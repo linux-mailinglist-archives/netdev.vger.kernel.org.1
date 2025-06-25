@@ -1,89 +1,99 @@
-Return-Path: <netdev+bounces-201281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8554AE8C55
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 20:26:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54A13AE8C64
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 20:31:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B0BA189D43D
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 18:26:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C1434A4F35
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 18:31:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4841C2D5439;
-	Wed, 25 Jun 2025 18:26:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ECFA2DA755;
+	Wed, 25 Jun 2025 18:31:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="fxss6MTr"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="VcTLptKK"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2075.outbound.protection.outlook.com [40.107.92.75])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2069.outbound.protection.outlook.com [40.107.236.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292942D5415
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 18:26:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.75
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18DCB2D8DBD;
+	Wed, 25 Jun 2025 18:30:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.69
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750875970; cv=fail; b=lYCrIyeelA02BNIBaeMsXsGvIyeqQJTrlwPyQQirpLQu2hc8cSNDh8bZGORYGqKi/P0dotjEmTI2nrRKLQeKhLIYJoLJCQ2r9jYIXNpg7dgvLWnRZd1c5QoaXvU5ETDTF8o37/kpDQf5Yov1FRsenjJ8khhjPYbCqbWvxHLjohw=
+	t=1750876260; cv=fail; b=o/35ovdJyt843AfpWEKQXIz3a7NggedrfaXepC0siQCcEpTQBorPmzRYIjHSOqzLlqhdBYMy+CSB0QU98cdi3YXc4eQP5sgTT4enpQxnz1e4olO7XQ5n9i8C622PGtomw/cLggN0CCr6adEs9d9i7gW2aK7Lo41OIOY5jxQb4vU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750875970; c=relaxed/simple;
-	bh=RTU0LVY6s6Pa2LvKVG3vhZ4V2E6m6gqWBWbp7WlOtnI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Qv9ouI5binBhiFTt43yD5raEGI/MEnR3XyI2W+VYCNLgSnZOuW3KN33/BfReTTqQD1HsCqLtephRZl936zNRjMG74qaFKlRjXQT+9qpnj1ZMX4Igeyxy2yAwp3tg4122bpB88VAA8jzbMine0i7YSBd0glrq+Ho7U2wj88bxXxw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=fxss6MTr; arc=fail smtp.client-ip=40.107.92.75
+	s=arc-20240116; t=1750876260; c=relaxed/simple;
+	bh=5LIJVIBurrFXH9Xqp8gZBvl0Y9J6Up9soWxc5yghu4g=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SZEu9P0TxgW/8e+kZiNV+KFyRH7rLF70XPA8GMpyE+iysqjwc6kMuzAAjShg1zmht7h7vWCr1C1IY2WYcaQTDk6gLLF4xirAmG4vXlH0Hw54RvS87I2YtZHaI5GgE0FbrCyvWyFfPEed5hEmo/dy4xALyNIU7Ev6HKq7pyjd/9o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=VcTLptKK; arc=fail smtp.client-ip=40.107.236.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Zw8rFrIq2hi++/bRNdIjsMtFGqe8KwS9UyAI78rMx82eQrPM03H1gdYtQpp8tYtMjvRQ3JGzUoXAQ0glYSoZeV4VoZqhVLZi9TOvOFN3Xh+z3biCyMsxJQd4YdKgqn4DtRtoF8BakKFKnGR/+zJ83XnnT5FMytYOgDOfhXHp/hh4PqsiWKuSJcwxX/XSM5Gc20qvgDYFIifM4+b1AZOQPv+xLMOnpImc6XdpGBXwnBSHCuGbRSKA+C5NUqyH3J/Hc6GHjd/pLniHGpUcNIg1aKAo0yc3jEZz6WkIyGI6azM0qApROqnrs0iKJ4z+stIeVhrXVj6scK9ulwg41ZEffA==
+ b=jAqD+FohXFL04UK6TT6cUvkOCGj6tk3GhNXPoSsmpFZ3f/EePGcdDl08VAgfHpL/4HTVekMEfHQ1Khe0tPNIGNEyGumP3DysemMI1bb9rwrscgSLjI+FFrI3/c6DInJo10tBKYDQN5ZF5hah7Xvw04zh9W6ptWknIICMZMJZwJDJqtk6HiMCDTMTJP/PX1mrr6VDYm0smr0CpJe9125J4bv2ftsSuJEV1LYEu4e5Q7AZutWlxSwzrKB12D4IRd5Lu+xAEa7ui0Huz24m634xyRre8Vmbs85usfcAoxO9SJYaOZi3ZzhW8wHcQqM8ICFXX4UGpM0hDxCkRC77iOKeVw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yS0a1tdUEHV3TySqKZWEhx17P4MhJueYakQJNMXjOv8=;
- b=Yci/3zgYPAN44dQi3m499euLWGcnCNG0sTKfUKBdXxoFObbF/ZY6Kk2ouqeLgRUxQtQeqnIEsu538KkxGhWnBKRLRZerMMza3LgKVwy2yW/J+z7Mva7YssJ1Eo5gY2gvrPGO9XzLXpC1ccWqxw27OIbo4RvxPNK6hxv9SV5dm/PZgcxS8FTbTQkGG/JbhJnfnJqehGc/IXVt2w0i0WuSFt1WcC9fdVdGIja3+TYP0KiVFqJ3UC8ZLDDm9Q/pAv/ErpCzWGak9hneY6SDYlW8B1JUK6Kbx+ME6ckZqGYe1u3SaREC0Q6SVN/3vCB4nuKJRNHV2AiaAtOweTshrcOBEg==
+ bh=YbzXMkpouc+mIYHMIF0trCD5Z4uJyghcl44Ay0BWKt4=;
+ b=G8GMbYXYgYTjESz/+tc/DjQZD/v0BJ5AvYETCGWwjAzOhwhNiRSLUScYKUKW0q6Xlvby5uh/9pqtFnjPdX3FjddIUamEc4aGIL3PQKlK2db4KkjxuDCVVsmq23PQa0rFWw+b10gIfiLKJSJmiZQ0KI5+x/N4DA9bGbOZYzCIjfsuyOqW2Jy2GYQUsvlitQXKNkTONNB7Jmh6lRZ+T+ly9vYNrgNhxMTOzvWcjLafLpxH+WhiM3A2DxD4E0UcbsBBTHsVkeJOFI0SC4N/MC0ZNGuL28oRyfyhP6k5to77fYINkp34oUPe07SJd29pj1K/yCgpMhc1H3MD0MgXAr+M+w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=gmail.com smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yS0a1tdUEHV3TySqKZWEhx17P4MhJueYakQJNMXjOv8=;
- b=fxss6MTrVzHWadcMO+fRu3v6ml4C6rJlvthExlF7/JckNrwoGafhPdwTmBrDWthrhuGwuL/9r5pSFHOi2hxfyEe+dZoqLQOrt+/RgGI3qjnyt5i8h/nWPmS9zckInbXM+FV03SKVuSGEzxP96YpDFoqizAiysf8Sg9dg5S6dgE4635fahcYVP97xov6z1Dvh9RDYnE/cOAnMLMOO4E2vX0BK6MCU0SWKHZvkVEzKC2P3yG+HO3zS/BN2ncpdd1opYeImmL+lu9+vHYeih5qtRknCW4UJnCgwyGKLrmPvrIPiWlmE8wiias1P2oZGywx5X1OQHHpm1T/MiBJGR92uzw==
-Received: from BYAPR02CA0019.namprd02.prod.outlook.com (2603:10b6:a02:ee::32)
- by SJ5PPF6785369A4.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::997) with
+ bh=YbzXMkpouc+mIYHMIF0trCD5Z4uJyghcl44Ay0BWKt4=;
+ b=VcTLptKKDFNkfWBrXqfSZx3Srg5eXZoI8a0Jj5fwwn4cMAYVVMSakaS4B5Z65ETrHRoAOYAiTHyKEzo85tFYRGCE1dp0y9YLlpp9wgRKxK8N3W6YalnGNnSu8xpauTCSoJWRLBT8K+vD4lnymPyf7Ce3ujQQnutpp2FfhaY4O5SFZk7K35JH/TksP5In0UGLJHA1dUFZx2EBl/P6d2BwQ5oeMDkB9kAtarvHwLhQcIeDgGeueq6jAspZZwbpa7Hdx7dhT6eixAxXChpToQ+rs3A/2Ajk+8MnN+Kv8+IVKe6v3sHSGZpZrHu7RxOLVSlPSARcF6BVl94YqCJHEiDrPg==
+Received: from SJ0PR13CA0201.namprd13.prod.outlook.com (2603:10b6:a03:2c3::26)
+ by DS5PPF23E22D637.namprd12.prod.outlook.com (2603:10b6:f:fc00::647) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.28; Wed, 25 Jun
- 2025 18:26:01 +0000
-Received: from SJ5PEPF000001EE.namprd05.prod.outlook.com
- (2603:10b6:a02:ee:cafe::d8) by BYAPR02CA0019.outlook.office365.com
- (2603:10b6:a02:ee::32) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8857.29 via Frontend Transport; Wed,
- 25 Jun 2025 18:26:00 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8678.31; Wed, 25 Jun
+ 2025 18:30:54 +0000
+Received: from SJ5PEPF000001F0.namprd05.prod.outlook.com
+ (2603:10b6:a03:2c3:cafe::41) by SJ0PR13CA0201.outlook.office365.com
+ (2603:10b6:a03:2c3::26) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8901.6 via Frontend Transport; Wed,
+ 25 Jun 2025 18:30:54 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- SJ5PEPF000001EE.mail.protection.outlook.com (10.167.242.202) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ5PEPF000001F0.mail.protection.outlook.com (10.167.242.68) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8880.14 via Frontend Transport; Wed, 25 Jun 2025 18:26:00 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.8880.14 via Frontend Transport; Wed, 25 Jun 2025 18:30:52 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 25 Jun
- 2025 11:25:49 -0700
-Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Wed, 25 Jun 2025 11:25:48 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
- Transport; Wed, 25 Jun 2025 11:25:47 -0700
+ 2025 11:30:27 -0700
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail202.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 25 Jun
+ 2025 11:30:27 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Wed, 25
+ Jun 2025 11:30:21 -0700
 From: Mark Bloch <mbloch@nvidia.com>
-To: David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, Carolina Jubran <cjubran@nvidia.com>, Mark Bloch
-	<mbloch@nvidia.com>
-Subject: [RFC PATCH iproute2-next] devlink: Add support for 'tc-bw' attribute in devlink-rate
-Date: Wed, 25 Jun 2025 21:25:45 +0300
-Message-ID: <20250625182545.86994-1-mbloch@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>
+CC: <saeedm@nvidia.com>, <gal@nvidia.com>, <leonro@nvidia.com>,
+	<tariqt@nvidia.com>, Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko
+	<jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Leon Romanovsky
+	<leon@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, Jeff Layton
+	<jlayton@kernel.org>, NeilBrown <neil@brown.name>, Olga Kornievskaia
+	<okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
+	<tom@talpey.com>, Shuah Khan <shuah@kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, Mark Bloch <mbloch@nvidia.com>
+Subject: [PATCH net-next v11 0/8] Support rate management on traffic classes in devlink and mlx5
+Date: Wed, 25 Jun 2025 21:30:10 +0300
+Message-ID: <20250625183018.87065-1-mbloch@nvidia.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -91,468 +101,268 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 X-NV-OnPremToCloud: AnonymousSubmission
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ5PEPF000001EE:EE_|SJ5PPF6785369A4:EE_
-X-MS-Office365-Filtering-Correlation-Id: 16210c40-5bad-4e39-8153-08ddb415bcb6
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001F0:EE_|DS5PPF23E22D637:EE_
+X-MS-Office365-Filtering-Correlation-Id: 120ca019-7131-4397-0bbe-08ddb4166ad4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013|13003099007;
+	BCL:0;ARA:13230040|1800799024|376014|7416014|82310400026|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?eV9bLaF0Kz4bPAl+xNqCh7CiVNwedemuw2ekPWH2+ddgT+JVPuDTHV3eI50n?=
- =?us-ascii?Q?JXjFrBgtbOxL86bNF4njoVnwH1O7oT5snMW1ZeqS18us9AFiboW2ap53iLye?=
- =?us-ascii?Q?IFbewqTu51H+aaBCZue5DQUCkEZmSK91zztCOPhItqxTHCadMerhpJ/cw5o7?=
- =?us-ascii?Q?F7b4IcDWQRWIaR8mC02GSnGhQuDVQpofaR0oW4YTQRwG0a7DRUxN8/Ee2Iof?=
- =?us-ascii?Q?Q+sGHP9ELWneDgbhBauXQF2OyNTK2jDpr+9ihT5/Roh07rJLlz66P73Ea2Je?=
- =?us-ascii?Q?hNolEVIwiVT5nQ4wfmceP8Ww5+hnJcslcAwI/z2kcvsMM2HdiWU/3ZmwzHai?=
- =?us-ascii?Q?GnJFzWZqO+2fCiQ4TssLsvCRDcNzHRQIV61Q7Y053MoX1oNFfxK0yrA7Cd+9?=
- =?us-ascii?Q?vW2788PFDDf2FlkdrVFfJ//EVfBXG4ZwpMiBo6OPxC59d9csrwiWdh6OdG+r?=
- =?us-ascii?Q?kmSzX2dgPRbh0BzE/9FQYITX+yVzPXfN5etMim8ptcBk4EPJpDXtVbZhJvHq?=
- =?us-ascii?Q?3UYuHkMUv84xnuCQlS0Hcx8nKJqqi3wt3F7wwkt9e/QpMIExDcy/9YSNGvMg?=
- =?us-ascii?Q?qpMJmpD0PYYRHmlCKjwvKqpRb69ggUNtW5ojDFkoQMnK4nv7WkBkJ9MccF7T?=
- =?us-ascii?Q?EnlfGtDvQKAJ79l6xIv64KZ9YikHhgbWwUA5qHbFRONOQ04oqEnHysWsa6Xy?=
- =?us-ascii?Q?Z11wKyY6+jeUNYlkixL2dxKMwL6fttMf2qenbMqi0BqMjnve5hPQuK5m3Aqf?=
- =?us-ascii?Q?p2RKBN3ZT17iiH2TUcEeilslppHZEKkM0dSVOCcWmUW3Cyvf+1Bubb/U8tLq?=
- =?us-ascii?Q?9VfFE3PBVNTb6V0jKJpOfbNoeqY+kyI+7QIigAoTJUiyvp00hDItfKCE4NH1?=
- =?us-ascii?Q?LsOQh2mZXeS1zL9g1UWzeYBtihzzAedRJtDQZ3807w2cSHICglkzB4yVmPzv?=
- =?us-ascii?Q?QdiU98ccY8RCc7XqFwNQplyaXcw2YYsZDalMl5zDWJjcLV0CSHUbsKYIL0xI?=
- =?us-ascii?Q?ZfS9EEcrbUsz8Yf7NqjUo98HspcUfPGF0bvUE/nK6w27SlJlOewMGHDV24av?=
- =?us-ascii?Q?oV3ma8VgCsaWKJks/wMePQUn1pccduH9oFdlij117Z14xPqlvRk5RlRPS8f9?=
- =?us-ascii?Q?psaRN51MRIenwW1EPW33w86dBVJ+ch2BNbrvABHU0d3kg5t0Y95PQtiBAGdl?=
- =?us-ascii?Q?EUbkkT2oVZvPQj0sY+s+aXqQvXq/t19EJ9GhkIwTEF6MHps+faOqNtF4wzTx?=
- =?us-ascii?Q?j6CuAtJZ5cjrRgmFVSujWxx0pfnjM7XZt5P1en5b2vzrwaWdB9vnBS7wtMik?=
- =?us-ascii?Q?j1E8+zJpNc4aJEG1k4U4RYHN0MnA6Rj/rgKa3HRjMDe1dQ2joLu2WnNUK30u?=
- =?us-ascii?Q?04yDwWjXn7JNw4PMjlbFigvWADiPdYoa+7fYWiJxB9raiAu6Ey9R6FmfXIDO?=
- =?us-ascii?Q?Gjtoh7GGBbOv3E4b8JI5z4p740vVj5MtB6stGBB8DPoSqf3ABGLxLn0+nHaI?=
- =?us-ascii?Q?0oMeLPSGPuZ1JKdeYWTU2tMFOMNMa8UrkjX92NGDJMJED4rpQwzdQpmJog?=
- =?us-ascii?Q?=3D=3D?=
+	=?utf-8?B?aWJrQWFmRHk0VDFKMkU4aWFWUnl3dTYyTFE0WWVWaDh4dnkyS3BoRDRqNlgr?=
+ =?utf-8?B?Q1gzdXJ0dkp5UkVqcWZ3RHgzajdYcWNzUy83QllOaGlQQ2o1Y1FpNWFFNk4z?=
+ =?utf-8?B?bzhZUVVUZTZaT09GYUpRL1Z0aEFKYXRWNWdYMitHcjErOGkzVXJUY25jNklm?=
+ =?utf-8?B?cEI1UTkzWHdwZU9LeVZuaEZpUHgwYTFNdTRMUlFtbkdlT2JES014SkNQYSt5?=
+ =?utf-8?B?T2JQdk5ScXJhNHpDYnhJVENWWHpyVXFrcFdVTVZLZGRBeTVBMUdXL04rcWp3?=
+ =?utf-8?B?UGUxTDIrSmsyM2RjeHJhTEhMSU4vdmwvd1pTTUhhWEtpa2xobmk2eVN4V1F5?=
+ =?utf-8?B?OTZzMWxPTkVxMTFwSEhidFR6SmoyYjJST2tEYW5taHhyTUZkanFnVDBrZk5E?=
+ =?utf-8?B?Y0o5ZGNrM3dMSHkwaEJHWU9Nbk5sYk1kR2tscmhWNmxUV0VyWW5TNnVUUUtt?=
+ =?utf-8?B?MGNUNkkxNmR1dytpYmtqSWNlZHlnejFNTzhZRGk3U3hyUS9ua2JuTjBRc28x?=
+ =?utf-8?B?Y2gyYlZoeHVrSHdpZXpZakpVSnRwSlBnK3lVWUVkU2xyZmF1aFRZTUZNZVhG?=
+ =?utf-8?B?bHpzTUNjWVJLY3JYb2U3eU1qTEY1ME05c0VleTI1Njd4RENnRXhHTkJQMSsw?=
+ =?utf-8?B?RzlDbmEvUmpSWmRNRCtTY3B3N0JDOHNpZDd4Q0JvMzVTWTdQY1R0eThzR2pP?=
+ =?utf-8?B?UFVlTHZJSkZsSFpIVzRJNTNXWUwzWGljZjVpVGF5Um1ORThpeVcxMUEyd3g1?=
+ =?utf-8?B?TUVOVGhBcGg4dGRGb0VZL3dSN1JTWklpeXZFbWlZTDBJSGxXZ3FHd2JoT0JC?=
+ =?utf-8?B?UC9sbmhtVkx5cjVhVDF3L3NpUFAyNUphRW0yUU9ZdmZjWVh0YzlLdHVFYnRi?=
+ =?utf-8?B?Y2l4Ry9wZzk0bURxSGVGcVArTlArMGExR3hpSkl5QlFKSEZBV1cwRmliNDJj?=
+ =?utf-8?B?V0Q5OEdrMmozcW9CM3RSUmU0ZnBLVVlBWGh2Wjc0NUtTZWxQdlJVY1B5ZDR0?=
+ =?utf-8?B?OExQRFRackplTDlPVlhuWWlYc1VGUWZrV0QwdnpMeHNZSWdCMXMxYWpIWFVI?=
+ =?utf-8?B?eTI0eUl4dkRVdDF3RXZBR1k4WWI5T1I2Q2RMclc5a0kvZ1JUVEF5eStRQWxX?=
+ =?utf-8?B?ZUhiMkFsWll5NWZHbTVzb053Y1NwemxyOEZDaXpLTm9YQUFlZjNJWjBQOTZi?=
+ =?utf-8?B?Vy9XQzFMZ2kzR0krS0d5aGtndGFsMzdDbVZDWVlyRHZoRlo1ZGt2eWIzbXFk?=
+ =?utf-8?B?K01nMU1zRUZTMXhlc0tLNW4xMytlREViMEt0KzRNRzZNdm1wQ1k3SVFnbkFC?=
+ =?utf-8?B?c05vVEQzeGVSeWZxcTZ6NnRsY0RjbzhnbElNN1hVQXZFZ3NJQThYbGtWeEtO?=
+ =?utf-8?B?ekZ4Qy9GSjZKUHpibWFDRnVuWGJ6WnFOY0Ruak0zZ1hGQm11djFnNTg1N2dq?=
+ =?utf-8?B?L3RUNy9iY1E1T0M0ZmJvUzAyNHlXMjNQa0oycnhVbHlvMXIzWEVyTU9XdFYr?=
+ =?utf-8?B?bWZpcjByeHRkNzhTT1ZlTW53Q0RqT0xRTWlncDN2Mk5MVmxGbFQwZnFISytB?=
+ =?utf-8?B?UjkrVnJhTzMwNGtnRnRqcU1WVTZvM3BWVTVRSWZqNnNjdkJoZVhtWEhMU0RB?=
+ =?utf-8?B?UXlSSHI5UCtmelRwOGdmcnFvY2JENldTY3dGKzdzVjM3ZCs0NFl3NE50L3JL?=
+ =?utf-8?B?bkNsY1VsWTNGNGg2cDdpeFVEa2pKQXBtUlZXMEM4OUJ5NlMzYXUxOHl1bzhJ?=
+ =?utf-8?B?alhhMnhKRm1WRUw3Vk9JVUdycElDemJieVlweHNNVjNNMENmeTZvUmMrNDlw?=
+ =?utf-8?B?QlFKK2h3Z3JYTTVOQ0kzbUlzVHg2eDZXaEpIdWRCZnBGWitBU1A4cjRsa2pK?=
+ =?utf-8?B?R1FteTBWV2lTcGQ5V0JpS2liVVdwcjRGUUJsSGVtb3c0SGdBb21JOTE2VlNn?=
+ =?utf-8?B?ZENneVVCWW14WXQ0SUhIZGYzY1YzWXprcTVSbE5aWkVKazhkWXQ0bjFTUkJ2?=
+ =?utf-8?B?VGlHSjc5SVowR1J1S2pOZDJhcmVCZ0dNUW4rbnZaSkY5SkNaL29TenEwWU5n?=
+ =?utf-8?B?alNaVklaWGZ3dEFhNkIzQUZXNCtmL3hFbCtuQT09?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013)(13003099007);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2025 18:26:00.9156
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2025 18:30:52.9433
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 16210c40-5bad-4e39-8153-08ddb415bcb6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 120ca019-7131-4397-0bbe-08ddb4166ad4
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ5PEPF000001EE.namprd05.prod.outlook.com
+	SJ5PEPF000001F0.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF6785369A4
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS5PPF23E22D637
 
-From: Carolina Jubran <cjubran@nvidia.com>
+V11:
+- Refactored the devlink code to accept relative TC bandwidth share
+  values instead of percentages.
+- Updated documentation to clarify that values are interpreted as
+  relative shares.
+- Refactored the logic in mlx5 to support proportional scaling for
+  tc-bw values.
+- Switched to `nlmsg_for_each_attr_type()` for cleaner attribute
+  parsing.
+- Added a hardware selftest to validate TC bandwidth behavior.
+- Refactored esw_qos_is_node_empty for readability.
 
-Introduce a new attribute 'tc-bw' to devlink-rate, allowing users to set
-the bandwidth allocation per traffic class. The new attribute enables
-fine-grained QoS configurations by assigning relative bandwidth shares
-to each traffic class, supporting more precise traffic shaping, which
-helps in achieving more precise bandwidth management across traffic
-streams.
+V10:
+- Added netdevsim selftest for tc-bw ops.
+- Dropped header: field as it’s unnecessary for local constants in
+  devlink.yaml.
 
-Add support for configuring 'tc-bw' via the devlink userspace utility
-and parse the 'tc-bw' arguments for accurate bandwidth assignment per
-traffic class.
+V9:
+- Defined DEVLINK_RATE_TCS_MAX as 8 in uapi/linux/devlink.h.
+- Replaced IEEE_8021QAZ_MAX_TCS with DEVLINK_RATE_TCS_MAX throughout
+  the code.
+- Updated devlink-rate-tc-index-max spec to reference the correct UAPI
+  header.
 
-This feature supports 8 traffic classes as defined by the IEEE 802.1Qaz
-standard.
+V8:
+- Limit line width to 80 characters in mlx5 changes instead of 100.
+- Increase the scheduling node levels to support TC arbitration.
+- Ensure parent nodes are set correctly in all code paths that extend
+  the hierarchy depth for TC arbitration.
+- Extended the cover letter with the ongoing discussion on devlink-rate
+  and net-shapers.
+- Extended the cover letter with the Netdev talk link on this series.
 
-Example commands:
-$ devlink port function rate add pci/0000:08:00.0/group \
-  tx_share 10Gbit tx_max 50Gbit tc-bw 0:20 1:0 2:0 3:0 4:0 5:80 6:0 7:0
+V7:
+- Fixed disabling tc-bw on leaf nodes that did not have tc-bw
+  configured.
+- Fixed an issue where tc-bw was disabled on a node with assigned
+  vports, ensuring that vport->qos.sched_node->parent is correctly
+  updated with the cloned node.
+- Declared a constant for the maximum allowed Traffic Class index in
+  devlink rate.
+- Added a range check to validate rate-tc-index.
+- Added documentation for the tc-bw argument.
+- Add a validation check to ensure that the total bandwidth assigned to
+  all traffic classes sums to 100.
 
-$ devlink port function rate set pci/0000:08:00.0/group \
-  tc-bw 0:20 1:0 2:0 3:0 4:0 5:80 6:0 7:0
+V6:
+- Addressed comments on devlink patch #3.
+- Removed first 4 IFC patches, to be pulled from mlx5-next.
 
-Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
-Signed-off-by: Mark Bloch <mbloch@nvidia.com>
----
+V5:
+- Fix warning in devlink_nl_rate_tc_bw_set().
+- Fix target branch of patch #4.
 
-Per Jakub's request[0] this is the iproute2 patch for the rate
-management support series. Support for this is added in v11.
+V4:
+- Renamed the nested attribute for traffic class bandwidth to
+  DEVLINK_ATTR_RATE_TC_BWS.
+- Changed the order of the attributes in `devlink.h`.
+- Refactored the initialization tc-bw array in
+  devlink_nl_rate_tc_bw_set().
+- Added extack messages to provide clear feedback on issues with tc-bw
+  arguments.
+- Updated `rate-tc-bws` to support a multi-attr set, where each
+  attribute includes an index and the corresponding bandwidth for that
+  traffic class.
+- Handled the issue where the user could provide
+  DEVLINK_ATTR_RATE_TC_BWS with duplicate indices.
+- Provided ynl exmaples in patch [1/5] commit message.
+- Take IFC patches to beginning of the series, targeted for mlx5-next.
 
-I've incldued the header file changes in this patch for ease of use.
+V3:
+- Dropped rate-tc-index, using tc-bw array index instead.
+- Renamed rate-bw to rate-tc-bw.
+- Documneted what the rate-tc-bw represents and added a range check for
+  validation.
+- Intorduced devlink_nl_rate_tc_bw_set() to parse and set the TC
+  bandwidth values.
+- Updated the user API in the commit message of patch 1/6 to ensure
+  bandwidths sum equals 100.
+- Fixed missing filling of rate-parent in devlink_nl_rate_fill().
 
-[0] - https://lore.kernel.org/netdev/20250521152431.56a77580@kernel.org/
+V2:
+- Included <linux/dcbnl.h> in devlink.h to resolve missing
+  IEEE_8021QAZ_MAX_TCS definition.
+- Refactored the rate-tc-bw attribute structure to use a separate
+  rate-tc-index.
+- Updated patch 2/6 title.
 
- devlink/devlink.c            | 191 +++++++++++++++++++++++++++++++++--
- include/uapi/linux/devlink.h |   9 ++
- man/man8/devlink-rate.8      |  14 +++
- 3 files changed, 208 insertions(+), 6 deletions(-)
+This patch series extends the devlink-rate API to support traffic class
+(TC) bandwidth management, enabling more granular control over traffic
+shaping and rate limiting across multiple TCs. The API now allows users
+to specify bandwidth proportions for different traffic classes in a
+single command. This is particularly useful for managing Enhanced
+Transmission Selection (ETS) for groups of Virtual Functions (VFs),
+allowing precise bandwidth allocation across traffic classes.
 
-diff --git a/devlink/devlink.c b/devlink/devlink.c
-index d14f3f45..75ade8bf 100644
---- a/devlink/devlink.c
-+++ b/devlink/devlink.c
-@@ -310,6 +310,7 @@ static int ifname_map_update(struct ifname_map *ifname_map, const char *ifname)
- #define DL_OPT_PORT_FN_RATE_TX_WEIGHT	BIT(56)
- #define DL_OPT_PORT_FN_CAPS	BIT(57)
- #define DL_OPT_PORT_FN_MAX_IO_EQS	BIT(58)
-+#define DL_OPT_PORT_FN_RATE_TC_BWS	BIT(59)
- 
- struct dl_opts {
- 	uint64_t present; /* flags of present items */
-@@ -372,6 +373,7 @@ struct dl_opts {
- 	uint32_t rate_tx_weight;
- 	char *rate_node_name;
- 	const char *rate_parent_node;
-+	uint32_t rate_tc_bw[DEVLINK_RATE_TCS_MAX];
- 	uint32_t linecard_index;
- 	const char *linecard_type;
- 	bool selftests_opt[DEVLINK_ATTR_SELFTEST_ID_MAX + 1];
-@@ -1699,6 +1701,84 @@ static int dl_args_finding_required_validate(uint64_t o_required,
- 	return err;
- }
- 
-+static int
-+parse_tc_bw_arg(const char *tc_bw_str, int *tc_index, uint32_t *tc_bw)
-+{
-+	char *index, *value, *endptr;
-+	char *input = NULL;
-+	int err;
-+
-+	input = strdup(tc_bw_str);
-+	if (!input)
-+		return -ENOMEM;
-+
-+	err = str_split_by_char(input, &index, &value, ':');
-+	if (err) {
-+		pr_err("Invalid format in token: %s\n", input);
-+		goto out;
-+	}
-+
-+	*tc_index = strtoul(index, &endptr, 10);
-+	if (endptr && *endptr) {
-+		pr_err("Invalid traffic class index: %s\n", index);
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+	*tc_bw = strtoul(value, &endptr, 10);
-+	if (endptr && *endptr) {
-+		pr_err("Invalid bandwidth value: %s\n", value);
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+out:
-+	free(input);
-+	return err;
-+}
-+
-+static int parse_tc_bw_args(struct dl *dl, uint32_t *tc_bw)
-+{
-+	bool parsed_indices[DEVLINK_RATE_TCS_MAX] = {};
-+	const char *tc_bw_str;
-+	int index, err, i;
-+	uint32_t bw;
-+
-+	memset(tc_bw, 0, sizeof(uint32_t) * DEVLINK_RATE_TCS_MAX);
-+
-+	for (i = 0; i < DEVLINK_RATE_TCS_MAX; i++) {
-+		err = dl_argv_str(dl, &tc_bw_str);
-+		if (err) {
-+			fprintf(stderr,
-+				"Error parsing tc-bw: example usage: tc-bw 0:60 1:10 2:0 3:0 4:30 5:0 6:0 7:0\n");
-+			return err;
-+		}
-+
-+		err = parse_tc_bw_arg(tc_bw_str, &index, &bw);
-+		if (err)
-+			return err;
-+
-+		if (index < 0 || index >= DEVLINK_RATE_TCS_MAX) {
-+			fprintf(stderr,
-+				"Error parsing tc-bw: invalid index: %d, use values between 0 and %d\n",
-+				index, DEVLINK_RATE_TC_INDEX_MAX);
-+			return -EINVAL;
-+		}
-+
-+		if (parsed_indices[index]) {
-+			fprintf(stderr,
-+				"Error parsing tc-bw: duplicate index : %d\n",
-+				index);
-+			return -EINVAL;
-+		}
-+
-+		tc_bw[index] = bw;
-+		parsed_indices[index] = true;
-+	}
-+
-+	return 0;
-+}
-+
- static int dl_argv_parse(struct dl *dl, uint64_t o_required,
- 			 uint64_t o_optional)
- {
-@@ -2237,6 +2317,13 @@ static int dl_argv_parse(struct dl *dl, uint64_t o_required,
- 			dl_arg_inc(dl);
- 			opts->rate_parent_node = "";
- 			o_found |= DL_OPT_PORT_FN_RATE_PARENT;
-+		} else if (dl_argv_match(dl, "tc-bw") &&
-+			   (o_all & DL_OPT_PORT_FN_RATE_TC_BWS)) {
-+			dl_arg_inc(dl);
-+			err = parse_tc_bw_args(dl, opts->rate_tc_bw);
-+			if (err)
-+				return err;
-+			o_found |= DL_OPT_PORT_FN_RATE_TC_BWS;
- 		} else if (dl_argv_match(dl, "lc") &&
- 			   (o_all & DL_OPT_LINECARD)) {
- 			dl_arg_inc(dl);
-@@ -2678,6 +2765,20 @@ static void dl_opts_put(struct nlmsghdr *nlh, struct dl *dl)
- 	if (opts->present & DL_OPT_PORT_FN_RATE_PARENT)
- 		mnl_attr_put_strz(nlh, DEVLINK_ATTR_RATE_PARENT_NODE_NAME,
- 				  opts->rate_parent_node);
-+	if (opts->present & DL_OPT_PORT_FN_RATE_TC_BWS) {
-+		struct nlattr *nla_tc_bw_entry;
-+		int i;
-+
-+		for (i = 0; i < DEVLINK_RATE_TCS_MAX; i++) {
-+			nla_tc_bw_entry =
-+				mnl_attr_nest_start(nlh,
-+						    DEVLINK_ATTR_RATE_TC_BWS);
-+			mnl_attr_put_u8(nlh, DEVLINK_ATTR_RATE_TC_INDEX, i);
-+			mnl_attr_put_u32(nlh, DEVLINK_ATTR_RATE_TC_BW,
-+					 opts->rate_tc_bw[i]);
-+			mnl_attr_nest_end(nlh, nla_tc_bw_entry);
-+		}
-+	}
- 	if (opts->present & DL_OPT_LINECARD)
- 		mnl_attr_put_u32(nlh, DEVLINK_ATTR_LINECARD_INDEX,
- 				 opts->linecard_index);
-@@ -5366,7 +5467,55 @@ static char *port_rate_type_name(uint16_t type)
- 	}
- }
- 
--static void pr_out_port_fn_rate(struct dl *dl, struct nlattr **tb)
-+static int
-+parse_rate_tc_bw(struct nlattr *nla_tc_bw, uint8_t *tc_index, uint32_t *tc_bw)
-+{
-+	struct nlattr *tb_tc_bw[DEVLINK_ATTR_MAX + 1] = {};
-+
-+	if (mnl_attr_parse_nested(nla_tc_bw, attr_cb, tb_tc_bw) != MNL_CB_OK)
-+		return MNL_CB_ERROR;
-+
-+	if (!tb_tc_bw[DEVLINK_ATTR_RATE_TC_INDEX] ||
-+	    !tb_tc_bw[DEVLINK_ATTR_RATE_TC_BW])
-+		return MNL_CB_ERROR;
-+
-+	*tc_index = mnl_attr_get_u8(tb_tc_bw[DEVLINK_ATTR_RATE_TC_INDEX]);
-+	*tc_bw = mnl_attr_get_u32(tb_tc_bw[DEVLINK_ATTR_RATE_TC_BW]);
-+
-+	return MNL_CB_OK;
-+}
-+
-+static void pr_out_port_fn_rate_tc_bw(struct dl *dl, const struct nlmsghdr *nlh)
-+{
-+	struct nlattr *nla_tc_bw;
-+
-+	mnl_attr_for_each(nla_tc_bw, nlh, sizeof(struct genlmsghdr)) {
-+		uint8_t tc_index;
-+		uint32_t tc_bw;
-+
-+		if (mnl_attr_get_type(nla_tc_bw) != DEVLINK_ATTR_RATE_TC_BWS)
-+			continue;
-+
-+		if (parse_rate_tc_bw(nla_tc_bw, &tc_index, &tc_bw) != MNL_CB_OK)
-+			continue;
-+
-+		if (tc_bw) {
-+			char buf[32];
-+
-+			if (dl->json_output) {
-+				snprintf(buf, sizeof(buf), "tc_%u", tc_index);
-+				print_uint(PRINT_JSON, buf, "%u", tc_bw);
-+			 } else {
-+				snprintf(buf, sizeof(buf), " tc_%u bw %u",
-+					 tc_index, tc_bw);
-+				print_string(PRINT_ANY, NULL, "%s", buf);
-+			}
-+		}
-+	}
-+}
-+
-+static void pr_out_port_fn_rate(struct dl *dl, const struct nlmsghdr *nlh,
-+				struct nlattr **tb)
- {
- 
- 	if (!tb[DEVLINK_ATTR_RATE_NODE_NAME])
-@@ -5412,6 +5561,7 @@ static void pr_out_port_fn_rate(struct dl *dl, struct nlattr **tb)
- 			print_uint(PRINT_ANY, "tx_weight",
- 				   " tx_weight %u", weight);
- 	}
-+
- 	if (tb[DEVLINK_ATTR_RATE_PARENT_NODE_NAME]) {
- 		const char *parent =
- 			mnl_attr_get_str(tb[DEVLINK_ATTR_RATE_PARENT_NODE_NAME]);
-@@ -5419,6 +5569,9 @@ static void pr_out_port_fn_rate(struct dl *dl, struct nlattr **tb)
- 		print_string(PRINT_ANY, "parent", " parent %s", parent);
- 	}
- 
-+	if (tb[DEVLINK_ATTR_RATE_TC_BWS])
-+		pr_out_port_fn_rate_tc_bw(dl, nlh);
-+
- 	pr_out_port_handle_end(dl);
- }
- 
-@@ -5434,7 +5587,7 @@ static int cmd_port_fn_rate_show_cb(const struct nlmsghdr *nlh, void *data)
- 	    !tb[DEVLINK_ATTR_RATE_NODE_NAME]) {
- 		return MNL_CB_ERROR;
- 	}
--	pr_out_port_fn_rate(dl, tb);
-+	pr_out_port_fn_rate(dl, nlh, tb);
- 	return MNL_CB_OK;
- }
- 
-@@ -5443,12 +5596,13 @@ static void cmd_port_fn_rate_help(void)
- 	pr_err("Usage: devlink port function rate help\n");
- 	pr_err("       devlink port function rate show [ DEV/{ PORT_INDEX | NODE_NAME } ]\n");
- 	pr_err("       devlink port function rate add DEV/NODE_NAME\n");
--	pr_err("               [ tx_share VAL ][ tx_max VAL ][ tx_priority N ][ tx_weight N ][ { parent NODE_NAME | noparent } ]\n");
-+	pr_err("               [ tx_share VAL ][ tx_max VAL ][ tx_priority N ][ tx_weight N ][ tc-bw INDEX:N ... INDEX:N ][ { parent NODE_NAME | noparent } ]\n");
- 	pr_err("       devlink port function rate del DEV/NODE_NAME\n");
- 	pr_err("       devlink port function rate set DEV/{ PORT_INDEX | NODE_NAME }\n");
--	pr_err("               [ tx_share VAL ][ tx_max VAL ][ tx_priority N ][ tx_weight N ][ { parent NODE_NAME | noparent } ]\n\n");
-+	pr_err("               [ tx_share VAL ][ tx_max VAL ][ tx_priority N ][ tx_weight N ][ tc-bw INDEX:N ... INDEX:N ][ { parent NODE_NAME | noparent } ]\n\n");
- 	pr_err("       VAL - float or integer value in units of bits or bytes per second (bit|bps)\n");
- 	pr_err("       N - integer representing priority/weight of the node among siblings\n");
-+	pr_err("       INDEX - integer representing traffic class index in the tc-bw option, ranging from 0 to 7\n");
- 	pr_err("       and SI (k-, m-, g-, t-) or IEC (ki-, mi-, gi-, ti-) case-insensitive prefix.\n");
- 	pr_err("       Bare number, means bits per second, is possible.\n\n");
- 	pr_err("       For details refer to devlink-rate(8) man page.\n");
-@@ -5503,7 +5657,8 @@ static int cmd_port_fn_rate_add(struct dl *dl)
- 			    DL_OPT_PORT_FN_RATE_TX_SHARE | DL_OPT_PORT_FN_RATE_TX_MAX |
- 			    DL_OPT_PORT_FN_RATE_TX_PRIORITY |
- 			    DL_OPT_PORT_FN_RATE_TX_WEIGHT |
--			    DL_OPT_PORT_FN_RATE_PARENT);
-+			    DL_OPT_PORT_FN_RATE_PARENT |
-+			    DL_OPT_PORT_FN_RATE_TC_BWS);
- 	if (err)
- 		return err;
- 
-@@ -5538,6 +5693,25 @@ static int cmd_port_fn_rate_del(struct dl *dl)
- 	return mnlu_gen_socket_sndrcv(&dl->nlg, nlh, NULL, NULL);
- }
- 
-+static void parse_tc_bw_entries(const struct nlmsghdr *nlh,
-+				struct dl_opts *opts)
-+{
-+	struct nlattr *nla_tc_bw;
-+
-+	mnl_attr_for_each(nla_tc_bw, nlh, sizeof(struct genlmsghdr)) {
-+		uint8_t tc_index;
-+		uint32_t tc_bw;
-+
-+		if (mnl_attr_get_type(nla_tc_bw) != DEVLINK_ATTR_RATE_TC_BWS)
-+			continue;
-+
-+		if (parse_rate_tc_bw(nla_tc_bw, &tc_index, &tc_bw) != MNL_CB_OK)
-+			continue;
-+
-+		opts->rate_tc_bw[tc_index] = tc_bw;
-+	}
-+}
-+
- static int port_fn_get_rates_cb(const struct nlmsghdr *nlh, void *data)
- {
- 	struct dl_opts *opts = data;
-@@ -5563,6 +5737,10 @@ static int port_fn_get_rates_cb(const struct nlmsghdr *nlh, void *data)
- 	if (tb[DEVLINK_ATTR_RATE_TX_WEIGHT])
- 		opts->rate_tx_weight =
- 			mnl_attr_get_u32(tb[DEVLINK_ATTR_RATE_TX_WEIGHT]);
-+
-+	if (tb[DEVLINK_ATTR_RATE_TC_BWS])
-+		parse_tc_bw_entries(nlh, opts);
-+
- 	return MNL_CB_OK;
- }
- 
-@@ -5578,7 +5756,8 @@ static int cmd_port_fn_rate_set(struct dl *dl)
- 				DL_OPT_PORT_FN_RATE_TX_MAX |
- 				DL_OPT_PORT_FN_RATE_TX_PRIORITY |
- 				DL_OPT_PORT_FN_RATE_TX_WEIGHT |
--				DL_OPT_PORT_FN_RATE_PARENT);
-+				DL_OPT_PORT_FN_RATE_PARENT |
-+				DL_OPT_PORT_FN_RATE_TC_BWS);
- 	if (err)
- 		return err;
- 
-diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
-index 9a1bdc94..78f505c1 100644
---- a/include/uapi/linux/devlink.h
-+++ b/include/uapi/linux/devlink.h
-@@ -221,6 +221,11 @@ enum devlink_port_flavour {
- 				      */
- };
- 
-+/* IEEE 802.1Qaz standard supported values. */
-+
-+#define DEVLINK_RATE_TCS_MAX 8
-+#define DEVLINK_RATE_TC_INDEX_MAX (DEVLINK_RATE_TCS_MAX - 1)
-+
- enum devlink_rate_type {
- 	DEVLINK_RATE_TYPE_LEAF,
- 	DEVLINK_RATE_TYPE_NODE,
-@@ -629,6 +634,10 @@ enum devlink_attr {
- 
- 	DEVLINK_ATTR_REGION_DIRECT,		/* flag */
- 
-+	DEVLINK_ATTR_RATE_TC_BWS,		/* nested */
-+	DEVLINK_ATTR_RATE_TC_INDEX,		/* u8 */
-+	DEVLINK_ATTR_RATE_TC_BW,		/* u32 */
-+
- 	/* Add new attributes above here, update the spec in
- 	 * Documentation/netlink/specs/devlink.yaml and re-generate
- 	 * net/devlink/netlink_gen.c.
-diff --git a/man/man8/devlink-rate.8 b/man/man8/devlink-rate.8
-index f09ac4ac..47e2ebc5 100644
---- a/man/man8/devlink-rate.8
-+++ b/man/man8/devlink-rate.8
-@@ -28,6 +28,7 @@ devlink-rate \- devlink rate management
- .RB [ " tx_max \fIVALUE " ]
- .RB [ " tx_priority \fIN " ]
- .RB [ " tx_weight \fIN " ]
-+.RB [ " tc-bw \fIINDEX:N " ]
- .RB "[ {" " parent \fINODE_NAME " | " noparent " "} ]"
- 
- .ti -8
-@@ -36,6 +37,7 @@ devlink-rate \- devlink rate management
- .RB [ " tx_max \fIVALUE " ]
- .RB [ " tx_priority \fIN " ]
- .RB [ " tx_weight \fIN " ]
-+.RB [ " tc-bw \fIINDEX:N " ]
- .RB "[ {" " parent \fINODE_NAME " | " noparent " "} ]"
- 
- .ti -8
-@@ -101,6 +103,12 @@ As a node is configured with a higher rate it gets more BW relative to it's
- siblings. Values are relative like a percentage points, they basically tell
- how much BW should node take relative to it's siblings.
- .PP
-+.BI tc-bw " INDEX:N"
-+- allows the user to assign relative bandwidth shares to specific traffic
-+classes using the IEEE 802.1Qaz standard. The values determine how bandwidth
-+is distributed between traffic classes in proportion to one another.
-+If not specified, the default bandwidth allocation is applied.
-+.PP
- .TP 8
- .I VALUE
- These parameter accept a floating point number, possibly followed by either a
-@@ -142,6 +150,12 @@ To specify in IEC units, replace the SI prefix (k-, m-, g-, t-) with IEC prefix
- .RE
- .PP
- .TP 8
-+.I INDEX
-+These parameters represent the traffic class index in the \fItc-bw\fR option.
-+The traffic class is specified as an integer value, ranging from 0 to 7, which
-+maps to the defined traffic classes under the IEEE 802.1Qaz standard.
-+.PP
-+.TP 8
- .I N
- These parameter accept integer meaning weight or priority of a node.
- .PP
+Additionally the series refines the QoS handling in net/mlx5 to support
+TC arbitration and bandwidth management on vports and rate nodes.
+
+Discussions on traffic class shaping in net-shapers began in V5 [1],
+where we discussed with maintainers whether net-shapers should support
+traffic classes and how this could be implemented.
+
+Later, after further conversations with Paolo Abeni and Simon Horman,
+Cosmin provided an update [2], confirming that net-shapers' tree-based
+hierarchy aligns well with traffic classes when treated as distinct
+subsets of netdev queues. Since mlx5 enforces a 1:1 mapping between TX
+queues and traffic classes, this approach seems feasible, though some
+open questions remain regarding queue reconfiguration and certain mlx5
+scheduling behaviors.
+
+Building on that discussion, Cosmin has now shared a concrete
+implementation plan on the netdev mailing list [3]. The plan, developed
+in collaboration with Paolo and Simon, outlines how net-shapers can be
+extended to support the same use cases currently covered by
+devlink-rate, with the eventual goal of aligning both and simplifying
+the shaping infrastructure in the kernel.
+
+This work was presented at Netdev 0x19 in Zagreb [4].
+There we presented how TC scheduling is enforced in mlx5 hardware,
+which led to discussions on the mailing list.
+
+A summary of how things work:
+
+Classification means labeling a packet with a traffic class based on
+the packet's DSCP or VLAN PCP field, then treating packets with
+different traffic classes differently during transmit processing.
+
+In a virtualized setup, VFs are untrusted and do not control
+classification or shaping. Classification is done by the hardware using
+a prio-to-TC mapping set by the hypervisor. VFs only select which send
+queue to use and are expected to respect the classification logic by
+sending each traffic class on its dedicated queue. As stated in the
+net-shapers plan [3], each transmit queue should carry only a single
+traffic class. Mixing classes in a single queue can lead to HOL
+blocking.
+
+In the mlx5 implementation, if the queue used does not match the
+classified traffic class, the hardware moves the queue to the correct
+TC scheduler. This movement is not a reclassification; it’s a necessary
+enforcement step to ensure traffic class isolation is maintained.
+
+Extend devlink-rate API to support rate management on TCs:
+- devlink: Extend the devlink rate API to support traffic class
+  bandwidth management
+
+Introduce a no-op implementation:
+- net/mlx5: Add no-op implementation for setting tc-bw on rate objects
+
+Add support for enabling and disabling TC QoS on vports and nodes:
+- net/mlx5: Add support for setting tc-bw on nodes
+- net/mlx5: Add traffic class scheduling support for vport QoS
+
+Support for setting tc-bw on rate objects:
+- net/mlx5: Manage TC arbiter nodes and implement full support for
+  tc-bw
+
+[1]
+https://lore.kernel.org/netdev/20241204220931.254964-1-tariqt@nvidia.com/
+[2]
+https://lore.kernel.org/netdev/67df1a562614b553dcab043f347a0d7c5393ff83.camel@nvidia.com/
+[3]
+https://lore.kernel.org/netdev/d9831d0c940a7b77419abe7c7330e822bbfd1cfb.camel@nvidia.com/T/
+[4]
+https://netdevconf.info/0x19/sessions/talk/optimizing-bandwidth-allocation-with-ets-and-traffic-classes.html
+
+Carolina Jubran (8):
+  netlink: introduce type-checking attribute iteration for nlmsg
+  devlink: Extend devlink rate API with traffic classes bandwidth management
+  selftest: netdevsim: Add devlink rate tc-bw test
+  net/mlx5: Add no-op implementation for setting tc-bw on rate objects
+  net/mlx5: Add support for setting tc-bw on nodes
+  net/mlx5: Add traffic class scheduling support for vport QoS
+  net/mlx5: Manage TC arbiter nodes and implement full support for tc-bw
+  selftests: drv-net: Add test for devlink-rate traffic class bandwidth distribution
+
+ Documentation/netlink/specs/devlink.yaml      |   32 +-
+ .../networking/devlink/devlink-port.rst       |    8 +
+ .../net/ethernet/mellanox/mlx5/core/devlink.c |    2 +
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.c | 1037 ++++++++++++++++-
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.h |    8 +
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |   14 +-
+ drivers/net/netdevsim/dev.c                   |   43 +
+ drivers/net/netdevsim/netdevsim.h             |    1 +
+ drivers/net/vxlan/vxlan_vnifilter.c           |   13 +-
+ fs/nfsd/nfsctl.c                              |   36 +-
+ include/net/devlink.h                         |    8 +
+ include/net/netlink.h                         |   14 +
+ include/uapi/linux/devlink.h                  |    9 +
+ net/devlink/netlink_gen.c                     |   15 +-
+ net/devlink/netlink_gen.h                     |    1 +
+ net/devlink/rate.c                            |  129 ++
+ .../drivers/net/hw/devlink_rate_tc_bw.py      |  466 ++++++++
+ .../drivers/net/netdevsim/devlink.sh          |   51 +
+ .../testing/selftests/net/lib/py/__init__.py  |    2 +-
+ tools/testing/selftests/net/lib/py/ynl.py     |    5 +
+ 20 files changed, 1823 insertions(+), 71 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/hw/devlink_rate_tc_bw.py
+
+
+base-commit: 8dacfd92dbefee829ca555a860e86108fdd1d55b
 -- 
 2.34.1
 
