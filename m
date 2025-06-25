@@ -1,135 +1,206 @@
-Return-Path: <netdev+bounces-200990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 060C5AE7AEA
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:53:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A287AE7AC2
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:49:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 873247B6AAA
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:47:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6307B7A3297
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:46:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E84FA28981F;
-	Wed, 25 Jun 2025 08:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE10E2868AC;
+	Wed, 25 Jun 2025 08:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dV5HAFvz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N+kdCcP+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8E5285CBC;
-	Wed, 25 Jun 2025 08:47:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF392750F8
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 08:46:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750841228; cv=none; b=qLVrF7CJThM3QgUrFUSHzSG3EdmRxS88XV0d+N3fSGTFIL11TUbkAvmuadFLkUjZtSPZ3+i2CejhF960lNlY3/KMTY+LMO9NmOU31cCHP7md/VKcyV01nudNZ+M5TypKcIYjWEP38lU8i+huKfeztWP435BrRrEvOxKA+WWBldI=
+	t=1750841213; cv=none; b=Feuh6/85k0JXJJZGPJAZfRU5Mol50Uiw5HP6w0SzLxVxpC0VrId3QSrrz8T4nHdGPadRmLy5pKi0TIi5biawDJVOofLnHr/CgIpy8c0zN2YB734RQqAh6blqLr1/L5YXDlvFK2DzA/otMXum7Kzne90e2/Fr2+/X3X5kL7KeHBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750841228; c=relaxed/simple;
-	bh=lDA2+D4K8jLzcqWHyNUWKnoO1uZ3+NKKkE0bfDP7PF0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W4KQkud+D03U+3UEgho4O2IwSevxZbg1E4aWVeRAgAaRinB6gq9+ll5UbGERtkSTf9ZSd54u536KBq6bmpZ6EbUVFJbKHphdQ5y2u7/E2konx9kNyIJF8XxOuVIrEbXnHDOx2nlaobhoTYuABCymrO8UL6BTutv4wq1nCWxGxpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dV5HAFvz; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3a6e8b1fa37so1553127f8f.2;
-        Wed, 25 Jun 2025 01:47:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750841225; x=1751446025; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aiq9kMFH9F7vJnvGPd+O1hgKLbEQsqIi3Mrcnkf+nZA=;
-        b=dV5HAFvzM3RVLrldFx0l5VSQ9tjlkD3iHut57qObmqtkKtd4OLMsaixknnDVTew9Ai
-         90QuWgLIpRcB7ANPHYf1aYd5K3NnnviNKOjoNH/xpvA3Bubi1mnsCKkPGu1OmZM43PnF
-         tkQcjhboIi4MCnipz3+5NPCBIAs/M5+TxL2dVpov7gVD39GWcVuU1uBDuUSZboMXKKjZ
-         gUvhJZR3z3AqgMjoFsRHSGEfcSbB+hXGH6mIgMhb1Pntue0KkOy2xo47KCLtk0m3i4fx
-         05XMCtiGVVmjwmhpzxl3iODeb7dwqUzz6K4L0xCPSYCFObuFc7qP7ITJ494KI4tZc31S
-         UhJQ==
+	s=arc-20240116; t=1750841213; c=relaxed/simple;
+	bh=T892iFCO06qpRgPeQchYWUIxyB8KQBY18W5Fu61V8v0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FiT+oz46PrIUpI5I08a5E/6M8HIOopgpJgqGbIwidyJwmBCCBcKOCxZkMjaPpcaxGYwWJf8UGzSrvMz21AhkqPKzR0CW76xUBn8Hzwyr2zTH+PXsqBeIXL2nSO8/c68xww/DWotELgkpVQf8cAujX3+RVwZNzmDDYJt+3S0ba58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N+kdCcP+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750841210;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=D+42UAAF2j4BWLSQ4E8Q8fXFCTjQBZojHeATS4CdgFc=;
+	b=N+kdCcP+NMHusa976MO5PB7DwAS/6Oh+OAVpqw2NQa/grBwy7FBx9JIqnfhkahUOzxZJGl
+	4rlUM0yKn3+thNPZrOPNIsFVOEE0J1FtNMUYRjYCwngsKLJCspN7/qWqv1g8pej2KKK+wf
+	l7p+LbeiWyw36rSwtcVaZXX9rpa+aYs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-669-f3DvaW2ROWCNhQwfZreuCQ-1; Wed, 25 Jun 2025 04:46:48 -0400
+X-MC-Unique: f3DvaW2ROWCNhQwfZreuCQ-1
+X-Mimecast-MFC-AGG-ID: f3DvaW2ROWCNhQwfZreuCQ_1750841207
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-453804ee4dfso6081325e9.1
+        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 01:46:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750841225; x=1751446025;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aiq9kMFH9F7vJnvGPd+O1hgKLbEQsqIi3Mrcnkf+nZA=;
-        b=M8CCMpQMSyYtz3SYo4kT1FPvF6uApx9g5Xn8C0TmxSjDzmWlKyDlat6Yz6ZskeFYwK
-         mvkp0gqWGmsfF2jv6/3jFuuzcYnW5feCPIC3MgxngQrlnbLMszmFwoLv2HPHwX5ijuKw
-         vsPgQOBUbMRjw8dLVVim8mWN4EvqSIRy2750MbXFoYo84caGEqCcl0mXabPRGxfsq2FL
-         LgIwFshLPTCCBBfDeCimjV5u+D99YLzJrv4HmM9IzVF0Pyl8UVyrOxmOBeYcu04I29GM
-         k6itXdyMGJY1NiW6/R2URwHIh87B2VgSpL75obFlcFe5rsBK66IyKO63l3hlTPwjbtci
-         RLrg==
-X-Forwarded-Encrypted: i=1; AJvYcCU/6tlNdLh9Ts8IB2KdzePYYOFAOzVVG/4LqvRNY+ZYCDf0J969cD45d3mGMKUazwNxCrDnl1vJIeKo@vger.kernel.org, AJvYcCWTV1QhZWOiDkUTA9xQVIpDgjrRH9jcPaYXCGLxTWklUHKpBoNxykQiA9yhlwhXIBsF4AfQijVjFtSlM9LmNv++Ad4=@vger.kernel.org, AJvYcCWjSGk6bcuXPAurq55CXDIDlOioF7mkP37Z2BH1bNLZ9U6R7i34CDW1+MNJWgFydpiXUsbhSBy1@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfnEfzeI24XWE7E00BYyQ6izW6iXolClknZKIY01zPMTRoGEbF
-	uIy1axr2H73CrvCxhDZMioXJQcEiR9kqNwQCJ3bBmM++zf2mrm4a6rlFA2PtQDaznpXIAAYsCne
-	RkBJa+SrhJoBeqMkKpDgUbR3k6n0RRKc=
-X-Gm-Gg: ASbGncuiTY57QAUllPlJWOOq/H8huvF6DSjvmqhGdgV0Xdhnu3Sd5fsqwZRIMapq+SM
-	lQwKuGTtwtQsiXZNRgQihcgu6xO55nqPPAoqRRPSwotcbM/e9KouW4hjiCtVjGbmDbX5yIg3VCI
-	9Q2Kg+aMQZvN+A20b46OPKZgelYr4LpvlMhCkpZRbsXhgdQg==
-X-Google-Smtp-Source: AGHT+IFChcgu3Oo7mLs5bbOfibDzsRiAxGriJGS52bXullFp8cPPdshfQTKjsMrNP8w1Na4ld5d5MyRAGXEBmCASjVQ=
-X-Received: by 2002:a05:6000:26d2:b0:3a5:2cf3:d6ab with SMTP id
- ffacd0b85a97d-3a6ed6464d7mr1623447f8f.39.1750841225180; Wed, 25 Jun 2025
- 01:47:05 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750841207; x=1751446007;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D+42UAAF2j4BWLSQ4E8Q8fXFCTjQBZojHeATS4CdgFc=;
+        b=dF5dvhnrmvtXH9Zo1kEHx5wr5uPlSDESLAzJG5tMjfU8ycI+4eUKDiW28U0eqYag6c
+         Pwoxy4SFPlVBKD7IAVNp1qVqBOaxV3lc1L82WglvpNAHrmPytpcJuBiZ/ppF4mqAxhfU
+         iQ1RDFTLkTlzn6KJQns2YZAoJTckIiffD5dAgFmOBxrdkzzryShKtOS/5sT4fSYEwx22
+         I8q/qQYbevIkpebWrXB6yl6pq/tbxb3dscbeVmtb6T8MBfxEkV+JcZHHLxFogAZpvi0f
+         pKCYUs5T/Bhi2sXLyU8OUnayKlASdHxUGP3cOpWPL1LxLCQUR0J7kw4pHQCxQBxrxvsT
+         u+SA==
+X-Forwarded-Encrypted: i=1; AJvYcCWT6A9zhWwKvUlzaMqOR9xwE32kwmvWIk2ySqO7MdrJGx58UY5i28jdSOWgCYuXaWyYg5Jo/kQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0jXr2Ynfo2rgxUeJ0SESkE5WUTG/QoHqez1VxNrv8UG8XJm6G
+	cDWU6EF3WVW7a7Z9nAQtvdaXIwrefvAlkgtjEYBumjgrzYQz1pOpozNUZw+qKzm7snhdZwXdYwi
+	2+HEcMRvKCq2YfWqO/lb+rbTS13foXbEKIsVL99iRPK7T/LnYCPKWZ7QobA==
+X-Gm-Gg: ASbGncv0IGqWMhxgbP/ZAT/x1Xz2lSB7VB297Cu7eIQQRAwO7xfIc4tqMa77twHYthZ
+	pzqDePatFkNkKWwSv7lipxR1QtOsKd5m4wPbtH/VcmxgNaGkxtyIXavgOfvECsiCTE6uy2IAmDD
+	W89/mCHWvmoMvp6P0crVrOt35PdHItpoTk7bC7XQvgKye1wAlY732h/G5OcElUEEzXQP00VazuQ
+	5pHYewO7j/vJO3xZz+W7zhRmq53XllCZM2RqhKBvItFmOxKPyj6rBoCnhXe/zRBY5hxewBuo5gh
+	q8OGuublZT1u0Z1caVTC4hFKstCv
+X-Received: by 2002:a05:600c:1d16:b0:453:8042:ba47 with SMTP id 5b1f17b1804b1-45381b0aa8bmr17319135e9.19.1750841207385;
+        Wed, 25 Jun 2025 01:46:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFdo3ANalwvdp1sAiXAQf4VC8mWRTnkMA0mUZ6qwOVf3rBLgRagdbcE6BtWV/oNmQJNx6Z7AQ==
+X-Received: by 2002:a05:600c:1d16:b0:453:8042:ba47 with SMTP id 5b1f17b1804b1-45381b0aa8bmr17318795e9.19.1750841206778;
+        Wed, 25 Jun 2025 01:46:46 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.151.122])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a6e811450bsm4062352f8f.97.2025.06.25.01.46.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Jun 2025 01:46:46 -0700 (PDT)
+Date: Wed, 25 Jun 2025 10:46:41 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net v2 2/3] vsock: Fix transport_* TOCTOU
+Message-ID: <lv6nvdc4lrwhipk6ehtivbnsn7ggb7bujky3z6ybhxorlmisgn@qyuo3egnbdu3>
+References: <20250620-vsock-transports-toctou-v2-0-02ebd20b1d03@rbox.co>
+ <20250620-vsock-transports-toctou-v2-2-02ebd20b1d03@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <721f6e0e09777e0842ecaca4578bc50c953d2428.1750838954.git.geert+renesas@glider.be>
-In-Reply-To: <721f6e0e09777e0842ecaca4578bc50c953d2428.1750838954.git.geert+renesas@glider.be>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Wed, 25 Jun 2025 09:46:36 +0100
-X-Gm-Features: Ac12FXwGDD0wK9R16XQVBpAwEzQWjUk-oPFNtpG5nL9WzdpZiuFF_pkYBSIMwKI
-Message-ID: <CA+V-a8sj0cVc2y6HbQjfPWxH9GRaDootusg+NARQdOv1DKxV1g@mail.gmail.com>
-Subject: Re: [PATCH] dt-bindings: net: Rename renesas,r9a09g057-gbeth.yaml
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250620-vsock-transports-toctou-v2-2-02ebd20b1d03@rbox.co>
 
-On Wed, Jun 25, 2025 at 9:11=E2=80=AFAM Geert Uytterhoeven
-<geert+renesas@glider.be> wrote:
+On Fri, Jun 20, 2025 at 09:52:44PM +0200, Michal Luczaj wrote:
+>Transport assignment may race with module unload. Protect new_transport
+>from becoming a stale pointer.
 >
-> The DT bindings file "renesas,r9a09g057-gbeth.yaml" applies to a whole
-> family of SoCs, and uses "renesas,rzv2h-gbeth" as a fallback compatible
-> value.  Hence rename it to the more generic "renesas,rzv2h-gbeth.yaml".
+>This also takes care of an insecure call in vsock_use_local_transport();
+>add a lockdep assert.
 >
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
->  .../{renesas,r9a09g057-gbeth.yaml =3D> renesas,rzv2h-gbeth.yaml}  | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->  rename Documentation/devicetree/bindings/net/{renesas,r9a09g057-gbeth.ya=
-ml =3D> renesas,rzv2h-gbeth.yaml} (98%)
+>BUG: unable to handle page fault for address: fffffbfff8056000
+>Oops: Oops: 0000 [#1] SMP KASAN
+>RIP: 0010:vsock_assign_transport+0x366/0x600
+>Call Trace:
+> vsock_connect+0x59c/0xc40
+> __sys_connect+0xe8/0x100
+> __x64_sys_connect+0x6e/0xc0
+> do_syscall_64+0x92/0x1c0
+> entry_SYSCALL_64_after_hwframe+0x4b/0x53
 >
-Reviewed-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+>Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> net/vmw_vsock/af_vsock.c | 28 +++++++++++++++++++++++-----
+> 1 file changed, 23 insertions(+), 5 deletions(-)
 
-Cheers,
-Prabhakar
+LGTM!
 
-> diff --git a/Documentation/devicetree/bindings/net/renesas,r9a09g057-gbet=
-h.yaml b/Documentation/devicetree/bindings/net/renesas,rzv2h-gbeth.yaml
-> similarity index 98%
-> rename from Documentation/devicetree/bindings/net/renesas,r9a09g057-gbeth=
-.yaml
-> rename to Documentation/devicetree/bindings/net/renesas,rzv2h-gbeth.yaml
-> index 9961253d1d411bd0..23e39bcea96b31db 100644
-> --- a/Documentation/devicetree/bindings/net/renesas,r9a09g057-gbeth.yaml
-> +++ b/Documentation/devicetree/bindings/net/renesas,rzv2h-gbeth.yaml
-> @@ -1,7 +1,7 @@
->  # SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->  %YAML 1.2
->  ---
-> -$id: http://devicetree.org/schemas/net/renesas,r9a09g057-gbeth.yaml#
-> +$id: http://devicetree.org/schemas/net/renesas,rzv2h-gbeth.yaml#
->  $schema: http://devicetree.org/meta-schemas/core.yaml#
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
 >
->  title: GBETH glue layer for Renesas RZ/V2H(P) (and similar SoCs)
-> --
-> 2.43.0
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 63a920af5bfe6960306a3e5eeae0cbf30648985e..a1b1073a2c89f865fcdb58b38d8e7feffcf1544f 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -407,6 +407,8 @@ EXPORT_SYMBOL_GPL(vsock_enqueue_accept);
+>
+> static bool vsock_use_local_transport(unsigned int remote_cid)
+> {
+>+	lockdep_assert_held(&vsock_register_mutex);
+>+
+> 	if (!transport_local)
+> 		return false;
+>
+>@@ -464,6 +466,8 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+>
+> 	remote_flags = vsk->remote_addr.svm_flags;
+>
+>+	mutex_lock(&vsock_register_mutex);
+>+
+> 	switch (sk->sk_type) {
+> 	case SOCK_DGRAM:
+> 		new_transport = transport_dgram;
+>@@ -479,12 +483,15 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+> 			new_transport = transport_h2g;
+> 		break;
+> 	default:
+>-		return -ESOCKTNOSUPPORT;
+>+		ret = -ESOCKTNOSUPPORT;
+>+		goto err;
+> 	}
+>
+> 	if (vsk->transport) {
+>-		if (vsk->transport == new_transport)
+>-			return 0;
+>+		if (vsk->transport == new_transport) {
+>+			ret = 0;
+>+			goto err;
+>+		}
+>
+> 		/* transport->release() must be called with sock lock acquired.
+> 		 * This path can only be taken during vsock_connect(), where we
+>@@ -508,8 +515,16 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+> 	/* We increase the module refcnt to prevent the transport unloading
+> 	 * while there are open sockets assigned to it.
+> 	 */
+>-	if (!new_transport || !try_module_get(new_transport->module))
+>-		return -ENODEV;
+>+	if (!new_transport || !try_module_get(new_transport->module)) {
+>+		ret = -ENODEV;
+>+		goto err;
+>+	}
+>+
+>+	/* It's safe to release the mutex after a successful try_module_get().
+>+	 * Whichever transport `new_transport` points at, it won't go await
+>+	 * until the last module_put() below or in vsock_deassign_transport().
+>+	 */
+>+	mutex_unlock(&vsock_register_mutex);
+>
+> 	if (sk->sk_type == SOCK_SEQPACKET) {
+> 		if (!new_transport->seqpacket_allow ||
+>@@ -528,6 +543,9 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+> 	vsk->transport = new_transport;
+>
+> 	return 0;
+>+err:
+>+	mutex_unlock(&vsock_register_mutex);
+>+	return ret;
+> }
+> EXPORT_SYMBOL_GPL(vsock_assign_transport);
 >
 >
+>-- 
+>2.49.0
+>
+
 
