@@ -1,121 +1,184 @@
-Return-Path: <netdev+bounces-201005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20C50AE7CE3
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:31:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F3DFAE7C97
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:25:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 164F54A7CC0
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 09:31:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 277563BBC9B
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 09:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5572BEC5F;
-	Wed, 25 Jun 2025 09:22:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CCB92C15B4;
+	Wed, 25 Jun 2025 09:18:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T8nYTZ2O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx-a.polytechnique.fr (mx-a.polytechnique.fr [129.104.30.14])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6070252906;
-	Wed, 25 Jun 2025 09:22:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.104.30.14
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDFBD29B23B;
+	Wed, 25 Jun 2025 09:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750843367; cv=none; b=X57JH6hN+So72DGVQebtzaodA8ZKKSceqDKJOde4r2bVX0oL6qfUn606UtAh83S9YRE+GZJVtbDHS0Bs/Lwukaaqn6B6obO/nxvrrA4difFusdkmLiqnhsIq1FRhXduzU2DsP9h4Tdv0em0Ck78tQfwfM0LWm8dr7jbLVHPsHbs=
+	t=1750843103; cv=none; b=U4Xh276xbWPzQuOgttYqX0zsMomhnGDseFVwEgoZ9VlJKpXaKhZcnTSBmf4vg5Zdypm+BCA9ZaUIDkXHfbBMm5j2X1G9IM0ZI/fFv9F1fvSlVeShJsoOaI/ykzjqpW4SsYzu/qcNDxWXr8vyHwSIvBhF+uym10Z3Kjk4ihlUSWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750843367; c=relaxed/simple;
-	bh=qqM24CG38I0YgdVs6wHu9lNFb6fYyDWo79Ns61wNk2U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=huTWsuma7Gpq8ikxn4DO/PR6wd1jLogj1rvPUitv/01AirQq/31RqwyZI8NVJrKVYpzXC+6Rq7FOL2cXOirwegGzdqL1tQ0Si93cRpbjby7fvlR1MseGpR6hh+5wWp0AoB4FMHQKXeQvGiaa4q2q6LO/ocsO5leMiJjokCnLz34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=fail smtp.mailfrom=gmail.com; arc=none smtp.client-ip=129.104.30.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=gmail.com
-Received: from zimbra.polytechnique.fr (zimbra.polytechnique.fr [129.104.69.30])
-	by mx-a.polytechnique.fr (tbp 25.10.18/2.0.8) with ESMTP id 55P9EwnY023896;
-	Wed, 25 Jun 2025 11:14:58 +0200
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.polytechnique.fr (Postfix) with ESMTP id 8EA3B761E58;
-	Wed, 25 Jun 2025 11:14:58 +0200 (CEST)
-X-Virus-Scanned: amavis at zimbra.polytechnique.fr
-Received: from zimbra.polytechnique.fr ([127.0.0.1])
- by localhost (zimbra.polytechnique.fr [127.0.0.1]) (amavis, port 10026)
- with ESMTP id 0ewgABPHqW04; Wed, 25 Jun 2025 11:14:58 +0200 (CEST)
-Received: from [130.190.109.159] (webmail-69.polytechnique.fr [129.104.69.39])
-	by zimbra.polytechnique.fr (Postfix) with ESMTPSA id 181BE761F7F;
-	Wed, 25 Jun 2025 11:14:58 +0200 (CEST)
-Message-ID: <4c6deafe-a6ec-40bf-873f-dc0df1a72dc4@gmail.com>
-Date: Wed, 25 Jun 2025 11:14:56 +0200
+	s=arc-20240116; t=1750843103; c=relaxed/simple;
+	bh=t4E/+UT8fmI9fR5q5fWeoyUhS4+biJF4voTPqNOEia0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fc6ErvtaSKvEXE9LBYcoYyydud8cxOmDby0HcfKJlubmyv15JUCa8CCNU5o0JLYIXGoIYApx2n0dgrDIs7YNOI8qT+qzuOh0yp2jeiXj4hnN3fDmyyi6lvsabO93pHvmnqcdq6rBjOhEU+Urs6IulPe1eugP0bnh0kCj/5QYIlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T8nYTZ2O; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750843100; x=1782379100;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=t4E/+UT8fmI9fR5q5fWeoyUhS4+biJF4voTPqNOEia0=;
+  b=T8nYTZ2OtmDDWiys+1XlzItMIsMXFMbfA+VL9SN6C/RgFT+/CdkfO+C6
+   Kp8v51eh9INMs32y71jlspqEqCtIbhG94uazAHBaeIPiFYKoNW6rq4rHN
+   qb9n+0sxhw268L9h7rnkCcA7T1l+jMJfMqevM0MpTqvsL55zO/XlM3BLj
+   SCDrGM0L1P877BkO7ns91z3VoDIn3/lBycTaUOjr6470XCgtrhNJiL/ym
+   wUG23RHSXCaBWwZEHYvh3+hKnocp/4se2EgzDe1QxP60eMMumo/F1Y86d
+   ZpUHVkGqYSs9f7Qr2ht7UtHs9A1BFLpzAa9AmynENrno4JvsBASyH5y/H
+   g==;
+X-CSE-ConnectionGUID: u3tryakDSxWfeFvKVVZqLQ==
+X-CSE-MsgGUID: ADxTI3ipT5OW4Tqvd/tX0Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11474"; a="53072787"
+X-IronPort-AV: E=Sophos;i="6.16,264,1744095600"; 
+   d="scan'208";a="53072787"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 02:18:19 -0700
+X-CSE-ConnectionGUID: Pu8/GqJxQ9Wf4jSmGYdK6Q==
+X-CSE-MsgGUID: yJ8Gcn95QCiXtZkX+gKVcw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,264,1744095600"; 
+   d="scan'208";a="157934397"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by orviesa005.jf.intel.com with ESMTP; 25 Jun 2025 02:18:15 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uUMGj-000SwA-29;
+	Wed, 25 Jun 2025 09:18:13 +0000
+Date: Wed, 25 Jun 2025 17:17:47 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vikas Gupta <vikas.gupta@broadcom.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
+	Vikas Gupta <vikas.gupta@broadcom.com>,
+	Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>,
+	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
+Subject: Re: [net-next, 08/10] bng_en: Add irq allocation support
+Message-ID: <202506251636.aTzmB45K-lkp@intel.com>
+References: <20250618144743.843815-9-vikas.gupta@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] atm: idt77252: Add missing `dma_map_error()`
-To: Simon Horman <horms@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Chas Williams <3chas3@gmail.com>,
-        "moderated list:ATM" <linux-atm-general@lists.sourceforge.net>,
-        "open list:ATM" <netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-References: <20250624064148.12815-3-fourier.thomas@gmail.com>
- <20250624165128.GA1562@horms.kernel.org>
-Content-Language: en-US, fr
-From: Thomas Fourier <fourier.thomas@gmail.com>
-In-Reply-To: <20250624165128.GA1562@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250618144743.843815-9-vikas.gupta@broadcom.com>
 
-On 24/06/2025 18:51, Simon Horman wrote:
-> On Tue, Jun 24, 2025 at 08:41:47AM +0200, Thomas Fourier wrote:
->> The DMA map functions can fail and should be tested for errors.
->>
->> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
->> ---
->>   drivers/atm/idt77252.c | 5 +++++
->>   1 file changed, 5 insertions(+)
->>
->> diff --git a/drivers/atm/idt77252.c b/drivers/atm/idt77252.c
->> index 1206ab764ba9..f2e91b7d79f0 100644
->> --- a/drivers/atm/idt77252.c
->> +++ b/drivers/atm/idt77252.c
->> @@ -852,6 +852,8 @@ queue_skb(struct idt77252_dev *card, struct vc_map *vc,
->>   
->>   	IDT77252_PRV_PADDR(skb) = dma_map_single(&card->pcidev->dev, skb->data,
->>   						 skb->len, DMA_TO_DEVICE);
->> +	if (dma_mapping_error(&card->pcidev->dev, IDT77252_PRV_PADDR(skb)))
->> +		return -ENOMEM;
->>   
->>   	error = -EINVAL;
->>   
->> @@ -1857,6 +1859,8 @@ add_rx_skb(struct idt77252_dev *card, int queue,
->>   		paddr = dma_map_single(&card->pcidev->dev, skb->data,
->>   				       skb_end_pointer(skb) - skb->data,
->>   				       DMA_FROM_DEVICE);
->> +		if (dma_mapping_error(&card->pcidev->dev, paddr))
->> +			goto outpoolrm;
->>   		IDT77252_PRV_PADDR(skb) = paddr;
->>   
->>   		if (push_rx_skb(card, skb, queue)) {
->> @@ -1871,6 +1875,7 @@ add_rx_skb(struct idt77252_dev *card, int queue,
->>   	dma_unmap_single(&card->pcidev->dev, IDT77252_PRV_PADDR(skb),
->>   			 skb_end_pointer(skb) - skb->data, DMA_FROM_DEVICE);
->>   
->> +outpoolrm:
->>   	handle = IDT77252_PRV_POOL(skb);
->>   	card->sbpool[POOL_QUEUE(handle)].skb[POOL_INDEX(handle)] = NULL;
-> Hi Thomas,
->
-> Can sb_pool_remove() be used here?
-> It seems to be the converse of sb_pool_add().
-> And safer than the code above.
-> But perhaps I'm missing something.
+Hi Vikas,
 
+kernel test robot noticed the following build warnings:
 
-Hi Simon,
+[auto build test WARNING on linus/master]
+[also build test WARNING on v6.16-rc3 next-20250624]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-I don't see any reason why this would be a problem,
+url:    https://github.com/intel-lab-lkp/linux/commits/Vikas-Gupta/bng_en-Add-PCI-interface/20250618-173130
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20250618144743.843815-9-vikas.gupta%40broadcom.com
+patch subject: [net-next, 08/10] bng_en: Add irq allocation support
+config: parisc-randconfig-r073-20250619 (https://download.01.org/0day-ci/archive/20250625/202506251636.aTzmB45K-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 8.5.0
 
-though, I don't think it is related and the change should be in the same 
-patch.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506251636.aTzmB45K-lkp@intel.com/
 
-Should I create another patch for that?
+smatch warnings:
+drivers/net/ethernet/broadcom/bnge/bnge_resc.c:347 bnge_alloc_irqs() warn: unsigned 'irqs_demand' is never less than zero.
 
+vim +/irqs_demand +347 drivers/net/ethernet/broadcom/bnge/bnge_resc.c
+
+   329	
+   330	int bnge_alloc_irqs(struct bnge_dev *bd)
+   331	{
+   332		u16 aux_msix, tx_cp, num_entries;
+   333		u16 irqs_demand, max, min = 1;
+   334		int i, rc = 0;
+   335	
+   336		irqs_demand = bnge_nqs_demand(bd);
+   337		max = bnge_get_max_func_irqs(bd);
+   338		if (irqs_demand > max)
+   339			irqs_demand = max;
+   340	
+   341		if (!(bd->flags & BNGE_EN_SHARED_CHNL))
+   342			min = 2;
+   343	
+   344		irqs_demand = pci_alloc_irq_vectors(bd->pdev, min, irqs_demand,
+   345						    PCI_IRQ_MSIX);
+   346		aux_msix = bnge_aux_get_msix(bd);
+ > 347		if (irqs_demand < 0 || irqs_demand < aux_msix) {
+   348			rc = -ENODEV;
+   349			goto err_free_irqs;
+   350		}
+   351	
+   352		num_entries = irqs_demand;
+   353		if (pci_msix_can_alloc_dyn(bd->pdev))
+   354			num_entries = max;
+   355		bd->irq_tbl = kcalloc(num_entries, sizeof(*bd->irq_tbl), GFP_KERNEL);
+   356		if (!bd->irq_tbl) {
+   357			rc = -ENOMEM;
+   358			goto err_free_irqs;
+   359		}
+   360	
+   361		for (i = 0; i < irqs_demand; i++)
+   362			bd->irq_tbl[i].vector = pci_irq_vector(bd->pdev, i);
+   363	
+   364		bd->irqs_acquired = irqs_demand;
+   365		/* Reduce rings based upon num of vectors allocated.
+   366		 * We dont need to consider NQs as they have been calculated
+   367		 * and must be more than irqs_demand.
+   368		 */
+   369		rc = bnge_adjust_rings(bd, &bd->rx_nr_rings,
+   370				       &bd->tx_nr_rings,
+   371				       irqs_demand - aux_msix, min == 1);
+   372		if (rc)
+   373			goto err_free_irqs;
+   374	
+   375		tx_cp = bnge_num_tx_to_cp(bd, bd->tx_nr_rings);
+   376		bd->nq_nr_rings = (min == 1) ?
+   377			max_t(u16, tx_cp, bd->rx_nr_rings) :
+   378			tx_cp + bd->rx_nr_rings;
+   379	
+   380		/* Readjust tx_nr_rings_per_tc */
+   381		if (!bd->num_tc)
+   382			bd->tx_nr_rings_per_tc = bd->tx_nr_rings;
+   383	
+   384		return 0;
+   385	
+   386	err_free_irqs:
+   387		dev_err(bd->dev, "Failed to allocate IRQs err = %d\n", rc);
+   388		bnge_free_irqs(bd);
+   389		return rc;
+   390	}
+   391	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
