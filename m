@@ -1,182 +1,265 @@
-Return-Path: <netdev+bounces-200942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36C80AE766C
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 07:31:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A9ACAE7680
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 07:54:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD8D43A967F
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 05:30:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27A643A6C19
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 05:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 257871EA73;
-	Wed, 25 Jun 2025 05:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C8E1DC198;
+	Wed, 25 Jun 2025 05:54:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ScHwaS5W"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ljKibZbs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D380800;
-	Wed, 25 Jun 2025 05:30:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA59919E97A
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 05:54:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750829456; cv=none; b=qdBK07c3rxOhmWZVK0/9CuPOTsvo0KHiKmZHmCrhONlhXK1dNKe9QF+KuYcik6YAfBm41xIKPrfokQtaNqAK9NrjJu7QSBKJdbYKCP9SC7Eb++9DTJOuPEEAGB2Tr/wegHCxb07Q3i6O9RiTX58hDyn7xdCOHh73xOUnJFBX13Q=
+	t=1750830893; cv=none; b=SG/He2wa4E9AEyGJ+kQ7mHe9Q1uX7bxFjnOyVazldOhkyBDR/YlY273XnAxc/PopMYzG9hYB4xvPh4zw7++YxlUan4alh0MqkdSCuiKx1oxkqZ30kTbCADMg6b9uU8XqBrtq7nSXWlInr/SezOWZ/YwmcJ8JNU3NMTE+nyVABXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750829456; c=relaxed/simple;
-	bh=qkqTrWqvL045MNwIzcxOuCzXWF8cU9oUhMgOHUeD7+I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MAaQDSAX/JB412XcUEMMau+whKUHQdiRsLJ8v18bsoIz/vc196MO8S6h/hjiOB1reK3WlbB9P9M9gI3SRnZduY28lkHxjIHuxRtLYaKmRNUVciaRRn8sjoT/aGl5HQYyK5t+axyxxYOmC/mhwtQCqV3pELdkZYTqAWT1Pf3N9XE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ScHwaS5W; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7490702fc7cso615379b3a.1;
-        Tue, 24 Jun 2025 22:30:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750829454; x=1751434254; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3evY/iE1wXVw/hvubL4CLnB0sjjyjXrMSBwjFohfH+0=;
-        b=ScHwaS5WDUL3b0jbCfj7OTEn0t8mq7YOMzZ5nOGjkjuSX3GVRSta7Uv9q8zdHKkCWh
-         MNmF+KdDHKpFoj2yBnPa5Eobj4gOP4qYECpIKx8/FxtTNC1aEIdMO5vurw48LdLQ8HID
-         FyZnpLHMCw4eQE3QH8QMyodP8bowhPl/+hYMyE+tLcqTGR6lRY737+cnn30E3fNsgnBe
-         AhLfyu6+kci7CHRWsULn1gFqwX/JzI6em7Ugb0SM7azvskuwYTlZ7BNwLks1bv5E/0N4
-         dknq+d+SbXfSZeDT7wD0K9IWyE2HqFRybdEB06ouRI9MSXbb13bzEtgupNvWaoENho5A
-         d9rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750829454; x=1751434254;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3evY/iE1wXVw/hvubL4CLnB0sjjyjXrMSBwjFohfH+0=;
-        b=oSRXfmFemDtRhP5+TQmBngPMWehhvbAlgMfSdC05E4eFKpAZg53zOZwfi8n/Kh0jo+
-         uQ2ahV8FbnjEoKoED13gTQ5h/wWJMqMMMeTrpIYBgz+c7XN6HgsivvWhTypV5KmnJolv
-         3MTh+yc9cBmWZ82NBWDmv4loIwT8xDxtCgIipXGTw+Pj0P1iVnalFpqsqFGeZGcYetkz
-         pm0/wybwN6WE82BeT0UrThtiHg6Tnz2yLy45n1hOpDUim7tLhMKvuiJp+PjrPcw14afv
-         b6naTKDBbGAlyE+uCbBrjKTY8ftzG1fZlMLJdOby3DkXukRj2cpFygZR7NWjb1lXkhiJ
-         iT/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVeytrn1MLiRtDx81WoLTZH4k7J5Zb2RYM+lpff8wxgZOF6LmMpnUGd6AkR6vR7h0VAZc830XT18dLiueQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+6a3esO4G0486I5cj64Q1LsFTfkic8y6WgCHqH2RTOZC1IRQh
-	HyoxwFJRNJgfYxSa+RmKpwLbkJsGC9DrCF1PJ1FWdLA5CRQDLvqzRfYd
-X-Gm-Gg: ASbGncsr//hnj3mZXZbR7dYNkZQeBpBRDymA74tgnjK996q+YuX2EXN6tKRGpThQX3S
-	euIR0qByObHKrJp22xNOdEWat/57oOspMk+0pDXNCR0nDxEyWmFtTTuLhhnpcBUYYsjuXpPiQxm
-	aVq8erv5mKq9tJRniYse84xniFiFb8fPEWzungJlpVjHGNLhKBiHItZoeSmtMfScovU2+aO2e+y
-	f3FycFp85e5T0wdt9OKI5xNXScxzVjwI3GkTiH8uYTZgRJ56DpBHHoxF8KwWfUf2YhY4nCDd6bD
-	7eX4C7+Ap/0t7uq2vKJmCorChvr4/1HDXO93x+HaztdC2H0XQiDoLQdC7swxQQ==
-X-Google-Smtp-Source: AGHT+IHBdzLEkklY0D9WmBJ64Xf7XejTse4UFiLRQR7hUrfFiqMI5K/Q7/CZsR5GOmtfYhbLVMFxmw==
-X-Received: by 2002:a05:6300:8e1b:b0:220:81e2:eae4 with SMTP id adf61e73a8af0-22081e2eaf6mr1165303637.39.1750829453617;
-        Tue, 24 Jun 2025 22:30:53 -0700 (PDT)
-Received: from deliz-1.. ([154.91.3.20])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-749b5e21466sm3297606b3a.49.2025.06.24.22.30.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jun 2025 22:30:53 -0700 (PDT)
-From: Deli Zhang <deli.zhang21th@gmail.com>
-To: michael.chan@broadcom.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Deli Zhang <deli.zhang21th@gmail.com>
-Subject: [PATCH] bnxt_en: Add parameter disable_vf_bind
-Date: Wed, 25 Jun 2025 13:30:05 +0800
-Message-ID: <20250625053005.79845-1-deli.zhang21th@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1750830893; c=relaxed/simple;
+	bh=+ThhVDgcKyNgoXR3ceM9CQSqps9gFTNIJ913NB9qqgM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N/xDu+iMofkQWk1PCv/oTZEl5nbVJeH6GsZfPHLpqsmhZR45LllP3wS9r6tZhY2BOUp6OdMnSmMQ8zLUyVicxH3Vlab2IqEY9+uzO5D3hcYmyhcSJY3PV0QSOljJjAXiZXeHtKgJorumz83/XGoUhVfH6dJO22DRnVWns/5i4R0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ljKibZbs; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4BB7A442AB;
+	Wed, 25 Jun 2025 05:54:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1750830882;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CMuydz6q12WdBGr/1sWsW0i9wU6BbuOSaXxAZIu2KC8=;
+	b=ljKibZbsew/qfRU2KmyqE7wpvi6Uo87YLY2r6QBtklZTCUydAqgM+eBVtAtdLRNWuBx71r
+	dEYJoW2dnwJ9ruAkvgHFQhh3ea681N8eesCf5ipEjQYY1SvSZjJp+VOayIu0jXxSDCKFif
+	biPSXlT4bw2+/D1FkWxiPwitTYTOaYI/7HPF8VMnGC5sdcn1N76K1K1H4djE2SBfvslYoZ
+	jmhftPvC1STO1NE/kjS3u3e5KN1PDxxPHQ2PTjWIYZGYzYSd12Pto8Qu7ydOKmrslmKJSk
+	o4E07Gp64BKZ5Jp+wzOaudhVH4xYYPc2HKpb7rSEmQA+ZbRVlELeoIBAu84Jkg==
+Date: Wed, 25 Jun 2025 07:54:41 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, "Russell King
+ (Oracle)" <linux@armlinux.org.uk>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>,
+ Robert Hancock <robert.hancock@calian.com>, Tao Ren <rentao.bupt@gmail.com>
+Subject: Re: Supporting SGMII to 100BaseFX SFP modules, with broadcom PHYs
+Message-ID: <20250625075441.6036223d@fedora.home>
+In-Reply-To: <24146e10-5e9c-42f5-9bbe-fe69ddb01d95@broadcom.com>
+References: <20250624233922.45089b95@fedora.home>
+	<24146e10-5e9c-42f5-9bbe-fe69ddb01d95@broadcom.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgddvudelkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeejudefjeekudffvdffledvtefhuddtfeelgeekleefieduffdvjeduieduteetkeenucffohhmrghinhepfhhsrdgtohhmnecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepkedprhgtphhtthhopehflhhorhhirghnrdhfrghinhgvlhhlihessghrohgruggtohhmrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrt
+ ghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehvlhgrughimhhirhdrohhlthgvrghnsehngihprdgtohhmpdhrtghpthhtohepkhgrsggvlheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhhosggvrhhtrdhhrghntghotghksegtrghlihgrnhdrtghomhdprhgtphhtthhopehrvghnthgrohdrsghuphhtsehgmhgrihhlrdgtohhm
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-In virtualization, VF is usually not bound by native drivers, instead
-should be passthrough to VM. Most PF and VF drivers provide separate
-names, e.g. "igb" and "igbvf", so that the hypervisor can control
-whether to use VF devices locally. The "bnxt_en" driver is a special
-case, it can drive both PF and VF devices, so here add a parameter
-"disable_vf_bind" to allow users to control.
+Hi Florian,
 
-Signed-off-by: Deli Zhang <deli.zhang21th@gmail.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 41 +++++++++++++++++++++--
- 1 file changed, 39 insertions(+), 2 deletions(-)
+On Tue, 24 Jun 2025 15:29:25 -0700
+Florian Fainelli <florian.fainelli@broadcom.com> wrote:
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 2cb3185c442c..89897182a71d 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -88,6 +88,12 @@ MODULE_DESCRIPTION("Broadcom NetXtreme network driver");
- 
- #define BNXT_TX_PUSH_THRESH 164
- 
-+#ifdef CONFIG_BNXT_SRIOV
-+static bool disable_vf_bind;
-+module_param(disable_vf_bind, bool, 0);
-+MODULE_PARM_DESC(disable_vf_bind, "Whether to disable binding to virtual functions (VFs)");
-+#endif
-+
- /* indexed by enum board_idx */
- static const struct {
- 	char *name;
-@@ -144,7 +150,12 @@ static const struct {
- 	[NETXTREME_E_P7_VF] = { "Broadcom BCM5760X Virtual Function" },
- };
- 
--static const struct pci_device_id bnxt_pci_tbl[] = {
-+/* The boundary between PF and VF devices in bnxt_pci_tbl */
-+#ifdef CONFIG_BNXT_SRIOV
-+#define FIRST_VF_DEV_ID 0x1606
-+#endif
-+
-+static struct pci_device_id bnxt_pci_tbl[] = {
- 	{ PCI_VDEVICE(BROADCOM, 0x1604), .driver_data = BCM5745x_NPAR },
- 	{ PCI_VDEVICE(BROADCOM, 0x1605), .driver_data = BCM5745x_NPAR },
- 	{ PCI_VDEVICE(BROADCOM, 0x1614), .driver_data = BCM57454 },
-@@ -196,7 +207,7 @@ static const struct pci_device_id bnxt_pci_tbl[] = {
- 	{ PCI_VDEVICE(BROADCOM, 0xd802), .driver_data = BCM58802 },
- 	{ PCI_VDEVICE(BROADCOM, 0xd804), .driver_data = BCM58804 },
- #ifdef CONFIG_BNXT_SRIOV
--	{ PCI_VDEVICE(BROADCOM, 0x1606), .driver_data = NETXTREME_E_VF },
-+	{ PCI_VDEVICE(BROADCOM, FIRST_VF_DEV_ID), .driver_data = NETXTREME_E_VF },
- 	{ PCI_VDEVICE(BROADCOM, 0x1607), .driver_data = NETXTREME_E_VF_HV },
- 	{ PCI_VDEVICE(BROADCOM, 0x1608), .driver_data = NETXTREME_E_VF_HV },
- 	{ PCI_VDEVICE(BROADCOM, 0x1609), .driver_data = NETXTREME_E_VF },
-@@ -17129,10 +17140,36 @@ static struct pci_driver bnxt_pci_driver = {
- #endif
- };
- 
-+#ifdef CONFIG_BNXT_SRIOV
-+static void bnxt_vf_bind_init(void)
-+{
-+	s32 idx;
-+
-+	if (!disable_vf_bind)
-+		return;
-+
-+	for (idx = 0; bnxt_pci_tbl[idx].device != 0; idx++) {
-+		if (bnxt_pci_tbl[idx].device == FIRST_VF_DEV_ID) {
-+			/* Truncate off VF devices */
-+			memset(&bnxt_pci_tbl[idx], 0, sizeof(struct pci_device_id));
-+			pr_info("%s: Disabled VF binding, id table offset %u",
-+				DRV_MODULE_NAME, idx);
-+			return;
-+		}
-+	}
-+
-+	/* Should not reach here! */
-+	pr_crit("%s: Unknown VF dev id %u", DRV_MODULE_NAME, FIRST_VF_DEV_ID);
-+}
-+#endif
-+
- static int __init bnxt_init(void)
- {
- 	int err;
- 
-+#ifdef CONFIG_BNXT_SRIOV
-+	bnxt_vf_bind_init();
-+#endif
- 	bnxt_debug_init();
- 	err = pci_register_driver(&bnxt_pci_driver);
- 	if (err) {
--- 
-2.47.0
+> Howdy,
+>=20
+> On 6/24/25 14:39, Maxime Chevallier wrote:
+> > Hello everyone,
+> >=20
+> > I'm reaching out to discuss an issue I've been facing with some SFP mod=
+ules
+> > that do SGMII to 100FX conversion.
+> >=20
+> > I'm using that on a product that has 1G-only SFP cage, where SGMII or 1=
+000BaseX
+> > are the only options, and that product needs to talk to a 100FX link pa=
+rtner.
+> >=20
+> > The only way this can ever work is with a media-converter PHY within th=
+e SFP,
+> > and apparently such SFP exist :
+> >=20
+> > https://www.fs.com/fr/products/37770.html?attribute=3D19567&id=3D335755
+> >=20
+> > I've tried various SFP modules from FS, Prolabs and Phoenix Contact with
+> > no luck. All these modules seem to integrate some variant of the
+> > Broadcom BCM5641 PHYs.
+> >=20
+> > I know that netdev@ isn't about fixing my local issues, but in the odd =
+chance anyone
+> > has ever either used such a module successfully, or has some insight on=
+ what is
+> > going on with these Broadcom PHYs, I would appreciate a lot :) Any find=
+ing or
+> > patch we can come-up with will be upstreamed of course :)
+> >=20
+> > Any people with some experience on this PHY or this kind of module may =
+be
+> > able to shed some lights on the findings I was able to gather so far.
+> >=20
+> > All modules have the same internal PHY, which exposes itself as a BCM54=
+61 :
+> >=20
+> > 	ID : 002060c1
+> > =09
+> > I know that because I was able to talk to the PHY using mdio over i2c, =
+at
+> > address 0x56 on the i2c bus. On some modules, the PHY doesn't reply at =
+all,
+> > on some it stalls the i2c bus if I try to do 16bits accesses (I have to=
+ use 8 bits
+> > accesses), and on some modules the regular 16bits accesses work...
+> >=20
+> > That alone makes me wonder if there's not some kind of firmware running=
+ in
+> > there replying to mdio ? =20
+>=20
+> Unclear, but that ID is correct for the BCM5461 and its variants.
+>=20
+> >=20
+> > Regarding what I can achieve with these, YMMV :
+> >=20
+> >   - I have a pair of Prolabs module with the ID "CISCO-PROLABS     GLC-=
+GE-100FX-C".
+> >=20
+> >     These are the ones that can only do 8bits mdio accesses. When the P=
+HY is
+> >     left undriven by the kernel, and you plug it into an SGMII-able SFP=
+ port, you
+> >     get a nice loop of 'link is up / link is down / link is up / ...' r=
+eported
+> >     by the MAC (or PCS). Its eeprom doesn't even say that it's a 100fx =
+module
+> >     (id->base.e100_base_fx isn't set). It does say "Cisco compatible", =
+maybe it's
+> >     using some flavour of SGMII that I don't know about ?
+> >    =20
+> >   - I have a pair of FS modules with the ID "FS     SFP-GE-100FX". Thes=
+e behave
+> >     almost exactly as the ones above, but it can be accessed with 16-bi=
+ts mdio
+> >     transactions.
+> >    =20
+> >   - I have a "PHOENIX CONTACT    2891081" that simply doesn't work
+> >  =20
+> >   - And maybe the most promising of all, a pair of "PROLABS    SFP-GE-1=
+00FX-C".
+> >     These reply on 16bits mdio accesses, and when you plug them with th=
+e PHY
+> >     undriven by the kernel (so relying only on internal config and stra=
+ps), I
+> >     get link-up detected by the MAC through inband SGMII, and I can rec=
+eive
+> >     traffic ! TX doesn't work though :(
+> >=20
+> > On the MAC side, I tested with 3 different SoC, all using a different P=
+CS :
+> >   - A Turris Omnia, that uses mvneta and its PCS
+> >   - A dwmac-socfpga board, using a Lynx / Altera TSE PCS to drive the S=
+GMII
+> >   - A KSZ9477 and its variant of DW XPCS.
+> >=20
+> > The behaviour is the same on all of them, so I'd say there's a very goo=
+d chance
+> > the modules are acting up. TBH I don't know much about sourcing SFPs, t=
+hey
+> > behave so differently that it may just be that I didn't find the exact =
+reference
+> > that for some reason happens to work ?
+> >=20
+> > The link-partner is a device that only does 100BaseX.
+> >=20
+> > On all of these modules, I've tried to either let the PHY completely un=
+managed
+> > by the kernel, no mdio transactions whatsoever and we leave the default=
+ PHY
+> > settings to their thing. As nothing worked, I've tried driving the PHY =
+through
+> > the kernel's broadcom.c driver, but that driver really doesn't support =
+100FX so
+> > it's also expected that this doesn't work. Unfortunately, I don't have
+> > access to any documentation for that PHY...
+> >=20
+> > The driver does say, for a similar model :
+> >=20
+> > 	/* The PHY is strapped in RGMII-fiber mode when INTERF_SEL[1:0]
+> > 	 * is 01b, and the link between PHY and its link partner can be
+> > 	 * either 1000Base-X or 100Base-FX.
+> > 	 * RGMII-1000Base-X is properly supported, but RGMII-100Base-FX
+> > 	 * support is still missing as of now.
+> > 	 */
+> >=20
+> > Not quite the same as our case as it's talking about RGMII, not SGMII, =
+but
+> > maybe the people who wrote that code know a bit more or have access to =
+some
+> > documentation ? I've tried to put these persons in CC :) =20
+>=20
+> Not sure if you can probe the various pins, but those that would be=20
+> interesting to measure would be:
+>=20
+> LNKSPD[1] / INTF_SEL[0]
+> LNKSPD[2] / INTF_SEL[1]
+> RGMIIEN
+> EN_10B/SD
+>=20
+> You can forcibly enable RGMII operation by writing to register 0x18,=20
+> shadow 0b111 (MII_BCM54XX_AUXCTL_SHDWSEL_MISC) and setting bit 7=20
+> (MII_BCM54XX_AUXCTL_SHDWSEL_MISC_RGMII_EN).
+>=20
+>  > > In any case, should anyone want to give this a shot in the future,  =
+=20
+> I'm using the
+> > following patch so that the SFP machinery can try to probe PHYs on these
+> > non-copper modules - that patch needs splitting up and is more of a hac=
+k than
+> > anything else.
+> >=20
+> > Thanks a lot everyone, and sorry for the noise if this is misplaced, =20
+>=20
+> For 100BaseFX, the signal detection is configured in bit 5 of the shadow=
+=20
+> 0b01100 in the 0x1C register. You can use bcm_{read,write}_shadow() for=20
+> that:
+>=20
+> 0 to use EN_10B/SD as CMOS/TTL signal detect (default)
+> 1 to use SD_100FX=C2=B1 as PECL signal detect
+>=20
+> You can use either copper or SGMII interface for 100BaseFX and that will=
+=20
+> be configured this way:
+>=20
+> - in register 0x1C, shadow 0b10 (1000Base-T/100Base-TX/10Base-T Spare=20
+> Control 1), set bit 4 to 1 to enable 100BaseFX
+>=20
+> - disable auto-negotiation with register 0x00 =3D 0x2100
+>=20
+> - set register 0x18 to 0x430 (bit 10 -> normal mode, bits 5:4 control=20
+> the edge rate. 0b00 -> 4ns, 0b01 -> 5ns, 0b10 -> 3ns, 0b11 -> 0ns. This=20
+> is the auxiliary control register (MII_BCM54XX_AUXCTL_SHDWSEL_AUXCTL).
+>=20
+> It's unclear from the datasheet whether 100BaseFX can work with RGMII.
 
+Thank you so much ! I'm trying to achieve SGMII to 100FX, so I'll give
+your instructions a try :) Thanks again for the quick answer, I'll let
+you know how this goes,
+
+Maxime
 
