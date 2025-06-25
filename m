@@ -1,369 +1,405 @@
-Return-Path: <netdev+bounces-201193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BE56AE865E
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 16:25:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1925BAE8663
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 16:25:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07EA15A6F85
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 14:23:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C32C3AAFEA
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 14:24:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5ED4264617;
-	Wed, 25 Jun 2025 14:22:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20C01265CDD;
+	Wed, 25 Jun 2025 14:24:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="O2XcBn9C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TNoiObDL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25FF263C9B
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 14:22:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E988263C9B;
+	Wed, 25 Jun 2025 14:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750861346; cv=none; b=f3uCury/FHx7Fg4qs0yIHC6r24PcUhvzKbvAWxBe2tHer5XpEQ7kgxlw/nJ4adLFWQVhmT9G71EwxbDYYy3PN0KPO0XmnLkkcc0Mr0yx9UfMQR5vfteE4hKk9NAZvt340cT/2RUBkS5V2iVfUKpyn64ZvI8by8DEbaKf1ZJRQek=
+	t=1750861469; cv=none; b=QaLVQDaDKVTCi1/b943Tfh1q8ioM54wDr9fu3Il6VuDrCWk78pcun+BINQ+o+yJelPYmTIgzuNIkdlaRPti9JQoAoRCBy0ekuANBVU3ahH7nOenn1fNMH8IxMPEolWnqgI5N2tZ85WPoeFsf083qxXnTtpaqUH3UaQqxUTgsrwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750861346; c=relaxed/simple;
-	bh=kzLW3zPnWa1wEO4Zrn8RenRJD4q3w8hbxkz1Q9+7Geg=;
+	s=arc-20240116; t=1750861469; c=relaxed/simple;
+	bh=4lQx4F9hjZWG+oecPIu73jVLUPGxu6Ppdl7qo3yREEA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YmrjuTeKMsWevFnc32+FqRhyuwCCC6Jkb8RosMfmdJgflU3MlgnFfzv8B04FbEABHTUnLaZPM62Wnm/Idm91yAJgnIVQlky/M9YjHdtCYaVGw4+mnm+VwGra/YPOudX3jE+gbwXOH/l+w6EP6KkgCIQTRwejdumo7/2jT2grbOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=O2XcBn9C; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7424ccbef4eso5168792b3a.2
-        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 07:22:24 -0700 (PDT)
+	 To:Cc:Content-Type; b=lo4bwIZp/G14tIsCqvzQSxL2D81wKClclJ0+mHmADQGFjyeiopcQ1/fIoyA6WgBHm9a6/q5B/Cb7UBpXgJreVfUVJvVZn72wDizfh2L5LE0x6vhSvrhkdR1fIFDWzIWJkRq6JLImqfhYn09Ku1e4qC9JhXm5r/qMZFgb0WV5/wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TNoiObDL; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-70e767ce72eso61452467b3.1;
+        Wed, 25 Jun 2025 07:24:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1750861344; x=1751466144; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=jA6qq53Qcvg4jWB1DFZWJEUs/z5lkLOZ+8gF9kaf4zQ=;
-        b=O2XcBn9CeaqdF7SDMXj/NVZQdD70z0UOZGtrx9OovXFi6NyxAPzQsJGHR1nO5mA/3v
-         xHGx+YrFrpxDIa8x0xuQISF3DOcdw7rD9UbEiKJ2xIKdKS/uiVTUD/JmSMBT2es8/FBx
-         DEnzKyr8vFmcAuO2EcyHcquzPX5d0N1LMfVVULMJcUc5zZen90MpZPmcoe4VtUpz55lm
-         O+ZQE1q5MwLN3iaW1UIQ5UxVd2ORuQ+1EWYlremnQCQCiQqieKgjoE4oLkx1c8qMAiQs
-         559yfLaRPjE3BfY1tmbh4HNBczq3g3eXAltIpYM9cY3iEGgMuUQrZHEyaO3Xh3Jf2+ci
-         wnpg==
+        d=gmail.com; s=20230601; t=1750861466; x=1751466266; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=64+eXwRfzFJ5ZZF2JmaBAaZJE0xEE8CT5TwD35FJ8Gc=;
+        b=TNoiObDLRLWEGNemagPOS21HVQJEKaFekwwv0vErMngIeRnrIWR3L7OXEVBTUSECP6
+         DAvpzbguXOydzEEsk6Uh4tRfmIj3gUEheFFD6fhks2QDrQMBt00Vq3esxrRyPZqX3pG7
+         37xGRxIf2QPDoC9dlZqEAE/6hsjRXhohEhbgvEpPqIwDZn3r3Cnc2RT4XD2asYGQ1sEx
+         99IlXGOLkM9vB4dO8aEo9wTmsewY8/Lny8DleqfyboFiz/idatXKTQKWrpda6wiQfTFv
+         wdATVrTja188VGrsN+x2wWEQnBY91B/RZf0OPtbek3ElMUVxb4elG+1YQj/t19UlBYLg
+         WFiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750861344; x=1751466144;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jA6qq53Qcvg4jWB1DFZWJEUs/z5lkLOZ+8gF9kaf4zQ=;
-        b=GN2/WMlrlyPKdYSgkPyYqaN2nG2/rJErf2WTAfnT+ylNkNqjVeNiMiWA3YYZRs2CiI
-         7Bdyd+Mcz64WLd2r99Z1LuVN1+B1Cy3vEm+oKQHTYq83DvZsID1sagSR2UoJpdidiKJm
-         jctefzQGpqVg2KAtp/x0S6zy1SBzE3+d2/gBMMfAXzV6Kdu0oXXoZgJUfJuj2TgqKFAq
-         uuwsE5HEjbsNYLNtbKXKVYFDFjAK/QVn5dEqy96f0/Ee8ihNMAELLeAQjNiCj1mfj7f2
-         hryrC80OU73YSCiTzRrg05PHVsZ0Df7iclng8f+YC0ZqInKBN+ovPmmaaRwqc/kBSvpg
-         JZ1g==
-X-Forwarded-Encrypted: i=1; AJvYcCXaAkQYVD7OZpZ8oyulcMvGrzAP0lMGnbNefY9GCkH3hmC47/6HHonmeWeJ2XDm6a/WuEubFvY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjcqvY4vItw1Gtxr6MtcMbY9shrdlfG8IYlop41HJjvOsLFe0j
-	pKCduD18aCyqBuWJSh/Hy11xhDkpTK9mAxzfmaYKsM/qu2dxlwCu/ZQ6PdMTg9p+CeTFot/NRhA
-	KVN9x8+ithXS2goSFwrVLGA4s7I4b8bc0C/gq5e4S
-X-Gm-Gg: ASbGncvC5oq5AHuahFKBKcz7z503cePO+p6vyPgzm34Ysk56D9cyhhoul8o7ieXTgmE
-	qHuCmTjsQvo/uNqQVuO08NGQzk4DYa6IOK7LLe4mmIEctUqX2avk0bIwTzhKGsDG0sGL/1W+TOn
-	EBx+VzhKW2OCvrQSbDkthvdAhpUsBwnLZpDV27phuEskWZIpC0gmhy
-X-Google-Smtp-Source: AGHT+IFEzFfGhUsVbWP1SftYqQm+LquUdczN4fPYqkcjAqqWWKdvCwJqAmrv9XMC1dzmpBdP0v1RC5dBSvUsbNHO+us=
-X-Received: by 2002:a05:6a00:3e0e:b0:748:f854:b765 with SMTP id
- d2e1a72fcca58-74ad4443c5emr4870304b3a.4.1750861343929; Wed, 25 Jun 2025
- 07:22:23 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750861466; x=1751466266;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=64+eXwRfzFJ5ZZF2JmaBAaZJE0xEE8CT5TwD35FJ8Gc=;
+        b=xAaPPGFAGYRxlv5wIVPdF4Twrl8ytatnRhP0pYo4qzB8Xzea2x0BLpTCnclVzlkPnu
+         Wi6vw0dPomvtuIt2mUivspeUvCuMUDdp9cFDOVy8Xw3gqZbveSbYCZqlTRbaFdzdIZ8T
+         JpJ/56PuG6lMxaV+gVuxS9v54Vl1DHpcvgayKYjdb/LNpHT/OvFDnubXURLTg02xZ+Uz
+         VbzEf7yGT7MOcKQgz4kqA+A19wQPylmgAP90uU/7I8wtdR/Z8+JjiMmb+guYbXuDMK/C
+         f3F5nsbPilbCt8mb7oo47g/2GIPMiFOiUy7jVC+rulhIfz5GHXnLZyTOzBgsfSwiJqgk
+         kKTw==
+X-Forwarded-Encrypted: i=1; AJvYcCU5UWBqEEdvGlovRlBtMbki4a2cADcaggDfGIjtInd2cZI+52qcWs7qqf4wlFehDOcnagjI2AdXbXrG@vger.kernel.org, AJvYcCUBf3komUcL4I/m/Bqm93/w2l+tljMAmWB59fz+7ZwuV+TDakRet1u03V+BJ6V6a2U3sAn0kzu1Ud/HcA==@vger.kernel.org, AJvYcCUlQ6hJo8k64BCfhOsCJy6dvUXFYob12hVgLJVT3nqaA5MeXYnaUvMSGM+/tcE9jaV3+0QNpbNGaPwU@vger.kernel.org, AJvYcCUmtFwt9WDhzYiJWouWaciLQX0rIIK3fbMaOIpDH6kjyUx68noTIX4tx/0RzxkG59Kp2JteRFgw/yjxwHxOyNY=@vger.kernel.org, AJvYcCV4n010a94L+yV82ohWpiL+Z/RFzGCC+ZlCjnqv+9pO+TauJ9UQZiDVLw9LuBVVHkCYJcWqXiXAUR8=@vger.kernel.org, AJvYcCV9rm2a3JY5yDKG1CeEJfsS60ILRPVqEiauwPPdu+kTf6z14f+EN3S9QQkf11jpnltTqQmeZ0LP@vger.kernel.org, AJvYcCW16vPuCmJWcRDO+0HQ0iDomMsCZ/zl8UBb6he5IBcv4q4GO8TfrkbYdZj6jdvtvO18LJCXI/vyQOEgWqJc@vger.kernel.org, AJvYcCWkTkm2IJduAxTl9z3un2pKfrR0Kzv9UOW5YzrXSB8+5fUfDJYL/r90XsUY3axdvYinA954funLZOKA@vger.kernel.org, AJvYcCWnxfHDrZRssX/QcWu3qfPHbO9uQLw42SjH9M9C9bg6KbQY8ALToK2V/mPPG0WQe9NRu6v3gnu2MOo2LdI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmuKeD8d6x6QXbCpstNTjjp0aXiZRzE+BJvAOOBpTDy3lD594u
+	dLvNLxTfBBzuCJSIyn+h68rm8oxdfrqMGL+K0N51wX6gPs78GyrEx5YMZdHuh5Xk/44Lfduzlz3
+	AhCgSLM6cjtaCM9/rEG8bahbCSlo/55M=
+X-Gm-Gg: ASbGncuQ7IIq6LeZnV0ZY13zsoe7NGPmZV6w2DkGbrhxExNZ4wuAoVB6bAZTEWmrKre
+	skj3/bdxUd67D/XLnm5NL93wjOTqjku5L2D2Img+pzoS4KAGOUUD9DI7M7fpar8egHNHbydOszv
+	Aw4BFiIBydMw5Y+HdYy70n7d2auXzzZ6i789lsbcD1Ng==
+X-Google-Smtp-Source: AGHT+IFk+/GbdFQ7pe2ZUPEw01sHglJ1f9nAD4x+JqwT6kdRFvMBui1vb6g1X14KApUglJ5N+5SCNIY5OjUpmYd7Piw=
+X-Received: by 2002:a05:690c:6c8c:b0:702:d85:5347 with SMTP id
+ 00721157ae682-71406e0865dmr42325307b3.36.1750861465689; Wed, 25 Jun 2025
+ 07:24:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <45876f14-cf28-4177-8ead-bb769fd9e57a@gmail.com>
- <aFosjBOUlOr0TKsd@pop-os.localdomain> <3af4930b-6773-4159-8a7a-e4f6f6ae8109@gmail.com>
- <5e4490da-3f6c-4331-af9c-0e6d32b6fc75@gmail.com>
-In-Reply-To: <5e4490da-3f6c-4331-af9c-0e6d32b6fc75@gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 25 Jun 2025 10:22:12 -0400
-X-Gm-Features: Ac12FXznJiXiH5EvqI_QOcqeM7xTlvPTFIge2YrM41bHMg9TaPAQ3gUB8kMGtik
-Message-ID: <CAM0EoMm+xgb0vkTDMAWy9xCvTF+XjGQ1xO5A2REajmBN1DKu1Q@mail.gmail.com>
-Subject: Re: Incomplete fix for recent bug in tc / hfsc
-To: Lion Ackermann <nnamrec@gmail.com>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org, 
-	Jiri Pirko <jiri@resnulli.us>, Mingi Cho <mincho@theori.io>
-Content-Type: multipart/mixed; boundary="00000000000074e7e40638662cec"
-
---00000000000074e7e40638662cec
+References: <20250612152313.GP381401@google.com> <CAOoeyxV-E_HQOBu0Pzfy0b0yJ2qbrW_C8pATCTWE4+PXqvHL6g@mail.gmail.com>
+ <20250613131133.GR381401@google.com> <CAOoeyxXftk9QX_REgeQhuXSc9rEguzXkKVKDQdawU=NzGbo9oA@mail.gmail.com>
+ <20250619115345.GL587864@google.com> <CAOoeyxXSTeypv2qQjcK1cSPtjch=gJGYzqoMsLQ-LJZ8Kwgd=w@mail.gmail.com>
+ <20250619152814.GK795775@google.com> <CAOoeyxU7eQneBuxbBqepta29q_OHPzrkN4SKmj6RX72L3Euw5A@mail.gmail.com>
+ <20250625090133.GP795775@google.com> <CAOoeyxWoxC-n3JjjFe8Ruq_VydXk=jev=mopKfL5B7gsaSg=Ag@mail.gmail.com>
+ <20250625134634.GY795775@google.com>
+In-Reply-To: <20250625134634.GY795775@google.com>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Wed, 25 Jun 2025 22:24:13 +0800
+X-Gm-Features: Ac12FXwOAsReVst2WQpcfNnHik1k8UbE-KC25E0rS5ks97enPxKsXXybra4VcWs
+Message-ID: <CAOoeyxVuu-kKoQa84mGOX=thAc0hnzQU8L=MnycoRRhzoZMnNw@mail.gmail.com>
+Subject: Re: [PATCH v12 1/7] mfd: Add core driver for Nuvoton NCT6694
+To: Lee Jones <lee@kernel.org>
+Cc: linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org, 
+	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org, 
+	Ming Yu <tmyu0@nuvoton.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 24, 2025 at 6:43=E2=80=AFAM Lion Ackermann <nnamrec@gmail.com> =
-wrote:
+Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B46=E6=9C=8825=E6=97=A5 =E9=
+=80=B1=E4=B8=89 =E4=B8=8B=E5=8D=889:46=E5=AF=AB=E9=81=93=EF=BC=9A
 >
-> Hi,
+> On Wed, 25 Jun 2025, Ming Yu wrote:
 >
-> On 6/24/25 11:24 AM, Lion Ackermann wrote:
-> > Hi,
+> > Dear Greg and Lee,
 > >
-> > On 6/24/25 6:41 AM, Cong Wang wrote:
-> >> On Mon, Jun 23, 2025 at 12:41:08PM +0200, Lion Ackermann wrote:
-> >>> Hello,
-> >>>
-> >>> I noticed the fix for a recent bug in sch_hfsc in the tc subsystem is
-> >>> incomplete:
-> >>>     sch_hfsc: Fix qlen accounting bug when using peek in hfsc_enqueue=
-()
-> >>>     https://lore.kernel.org/all/20250518222038.58538-2-xiyou.wangcong=
-@gmail.com/
-> >>>
-> >>> This patch also included a test which landed:
-> >>>     selftests/tc-testing: Add an HFSC qlen accounting test
-> >>>
-> >>> Basically running the included test case on a sanitizer kernel or wit=
-h
-> >>> slub_debug=3DP will directly reveal the UAF:
-> >>
-> >> Interesting, I have SLUB debugging enabled in my kernel config too:
-> >>
-> >> CONFIG_SLUB_DEBUG=3Dy
-> >> CONFIG_SLUB_DEBUG_ON=3Dy
-> >> CONFIG_SLUB_RCU_DEBUG=3Dy
-> >>
-> >> But I didn't catch this bug.
-> >>
+> > Thank you for your comments.
+> > I've reviewed your suggestions, but would appreciate your feedback on
+> > a few remaining points.
 > >
-> > Technically the class deletion step which triggered the sanitizer was n=
-ot
-> > present in your testcase. The testcase only left the stale pointer whic=
-h was
-> > never accessed though.
-> >
-> >>> To be completely honest I do not quite understand the rationale behin=
-d the
-> >>> original patch. The problem is that the backlog corruption propagates=
- to
-> >>> the parent _before_ parent is even expecting any backlog updates.
-> >>> Looking at f.e. DRR: Child is only made active _after_ the enqueue co=
-mpletes.
-> >>> Because HFSC is messing with the backlog before the enqueue completed=
-,
-> >>> DRR will simply make the class active even though it should have alre=
-ady
-> >>> removed the class from the active list due to qdisc_tree_backlog_flus=
-h.
-> >>> This leaves the stale class in the active list and causes the UAF.
-> >>>
-> >>> Looking at other qdiscs the way DRR handles child enqueues seems to r=
-esemble
-> >>> the common case. HFSC calling dequeue in the enqueue handler violates
-> >>> expectations. In order to fix this either HFSC has to stop using dequ=
-eue or
-> >>> all classful qdiscs have to be updated to catch this corner case wher=
+> > Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B46=E6=9C=8825=E6=97=A5=
+ =E9=80=B1=E4=B8=89 =E4=B8=8B=E5=8D=885:01=E5=AF=AB=E9=81=93=EF=BC=9A
+> > >
+> > > On Fri, 20 Jun 2025, Ming Yu wrote:
+> > >
+> > > > Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B46=E6=9C=8819=E6=
+=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=8811:28=E5=AF=AB=E9=81=93=EF=BC=
+=9A
+> > > > >
+> > > > > On Thu, 19 Jun 2025, Ming Yu wrote:
+> > > > >
+> > > > > > Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B46=E6=9C=8819=
+=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=887:53=E5=AF=AB=E9=81=93=EF=BC=
+=9A
+> > > > > > >
+> > > > > > > On Fri, 13 Jun 2025, Ming Yu wrote:
+> > > > > > >
+> > > > > > > > Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B46=E6=9C=
+=8813=E6=97=A5 =E9=80=B1=E4=BA=94 =E4=B8=8B=E5=8D=889:11=E5=AF=AB=E9=81=93=
+=EF=BC=9A
+> > > > > > > > >
+> > > > > > > > > On Fri, 13 Jun 2025, Ming Yu wrote:
+> > > > > > > > >
+> > > > > > > > > > Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B46=E6=
+=9C=8812=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=8811:23=E5=AF=AB=E9=81=
+=93=EF=BC=9A
+> > > > > > > > > > >
+> > > > > > > > > > > On Thu, 12 Jun 2025, Ming Yu wrote:
+> > > > > > > > > > >
+> > > > > > > > > > > > Dear Lee,
+> > > > > > > > > > > >
+> > > > > > > > > > > > Thank you for reviewing,
+> > > > > > > > > > > >
+> > > > > > > > > > > > Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B46=
+=E6=9C=8812=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=8810:00=E5=AF=AB=E9=
+=81=93=EF=BC=9A
+> > > > > > > > > > > > >
+> > > > > > > > > > > > ...
+> > > > > > > > > > > > > > +static const struct mfd_cell nct6694_devs[] =
+=3D {
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL=
+, 0, 0),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL=
+, 0, 1),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL=
+, 0, 2),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL=
+, 0, 3),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL=
+, 0, 4),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL=
+, 0, 5),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL=
+, 0, 6),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL=
+, 0, 7),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL=
+, 0, 8),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL=
+, 0, 9),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL=
+, 0, 10),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL=
+, 0, 11),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL=
+, 0, 12),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL=
+, 0, 13),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL=
+, 0, 14),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-gpio", NULL, NULL=
+, 0, 15),
+> > > > > > > > > > > > > > +
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL,=
+ 0, 0),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL,=
+ 0, 1),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL,=
+ 0, 2),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL,=
+ 0, 3),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL,=
+ 0, 4),
+> > > > > > > > > > > > > > +     MFD_CELL_BASIC("nct6694-i2c", NULL, NULL,=
+ 0, 5),
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > Why have we gone back to this silly numbering sch=
+eme?
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > What happened to using IDA in the child driver?
+> > > > > > > > > > > > >
+> > > > > > > > > > > >
+> > > > > > > > > > > > In a previous version, I tried to maintain a static=
+ IDA in each
+> > > > > > > > > > > > sub-driver. However, I didn=E2=80=99t consider the =
+case where multiple NCT6694
+> > > > > > > > > > > > devices are bound to the same driver =E2=80=94 in t=
+hat case, the IDs are not
+> > > > > > > > > > > > fixed and become unusable for my purpose.
+> > > > > > > > > > >
+> > > > > > > > > > > Not sure I understand.
+> > > > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > As far as I know, if I maintain the IDA in the sub-driv=
+ers and use
+> > > > > > > > > > multiple MFD_CELL_NAME("nct6694-gpio") entries in the M=
+FD, the first
+> > > > > > > > > > NCT6694 device bound to the GPIO driver will receive ID=
+s 0~15.
+> > > > > > > > > > However, when a second NCT6694 device is connected to t=
+he system, it
+> > > > > > > > > > will receive IDs 16~31.
+> > > > > > > > > > Because of this behavior, I switched back to using plat=
+form_device->id.
+> > > > > > > > >
+> > > > > > > > > Each of the devices will probe once.
+> > > > > > > > >
+> > > > > > > > > The first one will be given 0, the second will be given 1=
+, etc.
+> > > > > > > > >
+> > > > > > > > > Why would you give multiple IDs to a single device bound =
+to a driver?
+> > > > > > > > >
+> > > > > > > >
+> > > > > > > > The device exposes multiple peripherals =E2=80=94 16 GPIO c=
+ontrollers, 6 I2C
+> > > > > > > > adapters, 2 CAN FD controllers, and 2 watchdog timers. Each=
+ peripheral
+> > > > > > > > is independently addressable, has its own register region, =
+and can
+> > > > > > > > operate in isolation. The IDs are used to distinguish betwe=
+en these
+> > > > > > > > instances.
+> > > > > > > > For example, the GPIO driver will be probed 16 times, alloc=
+ating 16
+> > > > > > > > separate gpio_chip instances to control 8 GPIO lines each.
+> > > > > > > >
+> > > > > > > > If another device binds to this driver, it is expected to e=
+xpose
+> > > > > > > > peripherals with the same structure and behavior.
+> > > > > > >
+> > > > > > > I still don't see why having a per-device IDA wouldn't render=
+ each
+> > > > > > > probed device with its own ID.  Just as you have above.
+> > > > > > >
+> > > > > >
+> > > > > > For example, when the MFD driver and the I2C sub-driver are loa=
+ded,
+> > > > > > connecting the first NCT6694 USB device to the system results i=
+n 6
+> > > > > > nct6694-i2c platform devices being created and bound to the
+> > > > > > i2c-nct6694 driver. These devices receive IDs 0 through 5 via t=
+he IDA.
+> > > > > >
+> > > > > > However, when a second NCT6694 USB device is connected, its
+> > > > > > corresponding nct6694-i2c platform devices receive IDs 6 throug=
+h 11 =E2=80=94
+> > > > > > instead of 0 through 5 as I originally expected.
+> > > > > >
+> > > > > > If I've misunderstood something, please feel free to correct me=
+. Thank you!
+> > > > >
+> > > > > In the code above you register 6 I2C devices.  Each device will b=
 e
-> >>> child qlen was zero even though the enqueue succeeded. Alternatively =
-HFSC
-> >>> could signal enqueue failure if it sees child dequeue dropping packet=
-s to
-> >>> zero? I am not sure how this all plays out with the re-entrant case o=
-f
-> >>> netem though.
-> >>
-> >> I think this may be the same bug report from Mingi in the security
-> >> mailing list. I will take a deep look after I go back from Open Source
-> >> Summit this week. (But you are still very welcome to work on it by
-> >> yourself, just let me know.)
-> >>
-> >> Thanks!
+> > > > > assigned a platform ID 0 through 5. The .probe() function in the =
+I2C
+> > > > > driver will be executed 6 times.  In each of those calls to .prob=
+e(),
+> > > > > instead of pre-allocating a contiguous assignment of IDs here, yo=
+u
+> > > > > should be able to use IDA in .probe() to allocate those same devi=
+ce IDs
+> > > > > 0 through 5.
+> > > > >
+> > > > > What am I missing here?
+> > > > >
+> > > >
+> > > > You're absolutely right in the scenario where a single NCT6694 devi=
+ce
+> > > > is present. However, I=E2=80=99m wondering how we should handle the=
+ case where
+> > > > a second or even third NCT6694 device is bound to the same MFD driv=
+er.
+> > > > In that situation, the sub-drivers using a static IDA will continue
+> > > > allocating increasing IDs, rather than restarting from 0 for each
+> > > > device. How should this be handled?
+> > >
+> > > I'd like to see the implementation of this before advising.
+> > >
+> > > In such a case, I assume there would be a differentiating factor betw=
+een
+> > > the two (or three) devices.  You would then use that to decide which =
+IDA
+> > > would need to be incremented.
+> > >
+> > > However, Greg is correct.  Hard-coding look-ups for userspace to use
+> > > sounds like a terrible idea.
+> > >
 > >
-> >> My suggestion is we go back to a proposal i made a few moons back (was
-> >> this in a discussion with you? i dont remember): create a mechanism to
-> >> disallow certain hierarchies of qdiscs based on certain attributes,
-> >> example in this case disallow hfsc from being the ancestor of "qdiscs =
-that may
-> >> drop during peek" (such as netem). Then we can just keep adding more
-> >> "disallowed configs" that will be rejected via netlink. Similar idea
-> >> is being added to netem to disallow double duplication, see:
-> >> https://lore.kernel.org/netdev/20250622190344.446090-1-will@willsroot.=
-io/
-> >>
-> >> cheers,
-> >> jamal
+> > I understand.
+> > Do you think it would be better to pass the index via platform_data
+> > and use PLATFORM_DEVID_AUTO together with mfd_add_hotplug_devices()
+> > instead?
+> > For example:
+> > struct nct6694_platform_data {
+> >     int index;
+> > };
 > >
-> > I vaguely remember Jamal's proposal from a while back, and I believe th=
-ere was
-> > some example code for this approach already?
-> > Since there is another report you have a better overview, so it is prob=
-ably
-> > best you look at it first. In the meantime I can think about the soluti=
-on a
-> > bit more and possibly draft something if you wish.
+> > static struct nct6694_platform_data i2c_data[] =3D {
+> >     { .index =3D 0 }, { .index =3D 1 }, { .index =3D 2 }, { .index =3D =
+3 }, {
+> > .index =3D 4 }, { .index =3D 5 },
+> > };
 > >
-> > Thanks,
-> > Lion
+> > static const struct mfd_cell nct6694_devs[] =3D {
+> >     MFD_CELL_BASIC("nct6694-i2c", NULL, &i2c_data[0], sizeof(struct
+> > nct6694_platform_data), 0),
+> >     MFD_CELL_BASIC("nct6694-i2c", NULL, &i2c_data[1], sizeof(struct
+> > nct6694_platform_data), 0),
+> >     MFD_CELL_BASIC("nct6694-i2c", NULL, &i2c_data[2], sizeof(struct
+> > nct6694_platform_data), 0),
+> >     MFD_CELL_BASIC("nct6694-i2c", NULL, &i2c_data[3], sizeof(struct
+> > nct6694_platform_data), 0),
+> >     MFD_CELL_BASIC("nct6694-i2c", NULL, &i2c_data[4], sizeof(struct
+> > nct6694_platform_data), 0),
+> >     MFD_CELL_BASIC("nct6694-i2c", NULL, &i2c_data[5], sizeof(struct
+> > nct6694_platform_data), 0),
+> > };
+> > ...
+> > mfd_add_hotplug_devices(dev, nct6694_devs, ARRAY_SIZE(nct6694_devs));
+> > ...
 >
-> Actually I was intrigued, what do you think about addressing the root of =
-the
-> use-after-free only and ignore the backlog corruption (kind of). After th=
-e
-> recent patches where qlen_notify may get called multiple times, we could =
-simply
-> loosen qdisc_tree_reduce_backlog to always notify when the qdisc is empty=
-.
-> Since deletion of all qdiscs will run qdisc_reset / qdisc_purge_queue at =
-one
-> point or another, this should always catch left-overs. And we need not ca=
-re
-> about all the complexities involved of keeping the backlog right and / or
-> prevent certain hierarchies which seems rather tedious.
-> This requires some more testing, but I was imagining something like this:
+> No, that's clearly way worse.  =3D:-)
 >
-> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-> --- a/net/sched/sch_api.c
-> +++ b/net/sched/sch_api.c
-> @@ -780,15 +780,12 @@ static u32 qdisc_alloc_handle(struct net_device *de=
-v)
->
->  void qdisc_tree_reduce_backlog(struct Qdisc *sch, int n, int len)
->  {
-> -       bool qdisc_is_offloaded =3D sch->flags & TCQ_F_OFFLOADED;
->         const struct Qdisc_class_ops *cops;
->         unsigned long cl;
->         u32 parentid;
->         bool notify;
->         int drops;
->
-> -       if (n =3D=3D 0 && len =3D=3D 0)
-> -               return;
->         drops =3D max_t(int, n, 0);
->         rcu_read_lock();
->         while ((parentid =3D sch->parent)) {
-> @@ -797,17 +794,8 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, in=
-t n, int len)
->
->                 if (sch->flags & TCQ_F_NOPARENT)
->                         break;
-> -               /* Notify parent qdisc only if child qdisc becomes empty.
-> -                *
-> -                * If child was empty even before update then backlog
-> -                * counter is screwed and we skip notification because
-> -                * parent class is already passive.
-> -                *
-> -                * If the original child was offloaded then it is allowed
-> -                * to be seem as empty, so the parent is notified anyway.
-> -                */
-> -               notify =3D !sch->q.qlen && !WARN_ON_ONCE(!n &&
-> -                                                      !qdisc_is_offloade=
-d);
-> +               /* Notify parent qdisc only if child qdisc becomes empty.=
- */
-> +               notify =3D !sch->q.qlen;
->                 /* TODO: perform the search on a per txq basis */
->                 sch =3D qdisc_lookup(qdisc_dev(sch), TC_H_MAJ(parentid));
->                 if (sch =3D=3D NULL) {
-> @@ -816,6 +804,9 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, int=
- n, int len)
->                 }
->                 cops =3D sch->ops->cl_ops;
->                 if (notify && cops->qlen_notify) {
-> +                       /* Note that qlen_notify must be idempotent as it=
- may get called
-> +                        * multiple times.
-> +                        */
->                         cl =3D cops->find(sch, parentid);
->                         cops->qlen_notify(sch, cl);
->                 }
+> The clean-up that this provides is probably not worth all of this
+> discussion.  I _still_ think this enumeration should be done in the
+> driver.  But if you really can't make it work, I'll accept the .id
+> patch.
 >
 
-I believe this will fix the issue. My concern is we are not solving
-the root cause. I also posted a bunch of fixes on related issues for
-something Mingi Cho (on Cc) found - see attachments, i am not in favor
-of these either.
-Most of these setups are nonsensical. After seeing so many of these my
-view is we start disallowing such hierarchies.
+Okay, I would like to ask for your advice regarding the implementation of I=
+DA.
 
-cheers,
-jamal
+Using a global IDA in the sub-driver like this:
+(in i2c-nct6694.c)
+static DEFINE_IDA(nct6694_i2c_ida);
 
---00000000000074e7e40638662cec
-Content-Type: application/octet-stream; name="drr_fix.diff"
-Content-Disposition: attachment; filename="drr_fix.diff"
-Content-Transfer-Encoding: base64
-Content-ID: <f_mcc1lzem0>
-X-Attachment-Id: f_mcc1lzem0
+static int nct6694_i2c_probe(struct platform_device *pdev)
+{
+    ida_alloc(&nct6694_i2c_ida, GFP_KERNEL);
+    ...
+}
 
-ZGlmZiAtLWdpdCBhL25ldC9zY2hlZC9zY2hfYXBpLmMgYi9uZXQvc2NoZWQvc2NoX2FwaS5jCmlu
-ZGV4IGM1ZTM2NzNhYWRiZS4uNDZiMjQyMzNhODE4IDEwMDY0NAotLS0gYS9uZXQvc2NoZWQvc2No
-X2FwaS5jCisrKyBiL25ldC9zY2hlZC9zY2hfYXBpLmMKQEAgLTgxOSw4ICs4MTksMTEgQEAgdm9p
-ZCBxZGlzY190cmVlX3JlZHVjZV9iYWNrbG9nKHN0cnVjdCBRZGlzYyAqc2NoLCBpbnQgbiwgaW50
-IGxlbikKIAkJCWNsID0gY29wcy0+ZmluZChzY2gsIHBhcmVudGlkKTsKIAkJCWNvcHMtPnFsZW5f
-bm90aWZ5KHNjaCwgY2wpOwogCQl9Ci0JCXNjaC0+cS5xbGVuIC09IG47Ci0JCXNjaC0+cXN0YXRz
-LmJhY2tsb2cgLT0gbGVuOworCQkvKiBBdm9pZCB1bmRlcmZsb3dpbmcgcWxlbiBhbmQgYmFja2xv
-ZyAqLworCQlpZiAoc2NoLT5xLnFsZW4pCisJCQlzY2gtPnEucWxlbiAtPSBuOworCQlpZiAoc2No
-LT5xc3RhdHMuYmFja2xvZykKKwkJCXNjaC0+cXN0YXRzLmJhY2tsb2cgLT0gbGVuOwogCQlfX3Fk
-aXNjX3FzdGF0c19kcm9wKHNjaCwgZHJvcHMpOwogCX0KIAlyY3VfcmVhZF91bmxvY2soKTsKZGlm
-ZiAtLWdpdCBhL25ldC9zY2hlZC9zY2hfZHJyLmMgYi9uZXQvc2NoZWQvc2NoX2Ryci5jCmluZGV4
-IDliNmQ3OWJkODczNy4uNDVkYTVmMzI5NzAxIDEwMDY0NAotLS0gYS9uZXQvc2NoZWQvc2NoX2Ry
-ci5jCisrKyBiL25ldC9zY2hlZC9zY2hfZHJyLmMKQEAgLTIwLDYgKzIwLDcgQEAgc3RydWN0IGRy
-cl9jbGFzcyB7CiAKIAlzdHJ1Y3QgZ25ldF9zdGF0c19iYXNpY19zeW5jCQlic3RhdHM7CiAJc3Ry
-dWN0IGduZXRfc3RhdHNfcXVldWUJCXFzdGF0czsKKwlfX3U4CQkJCXFsZW5fbm90aWZ5X2luYWN0
-aXZlOwogCXN0cnVjdCBuZXRfcmF0ZV9lc3RpbWF0b3IgX19yY3UgKnJhdGVfZXN0OwogCXN0cnVj
-dCBsaXN0X2hlYWQJCWFsaXN0OwogCXN0cnVjdCBRZGlzYwkJCSpxZGlzYzsKQEAgLTIzNSw3ICsy
-MzYsMTAgQEAgc3RhdGljIHZvaWQgZHJyX3FsZW5fbm90aWZ5KHN0cnVjdCBRZGlzYyAqY3NoLCB1
-bnNpZ25lZCBsb25nIGFyZykKIHsKIAlzdHJ1Y3QgZHJyX2NsYXNzICpjbCA9IChzdHJ1Y3QgZHJy
-X2NsYXNzICopYXJnOwogCi0JbGlzdF9kZWxfaW5pdCgmY2wtPmFsaXN0KTsKKwlpZiAoY2xfaXNf
-YWN0aXZlKGNsKSkKKwkJbGlzdF9kZWxfaW5pdCgmY2wtPmFsaXN0KTsKKwllbHNlCisJCWNsLT5x
-bGVuX25vdGlmeV9pbmFjdGl2ZSA9IDE7CiB9CiAKIHN0YXRpYyBpbnQgZHJyX2R1bXBfY2xhc3Mo
-c3RydWN0IFFkaXNjICpzY2gsIHVuc2lnbmVkIGxvbmcgYXJnLApAQCAtMzYwLDYgKzM2NCwxNiBA
-QCBzdGF0aWMgaW50IGRycl9lbnF1ZXVlKHN0cnVjdCBza19idWZmICpza2IsIHN0cnVjdCBRZGlz
-YyAqc2NoLAogCQlyZXR1cm4gZXJyOwogCX0KIAorCS8qIEFkZHJlc3MgY29ybmVyIGNhc2Ugd2hl
-cmUgYSBjaGlsZCBxZGlzYyBkcm9wcGVkIHRoZSBwYWNrZXQgYWZ0ZXIKKwkgKiBlbnF1ZXVlIHJl
-dHVybmVkIHN1Y2Nlc3MgKGFzIG9mIG5vdyB0aGlzIGNhbiBvbmx5IGhhcHBlbiBpZiB0aGUgdXNl
-cgorCSAqIGhhcyBuZXRlbSBkb3duIHRoZSBoaWVyYXJjaHkpLgorCSAqLworCWlmICh1bmxpa2Vs
-eShjbC0+cWxlbl9ub3RpZnlfaW5hY3RpdmUpKSB7CisJCWNsLT5xbGVuX25vdGlmeV9pbmFjdGl2
-ZSA9IDA7CisJCXJldHVybiBORVRfWE1JVF9TVUNDRVNTIHwgX19ORVRfWE1JVF9CWVBBU1M7CisJ
-fQorCiAJaWYgKCFjbF9pc19hY3RpdmUoY2wpKSB7CiAJCWxpc3RfYWRkX3RhaWwoJmNsLT5hbGlz
-dCwgJnEtPmFjdGl2ZSk7CiAJCWNsLT5kZWZpY2l0ID0gY2wtPnF1YW50dW07Cg==
---00000000000074e7e40638662cec
-Content-Type: application/octet-stream; name="qfq_netem_child_fix.diff"
-Content-Disposition: attachment; filename="qfq_netem_child_fix.diff"
-Content-Transfer-Encoding: base64
-Content-ID: <f_mcc1mo7i1>
-X-Attachment-Id: f_mcc1mo7i1
+causes IDs to be globally incremented across all devices. For example,
+the first NCT6694 device gets probed 6 times and receives IDs 0=E2=80=935, =
+but
+when a second NCT6694 device is added, it receives IDs starting from
+6, rather than starting again from 0. This makes per-device ID mapping
+unreliable.
 
-ZGlmZiAtLWdpdCBhL25ldC9zY2hlZC9zY2hfYXBpLmMgYi9uZXQvc2NoZWQvc2NoX2FwaS5jCmlu
-ZGV4IGM1ZTM2NzNhYWRiZS4uMTBmYjcyZmVmOThlIDEwMDY0NAotLS0gYS9uZXQvc2NoZWQvc2No
-X2FwaS5jCisrKyBiL25ldC9zY2hlZC9zY2hfYXBpLmMKQEAgLTgxNCw2ICs4MTQsMTEgQEAgdm9p
-ZCBxZGlzY190cmVlX3JlZHVjZV9iYWNrbG9nKHN0cnVjdCBRZGlzYyAqc2NoLCBpbnQgbiwgaW50
-IGxlbikKIAkJCVdBUk5fT05fT05DRShwYXJlbnRpZCAhPSBUQ19IX1JPT1QpOwogCQkJYnJlYWs7
-CiAJCX0KKworCQlpZiAodW5saWtlbHkoKCFzY2gtPnEucWxlbiAmJiBuKSB8fAorCQkJICAgICAo
-IXNjaC0+cXN0YXRzLmJhY2tsb2cgJiYgbGVuKSkpCisJCQljb250aW51ZTsKKwogCQljb3BzID0g
-c2NoLT5vcHMtPmNsX29wczsKIAkJaWYgKG5vdGlmeSAmJiBjb3BzLT5xbGVuX25vdGlmeSkgewog
-CQkJY2wgPSBjb3BzLT5maW5kKHNjaCwgcGFyZW50aWQpOwpkaWZmIC0tZ2l0IGEvbmV0L3NjaGVk
-L3NjaF9xZnEuYyBiL25ldC9zY2hlZC9zY2hfcWZxLmMKaW5kZXggYmYxMjgyY2IyMmViLi42ZDg1
-ZGEyMWM0YjggMTAwNjQ0Ci0tLSBhL25ldC9zY2hlZC9zY2hfcWZxLmMKKysrIGIvbmV0L3NjaGVk
-L3NjaF9xZnEuYwpAQCAtMTI1OCw3ICsxMjU4LDE3IEBAIHN0YXRpYyBpbnQgcWZxX2VucXVldWUo
-c3RydWN0IHNrX2J1ZmYgKnNrYiwgc3RydWN0IFFkaXNjICpzY2gsCiAJYWdnID0gY2wtPmFnZzsK
-IAkvKiBpZiB0aGUgY2xhc3MgaXMgYWN0aXZlLCB0aGVuIGRvbmUgaGVyZSAqLwogCWlmIChjbF9p
-c19hY3RpdmUoY2wpKSB7Ci0JCWlmICh1bmxpa2VseShza2IgPT0gY2wtPnFkaXNjLT5vcHMtPnBl
-ZWsoY2wtPnFkaXNjKSkgJiYKKwkJY29uc3QgdTMyIHByZV9wZWVrX2JhY2tsb2cgPSBzY2gtPnFz
-dGF0cy5iYWNrbG9nOworCisJCXNrYiA9IGNsLT5xZGlzYy0+b3BzLT5wZWVrKGNsLT5xZGlzYyk7
-CisJCS8qIEFkZHJlc3MgY29ybmVyIGNhc2Ugd2hlcmUgYSBjaGlsZCBxZGlzYyBkcm9wcGVkIHRo
-ZSBwYWNrZXQKKwkJICogaW4gcGVlayBhZnRlciBlbnF1ZXVlIHJldHVybmVkIHN1Y2Nlc3MuCisJ
-CSAqIFFkaXNjcyBsaWtlIG5ldGVtIG1heSBleGhpYml0IHRoaXMgYmVoYXZpb3VyLgorCQkgKi8K
-KwkJaWYgKHVubGlrZWx5KHNjaC0+cXN0YXRzLmJhY2tsb2cgPCBwcmVfcGVla19iYWNrbG9nKSkK
-KwkJCXJldHVybiBORVRfWE1JVF9TVUNDRVNTIHwgX19ORVRfWE1JVF9CWVBBU1M7CisKKwkJaWYg
-KHVubGlrZWx5KHNrYikgJiYKIAkJICAgIGxpc3RfZmlyc3RfZW50cnkoJmFnZy0+YWN0aXZlLCBz
-dHJ1Y3QgcWZxX2NsYXNzLCBhbGlzdCkKIAkJICAgID09IGNsICYmIGNsLT5kZWZpY2l0IDwgbGVu
-KQogCQkJbGlzdF9tb3ZlX3RhaWwoJmNsLT5hbGlzdCwgJmFnZy0+YWN0aXZlKTsKZGlmZiAtLWdp
-dCBhL25ldC9zY2hlZC9zY2hfdGJmLmMgYi9uZXQvc2NoZWQvc2NoX3RiZi5jCmluZGV4IDRjOTc3
-ZjA0OTY3MC4uNDY1NWRiZjJjODNhIDEwMDY0NAotLS0gYS9uZXQvc2NoZWQvc2NoX3RiZi5jCisr
-KyBiL25ldC9zY2hlZC9zY2hfdGJmLmMKQEAgLTIxNyw2ICsyMTcsNyBAQCBzdGF0aWMgaW50IHRi
-Zl9zZWdtZW50KHN0cnVjdCBza19idWZmICpza2IsIHN0cnVjdCBRZGlzYyAqc2NoLAogCQlyZXR1
-cm4gcWRpc2NfZHJvcChza2IsIHNjaCwgdG9fZnJlZSk7CiAKIAluYiA9IDA7CisJcmV0ID0gTkVU
-X1hNSVRfU1VDQ0VTUzsKIAlza2JfbGlzdF93YWxrX3NhZmUoc2Vncywgc2VncywgbnNrYikgewog
-CQlza2JfbWFya19ub3Rfb25fbGlzdChzZWdzKTsKIAkJc2VnX2xlbiA9IHNlZ3MtPmxlbjsKQEAg
-LTIzMCw2ICsyMzEsMjIgQEAgc3RhdGljIGludCB0YmZfc2VnbWVudChzdHJ1Y3Qgc2tfYnVmZiAq
-c2tiLCBzdHJ1Y3QgUWRpc2MgKnNjaCwKIAkJCWxlbiArPSBzZWdfbGVuOwogCQl9CiAJfQorCisJ
-aWYgKHJldCAhPSBORVRfWE1JVF9TVUNDRVNTKSB7CisJCXdoaWxlIChuYiA+IDApIHsKKwkJCXN0
-cnVjdCBza19idWZmICpkc2tiID0gcWRpc2NfZGVxdWV1ZV9wZWVrZWQocS0+cWRpc2MpOworCisJ
-CQlpZiAoZHNrYikgeworCQkJCWtmcmVlX3NrYihkc2tiKTsKKwkJCQlxZGlzY19xc3RhdHNfZHJv
-cChzY2gpOworCQkJfQorCQkJbmItLTsKKwkJfQorCQlrZnJlZV9za2JfbGlzdChzZWdzKTsKKwkJ
-Y29uc3VtZV9za2Ioc2tiKTsKKwkJcmV0dXJuIE5FVF9YTUlUX0RST1A7CisJfQorCiAJc2NoLT5x
-LnFsZW4gKz0gbmI7CiAJc2NoLT5xc3RhdHMuYmFja2xvZyArPSBsZW47CiAJaWYgKG5iID4gMCkg
-ewo=
---00000000000074e7e40638662cec--
+To solve this, I believe the right approach is to have each NCT6694
+instance maintain its own IDA, managed by the MFD driver's private
+data. As mentioned earlier, for example:
+(in nct6694.c)
+struct nct6694 {
+    struct device *dev;
+    struct ida i2c_ida;
+};
+
+static int nct6694_probe(struct platform_device *pdev)
+{
+    ...
+    ida_init(&nct6694->i2c_ida);
+    ...
+}
+
+(in i2c-nct6694.c)
+static int nct6694_i2c_probe(struct platform_device *pdev)
+{
+    id =3D ida_alloc(&nct6694->i2c_ida, GFP_KERNEL);
+}
+
+This way, each device allocates IDs independently, and each set of
+I2C/GPIO instances gets predictable IDs starting from 0 per device. I
+think this resolves the original issue without relying on hardcoded
+platform IDs.
+Please let me know if this implementation aligns with what you had in mind.
+
+
+Thanks,
+Ming
 
