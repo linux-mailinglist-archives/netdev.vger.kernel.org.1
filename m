@@ -1,143 +1,219 @@
-Return-Path: <netdev+bounces-201220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B36A7AE883B
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 17:34:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E452FAE8850
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 17:36:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 095094A373F
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 15:33:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7879B16D59E
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 15:36:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60DA725F99A;
-	Wed, 25 Jun 2025 15:33:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CC8827F183;
+	Wed, 25 Jun 2025 15:36:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BN0KbcnT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gDJUwnA1"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E14725E445;
-	Wed, 25 Jun 2025 15:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9301A1A5B8C;
+	Wed, 25 Jun 2025 15:36:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750865615; cv=none; b=E99NvjL43gL9lZPUjtlId6ZGQbL5JNxBbpNUNITaccEyoBpv9jWbKtNqiV/SiU0Z9V0CwXF9+tCZPCPKeRnTdXHlc/zAldbJsjv/kTknlULphtGXCFcfX+J5TnNDlFfWtPewCIw152penjYHeM554CccTR2Bj1hPu4DGd+WBN50=
+	t=1750865763; cv=none; b=hr9DMIz6Ge61cJYLfU4l8wc4spY+obRBuflwfJlq5psZtnYXmk3HqiUQKg5pfYjLJCJHo2PCT92rKt6DGRimPqHsIuiYdWeQR6CFo4PQFfjEEgD1ktU+hByi//E0zIDFSLQN1YiM1z9dukxvxg2pAwDVmHN8+luRXgH7/WgpADA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750865615; c=relaxed/simple;
-	bh=8/YmsIFFyVC8EIUMRZzjBuyoWLpSCHvtknRAomVerJw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y/uiobn7gdUkny8Woueexe1GTzzUso1h5qiGh8BRJFoh1qq14BnQ4h39Sf2YiRwihhCiOweyYw0A7gaGvm9+PIiZlKlkShmduS6odK79DWy7HZlJhANUQ6JGb+xKHLL2m3rnph/+2nbyxLeXr0ip/IMye4rpL0rijEeeEU2hsCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BN0KbcnT; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 5CBE7442A9;
-	Wed, 25 Jun 2025 15:33:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1750865605;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=A2q9SQ4qqS5hVARAO+lvP8xdA01Da1YU1AfQAuXlTTg=;
-	b=BN0KbcnTMdnqcei9gX4mJK02e9Y7tI2Be/thjwv+mt97cgMZAJFEeP8hQHZtY9A5WvGQyv
-	8RBFt4XM7zg/spRBJT9tc7zYdteiTsDvkOqv/Q6mjpuaigFN6VCJnhk9c5XuykyWjeiO8P
-	9ImKds3J3h4EN877Zr29KbqzL6984zeh6A0xIPwWvxPL1krCeVz3L6heUE8aRn2UHThn6p
-	FSL9KShXZUgUr6QeqVScinglvVSo1smNSesL3txqz4NxKRZOrpMAyK/yGL6rjg8HKEQxrk
-	ZwgrRXjKRqBz6/Imq4Osoou9O0qN3nZOrsLFZLSU1o9aBhVup8aeWCe2z6eqXQ==
-Date: Wed, 25 Jun 2025 17:33:23 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/1] phy: micrel: add Signal Quality
- Indicator (SQI) support for KSZ9477 switch PHYs
-Message-ID: <20250625173323.37347eb7@fedora.home>
-In-Reply-To: <20250625124127.4176960-1-o.rempel@pengutronix.de>
-References: <20250625124127.4176960-1-o.rempel@pengutronix.de>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1750865763; c=relaxed/simple;
+	bh=hAhusCY1UVLnO94T21z3T2KWMZUlcysfphh4UVB5qHo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kPyyWZl3N+XrxE2EJv3q5mx9QrHg278ODBDHYpWmBN0BpB7oenKaZr5q9R0Dp/0US6Av5NBWvWC1RWDr754w37YbbMQNOq+T6ucAXCOgSIFTjfDRSKnb+M/Og2CZRNx8B0PLhkbirTo/4P97WIsqsWrMVykSE8shXG77KCjnuH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gDJUwnA1; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3df3891e28fso2476175ab.3;
+        Wed, 25 Jun 2025 08:36:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750865760; x=1751470560; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NK9MPfAllBjkHvaYOVWvvQc2sKXH+SqHsWGRM8yc6ak=;
+        b=gDJUwnA17xQPO5jrzBI3pSWK2U2AeD5oQa1YFZfcdChHg0VbAFxBkCqvVK4s9C3HAV
+         0kqbTTMJPvVl/sPgVDioHWSW18NNU+Awhj8xloxJlaO8Obj7xXwk9X/TB3zJkTlTNfPd
+         BsvB50KN+aEKsK0U0NVkxMbehjCEw5EFT9kYVO9dqPRES+LdaEWCw9UWERAkzWCERrNa
+         WOoexQzIaitYkKdpKjOJs7x19r1Rtow+7fue6dz2pOBjaExx60ilTv+3+XL6NbpvYQuv
+         PnHSO9OdiiCFQ+bkjFxVjc/x3Ur5dui20G1idSLcLB4NAH5MO6uRhX/f6Ff0g9fuF8rr
+         s60w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750865760; x=1751470560;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NK9MPfAllBjkHvaYOVWvvQc2sKXH+SqHsWGRM8yc6ak=;
+        b=VdJ/G212ag8+FNva/cor2e1yIY4toiVstSBFcaTkDbRe1R2mhjThhvloshQCfit39k
+         nbEb/ik+HQx6Nb6MSkOA37pAOd8fAjxTTwxJv5uwYvlHHITkAAe6ubpn39ulrJuixOCJ
+         Blgh6cAv5EXdEt8EycKa+P2MCIyvhka3/LFx7B5/AU9yDhV2rff73digbvt3/afhu4/o
+         T4LSmLPFmCDZVssiJkngrK2vRuHPyDEnhxQv6UpmPOEzVwI0ooeynwBiNM4HxJhqjKCy
+         2vTAiFfSXsykgwBt0WRJesD2kMgV8lAomzG+4ROI/iTi9PRQWKNdT32sH4Ap6Nvrs6Td
+         T4dA==
+X-Forwarded-Encrypted: i=1; AJvYcCUm3VInRfZ5V74Xn31lC4GIFfwTigE3CqqUGP4bT4gUz11Pc/Ha7tfeyU7BCn+8qWgWJbM=@vger.kernel.org, AJvYcCVYN3DVbL1BsuKHcAS6/CWWYKcK83jYLfJyRSQxWz8g5UkgGm/sMxXsd8/OAGfSMAlTCyJjYqBM@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9Oe76Wzthr56lb5XNJJBRFMFoQKhgTOG3ViKeaJR3EU2v8lNZ
+	4KURJRa/OISsh94aKTvqMbq1mBMtRPx8Wg3RdH2VqqKIy7NTxhZNjM7oczLKfGe8dEZ2O/sT8m+
+	b/3EpRAfAvAf2smj7SyYtlnrNe5hkip8=
+X-Gm-Gg: ASbGncuuAXGTVUYkOA5Z5+IxzbGvhuglcgk5DCDIRna+iEpQJOSRA8i+xsAbOyZz4LH
+	PM3py6SheV2kJKf/p7eAp0K6fQjCXRnkedCoXHCwz3tRedE69vzCi8XNVc6grdAkvJGNcWma6UR
+	92QdxcADfa9RWtzpfJDJmYvPp3pr9kb3j7ypT7nodFK1ZUEMMBT7xQ
+X-Google-Smtp-Source: AGHT+IERgmnmOjY23EseJt15ylSqQKVtxKcAsqHnE3WPHQ9BBfbB7rHvb8+QCJvs8u+XEUcE2f7iWi4vkoJHv80dfG0=
+X-Received: by 2002:a05:6e02:1aa5:b0:3df:3afa:28d6 with SMTP id
+ e9e14a558f8ab-3df3afa2b15mr15671375ab.2.1750865760557; Wed, 25 Jun 2025
+ 08:36:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20250625101014.45066-1-kerneljasonxing@gmail.com>
+ <20250625101014.45066-3-kerneljasonxing@gmail.com> <aFvpNHqvZp0eishZ@boxer>
+ <CAL+tcoBOpBxJN=S8FWgz++WxTzFP0rG-d+HRhSfZ6DLQjNuYtQ@mail.gmail.com> <aFwPCsSFkLYYoFu9@mini-arch>
+In-Reply-To: <aFwPCsSFkLYYoFu9@mini-arch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 25 Jun 2025 23:35:24 +0800
+X-Gm-Features: Ac12FXzDIxa4RWiYBy3fCgTNd0fAGci_avC_xNybEZ33rwPKemMcbVgx6g99XgY
+Message-ID: <CAL+tcoCSkXTJMPA7NQ7yEObmd2+HZ7mmppknq+yUUk=H4qYNow@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/2] selftests/bpf: check if the global
+ consumer of tx queue updates after send call
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org, 
+	magnus.karlsson@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgddvfeduhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeeuhfefgffgtdfhgffhvdfhhffhteeutdektefghfetveehheejjefgudeiudehudenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduuddprhgtphhtthhopehordhrvghmphgvlhesphgvnhhguhhtrhhonhhigidruggvpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrt
- ghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepkhgvrhhnvghlsehpvghnghhuthhrohhnihigrdguvg
-X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hi Oleksij,
-
-On Wed, 25 Jun 2025 14:41:26 +0200
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
-
-> Add support for the Signal Quality Index (SQI) feature on KSZ9477 family
-> switches. This feature provides a relative measure of receive signal
-> quality.
->=20
-> The KSZ9477 PHY provides four separate SQI values for a 1000BASE-T link,
-> one for each differential pair (Channel A-D). Since the current get_sqi
-> UAPI only supports returning a single value per port, this
-> implementation reads the SQI from Channel A as a representative metric.
-> This can be extended to provide per-channel readings once the UAPI is
-> enhanced for multi-channel support.
->=20
-> The hardware provides a raw 7-bit SQI value (0-127), where lower is
-> better. This raw value is converted to the standard 0-7 scale to provide
-> a usable, interoperable metric for userspace tools, abstracting away
-> hardware-specifics. The mapping to the standard 0-7 SQI scale was
-> determined empirically by injecting a 30MHz sine wave into the receive
-> pair with a signal generator. It was observed that the link becomes
-> unstable and drops when the raw SQI value reaches 8. This
-> implementation is based on these test results.
-
-[...]
-
-> +/**
-> + * kszphy_get_sqi - Read, average, and map Signal Quality Index (SQI)
-> + * @phydev: the PHY device
-> + *
-> + * This function reads and processes the raw Signal Quality Index from t=
+On Wed, Jun 25, 2025 at 11:00=E2=80=AFPM Stanislav Fomichev
+<stfomichev@gmail.com> wrote:
+>
+> On 06/25, Jason Xing wrote:
+> > On Wed, Jun 25, 2025 at 8:19=E2=80=AFPM Maciej Fijalkowski
+> > <maciej.fijalkowski@intel.com> wrote:
+> > >
+> > > On Wed, Jun 25, 2025 at 06:10:14PM +0800, Jason Xing wrote:
+> > > > From: Jason Xing <kernelxing@tencent.com>
+> > > >
+> > > > The subtest sends 33 packets at one time on purpose to see if xsk
+> > > > exitting __xsk_generic_xmit() updates the global consumer of tx que=
+ue
+> > > > when reaching the max loop (max_tx_budget, 32 by default). The numb=
+er 33
+> > > > can avoid xskq_cons_peek_desc() updates the consumer, to accurately
+> > > > check if the issue that the first patch resolves remains.
+> > > >
+> > > > Speaking of the selftest implementation, it's not possible to use t=
 he
-> + * PHY. Based on empirical testing, a raw value of 8 or higher indicates=
- a
-> + * pre-failure state and is mapped to SQI 0. Raw values from 0-7 are
-> + * mapped to the standard 0-7 SQI scale via a lookup table.
-> + *
-> + * Return: SQI value (0=E2=80=937), or a negative errno on failure.
-> + */
-> +static int kszphy_get_sqi(struct phy_device *phydev)
-> +{
-> +	int sum =3D 0;
-> +	int i, val, raw_sqi, avg_raw_sqi;
-> +	u8 channels;
-> +
-> +	/* Determine applicable channels based on link speed */
-> +	if (phydev->speed =3D=3D SPEED_1000)
-> +		/* TODO: current SQI API only supports 1 channel. */
-> +		channels =3D 1;
-> +	else if (phydev->speed =3D=3D SPEED_100)
-> +		channels =3D 1;
+> > > > normal validation_func to check if the issue happens because the wh=
+ole
+> > > > send packets logic will call the sendto multiple times such that we=
+'re
+> > > > unable to detect in time.
+> > > >
+> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > ---
+> > > >  tools/testing/selftests/bpf/xskxceiver.c | 30 ++++++++++++++++++++=
+++--
+> > > >  1 file changed, 28 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testi=
+ng/selftests/bpf/xskxceiver.c
+> > > > index 0ced4026ee44..f7aa83706bc7 100644
+> > > > --- a/tools/testing/selftests/bpf/xskxceiver.c
+> > > > +++ b/tools/testing/selftests/bpf/xskxceiver.c
+> > > > @@ -109,6 +109,8 @@
+> > > >
+> > > >  #include <network_helpers.h>
+> > > >
+> > > > +#define MAX_TX_BUDGET_DEFAULT 32
+> > >
+> > > and what if in the future you would increase the generic xmit budget =
+on
+> > > the system? it would be better to wait with test addition when you
+> > > introduce the setsockopt patch.
+>
+> We can always update it to follow new budget. The purpose of the test
+> is to document/verify userspace expectations. Sincle even with the
+> setsockopt we are still gonna have the default budget.
+>
+> > > plus keep in mind that xskxceiver tests ZC drivers as well. so either=
+ we
+> > > should have a test that serves all modes or keep it for skb mode only=
+.
+> > >
+> > > > +
+> > > >  static bool opt_verbose;
+> > > >  static bool opt_print_tests;
+> > > >  static enum test_mode opt_mode =3D TEST_MODE_ALL;
+> > > > @@ -1323,7 +1325,8 @@ static int receive_pkts(struct test_spec *tes=
+t)
+> > > >       return TEST_PASS;
+> > > >  }
+> > > >
+> > > > -static int __send_pkts(struct ifobject *ifobject, struct xsk_socke=
+t_info *xsk, bool timeout)
+> > > > +static int __send_pkts(struct test_spec *test, struct ifobject *if=
+object,
+> > > > +                    struct xsk_socket_info *xsk, bool timeout)
+> > > >  {
+> > > >       u32 i, idx =3D 0, valid_pkts =3D 0, valid_frags =3D 0, buffer=
+_len;
+> > > >       struct pkt_stream *pkt_stream =3D xsk->pkt_stream;
+> > > > @@ -1437,9 +1440,21 @@ static int __send_pkts(struct ifobject *ifob=
+ject, struct xsk_socket_info *xsk, b
+> > > >       }
+> > > >
+> > > >       if (!timeout) {
+> > > > +             int prev_tx_consumer;
+> > > > +
+> > > > +             if (!strncmp("TX_QUEUE_CONSUMER", test->name, MAX_TES=
+T_NAME_SIZE))
+> > > > +                     prev_tx_consumer =3D *xsk->tx.consumer;
+> > > > +
+> > > >               if (complete_pkts(xsk, i))
+> > > >                       return TEST_FAILURE;
+> > > >
+> > > > +             if (!strncmp("TX_QUEUE_CONSUMER", test->name, MAX_TES=
+T_NAME_SIZE)) {
+> > > > +                     int delta =3D *xsk->tx.consumer - prev_tx_con=
+sumer;
+> > >
+> > > hacking the data path logic for single test purpose is rather not goo=
+d.
+> > > I am also not really sure if this deserves a standalone test case or =
+could
+> > > we just introduce a check in data path in appropriate place.
+> >
+> > The big headache is that if we expect to detect such a case, we have
+> > to re-invent a similar send packet logic or hack the data path (a bit
+> > like this patch). I admit it's ugly as I mentioned yesterday.
+> >
+> > Sorry, Stanislav, no offense here. If you read this, please don't
+> > blame me. I know you wish me to add one related test case. So here we
+> > are. Since Maciej brought up the similar thought, I keep wondering if
+> > we should give up such a standalone test patch? Honestly it already
+> > involved more time than expected. The primary reason for me is that
+> > the issue doesn't cause much trouble to the application.
+>
+> IIUC, Maciej does not suggest to completely drop the test but rather
+> to move this check (unconditionally and only for skb mode) somewhere
 
-I understand the placeholder logic waiting for some improved uAPI, but
-this triggers an unused variable warning :( I think the commit log and
-the comment below are enough to explain that this can be improved later
-on.
-=09
-> +	else
-> +		return -EOPNOTSUPP;
-> +
-> +	/*
-> +	 * Sample and accumulate SQI readings for each pair (currently only one=
-).
+I prefer the former: make it suitable for all the cases. Whether it's
+zero copy mode or non-zc one, the behaviour of the consumer should be
+the same: update when finishing sending packets. I will give it a try
+again tomorrow since it's too late for me right now. Sorry.
 
-Maxime
+Thanks,
+Jason
 
