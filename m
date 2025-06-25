@@ -1,362 +1,140 @@
-Return-Path: <netdev+bounces-201191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36BBFAE8656
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 16:24:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC261AE8655
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 16:24:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD92E7B99FB
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 14:21:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 153DD3B967A
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 14:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA51265CB2;
-	Wed, 25 Jun 2025 14:21:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BjNUTOv0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2BFF261568;
+	Wed, 25 Jun 2025 14:21:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0628528D8FB;
-	Wed, 25 Jun 2025 14:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65604266F00
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 14:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750861279; cv=none; b=CwjLLh15uzutjoupgktWWcJOMygff5YQzsOlOxPfQ+ROc4i8u/sotRlPZXCf0byhlo4KjWTyJ1TQ+gtWl+qKhcrsPvWEBqkl6Px3sQMBxT/n08/JdrirTfHossvYqKZiHg136M1OOBZVM91nFjPmdKIZsZKuNUXBfN7cYXsSoM0=
+	t=1750861287; cv=none; b=AHtgeVmOGWDlnoNeMNH7tQbeqWyQA7WiRrrK1/okZ7m7k8PN668vnqiNxM9rEkTQf/L0o7IHPIAPvzc8GB3LiU0w2Sowk7C/ik17HPpcRtty7VqDiYvw7Nx1/q6hZrlmhhtlQZ7+BmyfT10ad4kKeZB7zQalgldADwP2Xc00tPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750861279; c=relaxed/simple;
-	bh=Z/AeoenbUGinh1j2XpcfN1DLfShTFchVD4CasX1XSSQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RVGhS49DF0p8+oaAmfz0a/pCgwvlaURVhcn+7X/Dg0vvrFK9xlxrYO2tAxN0KzNK2EueJJFhm7VhpGvAQyBMhP0sLcr75qrbvCClyopFRrvJzzNliAhIOTETAnlDptn7wAZMVDNjk1+iXa2jkrUOvdCm5MTLtrcQA5msBGpfNQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BjNUTOv0; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3df34b727dcso7371275ab.2;
-        Wed, 25 Jun 2025 07:21:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750861277; x=1751466077; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=73firwkFGU0VIpzvcoJAAGBtq9CpAKQSh63K1Y8NuW0=;
-        b=BjNUTOv0Y+veADOyIaHRtHqmtYFmMXEWQU0OIz6U1PA9maP5GlGCMZ8Hnvxc3r/R0x
-         snY/JsdhBvUllk71ggXGv2AaOrPOsJZe9ogLBdJm6AvNfRSfJq383zBex9Fi50RKbtuS
-         h8DcyyT6wL3+AS+ssV7Y+gLyMx6h85+DY7nIcfeF0JfdIoPdbMVqBy/H+3XevJQiYu1n
-         HOSMNodSlBQt2izLjDDX9At3dv+D2vVI1iJRwc1vGuh/6fij2md6uQKAQSrsRKJOXktP
-         MuCPWix5zv6chCG+FLXOTpNSa8WaOvsx6WAp/ihAOeJZAt4L90JNgXYi+wcoBF6uY6LO
-         U7rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750861277; x=1751466077;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=73firwkFGU0VIpzvcoJAAGBtq9CpAKQSh63K1Y8NuW0=;
-        b=D4avkjp0uvEkY0UyxlAKW213XzCixEiL1Ib89JTXOFH+SJBeDge1sTkQDE8DkSbgNO
-         MR7mpJSRCB4n2OVQiZ/fsDKDe+U7ecmUjDVd3XAsm8+LCidZ3RpsFBFeNjiSRUMYIUrr
-         OK74H0II11+VBKk9UchMzjRdREiXTR72lYVqZee+TcrH3xGcNdGQIBNTEFLInR4sPy6z
-         SLZOXiP16MHznaSxGywDbWndtcKs85hG2bjYBB1MmNW20tJB3fpObQuWgp0ZYrzpwlbg
-         uJwbN3Wjf9r2yzofyMW8qMpUclw+OeYrIjsolKbg8Jmj/C8P9b0sw28c4c2g3+1ueq2x
-         pIfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVgg0drvqTe1RrP/5hegiuL5JlrdTuK0gYI49UHE0qllI3jJJqKEx13U3jBgnwTg5iHwRE=@vger.kernel.org, AJvYcCWSAhJJeN479t9J3yLbxfwYgIwBKg20LUpPoFAfgVvxTkxL27y70rZ7g+KYmWPMNsrBl4uqqNxl@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHV9Qe7RYkSvxc6p3gxTkouzfcBhkt1zkjO7JPo022jsPIg1CL
-	hFSZx9LOmNdGm5DSNuxKwSQlAf+y1DzuZ9+vqQ+DWldswPb4xXQR77DvFHMokJFPsyh5O9jBQKR
-	5TUa1wP1WwjrpfOecqM1Kz6m1J49vtkcUDOdDEpOlCQ==
-X-Gm-Gg: ASbGncuLHhjSGVoOth65Gxldb5LeinrB7vENEyJZ3bsCWDxmHGNOGvCb2Qd/UdBZwpE
-	QwR2+2SDBARRsFEC3UpMFOsBFjWlbONx0HnqLX4qLjJTfaCgJ4lEIFa+ooEsOkV5AAdhACRKrf3
-	qTQp6i3OrfElFcCDCfv8LRgfRy1qNVPZ7G5/uxhAITmVg=
-X-Google-Smtp-Source: AGHT+IGoze6V3cplGyM7QdPbvtH9ZE908tCerukEcecaDNK3u32O7l1Fz6T/E6lmSY7lnhpOJ/WSwzairYOxoPKz8kA=
-X-Received: by 2002:a05:6e02:b28:b0:3df:3208:968e with SMTP id
- e9e14a558f8ab-3df328e2c22mr38972795ab.14.1750861277029; Wed, 25 Jun 2025
- 07:21:17 -0700 (PDT)
+	s=arc-20240116; t=1750861287; c=relaxed/simple;
+	bh=64gc/bivlLQdf8HiIPz0607rKHw5qWOyQ8V3IlfkOWs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Bbx4fUHgC4tHKVNw0WgclMDBCxzNhsZviZXlBfs+RyjVWIrxqUdMn19HQle3MJBu6s/YHf3U5JFStE7FDoTEguc+MENSfYd6b7w467HFgtcyPjvM+1JAfBosZCNV9n16AGs8uGcNQaa0qY9h/r/6PdLibyV7pPro9CwvBjDAmTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <jre@pengutronix.de>)
+	id 1uUR02-00017V-CV; Wed, 25 Jun 2025 16:21:18 +0200
+From: Jonas Rebmann <jre@pengutronix.de>
+Date: Wed, 25 Jun 2025 16:21:14 +0200
+Subject: [PATCH] net: fec: allow disable coalescing
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250625123527.98209-1-kerneljasonxing@gmail.com>
- <685bfbe2b5f51_21d18929413@willemb.c.googlers.com.notmuch> <aFv+aJFkVt/ehouG@boxer>
-In-Reply-To: <aFv+aJFkVt/ehouG@boxer>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 25 Jun 2025 22:20:40 +0800
-X-Gm-Features: Ac12FXxiB2GDDrb7EiIMiTy71y7t3tvL-b27rRxUorBwdUGsqjSpN-gRqwiqwM0
-Message-ID: <CAL+tcoDwm8TOJ5BUXtm3E5mQ7hdHxUXuemUS+JO75-bd7Tj8VA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5] net: xsk: introduce XDP_MAX_TX_BUDGET setsockopt
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org, 
-	magnus.karlsson@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, joe@dama.to, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250625-fec_deactivate_coalescing-v1-1-57a1e41a45d3@pengutronix.de>
+X-B4-Tracking: v=1; b=H4sIANkFXGgC/x3MQQqEMBAF0atIrw2YMIbBq4hI0/lxGiRKIiKId
+ zfM8i2qbirIikJDc1PGqUW3VGHbhuTHaYHRUE2uc33nXW8iZA5gOfTkA7NsvKKIpsWIj99gP2y
+ D91T7PSPq9X+P0/O8amWRPWsAAAA=
+X-Change-ID: 20250625-fec_deactivate_coalescing-c6f8d14a1d66
+To: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
+ Clark Wang <xiaoning.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: imx@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kernel@pengutronix.de, 
+ Jonas Rebmann <jre@pengutronix.de>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2562; i=jre@pengutronix.de;
+ h=from:subject:message-id; bh=64gc/bivlLQdf8HiIPz0607rKHw5qWOyQ8V3IlfkOWs=;
+ b=owGbwMvMwCF2ZcYT3onnbjcwnlZLYsiIYb0T9LCcx7lcZ4US9+MHsbuf527ZJnCRf73ILLbg0
+ tqVe6qPdZSyMIhxMMiKKbLEqskpCBn7XzertIuFmcPKBDKEgYtTACbSf4mR4a3r7XPujvtd/lQX
+ Vv3zybw0vVN784zZrsJBCwWef/vv3c3IsPGyjj7bAWumT22v+ZLL49fnq7n45cfNsv8vx/WktNW
+ SAQA=
+X-Developer-Key: i=jre@pengutronix.de; a=openpgp;
+ fpr=0B7B750D5D3CD21B3B130DE8B61515E135CD49B5
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:1101:1d::ac
+X-SA-Exim-Mail-From: jre@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, Jun 25, 2025 at 9:50=E2=80=AFPM Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> On Wed, Jun 25, 2025 at 09:38:42AM -0400, Willem de Bruijn wrote:
-> > Jason Xing wrote:
-> > > From: Jason Xing <kernelxing@tencent.com>
-> > >
-> > > This patch provides a setsockopt method to let applications leverage =
-to
-> > > adjust how many descs to be handled at most in one send syscall. It
-> > > mitigates the situation where the default value (32) that is too smal=
-l
-> > > leads to higher frequency of triggering send syscall.
-> > >
-> > > Considering the prosperity/complexity the applications have, there is=
- no
-> > > absolutely ideal suggestion fitting all cases. So keep 32 as its defa=
-ult
-> > > value like before.
-> > >
-> > > The patch does the following things:
-> > > - Add XDP_MAX_TX_BUDGET socket option.
-> > > - Convert TX_BATCH_SIZE tx_budget_spent.
-> > > - Set tx_budget_spent to 32 by default in the initialization phase as=
- a
-> > >   per-socket granular control.
-> > >
-> > > The idea behind this comes out of real workloads in production. We us=
-e a
-> > > user-level stack with xsk support to accelerate sending packets and
-> > > minimize triggering syscalls. When the packets are aggregated, it's n=
-ot
-> > > hard to hit the upper bound (namely, 32). The moment user-space stack
-> > > fetches the -EAGAIN error number passed from sendto(), it will loop t=
-o try
-> > > again until all the expected descs from tx ring are sent out to the d=
-river.
-> > > Enlarging the XDP_MAX_TX_BUDGET value contributes to less frequency o=
-f
-> > > sendto() and higher throughput/PPS.
-> > >
-> > > Here is what I did in production, along with some numbers as follows:
-> > > For one application I saw lately, I suggested using 128 as max_tx_bud=
-get
-> > > because I saw two limitations without changing any default configurat=
-ion:
-> > > 1) XDP_MAX_TX_BUDGET, 2) socket sndbuf which is 212992 decided by
-> > > net.core.wmem_default. As to XDP_MAX_TX_BUDGET, the scenario behind
-> > > this was I counted how many descs are transmitted to the driver at on=
-e
-> > > time of sendto() based on [1] patch and then I calculated the
-> > > possibility of hitting the upper bound. Finally I chose 128 as a
-> > > suitable value because 1) it covers most of the cases, 2) a higher
-> > > number would not bring evident results. After twisting the parameters=
-,
-> > > a stable improvement of around 4% for both PPS and throughput and les=
-s
-> > > resources consumption were found to be observed by strace -c -p xxx:
-> > > 1) %time was decreased by 7.8%
-> > > 2) error counter was decreased from 18367 to 572
-> > >
-> > > [1]: https://lore.kernel.org/all/20250619093641.70700-1-kerneljasonxi=
-ng@gmail.com/
-> > >
-> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > ---
-> > > v5
-> > > Link: https://lore.kernel.org/all/20250623021345.69211-1-kerneljasonx=
-ing@gmail.com/
-> > > 1. remove changes around zc mode
-> > >
-> > > v4
-> > > Link: https://lore.kernel.org/all/20250619090440.65509-1-kerneljasonx=
-ing@gmail.com/
-> > > 1. remove getsockopt as it seems no real use case.
-> > > 2. adjust the position of max_tx_budget to make sure it stays with ot=
-her
-> > > read-most fields in one cacheline.
-> > > 3. set one as the lower bound of max_tx_budget
-> > > 4. add more descriptions/performance data in Doucmentation and commit=
- message.
-> > >
-> > > V3
-> > > Link: https://lore.kernel.org/all/20250618065553.96822-1-kerneljasonx=
-ing@gmail.com/
-> > > 1. use a per-socket control (suggested by Stanislav)
-> > > 2. unify both definitions into one
-> > > 3. support setsockopt and getsockopt
-> > > 4. add more description in commit message
-> > >
-> > > V2
-> > > Link: https://lore.kernel.org/all/20250617002236.30557-1-kerneljasonx=
-ing@gmail.com/
-> > > 1. use a per-netns sysctl knob
-> > > 2. use sysctl_xsk_max_tx_budget to unify both definitions.
-> > > ---
-> > >  Documentation/networking/af_xdp.rst |  8 ++++++++
-> > >  include/net/xdp_sock.h              |  1 +
-> > >  include/uapi/linux/if_xdp.h         |  1 +
-> > >  net/xdp/xsk.c                       | 20 ++++++++++++++++----
-> > >  tools/include/uapi/linux/if_xdp.h   |  1 +
-> > >  5 files changed, 27 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/Documentation/networking/af_xdp.rst b/Documentation/netw=
-orking/af_xdp.rst
-> > > index dceeb0d763aa..9eb6f7b630a5 100644
-> > > --- a/Documentation/networking/af_xdp.rst
-> > > +++ b/Documentation/networking/af_xdp.rst
-> > > @@ -442,6 +442,14 @@ is created by a privileged process and passed to=
- a non-privileged one.
-> > >  Once the option is set, kernel will refuse attempts to bind that soc=
-ket
-> > >  to a different interface.  Updating the value requires CAP_NET_RAW.
-> > >
-> > > +XDP_MAX_TX_BUDGET setsockopt
-> > > +----------------------------
-> > > +
-> > > +This setsockopt sets the maximum number of descriptors that can be h=
-andled
-> > > +and passed to the driver at one send syscall. It is applied in the n=
-on-zero
-> > > +copy mode to allow application to tune the per-socket maximum iterat=
-ion for
-> > > +better throughput and less frequency of send syscall. Default is 32.
-> > > +
-> > >  XDP_STATISTICS getsockopt
-> > >  -------------------------
-> > >
-> > > diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-> > > index e8bd6ddb7b12..ce587a225661 100644
-> > > --- a/include/net/xdp_sock.h
-> > > +++ b/include/net/xdp_sock.h
-> > > @@ -84,6 +84,7 @@ struct xdp_sock {
-> > >     struct list_head map_list;
-> > >     /* Protects map_list */
-> > >     spinlock_t map_list_lock;
-> > > +   u32 max_tx_budget;
-> > >     /* Protects multiple processes in the control path */
-> > >     struct mutex mutex;
-> > >     struct xsk_queue *fq_tmp; /* Only as tmp storage before bind */
-> > > diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xdp.=
-h
-> > > index 44f2bb93e7e6..07c6d21c2f1c 100644
-> > > --- a/include/uapi/linux/if_xdp.h
-> > > +++ b/include/uapi/linux/if_xdp.h
-> > > @@ -79,6 +79,7 @@ struct xdp_mmap_offsets {
-> > >  #define XDP_UMEM_COMPLETION_RING   6
-> > >  #define XDP_STATISTICS                     7
-> > >  #define XDP_OPTIONS                        8
-> > > +#define XDP_MAX_TX_BUDGET          9
-> > >
-> > >  struct xdp_umem_reg {
-> > >     __u64 addr; /* Start of packet data area */
-> > > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> > > index 72c000c0ae5f..97aded3555c1 100644
-> > > --- a/net/xdp/xsk.c
-> > > +++ b/net/xdp/xsk.c
-> > > @@ -33,8 +33,7 @@
-> > >  #include "xdp_umem.h"
-> > >  #include "xsk.h"
-> > >
-> > > -#define TX_BATCH_SIZE 32
-> > > -#define MAX_PER_SOCKET_BUDGET (TX_BATCH_SIZE)
-> > > +#define MAX_PER_SOCKET_BUDGET 32
-> > >
-> > >  void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool)
-> > >  {
-> > > @@ -779,7 +778,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_s=
-ock *xs,
-> > >  static int __xsk_generic_xmit(struct sock *sk)
-> > >  {
-> > >     struct xdp_sock *xs =3D xdp_sk(sk);
-> > > -   u32 max_batch =3D TX_BATCH_SIZE;
-> > > +   u32 max_budget =3D READ_ONCE(xs->max_tx_budget);
-> > >     bool sent_frame =3D false;
-> > >     struct xdp_desc desc;
-> > >     struct sk_buff *skb;
-> > > @@ -797,7 +796,7 @@ static int __xsk_generic_xmit(struct sock *sk)
-> > >             goto out;
-> > >
-> > >     while (xskq_cons_peek_desc(xs->tx, &desc, xs->pool)) {
-> > > -           if (max_batch-- =3D=3D 0) {
-> > > +           if (max_budget-- =3D=3D 0) {
-> > >                     err =3D -EAGAIN;
-> > >                     goto out;
-> > >             }
-> > > @@ -1437,6 +1436,18 @@ static int xsk_setsockopt(struct socket *sock,=
- int level, int optname,
-> > >             mutex_unlock(&xs->mutex);
-> > >             return err;
-> > >     }
-> > > +   case XDP_MAX_TX_BUDGET:
-> > > +   {
-> > > +           unsigned int budget;
-> > > +
-> > > +           if (optlen !=3D sizeof(budget))
-> > > +                   return -EINVAL;
-> > > +           if (copy_from_sockptr(&budget, optval, sizeof(budget)))
-> > > +                   return -EFAULT;
-> > > +
-> > > +           WRITE_ONCE(xs->max_tx_budget, max(budget, 1));
-> >
-> > I still think that this needs a more sane upper bound than U32_MAX.
+In the current implementation, IP coalescing is always enabled and
+cannot be disabled.
 
-The reason why I didn't touch is that I refer to some existing
-mechanisms, like net.ipv4.tcp_limit_output_bytes that also doesn't
-constrain its max value for a single flow.
+As setting maximum frames to 0 or 1, or setting delay to zero implies
+immediate delivery of single packets/IRQs, disable coalescing in
+hardware in these cases.
 
-I really don't think it matters because 1) normally no one sets that
-large value to hope one send call can deal with that many desc, 2) the
-so-called proper value that may do harm to some unexpected cases which
-I'm unware of for now. I wonder why not give the user a choice. After
-all, it's his own decision.
+Signed-off-by: Jonas Rebmann <jre@pengutronix.de>
+---
+ drivers/net/ethernet/freescale/fec_main.c | 34 ++++++++++++++-----------------
+ 1 file changed, 15 insertions(+), 19 deletions(-)
 
-> >
-> > One limiting factor is the XSK TxQ length. At least it should be
-> > possible to fail if trying to set beyond that.
->
-> +1 and I don't really see a reason for something below 32.
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index 63dac42720453a8b8a847bdd1eec76ac072030bf..07676f35664736a89d53c1cb4a436218c28524f7 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -3121,27 +3121,23 @@ static int fec_enet_us_to_itr_clock(struct net_device *ndev, int us)
+ static void fec_enet_itr_coal_set(struct net_device *ndev)
+ {
+ 	struct fec_enet_private *fep = netdev_priv(ndev);
+-	int rx_itr, tx_itr;
++	int rx_itr = 0, tx_itr = 0;
+ 
+-	/* Must be greater than zero to avoid unpredictable behavior */
+-	if (!fep->rx_time_itr || !fep->rx_pkts_itr ||
+-	    !fep->tx_time_itr || !fep->tx_pkts_itr)
+-		return;
+-
+-	/* Select enet system clock as Interrupt Coalescing
+-	 * timer Clock Source
+-	 */
+-	rx_itr = FEC_ITR_CLK_SEL;
+-	tx_itr = FEC_ITR_CLK_SEL;
+-
+-	/* set ICFT and ICTT */
+-	rx_itr |= FEC_ITR_ICFT(fep->rx_pkts_itr);
+-	rx_itr |= FEC_ITR_ICTT(fec_enet_us_to_itr_clock(ndev, fep->rx_time_itr));
+-	tx_itr |= FEC_ITR_ICFT(fep->tx_pkts_itr);
+-	tx_itr |= FEC_ITR_ICTT(fec_enet_us_to_itr_clock(ndev, fep->tx_time_itr));
++	if (fep->rx_time_itr > 0 && fep->rx_pkts_itr > 1) {
++		/* Select enet system clock as Interrupt Coalescing timer Clock Source */
++		rx_itr = FEC_ITR_CLK_SEL;
++		rx_itr |= FEC_ITR_EN;
++		rx_itr |= FEC_ITR_ICFT(fep->rx_pkts_itr);
++		rx_itr |= FEC_ITR_ICTT(fec_enet_us_to_itr_clock(ndev, fep->rx_time_itr));
++	}
+ 
+-	rx_itr |= FEC_ITR_EN;
+-	tx_itr |= FEC_ITR_EN;
++	if (fep->tx_time_itr > 0 && fep->tx_pkts_itr > 1) {
++		/* Select enet system clock as Interrupt Coalescing timer Clock Source */
++		tx_itr = FEC_ITR_CLK_SEL;
++		tx_itr |= FEC_ITR_EN;
++		tx_itr |= FEC_ITR_ICFT(fep->tx_pkts_itr);
++		tx_itr |= FEC_ITR_ICTT(fec_enet_us_to_itr_clock(ndev, fep->tx_time_itr));
++	}
+ 
+ 	writel(tx_itr, fep->hwp + FEC_TXIC0);
+ 	writel(rx_itr, fep->hwp + FEC_RXIC0);
 
-Really? U32_MAX is a very very large value.
+---
+base-commit: 8dacfd92dbefee829ca555a860e86108fdd1d55b
+change-id: 20250625-fec_deactivate_coalescing-c6f8d14a1d66
 
-> So how about
-> [32, xs->tx->nentries] range?
->
-> Also if there's no xsk tx ring present we could bail out.
+Best regards,
+-- 
+Jonas Rebmann <jre@pengutronix.de>
 
-Sorry, I'm not sure about this. It seems to add more dependencies. But
-my opinion on the lower bound is one just like dev_weight :)
-
-Thanks,
-Jason
-
->
-> >
-> > > +           return 0;
-> > > +   }
-> > >     default:
-> > >             break;
-> > >     }
-> > > @@ -1734,6 +1745,7 @@ static int xsk_create(struct net *net, struct s=
-ocket *sock, int protocol,
-> > >
-> > >     xs =3D xdp_sk(sk);
-> > >     xs->state =3D XSK_READY;
-> > > +   xs->max_tx_budget =3D 32;
-> > >     mutex_init(&xs->mutex);
-> > >
-> > >     INIT_LIST_HEAD(&xs->map_list);
-> > > diff --git a/tools/include/uapi/linux/if_xdp.h b/tools/include/uapi/l=
-inux/if_xdp.h
-> > > index 44f2bb93e7e6..07c6d21c2f1c 100644
-> > > --- a/tools/include/uapi/linux/if_xdp.h
-> > > +++ b/tools/include/uapi/linux/if_xdp.h
-> > > @@ -79,6 +79,7 @@ struct xdp_mmap_offsets {
-> > >  #define XDP_UMEM_COMPLETION_RING   6
-> > >  #define XDP_STATISTICS                     7
-> > >  #define XDP_OPTIONS                        8
-> > > +#define XDP_MAX_TX_BUDGET          9
-> > >
-> > >  struct xdp_umem_reg {
-> > >     __u64 addr; /* Start of packet data area */
-> > > --
-> > > 2.41.3
-> > >
-> >
-> >
 
