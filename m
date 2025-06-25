@@ -1,64 +1,67 @@
-Return-Path: <netdev+bounces-200891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FEE0AE73EC
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 02:45:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85F15AE7406
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 03:04:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7230E16EC59
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 00:45:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0C9E7A5A42
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 01:03:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E55612C1A2;
-	Wed, 25 Jun 2025 00:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C64102AE72;
+	Wed, 25 Jun 2025 01:04:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uaZ5hUDh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tjv2LoFW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62B31EEE6;
-	Wed, 25 Jun 2025 00:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96AE52869E;
+	Wed, 25 Jun 2025 01:04:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750812326; cv=none; b=CMDEU75tlnPHPAN7JhIbrod1JM4OpjNSiPdKKdrTHM4sU9Q57fXfeaEUGId1T426BLvr7YXohzWvisiS6xVRNkZ9KEoqaPzFm2SKstztsiN29/ExKja+aDx9N3Dy4IxqBU88Ydsf8xELlmouyCRBqlqIirCgPCldY7nSdeiWDRQ=
+	t=1750813458; cv=none; b=GZSGOq0hm8kJKy+j0cfVwN4KP8JKa6IM3oTO1LOfiQj3NjzxMzTQ4Yn6UWbgaoceL9haSX8frbUqLPhEfpLQwU/fINWgN61tz2QHmceavWMDvTqRdagUlJTZlD+umJ/P4Uqr7DStFZOYDcoqrft7gMdaCK6rW0RTQCaHZg+l0Uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750812326; c=relaxed/simple;
-	bh=eRlCeZDC/evhY2Cx5J9+VqYhSZFBFgu/rZvpddXONDI=;
+	s=arc-20240116; t=1750813458; c=relaxed/simple;
+	bh=wyBT6Gqu2evLQ8PxUiJukzllO4b6g0W0O3IGbgvUIh8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rlZV4hO0348Dis1ojueXhCqvg2ZXTvkaHsNfPbe70FN3QFL5TF2YPp0oz3OI9WjIbt2sYF2B8WLASAAzWnVFBH4lGjxKFBLEdHFZMwB5Uvle53cS6Azlu0lLY4hrCMCQBr68ruT21h0mcznr57LoOOqkAxisQR7XykA1ab+a07k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uaZ5hUDh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A736C4CEE3;
-	Wed, 25 Jun 2025 00:45:25 +0000 (UTC)
+	 MIME-Version:Content-Type; b=O6uAtuul5rX3fzfvecu884aJkeRXu4XuzZT+5pNnglQ49aYLkCSNVjzqg01YrPPIfMcsdRWo3jdSAnkcjyncB+AC8fGqCEKLA0zAFK6OeYg8Ze0iqKq4BgbEY/qfWW+L2n1mDy3CSJFp3diVgHexzxWgL3sl7E8nnyrQlur1uzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tjv2LoFW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEBC8C4CEE3;
+	Wed, 25 Jun 2025 01:04:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750812326;
-	bh=eRlCeZDC/evhY2Cx5J9+VqYhSZFBFgu/rZvpddXONDI=;
+	s=k20201202; t=1750813458;
+	bh=wyBT6Gqu2evLQ8PxUiJukzllO4b6g0W0O3IGbgvUIh8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uaZ5hUDh9nDsLPEBof49fExd7ukHQip1e0CJ2NXNFmJub91Pz54F5jSEnfOxskRgJ
-	 cFTA7+as3bmOWQWL45D9YlQClS1wQ61w5ta67g8jlKXOgR8b76KqN9WFrJmU0Lx2XG
-	 7V1+KVRJXsE7PUTWMNn2GXl92Ln6XAVk/HebbGP2lR+XXVEz6XwosQH3hn1bIiEaO/
-	 SHtixl2/mu0gGNY8mZu4oLUFeTwbiF9ddoWnVe6FVD6nb0OFyg9Q+f6CmkIHvWBPob
-	 xP3XbsGHEKwo9GyytkzkGzmDZCC+Js9HsaA/9fxFxPCft8CRCQ7BskPFeyXK2Q0RI2
-	 Vz00B0274N6HA==
-Date: Tue, 24 Jun 2025 17:45:24 -0700
+	b=Tjv2LoFWbkC2mGwlVQcsGLLuzedVnVf62zVM/GBqCw5pye/4AnjQbRtGFvg0kLQQg
+	 sV7ciq/UQiXKCihpR/V8VVlqlJFK/US9Av6ifXQma34NqBaHeTDeM1sfIb2DyPADSF
+	 UM4SeYunazIwo/EiiNLbusQbG+6HvgNHOrTuorba5RixO/M8vUqUoPnF7D//INCEpa
+	 k8hneYe/b9Ahc30J3+hpT7sCQv0IQJa/eB03JxW6P2BjYHBlVwTRMQ5BXHeRacrZ2Q
+	 EdzFG1/se5jTSTFM+kpkW0Ct37aLoAua0D9ORAWZcOJ8yYsb+3VpahKkBPblv59fzp
+	 VDyWBb229cI8g==
+Date: Tue, 24 Jun 2025 18:04:15 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Yevgeny Kliteynik <kliteyn@nvidia.com>
-Cc: Simon Horman <horms@kernel.org>, Mark Bloch <mbloch@nvidia.com>, "David
- S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric
- Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- saeedm@nvidia.com, gal@nvidia.com, leonro@nvidia.com, tariqt@nvidia.com,
- Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, moshe@nvidia.com,
- Vlad Dogaru <vdogaru@nvidia.com>
-Subject: Re: [PATCH net-next v2 3/8] net/mlx5: HWS, Refactor and export rule
- skip logic
-Message-ID: <20250624174524.62bc82e6@kernel.org>
-In-Reply-To: <dff4ea02-4adc-4044-a18a-ee884abc0053@nvidia.com>
-References: <20250622172226.4174-1-mbloch@nvidia.com>
-	<20250622172226.4174-4-mbloch@nvidia.com>
-	<20250624183832.GF1562@horms.kernel.org>
-	<dff4ea02-4adc-4044-a18a-ee884abc0053@nvidia.com>
+To: Fan Gong <gongfan1@huawei.com>
+Cc: Zhu Yikai <zhuyikai1@h-partners.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ <linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn
+ Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>, Xin Guo
+ <guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
+ Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+ <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>, Gur Stavi
+ <gur.stavi@huawei.com>, Lee Trager <lee@trager.us>, Michael Ellerman
+ <mpe@ellerman.id.au>, Suman Ghosh <sumang@marvell.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Joe Damato <jdamato@fastly.com>, Christophe
+ JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH net-next v04 1/8] hinic3: Async Event Queue interfaces
+Message-ID: <20250624180415.54d0f9ab@kernel.org>
+In-Reply-To: <3fefa626dc1ad068d2994a3cd5d20fb7b8136990.1750665915.git.zhuyikai1@h-partners.com>
+References: <cover.1750665915.git.zhuyikai1@h-partners.com>
+	<3fefa626dc1ad068d2994a3cd5d20fb7b8136990.1750665915.git.zhuyikai1@h-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,21 +71,39 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 25 Jun 2025 03:35:52 +0300 Yevgeny Kliteynik wrote:
-> >> The bwc layer will use `mlx5hws_rule_skip` to keep track of numbers of
-> >> RX and TX rules individually, so export this function for future usage.
-> >>
-> >> While we're in there, reduce nesting by adding a couple of early return
-> >> statements.  
-> > 
-> > I'm all for reducing nesting. But this patch has two distinct changes.
-> > Please consider splitting it into two patches.  
-> 
-> Not sure I'd send the refactor thing alone - it isn't worth the effort
-> IMHO... But since I'm already in here - sure, will sent it in a separate
-> patch.
+On Tue, 24 Jun 2025 08:14:22 +0800 Fan Gong wrote:
+> Add async event queue interfaces initialization.
+> It allows driver to handle async events reported by HW.
 
-FWIW having a function which returns void but with 2 output parameters
-is in itself a bit awkward. I'd personally return a 2 bit bitmask of
-which mode is enabled. But there's no accounting for taste.
+Unfortunately this patch does not build cleanly:
+
+../drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c:203:6: warning: variable 'err' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+  203 |         if (eq->type == HINIC3_AEQ)
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+../drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c:206:22: note: uninitialized use occurs here
+  206 |         set_eq_cons_idx(eq, err ? HINIC3_EQ_NOT_ARMED :
+      |                             ^~~
+../drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c:203:2: note: remove the 'if' if its condition is always true
+  203 |         if (eq->type == HINIC3_AEQ)
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+  204 |                 err = aeq_irq_handler(eq);
+../drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c:201:9: note: initialize the variable 'err' to silence this warning
+  201 |         int err;
+      |                ^
+      |                 = 0
+../drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c:346:6: warning: variable 'err' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+  346 |         if (eq->type == HINIC3_AEQ) {
+      |             ^~~~~~~~~~~~~~~~~~~~~~
+../drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c:355:9: note: uninitialized use occurs here
+  355 |         return err;
+      |                ^~~
+../drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c:346:2: note: remove the 'if' if its condition is always true
+  346 |         if (eq->type == HINIC3_AEQ) {
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+../drivers/net/ethernet/huawei/hinic3/hinic3_eqs.c:344:9: note: initialize the variable 'err' to silence this warning
+  344 |         int err;
+      |                ^
+      |                 = 0
+-- 
+pw-bot: cr
 
