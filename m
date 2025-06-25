@@ -1,277 +1,151 @@
-Return-Path: <netdev+bounces-201317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8C7FAE8FAD
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 22:48:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD3F8AE8FC0
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 23:00:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DE581C23913
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 20:48:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E38E27AE94B
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 20:59:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C49BF1EF38F;
-	Wed, 25 Jun 2025 20:48:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1F28214236;
+	Wed, 25 Jun 2025 21:00:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dEvpItH5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I7MmOr7L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA5B1DFD8B;
-	Wed, 25 Jun 2025 20:48:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30FE61FC0EF;
+	Wed, 25 Jun 2025 21:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750884487; cv=none; b=LL/X0BF8utYu0Kb7WYMVNPvAy43qt2i/Oefx9cg8t5otWZ/t00m1n51F53OMuGM4vC7fG+vcZfataZvKNVVHtdeSGouEkf2XQB9DJRerkEUL+7HOuZJDdovuQ0w9uRqekzes+IuNCGE8n1ppi2+P5jzHvMGtnv5DViCz3w11gCs=
+	t=1750885221; cv=none; b=qQtpqfD3fk2GfFKBWZk3SFy1ghADZMS8I2IkvnW19ISu/HvxEdNMgLmEHh/ZF1LkUqaWsUTlwhLowAh58UymzbSiJE5F/mrGjTjFQyhU/Mv4H1X/ZKJ14mscneol5a4SwoiLUaWYjuM67YhS87lE+htZuRRgpHBcr7wwlCTEXvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750884487; c=relaxed/simple;
-	bh=nuEckLc/d0dmB2EIc+gySxUGvCjeFMbq6o4uimOy4oA=;
+	s=arc-20240116; t=1750885221; c=relaxed/simple;
+	bh=OfHpIqLcTHpXdRZRk0FudQdPhydGbCfNuVEN1gTGALc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KutAg6Z2aQMJCI7o7zaVIn2VvT/JTCcmtrqBJs2sJjUAwKH1ZH23Vk0aFlk7e9D0a22LX2mH79m7CgcxZYWBbJMPyGayuDvOnKPNptZpB1POqzLlWZsnIjSB6BgtNfK8UJ8kjgx4W+DjuOUY2Mez2Wkuzma2bk1m6+OYo0PE2s0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dEvpItH5; arc=none smtp.client-ip=209.85.214.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=FhiLBl7z5FJ6Q3QfEM5r3Iqukd1wexdz9B1TxGKeaC7xD8Wv0no3oFF50GR29p8ux2HUAPmddST1U3K2I3hIyNqk4duJxSGjjz2pUzQWXUDgQDjaX9e1g98uHYqrbN2+e++tviA6AMIZ54JkQ/znR/HuUyt+xdQwOWLXv8hCMXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I7MmOr7L; arc=none smtp.client-ip=209.85.218.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-23694cec0feso4014135ad.2;
-        Wed, 25 Jun 2025 13:48:05 -0700 (PDT)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ade3ce5a892so6543366b.3;
+        Wed, 25 Jun 2025 14:00:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750884485; x=1751489285; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=75jJvvv2MrkHgOrdZdE3yzodL7moqTV1X7NX8mGiTNg=;
-        b=dEvpItH5C3LvzUiwEm3RATrnDSAJwziEbtT7xQnc0rXRe/mLz/W7svQ/iMNy5AiwPf
-         1J8dLI4xtvy+j0cV1vG6pX0vjlLAhTNk9qADaFIhzSRegzkDld8N5iR/TxxjQyq0BqAf
-         W26XYlEeKepq0HEe6cDy6GrK0tBbzf1DMwtXu/1zWxL+LBz4vhIzmQHMa6dUO226HKjR
-         gnaj6TaUlt7KlvWAazWEdNpjf08wvgGUjRXxd1ABNyMFlX2dDEsh9OrcpJfohrnGvcDK
-         rLsFppBQiereUZ+vGGug+2fMfFITY1LPUz2cQSu7zEqYZvr8F6G3XQ7L7GXGxWugcSkQ
-         rK5g==
+        d=gmail.com; s=20230601; t=1750885218; x=1751490018; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xtDyYW716erUZTye2I7Yx5cC7l6zf3E0f6lveSci/PM=;
+        b=I7MmOr7LrhmaGFofK5WG8l1/mxPD7FsdO9jmO+FisDBdPQHfJ6wxC+00wC8PqzNymk
+         RR9TzQXAhHeTW+3APm48OGtymlIxwGQ1LIJBzwGq5goRKFqrITC0bW/tFMivtIeOv6Ti
+         ysT22tmUhR3Q1fpbwwztwmzloWCXYZ9bbNNVa6oLf1NW9Y5HcsShy05T4stn5AmshgiC
+         3wyv/j4LTGuXMnggaQf53E4K5sKcTclL0l9XEWsdB27WX0lzLsEj7zG6beZsqasiSyff
+         bExGURBMm7FKhFtx99F8mMVdSWTq1nld13BkxqJX+CnAn05TeUansLG5YuL0+EBKvprv
+         umxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750884485; x=1751489285;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=75jJvvv2MrkHgOrdZdE3yzodL7moqTV1X7NX8mGiTNg=;
-        b=idxv8SlhcJG+IaRhNVK61No+LOPoOkoJLkrd/e4nKC6C/MtTFftBvtDP0qaV/blKEi
-         kYqMwpzBvX3WIjpy1H3JJ7ifm0lPqEo9ft1y2v4vcR7djBrhRiu1pZBfga6VR2zO1KKI
-         sK2tzKb+5FNdF9SdTV803NKAkHi5bnDyOGZ3MWeC4qUCjImit+vEJVxwzSF9AqxhpqEM
-         ZtbJEnEvTonfMkG/MPxUfNWF8hC1mzG2MHowLuU0ZLBZTlCrTBTrkmyuk66d4hdPcSs8
-         sbt/UbdtAVciyU5US42GYqvXihiTwlL9DpbMjMz7Xw/PxszcbW1NBFmh/WbAbXzW+4E+
-         N6Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCUjYKeaG9R9Pd1BHlGBsDLq6mULzPU93aRHs2zhNeqi4YPuIm37cySfxR5IfuMqKkB3vi0=@vger.kernel.org, AJvYcCWnzTJsPhZq0aBgWA22OUHrn/F+TLuvTRKuGfXfJLU8GpyfyhSjz88BzAn/Vc54dOSb8HbIA+R1@vger.kernel.org, AJvYcCXgs861g6QNSiFFuePyYSca/6aJbCTCNnqYHXK9INz/JfE2YM9wSGsEipJBVEVyFkhbndb3MGu1el93dDRy@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYevB7hfDcru8g+6wjRqJH6nzSox506xjnOIIfshwtTpCY5vD3
-	23zKKpieV0yAkY0RHjOH849pmlXFfbukIBOYGaxQRF3F717YAKEKRec=
-X-Gm-Gg: ASbGncv5rrcKH+qCo9wsf2qsT6LadCafKm/wCWf4fk75JmwRSG1NR1kW3CeGjg0e9AZ
-	MxIwir8XHkZAVpfD5uySui34Kbxf8DGmZjGPP865S2ns1tj347i6msm+apaqGV9CPeiGSwUsX7F
-	XDO49VagFQGuCtJXAm/FowPS8ouV4FccSqrPfEgvcCjwCZSz27ZTe1T8fhZQ8j1SkragoCr4sk/
-	JKAUXSH8jTFpghGaSkv76JTB7V/pHZCrQAUuXBqiBVeeaKbty9nwsFvk6jwQf6eXmbTNJY19L1B
-	VW9rxJq956xE2rSvOeENkJJdU/3tM1022+g01AXt9UvqKK/HS7e5DJYwIMqj93BV5Aoj3tz/hUx
-	kc4B/Oi/GiJomRFqojRPRRnw=
-X-Google-Smtp-Source: AGHT+IF7fsB050mmo7FRvnrqVDKD0JxwGs2Y5b7Y7M1vFupthvCArB7beSMXuwlCz7lObtKxqifzfQ==
-X-Received: by 2002:a17:903:228b:b0:234:d7c5:a0ea with SMTP id d9443c01a7336-23824039f6fmr90196105ad.24.1750884485014;
-        Wed, 25 Jun 2025 13:48:05 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-237d86d1b74sm145500295ad.209.2025.06.25.13.48.04
+        d=1e100.net; s=20230601; t=1750885218; x=1751490018;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xtDyYW716erUZTye2I7Yx5cC7l6zf3E0f6lveSci/PM=;
+        b=HpW2vFXFHDRjV+jlAp/OKJ5PZ53onjHUzShJrP8ILkLgphinbmn8JCaJR5XSGArrq7
+         Y51UWV89bBaSdk8+jIW5zSo8qEc/yWNUtQaCjrGh9XGEeudWrPShCsoqtKTfUb+oup0q
+         +iePI7yABvQGcggNAad+fsP/JbVeNG7Dm+8LJxU+swPXNYe0HzQwahurq3hKySC8Ba8/
+         Ib+at6N4IWzxNh/BKAR4ZLB8hzs8Mx9ZvFF94J34PTRobClq+nmDS6qwi9clkBIixm1n
+         N3wzMW5eDOFB8KRDke79fFb/1PY4peBJN1AMdWQJz5x60oSoLvqzJZzl1OilfHO3UZvr
+         jhLA==
+X-Forwarded-Encrypted: i=1; AJvYcCWFpsqWhSVjYQvJisjh1lpe1R3jS/Nj+Yw6B6TBGUtELqnSM8tlT/J7Uz6yM1hDpePU7WA0NBQKfgfYJnw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4cjItLE14zcFj11EvGXC5prjsAhKTR2KuyB8N4MwCA1DaF6eP
+	gVp8Dph56UL2MHeBrS1DwZ7IVdh1B57ptebk7clgUgEk2ec4GOW8ybdw
+X-Gm-Gg: ASbGncuYzMOVg1U1BiTUJg4MXZ3Je1it4vqFYV7kIhsK9fPPGwiz1By3P5c1yPRI9GQ
+	KCI6ztm5p42Agk9MS4E1raEAYzYblUyZcmPB9wDibG7iC+7s/tdWLqISRxAI8O+UIF3rwDGFagw
+	3zC3COrGWXZWp9aBl8p/yBs45ZAJ8sk3WmYQJg5mOd7teQkPO6IhP+C9PLotyHqEUy3vdBGTY3T
+	gib1K4PS0RwFLaLMtmuqbDTp3cRpZqjxaEk7mQacRPHR5ExFf3PCjVN4qE7B0wuWCed9ZwikoEy
+	AU3bhWXsa1YMOjhLmucVftnvmbxpNfaKcTfzpTPhu63d04+tjA==
+X-Google-Smtp-Source: AGHT+IHoXq4o4O1lxYBHsSHlr0waxrAX3plNIH8HYR58L9eywjGP/mbTDhqAD9j1ufTf9GCb/8sTSA==
+X-Received: by 2002:a17:906:318d:b0:ad2:23d0:cde3 with SMTP id a640c23a62f3a-ae0bef3d062mr123463466b.15.1750885218186;
+        Wed, 25 Jun 2025 14:00:18 -0700 (PDT)
+Received: from skbuf ([86.127.223.77])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae0541bcec5sm1114461166b.143.2025.06.25.14.00.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 13:48:04 -0700 (PDT)
-Date: Wed, 25 Jun 2025 13:48:03 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: syzbot <syzbot+e67ea9c235b13b4f0020@syzkaller.appspotmail.com>,
-	andrii@kernel.org, ast@kernel.org, bjorn@kernel.org,
-	bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
-	edumazet@google.com, horms@kernel.org, jonathan.lemon@gmail.com,
-	kuba@kernel.org, linux-kernel@vger.kernel.org,
-	maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
-	netdev@vger.kernel.org, pabeni@redhat.com, sdf@fomichev.me,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [bpf?] [net?] possible deadlock in xsk_notifier (3)
-Message-ID: <aFxgg4rCQ8tfM9dw@mini-arch>
-References: <685af3b1.a00a0220.2e5631.0091.GAE@google.com>
- <CAL+tcoB0as6+5VOk9nu0M_OH4TqT6NjDZBZmgQgdQcYx0pciCw@mail.gmail.com>
- <aFwQZhpWIxVLJ1Ui@mini-arch>
- <CAL+tcoCmiT9XXUVGwcT1NB6bLVK69php-oH+9UL+mH6_HYxGhA@mail.gmail.com>
- <aFwZ5WWj835sDGpS@mini-arch>
+        Wed, 25 Jun 2025 14:00:16 -0700 (PDT)
+Date: Thu, 26 Jun 2025 00:00:14 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: nathan.lynch@amd.com, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] lib: packing: Include necessary headers
+Message-ID: <20250625210014.eqajfqiqkmycgoy4@skbuf>
+References: <20250624-packing-includes-v1-1-c23c81fab508@amd.com>
+ <20250624-packing-includes-v1-1-c23c81fab508@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aFwZ5WWj835sDGpS@mini-arch>
+In-Reply-To: <20250624-packing-includes-v1-1-c23c81fab508@amd.com>
+ <20250624-packing-includes-v1-1-c23c81fab508@amd.com>
 
-On 06/25, Stanislav Fomichev wrote:
-> On 06/25, Jason Xing wrote:
-> > On Wed, Jun 25, 2025 at 11:06 PM Stanislav Fomichev
-> > <stfomichev@gmail.com> wrote:
-> > >
-> > > On 06/25, Jason Xing wrote:
-> > > > On Wed, Jun 25, 2025 at 2:51 AM syzbot
-> > > > <syzbot+e67ea9c235b13b4f0020@syzkaller.appspotmail.com> wrote:
-> > > > >
-> > > > > Hello,
-> > > > >
-> > > > > syzbot found the following issue on:
-> > > > >
-> > > > > HEAD commit:    78f4e737a53e Merge tag 'for-6.16/dm-fixes' of git://git.ke..
-> > > > > git tree:       upstream
-> > > > > console output: https://syzkaller.appspot.com/x/log.txt?x=11b48f0c580000
-> > > > > kernel config:  https://syzkaller.appspot.com/x/.config?x=12ec1a20ad573841
-> > > > > dashboard link: https://syzkaller.appspot.com/bug?extid=e67ea9c235b13b4f0020
-> > > > > compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> > > > >
-> > > > > Unfortunately, I don't have any reproducer for this issue yet.
-> > > > >
-> > > > > Downloadable assets:
-> > > > > disk image: https://storage.googleapis.com/syzbot-assets/3ff97b2d201b/disk-78f4e737.raw.xz
-> > > > > vmlinux: https://storage.googleapis.com/syzbot-assets/1968f46c8915/vmlinux-78f4e737.xz
-> > > > > kernel image: https://storage.googleapis.com/syzbot-assets/3455e371b965/bzImage-78f4e737.xz
-> > > > >
-> > > > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > > > > Reported-by: syzbot+e67ea9c235b13b4f0020@syzkaller.appspotmail.com
-> > > > >
-> > > > > netlink: 4 bytes leftover after parsing attributes in process `syz.1.1331'.
-> > > > > ======================================================
-> > > > > WARNING: possible circular locking dependency detected
-> > > > > 6.16.0-rc3-syzkaller-00042-g78f4e737a53e #0 Not tainted
-> > > > > ------------------------------------------------------
-> > > > > syz.1.1331/11144 is trying to acquire lock:
-> > > > > ffff888054b136b0 (&xs->mutex){+.+.}-{4:4}, at: xsk_notifier+0x101/0x280 net/xdp/xsk.c:1649
-> > > > >
-> > > > > but task is already holding lock:
-> > > > > ffff888052f43d58 (&net->xdp.lock){+.+.}-{4:4}, at: xsk_notifier+0xa4/0x280 net/xdp/xsk.c:1645
-> > > > >
-> > > > > which lock already depends on the new lock.
-> > > > >
-> > > > >
-> > > > > the existing dependency chain (in reverse order) is:
-> > > > >
-> > > > > -> #2 (&net->xdp.lock){+.+.}-{4:4}:
-> > > > >        __mutex_lock_common kernel/locking/mutex.c:602 [inline]
-> > > > >        __mutex_lock+0x199/0xb90 kernel/locking/mutex.c:747
-> > > > >        xsk_notifier+0xa4/0x280 net/xdp/xsk.c:1645
-> > > > >        notifier_call_chain+0xbc/0x410 kernel/notifier.c:85
-> > > > >        call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:2230
-> > > > >        call_netdevice_notifiers_extack net/core/dev.c:2268 [inline]
-> > > > >        call_netdevice_notifiers net/core/dev.c:2282 [inline]
-> > > > >        unregister_netdevice_many_notify+0xf9d/0x2700 net/core/dev.c:12077
-> > > > >        unregister_netdevice_many net/core/dev.c:12140 [inline]
-> > > > >        unregister_netdevice_queue+0x305/0x3f0 net/core/dev.c:11984
-> > > > >        register_netdevice+0x18f1/0x2270 net/core/dev.c:11149
-> > > > >        lapbeth_new_device drivers/net/wan/lapbether.c:420 [inline]
-> > > > >        lapbeth_device_event+0x5b1/0xbe0 drivers/net/wan/lapbether.c:462
-> > > > >        notifier_call_chain+0xbc/0x410 kernel/notifier.c:85
-> > > > >        call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:2230
-> > > > >        call_netdevice_notifiers_extack net/core/dev.c:2268 [inline]
-> > > > >        call_netdevice_notifiers net/core/dev.c:2282 [inline]
-> > > > >        __dev_notify_flags+0x12c/0x2e0 net/core/dev.c:9497
-> > > > >        netif_change_flags+0x108/0x160 net/core/dev.c:9526
-> > > > >        dev_change_flags+0xba/0x250 net/core/dev_api.c:68
-> > > > >        devinet_ioctl+0x11d5/0x1f50 net/ipv4/devinet.c:1200
-> > > > >        inet_ioctl+0x3a7/0x3f0 net/ipv4/af_inet.c:1001
-> > > > >        sock_do_ioctl+0x118/0x280 net/socket.c:1190
-> > > > >        sock_ioctl+0x227/0x6b0 net/socket.c:1311
-> > > > >        vfs_ioctl fs/ioctl.c:51 [inline]
-> > > > >        __do_sys_ioctl fs/ioctl.c:907 [inline]
-> > > > >        __se_sys_ioctl fs/ioctl.c:893 [inline]
-> > > > >        __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:893
-> > > > >        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-> > > > >        do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
-> > > > >        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> > > > >
-> > > > > -> #1 (&dev_instance_lock_key#20){+.+.}-{4:4}:
-> > > > >        __mutex_lock_common kernel/locking/mutex.c:602 [inline]
-> > > > >        __mutex_lock+0x199/0xb90 kernel/locking/mutex.c:747
-> > > > >        netdev_lock include/linux/netdevice.h:2756 [inline]
-> > > > >        netdev_lock_ops include/net/netdev_lock.h:42 [inline]
-> > > > >        xsk_bind+0x37c/0x1570 net/xdp/xsk.c:1189
-> > > > >        __sys_bind_socket net/socket.c:1810 [inline]
-> > > > >        __sys_bind_socket net/socket.c:1802 [inline]
-> > > > >        __sys_bind+0x1a7/0x260 net/socket.c:1841
-> > > > >        __do_sys_bind net/socket.c:1846 [inline]
-> > > > >        __se_sys_bind net/socket.c:1844 [inline]
-> > > > >        __x64_sys_bind+0x72/0xb0 net/socket.c:1844
-> > > > >        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-> > > > >        do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
-> > > > >        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> > > > >
-> > > > > -> #0 (&xs->mutex){+.+.}-{4:4}:
-> > > > >        check_prev_add kernel/locking/lockdep.c:3168 [inline]
-> > > > >        check_prevs_add kernel/locking/lockdep.c:3287 [inline]
-> > > > >        validate_chain kernel/locking/lockdep.c:3911 [inline]
-> > > > >        __lock_acquire+0x126f/0x1c90 kernel/locking/lockdep.c:5240
-> > > > >        lock_acquire kernel/locking/lockdep.c:5871 [inline]
-> > > > >        lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5828
-> > > > >        __mutex_lock_common kernel/locking/mutex.c:602 [inline]
-> > > > >        __mutex_lock+0x199/0xb90 kernel/locking/mutex.c:747
-> > > > >        xsk_notifier+0x101/0x280 net/xdp/xsk.c:1649
-> > > > >        notifier_call_chain+0xbc/0x410 kernel/notifier.c:85
-> > > > >        call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:2230
-> > > > >        call_netdevice_notifiers_extack net/core/dev.c:2268 [inline]
-> > > > >        call_netdevice_notifiers net/core/dev.c:2282 [inline]
-> > > > >        unregister_netdevice_many_notify+0xf9d/0x2700 net/core/dev.c:12077
-> > > > >        rtnl_delete_link net/core/rtnetlink.c:3511 [inline]
-> > > > >        rtnl_dellink+0x3cb/0xa80 net/core/rtnetlink.c:3553
-> > > > >        rtnetlink_rcv_msg+0x95e/0xe90 net/core/rtnetlink.c:6944
-> > > > >        netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2534
-> > > > >        netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
-> > > > >        netlink_unicast+0x53d/0x7f0 net/netlink/af_netlink.c:1339
-> > > > >        netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1883
-> > > > >        sock_sendmsg_nosec net/socket.c:712 [inline]
-> > > > >        __sock_sendmsg net/socket.c:727 [inline]
-> > > > >        ____sys_sendmsg+0xa98/0xc70 net/socket.c:2566
-> > > > >        ___sys_sendmsg+0x134/0x1d0 net/socket.c:2620
-> > > > >        __sys_sendmsg+0x16d/0x220 net/socket.c:2652
-> > > > >        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-> > > > >        do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
-> > > > >        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> > > > >
-> > > > > other info that might help us debug this:
-> > > > >
-> > > > > Chain exists of:
-> > > > >   &xs->mutex --> &dev_instance_lock_key#20 --> &net->xdp.lock
-> > > > >
-> > > > >  Possible unsafe locking scenario:
-> > > > >
-> > > > >        CPU0                    CPU1
-> > > > >        ----                    ----
-> > > > >   lock(&net->xdp.lock);
-> > > > >                                lock(&dev_instance_lock_key#20);
-> > > > >                                lock(&net->xdp.lock);
-> > > > >   lock(&xs->mutex);
-> > > >
-> > > > I feel the above race map is not that right?
-> > > >
-> > > > My understanding is as shown below.
-> > > > CPU 0                                                    CPU 1
-> > > > ---                                                           ---
-> > > > unregister_netdevice_many_notify()
-> > > >                                                           xsk_bind()
-> > > > netdev_lock_ops(dev);
-> > > >
-> > > > mutex_lock(&xs->mutex);
-> > > >                                                           netdev_lock_ops(dev);
-> > > > xsk_notifier()
-> > > > mutex_lock(&net->xdp.lock);
-> > > > mutex_lock(&xs->mutex);
-> > > >
-> > > > So ABBA lock case happens, IIUC.
-> > >
-> > > Since we can't (easily) control the ordering in notifiers, looks like
-> > > we need to align xsk_bind ordering (to be instance lock -> xs->mutex).
-> > > LMK if you want to take a stab at this; otherwise I'll try to send a
-> > > fix.
-> > 
-> > I'm still learning the af_xdp. Sure, I'm interested in it, just a bit
-> > worried if I'm capable of completing it. I will try then.
+On Tue, Jun 24, 2025 at 08:50:44AM -0500, Nathan Lynch via B4 Relay wrote:
+> From: Nathan Lynch <nathan.lynch@amd.com>
 > 
-> SG, thanks! If you need more details lmk, but basically we need to reorder
-> netdev_lock_ops() and mutex_lock(lock: &xs->mutex)+XSK_READY check.
-> And similarly for cleanup (out_unlock/out_release) path.
+> packing.h uses ARRAY_SIZE(), BUILD_BUG_ON_MSG(), min(), max(), and
+> sizeof_field() without including the headers where they are defined,
+> potentially causing build failures.
+> 
+> Fix this in packing.h and sort the result.
+> 
+> Signed-off-by: Nathan Lynch <nathan.lynch@amd.com>
+> ---
+>  include/linux/packing.h | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/packing.h b/include/linux/packing.h
+> index 0589d70bbe0434c418f41b842f92b3300a107762..20ae4d452c7bb4069eb625ba332d617c2a840193 100644
+> --- a/include/linux/packing.h
+> +++ b/include/linux/packing.h
+> @@ -5,8 +5,12 @@
+>  #ifndef _LINUX_PACKING_H
+>  #define _LINUX_PACKING_H
+>  
+> -#include <linux/types.h>
+> +#include <linux/array_size.h>
+>  #include <linux/bitops.h>
+> +#include <linux/build_bug.h>
+> +#include <linux/minmax.h>
+> +#include <linux/stddef.h>
+> +#include <linux/types.h>
+>  
+>  #define GEN_PACKED_FIELD_STRUCT(__type) \
+>  	struct packed_field_ ## __type { \
+> 
+> ---
+> base-commit: 19272b37aa4f83ca52bdf9c16d5d81bdd1354494
+> change-id: 20250624-packing-includes-5d544b1efd86
+> 
+> Best regards,
+> -- 
+> Nathan Lynch <nathan.lynch@amd.com>
+> 
+> 
 
-Jakub just told me that I'm wrong and it looks similar to commit
-f0433eea4688 ("net: don't mix device locking in dev_close_many()
-calls"). So this is not as easy as flipping the lock ordering :-(
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+
+I assume this patch is not necessary for stable kernels, I haven't
+noticed any build breakage report in the packing integrations thus far.
+
+Netdev maintainers, can you pick this patch up via net-next? All past
+contributions to packing went through networking. Let me see if I can
+revive it in patchwork.
+
+pw-bot: under-review
+
+Nathan, if netdev maintainers don't respond within 24 hours, can you
+please post a v2 of this patch explicitly targeting the net-next tree,
+as per Documentation/process/maintainer-netdev.rst?
 
