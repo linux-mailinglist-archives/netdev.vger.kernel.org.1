@@ -1,364 +1,706 @@
-Return-Path: <netdev+bounces-201335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65240AE90DB
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 00:13:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D583AE90DD
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 00:14:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 293671C23064
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 22:14:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C82E5A5BD1
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 22:13:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14012877D6;
-	Wed, 25 Jun 2025 22:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DB4420469E;
+	Wed, 25 Jun 2025 22:14:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mRor0wG1"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cVJt1Xlr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9DC3264FBB
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 22:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750889622; cv=fail; b=GAxdzP9DhIQ1dfLLDp71Oni6GrXnTjsDA0Rjh5/Rj4bf5GL7ejVl8p8YZ+tmuoO9wrvi1KWI32IyuN5MS5Hq1J3AMZf3QonmF/ROgYrm2rYeLs5BEebVauNkUSb/Wqx/Ae/F/GVGedlxYPIwo3KFRkPIX7H86Sb9N0WnqZYAY8I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750889622; c=relaxed/simple;
-	bh=vjFHo4IF8VH2TnFMCvmmaxEyakLLii06C0AXJei3yfo=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=dxJClM62WWIICQS8MjixzoZvuc7bFPV9JkUCcpKBiZKC+srR7g9P85Xdr6kZY3qdxvJda1w5X9E+NCswfDrNPmKuQ7dOpOnv9CnzsovoGP5nwr/wSRUnpJsv+hF9qOIsMSFDZaGC53WIn5+dHaEwwp0ORX6Xt4pq8yGeE6STM90=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mRor0wG1; arc=fail smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750889621; x=1782425621;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=vjFHo4IF8VH2TnFMCvmmaxEyakLLii06C0AXJei3yfo=;
-  b=mRor0wG16CyHsjqNfMQQ8Yu7CZTDaZty9TOc71geTtgMqFHMqy70dLJL
-   dcQ9F3+nV2ZdgKKl0IbRsnnlZN5WVSr6TUf6IImMVtkqevt3Wvfl57peO
-   2qzNS2hUuCIt8Z5SjWbcHsD+cfkWGEMrx6KOKPUvY8SbnuA0XCeyfLBeD
-   7q6VEsVa3FiAYSHVaLLUInJDOgNn9/5FSTBmK9+ecripX3uNuNu09Nzqr
-   wa8k8TlwrTxNquCSbGjg6Yx5sFGJtHSTv+DlWMP00sqOVTmVSBw0YUyFc
-   gaW1ZxxeqsVOOLMRKqACtnAcXHpShIXthIpR+KYiF19I12Ga5/mypxew1
-   w==;
-X-CSE-ConnectionGUID: gaLHAkhQTpSRQbvcwSBFsw==
-X-CSE-MsgGUID: 9TK+XF5iSeqK/BzKV4SnXw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="53046413"
-X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
-   d="scan'208";a="53046413"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 15:13:40 -0700
-X-CSE-ConnectionGUID: M2T5+IxYRlKnQLAITNH7og==
-X-CSE-MsgGUID: 4E1IjDLJSUGbyOpWTFTedA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
-   d="scan'208";a="151859910"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 15:13:40 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 25 Jun 2025 15:13:39 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Wed, 25 Jun 2025 15:13:39 -0700
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (40.107.102.62)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Wed, 25 Jun 2025 15:13:39 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dMN2naloZm4CsrnMgcmbaJqlESkcPXKzxwliRkZSZ9a9w8Y1N7cGIpVgSAAb6+tQAphG1/B/1vSClMAB3YGMZ4KAuwHDL/qtF2+K5yLTBG9FnMx6fBFGWbUz6/Ax+x2aCflWBoLxZxQ7DwMS3U6JIotN8CgeR9wyLCFNvNTuGets8dIoGFLvP94aYYBuiSAm8JCtMPEUF82sfDpVsBLJs0x4qpvZdni9F2PCgDOGuOaGw5g/7vYWM/eDAG6peyCNhEXjvCXXAW2P+nnm91yojzGH051wixoEoFkfRYifrgcD07/RP7DQ1nBxlBglcIaqznJOnpYeejppf4Gdq/Ma4A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=r1xNw0gXkUgRBhWJcj5dLK5UIPuuN3Xsy+mbdf+vpAA=;
- b=Wytk6unvB9Mu4Hr+ab+SusAgwDNkjL13UhaduyyGPkTTaDa+doGf0bLRLpTUO7cYiBksgdF6XKBjHn1vCSLBqiozfo/9Yq4mOQdWcvXznQ3tzUz6jZpY+Y2wzhmm5MMiwA8KjdZwAurneMKPJO3FGk1RHvzBaiNEXZFF4iaVnBb7W8eKHGYje8PMeUU2KMNkcFz3rAcTOnYU3yPXFz6nyrwZ7kHLpFmPMuRxYt8fvMj57u/17mcAyxu+aWd8oTwwOvXFxP9F+ZohPyoEXrcnHuPWlwf4lj8Q1rdhFTujYugtutTHEmPbPLjDQV1sghiKYFQoIIlDEvaNaFGZRctuiA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW3PR11MB4538.namprd11.prod.outlook.com (2603:10b6:303:57::12)
- by PH7PR11MB6428.namprd11.prod.outlook.com (2603:10b6:510:1f4::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.26; Wed, 25 Jun
- 2025 22:13:09 +0000
-Received: from MW3PR11MB4538.namprd11.prod.outlook.com
- ([fe80::e117:2595:337:e067]) by MW3PR11MB4538.namprd11.prod.outlook.com
- ([fe80::e117:2595:337:e067%4]) with mapi id 15.20.8857.026; Wed, 25 Jun 2025
- 22:13:09 +0000
-Message-ID: <2a39f34b-bbf8-4c47-98f4-4669be2fcbd5@intel.com>
-Date: Wed, 25 Jun 2025 15:13:07 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net 1/2] ice: fix NULL pointer dereference in
- ice_unplug_aux_dev() on reset
-To: Brett Creeley <bcreeley@amd.com>, <intel-wired-lan@lists.osuosl.org>
-CC: <netdev@vger.kernel.org>, <Aleksandr.Loktionov@intel.com>,
-	<przemyslaw.kitszel@intel.com>, <david.m.ertman@intel.com>,
-	<anthony.l.nguyen@intel.com>, <michal.swiatkowski@linux.intel.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-References: <20250624142641.7010-1-emil.s.tantilov@intel.com>
- <20250624142641.7010-2-emil.s.tantilov@intel.com>
- <1d1ec8d8-84a4-4fc3-a89e-09cf6b42747d@amd.com>
-Content-Language: en-US
-From: "Tantilov, Emil S" <emil.s.tantilov@intel.com>
-In-Reply-To: <1d1ec8d8-84a4-4fc3-a89e-09cf6b42747d@amd.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MW4P220CA0017.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:303:115::22) To MW3PR11MB4538.namprd11.prod.outlook.com
- (2603:10b6:303:57::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 178302877E5
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 22:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750889657; cv=none; b=rJlwsGxjuSY3bU1YfcjmMW9UdpzBFQz+BOJ+Ay532eFvNJjSf9f93n9l2sbILdGH49kSYd/I3Zls0iKW6O0cPUhOQHThRWwT2jm7O16s8wGQnb51VhNhldnFBCMS0BErcsIycRaiGZcSM+CNBcruD+fJwkiZiqA+n4k3YLZntVQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750889657; c=relaxed/simple;
+	bh=pPrgIRqDtPNmNDfUKrhT2HwwlWEgkjvgfV9pjnx0ObE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Yc/g/irc5+ChHqBydJ1vK9L6h1/3YvD53IFzN8iP2OXgWhs0CNA9pJ+GaCzPHzWv9q9v/qVxaS14Jkwg3VWZXxu2DJpvbnDeL3mJGzbUNA4X5c55kRpi2Bl2zlKUpF+8DkmYA0yU2k4GYyF1ZTrQfXXiwM0tecBhTbCgPmJ4z1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cVJt1Xlr; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <5849d743-3a7e-455c-b91e-06c25bf711d8@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1750889650;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C3MXXGX2XQGYbgB64MWUWqNiZdRfcNF9FYeHnSChUIc=;
+	b=cVJt1XlrU11hpvTJhHqpmgmDjxGcXhhWYaYwbUeby4119o7SozL+ZiZS+SxTMNM8l+cXEx
+	wNzuoYJt7G/DcbTNwmFbMGJtIB1zudHNNXEO7K47p4fF33jsuM+TLYazLa5qBn8inYL1vc
+	gtlkY0LfH2MCoqC5SKDra+w4W5uVPaI=
+Date: Wed, 25 Jun 2025 23:14:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW3PR11MB4538:EE_|PH7PR11MB6428:EE_
-X-MS-Office365-Filtering-Correlation-Id: f9fb3e00-5340-49b4-bc63-08ddb43577df
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?MkI1ZndJblArOFB1cWZJSmo2Y2haOXkwM1EycjBRQVZXWG9XSloxRzFOTUFN?=
- =?utf-8?B?Mnp3ZjYwbEEvdlFrVFpzMjlINWpOcUFDbWEya3QrQ1YxUGRDNUZQTkNjQnRm?=
- =?utf-8?B?UXN5WGluYzNEbmludVIrZ0ZsdkFEcTF3aTc3SFdzSTBBYzBvb0l6aXg0eXNR?=
- =?utf-8?B?Z2lKWmxmTXRaTjRkM1FBMzJHQVdIUFhvcjdnb0IzTzRPak9kNlhrZEJYd2Q0?=
- =?utf-8?B?NHp3OCtEVXdlRlRZc3lBWjNUS1ZMQXBaNzR0a2dwcHZjUHFCazlGRW1IZjJY?=
- =?utf-8?B?VVZ2Z0dFYnVPSGs3UG0yTi9DQVJPc293cU1TWmYvRkp5andieHpZbWdHYTdX?=
- =?utf-8?B?YzNodU9WOUdtKzE4VmFDeTd1VG9EVHNPRVIzd0V6RHVJOWFNNFg0MXl2V0Iv?=
- =?utf-8?B?RVFPbUNzNmYyS25pamFrZTJnU0ltVnVPVXd0ZUJ5ZTN4ZGZ6anRuL3RuS2ZY?=
- =?utf-8?B?Zk16Z2Q5K0xjZEpHbklvNFVIN29PVGpJNnJvbm85TzZCVTRmci9HVmdaSFVZ?=
- =?utf-8?B?bVlIN3AyZlVmZ3g5QzVtSWhFcE5rcW10V1VZUmdPbWZ1a2tXR2hqUHhMM1pV?=
- =?utf-8?B?MmtoeHBmZ0ZUenU4TG9FbHY1VG1tZzhOODRWMVYwZzM1MVlKcU00OVdSbHZi?=
- =?utf-8?B?M25pUVRhUGJyejZDT3d1am9mQjEvOTI5WDlOaDNwckhqS3NNaU1DYWZ0Szlo?=
- =?utf-8?B?T25ENEh5cVJEVXZ0endiRER4MjdURWVVS1V1TlllZXJya3dzdXVmTVdUSnM0?=
- =?utf-8?B?ODByWWJTdFVtSUpWeCttaEZ0QjdPdVpDbjM5MVN3ejdlN0xOMXNNWVoyK254?=
- =?utf-8?B?NVVFSU83NE9TRGVheWlGaDZxYzdtT0VWVFpraEhjY1p0M1NYQW04TXRJZ2pa?=
- =?utf-8?B?NmhaTHhUMldGSkNEV013OEU2SHZQOTN6V0ZYa2Q2SEpRa2hkMXh5RVIva0Mz?=
- =?utf-8?B?ZVh4YVZLSXk2TWtxNDVKdTduRit2T1dqeHJtelkrSllZWjI2VkpDd3JKRElL?=
- =?utf-8?B?L2tGUUhCNitvVjJPS3ZwVjBrK2srRGNLcEVoT3gwNk92SlQ2alRKczR5UWJ4?=
- =?utf-8?B?cWZvZ1c1eE9vQmJ3ZzhTUWFES0g2MXFSSkxoUXhrVlh3OVFHZm9YN0VhdnBp?=
- =?utf-8?B?SVVFRkp0ZmNBM3BTSUt4VnNkSFREWVZDWEY4ZDh1OVB3NXY3Qm9GL0RRbXZP?=
- =?utf-8?B?YjA1V1htNkoza0VrSGp4K2ExcGxydVFFeFVjZVcwdmJOVUtVbFl4R0J3c2Vv?=
- =?utf-8?B?dzVpTndSRTFqbE9Oemt3cjFzY05UdklCTDRMT2oxVXRHNnVUUTVPRzROSXNN?=
- =?utf-8?B?cUtKclJpcmdlU1gvTWlsS1R2WVRNTmpjNllJY3R0eEpmU3RYWERkaFREdFQv?=
- =?utf-8?B?Sjk1cVh2Y2dJVEtyUGh2VHYrMXJoMmZ0c3RvbEtMckFNK0tOUDdYaXlaYUEw?=
- =?utf-8?B?NmgwWFp3OVpoek1CcSticWp0aFRWM3FOS2JESjAwQ3ZvQUlJTXNjVUZWN1JK?=
- =?utf-8?B?ZUQwcWZEOHA5WHFGUlQzTi9QMlZTQjJGdDJBN1BQQ0Y4MlByZHljZVZrS3ZT?=
- =?utf-8?B?VmNmeXdxQ1FtVkZmYkZSeTgwT0lYUDJnRXNyekF2MDRSZWRPck9raS8vaUV6?=
- =?utf-8?B?SE9EOGhHWGtGcXJTTHVMOCs5YWpicFdKSnk2a0dzWDN2akFjZ3lHQ0dDZm9m?=
- =?utf-8?B?aURtK2ppbWZNMXNFdUdZUEE3T3lmM25UVWtySXpoNHRnYkw1QkhVRGx4S2E3?=
- =?utf-8?B?MHFNclVibnNCSGNNVGVDMU9TVzhLc0kxdk00WFdBRnRVeVlVdnN5bUp3eEdr?=
- =?utf-8?B?b1pCRTZ2QjF5OGdDVWxwWHBndHE5UGZIcGtMTHIxQW9NaXA0clR1MjNaVzdu?=
- =?utf-8?B?Nmc5NUpVWXpIeit6YWFYQ0ZYcFBYNnpZTXQrMEhvQUo4a0MzMllFSXJicTRE?=
- =?utf-8?Q?MqjMadaVHT4=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR11MB4538.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a0Z4dHF1RCtYN1VjUGdhamIvUzRpUFY1ci92dFA1aFhSdFhhY2hTYVQxcU9Y?=
- =?utf-8?B?OFlXdExBMlowODk2ZlhDalFUTUVmanRTMndZNU1HT2RwOW5uMjRYYUdtRHNP?=
- =?utf-8?B?dURJMng0TUdoRHhDU0piL1JFVW9NTXZEdXdzUlpuSmZIdFVVSjI1OU1LcCtN?=
- =?utf-8?B?UWdOeVBUQ3dGejRMWUhXZXZNU1VrdVZ0cHlWOVhKTjcyUzBXSmJhcjk3dTZ2?=
- =?utf-8?B?QW5IKzUrdFYwNndiRGFSOHIvR2UwTjFaUHFFZzlQTTBlZm1qK1FndHFiUGQ3?=
- =?utf-8?B?aWVIamtCKzg2Yzl0bTVHdEl3cVZWemtCcXg5QnVvRjIwTGdxTk56NXhUU24r?=
- =?utf-8?B?dzlLZElEeDNVc0NqdWxXbXlVM3RSSHFhTVJ0M09yYTNDSFErZEwrcnlTZWRW?=
- =?utf-8?B?T2ZzdnBuMWdFNzJvcTV3OU52dTEvWEcyVFpYSFU3aHpmOUFURU9OUm9BYnIz?=
- =?utf-8?B?WUo5NS9rb2RmTjNoUWNHaTlsN0hSTmliTVpxdlB5RGVPR3U1YXE5QUN6MVRJ?=
- =?utf-8?B?Q0RDa1JUaVhSVStCQnFHelBzMFAzdzZiZk42bndVbzRMclA1VGdRRlJhYzRh?=
- =?utf-8?B?dmJHZlpESVdrNG1RMjN1WFpURWo1aFp3N0RSU2t5YWFBbDd4Qk8xdmpkdzlR?=
- =?utf-8?B?OHJsMXp1YlM5ZEphcG1HT0NNbnl1aCtsbWcrV1RvM2JkTUtoZko1SFVwcllW?=
- =?utf-8?B?TkkwbXhtUzQ3VkVBOHNpQVl4TUNMbjdaaFo1Zi9wTitYdWxWZDQvaUVqbUMw?=
- =?utf-8?B?dkFJdGhmTnpSVHpwVzBzbHVjZzJIZG9OOVFyNC9iZUJxMlBPZnl1MDB2eGpy?=
- =?utf-8?B?L0lDZW8yRks0K3F5czJSamFwcjdYUEcwSG9IR0ZBUTlRRXVNNCs1TkpMMTAw?=
- =?utf-8?B?c1pRRVlEWlFoMzJBOWJWbHhLZUFiWG9TbDlYeWtGYTFFNEpFcG1GSjZucFZV?=
- =?utf-8?B?ZzVWbVhUaFZPdXlJWk9tQ2JQNjVOWFNxNkMyTzAxOEZNc3Z1R09MMlhIRHdE?=
- =?utf-8?B?b0wyTHhiTndPenhDVnpVSVRNNitHekNBMng3WjlwRUpwUlBvYXVkaW90Q2NK?=
- =?utf-8?B?czduT0EvbzBzZEZydFJZYjB2c2V6Z1ZBeXY0WDc5TXltZDAwZUtDRlhQZHNw?=
- =?utf-8?B?M0NmdVpZRGNDS3k0Q3ZoOVd2dmFTcWZPSUg0eGYvYVRFTndQRFdpMk1XOXpx?=
- =?utf-8?B?ZkZLSEQxOWZCNmIycUZSaTlqMU96NHVvaXJkdElYT0tiZzh3NWZuU0IzaWd5?=
- =?utf-8?B?Z1dPNHUxMHpiTzNyMG9PRit2RldId09tUUlqbWtRcVZ4dmRXM2JzcFhvRlVn?=
- =?utf-8?B?OFgwRVp0YWVvOEtCUFppN1hoOWZsdnFRZzBrbWVrTGdsWTJjcy80UVNOOWVP?=
- =?utf-8?B?R280WWxZV1hnUXRUYVVYUGFpTDlGL2JncjFPYmZ1V2hXV3ZyelA4dVBRUmF6?=
- =?utf-8?B?RGtTcW9md3NaREl3QjZhS2tMdFM1a3hDeTRyVjVDVnkwQWl0OU1jbHZmVTE0?=
- =?utf-8?B?aXk2MXJwU0ZhUENjMGRQamY3dGNoOTRiU2ROWTZ2MUtTS3BUaUdzMURwSlky?=
- =?utf-8?B?aDRKMFdET2RTNWprdlNjSDhEUXZqMGJtMzRETkJ4Y0ZsdEF1ZTY5ZCtFaTVi?=
- =?utf-8?B?dE5OOFFIVGhFdG5BbytIS2dtd3Y4b0JlQ3ZFYXczMWdGbk1BMWFVaFFoMFRx?=
- =?utf-8?B?cHZnMHVjUXRraUxJTldCZ0VMU3BoejYxeG5PdkJZZWxUUUt2OHB6WFYwSjhM?=
- =?utf-8?B?YzFsMk5qeTNqUEw1TWZwSStHQ09IUDBDZEJEMzl1UzlOaDF4V1JrRXlYRzRO?=
- =?utf-8?B?Q0Vsb1YrVG9rRVdOaWFReHp1cXAyOFhhVHRndU43RXBXUFp5MExzV21vK09P?=
- =?utf-8?B?ZFBwaTI4WmtwaE9IQ3c4ZFM1L3ZoWDVwTFRGNzN0UGo2WTBGKzBZOTVTL21y?=
- =?utf-8?B?Vk9XUW1DYWVGbmdldDAvUTdmNkNjdXJXOVF0a1NjQk51Y3AzVHpCUzFuVkNa?=
- =?utf-8?B?TGhyMWdJemlkV21uRzM0YW13bTFPVDg4UXVwN2JuaFI3MEFMeDZ2VzVxVjhp?=
- =?utf-8?B?R0xTOFBkUlNLWThWOUcxVUFNZDVmWnR6K1VZcEhEU1VwSENpUlFSQmg4bmFG?=
- =?utf-8?B?YzQvSVhlaWVYVjM4eEFNLzFacmVIV1IyTzNReDBHcFZMZ2VSK0pTOWtXSmpG?=
- =?utf-8?B?emc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f9fb3e00-5340-49b4-bc63-08ddb43577df
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR11MB4538.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2025 22:13:09.6215
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5oOHzLF4BRaaFQ4j33WgK0XKMwzcpkyDvT8rBA0hsyg0mlryjwKLm9kxH3HAgZgXpfSnWjX/EgrbqKbEU5p0SCblXp9LIdAg3KskL9L5G9M=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6428
-X-OriginatorOrg: intel.com
+Subject: Re: [PATCH net-next v05 6/8] hinic3: Mailbox framework
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+ Bjorn Helgaas <helgaas@kernel.org>, luosifu <luosifu@huawei.com>,
+ Xin Guo <guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>,
+ Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
+ Shi Jing <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>,
+ Gur Stavi <gur.stavi@huawei.com>, Lee Trager <lee@trager.us>,
+ Michael Ellerman <mpe@ellerman.id.au>, Suman Ghosh <sumang@marvell.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Joe Damato <jdamato@fastly.com>,
+ Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+References: <cover.1750821322.git.zhuyikai1@h-partners.com>
+ <a50b33bb8b121f9a40f45414187b8b7cdab87fa4.1750821322.git.zhuyikai1@h-partners.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <a50b33bb8b121f9a40f45414187b8b7cdab87fa4.1750821322.git.zhuyikai1@h-partners.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
+On 25/06/2025 04:41, Fan Gong wrote:
+> Add mailbox framework initialization.
+> It allows driver to send commands to HW.
+> 
+> Co-developed-by: Xin Guo <guoxin09@huawei.com>
+> Signed-off-by: Xin Guo <guoxin09@huawei.com>
+> Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
+> Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
+> Signed-off-by: Fan Gong <gongfan1@huawei.com>
+> ---
+>   .../ethernet/huawei/hinic3/hinic3_common.c    |  14 +
+>   .../ethernet/huawei/hinic3/hinic3_common.h    |   9 +
+>   .../net/ethernet/huawei/hinic3/hinic3_mbox.c  | 403 ++++++++++++++++++
+>   .../net/ethernet/huawei/hinic3/hinic3_mbox.h  | 105 +++++
+>   4 files changed, 531 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_common.c b/drivers/net/ethernet/huawei/hinic3/hinic3_common.c
+> index d3a69d67b4c1..016da1911072 100644
+> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_common.c
+> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_common.c
+> @@ -3,6 +3,7 @@
+>   
+>   #include <linux/delay.h>
+>   #include <linux/dma-mapping.h>
+> +#include <linux/iopoll.h>
+>   
+>   #include "hinic3_common.h"
+>   
+> @@ -52,6 +53,19 @@ void hinic3_dma_free_coherent_align(struct device *dev,
+>   			  mem_align->ori_vaddr, mem_align->ori_paddr);
+>   }
+>   
+> +int hinic3_wait_for_timeout(void *priv_data, wait_cpl_handler handler,
+> +			    u32 wait_total_ms, u32 wait_once_us)
+> +{
+> +	enum hinic3_wait_return ret;
+> +	int err;
+> +
+> +	err = read_poll_timeout(handler, ret, ret == HINIC3_WAIT_PROCESS_CPL,
+> +				wait_once_us, wait_total_ms * USEC_PER_MSEC,
+> +				false, priv_data);
+> +
+> +	return err;
+> +}
+> +
+>   /* Data provided to/by cmdq is arranged in structs with little endian fields but
+>    * every dword (32bits) should be swapped since HW swaps it again when it
+>    * copies it from/to host memory. This is a mandatory swap regardless of the
+> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_common.h b/drivers/net/ethernet/huawei/hinic3/hinic3_common.h
+> index 52d6cb2515c8..50d1fd038b48 100644
+> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_common.h
+> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_common.h
+> @@ -18,6 +18,11 @@ struct hinic3_dma_addr_align {
+>   	dma_addr_t align_paddr;
+>   };
+>   
+> +enum hinic3_wait_return {
+> +	HINIC3_WAIT_PROCESS_CPL     = 0,
+> +	HINIC3_WAIT_PROCESS_WAITING = 1,
+> +};
+> +
+>   struct hinic3_sge {
+>   	u32 hi_addr;
+>   	u32 lo_addr;
+> @@ -40,6 +45,10 @@ int hinic3_dma_zalloc_coherent_align(struct device *dev, u32 size, u32 align,
+>   void hinic3_dma_free_coherent_align(struct device *dev,
+>   				    struct hinic3_dma_addr_align *mem_align);
+>   
+> +typedef enum hinic3_wait_return (*wait_cpl_handler)(void *priv_data);
+> +int hinic3_wait_for_timeout(void *priv_data, wait_cpl_handler handler,
+> +			    u32 wait_total_ms, u32 wait_once_us);
+> +
+>   void hinic3_cmdq_buf_swab32(void *data, int len);
+>   
+>   #endif
+> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c b/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
+> index e74d1eb09730..df908bfabdbd 100644
+> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
+> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
+> @@ -4,10 +4,413 @@
+>   #include <linux/dma-mapping.h>
+>   
+>   #include "hinic3_common.h"
+> +#include "hinic3_csr.h"
+>   #include "hinic3_hwdev.h"
+>   #include "hinic3_hwif.h"
+>   #include "hinic3_mbox.h"
+>   
+> +#define MBOX_MSG_POLLING_TIMEOUT_MS  8000 // send msg seg timeout
+> +#define MBOX_COMP_POLLING_TIMEOUT_MS 40000 // response
+> +
+> +#define MBOX_MAX_BUF_SZ           2048
+> +#define MBOX_HEADER_SZ            8
+> +
+> +/* MBOX size is 64B, 8B for mbox_header, 8B reserved */
+> +#define MBOX_SEG_LEN              48
+> +#define MBOX_SEG_LEN_ALIGN        4
+> +#define MBOX_WB_STATUS_LEN        16
+> +
+> +#define MBOX_SEQ_ID_START_VAL     0
+> +#define MBOX_SEQ_ID_MAX_VAL       42
+> +#define MBOX_LAST_SEG_MAX_LEN  \
+> +	(MBOX_MAX_BUF_SZ - MBOX_SEQ_ID_MAX_VAL * MBOX_SEG_LEN)
+> +
+> +#define MBOX_DMA_MSG_QUEUE_DEPTH    32
+> +#define MBOX_BODY_FROM_HDR(header)  ((u8 *)(header) + MBOX_HEADER_SZ)
+> +#define MBOX_AREA(hwif)  \
+> +	((hwif)->cfg_regs_base + HINIC3_FUNC_CSR_MAILBOX_DATA_OFF)
+> +
+> +#define MBOX_MQ_CI_OFFSET  \
+> +	(HINIC3_CFG_REGS_FLAG + HINIC3_FUNC_CSR_MAILBOX_DATA_OFF + \
+> +	 MBOX_HEADER_SZ + MBOX_SEG_LEN)
+> +
+> +#define MBOX_MQ_SYNC_CI_MASK   GENMASK(7, 0)
+> +#define MBOX_MQ_ASYNC_CI_MASK  GENMASK(15, 8)
+> +#define MBOX_MQ_CI_GET(val, field)  \
+> +	FIELD_GET(MBOX_MQ_##field##_CI_MASK, val)
+> +
+> +#define MBOX_MGMT_FUNC_ID         0x1FFF
+> +#define MBOX_COMM_F_MBOX_SEGMENT  BIT(3)
+> +
+> +static struct hinic3_msg_desc *get_mbox_msg_desc(struct hinic3_mbox *mbox,
+> +						 enum mbox_msg_direction_type dir,
+> +						 u16 src_func_id)
+> +{
+> +	struct hinic3_msg_channel *msg_ch;
+> +
+> +	msg_ch = (src_func_id == MBOX_MGMT_FUNC_ID) ?
+> +		&mbox->mgmt_msg : mbox->func_msg;
+> +
+> +	return (dir == MBOX_MSG_SEND) ?
+> +		&msg_ch->recv_msg : &msg_ch->resp_msg;
+> +}
+> +
+> +static void resp_mbox_handler(struct hinic3_mbox *mbox,
+> +			      const struct hinic3_msg_desc *msg_desc)
+> +{
+> +	spin_lock(&mbox->mbox_lock);
+> +	if (msg_desc->msg_info.msg_id == mbox->send_msg_id &&
+> +	    mbox->event_flag == MBOX_EVENT_START)
+> +		mbox->event_flag = MBOX_EVENT_SUCCESS;
+> +	spin_unlock(&mbox->mbox_lock);
+> +}
+> +
+> +static bool mbox_segment_valid(struct hinic3_mbox *mbox,
+> +			       struct hinic3_msg_desc *msg_desc,
+> +			       u64 mbox_header)
+> +{
+> +	u8 seq_id, seg_len, msg_id, mod;
+> +	u16 src_func_idx, cmd;
+> +
+> +	seq_id = MBOX_MSG_HEADER_GET(mbox_header, SEQID);
+> +	seg_len = MBOX_MSG_HEADER_GET(mbox_header, SEG_LEN);
+> +	msg_id = MBOX_MSG_HEADER_GET(mbox_header, MSG_ID);
+> +	mod = MBOX_MSG_HEADER_GET(mbox_header, MODULE);
+> +	cmd = MBOX_MSG_HEADER_GET(mbox_header, CMD);
+> +	src_func_idx = MBOX_MSG_HEADER_GET(mbox_header, SRC_GLB_FUNC_IDX);
+> +
+> +	if (seq_id > MBOX_SEQ_ID_MAX_VAL || seg_len > MBOX_SEG_LEN ||
+> +	    (seq_id == MBOX_SEQ_ID_MAX_VAL && seg_len > MBOX_LAST_SEG_MAX_LEN))
+> +		goto err_seg;
+> +
+> +	if (seq_id == 0) {
+> +		msg_desc->seq_id = seq_id;
+> +		msg_desc->msg_info.msg_id = msg_id;
+> +		msg_desc->mod = mod;
+> +		msg_desc->cmd = cmd;
+> +	} else {
+> +		if (seq_id != msg_desc->seq_id + 1 ||
+> +		    msg_id != msg_desc->msg_info.msg_id ||
+> +		    mod != msg_desc->mod || cmd != msg_desc->cmd)
+> +			goto err_seg;
+> +
+> +		msg_desc->seq_id = seq_id;
+> +	}
+> +
+> +	return true;
+> +
+> +err_seg:
+> +	dev_err(mbox->hwdev->dev,
+> +		"Mailbox segment check failed, src func id: 0x%x, front seg info: seq id: 0x%x, msg id: 0x%x, mod: 0x%x, cmd: 0x%x\n",
+> +		src_func_idx, msg_desc->seq_id, msg_desc->msg_info.msg_id,
+> +		msg_desc->mod, msg_desc->cmd);
+> +	dev_err(mbox->hwdev->dev,
+> +		"Current seg info: seg len: 0x%x, seq id: 0x%x, msg id: 0x%x, mod: 0x%x, cmd: 0x%x\n",
+> +		seg_len, seq_id, msg_id, mod, cmd);
+> +
+> +	return false;
+> +}
+> +
+> +static void recv_mbox_handler(struct hinic3_mbox *mbox,
+> +			      u64 *header, struct hinic3_msg_desc *msg_desc)
+> +{
+> +	void *mbox_body = MBOX_BODY_FROM_HDR(((void *)header));
+> +	u64 mbox_header = *header;
+> +	u8 seq_id, seg_len;
+> +	int pos;
+> +
+> +	if (!mbox_segment_valid(mbox, msg_desc, mbox_header)) {
+> +		msg_desc->seq_id = MBOX_SEQ_ID_MAX_VAL;
+> +		return;
+> +	}
+> +
+> +	seq_id = MBOX_MSG_HEADER_GET(mbox_header, SEQID);
+> +	seg_len = MBOX_MSG_HEADER_GET(mbox_header, SEG_LEN);
+> +
+> +	pos = seq_id * MBOX_SEG_LEN;
+> +	memcpy((u8 *)msg_desc->msg + pos, mbox_body, seg_len);
+> +
+> +	if (!MBOX_MSG_HEADER_GET(mbox_header, LAST))
+> +		return;
+> +
+> +	msg_desc->msg_len = MBOX_MSG_HEADER_GET(mbox_header, MSG_LEN);
+> +	msg_desc->msg_info.status = MBOX_MSG_HEADER_GET(mbox_header, STATUS);
+> +
+> +	if (MBOX_MSG_HEADER_GET(mbox_header, DIRECTION) == MBOX_MSG_RESP)
+> +		resp_mbox_handler(mbox, msg_desc);
+> +}
+> +
+> +void hinic3_mbox_func_aeqe_handler(struct hinic3_hwdev *hwdev, u8 *header,
+> +				   u8 size)
+> +{
+> +	u64 mbox_header = *((u64 *)header);
+> +	enum mbox_msg_direction_type dir;
+> +	struct hinic3_mbox *mbox;
+> +	struct hinic3_msg_desc *msg_desc;
+> +	u16 src_func_id;
 
+Reverse x-mas tree, please.
 
-On 6/24/2025 10:13 AM, Brett Creeley wrote:
-> 
-> 
-> On 6/24/2025 7:26 AM, Emil Tantilov wrote:
->> Caution: This message originated from an External Source. Use proper 
->> caution when opening attachments, clicking links, or responding.
->>
->>
->> Issuing a reset when the driver is loaded without RDMA support, will
->> results in a crash as it attempts to remove RDMA's non-existent auxbus
->> device:
->> echo 1 > /sys/class/net/<if>/device/reset
->>
->> BUG: kernel NULL pointer dereference, address: 0000000000000008
->> ...
->> RIP: 0010:ice_unplug_aux_dev+0x29/0x70 [ice]
->> ...
->> Call Trace:
->> <TASK>
->> ice_prepare_for_reset+0x77/0x260 [ice]
->> pci_dev_save_and_disable+0x2c/0x70
->> pci_reset_function+0x88/0x130
->> reset_store+0x5a/0xa0
->> kernfs_fop_write_iter+0x15e/0x210
->> vfs_write+0x273/0x520
->> ksys_write+0x6b/0xe0
->> do_syscall_64+0x79/0x3b0
->> entry_SYSCALL_64_after_hwframe+0x76/0x7e
->>
->> ice_unplug_aux_dev() checks pf->cdev_info->adev for NULL pointer, but
->> pf->cdev_info will also be NULL, leading to the deref in the trace above.
-> 
-> What about in ice_deinit_rdma(), can the cdev_info also be NULL there? 
-> If so kfree(pf->cdev_info->iddc_priv) will result in a similar trace on 
-> driver unload.
+> +
+> +	mbox = hwdev->mbox;
+> +	dir = MBOX_MSG_HEADER_GET(mbox_header, DIRECTION);
+> +	src_func_id = MBOX_MSG_HEADER_GET(mbox_header, SRC_GLB_FUNC_IDX);
+> +	msg_desc = get_mbox_msg_desc(mbox, dir, src_func_id);
+> +	recv_mbox_handler(mbox, (u64 *)header, msg_desc);
+> +}
+> +
+> +static int init_mbox_dma_queue(struct hinic3_hwdev *hwdev,
+> +			       struct mbox_dma_queue *mq)
+> +{
+> +	u32 size;
+> +
+> +	mq->depth = MBOX_DMA_MSG_QUEUE_DEPTH;
+> +	mq->prod_idx = 0;
+> +	mq->cons_idx = 0;
+> +
+> +	size = mq->depth * MBOX_MAX_BUF_SZ;
+> +	mq->dma_buf_vaddr = dma_alloc_coherent(hwdev->dev, size,
+> +					       &mq->dma_buf_paddr,
+> +					       GFP_KERNEL);
+> +	if (!mq->dma_buf_vaddr)
+> +		return -ENOMEM;
+> +
+> +	return 0;
+> +}
+> +
+> +static void uninit_mbox_dma_queue(struct hinic3_hwdev *hwdev,
+> +				  struct mbox_dma_queue *mq)
+> +{
+> +	dma_free_coherent(hwdev->dev, mq->depth * MBOX_MAX_BUF_SZ,
+> +			  mq->dma_buf_vaddr, mq->dma_buf_paddr);
+> +}
+> +
+> +static int hinic3_init_mbox_dma_queue(struct hinic3_mbox *mbox)
+> +{
+> +	u32 val;
+> +	int err;
+> +
+> +	err = init_mbox_dma_queue(mbox->hwdev, &mbox->sync_msg_queue);
+> +	if (err)
+> +		return err;
+> +
+> +	err = init_mbox_dma_queue(mbox->hwdev, &mbox->async_msg_queue);
+> +	if (err) {
+> +		uninit_mbox_dma_queue(mbox->hwdev, &mbox->sync_msg_queue);
+> +		return err;
+> +	}
+> +
+> +	val = hinic3_hwif_read_reg(mbox->hwdev->hwif, MBOX_MQ_CI_OFFSET);
+> +	val &= ~MBOX_MQ_SYNC_CI_MASK;
+> +	val &= ~MBOX_MQ_ASYNC_CI_MASK;
+> +	hinic3_hwif_write_reg(mbox->hwdev->hwif, MBOX_MQ_CI_OFFSET, val);
+> +
+> +	return 0;
+> +}
+> +
+> +static void hinic3_uninit_mbox_dma_queue(struct hinic3_mbox *mbox)
+> +{
+> +	uninit_mbox_dma_queue(mbox->hwdev, &mbox->sync_msg_queue);
+> +	uninit_mbox_dma_queue(mbox->hwdev, &mbox->async_msg_queue);
+> +}
+> +
+> +static int alloc_mbox_msg_channel(struct hinic3_msg_channel *msg_ch)
+> +{
+> +	msg_ch->resp_msg.msg = kzalloc(MBOX_MAX_BUF_SZ, GFP_KERNEL);
+> +	if (!msg_ch->resp_msg.msg)
+> +		return -ENOMEM;
+> +
+> +	msg_ch->recv_msg.msg = kzalloc(MBOX_MAX_BUF_SZ, GFP_KERNEL);
+> +	if (!msg_ch->recv_msg.msg) {
+> +		kfree(msg_ch->resp_msg.msg);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	msg_ch->resp_msg.seq_id = MBOX_SEQ_ID_MAX_VAL;
+> +	msg_ch->recv_msg.seq_id = MBOX_SEQ_ID_MAX_VAL;
+> +
+> +	return 0;
+> +}
+> +
+> +static void free_mbox_msg_channel(struct hinic3_msg_channel *msg_ch)
+> +{
+> +	kfree(msg_ch->recv_msg.msg);
+> +	kfree(msg_ch->resp_msg.msg);
+> +}
+> +
+> +static int init_mgmt_msg_channel(struct hinic3_mbox *mbox)
+> +{
+> +	int err;
+> +
+> +	err = alloc_mbox_msg_channel(&mbox->mgmt_msg);
+> +	if (err) {
+> +		dev_err(mbox->hwdev->dev, "Failed to alloc mgmt message channel\n");
+> +		return err;
+> +	}
+> +
+> +	err = hinic3_init_mbox_dma_queue(mbox);
+> +	if (err) {
+> +		dev_err(mbox->hwdev->dev, "Failed to init mbox dma queue\n");
+> +		free_mbox_msg_channel(&mbox->mgmt_msg);
+> +		return err;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void uninit_mgmt_msg_channel(struct hinic3_mbox *mbox)
+> +{
+> +	hinic3_uninit_mbox_dma_queue(mbox);
+> +	free_mbox_msg_channel(&mbox->mgmt_msg);
+> +}
+> +
+> +static int hinic3_init_func_mbox_msg_channel(struct hinic3_hwdev *hwdev)
+> +{
+> +	struct hinic3_mbox *mbox;
+> +	int err;
+> +
+> +	mbox = hwdev->mbox;
+> +	mbox->func_msg = kzalloc(sizeof(*mbox->func_msg), GFP_KERNEL);
+> +	if (!mbox->func_msg)
+> +		return -ENOMEM;
+> +
+> +	err = alloc_mbox_msg_channel(mbox->func_msg);
+> +	if (err)
+> +		goto err_free_func_msg;
+> +
+> +	return 0;
+> +
+> +err_free_func_msg:
+> +	kfree(mbox->func_msg);
+> +	mbox->func_msg = NULL;
+> +
+> +	return err;
+> +}
+> +
+> +static void hinic3_uninit_func_mbox_msg_channel(struct hinic3_hwdev *hwdev)
+> +{
+> +	struct hinic3_mbox *mbox = hwdev->mbox;
+> +
+> +	free_mbox_msg_channel(mbox->func_msg);
+> +	kfree(mbox->func_msg);
+> +	mbox->func_msg = NULL;
+> +}
+> +
+> +static void prepare_send_mbox(struct hinic3_mbox *mbox)
+> +{
+> +	struct hinic3_send_mbox *send_mbox = &mbox->send_mbox;
+> +
+> +	send_mbox->data = MBOX_AREA(mbox->hwdev->hwif);
+> +}
+> +
+> +static int alloc_mbox_wb_status(struct hinic3_mbox *mbox)
+> +{
+> +	struct hinic3_send_mbox *send_mbox = &mbox->send_mbox;
+> +	struct hinic3_hwdev *hwdev = mbox->hwdev;
+> +	u32 addr_h, addr_l;
+> +
+> +	send_mbox->wb_vaddr = dma_alloc_coherent(hwdev->dev,
+> +						 MBOX_WB_STATUS_LEN,
+> +						 &send_mbox->wb_paddr,
+> +						 GFP_KERNEL);
+> +	if (!send_mbox->wb_vaddr)
+> +		return -ENOMEM;
+> +
+> +	addr_h = upper_32_bits(send_mbox->wb_paddr);
+> +	addr_l = lower_32_bits(send_mbox->wb_paddr);
+> +	hinic3_hwif_write_reg(hwdev->hwif, HINIC3_FUNC_CSR_MAILBOX_RESULT_H_OFF,
+> +			      addr_h);
+> +	hinic3_hwif_write_reg(hwdev->hwif, HINIC3_FUNC_CSR_MAILBOX_RESULT_L_OFF,
+> +			      addr_l);
+> +
+> +	return 0;
+> +}
+> +
+> +static void free_mbox_wb_status(struct hinic3_mbox *mbox)
+> +{
+> +	struct hinic3_send_mbox *send_mbox = &mbox->send_mbox;
+> +	struct hinic3_hwdev *hwdev = mbox->hwdev;
+> +
+> +	hinic3_hwif_write_reg(hwdev->hwif, HINIC3_FUNC_CSR_MAILBOX_RESULT_H_OFF,
+> +			      0);
+> +	hinic3_hwif_write_reg(hwdev->hwif, HINIC3_FUNC_CSR_MAILBOX_RESULT_L_OFF,
+> +			      0);
+> +
+> +	dma_free_coherent(hwdev->dev, MBOX_WB_STATUS_LEN,
+> +			  send_mbox->wb_vaddr, send_mbox->wb_paddr);
+> +}
+> +
+> +static int hinic3_mbox_pre_init(struct hinic3_hwdev *hwdev,
+> +				struct hinic3_mbox **mbox)
+> +{
+> +	(*mbox) = kzalloc(sizeof(struct hinic3_mbox), GFP_KERNEL);
+> +	if (!(*mbox))
+> +		return -ENOMEM;
+> +
+> +	(*mbox)->hwdev = hwdev;
+> +	mutex_init(&(*mbox)->mbox_send_lock);
+> +	mutex_init(&(*mbox)->msg_send_lock);
+> +	spin_lock_init(&(*mbox)->mbox_lock);
+> +
+> +	(*mbox)->workq = create_singlethread_workqueue(HINIC3_MBOX_WQ_NAME);
+> +	if (!(*mbox)->workq) {
+> +		dev_err(hwdev->dev, "Failed to initialize MBOX workqueue\n");
+> +		kfree((*mbox));
+> +		return -ENOMEM;
+> +	}
+> +	hwdev->mbox = (*mbox);
+> +
+> +	return 0;
+> +}
 
-This bug is seen on a NIC with no RDMA support, so the RDMA init/deinit
-flow will not happen. It is protected by the !ice_is_rdma_ena(pf)
-check.
+That's pretty interesting solution, but the way it's usually done in the
+kernel is different. AFAIU, the problem you are trying to solve is to
+return error code in case of any problems and keep the newly allocated
+pointer in case of success. That can be done by using "struct
+hinic3_mbox *" as function return type and put ERR_PTR(err) in case of
+error. In the caller function you can use "if(IS_ERR())" construction
+to check for error.
 
-> 
->>
->> Introduce a flag to be set when the creation of the auxbus device is
->> successful, to avoid multiple NULL pointer checks in 
->> ice_unplug_aux_dev().
-> 
-> IMHO adding a state flag to prevent NULL pointer checks in the control 
-> path isn't enough justification unless there's something I'm missing here.
-> 
+But in this particular case I don't see any immediate benefit of moving
+mbox allocation into hinic3_mbox_pre_init(), as you still have error
+path in hinic3_init_mbox() which has to free previously allocated mbox.
+You can simplify this completely by allocating mbox hinic3_init_mbox()
+and only do init stuff in hinic3_mbox_pre_init().
 
-Avoid defensive programming. The use of the flag makes this path
-deterministic (only attempt to remove the auxbus device if we know for a
-fact that it was created). The NULL pointer checks provide protection 
-for this crash, but only by association. Say there was another bug in 
-that path that cleared them prematurely, with the NULL pointer checks in 
-place you will avoid crashing, but fail to remove the auxbus device, or 
-if such a patch was introduced, you'd want to crash, which gives 
-validation a chance to catch it.
+> +
+> +int hinic3_init_mbox(struct hinic3_hwdev *hwdev)
+> +{
+> +	struct hinic3_mbox *mbox;
+> +	int err;
+> +
+> +	err = hinic3_mbox_pre_init(hwdev, &mbox);
+> +	if (err)
+> +		return err;
+> +
+> +	err = init_mgmt_msg_channel(mbox);
+> +	if (err)
+> +		goto err_destroy_workqueue;
+> +
+> +	err = hinic3_init_func_mbox_msg_channel(hwdev);
+> +	if (err)
+> +		goto err_uninit_mgmt_msg_ch;
+> +
+> +	err = alloc_mbox_wb_status(mbox);
+> +	if (err) {
+> +		dev_err(hwdev->dev, "Failed to alloc mbox write back status\n");
+> +		goto err_uninit_func_mbox_msg_ch;
+> +	}
+> +
+> +	prepare_send_mbox(mbox);
+> +
+> +	return 0;
+> +
+> +err_uninit_func_mbox_msg_ch:
+> +	hinic3_uninit_func_mbox_msg_channel(hwdev);
+> +
+> +err_uninit_mgmt_msg_ch:
+> +	uninit_mgmt_msg_channel(mbox);
+> +
+> +err_destroy_workqueue:
+> +	destroy_workqueue(mbox->workq);
+> +	kfree(mbox);
+> +
+> +	return err;
+> +}
+> +
+> +void hinic3_free_mbox(struct hinic3_hwdev *hwdev)
+> +{
+> +	struct hinic3_mbox *mbox = hwdev->mbox;
+> +
+> +	destroy_workqueue(mbox->workq);
+> +	free_mbox_wb_status(mbox);
+> +	hinic3_uninit_func_mbox_msg_channel(hwdev);
+> +	uninit_mgmt_msg_channel(mbox);
+> +	kfree(mbox);
+> +}
+> +
+>   int hinic3_send_mbox_to_mgmt(struct hinic3_hwdev *hwdev, u8 mod, u16 cmd,
+>   			     const struct mgmt_msg_params *msg_params)
+>   {
+> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h b/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h
+> index d7a6c37b7eff..730795b66a86 100644
+> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h
+> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h
+> @@ -9,6 +9,111 @@
+>   
+>   struct hinic3_hwdev;
+>   
+> +#define MBOX_MSG_HEADER_SRC_GLB_FUNC_IDX_MASK  GENMASK_ULL(12, 0)
+> +#define MBOX_MSG_HEADER_STATUS_MASK            BIT_ULL(13)
+> +#define MBOX_MSG_HEADER_SOURCE_MASK            BIT_ULL(15)
+> +#define MBOX_MSG_HEADER_AEQ_ID_MASK            GENMASK_ULL(17, 16)
+> +#define MBOX_MSG_HEADER_MSG_ID_MASK            GENMASK_ULL(21, 18)
+> +#define MBOX_MSG_HEADER_CMD_MASK               GENMASK_ULL(31, 22)
+> +#define MBOX_MSG_HEADER_MSG_LEN_MASK           GENMASK_ULL(42, 32)
+> +#define MBOX_MSG_HEADER_MODULE_MASK            GENMASK_ULL(47, 43)
+> +#define MBOX_MSG_HEADER_SEG_LEN_MASK           GENMASK_ULL(53, 48)
+> +#define MBOX_MSG_HEADER_NO_ACK_MASK            BIT_ULL(54)
+> +#define MBOX_MSG_HEADER_DATA_TYPE_MASK         BIT_ULL(55)
+> +#define MBOX_MSG_HEADER_SEQID_MASK             GENMASK_ULL(61, 56)
+> +#define MBOX_MSG_HEADER_LAST_MASK              BIT_ULL(62)
+> +#define MBOX_MSG_HEADER_DIRECTION_MASK         BIT_ULL(63)
+> +
+> +#define MBOX_MSG_HEADER_SET(val, member) \
+> +	FIELD_PREP(MBOX_MSG_HEADER_##member##_MASK, val)
+> +#define MBOX_MSG_HEADER_GET(val, member) \
+> +	FIELD_GET(MBOX_MSG_HEADER_##member##_MASK, val)
+> +
+> +/* identifies if a segment belongs to a message or to a response. A VF is only
+> + * expected to send messages and receive responses. PF driver could receive
+> + * messages and send responses.
+> + */
+> +enum mbox_msg_direction_type {
+> +	MBOX_MSG_SEND = 0,
+> +	MBOX_MSG_RESP = 1,
+> +};
+> +
+> +#define HINIC3_MBOX_WQ_NAME  "hinic3_mbox"
+> +
+> +struct mbox_msg_info {
+> +	u8 msg_id;
+> +	u8 status;
+> +};
+> +
+> +struct hinic3_msg_desc {
+> +	void                 *msg;
+> +	u16                  msg_len;
+> +	u8                   seq_id;
+> +	u8                   mod;
+> +	u16                  cmd;
+> +	struct mbox_msg_info msg_info;
+> +};
+> +
+> +struct hinic3_msg_channel {
+> +	struct   hinic3_msg_desc resp_msg;
+> +	struct   hinic3_msg_desc recv_msg;
+> +};
+> +
+> +struct hinic3_send_mbox {
+> +	u8 __iomem *data;
+> +	void       *wb_vaddr;
+> +	dma_addr_t wb_paddr;
+> +};
+> +
+> +enum mbox_event_state {
+> +	MBOX_EVENT_START   = 0,
+> +	MBOX_EVENT_FAIL    = 1,
+> +	MBOX_EVENT_SUCCESS = 2,
+> +	MBOX_EVENT_TIMEOUT = 3,
+> +	MBOX_EVENT_END     = 4,
+> +};
+> +
+> +struct mbox_dma_msg {
+> +	u32 xor;
+> +	u32 dma_addr_high;
+> +	u32 dma_addr_low;
+> +	u32 msg_len;
+> +	u64 rsvd;
+> +};
+> +
+> +struct mbox_dma_queue {
+> +	void       *dma_buf_vaddr;
+> +	dma_addr_t dma_buf_paddr;
+> +	u16        depth;
+> +	u16        prod_idx;
+> +	u16        cons_idx;
+> +};
+> +
+> +struct hinic3_mbox {
+> +	struct hinic3_hwdev       *hwdev;
+> +	/* lock for send mbox message and ack message */
+> +	struct mutex              mbox_send_lock;
+> +	/* lock for send mbox message */
+> +	struct mutex              msg_send_lock;
+> +	struct hinic3_send_mbox   send_mbox;
+> +	struct mbox_dma_queue     sync_msg_queue;
+> +	struct mbox_dma_queue     async_msg_queue;
+> +	struct workqueue_struct   *workq;
+> +	/* driver and MGMT CPU */
+> +	struct hinic3_msg_channel mgmt_msg;
+> +	/* VF to PF */
+> +	struct hinic3_msg_channel *func_msg;
+> +	u8                        send_msg_id;
+> +	enum mbox_event_state     event_flag;
+> +	/* lock for mbox event flag */
+> +	spinlock_t                mbox_lock;
+> +};
+> +
+> +void hinic3_mbox_func_aeqe_handler(struct hinic3_hwdev *hwdev, u8 *header,
+> +				   u8 size);
+> +int hinic3_init_mbox(struct hinic3_hwdev *hwdev);
+> +void hinic3_free_mbox(struct hinic3_hwdev *hwdev);
+> +
+>   int hinic3_send_mbox_to_mgmt(struct hinic3_hwdev *hwdev, u8 mod, u16 cmd,
+>   			     const struct mgmt_msg_params *msg_params);
+>   
 
->>
->> Fixes: c24a65b6a27c7 ("iidc/ice/irdma: Update IDC to support multiple 
->> consumers")
->> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
->> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->> ---
->>   drivers/net/ethernet/intel/ice/ice.h     |  1 +
->>   drivers/net/ethernet/intel/ice/ice_idc.c | 10 ++++++----
->>   2 files changed, 7 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ 
->> ethernet/intel/ice/ice.h
->> index ddd0ad68185b..0ef11b7ab477 100644
->> --- a/drivers/net/ethernet/intel/ice/ice.h
->> +++ b/drivers/net/ethernet/intel/ice/ice.h
->> @@ -509,6 +509,7 @@ enum ice_pf_flags {
->>          ICE_FLAG_LINK_LENIENT_MODE_ENA,
->>          ICE_FLAG_PLUG_AUX_DEV,
->>          ICE_FLAG_UNPLUG_AUX_DEV,
->> +       ICE_FLAG_AUX_DEV_CREATED,
->>          ICE_FLAG_MTU_CHANGED,
->>          ICE_FLAG_GNSS,                  /* GNSS successfully 
->> initialized */
->>          ICE_FLAG_DPLL,                  /* SyncE/PTP dplls 
->> initialized */
->> diff --git a/drivers/net/ethernet/intel/ice/ice_idc.c b/drivers/net/ 
->> ethernet/intel/ice/ice_idc.c
->> index 6ab53e430f91..420d45c2558b 100644
->> --- a/drivers/net/ethernet/intel/ice/ice_idc.c
->> +++ b/drivers/net/ethernet/intel/ice/ice_idc.c
->> @@ -336,6 +336,7 @@ int ice_plug_aux_dev(struct ice_pf *pf)
->>          mutex_lock(&pf->adev_mutex);
->>          cdev->adev = adev;
->>          mutex_unlock(&pf->adev_mutex);
->> +       set_bit(ICE_FLAG_AUX_DEV_CREATED, pf->flags);
-> 
-> What if this bit is set already, should ice_plug_aux_dev() be executed?
-
-The purpose of this bit is to mark the successful creation of the auxbus 
-device, I am not aware of any action that needs to be taken should 
-ice_plug_aux_dev() be called with the bit set and there was no check 
-like this previously.
-
-> 
->>
->>          return 0;
->>   }
->> @@ -347,15 +348,16 @@ void ice_unplug_aux_dev(struct ice_pf *pf)
->>   {
->>          struct auxiliary_device *adev;
->>
->> +       if (!test_and_clear_bit(ICE_FLAG_AUX_DEV_CREATED, pf->flags))
->> +               return;
->> +
-> 
-> To re-iterate my comment above, I think the driver should just check if 
-> pf->cdev_info is valid before de-referencing it. Also, the local adev 
-> variable will have to be set to NULL to handle this case.
-
-Understood. I am not opposed to changing the patch to add another NULL 
-check if that is the consensus. Another option is to add the same check 
-for !ice_is_rdma_ena(pf) like in the other functions. This should work 
-at present, because the driver fails to load if RDMA init errors out.
-
-Thanks,
-Emil
-
-> 
-> Brett
-> 
->>          mutex_lock(&pf->adev_mutex);
->>          adev = pf->cdev_info->adev;
->>          pf->cdev_info->adev = NULL;
-> 
-> 
->>          mutex_unlock(&pf->adev_mutex);
->>
->> -       if (adev) {
->> -               auxiliary_device_delete(adev);
->> -               auxiliary_device_uninit(adev);
->> -       }
->> +       auxiliary_device_delete(adev);
->> +       auxiliary_device_uninit(adev);
->>   }
->>
->>   /**
->> -- 
->> 2.37.3
->>
->>
-> 
 
