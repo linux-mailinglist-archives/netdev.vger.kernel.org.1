@@ -1,114 +1,175 @@
-Return-Path: <netdev+bounces-201114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08BC6AE822B
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 13:58:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B7FFAE823C
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 14:00:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C53D84A30E2
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:57:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AA9F5A759C
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:57:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D5F2609FB;
-	Wed, 25 Jun 2025 11:54:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B3125DAE2;
+	Wed, 25 Jun 2025 11:56:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="l1JjiTMl"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ISCEm7UK"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D65B25F971;
-	Wed, 25 Jun 2025 11:54:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6917625EF82;
+	Wed, 25 Jun 2025 11:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750852486; cv=none; b=gj3GaLnOfSg4xQGpf5gUJeZQ6mfBwQRfmwVgLW4Sdpr2j1Dy7yjJXiDY8suobYJgaPCdkfsk7ZKS/PDTkCTi0qxke9YdhqfLQsiRS4/yMgzdziF5FHI8PXFniKIbIjqNB1sjhAdR+b+awr+0gLqvZv/Q91J+9fTJtnOeD8y5jrA=
+	t=1750852613; cv=none; b=Kwb57SsYM2OLUyxT3LJAFvSM+6/c6NYg0Vvm6eG7CQVBOgQQmRjTrJ4cleC4bwftHxRGHImM+yWuEMnpyR+HJ5hH/nPY49c64PVwLiOryABD4+p3QqJGT7s9hM4zUrdJU1Gal0vREyLNYliKx4zadoWXY3TnX+uZsOxW17LTHeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750852486; c=relaxed/simple;
-	bh=fYhqgWcrMDUQh0LcbaY40LxLgotnOxTn/1XEiPONA6w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eMdmwKkYsgtZwZtP9A3Vpv5bNL0c3KQQnUSV3KfXpXJ38PEqnsvGjjQ+LHxenmd3/hXoMkeXtjE2CUAHrgv9HZLTYfOIcbKweNaX1cY7YwX2W7bTh+T6YkDvkITmzzzFxIjoBNh7Z2WvjartC/73Mim708SltiCXqURZOBSoI+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=l1JjiTMl; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+	s=arc-20240116; t=1750852613; c=relaxed/simple;
+	bh=cVo9Xcg87O0oGsmnAr6w6S5Wjns36e/PNeBgLvqTRLw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IdgFBY7/IeQP9ZduzPfeV9fklaww5wWMwrWWinDjmFTczkB9D/d9EhThlkVEcHxF7USIwCmOeCSjD7mGkHUaOQtYMUMFrEa9wi7DRDNWRJ9DGq5O8f5i2e2VQAZkL3HG+18ar/Ca1u6/fVJgTPx2JwY8ajtSizfsGKm+YNO90C8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ISCEm7UK; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=yBa1t/SHtIDzKXtNq3+WIr8qjUOXvNiOwZ9/+bz71Z8=; t=1750852485; x=1752062085; 
-	b=l1JjiTMlB5mg6H3Fv4RJWTR9ztIXNNK8rf4HiF+ABl8ta0VbvxPWnfGaOU/XK/VqLjCD9TogSuK
-	KYAl0DS5vOLxpFD0dKFvd21SFbRGpg6A7U4VJc4wVZFXfsql7J3yaNBPjXw0ZzpWhH5jIPPcmsl/6
-	OR/U3vuAHyRJ7cs2HGseSruonmT+eFhK4C4UntySc1M34+5L6sDfaLohWgHANLv+y1VkV2G4boM1a
-	u6dqhzmvOeh7/1E8x5IfgHkICf0ANX8XaPNwJVwhGhqtpDp99RWSjSmx/5LDAQPM7Pjy0W1qk3H/U
-	zCh/QxThvtHargiX+yeGm+EPNGLCT+uPhJOw==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1uUOi5-00000009wKe-3cvn;
-	Wed, 25 Jun 2025 13:54:38 +0200
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Subject: [GIT PULL] wireless-2025-06-25
-Date: Wed, 25 Jun 2025 13:54:08 +0200
-Message-ID: <20250625115433.41381-3-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.50.0
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=Bsdjmw/s0xK6OKQhogNcYxPwxByyT90uqYrflwQOPIs=; b=ISCEm7UK2/Ndd5WFsguA3KwXrV
+	z7CtUSXJmkgIQUwR5ohAVehe5E6T9QnfoFrtrhtS7F6/T+ooG3P8tkd8nIUVMkn6uPBkTWqQnPsyH
+	m4IQlmMhQnTYfEZTz2L5X78guxhKsBstJBSoxsF0UAXFBVNDZ6RuYqDWkWCWb7x08Yvyx/r1GgbMz
+	645hx+s+deLXYHnXtJiJ7kavlHG/WH6DMrbDvK/zKs5eO8hE9Fd0SRkoWdlIS/BgAq+OnDRhdm21r
+	3T90GLZ16Fw0s9Y0FKnEgO9u8o62mDPgbkDDiGWAeopsqRACPP7AA5m7t4M+3LLdL0AtGJlscMn+A
+	3m1FwSZg==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uUOk8-00000005qQC-0LQ8;
+	Wed, 25 Jun 2025 11:56:44 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 5FFF030BAFF; Wed, 25 Jun 2025 13:56:43 +0200 (CEST)
+Date: Wed, 25 Jun 2025 13:56:43 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: linux-kernel@vger.kernel.org, rcu@vger.kernel.org, lkmm@lists.linux.dev,
+	Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>,
+	Waiman Long <longman@redhat.com>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang@linux.dev>, Breno Leitao <leitao@debian.org>,
+	aeh@meta.com, netdev@vger.kernel.org, edumazet@google.com,
+	jhs@mojatatu.com, kernel-team@meta.com,
+	Erik Lundgren <elundgren@meta.com>
+Subject: Re: [PATCH 4/8] shazptr: Avoid synchronize_shaptr() busy waiting
+Message-ID: <20250625115643.GE1613376@noisy.programming.kicks-ass.net>
+References: <20250625031101.12555-1-boqun.feng@gmail.com>
+ <20250625031101.12555-5-boqun.feng@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-
-Hi,
-
-Just a handful of new fixes, nothing stands out. No known
-conflicts either.
-
-Please pull and let us know if there's any problem.
-
-Thanks,
-johannes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250625031101.12555-5-boqun.feng@gmail.com>
 
 
+Response is a bit weird because non-linear editing..
 
-The following changes since commit 5c8013ae2e86ec36b07500ba4cacb14ab4d6f728:
+On Tue, Jun 24, 2025 at 08:10:57PM -0700, Boqun Feng wrote:
 
-  Merge tag 'net-6.16-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-06-19 10:21:32 -0700)
+> +	/* Whether the scan kthread has been scheduled to scan */
+> +	bool scheduled;
 
-are available in the Git repository at:
+> +static int __noreturn shazptr_scan_kthread(void *unused)
+> +{
+> +	for (;;) {
+> +		swait_event_idle_exclusive(shazptr_scan.wq,
+> +					   READ_ONCE(shazptr_scan.scheduled));
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2025-06-25
+This seems weird; why use a whole wait-queue, in exclusive mode no less,
+for something that is one known thread.
 
-for you to fetch changes up to 95b922dd04f74a45fb86b34a25cda62f427a2b5c:
+Also, I think this thing needs to be FREEZABLE, otherwise suspend might
+have issues.
 
-  Merge tag 'iwlwifi-fixes-2025-06-25' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next (2025-06-25 10:20:03 +0200)
+Why not just write it like:
 
-----------------------------------------------------------------
-Just a few fixes:
- - iwlegacy: work around large stack with clang/kasan
- - mac80211: fix integer overflow
- - mac80211: fix link struct init vs. RCU publish
- - iwlwifi: fix warning on IFF_UP
+		for (;;) {
+			set_current_state(TASK_IDLE | TASK_FREEZABLE);
+			if (!list_empty(&scan->queue))
+				break;
+			schedule();
+		}
+		__set_current_state(TASK_RUNNABLE);
 
-----------------------------------------------------------------
-Arnd Bergmann (1):
-      wifi: iwlegacy: work around excessive stack usage on clang/kasan
+		for (;;) {
+			scoped_guard (mutex, scan->lock) {
+				if (list_empty(scan->queued) &&
+				    list_empty(scan->scanning))
+					break;
+			}
 
-Johannes Berg (2):
-      wifi: mac80211: finish link init before RCU publish
-      Merge tag 'iwlwifi-fixes-2025-06-25' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
+			shazptr_do_scan(scan);
+		}
 
-Lachlan Hodges (1):
-      wifi: mac80211: fix beacon interval calculation overflow
 
-Miri Korenblit (1):
-      wifi: iwlwifi: mvm: assume '1' as the default mac_config_cmd version
+> +		shazptr_do_scan(&shazptr_scan);
+> +
+> +		scoped_guard(mutex, &shazptr_scan.lock) {
+> +			if (list_empty(&shazptr_scan.queued) &&
+> +			    list_empty(&shazptr_scan.scanning))
+> +				shazptr_scan.scheduled = false;
 
- drivers/net/wireless/intel/iwlegacy/4965-rs.c    | 3 ++-
- drivers/net/wireless/intel/iwlwifi/mvm/mld-mac.c | 4 ++--
- net/mac80211/link.c                              | 6 +++---
- net/mac80211/util.c                              | 2 +-
- 4 files changed, 8 insertions(+), 7 deletions(-)
+This condition, why can't we directly use this condition instead of
+scheduled?
+
+> +		}
+> +	}
+> +}
+
+
+> +static void synchronize_shazptr_normal(void *ptr)
+> +{
+
+> +
+> +	/* Found blocking slots, prepare to wait. */
+> +	if (blocking_grp_mask) {
+> +		struct shazptr_scan *scan = &shazptr_scan;
+> +		struct shazptr_wait wait = {
+> +			.blocking_grp_mask = blocking_grp_mask,
+> +		};
+> +
+> +		INIT_LIST_HEAD(&wait.list);
+> +		init_completion(&wait.done);
+> +
+> +		scoped_guard(mutex, &scan->lock) {
+> +			list_add_tail(&wait.list, &scan->queued);
+> +
+> +			if (!scan->scheduled) {
+> +				WRITE_ONCE(scan->scheduled, true);
+> +				swake_up_one(&shazptr_scan.wq);
+> +			}
+
+Or perhaps; just write this like:
+
+			bool was_empty = list_empty(&scan->queued);
+			list_add_tail(&wait.list, &scan->queued);
+			if (was_empty)
+				wake_up_process(scan->thread);
+
+> +		}
+> +
+> +		wait_for_completion(&wait.done);
+> +	}
+> +}
+
 
