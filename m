@@ -1,271 +1,249 @@
-Return-Path: <netdev+bounces-201225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA8B7AE888E
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 17:46:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E91BAE88CF
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 17:52:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6AB12188813C
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 15:47:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03D1D1890F40
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 15:52:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F273028689C;
-	Wed, 25 Jun 2025 15:46:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3B228F935;
+	Wed, 25 Jun 2025 15:52:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B/ddR3YB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AroxS4Xe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415BE15DBC1;
-	Wed, 25 Jun 2025 15:46:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C6C29B20E
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 15:52:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750866409; cv=none; b=NUgjIoNRtgarjAicmPSUmKpbCEve6VuwmLwYchBz4QcTiHolSGwzfPEmYPEbNZOdBh8MAXVOjyRtZvPNWkYpr7UeI64d5qjMCLH3aHZdYWNgb2nigxcKxlKVKO31oLmvY66tc0K62Qh44S25xDJvJvPGsYUr7I1C9WlNikMfkLs=
+	t=1750866733; cv=none; b=dPEfyPCKEi19PMmAk66ItsaDduISEVlWzjx+rr8awYHgP3gwqxe12oZzTdYFkI6m1Qx6HXPIXIewc06HJyxMJU7wW4BpUginEkyynRkwR5KPtG5ea5MKsmOG9nGctID+xLPKeEdasRKJqvh2cruSSSXtEXDyR1JZUO0YncpnI/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750866409; c=relaxed/simple;
-	bh=aKgM6Pc1KDtR6QB+3Mz/BgYOpk574O1TBmYyLDC2/Z4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fGjqEjD+wBZTypcBTfjLgSFXACu9s/wylxmyXbL2SupqaLs/uCJ+XSPavzJWtamFdSLxLYIXW74pFWnnT1iKb22kSG4GPuLehUXd5n1j3E/G58bgWz6t0Bbj28/Cj2+e23fDjxrlExTM61p9pfSlCPIlvD3rMutx2Gala9GoH4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B/ddR3YB; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-234d3261631so369935ad.1;
-        Wed, 25 Jun 2025 08:46:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750866407; x=1751471207; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=/51X+PmNEz/ZTtQwAkNz0pI8nEQTlFHqT6YHtRmYQVk=;
-        b=B/ddR3YB6pMYYy07ZmedAamnolALe1s3/13LowAh21GwcJlI1UGoMLEfcyuy/jhfn4
-         swq1uP444aDlg+zxaRFX+IHyCoK8lATh/K2L6z5aMLWny6E9W+WxERftcVkwKVNrdWe1
-         ITQ03T0BpElBZnctEO6gMs5LNgNpuflqFLitJHuRFiVjRdqYxzn6Z7n+LxsYSeyT2+Kx
-         lII5Pn5euZeeO7J7mFHn2HyM5og6skqtHQQXUyZvBMZUF5cboUDdf6TIL9gtGWYjJp7L
-         z+x8UKbJa464DhdNc6htSENsqX0m+xTZJlpdp1Z2u3RzUGNhDyriZimXLWxNW6cx4HBT
-         5LSQ==
+	s=arc-20240116; t=1750866733; c=relaxed/simple;
+	bh=2dEZxA9znoi4/j5ZU/wsEM4CqiVDW+cT8z82gn8Ynjg=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=KZkpJ+o4Qn0OGc7C3jaqUdFqS6blZ9A2DpV4zOiPL8Z12058SRxfzGYJhtbsbJSRXibWEcN7fVhwCi8w+qLOLCby7OJxlOW4xCQT0k9lQPH3br1DlEXF6Nksx0cX1VL4ivLeN8WXsE3AFshyOJkZ/HvEdkPn1iXAyeygufttgV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AroxS4Xe; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750866730;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UprNKi29neeOtDuoBhXpguAmiHeVIiz0UMx6QLlk6uM=;
+	b=AroxS4XeeMZYXFDXFXjRw0Vxbsvs3qtGYGbyQMtNCsXu60Mimi/k1SQm+KuA1+kCJcjvQO
+	6moXOgdHAxqh3UDE4TYNo9Rqp1K2d82WvgDYZWA+D/1jAXRqVO8rrO1vszinlHBE3Lugo+
+	VXglqUs/zO9lbShzO95jmmfcUVyImQk=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-364-dSWa0ui4OO6dBFi9WrPNbg-1; Wed, 25 Jun 2025 11:52:08 -0400
+X-MC-Unique: dSWa0ui4OO6dBFi9WrPNbg-1
+X-Mimecast-MFC-AGG-ID: dSWa0ui4OO6dBFi9WrPNbg_1750866728
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-311a6b43ed7so5763046a91.1
+        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 08:52:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750866407; x=1751471207;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1750866728; x=1751471528;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/51X+PmNEz/ZTtQwAkNz0pI8nEQTlFHqT6YHtRmYQVk=;
-        b=aWAPaJ9asO7G/leAV+zhxsDvx5x3Tt4j78t2VWcpE7cLD9FoVCCiaP3owQjxEvVTWD
-         KrAl/hcGvOSyXX/6l+/iqOOTqT0DNU0+OyhYSr8JcJNUdWeBxRSWGGr5oqx7dSXBVU/b
-         ltvbwA5MX4r1fOSl9SI3JB4Dz6PddSZAryTJ4MYId6HmJv/kxiBWD2uSrdIJzGVxWjKi
-         Lo08CPDD7fLf6X19qBMfvSsdUhqptsB73LtrqsiHkj2oX8mQF6Kn519TpY/Bvs1rAqEx
-         FFgKvUmtWi9Qoz1jR39tt1/XH8elx1U5LwY0DxgGEajqOHNaE3pz/ItLGK4TBcMj6S7s
-         q/NA==
-X-Forwarded-Encrypted: i=1; AJvYcCXQE6U3mjPGKWLYByH6gQmQz4hvY20SYkq21bv7I+CVm1AtZCB2ZCRdgZ7BVqLz3aQisEEBCCjjcWcqbSj0@vger.kernel.org, AJvYcCXVWjc17mFVcirwF0nUqAkwITguKDXnhoPxRZTuTcgTaz8zldsUBvAiRRcxHR+GYGLldz8=@vger.kernel.org, AJvYcCXpbIRNOm9QMyUR7JUgkN6LoZ1gIK1vvOikuYR6ZtE03/Yntl+kyDdFIhwjrdXVOyOmYmo1Bu/Y@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGRwH2lAi5h4r3kqBCZbqETsRfjXPfvTM3iRySsd+dG8DAf133
-	dIvT6wGBIp0sUBAMay7aUdr6WOOhUePWvOLmdlCkxaZul0E3x30ALmg=
-X-Gm-Gg: ASbGncvttvcTX/VbHPW8A7kHbJaHoQwugYRq5j9aiAeEU/T9H9H0xCevSsm8kaGZYtB
-	95v8d1k4NkP1zC1Xj8N6nvus2xZt+xP9vYeXs+a6euLbEig5BYfe/nhMeo0/EtI/YzdmDNWEc6O
-	ryRP3CgRlCAUMt86wbZIo748pXKZS2GIF5BpIZc4K4nGfws7uLHPu1H/8CD/NCsb593NmgRXXNp
-	tVttJJgQDnFOv9vjZJf6eMcAUqNogrgVCqQZgSZ/UrWQ/ub6vVQ0UyODAIUTUwHR0YfS2AJlguf
-	eAi+hpRiNN/mtSQh720l/GEa+H223wxDKmhLsNQFcFjk5YZ0Hx+pIB2qB2IxmxFJ/XYcuebp+ig
-	Y0pBcfy4dOU9Mvfs3Fs0+XaE=
-X-Google-Smtp-Source: AGHT+IH37pvTbM1uImAHDo+bJnWCTeX3jIdtvgP5fYWBiLshFdz0z+SJkY/pdvBBhIWareIvSTJzAA==
-X-Received: by 2002:a17:902:cec5:b0:234:f4da:7eed with SMTP id d9443c01a7336-23824362d4dmr67367415ad.44.1750866407311;
-        Wed, 25 Jun 2025 08:46:47 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-237d8393043sm142621705ad.3.2025.06.25.08.46.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 08:46:46 -0700 (PDT)
-Date: Wed, 25 Jun 2025 08:46:45 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: syzbot <syzbot+e67ea9c235b13b4f0020@syzkaller.appspotmail.com>,
-	andrii@kernel.org, ast@kernel.org, bjorn@kernel.org,
-	bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
-	edumazet@google.com, horms@kernel.org, jonathan.lemon@gmail.com,
-	kuba@kernel.org, linux-kernel@vger.kernel.org,
-	maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
-	netdev@vger.kernel.org, pabeni@redhat.com, sdf@fomichev.me,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [bpf?] [net?] possible deadlock in xsk_notifier (3)
-Message-ID: <aFwZ5WWj835sDGpS@mini-arch>
-References: <685af3b1.a00a0220.2e5631.0091.GAE@google.com>
- <CAL+tcoB0as6+5VOk9nu0M_OH4TqT6NjDZBZmgQgdQcYx0pciCw@mail.gmail.com>
- <aFwQZhpWIxVLJ1Ui@mini-arch>
- <CAL+tcoCmiT9XXUVGwcT1NB6bLVK69php-oH+9UL+mH6_HYxGhA@mail.gmail.com>
+        bh=UprNKi29neeOtDuoBhXpguAmiHeVIiz0UMx6QLlk6uM=;
+        b=nVITz0MbmYCxJbhImVz0PigR60P0o4L6s6JmyTQD0sAKzJYnUtJWnPuBuhvZYJBCW+
+         4imfZZPdVUoJnuttieLA3v3wV6tbSafwzd71X7Y7ZEf+iS0OfdMIRnhiSUargDAVyavY
+         rMD23Vtq3L39/BvIiVH/FNAQtWNGleJcI2dDjg7zc8ZJmAf0ASyx5maqoBGdRCdEC0BD
+         gpkrm3F3QS2p+uVYaERjeU8QtVwnjt3pipO0Y72vtSJ+EYI9h8mJtjIh0Srppkh8RH35
+         P5qGlCrtV2h9dvrvMk2oBv+0Gd7Y90q6uy9EuVhbYgtIVm7aBAXhzDBpATy2Qh5cMxep
+         SMMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVnfD7oXKHy4h4YieUmiUvTdFTFR7y4dWHmTL+/G9WCxU5YCHjwl5WqNLE48efJUzPb55EDjks=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmDKQ+V6axvTF3Wc0heQfU33jVPP2Wa/9/lUnjKm0Qqip8WgO0
+	c9o+UxFHE8DFO7272fOckF9tn8Osf7FrJq0RBaZGfs6c9XDxdm6Aw0zDc3xo0vA+FhjKjGWp38z
+	n/tBciYONndoB6RnLD3iJK7ofXy/Pf8Zwn4RiFtzF69BhXyUV0UWM2Do3NQ==
+X-Gm-Gg: ASbGncsvpKu4ZMauionKuyhF3kZmmcXsHgP9Od/9UbJgiSqD3xDc/X8FNtXj+5k7Ain
+	bxN7sf3ZOaw7q3FOlUi9aWmOOQ8/01yqVICvXg6Rz1QMx5i21fPqWUF8e2XHROfsrZ/dqciv6Fh
+	mctdLsUdGnjHotlk3my+LdEAFypfbC+PIysUQolYGjfQhpLCHg8yBVgHGGGGj5Ls6lSEkK6QD4q
+	fC6mNbpu9U7lmD6MJrSh/dqRpn6j0li4paX6d83FA29R6gB5rlj/mF7vS3jPe0WqsttFqBbfOz9
+	X6Jyz5vzMV1KDoFNb2PrzgXRyqRMiufErm1pRQffGnbN1kiWfwGJH1g5qEPMpVTQMWxs
+X-Received: by 2002:a17:90b:1fce:b0:312:e731:5a6b with SMTP id 98e67ed59e1d1-315f269fa68mr4355070a91.32.1750866727513;
+        Wed, 25 Jun 2025 08:52:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGglaSDui+roskZocwG9xuSyfP0Kpa0z0xiQ8gfEl8NwUolpzM/PIXW3EJfCfspj5HFPWW0bw==
+X-Received: by 2002:a17:90b:1fce:b0:312:e731:5a6b with SMTP id 98e67ed59e1d1-315f269fa68mr4355024a91.32.1750866727029;
+        Wed, 25 Jun 2025 08:52:07 -0700 (PDT)
+Received: from ?IPV6:2601:600:947f:f020:85dc:d2b2:c5ee:e3c4? ([2601:600:947f:f020:85dc:d2b2:c5ee:e3c4])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-315f53ea827sm2146576a91.41.2025.06.25.08.52.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Jun 2025 08:52:05 -0700 (PDT)
+From: Waiman Long <llong@redhat.com>
+X-Google-Original-From: Waiman Long <longman@redhat.com>
+Message-ID: <c649c8ec-6c1b-41a3-90c5-43c0feed7803@redhat.com>
+Date: Wed, 25 Jun 2025 11:52:04 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL+tcoCmiT9XXUVGwcT1NB6bLVK69php-oH+9UL+mH6_HYxGhA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/8] Introduce simple hazard pointers
+To: Boqun Feng <boqun.feng@gmail.com>, linux-kernel@vger.kernel.org,
+ rcu@vger.kernel.org, lkmm@lists.linux.dev
+Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@kernel.org>,
+ Will Deacon <will@kernel.org>, Davidlohr Bueso <dave@stgolabs.net>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Josh Triplett <josh@joshtriplett.org>,
+ Frederic Weisbecker <frederic@kernel.org>,
+ Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+ Joel Fernandes <joelagnelf@nvidia.com>, Uladzislau Rezki <urezki@gmail.com>,
+ Steven Rostedt <rostedt@goodmis.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Lai Jiangshan <jiangshanlai@gmail.com>, Zqiang <qiang.zhang@linux.dev>,
+ Breno Leitao <leitao@debian.org>, aeh@meta.com, netdev@vger.kernel.org,
+ edumazet@google.com, jhs@mojatatu.com, kernel-team@meta.com,
+ Erik Lundgren <elundgren@meta.com>
+References: <20250625031101.12555-1-boqun.feng@gmail.com>
+ <20250625031101.12555-2-boqun.feng@gmail.com>
+Content-Language: en-US
+In-Reply-To: <20250625031101.12555-2-boqun.feng@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 06/25, Jason Xing wrote:
-> On Wed, Jun 25, 2025 at 11:06 PM Stanislav Fomichev
-> <stfomichev@gmail.com> wrote:
-> >
-> > On 06/25, Jason Xing wrote:
-> > > On Wed, Jun 25, 2025 at 2:51 AM syzbot
-> > > <syzbot+e67ea9c235b13b4f0020@syzkaller.appspotmail.com> wrote:
-> > > >
-> > > > Hello,
-> > > >
-> > > > syzbot found the following issue on:
-> > > >
-> > > > HEAD commit:    78f4e737a53e Merge tag 'for-6.16/dm-fixes' of git://git.ke..
-> > > > git tree:       upstream
-> > > > console output: https://syzkaller.appspot.com/x/log.txt?x=11b48f0c580000
-> > > > kernel config:  https://syzkaller.appspot.com/x/.config?x=12ec1a20ad573841
-> > > > dashboard link: https://syzkaller.appspot.com/bug?extid=e67ea9c235b13b4f0020
-> > > > compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> > > >
-> > > > Unfortunately, I don't have any reproducer for this issue yet.
-> > > >
-> > > > Downloadable assets:
-> > > > disk image: https://storage.googleapis.com/syzbot-assets/3ff97b2d201b/disk-78f4e737.raw.xz
-> > > > vmlinux: https://storage.googleapis.com/syzbot-assets/1968f46c8915/vmlinux-78f4e737.xz
-> > > > kernel image: https://storage.googleapis.com/syzbot-assets/3455e371b965/bzImage-78f4e737.xz
-> > > >
-> > > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > > > Reported-by: syzbot+e67ea9c235b13b4f0020@syzkaller.appspotmail.com
-> > > >
-> > > > netlink: 4 bytes leftover after parsing attributes in process `syz.1.1331'.
-> > > > ======================================================
-> > > > WARNING: possible circular locking dependency detected
-> > > > 6.16.0-rc3-syzkaller-00042-g78f4e737a53e #0 Not tainted
-> > > > ------------------------------------------------------
-> > > > syz.1.1331/11144 is trying to acquire lock:
-> > > > ffff888054b136b0 (&xs->mutex){+.+.}-{4:4}, at: xsk_notifier+0x101/0x280 net/xdp/xsk.c:1649
-> > > >
-> > > > but task is already holding lock:
-> > > > ffff888052f43d58 (&net->xdp.lock){+.+.}-{4:4}, at: xsk_notifier+0xa4/0x280 net/xdp/xsk.c:1645
-> > > >
-> > > > which lock already depends on the new lock.
-> > > >
-> > > >
-> > > > the existing dependency chain (in reverse order) is:
-> > > >
-> > > > -> #2 (&net->xdp.lock){+.+.}-{4:4}:
-> > > >        __mutex_lock_common kernel/locking/mutex.c:602 [inline]
-> > > >        __mutex_lock+0x199/0xb90 kernel/locking/mutex.c:747
-> > > >        xsk_notifier+0xa4/0x280 net/xdp/xsk.c:1645
-> > > >        notifier_call_chain+0xbc/0x410 kernel/notifier.c:85
-> > > >        call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:2230
-> > > >        call_netdevice_notifiers_extack net/core/dev.c:2268 [inline]
-> > > >        call_netdevice_notifiers net/core/dev.c:2282 [inline]
-> > > >        unregister_netdevice_many_notify+0xf9d/0x2700 net/core/dev.c:12077
-> > > >        unregister_netdevice_many net/core/dev.c:12140 [inline]
-> > > >        unregister_netdevice_queue+0x305/0x3f0 net/core/dev.c:11984
-> > > >        register_netdevice+0x18f1/0x2270 net/core/dev.c:11149
-> > > >        lapbeth_new_device drivers/net/wan/lapbether.c:420 [inline]
-> > > >        lapbeth_device_event+0x5b1/0xbe0 drivers/net/wan/lapbether.c:462
-> > > >        notifier_call_chain+0xbc/0x410 kernel/notifier.c:85
-> > > >        call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:2230
-> > > >        call_netdevice_notifiers_extack net/core/dev.c:2268 [inline]
-> > > >        call_netdevice_notifiers net/core/dev.c:2282 [inline]
-> > > >        __dev_notify_flags+0x12c/0x2e0 net/core/dev.c:9497
-> > > >        netif_change_flags+0x108/0x160 net/core/dev.c:9526
-> > > >        dev_change_flags+0xba/0x250 net/core/dev_api.c:68
-> > > >        devinet_ioctl+0x11d5/0x1f50 net/ipv4/devinet.c:1200
-> > > >        inet_ioctl+0x3a7/0x3f0 net/ipv4/af_inet.c:1001
-> > > >        sock_do_ioctl+0x118/0x280 net/socket.c:1190
-> > > >        sock_ioctl+0x227/0x6b0 net/socket.c:1311
-> > > >        vfs_ioctl fs/ioctl.c:51 [inline]
-> > > >        __do_sys_ioctl fs/ioctl.c:907 [inline]
-> > > >        __se_sys_ioctl fs/ioctl.c:893 [inline]
-> > > >        __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:893
-> > > >        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-> > > >        do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
-> > > >        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> > > >
-> > > > -> #1 (&dev_instance_lock_key#20){+.+.}-{4:4}:
-> > > >        __mutex_lock_common kernel/locking/mutex.c:602 [inline]
-> > > >        __mutex_lock+0x199/0xb90 kernel/locking/mutex.c:747
-> > > >        netdev_lock include/linux/netdevice.h:2756 [inline]
-> > > >        netdev_lock_ops include/net/netdev_lock.h:42 [inline]
-> > > >        xsk_bind+0x37c/0x1570 net/xdp/xsk.c:1189
-> > > >        __sys_bind_socket net/socket.c:1810 [inline]
-> > > >        __sys_bind_socket net/socket.c:1802 [inline]
-> > > >        __sys_bind+0x1a7/0x260 net/socket.c:1841
-> > > >        __do_sys_bind net/socket.c:1846 [inline]
-> > > >        __se_sys_bind net/socket.c:1844 [inline]
-> > > >        __x64_sys_bind+0x72/0xb0 net/socket.c:1844
-> > > >        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-> > > >        do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
-> > > >        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> > > >
-> > > > -> #0 (&xs->mutex){+.+.}-{4:4}:
-> > > >        check_prev_add kernel/locking/lockdep.c:3168 [inline]
-> > > >        check_prevs_add kernel/locking/lockdep.c:3287 [inline]
-> > > >        validate_chain kernel/locking/lockdep.c:3911 [inline]
-> > > >        __lock_acquire+0x126f/0x1c90 kernel/locking/lockdep.c:5240
-> > > >        lock_acquire kernel/locking/lockdep.c:5871 [inline]
-> > > >        lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5828
-> > > >        __mutex_lock_common kernel/locking/mutex.c:602 [inline]
-> > > >        __mutex_lock+0x199/0xb90 kernel/locking/mutex.c:747
-> > > >        xsk_notifier+0x101/0x280 net/xdp/xsk.c:1649
-> > > >        notifier_call_chain+0xbc/0x410 kernel/notifier.c:85
-> > > >        call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:2230
-> > > >        call_netdevice_notifiers_extack net/core/dev.c:2268 [inline]
-> > > >        call_netdevice_notifiers net/core/dev.c:2282 [inline]
-> > > >        unregister_netdevice_many_notify+0xf9d/0x2700 net/core/dev.c:12077
-> > > >        rtnl_delete_link net/core/rtnetlink.c:3511 [inline]
-> > > >        rtnl_dellink+0x3cb/0xa80 net/core/rtnetlink.c:3553
-> > > >        rtnetlink_rcv_msg+0x95e/0xe90 net/core/rtnetlink.c:6944
-> > > >        netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2534
-> > > >        netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
-> > > >        netlink_unicast+0x53d/0x7f0 net/netlink/af_netlink.c:1339
-> > > >        netlink_sendmsg+0x8d1/0xdd0 net/netlink/af_netlink.c:1883
-> > > >        sock_sendmsg_nosec net/socket.c:712 [inline]
-> > > >        __sock_sendmsg net/socket.c:727 [inline]
-> > > >        ____sys_sendmsg+0xa98/0xc70 net/socket.c:2566
-> > > >        ___sys_sendmsg+0x134/0x1d0 net/socket.c:2620
-> > > >        __sys_sendmsg+0x16d/0x220 net/socket.c:2652
-> > > >        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-> > > >        do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
-> > > >        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> > > >
-> > > > other info that might help us debug this:
-> > > >
-> > > > Chain exists of:
-> > > >   &xs->mutex --> &dev_instance_lock_key#20 --> &net->xdp.lock
-> > > >
-> > > >  Possible unsafe locking scenario:
-> > > >
-> > > >        CPU0                    CPU1
-> > > >        ----                    ----
-> > > >   lock(&net->xdp.lock);
-> > > >                                lock(&dev_instance_lock_key#20);
-> > > >                                lock(&net->xdp.lock);
-> > > >   lock(&xs->mutex);
-> > >
-> > > I feel the above race map is not that right?
-> > >
-> > > My understanding is as shown below.
-> > > CPU 0                                                    CPU 1
-> > > ---                                                           ---
-> > > unregister_netdevice_many_notify()
-> > >                                                           xsk_bind()
-> > > netdev_lock_ops(dev);
-> > >
-> > > mutex_lock(&xs->mutex);
-> > >                                                           netdev_lock_ops(dev);
-> > > xsk_notifier()
-> > > mutex_lock(&net->xdp.lock);
-> > > mutex_lock(&xs->mutex);
-> > >
-> > > So ABBA lock case happens, IIUC.
-> >
-> > Since we can't (easily) control the ordering in notifiers, looks like
-> > we need to align xsk_bind ordering (to be instance lock -> xs->mutex).
-> > LMK if you want to take a stab at this; otherwise I'll try to send a
-> > fix.
-> 
-> I'm still learning the af_xdp. Sure, I'm interested in it, just a bit
-> worried if I'm capable of completing it. I will try then.
 
-SG, thanks! If you need more details lmk, but basically we need to reorder
-netdev_lock_ops() and mutex_lock(lock: &xs->mutex)+XSK_READY check.
-And similarly for cleanup (out_unlock/out_release) path.
+On 6/24/25 11:10 PM, Boqun Feng wrote:
+> As its name suggests, simple hazard pointers (shazptr) is a
+> simplification of hazard pointers [1]: it has only one hazard pointer
+> slot per-CPU and is targeted for simple use cases where the read-side
+> already has preemption disabled. It's a trade-off between full features
+> of a normal hazard pointer implementation (multiple slots, dynamic slot
+> allocation, etc.) and the simple use scenario.
+>
+> Since there's only one slot per-CPU, so shazptr read-side critical
+> section nesting is a problem that needs to be resolved, because at very
+> least, interrupts and NMI can introduce nested shazptr read-side
+> critical sections. A SHAZPTR_WILDCARD is introduced to resolve this:
+> SHAZPTR_WILDCARD is a special address value that blocks *all* shazptr
+> waiters. In an interrupt-causing shazptr read-side critical section
+> nesting case (i.e. an interrupt happens while the per-CPU hazard pointer
+> slot being used and tries to acquire a hazard pointer itself), the inner
+> critical section will switch the value of the hazard pointer slot into
+> SHAZPTR_WILDCARD, and let the outer critical section eventually zero the
+> slot. The SHAZPTR_WILDCARD still provide the correct protection because
+> it blocks all the waiters.
+>
+> It's true that once the wildcard mechanism is activated, shazptr
+> mechanism may be downgrade to something similar to RCU (and probably
+> with a worse implementation), which generally has longer wait time and
+> larger memory footprint compared to a typical hazard pointer
+> implementation. However, that can only happen with a lot of users using
+> hazard pointers, and then it's reasonable to introduce the
+> fully-featured hazard pointer implementation [2] and switch users to it.
+>
+> Note that shazptr_protect() may be added later, the current potential
+> usage doesn't require it, and a shazptr_acquire(), which installs the
+> protected value to hazard pointer slot and proves the smp_mb(), is
+> enough for now.
+>
+> [1]: M. M. Michael, "Hazard pointers: safe memory reclamation for
+>       lock-free objects," in IEEE Transactions on Parallel and
+>       Distributed Systems, vol. 15, no. 6, pp. 491-504, June 2004
+>
+> Link: https://lore.kernel.org/lkml/20240917143402.930114-1-boqun.feng@gmail.com/ [2]
+> Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
+> ---
+>   include/linux/shazptr.h  | 73 ++++++++++++++++++++++++++++++++++++++++
+>   kernel/locking/Makefile  |  2 +-
+>   kernel/locking/shazptr.c | 29 ++++++++++++++++
+>   3 files changed, 103 insertions(+), 1 deletion(-)
+>   create mode 100644 include/linux/shazptr.h
+>   create mode 100644 kernel/locking/shazptr.c
+>
+> diff --git a/include/linux/shazptr.h b/include/linux/shazptr.h
+> new file mode 100644
+> index 000000000000..287cd04b4be9
+> --- /dev/null
+> +++ b/include/linux/shazptr.h
+> @@ -0,0 +1,73 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Simple hazard pointers
+> + *
+> + * Copyright (c) 2025, Microsoft Corporation.
+> + *
+> + * Author: Boqun Feng <boqun.feng@gmail.com>
+> + *
+> + * A simple variant of hazard pointers, the users must ensure the preemption
+> + * is already disabled when calling a shazptr_acquire() to protect an address.
+> + * If one shazptr_acquire() is called after another shazptr_acquire() has been
+> + * called without the corresponding shazptr_clear() has been called, the later
+> + * shazptr_acquire() must be cleared first.
+> + *
+> + * The most suitable usage is when only one address need to be protected in a
+> + * preemption disabled critical section.
+> + */
+> +
+> +#ifndef _LINUX_SHAZPTR_H
+> +#define _LINUX_SHAZPTR_H
+> +
+> +#include <linux/cleanup.h>
+> +#include <linux/percpu.h>
+> +
+> +/* Make ULONG_MAX the wildcard value */
+> +#define SHAZPTR_WILDCARD ((void *)(ULONG_MAX))
+> +
+> +DECLARE_PER_CPU_SHARED_ALIGNED(void *, shazptr_slots);
+> +
+> +/* Represent a held hazard pointer slot */
+> +struct shazptr_guard {
+> +	void **slot;
+> +	bool use_wildcard;
+> +};
+> +
+> +/*
+> + * Acquire a hazptr slot and begin the hazard pointer critical section.
+> + *
+> + * Must be called with preemption disabled, and preemption must remain disabled
+> + * until shazptr_clear().
+> + */
+> +static inline struct shazptr_guard shazptr_acquire(void *ptr)
+> +{
+> +	struct shazptr_guard guard = {
+> +		/* Preemption is disabled. */
+> +		.slot = this_cpu_ptr(&shazptr_slots),
+> +		.use_wildcard = false,
+> +	};
+> +
+> +	if (likely(!READ_ONCE(*guard.slot))) {
+> +		WRITE_ONCE(*guard.slot, ptr);
+> +	} else {
+> +		guard.use_wildcard = true;
+> +		WRITE_ONCE(*guard.slot, SHAZPTR_WILDCARD);
+> +	}
+Is it correct to assume that shazptr cannot be used in a mixed context 
+environment on the same CPU like a task context and an interrupt context 
+trying to acquire it simultaneously because the current check isn't 
+atomic with respect to that?
+> +
+> +	smp_mb(); /* Synchronize with smp_mb() at synchronize_shazptr(). */
+> +
+> +	return guard;
+> +}
+> +
+> +static inline void shazptr_clear(struct shazptr_guard guard)
+> +{
+> +	/* Only clear the slot when the outermost guard is released */
+> +	if (likely(!guard.use_wildcard))
+> +		smp_store_release(guard.slot, NULL); /* Pair with ACQUIRE at synchronize_shazptr() */
+> +}
+
+Is it better to name it shazptr_release() to be conformant with our 
+current locking convention?
+
+Cheers,
+Longman
+
 
