@@ -1,230 +1,110 @@
-Return-Path: <netdev+bounces-201135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96E78AE8326
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 14:50:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EBFDAE836A
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 14:57:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2C981790C2
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 12:50:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EDBF6A3779
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 12:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19A10261365;
-	Wed, 25 Jun 2025 12:50:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 492C0261393;
+	Wed, 25 Jun 2025 12:52:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L36Fm4ho"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dgo5cfGm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD5B25D1E0;
-	Wed, 25 Jun 2025 12:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D96D261390
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 12:52:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750855818; cv=none; b=hQN7vIYJoaGg3y8KcO+Lm2Df9jAxnHsgHgZhDhKnouyRh+i+f9oe8p9BbcwVr76nzxtg5ncViRXW8NA3TWCsjecbgvMUpVo4Zs59sTCUbPUg3n81OjsVPCI5I50wQeVhmTXeYrRWjrJ8TOAUim7D8Y+M8vFQ9Oo1IcQh0mN+Afc=
+	t=1750855943; cv=none; b=n9dFn6s5Y9n1qdyUH3QjVslxNduLsQ6dk9ScqXSpiBqENUv3Vb6CJipIPaDMvc4AENxGmCK7mcinp8XLJMbNcOMEH6De7pVdhvdUQ7b4vZHBwwTsci86KsrAWReAPlQ9WjVTjEhEejAC9KrCE5BmUo3pUTV/aN2Xs2Vsv490+p4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750855818; c=relaxed/simple;
-	bh=QLGFzP3/sxNPrkfh2CP+Tmg64IAG2Scn6S3cbmRklr4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QUD6jkQE+fG1a/lxDhg22KauK42F4zl3hLwWr8zjg32NJF+eGYvKXVwulBwLH6RkMduBO3nTBydeUj4J9zcruN2TCkhzahsJozx3qqQ7JNxC1vhSMBoiSXhF6GEJUQ8guqQ1aHgT0Um8AX+6w4za3GShCAmOB1UJz73gx3jhAWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L36Fm4ho; arc=none smtp.client-ip=209.85.166.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-86cf9f46b06so216619239f.2;
-        Wed, 25 Jun 2025 05:50:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750855815; x=1751460615; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VEB+t9cZhMhKXuNVDSpqcCgPij5UADE4sfitMU0dBr0=;
-        b=L36Fm4ho3pLVCuTMbpD6erwzR8e2EjzDrIuswakDJKlmTH+pHCV2HqqxQ91jPw9cHe
-         8lDL2n6MV3XORKI/Jp3g3k3oUHrTnPnazQDh5TgmY79UoBfhU9euff1sEvkhpoJBA2tI
-         W85QhtyLdEn9QEjxdULyGS8ntCaeGo4sMrjBOHxEkkQ24GOzbH33Fwc2h52k53dBhuBG
-         AxgaaOWKo9SH2xSdhQo3vRPPtx6CtPt/RxU+VH9rU50MSdskaVfvfeEsFzOZbRFmiOkO
-         LUV+BtxfWiGtahtpHkhTaeRXM7bM5rSBCN6DH85pFDHEQzC2kFsVCSLI17LbgV2RElp+
-         xeWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750855815; x=1751460615;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VEB+t9cZhMhKXuNVDSpqcCgPij5UADE4sfitMU0dBr0=;
-        b=jWuI2EAkFtmUIvqN5QaYmC1zowTA78xyuWlN/GYvU3a4kmehrXL5IT71BzySRItshG
-         t3avfvr2+bZcYodR6oNzYHDllSLrTPSo3w8RDDnO/Bm2sHTdIKIV7qxG9dKtZVquBxZu
-         zSUiUoQO5O5Aaq5HEWnwdiq+jXY5SFju9zKzYQZSAX9s8kgzDeKRUwEQk5GDECBl7JXY
-         +Zu4hNNrqgS2Jm2STrBmtxmXN32ZWpAAjgDR5HoTcMtx2VAU6jgTHlIICHlGGo5xlvTk
-         ZeYzU62pp+EohM9AMHwuFoScXO0hmxKPNYass57rC2k3iveaHMdCdc7sf4xaKPkSMLBO
-         PHXA==
-X-Forwarded-Encrypted: i=1; AJvYcCVRc5KFMqix/0NvYJw3OFY5eMxuMAa6zDBH+7cQJbZUBB5k3TlqO3a4Ug1Zwi/u+t2+9Bk=@vger.kernel.org, AJvYcCWmTVpVG+yF6Mh16r7OtnzgIG7H+nKZklbyH7zA8IBR4KZtCq7o5BrZeQKv/M6ehhqfj5euf3Ae@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywz3vEO+o8DtsFa/KMBiJ5GaVHTBXM9tW4SoV3FV960Ay7CBHJW
-	d0kPL8LDm2iIDQrKJv7Ft7gJpkc0Bd5Lg66h+TUjK53EtZd+K1PVKR0fIQEGp1ZjuPnDOlCSqGA
-	kZ6eVEhMRXHKx/vCHafVYdbwJBtihgho=
-X-Gm-Gg: ASbGncsdX35l1jrUjBa2TI/9PwXGAWfTJKuzqoWezqJZaY/OcmAcFz70jviz1NZ9elh
-	DGOW+5Boi7wSofU4FdqU7TTpleB2Fp24zzsqxWGRPONy/k/ZBX03lScre3dg7l014VHeyldVnDG
-	ExWo5z9jCDt8wKsN2zr8gHb0VShcmOmbNi0A+DE5H2RnI=
-X-Google-Smtp-Source: AGHT+IFJblhjspcL9/xJzcahHCa03/6ApQYMcbTIledhe3BA10tbDbNZGa7Ygqlui7ZUNY7gnHtQNoN8RMjuHQiBuVo=
-X-Received: by 2002:a05:6e02:1789:b0:3dc:8b29:30b1 with SMTP id
- e9e14a558f8ab-3df3299f953mr35562645ab.14.1750855815228; Wed, 25 Jun 2025
- 05:50:15 -0700 (PDT)
+	s=arc-20240116; t=1750855943; c=relaxed/simple;
+	bh=lrGJWpMrdwaCLp9XqcVclLVJiL6eGjT6cGqHD6SvrT4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=uyy88O7cLPCgU/jqlnhhgzbIiFuSK8FzEZm8MuzHwlDrDD2jVChCeB/5NJZXdNx8iut5gMFlzGqiXMGFeQ80ZrJN551ESF1/WOWKxvzH1PF7YsEnOLELw+O+G1eix6HNFriBLXU6XuZ6dFeJfy8aHBSmly+dzOjMekiAHQe+9mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dgo5cfGm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F04FAC4CEEF;
+	Wed, 25 Jun 2025 12:52:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750855942;
+	bh=lrGJWpMrdwaCLp9XqcVclLVJiL6eGjT6cGqHD6SvrT4=;
+	h=From:Date:Subject:To:Cc:From;
+	b=dgo5cfGmlIE8IuMKqhP3xtTmCv8ljpV4XzAd4uDiCa9iIpBAomKDFrYsTEwFgzmiP
+	 R/LpWL0rHMos2anNjzstAWfd8y949/I46iNXLFkibqVbSEhkFdAHKl995BgeZfegKK
+	 uT6n09j16wL2PIn+B6JNhaj03UlMjP671CqpPanW8r8RpLwsEe9iXWHDMa/rMmTnze
+	 aTwOQbXwGV1DBsWOOcCwiCXRA4xKAU5/kvi453JvmIYfhGyTiAjxywT2h4hfnc9IqN
+	 u58BQiACeURLWs5M9O66tXoo/dxBOhcplqwDv9vwmhnQOomLFy8QZHltXiyKK37HiW
+	 yWxunoYdueAcQ==
+From: Simon Horman <horms@kernel.org>
+Date: Wed, 25 Jun 2025 13:52:10 +0100
+Subject: [PATCH net-next] tg3: spelling corrections
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250625101014.45066-1-kerneljasonxing@gmail.com>
- <20250625101014.45066-2-kerneljasonxing@gmail.com> <aFvY10KkS9eUbcOw@boxer>
-In-Reply-To: <aFvY10KkS9eUbcOw@boxer>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 25 Jun 2025 20:49:38 +0800
-X-Gm-Features: Ac12FXxSgQDtJuisoQNMD07REoeT0RG7U_jUcSi5OKYd-dziDZCmw0xIPTOI5RM
-Message-ID: <CAL+tcoBfg-HfMxYHTnP6xb0ZWp68KiP4R0U-AdUt9UE=UJYCkw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/2] net: xsk: update tx queue consumer
- immediately after transmission
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, joe@dama.to, 
-	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250625-tg3-spell-v1-1-78b8b0deee28@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAPnwW2gC/x3MSQqAMBAF0atIr23QaJyuIi4cfrRBoiRBBPHuB
+ pcPinrIwwk8dclDDpd4OWxEniY0b6NdwbJEk8qUziqlOawF+xP7zm1ewyhtmmkqKfang5H7f/V
+ kEdjiDjS87wecOmekZQAAAA==
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+ Michael Chan <mchan@broadcom.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, Simon Horman <horms@kernel.org>
+X-Mailer: b4 0.14.0
 
-Hi Maciej,
+Correct spelling as flagged by codespell.
 
-On Wed, Jun 25, 2025 at 7:09=E2=80=AFPM Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> On Wed, Jun 25, 2025 at 06:10:13PM +0800, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > For afxdp, the return value of sendto() syscall doesn't reflect how man=
-y
-> > descs handled in the kernel. One of use cases is that when user-space
-> > application tries to know the number of transmitted skbs and then decid=
-es
-> > if it continues to send, say, is it stopped due to max tx budget?
-> >
-> > The following formular can be used after sending to learn how many
-> > skbs/descs the kernel takes care of:
-> >
-> >   tx_queue.consumers_before - tx_queue.consumers_after
-> >
-> > Prior to the current patch, in non-zc mode, the consumer of tx queue is
-> > not immediately updated at the end of each sendto syscall when error
-> > occurs, which leads to the consumer value out-of-dated from the perspec=
-tive
-> > of user space. So this patch requires store operation to pass the cache=
-d
-> > value to the shared value to handle the problem.
-> >
-> > More than those explicit errors appearing in the while() loop in
-> > __xsk_generic_xmit(), there are a few possible error cases that might
-> > be neglected in the following call trace:
-> > __xsk_generic_xmit()
-> >     xskq_cons_peek_desc()
-> >         xskq_cons_read_desc()
-> >           xskq_cons_is_valid_desc()
-> > It will also cause the premature exit in the while() loop even if not
-> > all the descs are consumed.
-> >
-> > Based on the above analysis, using 'cached_prod !=3D cached_cons' could
-> > cover all the possible cases because it represents there are remaining
-> > descs that are not handled and cached_cons are not updated to the globa=
-l
-> > state of consumer at this time.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> > v3
-> > Link: https://lore.kernel.org/all/20250623073129.23290-1-kerneljasonxin=
-g@gmail.com/
-> > 1. use xskq_has_descs helper.
-> > 2. add selftest
-> >
-> > V2
-> > Link: https://lore.kernel.org/all/20250619093641.70700-1-kerneljasonxin=
-g@gmail.com/
-> > 1. filter out those good cases because only those that return error nee=
-d
-> > updates.
-> > Side note:
-> > 1. in non-batched zero copy mode, at the end of every caller of
-> > xsk_tx_peek_desc(), there is always a xsk_tx_release() function that us=
-ed
-> > to update the local consumer to the global state of consumer. So for th=
-e
-> > zero copy mode, no need to change at all.
-> > 2. Actually I have no strong preference between v1 (see the above link)
-> > and v2 because smp_store_release() shouldn't cause side effect.
-> > Considering the exactitude of writing code, v2 is a more preferable
-> > one.
-> > ---
-> >  net/xdp/xsk.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >
-> > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> > index 5542675dffa9..ab6351b24ac8 100644
-> > --- a/net/xdp/xsk.c
-> > +++ b/net/xdp/xsk.c
-> > @@ -856,6 +856,9 @@ static int __xsk_generic_xmit(struct sock *sk)
-> >       }
-> >
-> >  out:
-> > +     if (xskq_has_descs(xs->tx))
-> > +             __xskq_cons_release(xs->tx);
-> > +
-> >       if (sent_frame)
-> >               if (xsk_tx_writeable(xs))
-> >                       sk->sk_write_space(sk);
->
-> Hi Jason,
-> IMHO below should be enough to address the issue:
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+ drivers/net/ethernet/broadcom/tg3.c | 4 ++--
+ drivers/net/ethernet/broadcom/tg3.h | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-Sure, it can.
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index 91104cc2c238..c00b05b2e945 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -6686,7 +6686,7 @@ static void tg3_rx_data_free(struct tg3 *tp, struct ring_info *ri, u32 map_sz)
+  * We only need to fill in the address because the other members
+  * of the RX descriptor are invariant, see tg3_init_rings.
+  *
+- * Note the purposeful assymetry of cpu vs. chip accesses.  For
++ * Note the purposeful asymmetry of cpu vs. chip accesses.  For
+  * posting buffers we only dirty the first cache line of the RX
+  * descriptor (containing the address).  Whereas for the RX status
+  * buffers the cpu only reads the last cacheline of the RX descriptor
+@@ -10145,7 +10145,7 @@ static int tg3_reset_hw(struct tg3 *tp, bool reset_phy)
+ 	tp->grc_mode |= GRC_MODE_HOST_SENDBDS;
+ 
+ 	/* Pseudo-header checksum is done by hardware logic and not
+-	 * the offload processers, so make the chip do the pseudo-
++	 * the offload processors, so make the chip do the pseudo-
+ 	 * header checksums on receive.  For transmit it is more
+ 	 * convenient to do the pseudo-header checksum in software
+ 	 * as Linux does that on transmit for us in all cases.
+diff --git a/drivers/net/ethernet/broadcom/tg3.h b/drivers/net/ethernet/broadcom/tg3.h
+index b473f8014d9c..a9e7f88fa26d 100644
+--- a/drivers/net/ethernet/broadcom/tg3.h
++++ b/drivers/net/ethernet/broadcom/tg3.h
+@@ -2390,7 +2390,7 @@
+ #define TG3_CL45_D7_EEERES_STAT_LP_1000T	0x0004
+ 
+ 
+-/* Fast Ethernet Tranceiver definitions */
++/* Fast Ethernet Transceiver definitions */
+ #define MII_TG3_FET_PTEST		0x17
+ #define  MII_TG3_FET_PTEST_TRIM_SEL	0x0010
+ #define  MII_TG3_FET_PTEST_TRIM_2	0x0002
 
-Can I ask one more thing? Technically it's not considered a bug,
-right? I'm not sure if it's worth telling the stable team to backport
-in older versions.
-
->
->         if (sent_frame) {
-
-Using this condition means the consumer is updated in majority cases
-including those good cases [1]. The intention of the current patch is
-to update the consumer only when the error occurs because in other
-cases xskq_cons_peek_desc() does it.
-
-[1]: https://lore.kernel.org/all/aFVr60tw3QJopcOo@mini-arch/
-
->                 __xskq_cons_release(xs->tx);
->                 if (xsk_tx_writeable(xs))
->                         sk->sk_write_space(sk);
->         }
->
-> which basically is what xsk_tx_release() does for each tx socket in list.
-> zc drivers call it whenever there was a single descriptor produced to HW
-> ring. So should we on generic xmit side, based on @sent_frame.
-
-As you said, they would be the same :)
-
->
-> We could even wrap these 3 lines onto internal function, say
-> __xsk_tx_release() and use it in xsk_tx_release() as well.
-
-I can do it in the next respin.
-
-But I have no obvious opinion on how to write it. If no one is opposed
-to the taste of patch, I will follow your advice. Thanks.
-
-Thanks,
-Jason
-
->
-> > --
-> > 2.41.3
-> >
 
