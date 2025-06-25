@@ -1,179 +1,201 @@
-Return-Path: <netdev+bounces-200987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95CDAAE7A9D
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:45:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 043D5AE7A92
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:44:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F6B77B2A93
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:42:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D5E8162CD1
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2683A28314E;
-	Wed, 25 Jun 2025 08:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 072FF1DF247;
+	Wed, 25 Jun 2025 08:43:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sSh0yxt3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ehjd1MSk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5EB27F187;
-	Wed, 25 Jun 2025 08:42:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1030728641B
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 08:43:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750840973; cv=none; b=jRB4mZP7yj7qbrbKTbRKPPSxlf1B5X+OjQMTD2tRkCVYxOM3SQ7EZMti7VTcelyAlTu3Miq6md/Ziq/LlzpwzITngOuUc1sIVplrF0VYxNF7W3HbL2Cb8hMLDrLY/8iPkTQKW3mSp1EcYZaWX4rD8NBTyhsVdCNkAXUeUUjBDEM=
+	t=1750841006; cv=none; b=gFABvH0fBGfOPodyQLulCURuXSiF6VWxWYUE8uYYWu4IoDmuiwl1HI0/NYeJiMZ36Ofa7UMrrXlwN84edD++epdGOKHY3QOKup6zdU0lokC9clNwumm88trTPMAUIrvR3D4zCeK5lxAnEHQGzxFJFeSf1S8+WyTU9Ic22TNVNAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750840973; c=relaxed/simple;
-	bh=8RyD8b+dB6zF43UCsVGSQk0jUPuIhhPSK+qvKJ7Em2A=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=J9oLRC0nxyJfbGcuzqWagmqnBq+4v7Cdu2866qylzz10kueLLt5igKjrpuq/V/0gla37/rJvWv1GM2f4rO/uzMkHomc6s4jylceD5U60XxvVE+8/iuvNxoAWqN/t3rRfIsjQeEN6LAfETzBBqqWkTAjZ652CCt9HH0ttiaI3gGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sSh0yxt3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C0E80C4CEEA;
-	Wed, 25 Jun 2025 08:42:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750840972;
-	bh=8RyD8b+dB6zF43UCsVGSQk0jUPuIhhPSK+qvKJ7Em2A=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=sSh0yxt3Bl4Lr9AkqrAkd34sEsrpkvyQGaD9owIXHN04JGR6xAwClsAQkoKiIxKso
-	 pRdjBbM0n+2wOb1Nj2sVPzFLOEgBCY7UCnLJss9lkw8UH5bok5usFozt6swIZNgYH7
-	 3lIWcVhD5BhvlXCw0mdLFLr3jowqboxN3Ln0WOwkdEDCLvs1YbvWX3JGcOmci/lPh7
-	 cVy+UmoAc3qrraWtuMrKamzTdGnT40/Iyq3urtMoukIPZUf+JkdZhHlKIp5y9eVvsD
-	 qDLj1tlYYkSvxVorvIg99nwCRHrF53Q2Ndc5UGv4OkhBRZ5n0/2TusyF0cmjm/Wgua
-	 q33L0WBCFCy/w==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0F9C7EE30;
-	Wed, 25 Jun 2025 08:42:52 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Wed, 25 Jun 2025 16:42:49 +0800
-Subject: [PATCH v2] Bluetooth: hci_event: Add support for handling LE BIG
- Sync Lost event
+	s=arc-20240116; t=1750841006; c=relaxed/simple;
+	bh=BKtDcFi1Di1ki3VEVQwPsdVZaQrBBaEmFv2TZrKgRUk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ni/8yPW9TZHlXbH8y3RiLEvb13PCi22ULsemLYjtvWFpLNmbx14q+rllgPqqEttVd9weKhysiHnlr4yJm6YHUFQjVJzVaHJdmds+zwrvosxtkOwogjepDU3A2APrbDhOvSUwPNYr3lDEEpHAYz2/n8k39eZcQNIpkSzRXEQqeUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ehjd1MSk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750841004;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fBqo0mSOQ7uYPQmFn/GbeEwpagKUqVWJtoBByFsAo4c=;
+	b=Ehjd1MSkvhjTlx03oy4I3RO9VY2YCKhhylowJ8ptvq0lBxVCJKbuFdvQqVIK6NnqnuR00W
+	wg07tTR5uX5bnjErS3yia0I85XaymRmpEJ8NDgkLLMZB22WtN9/a9AuJU8Y5TqUZxbR8MX
+	uuwDsdYuS8D2LrdvXv6N1964hsQddxM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-562-fpB32zOePACj8U0Y1zNuOQ-1; Wed, 25 Jun 2025 04:43:22 -0400
+X-MC-Unique: fpB32zOePACj8U0Y1zNuOQ-1
+X-Mimecast-MFC-AGG-ID: fpB32zOePACj8U0Y1zNuOQ_1750841001
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a56b3dee17so323193f8f.0
+        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 01:43:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750841001; x=1751445801;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fBqo0mSOQ7uYPQmFn/GbeEwpagKUqVWJtoBByFsAo4c=;
+        b=bVHoL+KqNkgBuP78Mc9A5Z0wgI24mbaPQSXplWk+fjQ0HkCdzWUjSyK0xM7tUzNj2w
+         rErhKvKw3lZiSsa1qAhTsAikQRBFzd9iHk1062Gst/XS/Q5tG92OwDRB+0tdFf2lACQn
+         lDPlcsEXn9apBYa3+6bQk35ojBrxZ8p2CrDiWj5rHpqx8TuRW8Jww7fG8ImLKfjeCwKU
+         AO+dRD2nVrWeDzltUamDLVF5qSxJx2XXcWxeWQc7fqK74ov17UAUqHVcx6k6l0VLqVqg
+         8/DnNLcCNs65YypKZvGPDvhkKiqvY7CjkgHBLE4ElEVriCVjD1wq/3H4i+UG+4k8Z+CA
+         W3ag==
+X-Forwarded-Encrypted: i=1; AJvYcCXURl9TZ6KC4GMw1e+5D8QptfwQ/w+aDpWf7KKhNjR2x8tA3anNf0gPTUMYJgSKKHJs/REiaZY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxY3Q2xZEDH7NxZ+vMMcFJlk7aeRXa6Wf3+RrxdVAOz+y3/QIYN
+	EZqsn7543Vwf34eiQOOXfpnANr7w7cTBc49OzYZp0QMmWMjod0XxsKDlhThY+rDQJ6Kv03RkcgX
+	4oHIp5+4rek2vyEWVYnF6671vA5hoo9OS7/TGXpzZa7h5whQg03I+DpxiIg==
+X-Gm-Gg: ASbGncsCXcpdud+7WUKc6onMSUZAcMqMonctgZg2p0LLE+EKpoJQwV2D5521vbqVBez
+	g5bWiEG/QZy0kJPcVly/QA+qUbN1Ar6FaNMRrZiWgTKIOrXvAaRQQIUsSXywbOK6cn6WeuNR+ct
+	u2qyxVcq/9lYxx7mXoWmizahjfIbPJt1lfZmDaYhUMPxhrtB/v9hIcrHZfBmbqvDkL03LuF+XMr
+	7y9WWc6u7JfSp2m6sVBnq13WxQJ0AczQ9y8QLkpso38PLnnRw2SaUtrxEdSALu6lXJ52c6+J4rY
+	m8gPv65aVBAL53mZfPmindtCgVGH
+X-Received: by 2002:a5d:64e6:0:b0:3a4:f722:a46b with SMTP id ffacd0b85a97d-3a6e71ff6aamr5892462f8f.15.1750841000847;
+        Wed, 25 Jun 2025 01:43:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEwLmN7pgjPo42yw5pKV9YdU4xug/vMd5HIXDLqwYvt3dwxUtKIILfncsdF1q/xkL+ig67Dmg==
+X-Received: by 2002:a5d:64e6:0:b0:3a4:f722:a46b with SMTP id ffacd0b85a97d-3a6e71ff6aamr5892437f8f.15.1750841000364;
+        Wed, 25 Jun 2025 01:43:20 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.151.122])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45382363f7fsm12918295e9.27.2025.06.25.01.43.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Jun 2025 01:43:19 -0700 (PDT)
+Date: Wed, 25 Jun 2025 10:43:12 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net v2 1/3] vsock: Fix transport_{g2h,h2g} TOCTOU
+Message-ID: <zdiqu6pszqwb4y5o7oqzdovfvzkbrvc6ijuxoef2iloklahyoy@njsnvn7hfwye>
+References: <20250620-vsock-transports-toctou-v2-0-02ebd20b1d03@rbox.co>
+ <20250620-vsock-transports-toctou-v2-1-02ebd20b1d03@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250625-handle_big_sync_lost_event-v2-1-81f163057a21@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAIi2W2gC/33NywrCMBCF4VcpWRtppjd05XtICXEytgNtIkkJl
- tJ3NxbXLv+z+M4mIgWmKK7FJgIljuxdDjgVAkfjBpJscwsooSlbBTKPdiL94EHH1aGefFw0JXK
- LrLGz2NbVpTQgMvAK9OT3gd/73CPHxYf1+Erqu/5YqP+xSUklsQKkqrO2Nc3NzJMfGM/oZ9Hv+
- /4B3kTbpMYAAAA=
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Johan Hedberg <johan.hedberg@gmail.com>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1750840971; l=3131;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=+z+dUqdDyldE5nsJD9/hOCyoQSkymotIIMTtOBNS5rQ=;
- b=adqKAGMBBzMjHlYTHEQ8EceIJGHCS/cRUiqWAz/PvVVp+OFw2uzyYJdzKA9vYV14Jf4AZLuai
- j6eY1JBCXx5AdJKvtPM892IgAmUYV47Cw+z4SiHEKQ2th6MAvm5nKPK
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250620-vsock-transports-toctou-v2-1-02ebd20b1d03@rbox.co>
 
-From: Yang Li <yang.li@amlogic.com>
+On Fri, Jun 20, 2025 at 09:52:43PM +0200, Michal Luczaj wrote:
+>vsock_find_cid() and vsock_dev_do_ioctl() may race with module unload.
+>transport_{g2h,h2g} may become NULL after the NULL check.
+>
+>Introduce vsock_transport_local_cid() to protect from a potential
+>null-ptr-deref.
+>
+>KASAN: null-ptr-deref in range [0x0000000000000118-0x000000000000011f]
+>RIP: 0010:vsock_find_cid+0x47/0x90
+>Call Trace:
+> __vsock_bind+0x4b2/0x720
+> vsock_bind+0x90/0xe0
+> __sys_bind+0x14d/0x1e0
+> __x64_sys_bind+0x6e/0xc0
+> do_syscall_64+0x92/0x1c0
+> entry_SYSCALL_64_after_hwframe+0x4b/0x53
+>
+>KASAN: null-ptr-deref in range [0x0000000000000118-0x000000000000011f]
+>RIP: 0010:vsock_dev_do_ioctl.isra.0+0x58/0xf0
+>Call Trace:
+> __x64_sys_ioctl+0x12d/0x190
+> do_syscall_64+0x92/0x1c0
+> entry_SYSCALL_64_after_hwframe+0x4b/0x53
+>
+>Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
+>Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> net/vmw_vsock/af_vsock.c | 23 +++++++++++++++++------
+> 1 file changed, 17 insertions(+), 6 deletions(-)
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 2e7a3034e965db30b6ee295370d866e6d8b1c341..63a920af5bfe6960306a3e5eeae0cbf30648985e 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -531,9 +531,21 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+> }
+> EXPORT_SYMBOL_GPL(vsock_assign_transport);
+>
+>+static u32 vsock_transport_local_cid(const struct vsock_transport **transport)
 
-When the BIS source stops, the controller sends an LE BIG Sync Lost
-event (subevent 0x1E). Currently, this event is not handled, causing
-the BIS stream to remain active in BlueZ and preventing recovery.
+Why we need double pointer?
 
-Signed-off-by: Yang Li <yang.li@amlogic.com>
----
-Changes in v2:
-- Matching the BIG handle is required when looking up a BIG connection.
-- Use ev->reason to determine the cause of disconnection.
-- Call hci_conn_del after hci_disconnect_cfm to remove the connection entry
-- Delete the big connection
-- Link to v1: https://lore.kernel.org/r/20250624-handle_big_sync_lost_event-v1-1-c32ce37dd6a5@amlogic.com
----
- include/net/bluetooth/hci.h |  6 ++++++
- net/bluetooth/hci_event.c   | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 37 insertions(+)
+>+{
+>+	u32 cid = VMADDR_CID_ANY;
+>+
+>+	mutex_lock(&vsock_register_mutex);
+>+	if (*transport)
+>+		cid = (*transport)->get_local_cid();
+>+	mutex_unlock(&vsock_register_mutex);
+>+
+>+	return cid;
+>+}
+>+
+> bool vsock_find_cid(unsigned int cid)
+> {
+>-	if (transport_g2h && cid == transport_g2h->get_local_cid())
+>+	if (cid == vsock_transport_local_cid(&transport_g2h))
+> 		return true;
+>
+> 	if (transport_h2g && cid == VMADDR_CID_HOST)
+>@@ -2536,18 +2548,17 @@ static long vsock_dev_do_ioctl(struct file *filp,
+> 			       unsigned int cmd, void __user *ptr)
+> {
+> 	u32 __user *p = ptr;
+>-	u32 cid = VMADDR_CID_ANY;
+> 	int retval = 0;
+>+	u32 cid;
+>
+> 	switch (cmd) {
+> 	case IOCTL_VM_SOCKETS_GET_LOCAL_CID:
+> 		/* To be compatible with the VMCI behavior, we prioritize the
+> 		 * guest CID instead of well-know host CID (VMADDR_CID_HOST).
+> 		 */
+>-		if (transport_g2h)
+>-			cid = transport_g2h->get_local_cid();
+>-		else if (transport_h2g)
+>-			cid = transport_h2g->get_local_cid();
+>+		cid = vsock_transport_local_cid(&transport_g2h);
+>+		if (cid == VMADDR_CID_ANY)
+>+			cid = vsock_transport_local_cid(&transport_h2g);
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 82cbd54443ac..48389a64accb 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -2849,6 +2849,12 @@ struct hci_evt_le_big_sync_estabilished {
- 	__le16  bis[];
- } __packed;
- 
-+#define HCI_EVT_LE_BIG_SYNC_LOST 0x1e
-+struct hci_evt_le_big_sync_lost {
-+	__u8    handle;
-+	__u8    reason;
-+} __packed;
-+
- #define HCI_EVT_LE_BIG_INFO_ADV_REPORT	0x22
- struct hci_evt_le_big_info_adv_report {
- 	__le16  sync_handle;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 66052d6aaa1d..d0b9c8dca891 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -7026,6 +7026,32 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
-+					    struct sk_buff *skb)
-+{
-+	struct hci_evt_le_big_sync_lost *ev = data;
-+	struct hci_conn *bis, *conn;
-+
-+	bt_dev_dbg(hdev, "big handle 0x%2.2x", ev->handle);
-+
-+	hci_dev_lock(hdev);
-+
-+	list_for_each_entry(bis, &hdev->conn_hash.list, list) {
-+		if (test_and_clear_bit(HCI_CONN_BIG_SYNC, &bis->flags) &&
-+		    (bis->iso_qos.bcast.big == ev->handle)) {
-+			hci_disconn_cfm(bis, ev->reason);
-+			hci_conn_del(bis);
-+
-+			/* Delete the big connection */
-+			conn = hci_conn_hash_lookup_pa_sync_handle(hdev, bis->sync_handle);
-+			if (conn)
-+				hci_conn_del(conn);
-+		}
-+	}
-+
-+	hci_dev_unlock(hdev);
-+}
-+
- static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *data,
- 					   struct sk_buff *skb)
- {
-@@ -7149,6 +7175,11 @@ static const struct hci_le_ev {
- 		     hci_le_big_sync_established_evt,
- 		     sizeof(struct hci_evt_le_big_sync_estabilished),
- 		     HCI_MAX_EVENT_SIZE),
-+	/* [0x1e = HCI_EVT_LE_BIG_SYNC_LOST] */
-+	HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_LOST,
-+		     hci_le_big_sync_lost_evt,
-+		     sizeof(struct hci_evt_le_big_sync_lost),
-+		     HCI_MAX_EVENT_SIZE),
- 	/* [0x22 = HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
- 	HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
- 		     hci_le_big_info_adv_report_evt,
+I still prefer the old `if ... else if ...`, what is the reason of this
+change? I may miss the point.
 
----
-base-commit: bd35cd12d915bc410c721ba28afcada16f0ebd16
-change-id: 20250612-handle_big_sync_lost_event-4c7dc64390a2
+But overall LGTM!
 
-Best regards,
--- 
-Yang Li <yang.li@amlogic.com>
+Thanks,
+Stefano
 
+>
+> 		if (put_user(cid, p) != 0)
+> 			retval = -EFAULT;
+>
+>-- 
+>2.49.0
+>
 
 
