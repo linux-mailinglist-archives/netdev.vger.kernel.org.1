@@ -1,130 +1,142 @@
-Return-Path: <netdev+bounces-201357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 624AFAE92BD
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 01:35:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77D49AE92C6
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 01:37:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D50F6188359F
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 23:35:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 459921883E7A
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 23:38:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05D0A2D3ED1;
-	Wed, 25 Jun 2025 23:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF5C02BDC36;
+	Wed, 25 Jun 2025 23:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q8W44OG9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ox5ajdJG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8108D2D9799;
-	Wed, 25 Jun 2025 23:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5801D28727B;
+	Wed, 25 Jun 2025 23:37:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750894211; cv=none; b=VyvnoSTTWHfRxVq+yu/OJ5CXfl0AzSjVrb5kS2v6Vla40mAHjuJzXsybwhMDH9nRz7BjWbFYssL2euMUjYd4PcWUUvluDAYO/W6u3mPyTLn65aTNOwqpgW7ZMudRu5byNC2Fin9CJDDyseswK7sSteHJFvbXONvH4xWSmXHugwI=
+	t=1750894666; cv=none; b=OhIZW9+EmA/R+QiVr9xA2x5SMBGfsgFKp3JVVb2bwyt25zwav9mIAk5Qo40WsL/ZQbCoaOiLG0xeUHTx5SBcLFLf6xvRF+bS5rvbtzp1QEzBO8ptPTUwkFXG+7sADUt8C8eugwYIbXjx8EFZp2hifbdgco7HV6p2QEElN+uNn3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750894211; c=relaxed/simple;
-	bh=Cyk1TBnxxpgcg8zPDHyXMCBT5SKpZHjDWYtGzReT2Fw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uIxPz2lb6otdVSoFI5Ye908tb0zVruTbey3a+EPcvVz3+mgXt7fzQt9LJhR314vF7RUNlDzlY4MUfLA0NbbWFBb6YHCn5QjXhzxvESm6+vSW7FlT/CdRFWRLlHLHgzZccsAP+Hz5tNZw8qBQNPfJiSG4yJOz70BtxPD5Yn9q9Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q8W44OG9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 940F0C4CEEA;
-	Wed, 25 Jun 2025 23:30:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750894210;
-	bh=Cyk1TBnxxpgcg8zPDHyXMCBT5SKpZHjDWYtGzReT2Fw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q8W44OG9Zxk+iRf2iL0uZTpQ5YU73OTrSL1Or/3pXwEda2IFgwjxJFopob6oZiI4q
-	 Y7rLX3KiryMkojo8ZKh9dPdXQEmMJe425DPAefw7BSGWShM+tN6WNj7cZVZ4Rb76iw
-	 AP85u2yIhipTJGgLOKpEei3M/1oz/O/mjKyktNy4SqUD3LoJ+8dN7TfcfRbGWj+zh4
-	 SypYRJzgwuQ701ajDicqMVThQ8T1Kq3QbIjkzodHQ4qns2U13MNhGAayusDcGe5ud1
-	 hGbqV7ZUFL95a8/hkj44A5+M1i//O7NDIPqDjxuMbwL5nXyXEV3PyNBStVg9rDJGkC
-	 nHAXDi+47rN6g==
-Date: Wed, 25 Jun 2025 16:30:09 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: allison.henderson@oracle.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, tj@kernel.org,
- andrew@lunn.ch, hannes@cmpxchg.org, mkoutny@suse.com,
- cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4.1] rds: Expose feature parameters via sysfs
- (and ELF)
-Message-ID: <20250625163009.7b3a9ae1@kernel.org>
-In-Reply-To: <20250623155305.3075686-2-konrad.wilk@oracle.com>
-References: <20250623155305.3075686-1-konrad.wilk@oracle.com>
-	<20250623155305.3075686-2-konrad.wilk@oracle.com>
+	s=arc-20240116; t=1750894666; c=relaxed/simple;
+	bh=xHrTYbF92chgZYeYWlQJGbK8QUmCthZ4uep2qydiOjs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eeVNgR0rCd3j/MVrCnS/9mipP9s6bMsXOmuJLCRyS3FBpjW/Z2uJvQVSJYRr0aK7JfOksqfeaUYjS8Su1ZhQDpweGLxkpSJkfCmfRwIBRfH21GgH2syGXzlNr0IiqwEPI3ysi+IEz5H6uuO3kRywnEGL3A4gdJkmcJOQKs97yjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ox5ajdJG; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-747c2cc3419so456212b3a.2;
+        Wed, 25 Jun 2025 16:37:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750894665; x=1751499465; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6KLByGxx/RM99lGy5OggoUQdzdk3RoTvXMgy9x4lPEg=;
+        b=Ox5ajdJGHO3ZYBbse/qBvawDWIbKWBtF+nmERFIDngoZ1L5MfLOz43CWoFIoQMeeMI
+         nudPdp9GKmBPPVEw3FxNwyYVOf+uyjsBe+5ptixI2/eUC6dzw+WvmBPQNHeyHdbsj4cA
+         XeywlMPsIvpLX5YhigWdD2IcypCElSGVbMBQx3D3TIRKEGuvcLmOXCZ5gwoSEwBlQErV
+         ZHD3nYNre9YT0p+sCsMyw/aogF7RrHFHMQcsRBmPJ+VyO9FlNxyq5T0/R6Teh7S04U9J
+         YejDVxeL4kVp1+q0vqG4GQPa3WHeieWNB7dBwrU2PAA1qzGwXB/fUwLX1HMbAUE2Bf/9
+         ri8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750894665; x=1751499465;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6KLByGxx/RM99lGy5OggoUQdzdk3RoTvXMgy9x4lPEg=;
+        b=lVngaHeaxJYEfJMw7yiblCySEPFKvj11rh1StffteknMWk2Pi9JogqbfoQ24RnrDTR
+         sXGy9JjeVAoGcvQTW5fm0qyix1s4fgXhW9y+Ov56mIy4a46N1lbgxRV3YbNt4n+G9NSb
+         791ghSY538w3jtYwOWFTnslrxV8ZM1td6BE4ekTDyhYsO+2j4U2GR6+rPVnznZw92Eet
+         gklO4ol5YJva02pD5IPo3dngkJabYRYE08VN/OO/Nr+Vhecg+TCzWQR9Q9nbZVFZKmrL
+         LbVhp76dOmV3rYg1nb9WmRZyPLJReBOc6Jnfly3EmYm5VyT6ASLSEP0e/m3sp0XPSY5W
+         sk3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVyUkFccb9cbKhgGVY2LsirScFFQBxGOj5W1UBFr9x1yvW11qL0ystthb2+oGXuZEm0ejM1cA+j@vger.kernel.org, AJvYcCXCWnzPRq8ofnWMoqOchsFgiH6duIFuQVd94KY1F6ZuYB+MAwepmaoYKhHRy+5UCfkw8Ns=@vger.kernel.org, AJvYcCXYRan755KT8PwQ5b4pylTv0GhABRPHUDQpnkfhsidMvdV53LdI3dKW7aSswK7iJHFGr4cjWrFga/K66y3j@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywe9uGKjNT6mQ5RRM/vVIqGckbNEFUescLmqnOGRINRNMpjuOsm
+	69n0BU5MIdufvISbk5pit17vYjRTlpfiPSDwhrCqUQchcPJ/E12Sloo=
+X-Gm-Gg: ASbGncsH3sUaHfA/SqFlUv8hRS9VYkZC3OcTgRlWV4agb0kkh0C2gcyrXgcKQrEfzYC
+	R6FxIDPFjhfQcE0v2gKX/Zm1s+stcjpjQAphD6YkpVi9DNeCVcN3BneqYpzmGdGrtClj6Cf0S4L
+	fHutTgv9jqY9Ulyu60ylT50aoCKJd9wlfZNEMLIcKy1C+EixCPPjWmcsR1YO4k+wt+aeZ9Z5+qP
+	oLwBUTSdQqPDJOcUBYFPmbhFBEJSY6p5glU3xct/R4vrZjG9Zpdf/VzVAyoUIPgEnPufBSOkNT1
+	fkUk5IbXZPCItsIfAj8d4NKLcYQOUxOFTQyRjfXzmFUP1hUz9DwiMMgABqa3TeQwROga5qWg1cL
+	wKeUqk68gUPs+ZfROy5pY1nc=
+X-Google-Smtp-Source: AGHT+IEbTrXZnKzgaak+y3ylQdeGUZLfweU3Yku499AWI/Fx0tzO6a4rPiAUBrxl3OBx2DLznkvPwQ==
+X-Received: by 2002:a17:902:dac6:b0:234:e7bb:963b with SMTP id d9443c01a7336-238240d1b55mr93770915ad.16.1750894664511;
+        Wed, 25 Jun 2025 16:37:44 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-237d867b438sm141528705ad.176.2025.06.25.16.37.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Jun 2025 16:37:44 -0700 (PDT)
+Date: Wed, 25 Jun 2025 16:37:43 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jason Xing <kerneljasonxing@gmail.com>,
+	syzbot <syzbot+e67ea9c235b13b4f0020@syzkaller.appspotmail.com>,
+	andrii@kernel.org, ast@kernel.org, bjorn@kernel.org,
+	bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+	edumazet@google.com, horms@kernel.org, jonathan.lemon@gmail.com,
+	linux-kernel@vger.kernel.org, maciej.fijalkowski@intel.com,
+	magnus.karlsson@intel.com, netdev@vger.kernel.org,
+	pabeni@redhat.com, sdf@fomichev.me, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [bpf?] [net?] possible deadlock in xsk_notifier (3)
+Message-ID: <aFyIRxuBrpRsB0iF@mini-arch>
+References: <685af3b1.a00a0220.2e5631.0091.GAE@google.com>
+ <CAL+tcoB0as6+5VOk9nu0M_OH4TqT6NjDZBZmgQgdQcYx0pciCw@mail.gmail.com>
+ <aFwQZhpWIxVLJ1Ui@mini-arch>
+ <CAL+tcoCmiT9XXUVGwcT1NB6bLVK69php-oH+9UL+mH6_HYxGhA@mail.gmail.com>
+ <aFwZ5WWj835sDGpS@mini-arch>
+ <aFxgg4rCQ8tfM9dw@mini-arch>
+ <20250625140357.6203d0af@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250625140357.6203d0af@kernel.org>
 
-On Mon, 23 Jun 2025 11:51:36 -0400 Konrad Rzeszutek Wilk wrote:
-> With the value of 'supported' in them. In the future this value
-> could change to say 'deprecated' or have other values (for example
-> different versions) or can be runtime changed.
-
-I'm curious how this theoretical 'deprecated' value would work
-in context of uAPI which can never regress..
-
-> The choice to use sysfs and this particular way is modeled on the
-> filesystems usage exposing their features.
+On 06/25, Jakub Kicinski wrote:
+> On Wed, 25 Jun 2025 13:48:03 -0700 Stanislav Fomichev wrote:
+> > > > I'm still learning the af_xdp. Sure, I'm interested in it, just a bit
+> > > > worried if I'm capable of completing it. I will try then.  
+> > > 
+> > > SG, thanks! If you need more details lmk, but basically we need to reorder
+> > > netdev_lock_ops() and mutex_lock(lock: &xs->mutex)+XSK_READY check.
+> > > And similarly for cleanup (out_unlock/out_release) path.  
+> > 
+> > Jakub just told me that I'm wrong and it looks similar to commit
+> > f0433eea4688 ("net: don't mix device locking in dev_close_many()
+> > calls"). So this is not as easy as flipping the lock ordering :-(
 > 
-> Alternative solution such as exposing one file ('features') with
-> each feature enumerated (which cgroup does) is a bit limited in
-> that it does not provide means to provide extra content in the future
-> for each feature. For example if one of the features had three
-> modes and one wanted to set a particular one at runtime - that
-> does not exist in cgroup (albeit it can be implemented but it would
-> be quite hectic to have just one single attribute).
+> I don't think registering a netdev from NETDEV_UP even of another
+> netdev is going to play way with instance locks and lockdep.
+> This is likely a false positive but if syzbot keeps complaining
+> we could:
 > 
-> Another solution of using an ioctl to expose a bitmask has the
-> disadvantage of being less flexible in the future and while it can
-> have a bit of supported/unsupported, it is not clear how one would
-> change modes or expose versions. It is most certainly feasible
-> but it can get seriously complex fast.
-> 
-> As such this mechanism offers the basic support we require
-> now and offers the flexibility for the future.
-> 
-> Lastly, we also utilize the ELF note macro to expose these via
-> so that applications that have not yet initialized RDS transport
-> can inspect the kernel module to see if they have the appropiate
-> support and choose an alternative protocol if they wish so.
+> diff --git a/drivers/net/wan/lapbether.c b/drivers/net/wan/lapbether.c
+> index 995a7207bdf8..f357a7ac70ac 100644
+> --- a/drivers/net/wan/lapbether.c
+> +++ b/drivers/net/wan/lapbether.c
+> @@ -81,7 +81,7 @@ static struct lapbethdev *lapbeth_get_x25_dev(struct net_device *dev)
+>  
+>  static __inline__ int dev_is_ethdev(struct net_device *dev)
+>  {
+> -       return dev->type == ARPHRD_ETHER && strncmp(dev->name, "dummy", 5);
+> +       return dev->type == ARPHRD_ETHER && !netdev_need_ops_lock(dev);
+>  }
+>  
+> IDK what the dummy hack is there for, it's been like that since 
+> git begun..
 
-Looks like this paragraph had a line starting with #, presumably
-talking about the ELF note and it got eaten by git? Please fix.
-
-
-FWIW to me this series has a strong whiff of "we have an OOT module
-which has much more functionality and want to support a degraded /
-upstream-only mode in the user space stack". I'm probably over-
--interpreting, and you could argue this will help you make real
-use of the upstream RDS. I OTOH would argue that it's a technical
-solution to a non-technical problem of not giving upstreaming 
-sufficient priority; I'd prefer to see code flowing upstream _first_ 
-and then worry about compatibility.
-
-$ git log --oneline --since='6 months ago' -- net/rds/ 
-433dce0692a0 rds: Correct spelling
-6e307a873d30 rds: Correct endian annotation of port and addr assignments
-5bccdc51f90c replace strncpy with strscpy_pad
-c50d295c37f2 rds: Use nested-BH locking for rds_page_remainder
-0af5928f358c rds: Acquire per-CPU pointer within BH disabled section
-aaaaa6639cf5 rds: Disable only bottom halves in rds_page_remainder_alloc()
-357660d7596b Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
-5c70eb5c593d net: better track kernel sockets lifetime
-c451715d78e3 net/rds: Replace deprecated strncpy() with strscpy_pad()
-7f5611cbc487 rds: sysctl: rds_tcp_{rcv,snd}buf: avoid using current->nsproxy
-$
-
-IOW applying this patch is a bit of a leap of faith that RDS
-upstreaming will restart. I don't have anything against the patch
-per se, but neither do I have much faith in this. So if v5 is taking 
-a long time to get applied it will be because its waiting for DaveM or
-Paolo to take it.
+Agreed. The driver itlself looks interesting. IIUC, when loaded, it
+unconditionally creates virtual netdev for any eth device in the init
+ns. A bit surprised that syzbot enables it, none of my machines have it
+enabled.
 
