@@ -1,116 +1,95 @@
-Return-Path: <netdev+bounces-200897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54BF2AE7430
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 03:17:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D18CAE743A
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 03:19:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9CA9161338
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 01:17:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCC0F16C2DD
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 01:19:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8AE1433B1;
-	Wed, 25 Jun 2025 01:17:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF1BC16E863;
+	Wed, 25 Jun 2025 01:19:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="gx10UoBj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I0Al0brl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565CD1805E;
-	Wed, 25 Jun 2025 01:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6747D07D;
+	Wed, 25 Jun 2025 01:19:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750814224; cv=none; b=r8YzAot56CSLwgxoCuaNXLMGbUqUT1aDJaxL1ofJazV0U05Ew9GZ2rtR02iXyBgJWI0pq4QZXkg6/HEIELxjBmSdVhs20wunbNhBZQp2bW9YfSQWJ0CbcCBxI6OjtgWCnHUQ5T+qbOGHW6srT6PCDdgvhi+Zptz5azLbXTn4Sbo=
+	t=1750814380; cv=none; b=h0Y4W3l5WHjBnlfg3nohX80ZYQvq8A2B6919S5EXymE8rTqdBBXNsGqmXpCCbM2XvtuJEAn9p11zLbU42c5Xh3X+CRXwFrs7fCWXxHk7V4UsJoRZQcrstxQAshk5WI5E5wutfz/ohgnuwbO+oxn903zkf33OpLGmXdwpiwbkwFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750814224; c=relaxed/simple;
-	bh=5XUyihkrbOn6Ofo5+8+/PXUFLh8w4H2xDMzVhIlZItc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=hLl+O4eIusK4MceithoiW3VhjOAPs0+ArBLF3AO/V7jetShi/uLrRJZ4OvaG5XycjJ9A98k9eUHV+FAJmLVlZPgikMh6f2h5M8zlAEnUNTn0SaW4HsQbW/e0o+u5QOLMzHBAYQKmLs4FDwNyhDlDB4phwb9kJjn61unZ7K2PHUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=gx10UoBj; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1750814210;
-	bh=q8tG0fJnUYEI2QIuf+b78tjrWWHHQ4It3k6SyeVQdgQ=;
-	h=Date:From:To:Cc:Subject:From;
-	b=gx10UoBjz5bH9VSVWwpzwtq67HKYS+fHJv+gqHBG5qHojIYCXUkCXlsQm2jPLIUom
-	 SodmMB/0PWXsVJiRBi6rwT7DhqQzsrKuJ5SiFeWREDcIxgvKKj0qiohhKHkeTNoXUQ
-	 /RW7c3U6rAZ27PR/sxnqH9qa9PLIFWpA9KGSHf2vt8gVN/QbLBud1e/55mRenaN9+8
-	 QMd82x++17LB1fw5OxhXWl4pHIjwVXu9CPOeYb5GLhwbaDKOnxwGU2TVfykL0XEwGF
-	 d4xPQFn+cUDzw/dhRn8lInvgB5VHNLhrQwy1hiIy1EPx0oG+fRKLKf+HYsK0C1iaxj
-	 ZGrLKr4MCYR3g==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bRkS20YJyz4wbR;
-	Wed, 25 Jun 2025 11:16:49 +1000 (AEST)
-Date: Wed, 25 Jun 2025 11:16:48 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
- <johan.hedberg@gmail.com>, David Miller <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: duplicate patches in the bluetooth tree
-Message-ID: <20250625111648.54026af1@canb.auug.org.au>
+	s=arc-20240116; t=1750814380; c=relaxed/simple;
+	bh=ZZpsGWbOpD7WESphcM99JbXk8HbeWzvARFtH/vuKhN0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=gmOlMNoSB5Av+prdiMVR3yG2GplNYxKeaTizyavrYZTz+qPpr4QKrye9EFcTTmGa+luyxehKb/UX7e9G9avyUfqrHvXv9gE1g9ieyp2sjF+AAYmMWJ/nDQlDXtg5Wts7AlW9shSW+AlcLBekwz871UU8vJoGqpS/DRfYn3CP1j0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I0Al0brl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 017B1C4CEE3;
+	Wed, 25 Jun 2025 01:19:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750814380;
+	bh=ZZpsGWbOpD7WESphcM99JbXk8HbeWzvARFtH/vuKhN0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=I0Al0brlBqf41dLwop2rFptO4UbjKFq70OE8lHSZ9yLbuijSpw2nvLSyTxMCV9IWo
+	 Y6zTrT6ppD2GOter0dx8krnwznO80xFTUf6DHxkXT3L2Sxz0vqvhekFTGkqaN80eX1
+	 Dpq7JgpB5qliGIf1LQqYtYfN2x2o5Sb2fqXubdm9ukJTeju8KJxUwn11L8hLEonUF4
+	 8eNYlL2upxOjBDW6/nRGav6L42H1P5PDm14NT8MczCys1qjbvqBL1s2dx2W+gta7js
+	 QXc6oqS26M3rjdbArmmy2JcRFjrcImUHwBVIcbCFvo5ZVq1KgHAXtMfbki0lXM6j90
+	 b87KEbttVHzAA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD9739FEB73;
+	Wed, 25 Jun 2025 01:20:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/igzNDWfQ42yyE2E3gL/Wr=B";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
+Subject: Re: [RESEND][PATCH 0/1] Enable FLEXCOMs and GMAC for SAMA7D65 SoC
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175081440675.4094974.16233310616580116141.git-patchwork-notify@kernel.org>
+Date: Wed, 25 Jun 2025 01:20:06 +0000
+References: <cover.1750694691.git.Ryan.Wanner@microchip.com>
+In-Reply-To: <cover.1750694691.git.Ryan.Wanner@microchip.com>
+To: Ryan Wanner <Ryan.Wanner@microchip.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
---Sig_/igzNDWfQ42yyE2E3gL/Wr=B
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hello:
 
-Hi all,
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-The following commits are also in the net tree as different commits
-(but the same patches):
+On Mon, 23 Jun 2025 09:11:07 -0700 you wrote:
+> From: Ryan Wanner <Ryan.Wanner@microchip.com>
+> 
+> This patch set adds all the supported FLEXCOMs for the SAMA7D65 SoC.
+> This also adds the GMAC interfaces and enables GMAC0 interface for the SAMA7D65 SoC.
+> 
+> With the FLEXCOMs added to the SoC the MCP16502 and the MAC address
+> EEPROM are both added to flexcom10.
+> 
+> [...]
 
-  4500d2e8da07 ("Bluetooth: hci_core: Fix use-after-free in vhci_flush()")
-  6c31dab4ff1e ("driver: bluetooth: hci_qca:fix unable to load the BT drive=
-r")
-  d5c2d5e0f1d3 ("Bluetooth: L2CAP: Fix L2CAP MTU negotiation")
-  866fd57640ce ("Bluetooth: btintel_pcie: Fix potential race condition in f=
-irmware download")
+Here is the summary with links:
+  - [RESEND,1/1] dt-bindings: net: cdns,macb: add sama7d65 ethernet interface
+    https://git.kernel.org/netdev/net-next/c/8dacfd92dbef
 
-These are commits
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  1d6123102e9f ("Bluetooth: hci_core: Fix use-after-free in vhci_flush()")
-  db0ff7e15923 ("driver: bluetooth: hci_qca:fix unable to load the BT drive=
-r")
-  042bb9603c44 ("Bluetooth: L2CAP: Fix L2CAP MTU negotiation")
-  89a33de31494 ("Bluetooth: btintel_pcie: Fix potential race condition in f=
-irmware download")
 
-in the net tree.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/igzNDWfQ42yyE2E3gL/Wr=B
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmhbTgAACgkQAVBC80lX
-0GyGGwf+NeHw3rO1+U3jZpuspVbql7TqyGYCsO+Z5ByFu2Rg2orbEgTGLXTIiNxw
-GZ1EgAqE1pX/Ibfy1qR4zakNWgfZzGC+x5I4lp1/rlkuu0Y8v3t9dikj1BkUQ+qO
-qHbsG75r8PBQjgZVp8I+Xtcuylo90MC4V9UAaLoPOZB/JQNEvW+3v/1SYCTVBdWs
-pbeUhFOWk72C129SohaIkwHRZGdH2dWqqStmFKYU81HrLgn7SBFH43ZW0NybGhHp
-edNACtgYCz4WgyjR5BZ3hy9rdpxXbNVhmCLMdcXUqof7hDwRBjIeBsBzU+gMlfwj
-mF3ZBPAC5es6305HDioGyEt2u6qFJg==
-=J3FK
------END PGP SIGNATURE-----
-
---Sig_/igzNDWfQ42yyE2E3gL/Wr=B--
 
