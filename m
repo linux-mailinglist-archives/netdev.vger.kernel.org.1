@@ -1,80 +1,81 @@
-Return-Path: <netdev+bounces-200950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F204CAE7785
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:52:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35777AE7786
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:52:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1D421BC54CF
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 06:52:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C36F55A27B2
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 06:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F6D71FBCA7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D695202987;
 	Wed, 25 Jun 2025 06:51:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GWG8z0g8"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PMbabNB5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A051F419B
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 06:51:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D781F4611
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 06:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750834293; cv=none; b=f8eWKb+NxYngtGngNGT5a3+iZoVKnOSTyEExQJtOzN8FbzSCQgCuuYHfngpIQLxL74Bf/6VuP0QfSPKJi2geFs5AL8ohgFrbAHvtOkGi2IWZDYICMMowKNCqF5wp4QttzZcJDuWUmhlyBo8L/dyBa2ShH1ogHdqFKvSPvv6+Ugs=
+	t=1750834293; cv=none; b=VWP1vzeLgc4we0VKlVCqeclwnuiMpiTnnUCbpsPKUG8XT52ovqDMRZrtAplw48FAyG5j9e4MP1BZO+ri4JiI/EsZ17N6Pl9i+c5hpi9fb48Mtjbw9WF56uKPBsSCbLXdadVh547zqSxDITwcMQjQgafsOyqdwL/hg2ZutadjuWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1750834293; c=relaxed/simple;
-	bh=T0sr+UMqlQEDTrrx/2ryP7d0YJJlLXjokEiyzEW7sJA=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=WHYq9xNdRWA84Mb/DNYN80mnv0b4cARUW1k8YrNz46nGDSCp20ieg5rbzOu0r1Nxz6rLrQlsX3jugdGLY+EyWdSiIIrtAVQHbmsg/K+oqKUPKOn/+7VhzKJWfrrvBaowElPzPba1gwsCiNmzEanyy42EmSM4VS53jc7KAcardOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GWG8z0g8; arc=none smtp.client-ip=209.85.167.48
+	bh=TVt2glf3A/9aIAZIwDxoGAZLKL/vwHTf0ketNOC4F/o=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=kEWpmNhUQxP/Z+E2BI2gcZHOu6F7+uz8fbG2MlJXesQ8obOR015wPXJkn7PnUc/qxkQNyXj/psPucm4i+2Bvn5MoTLGDxeSFIXjYvTo527bjxFRKHnqae0i37fwmOWLIineCGwjnSec7ETorjlNcCye/6ajTq4MUeCNmXZ9tr7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PMbabNB5; arc=none smtp.client-ip=209.85.167.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-553b9eb2299so562988e87.0
-        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 23:51:29 -0700 (PDT)
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-553bcba4ff8so6304381e87.2
+        for <netdev@vger.kernel.org>; Tue, 24 Jun 2025 23:51:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1750834288; x=1751439088; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=AIc3f7Yz1RfvrfiVwjLbNXmX/5TUWv9MhRtU7U8fR9E=;
-        b=GWG8z0g8jbLeifNHFJjVeskreJ0oPVFrs95VMFZRVnmtSbrEFvZWqaD0Ab+KWFstYv
-         zlUUaNkKamhSC4Y9toZLQKPGukNyhl1IUZcsWA/yvtsrPWKrXgTGfw+gT6L7ppJsm4Sf
-         HZXZNkUIrkRUEEZZ06IAKq3DAn1Q/kzAWFf9OmYt34SFJOIX9ryQzpT9fL4+8//6UZYy
-         xiZHpnwadRPisN0c9gnyVRWegvrhoFxhOJj+UNa667YAjdMwD1jgxvsJwkNStfbwNdYW
-         LJpZ7Nzh2RtzMwU/FHgRjYoofK0UyPg9AfJc35SRBAS4ntJCNJpNG0CPnthSj3WQ7bGT
-         vtLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750834288; x=1751439088;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=linaro.org; s=google; t=1750834289; x=1751439089; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=AIc3f7Yz1RfvrfiVwjLbNXmX/5TUWv9MhRtU7U8fR9E=;
-        b=rNIlr9EDrQYXxidLXryi58ep6nS4bLkuHv9ac7zD3YA6aNuolTVciYR5FgKtNWAvZf
-         Xpj+7bXCoWSpDLvfPFbVhK+ZXnDQEBliFjKkZJ/QkYtecM2CEtgBV/VJKyjNYaKaPsta
-         lDyW7w7eVwGZ1vOMTmvsNZXysnOe1MuxZZ6587QsAF4r7AesdMLqAc1P7KGJrgbmJu9l
-         sA//1ehHKCZNXZYf36RUG8mBx426oQoiQ9mG0LLeZVzFql80XfkjeuEHNUQMvbZ+I/dv
-         bmONn8c4yqfcArC8OFnv/CobUBe7FtkkcNnnrcZqHpMyk/M1RFsd8AR9s8hfpcgqztjo
-         v2Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCXMDPdxDqgHYy27hVBAP4EUTHr9kL62xtj4fkbxPj4RqCKtvI1i4zwHS6mbEc6EF3bYMgpec6Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQOJNOiC+7JX3Piw6pgNpm64vx+wPWbfTNsYx/DEg2RBF6traz
-	m0uYEWFGhzch6IJ0dgF/9AHn43h6FiwLYKYpHwiXhHcLC2wpoFVfrRCC/RAlbqQgS3M=
-X-Gm-Gg: ASbGncv1W8C8gdb1v3ykKtsurl+xvbAbUj5vTO0W5SO3ZetQFu5rRndZHEkX5QaTpun
-	+JNiuFLRv/AMrQGHEiy0U62d2T+GxHUJ5r2nf7SwDbhVLIWVjK2ZCbOgIz52irGZYc4/aipykq/
-	hrO2u0+juD1dhda9qh2F3HuDucazwaYF6xatWea7NJfqtG4qP/694P8wVjgdgBvpUEKRaKv8YPE
-	vFWr57m7bjmkomJt/mX5y8905ToI+mqkRw/i7/NjXC432toJ6EYIY5lkuM7PxvN/hXASxkPq6GT
-	oeMNHho58KFk7b3ycqNOz7MqUXLBxR0DoTN0+vsVVwEqMmMlloJFQeZPVZVx026hCnipPK+hgud
-	uNIrL4jE=
-X-Google-Smtp-Source: AGHT+IFfnCfFr6rrLmY08KFvWzCaJ2n+iHm/mfMNffAzy9xU/MZGrpU33mwkVJ761bVk28DJyTGC1Q==
-X-Received: by 2002:a05:6512:3095:b0:553:cf72:45d3 with SMTP id 2adb3069b0e04-554fdc82bb0mr467215e87.3.1750834287716;
-        Tue, 24 Jun 2025 23:51:27 -0700 (PDT)
+        bh=12dE6oYeLrCIwLimRV+TklOXKBgCTUbUVyiZtB0fiQM=;
+        b=PMbabNB5NnDJ4tYgbysikMG++OO3jlsU1qrFUwozU4dAou564rIfRzVx3Kl+UdsXN4
+         7JFfhEZxwpsJKl62lf0YtWf8Ol5Y1ekKL9FjQqR5+ZVFckVIUiiSOpXD5iytojJ0lStt
+         hGRTkwg+oVUTPGC8nJMUlbhJJwPJfEPGIAmY9wt+NYEzo6/JgwP5/YGMkEZDk3iFeLSt
+         A/KrPz0A8wtKwwOyX7oaIbPmi/IDjAzn547E1WMd8E3cAIZmbHBkKKlHqOTbveMqZtCO
+         r25oZ/CN1ZK2dtmCp39lpx3swgQxX9mGtdmNIo99NhF29Ya/LcQCAMFM5sIR8D09m90D
+         27oQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750834289; x=1751439089;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=12dE6oYeLrCIwLimRV+TklOXKBgCTUbUVyiZtB0fiQM=;
+        b=RgGzBDYKTEzLnlyIhr7aMuAoFKw7zMdi9KX3t1iDV047SNLf+qHm6TZgYH+mklSu9+
+         UjsFFaKw6r6c0V5iinChSfS/A/0IsXugEvhYx044fb8xKHM4z9EL4++tle/sKcZoxdkG
+         Sl9J0BJMKarxr00RDVpEli3IrEX6yFS1UdwH5GEA2VheA2XsDAuGW/lYiRNfQFbku/lU
+         Fyxa6w2jUlMrPBm9nsn+WfM0WVCj+ot0Mb/94Oj72UgPw4U0s/Hi6BS0J5Ym6cf/6u9H
+         y4QoCCbGRnF9IUayZFimrtVRuibs48hbvZui03a4h5MRvZOt5KzP6GKY1N03BOqUXeZs
+         iReA==
+X-Forwarded-Encrypted: i=1; AJvYcCWiJFgMdvcSMsYiIdsxittuE9bZKx0W+SyqqD7xxvISYP7jmLXZlZMlllmGiRGbo8+APGKDcbE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yysa+v2Ce/6mQcLnrxf0+LyK7pNDg06bsjUNdBrc8fs41cFLY8r
+	txZ7jUZY9mOgOxHeHY2/KzZoTrjBzaY4BQKAMHMbinygvR9U5EV+ING7qzi3OYb+VB4=
+X-Gm-Gg: ASbGncsReDlmJ3J2hd8j4u0nJvZ+L4H6Khy0LquM8gUd6/KRi1LrFRleShVC6J/enHC
+	HjFQ4yHFnI3D5ZJ4nI9s3xIPOwSgcxqEPGDsGEm2JmEP8PVjj+y75ggAyCpry7coiXPQwUlnI5E
+	k6DZNUQq7tlVI+byzV5YRsXk70XzLzhtoEC3UBi5Z9TGXRtqtnNcIh5Ci3BixHvCsI13YBMKx8Z
+	AyhYY88GtQWzOfh6TYM786niZOiHjomUsCyOaWErfyj5wP/YAxy2/1zle6BtfgogLPvcJG0ZrW8
+	d0ThfXwuFjFX7W1CTvLkoo6glxc0mrkPidpYpa48lyyhC5xN9uyWUewfaaD0qgRfYzBNooSs
+X-Google-Smtp-Source: AGHT+IGUxv5nPacgAguVtkjJXEqXYX68CANliwIoRa997Go2LL0qf50HZWO93djsmy6Nfeo9S33zQQ==
+X-Received: by 2002:a05:6512:3996:b0:553:ad3f:1597 with SMTP id 2adb3069b0e04-554fdf66ff2mr480996e87.53.1750834288878;
+        Tue, 24 Jun 2025 23:51:28 -0700 (PDT)
 Received: from [192.168.1.140] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-553e41c3dc4sm2068379e87.157.2025.06.24.23.51.26
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-553e41c3dc4sm2068379e87.157.2025.06.24.23.51.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jun 2025 23:51:27 -0700 (PDT)
+        Tue, 24 Jun 2025 23:51:28 -0700 (PDT)
 From: Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH net-next v2 0/2] net: dsa: ks8995: Fix up bindings
-Date: Wed, 25 Jun 2025 08:51:23 +0200
-Message-Id: <20250625-ks8995-dsa-bindings-v2-0-ce71dce9be0b@linaro.org>
+Date: Wed, 25 Jun 2025 08:51:24 +0200
+Subject: [PATCH net-next v2 1/2] dt-bindings: dsa: Rewrite Micrel KS8995 in
+ schema
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,11 +84,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAGucW2gC/32NTQ6CMBBGr2Jm7Zi2/FhceQ/DosgAE83UdAjBE
- O5uwwFcvrx879tAKTEp3E4bJFpYOUoGdz7BcwoyEnKfGZxxlaldiS/1TVNhrwE7lp5lVOyML0r
- vClvZBvLyk2jg9ag+QGhGoXWGNpuJdY7pe9wt9vB/y4tFg1cbfFcOdZEP7m+WkOIlphHafd9/P
- nUf1cEAAAA=
-X-Change-ID: 20250624-ks8995-dsa-bindings-b08348231519
+Message-Id: <20250625-ks8995-dsa-bindings-v2-1-ce71dce9be0b@linaro.org>
+References: <20250625-ks8995-dsa-bindings-v2-0-ce71dce9be0b@linaro.org>
+In-Reply-To: <20250625-ks8995-dsa-bindings-v2-0-ce71dce9be0b@linaro.org>
 To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -98,48 +97,196 @@ Cc: Frederic Lambert <frdrc66@gmail.com>, Gabor Juhos <juhosg@openwrt.org>,
  devicetree@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
 X-Mailer: b4 0.14.2
 
-After looking at the datasheets for KS8995 I realized this is
-a DSA switch and need to have DT bindings as such and be implemented
-as such.
+After studying the datasheets for some of the KS8995 variants
+it becomes pretty obvious that this is a straight-forward
+and simple MII DSA switch with one port in (CPU) and four outgoing
+ports, and it even supports custom tags by setting a bit in
+a special register, and elaborate VLAN handling as all DSA
+switches do.
 
-This series just fixes up the bindings and the offending device tree.
+What is a bit odd with KS8995 is that it uses an extra MII-P5
+port to access one of the PHYs separately, on the side of the
+switch fabric, such as when using a WAN port separately from
+a LAN switch in a home router.
 
-The existing kernel driver which is in drivers/net/phy/spi_ks8995.c
-does not implement DSA. It can be forgiven for this because it was
-merged in 2011 and the DSA framework was not widely established
-back then. It continues to probe fine but needs to be rewritten
-to use the special DSA tag and moved to drivers/net/dsa as time
-permits. (I hope I can do this.)
-
-It's fine for the networking tree to merge both patches, I maintain
-ixp4xx as well. But I can also carry the second patch through the
-SoC tree if so desired.
+Rewrite the terse bindings to YAML, and move to the proper
+subdirectory. Include a verbose example to make things clear.
 
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
-Changes in v2:
-- The device ports are MII and not RGMII (copy/paste error...)
-- Document the elusive "port 5" which is a separate PHY inside the
-  KS8995 usually used for "WAN" ports in home routers.
-- Include a verbose example with a switch-facing ethernet MII and
-  a WAN-facing MII for the port 5 PHY in the DT binding.
-- Link to v1: https://lore.kernel.org/r/20250624-ks8995-dsa-bindings-v1-0-71a8b4f63315@linaro.org
-
----
-Linus Walleij (2):
-      dt-bindings: dsa: Rewrite Micrel KS8995 in schema
-      ARM: dts: Fix up wrv54g device tree
-
  .../devicetree/bindings/net/dsa/micrel,ks8995.yaml | 135 +++++++++++++++++++++
  .../devicetree/bindings/net/micrel-ks8995.txt      |  20 ---
- .../dts/intel/ixp/intel-ixp42x-linksys-wrv54g.dts  |  92 +++++++++++---
- 3 files changed, 213 insertions(+), 34 deletions(-)
----
-base-commit: 19272b37aa4f83ca52bdf9c16d5d81bdd1354494
-change-id: 20250624-ks8995-dsa-bindings-b08348231519
+ 2 files changed, 135 insertions(+), 20 deletions(-)
 
-Best regards,
+diff --git a/Documentation/devicetree/bindings/net/dsa/micrel,ks8995.yaml b/Documentation/devicetree/bindings/net/dsa/micrel,ks8995.yaml
+new file mode 100644
+index 0000000000000000000000000000000000000000..854808ff5ad5d1a607e1e0eb537989351f1f881c
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/dsa/micrel,ks8995.yaml
+@@ -0,0 +1,135 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/dsa/micrel,ks8995.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Micrel KS8995 Family DSA Switches
++
++maintainers:
++  - Linus Walleij <linus.walleij@linaro.org>
++
++description:
++  The Micrel KS8995 DSA Switches are 100 Mbit switches that were produced in
++  the early-to-mid 2000s. The chip features a CPU port and four outgoing ports,
++  each with an internal PHY. The chip itself is managed over SPI, but all the
++  PHYs need to be accessed from an external MDIO channel.
++
++  Further, a fifth PHY is available and can be used separately from the switch
++  fabric, connected to an external MII interface name MII-P5. This is
++  unrelated from the CPU-facing port 5 which is used for DSA MII traffic.
++
++properties:
++  compatible:
++    enum:
++      - micrel,ks8995
++      - micrel,ksz8795
++      - micrel,ksz8864
++
++  reg:
++    maxItems: 1
++
++  reset-gpios:
++    description: GPIO to be used to reset the whole device
++    maxItems: 1
++
++allOf:
++  - $ref: dsa.yaml#/$defs/ethernet-ports
++  - $ref: /schemas/spi/spi-peripheral-props.yaml#
++
++required:
++  - compatible
++  - reg
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/gpio/gpio.h>
++
++    spi {
++      #address-cells = <1>;
++      #size-cells = <0>;
++
++      ethernet-switch@0 {
++        compatible = "micrel,ks8995";
++        reg = <0>;
++        spi-max-frequency = <25000000>;
++
++        ethernet-ports {
++          #address-cells = <1>;
++          #size-cells = <0>;
++
++          ethernet-port@0 {
++            reg = <0>;
++            label = "lan1";
++          };
++          ethernet-port@1 {
++            reg = <1>;
++            label = "lan2";
++          };
++          ethernet-port@2 {
++            reg = <2>;
++            label = "lan3";
++          };
++          ethernet-port@3 {
++            reg = <3>;
++            label = "lan4";
++          };
++          ethernet-port@4 {
++            reg = <4>;
++            ethernet = <&mac2>;
++            phy-mode = "mii";
++            fixed-link {
++              speed = <100>;
++              full-duplex;
++            };
++          };
++        };
++      };
++    };
++
++    soc {
++      #address-cells = <1>;
++      #size-cells = <1>;
++
++      /* The WAN port connected on MII-P5 */
++      ethernet-port@1000 {
++        reg = <0x00001000 0x1000>;
++        label = "wan";
++        phy-mode = "mii";
++        phy-handle = <&phy5>;
++      };
++
++      mac2: ethernet-port@2000 {
++        reg = <0x00002000 0x1000>;
++        phy-mode = "mii";
++        fixed-link {
++          speed = <100>;
++          full-duplex;
++        };
++      };
++    };
++
++    mdio {
++      #address-cells = <1>;
++      #size-cells = <0>;
++
++      /* LAN PHYs 1-4 accessible over external MDIO */
++      phy1: ethernet-phy@1 {
++        reg = <1>;
++      };
++      phy2: ethernet-phy@2 {
++        reg = <2>;
++      };
++      phy3: ethernet-phy@3 {
++        reg = <3>;
++      };
++      phy4: ethernet-phy@4 {
++        reg = <4>;
++      };
++      /* WAN PHY accessible over external MDIO */
++      phy5: ethernet-phy@5 {
++        reg = <5>;
++      };
++    };
+diff --git a/Documentation/devicetree/bindings/net/micrel-ks8995.txt b/Documentation/devicetree/bindings/net/micrel-ks8995.txt
+deleted file mode 100644
+index 281bc2498d12764740dab821e8cabcb5e0a3d8fc..0000000000000000000000000000000000000000
+--- a/Documentation/devicetree/bindings/net/micrel-ks8995.txt
++++ /dev/null
+@@ -1,20 +0,0 @@
+-Micrel KS8995 SPI controlled Ethernet Switch families
+-
+-Required properties (according to spi-bus.txt):
+-- compatible: either "micrel,ks8995", "micrel,ksz8864" or "micrel,ksz8795"
+-
+-Optional properties:
+-- reset-gpios : phandle of gpio that will be used to reset chip during probe
+-
+-Example:
+-
+-spi-master {
+-	...
+-	switch@0 {
+-		compatible = "micrel,ksz8795";
+-
+-		reg = <0>;
+-		spi-max-frequency = <50000000>;
+-		reset-gpios = <&gpio0 46 GPIO_ACTIVE_LOW>;
+-	};
+-};
+
 -- 
-Linus Walleij <linus.walleij@linaro.org>
+2.49.0
 
 
