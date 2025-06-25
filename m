@@ -1,149 +1,110 @@
-Return-Path: <netdev+bounces-201230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A711AE8911
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 18:03:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFBFDAE8919
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 18:04:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17E6917A1E7
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 16:03:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CFEF3A275B
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 16:04:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A7571C5489;
-	Wed, 25 Jun 2025 16:03:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFB5F264A8E;
+	Wed, 25 Jun 2025 16:04:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dm6vA47H"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LtvXiaKM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B79491CEAD6
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 16:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2E81CEAD6
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 16:04:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750867407; cv=none; b=Oz3AmBDfIgOQsIXInJi4VVrIM7lTL++gssarx2mpnubDdNCD0OwXuY0MsdwuBZ2iOXfci9UrlH/7++cV54rUgOGElJyVrqZbNnRzzQNlG74f2MTciC8UQhG7bre0zivibH5QepEAhSfC1TmwXqNZnOF6OCbluaULxWlEr1IDbGY=
+	t=1750867470; cv=none; b=jc1IN2uIK1FFjPEaeDjJH3ATQXLrfjIe36rfoGC59owlRttqQym0gKa9DAQhQSkzPnkhnwqx9oJzVpm/wu/PJfW5zFHXSLOQTvC/M3/ATXlrfJuonWNtwT9QT8mJbXs9Ot8qg2GRtOk3YxH7+OLcRJBW7QTfQgz54Eb0aEPPyHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750867407; c=relaxed/simple;
-	bh=ps0c5fJmtFiQhgsgNiyDAw7N9pg5CL+LBJTcwKVj3wI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jSrrCLrNtxxQ0EckaEu/Mdf82RyVyh9bA8Aecyoxe2TVskx/LJcM5rwKhc91aMu9eHMmiQmh/987haifxapBgbj6yFQH/3Py/uvo6yvOSUZGBjBB5zcllLDSPU4kxZCFcc5U7GscVLpbB8aXMAV8nvYSzKv11BnS6wv9JEP8II4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Dm6vA47H; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4a442a3a2bfso1482181cf.1
-        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 09:03:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750867404; x=1751472204; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hSYoPq4zo0mkb8XfZ9qxE0qbpBP7dRXASL6qsnF7ykY=;
-        b=Dm6vA47HAocEhWXeE9REr7xnVkD39M7gS83ptIh9P/NvPp/0pPbrnuy9ZpUlRn1aWf
-         sXga6cCqcMB9sGZfs8aFJ6EN/MGzFkjIWjOscic3bYxC5zrYHuNDhCXr4T85fjIkjYsx
-         7AEYrnQfj94PnbGNO9zG/I10uafbBhTS52ddKhmX7g+sw1K7X/LS+54d31EJs9Qiq/B+
-         LqmQ7svF0nuNcM+ITeJ8BGEAb0/tY5LTJyBR3GfyK7Q6U/3vZBsyvwXmmTt1qqX3Q2+y
-         zuboZCSr6U5mufkwSGJROzPQ+omVFcN/mZcjWG0PGWrBLtJ9PjHk+7xjG444t24wH9R8
-         7Kmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750867404; x=1751472204;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hSYoPq4zo0mkb8XfZ9qxE0qbpBP7dRXASL6qsnF7ykY=;
-        b=ojZCYEGe2MS0cSwooQ0IA+A3/1dj2GwNw6Tv4EctLzV9JBk4zl9MUyfsTYqdQZ6XU3
-         Z/c0VvhXYZfuGUwiauyNaYDtbNNhkSp6kqsFyZPA4rs0sMJnJqrGnZLFIkrudUzeq18W
-         YAlcDiN4Siww8kFbhGqKJkl67IG+HAyXeP1WHrsBpmdRaNxeiFZu0MYh8jJdm465xASy
-         50tEa4jTorRd9GKQ+Iwf4J31iMZ123BGfuuiERY4YzyhRKw821ias7b5dfOBLFixqdj2
-         Ujg3l9r2JYo3R8CBftCJtR7J6GIRXAIPUUOuRiO3BstUfx5SDRczWhEkYQMTzCwUyjKt
-         kIHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWIcQxRRZvJ2c4VtrtnP6HBbb+GCtzuOSIbjj5v7VbnJdiHnZjXODJm17XSkUGbHPnpPtXx4hA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyb5pav+9h8ua7FT777sg+7/AYzHA+Bk+O440hgoLZRqvwMDm4D
-	00sBq/BWPfkNRnLVmm+33uUNDVv7BxRWRIl5QARr7bV8lri+TBu/9EzmmHICiWmKsGsRcXq9Yms
-	ZArD2J0jJnAdhauQmmtlubi1Kx740LnbY275q4uIB
-X-Gm-Gg: ASbGnctBRuUlkbrqRFZPS1qhZ0g6g92r1b3A3Ng2Ykl5U4YkvVc7z7GYUkOWkwBBf3f
-	/LpcFVH5ew/dU+nQsjPB0AmLNnvYSztoAlEwTvHbpXYKlfC6HH1iJj/Hjp7BBxH7BlycS8p8C0+
-	dQOu+EnIgGZBElLtVN5b5jXoW0KFIdukgrdstWKzC9Fg==
-X-Google-Smtp-Source: AGHT+IE9hj3pETZzgNRxZ9ATmZe4USbuR0UgwV7tomSG3LKgPATpikEwWMNTs3R4vF0lvnO45CiRdslDxMzt45kKIcU=
-X-Received: by 2002:ac8:5dcf:0:b0:4a2:719b:1238 with SMTP id
- d75a77b69052e-4a7c06f04c9mr49189211cf.12.1750867404147; Wed, 25 Jun 2025
- 09:03:24 -0700 (PDT)
+	s=arc-20240116; t=1750867470; c=relaxed/simple;
+	bh=weY6dY/NG/633bPgu7A3CLaWALB9w4mT2VRQGHXp5lE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mDsJGrMCatLL+U3bv0SwL7ZhKHstAt7L5QyOMX/kAjxyefj0xXy2TZDQ5H89VUylAP1Wpcsn9EPW34rOqPKeCP+JmqfDraghNsn4caK16Ae16O6X2suFZgzYSl3UynXDOE27Q9sh7frw45AKxoiRMr2zrq0wfU9KiUfxww4X/1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LtvXiaKM; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750867469; x=1782403469;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=weY6dY/NG/633bPgu7A3CLaWALB9w4mT2VRQGHXp5lE=;
+  b=LtvXiaKM38wfmTc41XmGQTfqwO4FSbCo/hCHJaNLY3eK5XYoFJieO1/y
+   SMGRjax+XnkQvuQbp4nE+vQ1PtNL9GSKNXt7NSxbH4UU3S2XJmNL+waP6
+   +b6UeGqhiM8sIDTBCB4JIK3rbPzQ2u3WoMaxuzPzDsT+Zw1Qi45tb3Xuq
+   e0Cm0bwKFPboyM23bquzsgBApXGCMcr+NweeyGMERRD1/DMfC3umdO3I4
+   eZUvgoxkIfxgw6PCA21t3yZJQMtR4zK6C6G6f4srVMYkpodRcDvrllSqw
+   dRWH3rpsI7c5bwOpuC8wHzu54ZrSu2/925htcVHr08fWsJairTV3EFczl
+   w==;
+X-CSE-ConnectionGUID: 9FvxeMlFSjiXeOWZE9zAgw==
+X-CSE-MsgGUID: nQ1ffMudROGFbabc+9QXKg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="70714932"
+X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
+   d="scan'208";a="70714932"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 09:04:28 -0700
+X-CSE-ConnectionGUID: VLIuM2LrSU+hHl/6++y4Rw==
+X-CSE-MsgGUID: yTZz/bU5QoOCfxv0IDPSmQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,265,1744095600"; 
+   d="scan'208";a="157752569"
+Received: from dcskidmo-m40.jf.intel.com ([10.166.241.13])
+  by fmviesa004.fm.intel.com with ESMTP; 25 Jun 2025 09:04:28 -0700
+From: Joshua Hay <joshua.a.hay@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Joshua Hay <joshua.a.hay@intel.com>
+Subject: [Intel-wired-lan] [PATCH net 0/5] idpf: replace Tx flow scheduling buffer ring with buffer pool
+Date: Wed, 25 Jun 2025 09:11:51 -0700
+Message-Id: <20250625161156.338777-1-joshua.a.hay@intel.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250625153628.298481-1-guoxin0309@gmail.com>
-In-Reply-To: <20250625153628.298481-1-guoxin0309@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 25 Jun 2025 09:03:13 -0700
-X-Gm-Features: AX0GCFvTdLRvVWatub4624qRGdWR0QP6u7VG6WHZKo_7YAwkHGX2hMIFXsCeAJI
-Message-ID: <CANn89iKrwuyN2ixswA-u1AxW=BX8QwWp=WHskCmh_1qye3QvLA@mail.gmail.com>
-Subject: Re: [PATCH net-next v1] tcp: fix tcp_ofo_queue() to avoid including
- too much DUP SACK range
-To: "xin.guo" <guoxin0309@gmail.com>
-Cc: ncardwell@google.com, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 25, 2025 at 8:37=E2=80=AFAM xin.guo <guoxin0309@gmail.com> wrot=
-e:
->
-> If the new coming segment covers more than one skbs in the ofo queue,
-> and which seq is equal to rcv_nxt , then the sequence range
-> that is not duplicated will be sent as DUP SACK,  the detail as below,
-> in step6, the {501,2001} range is clearly including too much
-> DUP SACK range:
-> 1. client.43629 > server.8080: Flags [.], seq 501:1001, ack 1325288529,
-> win 20000, length 500: HTTP
-> 2. server.8080 > client.43629: Flags [.], ack 1, win 65535, options
-> [nop,nop,TS val 269383721 ecr 200,nop,nop,sack 1 {501:1001}], length 0
-> 3. Iclient.43629 > server.8080: Flags [.], seq 1501:2001,
-> ack 1325288529, win 20000, length 500: HTTP
-> 4. server.8080 > client.43629: Flags [.], ack 1, win 65535, options
-> [nop,nop,TS val 269383721 ecr 200,nop,nop,sack 2 {1501:2001}
-> {501:1001}], length 0
-> 5. client.43629 > server.8080: Flags [.], seq 1:2001,
-> ack 1325288529, win 20000, length 2000: HTTP
-> 6. server.8080 > client.43629: Flags [.], ack 2001, win 65535,
-> options [nop,nop,TS val 269383722 ecr 200,nop,nop,sack 1 {501:2001}],
-> length 0
->
-> After this fix, the step6 is as below:
-> 6. server.8080 > client.43629: Flags [.], ack 2001, win 65535,
-> options [nop,nop,TS val 269383722 ecr 200,nop,nop,sack 1 {501:1001}],
-> length 0
+This series fixes a stability issue in the flow scheduling Tx send/clean
+path that results in a Tx timeout.                                       
+                                                                         
+The existing guardrails in the Tx path were not sufficient to prevent
+the driver from reusing completion tags that were still in flight (held
+by the HW).  This collision would cause the driver to erroneously clean
+the wrong packet thus leaving the descriptor ring in a bad state.        
 
-I am not convinced this is the expected output ?
+The main point of this refactor is replace the flow scheduling buffer
+ring with a large pool/array of buffers.  The completion tag then simply
+is the index into this array.  The driver tracks the free tags and pulls
+the next free one from a refillq.  The cleaning routines simply use the
+completion tag from the completion descriptor to index into the array to
+quickly find the buffers to clean.                                       
 
-If this is a DUP SACK, it should be :
+All of the code to support the refactor is added first to ensure traffic
+still passes with each patch.  The final patch then removes all of the
+obsolete stashing code.
 
-Flags [.], ack 2001, win 65535, ... sack 2 {1501:2001} {501:1001} ....
+Joshua Hay (5):
+  idpf: add support for Tx refillqs in flow scheduling mode
+  idpf: improve when to set RE bit logic
+  idpf: replace flow scheduling buffer ring with buffer pool
+  idpf: stop Tx if there are insufficient buffer resources
+  idpf: remove obsolete stashing code
 
+ .../ethernet/intel/idpf/idpf_singleq_txrx.c   |   6 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 626 ++++++------------
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  76 +--
+ 3 files changed, 239 insertions(+), 469 deletions(-)
 
+-- 
+2.39.2
 
->
-> Signed-off-by: xin.guo <guoxin0309@gmail.com>
-> ---
-> v1: add more information in commit message
-> ---
->  net/ipv4/tcp_input.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index 19a1542883df..f8c62850e9ca 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -4846,7 +4846,7 @@ static void tcp_ofo_queue(struct sock *sk)
->                 if (before(TCP_SKB_CB(skb)->seq, dsack_high)) {
->                         __u32 dsack =3D dsack_high;
->                         if (before(TCP_SKB_CB(skb)->end_seq, dsack_high))
-> -                               dsack_high =3D TCP_SKB_CB(skb)->end_seq;
-> +                               dsack =3D TCP_SKB_CB(skb)->end_seq;
->                         tcp_dsack_extend(sk, TCP_SKB_CB(skb)->seq, dsack)=
-;
-
-At a first glance, bug is in tcp_dsack_extend()
 
