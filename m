@@ -1,114 +1,104 @@
-Return-Path: <netdev+bounces-200900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51507AE7477
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 03:48:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23B25AE749B
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 04:04:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 011A07A68CB
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 01:47:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C99C16E03B
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 02:04:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5125189B8C;
-	Wed, 25 Jun 2025 01:48:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439C01922D3;
+	Wed, 25 Jun 2025 02:04:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A3F156237;
-	Wed, 25 Jun 2025 01:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A84A15278E;
+	Wed, 25 Jun 2025 02:04:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750816116; cv=none; b=dIhfMyYaWdn3XOyizG5m8Hoy2e5QeUzXzXFHXl9ep8g692F7rS4ZQeBz33+B7aTtOgf8cmUJ3BbKKlPTliDxMiY7TEHUfIieLA68hjB1AhIFoobNEVkixlrMcv2jKmOcnqSCuox13S4sTUtSfXIGB6hc5H998kmFkNDWn2ppjsY=
+	t=1750817095; cv=none; b=fUQY+c7SmjWLwz4NySetcFXR66+0jyxoDB25HwoYobhpoLbWKpLT5MwV6NLQbbB6rANaHauTzeo+kT/abqww+0XqvUdzQqtS+jUPOtXkpcnQj226U9E6zAbc3XOWFVba889KKgfvqp+GHhQRfD84vo7rA9Lt85mpemNBcpJs1i8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750816116; c=relaxed/simple;
-	bh=UwOpnUw7+tLe3YXOCyQZJEC4QKByBoiiNnd+FyujE38=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=e3S004scFMY6l5473gS541P3ifGHNlcBgKE1V5FS2reZBKhINUGI+fyvoWEGbqmS5gbJtnSPFsyhb99YMriZE67HYOQyCtdaVY/yo3fE0y66OiECMfN2O4rVnuCc9X9n1DNen95FAjEfiS1MIZanDVBPbz23/w1RQT1aJwHCibM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+	s=arc-20240116; t=1750817095; c=relaxed/simple;
+	bh=culdkqbFYK9shNmCfgB7f/uFr+cX5HWHD5oZkjIM+iM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ui3RPh7tpbd0HextaZucbKOIKrsZfSnPwuFG7cGNZ1hz/6MzOZIqVnNoU8knHYCfpxq7Eeccz/mKaplDf59OoSecv6C76OuiuzI8CPwajjPTzGidMkrkNJ7f9+oiG7N93Y4jhiq0XZA1EhPZuIZ2DiA4/OjWjKbN0A4ZV77ziV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bRl7F6sjvztS42;
-	Wed, 25 Jun 2025 09:47:21 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1F932140545;
-	Wed, 25 Jun 2025 09:48:31 +0800 (CST)
-Received: from [10.174.179.113] (10.174.179.113) by
- dggpemf500002.china.huawei.com (7.185.36.57) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 25 Jun 2025 09:48:30 +0800
-Message-ID: <2b969f72-b5c3-4102-a7ea-77b5c726bc76@huawei.com>
-Date: Wed, 25 Jun 2025 09:48:29 +0800
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4bRlSj5cBBz1d1lV;
+	Wed, 25 Jun 2025 10:02:29 +0800 (CST)
+Received: from kwepemk100010.china.huawei.com (unknown [7.202.194.58])
+	by mail.maildlp.com (Postfix) with ESMTPS id D33C51402EB;
+	Wed, 25 Jun 2025 10:04:49 +0800 (CST)
+Received: from workspace-z00536909-5022804397323726849.huawei.com
+ (7.151.123.135) by kwepemk100010.china.huawei.com (7.202.194.58) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 25 Jun
+ 2025 10:04:48 +0800
+From: zhangjianrong <zhangjianrong5@huawei.com>
+To: <michael.jamet@intel.com>, <mika.westerberg@linux.intel.com>,
+	<YehezkelShB@gmail.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <guhengsheng@hisilicon.com>, <caiyadong@huawei.com>,
+	<xuetao09@huawei.com>, <lixinghang1@huawei.com>
+Subject: [PATCH] [net] net: thunderbolt: Fix the parameter passing of tb_xdomain_enable_paths()/tb_xdomain_disable_paths()
+Date: Wed, 25 Jun 2025 10:04:48 +0800
+Message-ID: <20250625020448.1407142-1-zhangjianrong5@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ipv4: fib: Remove unnecessary encap_type check
-To: Kuniyuki Iwashima <kuniyu@google.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20250624140315.3929702-1-yuehaibing@huawei.com>
- <CAAVpQUAEA6jkcM4VhzgYnx-dS1FEodN7y3DSK7LAh7Evt6bgjw@mail.gmail.com>
-Content-Language: en-US
-From: Yue Haibing <yuehaibing@huawei.com>
-In-Reply-To: <CAAVpQUAEA6jkcM4VhzgYnx-dS1FEodN7y3DSK7LAh7Evt6bgjw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- dggpemf500002.china.huawei.com (7.185.36.57)
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemk100010.china.huawei.com (7.202.194.58)
 
-On 2025/6/25 2:26, Kuniyuki Iwashima wrote:
-> On Tue, Jun 24, 2025 at 6:46 AM Yue Haibing <yuehaibing@huawei.com> wrote:
->>
->> lwtunnel_build_state() has check validity of encap_type,
->> so no need to do this before call it.
->>
->> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
->> ---
->>  net/ipv4/fib_semantics.c | 8 --------
->>  1 file changed, 8 deletions(-)
->>
->> diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
->> index f7c9c6a9f53e..475ffcbf4927 100644
->> --- a/net/ipv4/fib_semantics.c
->> +++ b/net/ipv4/fib_semantics.c
->> @@ -625,11 +625,6 @@ int fib_nh_common_init(struct net *net, struct fib_nh_common *nhc,
->>         if (encap) {
->>                 struct lwtunnel_state *lwtstate;
->>
->> -               if (encap_type == LWTUNNEL_ENCAP_NONE) {
->> -                       NL_SET_ERR_MSG(extack, "LWT encap type not specified");
->> -                       err = -EINVAL;
->> -                       goto lwt_failure;
->> -               }
->>                 err = lwtunnel_build_state(net, encap_type, encap,
->>                                            nhc->nhc_family, cfg, &lwtstate,
->>                                            extack);
->> @@ -890,9 +885,6 @@ static int fib_encap_match(struct net *net, u16 encap_type,
->>         struct lwtunnel_state *lwtstate;
->>         int ret, result = 0;
->>
->> -       if (encap_type == LWTUNNEL_ENCAP_NONE)
->> -               return 0;
-> 
-> Now this condition returns -EINVAL, which confuses fib_encap_match(), no ?
+According to the description of tb_xdomain_enable_paths(), the third
+parameter represents the transmit ring and the fifth parameter represents
+the receive ring. tb_xdomain_disable_paths() is the same case.
 
-Right, sorry for overlook this, will restore in v2.
+Signed-off-by: zhangjianrong <zhangjianrong5@huawei.com>
+---
+ drivers/net/thunderbolt/main.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-> 
-> 
->> -
->>         ret = lwtunnel_build_state(net, encap_type, encap, AF_INET,
->>                                    cfg, &lwtstate, extack);
->>         if (!ret) {
->> --
->> 2.34.1
->>
-> 
+diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
+index 0a53ec293d04..f4c782759566 100644
+--- a/drivers/net/thunderbolt/main.c
++++ b/drivers/net/thunderbolt/main.c
+@@ -396,9 +396,9 @@ static void tbnet_tear_down(struct tbnet *net, bool send_logout)
+ 
+ 		ret = tb_xdomain_disable_paths(net->xd,
+ 					       net->local_transmit_path,
+-					       net->rx_ring.ring->hop,
++					       net->tx_ring.ring->hop,
+ 					       net->remote_transmit_path,
+-					       net->tx_ring.ring->hop);
++					       net->rx_ring.ring->hop);
+ 		if (ret)
+ 			netdev_warn(net->dev, "failed to disable DMA paths\n");
+ 
+@@ -662,9 +662,9 @@ static void tbnet_connected_work(struct work_struct *work)
+ 		goto err_free_rx_buffers;
+ 
+ 	ret = tb_xdomain_enable_paths(net->xd, net->local_transmit_path,
+-				      net->rx_ring.ring->hop,
++				      net->tx_ring.ring->hop,
+ 				      net->remote_transmit_path,
+-				      net->tx_ring.ring->hop);
++				      net->rx_ring.ring->hop);
+ 	if (ret) {
+ 		netdev_err(net->dev, "failed to enable DMA paths\n");
+ 		goto err_free_tx_buffers;
+-- 
+2.34.1
+
 
