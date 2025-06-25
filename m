@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-201128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 361D6AE82AB
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 14:26:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 359DAAE82AC
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 14:27:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E27AA172FDA
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 12:26:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 777C73A58B8
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 12:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2595325FA11;
-	Wed, 25 Jun 2025 12:25:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E572609C2;
+	Wed, 25 Jun 2025 12:25:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GTDh6eO7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AI/e6nso"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7F825BF19;
-	Wed, 25 Jun 2025 12:25:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921E425EF8F;
+	Wed, 25 Jun 2025 12:25:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750854347; cv=none; b=cGE93Mc+LuilIepKJdzNsD8ElHZXVbi5BrLFRcz9p5oSlZqnsbpRTDNaA9FqfAwgFhI07+SgIzIe4k0MnP2DNQvTFwJlMRU6Aqfd1gpcQSwHigRukkzw8HAsMABoKY9P5nuIWKTma0W1zeR8JPtI/19O9AaXPnsRAtdfBrzlBww=
+	t=1750854349; cv=none; b=uOvrnnIgFORGpD+ITMCp5M8nZSfD+EPjR5dv/ru2QQDuPgLYK8nLWu7nZu33su0uwq3BXihYplQvYT5PIxxHqw03O8ORofgMryC+XbOhV3JvA6QqeC9N7jfCqhbh+6+y7ZXW0P8Eq/shDpzNgF0h0Gw9kJpPy95Ue6LSfIyisX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750854347; c=relaxed/simple;
-	bh=YRXmrqvP3M3tB2iy+7DSsufyltwbs2fauGg/i1jbcu4=;
+	s=arc-20240116; t=1750854349; c=relaxed/simple;
+	bh=GWlhp73LNm/7EbO3DbUYo/TyoyteULAA+bKvzRvitdU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=k6YJFvAZ+pKSUhMNFrthmMfm6BdhibQw1qStBxcHKu5z0YgFS+djPZMDrh3jvey/I7a+9Zx2PkAnxUclEFyejngjk627kwF+Fye3v23oODFHe4GQDqEru0vv3tZTfIvOIZSST2HT/tWcaI5Chxj2ieL93CpyQzzj3zbO7N4/K8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GTDh6eO7; arc=none smtp.client-ip=209.85.214.182
+	 In-Reply-To:To:Cc; b=FLI9CuM4w1WZush1+cHt/P1G5A4jhOhMo3NsvJGnjVh1p1ul82tcyIj6r3CMLGN2V+Lo7MJ+XRk7IPfkkt1JH0g1M8rrheSDs5/bUOSYbj8+/FGVc42ZLdMsLuaF/0Mgh0I4Gs8NB9fvl0NE6DuHLKckVuIP8N763XAim4gOJPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AI/e6nso; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-23602481460so17502865ad.0;
-        Wed, 25 Jun 2025 05:25:45 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-237e6963f63so27646925ad.2;
+        Wed, 25 Jun 2025 05:25:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750854345; x=1751459145; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750854346; x=1751459146; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=AQx43JAoJGCGCTWMGPvD7Db1D0wY/v2UilUjcKIQhZ4=;
-        b=GTDh6eO7HeMgl+13HrA1pm1v+RVOvRXcZ02UF3dPIzeAgLCcAahCjX8HYuoh71k9Bv
-         YBDV9Oh0L/NgwAwAHvSHOf4PBjywaG1iuxooDRQnN6CgiwNdvDENIFWYefKHcBNtDvH1
-         EayFfLad20P6PH8kHsIAzBKgrBQdQxvPj3ekys9uF0H4ItKRorx1XfhN/7M6d57HPdrj
-         PI8NXR5ZPI0rcWgvJSLRfN5OScFyLHJQtAajEZrfy951wxBkOPJGbsGmkSVcp+NxqStL
-         lywO1fy0YYY3Ba3pQlSCMB/y/5eey+ZI/t55awtoSltPC51JgqgJ3ITQxwwbl5/OiWxx
-         cf9Q==
+        bh=gK8Hp/mA0/WB+LCIYX3QIzvfFd0YpHU2lftvUglJLEk=;
+        b=AI/e6nsoLKUx+iWuYt2f/94E9X5rQPiqg9t+uIjN3jD0U8Gk5tdz8/H12ENO2VaNtD
+         aMRst/y384qHnr9w7+PKVyike9C8kHj/5aWqq4LH0uWYj54Lqfl8adVqfA7qKKajFtUY
+         gHeR7IeXz+yy8OsjZrM6V9TTqzIM4j8zdJ9uNfkqcFuqpq/M/rSU6orgCviMaNOca2hA
+         kJFmvQqRHGwWmPXQh1yHECuz6yDvINxXsmiPeUOkwB0S8fkwF+JK/SYSZSBk9UsqENoa
+         id6+BjrlpkxZFNlWu280qZw+MvVrq74wovackoPy50bSWbXO/33VHqoTONPnWERocmKD
+         SQxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750854345; x=1751459145;
+        d=1e100.net; s=20230601; t=1750854346; x=1751459146;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AQx43JAoJGCGCTWMGPvD7Db1D0wY/v2UilUjcKIQhZ4=;
-        b=olWBDvQ0ALY0SUa324QhNydjpGI8mblplB5v3AmqxeqpJCjwcCCRaqJOIPmMEX3PNa
-         dliSyGu53uR8yOAImBD6GrWoW9pwptjoh0K6WsOG3cbEHMXsYK+1kzZXdbCpmfNltYf7
-         HWSxEUy8N9An2xSw9mXow4h2VhVsUo/vcuJIsUgPcaoTGAfZYCe7EM/Xyz91AZ6UreJp
-         hA4PEeQ6DQyDPEGtgBSGadc4QXSViwZ71t+o4iHSHDPrwT1O4dzvYDqCkSbjOoc9rjES
-         amPZ+d/H+LMHesuXn5inZMi/b++FDX9Q8qCZ5NPp5h5MUPOJT2dKWILVa13kp20eAofs
-         mkMg==
-X-Forwarded-Encrypted: i=1; AJvYcCWjbq+ubtpN6LmpYiY9kF7zanr0QZ82MZhcu1ofWvFCVx0IBIgUiCBEawehFzCSQmtGjMHIxo8NavSVMU8=@vger.kernel.org, AJvYcCXf0t/XmIUmSL4Q/7YxFeIPXx/Y+hVhYie6frKQ1IBV/Y15oF8JMYdB/vmPq0jYx9CvfkkPpH2W6lfxKa1U66c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwskIxpJ6fcNDWhLpMBsPl3ka13ZdtjjKX5nQB6R49pusTlYvR9
-	qBzM9HR+dUDUgZf+Hwdc2I+qKJPjbT7UuvurAO7bmd3K0VIZoTUoduBL
-X-Gm-Gg: ASbGncs/8DbS0v8HBdxionj92dS/BE+Jxs/DNWh5yyhdtpWcqkG8R5joL46zD6au1ns
-	td17xdjL97pT/NLkeS/iAe1MJJ43mMkewKSNTCf/ObJdkvk6sHIneD/ruGUf+nWOBMhimfzZuGP
-	uprDVCechb8h32mlMRid7cl/qWCCSYFHBI4haOih+Qa1njNNatwL7GRIocuXTp43cn8L9iho7N0
-	hDT/PEoT2f+ZvC03o136OIuemQKDs6oVvqr0mgfiSC7JbLgyXd3wpuZ2De2oZLHbfzyBCwhkKFJ
-	UDuPwaHxInaJuF3sGLsu0lYtSZlba8/SNCWFyCbnsl71/xmOeYxRGjjzfp4Zfk4HBDbGtN8wpvr
-	bHsn6rlJbVexnH0s9+rS950UbD2mtpeJm9WTnauI6+fhfcx+JNO3rS0vQ
-X-Google-Smtp-Source: AGHT+IEi8CWyMU673+BCBQHzKVzK6rWZJmwPlwuPsnwkOjHOqfKVf+EzvwqVyPcy3sTt99q1VqQR1Q==
-X-Received: by 2002:a17:902:da91:b0:224:26fd:82e5 with SMTP id d9443c01a7336-238247987ccmr51072835ad.48.1750854344507;
-        Wed, 25 Jun 2025 05:25:44 -0700 (PDT)
+        bh=gK8Hp/mA0/WB+LCIYX3QIzvfFd0YpHU2lftvUglJLEk=;
+        b=UB732ojk3QsPiDp+Lb5rpHvJVFz6OO/ERUm7XcpeU076aVkmzaMTDLq7l2+eVqD+/J
+         wcvRQ/6QAJLCSXh0Ui9ZUzDGynL3a1VhrxChtnH3365i5X2oobQGP8BJ1hQMAH6VrlY0
+         rnEQAGNj/yhqj07oEUfamLXg9Zpnq0oNKi5Cr+e4+nTk5yO0YJOf8xM6HqRCZcDJo08g
+         NfPmitthd0/MQBG7Lp5zJH2TBh1UBEVYdMNLs1MQhXrDTE3tWoVgRgTCshoQdL0fJcRT
+         h/Zc+sVzOU6F6cVngbHLmeSDi1lZBeb1r6u11XygatxNc6ImB3iE9rFKBbfxnUnY3ACi
+         R5MA==
+X-Forwarded-Encrypted: i=1; AJvYcCV0/LskhkyJHYVtgtp8QKz+7LAXJMtL4Z7QSWGK5UH1Of0oud7Cdyx7Uu1giM65ym/geveBQQv0C4ZOlxq26Lw=@vger.kernel.org, AJvYcCXH+Dokr9M2ytngjMThbna7XbpKWo4BYZizzqZD3qYcvAbQwv8ma3vpagsASQ4citf3SO8WcGYcFQtfrG8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywq4hL/0HQtQPEUHPlsQT1zHPzMZFuqOjDlKu22dMbYE5fDNpaw
+	j6OdTcZXvrWT+BtsZc0amaFvsrN+VhgEQXwgHqtgYFMTKXgGyXowB0JY
+X-Gm-Gg: ASbGncvGXUTsAoTRXNJZtDX7GYx6BUwrkfhPaeePpA1J0mJNP+27+dml6NE7K+CBDzo
+	SLNY+qxPw63KJlct4dGT29tCEE1nQaRooS2/fQUm016HY4LwHZ5DftiDqVtMlSa/mVEsdoSpkNe
+	s25kHJRcJir/brs/l4DOckWKrgHvlNG6yMOqAzLGzv76OEEoAl6uZZIG9rrZqO5n4rsm/0fqso2
+	V2gBVVnXPJKIgdrf3gvte4k9M10Wz6/2Hg9V68MqFV5CPmeTopqD6hftm/e3rYD1/77+EmiyboV
+	tvNIWEPRfmAQvdNJU8zAFnkY8BQXF+CefNNzzp1uItlv7UdrWF2b8LP4BD49QTlrh5n7mFlFaU+
+	ClUKfpxebj1djc935sTJ4MtiAs7l7lDgSALuQJfZHprSBggIQzNfXJ0Jk
+X-Google-Smtp-Source: AGHT+IHtv4E8mTXtJhjRtDr/sOzVXJ8chAiqbXjdQq30k70nkAEaKLwRixvhgJfDtHBn2buXrkIWeA==
+X-Received: by 2002:a17:903:2f10:b0:223:f9a4:3f99 with SMTP id d9443c01a7336-23824044733mr56789135ad.29.1750854345794;
+        Wed, 25 Jun 2025 05:25:45 -0700 (PDT)
 Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa ([50.233.106.34])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d83ea243sm137551405ad.72.2025.06.25.05.25.43
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d83ea243sm137551405ad.72.2025.06.25.05.25.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 05:25:44 -0700 (PDT)
+        Wed, 25 Jun 2025 05:25:45 -0700 (PDT)
 From: Tamir Duberstein <tamird@gmail.com>
-Date: Wed, 25 Jun 2025 05:25:38 -0700
-Subject: [PATCH net-next v2 1/2] Use unqualified references to ffi types
+Date: Wed, 25 Jun 2025 05:25:39 -0700
+Subject: [PATCH net-next v2 2/2] Cast to the proper type
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,7 +84,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250625-correct-type-cast-v2-1-6f2c29729e69@gmail.com>
+Message-Id: <20250625-correct-type-cast-v2-2-6f2c29729e69@gmail.com>
 References: <20250625-correct-type-cast-v2-0-6f2c29729e69@gmail.com>
 In-Reply-To: <20250625-correct-type-cast-v2-0-6f2c29729e69@gmail.com>
 To: FUJITA Tomonori <fujita.tomonori@gmail.com>, 
@@ -98,108 +98,54 @@ To: FUJITA Tomonori <fujita.tomonori@gmail.com>,
 Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
  linux-kernel@vger.kernel.org, Tamir Duberstein <tamird@gmail.com>
 X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openssh-sha256; t=1750854341; l=4578;
+X-Developer-Signature: v=1; a=openssh-sha256; t=1750854341; l=1601;
  i=tamird@gmail.com; h=from:subject:message-id;
- bh=YRXmrqvP3M3tB2iy+7DSsufyltwbs2fauGg/i1jbcu4=;
+ bh=GWlhp73LNm/7EbO3DbUYo/TyoyteULAA+bKvzRvitdU=;
  b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
  MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
- QBoKBgtgkGMb4d+aGKpEutO9jimAlYOOxMhT+JLyoYfd3r2VHzuhFKYRtaf53ZUtw1DQ27+ThmE
- N7Vo2YRpX9Ac=
+ QLiFIDwSMOyJlQHnf/QjQNXkpiIIChkOhXZtBSbgofNDN9br92N6eAa+Mq90ITZAPwF3itPMtkc
+ 2hu6u7BX0eQI=
 X-Developer-Key: i=tamird@gmail.com; a=openssh;
  fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
-Remove unnecessary qualifications; `kernel::ffi::*` is included in
-`kernel::prelude`.
+Use the ffi type rather than the resolved underlying type.
 
+Acked-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 ---
- rust/kernel/net/phy.rs | 24 ++++++++----------------
- 1 file changed, 8 insertions(+), 16 deletions(-)
+ rust/kernel/net/phy.rs | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-index 65ac4d59ad77..9b4dc09403e4 100644
+index 9b4dc09403e4..5fa6b7e97887 100644
 --- a/rust/kernel/net/phy.rs
 +++ b/rust/kernel/net/phy.rs
-@@ -312,9 +312,7 @@ impl<T: Driver> Adapter<T> {
-     /// # Safety
-     ///
-     /// `phydev` must be passed by the corresponding callback in `phy_driver`.
--    unsafe extern "C" fn soft_reset_callback(
--        phydev: *mut bindings::phy_device,
--    ) -> crate::ffi::c_int {
-+    unsafe extern "C" fn soft_reset_callback(phydev: *mut bindings::phy_device) -> c_int {
-         from_result(|| {
-             // SAFETY: This callback is called only in contexts
-             // where we hold `phy_device->lock`, so the accessors on
-@@ -328,7 +326,7 @@ impl<T: Driver> Adapter<T> {
-     /// # Safety
-     ///
-     /// `phydev` must be passed by the corresponding callback in `phy_driver`.
--    unsafe extern "C" fn probe_callback(phydev: *mut bindings::phy_device) -> crate::ffi::c_int {
-+    unsafe extern "C" fn probe_callback(phydev: *mut bindings::phy_device) -> c_int {
-         from_result(|| {
-             // SAFETY: This callback is called only in contexts
-             // where we can exclusively access `phy_device` because
-@@ -343,9 +341,7 @@ impl<T: Driver> Adapter<T> {
-     /// # Safety
-     ///
-     /// `phydev` must be passed by the corresponding callback in `phy_driver`.
--    unsafe extern "C" fn get_features_callback(
--        phydev: *mut bindings::phy_device,
--    ) -> crate::ffi::c_int {
-+    unsafe extern "C" fn get_features_callback(phydev: *mut bindings::phy_device) -> c_int {
-         from_result(|| {
-             // SAFETY: This callback is called only in contexts
-             // where we hold `phy_device->lock`, so the accessors on
-@@ -359,7 +355,7 @@ impl<T: Driver> Adapter<T> {
-     /// # Safety
-     ///
-     /// `phydev` must be passed by the corresponding callback in `phy_driver`.
--    unsafe extern "C" fn suspend_callback(phydev: *mut bindings::phy_device) -> crate::ffi::c_int {
-+    unsafe extern "C" fn suspend_callback(phydev: *mut bindings::phy_device) -> c_int {
-         from_result(|| {
-             // SAFETY: The C core code ensures that the accessors on
-             // `Device` are okay to call even though `phy_device->lock`
-@@ -373,7 +369,7 @@ impl<T: Driver> Adapter<T> {
-     /// # Safety
-     ///
-     /// `phydev` must be passed by the corresponding callback in `phy_driver`.
--    unsafe extern "C" fn resume_callback(phydev: *mut bindings::phy_device) -> crate::ffi::c_int {
-+    unsafe extern "C" fn resume_callback(phydev: *mut bindings::phy_device) -> c_int {
-         from_result(|| {
-             // SAFETY: The C core code ensures that the accessors on
-             // `Device` are okay to call even though `phy_device->lock`
-@@ -387,9 +383,7 @@ impl<T: Driver> Adapter<T> {
-     /// # Safety
-     ///
-     /// `phydev` must be passed by the corresponding callback in `phy_driver`.
--    unsafe extern "C" fn config_aneg_callback(
--        phydev: *mut bindings::phy_device,
--    ) -> crate::ffi::c_int {
-+    unsafe extern "C" fn config_aneg_callback(phydev: *mut bindings::phy_device) -> c_int {
-         from_result(|| {
-             // SAFETY: This callback is called only in contexts
-             // where we hold `phy_device->lock`, so the accessors on
-@@ -403,9 +397,7 @@ impl<T: Driver> Adapter<T> {
-     /// # Safety
-     ///
-     /// `phydev` must be passed by the corresponding callback in `phy_driver`.
--    unsafe extern "C" fn read_status_callback(
--        phydev: *mut bindings::phy_device,
--    ) -> crate::ffi::c_int {
-+    unsafe extern "C" fn read_status_callback(phydev: *mut bindings::phy_device) -> c_int {
-         from_result(|| {
-             // SAFETY: This callback is called only in contexts
-             // where we hold `phy_device->lock`, so the accessors on
-@@ -422,7 +414,7 @@ impl<T: Driver> Adapter<T> {
-     unsafe extern "C" fn match_phy_device_callback(
-         phydev: *mut bindings::phy_device,
-         _phydrv: *const bindings::phy_driver,
--    ) -> crate::ffi::c_int {
-+    ) -> c_int {
-         // SAFETY: This callback is called only in contexts
-         // where we hold `phy_device->lock`, so the accessors on
-         // `Device` are okay to call.
+@@ -163,20 +163,20 @@ pub fn set_speed(&mut self, speed: u32) {
+         let phydev = self.0.get();
+         // SAFETY: The struct invariant ensures that we may access
+         // this field without additional synchronization.
+-        unsafe { (*phydev).speed = speed as i32 };
++        unsafe { (*phydev).speed = speed as c_int };
+     }
+ 
+     /// Sets duplex mode.
+     pub fn set_duplex(&mut self, mode: DuplexMode) {
+         let phydev = self.0.get();
+         let v = match mode {
+-            DuplexMode::Full => bindings::DUPLEX_FULL as i32,
+-            DuplexMode::Half => bindings::DUPLEX_HALF as i32,
+-            DuplexMode::Unknown => bindings::DUPLEX_UNKNOWN as i32,
++            DuplexMode::Full => bindings::DUPLEX_FULL,
++            DuplexMode::Half => bindings::DUPLEX_HALF,
++            DuplexMode::Unknown => bindings::DUPLEX_UNKNOWN,
+         };
+         // SAFETY: The struct invariant ensures that we may access
+         // this field without additional synchronization.
+-        unsafe { (*phydev).duplex = v };
++        unsafe { (*phydev).duplex = v as c_int };
+     }
+ 
+     /// Reads a PHY register.
 
 -- 
 2.50.0
