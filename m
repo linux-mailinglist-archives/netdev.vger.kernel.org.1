@@ -1,82 +1,81 @@
-Return-Path: <netdev+bounces-201139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3524AAE8393
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 15:03:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 210DEAE839F
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 15:05:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46FE516A950
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 13:03:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83C0E16BC1B
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 13:05:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8BDF25D53E;
-	Wed, 25 Jun 2025 13:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72CB925F99F;
+	Wed, 25 Jun 2025 13:05:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="SRZtoZyb"
+	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="UHhwSQDE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC543A1BA
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 13:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928A98633A
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 13:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750856611; cv=none; b=PTN/tblIcTcIp/uOvo0PVxsHOO8hxrQsQq6vF2MhJy130CUkg93vmcWnYob7ualOjqHicQuOsX9HpGAGQN3IMtOE5KNRuBs2vKldKK3XQhP8tM0ZE5WyXeNl29RPp8EfoYTgmldSXCq5X2/Ueoz27I11nokjzeU4c53fMFyv5ac=
+	t=1750856710; cv=none; b=kQtocsghjRsNXluBTmfiJoG6DWCCOG35E2zji4mqBBa12l+iS/2bI7algrjmxyNyByWJ7crFyWMQTr+pZ9a3+zCpv3+e+EEfPwYsElkeM3IEKVnvj1rChcIGiQtdhRn/YBEqb8RURFVhbbuBZjY1fcxzCSDYcrlLIS9B/RQZY1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750856611; c=relaxed/simple;
-	bh=X2a6bqPFcCqZOdUd0nAAfcySHkqblc2JtB5nNaZZass=;
+	s=arc-20240116; t=1750856710; c=relaxed/simple;
+	bh=cQChFIpemYCEU2to3qepypyGDWAJy+q5e4OEX2BidPc=;
 	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=G4pQyeyeSiMhHX+Vzl3IZ9uqypLWAOHogkRqXzNAhzaZHIqZtYSzRnh0N5qyIxElQeExAa2nmtU6k8nKMPK8mwTaFKTpaDACbHt/6xRcv6oHDEbfM/lvw3L9RFOHcPHvmUAscaDeNFArTUjSut92XOTpLUjKkBcf41U6c8DL078=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=SRZtoZyb; arc=none smtp.client-ip=209.85.221.49
+	 In-Reply-To:Content-Type; b=qlff6qiV1srrnbxgo+fR8BSjPO7yqs/NOBqzdehVNsKS0MGsRx1L7oCpfBUcRCdunr89vYcZtslHuJcYklfsE/DoaMk5IRFMUHunG7OvhHBQQ1jK/ICbm/fwVyZmU7dMIxsCdVornSL5I/zgq0LJ9DR1MT25erQPE/QEirhpiCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=UHhwSQDE; arc=none smtp.client-ip=209.85.218.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jacekk.info
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3a548a73ff2so1527602f8f.0
-        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 06:03:29 -0700 (PDT)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ade4679fba7so279210166b.2
+        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 06:05:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jacekk.info; s=g2024; t=1750856608; x=1751461408; darn=vger.kernel.org;
+        d=jacekk.info; s=g2024; t=1750856707; x=1751461507; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=R67vbOcUZfWm73DIVUMK1L7ghH4UOTOk4lzaOIIxPrs=;
-        b=SRZtoZybsEUzO2clrhTmINgsU6cevKwEwVVcvlh9eyiP1+Co4Aar74t366p44JvcUY
-         bPsI4oDM90ISY0NHQi47k/vtv+Miqe3uylbUp3BEsiD0uxAtQDicz0qQ5y8tzbBWjDXu
-         zrroXO1TVgHwwvP+58PGm9qdb+SLNsSPVA0AO4mQp+151ThY8qIBl+oxwJRlHRwCqYa8
-         OMgxRspppNlwcB3lJwYq//4VfqAS2jsMBW7KV7A2Myih/O50DK1320HPcHbMKfIkfB1Q
-         DzdAD56W2tcBt+HrlDNr1GhbFFwQDU2DGEVayr8NSamaNI9GuAVh5jLCxMUENJCzHrjX
-         u2VA==
+        bh=NSJW3n5WDshYJ48Euz3P/Df3ZQsxS6XzFo5zNuEInuk=;
+        b=UHhwSQDENZ4o5z4XYx7BFX0va9MYcdJi9msZYls4fl0Fq7ACICy1kZjjpsOpq4W5+q
+         TJXuCi7EbJzN/cTQy2BbDe3QnI32hbxcpjMkH70nJiUpivynibREbqUex84BnHygiUGg
+         X2NCn0kgImsK1PAfpWbIK0fk92UMKobsCVJBW3bQhSXa3wVvZEBvWDMzwn/7Mgf5zb/T
+         E6wGugN4gYJgt9Ayziq63Vv3Tv1vSMMLO03vjPbYqEs+NtRD1EZnJfzOJy/TvkVKG7w5
+         zgn+4vufCywKEElVxPWcpM9N073jlieXzXanRfIagLHzU9OesnzakB1tvO2b0x+Flcot
+         RYFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750856608; x=1751461408;
+        d=1e100.net; s=20230601; t=1750856707; x=1751461507;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:subject:user-agent:mime-version:date:message-id:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R67vbOcUZfWm73DIVUMK1L7ghH4UOTOk4lzaOIIxPrs=;
-        b=Id7HybenjF4gsdu7j9om6KHf6PYpiaVOW5n1X7gmx9NETSOj3Np9tQo/KhweQJSzx0
-         WMr3VPkOtRnAf5ycLLipkod19c3Pxflrc1sCcxyALBiWNLRTzKyzNN4B06fhqHRGpITh
-         aifE9iXsv4a9sT5Jhd8HAu6NodjQIukgE7NtDDvN9ZZHKIHSFV9bpCM7sUqw2Q7KWnda
-         FOGcty6zulCtX7NpjZomky/aJXrtsiBTby81pIORGjQuoZVS0CKaSmXK7OE6fMdJO2vK
-         36yWNCOmKxeBB5zyMfryr4/saUBdpCAAgul6lKKdLPD2V4pgKpXTB0qWcOVP+xTL+2G+
-         yjqw==
-X-Forwarded-Encrypted: i=1; AJvYcCXGR4XjgocUFhY0ACxAa8PC/hQ0sHq135xfIIwoSxTNIdAKYevnG4PCykU9tgqstT0uQ9Cx7BM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqxXjrNwY943Uor9gh1YEiYt5MlRA2ROvo5b5OQ6bTBZLuZQd8
-	7Y06mHJbbi7BnmuXehphdEclXUmpDH6nyGtzD7KS537wcrit5YMJVJsz4el6GrI7IDP/0dnNhWU
-	V5p8E0w==
-X-Gm-Gg: ASbGncu8KZR0tJrE5WrhZ6Zo2Tc33ax3jQaBuByV9ceHqmie6TJhNFvOL4WXPl4FhA6
-	OqrW8jobONYGWc8X4E73nb4pqjnLjCYE/tJDXT2asRPGA7y4H6KLEWQVezXIjTCxKJbpbklcREI
-	xT9bi+UJvOaljk8F70hTWvLmJMaZ+5CJtzIc6AqJ1vXH87/PsjPmFwD9gIHz0eXElpefHXNadyO
-	HTf8lHfEtYajY6lghiDUIOkEMkKAHanEUkttCx1vPdoNzjn5mmjCeqNjkFl8m3C6JgRbg+C+7ZA
-	WVKnWAwn2zMjZGQ4u/rJS2xX3d29JMfKtXA9TgkFU5cLQwxhBm4CSYQwSabD2cUq
-X-Google-Smtp-Source: AGHT+IFgMJIq/eGyoizczszmR53QE4J3SMmdHR+AgUSfMQ6K9taH4rprzgWuCxaybgUuO0JGEwa4hg==
-X-Received: by 2002:a05:6000:2406:b0:3a1:fe77:9e1d with SMTP id ffacd0b85a97d-3a6ed5da5bdmr2064474f8f.16.1750856607388;
-        Wed, 25 Jun 2025 06:03:27 -0700 (PDT)
+        bh=NSJW3n5WDshYJ48Euz3P/Df3ZQsxS6XzFo5zNuEInuk=;
+        b=psUmPY6v9nX6bnru2Fxr/nlQiPMUEgVR1DpEBHG/WjP707D8jwsfUWQLyEroxMdWsy
+         DgdHV3swmDlJHvt3FtcAM/C5euQbGgi99oqAEAFmhyLxKH7CV4zGhcLSkuift8662VGV
+         5i0QC2TeUcB3JgO8BrKjuEyhizKKT8LgtQ/+23eG1IjB1r7eqjpwqvgwz4rqLyfV2T4W
+         t1YE4gsy3gAPNlaOUWwt2ytnTMErkWz+hWex50eZRoI1uUUXC28fy5pTyC3U+rLttuT4
+         H53INzfFy4OqHJwd+92ovimwBLQumycbF5GqB+SY6mEFxTpkDqwqsbRE+y+0Pve+yJ/p
+         jsdA==
+X-Forwarded-Encrypted: i=1; AJvYcCXKF6bloUZUfGmfD7OlbviBXiRo2jZ3CQHuZSyQkhP8h/ebzPtW5611w0/Ur8nhZKRXmkgDP5M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBAT/f31c1TU96eKht9HpZh4WbBgy84IW76+OZubXeaueRgq9b
+	Mx5AEP/HR5nUEUSdy5P/UySf+Lpqt/cpcHIKes2e+xZni2wvPpg6PckYfuUMwMWTXg==
+X-Gm-Gg: ASbGncvrWpMA30AD28jc8IQow3NqNOq2zlXOJ5HQWAFHS8B6/J1ljHPhcAcpjkvH7nu
+	VZJBuBn+yJjHL3stGNsx3HM0jEnxm93TZYd3Qm/j5sZ/ycFHBWS7/6KG4EnOy8zyvwtWO9wKL5M
+	fIulUyoL0kC4BM2m9evoN++VL8k/DW/fr3jwXMY0o5yKBF1PVvQ3ZpWN27xufB2HWvxp+jHMcyA
+	DA2jpZCay01CJdMQJeQ+0w6oKJ7efqgB/uhSjv189JN9CO4aVznb4vLundMUPKvGPuyK8Q8ksI+
+	hqhMpMw/Y/Fa8rBuVjS+4JEuRp8WlNgTSGxuRHa+PRhaXRRnJ3OjEt5LzTu+RuB6
+X-Google-Smtp-Source: AGHT+IEC2nKPUdk50WFpUghJX26BtPFp6JEJuxNyGydhjELLPNt5ycVNb0kOu3HHnkCcdxhTWPz2uQ==
+X-Received: by 2002:a17:907:fd01:b0:ad8:a04e:dbd9 with SMTP id a640c23a62f3a-ae0bf154a67mr288967966b.31.1750856706457;
+        Wed, 25 Jun 2025 06:05:06 -0700 (PDT)
 Received: from [192.168.0.114] ([91.196.212.106])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae0bddcc68asm151660966b.174.2025.06.25.06.03.26
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae0c0a824a0sm127853766b.36.2025.06.25.06.05.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Jun 2025 06:03:26 -0700 (PDT)
+        Wed, 25 Jun 2025 06:05:03 -0700 (PDT)
 From: Jacek Kowalski <jacek@jacekk.info>
 X-Google-Original-From: Jacek Kowalski <Jacek@jacekk.info>
-Message-ID: <41ea8706-ffb2-48c6-8a2f-5c4c51dc1a0e@jacekk.info>
-Date: Wed, 25 Jun 2025 15:03:24 +0200
+Message-ID: <613026c7-319c-480f-83da-ffc85faaf42b@jacekk.info>
+Date: Wed, 25 Jun 2025 15:05:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,8 +83,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] e1000: drop checksum constant cast to u16 in
- comparisons
+Subject: Re: [PATCH v3 2/2] e1000e: ignore factory-default checksum value on
+ TGP platform
 To: Simon Horman <horms@kernel.org>
 Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
  Przemek Kitszel <przemyslaw.kitszel@intel.com>,
@@ -93,60 +92,32 @@ Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
  intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <46b2b70d-bf53-4b0a-a9f3-dfd8493295b9@jacekk.info>
- <20250625121828.GB1562@horms.kernel.org>
+ linux-kernel@vger.kernel.org, Vlad URSU <vlad@ursu.me>
+References: <91030e0c-f55b-4b50-8265-2341dd515198@jacekk.info>
+ <5c75ef9b-12f5-4923-aef8-01d6c998f0af@jacekk.info>
+ <20250624194237.GI1562@horms.kernel.org>
+ <0407b67d-e63f-4a85-b3b4-1563335607dc@jacekk.info>
+ <20250625094411.GM1562@horms.kernel.org>
 Content-Language: en-US
-In-Reply-To: <20250625121828.GB1562@horms.kernel.org>
+In-Reply-To: <20250625094411.GM1562@horms.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hey,
+>>>> +#define NVM_CHECKSUM_FACTORY_DEFAULT 0xFFFF
+>>>
+>>> Perhaps it is too long, but I liked Vlad's suggestion of naming this
+>>> NVM_CHECKSUM_WORD_FACTORY_DEFAULT.
 
-> 1. It's normal for patch-sets, to have a cover letter.
->    That provides a handy place for high level comments,
->    perhaps ironically, such as this one.
+So the proposals are:
 
-I'll add it in a second iteration.
+1. NVM_CHECKSUM_WORD_FACTORY_DEFAULT
+2. NVM_CHECKSUM_FACTORY_DEFAULT
+3. NVM_CHECKSUM_INVALID
+4. NVM_CHECKSUM_MISSING
+5. NVM_CHECKSUM_EMPTY
+6. NVM_NO_CHECKSUM
 
-
-> 2. Please provide some text in the patch description.
->    I know these changes are trivial. But we'd like to have something there.
->    E.g.
-> 
->    Remove unnecessary cast of constants to u16,
->    allowing the C type system to do it's thing.
-> 
->    No behavioural change intended.
->    Compile tested only.
-
-Wilco.
-
-
-> 4. Please make sure the patchset applies cleanly to it's target tree.
->    It seems that in it's current form the patchset doesn't
->    apply to iwl-next or net-next.
-
-Just to be sure, iwl-next is this one:
-git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/linux.git
-refs/heads/for-next
-?
-
-
-> 5. It's up to you. But in general there is no need
->    to CC linux-kernel@vger.kernel.org on Networking patches
-
-I've just followed get_maintainers.pl output to the letter.
-
-
-> As for this patch itself, it looks good to me.
-> But I think you missed two.
-
-Rather: I have not touched subtraction on purpose.
-
-But checking the compiler output - yes, it can be dropped as well.
-
-I'll prepare an updated patch set with subtraction changes across Intel drivers included.
+Any other contenders?
 
 -- 
 Best regards,
