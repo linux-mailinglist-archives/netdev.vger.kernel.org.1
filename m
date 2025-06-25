@@ -1,172 +1,137 @@
-Return-Path: <netdev+bounces-200883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60567AE739F
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 02:08:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F21FAE73B5
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 02:19:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58A263ADF9C
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 00:07:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55E743BBC4B
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 00:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A751367;
-	Wed, 25 Jun 2025 00:08:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F3D1C69D;
+	Wed, 25 Jun 2025 00:19:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I6bwZMuk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fx366FEQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C576EBA4A;
-	Wed, 25 Jun 2025 00:08:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B928F58;
+	Wed, 25 Jun 2025 00:19:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750810091; cv=none; b=k4Igqtf9tnOFVdsLMTLA/EPetB5KT0TQc2I3TPx2J8k/gG/b4vk7IVmYmig06bgc5vy53B03N3eeE7q9COYh91eMDYBc1xpB5EsVmUOY+J0ZwZqDhJ5eWMongBrcJZWBJ3OCwDtifWDI6095i71mAo2z8bajpwPBVvrn/m7IHvs=
+	t=1750810780; cv=none; b=nB30u9TPtAcqNq73FAz5OlfjInNXl3Iw3Xx+fs5oTRY8fTFJWeTYAfW4wdy3z8R7U3pIzVrMwpUPCVclfTmjMWf1CEbYfeXxbai0I1kIVtK8hcPRDQhN8ctXJb6YFRMNK3uBddb5VXaeADY3UjzaEvbAeeDevIPSx+m7MeDH9pM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750810091; c=relaxed/simple;
-	bh=VB6RjF5qIFd0dFoB+XW85/SNYXcGJtaEsdKLLYK1WQ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Tzv/okSWbfOIQBvL7LZXMDLAtxXeJjaluT3jrOBl7GxXrO0SnWGpKmbkvwUwYuIyzWocBMpT6qkLTeqVUAu0EH2dnovnkPPMX7Qtz2IoKEW127MTCQXoACz7QZ0wVb+8MPdWhOmEzr4RD3h+EX0/xeP0xe9BNFU6jVTeXWoOnsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I6bwZMuk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACFE2C4CEE3;
-	Wed, 25 Jun 2025 00:08:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750810091;
-	bh=VB6RjF5qIFd0dFoB+XW85/SNYXcGJtaEsdKLLYK1WQ0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I6bwZMukbdoONRb4Jlg6TvrF7KMpVs2OX+Gr+2XEB4kIB2ccz9xHcyWZT27elPMoO
-	 FlC7Wa7+8NIGGcqeAaOQ/Wqw00mj+EoNEySkDr9yZdhPIj3WL05GtQ8wiwrVuZnuyH
-	 06ewAsJjodRjvu440DMRFZrLJJAcexNlutxv2JWc0PW/qvDJcflXSKnHQmgmuXVOqe
-	 4O6xdiqBOfozEUTd+3IfwXLsZ1HwhgNYNSbNQyYc1pGIrFGMKkvePgq83bedJ3AWwO
-	 2HBRHYL9sHdik25lAvf6418pfzT4isaTbLhjrBvocTIpsGBiHMyhmNRWpabM3Ls7ww
-	 hN58Xk2Ue0g1Q==
-Date: Tue, 24 Jun 2025 17:08:09 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
- <saeedm@nvidia.com>, <gal@nvidia.com>, <leonro@nvidia.com>,
- <tariqt@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <moshe@nvidia.com>, Yevgeny Kliteynik
- <kliteyn@nvidia.com>, Vlad Dogaru <vdogaru@nvidia.com>
-Subject: Re: [PATCH net-next v2 7/8] net/mlx5: HWS, Shrink empty matchers
-Message-ID: <20250624170809.2aac2c69@kernel.org>
-In-Reply-To: <20250622172226.4174-8-mbloch@nvidia.com>
-References: <20250622172226.4174-1-mbloch@nvidia.com>
-	<20250622172226.4174-8-mbloch@nvidia.com>
+	s=arc-20240116; t=1750810780; c=relaxed/simple;
+	bh=a7wjzVy/r7x+Nyd08sAoM4J2gWsjuRd+V4EGUw1R6XQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pCOIT6ninLTaBh9Q7oLM9KWR13S0sClv//TtdLGLp6kRaaxl/UjVkaLN0/h14VPTUaf2Rn7RRIyOgQQs3HJhivM5mmuSSjNXeaDySiW04tOCBC0INsT1h2iumJt/rJd77T24gukajdPtuwui+mceYMbq85fYruV1mCmd9JJTZgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fx366FEQ; arc=none smtp.client-ip=209.85.166.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3df2e7cdc64so7495695ab.1;
+        Tue, 24 Jun 2025 17:19:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750810778; x=1751415578; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yc+3hUor/fe4fOg/ZXIRIZ2LBDoXP14DIJKaJhU8spo=;
+        b=Fx366FEQuPC8bcURb48LKZfEjzJ/sgqqUwZZbTv6QqgOyIb6xCeEzyjVmcg/GKI5za
+         /fIU6rUrGaG2wrrN0DAFWEPNm1xuvoYrg4pZERh6lHuxrZfTvubszIOMj7A7gdSMLfU1
+         R7xyzetyjYz4/M/0LlI29vbdw5fn5JZfg42/rlAhT6UO0OgsMSlE0MnoOcGyOK0N28ES
+         rndLqnielTuqk1+vXjpMi2avYZFP3W7tneNf9HsX96+H3NK7r3EdYSyswr4tDr10/rP7
+         9cu1t+B0wZosdcSwqEFKWtawH8ZCfCuGACnrCXcHjVUbinTR+WoJsdRJ+cNdEGwsI79z
+         WP7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750810778; x=1751415578;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yc+3hUor/fe4fOg/ZXIRIZ2LBDoXP14DIJKaJhU8spo=;
+        b=MV1Ty4P7drP/6ghD+EQAMRczcztemBPUU+tSY7JpsrzRfy6/qhDDbY60kqo35Iu0ER
+         ts2R4ixrT05R5NzYM6v42pfQ9XNcCh/h+GXLLOxpcppxfmG43Z+ysmAQedhPFwmEVHHM
+         HkCiUyigD7qyrvxjOKCOJCgKlwzy0FikqefK0jqdj1Ft+1VAOjJ+joISP62g+GB+eWFd
+         TbUiuIgQ37VU7RJICZS+zxg8vhv36kjbHuxkMNBtNE0LnegbFUESm8+zONnSGU0RbM4z
+         iXEcUTgi/KCTpM891CYL6KhiF+9+K7/fQHdjMWR1OzEvYqjYh8uQYsb8+8o9a+29O72K
+         2YaA==
+X-Forwarded-Encrypted: i=1; AJvYcCVolpJ1AOgQh5HatjgA30WMyRhw33fnvlOEgTL9Wxs1x21ks9lufNYQlFK/SbzTSXk+B4bDpGy3@vger.kernel.org, AJvYcCWvc7QZ9ch62Lh4/ey0I4frRl9XzYstKJcWd+k5LvSDocz285suvrqR+Eq1FySaqE9ZZ6s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxq9mFOkudM95JIgb1/LV5xs1EEx+4IQmLd+ZrxsZB4WThzYtEa
+	AQpUJspB8tPdjfrYJ2yXjjhomecvKiVwuRVRQxcZLPHLIbHQS2gem/qzBDKS1bq9eurzIrNeLvI
+	jOZJNR44EniOT8gNsCCi8W9dTE/8mGiE=
+X-Gm-Gg: ASbGncueabusbegWAGe9tlHdLzIqcniUNyG06DDLLwtvTJ0uReO9demQWLScmfPselK
+	1REGVGJisbf5hU+ZP252Y/D2P/HRmEH5QPMC86GmQ0ZzuOM8+b8W43nZL05dZEaKGOiQ2Jxdws0
+	J+JtHpg9Lv1S+Ol49CbRm8FcZv/zHqpwz241uXf5ITWg==
+X-Google-Smtp-Source: AGHT+IFroH5KsAzHW2FXzYXlZZ9789zcgOoJ1xpqexS+mIEjVqj00OoM0laVq3MOYQXTFzzgjRHg8aqf5DSdN2Oeqs0=
+X-Received: by 2002:a05:6e02:3811:b0:3dd:b5ef:4556 with SMTP id
+ e9e14a558f8ab-3df3290dd68mr16922755ab.18.1750810777698; Tue, 24 Jun 2025
+ 17:19:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250623021345.69211-1-kerneljasonxing@gmail.com> <20250624163114.712a9c43@kernel.org>
+In-Reply-To: <20250624163114.712a9c43@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 25 Jun 2025 08:19:01 +0800
+X-Gm-Features: Ac12FXyjJgvorLi2Ocj62AKXb1mCAGhn4uA6CwcCGwhfuZ8nxXa932I6D_EH2EI
+Message-ID: <CAL+tcoBQvDJO8n7npQjzKBd6HEZ8KhE08g4hRhqokU-bpTe6tw@mail.gmail.com>
+Subject: Re: [PATCH net-next v4] net: xsk: introduce XDP_MAX_TX_BUDGET setsockopt
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
+	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, joe@dama.to, 
+	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 22 Jun 2025 20:22:25 +0300 Mark Bloch wrote:
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
-> index 0a7903cf75e8..b7098c7d2112 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
-> @@ -3,6 +3,8 @@
->  
->  #include "internal.h"
->  
-> +static int hws_bwc_matcher_move(struct mlx5hws_bwc_matcher *bwc_matcher);
+On Wed, Jun 25, 2025 at 7:31=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 23 Jun 2025 10:13:45 +0800 Jason Xing wrote:
+> > @@ -424,7 +421,9 @@ bool xsk_tx_peek_desc(struct xsk_buff_pool *pool, s=
+truct xdp_desc *desc)
+> >       rcu_read_lock();
+> >  again:
+> >       list_for_each_entry_rcu(xs, &pool->xsk_tx_list, tx_list) {
+> > -             if (xs->tx_budget_spent >=3D MAX_PER_SOCKET_BUDGET) {
+> > +             int max_budget =3D READ_ONCE(xs->max_tx_budget);
+> > +
+> > +             if (xs->tx_budget_spent >=3D max_budget) {
+> >                       budget_exhausted =3D true;
+> >                       continue;
+> >               }
+>
+> I still think you're mixing two very different things. In the generic
+> xmit path the value you're changing is a budget. But xsk_tx_peek_desc()
+> *does not* exit after the "per socket budget" gets spent. The per
+> socket budget only controls how many frames we pick from a single sock
+> before we move to the next. But if we run out of budget on all sockets
+> we give every socket a full budget again and start from the first one
 
-Is there a circular dependency? Normally we recommend that people
-reorder code rather that add forward declarations.
+Ah, my fault. Thanks for reminding me. I missed the 'refilling budget'
+process...
+For the record:
+xsk_tx_peek_desc()
+    -> xs->tx_budget_spent =3D 0;
 
->  static u16 hws_bwc_gen_queue_idx(struct mlx5hws_context *ctx)
->  {
->  	/* assign random queue */
-> @@ -409,6 +411,70 @@ static void hws_bwc_rule_cnt_dec(struct mlx5hws_bwc_rule *bwc_rule)
->  		atomic_dec(&bwc_matcher->tx_size.num_of_rules);
->  }
->  
-> +static int
-> +hws_bwc_matcher_rehash_shrink(struct mlx5hws_bwc_matcher *bwc_matcher)
-> +{
-> +	struct mlx5hws_bwc_matcher_size *rx_size = &bwc_matcher->rx_size;
-> +	struct mlx5hws_bwc_matcher_size *tx_size = &bwc_matcher->tx_size;
-> +
-> +	/* It is possible that another thread has added a rule.
-> +	 * Need to check again if we really need rehash/shrink.
-> +	 */
-> +	if (atomic_read(&rx_size->num_of_rules) ||
-> +	    atomic_read(&tx_size->num_of_rules))
-> +		return 0;
-> +
-> +	/* If the current matcher RX/TX size is already at its initial size. */
-> +	if (rx_size->size_log == MLX5HWS_BWC_MATCHER_INIT_SIZE_LOG &&
-> +	    tx_size->size_log == MLX5HWS_BWC_MATCHER_INIT_SIZE_LOG)
-> +		return 0;
-> +
-> +	/* Now we've done all the checking - do the shrinking:
-> +	 *  - reset match RTC size to the initial size
-> +	 *  - create new matcher
-> +	 *  - move the rules, which will not do anything as the matcher is empty
-> +	 *  - destroy the old matcher
-> +	 */
-> +
-> +	rx_size->size_log = MLX5HWS_BWC_MATCHER_INIT_SIZE_LOG;
-> +	tx_size->size_log = MLX5HWS_BWC_MATCHER_INIT_SIZE_LOG;
-> +
-> +	return hws_bwc_matcher_move(bwc_matcher);
-> +}
-> +
-> +static int hws_bwc_rule_cnt_dec_with_shrink(struct mlx5hws_bwc_rule *bwc_rule,
-> +					    u16 bwc_queue_idx)
-> +{
-> +	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
-> +	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
-> +	struct mutex *queue_lock; /* Protect the queue */
-> +	int ret;
-> +
-> +	hws_bwc_rule_cnt_dec(bwc_rule);
-> +
-> +	if (atomic_read(&bwc_matcher->rx_size.num_of_rules) ||
-> +	    atomic_read(&bwc_matcher->tx_size.num_of_rules))
-> +		return 0;
-> +
-> +	/* Matcher has no more rules - shrink it to save ICM. */
-> +
-> +	queue_lock = hws_bwc_get_queue_lock(ctx, bwc_queue_idx);
-> +	mutex_unlock(queue_lock);
-> +
-> +	hws_bwc_lock_all_queues(ctx);
-> +	ret = hws_bwc_matcher_rehash_shrink(bwc_matcher);
-> +	hws_bwc_unlock_all_queues(ctx);
-> +
-> +	mutex_lock(queue_lock);
+> again.
+>
+> For the ZC case the true budget is set by the driver's NAPI loop.
 
-Dropping and re-taking caller-held locks is a bad code smell.
-Please refactor - presumably you want some portion of the condition
-to be under the lock with the dec? return true / false based on that.
-let the caller drop the lock and do the shrink if true was returned
-(directly or with another helper)
+True.
 
-> +	if (unlikely(ret))
-> +		mlx5hws_err(ctx,
-> +			    "BWC rule deletion: shrinking empty matcher failed (%d)\n",
-> +			    ret);
-> +
-> +	return ret;
-> +}
-> +
->  int mlx5hws_bwc_rule_destroy_simple(struct mlx5hws_bwc_rule *bwc_rule)
->  {
->  	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
-> @@ -425,8 +491,8 @@ int mlx5hws_bwc_rule_destroy_simple(struct mlx5hws_bwc_rule *bwc_rule)
->  	mutex_lock(queue_lock);
->  
->  	ret = hws_bwc_rule_destroy_hws_sync(bwc_rule, &attr);
-> -	hws_bwc_rule_cnt_dec(bwc_rule);
->  	hws_bwc_rule_list_remove(bwc_rule);
-> +	hws_bwc_rule_cnt_dec_with_shrink(bwc_rule, idx);
->  
->  	mutex_unlock(queue_lock);
+I will remove this one.
+
+Thanks,
+Jason
+
+> --
+> pw-bot: cr
 
