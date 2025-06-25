@@ -1,111 +1,113 @@
-Return-Path: <netdev+bounces-200908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 780B9AE751D
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 05:11:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E691AE751F
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 05:11:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 169621922372
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 03:11:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6E07175595
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 03:11:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027821D63F8;
-	Wed, 25 Jun 2025 03:11:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36AAD1DDC2B;
+	Wed, 25 Jun 2025 03:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J/2/ozm5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j9ItMkGz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6753D76;
-	Wed, 25 Jun 2025 03:11:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C951D90DF;
+	Wed, 25 Jun 2025 03:11:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750821087; cv=none; b=EtOb0MDSTQ4qhmBWRj6VpQ7KRk9A3bfOgIQaI3/B10r2zDiihepDx81PIyez9xfnxRT1fjIl6Uz6tBZrQWuEBXsA36nwmTEQeud4G+WjOIfvY/4ixqbl6mJp15RfVW5DTjJ0BYGBNtfeA5sd0klKl7wTY8iipL9UGzrtVWMB+q8=
+	t=1750821090; cv=none; b=tgtbVTZVUu0X7UzCuyZWQIhScrtOGn5W62z+csnIXw7ywSc+NQXh6E2jjQeQOPJZMTsBJ7eayJAJRIkBeK+Mw+dSh/dNd7CzLq8oqRLpg3qCRUx9ZjRoVqTmejEpK3Q/Y+JAiRVi6OK9IcGr/aARm78S+OsAt+jUornuIPgsBRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750821087; c=relaxed/simple;
-	bh=dmJlZNkGnYr4lMKNh/KeJpM+mdF8w7szhNRQjOFxOSY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pI+iF9r0iTbn++D7P73xi7cDI4j36zvWDNeuHKlLzYLj9xlQ5xBJge7nx1d7O7kmzh5CjjQsnigDDAqS7/JXXugdv1AHAoLRU4y7IVaSOUziDXPolnjoNzMglPQy/LWjJxh9j9lmtD3YdaNx1zXEuTRU9WlVmReWZAIwAGqw0SM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J/2/ozm5; arc=none smtp.client-ip=209.85.219.50
+	s=arc-20240116; t=1750821090; c=relaxed/simple;
+	bh=TpNMyZrlm4tnbU8qIbQP9OAezqCkZ8eRw46ditrX03g=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=cc84KsUrCKWTEIX1R6DV6oYpVOacXdkZ59/kYM1FViZTGyZzigbJD3WbRPVYFQyInaWoJg0xVnVx9eAwB23E8AuuGC+8MICmRZCeDYeySe4Y7UCY/rL6R0kVvH/y/YCAqDLj/+x5/Gny7JU2dm/pgf15IdjESpPA42VT3pT76V8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j9ItMkGz; arc=none smtp.client-ip=209.85.219.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6fb0eb0f0fbso5338696d6.1;
-        Tue, 24 Jun 2025 20:11:26 -0700 (PDT)
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6fafdd322d3so68603096d6.3;
+        Tue, 24 Jun 2025 20:11:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750821085; x=1751425885; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:feedback-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=37wLyUOFnEhvbHdZdl11U23f9N/UOWSnFyRj6lojqvw=;
-        b=J/2/ozm5KrTcAYJSKEs35JdF9evp2dk7cR5TNUppb0f0pXC3bzo4A1PTKThd9YREi5
-         kkYzKJ/r02MeRO7WuutRc+5HYnu8enhRgwfjvcWCirvj1sJqQyzTWHGkBE21kqZXnJA6
-         WuXkWXd6b4gOa05ZN8fuXDGYht4uTGqGA+hJMu1/Lo2DR9ENtH4qA5GQowLErAC8kAmr
-         NcbsPLgBMZdvUpSUHpXQG1MBX1eO6Llr3TEWw7b72ToJLCd48ycBQmRCT4SXK402bP1W
-         CgmjX5uiLJFel9qxV/6LvSkF5ZyPIoCaLafXHW/JFPqT1vyBEziHzU0b5b0vbbZc2nJm
-         jPDw==
+        d=gmail.com; s=20230601; t=1750821087; x=1751425887; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:feedback-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=boywPtnWXFrorYFTYWBJNeUbr+NvAx7NTSh4JFed8T4=;
+        b=j9ItMkGz0FixI+Qa7A44usw4bQ/lLJM2tmoKM0qTAt2z2/mLtqWfMAF2B3kzY8PzRp
+         Mb8EjXF/HUU+7nYBxfnvyoqT3S0Xhi/nvLBoDpNbSaiR6ThecK7LOiMuEj1TEY9IBGy/
+         ac8Hdi5L7DI8m6qxwLylzsrUApGCsj9uXcMBOHuYHxdlGbzfVLHcD5qKuSqq6MR84Znz
+         Xx/uDimfaxgubDfpeM1B4ahtriAfAeavW5dxSiZGqxRcS+Q9EvksiSCiDDRsI/S2VWz4
+         ZLEsOLDrQXxM5V17QuseZRya93ma8E8tlVh73AZ+TRhoAAcFTYYCjTukQqvPJxGj/erl
+         A/eA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750821085; x=1751425885;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:feedback-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=37wLyUOFnEhvbHdZdl11U23f9N/UOWSnFyRj6lojqvw=;
-        b=Hn//Zu4EtaMfcBPd0ofpCU3TjCKEcq89mx8i19stPGTAjsYTgLHR09rFd1snrgeytO
-         UQj5qanPmVOyCwxnCc7dv0jJVgDqeJ0HUUpxMBaSym8mtbf0hvJbZU++SEOPUO5poHf+
-         iy5KYqg72+qilHlvHRrYRyCrqUlqT8BQEci9hQuIjMVpOkgOxTDA+Wd8cIjaXT6q+l4L
-         tDH/r8KFDwrRDjYpMkPJrPaexUth78sOtuj7VR9kyB3mj4IYHIfGT2Uu+GogvemDz8iT
-         q/J0CSUJWJj7qEOFyxNIDpgDFVVTnw0vjt+iyVt85JKdmJa0zUzU63ZLWh57WOCTFm+X
-         bd+w==
-X-Forwarded-Encrypted: i=1; AJvYcCWBXIrBnWZaWvVaUfz1DKl5mE7BUGeSroUzHUiMwQTj2MYXWyYtTzUjaxcU/lMYPRdD9JU1@vger.kernel.org, AJvYcCX6ZnJMJ8gm/yxcRirLtKSa023g0ZEH8O6n8oRl0YUsf0UgU4YCcVCw+tf71I+L1wbZZ9EgT9M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyR/33UaszWA4dHrWS3DZFpETyN4SP+iGsXJ5MHnZBqRybGnnb4
-	UIapSLQ0r2VNKk6kona4I1y0fLz7xqmCgzc6B1qS/s4lgQqmnT68sQej
-X-Gm-Gg: ASbGncvB7x/QphMk2e/iOpTRQi68T9I6igVPZ0upnCxUYouSaUGEEJ0zhWfMY0zRfg/
-	xbLEPAqpi+S9wGlf9/ZNq5Wwpvj1Ug1zpU1vZ6xWeB82ALYDVEPIJTBmj2N0uGU81dLU7CVKeG6
-	XSQsdEuwmms9UQjzebzJI7084kGVBLRsi3KXWguFydiCxv48wvC6WucheHS7KGBQO+NASaak5cQ
-	emFhWqqN5sj1LyySpu69scYvtGbREK/ajmnnRpY4dRld5I4yIZt3V37E+hXEPaTRaU9tSB3Ujal
-	daAsY2aokfDZ2ApZmCMG+nl78pq2ELA8WH5pxZzUh0sinHtYQYjxr+KybXF2YwKHGY7vltArOCf
-	7YFDICOdS1T4y/lup4pEQMYCa9b2LhdLDzM4pyPutemE3VHAPkHJh
-X-Google-Smtp-Source: AGHT+IEaKhNkzW0FbV9f70GZpEk7DuWFP3tTqujTO5SU7v0JJSU26+B+8T1tUhbIvgQO9vAEkRQw4A==
-X-Received: by 2002:a05:6214:4f14:b0:6fa:edb8:b343 with SMTP id 6a1803df08f44-6fd387ec5b8mr75990336d6.2.1750821085027;
-        Tue, 24 Jun 2025 20:11:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750821087; x=1751425887;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:feedback-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=boywPtnWXFrorYFTYWBJNeUbr+NvAx7NTSh4JFed8T4=;
+        b=tOQ6gM+QshLUq5u2IHHpcrwDDwnq/XHVtt6D1hgDdclEzzbjSidS+mV+s9A5CX8u3H
+         doXcOFKHCEPps+Ysg/1T0ZqBsB7NfxlBvL/GCg01Mc/7RRJb1ReVJRofa6lDBZWLTDlh
+         Dkk6KOV80hEjfyOVS/+TuElLKDG8zB/MKPkyTc9uLdk7Rad/ZDRk5NqbJX5q0pe0WF3s
+         KZXXBHX1ImScJczlzCyPbaxgjhQvWXkFUEqMwwJnIynVHRYnYNkWjMsemeFF89L5/7PV
+         oeKUrqmsVjvMjoFl3bnzI/xH2v0iK0jYLTNELdEQPjKBTjj2X5nF/RqxA3lMKpHOyjeQ
+         pIFw==
+X-Forwarded-Encrypted: i=1; AJvYcCWZebJT/5CE3yD8JRJ1h+ZYcF+xQXXrGCWaSA4QIs8z8RkvdBCu7LaNj4fDNV9SaM3ijQ3A@vger.kernel.org, AJvYcCWrFgEizx9g0EFWSS2R2m06cSl5pW6cXrsdYjSddS7d94oV99u4Rfz9nJLiJPs7lnwaceHGUMM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNhrH8ZrDqkk+tll1rvMwtlmw/c+pDdkINRJF29PIDXQoq87CV
+	u5Vw0MralNuIK/wlKKh4PUA90QRlPfInS7eZJIjnCT6O2KUmHsXHGzeh
+X-Gm-Gg: ASbGncsUKfFlVRwsD5nEohsJJ0NS3hSgLCP6vh4OvUERVXAKsDr4p52ctKZx+sHipPR
+	H+KhvgxVB0z8h3Wn8lp3oPmYtndYGfv75PdZsjxcyeKrXDoFPSbq7RRcta12EYJSFpltHED9S4g
+	drrbLUZ/FCAd7LeC8I/vtm5a9nYwEfqykolWdnoFL5tdkuQ4GQmlpks24o242mT+vxHg86TGz6R
+	mmPDkroWumxq/YTUuL4PPIOx6HrjxeVnMBmxllMmQ0V3asOnoxdlOCa+K28nfRPA91cwrtMH9Mq
+	Vopat+OMYUpk14m5428N2h2LFNo9RyxfQJnVjh4n6c+zemDj+KBHhMM2ICVZkartHSrEmqiNUlF
+	CeFZuKpfu1ttRl/76bv8pRNj4/uGLrZw6OwPy+ls3rqyFCrrUum6f
+X-Google-Smtp-Source: AGHT+IGSm71fAe04SBpyuIDvnyyRGSPKtLQRNbYp3JCDXDkvCoRWay4YKL+d8dRstEpJV4yfKMo0Cg==
+X-Received: by 2002:ad4:5f85:0:b0:6fa:c81a:621b with SMTP id 6a1803df08f44-6fd5ef42043mr21228666d6.14.1750821087055;
+        Tue, 24 Jun 2025 20:11:27 -0700 (PDT)
 Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d3f99efaa9sm567189785a.58.2025.06.24.20.11.23
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd1c2c544bsm43838116d6.30.2025.06.24.20.11.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jun 2025 20:11:24 -0700 (PDT)
-Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 9CE32F40066;
-	Tue, 24 Jun 2025 23:11:23 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Tue, 24 Jun 2025 23:11:23 -0400
-X-ME-Sender: <xms:22hbaLUxtLizeeFIafMYrMGPO6_IUUROpxUeMU-9dXMgPpLVSv5-JQ>
-    <xme:22hbaDnkM5oDjL7Fb72WmIxb1SAadqxuznNCFtw914xf2mbBqY4QqpIX-VBMDJXL5
-    RbwiyXW6PFZNs0l8Q>
-X-ME-Received: <xmr:22hbaHa6DxExEPIbPJ2_uMAz2a_Hw4xJHrsLKy0mV-dtHV6UMLmrzSfTAQ>
+        Tue, 24 Jun 2025 20:11:26 -0700 (PDT)
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 17AD4F40066;
+	Tue, 24 Jun 2025 23:11:26 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-09.internal (MEProxy); Tue, 24 Jun 2025 23:11:26 -0400
+X-ME-Sender: <xms:3WhbaByz6eoAOuuNVOH22m3lV3L9CsA1OzrSuzd6rQwM_IF6s_G2Qg>
+    <xme:3WhbaBSHMqpCnc5F1GahG5rvAZRHHoy7kHE-3pe7-Ph6kDNUXbXwjPRpceykZPv7r
+    sYVO3sceET-TnfDFQ>
+X-ME-Received: <xmr:3WhbaLXTr7J34C3T81DJQZm2bwXONkCy9JDMaHsMhK1wFbw88McLnfF6sA>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtddvgddvudeihecutefuodetggdotefrod
     ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
     ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeeuohhquhhnucfhvghn
-    ghcuoegsohhquhhnrdhfvghnghesghhmrghilhdrtghomheqnecuggftrfgrthhtvghrnh
-    epgeegueekgefhvedukedtveejhefhkeffveeufeduiedvleetledtkeehjefgieevnecu
-    ffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurf
-    grrhgrmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshho
-    nhgrlhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghngh
-    eppehgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepvdei
-    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvh
-    hgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehrtghusehvghgvrhdrkhgvrhhn
-    vghlrdhorhhgpdhrtghpthhtoheplhhkmhhmsehlihhsthhsrdhlihhnuhigrdguvghvpd
-    hrtghpthhtohepphgvthgvrhiisehinhhfrhgruggvrggurdhorhhgpdhrtghpthhtohep
-    mhhinhhgoheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepfihilhhlsehkvghrnhgvlh
-    drohhrghdprhgtphhtthhopegsohhquhhnrdhfvghnghesghhmrghilhdrtghomhdprhgt
-    phhtthhopehlohhnghhmrghnsehrvgguhhgrthdrtghomhdprhgtphhtthhopegurghvvg
-    esshhtghholhgrsghsrdhnvght
-X-ME-Proxy: <xmx:22hbaGXU4-JtYzfbe7cuBsHYKmE_1xV7XkWwHwwfiJ0JVw1rA7CSlA>
-    <xmx:22hbaFnxM-vxVdj0pYO1Kgig0ovL9XbDKLHawDGt-k70AQw5LeYj1w>
-    <xmx:22hbaDdV5vwCEe1RFQ5s0JQ_isQr0qpXEQmLRbcmtb5U3JJRmKoazQ>
-    <xmx:22hbaPFD81Gef9jXtG6HTgG6fTqC8h8qsh_iZkeVYp6rvJyOD83f1Q>
-    <xmx:22hbaHlAexzm1mL7loKjEe67Ld19d_IzmXP54NmhEH7thDh5YDmL9ehm>
+    hrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeeuohhquhhnucfh
+    vghnghcuoegsohhquhhnrdhfvghnghesghhmrghilhdrtghomheqnecuggftrfgrthhtvg
+    hrnhepgffhffevhffhvdfgjefgkedvlefgkeegveeuheelhfeivdegffejgfetuefgheei
+    necuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
+    curfgrrhgrmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghr
+    shhonhgrlhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvg
+    hngheppehgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohep
+    vdeipdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlh
+    esvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehrtghusehvghgvrhdrkhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtoheplhhkmhhmsehlihhsthhsrdhlihhnuhigrdguvg
+    hvpdhrtghpthhtohepphgvthgvrhiisehinhhfrhgruggvrggurdhorhhgpdhrtghpthht
+    ohepmhhinhhgoheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepfihilhhlsehkvghrnh
+    gvlhdrohhrghdprhgtphhtthhopegsohhquhhnrdhfvghnghesghhmrghilhdrtghomhdp
+    rhgtphhtthhopehlohhnghhmrghnsehrvgguhhgrthdrtghomhdprhgtphhtthhopegurg
+    hvvgesshhtghholhgrsghsrdhnvght
+X-ME-Proxy: <xmx:3WhbaDgu0XJd10XykLp5KOj6_Ba-AzkcTyX3fCt1H78glmdtLxZt7Q>
+    <xmx:3WhbaDDCejoWtF8W9iTjodP-KlBmOQN7UllXdsTt8E6gqOallW5w-g>
+    <xmx:3WhbaMJq4lV_cYF4ZKlnMqH6y96puf8UFVHvtFhuU1L3p7FGh-aH6w>
+    <xmx:3WhbaCBSxxYaCH74trqxFuU-X_UCjZnosmG5Vn9q6I34coDCZlPOkQ>
+    <xmx:3mhbaHyE10R5yEuAJfZ6_R33m-IVjO6WyKbJooNCZNkmT511yf278yCC>
 Feedback-ID: iad51458e:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 24 Jun 2025 23:11:23 -0400 (EDT)
+ 24 Jun 2025 23:11:24 -0400 (EDT)
 From: Boqun Feng <boqun.feng@gmail.com>
 To: linux-kernel@vger.kernel.org,
 	rcu@vger.kernel.org,
@@ -133,10 +135,12 @@ Cc: Peter Zijlstra <peterz@infradead.org>,
 	jhs@mojatatu.com,
 	kernel-team@meta.com,
 	Erik Lundgren <elundgren@meta.com>
-Subject: [PATCH 0/8] Introduce simple hazard pointers for lockdep
-Date: Tue, 24 Jun 2025 20:10:53 -0700
-Message-Id: <20250625031101.12555-1-boqun.feng@gmail.com>
+Subject: [PATCH 1/8] Introduce simple hazard pointers
+Date: Tue, 24 Jun 2025 20:10:54 -0700
+Message-Id: <20250625031101.12555-2-boqun.feng@gmail.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250625031101.12555-1-boqun.feng@gmail.com>
+References: <20250625031101.12555-1-boqun.feng@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -145,127 +149,180 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+As its name suggests, simple hazard pointers (shazptr) is a
+simplification of hazard pointers [1]: it has only one hazard pointer
+slot per-CPU and is targeted for simple use cases where the read-side
+already has preemption disabled. It's a trade-off between full features
+of a normal hazard pointer implementation (multiple slots, dynamic slot
+allocation, etc.) and the simple use scenario.
 
-This is the official first version of simple hazard pointers following
-the RFC:
+Since there's only one slot per-CPU, so shazptr read-side critical
+section nesting is a problem that needs to be resolved, because at very
+least, interrupts and NMI can introduce nested shazptr read-side
+critical sections. A SHAZPTR_WILDCARD is introduced to resolve this:
+SHAZPTR_WILDCARD is a special address value that blocks *all* shazptr
+waiters. In an interrupt-causing shazptr read-side critical section
+nesting case (i.e. an interrupt happens while the per-CPU hazard pointer
+slot being used and tries to acquire a hazard pointer itself), the inner
+critical section will switch the value of the hazard pointer slot into
+SHAZPTR_WILDCARD, and let the outer critical section eventually zero the
+slot. The SHAZPTR_WILDCARD still provide the correct protection because
+it blocks all the waiters.
 
-	https://lore.kernel.org/lkml/20250414060055.341516-1-boqun.feng@gmail.com/
+It's true that once the wildcard mechanism is activated, shazptr
+mechanism may be downgrade to something similar to RCU (and probably
+with a worse implementation), which generally has longer wait time and
+larger memory footprint compared to a typical hazard pointer
+implementation. However, that can only happen with a lot of users using
+hazard pointers, and then it's reasonable to introduce the
+fully-featured hazard pointer implementation [2] and switch users to it.
 
-I rebase it onto v6.16-rc3 and hope to get more feedback this time.
+Note that shazptr_protect() may be added later, the current potential
+usage doesn't require it, and a shazptr_acquire(), which installs the
+protected value to hazard pointer slot and proves the smp_mb(), is
+enough for now.
 
-Thanks a lot for Breno Leitao to try the RFC out and share the numbers.
+[1]: M. M. Michael, "Hazard pointers: safe memory reclamation for
+     lock-free objects," in IEEE Transactions on Parallel and
+     Distributed Systems, vol. 15, no. 6, pp. 491-504, June 2004
 
-I did an extra comparison this time, between the shazptr solution and
-the synchronize_rcu_expedited() solution. In my test, during a 100 times
-"tc qdisc replace" run:
-
-* IPI rate with the shazptr solution: ~14 per second per core.
-* IPI rate with synchronize_rcu_expedited(): ~140 per second per core.
-
-(IPI results were from the 'CAL' line in /proc/interrupt)
-
-This shows that while both solutions have the similar speedup, shazptr
-solution avoids the introduce of high IPI rate compared to
-synchronize_rcu_expedited().
-
-Feedback is welcome and please let know if there is any concern or
-suggestion. Thanks!
-
-Regards,
-Boqun
-
---------------------------------------
-Please find the old performance below:
-
-On my system (a 96-cpu VMs), the results of:
-
-	time /usr/sbin/tc qdisc replace dev eth0 root handle 0x1: mq
-
-are (with lockdep enabled):
-
-	(without the patchset)
-	real    0m1.039s
-	user    0m0.001s
-	sys     0m0.069s
-
-	(with the patchset)
-	real    0m0.053s
-	user    0m0.000s
-	sys     0m0.051s
-
-i.e. almost 20x speed-up.
-
-Other comparisons between RCU and shazptr, the rcuscale results (using
-default configuration from
-tools/testing/selftests/rcutorture/bin/kvm.sh):
-
-RCU:
-
-	Average grace-period duration: 7470.02 microseconds
-	Minimum grace-period duration: 3981.6
-	50th percentile grace-period duration: 6002.73
-	90th percentile grace-period duration: 7008.93
-	99th percentile grace-period duration: 10015
-	Maximum grace-period duration: 142228
-
-shazptr:
-
-	Average grace-period duration: 0.845825 microseconds
-	Minimum grace-period duration: 0.199
-	50th percentile grace-period duration: 0.585
-	90th percentile grace-period duration: 1.656
-	99th percentile grace-period duration: 3.872
-	Maximum grace-period duration: 3049.05
-
-shazptr (skip_synchronize_self_scan=1, i.e. always let scan kthread to
-wakeup):
-
-	Average grace-period duration: 467.861 microseconds
-	Minimum grace-period duration: 92.913
-	50th percentile grace-period duration: 440.691
-	90th percentile grace-period duration: 460.623
-	99th percentile grace-period duration: 650.068
-	Maximum grace-period duration: 5775.46
-
-shazptr_wildcard (i.e. readers always use SHAZPTR_WILDCARD):
-
-	Average grace-period duration: 599.569 microseconds
-	Minimum grace-period duration: 1.432
-	50th percentile grace-period duration: 582.631
-	90th percentile grace-period duration: 781.704
-	99th percentile grace-period duration: 1160.26
-	Maximum grace-period duration: 6727.53
-
-shazptr_wildcard (skip_synchronize_self_scan=1):
-
-	Average grace-period duration: 460.466 microseconds
-	Minimum grace-period duration: 303.546
-	50th percentile grace-period duration: 424.334
-	90th percentile grace-period duration: 482.637
-	99th percentile grace-period duration: 600.214
-	Maximum grace-period duration: 4126.94
-
-Boqun Feng (8):
-  Introduce simple hazard pointers
-  shazptr: Add refscale test
-  shazptr: Add refscale test for wildcard
-  shazptr: Avoid synchronize_shaptr() busy waiting
-  shazptr: Allow skip self scan in synchronize_shaptr()
-  rcuscale: Allow rcu_scale_ops::get_gp_seq to be NULL
-  rcuscale: Add tests for simple hazard pointers
-  locking/lockdep: Use shazptr to protect the key hashlist
-
- include/linux/shazptr.h  |  73 +++++++++
- kernel/locking/Makefile  |   2 +-
- kernel/locking/lockdep.c |  11 +-
- kernel/locking/shazptr.c | 318 +++++++++++++++++++++++++++++++++++++++
- kernel/rcu/rcuscale.c    |  60 +++++++-
- kernel/rcu/refscale.c    |  77 ++++++++++
- 6 files changed, 534 insertions(+), 7 deletions(-)
+Link: https://lore.kernel.org/lkml/20240917143402.930114-1-boqun.feng@gmail.com/ [2]
+Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
+---
+ include/linux/shazptr.h  | 73 ++++++++++++++++++++++++++++++++++++++++
+ kernel/locking/Makefile  |  2 +-
+ kernel/locking/shazptr.c | 29 ++++++++++++++++
+ 3 files changed, 103 insertions(+), 1 deletion(-)
  create mode 100644 include/linux/shazptr.h
  create mode 100644 kernel/locking/shazptr.c
 
+diff --git a/include/linux/shazptr.h b/include/linux/shazptr.h
+new file mode 100644
+index 000000000000..287cd04b4be9
+--- /dev/null
++++ b/include/linux/shazptr.h
+@@ -0,0 +1,73 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Simple hazard pointers
++ *
++ * Copyright (c) 2025, Microsoft Corporation.
++ *
++ * Author: Boqun Feng <boqun.feng@gmail.com>
++ *
++ * A simple variant of hazard pointers, the users must ensure the preemption
++ * is already disabled when calling a shazptr_acquire() to protect an address.
++ * If one shazptr_acquire() is called after another shazptr_acquire() has been
++ * called without the corresponding shazptr_clear() has been called, the later
++ * shazptr_acquire() must be cleared first.
++ *
++ * The most suitable usage is when only one address need to be protected in a
++ * preemption disabled critical section.
++ */
++
++#ifndef _LINUX_SHAZPTR_H
++#define _LINUX_SHAZPTR_H
++
++#include <linux/cleanup.h>
++#include <linux/percpu.h>
++
++/* Make ULONG_MAX the wildcard value */
++#define SHAZPTR_WILDCARD ((void *)(ULONG_MAX))
++
++DECLARE_PER_CPU_SHARED_ALIGNED(void *, shazptr_slots);
++
++/* Represent a held hazard pointer slot */
++struct shazptr_guard {
++	void **slot;
++	bool use_wildcard;
++};
++
++/*
++ * Acquire a hazptr slot and begin the hazard pointer critical section.
++ *
++ * Must be called with preemption disabled, and preemption must remain disabled
++ * until shazptr_clear().
++ */
++static inline struct shazptr_guard shazptr_acquire(void *ptr)
++{
++	struct shazptr_guard guard = {
++		/* Preemption is disabled. */
++		.slot = this_cpu_ptr(&shazptr_slots),
++		.use_wildcard = false,
++	};
++
++	if (likely(!READ_ONCE(*guard.slot))) {
++		WRITE_ONCE(*guard.slot, ptr);
++	} else {
++		guard.use_wildcard = true;
++		WRITE_ONCE(*guard.slot, SHAZPTR_WILDCARD);
++	}
++
++	smp_mb(); /* Synchronize with smp_mb() at synchronize_shazptr(). */
++
++	return guard;
++}
++
++static inline void shazptr_clear(struct shazptr_guard guard)
++{
++	/* Only clear the slot when the outermost guard is released */
++	if (likely(!guard.use_wildcard))
++		smp_store_release(guard.slot, NULL); /* Pair with ACQUIRE at synchronize_shazptr() */
++}
++
++void synchronize_shazptr(void *ptr);
++
++DEFINE_CLASS(shazptr, struct shazptr_guard, shazptr_clear(_T),
++	     shazptr_acquire(ptr), void *ptr);
++#endif
+diff --git a/kernel/locking/Makefile b/kernel/locking/Makefile
+index a114949eeed5..1517076c98ec 100644
+--- a/kernel/locking/Makefile
++++ b/kernel/locking/Makefile
+@@ -3,7 +3,7 @@
+ # and is generally not a function of system call inputs.
+ KCOV_INSTRUMENT		:= n
+ 
+-obj-y += mutex.o semaphore.o rwsem.o percpu-rwsem.o
++obj-y += mutex.o semaphore.o rwsem.o percpu-rwsem.o shazptr.o
+ 
+ # Avoid recursion lockdep -> sanitizer -> ... -> lockdep & improve performance.
+ KASAN_SANITIZE_lockdep.o := n
+diff --git a/kernel/locking/shazptr.c b/kernel/locking/shazptr.c
+new file mode 100644
+index 000000000000..991fd1a05cfd
+--- /dev/null
++++ b/kernel/locking/shazptr.c
+@@ -0,0 +1,29 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Simple hazard pointers
++ *
++ * Copyright (c) 2025, Microsoft Corporation.
++ *
++ * Author: Boqun Feng <boqun.feng@gmail.com>
++ */
++
++#include <linux/atomic.h>
++#include <linux/cpumask.h>
++#include <linux/shazptr.h>
++
++DEFINE_PER_CPU_SHARED_ALIGNED(void *, shazptr_slots);
++EXPORT_PER_CPU_SYMBOL_GPL(shazptr_slots);
++
++void synchronize_shazptr(void *ptr)
++{
++	int cpu;
++
++	smp_mb(); /* Synchronize with the smp_mb() in shazptr_acquire(). */
++	for_each_possible_cpu(cpu) {
++		void **slot = per_cpu_ptr(&shazptr_slots, cpu);
++		/* Pair with smp_store_release() in shazptr_clear(). */
++		smp_cond_load_acquire(slot,
++				      VAL != ptr && VAL != SHAZPTR_WILDCARD);
++	}
++}
++EXPORT_SYMBOL_GPL(synchronize_shazptr);
 -- 
 2.39.5 (Apple Git-154)
 
