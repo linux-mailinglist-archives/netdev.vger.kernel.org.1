@@ -1,106 +1,75 @@
-Return-Path: <netdev+bounces-200894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E345AE7419
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 03:10:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C54EAE7420
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 03:11:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFA2217F636
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 01:10:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDEC117E4F4
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 01:11:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20D901474CC;
-	Wed, 25 Jun 2025 01:09:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ADD5126F0A;
+	Wed, 25 Jun 2025 01:11:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bxyVSObC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U4iiJiki"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEDEB347B4
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 01:09:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D301F1E4BE;
+	Wed, 25 Jun 2025 01:11:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750813783; cv=none; b=H+PEhybdauAHsnxX/W4rB9XVym/FGtFDU15gcFe5TS9/5UzWn4dCEst+p6CUXR9m75g8t/wnhl6Cbtb1azWfjKe4NZOx5vpc/kUu0DVWF+SsPld8deOjoXrf0N+j2t5NMUE+iO3t9lbonyrQEazkkDeMnnJ47POJTDF66qskFBI=
+	t=1750813905; cv=none; b=mUUEzI0DiP/0mWHWKhR4TnACF5w/CgVw6tFBiaWaC0YEUxPtw6um7HYyrcRt9u5hZTguJzuVmGefaIeVqAS7Dso5zP46cbZSt7NgpOg6DiHWfpJ6xx9M4jBvLMMk4euWmT1dHrC14zYSFMBalBwl1VfRkzeaSOgWf8qActBcMF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750813783; c=relaxed/simple;
-	bh=3cR89uuv992quZ5YRC1rXsho1Mazrjn5Gop+SsDSomY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Qg/CAoB/0hKaiKwr1ltlkf5bdsUoQKjM3x3Uo0HbM9bQ5LyU+lewWSU+WwckqdysRD/tqzi0Zy7mRGivCCCguoZNiqfe3XFZWw+ctTU/RaNVWwmhgT8Qd2IeZ+pLad5UrUNB6fcCDmht8iucmIJxemH4yPTSvaodE6E7V8tlRfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bxyVSObC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79CA1C4CEF0;
-	Wed, 25 Jun 2025 01:09:42 +0000 (UTC)
+	s=arc-20240116; t=1750813905; c=relaxed/simple;
+	bh=J7mskIOl6mooDicAfCx/bLYXvIrbA0wCKKMXKC4Ob4Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=s9sayPDbzDpCFZu9tg/6KHw5NYPYyjtm9dxrmUJ26WsPnrr7Gk7GtZ6tzOe2iqgIAvFnzmfDcIrU3/zNbn4w26cBmJNpJvHvGiTwDDX0P8jwvWE6keGyKWppSauO3j3ddo2cttKkIgiZ3ylZN5HxrdRjKjeR55bRAmhqfw0UYdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U4iiJiki; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6E83C4CEF0;
+	Wed, 25 Jun 2025 01:11:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750813782;
-	bh=3cR89uuv992quZ5YRC1rXsho1Mazrjn5Gop+SsDSomY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bxyVSObCNH7GxM7ykTZ5TR8g/PBBofKnjmuL1bGYSyoKH9Inncewv/wkQrPk/o+Z/
-	 rVXAN92WcY7sIvahcxxx2rEWr7gcVoD0Syii2rNx0XCR1+5Bg8boFadolOWDudLsqG
-	 cNvaTWLnex9viWMkxztdmBskbwvqk/EcBoageqdgqUxpDa7+js7XpleqIsBkV15I5z
-	 hDtGtDDqjFeeD7fh3tqcH+xzw7NyBUasPSyjiPo5vJjtbMW8CjWymGUmasfk+Abcgi
-	 V7MANGCRdUsUSPV1iOR51IzRuQj2wuAE+nPRuaZlLK9AqDPE0Ti4OEWoft5qbCNju9
-	 U0b7HrilavzaA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B2439FEB73;
-	Wed, 25 Jun 2025 01:10:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1750813905;
+	bh=J7mskIOl6mooDicAfCx/bLYXvIrbA0wCKKMXKC4Ob4Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=U4iiJikiRVIDFHdX3jSVgsKA0BadcI31/tXpsbHSG0/GavRjf+XHhUiIjOWtHsDRE
+	 MNfKUvablXbnnyGk9cSAdL+fj2yxpzp8HcPc+di2aN/7thWaDY1yq/JJhAjgEhTp+C
+	 Am5/1IPsgkKixGYXeoHb25OwtR+4P660BhbxyrtqdaZIHV1r1cK9fpn+fiplFY03z+
+	 lfAb+sUaVBvZEf+LkjY3u32vZhMD/v6dKyk5D558s01uTAmJaJtN8KljEOX4E0abxK
+	 qJnCxr7AmYfSKiREKVBYdbhAs1LWToL1uXLcbXNj4xPhkGoKlMYG2h5Xf22sDVONz+
+	 FwrvZb0lEk9kQ==
+Date: Tue, 24 Jun 2025 18:11:43 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, imx@lists.linux.dev
+Subject: Re: [PATCH v2 net-next 0/3] change some statistics to 64-bit
+Message-ID: <20250624181143.6206a518@kernel.org>
+In-Reply-To: <20250624101548.2669522-1-wei.fang@nxp.com>
+References: <20250624101548.2669522-1-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: xsk: dpaa2: avoid repeatedly updating the
- global consumer
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175081380923.4090877.16334008056847713853.git-patchwork-notify@kernel.org>
-Date: Wed, 25 Jun 2025 01:10:09 +0000
-References: <20250623120159.68374-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20250623120159.68374-1-kerneljasonxing@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com,
- maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me,
- ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com, willemdebruijn.kernel@gmail.com,
- ioana.ciornei@nxp.com, netdev@vger.kernel.org, kernelxing@tencent.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 24 Jun 2025 18:15:45 +0800 Wei Fang wrote:
+> The port MAC counters of ENETC are 64-bit registers and the statistics
+> of ethtool are also u64 type, so add enetc_port_rd64() helper function
+> to read 64-bit statistics from these registers, and also change the
+> statistics of ring to unsigned long type to be consistent with the
+> statistics type in struct net_device_stats.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 23 Jun 2025 20:01:59 +0800 you wrote:
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> This patch avoids another update of the consumer at the end of
-> dpaa2_xsk_tx().
-> 
-> In the zero copy xmit path, two versions (batched and non-batched)
-> regarding how the consumer of tx ring changes are implemented in
-> xsk_tx_peek_release_desc_batch() that eventually updates the local
-> consumer to the global consumer in either of the following call trace:
-> 1) batched mode:
->    xsk_tx_peek_release_desc_batch()
->        __xskq_cons_release()
-> 2) non-batched mode:
->    xsk_tx_peek_release_desc_batch()
->        xsk_tx_peek_release_fallback()
->            xsk_tx_release()
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] net: xsk: dpaa2: avoid repeatedly updating the global consumer
-    https://git.kernel.org/netdev/net-next/c/da7aee716163
-
-You are awesome, thank you!
+this series adds almost 100 sparse warnings
+please trying building it with C=1
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
