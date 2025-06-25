@@ -1,52 +1,99 @@
-Return-Path: <netdev+bounces-201029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A445AE7E71
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 12:04:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 163F0AE7EBF
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 12:12:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD4BF16C7FC
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:04:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53F84188604E
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:12:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87832285C80;
-	Wed, 25 Jun 2025 10:04:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 065C229DB86;
+	Wed, 25 Jun 2025 10:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GerdQn1n"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9F81F460B;
-	Wed, 25 Jun 2025 10:04:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A3A29CB5A;
+	Wed, 25 Jun 2025 10:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750845881; cv=none; b=sjhBT6nW4s16Vbs+RA/Fy6K8lJxm/6hSR3LmeJRj9kiVxXxjZG1jgbWlWHd0Ww+7hgMQssKkIYX3g3VPgmbZKSW4g/aQTrgf2SXR/dZ5iu3Tx2Dk5VGkepEN4XL+HP2DiZP8yJS/LdcZetoKTVgR9/sUPafM7zV9GC6VYa60/sk=
+	t=1750846227; cv=none; b=Xcwwpq48Mc/bvc+uNqntMo7DDrZj5siL80zfiquy2oQv3HfiLhPqpJ1q3fYKqS+k437fZq3tr1PHtG81/ZfZ01whUKzTpQ7oziHZqWwmRe53MXaQ+SAjpVWumCIauOlufHoN+MdScp9M6rbH7EFmik5wfssjUGonAO84gZnwHFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750845881; c=relaxed/simple;
-	bh=GvIaJF5+J/InRTOZVzTLzmt/zTQ4aOIgzf23NRiEfPM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Y8ZhxOybLJzK7432FILUhhehTeRYBfrtvbD+4kYnsTUm14TYQZrf82kYxApxoXpjrkF1Fqd6DCDrtjn3JYqHwgCF6WPp1ySNbFiglL7G8VP6bpADJP9NtrLsriVbgK0lIPu5Q1iONQmP06VGqy7y+rosLk7VHqOqJ3rAWQOhoH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4bRyB25xydz2QTxx;
-	Wed, 25 Jun 2025 18:05:30 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id A9B4E1A016C;
-	Wed, 25 Jun 2025 18:04:35 +0800 (CST)
-Received: from huawei.com (10.175.124.27) by dggpemf500002.china.huawei.com
- (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 25 Jun
- 2025 18:04:34 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<yuehaibing@huawei.com>
-Subject: [PATCH net-next] net: Remove unused function first_net_device_rcu()
-Date: Wed, 25 Jun 2025 18:21:55 +0800
-Message-ID: <20250625102155.483570-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1750846227; c=relaxed/simple;
+	bh=SnMF6+mz1nF2E+YRW5/AkEU84EPBVwPu2NzXR5bmmvI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jkL3CI7okpbzZIdCla94WcE7RhoZ17+2HOVKFqp5uXQhWXILWazoEQeAMZM0MhBuX4jc/Jq1zItX4ldNaLTNLEAuIB+Zh3trd1xuSSkYpy/+ruBkGF+a3R1Sovm00t6OFGRtJ6bIZKIykDmYmx05uQj1OiAZRzp2jHESW8lX10g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GerdQn1n; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-315f6b20cf9so636186a91.2;
+        Wed, 25 Jun 2025 03:10:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750846226; x=1751451026; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=t14IVCWIL6UwGFpbstnKzIoJsAN1dFHEc5LI7VsNxvo=;
+        b=GerdQn1nPcNv9orraDgGO417fjhv9AizRg/vVAwkQ6YoYC5meAhmG2Z/zK2TmFlhB+
+         ArGMeUTdU+efwDmy7FBdQ1oC/VwTFSppd7MXQ4pbtTRSf5Fmt0rRgvjvdwdQ2iNlQXo4
+         jLqcHToWtIW1lAm2vW4hyYTwcJ5eiQphTTcGt4KyljIgwAQjrw3YY2QzrWgoMP39dcKI
+         A3a6qDaWV6mWFYdgPVP7/IxA3De2U8ym2EJbGrH1/qQNBe4OMaIENL6hjBCoDdxYVDPu
+         vAYLZqL7DZ6jcARCF1LEIj36bcrpopQgG3iRnI/DfXukwRWA1WaVbQ/t32djAoZViZbb
+         lX3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750846226; x=1751451026;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=t14IVCWIL6UwGFpbstnKzIoJsAN1dFHEc5LI7VsNxvo=;
+        b=fB5cjrR4L6LRhbrEXuT1I7DTT046snWTNC/AxM9XjllOFxyeN2L4xek3niRyqENc0i
+         EvqMN3zRlZH55B04INyM5bz1lu91tu0UtuLmpMNnp3ojTkYvYQ2NXn+JfdwD9g/Dqe4d
+         RykwxN7jQ+sUEqRQRpUbYAB33e8P/onQ1//5wLLbuIhzc9X5Wbo2sNQh2o86VsHrR/++
+         8UDYl8rx8BiTdPYz21yb2S1eckUl0EwFOqCgqdu3OApRNau1+ZvgHjRaQe0WbOj3uaK6
+         ea0qBXJ9FzPD0iEYbCIoz51Bxi00ZoOAT5oLxkcrhDv4erSdBUaGflo/r5Kgx7ChBHod
+         9FYw==
+X-Forwarded-Encrypted: i=1; AJvYcCWW9nwzxwQyZsQAqHIYYeFrqpPoXwGqHuWSIdXdW6SgrqnEVYUPPSCl3Tv7pEsUE5EXD9UvgZ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWofZIyi/4sfxCHLob00YtyFnP73g32FoNXH3g8InS2tXdHYQv
+	Ho92ocPkZaTO5zQW0WhBSxMfjkXTi8z+hyompFO6Jfk0WTT29rVYh9GR
+X-Gm-Gg: ASbGncug5Kb0tGqetmYeSxSPTqJSPmJcAFeGDAXNBB8uuJlZC6KNSKFld29eVpR2NE4
+	flDGQEjPMKUqAbw+3hIq+VnjSh26oInUHvxLQBy6hUQlht7SFjL/BL+pDMtmQOoEgAon8SHxcGq
+	eo2Bx1DW/IPuuq2cFGekxvX9Ioy54a+ZJm3cipc2aUpQED+hvK0KvCychdk/lVLUeu9oCaDSI92
+	RofMF7ySeeCm4tRpUk9msi7GJ2TuX+1C6Sa5A5wdQo5MYV+iL+yPoEgkaPA1nEuImYT3FLSCIQk
+	5VmHRfcY1ub5reTZ/7LSs73I7ZRhGPt8rNSY5MiKrZEXUr1PSCzOOfDYdgz1Scn4MjfaThXhV1+
+	OXqTEZ5dHs74UecZNgVkJbl7nznRCCsmo/g==
+X-Google-Smtp-Source: AGHT+IHr7iNnwxcOPeQ9ZThXwUGZJ7GbcERsSUmiNLc314q/XvVhwJaI9AdDeiJGJhiQ1rxqLsxuzQ==
+X-Received: by 2002:a17:90b:5707:b0:312:1ac5:c7c7 with SMTP id 98e67ed59e1d1-315f260f7d1mr3955006a91.2.1750846225691;
+        Wed, 25 Jun 2025 03:10:25 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-315f5437a0bsm1328838a91.35.2025.06.25.03.10.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Jun 2025 03:10:25 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	sdf@fomichev.me,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	joe@dama.to,
+	willemdebruijn.kernel@gmail.com
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next v3 0/2] net: xsk: update tx queue consumer
+Date: Wed, 25 Jun 2025 18:10:12 +0800
+Message-Id: <20250625101014.45066-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,37 +101,22 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- dggpemf500002.china.huawei.com (7.185.36.57)
 
-This is unused since commit f04565ddf52e ("dev: use name hash for
-dev_seq_ops")
+From: Jason Xing <kernelxing@tencent.com>
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- include/linux/netdevice.h | 7 -------
- 1 file changed, 7 deletions(-)
+Patch 1 makes sure the consumer is updated at the end of xsk xmit.
+Patch 2 adds corresponding test.
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 03c26bb0fbbe..431d5ca10905 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3316,13 +3316,6 @@ static inline struct net_device *first_net_device(struct net *net)
- 		net_device_entry(net->dev_base_head.next);
- }
- 
--static inline struct net_device *first_net_device_rcu(struct net *net)
--{
--	struct list_head *lh = rcu_dereference(list_next_rcu(&net->dev_base_head));
--
--	return lh == &net->dev_base_head ? NULL : net_device_entry(lh);
--}
--
- int netdev_boot_setup_check(struct net_device *dev);
- struct net_device *dev_getbyhwaddr(struct net *net, unsigned short type,
- 				   const char *hwaddr);
+Jason Xing (2):
+  net: xsk: update tx queue consumer immediately after transmission
+  selftests/bpf: check if the global consumer of tx queue updates after
+    send call
+
+ net/xdp/xsk.c                            |  3 +++
+ tools/testing/selftests/bpf/xskxceiver.c | 30 ++++++++++++++++++++++--
+ 2 files changed, 31 insertions(+), 2 deletions(-)
+
 -- 
-2.34.1
+2.41.3
 
 
