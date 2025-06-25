@@ -1,213 +1,109 @@
-Return-Path: <netdev+bounces-200997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19E89AE7B50
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:03:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DBD40AE7B30
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:00:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B53625A57FD
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 09:02:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E2EB5A1FF2
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 09:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FBA429B20E;
-	Wed, 25 Jun 2025 09:01:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76E8E2882C7;
+	Wed, 25 Jun 2025 09:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Agurw7Lq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PNQEjXd3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5554C29ACE6
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 09:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 512C52882BD
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 09:00:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750842084; cv=none; b=jJ+2Pj1m6efxdn6tf8rflQddqN2Bpq/7+6h9J1eXW2qIboNFl6TL6jf1tZn1IxY2erdo772pws2l0kJ4k0LtpSYRyYTK+YlAgNFbWPGRr0YFSmLWrSWsRCO58ScAapP+z+mVQ/Pu9aXJJ/kmcKjevPSG33IAqhEGccveXFjcAyA=
+	t=1750842039; cv=none; b=YIYrWbzOJFxf1DpC1kXETKT/CiDcQ/foKa3L/v4HZu0sEret4fj8DXPuGH+rUr1ANyQp+PNE1jn1xohQO0+/iYmiZ+s3DdHq/K5/KWO7IVJCML2PPxRwFEsK8QLQ1GmqyJkTEpZjcimyLJrl1Fp3+/6yU/qyKAB16rmmRXwtVfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750842084; c=relaxed/simple;
-	bh=J3LRFCdKMHDJ3jfOLnnBbarNlAuSi67YvUjOp7gGJUY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BsvCEg8yCWBUhsIUcKErwZFxjs6/BDarD6vMi4vQ8YLxcsQqxc7BoB9LURcT40OhNOEEAaBB3mpcfeblY35l4gBqHO5arZJ1AbBWSyicGuMP7xW1pfElwJtxu3eebI3CHhwOddL6mWp/SWwc4Q9J+9FaRwWVIa1aaaJHeCexsME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Agurw7Lq; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750842083; x=1782378083;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=J3LRFCdKMHDJ3jfOLnnBbarNlAuSi67YvUjOp7gGJUY=;
-  b=Agurw7LqRJ5BLIGGRy7IurJuAGoEscw4WqDjfZ/l7Q6UiqjK/RY8dfRW
-   2odCV4sNO3bzeg4MQ+H0mgMzPxK362Ix7OtyK73I8OwupnXRd9cifP5yb
-   g7YzchBX7UVixlfWSF3NHO+55gZmBtZM2gVZ1C/dR9lwQP7yvP6AOFvTl
-   6SWFgMONfR3xhpC8z0qdcadbzlezlaltA+sRhwPWGY+V30kAn+5C0Avxm
-   UV5/1OWgRasU/qB8kjUYLFDJOCF4XIuL7W5ZokHPbfROZW4oZycC0BCrE
-   kgZm+DjgUKOhp/GCq0FGE+4mOrLqgG9x3QVprvEP4Z3quHCPqdUlbVW9E
-   A==;
-X-CSE-ConnectionGUID: awhkuWDDSUKWulVxvCZcwg==
-X-CSE-MsgGUID: tPH6N+rARUW3G5bhAJhQiw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11474"; a="64461538"
-X-IronPort-AV: E=Sophos;i="6.16,264,1744095600"; 
-   d="scan'208";a="64461538"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 02:01:22 -0700
-X-CSE-ConnectionGUID: 6zJV9Ft3SbG7BDUZEIyhaw==
-X-CSE-MsgGUID: HyseNS8VSMWR+OqTOu1V3A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,264,1744095600"; 
-   d="scan'208";a="151671160"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 02:01:20 -0700
-Date: Wed, 25 Jun 2025 11:00:22 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, mengyuanlou@net-swift.com,
-	duanqiangwen@net-swift.com
-Subject: Re: [PATCH net v2 3/3] net: ngbe: specify IRQ vector when the number
- of VFs is 7
-Message-ID: <aFu6ph+7xhWxwX3W@mev-dev.igk.intel.com>
-References: <20250624085634.14372-1-jiawenwu@trustnetic.com>
- <20250624085634.14372-4-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1750842039; c=relaxed/simple;
+	bh=EqOQBZGIl8v57Asips7WSkEe+4xIy09GYhNNBk6Pq+Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ba25BjplF5UXlod07DzrsOQpM0EeWTls0wnnHfZN+wMH79j+BsW92BZAnWNIM0Ille3G44RkhkbzpIURoaAnB1kfJ1tM5NVqHEAat/7aikIUj6dmQknw6z0iKzyOFGC54+MHTVp4hfMp/xBeCGMdp9wy/kljO5wxUUC6nymLJ+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PNQEjXd3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CD5EC4CEF2;
+	Wed, 25 Jun 2025 09:00:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750842038;
+	bh=EqOQBZGIl8v57Asips7WSkEe+4xIy09GYhNNBk6Pq+Y=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PNQEjXd3eoNwxsNIiE0fi1iqdxKtDwToLnt3bKNnRWob+SP2UEjt92E9Q7srdre8s
+	 oPabYIKx2mbqiCWhEuXGRxB8P0DLYuAimVRwz1MRj9QF3AZQWivRNeCmqV9nAn9+Fh
+	 cLjn4fkIQruI37iqISU9Che/Cb3in1Ppc+tROFHsgv9gninHwQPeeEuV5OttXBY483
+	 1uHg6R9C52hJx6aakUnzuiueXdee4JLwOTxX3tmG8wZHx+B4G+NSWqv1LIp83sFe/N
+	 VBk16l7olyJcMacXM9ygYIiB6QxVUmhz0MPVIrP5/JwMJBh0JMkw0qouJGNqktdyNe
+	 W9eEW3Acws+mg==
+From: Antoine Tenart <atenart@kernel.org>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com
+Cc: Antoine Tenart <atenart@kernel.org>,
+	netdev@vger.kernel.org,
+	Menglong Dong <menglong8.dong@gmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>
+Subject: [PATCH net] net: ipv4: fix stat increase when udp early demux drops the packet
+Date: Wed, 25 Jun 2025 11:00:34 +0200
+Message-ID: <20250625090035.261653-1-atenart@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250624085634.14372-4-jiawenwu@trustnetic.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 24, 2025 at 04:56:34PM +0800, Jiawen Wu wrote:
-> For NGBE devices, the queue number is limited to be 1 when SRIOV is
-> enabled. In this case, IRQ vector[0] is used for MISC and vector[1] is
-> used for queue, based on the previous patches. But for the hardware
-> design, the IRQ vector[1] must be allocated for use by the VF[6] when
-> the number of VFs is 7. So the IRQ vector[0] should be shared for PF
-> MISC and QUEUE interrupts.
-> 
-> +-----------+----------------------+
-> | Vector    | Assigned To          |
-> +-----------+----------------------+
-> | Vector 0  | PF MISC and QUEUE    |
-> | Vector 1  | VF 6                 |
-> | Vector 2  | VF 5                 |
-> | Vector 3  | VF 4                 |
-> | Vector 4  | VF 3                 |
-> | Vector 5  | VF 2                 |
-> | Vector 6  | VF 1                 |
-> | Vector 7  | VF 0                 |
-> +-----------+----------------------+
-> 
-> Minimize code modifications, only adjust the IRQ vector number for this
-> case.
-> 
-> Fixes: 877253d2cbf2 ("net: ngbe: add sriov function support")
-> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> ---
->  drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 9 +++++++++
->  drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 4 ++++
->  drivers/net/ethernet/wangxun/libwx/wx_type.h  | 1 +
->  drivers/net/ethernet/wangxun/ngbe/ngbe_main.c | 2 +-
->  drivers/net/ethernet/wangxun/ngbe/ngbe_type.h | 3 ++-
->  5 files changed, 17 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-> index 66eaf5446115..7b53169cd216 100644
-> --- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-> @@ -1794,6 +1794,13 @@ static int wx_acquire_msix_vectors(struct wx *wx)
->  	wx->msix_entry->entry = nvecs;
->  	wx->msix_entry->vector = pci_irq_vector(wx->pdev, nvecs);
->  
-> +	if (test_bit(WX_FLAG_IRQ_VECTOR_SHARED, wx->flags)) {
-> +		wx->msix_entry->entry = 0;
-> +		wx->msix_entry->vector = pci_irq_vector(wx->pdev, 0);
-> +		wx->msix_q_entries[0].entry = 0;
-> +		wx->msix_q_entries[0].vector = pci_irq_vector(wx->pdev, 1);
-> +	}
-> +
->  	return 0;
->  }
->  
-> @@ -2292,6 +2299,8 @@ static void wx_set_ivar(struct wx *wx, s8 direction,
->  
->  	if (direction == -1) {
->  		/* other causes */
-> +		if (test_bit(WX_FLAG_IRQ_VECTOR_SHARED, wx->flags))
-> +			msix_vector = 0;
->  		msix_vector |= WX_PX_IVAR_ALLOC_VAL;
->  		index = 0;
->  		ivar = rd32(wx, WX_PX_MISC_IVAR);
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-> index e8656d9d733b..c82ae137756c 100644
-> --- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-> @@ -64,6 +64,7 @@ static void wx_sriov_clear_data(struct wx *wx)
->  	wr32m(wx, WX_PSR_VM_CTL, WX_PSR_VM_CTL_POOL_MASK, 0);
->  	wx->ring_feature[RING_F_VMDQ].offset = 0;
->  
-> +	clear_bit(WX_FLAG_IRQ_VECTOR_SHARED, wx->flags);
->  	clear_bit(WX_FLAG_SRIOV_ENABLED, wx->flags);
->  	/* Disable VMDq flag so device will be set in NM mode */
->  	if (wx->ring_feature[RING_F_VMDQ].limit == 1)
-> @@ -78,6 +79,9 @@ static int __wx_enable_sriov(struct wx *wx, u8 num_vfs)
->  	set_bit(WX_FLAG_SRIOV_ENABLED, wx->flags);
->  	dev_info(&wx->pdev->dev, "SR-IOV enabled with %d VFs\n", num_vfs);
->  
-> +	if (num_vfs == 7 && wx->mac.type == wx_mac_em)
-> +		set_bit(WX_FLAG_IRQ_VECTOR_SHARED, wx->flags);
-> +
->  	/* Enable VMDq flag so device will be set in VM mode */
->  	set_bit(WX_FLAG_VMDQ_ENABLED, wx->flags);
->  	if (!wx->ring_feature[RING_F_VMDQ].limit)
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> index d392394791b3..c363379126c0 100644
-> --- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> +++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-> @@ -1191,6 +1191,7 @@ enum wx_pf_flags {
->  	WX_FLAG_VMDQ_ENABLED,
->  	WX_FLAG_VLAN_PROMISC,
->  	WX_FLAG_SRIOV_ENABLED,
-> +	WX_FLAG_IRQ_VECTOR_SHARED,
->  	WX_FLAG_FDIR_CAPABLE,
->  	WX_FLAG_FDIR_HASH,
->  	WX_FLAG_FDIR_PERFECT,
-> diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-> index 68415a7ef12f..e0fc897b0a58 100644
-> --- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-> +++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-> @@ -286,7 +286,7 @@ static int ngbe_request_msix_irqs(struct wx *wx)
->  	 * for queue. But when num_vfs == 7, vector[1] is assigned to vf6.
->  	 * Misc and queue should reuse interrupt vector[0].
->  	 */
-> -	if (wx->num_vfs == 7)
-> +	if (test_bit(WX_FLAG_IRQ_VECTOR_SHARED, wx->flags))
->  		err = request_irq(wx->msix_entry->vector,
->  				  ngbe_misc_and_queue, 0, netdev->name, wx);
->  	else
-> diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-> index 6eca6de475f7..b6252b272364 100644
-> --- a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-> +++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-> @@ -87,7 +87,8 @@
->  #define NGBE_PX_MISC_IC_TIMESYNC		BIT(11) /* time sync */
->  
->  #define NGBE_INTR_ALL				0x1FF
-> -#define NGBE_INTR_MISC(A)			BIT((A)->num_q_vectors)
-> +#define NGBE_INTR_MISC(A)			((A)->num_vfs == 7 ? \
-> +						 BIT(0) : BIT((A)->num_q_vectors))
+udp_v4_early_demux now returns drop reasons as it either returns 0 or
+ip_mc_validate_source, which returns itself a drop reason. However its
+use was not converted in ip_rcv_finish_core and the drop reason is
+ignored, leading to potentially skipping increasing LINUX_MIB_IPRPFILTER
+if the drop reason is SKB_DROP_REASON_IP_RPFILTER.
 
-Isn't it problematic that configuring interrupts is done in
-ndo_open/ndo_stop on PF, but it depends on numvfs set in otther context.
-If you start with misc on index 8 and after that set numvfs to 7 isn't
-it fail?
+This is a fix and we're not converting udp_v4_early_demux to explicitly
+return a drop reason to ease backports; this can be done as a follow-up.
 
->  
->  #define NGBE_PHY_CONFIG(reg_offset)		(0x14000 + ((reg_offset) * 4))
->  #define NGBE_CFG_LAN_SPEED			0x14440
-> -- 
-> 2.48.1
+Fixes: d46f827016d8 ("net: ip: make ip_mc_validate_source() return drop reason")
+Cc: Menglong Dong <menglong8.dong@gmail.com>
+Reported-by: Sabrina Dubroca <sd@queasysnail.net>
+Signed-off-by: Antoine Tenart <atenart@kernel.org>
+---
+ net/ipv4/ip_input.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/net/ipv4/ip_input.c b/net/ipv4/ip_input.c
+index 30a5e9460d00..4bb15bb59993 100644
+--- a/net/ipv4/ip_input.c
++++ b/net/ipv4/ip_input.c
+@@ -319,8 +319,8 @@ static int ip_rcv_finish_core(struct net *net,
+ 			      const struct sk_buff *hint)
+ {
+ 	const struct iphdr *iph = ip_hdr(skb);
+-	int err, drop_reason;
+ 	struct rtable *rt;
++	int drop_reason;
+ 
+ 	if (ip_can_use_hint(skb, iph, hint)) {
+ 		drop_reason = ip_route_use_hint(skb, iph->daddr, iph->saddr,
+@@ -345,8 +345,8 @@ static int ip_rcv_finish_core(struct net *net,
+ 			break;
+ 		case IPPROTO_UDP:
+ 			if (READ_ONCE(net->ipv4.sysctl_udp_early_demux)) {
+-				err = udp_v4_early_demux(skb);
+-				if (unlikely(err))
++				drop_reason = udp_v4_early_demux(skb);
++				if (unlikely(drop_reason))
+ 					goto drop_error;
+ 
+ 				/* must reload iph, skb->head might have changed */
+-- 
+2.49.0
+
 
