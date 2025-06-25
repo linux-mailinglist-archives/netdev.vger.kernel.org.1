@@ -1,132 +1,121 @@
-Return-Path: <netdev+bounces-201012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46144AE7DBB
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:45:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2647AE7DB2
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:45:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52EC71C23A37
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 09:42:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A03673ACEF9
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 09:42:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986BE2DBF66;
-	Wed, 25 Jun 2025 09:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0147B2DFA57;
+	Wed, 25 Jun 2025 09:35:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="X24D4Uid"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D2JVBFYd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E837A29C347
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 09:34:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 681682DFA2F
+	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 09:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750844047; cv=none; b=JnBfj/1klnQyAkXT2w7bsqudS4TNoQg401hDHtGMdiZEa/HIrXFw990HGfEEzWMUtyb1mV6/CYsnS0deMQKEIhOeCZDHc9gQa/FYDpaGqn5bOba/8YDIGWWT29BS6YlDVkq5HHYzE/EeSRsZBBZRZVm8+z5IawT5MOKoME/mih0=
+	t=1750844105; cv=none; b=jedPkiOjeipNkbYPx/XkEL8edh75CF1ceR7t0flgX1QhhI+48Xck/CN4ikpjlnJBRUReSWzKMR+LSpgw7n7LGQDq/sONTXNQc9QEugkpU3ant4OKHNxC6bXMjjjbEeucughrtcSbHSwYvcfBouVjvn4TdT8Hzlf3uQatr55GXUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750844047; c=relaxed/simple;
-	bh=khNkfOsR7Llox6I112lqSvaS2QdOn2MM5KZ08Ea+Wgk=;
-	h=From:Date:Subject:MIME-Version:Message-Id:To:Cc:Content-Type:
-	 References; b=QE+4ibeKOaCO7nDYjPfve07N9pOVZY+0h3k4Q9nit7t+f3kBfqk5w7MHkkzwupfGAZR05rPPkEeQk1QA4txnEEut5sVXuKDbBqmOOWvL5Ammpwwdl/8HOH+AL7opoy9cBKLaTn1V1No464Nc51fUow/Yewd/D+klILBPkYmkFqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=X24D4Uid; arc=none smtp.client-ip=203.254.224.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20250625093356epoutp02e0efc65355d49101d5b9b6b000cec2ee~MP1--lE5c1529815298epoutp02D
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 09:33:56 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20250625093356epoutp02e0efc65355d49101d5b9b6b000cec2ee~MP1--lE5c1529815298epoutp02D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1750844036;
-	bh=CBC9RrUsb8ZR2LuYyo/8tdiochVtCnPVT6I0z3/0w9w=;
-	h=From:Date:Subject:To:Cc:References:From;
-	b=X24D4UidyqsXvF5h62ivkZwJ1g/Pcuce28g+FFNq4XFP464SWDlVKn86pMoPbP0SC
-	 aqEAXabVO2WLzxhK7nIUffPC0nkxv3GR4f4CWGpbzKn3Dl0NnbAGwJluUDsqwhlkX7
-	 53Aor0q6uCclT+GZtwplfbm6aY+cBIlTow1pAsOc=
-Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
-	epcas1p2.samsung.com (KnoxPortal) with ESMTPS id
-	20250625093355epcas1p2faae8a26c68cb02ea04d4c88e02b1581~MP1_vdX511190011900epcas1p2r;
-	Wed, 25 Jun 2025 09:33:55 +0000 (GMT)
-Received: from epcas1p3.samsung.com (unknown [182.195.36.223]) by
-	epsnrtp01.localdomain (Postfix) with ESMTP id 4bRxTZ72sVz6B9m5; Wed, 25 Jun
-	2025 09:33:54 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20250625093354epcas1p1c9817df6e1d1599e8b4eb16c5715a6fd~MP19wiIYq0667706677epcas1p1z;
-	Wed, 25 Jun 2025 09:33:54 +0000 (GMT)
-Received: from U20PB1-1082.tn.corp.samsungelectronics.net (unknown
-	[10.91.135.33]) by epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20250625093354epsmtip292d16f2bc0d2b23d1119c49d914b7fca~MP19s5avp0986709867epsmtip2P;
-	Wed, 25 Jun 2025 09:33:54 +0000 (GMT)
-From: "Peter GJ. Park" <gyujoon.park@samsung.com>
-Date: Wed, 25 Jun 2025 18:33:48 +0900
-Subject: [PATCH] net: usb: usbnet: fix use-after-free in race on workqueue
+	s=arc-20240116; t=1750844105; c=relaxed/simple;
+	bh=2rRu350h60JHsmwsHwJzodt622gtKWzq+OPhnEchrqY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GA02EPKoLNJnEtDaMcJxJX3BMVjp1XZJZRiNZzgwZ06j8uiDnI2DC6ywQ3s9LIczQCDRRxWOo5g8Vq2Pp4olRFvR9iqkCEMs9TpFlmQL8/nQpzvehx/Zr5BPBL237SBzgmPAUZoE2+EFtZna545KCiJcyxPohJvxLU3w9aHsow4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D2JVBFYd; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1750844103;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5mAqAwTOZXkehu4n5rF4nF6gF35YsBdMKC3cn/fzrXw=;
+	b=D2JVBFYdNb1J7+h0Uw25EW2R694ur5EdA36FOsoooJb6uS0rHK9f4hbPD3BXITJPzjTQXY
+	kkld9T4bTQIJNWrpG0urThzMjIl7SNfGpbvD+uZ3bRcNTXmLk0eF3cj1i0+Hnq/lS9gS/L
+	X9jKtRcSL87+nL0/+RtdtN0a/dqSVQ4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-569-gQZyi4zuOcWSUbO-LbUusQ-1; Wed, 25 Jun 2025 05:35:00 -0400
+X-MC-Unique: gQZyi4zuOcWSUbO-LbUusQ-1
+X-Mimecast-MFC-AGG-ID: gQZyi4zuOcWSUbO-LbUusQ_1750844100
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-450d290d542so8964935e9.1
+        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 02:35:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750844099; x=1751448899;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5mAqAwTOZXkehu4n5rF4nF6gF35YsBdMKC3cn/fzrXw=;
+        b=DJlZoKyg1hH3vJ3ErBUrbyjZ9l1JnNzX49OgsrWlvsoJc9xpmLkS1Q4indWZu7ALaZ
+         xZE980RyV60Bnq3aBsi/qv78grQWH9VdzqxN5NzNV3SnkGSwgTesNa04CQId3iJ3pUI4
+         TBVssbpgWiI+CJaV7jUFaWu4jf3yTBOfWrxSQ6BRlkfVhgjrFpSKfW2fk9cPeOsc1ClN
+         23/5z5dzGH21aH7+HvbeGXd7JdK4BKvMMC5LthJ/rde+XN2MhBmKKqp84N+ZT0MeoE6O
+         h6AJ4JYMprHgpnaPHxrMjW8XEv5dnmJGhNNr0xtj/3oMFyQbB9Xq6iqdoVDAqPtBC0Vn
+         8jjw==
+X-Forwarded-Encrypted: i=1; AJvYcCWRPyRZPCBN1NWKO/n/4SASBNLUxQJw+Z2l5WsT2s2CM69V9HTsDdWrJykGlyKcFLmtDJY8n50=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/B4C9ZSqMO6vg+bppTRwpUFp/wctq9Kv+Dkea4jAJHFDUEnfe
+	8W1SauorjI5l9g0vZ+btN3AEEi0G0Bhk2YxPBhQAKoDx/T/kTD+isI5vweTfrabp40orRDLmLCE
+	GjzHt3abCI7bi2Mody3RKu9VRpTyg04gqhCrmpj8rAtR031GQQEJzR/nxUw==
+X-Gm-Gg: ASbGncuFcdJl4/DGVNv2QcKyup1M5Edp877E/+j2BVHKY0ys7wyZCqkUFrQHFluyqga
+	DyrGX+ElPWKpclycnvpvh+eV9P58Cp6zvr96Tyz/Nz0AaVMeykEGmaoQ/AlgSFhm1y10vsVwL7W
+	M9D0Cq5U6BL0WZPtD6WGJRL3TABZmYdHB3dfqDVpmJqLseIy/roW9UYsqmlC7TQbSEaOBVlUaJV
+	zcRwdf7q0iRhDKvajWD3fAiYdblzg2679vKpo+l8t9SsgjT1uuvweaodx/qQUP8MDl2a3TCI8lw
+	rK6nQqr71k//tJXdWKaL
+X-Received: by 2002:a05:600c:c16d:b0:442:d9fc:7de with SMTP id 5b1f17b1804b1-45381aecd69mr19753285e9.22.1750844099569;
+        Wed, 25 Jun 2025 02:34:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEVkdjnYscaljj059nOuXtgs3DwQ8AuTeC7qCsDKRiosXM4d0YU/2WmfNVz/msXSSKT4XX+kg==
+X-Received: by 2002:a05:600c:c16d:b0:442:d9fc:7de with SMTP id 5b1f17b1804b1-45381aecd69mr19752935e9.22.1750844099160;
+        Wed, 25 Jun 2025 02:34:59 -0700 (PDT)
+Received: from localhost ([2a01:e11:1007:ea0:8374:5c74:dd98:a7b2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4538233c4acsm14047705e9.1.2025.06.25.02.34.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Jun 2025 02:34:58 -0700 (PDT)
+Date: Wed, 25 Jun 2025 11:34:57 +0200
+From: Davide Caratti <dcaratti@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, donald.hunter@gmail.com, netdev@vger.kernel.org,
+	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	horms@kernel.org, matttbe@kernel.org, martineau@kernel.org,
+	geliang@kernel.org, mptcp@lists.linux.dev
+Subject: Re: [PATCH net 07/10] netlink: specs: mptcp: replace underscores
+ with dashes in names
+Message-ID: <aFvCwcH2mJ2WxFYv@dcaratti.users.ipa.redhat.com>
+References: <20250624211002.3475021-1-kuba@kernel.org>
+ <20250624211002.3475021-8-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250625-usbnet-uaf-fix-v1-1-421eb05ae6ea@samsung.com>
-X-B4-Tracking: v=1; b=H4sIAHvCW2gC/x2MQQqAIBAAvyJ7bsEEw/pKdNBaay8WmhFEf2/pO
-	AMzDxTKTAUG9UCmiwvvSaBtFMybTyshL8JgtLG6MxZrCYlOrD5i5Bt7H5xdqA1ujiDRkUn0Pxy
-	n9/0AVpR/pGAAAAA=
-X-Change-ID: 20250625-usbnet-uaf-fix-9ab85de1b8cf
-To: Oliver Neukum <oneukum@suse.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org, "Peter GJ. Park" <gyujoon.park@samsung.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1750844034; l=1198;
-	i=gyujoon.park@samsung.com; s=20250625; h=from:subject:message-id;
-	bh=khNkfOsR7Llox6I112lqSvaS2QdOn2MM5KZ08Ea+Wgk=;
-	b=22L8HpUpqznMwZsnG30qdugykmy8QNtjp4q/oY1GDx+mA56yNFHaSpYKNkVvWLtg0rBLHTvaO
-	oWVD9VL9XGaBs2WVE1Qhy78AL7auR/61t/1pqZuFb2dBU4WhFNyRCgy
-X-Developer-Key: i=gyujoon.park@samsung.com; a=ed25519;
-	pk=EdSwPjEiPaVzw7VRIRalIsT9igO06CZZXNJzE0/whs0=
-X-CMS-MailID: 20250625093354epcas1p1c9817df6e1d1599e8b4eb16c5715a6fd
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 101P
-cpgsPolicy: CPGSC10-711,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250625093354epcas1p1c9817df6e1d1599e8b4eb16c5715a6fd
-References: <CGME20250625093354epcas1p1c9817df6e1d1599e8b4eb16c5715a6fd@epcas1p1.samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250624211002.3475021-8-kuba@kernel.org>
 
-When usbnet_disconnect() queued while usbnet_probe() processing,
-it results to free_netdev before kevent gets to run on workqueue,
-thus workqueue does assign_work() with referencing freeed memory address.
+On Tue, Jun 24, 2025 at 02:09:59PM -0700, Jakub Kicinski wrote:
+> We're trying to add a strict regexp for the name format in the spec.
+> Underscores will not be allowed, dashes should be used instead.
+> This makes no difference to C (codegen, if used, replaces special
+> chars in names) but it gives more uniform naming in Python.
+> 
+> Fixes: bc8aeb2045e2 ("Documentation: netlink: add a YAML spec for mptcp")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: matttbe@kernel.org
+> CC: martineau@kernel.org
+> CC: geliang@kernel.org
+> CC: donald.hunter@gmail.com
+> CC: dcaratti@redhat.com
+> CC: mptcp@lists.linux.dev
 
-For graceful disconnect and to prevent use-after-free of netdev pointer,
-the fix adds canceling work and timer those are placed by usbnet_probe()
-
-Signed-off-by: Peter GJ. Park <gyujoon.park@samsung.com>
----
- drivers/net/usb/usbnet.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index c04e715a4c2ade3bc5587b0df71643a25cf88c55..3c5d9ba7fa6660273137c80106746103f84f5a37 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -1660,6 +1660,9 @@ void usbnet_disconnect (struct usb_interface *intf)
- 	usb_free_urb(dev->interrupt);
- 	kfree(dev->padding_pkt);
- 
-+	timer_delete_sync(&dev->delay);
-+	tasklet_kill(&dev->bh);
-+	cancel_work_sync(&dev->kevent);
- 	free_netdev(net);
- }
- EXPORT_SYMBOL_GPL(usbnet_disconnect);
-
----
-base-commit: 86731a2a651e58953fc949573895f2fa6d456841
-change-id: 20250625-usbnet-uaf-fix-9ab85de1b8cf
-
-Best regards,
--- 
-Peter GJ. Park <gyujoon.park@samsung.com>
+Reviewed-by: Davide Caratti <dcaratti@redhat.com>
 
 
