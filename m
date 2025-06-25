@@ -1,209 +1,100 @@
-Return-Path: <netdev+bounces-201052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F7C0AE7EC4
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 12:13:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 958D9AE7EC5
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 12:13:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAD29189B0DC
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:12:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A117B160EB6
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:12:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1490F2BE7CF;
-	Wed, 25 Jun 2025 10:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17DB2BD59F;
+	Wed, 25 Jun 2025 10:11:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I6vFSnzJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mphwUbRo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798CB2BDC38;
-	Wed, 25 Jun 2025 10:10:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C928F29B205;
+	Wed, 25 Jun 2025 10:11:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750846241; cv=none; b=H5IkNc9yfs7F9UBc40O6pjEoupj5Rox7orWBlQdeazuLTUPREx6QJsDZBSKQSZGIu9xBEFMirLQsmTp5lMK9CwDBVGkJSd+1K0BZ/jztIBTwBKXHsq1k6/tpjyLyTka7XlwUF1KzPHRNqZ+raPbm65aUU2ptg5Z5L7/rASjck0c=
+	t=1750846264; cv=none; b=XJ+I4Veet3viZ8M2oQId0xK338OiDhOB0tUysKxmN/BAJIXP2fuOnbATjI9DIPZnmDVsJxSghRkZQfoTLi7c9AV88/M9KxLEm7C8mHvbH1c234PShJfP7hUvilwm9pLo+XwREEiR5NeLpjMd59D9svCqVRq3ZKmgvX89CyHPDJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750846241; c=relaxed/simple;
-	bh=UPIyeW9W3kqd6AdVIfdrUFGW9GSHoK6qYZPW1Bg4fWk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XFQevkXTQgEtwUx3BbFOOjENBem6v5rYt++J4D++9RRkdTl3aViJm+QyYLvvXY0W87i43eUGdG2IHbfcVSTdcd2PyViAfeImOBvOC4KJ/cMb3wv33iypgw7PcXVH5fRWVSawhs1nq9fWCZ1fgQoMXyZ7kXSWf7+ob4GAiB9Nx5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I6vFSnzJ; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-315c1b0623cso3614750a91.1;
-        Wed, 25 Jun 2025 03:10:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750846239; x=1751451039; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5AGCyX14dEKx9XCAcpASiiI7DxVWDRzZMzeJaYAUn4M=;
-        b=I6vFSnzJ6K5h2ErIEZMq7l8+oWjT6TZ5YZYQrvMY1Mk4htcrXiWLmwT68VcXeDlGCP
-         3TneJ0jYZgcyY1FVRP+0Rd7zRB5rxfy/N1hMGnSFaeY1wupIbeTiCe5YXqnaRMoXoM/J
-         rryEQ+n+DYfkToUbpUJEXPYPE719oFvqxP43PyJhJj05RdxoCwv4tGp7efAgkP4axUKg
-         vy+797xTsRGEB6GQkb3z4w4y63N+cPqT/mHv4KK9q+Oz6FEiA0y29QrGYRimSitlKOUT
-         /kfiaUcBKeCFmzTkvNCUNEeDzLHwRSZQ/EYO00iXu8WkRGXpKCscYeVbkp5s45X8zDKP
-         5btw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750846239; x=1751451039;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5AGCyX14dEKx9XCAcpASiiI7DxVWDRzZMzeJaYAUn4M=;
-        b=ixM5jZIVBj0OQithTX0JI6lAQZYuIAPzXaZlb6zQPo92U0DVkJigyDH/xxguDT3Cgq
-         hVSKOlljAULBGV/RiWLJVG7YIPaQDBQXTxG/l17ItI1SX3IUOQe71ee7Tu52uNj66HrA
-         wCnTrP8bXmhgrCdqhfUC1y7D7sKk/1HlWUOHrO+HfWB2V/DCiSu5wvlR2Or9PvW6TT1H
-         SYMgg9yFO2jU1anrqr6ThZ2ypzp046VvRjruaRJmXNBCodrIUXvQyE6VaQ2w9Zg6nXya
-         NSnrG7NZZpIUbEX7z/5vGFR+GGwT4HPFtPa++iwMxf3hXo8QjkBPwmIdLeWSs5eMzyjz
-         IySg==
-X-Forwarded-Encrypted: i=1; AJvYcCXLd5Rb7RMHce4C9kDrz1Uh94OzJxq6UR6GLdUSL3iPi0SE3jwI080WeOoILEptH+S0KVwnAlI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxrh6Yq5WiX7lMuBtHFRK1c/APeHCkdjo7rj0H2wLc4PGdQzLzF
-	H7G2shmUsm2R8UZSsCZThIaWHLZdMFVeJHiq1gILLri4BFZXAKDjaSNg
-X-Gm-Gg: ASbGncsD+W8krQmVSkvJbAXsaHQPQRyTcGgQSdiNSfLVQQpQJ4k2fSwk5BPDXay3iZz
-	sWVymqWN3+6o/CkoJYGrHj3Q5N1hq++XcnqeV5DWlrkcD7NQXyXvjFtsLIxjQbAdI0OR3Eb4GVG
-	WdTpMWEMxxwiXPCA/0KuRbpfpGGTunyxncET+u054ngBf+eHe4Ij2IF+S6Yv1iMtwo0osvbGIkX
-	+59pr/tv7q+yg4kRJDtOCkMhET9gk1NYib3HJZvlTJJvH7fGxbUjzM9W15/8h5hZ+KA0l8FS/vD
-	nHbCkv8qHAjq77ydNg+dsWI4fHIjZngDSk0wlAgeGx8GFR4J1fisvwGF+i0hB1DO2qnZd1TIZt1
-	pfXoZQDLFFKTLiZ0hGV+kHAJsn9CkZZGODw==
-X-Google-Smtp-Source: AGHT+IEO2URLiZhS8bYplN02TdS3MALXZtd23O3nEBxnjrTt+qbG0lWZZUEDHqCbaGnbVZkiy6P/fg==
-X-Received: by 2002:a17:90b:55c4:b0:313:23ed:6ff with SMTP id 98e67ed59e1d1-315f25edccamr3164926a91.1.1750846238651;
-        Wed, 25 Jun 2025 03:10:38 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-315f5437a0bsm1328838a91.35.2025.06.25.03.10.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 03:10:38 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	sdf@fomichev.me,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	joe@dama.to,
-	willemdebruijn.kernel@gmail.com
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v3 2/2] selftests/bpf: check if the global consumer of tx queue updates after send call
-Date: Wed, 25 Jun 2025 18:10:14 +0800
-Message-Id: <20250625101014.45066-3-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20250625101014.45066-1-kerneljasonxing@gmail.com>
-References: <20250625101014.45066-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1750846264; c=relaxed/simple;
+	bh=NwTJ5PPP27/rCSfWuv+FtUT/aFui2Wgz+XXfCohOF6I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bTrkk24bZWzSbjI3MS3aR/lwEHYALdmuGMf40lbEKaIhkVnexxY242MGhho4M3U1Xv2RBCKn/n2fkfeLV5ZF5EaefRQw/li8fbPeNwun95OiIeOBwt4i4iNzXIjVJe/Vq0UQvgMwN5zUSwjRUbgEn0vDtk7wF151w/s/bkhlB2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mphwUbRo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9551C4CEF1;
+	Wed, 25 Jun 2025 10:10:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750846264;
+	bh=NwTJ5PPP27/rCSfWuv+FtUT/aFui2Wgz+XXfCohOF6I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mphwUbRoNuqPd1spfj2i4euFYm2aegLZg0nYHMQ9FvB2CfikTQfdR9a6Qm0Akrd0E
+	 Xe4y4P9orJTeuJ/ojRBpSNDu0ymAjKL2/F9Fe/BUH+m101nx6V09UbWX6gaMxIrFMV
+	 KNWgJxMGHk/7OMXk26aqz0EVhtQZsTCnhfKW5dBgKe64eQ+rNciTOYkrNjTYiNeF+D
+	 /fBK2mMNa0foJcw+dVe/TkHPhQl8ioQHJaBxlGzCCrHU365l/W3Ka6awKOjA+MJ/2H
+	 zvb+Zdpz967THwMiUVUFbVUFQOY4bSK8AUOrGZtnGJFKgNzCw2MkOYvvJFwtg4tRPQ
+	 22nJAXGBRV73w==
+Date: Wed, 25 Jun 2025 11:10:57 +0100
+From: Simon Horman <horms@kernel.org>
+To: "Koen De Schepper (Nokia)" <koen.de_schepper@nokia-bell-labs.com>
+Cc: Ferenc Fejes <ferenc@fejes.dev>,
+	"Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>,
+	"alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>,
+	"pctammela@mojatatu.com" <pctammela@mojatatu.com>,
+	"donald.hunter@gmail.com" <donald.hunter@gmail.com>,
+	"xandfury@gmail.com" <xandfury@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"dave.taht@gmail.com" <dave.taht@gmail.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"jhs@mojatatu.com" <jhs@mojatatu.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"stephen@networkplumber.org" <stephen@networkplumber.org>,
+	"xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>,
+	"jiri@resnulli.us" <jiri@resnulli.us>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"ast@fiberby.net" <ast@fiberby.net>,
+	"liuhangbin@gmail.com" <liuhangbin@gmail.com>,
+	"shuah@kernel.org" <shuah@kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"ij@kernel.org" <ij@kernel.org>,
+	"ncardwell@google.com" <ncardwell@google.com>,
+	"g.white@cablelabs.com" <g.white@cablelabs.com>,
+	"ingemar.s.johansson@ericsson.com" <ingemar.s.johansson@ericsson.com>,
+	"mirja.kuehlewind@ericsson.com" <mirja.kuehlewind@ericsson.com>,
+	"cheshire@apple.com" <cheshire@apple.com>,
+	"rs.ietf@gmx.at" <rs.ietf@gmx.at>,
+	"Jason_Livingood@comcast.com" <Jason_Livingood@comcast.com>,
+	"vidhi_goel@apple.com" <vidhi_goel@apple.com>
+Subject: Re: [PATCH v20 net-next 0/6] DUALPI2 patch
+Message-ID: <20250625101057.GV1562@horms.kernel.org>
+References: <20250621193331.16421-1-chia-yu.chang@nokia-bell-labs.com>
+ <6f880f49c2d9ef20ab087c6e9d1a6d6c8f6e500a.camel@fejes.dev>
+ <VI1PR07MB5567EDDD3F6F999B7B082575B978A@VI1PR07MB5567.eurprd07.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <VI1PR07MB5567EDDD3F6F999B7B082575B978A@VI1PR07MB5567.eurprd07.prod.outlook.com>
 
-From: Jason Xing <kernelxing@tencent.com>
+On Tue, Jun 24, 2025 at 01:53:31PM +0000, Koen De Schepper (Nokia) wrote:
+> Hi Ferenc,
+> 
+> We spend a lot of effort on the tc version of DualPI2, mainly to share the know how with others as a reference implementation. I hope this tc realization can be accepted now. 
+> 
+> This shouldn't stop any other realizations (using other technologies) that can be done in parallel by people that are interested in those. The performance and correct functioning of those other realizations can then also be compared/verified with the tc DualPI2.
 
-The subtest sends 33 packets at one time on purpose to see if xsk
-exitting __xsk_generic_xmit() updates the global consumer of tx queue
-when reaching the max loop (max_tx_budget, 32 by default). The number 33
-can avoid xskq_cons_peek_desc() updates the consumer, to accurately
-check if the issue that the first patch resolves remains.
-
-Speaking of the selftest implementation, it's not possible to use the
-normal validation_func to check if the issue happens because the whole
-send packets logic will call the sendto multiple times such that we're
-unable to detect in time.
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- tools/testing/selftests/bpf/xskxceiver.c | 30 ++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
-index 0ced4026ee44..f7aa83706bc7 100644
---- a/tools/testing/selftests/bpf/xskxceiver.c
-+++ b/tools/testing/selftests/bpf/xskxceiver.c
-@@ -109,6 +109,8 @@
- 
- #include <network_helpers.h>
- 
-+#define MAX_TX_BUDGET_DEFAULT 32
-+
- static bool opt_verbose;
- static bool opt_print_tests;
- static enum test_mode opt_mode = TEST_MODE_ALL;
-@@ -1323,7 +1325,8 @@ static int receive_pkts(struct test_spec *test)
- 	return TEST_PASS;
- }
- 
--static int __send_pkts(struct ifobject *ifobject, struct xsk_socket_info *xsk, bool timeout)
-+static int __send_pkts(struct test_spec *test, struct ifobject *ifobject,
-+		       struct xsk_socket_info *xsk, bool timeout)
- {
- 	u32 i, idx = 0, valid_pkts = 0, valid_frags = 0, buffer_len;
- 	struct pkt_stream *pkt_stream = xsk->pkt_stream;
-@@ -1437,9 +1440,21 @@ static int __send_pkts(struct ifobject *ifobject, struct xsk_socket_info *xsk, b
- 	}
- 
- 	if (!timeout) {
-+		int prev_tx_consumer;
-+
-+		if (!strncmp("TX_QUEUE_CONSUMER", test->name, MAX_TEST_NAME_SIZE))
-+			prev_tx_consumer = *xsk->tx.consumer;
-+
- 		if (complete_pkts(xsk, i))
- 			return TEST_FAILURE;
- 
-+		if (!strncmp("TX_QUEUE_CONSUMER", test->name, MAX_TEST_NAME_SIZE)) {
-+			int delta = *xsk->tx.consumer - prev_tx_consumer;
-+
-+			if (delta != MAX_TX_BUDGET_DEFAULT)
-+				return TEST_FAILURE;
-+		}
-+
- 		usleep(10);
- 		return TEST_PASS;
- 	}
-@@ -1492,7 +1507,7 @@ static int send_pkts(struct test_spec *test, struct ifobject *ifobject)
- 				__set_bit(i, bitmap);
- 				continue;
- 			}
--			ret = __send_pkts(ifobject, &ifobject->xsk_arr[i], timeout);
-+			ret = __send_pkts(test, ifobject, &ifobject->xsk_arr[i], timeout);
- 			if (ret == TEST_CONTINUE && !test->fail)
- 				continue;
- 
-@@ -2613,6 +2628,16 @@ static int testapp_adjust_tail_grow_mb(struct test_spec *test)
- 				   XSK_UMEM__LARGE_FRAME_SIZE * 2);
- }
- 
-+static int testapp_tx_queue_consumer(struct test_spec *test)
-+{
-+	int nr_packets = MAX_TX_BUDGET_DEFAULT + 1;
-+
-+	pkt_stream_replace(test, nr_packets, MIN_PKT_SIZE);
-+	test->ifobj_tx->xsk->batch_size = nr_packets;
-+
-+	return testapp_validate_traffic(test);
-+}
-+
- static void run_pkt_test(struct test_spec *test)
- {
- 	int ret;
-@@ -2723,6 +2748,7 @@ static const struct test_spec tests[] = {
- 	{.name = "XDP_ADJUST_TAIL_SHRINK_MULTI_BUFF", .test_func = testapp_adjust_tail_shrink_mb},
- 	{.name = "XDP_ADJUST_TAIL_GROW", .test_func = testapp_adjust_tail_grow},
- 	{.name = "XDP_ADJUST_TAIL_GROW_MULTI_BUFF", .test_func = testapp_adjust_tail_grow_mb},
-+	{.name = "TX_QUEUE_CONSUMER", .test_func = testapp_tx_queue_consumer},
- 	};
- 
- static void print_tests(void)
--- 
-2.41.3
-
++1
 
