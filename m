@@ -1,93 +1,105 @@
-Return-Path: <netdev+bounces-200979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-200980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22847AE79C6
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:17:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21538AE79D0
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 10:19:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C22DB4A1964
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:17:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8839B164DEA
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 08:19:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EC89211484;
-	Wed, 25 Jun 2025 08:16:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5711E1FCFF8;
+	Wed, 25 Jun 2025 08:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BnFbIaq6"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="tA4ZKE/U";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="XY970qlQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6414D211290;
-	Wed, 25 Jun 2025 08:16:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A1B3594E;
+	Wed, 25 Jun 2025 08:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750839389; cv=none; b=BVQ7q+ZKvg2QZZHQiHaSVUJ3c2ruHvkPjaYnK9CAs1FB8qtZMtfkCYb2pAlsVLU+qJGvJDnKh97dTbz50LPbf0N/qCFxdLNUmBqAavpPUSaqGjKYPAkk7SrokVJvwAwv7YIdgaHUGVNwbvA2Y37Ujp9M05X5NYCScStG4Hak0/A=
+	t=1750839582; cv=none; b=I8Acrwxu4MQe2+nqQ16rXEsTk00tzMT/+gIvPSVBj72iNw6KJhQCc1r06iB0YdFRCqMPVxlVVCfrFZIJ8t3zTssS8PU1oPDJ4iQfzGMIKJqf5kvBDck20H3cuMWXEhKXWFPwdqNwQBJChe1P6+OmWQh7QyxFps7HMPDvRJkYQ5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750839389; c=relaxed/simple;
-	bh=Tq7JiNhUc/TmZgnGqkVm2S6PN6rdSjbPFvW/AHOLB8E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QIppNeWXzNxeV5KsL8wuufaAnJJSxq/bw4KUyoSas+5gXfpdxraaHe0H6vlei0Nun2tQvB57hUjlC2wCxhyv5qNYE5BKNXQUEKWfBkkgx8j0dSRvWgTZVzUWGxSLQWS/nMHYq0xUKeLRZQkJ25ABaPd0eGdv8TU0WY/r4Uik1Os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BnFbIaq6; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Kmzfb1nkzdrlqwAWTt9ms5w6okRVCGLkfGIvWoO8lgk=; b=BnFbIaq61VP2otrUASU7ANP7VN
-	8pPOx63R9LzJZ3WSQHnuS7afqC47qBYFhRwU4N59Ih0Hi2pzn+Z4h51OXEZS62lRZkkP3as6oxssY
-	T8Wo2vKbk2mlfxKNoZMnVdsdcFQIZw6wVP+VXmNZz3qxunn/iPQ9SBSQyFmJKdMPrdPs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uULIu-00Gt4U-7j; Wed, 25 Jun 2025 10:16:24 +0200
-Date: Wed, 25 Jun 2025 10:16:24 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Guillaume Nault <gnault@redhat.com>
-Subject: Re: [PATCH net-next 3/3] ppp: synchronize netstats updates
-Message-ID: <e6110e8c-34cb-4152-8fce-4de7675b639d@lunn.ch>
-References: <20250625034021.3650359-1-dqfext@gmail.com>
- <20250625034021.3650359-4-dqfext@gmail.com>
+	s=arc-20240116; t=1750839582; c=relaxed/simple;
+	bh=16aWqNKmoqZ7N+hUoLW3zWsloeGrZc5zfK7pvbKOgOM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=CkzFMYQwY5vUNbpkesVOfcA1d+ZSoBvz7lsEvh4Hjwq43N44+xClNx0IrOidhzJ9TnQlCCdn2v7KVPlnvTFnF6K8koWQ4YI3zs4sZA52Ff4gKQZY5p2nm9H9eb54emFcdmzEAxXqX3pLSvRn5qw8eRpKQxALC0BMvBf+gP9SaLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=tA4ZKE/U; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=XY970qlQ; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1750839572;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8WeX6Ff7ZzvVAy0/XInX41qrqklcove/vGha5dJn4s4=;
+	b=tA4ZKE/UDXhBBa7OC7zsL5ZxL+DIJpQ5lPZ81IKyqsRRg6JhNEZ8TiL2GM+HuXmtGpsT6M
+	GcclnOMnuCmxc97ALT/u9yGpzbkdnKedlbVc4GPKAGIcMh2PkLZRPPH02pCJHf5bfvhPiJ
+	mKf0XMrJZCrrf0h6HWcnsCqWhfiKTh6me8lcmI9gVSiHYwHF0OsB3DcmOfmb4rhLXAtoEu
+	zc03U2mjBVt8+mZ5OINZ1Wxd+YF2+C8qSic2g1ky3BdRDT/XebMJ9o0FKx8GGQm5Il37DP
+	8WrStx4q8M3jsg7fg14hoOO0xLYb8irBa+8q1REONYx9tXtYp8PTj3mp1/lNOg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1750839572;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8WeX6Ff7ZzvVAy0/XInX41qrqklcove/vGha5dJn4s4=;
+	b=XY970qlQnhbdUx1F7pPg8TNTCZODw2kL+scMxIV5YnO6cxGgaC0MAMcdQMEQSePhrJ4/zI
+	Ibbe03xr3jdWI4DQ==
+To: Paolo Abeni <pabeni@redhat.com>, LKML <linux-kernel@vger.kernel.org>
+Cc: Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [patch 08/13] ptp: Split out PTP_PIN_GETFUNC ioctl code
+In-Reply-To: <87zfdxmf7h.ffs@tglx>
+References: <20250620130144.351492917@linutronix.de>
+ <20250620131944.218487429@linutronix.de>
+ <caef5686-961d-43aa-8141-c9c90ada2307@redhat.com> <87zfdxmf7h.ffs@tglx>
+Date: Wed, 25 Jun 2025 10:19:31 +0200
+Message-ID: <87wm90mdws.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250625034021.3650359-4-dqfext@gmail.com>
+Content-Type: text/plain
 
-On Wed, Jun 25, 2025 at 11:40:20AM +0800, Qingfang Deng wrote:
-> The PPP receive path can now run concurrently across CPUs (after converting
-> rlock to rwlock in an earlier patch). This may lead to data races on
-> net_device->stats.
-> 
-> Convert all stats updates in both transmit and receive paths to use the
-> DEV_STATS_INC() macro, which updates stats atomically.
+On Tue, Jun 24 2025 at 15:39, Thomas Gleixner wrote:
+> On Tue, Jun 24 2025 at 11:22, Paolo Abeni wrote:
+>>> +	if (cmd == PTP_PIN_GETFUNC2 && !mem_is_zero(pd.rsv, sizeof(pd.rsv)))
+>>> +		return -EINVAL;
+>>> +	else
+>>> +		memset(pd.rsv, 0, sizeof(pd.rsv));
+>>
+>> Minor nit: I personally find the 'else' statement after return
+>> counter-intuitive and dropping it would save an additional LoC.
+>
+> Of course ...
 
-Do you have benchmark numbers for these changes? How big an
-improvement does it makes?
+But second thoughts. The actual logic here is:
 
-https://elixir.bootlin.com/linux/v6.15.3/source/include/linux/netdevice.h#L5549
+	if (cmd == PTP_PIN_GETFUNC2) {
+		if (!mem_is_zero(pd.rsv, sizeof(pd.rsv)))
+			return -EINVAL;
+	} else {
+		memset(pd.rsv, 0, sizeof(pd.rsv));
+	}
 
-/* Note: Avoid these macros in fast path, prefer per-cpu or per-queue counters. */
-#define DEV_STATS_INC(DEV, FIELD) atomic_long_inc(&(DEV)->stats.__##FIELD)
+because PTP_PIN_GETFUNC did not mandate the reserved fields to be zero,
+which means the reserved fields can never be used with that opcode.
 
-As far as i can see, you only use DEV_STATS_INC() in error paths. It
-might be worth mentioning this. As the comment says, you don't want to
-use it on the hot path.
+But as it stands today, pd.rsv is not used at all in that function and
+pd is fully overwritten via pd = pd->ops_config[] later. So the memset
+is completely useless right now and can go away completely.
+
+Thanks,
+
+        tglx
 
 
-    Andrew
-
----
-pw-bot: cr
 
