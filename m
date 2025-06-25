@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-201145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50BEEAE8430
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 15:18:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E8E4AE844E
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 15:19:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF0904A8066
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 13:16:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB2B51888C5F
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 13:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41395265282;
-	Wed, 25 Jun 2025 13:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 818A1266B6B;
+	Wed, 25 Jun 2025 13:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gWT6vpi5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R65+/fuF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10802264F9F;
-	Wed, 25 Jun 2025 13:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5220A266B40;
+	Wed, 25 Jun 2025 13:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750857357; cv=none; b=UwEIgOdAvfgb6a6i2zVA4hSLdbAw+QlLk1R2Mxz/8RByglfhIP0q04758GxfkKElInG4ASumd0ra3m9wyiUsEjskyRkANktADqKX4qSzXlWgsuURxtiGn5AgQjrfRIGSmIAaI8GiwYuxFG3FhkW0s+mpZZREss3jLuW61+bbR6Q=
+	t=1750857359; cv=none; b=sN7qbIrSOhaubJRPf2kRSfrOXJFOTozeVVI2ne4lMGnTScl8Antg1hpiI3FmMrWRGbkb6MdsyyxzYCbAwB/XHS9yokNC9JjJkjpfPOrCwBkClZTH+Z4YYCu4DBcXaJ0xsm1OUHEH5fghaPzS55LCI8QZs+OoatgNWyEfj9UcSEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750857357; c=relaxed/simple;
-	bh=tzu8C7G0MXN2UCFhPls8DX7uDkR2X/rKpQJD5CnqN8o=;
+	s=arc-20240116; t=1750857359; c=relaxed/simple;
+	bh=6FGvTFiznU/YaYWH3NC0Q28wP/NFxB0CJ852Q7yLWto=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AWm6IkPfu1jbLDoNQ+I0GMcJ6GW0CM+k2ZFPfXwlcwsCrXHE1jV4zy+BW76y5iI5lgciGxwoDZXGlyiRmlDn+XMzASur4O7tkedNkgowjCfpTksQ/J4/yfPLTOSEEfDwGqkCSDsO6LZ/yNpxNuk5S9eAili5Pts3C4zk6Yqkla0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gWT6vpi5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48213C4CEF0;
-	Wed, 25 Jun 2025 13:15:54 +0000 (UTC)
+	 MIME-Version; b=ObJPix1RnC6GqBFCD7tSe+ERG23W8LZIUVT78/lTmeJgdxeLuFJIpIgLgLQpNEVCnNfXrWhmdHoXr6W/KR56LKdNO0bLC9u+rdBPTecVd4cGfXfTPC+Ao2CFRaIBY0SuTqZgSGulHW3iXJRiIcdkK6xY1lxHjqwNjZseHcVHVz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R65+/fuF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 016BAC4CEF5;
+	Wed, 25 Jun 2025 13:15:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750857356;
-	bh=tzu8C7G0MXN2UCFhPls8DX7uDkR2X/rKpQJD5CnqN8o=;
+	s=k20201202; t=1750857359;
+	bh=6FGvTFiznU/YaYWH3NC0Q28wP/NFxB0CJ852Q7yLWto=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gWT6vpi5BODHPyeVqzNQJeFoRruUOyzf+nuN/Vbk1yO1fGiePeTUm3kaWPxO5Sncu
-	 mFvn0biHHgL/IrQI4LjX3M3Ji7qn2PorTm08rNQiigEUORqJjiTfV9/Ov6LfsrVqa7
-	 Or632OZbPTLpFo0DqhzElhPJklq+zGMaEk84XJvUNQ+qvHI+5Psc3Pof65fdnbVKGs
-	 WjBmeJM4OjItEOGxLs8PX2EdqX+u6AC3IYOPfDhU4E1bcK2shrnnRPl5h0SMnpOmPK
-	 ZZXG4KHYXsP2c9quWr2apNoJOCfS3TLkV/AAs9SsfA0Mb1XMRehXyTFzkz2y0LqMNE
-	 1NVVuBcFQQsgQ==
+	b=R65+/fuFoMFU0nJIJeS/jVGsx/DWb6yzZE6aM/rohakai6HSG82IGaVrnWeiV/C8P
+	 brcsURjy1Z+9jZAftBRxadvrGHiqoFRBFShE3UNt+oljVf5NLZorwE/Z76eKxNwpJf
+	 LGBkUo9HdQyFKpHnVsJ+zB/vfxu326X0Q4bHUkFWSMWCT/0kF1TQFlc5F0RVT8onVO
+	 IA2GgiX/xH5wc8FIEmFI0pfii7KCjvoEOI1UcUp7hwmySLjV87u+9ac8wcMxwVJf8v
+	 NxTe1hjpUBwNRElVPZUFXEkI7Eac5F8uJAatwVidHBfuva99H+BiW0Hnpu4sJ+c9oB
+	 Q1W2ACLbErhvg==
 From: Will Deacon <will@kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: Will Deacon <will@kernel.org>,
@@ -54,9 +54,9 @@ Cc: Will Deacon <will@kernel.org>,
 	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
 	netdev@vger.kernel.org,
 	virtualization@lists.linux.dev
-Subject: [PATCH 2/5] vsock/virtio: Resize receive buffers so that each SKB fits in a page
-Date: Wed, 25 Jun 2025 14:15:40 +0100
-Message-Id: <20250625131543.5155-3-will@kernel.org>
+Subject: [PATCH 3/5] vhost/vsock: Allocate nonlinear SKBs for handling large receive buffers
+Date: Wed, 25 Jun 2025 14:15:41 +0100
+Message-Id: <20250625131543.5155-4-will@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250625131543.5155-1-will@kernel.org>
 References: <20250625131543.5155-1-will@kernel.org>
@@ -68,37 +68,118 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When allocating receive buffers for the vsock virtio RX virtqueue, an
-SKB is allocated with a 4140 data payload (the 44-byte packet header +
-VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE). Even when factoring in the SKB
-overhead, the resulting 8KiB allocation thanks to the rounding in
-kmalloc_reserve() is wasteful (~3700 unusable bytes) and results in a
-higher-order page allocation for the sake of a few hundred bytes of
-packet data.
+When receiving a packet from a guest, vhost_vsock_handle_tx_kick()
+calls vhost_vsock_alloc_skb() to allocate and fill an SKB with the
+receive data. Unfortunately, these are always linear allocations and can
+therefore result in significant pressure on kmalloc() considering that
+the maximum packet size (VIRTIO_VSOCK_MAX_PKT_BUF_SIZE +
+VIRTIO_VSOCK_SKB_HEADROOM) is a little over 64KiB, resulting in a 128KiB
+allocation for each packet.
 
-Limit the vsock virtio RX buffers to a page per SKB, resulting in much
-better memory utilisation and removing the need to allocate higher-order
-pages entirely.
+Rework the vsock SKB allocation so that, for sizes with page order
+greater than PAGE_ALLOC_COSTLY_ORDER, a nonlinear SKB is allocated
+instead with the packet header in the SKB and the receive data in the
+fragments.
 
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- include/linux/virtio_vsock.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/vhost/vsock.c        | 15 +++++++++------
+ include/linux/virtio_vsock.h | 31 +++++++++++++++++++++++++------
+ 2 files changed, 34 insertions(+), 12 deletions(-)
 
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index 66a0f060770e..cfa4e1bcf367 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -344,11 +344,16 @@ vhost_vsock_alloc_skb(struct vhost_virtqueue *vq,
+ 
+ 	len = iov_length(vq->iov, out);
+ 
+-	if (len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE + VIRTIO_VSOCK_SKB_HEADROOM)
++	if (len < VIRTIO_VSOCK_SKB_HEADROOM ||
++	    len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE + VIRTIO_VSOCK_SKB_HEADROOM)
+ 		return NULL;
+ 
+ 	/* len contains both payload and hdr */
+-	skb = virtio_vsock_alloc_skb(len, GFP_KERNEL);
++	if (len > SKB_WITH_OVERHEAD(PAGE_SIZE << PAGE_ALLOC_COSTLY_ORDER))
++		skb = virtio_vsock_alloc_skb_with_frags(len, GFP_KERNEL);
++	else
++		skb = virtio_vsock_alloc_skb(len, GFP_KERNEL);
++
+ 	if (!skb)
+ 		return NULL;
+ 
+@@ -377,10 +382,8 @@ vhost_vsock_alloc_skb(struct vhost_virtqueue *vq,
+ 
+ 	virtio_vsock_skb_rx_put(skb);
+ 
+-	nbytes = copy_from_iter(skb->data, payload_len, &iov_iter);
+-	if (nbytes != payload_len) {
+-		vq_err(vq, "Expected %zu byte payload, got %zu bytes\n",
+-		       payload_len, nbytes);
++	if (skb_copy_datagram_from_iter(skb, 0, &iov_iter, payload_len)) {
++		vq_err(vq, "Failed to copy %zu byte payload\n", payload_len);
+ 		kfree_skb(skb);
+ 		return NULL;
+ 	}
 diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
-index 36fb3edfa403..67ffb64325ef 100644
+index 67ffb64325ef..8f9fa1cab32a 100644
 --- a/include/linux/virtio_vsock.h
 +++ b/include/linux/virtio_vsock.h
-@@ -111,7 +111,8 @@ static inline size_t virtio_vsock_skb_len(struct sk_buff *skb)
- 	return (size_t)(skb_end_pointer(skb) - skb->head);
+@@ -51,27 +51,46 @@ static inline void virtio_vsock_skb_rx_put(struct sk_buff *skb)
+ {
+ 	u32 len;
+ 
++	DEBUG_NET_WARN_ON_ONCE(skb->len);
+ 	len = le32_to_cpu(virtio_vsock_hdr(skb)->len);
+ 
+-	if (len > 0)
++	if (skb_is_nonlinear(skb))
++		skb->len = len;
++	else
+ 		skb_put(skb, len);
  }
  
--#define VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE	(1024 * 4)
-+#define VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE	(SKB_WITH_OVERHEAD(PAGE_SIZE) \
-+						 - VIRTIO_VSOCK_SKB_HEADROOM)
- #define VIRTIO_VSOCK_MAX_BUF_SIZE		0xFFFFFFFFUL
- #define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE		(1024 * 64)
+-static inline struct sk_buff *virtio_vsock_alloc_skb(unsigned int size, gfp_t mask)
++static inline struct sk_buff *
++__virtio_vsock_alloc_skb_with_frags(unsigned int header_len,
++				    unsigned int data_len,
++				    gfp_t mask)
+ {
+ 	struct sk_buff *skb;
++	int err;
  
+-	if (size < VIRTIO_VSOCK_SKB_HEADROOM)
+-		return NULL;
+-
+-	skb = alloc_skb(size, mask);
++	skb = alloc_skb_with_frags(header_len, data_len,
++				   PAGE_ALLOC_COSTLY_ORDER, &err, mask);
+ 	if (!skb)
+ 		return NULL;
+ 
+ 	skb_reserve(skb, VIRTIO_VSOCK_SKB_HEADROOM);
++	skb->data_len = data_len;
+ 	return skb;
+ }
+ 
++static inline struct sk_buff *
++virtio_vsock_alloc_skb_with_frags(unsigned int size, gfp_t mask)
++{
++	size -= VIRTIO_VSOCK_SKB_HEADROOM;
++	return __virtio_vsock_alloc_skb_with_frags(VIRTIO_VSOCK_SKB_HEADROOM,
++						   size, mask);
++}
++
++static inline struct sk_buff *virtio_vsock_alloc_skb(unsigned int size, gfp_t mask)
++{
++	return __virtio_vsock_alloc_skb_with_frags(size, 0, mask);
++}
++
+ static inline void
+ virtio_vsock_skb_queue_head(struct sk_buff_head *list, struct sk_buff *skb)
+ {
 -- 
 2.50.0.714.g196bf9f422-goog
 
