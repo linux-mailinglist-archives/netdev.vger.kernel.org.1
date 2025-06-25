@@ -1,72 +1,114 @@
-Return-Path: <netdev+bounces-201292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8E26AE8C9D
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 20:37:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC43CAE8CA2
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 20:38:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 511A81894395
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 18:37:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F11817A1F76
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 18:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF672D5C8B;
-	Wed, 25 Jun 2025 18:37:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B8D72D660E;
+	Wed, 25 Jun 2025 18:38:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I1Di+KYC"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="vvv5A7N7";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="rPbv0I9b"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47548634A;
-	Wed, 25 Jun 2025 18:37:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB06E1AF0BB;
+	Wed, 25 Jun 2025 18:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750876632; cv=none; b=YvwHISJKTHw7xvwwKRvD/vMgC1yRFXAo9FdNT6muLtG2Gqhue1HbvKHgAVodbe+Y171m7jDfOFyjtc6t08TJak7EKzNjTiL8Hyz88xMjyb3J9/8b1APYU8iYm23+Or2W6MxLJ29e2QqcAR1N5+tOkPrqC/ZBIyPFy539HFePXC0=
+	t=1750876713; cv=none; b=Jl2G+ZsgLXOuXUMzV3foFl9TW1n+yA5yo3c7K5j5WlwlnRUdsC4lzli+vCuiHo0Vm/K58IbCQc6ikTxM/V4ix6w5AiU9p0W3M8EC54TJ0JFWsu5JsEf4sagjoxfaJ9+7GT6j39azgPFEZmOQMHakcUEqY4uls20RdNmkeRCm9jo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750876632; c=relaxed/simple;
-	bh=RthnF4fFeRyk9Gmg9wEI8C/dlSVpbxQt34w1wuFERRY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qYCKFOrC6BAFibJCjdhwfIrsra0fRWkSnC3r8u9qvD18VtP0r2b6yBN34OuflchRa9M6qOrWoLlQcxB9HGMUICX9ZIg2vz1SAacEBFWxpX0oGm2Davl6KxaEzMZ1VtpO132c7dC+US5Re54BSIqNCkMIk1X4VMUORuE3sc60/rI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I1Di+KYC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA82AC4CEEE;
-	Wed, 25 Jun 2025 18:37:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750876632;
-	bh=RthnF4fFeRyk9Gmg9wEI8C/dlSVpbxQt34w1wuFERRY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=I1Di+KYCjMGRzpFYKJprImcSUKNR0fL79BQVpBCRe6YbPAxIMlbxa04dbrOBaocQ5
-	 jOJVQGjzc9bLxptC9DSNe8RqHr/ZPp+Bf+i+Ygq3FCiY5wYdiok2n6LE1nJX4h/zk2
-	 Ho95+aLj1UNGlSc378i4m3332AXDoCxuPv8TRgmNhhhmIPWWGis3/4DWoVbNHPWTZ8
-	 ljKNhDzXNsk88fbs7MU0JPnkeAZ0RY13D2eTPbnhZbDdK2kHoRleEBxZssOhPdW9/t
-	 qcDe1wdTz3/CCH9dUaWSw4FEPXfVzg+V/VeAmd5ADvfZM7IdaocaVmrDKZXMZPS2Vk
-	 Ve+DrzXR8FrvA==
-Date: Wed, 25 Jun 2025 19:37:08 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: Remove unused function
- first_net_device_rcu()
-Message-ID: <20250625183708.GL1562@horms.kernel.org>
-References: <20250625102155.483570-1-yuehaibing@huawei.com>
+	s=arc-20240116; t=1750876713; c=relaxed/simple;
+	bh=vhIpbL8PX1zuLkauw/1TluiZTOdJeUcJLbeWVxmstB0=;
+	h=Message-ID:From:To:Cc:Subject:Date; b=upQijAVk3X51V0i65qnsoeWQmNb7M/WbN2g51DJAKSx838knjmqZ95BXn0oQcNi3MfgBAdNENyvA35UxqX+fPRPLH2UGIR3y9d6uo9nUL73Xt6+FBkFd+1FFBZseyktUK8M4dQPpeBpOFGmOfM5NW6dVd/U4GnnJXho6zCrywT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=vvv5A7N7; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=rPbv0I9b; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Message-ID: <20250625182951.587377878@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1750876707;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc; bh=vtyXAHESSpGD7UpiGsAjSdb/OwZhsKJr4dsRrO4YTfE=;
+	b=vvv5A7N7HVrhlNOuUYrNXKklHpbSiaMu/wtFA/BR7cFYx+x0ecvi8sg2o4SZ4CmbGDSo5a
+	77aitqR6B9xh2mCRkh0AzE9ZyncT2ry8lWC8ctiC5TeM8RZELPaTZGpLLvLJQX+TA7HUaB
+	PJyfpGstoAH3oTEpGCY8OmrMJHjW+V7zL/0ujlJQnP4pvHpR3oJ0BXEfxa3ndtXBaGUsZQ
+	LZThj08CvFwJ8ZaravLs0luB0ogmWjkgRpEIqoboAblOLAld2R/jB5uYKwsgdCWgpRjwQg
+	QIK9c9gfSAwgi0ixUP91TW8/BXyKw2bk5NKTY0wW8CQX2DURdqF6LhmA2ZV8ew==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1750876707;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc; bh=vtyXAHESSpGD7UpiGsAjSdb/OwZhsKJr4dsRrO4YTfE=;
+	b=rPbv0I9bDXpOA5f9Qpmwsin4dawmyyCxpDccsGoBvdNmiBIGnycxeVB7YUbWJlivJCkJZs
+	yMmXgw32nGY88vAA==
+From: Thomas Gleixner <tglx@linutronix.de>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: netdev@vger.kernel.org,
+ Richard Cochran <richardcochran@gmail.com>,
+ Christopher Hall <christopher.s.hall@intel.com>,
+ John Stultz <jstultz@google.com>,
+ Frederic Weisbecker <frederic@kernel.org>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Miroslav Lichvar <mlichvar@redhat.com>,
+ Werner Abt <werner.abt@meinberg-usa.com>,
+ David Woodhouse <dwmw2@infradead.org>,
+ Stephen Boyd <sboyd@kernel.org>,
+ =?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
+ Kurt Kanzenbach <kurt@linutronix.de>,
+ Nam Cao <namcao@linutronix.de>,
+ Antoine Tenart <atenart@kernel.org>
+Subject: [patch V3 00/11] timekeeping: Provide support for auxiliary clocks -
+ Remaining series
+Date: Wed, 25 Jun 2025 20:38:25 +0200 (CEST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250625102155.483570-1-yuehaibing@huawei.com>
 
-On Wed, Jun 25, 2025 at 06:21:55PM +0800, Yue Haibing wrote:
-> This is unused since commit f04565ddf52e ("dev: use name hash for
-> dev_seq_ops")
-> 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+This is the remaining series of V2, which can be found here:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+   https://lore.kernel.org/all/20250519082042.742926976@linutronix.de
 
+The first 15 patches of V2 have been merged into the tip tree and this is
+the update of the remaining 11, which addresses the review feedback.
+
+Changes vs. V2:
+
+  - Use kobject.h, clockid_t and cleanup the sysfs init - Thomas W.
+
+  - Use aux_tkd, aux_tks instead of tkd, tks in aux clock specific
+    functions for clarity - John
+
+  - Remove misleading clock TAI comment - John
+
+The series applies on top of:
+
+    git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git timers/ptp
+
+and is available from git:
+
+     git://git.kernel.org/pub/scm/linux/kernel/git/tglx/devel.git timers/ptp/clocks
+
+A small update for PTP to support auxiliary clocks in
+PTP_SYS_OFFSET_EXTENDED is going to be sent seperately as it has a
+dependency on pending PTP changes.
+
+Thanks,
+
+	tglx
+---
+ Documentation/ABI/stable/sysfs-kernel-time-aux-clocks |    5 
+ include/linux/posix-timers.h                          |    5 
+ include/linux/timekeeping.h                           |   11 
+ kernel/time/posix-timers.c                            |    3 
+ kernel/time/posix-timers.h                            |    1 
+ kernel/time/timekeeping.c                             |  484 +++++++++++++++---
+ 6 files changed, 451 insertions(+), 58 deletions(-)
 
