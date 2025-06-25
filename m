@@ -1,92 +1,148 @@
-Return-Path: <netdev+bounces-201337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61A3FAE90EF
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 00:18:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 181A3AE90F5
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 00:20:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37F141898BF8
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 22:18:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10E56189D55B
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 22:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D11CC2F2C5A;
-	Wed, 25 Jun 2025 22:18:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 530622F2C6F;
+	Wed, 25 Jun 2025 22:20:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MT2kPDja"
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="oDW9APQE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-106103.protonmail.ch (mail-106103.protonmail.ch [79.135.106.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD1D035280
-	for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 22:18:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D522877DD;
+	Wed, 25 Jun 2025 22:20:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.103
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750889908; cv=none; b=pGBnmj79WWG/nuVZ2HPWalmBxwEyOp3wUAVEO9qkgczwSboSFDl8fl6ni4aQk7blauZb9SjjXLDRVfIcixOHgW/POsGSrHDQ3Ai2+d1ffpEbbrEKJFdksDUS/wm8w1KNonbHdOtxdSPGgRT7DuBlTs5yN5/749FCDQpa/72hzvg=
+	t=1750890021; cv=none; b=VkgqDRAEPWrXl2b9LqikX9ye18ZxA3KbljKqMGyDMZBT0AVeggcdZmYdZC1HBjXz9VEAaR5OWfis/YY4sJfT1M0Ofu5jEbWxTUnr22gt0ahaijPDT94f4MzyYHZwKI72HqIOMJEzj+N/mcCjresqjoRirUkXX7+xsWNTpyRgDss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750889908; c=relaxed/simple;
-	bh=5vth//wMCKfJW+u426ptA7F1lfRfH32dFxUCxS3NQjM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hsCxYmXe5W1I4EEFnZ8g8sAMh4d9G0rA56z25+lOroNXVEeloPnJYZ4yKOds75fWqoY6L8isF9dPnLgZP4M0FYLBG51vsbssdgXc3VkWND3TzpzXSGlAimODfdlObJlvQ2Mir5J0ZVJNfDu12VIsJyDe9De5JK9UNDGl0NkBryM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MT2kPDja; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8728BC4CEEA;
-	Wed, 25 Jun 2025 22:18:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750889908;
-	bh=5vth//wMCKfJW+u426ptA7F1lfRfH32dFxUCxS3NQjM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MT2kPDjaBOgpSaNhq4C+2cKRj8KFlJv1N/v2jP8/8NXPWYslhK4z4b4/qWGFZT9X5
-	 d/4cSALXJmt31i/tsalCqKuKOV5aLzvI9IE8VObfAbU+8JHtvqbgNeDsKdOMc00XAD
-	 bQGRjpblvtZ5fD5Naxxe+m+Bfz2AG2P85P+0OyXaRRSFGv4lE3aSnL+eKpxoKyz7UM
-	 jUMRN26hLLpXwOGd/gJnnydle5aOtq4AcsCu3zj1rDeQlQeiihdeOZKa0avHdqw2im
-	 5xNUtUEVlom78MJ1lU6EfulSIY9M8ldh+hLLBgnAmrfpYeAb7IE5FxELWnqWjmUPK0
-	 0WIj+YNquRiIQ==
-Date: Wed, 25 Jun 2025 15:18:26 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: Donald Hunter <donald.hunter@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Saeed Mahameed
- <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan
- <tariqt@nvidia.com>, Boris Pismenny <borisp@nvidia.com>, Kuniyuki Iwashima
- <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, David Ahern
- <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>, Patrisious
- Haddad <phaddad@nvidia.com>, Raed Salem <raeds@nvidia.com>, Jianbo Liu
- <jianbol@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, Rahul
- Rameshbabu <rrameshbabu@nvidia.com>, Stanislav Fomichev <sdf@fomichev.me>,
- Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>, Alexander
- Lobakin <aleksander.lobakin@intel.com>, Jacob Keller
- <jacob.e.keller@intel.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 08/17] net: psp: add socket security association code
-Message-ID: <20250625151826.48cc600b@kernel.org>
-In-Reply-To: <20250625135210.2975231-9-daniel.zahka@gmail.com>
-References: <20250625135210.2975231-1-daniel.zahka@gmail.com>
-	<20250625135210.2975231-9-daniel.zahka@gmail.com>
+	s=arc-20240116; t=1750890021; c=relaxed/simple;
+	bh=E2X8JFzbatE1FCWlY5YF6I83d2kqH95jUGI4Wns86t8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XZ2H6YvRYdwnh/8xm1U7nGmTEgGXCgqLC2iE7CXkvmZkPZdzPFGBo9O0aM/pIVueMH9t/KF1RS0vBXKG44UjEIgDgn21uFJ6Enp/6Q1wfNlOnJEQUcaM9y2HtjVrcxdipQERqLQW5+EjmLYlaTf+1PmjPlSmvwt55Tq+dG/Dz/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=oDW9APQE; arc=none smtp.client-ip=79.135.106.103
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1750890011; x=1751149211;
+	bh=E2X8JFzbatE1FCWlY5YF6I83d2kqH95jUGI4Wns86t8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=oDW9APQEaPN0TF9Pbt6GIgp1fNrQT6QgvtjS6i7PVCoh7VEIsUvk6Lt6iUCuh4C8I
+	 FRi4/y3YXUj+CmU4Un++R5RuYbR1eCYa0f2ToJp7S5h/Hh+cQyRmnrja1O9ti8jDQl
+	 fPkwRn6A5kJ4WJFD6fOsH0GXUgXqvRGkDfLm45m51eF0ZXp34ayUOXa3iEUhc83GVm
+	 p1heVjNaZrEHpqfITArKh+T+Rw8MhUCs0ieNTG+obos1E5hkfBc+pdoCQ99ufxRYwz
+	 THT+32eC163nLE44gpE5zzKvvwuGyX5aG4MeA0YRc0perPypZnqKqvBK+W9UhtyslT
+	 ykjNJ1SNrQEmQ==
+Date: Wed, 25 Jun 2025 22:20:01 +0000
+To: Jonathan Cameron <jic23@kernel.org>
+From: Yassine Oudjana <y.oudjana@protonmail.com>
+Cc: Lars-Peter Clausen <lars@metafoo.de>, Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, Alexander Sverdlin <alexander.sverdlin@gmail.com>, Sean Nyekjaer <sean@geanix.com>, Javier Carrasco <javier.carrasco.cruz@gmail.com>, Matti Vaittinen <mazziesaccount@gmail.com>, Antoniu Miclaus <antoniu.miclaus@analog.com>, Ramona Gradinariu <ramona.gradinariu@analog.com>, "Yo-Jung (Leo) Lin" <0xff07@gmail.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Neil Armstrong <neil.armstrong@linaro.org>, =?utf-8?Q?Barnab=C3=A1s_Cz=C3=A9m=C3=A1n?= <barnabas.czeman@mainlining.org>, Danila Tikhonov
+	<danila@jiaxyga.com>, Antoni Pokusinski <apokusinski01@gmail.com>, Vasileios Amoiridis <vassilisamir@gmail.com>, Petar Stoykov <pd.pstoykov@gmail.com>, shuaijie wang <wangshuaijie@awinic.com>, Yasin Lee <yasin.lee.x@gmail.com>, "Borislav Petkov (AMD)" <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, Tony Luck <tony.luck@intel.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Ingo Molnar <mingo@kernel.org>, Yassine Oudjana <yassine.oudjana@gmail.com>, linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH 1/3] net: qrtr: Turn QRTR into a bus
+Message-ID: <ZUlOGBxe4Dky-Qo1EtYMuS0kDRjYdkqex3qgSiFBkFwIdEUpHjsD2pcl3VvMPjD-ZAeqcP5P40AsSfHtv4fJ8Z8stUu4nwYFw0qt3vtf7yc=@protonmail.com>
+In-Reply-To: <20250406170111.7a11437a@jic23-huawei>
+References: <20250406140706.812425-1-y.oudjana@protonmail.com> <20250406140706.812425-2-y.oudjana@protonmail.com> <20250406170111.7a11437a@jic23-huawei>
+Feedback-ID: 6882736:user:proton
+X-Pm-Message-ID: db9bb8d33409b840d6eaf22ce2cef2153ee0ccda
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 25 Jun 2025 06:51:58 -0700 Daniel Zahka wrote:
-> +enum skb_drop_reason
-> +psp_twsk_rx_policy_check(struct inet_timewait_sock *tw, struct sk_buff *skb)
-> +{
-> +	return __psp_sk_rx_policy_check(skb, psp_twsk_assoc(tw));
-> +}
-> +EXPORT_SYMBOL_GPL(psp_twsk_rx_policy_check);
 
-This is just for IPv6 right? Let's switch all the exports for IPv6 to
+On Sunday, April 6th, 2025 at 5:01 PM, Jonathan Cameron <jic23@kernel.org> =
+wrote:
 
-EXPORT_IPV6_MOD_GPL()
+> On Sun, 06 Apr 2025 14:07:43 +0000
+> Yassine Oudjana y.oudjana@protonmail.com wrote:
+>=20
+> > Implement a QRTR bus to allow for creating drivers for individual QRTR
+> > services. With this in place, devices are dynamically registered for QR=
+TR
+> > services as they become available, and drivers for these devices are
+> > matched using service and instance IDs.
+> >=20
+> > In smd.c, replace all current occurences of qdev with qsdev in order to
+> > distinguish between the newly added QRTR device which represents a QRTR
+> > service with the existing QRTR SMD device which represents the endpoint
+> > through which services are provided.
+> >=20
+> > Signed-off-by: Yassine Oudjana y.oudjana@protonmail.com
+>=20
+> Hi Yassine
+>=20
+> Just took a quick look through.
+>=20
+> It might make more sense to do this with an auxiliary_bus rather
+> than defining a new bus.
+>=20
+> I'd also split out the renames as a precursor patch.
+>=20
+> Various other comments inline.
+>=20
+> Jonathan
 
-> +void psp_reply_set_decrypted(struct sock *sk, struct sk_buff *skb)
+<...>
 
-And this one needs an export, too
--- 
-pw-bot: cr
+> > + if (!del_server)
+> > + return -ENOMEM;
+> > +
+> > + del_server->parent =3D qsdev;
+> > + del_server->port =3D port;
+> > +
+> > + INIT_WORK(&del_server->work, qcom_smd_qrtr_del_device_worker);
+> > + schedule_work(&del_server->work);
+> > +
+> > + return 0;
+> > +}
+> > +
+> > +static int qcom_smd_qrtr_device_unregister(struct device *dev, void *d=
+ata)
+> > +{
+> > + device_unregister(dev);
+>=20
+>=20
+> One option that may simplify this is to do the device_unregister() handli=
+ng
+> a devm_action_or_reset() handler that is using the parent device as it's =
+dev
+> but unregistering the children. That way the unregister is called in the
+> reverse order of setup and you only register a handler for those devices
+> registered (rather walking children). I did this in the CXL pmu driver
+> for instance.
+
+Not sure I understand this correctly. This function is called for all child=
+ren when
+the parent (the bus) is removed in order to unregister them, so its called =
+for all
+registered devices under the parent. It's just a wrapper for device_unregis=
+ter so
+that it can be used with device_for_each_child. If I register a handler wit=
+h
+devm_add_action_or_reset using the parent device then it seems to me like I=
+ will
+have to add a new function used as handler for that which in turn goes over=
+ the
+children and unregisters them (we always unregister all children since the =
+parent
+will be no more) then I will only be adding an extra layer. I checked the C=
+XL PMU
+driver but I only found devm_add_action_or_reset used for cleaning up objec=
+ts
+associated with the device, not removing child devices.
+
 
