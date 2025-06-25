@@ -1,181 +1,114 @@
-Return-Path: <netdev+bounces-201113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42476AE8215
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 13:55:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08BC6AE822B
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 13:58:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCBA27AA7C5
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:54:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C53D84A30E2
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:57:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DAD2267AEB;
-	Wed, 25 Jun 2025 11:52:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D5F2609FB;
+	Wed, 25 Jun 2025 11:54:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ij1geo9+";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="yI77TiUa"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="l1JjiTMl"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B17E25E44B;
-	Wed, 25 Jun 2025 11:52:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D65B25F971;
+	Wed, 25 Jun 2025 11:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750852364; cv=none; b=hUCjLWTAvfVi+gB8BFFXJwN4ZobUeXfdtNwyneNy3bUd8MHyKORyQGXBMSa46CxZEpXh46NaGzSqER4uFgTY5tKmks9oziBsXlGnPDm7vMdrIVXnnc9Z3j5zzOKKWwDCGtr2XVA7yIXBBJH0WFp0/g3b/8VIi7hpa/8YvAzFmso=
+	t=1750852486; cv=none; b=gj3GaLnOfSg4xQGpf5gUJeZQ6mfBwQRfmwVgLW4Sdpr2j1Dy7yjJXiDY8suobYJgaPCdkfsk7ZKS/PDTkCTi0qxke9YdhqfLQsiRS4/yMgzdziF5FHI8PXFniKIbIjqNB1sjhAdR+b+awr+0gLqvZv/Q91J+9fTJtnOeD8y5jrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750852364; c=relaxed/simple;
-	bh=TWIqKKbfG6uuI5HtJ3eC8YlrZRXG3e3FNtS1Y27gBWY=;
-	h=Message-ID:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Date; b=G8cem57f2PKYvdARL9aNc/1Y5yTt9oeT1l9MRQaNWaQYzJx9uBSvzk7jKwe4zDdZm+Jwh7bOf1+HlS04VWV0bus8u5wQ9Ok2YHY/UvDNEkNEcO0z9OQNntxH8OuCStw459iW8UDanP+Vs9acKXdUk8QD9mHYTWz5tS/sMWlFrPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ij1geo9+; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=yI77TiUa; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Message-ID: <20250625115133.486953538@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1750852359;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 references:references; bh=GCssfyGvJulb+kWMiAtrGha00DmPusbjNgsxf3WrhOI=;
-	b=ij1geo9+GrIYRBF5s3mgwgO/FAfNNTqkmPB8Xy5nTJi1av60V6YnQdQ6PoSpdiVKpX0cQN
-	UFE4AYhgYiPogILMxtFY2aWsEYwB70GsbFeyro8Yxx04hLV5yb5IwKErr7lInhabF5YyEr
-	zryubZbPNYe1nROE2hXmeenMBmS7VcZrNnLg3PI2HjydFj5UAlfj28qCgKb31fMK01QX+I
-	TIjlom64jjT3Wt5I4aJPsq50gfyUYNo4SqzxMiScG0Y1c15uG3u/szXD3l6P6A+0X7DGy2
-	uYN5tJJ6dSJvDOKShekQCbt4dLMoTx8+VHCJHnpzVqTpoVLMuD1DdWOa2qRnSw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1750852359;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 references:references; bh=GCssfyGvJulb+kWMiAtrGha00DmPusbjNgsxf3WrhOI=;
-	b=yI77TiUaBFd0b2giLZAR3Rs2r4RQHtySXnAtTI/QfaEbAzV+CzTK+nPIsGtM/eejba2I45
-	v6UtiPDj/3WmR2AQ==
-From: Thomas Gleixner <tglx@linutronix.de>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: Richard Cochran <richardcochran@gmail.com>,
- netdev@vger.kernel.org,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>
-Subject: [patch V2 13/13] ptp: Simplify ptp_read()
-References: <20250625114404.102196103@linutronix.de>
+	s=arc-20240116; t=1750852486; c=relaxed/simple;
+	bh=fYhqgWcrMDUQh0LcbaY40LxLgotnOxTn/1XEiPONA6w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eMdmwKkYsgtZwZtP9A3Vpv5bNL0c3KQQnUSV3KfXpXJ38PEqnsvGjjQ+LHxenmd3/hXoMkeXtjE2CUAHrgv9HZLTYfOIcbKweNaX1cY7YwX2W7bTh+T6YkDvkITmzzzFxIjoBNh7Z2WvjartC/73Mim708SltiCXqURZOBSoI+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=l1JjiTMl; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=yBa1t/SHtIDzKXtNq3+WIr8qjUOXvNiOwZ9/+bz71Z8=; t=1750852485; x=1752062085; 
+	b=l1JjiTMlB5mg6H3Fv4RJWTR9ztIXNNK8rf4HiF+ABl8ta0VbvxPWnfGaOU/XK/VqLjCD9TogSuK
+	KYAl0DS5vOLxpFD0dKFvd21SFbRGpg6A7U4VJc4wVZFXfsql7J3yaNBPjXw0ZzpWhH5jIPPcmsl/6
+	OR/U3vuAHyRJ7cs2HGseSruonmT+eFhK4C4UntySc1M34+5L6sDfaLohWgHANLv+y1VkV2G4boM1a
+	u6dqhzmvOeh7/1E8x5IfgHkICf0ANX8XaPNwJVwhGhqtpDp99RWSjSmx/5LDAQPM7Pjy0W1qk3H/U
+	zCh/QxThvtHargiX+yeGm+EPNGLCT+uPhJOw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1uUOi5-00000009wKe-3cvn;
+	Wed, 25 Jun 2025 13:54:38 +0200
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-2025-06-25
+Date: Wed, 25 Jun 2025 13:54:08 +0200
+Message-ID: <20250625115433.41381-3-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 25 Jun 2025 13:52:39 +0200 (CEST)
+Content-Transfer-Encoding: 8bit
 
-The mixture of gotos and direct return codes is inconsistent and just makes
-the code harder to read. Let it consistently return error codes directly and
-tidy the code flow up accordingly.
+Hi,
 
-No functional change intended.
+Just a handful of new fixes, nothing stands out. No known
+conflicts either.
 
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
----
-V2: Fix the return value - Paolo
-    Drop the __free() part - Jakub
----
- drivers/ptp/ptp_chardev.c |   54 +++++++++++++---------------------------------
- 1 file changed, 16 insertions(+), 38 deletions(-)
+Please pull and let us know if there's any problem.
 
---- a/drivers/ptp/ptp_chardev.c
-+++ b/drivers/ptp/ptp_chardev.c
-@@ -106,8 +106,7 @@ int ptp_set_pinfunc(struct ptp_clock *pt
- 
- int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
- {
--	struct ptp_clock *ptp =
--		container_of(pccontext->clk, struct ptp_clock, clock);
-+	struct ptp_clock *ptp = container_of(pccontext->clk, struct ptp_clock, clock);
- 	struct timestamp_event_queue *queue;
- 	char debugfsname[32];
- 
-@@ -536,67 +535,46 @@ long ptp_ioctl(struct posix_clock_contex
- ssize_t ptp_read(struct posix_clock_context *pccontext, uint rdflags,
- 		 char __user *buf, size_t cnt)
- {
--	struct ptp_clock *ptp =
--		container_of(pccontext->clk, struct ptp_clock, clock);
-+	struct ptp_clock *ptp =	container_of(pccontext->clk, struct ptp_clock, clock);
- 	struct timestamp_event_queue *queue;
- 	struct ptp_extts_event *event;
--	int result;
-+	ssize_t result;
- 
- 	queue = pccontext->private_clkdata;
--	if (!queue) {
--		result = -EINVAL;
--		goto exit;
--	}
-+	if (!queue)
-+		return -EINVAL;
- 
--	if (cnt % sizeof(struct ptp_extts_event) != 0) {
--		result = -EINVAL;
--		goto exit;
--	}
-+	if (cnt % sizeof(*event) != 0)
-+		return -EINVAL;
- 
- 	if (cnt > EXTTS_BUFSIZE)
- 		cnt = EXTTS_BUFSIZE;
- 
--	cnt = cnt / sizeof(struct ptp_extts_event);
--
--	if (wait_event_interruptible(ptp->tsev_wq,
--				     ptp->defunct || queue_cnt(queue))) {
-+	if (wait_event_interruptible(ptp->tsev_wq, ptp->defunct || queue_cnt(queue)))
- 		return -ERESTARTSYS;
--	}
- 
--	if (ptp->defunct) {
--		result = -ENODEV;
--		goto exit;
--	}
-+	if (ptp->defunct)
-+		return -ENODEV;
- 
- 	event = kmalloc(EXTTS_BUFSIZE, GFP_KERNEL);
--	if (!event) {
--		result = -ENOMEM;
--		goto exit;
--	}
-+	if (!event)
-+		return -ENOMEM;
- 
- 	scoped_guard(spinlock_irq, &queue->lock) {
--		size_t qcnt = queue_cnt(queue);
--
--		if (cnt > qcnt)
--			cnt = qcnt;
-+		size_t qcnt = min((size_t)queue_cnt(queue), cnt / sizeof(*event));
- 
--		for (size_t i = 0; i < cnt; i++) {
-+		for (size_t i = 0; i < qcnt; i++) {
- 			event[i] = queue->buf[queue->head];
- 			/* Paired with READ_ONCE() in queue_cnt() */
- 			WRITE_ONCE(queue->head, (queue->head + 1) % PTP_MAX_TIMESTAMPS);
- 		}
-+		cnt = qcnt * sizeof(*event);
- 	}
- 
--	cnt = cnt * sizeof(struct ptp_extts_event);
--
- 	result = cnt;
--	if (copy_to_user(buf, event, cnt)) {
-+	if (copy_to_user(buf, event, cnt))
- 		result = -EFAULT;
--		goto free_event;
--	}
- 
--free_event:
- 	kfree(event);
--exit:
- 	return result;
- }
+Thanks,
+johannes
 
+
+
+The following changes since commit 5c8013ae2e86ec36b07500ba4cacb14ab4d6f728:
+
+  Merge tag 'net-6.16-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-06-19 10:21:32 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2025-06-25
+
+for you to fetch changes up to 95b922dd04f74a45fb86b34a25cda62f427a2b5c:
+
+  Merge tag 'iwlwifi-fixes-2025-06-25' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next (2025-06-25 10:20:03 +0200)
+
+----------------------------------------------------------------
+Just a few fixes:
+ - iwlegacy: work around large stack with clang/kasan
+ - mac80211: fix integer overflow
+ - mac80211: fix link struct init vs. RCU publish
+ - iwlwifi: fix warning on IFF_UP
+
+----------------------------------------------------------------
+Arnd Bergmann (1):
+      wifi: iwlegacy: work around excessive stack usage on clang/kasan
+
+Johannes Berg (2):
+      wifi: mac80211: finish link init before RCU publish
+      Merge tag 'iwlwifi-fixes-2025-06-25' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
+
+Lachlan Hodges (1):
+      wifi: mac80211: fix beacon interval calculation overflow
+
+Miri Korenblit (1):
+      wifi: iwlwifi: mvm: assume '1' as the default mac_config_cmd version
+
+ drivers/net/wireless/intel/iwlegacy/4965-rs.c    | 3 ++-
+ drivers/net/wireless/intel/iwlwifi/mvm/mld-mac.c | 4 ++--
+ net/mac80211/link.c                              | 6 +++---
+ net/mac80211/util.c                              | 2 +-
+ 4 files changed, 8 insertions(+), 7 deletions(-)
 
