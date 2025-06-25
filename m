@@ -1,100 +1,121 @@
-Return-Path: <netdev+bounces-200999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 163BCAE7B83
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:07:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20C50AE7CE3
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 11:31:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42A991895B92
-	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 09:08:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 164F54A7CC0
+	for <lists+netdev@lfdr.de>; Wed, 25 Jun 2025 09:31:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4F8F285CBD;
-	Wed, 25 Jun 2025 09:07:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eUztFy2h"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5572BEC5F;
+	Wed, 25 Jun 2025 09:22:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE6426B77F;
-	Wed, 25 Jun 2025 09:07:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mx-a.polytechnique.fr (mx-a.polytechnique.fr [129.104.30.14])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6070252906;
+	Wed, 25 Jun 2025 09:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.104.30.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750842459; cv=none; b=RtQb4hjGfl+fPviuotmPZ4PmR4jhIst/IBAZxMz1jtBW8TKRi5raR9aikxkYZssp6EDXEpUvqj8FCqNjY1wT8d+V8jfeYobhXXilNTqJCYpDSWMeBugDUrRVWw8sm93VAVN5fHR4iCFGXR+ELD8XGL3mtLHGmX452VSpeKop464=
+	t=1750843367; cv=none; b=X57JH6hN+So72DGVQebtzaodA8ZKKSceqDKJOde4r2bVX0oL6qfUn606UtAh83S9YRE+GZJVtbDHS0Bs/Lwukaaqn6B6obO/nxvrrA4difFusdkmLiqnhsIq1FRhXduzU2DsP9h4Tdv0em0Ck78tQfwfM0LWm8dr7jbLVHPsHbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750842459; c=relaxed/simple;
-	bh=Wm/Qm170JnmvLoFVbqubHllu4LDDa//IX18AMk/c+g8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IwFFForBVnhwUau6htvAD7EiCFz+ES5F3Na5zTiJegX4S09KZTjvuzzp8QgxpyMffeEJuPIodplpqbXLkATixs3EnOjjWy0Rqy6x/1m1ytSwefoaO7nevPDqUsamQWBVO+RPL2xQKCeetaxfzc/tO7c0WqLGZDaURl4b3IXomH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eUztFy2h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3E4BC4CEEA;
-	Wed, 25 Jun 2025 09:07:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750842459;
-	bh=Wm/Qm170JnmvLoFVbqubHllu4LDDa//IX18AMk/c+g8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eUztFy2hS2wfsb8j77f2PVF4wB4X8iJeV6TVrk5esjbRwDb2d/nWAX7Qvgkencf+1
-	 LkOqcqQP36WgokaH0Rb4nb4VZPiyuLCttGVkE2+M9N07PTbboioekupa0qE8jXdssk
-	 ZWgLsKI4swkfWT0iGJpXtkppL87YR/otVdn740n9gKoumV1qt1v3gw5nqZqxJW5NMj
-	 oDKnzlGgCl7lJRkPWW7Cm+YretQ4cBy+ynGytnSY/GiKqs5QXvE5BthcpKF01dyyy3
-	 EJDVL6rAeK3loyeOgI500rxCGxYwH3DzNyak48FD9mGzmqPI6NqObJF/wlirXSqxCG
-	 PABnRRg0crxdQ==
-Date: Wed, 25 Jun 2025 10:07:34 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jamie Bainbridge <jamie.bainbridge@gmail.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Brett Creeley <brett.creeley@amd.com>,
-	Ivan Vecera <ivecera@redhat.com>, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net] i40e: When removing VF MAC filters, only check
- PF-set MAC
-Message-ID: <20250625090734.GJ1562@horms.kernel.org>
-References: <c856f16e6ab37286733174c0fcf12bc72b677096.1750807588.git.jamie.bainbridge@gmail.com>
+	s=arc-20240116; t=1750843367; c=relaxed/simple;
+	bh=qqM24CG38I0YgdVs6wHu9lNFb6fYyDWo79Ns61wNk2U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=huTWsuma7Gpq8ikxn4DO/PR6wd1jLogj1rvPUitv/01AirQq/31RqwyZI8NVJrKVYpzXC+6Rq7FOL2cXOirwegGzdqL1tQ0Si93cRpbjby7fvlR1MseGpR6hh+5wWp0AoB4FMHQKXeQvGiaa4q2q6LO/ocsO5leMiJjokCnLz34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=fail smtp.mailfrom=gmail.com; arc=none smtp.client-ip=129.104.30.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=gmail.com
+Received: from zimbra.polytechnique.fr (zimbra.polytechnique.fr [129.104.69.30])
+	by mx-a.polytechnique.fr (tbp 25.10.18/2.0.8) with ESMTP id 55P9EwnY023896;
+	Wed, 25 Jun 2025 11:14:58 +0200
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.polytechnique.fr (Postfix) with ESMTP id 8EA3B761E58;
+	Wed, 25 Jun 2025 11:14:58 +0200 (CEST)
+X-Virus-Scanned: amavis at zimbra.polytechnique.fr
+Received: from zimbra.polytechnique.fr ([127.0.0.1])
+ by localhost (zimbra.polytechnique.fr [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id 0ewgABPHqW04; Wed, 25 Jun 2025 11:14:58 +0200 (CEST)
+Received: from [130.190.109.159] (webmail-69.polytechnique.fr [129.104.69.39])
+	by zimbra.polytechnique.fr (Postfix) with ESMTPSA id 181BE761F7F;
+	Wed, 25 Jun 2025 11:14:58 +0200 (CEST)
+Message-ID: <4c6deafe-a6ec-40bf-873f-dc0df1a72dc4@gmail.com>
+Date: Wed, 25 Jun 2025 11:14:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c856f16e6ab37286733174c0fcf12bc72b677096.1750807588.git.jamie.bainbridge@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] atm: idt77252: Add missing `dma_map_error()`
+To: Simon Horman <horms@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Chas Williams <3chas3@gmail.com>,
+        "moderated list:ATM" <linux-atm-general@lists.sourceforge.net>,
+        "open list:ATM" <netdev@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+References: <20250624064148.12815-3-fourier.thomas@gmail.com>
+ <20250624165128.GA1562@horms.kernel.org>
+Content-Language: en-US, fr
+From: Thomas Fourier <fourier.thomas@gmail.com>
+In-Reply-To: <20250624165128.GA1562@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 25, 2025 at 09:29:18AM +1000, Jamie Bainbridge wrote:
-> When the PF is processing an Admin Queue message to delete a VF's MACs
-> from the MAC filter, we currently check if the PF set the MAC and if
-> the VF is trusted.
-> 
-> This results in undesirable behaviour, where if a trusted VF with a
-> PF-set MAC sets itself down (which sends an AQ message to delete the
-> VF's MAC filters) then the VF MAC is erased from the interface.
-> 
-> This results in the VF losing its PF-set MAC which should not happen.
-> 
-> There is no need to check for trust at all, because an untrusted VF
-> cannot change its own MAC. The only check needed is whether the PF set
-> the MAC. If the PF set the MAC, then don't erase the MAC on link-down.
-> 
-> Resolve this by changing the deletion check only for PF-set MAC.
-> 
-> (the out-of-tree driver has also intentionally removed the check for VF
-> trust here with OOT driver version 2.26.8, this changes the Linux kernel
-> driver behaviour and comment to match the OOT driver behaviour)
-> 
-> Fixes: ea2a1cfc3b201 ("i40e: Fix VF MAC filter removal")
-> Signed-off-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
-> ---
-> v2: Reword commit message as suggested by Simon Horman.
+On 24/06/2025 18:51, Simon Horman wrote:
+> On Tue, Jun 24, 2025 at 08:41:47AM +0200, Thomas Fourier wrote:
+>> The DMA map functions can fail and should be tested for errors.
+>>
+>> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
+>> ---
+>>   drivers/atm/idt77252.c | 5 +++++
+>>   1 file changed, 5 insertions(+)
+>>
+>> diff --git a/drivers/atm/idt77252.c b/drivers/atm/idt77252.c
+>> index 1206ab764ba9..f2e91b7d79f0 100644
+>> --- a/drivers/atm/idt77252.c
+>> +++ b/drivers/atm/idt77252.c
+>> @@ -852,6 +852,8 @@ queue_skb(struct idt77252_dev *card, struct vc_map *vc,
+>>   
+>>   	IDT77252_PRV_PADDR(skb) = dma_map_single(&card->pcidev->dev, skb->data,
+>>   						 skb->len, DMA_TO_DEVICE);
+>> +	if (dma_mapping_error(&card->pcidev->dev, IDT77252_PRV_PADDR(skb)))
+>> +		return -ENOMEM;
+>>   
+>>   	error = -EINVAL;
+>>   
+>> @@ -1857,6 +1859,8 @@ add_rx_skb(struct idt77252_dev *card, int queue,
+>>   		paddr = dma_map_single(&card->pcidev->dev, skb->data,
+>>   				       skb_end_pointer(skb) - skb->data,
+>>   				       DMA_FROM_DEVICE);
+>> +		if (dma_mapping_error(&card->pcidev->dev, paddr))
+>> +			goto outpoolrm;
+>>   		IDT77252_PRV_PADDR(skb) = paddr;
+>>   
+>>   		if (push_rx_skb(card, skb, queue)) {
+>> @@ -1871,6 +1875,7 @@ add_rx_skb(struct idt77252_dev *card, int queue,
+>>   	dma_unmap_single(&card->pcidev->dev, IDT77252_PRV_PADDR(skb),
+>>   			 skb_end_pointer(skb) - skb->data, DMA_FROM_DEVICE);
+>>   
+>> +outpoolrm:
+>>   	handle = IDT77252_PRV_POOL(skb);
+>>   	card->sbpool[POOL_QUEUE(handle)].skb[POOL_INDEX(handle)] = NULL;
+> Hi Thomas,
+>
+> Can sb_pool_remove() be used here?
+> It seems to be the converse of sb_pool_add().
+> And safer than the code above.
+> But perhaps I'm missing something.
 
-Thanks for the update.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Hi Simon,
+
+I don't see any reason why this would be a problem,
+
+though, I don't think it is related and the change should be in the same 
+patch.
+
+Should I create another patch for that?
+
 
