@@ -1,182 +1,398 @@
-Return-Path: <netdev+bounces-201376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 094FAAE9381
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 02:52:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AFA0AE939C
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 03:16:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D4D67AEF3D
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 00:50:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01A1E4A5E88
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 01:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC7CD1494C2;
-	Thu, 26 Jun 2025 00:52:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD35E1547C0;
+	Thu, 26 Jun 2025 01:16:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tjxjkAUP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qwp8Xf0p"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2080.outbound.protection.outlook.com [40.107.243.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBCAEEDE
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 00:52:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.80
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750899132; cv=fail; b=oe7Epd3WVZKX3QoC/k/0OeN7aLZIdY03Va6tT9uXDKcZuOiyWbvO9SaEbrwoeFAAtHfgDz2HT4FsoUS8+XXtU+tkRAnbdExIJ7dmQOx7lmvshKHN+2MR5Hqb0dAisCOtUlf4p0M805BZLKtw17WnmrS9HzesPiYpY3ESncRReDI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750899132; c=relaxed/simple;
-	bh=4W9wczuuftBPYg937L2YvgNt7vFeJdwhi04iEjBueik=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=ExtiSNov/J7k4Ox1RkHgynjSnZquqFUCpc8m8ZbRN7rkzDWWjbwNGLJLcd6HZlZ2I6pbupikqJK2MW+ZnwtRDVNvEo8zt+BcO/F5t0yb59rtUC93fE3qAdPUXunsOh3P46uDOfTNHQwcB2Ap8X5eEk+/XIgPIbtNROyIgT6unqk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tjxjkAUP; arc=fail smtp.client-ip=40.107.243.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FjkfN7SMYXTkhY5f4FbPEGontsXQsXxbbfF++JQHo//HhI4O5pt0ouNNBtpZicXTP3XoY2CJlGPBJhAdyC48zQxqGDnB9OmAHpEB5zPkGc/IhDtDH51++P4H13k60HRHsw0QKOCVf+kjM4dfFvLPmI5t111/db9ltdUndayjsioERaiTe+/6iHjLUjqAudP+fyQkdr82p/vw+lSNcpXywzJPqIaZF4btXa8mq/rG8UWH8SIDWPFMj+0qd7Z+VDjOmhYD268aN1WK/e65VZPhGTUToSafhVQ6S3w9XUm6dLZiowTTkFKE/VGjU+beZGNzBvZ3x8YRsdGXoIIWQ7CGaA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HBVt1DE9liuiMxm0i663vMOKu2Yvl3uhbDZc7NEvZsI=;
- b=Xj14eDgMlwOgB9Wo9g4vFyScLpYY43p+L4CQOEIJUsuwwmukgJgV5P+FzBOcl/6XxLsQ4Ib//NAx/tjI7PDFskkt88+YxI/5QZepJ8h/ibewgI3pv++U2YrIkKfl64ZhITe68l2LEvXavudftj9oeJIPNDsk9qnwkwfn33kxmtx1SyF7VXOZuLHr9nzxrfTyukvVPreRnynj2pIPlxdJjgXCfQLi+XRYNxfS6Vl4RD/1PnW+aIsRH28ueb3Cgl/OekuwD6c7e7KuHnR2Y2hiaTLsKHyZ4ne28zfSznLKUvYh40j8S5oArC7tWmwHpHi21m5XoGHeuFdDMosmO8jv6w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HBVt1DE9liuiMxm0i663vMOKu2Yvl3uhbDZc7NEvZsI=;
- b=tjxjkAUP1iX+X3u1JmP4svDbA/YVAZq6tWGTXVZ9IhM9GL6r/IB46ygOp1LPYAd+HHZaeiUCiDaZQYeJfIhHXrvXJiB52NO6fjP79yxhBjMS0V8haallOjdHACzudvs+aEnP8w00lyooCHisenuiGNwuJtiysjE5JH0nzjMJtPZf38jC4aX8mmmvOsnKgR67V6FfF6uQX9Jq3g1Hl5f58QpiMIL6fSMNRM1jKhtU5GdqkxcuNnuYTHQTVSt5Dxo2n3+kmbLIcxXzWGFOV5idpJSLSH5gaGR/+gl3SMnIltaTV6giOzlv94qGBcRxovlDwfMxAEZTb0ewdFKAT0N9sQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV3PR12MB9356.namprd12.prod.outlook.com (2603:10b6:408:20c::21)
- by CYXPR12MB9317.namprd12.prod.outlook.com (2603:10b6:930:e2::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.29; Thu, 26 Jun
- 2025 00:52:07 +0000
-Received: from LV3PR12MB9356.namprd12.prod.outlook.com
- ([fe80::843d:81e5:3051:a728]) by LV3PR12MB9356.namprd12.prod.outlook.com
- ([fe80::843d:81e5:3051:a728%4]) with mapi id 15.20.8857.026; Thu, 26 Jun 2025
- 00:52:07 +0000
-From: Benjamin Poirier <bpoirier@nvidia.com>
-To: Michal Kubecek <mkubecek@suse.cz>
-Cc: netdev@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>
-Subject: [PATCH ethtool] ethtool.8: Remove "default" note about rxfh xfrm
-Date: Thu, 26 Jun 2025 09:51:44 +0900
-Message-ID: <20250626005144.79972-1-bpoirier@nvidia.com>
-X-Mailer: git-send-email 2.49.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: TYCP286CA0279.JPNP286.PROD.OUTLOOK.COM
- (2603:1096:400:3c9::6) To LV3PR12MB9356.namprd12.prod.outlook.com
- (2603:10b6:408:20c::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD003335C7;
+	Thu, 26 Jun 2025 01:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750900602; cv=none; b=gyrsf+ZL+sK1BmVcMFMs7oE0J2ubo3UITG7haPpXrtGdWIcWYQYC5qrCip+o1Lwc7Yr8FYG45F0qjP3RAVBcTKq2uOVK865vw/mcFNxkfBpaWRQcQsr0KzUQg0vU/cwfBCQ4toL0aGxJeQ9onUsTY3UUCavT99SW9+6GoLHUebQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750900602; c=relaxed/simple;
+	bh=fZmEkcRaphS1Pzp0p2e7DQb6gDbkGOjJ9wLn/H2FEj0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uQU98+0KB5WYwtVjQke8WOCaUq9aATRAmVaL7gJLupraz6gmjA+dL6EMPu4FRgEjmr9ARqq4RQBQqx6rxxZs5hcSeYNN82t8Ghkwz+jtCx1uIvnwlnjjz0CAcC32Xo2AsJhl5u53gNCAPktCAbOdlCe2BEab5+4FNO2ddz+sWJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qwp8Xf0p; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3df303e45d3so1753025ab.0;
+        Wed, 25 Jun 2025 18:16:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750900600; x=1751505400; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jPjTX8a7bDkTwMmxbizDS1L5yf8OvTy1ffktEu+LZNY=;
+        b=Qwp8Xf0pbncFk2nCeEwF2Q4gMtYIIknaRc6iePEyJZL2GjAks1PdInGqVmn3e1YUey
+         s5EqOHNcyl0e9pkoyPCWQ8Jawiq+lOz8JYi4cSCpuvtortQJxo+G+o0nL7tR6ICss3bz
+         fk79cyxKi3RAsE5q51Vc2Gmmp6JRCUlg2fFoARWdcaUr3lOgkREBDpEC1cDjRe4ti50r
+         tnadW61SKhAVL3yj8q8hrJtnIx7D5FosnyurhplGcyBdUvx80tjyHw3Qdo/BiU8Se2A7
+         D493xCHfXeB5cIfN3sH9eJN3uRFiWaSNeYdIUQqSIi2RE26bm1WSqZb8w0vREyOx1u0J
+         iPMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750900600; x=1751505400;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jPjTX8a7bDkTwMmxbizDS1L5yf8OvTy1ffktEu+LZNY=;
+        b=qK1VGkU6cjUdOmb+Pdg+oiLTg++Rfmqy/YQdJgDARQRB4tx6OnCrFY8S+i9ytr/W3A
+         Vbq3Bh2oSf+NIhsXEQmTDMAyCPq350iMYhajccAgp+4DXJU8AzHP42pIMHUupLi3GjmX
+         SAQOTHEpgv4E4Ka3KWSLNaERnctsINZA9IHv3TyPlDptk8Q5s4cTY+5xrrmazFMbhwCB
+         KQwWEXt4xIQDhUytFnWuHmuXLKZaj2jK9xRa53906lEsIgU6pgoQlJJOTIt7DO2x1avT
+         jOVfpfFaux8lBDfhHUvhRc8wPGQOLxeh/yeYFmfpRP1VMKNnk4rljoeYpefne7pHstC7
+         J8OA==
+X-Forwarded-Encrypted: i=1; AJvYcCW1BegEBzzZqEZvG7jndp3w9h1CtSPcwcWhl92lhw1TWxh5kNAFljZZx29JdiLQEdfRv4BmK5SR@vger.kernel.org, AJvYcCWR9LHd6uJz0zQzo6f4bHeo+Dzl+1k6c6ya/4UfuFw2eMRIMLa82gXI3i4EMWTzyAPASdY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzpg5TVe+vM0e7xP4FMxwcJZEWL459pBO2dBOBI94CCs5XCB3oS
+	TFNyeYCAbsqmQKUugdjOzz7s1UhII0Il9aP8NlhZAyUw2SOp7ijz2EmQJf6wMglafTdN3TCY+1I
+	+Q165thEk7oGpYUo3HSQfSTT3PDBrE0c=
+X-Gm-Gg: ASbGnctGk/DNVAZ64/6fslVfvLxyljjS3sPAa1JdEO5m8enl9RTKU/Z4I5T5sdLEuxQ
+	0IxCPq1XRiHFVWJgdlWJLS63CRbpXBge6ufA7n4pORR+0Hf/Hm2gawmXC1z89LX91AiTcziEHEN
+	X/dZ3+iTYMz/q1dWp0IsaR+Pjzx2w/AxzqIrmBm8EWAkdMFuAGprBj
+X-Google-Smtp-Source: AGHT+IHxI/wBMLUevRgmclJysFQpqQNablAbPvYRZiZCEaUvYJLvwDTGPm1aGxZijAcYbARN+gVz4SSLb1h/7HYlce0=
+X-Received: by 2002:a05:6e02:1a63:b0:3dd:babf:9b00 with SMTP id
+ e9e14a558f8ab-3df3287f2e6mr63549095ab.1.1750900599690; Wed, 25 Jun 2025
+ 18:16:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV3PR12MB9356:EE_|CYXPR12MB9317:EE_
-X-MS-Office365-Filtering-Correlation-Id: c85bac8f-bff2-4f3a-17c6-08ddb44bad1e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?LLBjZMGLwS/iKOuI7X9AwqcFs9WMVjVxHJn4O08AUvx5zTZckmeGOXrcyC6S?=
- =?us-ascii?Q?52VG84pklYhsl8M6dM+1YAtxjdxHfggbnpgqw2brgg+kpr7+qkzGYdzcpI5Q?=
- =?us-ascii?Q?6KOPmnkRMQd1ktwJRKmroZUFICemtT/dzWyAWQ2aDEeU2Fv3sXRoFbiw1Lqa?=
- =?us-ascii?Q?eHAJu3+6YKaoMTOP7ankm6FFE9oODG9LkCFYTJoClYJ0wSKoJbZHYRkZNr+N?=
- =?us-ascii?Q?+w8s31NR7KPz6panoOOh9WTimp2kf5ToC6KX2g4YvDlEuV4nEailq1hW9eG4?=
- =?us-ascii?Q?hTAMX8BtebcHyy1ufyaH1nSOWJbt8l/+X6TgYj9x7XJ8FnH2KPn1gx+4C+mu?=
- =?us-ascii?Q?z1g7R5VxNsPSKi47O9OPyI7bW8hTFQdjE1Tiazvyoe9zh5ohh28ts/rN+I8x?=
- =?us-ascii?Q?IofW6H4HzapaAtyn5D9oqz9AuRZyJNt82dmNS0K7qlvksxcz4swLO0SBWhLi?=
- =?us-ascii?Q?IYJW+oaV5ZtDMzupGd3dHJbbMfVjVlIrUmwGPzjyLlxpHMRixRX0smVxmB9F?=
- =?us-ascii?Q?TPWBtI6Nea3W4W/DhabVWPv4P5SsS0Q7828gJ/rTorlMCvAFSdn6XyiNHEaI?=
- =?us-ascii?Q?w1nRYpm4T/HahjYb0DB8J7qZJI/BFGjdaBkmwLG/diar+AuGljzAoAbv5HCw?=
- =?us-ascii?Q?3dp32k6u02z+jn0eLmUiZIZ/aeywwzjrKDunXXBty+RNBfCXXZ8EAWBM/pIO?=
- =?us-ascii?Q?vaZOcAqd8QG/CMR4OJk9oQzhwB9Ed+n5uUwrTT0K20CaG0xzSAt0rqUjM8WY?=
- =?us-ascii?Q?GxvGRxuBzvL1PT222mEegJ240mR3wzBlscLZcZMNaJtqU6C3oBWzAvDNMqga?=
- =?us-ascii?Q?NA+7gyZ3KNfETFo+t7RAiKJXmz1fxnPJaKZTm32erlMm7h2q5SgN8D1cfxV0?=
- =?us-ascii?Q?AZMw0CsuLf5foYlC4z/1JrCicVpuIsU/4H6akO42UYRnWFRJi/zBNGQ5PIAm?=
- =?us-ascii?Q?6kOvzTKuncXqktjqR2mfye6o+PfqW9pbacU4DEoj9U6lIhT9BK9ih+h2QhRo?=
- =?us-ascii?Q?6w3dCxbHN0Habn8X1xo3h+YMaYyblKCZ2dX18gwfI7PGQNcxlXDjGb6IdRxG?=
- =?us-ascii?Q?RcO6jm3O9FjOLAp+882+aZLjJBtwusKw8qROumAb02aasJkORjgiMxlu04fK?=
- =?us-ascii?Q?4uNiWvmOlNP5KHJZ5XRcLI89U06P5m7Jz2nCk0YNTDh0V1muCmo71+BK+xHd?=
- =?us-ascii?Q?b2VEg/hHQ3YnUHOdiiX+oSn3tzQqJRbUyyK33s98l3vmOYxaDx6jxrwUoIN8?=
- =?us-ascii?Q?iJPjTB7NYs+4f+8C7HTOP3xGU3sEAD5l5mzF5mLG+lpuo/cnvH6sg5eEilMU?=
- =?us-ascii?Q?gKx3Uq6dcldtIdJf9/HQbZQKUzdzMtLcRu12QxD3Kw27bSRSQMQJAM3lvaeX?=
- =?us-ascii?Q?cl6vSODedgkl/VJzS4Xl1c1tVfBFQxLkFAhKK/iSTbDAQ7KF5dT1quz/dMwz?=
- =?us-ascii?Q?/c9MDtCIimI=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9356.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?aUQHcKar4r3jAQ3XrnTBpofUxkLrw8QQEOBTh4FW0YLMILpN5Y6Gd2UfYDqL?=
- =?us-ascii?Q?XxtA3le6+b6WfYcxGnw/EWOz+htBWZqF9MP2lNAK0hpojy/jyCscvot6ud/6?=
- =?us-ascii?Q?Oat+hAvUG62Fk04MoF0MDTu/u1qozwAQsHTCauTwCs4HkAvoZRwKyhsa/2Z0?=
- =?us-ascii?Q?LRAt61WIjhg7J3gXRE+Wp4isRE8ue/bmZf6ebvvZYvFWPdLZ1OO1ZlV+3KNw?=
- =?us-ascii?Q?FsLaamiwjpw8wuEhgGgThuO3/tDhRzL3W2ykIqPisGST3KgO8TKPgm23E0MY?=
- =?us-ascii?Q?568cGocrJZPxK84lITiin39PtwzWZVydyRZ71nyItj+LGxgAN9q3BA6EITli?=
- =?us-ascii?Q?6dqgXX2yZ52ciS8kaRYgG4trAmpnCkUBzAHRDbMLES3BCLqfwRub/8M9N3qH?=
- =?us-ascii?Q?bQ09X5NGbXJDH5BdN4wKPNXLjm5qdnegbnSXRwiMZgS58oqBD8vc3tQ5PbOU?=
- =?us-ascii?Q?MCfcQ0hyqafJ4j5yZnzLfbwXuYPO/nfNhZd3gd7x8ZKvtFPBrytwKRQeCsJp?=
- =?us-ascii?Q?nNsPQZsOY3m6B7pE/fHfaid5lkpSJTqbyVoJnRgZ5wDLHYuu9aY6SYpKOFpn?=
- =?us-ascii?Q?sDer6k46KwoUtgFNii0301sR8RxGicSvjwVeGvTu5lj368vo51Yc3rlsuD3D?=
- =?us-ascii?Q?4XyMGQUHhb6s5is/kYEkgPoI2SQZldcJIRAl6CO0D+X+1GcbjMGMihQeSjIm?=
- =?us-ascii?Q?k4liaqm8yZx7gPMvrMQixNm37pnRjeLf/qw6PVK7kaHRQR9sZfAjwNx+mqQN?=
- =?us-ascii?Q?ZUHx9q9KqXQEnJj0cjEx/guh7GqrjIREs4q+zwOMWoCPxF/2bNj/kC2ZAAo7?=
- =?us-ascii?Q?tmshMwwlLEDK9uX0gOMc+m/YSwKN9oGun4jhJg40XqoPo66snuP5GeGdkwqd?=
- =?us-ascii?Q?TC5BLPEGwBLRMcu6xFElSAo3wm84AM5YVrEzTKaRfkJ2F4uW+WennoUh/Dit?=
- =?us-ascii?Q?Z0FE9G+GtMh1/5vCnUNBkVR+rdc7Ta+YbQdr98hxBmm1UBPQTPsRlT7lHQCX?=
- =?us-ascii?Q?IP7RwS3b+Yc4uI7WYIyZmveQNqkeR7bOnPJMRkE/IqxsPoefMKDoZ2yC57rs?=
- =?us-ascii?Q?noCcDC9Yfyd7dMks1/zf3+3Lm9wCLN7SI9LsmOG5vuQ8ReE0vs5GGbtjXZ6q?=
- =?us-ascii?Q?PyJdUCJMyL2BI1Ju2uWkqbeCovh3PA7VWb15SKQq03JMI7jz6WJvllHdrqeg?=
- =?us-ascii?Q?7vxHpP2oqoOzO5nrpBbp7ec6kqaokld1sdeI+XqPq5ETnMdBLAiLotUYawSR?=
- =?us-ascii?Q?Z6LMq0AVxvTx5Jwf8X3sd75uDNYXy/32u21yVo+rdShHP3bhi8E73UTX9Hh5?=
- =?us-ascii?Q?c9Li5gNGEOJApV/p1580AqQYgTsW/iA7SzTMOjpRXlE5T9NW9z+JcMs2ATsI?=
- =?us-ascii?Q?2iBBuSUwleBzwhJTYzpAGj5GdYu0F46cDFlbVactyAx6Y/eOkF2QPb/CCof5?=
- =?us-ascii?Q?NveV2xeUg1T2UKPvqSzCRzjZXiKEBnU13F40Xyall8jzt+581s9c2FWgke+g?=
- =?us-ascii?Q?d+Vbcy8O1MwBTb5t/lBkDNIQEwVekQaGixCgxxGXyGwrz0+GvFHA5eF6dvXq?=
- =?us-ascii?Q?TXQ/i070yqdjpru63mDl/oc118sUORUYHqAFsbcc?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c85bac8f-bff2-4f3a-17c6-08ddb44bad1e
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9356.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2025 00:52:07.7574
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MDs5EXAPgVsQb+2fdd/XAv8F1NzoZ5m88l1AOdsU8EdIL3sj/rPVcYK5ULk9flhG8Q9V/7D02nqv50NMFT9xbQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9317
+References: <20250625123527.98209-1-kerneljasonxing@gmail.com>
+ <685bfbe2b5f51_21d18929413@willemb.c.googlers.com.notmuch>
+ <aFv+aJFkVt/ehouG@boxer> <CAL+tcoDwm8TOJ5BUXtm3E5mQ7hdHxUXuemUS+JO75-bd7Tj8VA@mail.gmail.com>
+In-Reply-To: <CAL+tcoDwm8TOJ5BUXtm3E5mQ7hdHxUXuemUS+JO75-bd7Tj8VA@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 26 Jun 2025 09:16:03 +0800
+X-Gm-Features: Ac12FXyAx2smAUo9NkXhznKH_45qyMoFCVjSLpziQfVqTf6yrNEW44J24FTkQaw
+Message-ID: <CAL+tcoA92M4ywB9xKZoW_GMib18nakWkQpX_GQdYYotKC_5ORg@mail.gmail.com>
+Subject: Re: [PATCH net-next v5] net: xsk: introduce XDP_MAX_TX_BUDGET setsockopt
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org, 
+	magnus.karlsson@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, joe@dama.to, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Since linux.git commit 4d20c9f2db83 ("net/mlx5e: Symmetric OR-XOR RSS hash
-control"), the default rxfh xfrm used by mlx5 devices is
-'symmetric-or-xor'. Since the default xfrm is driver-dependent and
-ethtool.8 does not document the default values implemented by drivers,
-remove the comment from ethtool.8 which says that the default xfrm is
-'none'.
+On Wed, Jun 25, 2025 at 10:20=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.=
+com> wrote:
+>
+> On Wed, Jun 25, 2025 at 9:50=E2=80=AFPM Maciej Fijalkowski
+> <maciej.fijalkowski@intel.com> wrote:
+> >
+> > On Wed, Jun 25, 2025 at 09:38:42AM -0400, Willem de Bruijn wrote:
+> > > Jason Xing wrote:
+> > > > From: Jason Xing <kernelxing@tencent.com>
+> > > >
+> > > > This patch provides a setsockopt method to let applications leverag=
+e to
+> > > > adjust how many descs to be handled at most in one send syscall. It
+> > > > mitigates the situation where the default value (32) that is too sm=
+all
+> > > > leads to higher frequency of triggering send syscall.
+> > > >
+> > > > Considering the prosperity/complexity the applications have, there =
+is no
+> > > > absolutely ideal suggestion fitting all cases. So keep 32 as its de=
+fault
+> > > > value like before.
+> > > >
+> > > > The patch does the following things:
+> > > > - Add XDP_MAX_TX_BUDGET socket option.
+> > > > - Convert TX_BATCH_SIZE tx_budget_spent.
+> > > > - Set tx_budget_spent to 32 by default in the initialization phase =
+as a
+> > > >   per-socket granular control.
+> > > >
+> > > > The idea behind this comes out of real workloads in production. We =
+use a
+> > > > user-level stack with xsk support to accelerate sending packets and
+> > > > minimize triggering syscalls. When the packets are aggregated, it's=
+ not
+> > > > hard to hit the upper bound (namely, 32). The moment user-space sta=
+ck
+> > > > fetches the -EAGAIN error number passed from sendto(), it will loop=
+ to try
+> > > > again until all the expected descs from tx ring are sent out to the=
+ driver.
+> > > > Enlarging the XDP_MAX_TX_BUDGET value contributes to less frequency=
+ of
+> > > > sendto() and higher throughput/PPS.
+> > > >
+> > > > Here is what I did in production, along with some numbers as follow=
+s:
+> > > > For one application I saw lately, I suggested using 128 as max_tx_b=
+udget
+> > > > because I saw two limitations without changing any default configur=
+ation:
+> > > > 1) XDP_MAX_TX_BUDGET, 2) socket sndbuf which is 212992 decided by
+> > > > net.core.wmem_default. As to XDP_MAX_TX_BUDGET, the scenario behind
+> > > > this was I counted how many descs are transmitted to the driver at =
+one
+> > > > time of sendto() based on [1] patch and then I calculated the
+> > > > possibility of hitting the upper bound. Finally I chose 128 as a
+> > > > suitable value because 1) it covers most of the cases, 2) a higher
+> > > > number would not bring evident results. After twisting the paramete=
+rs,
+> > > > a stable improvement of around 4% for both PPS and throughput and l=
+ess
+> > > > resources consumption were found to be observed by strace -c -p xxx=
+:
+> > > > 1) %time was decreased by 7.8%
+> > > > 2) error counter was decreased from 18367 to 572
+> > > >
+> > > > [1]: https://lore.kernel.org/all/20250619093641.70700-1-kerneljason=
+xing@gmail.com/
+> > > >
+> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > ---
+> > > > v5
+> > > > Link: https://lore.kernel.org/all/20250623021345.69211-1-kerneljaso=
+nxing@gmail.com/
+> > > > 1. remove changes around zc mode
+> > > >
+> > > > v4
+> > > > Link: https://lore.kernel.org/all/20250619090440.65509-1-kerneljaso=
+nxing@gmail.com/
+> > > > 1. remove getsockopt as it seems no real use case.
+> > > > 2. adjust the position of max_tx_budget to make sure it stays with =
+other
+> > > > read-most fields in one cacheline.
+> > > > 3. set one as the lower bound of max_tx_budget
+> > > > 4. add more descriptions/performance data in Doucmentation and comm=
+it message.
+> > > >
+> > > > V3
+> > > > Link: https://lore.kernel.org/all/20250618065553.96822-1-kerneljaso=
+nxing@gmail.com/
+> > > > 1. use a per-socket control (suggested by Stanislav)
+> > > > 2. unify both definitions into one
+> > > > 3. support setsockopt and getsockopt
+> > > > 4. add more description in commit message
+> > > >
+> > > > V2
+> > > > Link: https://lore.kernel.org/all/20250617002236.30557-1-kerneljaso=
+nxing@gmail.com/
+> > > > 1. use a per-netns sysctl knob
+> > > > 2. use sysctl_xsk_max_tx_budget to unify both definitions.
+> > > > ---
+> > > >  Documentation/networking/af_xdp.rst |  8 ++++++++
+> > > >  include/net/xdp_sock.h              |  1 +
+> > > >  include/uapi/linux/if_xdp.h         |  1 +
+> > > >  net/xdp/xsk.c                       | 20 ++++++++++++++++----
+> > > >  tools/include/uapi/linux/if_xdp.h   |  1 +
+> > > >  5 files changed, 27 insertions(+), 4 deletions(-)
+> > > >
+> > > > diff --git a/Documentation/networking/af_xdp.rst b/Documentation/ne=
+tworking/af_xdp.rst
+> > > > index dceeb0d763aa..9eb6f7b630a5 100644
+> > > > --- a/Documentation/networking/af_xdp.rst
+> > > > +++ b/Documentation/networking/af_xdp.rst
+> > > > @@ -442,6 +442,14 @@ is created by a privileged process and passed =
+to a non-privileged one.
+> > > >  Once the option is set, kernel will refuse attempts to bind that s=
+ocket
+> > > >  to a different interface.  Updating the value requires CAP_NET_RAW=
+.
+> > > >
+> > > > +XDP_MAX_TX_BUDGET setsockopt
+> > > > +----------------------------
+> > > > +
+> > > > +This setsockopt sets the maximum number of descriptors that can be=
+ handled
+> > > > +and passed to the driver at one send syscall. It is applied in the=
+ non-zero
+> > > > +copy mode to allow application to tune the per-socket maximum iter=
+ation for
+> > > > +better throughput and less frequency of send syscall. Default is 3=
+2.
+> > > > +
+> > > >  XDP_STATISTICS getsockopt
+> > > >  -------------------------
+> > > >
+> > > > diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+> > > > index e8bd6ddb7b12..ce587a225661 100644
+> > > > --- a/include/net/xdp_sock.h
+> > > > +++ b/include/net/xdp_sock.h
+> > > > @@ -84,6 +84,7 @@ struct xdp_sock {
+> > > >     struct list_head map_list;
+> > > >     /* Protects map_list */
+> > > >     spinlock_t map_list_lock;
+> > > > +   u32 max_tx_budget;
+> > > >     /* Protects multiple processes in the control path */
+> > > >     struct mutex mutex;
+> > > >     struct xsk_queue *fq_tmp; /* Only as tmp storage before bind */
+> > > > diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xd=
+p.h
+> > > > index 44f2bb93e7e6..07c6d21c2f1c 100644
+> > > > --- a/include/uapi/linux/if_xdp.h
+> > > > +++ b/include/uapi/linux/if_xdp.h
+> > > > @@ -79,6 +79,7 @@ struct xdp_mmap_offsets {
+> > > >  #define XDP_UMEM_COMPLETION_RING   6
+> > > >  #define XDP_STATISTICS                     7
+> > > >  #define XDP_OPTIONS                        8
+> > > > +#define XDP_MAX_TX_BUDGET          9
+> > > >
+> > > >  struct xdp_umem_reg {
+> > > >     __u64 addr; /* Start of packet data area */
+> > > > diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> > > > index 72c000c0ae5f..97aded3555c1 100644
+> > > > --- a/net/xdp/xsk.c
+> > > > +++ b/net/xdp/xsk.c
+> > > > @@ -33,8 +33,7 @@
+> > > >  #include "xdp_umem.h"
+> > > >  #include "xsk.h"
+> > > >
+> > > > -#define TX_BATCH_SIZE 32
+> > > > -#define MAX_PER_SOCKET_BUDGET (TX_BATCH_SIZE)
+> > > > +#define MAX_PER_SOCKET_BUDGET 32
+> > > >
+> > > >  void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool)
+> > > >  {
+> > > > @@ -779,7 +778,7 @@ static struct sk_buff *xsk_build_skb(struct xdp=
+_sock *xs,
+> > > >  static int __xsk_generic_xmit(struct sock *sk)
+> > > >  {
+> > > >     struct xdp_sock *xs =3D xdp_sk(sk);
+> > > > -   u32 max_batch =3D TX_BATCH_SIZE;
+> > > > +   u32 max_budget =3D READ_ONCE(xs->max_tx_budget);
+> > > >     bool sent_frame =3D false;
+> > > >     struct xdp_desc desc;
+> > > >     struct sk_buff *skb;
+> > > > @@ -797,7 +796,7 @@ static int __xsk_generic_xmit(struct sock *sk)
+> > > >             goto out;
+> > > >
+> > > >     while (xskq_cons_peek_desc(xs->tx, &desc, xs->pool)) {
+> > > > -           if (max_batch-- =3D=3D 0) {
+> > > > +           if (max_budget-- =3D=3D 0) {
+> > > >                     err =3D -EAGAIN;
+> > > >                     goto out;
+> > > >             }
+> > > > @@ -1437,6 +1436,18 @@ static int xsk_setsockopt(struct socket *soc=
+k, int level, int optname,
+> > > >             mutex_unlock(&xs->mutex);
+> > > >             return err;
+> > > >     }
+> > > > +   case XDP_MAX_TX_BUDGET:
+> > > > +   {
+> > > > +           unsigned int budget;
+> > > > +
+> > > > +           if (optlen !=3D sizeof(budget))
+> > > > +                   return -EINVAL;
+> > > > +           if (copy_from_sockptr(&budget, optval, sizeof(budget)))
+> > > > +                   return -EFAULT;
+> > > > +
+> > > > +           WRITE_ONCE(xs->max_tx_budget, max(budget, 1));
+> > >
+> > > I still think that this needs a more sane upper bound than U32_MAX.
+>
+> The reason why I didn't touch is that I refer to some existing
+> mechanisms, like net.ipv4.tcp_limit_output_bytes that also doesn't
+> constrain its max value for a single flow.
+>
+> I really don't think it matters because 1) normally no one sets that
+> large value to hope one send call can deal with that many desc, 2) the
+> so-called proper value that may do harm to some unexpected cases which
+> I'm unware of for now. I wonder why not give the user a choice. After
+> all, it's his own decision.
+>
+> > >
+> > > One limiting factor is the XSK TxQ length. At least it should be
+> > > possible to fail if trying to set beyond that.
+> >
+> > +1 and I don't really see a reason for something below 32.
+>
+> Really? U32_MAX is a very very large value.
+>
+> > So how about
+> > [32, xs->tx->nentries] range?
 
-Cc: Gal Pressman <gal@nvidia.com>
-Signed-off-by: Benjamin Poirier <bpoirier@nvidia.com>
----
- ethtool.8.in | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Sorry, I still think one is an appropriate lower value because setting
+a lower value than 32 is not that a big bad thing for users or even
+not a bad thing at all. The first version of the value is 16 which had
+been used for a while. I guess Willem is worried that a too large
+value may have an adverse impact on the system/xsk flow?
 
-diff --git a/ethtool.8.in b/ethtool.8.in
-index fd6ce20..29b8a8c 100644
---- a/ethtool.8.in
-+++ b/ethtool.8.in
-@@ -1322,7 +1322,7 @@ and destination fields (as selected by
- then yield the same hash for the other flow direction where the source and
- destination fields are swapped (i.e. Symmetric RSS). Note that this operation
- reduces the entropy of the input set and the hash algorithm could potentially
--be exploited. Switch off (default) by
-+be exploited. Switch off by
- .B xfrm none.
- .TP
- .BI start\  N
--- 
-2.49.0
+> >
+> > Also if there's no xsk tx ring present we could bail out.
+>
+> Sorry, I'm not sure about this. It seems to add more dependencies. But
+> my opinion on the lower bound is one just like dev_weight :)
 
+After rethinking setting xs->tx->nentries as its upper bound, it makes
+sense to me overall. But I'm not sure if such a case can happen in the
+real world:
+1) CPU 0: keep calling sendto() or poll() syscall to driver the xsk to
+send the packets (in __xsk_generic_xmit())
+2) CPU 1: keep writing the data into the tx ring in the application
+(like by using xsk_ring_prod__submit(xsk->tx, index))
+?
+If the asynchrony of writing and sending desc might happen, the
+'xs->tx->nentries' doesn't have a strong underlying theory to support
+any more. At least, AFAIK, with my limited knowledge, we don't
+prohibit users from trying the above scenario, right?
+
+Since the patch was marked as change-requested, please allow me to ask
+one more time: if we really need a valid max number for it?
+
+Thanks,
+Jason
+
+>
+> Thanks,
+> Jason
+>
+> >
+> > >
+> > > > +           return 0;
+> > > > +   }
+> > > >     default:
+> > > >             break;
+> > > >     }
+> > > > @@ -1734,6 +1745,7 @@ static int xsk_create(struct net *net, struct=
+ socket *sock, int protocol,
+> > > >
+> > > >     xs =3D xdp_sk(sk);
+> > > >     xs->state =3D XSK_READY;
+> > > > +   xs->max_tx_budget =3D 32;
+> > > >     mutex_init(&xs->mutex);
+> > > >
+> > > >     INIT_LIST_HEAD(&xs->map_list);
+> > > > diff --git a/tools/include/uapi/linux/if_xdp.h b/tools/include/uapi=
+/linux/if_xdp.h
+> > > > index 44f2bb93e7e6..07c6d21c2f1c 100644
+> > > > --- a/tools/include/uapi/linux/if_xdp.h
+> > > > +++ b/tools/include/uapi/linux/if_xdp.h
+> > > > @@ -79,6 +79,7 @@ struct xdp_mmap_offsets {
+> > > >  #define XDP_UMEM_COMPLETION_RING   6
+> > > >  #define XDP_STATISTICS                     7
+> > > >  #define XDP_OPTIONS                        8
+> > > > +#define XDP_MAX_TX_BUDGET          9
+> > > >
+> > > >  struct xdp_umem_reg {
+> > > >     __u64 addr; /* Start of packet data area */
+> > > > --
+> > > > 2.41.3
+> > > >
+> > >
+> > >
 
