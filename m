@@ -1,129 +1,83 @@
-Return-Path: <netdev+bounces-201522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA5ABAE9BC8
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 12:49:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DF12AE9C25
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 13:06:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B085F1C422D0
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 10:50:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 627BD3A8F2B
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 11:06:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DDB725BEE7;
-	Thu, 26 Jun 2025 10:49:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3712B274FF4;
+	Thu, 26 Jun 2025 11:06:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZMr9qH5Y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="icYoqMhn"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4DF9259C9C
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 10:49:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8612727F0;
+	Thu, 26 Jun 2025 11:06:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750934969; cv=none; b=GJfuEuYrVheZdsXbfQCa6jLCKY8xg7wWStUewWuxl9AzV5Jw6WtHqzA2dr6PZBWCmHT31QDv5tYAskk35QZ/fcdZ6ILVo1zuTFcx58YijLBIzb3gt5GRLjmk3RZ6/gX7Pwt/I2WGXbsBRiE5MVVKkQ/BIRbaPIv101kyFjMurFo=
+	t=1750935983; cv=none; b=LYMqzMLeiiXQhr4HrlrvaVByB1aEnHfyKndbAzB/EJlTdhVXQ89w0vdd33jjXzCy48PkavlLfrCu8cREmSTQ00G3uX6xBGbqoX9SUXPWnocRv4p/Z9+OsFCpJrRJ4sfnapaBB004FLsxP9vz6jfoO0lGNocg+xSVvhZeZwLVcWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750934969; c=relaxed/simple;
-	bh=Zk9uNBD/3zLkNEjmpD3qCsMfvJIuuh1c2ZCwfPqI+70=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f4guygQDJcvn5s+lmrWanktJv764j4qOli65UCYljpjPIVfnx52r7k33SLtNI6G/wXgWJHiqbOUVQbTe/ykTjyKLEN/z8vZ+gyyzCN2rsiM+yVTraA8eFTrlREf4dAMwRqHfwx6iaaBN/c+OV5eVt0I3cGWjNXYCIV9oxqxD/Mg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZMr9qH5Y; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750934963;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hClEzZB7iPAsT1CZh0FstMmZiuvXLbKEWsZdkRZsLLk=;
-	b=ZMr9qH5Y+StSspDlIg6p5TX2g+Yf5X29P90C3ECfdBf6VH2BRbJBa9UCn4XQdILh0dK0ER
-	MdpJ8ikIyc6oDhBV9tdS6fPJZQ0JpxdIeHN6ZGp2qHPnds+M8WMw+KD3fajjqB1uoAq7+u
-	yfStGW2HhzgTRq1ax8efCdEghahQ7uU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-614-GNHpPoebMs2nvPh8o_9D0g-1; Thu, 26 Jun 2025 06:49:22 -0400
-X-MC-Unique: GNHpPoebMs2nvPh8o_9D0g-1
-X-Mimecast-MFC-AGG-ID: GNHpPoebMs2nvPh8o_9D0g_1750934961
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-453018b4ddeso4882705e9.3
-        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 03:49:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750934961; x=1751539761;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hClEzZB7iPAsT1CZh0FstMmZiuvXLbKEWsZdkRZsLLk=;
-        b=ilH3qn8JSUgOC7br5wa6W1dGiSuyPj4gc9XZZoUMoGd7aXSMu6RYjDXrolXzv/+1Hj
-         erm04/hNwfIpCn6QnObwiRu9ywkcBFhaadPcyYRGjTownmoSAMddZW+7jcdPZcTXSsgq
-         j0NsZwl/3sxRt16X1fB/55XQ5D+Kq7/cgFu9L94MHD24AE8Tg3opOjVoYzc8LaGNyvV8
-         T5rGUdj7/muzHwNjJW5uQs1N4tXnJB8W/JUn5qVFDlDkrXM9wV0DKLPDr7Ro7ROFyQ/s
-         0JG4QiIqKbGcDL5XIosvqdZn8INXAerdSE2LN1RqP69zVnDpta34ijn0twZdBTj6pf00
-         ulkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWDkFPl0EWnwA001uX4jmQqeALE/81IjrDXbRxWChRb1zQcsSgEC0Wy98RzPp+g9iwe/lwBkcE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHREDojq3yn2meXVP1aVZWRoHQEu6uCzuHwcp61uGXZTA7FgmZ
-	x8wxXCp1EoUyYXE3dDMWlxykhtriwEuZhG+90EmFLd81IVhWFhcOdLbPCurQUx5qrSdQtkhyIqP
-	73BajaNzgpgPvrZYuh00fqgAtol8od6XxuW3gCZO855W+tmdqOkvjHO2N5g==
-X-Gm-Gg: ASbGncvpHiBIhsoDMIGRYgN5X/az74nJPEc0IA7hUGXRfD7qJ5rlnvskQoNxm3hnoCu
-	4gu2J0e4+y6eLCvprpQyXiept1hZKsdaAzf/cYS9wR4+COeCnJg1mkQXSIRVusrzZN9NS5Y1HC5
-	gTi5xGx0y+qQxqgc3eo8Pnvq7yvBW+7G0vz3zhWrKc3qPhL4z4x7kxEk7Mu3ONoH65ZkyyEniE7
-	c+hAK7o8TUnuwYsBVE+fcLCZFy0+LK/zQZx0hzNwvG/szDGAcgcpJqS9LifPkdd4OVK6rGmvUXZ
-	vxJAT2GKL7fpVVodggJ9xmuh+y1Lfmclxix/B/HYRZvzP2DhfeHUxooYQFgsmrTsEOyRmA==
-X-Received: by 2002:a05:600c:8414:b0:43c:fe90:1282 with SMTP id 5b1f17b1804b1-4538acfd410mr16688865e9.7.1750934960925;
-        Thu, 26 Jun 2025 03:49:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGw8yRKgKYEs5+g9AWNThiUunldNOI2Tc8JO6kDN8yD1L5b2b9siy9ooGV55tvobGHLCrFHqw==
-X-Received: by 2002:a05:600c:8414:b0:43c:fe90:1282 with SMTP id 5b1f17b1804b1-4538acfd410mr16688595e9.7.1750934960508;
-        Thu, 26 Jun 2025 03:49:20 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:244f:bd10:2bd0:124a:622c:badb? ([2a0d:3344:244f:bd10:2bd0:124a:622c:badb])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4538a4076ebsm15506555e9.31.2025.06.26.03.49.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Jun 2025 03:49:20 -0700 (PDT)
-Message-ID: <9829a19e-0f19-46e4-a007-0e943f1fcdb8@redhat.com>
-Date: Thu, 26 Jun 2025 12:49:18 +0200
+	s=arc-20240116; t=1750935983; c=relaxed/simple;
+	bh=x7q5skRjz1OVgPcEtm4Z3B1dc5BXdbgM2Msi2ETyg6U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g1ROYI/1V8mqfWh0sOCtThDtja4RM+ZJAYCt/o3WXXa8A4F+XCoQucx6MCaChswQP/ZfM1NyOBeNG/R8bsqw3OrnrYtzBha3pMXQWAh6X07t+c97dMsXjR9vUurfro0QcidFpnthVl9B4KW94NN+VzKR53jWIs0hr6hlgRFoXDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=icYoqMhn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76C07C4CEEB;
+	Thu, 26 Jun 2025 11:06:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750935982;
+	bh=x7q5skRjz1OVgPcEtm4Z3B1dc5BXdbgM2Msi2ETyg6U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=icYoqMhnqYMQnSt4bSPYDHPDWBr6x5oglxgY9OfIgYI/cdFz6wOfqAHwP+0WA3d2v
+	 X2FdQnArtRzcfWU7Dk0qFmLh/QISndbDXnCAV1IxxjE1cyozVD0c3EbsDR/zROPkUc
+	 /c4QMKrgIzKuY8CcNywNZte7YdxR0aXEigfw0hVWFzpA7KahkOqS7WrG1dx+uk3i/l
+	 2k2JGhJA8Zzc5JDjJmROP4L8XEqpphC2if+YgYWzUGsyz2s/BTdRd5dGMeaXB/kz2N
+	 YgQ+wrOhtvEXn0JzZti5d4Pe3TePvTMhFivE9hSGUaPT3znloIlERLamqLKvFkDhH4
+	 Fwny1X2zfHAgA==
+Date: Thu, 26 Jun 2025 12:06:19 +0100
+From: Simon Horman <horms@kernel.org>
+To: Thomas Fourier <fourier.thomas@gmail.com>
+Cc: Chas Williams <3chas3@gmail.com>,
+	linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] atm: idt77252: Use sb_pool_remove()
+Message-ID: <20250626110619.GW1562@horms.kernel.org>
+References: <20250626075317.191931-2-fourier.thomas@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next v7 1/3] net: bonding: add broadcast_neighbor option for
- 802.3ad
-To: Tonghao Zhang <tonghao@bamaicloud.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Steven Rostedt <rostedt@goodmis.org>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Nikolay Aleksandrov <razor@blackwall.org>,
- Zengbing Tu <tuzengbing@didiglobal.com>
-References: <cover.1750642572.git.tonghao@bamaicloud.com>
- <f1511ff00f95124d1d7477b0793963044be60650.1750642573.git.tonghao@bamaicloud.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <f1511ff00f95124d1d7477b0793963044be60650.1750642573.git.tonghao@bamaicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250626075317.191931-2-fourier.thomas@gmail.com>
 
-On 6/24/25 4:18 AM, Tonghao Zhang wrote:
-> @@ -893,6 +909,8 @@ static int bond_option_mode_set(struct bonding *bond,
->  	/* don't cache arp_validate between modes */
->  	bond->params.arp_validate = BOND_ARP_VALIDATE_NONE;
->  	bond->params.mode = newval->value;
-> +	/* cleanup broadcast_neighbor when changing mode */
-> +	bond->params.broadcast_neighbor = 0;
+On Thu, Jun 26, 2025 at 09:53:16AM +0200, Thomas Fourier wrote:
+> Replacing the manual pool remove with the dedicated function.
+> 
+> Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
 
-This does not look enough: it looks like 'bond_bcast_neigh_enabled'
-accounting is ignored, and should instead adjusted accordingly.
+Hi Thomas,
 
-Side notes: please include per patch changelog to help reviewers, and
-when replying to reviewers comment, please properly trim the unrelevant
-message part and separate your text from the quoted one.
+Unfortunately this patch doesn't apply cleanly on net-next,
+which is a pre-requisite for our CI to process it.
 
-Thanks,
+I suggest reposting this patch once your other patch to this file [1]
+has been accepted.
 
-Paolo
+[1] [PATCH v2] atm: idt77252: Add missing `dma_map_error()`
+    https://lore.kernel.org/all/20250624064148.12815-3-fourier.thomas@gmail.com/
 
+The code change itself looks good to me.
+
+-- 
+pw-bot: deferred
 
