@@ -1,52 +1,55 @@
-Return-Path: <netdev+bounces-201565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8D36AE9EBA
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 15:28:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00918AE9EBB
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 15:28:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DC2018878CE
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 13:27:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C41A7B5B50
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 13:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7134328C009;
-	Thu, 26 Jun 2025 13:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C13CD2E54B5;
+	Thu, 26 Jun 2025 13:27:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="tIbW0I3w";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0sgelXYS"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="45OeGOvb";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="E6GZZrhE"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94AD328BAAD;
-	Thu, 26 Jun 2025 13:27:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383FE21CC62;
+	Thu, 26 Jun 2025 13:27:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750944453; cv=none; b=BxDHcrqXM3SPCBequipkUXaFXgpwEPvMUR+1gj/7fMJv4pEGcdXGhw8x8aZFlJPx/9KfeTqs0tBsDOI3reJXeZUMXTYNL+W521yePZ6548RltmRJpo646/9+JLHmpIcOXG77InXPs5M3ifZgFHGeMgfW/I2fIHgD1VkvEq56kr0=
+	t=1750944454; cv=none; b=A48wmNYSe0siT/kNr7LZt6/OVkz9DFC529TeB/i653fxvnFur+SlzYRIAeIKp7rQWbHLOPYoEOT6BY/JOh9hYDGjyVaK+Fc+j1TsBG2wt7m7Y6YdXlOmbNmUYpEVKSYlWHgTD3eLTBQO69yZsqZ1z74DOmrUSzaPbHVKFywepZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750944453; c=relaxed/simple;
-	bh=+g2xAtY19rs9wmZVdJBWvJTRN2jcGk4G9wKZczvbe00=;
-	h=Message-ID:From:To:Cc:Subject:Date; b=Ku+czmNY2OuSKkEQ99MdcVrU9tsixR30zj8CgbDUSA+6nVzcPYiPCynRykkFQjBt+uFzS29DiwnV3bA00TQbP4iC7EKaJHMVqHzEnTONOEH8ZjxRsnPMh8hYdsVUf2IKuamsCXNeOg/PYwCE7XckxoN04CEbRifreCRBRT9JJT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=tIbW0I3w; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0sgelXYS; arc=none smtp.client-ip=193.142.43.55
+	s=arc-20240116; t=1750944454; c=relaxed/simple;
+	bh=iPQitKJaOAw1dcX7ZOo2cTMoyJ5pc70J9AQA/1gmZz8=;
+	h=Message-ID:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Date; b=GKYGfddl1zh/Ittcaz9OzKCt98UoVLY9Tzb5pMxVcp9ld3rQuozF0qkdGoMo7DLAZSxocpxOr3yieVp1Td46lkXqVPP+ftji+3A36IF9eTgIa/v6WxN0kstP9XePelWBTdHK0N0+liycbA5ywGCjeYBS5Gls/oPGR2wvCQy4BdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=45OeGOvb; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=E6GZZrhE; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Message-ID: <20250626124327.667087805@linutronix.de>
+Message-ID: <20250626131708.419101339@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1750944449;
+	s=2020; t=1750944451;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc; bh=QWgJWSmIUCV1467V2UYeprQ3/qYWMoWGUhlIF1YZ6bM=;
-	b=tIbW0I3wMyX7NEqzAuDAegPqhqqHZOwhr4gu8MQI2pfhZe1XV7Yz0ERBgITuWRDRsbjN8/
-	KGwB7Wvz4FA40ldoo/1Ae1MENY09zmYbWYfNeNK45iAphw1HalhlWN3UaK1nG2hb5HnwVK
-	l1E/pr/qXDD887MURy7YpwJ9KBmCwCdDWi57BjsU0c0Kxnu2UPj9j/GcoWS3xZaS5NBVBm
-	U4RnqIO2QChtWs7DMFlTkoI2w8lx+qofEeoHVvrnyeeWsySW0I7TGgNU2LERcY/mi5W4jH
-	vgnfgI5KiQFgr7qgsz1S1rgI04WOAG2mVwORv0opgl5yu5pjfA+J3+lkbDkbwA==
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 references:references; bh=3g83WUkcahA98tSAvTQ+7u+GY59xMVQMWbvReg+4HxI=;
+	b=45OeGOvbc1FQu84tfTVe0f2noUtdJYd9OuBPXbg6cB8GmCirEgGwogjyC+D9dYYo0qlTlj
+	FBSdahHr8QXontgg1UjT/tV6dgwkbqbtIRFjHs8AbUxqywoKG/DZNWmWlwQmYbHUX0IMZR
+	/hIfxxipeXHmkhiyj5D/2/p7VJk3sx7TCq0mwqNVSJL1WMKQyxAQQblzw3bJySGFYqcwyk
+	NHfTyX5j7/MrAtI1IqjYJ9K/kL3GmnoL8foFJgkxM27C7CMfUykryIgzJ3nA1uayXw6kIP
+	/cKsMCEwg/XCsX2gLDKci8qi453Nv/BqYZXXciFtBKNyAfkLlFXOZYECKyYtgg==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1750944449;
+	s=2020e; t=1750944451;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc; bh=QWgJWSmIUCV1467V2UYeprQ3/qYWMoWGUhlIF1YZ6bM=;
-	b=0sgelXYSNMB3dpgn02rqW0G8Hsomh0utPuWwA0EZEiOXpX9XsJ6vvshKC9FH+agUR/L+2+
-	J8mNLEQ8e+ZbjsCQ==
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 references:references; bh=3g83WUkcahA98tSAvTQ+7u+GY59xMVQMWbvReg+4HxI=;
+	b=E6GZZrhErWzckN9MDzfoFmzVq1fkYY5lUJ56uKMVLqh8VpHKQQ6YLFPym0ZOSff2+iNP2D
+	dTZ1yNIN+8+FeoDw==
 From: Thomas Gleixner <tglx@linutronix.de>
 To: LKML <linux-kernel@vger.kernel.org>
 Cc: netdev@vger.kernel.org,
@@ -63,102 +66,85 @@ Cc: netdev@vger.kernel.org,
  Kurt Kanzenbach <kurt@linutronix.de>,
  Nam Cao <namcao@linutronix.de>,
  Antoine Tenart <atenart@kernel.org>
-Subject: [patch 0/3] ptp: Provide support for auxiliary clocks for
- PTP_SYS_OFFSET_EXTENDED
-Date: Thu, 26 Jun 2025 15:27:28 +0200 (CEST)
+Subject: [patch 1/3] timekeeping: Provide ktime_get_clock_ts64()
+References: <20250626124327.667087805@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 26 Jun 2025 15:27:30 +0200 (CEST)
 
-This small series enables support for auxiliary clocks on top of the
-timekeeping core infrastructure, which has been paritially merged. The
-remaining outstanding patches can be found here:
+PTP implements an inline switch case for taking timestamps from various
+POSIX clock IDs, which already consumes quite some text space. Expanding it
+for auxiliary clocks really becomes too big for inlining.
 
-     https://lore.kernel.org/all/20250625182951.587377878@linutronix.de
+Provide a out of line version. 
 
-Auxiliary clocks are required to support TSN use cases in automation,
-automotive, audio and other areas. They utilize PTP for synchronizing nodes
-in a network accurately, but the underlying master clock is not necessarily
-related to clock TAI. They are completely independent and just represent a
-common notion of time in a network for an application specific
-purpose. This comes with problems obvioulsy:
+The function invalidates the timestamp in case the clock is invalid. The
+invalidation allows to implement a validation check without the need to
+propagate a return value through deep existing call chains.
 
-   1) Applications have no fast access to the time of such independent PTP
-      clocks. The only way is to utilize the file descriptor of the PTP
-      device with clock_gettime(). That's slow as it has to go all the way
-      out to the hardware.
-
-   2) The network stack cannot access PTP time at all because accessing the
-      PTP hardware requires preemptible task context in quite some cases.
-
-The timekeeper core changes provide support for this including the ability
-to steer these clocks independently from the core timekeeper via
-clock_adjtimex(2).
-
-This is obviously incomplete as the user space steering daemon needs to be
-able to correlate timestamps from these auxiliary clocks with the
-associated PTP device timestamp. The PTP_SYS_OFFSET_EXTENDED IOCTL command
-already supports to select clock IDs for pre and post hardware timestamps,
-so the first step for correlation is to extend that IOCTL to allow
-selecting auxiliary clocks.
-
-Auxiliary clocks do not provide a seperate CLOCK_MONOTONIC_RAW variant as
-they are internally utilizing the same clocksource and therefore the
-existing CLOCK_MONOTONIC_RAW correlation is valid for them too, if user
-space wants to determine the correlation to the underlying clocksource raw
-initial conversion factor:
-
-CLOCK_MONOTONIC_RAW:
-
-  The clocksource readout is converted to nanoseconds by a conversion
-  factor, which has been determined at setup time. This factor does not
-  change over the lifetime of the system.
-
-CLOCK_REALTIME, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_TAI:
-
-  The clocksource readout is converted to nanoseconds by a conversion
-  factor, which starts with the CLOCK_MONOTONIC_RAW conversion factor at
-  setup time. This factor can be steered via clock_adjtimex(CLOCK_REALTIME).
-
-  All related clocks use the same conversion factor and internally these
-  clocks are built on top of CLOCK_MONOTONIC by adding a clock specific
-  offset after the conversion. The CLOCK_REALTIME and CLOCK_TAI offsets can
-  be set via clock_settime(2) or clock_adjtimex(2). The CLOCK_BOOTTIME
-  offset is modified after a suspend/resume cycle to take the suspend time
-  into account.
-
-CLOCK_AUX:
-
-  The clocksource readout is converted to nanoseconds by a conversion
-  factor, which starts with the CLOCK_MONOTONIC_RAW conversion factor at
-  setup time. This factor can be steered via clock_adjtimex(CLOCK_AUX[n]).
-
-  Each auxiliary clock uses its own conversion factor and offset. The
-  offset can be set via clock_settime(2) or clock_adjtimex(2) for each
-  clock ID.
-
-The series applies on top of the above mentioned timekeeper core changes
-and the PTP character device spring cleaning series, which can be found
-here:
-
-  https://lore.kernel.org/all/20250625114404.102196103@linutronix.de
-
-It is also available via git with all prerequisite patches:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/tglx/devel.git timers/ptp/driver-auxclock
-
-Miroslav: This branch should enable you to test the actual steering via a
-	  PTP device which has PTP_SYS_OFFSET_EXTENDED support in the driver.
-
-Thanks,
-
-	tglx
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 ---
- drivers/ptp/ptp_chardev.c        |   21 ++++++++++++++++-----
- include/linux/ptp_clock_kernel.h |   34 ++++------------------------------
- include/linux/timekeeping.h      |    1 +
- kernel/time/timekeeping.c        |   34 ++++++++++++++++++++++++++++++++++
- 4 files changed, 55 insertions(+), 35 deletions(-)
+ include/linux/timekeeping.h |    1 +
+ kernel/time/timekeeping.c   |   34 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 35 insertions(+)
+
+--- a/include/linux/timekeeping.h
++++ b/include/linux/timekeeping.h
+@@ -44,6 +44,7 @@ extern void ktime_get_ts64(struct timesp
+ extern void ktime_get_real_ts64(struct timespec64 *tv);
+ extern void ktime_get_coarse_ts64(struct timespec64 *ts);
+ extern void ktime_get_coarse_real_ts64(struct timespec64 *ts);
++extern void ktime_get_clock_ts64(clockid_t id, struct timespec64 *ts);
+ 
+ /* Multigrain timestamp interfaces */
+ extern void ktime_get_coarse_real_ts64_mg(struct timespec64 *ts);
+--- a/kernel/time/timekeeping.c
++++ b/kernel/time/timekeeping.c
+@@ -1636,6 +1636,40 @@ void ktime_get_raw_ts64(struct timespec6
+ EXPORT_SYMBOL(ktime_get_raw_ts64);
+ 
+ /**
++ * ktime_get_clock_ts64 - Returns time of a clock in a timespec
++ * @id:		POSIX clock ID of the clock to read
++ * @ts:		Pointer to the timespec64 to be set
++ *
++ * The timestamp is invalidated (@ts->sec is set to -1) if the
++ * clock @id is not available.
++ */
++void ktime_get_clock_ts64(clockid_t id, struct timespec64 *ts)
++{
++	/* Invalidate time stamp */
++	ts->tv_sec = -1;
++	ts->tv_nsec = 0;
++
++	switch (id) {
++	case CLOCK_REALTIME:
++		ktime_get_real_ts64(ts);
++		return;
++	case CLOCK_MONOTONIC:
++		ktime_get_ts64(ts);
++		return;
++	case CLOCK_MONOTONIC_RAW:
++		ktime_get_raw_ts64(ts);
++		return;
++	case CLOCK_AUX ... CLOCK_AUX_LAST:
++		if (IS_ENABLED(CONFIG_POSIX_AUX_CLOCKS))
++			ktime_get_aux_ts64(id, ts);
++		return;
++	default:
++		WARN_ON_ONCE(1);
++	}
++}
++EXPORT_SYMBOL_GPL(ktime_get_clock_ts64);
++
++/**
+  * timekeeping_valid_for_hres - Check if timekeeping is suitable for hres
+  */
+ int timekeeping_valid_for_hres(void)
+
 
