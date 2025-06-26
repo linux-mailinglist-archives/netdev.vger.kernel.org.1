@@ -1,165 +1,179 @@
-Return-Path: <netdev+bounces-201544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F565AE9D58
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 14:20:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 033C2AE9D5C
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 14:21:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 596AC1C268C3
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 12:20:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C9EB5A023E
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 12:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 907E21AC88B;
-	Thu, 26 Jun 2025 12:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K1f6c+40"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A37218ABA;
+	Thu, 26 Jun 2025 12:21:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011E033F9
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 12:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0971E9B04
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 12:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750940402; cv=none; b=Q54wZ+ZrXvHnpG1DkOrt4xeI5C0EofpLwGXSejRRcr3a5D6Be4H/5rbsXlxjFDUTZOyWgvtAE+9LJGRCF+UZrLhQ+mDMs2P22GRJ+LRHUxSqFji5CTJibVQpxjzk2OWoheFhX4ytiQz6ztcZEOYQx6xUqC9LrTY0uJSL/5kQFE0=
+	t=1750940463; cv=none; b=uJTXI5QxmXWKWm6zwutvWZeSrr7kUDqTbVhe1pHAgI9/m8KwAfShGfgeEG0d8gDnv/mwaIX759Sqr/juq57sn2hJe/LMJV9Gl1EL1aaSQN/w78iKEi2vGVZY2oL8Pmz9WWXgpaFMjou5cNHzQwT0h4m/yBKH14vyTmYO1F/BfoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750940402; c=relaxed/simple;
-	bh=XzxjuhCs/k1M3A+5Vks7C5J8QTluBHAjR7zpLY9PeT8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B4OMf6VTOE79/KeKAxd4dR/OQr4qoCF9ZlT6b7NkWdwOr5iqX68Bd1M+KvDmzASVGKfLWJJUjhK9lzoqE/IRf/M3+1LSzeyn08v9W8oReQ8ywdg9CKyrQFdnHfN2kgF7GYim/YQj84UJreVQ6CEicLQVKTcEvukEfbc19rshLDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K1f6c+40; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6fad4a1dc33so9539366d6.1
-        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 05:20:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750940400; x=1751545200; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=55pV9PkLdVLLbowt1vxoDtKkZVQBIQsno4sCRSRAaro=;
-        b=K1f6c+40bM/NkxZZHnLBR5D+2ECeDUzTX77q5I6BfiH4EP7kvm9IBteRb79k7g4AP4
-         iDXtNUcRASbeo/BOlX3SAE8CQx9v1k797j0UW+99Fyw3Njh1KSqTSpJe/AxzYgHsh/PL
-         DW5VC+glqTl1PDGAcBH4o9EeGurIIKScNyCnIWV/9r6/OIB45n+L2kX2yWPBpNMPaXrx
-         GTgJMG58qmB1Jf3tSJ7aIPqjavR/7goUemifMwkVbkPC75azynKlcCKkfAvtayE9JaK9
-         C/89CkevBRGbMCxFqFkSGNGr7NaqpaIRUwKbD3eagA+++0TaUPOL7ltfGtahQ1mPZ2d+
-         fvBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750940400; x=1751545200;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=55pV9PkLdVLLbowt1vxoDtKkZVQBIQsno4sCRSRAaro=;
-        b=akbwTrCE8kZ6zTKat+oVQsXF8D+XNzk274Lmu7GX+HBaDYzHWnSLnf5tLtLvCWT8/3
-         TQDQN7pjhuIixBGxPf9FbAM4yzNWdlgJTb8YujMHalRmpkWLD2ojrqNk7MUvaezklk1x
-         gcNzs+HbykpL0FxG2jxuqtzPpu/kScpN0imzyypxTvMbZH8wOG8JsP39oKa/G22kz4Ms
-         Yqs5AMtHVGHGFWgCkDR7yh5um/osxESfjpzzZwKPP5F8SEVft8TugpVs+ROxKXDfSxv+
-         QflOHtgpicNvvVr9sHs/EmXscN7dYZJWVjo5qOKEADWxfODpERxGtCgaQ7ib/cvyft2F
-         MBfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX8TvfcouUxRv88a7KwNIHsWylJPqzb7WGi4cKm6CFPnoK7xmOwebDuxb8Rge7h/Q4rFQfPxBw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxgQ8rL1yflLk5rbpgDqMJi8edWisXcvsSoOSyyafAY/psrAO8
-	RSS64DPUqPIHj817BfAH/EhuadNAcnfT/dpMwtfEzlrznmKm5ds9GoN7
-X-Gm-Gg: ASbGncvKcGpoicwLj1WMSzfdQHgoW0cApg6PBwIGYhgG1/esMaCThnqqkyEJp/F83uu
-	cz3LlfY6U3lKxfM7EdGcpyMAsMTvxjxu3iRRQodpC05BvJUXF/Bh1SfW3nXwDDVZHSp+tkdGKML
-	nQpOBWjtEm9pxsz8yzxhy7TFTl5xipn6lXuwruHFsBb7CfIhYJW8SStJrF8jBL8QUv19kRXA0ZZ
-	7cCkanZcQ1sKCrgCH1A3i+hRRS0WIAPTmxqdLtv1dbOwBqj3TE6cELKzF/5ixpqiI2ELQC/q/4H
-	FTVFakUH0W37Oj/+OVRaLO/qOTvYv02/hDTG3vqHEon3Av6yY6v86btI+N9mXVGY1qW8ETYe2Lw
-	9nEv+X195x7CSfUOLrl9MpNbg9M/6w0Yz0xvomCGT
-X-Google-Smtp-Source: AGHT+IFZhzyBFLFnvua7f2bkmq22wq0ISdeLLCUt08Y9Zocqb+Apb+fdR4PI+GMBczSbilklh/bVbQ==
-X-Received: by 2002:a05:6214:2f8c:b0:6fb:597f:b4d0 with SMTP id 6a1803df08f44-6fd5ef5addfmr121799346d6.6.1750940399651;
-        Thu, 26 Jun 2025 05:19:59 -0700 (PDT)
-Received: from ?IPV6:2600:4040:95d2:7b00:8471:c736:47af:a8b7? ([2600:4040:95d2:7b00:8471:c736:47af:a8b7])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd7718e77bsm6631116d6.10.2025.06.26.05.19.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Jun 2025 05:19:59 -0700 (PDT)
-Message-ID: <a6f3efcf-f820-4b0e-8d2b-9b818b58fc2f@gmail.com>
-Date: Thu, 26 Jun 2025 08:19:57 -0400
+	s=arc-20240116; t=1750940463; c=relaxed/simple;
+	bh=UfIaVjPR+dlZRMg3kV5PE/TLrn4vs2+ACMaK/AXQ0f0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dzXZAJ/t29XQrTzdnPnYObNEYhjO8HG3GplC2SrCve8zLWqHRzwu2kxcnJwWte67P657RI92K7w0zMb08my8Q5/0vIoTqD50t9WD0m1LjKYfyATl/LWe3M0/8O3rpGgDPHIlCToE27LLP8JHo3ueoi4S4dMENUvCJvsmO9mFx6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uUlb3-0008Io-1q; Thu, 26 Jun 2025 14:20:53 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uUlb1-005RgD-2A;
+	Thu, 26 Jun 2025 14:20:51 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uUlb1-001Zfo-1l;
+	Thu, 26 Jun 2025 14:20:51 +0200
+Date: Thu, 26 Jun 2025 14:20:51 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Lucas Stach <l.stach@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de, Russell King <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v2 1/1] phy: micrel: add Signal Quality
+ Indicator (SQI) support for KSZ9477 switch PHYs
+Message-ID: <aF07I-QtyH8hbupf@pengutronix.de>
+References: <20250625124127.4176960-1-o.rempel@pengutronix.de>
+ <5a094e3b95f1219435056d87ca4f643398bcb1d3.camel@pengutronix.de>
+ <aFzWiZ9ohbE_Unuz@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 10/17] psp: track generations of device key
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Boris Pismenny <borisp@nvidia.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
- <willemb@google.com>, David Ahern <dsahern@kernel.org>,
- Neal Cardwell <ncardwell@google.com>, Patrisious Haddad
- <phaddad@nvidia.com>, Raed Salem <raeds@nvidia.com>,
- Jianbo Liu <jianbol@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
- Rahul Rameshbabu <rrameshbabu@nvidia.com>,
- Stanislav Fomichev <sdf@fomichev.me>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
-References: <20250625135210.2975231-1-daniel.zahka@gmail.com>
- <20250625135210.2975231-11-daniel.zahka@gmail.com>
- <685c9236a44fc_2a5da429471@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Daniel Zahka <daniel.zahka@gmail.com>
-In-Reply-To: <685c9236a44fc_2a5da429471@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aFzWiZ9ohbE_Unuz@pengutronix.de>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+On Thu, Jun 26, 2025 at 07:11:38AM +0200, Oleksij Rempel wrote:
+> On Wed, Jun 25, 2025 at 08:06:32PM +0200, Lucas Stach wrote:
+> > Hi Oleksij,
+> > 
+> > Am Mittwoch, dem 25.06.2025 um 14:41 +0200 schrieb Oleksij Rempel:
+> > > Add support for the Signal Quality Index (SQI) feature on KSZ9477 family
+> > > switches. This feature provides a relative measure of receive signal
+> > > quality.
+> > > 
+> > > The KSZ9477 PHY provides four separate SQI values for a 1000BASE-T link,
+> > > one for each differential pair (Channel A-D). Since the current get_sqi
+> > > UAPI only supports returning a single value per port, this
+> > > implementation reads the SQI from Channel A as a representative metric.
+> > 
+> > I wonder if it wouldn't be more useful to report the worst SQI from all
+> > the channels instead.
+> 
+> It was my first idea too, just to report the worst SQI from all
+> channels. But this makes it impossible to report SQI for each pair
+> later. If we ever want to support SQI per pair, the current code would
+> suddenly start to show only SQI for pair A, not the worst one, so the
+> SQI interface would change meaning without warning.
+> 
+> There is another problem if we want to extend the SQI UAPI for per-pair
+> support: with 100Mbit/s links, we can't know which pair is used. The PHY
+> reports SQI only for the RX pair, which can change depending on MDI-X
+> resolution, and with auto MDI-X mode, this PHY doesn't tell us which
+> pair it is.
+> 
+> That means, at this point, we have hardware which in some modes can't
+> provide pair-related information. So, it is better to keep the already
+> existing UAPI explicitly per link instead of per pair. This matches the
+> current hardware limits and avoids confusion for users and developers.
+> If we want per-pair SQI in the future, the API must handle these cases
+> clearly.
 
+...
 
-On 6/25/25 8:20 PM, Willem de Bruijn wrote:
-> Daniel Zahka wrote:
->> From: Jakub Kicinski <kuba@kernel.org>
->>
->> There is a (somewhat theoretical in absence of multi-host support)
->> possibility that another entity will rotate the key and we won't
->> know. This may lead to accepting packets with matching SPI but
->> which used different crypto keys than we expected. Maintain and
->> compare "key generation" per PSP spec.
-> One option is for the device to include a generation id along
-> with the session key and SPI.
->
-> It already does, as the MSB of the SPI determines which of the two
-> device keys is responsible.
->
-> But this could be extended to multi-bit.
+> > This ends up spending a sizable amount of time just spinning the CPU to
+> > collect the samples for the averaging. Given that only very low values
+> > seem to indicate a working link, I wonder how significant the
+> > fluctuations in reported link quality are in reality. Is it really
+> > worth spending 120us of CPU time to average those values?
+> > 
+> > Maybe a running average updated with a new sample each time this
+> > function is called would be sufficient?
+> 
+> Hm. Good point. I'l try it. We already have proper interface for this
+> case :)
 
-The idea behind psd->generation is that the device can give each device 
-key an id, and then on rx, the device will fill out the rx metadata with 
-the id for whatever key was used for decryption. The policy checking 
-code in the tcp layer checks the generation from the rx metadata against 
-the one in the psp_assoc from when the session key was created. In this 
-way, psd->generation is opaque. It would be most intuitive for it to be 
-something like additional MSBs of the spi space, though.
+After some more testing with a signal generator, I started to doubt the
+usability of our SQI hardware implementation in this case.
 
->
-> Another option to avoid this issue is for a device to notify the host
-> whenever it rotates the key. This can be due to a multi-host scenario
-> where another host requested a rotation. Or it may be a device
-> initiated rotation as it runs out of 31b SPI.
->   
+The problem is: the signal issue can only be detected if data transfer is
+ongoing - more specifically, if data is being received (for example, when
+running iperf). The SQI register on this hardware is updated every 3 µs. This
+means if any data is received within this window, we can detect noise on the
+wire. But if there is no transfer, the SQI register always shows perfect link
+quality.
 
-This will need to be supported in any case. I think this is all to deal 
-with any potential races against getting a spi after a rotation and 
-immediately trying to use it to forge a packet targeted towards a socket 
-on the same machine that may now have that same spi from a previous 
-device key. I'm not sure if that is a legitimate concern, but if the 
-device has the ability to provide extra device key generation bits with 
-rx decryption metadata, this just uses that.
+On the other hand, as long as noise or a sine wave is injected into the twisted
+pair, it is possible to see bandwidth drops in iperf, but no other error
+counters indicate problems. Even the RxErr counter on the PHY side stays silent
+(it seems to detect only other kinds of errors). If SQI is actively polled
+during this time, it will show a worse value - so in general, SQI seems to be
+usable.
 
->> Since we're tracking "key generations" more explicitly now,
->> maintain different lists for associations from different generations.
->> This way we can catch stale associations (the user space should
->> listen to rotation notifications and change the keys).
->>
->> Drivers can "opt out" of generation tracking by setting
->> the generation value to 0.
-> Why?
+At an early stage of the SQI implementation, I didn’t have a strong opinion
+about the need to differentiate these interfaces. But now, based on practical
+experience, I see that the difference is very important.
 
-If the device doesn't support this capability of filling out rx metadata 
-with additional key generation bits beyond the MSB of the spi.
+It looks like we have two types of SQI hardware implementations:
+
+- Hardware which provides the worst value since last read
+
+- Hardware which automatically updates the value every N microseconds
+
+- Hardware which provides both values
+
+Both types are recommended by the Open Alliance as:
+
+- "worst case SQI value since last read"
+
+- "current SQI value"
+
+My question is: do we really need both interfaces? The "current SQI value"
+seems impractical if it only reflects quality during active data transfer.
+
+What do you think?
+
+Best Regards,
+Oleksij
+--- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
