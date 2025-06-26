@@ -1,497 +1,248 @@
-Return-Path: <netdev+bounces-201581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 049CDAE9FA4
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 16:00:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1175FAE9F77
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 15:55:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C511A565EBF
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 13:59:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B7177A72CA
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 13:54:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4273B2E92DB;
-	Thu, 26 Jun 2025 13:58:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 709562E7189;
+	Thu, 26 Jun 2025 13:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nvz66jWq"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="dLm84g3i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3B02E92CA;
-	Thu, 26 Jun 2025 13:58:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D60928FFEE
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 13:55:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750946327; cv=none; b=Slk8ml8UqIMvNvKSmMDtYdkmygNbh9KHzsu0wz1FQUvwz2Jay+R8Xjfb0n8r/sHn8v9M7+fcElEfO/RY3Sld0JL4ck1KBPPI9jsM0DOcXquiERVVqDI5oJjtXl/oUBhdinu4Drfy2tzeG7/bJhiSKCom6/C2wbljfEf4SEeRO7Q=
+	t=1750946147; cv=none; b=h4i0NRnmSY5/O+ESDw5MIOXZJImWWDBH0l9L6VSS+uKlMXglKSj8k/QacM7g7NAjISVz8ACw6dtBTz5iixAO1blBuX6qSykhZwUffm3DpxYlaRjsYqPLNMxlyMimEr4s3ExeWIXK2OnsyOgIA9pZe/rvOACy0dIrsQD0eYm3pqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750946327; c=relaxed/simple;
-	bh=0laFhqlvaqRpPTlxzuDrZaFjv+XR0TCdM/C39Z5OfSc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ea6+RxWGe7IIPVf1nJWvu21qvbgx+ZJD9kcdPLzUAZFi7ndXxOMIz6B53rd9KLwEKvvPlFcKbhXJb5uX/nt/RHDZ1NxgE7dz9X3AEfFGzcAFFZ41E2WQJuhytP5pqIYGw/Qau5+cRL83uHqB/LO9sWG/R0kasJ/yssWKN0Q+0Ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nvz66jWq; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750946325; x=1782482325;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=0laFhqlvaqRpPTlxzuDrZaFjv+XR0TCdM/C39Z5OfSc=;
-  b=nvz66jWqHTCfRN1+25LpPN7LX9YZbuRp6JBYJ87LVA9g9B999Ety2LVA
-   cPBJhwx8s+SvU72e24FdJnlpyJUg9hkSsNBIOsZaiwqu+WpfWX8kwW1Gy
-   vNG5QHmXQg9JoqPbxD+4SFcUIspriaJTmsdLWhYriyPWX7PU0OW/gvnKc
-   p2OFd/RLawyQX9shNSlHYlXqoi+TVQvoDNJJVMSTF/tLVKITQd6BXAbdJ
-   hNINfPX5PHxWLHJZNQf9p6/jZ6qibsJYoUx9XWf2851JdxU6IWTUbKRzQ
-   OV+Zdt7uS81Ev1DxGSu3yvhkSSqz4ydQN+CDjj4dsyfmnKly3G1MlXCji
-   A==;
-X-CSE-ConnectionGUID: jY7MsYT8T/ak+EfjW9desg==
-X-CSE-MsgGUID: qm+0yN3LSUGWdIzm2EjnpA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="40859264"
-X-IronPort-AV: E=Sophos;i="6.16,267,1744095600"; 
-   d="scan'208";a="40859264"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 06:58:44 -0700
-X-CSE-ConnectionGUID: EqZ4Acf9TfW2tm0jq5CtNA==
-X-CSE-MsgGUID: yGZNMOGeQoy2hmGXgJ94EQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,267,1744095600"; 
-   d="scan'208";a="158271347"
-Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
-  by orviesa005.jf.intel.com with ESMTP; 26 Jun 2025 06:58:40 -0700
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-To: donald.hunter@gmail.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	vadim.fedorenko@linux.dev,
-	jiri@resnulli.us,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	aleksandr.loktionov@intel.com,
-	corbet@lwn.net
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	linux-rdma@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Milena Olech <milena.olech@intel.com>
-Subject: [PATCH net-next v7 3/3] ice: add ref-sync dpll pins
-Date: Thu, 26 Jun 2025 15:52:19 +0200
-Message-Id: <20250626135219.1769350-4-arkadiusz.kubalewski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20250626135219.1769350-1-arkadiusz.kubalewski@intel.com>
-References: <20250626135219.1769350-1-arkadiusz.kubalewski@intel.com>
+	s=arc-20240116; t=1750946147; c=relaxed/simple;
+	bh=p8dTFwOXaJolnPKKZxBvR0kA3vRQTNDo779L0Xg/S4M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J9puI3fnyJc2yoVdJPmrVmUWjdbTV8dmWPra1hn6p38yn1WYq3w5gZtSOfpvFNh6fwWJ/kB/zPLYutKFqnRMzT8mlarn4DNN79rbFRvmLsNPYslJu/KHP7U2S9VzTstWBWyMHUkKEyEDerLCX20JekG3NVWiONjQsOScR71TDFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=dLm84g3i; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7d21cecc11fso164866085a.3
+        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 06:55:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1750946144; x=1751550944; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+KY6uoWqFt+gH5qFF/7TA+aeZmO9qstem/kfCaD0HTU=;
+        b=dLm84g3ivfuQWL2r12ELv7h52SvlKvyzA3gAyTGQ2jJR0KGpFnnX6bWX34Cl9O3nSN
+         DeCHv6Fz9Nf0dtw+Sek7glBwFOoTgbq0jqp7SF4vtJht8+ZNqaDyp62tRUkBeqQaiG8n
+         3Y6y7hndWDVH83rG9FSZ98EqHliUM2CtcUupkFNB1Q2I6940CJYxAXQbARA1jBLgkJwZ
+         pL+LYKVPlKcrjgg+CYu4Se4PSIUwR4rHbvGcHTKnY8lAWvglDp2yBvuXBJXm/CebYRZV
+         vj49/d8tICu153jRw2v7ly/vfIZI1BrKPpzWtUWN1QbUTG4d4ETQDZzMcura2/zYrymb
+         3j/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750946144; x=1751550944;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+KY6uoWqFt+gH5qFF/7TA+aeZmO9qstem/kfCaD0HTU=;
+        b=qGN0NPBQ6yMD/JQ/y/AT8fpntCj7PZpOxDu4biF88l3PuhqI6DuBBCyGJFbCxjYDKa
+         i/V7cVdRPhE/IsqxLGHH6FA3zer42BlOyRj1OxJVMCbBy/HUVfU0DJy1oneIRipO3Ufw
+         UXqghcJiXIx91/dYUPBl8cahcK0xxhEybSeLq/K91WHJPtUR8NK0Iw7cVc0vbyNnhuZz
+         IgkrtWoIAzNwns4G3xOR/W+zBk2tiiAS3If9XT0ILzqZTLJSec2ij4d9NoEKtfwGkWHO
+         dJfn0G1AiowD8ZjbPT3H83BD/6jH0AhNz7lANV9gHoxHXuvjKuQxPhj67JPDx28SFM1A
+         lS+Q==
+X-Gm-Message-State: AOJu0YxqJaCUxXQ9SNJGgIDP/Ol1+v5GLo6n3mZ6NFg6+7Yd+M1Fd/5E
+	Q45b2qTocGKEq311rNMVcuTcvC89afFBoymAhcIgCgjryYtdYnyULLxgEXg8d4YWYNc=
+X-Gm-Gg: ASbGncvVrqolKqsaWyH5vgrCHIBPntRP3X/tB1CSng84fm5SoCGxXaf+OhPcZodcbK2
+	mLMmGa0WTuB1FZmhKtxn/3z2LAREAEl9/9ShNYvekah7jSNtmvABlw3M8WoxtznJ9SFnSYGSjFi
+	HF0lRHz6hCtehf8dcIaq+llfMFvhMFd04pcGrs7g+oOlUN0ojrxOSuAUFSfoSjKfOAIVOL2j90T
+	72UmwtafeKkdyO3HDx91XwTwRXlklXisds5sgm6Ry+bhofEPr5tFTXsFpidaA9zlhX+RsR6cTPV
+	Vg0isa81gVIF/dH436SEr+xLq3WY0tpRVqBTlGZ74bDhs9eiLu5O9b2oozPbyusJmtbKrfUJgQ6
+	0xM4wiaOsv1h7TtDRX7oHm4SPskO98uLWkRGSghhhb1x1ZSt+4A==
+X-Google-Smtp-Source: AGHT+IGF/axsm6TCoasMp3dJRYEbfjzn0cVauHe6eM7reaEROspM7hrYNsrohQKzR2Mdxe6cc1rxiA==
+X-Received: by 2002:a05:6214:ca8:b0:6fa:ccb6:602a with SMTP id 6a1803df08f44-6fd5ef83730mr118879916d6.20.1750946144137;
+        Thu, 26 Jun 2025 06:55:44 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd7718a750sm7634076d6.8.2025.06.26.06.55.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Jun 2025 06:55:44 -0700 (PDT)
+Date: Thu, 26 Jun 2025 06:55:41 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: z30015464 <zhongxuan2@huawei.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <dsahern@gmail.com>, <gaoxingwang1@huawei.com>, <yanan@huawei.com>,
+ <tangce1@huawei.com>
+Subject: Re: [Issue] iproute2: coredump problem with command ip link xstats
+Message-ID: <20250626065519.753de723@hermes.local>
+In-Reply-To: <20250619074552.1775627-1-zhongxuan2@huawei.com>
+References: <20250619074552.1775627-1-zhongxuan2@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Implement reference sync input pin get/set callbacks, allow user space
-control over dpll pin pairs capable of reference sync support.
+On Thu, 19 Jun 2025 15:45:52 +0800
+z30015464 <zhongxuan2@huawei.com> wrote:
 
-Reviewed-by: Milena Olech <milena.olech@intel.com>
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> Hello everyone,
+>=20
+> I having an issues while using iprute2 6.15.0. When I created a bond and =
+intended to use 'ip link xstats' command to query extended information, a s=
+tack overflow occurred, followed by a coredump. I couldn't identify the roo=
+t cause through the code and need some help.
+>=20
+> Example:
+> ifconfig eth1 up
+> modprobe bonding mode=3D4 max_bonds=3D1 lacp_rate=3D1 miimon=3D100
+> ip addr add 7.7.0.100/24 dev bond0
+> ip link xstats type bond dev bond0
+>=20
+> Here is the result:
+> [root@localhost /]# ip link xstats type bond
+> bond0
+>                     LACPDU Rx 0
+>                     LACPDU Tx 0
+>                     LACPDU Unknown type Rx 0
+>                     LACPDU Illegal Rx 0
+>                     Marker Rx 0
+>                     Marker Tx 0
+>                     Marker response Rx 0
+>                     Marker response Tx 0
+>                     Marker unknown type Rx 0
+> *** stack smashing detected ***: terminated
+> Aborted (core dumped)
+>=20
+> Here is the result with valgrind:
+> [root@localhost /]# valgrind ip link xstats type bond dev bond0
+> =3D=3D242893=3D=3D Memcheck, a memory error detector
+> =3D=3D242893=3D=3D Copyright (C) 2002-2022, and GNU GPL'd, by Julian Sewa=
+rd et al.
+> =3D=3D242893=3D=3D Using Valgrind-3.22.0 and LibVEX; rerun with -h for co=
+pyright info
+> =3D=3D242893=3D=3D Command: ip link xstats type bond dev bond0
+> =3D=3D242893=3D=3D
+> bond0
+>                     LACPDU Rx 0
+>                     LACPDU Tx 0
+>                     LACPDU Unknown type Rx 0
+>                     LACPDU Illegal Rx 0
+>                     Marker Rx 0
+>                     Marker Tx 0
+>                     Marker response Rx 0
+>                     Marker response Tx 0
+>                     Marker unknown type Rx 0
+> *** stack smashing detected ***: terminated
+> =3D=3D242893=3D=3D
+> =3D=3D242893=3D=3D Process terminating with default action of signal 6 (S=
+IGABRT)
+> =3D=3D242893=3D=3D    at 0x498AB5C: __pthread_kill_implementation (pthrea=
+d_kill.c:44)
+> =3D=3D242893=3D=3D    by 0x493CF45: raise (raise.c:26)
+> =3D=3D242893=3D=3D    by 0x492733B: abort (abort.c:79)
+> =3D=3D242893=3D=3D    by 0x49281A8: __libc_message.cold (libc_fatal.c:152)
+> =3D=3D242893=3D=3D    by 0x4A1621A: __fortify_fail (fortify_fail.c:24)
+> =3D=3D242893=3D=3D    by 0x4A17435: __stack_chk_fail (stack_chk_fail.c:24)
+> =3D=3D242893=3D=3D    by 0x157A81: bond_print_stats_attr (iplink_bond.c:8=
+77)
+> =3D=3D242893=3D=3D    by 0x157B02: bond_print_xstats (iplink_bond.c:895)
+> =3D=3D242893=3D=3D    by 0x1846A9: rtnl_dump_filter_l (libnetlink.c:926)
+> =3D=3D242893=3D=3D    by 0x185A01: rtnl_dump_filter_nc (libnetlink.c:969)
+> =3D=3D242893=3D=3D    by 0x16B0BF: iplink_ifla_xstats (iplink_xstats.c:71)
+> =3D=3D242893=3D=3D    by 0x118C3C: do_cmd (ip.c:131)
+> =3D=3D242893=3D=3D
+> =3D=3D242893=3D=3D HEAP SUMMARY:
+> =3D=3D242893=3D=3D     in use at exit: 33,878 bytes in 4 blocks
+> =3D=3D242893=3D=3D   total heap usage: 8 allocs, 4 frees, 66,755 bytes al=
+located
+> =3D=3D242893=3D=3D
+> =3D=3D242893=3D=3D LEAK SUMMARY:
+> =3D=3D242893=3D=3D    definitely lost: 0 bytes in 0 blocks
+> =3D=3D242893=3D=3D    indirectly lost: 0 bytes in 0 blocks
+> =3D=3D242893=3D=3D      possibly lost: 0 bytes in 0 blocks
+> =3D=3D242893=3D=3D    still reachable: 33,878 bytes in 4 blocks
+> =3D=3D242893=3D=3D         suppressed: 0 bytes in 0 blocks
+> =3D=3D242893=3D=3D Rerun with --leak-check=3Dfull to see details of leake=
+d memory
+> =3D=3D242893=3D=3D
+> =3D=3D242893=3D=3D For lists of detected and suppressed errors, rerun wit=
+h: -s
+> =3D=3D242893=3D=3D ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0=
+ from 0)
+> Aborted (core dumped)
+>=20
+> Through gdb debugging, __stack_chk_fail was triggered after the end of fu=
+nction bond_print_stats_attr function.
+> I first found this issue in version 6.6.0. After replacing package 6.15.0=
+, the issue still persists.=20
+> I also tried version 5.15.0 but there was no abnormality.
+> Maybe some modifications triggered this issue, but I cannot found the cau=
+se. I hope to get some helps.
+>=20
+> Thank you very much.
+>=20
+>=20
+>=20
+
+Thanks, fixed it with:
+
+=46rom e4d10d064f5dbc64e4d2d73074c33b54d06b4514 Mon Sep 17 00:00:00 2001
+From: Stephen Hemminger <stephen@networkplumber.org>
+Date: Thu, 26 Jun 2025 06:50:17 -0700
+Subject: [PATCH] bond: fix stack smash in xstats
+
+Building with stack smashing detection finds an off by one
+in the bond xstats attribute parsing.
+
+$ ip link xstats type bond dev bond0
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+bond0
+                    LACPDU Rx 0
+                    LACPDU Tx 0
+                    LACPDU Unknown type Rx 0
+                    LACPDU Illegal Rx 0
+                    Marker Rx 0
+                    Marker Tx 0
+                    Marker response Rx 0
+                    Marker response Tx 0
+                    Marker unknown type Rx 0
+*** stack smashing detected ***: terminated
+
+Program received signal SIGABRT, Aborted.
+
+Reported-by: z30015464 <zhongxuan2@huawei.com>
+Fixes: 440c5075d662 ("ip: bond: add xstats support")
+Cc: nikolay@cumulusnetworks.com
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
-v7:
-- rebase and align with introducation of software pins
----
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   2 +
- drivers/net/ethernet/intel/ice/ice_dpll.c     | 284 ++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_dpll.h     |   2 +
- 3 files changed, 288 insertions(+)
+ ip/iplink_bond.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index 0ae7387e0599..712f7ef2a00a 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -2304,6 +2304,8 @@ struct ice_aqc_get_cgu_abilities {
- 	u8 rsvd[3];
- };
- 
-+#define ICE_AQC_CGU_IN_CFG_FLG2_REFSYNC_EN		BIT(7)
-+
- /* Set CGU input config (direct 0x0C62) */
- struct ice_aqc_set_cgu_input_config {
- 	u8 input_idx;
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
-index d6190d9e32ba..39743cdba986 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.c
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
-@@ -36,6 +36,19 @@
- #define ICE_DPLL_PIN_SW_2_OUTPUT_ABS_IDX \
- 	(ICE_DPLL_PIN_SW_OUTPUT_ABS(ICE_DPLL_PIN_SW_2_IDX))
- 
-+#define ICE_SR_PFA_DPLL_DEFAULTS		0x152
-+#define ICE_DPLL_PFA_REF_SYNC_TYPE		0x2420
-+#define ICE_DPLL_PFA_REF_SYNC_TYPE2		0x2424
-+#define ICE_DPLL_PFA_END			0xFFFF
-+#define ICE_DPLL_PFA_HEADER_LEN			4
-+#define ICE_DPLL_PFA_ENTRY_LEN			3
-+#define ICE_DPLL_PFA_MAILBOX_REF_SYNC_PIN_S	4
-+#define ICE_DPLL_PFA_MASK_OFFSET		1
-+#define ICE_DPLL_PFA_VALUE_OFFSET		2
-+
-+#define ICE_DPLL_E810C_SFP_NC_PINS		2
-+#define ICE_DPLL_E810C_SFP_NC_START		4
-+
- /**
-  * enum ice_dpll_pin_type - enumerate ice pin types:
-  * @ICE_DPLL_PIN_INVALID: invalid pin type
-@@ -2107,6 +2120,149 @@ ice_dpll_sw_esync_get(const struct dpll_pin *pin, void *pin_priv,
- 						 extack);
- }
- 
-+/*
-+ * ice_dpll_input_ref_sync_set - callback for setting reference sync feature
-+ * @pin: pointer to a pin
-+ * @pin_priv: private data pointer passed on pin registration
-+ * @ref_pin: pin pointer for reference sync pair
-+ * @ref_pin_priv: private data pointer of ref_pin
-+ * @state: requested state for reference sync for pin pair
-+ * @extack: error reporting
-+ *
-+ * Dpll subsystem callback. Handler for setting reference sync frequency
-+ * feature for input pin.
-+ *
-+ * Context: Acquires and releases pf->dplls.lock
-+ * Return:
-+ * * 0 - success
-+ * * negative - error
-+ */
-+static int
-+ice_dpll_input_ref_sync_set(const struct dpll_pin *pin, void *pin_priv,
-+			    const struct dpll_pin *ref_pin, void *ref_pin_priv,
-+			    const enum dpll_pin_state state,
-+			    struct netlink_ext_ack *extack)
-+{
-+	struct ice_dpll_pin *p = pin_priv;
-+	struct ice_pf *pf = p->pf;
-+	u8 flags_en = 0;
-+	int ret;
-+
-+	if (ice_dpll_is_reset(pf, extack))
-+		return -EBUSY;
-+	mutex_lock(&pf->dplls.lock);
-+
-+	if (p->flags[0] & ICE_AQC_GET_CGU_IN_CFG_FLG2_INPUT_EN)
-+		flags_en = ICE_AQC_SET_CGU_IN_CFG_FLG2_INPUT_EN;
-+	if (state == DPLL_PIN_STATE_CONNECTED)
-+		flags_en |= ICE_AQC_CGU_IN_CFG_FLG2_REFSYNC_EN;
-+	ret = ice_aq_set_input_pin_cfg(&pf->hw, p->idx, 0, flags_en, 0, 0);
-+	if (!ret)
-+		ret = ice_dpll_pin_state_update(pf, p, ICE_DPLL_PIN_TYPE_INPUT,
-+						extack);
-+	mutex_unlock(&pf->dplls.lock);
-+
-+	return ret;
-+}
-+
-+/**
-+ * ice_dpll_input_ref_sync_get - callback for getting reference sync config
-+ * @pin: pointer to a pin
-+ * @pin_priv: private data pointer passed on pin registration
-+ * @ref_pin: pin pointer for reference sync pair
-+ * @ref_pin_priv: private data pointer of ref_pin
-+ * @state: on success holds reference sync state for pin pair
-+ * @extack: error reporting
-+ *
-+ * Dpll subsystem callback. Handler for setting reference sync frequency
-+ * feature for input pin.
-+ *
-+ * Context: Acquires and releases pf->dplls.lock
-+ * Return:
-+ * * 0 - success
-+ * * negative - error
-+ */
-+static int
-+ice_dpll_input_ref_sync_get(const struct dpll_pin *pin, void *pin_priv,
-+			    const struct dpll_pin *ref_pin, void *ref_pin_priv,
-+			    enum dpll_pin_state *state,
-+			    struct netlink_ext_ack *extack)
-+{
-+	struct ice_dpll_pin *p = pin_priv;
-+	struct ice_pf *pf = p->pf;
-+
-+	if (ice_dpll_is_reset(pf, extack))
-+		return -EBUSY;
-+	mutex_lock(&pf->dplls.lock);
-+	if (p->flags[0] & ICE_AQC_CGU_IN_CFG_FLG2_REFSYNC_EN)
-+		*state = DPLL_PIN_STATE_CONNECTED;
-+	else
-+		*state = DPLL_PIN_STATE_DISCONNECTED;
-+	mutex_unlock(&pf->dplls.lock);
-+
-+	return 0;
-+}
-+
-+/*
-+ * ice_dpll_sw_input_ref_sync_set - callback for setting reference sync feature
-+ * @pin: pointer to a pin
-+ * @pin_priv: private data pointer passed on pin registration
-+ * @ref_pin: pin pointer for reference sync pair
-+ * @ref_pin_priv: private data pointer of ref_pin
-+ * @state: requested state for reference sync for pin pair
-+ * @extack: error reporting
-+ *
-+ * Dpll subsystem callback. Handler for setting reference sync
-+ * feature for input pins.
-+ *
-+ * Context: Calls a function which acquires and releases pf->dplls.lock
-+ * Return:
-+ * * 0 - success
-+ * * negative - error
-+ */
-+static int
-+ice_dpll_sw_input_ref_sync_set(const struct dpll_pin *pin, void *pin_priv,
-+			       const struct dpll_pin *ref_pin,
-+			       void *ref_pin_priv,
-+			       const enum dpll_pin_state state,
-+			       struct netlink_ext_ack *extack)
-+{
-+	struct ice_dpll_pin *p = pin_priv;
-+
-+	return ice_dpll_input_ref_sync_set(pin, p->input, ref_pin, ref_pin_priv,
-+					   state, extack);
-+}
-+
-+/**
-+ * ice_dpll_sw_input_ref_sync_get - callback for getting reference sync config
-+ * @pin: pointer to a pin
-+ * @pin_priv: private data pointer passed on pin registration
-+ * @ref_pin: pin pointer for reference sync pair
-+ * @ref_pin_priv: private data pointer of ref_pin
-+ * @state: on success holds reference sync state for pin pair
-+ * @extack: error reporting
-+ *
-+ * Dpll subsystem callback. Handler for setting reference sync feature for
-+ * input pins.
-+ *
-+ * Context: Calls a function which acquires and releases pf->dplls.lock
-+ * Return:
-+ * * 0 - success
-+ * * negative - error
-+ */
-+static int
-+ice_dpll_sw_input_ref_sync_get(const struct dpll_pin *pin, void *pin_priv,
-+			       const struct dpll_pin *ref_pin,
-+			       void *ref_pin_priv,
-+			       enum dpll_pin_state *state,
-+			       struct netlink_ext_ack *extack)
-+{
-+	struct ice_dpll_pin *p = pin_priv;
-+
-+	return ice_dpll_input_ref_sync_get(pin, p->input, ref_pin, ref_pin_priv,
-+					   state, extack);
-+}
-+
- /**
-  * ice_dpll_rclk_state_on_pin_set - set a state on rclk pin
-  * @pin: pointer to a pin
-@@ -2234,6 +2390,8 @@ static const struct dpll_pin_ops ice_dpll_pin_sma_ops = {
- 	.phase_offset_get = ice_dpll_phase_offset_get,
- 	.esync_set = ice_dpll_sw_esync_set,
- 	.esync_get = ice_dpll_sw_esync_get,
-+	.ref_sync_set = ice_dpll_sw_input_ref_sync_set,
-+	.ref_sync_get = ice_dpll_sw_input_ref_sync_get,
- };
- 
- static const struct dpll_pin_ops ice_dpll_pin_ufl_ops = {
-@@ -2262,6 +2420,8 @@ static const struct dpll_pin_ops ice_dpll_input_ops = {
- 	.phase_offset_get = ice_dpll_phase_offset_get,
- 	.esync_set = ice_dpll_input_esync_set,
- 	.esync_get = ice_dpll_input_esync_get,
-+	.ref_sync_set = ice_dpll_input_ref_sync_set,
-+	.ref_sync_get = ice_dpll_input_ref_sync_get,
- };
- 
- static const struct dpll_pin_ops ice_dpll_output_ops = {
-@@ -2560,6 +2720,88 @@ static void ice_dpll_periodic_work(struct kthread_work *work)
- 				   msecs_to_jiffies(500));
- }
- 
-+/**
-+ * ice_dpll_init_ref_sync_inputs - initialize reference sync pin pairs
-+ * @pf: pf private structure
-+ *
-+ * Read DPLL TLV capabilities and initialize reference sync pin pairs in
-+ * dpll subsystem.
-+ *
-+ * Return:
-+ * * 0 - success or nothing to do (no ref-sync tlv are present)
-+ * * negative - AQ failure
-+ */
-+static int ice_dpll_init_ref_sync_inputs(struct ice_pf *pf)
-+{
-+	struct ice_dpll_pin *inputs = pf->dplls.inputs;
-+	struct ice_hw *hw = &pf->hw;
-+	u16 addr, len, end, hdr;
-+	int ret;
-+
-+	ret = ice_get_pfa_module_tlv(hw, &hdr, &len, ICE_SR_PFA_DPLL_DEFAULTS);
-+	if (ret) {
-+		dev_err(ice_pf_to_dev(pf),
-+			"Failed to read PFA dpll defaults TLV ret=%d\n", ret);
-+		return ret;
-+	}
-+	end = hdr + len;
-+
-+	for (addr = hdr + ICE_DPLL_PFA_HEADER_LEN; addr < end;
-+	     addr += ICE_DPLL_PFA_ENTRY_LEN) {
-+		unsigned long bit, ul_mask, offset;
-+		u16 pin, mask, buf;
-+		bool valid = false;
-+
-+		ret = ice_read_sr_word(hw, addr, &buf);
-+		if (ret)
-+			return ret;
-+
-+		switch (buf) {
-+		case ICE_DPLL_PFA_REF_SYNC_TYPE:
-+		case ICE_DPLL_PFA_REF_SYNC_TYPE2:
-+		{
-+			u16 mask_addr = addr + ICE_DPLL_PFA_MASK_OFFSET;
-+			u16 val_addr = addr + ICE_DPLL_PFA_VALUE_OFFSET;
-+
-+			ret = ice_read_sr_word(hw, mask_addr, &mask);
-+			if (ret)
-+				return ret;
-+			ret = ice_read_sr_word(hw, val_addr, &pin);
-+			if (ret)
-+				return ret;
-+			if (buf == ICE_DPLL_PFA_REF_SYNC_TYPE)
-+				pin >>= ICE_DPLL_PFA_MAILBOX_REF_SYNC_PIN_S;
-+			valid = true;
-+			break;
-+		}
-+		case ICE_DPLL_PFA_END:
-+			addr = end;
-+			break;
-+		default:
-+			continue;
-+		}
-+		if (!valid)
-+			continue;
-+
-+		ul_mask = mask;
-+		offset = 0;
-+		for_each_set_bit(bit, &ul_mask, BITS_PER_TYPE(u16)) {
-+			int i, j;
-+
-+			if (hw->device_id == ICE_DEV_ID_E810C_SFP &&
-+			    pin > ICE_DPLL_E810C_SFP_NC_START)
-+				offset = -ICE_DPLL_E810C_SFP_NC_PINS;
-+			i = pin + offset;
-+			j = bit + offset;
-+			if (i < 0 || j < 0)
-+				return -ERANGE;
-+			inputs[i].ref_sync = j;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- /**
-  * ice_dpll_release_pins - release pins resources from dpll subsystem
-  * @pins: pointer to pins array
-@@ -2634,6 +2876,36 @@ ice_dpll_unregister_pins(struct dpll_device *dpll, struct ice_dpll_pin *pins,
- 			dpll_pin_unregister(dpll, pins[i].pin, ops, &pins[i]);
- }
- 
-+/**
-+ * ice_dpll_pin_ref_sync_register - register reference sync pins
-+ * @pins: pointer to pins array
-+ * @count: number of pins
-+ *
-+ * Register reference sync pins in dpll subsystem.
-+ *
-+ * Return:
-+ * * 0 - success
-+ * * negative - registration failure reason
-+ */
-+static int
-+ice_dpll_pin_ref_sync_register(struct ice_dpll_pin *pins, int count)
-+{
-+	int ret, i;
-+
-+	for (i = 0; i < count; i++) {
-+		if (!pins[i].hidden && pins[i].ref_sync) {
-+			int j = pins[i].ref_sync;
-+
-+			ret = dpll_pin_ref_sync_pair_add(pins[i].pin,
-+							 pins[j].pin);
-+			if (ret)
-+				return ret;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- /**
-  * ice_dpll_register_pins - register pins with a dpll
-  * @dpll: dpll pointer to register pins with
-@@ -2922,6 +3194,14 @@ static int ice_dpll_init_pins(struct ice_pf *pf, bool cgu)
- 				goto deinit_sma;
- 			count += ICE_DPLL_PIN_SW_NUM;
- 		}
-+		ret = ice_dpll_pin_ref_sync_register(pf->dplls.inputs,
-+						     pf->dplls.num_inputs);
-+		if (ret)
-+			goto deinit_ufl;
-+		ret = ice_dpll_pin_ref_sync_register(pf->dplls.sma,
-+						     ICE_DPLL_PIN_SW_NUM);
-+		if (ret)
-+			goto deinit_ufl;
- 	} else {
- 		count += pf->dplls.num_outputs + 2 * ICE_DPLL_PIN_SW_NUM;
- 	}
-@@ -3219,6 +3499,8 @@ ice_dpll_init_info_direct_pins(struct ice_pf *pf,
- 		pins[i].prop.freq_supported_num = freq_supp_num;
- 		pins[i].pf = pf;
- 	}
-+	if (input)
-+		ret = ice_dpll_init_ref_sync_inputs(pf);
- 
- 	return ret;
- }
-@@ -3284,6 +3566,8 @@ static int ice_dpll_init_info_sw_pins(struct ice_pf *pf)
- 		pin->pf = pf;
- 		pin->prop.board_label = ice_dpll_sw_pin_sma[i];
- 		pin->input = &d->inputs[pin_abs_idx];
-+		if (pin->input->ref_sync)
-+			pin->ref_sync = pin->input->ref_sync - pin_abs_idx;
- 		pin->output = &d->outputs[ICE_DPLL_PIN_SW_OUTPUT_ABS(i)];
- 		ice_dpll_phase_range_set(&pin->prop.phase_range, phase_adj_max);
- 	}
-diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.h b/drivers/net/ethernet/intel/ice/ice_dpll.h
-index a5a5b61c5115..c0da03384ce9 100644
---- a/drivers/net/ethernet/intel/ice/ice_dpll.h
-+++ b/drivers/net/ethernet/intel/ice/ice_dpll.h
-@@ -32,6 +32,7 @@ enum ice_dpll_pin_sw {
-  * @freq: current frequency of a pin
-  * @phase_adjust: current phase adjust value
-  * @phase_offset: monitored phase offset value
-+ * @ref_sync: store id of reference sync pin
-  */
- struct ice_dpll_pin {
- 	struct dpll_pin *pin;
-@@ -49,6 +50,7 @@ struct ice_dpll_pin {
- 	enum dpll_pin_direction direction;
- 	s64 phase_offset;
- 	u8 status;
-+	u8 ref_sync;
- 	bool active;
- 	bool hidden;
- };
--- 
-2.38.1
+diff --git a/ip/iplink_bond.c b/ip/iplink_bond.c
+index 19af67d0..62dd907c 100644
+--- a/ip/iplink_bond.c
++++ b/ip/iplink_bond.c
+@@ -852,7 +852,7 @@ static void bond_print_stats_attr(struct rtattr *attr, =
+int ifindex)
+ 	const char *ifname =3D "";
+ 	int rem;
+=20
+-	parse_rtattr(bondtb, LINK_XSTATS_TYPE_MAX+1, RTA_DATA(attr),
++	parse_rtattr(bondtb, LINK_XSTATS_TYPE_MAX, RTA_DATA(attr),
+ 	RTA_PAYLOAD(attr));
+ 	if (!bondtb[LINK_XSTATS_TYPE_BOND])
+ 		return;
+--=20
+2.47.2
 
 
