@@ -1,248 +1,111 @@
-Return-Path: <netdev+bounces-201412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E990AE9643
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 08:28:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08BCFAE964C
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 08:32:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 044345A74B2
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 06:27:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A9E41682A4
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 06:32:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72746236457;
-	Thu, 26 Jun 2025 06:28:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="JmX9FPpJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DD771A23A4;
+	Thu, 26 Jun 2025 06:32:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67DEF22F76C;
-	Thu, 26 Jun 2025 06:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F39313A3F7
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 06:32:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750919292; cv=none; b=dnpCnNp5PW+iZfnrslYG3ePV874tanCciz3NtULPzhKGmQ90vio5KI6kWtkDYXsxP8tX2UxovehcftEXI0YQEq/Co1gG6IInhh8VhilIgARmTJKS59k5kxiyDFvwr5ZZ9OQQNtJEII2b29X9B9SBFEt1k6RIVy05CBN2/yhVMfQ=
+	t=1750919571; cv=none; b=rkrvqDilyhCpEAS7mZAn8iifU3PlQ87ms/lP8tLQaxXdozJC6L+jPY8zMjFt6wxs8d46jdA7HjFqZjrgnyqNTLWLbLHBfb2/9JhUxzG4VeZlGT4wXqyivLpwVSM47YaTYMjWvu3PF1yu8xl55Mx7tzBRlCN3DLARWRh5TtUOxcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750919292; c=relaxed/simple;
-	bh=N4+EBStamH18yC84cVsW43kn3FrOjyeb1A697dQXwBo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NkXriOd1+/DWFFW+DkJrnd6DJtzCvQ/Aju9WKpeHIamFx4JhznmcLGQG7nIFTicSugfKucZId86VldJ0BcpWUFWije+m0MWuxU4uXpuX2aR3Id2Wec9G960OYwku9iGnaXdmYQGxFvr+5MXH+x31xlRUTZdCFBnILHCnHkpFfxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=JmX9FPpJ; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CE4E410397285;
-	Thu, 26 Jun 2025 08:28:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1750919287; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=aOywoeS6URIUGte85xuUw45vaQaD6qm7x5c4nv66H4c=;
-	b=JmX9FPpJWXh0V6wVKXgTn1rrkOMjdlo3mghi+sU4xfc0lg96Y2zMko9v1SQu7DiAedAPsv
-	hHNKZa41SyQks1DP2iTPrQESRjPDxXErLICpQr4fWrp7Gura9dlDBWONhNmGbGpWIBAiz9
-	HUqcLh+NzuNLWEs6tT5entH5znqhMtaRyRaAbu/NxfpeZcpYBX1L6XtxlYTDVfxYh99s7X
-	gtFkiM3JeUs5kTguNZsKluVbETKbaFOevHmqgj5pqFA+6z/FBnf9gw4AFibJOXh1Ydtjvy
-	tpGQ5SxfzKNP2z6Qtv4hvZrjDxj3/cZdgeqWir80bhGiVdd8ZRM91+bfvGTG1w==
-Date: Thu, 26 Jun 2025 08:28:00 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
- <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew@lunn.ch>
-Subject: Re: [net-next v13 04/11] net: mtip: The L2 switch driver for imx287
-Message-ID: <20250626082800.5ddca021@wsk>
-In-Reply-To: <20159d14-7d6b-4c16-9f00-ae993cc16f90@redhat.com>
-References: <20250622093756.2895000-1-lukma@denx.de>
-	<20250622093756.2895000-5-lukma@denx.de>
-	<b31793de-e34f-438c-aa37-d68f3cb42b80@redhat.com>
-	<20250624230437.1ede2bcb@wsk>
-	<20159d14-7d6b-4c16-9f00-ae993cc16f90@redhat.com>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1750919571; c=relaxed/simple;
+	bh=TDalTunvn+bElhwPUzbvPpsFu1PtmiCO8ngSflWTgFA=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=X+33SbxUydOQZ6ItcNsizjM8prEqF0Wj8AIayjtStwP+u5OjW8gCs5CfAGGmd7ZDCma7fkrgNPjI1iaUVx5JN8lT/W8Zho9oaOdmJ/6N2UsZWDRWCV5RXld3Ix4H98YHYpn8gN6ITzPUr4vAg55yWs+y7Zp315gW/JNA8FfRq70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=52.59.177.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: zesmtpsz7t1750919509t638f7b38
+X-QQ-Originating-IP: youq8oWcb23IKTfGp+nG3DY+36M5LvSROlFByKM0GxU=
+Received: from smtpclient.apple ( [36.27.0.255])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 26 Jun 2025 14:31:47 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 18266739101542888331
+EX-QQ-RecipientCnt: 10
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/Fx83fi2=ba.0dUz7yta_/mB";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
-
---Sig_/Fx83fi2=ba.0dUz7yta_/mB
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.400.131.1.6\))
+Subject: Re: [PATCH net-next v2 08/12] net: txgbevf: add phylink check flow
+From: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
+In-Reply-To: <71d0b663-c717-45a5-ae23-f5b91d199eac@lunn.ch>
+Date: Thu, 26 Jun 2025 14:31:36 +0800
+Cc: netdev@vger.kernel.org,
+ michal.swiatkowski@linux.intel.com,
+ kuba@kernel.org,
+ pabeni@redhat.com,
+ horms@kernel.org,
+ andrew+netdev@lunn.ch,
+ duanqiangwen@net-swift.com,
+ linglingzhang@trustnetic.com,
+ jiawenwu@net-swift.com
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <B649FE55-96A3-4631-8714-51128EDEE810@net-swift.com>
+References: <20250625102058.19898-1-mengyuanlou@net-swift.com>
+ <20250625102058.19898-9-mengyuanlou@net-swift.com>
+ <71d0b663-c717-45a5-ae23-f5b91d199eac@lunn.ch>
+To: Andrew Lunn <andrew@lunn.ch>
+X-Mailer: Apple Mail (2.3826.400.131.1.6)
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: M//muKyjQOU46/zlIP25euEQArTG40H60+sTGyW5cZastvY1o2N0R7f6
+	CpKvs3LEyVyd/d06w+jgsx3m/Dz0EtNBnK85L0N65uxJNNEN1Ffstw9Kq1Dtvzxa0ap/BZO
+	AL8TbSEFd+1ZqLArI3noPnKI0G3ha/INeb4S0olZOy+HuBT9+4x+KPU4gDLZI8dc9K3coxv
+	tpSjguDRPsxNPMGOtGyR3k1dFgxmNAwI36GLr3I+MYFw/dw9D2HFX5kbnEBzlUaGq2zOxon
+	3PMxfrz3hFC85RTxGZWgxAYw/qlDjkhp56bf0I44p6cEh+aAsvDNJw3o2blx/FI4stZoiiM
+	/pvtAXVYiBYSD8rtDwDOkYXVJnWCc84OVp0K5faiwTckLLGYUvGRPn+WtJtURKecxAyQ4ec
+	CA9WJ6aOMcGlEn+qEmcVVEXpMcaHU+SZtxT7HK77birhblwHZOe4+duzkAw2PC/cgSUzaWH
+	eXOX0Y3YFBgAjmBLmqxGvwh+L6JHmpeMRhwnTQ8SG702dwNLgImtiNW50PDB3nywpv1teMU
+	AYycfAzfbJIk5Fc7X0rfbwTcphIreBJVhCLk0nKF+7RtcGUJazNru7d7Du/O4oMfZYWX1+R
+	1h6AqCgH5Zdv7JxSu5N/z5DrBNtxIIlUZhQARIV6iIpM0Fj4zGz9fDQ7wpwh/BwRc/BZqjc
+	ihb2nLAMNO5sT9ELzyEtKvtAtPJn3P/2pWtrPnbA4l9RDCTNtt8/s86zbn/19Jx8gNAMvSp
+	JGGja8EOCqAMP7MUTMa6ybKR0osieFjvtc4Ck2fwLcVtBUxvLB3GZ7TrV4wyeM63YuTTpwi
+	FUYMqqv8TUVJIiPEii8PiYeJQ7dGs4xypDBjhvcQHI4niMX0NnjXySh7ylohNu8zsOYzwND
+	pgCS65CctuzGl1gPEDC2G3CzQqLTXudWc8rFuk22d5CsgG1vV6zRmkoN+5hXXEnWV+Azgb8
+	DCcpeDNYtnl6f1nA8ijZOE3o7NUErWbtQas06jr+xkhzUM9hl2UsLw+9Q5vfr7WFH6GZ93l
+	dFjPLXGr9Za1VIkIIxq0DBHuUGch4=
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+X-QQ-RECHKSPAM: 0
 
-Hi Paolo,
 
-> On 6/24/25 11:04 PM, Lukasz Majewski wrote:
-> >> On 6/22/25 11:37 AM, Lukasz Majewski wrote: =20
-> >>> +static void mtip_aging_timer(struct timer_list *t)
-> >>> +{
-> >>> +	struct switch_enet_private *fep =3D timer_container_of(fep,
-> >>> t,
-> >>> +
-> >>> timer_aging); +
-> >>> +	fep->curr_time =3D mtip_timeincrement(fep->curr_time);
-> >>> +
-> >>> +	mod_timer(&fep->timer_aging,
-> >>> +		  jiffies +
-> >>> msecs_to_jiffies(LEARNING_AGING_INTERVAL)); +}   =20
-> >>
-> >> It's unclear to me why you decided to maintain this function and
-> >> timer while you could/should have used a macro around jiffies
-> >> instead. =20
-> >=20
-> > This is a bit more tricky than just getting value from jiffies.
-> >=20
-> > The current code provides a monotonic, starting from 0 time "base"
-> > for learning and managing entries in internal routing tables for
-> > MTIP.
-> >=20
-> > To be more specific - the fep->curr_time is a value incremented
-> > after each ~10ms.
-> >=20
-> > Simple masking of jiffies would not provide such features. =20
+
+> 2025=E5=B9=B46=E6=9C=8826=E6=97=A5 01:08=EF=BC=8CAndrew Lunn =
+<andrew@lunn.ch> =E5=86=99=E9=81=93=EF=BC=9A
 >=20
-> I guess you can get the same effect storing computing the difference
-> from an initial jiffies value and using jiffies_to_msecs(<delta>)/10.
-
-With some coding assuring only 10 bit width of the resulting clock
-(based on jiffies) I can have a monotonic clock which will not start
-from 0.
-
+> On Wed, Jun 25, 2025 at 06:20:54PM +0800, Mengyuan Lou wrote:
+>> Add phylink support to wangxun 10/25/40G virtual functions.
 >=20
-> >> [...] =20
-> >>> +static int mtip_sw_learning(void *arg)
-> >>> +{
-> >>> +	struct switch_enet_private *fep =3D arg;
-> >>> +
-> >>> +	while (!kthread_should_stop()) {
-> >>> +		set_current_state(TASK_INTERRUPTIBLE);
-> >>> +		/* check learning record valid */
-> >>> +		mtip_atable_dynamicms_learn_migration(fep,
-> >>> fep->curr_time,
-> >>> +						      NULL,
-> >>> NULL);
-> >>> +		schedule_timeout(HZ / 100);
-> >>> +	}
-> >>> +
-> >>> +	return 0;
-> >>> +}   =20
-> >>
-> >> Why are you using a full blown kernel thread here?  =20
-> >=20
-> > The MTIP IP block requires the thread for learning. It is a HW based
-> > switching accelerator, but the learning feature must be performed by
-> > SW (by writing values to its registers).
-> >  =20
-> >> Here a timer could
-> >> possibly make more sense. =20
-> >=20
-> > Unfortunately, not - the code (in
-> > mtip_atable_dynamicms_learn_migration() must be called). This
-> > function has another role - it updates internal routing table with
-> > timestamps (provided by timer mentioned above). =20
+> What do you gain by having a phylink instance for a VF?
 >=20
-> Why a periodic timer can't call such function?
+> All the ops you define are basically NOPs. What is phylink actually
+> doing?
 
-Yes, the kthread can be replaced with timer with 100ms period.
-
-Just to explain - the mtip_atable_dynamicms_learn_migration(), which
-requires monotonic value incremented once per 10ms, is called at two
-places:
-
-1. mtip_switch_rx() -> the dynamic table is examined if required (i.e.
-new frame arrives). In this place the counter requires 10ms resolution
-(can be extracted from jiffies).
-
-2. The mtip_sw_learning() - which now is run from kthread, but it can
-be replaced with timer (100ms resolution).
+I think phylink helps me monitor the changes in link status and
+automatically set the netif status.
+Besides, I can also directly use the get_link_ksettings interface.
 
 >=20
-> >  =20
-> >> Why are checking the table every 10ms, while
-> >> the learning intervall is 100ms?  =20
-> >=20
-> > Yes, this is correct. In 10ms interval the internal routing table is
-> > updated. 100 ms is for learning.
-> >  =20
-> >> I guess you could/should align the
-> >> frequency here with such interval. =20
-> >=20
-> > IMHO learning with 10ms interval would bring a lot of overhead.
-> >=20
-> > Just to mention - the MTIP IP block can generate interrupt for
-> > learning event. However, it has been advised (bu NXP support), that
-> > a thread with 100ms interval shall be used to avoid too many
-> > interrupts. =20
->=20
-> FTR, my suggestion is to increase the
-> mtip_atable_dynamicms_learn_migration's call period to 100ms
-
-As mentioned above - it is called in two places. One is in kthread
-started at 100ms period, another one is asynchronous when frame arrives.
-
->=20
-> >> Side note: I think you should move the buffer management to a later
-> >> patch: this one is still IMHO too big. =20
-> >=20
-> > And this is problematic - the most time I've spent for v13 to
-> > separate the code - i.e. I exclude one function, then there are
-> > warnings that other function is unused (and of course WARNINGS in a
-> > separate patches are a legitimate reason to call for another patch
-> > set revision). =20
->=20
-> A trick to break that kind of dependencies chain is to leave a
-> function implementation empty.
->=20
-> On the same topic, you could have left mtip_rx_napi() implementation
-> empty up to patch 6 or you could have introduced napi initialization
-> and cleanup only after such patch.
->=20
-> In a similar way, you could introduce buffer managements in a later
-> patch and add the relevant calls afterwards.
-
-I get your point.
-
->=20
-> /P
+> Andrew
 >=20
 
-
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/Fx83fi2=ba.0dUz7yta_/mB
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmhc6HAACgkQAR8vZIA0
-zr0Q6ggAhP76zLQCcS7yPIT4oJTgBppnruWfx1DIYSqVAPc72wii+bwG2zw3wD9P
-zWluiinx+cLcfhysEy4jYVBnrJx0lZRwaISWGByo3/DHcjHxKxlYP6dNO0YdcuWS
-JuE3k8RXNRImfH74zo7HpbXjClU4htBIwJgKH0YsztnqpjPA6Vjlj6MEQdkAefXv
-29Y9mXxloNMt6kmRey8a6i4hoqKUtnQKAK9BjZHYMHecCPhcyDwhF/dIP26yJpS7
-mg2kO096B9sosW3w3AN0GC/poDi2OohgoYq4Yf5DmfVosHTtBXnsTGcNql33Uyct
-qj4aoXLChq3ztyZMeNecCr3QGG8MQQ==
-=Raoa
------END PGP SIGNATURE-----
-
---Sig_/Fx83fi2=ba.0dUz7yta_/mB--
 
