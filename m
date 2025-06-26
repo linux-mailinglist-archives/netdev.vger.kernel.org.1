@@ -1,71 +1,66 @@
-Return-Path: <netdev+bounces-201420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01558AE96A3
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 09:15:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51989AE96AE
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 09:23:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8191F3B613E
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 07:14:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83E311675CB
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 07:23:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3A011A262D;
-	Thu, 26 Jun 2025 07:15:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F06323B613;
+	Thu, 26 Jun 2025 07:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jMMQY7gQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aVGcUQv6"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3504C2264B3
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 07:15:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F0223ABAD;
+	Thu, 26 Jun 2025 07:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750922112; cv=none; b=T+ehwxn0S6BINbV5rLYpfLRDJ5zFAzumfVQ6PK2yIyJoR+RWumKQZzAb5iURzDYtUhm9torDwL+6HPA55f7T9TeJFQD6lOPys1YqomBHTn7vRq2EebbPSxqeqxo8598U3WUFVkKVK+6p/O0WfeuSfEMQsG7VirZzpOcG3Zp0B6k=
+	t=1750922594; cv=none; b=uxG/D4iOqQORRhDqPLFmmWt2kQnQy2Ak8DOJTpmYP9tfRCkJ4ZlVNtm3Kl0YVc6VO3jTA+knBE8TdBJeguTpApqUKFE7Rjfu9jm8HeyxwtW9loqT41Ni6upGeYNUvmgqwC3S6eolhQu+VhICrPrOJgIunVQbfSuGIW5arzkl+NY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750922112; c=relaxed/simple;
-	bh=jHVx/rBsbfTaRg5sxirHXNnIb2fyT0Vgajsvma8uCI4=;
+	s=arc-20240116; t=1750922594; c=relaxed/simple;
+	bh=dSPoY0RTF1Wz7DfHLCqbTmsTIUvPWjfQthz5/822Et8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BXPuMX9geEchp9/3nnq+nZER7GkPu+/BVbKqDWil5+CYVW7xfT0my0zCjBV8tLHZzeYfmUKvhc6bRT0QAczlExZ5mgwHhb49pdmCuha7dupDHH5wjMI3RUh98Zc8+HEUHpbbvF2x2LZXOVvk4LmAyk0+9YBfkl3u7nq5BLMhB44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jMMQY7gQ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=+Js178syGoOHRlZ3X1Gj/CO6E3ZUfUqG8Nf668uUeqk=; b=jMMQY7gQx7yYVi4pzuKvkND8Ln
-	W0aw+ZNiYSXLR3Jx4loOxJiPuFI3jKBR/SG8PCnnEL7q9RqWfArOv5Rht98t96zxXhhD2bd+Olw3G
-	mGZDOuEyBJeDGtRXa0C3hyf7pJXTEwiCpsyzkYxYO12EPYMTgVJbzxPvU+DzvVX9hu8OrQbj6Dxm7
-	qH2p/OJQ2ewKtfB2iLW2+Hf6lMnje8XGVZZHFRGgcCecfcx/nWmMi0lu8RJMEgfq63bUbo0Fa7lKe
-	yXNlvJmppEoF3uFalZbN1Vf2B/rffjdp2kn7UX+wRjQHdmPDkfx2xSP8hgqXtMOmD/bS68bewVgYG
-	nOjtGo7g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44936)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uUgp5-00085Q-2K;
-	Thu, 26 Jun 2025 08:15:03 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uUgp2-0006KK-2Z;
-	Thu, 26 Jun 2025 08:15:00 +0100
-Date: Thu, 26 Jun 2025 08:15:00 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Jakub Raczynski <j.raczynski@samsung.com>, andrew@lunn.ch,
-	hkallweit1@gmail.com, netdev@vger.kernel.org,
-	Wenjing Shan <wenjing.shan@samsung.com>
-Subject: Re: [PATCH 1/2] net/mdiobus: Fix potential out-of-bounds read/write
- access
-Message-ID: <aFzzdP4Og_oim4-l@shell.armlinux.org.uk>
-References: <aEb2WfLHcGBdI3_G@shell.armlinux.org.uk>
- <CGME20250609153151eucas1p12def205b1e442c456d043ab444418a56@eucas1p1.samsung.com>
- <20250609153147.1435432-1-j.raczynski@samsung.com>
- <0d51f36d-eee3-4455-a886-d6a979e8e891@sabinyo.mountain>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FvcrOZRSB35+ebVkaZTEsqPDd/uUr7l6lrXqDs1wEaVZoGRmYSVgA5i/TWGWLbnM+KR5d1qeMcesiNOPt2mkZR2a3Oi8Jqk9c957F0Iu780dHPDahOCbO7eMM3Ej2v5srKY3Lb9uhff6w00YBcQ6rhsVWnVnGfxxmi2O9yvpuik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aVGcUQv6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 404EDC4CEEB;
+	Thu, 26 Jun 2025 07:23:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750922593;
+	bh=dSPoY0RTF1Wz7DfHLCqbTmsTIUvPWjfQthz5/822Et8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aVGcUQv6TheU857JqgXR7TFkxH3ZjZlChGuDicn+jBA6zuQVryeNpGhk55jj6jfsE
+	 01yDToqQFgLs0rlffFNCCu83JmoqQn+k6ifjjVwhaZNAvkzG9orc0xZeCc61rULHdI
+	 JWXfKtHvNQvRBiDqe9g+58fNjHyDkEnSDnT3+Y/J4QkUKQ+s0uiGJbjD+S6wyMcR7Y
+	 yQz5aj7uza849zT6OIm1/RCi15qdmkXuBUaL1C8/J1Vbz0Xsf1dNqHwh3Sm2O9XYFt
+	 HoOKPLvwaidLCENWzL8xc6ZvKpOR/tDNS2QyEsCmWDHHsgVhA9OuOdQ1AEgfIGwCzT
+	 i4Ch+zvhw5GGw==
+Date: Thu, 26 Jun 2025 08:23:08 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Wei Fang <wei.fang@nxp.com>, Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>
+Subject: Re: [PATCH v2 net-next 0/3] change some statistics to 64-bit
+Message-ID: <20250626072308.GQ1562@horms.kernel.org>
+References: <20250624101548.2669522-1-wei.fang@nxp.com>
+ <20250624181143.6206a518@kernel.org>
+ <PAXPR04MB8510EDB597AD25F666C450ED887BA@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <20250625163459.GD152961@horms.kernel.org>
+ <20250625133224.275a8635@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,53 +69,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0d51f36d-eee3-4455-a886-d6a979e8e891@sabinyo.mountain>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250625133224.275a8635@kernel.org>
 
-On Wed, Jun 25, 2025 at 10:23:17AM -0500, Dan Carpenter wrote:
-> On Mon, Jun 09, 2025 at 05:31:46PM +0200, Jakub Raczynski wrote:
-> > When using publicly available tools like 'mdio-tools' to read/write data
-> > from/to network interface and its PHY via mdiobus, there is no verification of
-> > parameters passed to the ioctl and it accepts any mdio address.
-> > Currently there is support for 32 addresses in kernel via PHY_MAX_ADDR define,
-> > but it is possible to pass higher value than that via ioctl.
-> > While read/write operation should generally fail in this case,
-> > mdiobus provides stats array, where wrong address may allow out-of-bounds
-> > read/write.
+On Wed, Jun 25, 2025 at 01:32:24PM -0700, Jakub Kicinski wrote:
+> On Wed, 25 Jun 2025 17:34:59 +0100 Simon Horman wrote:
+> > > Simon has posted a patch [1] to fix the sparse warnings. Do I need to wait until
+> > > Simon's patch is applied to the net-next tree and then resend this patch set?
+> > > 
+> > > [1] https://lore.kernel.org/imx/20250624-etnetc-le-v1-1-a73a95d96e4e@kernel.org/  
 > > 
-> > Fix that by adding address verification before read/write operation.
-> > While this excludes this access from any statistics, it improves security of
-> > read/write operation.
+> > Yes, I have confirmed that with patch[1] applied this patch-set
+> > does not introduce any Sparse warnings (in my environment).
 > > 
-> > Fixes: 080bb352fad00 ("net: phy: Maintain MDIO device and bus statistics")
-> > Signed-off-by: Jakub Raczynski <j.raczynski@samsung.com>
-> > Reported-by: Wenjing Shan <wenjing.shan@samsung.com>
-> > ---
-> >  drivers/net/phy/mdio_bus.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
+> > I noticed the Sparse warnings that are otherwise introduced when reviewing
+> > v1 of this patchset which is why I crated patch[1].
 > > 
-> > diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
-> > index a6bcb0fee863..60fd0cd7cb9c 100644
-> > --- a/drivers/net/phy/mdio_bus.c
-> > +++ b/drivers/net/phy/mdio_bus.c
-> > @@ -445,6 +445,9 @@ int __mdiobus_read(struct mii_bus *bus, int addr, u32 regnum)
-> >  
-> >  	lockdep_assert_held_once(&bus->mdio_lock);
-> >  
-> > +	if (addr >= PHY_MAX_ADDR)
-> > +		return -ENXIO;
+> > The issue is that there is are long standing Sparse warnings - which
+> > highlight a driver bug, albeit one that doesn't manifest with in tree
+> > users. They is due to an unnecessary call to le64_to_cpu(). The warnings
+> > are:
+> > 
+> >   .../enetc_hw.h:513:16: warning: cast to restricted __le64
+> >   .../enetc_hw.h:513:16: warning: restricted __le64 degrades to integer
+> >   .../enetc_hw.h:513:16: warning: cast to restricted __le64
+> > 
+> > Patches 2/3 and 3/3 multiply the incidence of the above 3 warnings because
+> > they increase the callers of the inline function where the problem lies.
+> > 
+> > But I'd argue that, other than noise, they don't make things worse.
+> > The bug doesn't manifest for in-tree users (and if it did, it would
+> > have been manifesting anyway).
+> > 
+> > So I'd advocate accepting this series (or not) independent of resolving
+> > the Sparse warnings. Which should disappear when patch[1], or some variant
+> > thereof, is accepted (via net or directly into net-next).
 > 
-> addr is an int so Smatch wants this to be:
-> 
-> 	if (addr < 0 || addr >= PHY_MAX_ADDR)
-> 		return return -ENXIO;
-> 
-> I think that although addr is an int, the actual values are limited to
-> 0-U16_MAX?
+> All fair points, but unfortunately if there is a build issue 
+> the patches are not fed into the full CI cycle.
 
-0 to 31 inclusive.
+Thanks, I wasn't aware of that.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> Simon's fix
+> will hit net-next tomorrow, let's get these reposted tomorrow
+> so we can avoid any (unlikely) surprises?
+
+Yes, agreed. Let's avoid surprises.
 
