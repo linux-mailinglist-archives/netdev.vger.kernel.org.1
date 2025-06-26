@@ -1,106 +1,158 @@
-Return-Path: <netdev+bounces-201468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91C88AE985B
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 10:32:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB71BAE988D
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 10:38:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADA0C3B073E
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 08:31:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D8C63A5668
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 08:36:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C1BD28FFD0;
-	Thu, 26 Jun 2025 08:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BFF291C07;
+	Thu, 26 Jun 2025 08:35:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FP0ISR/K"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11F6218AB0
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 08:32:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658B828725E;
+	Thu, 26 Jun 2025 08:35:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750926726; cv=none; b=doTMwmETUz1z4sYcBvfrvvUpWw1qHYcypiqN99CZg2aT3TAeyxQPaP4zlDSMo+7S+iQBo0XTc04PZuQ/QSQRb4uz27EgvORdqwzdka3r+UW2cJBF0lTZWpJtRaQVG3lmlJf57cLRwcW5WNUPSdsDSIfBCzijQks0jyTQ38kUeiA=
+	t=1750926916; cv=none; b=CNewIsfKhNPpBHPWmetu00zymsEPOn6abHHjX2h/zSC/R2XCdQJmWSliL1ImOqt2rFr5HFiF56jD8l+chmqN5Lmyl+OT9SmEL8Dfo9k/AeN/yXZfoyE4Z6PYM9XIYCDIBHja2I2PT3oCdsQWJZISVeqiSzqZ5tPSYtRcvGR3ax8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750926726; c=relaxed/simple;
-	bh=uP/rFDx8e9z3sNXc4VRTDpBmgU3yeg67Y/han+fosNQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FhkU8/31LEUV2rROH6Q3ELz0oRXviSvTKjmrREhwtYubRrttUrXIKgTtSegaKSa4kEMrkQKlw4vctloTNb99wccWfogsNvpwV+/t9C6yCBIpan3WQ/1OyJdfAXGRBv/h+dSpT696JMTYhPp3pVp+PbOu5j2WbyPwHlL1kkPyTFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <jre@pengutronix.de>)
-	id 1uUi1Y-0000AH-3U; Thu, 26 Jun 2025 10:32:00 +0200
-Message-ID: <f2647407-3de0-4afd-bc79-5b58e13f10aa@pengutronix.de>
-Date: Thu, 26 Jun 2025 10:33:51 +0200
+	s=arc-20240116; t=1750926916; c=relaxed/simple;
+	bh=nHUZ668U+MnRs1YAZ7/aO4LbEwCxp+qT3jC3qnd47PU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ITVWJbBlunb3YXwKkLT3HCvqWiL2qUjrPdvJaRG0KTzm3VDZQ8eKrlAjb7QHdpNSJFiqlCSBHoLHdaeqtLPxZdKgCo2zYaOUCuSdIFdgS4OAMJWq0x1cI1rZLPMEfahJsSHk0d7vs0fHCm8C6DZ8fPeQRNDSHDVG/6NtZpQ9kQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FP0ISR/K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B791C4CEEB;
+	Thu, 26 Jun 2025 08:35:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750926916;
+	bh=nHUZ668U+MnRs1YAZ7/aO4LbEwCxp+qT3jC3qnd47PU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FP0ISR/KkbU8MDlw/EEwLR9YHqsTvWvkgcUOdis6QPGmCj+MtHk8YcmUgNWTK8xaR
+	 gQufPOuWtEcSxcK/UOgDoO08S1DzoIes0S3W/yG7Z4lowW1VignwLyjz5f2+Av6sAM
+	 QmYJ8ocjop8hUzRjponRhMzL5Pmh2zUM5IUR2DG1bnyjzdJYbLnKMdDQZT8AUE/k6R
+	 Se3pc/EovVh51EioT0R926xbqAw/t9o4VN6mZC2tyD+SzWUjcNexRGIL7r0xO19A56
+	 f7hiMoVnJX2GB9cPH8DM6+zWqgupkCdFH65foBLsxda+1quxPQZA9xp4juoXnk4qMy
+	 SeaGOsa5TJugw==
+Date: Thu, 26 Jun 2025 09:35:12 +0100
+From: Simon Horman <horms@kernel.org>
+To: Malaya Kumar Rout <malayarout91@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] selftests: net: fix resource leak  in napi_id_helper.c
+Message-ID: <20250626083512.GT1562@horms.kernel.org>
+References: <20250625153334.434747-1-malayarout91@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: fec: allow disable coalescing
-To: Andrew Lunn <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>
-Cc: "imx@lists.linux.dev" <imx@lists.linux.dev>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kernel@pengutronix.de" <kernel@pengutronix.de>,
- Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <20250625-fec_deactivate_coalescing-v1-1-57a1e41a45d3@pengutronix.de>
- <PAXPR04MB8510C17E1980D456FD9F094F887AA@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <d60808b3-eb20-40ab-b952-d9cd8d8d68a7@lunn.ch>
-Content-Language: en-US
-From: Jonas Rebmann <jre@pengutronix.de>
-In-Reply-To: <d60808b3-eb20-40ab-b952-d9cd8d8d68a7@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: jre@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250625153334.434747-1-malayarout91@gmail.com>
 
-Hi Andrew,
-
-On 2025-06-26 10:12, Andrew Lunn wrote:
-> On Thu, Jun 26, 2025 at 02:36:37AM +0000, Wei Fang wrote:
->>>
->>> -       /* Must be greater than zero to avoid unpredictable behavior */
->>> -       if (!fep->rx_time_itr || !fep->rx_pkts_itr ||
->>> -           !fep->tx_time_itr || !fep->tx_pkts_itr)
->>> -               return;
+On Wed, Jun 25, 2025 at 09:03:07PM +0530, Malaya Kumar Rout wrote:
+> Resolve minor resource leaks reported by cppcheck in napi_id_helper.c
 > 
-> Hi Wei
+> cppcheck output before this patch:
+> tools/testing/selftests/drivers/net/napi_id_helper.c:37:3: error: Resource leak: server [resourceLeak]
+> tools/testing/selftests/drivers/net/napi_id_helper.c:46:3: error: Resource leak: server [resourceLeak]
+> tools/testing/selftests/drivers/net/napi_id_helper.c:51:3: error: Resource leak: server [resourceLeak]
+> tools/testing/selftests/drivers/net/napi_id_helper.c:59:3: error: Resource leak: server [resourceLeak]
+> tools/testing/selftests/drivers/net/napi_id_helper.c:67:3: error: Resource leak: server [resourceLeak]
+> tools/testing/selftests/drivers/net/napi_id_helper.c:76:3: error: Resource leak: server [resourceLeak]
 > 
-> When i see a comment like this being removed, i wounder if there is
-> any danger of side effects? Do you know what is being done here is
-> actually safe, for all the different versions of the FEC which support
-> coalescence?
+> cppcheck output after this patch:
+> No resource leaks found
+> 
+> Signed-off-by: Malaya Kumar Rout <malayarout91@gmail.com>
 
-For reference, this comment is taken in plain from section 11.6.4.1.16.3
-in the i.MX 8M Plus Applications Processor Reference Manual (and is the
-same for the 6UL).
+Thanks,
 
-I was also worried about this so I made sure that in any case where
-either of those is zero, the coalescing enable bit (FEC_ITR_EN) is
-explicitly disabled.
+I agree that it is nice to address these warnings.
+But for completeness doesn't client also need to be closed
+if an error occurs after it is accepted?
 
-fec_enet_itr_coal_set is only ever called if FEC_QUIRK_HAS_COALESCE is
-set and for those models, we expect disabling coalescing via FEC_ITR_EN
--- and consequently also setting the parameters to zero -- to be
-unproblematic. This is also the reset default.
+Also, I'd suggest using a ladder of goto labels for error handling,
+as is common in (Neworking?) kernel code.
 
-Regards,
-Jonas
+E.g. (compile tested only!!)
 
--- 
-Pengutronix e.K.                           | Jonas Rebmann               |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-9    |
+diff --git a/tools/testing/selftests/drivers/net/napi_id_helper.c b/tools/testing/selftests/drivers/net/napi_id_helper.c
+index eecd610c2109..105517dc315d 100644
+--- a/tools/testing/selftests/drivers/net/napi_id_helper.c
++++ b/tools/testing/selftests/drivers/net/napi_id_helper.c
+@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
+ 
+ 	if (setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
+ 		perror("setsockopt");
+-		return 1;
++		goto err_close_server;
+ 	}
+ 
+ 	address.sin_family = AF_INET;
+@@ -43,12 +43,12 @@ int main(int argc, char *argv[])
+ 
+ 	if (bind(server, (struct sockaddr *)&address, sizeof(address)) < 0) {
+ 		perror("bind failed");
+-		return 1;
++		goto err_close_server;
+ 	}
+ 
+ 	if (listen(server, 1) < 0) {
+ 		perror("listen");
+-		return 1;
++		goto err_close_server;
+ 	}
+ 
+ 	ksft_ready();
+@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
+ 	client = accept(server, NULL, 0);
+ 	if (client < 0) {
+ 		perror("accept");
+-		return 1;
++		goto err_close_server;
+ 	}
+ 
+ 	optlen = sizeof(napi_id);
+@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
+ 			 &optlen);
+ 	if (ret != 0) {
+ 		perror("getsockopt");
+-		return 1;
++		goto err_close_client;
+ 	}
+ 
+ 	read(client, buf, 1024);
+@@ -73,11 +73,17 @@ int main(int argc, char *argv[])
+ 
+ 	if (napi_id == 0) {
+ 		fprintf(stderr, "napi ID is 0\n");
+-		return 1;
++		goto err_close_client;
+ 	}
+ 
+ 	close(client);
+ 	close(server);
+ 
+ 	return 0;
++
++err_close_client:
++	close(client);
++err_close_server:
++	close(server);
++	return 1;
+ }
 
