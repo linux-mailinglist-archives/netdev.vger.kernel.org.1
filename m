@@ -1,139 +1,176 @@
-Return-Path: <netdev+bounces-201514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15DE5AE9A0F
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 11:32:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69FC9AE9A53
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 11:41:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5FE2E7AD554
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 09:30:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9E473A5B26
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 09:41:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CE562BDC37;
-	Thu, 26 Jun 2025 09:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDBA52BD01A;
+	Thu, 26 Jun 2025 09:41:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ktr3T636"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="a83gXHvo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91FEA218AB4
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 09:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E87A15539A;
+	Thu, 26 Jun 2025 09:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750930284; cv=none; b=atE5rPCRebeUwsnaTCw46eWyYIzbfigm+ky2UxaQHu327wKL3Dp2eGY9/uud1mPaBMqz+VeBvG59nDOGuDn2BfcYmdwQZOUvbv7Xb+3sG5m+4fDJP6Azz/XGwq/vCFiOCjQJga6GrkIr4NAGzB0gFhA3WK4yMU8TenF9OkpEBdY=
+	t=1750930883; cv=none; b=PrnVDjmw58HToYXkx8ZiJ0UqwfCf/cmEQe5Jrl/q7Y+o3CTPgEtT3Rwo6orrn3o2Ulueke2sH4c7p2fkAw+WSOGJaKexsHkSlE6ZNp8yoLxglMkiqmNzPMMuMwNakOJFxZYwEsyaHz5hYJw9Exq1jk+dP+xOrrsNp2HmjIyGew0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750930284; c=relaxed/simple;
-	bh=zcJcfMMo/3ACIpZ4LXAPPwHUQXeQXL9s0zWxVNFTS0Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Cj+/X9NC/aR7Krc6z5dF0KZJbHmDvb4QulDFNE57sf0X4rvZYp5/rW3qA5paY+y4PvkphGA+nwAWQovu3vij01ixbHgY/J5WNTcKgQwjGsdCZPdl8w00PGUncI9jSKSr+PhToYvbvg33yPno/6pdBp/yDzn+1kYZZID8L4ryRYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ktr3T636; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4a58f79d6e9so12516651cf.2
-        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 02:31:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750930281; x=1751535081; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4vP735jlG/NZz9NPdW241a1xK9Iw0Q6bSF51FFzMtrc=;
-        b=ktr3T636XiNlATAJGn/WX/Ncx5d+CR0Slt/iR5RL7D9SqJgSjwuRp8T5OihcWahh3A
-         njJdTboeNDX8DWo0zY2irmWoWuBYErOhOnrGLm/fHU5A9GJ+Q7Em6s5AbxZ7FUTMBedm
-         lJ4KIMeS2RPVo009JakzKA9CnJKMX3KBHwkewn+CoTBlIKFvSWITBYgWo/ltjOhfB2jD
-         pgEFGg5MkQ6zwRW2KYWtl+DIOmX+UolM69XuZTua6x1IGuXFpza5vOflTTvmvG26cJQ9
-         als9azWbPxtMtwYLuT1kw8wm+YDOiUMFSTEibErRJLzjiLIlgds1Ma4SvbKH8IuiGL+l
-         9JKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750930281; x=1751535081;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4vP735jlG/NZz9NPdW241a1xK9Iw0Q6bSF51FFzMtrc=;
-        b=OLN2ui/VOKpcFG3SzLctJfzfssKVR5ARV/F/XN96HGk5C6BlPJoc1VimqqqT/YeMCi
-         MhOX4RI1VDG7wjYaBJMzk7KXWO7xd+26F6fi///Zqduw2HOyWLHYZdn32zZrSw6moGaV
-         VxLRdRLkHyZYD8db4Xjxj0WRZAkYwOu+xqRhwVm7OI52g88lFLYx/n+l79NjCom/5aAJ
-         0VmW3CMB5HCQcnc/NosMX1yIxLHLzKokUCnJutf/2llh0WvCzmxYgdVo9w6XgTCGqz8/
-         dyYeuvak/k+LhLzopyjUNJGCWHs00GmdD7Iw189yM7+f6TziklOvP8R6bky7f+6sn79w
-         kfkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWfUMSv9VnYTIy3nvQq3T9WqtDY9rGhkuj08NFCc3dSXfozup8+FSrbdgcpuZTxzez8LRY0hhg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyhO9kNLiqWYQnp6+IoKXNwSBuRhYhPxEH4fxGa9ybD1kfHQSi
-	VKw+gZSMaQnfISbYliaWKA34BqC6QQ4LBuX3wfTSSCAnOC2ShRD2L4ZpbJLCaUS2Ixwb0uX+LPj
-	duxMrUXQnV0EV+lnWGs0OnnrZqrig+p7dZ1RvOuyX
-X-Gm-Gg: ASbGncvz8PEpHsrE7DWxKBCkc8nYpmAAx9wa3KwVIVAyAukM+EhGtW2q9rGwDB+LeYf
-	ZVnTfJVPqWuParp2H8vQzSFNGfc0p2I7R+SrJPNBJu6OdK7FIFTgLr0QJQoLCEK4jt5aAhlsWL7
-	GW5KmDTtawxUFuhviBlMAx3H5jhqT6nyM3j/T0KvS3
-X-Google-Smtp-Source: AGHT+IG3j1OK/oS3D82GvQxL4C8Q7CEz96grJuI9Aq7cyeeFt9o1HqZVmE+bU3EeKkQJ01kqRFz0Z8i4LjDFkj0xAsk=
-X-Received: by 2002:a05:622a:64d:b0:48c:5c4d:68e7 with SMTP id
- d75a77b69052e-4a7f2869e45mr46583711cf.6.1750930281188; Thu, 26 Jun 2025
- 02:31:21 -0700 (PDT)
+	s=arc-20240116; t=1750930883; c=relaxed/simple;
+	bh=zhRAEAp6CfRUkELZ88WpIQpghW2g7vON8T0ZWoFnEh0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JNlmhu3Z5U6qxKPD27Tgo8KwEkcqos87dXi6RlSKG3udu41KiWQIsiZJDfAGM8Zt26yMyMqaR7XWUZDQdWORN74PALo3rZh8oHUKl+kU2yK4zHrufSG7+E66SbLVfYoByiA2HDdB5eqjSKRqq4b6AD5iziRvra8cNQ/o+unb0/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=a83gXHvo; arc=none smtp.client-ip=198.47.19.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllvem-sh04.itg.ti.com ([10.64.41.54])
+	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTP id 55Q9eqhl2115910;
+	Thu, 26 Jun 2025 04:40:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1750930852;
+	bh=iA/8SO2mGfVZC7bo0ZFuR79S7HLwYm6xuSgZaGNdeiM=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To;
+	b=a83gXHvo1EAsgKkMTTOdCfZ7FG+dcLW6lnsxqrO3vv6KzDFjYYavD3BmGgdHuOFQ7
+	 T7dABv2Yn0kS8PgiswWFN+rRYN+cBZ2+ksB+v5dAJYKmZhdYNnf95CDeMXDOxQ9i+S
+	 gaiFno2pnCTsW33QChz7rI/BRsEsaS79G1cGgIM4=
+Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
+	by fllvem-sh04.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 55Q9eqxZ2128746
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Thu, 26 Jun 2025 04:40:52 -0500
+Received: from DLEE113.ent.ti.com (157.170.170.24) by DLEE105.ent.ti.com
+ (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Thu, 26
+ Jun 2025 04:40:51 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
+ Frontend Transport; Thu, 26 Jun 2025 04:40:51 -0500
+Received: from localhost (uda0492258.dhcp.ti.com [172.24.227.169])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 55Q9eodS789152;
+	Thu, 26 Jun 2025 04:40:51 -0500
+Date: Thu, 26 Jun 2025 15:10:50 +0530
+From: Siddharth Vadapalli <s-vadapalli@ti.com>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Andy Whitcroft <apw@canonical.com>,
+        Dwaipayan Ray
+	<dwaipayanray1@gmail.com>,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+        Joe
+ Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>,
+        Nishanth Menon
+	<nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+        Siddharth Vadapalli
+	<s-vadapalli@ti.com>,
+        Roger Quadros <rogerq@kernel.org>, Tero Kristo
+	<kristo@kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <linux@ew.tq-group.com>,
+        Maxime Chevallier <maxime.chevallier@bootlin.com>,
+        Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH net-next v2 2/3] net: ethernet: ti: am65-cpsw: fixup PHY
+ mode for fixed RGMII TX delay
+Message-ID: <54d6cd05-65ef-4e1d-8041-3e4a2c50b443@ti.com>
+References: <cover.1750756583.git.matthias.schiffer@ew.tq-group.com>
+ <9b3fb1fbf719bef30702192155c6413cd5de5dcf.1750756583.git.matthias.schiffer@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250625153628.298481-1-guoxin0309@gmail.com> <CANn89iKrwuyN2ixswA-u1AxW=BX8QwWp=WHskCmh_1qye3QvLA@mail.gmail.com>
-In-Reply-To: <CANn89iKrwuyN2ixswA-u1AxW=BX8QwWp=WHskCmh_1qye3QvLA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 26 Jun 2025 02:31:10 -0700
-X-Gm-Features: Ac12FXzzAQB73uPrqVNvj4Bvd9uyIFjGaubPVHvVRmijuUwdC8s3o-pnVmVZm2g
-Message-ID: <CANn89i+ZVR_qvYE3F+ogyhEKX0KjiW3vQx0R1V9GHNxm+EHt0g@mail.gmail.com>
-Subject: Re: [PATCH net-next v1] tcp: fix tcp_ofo_queue() to avoid including
- too much DUP SACK range
-To: "xin.guo" <guoxin0309@gmail.com>
-Cc: ncardwell@google.com, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <9b3fb1fbf719bef30702192155c6413cd5de5dcf.1750756583.git.matthias.schiffer@ew.tq-group.com>
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Wed, Jun 25, 2025 at 9:03=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Wed, Jun 25, 2025 at 8:37=E2=80=AFAM xin.guo <guoxin0309@gmail.com> wr=
-ote:
-> >
-> > If the new coming segment covers more than one skbs in the ofo queue,
-> > and which seq is equal to rcv_nxt , then the sequence range
-> > that is not duplicated will be sent as DUP SACK,  the detail as below,
-> > in step6, the {501,2001} range is clearly including too much
-> > DUP SACK range:
-> > 1. client.43629 > server.8080: Flags [.], seq 501:1001, ack 1325288529,
-> > win 20000, length 500: HTTP
-> > 2. server.8080 > client.43629: Flags [.], ack 1, win 65535, options
-> > [nop,nop,TS val 269383721 ecr 200,nop,nop,sack 1 {501:1001}], length 0
-> > 3. Iclient.43629 > server.8080: Flags [.], seq 1501:2001,
-> > ack 1325288529, win 20000, length 500: HTTP
-> > 4. server.8080 > client.43629: Flags [.], ack 1, win 65535, options
-> > [nop,nop,TS val 269383721 ecr 200,nop,nop,sack 2 {1501:2001}
-> > {501:1001}], length 0
-> > 5. client.43629 > server.8080: Flags [.], seq 1:2001,
-> > ack 1325288529, win 20000, length 2000: HTTP
-> > 6. server.8080 > client.43629: Flags [.], ack 2001, win 65535,
-> > options [nop,nop,TS val 269383722 ecr 200,nop,nop,sack 1 {501:2001}],
-> > length 0
-> >
-> > After this fix, the step6 is as below:
-> > 6. server.8080 > client.43629: Flags [.], ack 2001, win 65535,
-> > options [nop,nop,TS val 269383722 ecr 200,nop,nop,sack 1 {501:1001}],
-> > length 0
->
-> I am not convinced this is the expected output ?
->
-> If this is a DUP SACK, it should be :
->
-> Flags [.], ack 2001, win 65535, ... sack 2 {1501:2001} {501:1001} ....
->
->
+On Tue, Jun 24, 2025 at 12:53:33PM +0200, Matthias Schiffer wrote:
 
->
-> At a first glance, bug is in tcp_dsack_extend()
+Hello Matthias,
 
-After more thoughts and RFC 2883 read, I think your patch is correct.
+> All am65-cpsw controllers have a fixed TX delay, so the PHY interface
+> mode must be fixed up to account for this.
+> 
+> Modes that claim to a delay on the PCB can't actually work. Warn people
+> to update their Device Trees if one of the unsupported modes is specified.
+> 
+> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> ---
+>  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 27 ++++++++++++++++++++++--
+>  1 file changed, 25 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> index f20d1ff192efe..519757e618ad0 100644
+> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> @@ -2602,6 +2602,7 @@ static int am65_cpsw_nuss_init_slave_ports(struct am65_cpsw_common *common)
+>  		return -ENOENT;
+>  
+>  	for_each_child_of_node(node, port_np) {
+> +		phy_interface_t phy_if;
+>  		struct am65_cpsw_port *port;
+>  		u32 port_id;
+>  
+> @@ -2667,14 +2668,36 @@ static int am65_cpsw_nuss_init_slave_ports(struct am65_cpsw_common *common)
+>  
+>  		/* get phy/link info */
+>  		port->slave.port_np = of_node_get(port_np);
+> -		ret = of_get_phy_mode(port_np, &port->slave.phy_if);
+> +		ret = of_get_phy_mode(port_np, &phy_if);
+>  		if (ret) {
+>  			dev_err(dev, "%pOF read phy-mode err %d\n",
+>  				port_np, ret);
+>  			goto of_node_put;
+>  		}
+>  
+> -		ret = phy_set_mode_ext(port->slave.ifphy, PHY_MODE_ETHERNET, port->slave.phy_if);
+> +		/* CPSW controllers supported by this driver have a fixed
+> +		 * internal TX delay in RGMII mode. Fix up PHY mode to account
+> +		 * for this and warn about Device Trees that claim to have a TX
+> +		 * delay on the PCB.
+> +		 */
+> +		switch (phy_if) {
+> +		case PHY_INTERFACE_MODE_RGMII_ID:
+> +			phy_if = PHY_INTERFACE_MODE_RGMII_RXID;
+> +			break;
+> +		case PHY_INTERFACE_MODE_RGMII_TXID:
+> +			phy_if = PHY_INTERFACE_MODE_RGMII;
+> +			break;
+> +		case PHY_INTERFACE_MODE_RGMII:
+> +		case PHY_INTERFACE_MODE_RGMII_RXID:
+> +			dev_warn(dev,
+> +				 "RGMII mode without internal TX delay unsupported; please fix your Device Tree\n");
 
-I will include it in a series with two packetdrill tests, and another fix.
-I will add appropriate Fixes: tag
+Existing users designed boards and enabled Ethernet functionality using
+"rgmii-rxid" in the device-tree and implementing the PCB traces in a
+way that they interpret "rgmii-rxid". So their (mis)interpretation of
+it is being challenged by the series. While it is true that we are updating
+the bindings and driver to move towards the correct definition, I believe that
+the above message would cause confusion. Would it be alright to update it to
+something similar to:
 
-Thanks !
+"Interpretation of RGMII delays has been corrected; no functional impact; please fix your Device Tree"
+
+Regards,
+Siddharth.
 
