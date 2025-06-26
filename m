@@ -1,122 +1,190 @@
-Return-Path: <netdev+bounces-201516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90920AE9A74
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 11:53:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2173CAE98D1
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 10:46:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DE151C213BB
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 09:53:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C0847B60CA
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 08:44:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484DB29614F;
-	Thu, 26 Jun 2025 09:53:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7739294A11;
+	Thu, 26 Jun 2025 08:45:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="YC7oo4FO"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="C5bzc0nq"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39377239E79
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 09:53:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40488293C57
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 08:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750931604; cv=none; b=cxwHjYUt7Bh+OjeBIuAxY+q4bripVUeRFX5QYb12LAuGuFK+FR/sQZkPs7wGkX1unA0EYN3Oq65irIt12Rc/iuADafewKYuorg2cfRO0FCyh77lkVs4K0OaTX7jP+nMiRWRJmWSV4PHW1CPUtu64aC7h7neRld4PYKUqY4Ap7Es=
+	t=1750927555; cv=none; b=u99wiym/r0jgwTzgN62sXgZkXptLhIv417H6PSi8PJ3uWgMJd6+sbd5pHFUv8OnCvOarvMMw3Zu/C9hnQMZKDRQWFGHFhuKnhrvEvnDhXZbw+JjCxqf5CMgbVkZCuxl8yroYUM2sowh6uU9RoKksUdhYtONNFKqiF0v9cX2syb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750931604; c=relaxed/simple;
-	bh=6xt2LoZ7um35rNritE2Wf/QwH+8ilLcVf1tM7PmYNrk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FqUhEcUficyXaAUipt6vln4FDARQjZBrCFsMt6jCiVv4cHrTk+KC0nF9T0T24d2xT5gCRSB0bQnQXtFUtJDMhFGMo6xv0uY5UDUmt0rDjiE37QPJSTp5HZYcfpgLlQ0I5NJg7xHXKpqxR8SrmzAv9TLRUNqCDZ3AxlGnANYa13g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=YC7oo4FO; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=v/q6IdJG8Uymm/aG7hvNeaBvQ6/NVz2xUiJSURPH0ew=; b=YC7oo4FOJnk4o1w/qIJfPvWDfK
-	1PWyXJCQutSel9kN1vFJ3s0ajl5M4FLCcwYajNDAE/pL1pABCDbdiOfTftvX0+aZ1XUw5PvGi6dmp
-	wF6B1xeVnQcVYp1delMvT9SsCv/P7RTGwDPYI71AxUgt9DS2j/GPq4LfSdJBEHzvDkB03K30OCB+J
-	G32znKSZ37xyXWGG5DkuFtXrVHFGLR3/hQ3dXnex/BL2lDmMCAvlnPJqOFDOZp2nnJisQsZI3HUhY
-	sh+rMoLxU3KiqD2vMxqaOof5UhibvIHCG9+uJ1GAsQQaF64V9Gpl3oLzId1RboUuR5Ecoome4B7Qc
-	F/tRDXhQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1uUj2d-001A8z-0S;
-	Thu, 26 Jun 2025 17:53:08 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 26 Jun 2025 17:53:07 +0800
-Date: Thu, 26 Jun 2025 17:53:07 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Aakash Kumar S <saakashkumar@marvell.com>
-Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, akamaluddin@marvell.com,
-	antony@phenome.org
-Subject: Re: [PATCH] xfrm: Duplicate SPI Handling
-Message-ID: <aF0Yg4CMeG3y74gh@gondor.apana.org.au>
-References: <20250624181054.1502835-1-saakashkumar@marvell.com>
+	s=arc-20240116; t=1750927555; c=relaxed/simple;
+	bh=usCCUwmjyqyyEcTEx2PPluqEILls9clOgYNF4RVcNQs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RE/+SRld+HqqsHFS1LdYN+m53pj3rR98TD44fyjTut3C2ydq5/l/+nZOeOQWveo5op837hhWskifXLdh+6w9M4pW8VhhEWHcAy2OEIFjK75JwNX9NkqvbvJYzhnTuXXhDhwQWhfU7gOfVCuiPMOua5rPO6upkwXXvNbz1JfebME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=C5bzc0nq; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2360ff7ac1bso6563695ad.3
+        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 01:45:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1750927553; x=1751532353; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dHqqfILujOQlZfvnVRT+lGC/mQsUxHGOl+R4kKzqE8E=;
+        b=C5bzc0nqVrcjZ3WIvW2mJM8EDQXabQYgk2B4Q5jRspySPQiWcnLWP9Td68EJO5MjdW
+         XXp8W3gnl5WT5iQSCAykHbUtPHzARUGZdE1MSQfnalude829Z2IgcHBxYkUx7UC7+QYK
+         c2j9EOByScikwRHUpR7Bbw9TIsYrXTICuZsTI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750927553; x=1751532353;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dHqqfILujOQlZfvnVRT+lGC/mQsUxHGOl+R4kKzqE8E=;
+        b=L0tS4gMndT2TLztzh3S0sAWELl+lt6Sjn5B7tGoMsVfX54TPWp1ie3TqpPtubz42iX
+         ko8T4qzfrmD17OaOSLCt/YZ4drMB9HmGXOlvAb5mr686LAEdBQ4xCkVKpYs/de2LcpYk
+         w+qjhQFxw63wWFRN/9hwKjCNeqDJQdMdPcwbIgw9YujgHWG75Zq5oaMtO2cA3pHoreVy
+         eyZF6GDphy5RUHrg4j1b/QS8HXdakwTAABumNKGWHEDzf37iXXXKHlI+dE7hWH6cuG39
+         mZmjSOWACRJMYf9ejZ0oobQx4dFWC9SO/bVIyerGTaWNK3+0dAZoM+yyNng9YPn4sUK8
+         cmyQ==
+X-Gm-Message-State: AOJu0YxyM+SDcFBC6zwqpQNTpBT8O84OhNKMwaspSI6JwN7RJXnhO6Vo
+	YjYrUQ1xq5R/MPN16TosH3nPD9NaZfUUeGzWvw+gpHEup/d7FksE1th1qYFDtvzI7w==
+X-Gm-Gg: ASbGncsf2Iz/HjV5tTLPThmLguM5d4JxesIfrxTxaQZiYfnHvnYcYA4as9qlDS16oLd
+	FlgbkS0bf0rvhhUkPVnW3wNtZu6bFu1sQcrRY5JOxnB0qcn4ZEE5IJIKEtYieSonuSUl8r1leQk
+	XDGEnUmGN728uDZSatoAk4EFe53nFs1YlS4XLymC42ZRnWIEPpPQ5q1uYDdzbhB0U89stAHzRZ/
+	DFaTY5xBT1+wyyiNzbUNZtFJW4fp0jgPvtCGUy0gHvO9DlM2A31WJ2dXFfmBVP2NQ8KAFhqeYgO
+	LJ0kQ0gKS59m7/Bp6zWMfOSqGXmjhBWnEqZaHhw9ApRP2bATrruiQdh5rZrIqgAppJ1Bjp0X6Ez
+	UJjAbAZB6JORsh9pDpwRziJZ+50mK
+X-Google-Smtp-Source: AGHT+IH/zjVkc6WPJpkxwvBbOorFv8w+P//bLCB5Bvyar4kfMeQSxtw7bRnIjYaZ4tU8ygJUhttGyQ==
+X-Received: by 2002:a17:903:3c4e:b0:235:f3e6:4680 with SMTP id d9443c01a7336-238c8741578mr36433765ad.21.1750927553455;
+        Thu, 26 Jun 2025 01:45:53 -0700 (PDT)
+Received: from localhost.localdomain ([192.19.203.250])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-237d83fbe94sm152524875ad.86.2025.06.26.01.45.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Jun 2025 01:45:53 -0700 (PDT)
+From: Vikas Gupta <vikas.gupta@broadcom.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	vsrama-krishna.nemani@broadcom.com,
+	Vikas Gupta <vikas.gupta@broadcom.com>
+Subject: [net-next, v2 00/10] Introducing Broadcom BNGE Ethernet Driver
+Date: Thu, 26 Jun 2025 14:08:09 +0000
+Message-ID: <20250626140844.266456-1-vikas.gupta@broadcom.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250624181054.1502835-1-saakashkumar@marvell.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 24, 2025 at 11:40:54PM +0530, Aakash Kumar S wrote:
-> The issue originates when Strongswan initiates an XFRM_MSG_ALLOCSPI
-> Netlink message, which triggers the kernel function xfrm_alloc_spi().
-> This function is expected to ensure uniqueness of the Security Parameter
-> Index (SPI) for inbound Security Associations (SAs). However, it can
-> return success even when the requested SPI is already in use, leading
-> to duplicate SPIs assigned to multiple inbound SAs, differentiated
-> only by their destination addresses.
-> 
-> This behavior causes inconsistencies during SPI lookups for inbound packets.
-> Since the lookup may return an arbitrary SA among those with the same SPI,
-> packet processing can fail, resulting in packet drops.
-> 
-> According to RFC 4301 section 4.4.2 , for inbound processing a unicast SA
-> is uniquely identified by the SPI and optionally protocol.
-> 
-> Reproducing the Issue Reliably:
-> To consistently reproduce the problem, restrict the available SPI range in
-> charon.conf : spi_min = 0x10000000 spi_max = 0x10000002
-> This limits the system to only 2 usable SPI values.
-> Next, create more than 2 Child SA. each using unique pair of src/dst address.
-> As soon as the 3rd Child SA is initiated, it will be assigned a duplicate
-> SPI, since the SPI pool is already exhausted.
-> With a narrow SPI range, the issue is consistently reproducible.
-> With a broader/default range, it becomes rare and unpredictable.
-> 
-> Current implementation:
-> xfrm_spi_hash() lookup function computes hash using daddr, proto, and family.
-> So if two SAs have the same SPI but different destination addresses, then
-> they will:
-> a. Hash into different buckets
-> b. Be stored in different linked lists (byspi + h)
-> c. Not be seen in the same hlist_for_each_entry_rcu() iteration.
-> As a result, the lookup will result in NULL and kernel allows that Duplicate SPI
-> 
-> Proposed Change:
-> xfrm_state_lookup_spi_proto() does a truly global search - across all states,
-> regardless of hash bucket and matches SPI and proto.
-> 
-> Signed-off-by: Aakash Kumar S <saakashkumar@marvell.com>
-> ---
->  net/xfrm/xfrm_state.c | 78 ++++++++++++++++++++++++++-----------------
->  1 file changed, 47 insertions(+), 31 deletions(-)
+Hi,
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+This patch series introduces the Ethernet driver for Broadcom’s
+BCM5770X chip family, which supports 50/100/200/400/800 Gbps
+link speeds. The driver is built as the bng_en.ko kernel module.
+
+To keep the series within a reviewable size (~5K lines of code), this initial
+submission focuses on the core infrastructure and initialization, including:
+1) PCIe support (device IDs, probe/remove)
+2) Devlink support
+3) Firmware communication mechanism
+4) Creation of network device
+5) PF Resource management (rings, IRQs, etc. for netdev & aux dev)
+
+Support for Tx/Rx datapaths, link management, ethtool/devlink operations and
+additional features will be introduced in the subsequent patch series.
+
+The bng_en driver shares the bnxt_hsi.h file with the bnxt_en driver, as the bng_en
+driver leverages the hardware communication protocol used by the bnxt_en driver.
+
+======================================================================
+Changes from:
+v1->v2
+
+Addressed warnings and errors in the following patches:
+-Patch 8/10
+-Patch 10/10
+
+Addressed the following major comments by Vadim Fedorenko on Patch 1/10:
+Patch 1/10:
+  - Use of the dma_set_mask_and_coherent() API.
+Patch 2/10:
+  - Added error logs via extack.
+Patch 3/10:
+  - Renamed functions to use the hwrm prefix. This change affects other
+patches in the series as well.
 
 Thanks,
+Vikas
+
+Vikas Gupta (10):
+  bng_en: Add PCI interface
+  bng_en: Add devlink interface
+  bng_en: Add firmware communication mechanism
+  bng_en: Add initial interaction with firmware
+  bng_en: Add ring memory allocation support
+  bng_en: Add backing store support
+  bng_en: Add resource management support
+  bng_en: Add irq allocation support
+  bng_en: Initialize default configuration
+  bng_en: Add a network device
+
+ MAINTAINERS                                   |   6 +
+ drivers/net/ethernet/broadcom/Kconfig         |   9 +
+ drivers/net/ethernet/broadcom/Makefile        |   1 +
+ drivers/net/ethernet/broadcom/bnge/Makefile   |  12 +
+ drivers/net/ethernet/broadcom/bnge/bnge.h     | 218 ++++++
+ .../net/ethernet/broadcom/bnge/bnge_core.c    | 387 ++++++++++
+ .../net/ethernet/broadcom/bnge/bnge_devlink.c | 308 ++++++++
+ .../net/ethernet/broadcom/bnge/bnge_devlink.h |  18 +
+ .../net/ethernet/broadcom/bnge/bnge_ethtool.c |  33 +
+ .../net/ethernet/broadcom/bnge/bnge_ethtool.h |   9 +
+ .../net/ethernet/broadcom/bnge/bnge_hwrm.c    | 507 +++++++++++++
+ .../net/ethernet/broadcom/bnge/bnge_hwrm.h    | 110 +++
+ .../ethernet/broadcom/bnge/bnge_hwrm_lib.c    | 703 ++++++++++++++++++
+ .../ethernet/broadcom/bnge/bnge_hwrm_lib.h    |  27 +
+ .../net/ethernet/broadcom/bnge/bnge_netdev.c  | 266 +++++++
+ .../net/ethernet/broadcom/bnge/bnge_netdev.h  | 206 +++++
+ .../net/ethernet/broadcom/bnge/bnge_resc.c    | 605 +++++++++++++++
+ .../net/ethernet/broadcom/bnge/bnge_resc.h    |  94 +++
+ .../net/ethernet/broadcom/bnge/bnge_rmem.c    | 438 +++++++++++
+ .../net/ethernet/broadcom/bnge/bnge_rmem.h    | 188 +++++
+ 20 files changed, 4145 insertions(+)
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/Makefile
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge.h
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_core.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_devlink.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_devlink.h
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_ethtool.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_ethtool.h
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_hwrm.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_hwrm.h
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_hwrm_lib.h
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_resc.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_resc.h
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_rmem.c
+ create mode 100644 drivers/net/ethernet/broadcom/bnge/bnge_rmem.h
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.47.1
+
 
