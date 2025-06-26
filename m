@@ -1,190 +1,278 @@
-Return-Path: <netdev+bounces-201396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93E8AAE9468
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 04:51:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48243AE9476
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 04:58:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24CD53AE562
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 02:51:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AA0C1C27D82
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 02:59:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED1DD1F4CA9;
-	Thu, 26 Jun 2025 02:51:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U2/RTvQa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A15EEDE;
+	Thu, 26 Jun 2025 02:58:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535C81482F5
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 02:51:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C43573451
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 02:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750906279; cv=none; b=EXxXqRvXDKtMC2dUh/8zlMy5B2JYZpUZgLzLPohBuETxuqKzK9hjy7SIQbwm1svyKcPemceMpa9mMkFvvgakqSfpjwvRwoKiBDFd53PU/VAV9HPeqzQQMJGm1/bQD41ul6WAFAVW61+tCeqqPvHGWoWIl5et+DZdCZcBp/mPQ2Y=
+	t=1750906729; cv=none; b=Oa+ezPkS5Li8f8n63FMXuMFbZ68LgLxneXD8qaTcYxq3jUuiQgNSX5tS15JCxYTA5r7QBwvaaGsVh/Xyq9NU9Y3c1xCXwWmRIgChlZa/6mNEI/4/wjRYWpWIeBo3YeBNZALYEhHMD3B6vj/q0vnJ4VWdjY75AHM1DcxWbuzoJNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750906279; c=relaxed/simple;
-	bh=AbbTcY3G90uhbAvwfnDrpva8mh1yG4yY6IHShSbbWSY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rl3YYboEqmaR11Etg2G6X+dMbcd7kOu5pUyu08d7WIRFw9JFpHBZztqDDkcYRL00yJDkOza42pTVkhxZ1Z3iRm4tK1WefSY9NwEoapuKu9bTDm51FlodKCqhpu8TqLLBysWprQWI4EDXj4MF9QxeT/mFXfMYisPkfBFPOXdsS+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U2/RTvQa; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750906277;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xEngYMz6+Uctu+0RSamLzUn3jyWMAMQ76O4pVQprsBY=;
-	b=U2/RTvQaj2Vd1ovvx+qdyzQReQldrpVvTpCRA3+qDSqJ3+o12ptAh9JTk8DUNL2CsmrQBm
-	tqxItymnZC0qTdne9nQV05P5la0AG3X10vHCvMWtAo3A2aWW31QWd8cUG672RAYrmZAJxS
-	YJHFSZbrcIQIUs8ULCIEfj/GtkHB9P8=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-90-0-OdhShBNFyZ9Ua4xU3RKA-1; Wed, 25 Jun 2025 22:51:14 -0400
-X-MC-Unique: 0-OdhShBNFyZ9Ua4xU3RKA-1
-X-Mimecast-MFC-AGG-ID: 0-OdhShBNFyZ9Ua4xU3RKA_1750906273
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-313f8835f29so782545a91.3
-        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 19:51:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750906273; x=1751511073;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xEngYMz6+Uctu+0RSamLzUn3jyWMAMQ76O4pVQprsBY=;
-        b=wtZroHQI3glw9sm1fN9aR04LPmki4EQOU810iMI2v+nBZ/KJg0GJHLRUQMbM5MO++2
-         X4Zu8pUB5kE/fEPHrLnr7mtUW/LBzrWlJreb6v+lS6TYNfhbseXx8G/mVmenDp+U0JZW
-         CwxT88UWTo78C3fO1EJRxkoSS8i0uZ90SYrZES2yPcebBr1mMvNRSjpqzMEyvOtipqV1
-         AOc7WbdvndkkirwnWWhSHwkqfA/TV3Et+vEjiXPNQ2NqH3fBJh3BDH9MYVT1aZU4ymj1
-         To8CtDISI5LMBKgbdS1czWSFo5rbFiOgGNMTYYTs3Bmd6mRIfSW8yTAscqlE+X9SewUw
-         Bk0A==
-X-Gm-Message-State: AOJu0YxyS5mbtncFIqev4zQM+KB77pBkwbB/K8AxXrYUbIwcJXJPylpz
-	+zrNAhj8IZow0bcjB9+0hAJJdvZCmHHkEGTAnzOs4TckxbKJsJhFiJ4PB0UmkoLsVZuz/B2C9gQ
-	+s8K8XMkFlc2skWgF2fKTlI3R4g7TVtkKyUbROq00YBNk+k9GH7Q4wjCcR8K81erMBv79F3LpHu
-	XZ5bWM0N4DMNVc7gU+6wkNPPhrgB6gWy4h
-X-Gm-Gg: ASbGncu1FeQhAXb3XsGHMZ6znQ7RLpY/ATmyOhR3qwx+dV98ZzbPhlBGjqu9Z+0sC37
-	RO1fYgHFQ+QWO2vv8+MmVuFD6KHjp7mg+Ld6BVMirvh6B+NEonR/9C3GioBd/hlEsrT+zbXZjyM
-	uGSwh/
-X-Received: by 2002:a17:90b:562d:b0:30e:3718:e9d with SMTP id 98e67ed59e1d1-315f26b3e52mr7507603a91.35.1750906273389;
-        Wed, 25 Jun 2025 19:51:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFy1oEFNW+pNyBHKxl5UFz4XuW+PyQ5F7+ZNjbo3jFzhfPpd3FRUMNsXAMnW3CCIEXyQmt+3K6tjBWZQ09ordg=
-X-Received: by 2002:a17:90b:562d:b0:30e:3718:e9d with SMTP id
- 98e67ed59e1d1-315f26b3e52mr7507572a91.35.1750906273025; Wed, 25 Jun 2025
- 19:51:13 -0700 (PDT)
+	s=arc-20240116; t=1750906729; c=relaxed/simple;
+	bh=OBqjJZhZeRPnDgb/EP+AF5bAMmAxKia3QJtNrLKoIb0=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=qRkTnaGb9q8h11y3iE6gbQzObLPR8jA+OuSc40W6AjpGQF+JT6yYNmDlUR63wqJoJxaaMomUb51WlPG3tvjWEZmsMX6+lpjjg2/5lh64NTx0GelMoSVbr2CUvet6gp3uuN4cfo4iOcHSloTpXbziU0OE1mg8sF0vrx7r+mRAhDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.207.19.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
+X-QQ-mid: zesmtpsz9t1750906688tab4862a9
+X-QQ-Originating-IP: +biMiPwQNTyweX21nkkMDRenvdfo7rG/lVm1Gh+WX1Y=
+Received: from smtpclient.apple ( [111.202.70.102])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 26 Jun 2025 10:58:06 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 8340976094346290771
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250625160849.61344-1-minhquangbui99@gmail.com> <20250625160849.61344-5-minhquangbui99@gmail.com>
-In-Reply-To: <20250625160849.61344-5-minhquangbui99@gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 26 Jun 2025 10:51:01 +0800
-X-Gm-Features: Ac12FXxCVxp6548gkQ8YE-vjFv3IjVZGUSKTIBIUxHnJq7DtVbLHmVNL-WVcg1k
-Message-ID: <CACGkMEv-EgkZs6d4MHwxj0t_-pQvxMRLTdgguP7GUijbg-kEoA@mail.gmail.com>
-Subject: Re: [PATCH net 4/4] virtio-net: allow more allocated space for
- mergeable XDP
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
+Subject: Re: [net-next v6 4/4] net: bonding: add tracepoint for 802.3ad
+From: Tonghao Zhang <tonghao@bamaicloud.com>
+In-Reply-To: <2482590.1750794203@famine>
+Date: Thu, 26 Jun 2025 10:57:56 +0800
+Cc: netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Steven Rostedt <rostedt@goodmis.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ Zengbing Tu <tuzengbing@didiglobal.com>
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <3EBEA7DD-A040-420D-9420-8211BACC0388@bamaicloud.com>
+References: <cover.1749525581.git.tonghao@bamaicloud.com>
+ <10b8f570bd59104a1c7d5ecdc9a82c6ec61d2d1c.1749525581.git.tonghao@bamaicloud.com>
+ <1931181.1750120130@famine>
+ <C75C5F1F-544F-4613-91D9-4F876EF286B3@bamaicloud.com>
+ <8DB4F573-128C-4A2D-A4D0-3909586AFF8C@bamaicloud.com>
+ <2482590.1750794203@famine>
+To: Jay Vosburgh <jv@jvosburgh.net>
+X-Mailer: Apple Mail (2.3826.600.51.1.1)
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: N2v4nqiyABSwTPlEa1K1on9sVFXDSzGaiw86RWaJzGpzXDoM6dUyV7AJ
+	RWIdyubISJ0C1edNiEL/cfEBcXlHNvDr5GglIsCFw2yhwKK1n6H4TMQ4suQ3u6rzql2123C
+	dvPiisuyhkTDMJiBujoAWS3+95aHpFIw+jgqp58n0QQ/10NIirEZ9NVijh0Efm/Mz2Xyt2B
+	lRYuC4x9wJDh0uApUZDjBKx1B9W82cnl9yuhqQcipv02/kJdYQ5DmnKPTzXMaop00yRJDVC
+	hcnpQbEBvhyjlDL/RvXu+j3F5/Gi5yJWErhR22O8un/GB0Gu9tNVSLklnLriTFzWFXC0e5D
+	SDD1iwgNQ/WkHXwxDJ+COAXFIzCBGyBCGanQjLxSaSod017WoGhtN9qceamqkRiXQnuuh8m
+	tL1k9oB6ab8BCci4qozlhx5Y8B7Zym32x/BW58g9rTIpnAUnvkp6Xl1yIRmL5TaVxSOiZNI
+	+dsEAdenD628y//fdGGUu6sg4mUM1K+CartaquUDXJJJ3YJyQXQDW7Z9HTtxOHOjbJH/iac
+	bgWUR1RaJ0cmK0zIiryGW9Oiebe90apw6vOQxxy6zN1b7LdDxHejgQelEt5RuH+kCPqOcGM
+	a99soeW5uK6ncpwWT91EV1X8uP3yIklFjjHBuri40q2pHlRyF3zALQ9Xy0aYv86tCOMNOe1
+	hAcbuLHsqCpwtNBNvPOV27C9ndm2IrxS4ubGi3UE9M3CwI4GTK9lCVdbF8ms+SYOiKAT1bJ
+	/xRz8XY+V9iK6EHPaR3yZn7cQnPLVItOEWIaVKORT7dUkiYtDkwIdhjk3LQ6VluhBeb5RTa
+	H6nZO/C/Et1aJXKT2MyI7iyKrz8iRHS6wlwRJ0iuLv8JOOnddLk3pXWIiGJS8lf9Qt6m65s
+	XkGZqdW3/4qR5VxbfGlsd2NKXfAF0ZO8drCfnoQUkUUXm88AT27qeyjdDGGrnGS2514Xfu5
+	mEu95OnwiHaE19Ggk1bQSPFjeeVgWUdm+Uos=
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
-On Thu, Jun 26, 2025 at 12:10=E2=80=AFAM Bui Quang Minh
-<minhquangbui99@gmail.com> wrote:
->
-> When the mergeable receive buffer is prefilled before XDP is set, it
-> does not reserve the space for XDP_PACKET_HEADROOM and skb_shared_info.
-> So when XDP is set and this buffer is used to receive frame, we need to
-> create a new buffer with reserved headroom, tailroom and copy the frame
-> data over. Currently, the new buffer's size is restricted to PAGE_SIZE
-> only. If the frame data's length + headroom + tailroom exceeds
-> PAGE_SIZE, the frame is dropped.
->
-> However, it seems like there is no restriction on the total size in XDP.
-> So we can just increase the size of new buffer to 2 * PAGE_SIZE in that
-> case and continue to process the frame.
->
-> In my opinion, the current drop behavior is fine and expected so this
-> commit is just an improvement not a bug fix.
 
-Then this should go for net-next.
 
->
-> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+> 2025=E5=B9=B46=E6=9C=8825=E6=97=A5 03:43=EF=BC=8CJay Vosburgh =
+<jv@jvosburgh.net> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> Tonghao Zhang <tonghao@bamaicloud.com> wrote:
+>=20
+>>> 2025=E5=B9=B46=E6=9C=8817=E6=97=A5 18:37=EF=BC=8CTonghao Zhang =
+<tonghao@bamaicloud.com> =E5=86=99=E9=81=93=EF=BC=9A
+>>>=20
+>>>> 2025=E5=B9=B46=E6=9C=8817=E6=97=A5 08:28=EF=BC=8CJay Vosburgh =
+<jv@jvosburgh.net> =E5=86=99=E9=81=93=EF=BC=9A
+>>>>=20
+>>>> Tonghao Zhang <tonghao@bamaicloud.com> wrote:
+>>>>=20
+>>>>> Users can monitor NIC link status changes through netlink. =
+However, LACP
+>>>>> protocol failures may occur despite operational physical links. =
+There is
+>>>>> no way to detect LACP state changes. This patch adds tracepoint at
+>>>>> LACP state transition.
+>>>>=20
+>>>> This patch really has nothing to do with the rest of the series
+>>>> (it's unrelated to the broadcast_neighbor functionality), and =
+should
+>>>> really be sent separately.
+>>> =E2=80=A6 monitoring the lacp state is part of =E2=80=9Cno-stacking=E2=
+=80=9D arch solution. So I sent it as series.
+>>> if unnecessary, I will set it separately.
+>>>=20
+>>>> That said, I recall asking about work that was proposed some
+>>> Sorry I may miss your commits about this patch.
+>>>> time ago to create netlink events (visible to ip monitor, et al) =
+when
+>>>> the LACP state changes.  That would be a cleaner method to watch =
+the
+>>>> LACP state machine (as it would integrate with all of the other =
+event
+>>> Why not consider a BPF+tracepoint solution? It provides more =
+flexible LACP data collection with simpler implementation.
+>> We developed a component. It collects kernel events via kprobe, =
+ftrace, and tracepoint. Events include:
+>> - Scheduling latency
+>> - Direct memory reclaim
+>> - Network packets drop
+>> - LACP state events
+>>=20
+>> BPF + tracepoint is our optimal approach. I think we should support =
+this method.
+>=20
+> At present, as far as I know, networking state change events are
+> exported to user space through netlink.  Absent a compelling reason =
+why
+> the LACP state change cannot be exported via netlink, my view is that =
+it
+> should be consistent with all other network events.
+>=20
+> Also, to be clear, I'm asking for justification because this is
+> a request to do something in a special bonding-unique way.  There are
+> already a lot of special cases in bonding, in which things are done
+> differently than the usual practice.  Adding an API element, such as a
+> tracepoint, is forever, and as such adding one that also differs from
+> the usual practice deserves scrutiny.
+I will research the netlink notification method and post a patch when =
+it's ready.
+>=20
+> -J
+>=20
+>=20
+>>>> infrastructure).  Maybe I missed the response, but what became of =
+that
+>>>> work?
+>>>>=20
+>>>> -J
+>>>>=20
+>>>>> Cc: Jay Vosburgh <jv@jvosburgh.net>
+>>>>> Cc: "David S. Miller" <davem@davemloft.net>
+>>>>> Cc: Eric Dumazet <edumazet@google.com>
+>>>>> Cc: Jakub Kicinski <kuba@kernel.org>
+>>>>> Cc: Paolo Abeni <pabeni@redhat.com>
+>>>>> Cc: Simon Horman <horms@kernel.org>
+>>>>> Cc: Jonathan Corbet <corbet@lwn.net>
+>>>>> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+>>>>> Cc: Steven Rostedt <rostedt@goodmis.org>
+>>>>> Cc: Masami Hiramatsu <mhiramat@kernel.org>
+>>>>> Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+>>>>> Cc: Nikolay Aleksandrov <razor@blackwall.org>
+>>>>> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+>>>>> Signed-off-by: Zengbing Tu <tuzengbing@didiglobal.com>
+>>>>> Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+>>>>> ---
+>>>>> drivers/net/bonding/bond_3ad.c |  6 ++++++
+>>>>> include/trace/events/bonding.h | 37 =
+++++++++++++++++++++++++++++++++++
+>>>>> 2 files changed, 43 insertions(+)
+>>>>> create mode 100644 include/trace/events/bonding.h
+>>>>>=20
+>>>>> diff --git a/drivers/net/bonding/bond_3ad.c =
+b/drivers/net/bonding/bond_3ad.c
+>>>>> index d1c2d416ac87..55703230ab29 100644
+>>>>> --- a/drivers/net/bonding/bond_3ad.c
+>>>>> +++ b/drivers/net/bonding/bond_3ad.c
+>>>>> @@ -16,6 +16,9 @@
+>>>>> #include <net/bond_3ad.h>
+>>>>> #include <net/netlink.h>
+>>>>>=20
+>>>>> +#define CREATE_TRACE_POINTS
+>>>>> +#include <trace/events/bonding.h>
+>>>>> +
+>>>>> /* General definitions */
+>>>>> #define AD_SHORT_TIMEOUT           1
+>>>>> #define AD_LONG_TIMEOUT            0
+>>>>> @@ -1146,6 +1149,9 @@ static void ad_mux_machine(struct port =
+*port, bool *update_slave_arr)
+>>>>> port->actor_port_number,
+>>>>> last_state,
+>>>>> port->sm_mux_state);
+>>>>> +
+>>>>> + trace_3ad_mux_state(port->slave->dev, last_state, =
+port->sm_mux_state);
+>>>>> +
+>>>>> switch (port->sm_mux_state) {
+>>>>> case AD_MUX_DETACHED:
+>>>>> port->actor_oper_port_state &=3D ~LACP_STATE_SYNCHRONIZATION;
+>>>>> diff --git a/include/trace/events/bonding.h =
+b/include/trace/events/bonding.h
+>>>>> new file mode 100644
+>>>>> index 000000000000..1ee4b07d912a
+>>>>> --- /dev/null
+>>>>> +++ b/include/trace/events/bonding.h
+>>>>> @@ -0,0 +1,37 @@
+>>>>> +/* SPDX-License-Identifier: GPL-2.0 */
+>>>>> +
+>>>>> +#if !defined(_TRACE_BONDING_H) || =
+defined(TRACE_HEADER_MULTI_READ)
+>>>>> +#define _TRACE_BONDING_H
+>>>>> +
+>>>>> +#include <linux/netdevice.h>
+>>>>> +#include <linux/tracepoint.h>
+>>>>> +
+>>>>> +#undef TRACE_SYSTEM
+>>>>> +#define TRACE_SYSTEM bonding
+>>>>> +
+>>>>> +TRACE_EVENT(3ad_mux_state,
+>>>>> + TP_PROTO(struct net_device *dev, u32 last_state, u32 =
+curr_state),
+>>>>> + TP_ARGS(dev, last_state, curr_state),
+>>>>> +
+>>>>> + TP_STRUCT__entry(
+>>>>> + __field(int, ifindex)
+>>>>> + __string(dev_name, dev->name)
+>>>>> + __field(u32, last_state)
+>>>>> + __field(u32, curr_state)
+>>>>> + ),
+>>>>> +
+>>>>> + TP_fast_assign(
+>>>>> + __entry->ifindex =3D dev->ifindex;
+>>>>> + __assign_str(dev_name);
+>>>>> + __entry->last_state =3D last_state;
+>>>>> + __entry->curr_state =3D curr_state;
+>>>>> + ),
+>>>>> +
+>>>>> + TP_printk("ifindex %d dev %s last_state 0x%x curr_state 0x%x",
+>>>>> +   __entry->ifindex, __get_str(dev_name),
+>>>>> +   __entry->last_state, __entry->curr_state)
+>>>>> +);
+>>>>> +
+>>>>> +#endif /* _TRACE_BONDING_H */
+>>>>> +
+>>>>> +#include <trace/define_trace.h>
+>>>>> --=20
+>>>>> 2.34.1
+>>>>>=20
+>>>>=20
+>>>> ---
+>>>> -Jay Vosburgh, jv@jvosburgh.net
+>>=20
+>>=20
+>>=20
 > ---
->  drivers/net/virtio_net.c | 19 +++++++++++++++----
->  1 file changed, 15 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 844cb2a78be0..663cec686045 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -2277,13 +2277,26 @@ static void *mergeable_xdp_get_buf(struct virtnet=
-_info *vi,
->                                               len);
->                 if (!xdp_page)
->                         return NULL;
-> +
-> +               *frame_sz =3D PAGE_SIZE;
->         } else {
-> +               unsigned int total_len;
-> +
->                 xdp_room =3D SKB_DATA_ALIGN(XDP_PACKET_HEADROOM +
->                                           sizeof(struct skb_shared_info))=
-;
-> -               if (*len + xdp_room > PAGE_SIZE)
-> +               total_len =3D *len + xdp_room;
-> +
-> +               /* This must never happen because len cannot exceed PAGE_=
-SIZE */
-> +               if (unlikely(total_len > 2 * PAGE_SIZE))
->                         return NULL;
->
-> -               xdp_page =3D alloc_page(GFP_ATOMIC);
-> +               if (total_len > PAGE_SIZE) {
-> +                       xdp_page =3D alloc_pages(GFP_ATOMIC, 1);
+> -Jay Vosburgh, jv@jvosburgh.net
 
-I'm not sure it's worth optimizing the corner case here that may bring
-burdens for maintenance.
-
-And a good optimization here is to reduce the logic duplication by
-reusing xdp_linearize_page().
-
-
-> +                       *frame_sz =3D 2 * PAGE_SIZE;
-> +               } else {
-> +                       xdp_page =3D alloc_page(GFP_ATOMIC);
-> +                       *frame_sz =3D PAGE_SIZE;
-> +               }
->                 if (!xdp_page)
->                         return NULL;
->
-> @@ -2291,8 +2304,6 @@ static void *mergeable_xdp_get_buf(struct virtnet_i=
-nfo *vi,
->                        page_address(*page) + offset, *len);
->         }
->
-> -       *frame_sz =3D PAGE_SIZE;
-> -
->         put_page(*page);
->
->         *page =3D xdp_page;
-> --
-
-Thanks
-
-> 2.43.0
->
 
 
