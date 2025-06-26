@@ -1,126 +1,100 @@
-Return-Path: <netdev+bounces-201518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF7B2AE9B0C
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 12:18:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 393C9AE9B8D
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 12:36:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4ED517C4AF
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 10:18:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79B031660C9
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 10:36:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D878021CA1D;
-	Thu, 26 Jun 2025 10:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C31B268684;
+	Thu, 26 Jun 2025 10:31:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14F016A94A
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 10:18:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC01921A420;
+	Thu, 26 Jun 2025 10:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750933125; cv=none; b=N23uGZFOfDI4oB1cqNlSIDWVxSua+Yl5uojc7aK4NEKzgX6JQKLUZRFxY0g/3Crp6B729sVHZFhzI4X8FGI0KgQ1UMRnFPosEZKai0GRICKnSc0IhuaeCfmepvNwd/KGVkBSPMq7SlFG7MJmcB/Zgyr3UJBgnuGtBSN4F4PbUXQ=
+	t=1750933889; cv=none; b=kkT4Tf+RQfflfn8g0Wthm4X/OweS3UHYFDfzNy09S7YNNBQiGY9ThFEugZHZ3/69rtFAC1ewnRI7ym5tCvUXGIO9e6Xt9dE8VGoIVTQqBMC97anUpJX40VOv3HZ3kPSvBGq1ShjyOfG8GxRSbv/Ad3ojfmWrcp8pX5ExAzw9ypg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750933125; c=relaxed/simple;
-	bh=CGKx2EBTVnGnZ/Rsc5Qxm6HBGZtC8OudMU3a2sjLxUs=;
+	s=arc-20240116; t=1750933889; c=relaxed/simple;
+	bh=GnDNt+q5EI8c/ZXXdaO/Ry+x4SX461tey5/yPbMiUC0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AIyyNGeVlbedRETbDedRoblEl7zyZ7HA/4xI9g6OHIM8cN8TnQejoAkukdiHLQBKFmiQ87dIKB11YdXps3R2HYCUtaDN8CmQ911waOjWW4/JDuZtgUFNtssSGXTc4rdAMvECYj4bKO8D3LyQLg/Wy/harFR225xCn9TBpDvGbQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uUjgc-0003YM-Rf; Thu, 26 Jun 2025 12:18:30 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uUjgb-005Qny-19;
-	Thu, 26 Jun 2025 12:18:29 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uUjgb-001XrH-0k;
-	Thu, 26 Jun 2025 12:18:29 +0200
-Date: Thu, 26 Jun 2025 12:18:29 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PAui7yG2oIIE2VXShNn8fGdGcjEtBHcGuGsSrOgUxoZ9Ct/cUXz9MrGQJDRtjLph/ot+DG2X8WpKRO/1Te8znVT6/Dkt4jFY7hecOeyTC31KPLndAJmpwgoYf43Jh6QFJ0PSgpzrB3MA4dDFgvvsRSnyV1YtFcVh35m5GJvUDT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-60c4521ae2cso1513661a12.0;
+        Thu, 26 Jun 2025 03:31:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750933886; x=1751538686;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OmpUdW5cO4HhOMld9+otLQ45frNnQ2stlAqm727cEZc=;
+        b=n3TA+GithyQbldQXglA7C4d7Ohtl4YBFeT3l0Oes+qvaUz1lyvcJjw3fIGxegeJCsR
+         5JcSP3Ro4q0SwjK/RN94QoD0Tu5Qlz3K29l/K5vSgGUxhGAwmUtVfKq8E+Hc+N1bBGJm
+         De09VridrF6/m6rW4y5Kg1Gisg/3pkE/sv49C//0Utl6eNeNVXHfCDo2dbv0SDwFEkWN
+         elwd6He5u7jzX0RA83/362B+p80H7dyddE/b+muVD6BeY0Qz9w1grSXToirJhTE33cfy
+         r/jZSdNRk52x1A2CqJQXy8ZAzM4E2myuoLVuH2MnS7dubzIu4IF+a2Me+hTbbjGumLkt
+         qUHA==
+X-Forwarded-Encrypted: i=1; AJvYcCUEthHSbPY3b+TKGEyPecCc8F0aL01hCcWIRmkw0TrEhCxZZ47/hQKERGj2ML93mI4p0pqlLs3vrXCHdMYxZ8up@vger.kernel.org, AJvYcCUR5CkolATV/yP7Iv9YHbK/INJ11mjPS7k1PC75RB/Uqvsv1MrE3Jhs7yt2lna7rcQFfbk=@vger.kernel.org, AJvYcCVFexzgOpTZ6SKQCAc1B5cDm1Eq49TuLnpPictFotHJDkuK6jNZlErj/bvrkczw0ag4V4fJm/jHQEBCbdB/@vger.kernel.org, AJvYcCVjghlNcWQQ6SSvQCQ7/sFRjaDw8Ma7IcQJ6bB79wqD6VawxYsG+4jIZjeMclZ5r8jIQ49bgHvn@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+D7ihM0I63oL3WS+jR+f4x7hT0psVpZXtZIa0+/yIeDzO1mb6
+	V5bFzdOPguATaiWRYMgtOp90f6jXY2bbCFAIXYsEmnB+G01oPnbqpJCQ
+X-Gm-Gg: ASbGncstKuG4erZnD7Fy72ZW1gF4BznTVseyAE5/wRWtLv3csx9CerkWGEvgcnZwjuT
+	BcmlOufIbGw61m6Ghoja2dbatCRzSwzgpwZFDHiMDTixH1dOfvUd+CZplvKswbbF0zgNfHVODr2
+	EKgJIgrM5iitUq5Sp3Vbjkzz6WLqwc5ipJbSV6t/qJ5g1JlIhvR47XJL2QmAAWiN5lRqSLWAjDT
+	icPtz6cdFVHWeAuoz62ms/53qUipHlL8gUXRG8DTv2erKjUw1UdhyV72b/GwzYM6ukBRmILMmcb
+	6zCUO1mlEs1KA6DjxqHP6UvduuZNM9Xd6D1/gAuhqZM7p8YwMbIf
+X-Google-Smtp-Source: AGHT+IHd9W2v8OJUTxiUy7PQcBOs9sxn8KJRAFWKIx4csWgVqOlg3SR9T44yg3x21QnhYH8gtFjLPw==
+X-Received: by 2002:a17:906:f5a7:b0:ad9:f54f:70a2 with SMTP id a640c23a62f3a-ae0be88e5c9mr636284366b.22.1750933885862;
+        Thu, 26 Jun 2025 03:31:25 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:4::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae0d4815f46sm126845666b.185.2025.06.26.03.31.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Jun 2025 03:31:25 -0700 (PDT)
+Date: Thu, 26 Jun 2025 03:31:23 -0700
+From: Breno Leitao <leitao@debian.org>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Woojung Huh <woojung.huh@microchip.com>,
-	Simon Horman <horms@kernel.org>,
-	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
-	netdev@vger.kernel.org, Phil Elwell <phil@raspberrypi.org>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>, kernel@pengutronix.de,
-	Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next v1 1/1] net: usb: lan78xx: fix WARN in
- __netif_napi_del_locked on disconnect
-Message-ID: <aF0edQRJAXSps5CV@pengutronix.de>
-References: <20250620085144.1858723-1-o.rempel@pengutronix.de>
- <20250623165537.53558fdb@kernel.org>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	bpf@vger.kernel.org, gustavold@gmail.com
+Subject: Re: [PATCH net-next v2 4/4] selftests: net: add netpoll basic
+ functionality test
+Message-ID: <aF0hes00SoHF8umw@gmail.com>
+References: <20250625-netpoll_test-v2-0-47d27775222c@debian.org>
+ <20250625-netpoll_test-v2-4-47d27775222c@debian.org>
+ <20250625150919.7b06b436@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250623165537.53558fdb@kernel.org>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20250625150919.7b06b436@kernel.org>
 
-On Mon, Jun 23, 2025 at 04:55:37PM -0700, Jakub Kicinski wrote:
-> On Fri, 20 Jun 2025 10:51:44 +0200 Oleksij Rempel wrote:
-> > A WARN may be triggered in __netif_napi_del_locked() during USB device
-> > disconnect:
-> > 
-> >   WARNING: CPU: 0 PID: 11 at net/core/dev.c:7417 __netif_napi_del_locked+0x2b4/0x350
-> > 
-> > This occurs because NAPI remains enabled when the device is unplugged and
-> > teardown begins. While `napi_disable()` was previously called in the
-> > `lan78xx_stop()` path, that function is not invoked on disconnect. Instead,
-> > when using PHYLINK, the `mac_link_down()` callback is guaranteed to run
-> > during disconnect, making it the correct place to disable NAPI.
-> > 
-> > Similarly, move `napi_enable()` to `mac_link_up()` to pair the lifecycle
-> > with actual MAC state.
+On Wed, Jun 25, 2025 at 03:09:19PM -0700, Jakub Kicinski wrote:
+> On Wed, 25 Jun 2025 04:39:49 -0700 Breno Leitao wrote:
+> > +    raise KsftSkipEx("netpoll_poll_dev() was not called. Skipping test")
 > 
-> Stopping and starting NAPI on link events is pretty unusual.
-> The problem is the disconnect handling, unregistering netdev
-> removes the NAPIs automatically, I think all you need is to
-> remove the explicit netif_napi_del() in lan78xx_disconnect().
-> Core will call _stop (which disables the NAPI), and then
-> it will del the NAPI.
+> Let's make this an Xfail. Looks like the condition doesn't trigger 
+> in VM testing :(
 
-ack.
+Exactly, there is a chance this will not trigger it, and you do not want
+this bothering you. Having it as Xfail will be a false positive.
 
-> > This patch is intended for `net-next` since the issue existed before the
-> > PHYLINK migration, but is more naturally and cleanly addressed now that
-> > PHYLINK manages link state transitions.
-> 
-> And repost that for net, please.. :)
-
-It will be not compatible with the PHYlink migration patch in the
-net-next. Should i wait until PHYlink patch goes to the net and then
-send different patch variants for stable before PHYlink migration and
-after?
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+I have a plan to make this consitent by writing some configfs hook
+for debug, then maybe we can make it a debug?!
 
