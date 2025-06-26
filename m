@@ -1,71 +1,96 @@
-Return-Path: <netdev+bounces-201403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 164F8AE9513
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 07:12:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1287AE951C
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 07:17:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1EE91C270F6
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 05:13:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 540CF1C26633
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 05:18:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19EDB202990;
-	Thu, 26 Jun 2025 05:12:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5AF217BA5;
+	Thu, 26 Jun 2025 05:17:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="xAT64G2u"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hXhgJHil"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E5919D07A;
-	Thu, 26 Jun 2025 05:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CD61E545;
+	Thu, 26 Jun 2025 05:17:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750914765; cv=none; b=rwx4IaW3ZNloYQg2tj0uReudcUPx5qyfpJtiGMwjFK7cZi375RtCjiWJexu40oaKAE9YGK3NUUGrY4KRrJ+zagP5Rys+9FZk2cXyLbI5vVWeRhCc1477jWwhtZ3cHPGAEJbCqmQBOpsnZ/myTLpk+pC6Psno0qmz1i8lbQgcYsU=
+	t=1750915064; cv=none; b=JCTDj9z6JklPO4tNE/cBs9BlX1ubwXBLvGJGzBJN50jwxb6nhSiGHCFKYOYkFG1XCj3Y5j4SSDgHcmotK5bAyxhDikHWkrQIXZUYqrzpxRdGqhzvL86qELNzoVDG4eyz52e7lc1sChpSpldVaMeHC/7bdoZG9EAASFHgIk0NMuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750914765; c=relaxed/simple;
-	bh=GK9PFc4+ENomB3smPxI3RWkAIBy0mRwcazR32hNudzE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fo6hH9Vz1FWFJlC9LFvZL1Eu7Ho0kL3q/t75WDBJzd2S8AEABeJD6bmMBlRzPd822KI2ran89QJnW03956KEEIdbjOd2+ZMFCnWXz/lPaANkCDfd37eWu3EivM8TeGxuQUBEMfcXFTNINGpQEjZnXAp3avn6sjC65FUOfiFBg4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=xAT64G2u; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTP id 55Q5CTOg1647971;
-	Thu, 26 Jun 2025 00:12:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1750914749;
-	bh=RsKjgIvdpHJg3gLCjdxUcehR+v57g5h4k4rBcDGpB7o=;
-	h=From:To:CC:Subject:Date;
-	b=xAT64G2uPgZW/rEA0mENQUtBN/eOvi+aSdxp+NAzHeEtGQVVgK+y52IDESfOCbGgF
-	 vFzsh+hfQLJsonUblgrKhUWZs4kR6eJbkPKfjJi5pyimzUXqJxRgud1QBhVes4rsdQ
-	 pRrM894ChAoQ4fAk6GnrQs+91eAdwl7hz4CcT/kQ=
-Received: from DLEE115.ent.ti.com (dlee115.ent.ti.com [157.170.170.26])
-	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 55Q5CSsA1670831
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
-	Thu, 26 Jun 2025 00:12:28 -0500
-Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Thu, 26
- Jun 2025 00:12:28 -0500
-Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE106.ent.ti.com
- (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
- Frontend Transport; Thu, 26 Jun 2025 00:12:28 -0500
-Received: from localhost (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.227.220])
-	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 55Q5CRJD419823;
-	Thu, 26 Jun 2025 00:12:28 -0500
-From: Chintan Vankar <c-vankar@ti.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <rogerq@kernel.org>,
-        <horms@kernel.org>, <mwalle@kernel.org>, <jacob.e.keller@intel.com>,
-        <jpanis@baylibre.com>
-CC: <s-vadapalli@ti.com>, <danishanwar@ti.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Chintan Vankar <c-vankar@ti.com>
-Subject: [PATCH net v2] net: ethernet: ti: am65-cpsw-nuss: Fix skb size by accounting for skb_shared_info
-Date: Thu, 26 Jun 2025 10:42:26 +0530
-Message-ID: <20250626051226.2418638-1-c-vankar@ti.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1750915064; c=relaxed/simple;
+	bh=7pDiatASWg3dksMGPUf9Q1jgVSSLuS8UeB4OcJQOaNA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LaFoNUuAuWDjfTthVmKign8qG6ePK5SmpgDzCSsZUWyxmxKwEBRFfjXoPLq/HFqb7J7ACreZb950otieO/pcVjiOOuCqYSzYAbwMpoDhQ1rbeGJVv2Mq/0xdqHWVgDVkc680UdykjRhcdQZvntvAELOVsIRoonqesm1hXXHFwFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hXhgJHil; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55Q4An3k019590;
+	Thu, 26 Jun 2025 05:17:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=VRE/3PBW3+oTGB+4b4bhY8mH41mjdoc/AXbX/9qR5
+	n0=; b=hXhgJHilC8j7Q66Djk1uIdbsAO1Uj3dmdyMH80+WeY2tVuxyzm+DnEwPW
+	J7f9yxa/WOqQTezBboPY+3uW3lKMUPiOeY17uYdqj87AQ+/f5qbP6NbE8CvqCqzh
+	us69zrhp59j8w9tLXHMxQHxc974QdUd5CWsEdR6uasgXN7c/hhM/r5njXoWinr1g
+	4KJbOeZTcny5MYq+PYjfLjpP2Iv/zaXtuhfP7LY85YseWlL47flwiPN28A5uXp1A
+	QiVjNVPIzJ0jgHcEA4Fhf7gRG0IK37URhfVlF40dfIreC4brfeMRwPW8RF/vm952
+	ItV6VxHpgo1E/9mT572Eh7wNIB5YA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47dmf3btyq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 26 Jun 2025 05:17:27 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 55Q5HRkZ017031;
+	Thu, 26 Jun 2025 05:17:27 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47dmf3btyn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 26 Jun 2025 05:17:27 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55Q4wohH002499;
+	Thu, 26 Jun 2025 05:17:26 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47e8jmd4r3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 26 Jun 2025 05:17:26 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55Q5HMx856426902
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 26 Jun 2025 05:17:22 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 729A02004B;
+	Thu, 26 Jun 2025 05:17:22 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3B8B520043;
+	Thu, 26 Jun 2025 05:17:21 +0000 (GMT)
+Received: from LAPTOP-8S6R7U4L.ibm.com (unknown [9.111.56.205])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 26 Jun 2025 05:17:21 +0000 (GMT)
+From: Jan Karcher <jaka@linux.ibm.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, David Miller <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Alexandra Winter <wintera@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Jan Karcher <jaka@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+        Sidraya Jayagond <sidraya@linux.ibm.com>,
+        Mahanta Jambigi <mjambigi@linux.ibm.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>
+Subject: [PATCH net v2] MAINTAINERS: update smc section
+Date: Thu, 26 Jun 2025 07:16:53 +0200
+Message-ID: <20250626051653.4259-1-jaka@linux.ibm.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,45 +98,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=M5FNKzws c=1 sm=1 tr=0 ts=685cd7e7 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=6IFa9wvqVegA:10 a=SRrdq9N9AAAA:8 a=VnNF1IyMAAAA:8 a=VwQbUJbxAAAA:8 a=9JzLZ8vFzxP9H69fwZ8A:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI2MDA0MCBTYWx0ZWRfX3h+0JGGmTTqL ybIwV9vnUkpLKKoaJKmb/je2Jtsz93MSuPQ27xGSCBfnWSVCbo3qZtUs1ncKDFWl0yM9su4H6Te qbTMV0kJ4gEWft7Wi3GO0iBj2XZMZj7FpQOTzd6tBYqtD28dEIgk1NS4ox4JpxL4BRKyK+YydEa
+ EY8UVSmYJ4oEV8H2QBOT/AJ8wS+ZREZbuR+c/DH6dLrzacnEbd6aWe3MpCoMOWolTU2XMKIcW0j GYTKdEkmTdQVzuRAoydH5zzpfyMISOvgiscjqRT1pfK3uRNJy58jmEyiqwFk+/paboUwpfLv02K yRu81VJByk/YE2hikSkjy33Kqbw3D4EZrfQxhUmqDAnqpIPyeQrH3aFpIV/colAvarZAn8WVgOo
+ A8hcnYTfMwnZfSI8iaaYsKHAeTkeQhN1vXehryGpLVCfPP51e0L+3YRUk4ViLtWEKVSFb9D/
+X-Proofpoint-GUID: MWReB_C4pjvLduocTBNfzyqN9x032dQ6
+X-Proofpoint-ORIG-GUID: 2dILJEqJbjZDEM8XfV_jEJfIlvWbNfqF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-06-26_02,2025-06-25_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 malwarescore=0 impostorscore=0 suspectscore=0
+ priorityscore=1501 phishscore=0 spamscore=0 clxscore=1015 adultscore=0
+ mlxscore=0 mlxlogscore=824 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2506260040
 
-While transitioning from netdev_alloc_ip_align() to build_skb(), memory
-for the "skb_shared_info" member of an "skb" was not allocated. Fix this
-by including sizeof(skb_shared_info) in the packet length during
-allocation.
+Due to changes of my responsibilities within IBM i
+can no longer act as maintainer for smc.
 
-Fixes: 8acacc40f733 ("net: ethernet: ti: am65-cpsw: Add minimal XDP support")
-Signed-off-by: Chintan Vankar <c-vankar@ti.com>
+As a result of the co-operation with Alibaba over
+the last years we decided to, once more, give them
+more responsibility for smc by appointing
+D. Wythe <alibuda@linux.alibaba.com> and
+Dust Li <dust.li@linux.alibaba.com>
+as maintainers as well.
+
+Within IBM Sidraya Jayagond <sidraya@linux.ibm.com>
+and Mahanta Jambigi <mjambigi@linux.ibm.com>
+are going to take over the maintainership for smc.
+
+v1 -> v2:
+* Added Mahanta as reviewer for the time being due
+to missing contributions.
+
+Signed-off-by: Jan Karcher <jaka@linux.ibm.com>
 ---
+ MAINTAINERS | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-This patch is based on the commit '9caca6ac0e26' of origin/main branch of
-Linux-net repository.
-
-Link to v1:
-https://lore.kernel.org/r/598f9e77-8212-426b-97ab-427cb8bd4910@ti.com/
-
-Changes from v1 to v2:
-- Updated commit message and code change as suggested by Siddharth
-  Vadapalli.
-
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index f20d1ff192ef..67fef2ea4900 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -856,7 +856,7 @@ static struct sk_buff *am65_cpsw_build_skb(void *page_addr,
- {
- 	struct sk_buff *skb;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index c3f7fbd0d67a..cfe9d000fbff 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -22550,9 +22550,11 @@ S:	Maintained
+ F:	drivers/misc/sgi-xp/
  
--	len += AM65_CPSW_HEADROOM;
-+	len += AM65_CPSW_HEADROOM + SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
- 
- 	skb = build_skb(page_addr, len);
- 	if (unlikely(!skb))
+ SHARED MEMORY COMMUNICATIONS (SMC) SOCKETS
++M:	D. Wythe <alibuda@linux.alibaba.com>
++M:	Dust Li <dust.li@linux.alibaba.com>
++M:	Sidraya Jayagond <sidraya@linux.ibm.com>
+ M:	Wenjia Zhang <wenjia@linux.ibm.com>
+-M:	Jan Karcher <jaka@linux.ibm.com>
+-R:	D. Wythe <alibuda@linux.alibaba.com>
++R:	Mahanta Jambigi <mjambigi@linux.ibm.com>
+ R:	Tony Lu <tonylu@linux.alibaba.com>
+ R:	Wen Gu <guwen@linux.alibaba.com>
+ L:	linux-rdma@vger.kernel.org
 -- 
-2.34.1
+2.43.2
 
 
