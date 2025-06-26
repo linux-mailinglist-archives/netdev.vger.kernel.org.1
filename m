@@ -1,186 +1,154 @@
-Return-Path: <netdev+bounces-201369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49219AE933B
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 02:08:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA4A3AE9357
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 02:20:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF2331C27AC2
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 00:08:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D0427A6531
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 00:19:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E7A13B58D;
-	Thu, 26 Jun 2025 00:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84C4233993;
+	Thu, 26 Jun 2025 00:20:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PnfROHME"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dUPCo/wa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4011F73451;
-	Thu, 26 Jun 2025 00:07:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1A2EEDE
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 00:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750896471; cv=none; b=tXdifgbu2JlOzGu8rLmyI8IqcGMUA3RwtOIkXtKmmJjyNUkqCzwsOYZzax15DxNX0fAJHc7VSuBpBUb+7vSWSvoF9ZxBW/ie8vkUabWgLiGrliwFg4L+yl8S+vmj5WfkUolXrv/roFq2fZAF9yt5hsbfuZCb/5eNBJ31FZTQJD4=
+	t=1750897219; cv=none; b=LFDi5ZVNos8qxKAIMH8/GiW7D+XZModKiHck5le3FLiqDOlcGnc1V450AvI5sa6QjKJW1/2rAavJykXstI41S5CM4ilpq3gLfIj5krDVlp5DzUJE5UpUIJ8stwg6zba++BcybVXLSVQj64o+xVSmsGpBlRZNyNIO8QoGLexLEeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750896471; c=relaxed/simple;
-	bh=C3hz+TTEceJ65LIM6563d2BqKNpBHkLD6nboo3kPOXo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eDtRI8n7wDKYKzq9Lv4BoU91b0xGajmaU82Urj+DAJwL6xvJ0VSKBCtlpCRw+kM3wDrjVvqplNLvvIeacNEiEk/RY9cmZAA3pYulMzrBXTu97vctylik9fsRuaokiR4tarSXUAgXt+c/j8U96ZCyx+kwZNb72/g2aSK7cMcVv8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PnfROHME; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750896470; x=1782432470;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=C3hz+TTEceJ65LIM6563d2BqKNpBHkLD6nboo3kPOXo=;
-  b=PnfROHMEoGlNKTRBddhXL2L1fgI5f//IX/vHvQxJc8PVXYkDHz3l3S+l
-   pnN1xDNR2x9QSQBq2mDz7QKojQwKgF0PhP3TSVGcTgGqyr0ceYgVSIsfl
-   5WkJQftCEwnn81C0sMn/TL6tLfORwwZDm6NCiAWtmaztm/A58XuSstQyk
-   sZD8hfldMK5KY6xboAoXysCoOCRFC9m1XdT/3Ustpt7fVSb3wRFJk70ci
-   UOCYhfV71ZIWiq8YkSDvtnbJXxT72fsFUY/Zmc++5yKWYtNaMjSQ/MN1w
-   RFmv/o3H1Dulk3m3m0emO1kYKMJdg0IPLwAh6ldAvefG0Q9Efy4CN2qWJ
-   Q==;
-X-CSE-ConnectionGUID: lzf7WiPSRSGi6xQWZ+/dag==
-X-CSE-MsgGUID: kzJia0nLQYiv8+3wu4ps0A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="52904175"
-X-IronPort-AV: E=Sophos;i="6.16,266,1744095600"; 
-   d="scan'208";a="52904175"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 17:07:50 -0700
-X-CSE-ConnectionGUID: plp4ybH+QhCL0Ta6GYKqGQ==
-X-CSE-MsgGUID: fg5ZsG4xT0WtUFO3hx3AFA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,266,1744095600"; 
-   d="scan'208";a="157858423"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 25 Jun 2025 17:07:46 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uUa9Y-000TYc-09;
-	Thu, 26 Jun 2025 00:07:44 +0000
-Date: Thu, 26 Jun 2025 08:07:02 +0800
-From: kernel test robot <lkp@intel.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>
-Subject: Re: [PATCH net-next v2 1/1] phy: micrel: add Signal Quality
- Indicator (SQI) support for KSZ9477 switch PHYs
-Message-ID: <202506260756.KhOdmLCy-lkp@intel.com>
-References: <20250625124127.4176960-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1750897219; c=relaxed/simple;
+	bh=0H0s3NHA6Do6Cgkzj1VH/Y7kfE+I/KuzK4NdLxYNwPY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Sx0l5t13VzUDP8L1KGIH81REls9FbdBXnLyyQ1qkUADR1N1T/Xwiic+yac0AIqGx7rcH52NjjvhuXFAYo66Czti3hbG2gh1paxJC2g8iATv7PP1RwJZLXTr13hvoUhlVuACOqJnu5uv5uDkuAXW2+eI2ibURBachJ8ewZhqmm8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dUPCo/wa; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-70e23e9aeefso4256557b3.2
+        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 17:20:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750897207; x=1751502007; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gs4ejpuXHLGTX9L0lDbiBLPC0PjXU3YMoO9+1dS6Bd8=;
+        b=dUPCo/wa8FF9CRo+z+0spu/jRAr5hg0EdpWe/guviqE8GVBTabuY9/ai3eg+HwFq34
+         Fs/5pzeKpMaAUWXGwAR2A6epTjSUwBHvNOaylz6gyKy5mHLzQecjooDc8WxeF+BEFwCz
+         LQK1ADyzSsdZOnXIWOKvblBdXsnSTE6EPMSWA2ANOtscXJNVdsHQP638cGbcNO7bmKWl
+         ZecqE3Xomk0x6+gRVpN5AmmUozT+Tnd2ketAr4KU/5lCmJ28gPkwQQfyjKZ6zFNgvqWV
+         h5PoZ/GHySnBxwMP0FVroHShU1yTzymwLhxU4UV8LAdDCR71fXg9nfbFaxf5x/BTXBgO
+         /H6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750897207; x=1751502007;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=gs4ejpuXHLGTX9L0lDbiBLPC0PjXU3YMoO9+1dS6Bd8=;
+        b=a6swrOSvwE2/J0gkcgXjDAKVY+rPqrSOcfMXuxCiP5N+SX/jL6rsEdet4tQXfb6Wjv
+         k4ewTA1mM5gwG15BYScKZMdMUXoOhrT+V/5WIlP8ntSC7aEJhgUnHheRKZTmzQbyCTaR
+         jHsxjEbj+5GvR1pjQ4fkMTCke7mkE8ypL16QCmAi7hfhR81FjyYKtG9UoIB+qMeSw4ru
+         FakffadfLrUuZZ+E/1QBDhYI3rouhlQKZpR19/0pI+rbATUa+bBuuqpxZ77slSE86nfu
+         J0zg9wGFR4cDGglsV9easUVah0v4/r7ogD0/OFbLgMpfFvGKyrT3OARn3od0iS0K2S/r
+         evvA==
+X-Forwarded-Encrypted: i=1; AJvYcCUihGGCQlWjLzCgVJYp17I1tHZ3QAcSInKymp2AssCs6ORai+NbKFpXHnIytQBm9QBkGXsxiA4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCa6bElDPbMeYc/jhf25rhs7t+482VQMnGUvWTIStlEJjLUC3D
+	YFv8ZWt/MG5nCewBwj+s9MlLFIC0sYpaoZT3oIlGbjhwy+A1fmgSbyUo
+X-Gm-Gg: ASbGncuzGtEt3JoDJdxM7/YA0cvHevlivhA0c9wLL5zrLQ6zcBuJ5mH9ne+XNx1VoWo
+	CIy++ByG74UmKXDab+E60gh6D0TNtriZRjBg0zC0ylLGpdCHtgDCl4neTPdEdr07ylEvRIW35KN
+	NQkZ2xkY1gUU8Rf+5bx3+Jh5di6tMfgE5cnuPi6Z7yKXYmSlY/qtO79ZNEWqKC41vP3gv0a3pqX
+	L1yGhHZK/z62hTiOM+pLu09Pl6oa7AuCpYRbuYdVSVbkUMes0fGzSbU3VG/dtQekqc+UOGUaJ6/
+	bbhByVvrcu3BLbflYkDif1MaLpxO9m6A29KwvHcu4vmY7/0GrLNgYvSLIWpH2cavi0SYYCN+hr9
+	cUe6n1RqeL0jAOqVPoBFlpVdecAeqcGhi0hiJRFNYcIswegwuJOmI
+X-Google-Smtp-Source: AGHT+IFzezoKH3r+JeF0iy5GxlDtTlLl/z/0/m3ZKNYBojvjwj2nxQs/yEPQUMZTfmRxI32BhVji+g==
+X-Received: by 2002:a05:690c:6e13:b0:714:250:833a with SMTP id 00721157ae682-71406df28eemr73768407b3.27.1750897207698;
+        Wed, 25 Jun 2025 17:20:07 -0700 (PDT)
+Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-712c4a21f02sm26583867b3.45.2025.06.25.17.20.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Jun 2025 17:20:07 -0700 (PDT)
+Date: Wed, 25 Jun 2025 20:20:06 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Daniel Zahka <daniel.zahka@gmail.com>, 
+ Donald Hunter <donald.hunter@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, 
+ Leon Romanovsky <leon@kernel.org>, 
+ Tariq Toukan <tariqt@nvidia.com>, 
+ Boris Pismenny <borisp@nvidia.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ David Ahern <dsahern@kernel.org>, 
+ Neal Cardwell <ncardwell@google.com>, 
+ Patrisious Haddad <phaddad@nvidia.com>, 
+ Raed Salem <raeds@nvidia.com>, 
+ Jianbo Liu <jianbol@nvidia.com>, 
+ Dragos Tatulea <dtatulea@nvidia.com>, 
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
+ Stanislav Fomichev <sdf@fomichev.me>, 
+ =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ Jacob Keller <jacob.e.keller@intel.com>, 
+ netdev@vger.kernel.org
+Message-ID: <685c9236a44fc_2a5da429471@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250625135210.2975231-11-daniel.zahka@gmail.com>
+References: <20250625135210.2975231-1-daniel.zahka@gmail.com>
+ <20250625135210.2975231-11-daniel.zahka@gmail.com>
+Subject: Re: [PATCH v2 10/17] psp: track generations of device key
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250625124127.4176960-1-o.rempel@pengutronix.de>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi Oleksij,
+Daniel Zahka wrote:
+> From: Jakub Kicinski <kuba@kernel.org>
+> 
+> There is a (somewhat theoretical in absence of multi-host support)
+> possibility that another entity will rotate the key and we won't
+> know. This may lead to accepting packets with matching SPI but
+> which used different crypto keys than we expected. Maintain and
+> compare "key generation" per PSP spec.
 
-kernel test robot noticed the following build warnings:
+One option is for the device to include a generation id along
+with the session key and SPI.
 
-[auto build test WARNING on net-next/main]
+It already does, as the MSB of the SPI determines which of the two
+device keys is responsible.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Oleksij-Rempel/phy-micrel-add-Signal-Quality-Indicator-SQI-support-for-KSZ9477-switch-PHYs/20250625-204330
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250625124127.4176960-1-o.rempel%40pengutronix.de
-patch subject: [PATCH net-next v2 1/1] phy: micrel: add Signal Quality Indicator (SQI) support for KSZ9477 switch PHYs
-config: i386-buildonly-randconfig-004-20250626 (https://download.01.org/0day-ci/archive/20250626/202506260756.KhOdmLCy-lkp@intel.com/config)
-compiler: clang version 20.1.7 (https://github.com/llvm/llvm-project 6146a88f60492b520a36f8f8f3231e15f3cc6082)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250626/202506260756.KhOdmLCy-lkp@intel.com/reproduce)
+But this could be extended to multi-bit.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506260756.KhOdmLCy-lkp@intel.com/
+Another option to avoid this issue is for a device to notify the host
+whenever it rotates the key. This can be due to a multi-host scenario
+where another host requested a rotation. Or it may be a device
+initiated rotation as it runs out of 31b SPI.
+ 
+> Since we're tracking "key generations" more explicitly now,
+> maintain different lists for associations from different generations.
+> This way we can catch stale associations (the user space should
+> listen to rotation notifications and change the keys).
+> 
+> Drivers can "opt out" of generation tracking by setting
+> the generation value to 0.
 
-All warnings (new ones prefixed by >>):
+Why?
 
->> drivers/net/phy/micrel.c:2247:5: warning: variable 'channels' set but not used [-Wunused-but-set-variable]
-    2247 |         u8 channels;
-         |            ^
-   1 warning generated.
-
-
-vim +/channels +2247 drivers/net/phy/micrel.c
-
-  2231	
-  2232	/**
-  2233	 * kszphy_get_sqi - Read, average, and map Signal Quality Index (SQI)
-  2234	 * @phydev: the PHY device
-  2235	 *
-  2236	 * This function reads and processes the raw Signal Quality Index from the
-  2237	 * PHY. Based on empirical testing, a raw value of 8 or higher indicates a
-  2238	 * pre-failure state and is mapped to SQI 0. Raw values from 0-7 are
-  2239	 * mapped to the standard 0-7 SQI scale via a lookup table.
-  2240	 *
-  2241	 * Return: SQI value (0–7), or a negative errno on failure.
-  2242	 */
-  2243	static int kszphy_get_sqi(struct phy_device *phydev)
-  2244	{
-  2245		int sum = 0;
-  2246		int i, val, raw_sqi, avg_raw_sqi;
-> 2247		u8 channels;
-  2248	
-  2249		/* Determine applicable channels based on link speed */
-  2250		if (phydev->speed == SPEED_1000)
-  2251			/* TODO: current SQI API only supports 1 channel. */
-  2252			channels = 1;
-  2253		else if (phydev->speed == SPEED_100)
-  2254			channels = 1;
-  2255		else
-  2256			return -EOPNOTSUPP;
-  2257	
-  2258		/*
-  2259		 * Sample and accumulate SQI readings for each pair (currently only one).
-  2260		 *
-  2261		 * Reference: KSZ9477S Datasheet DS00002392C, Section 4.1.11 (page 26)
-  2262		 * - The SQI register is updated every 2 µs.
-  2263		 * - Values may fluctuate significantly, even in low-noise environments.
-  2264		 * - For reliable estimation, average a minimum of 30–50 samples
-  2265		 *   (recommended for noisy environments)
-  2266		 * - In noisy environments, individual readings are highly unreliable.
-  2267		 *
-  2268		 * We use 40 samples per pair with a delay of 3 µs between each
-  2269		 * read to ensure new values are captured (2 µs update interval).
-  2270		 */
-  2271		for (i = 0; i < KSZ9477_SQI_SAMPLE_COUNT; i++) {
-  2272			val = phy_read_mmd(phydev, MDIO_MMD_PMAPMD,
-  2273					   KSZ9477_MMD_SIGNAL_QUALITY_CHAN_A);
-  2274			if (val < 0)
-  2275				return val;
-  2276	
-  2277			raw_sqi = FIELD_GET(KSZ9477_MMD_SQI_MASK, val);
-  2278			sum += raw_sqi;
-  2279	
-  2280			udelay(KSZ9477_MMD_SQI_READ_DELAY_US);
-  2281		}
-  2282	
-  2283		avg_raw_sqi = sum / KSZ9477_SQI_SAMPLE_COUNT;
-  2284	
-  2285		/* Handle the pre-fail/failed state first. */
-  2286		if (avg_raw_sqi >= ARRAY_SIZE(ksz_sqi_mapping))
-  2287			return 0;
-  2288	
-  2289		/* Use the lookup table for the good signal range. */
-  2290		return ksz_sqi_mapping[avg_raw_sqi];
-  2291	}
-  2292	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 
