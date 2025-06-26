@@ -1,179 +1,113 @@
-Return-Path: <netdev+bounces-201545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 033C2AE9D5C
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 14:21:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A1A8AE9D8C
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 14:33:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C9EB5A023E
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 12:20:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3B893ADC7E
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 12:31:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A37218ABA;
-	Thu, 26 Jun 2025 12:21:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7872E11C0;
+	Thu, 26 Jun 2025 12:32:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA0971E9B04
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 12:21:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D1B2E06E4;
+	Thu, 26 Jun 2025 12:32:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750940463; cv=none; b=uJTXI5QxmXWKWm6zwutvWZeSrr7kUDqTbVhe1pHAgI9/m8KwAfShGfgeEG0d8gDnv/mwaIX759Sqr/juq57sn2hJe/LMJV9Gl1EL1aaSQN/w78iKEi2vGVZY2oL8Pmz9WWXgpaFMjou5cNHzQwT0h4m/yBKH14vyTmYO1F/BfoU=
+	t=1750941123; cv=none; b=QsBnwBha0H96EeItJCFJzZxVqqHnVCy1cI60mf8LzJxasxDyHG3eaq+TaCxK6pMszpO4jgkTyQbx3a8gx/RT9b9Y2is0V+la0HeOovFTMJKRWMneTz2axjoruvFY1beNfZkpIZzobQ4RTC/vRXc8dAJI2zqkfzLmgDlA9QzfNwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750940463; c=relaxed/simple;
-	bh=UfIaVjPR+dlZRMg3kV5PE/TLrn4vs2+ACMaK/AXQ0f0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dzXZAJ/t29XQrTzdnPnYObNEYhjO8HG3GplC2SrCve8zLWqHRzwu2kxcnJwWte67P657RI92K7w0zMb08my8Q5/0vIoTqD50t9WD0m1LjKYfyATl/LWe3M0/8O3rpGgDPHIlCToE27LLP8JHo3ueoi4S4dMENUvCJvsmO9mFx6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uUlb3-0008Io-1q; Thu, 26 Jun 2025 14:20:53 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uUlb1-005RgD-2A;
-	Thu, 26 Jun 2025 14:20:51 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uUlb1-001Zfo-1l;
-	Thu, 26 Jun 2025 14:20:51 +0200
-Date: Thu, 26 Jun 2025 14:20:51 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Lucas Stach <l.stach@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel@pengutronix.de, Russell King <linux@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v2 1/1] phy: micrel: add Signal Quality
- Indicator (SQI) support for KSZ9477 switch PHYs
-Message-ID: <aF07I-QtyH8hbupf@pengutronix.de>
-References: <20250625124127.4176960-1-o.rempel@pengutronix.de>
- <5a094e3b95f1219435056d87ca4f643398bcb1d3.camel@pengutronix.de>
- <aFzWiZ9ohbE_Unuz@pengutronix.de>
+	s=arc-20240116; t=1750941123; c=relaxed/simple;
+	bh=R406E7aTx9nftAo+npNCuL0z+9TS/Ddep2sOGrAWnJ8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LX88ySAfAeTRpnSd3Mx8qGmJD+Kbfd2fZk54B5rX3+pz8iBK2bbMNA2BBru4BwIGIMez7NaNTnPkjFxaw8y204l0uhuA5Dbx3wXsaN9eQTc+c09nwqXvZu8BA7CQ3b9FPQttWwTZvgn1GwVgHz17nJtQEncPbcjHH7nlIKP2OHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6fafdd322d3so11162126d6.3;
+        Thu, 26 Jun 2025 05:32:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750941120; x=1751545920;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nxNrve9T9gi+GNOSoG1/RnrvLgc8XNYEUQ9CWlM5sRU=;
+        b=Bpkt5iP379D8kG4dB9VWH2BZovjCxFjln20cMse3LhBPepqljtMH+/Y4xthwuo0kI8
+         CmZA4meydIcZY5EVsru9beEFhFhs58ftA33RpaxFkJzQ86/1w4IJHIOxA7gT38JBgoHH
+         HcNUyIUO2i78d1ZeRpOkUYgiJbNa66/a6nNNiQusc2oO18Q/By2IlEFF5z2HgepynjMB
+         0VhJD+n74J0S0pK3atPdwOGrj/eY3GREsWz41i+kRbMUxDOvrWBFdC/vTilA9nv60wPB
+         rlT1gRepv9XMF4dpAzatVNZ4Tk/q0KFKoSTRjb/5eviNRcPD9zP7jpm2zhPnjy5w+I3F
+         gsWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU/n4IShENGjsYFEGkzBee5kgoheGKApUnLqKKNvNBHwLkmRi12wGuB+yl8nGfDohKVHwaD0POZgIKclEoFMctWxJI=@vger.kernel.org, AJvYcCUbVXzkj5BN0+LREGTBctXD8suqWE9eFLPon5XoQWbApiIg5NWxgJQxX4fyBnleGxSM+zRC9eq9FXnB@vger.kernel.org, AJvYcCVs23G6sz8bo3C2/K4/r1Cy8FAWKzJoth+yLAWL8Px/Ox8WRFRibXhj7tvVrPG4LN7FzOd3skk8Ltpq@vger.kernel.org, AJvYcCWCa0wN8wTrlxi7n0ayq2r04jm3hhnDlWJ8KHq4SOX3J9phZAuxobA59B9KgfJe6z/8xnRB4bFI@vger.kernel.org, AJvYcCXbU9NQEUs0JDPRbXJLNjZi4/BSu57cOCdr+S8lJaX9G/bencIHPNn8jVaZFVCEn/Zf6/SJ1oyVGLYZ8Y8W@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxq6OSLW+O9L7IT7hzRwhr5CHtat+mN7VxUY12y/qgvAS7VtHSI
+	vLTAZ06M5WNicprycefwW4BiCQU+1Vz2WTfnDc5rFuUtoQhSWhRx6JSCMZYlmg7I
+X-Gm-Gg: ASbGncvwul51AbqyFSpUXYvs15n53rxczdevIy9f5V98U44PJA4AjwyNTXPWqzQCiHo
+	gDkIfHJN7xrlORDErRMGNzkWUkRqD3cl4NpODp6ckNK6VagMgojVJeFWd4Co6NJgxonshw3l3C6
+	ohopiclzF3hePkdhRVXtEA265AUYYRpx87/6/oYunaRDX2yKmOS36lC38OSvlG+O7O4dCJjj1gm
+	aK1Sd5NtUf6TQwthF1K5II+69Yy1pDfGJVz+ZZ6RW/HXzNroAtyt8KhnU0VTLXRQNAkrFr0hSAX
+	Spp7SqsVN47sGg4BE4JPHWdkF1KA3Pt8YZYYwYNo+mVsUwrdZm3UeneUJAUYKbXls/wEsKN1ztQ
+	BFczd+BIs2NoZ+q36LrVc9EDT8Dpvyeh8bqNJswM=
+X-Google-Smtp-Source: AGHT+IFMcDhs+jApIf22vPRkqGanag5A9ET+xYuh/7vx5BXkZHmFaIrdwkf/HasdLQViGtJ5HHwIQw==
+X-Received: by 2002:a05:6214:5098:b0:6fa:faf7:7545 with SMTP id 6a1803df08f44-6fd5ef8c915mr122820756d6.31.1750941119247;
+        Thu, 26 Jun 2025 05:31:59 -0700 (PDT)
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com. [209.85.222.174])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd7718f5ddsm6815056d6.14.2025.06.26.05.31.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Jun 2025 05:31:58 -0700 (PDT)
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7d0976776dcso96907885a.2;
+        Thu, 26 Jun 2025 05:31:58 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU1mf2/eEv0M2yPeHYJa4sIA+z3A6HHPjbUpVtk7xypL4jgewEpM3OImPOrBy6ucP+UcwUx4Kkn@vger.kernel.org, AJvYcCUjXVWoZn/kXiNrIusDA5P2Kn8vK1xz+xIZhBxam7JV3QidI0412THcVCvgY0ElBKjMLywACfsLY2BaoyLZMrKQMMA=@vger.kernel.org, AJvYcCXCKJKJDGp7uL9qT738/oyiipeCPoWE4VmWMH/btyNPmgp4wap9zJW7PC71OMGuY31ycDqqcc0S1m8w@vger.kernel.org, AJvYcCXj6M/vYp5ftWSkG5apRbmXAlgg0/+WlHXwgVahB0xl2dsVmHUwPFkSrKt/aiMQh4N3M7frvvpcUILViAIo@vger.kernel.org, AJvYcCXkD9eesBtvKl9rBxhgp5/S/vNPw8iBxNmcI1T6RpSeSOMDn4qYtaaIOgbBYSVlVe34DChq4Ei/gTMJ@vger.kernel.org
+X-Received: by 2002:a05:620a:708a:b0:7d4:4214:2cba with SMTP id
+ af79cd13be357-7d44214358dmr71619285a.40.1750941117802; Thu, 26 Jun 2025
+ 05:31:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aFzWiZ9ohbE_Unuz@pengutronix.de>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20250623080405.355083-1-john.madieu.xa@bp.renesas.com> <20250623080405.355083-3-john.madieu.xa@bp.renesas.com>
+In-Reply-To: <20250623080405.355083-3-john.madieu.xa@bp.renesas.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 26 Jun 2025 14:31:45 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdX2EGutZTPPNMdC5LTaVAQzpcVADBy9KMTSgYQHMxQ7-Q@mail.gmail.com>
+X-Gm-Features: Ac12FXznJsGPV2UOxrW_ydw441QmYNHWnstaX0n4g87XOD9sgfoD3vhkXgwlTyc
+Message-ID: <CAMuHMdX2EGutZTPPNMdC5LTaVAQzpcVADBy9KMTSgYQHMxQ7-Q@mail.gmail.com>
+Subject: Re: [PATCH v3 2/3] arm64: dts: renesas: r9a09g047: Add GBETH nodes
+To: John Madieu <john.madieu.xa@bp.renesas.com>
+Cc: magnus.damm@gmail.com, robh@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, mturquette@baylibre.com, sboyd@kernel.org, 
+	richardcochran@gmail.com, linux-renesas-soc@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-clk@vger.kernel.org, netdev@vger.kernel.org, biju.das.jz@bp.renesas.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jun 26, 2025 at 07:11:38AM +0200, Oleksij Rempel wrote:
-> On Wed, Jun 25, 2025 at 08:06:32PM +0200, Lucas Stach wrote:
-> > Hi Oleksij,
-> > 
-> > Am Mittwoch, dem 25.06.2025 um 14:41 +0200 schrieb Oleksij Rempel:
-> > > Add support for the Signal Quality Index (SQI) feature on KSZ9477 family
-> > > switches. This feature provides a relative measure of receive signal
-> > > quality.
-> > > 
-> > > The KSZ9477 PHY provides four separate SQI values for a 1000BASE-T link,
-> > > one for each differential pair (Channel A-D). Since the current get_sqi
-> > > UAPI only supports returning a single value per port, this
-> > > implementation reads the SQI from Channel A as a representative metric.
-> > 
-> > I wonder if it wouldn't be more useful to report the worst SQI from all
-> > the channels instead.
-> 
-> It was my first idea too, just to report the worst SQI from all
-> channels. But this makes it impossible to report SQI for each pair
-> later. If we ever want to support SQI per pair, the current code would
-> suddenly start to show only SQI for pair A, not the worst one, so the
-> SQI interface would change meaning without warning.
-> 
-> There is another problem if we want to extend the SQI UAPI for per-pair
-> support: with 100Mbit/s links, we can't know which pair is used. The PHY
-> reports SQI only for the RX pair, which can change depending on MDI-X
-> resolution, and with auto MDI-X mode, this PHY doesn't tell us which
-> pair it is.
-> 
-> That means, at this point, we have hardware which in some modes can't
-> provide pair-related information. So, it is better to keep the already
-> existing UAPI explicitly per link instead of per pair. This matches the
-> current hardware limits and avoids confusion for users and developers.
-> If we want per-pair SQI in the future, the API must handle these cases
-> clearly.
+On Mon, 23 Jun 2025 at 10:04, John Madieu <john.madieu.xa@bp.renesas.com> wrote:
+> Add GBETH nodes to RZ/G3E (R9A09G047) SoC DTSI.
+>
+> Reviewed-by: Biju Das <biju.das.jz@bp.renesas.com>
+> Tested-by: Biju Das <biju.das.jz@bp.renesas.com>
+> Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> Signed-off-by: John Madieu <john.madieu.xa@bp.renesas.com>
 
-...
+> v3:
+> Labels mdio nodes
 
-> > This ends up spending a sizable amount of time just spinning the CPU to
-> > collect the samples for the averaging. Given that only very low values
-> > seem to indicate a working link, I wonder how significant the
-> > fluctuations in reported link quality are in reality. Is it really
-> > worth spending 120us of CPU time to average those values?
-> > 
-> > Maybe a running average updated with a new sample each time this
-> > function is called would be sufficient?
-> 
-> Hm. Good point. I'l try it. We already have proper interface for this
-> case :)
+Thanks, will queue in renesas-devel for v6.17.
 
-After some more testing with a signal generator, I started to doubt the
-usability of our SQI hardware implementation in this case.
+Gr{oetje,eeting}s,
 
-The problem is: the signal issue can only be detected if data transfer is
-ongoing - more specifically, if data is being received (for example, when
-running iperf). The SQI register on this hardware is updated every 3 µs. This
-means if any data is received within this window, we can detect noise on the
-wire. But if there is no transfer, the SQI register always shows perfect link
-quality.
+                        Geert
 
-On the other hand, as long as noise or a sine wave is injected into the twisted
-pair, it is possible to see bandwidth drops in iperf, but no other error
-counters indicate problems. Even the RxErr counter on the PHY side stays silent
-(it seems to detect only other kinds of errors). If SQI is actively polled
-during this time, it will show a worse value - so in general, SQI seems to be
-usable.
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-At an early stage of the SQI implementation, I didn’t have a strong opinion
-about the need to differentiate these interfaces. But now, based on practical
-experience, I see that the difference is very important.
-
-It looks like we have two types of SQI hardware implementations:
-
-- Hardware which provides the worst value since last read
-
-- Hardware which automatically updates the value every N microseconds
-
-- Hardware which provides both values
-
-Both types are recommended by the Open Alliance as:
-
-- "worst case SQI value since last read"
-
-- "current SQI value"
-
-My question is: do we really need both interfaces? The "current SQI value"
-seems impractical if it only reflects quality during active data transfer.
-
-What do you think?
-
-Best Regards,
-Oleksij
---- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
