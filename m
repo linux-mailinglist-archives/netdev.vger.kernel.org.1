@@ -1,87 +1,86 @@
-Return-Path: <netdev+bounces-201619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9685EAEA137
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 16:50:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0029EAEA140
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 16:51:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F1041761B5
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 14:45:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A6D33AE884
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 14:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05D412EAD0E;
-	Thu, 26 Jun 2025 14:45:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3A9F2EB5B9;
+	Thu, 26 Jun 2025 14:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cgukLk3b"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xeBLbF5/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1AD2EACE3
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 14:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598DC2E7181
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 14:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750949111; cv=none; b=t0yqapgSB3VzLDsRz/hYi8AvR+xQ5BdKDNuhN8YwRoF4kx2bOZ+RWTLINm/AqIaucCmnFTf3eE1GojlZ7L0Sdsirnv4HB6BekVD2EgpwJ1Fj8E+6acD7835xd5I8IgwhS/ir7fdJ/sN7ZvyXsxiN+M9fDjZr8p/p76nnnPDhfp4=
+	t=1750949189; cv=none; b=bJYMEkla81eG+YXDVbi5gkV4ZAPvl6DWTTI0HCVIHoRGOqkTHsbINUu4XlEnc25kZA7iIKrc4PDne4XzozDNfXybQwKhR0TbrvPy3qzkKzBTIVDTMcIg82OjLIiROAx5r8bNTUYT9GqRPq2WeF3A9+DmZ43AKSVrZWUQk0I9oo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750949111; c=relaxed/simple;
-	bh=e+gsRV9FF4hkpSUjFcDjLpDBVZY/qZIjVEe/Jqlzs9I=;
+	s=arc-20240116; t=1750949189; c=relaxed/simple;
+	bh=Cw6x/a2X2y1/4wocqjsOrUZnoL0vCjBGQvSjYkMpUVc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gm4ZB1HwyAmVW0eicEB/yKhT+NS4qNY7KkD2OBlQZuUVXFh63I0/z+TRGgxz20L9VXu7QNMp8i4uOCEq2sK+3zHroRSnyTj8pD23Bkaam4rULrcuBCseKf4xUET9cCYIcVf/3YKontMzg/gKscCce6L48zjLtcX0CvkoasUbgPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cgukLk3b; arc=none smtp.client-ip=209.85.160.173
+	 To:Cc:Content-Type; b=kv05MOHzS4VM8TqpboHJVn/JixcT+gDSBiULs/PofLrqAwWM6XlHINydGLCuQcoc+tMeT38jRSA7BV+YNWzLQc8cf1fvD9GyAIGEPc5DxxglGVdNm8RDtVMuPTvnJV6uaTaFYZLAMgrsbra7acX6YJ1ldmeLe8jn+QTwFFYO1oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xeBLbF5/; arc=none smtp.client-ip=209.85.222.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4a5903bceffso14950251cf.3
-        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 07:45:10 -0700 (PDT)
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7d38d562a55so131090785a.2
+        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 07:46:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750949109; x=1751553909; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1750949187; x=1751553987; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e+gsRV9FF4hkpSUjFcDjLpDBVZY/qZIjVEe/Jqlzs9I=;
-        b=cgukLk3bt7Mn2nDOZ0cBbtCh2CZxNjPfTWf/8Ez+IGvSmm8T3ZNc8+MzevLs2wLDgp
-         LzosGW/RKpWJe3suHXj4ROMM/R5AbuSyjEKglnJPFF5DA3dhhIMuma72j9PaXLgMaUnT
-         74pJ25CeKvmVaWyy1tmVf6n2KTG0RDB8aoZI3Jj81NXdzZZjWOpVBQRQTELm9ktkc2ZC
-         XF2NWBt6Gy53lv6G+2/SsorPlmMd8W9ERxjazvIvHo6KO5YMX2GopbW6VeJmzUUw2yKl
-         /1h3CYj1LzWk7K1ruI7BUY5yPAuDRlPxlVyRR2Tbv6DmQiLcriVUma3th5pWswePYuG+
-         mIKw==
+        bh=Cw6x/a2X2y1/4wocqjsOrUZnoL0vCjBGQvSjYkMpUVc=;
+        b=xeBLbF5/M+7+AvNJzter9ts2CZmINSAVDhLcWBzokWaZG+eeH5GIYw1p+Dnk3QI8QD
+         Qd0xiUW27GiUDw62bby/5aGIzh+6lA4qhDKkiyMCEF03lWUkl/KSZHKGCtpzhoa9h+BG
+         SR9UM1vdpNcFndIb6xVdkhL91q/q9tXFpWQkBFUx3ZYRMaOjt56DlWQ85BzvT6OsBkMv
+         Ax7bbjnIyR2u6EY3CSAi+CWwoD4p3WOsfnZut3N13eZ8+KH35wtrdXVtnpvaFs1rVT9y
+         QHKq2ShFVHwaWEuDpVe8IzaQ8vAU4Xkeb4OXKEhXF9mRVWkRSq9THnEyf0KFXlRlKlkO
+         NXnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750949109; x=1751553909;
+        d=1e100.net; s=20230601; t=1750949187; x=1751553987;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=e+gsRV9FF4hkpSUjFcDjLpDBVZY/qZIjVEe/Jqlzs9I=;
-        b=je/cEY5r3kOxl189MMFNlkzc+3BAbPGw8xaG87Lkef87tZc5yKXUwWPWk5CCCYcw+I
-         ofeWjMa1QDiMHRI2QvVtEP87i0XzRcS59OPi81dGp8QckFf44fhHNW+vco6g0aG/fshC
-         8zer3SJCQCgNCF3mWG8/KLshhf730nmx4K4Frbq/tvushU6pdJZEviopCQYDvWaujoFn
-         bow71UIfUlWTGmKgB/Cau1TGnArvEbZy5LVVZMG/SWgydR0dW7kfbWr8Lx/GWZ2BITur
-         TpNqUng+GTJaU6XYE8oDRktitKHVHNkQG34oDsWhsd85lL5KF1NeZKUEIx10JVCtVYXz
-         XaGg==
-X-Forwarded-Encrypted: i=1; AJvYcCWVEEZ+rl8aMvYD9v/FrZVEx9H+RXpkjPpiwrA8qgrHipLWP2ayOkwtF1ImQIRlOnZJfx8eBKM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywv0Wsm5lRSXHl8AnEyBw+oji/RtXijjvPv7+wrEHbuQCeK+5lj
-	355BVC7LFPMTi3rmAGVowc4o25eegNEV7o7zFWuZO/HTpMMaoenvdRStvm9IIVdNKn+/3UfCYq2
-	OKPvmCSAmZ95KJrLTp66Tj5Vk+F8G3ZosLAEcHRh8
-X-Gm-Gg: ASbGncu367hfLBBa8FQ80Egf8D9DsuKI8kAzE5ssA2iLZwTO15nJGhDXwh+v16lvGZn
-	GtFsF5GzTMHYJ3PFyaTc/KUuRZJ64ZOD4npdwcItclyGkh30SOU9jIc5BN9lQL5blxwiD7/93Ek
-	Adtir166EAaCYUUgpC9KuH7b5wTOLxFYdanbtrdYKBLEM=
-X-Google-Smtp-Source: AGHT+IFlj5Bzt34SMqIzyXP6W2HJmsmWujPGga7rNgP74MwWKL59Wl1NdFxk1lAFHxpNQrJsSKTCkW1pMaBHFi3RAs4=
-X-Received: by 2002:ac8:5f4a:0:b0:4a6:f5a8:3832 with SMTP id
- d75a77b69052e-4a7f2a1b4b4mr57849181cf.42.1750949108758; Thu, 26 Jun 2025
- 07:45:08 -0700 (PDT)
+        bh=Cw6x/a2X2y1/4wocqjsOrUZnoL0vCjBGQvSjYkMpUVc=;
+        b=Tnh8E+pOwXLqNkF2sxQKSTlbx3BnzS/HQxAfA8j0q2kj0OkhUZAYGusAX2IAbaRx0+
+         gj+6BjC2GDbrJu3aaCxKQbRMsAba48NNaLk9CjlSnjwGZUGNkDS5rG0Qf/NR7dOQSRFj
+         2GNWjERYq74dyHwVafAgATkxuCxKrKcbA2aBN64hy8B/H8AsTGEasUA66yCdI6SlRksN
+         2SdiUVyEJ/qa5SKGLL3Uc8a/g1aFIbeUeOuxD/GVRO4eSd8kiahoZFsPqE1M0QpxYNQD
+         PnTTST2/zs63t6EnoutlAARWBwKOAnaha2hH4XHmH6ooVEKuAUETJJTpOiUthM60cb7r
+         uDIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXv/V3sLgNFRlIEya2VvLVmADInTOM54Wxq31wcr5zZ/auouRPRxIVrHoZoP76WfhEkl0q25Jc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/E524+XSbPNYO8XAxcTuAcFKXAY2yOERlUeWa5tdcjukPHnf/
+	d8fgLeF8enMx5WiHBqfhEPQL4s8OqFIHS+AtFw+vNDIpf1L06CVO4Ad4k4Xj/UK+hbtnnDf6dGG
+	JbmkkucB+WZRThgLZGEA9fTGkR4ibwRCJTHxTNkjB
+X-Gm-Gg: ASbGnct/aigU0M1i26cCYuI4kh3xHHEZR4QNei5VcuWPSjHNdidZecW4mkSV8UKYR+d
+	EAKjH0D1/+Z+h3nEnhKh7TVjQ5mE0BbQIl7sYnWmIOwrhewEluTJzZQv/qPiitXZ8UVQwT7jcAz
+	F580Czt85FThPb4s1g9dIB3AkzUxwUD0QsxFNZVOpESS8=
+X-Google-Smtp-Source: AGHT+IGR2rt063M279ZAfLwE4jVglVq/GXMFZQHqoRlkc/MRbT5QchE3p5WlVJ87GhLKdT79h7/p4NDtc0gf935Gc0s=
+X-Received: by 2002:a05:620a:450c:b0:7d3:a6d1:b66f with SMTP id
+ af79cd13be357-7d42974c6f9mr1221226385a.47.1750949186270; Thu, 26 Jun 2025
+ 07:46:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250624202616.526600-1-kuni1840@gmail.com> <20250624202616.526600-11-kuni1840@gmail.com>
-In-Reply-To: <20250624202616.526600-11-kuni1840@gmail.com>
+References: <20250624202616.526600-1-kuni1840@gmail.com> <20250624202616.526600-12-kuni1840@gmail.com>
+In-Reply-To: <20250624202616.526600-12-kuni1840@gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 26 Jun 2025 07:44:57 -0700
-X-Gm-Features: Ac12FXyuiMXY8IOg6qbC6BGrwGqMKB-3hf1lEwxBfgYPsvERrNTwQaRmBcpoYw0
-Message-ID: <CANn89i+FwEpLOMFhH90_HMVsi0XLTU+wY+Eer+1w2jgPg9TWng@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 10/15] ipv6: mcast: Remove unnecessary
- ASSERT_RTNL and comment.
+Date: Thu, 26 Jun 2025 07:46:14 -0700
+X-Gm-Features: Ac12FXxxCG3JXDT9Rgi-QeodJDf_GuCVQtNt6u8yD0cDLJljRlsndU0y7Oqhg0g
+Message-ID: <CANn89iLs3iGM6E0GummYY2ZoQgqEbAamO6=ff1wk54GgodCX+w@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 11/15] ipv6: anycast: Don't use rtnl_dereference().
 To: Kuniyuki Iwashima <kuni1840@gmail.com>
 Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
@@ -94,11 +93,17 @@ om> wrote:
 >
 > From: Kuniyuki Iwashima <kuniyu@google.com>
 >
-> Now, RTNL is not needed for mcast code, and what's commented in
-> ip6_mc_msfget() is apparent by for_each_pmc_socklock(), which has
-> lockdep annotation for lock_sock().
+> inet6_dev->ac_list is protected by inet6_dev->lock, so rtnl_dereference()
+> is a bit rough annotation.
 >
-> Let's remove the comment and ASSERT_RTNL() in ipv6_mc_rejoin_groups().
+> As done in mcast.c, we can use ac_dereference() that checks if
+> inet6_dev->lock is held.
+>
+> Let's replace rtnl_dereference() with a new helper ac_dereference().
+>
+> Note that now addrconf_join_solict() / addrconf_leave_solict() in
+> __ipv6_dev_ac_inc() / __ipv6_dev_ac_dec() does not need RTNL, so we
+> can remove ASSERT_RTNL() there.
 >
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 
