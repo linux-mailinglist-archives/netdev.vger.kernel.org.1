@@ -1,146 +1,109 @@
-Return-Path: <netdev+bounces-201661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21798AEA405
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 19:10:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CA45AEA43A
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 19:14:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E07187ABA57
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 17:09:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75E22562987
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 17:14:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB6422ED163;
-	Thu, 26 Jun 2025 17:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC342EB5CC;
+	Thu, 26 Jun 2025 17:13:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DzQmK/lM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111652ECE88;
-	Thu, 26 Jun 2025 17:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571302ECEA6
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 17:13:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750957819; cv=none; b=dvwdlQHzi6bJS+sCsQ8M+kbLFGYrbU66dfSUxtFH2n/sX8711bQo4swnsUb58DCBmR8N2fpzSELsI0kfgT83QYYkmO7Szgmw4Vk3mkPBnpY51EQSbhH7AkzaNRNX6wXWUyJrva2W5gp1AnM6xvC87CU9+9YKywB/xjduQMEf97M=
+	t=1750958012; cv=none; b=W6cGj2MzOjI05kqlCWAtoBYXh2mC8S+4qfTMr1RxmnXr89Dk9sFYDxsMJiWO4un8SbBoRE8ZRAXj5ztZrLdvbHNKnTi/SzMkGiVGC2Nhg+tAk0beNXilrqMSkvdN0DfachCvyDf4YLDcdZ392UWHTEVdMRpWVZcn7xS5GxQxmEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750957819; c=relaxed/simple;
-	bh=dFE7wN6V0AnDyFE1cvo/wrWMzfKaPnVu9t9IoU0obTI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oMfTw35iSm6HQ2JAQ24C3efx9ReUNBP32EGWhp6FAnZqrj200ybT6mi/dZdci6BsOyxEmDWJdEDs4WhfaNkMy5wOnZNUgcJKv6UFzRwoBsahZj1Jd5XyGe+Wo53AQw9Gn17wT2Pe648Y8SukvePGcdWL4+TXG3AYq3/W2vd0kAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1750958012; c=relaxed/simple;
+	bh=ZNHXEtJ0/7Wjin9NyDfJ2mvMBuoYNYE0UAKv1ZoFR3Y=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Bb4mphdleyMNyZQ0202aUqiJPGobYx4B2nlBVQewG4n7BdyqMlUT3/NTKkBCCWrLOi2TDlXw2deOu1fDJWm1WNvJMHyvZuoLPA5KEvZGP80JuqdntIaIbeP6WgRGI2P7ltzmD7m20no7Ohgwhn1DvtFwvQDQU3l4NNfAE/hly7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DzQmK/lM; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-601dfef6a8dso1946542a12.1;
-        Thu, 26 Jun 2025 10:10:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750957816; x=1751562616;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-70e447507a0so10620467b3.0
+        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 10:13:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750958010; x=1751562810; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MuOcGODFJxLIsNTIxNnE68hhtwcbQnl8mVcIvSCtqqs=;
-        b=jspNK6mfshrc+9k3R63m1h2U4n+y1ijSu8GWC5X80iUcKba55TEnaEDtA3WgrH9hB1
-         jtzHqGMidsy+rwQGK0EadWa7g7eexXgTQX6G3Rv3r2iBPkgyBFRTBubwSlJRfoxaNuWU
-         ggcNt9HkltAX2c/eEHCy2WrhJFyuXgw7ftIDQvNk1epJTtcVtuRGpZw12khQoODxmeCl
-         fCw8scpJdJ9XtQKgupp+DYmIb37vD6OVC0i6s0TuTxUm/SpFvfi3Vp6+oOe8BkhapmAh
-         D3EPv3JF7ugnJbfvwedSiCg4VuZhMTB/zPC90Qr7QMI5VXNQEbcfoSL4k1XIGShM60L8
-         rzfw==
-X-Forwarded-Encrypted: i=1; AJvYcCU3wxzY2mclXt8qkYbUvYBDifto2nC1Jg38CCEYt9WJxGmLVW5NitC6PcI9GtklYF7FRElhnE1/P75MqNHbn2hx@vger.kernel.org, AJvYcCVNeEB0NUouwcVmxU+IYoKYLkCP3D0SOIjBnzUqMJDcCC67UlasVdV6TQexT3o13PIAij3qSanj@vger.kernel.org, AJvYcCVUB4fn3Oz8ieD9ek1/NxK1WhcCrDCklQhEOugE3Hv1e2EyFbysTUX++0w0X8jOT2fNpq4=@vger.kernel.org, AJvYcCXc/imh6KtJ4dboyEBxRPjhd6jYBXoMAsW0jBgqWC8SdoLbNRTptgEuneonYDvtyBsG7C7wMiWZv7UCPtQv@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQ59nZ6nq8VyLoCuv3JMUT1agb6ytEDyenTJ5i3P22WVSs2SeX
-	k2awnD+S/HhQJT6+Zt3fzgOw4gVZ0HEcHZkxfIpgywXA60lhodtzvRrgasIwkA==
-X-Gm-Gg: ASbGnctLi/PgdI/2qMxLmM7LZAWhdXT0BjDUwYEX6FqZRHusqxilcPNqUlKXt75mYIu
-	+uA0jO1Jyoa3ogmdx6BYowmQd1dywgRSJIpJTK1gIu5djgP7NUUKpuUL+sff2D01y50UqkxX+Wq
-	1Uf72WBgnGCXVxzwbJV/n7ba1LwjoRCrPZ15QCAoYgu1mwg4wS1nc2QipyRg9vYjEOV69hI8kks
-	LbQMg41v4yCej/NKipydqn7JpB8ZvarhbVvmQD2eUqaelmzekEx07Z7aQx1D6LJn9m75HTcJGRD
-	ZHvk/bZaECWx6FhY1IApRCtRN0vTFOIrkYzYfD3AnLUoqHAH/9Ys
-X-Google-Smtp-Source: AGHT+IEwLDfOp5oX/3SNm58CDYQiNOY0hlTx9tedUeDwZqfaqJg+QqJC2Nvn58GQUJIoGBLUCj341w==
-X-Received: by 2002:a05:6402:42c1:b0:5f8:357e:bb1 with SMTP id 4fb4d7f45d1cf-60c4dd426aemr7706601a12.22.1750957816002;
-        Thu, 26 Jun 2025 10:10:16 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:7::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60c826f6788sm255272a12.0.2025.06.26.10.10.14
+        bh=UC1Yv3NMZawoQIRSNUMgquzlpouMmlSswPoNSjHM88Y=;
+        b=DzQmK/lMAhDvC4W2rGzuusdJN+B7HIIWae7XUGyUTR8dLgWl2OauDja+Ta8R6JJfVr
+         6mujL5b/7fRqkOrXSRQSDr2eqrBvPjdNniSn4f9X2ss+QM21b3fcpLhHzIyrFsR/uC3n
+         sb1wRVyeHRfkAVwMV+kmZnsCZeqGVmGYEA37K7tdCPyw1QM9TMy1f/7lAZk0INh9HtBR
+         qvlM6QJD8JZ2Q4tN3AzqSSKFU9cGiT5HpdJtac5IJcQlo57fyJRe83ggod/5Wk04Sp0x
+         2V7yBDcV+CMtWwY4Q8dLsuFn3GcrIrYdNGsjbEVhKRwklbbe8JbaIrcUQ+BAqzlJNWeI
+         vCbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750958010; x=1751562810;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=UC1Yv3NMZawoQIRSNUMgquzlpouMmlSswPoNSjHM88Y=;
+        b=E51Xqhi5HqzXDo9Z/S/RBoER6QEXZMNx3OeYt0wN65ocmqAj/WLxuKE/71KuQk+bb+
+         tH0JpbvaIkxMHR4KKaAoBQtvu3G0IogSgZt2OuME3l/0cLUAaiZpfNBOQOh9GOfqiLW/
+         heQK1pLPvuv3I4pTM7DfRzsW3wn9rtAJROpjoFtZWN+JhGmBD8+Ns98FDIm5bi0TKvYD
+         eWEEssyu57DdQex9H2E2b0HecScUvXkq11WrtCjpf1rmpf0JdC9L+L4ZUQ9cwNHdino6
+         cwSmjk3koAQA4ExSbBFLC70h23TtH6ATkEnauDezdlz0sEA9pSsUExvtuhk2LM43oeU2
+         DhuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWLEiL2dBWrMeta5KQSyUazy/XvBTfmUUzn5IV6ng8Bem3gFndDjLGBZVStagFJyGnB6YrJpw0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw36xja3bvLEF/tKDLjV+eZyp12mwCsE7Qeu5NDjxR7mGT1ba6E
+	y28vtIn8fNJXQakB/UJXQOHIY9cpnq0riHPJs9a3sMluWUlI2NtSjrBTCzVkNw==
+X-Gm-Gg: ASbGncueVMWQzaxb43p+CfYi93mgKcdoNEIBAgmvHG6s17WxQEyJVnYzijZmbALKDbJ
+	UM1NfPQR94V21k/0gnAmrErbehF7l1LVfMis3JGSQOK8cm91/EoYvzDKP0mUmmdzwd2+ckl5k1o
+	Iw3dq9QqdUdMQlAMkH2BCygyiqueZApbPEk6WkS5Nvio21hIOc/TLqXktQ2wecaJ/cmJAvXoQSU
+	DJdx4GlTWVn8QcmEP0W9FAA1mXmmjQVI4nGEOJOv9OIXfzvBwbrhWR7Au9eMabDrmamc0h5rVvp
+	1DmC9i8/3ps5nRSUAWrEKkgRVkCM1Url142FLxcDFTaqcE7thk0/dvymEPbHWsI3MqL/au+/Bqz
+	O7kXa4HHFFm6+ueVwJSwO/Y494QZ4MA1L2CsMgBhMszMUohLaXoxa
+X-Google-Smtp-Source: AGHT+IHRnSHTPadMkbjvZ6K8Vh9M17Ey2NRrlcN9dlyveHWO80nxCRw1EZeLYc2pWl9ePHD/T7N89Q==
+X-Received: by 2002:a05:690c:3583:b0:70c:d256:e7fc with SMTP id 00721157ae682-71406dd1946mr114554837b3.21.1750958010146;
+        Thu, 26 Jun 2025 10:13:30 -0700 (PDT)
+Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-71515c040acsm713267b3.38.2025.06.26.10.13.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jun 2025 10:10:15 -0700 (PDT)
-Date: Thu, 26 Jun 2025 10:10:13 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
-	gustavold@gmail.com
-Subject: Re: [PATCH net-next v2 4/4] selftests: net: add netpoll basic
- functionality test
-Message-ID: <aF1+9YlFUF8vWH4P@gmail.com>
-References: <20250625-netpoll_test-v2-0-47d27775222c@debian.org>
- <20250625-netpoll_test-v2-4-47d27775222c@debian.org>
- <685d75ceb113c_2e676c294d1@willemb.c.googlers.com.notmuch>
+        Thu, 26 Jun 2025 10:13:29 -0700 (PDT)
+Date: Thu, 26 Jun 2025 13:13:28 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Stanislav Fomichev <sdf@fomichev.me>, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com
+Message-ID: <685d7fb87e1e6_2e676c29436@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250623150814.3149231-3-sdf@fomichev.me>
+References: <20250623150814.3149231-1-sdf@fomichev.me>
+ <20250623150814.3149231-3-sdf@fomichev.me>
+Subject: Re: [PATCH net-next 2/8] net:
+ s/dev_get_port_parent_id/netif_get_port_parent_id/
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <685d75ceb113c_2e676c294d1@willemb.c.googlers.com.notmuch>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 26, 2025 at 12:31:10PM -0400, Willem de Bruijn wrote:
-> Breno Leitao wrote:
-> > Add a basic selftest for the netpoll polling mechanism, specifically
-> > targeting the netpoll poll() side.
-> > 
-> > The test creates a scenario where network transmission is running at
-> > maximum speed, and netpoll needs to poll the NIC. This is achieved by:
-> > 
-> >   1. Configuring a single RX/TX queue to create contention
-> >   2. Generating background traffic to saturate the interface
-> >   3. Sending netconsole messages to trigger netpoll polling
-> >   4. Using dynamic netconsole targets via configfs
-> >   5. Delete and create new netconsole targets after some messages
-> >   6. Start a bpftrace in parallel to make sure netpoll_poll_dev() is
-> >      called
-> >   7. If bpftrace exists and netpoll_poll_dev() was called, stop.
-> > 
-> > The test validates a critical netpoll code path by monitoring traffic
-> > flow and ensuring netpoll_poll_dev() is called when the normal TX path
-> > is blocked.
-> > 
-> > This addresses a gap in netpoll test coverage for a path that is
-> > tricky for the network stack.
-> > 
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> 
-> > +def bpftrace_call() -> None:
-> > +    """Call bpftrace to find how many times netpoll_poll_dev() is called.
-> > +    Output is saved in the global variable `maps`"""
-> > +
-> > +    # This is going to update the global variable, that will be seen by the
-> > +    # main function
-> > +    global MAPS  # pylint: disable=W0603
-> > +
-> > +    # This will be passed to bpftrace as in bpftrace -e "expr"
-> > +    expr = "BEGIN{ @hits = 0;} kprobe:netpoll_poll_dev { @hits += 1; }"
-> 
-> Is that BEGIN statement needed? I generally just use count().
+Stanislav Fomichev wrote:
+> Maintain netif vs dev semantics.
 
-If I use `hits += 1` then yes, but, I've learned that I don't need it if
-I use `count()`. So, I will see something like:
+This is quite terse, when landing on this patch with a git blame.
 
-kprobe:netpoll_poll_dev { @hits = count(); }
-
-> > +
-> > +    MAPS = bpftrace(expr, timeout=BPFTRACE_TIMEOUT, json=True)
-> > +    logging.debug("BPFtrace output: %s", MAPS)
-> > +
-> > +
-> > +def bpftrace_start():
-> > +    """Start a thread to call `call_bpf` in parallel for 2 seconds."""
-> 
-> Stale comment? BPFTRACE_TIMEOUT is set to 15.
-
-Yes. I will remove it.
-
-Thanks for the review,
---breno
+Can you repeat the helpful intro from the cover letter, or point to or
+quote the relevant paragraph in netdevices.rst?
+ 
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 
