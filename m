@@ -1,175 +1,148 @@
-Return-Path: <netdev+bounces-201387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BDFFAE93E9
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 04:13:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 131C3AE93E3
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 04:09:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70A894A1EB2
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 02:13:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7227B1C41D0F
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 02:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377751DEFD2;
-	Thu, 26 Jun 2025 02:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54FCE155C88;
+	Thu, 26 Jun 2025 02:09:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5Bepo7B"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA6D31C84D6;
-	Thu, 26 Jun 2025 02:13:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7CF126C17
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 02:09:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750903984; cv=none; b=iZ08rNyqEUV1cDmGLwTHQUtuX7MX/6nWUJ5E2aHHVd0+Qi2aTmWUGk5vfF+Xmcn22Lb5CT3fqtSv/UaBGQqOK0JEerOo9p/uNq2IWsKvKHUvIKgLrueltPd/gIEMwqtQY/+XhhhlX9AO9TJz7jGR/vciMSI4S/kyjEwyVCtUXU4=
+	t=1750903790; cv=none; b=KGDouFPwpdGQdej7OKrAP/R+/TO45RDC5ieVAAVeWc/uFT8zaEE+vXVWKer7zDCDQkImD4JFzGrbebhPmaE0FHqX78SmGpynM0u0wQRk4XlcEmGR8iraK+K9pSE+mtoRAHeoZLh4NTScWqh3wosLSZduYvJfsz1Pa/+tTwlXbIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750903984; c=relaxed/simple;
-	bh=T9HkFnDBMvtvh+rx8Kod6hT1Ps6qQGtTGTjHSzPg5hY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YiEy1bVfbVMZ0tgt6kD9cW6NMRJGi6aueXYDApap6gX2X1pLBRGoxs8tiwc5LwLwQUt8ZSpqtZvLHmHDD5uvA0VsI3Zk4JHtPXjP1Lo2X4mZr9rpLFnSClnFNs/UrUuo517ahfEo6V85qxnZJb44XpZgoX9GhFcdECYf2zh4EWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bSMcV1V9Wz2BdVy;
-	Thu, 26 Jun 2025 10:11:22 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id E6E37140109;
-	Thu, 26 Jun 2025 10:12:59 +0800 (CST)
-Received: from localhost.localdomain (10.90.31.46) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 26 Jun 2025 10:12:59 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<shaojijie@huawei.com>
-Subject: [PATCH v3 net-next 3/3] net: hibmcge: configure FIFO thresholds according to the MAC controller documentation
-Date: Thu, 26 Jun 2025 10:06:13 +0800
-Message-ID: <20250626020613.637949-4-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20250626020613.637949-1-shaojijie@huawei.com>
-References: <20250626020613.637949-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1750903790; c=relaxed/simple;
+	bh=Wqty1Sr2BI+7QSfMAWMfkPsDP6b5h8UaMXw4nLxdkhs=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=TVk9+BNj8FrTFUOrhaw0zIt7Y2UOPVbvgEPoyKcyWbAQCuuJCSbdfurHb9kZmM/0ZPXzQ5QXnvlyxvx9r1rVjc5PgRfZAgoX5ka7tHd1XHJHJJ4V5X9T+eRhjgqrVkLH21y8RHo0GdH4A8ibzOB1zMmphLxjDv/ADoR/TAe5osw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e5Bepo7B; arc=none smtp.client-ip=209.85.219.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e8600c87293so352255276.1
+        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 19:09:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750903788; x=1751508588; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mGO3+WNE1wIEinGZMQxws0sCB+Qzo5nwbEfCXDM6Reg=;
+        b=e5Bepo7BHMf3a6Asm9aYK37MXZWwhCcYZqEkwXe1Lr2DLsFPlH4Hp6uloE4U4gZL91
+         kWMdZqFxbUfQPgCDx4ebEBxlV0xgN9V/mzdHSPfCsBwNiVTVHpbJKRIfArUK0yWYXQdH
+         3RPbKEv8a0r/QcxQOLNdufROxxeCMGJJc3scdj00lXGIJBheDj1mBjsw/4RFTaVF2LQy
+         Bjw0WAliYTJ+7rAEy6SHe6LXv3CBKKHO1u+wS3mnZtVnX0EnAC1mkv1SEVpmWm0LoCDn
+         O5LYReN1nCXU1PUitFpOe86UrIa9dkbToGgmLFdEvUXhWDYCKMWGsE1H5sYLwR2Ai6+R
+         7sAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750903788; x=1751508588;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=mGO3+WNE1wIEinGZMQxws0sCB+Qzo5nwbEfCXDM6Reg=;
+        b=Lq7ii/jsHZmVtFmwlxNcoifduqFxGdiKoA3mTV+xINplQLWkklIY2Wua+gOCgg7pEI
+         9rRKXUahHmGus0Ki5JJJOWHBLqoBhqlItnSAd8pZ7ug9BPoRWoCw/5jnHXvtIOHslzH9
+         A4aJUoLvDhyLQf7LtvnZF9x8MQWd5y+G4VrAMj2ZVJITfhJExBhv3z5cXxmlDUp33kRs
+         aYpsw4WEnvH7IyIyW8aG9wbly6WJ4VaY7Th/FRgI0Lta9AmovfGCgjttPalvzGuYhOnJ
+         N+dtaEAG64rgRYeDMkIBwHPD59cXbQ1cY+wZjcD2zCzuEOK8bHvH0CC9Z25hHNsHjyhm
+         uYlw==
+X-Forwarded-Encrypted: i=1; AJvYcCVJoRrVFQ9lqJH4/JDaUAsMB7YwpT/tFYqi3lYhq2o35eA7WUBKPKTSo31S0d7jRTDd9w7QxCQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKISeOzb7sQCdQllDQP39X14/ve8tSKKLXdjFWdC/bwkTyNZD4
+	/m2C5wO1znX0fkhnubOaqa5nP0fHU1LbC5a5FTxaZ7uW2g6dCjTdvPw7
+X-Gm-Gg: ASbGncseTiI1bCAFWhIp7P2Qkpgc6gVJMDvS6509p5mpnS/qpfmEwNbzY37kO6j1wKx
+	ozcX3/KMKuijms3UiE85LjzT/TIUu0f9JiK3k2fRdnTYfOfNXzZwJYHWDEsND9pqqvHb/K2XUDD
+	6SSVSCQJmQHgngo6lFkKqD2vmByoRBWor3Rs2bhft12l5jalihCXMpiloLnAam2jOoQEKpbhXqT
+	HxnkxQy7uQ3p29GdyhPRVem+TR6Boq1TkPsir8T+0kMddR665E/h6AwUpD5p5cakywhpWGO28u1
+	qn0sDOI4/WtTkeuSpq3vNnhRGKGEWoE0Zv5R1lIP8ZmncNUF182/UYDmImnmDHIxGgq+yTn1+P2
+	SpZb6NWkh2LYcHWxHS3vnoMPD/UJ/WQlmeEIVcYl3rg==
+X-Google-Smtp-Source: AGHT+IHOg9gE9rwG6ydwBzD4KT8iHu3nL+B+0sA1LmI2CjR889nbFxAVjJT5+/QJS7Na/Hmw1XGbPQ==
+X-Received: by 2002:a05:6902:846:b0:e82:5142:7c9f with SMTP id 3f1490d57ef6-e86017c4236mr5715893276.35.1750903787734;
+        Wed, 25 Jun 2025 19:09:47 -0700 (PDT)
+Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e85e39a6b1csm2014084276.6.2025.06.25.19.09.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Jun 2025 19:09:47 -0700 (PDT)
+Date: Wed, 25 Jun 2025 22:09:46 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Daniel Zahka <daniel.zahka@gmail.com>, 
+ Donald Hunter <donald.hunter@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, 
+ Leon Romanovsky <leon@kernel.org>, 
+ Tariq Toukan <tariqt@nvidia.com>, 
+ Boris Pismenny <borisp@nvidia.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ David Ahern <dsahern@kernel.org>, 
+ Neal Cardwell <ncardwell@google.com>, 
+ Patrisious Haddad <phaddad@nvidia.com>, 
+ Raed Salem <raeds@nvidia.com>, 
+ Jianbo Liu <jianbol@nvidia.com>, 
+ Dragos Tatulea <dtatulea@nvidia.com>, 
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
+ Stanislav Fomichev <sdf@fomichev.me>, 
+ =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ Jacob Keller <jacob.e.keller@intel.com>, 
+ netdev@vger.kernel.org
+Message-ID: <685cabeaa2ef6_2a5da42944b@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250625135210.2975231-9-daniel.zahka@gmail.com>
+References: <20250625135210.2975231-1-daniel.zahka@gmail.com>
+ <20250625135210.2975231-9-daniel.zahka@gmail.com>
+Subject: Re: [PATCH v2 08/17] net: psp: add socket security association code
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Configure FIFO thresholds according to the MAC controller documentation
+Daniel Zahka wrote:
+> From: Jakub Kicinski <kuba@kernel.org>
+> 
+> Add the ability to install PSP Rx and Tx crypto keys on TCP
+> connections. Netlink ops are provided for both operations.
+> Rx side combines allocating a new Rx key and installing it
+> on the socket. Theoretically these are separate actions,
+> but in practice they will always be used one after the
+> other. We can add distinct "alloc" and "install" ops later.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
+> Co-developed-by: Daniel Zahka <daniel.zahka@gmail.com>
 
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
-ChangeLog:
-v1 -> v2:
-  - Fix code formatting errors, reported by Jakub Kicinski
-  v1: https://lore.kernel.org/all/20250619144423.2661528-1-shaojijie@huawei.com/
----
- .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   | 49 +++++++++++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  |  6 +++
- 2 files changed, 55 insertions(+)
+> +static inline bool psp_is_nondata(struct sk_buff *skb, struct psp_assoc *pas)
+> +{
+> +	bool fin = !!(TCP_SKB_CB(skb)->tcp_flags & TCPHDR_FIN);
+> +	u32 end_seq = TCP_SKB_CB(skb)->end_seq;
+> +	u32 seq = TCP_SKB_CB(skb)->seq;
+> +	bool pure_fin;
+> +
+> +	pure_fin = fin && end_seq - seq == 1;
+> +
+> +	return seq == end_seq || (pure_fin && seq == pas->upgrade_seq);
+> +}
 
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-index 6e5602591554..8cca8316ba40 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-@@ -18,6 +18,13 @@
- #define HBG_ENDIAN_CTRL_LE_DATA_BE	0x0
- #define HBG_PCU_FRAME_LEN_PLUS 4
- 
-+#define HBG_FIFO_TX_FULL_THRSLD		0x3F0
-+#define HBG_FIFO_TX_EMPTY_THRSLD	0x1F0
-+#define HBG_FIFO_RX_FULL_THRSLD		0x240
-+#define HBG_FIFO_RX_EMPTY_THRSLD	0x190
-+#define HBG_CFG_FIFO_FULL_THRSLD	0x10
-+#define HBG_CFG_FIFO_EMPTY_THRSLD	0x01
-+
- static bool hbg_hw_spec_is_valid(struct hbg_priv *priv)
- {
- 	return hbg_reg_read(priv, HBG_REG_SPEC_VALID_ADDR) &&
-@@ -272,6 +279,41 @@ void hbg_hw_set_rx_pause_mac_addr(struct hbg_priv *priv, u64 mac_addr)
- 	hbg_reg_write64(priv, HBG_REG_FD_FC_ADDR_LOW_ADDR, mac_addr);
- }
- 
-+static void hbg_hw_set_fifo_thrsld(struct hbg_priv *priv,
-+				   u32 full, u32 empty, enum hbg_dir dir)
-+{
-+	u32 value = 0;
-+
-+	value |= FIELD_PREP(HBG_REG_FIFO_THRSLD_FULL_M, full);
-+	value |= FIELD_PREP(HBG_REG_FIFO_THRSLD_EMPTY_M, empty);
-+
-+	if (dir & HBG_DIR_TX)
-+		hbg_reg_write(priv, HBG_REG_TX_FIFO_THRSLD_ADDR, value);
-+
-+	if (dir & HBG_DIR_RX)
-+		hbg_reg_write(priv, HBG_REG_RX_FIFO_THRSLD_ADDR, value);
-+}
-+
-+static void hbg_hw_set_cfg_fifo_thrsld(struct hbg_priv *priv,
-+				       u32 full, u32 empty, enum hbg_dir dir)
-+{
-+	u32 value;
-+
-+	value = hbg_reg_read(priv, HBG_REG_CFG_FIFO_THRSLD_ADDR);
-+
-+	if (dir & HBG_DIR_TX) {
-+		value |= FIELD_PREP(HBG_REG_CFG_FIFO_THRSLD_TX_FULL_M, full);
-+		value |= FIELD_PREP(HBG_REG_CFG_FIFO_THRSLD_TX_EMPTY_M, empty);
-+	}
-+
-+	if (dir & HBG_DIR_RX) {
-+		value |= FIELD_PREP(HBG_REG_CFG_FIFO_THRSLD_RX_FULL_M, full);
-+		value |= FIELD_PREP(HBG_REG_CFG_FIFO_THRSLD_RX_EMPTY_M, empty);
-+	}
-+
-+	hbg_reg_write(priv, HBG_REG_CFG_FIFO_THRSLD_ADDR, value);
-+}
-+
- static void hbg_hw_init_transmit_ctrl(struct hbg_priv *priv)
- {
- 	u32 ctrl = 0;
-@@ -332,5 +374,12 @@ int hbg_hw_init(struct hbg_priv *priv)
- 
- 	hbg_hw_init_rx_control(priv);
- 	hbg_hw_init_transmit_ctrl(priv);
-+
-+	hbg_hw_set_fifo_thrsld(priv, HBG_FIFO_TX_FULL_THRSLD,
-+			       HBG_FIFO_TX_EMPTY_THRSLD, HBG_DIR_TX);
-+	hbg_hw_set_fifo_thrsld(priv, HBG_FIFO_RX_FULL_THRSLD,
-+			       HBG_FIFO_RX_EMPTY_THRSLD, HBG_DIR_RX);
-+	hbg_hw_set_cfg_fifo_thrsld(priv, HBG_CFG_FIFO_FULL_THRSLD,
-+				   HBG_CFG_FIFO_EMPTY_THRSLD, HBG_DIR_TX_RX);
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-index d40880beb2f8..a39d1e796e4a 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-@@ -141,7 +141,13 @@
- /* PCU */
- #define HBG_REG_TX_FIFO_THRSLD_ADDR		(HBG_REG_SGMII_BASE + 0x0420)
- #define HBG_REG_RX_FIFO_THRSLD_ADDR		(HBG_REG_SGMII_BASE + 0x0424)
-+#define HBG_REG_FIFO_THRSLD_FULL_M		GENMASK(25, 16)
-+#define HBG_REG_FIFO_THRSLD_EMPTY_M		GENMASK(9, 0)
- #define HBG_REG_CFG_FIFO_THRSLD_ADDR		(HBG_REG_SGMII_BASE + 0x0428)
-+#define HBG_REG_CFG_FIFO_THRSLD_TX_FULL_M	GENMASK(31, 24)
-+#define HBG_REG_CFG_FIFO_THRSLD_TX_EMPTY_M	GENMASK(23, 16)
-+#define HBG_REG_CFG_FIFO_THRSLD_RX_FULL_M	GENMASK(15, 8)
-+#define HBG_REG_CFG_FIFO_THRSLD_RX_EMPTY_M	GENMASK(7, 0)
- #define HBG_REG_CF_INTRPT_MSK_ADDR		(HBG_REG_SGMII_BASE + 0x042C)
- #define HBG_INT_MSK_WE_ERR_B			BIT(31)
- #define HBG_INT_MSK_RBREQ_ERR_B			BIT(30)
--- 
-2.33.0
-
+Minor: with that test against pas->upgrade_seq this function does more
+than its name implies. Maybe psp_is_allowed_nondata_at_upgrade or so.
 
