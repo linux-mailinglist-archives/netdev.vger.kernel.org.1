@@ -1,160 +1,146 @@
-Return-Path: <netdev+bounces-201697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62295AEAA28
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 01:02:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9B37AEAA6B
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 01:18:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 626757A31E3
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 23:00:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37E5B1C26F2C
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 23:18:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD421EDA3C;
-	Thu, 26 Jun 2025 23:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 274471DED7B;
+	Thu, 26 Jun 2025 23:17:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D+T+Eyaw"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="HFfKRDT7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE1018871F
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 23:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0801FBCA1;
+	Thu, 26 Jun 2025 23:17:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750978937; cv=none; b=Cx24HUqSKbsVtDnDZXuv62mKZQyzmgsxe5T5bzJxptxUbmfhKvK0day+v1pjzMRWljmdsDp4cQtWsBfogCFp8iceYyuybQWEx+MiAtYB7ppv/X3RpyJ/WdRiu2qUmmgdIC6FVVhSJ21co9ZaXFhCez+pv8ZnWoN31p47o8ZLjQc=
+	t=1750979824; cv=none; b=Ri7GYLUYOcOKx2gdkECbowgu5PwIKDWBDEYOWt7uXRvV5PCVYRRj5UKkyhGpN9qRT6SdBMed8gq++ALS7rOGMtkaFu1mSZtQwuvCklzLv854dn73cXsA9NILN2JTUMS2lil5t/Oh6hWsssBzvtZNI6v0VwoJUXkA4FvG/EYVOzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750978937; c=relaxed/simple;
-	bh=nub01D8M7RV9xlJ0/aVofev++91DZcJt80rM/TN9yh8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ek7tQTB4pvDBGgjHE/vHMu8Av3QsWku7eqXvKZeWBqrgts6aTKujWsiaASQqr1vmI715olybRMPf5KRY0N7QyDdTSwdsOIm2tdHNv3laP5CIwfPFraAGX9TeufiAmEvw1GYir5oBKQGcYjrMdxuPfTf40hsGUtZb2JGiYD2SJ9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D+T+Eyaw; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1750978935; x=1782514935;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nub01D8M7RV9xlJ0/aVofev++91DZcJt80rM/TN9yh8=;
-  b=D+T+Eyaw9Tm8rJx7crhO33bHM3ovnp3sT/iFYvvJaHXIpQINoAqMZd/M
-   8qO8ErZJA/fDAJ3IZKmJ02KQ1Jqjm4BZvrS5BSqOuBeiH04/ES3abjvxQ
-   ffzoa8FHiYlR67tiTMceEM49NBKDMI2Ec29y1DxJPUeOkr+uxqTLeJ7lJ
-   HGaU36KZVMshCi7pq53DzLp6YzAhaqK1nmcGXDlbvRLkpBXZoFrz25nuz
-   LcZRaT7TjbVgi56Z0UltG62+ovNMqrQ6WcbSsGELs4LBY7pkpTaUtd5gn
-   tB1dlZ7J3YrZ7othk0mQ2Kd3js2SAvfTyiM+eFxi2rvycSOgT+L4RQuuO
-   w==;
-X-CSE-ConnectionGUID: 8f2NxcEUTfSRPlpidrTHtA==
-X-CSE-MsgGUID: HAtxW5inT928C8e1bev0UQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11476"; a="53153003"
-X-IronPort-AV: E=Sophos;i="6.16,268,1744095600"; 
-   d="scan'208";a="53153003"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 16:01:59 -0700
-X-CSE-ConnectionGUID: RQKJmr1HQQaruMKrHEN3xA==
-X-CSE-MsgGUID: v7UBRS7vRxqtMaLD3sSJ9g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,268,1744095600"; 
-   d="scan'208";a="152747001"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 26 Jun 2025 16:01:56 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uUvbO-000Vbm-09;
-	Thu, 26 Jun 2025 23:01:54 +0000
-Date: Fri, 27 Jun 2025 07:00:59 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, kernel-team@cloudflare.com,
-	Lee Valentine <lvalentine@cloudflare.com>
-Subject: Re: [PATCH net-next 1/2] tcp: Consider every port when connecting
- with IP_LOCAL_PORT_RANGE
-Message-ID: <202506270619.Cjd8lmig-lkp@intel.com>
-References: <20250626120247.1255223-1-jakub@cloudflare.com>
+	s=arc-20240116; t=1750979824; c=relaxed/simple;
+	bh=1wA9A47szU+VrjeV4OiB2bj/WtG8oYnLQCRFfmIFE84=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FZ/37OWQxrrHSkcX4iKVeCD0hsd9j9TUU2X9cwyX+NeJh3hrLgUYprYHh889C2UTHppviyiunYaSASgwr9H4/kj0FsHvfMKgQ+ysIZnYds0Q0g/VbK6lIafWk/S7e/G36xOhf9csn7SbcopeRmVUHyCf4l8WdbGEVarHAKV+byc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=HFfKRDT7; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=HRJjLTvM5n86H842Si//qWpIS9NZshIAK219b6uDKos=; b=HFfKRDT7R1rA/Pr+DNhjN5uZsN
+	AyelXKX6kSvfhib5cCYvPih3Iv0HL7a2DGwnrS8Fpm9df8Uls565gFoIYwHT7Ht4uyfXq3lUq7t/N
+	TvIP1bB7irCJXh9mPJFzYsW6SRGMDGe7lNL1P7tMWd4bRp83eN0kR92qL2vhb+FCjxA5puWHpHhU1
+	JlBdr8cFiQ49fL0O32PcseB9gUCjXMtBF664ukpXwKW60ZGgXsalpcVS7kSxY8rU801qm113tR+Ff
+	DzzP9nZCIiYRpPQM++eMzGQUOXAzECiV7N2u3Dq6ZF+WdMneZymo3OjOQCbA9qzu9Kl4R+kNiDMtK
+	yGIcbPJw==;
+Received: from localhost ([127.0.0.1])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1uUvam-000M7V-20;
+	Fri, 27 Jun 2025 01:01:17 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf-next 2025-06-27
+Date: Fri, 27 Jun 2025 01:01:10 +0200
+Message-ID: <20250626230111.24772-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250626120247.1255223-1-jakub@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27681/Thu Jun 26 10:38:00 2025)
 
-Hi Jakub,
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-kernel test robot noticed the following build warnings:
+The following pull-request contains BPF updates for your *net-next* tree.
 
-[auto build test WARNING on net-next/main]
+We've added 6 non-merge commits during the last 8 day(s) which contain
+a total of 6 files changed, 120 insertions(+), 20 deletions(-).
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jakub-Sitnicki/selftests-net-Cover-port-sharing-scenarios-with-IP_LOCAL_PORT_RANGE/20250626-200955
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250626120247.1255223-1-jakub%40cloudflare.com
-patch subject: [PATCH net-next 1/2] tcp: Consider every port when connecting with IP_LOCAL_PORT_RANGE
-config: x86_64-kexec (https://download.01.org/0day-ci/archive/20250627/202506270619.Cjd8lmig-lkp@intel.com/config)
-compiler: clang version 20.1.7 (https://github.com/llvm/llvm-project 6146a88f60492b520a36f8f8f3231e15f3cc6082)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250627/202506270619.Cjd8lmig-lkp@intel.com/reproduce)
+The main changes are:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506270619.Cjd8lmig-lkp@intel.com/
+1) Fix RCU usage in task_cls_state() for BPF programs using helpers like
+   bpf_get_cgroup_classid_curr() outside of networking, from Charalampos
+   Mitrodimas.
 
-All warnings (new ones prefixed by >>):
+2) Fix a sockmap race between map_update and a pending workqueue from
+   an earlier map_delete freeing the old psock where both pointed to the
+   same psock->sk, from Jiayuan Chen.
 
->> net/ipv4/inet_hashtables.c:1015:21: warning: unused variable 'sk2' [-Wunused-variable]
-    1015 |         const struct sock *sk2;
-         |                            ^~~
-   1 warning generated.
+3) Fix a data corruption issue when using bpf_msg_pop_data() in kTLS which
+   failed to recalculate the ciphertext length, also from Jiayuan Chen.
 
+4) Remove xdp_redirect_map{,_err} trace events since they are unused and
+   also hide XDP trace events under CONFIG_BPF_SYSCALL, from Steven Rostedt.
 
-vim +/sk2 +1015 net/ipv4/inet_hashtables.c
+Please consider pulling these changes from:
 
-  1007	
-  1008	/* True on source address conflict with another socket. False otherwise.
-  1009	 * Caller must hold hashbucket lock for this tb.
-  1010	 */
-  1011	static inline bool check_bound(const struct sock *sk,
-  1012				       const struct inet_bind_bucket *tb)
-  1013	{
-  1014		const struct inet_bind2_bucket *tb2;
-> 1015		const struct sock *sk2;
-  1016	
-  1017		hlist_for_each_entry(tb2, &tb->bhash2, bhash_node) {
-  1018	#if IS_ENABLED(CONFIG_IPV6)
-  1019			if (sk->sk_family == AF_INET6) {
-  1020				if (tb2->addr_type == IPV6_ADDR_ANY ||
-  1021				    ipv6_addr_equal(&tb2->v6_rcv_saddr,
-  1022						    &sk->sk_v6_rcv_saddr))
-  1023					return true;
-  1024				continue;
-  1025			}
-  1026	
-  1027			/* Check for ipv6 non-v6only wildcard sockets */
-  1028			if (tb2->addr_type == IPV6_ADDR_ANY)
-  1029				sk_for_each_bound(sk2, &tb2->owners)
-  1030					if (!sk2->sk_ipv6only)
-  1031						return true;
-  1032	
-  1033			if (tb2->addr_type != IPV6_ADDR_MAPPED)
-  1034				continue;
-  1035	#endif
-  1036			if (tb2->rcv_saddr == INADDR_ANY ||
-  1037			    tb2->rcv_saddr == sk->sk_rcv_saddr)
-  1038				return true;
-  1039		}
-  1040	
-  1041		return false;
-  1042	}
-  1043	
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Cong Wang, Daniel Borkmann, Jakub Kicinski, Jesper Dangaard Brouer, John 
+Fastabend, Toke Høiland-Jørgensen
+
+----------------------------------------------------------------
+
+The following changes since commit 2c7e4a2663a1ab5a740c59c31991579b6b865a26:
+
+  Merge tag 'net-6.16-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-06-05 12:34:55 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+for you to fetch changes up to 16f3c7ad887c1f8fd698ab568b5851cadb65b5a8:
+
+  xdp: tracing: Hide some xdp events under CONFIG_BPF_SYSCALL (2025-06-12 19:36:53 -0700)
+
+----------------------------------------------------------------
+bpf-next-for-netdev
+
+----------------------------------------------------------------
+Charalampos Mitrodimas (1):
+      net, bpf: Fix RCU usage in task_cls_state() for BPF programs
+
+Jiayuan Chen (3):
+      bpf, sockmap: Fix psock incorrectly pointing to sk
+      bpf, ktls: Fix data corruption when using bpf_msg_pop_data() in ktls
+      selftests/bpf: Add test to cover ktls with bpf_msg_pop_data
+
+Steven Rostedt (2):
+      xdp: Remove unused events xdp_redirect_map and xdp_redirect_map_err
+      xdp: tracing: Hide some xdp events under CONFIG_BPF_SYSCALL
+
+ include/trace/events/xdp.h                         | 21 +----
+ net/core/netclassid_cgroup.c                       |  4 +-
+ net/core/skmsg.c                                   |  7 ++
+ net/tls/tls_sw.c                                   | 13 ++++
+ .../selftests/bpf/prog_tests/sockmap_ktls.c        | 91 ++++++++++++++++++++++
+ .../selftests/bpf/progs/test_sockmap_ktls.c        |  4 +
+ 6 files changed, 120 insertions(+), 20 deletions(-)
 
