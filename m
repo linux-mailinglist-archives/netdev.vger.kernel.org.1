@@ -1,144 +1,101 @@
-Return-Path: <netdev+bounces-201438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 366F8AE9764
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 10:02:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D27DAAE976A
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 10:02:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77A6617D302
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 08:02:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C88D01C2825F
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 08:02:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2525260574;
-	Thu, 26 Jun 2025 08:01:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A86AD25B677;
+	Thu, 26 Jun 2025 08:02:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c6/PNaPf"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oFv1FQMD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753B625BEEC;
-	Thu, 26 Jun 2025 08:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B618623314B;
+	Thu, 26 Jun 2025 08:02:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750924884; cv=none; b=jed877sv74iGniGQWn95vQyQjTtfmIscxwRTjQbfOhNrwBU03qU2H61whGFQNSTlwPKa+cDOtsjAT1PwWhwP3DklfZ220z3dcC6wp/hZeOrluyQMx98fSvpgdZibTOZsK2rzP0VXiwOtRQdNKssvwaHwSReOZYh3jMx0uvztmxQ=
+	t=1750924951; cv=none; b=HyN87RT/UwF3MxFktd4STAKk2dWxb3fclkIvtddsqG2bOzOCF7XGhKVfaUPLCGtnUgSp5hUa+PE9AVbiAvMlcWwqJb7/sT3DdXN3k3RD+ie9kdyFVqboIFCc7yGy3bWVp6+P/cGRvFVM9DqXhs7uRDy90BrW7fuTDnM1N201qiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750924884; c=relaxed/simple;
-	bh=Hq80mkzOm4sDH1lo61LQlZ+WhvZpGs/2+0D69YVEncc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ro3R6v39sIF+IX5QCwlStOc/SfkzJ/DeLdl9IxAbA3KttzWraa9OQFWqM1nbRcbt/pB1tlPKnM3tsUoJPekvdKUoiI5nA+ZnRAmUhLgxYJyZrGWOprYEUZqAHiKqXvZMRBVikABfsh4v/T7ix6iYcmBENXapL5P1K09srLJog4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c6/PNaPf; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-234b9dfb842so7216105ad.1;
-        Thu, 26 Jun 2025 01:01:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750924883; x=1751529683; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RnJ5HyRFTLzSb90lPZ0kytxtuJ4Ps5kIpRokWvdn6qw=;
-        b=c6/PNaPfKI/QcO223m05Msok8wJhB7/39HoDUczqjtJ+ZkeYLrMuxZKEByRx/GJ4S7
-         uDo+1hvoCbRYJOoyZ+9iI9p9/EK67vf4gLgfZUXaJSoeaNWgr4VH/3Hcr/DVlxq8sxDQ
-         pIT7MBfCK40w28Z5WRosWi7Kvwc+L2cIiAmF02iZ+tSvP7w7jjx3JgE49DBeA4P5qD2F
-         xg+0KYDhLhv3Jzf7QYJxB6BUMMBDfn9cBrdp6zkv3hQTmq8puGRFpmuq/tNBRRAJPfVk
-         2AbM6m6UbuboQy6u/AT/UYULJqC/WJX6chfMixSxa/Mhag90iRZ7HFug97l5DKqhFbdk
-         YKDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750924883; x=1751529683;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RnJ5HyRFTLzSb90lPZ0kytxtuJ4Ps5kIpRokWvdn6qw=;
-        b=ocyIPwrriOWGMfQ8bL9MSRTaIyW7VWS9K82NkFhtYjbsmvske/YqtvTdastsAFHlx4
-         v9Nu9kqRk6JWxleK0gjuXGSeR5Xv/PsXS4BXf/EChOuYd27kGFWrSSq2KA7YXOx8+eBd
-         P4YnglUebbKy6NaGn+vraAIL5o49BAefeDs/eVbH1ZUF6T05CKWY7+vMCBLZrOKbUEWc
-         4cHj8TRd1xx5IO9MoM+nOsKkxJi8+ma+IgYfXmDJNdfWEH9YxgHfsI+m2S0O7W/x4aft
-         FA5dBoVb1PeBGsHM/DUvUC1pxmgj81feWZlcxkRfqfAF71EPsh69W9HmKLPwGjy55FbK
-         C+wQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVUSzVbE/h95LdZd0NRaNJzQTfqmr9XvCINGZxnIAqiI7yqQRLLf7KeOZ/S8qSHlxdkpHfRn0Ke5X3T@vger.kernel.org, AJvYcCXFLAeyBp9kl6yjmslg6IUsEjOBR7i2dj7epqgy3c2W4nOT5aoZWDJ0jbCvYarEjHRopHHHT1U4YxGyfU7q@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpjzW4dZJnh71evbJNmrMyKgBNjIyHZ6B/V6yAfZ0Iil9zdykt
-	nuDsCl6wRPaih2MZKjUuDxoIf6Gn6X5Y5bDtg0efxTLfBHUfTlrsQaPh
-X-Gm-Gg: ASbGncuiqb7i1VgCm1o3EsgMtG2g+rGCg9LLy8YL35qFNsQ2P5TPqmpFnJlNPn12u7R
-	1Ls8+G0ZvmdXRGDy0lgJlzHDUzf+udXDuZOEd2CNalaukMLFwr3Bsck5UNlGFTfP9xMC0f732Ff
-	pxro7D0fy+HaD3S+se2TRIhVfaEaGK8c0wTJAPt9qvb3n3bzlYOSY3YpKJ+g6po0AhfvjJtWBjj
-	B0+2YRB2aOkR/CgFV9yt/z8j2Zww6XFoMaiFhidy1CTCQQnMVvJXM1ctlxVuez1nsnKi+Odn3ja
-	OotOCWhsTLM6lTK3oxvEKUGaKV69FTh3GVpA8x61QLv6X0KxEj/Wub37OeIOJA==
-X-Google-Smtp-Source: AGHT+IHEcN9TqXpZqCIhiJkeXd5Rd4ZpIJF9ZCmoYkubJ2AJSnfavgHhpNIHpdPsx+RjCvP+UqGFrw==
-X-Received: by 2002:a17:902:e947:b0:235:7c6:ebdb with SMTP id d9443c01a7336-23823f88824mr119070055ad.10.1750924882766;
-        Thu, 26 Jun 2025 01:01:22 -0700 (PDT)
-Received: from localhost ([2001:19f0:ac00:4eb8:5400:5ff:fe30:7df3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-237d8695195sm156236865ad.187.2025.06.26.01.01.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jun 2025 01:01:22 -0700 (PDT)
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1750924951; c=relaxed/simple;
+	bh=cEaC6+G/sN4jozSX9BP1ZCCBNnJkl7knaZmfoplO16E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R4aY97ELNW6CDkDzWet3kTDSDYyKdC/+9AZZ1kjTqDdBXhZNrRBGGL6Pubzh9jmZpK3ZcvnGutIn/SVgLhPsJukTZltuKQBvYLNU8Ex3sOB4zXz3gkZbdJ1M1jaVZoGON30KCbPkZV0f7dBV7ds99r+CFOzvLbSgRJ7qCWjuwnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oFv1FQMD; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3dQ8YaRlPH8leheSk/R4RK1kv8p6nuXuYIhHCLiJSfw=; b=oFv1FQMDH/Tz+OBC5qChk1l6P8
+	395y1OId5p42efMwHjjuhLS+fTIwrfsZr0q3lel7P1LDJmcOCanUL/7OwfMOVOpCxnc7PUy/SV1WZ
+	GVa9D42034UJKVeUwuZ95YySR+iURF5IkFwxbumR7mplKUSOGgV5mhDIHk3LsGoCiNg0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uUhYg-00H10f-Vs; Thu, 26 Jun 2025 10:02:10 +0200
+Date: Thu, 26 Jun 2025 10:02:10 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Chen Wang <unicorn_wang@outlook.com>,
-	Inochi Amaoto <inochiama@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
-	Ze Huang <huangze@whut.edu.cn>,
-	Yixun Lan <dlan@gentoo.org>,
-	Thomas Bonnefille <thomas.bonnefille@bootlin.com>
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	sophgo@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	Longbin Li <looong.bin@gmail.com>
-Subject: [PATCH net-next RFC v3 4/4] riscv: dts: sophgo: Enable ethernet device for Huashan Pi
-Date: Thu, 26 Jun 2025 16:00:54 +0800
-Message-ID: <20250626080056.325496-5-inochiama@gmail.com>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250626080056.325496-1-inochiama@gmail.com>
-References: <20250626080056.325496-1-inochiama@gmail.com>
+	Andy Whitcroft <apw@canonical.com>,
+	Dwaipayan Ray <dwaipayanray1@gmail.com>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Joe Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>,
+	Nishanth Menon <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>, Tero Kristo <kristo@kernel.org>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux@ew.tq-group.com
+Subject: Re: [PATCH net-next v2 3/3] checkpatch: check for comment explaining
+ rgmii(|-rxid|-txid) PHY modes
+Message-ID: <c954eabf-aa75-4373-8144-19ef88e1e696@lunn.ch>
+References: <cover.1750756583.git.matthias.schiffer@ew.tq-group.com>
+ <bc112b8aa510cf9df9ab33178d122f234d0aebf7.1750756583.git.matthias.schiffer@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bc112b8aa510cf9df9ab33178d122f234d0aebf7.1750756583.git.matthias.schiffer@ew.tq-group.com>
 
-Enable ethernet controller and mdio multiplexer device on Huashan Pi.
+On Tue, Jun 24, 2025 at 12:53:34PM +0200, Matthias Schiffer wrote:
+> Historically, the RGMII PHY modes specified in Device Trees have been
+> used inconsistently, often referring to the usage of delays on the PHY
+> side rather than describing the board; many drivers still implement this
+> incorrectly.
+> 
+> Require a comment in Devices Trees using these modes (usually mentioning
+> that the delay is realized on the PCB), so we can avoid adding more
+> incorrect uses (or will at least notice which drivers still need to be
+> fixed).
+> 
+> Suggested-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
 
-Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
----
- arch/riscv/boot/dts/sophgo/cv1812h-huashan-pi.dts | 8 ++++++++
- 1 file changed, 8 insertions(+)
+One question, how should this be merged? The two DT patches might want
+to go via the TI DT Maintainer. And this patch via the checkpatch
+Maintainer? Or do you plan to merge it some other way?
 
-diff --git a/arch/riscv/boot/dts/sophgo/cv1812h-huashan-pi.dts b/arch/riscv/boot/dts/sophgo/cv1812h-huashan-pi.dts
-index 26b57e15adc1..4a5835fa9e96 100644
---- a/arch/riscv/boot/dts/sophgo/cv1812h-huashan-pi.dts
-+++ b/arch/riscv/boot/dts/sophgo/cv1812h-huashan-pi.dts
-@@ -55,6 +55,14 @@ &emmc {
- 	non-removable;
- };
- 
-+&gmac0 {
-+	status = "okay";
-+};
-+
-+&mdio {
-+	status = "okay";
-+};
-+
- &sdhci0 {
- 	status = "okay";
- 	bus-width = <4>;
--- 
-2.50.0
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
+    Andrew
 
