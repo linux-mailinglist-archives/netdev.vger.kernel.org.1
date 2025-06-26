@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-201383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 131C3AE93E3
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 04:09:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48AA8AE93E4
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 04:12:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7227B1C41D0F
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 02:10:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39C9F16E418
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 02:12:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54FCE155C88;
-	Thu, 26 Jun 2025 02:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE4FE1B4248;
+	Thu, 26 Jun 2025 02:12:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5Bepo7B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iQ/Ws0qC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7CF126C17
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 02:09:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568411AAA1E
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 02:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750903790; cv=none; b=KGDouFPwpdGQdej7OKrAP/R+/TO45RDC5ieVAAVeWc/uFT8zaEE+vXVWKer7zDCDQkImD4JFzGrbebhPmaE0FHqX78SmGpynM0u0wQRk4XlcEmGR8iraK+K9pSE+mtoRAHeoZLh4NTScWqh3wosLSZduYvJfsz1Pa/+tTwlXbIk=
+	t=1750903924; cv=none; b=F5xCiZ9uIk1qCxNe+RLdYk4IBXJeEmrU3AJhD8Tvl8EscLOwD4hgH1+lj6Tc/d9OFDpM8TBhCengo3ZzM/Vc6tTlPOd3khxD1xX08EEXm8Ru2cUFxFIaWOzuPzAQtcn8e6lH6+329U5MVfAH8CijZWQRlv5z2ZYMsOQ7SdGa1Us=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750903790; c=relaxed/simple;
-	bh=Wqty1Sr2BI+7QSfMAWMfkPsDP6b5h8UaMXw4nLxdkhs=;
+	s=arc-20240116; t=1750903924; c=relaxed/simple;
+	bh=dlu1oOBDb0G0LhtCbGJphyh/kQYZX8m/ub+ch/48lTM=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=TVk9+BNj8FrTFUOrhaw0zIt7Y2UOPVbvgEPoyKcyWbAQCuuJCSbdfurHb9kZmM/0ZPXzQ5QXnvlyxvx9r1rVjc5PgRfZAgoX5ka7tHd1XHJHJJ4V5X9T+eRhjgqrVkLH21y8RHo0GdH4A8ibzOB1zMmphLxjDv/ADoR/TAe5osw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e5Bepo7B; arc=none smtp.client-ip=209.85.219.182
+	 Mime-Version:Content-Type; b=Wt58xV97NfIkdOZWEar4mYpDjBckT8ncON/B9KDxWjlhb7XIAX+Vhmbhs21iTgpUm0Wcm04qxIqKRegKrN9dpaTHj3XTjD8vqpjYy+SsXd2ftRt/Hcv7r70GRn3bQ2XjwfVh7C/LVID2qW5A5S93yvCb5at+Kh4k+Gr0Xukj5sQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iQ/Ws0qC; arc=none smtp.client-ip=209.85.128.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e8600c87293so352255276.1
-        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 19:09:48 -0700 (PDT)
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-70e1d8c2dc2so5404897b3.3
+        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 19:12:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750903788; x=1751508588; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750903922; x=1751508722; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mGO3+WNE1wIEinGZMQxws0sCB+Qzo5nwbEfCXDM6Reg=;
-        b=e5Bepo7BHMf3a6Asm9aYK37MXZWwhCcYZqEkwXe1Lr2DLsFPlH4Hp6uloE4U4gZL91
-         kWMdZqFxbUfQPgCDx4ebEBxlV0xgN9V/mzdHSPfCsBwNiVTVHpbJKRIfArUK0yWYXQdH
-         3RPbKEv8a0r/QcxQOLNdufROxxeCMGJJc3scdj00lXGIJBheDj1mBjsw/4RFTaVF2LQy
-         Bjw0WAliYTJ+7rAEy6SHe6LXv3CBKKHO1u+wS3mnZtVnX0EnAC1mkv1SEVpmWm0LoCDn
-         O5LYReN1nCXU1PUitFpOe86UrIa9dkbToGgmLFdEvUXhWDYCKMWGsE1H5sYLwR2Ai6+R
-         7sAg==
+        bh=kCY1KeB66b7fmFJnlWcA8wXX5bGvO+8egACKlF7Srpc=;
+        b=iQ/Ws0qChegZdc8x5oFMktywDGtPIxlYUPKwEb6z7xojPt0ikITfaptN89ghlM9HwE
+         wWM3YIRl6gKNxlV3nMPjbyVmNNcdC2esfMne9ZWyWPntKGN5+QrKg4wylHveX0BXfXDB
+         r8JQKyzvfAF7F+AYTUxa0wgWmUIuL/OKagcXZ2y2p6o+/V+RXdioQxCe59NNzDbOKDqd
+         QaBNPcWLW0UBSPmMszYJoxS4/60b6ih1RNN11IY7AmRvGdOq93dnZjGI7AQsyxpcc12C
+         MzeMrhkk1SbVB9JKjK4ahCqL5JvWsLTMb6o/jxW9ygZzC1yinV9m7Rr5iPqQ9hVvOPpp
+         ofSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750903788; x=1751508588;
+        d=1e100.net; s=20230601; t=1750903922; x=1751508722;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=mGO3+WNE1wIEinGZMQxws0sCB+Qzo5nwbEfCXDM6Reg=;
-        b=Lq7ii/jsHZmVtFmwlxNcoifduqFxGdiKoA3mTV+xINplQLWkklIY2Wua+gOCgg7pEI
-         9rRKXUahHmGus0Ki5JJJOWHBLqoBhqlItnSAd8pZ7ug9BPoRWoCw/5jnHXvtIOHslzH9
-         A4aJUoLvDhyLQf7LtvnZF9x8MQWd5y+G4VrAMj2ZVJITfhJExBhv3z5cXxmlDUp33kRs
-         aYpsw4WEnvH7IyIyW8aG9wbly6WJ4VaY7Th/FRgI0Lta9AmovfGCgjttPalvzGuYhOnJ
-         N+dtaEAG64rgRYeDMkIBwHPD59cXbQ1cY+wZjcD2zCzuEOK8bHvH0CC9Z25hHNsHjyhm
-         uYlw==
-X-Forwarded-Encrypted: i=1; AJvYcCVJoRrVFQ9lqJH4/JDaUAsMB7YwpT/tFYqi3lYhq2o35eA7WUBKPKTSo31S0d7jRTDd9w7QxCQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKISeOzb7sQCdQllDQP39X14/ve8tSKKLXdjFWdC/bwkTyNZD4
-	/m2C5wO1znX0fkhnubOaqa5nP0fHU1LbC5a5FTxaZ7uW2g6dCjTdvPw7
-X-Gm-Gg: ASbGncseTiI1bCAFWhIp7P2Qkpgc6gVJMDvS6509p5mpnS/qpfmEwNbzY37kO6j1wKx
-	ozcX3/KMKuijms3UiE85LjzT/TIUu0f9JiK3k2fRdnTYfOfNXzZwJYHWDEsND9pqqvHb/K2XUDD
-	6SSVSCQJmQHgngo6lFkKqD2vmByoRBWor3Rs2bhft12l5jalihCXMpiloLnAam2jOoQEKpbhXqT
-	HxnkxQy7uQ3p29GdyhPRVem+TR6Boq1TkPsir8T+0kMddR665E/h6AwUpD5p5cakywhpWGO28u1
-	qn0sDOI4/WtTkeuSpq3vNnhRGKGEWoE0Zv5R1lIP8ZmncNUF182/UYDmImnmDHIxGgq+yTn1+P2
-	SpZb6NWkh2LYcHWxHS3vnoMPD/UJ/WQlmeEIVcYl3rg==
-X-Google-Smtp-Source: AGHT+IHOg9gE9rwG6ydwBzD4KT8iHu3nL+B+0sA1LmI2CjR889nbFxAVjJT5+/QJS7Na/Hmw1XGbPQ==
-X-Received: by 2002:a05:6902:846:b0:e82:5142:7c9f with SMTP id 3f1490d57ef6-e86017c4236mr5715893276.35.1750903787734;
-        Wed, 25 Jun 2025 19:09:47 -0700 (PDT)
+        bh=kCY1KeB66b7fmFJnlWcA8wXX5bGvO+8egACKlF7Srpc=;
+        b=qzWKVYEDv+pwz2L379dCmEwFYCK4rtA77bpYDDcFddXjnIZj8/laBIq1NqLNxIj97F
+         YKtBmd3o2lkvDeYnEGQ2K8SEYVyl6ms6MWSw3x+nSKKDt3xFDeG6l1/A0JiG6xky64JW
+         KkognDAOWjkf85fq6YJ3B2BP9AqIyF4Eod7fgbIU/0UgjHU/ywnKSq8VpO746s8uXuwi
+         bLmnW/fC+2RmGpKuXghRqeo1Hv1jZ75AOQkOYowCvvE+bN78j9m4/nczIGvaLXFyxN3l
+         2Nq3/DOvgXEq+GhGoEgpXhXzGnSAnQtGxNuQC1RryrpNLdXvtLm6EsHQOrXWjNGi6gjE
+         /Klw==
+X-Forwarded-Encrypted: i=1; AJvYcCWsjTNR+SGL1DOC2y88w8hoGbU0OyVyOZ/Hf+t4VK6nzoDmHac5M91v62DKWzp4vO6DCpDV1gI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzywVdbGuHxS8V278X6rA+a0bja05E+qdUw3UaYu15R2c6fzcgX
+	3y+PjgkvRK+/gZ8IPGqqrnhcEgoaT6ftMA5avLDYDJqWWr79M7EJ2pRj
+X-Gm-Gg: ASbGncvIjqwt5M6MaAWaOPdehmI6soKT8A4UW6Xmud0EAlBqXiun2oY0Es+acV8ZbmT
+	tH5CLqeArB11Wd2iB312VMqN1yhba/0S6y7O192++y116hnX8V85V0BNMh/MYgSd8G4c/6wmZ+p
+	xmrDlEQAd6qSXkLwOfX5waVMH6NuHYcjQKDSlifGiUBXQiM0dWFwlfPwW1BOhFhGTGlBglLJvkj
+	56KQ06i/ery9G5hVN3EPb5jgKFy3d/XtniOyh7Z0wj6jvI6wrhz0YCS0Zl8Xyogq2ZThrDeA2HY
+	wlBVuUsj6LI6gAB31vRp8t01KwP+2g+/86SmL0D2bCyZ5OCLp3GqKGDMEPkHDlStD+xkg/FaZf3
+	0bGas11rc1aS9Pacu1RRmVzLMo/vUxPLARJ2A5BbQzA==
+X-Google-Smtp-Source: AGHT+IFStOQrnZ0kRqb2yl5GKZFeYdrPlYU3gUoNtnClKc/nE+dGNoCLWvPJpUrbamqhu/KduqcMqA==
+X-Received: by 2002:a05:690c:380d:b0:712:d946:788e with SMTP id 00721157ae682-71406cd2533mr79141497b3.14.1750903922319;
+        Wed, 25 Jun 2025 19:12:02 -0700 (PDT)
 Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e85e39a6b1csm2014084276.6.2025.06.25.19.09.46
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-712c4b96c1dsm26849247b3.62.2025.06.25.19.12.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 19:09:47 -0700 (PDT)
-Date: Wed, 25 Jun 2025 22:09:46 -0400
+        Wed, 25 Jun 2025 19:12:01 -0700 (PDT)
+Date: Wed, 25 Jun 2025 22:12:01 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: Daniel Zahka <daniel.zahka@gmail.com>, 
  Donald Hunter <donald.hunter@gmail.com>, 
@@ -102,7 +102,7 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
  Alexander Lobakin <aleksander.lobakin@intel.com>, 
  Jacob Keller <jacob.e.keller@intel.com>, 
  netdev@vger.kernel.org
-Message-ID: <685cabeaa2ef6_2a5da42944b@willemb.c.googlers.com.notmuch>
+Message-ID: <685cac7163d82_2a5da429488@willemb.c.googlers.com.notmuch>
 In-Reply-To: <20250625135210.2975231-9-daniel.zahka@gmail.com>
 References: <20250625135210.2975231-1-daniel.zahka@gmail.com>
  <20250625135210.2975231-9-daniel.zahka@gmail.com>
@@ -131,18 +131,43 @@ Daniel Zahka wrote:
 > Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 > Co-developed-by: Daniel Zahka <daniel.zahka@gmail.com>
 
-> +static inline bool psp_is_nondata(struct sk_buff *skb, struct psp_assoc *pas)
-> +{
-> +	bool fin = !!(TCP_SKB_CB(skb)->tcp_flags & TCPHDR_FIN);
-> +	u32 end_seq = TCP_SKB_CB(skb)->end_seq;
-> +	u32 seq = TCP_SKB_CB(skb)->seq;
-> +	bool pure_fin;
+>  /**
+>   * struct psp_dev_ops - netdev driver facing PSP callbacks
+>   */
+> @@ -109,6 +145,28 @@ struct psp_dev_ops {
+>  	 * @key_rotate: rotate the device key
+>  	 */
+>  	int (*key_rotate)(struct psp_dev *psd, struct netlink_ext_ack *extack);
 > +
-> +	pure_fin = fin && end_seq - seq == 1;
+> +	/**
+> +	 * @rx_spi_alloc: allocate an Rx SPI+key pair
+> +	 * Allocate an Rx SPI and resulting derived key.
+> +	 * This key should remain valid until key rotation.
+> +	 */
+> +	int (*rx_spi_alloc)(struct psp_dev *psd, u32 version,
+> +			    struct psp_key_parsed *assoc,
+> +			    struct netlink_ext_ack *extack);
 > +
-> +	return seq == end_seq || (pure_fin && seq == pas->upgrade_seq);
-> +}
+> +	/**
+> +	 * @tx_key_add: add a Tx key to the device
+> +	 * Install an association in the device. Core will allocate space
+> +	 * for the driver to use at drv_data.
+> +	 */
+> +	int (*tx_key_add)(struct psp_dev *psd, struct psp_assoc *pas,
+> +			  struct netlink_ext_ack *extack);
+> +	/**
+> +	 * @tx_key_del: remove a Tx key from the device
+> +	 * Remove an association from the device.
+> +	 */
+> +	void (*tx_key_del)(struct psp_dev *psd, struct psp_assoc *pas);
+>  };
 
-Minor: with that test against pas->upgrade_seq this function does more
-than its name implies. Maybe psp_is_allowed_nondata_at_upgrade or so.
+This Tx driver API is necessary for devices that store keys in an
+on-device key database.
+
+The preferred device model for PSP is keys-in-descriptor, in line with
+the protocol design goal of O(1) device state. 
+
+In that case, can the driver leave these callbacks NULL? And, in the
+driver tx datapath, access the tx key from psp_sk_assoc().
 
