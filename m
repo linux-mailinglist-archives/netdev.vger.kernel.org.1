@@ -1,172 +1,232 @@
-Return-Path: <netdev+bounces-201400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1846AE949C
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 05:42:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C94D0AE9503
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 07:02:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 886F33B31D7
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 03:41:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C8141C409D3
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 05:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 946C91F12E9;
-	Thu, 26 Jun 2025 03:42:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 182B01CEEBE;
+	Thu, 26 Jun 2025 05:02:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcpcWR5M"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF1BA1E98E6;
-	Thu, 26 Jun 2025 03:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3ED2F1FF6;
+	Thu, 26 Jun 2025 05:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750909337; cv=none; b=iXfo1lSRMQi8ArgbCqxU0cDbsWKfByahDW3vRLxCP/rbe8i3/Wow9PthwkLo423oO4i3w12cq6XTx5qIbq1qTjIRN4FzvcFggVWRJNOVvSPWqalfSVUmwbvUMcGGdWa6eqlAqe7PGzu4O/tQ9wAd/pFYdsvdplTv4LCu/Af0aFE=
+	t=1750914155; cv=none; b=f7/hRX9QOkuf1+/efGZF0AUSEqvPsUumb0W0/8NnmwDqJbq+dE5Gfdrn59SIPMACHfpz+6IfJp506yncXGyveS/h0hPnr5NozpQVvFLmSa2vDqkIdD01dhbAcNtQkAjtO+1GZ0hTWgikIXQyRWp/9ZZebdEWUuJsWhHur15gZM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750909337; c=relaxed/simple;
-	bh=Dw17iLxi7vHOpWmFShysTFc4ChOtppgJvzbcyKjSp4Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=EHWGabAvu1XCf0p+nwLfb/59Z9/S0/Ckks4YI27b274+uCS/LQAigS7yfTIrtojoZRtq8OjRWtZr4iJZ2yiAiIk4s4DaCpBM+HYoBUVM4Qfy0525CgJ1qnJkXgi7VjvRvqUPlWi2hnhIM2HDEoF5xtVD1gJqJ5vzhNfqdroaCK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4bSPXR0d7jzdbln;
-	Thu, 26 Jun 2025 11:37:59 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3752618049E;
-	Thu, 26 Jun 2025 11:41:57 +0800 (CST)
-Received: from kwepemq200002.china.huawei.com (7.202.195.90) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 26 Jun 2025 11:41:47 +0800
-Received: from [10.174.177.223] (10.174.177.223) by
- kwepemq200002.china.huawei.com (7.202.195.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 26 Jun 2025 11:41:46 +0800
-Message-ID: <900f28da-83db-4b17-b56b-21acde70e47f@huawei.com>
-Date: Thu, 26 Jun 2025 11:41:45 +0800
+	s=arc-20240116; t=1750914155; c=relaxed/simple;
+	bh=NH4j2FqqJw6bDqDteI6k4MIVpp4cPtz23hroizXPlvg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=PCbe2tKSE5DQevg3LzqdhKAdfBLVtesSnEjcO7dSLHBPTPp4kXbEW+daNke1RDVx7xVRzANHBpLwz5kgoD+HSFe5KCzG92MCpLVZpBd6FpTZ1qWxQ8pL4bOH2xdK1mKr2WmjOVcm6aM1UA87Ay9oRMOqcr80vNMqDRYFI11beYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bcpcWR5M; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7424ccbef4eso673579b3a.2;
+        Wed, 25 Jun 2025 22:02:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1750914153; x=1751518953; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pAbqyCTcegVpKrpjqoB86gZ0JnTtn6KDYt9zM32bdZE=;
+        b=bcpcWR5M3AbwF3cSEch97CJTX+bv9Idx/fahmsQMiMUPiOWPIiNAqLhydxW0eqPXAB
+         Jk3KrtI1fHjmklEMzcb6cOW7sr2Vq5wVeNnOIkZYn01Bb+3j6xxzilFtD7raA9UNeW6R
+         Tj4ByjicGgUd2/nk6IHAnTKFgPAqccK4EYVY+Ghclp1XjuZY1MmvKBMfTdu7+oxYeJ7s
+         AiyCRWELRD1jpAbaoYoMWopDrbcgb561dic5yMAA8n/NwgU1pMRkL8QbJFwm5mM/Fl22
+         EJf2bf3sW/hIp4pYlKE4cTWEjwtaMn2H1xM8OEYAabfXfVgfAQozJYZUF6UM1bjbubDB
+         W4+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750914153; x=1751518953;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pAbqyCTcegVpKrpjqoB86gZ0JnTtn6KDYt9zM32bdZE=;
+        b=Tot2/1cxsPgQJVuaSkq9Ar1WjEZWl5bFmZTbzSXFQah+sOlowRixebXXbldsUlRznN
+         Cl3yvoyyJHWrOom2Bw6cc/tLiMkRqmhhxWYk+LA1T6DzXlboo8dzDfCTIAXUeFK2draq
+         1gTUbBcLrUvFo8DwrQftSjC7ebE26lYogF5XxPC2ZAYsErNf6I+BpP5m0rf7BypgWsjf
+         MmO4xmN4TMeuBiMflMVMaTUVAtUStPCiURaMABe+rl+kCC3wQaG/kwGsKB7E7JRHbiYN
+         GjylCnEHCBx911P3krB8wv9/1Qdy+/MotmZNgwTdJQZs6nemIYIVMMc/TCt/2C3ziBs9
+         qj1w==
+X-Forwarded-Encrypted: i=1; AJvYcCUDTMroJWp3XTDeYH/dyEYV1zmEBYjyiMGuaxJlHcEC4ApS9g8nbW/YeSxxjs+W6Hl5gT1s9iEK@vger.kernel.org, AJvYcCUhWlZxPqY5+QfuFNrL2KQHrtacYZibe/BvKztwNRJGi/bIODkV0GbJ60Oxhg3zn774G0jNf/xK+IsLG4eL@vger.kernel.org, AJvYcCWBc+Lc0zpMMtO7WhtgTDbqwxt/J6CRsgizCHIoYEVJjldihy72p4H5n1pl2qGTtrkfJzICZ6WbE2LNxBYc@vger.kernel.org, AJvYcCWrUy3fYqkfNP/9XAkjFYjfJ6lybQZGGtKSXqYZxeQe5F5x1oiD4Dbw6daWQtiGQiCwaR4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQh9UfwXUscZ5QAah/XFMaeHlp0tONeOGhosGBNOY9IgB6ZtTK
+	r2QqCwLou3JufIYh529j7p6zbWgQ9zk4pZ6gwcVYy8/Pk4byugkgkaJS
+X-Gm-Gg: ASbGncvkk+RBb0biR2kkSqcDvtAJ0Wg/2McPmCTODubMmKFBy4P8O90Hj29vfHEYA8S
+	m5/f4Xt/C0YBMfa1V1gZrRgotYpFMjKBbaAlmUXy5uxBL92Y9seR+FwhQtP0lrHR+anO3cZo5Tw
+	vV8kyZrBTNEqfJzLdAm05bFyd/3HF4VVjC4vJxBiE+D2I5+M88CeTIqAKIt1MnoiRuofkYMFJIW
+	eSu3yRoCQOQHjoyeEUNwQoQcatRAIBTSmCuqHmWg/hT6Jj7YVjMfcaHJGftqgl1NX/KgGcEfIm6
+	3ng8RbDGfKGSEB/t5sAF+GZoWh4cT1xkQwa7yaQypkzSWQ1RCI7lqlyh8cPhurFHyQrHKTCKTMJ
+	JGSBIfRzv
+X-Google-Smtp-Source: AGHT+IGX8J1VxZS2sFcA0G08BiW/FQ1pEDJzIhrYph3nSUl3wWFtXA7FYdmCcKqPVRcKXEU4f7ucWw==
+X-Received: by 2002:a05:6300:4041:b0:220:3ab2:b50e with SMTP id adf61e73a8af0-2207f154d7cmr9460458637.6.1750914152614;
+        Wed, 25 Jun 2025 22:02:32 -0700 (PDT)
+Received: from devant.antgroup-inc.local ([47.89.83.0])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-749b5e211d1sm5842808b3a.44.2025.06.25.22.02.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Jun 2025 22:02:32 -0700 (PDT)
+From: Xuewei Niu <niuxuewei97@gmail.com>
+X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+To: sgarzare@redhat.com
+Cc: davem@davemloft.net,
+	decui@microsoft.com,
+	fupan.lfp@antgroup.com,
+	haiyangz@microsoft.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	kys@microsoft.com,
+	leonardi@redhat.com,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	netdev@vger.kernel.org,
+	niuxuewei.nxw@antgroup.com,
+	niuxuewei97@gmail.com,
+	pabeni@redhat.com,
+	stefanha@redhat.com,
+	virtualization@lists.linux.dev,
+	wei.liu@kernel.org,
+	xuanzhuo@linux.alibaba.com
+Subject: Re: [PATCH net-next v3 1/3] vsock: Add support for SIOCINQ ioctl
+Date: Thu, 26 Jun 2025 13:02:19 +0800
+Message-Id: <20250626050219.1847316-1-niuxuewei.nxw@antgroup.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <wgyxcpcsnpsta65q4n7pekw2hbedrbzqgtevkzqaqkjrqfjlyo@6jod5pw75lyf>
+References: <wgyxcpcsnpsta65q4n7pekw2hbedrbzqgtevkzqaqkjrqfjlyo@6jod5pw75lyf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: vlan: fix VLAN 0 refcount imbalance of toggling
- filtering during runtime
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<horms@kernel.org>, <jiri@resnulli.us>, <oscmaes92@gmail.com>,
-	<linux@treblig.org>, <pedro.netdev@dondevamos.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <yuehaibing@huawei.com>,
-	<zhangchangzhong@huawei.com>
-References: <20250623113008.695446-1-dongchenchen2@huawei.com>
- <20250624174252.7fbd3dbe@kernel.org>
-From: "dongchenchen (A)" <dongchenchen2@huawei.com>
-In-Reply-To: <20250624174252.7fbd3dbe@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemq200002.china.huawei.com (7.202.195.90)
 
+> On Wed, Jun 25, 2025 at 08:03:00AM +0000, Dexuan Cui wrote:
+> >> From: Stefano Garzarella <sgarzare@redhat.com>
+> >> Sent: Tuesday, June 17, 2025 7:39 AM
+> >>  ...
+> >> Now looks better to me, I just checked transports: vmci and virtio/vhost
+> >> returns what we want, but for hyperv we have:
+> >>
+> >> 	static s64 hvs_stream_has_data(struct vsock_sock *vsk)
+> >> 	{
+> >> 		struct hvsock *hvs = vsk->trans;
+> >> 		s64 ret;
+> >>
+> >> 		if (hvs->recv_data_len > 0)
+> >> 			return 1;
+> >>
+> >> @Hyper-v maintainers: do you know why we don't return `recv_data_len`?
+> >
+> >Sorry for the late response!  This is the complete code of the function:
+> >
+> >static s64 hvs_stream_has_data(struct vsock_sock *vsk)
+> >{
+> >        struct hvsock *hvs = vsk->trans;
+> >        s64 ret;
+> >
+> >        if (hvs->recv_data_len > 0)
+> >                return 1;
+> >
+> >        switch (hvs_channel_readable_payload(hvs->chan)) {
+> >        case 1:
+> >                ret = 1;
+> >                break;
+> >        case 0:
+> >                vsk->peer_shutdown |= SEND_SHUTDOWN;
+> >                ret = 0;
+> >                break;
+> >        default: /* -1 */
+> >                ret = 0;
+> >                break;
+> >        }
+> >
+> >        return ret;
+> >}
+> >
+> >If (hvs->recv_data_len > 0), I think we can return hvs->recv_data_len here.
+> >
+> >If hvs->recv_data_len is 0, and hvs_channel_readable_payload(hvs->chan)
+> >returns 1, we should not return hvs->recv_data_len (which is 0 here), 
+> >and it's
+> >not very easy to find how many bytes of payload in total is available right now:
+> >each host-to-guest "packet" in the VMBus channel ringbuffer has a header
+> >(which is not part of the payload data) and a trailing padding field, and we
+> >would have to iterate on all the "packets" (or at least the next
+> >"packet"?) to find the exact bytes of pending payload. Please see
+> >hvs_stream_dequeue() for details.
+> >
+> >Ideally hvs_stream_has_data() should return the exact length of pending
+> >readable payload, but when the hv_sock code was written in 2017,
+> >vsock_stream_has_data() -> ... -> hvs_stream_has_data() basically only needs
+> >to know whether there is any data or not, i.e. it's kind of a boolean variable, so
+> >hvs_stream_has_data() was written to return 1 or 0 for simplicity. :-)
+> 
+> Yeah, I see, thanks for the details! :-)
+> 
+> >
+> >I can post the patch below (not tested yet) to fix hvs_stream_has_data() by
+> >returning the payload length of the next single "packet".  Does it look good
+> >to you?
+> 
+> Yep, LGTM! Can be a best effort IMO.
+> 
+> Maybe when you have it tested, post it here as proper patch, and Xuewei 
+> can include it in the next version of this series (of course with you as 
+> author, etc.). In this way will be easy to test/merge, since they are 
+> related.
+> 
+> @Xuewei @Dexuan Is it okay for you?
 
-> On Mon, 23 Jun 2025 19:30:08 +0800 Dong Chenchen wrote:
->> $ ip link add bond0 type bond mode 0
->> $ ip link add link bond0 name vlan0 type vlan id 0 protocol 802.1q
->> $ ethtool -K bond0 rx-vlan-filter off
->> $ ifconfig bond0 up
->> $ ethtool -K bond0 rx-vlan-filter on
->> $ ifconfig bond0 down
->> $ ifconfig bond0 up
->> $ ip link del vlan0
+Yeah, sounds good to me!
 
-Hi, Jakub
-Thanks for your review!
+Thanks,
+Xuewei
 
-> Please try to figure out the reasonable combinations in which we can
-> change the flags and bring the device up and down. Create a selftest
-> in bash and add it under tools/testing/selftests/net
-
-selftest patch will be added in v2.
-
->> diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
->> index 06908e37c3d9..6e01ece0a95c 100644
->> --- a/net/8021q/vlan.c
->> +++ b/net/8021q/vlan.c
->> @@ -504,12 +504,21 @@ static int vlan_device_event(struct notifier_block *unused, unsigned long event,
->>   		break;
->>   
->>   	case NETDEV_CVLAN_FILTER_PUSH_INFO:
->> +		flgs = dev_get_flags(dev);
-> Why call dev_get_flags()? You can test dev->flags & IFF_UP directly
-
-Yes, there is no need to use this function, I will modify it in v2
-
->> +		if (flgs & IFF_UP) {
->> +			pr_info("adding VLAN 0 to HW filter on device %s\n",
->> +				dev->name);
->> +			vlan_vid_add(dev, htons(ETH_P_8021Q), 0);
-> Not sure if this works always, because if we have no vlan at all when
-> the device comes up vlan_info will be NULL and we won't even get here.
->
-> IIUC adding vlan 0 has to be handled early, where UP is handled.
-
-Yes, that's right.
-
-the sequence as below can still trigger the issue:
-
-$ ip link add bond0 type bond mode 0
-$ ethtool -K bond0 rx-vlan-filter off
-$ ifconfig bond0 up
-$ ethtool -K bond0 rx-vlan-filter on
-$ ip link add link bond0 name vlan0 type vlan id 0 protocol 802.1q
-$ ifconfig bond0 down
-$ ifconfig bond0 up
-$ ip link del vlan0
-
-maybe we can fix it by:
-
-diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
-index 6e01ece0a95c..262f8d3f06ef 100644
---- a/net/8021q/vlan.c
-+++ b/net/8021q/vlan.c
-@@ -378,14 +378,18 @@ static int vlan_device_event(struct notifier_block *unused, unsigned long event,
-              return notifier_from_errno(err);
-      }
-  
--    if ((event == NETDEV_UP) &&
--        (dev->features & NETIF_F_HW_VLAN_CTAG_FILTER)) {
-+    if (((event == NETDEV_UP) &&
-+        (dev->features & NETIF_F_HW_VLAN_CTAG_FILTER)) ||
-+        (event == NETDEV_CVLAN_FILTER_PUSH_INFO &&
-+        (dev->flags & IFF_UP))) {
-          pr_info("adding VLAN 0 to HW filter on device %s\n",
-              dev->name);
-          vlan_vid_add(dev, htons(ETH_P_8021Q), 0);
-      }
--    if (event == NETDEV_DOWN &&
--        (dev->features & NETIF_F_HW_VLAN_CTAG_FILTER))
-+    if ((event == NETDEV_DOWN &&
-+        (dev->features & NETIF_F_HW_VLAN_CTAG_FILTER)) ||
-+        (event == NETDEV_CVLAN_FILTER_DROP_INFO &&
-+        (dev->flags & IFF_UP)))
-          vlan_vid_del(dev, htons(ETH_P_8021Q), 0);
-  
-     vlan_info = rtnl_dereference(dev->vlan_info);
-
-------
-Best regards
-Dong Chenchen
-
->> +		}
->>   		err = vlan_filter_push_vids(vlan_info, htons(ETH_P_8021Q));
->>   		if (err)
->>   			return notifier_from_errno(err);
->>   		break;
->>   
->>   	case NETDEV_CVLAN_FILTER_DROP_INFO:
->> +		flgs = dev_get_flags(dev);
->> +		if (flgs & IFF_UP)
->> +			vlan_vid_del(dev, htons(ETH_P_8021Q), 0);
->>   		vlan_filter_drop_vids(vlan_info, htons(ETH_P_8021Q));
+> Thanks,
+> Stefano
+> 
+> >
+> >--- a/net/vmw_vsock/hyperv_transport.c
+> >+++ b/net/vmw_vsock/hyperv_transport.c
+> >@@ -694,15 +694,25 @@ static ssize_t hvs_stream_enqueue(struct vsock_sock *vsk, struct msghdr *msg,
+> > static s64 hvs_stream_has_data(struct vsock_sock *vsk)
+> > {
+> >        struct hvsock *hvs = vsk->trans;
+> >+       bool need_refill = !hvs->recv_desc;
+> >        s64 ret;
+> >
+> >        if (hvs->recv_data_len > 0)
+> >-               return 1;
+> >+               return hvs->recv_data_len;
+> >
+> >        switch (hvs_channel_readable_payload(hvs->chan)) {
+> >        case 1:
+> >-               ret = 1;
+> >-               break;
+> >+               if (!need_refill)
+> >+                       return -EIO;
+> >+
+> >+               hvs->recv_desc = hv_pkt_iter_first(hvs->chan);
+> >+               if (!hvs->recv_desc)
+> >+                       return -ENOBUFS;
+> >+
+> >+               ret = hvs_update_recv_data(hvs);
+> >+               if (ret)
+> >+                       return ret;
+> >+               return hvs->recv_data_len;
+> >        case 0:
+> >                vsk->peer_shutdown |= SEND_SHUTDOWN;
+> >                ret = 0;
+> >
+> >Thanks,
+> >Dexuan
 
