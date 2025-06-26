@@ -1,101 +1,112 @@
-Return-Path: <netdev+bounces-201694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A714AEA92C
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 23:59:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E7B2AEA94F
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 00:03:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02EF6642DCA
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 21:59:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C49A41C41494
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 22:03:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC807265621;
-	Thu, 26 Jun 2025 21:59:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D992609C8;
+	Thu, 26 Jun 2025 22:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pGU4PPo+"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="X6Rh22Wo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7ACF2620C4
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 21:59:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5861DEFE9;
+	Thu, 26 Jun 2025 22:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750975180; cv=none; b=EFf2gIEfFflVk/Ia4geouAb6oOpvHiGkFrj/m47sdhpLWdDv9K2rqbSpBUostABKQJO9a5xUpbvgqD4mX70alUEFJeBwallBpOXPCSiv7R5Jp7Qn1gJSYnCKtsaXx/cwkGjgLtVCoj4PvMlXoGH8z2vSxrxY1WbzhmFFG4i8r0g=
+	t=1750975389; cv=none; b=ZE6X4V4CM2C2ruP2Xjc59OfCdm1su1s8lK23xSEz+NiAtfDLjv/pk/gI7AZk/ORDFHf062X4A5xTD/UAsRRI6AT73pFPekJqWMMJv4af1mQBo1XLJDZqs22G2iZCU8HKXWt/J/UeVy68QWSHS7NMfEt1HOszpw+4vHAw4fTCkZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750975180; c=relaxed/simple;
-	bh=aW3OKh65xmX1rIQAXMBt9nyxtvoln/xu4ovPWUjAai8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BOje1PkdtETIPRYQGZAD+O4oEWPfTno+AMaLCjsUQIHk7ec4xkbrQrE8B9OB6ycQiV+oqpoUdkeONerEu6+xHNcFMmCIpIcUL+H/ScJ7Y5qpFkuXhXK4RDdDrKxjI1rqJmeJNA0u1+4uPAMPFCb2kyEhqaIQSZNV0kE3oHrDtFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pGU4PPo+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4694BC4CEEB;
-	Thu, 26 Jun 2025 21:59:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750975180;
-	bh=aW3OKh65xmX1rIQAXMBt9nyxtvoln/xu4ovPWUjAai8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pGU4PPo+Pmja2Tc3ti+Bs/pxqrDsUTHzZBdPOLJOjFBnDFGBAX4AasYf67Kripraw
-	 ZS/ACz8F5Fir52QkhbvkJA7NIed5uIyP0FZYEEhoAqKQUs9EPgr9npQoFmT8c4zTTG
-	 G/+3uMBI7a7K/5QjbXJWvRtL4gQZ98I4Jj246s+UOFsXCWQY7OzmHhS+4CyCz7vmL4
-	 RAwOVmbvfZhjFXyz4benEtFLY/fKqrL32LDZSB5hAP5qSwe2GvnMx2o3wRXYFpgouu
-	 4W8CaJHU48qedrMcDxLjszD3mRYHP5R4Q860gBjuKj7Kehokq193uOfq37PpJ7W8KP
-	 WR4ibb2MReyHw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC643A40FCB;
-	Thu, 26 Jun 2025 22:00:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1750975389; c=relaxed/simple;
+	bh=Zz3TomaGnvO04qN3clsGVUtRn6+iXAtAnZgaeVNMRbE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ol+ex3+NP/CqJcXVUzIhMv4hY6+qjt9GPfA7tEmayEvqC/Qpi12Jvzc+uTrbdulD+N2skResv7TrJwBMmzEdt5peiRYdwOaDOhwCmNnURLfGv3OBe6SCUy4FIK6jez16PyYv0kOkxw5em3jlevK9dxR+pSc/HVTSP1h1JIpndFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=X6Rh22Wo; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description;
+	bh=WFlQDU+VohmHIo9h8FaKE3p3VB4fZz3wWW+SCs2CefQ=; b=X6Rh22WouTtz+wX0RaCmLzXTK9
+	EhvrrSmKL4GG8o1zLrSR7zhwz9q2Ow4J1XPCgE8DYP4vggAtbAqIPFlaKG0sY/Aj6oDU+9mPregrb
+	AXwQipEcAnBpKDHotH9U911o1JMYFJv6RhVYA/hq+Uh+dGj2Z01MsohdKgW9JxYSywXG9h5XKeIIM
+	B2KAGxSu2EhTOGaykyOO/J3TIp0doK7iD6fjcgJICT3cYmT+6DCuDpsBU9F+Il1RjTwa39w0fwFpk
+	lSogVLqxPZiUriVCHZHOCCCJ3FIoTCnGP7hj/uZ5GMw7yeJUG9+E7H9tA3e5e33HxVtD08jr3Qu/j
+	wHUR3jWg==;
+Received: from [50.53.25.54] (helo=[192.168.254.17])
+	by casper.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uUugG-0000000Cbf7-4Bro;
+	Thu, 26 Jun 2025 22:02:53 +0000
+Message-ID: <7553d675-622a-4eb6-a216-2eff2f5fe3b0@infradead.org>
+Date: Thu, 26 Jun 2025 15:02:46 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2] bond: fix stack smash in xstats
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175097520650.1346572.7068115127244556855.git-patchwork-notify@kernel.org>
-Date: Thu, 26 Jun 2025 22:00:06 +0000
-References: <20250626140124.39522-2-stephen@networkplumber.org>
-In-Reply-To: <20250626140124.39522-2-stephen@networkplumber.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, zhongxuan2@huawei.com, nikolay@cumulusnetworks.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 02/14] docs: networking: Add PPE driver
+ documentation for Qualcomm IPQ9574 SoC
+To: Luo Jie <quic_luoj@quicinc.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Lei Wei <quic_leiwei@quicinc.com>,
+ Suruchi Agarwal <quic_suruchia@quicinc.com>,
+ Pavithra R <quic_pavir@quicinc.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>
+Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org,
+ quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com
+References: <20250626-qcom_ipq_ppe-v5-0-95bdc6b8f6ff@quicinc.com>
+ <20250626-qcom_ipq_ppe-v5-2-95bdc6b8f6ff@quicinc.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20250626-qcom_ipq_ppe-v5-2-95bdc6b8f6ff@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
+Hi--
 
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+On 6/26/25 7:31 AM, Luo Jie wrote:
+> +Below is a simplified hardware diagram of IPQ9574 SoC which includes the PPE engine and
+> +other blocks which are in the SoC but outside the PPE engine. These blocks work together
+> +to enable the Ethernet for the IPQ SoC::
+> +
 
-On Thu, 26 Jun 2025 07:01:25 -0700 you wrote:
-> Building with stack smashing detection finds an off by one
-> in the bond xstats attribute parsing.
-> 
-> $ ip link xstats type bond dev bond0
-> [Thread debugging using libthread_db enabled]
-> Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
-> bond0
->                     LACPDU Rx 0
->                     LACPDU Tx 0
->                     LACPDU Unknown type Rx 0
->                     LACPDU Illegal Rx 0
->                     Marker Rx 0
->                     Marker Tx 0
->                     Marker response Rx 0
->                     Marker response Tx 0
->                     Marker unknown type Rx 0
-> *** stack smashing detected ***: terminated
-> 
-> [...]
+[snip]
 
-Here is the summary with links:
-  - [iproute2] bond: fix stack smash in xstats
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=ede5e0b67c13
+> + | |              +-------------------------+ +---------+ +---------+         | |
+> + | |125/312.5M clk|       (PCS0)            | | (PCS1)  | | (PCS2)  | pcs ops | |
+> + | +--------------+       UNIPHY0           | | UNIPHY1 | | UNIPHY2 |<--------+ |
+> + +--------------->|                         | |         | |         |           |
+> + | 31.25M ref clk +-------------------------+ +---------+ +---------+           |
+> + |                   |     |      |      |          |          |                |
+> + |              +-----------------------------------------------------+         |
+> + |25/50M ref clk| +-------------------------+    +------+   +------+  | link    |
+> + +------------->| |      QUAD PHY           |    | PHY4 |   | PHY5 |  |---------+
+> +                | +-------------------------+    +------+   +------+  | change
+> +                |                                                     |
+> +                |                       MDIO bus                      |
+> +                +-----------------------------------------------------+
 
-You are awesome, thank you!
+Does the 'M' on the clk signals on the left side mean megahertz (MHz)?
+I guess that it does, but it was a little confusing when I first saw it.
+
+Thanks.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+~Randy
 
 
