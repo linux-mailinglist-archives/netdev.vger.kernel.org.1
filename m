@@ -1,232 +1,271 @@
-Return-Path: <netdev+bounces-201401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C94D0AE9503
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 07:02:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 927FAAE9511
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 07:11:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C8141C409D3
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 05:02:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F9E51C26FC6
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 05:12:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 182B01CEEBE;
-	Thu, 26 Jun 2025 05:02:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcpcWR5M"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89541DE8BE;
+	Thu, 26 Jun 2025 05:11:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3ED2F1FF6;
-	Thu, 26 Jun 2025 05:02:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810DC38FB9
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 05:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750914155; cv=none; b=f7/hRX9QOkuf1+/efGZF0AUSEqvPsUumb0W0/8NnmwDqJbq+dE5Gfdrn59SIPMACHfpz+6IfJp506yncXGyveS/h0hPnr5NozpQVvFLmSa2vDqkIdD01dhbAcNtQkAjtO+1GZ0hTWgikIXQyRWp/9ZZebdEWUuJsWhHur15gZM4=
+	t=1750914712; cv=none; b=JEo3biYmkfq8DDZt7XMU7ZyhB7W5CeQsHnm04qzBWsTHaC/3cW+6VMNO8MZscs0W8N8VLMrUmGcAG1orfOhq2waiTKgtYeVTSYnC1U1xDQJGm5rEbs5+HQlxESSVCnCa8UPNpAuDXLM13ALIq7kNZo7BhkyRhJVWdfeumpQdpKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750914155; c=relaxed/simple;
-	bh=NH4j2FqqJw6bDqDteI6k4MIVpp4cPtz23hroizXPlvg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PCbe2tKSE5DQevg3LzqdhKAdfBLVtesSnEjcO7dSLHBPTPp4kXbEW+daNke1RDVx7xVRzANHBpLwz5kgoD+HSFe5KCzG92MCpLVZpBd6FpTZ1qWxQ8pL4bOH2xdK1mKr2WmjOVcm6aM1UA87Ay9oRMOqcr80vNMqDRYFI11beYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bcpcWR5M; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7424ccbef4eso673579b3a.2;
-        Wed, 25 Jun 2025 22:02:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750914153; x=1751518953; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pAbqyCTcegVpKrpjqoB86gZ0JnTtn6KDYt9zM32bdZE=;
-        b=bcpcWR5M3AbwF3cSEch97CJTX+bv9Idx/fahmsQMiMUPiOWPIiNAqLhydxW0eqPXAB
-         Jk3KrtI1fHjmklEMzcb6cOW7sr2Vq5wVeNnOIkZYn01Bb+3j6xxzilFtD7raA9UNeW6R
-         Tj4ByjicGgUd2/nk6IHAnTKFgPAqccK4EYVY+Ghclp1XjuZY1MmvKBMfTdu7+oxYeJ7s
-         AiyCRWELRD1jpAbaoYoMWopDrbcgb561dic5yMAA8n/NwgU1pMRkL8QbJFwm5mM/Fl22
-         EJf2bf3sW/hIp4pYlKE4cTWEjwtaMn2H1xM8OEYAabfXfVgfAQozJYZUF6UM1bjbubDB
-         W4+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750914153; x=1751518953;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pAbqyCTcegVpKrpjqoB86gZ0JnTtn6KDYt9zM32bdZE=;
-        b=Tot2/1cxsPgQJVuaSkq9Ar1WjEZWl5bFmZTbzSXFQah+sOlowRixebXXbldsUlRznN
-         Cl3yvoyyJHWrOom2Bw6cc/tLiMkRqmhhxWYk+LA1T6DzXlboo8dzDfCTIAXUeFK2draq
-         1gTUbBcLrUvFo8DwrQftSjC7ebE26lYogF5XxPC2ZAYsErNf6I+BpP5m0rf7BypgWsjf
-         MmO4xmN4TMeuBiMflMVMaTUVAtUStPCiURaMABe+rl+kCC3wQaG/kwGsKB7E7JRHbiYN
-         GjylCnEHCBx911P3krB8wv9/1Qdy+/MotmZNgwTdJQZs6nemIYIVMMc/TCt/2C3ziBs9
-         qj1w==
-X-Forwarded-Encrypted: i=1; AJvYcCUDTMroJWp3XTDeYH/dyEYV1zmEBYjyiMGuaxJlHcEC4ApS9g8nbW/YeSxxjs+W6Hl5gT1s9iEK@vger.kernel.org, AJvYcCUhWlZxPqY5+QfuFNrL2KQHrtacYZibe/BvKztwNRJGi/bIODkV0GbJ60Oxhg3zn774G0jNf/xK+IsLG4eL@vger.kernel.org, AJvYcCWBc+Lc0zpMMtO7WhtgTDbqwxt/J6CRsgizCHIoYEVJjldihy72p4H5n1pl2qGTtrkfJzICZ6WbE2LNxBYc@vger.kernel.org, AJvYcCWrUy3fYqkfNP/9XAkjFYjfJ6lybQZGGtKSXqYZxeQe5F5x1oiD4Dbw6daWQtiGQiCwaR4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQh9UfwXUscZ5QAah/XFMaeHlp0tONeOGhosGBNOY9IgB6ZtTK
-	r2QqCwLou3JufIYh529j7p6zbWgQ9zk4pZ6gwcVYy8/Pk4byugkgkaJS
-X-Gm-Gg: ASbGncvkk+RBb0biR2kkSqcDvtAJ0Wg/2McPmCTODubMmKFBy4P8O90Hj29vfHEYA8S
-	m5/f4Xt/C0YBMfa1V1gZrRgotYpFMjKBbaAlmUXy5uxBL92Y9seR+FwhQtP0lrHR+anO3cZo5Tw
-	vV8kyZrBTNEqfJzLdAm05bFyd/3HF4VVjC4vJxBiE+D2I5+M88CeTIqAKIt1MnoiRuofkYMFJIW
-	eSu3yRoCQOQHjoyeEUNwQoQcatRAIBTSmCuqHmWg/hT6Jj7YVjMfcaHJGftqgl1NX/KgGcEfIm6
-	3ng8RbDGfKGSEB/t5sAF+GZoWh4cT1xkQwa7yaQypkzSWQ1RCI7lqlyh8cPhurFHyQrHKTCKTMJ
-	JGSBIfRzv
-X-Google-Smtp-Source: AGHT+IGX8J1VxZS2sFcA0G08BiW/FQ1pEDJzIhrYph3nSUl3wWFtXA7FYdmCcKqPVRcKXEU4f7ucWw==
-X-Received: by 2002:a05:6300:4041:b0:220:3ab2:b50e with SMTP id adf61e73a8af0-2207f154d7cmr9460458637.6.1750914152614;
-        Wed, 25 Jun 2025 22:02:32 -0700 (PDT)
-Received: from devant.antgroup-inc.local ([47.89.83.0])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-749b5e211d1sm5842808b3a.44.2025.06.25.22.02.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 22:02:32 -0700 (PDT)
-From: Xuewei Niu <niuxuewei97@gmail.com>
-X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
-To: sgarzare@redhat.com
-Cc: davem@davemloft.net,
-	decui@microsoft.com,
-	fupan.lfp@antgroup.com,
-	haiyangz@microsoft.com,
-	jasowang@redhat.com,
-	kvm@vger.kernel.org,
-	kys@microsoft.com,
-	leonardi@redhat.com,
-	linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mst@redhat.com,
-	netdev@vger.kernel.org,
-	niuxuewei.nxw@antgroup.com,
-	niuxuewei97@gmail.com,
-	pabeni@redhat.com,
-	stefanha@redhat.com,
-	virtualization@lists.linux.dev,
-	wei.liu@kernel.org,
-	xuanzhuo@linux.alibaba.com
-Subject: Re: [PATCH net-next v3 1/3] vsock: Add support for SIOCINQ ioctl
-Date: Thu, 26 Jun 2025 13:02:19 +0800
-Message-Id: <20250626050219.1847316-1-niuxuewei.nxw@antgroup.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <wgyxcpcsnpsta65q4n7pekw2hbedrbzqgtevkzqaqkjrqfjlyo@6jod5pw75lyf>
-References: <wgyxcpcsnpsta65q4n7pekw2hbedrbzqgtevkzqaqkjrqfjlyo@6jod5pw75lyf>
+	s=arc-20240116; t=1750914712; c=relaxed/simple;
+	bh=yiyJi7OAXIRkgvzmslOVi4SXkRGJb0a6ChnFNVnTl7c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=esIuDY5bO/Q7fIFSjYIBpEDFhOnt6xjtFT+hcqO+FbcEb1RxsfMzTpFymueV7bg/g9xqfFU9l7JBvvOYq34F7IQO+FhT7bje35wApWD11pfKwm192I/7bGDN6NWaJ2WjUGPZuWWd725lwo5oI+EzX9N9qHCpbH2yQNLC8dHntvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uUetf-0007Lc-LV; Thu, 26 Jun 2025 07:11:39 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uUete-005Ofk-0K;
+	Thu, 26 Jun 2025 07:11:38 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uUetd-001Sfn-38;
+	Thu, 26 Jun 2025 07:11:37 +0200
+Date: Thu, 26 Jun 2025 07:11:37 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Lucas Stach <l.stach@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de, Russell King <linux@armlinux.org.uk>
+Subject: Re: [PATCH net-next v2 1/1] phy: micrel: add Signal Quality
+ Indicator (SQI) support for KSZ9477 switch PHYs
+Message-ID: <aFzWiZ9ohbE_Unuz@pengutronix.de>
+References: <20250625124127.4176960-1-o.rempel@pengutronix.de>
+ <5a094e3b95f1219435056d87ca4f643398bcb1d3.camel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <5a094e3b95f1219435056d87ca4f643398bcb1d3.camel@pengutronix.de>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-> On Wed, Jun 25, 2025 at 08:03:00AM +0000, Dexuan Cui wrote:
-> >> From: Stefano Garzarella <sgarzare@redhat.com>
-> >> Sent: Tuesday, June 17, 2025 7:39 AM
-> >>  ...
-> >> Now looks better to me, I just checked transports: vmci and virtio/vhost
-> >> returns what we want, but for hyperv we have:
-> >>
-> >> 	static s64 hvs_stream_has_data(struct vsock_sock *vsk)
-> >> 	{
-> >> 		struct hvsock *hvs = vsk->trans;
-> >> 		s64 ret;
-> >>
-> >> 		if (hvs->recv_data_len > 0)
-> >> 			return 1;
-> >>
-> >> @Hyper-v maintainers: do you know why we don't return `recv_data_len`?
-> >
-> >Sorry for the late response!  This is the complete code of the function:
-> >
-> >static s64 hvs_stream_has_data(struct vsock_sock *vsk)
-> >{
-> >        struct hvsock *hvs = vsk->trans;
-> >        s64 ret;
-> >
-> >        if (hvs->recv_data_len > 0)
-> >                return 1;
-> >
-> >        switch (hvs_channel_readable_payload(hvs->chan)) {
-> >        case 1:
-> >                ret = 1;
-> >                break;
-> >        case 0:
-> >                vsk->peer_shutdown |= SEND_SHUTDOWN;
-> >                ret = 0;
-> >                break;
-> >        default: /* -1 */
-> >                ret = 0;
-> >                break;
-> >        }
-> >
-> >        return ret;
-> >}
-> >
-> >If (hvs->recv_data_len > 0), I think we can return hvs->recv_data_len here.
-> >
-> >If hvs->recv_data_len is 0, and hvs_channel_readable_payload(hvs->chan)
-> >returns 1, we should not return hvs->recv_data_len (which is 0 here), 
-> >and it's
-> >not very easy to find how many bytes of payload in total is available right now:
-> >each host-to-guest "packet" in the VMBus channel ringbuffer has a header
-> >(which is not part of the payload data) and a trailing padding field, and we
-> >would have to iterate on all the "packets" (or at least the next
-> >"packet"?) to find the exact bytes of pending payload. Please see
-> >hvs_stream_dequeue() for details.
-> >
-> >Ideally hvs_stream_has_data() should return the exact length of pending
-> >readable payload, but when the hv_sock code was written in 2017,
-> >vsock_stream_has_data() -> ... -> hvs_stream_has_data() basically only needs
-> >to know whether there is any data or not, i.e. it's kind of a boolean variable, so
-> >hvs_stream_has_data() was written to return 1 or 0 for simplicity. :-)
+On Wed, Jun 25, 2025 at 08:06:32PM +0200, Lucas Stach wrote:
+> Hi Oleksij,
 > 
-> Yeah, I see, thanks for the details! :-)
+> Am Mittwoch, dem 25.06.2025 um 14:41 +0200 schrieb Oleksij Rempel:
+> > Add support for the Signal Quality Index (SQI) feature on KSZ9477 family
+> > switches. This feature provides a relative measure of receive signal
+> > quality.
+> > 
+> > The KSZ9477 PHY provides four separate SQI values for a 1000BASE-T link,
+> > one for each differential pair (Channel A-D). Since the current get_sqi
+> > UAPI only supports returning a single value per port, this
+> > implementation reads the SQI from Channel A as a representative metric.
 > 
-> >
-> >I can post the patch below (not tested yet) to fix hvs_stream_has_data() by
-> >returning the payload length of the next single "packet".  Does it look good
-> >to you?
-> 
-> Yep, LGTM! Can be a best effort IMO.
-> 
-> Maybe when you have it tested, post it here as proper patch, and Xuewei 
-> can include it in the next version of this series (of course with you as 
-> author, etc.). In this way will be easy to test/merge, since they are 
-> related.
-> 
-> @Xuewei @Dexuan Is it okay for you?
+> I wonder if it wouldn't be more useful to report the worst SQI from all
+> the channels instead.
 
-Yeah, sounds good to me!
+It was my first idea too, just to report the worst SQI from all
+channels. But this makes it impossible to report SQI for each pair
+later. If we ever want to support SQI per pair, the current code would
+suddenly start to show only SQI for pair A, not the worst one, so the
+SQI interface would change meaning without warning.
 
-Thanks,
-Xuewei
+There is another problem if we want to extend the SQI UAPI for per-pair
+support: with 100Mbit/s links, we can't know which pair is used. The PHY
+reports SQI only for the RX pair, which can change depending on MDI-X
+resolution, and with auto MDI-X mode, this PHY doesn't tell us which
+pair it is.
 
-> Thanks,
-> Stefano
+That means, at this point, we have hardware which in some modes can't
+provide pair-related information. So, it is better to keep the already
+existing UAPI explicitly per link instead of per pair. This matches the
+current hardware limits and avoids confusion for users and developers.
+If we want per-pair SQI in the future, the API must handle these cases
+clearly.
+
+> > This can be extended to provide per-channel readings once the UAPI is
+> > enhanced for multi-channel support.
+> > 
+> > The hardware provides a raw 7-bit SQI value (0-127), where lower is
+> > better. This raw value is converted to the standard 0-7 scale to provide
+> > a usable, interoperable metric for userspace tools, abstracting away
+> > hardware-specifics. The mapping to the standard 0-7 SQI scale was
+> > determined empirically by injecting a 30MHz sine wave into the receive
+> > pair with a signal generator. It was observed that the link becomes
+> > unstable and drops when the raw SQI value reaches 8. This
+> > implementation is based on these test results.
+> > 
+> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> > ---
+> > changes v2:
+> > - Reword commit message
+> > - Fix SQI value inversion
+> > - Implement an empirically-derived, non-linear mapping to the standard
+> >   0-7 SQI scale
+> > ---
+> >  drivers/net/phy/micrel.c | 124 +++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 124 insertions(+)
+> > 
+> > diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+> > index d0429dc8f561..6422d9a7c09f 100644
+> > --- a/drivers/net/phy/micrel.c
+> > +++ b/drivers/net/phy/micrel.c
+> > @@ -2173,6 +2173,128 @@ static void kszphy_get_phy_stats(struct phy_device *phydev,
+> >  	stats->rx_errors = priv->phy_stats.rx_err_pkt_cnt;
+> >  }
+> >  
+> > +/* Base register for Signal Quality Indicator (SQI) - Channel A
+> > + *
+> > + * MMD Address: MDIO_MMD_PMAPMD (0x01)
+> > + * Register:    0xAC (Channel A)
+> > + * Each channel (pair) has its own register:
+> > + *   Channel A: 0xAC
+> > + *   Channel B: 0xAD
+> > + *   Channel C: 0xAE
+> > + *   Channel D: 0xAF
+> > + */
+> > +#define KSZ9477_MMD_SIGNAL_QUALITY_CHAN_A	0xAC
+> > +
+> > +/* SQI field mask for bits [14:8]
+> > + *
+> > + * SQI indicates relative quality of the signal.
+> > + * A lower value indicates better signal quality.
+> > + */
+> > +#define KSZ9477_MMD_SQI_MASK			GENMASK(14, 8)
+> > +
+> > +#define KSZ9477_SQI_MAX				7
+> > +
+> > +/* Delay between consecutive SQI register reads in microseconds.
+> > + *
+> > + * Reference: KSZ9477S Datasheet DS00002392C, Section 4.1.11 (page 26)
+> > + * The register is updated every 2 µs. Use 3 µs to avoid redundant reads.
+> > + */
+> > +#define KSZ9477_MMD_SQI_READ_DELAY_US		3
+> > +
+> > +/* Number of SQI samples to average for a stable result.
+> > + *
+> > + * Reference: KSZ9477S Datasheet DS00002392C, Section 4.1.11 (page 26)
+> > + * For noisy environments, a minimum of 30–50 readings is recommended.
+> > + */
+> > +#define KSZ9477_SQI_SAMPLE_COUNT		40
+> > +
+> > +/* The hardware SQI register provides a raw value from 0-127, where a lower
+> > + * value indicates better signal quality. However, empirical testing has
+> > + * shown that only the 0-7 range is relevant for a functional link. A raw
+> > + * value of 8 or higher was measured directly before link drop. This aligns
+> > + * with the OPEN Alliance recommendation that SQI=0 should represent the
+> > + * pre-failure state.
+> > + *
+> > + * This table provides a non-linear mapping from the useful raw hardware
+> > + * values (0-7) to the standard 0-7 SQI scale, where higher is better.
+> > + */
+> > +static const u8 ksz_sqi_mapping[] = {
+> > +	7, /* raw 0 -> SQI 7 */
+> > +	7, /* raw 1 -> SQI 7 */
+> > +	6, /* raw 2 -> SQI 6 */
+> > +	5, /* raw 3 -> SQI 5 */
+> > +	4, /* raw 4 -> SQI 4 */
+> > +	3, /* raw 5 -> SQI 3 */
+> > +	2, /* raw 6 -> SQI 2 */
+> > +	1, /* raw 7 -> SQI 1 */
+> > +};
+> > +
+> > +/**
+> > + * kszphy_get_sqi - Read, average, and map Signal Quality Index (SQI)
+> > + * @phydev: the PHY device
+> > + *
+> > + * This function reads and processes the raw Signal Quality Index from the
+> > + * PHY. Based on empirical testing, a raw value of 8 or higher indicates a
+> > + * pre-failure state and is mapped to SQI 0. Raw values from 0-7 are
+> > + * mapped to the standard 0-7 SQI scale via a lookup table.
+> > + *
+> > + * Return: SQI value (0–7), or a negative errno on failure.
+> > + */
+> > +static int kszphy_get_sqi(struct phy_device *phydev)
+> > +{
+> > +	int sum = 0;
+> > +	int i, val, raw_sqi, avg_raw_sqi;
+> > +	u8 channels;
+> > +
+> > +	/* Determine applicable channels based on link speed */
+> > +	if (phydev->speed == SPEED_1000)
+> > +		/* TODO: current SQI API only supports 1 channel. */
+> > +		channels = 1;
+> > +	else if (phydev->speed == SPEED_100)
+> > +		channels = 1;
+> > +	else
+> > +		return -EOPNOTSUPP;
+> > +
+> > +	/*
+> > +	 * Sample and accumulate SQI readings for each pair (currently only one).
+> > +	 *
+> > +	 * Reference: KSZ9477S Datasheet DS00002392C, Section 4.1.11 (page 26)
+> > +	 * - The SQI register is updated every 2 µs.
+> > +	 * - Values may fluctuate significantly, even in low-noise environments.
+> > +	 * - For reliable estimation, average a minimum of 30–50 samples
+> > +	 *   (recommended for noisy environments)
+> > +	 * - In noisy environments, individual readings are highly unreliable.
+> > +	 *
+> > +	 * We use 40 samples per pair with a delay of 3 µs between each
+> > +	 * read to ensure new values are captured (2 µs update interval).
+> > +	 */
+> > +	for (i = 0; i < KSZ9477_SQI_SAMPLE_COUNT; i++) {
+> > +		val = phy_read_mmd(phydev, MDIO_MMD_PMAPMD,
+> > +				   KSZ9477_MMD_SIGNAL_QUALITY_CHAN_A);
+> > +		if (val < 0)
+> > +			return val;
+> > +
+> > +		raw_sqi = FIELD_GET(KSZ9477_MMD_SQI_MASK, val);
+> > +		sum += raw_sqi;
+> > +
+> > +		udelay(KSZ9477_MMD_SQI_READ_DELAY_US);
 > 
-> >
-> >--- a/net/vmw_vsock/hyperv_transport.c
-> >+++ b/net/vmw_vsock/hyperv_transport.c
-> >@@ -694,15 +694,25 @@ static ssize_t hvs_stream_enqueue(struct vsock_sock *vsk, struct msghdr *msg,
-> > static s64 hvs_stream_has_data(struct vsock_sock *vsk)
-> > {
-> >        struct hvsock *hvs = vsk->trans;
-> >+       bool need_refill = !hvs->recv_desc;
-> >        s64 ret;
-> >
-> >        if (hvs->recv_data_len > 0)
-> >-               return 1;
-> >+               return hvs->recv_data_len;
-> >
-> >        switch (hvs_channel_readable_payload(hvs->chan)) {
-> >        case 1:
-> >-               ret = 1;
-> >-               break;
-> >+               if (!need_refill)
-> >+                       return -EIO;
-> >+
-> >+               hvs->recv_desc = hv_pkt_iter_first(hvs->chan);
-> >+               if (!hvs->recv_desc)
-> >+                       return -ENOBUFS;
-> >+
-> >+               ret = hvs_update_recv_data(hvs);
-> >+               if (ret)
-> >+                       return ret;
-> >+               return hvs->recv_data_len;
-> >        case 0:
-> >                vsk->peer_shutdown |= SEND_SHUTDOWN;
-> >                ret = 0;
-> >
-> >Thanks,
-> >Dexuan
+> This ends up spending a sizable amount of time just spinning the CPU to
+> collect the samples for the averaging. Given that only very low values
+> seem to indicate a working link, I wonder how significant the
+> fluctuations in reported link quality are in reality. Is it really
+> worth spending 120us of CPU time to average those values?
+> 
+> Maybe a running average updated with a new sample each time this
+> function is called would be sufficient?
+
+Hm. Good point. I'l try it. We already have proper interface for this
+case :)
+
+Best Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
