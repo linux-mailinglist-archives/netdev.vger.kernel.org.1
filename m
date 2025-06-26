@@ -1,146 +1,147 @@
-Return-Path: <netdev+bounces-201398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F190AE948C
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 05:32:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7914FAE9498
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 05:38:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18B6B3BCEEA
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 03:31:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAB2F5A81CC
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 03:37:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A8C515689A;
-	Thu, 26 Jun 2025 03:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D3091D7984;
+	Thu, 26 Jun 2025 03:38:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ft0CKFTf"
+	dkim=pass (2048-bit key) header.d=freebsd.org header.i=@freebsd.org header.b="JyUFICjq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx2.freebsd.org (mx2.freebsd.org [96.47.72.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD82143C61
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 03:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750908731; cv=none; b=YQjyKtmrx4pd9j4vDM9g3XZQ6ulwVwYbk7S2aW8pbJDPE+B/7Lu/9+I2lSnTIFQfUtW2dAriiGYwmQbYXvHirzlT8r5+stGISQqy2W9ObFHjKE+Z8IiVaaaAD3CGAwzkQN/p575AdSaaDZb0FxahOEs1F5nKm+5T1XV49twKk/Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750908731; c=relaxed/simple;
-	bh=KQQLZPykY0DQhg4C2afSEMhGY2FfRe/jFAwSIUCvE0A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NDYTS6RnPJNss8ewKaWYg/aEBOcjj7pwQThFOJ/MwOcnuyjY40O4WrBH0nOaXTaVXHJ9sXLbKenpdUE3pE/vDHxy1/wNSLWTU6upvILAdn+ohGhEKDGhbpyWHncw9ZB2OMqF/pIBF7094n6Zm9PNz8r1dncoqiJH8o56t5JPUvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ft0CKFTf; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4a7f46f9bb6so4118171cf.3
-        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 20:32:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750908728; x=1751513528; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yAR0KhNmSTLdc5IlLyk3RFNMjr4Z74Gp1ztOJmXzAWY=;
-        b=Ft0CKFTfZ9pf06gHiicScPmwYOyJNDnXBTXfgwOXeR68otILi4uItke38Tt6N1hZE0
-         ZIOS4bcQueekbvUfqgwbMDA6hFwF/nzA6HGVGK6LTYmG9/QSFnL4fGr3rv5TrK7xdXKe
-         ZiOgoUWTPPy9nDiatywPZ2fOhyRnn5xJyzi90RcyMtHG1Fqd9Vgt5gt4KgMr6YozDkrh
-         IeZtr9P4mQeDDA1Dx5RPgfL3nA98R9Zz4YpUQxOvrONDQLH7+vtLYN96iTNiSeg+S7zU
-         J8nOUkQ6e4H1Vuts9yNbsB3tKIU5cgnRvqBh5Lskfc5OEmR/FHLndnflTKFlotJQdR8N
-         kbKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750908728; x=1751513528;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yAR0KhNmSTLdc5IlLyk3RFNMjr4Z74Gp1ztOJmXzAWY=;
-        b=EjjfPqNpY6Qx2UyAgTKgRIrdux0eXUuTp/qQCp8hM7G7wJxY4lxSMQcr4+h4MVQCRo
-         7yUB9kqJ0Nn+8hvVpZ7CX+RMdoQvKV9XEFBQXUErhOoXSkH57PEE6gGy8DHmFCOR1RPY
-         zLV2+apM9ZAyjg3DgKfkpGe7WI1bn67+X1YddYPf2pg6j67p5DDDiUi7RkGETSOev+sS
-         JFxOdBRvwXlouXWWlzmvgrH8HfPakBUEg1ppyVvjNiIN8I/mi9lVrit5egCCHrk9fuNe
-         /xSO35MmyvNJGKaCAP2qY2Ss7X1YF6G8ZFTNKOKm8IcrTay0vi0mUYXLwi6j2iObnbKh
-         r9wA==
-X-Forwarded-Encrypted: i=1; AJvYcCXp5cTRtMl81CoheKltm5dBkgh1+Y9m/HNtyY6tRi6JH9s20XlMuhy1JO1uPpTI0n32R8IyURI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDqtJ+jwoXCleJv8187CzxT/Fk6sHFfMKd8CddpZlo8bbzxswp
-	pOqyqpVeGBqGgP7KP+vAuXUYFsNL8sFGvOSWwDZo+SisVfzm7Cir8KagbJuf3BOl3OLmBOwJK6R
-	iFizz7yVVQucg5bZ8Otl9LBxnBje8cv57qheDpsA1
-X-Gm-Gg: ASbGnct/lo/UvvfMMoc7bZR+30mumZ555a2PrpA5WjKa5baHa1TqqekcKiOz+x2av6F
-	QCIEGbs8RcYMjmMidOc4MvtXa/QSbajW9KxYuSg5a1k604IH9h1hMWfigUQjf7+d9rWfiKJmKMp
-	UG9N+3PQ8RdWpb18r5mI/FQg1bn7wC+mSpOH5hlez2qKo=
-X-Google-Smtp-Source: AGHT+IF5c6/Ffr2ZlLmLBLEa9u4updyjaW2akXYsbGKR25gVnGjqxApkMKJsmYID0ISi/gUvyJzJuGiVPCpD1WS7pr8=
-X-Received: by 2002:ac8:7dc8:0:b0:4a6:f546:e157 with SMTP id
- d75a77b69052e-4a7c05f4af1mr104663651cf.4.1750908728324; Wed, 25 Jun 2025
- 20:32:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E431319F42D
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 03:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=96.47.72.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1750909087; cv=pass; b=tATcKPRjfVb0Gv6BursQUvvPXnwgwHED+q3mxIj5aDty1e9oGlUPahNHUkaiMigcoNuHtxGICQT8RRGaPIQX8w072d5i0v6npQBlfxJba6scVQRw75Comjm4PEEdlrJydkMhGXq+yRMLwZF5+LrSDtNCrknP2Au1pwJ6tjxuhLc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1750909087; c=relaxed/simple;
+	bh=Swq7boTMBmXFAxBINVMcM87Q+vzn/k+3jOH7eQzg74w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RjS2pl8XrzDr+f0fGBNl2O3tnz5n6y9uLY+c1LhWdUmBM/VAB726zHgdCPr9snEO5sieWknIA4OSOEylt2UZf93yWaM7mpd8DDr/X8EhP1ZGFKIYt+CeErBGHFpMasjg2m8Ryy4YyYzhhKJwiDw+dRzqEn3nvsZUl9ZW0nc2Etk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=FreeBSD.org; spf=pass smtp.mailfrom=FreeBSD.org; dkim=pass (2048-bit key) header.d=freebsd.org header.i=@freebsd.org header.b=JyUFICjq; arc=pass smtp.client-ip=96.47.72.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=FreeBSD.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=FreeBSD.org
+Received: from mx1.freebsd.org (mx1.freebsd.org [96.47.72.80])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits)
+	 client-signature RSA-PSS (4096 bits))
+	(Client CN "mx1.freebsd.org", Issuer "R10" (verified OK))
+	by mx2.freebsd.org (Postfix) with ESMTPS id 4bSPXR16W9z3TFM;
+	Thu, 26 Jun 2025 03:37:59 +0000 (UTC)
+	(envelope-from kevans@FreeBSD.org)
+Received: from smtp.freebsd.org (smtp.freebsd.org [IPv6:2610:1c1:1:606c::24b:4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "smtp.freebsd.org", Issuer "R11" (verified OK))
+	by mx1.freebsd.org (Postfix) with ESMTPS id 4bSPXQ0t8Dz3ls1;
+	Thu, 26 Jun 2025 03:37:58 +0000 (UTC)
+	(envelope-from kevans@FreeBSD.org)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=freebsd.org; s=dkim;
+	t=1750909078;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A1tKoSwrJQsbcYq+qY9jWj6OI+RYMT06LdinvFds3WU=;
+	b=JyUFICjq9YUgpNaDXmZvlypC2S9PQta5kN/lC5idotuefEpjxoNwJBzJcqz+ajBUfe58pZ
+	+HijlwwKWuC4sqNPK7cG88S+cnF0rYTsSVuQeThYxujssK8Ev9v73SnJN+EHOsOzeI8c7F
+	CzR+Ix/1SUffe/fzc3vQ3RJ+eXS5O87dmiGdIkvw+IADrBO8QZsRLNZirIGXNPQsU/zuK2
+	ijtSgCOv1gU252yBwxSxlm/3VCqKogRPgQ25wV8YEwKvLG1HaOfX4U5QMcdf7qC7pqEOPW
+	44aOWKz9/qFFP2ohywaIQ6cQjFA6JwaeCQ1KRHuCpQZolr1vmAvjn71pRhIPCA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=freebsd.org;
+	s=dkim; t=1750909078;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A1tKoSwrJQsbcYq+qY9jWj6OI+RYMT06LdinvFds3WU=;
+	b=vxm0w4ASr8djym2evkXidfdpOMAyXDzaQih5K109swUSaWYfLZMJLukahRGaOBU86q8rMy
+	jSkW9bJZe76ZzgSXggSR/Khv0S6FTmyhBXtau1U/1FN0nlhEWkra7ESVaIxKws96L4OdEK
+	O45eRB0ZI3ZB3rhjZybgSGc+KJElgc+tZ6CwVtK3TXjnexqHYLzJeoP75rsjxfvqqBHyUA
+	ijIDj+NHH/FqBHGNRPvWW5vRrYWN89ZoWfzoaVs13YmjzqXzPvP7i2AAy5bVwD1ldW3t/u
+	df77sU7m0XNVafN4rEIGEd2mdzyXytzu8o/5YeXRH3jO9Ep+zVhjC802XeljKw==
+ARC-Authentication-Results: i=1;
+	mx1.freebsd.org;
+	none
+ARC-Seal: i=1; s=dkim; d=freebsd.org; t=1750909078; a=rsa-sha256; cv=none;
+	b=Imgy1gWmIix4nziuxiVOvDcZdxRBxBGIfTb0BEDscIA4uwG54yuok0h8GxPblgbDoA97vX
+	pwDj+I8bALVoYaEv/gfnCceX7ukiu8Q7TdyFXoD+/FiJUReUWolei2Qheg5xFt1UEprUAa
+	MNRCb5DV/ehW7AgJtBLGl1wcz0qZXT+mnqeuJb4/9oy4111FXrdITRCgrdU9sBJxf5lgTk
+	YQAcov7txBwOjuTcqETpEBOv+Zyp62HkNxoryS8FCCc+wJbgG53cvMX3JiBxN12jtJXSKx
+	w/i9wUe3yEVshNjBrdn49P2TTuT2c004GBxV4pErk6z1MjbMnrBkYJEG/kwjlQ==
+Received: from [10.9.4.95] (unknown [209.182.120.176])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: kevans/mail)
+	by smtp.freebsd.org (Postfix) with ESMTPSA id 4bSPXP0sXSzJJj;
+	Thu, 26 Jun 2025 03:37:57 +0000 (UTC)
+	(envelope-from kevans@FreeBSD.org)
+Message-ID: <d309fd3a-daf1-4fd5-98aa-2920f50146fd@FreeBSD.org>
+Date: Wed, 25 Jun 2025 22:37:55 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250625135210.2975231-1-daniel.zahka@gmail.com> <20250625135210.2975231-9-daniel.zahka@gmail.com>
-In-Reply-To: <20250625135210.2975231-9-daniel.zahka@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 25 Jun 2025 20:31:57 -0700
-X-Gm-Features: Ac12FXzKd3gDVaQ1V8FammYEd0oPsY3K68S8oXKynx0DuIWEVVe_GbwPyQrZ9qs
-Message-ID: <CANn89iKvLQ3jZ8fYwRiBHo-PmSKbhwujWpjFUKtRYANGaPk70g@mail.gmail.com>
-Subject: Re: [PATCH v2 08/17] net: psp: add socket security association code
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
-	Boris Pismenny <borisp@nvidia.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Patrisious Haddad <phaddad@nvidia.com>, Raed Salem <raeds@nvidia.com>, 
-	Jianbo Liu <jianbol@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, 
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Jacob Keller <jacob.e.keller@intel.com>, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RESEND PATCH v1 wireguard-tools] ipc: linux: Support incremental
+ allowed ips updates
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>, Jordan Rife <jordan@jrife.io>
+Cc: wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
+References: <20250517192955.594735-1-jordan@jrife.io>
+ <aCzirk7xt3K-5_ql@zx2c4.com> <aCzvxmD5eHRTIoAF@zx2c4.com>
+ <vq4hbaffjqdgdvzszf5j56mikssy2v2qtqn2s5vxap3q5gi4kz@ydrbhsdfeocr>
+ <CAHmME9rbRpNZ1pP-y_=EzPxRMqBbPobjpBazec+swr+2wwDCWg@mail.gmail.com>
+Content-Language: en-US
+From: Kyle Evans <kevans@FreeBSD.org>
+In-Reply-To: <CAHmME9rbRpNZ1pP-y_=EzPxRMqBbPobjpBazec+swr+2wwDCWg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 25, 2025 at 6:52=E2=80=AFAM Daniel Zahka <daniel.zahka@gmail.co=
-m> wrote:
->
-> From: Jakub Kicinski <kuba@kernel.org>
->
-> Add the ability to install PSP Rx and Tx crypto keys on TCP
-> connections. Netlink ops are provided for both operations.
-> Rx side combines allocating a new Rx key and installing it
-> on the socket. Theoretically these are separate actions,
-> but in practice they will always be used one after the
-> other. We can add distinct "alloc" and "install" ops later.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
-> Co-developed-by: Daniel Zahka <daniel.zahka@gmail.com>
-> ---
-> +/**
-> + * psp_assoc_put() - release a reference on a PSP association
-> + * @pas: association to release
-> + */
-> +void psp_assoc_put(struct psp_assoc *pas)
-> +{
-> +       if (pas && refcount_dec_and_test(&pas->refcnt))
-> +               call_rcu(&pas->rcu, psp_assoc_free_queue);
-> +}
-> +
-> +void psp_sk_assoc_free(struct sock *sk)
-> +{
-> +       rcu_read_lock();
+On 5/21/25 18:51, Jason A. Donenfeld wrote:
+> On Thu, May 22, 2025 at 1:02 AM Jordan Rife <jordan@jrife.io> wrote:
+>>>> Merged here:
+>>>> https://git.zx2c4.com/wireguard-tools/commit/?id=0788f90810efde88cfa07ed96e7eca77c7f2eedd
+>>>>
+>>>> With a followup here:
+>>>> https://git.zx2c4.com/wireguard-tools/commit/?id=dce8ac6e2fa30f8b07e84859f244f81b3c6b2353
+>>>
+>>> Also,
+>>> https://git.zx2c4.com/wireguard-go/commit/?id=256bcbd70d5b4eaae2a9f21a9889498c0f89041c
+>>
+>> Nice, cool to see this extended to wireguard-go as well. As a follow up,
+>> I was planning to also create a patch for golang.zx2c4.com/wireguard/wgctrl
+>> so the feature can be used from there too.
+> 
+> Wonderful, please do! Looking forward to merging that.
+> 
+> There's already an open PR in FreeBSD too.
 
-This is a writer side.
+FreeBSD support landed as of:
 
-rcu_read_lock() here is wrong, and only silences lockdep.
+https://cgit.freebsd.org/src/commit/?id=f6d9e22982a
 
-Use instead rcu_dereference_protected(sk->psp_assoc,
-whatever_assert_making_sure_we_are_under_some_protection_against_another_wr=
-iter);
+It will be available in FreeBSD 15.0 and probably 14.4 (to be released 
+next year) as well.  I have pushed a branch, ke/fbsd_aip, to the 
+wireguard-tools repository for your consideration.
 
-The condition can be 1 if we are in a sk dismantle point, otherwise
-lockdep_sock_is_held(sk) is often used.
+Aside: this is a really neat feature.
 
+Thanks!
 
-> +       psp_assoc_put(rcu_dereference(sk->psp_assoc));
-> +       rcu_assign_pointer(sk->psp_assoc, NULL);
-> +       rcu_read_unlock();
-> +}
+Kyle Evans
 
