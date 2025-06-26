@@ -1,122 +1,106 @@
-Return-Path: <netdev+bounces-201478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F30A9AE9883
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 10:37:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91C88AE985B
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 10:32:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AD9A1C22D39
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 08:37:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADA0C3B073E
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 08:31:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CAE42D9787;
-	Thu, 26 Jun 2025 08:34:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="jHRd3wtQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C1BD28FFD0;
+	Thu, 26 Jun 2025 08:32:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80F22957A7;
-	Thu, 26 Jun 2025 08:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11F6218AB0
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 08:32:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750926882; cv=none; b=UpIOsSHKjed5+JOvO5Z+eM/qk47Wx7sxKTcPJn7OHEERfpKk1rcEg3CQtHus1PuuBJxABbMWRYn7wU8oFgY3dhA6wVUpzid+o+vOIR9Uvv+MJtNOKksJAJAV++K6yf+iHU9naR037pkZ4/XwMkRZ+E+60Fq9q9LgjH6jI2GcCNE=
+	t=1750926726; cv=none; b=doTMwmETUz1z4sYcBvfrvvUpWw1qHYcypiqN99CZg2aT3TAeyxQPaP4zlDSMo+7S+iQBo0XTc04PZuQ/QSQRb4uz27EgvORdqwzdka3r+UW2cJBF0lTZWpJtRaQVG3lmlJf57cLRwcW5WNUPSdsDSIfBCzijQks0jyTQ38kUeiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750926882; c=relaxed/simple;
-	bh=7h+/r7ZtMJq1dvKCjGhVatzMhyp/ApkTbFKk+cSkUPk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=NS//RILFmFB36VNM3CgRDL3hb/0zpYaqRvh/xvtshCTuP0//37vlQtH824U8A/JMgd8pBMeWpVmD1ZN6zvM6egkZmw1J9LmymternFVJVGAcaPW/wtXdeeQ2YOHlwrN+1HRwZXSAB27bdbq8IVaz3rNjZZQX9uLw5xjutcrTE84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=jHRd3wtQ; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1uUi42-00GcIE-HJ; Thu, 26 Jun 2025 10:34:34 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=+2QJ2vK3aC9RmVaDqJqvoTd0vBNxxH4J4lY+mVdjibA=; b=jHRd3wtQoqHYsQcE5sg03XYmYi
-	QDKRMIK/Me3iH+8BurUMVt4whIybimNQP8R/VhBHY79zK3AX4GsGP0Dgj5Gc2ds0SCdDmRG1EdDRs
-	dfTLySNVofxPciNZrcLa2dIjQkkr1M1tify/2MeX8vsCW+qw4XpbWKQkfNokWWjE/0fLDUbNd9uMw
-	l6heAg8atTSfANajnruOOPrn9HszxzkfYw24y52aHM0rzo479kS26fZDdNdOEEPdW6+o389sGUXeP
-	jSEnr5vU1PuOxUHW5anrCl1EDKcv3YDg9VAQ5r+wHSB4ySGkjjZ066r5XTRtADnFmY4kLI68A2PBf
-	/v6CFrtg==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1uUi42-0002Kq-6U; Thu, 26 Jun 2025 10:34:34 +0200
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1uUi3T-009Fh5-9i; Thu, 26 Jun 2025 10:33:59 +0200
-From: Michal Luczaj <mhal@rbox.co>
-Date: Thu, 26 Jun 2025 10:33:42 +0200
-Subject: [PATCH net-next v2 9/9] net: skbuff: Drop unused @skb
+	s=arc-20240116; t=1750926726; c=relaxed/simple;
+	bh=uP/rFDx8e9z3sNXc4VRTDpBmgU3yeg67Y/han+fosNQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FhkU8/31LEUV2rROH6Q3ELz0oRXviSvTKjmrREhwtYubRrttUrXIKgTtSegaKSa4kEMrkQKlw4vctloTNb99wccWfogsNvpwV+/t9C6yCBIpan3WQ/1OyJdfAXGRBv/h+dSpT696JMTYhPp3pVp+PbOu5j2WbyPwHlL1kkPyTFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <jre@pengutronix.de>)
+	id 1uUi1Y-0000AH-3U; Thu, 26 Jun 2025 10:32:00 +0200
+Message-ID: <f2647407-3de0-4afd-bc79-5b58e13f10aa@pengutronix.de>
+Date: Thu, 26 Jun 2025 10:33:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: fec: allow disable coalescing
+To: Andrew Lunn <andrew@lunn.ch>, Wei Fang <wei.fang@nxp.com>
+Cc: "imx@lists.linux.dev" <imx@lists.linux.dev>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kernel@pengutronix.de" <kernel@pengutronix.de>,
+ Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20250625-fec_deactivate_coalescing-v1-1-57a1e41a45d3@pengutronix.de>
+ <PAXPR04MB8510C17E1980D456FD9F094F887AA@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <d60808b3-eb20-40ab-b952-d9cd8d8d68a7@lunn.ch>
+Content-Language: en-US
+From: Jonas Rebmann <jre@pengutronix.de>
+In-Reply-To: <d60808b3-eb20-40ab-b952-d9cd8d8d68a7@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250626-splice-drop-unused-v2-9-3268fac1af89@rbox.co>
-References: <20250626-splice-drop-unused-v2-0-3268fac1af89@rbox.co>
-In-Reply-To: <20250626-splice-drop-unused-v2-0-3268fac1af89@rbox.co>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
- David Ahern <dsahern@kernel.org>, Boris Pismenny <borisp@nvidia.com>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Ayush Sawal <ayush.sawal@chelsio.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>, 
- "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>, 
- Wen Gu <guwen@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
- Michal Luczaj <mhal@rbox.co>
-X-Mailer: b4 0.14.2
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: jre@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Since its introduction in commit 6fa01ccd8830 ("skbuff: Add pskb_extract()
-helper function"), pskb_carve_frag_list() never used the argument @skb.
-Drop it and adapt the only caller.
+Hi Andrew,
 
-No functional change intended.
+On 2025-06-26 10:12, Andrew Lunn wrote:
+> On Thu, Jun 26, 2025 at 02:36:37AM +0000, Wei Fang wrote:
+>>>
+>>> -       /* Must be greater than zero to avoid unpredictable behavior */
+>>> -       if (!fep->rx_time_itr || !fep->rx_pkts_itr ||
+>>> -           !fep->tx_time_itr || !fep->tx_pkts_itr)
+>>> -               return;
+> 
+> Hi Wei
+> 
+> When i see a comment like this being removed, i wounder if there is
+> any danger of side effects? Do you know what is being done here is
+> actually safe, for all the different versions of the FEC which support
+> coalescence?
 
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
----
- net/core/skbuff.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+For reference, this comment is taken in plain from section 11.6.4.1.16.3
+in the i.MX 8M Plus Applications Processor Reference Manual (and is the
+same for the 6UL).
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index b5f685b6611c177c199f70bb16fd3940bce8cded..f8553c674fe5052e7c1ea53022e252a54a9d6c72 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -6756,8 +6756,7 @@ static int pskb_carve(struct sk_buff *skb, const u32 off, gfp_t gfp);
- /* carve out the first eat bytes from skb's frag_list. May recurse into
-  * pskb_carve()
-  */
--static int pskb_carve_frag_list(struct sk_buff *skb,
--				struct skb_shared_info *shinfo, int eat,
-+static int pskb_carve_frag_list(struct skb_shared_info *shinfo, int eat,
- 				gfp_t gfp_mask)
- {
- 	struct sk_buff *list = shinfo->frag_list;
-@@ -6862,7 +6861,7 @@ static int pskb_carve_inside_nonlinear(struct sk_buff *skb, const u32 off,
- 		skb_clone_fraglist(skb);
- 
- 	/* split line is in frag list */
--	if (k == 0 && pskb_carve_frag_list(skb, shinfo, off - pos, gfp_mask)) {
-+	if (k == 0 && pskb_carve_frag_list(shinfo, off - pos, gfp_mask)) {
- 		/* skb_frag_unref() is not needed here as shinfo->nr_frags = 0. */
- 		if (skb_has_frag_list(skb))
- 			kfree_skb_list(skb_shinfo(skb)->frag_list);
+I was also worried about this so I made sure that in any case where
+either of those is zero, the coalescing enable bit (FEC_ITR_EN) is
+explicitly disabled.
+
+fec_enet_itr_coal_set is only ever called if FEC_QUIRK_HAS_COALESCE is
+set and for those models, we expect disabling coalescing via FEC_ITR_EN
+-- and consequently also setting the parameters to zero -- to be
+unproblematic. This is also the reset default.
+
+Regards,
+Jonas
 
 -- 
-2.49.0
-
+Pengutronix e.K.                           | Jonas Rebmann               |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-9    |
 
