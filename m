@@ -1,259 +1,251 @@
-Return-Path: <netdev+bounces-201671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B57CAEA667
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 21:25:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9620AAEA82E
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 22:16:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5471F3A9C2F
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 19:25:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20A4B3A4360
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 20:16:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57CB82ECE8C;
-	Thu, 26 Jun 2025 19:25:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D0D1DEFE9;
+	Thu, 26 Jun 2025 20:16:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3D52F1FF9
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 19:25:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 811672628C
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 20:16:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.205.220.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750965941; cv=none; b=GvGAyMCBzp9O8RbVZgkxSSh8CxqXPgfpl9bYPyacX8fIyhjR/8N9t/SNxrwSYp17s16UwC9Ob/wZkhxuENCFaTmIyXC1IFoRE5HmQBNkQoIPiKY8KvSwfKazKy44vmHmEspDRaPmsIjhjZRN5/ub73YyAKYpA+eJDVpB9nETv20=
+	t=1750969013; cv=none; b=dRiRL6reIw3GxcstUGI0iEdIV12mMfrHIY/2L7uenMntZuq5eZlG+jl0eNbUpDSF8w6primxC4IvTZCESfG0RhHV0R0GfRbjcPsosqxrSbZy0EgUu71eYj06gyyEHfByomKBM0VitSAfmn3io6N45tjTHIWDYqtM8yJnLnVWxkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750965941; c=relaxed/simple;
-	bh=Umg9+xD0kUpefrULO9831amcm/kvWphY/2gpXmp9WX8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=A8NHiPnEnPU2QY7xU3bQXd0zA2HWrUpN8FPqYBZtOBcs862PB4pSgT/Qp0+QyWFL91LfyZdqRMtaZdonDfdUqvCM8s16NFoE0eGOTzdbBsurPvHIAmtclE8nL8HTB7Th0JDSf7fe1behbe99RwHsEGIeSKC07MNa/tpVOZLTWg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3ddc1af1e5bso32500095ab.0
-        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 12:25:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750965937; x=1751570737;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3ITL/fXLs649CrWs1OxmddlKSg0ISConOPnCKE3Uc0g=;
-        b=apj70UjPlFrJXKJ3fqE+5BZ0uV45GVTQfwVX8r7FlK3+1SK3YdsCYmupN+Yvwx/diX
-         RYAytyP3YlSj8Ywio+jhIhKBtJIAC2PGAE6PyMLU8+jRHcoyU9L+ixmgqYvtZpCUTF6Q
-         y2mxBt5n7cSbSmEAmXCB2vNlZwxBLULAj1lNnyem9FcU/keAG0SmNP8C99z9Lt8eSWap
-         OGKCHa+2JmdOchoXVfR4yXI3vCUgK9bu9LHfHvWdbUBXhiBFOxvAB0wLz4mbgEHCsSME
-         DqhTVTW4mUuEHyrEuiZOevjYmzJD2L0mIRtZe+VBl20qbbR7Q2oZ1pdlm44PDH4LLeWr
-         Cq5w==
-X-Forwarded-Encrypted: i=1; AJvYcCWfuu+EVoq0DnYYWKeftLc3lBsEpSD40GjRoNRDf7r17oe4GOCoJp51/44Y3LlIchUFdkg9gcI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFr/BXLzl1P9VAsJPDeatZDc9IUY1k1+gVPE0xQK6dZ31+T0Cs
-	l/ewzVeP8HPy/6gaIAoCzEK5cBuWslQiDTrs8RWwnK8HHzsYEH5pSveiGcMzqAXN4hKR4KKi9+G
-	G4gklVzoWeAdiPxhePYejUcF4PR6I5TrS2MySz1tUqa41aIZGQwX3ZWt7smA=
-X-Google-Smtp-Source: AGHT+IEJN4dCnr7Yao52pOFWF+7HitZJ86CXiJ62npUrAP/MiC1G18NaAytAFBNKFR5Jb9TrredgrLEYmVQn9OY/eEzaevPxhIdj
+	s=arc-20240116; t=1750969013; c=relaxed/simple;
+	bh=0KTVqImSngsFLhxo2cxX2VpRDtBs5UBJ7XUkY2W3oJg=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Gx6awlWXrd48MNyYv3PNdpxfChIUf0v95pgVXjMRgwSejqNron1vN94Wqb0/SAtqq326QUOLe8PhOyKo7lgBZa2BTM2wDt3t/B6UizP7fXlOjiW9L93G8R59qngqU8cqA5GXHz9HRc8YLbqtok9Ai+BofF5r02qxIBniKUgrrVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net; spf=none smtp.mailfrom=lists.ewheeler.net; arc=none smtp.client-ip=173.205.220.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lists.ewheeler.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=lists.ewheeler.net
+Received: from localhost (localhost [127.0.0.1])
+	by mx.ewheeler.net (Postfix) with ESMTP id 8C6FF87;
+	Thu, 26 Jun 2025 13:16:45 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+	by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+	with LMTP id iWrPZwNr8LWp; Thu, 26 Jun 2025 13:16:44 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx.ewheeler.net (Postfix) with ESMTPSA id 163A141;
+	Thu, 26 Jun 2025 13:16:44 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 163A141
+Date: Thu, 26 Jun 2025 13:16:44 -0700 (PDT)
+From: Eric Wheeler <netdev@lists.ewheeler.net>
+To: Neal Cardwell <ncardwell@google.com>
+cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+    Geumhwan Yu <geumhwan.yu@samsung.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Sasha Levin <sashal@kernel.org>, Yuchung Cheng <ycheng@google.com>, 
+    stable@kernel.org
+Subject: Re: [BISECT] regression: tcp: fix to allow timestamp undo if no
+ retransmits were sent
+In-Reply-To: <CADVnQym2vbWXHSVhyc6-QZLg-ASJfM-SCzu1tRsyapD_ms9S_w@mail.gmail.com>
+Message-ID: <ad6e6f7c-ba17-70d-d8c3-10703813cdc@ewheeler.net>
+References: <64ea9333-e7f9-0df-b0f2-8d566143acab@ewheeler.net> <d7421eff-7e61-16ec-e1ca-e969b267f44d@ewheeler.net> <CADVnQy=SLM6vyWr5-UGg6TFU+b0g4s=A0h2ujRpphTyuxDYXKA@mail.gmail.com> <CADVnQy=kB-B-9rAOgSjBAh+KHx4pkz-VoTnBZ0ye+Fp4hjicPA@mail.gmail.com>
+ <CADVnQyna9cMvJf9Mp5jLR1vryAY1rEbAjZC_ef=Q8HRM4tNFzQ@mail.gmail.com> <CADVnQyk0bsGJrcA13xEaDmVo_6S94FuK68T0_iiTLyAKoVVPyA@mail.gmail.com> <CADVnQyktk+XpvLuc6jZa5CpqoGyjzzzYJ5iJk3=Eh5JAGyNyVQ@mail.gmail.com> <9ef3bfe-01f-29da-6d5-1baf2fad7254@ewheeler.net>
+ <a8579544-a9de-63ae-61ed-283c872289a@ewheeler.net> <CADVnQymCso04zj8N0DYP9EkhTwXqtbsCu1xLxAUC60rSd09Rkw@mail.gmail.com> <452b3c16-b994-a627-c737-99358be8b030@ewheeler.net> <9c82e38f-8253-3e41-a5f-dfbb261165ca@ewheeler.net>
+ <CADVnQy=mrWeWWTV9YpTaH7G9QvW-qOd_VH5B4=vTxR6rZKwe4A@mail.gmail.com> <294fe4ea-eb6c-3dc3-9c5-66f69514bc94@ewheeler.net> <CADVnQym2vbWXHSVhyc6-QZLg-ASJfM-SCzu1tRsyapD_ms9S_w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:318f:b0:3dc:7d57:30a8 with SMTP id
- e9e14a558f8ab-3df4aba4e14mr8321715ab.10.1750965937642; Thu, 26 Jun 2025
- 12:25:37 -0700 (PDT)
-Date: Thu, 26 Jun 2025 12:25:37 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <685d9eb1.050a0220.2303ee.02a7.GAE@google.com>
-Subject: [syzbot] [net?] KASAN: slab-out-of-bounds Read in pause_parse_request
-From: syzbot <syzbot+430f9f76633641a62217@syzkaller.appspotmail.com>
-To: andrew@lunn.ch, danieller@nvidia.com, davem@davemloft.net, 
-	edumazet@google.com, horms@kernel.org, kory.maincent@bootlin.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, maxime.chevallier@bootlin.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/mixed; boundary="8323328-1853565301-1750969004=:5615"
 
-Hello,
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-syzbot found the following issue on:
+--8323328-1853565301-1750969004=:5615
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-HEAD commit:    a9b24b3583ae net: phy: realtek: add error handling to rtl8..
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=15d50f0c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fab0bcec5be1995b
-dashboard link: https://syzkaller.appspot.com/bug?extid=430f9f76633641a62217
-compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17d1b182580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=120bff0c580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/9205e4571dc2/disk-a9b24b35.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/9a698a98f3a1/vmlinux-a9b24b35.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/5964c8e14f44/bzImage-a9b24b35.xz
-
-The issue was bisected to:
-
-commit 963781bdfe2007e062e05b6b8a263ae9340bd523
-Author: Jakub Kicinski <kuba@kernel.org>
-Date:   Mon Jun 23 23:17:15 2025 +0000
-
-    net: ethtool: call .parse_request for SET handlers
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=101f208c580000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=121f208c580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=141f208c580000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+430f9f76633641a62217@syzkaller.appspotmail.com
-Fixes: 963781bdfe20 ("net: ethtool: call .parse_request for SET handlers")
-
-==================================================================
-BUG: KASAN: slab-out-of-bounds in pause_parse_request+0x40/0x160 net/ethtool/pause.c:37
-Read of size 8 at addr ffff888034301530 by task syz-executor369/5848
-
-CPU: 1 UID: 0 PID: 5848 Comm: syz-executor369 Not tainted 6.16.0-rc2-syzkaller-00867-ga9b24b3583ae #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:408 [inline]
- print_report+0xd2/0x2b0 mm/kasan/report.c:521
- kasan_report+0x118/0x150 mm/kasan/report.c:634
- pause_parse_request+0x40/0x160 net/ethtool/pause.c:37
- ethnl_default_parse net/ethtool/netlink.c:456 [inline]
- ethnl_default_set_doit+0x2c1/0xa40 net/ethtool/netlink.c:881
- genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x205/0x470 net/netlink/af_netlink.c:2534
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x758/0x8d0 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:714 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:729
- ____sys_sendmsg+0x505/0x830 net/socket.c:2614
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
- __sys_sendmsg net/socket.c:2700 [inline]
- __do_sys_sendmsg net/socket.c:2705 [inline]
- __se_sys_sendmsg net/socket.c:2703 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f99cc8969d9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffdf8e93908 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f99cc8e44ad RCX: 00007f99cc8969d9
-RDX: 0000000000000040 RSI: 0000200000000000 RDI: 0000000000000003
-RBP: 00007f99cc8e447d R08: 0000000000000000 R09: 0000555500000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f99cc8e43e5
-R13: 0000000000000001 R14: 00007ffdf8e93950 R15: 0000000000000003
- </TASK>
-
-Allocated by task 5848:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:394
- kasan_kmalloc include/linux/kasan.h:260 [inline]
- __do_kmalloc_node mm/slub.c:4328 [inline]
- __kmalloc_noprof+0x27a/0x4f0 mm/slub.c:4340
- kmalloc_noprof include/linux/slab.h:909 [inline]
- kmalloc_array_noprof include/linux/slab.h:948 [inline]
- genl_family_rcv_msg_attrs_parse+0xa3/0x2a0 net/netlink/genetlink.c:940
- genl_family_rcv_msg_doit+0xb8/0x300 net/netlink/genetlink.c:1093
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x205/0x470 net/netlink/af_netlink.c:2534
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x758/0x8d0 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:714 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:729
- ____sys_sendmsg+0x505/0x830 net/socket.c:2614
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
- __sys_sendmsg net/socket.c:2700 [inline]
- __do_sys_sendmsg net/socket.c:2705 [inline]
- __se_sys_sendmsg net/socket.c:2703 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff888034301500
- which belongs to the cache kmalloc-64 of size 64
-The buggy address is located 8 bytes to the right of
- allocated 40-byte region [ffff888034301500, ffff888034301528)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x34301
-ksm flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000000 ffff88801a4418c0 ffffea00009e8e40 dead000000000003
-raw: 0000000000000000 0000000080200020 00000000f5000000 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 1153, tgid 1153 (kworker/u8:6), ts 27371323863, free_ts 0
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x240/0x2a0 mm/page_alloc.c:1704
- prep_new_page mm/page_alloc.c:1712 [inline]
- get_page_from_freelist+0x21e4/0x22c0 mm/page_alloc.c:3669
- __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:4959
- alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2419
- alloc_slab_page mm/slub.c:2451 [inline]
- allocate_slab+0x8a/0x3b0 mm/slub.c:2619
- new_slab mm/slub.c:2673 [inline]
- ___slab_alloc+0xbfc/0x1480 mm/slub.c:3859
- __slab_alloc mm/slub.c:3949 [inline]
- __slab_alloc_node mm/slub.c:4024 [inline]
- slab_alloc_node mm/slub.c:4185 [inline]
- __do_kmalloc_node mm/slub.c:4327 [inline]
- __kmalloc_noprof+0x305/0x4f0 mm/slub.c:4340
- kmalloc_noprof include/linux/slab.h:909 [inline]
- kzalloc_noprof include/linux/slab.h:1039 [inline]
- lsm_blob_alloc security/security.c:684 [inline]
- lsm_task_alloc security/security.c:771 [inline]
- security_task_alloc+0x4d/0x360 security/security.c:3160
- copy_process+0x1530/0x3c00 kernel/fork.c:2151
- kernel_clone+0x21e/0x870 kernel/fork.c:2599
- user_mode_thread+0xdd/0x140 kernel/fork.c:2677
- call_usermodehelper_exec_work+0x5c/0x230 kernel/umh.c:171
- process_one_work kernel/workqueue.c:3238 [inline]
- process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3321
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
- kthread+0x70e/0x8a0 kernel/kthread.c:464
- ret_from_fork+0x3f9/0x770 arch/x86/kernel/process.c:148
-page_owner free stack trace missing
-
-Memory state around the buggy address:
- ffff888034301400: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
- ffff888034301480: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
->ffff888034301500: 00 00 00 00 00 fc fc fc fc fc fc fc fc fc fc fc
-                                     ^
- ffff888034301580: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
- ffff888034301600: 00 00 00 00 00 00 05 fc fc fc fc fc fc fc fc fc
-==================================================================
+On Thu, 26 Jun 2025, Neal Cardwell wrote:
+> On Wed, Jun 25, 2025 at 7:15 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
+> >
+> > On Wed, 25 Jun 2025, Neal Cardwell wrote:
+> > > On Wed, Jun 25, 2025 at 3:17 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
+> > > >
+> > > > On Wed, 18 Jun 2025, Eric Wheeler wrote:
+> > > > > On Mon, 16 Jun 2025, Neal Cardwell wrote:
+> > > > > > On Mon, Jun 16, 2025 at 4:14 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
+> > > > > > > On Sun, 15 Jun 2025, Eric Wheeler wrote:
+> > > > > > > > On Tue, 10 Jun 2025, Neal Cardwell wrote:
+> > > > > > > > > On Mon, Jun 9, 2025 at 1:45 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > > > > > > > > On Sat, Jun 7, 2025 at 7:26 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > > > > > > > > > On Sat, Jun 7, 2025 at 6:54 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > > > > > > > > > > On Sat, Jun 7, 2025 at 3:13 PM Neal Cardwell <ncardwell@google.com> wrote:
+> > > > > > > > > > > > > On Fri, Jun 6, 2025 at 6:34 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
+> > > > > > > > > > > > > > On Fri, 6 Jun 2025, Neal Cardwell wrote:
+> > > > > > > > > > > > > > > On Thu, Jun 5, 2025 at 9:33 PM Eric Wheeler <netdev@lists.ewheeler.net> wrote:
+> > > > > > > > > > > > > > > > After upgrading to Linux v6.6.85 on an older Supermicro SYS-2026T-6RFT+
+> > > > > > > > > > > > > > > > with an Intel 82599ES 10GbE NIC (ixgbe) linked to a Netgear GS728TXS at
+> > > > > > > > > > > > > > > > 10GbE via one SFP+ DAC (no bonding), we found TCP performance with
+> > > > > > > > > > > > > > > > existing devices on 1Gbit ports was <60Mbit; however, TCP with devices
+> > > > > > > > > > > > > > > > across the switch on 10Gbit ports runs at full 10GbE.
+> > > > > > > > > > > > > > > >
+> > > > > > > > > > > > > > > > Through bisection, we found this first-bad commit:
+> > > > > > > > > > > > > > > >
+> > > > > > > > > > > > > > > >         tcp: fix to allow timestamp undo if no retransmits were sent
+> > > > > > > > > > > > > > > >                 upstream:       e37ab7373696e650d3b6262a5b882aadad69bb9e
+> > > > > > > > > > > > > > > >                 stable 6.6.y:   e676ca60ad2a6fdeb718b5e7a337a8fb1591d45f
+> > > > > > > > >
+> > > > > > > >
+> > > > > > > > > The attached patch should apply (with "git am") for any recent kernel
+> > > > > > > > > that has the "tcp: fix to allow timestamp undo if no retransmits were
+> > > > > > > > > sent" patch it is fixing. So you should be able to test it on top of
+> > > > > > > > > the 6.6 stable or 6.15 stable kernels you used earlier. Whichever is
+> > > > > > > > > easier.
+> > > > > > >
+> > > > > > > Definitely better, but performance is ~15% slower vs reverting, and the
+> > > > > > > retransmit counts are still higher than the other.  In the two sections
+> > > > > > > below you can see the difference between after the fix and after the
+> > > > > > > revert.
+> > > > > > >
+> > > > > >
+> > > > > > Would you have cycles to run the "after-fix" and "after-revert-6.6.93"
+> > > > > > cases multiple times, so we can get a sense of what is signal and what
+> > > > > > is noise? Perhaps 20 or 50 trials for each approach?
+> > > > >
+> > > > > I ran 50 tests after revert and compare that to after the fix using both
+> > > > > average and geometric mean, and it still appears to be slightly slower
+> > > > > then with the revert alone:
+> > > > >
+> > > > >       # after-revert-6.6.93
+> > > > >       Arithmetic Mean: 843.64 Mbits/sec
+> > > > >       Geometric Mean: 841.95 Mbits/sec
+> > > > >
+> > > > >       # after-tcp-fix-6.6.93
+> > > > >       Arithmetic Mean: 823.00 Mbits/sec
+> > > > >       Geometric Mean: 819.38 Mbits/sec
+> > > > >
+> > > >
+> > > > Re-sending this question in case this message got lost:
+> > > >
+> > > > > Do you think that this is an actual performance regression, or just a
+> > > > > sample set that is not big enough to work out the averages?
+> > > > >
+> > > > > Here is the data collected for each of the 50 tests:
+> > > > >       - https://www.linuxglobal.com/out/for-neal/after-revert-6.6.93.tar.gz
+> > > > >       - https://www.linuxglobal.com/out/for-neal/after-tcp-fix-6.6.93.tar.gz
+> > >
+> > > Hi Eric,
+> > >
+> > > Many thanks for this great data!
+> > >
+> > > I have been looking at this data. It's quite interesting.
+> > >
+> > > Looking at the CDF of throughputs for the "revert" cases vs the "fix"
+> > > cases (attached) it does look like for the 70-th percentile and below
+> > > (the 70% of most unlucky cases), the "fix" cases have a throughput
+> > > that is lower, and IMHO this looks outside the realm of what we would
+> > > expect from noise.
+> > >
+> > > However, when I look at the traces, I don't see any reason why the
+> > > "fix" cases would be systematically slower. In particular, the "fix"
+> > > and "revert" cases are only changing a function used for "undo"
+> > > decisions, but for both the "fix" or "revert" cases, there are no
+> > > "undo" events, and I don't see cases with spurious retransmissions
+> > > where there should have been "undo" events and yet there were not.
+> > >
+> > > Visually inspecting the traces, the dominant determinant of
+> > > performance seems to be how many RTO events there were. For example,
+> > > the worst case for the "fix" trials has 16 RTOs, whereas the worst
+> > > case for the "revert" trials has 13 RTOs. And the number of RTO events
+> > > per trial looks random; I see similar qualitative patterns between
+> > > "fix" and "revert" cases, and don't see any reason why there are more
+> > > RTOs in the "fix" cases than the "revert" cases. All the RTOs seem to
+> > > be due to pre-existing (longstanding) performance problems in non-SACK
+> > > loss recovery.
+> > >
+> > > One way to proceed would be for me to offer some performance fixes for
+> > > the RTOs, so we can get rid of the RTOs, which are the biggest source
+> > > of performance variation. That should greatly reduce noise, and
+> > > perhaps make it easier to see if there is any real difference between
+> > > "fix" and "revert" cases.
+> > >
+> > > We could compare the following two kernels, with another 50 tests for
+> > > each of two kernels:
+> > >
+> > > + (a) 6.6.93 + {2 patches to fix RTOs} + "revert"
+> > > + (b) 6.6.93 + {2 patches to fix RTOs} + "fix"
+> > >
+> > > where:
+> > >
+> > > "revert" =  revert e37ab7373696 ("tcp: fix to allow timestamp undo if
+> > > no retransmits were sent")
+> > > "fix" = apply d0fa59897e04 ("tcp: fix tcp_packet_delayed() for
+> > > tcp_is_non_sack_preventing_reopen() behavior"
+> > >
+> > > This would have the side benefit of testing some performance
+> > > improvements for non-SACK connections.
+> > >
+> > > Are you up for that? :-)
+> >
+> >
+> > Sure, if you have some patch ideas in mind, I'm all for getting patches
+> > merged improve performance.
+> 
+> Great! Thanks for being willing to do this! I will try to post some
+> patches ASAP.
+> 
+> > BTW, what causes a non-SACK connection?  The RX side is a near-idle Linux
+> > 6.8 host default sysctl settings.
+> 
+> Given the RX side is a Linux 6.8 host, the kernel should be supporting
+> TCP SACK due to kernel compile-time defaults (see the
+> "net->ipv4.sysctl_tcp_sack = 1;" in net/ipv4/tcp_ipv4.c.
+>
+> Given that factor, off-hand, I can think of only a few reasons why the
+> RX side would not negotiate SACK support:
+> 
+> (1) Some script or software on the RX machine has disabled SACK via
+> "sysctl net.ipv4.tcp_sack=0" or equivalent, perhaps at boot time (this
+> is easy to check with "sysctl net.ipv4.tcp_sack").
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+It looks like you are right:
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+	# cat /proc/sys/net/ipv4/tcp_sack 
+	0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+and it runs way faster after turning it on:
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+	~]# iperf3 -c 192.168.1.203
+	Connecting to host 192.168.1.203, port 5201
+	[  5] local 192.168.1.52 port 55104 connected to 192.168.1.203 port 5201
+	[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+	[  5]   0.00-1.00   sec   115 MBytes   964 Mbits/sec   27    234 KBytes       
+	[  5]   1.00-2.00   sec   113 MBytes   949 Mbits/sec    7    242 KBytes       
+	[  5]   2.00-3.00   sec   113 MBytes   950 Mbits/sec    7    247 KBytes       
+	[  5]   3.00-4.00   sec   113 MBytes   947 Mbits/sec    8    261 KBytes       
+	[  5]   4.00-5.00   sec   114 MBytes   953 Mbits/sec   11    261 KBytes       
+	[  5]   5.00-6.00   sec   113 MBytes   948 Mbits/sec    9    261 KBytes       
+	[  5]   6.00-7.00   sec   113 MBytes   950 Mbits/sec    5    261 KBytes       
+	[  5]   7.00-8.00   sec   113 MBytes   947 Mbits/sec   10    272 KBytes       
+	[  5]   8.00-9.00   sec   113 MBytes   950 Mbits/sec    5    274 KBytes       
+	[  5]   9.00-10.00  sec   113 MBytes   947 Mbits/sec    6    275 KBytes       
+	- - - - - - - - - - - - - - - - - - - - - - - - -
+	[ ID] Interval           Transfer     Bitrate         Retr
+	[  5]   0.00-10.00  sec  1.11 GBytes   950 Mbits/sec   95             sender
+	[  5]   0.00-10.04  sec  1.11 GBytes   945 Mbits/sec                  receiver
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Do you want to continue troubleshooting non-SACK performance since I
+have a reliable way to reproduce the issue, or leave it here with "I
+should have had sack enabled" ?
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-Eric
+--8323328-1853565301-1750969004=:5615--
 
