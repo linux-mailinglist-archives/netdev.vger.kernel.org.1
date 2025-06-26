@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-201684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B03FCAEA8C5
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 23:25:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8AADAEA8C8
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 23:26:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07B514E3C2C
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 21:25:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3325F189AC95
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 21:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B20B27EFFE;
-	Thu, 26 Jun 2025 21:24:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D266285058;
+	Thu, 26 Jun 2025 21:24:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WMJ4lX3a"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jbmX6uI4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13E0270EBB;
-	Thu, 26 Jun 2025 21:24:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4109D277031;
+	Thu, 26 Jun 2025 21:24:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750973045; cv=none; b=hm2Ponh75nNTvcjf2D9EKBDXragY3unmtwBLZHmIErqPV3zOmpZkqYK+hj0cMUf3EFgxdfVI8RZPQ1XrThsq1RY8NHBZsFewhxgN55dJ35r83ISjYUUovSQNOLvkUGcC88+FSYAp2KPMjjr1cITR8v8WvNpsXdHkAhAopXXf9X4=
+	t=1750973046; cv=none; b=BeyyPGqkiiqYQIaibLODls+eS3JzsPL6ZdnL/qBgG0KuoAb2GEubLZ/Acqsc+Oq52jQiV+l+F/s7Jv8WhRz8fKVyDR+5Z00o1y4oAw+hpkovXYTgPVXK2a9QUz8Zv5LW98HO5IpNng3kgamWW3ATyz4DRJ5pGwys1kE/P+DQYtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750973045; c=relaxed/simple;
-	bh=VgK/NIhUXE0D/v0L2JOAxu2iW9zQf8L4zbbGLAyyORk=;
+	s=arc-20240116; t=1750973046; c=relaxed/simple;
+	bh=JFw7TrPsCT0OFXmIGmyZgDpgghjWJZKpxZeoG+2gAJE=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a2/GL6wspWO25ZwWjZzQjL1dx5rrzJ1Vq+axKa5TBVznYigOA85/fB3w26HSguFqypYUJMy4+XuuXFBcIhkeRk9YC/sMMKHFvkJ0K5Fy6v0BoL1j9x+hjh39fnWxrIIcxZp6Hje2XTr+Tpppl4y9lFchKKuWg62BCx2xDheWKsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WMJ4lX3a; arc=none smtp.client-ip=209.85.128.54
+	 MIME-Version; b=lBUDenzG3xdWeSG+1nOpwbcDei/9reKROB2pHTMyyUU30eNAYxQx1U+b78dBsRD0aHWRpvdFoOg0IdMd7PlpDSHUvr908Ttw9VAsV7JawA3lCXJo/YSb49BxAsAs7LqPt2HWNEIu0te8oWy9TQixnv3btIVd43SlQPGJ+3K/f94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jbmX6uI4; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-451ebd3d149so8414445e9.2;
-        Thu, 26 Jun 2025 14:24:02 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-453398e90e9so10655125e9.1;
+        Thu, 26 Jun 2025 14:24:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750973041; x=1751577841; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1750973042; x=1751577842; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xDI29+q7HlJ7MkSmIREKY4LqDtP09HQBgq1hjSUYkAM=;
-        b=WMJ4lX3aD1i4yKuo0WZ8pH+f9Y/rkvWLgNjGA1AZfDDO3zthcxUqAzyIbjNvSRhyTJ
-         0HwIXGNKnX28kJrd4NMG+QWHA7OMZNlgEsvZBbG5zBsr3N26nwIfjWrZPAubPIouCeKN
-         F8jsEruc4J5DQkK5KB9p3kKXUEnFSyUWP+jO2pzWrGYKf2SZdqVU3BsTQJfGqmwaEgyB
-         DzHSKagNLuQDqwdb0Jniysk2mwOMNN7Xu3v86ynPBZLe3Aox2By+1BcXrIRFxvIRNe9W
-         2+z9t8+OcAPjpdO+Cc3B3qJKjPIn2H95RrmhXur4Az9nYBc720NpQrH6nizQhGLQfwOK
-         w8MQ==
+        bh=BIOMFqyNUBF162fetCo3wyfrnMMJk+JlU3hf3FfA/ng=;
+        b=jbmX6uI4EUeLLtUMN/cUDyY3MuFaSPKMipIG6YR2h5O8Q6CZZ8e0A58Mt0sOOv9+Fr
+         Tz2Wj1ykz1ZeomdtablXWO/ZKlrE24TQFS9AhAlwYfQYzNuwv3gxmiHlHX59i0KLKyt1
+         lDj2dtVZbD+NcIaEzrWYt/2qVudr6wRJSuVC+xtK2ImX/ifB/41pFZuB4b8fH++hR5kh
+         XG499g5MJHXv3eb6K6asFOuVbJ302w9vYb84PG7hMn+6cHKhFFPHFjFlLMi/RJokQjJy
+         8VxAU+d2oNYW2ZC5/+PFYftglUdHXw9wIlO6cJUvrlA+1dSeP2p66H1WV+1D0/rGSh9B
+         /b9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750973041; x=1751577841;
+        d=1e100.net; s=20230601; t=1750973042; x=1751577842;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xDI29+q7HlJ7MkSmIREKY4LqDtP09HQBgq1hjSUYkAM=;
-        b=cZQJRx8THv9k9PbcdV7U9vkftXCewxnQimrkEe4cEpWtesrcwGr1G3yJ3GQJ/cHPmR
-         lDrNjL8//lskS6Ol4C+MM3M6ufEVy0ZL2BWQuVvp4GXoWG/8DLfDy4rxE5epPMqwm9IY
-         yEkws13UtgDLB/J0zSgt1lRPucNU+BffiwwsauKr8qRFjXLDVVFkvEA20TsyH12YChx9
-         UKcoSxiIG22kRzq6RReLRNJ7z+rvVtx1ZKOR20N80C4IXn6PIa94OQMDHQ2ylpEbcSI0
-         BoaDxm4DHeBkDF/nRuRWjJZy7EfrUzy9xv0W450KI8cTMLl/K6Tqc2QfKzAsge1GKxSH
-         q09A==
-X-Forwarded-Encrypted: i=1; AJvYcCWMyFQh/rjDeJd59eU/dLRUz3Td9kVpE2ZPPFnxk7FRjSBYn6MHQjynr8MxqTnD7XmdMMol7C1EYekV@vger.kernel.org, AJvYcCWTbwfmIcGypvnyMz5/7UAgcKpgpdRvMjXz3arzg1aaUAzg7BwOgvG1VPYobrvwL8oBswylwG7GVRWXPjBq@vger.kernel.org, AJvYcCWfP+DiRwYeNbfzImqd24iT2yrORHeqkh+9ZESU+PvllkrtYxJx4+/XKR6Si5A5iIFJpPMVcdr7@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpfVHX38jTjxIU6MPrzbl6JGdMj8KXIgY7pKgDkQYfDCzja3Pf
-	hpfjms3PJD2MdjlSu65lb1cfcvWi2D7LxkAukivtHGPKNJYh40AqYzAZ
-X-Gm-Gg: ASbGncs8PhLetONKEtRm4/s7quzFn89APD+GyNxjZzKP8IDnYYuV4EOa68ZZts/5ohp
-	4FZ6uF8lUNtPyTzJf/zlUC2IsVQBOsY3mJdpX/7tT2glHskhBN0Tolpx5ReKXqa8cEcl108ZV8s
-	RXaMwRn9iZBWzOSvhyh31Nm/df2Uu/eKnhuFDE3AJRxAVJFSB05jnJb0LaQJRnXHWYoqrk3M5dW
-	vJc0BlcuxGwRhxCbTRSaNfzZGwFHSLMUzYEozuwcjaMFyh2SG2YxXnVsB/i3R0CH/C7csx3ZWqR
-	CKXEzmcvM/rS6x3r8gNGD1R0Xg+CjTPKmJrvKDRsZwbLZ+yzN6waepruPV44bYw3iGNjgpnYYqb
-	2nU5rHP3Zq+8m5jHUZwhNMHX+OWCe3NclY1AiJRi/mQ==
-X-Google-Smtp-Source: AGHT+IHywJBN/nU81F+eHK8T8VpKKa8vo6AdlwewctsWYZguLnQqkjAOXE7zIDslsvuWqLPSKStb0g==
-X-Received: by 2002:a05:600c:8506:b0:43d:db5:7af8 with SMTP id 5b1f17b1804b1-4538ee61ed7mr7479385e9.21.1750973040960;
-        Thu, 26 Jun 2025 14:24:00 -0700 (PDT)
+        bh=BIOMFqyNUBF162fetCo3wyfrnMMJk+JlU3hf3FfA/ng=;
+        b=D0YjSjgq3903OQ5NK/6HhjLaFIrgutK4Ltnu+gM76NvTYPbBnvgCaNIfb0TmZ1kt3E
+         JQLC8n1VFrRR0c32GLNGbbzO9gT0l1oKHDNQ1hTZvewBbLUZI+lU7t2/uAIab2nGY8Vy
+         BJnQ3FItVXAEjeBt2j36E71AgWEYU5v7e2dmOv3ZaUisYYWIKbPmgpGFVy9Bb7lnTZx5
+         WMDnryYBidB5P7jPafLbRl58dNpQOk9XAXEiAgHudVSmY0NJ1FEOobSK/Q4nG5BVRh9M
+         JNUiGlMdZISizSr3wKRHeVwxBh5UgnIdhXHzMDTG3nzZxkwcD+mwDZh6m6WUL9Laukgz
+         X1ow==
+X-Forwarded-Encrypted: i=1; AJvYcCUDd1JG5NOVKI5hHPujhnAFKz2GxduwQOdpv6N5bURZ0DXtO/jiIGO3Fu4Vjt1DjMmhtDV1lQx8RnPJdcvv@vger.kernel.org, AJvYcCVrCcUDM2xIzSfLKZvtxmu3xE0u1rTNoxARKMlmF+xEqxHOTkj1n7Ot1hjG+pXWc5hYWGYxjEaA@vger.kernel.org, AJvYcCWZTXZ7y+6NokMh+An64onQXFfOvCJZwZOVMeJd6qoIg8CAATsuDyOsnzaUNM5lQxTSfdiYiIIsVTPu@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFs69CKNPLlJEc8mHHVuvy05gqOXGSOEaibe4bcdz3ToGgFC5x
+	CHoQF2G4Ily9WceW6luG7hMqdUuvzTY/5uiuLncIJFTuY0L9PSq1X/JZ
+X-Gm-Gg: ASbGncsI0eq5KQV2e7WWv5NbaMwN3EQ/DigY0EOa0k/+YE8fbNMVEG5KqQEU8YonDEt
+	mDEBq09TWkUg39pHiIK6Hpu1lS7W8kEPDlMH1ch4LZdhVrUNqsaABjK0+krgIFoMjP+5CcieKqk
+	JzAlL/zjEj20rd+3hNOLBTt2f9FD+STzUBsxf4aFP37VYqy7PP/5u4anSNwrCpcjhMobbdJXmpE
+	wffaA3ZcvLNYP/Jlgl3gUiyBHXq2E59KjGinqCnlTMUpjf2RbCZDo0D5wEX45K6h0YSYJwNemHb
+	3AcoytpI6WmrR4jLgHc1SLcFgtlQEyXkE0ua2sQQRPv0FJQH03ziecuGHkdsIOSe0psc876Beff
+	01kvUNBwlzfqoe/kDfQuP3hXwuGhAl9M=
+X-Google-Smtp-Source: AGHT+IGYoTCE2ejOG9HTcWhAHwI4ndhvI/OD/F9Oaq0DjE5kPHJxe/T8XEsB2iQptOTFDVbPGZnj9Q==
+X-Received: by 2002:a05:600c:828f:b0:43c:f629:66f4 with SMTP id 5b1f17b1804b1-4538fdfbd9amr488595e9.0.1750973042423;
+        Thu, 26 Jun 2025 14:24:02 -0700 (PDT)
 Received: from localhost.localdomain (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-453835798acsm57186475e9.10.2025.06.26.14.23.59
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-453835798acsm57186475e9.10.2025.06.26.14.24.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jun 2025 14:24:00 -0700 (PDT)
+        Thu, 26 Jun 2025 14:24:02 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Christian Marangi <ansuelsmth@gmail.com>,
 	Lee Jones <lee@kernel.org>,
@@ -100,9 +100,9 @@ To: Christian Marangi <ansuelsmth@gmail.com>,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [net-next PATCH v15 06/12] net: mdio: Add Airoha AN8855 Switch MDIO PBUS
-Date: Thu, 26 Jun 2025 23:23:05 +0200
-Message-ID: <20250626212321.28114-7-ansuelsmth@gmail.com>
+Subject: [net-next PATCH v15 07/12] nvmem: an8855: Add support for Airoha AN8855 Switch EFUSE
+Date: Thu, 26 Jun 2025 23:23:06 +0200
+Message-ID: <20250626212321.28114-8-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250626212321.28114-1-ansuelsmth@gmail.com>
 References: <20250626212321.28114-1-ansuelsmth@gmail.com>
@@ -114,353 +114,126 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add Airoha AN8855 MDIO PBUS driver that permits to access the internal
-Gigabit PHY from the Switch register.
-
-This have the benefits of exposing direct access to CL45 address and
-Vendor MDIO pages via specific Switch registers.
-
-Additional info are present in a long explaination in the MDIO driver
-and also finding from Reverse-Engineering the implementation.
-
-This requires the upper Switch MFD to be probed and init to actually
-work as it does make use of regmap.
+Add support for Airoha AN8855 Switch EFUSE. These EFUSE might be used
+for calibration data for the internal switch PHYs.
 
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
- drivers/net/mdio/Kconfig       |  10 ++
- drivers/net/mdio/Makefile      |   1 +
- drivers/net/mdio/mdio-an8855.c | 262 +++++++++++++++++++++++++++++++++
- include/linux/dsa/an8855.h     |  18 +++
- 4 files changed, 291 insertions(+)
- create mode 100644 drivers/net/mdio/mdio-an8855.c
- create mode 100644 include/linux/dsa/an8855.h
+ drivers/nvmem/Kconfig        | 11 ++++++
+ drivers/nvmem/Makefile       |  2 ++
+ drivers/nvmem/an8855-efuse.c | 68 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 81 insertions(+)
+ create mode 100644 drivers/nvmem/an8855-efuse.c
 
-diff --git a/drivers/net/mdio/Kconfig b/drivers/net/mdio/Kconfig
-index 7db40aaa079d..7f8f0b5caa42 100644
---- a/drivers/net/mdio/Kconfig
-+++ b/drivers/net/mdio/Kconfig
-@@ -42,6 +42,16 @@ config MDIO_XGENE
- 	  This module provides a driver for the MDIO busses found in the
- 	  APM X-Gene SoC's.
+diff --git a/drivers/nvmem/Kconfig b/drivers/nvmem/Kconfig
+index d370b2ad11e7..8fb1a0efd431 100644
+--- a/drivers/nvmem/Kconfig
++++ b/drivers/nvmem/Kconfig
+@@ -28,6 +28,17 @@ source "drivers/nvmem/layouts/Kconfig"
  
-+config MDIO_AN8855
-+	tristate "Airoha AN8855 Switch MDIO bus controller"
-+	depends on MFD_AIROHA_AN8855
-+	depends on OF_MDIO
-+	select MDIO_REGMAP
+ # Devices
+ 
++config NVMEM_AN8855_EFUSE
++	tristate "Airoha AN8855 eFuse support"
++	depends on MFD_AIROHA_AN8855 || COMPILE_TEST
 +	help
-+	  This module provides a driver for the Airoha AN8855 Switch
-+	  that requires a MDIO passtrough as switch address is shared
-+	  with the internal PHYs and requires additional page handling.
++	  Say y here to enable support for reading eFuses on Airoha AN8855
++	  Switch. These are e.g. used to store factory programmed
++	  calibration data required for the PHY.
 +
- config MDIO_ASPEED
- 	tristate "ASPEED MDIO bus controller"
- 	depends on ARCH_ASPEED || COMPILE_TEST
-diff --git a/drivers/net/mdio/Makefile b/drivers/net/mdio/Makefile
-index c23778e73890..2b9edddf3911 100644
---- a/drivers/net/mdio/Makefile
-+++ b/drivers/net/mdio/Makefile
-@@ -5,6 +5,7 @@ obj-$(CONFIG_ACPI_MDIO)		+= acpi_mdio.o
- obj-$(CONFIG_FWNODE_MDIO)	+= fwnode_mdio.o
- obj-$(CONFIG_OF_MDIO)		+= of_mdio.o
++	  This driver can also be built as a module. If so, the module will
++	  be called nvmem-an8855-efuse.
++
+ config NVMEM_APPLE_EFUSES
+ 	tristate "Apple eFuse support"
+ 	depends on ARCH_APPLE || COMPILE_TEST
+diff --git a/drivers/nvmem/Makefile b/drivers/nvmem/Makefile
+index 2021d59688db..5c9e6e450181 100644
+--- a/drivers/nvmem/Makefile
++++ b/drivers/nvmem/Makefile
+@@ -10,6 +10,8 @@ nvmem_layouts-y			:= layouts.o
+ obj-y				+= layouts/
  
-+obj-$(CONFIG_MDIO_AN8855)		+= mdio-an8855.o
- obj-$(CONFIG_MDIO_ASPEED)		+= mdio-aspeed.o
- obj-$(CONFIG_MDIO_BCM_IPROC)		+= mdio-bcm-iproc.o
- obj-$(CONFIG_MDIO_BCM_UNIMAC)		+= mdio-bcm-unimac.o
-diff --git a/drivers/net/mdio/mdio-an8855.c b/drivers/net/mdio/mdio-an8855.c
+ # Devices
++obj-$(CONFIG_NVMEM_AN8855_EFUSE)	+= nvmem-an8855-efuse.o
++nvmem-an8855-efuse-y 			:= an8855-efuse.o
+ obj-$(CONFIG_NVMEM_APPLE_EFUSES)	+= nvmem-apple-efuses.o
+ nvmem-apple-efuses-y 			:= apple-efuses.o
+ obj-$(CONFIG_NVMEM_APPLE_SPMI)		+= apple_nvmem_spmi.o
+diff --git a/drivers/nvmem/an8855-efuse.c b/drivers/nvmem/an8855-efuse.c
 new file mode 100644
-index 000000000000..990cf683b470
+index 000000000000..d1afde6f623f
 --- /dev/null
-+++ b/drivers/net/mdio/mdio-an8855.c
-@@ -0,0 +1,262 @@
-+// SPDX-License-Identifier: GPL-2.0+
++++ b/drivers/nvmem/an8855-efuse.c
+@@ -0,0 +1,68 @@
++// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * MDIO PBUS driver for Airoha AN8855 Switch
-+ *
-+ * Author: Christian Marangi <ansuelsmth@gmail.com>
-+ *
++ *  Airoha AN8855 Switch EFUSE Driver
 + */
 +
-+#include <linux/dsa/an8855.h>
++#include <linux/mod_devicetable.h>
 +#include <linux/module.h>
-+#include <linux/of_mdio.h>
++#include <linux/nvmem-provider.h>
 +#include <linux/platform_device.h>
 +#include <linux/regmap.h>
 +
-+/* AN8855 permit to access the internal GPHY via the PBUS
-+ * interface.
-+ *
-+ * Some piece of this comes from Reverse-Enginnering
-+ * by applying the value on the Switch and observing
-+ * it by reading the raw value on the MDIO BUS.
-+ *
-+ * The CL22 address are shifted by 4 left
-+ * The CL44 address need to be multiplied by 4 (and
-+ * no shift)
-+ *
-+ * The GPHY have additional configuration (like auto
-+ * downshift) at PAGE 1 in the EXT register.
-+ * It was discovered that it's possible to access
-+ * PAGE x address by increasing them by 2 on setting
-+ * the value in the related mask.
-+ * The PHY have these custom/vendor register
-+ * always starting at 0x10.
-+ * From MDIO bus, for address 0x0 to 0xf, PHY
-+ * always report PAGE 0 values.
-+ * From PBUS, on setting the PAGE value, 0x0 to 0xf
-+ * always report 0.
-+ *
-+ * (it can also be notice that PBUS does NOT change the
-+ *  page on accessing these custom/vendor register)
-+ *
-+ * Comparison examples:
-+ *	(PORT 0 PAGE 1)		  |	(PORT 0 PAGE 2)
-+ *  PBUS ADDR	  VALUE	    MDIO  |  PBUS ADDR	  VALUE	    MDIO
-+ * 0xa0803000: 0x00000000  0x1840 | 0xa0804000: 0x00000000  0x1840
-+ * 0xa0803010: 0x00000000  0x7949 | 0xa0804010: 0x00000000  0x7949
-+ * 0xa0803020: 0x00000000  0xc0ff | 0xa0804020: 0x00000000  0xc0ff
-+ * 0xa0803030: 0x00000000  0x0410 | 0xa0804030: 0x00000000  0x0410
-+ * 0xa0803040: 0x00000000  0x0de1 | 0xa0804040: 0x00000000  0x0de1
-+ * 0xa0803050: 0x00000000  0x0000 | 0xa0804050: 0x00000000  0x0000
-+ * 0xa0803060: 0x00000000  0x0004 | 0xa0804060: 0x00000000  0x0004
-+ * 0xa0803070: 0x00000000  0x2001 | 0xa0804070: 0x00000000  0x2001
-+ * 0xa0803080: 0x00000000  0x0000 | 0xa0804080: 0x00000000  0x0000
-+ * 0xa0803090: 0x00000000  0x0200 | 0xa0804090: 0x00000000  0x0200
-+ * 0xa08030a0: 0x00000000  0x4000 | 0xa08040a0: 0x00000000  0x4000
-+ * 0xa08030b0: 0x00000000  0x0000 | 0xa08040b0: 0x00000000  0x0000
-+ * 0xa08030c0: 0x00000000  0x0000 | 0xa08040c0: 0x00000000  0x0000
-+ * 0xa08030d0: 0x00000000  0x0000 | 0xa08040d0: 0x00000000  0x0000
-+ * 0xa08030e0: 0x00000000  0x0000 | 0xa08040e0: 0x00000000  0x0000
-+ * 0xa08030f0: 0x00000000  0x2000 | 0xa08040f0: 0x00000000  0x2000
-+ * 0xa0803100: 0x00000000  0x0000 | 0xa0804100: 0x00000000  0x0000
-+ * 0xa0803110: 0x00000000  0x0000 | 0xa0804110: 0x0000030f  0x030f
-+ * 0xa0803120: 0x00000000  0x0000 | 0xa0804120: 0x00000000  0x0000
-+ * 0xa0803130: 0x00000030  0x0030 | 0xa0804130: 0x00000000  0x0000
-+ * 0xa0803140: 0x00003a14  0x3a14 | 0xa0804140: 0x00000000  0x0000
-+ * 0xa0803150: 0x00000101  0x0101 | 0xa0804150: 0x00000000  0x0000
-+ * 0xa0803160: 0x00000001  0x0001 | 0xa0804160: 0x00000000  0x0000
-+ * 0xa0803170: 0x00000800  0x0800 | 0xa0804170: 0x000001ff  0x01ff
-+ * 0xa0803180: 0x00000000  0x0000 | 0xa0804180: 0x0000ff1f  0xff1f
-+ * 0xa0803190: 0x0000001f  0x001f | 0xa0804190: 0x000083ff  0x83ff
-+ * 0xa08031a0: 0x00000000  0x0000 | 0xa08041a0: 0x00000000  0x0000
-+ * 0xa08031b0: 0x00000000  0x0000 | 0xa08041b0: 0x00000000  0x0000
-+ * 0xa08031c0: 0x00003001  0x3001 | 0xa08041c0: 0x00000000  0x0000
-+ * 0xa08031d0: 0x00000000  0x0000 | 0xa08041d0: 0x00000000  0x0000
-+ * 0xa08031e0: 0x00000000  0x0000 | 0xa08041e0: 0x00000000  0x0000
-+ * 0xa08031f0: 0x00000000  0x0001 | 0xa08041f0: 0x00000000  0x0002
-+ *
-+ * Using the PBUS permits to have consistent access
-+ * to Switch and PHY without having to relay on checking
-+ * pages.
-+ *
-+ * It does also permit to cut on CL45 access and PAGE1
-+ * access as the PBUS expose direct register for them.
-+ *
-+ * The base address is 0xa0800000 and can be seen as
-+ * bitmap to derive each specific address.
-+ *
-+ * Example:
-+ *   PORT 1 ADDR 0x2 --> 0xa1800020
-+ *			    ^    ^
-+ *			    |    ADDR
-+ *			    PORT
-+ *   PORT 2 DEVAD 1 ADDR 0x2 --> 0xa2840008
-+ *				    ^ ^   ^
-+ *				    | |   ADDR (*4)
-+ *				    | DEVAD
-+ *				    PORT
-+ *   PORT 3 PAGE 1 ADDR 0x14 --> 0xa3803140
-+ *				    ^  ^^^
-+ *				    |  |ADDR
-+ *				    |  PAGE (+2)
-+ *				    PORT
-+ *
-+ * It's worth mention that trying to read more than the
-+ * expected PHY address cause the PBUS to ""crash"" and
-+ * the Switch to lock out (requiring a reset).
-+ * Validation of the port value is put to prevent this
-+ * problem.
-+ */
++#define AN8855_EFUSE_CELL		50
 +
-+struct an8855_mdio_priv {
-+	struct regmap *regmap;
-+	u32 base_addr;
-+	u8 next_page;
-+};
++#define AN8855_EFUSE_DATA0		0x1000a500
++#define   AN8855_EFUSE_R50O		GENMASK(30, 24)
 +
-+static int an8855_mdio_read(struct mii_bus *bus, int addr, int regnum)
++static int an8855_efuse_read(void *context, unsigned int offset,
++			     void *val, size_t bytes)
 +{
-+	struct an8855_mdio_priv *priv = bus->priv;
-+	u32 pbus_addr = AN8855_GPHY_ACCESS;
-+	u32 port = addr - priv->base_addr;
-+	u32 val;
-+	int ret;
++	struct regmap *regmap = context;
 +
-+	/* Signal invalid address for mdio tools */
-+	if (port >= AN8855_NUM_PHY_PORT)
-+		return 0xffff;
-+
-+	pbus_addr |= FIELD_PREP(AN8855_GPHY_PORT, port);
-+	pbus_addr |= FIELD_PREP(AN8855_CL22_ADDR, regnum);
-+	if (priv->next_page)
-+		pbus_addr |= FIELD_PREP(AN8855_PAGE_SELECT,
-+					priv->next_page + 2);
-+
-+	ret = regmap_read(priv->regmap, pbus_addr, &val);
-+	if (ret)
-+		return ret;
-+
-+	return val & 0xffff;
++	return regmap_bulk_read(regmap, AN8855_EFUSE_DATA0 + offset,
++				val, bytes / sizeof(u32));
 +}
 +
-+static int an8855_mdio_write(struct mii_bus *bus, int addr, int regnum,
-+			     u16 value)
++static int an8855_efuse_probe(struct platform_device *pdev)
 +{
-+	struct an8855_mdio_priv *priv = bus->priv;
-+	u32 pbus_addr = AN8855_GPHY_ACCESS;
-+	u32 port = addr - priv->base_addr;
-+
-+	if (port >= AN8855_NUM_PHY_PORT)
-+		return -EINVAL;
-+
-+	/* When PHY ask to change page, skip writing it and
-+	 * save it for the next read/write.
-+	 */
-+	if (regnum == AN8855_PHY_SELECT_PAGE) {
-+		priv->next_page = value;
-+		return 0;
-+	}
-+
-+	pbus_addr |= FIELD_PREP(AN8855_GPHY_PORT, port);
-+	pbus_addr |= FIELD_PREP(AN8855_CL22_ADDR, regnum);
-+	if (priv->next_page)
-+		pbus_addr |= FIELD_PREP(AN8855_PAGE_SELECT,
-+					priv->next_page + 2);
-+
-+	return regmap_write(priv->regmap, pbus_addr, value);
-+}
-+
-+static int an8855_mdio_cl45_read(struct mii_bus *bus, int addr, int devnum,
-+				 int regnum)
-+{
-+	struct an8855_mdio_priv *priv = bus->priv;
-+	u32 pbus_addr = AN8855_GPHY_ACCESS;
-+	u32 port = addr - priv->base_addr;
-+	u32 val;
-+	int ret;
-+
-+	/* Signal invalid address for mdio tools */
-+	if (port >= AN8855_NUM_PHY_PORT)
-+		return 0xffff;
-+
-+	pbus_addr |= FIELD_PREP(AN8855_GPHY_PORT, port);
-+	pbus_addr |= FIELD_PREP(AN8855_DEVAD_ADDR, devnum);
-+	pbus_addr |= FIELD_PREP(AN8855_CL45_ADDR, regnum * 4);
-+
-+	ret = regmap_read(priv->regmap, pbus_addr, &val);
-+	if (ret)
-+		return ret;
-+
-+	return val & 0xffff;
-+}
-+
-+static int an8855_mdio_cl45_write(struct mii_bus *bus, int addr, int devnum,
-+				  int regnum, u16 value)
-+{
-+	struct an8855_mdio_priv *priv = bus->priv;
-+	u32 pbus_addr = AN8855_GPHY_ACCESS;
-+	u32 port = addr - priv->base_addr;
-+
-+	if (port >= AN8855_NUM_PHY_PORT)
-+		return -EINVAL;
-+
-+	pbus_addr |= FIELD_PREP(AN8855_GPHY_PORT, port);
-+	pbus_addr |= FIELD_PREP(AN8855_DEVAD_ADDR, devnum);
-+	pbus_addr |= FIELD_PREP(AN8855_CL45_ADDR, regnum * 4);
-+
-+	return regmap_write(priv->regmap, pbus_addr, value);
-+}
-+
-+static int an8855_mdio_probe(struct platform_device *pdev)
-+{
++	struct nvmem_config an8855_nvmem_config = {
++		.name = "an8855-efuse",
++		.size = AN8855_EFUSE_CELL * sizeof(u32),
++		.stride = sizeof(u32),
++		.word_size = sizeof(u32),
++		.reg_read = an8855_efuse_read,
++	};
 +	struct device *dev = &pdev->dev;
-+	struct an8855_mdio_priv *priv;
-+	struct mii_bus *bus;
-+	int ret;
++	struct nvmem_device *nvmem;
++	struct regmap *regmap;
 +
-+	bus = devm_mdiobus_alloc_size(dev, sizeof(*priv));
-+	if (!bus)
-+		return -ENOMEM;
-+
-+	priv = bus->priv;
-+	priv->regmap = dev_get_regmap(dev->parent, NULL);
-+	if (!priv->regmap)
++	/* Assign NVMEM priv to MFD regmap */
++	regmap = dev_get_regmap(dev->parent, NULL);
++	if (!regmap)
 +		return -ENOENT;
 +
-+	ret = of_property_read_u32(dev->parent->of_node, "reg",
-+				   &priv->base_addr);
-+	if (ret)
-+		return -EINVAL;
++	an8855_nvmem_config.priv = regmap;
++	an8855_nvmem_config.dev = dev;
++	nvmem = devm_nvmem_register(dev, &an8855_nvmem_config);
 +
-+	bus->name = "an8855_mdio_bus";
-+	snprintf(bus->id, MII_BUS_ID_SIZE, "%s-gphy-pbus", dev_name(dev));
-+	bus->parent = dev;
-+	bus->read = an8855_mdio_read;
-+	bus->write = an8855_mdio_write;
-+	bus->read_c45 = an8855_mdio_cl45_read;
-+	bus->write_c45 = an8855_mdio_cl45_write;
-+
-+	ret = devm_of_mdiobus_register(dev, bus, dev->of_node);
-+	if (ret)
-+		return dev_err_probe(dev, ret, "failed to register MDIO bus\n");
-+
-+	return 0;
++	return PTR_ERR_OR_ZERO(nvmem);
 +}
 +
-+static const struct of_device_id an8855_mdio_of_match[] = {
-+	{ .compatible = "airoha,an8855-mdio", },
++static const struct of_device_id an8855_efuse_of_match[] = {
++	{ .compatible = "airoha,an8855-efuse", },
 +	{ /* sentinel */ }
 +};
-+MODULE_DEVICE_TABLE(of, an8855_mdio_of_match);
++MODULE_DEVICE_TABLE(of, an8855_efuse_of_match);
 +
-+static struct platform_driver an8855_mdio_driver = {
-+	.probe	= an8855_mdio_probe,
++static struct platform_driver an8855_efuse_driver = {
++	.probe = an8855_efuse_probe,
 +	.driver = {
-+		.name = "an8855-mdio",
-+		.of_match_table = an8855_mdio_of_match,
++		.name = "an8855-efuse",
++		.of_match_table = an8855_efuse_of_match,
 +	},
 +};
-+module_platform_driver(an8855_mdio_driver);
++module_platform_driver(an8855_efuse_driver);
 +
 +MODULE_AUTHOR("Christian Marangi <ansuelsmth@gmail.com>");
-+MODULE_DESCRIPTION("Driver for AN8855 MDIO passthrough");
++MODULE_DESCRIPTION("Driver for AN8855 Switch EFUSE");
 +MODULE_LICENSE("GPL");
-diff --git a/include/linux/dsa/an8855.h b/include/linux/dsa/an8855.h
-new file mode 100644
-index 000000000000..32ec29b3abb0
---- /dev/null
-+++ b/include/linux/dsa/an8855.h
-@@ -0,0 +1,18 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+#ifndef _NET_AN8855_H
-+#define _NET_AN8855_H
-+
-+#define AN8855_GPHY_ACCESS		0xa0800000
-+#define	  AN8855_GPHY_PORT		GENMASK(26, 24)
-+#define	  AN8855_DEVAD_ADDR		GENMASK(23, 18)
-+#define	  AN8855_PAGE_SELECT		GENMASK(14, 12)
-+#define	  AN8855_ADDR			GENMASK(11, 0)
-+#define	    AN8855_CL45_ADDR		AN8855_ADDR
-+#define	    AN8855_CL22_ADDR		GENMASK(8, 4)
-+
-+#define AN8855_PHY_SELECT_PAGE		0x1f
-+
-+#define AN8855_NUM_PHY_PORT		5
-+
-+#endif /* _NET_AN8855_H */
 -- 
 2.48.1
 
