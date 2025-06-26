@@ -1,146 +1,286 @@
-Return-Path: <netdev+bounces-201414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D717AE9654
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 08:35:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0973EAE9659
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 08:35:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3FF55A13D2
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 06:34:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 360307B0808
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 06:34:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3763226D18;
-	Thu, 26 Jun 2025 06:35:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="g0m/wFnB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77D28235362;
+	Thu, 26 Jun 2025 06:35:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C0E13A3F7;
-	Thu, 26 Jun 2025 06:35:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 858AE13A3F7;
+	Thu, 26 Jun 2025 06:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750919712; cv=none; b=P8uTkIEZ7Sg9WKCIDtrhb1h5qSF9gCJgw7EEl6D5mDFZRID7F5066JSPzh76E1hPkVqV/ojT5dJn1qTkhSDS9u3Vd/tFUSdxFH0Xwco43RQm3ZsCludn0DuLKLPKoj//okSYzCSuJ8WuI5aUqbzMyzAd253D202sW30y/tpsdSw=
+	t=1750919747; cv=none; b=FiksQX2KM3/eq46ruNqmoLvGYdzC6mDUndn166Ts7pKGks9nkYtxaCpAbX4ErXL2G1gPXyt0niHUvmBOseB098NWOupMU6nFwymwHiDwLzbbt6h+HlL6CZkh0zLLLTFC+t8hnJTIF00EqjVDtDvlyzSJwJoP/YnMSaBEAZw9GWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750919712; c=relaxed/simple;
-	bh=kXEwt3IRU2NN6XR4T29MvS381DWcfgzy/ExFUQTFHXc=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jwM1xhA3gsxrAxEp7JbBQ0f98jMOpZd1osm7i/AdXzz+I+MgED3WZY+8GGHa9WH6DKeqY+s27WidyWRa3lwiFtL0tMHhikn1nkki88HXu1fuQ9LkDk/CXnFnrLBrIx6PrFqsd4FIU6hrsXnLyZGBiQ7vlrH7YyAVcHm0K5HPw9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=g0m/wFnB; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55PI6RxZ019763;
-	Wed, 25 Jun 2025 23:34:44 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=/6+WkD4QKS5qw/KRv6OC76vlR
-	Djj+Bgyl5FuINvA4tI=; b=g0m/wFnBbrUp46kQzthTvmNcQYmJSXvVQKnDUA8zl
-	V6x3qXfQQC1fmAQ3f6Z6Ovp1EQsOjcW/RL6Xanmjbx0HpCyLAL6Uarm0kdu+zEiT
-	bGPUvhTq/sVGqmIvrnjMqRLt+j3FfJ7Co7+TvrXBp2t8s/KdoGZzsL5A2//rQxhE
-	TfRa3gBopk55a+C0uNRDR6ObESX3x83YcOCAdkLuP/dPan9FBi35fEVNC4WCUEo6
-	Hr4+MFcv8xVjqh2pYId1WDG+YvBCjJEo84kKMO4vb+wPf1PSHLyyH0ZoOic7JN9C
-	2d/eT+oImf8+Kp95CpvsE64RgC1y/CLHHU9NrOlatAYVg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 47gp3q95v7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 25 Jun 2025 23:34:43 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 25 Jun 2025 23:34:28 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 25 Jun 2025 23:34:28 -0700
-Received: from 822c91e11a5c (HY-LT91368.marvell.com [10.29.24.116])
-	by maili.marvell.com (Postfix) with SMTP id 360CC3F7077;
-	Wed, 25 Jun 2025 23:34:23 -0700 (PDT)
-Date: Thu, 26 Jun 2025 06:34:23 +0000
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-CC: Sai Krishna <saikrishnag@marvell.com>,
-        Sunil Goutham
-	<sgoutham@marvell.com>,
-        Linu Cherian <lcherian@marvell.com>,
-        Geetha sowjanya
-	<gakula@marvell.com>,
-        Jerin Jacob <jerinj@marvell.com>, hariprasad
-	<hkelam@marvell.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
-Subject: Re: [PATCH net-next] octeontx2-af: Fix error code in rvu_mbox_init()
-Message-ID: <aFzp70LaPoO0ukw8@822c91e11a5c>
-References: <ee7944ae-7d7d-480d-af33-b77f2aa15500@sabinyo.mountain>
+	s=arc-20240116; t=1750919747; c=relaxed/simple;
+	bh=bIsQmeRpiiKYNJTGcMkzw7UBTwvfOSVX5juQTe+krIE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VwP//mBPs+PrCPYMxh4YOPojB2WJNbB4a3ayZw/jQY67/zqL/X3xpLR+qUbI6VfBC2xfty+rnHSCnrz8YY3sameJHFwnwc9PT5ucoGmHkW6RIvF7FK6CHVTxSmmulscyr6KYLUxW1yqvHaOBx+5pRxh16JOZEfrYwsvNVDK829g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-669ff7000002311f-24-685cea3447ce
+Date: Thu, 26 Jun 2025 15:35:27 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	Zi Yan <ziy@nvidia.com>, willy@infradead.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org,
+	almasrymina@google.com, ilias.apalodimas@linaro.org,
+	harry.yoo@oracle.com, hawk@kernel.org, akpm@linux-foundation.org,
+	davem@davemloft.net, john.fastabend@gmail.com,
+	andrew+netdev@lunn.ch, asml.silence@gmail.com, tariqt@nvidia.com,
+	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
+	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
+	rppt@kernel.org, surenb@google.com, mhocko@suse.com,
+	horms@kernel.org, linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	vishal.moola@gmail.com, hannes@cmpxchg.org, jackmanb@google.com,
+	"jesper@cloudflare.com" <jesper@cloudflare.com>
+Subject: Re: [PATCH net-next v6 9/9] page_pool: access ->pp_magic through
+ struct netmem_desc in page_pool_page_is_pp()
+Message-ID: <20250626063527.GA28653@system.software.com>
+References: <20250620041224.46646-1-byungchul@sk.com>
+ <20250620041224.46646-10-byungchul@sk.com>
+ <ce5b4b18-9934-41e3-af04-c34653b4b5fa@redhat.com>
+ <20250623101622.GB3199@system.software.com>
+ <460ACE40-9E99-42B8-90F0-2B18D2D8C72C@nvidia.com>
+ <a8d40a05-db4c-400f-839b-3c6159a1feab@redhat.com>
+ <42E9BEA8-9B02-440F-94BF-74393827B01E@nvidia.com>
+ <87o6udfbdz.fsf@toke.dk>
+ <77c6a6dd-0e03-4b81-a9c7-eaecaa4ebc0b@redhat.com>
+ <20250625012432.GA74285@system.software.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <ee7944ae-7d7d-480d-af33-b77f2aa15500@sabinyo.mountain>
-X-Authority-Analysis: v=2.4 cv=AemxH2XG c=1 sm=1 tr=0 ts=685cea03 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8 a=KKAkSRfTAAAA:8 a=M5GUcnROAAAA:8 a=BdBXECxqI82sMXVekp8A:9
- a=CjuIK1q_8ugA:10 a=cvBusfyB2V15izCimMoJ:22 a=OBjm3rFKGHvpk9ecZwUJ:22 a=yGmsW_zf-WRfUAWRrVPH:22
-X-Proofpoint-ORIG-GUID: rr-0S0kE2nnZrOVJiDy2RL4GxNgV0ymn
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI2MDA1MiBTYWx0ZWRfX4hOtyfPTcBMi jtnd7kv0aVeZF+b8wCmCoLgKkaObtcZ5Er6sS9SKl8sDnGgC5Yz5WftEXCLRZLsTdIR+R9DoiMt 8TxxFvJs+FNThxbMb/QzOeVxQrQV7ThY6w4av1nSPkBrl2CBWG3g7ABC+45jhy2mVLM+QZqOTq/
- IH3C+biTBk/h5dG6SifF7mtXtB0B/zjtatYRerDEDtL3AZrWQHywwfX9OV69jMvVSn84HNVySbH GpvUEwEyiuOK3b9AYiL1+ZLsRbN5yUSNmFXIQ8D6EKWJ175dx1McANSXAYo81a+pu8rzcAu2VtA jm9RVmJhsROZ/cEyDNv5R9wIIpsKzWekEhT5gktLlYhH6NOPu3loQ9EnIKkvgn1sUnbr/k7b6Kf
- 5V7Kezg+ptIsEL3NweP8CGDzeavdGWx/SVDwrAidq5hPJbgRIQk3g8cUXMpuRrnKFj/ZiTIJ
-X-Proofpoint-GUID: rr-0S0kE2nnZrOVJiDy2RL4GxNgV0ymn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-26_03,2025-06-25_01,2025-03-28_01
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250625012432.GA74285@system.software.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHe3fec3E6OJ1M3zQoFlJ0s8LyCbpLcCKCrkRa6MhDW6nFpjYD
+	wVK6mJpdqW3GLFLTaLZyTrEoNbULXSxjlTdW2V3T5mitWk6J/Pbj//D8f8+Hh6MEGx3GaVJS
+	JW2KKknJyLH8a9CFWfM/bVXPybuPwWS5wkDFDz2UdttpMJXbELg8r1n43tjMwMViNwWmxzkY
+	Bi0/KXjX5GShwroGukp6MNQdqqbAeayFgfwcLwU3Pb0sFPmKMBywl8ngia2AhlM/L1FQndXN
+	wrNaEwOdV3w09NTnY7hnuIyhq2AZNJlDwP3gC4JGS7UM3HlFDJxsNTPwJqcLQWuDE4NxfwEC
+	yy0HDd4fQx3Gu53ssgix31jIiA1f+ijxxuWXMrHG0MGKZmuaeL1supjraKVEa/kRRrQOnGDF
+	9hd1jNhy1ovFGvt3mZif3cuI/e9eYbHvVhsjWm604bVCrHxRopSkSZe0kUsS5OoBb+ge23L9
+	0UvvURbqjsxFARzho0j21fP4H3e4amk/Yz6C5J21UH5m+KnE4fAMczA/jVgPVg4zxR9mibkx
+	2M/jeD3xOnuGcwUPpPd0F5uL5JzAd1KkofA4GhmMJffOvcUjyzNJTVU7k4u4IQ4npX+4kXgS
+	ya4yDvcE8AuJc/A34+fx/BRy29Ys83cS/iFHnh7OY0eOnkDulDlwIRprGKUwjFIY/isMoxRm
+	hMuRoElJT1ZpkqJmqzNSNPrZ23cnW9HQN5Vk/oqzo4EnG+oRzyFlkKLyRZxaoFXpuozkekQ4
+	ShmsOBMdqxYUiaqMfZJ2d7w2LUnS1aNwDitDFfPcexMFfocqVdolSXsk7b+pjAsIy0JKfcVC
+	V3WbbHHpXuNg72DDFoWr6FtCbFZMRPPkVZ2mGYvdrqMrBTI5JtD6cN3UzA9ptZNaisOXeny+
+	1RPtZMYCer3vwTb62rawkI0fA/PbHsU//3x8RUfMhVNb940Jev9It6mjKW3nwK85OdqlgXpy
+	IsGzf3PFyaqrryKF1hJDQWa0EuvUqrnTKa1O9ReYZb38SQMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA03Se0hTcRTA8X67d/deR4vrMr1lIkzKsocFRSeKWBR0CXqAf1hq1FUvbTin
+	bPmKHpbSY06z99qDVlqmCYtVOs0ipmkSmI8aVupklYXIypxDW7V0Evnfh3M4378OhUn0wkWU
+	QnWEV6s4pZQQ4aLdm4pWrRtOka9p1a0Ak7WWgPsT+VA1aBeCqaYOgXfyAwljLW0EVNzyYWB6
+	XYzDuPUnBp9b3STct+0C190hHJrO1mPgvvCSgNJiPwZPJz0kmANmHE7b7wmg2dwuhM66MiFc
+	+XkHg/rCQRJ6Gk0EDNQGhDDkKMWh3VCNg6tMBq2WcPC9GkHQYq0XgE9nJuByt4WAj8UuBN3N
+	bhyMp8oQWJ/1CsE/MdUwvhggZUvZUWM5wTaPfMPYR9XvBGyDoZ9kLbYc9uG9OFbb242xtprz
+	BGv7cYlk+5xNBPtS78fZBvuYgC0t8hDs6Of3OPvt2VuCrfj6XbB3fpJoczqvVOTy6vgth0Ty
+	H/6I7Lqt+SV3vqBCNBivRSEUQ69j+r2Nwmnj9BJGp7di0yboWKa3dzLoMHoZYzvzIGiMPkcy
+	lpawac+n8xm/eyg4F9PAeK66SC0SURJ6AGOayy+imUUo037jEz5zvJJpeNxHaBE15Uim6g81
+	M45mih4bg50QeiPjHv9NTHsBHcM8r2sTlKN5hlklw6yS4X/JMKtkQXgNClOocjM5hXL9ak2G
+	vEClyF+dlpVpQ1P/cvf4r4t25O3Z4UA0haRzxQ+cyXKJkMvVFGQ6EENh0jDxtQ1Jcok4nSs4
+	yquzDqpzlLzGgSIpXBoh3pnIH5LQh7kjfAbPZ/Pqf1sBFbKoEIVnuKu65tzkFsSZXd7AQlkX
+	zu0/OREVEyCGO2OiFidfz0nNtQ9ttAE37EzgU/eVJFwbXYLifLfSQl0H8gSPfCUKa+htffj1
+	aDOVGBUbva3tzTGPNq+Qs8raUvjNlS1PaiPTM1ZKliduH+H2lOk6TJUnarNsizu8vhdJSz1O
+	Ka6Rc2vjMLWG+wvyjXrZKwMAAA==
+X-CFilter-Loop: Reflected
 
-On 2025-06-25 at 15:23:05, Dan Carpenter (dan.carpenter@linaro.org) wrote:
-> The error code was intended to be -EINVAL here, but it was accidentally
-> changed to returning success.  Set the error code.
+On Wed, Jun 25, 2025 at 10:24:32AM +0900, Byungchul Park wrote:
+> On Tue, Jun 24, 2025 at 04:56:32PM +0200, David Hildenbrand wrote:
+> > 
+> > On 24.06.25 16:43, Toke Høiland-Jørgensen wrote:
+> > > Zi Yan <ziy@nvidia.com> writes:
+> > > 
+> > > > On 23 Jun 2025, at 10:58, David Hildenbrand wrote:
+> > > > 
+> > > > > On 23.06.25 13:13, Zi Yan wrote:
+> > > > > > On 23 Jun 2025, at 6:16, Byungchul Park wrote:
+> > > > > > 
+> > > > > > > On Mon, Jun 23, 2025 at 11:16:43AM +0200, David Hildenbrand wrote:
+> > > > > > > > On 20.06.25 06:12, Byungchul Park wrote:
+> > > > > > > > > To simplify struct page, the effort to separate its own descriptor from
+> > > > > > > > > struct page is required and the work for page pool is on going.
+> > > > > > > > > 
+> > > > > > > > > To achieve that, all the code should avoid directly accessing page pool
+> > > > > > > > > members of struct page.
+> > > > > > > > > 
+> > > > > > > > > Access ->pp_magic through struct netmem_desc instead of directly
+> > > > > > > > > accessing it through struct page in page_pool_page_is_pp().  Plus, move
+> > > > > > > > > page_pool_page_is_pp() from mm.h to netmem.h to use struct netmem_desc
+> > > > > > > > > without header dependency issue.
+> > > > > > > > > 
+> > > > > > > > > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > > > > > > > > Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
+> > > > > > > > > Reviewed-by: Mina Almasry <almasrymina@google.com>
+> > > > > > > > > Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+> > > > > > > > > Reviewed-by: Vlastimil Babka <vbabka@suse.cz>
+> > > > > > > > > Acked-by: Harry Yoo <harry.yoo@oracle.com>
+> > > > > > > > > ---
+> > > > > > > > >     include/linux/mm.h   | 12 ------------
+> > > > > > > > >     include/net/netmem.h | 14 ++++++++++++++
+> > > > > > > > >     mm/page_alloc.c      |  1 +
+> > > > > > > > >     3 files changed, 15 insertions(+), 12 deletions(-)
+> > > > > > > > > 
+> > > > > > > > > diff --git a/include/linux/mm.h b/include/linux/mm.h
+> > > > > > > > > index 0ef2ba0c667a..0b7f7f998085 100644
+> > > > > > > > > --- a/include/linux/mm.h
+> > > > > > > > > +++ b/include/linux/mm.h
+> > > > > > > > > @@ -4172,16 +4172,4 @@ int arch_lock_shadow_stack_status(struct task_struct *t, unsigned long status);
+> > > > > > > > >      */
+> > > > > > > > >     #define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
+> > > > > > > > > 
+> > > > > > > > > -#ifdef CONFIG_PAGE_POOL
+> > > > > > > > > -static inline bool page_pool_page_is_pp(struct page *page)
+> > > > > > > > > -{
+> > > > > > > > > -     return (page->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
+> > > > > > > > > -}
+> > > > > > > > > -#else
+> > > > > > > > > -static inline bool page_pool_page_is_pp(struct page *page)
+> > > > > > > > > -{
+> > > > > > > > > -     return false;
+> > > > > > > > > -}
+> > > > > > > > > -#endif
+> > > > > > > > > -
+> > > > > > > > >     #endif /* _LINUX_MM_H */
+> > > > > > > > > diff --git a/include/net/netmem.h b/include/net/netmem.h
+> > > > > > > > > index d49ed49d250b..3d1b1dfc9ba5 100644
+> > > > > > > > > --- a/include/net/netmem.h
+> > > > > > > > > +++ b/include/net/netmem.h
+> > > > > > > > > @@ -56,6 +56,20 @@ NETMEM_DESC_ASSERT_OFFSET(pp_ref_count, pp_ref_count);
+> > > > > > > > >      */
+> > > > > > > > >     static_assert(sizeof(struct netmem_desc) <= offsetof(struct page, _refcount));
+> > > > > > > > > 
+> > > > > > > > > +#ifdef CONFIG_PAGE_POOL
+> > > > > > > > > +static inline bool page_pool_page_is_pp(struct page *page)
+> > > > > > > > > +{
+> > > > > > > > > +     struct netmem_desc *desc = (struct netmem_desc *)page;
+> > > > > > > > > +
+> > > > > > > > > +     return (desc->pp_magic & PP_MAGIC_MASK) == PP_SIGNATURE;
+> > > > > > > > > +}
+> > > > > > > > > +#else
+> > > > > > > > > +static inline bool page_pool_page_is_pp(struct page *page)
+> > > > > > > > > +{
+> > > > > > > > > +     return false;
+> > > > > > > > > +}
+> > > > > > > > > +#endif
+> > > > > > > > 
+> > > > > > > > I wonder how helpful this cleanup is long-term.
+> > > > > > > > 
+> > > > > > > > page_pool_page_is_pp() is only called from mm/page_alloc.c, right?
+> > > > > > > 
+> > > > > > > Yes.
+> > > > > > > 
+> > > > > > > > There, we want to make sure that no pagepool page is ever returned to
+> > > > > > > > the buddy.
+> > > > > > > > 
+> > > > > > > > How reasonable is this sanity check to have long-term? Wouldn't we be
+> > > > > > > > able to check that on some higher-level freeing path?
+> > > > > > > > 
+> > > > > > > > The reason I am commenting is that once we decouple "struct page" from
+> > > > > > > > "struct netmem_desc", we'd have to lookup here the corresponding "struct
+> > > > > > > > netmem_desc".
+> > > > > > > > 
+> > > > > > > > ... but at that point here (when we free the actual pages), the "struct
+> > > > > > > > netmem_desc" would likely already have been freed separately (remember:
+> > > > > > > > it will be dynamically allocated).
+> > > > > > > > 
+> > > > > > > > With that in mind:
+> > > > > > > > 
+> > > > > > > > 1) Is there a higher level "struct netmem_desc" freeing path where we
+> > > > > > > > could check that instead, so we don't have to cast from pages to
+> > > > > > > > netmem_desc at all.
+> > > > > > > 
+> > > > > > > I also thought it's too paranoiac.  However, I thought it's other issue
+> > > > > > > than this work.  That's why I left the API as is for now, it can be gone
+> > > > > > > once we get convinced the check is unnecessary in deep buddy.  Wrong?
+> > > > > > > 
+> > > > > > > > 2) How valuable are these sanity checks deep in the buddy?
+> > > > > > > 
+> > > > > > > That was also what I felt weird on.
+> > > > > > 
+> > > > > > It seems very useful when I asked last time[1]:
+> > > > > > 
+> > > > > > |> We have actually used this at Cloudflare to catch some page_pool bugs.
+> > > > > 
+> > > > > My question is rather, whether there is some higher-level freeing path for netmem_desc where we could check that instead (IOW, earlier).
+> > > > > 
+> > > > > Or is it really arbitrary put_page() (IOW, we assume that many possible references can be held)?
+> > > > 
+> > > > +Toke, who I talked about this last time.
+> > > > 
+> > > > Maybe he can shed some light on it.
+> > > 
+> > > As others have pointed out, basically, AFAIU: Yes, pages are *supposed*
+> > > to go through a common freeing path where this check could reside, but
+> > > we've had bugs where they ended up leaking anyway, which is why this
+> > > check in MM was added in the first place.
+> > 
+> > Okay, thanks. If we could be using a page type instead to catch such
+> > leaks to the page allocator, we could implement it without any such
+> > pp-specific checks.
+> > 
+> > page types are stored in page->page_type and overlay page->_mapcount
+> > right now.
+> > 
+> > Looking at "struct netmem_desc", page->_mapcount should not be overlayed
+> > (good!).
+> > 
+> > 
+> > So, you could be setting the type when creating a "struct netmem_desc"
+> > page, and clearing the type when about to free the page. In the buddy,
+> > you can then check without any casts from page to whatever else if the
+> > type is still unexpectedly set. If still set, you know that there is
+> > unexpected freeing.
 > 
-> Fixes: e53ee4acb220 ("octeontx2-af: CN20k basic mbox operations and structures")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-
- Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
-
- Thanks for the patch. This has been pointed by Simon earlier:
- https://lore.kernel.org/all/20250618194301.GA1699@horms.kernel.org/
-
- Thanks,
- Sundeep
-
-> ---
->  drivers/net/ethernet/marvell/octeontx2/af/rvu.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> Yeah, this is what we all were looking forward to.  However, I decided
+> to use the pp field for the checking since it's not ready for now.
 > 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-> index 7e538ee8a59f..c6bb3aaa8e0d 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.c
-> @@ -2458,9 +2458,9 @@ static int rvu_mbox_init(struct rvu *rvu, struct mbox_wq_info *mw,
->  			 void (mbox_handler)(struct work_struct *),
->  			 void (mbox_up_handler)(struct work_struct *))
->  {
-> -	int err = -EINVAL, i, dir, dir_up;
->  	void __iomem **mbox_regions;
->  	struct ng_rvu *ng_rvu_mbox;
-> +	int err, i, dir, dir_up;
->  	void __iomem *reg_base;
->  	struct rvu_work *mwork;
->  	unsigned long *pf_bmap;
-> @@ -2526,6 +2526,7 @@ static int rvu_mbox_init(struct rvu *rvu, struct mbox_wq_info *mw,
->  			goto free_regions;
->  		break;
->  	default:
-> +		err = -EINVAL;
->  		goto free_regions;
->  	}
->  
-> -- 
-> 2.47.2
+> So.. Is the current approach okay *for now*, even though the approach
+> should be updated once the type can be checked inside mm later?
 > 
+> Or do you want me to wait for it to be ready before this netmem work to
+> remove the pp fields from struct page?
+
+Just in case you may get it wrong, I'm still waiting for your answer,
+even though I've sent v7 with this patch excluded.
+
+To Willy and David,
+
+Is the work to add pp type(or bump) going to be done shortly?  If yes,
+I should wait for it.  If no, it'd better use the pp magic field *for
+now*.
+
+	Byungchul
+
+> 	Byungchul
+> > 
+> > I'll note that page types will be a building blocks of memdescs, to
+> > descibe "what we are pointing at". See
+> > 
+> > https://kernelnewbies.org/MatthewWilcox/Memdescs
+> > 
+> > Willy already planned for a "Bump" type; I assume this would now be
+> > "NMDesc" or sth like that IIUC.
+> > 
+> > --
+> > Cheers,
+> > 
+> > David / dhildenb
 
