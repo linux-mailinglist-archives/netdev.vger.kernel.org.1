@@ -1,152 +1,119 @@
-Return-Path: <netdev+bounces-201629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C83EFAEA22E
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 17:15:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A855AEA20B
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 17:12:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC30F3AE8E2
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 15:08:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 203097B59D2
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 15:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F3682ECD1B;
-	Thu, 26 Jun 2025 15:06:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2DE2E7623;
+	Thu, 26 Jun 2025 15:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kBtERjOW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JW/zDQE5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A12A2ECD0B
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 15:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13F472E6133
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 15:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750950377; cv=none; b=YnVNK9D14mEYwLs+jnEOfr13FONgLTksZ9lRWnheDst7zG18foXTnkZ8QYbAsQr17ImAFG2SYJYplxeQ7EIS41nOnxoVSUCMPSQbcgibEcCGiyKWd7tNFvvKWIoaAgOUNc1iBJ9g53o+uymIJnSWnki7xgUpftRrOkACf1ziouQ=
+	t=1750950719; cv=none; b=oyMrV72AG9yf/DME8x1lxPy5f3anORw6T7v4AJzRqdB328m5b95ohUe3MW+Do4za9+X3DSx9gxW5+qSHRrdzvhgPZ7v6y5eSLoR008I/VH4FaKMPy4oATVTBt5uO2xdSQCdmSv9JFSG+u/PL6fn5RRiqXu6IutNSFlAW6/nMY34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750950377; c=relaxed/simple;
-	bh=LVREvng0rxqkakxocau8Ja1CRAeRCBfnsb1BalgotGY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cQ7IdzEKP7qS668cTqNofH4fY9C6BgGIpfMfsNHMSjzS/lLzgUe5Hzl3bYxlqOnAZEitIgqqZvMTZtE3EbQ7MyH6krQXgHl7GJIRI7XRARhdc4vROA6DPj+I8sfWoOOER2XAbCl6l5f+A/V9VNKAWV3LCsOz78bHRHWCc/FvO5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kBtERjOW; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6f2b58f0d09so2446376d6.3
-        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 08:06:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750950374; x=1751555174; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U4QxGauz/Qj1iZreTbsJ/LGLMTZaAoRfTwu2zcOintE=;
-        b=kBtERjOWMdZuezbTCAip3SU7jqt6kkFneQOFq29kWPkVT1Qyt2UbppEYu9WhKRmA37
-         ZFRfiKecru4q6FyJn1l/Fu1prZ5C9oZNv4I1KYiHG0ZUfcC7k3yICLR6FWMlYB3muJbE
-         h/8C642F8sX0uolXaVzqavqwuaILagp7nOhUg1rWcJ2r9AHopjY/XjGttZdaUcc65QND
-         5hDbTBjdA+q2caCH4KLbTD6IL+xMZANUqf2U78locX4rVscZ7YyvYwS8CdPeE5IgkEVv
-         KNQ4xz0IJdd9B8KF9PthWOv/X/gy8N2AP2tT5gcsIrt/L6afV1OpVDwZ27WJVWC05VcU
-         harw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750950374; x=1751555174;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U4QxGauz/Qj1iZreTbsJ/LGLMTZaAoRfTwu2zcOintE=;
-        b=smGSh//30M6bQA+nhStehHy751zlGooBFnCOBOn10FiaASEbuJqINAjSS0C6aiZcR/
-         vB7ull0lXlKmty0Tq+Bq0JBEgwZep45VVy5Q3OvKi/F0wPsb59Hg2sXHL+lF3lSUi+or
-         BH6qej7wMtktJKrNcdfmNVpbFeF3YF7IdWDzYO4X+Xi6ybakdwlRJ+80/TlmloTfp3Fl
-         jWUsVRxG21P030eK1baoWu3D29X6Ltl6hRvl08faOkSE2sdyzUcF8TRB0NWD14OEhCsD
-         Cj/TYpObRC69or2cU4gQsK7ckXctui0l/R2N56aPlSSe+uk/sFsuFvQkO/xMj2OLzNd9
-         Z47g==
-X-Forwarded-Encrypted: i=1; AJvYcCXUZb8QbE0FCTR0jhp9wlwf9uQBUXR1f4rXtzwa32yEWDInuL48F1ez8qWWoaoX4OYgEruUld8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVrG8FxyR7kPQpmShAumHrBJ4EbO15dTeD2wwq7tHo23IW15m5
-	5n3MmUG5+u/eh0eLiptUhbZ5rZxQlmVICdzT+A3OVBVSVwpFBwDMx/+/NBQlzbe0TiH3xLdKSFZ
-	cRQm1pxvuDSg6FU4fq1QqlJO3efTLnA==
-X-Gm-Gg: ASbGncv+6VfOK0XJd3ykj4v68ZBNK8Uh3AkGntxycV7dQ7KP3GRMnItFgikpikghbhm
-	SkvP1J//bShYXifXi9zeps71mQvhioM/w61q9kbN8ZAAG57JCeh0jo923NzfyifV+m0/EkAL0uU
-	3C28G0KZjRLf7VDMPiJitqgXNKSG+Crk8LDxVzj9HQiJPOh4ApTw==
-X-Google-Smtp-Source: AGHT+IG6ghQInplRE0BNMglL2cNZFJ+NmVvTmaXwd4ThmBVaC4pg1+IykS61HgV6z3aRVtuuaar6KnwLZ+NRkV68iiM=
-X-Received: by 2002:a05:6214:1d24:b0:6fd:ace:4ceb with SMTP id
- 6a1803df08f44-6fd5efa9ademr41179386d6.8.1750950374139; Thu, 26 Jun 2025
- 08:06:14 -0700 (PDT)
+	s=arc-20240116; t=1750950719; c=relaxed/simple;
+	bh=d+QfPkx/v3aqy4lCtkbHbNfk94Rwa682MI4Rcan1b3Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LshLYuUkeg3wmJ7nduWUID8J2L7FUSNuy9wj0XkXHGG/vTwQo0tl2mOc91nCT5fFLh2bFWbNAQouINf09keBt8rwsRfAPWKySOU9p42xuY5/jlVu/amZb3weQgfRBJe5mbwJ22coNpzkT7zwyIX9+O+zotFmUdE3gmGpKq5fJm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JW/zDQE5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90EB6C4CEEB;
+	Thu, 26 Jun 2025 15:11:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750950718;
+	bh=d+QfPkx/v3aqy4lCtkbHbNfk94Rwa682MI4Rcan1b3Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JW/zDQE5Pcc0xtauK3ivVpMqmtyashCrQ29KoAYX9JhVQc0NL6NvEkDNiIcgR4+xN
+	 YtRwBZhp2jVgoTFDsUiopkomcae4lVIlqezKtP+dN0Kf9A/PVKWdQlWtTjdU1E3nbJ
+	 x9Sbnt2p0uX5VpGqGcsREmPvCsG5LLlPMeYQ6B14WPQivpSW4Py+aCk9ZkDKo6upSz
+	 lOBJ4mG2eG6gbtAH5C4kG1FDDg87hkUBZ6Hl5i+umumGx47uh5RTmg4FPKFxSTEvqu
+	 3H/J1CELiXNJ17SAfUCEPTU7/NIuTys2USM21Fjs7lDliFGxyZqNQbsVzvdZanFNIl
+	 nh51bqCfXBZ2A==
+Date: Thu, 26 Jun 2025 08:11:56 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Daniel Zahka <daniel.zahka@gmail.com>, Donald Hunter
+ <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Saeed Mahameed <saeedm@nvidia.com>, Leon
+ Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Boris
+ Pismenny <borisp@nvidia.com>, Kuniyuki Iwashima <kuniyu@google.com>, Willem
+ de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, Neal
+ Cardwell <ncardwell@google.com>, Patrisious Haddad <phaddad@nvidia.com>,
+ Raed Salem <raeds@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>, Dragos
+ Tatulea <dtatulea@nvidia.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdl?=
+ =?UTF-8?B?bnNlbg==?= <toke@redhat.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Jacob Keller <jacob.e.keller@intel.com>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH v2 02/17] psp: base PSP device support
+Message-ID: <20250626081156.475c14d2@kernel.org>
+In-Reply-To: <685d5847a57d7_2de3952949b@willemb.c.googlers.com.notmuch>
+References: <20250625135210.2975231-1-daniel.zahka@gmail.com>
+	<20250625135210.2975231-3-daniel.zahka@gmail.com>
+	<685c8c553072b_2a5da429429@willemb.c.googlers.com.notmuch>
+	<20250626070047.6567609c@kernel.org>
+	<685d5847a57d7_2de3952949b@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250625153628.298481-1-guoxin0309@gmail.com> <CANn89iKrwuyN2ixswA-u1AxW=BX8QwWp=WHskCmh_1qye3QvLA@mail.gmail.com>
- <CANn89i+ZVR_qvYE3F+ogyhEKX0KjiW3vQx0R1V9GHNxm+EHt0g@mail.gmail.com>
-In-Reply-To: <CANn89i+ZVR_qvYE3F+ogyhEKX0KjiW3vQx0R1V9GHNxm+EHt0g@mail.gmail.com>
-From: Xin Guo <guoxin0309@gmail.com>
-Date: Thu, 26 Jun 2025 23:06:01 +0800
-X-Gm-Features: Ac12FXzflDMfoSPOXhoyQFuoGTgO1w459stbNUttANUPYxq1Tmj8RNI8f1Xi7fI
-Message-ID: <CAMaK5_h0pdwbKGcZ-xmVULnxeJ=r0QrDeGepYuar=67n0spuHQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v1] tcp: fix tcp_ofo_queue() to avoid including
- too much DUP SACK range
-To: Eric Dumazet <edumazet@google.com>
-Cc: ncardwell@google.com, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Thanks Eric, have a nice day.
+On Thu, 26 Jun 2025 10:25:11 -0400 Willem de Bruijn wrote:
+> Preferable over the following?
+> 
+> 	struct psphdr {
+> 		u8      nexthdr;
+> 		u8      hdrlen;
+> 		u8      crypt_offset;
+> 
+> 		u8      sample:1;
+> 		u8      drop:1;
+> 		u8	version:4;
+> 		u8	vc_present:1;
+> 		u8	reserved:1;
+> 
+> 		__be32  spi;
+> 		__be64  iv;
+> 		__be64  vc[]; /* optional */
+> 	};
+> 
+> I suppose that has an endianness issue requiring
+> variants with __LITTLE_ENDIAN_BITFIELD and
+> __BIG_ENDIAN_BITFIELD.
 
-Regards
-Guo Xin.
+Right, this part. Always gives me pause :(
 
-On Thu, Jun 26, 2025 at 5:31=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Wed, Jun 25, 2025 at 9:03=E2=80=AFAM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > On Wed, Jun 25, 2025 at 8:37=E2=80=AFAM xin.guo <guoxin0309@gmail.com> =
-wrote:
-> > >
-> > > If the new coming segment covers more than one skbs in the ofo queue,
-> > > and which seq is equal to rcv_nxt , then the sequence range
-> > > that is not duplicated will be sent as DUP SACK,  the detail as below=
-,
-> > > in step6, the {501,2001} range is clearly including too much
-> > > DUP SACK range:
-> > > 1. client.43629 > server.8080: Flags [.], seq 501:1001, ack 132528852=
-9,
-> > > win 20000, length 500: HTTP
-> > > 2. server.8080 > client.43629: Flags [.], ack 1, win 65535, options
-> > > [nop,nop,TS val 269383721 ecr 200,nop,nop,sack 1 {501:1001}], length =
-0
-> > > 3. Iclient.43629 > server.8080: Flags [.], seq 1501:2001,
-> > > ack 1325288529, win 20000, length 500: HTTP
-> > > 4. server.8080 > client.43629: Flags [.], ack 1, win 65535, options
-> > > [nop,nop,TS val 269383721 ecr 200,nop,nop,sack 2 {1501:2001}
-> > > {501:1001}], length 0
-> > > 5. client.43629 > server.8080: Flags [.], seq 1:2001,
-> > > ack 1325288529, win 20000, length 2000: HTTP
-> > > 6. server.8080 > client.43629: Flags [.], ack 2001, win 65535,
-> > > options [nop,nop,TS val 269383722 ecr 200,nop,nop,sack 1 {501:2001}],
-> > > length 0
-> > >
-> > > After this fix, the step6 is as below:
-> > > 6. server.8080 > client.43629: Flags [.], ack 2001, win 65535,
-> > > options [nop,nop,TS val 269383722 ecr 200,nop,nop,sack 1 {501:1001}],
-> > > length 0
-> >
-> > I am not convinced this is the expected output ?
-> >
-> > If this is a DUP SACK, it should be :
-> >
-> > Flags [.], ack 2001, win 65535, ... sack 2 {1501:2001} {501:1001} ....
-> >
-> >
->
-> >
-> > At a first glance, bug is in tcp_dsack_extend()
->
-> After more thoughts and RFC 2883 read, I think your patch is correct.
->
-> I will include it in a series with two packetdrill tests, and another fix=
-.
-> I will add appropriate Fixes: tag
->
-> Thanks !
+> > > This makes sense with a single physical device plus optional virtual
+> > > (vlan, bonding, ..) devices.
+> > > 
+> > > It may also be possible for a single physical device (with single
+> > > device key) to present multiple PFs and/or VFs. In that case, will
+> > > there be multiple struct psp_dev, or will one PF be the "main".  
+> > 
+> > AFAIU we have no ability to represent multi-PCIe function devices 
+> > in the kernel model today. So realistically I think psp_dev per
+> > function and then propagate the rotation events.  
+> 
+> IDPF does support multiple "vports" (num_alloc_vports), and with that
+> struct net_device, from a single BDF.
+
+Upstream? If yes then I'm very bad at reviewing code :D
 
