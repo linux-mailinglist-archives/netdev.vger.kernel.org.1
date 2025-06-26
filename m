@@ -1,219 +1,103 @@
-Return-Path: <netdev+bounces-201556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3583BAE9E1C
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 15:03:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68067AE9E23
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 15:05:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AEA016A34E
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 13:02:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DED44E00B6
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 13:05:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBCA42E5417;
-	Thu, 26 Jun 2025 13:02:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="L50wm7zX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 548642E426F;
+	Thu, 26 Jun 2025 13:05:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61EA2E336E;
-	Thu, 26 Jun 2025 13:02:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED5C1D5CD7;
+	Thu, 26 Jun 2025 13:04:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750942956; cv=none; b=bnptRUl/3esDsnxuNSe7GYr4uKi8bDeXLOcdoUfPX2m5PO2FdZVS9R2A1J9PundHRIpNfWpGwytYUHRGFuE/LCtcrHsaGwhYFGElJYdF958zXgNTMY5LXICfl4bwIsEtQYvefohwV+WGiwMfdkuEoYDQYdyMuZqcM+BAwW888DQ=
+	t=1750943101; cv=none; b=eQn6847nOtyplNlHUIsNcyb+4jdOvAii4aQntYXnVr9YwN8GOsvmTsTRj/6HZF/l76uKevP/+D3bzc4Dex4nXIcFvQpP0y31kdk80gZvd55zwf4MGFBJdNvnLJqNyNF7/C9IR33mL6iCRr+nWeAl0QSl0TTTiWDqMOcfeNwZe3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750942956; c=relaxed/simple;
-	bh=jlmLk4NgCnLxwPz3TcSBRO0owp1iKVp62VJIE1enHnY=;
+	s=arc-20240116; t=1750943101; c=relaxed/simple;
+	bh=+weNGP25j0iT/YTTMWNnT/VBrQmiEdyYjSYQGmhbTgg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lfxhJzjCRN3LtWn6wc88ClLrJSrTs3pq3tyZk9WkIQit40Njc3DR+BsiN4r4Ln4Rn6khpfTzxV0Ei0Sgwwq1+ezsc4hCMr6HavwJrU4U5wsM9ajjkOO89zngZ6tn4etzIYBurcILRqOOuYCAfnrRGGEltIOcx9c5C1VQFL3F4zQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=L50wm7zX; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=cVDiaBAprrueH4nbsn+vuEhFoeflTwQpyVt/8cXAMBI=; b=L50wm7zXljmfRKbZ95Yuv/YTsS
-	QtdHJtaK6uLZf/BFV6sN8Lvll54CPnK5mh6IfUe+3SzbWihBi/5D5Y/nzA2/df0Yi1iHtMD1DYer0
-	llkpyd3BILIH0/TDGw3q3hJulaB2HFpdcYpaWFwho9Ada+8ejgcvL9uO3JpChitS0IrAfqa2APXW2
-	OUXeNU9W3lAOVtbQKNOwlksq51OXA+/nDLRcFj91M6eOtTHkXDt5bTpe8CbynUa0mNsjVHSjOnRY2
-	wT+qCD7d+BH8Ynh/Sym/s+XWkw3yN0UzcuxNsc3GFf/0m/WYVuNNiDQ5wUgd10thnNAg6Cq1IJ/Mn
-	tED7xW0w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46316)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uUmFA-0008UZ-0e;
-	Thu, 26 Jun 2025 14:02:20 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uUmF6-0006Wy-1e;
-	Thu, 26 Jun 2025 14:02:16 +0100
-Date: Thu, 26 Jun 2025 14:02:16 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Kamil =?iso-8859-1?Q?Hor=E1k?= - 2N <kamilh@axis.com>
-Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
-	andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	f.fainelli@gmail.com, robh@kernel.org, andrew+netdev@lunn.ch
-Subject: Re: [PATCH 1/3] net: phy: MII-Lite PHY interface mode
-Message-ID: <aF1E2G69T4IlkCl9@shell.armlinux.org.uk>
-References: <20250626115619.3659443-1-kamilh@axis.com>
- <20250626115619.3659443-2-kamilh@axis.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=k9cR7Z7Fb6R67An3zJx2E9DclNuRFWWJML6sIv8mqaxXi1b4E5KtIQtWX+at320WhcDnNaUhXB62/hmfWnNTiou8NvPohZkTM9pLjiqXWonOKjSdEI5C6XurqFFoYSMzWlJhvEvNukBLiRBjQhoZD3UKOYgbVyHKJNxf/VhpjZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-ae04d3d63e6so168124966b.2;
+        Thu, 26 Jun 2025 06:04:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750943098; x=1751547898;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M2fxZkpu+g6S2FCWHi7Fk2Zxk55b+c9y9r1cNytFmTg=;
+        b=TUpL0+88RU6rY3kADxb+RbqLq1gFGN1nlqrgz1h5/mLZgDKT6aE8P81H4dF+58Yni6
+         HfEnwWKaxhC9/uRwxD/uxSYp0jFvpx8m03/4IGetDyJRLoHUg2+rKYb2fJzNzMbG/E6I
+         KjCdP3vYNA5W5E0xETakNflP2KCagCAgE6nHWc1iiiYiABVCn6m+EkHu1lEc1aQqMnP1
+         BloDniOWE7tbyvRg7OPhQbNeoUk9X5odGOPMSHhCGAmxwJA7S7ooY64Ix0cSwSvNq3Ls
+         efl5xtOaOfSqT3apfC5HsUQ/CWRkDOMWSLfgteKTTg/BP9Co3olxG7DZRIvkIYSoSg2o
+         q8Nw==
+X-Forwarded-Encrypted: i=1; AJvYcCUp3q0DDs0pvItfJ2WNRDdF8MNe9RO0QjFdq0vssut9YYXG6ksWaUd1hMtRLpy0HgGRd+GkJmjg0yCkMoFmU+RA@vger.kernel.org, AJvYcCUwODCvKs5jeoiwPBOqKVA7OEREtDIJt3KFTgYp+QV0z48s1gGAod7Ne20D2bAZgE6kUS4=@vger.kernel.org, AJvYcCVEhKQ+ZDI9ON2Bi+kgmkKlXk1URaQRhtVlTIzrKEIRFPSsj6V5dSTkKjctCAY4c5LR5Mb1M+94@vger.kernel.org, AJvYcCVqDGLZ30b3pViSCJ1L6W5s/mf4WFMGOaY//qqDIDcAV3oltSW5LHyeIoQ7V9wrpdB3W3Oj5dF0R9ZXrOwS@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyf/kuxUPE306AM8XyvT4z2S+pejtkcytKYA22JMbaBn+4L10qg
+	UDLcs9MlQNTWusYb2mPPHsq61vnrX+9vXLw3+EtipQE1ejffwCj8QK29
+X-Gm-Gg: ASbGncu1pP/tu6tW/qgTTgp3D1RWWQXBaaq7msrJwiqEQVCZlXNsYcnwbJ+19FFg6H9
+	0x95p1eFYS2j9/13mflVvqb1RWYrSDRC0aADtUeQ7/YSTucVm3GEtElec0IpHZ0Ef0adSUNyJVM
+	raWv+5k0PjqRo8xGhhvfDqswY0j/tlgdbU6qrRuup8aB2Qsj/LOWIe/hoK+qVAFksrUg6CCzNqh
+	wEcEYOjLWqxRwzM+7RZMWjvjm6ze+zxQ77C/2zMIXi5hgNlXa29+kY/MZ4xZaRrpLwti7kKo0sw
+	ehqYeC3lE+es3ttwm0mowu+2yZf0VnQO826G3xI5Y9VIHvqlRI2jvMsoerPkZdQ=
+X-Google-Smtp-Source: AGHT+IH4MGOLayR/rn22OHrjTwBgXqcDJuwyeCilYt5OKjYbX6jO+F5h9G77Q+IMrfXKArPgDWoPHQ==
+X-Received: by 2002:a17:907:8997:b0:ade:c108:c5bf with SMTP id a640c23a62f3a-ae0beabb66amr704633866b.43.1750943097533;
+        Thu, 26 Jun 2025 06:04:57 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:2::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae0bccb4379sm340009966b.8.2025.06.26.06.04.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Jun 2025 06:04:57 -0700 (PDT)
+Date: Thu, 26 Jun 2025 06:04:53 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>, ajor@meta.com
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	bpf@vger.kernel.org, gustavold@gmail.com
+Subject: Re: [PATCH net-next v2 3/4] selftests: drv-net: Strip '@' prefix
+ from bpftrace map keys
+Message-ID: <aF1FdfXnqTT3she7@gmail.com>
+References: <20250625-netpoll_test-v2-0-47d27775222c@debian.org>
+ <20250625-netpoll_test-v2-3-47d27775222c@debian.org>
+ <20250625150710.4ee0f729@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250626115619.3659443-2-kamilh@axis.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250625150710.4ee0f729@kernel.org>
 
-On Thu, Jun 26, 2025 at 01:56:17PM +0200, Kamil Horák - 2N wrote:
-> diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
-> index 9b1de54fd483..7d3b85a07b8c 100644
-> --- a/drivers/net/phy/broadcom.c
-> +++ b/drivers/net/phy/broadcom.c
-> @@ -423,6 +423,13 @@ static int bcm54811_config_init(struct phy_device *phydev)
->  	/* With BCM54811, BroadR-Reach implies no autoneg */
->  	if (priv->brr_mode)
->  		phydev->autoneg = 0;
+On Wed, Jun 25, 2025 at 03:07:10PM -0700, Jakub Kicinski wrote:
+> On Wed, 25 Jun 2025 04:39:48 -0700 Breno Leitao wrote:
+> > The '@' prefix in bpftrace map keys is specific to bpftrace and can be
+> > safely removed when processing results. This patch modifies the bpftrace
+> > utility to strip the '@' from map keys before storing them in the result
+> > dictionary, making the keys more consistent with Python conventions.
+> 
+> Make sense, tho, could you double check or ask Alastair if all outputs
+> are prefixed with @? Maybe there's some map type or other thingamajig
+> that doesn't have the prefix? 
 
-Blank line here to aid readability please.
+I have a quick chat with Alastair earlier today, and I understood that
+all map symbols start with @.
 
-> +	/* Enable MII Lite (No TXER, RXER, CRS, COL) if configured */
-> +	err = bcm_phy_modify_exp(phydev, BCM_EXP_SYNC_ETHERNET,
-> +				 BCM_EXP_SYNC_ETHERNET_MII_LITE,
-> +				 phydev->interface == PHY_INTERFACE_MODE_MIILITE ?
-> +				 BCM_EXP_SYNC_ETHERNET_MII_LITE : 0);
-
-In cases like this, where the ternary op leads to less readable code,
-it's better to do:
-
-	if (phydev->interface == PHY_INTERFACE_MODE_MIILITE)
-		exp_sync_ethernet = BCM_EXP_SYNC_ETHERNET_MII_LITE;
-	else
-		exp_sync_ethernet = 0;
-
-	err = bcm_phy_modify_exp(phydev, BCM_EXP_SYNC_ETHERNET,
-				 BCM_EXP_SYNC_ETHERNET_MII_LITE,
-				 exp_sync_ethernet);
-
-> +	if (err < 0)
-> +		return err;
->  
->  	return bcm5481x_set_brrmode(phydev, priv->brr_mode);
->  }
-
-I'd include this with the above change:
-
-> diff --git a/include/linux/brcmphy.h b/include/linux/brcmphy.h
-> index 028b3e00378e..15c35655f482 100644
-> --- a/include/linux/brcmphy.h
-> +++ b/include/linux/brcmphy.h
-> @@ -182,6 +182,12 @@
->  #define BCM_LED_MULTICOLOR_ACT		0x9
->  #define BCM_LED_MULTICOLOR_PROGRAM	0xa
->  
-> +/*
-> + * Broadcom Synchronous Ethernet Controls (expansion register 0x0E)
-> + */
-> +#define BCM_EXP_SYNC_ETHERNET		(MII_BCM54XX_EXP_SEL_ER + 0x0E)
-> +#define BCM_EXP_SYNC_ETHERNET_MII_LITE	BIT(11)
-> +
->  /*
->   * BCM5482: Shadow registers
->   * Shadow values go into bits [14:10] of register 0x1c to select a shadow
-
-... and send the changes below as a separate patch as these changes
-below are modifying generic code.
-
-> diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
-> index e177037f9110..b2df06343b7e 100644
-> --- a/drivers/net/phy/phy-core.c
-> +++ b/drivers/net/phy/phy-core.c
-> @@ -115,6 +115,7 @@ int phy_interface_num_ports(phy_interface_t interface)
->  		return 0;
->  	case PHY_INTERFACE_MODE_INTERNAL:
->  	case PHY_INTERFACE_MODE_MII:
-> +	case PHY_INTERFACE_MODE_MIILITE:
->  	case PHY_INTERFACE_MODE_GMII:
->  	case PHY_INTERFACE_MODE_TBI:
->  	case PHY_INTERFACE_MODE_REVMII:
-> diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
-> index 38417e288611..b4a4dea3e756 100644
-> --- a/drivers/net/phy/phy_caps.c
-> +++ b/drivers/net/phy/phy_caps.c
-> @@ -316,6 +316,10 @@ unsigned long phy_caps_from_interface(phy_interface_t interface)
->  		link_caps |= BIT(LINK_CAPA_100HD) | BIT(LINK_CAPA_100FD);
->  		break;
->  
-> +	case PHY_INTERFACE_MODE_MIILITE:
-> +		link_caps |= BIT(LINK_CAPA_10FD) | BIT(LINK_CAPA_100FD);
-> +		break;
-> +
->  	case PHY_INTERFACE_MODE_TBI:
->  	case PHY_INTERFACE_MODE_MOCA:
->  	case PHY_INTERFACE_MODE_RTBI:
-> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> index 0faa3d97e06b..766cad40f1b8 100644
-> --- a/drivers/net/phy/phylink.c
-> +++ b/drivers/net/phy/phylink.c
-> @@ -234,6 +234,7 @@ static int phylink_interface_max_speed(phy_interface_t interface)
->  	case PHY_INTERFACE_MODE_SMII:
->  	case PHY_INTERFACE_MODE_REVMII:
->  	case PHY_INTERFACE_MODE_MII:
-> +	case PHY_INTERFACE_MODE_MIILITE:
->  		return SPEED_100;
->  
->  	case PHY_INTERFACE_MODE_TBI:
-> diff --git a/include/linux/phy.h b/include/linux/phy.h
-> index e194dad1623d..6aad4b741c01 100644
-> --- a/include/linux/phy.h
-> +++ b/include/linux/phy.h
-> @@ -103,6 +103,7 @@ extern const int phy_basic_ports_array[3];
->   * @PHY_INTERFACE_MODE_QUSGMII: Quad Universal SGMII
->   * @PHY_INTERFACE_MODE_1000BASEKX: 1000Base-KX - with Clause 73 AN
->   * @PHY_INTERFACE_MODE_10G_QXGMII: 10G-QXGMII - 4 ports over 10G USXGMII
-> + * @PHY_INTERFACE_MODE_MIILITE: MII-Lite - MII without RXER TXER CRS COL
->   * @PHY_INTERFACE_MODE_MAX: Book keeping
->   *
->   * Describes the interface between the MAC and PHY.
-> @@ -144,6 +145,7 @@ typedef enum {
->  	PHY_INTERFACE_MODE_QUSGMII,
->  	PHY_INTERFACE_MODE_1000BASEKX,
->  	PHY_INTERFACE_MODE_10G_QXGMII,
-> +	PHY_INTERFACE_MODE_MIILITE,
->  	PHY_INTERFACE_MODE_MAX,
->  } phy_interface_t;
->  
-> @@ -260,6 +262,8 @@ static inline const char *phy_modes(phy_interface_t interface)
->  		return "qusgmii";
->  	case PHY_INTERFACE_MODE_10G_QXGMII:
->  		return "10g-qxgmii";
-> +	case PHY_INTERFACE_MODE_MIILITE:
-> +		return "mii-lite";
->  	default:
->  		return "unknown";
->  	}
-
-Otherwise, I think this is fine.
-
-Please remember netdev's rules, which can be found in the tl;dr on:
-https://www.kernel.org/doc/html/v6.1/process/maintainer-netdev.html
-
-(There's probably an updated version, but I can never remember the URL.)
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+CCing him.
 
