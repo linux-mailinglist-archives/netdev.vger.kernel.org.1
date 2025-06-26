@@ -1,152 +1,152 @@
-Return-Path: <netdev+bounces-201572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A596AE9F26
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 15:41:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00567AE9F47
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 15:45:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAA8A3AB06A
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 13:41:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9820F3B6FD2
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 13:44:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6EA32E7170;
-	Thu, 26 Jun 2025 13:41:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X3IzrZqz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38CCF2E763F;
+	Thu, 26 Jun 2025 13:44:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CD92E6D12
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 13:41:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D602E7632
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 13:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750945305; cv=none; b=tWIVt1Sfqi41xrea6GULD/KsYCZD/OkeIDMe04H8K1z844RoCyxPrEr/l7p2lYPk7bEkGUBRwc9EvLJL0uFvdQbMhUq4w5ug6T/lGQwVZppvBFj64LfmI/nXZyT1i5IweBdkTXRq5a6iNpp/f5W0ydMCdvC3RowGZl/V3SgbvRA=
+	t=1750945467; cv=none; b=UpXmmNAiQgnTiWhTUEDxkhN7OYu6pvZf5Kt/57O9uIJ/R8/rdTK8QB0/6P1vVul9z1LAfoPxJ2tub03jYG6oFgH2Nokzz9zXbL8pihoU8M3XDro9MG0SnzAEAC49atAmdD0RHGXHYxV2fL8NQGfpzrh6LrVCrORSiFZM1dS3IP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750945305; c=relaxed/simple;
-	bh=u//lhMQd9KbT5fl1+Ybodhjdf9qWY1hgEEFgP8FQnaQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wj2cfN6SVnJp1orOZiqZqznQWq01JFQCMJbTI9g6a+0G8m+iPgYMGZeY9YtJ+bInVb16625C6p6Jtt6922HliQYEJAuci27xA8Yc99Wv+Xuikpw1aUQBNGyCj6yYtweE1ltX1Xd1xC8Clg8GW4j2k1QmicEEI9iU3ZQzDdi77Ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X3IzrZqz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750945302;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=z0Ss0ltDzwSWgijfXapYyn0ZCd0YeYzc6zs5snpEFT0=;
-	b=X3IzrZqzb6P/3q4ABT7PxyjL3htqgi08bgbVQtS/NM+WDGaHpCmc41YI4RyaUGUzZgwhJb
-	lu+EhQRwVOH3x/fvtfpER31GO4eBQ5YXW6Q4wuzyhw6LT/bO3wpJQObLmpx4hVehh6xCSl
-	/MUh0d1Tpaphx3MND5A3y7IPIHk6d6k=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-644-gj5RnWgjMEqQx_T1sOaD-w-1; Thu, 26 Jun 2025 09:41:41 -0400
-X-MC-Unique: gj5RnWgjMEqQx_T1sOaD-w-1
-X-Mimecast-MFC-AGG-ID: gj5RnWgjMEqQx_T1sOaD-w_1750945300
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a523ce0bb2so618375f8f.0
-        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 06:41:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750945300; x=1751550100;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z0Ss0ltDzwSWgijfXapYyn0ZCd0YeYzc6zs5snpEFT0=;
-        b=wYOwC8zIuRxTNtpqY9oOJTgUUsXHu4xNmPuqvRR4ZZi163r+jgHh27Nu7RTtAnYWIL
-         ft0G0oIZokYzpeZADf2znP0wfOuwXDHfNFNcYBI3Pqwuk2pnXxnB7rjqg7K9l6t5C89u
-         M/4dy8u4pLVpn0RZTPrE7APLO4COQpCCDRyqkadfYupNzV604G1ovlvWq/Umv05EJj2F
-         1BMzJwwKidz6xiIEM7d4IxXTXLUi9m0Gajcte225e+rJG+bs0KdOtRZlFo/iIEYyTMH6
-         iLMYvX3IKGyIMkIOf6PeIJGA6IIww9RVDrgB7wOPW9wRpqg/VCEi6AlIeYDBw4xPNs8r
-         qt5Q==
-X-Gm-Message-State: AOJu0Yz2Zjaxtet8YigbIhSnFOJKpYUkKLrpQGEg/KZScRbTrPZP9k1I
-	JfGBtUOjLZXwOnhcCAWZ3DcupMRHwWverW4f0QRpCZyTqTQpplxJmKiPGgBgiUaJ8yZlJHToNkN
-	+cA+HhZur3c5UtqwvmlG9HxofRMA8LfClecxtEzGSSXEjxebGvEZkqw8Yjw==
-X-Gm-Gg: ASbGncuCQbA7wtMXX9auKXp4nhpQ7FiFcQJbyoRmoSqVtA7lE+G6AKpg0JIEHQVjWER
-	TK8J9yUnxuXwdiVrjFFaLP71VIeiaiNIi9brTylBQaLtJ9J/Ca24JhcrJX2sab889evEVH7qqMU
-	oDR1OaYEfNLbuOsTii1rElthmeQpR2xFjifQnKo7K2KitG4nCtMm6vbdHxGbTWZ/1PIvzVHmsD3
-	Jhf2xAQPbmOFf5oKDkR51cPvSZsgGAHGtGMULKKlKE+HLXd+V0ponD9NCU+0qrOwqhgosv5zW0W
-	XO/OmscA9KHBSvHJH0oaJAWABe5e0D9+7lD6AonEUK6tfw/+zevSvJLcWOhDTTC6+tZY2Q==
-X-Received: by 2002:a5d:588e:0:b0:3a6:da76:38b0 with SMTP id ffacd0b85a97d-3a6ed60d1a6mr6807748f8f.25.1750945299844;
-        Thu, 26 Jun 2025 06:41:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGfpzvDzK/js7oHvBCNDg74CZrX6PkImoh75g9knZnAzWkas5KoUDeobMR5WQSvrVxD20Ig9w==
-X-Received: by 2002:a5d:588e:0:b0:3a6:da76:38b0 with SMTP id ffacd0b85a97d-3a6ed60d1a6mr6807707f8f.25.1750945299335;
-        Thu, 26 Jun 2025 06:41:39 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:244f:bd10:2bd0:124a:622c:badb? ([2a0d:3344:244f:bd10:2bd0:124a:622c:badb])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a831051c49sm292841f8f.30.2025.06.26.06.41.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Jun 2025 06:41:38 -0700 (PDT)
-Message-ID: <46fe8f22-48a5-4593-827d-3b59e9aee7e0@redhat.com>
-Date: Thu, 26 Jun 2025 15:41:36 +0200
+	s=arc-20240116; t=1750945467; c=relaxed/simple;
+	bh=lOIhZPwjq2iRUH2/8/px4H6GSxHqp5XVL22e3XXy7z8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=gkSMwFUGJO8e0DzvFVieocxLDeqIt7MtjWLb8LdHaIWgSL3dqLS2aW7lW/oKFkNfpSpbuoNaqDz6x0Mri6Fp+cgYdvWRxIBTqz4h8+Fe0488+Kp6jifM5B1AxHcsYBd/vz5sLyuIT9N24MJRcCwu5wqK9U7y8BiFJrlF4p3tsHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <jre@pengutronix.de>)
+	id 1uUmte-0004GB-8X; Thu, 26 Jun 2025 15:44:10 +0200
+From: Jonas Rebmann <jre@pengutronix.de>
+Date: Thu, 26 Jun 2025 15:44:02 +0200
+Subject: [PATCH v2] net: fec: allow disable coalescing
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next v7 3/3] net: bonding: send peer notify when failure
- recovery
-To: Tonghao Zhang <tonghao@bamaicloud.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Nikolay Aleksandrov <razor@blackwall.org>,
- Zengbing Tu <tuzengbing@didiglobal.com>
-References: <cover.1750642572.git.tonghao@bamaicloud.com>
- <6965bf859a08214da53cad17ea6ed1be841618fa.1750642573.git.tonghao@bamaicloud.com>
- <77694cec-af8e-4685-8918-4fd8c12ba960@redhat.com>
- <EA1E6A18-1A83-43B8-B91F-5755EB553766@bamaicloud.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <EA1E6A18-1A83-43B8-B91F-5755EB553766@bamaicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250626-fec_deactivate_coalescing-v2-1-0b217f2e80da@pengutronix.de>
+X-B4-Tracking: v=1; b=H4sIAKFOXWgC/42NQQrCMBBFr1JmbaSJTRRX3kNKGZJpOyBJSWKol
+ N7d2BO4fA/++xskikwJ7s0GkQonDr6COjVgZ/QTCXaVQbVKt0ZpMZIdHKHNXDDTYAO+KFn2k7B
+ mvDnZoXTGQN0vkUZej/azrzxzyiF+jqsif/afapFCCn1FSZ3ETrvLYyE/vXMMntezI+j3ff8CC
+ mFWLMcAAAA=
+X-Change-ID: 20250625-fec_deactivate_coalescing-c6f8d14a1d66
+To: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
+ Clark Wang <xiaoning.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: imx@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kernel@pengutronix.de, 
+ Jonas Rebmann <jre@pengutronix.de>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3113; i=jre@pengutronix.de;
+ h=from:subject:message-id; bh=lOIhZPwjq2iRUH2/8/px4H6GSxHqp5XVL22e3XXy7z8=;
+ b=owGbwMvMwCF2ZcYT3onnbjcwnlZLYsiI9Vvx4OHE6n/nVJLubsl8WbztT/rihy+8LZfZnFnsV
+ d+394WAU0cpC4MYB4OsmCJLrJqcgpCx/3WzSrtYmDmsTCBDGLg4BWAic40Y/vvq6XwWsDDStV++
+ aeWlK3EHNFpK2zeHhrqnbrV90dbjUc7w34GDW3TyRK0ic8GQ5Q+nHfUIsr28IufcJd6DzmVSn/Q
+ t+AA=
+X-Developer-Key: i=jre@pengutronix.de; a=openpgp;
+ fpr=0B7B750D5D3CD21B3B130DE8B61515E135CD49B5
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:1101:1d::ac
+X-SA-Exim-Mail-From: jre@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 6/26/25 1:36 PM, Tonghao Zhang wrote:
->> 2025年6月26日 19:16，Paolo Abeni <pabeni@redhat.com> 写道：
->>
->> On 6/24/25 4:18 AM, Tonghao Zhang wrote:
->>> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
->>> index 12046ef51569..0acece55d9cb 100644
->>> --- a/drivers/net/bonding/bond_main.c
->>> +++ b/drivers/net/bonding/bond_main.c
->>> @@ -1237,17 +1237,28 @@ static struct slave *bond_find_best_slave(struct bonding *bond)
->>> /* must be called in RCU critical section or with RTNL held */
->>> static bool bond_should_notify_peers(struct bonding *bond)
->>> {
->>> - struct slave *slave = rcu_dereference_rtnl(bond->curr_active_slave);
->>> + struct bond_up_slave *usable;
->>> + struct slave *slave = NULL;
->>>
->>> - if (!slave || !bond->send_peer_notif ||
->>> + if (!bond->send_peer_notif ||
->>>    bond->send_peer_notif %
->>>    max(1, bond->params.peer_notif_delay) != 0 ||
->>> -    !netif_carrier_ok(bond->dev) ||
->>> -    test_bit(__LINK_STATE_LINKWATCH_PENDING, &slave->dev->state))
->>> +    !netif_carrier_ok(bond->dev))
->>> return false;
->>>
->>> + if (BOND_MODE(bond) == BOND_MODE_8023AD) {
->>
->> I still don't see why you aren't additionally checking
->> broadcast_neighbor here. At least a code comment is necessary (or a code
-> checking broadcast_neighbor is unnecessary, because send_peer_notif is set when bond is in BOND_MODE_8023AD mode and broadcast_neighbor is enabled.
+In the current implementation, IP coalescing is always enabled and
+cannot be disabled.
 
-I see. send_peer_notif is cleared on mode changes, so we can't reach
-here with a non zero value after changing the mode to something else.
+As setting maximum frames to 0 or 1, or setting delay to zero implies
+immediate delivery of single packets/IRQs, disable coalescing in
+hardware in these cases.
 
-IMHO the scenario is not trivial, a comment here is deserved (at very
-least because I already asked it 3 times ;).
+This also guarantees that coalescing is never enabled with ICFT or ICTT
+set to zero, a configuration that could lead to unpredictable behaviour
+according to i.MX8MP reference manual.
 
-Thanks,
+Signed-off-by: Jonas Rebmann <jre@pengutronix.de>
+---
+Changes in v2:
+- Adjust type of rx_itr, tx_itr (Thanks, Wei)
+- Set multiple FEC_ITR_ flags in one line for more compact code (Thanks, Wei)
+- Commit Message: mention ICFT/CTT fields constraints (Thanks, Andrew)
+- Link to v1: https://lore.kernel.org/r/20250625-fec_deactivate_coalescing-v1-1-57a1e41a45d3@pengutronix.de
+---
+ drivers/net/ethernet/freescale/fec_main.c | 34 +++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 18 deletions(-)
 
-Paolo
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index 63dac42720453a8b8a847bdd1eec76ac072030bf..d4eed252ad4098a7962f615bce98338bc3d12f5c 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -3121,27 +3121,25 @@ static int fec_enet_us_to_itr_clock(struct net_device *ndev, int us)
+ static void fec_enet_itr_coal_set(struct net_device *ndev)
+ {
+ 	struct fec_enet_private *fep = netdev_priv(ndev);
+-	int rx_itr, tx_itr;
++	u32 rx_itr = 0, tx_itr = 0;
++	int rx_ictt, tx_ictt;
+ 
+-	/* Must be greater than zero to avoid unpredictable behavior */
+-	if (!fep->rx_time_itr || !fep->rx_pkts_itr ||
+-	    !fep->tx_time_itr || !fep->tx_pkts_itr)
+-		return;
+-
+-	/* Select enet system clock as Interrupt Coalescing
+-	 * timer Clock Source
+-	 */
+-	rx_itr = FEC_ITR_CLK_SEL;
+-	tx_itr = FEC_ITR_CLK_SEL;
++	rx_ictt = fec_enet_us_to_itr_clock(ndev, fep->rx_time_itr);
++	tx_ictt = fec_enet_us_to_itr_clock(ndev, fep->tx_time_itr);
+ 
+-	/* set ICFT and ICTT */
+-	rx_itr |= FEC_ITR_ICFT(fep->rx_pkts_itr);
+-	rx_itr |= FEC_ITR_ICTT(fec_enet_us_to_itr_clock(ndev, fep->rx_time_itr));
+-	tx_itr |= FEC_ITR_ICFT(fep->tx_pkts_itr);
+-	tx_itr |= FEC_ITR_ICTT(fec_enet_us_to_itr_clock(ndev, fep->tx_time_itr));
++	if (rx_ictt > 0 && fep->rx_pkts_itr > 1) {
++		/* Enable with enet system clock as Interrupt Coalescing timer Clock Source */
++		rx_itr = FEC_ITR_EN | FEC_ITR_CLK_SEL;
++		rx_itr |= FEC_ITR_ICFT(fep->rx_pkts_itr);
++		rx_itr |= FEC_ITR_ICTT(rx_ictt);
++	}
+ 
+-	rx_itr |= FEC_ITR_EN;
+-	tx_itr |= FEC_ITR_EN;
++	if (tx_ictt > 0 && fep->tx_pkts_itr > 1) {
++		/* Enable with enet system clock as Interrupt Coalescing timer Clock Source */
++		tx_itr = FEC_ITR_EN | FEC_ITR_CLK_SEL;
++		tx_itr |= FEC_ITR_ICFT(fep->tx_pkts_itr);
++		tx_itr |= FEC_ITR_ICTT(tx_ictt);
++	}
+ 
+ 	writel(tx_itr, fep->hwp + FEC_TXIC0);
+ 	writel(rx_itr, fep->hwp + FEC_RXIC0);
+
+---
+base-commit: 8dacfd92dbefee829ca555a860e86108fdd1d55b
+change-id: 20250625-fec_deactivate_coalescing-c6f8d14a1d66
+
+Best regards,
+-- 
+Jonas Rebmann <jre@pengutronix.de>
 
 
