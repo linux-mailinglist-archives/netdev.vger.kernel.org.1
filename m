@@ -1,146 +1,239 @@
-Return-Path: <netdev+bounces-201698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9B37AEAA6B
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 01:18:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68530AEAA99
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 01:28:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37E5B1C26F2C
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 23:18:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 070863B7911
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 23:28:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 274471DED7B;
-	Thu, 26 Jun 2025 23:17:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC477221FD2;
+	Thu, 26 Jun 2025 23:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="HFfKRDT7"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="V50tz4OH";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="fEMPbN/X"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0801FBCA1;
-	Thu, 26 Jun 2025 23:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3394921CA08
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 23:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750979824; cv=none; b=Ri7GYLUYOcOKx2gdkECbowgu5PwIKDWBDEYOWt7uXRvV5PCVYRRj5UKkyhGpN9qRT6SdBMed8gq++ALS7rOGMtkaFu1mSZtQwuvCklzLv854dn73cXsA9NILN2JTUMS2lil5t/Oh6hWsssBzvtZNI6v0VwoJUXkA4FvG/EYVOzk=
+	t=1750980521; cv=none; b=qy4Mb3l0q7dh8igcnxcMQTcbwv86f7rF6Uygh9uzbrN/Bkejnk+lKGtzHv7WIeY/v8ND9GfT0R5F66z+ooCAVmwWr0j8LwzULAHa7Wczs0G97xG/6/bRwaR/WczWtsNam6ZFnbIqKfoi/FcvJgJqrLD6p4Lr7tm/2RE14Btxe5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750979824; c=relaxed/simple;
-	bh=1wA9A47szU+VrjeV4OiB2bj/WtG8oYnLQCRFfmIFE84=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FZ/37OWQxrrHSkcX4iKVeCD0hsd9j9TUU2X9cwyX+NeJh3hrLgUYprYHh889C2UTHppviyiunYaSASgwr9H4/kj0FsHvfMKgQ+ysIZnYds0Q0g/VbK6lIafWk/S7e/G36xOhf9csn7SbcopeRmVUHyCf4l8WdbGEVarHAKV+byc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=HFfKRDT7; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=HRJjLTvM5n86H842Si//qWpIS9NZshIAK219b6uDKos=; b=HFfKRDT7R1rA/Pr+DNhjN5uZsN
-	AyelXKX6kSvfhib5cCYvPih3Iv0HL7a2DGwnrS8Fpm9df8Uls565gFoIYwHT7Ht4uyfXq3lUq7t/N
-	TvIP1bB7irCJXh9mPJFzYsW6SRGMDGe7lNL1P7tMWd4bRp83eN0kR92qL2vhb+FCjxA5puWHpHhU1
-	JlBdr8cFiQ49fL0O32PcseB9gUCjXMtBF664ukpXwKW60ZGgXsalpcVS7kSxY8rU801qm113tR+Ff
-	DzzP9nZCIiYRpPQM++eMzGQUOXAzECiV7N2u3Dq6ZF+WdMneZymo3OjOQCbA9qzu9Kl4R+kNiDMtK
-	yGIcbPJw==;
-Received: from localhost ([127.0.0.1])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1uUvam-000M7V-20;
-	Fri, 27 Jun 2025 01:01:17 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf-next 2025-06-27
-Date: Fri, 27 Jun 2025 01:01:10 +0200
-Message-ID: <20250626230111.24772-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1750980521; c=relaxed/simple;
+	bh=ErAb8fKQuvG7AXJP4EWMfwv3bvetPyv8S3yKQ8C5660=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=DIdTxYDwTvykj3Hew7PliY279oLZbs3O2uemU1gvWyijnbK8uB7vkaCrTHw57HTQ2mfVWQXNa7sdjrra7NMnONOZI/EE3Za2tS7o3dp7PYfw7I/1kCWwiSQF9D7bwPYFOxQl0ZMI1Gdszjs/QsJZkfIW/VS0AtH0mOwM8e7ktZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=V50tz4OH; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=fEMPbN/X; arc=none smtp.client-ip=202.12.124.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
+	by mailfout.stl.internal (Postfix) with ESMTP id 146FE1D00266;
+	Thu, 26 Jun 2025 19:28:38 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Thu, 26 Jun 2025 19:28:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-transfer-encoding:content-type
+	:content-type:date:date:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to; s=fm3; t=1750980517; x=1751066917; bh=aCHT6S9sTlK1lHK/wqx16
+	Mn5sRFkQNOkRGGZPxN/trE=; b=V50tz4OHpeNtbpVDwrPmle/6jUcGo02FZPEY/
+	JF/8UqhfRnRIu1N1OceNzrPbT45d0n41ICnfhLt9c0QK955xpR8YUR33gFY8iuJu
+	A8L3z69YljTpl824oAl/cWNBHvf71MR23ajESk5oYA4qVvZgKO9WJxvgm70+2Oqi
+	4fsNnSp1KSiXHtj90BFCsvu3LGJki6mG75Ppf7ce4C9i9OsXkJksfh1/sTVEpKAV
+	/b5rDfROLvkjbHkbi+JAJ0HItabhI/9I63xjHWG8011c8E+a7gaNUOxTAp2lVn7T
+	HDb/1XdSDmu9JuQg9RGifqX6u7MRom5Z2NovtYMYcCBN+xujg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id
+	:content-transfer-encoding:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1750980517; x=1751066917; bh=aCHT6S9sTlK1lHK/wqx16Mn5sRFkQNOkRGG
+	ZPxN/trE=; b=fEMPbN/XdETp4cSEJvD9/Hv18BB94jr1jXSILFZQPyaqHIYFLHe
+	CfuTnaVMNlRXsKMsxBwmZgWwRNAUUJYcITJK6JiGiBFiBYvfX9tGtyX/01E9aSys
+	r8n2/SjY68lNOjmMJ3gMYkZEKCQ7vaEagnPYcdzo7mF7jG/5bCc9hh/1HTTnEQJ6
+	gJKo6C/Ps80C5HL0/VNc58i9jJXTeVTpRLudHvzQIHTNEMJV+hrJKL+cAjT4yZNI
+	hLueVZQ2ZqNc5V05i5dB6SF2LGa3s1WxmBlw4P7IcCGegFu3AK+6l+a9n7nCX8J0
+	SUb6kqRW6nyrSUuMUUVzrkbh6uhbrXb73rg==
+X-ME-Sender: <xms:pdddaORlGvB3QDxD2gXkeeLpu13Sj3-ZlgOfmoiWqhhGTTlyoEkhwQ>
+    <xme:pdddaDxW7uBBfL2pd7qq_cLT2GN6hq-DGev_-dpS5vqIx-cFWQ2joL8LX-DO7FHcE
+    8HGTZyI81jtjNCA-RA>
+X-ME-Received: <xmr:pdddaL33pGWs_zZNRo8u9_IAw31saKx_smOQg3DQa_V7nKS26_kD19YqCsCZ-qytwmzEwQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddugeelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
+    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
+    ephffvvefujghfofggtgfgfffksehtqhertdertddvnecuhfhrohhmpeflrgihucggohhs
+    sghurhhghhcuoehjvhesjhhvohhssghurhhghhdrnhgvtheqnecuggftrfgrthhtvghrnh
+    epleegjeejueekvefhgfegveehieekieeigeeiieekgeehieffteetffffuefgveffnecu
+    ffhomhgrihhnpehgihhthhhusgdrtghomhenucevlhhushhtvghrufhiiigvpedtnecurf
+    grrhgrmhepmhgrihhlfhhrohhmpehjvhesjhhvohhssghurhhghhdrnhgvthdpnhgspghr
+    tghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmhesug
+    grvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehlihhuhhgrnhhgsghinhesghhmrghi
+    lhdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtg
+    hpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhgurhgvfido
+    nhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrth
+    drtghomhdprhgtphhtthhopehjihhrihesrhgvshhnuhhllhhirdhushdprhgtphhtthho
+    pehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:pdddaKC18Ap4idg_AolzgYQ5udxETaM_sDMk_scYelj2nXwBNbNn8g>
+    <xmx:pdddaHjZbleskNPdMAEkwJJEi7cqd6aN2pa3NG7AdA20W96nNn_ZcA>
+    <xmx:pdddaGoEG91vzrZQI0V4H0PNFM-ByuMMpg5oiI6aRFrSKZN5zJD9MA>
+    <xmx:pdddaKiuzdo1rAiSWjGhkADKg1Ru3SwblO7UXfeOyh4yYS2dcPRImw>
+    <xmx:pdddaAxVjKAxoO4VvnGnPFTi3hWznjP9rFWE4SJfeoDYOcU0RzUYu63r>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 26 Jun 2025 19:28:36 -0400 (EDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 75B3C9FCA2; Thu, 26 Jun 2025 16:28:35 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 74D269FB75;
+	Thu, 26 Jun 2025 16:28:35 -0700 (PDT)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Hangbin Liu <liuhangbin@gmail.com>
+cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+    netdev@vger.kernel.org
+Subject: Re: [Bonding Draft Proposal] Add lacp_prio Support for ad_select?
+In-reply-to: <aFpLXdT4_zbqvUTd@fedora>
+References: <aFpLXdT4_zbqvUTd@fedora>
+Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
+   message dated "Tue, 24 Jun 2025 06:53:17 -0000."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27681/Thu Jun 26 10:38:00 2025)
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2627545.1750980515.1@famine>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 26 Jun 2025 16:28:35 -0700
+Message-ID: <2627546.1750980515@famine>
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+Hangbin Liu <liuhangbin@gmail.com> wrote:
 
-The following pull-request contains BPF updates for your *net-next* tree.
+>Hi Jay,
+>
+>We have a customer setup involving two separate switches with identical
+>L2/VLAN configurations. Each switch forms an independent aggregator
+>(port-channel), and the end host connects to both with the same number of
+>links and equivalent bandwidth.
+>
+>As a result, the host ends up with two aggregators under a single bond
+>interface. Since the user cannot arbitrarily override port count or
+>bandwidth, they are asking for a new mechanism, lacp_prio, to influence
+>aggregator selection via ad_select.
+>
+>Do you think this is a reasonable addition?
 
-We've added 6 non-merge commits during the last 8 day(s) which contain
-a total of 6 files changed, 120 insertions(+), 20 deletions(-).
+	In principle, I don't see a reason not to use the system
+priority, et al, to influence the aggregator selection when bonding ends
+up with multiple aggregators.  I'm undecided as to whether it should be
+a separate ad_select policy or a "tiebreaker," but a separate policy is
+probably simpler to deal with.
 
-The main changes are:
+>If yes, what would be the best way to compare priorities?
+>
+>1. Port Priority Only. Currently initialized to 0xff. We could add a para=
+meter
+>   allowing users to configure it.
+>   a) Use the highest port priority within each aggregator for comparison
+>   b) Sum all port priorities in each aggregator and compare the totals
 
-1) Fix RCU usage in task_cls_state() for BPF programs using helpers like
-   bpf_get_cgroup_classid_curr() outside of networking, from Charalampos
-   Mitrodimas.
+	I'm not a fan of this, as explained below.
 
-2) Fix a sockmap race between map_update and a pending workqueue from
-   an earlier map_delete freeing the old psock where both pointed to the
-   same psock->sk, from Jiayuan Chen.
+	Also, note that in LACP-land, when comparing priorities, the
+higher priority is numerically smaller, which makes "add them up and
+compare" a little counter intuitive to me.
 
-3) Fix a data corruption issue when using bpf_msg_pop_data() in kTLS which
-   failed to recalculate the ciphertext length, also from Jiayuan Chen.
+>2. Full LACP Info Comparison. Compare fields such as system_priority, sys=
+tem,
+>   port_priority, port_id, etc.
 
-4) Remove xdp_redirect_map{,_err} trace events since they are unused and
-   also hide XDP trace events under CONFIG_BPF_SYSCALL, from Steven Rostedt.
+	I think it makes more sense to use the System ID (system
+priority and aggregator MAC address) from the LAG ID of the local
+aggregator.  In the bonding implementation, an aggregator is assigned a
+MAC when an interface is added, so the only aggregators lacking a MAC
+are ones that have no ports (which can't be active).
 
-Please consider pulling these changes from:
+	If we want to use the partner System ID, that's a little more
+complicated.  If aggregators in question both have LACP partners, then
+the System IDs will be unique, since the MAC addresses will differ.  If
+the aggregators don't have LACP partners, then they'll be individual
+ports, and the partner information won't be available.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+	Modulo the fact that bonding assigns a MAC to an aggregator
+before the standard does (for the System ID), this is approximately
+what's described in 802.1AX-2014 6.7.1, although the context there is
+criteria for prioritizing between ports during selection for aggregation
+when limited capabilities exist (i.e., 6 ports but only the ability to
+accomodate 4 in an aggregrator).
 
-Thanks a lot!
+	FWIW, the 802.1AX standard is pretty quiet on this whole
+situation.  It recognises that "A System may contain multiple
+Aggregators, serving multiple Aggregator Clients" (802.1AX-2014 6.2.1)
+but doesn't have any verbiage that I can find on requirements for
+choosing between multiple such Aggregators if only one can be active.  I
+think the presumption in the standard is that the multiple aggregators
+would or could be active simultaneously as independent entities.
 
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
+	Anyway, the upshot is that we can pretty much choose as we see
+fit for this particular case.
 
-Cong Wang, Daniel Borkmann, Jakub Kicinski, Jesper Dangaard Brouer, John 
-Fastabend, Toke Høiland-Jørgensen
+>At present, the libteam code has implemented an approach that selects the
+>aggregator based on the highest system_priority/system from both local an=
+d
+>partner data.[1]
 
-----------------------------------------------------------------
+	Just looking at libteam code, it's more complicated than that.
+The documentation says "Aggregator with highest priority according to
+LACP standard will be selected," and the code looks to be doing memcmp()
+on
 
-The following changes since commit 2c7e4a2663a1ab5a740c59c31991579b6b865a26:
+struct lacpdu_info {
+	uint16_t		system_priority;
+	uint8_t			system[ETH_ALEN]; /* ID */
+	uint16_t		key;
+	uint16_t		port_priority;
+	uint16_t		port; /* ID */
+	uint8_t			state;
+} __attribute__((__packed__));
 
-  Merge tag 'net-6.16-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-06-05 12:34:55 -0700)
+	which is essentially the local portion of a LAG ID per
+802.1AX-2014 6.3.6.1, with the key and state set to zero for the
+comparison.  Also, the function you reference, get_lacp_port_prio_info,
+is choosing between the actor and partner information for reasons that
+aren't explained in the code, but I suspect might to comply with the
+statement in 6.3.6.1:
 
-are available in the Git repository at:
+	"To simplify comparison of LAG IDs it is conventional to order
+	these such that S is the numerically smaller of S and T."
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+	where S and T are System Identifiers (comprised of System
+Priority and the MAC address), or perhaps 6.7.1, as described above.
 
-for you to fetch changes up to 16f3c7ad887c1f8fd698ab568b5851cadb65b5a8:
+	Anyway, without knowing exactly why the team function is doing
+what it does, I'm not sure if that's the proper algorithm to use.  Jiri
+is on Cc, maybe he remembers.
 
-  xdp: tracing: Hide some xdp events under CONFIG_BPF_SYSCALL (2025-06-12 19:36:53 -0700)
+	-J
 
-----------------------------------------------------------------
-bpf-next-for-netdev
+>Looking forward to your thoughts.
+>
+>Best regards,
+>Hangbin
+>
+>[1] https://github.com/jpirko/libteam/blob/master/teamd/teamd_runner_lacp=
+.c#L402
 
-----------------------------------------------------------------
-Charalampos Mitrodimas (1):
-      net, bpf: Fix RCU usage in task_cls_state() for BPF programs
-
-Jiayuan Chen (3):
-      bpf, sockmap: Fix psock incorrectly pointing to sk
-      bpf, ktls: Fix data corruption when using bpf_msg_pop_data() in ktls
-      selftests/bpf: Add test to cover ktls with bpf_msg_pop_data
-
-Steven Rostedt (2):
-      xdp: Remove unused events xdp_redirect_map and xdp_redirect_map_err
-      xdp: tracing: Hide some xdp events under CONFIG_BPF_SYSCALL
-
- include/trace/events/xdp.h                         | 21 +----
- net/core/netclassid_cgroup.c                       |  4 +-
- net/core/skmsg.c                                   |  7 ++
- net/tls/tls_sw.c                                   | 13 ++++
- .../selftests/bpf/prog_tests/sockmap_ktls.c        | 91 ++++++++++++++++++++++
- .../selftests/bpf/progs/test_sockmap_ktls.c        |  4 +
- 6 files changed, 120 insertions(+), 20 deletions(-)
+---
+	-Jay Vosburgh, jv@jvosburgh.net
 
