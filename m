@@ -1,165 +1,166 @@
-Return-Path: <netdev+bounces-201655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFF43AEA385
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 18:31:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B121FAEA3AD
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 18:45:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 664844E2042
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 16:31:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 685221C25077
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 16:45:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 600A5204863;
-	Thu, 26 Jun 2025 16:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426D61F3BB5;
+	Thu, 26 Jun 2025 16:45:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y0pJdBkO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BFHA4Az3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12392F1FF9;
-	Thu, 26 Jun 2025 16:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A14F405F7;
+	Thu, 26 Jun 2025 16:45:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750955474; cv=none; b=LiKSUAEl7FD7JZpQPKwkEZa1OQYPInAFqOzd3Rx5gayc+O9JYL6IHTMV6+rDN5h5dwdBoxyyWf6mVq0K41fwM2NNmW25d9nKz95/rlyjEbEGgvrgCNzUz8qzKh9QdeiJM8L2q4CfyNrJrzt9Ht5H6Bq1zCQsWjpdOZ87/WyF1JI=
+	t=1750956316; cv=none; b=leA2V6px5tXduP4hrc6QQX45IhfgkzHbKBoRpAzK8dXa95jE1tZsYgu/myfIDERuXQUabIMfGAisBDnDcV4onBaIz3l+wdOHk+UXyNkro9xi9h3QVzDJiShLJwGZbYoVA+WnmmvbtYjNGBEPK0EAg7GYgVuEBAX4u/3BpnrHdAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750955474; c=relaxed/simple;
-	bh=HT7TrT+9RAo9P1265OpuBOUxaqxI8OngOWZcR/hl21A=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=AXtnBE3Djt/GS0ZoBIdwST20ELldEF5oeBTa3LpzOAJWq4/oBHlJWOOjNmlB1X942zxgQtxFV6R3mcYKmY/KCMO9QYt6npEPd/pniqnT5zspSKhAVqRQBmJgyaiu/IoLJEShJK9cBQyjRhKj3kQgV9EFfRJFFTu6Z1xW/FauglM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y0pJdBkO; arc=none smtp.client-ip=209.85.219.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e7387d4a336so1078278276.2;
-        Thu, 26 Jun 2025 09:31:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750955472; x=1751560272; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sU907uMABVIuqhXrvaDd1M5r5o0uDZff62vwsqKDZWA=;
-        b=Y0pJdBkOmarrN+IHFZDGP1iCHN3ett7qeY3sikhuq5Tb6PTJgR6Pd75I9Bm4O6aWWa
-         tTQcZotisrw9Zn5owJmMvvmF0LzIldVxybU2S95vAIbR3LRYbWZVE8WnmtYIO4EaJI5B
-         jV46nPYnywr0Kv3a2kJJOgDZV8CipTN3KJlvR9YM6dQlalDqTP2p51DE1iKxZHwsIvUy
-         c9yHEdeEY7XXgu+LwvQEZft8V+vH9VSaEA+utcSlVGdkakfb/hIABa58WWnQpRyaTvKu
-         YdYXccSZKZOI7DdNRgkixQhCr8RBukJGa7x9wuAiYKPMlv0lgWtfpucON7kFzv0r0veC
-         uDXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750955472; x=1751560272;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=sU907uMABVIuqhXrvaDd1M5r5o0uDZff62vwsqKDZWA=;
-        b=LYoZMxa/l05giENjb2ZFg30TgxNYjqfZDNhbVLW4eot2mUNLvFBYKoCa4f5sJ89t1y
-         a0DvFiASkaVQrKN93V2oLAQp9BFcIY7fOZjWJbRPR5V2pxE9f912HoP/QU5eSes4K35f
-         u8NHcvIhreYT/Z/sHNhMxl6LF0rCXnhBtT+6AZMQfzKEGwTQFdIlcwRRCjjrvxBMqSXr
-         ahkEk/+IOIsljzlcVh2NAkYqDfzxG2pGO4qSdBsLKGVnqvyYmyJSQmnPUQ/RzO7Hgfnl
-         fNQbxR1cpVYtvyFJQJ1wUfmYY6X+cDKw7rPeG389GN5dfjRWBEACssgm/cE70UlBtT+0
-         d0AA==
-X-Forwarded-Encrypted: i=1; AJvYcCUO5+T+v7aDBPq0LST+APP+XxeOY7cOZIJnM2Po4+5kClYOmFWDSkE3Aw3H8RHI7HN6L84=@vger.kernel.org, AJvYcCVQDccJMls02/QWF0Il5/wZw6Ro0+WSs+S4VU1hcHlS5MVgsrrunrqPC5F0X2N/AsVWTM4UQ/OLeOlUg3uYZxGN@vger.kernel.org, AJvYcCWuUvNckAs/bD4IBzyiN696nimzmRr0et09Z2G+TGDkWvQjBh/FwpmmAlbvO/Mtm27Zs7kTuWi6@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1x4FuylZOjKf298XBBrPL+zrPXHpqlDfQZTs0x/ZeeVLjgp4Q
-	8yLYW7YSGMxk8f5jL6POY2w/y6nXqeYzjQMnnc/KZ+HJ9h10Dfy0Fuf2
-X-Gm-Gg: ASbGncvYWRsAvmdCQHu5cpt/0ZLbN+5t3w4HClg9ycGRyHBI9F7jNDPjq8WFl/veT27
-	VV2hQYljb2wY7dpt5xuocfvuqER2/lQIjFSCax2jRbiIbAA/3WyFvJFNOFVWfmU99IaV80mFB9W
-	Qgawmpa77qAiW0r1jILNcW1dfejLDfVfcmwDkaLaP23Iq9FWbp/+k6LuWtllGokMdgiDAvGNknT
-	zLm7kR0Ga4PV8XCvykvf8kBDwWzvGJDmPyFjzE73RAtNHvY5H2IMWKM9SyDRSdfOy8zRm6ZGHjU
-	JlgZSXFnOpE6LerfxC0cBjU1wAxYpbrdoeEId8DqjjqyiXuA8o5zNPLRTAhMFevBLULxz2D6Eo1
-	cQGHv3QYapt5AUp4jUkF7MZB3qyKifZVAcrEwQSU1lw==
-X-Google-Smtp-Source: AGHT+IFrPsJ7ocFnnJXVD1xPpmy2Gbr6SdxJFVUck73u2UFAzH256ovImqgekymICTAG/orEeonCbQ==
-X-Received: by 2002:a05:6902:5086:b0:e87:985c:d69f with SMTP id 3f1490d57ef6-e87985cd8c8mr5729673276.41.1750955471718;
-        Thu, 26 Jun 2025 09:31:11 -0700 (PDT)
-Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e87a6bd0559sm85077276.32.2025.06.26.09.31.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jun 2025 09:31:11 -0700 (PDT)
-Date: Thu, 26 Jun 2025 12:31:10 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Breno Leitao <leitao@debian.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- bpf@vger.kernel.org, 
- gustavold@gmail.com, 
- Breno Leitao <leitao@debian.org>
-Message-ID: <685d75ceb113c_2e676c294d1@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250625-netpoll_test-v2-4-47d27775222c@debian.org>
-References: <20250625-netpoll_test-v2-0-47d27775222c@debian.org>
- <20250625-netpoll_test-v2-4-47d27775222c@debian.org>
-Subject: Re: [PATCH net-next v2 4/4] selftests: net: add netpoll basic
- functionality test
+	s=arc-20240116; t=1750956316; c=relaxed/simple;
+	bh=52tMnreW8uelOqocxxeVtuaIXYhaUzlqD6oKmCy37xA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Jb1R4hlyVdAnbWNz1BcsETZXLh0cg3B+BUm5qxBPvDL37Deq5TXe3PIt5mbambEguONcOBol/hiJUWIuNuV9J8gEzfFanj8wwMnhxZVUohOi+3G69OaaBD8mndXmeOfEnsLwAJytn3t4oDzmi3B43ikT5nW44BLVMZq8z5qVJMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BFHA4Az3; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750956314; x=1782492314;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=52tMnreW8uelOqocxxeVtuaIXYhaUzlqD6oKmCy37xA=;
+  b=BFHA4Az3NGm0izz4IOLtmTc4hrqzh0KtmnmgakMALLSyrGre6tzxDTbd
+   dHqJE2gCu09TWn3zpm8PpbgPxtxZrPdZOKp2DDnQfqIRsE5zOpVkFCkRI
+   RP5YP1h5IPfK9cmpKQ/ussGiRIxVXtEcm+d8fFd2P3Mat8fBGSgd1+j8y
+   EiyUxymBlNQmanl+O5LH9ZKf4Uf4erhg1E9J02WApkhWJzDyH5MEFYFJR
+   RdzeThUepT7mwnGhK+bxURAdLvDoBIPnb/cqly++p4kIv74OAihatr4XM
+   l5rX6b+hoxDiB9Ro61NgoTcYcG4FN+7eEifg58oD/1BkO7rJat+PjWB38
+   Q==;
+X-CSE-ConnectionGUID: 0bHRnXx3TMGL7CI87oRgPA==
+X-CSE-MsgGUID: 0x8s+rQPT3eQdqKMBP1iWw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11476"; a="64616473"
+X-IronPort-AV: E=Sophos;i="6.16,268,1744095600"; 
+   d="scan'208";a="64616473"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2025 09:45:14 -0700
+X-CSE-ConnectionGUID: Xd7pQarPSgOgwvcrAXpOIg==
+X-CSE-MsgGUID: 3IBmPZz2TEi2ZqTV/SNSnw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,268,1744095600"; 
+   d="scan'208";a="152079578"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orviesa006.jf.intel.com with ESMTP; 26 Jun 2025 09:45:12 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+	id 59AA82AD; Thu, 26 Jun 2025 19:45:10 +0300 (EEST)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Leon Romanovsky <leon@kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH net-next v1 1/1] net/mlx5: Don't use "proxy" headers
+Date: Thu, 26 Jun 2025 19:45:09 +0300
+Message-ID: <20250626164509.327410-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Breno Leitao wrote:
-> Add a basic selftest for the netpoll polling mechanism, specifically
-> targeting the netpoll poll() side.
-> 
-> The test creates a scenario where network transmission is running at
-> maximum speed, and netpoll needs to poll the NIC. This is achieved by:
-> 
->   1. Configuring a single RX/TX queue to create contention
->   2. Generating background traffic to saturate the interface
->   3. Sending netconsole messages to trigger netpoll polling
->   4. Using dynamic netconsole targets via configfs
->   5. Delete and create new netconsole targets after some messages
->   6. Start a bpftrace in parallel to make sure netpoll_poll_dev() is
->      called
->   7. If bpftrace exists and netpoll_poll_dev() was called, stop.
-> 
-> The test validates a critical netpoll code path by monitoring traffic
-> flow and ensuring netpoll_poll_dev() is called when the normal TX path
-> is blocked.
-> 
-> This addresses a gap in netpoll test coverage for a path that is
-> tricky for the network stack.
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+Update header inclusions to follow IWYU (Include What You Use)
+principle.
 
-> +def bpftrace_call() -> None:
-> +    """Call bpftrace to find how many times netpoll_poll_dev() is called.
-> +    Output is saved in the global variable `maps`"""
-> +
-> +    # This is going to update the global variable, that will be seen by the
-> +    # main function
-> +    global MAPS  # pylint: disable=W0603
-> +
-> +    # This will be passed to bpftrace as in bpftrace -e "expr"
-> +    expr = "BEGIN{ @hits = 0;} kprobe:netpoll_poll_dev { @hits += 1; }"
+Note that kernel.h is discouraged to be included as it's written
+at the top of that file.
 
-Is that BEGIN statement needed? I generally just use count().
+While doing that, sort headers alphabetically.
 
-> +
-> +    MAPS = bpftrace(expr, timeout=BPFTRACE_TIMEOUT, json=True)
-> +    logging.debug("BPFtrace output: %s", MAPS)
-> +
-> +
-> +def bpftrace_start():
-> +    """Start a thread to call `call_bpf` in parallel for 2 seconds."""
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ include/linux/mlx5/driver.h | 45 +++++++++++++++++++++++--------------
+ 1 file changed, 28 insertions(+), 17 deletions(-)
 
-Stale comment? BPFTRACE_TIMEOUT is set to 15.
+diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
+index e6ba8f4f4bd1..2a2d9cead9b3 100644
+--- a/include/linux/mlx5/driver.h
++++ b/include/linux/mlx5/driver.h
+@@ -33,28 +33,38 @@
+ #ifndef MLX5_DRIVER_H
+ #define MLX5_DRIVER_H
+ 
+-#include <linux/kernel.h>
+-#include <linux/completion.h>
+-#include <linux/pci.h>
+-#include <linux/irq.h>
+-#include <linux/spinlock_types.h>
+-#include <linux/semaphore.h>
+-#include <linux/slab.h>
+-#include <linux/vmalloc.h>
+-#include <linux/xarray.h>
+-#include <linux/workqueue.h>
+-#include <linux/mempool.h>
+-#include <linux/interrupt.h>
+-#include <linux/notifier.h>
+-#include <linux/refcount.h>
+ #include <linux/auxiliary_bus.h>
+-#include <linux/mutex.h>
++#include <linux/completion.h>
++#include <linux/idr.h>
++#include <linux/io.h>
++#include <linux/kref.h>
++#include <linux/lockdep_types.h>
++#include <linux/minmax.h>
++#include <linux/mutex_types.h>
++#include <linux/notifier.h>
++#include <linux/pci.h>
++#include <linux/printk.h>
++#include <linux/refcount.h>
++#include <linux/semaphore.h>
++#include <linux/spinlock_types.h>
++#include <linux/timer_types.h>
++#include <linux/types.h>
++#include <linux/workqueue.h>
++#include <linux/xarray.h>
++
++#include <rdma/ib_verbs.h>
++
++#include <asm/page.h>
+ 
+ #include <linux/mlx5/device.h>
+ #include <linux/mlx5/doorbell.h>
+ #include <linux/mlx5/eq.h>
+-#include <linux/timecounter.h>
+-#include <net/devlink.h>
++
++struct dentry;
++struct device;
++struct dma_pool;
++struct net_device;
++struct pci_dev;
+ 
+ #define MLX5_ADEV_NAME "mlx5_core"
+ 
+@@ -243,6 +253,7 @@ struct mlx5_cmd_first {
+ 	__be32		data[4];
+ };
+ 
++struct cmd_msg_cache;
+ struct mlx5_cmd_msg {
+ 	struct list_head		list;
+ 	struct cmd_msg_cache	       *parent;
+-- 
+2.47.2
 
-> +    global BPF_THREAD  # pylint: disable=W0603
-> +
-> +    BPF_THREAD = threading.Thread(target=bpftrace_call)
-> +    BPF_THREAD.start()
-> +    if not BPF_THREAD.is_alive():
-> +        raise KsftSkipEx("BPFtrace thread is not alive. Skipping test")
-> +
-> +
 
