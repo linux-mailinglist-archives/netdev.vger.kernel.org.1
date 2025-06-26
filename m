@@ -1,168 +1,186 @@
-Return-Path: <netdev+bounces-201368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FFDAAE9331
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 02:06:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49219AE933B
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 02:08:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 577913A3C68
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 00:06:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF2331C27AC2
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 00:08:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE4D6171C9;
-	Thu, 26 Jun 2025 00:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E7A13B58D;
+	Thu, 26 Jun 2025 00:07:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T+wA+VCV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PnfROHME"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5590FEED8
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 00:06:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4011F73451;
+	Thu, 26 Jun 2025 00:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750896381; cv=none; b=pNO6gUVcWASOLQHCwh31izs2dSEqPdY3fCqjYY3+P5u1P2dBFLac7hsc+eodqVqYh78p3VNK03H7u8l7h99GHq0W2Hfxtq959tekFSiQDs3M57wwzKOELf4mcNYKqYXD675xuM49OBLNAm6NsbFJH6JVLOGDu6zNGb2siwnF4Kk=
+	t=1750896471; cv=none; b=tXdifgbu2JlOzGu8rLmyI8IqcGMUA3RwtOIkXtKmmJjyNUkqCzwsOYZzax15DxNX0fAJHc7VSuBpBUb+7vSWSvoF9ZxBW/ie8vkUabWgLiGrliwFg4L+yl8S+vmj5WfkUolXrv/roFq2fZAF9yt5hsbfuZCb/5eNBJ31FZTQJD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750896381; c=relaxed/simple;
-	bh=jNJZ1o5yQiHLdkdDaMegq5uSIuL9AmBrHKR7ns8YCBM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=snF4r+bFpyXYHTMb7Zc+gXmy8dMApa0IMt7NRqH4oGQtxnmlK9bsdrFVGOtSVeAIz+HBY/1lIUxLN/MaqEa0pl8mT37k50Bqk39lKW0Z/VlVyS17Z1qu0dPNSFRpkwGTmEhf2KzdOfFm4qm1xF3/yKBd4BOOF4bQC1HGDTQRhkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T+wA+VCV; arc=none smtp.client-ip=209.85.128.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-711a3dda147so5207357b3.2
-        for <netdev@vger.kernel.org>; Wed, 25 Jun 2025 17:06:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750896376; x=1751501176; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kGcAIT+vQp6AZQmasqqBsxcJqnSBN/0qxuv9TKXgAHU=;
-        b=T+wA+VCVaiQRmydbDp/0a73SXW6+0IDZDrWVS+I3eK7Tk2G56/SXew6ehZ2F5Us9au
-         2urEC0keERs4td+E+XkeTAeoVJqjnpxf92a+o5e4G+pbuEEHDSfMj+wgd642bIGTG+vN
-         MxsYuGxssKePdcpKO0dAXtX0EM7wM7YeJsaiB3qCAkgsIVaLtDLx8GhT1+w6wVMNRhk7
-         i+4FzXoDTab+NY4PYhTkrB3qm6bb41EJ7oym4KU6ksu9tJzbFNh88hZ1JpmPcwlClwRO
-         AGs2da/htJ9eRrisdOfSa3h61Uwhk9cQbjmE3dGV0qluiN3VzQPr69mQfxW3YJ1h9dHo
-         onJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750896376; x=1751501176;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=kGcAIT+vQp6AZQmasqqBsxcJqnSBN/0qxuv9TKXgAHU=;
-        b=uKIuTQZSv94ZIDDNhAXrCHigVAg+JlJflm6V8Rbd0uz4pVmaAJBvXATVIvTi7dALFC
-         h8mAUJWo99wMiBXLRdhwIFtV7lWMohtp81gx1H8tWIt67lHonGOmJt/Y2+IhFZByg+bT
-         GC/fTJmsNDVXYIY2LEfgj0ovDAZQtR9w1YutcGWfPVtO78ffQxi75v7WONnN2+uXnLtt
-         l/fCaHJASlwwBC/CFvHYYTnQBR93EcfVPDlhc8MZHck6kCqgbh5loCuj4yBGbTVpuHFU
-         KI/8lLGI1DwJa6eiHOA+lQ40ftt4y4H3pS7Mg2zXKceAEsv+/TPl1RsmDtW2ARRPiW2I
-         qpsg==
-X-Forwarded-Encrypted: i=1; AJvYcCWdEF2SajHGDDE9axoBipZ1tBJsSK+nB5pzP6Gcnyg89QPUGDN/EpJ/FzQyBl055WJWUX1ZI5g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyir7GeRsLSFnwE1SE83I+miuV0kMNbWM2zRYezgzdmjPu4G765
-	OISi/0mvDXvkJ3faUW/EhJWOwsLWgWSqeb4EAlGmOXeCismsTG2IUPtL
-X-Gm-Gg: ASbGncvFO4F0p8YE5pnbls6/72/kWN+NIE9PMVJZJdqJIkM2qcfpKI3rwds829xF8Ps
-	dUpTEDihPnRvS5BiENqs9QbXicey8S4n/eq2S6ZIS7FMj2wa/PauRted9D3t9Sx1GgHkdnnSBw4
-	guy2pJcUEQypLklcQlfym8/hGQFMSLQASw+KT0hZlcn5y1p5Ymit4pA8No19405jCZzid3KdlD2
-	1hZDvSGCsBMnjcfsWuzHvTnfvV45xAIZxtmLb93RVFbIMWyZhx7Cg9B67h6l/DWsGyLYMxeKedf
-	ACkzryRs2B9gGXYhcoqggx9sVYpnqRMrrH5wOC+8FdhixQQZFsAbyu1gN4itA2Fx2M7mE0B79EO
-	Ke3iT1Jveb7bZPsDhj2fWn741S2nuePSgK/2ZMycYYQ==
-X-Google-Smtp-Source: AGHT+IFTZsrEdbbxo8bbPClNZe/68IhYC6HH7AWvNEM4BFSeN+6RvVCRLnkpKq7eFoWNQifZJek69Q==
-X-Received: by 2002:a05:690c:311:b0:711:406f:7735 with SMTP id 00721157ae682-71406ca3168mr72454167b3.13.1750896376238;
-        Wed, 25 Jun 2025 17:06:16 -0700 (PDT)
-Received: from localhost (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-712c4ba6a94sm26791377b3.76.2025.06.25.17.06.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jun 2025 17:06:15 -0700 (PDT)
-Date: Wed, 25 Jun 2025 20:06:15 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Daniel Zahka <daniel.zahka@gmail.com>, 
- Donald Hunter <donald.hunter@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, 
- Leon Romanovsky <leon@kernel.org>, 
- Tariq Toukan <tariqt@nvidia.com>, 
- Boris Pismenny <borisp@nvidia.com>, 
- Kuniyuki Iwashima <kuniyu@google.com>, 
- Willem de Bruijn <willemb@google.com>, 
- David Ahern <dsahern@kernel.org>, 
- Neal Cardwell <ncardwell@google.com>, 
- Patrisious Haddad <phaddad@nvidia.com>, 
- Raed Salem <raeds@nvidia.com>, 
- Jianbo Liu <jianbol@nvidia.com>, 
- Dragos Tatulea <dtatulea@nvidia.com>, 
- Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, 
- =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>, 
- Jacob Keller <jacob.e.keller@intel.com>, 
- netdev@vger.kernel.org
-Message-ID: <685c8ef72e61f_2a5da429434@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250625135210.2975231-5-daniel.zahka@gmail.com>
-References: <20250625135210.2975231-1-daniel.zahka@gmail.com>
- <20250625135210.2975231-5-daniel.zahka@gmail.com>
-Subject: Re: [PATCH v2 04/17] tcp: add datapath logic for PSP with inline key
- exchange
+	s=arc-20240116; t=1750896471; c=relaxed/simple;
+	bh=C3hz+TTEceJ65LIM6563d2BqKNpBHkLD6nboo3kPOXo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eDtRI8n7wDKYKzq9Lv4BoU91b0xGajmaU82Urj+DAJwL6xvJ0VSKBCtlpCRw+kM3wDrjVvqplNLvvIeacNEiEk/RY9cmZAA3pYulMzrBXTu97vctylik9fsRuaokiR4tarSXUAgXt+c/j8U96ZCyx+kwZNb72/g2aSK7cMcVv8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PnfROHME; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1750896470; x=1782432470;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=C3hz+TTEceJ65LIM6563d2BqKNpBHkLD6nboo3kPOXo=;
+  b=PnfROHMEoGlNKTRBddhXL2L1fgI5f//IX/vHvQxJc8PVXYkDHz3l3S+l
+   pnN1xDNR2x9QSQBq2mDz7QKojQwKgF0PhP3TSVGcTgGqyr0ceYgVSIsfl
+   5WkJQftCEwnn81C0sMn/TL6tLfORwwZDm6NCiAWtmaztm/A58XuSstQyk
+   sZD8hfldMK5KY6xboAoXysCoOCRFC9m1XdT/3Ustpt7fVSb3wRFJk70ci
+   UOCYhfV71ZIWiq8YkSDvtnbJXxT72fsFUY/Zmc++5yKWYtNaMjSQ/MN1w
+   RFmv/o3H1Dulk3m3m0emO1kYKMJdg0IPLwAh6ldAvefG0Q9Efy4CN2qWJ
+   Q==;
+X-CSE-ConnectionGUID: lzf7WiPSRSGi6xQWZ+/dag==
+X-CSE-MsgGUID: kzJia0nLQYiv8+3wu4ps0A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11475"; a="52904175"
+X-IronPort-AV: E=Sophos;i="6.16,266,1744095600"; 
+   d="scan'208";a="52904175"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2025 17:07:50 -0700
+X-CSE-ConnectionGUID: plp4ybH+QhCL0Ta6GYKqGQ==
+X-CSE-MsgGUID: fg5ZsG4xT0WtUFO3hx3AFA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,266,1744095600"; 
+   d="scan'208";a="157858423"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 25 Jun 2025 17:07:46 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uUa9Y-000TYc-09;
+	Thu, 26 Jun 2025 00:07:44 +0000
+Date: Thu, 26 Jun 2025 08:07:02 +0800
+From: kernel test robot <lkp@intel.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>
+Subject: Re: [PATCH net-next v2 1/1] phy: micrel: add Signal Quality
+ Indicator (SQI) support for KSZ9477 switch PHYs
+Message-ID: <202506260756.KhOdmLCy-lkp@intel.com>
+References: <20250625124127.4176960-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250625124127.4176960-1-o.rempel@pengutronix.de>
 
-Daniel Zahka wrote:
-> From: Jakub Kicinski <kuba@kernel.org>
-> 
-> Add validation points and state propagation to support PSP key
-> exchange inline, on TCP connections. The expectation is that
-> application will use some well established mechanism like TLS
-> handshake to establish a secure channel over the connection and
-> if both endpoints are PSP-capable - exchange and install PSP keys.
-> Because the connection can existing in PSP-unsecured and PSP-secured
-> state we need to make sure that there are no race conditions or
-> retransmission leaks.
-> 
-> On Tx - mark packets with the skb->decrypted bit when PSP key
-> is at the enqueue time. Drivers should only encrypt packets with
-> this bit set. This prevents retransmissions getting encrypted when
-> original transmission was not. Similarly to TLS, we'll use
-> sk->sk_validate_xmit_skb to make sure PSP skbs can't "escape"
-> via a PSP-unaware device without being encrypted.
-> 
-> On Rx - validation is done under socket lock. This moves the validation
-> point later than xfrm, for example. Please see the documentation patch
-> for more details on the flow of securing a connection, but for
-> the purpose of this patch what's important is that we want to
-> enforce the invariant that once connection is secured any skb
-> in the receive queue has been encrypted with PSP.
-> 
-> Add trivialities like GRO and coalescing checks.
-> 
-> This change only adds the validation points, for ease of review.
-> Subsequent change will add the ability to install keys, and flesh
-> the enforcement logic out
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
-> Co-developed-by: Daniel Zahka <daniel.zahka@gmail.com>
+Hi Oleksij,
 
-> @@ -2068,7 +2074,8 @@ bool tcp_add_backlog(struct sock *sk, struct sk_buff *skb,
->  	     (TCPHDR_ECE | TCPHDR_CWR | TCPHDR_AE)) ||
->  	    !tcp_skb_can_collapse_rx(tail, skb) ||
->  	    thtail->doff != th->doff ||
-> -	    memcmp(thtail + 1, th + 1, hdrlen - sizeof(*th)))
-> +	    memcmp(thtail + 1, th + 1, hdrlen - sizeof(*th)) ||
-> +	    psp_skb_coalesce_diff(tail, skb))
->  		goto no_coalesce;
+kernel test robot noticed the following build warnings:
 
-Since this is a "can these skbs be coalesced" condition check, move it
-inside tcp_skb_can_collapse_rx?
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Oleksij-Rempel/phy-micrel-add-Signal-Quality-Indicator-SQI-support-for-KSZ9477-switch-PHYs/20250625-204330
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250625124127.4176960-1-o.rempel%40pengutronix.de
+patch subject: [PATCH net-next v2 1/1] phy: micrel: add Signal Quality Indicator (SQI) support for KSZ9477 switch PHYs
+config: i386-buildonly-randconfig-004-20250626 (https://download.01.org/0day-ci/archive/20250626/202506260756.KhOdmLCy-lkp@intel.com/config)
+compiler: clang version 20.1.7 (https://github.com/llvm/llvm-project 6146a88f60492b520a36f8f8f3231e15f3cc6082)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250626/202506260756.KhOdmLCy-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506260756.KhOdmLCy-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/phy/micrel.c:2247:5: warning: variable 'channels' set but not used [-Wunused-but-set-variable]
+    2247 |         u8 channels;
+         |            ^
+   1 warning generated.
+
+
+vim +/channels +2247 drivers/net/phy/micrel.c
+
+  2231	
+  2232	/**
+  2233	 * kszphy_get_sqi - Read, average, and map Signal Quality Index (SQI)
+  2234	 * @phydev: the PHY device
+  2235	 *
+  2236	 * This function reads and processes the raw Signal Quality Index from the
+  2237	 * PHY. Based on empirical testing, a raw value of 8 or higher indicates a
+  2238	 * pre-failure state and is mapped to SQI 0. Raw values from 0-7 are
+  2239	 * mapped to the standard 0-7 SQI scale via a lookup table.
+  2240	 *
+  2241	 * Return: SQI value (0–7), or a negative errno on failure.
+  2242	 */
+  2243	static int kszphy_get_sqi(struct phy_device *phydev)
+  2244	{
+  2245		int sum = 0;
+  2246		int i, val, raw_sqi, avg_raw_sqi;
+> 2247		u8 channels;
+  2248	
+  2249		/* Determine applicable channels based on link speed */
+  2250		if (phydev->speed == SPEED_1000)
+  2251			/* TODO: current SQI API only supports 1 channel. */
+  2252			channels = 1;
+  2253		else if (phydev->speed == SPEED_100)
+  2254			channels = 1;
+  2255		else
+  2256			return -EOPNOTSUPP;
+  2257	
+  2258		/*
+  2259		 * Sample and accumulate SQI readings for each pair (currently only one).
+  2260		 *
+  2261		 * Reference: KSZ9477S Datasheet DS00002392C, Section 4.1.11 (page 26)
+  2262		 * - The SQI register is updated every 2 µs.
+  2263		 * - Values may fluctuate significantly, even in low-noise environments.
+  2264		 * - For reliable estimation, average a minimum of 30–50 samples
+  2265		 *   (recommended for noisy environments)
+  2266		 * - In noisy environments, individual readings are highly unreliable.
+  2267		 *
+  2268		 * We use 40 samples per pair with a delay of 3 µs between each
+  2269		 * read to ensure new values are captured (2 µs update interval).
+  2270		 */
+  2271		for (i = 0; i < KSZ9477_SQI_SAMPLE_COUNT; i++) {
+  2272			val = phy_read_mmd(phydev, MDIO_MMD_PMAPMD,
+  2273					   KSZ9477_MMD_SIGNAL_QUALITY_CHAN_A);
+  2274			if (val < 0)
+  2275				return val;
+  2276	
+  2277			raw_sqi = FIELD_GET(KSZ9477_MMD_SQI_MASK, val);
+  2278			sum += raw_sqi;
+  2279	
+  2280			udelay(KSZ9477_MMD_SQI_READ_DELAY_US);
+  2281		}
+  2282	
+  2283		avg_raw_sqi = sum / KSZ9477_SQI_SAMPLE_COUNT;
+  2284	
+  2285		/* Handle the pre-fail/failed state first. */
+  2286		if (avg_raw_sqi >= ARRAY_SIZE(ksz_sqi_mapping))
+  2287			return 0;
+  2288	
+  2289		/* Use the lookup table for the good signal range. */
+  2290		return ksz_sqi_mapping[avg_raw_sqi];
+  2291	}
+  2292	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
