@@ -1,468 +1,151 @@
-Return-Path: <netdev+bounces-201552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BD55AE9DEE
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 14:58:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C396AE9DE8
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 14:57:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49B6F6401F8
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 12:57:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21AC516AF7B
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 12:57:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C8832E1C60;
-	Thu, 26 Jun 2025 12:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nT51aSI6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6F42E1729;
+	Thu, 26 Jun 2025 12:57:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E38CD2E1729;
-	Thu, 26 Jun 2025 12:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A571B4F0A
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 12:57:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750942659; cv=none; b=HARNagRvJP2f1JAM745CkUCD3ZY5/9Uz3cHso8IqDOJu4HPnMobLLwpWw2JlV/VcyRCZ1mEnbWnCPmk1RJjRfJcrX6lNdahkno19SyZLBazW8BzY7HWCl2HoJ+b8UuqAhkFiHeI7JXZJoLs2/nbXgaz156Q9X+V3s0yy2eHdRyI=
+	t=1750942652; cv=none; b=EKlQoRP8WVYhqni6AiiLnDt9ofmXajiC21l6trea7wGXN40XaVTk+lz3RV9tKG/o5p+ZA3wPfLkAxwfaVc+aj8NRu3nJTBJ4CifIHjeagzeyQkcXybvPho/BcwMMDZC87pIBtsKxfuEW5mbRfE0mZ3pFLOA/XLYeaKU6TtEAWk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750942659; c=relaxed/simple;
-	bh=Z5XIQXQlazJbc/jPqjX37W6puWm6Ny0RQLBxIS6zP9g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DInjxeROLlQTpr/FITcnrmWE/lT30JXi0Dn15RdA0go6ZwfId56ehf1yKSVXxPW3vt6Lo2oE/szZBSLT3JTWAtPhi54BH2vTklk8xeaVrMxFOlw0PBCTt3GINwqXIqL6qBZVHLMdtmFgHC0d31eUE6aUOJqsBMddvjojUvZoQQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nT51aSI6; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-32addf54a00so7793281fa.1;
-        Thu, 26 Jun 2025 05:57:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1750942655; x=1751547455; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hbDBF1m4ND8ODEViRH7eWaeCoVkwsjO8vjNuWncwojs=;
-        b=nT51aSI6bIDaE6LQVthN9Uv6ONBsZlAsM193v/vA/ZpkDTZj70iD+rl3uD9W6/N+fG
-         EAMS+UDfI25GZ0pRyK764WNgydAGGFyvW3pxLkyP59LuhX6upu3cIH5ENc2+rjlpDIY9
-         u5O4HBIcqzJjSDxN5uM0IEFQlJwuL/TJ9wQ82UEwu08S2ocGMhuvhiSFSKmYbbidWj9F
-         gv4E5/Jfn4MBj8GVe88GUVzjUklvPu1i9Ax+mko918PBSaXdCQXTS8u6KKcQsbg/9REU
-         exciRbpOyC5nfIIu3zTVVorLygS3cUVMy/BxguLymRgxiCvYZrBkOlpdkOCQPorwM8PL
-         R1uA==
+	s=arc-20240116; t=1750942652; c=relaxed/simple;
+	bh=rPXf71MDkv1KkvzkugTsNBkpv9MI4q54otRR8aGtKxg=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=uAlZqbgF/d0qjjan6xuGj2lHfvFROrD20YK21+MMvWuxt/R4meC6oHIKhTMcYngr2m+egIhjsyjNlOV4VtLx1MtKoGV5xeaTp563Wrx/0EOh/BByUI/lf3T9wcCe1tbDFMWKeQ3seEqPMTsK+qhZ/a2JsMpLY2Zi0iWgyL1IF0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3df2d0b7c50so9757815ab.1
+        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 05:57:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750942655; x=1751547455;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hbDBF1m4ND8ODEViRH7eWaeCoVkwsjO8vjNuWncwojs=;
-        b=PzAXrubu1iw6tsx5kShaOltZLbWZaXP3zpMAoCHnKqirqiEUA6/wJ4hrvnoG9JIraH
-         DNBtZgIWaFMtCKdoeFabhx/dy1d5OraPWCgRdmRPP3kecfR8wrVMXNvOJmCjluFpM/r1
-         8Gxjh2bjVhCJ8rYbDgROtnSrUiM5zWAMvK5I+zGsogMF+GAd0FWsCZQuDDP/OvdOLu9I
-         KhPjxscNo+3bDJW9xBENXRD0XYXtzt/RCz5UwWb301/UsOiQaD1Ods2rb2rgSYBuWKwQ
-         LU2ftyDS4v80kt0yo5EloOBWYZelx7kNI+14Mp1oVaWewGCH5jK37IunEZ55HF+l1Gpm
-         8XxA==
-X-Forwarded-Encrypted: i=1; AJvYcCU0Ft8RoAdArsTW9mypwj17w4SGwbRhTcSjlkhINuiOgsovJgvByooT0EHPVMc2z/aWjhKHfnwU@vger.kernel.org, AJvYcCVIqcTlwGvR0uak3sEB6VRmW61LPGuwOw7c4+9+c2p9Gm1Qfl6Kwlsu/J8nWHaA+5mU4HdZb581@vger.kernel.org, AJvYcCW/fVOTrWGp5c3ggKhDKSl7tq4vkCdRNG9mSD4h2EpxeQcchUHY89ze6XYxopT1Ddy3JW5al1fDVYZKJwT5t9Y=@vger.kernel.org, AJvYcCWIi2LxRg5rqmAZeH2gQA1d2UnoWKj7PpueEAAk1PwiaeBIDaye5AniGBe3YAQc1GXQ1lICHfxzkSW6RXdn@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhcFDMXBx+XF2uz1ENevHdgwqfAUz8+E+ew1HG18LMUxfNnYPb
-	to+6LtuiIifN7f7PtHUo3xxXDsZ7cN4fYBJojUPBgSFYOACa8q2zvhVQfnm9UV8qrU+w7DNByss
-	o6WcNbBqqzuS/o4s3T9/3Eks0rQzt35g2KGMX8U0Jcw==
-X-Gm-Gg: ASbGncu4W9LJ1Siy8xLcrOFLXNm1pFWDzr4DEgnLxI9EmT8HXzTaQyoJbuaYEO6zFGv
-	BzAEl8kOj6DtnOESHI6VQ7SSGmi53GUN7kALLYILfmo8CsKCdpBSEo0toVgpSYcdpMP1aym9JrT
-	J72fjVDtvFYZzBwirp7v0ujqBp5PWK83q1WAEMxSbslg==
-X-Google-Smtp-Source: AGHT+IF2Wqjq+z5Kekhx8NTddyZTPh0HFQb8SRZurjGuP33M/t0OWBh1RC07DUJS9Qf8Npu4yJAd8K2ViTlWgwhM72s=
-X-Received: by 2002:a05:651c:3045:b0:32b:7165:d0 with SMTP id
- 38308e7fff4ca-32cc643d074mr16874431fa.10.1750942654696; Thu, 26 Jun 2025
- 05:57:34 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1750942649; x=1751547449;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nwN0ldL1U178GSOcHtpYmNajlC0ep0MCuxdwVuLJqik=;
+        b=HkZwJogoCbCHaR02Y1xa6EsUB7ltw2YezbuAL9zqYQSN5cn9zUfBaQWE61futOeW+m
+         wvWDmasn/09qWKodKyyS/x4KcJyDEN89c4u6HNhmOmFrvILOR+4LG+DMdB1gco+ZbrZQ
+         CE6dXQ1WKuS9BPlrrkBeoGvF1UB3wpmBg+XdCASHbmHm1zSVNA7DN703+oUdVakTi1Bl
+         geAMrOaT9+Lb9LngNOqRa7MVU1X35L/LJd0EXXrjHa9nW3ZE+in6MjCyHSZh4lJt18qC
+         Eg8ohj3zeR7MroCtfsBx4vv7FWr21JHfgHM+8z6coAy0gL38CDGn07AiGqy+HMG/MEDd
+         iqCw==
+X-Forwarded-Encrypted: i=1; AJvYcCWB6cCwpI8iFxUDIFbnb/vi4XNmgDgybO4bEC0k4Jjt899UUyiuF9eliU2qDbI0B/jpo5Am7bU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyr2OWYFqk6BerGdevpTOfN7st1JvbUwiq9Wk/OEG3HpYKL7FzP
+	gg+OWFTXG9R73nfCGL2lP48CEWCS/u75GQfbP/xofpuz01Rv5BANr0Cep2CvFVhtQjpjxcbgl/B
+	NUaSRLj502ytYB4o5vaYqSBzi9cq1pn+GV+Tb/lmmByFciwcfee5HgqGk2EQ=
+X-Google-Smtp-Source: AGHT+IHXEk1bZFIRP52lSlkallAfbwT7GM52DnNGb6AhRhB7qmX+IWQhTW+84vSo3Ni9jUrSIxOP37ua4ZcX8RmsveKxub85M+GI
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250626115209.17839-1-ceggers@arri.de>
-In-Reply-To: <20250626115209.17839-1-ceggers@arri.de>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 26 Jun 2025 08:57:22 -0400
-X-Gm-Features: Ac12FXwbphIiiUdCuEqIOLqT54dhAb91jK5k-PvTjulolO7Gvgbeo-8mmls3-Gg
-Message-ID: <CABBYNZLfDqh=49qtC2M6F+f+rmgZ-hQGnABseqWyk0H4QDGTqQ@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: HCI: Set extended advertising data synchronously
-To: Christian Eggers <ceggers@arri.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Jaganath Kanakkassery <jaganath.k.os@gmail.com>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+X-Received: by 2002:a05:6e02:1f08:b0:3df:2a58:381a with SMTP id
+ e9e14a558f8ab-3df32871b05mr91740935ab.3.1750942649532; Thu, 26 Jun 2025
+ 05:57:29 -0700 (PDT)
+Date: Thu, 26 Jun 2025 05:57:29 -0700
+In-Reply-To: <685ce019.a00a0220.2e5631.0206.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <685d43b9.050a0220.2303ee.01db.GAE@google.com>
+Subject: Re: [syzbot] [wireless?] WARNING in _ieee80211_sta_cur_vht_bw
+From: syzbot <syzbot+ededba317ddeca8b3f08@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Christian,
+syzbot has found a reproducer for the following issue on:
 
-On Thu, Jun 26, 2025 at 7:52=E2=80=AFAM Christian Eggers <ceggers@arri.de> =
-wrote:
->
-> Currently, for controllers with extended advertising, the advertising
-> data is set in the asynchronous response handler for extended
-> adverstising params. As most advertising settings are performed in a
-> synchronous context, the (asynchronous) setting of the advertising data
-> is done too late (after enabling the advertising).
->
-> Move setting of adverstising data from asynchronous response handler
-> into synchronous context to fix ordering of HCI commands.
->
-> Signed-off-by: Christian Eggers <ceggers@arri.de>
-> Fixes: a0fb3726ba55 ("Bluetooth: Use Set ext adv/scan rsp data if control=
-ler supports")
-> Cc: stable@vger.kernel.org
-> v1: https://lore.kernel.org/linux-bluetooth/20250625130510.18382-1-cegger=
-s@arri.de/
-> ---
-> v2: convert setting of adv data into synchronous context (rather than mov=
-ing
-> more methods into asynchronous response handlers).
-> - hci_set_ext_adv_params_sync: new method
-> - hci_set_ext_adv_data_sync: move within source file (no changes)
-> - hci_set_adv_data_sync: dito
-> - hci_update_adv_data_sync: dito
-> - hci_cc_set_ext_adv_param: remove (performed synchronously now)
->
-> On Wednesday, 25 June 2025, 15:26:58 CEST, Luiz Augusto von Dentz wrote:
-> > That said for the likes of MGMT_OP_ADD_EXT_ADV_DATA you will still
-> > need to detect if the instance has already been enabled then do
-> > disable/re-enable logic if the quirk is set.
->
-> The critical opcode (HCI_OP_LE_SET_EXT_ADV_DATA) is only used in
-> hci_set_ext_adv_data_sync(). Two of the callers already ensure that
-> the advertising instance is disabled, so only hci_update_adv_data_sync()
-> may need a quirk. I suggest doing this in a separate patch.
->
-> regards,
-> Christian
->
->  net/bluetooth/hci_event.c |  36 -------
->  net/bluetooth/hci_sync.c  | 209 ++++++++++++++++++++++++--------------
->  2 files changed, 132 insertions(+), 113 deletions(-)
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 66052d6aaa1d..4d5ace9d245d 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2150,40 +2150,6 @@ static u8 hci_cc_set_adv_param(struct hci_dev *hde=
-v, void *data,
->         return rp->status;
->  }
->
-> -static u8 hci_cc_set_ext_adv_param(struct hci_dev *hdev, void *data,
-> -                                  struct sk_buff *skb)
-> -{
-> -       struct hci_rp_le_set_ext_adv_params *rp =3D data;
-> -       struct hci_cp_le_set_ext_adv_params *cp;
-> -       struct adv_info *adv_instance;
-> -
-> -       bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
-> -
-> -       if (rp->status)
-> -               return rp->status;
-> -
-> -       cp =3D hci_sent_cmd_data(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS);
-> -       if (!cp)
-> -               return rp->status;
-> -
-> -       hci_dev_lock(hdev);
-> -       hdev->adv_addr_type =3D cp->own_addr_type;
-> -       if (!cp->handle) {
-> -               /* Store in hdev for instance 0 */
-> -               hdev->adv_tx_power =3D rp->tx_power;
-> -       } else {
-> -               adv_instance =3D hci_find_adv_instance(hdev, cp->handle);
-> -               if (adv_instance)
-> -                       adv_instance->tx_power =3D rp->tx_power;
-> -       }
-> -       /* Update adv data as tx power is known now */
-> -       hci_update_adv_data(hdev, cp->handle);
-> -
-> -       hci_dev_unlock(hdev);
-> -
-> -       return rp->status;
-> -}
-> -
->  static u8 hci_cc_read_rssi(struct hci_dev *hdev, void *data,
->                            struct sk_buff *skb)
->  {
-> @@ -4164,8 +4130,6 @@ static const struct hci_cc {
->         HCI_CC(HCI_OP_LE_READ_NUM_SUPPORTED_ADV_SETS,
->                hci_cc_le_read_num_adv_sets,
->                sizeof(struct hci_rp_le_read_num_supported_adv_sets)),
-> -       HCI_CC(HCI_OP_LE_SET_EXT_ADV_PARAMS, hci_cc_set_ext_adv_param,
-> -              sizeof(struct hci_rp_le_set_ext_adv_params)),
->         HCI_CC_STATUS(HCI_OP_LE_SET_EXT_ADV_ENABLE,
->                       hci_cc_le_set_ext_adv_enable),
->         HCI_CC_STATUS(HCI_OP_LE_SET_ADV_SET_RAND_ADDR,
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 1f8806dfa556..2a09b2cb983e 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -1205,9 +1205,116 @@ static int hci_set_adv_set_random_addr_sync(struc=
-t hci_dev *hdev, u8 instance,
->                                      sizeof(cp), &cp, HCI_CMD_TIMEOUT);
->  }
->
-> +static int
-> +hci_set_ext_adv_params_sync(struct hci_dev *hdev,
-> +                           const struct hci_cp_le_set_ext_adv_params *cp=
-,
-> +                           struct hci_rp_le_set_ext_adv_params *rp)
-> +{
-> +       struct sk_buff *skb;
-> +
-> +       skb =3D __hci_cmd_sync(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof=
-(*cp),
-> +                            cp, HCI_CMD_TIMEOUT);
-> +
-> +       /* If command return a status event, skb will be set to -ENODATA =
-*/
-> +       if (skb =3D=3D ERR_PTR(-ENODATA))
-> +               return 0;
-> +
-> +       if (IS_ERR(skb)) {
-> +               bt_dev_err(hdev, "Opcode 0x%4.4x failed: %ld",
-> +                          HCI_OP_LE_SET_EXT_ADV_PARAMS, PTR_ERR(skb));
-> +               return PTR_ERR(skb);
-> +       }
-> +
-> +       if (skb->len !=3D sizeof(*rp)) {
-> +               bt_dev_err(hdev, "Invalid response length for "
-> +                          "HCI_OP_LE_SET_EXT_ADV_PARAMS: %u", skb->len);
-> +               kfree_skb(skb);
-> +               return -EIO;
-> +       }
-> +
-> +       memcpy(rp, skb->data, sizeof(*rp));
-> +       kfree_skb(skb);
-> +
-> +       return rp->status;
-> +}
-> +
-> +static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> +{
-> +       DEFINE_FLEX(struct hci_cp_le_set_ext_adv_data, pdu, data, length,
-> +                   HCI_MAX_EXT_AD_LENGTH);
-> +       u8 len;
-> +       struct adv_info *adv =3D NULL;
-> +       int err;
-> +
-> +       if (instance) {
-> +               adv =3D hci_find_adv_instance(hdev, instance);
-> +               if (!adv || !adv->adv_data_changed)
-> +                       return 0;
-> +       }
-> +
-> +       len =3D eir_create_adv_data(hdev, instance, pdu->data,
-> +                                 HCI_MAX_EXT_AD_LENGTH);
-> +
-> +       pdu->length =3D len;
-> +       pdu->handle =3D adv ? adv->handle : instance;
-> +       pdu->operation =3D LE_SET_ADV_DATA_OP_COMPLETE;
-> +       pdu->frag_pref =3D LE_SET_ADV_DATA_NO_FRAG;
-> +
-> +       err =3D __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_DATA,
-> +                                   struct_size(pdu, data, len), pdu,
-> +                                   HCI_CMD_TIMEOUT);
-> +       if (err)
-> +               return err;
-> +
-> +       /* Update data if the command succeed */
-> +       if (adv) {
-> +               adv->adv_data_changed =3D false;
-> +       } else {
-> +               memcpy(hdev->adv_data, pdu->data, len);
-> +               hdev->adv_data_len =3D len;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static int hci_set_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> +{
-> +       struct hci_cp_le_set_adv_data cp;
-> +       u8 len;
-> +
-> +       memset(&cp, 0, sizeof(cp));
-> +
-> +       len =3D eir_create_adv_data(hdev, instance, cp.data, sizeof(cp.da=
-ta));
-> +
-> +       /* There's nothing to do if the data hasn't changed */
-> +       if (hdev->adv_data_len =3D=3D len &&
-> +           memcmp(cp.data, hdev->adv_data, len) =3D=3D 0)
-> +               return 0;
-> +
-> +       memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
-> +       hdev->adv_data_len =3D len;
-> +
-> +       cp.length =3D len;
-> +
-> +       return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_ADV_DATA,
-> +                                    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> +}
-> +
-> +int hci_update_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> +{
-> +       if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED))
-> +               return 0;
-> +
-> +       if (ext_adv_capable(hdev))
-> +               return hci_set_ext_adv_data_sync(hdev, instance);
-> +
-> +       return hci_set_adv_data_sync(hdev, instance);
-> +}
-> +
->  int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
->  {
->         struct hci_cp_le_set_ext_adv_params cp;
-> +       struct hci_rp_le_set_ext_adv_params rp;
->         bool connectable;
->         u32 flags;
->         bdaddr_t random_addr;
-> @@ -1316,8 +1423,20 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev=
- *hdev, u8 instance)
->                 cp.secondary_phy =3D HCI_ADV_PHY_1M;
->         }
->
-> -       err =3D __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS,
-> -                                   sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> +       err =3D hci_set_ext_adv_params_sync(hdev, &cp, &rp);
-> +       if (err)
-> +               return err;
-> +
-> +       hdev->adv_addr_type =3D own_addr_type;
-> +       if (!cp.handle) {
-> +               /* Store in hdev for instance 0 */
-> +               hdev->adv_tx_power =3D rp.tx_power;
-> +       } else if (adv) {
-> +               adv->tx_power =3D rp.tx_power;
-> +       }
+HEAD commit:    ecb259c4f70d Add linux-next specific files for 20250626
+git tree:       linux-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=130db182580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4e847490ba2a1e14
+dashboard link: https://syzkaller.appspot.com/bug?extid=ededba317ddeca8b3f08
+compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=102fcf0c580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11b67dd4580000
 
-We can probably move the above code into hci_set_ext_adv_params_sync
-so we guarantee the tx_power is updated whenever it is used, if there
-are differences between the likes of directed advertisements, etc,
-that can probably be handled internally as well, although I think it
-doesn't seem to need a special handling since we restrict directected
-advertisements to handle 0x00 only.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/5c1b08ab7d3a/disk-ecb259c4.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f8489f3be9c8/vmlinux-ecb259c4.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/150ce938c7c2/bzImage-ecb259c4.xz
 
-> +       /* Update adv data as tx power is known now */
-> +       err =3D hci_set_ext_adv_data_sync(hdev, cp.handle);
->         if (err)
->                 return err;
->
-> @@ -1822,79 +1941,6 @@ int hci_le_terminate_big_sync(struct hci_dev *hdev=
-, u8 handle, u8 reason)
->                                      sizeof(cp), &cp, HCI_CMD_TIMEOUT);
->  }
->
-> -static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> -{
-> -       DEFINE_FLEX(struct hci_cp_le_set_ext_adv_data, pdu, data, length,
-> -                   HCI_MAX_EXT_AD_LENGTH);
-> -       u8 len;
-> -       struct adv_info *adv =3D NULL;
-> -       int err;
-> -
-> -       if (instance) {
-> -               adv =3D hci_find_adv_instance(hdev, instance);
-> -               if (!adv || !adv->adv_data_changed)
-> -                       return 0;
-> -       }
-> -
-> -       len =3D eir_create_adv_data(hdev, instance, pdu->data,
-> -                                 HCI_MAX_EXT_AD_LENGTH);
-> -
-> -       pdu->length =3D len;
-> -       pdu->handle =3D adv ? adv->handle : instance;
-> -       pdu->operation =3D LE_SET_ADV_DATA_OP_COMPLETE;
-> -       pdu->frag_pref =3D LE_SET_ADV_DATA_NO_FRAG;
-> -
-> -       err =3D __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_DATA,
-> -                                   struct_size(pdu, data, len), pdu,
-> -                                   HCI_CMD_TIMEOUT);
-> -       if (err)
-> -               return err;
-> -
-> -       /* Update data if the command succeed */
-> -       if (adv) {
-> -               adv->adv_data_changed =3D false;
-> -       } else {
-> -               memcpy(hdev->adv_data, pdu->data, len);
-> -               hdev->adv_data_len =3D len;
-> -       }
-> -
-> -       return 0;
-> -}
-> -
-> -static int hci_set_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> -{
-> -       struct hci_cp_le_set_adv_data cp;
-> -       u8 len;
-> -
-> -       memset(&cp, 0, sizeof(cp));
-> -
-> -       len =3D eir_create_adv_data(hdev, instance, cp.data, sizeof(cp.da=
-ta));
-> -
-> -       /* There's nothing to do if the data hasn't changed */
-> -       if (hdev->adv_data_len =3D=3D len &&
-> -           memcmp(cp.data, hdev->adv_data, len) =3D=3D 0)
-> -               return 0;
-> -
-> -       memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
-> -       hdev->adv_data_len =3D len;
-> -
-> -       cp.length =3D len;
-> -
-> -       return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_ADV_DATA,
-> -                                    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> -}
-> -
-> -int hci_update_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> -{
-> -       if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED))
-> -               return 0;
-> -
-> -       if (ext_adv_capable(hdev))
-> -               return hci_set_ext_adv_data_sync(hdev, instance);
-> -
-> -       return hci_set_adv_data_sync(hdev, instance);
-> -}
-> -
->  int hci_schedule_adv_instance_sync(struct hci_dev *hdev, u8 instance,
->                                    bool force)
->  {
-> @@ -6269,6 +6315,7 @@ static int hci_le_ext_directed_advertising_sync(str=
-uct hci_dev *hdev,
->                                                 struct hci_conn *conn)
->  {
->         struct hci_cp_le_set_ext_adv_params cp;
-> +       struct hci_rp_le_set_ext_adv_params rp;
->         int err;
->         bdaddr_t random_addr;
->         u8 own_addr_type;
-> @@ -6310,8 +6357,16 @@ static int hci_le_ext_directed_advertising_sync(st=
-ruct hci_dev *hdev,
->         if (err)
->                 return err;
->
-> -       err =3D __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS,
-> -                                   sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> +       err =3D hci_set_ext_adv_params_sync(hdev, &cp, &rp);
-> +       if (err)
-> +               return err;
-> +
-> +       hdev->adv_addr_type =3D own_addr_type;
-> +       /* Store in hdev for instance 0 */
-> +       hdev->adv_tx_power =3D rp.tx_power;
-> +
-> +       /* Update adv data as tx power is known now */
-> +       err =3D hci_set_ext_adv_data_sync(hdev, cp.handle);
->         if (err)
->                 return err;
->
-> --
-> 2.44.1
->
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ededba317ddeca8b3f08@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: ./include/net/mac80211.h:7769 at ieee80211_chan_width_to_rx_bw include/net/mac80211.h:7769 [inline], CPU#0: syz-executor109/5836
+WARNING: ./include/net/mac80211.h:7769 at _ieee80211_sta_cur_vht_bw+0x524/0x6e0 net/mac80211/vht.c:549, CPU#0: syz-executor109/5836
+Modules linked in:
+CPU: 0 UID: 0 PID: 5836 Comm: syz-executor109 Not tainted 6.16.0-rc3-next-20250626-syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+RIP: 0010:ieee80211_chan_width_to_rx_bw include/net/mac80211.h:7769 [inline]
+RIP: 0010:_ieee80211_sta_cur_vht_bw+0x524/0x6e0 net/mac80211/vht.c:549
+Code: 00 00 00 eb 49 41 83 fd 05 74 30 41 83 fd 0d 75 13 e8 70 f9 d5 f6 b8 04 00 00 00 eb 31 e8 64 f9 d5 f6 eb 28 e8 5d f9 d5 f6 90 <0f> 0b 90 eb 1d e8 52 f9 d5 f6 b8 02 00 00 00 eb 13 e8 46 f9 d5 f6
+RSP: 0018:ffffc90003fcef48 EFLAGS: 00010293
+RAX: ffffffff8aea1323 RBX: ffff888073fd8000 RCX: ffff888032595a00
+RDX: 0000000000000000 RSI: ffffffff8f9a5660 RDI: 0000000000000007
+RBP: 0000000000000000 R08: ffff888032595a00 R09: 0000000000000007
+R10: 000000000000000d R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000007 R14: ffff888073fd8180 R15: 1ffff1100e7fb030
+FS:  0000555588b13380(0000) GS:ffff8881259e6000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055dba778f798 CR3: 0000000076a32000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ ieee80211_sta_cur_vht_bw net/mac80211/ieee80211_i.h:2230 [inline]
+ __ieee80211_vht_handle_opmode+0x3c0/0x850 net/mac80211/vht.c:701
+ sta_link_apply_parameters+0xb75/0xf60 net/mac80211/cfg.c:1987
+ sta_apply_parameters+0x944/0x15b0 net/mac80211/cfg.c:2111
+ ieee80211_add_station+0x424/0x6a0 net/mac80211/cfg.c:2194
+ rdev_add_station+0x108/0x290 net/wireless/rdev-ops.h:201
+ nl80211_new_station+0x1755/0x1b70 net/wireless/nl80211.c:8358
+ genl_family_rcv_msg_doit+0x212/0x300 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x205/0x470 net/netlink/af_netlink.c:2534
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
+ netlink_unicast+0x758/0x8d0 net/netlink/af_netlink.c:1339
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
+ sock_sendmsg_nosec net/socket.c:714 [inline]
+ __sock_sendmsg+0x219/0x270 net/socket.c:729
+ ____sys_sendmsg+0x505/0x830 net/socket.c:2614
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2668
+ __sys_sendmsg net/socket.c:2700 [inline]
+ __do_sys_sendmsg net/socket.c:2705 [inline]
+ __se_sys_sendmsg net/socket.c:2703 [inline]
+ __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2703
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f22ab1537d9
+Code: 48 83 c4 28 c3 e8 e7 18 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fffa34ff748 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fffa34ff918 RCX: 00007f22ab1537d9
+RDX: 0000000000000000 RSI: 0000200000001080 RDI: 0000000000000006
+RBP: 00007f22ab1c6610 R08: 0000000000000000 R09: 00007fffa34ff918
+R10: 0000000000000012 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007fffa34ff908 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
 
 
---=20
-Luiz Augusto von Dentz
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
