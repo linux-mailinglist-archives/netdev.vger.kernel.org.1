@@ -1,172 +1,164 @@
-Return-Path: <netdev+bounces-201429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2627FAE9704
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 09:42:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 904C6AE9739
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 09:51:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFA64189AF37
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 07:43:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5AB10189D6AE
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 07:51:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06EA325485A;
-	Thu, 26 Jun 2025 07:42:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F075236453;
+	Thu, 26 Jun 2025 07:51:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="f2SLXA10"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="O659ElZ4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1625F24E4C6
-	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 07:42:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 400DD20013A;
+	Thu, 26 Jun 2025 07:51:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750923768; cv=none; b=AAOyZ8HI6d95G82UfP1T+QBAB9xQ5pWXGZTNoG9cUUzw7b9RVjXG/wKcD0lOq5XhhU+f4lUDqgHPQdMeT/P73/RXqHNAWpsdA7zxmzAcphK25S7t9S9kiixe1/eZQ+o2+LypxacWnZRderIv4BkFzH2S1rc61jqPP9FXXgH5+3M=
+	t=1750924272; cv=none; b=JH6Ho+x4xiZ5FKg1ozKVDn+Zygk5iLN1YaMCrPxfF/kVA5Cezf7/7AaUAPiTbj24eSGvoBvTlEFYN473ePOz55d7/UFkKR7RxfCir1AaXLWpppgm1pz6mQhCqDOEoJcp+6yPws5beb7/7WnGBO+R+RgQ/63aRacMaRLMtzX3Iqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750923768; c=relaxed/simple;
-	bh=XqoCUNoIiXGdV4LT9cOwCfiJqNJ2Cfp6GN5FZdKyQLw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L5CE9ER9oXuZTQiGD3nrm0IVc+4feroK9iqEUO0wZI8IzhRmKzWLOPaVgjMyLdxDodiGhYXXc+0ae1UJ/UDQtXegvzgkugus0kPI0Y5s3sElEvwJaQB0Sh7J5SVLosl5y15nuX9RoT4l2Rhlqja1O2CF6xdt7OgzmoaAIcKks94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=f2SLXA10; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ae04d3d63e6so118388966b.2
-        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 00:42:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gooddata.com; s=google; t=1750923765; x=1751528565; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kmlQgV9vWUgrOGrYQ1qTDZBBqbmkBrpQQvLdyRNMshw=;
-        b=f2SLXA10OgDElQ3OEuNBu6Qk/hhc/Iu/Bgou2t9Q4Gw96jsE3RjDfzNqBTiAiTkybf
-         1ToPU0l95CX5FLYY9A1fJOxC+SW1Eql7Bj14Yx3/Qt5girolUHjtSjDZg6xjCfR6iXTY
-         RgPyUoLn4F6cVIlSyWQGUX6yHkItQgZ3IaKNo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750923765; x=1751528565;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kmlQgV9vWUgrOGrYQ1qTDZBBqbmkBrpQQvLdyRNMshw=;
-        b=JDBzxxLqlAAM+NPOY/mX+XuPL87j46Znck9itlItoNOEsENtXV3ZxspCPtCh1hwbm7
-         67KuHHcK9B3lP028i2pS49reuvad4by37qAGqJV7syddMrOrDCF0O1CksMSzuxrlUm/a
-         4xzeh4TJWT7b5GzYA3XWfBvClhbMeYuMBdNJWi92bXAJgoJecIg5scZEtfedSboRclsm
-         nsz2Sqv+/+WLgtIfFVmSCx7gHx000Jdhy/gzfZyAgpC6eNin12XXf65Pdpfq6H3+KsP+
-         oPitupxlgxcwRWEK/YRHp2mlN9B3Xhm5KW1caAT+gq0GxE+M3mbHP/7QI2luAwVu1JbR
-         UL4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU5JeQTJlBVuGJWycS/xvRrcOJYpEHtxXrvSfPRjfcoOd4ga0HyskDNOX8pExdMQqnjfJzbOLM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxN4h8zASdQPtrDOEJKjq8n2GfirBbYNP/0Ye15LenQGosUwl39
-	zukzzBryxRKPXDZtKBAYHi1imLgzGEBVuaoI5AuFA4Iuicy072UAfoZimNQAkT4Kax1HsHEFzng
-	GYgcW+VXisxAw2dKRcAhiPgaZ7TZ/MexeNcsqzvZZ
-X-Gm-Gg: ASbGncvRMWj5Gj39At9z6OZ20bSIt5iIFK8Uxc0nMqxPURaZmuVTsLldPXO+LiEjxxt
-	jypwlAL29umbvPswfWbIN/k26+smp8L1HuR286/TCMfZf7W48j/VwOCOdOcstcw/NVVdPA/Vx+f
-	S8WfhpjRtx5KeGsf7noaizTzvmp7c4MqTs5JIqierbiU6t
-X-Google-Smtp-Source: AGHT+IGQ29SGdr4U8XdsEp043TI4qqT4doANfCqlH4050quc3HJ8Dr4GriJAlIEzNsBr4wRg0VBwCQ401xKutfq2aME=
-X-Received: by 2002:a17:906:c452:b0:ae0:16db:1b62 with SMTP id
- a640c23a62f3a-ae0beb852cdmr433825266b.59.1750923765153; Thu, 26 Jun 2025
- 00:42:45 -0700 (PDT)
+	s=arc-20240116; t=1750924272; c=relaxed/simple;
+	bh=xjVdLV/JVz2BsWEL05AlHxeZQWEEvAm7WvVCsdy8r8Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ZauVaJX6rri1QTLUUHMKFrCSdZ6rVNjMYYbnQTVDHdFToj3xpF0fR+JIysTU8g1htdWSEVUbAX6wpsQ9PYom++y7EcQrG+gUcmBxijvTZNp60DTHWLdD0XXX2xjyTQV9UfAI7MM6ZgOZAUJeDE3WZ9/fHS70Fjc9XedinJM74C8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=O659ElZ4; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=nr
+	cH+J0mcbi7MPQc1gfhaJE8haS8C9y1V4Z6MecyyhQ=; b=O659ElZ43LwpJ6LGnv
+	iK3ZnWDuqvKYBGWSTLSn+Wu2Y/dLWk12YeIOOP6JQYYuHHzhZXnBgITO9wVcVZbG
+	KTxPpblbRKacaR0mbLtOuD87xYRIOuZZleEdi7bAub6x77vJkUsFZ91nDy/Hk9HN
+	drPNa9urCGwBov1ew3UioPn/c=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wDXX+i8+1xoujOlAg--.17814S2;
+	Thu, 26 Jun 2025 15:50:22 +0800 (CST)
+From: Feng Yang <yangfeng59949@163.com>
+To: stfomichev@gmail.com
+Cc: aleksander.lobakin@intel.com,
+	almasrymina@google.com,
+	asml.silence@gmail.com,
+	davem@davemloft.net,
+	ebiggers@google.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	kerneljasonxing@gmail.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	willemb@google.com,
+	yangfeng59949@163.com,
+	yangfeng@kylinos.cn
+Subject: Re: [PATCH] skbuff: Improve the sending efficiency of __skb_send_sock
+Date: Thu, 26 Jun 2025 15:50:20 +0800
+Message-Id: <20250626075020.95425-1-yangfeng59949@163.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <aFxBi55GlhVdHzE4@mini-arch>
+References: <aFxBi55GlhVdHzE4@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
- <4a061a51-8a6c-42b8-9957-66073b4bc65f@intel.com> <20250415175359.3c6117c9@kernel.org>
- <CAK8fFZ6ML1v8VCjN3F-r+SFT8oF0xNpi3hjA77aRNwr=HcWqNA@mail.gmail.com>
- <20250416064852.39fd4b8f@kernel.org> <CAK8fFZ4bKHa8L6iF7dZNBRxujdmsoFN05p73Ab6mkPf6FGhmMQ@mail.gmail.com>
- <CO1PR11MB5089365F31BCD97E59CCFA83D6BD2@CO1PR11MB5089.namprd11.prod.outlook.com>
- <20250416171311.30b76ec1@kernel.org> <CO1PR11MB508931FBA3D5DFE7D8F07844D6BC2@CO1PR11MB5089.namprd11.prod.outlook.com>
- <CAK8fFZ6+BNjNdemB+P=SuwU6X9a9CmtkR8Nux-XG7QHdcswvQQ@mail.gmail.com>
- <CAK8fFZ4BJ-T40eNzO1rDLLpSRkeaHGctATsGLKD3bqVCa4RFEQ@mail.gmail.com>
- <CAK8fFZ5XTO9dGADuMSV0hJws-6cZE9equa3X6dfTBgDyzE1pEQ@mail.gmail.com>
- <b3eb99da-9293-43e8-a24d-f4082f747d6c@intel.com> <CAK8fFZ7LREBEdhXjBAKuaqktOz1VwsBTxcCpLBsa+dkMj4Pyyw@mail.gmail.com>
- <20250625132545.1772c6ab@kernel.org>
-In-Reply-To: <20250625132545.1772c6ab@kernel.org>
-From: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Date: Thu, 26 Jun 2025 09:42:19 +0200
-X-Gm-Features: Ac12FXyfYBwNw7r-sTtnJ3Pq-xINRVOqJANIwsOhTjNx6hz7HmeFqHgFcDwpzd8
-Message-ID: <CAK8fFZ7KDaPk_FVDbTdFt8soEWrpJ_g0_fiKEg1WzjRp1BC0Qg@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
- driver after upgrade to 6.13.y (regression in commit 492a044508ad)
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, 
-	"Keller, Jacob E" <jacob.e.keller@intel.com>, "Damato, Joe" <jdamato@fastly.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, 
-	"Czapnik, Lukasz" <lukasz.czapnik@intel.com>, "Dumazet, Eric" <edumazet@google.com>, 
-	"Zaki, Ahmed" <ahmed.zaki@intel.com>, Martin Karsten <mkarsten@uwaterloo.ca>, 
-	Igor Raits <igor@gooddata.com>, Daniel Secik <daniel.secik@gooddata.com>, 
-	Zdenek Pesek <zdenek.pesek@gooddata.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDXX+i8+1xoujOlAg--.17814S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxXF17XFyfuFWfAF47Cry5twb_yoW5Cry7pF
+	WfGFZxWr4DJF17urn3tw4F9r43tayvkr48GF4Sva4fAr90yryFgF4UKr10ka9YkryxCF4x
+	Xr4qqr1UKrn0yaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0JUyxRhUUUUU=
+X-CM-SenderInfo: p1dqww5hqjkmqzuzqiywtou0bp/1tbiZRx4eGhc+MFgSQAAsd
 
->
-> On Wed, 25 Jun 2025 19:51:08 +0200 Jaroslav Pulchart wrote:
-> > Great, please send me a link to the related patch set. I can apply them=
- in
-> > our kernel build and try them ASAP!
->
-> Sorry if I'm repeating the question - have you tried
-> CONFIG_MEM_ALLOC_PROFILING? Reportedly the overhead in recent kernels
-> is low enough to use it for production workloads.
+On Wed, 25 Jun 2025 11:35:55 -0700, Stanislav Fomichev <stfomichev@gmail.com> wrote:
 
-I try it now, the fresh booted server:
+> On 06/23, Feng Yang wrote:
+> > From: Feng Yang <yangfeng@kylinos.cn>
+> > 
+> > By aggregating skb data into a bvec array for transmission, when using sockmap to forward large packets,
+> > what previously required multiple transmissions now only needs a single transmission, which significantly enhances performance.
+> > For small packets, the performance remains comparable to the original level.
+> > 
+> > When using sockmap for forwarding, the average latency for different packet sizes
+> > after sending 10,000 packets is as follows:
+> > size	old(us)		new(us)
+> > 512	56		55
+> > 1472	58		58
+> > 1600	106		79
+> > 3000	145		108
+> > 5000	182		123
+> > 
+> > Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
+> > ---
+> >  net/core/skbuff.c | 112 +++++++++++++++++++++-------------------------
+> >  1 file changed, 52 insertions(+), 60 deletions(-)
+> > 
+> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > index 85fc82f72d26..664443fc9baf 100644
+> > --- a/net/core/skbuff.c
+> > +++ b/net/core/skbuff.c
+> > @@ -3235,84 +3235,75 @@ typedef int (*sendmsg_func)(struct sock *sk, struct msghdr *msg);
+> >  static int __skb_send_sock(struct sock *sk, struct sk_buff *skb, int offset,
+> >  			   int len, sendmsg_func sendmsg, int flags)
+> >  {
+> > -	unsigned int orig_len = len;
+> >  	struct sk_buff *head = skb;
+> >  	unsigned short fragidx;
+> > -	int slen, ret;
+> > +	struct msghdr msg;
+> > +	struct bio_vec *bvec;
+> > +	int max_vecs, ret, slen;
+> > +	int bvec_count = 0;
+> > +	unsigned int copied = 0;
+> >  
+> > -do_frag_list:
+> > -
+> > -	/* Deal with head data */
+> > -	while (offset < skb_headlen(skb) && len) {
+> > -		struct kvec kv;
+> > -		struct msghdr msg;
+> > -
+> > -		slen = min_t(int, len, skb_headlen(skb) - offset);
+> > -		kv.iov_base = skb->data + offset;
+> > -		kv.iov_len = slen;
+> > -		memset(&msg, 0, sizeof(msg));
+> > -		msg.msg_flags = MSG_DONTWAIT | flags;
+> > -
+> > -		iov_iter_kvec(&msg.msg_iter, ITER_SOURCE, &kv, 1, slen);
+> > -		ret = INDIRECT_CALL_2(sendmsg, sendmsg_locked,
+> > -				      sendmsg_unlocked, sk, &msg);
+> > -		if (ret <= 0)
+> > -			goto error;
+> > +	max_vecs = skb_shinfo(skb)->nr_frags + 1; // +1 for linear data
+> > +	if (skb_has_frag_list(skb)) {
+> > +		struct sk_buff *frag_skb = skb_shinfo(skb)->frag_list;
+> >  
+> > -		offset += ret;
+> > -		len -= ret;
+> > +		while (frag_skb) {
+> > +			max_vecs += skb_shinfo(frag_skb)->nr_frags + 1; // +1 for linear data
+> > +			frag_skb = frag_skb->next;
+> > +		}
+> >  	}
+> >  
+> > -	/* All the data was skb head? */
+> > -	if (!len)
+> > -		goto out;
+> > +	bvec = kcalloc(max_vecs, sizeof(struct bio_vec), GFP_KERNEL);
+> > +	if (!bvec)
+> > +		return -ENOMEM;
+> 
+> Not sure allocating memory here is a good idea. From what I can tell
+> this function is used by non-sockmap callers as well..
 
-# sort -g /proc/allocinfo| tail -n 15
-    45409728   236509 fs/dcache.c:1681 func:__d_alloc
-    71041024    17344 mm/percpu-vm.c:95 func:pcpu_alloc_pages
-    71524352    11140 kernel/dma/direct.c:141 func:__dma_direct_alloc_pages
-    85098496     4486 mm/slub.c:2452 func:alloc_slab_page
-   115470992   101647 fs/ext4/super.c:1388 [ext4] func:ext4_alloc_inode
-   134479872    32832 kernel/events/ring_buffer.c:811 func:perf_mmap_alloc_=
-page
-   141426688    34528 mm/filemap.c:1978 func:__filemap_get_folio
-   191594496    46776 mm/memory.c:1056 func:folio_prealloc
-   360710144      172 mm/khugepaged.c:1084 func:alloc_charge_folio
-   444076032    33790 mm/slub.c:2450 func:alloc_slab_page
-   530579456   129536 mm/page_ext.c:271 func:alloc_page_ext
-   975175680      465 mm/huge_memory.c:1165 func:vma_alloc_anon_folio_pmd
-  1022427136   249616 mm/memory.c:1054 func:folio_prealloc
-  1105125376   139252 drivers/net/ethernet/intel/ice/ice_txrx.c:681
-[ice] func:ice_alloc_mapped_page
-  1621598208   395848 mm/readahead.c:186 func:ractl_alloc_folio
+Alternatively, we can use struct bio_vec bvec[size] to avoid memory allocation.
+Even if the "size" is insufficient, the unsent portion will be transmitted in the next call to `__skb_send_sock`.
 
+Here we just merge them and send together. The other invocations of this function should still be able to send normally.
 
->
-> > st 25. 6. 2025 v 16:03 odes=C3=ADlatel Przemek Kitszel <
-> > przemyslaw.kitszel@intel.com> napsal:
-> >
-> > > On 6/25/25 14:17, Jaroslav Pulchart wrote:
-> > > > Hello
-> > > >
-> > > > We are still facing the memory issue with Intel 810 NICs (even on l=
-atest
-> > > > 6.15.y).
-> > > >
-> > > > Our current stabilization and solution is to move everything to a n=
-ew
-> > > > INTEL-FREE server and get rid of last Intel sights there (after Int=
-el's
-> > > > CPU vulnerabilities fuckups NICs are next step).
-> > > >
-> > > > Any help welcomed,
-> > > > Jaroslav P.
-> > > >
-> > > >
-> > >
-> > > Thank you for urging us, I can understand the frustration.
-> > >
-> > > We have identified some (unrelated) memory leaks, will soon ship fixe=
-s.
-> > > And, as there were no clear issue with any commit/version you have
-> > > posted to be a culprit, there is a chance that our random findings co=
-uld
-> > > help. Anyway going to zero kmemleak reports is good in itself, that i=
-s
-> > > a good start.
-> > >
-> > > Will ask my VAL too to increase efforts in this area too.
->
 
