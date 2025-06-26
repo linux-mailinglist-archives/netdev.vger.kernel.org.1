@@ -1,93 +1,87 @@
-Return-Path: <netdev+bounces-201666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91626AEA53F
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 20:21:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 807F3AEA568
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 20:30:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58E667AA7B8
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 18:19:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0563C564535
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 18:29:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE5C82248A0;
-	Thu, 26 Jun 2025 18:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A8052EE5F1;
+	Thu, 26 Jun 2025 18:29:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tl5wLpnr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c7GFK1a1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85AB1219303;
-	Thu, 26 Jun 2025 18:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114682F1FCE;
+	Thu, 26 Jun 2025 18:29:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750962071; cv=none; b=hQe6ISZUQjfIeSKisBahC1eRRQtTuJ5hCg7i8rwyUzuHmkkIQ17WW6Pwc0GI0sXhVjVmy/gk1Uw3o75D38cl21Q7Gx6ZI0gMg33FKp6exSwA6fUWJHO2S1tDbVBPjoHrTs1T/IjehR+NSKvMDweRUlfTo+gdOr6yNupiWYEfaUw=
+	t=1750962596; cv=none; b=HThAFsVy2P4ds2I65PEpAfFQ1ofUOExzSSQ1XGyvBuRyNOuCzDrgjj9Pj7lec8bnJPWX2UhIeXnou7sPIp+4Zf04+LXw8EdtLhOaQLzvi5c/2eihyB2CukmCgRpYocnXU6/fRFTgtlNyYtgqEFJFPbmWuR5p6QIT6v0n4yGbteI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750962071; c=relaxed/simple;
-	bh=Uis5VaMGXGcfGNkwwbsvB9JFelGu2N6VH0/KBsVtlks=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JYjH++9XdK/2ZlYNNg+Um7e0wTCLCGiJOcbf8QiL6wTkHGTpmCmqVzmuBNbAiD8IJFeKGHatjZXuFlTrkMu8Q7566uKGbpyJ57cdtNNUz6DI0G6Lv2mEuay0t80zLpTBMrn4zGgIcRQ+GprT3lfSgAgoJUgVzsbyrM9c3cbzOj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tl5wLpnr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC24AC4CEEB;
-	Thu, 26 Jun 2025 18:21:10 +0000 (UTC)
+	s=arc-20240116; t=1750962596; c=relaxed/simple;
+	bh=TtyXTqZHS7WMCX37CORNs51o3WK6Gt83ngInIItezg8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VownYtsXBWRQVpWCaQUYrD+ltKOyWvFGzICzilxewt3DO/qyUxx2lWRPZgj+sdpQy1zm3E+6LtRmHfDX18gQ+6rQJj6EzltB2wcW/MH7ocj1YwsWX2g6Z+3h3z6Ej9YpGvu7pgg168+wNSyc68VuyP8c3Oht4OXG4T29nxiSdXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c7GFK1a1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 051E4C4CEEB;
+	Thu, 26 Jun 2025 18:29:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750962071;
-	bh=Uis5VaMGXGcfGNkwwbsvB9JFelGu2N6VH0/KBsVtlks=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Tl5wLpnrZ2YSi4lvtH2EQizW3G2PQORthSDVfjvrUa4Yl/V49GUofPYmTN3d/b5J2
-	 kxAK0jODSprNgA+IwxXduUwgCqzkwcDxMu4cIEfa2fmPixqO8xTbtLD2w2tNDr4Jbf
-	 He9n9QWuJvYNoAJN1fBI7XyfVWvW1ujagnzt0LaqclWgX4gndpW0UOlt80qM+W46iE
-	 Z4/fNYQ25n/XNSlGVoUqOn/CNAqQgLPVHTq3qT4RZ9c8ou+m4kbXaHv8sMKv8RPpwn
-	 S2gf9bvRV7ZR4mqkl9KOlbBpB4q1Yj5WJnJ16zzg24SY1uzEdiySk2YRN4ce+P8Ao4
-	 IL4UgOTn2aaEw==
+	s=k20201202; t=1750962595;
+	bh=TtyXTqZHS7WMCX37CORNs51o3WK6Gt83ngInIItezg8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=c7GFK1a1t9dBNPzGktr/+eb67PkxOiElidnZ6I1BZmYRVIP9Wf8ipLIWyboXhAbTy
+	 fixal4soaaTKK0kHVAXftqWAdi+FOP3Tj3yBZXiw4VYjj9yUGPsQ2H9s2sPib+B0nL
+	 OCFZzQ9TLb43FPlqlTEPkmDu+SwQIVLEez3pQRH5tNWyMRPgENeKDU2jAVe2INgbqM
+	 AuGpM4Gwj+rLkvSOpasjJZi8zXUNRtvtNRGwQNDE5ea6OZDY6HW7wKUvNshUKTKaM4
+	 WT1DPqiKdGbBqEPXS5MH7OsdBJC2h6TTKlzk1RbhX3Qev9D2tf2TsxtLhoCjF1FCXz
+	 7cqTMPSjEtTuQ==
+Date: Thu, 26 Jun 2025 11:29:54 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	corbet@lwn.net,
-	linux-doc@vger.kernel.org
-Subject: [PATCH net] docs: netdev: correct the heading level for co-posting selftests
-Date: Thu, 26 Jun 2025 11:20:55 -0700
-Message-ID: <20250626182055.4161905-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.0
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Woojung Huh <woojung.huh@microchip.com>, Simon Horman
+ <horms@kernel.org>, Thangaraj Samynathan <Thangaraj.S@microchip.com>,
+ netdev@vger.kernel.org, Phil Elwell <phil@raspberrypi.org>, Russell King
+ <rmk+kernel@armlinux.org.uk>, linux-kernel@vger.kernel.org, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ kernel@pengutronix.de, Rengarajan Sundararajan
+ <Rengarajan.S@microchip.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Paolo Abeni <pabeni@redhat.com>, "David S.
+ Miller" <davem@davemloft.net>, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next v1 1/1] net: usb: lan78xx: fix WARN in
+ __netif_napi_del_locked on disconnect
+Message-ID: <20250626112954.5987f2e9@kernel.org>
+In-Reply-To: <aF0edQRJAXSps5CV@pengutronix.de>
+References: <20250620085144.1858723-1-o.rempel@pengutronix.de>
+	<20250623165537.53558fdb@kernel.org>
+	<aF0edQRJAXSps5CV@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-"Co-posting selftests" belongs in the "netdev patch review" section,
-same as "co-posting changes to user space components". It was
-erroneously added as its own section.
+On Thu, 26 Jun 2025 12:18:29 +0200 Oleksij Rempel wrote:
+> > > This patch is intended for `net-next` since the issue existed before the
+> > > PHYLINK migration, but is more naturally and cleanly addressed now that
+> > > PHYLINK manages link state transitions.  
+> > 
+> > And repost that for net, please.. :)  
+> 
+> It will be not compatible with the PHYlink migration patch in the
+> net-next. Should i wait until PHYlink patch goes to the net and then
+> send different patch variants for stable before PHYlink migration and
+> after?
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: corbet@lwn.net
-CC: linux-doc@vger.kernel.org
----
- Documentation/process/maintainer-netdev.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
-index 1ac62dc3a66f..e1755610b4bc 100644
---- a/Documentation/process/maintainer-netdev.rst
-+++ b/Documentation/process/maintainer-netdev.rst
-@@ -312,7 +312,7 @@ Posting as one thread is discouraged because it confuses patchwork
- (as of patchwork 2.2.2).
- 
- Co-posting selftests
----------------------
-+~~~~~~~~~~~~~~~~~~~~
- 
- Selftests should be part of the same series as the code changes.
- Specifically for fixes both code change and related test should go into
--- 
-2.50.0
-
+The conflict will be relatively easy, we will have to cope.
+But you really, really should hold off net-next patches until 
+you fix all the pre-existing bugs :|
 
