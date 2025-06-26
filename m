@@ -1,172 +1,172 @@
-Return-Path: <netdev+bounces-201428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3528EAE96F1
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 09:39:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2627FAE9704
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 09:42:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7069C17286C
-	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 07:39:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFA64189AF37
+	for <lists+netdev@lfdr.de>; Thu, 26 Jun 2025 07:43:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 003ED1CEEBE;
-	Thu, 26 Jun 2025 07:39:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06EA325485A;
+	Thu, 26 Jun 2025 07:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YFoNCyfq"
+	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="f2SLXA10"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6522F1B043C;
-	Thu, 26 Jun 2025 07:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1625F24E4C6
+	for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 07:42:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750923565; cv=none; b=oEub0fMMnxWEUcfC2NvTZWTEDoZ5h5b9NmIqLPraOaQKWW6vJVFp++5aSv2MXyFAUDt+Z/wERfrR0YClcSCCyXe8OjO6YAvrN4eDB5uuAwNORiEElid8GJ8TbglDrroqvR9WSNU+KOd3DYYku26FNtnSzzdz+A6VwSlaEPbbTQw=
+	t=1750923768; cv=none; b=AAOyZ8HI6d95G82UfP1T+QBAB9xQ5pWXGZTNoG9cUUzw7b9RVjXG/wKcD0lOq5XhhU+f4lUDqgHPQdMeT/P73/RXqHNAWpsdA7zxmzAcphK25S7t9S9kiixe1/eZQ+o2+LypxacWnZRderIv4BkFzH2S1rc61jqPP9FXXgH5+3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750923565; c=relaxed/simple;
-	bh=EtPDjFi+XnuRhMRKP3rZUOFK2bjQDeiMwOur+xiZTUs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t2Vr7QbMorGa831D9NDqr++ohqDpoVPrQbRV4VuM/21AZP2Na/wwpSaZxkPtYiQdUqT1vzCpX0nXb2LuINfTWsmU/yerMNb1bSW/KL7iuJF77rBpVwXfiV/eiuneFxfV9kcA5kJbjAGSpB5QklUff8n9O7pqPGgmRy1Zn3RMTcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YFoNCyfq; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55Q4AZht015779;
-	Thu, 26 Jun 2025 07:39:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=XqhQ1W
-	VIGZgb/9ywZtvmcV5uYQ5lVsNXe04xKbEf1LU=; b=YFoNCyfqhIP6P9ZGIrwvc0
-	lZdq6vLMlsFDwPdl7NiIsPaNaMazJccTfyEfyMHtYVVT+EXVe/SMbstbqlp6HR+T
-	0AdSeWsxNJATaSrG3tWORNfHyzh+gDejUDYV0k2aEJ2lpPXVGQfBYWF9LiK+Wvp6
-	ANs/xEpq/kiA5+S6Dhm8qC6wzP0XMW1HMKgQwxd9qNEHtOiPdBCsEvisvbVWnKX2
-	08749Zwxgap0Hl1ZPmyNm/WXLvNfJ2M2h1QOq8A4DOLEZv2NaZvTklXXx5N6FAZF
-	Vm7Oy4ixSYA21P7Vvr/Y2Lhic1MDoCTlokG+J5gMTVsnh/JElhwfwCatar1DfMnw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47dm8jmwbq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Jun 2025 07:39:16 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 55Q7PE4h009937;
-	Thu, 26 Jun 2025 07:39:15 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47dm8jmwbh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Jun 2025 07:39:15 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55Q4wbfU006397;
-	Thu, 26 Jun 2025 07:39:14 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47e82pdsxe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Jun 2025 07:39:14 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55Q7dDb417564288
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 26 Jun 2025 07:39:13 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0A4C85805D;
-	Thu, 26 Jun 2025 07:39:13 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 16D9B5805A;
-	Thu, 26 Jun 2025 07:39:10 +0000 (GMT)
-Received: from [9.87.149.7] (unknown [9.87.149.7])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 26 Jun 2025 07:39:09 +0000 (GMT)
-Message-ID: <7349ba11-f977-443c-b60c-c401cf58a23d@linux.ibm.com>
-Date: Thu, 26 Jun 2025 09:39:09 +0200
+	s=arc-20240116; t=1750923768; c=relaxed/simple;
+	bh=XqoCUNoIiXGdV4LT9cOwCfiJqNJ2Cfp6GN5FZdKyQLw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L5CE9ER9oXuZTQiGD3nrm0IVc+4feroK9iqEUO0wZI8IzhRmKzWLOPaVgjMyLdxDodiGhYXXc+0ae1UJ/UDQtXegvzgkugus0kPI0Y5s3sElEvwJaQB0Sh7J5SVLosl5y15nuX9RoT4l2Rhlqja1O2CF6xdt7OgzmoaAIcKks94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=f2SLXA10; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ae04d3d63e6so118388966b.2
+        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 00:42:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gooddata.com; s=google; t=1750923765; x=1751528565; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kmlQgV9vWUgrOGrYQ1qTDZBBqbmkBrpQQvLdyRNMshw=;
+        b=f2SLXA10OgDElQ3OEuNBu6Qk/hhc/Iu/Bgou2t9Q4Gw96jsE3RjDfzNqBTiAiTkybf
+         1ToPU0l95CX5FLYY9A1fJOxC+SW1Eql7Bj14Yx3/Qt5girolUHjtSjDZg6xjCfR6iXTY
+         RgPyUoLn4F6cVIlSyWQGUX6yHkItQgZ3IaKNo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750923765; x=1751528565;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kmlQgV9vWUgrOGrYQ1qTDZBBqbmkBrpQQvLdyRNMshw=;
+        b=JDBzxxLqlAAM+NPOY/mX+XuPL87j46Znck9itlItoNOEsENtXV3ZxspCPtCh1hwbm7
+         67KuHHcK9B3lP028i2pS49reuvad4by37qAGqJV7syddMrOrDCF0O1CksMSzuxrlUm/a
+         4xzeh4TJWT7b5GzYA3XWfBvClhbMeYuMBdNJWi92bXAJgoJecIg5scZEtfedSboRclsm
+         nsz2Sqv+/+WLgtIfFVmSCx7gHx000Jdhy/gzfZyAgpC6eNin12XXf65Pdpfq6H3+KsP+
+         oPitupxlgxcwRWEK/YRHp2mlN9B3Xhm5KW1caAT+gq0GxE+M3mbHP/7QI2luAwVu1JbR
+         UL4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU5JeQTJlBVuGJWycS/xvRrcOJYpEHtxXrvSfPRjfcoOd4ga0HyskDNOX8pExdMQqnjfJzbOLM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxN4h8zASdQPtrDOEJKjq8n2GfirBbYNP/0Ye15LenQGosUwl39
+	zukzzBryxRKPXDZtKBAYHi1imLgzGEBVuaoI5AuFA4Iuicy072UAfoZimNQAkT4Kax1HsHEFzng
+	GYgcW+VXisxAw2dKRcAhiPgaZ7TZ/MexeNcsqzvZZ
+X-Gm-Gg: ASbGncvRMWj5Gj39At9z6OZ20bSIt5iIFK8Uxc0nMqxPURaZmuVTsLldPXO+LiEjxxt
+	jypwlAL29umbvPswfWbIN/k26+smp8L1HuR286/TCMfZf7W48j/VwOCOdOcstcw/NVVdPA/Vx+f
+	S8WfhpjRtx5KeGsf7noaizTzvmp7c4MqTs5JIqierbiU6t
+X-Google-Smtp-Source: AGHT+IGQ29SGdr4U8XdsEp043TI4qqT4doANfCqlH4050quc3HJ8Dr4GriJAlIEzNsBr4wRg0VBwCQ401xKutfq2aME=
+X-Received: by 2002:a17:906:c452:b0:ae0:16db:1b62 with SMTP id
+ a640c23a62f3a-ae0beb852cdmr433825266b.59.1750923765153; Thu, 26 Jun 2025
+ 00:42:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] MAINTAINERS: update smc section
-To: Jan Karcher <jaka@linux.ibm.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Alexandra Winter
- <wintera@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Sidraya Jayagond <sidraya@linux.ibm.com>,
-        Mahanta Jambigi <mjambigi@linux.ibm.com>,
-        Tony Lu
- <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>
-References: <20250626051653.4259-1-jaka@linux.ibm.com>
-Content-Language: en-US
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <20250626051653.4259-1-jaka@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI2MDA1OCBTYWx0ZWRfX2hq+g/X2FgyC LFeUXWKxcoIiwPtjuKCuiF9d9+mw+99hkfstxnIW7Dq2WFqP63oLY3qs2uGCGfloJsQPerGQUBy mRvlZ4X6xyeNtHPIMB3tvaobT89IHkrDfbbs9yXm08l81HSSYIp8nZS3FPEwp6d91oW82xB4Lp/
- sXgsxIXnXgT6yXA+a4fq1aDYg1eviZ9KndVinmc9NYGUWSo3QFcamXbGH8ur0uVc9mIo1Z2G8nt RSPnZ4t3xSrHsHJWezIkx8mysFhxdFFPp91zoVrA8kBmEHN+imH1bxrjOmqktZTShEIoNFtAQMQ BkjFHElqsNxqWxPmscy5B68RbhR0v0NqOS+e1WP8OdxByjx3CAVSVjrN1rJjy9NVLnu7ZEh0x76
- FY8s1MiNNZlIDeisP+Y0ZxloFo2KoTYsurF0WNfhOq7haFl2JsRs8oMtV2KkZIfLnMKE0Tau
-X-Proofpoint-GUID: rhdBHarsnlOQeBsy9nQoyi_Enq38eJIh
-X-Proofpoint-ORIG-GUID: -6JO3-8b-ByJPCxafyVT6NP9Mq-yJjLr
-X-Authority-Analysis: v=2.4 cv=combk04i c=1 sm=1 tr=0 ts=685cf924 cx=c_pps a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=SRrdq9N9AAAA:8 a=VnNF1IyMAAAA:8 a=VwQbUJbxAAAA:8 a=qPgYS-SWOX8TBiLe_hsA:9
- a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-26_03,2025-06-25_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 spamscore=0 adultscore=0 mlxlogscore=937 clxscore=1015
- impostorscore=0 suspectscore=0 mlxscore=0 phishscore=0 lowpriorityscore=0
- bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506260058
+References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
+ <4a061a51-8a6c-42b8-9957-66073b4bc65f@intel.com> <20250415175359.3c6117c9@kernel.org>
+ <CAK8fFZ6ML1v8VCjN3F-r+SFT8oF0xNpi3hjA77aRNwr=HcWqNA@mail.gmail.com>
+ <20250416064852.39fd4b8f@kernel.org> <CAK8fFZ4bKHa8L6iF7dZNBRxujdmsoFN05p73Ab6mkPf6FGhmMQ@mail.gmail.com>
+ <CO1PR11MB5089365F31BCD97E59CCFA83D6BD2@CO1PR11MB5089.namprd11.prod.outlook.com>
+ <20250416171311.30b76ec1@kernel.org> <CO1PR11MB508931FBA3D5DFE7D8F07844D6BC2@CO1PR11MB5089.namprd11.prod.outlook.com>
+ <CAK8fFZ6+BNjNdemB+P=SuwU6X9a9CmtkR8Nux-XG7QHdcswvQQ@mail.gmail.com>
+ <CAK8fFZ4BJ-T40eNzO1rDLLpSRkeaHGctATsGLKD3bqVCa4RFEQ@mail.gmail.com>
+ <CAK8fFZ5XTO9dGADuMSV0hJws-6cZE9equa3X6dfTBgDyzE1pEQ@mail.gmail.com>
+ <b3eb99da-9293-43e8-a24d-f4082f747d6c@intel.com> <CAK8fFZ7LREBEdhXjBAKuaqktOz1VwsBTxcCpLBsa+dkMj4Pyyw@mail.gmail.com>
+ <20250625132545.1772c6ab@kernel.org>
+In-Reply-To: <20250625132545.1772c6ab@kernel.org>
+From: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Date: Thu, 26 Jun 2025 09:42:19 +0200
+X-Gm-Features: Ac12FXyfYBwNw7r-sTtnJ3Pq-xINRVOqJANIwsOhTjNx6hz7HmeFqHgFcDwpzd8
+Message-ID: <CAK8fFZ7KDaPk_FVDbTdFt8soEWrpJ_g0_fiKEg1WzjRp1BC0Qg@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
+ driver after upgrade to 6.13.y (regression in commit 492a044508ad)
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, 
+	"Keller, Jacob E" <jacob.e.keller@intel.com>, "Damato, Joe" <jdamato@fastly.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, 
+	"Czapnik, Lukasz" <lukasz.czapnik@intel.com>, "Dumazet, Eric" <edumazet@google.com>, 
+	"Zaki, Ahmed" <ahmed.zaki@intel.com>, Martin Karsten <mkarsten@uwaterloo.ca>, 
+	Igor Raits <igor@gooddata.com>, Daniel Secik <daniel.secik@gooddata.com>, 
+	Zdenek Pesek <zdenek.pesek@gooddata.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+>
+> On Wed, 25 Jun 2025 19:51:08 +0200 Jaroslav Pulchart wrote:
+> > Great, please send me a link to the related patch set. I can apply them=
+ in
+> > our kernel build and try them ASAP!
+>
+> Sorry if I'm repeating the question - have you tried
+> CONFIG_MEM_ALLOC_PROFILING? Reportedly the overhead in recent kernels
+> is low enough to use it for production workloads.
+
+I try it now, the fresh booted server:
+
+# sort -g /proc/allocinfo| tail -n 15
+    45409728   236509 fs/dcache.c:1681 func:__d_alloc
+    71041024    17344 mm/percpu-vm.c:95 func:pcpu_alloc_pages
+    71524352    11140 kernel/dma/direct.c:141 func:__dma_direct_alloc_pages
+    85098496     4486 mm/slub.c:2452 func:alloc_slab_page
+   115470992   101647 fs/ext4/super.c:1388 [ext4] func:ext4_alloc_inode
+   134479872    32832 kernel/events/ring_buffer.c:811 func:perf_mmap_alloc_=
+page
+   141426688    34528 mm/filemap.c:1978 func:__filemap_get_folio
+   191594496    46776 mm/memory.c:1056 func:folio_prealloc
+   360710144      172 mm/khugepaged.c:1084 func:alloc_charge_folio
+   444076032    33790 mm/slub.c:2450 func:alloc_slab_page
+   530579456   129536 mm/page_ext.c:271 func:alloc_page_ext
+   975175680      465 mm/huge_memory.c:1165 func:vma_alloc_anon_folio_pmd
+  1022427136   249616 mm/memory.c:1054 func:folio_prealloc
+  1105125376   139252 drivers/net/ethernet/intel/ice/ice_txrx.c:681
+[ice] func:ice_alloc_mapped_page
+  1621598208   395848 mm/readahead.c:186 func:ractl_alloc_folio
 
 
-
-On 26.06.25 07:16, Jan Karcher wrote:
-> Due to changes of my responsibilities within IBM i
-> can no longer act as maintainer for smc.
-> 
-> As a result of the co-operation with Alibaba over
-> the last years we decided to, once more, give them
-> more responsibility for smc by appointing
-> D. Wythe <alibuda@linux.alibaba.com> and
-> Dust Li <dust.li@linux.alibaba.com>
-> as maintainers as well.
-> 
-> Within IBM Sidraya Jayagond <sidraya@linux.ibm.com>
-> and Mahanta Jambigi <mjambigi@linux.ibm.com>
-> are going to take over the maintainership for smc.
-> 
-> v1 -> v2:
-> * Added Mahanta as reviewer for the time being due
-> to missing contributions.
-> 
-> Signed-off-by: Jan Karcher <jaka@linux.ibm.com>
-> ---
->   MAINTAINERS | 6 ++++--
->   1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index c3f7fbd0d67a..cfe9d000fbff 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -22550,9 +22550,11 @@ S:	Maintained
->   F:	drivers/misc/sgi-xp/
->   
->   SHARED MEMORY COMMUNICATIONS (SMC) SOCKETS
-> +M:	D. Wythe <alibuda@linux.alibaba.com>
-> +M:	Dust Li <dust.li@linux.alibaba.com>
-> +M:	Sidraya Jayagond <sidraya@linux.ibm.com>
->   M:	Wenjia Zhang <wenjia@linux.ibm.com>
-> -M:	Jan Karcher <jaka@linux.ibm.com>
-> -R:	D. Wythe <alibuda@linux.alibaba.com>
-> +R:	Mahanta Jambigi <mjambigi@linux.ibm.com>
->   R:	Tony Lu <tonylu@linux.alibaba.com>
->   R:	Wen Gu <guwen@linux.alibaba.com>
->   L:	linux-rdma@vger.kernel.org
-
-Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+>
+> > st 25. 6. 2025 v 16:03 odes=C3=ADlatel Przemek Kitszel <
+> > przemyslaw.kitszel@intel.com> napsal:
+> >
+> > > On 6/25/25 14:17, Jaroslav Pulchart wrote:
+> > > > Hello
+> > > >
+> > > > We are still facing the memory issue with Intel 810 NICs (even on l=
+atest
+> > > > 6.15.y).
+> > > >
+> > > > Our current stabilization and solution is to move everything to a n=
+ew
+> > > > INTEL-FREE server and get rid of last Intel sights there (after Int=
+el's
+> > > > CPU vulnerabilities fuckups NICs are next step).
+> > > >
+> > > > Any help welcomed,
+> > > > Jaroslav P.
+> > > >
+> > > >
+> > >
+> > > Thank you for urging us, I can understand the frustration.
+> > >
+> > > We have identified some (unrelated) memory leaks, will soon ship fixe=
+s.
+> > > And, as there were no clear issue with any commit/version you have
+> > > posted to be a culprit, there is a chance that our random findings co=
+uld
+> > > help. Anyway going to zero kmemleak reports is good in itself, that i=
+s
+> > > a good start.
+> > >
+> > > Will ask my VAL too to increase efforts in this area too.
+>
 
