@@ -1,151 +1,168 @@
-Return-Path: <netdev+bounces-202018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04427AEBF94
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 21:16:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E214AEC086
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 22:01:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B988F56394C
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 19:16:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FC731C4590B
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 20:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275791F8724;
-	Fri, 27 Jun 2025 19:16:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HeSdvolZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48062201266;
+	Fri, 27 Jun 2025 20:01:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA891E1E0B;
-	Fri, 27 Jun 2025 19:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6900F15E8B;
+	Fri, 27 Jun 2025 20:01:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751051765; cv=none; b=D6oeB8ewJHHXhbj7c6b76ALVR3IyhuoqCfcHaVZIeYFh2J5N5cAHQZYKeLeq7xRgOQSEa3BxFg3O3UJdJOE7d5yLzm3OWFVMw3oWvx9QlfULwwssIFRlMU+VPJjYL+jeYI2R4pqC+Qv4WW4rKcFNyTz9ZTG+ry4uD2fiCJ55Xyc=
+	t=1751054506; cv=none; b=svY2gZM/4Uncqo24EbUxgY6dUSR1d1T/HXwR9tPTbSKxdjsytqEo8jYf/IgoLWx04Mg2EVvj1a3vCEKLY+gLRDhxp1RuUP64BmJZ7wZu8CAJV1PhyNXRFk/YcixlzFvy/6XoRDZe9Q/9VBpUxbWkjMMjWriDvPVFVcJgdcHmfes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751051765; c=relaxed/simple;
-	bh=e3ItbkmjlCF+WHhbj2/fNpi4b7yR0M+6lB+y/2rBgh4=;
+	s=arc-20240116; t=1751054506; c=relaxed/simple;
+	bh=alEzDmtk2I2rFB/roV/8cjxA5f7pcGNJr887FkIlt8o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KyYe7JTxWRN7bvmsEQtL4igwUL89jr9J8w4PfhAOmbYt4nLyAAHpN5+mJE9MKpnGYoweTwBSGLlcZGOG9pBRYX+KJnF11RfhtPOL0BrAkykB5J1XsB9BR3BxiE/fN9/8cVT8F5ZoZkmOy8s42ye+abeNAXlrkPXu/TaHxsEcOt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HeSdvolZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7DD2C4CEE3;
-	Fri, 27 Jun 2025 19:15:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751051764;
-	bh=e3ItbkmjlCF+WHhbj2/fNpi4b7yR0M+6lB+y/2rBgh4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HeSdvolZ1UWrXJ9VSVn0ZS0DXIqe2eIXrXITt8duLo+CfF5vTXac+ssoZApecraH1
-	 P6B34G+ZT4coa3ZcU6wxNroRRNJoZdFztXJD03a4AdF1WGj/t9kpNYDL/NfBJE4Wof
-	 KmdnpV4SLP6BzmvZek6j0+ATHYvGhFeAd1DG8mXmgIsOfucxt3OywgB99zLXehfevR
-	 mqU7rlqzqJtoNk10nnojKRiZNt0EB9GqJ5bK68DoJUsEIZlO21up/E/uvVTp+qY8Wt
-	 bHmHC42juwXKYjbB+5rAmVCmyt4SIW3YdBju8ygb3Yey69lLMJjOUfvZszDV8BjyJY
-	 3XsaCQMDAlyHw==
-Date: Fri, 27 Jun 2025 20:15:55 +0100
-From: Simon Horman <horms@kernel.org>
-To: =?utf-8?B?VGjDqW8=?= Lebrun <theo.lebrun@bootlin.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=JxsAUsCHoHg3OHn6bJP2t15aNMStWa8DdPA5qdsyEv/wK0ru/pgXWqqgsYTjBjA9JIb4DWXyafDci37vXJfN2pPKQ3euEghAS6dWQcCbfmLx9Z9QTujikrc9QWh4hARzaYotGeQ6v+zGUr6hCaxzw1rNoCjqkzCQPJhsJ+jh1jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1uVEnR-000000003Fi-3XIT;
+	Fri, 27 Jun 2025 19:31:37 +0000
+Date: Fri, 27 Jun 2025 20:31:34 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "Chester A. Unal" <chester.a.unal@arinc9.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>,
-	Samuel Holland <samuel.holland@sifive.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>,
-	Gregory CLEMENT <gregory.clement@bootlin.com>,
-	Cyrille Pitchen <cyrille.pitchen@atmel.com>,
-	Harini Katakam <harini.katakam@xilinx.com>,
-	Rafal Ozieblo <rafalo@cadence.com>,
-	Haavard Skinnemoen <hskinnemoen@atmel.com>,
-	Jeff Garzik <jeff@garzik.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-mips@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Tawfik Bayouk <tawfik.bayouk@mobileye.com>
-Subject: Re: [PATCH net-next v2 16/18] MIPS: mobileye: add EyeQ5 DMA IOCU
- support
-Message-ID: <20250627191555.GD1776@horms.kernel.org>
-References: <20250627-macb-v2-0-ff8207d0bb77@bootlin.com>
- <20250627-macb-v2-16-ff8207d0bb77@bootlin.com>
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [net-next PATCH 0/6] net: dsa: mt7530: modernize MIB handling +
+ fix
+Message-ID: <aF7xlqRLXlZu0DZr@makrotopia.org>
+References: <20250410163022.3695-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250627-macb-v2-16-ff8207d0bb77@bootlin.com>
+In-Reply-To: <20250410163022.3695-1-ansuelsmth@gmail.com>
 
-On Fri, Jun 27, 2025 at 11:09:02AM +0200, Théo Lebrun wrote:
-> Both Cadence GEM Ethernet controllers on EyeQ5 are hardwired through CM3
-> IO Coherency Units (IOCU). For DMA coherent accesses, BIT(36) must be
-> set in DMA addresses.
+Hi Christian,
+
+On Thu, Apr 10, 2025 at 06:30:08PM +0200, Christian Marangi wrote:
+> This small series modernize MIB handling for MT7530 and also
+> implement .get_stats64.
 > 
-> Implement that in platform-specific dma_map_ops which get attached to
-> both instances of `cdns,eyeq5-gem` through a notifier block.
+> It was reported that kernel and Switch MIB desync in scenario where
+> a packet is forwarded from a port to another. In such case, the
+> forwarding is offloaded and the kernel is not aware of the
+> transmitted packet. To handle this, read the counter directly
+> from Switch registers.
 > 
-> Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
+> Christian Marangi (6):
+>   net: dsa: mt7530: generalize read port stats logic
+>   net: dsa: mt7530: move pkt size and rx err MIB counter to rmon stats
+>     API
+>   net: dsa: mt7530: move pause MIB counter to eth_ctrl stats API
+>   net: dsa: mt7530: move pkt stats and err MIB counter to eth_mac stats
+>     API
+>   net: dsa: mt7530: move remaining MIB counter to define
+>   net: dsa: mt7530: implement .get_stats64
 
-...
+After this series being applied I see lockdep warnings every time
+the interface counters are being read on MT7531 connected via MDIO:
 
-> diff --git a/arch/mips/mobileye/eyeq5-iocu-dma.c b/arch/mips/mobileye/eyeq5-iocu-dma.c
+[  234.374708] BUG: sleeping function called from invalid context at kernel/locking/mutex.c:579
+[  234.383200] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 3667, name: ifconfig
+[  234.391202] preempt_count: 1, expected: 0
+[  234.395226] INFO: lockdep is turned off.
+[  234.399150] CPU: 3 UID: 0 PID: 3667 Comm: ifconfig Tainted: G        W  O        6.16.0-rc1+ #0 NONE 
+[  234.399158] Tainted: [W]=WARN, [O]=OOT_MODULE
+[  234.399160] Hardware name: Bananapi BPI-R3 (DT)
+[  234.399162] Call trace:
+[  234.399165]  show_stack+0x28/0x78 (C)
+[  234.399179]  dump_stack_lvl+0x68/0x8c
+[  234.399184]  dump_stack+0x14/0x1c
+[  234.399188]  __might_resched+0x138/0x250
+[  234.399197]  __might_sleep+0x44/0x80
+[  234.399201]  __mutex_lock+0x4c/0x934
+[  234.399209]  mutex_lock_nested+0x20/0x28
+[  234.399215]  mt7530_get_stats64+0x40/0x2ac
+[  234.399222]  dsa_user_get_stats64+0x2c/0x40
+[  234.399229]  dev_get_stats+0x44/0x1e0
+[  234.399237]  dev_seq_printf_stats+0x24/0xe0
+[  234.399244]  dev_seq_show+0x14/0x40
+[  234.399248]  seq_read_iter+0x368/0x464
+[  234.399257]  seq_read+0xd0/0xfc
+[  234.399263]  proc_reg_read+0xa8/0xf0
+[  234.399268]  vfs_read+0x98/0x2b0
+[  234.399275]  ksys_read+0x54/0xdc
+[  234.399280]  __arm64_sys_read+0x18/0x20
+[  234.399286]  invoke_syscall.constprop.0+0x4c/0xd0
+[  234.399293]  do_el0_svc+0x3c/0xd0
+[  234.399298]  el0_svc+0x34/0xa0
+[  234.399303]  el0t_64_sync_handler+0x104/0x138
+[  234.399308]  el0t_64_sync+0x158/0x15c
 
-...
+Note that this only shows with some lock debugging options being set
+and may not actually be a problem, but I believe it anyway should be
+fixed somehow.
 
-> +const struct dma_map_ops eyeq5_iocu_ops = {
-> +	.alloc			= eyeq5_iocu_alloc,
-> +	.free			= eyeq5_iocu_free,
-> +	.alloc_pages_op		= dma_direct_alloc_pages,
-> +	.free_pages		= dma_direct_free_pages,
-> +	.mmap			= eyeq5_iocu_mmap,
-> +	.get_sgtable		= eyeq5_iocu_get_sgtable,
-> +	.map_page		= eyeq5_iocu_map_page,
-> +	.unmap_page		= eyeq5_iocu_unmap_page,
-> +	.map_sg			= eyeq5_iocu_map_sg,
-> +	.unmap_sg		= eyeq5_iocu_unmap_sg,
-> +	.get_required_mask	= dma_direct_get_required_mask,
-> +};
-> +EXPORT_SYMBOL(eyeq5_iocu_ops);
+#
+# Lock Debugging (spinlocks, mutexes, etc...)
+#
+CONFIG_LOCK_DEBUGGING_SUPPORT=y
+CONFIG_PROVE_LOCKING=y
+CONFIG_PROVE_RAW_LOCK_NESTING=y
+# CONFIG_LOCK_STAT is not set
+CONFIG_DEBUG_RT_MUTEXES=y
+CONFIG_DEBUG_SPINLOCK=y
+CONFIG_DEBUG_MUTEXES=y
+CONFIG_DEBUG_WW_MUTEX_SLOWPATH=y
+CONFIG_DEBUG_RWSEMS=y
+CONFIG_DEBUG_LOCK_ALLOC=y
+CONFIG_LOCKDEP=y
+CONFIG_LOCKDEP_BITS=15
+CONFIG_LOCKDEP_CHAINS_BITS=16
+CONFIG_LOCKDEP_STACK_TRACE_BITS=19
+CONFIG_LOCKDEP_STACK_TRACE_HASH_BITS=14
+CONFIG_LOCKDEP_CIRCULAR_QUEUE_BITS=12
+# CONFIG_DEBUG_LOCKDEP is not set
+CONFIG_DEBUG_ATOMIC_SLEEP=y
+# CONFIG_DEBUG_LOCKING_API_SELFTESTS is not set
+# CONFIG_LOCK_TORTURE_TEST is not set
+# CONFIG_WW_MUTEX_SELFTEST is not set
+# CONFIG_SCF_TORTURE_TEST is not set
+# CONFIG_CSD_LOCK_WAIT_DEBUG is not set
+# end of Lock Debugging (spinlocks, mutexes, etc...)
 
-Hi Théo,
+CONFIG_TRACE_IRQFLAGS=y
+CONFIG_TRACE_IRQFLAGS_NMI=y
+# CONFIG_DEBUG_IRQFLAGS is not set
+CONFIG_STACKTRACE=y
+# CONFIG_WARN_ALL_UNSEEDED_RANDOM is not set
+# CONFIG_DEBUG_KOBJECT is not set
 
-Does eyeq5_iocu_ops need to be exported?
-If so it should probably be declared in a header file somewhere.
-But I if not probably the EXPORT_SYMBOL line should be
-dropped, and the structure made static.
 
-Flagged by Sparse.
+Cheers
 
-> +
-> +static int eyeq5_iocu_notifier(struct notifier_block *nb,
-> +			       unsigned long event,
-> +			       void *data)
-> +{
-> +	struct device *dev = data;
-> +
-> +	/*
-> +	 * IOCU routing is hardwired; we must use our above custom
-> +	 * routines for cache-coherent DMA on ethernet interfaces.
-> +	 */
-> +	if (event == BUS_NOTIFY_ADD_DEVICE &&
-> +	    device_is_compatible(dev, "mobileye,eyeq5-gem")) {
-> +		set_dma_ops(dev, &eyeq5_iocu_ops);
-> +		return NOTIFY_OK;
-> +	}
-> +
-> +	return NOTIFY_DONE;
-> +}
 
-...
+Daniel
 
