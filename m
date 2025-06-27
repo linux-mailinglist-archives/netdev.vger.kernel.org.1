@@ -1,206 +1,198 @@
-Return-Path: <netdev+bounces-201923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E48D6AEB712
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 14:05:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39221AEB727
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 14:10:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0276717BB17
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 12:06:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9107E16BF84
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 12:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB9823B61D;
-	Fri, 27 Jun 2025 12:05:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72FAB2BF3E4;
+	Fri, 27 Jun 2025 12:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="IOjPJtY0"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="NGzl0STT"
 X-Original-To: netdev@vger.kernel.org
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011015.outbound.protection.outlook.com [40.107.130.15])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A92E19F461
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 12:05:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751025956; cv=fail; b=B6vGrLvSCP7nmqgUlZnFz07DzE0hHiiV2bZcfQb1tgmQkeYUBIIxmmS7xheo+hhYzIGKq9/ArOtT+EntrooBgvwj3daOZZqizQPaJrH4DtLwniLKW+E8GvlR7vcHLQB5MhSQWkC6k+TfN4cmMckuaTEtUqhmCIWVhNFVTvHMOYA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751025956; c=relaxed/simple;
-	bh=0JbCcoDG3EJyUeh6LGGwJWS+q5wWNzGdJedDedPY4CQ=;
-	h=Message-ID:Date:Subject:To:References:From:Cc:In-Reply-To:
-	 Content-Type:MIME-Version; b=Mp46PaF3tIBtKdevGqDZHelIH7K+vzPw37abl5EgHaoxeJHVBmA0I67ilohqMvKSqfgS1nqIfbT0fdg/3ETQ1/6GHUNTVMGVlOkj2M5Oi8wtc/RaZxxMEuKMMdEqLzc0uBK9ao2SDkepGoEPElwe1e2Y92I0TUxzd1OG4ClehTk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=2n.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=IOjPJtY0; arc=fail smtp.client-ip=40.107.130.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=2n.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VhUg2QlOCnsUhMPe5BbFmWgucEWM6nGlwyNEZY48elqmFHqWUGyxeMvR3KhUPl6VMtRWdqr4L1xfINZ2f9V4l8ZLL0e01wacrKIxbNLFO8phuisul2JgVQnoWyx4Tih6mB6OEr0Czu8AqamsM8yoMz1iC5wsod2hdKbIgqUgUKtV6eGj6EEVSlcU7BnQTMTI/S/FwIyOaibyY/N06wlG+rRE/Z+OU4mf0z62ltrjk6SCMh0MwZjAnAq+9N76+qrTxjJMemjgdnTJQ5XZ9DSuFNfNdRaSxfoOG95nped+WCENn9h4jkg0Yx+J11vmltFqINp09VMz+9PyVJYdkKro6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ugw1iTcTRyznykf49WnwxY1jP30iLqRwst/k403z0Zc=;
- b=QGCGuCTg+lGoCIoyL6Ary8WIKaW/SxN0mQKm321M0/FQlw4cvk5xqe0/Q82VINi5kHSZxxrc4RcE8+aAyFSRh/aWBDX20kzc4WDvZcxqxTkhoAD2/yOW9LhSQXL8rxkMmEi8h2U3jeralvZ5B+56E5WjIn/xnwpGrid3wCTfB9K0VdEFKDUX/NSu1/ASSwOZMY7fxJXqBbafCsFPZ3JsRrZvSSo+VCwzcs+AcGQMkv+iOmvrdpliGjUrwC4uGoebgJG8K6iuNy72ziqRBMwLWKmtP3bfoBn0u4m+tWnOHil0tV7RkMkUwxVyvGyRQOAu3C0IGuadz3hzmY33zxm/5Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=2n.com; dmarc=pass action=none header.from=axis.com; dkim=pass
- header.d=axis.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ugw1iTcTRyznykf49WnwxY1jP30iLqRwst/k403z0Zc=;
- b=IOjPJtY0vaUg11+3gxidq6gi5HqMgTtKb7I2UTYE+1U5QQJmuKaREazGOfgvUAIzG6FFSMSX1OgQiTyZQSi/7lrswKOEiJnelMw+Ugkr0xXW5vF21ajiXSAYj9YgV3dtkIylW5rST4PiRCs/4duqr64Ptot4FxZ7sTSQ+2j7mHE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=axis.com;
-Received: from DB5PR02MB10093.eurprd02.prod.outlook.com (2603:10a6:10:488::13)
- by AS2PR02MB9631.eurprd02.prod.outlook.com (2603:10a6:20b:595::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.33; Fri, 27 Jun
- 2025 12:05:49 +0000
-Received: from DB5PR02MB10093.eurprd02.prod.outlook.com
- ([fe80::2a25:783c:e73a:a81d]) by DB5PR02MB10093.eurprd02.prod.outlook.com
- ([fe80::2a25:783c:e73a:a81d%4]) with mapi id 15.20.8880.015; Fri, 27 Jun 2025
- 12:05:49 +0000
-Message-ID: <5909c12e-c957-4477-9012-b3bdb61b2e70@axis.com>
-Date: Fri, 27 Jun 2025 14:05:48 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] dt-bindings: ethernet-phy: add MII-Lite phy interface
- type
-To: Krzysztof Kozlowski <krzk@kernel.org>
-References: <20250626115619.3659443-1-kamilh@axis.com>
- <20250626115619.3659443-3-kamilh@axis.com>
- <cbf487b5-a3e5-4741-b672-8ba062f86a54@kernel.org>
-Content-Language: en-US
-From: =?UTF-8?B?S2FtaWwgSG9yw6FrICgyTik=?= <kamilh@axis.com>
-Cc: netdev <netdev@vger.kernel.org>
-In-Reply-To: <cbf487b5-a3e5-4741-b672-8ba062f86a54@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR4P281CA0214.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:e4::10) To DB5PR02MB10093.eurprd02.prod.outlook.com
- (2603:10a6:10:488::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB64619F461;
+	Fri, 27 Jun 2025 12:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751026230; cv=none; b=aVmx5L5n0yqvleeusN27iQuIE4H9fiqlMway+8/S5d+4snjqvDUbNIwaWO0XmonaGIHY9kgYdTiX+TsfrSGn671feJlDYx7WuW6sFVQfXIqANkLrbE6pI6Ic/NHX7STf2eJANKQJd4L3NuVSxsLSZYrRBx4oUKrW2wXWBhpD/Wo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751026230; c=relaxed/simple;
+	bh=Q6DAgIisXotFp2YyZDRPMkG4NDGXfd1fpY31E0F3F0k=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=QMr1r7RGDy/vOTfLwo1gV920CY7w0ssWjGrlrMRYUSPg/dfYwZpkHAgBIJXIjmvNQAY4vUE8gkE2VZU98hnG9+zYpUCPZmQdghWbdFo/5C2rsrukRWPdkaKVcGK82gjaJTNfJUv4OK0oKSj4D6h4YoR3A2/DQ2kEPH8NFqhep5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=NGzl0STT; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55RBNrSJ027982;
+	Fri, 27 Jun 2025 12:10:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=oGsPkH2rrxLl8WhqTb5Ki4
+	2Da0cJxP6OhsnxYq2B9B4=; b=NGzl0STTMoWl86P1SubDRpqvYhG0YzuCmQkkKX
+	+T7UKrcXSQqgOkVaIaEjy6zojkDNM9OujWS89S20g/C+zQA7MZrmq0pMrV72HlpT
+	PV/ta8U7y28OLXUwsOmG+jVETyFLM/CIx1MteISJRpeCwocNTZWVJ4wO2B06Z672
+	opYpCRc3s4s01NZx1gDiJG4Ran+gSCmhSTuF1vZIzwuDBDrfiUcLstFa1UGxuykB
+	Qtp1fYYTz4FVS6JiAgJlyjxq4rgOuQox/qXvfPlQGsMw5UpitkB90bVT3lqEkHUK
+	GtwOYaYcr84rlJ2WlmgvNAgmYV3qEknerqOhr6ZIF6Ud1/Lg==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47ec26h5km-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 27 Jun 2025 12:10:15 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 55RCAE9M007416
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 27 Jun 2025 12:10:14 GMT
+Received: from nsssdc-sh01-lnx.ap.qualcomm.com (10.80.80.8) by
+ nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Fri, 27 Jun 2025 05:10:08 -0700
+From: Luo Jie <quic_luoj@quicinc.com>
+Subject: [PATCH v2 0/8] Add Network Subsystem (NSS) clock controller
+ support for IPQ5424 SoC
+Date: Fri, 27 Jun 2025 20:09:16 +0800
+Message-ID: <20250627-qcom_ipq5424_nsscc-v2-0-8d392f65102a@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB5PR02MB10093:EE_|AS2PR02MB9631:EE_
-X-MS-Office365-Filtering-Correlation-Id: 43547dc9-b67c-4c57-06da-08ddb572f4c5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?bXBqQWpPZ0p0SVE3bzVqUWkyZ005QU5JNVVVSWVtcy9iU00wUitKaUlMUXJw?=
- =?utf-8?B?dkFDMFB5Z3lCb0xWQysrVWNsdlZlZ0RHN1h1WTN0alB1alduM2hYRk5vbjBX?=
- =?utf-8?B?d212YjdCNWFVbERJODZsT3NXZ1N0Mng3N3NrUDhCMzFFbytzN29rM0ZCbjha?=
- =?utf-8?B?L2M3TEJqd0NEZ08wS3RXWWNLMkE1OG5BNFNBKzdVMXNvSXE5STY3THRTQXNH?=
- =?utf-8?B?dWFKK3VUbktIa0JSV0dTeWwwcXN1WDkzRDF0Z2VjV3dGTjVuWjBBTlpudTBO?=
- =?utf-8?B?d1AyMnFGUzNaMnUwV1hHZUxiRlZEK1hHTis5SHQ0b0xTRGlPTkM3QXVmblJw?=
- =?utf-8?B?akJaYjUxbmxTQ09wejJ6RFRaaGNUQXY5WmJ4U3pndFowZUozV3lzd3N0dncr?=
- =?utf-8?B?dFlBclhjbElaUXZURUNlNEJNKzM2MFRXcnJFS3p5VVF1V0wrNlJibFBuVGJq?=
- =?utf-8?B?Q2N6d3p0SjJoTERpQUtFcHNsQmdscStjY3lXeXlaVUZyeWhTMHIzdjdZNDNs?=
- =?utf-8?B?RlZKUVpQSXRoWjhPeWpZZmpTZE83dE4xaUdhZHQrMU45bm5SWnNWT0lydmtl?=
- =?utf-8?B?Y2NVZnl4T0VwbGhiRlRDeVd0VlJVYkNsb3duMm1LMkFNLzhEU2ZaUmttUVM0?=
- =?utf-8?B?SXZSZXNqRnpiTWRhOU9HWjlBRTM5aHZRQ3AxYVI2UWFFYnpDeHFKYXBJdFQv?=
- =?utf-8?B?ODBENEVEUWxsa2FKakFhSlhFcDgvTlFaMzhxNVdGbzJpQTcyUkpuMVZ0RWtG?=
- =?utf-8?B?ZlFkWmlXUWgycXUrdFlCa05zU1ZvcjVJR0VteVl3aWI1Y2xnQkp6dFBoa2NF?=
- =?utf-8?B?Y0h3YkJ1SXE3VmUvaGJaalJBQmhSLzYyUnRGV0Q3Vi9OVnd1VVMvRHliS3h1?=
- =?utf-8?B?NFlrQ3BadUJHV3hSWnlLN0s4eXgxeDBRVzcrMG15enU4ZG83NFFpMm9teTN2?=
- =?utf-8?B?SWFCNXNVaGM3UkVsaFNGUTZzU0RHR1MxOWJGZWY3Z0dUUlFuZGtnNU5Cc0dU?=
- =?utf-8?B?NCtGdjV0enJUbFd0SlJLQVRhL1l4QlRKY2pERkdLSkxZMGsvelU0cTg4N1Fx?=
- =?utf-8?B?Qmo0LzB3Rm8ycXlJZTNuM25nRG1vRkhQUU5RbXJiU1poYTBVa3ZaUDV2dGtQ?=
- =?utf-8?B?LytZNWREYU1OUEI1NGtGWUZtL0o1dXAvT3V3Q3ZPK0FkdDI4ZkVhZStsbmMw?=
- =?utf-8?B?K21abXI4b2VuTm00SnZKV054aHNEU2Y4UTVmdkZpSk9SREpjMFJXMUZiRVVI?=
- =?utf-8?B?czhrY0JOaW1lclA0OG1zRjhDMVdwMjdPdDhsU2phZUFSL0JwWmxrcWJkRUEr?=
- =?utf-8?B?OTAzUnBYVXZCL1ZPcHNCTWI4dmVWVlAvK2NUMjhqYUY2cW1WZ0ZEYXZyOUw0?=
- =?utf-8?B?aE9mL1NaR3hKbDRkQ2Z5cjFSRmJqOXBZOHBpcHp0c1pkc1A2bkxrdnFCMnpP?=
- =?utf-8?B?ODNzekRKMWtSRUpRYitQT1pwZkYyMWhGY2xMbk1WakEzRkpNdjNjVDNtS2Nw?=
- =?utf-8?B?QzRzMlFMeXRKNlNMbTJlTzR2MDEzTTRudjVCQlJIbEhUMm9rVUVCa3NjbWZR?=
- =?utf-8?B?ZnpQKy9ndDQwZ05HVkRFdk8vdnFmSHI1QlRzb0lha0ZYUHB1UVFqMFJidFRN?=
- =?utf-8?B?dGM4QWVvZHZGNjBmWGg4YzJiakdLMmRsN3hFeElKeUJrZnNwTGI1Y1FlNVp3?=
- =?utf-8?B?Z2JCdFJMWjA1NVFhLzczNHNHQUg1WDFSaHg3Szl3ZU5KWTNoSCtTVlYwcUVj?=
- =?utf-8?B?SCtzTnE1TlBKWWhNdEpBNHVETlp1UXFyQkVEYklGSndhUEJMQnBNbVJhVVZH?=
- =?utf-8?B?WEtlUlFORTZxakVYK0JIZXlZeUVCMGM5anZkVUFaQ1p1akxSeXhucHpTTVMz?=
- =?utf-8?B?ZVdXaE1BVnUvdGIyZ1FiSmY0MG45VXMvQVJ5Y3FydENtRWZoM2lhb1dsVGlC?=
- =?utf-8?Q?pjxyLe+5Afw=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB5PR02MB10093.eurprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VWgyd3k3L2JQODFrOTg5VWtyOTFjeEVkZnJnZ3IzbDFpVFlTbkxJS0VnemNy?=
- =?utf-8?B?S1dYWVpVd2ZqYk12Z3NiZEdXUVJ6L1h5RzV6TG1VcitTa1J5T0dxNmJoZDFo?=
- =?utf-8?B?d1JkUU9FU2kvZnVHYTlzMENTaFgvV0pSY3o4TlZKVTlBcUJocERsTHkxNU93?=
- =?utf-8?B?TDlFaEdySTg5QTJ1Zm9vWTVvL2o0WitVSHhvQXNTQWVTQWlWcmpzcHJnSVhH?=
- =?utf-8?B?bVZLcGw4TExjRkk2WWxIbjNTSGN3Ykl1dEVrYktDenRaSXRoTmxyOWlaZzhT?=
- =?utf-8?B?MENOaE1CeFN0bjlLSkZQMDNvSWx3WklpeUpraXVhTk45dnBVS1VQZ3phcDM4?=
- =?utf-8?B?SXU0Y0NRQzFiOGcxcWtsSDh3blZYRUdTaE5FWTJST3JTRWxGb0RSbnBxNTdr?=
- =?utf-8?B?RTUxRFA4SEFFL0RKMFBER3UwTlVEQTRzVDJTT3hic3RnOFcyZ05hdjJWRkZq?=
- =?utf-8?B?ZEdZNzJ1MWZnWXg4dm0rRTVnSEtJSEhFaTFXSkNqMDVoUnZQZjZTK2d1ZU8x?=
- =?utf-8?B?cjJscVU2MlExRnlkR3YwZkR3WGRxYzJPVmdaeFFyZzNLQnBkQTFZZzJBbEIx?=
- =?utf-8?B?VFowMzlDVEpsYmRnZmFDb25qTndpdHhaMXVCR0lreEV3RG45MDBvOTdEV1gz?=
- =?utf-8?B?K2FWcFNDNnE5WEIvWEtTcGJTNytMa0tQS1R4dmdQRlFndFFML1NBVTlnMFNW?=
- =?utf-8?B?QmtOejk0NHMxL0VzQkNDMUduL001Y04wS3lUNzUvV1JOWWVpbjJVT2E3RDdJ?=
- =?utf-8?B?a0hCaUdmRGREdmJGNVNqNzk2cmEzbFRZaFNDa0F0aWlSYllLdk96ajdadFIy?=
- =?utf-8?B?QXhmM2VPS09sOE5pM2d6RE1NM2pqOXgvRmhxZU1CcCttQm5sYkRtbURrQXdh?=
- =?utf-8?B?L0VtVTdnTWxVaUpTTnh4S0NDbllHNG5sa2pDNFNBT3hLTnlzSFQwc3hDelpv?=
- =?utf-8?B?OEt2eTlqaE04ZWw1OU9lTm1mb1p4UW5IUEplaVc5NTRWRjVybDdnbGlMQUFG?=
- =?utf-8?B?MEpadkRaMWp0SEZOVTZJU2VMcXhjZUhxT01NV085eFNGTUZLRHEzY01BWXEv?=
- =?utf-8?B?N0FjRDdZSzhpSUh4MVVnYThhWk5MRU5BM1A4SFFLU3JMdEtSZ3hPUWx6TUNK?=
- =?utf-8?B?UVpJbTdHQVpLMnUzWXEzOXkyVDNLRmdWd3BkQW9QSnIzRFM4T1RDaE9CVjBk?=
- =?utf-8?B?K1J6dHJjZnBvTGVRbUhMaC9OMHQrU3ZySzFYTnNqWWJMZzIyL1JPdVpKc1Zv?=
- =?utf-8?B?VHltcENwUlJEMDNOZjlPdlJaeGRkdGNwVjhYTEpJK2thdnhCMGg1SmY3M1V3?=
- =?utf-8?B?RjU2aEVCbThnK1VYNU9uTGN4YmRkaWVGdDdPcFluZjRSZm5QZU83b3plaE9j?=
- =?utf-8?B?dVhDcjJkTVRTM09ibDZlckVmajZ2ekN0ZnFRRDA2WU0xN2RIeUJ6U3UyMUcr?=
- =?utf-8?B?YjhvR3NnSEd1U1p5QkpSeDloZXpkVHY3V29ZbUZJT2doQ2FZaVQ2NEd5bXdI?=
- =?utf-8?B?eGxNZTFSbGt4bUhyeUtUV3JOZlBBalV0RzIrc3JJMVphVnlyYWt4d3VNUUU1?=
- =?utf-8?B?VkFhTHdzSnJ3ZUwyWmRnZ21rclhDNU5RSWNrT1gzcjJBSzdXOGhnY0xlU3hh?=
- =?utf-8?B?Q0FxYUU1RnR4SkFkQWtNN2JlRFQyc2Rab3BDSTNHTUExSnNITzRZak9TSFIw?=
- =?utf-8?B?SjNDMFhtN2xNU3g2RG90eDZ6bnJ6T3p4dlhFeG13TzUzOFYrTDRhNGkvdDVq?=
- =?utf-8?B?eEdMbWFHMHFYamEvWHEzWWI2Ri9IQkxXRnkweXRJSXRJYWFQM2hJUDEweTJI?=
- =?utf-8?B?a3hlamlzbWtJY3BiNW1hQkU4TG9OdTVDUi9BOFY1TEFmMzFGeVF4eGdjRFQv?=
- =?utf-8?B?Nm1ybHdmTTBmMlE2ZFhHWjFTOU1iMnJDNnM0RVN0disrMFZCbjZnUXpEdWZG?=
- =?utf-8?B?TThNUjFTT3BVaWhiZzkrZExDNW56V0tmaEZQS0NnSXNsZlY4bWNIaWdvVnJ1?=
- =?utf-8?B?VGg4WU1OQUdWMDAxVGRoQU82ZGJzNnMwWHJCclJOZ2NKcUtUU21CTDRXU1E2?=
- =?utf-8?B?WnZLdUF0TkpiVFRaVE5zQ2tkSlZPU3dod094MVNFT2p3bktWNTd3ZlVmM1lE?=
- =?utf-8?Q?dXL3txgNuAlKb4pNTTYfCYXMc?=
-X-OriginatorOrg: axis.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 43547dc9-b67c-4c57-06da-08ddb572f4c5
-X-MS-Exchange-CrossTenant-AuthSource: DB5PR02MB10093.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2025 12:05:49.5072
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: D0bE+YAmrDu5TdabtmBWO/ie+yVpL9ib1sVwKlB5O/WKRra9+ld6oCdHXyHEL3rW
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS2PR02MB9631
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAO2JXmgC/22O22rDMBBEf8XouSrSypYvT/mPEoK0WjcL8U1yT
+ ULIv1eJC6XQxxlmzsxdJIpMSXTFXUTaOPE0ZgFvhcCzGz9JcshagIJKWbBywWk48bxUJZSnMSV
+ ESU1LyoSmrYBELs6Rer6+oB/HrM+c1ineXhubfro/OF3/h9u0VLIMCMF6g6HHw/LFyCO+56w4P
+ vaFSNlNvO4zv2fz952t/rJxGOfLRQJ4MOC9bvrQbeZ517tEMkcHXrvCQ41owZDSntpAumoUOdd
+ qU6kmV2tXu9bWJv94fAPlKCmhPQEAAA==
+To: Bjorn Andersson <andersson@kernel.org>,
+        Michael Turquette
+	<mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>, Georgi Djakov <djakov@kernel.org>,
+        Philipp Zabel
+	<p.zabel@pengutronix.de>,
+        Richard Cochran <richardcochran@gmail.com>,
+        "Konrad
+ Dybcio" <konradybcio@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Anusha Rao <quic_anusha@quicinc.com>
+CC: <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-pm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <quic_kkumarcs@quicinc.com>,
+        <quic_linchen@quicinc.com>, <quic_leiwei@quicinc.com>,
+        <quic_suruchia@quicinc.com>, <quic_pavir@quicinc.com>,
+        Luo Jie
+	<quic_luoj@quicinc.com>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1751026208; l=3125;
+ i=quic_luoj@quicinc.com; s=20250209; h=from:subject:message-id;
+ bh=Q6DAgIisXotFp2YyZDRPMkG4NDGXfd1fpY31E0F3F0k=;
+ b=QBBcMlWF/8hT1ZgeU+Cp68z9Jp+CgKePXzxB4Wj6g0x2nHZ3D+TtSODBSMLu9NNhPbBjEU/bB
+ x+LBFdDVlXWCi4EDL3CuZrtDWZVFN8GPH0X73n1ddIuEcbPMQ/F9i18
+X-Developer-Key: i=quic_luoj@quicinc.com; a=ed25519;
+ pk=pzwy8bU5tJZ5UKGTv28n+QOuktaWuriznGmriA9Qkfc=
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI3MDEwMSBTYWx0ZWRfX9yBDhKmhkeMd
+ sbMxGFYNb85A5JL71k54wfyfNKhmyeiNDku4kX+ZdjnY2Ig6oz2simG1IIPH8jN3vgDEkBVWeAK
+ ywH8Z5G+s+2DZ+oS3w+YEFGz1aKfpCixILg78h4rF1rTrB/y5xEM5HYK/XueBSMtffiIfAMCuHi
+ yDDtkD6R6zfPgjFq3qI+oIDkeW9mNTqC9wpHW9oMOHnVps4gyVTlLtS2asT13RCjKlNgYEdEnLE
+ l0hllkNvNSY26EtLytG2LKhgUQvvd4kV6z7uno7DWCLIPiZegebNR/Vnh3kVdXI7RpseBzl8zgE
+ WZBkACOylveAUnowSLv6rW+iXxZh3YJ9ZbQQwOG0wZ6moYZODXCMHkH4DjKkArzezj5ead3IdSS
+ PV5QSSkg6wRiAOhFsprcAuJcJGU0Y8SO1oJ9JNRi5o8HJm4HBoyB+mxBGLPE1+exQPgEHEL5
+X-Authority-Analysis: v=2.4 cv=XPQwSRhE c=1 sm=1 tr=0 ts=685e8a27 cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=VwQbUJbxAAAA:8
+ a=COk6AnOGAAAA:8 a=oHpHAfgEF3aet8mg8aIA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-GUID: iQvvtPDnB7v6Uf59wPRm27eHKAwNWk4-
+X-Proofpoint-ORIG-GUID: iQvvtPDnB7v6Uf59wPRm27eHKAwNWk4-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-06-27_04,2025-06-26_05,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 impostorscore=0 clxscore=1015 suspectscore=0 mlxscore=0
+ spamscore=0 phishscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0
+ priorityscore=1501 adultscore=0 classifier=spam authscore=0 authtc=n/a
+ authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505280000 definitions=main-2506270101
 
+The NSS clock controller on the IPQ5424 SoC provides clocks and resets
+to the networking related hardware blocks such as the Packet Processing
+Engine (PPE) and UNIPHY (PCS). Its parent clocks are sourced from the
+GCC, CMN PLL, and UNIPHY blocks.
 
+Additionally, register the gpll0_out_aux GCC clock, which serves as one
+of the parent clocks for some of the NSS clocks.
 
-On 6/26/25 13:58, Krzysztof Kozlowski wrote:
-> On 26/06/2025 13:56, Kamil Horák - 2N wrote:
->> Some Broadcom PHYs are capable to operate in simplified MII mode,
->> without TXER, RXER, CRS and COL signals as defined for the MII.
->> The MII-Lite mode can be used on most Ethernet controllers with full
->> MII interface by just leaving the input signals (RXER, CRS, COL)
->> inactive. The absence of COL signal makes half-duplex link modes
->> impossible but does not interfere with BroadR-Reach link modes on
->> Broadcom PHYs, because they are all full-duplex only.
->>
->> Add new interface type "mii-lite" to phy-connection-type enum.
->>
->> Fixes: 03ab6c244bb0 ("net: phy: bcm-phy-lib: Implement BroadR-Reach link modes")
->> Signed-off-by: Kamil Horák - 2N <kamilh@axis.com>
->> ---
->>   Documentation/devicetree/bindings/net/ethernet-controller.yaml | 1 +
-> 
-> You just sent v3 (double v3!) of this, no changelog, no explanations.
-> 
-> Please slow down and don't send the same triple time. Provide changelog,
-> as explained in submitting patches.
-I am sorry, that was not done intentionally. I would have rather 
-cancelled or withdrawn the posts but there is apparently no way to do so :-(
+The NSS NoC clocks are also enabled to use the icc-clk framework, enabling
+the creation of interconnect paths for the network subsystem’s connections
+with these NoCs.
 
-> 
-> Best regards,
-> Krzysztof
+The NSS clock controller receives its input clocks from the CMN PLL outputs.
+The related patch series which adds support for IPQ5424 SoC in the CMN PLL
+driver is listed below.
+https://lore.kernel.org/all/20250610-qcom_ipq5424_cmnpll-v3-0-ceada8165645@quicinc.com/
 
-Kamil
+Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+---
+Changes in v2:
+- Add new, separate clock names "nss" and "ppe" in dtbindings to support
+  the IPQ5424 SoC.
+- Wrap the commit message body at 75 columns.
+- Fix the indentation issue in the `IPQ_NSSCC_5424` Kconfig entry.
+- Enhance the commit message for the defconfig patch to clarify the requirement
+  for enabling `IPQ_NSSCC_5424`.
+- Link to v1: https://lore.kernel.org/r/20250617-qcom_ipq5424_nsscc-v1-0-4dc2d6b3cdfc@quicinc.com
+
+---
+Luo Jie (8):
+      dt-bindings: interconnect: Add Qualcomm IPQ5424 NSSNOC IDs
+      clk: qcom: ipq5424: Enable NSS NoC clocks to use icc-clk
+      dt-bindings: clock: gcc-ipq5424: Add definition for GPLL0_OUT_AUX
+      clock: qcom: gcc-ipq5424: Add gpll0_out_aux clock
+      dt-bindings: clock: qcom: Add NSS clock controller for IPQ5424 SoC
+      clk: qcom: Add NSS clock controller driver for IPQ5424
+      arm64: dts: qcom: ipq5424: Add NSS clock controller node
+      arm64: defconfig: Build NSS clock controller driver for IPQ5424
+
+ .../bindings/clock/qcom,ipq9574-nsscc.yaml         |   70 +-
+ arch/arm64/boot/dts/qcom/ipq5424.dtsi              |   30 +
+ arch/arm64/configs/defconfig                       |    1 +
+ drivers/clk/qcom/Kconfig                           |   11 +
+ drivers/clk/qcom/Makefile                          |    1 +
+ drivers/clk/qcom/gcc-ipq5424.c                     |   21 +-
+ drivers/clk/qcom/nsscc-ipq5424.c                   | 1340 ++++++++++++++++++++
+ include/dt-bindings/clock/qcom,ipq5424-gcc.h       |    3 +-
+ include/dt-bindings/clock/qcom,ipq5424-nsscc.h     |   65 +
+ include/dt-bindings/interconnect/qcom,ipq5424.h    |   19 +
+ include/dt-bindings/reset/qcom,ipq5424-nsscc.h     |   46 +
+ 11 files changed, 1597 insertions(+), 10 deletions(-)
+---
+base-commit: b27cc623e01be9de1580eaa913508b237a7a9673
+change-id: 20250626-qcom_ipq5424_nsscc-e89e03d8952e
+prerequisite-change-id: 20250610-qcom_ipq5424_cmnpll-22b232bb18fd:v3
+prerequisite-patch-id: dc3949e10baf58f8c28d24bb3ffd347a78a1a2ee
+prerequisite-patch-id: da645619780de3186a3cccf25beedd4fefab36df
+prerequisite-patch-id: c7fbe69bfd80fc41c3f76104e36535ee547583db
+prerequisite-patch-id: 541f835fb279f83e6eb2405c531bd7da9aacf4bd
+
+Best regards,
+-- 
+Luo Jie <quic_luoj@quicinc.com>
+
 
