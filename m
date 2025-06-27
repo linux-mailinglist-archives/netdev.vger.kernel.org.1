@@ -1,235 +1,169 @@
-Return-Path: <netdev+bounces-201952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B50A6AEB8E8
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 15:29:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFF0FAEB907
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 15:33:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F4D416C4B1
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 13:29:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EB434A0BE4
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 13:33:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11FCA2D97BF;
-	Fri, 27 Jun 2025 13:29:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B96D269CF0;
+	Fri, 27 Jun 2025 13:33:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gehealthcare.com header.i=@gehealthcare.com header.b="rY6u5fxh"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="gjs5h5J9"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2062.outbound.protection.outlook.com [40.107.94.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656F9202990;
-	Fri, 27 Jun 2025 13:29:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751030946; cv=fail; b=nsM+aaiDw+99C+kSokqY5WNeXsXk7QPebETnVbie4ZkvvAcuqoI5wFxIXoBmC7Bi3PeY6tVOoJmIEMpYjzBVqIfVrR2my/8wP3bcPufsNPPAVM9CuruM0BJR3GivvrFRcmSHYLvOKxVtBzbiKFwDRdD3nmPaYYUbCSH8VVqrJjo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751030946; c=relaxed/simple;
-	bh=g5a/g3j5islOZk8iLEJ+5ZbigB9MToMdp98OnLGEpN0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dsLlcNrjfErsjVv/N1g+VEKGkDGZaSqnQ0l92Oaj/uAkHyf2Fyd69Iyz43hoZsKyJgCUMBfOPlZXjRnbNEo4zKtbc5HGd2dtJOhzZlM5r2JQn+5pf9r8PUrPX3M+fmGLAsoS7s625SHtdm4t7W7MUz4gL+/HavxATwGfK3hZwXI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gehealthcare.com; spf=pass smtp.mailfrom=gehealthcare.com; dkim=pass (2048-bit key) header.d=gehealthcare.com header.i=@gehealthcare.com header.b=rY6u5fxh; arc=fail smtp.client-ip=40.107.94.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gehealthcare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gehealthcare.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=I/I+8RlvOQ1TFioC7MSPhr72b1m6BBSx49Q+MupQApjYfFTYg++XcdzWicNOe+2nJAvf22AGb95Uw6WBAlYvr9ecBIJF6JXfTFPnGHlz9Q7Q23CQvDERBGC6kqxuJA1oyVmBe0f0BKPPwUXSskRWLuYickXkJCUYsmHHRLlfGQUOMwNR7eHvrE4O5Qvu2TzNVtNmWhyA/tO7+ITFaQHmRNxLzztI+ISHzV2ItKsZt2V/RkH1zA7mn7TRz4Fhfv5bD5sd/fvjoGt6qMM6vCi5Oh4RVtXImS349/QtFufWjbI9em+kl6RDKtflVDWczhCGS6tJtgz4xdyQcEY7tx6MYw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eF3N9Hs4FL4yAT9TCiuvGagJDX1oMXKdzIIQJEohH5g=;
- b=RFqACo3T6eo983XGYO+69TgGdHndPDu/M3HiUHx+drVyR0wm2qmSQO7Gp0Z0+W5wY8gEtidKtcrGTATQ58O66ie142yXXiWO1eDi/iB72mqtim8n6mpcsNO4FvBidx5x+K+OO6HGEdCDBuZZa5UCyNvDP14sQaaaAnmkXG7g9PCv1PAn+2zpVr/3D8ap4lpMnacWkTSVBJ+UHnbDVhCAvXPcw5lN/mpAHW87+j5ZCV0YBQjxAiu2Hr8mOKnAGzVzKjymRBBKtPLD4D9POpFxVo1ou7p4HcYn1eEqsvNQt3vvNaTkcWF7HpKR2SaSB7w56LR+h7wASGrpuMlPfYHEvQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 165.85.157.49) smtp.rcpttodomain=vger.kernel.org
- smtp.mailfrom=gehealthcare.com; dmarc=fail (p=quarantine sp=quarantine
- pct=100) action=quarantine header.from=gehealthcare.com; dkim=none (message
- not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gehealthcare.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eF3N9Hs4FL4yAT9TCiuvGagJDX1oMXKdzIIQJEohH5g=;
- b=rY6u5fxhTkwRVJpIjnSo5+kzu+VhZpbZWDJK2nUKhSRML+kZb7SaXJK0tP2fQJtJWhg6PLBL63exa7PocxQzbmdop+uuhuGs8puNGrb1cOBpBp1/ltljIouOLcqhIA+Eh5Y9qvPLRP3MzpAf+6WnDMz5UsMblDJ8xvXHgsDMAvXL7NaVjPeh52zCoyu33+WmOqJZ4N9qy4zyhQjQiSLJ9O9AQyLsJVILiRwuO2SwVn9D+Cm4JPuLqdvPD5U+GfKSnH3C6wEoPVrNcbo4kfMxwUJPWd1bBzBmAcJW2gz2SiFW7mzhILlcIjWKhRv5jhKCLa+nymb+x9HWnT7c821xIw==
-Received: from BN9PR03CA0713.namprd03.prod.outlook.com (2603:10b6:408:ef::28)
- by SJ4PPF1419DF580.namprd22.prod.outlook.com (2603:10b6:a0f:fc02::f8c) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.19; Fri, 27 Jun
- 2025 13:29:00 +0000
-Received: from BN2PEPF000044A7.namprd04.prod.outlook.com
- (2603:10b6:408:ef:cafe::9a) by BN9PR03CA0713.outlook.office365.com
- (2603:10b6:408:ef::28) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.20 via Frontend Transport; Fri,
- 27 Jun 2025 13:29:00 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 165.85.157.49)
- smtp.mailfrom=gehealthcare.com; dkim=none (message not signed)
- header.d=none;dmarc=fail action=quarantine header.from=gehealthcare.com;
-Received-SPF: Fail (protection.outlook.com: domain of gehealthcare.com does
- not designate 165.85.157.49 as permitted sender)
- receiver=protection.outlook.com; client-ip=165.85.157.49;
- helo=atlrelay2.compute.ge-healthcare.net;
-Received: from atlrelay2.compute.ge-healthcare.net (165.85.157.49) by
- BN2PEPF000044A7.mail.protection.outlook.com (10.167.243.101) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8880.14 via Frontend Transport; Fri, 27 Jun 2025 13:29:00 +0000
-Received: from b3410ffb93c4 (zoo13.fihel.lab.ge-healthcare.net [10.168.174.111])
-	by builder1.fihel.lab.ge-healthcare.net (Postfix) with SMTP id 26113D04CB;
-	Fri, 27 Jun 2025 16:28:57 +0300 (EEST)
-Date: Fri, 27 Jun 2025 16:28:56 +0300
-From: Ian Ray <ian.ray@gehealthcare.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, horms@kernel.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	brian.ruley@gehealthcare.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH v2] igb: Fix watchdog_task race with
- shutdown
-Message-ID: <aF6cmKkrJSV_AWBN@b3410ffb93c4>
-References: <20250603080949.1681-1-ian.ray@gehealthcare.com>
- <20250605184339.7a4e0f96@kernel.org>
- <aEaAGqP-KtcYCMs-@50995b80b0f4>
- <20250609161039.00c73103@kernel.org>
- <aEgokTyzDrZ6p4aL@21d8f0102f10>
- <3504878c-6b3f-4d5f-bcfd-2e7e4a912570@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95DD58460
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 13:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751031204; cv=none; b=ZBXtH4EiJ5Ys36FPSN7E2GpF3lwDCQgDeeXUQOU4au8ZVaGUg8gZX8z97UidwrJs5Nv54BWhE13C5kCak6ecMJZi7mKs5mP0UD2lQ1Do+DNKHez5doZPIrlIppIHvOgVHC+FkYdj2ngY/DZns9LXHl7ONDe0t8LOStTV0Z3gNh4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751031204; c=relaxed/simple;
+	bh=nuDL8uOXmOwnr1R9VZk1TlZ9XHESg2IYOkSnc4XoY7A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n/FVScSMxZfQO40rjaB3JbPReirmwofh7vuU7gMvnuRAZwtek8Q6w4J0rGt7Pouaamr4VpAg6qvnTl6OR3H1SbbGPAh3jit/ucNsmCdIHGM19Q+Xml5mE2eoFikg2gHhHEiXlLNkw5G/t9WXkX9aK85lW/hUc5onfA5KEOsuCF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=gjs5h5J9; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-60c4f796446so3680220a12.1
+        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 06:33:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1751031201; x=1751636001; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fC8ctkh8Z5OzSSyR1DkWnfj9Z3KeLFKI5XeDIF5nb3c=;
+        b=gjs5h5J9lnLWq6vaKmzi2iBE1izco9TeXjptVvBMlWdx7pIv5/lfxTnRk37dDjyp8M
+         VkD07VOZXmmVn9ge0r9XhGHXJYBxxCj/xdDcAx0do846ZKM/XqcFXlpbLP7NoKhYy7BA
+         /S9xp0QxH7IUXiw5XCb7ZJNPEKALhqCGEF+GC1rXyF37E1ZdL74t3VQM3qHoL3rGnjo/
+         EGEjM8LwTr2KXPKIaTi6AMdt6dRbMHSOBYudlcv7bocJNlZ8qDKvLHTaGgXhpasetc8V
+         uUzNZ1vLxsRnvc0E/eSU37+Del+8Fq6X3ZmRBObe+W+nagSyVkKZ+h3Kn9tpUTVjkuy2
+         /+ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751031201; x=1751636001;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fC8ctkh8Z5OzSSyR1DkWnfj9Z3KeLFKI5XeDIF5nb3c=;
+        b=cfGYJUOsksWuA1io1QB01tF4mgTuc9c4R6wnITktS8ZP+BgZpRSqmdbkwDLSsc2uUQ
+         5kAok7zlq7/7hKkDy1K4Ye2IPt7uImsOY4cvpK8tsd3xx9Knrj20QrMFMPGgWCHk1Gah
+         wL8cenSbBGHW/H92deFFqioVKakBuRqzVIkugNQTiWWSryIBfJfpldGuiTHzvSrQxqRd
+         kaJGxSnE2xtwP+NoAoltL2v3lFIGnsDYCH/EwgqH9DWM4WFyIaWtor6sJfcAZCxhu6bX
+         segGaMjhZ07yrWK4oUGCmQhKZknUJj8QIvLRkP110xUe96oW58e77oJIpRS8Y/r1vdA/
+         qzBA==
+X-Forwarded-Encrypted: i=1; AJvYcCVlaJYmqITiZnV88JwrwRVgtYr3caEWZUR++TyHMS44FpLCrtRK3Tt27PKcSXIv4j7KVkyDXYA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTrbSwdtGA33fR6UmSx6+x9fLmuylhez867m/SSNPpV7gefhdY
+	2ldFGtgmBhPDHwGbGqiCoRJgNb2njRKH1RxAFdmkIJqwrC8Fxf8N8+qEbaNNPve8NHYh7knthIT
+	La2BO
+X-Gm-Gg: ASbGnctlVEnEN+FLW6CcrBSe/wEs16ebH/D601CPzYsM529DJ9a056XG6qlBBNwDPJj
+	/LBl2b1qC+1gIZtZzizPEqk4QPMpGJrEJkwJNHKG3b9L/nrmkm9WYmNJbEU1loGy1H4aGeuyU/X
+	7jqq3pHxj1ESyesIzFrAiWLFF0uvyKAI5zkjLEWfHXe5XASPGnwDG45SOiuXIJCtqkAgLncSwYF
+	ulHwYOMR8yKDTJo3TJbqGlPhNMh3XEmPSMsSbLAMU1KZqrjBQLbWcmkOo1NwpnGQw8h2XbOfxy8
+	b6sVeJJHHy0bM8AZ2Jn1+BM1qLzrhcGJhA6ZR2TXYZoAVX5+sIvCSYUHnTrBQ6HO7fmj30/3Sh8
+	qmnSkqlclcgvE6upkgQ==
+X-Google-Smtp-Source: AGHT+IHhNvsh0K8t7ydoLwP5KSQZNEkGW6f76iDXty3Yt2D2To+eO9K0YaFt5h+3tQBJu/PSngzRhg==
+X-Received: by 2002:a05:6402:5110:b0:607:f082:583a with SMTP id 4fb4d7f45d1cf-60c88e65b77mr2962419a12.27.1751031200483;
+        Fri, 27 Jun 2025 06:33:20 -0700 (PDT)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60c831d5fecsm1485517a12.63.2025.06.27.06.33.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Jun 2025 06:33:19 -0700 (PDT)
+Message-ID: <ac869b58-4534-464d-a661-3d70b0ae2d1d@blackwall.org>
+Date: Fri, 27 Jun 2025 16:33:18 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3504878c-6b3f-4d5f-bcfd-2e7e4a912570@intel.com>
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF000044A7:EE_|SJ4PPF1419DF580:EE_
-X-MS-Office365-Filtering-Correlation-Id: 87785b0e-7fc2-4728-80c9-08ddb57e93ab
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?LlOMpj2wl6MHqXIohAaBt/14vdhU5MeMTR9HDwx2dT35z4dXcMCgkmmjh0/W?=
- =?us-ascii?Q?fy8v84ZwiO7eZ0x6kb6gvPPGXRZ2XV4nhFCqxVvAZ2Lruq4705jeApiq96zI?=
- =?us-ascii?Q?uSQ1OS1YH18n0PbdIMvsnQrIr+fGTSwEcbmAds/8/f8GHG4syHb8xlj/Yoqp?=
- =?us-ascii?Q?5JJitnP0G98I3LuHUn3lZ0g2mTHnXA4pn4nZFEJwfudHoWLykZqn/O3o8uWh?=
- =?us-ascii?Q?jSrFc9aVcp32v4DDnFQJNK+Z0j5JXR8N4vgmtVIRWn5FEFqoA9CbySLa7M53?=
- =?us-ascii?Q?v5l2gMZiINnM8R+TcjB+QFaAH26B3wGVyHawjj+6h7Ig7cGlsxc/aT7kJk/u?=
- =?us-ascii?Q?HmZHDBxBw+cNT9k6aZWTIzbXjlmQpASANfjUDzGJSiKKBkZCVnyVt0yI7OGG?=
- =?us-ascii?Q?SzbsDgmS2AxU7yDHkvaTpmqs5JWAQPhaA74u3gmkxDRIPPA+1T43N2PGWgqb?=
- =?us-ascii?Q?2QEYe6Yy+AomoDnemWe2RGkhynGR5iMVA5Diva5/NxrKZIq0tJ9E4I0bALw7?=
- =?us-ascii?Q?UDBP22CypDDYbJJD7syakXacLqPkQsnqIO/l+rj7CPluPOY1CjI9+HXxTW9X?=
- =?us-ascii?Q?S0WWobIOK18CZE+BBdRXjDgosG9axsurMaOYKOl2KMhkdEeQVUIdeheZN9Ep?=
- =?us-ascii?Q?PxH8qER7Cew44ii2vLHNdZz/U8Zxci/5uxezlXOXtebDQe87lqGsTrtWCLty?=
- =?us-ascii?Q?HalTyN+cjP6CyGrX46NPIYx4TthGfUriYxpLbQsDyBjf+Mzn3sGjMur0RHlL?=
- =?us-ascii?Q?giQH8kKT35hVt+YBDxfUTMxh7oPushHai+XsDaXZrVECQ29Un1XLk8KOKM6O?=
- =?us-ascii?Q?VH6sOO2i1+qvj+HVTBhtKv5a5GVgZoeHX/Sk3bzYGvoPtobHYEzwJfxXDVsF?=
- =?us-ascii?Q?GrmL6GTE3qJlOi3d0eo/FhxzjWt30VZ58wzCodyQRdTabQnDZwtJKX+HivSZ?=
- =?us-ascii?Q?tWhFKwo6BYKLYkaMiJDcE0JmUSX9JFgSOeRgbTBSMgFbKwPttmcZej9gR02x?=
- =?us-ascii?Q?cxB0LfhlHmb/J+V/tgrfWenOqOOFVSmOico3Drb2jHTLYYNBp6/oN0AY/PAS?=
- =?us-ascii?Q?5lnChSfQBhegXP/JBrh+KFFme4SgLcSphNQiboqYljtczACrvKxKaLmLX442?=
- =?us-ascii?Q?4ByG2SYngfVirA/Gx8kxWdN/+MmF1MAIdu+omBYXiVjIB5GKqqCRbwDnxH7Y?=
- =?us-ascii?Q?nQQXwtZPXRz1ZeXw/wPljQioc/nd0a8c01uXwlbOFFasjN9LLKb54f2KHBu1?=
- =?us-ascii?Q?cb2k5UDFH0oTn/N8+umEpMtbNHZMtTJGYpyQE2bcoxIfxIyR6IQvhC7Sk5nC?=
- =?us-ascii?Q?f+cJBBJpDF31acM0Et+m+SmIdXPyuAsxGq5sIdRDChIy9gfRZw/MrV0KO7J4?=
- =?us-ascii?Q?pJsHVfa7T7PyWOYTYaH2yuCLLH188tBwD86pUErDt04azVGL2tg9SKglx4y4?=
- =?us-ascii?Q?2lkt654fkdGf3hQlKetg+nRW365Z6XaQc1DllW56t1TZu5zUJASCVWGh2FMK?=
- =?us-ascii?Q?9XqOp1Ta2eV/gBOuS9SPuZzhfWShMcALAqe0?=
-X-Forefront-Antispam-Report:
-	CIP:165.85.157.49;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:atlrelay2.compute.ge-healthcare.net;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: gehealthcare.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2025 13:29:00.1638
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 87785b0e-7fc2-4728-80c9-08ddb57e93ab
-X-MS-Exchange-CrossTenant-Id: 9a309606-d6ec-4188-a28a-298812b4bbbf
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=9a309606-d6ec-4188-a28a-298812b4bbbf;Ip=[165.85.157.49];Helo=[atlrelay2.compute.ge-healthcare.net]
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TreatMessagesAsInternal-BN2PEPF000044A7.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ4PPF1419DF580
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: ipv4: guard ip_mr_output() with rcu
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
+ David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com,
+ syzbot+f02fb9e43bd85c6c66ae@syzkaller.appspotmail.com,
+ Petr Machata <petrm@nvidia.com>, Roopa Prabhu <roopa@nvidia.com>,
+ Benjamin Poirier <bpoirier@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
+References: <20250627114641.3734397-1-edumazet@google.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250627114641.3734397-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 16, 2025 at 02:47:29PM -0700, Jacob Keller wrote:
-> On 6/10/2025 5:44 AM, Ian Ray wrote:
-> > On Mon, Jun 09, 2025 at 04:10:39PM -0700, Jakub Kicinski wrote:
-:
-> > IIUC set_bit() is an atomic operation (via bitops.h), and so
-> > my previous comment still stands.
-> >
-> > (Sorry if I have misunderstood your question.)
-> >
-> > Either watchdog_task runs just before __IGB_DOWN is set (and
-> > the timer is stopped by this patch) -- or watchdog_task runs
-> > just after __IGB_DOWN is set (and thus the timer will not be
-> > restarted).
-> >
-> > In both cases, the final cancel_work_sync ensures that the
-> > watchdog_task completes before igb_down() continues.
-> >
-> > Regards,
-> > Ian
+On 6/27/25 14:46, Eric Dumazet wrote:
+> syzbot found at least one path leads to an ip_mr_output()
+> without RCU being held.
 > 
-> Hmm. Well set_bit is atomic, but I don't think it has ordering
-> guarantees on its own. Wouldn't we need to be using a barrier here to
-> guarantee ordering here?
+> Add guard(rcu)() to fix this in a concise way.
 > 
-> Perhaps cancel_work_sync has barriers implied and that makes this work
-> properly?
-
-Ah, I see.  I checked the cancel_work_documentation and implementation
-and I am not sure we can make any assumptions about barriers.
-
-Would two additional calls to smp_mb__after_atomic() be acceptable?
-Something like this (on top of this series v2).
-
--- >8 --
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index a65ae7925ae8..9b63dc594454 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -2179,6 +2179,7 @@ void igb_down(struct igb_adapter *adapter)
-         * disable watchdog from being rescheduled.
-         */
-        set_bit(__IGB_DOWN, &adapter->state);
-+       smp_mb__after_atomic();
-        timer_delete_sync(&adapter->watchdog_timer);
-        timer_delete_sync(&adapter->phy_info_timer);
-
-@@ -3886,6 +3887,7 @@ static void igb_remove(struct pci_dev *pdev)
-         * disable watchdog from being rescheduled.
-         */
-        set_bit(__IGB_DOWN, &adapter->state);
-+       smp_mb__after_atomic();
-        timer_delete_sync(&adapter->watchdog_timer);
-        timer_delete_sync(&adapter->phy_info_timer);
--- >8 --
-
-Thanks,
-Ian
-
+> WARNING: CPU: 0 PID: 0 at net/ipv4/ipmr.c:2302 ip_mr_output+0xbb1/0xe70 net/ipv4/ipmr.c:2302
+> Call Trace:
+>  <IRQ>
+>   igmp_send_report+0x89e/0xdb0 net/ipv4/igmp.c:799
+>  igmp_timer_expire+0x204/0x510 net/ipv4/igmp.c:-1
+>   call_timer_fn+0x17e/0x5f0 kernel/time/timer.c:1747
+>   expire_timers kernel/time/timer.c:1798 [inline]
+>   __run_timers kernel/time/timer.c:2372 [inline]
+>   __run_timer_base+0x61a/0x860 kernel/time/timer.c:2384
+>   run_timer_base kernel/time/timer.c:2393 [inline]
+>   run_timer_softirq+0xb7/0x180 kernel/time/timer.c:2403
+>   handle_softirqs+0x286/0x870 kernel/softirq.c:579
+>   __do_softirq kernel/softirq.c:613 [inline]
+>   invoke_softirq kernel/softirq.c:453 [inline]
+>   __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:680
+>   irq_exit_rcu+0x9/0x30 kernel/softirq.c:696
+>   instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1050 [inline]
+>   sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1050
 > 
-> > ORDERING
-> > --------
-> >
-> > Like with atomic_t, the rule of thumb is:
-> >
-> >  - non-RMW operations are unordered;
-> >
-> >  - RMW operations that have no return value are unordered;
-> >
-> >  - RMW operations that have a return value are fully ordered.
-> >
-> >  - RMW operations that are conditional are fully ordered.
-> >
-> > Except for a successful test_and_set_bit_lock() which has ACQUIRE semantics,
-> > clear_bit_unlock() which has RELEASE semantics and test_bit_acquire which has
-> > ACQUIRE semantics.
-> >
+> Fixes: 35bec72a24ac ("net: ipv4: Add ip_mr_output()")
+> Reported-by: syzbot+f02fb9e43bd85c6c66ae@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/685e841a.a00a0220.129264.0002.GAE@google.com/T/#u
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Petr Machata <petrm@nvidia.com>
+> Cc: Roopa Prabhu <roopa@nvidia.com>
+> Cc: Nikolay Aleksandrov <razor@blackwall.org>
+> Cc: Benjamin Poirier <bpoirier@nvidia.com>
+> Cc: Ido Schimmel <idosch@nvidia.com>
+> ---
+>  net/ipv4/ipmr.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> set_bit is listed as a RMW without a return value, so its unordered.
-> That makes me think we'd want clear_bit_unlock() if the cancel_work_sync
-> itself doesn't provide the barriers we need.
-> 
-> Thanks,
-> Jake
+> diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+> index f78c4e53dc8c161e334781970bbff6069c084ebb..3a2044e6033d5683bda678489f6eaf72ea0b8890 100644
+> --- a/net/ipv4/ipmr.c
+> +++ b/net/ipv4/ipmr.c
+> @@ -2299,7 +2299,8 @@ int ip_mr_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+>  	struct mr_table *mrt;
+>  	int vif;
+>  
+> -	WARN_ON_ONCE(!rcu_read_lock_held());
+> +	guard(rcu)();
+
+Interesting construct. :)
+
+> +
+>  	dev = rt->dst.dev;
+>  
+>  	if (IPCB(skb)->flags & IPSKB_FORWARDED)
+> @@ -2313,7 +2314,6 @@ int ip_mr_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+>  	if (IS_ERR(mrt))
+>  		goto mc_output;
+>  
+> -	/* already under rcu_read_lock() */
+>  	cache = ipmr_cache_find(mrt, ip_hdr(skb)->saddr, ip_hdr(skb)->daddr);
+>  	if (!cache) {
+>  		vif = ipmr_find_vif(mrt, dev);
+
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+
 
