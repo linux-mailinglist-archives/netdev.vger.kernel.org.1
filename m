@@ -1,107 +1,162 @@
-Return-Path: <netdev+bounces-201986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFFCFAEBDA4
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 18:38:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB26AAEBDB6
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 18:43:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97E46179D53
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 16:38:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C0F37A5225
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 16:42:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96D929898B;
-	Fri, 27 Jun 2025 16:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E784629E115;
+	Fri, 27 Jun 2025 16:43:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U8prCgDV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LwpLaiAq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342661CEACB
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 16:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70F98213245;
+	Fri, 27 Jun 2025 16:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751042306; cv=none; b=u6fvrmdyph61SFqkYeH5fO8cFE9SjneflqfIrhSJc3UH9dDoizrJMQEaL1upLP86cTdwCgvE0ivgX51cBxKBse/wjqS/y3/GaSkSE8NZBycfelgz72bs0qLP7DNYjeUliAL6hWnZLxPNipQe3RpCG7fMNwfkORZYNxxldIMERmE=
+	t=1751042620; cv=none; b=cQgl5DAYofxJTZW3khZL6vHgu9BccJRLi8hmO66mmJgGMAv7ilXDcMbgsksSroCSKI2Sv6yabJyRtEvYwpuQU1wrqf7gKBsJB4NV9Q1e1x9JW429CX5D/pfqmWdMheI0r6mX5AOmT9bSkfJ1V0kMoRJyUQi2sh7qwAqeF+DI1oQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751042306; c=relaxed/simple;
-	bh=VhveM/KOuGUtxeJDoBDNqK2L1eLPl7UszqRULWUiuAg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=egxaRcpIKNwVtbutGvhR8HkquOu5NHwYK4z+XUK+v2nuZaaOSfuev+aAxrtYSz6s3ASZZIXmvI+nHtIPMnf2Q96Qsv0WHP3Ns/miB5O2R2LthJkM1IIWC6xdm+kgrFiVc/IYDRhJk8PHdxuj52cP7RkApS/wUqH8QUuj9FpJjkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U8prCgDV; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b26f5f47ba1so50333a12.1
-        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 09:38:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751042304; x=1751647104; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MjA155f1pBEqKH7AB3aZFGokcKJAb1KjX75SUqeTg+c=;
-        b=U8prCgDV4iDT7NllOEwo3a0kxxKWCMnqDxV2NEe1PeNXgnKmkt1aEw3GDs+p8opmez
-         4nAmQqtAQ3AypfUANAfdpBqrCxc+iyLysjgqf1mQnVWjmcv/CY2963pQA85BO0jKyzE0
-         qa/+EaaLmjYaU/I0mjp9umwzHlqOCgPSsjPWxCxhpA2mqaSV+dFMMpZ3V9jf0pzaFLsR
-         /+MdNIjcIRs9clEuXPeV4i0VbCMYGh/Pc1wvY9DK+ghigLDTioKTzVRxzO1s8X6ngPgL
-         NUJYVXkNP52FW6QnEFp31kgvgNd5MzKe4aAENTZqXzfBZgURY8DhBZuX/riUeWytqi1g
-         OIeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751042304; x=1751647104;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MjA155f1pBEqKH7AB3aZFGokcKJAb1KjX75SUqeTg+c=;
-        b=L21mHtrz6OpvgBhy5X+ZeYch7jZFr2MJeLI/A99st5PFQSBPcRHfqI0Y9vz8M/tIzE
-         1u4f816y5Qi55trLmHV9I0RyYJquo4X2cBRsU1xuAnSY+Vxh//QIS2/mhJeVHh0XuYhs
-         TZ8Inq2/AkbfdYBfobbMWhenT+AIzHaeMnWL/WZHZkydQcs3RGNxM2CBmBbyrmgmJMr8
-         YDTImJi5FQ821FyE/vCwURrp3Nui9CcklkICfki7/Jd30OYodO++7+k//YftHG9/Y7Lo
-         olq92vYb7iLQU4nzkpjedhtkKLsuBT+mO1xmvKQJz98c23CtER8KcwU8017h5sugh6Lo
-         Jd4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX5mgCnXWzLh0HRw0hmFD5QzugTKgasFtxcWwKwprWbU28ZgV865ToQCqwMjuOwtCP7NE9MDLs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9KGrXkGdjEFgf6LlsYcSgRHadUPaRgyIZwdZ8aJYEjdsGKMUj
-	WROD3v7X+5tw2c3FObeyLUqg7YlFIjmijryD7d2n6gvJLijRjEP76iDS9OE0ANH9JwdEhtThzSn
-	ndS+7HxHNDZTaDNeCaqPLqAdDdV9DtYM/uo17XhHjAovg5+MOOJY/2DgQ
-X-Gm-Gg: ASbGnctD5kvOL//3KmQx86F/pyJBiDqEKJ6a9AUA3Jy2pu20uRZklE2jEdzylJKMOaa
-	AkDBPMY5unEvgAkTZosOAVLg6IphR65ZoFwA4o5tncbcp8nLEwdw2KfMh3NH5p1T40gUoyNV7Lo
-	TyqR7SLz9uiQxGQZCO1G/ZrzQMt7Q9QhcVMQCfvKzkkQ==
-X-Google-Smtp-Source: AGHT+IG0R+6DD1YIN9X+I3Sr4l+PLbikt5EFdVSxPYums+jwJ4sPDhYi+qtXz6JrPx2ef0oP7bSY9IBLHRLhjTjW3K4=
-X-Received: by 2002:a17:90b:1dc4:b0:311:e8cc:4264 with SMTP id
- 98e67ed59e1d1-318c922ef55mr7404410a91.12.1751042304252; Fri, 27 Jun 2025
- 09:38:24 -0700 (PDT)
+	s=arc-20240116; t=1751042620; c=relaxed/simple;
+	bh=w0Qvb5gaHtm51GC76JQELFJhsNqUPR2AjuWI1DWdcXw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t8TKhaZKA5zVORzmtQF64RGUHgnmaOgX7Kq/q3gJKSB0C2z7ycp4K9b7dGbn1SsMRQuVL0ghNSqaZ3RnGcBnqe/Ro7tbB4E4lzZRkMG93zvLtwW5P3lRbo3WeudkqsB4iVNjIBkgzZnwULx40YNvtv99abUjQOAbx7oP4gFlVPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LwpLaiAq; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751042620; x=1782578620;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=w0Qvb5gaHtm51GC76JQELFJhsNqUPR2AjuWI1DWdcXw=;
+  b=LwpLaiAq/AnFgPvYikDjz+oFjPdCN9ahaSYTZHRO9CAZTBSPwg/MlmHl
+   uibkdb2eANeyZwLavNYuoIsZqUNRLAeGb1DCiXlVQ/KRWhuiYfSUQDSyK
+   Ki1xHJgThbb+1d0vsoKTVXoVtq8YbKAIuanxtWQ+3F+w42zir46HaruMw
+   GYr7PdzRd/aIPNtcbTuSm6HLB/jf0mC1PR/vhBOVNCGj1Sy79yUaOSLnC
+   7M3o0k4eQ3iDvWLpP5KStTZsxSujkrzzKiQvdkIG9u9MPAMVDlpBDAhtb
+   WteILNkxU38iG3MHILModvZtXL2RUUvGve+stgeqV4GSpB65Zqp8MTJGN
+   w==;
+X-CSE-ConnectionGUID: mzesbOdnRE2iY0xVZCmsKQ==
+X-CSE-MsgGUID: GOmoWzH+QES59g3LDwkPHw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11477"; a="63617817"
+X-IronPort-AV: E=Sophos;i="6.16,270,1744095600"; 
+   d="scan'208";a="63617817"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2025 09:43:38 -0700
+X-CSE-ConnectionGUID: Om7lJGA1RVGaqHnTCss+Hg==
+X-CSE-MsgGUID: v8GaP8DNT++Zq3c0zael/A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,270,1744095600"; 
+   d="scan'208";a="152583283"
+Received: from cmdeoliv-mobl4.amr.corp.intel.com (HELO [10.125.109.77]) ([10.125.109.77])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2025 09:43:37 -0700
+Message-ID: <42a0fe0b-a936-4688-a061-76b37e841ce6@intel.com>
+Date: Fri, 27 Jun 2025 09:43:36 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250624202616.526600-1-kuni1840@gmail.com> <20250624202616.526600-7-kuni1840@gmail.com>
- <CANn89i+aMsdJ+oQmo1y4sbjJM40NJpFNYn2YT5Gf1WrfMc1nOg@mail.gmail.com>
- <CAAVpQUDa8w49-mvf4=nAYLKv0aX9hmAt312_0CD+u4nSWWAv3A@mail.gmail.com> <CANn89iLpv6esFywtGMZTuNU2Ppdj_Ps_vff-c+Sp_iPNZrkxJA@mail.gmail.com>
-In-Reply-To: <CANn89iLpv6esFywtGMZTuNU2Ppdj_Ps_vff-c+Sp_iPNZrkxJA@mail.gmail.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Fri, 27 Jun 2025 09:38:11 -0700
-X-Gm-Features: Ac12FXxyTYfIo1P9JJiKxulHtGV5-s5POmekHMVbOF3D_WBgJBRSLYnx7eLGqjM
-Message-ID: <CAAVpQUAxYYAi+veJhCYVKxzyDDC=P4i5up58WR0Lnsawf6MHjw@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 06/15] ipv6: mcast: Don't hold RTNL for
- IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP.
-To: Eric Dumazet <edumazet@google.com>
-Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v17 06/22] cxl: Support dpa initialization without a
+ mailbox
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+ Alejandro Lucero <alucerop@amd.com>
+References: <20250624141355.269056-1-alejandro.lucero-palau@amd.com>
+ <20250624141355.269056-7-alejandro.lucero-palau@amd.com>
+ <20250627094214.000036e6@huawei.com>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20250627094214.000036e6@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jun 27, 2025 at 12:21=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Thu, Jun 26, 2025 at 6:01=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.=
-com> wrote:
-> >
->
-> > I'll post a follow-up for other rt6_lookup() users and dst.dev
-> > users under RCU.
->
-> I have prepared a series adding annotations and helpers.
 
-Thank you!!  Will use the helper in v3.
+
+On 6/27/25 1:42 AM, Jonathan Cameron wrote:
+> On Tue, 24 Jun 2025 15:13:39 +0100
+> alejandro.lucero-palau@amd.com wrote:
+> 
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>> Type3 relies on mailbox CXL_MBOX_OP_IDENTIFY command for initializing
+>> memdev state params which end up being used for DPA initialization.
+>>
+>> Allow a Type2 driver to initialize DPA simply by giving the size of its
+>> volatile hardware partition.
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> º
+> 
+> ?  Looks like an accidental degree symbol.
+> 
+>> ---
+>>  drivers/cxl/core/mbox.c | 17 +++++++++++++++++
+> Location make sense?   I'd like some reasoning text for that in the patch
+> description.  After all whole point is this isn't a mailbox thing!
+> 
+> Maybe moving add_part and this to somewhere more general makes sense?
+
+core/memdev.c? Seems like a memdev type of thing.
+
+DJ
+
+> 
+>>  include/cxl/cxl.h       |  1 +
+>>  2 files changed, 18 insertions(+)
+>>
+>> diff --git a/drivers/cxl/core/mbox.c b/drivers/cxl/core/mbox.c
+>> index d78f6039f997..d3b4ba5214d5 100644
+>> --- a/drivers/cxl/core/mbox.c
+>> +++ b/drivers/cxl/core/mbox.c
+>> @@ -1284,6 +1284,23 @@ static void add_part(struct cxl_dpa_info *info, u64 start, u64 size, enum cxl_pa
+>>  	info->nr_partitions++;
+>>  }
+>>  
+>> +/**
+>> + * cxl_set_capacity: initialize dpa by a driver without a mailbox.
+>> + *
+>> + * @cxlds: pointer to cxl_dev_state
+>> + * @capacity: device volatile memory size
+>> + */
+>> +void cxl_set_capacity(struct cxl_dev_state *cxlds, u64 capacity)
+>> +{
+>> +	struct cxl_dpa_info range_info = {
+>> +		.size = capacity,
+>> +	};
+>> +
+>> +	add_part(&range_info, 0, capacity, CXL_PARTMODE_RAM);
+>> +	cxl_dpa_setup(cxlds, &range_info);
+>> +}
+>> +EXPORT_SYMBOL_NS_GPL(cxl_set_capacity, "CXL");
+>> +
+>>  int cxl_mem_dpa_fetch(struct cxl_memdev_state *mds, struct cxl_dpa_info *info)
+>>  {
+>>  	struct cxl_dev_state *cxlds = &mds->cxlds;
+>> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+>> index 0810c18d7aef..4975ead488b4 100644
+>> --- a/include/cxl/cxl.h
+>> +++ b/include/cxl/cxl.h
+>> @@ -231,4 +231,5 @@ struct cxl_dev_state *_devm_cxl_dev_state_create(struct device *dev,
+>>  int cxl_map_component_regs(const struct cxl_register_map *map,
+>>  			   struct cxl_component_regs *regs,
+>>  			   unsigned long map_mask);
+>> +void cxl_set_capacity(struct cxl_dev_state *cxlds, u64 capacity);
+>>  #endif /* __CXL_CXL_H__ */
+> 
+> 
+
 
