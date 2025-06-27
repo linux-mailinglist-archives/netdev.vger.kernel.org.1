@@ -1,118 +1,139 @@
-Return-Path: <netdev+bounces-201886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04AFCAEB597
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 13:00:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBA8DAEB5A6
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 13:02:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6F281C21DA1
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 11:00:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 311A63BF670
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 11:01:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BC4229C35A;
-	Fri, 27 Jun 2025 11:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84DF32BEC2F;
+	Fri, 27 Jun 2025 11:01:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="c6urAryN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Psf/xmMb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE9CF2F1FC3
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 11:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E50B829552F
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 11:01:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751022007; cv=none; b=TAd44AdhkibkB6s9rn9jCBfIu4FzQLmeg9dVa1KR6sTCdqxh/Qt2Cuh6D7YnxhJDMMym7+m3kp41EFugY3xHX4zBL/0cGk6+BQPvTbSP9+PX0tr4QwVhH9NE4XRihBkSV0t7emFCJ+VBV8o0Frs1CngWCMMaLNXuHtsd6HxCM68=
+	t=1751022085; cv=none; b=bSlQydDUZRNcbCQVjD5aMngpDNopzJz/Yx5Z2qfCY0XCqoKAG6N1GW6QRpe3HCKnrEhubsvxIg6BKULB/ZuYPILJvPCa6p9gwEkytYnGY3TUPL50SbFc8iI5OP0VERfhUJkx6m6AWBZCsl1cuTQTtSXFPexQBKbLE7pkCb6013M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751022007; c=relaxed/simple;
-	bh=vLo5INOPS/WDpIxNx5EixrWME6bTViVtqYq5HO8ajvQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:MIME-Version:
-	 Content-Type:References; b=AQFw7RzCmuE+wWEJzvkCZlVVRbf8mvT1WrPTt+NrXT6GLMAXIHuFevc7/1MNySdT0JRK5h1mPtdWWziJq1/XRb1ehs3JpCULYZi6W2tnx5FJ07xNfJ557ognHWXT1d5K3CL5Gxs9+wmXYtAijIakabUJopKrKN2bxzykXPYbOSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=c6urAryN; arc=none smtp.client-ip=203.254.224.33
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from epcas1p3.samsung.com (unknown [182.195.41.47])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20250627110001epoutp0382ef64dd9cc375eaf7845c6e8ae6ac2d~M4Tu62FSm0922109221epoutp03L
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 11:00:01 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20250627110001epoutp0382ef64dd9cc375eaf7845c6e8ae6ac2d~M4Tu62FSm0922109221epoutp03L
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1751022001;
-	bh=+ENfZgyXG6LRtkLsvTjegXsc5nM6Q4iQE+wp1eC5dN0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=c6urAryNFOrLbEjPvy+dNYuBLBOACYyYsVD7KypMRs90ko1mcGgdm+K7/UUqIJM22
-	 9CdPopiDEALv2u/dDI3JOFQc15+eZ/lj6bv7ouR37IUsnq7Z6umaKMMUh8ctXlrd90
-	 20qN/G/YIKVKXrsBGpwesXbOD+oPVrgZje+xjX20=
-Received: from epsnrtp01.localdomain (unknown [182.195.42.153]) by
-	epcas1p2.samsung.com (KnoxPortal) with ESMTPS id
-	20250627110001epcas1p21f2a1180b51fc82517facb6b9f247e14~M4TuV63LA0253702537epcas1p2E;
-	Fri, 27 Jun 2025 11:00:01 +0000 (GMT)
-Received: from epcas1p2.samsung.com (unknown [182.195.36.223]) by
-	epsnrtp01.localdomain (Postfix) with ESMTP id 4bTCJ057Wzz6B9m5; Fri, 27 Jun
-	2025 11:00:00 +0000 (GMT)
-Received: from epsmtip2.samsung.com (unknown [182.195.34.31]) by
-	epcas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20250627105959epcas1p168bbbe460ee1f081e67723505e1f57c9~M4TsoWor_2955029550epcas1p1Z;
-	Fri, 27 Jun 2025 10:59:59 +0000 (GMT)
-Received: from U20PB1-1082.tn.corp.samsungelectronics.net (unknown
-	[10.91.135.33]) by epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20250627105959epsmtip21aa89321785c91e7dfb1e50c794acb7e~M4TsjuKwn3127031270epsmtip2N;
-	Fri, 27 Jun 2025 10:59:59 +0000 (GMT)
-From: "Peter GJ. Park" <gyujoon.park@samsung.com>
-To: pabeni@redhat.com
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	gyujoon.park@samsung.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org, oneukum@suse.com
-Subject: [PATCH net v2] net: usb: usbnet: fix use-after-free in race on
- workqueue
-Date: Fri, 27 Jun 2025 19:59:53 +0900
-Message-Id: <20250627105953.2711808-1-gyujoon.park@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <87a7f8a6-71b1-4b90-abc7-0a680f2a99cf@redhat.com>
+	s=arc-20240116; t=1751022085; c=relaxed/simple;
+	bh=ZbJdgOIbkGwBeQnmkTbzv066EyMDgSE02LiXwxp50sQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XrcFkLwC8EWR3BDK5eDvbs9Vx3g/QexbjIAiiMyePKoP68KBU5VK98zP9e3n7mZPaZk0E1qtBDUB5BWIq1PnGp0EdVDHpXa0N+jRQTWmyyvVqouT6/w/Q+FeKx/lRoiPNuTP35fBSCCL8i+O6bTPZfKJjL0vCyLrVvqemfBxgjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Psf/xmMb; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751022081;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZbJdgOIbkGwBeQnmkTbzv066EyMDgSE02LiXwxp50sQ=;
+	b=Psf/xmMbBHgShJ6toEH8rd5591TixXJEO2AjVEsV2vcf7AQqMcwA+AtPYx/fw9kvSvb17H
+	vjcYim9rL4Lzft1gdOjg5i+1mR2L+uRHtLYrmcY9z9k7KXIDMf4/AWbbPJRAHSVHk7m2+M
+	ZUUO6bdsfrlQ9ApyfPU5XU+GN+pwUFE=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-322-fIYr3Bj0Mv69EHj4pl5qNQ-1; Fri, 27 Jun 2025 07:01:20 -0400
+X-MC-Unique: fIYr3Bj0Mv69EHj4pl5qNQ-1
+X-Mimecast-MFC-AGG-ID: fIYr3Bj0Mv69EHj4pl5qNQ_1751022079
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6ff810877aaso25082726d6.3
+        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 04:01:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751022079; x=1751626879;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZbJdgOIbkGwBeQnmkTbzv066EyMDgSE02LiXwxp50sQ=;
+        b=qDtzBL4OOQg/qPQk8M6YZy/fZflRyisPnFhApNJVdajWyqI+L5qTJdzL3cHnWVK+AG
+         zQeFqhsffRxwX1vdHf8x4avQKsje52Ib2KUVSeSdfEJckKAf3C+eLbh2JDU7KmG2qt8p
+         E/0+2It4kWI8JB569XkAtQ39vH5W0FNJs58SFMr417EFXi7VTWEMec6z6MkT6uO+4YVL
+         1o8CPuiCQ68DyFWp1wDX44GVtZUVo12f0zQ194/vYnEb4bxOSzHRsK/nP0aHQJlgLBZi
+         FSwucrs/98zxqS6CfaXJeTGW4nKUeI0hkZMHxPZpJlV9yrKzD+2d+hjszR3rXHV5vudX
+         fa1w==
+X-Forwarded-Encrypted: i=1; AJvYcCURS80mqwxdY1JyFzGd6/LPgFWH4G2lccgeD1ntv9dwHrOtdXWkrcS/lnNrpyA8TW5wZqvdPZU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6kb6ts0Qh8RRoMqS5bKc8wuBEJG2AXu8DzreZKti+VIK7pMQF
+	7AhNs12aAQlmE2atkHjURZddiTdAAukzTsCK8OUECpePYR+FauO7yOKE9funVreXNU/b6sKIZdX
+	XY5d1WhAqLj3u0mO8xQRBN1ZYWMoIplyW5VPPC0enCWXySImOy/krM3+PqQ==
+X-Gm-Gg: ASbGnctQlT2rPcVUGhzaSd4oJ+YotYl6YVKKXNikJ2mFYjEPaMBUAfcIkcAS1d1szkX
+	bh1z/BH1FMso32csuVP280bGjW3Jxu4yMns43hYwnwI3FAib/yX0PTXZry4VEymL2Ya2eVrdL3D
+	erjcKV0TvXfR/jN/qKO+7Jeg/jYdaUxKCgvCM+HdAS6IuJCcZkwHyCzJhmLc8JOCgaGfc9FIfez
+	7sxHeoHbqS4LxZtPBNR1Y/UkiPwhf6Ouop79zBUq3wqLsaeMk7UY6wmjJtJOj3BPhPVzqbSjwxX
+	CTtzzYqSaqauwboPYAMizz35AWZh
+X-Received: by 2002:a05:6214:76b:b0:6fd:d33:bf30 with SMTP id 6a1803df08f44-700033b6fcamr44379896d6.44.1751022078488;
+        Fri, 27 Jun 2025 04:01:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEI8TS4H6eRA0UouWBKDumbd4mbbqZxeye6OCeaKrfLx9sLYI9IeIKljRoNoP6GNozp6MQ7gA==
+X-Received: by 2002:a05:6214:76b:b0:6fd:d33:bf30 with SMTP id 6a1803df08f44-700033b6fcamr44378836d6.44.1751022077610;
+        Fri, 27 Jun 2025 04:01:17 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.181.237])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd772e3f2dsm17994826d6.78.2025.06.27.04.01.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Jun 2025 04:01:17 -0700 (PDT)
+Date: Fri, 27 Jun 2025 13:01:10 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Dexuan Cui <decui@microsoft.com>
+Cc: Xuewei Niu <niuxuewei97@gmail.com>, 
+	"davem@davemloft.net" <davem@davemloft.net>, "fupan.lfp@antgroup.com" <fupan.lfp@antgroup.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, "jasowang@redhat.com" <jasowang@redhat.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, KY Srinivasan <kys@microsoft.com>, 
+	"leonardi@redhat.com" <leonardi@redhat.com>, "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "niuxuewei.nxw@antgroup.com" <niuxuewei.nxw@antgroup.com>, 
+	"pabeni@redhat.com" <pabeni@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, "wei.liu@kernel.org" <wei.liu@kernel.org>, 
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>
+Subject: Re: [EXTERNAL] Re: [PATCH net-next v3 1/3] vsock: Add support for
+ SIOCINQ ioctl
+Message-ID: <ubgfre6nd4543iu5yybkmnd2ihbzfb6257u7jjfz4xqk4nhfdu@43yfocr4z4st>
+References: <wgyxcpcsnpsta65q4n7pekw2hbedrbzqgtevkzqaqkjrqfjlyo@6jod5pw75lyf>
+ <20250626050219.1847316-1-niuxuewei.nxw@antgroup.com>
+ <BL1PR21MB3115D30477067C46F5AC86C3BF45A@BL1PR21MB3115.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMS-MailID: 20250627105959epcas1p168bbbe460ee1f081e67723505e1f57c9
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-CMS-TYPE: 101P
-cpgsPolicy: CPGSC10-711,Y
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20250627105959epcas1p168bbbe460ee1f081e67723505e1f57c9
-References: <87a7f8a6-71b1-4b90-abc7-0a680f2a99cf@redhat.com>
-	<CGME20250627105959epcas1p168bbbe460ee1f081e67723505e1f57c9@epcas1p1.samsung.com>
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <BL1PR21MB3115D30477067C46F5AC86C3BF45A@BL1PR21MB3115.namprd21.prod.outlook.com>
 
-When usbnet_disconnect() queued while usbnet_probe() processing,
-it results to free_netdev before kevent gets to run on workqueue,
-thus workqueue does assign_work() with referencing freeed memory address.
+On Fri, Jun 27, 2025 at 08:50:46AM +0000, Dexuan Cui wrote:
+>> From: Xuewei Niu <niuxuewei97@gmail.com>
+>> Sent: Wednesday, June 25, 2025 10:02 PM
+>> > ...
+>> > Maybe when you have it tested, post it here as proper patch, and Xuewei
+>> > can include it in the next version of this series (of course with you as
+>> > author, etc.). In this way will be easy to test/merge, since they are
+>> > related.
+>> >
+>> > @Xuewei @Dexuan Is it okay for you?
+>>
+>> Yeah, sounds good to me!
+>>
+>> Thanks,
+>> Xuewei
+>
+>Hi Xuewei, Stefano, I posted the patch here:
+>https://lore.kernel.org/virtualization/1751013889-4951-1-git-send-email-decui@microsoft.com/T/#u
 
-For graceful disconnect and to prevent use-after-free of netdev pointer,
-the fix adds canceling work and timer those are placed by usbnet_probe()
+Great, thanks!
 
-Signed-off-by: Peter GJ. Park <gyujoon.park@samsung.com>
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
----
- drivers/net/usb/usbnet.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index c04e715a4c2a..3c5d9ba7fa66 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -1660,6 +1660,9 @@ void usbnet_disconnect (struct usb_interface *intf)
- 	usb_free_urb(dev->interrupt);
- 	kfree(dev->padding_pkt);
-
-+	timer_delete_sync(&dev->delay);
-+	tasklet_kill(&dev->bh);
-+	cancel_work_sync(&dev->kevent);
- 	free_netdev(net);
- }
- EXPORT_SYMBOL_GPL(usbnet_disconnect);
---
-2.25.1
+>
+>Xuewei, please help to re-post this patch with the next version of your patchset.
+>Feel free to add your Signed-off-by, if you need.
+>
+>Thanks,
+>Dexuan
+>
 
 
