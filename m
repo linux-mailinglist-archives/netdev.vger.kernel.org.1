@@ -1,141 +1,149 @@
-Return-Path: <netdev+bounces-201734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1CDDAEACF0
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 04:44:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 70430AEAD0C
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 04:56:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60DE51885F48
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 02:44:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A2C41C21CE9
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 02:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 925C319D89B;
-	Fri, 27 Jun 2025 02:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A70BD194AD5;
+	Fri, 27 Jun 2025 02:56:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f+OpDwJ8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OdfZsgQJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046C6199E9D
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 02:43:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A08219E8;
+	Fri, 27 Jun 2025 02:56:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750992220; cv=none; b=LO9GX5+iaRS6pdf1QAfSr5S0rpoc5rrsZUvqK0VvyZFWGuF+WX3xIoVLi7Mbw2IsmRglHyidxr5zDi1RzXk5tkdoHX8LxFQShd0IHjwn09HWaemHYjtuZPfpYSnP96VwIiljGi5kTA+I7AHwUaul3WqM5qnSHY30jjt4/PHd+3c=
+	t=1750993008; cv=none; b=dpYIUWKpCyck6P4QYO+TFgjMekkSbZGi46Op3iTVy6omoxsu/S5x+TquigVCA6MUJC2/IkHzEHIE0H3m9KLjSADAUUpYbwnB3Ste0Nx9vPyT0kpD3MKaQFW8T5MQvOnhNAj4eoir32gsOXzSBJMJQhycts8+/nv67vcVyuOBWw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750992220; c=relaxed/simple;
-	bh=RXC4Rxkam+ZBAOFfCItPQiQAgEwB6Nk3xgueJRX/EL4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Tb5KJ13385pOLhG3NFv8Pdgy+TyEj5QlqbdppjEx4Xe1+2E4KnN6EIBmcFFSP2GswyUnp1vDUBq30kxHl4fujiUqPoizxZeh0/dv2inIS34aU8NoK3p1JXV9qrHiOH7B3tTOfEnYib22kTgeNGukWxRG9u7/p6IaS78/ZB1Znfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f+OpDwJ8; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1750992215;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RXC4Rxkam+ZBAOFfCItPQiQAgEwB6Nk3xgueJRX/EL4=;
-	b=f+OpDwJ8InoOr8JvoeuHxbODQk0deDxL8X3f+/xEylGS2Lac9HO8f9BbGjU33L6z2e2caC
-	xuJafinTLHXaeLRMu3UTElGML4az6V/ipbfDkmA7sd65FxjVMSKQp4jselapY2+2WG/YmX
-	0Vp+fgbZ2FvOrpX9kuXYUrh5J1swJZ8=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-647-jIwivknqN9uP20yD2JSr-A-1; Thu, 26 Jun 2025 22:43:33 -0400
-X-MC-Unique: jIwivknqN9uP20yD2JSr-A-1
-X-Mimecast-MFC-AGG-ID: jIwivknqN9uP20yD2JSr-A_1750992212
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-b31df10dfadso1027568a12.0
-        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 19:43:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750992212; x=1751597012;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RXC4Rxkam+ZBAOFfCItPQiQAgEwB6Nk3xgueJRX/EL4=;
-        b=VlKGAwCy7n8/FBgcXR0yTsIEWxsyddp8mimAbb1IHWzHaWTEDWBuhW1CkNHf3dWxmp
-         EBfCsdTF6cX9CtkVm7ElnpvMSmurykU9WREwjtcfaVele1Gx2yJPa7ppSLIi1A38GuLU
-         q8oQfv+RfRyiWaIPS9Tl9C53Jc6VCd5d+PBoF5uXVhLQ6AKUX+gfmQpBbl3+rwE6FBfE
-         mJF+GqO7DJxeTGCPBVaxomW2x2QdZhlURZEO/SF9LfLG0qaJxznqMM7QIDx1FbbqNwF1
-         766U5DoPh8wfnarUKWSkAjmZVLkCxGaoyjfGbUV1UQVl8z+JjNzJAHUuE5lIZLyHMLwF
-         ZFug==
-X-Gm-Message-State: AOJu0YwBwECtdGnDwvnHf7K6s1bExyyE+dSZZV2QwtZR4cRcvKXvytPy
-	LqOQeSAeQAh4qk3F/VwIACBda0E3H7sbOLW9APPXyS8TqDHrE7VhGSilALfidJBQrsivRjy4257
-	FQXOdqpDFKlWDkl2xDvQzt/u8D98w0aDHPbtA2ulQoBJW28f5wBrjkPb/25mgg0LaZqgpUUI8E6
-	bimdP+XOXN9a4WFh2+EdyWBhVz6WElgdo+
-X-Gm-Gg: ASbGncs8ODCB1x+O+S8zcPOQ8LfXsBrl6XE1gHZRqddRLLTEx4bJ++HJgAuHZddjrRQ
-	F8GC7l9Tw8k3RHXxsGL2wBTAiNwqVMmsWDuq8NshiK8ToZagvcSv/3eE3T2BLMH3nJ5JhYUlRSh
-	me
-X-Received: by 2002:a17:90a:d64b:b0:312:1dc9:9f67 with SMTP id 98e67ed59e1d1-318c9107a53mr2192663a91.2.1750992212424;
-        Thu, 26 Jun 2025 19:43:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGJM16rdnxRskTxwuXyeMZbSoBcs9q4++zM+ywcskISDMXjQ0J0UHxMNSH2KE2x3C2uBazsSFuOebCMbQTd6Tc=
-X-Received: by 2002:a17:90a:d64b:b0:312:1dc9:9f67 with SMTP id
- 98e67ed59e1d1-318c9107a53mr2192640a91.2.1750992212056; Thu, 26 Jun 2025
- 19:43:32 -0700 (PDT)
+	s=arc-20240116; t=1750993008; c=relaxed/simple;
+	bh=6HaipL2Nb3QqfyHkXwTX10Vg5Q0zLosiWZASw1iDunI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iygLSTWcfVFe73Ih9S0g7nScfwqovRsLZBtKjIbZygZZLLw0UvPFs2m4rj8TyTIOiio6qYdhYMGiV4i+PqUsTeg9f/UkqjgUHqb3d2tcYXeN6XdhT7V/F2jhMXba/v6LHDN7XCB+RRja6MFwQ26AFR3VgpQAIunoVNNQtmgoxME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OdfZsgQJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECAB8C4CEEE;
+	Fri, 27 Jun 2025 02:56:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1750993008;
+	bh=6HaipL2Nb3QqfyHkXwTX10Vg5Q0zLosiWZASw1iDunI=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=OdfZsgQJGCnp3QbzwZi/zpPrlV5AoEmH+oQkmwbR6fdiolFsnMuFy5CbxALNOtiIl
+	 K3izNJ445A48065KWMd5dheH849l83Vg0XMaYNBhLm/OHhNIMjXaWIAMIyuVXX1oHj
+	 8ST9CyjCzuLKEuS6AE3RJY1depX4h/si9ywALa8ffHaOKsQEI7czwRP/P4hOmBzHTL
+	 OYSohwCRSgjkzUGQQTKYP6tl5FEs0XMZ0lIalMChEoUf33q/JnyYOB+RIxzXSE8QQG
+	 36bti5RB2cXv7p2zSLKRKySeQrSPbG5gyEzSFr01Z9EIFDkIW2IhWckSxMUE7rmMJt
+	 HDlifh/m7lBFQ==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 99F29CE0C3C; Thu, 26 Jun 2025 19:56:47 -0700 (PDT)
+Date: Thu, 26 Jun 2025 19:56:47 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>, linux-kernel@vger.kernel.org,
+	rcu@vger.kernel.org, lkmm@lists.linux.dev,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@kernel.org>, Will Deacon <will@kernel.org>,
+	Waiman Long <longman@redhat.com>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang@linux.dev>, Breno Leitao <leitao@debian.org>,
+	aeh@meta.com, netdev@vger.kernel.org, edumazet@google.com,
+	jhs@mojatatu.com, kernel-team@meta.com,
+	Erik Lundgren <elundgren@meta.com>
+Subject: Re: [PATCH 0/8] Introduce simple hazard pointers for lockdep
+Message-ID: <a8e06076-3f66-441f-9ccb-0b368d95e1a1@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <20250625031101.12555-1-boqun.feng@gmail.com>
+ <aFvl96hO03K1gd2m@infradead.org>
+ <aFwC-dvuyYRYSWpY@Mac.home>
+ <aF0eEfoWVCyoIAgx@infradead.org>
+ <aF1rjV8XQozi7hXB@Mac.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250625160849.61344-1-minhquangbui99@gmail.com>
- <20250625160849.61344-4-minhquangbui99@gmail.com> <CACGkMEvY9pvvfq3Ok=55O1t3+689RCfqQJqaWjLcduHJ79CDWA@mail.gmail.com>
- <8f0927bf-dc2f-4a20-887a-6d8529623dd7@gmail.com>
-In-Reply-To: <8f0927bf-dc2f-4a20-887a-6d8529623dd7@gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 27 Jun 2025 10:43:20 +0800
-X-Gm-Features: Ac12FXyeaiRss6v-acFo0ljDViofeaY9eNXnTbOP2WE1qi3Xv2JlKX1swLORs6U
-Message-ID: <CACGkMEvf18Dmo5Wzdq-GnJf-jOrzKMQ7epZA+ssWPzXvCnCXvw@mail.gmail.com>
-Subject: Re: [PATCH net 3/4] virtio-net: create a helper to check received
- mergeable buffer's length
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aF1rjV8XQozi7hXB@Mac.home>
 
-On Thu, Jun 26, 2025 at 11:38=E2=80=AFPM Bui Quang Minh
-<minhquangbui99@gmail.com> wrote:
->
-> On 6/26/25 09:38, Jason Wang wrote:
-> > On Thu, Jun 26, 2025 at 12:10=E2=80=AFAM Bui Quang Minh
-> > <minhquangbui99@gmail.com> wrote:
-> >> Currently, we have repeated code to check the received mergeable buffe=
-r's
-> >> length with allocated size. This commit creates a helper to do that an=
-d
-> >> converts current code to use it.
-> >>
-> >> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
-> > I think it would be better to introduce this as patch 1, so a
-> > mergeable XDP path can use that directly.
-> >
-> > This will have a smaller changeset.
->
-> I'm just concerned that it might make backporting the fix harder because
-> the fix depends on this refactor and this refactor touches some function
-> that may create conflict.
+On Thu, Jun 26, 2025 at 08:47:25AM -0700, Boqun Feng wrote:
+> On Thu, Jun 26, 2025 at 03:16:49AM -0700, Christoph Hellwig wrote:
+> > On Wed, Jun 25, 2025 at 07:08:57AM -0700, Boqun Feng wrote:
+> > > Sure, I will put one for the future version, here is the gist:
+> > 
+> > Thanks a lot!
+> > 
+> > > The updater's wait can finish immediately if no one is accessing 'a', in
+> > > other words it doesn't need to wait for reader 2.
+> > 
+> > So basically it is the RCU concept, but limited to protecting exactly
+> > one pointer update per critical section with no ability for the read
+> > to e.g. acquire a refcount on the objected pointed to by that pointer?
+> 
+> For the current simple hazard pointer, yes. But simple hazard pointers
+> is easily to extend so support reading:
+> 
+> 	{ gp is a global pointer }
+> 
+> 	Reader				Updater
+> 	======				=======
+> 	g = shazptr_acquire(p):
+> 	      WRITE_ONCE(*this_cpu_ptr(slot), gp);
+> 	      smp_mb();
+> 	
+> 	if (READ_ONCE(gp) == *this_cpu_ptr(slot)) {
+> 	    // still being protected.
+> 	    <can read gp here>
+> 					to_free = READ_ONCE(gp);
+> 					WRITE_ONCE(gp, new);
+> 					synchronize_shazptr(to_free):
+> 					  smp_mb();
+> 					  // wait on the slot of reader
+> 					  // CPU being 0.
+> 					  READ_ONCE(per_cpu(reader, slot));
+> 	}
+> 
+> 	shazptr_clear(g):
+> 	  WRITE_ONCE(*this_cpu_ptr(slot), NULL); // unblock synchronize_shazptr()
+> 
+> 
+> Usually the shazptr_acqurie() + "pointer comparison"* is called
+> shazptr_try_protect().
+> 
+> I will add a document about this in the next version along with other
+> bits of hazard pointers.
+> 
+> [*]: The pointer comparison is more complicated topic, but Mathieu has
+>      figured out how to do it correctly:
+> 
+>      https://lore.kernel.org/lkml/20241008135034.1982519-2-mathieu.desnoyers@efficios.com/
 
-We can make it a single patch that contains:
+It might be helpful to add that, at a high level, hazard pointers
+are a scalable replacement for reference counting.  At a similarly
+high level, RCU is a scalable replacement for reader-writer locking.
+At lower levels, there is considerable overlap in applicability, so that
+you can use RCU to replace many reference-counting use cases and hazard
+pointers to replace many reader-writer-locking use cases..
 
-1) new helper
-2) fixes
+Plus, as both Mathieu and Boqun pointed out, both RCU and hazard pointers
+can be combined with other synchronization mechanisms, including each
+other.
 
-as long as the changeset meets the requirement of -stable.
-
-Thanks
-
->
-> Thanks,
-> Quang Minh.
->
-
+							Thanx, Paul
 
