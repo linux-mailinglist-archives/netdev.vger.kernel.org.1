@@ -1,78 +1,80 @@
-Return-Path: <netdev+bounces-201972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1314AEBA96
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 16:57:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F185AEBAF3
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 17:03:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D56B1C4370C
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 14:58:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 566F31C22A32
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 15:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 821F52E88A9;
-	Fri, 27 Jun 2025 14:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5A92E8886;
+	Fri, 27 Jun 2025 15:02:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="TfHM5Ljp";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="aCucV8Th"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="UF1YQMtS";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="u7DNS3ec"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCCFF2E8892;
-	Fri, 27 Jun 2025 14:57:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0883A29C35A;
+	Fri, 27 Jun 2025 15:02:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751036255; cv=none; b=gQawNBog+mHSsiTH8zKff7GN4NkSRFLQMnoNCMqyFUsG4UnVaPLUxe6aGKr/X1lipC4CksTO+s+pd/Nvk2puJszAR3WhR5hy0v/AS+35GuOr40BSy79yQ7EcbqpgSMuIklO6Eu4AQ47pE1hKbY3QCdPUZ3aYi3PxY6Guhd4IZCA=
+	t=1751036562; cv=none; b=qCoHR1Jd5vrsBbD0aN8x9iIaFWNbVGyh2GBTTCl448ZVjal/YY0ZXlgWLMyJA+h80GTaCNt2QauWnSOtu91VkwQO5+95ABC7w80wnolmCdaopN3b2q/X+RHOdEVl0yvIZXFKG3v3qVDhHq/Z8uelVSEYhG4BKPp9IqtgTgelZsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751036255; c=relaxed/simple;
-	bh=xZbTmD86sEhU8AI4zrEanIw7Ar7agxZDcHD3nGgxk3k=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=EYw5ma1lrBj2OW6wbKY8WRfopoBRNSEefh8oFX4YDw48KDePOx6zR0CPXKRfnHFtR6dW+u4hWoixFj8vq15YiHOviX4Eu4FAiJy75M7rOYvuOCaQJzSOOlfjjoMvohsop9JYU+Fubx2XdQuRn1k5wTeZfW9oGusjgxoHqzapxm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=TfHM5Ljp; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=aCucV8Th; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1751036252;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/bQC5mOsy0X3y6YunJaTMnOlKBLNzqK+7WUtDYc4TKI=;
-	b=TfHM5Ljpjs5hdt4e98fWyuNUO/Q9pItDM2tujxu3cJP8p2jCdXe+fVyS+UnYvlUn3EuFEV
-	FFjtAhlis4mhIHinHpmp+5uN4hrohQ5CmgcEkwii5IkmhQnCbmJukRzcKOo7JfAXB2Twir
-	Fwjdz6lDCyeQSklvghCgnRWkO468onWPTDSu6KLyX36rOj6ZXf8ak40LbP6OBkJAPc3Jm9
-	+33bFnisCG20yeavoTV0cHXQ8BQ7j2eA/bfENOW1WMiTvRXtDsi5TxNZCMJ3QnWoE7QbYM
-	OMVv3HjOS/Rl+5ofXmkw9cUWNzsv4kkM/Mrr1nU/TIWa+yp83vCR8MJjYVmlqw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1751036252;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/bQC5mOsy0X3y6YunJaTMnOlKBLNzqK+7WUtDYc4TKI=;
-	b=aCucV8ThJQED3l2MRuvwx0TMAEFtugz4Lzo7dJN8+xJi+QRK//S5Vh4Z5qAVYuRMQOz+/R
-	ok2LRwPavTuhfbCQ==
-To: John Stultz <jstultz@google.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, Richard
- Cochran <richardcochran@gmail.com>, Christopher Hall
- <christopher.s.hall@intel.com>, Frederic Weisbecker <frederic@kernel.org>,
- Anna-Maria Behnsen <anna-maria@linutronix.de>, Miroslav Lichvar
- <mlichvar@redhat.com>, Werner Abt <werner.abt@meinberg-usa.com>, David
- Woodhouse <dwmw2@infradead.org>, Stephen Boyd <sboyd@kernel.org>, Thomas
- =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, Kurt
- Kanzenbach <kurt@linutronix.de>, Nam Cao <namcao@linutronix.de>, Antoine
- Tenart <atenart@kernel.org>
-Subject: Re: [patch V3 04/11] timekeeping: Provide time setter for auxiliary
- clocks
-In-Reply-To: <87ldpdnu8y.ffs@tglx>
-References: <20250625182951.587377878@linutronix.de>
- <20250625183757.995688714@linutronix.de>
- <CANDhNCpu5+ZVxFg0XVU4KYEWnNCbSruPob9dOeF3btxqJ1N70g@mail.gmail.com>
- <87ldpdnu8y.ffs@tglx>
-Date: Fri, 27 Jun 2025 16:57:31 +0200
-Message-ID: <87ikkhnsf8.ffs@tglx>
+	s=arc-20240116; t=1751036562; c=relaxed/simple;
+	bh=w+yCshq1AkXfy4TG62/0dF7Z5UjrzjrNi/Pr8M8ehnI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LQafMbqjgWi6poA6aja3CXu/DLMMBIvnz8L+x63sAFWlzJRwMlCh/FERIYT2z50G0u1MAqf3e2vvNX73H9KD/zJMSNNqd/WkZ2SSDFLJb4KGkJb0zQsIyUgsD7sdHwJfaPTp/UqtO2U+XtZEx11k8ZJuoF0LIG8R327p7WE4SVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=UF1YQMtS; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=u7DNS3ec; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id B6DD76026B; Fri, 27 Jun 2025 17:02:30 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1751036550;
+	bh=3up0GGkeLjfGH9K3CPQwwnONHBuElUgJFrn89fyMrvo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UF1YQMtSh3F8PdvMtyrPzxuJQAGPhyrJcIIGLhfQCl1OelebSKJ8AA4zsSl6dicGH
+	 MsbDDMFQPWJkq2LP3kSMb88DSXVdHNOKVPotWd1CaZ5FcDOwJYVdr74MkT7RhSoeI8
+	 txoxqdFeVaAKomNrfErgf9ZjyMeDzDFob1SjcEYfV6wjZ4WvcWnb0rv5PFkSVomhJI
+	 dAAxtDWzaFEeygdiGj0iCaFuMgB7JSpcsLf5+OVvtsX1gToGk8gOY0lh0JKvHAXyzQ
+	 qfmThY9JxwCIru5nCrbSfJdo5CEzJf4nV9bdWlEUmu48yAJ4i7JhY0KkKs1ls/tek4
+	 PS152NW/abUgg==
+X-Spam-Level: 
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id A025760265;
+	Fri, 27 Jun 2025 17:02:27 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1751036547;
+	bh=3up0GGkeLjfGH9K3CPQwwnONHBuElUgJFrn89fyMrvo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=u7DNS3ecPip3oMYv/xopaI1mRYnKhmKMv5k240A1tzuTh4BUnmTaxfLxrxb52F0eo
+	 UkeINdBbYrljmFJb1pKVXgEtg7aR+1WsmqJ+1Vboi/tgj0JR3Mlcz5YojFopQ+pnm8
+	 6d9cyxaMYmBdlQQfUEa8Zesta/3g0u0to2hCsPpBkZctlToqGIz/X+3y0QtZ3r4p9K
+	 7Stm2lz43BdEnt1hWwQC/TnLgAW3mIVomPAmLEKLIJVmB4vYW7+V2ULTBbaU/hvekE
+	 hkpBI9qwHdmVmsXu7mP1jKVxRWwt1k7yRpCelD5taIOYxOQBMjes4fEbYMEnkHCIvg
+	 EN3853hRAL6aQ==
+Date: Fri, 27 Jun 2025 17:02:25 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] net: netfilter: Add IPIP flowtable SW
+ acceleration
+Message-ID: <aF6ygRse7xSy949F@calendula>
+References: <20250627-nf-flowtable-ipip-v2-0-c713003ce75b@kernel.org>
+ <20250627-nf-flowtable-ipip-v2-1-c713003ce75b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,55 +82,173 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <20250627-nf-flowtable-ipip-v2-1-c713003ce75b@kernel.org>
 
-On Fri, Jun 27 2025 at 16:18, Thomas Gleixner wrote:
+On Fri, Jun 27, 2025 at 02:45:28PM +0200, Lorenzo Bianconi wrote:
+> Introduce SW acceleration for IPIP tunnels in the netfilter flowtable
+> infrastructure.
+> IPIP SW acceleration can be tested running the following scenario where
+> the traffic is forwarded between two NICs (eth0 and eth1) and an IPIP
+> tunnel is used to access a remote site (using eth1 as the underlay device):
+> 
+> ETH0 -- TUN0 <==> ETH1 -- [IP network] -- TUN1 (192.168.100.2)
+> 
+> $ip addr show
+> 6: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+>     link/ether 00:00:22:33:11:55 brd ff:ff:ff:ff:ff:ff
+>     inet 192.168.0.2/24 scope global eth0
+>        valid_lft forever preferred_lft forever
+> 7: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+>     link/ether 00:11:22:33:11:55 brd ff:ff:ff:ff:ff:ff
+>     inet 192.168.1.1/24 scope global eth1
+>        valid_lft forever preferred_lft forever
+> 8: tun0@NONE: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1480 qdisc noqueue state UNKNOWN group default qlen 1000
+>     link/ipip 192.168.1.1 peer 192.168.1.2
+>     inet 192.168.100.1/24 scope global tun0
+>        valid_lft forever preferred_lft forever
+> 
+> $ip route show
+> default via 192.168.100.2 dev tun0
+> 192.168.0.0/24 dev eth0 proto kernel scope link src 192.168.0.2
+> 192.168.1.0/24 dev eth1 proto kernel scope link src 192.168.1.1
+> 192.168.100.0/24 dev tun0 proto kernel scope link src 192.168.100.1
+> 
+> $nft list ruleset
+> table inet filter {
+>         flowtable ft {
+>                 hook ingress priority filter
+>                 devices = { eth0, eth1 }
+>         }
+> 
+>         chain forward {
+>                 type filter hook forward priority filter; policy accept;
+>                 meta l4proto { tcp, udp } flow add @ft
+>         }
+> }
 
-> On Thu, Jun 26 2025 at 21:23, John Stultz wrote:
->> On Wed, Jun 25, 2025 at 11:38=E2=80=AFAM Thomas Gleixner <tglx@linutroni=
-x.de> wrote:
->>>
->>> Add clock_settime(2) support for auxiliary clocks. The function affects=
- the
->>> AUX offset which is added to the "monotonic" clock readout of these clo=
-cks.
->>>
->>> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
->>> ---
->>
->> Minor fretting: I worry a little that the difference here between the
->> default timekeeper where set adjusts the REALTIME offset from
->> MONOTONIC, and here where it directly adjusts "mono" might confuse
->> later readers?
+Is there a proof that this accelerates forwarding?
+
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  net/ipv4/ipip.c                  | 21 +++++++++++++++++++++
+>  net/netfilter/nf_flow_table_ip.c | 28 ++++++++++++++++++++++++++--
+>  2 files changed, 47 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/ipv4/ipip.c b/net/ipv4/ipip.c
+> index 3e03af073a1ccc3d7597a998a515b6cfdded40b5..05fb1c859170d74009d693bc8513183bdec3ff90 100644
+> --- a/net/ipv4/ipip.c
+> +++ b/net/ipv4/ipip.c
+> @@ -353,6 +353,26 @@ ipip_tunnel_ctl(struct net_device *dev, struct ip_tunnel_parm_kern *p, int cmd)
+>  	return ip_tunnel_ctl(dev, p, cmd);
+>  }
+>  
+> +static int ipip_fill_forward_path(struct net_device_path_ctx *ctx,
+> +				  struct net_device_path *path)
+> +{
+> +	struct ip_tunnel *tunnel = netdev_priv(ctx->dev);
+> +	const struct iphdr *tiph = &tunnel->parms.iph;
+> +	struct rtable *rt;
+> +
+> +	rt = ip_route_output(dev_net(ctx->dev), tiph->daddr, 0, 0, 0,
+> +			     RT_SCOPE_UNIVERSE);
+> +	if (IS_ERR(rt))
+> +		return PTR_ERR(rt);
+> +
+> +	path->type = DEV_PATH_ETHERNET;
+> +	path->dev = ctx->dev;
+> +	ctx->dev = rt->dst.dev;
+> +	ip_rt_put(rt);
 >
-> Actually it's not really that different.
+> +	return 0;
+> +}
+> +
+>  static const struct net_device_ops ipip_netdev_ops = {
+>  	.ndo_init       = ipip_tunnel_init,
+>  	.ndo_uninit     = ip_tunnel_uninit,
+> @@ -362,6 +382,7 @@ static const struct net_device_ops ipip_netdev_ops = {
+>  	.ndo_get_stats64 = dev_get_tstats64,
+>  	.ndo_get_iflink = ip_tunnel_get_iflink,
+>  	.ndo_tunnel_ctl	= ipip_tunnel_ctl,
+> +	.ndo_fill_forward_path = ipip_fill_forward_path,
+>  };
+>  
+>  #define IPIP_FEATURES (NETIF_F_SG |		\
+> diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
+> index 8cd4cf7ae21120f1057c4fce5aaca4e3152ae76d..255ed53c11c927549dc87ffc6c399385e3fb68ff 100644
+> --- a/net/netfilter/nf_flow_table_ip.c
+> +++ b/net/netfilter/nf_flow_table_ip.c
+> @@ -277,13 +277,31 @@ static unsigned int nf_flow_xmit_xfrm(struct sk_buff *skb,
+>  	return NF_STOLEN;
+>  }
+>  
+> +static bool nf_flow_ip4_encap_proto(struct sk_buff *skb, u16 *size)
+> +{
+> +	struct iphdr *iph;
+> +
+> +	if (!pskb_may_pull(skb, sizeof(*iph)))
+> +		return false;
+> +
+> +	iph = (struct iphdr *)skb_network_header(skb);
+> +	*size = iph->ihl << 2;
+> +
+> +	return iph->protocol == IPPROTO_IPIP;
+> +}
 >
-> In both cases the new offset to the monotonic clock is calculated and
-> stored in the relevant tk::offs_* member.
->
-> The difference is that the core timekeeper operates on xtime, but for
-> simplicity I chose to calculate the resulting tk::offs_aux directly from
-> the monotonic base. That's valid with the aux clocks as they don't
-> need any of the xtime parts.
+>  static bool nf_flow_skb_encap_protocol(struct sk_buff *skb, __be16 proto,
+>  				       u32 *offset)
+>  {
+>  	struct vlan_ethhdr *veth;
+>  	__be16 inner_proto;
+> +	u16 size;
+>  
+>  	switch (skb->protocol) {
+> +	case htons(ETH_P_IP):
+> +		if (nf_flow_ip4_encap_proto(skb, &size))
+> +			*offset += size;
 
-Actually using xtime and adjusting it and xtime_to_mono does not work
-for those auxiliary clocks because the offset to clock "monotonic" is
-allowed to be negative, unless it would result in a overall negative
-time readout.
+This is blindly skipping the outer IP header.
 
-This is required for those clocks because the TSN/PTP zoo out there
-especially in automation/automotive uses clockmasters starting at the
-epoch for their specialized networks. So if the clockmaster starts up
-_after_ the client, then the pile of xtime sanity checks would prevent
-setting the clock back to the epoch.
+> +		return true;
+>  	case htons(ETH_P_8021Q):
+>  		if (!pskb_may_pull(skb, skb_mac_offset(skb) + sizeof(*veth)))
+>  			return false;
+> @@ -310,6 +328,7 @@ static void nf_flow_encap_pop(struct sk_buff *skb,
+>  			      struct flow_offload_tuple_rhash *tuplehash)
+>  {
+>  	struct vlan_hdr *vlan_hdr;
+> +	u16 size;
+>  	int i;
+>  
+>  	for (i = 0; i < tuplehash->tuple.encap_num; i++) {
+> @@ -331,6 +350,12 @@ static void nf_flow_encap_pop(struct sk_buff *skb,
+>  			break;
+>  		}
+>  	}
+> +
+> +	if (skb->protocol == htons(ETH_P_IP) &&
+> +	    nf_flow_ip4_encap_proto(skb, &size)) {
+> +		skb_pull(skb, size);
+> +		skb_reset_network_header(skb);
+> +	}
 
-I tried to work around that, but the result was more horrible and
-fragile than the current approach with the aux specific offset.
+I have a similar patch from 2023, I think I keep somewhere in my trees.
 
-Don't ask :)
-
-Thanks,
-
-        tglx
-
+>  }
+>  
+>  static unsigned int nf_flow_queue_xmit(struct net *net, struct sk_buff *skb,
+> @@ -357,8 +382,7 @@ nf_flow_offload_lookup(struct nf_flowtable_ctx *ctx,
+>  {
+>  	struct flow_offload_tuple tuple = {};
+>  
+> -	if (skb->protocol != htons(ETH_P_IP) &&
+> -	    !nf_flow_skb_encap_protocol(skb, htons(ETH_P_IP), &ctx->offset))
+> +	if (!nf_flow_skb_encap_protocol(skb, htons(ETH_P_IP), &ctx->offset))
+>  		return NULL;
+>  
+>  	if (nf_flow_tuple_ip(ctx, skb, &tuple) < 0)
+> 
+> -- 
+> 2.50.0
+> 
 
