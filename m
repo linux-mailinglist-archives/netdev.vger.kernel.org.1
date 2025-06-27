@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-201707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01135AEABAD
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 02:20:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C139EAEABAF
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 02:20:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F8A43B2F13
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 00:19:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76C281C251A7
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 00:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C5F71096F;
-	Fri, 27 Jun 2025 00:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7AB2A1B2;
+	Fri, 27 Jun 2025 00:19:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j2o5G0zj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GPHakjTE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07123F4E2;
-	Fri, 27 Jun 2025 00:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C00C224FA
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 00:19:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750983590; cv=none; b=bERtUg4D9ta4Rvesg9FB6cQPzn6XnqBgkuGy0TdeZPDmeS1/PME2EfJrjQ5iEg877uUE2cu/zE27R9IPAyIJnaDOdH/qNrVWVGI8bEhkiGFtNn855ZbesOMkgeJ1TqVrTJTsswUam4KeU18GKadZ7TeO6Qh4TexXsYvLXq8IlPI=
+	t=1750983591; cv=none; b=MbHACWtNl3UPgN+ZIQI6PpjnHCVrtNbDcOqye9gpJYCQzh96dEDSf1N8z0svZtda9t/qL1exFvSVSjoIfYOWXW8MV2uVzbl18TWPX1DXvw2t8xs2ND12P8E9l/HoDg/Dp5fwOUytfgIpygSP/5MHzlVTj3LVAaB8ChJHAP5ioMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750983590; c=relaxed/simple;
-	bh=/gSgrljG7eAjzXFe8hf2tvSNTEmVpGZaz1Bti9sY76w=;
+	s=arc-20240116; t=1750983591; c=relaxed/simple;
+	bh=A/GPq/k9Nay0IeBg/c26bLVz5zmhn+66UN35AjQ18KY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RT6SL6BoNbQDubygMIZU942EfQQC/h0MUb7zwlWo5b71EFD9G+5hiSTy7dcofc++y3/S7SrhiLm5UHApL4z5pP5I7KwsmXZrCxu9SCni0e/sO6ix6X4mNgBe4KsZS9+f/Fu3sQ0OcaeDhAFtVS+VOPJ5vyHpE6Kb9sk5KOGZg4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j2o5G0zj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78A7AC4CEF1;
-	Fri, 27 Jun 2025 00:19:49 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Qyb8TLrB9BX/6WZ5+UGwEvtiEqMkgvsnbySgFxsZb4lqswPqJsg+U9QJ99datlI86YM7xSj28kqF6VXemI/JTYF2YR1B7wYoY6jRr8nzgoSzPtrfdc5G6JgcMysM++mpv6A+sConqsTswnbT++CsAJp3hoEMUBiFeunia6pOdiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GPHakjTE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE18CC4CEEB;
+	Fri, 27 Jun 2025 00:19:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750983589;
-	bh=/gSgrljG7eAjzXFe8hf2tvSNTEmVpGZaz1Bti9sY76w=;
+	s=k20201202; t=1750983590;
+	bh=A/GPq/k9Nay0IeBg/c26bLVz5zmhn+66UN35AjQ18KY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=j2o5G0zj6/1UMIsC7lenn0zlPElsXrFhtqVE82YvGJi3dhRhvvVbQAdN3cs+nhMAy
-	 6GPtI+obQDUgEB9CEB31X8KmjtWgj1TYBSQHe3Tahi28J2re4o26adXlIcbUn+IsVx
-	 aN9TVX4YkUaEj8Ppv1j0moZqQmiDKE/zhMIabiBnc5czxVfUKhJtyk4qia4YX7VoUe
-	 mop8aE9865eX3v/OKCNznkBcKipVxJZGJZw2bzs4cnWS582KK5DbYNSQCu77cZS5Gi
-	 JodY6qfTFOEwr+BYCEyTZMvQyaGXCRxnO0ShOGH/b1p8GcnQ/vYKvHM/1qp1VSB+in
-	 mcgZqgOugiWpA==
+	b=GPHakjTEzBgJZYFQzPu07aArQupswCEtrO40OOgknyCfhs7wzAbukHHOCtiIik1ra
+	 anDHFJgX1j30s2e/PgCiC8BGB2i2C6gqwaeLyb7eDz3qb0ZnI+1i2VpG8BHruj2pvU
+	 MIC+VrIUbmaqtochAcwS5svxt6d8nsOnn2wPflOpzvGQsOp35J+zZKWEV/GRsex5ma
+	 lyJH0WM1TO837tJfisqPPN/HByu+mSvvs84Z5ef4b5nHB8sAbpRORG+VlF7UHiMcZt
+	 rJ9EsWc1G/sbPPM5W0biLBCkucVokm/BFg6kbknpJ0xVr4QZeNFSSngYMRmela7uvl
+	 0Unc7pcUINj/w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAC733A40FCB;
-	Fri, 27 Jun 2025 00:20:16 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CE13A40FCB;
+	Fri, 27 Jun 2025 00:20:18 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf-next 2025-06-27
+Subject: Re: [PATCH net] net: airoha: Get rid of dma_sync_single_for_device()
+ in airoha_qdma_fill_rx_queue()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175098361574.1380299.124028561728330295.git-patchwork-notify@kernel.org>
-Date: Fri, 27 Jun 2025 00:20:15 +0000
-References: <20250626230111.24772-1-daniel@iogearbox.net>
-In-Reply-To: <20250626230111.24772-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
+ <175098361699.1380299.1821906889134866551.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Jun 2025 00:20:16 +0000
+References: <20250625-airoha-sync-for-device-v1-1-923741deaabf@kernel.org>
+In-Reply-To: <20250625-airoha-sync-for-device-v1-1-923741deaabf@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
 
 Hello:
 
-This pull request was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 27 Jun 2025 01:01:10 +0200 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
+On Wed, 25 Jun 2025 16:43:15 +0200 you wrote:
+> Since the page_pool for airoha_eth driver is created with
+> PP_FLAG_DMA_SYNC_DEV flag, we do not need to sync_for_device each page
+> received from the pool since it is already done by the page_pool codebase.
 > 
-> The following pull-request contains BPF updates for your *net-next* tree.
-> 
-> We've added 6 non-merge commits during the last 8 day(s) which contain
-> a total of 6 files changed, 120 insertions(+), 20 deletions(-).
+> Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 SoC")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - pull-request: bpf-next 2025-06-27
-    https://git.kernel.org/netdev/net-next/c/32155c6fd9ec
+  - [net] net: airoha: Get rid of dma_sync_single_for_device() in airoha_qdma_fill_rx_queue()
+    https://git.kernel.org/netdev/net-next/c/4cd9d227ab83
 
 You are awesome, thank you!
 -- 
