@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-201749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9141AEAE48
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 07:02:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D6DCAEAE50
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 07:05:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6D5D1BC665B
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 05:02:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C4081BC6BB4
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 05:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8C21D63FC;
-	Fri, 27 Jun 2025 05:02:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F6271DB95E;
+	Fri, 27 Jun 2025 05:05:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ycItnuI8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S3y1Ge8e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C5C13AA2F
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 05:01:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4941D63FC
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 05:05:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751000520; cv=none; b=F5dWSzS2if71XznJcpIhO5D+1SWFDz4d/LwSLBTOoyEu0HP55JbTlJq+ClEU5SMNf12vUB09yXi2JV8FoySbLErILK+RSpAjsrNwM7ospVp4a023aQKwJURMAV44WOXnnbsiEaAn/TbZrPW9mgPwmsLyJypj5dbPgxZD6YPiZ7U=
+	t=1751000742; cv=none; b=KZGX7xsjGEiK8vf9x1Bmbpfs+sDHSSe1bZBSlT2IjivAhvgLuzfh5R5g7eJjm5BRYVTmeSi+d+dF1z0glpLI4B+f002Mx3UTYHO0ovzNBwZvaAzw43oOSe+mwWEYCQ7klnKQ2awkzpFgHsgoAAnZZ+7Qsgwq290Z1Gx9v5zphzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751000520; c=relaxed/simple;
-	bh=Z3FbewX8QlK07rvYN/BaaHNV4fDQCo+Jqv86OpCEw0A=;
+	s=arc-20240116; t=1751000742; c=relaxed/simple;
+	bh=uIye7ffYxRe1aj/nL4Kj9OwVydMQ9C81AyEC1pdrgBo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cwL+Bkmpw7HL/NsX8jkz3sy7+bTyjqBShcSjDlMEfQG2kWYwOWVmub5x1xlcszdlQy7exIvxoBHYJjKrD2x6mBul9NdtZPDgHwnTtB0v/+XcUeCPgDfERGK3/6jDhai2AkoDS66nDQY2tmseyBdDg7B43B/L41sa7veezHBxB6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ycItnuI8; arc=none smtp.client-ip=209.85.167.48
+	 To:Cc:Content-Type; b=NEhY7PFACq+ygzjm31dhYItruqPs1q+7+OHuAe0vt8bzO0VAbvL9pg3jLjunkXhcvruWxzXs0KkuwbGqn3buUPxewsLjKxnEnHfnaN1aHZG9a7VWQVHUEJHgi8Kxwc/plbxVjwMgyE3hYHiXJ0eK9qAtlx8aNyJitvHlcx2Adg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S3y1Ge8e; arc=none smtp.client-ip=209.85.167.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-553bcf41440so1809607e87.3
-        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 22:01:58 -0700 (PDT)
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-555024588b0so1648758e87.3
+        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 22:05:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751000517; x=1751605317; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1751000738; x=1751605538; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UKjKjCy0SRZNvK1D86lVvJiAl2KlWhOCZZnxJO+0yho=;
-        b=ycItnuI8URYG91Se8BXra7inKvQwORHBopONHzSvQhjQvShydgUXO7yz9HNR49ktNy
-         p5PR/c+rqxVPNtrt2kYLyqXyhAfvvFUUKvPJRULSR14P1oAzE4NJUTRBsnJAZCFrVO7s
-         moRbCvV6U04rTTyDGSJ8H2RoctY3Bkrs40FLs3r3KTS0afnav4YQMRpvW/yDJd8/5+Mu
-         9G8WRYXy4oAqVq9QWCcefxSUYB2+PQu2/AqnL6+804ovy/b1TNQ58MjPa0GRBdIucYjy
-         QBHOgTU5KAtTTHNDYain7WRACfZ5lo6/Rxd2IBKzva/l2EEkL+yf9CTIh94rs50SsQyb
-         tIKQ==
+        bh=Tf9/SME+Lnr+OxDNQZdzbpnAWX5mL997K/xhcs2nDIk=;
+        b=S3y1Ge8eIVzoqoRFv9Wdkc4tPK6QQcNer/tvvce2skvuLdap9HKwpQruuIcRJKmqQk
+         cYljQgH2WNJs8NmyeDlBmFMtqtC6XvsmdrGofwkPQjW4nwSq4jhabPqzEBA3F7KbMoe9
+         9FuNeoD/hkH2lAJD4mgLfiYrptF5AzUabc3dRcZ7gASc780trAZbZkEzUp7kaqR+ZBhX
+         IV26GYgaNgypSXlmv2+eEAXwgTdyUIW5dirSQRxktv9bWfUrmWq+Tc49IHN6pK+xc9s7
+         Qw2cqJceGiFWGl7ddEynMgpO8DjwkJYPYA2uEC5AtFFsIEVL/umXKTjxN8pdpeg/xNLd
+         2J3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751000517; x=1751605317;
+        d=1e100.net; s=20230601; t=1751000738; x=1751605538;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UKjKjCy0SRZNvK1D86lVvJiAl2KlWhOCZZnxJO+0yho=;
-        b=tvvwAzwtl1Q2wRjGyORO5yn0grylWoFCbFlsxu2xzhiNJyaYSfXYr7wlEVg9RIXhRj
-         gKnOqVe+ySy7QNzW0USJHi/zg7jAkUqwdberuYzf/x8jVVKlOtvbsPBBnheyiDdVoEqk
-         7SnVZtXRY6fYvnbNyO1QmsIRxOmAhYW1kIVSoSMcMJD+c4hi5JaGeFQz3oBdJm1CyMgW
-         Eg0FrYEWZgbGA13EiuPIk8Usjz3MEV5dTknUGar/f94I+Zwk0jResdgAf97afegg7vA3
-         kEmF4PZLk/s95X2A8oVVPKCXZj6xyni8vFgJd6aJUTne0S+ejYkMUVPS+AsPX7QVU1NS
-         G49g==
-X-Forwarded-Encrypted: i=1; AJvYcCW92ugylVNYh5yyIfvpBJrJq4SPHfPsJca9tQhDOsxfIo1YLN1MpADKP28BaOSSyRzTh+6y9w8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxnxr3jJ3moD9HsrmxM5h2Fep7w3Kvkbar9c56aTRSul7X8jAwm
-	hBsdjCtYYBZgEWqthnHKbDn2mS1OcolQ9ICmltzlEk1sbnli0f3z58YU2ZQwMYMfNwHY4yP1kD/
-	v02WABqhxhtJ5ECakuhWCVDRkjGHJIrJ6NwIvlBg=
-X-Gm-Gg: ASbGnctJEqFcfaW38xAnqBW5xrFuK65mA2fuUa3bsp1h1faKkVX5psJ3m+owcJCPpFb
-	OlIC3lxA+Hg0stWPWHv2w6lM8+sfoBMgTxtZTOa8wXTUMcANCsqtXyBbyHSQKiX/oI1/r6gkit5
-	NxCd+2/f706LxeQKxB8lV6tA/ix3ET7ErkKqzl07NdB3bt/ahPEmTCtHUEjwy6PU/k4yPXQNee
-X-Google-Smtp-Source: AGHT+IEHs6nVqj1swP5DaPQYt5yJHxac9/Yjg4QyXlE/hTdB/XiNJ3W195Tx8y86sMh3C+YAwIxMBcQtnjr556e4AJE=
-X-Received: by 2002:a05:6512:220d:b0:553:65bc:4232 with SMTP id
- 2adb3069b0e04-5550b9edf7fmr701066e87.31.1751000516969; Thu, 26 Jun 2025
- 22:01:56 -0700 (PDT)
+        bh=Tf9/SME+Lnr+OxDNQZdzbpnAWX5mL997K/xhcs2nDIk=;
+        b=hJjsd3FhgHvNhl/uvmM2RF/IiHG3tzD/btLB6gUP1jL06lV5VlZ6mIRXK7fzzkIEv4
+         yHK28kymK6NicIywMgaeJV2tj7e3IzHECfbfXFfGuSAlXVzfaNw84XM6JakkidehRr7K
+         MukcX/ismu0pCsgxOXOvvySQPp1ykNoz+XG36bMnUwrMheBjJVeDHJeTpJHXfNvLaq/3
+         DrhplTE1kHt5YBjnvH4yzO5K0M4Rge46QvSVfYVNz8BD3wZ72drD0pRHqcXb7BVwQj17
+         rIE0xMd2JSQTioLlhQq+z+fsTWD3Q7y0Q9Gf1Q2+58o3lT5YeHOonmtY+rwQenhvAyqP
+         sDQw==
+X-Forwarded-Encrypted: i=1; AJvYcCUoh9fPsQa9haf+xduOiEyemSffiIq5JZLLsa79kFKJbRcsZCnDWKOvgc6oFdPsfAfG2ghY8LI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlL/FGYv6JujsT5x02eWQvTGL9lZb59T5P4xbRujcBuaX8tJqj
+	9IXk/Dosq63ONpvwVagmEnXdkG69UUIory4hK1eMJl4KNoLhNtvU+ZAQbIfM9L+v0ZlccSAFeT3
+	Fz7SRtmyTze+hlr8CiOxz5M7hBNdvdxMWzEmJReU=
+X-Gm-Gg: ASbGncscwjjZAoCb0qDfKNLnN849wp2J0UJHa2CSpSNxeEoe+D3qxP7S1Ey/iBN6g7k
+	HOUsMV2PSwo8V396NFfzdvGv5+7hnHfSAQbxGm+13RKuw9RHbhsBwLSIVhnavqk5XqxG7YYEtEP
+	/BL5wHL//ggEJDpd0DtR3x0s5eUhqeyRgz+xRTb36nfvqet+V2Zt5GOUizOR1K33H/Qsmxfy5a
+X-Google-Smtp-Source: AGHT+IHxMdjZLi5zdWFPxgNJl3H+FXj+B0DtRSD7w9LvBGgi4rorsxPqXascidhMd5oHNu9DiJmvCC4It4bH59cyZ48=
+X-Received: by 2002:a05:6512:3053:b0:553:a490:fee0 with SMTP id
+ 2adb3069b0e04-5550b7ea031mr633573e87.10.1751000738369; Thu, 26 Jun 2025
+ 22:05:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250625182951.587377878@linutronix.de> <20250625183758.317946543@linutronix.de>
-In-Reply-To: <20250625183758.317946543@linutronix.de>
+References: <20250625182951.587377878@linutronix.de> <20250625183758.382451331@linutronix.de>
+In-Reply-To: <20250625183758.382451331@linutronix.de>
 From: John Stultz <jstultz@google.com>
-Date: Thu, 26 Jun 2025 22:01:45 -0700
-X-Gm-Features: Ac12FXzsDWO6JYo14Vvw0pilvx6WlxJJ95tYAxaKnJ44M0hc4eUPKeoJOV22TSU
-Message-ID: <CANDhNCoNCdJoC6X1yz+EHC5dp4+nJ11vnDj_s2Vp5=oHfxXnhw@mail.gmail.com>
-Subject: Re: [patch V3 09/11] timekeeping: Provide adjtimex() for auxiliary clocks
+Date: Thu, 26 Jun 2025 22:05:26 -0700
+X-Gm-Features: Ac12FXw9hjSNp0HR-ZscbMYiCPvydKhabPLUOL7jmSTHRCYJFisVMbyHu9-jLKU
+Message-ID: <CANDhNCoduoTdzN0v59fnJjndu9cOYkSLZg8Sb_csnNx6CaOOJA@mail.gmail.com>
+Subject: Re: [patch V3 10/11] timekeeping: Provide update for auxiliary timekeepers
 To: Thomas Gleixner <tglx@linutronix.de>
 Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
 	Richard Cochran <richardcochran@gmail.com>, Christopher Hall <christopher.s.hall@intel.com>, 
@@ -96,18 +96,42 @@ Content-Transfer-Encoding: quoted-printable
 On Wed, Jun 25, 2025 at 11:38=E2=80=AFAM Thomas Gleixner <tglx@linutronix.d=
 e> wrote:
 >
-> The behaviour is close to clock_adtime(CLOCK_REALTIME) with the
-> following differences:
->
->   1) ADJ_SETOFFSET adjusts the auxiliary clock offset
->
->   2) ADJ_TAI is not supported
->
->   3) Leap seconds are not supported
->
->   4) PPS is not supported
+> Update the auxiliary timekeepers periodically. For now this is tied to th=
+e system
+> timekeeper update from the tick. This might be revisited and moved out of=
+ the tick.
 >
 > Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> ---
+>  kernel/time/timekeeping.c |   18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+> ---
+>
+> --- a/kernel/time/timekeeping.c
+> +++ b/kernel/time/timekeeping.c
+> @@ -2762,6 +2766,20 @@ static void tk_aux_update_clocksource(vo
+>         }
+>  }
+>
+> +static void tk_aux_advance(void)
+> +{
+> +       unsigned long active =3D READ_ONCE(aux_timekeepers);
+> +       unsigned int id;
+> +
+> +       for_each_set_bit(id, &active, BITS_PER_LONG) {
+> +               struct tk_data *tkd =3D &timekeeper_data[id + TIMEKEEPER_=
+AUX_FIRST];
 
+Again, a nit, but I'd use aux_tkd or something just to be super clear
+we're using aux ones here.
+
+> +
+> +               guard(raw_spinlock)(&tkd->lock);
+> +               if (tkd->shadow_timekeeper.clock_valid)
+> +                       __timekeeping_advance(tkd, TK_ADV_TICK);
+> +       }
+> +}
+
+Otherwise,
 Acked-by: John Stultz <jstultz@google.com>
 
