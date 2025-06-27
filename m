@@ -1,96 +1,132 @@
-Return-Path: <netdev+bounces-202068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3CF5AEC293
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 00:19:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C25CFAEC29C
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 00:29:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C58766E697C
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 22:19:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64B921C450FF
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 22:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E3D928D8C2;
-	Fri, 27 Jun 2025 22:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7BD28F53F;
+	Fri, 27 Jun 2025 22:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TeVBI21d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LWubhjeN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03EF14F9D6;
-	Fri, 27 Jun 2025 22:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 280D028C862
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 22:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751062787; cv=none; b=J4sZ/GMM5O2O4SsqR99cdiwfHCjdD/aQ730UDD1pBwdGNyEDbyo8v/IP37IQrx/KMZ71J3guIqHiJi9u9LPfrhbbVxNRbYJzU5FqJz06Wnds+nnmI61pRajH4YWHLY3Hlwi0/rjPOlWHSAHu8XlSegknnr3BGYZ+opstgVoYUTE=
+	t=1751063376; cv=none; b=jCAwXe2vXyYqDYHyxmyCeTfIT06yRtrpSabsSOaXyRkQJzrk9z/BXIx3h01MHs0TRHX6dZFMzI84bjCqezxopABxC6oFE4jTibvQzfnSuDzXWyOAWIdOkVsWlbtJrnT/Hgqwd0UTUPOI5RUSq7xRzWEARFSHm7GBx8j7M5XIm0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751062787; c=relaxed/simple;
-	bh=N0V4BZdMH/VMOZWlTiUnUi2RLPy+t6c7H7VRP1hkvI4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Pvvg1sA15DdHU1oTEzJOwMD6sVruAtxMD6ctob0Ue/kILa203NJK414/AXfSwq/+EhO79nf5I5Hhv1vdHHqI3gNioRXrp6zZP35AIHanR8BjemgZdFzBGK6o7lwYsFciPN0Ez1LUrZ0azNIDlcLNXatgd5HxbQLFoqQmvTEzReU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TeVBI21d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49578C4CEE3;
-	Fri, 27 Jun 2025 22:19:47 +0000 (UTC)
+	s=arc-20240116; t=1751063376; c=relaxed/simple;
+	bh=Eq68Xvju2V+rYV9nMQRdXpxP5x2zMyXc1jmQ6XOt3Sc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OuejzrgxigWPLlq7F6i75bmWi28x7NN6/bC/xsBYZc2MLUxLSIgbT6PYcR43Q9utFGa4rHhRh2oXgbxX+WLP4pueECfwXa5Y+8/ZtEkhK8xXvB93UZhS+ApMzbQGxS4Gx1bpsuLnX5SvL6UbeIbKSItVx9m2/3Z7ugPDHzXVPjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LWubhjeN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A7FAC4CEE3;
+	Fri, 27 Jun 2025 22:29:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751062787;
-	bh=N0V4BZdMH/VMOZWlTiUnUi2RLPy+t6c7H7VRP1hkvI4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TeVBI21dhl1/DYXVMMVKW2B705RhlpboV6f4DisDbPbjiTsap8ypete8NTP5D4fec
-	 pzvE+wXwp/Xm302YK9sP3ZJ+WAn20UiKglAwi/eAfO5BrBX1YBGe6xbt1NhzUO50fP
-	 p9oIAFBcIk1ONe4Smm4GRmG/id1OvEoRFXKKVw/AZ0YhugVKHL/ub6/5vCzdafl10V
-	 x22tJi6dzPbpsrmbVS5zoGNYtVOq428UeFc705zAGJoG4RCRe7rpUn1pHE/d/jr5oS
-	 /C9aBmRP3RcfHvVR/RB9wYfPBRPdXZgwABvdkXdoZnivnunjpcSOH8rVUjzluDqFtP
-	 cFr1fiazE3ZXA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DA238111CE;
-	Fri, 27 Jun 2025 22:20:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1751063375;
+	bh=Eq68Xvju2V+rYV9nMQRdXpxP5x2zMyXc1jmQ6XOt3Sc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LWubhjeNm0t0ER02U/fS/SFaPZAfR9/KBvIRauwz7EhLw8evAToMmmjnKC16B1eO0
+	 6pOWL9AsbhILuvvgHeOblv5y7QhAFLBlEmd0nT4/ErWBpOhMrvz2Xk4AC1gObXxRpZ
+	 E81TpBaJpHEh+hikHuwh9ppn3Ce3fQV0OxjDyagoLQSgrtaXaoJNn8YsZ7EEo7nEuO
+	 J1oloO6PDemRLkXBU8hw3ucixdMjPTnRtJXUpbq6DRXmZGBHfTojuCvxbzybsisF90
+	 QCQImcMm/L57luyQgsosQ9FP6pIlEg/TK01gfjg5vGIAy7lSeiecoC3lAbD0kjdpDc
+	 5lU3mO1sjKfdQ==
+Date: Fri, 27 Jun 2025 15:29:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Simon Horman
+ <horms@kernel.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2] ip6_tunnel: enable to change proto of fb
+ tunnels
+Message-ID: <20250627152934.6379eefc@kernel.org>
+In-Reply-To: <20250626215919.2825347-1-nicolas.dichtel@6wind.com>
+References: <20250626215919.2825347-1-nicolas.dichtel@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 0/2] NFC: trf7970a: Add option to reduce antenna gain
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175106281324.2076129.2162106005861598496.git-patchwork-notify@kernel.org>
-Date: Fri, 27 Jun 2025 22:20:13 +0000
-References: <20250626141242.3749958-1-paul.geurts@prodrive-technologies.com>
-In-Reply-To: <20250626141242.3749958-1-paul.geurts@prodrive-technologies.com>
-To: Paul Geurts <paul.geurts@prodrive-technologies.com>
-Cc: mgreer@animalcreek.com, krzk@kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- robh@kernel.org, conor+dt@kernel.org, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, martijn.de.gouw@prodrive-technologies.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 26 Jun 2025 23:55:09 +0200 Nicolas Dichtel wrote:
+> I finally checked  all params, let's do this properly (:
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Nice :)
 
-On Thu, 26 Jun 2025 16:12:40 +0200 you wrote:
-> The TRF7970a device is sensitive to RF disturbances, which can make it
-> hard to pass some EMC immunity tests. By reducing the RX antenna gain,
-> the device becomes less sensitive to EMC disturbances, as a trade-off
-> against antenna performance.
-> 
-> Signed-off-by: Paul Geurts <paul.geurts@prodrive-technologies.com>
-> 
-> [...]
+> -static void ip6_tnl0_update(struct ip6_tnl *t, struct __ip6_tnl_parm *p)
+> +static int ip6_tnl0_update(struct ip6_tnl *t, struct __ip6_tnl_parm *p,
+> +			   bool strict)
+>  {
+> -	/* for default tnl0 device allow to change only the proto */
+> +	/* For the default ip6tnl0 device, allow changing only the protocol (the
 
-Here is the summary with links:
-  - [v3,1/2] dt-bindings: net/nfc: ti,trf7970a: Add ti,rx-gain-reduction-db option
-    https://git.kernel.org/netdev/net-next/c/2bee162a28fb
-  - [v3,2/2] NFC: trf7970a: Create device-tree parameter for RX gain reduction
-    https://git.kernel.org/netdev/net-next/c/5d69351820ea
+nit: the "(the" may look better on the next line?
 
-You are awesome, thank you!
+> +	 * IP6_TNL_F_CAP_PER_PACKET flag is set on ip6tnl0, and all other
+> +	 * parameters are 0).
+> +	 */
+> +	if (strict &&
+> +	    (!ipv6_addr_any(&p->laddr) || !ipv6_addr_any(&p->raddr) ||
+> +	     p->flags != t->parms.flags || p->hop_limit || p->encap_limit ||
+> +	     p->flowinfo || p->link || p->fwmark || p->collect_md))
+> +		return -EINVAL;
+> +
+>  	t->parms.proto = p->proto;
+>  	netdev_state_change(t->dev);
+> +	return 0;
+>  }
+>  
+>  static void
+> @@ -1680,7 +1691,7 @@ ip6_tnl_siocdevprivate(struct net_device *dev, struct ifreq *ifr,
+>  			} else
+>  				t = netdev_priv(dev);
+>  			if (dev == ip6n->fb_tnl_dev)
+> -				ip6_tnl0_update(t, &p1);
+> +				ip6_tnl0_update(t, &p1, false);
+>  			else
+>  				ip6_tnl_update(t, &p1);
+>  		}
+> @@ -2053,8 +2064,31 @@ static int ip6_tnl_changelink(struct net_device *dev, struct nlattr *tb[],
+>  	struct ip6_tnl_net *ip6n = net_generic(net, ip6_tnl_net_id);
+>  	struct ip_tunnel_encap ipencap;
+>  
+> -	if (dev == ip6n->fb_tnl_dev)
+> -		return -EINVAL;
+> +	if (dev == ip6n->fb_tnl_dev) {
+> +		struct ip6_tnl *t = netdev_priv(ip6n->fb_tnl_dev);
+
+the compiler complains that t is declared here but not used..
+
+> +
+> +		if (ip_tunnel_netlink_encap_parms(data, &ipencap)) {
+> +			/* iproute2 always sets TUNNEL_ENCAP_FLAG_CSUM6, so
+> +			 * let's ignore this flag.
+> +			 */
+> +			ipencap.flags &= ~TUNNEL_ENCAP_FLAG_CSUM6;
+> +			if (memchr_inv(&ipencap, 0, sizeof(ipencap))) {
+> +				NL_SET_ERR_MSG(extack,
+> +					       "Only protocol can be changed for fallback tunnel, not encap params");
+> +				return -EINVAL;
+> +			}
+> +		}
+> +
+> +		ip6_tnl_netlink_parms(data, &p);
+> +		if (ip6_tnl0_update(netdev_priv(ip6n->fb_tnl_dev), &p,
+
+.. you probably meant to use it here?
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
