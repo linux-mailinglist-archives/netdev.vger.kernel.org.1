@@ -1,119 +1,134 @@
-Return-Path: <netdev+bounces-201865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E547AEB46C
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 12:23:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97013AEB4A4
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 12:29:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC56C1636E0
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 10:23:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63D683B2979
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 10:26:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 870AE29C32C;
-	Fri, 27 Jun 2025 10:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACC5C2DCC10;
+	Fri, 27 Jun 2025 10:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VE8XFQX/"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="k2+CuFGi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8295B299AB1
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 10:19:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D2729A301
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 10:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751019581; cv=none; b=dbfxsCHapxOrvyhEzUuKmfoH2pYLzC5uApnEicPXI4YDIbhNX7v51YAeVd0Y6OE/Fw3nsbpHUNGg2zMhyh6Wa9cnuexspEedoKYhrqQYTG33kYXufbxNbESjefI43ya7pObdFOlcLZp8O1tp2J8GR/bE5+1TLy2X4aiSxz70sqQ=
+	t=1751019754; cv=none; b=RQnjYNtrDmwngmD/JCd2pZNzL9oOh/g8xcWhsQAU5iPhTbdqP66Ru/eMMYA+NyJTJhezOG9PAf7s/37egV2P8wOwrLEz2MFQNuhrwoVTRmFEFRRXckBaMbSDt6lH3jdq13LRROG3knpnWadiqHMcXic+K8IlAUcCcIIU7THiCQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751019581; c=relaxed/simple;
-	bh=VT0SNElymWMyAmHo/BlHqxqUjs2SuhiKv/mBEoBfRe0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oy2i2BkLCz3wDkdGhGGMROSIU8p76PC6L3LR/1QZMg89b8wbgBPePfzXY7IswHTme+zsYGP9iko21mXQUcNJIWwxRNIhte5txq8ZiD5odh/LfqSjDdB/VJ1XWM34dm9z2CYlgf0xVv9BewHW29Dp56XADKzciG6upF9mo4MdKdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VE8XFQX/; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7d2107eb668so321030585a.1
-        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 03:19:39 -0700 (PDT)
+	s=arc-20240116; t=1751019754; c=relaxed/simple;
+	bh=s8ZiiE6pHUvr9gtLMt4WDPecDrQRJim5pyRk8EKuUdg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BquViLc/txWOdPPI/uUCT6zgDsYj9yx8krH2viwjARLWpvytAYg3y9pZcYEPvNynEZ+gvZX4bL3iSfMgQzCNs1V9di60+0YCEE8vRf2Cx+upsEspy2wHKNE8D82n2XOiUa9/TSphX1GAZTXvuA5tZyp2+XbjO+FwFwwtTfhjQEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=k2+CuFGi; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ae0b6532345so581787966b.1
+        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 03:22:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751019578; x=1751624378; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4W27Bdrl+lJBvU0tDOv/G18DYor/BrpM+MFHb+g+6E4=;
-        b=VE8XFQX/75BtcYLSXterYAbvaupMBVdsEtiy+6rsAxuZLiTeV0nA+h9UZlX90WfMKS
-         jYGfCy2Y/zUXLAlaGPtsEWTlIoN/Z+7VB6wDxhc8sKNrvuq4mfX9LvwTmWWirdLOUN3P
-         /vwW63jaJim6e0wCwhWEtamdy/pp0Y1QmuWcEVrxfyMIljRQivBaheScYddXYVQ0wAkl
-         aZ92NcQGLbFuCywwRSJSejXc9VA3fVBWFadwOLFsQiw/s2LFyUZJPb8xC2r+VA/EAwhB
-         4zjI+/Vf06k5/xbZs+Y3GMCNLzsYuCFixAzXhzUcvWxjdE/H+bTwY8N9S2pLDGpmIMj7
-         6QOQ==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1751019750; x=1751624550; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zGUGwnAuhK8MqbgXiShFzJdKHPJL+NaZqgwZsBl0yC4=;
+        b=k2+CuFGi50chqJqdmP1/ruwT3KGhSiLY0i8WUBRnGZr8nKFBbfMRr1mQc1D4zsYxCG
+         ZAoQkKyX1EyJ2F1jKuHCRjUiEuWcLjNd4RUju4/6EPRlhWcvAx0ZzS1feAHOUHjPY2pp
+         rkjL+3txpVJZq48NDVatU0PhMp/x+QaOa5Yt4gPyEtqUAJOXKmnWq/HGQ9Une9i7rx0W
+         ZOiZzpRUi5Pu33mniAA3+oU3LIrSS1rYNsmn1jPqOYpfQDK8ghW8/vidPD7r6awQ7L19
+         2/ifltrdSJWpMCBN3M3thnQoeXv+fSicfKGX46mNDmSily1FrXXeo8whhkrQZ4moZKtY
+         LPjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751019578; x=1751624378;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4W27Bdrl+lJBvU0tDOv/G18DYor/BrpM+MFHb+g+6E4=;
-        b=jhtgQLoCU/c5ElStnm05uynaGOKHdeoViPLQxg209BMB/mTaQ9E1grZEX6G7Y0EPR0
-         moAomUG1Ne60Noznrl3rjKkh2H223Hp3ikHE0AqXj4LMJCNBoJ0iDiYa0ofOUceFbMcj
-         xvpPzkbE3RPktJH77ZqaSC3fnlLvOap59s8PO2aiiUF1g7IpEr0qXk2aczgGHIrLH/bx
-         I9wWH5rWyA6EVrqsvhC5kguqmrfJLiGhPPPP0vVriW/kghkasWjHy4+zAVCJWT2tmvS4
-         cFVw2LZNvtWnBujz6InHRTw8EC41F/iog6aVcI5tBFpnDkE1yBMHUPCEyI9AFRqHZ8sc
-         RNCA==
-X-Forwarded-Encrypted: i=1; AJvYcCW2f6F+4VndK5YsF4InRqedOJZoFGIZrjjmFuW3PZ1ZQ9VdKb/wwaqkzixxet2M1PFzr8tzZHU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyso/lG3tvgZwtSRItaTzfxiayj9B6Lb0U8c0DnlKBPJp37y29u
-	tKbUxEWCWpV1dwE3/dI12xIUNtYclacQZCDKmxeXdaO+W05tE7nUNmWxyVBOYB1wOFNawkEUDTP
-	9JRUt6MniaEDY/oIFFi94BsRqIJW3maMuWdQ8M4fX
-X-Gm-Gg: ASbGncvcW/zuWTZP5x+zGwbDqvvw++RCM8DoF91D/lfUv7M6v4FJAGmHPeIAEtV+QcI
-	5Yjq0tU7bPcY6hhtXeYV7vdJNig8tNLxgJFjW4DBJxjmg8ryWjAGBxSuvFmmX8XOnZOurEICmo6
-	ha/gwDwpOBUMfvZjhNVGyii3uNlQ0XOusg7QMdzMN2Og==
-X-Google-Smtp-Source: AGHT+IGhssF/7OwJw+s/lmqvSRhKlybAUXJRtUQ5h6FWADwBZyzZMTJ8Pf6cmRE/TiIyagH7u4kAOPO7J2gAwcqURbc=
-X-Received: by 2002:a05:620a:3624:b0:7d4:219:50d4 with SMTP id
- af79cd13be357-7d443992b74mr269767885a.34.1751019578183; Fri, 27 Jun 2025
- 03:19:38 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751019750; x=1751624550;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zGUGwnAuhK8MqbgXiShFzJdKHPJL+NaZqgwZsBl0yC4=;
+        b=S88W4sJLeL+BGclJuzYkzL+P4JvLh669zNj/mjUWp2jStcrqccGdunHUfTSaA5GA9u
+         2DlcZEDUWhuaY3TCBWZyM2eYQOud5R5SO9NCzmbaPxYz5m+B1bT2IrZPlcGNblsiQNpW
+         P569kIiboJj78cdW/iheQqmpxbCXzR5LyTbjr/u/Kl4h73uxqwUhT+bn2buN7j51mVES
+         HXKmCEwj/G+zh+SBg+1clhUhR2YlW4GHq5I1BM9niKfAsOGsVB8FP8pCgWj2qlg7WfG3
+         rmt+cjMj0Vdx7NbFd+lYXdJLKbDZByPQpt1YjjSUuOaRtvk4oavXg7wmt+I3YlKMjEfM
+         naQQ==
+X-Gm-Message-State: AOJu0YwN/QQW74RSTA1quMejKAFbXmmEHvGCfujc24Hh/B2itOXjGDwO
+	11pnPBpsFo1ooYKPipLnsYcjYSmhsN1TtC2eFk2EQF1g/Sn/ogoTeQd/UUfFuzIBfTxuZkA/Qex
+	NFj+N
+X-Gm-Gg: ASbGnctM8/e++T4qvM8q4KP8syA733eAa4YdsP8NwV1NjN3epRZY9FTkSgSTpJkzdHn
+	ENEdlu6VUNcBcPOfvoqJUfS9TgIPHoYymEavWW/qypQQu2ohJNiBbYka3/iQmC1kIY5yD6iJyM/
+	fMWL/JiK1yB1Ss6sU9+m4caR6Npv3uODTiYE5nvxoX3xN61hX9pRcpVYzB+utkzDRXCmdH4PPQv
+	M3Q7UpUz1G+f/+RKkAaUHX+rngarHngSyyV9UkNAjiw5DkcQOARo9QAxFyMzLqm123Hzrc3tAUR
+	QRBN/ww7JBCHvTaGrEagH3sDT4P1ZOtPhj57v8do1PJ5MY8G262/oZJzzVZ5YZz7TBb0ZZ14kkc
+	MEYFJWEodwz2uxgfzPqH39ar/gu+x
+X-Google-Smtp-Source: AGHT+IE91OPz08IFTkinkt2AHiqhjKg3XMlDuTR8nwgBpzRrkeW2Al5f9bM+VB6od7e4zbBUhZYi+A==
+X-Received: by 2002:a17:907:7fa2:b0:ad8:959c:c567 with SMTP id a640c23a62f3a-ae35024fe25mr244930366b.10.1751019749860;
+        Fri, 27 Jun 2025 03:22:29 -0700 (PDT)
+Received: from localhost (p200300f65f06ab0400000000000001b9.dip0.t-ipconnect.de. [2003:f6:5f06:ab04::1b9])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-ae353c6bbe3sm97297066b.118.2025.06.27.03.22.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Jun 2025 03:22:29 -0700 (PDT)
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-parisc@vger.kernel.org
+Subject: [PATCH] net: tulip: Rename PCI driver struct to end in _driver
+Date: Fri, 27 Jun 2025 12:22:20 +0200
+Message-ID: <20250627102220.1937649-2-u.kleine-koenig@baylibre.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250627094406.100919-1-yangfeng59949@163.com>
-In-Reply-To: <20250627094406.100919-1-yangfeng59949@163.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 27 Jun 2025 03:19:27 -0700
-X-Gm-Features: Ac12FXw-auM3OX9rpgkyk_nstk8T5gkiOxE7Zr8Bgud1mZDhXjqhjvhmZDAmdJ4
-Message-ID: <CANn89i+JziB6-WTqyK47=Otn8i6jShTz=kzTJbJdJgC0=Kfw6A@mail.gmail.com>
-Subject: Re: [PATCH v2] skbuff: Improve the sending efficiency of __skb_send_sock
-To: Feng Yang <yangfeng59949@163.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	willemb@google.com, almasrymina@google.com, kerneljasonxing@gmail.com, 
-	ebiggers@google.com, asml.silence@gmail.com, aleksander.lobakin@intel.com, 
-	stfomichev@gmail.com, yangfeng@kylinos.cn, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1245; i=u.kleine-koenig@baylibre.com; h=from:subject; bh=s8ZiiE6pHUvr9gtLMt4WDPecDrQRJim5pyRk8EKuUdg=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBoXnDcMjJBYg5gCFIS22jS0XuNYbfDlnIdAovsd FAxr2zVZF6JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCaF5w3AAKCRCPgPtYfRL+ Tu71B/47n29FL5xDhs0JB0Z6fwiwT6cSBmwA2DKeJN9JTAO52f4BOIn/xG+k4CIL8PDVS1jewQX 4ZxGCTR3gdGmxIUMjPA1XYuao+NRl2J2wHaWPUXh0/QhWIoC1gBaEDKRB+2KR8FYgZLJQbyLxo4 8MCW8ANovTUBEcTQEo2S2/l2PAx6+1Y17ac7WaI7nO6LYBfW5HIm1ki2daioIztAakncfJt6nxT Mi+Np+FwiAY5bFaQ7f7sI09Kjrpe0wdyICVHxk2CvqWGzluN+orNZ+I22mEFD3I5/8EdZ18wY3I 8TD4cWzg4NwQCuxzJP/jpuKey+yk1efSdCTNRW8sjpPc9Gmr
+X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jun 27, 2025 at 2:44=E2=80=AFAM Feng Yang <yangfeng59949@163.com> w=
-rote:
->
-> From: Feng Yang <yangfeng@kylinos.cn>
->
-> By aggregating skb data into a bvec array for transmission, when using so=
-ckmap to forward large packets,
-> what previously required multiple transmissions now only needs a single t=
-ransmission, which significantly enhances performance.
-> For small packets, the performance remains comparable to the original lev=
-el.
->
-> When using sockmap for forwarding, the average latency for different pack=
-et sizes
-> after sending 10,000 packets is as follows:
-> size    old(us)         new(us)
-> 512     56              55
-> 1472    58              58
-> 1600    106             79
-> 3000    145             108
-> 5000    182             123
->
-> Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
+This is not only a cosmetic change because the section mismatch checks
+also depend on the name and for drivers the checks are stricter than for
+ops.
 
-Instead of changing everything, have you tried strategically adding
-MSG_MORE in this function ?
+However xircom_driver also passes the stricter checks just fine, so no
+further changes needed.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
+---
+ drivers/net/ethernet/dec/tulip/xircom_cb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/dec/tulip/xircom_cb.c b/drivers/net/ethernet/dec/tulip/xircom_cb.c
+index 8759f9f76b62..e5d2ede13845 100644
+--- a/drivers/net/ethernet/dec/tulip/xircom_cb.c
++++ b/drivers/net/ethernet/dec/tulip/xircom_cb.c
+@@ -143,7 +143,7 @@ static const struct pci_device_id xircom_pci_table[] = {
+ };
+ MODULE_DEVICE_TABLE(pci, xircom_pci_table);
+ 
+-static struct pci_driver xircom_ops = {
++static struct pci_driver xircom_driver = {
+ 	.name		= "xircom_cb",
+ 	.id_table	= xircom_pci_table,
+ 	.probe		= xircom_probe,
+@@ -1169,4 +1169,4 @@ investigate_write_descriptor(struct net_device *dev,
+ 	}
+ }
+ 
+-module_pci_driver(xircom_ops);
++module_pci_driver(xircom_driver);
+
+base-commit: e04c78d86a9699d136910cfc0bdcf01087e3267e
+-- 
+2.49.0
+
 
