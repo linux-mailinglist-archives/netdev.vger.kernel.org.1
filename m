@@ -1,98 +1,132 @@
-Return-Path: <netdev+bounces-201712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22E82AEABF2
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 02:49:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CB43AEABF7
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 02:50:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8899816AAD7
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 00:49:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CED04176CE5
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 00:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEE4C70830;
-	Fri, 27 Jun 2025 00:49:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 741182F1FE6;
+	Fri, 27 Jun 2025 00:49:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JhD6dYEI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hv7Tq2ce"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF5B45C14;
-	Fri, 27 Jun 2025 00:49:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1ECF219E8
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 00:49:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750985347; cv=none; b=d3gwNWcGKI5XccS6QpJtH6Xw+LfrlCmbpi3UI38yT5PWOP+GDk5KEMnFkCyE2t26AtmQunsoevcn1oDcln3E7MBwGIN0wPDJEO7ioKMYs3OrVtaJRgouBZoFnJiA7leryANGivYGLxwMWbW3FDyIQVVD1ZAhvpJjwF/tTYHIoW4=
+	t=1750985389; cv=none; b=g1pvvZpYQfADVKzvBv+cD9yYO3e0KGjMf+XnKVozXLElc5llkdLsg5VNuQwrZlIIWgtxRL4I8d4J1iralaoLEfWhbkKAgYLicUneajzpktMfUDuDeyUCWF1b2h681uZtrDbIoyF/CzcgNfVrZ6ctt6pPw9U3cX0cW7LNNxFLass=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750985347; c=relaxed/simple;
-	bh=EpqjtPVGt04E7RcuSotMKejW6u3yq2ucjguads+7u2c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nLsYnD9UNPoKMcXiNt7GqQAb0Ia8sg0tMlk1LIJ1/cC5+vs+aHfROJ3Jw5zH49xHOnI+fg7nd+qc0Zjz8ogvVEZbQgGskjDZfZbxJS+O+gktSW7BAuodrncKy1cVdnB8at1zzI+mKdRPsJa8Gwcg35ebbuJzJkOTWYHiaMiFPhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JhD6dYEI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90785C4CEEB;
-	Fri, 27 Jun 2025 00:49:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750985347;
-	bh=EpqjtPVGt04E7RcuSotMKejW6u3yq2ucjguads+7u2c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JhD6dYEItqr1kEqwbDypImWuwC6DkC//2HpSf/hgwxLYbnhR8EuQdDrRcs9QYZXpL
-	 NCOk1Ui6TH1oeylieGVA0AaZpYjG06vWKOUgNQYb5uPEjlAhA4GaIVVVh5MvTCgWbS
-	 PmG7wnTnV/4the3QfpV471XKmIZ33YZPjwtHfKr0QMean7TulHtheSS+nwRf/gMP0g
-	 VF0THNST7vk0sxscSP/ClnJp5iBAwWIGfVjP/PV/8anoSyJdkah3YyVbeuERLiNIRJ
-	 M1452yPuJMakT9SvZoHdVGPZV37wH7NBQp6QlZYsNsJ44lwYi+mpihmoggrA0c7Uie
-	 N+XC/kOPDkhFA==
-Date: Thu, 26 Jun 2025 17:49:04 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Byungchul Park <byungchul@sk.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, kernel_team@skhynix.com,
- almasrymina@google.com, ilias.apalodimas@linaro.org, harry.yoo@oracle.com,
- hawk@kernel.org, akpm@linux-foundation.org, davem@davemloft.net,
- john.fastabend@gmail.com, andrew+netdev@lunn.ch, asml.silence@gmail.com,
- toke@redhat.com, tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
- saeedm@nvidia.com, leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
- vbabka@suse.cz, rppt@kernel.org, surenb@google.com, mhocko@suse.com,
- horms@kernel.org, linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
- vishal.moola@gmail.com, hannes@cmpxchg.org, ziy@nvidia.com,
- jackmanb@google.com
-Subject: Re: [PATCH net-next v7 1/7] netmem: introduce struct netmem_desc
- mirroring struct page
-Message-ID: <20250626174904.4a6125c9@kernel.org>
-In-Reply-To: <20250625043350.7939-2-byungchul@sk.com>
-References: <20250625043350.7939-1-byungchul@sk.com>
-	<20250625043350.7939-2-byungchul@sk.com>
+	s=arc-20240116; t=1750985389; c=relaxed/simple;
+	bh=t9GzxriHItaYufrE46NVicjlDRSBAeoAcSwvCMiIbH4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rFYEc53fIetHmkc20ldpmL6m/+W4t8AgKzThz/ANUKnpK8wdDrowTcc1irFZ14b1pcGfpv9DSdNhc8BEc9h3y+zHnfOYs/CYQnVDxcGGsAc8+ZlHgG52PLrAiehjM44vIvHU1SH+ANH7kFCBNUxVkbo6CsTGOlW6FMc2HE7bTLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hv7Tq2ce; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-313bb9b2f5bso1823424a91.3
+        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 17:49:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750985387; x=1751590187; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aUS5s+FmIVOfinc0Mjca8HRs8d3I6dW0KrMZu0JgTXk=;
+        b=Hv7Tq2cenGeScn7Mkklb3fBuBej7m8X00CdgvEvZGvmWy7Iv5HHEd79MOSycSUGJLF
+         UOVhLVnMX2uh4YNVtZ4My7qlb7DrOvpGsm8R9trP3XxgWovlNhN8gIa62K/tgSzpZSmG
+         Nz+TE5saafeM0pXxnEaMDYMf0Wo+r9HgklX5JULSXud9TLA8PoYRWryP3eb0weHuQ/H3
+         DIioM9pPOL3do+LjqTEP39K9WaQi03+V9mX4So4rn/3Eqj7K8LzUK+phn0IP0BhsYt35
+         A6EjZQb+G2u4JKd5vSwMFG2nLQovnhodbdkJVGF2m4DuZT/hljD8omGiO27B4fQd9n+3
+         ggDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750985387; x=1751590187;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aUS5s+FmIVOfinc0Mjca8HRs8d3I6dW0KrMZu0JgTXk=;
+        b=ISdPYsPpxQN/qgX4ZJxKS3vSspQhQ42nLfRzse2bCz9XGxlJJSTbQUUB26ldpWR5gw
+         lhs4R5urKAVXo12QDhO+HFZZ8geoTqsT2PWZIMqdlEwW9fRE1kbvoC6POGuQROTokApg
+         EWbsmFqJ8Bh+iNmEmtE1/P957Sb+h5FGg90ht6+YTsC6qaxJzs7jt+66CgPL60QiN9mu
+         0ulhrj/6NyIqn58HNgl/hJeNLOsT0ISa9QMgxzBIh3NFI1OFm/2qdet3YSaTZu7XPwB1
+         LW1/0FMN1rRXivMFBPH7KSv+r61CB/yn2FTYdQkgOwa3K/2tl/r7R68IMr2BqIeRVr+g
+         D55A==
+X-Forwarded-Encrypted: i=1; AJvYcCXaq5GMfFM+HLYC95EaiFR2ooT2c0UaRzeqv2XaLYMLlG6EvuCNrpDev+BMOJap8426UWLdJS4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbzsvFfkn8XhtmcROltTFf4Ii6q4NhzVuntzY89mpnSqvbMnHC
+	M055WCHlPBcbQ89TuO+QHv4QZBbRmJTgBX/6gTT/KRtoAJHm630A+wHBAk4GRuCD4nFt5DvG37Z
+	LOe09lTXc+J6hyE4uCHY52wZ9hbDuuBzSPpFryamJ
+X-Gm-Gg: ASbGncsk4CBNAAnU0ddbL2Irvf4ffGzr77Q7VwMG6KuHXFyBIp8lRtKXbQ4vVOKgQn3
+	e3eNJQ6Eelna4kboa0Coox8t8LiGnkIjkgH1vH9wBiCupgFfzd1Uc5kbFbrvvTsX0juanfNJIpq
+	hagtk3yrY4Ssd/YEcdH+wC11qbaGIYhzphIw3kq7Q07trLwByO5kQbgY68agIFpd8GLhAUu6eEY
+	3FH
+X-Google-Smtp-Source: AGHT+IEOSiNmZypnJfKZ76MuBP2z1p5J63JUg/XT6kp8Ckdj5f9demlFC0iYLsVSiFJR1y06q1lAK89qsFChtoixhc4=
+X-Received: by 2002:a17:90b:384c:b0:312:959:dc3c with SMTP id
+ 98e67ed59e1d1-318c8fef406mr1573686a91.10.1750985387097; Thu, 26 Jun 2025
+ 17:49:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250624202616.526600-1-kuni1840@gmail.com> <6c33dd3e-373a-41b3-b67a-1b89ce1ab1b5@redhat.com>
+In-Reply-To: <6c33dd3e-373a-41b3-b67a-1b89ce1ab1b5@redhat.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Thu, 26 Jun 2025 17:49:35 -0700
+X-Gm-Features: Ac12FXzEPvkH5Um9N4GGbaWRTbQL6jULHxR80kaTO52nyps2QBHIy6nzH97I5bU
+Message-ID: <CAAVpQUAT8gs10P9DbwfMNZu2xyzEChgMPMFzO9VKdDJT2oPcrw@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 00/15] ipv6: Drop RTNL from mcast.c and anycast.c
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 25 Jun 2025 13:33:44 +0900 Byungchul Park wrote:
-> +/* A memory descriptor representing abstract networking I/O vectors,
-> + * generally for non-pages memory that doesn't have its corresponding
-> + * struct page and needs to be explicitly allocated through slab.
+On Thu, Jun 26, 2025 at 6:27=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On 6/24/25 10:24 PM, Kuniyuki Iwashima wrote:
+> > From: Kuniyuki Iwashima <kuniyu@google.com>
+> >
+> > This is a prep series for RCU conversion of RTM_NEWNEIGH, which needs
+> > RTNL during neigh_table.{pconstructor,pdestructor}() touching IPv6
+> > multicast code.
+> >
+> > Currently, IPv6 multicast code is protected by lock_sock() and
+> > inet6_dev->mc_lock, and RTNL is not actually needed.
+> >
+> > In addition, anycast code is also in the same situation and does not
+> > need RTNL at all.
+> >
+> > This series removes RTNL from net/ipv6/{mcast.c,anycast.c} and finally
+> > removes setsockopt_needs_rtnl() from do_ipv6_setsockopt().
+>
+> I went through the whole series I could not find any obvious bug.
+>
+> Still this is not trivial matter and I recently missed bugs in similar
+> changes, so let me keep the series in PW for a little longer, just in
+> case some other pair of eyes would go over it ;)
 
-I still don't get what your final object set is going to be.
+Thank you Paolo!
 
-We have 
- - CPU-readable buffers (struct page)
- - un-readable buffers (struct net_iov)
- - abstract reference which can be a pointer to either of the
-   above two (bitwise netmem_ref)
+>
+> BTW @Kuniyuki: do you have a somewhat public todo list that others could
+> peek at to join this effort?
 
-You say you want to evacuate page pool state from struct page
-so I'd expect you to add a type which can always be fed into
-some form of $type_to_virt(). A type which can always be cast
-to net_iov, but not vice versa. So why are you putting things
-inside net_iov, not outside.
+I  don't have a public one now, but I can create a public repo on GitHub
+and fill the Issues tab as the todo list.  Do you have any ideas ?
 
-> + * net_iovs are allocated and used by networking code, and the size of
-> + * the chunk is PAGE_SIZE.
 
-FWIW not for long. Patches to make the size of net_iov configurable 
-are in progress.
+>
+> Thanks!
+>
+> Paolo
+>
 
