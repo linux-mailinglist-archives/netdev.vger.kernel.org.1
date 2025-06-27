@@ -1,89 +1,100 @@
-Return-Path: <netdev+bounces-201845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8CDFAEB2A6
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 11:21:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F2080AEB2C4
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 11:24:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EA251882DB8
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 09:19:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA90A189FE4C
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 09:21:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D41C2C08CB;
-	Fri, 27 Jun 2025 09:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 234322951D3;
+	Fri, 27 Jun 2025 09:19:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qgwWRWVD"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425EB298CD7;
-	Fri, 27 Jun 2025 09:13:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC322737F9;
+	Fri, 27 Jun 2025 09:19:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751015631; cv=none; b=YCly6GbnJpehQSRnpBuacRUBEQzNwCF7u4wF98YpOH3OBm2WB2vQhCSwo+T8qq3DIcpYPsH0b+hcM8keNkFBDgeh+S1Yv3a7jzGiq3npg+ex6BU7N6l6+XrDDBtUNexQ40OU0Y3eBF1a5N5Bj0xUWVuepcqRQeWriEBuU5WX+Ik=
+	t=1751015989; cv=none; b=Ge/ZfoiaFhHK+gEqsSzS3x27dynb4rzg+psD8imPa0L3MHsPrGzFSlDKHqvYZKUuDZyGE0R8sqRv2aaykBYZYys4qn9mfbIHvgeKM0ebVYQL69H414LYIul+CcVN0KwYMKE0gnLn79xlvliK0Ubsgd3Yut6ox51Vk3LcdYvsH1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751015631; c=relaxed/simple;
-	bh=AQcoq2qZxJEuezCfVgUpMT9Nvr0nzks5AnC9mJN0jmA=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Sq02XPkjIZdDd2Q31fnRD83jTZaqehNLXmkmzVC4hAUDizhcN91hixiF72KFK8642IjmRHZB0whusVx8fkbR5zcIX3HclHNw3+MqF1JrQ8UUnImH0fzxpqn0B21Qv1wn2omGwso08mgqKszflS+2/fo0Orn1NXH73Ie/Tj0Kyyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bT8tQ2TP6z6L5LH;
-	Fri, 27 Jun 2025 17:11:10 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 58D3D140417;
-	Fri, 27 Jun 2025 17:13:48 +0800 (CST)
-Received: from localhost (10.48.153.213) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 27 Jun
- 2025 11:13:47 +0200
-Date: Fri, 27 Jun 2025 10:13:45 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: <alejandro.lucero-palau@amd.com>
-CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>, Zhi Wang
-	<zhiw@nvidia.com>, Ben Cheatham <benjamin.cheatham@amd.com>
-Subject: Re: [PATCH v17 16/22] cxl/region: Factor out interleave ways setup
-Message-ID: <20250627101345.00002524@huawei.com>
-In-Reply-To: <20250624141355.269056-17-alejandro.lucero-palau@amd.com>
-References: <20250624141355.269056-1-alejandro.lucero-palau@amd.com>
-	<20250624141355.269056-17-alejandro.lucero-palau@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1751015989; c=relaxed/simple;
+	bh=HHy2Pg+UE5KBn+wjLN9AO5SYJKUua6er5GUgihVjtY4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=max/m8ziC9A3d9jx/CyQwCll8zOWriApFwYuEroBoMOQL2k+hTjUJN4INhnTnwbBX2PqDNhKLYaMA0ea0byB0snbxRTFSu+JiJVUUKAPp2zZExrSCVfqOO9RH403LP7NTFqcruiXwEHX/5DEx/75bEIOl93oQuZ9KO/Jp4mr+1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qgwWRWVD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62638C4CEE3;
+	Fri, 27 Jun 2025 09:19:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751015988;
+	bh=HHy2Pg+UE5KBn+wjLN9AO5SYJKUua6er5GUgihVjtY4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qgwWRWVDVhheB5BxvJvnEp840lhClu6AanuM19OkKHyd4M8Rj+dIQUAFUIRZbtspo
+	 KEgMosl1lEYvSgC8oGl6vbbS4TT8uRfasoJ4hmTQ/De9vfoJjANzB+XrJsZ66D+npY
+	 DdD7dju4WW9F7g3C3uz190GZUYUN/pUDRdHLiJqfnugJ1itua3DtAAaLE8tBSYV2/k
+	 Y8xsDxWVIzScNMTFem9akqq09JRpU4OOMIGUuCcsf0BwJftyaRo4LKkJNXvz7M5VVN
+	 XZxDmwVX1NzsktqiQ+ycP5FFNbKcYUopm2mwBCvd4HwNCMSwFruaE21r/nQfum2iGN
+	 SwpgboaZwRO9A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCB73A40FD5;
+	Fri, 27 Jun 2025 09:20:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next PATCH v2 1/2] dt-bindings: net: Document support for
+ Airoha
+ AN7583 MDIO Controller
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175101601424.1850068.15093063500117944287.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Jun 2025 09:20:14 +0000
+References: <20250617091655.10832-1-ansuelsmth@gmail.com>
+In-Reply-To: <20250617091655.10832-1-ansuelsmth@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ p.zabel@pengutronix.de, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Tue, 24 Jun 2025 15:13:49 +0100
-<alejandro.lucero-palau@amd.com> wrote:
+Hello:
 
-> From: Alejandro Lucero <alucerop@amd.com>
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Tue, 17 Jun 2025 11:16:52 +0200 you wrote:
+> Airoha AN7583 SoC have 3 different MDIO Controller. One comes from
+> the intergated Switch based on MT7530. The other 2 live under the SCU
+> register and expose 2 dedicated MDIO controller.
 > 
-> Region creation based on Type3 devices is triggered from user space
-> allowing memory combination through interleaving.
+> Document the schema for the 2 dedicated MDIO controller.
+> Each MDIO controller can be independently reset with the SoC reset line.
+> Each MDIO controller have a dedicated clock configured to 2.5MHz by
+> default to follow MDIO bus IEEE 802.3 standard.
 > 
-> In preparation for kernel driven region creation, that is Type2 drivers
-> triggering region creation backed with its advertised CXL memory, factor
-> out a common helper from the user-sysfs region setup for interleave ways.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Zhi Wang <zhiw@nvidia.com>
-> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
-As a heads up, this code changes a fair bit in Dan's ACQUIRE() series
-that may well land before this.  Dave can ask for whatever resolution he
-wants when we get to that stage!
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2,1/2] dt-bindings: net: Document support for Airoha AN7583 MDIO Controller
+    https://git.kernel.org/netdev/net-next/c/a6ee35bd1fe0
+  - [net-next,v2,2/2] net: mdio: Add MDIO bus controller for Airoha AN7583
+    https://git.kernel.org/netdev/net-next/c/67e3ba978361
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
