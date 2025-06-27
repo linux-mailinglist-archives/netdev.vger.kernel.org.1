@@ -1,117 +1,185 @@
-Return-Path: <netdev+bounces-201894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 189FAAEB5EC
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 13:08:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00B86AEB56F
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 12:52:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A00883BDD9D
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 11:08:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEC211BC3E84
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 10:52:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F9262DD5F5;
-	Fri, 27 Jun 2025 11:05:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698A0298CAB;
+	Fri, 27 Jun 2025 10:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TEI97BOK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bt9nFbfp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7B42DBF65;
-	Fri, 27 Jun 2025 11:05:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88F81DDC1E
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 10:51:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751022306; cv=none; b=ApuS4t0GWhzWnjJTcd3VakdHxXDe8NxzXyCn1wXxSRDB8piqfuOvohRyE5xQorypEG4HSeChcqVfFETklE+nZn6t0TQ59TIYX9fFyyci2TNzEoMRpdGXU0WfZoVu7j1tYpW1+16otC4xjsj8fHQLp+YHELaO81j9bWttKPGqjgQ=
+	t=1751021518; cv=none; b=JgRYrNkDlm0oikOSh8G50YEgLWwIpglkG+/kRJGo4ajAbQBFHOpqMsbh1lFrfwwSSEs1YeTqA8jpkWmaUVOnIsynH4Rqkjz2TRjZSN6SCQv5mwLcktpGgvDMRnUd8G/2uF97PiAzeD40wK6jA/rkL2GaFfd3vYp7/Mzx3HEUS1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751022306; c=relaxed/simple;
-	bh=B06vqLsvetg1jFxGBYXyf+6nQe601dcV30vu83BMpw4=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=qlCekw3K81aslsH+3mY5IZXgFLnZ2HLPjvQFW9VQaPQ+uAa79KHe915gsVCcIKz+nf3AJd6a+6iFWBs0/CHBR70vIRfBDiLbrejyj/nMXN0dBEjGIYOlp5hJnuu3G6gwzuBIbNb3HZo6ZM+QgtVaP+IRc1HzO008cuRxWrJmHjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TEI97BOK; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4537deebb01so10696165e9.0;
-        Fri, 27 Jun 2025 04:05:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751022303; x=1751627103; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=B06vqLsvetg1jFxGBYXyf+6nQe601dcV30vu83BMpw4=;
-        b=TEI97BOKbaCHNyc8Q68TFIgi0Yh0TDvgdHvtyVszvVDZysangSrhIif0icgg8FrHSz
-         ozPDkSJopuhwZjSVaOVeW8os3v0xW6m+wfCMss9uq0xjV2lAEqu59qsSac6KRdUm11yV
-         Vo+TpdjebXz7/Pd7EmXlp3lJklcZTiPs5yqMECYuJaBb12Gu4WedxXsqddVt+VLhcsAO
-         L8jcF12Pr4M79Dh9ZOgrCD6BuMZVyO5XJhiknVew3Pqb1MmPIbtCmpsUpUk0gd/dBi1r
-         i8nCrfDld16wtHd87v0IaFv0WUSChZWjzc5X1VwUmpcMiV2X30G7FZORK2Jf8ydbDt+z
-         Wr2g==
+	s=arc-20240116; t=1751021518; c=relaxed/simple;
+	bh=8NiJEsAY6H5hPb9ifVbvDlDwq1XB2n1aC1SVumzVDf8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LZ8ubotSncSZwDekfXgqJWdV1LZQODxkx9zIyhwZlC2y/MrlceW5OBSLKpGzmFj2UgUQFlh8AbG1S3nKxECieJqZ1KWGxxkBHRLWrPz5P5j2FydNsEnxF99rlNo+lt33pBKP1+BeWQ3eKU44bRzqo/KMMhY+sjUlbAqtz4eNDQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bt9nFbfp; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751021515;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L9N28nJ//bAtYtJKvSA/25sV4gpscCPOFq7vHxaYwng=;
+	b=Bt9nFbfpYtZskS5sVeVxxzeJj9b/wOKJadU3h4Vubdg3AOpnOS2r6eHiaDnVr3gE85DR+/
+	z/4dpMSh0ZBuhJNuwA07FNwQcOMS2KUA0miccOrLlQE9gAnHE7rvS/nPmkf21JHzPXX7aI
+	xlWu26QpcstjiXC8XlIJtPOY7mGjxFY=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-695-_5T0XhASOhmH3bUZnDdthQ-1; Fri, 27 Jun 2025 06:51:54 -0400
+X-MC-Unique: _5T0XhASOhmH3bUZnDdthQ-1
+X-Mimecast-MFC-AGG-ID: _5T0XhASOhmH3bUZnDdthQ_1751021514
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4a58cd9b142so41639861cf.0
+        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 03:51:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751022303; x=1751627103;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B06vqLsvetg1jFxGBYXyf+6nQe601dcV30vu83BMpw4=;
-        b=H8cB03UGprc5nmEXvO6th11U5twIwGUEsedTgx+whOptMYUSRla4IsTbQKWAHfmXtB
-         nTrPYFU0WEkk+EEWblAM6OpitCveYJuEUrUOFrT9hCoFEt/Oc9QyLxPZnggFGZSKNSsf
-         7S6waGcBkgNT8xBmUZO7/uz0cEv6j0tWqvj2X4S6csW4lF4j+B60bkeW77AgYFz1YWyb
-         3mrtCA5+gAlcB9ckI0QNHcoW0yvJsHOK6+BSmEq7EBKia47K8aYXFOmN+ihg0NN6HUpN
-         +V4AQR9sOrN3WUcIk/9OkvypYgwQihAAdWlM08XM2syWD8e71PXT0/kPBICCuj8+R9ZX
-         x/OQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX8Y59V1Z6PT183VamKk9V5Cqxqg2C3CzgVm0UFceSyLMOzsg9nE9hpkPezbMsej9nMfSaFM6dulK1ixK0=@vger.kernel.org, AJvYcCXGJNAF0De8bUXRMtKbFsyoqsrRJ+qSbLgo/Hc6hFR/AmGluM543q7f5sydSFCrYUsSKgpKd2xm@vger.kernel.org
-X-Gm-Message-State: AOJu0YzP+gxpx9P/N8ifU4JysFUGsPfMaEIq8V9TGoJa4WVDoh520eLs
-	jVa1KM7lgJ5CjJs2cp05RcaiUq3j4NWwfmiJql9BYboY+S9A382g6gn4
-X-Gm-Gg: ASbGncul3YmQKG81Ane71cLCJ+TyufmCzXWZJrcVqrEXDHDDkFk7qTEcKZQ21I3dS2E
-	ufYIyZXp96Uxxn7omu7dhY0QBGo6iLA7SONb+J0zLjROj5akWovWREukxYkJaWXWKaMVztA3Une
-	BszhOG/goF4PPmSQwBr2+Zm/Appa6sm1uFe6GtVH0mCleTbgwVZpK3xhDDg4TUz0sTQqeRgih4e
-	OlQJgkMnU8dWoFikPn4bFmuWV4g/pVbMhZ+QzYYOcqeyEiWi0eul76mLK22OxgY8xNUaNDZheK2
-	uuMF0a923CiSR/IfQCX2E3N0BUKNI27FXDnN/+wsBLnO1cAO/pQixY5V8SVxTH880zDtylBwFQ=
-	=
-X-Google-Smtp-Source: AGHT+IFFLTapbpq9yfN5NyUmLLfh7yHtwG+Kidt1zCbPWpTZBl7MH09mVCDDdVXETaSXAjZye1DAKQ==
-X-Received: by 2002:a05:600c:c172:b0:453:6183:c443 with SMTP id 5b1f17b1804b1-4538ee33209mr27999405e9.5.1751022302697;
-        Fri, 27 Jun 2025 04:05:02 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:40b8:18e0:8ac6:da0])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4538a3fe587sm48410295e9.19.2025.06.27.04.05.01
+        d=1e100.net; s=20230601; t=1751021514; x=1751626314;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L9N28nJ//bAtYtJKvSA/25sV4gpscCPOFq7vHxaYwng=;
+        b=cWrUZ9VSH7J52q32HOBMeZAAZZjPhHu+VNzuB+1QYrDV79XdrL2einDvpnNo51GvCj
+         SIRQvFh1L81mSyH2356EVNF25I6Pmpwa3g0RyOcHQfuW7FA7ULtSZ1zB4NN7qP+G0ZS/
+         PKB+lSrHK3bOA68rtEnVfLmnynpo0iJtHwojdfnu4NSvPXhVAtZqPEOHQsa6XygCOXnv
+         Lrn6l+YHObWlI2EpIOC+37MIHszthd0O9jDU6yUTOglckyZVWa46UdIaLoImFbm7UVf7
+         skL+AV8xHbRv85nGXwtl2+oXrKagwdoYnbsZLHG2YehPUWuEMV3h1ClgjeVkK7L4wwR6
+         OkXg==
+X-Forwarded-Encrypted: i=1; AJvYcCXF6E2dcLADnQq+LLKaNuZ39YsI9LYdGFg3hH2CAJgEXozXqxawPHNKmlZa238BK5fHy4YIwG8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpgB2rJIJKiuqFKLi4bshcBVi2QdQFzhd4oA4SiBLWRdQ0ivbp
+	dtBP0p+9+1GOXVLtWZZ2m2LY0qlOfXRFb+v9JtED8bXsB0SF5TrF6edrRWvFwTuSa63o80MUAWa
+	UM38AiGtzTkrV3p557C2fwR4ahtGzXi/gZ43Gdv2EtQqbyqwpaGLCIhuXMQ==
+X-Gm-Gg: ASbGncu2B1Yqp3jrbgoS/XTiq+/Dxf+AyxNhdk22MaDmlYjlK1HDCkrzqh9zb5ShqYZ
+	Hywoq/zIreLPzRYlvHi/kVj3zlar2SWXZiOFK+DjMIqV9nIV6xo/xuXgSn4FWY0CIKwzx8Zc/gt
+	4AbFZ1x61pKR+BqGqp+QHE6bVyWADdLYh7C6TS8c6g6DslkSUepbKW5qj6pl2rAE+GcoMnTginm
+	gmGCheO2EFFI6tTUg2qhgLTKEPjXQeCofDJNuL0kpKwxZ7ttyDgC2QgV+uCPB+0Y0OxTNl/FG6O
+	oDCcnNceS2XWSj4AUEt9SPFlD1b8
+X-Received: by 2002:ac8:7f4e:0:b0:4a7:30e2:b31e with SMTP id d75a77b69052e-4a7fcac456fmr48138321cf.34.1751021513884;
+        Fri, 27 Jun 2025 03:51:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHUZBEeQ02fjTo/PBcoZEjlOKuEN1OVgF9WmLAZpvc5pbASKuBu4dcl/skhi8pvedUhQk6Z7w==
+X-Received: by 2002:ac8:7f4e:0:b0:4a7:30e2:b31e with SMTP id d75a77b69052e-4a7fcac456fmr48137981cf.34.1751021513420;
+        Fri, 27 Jun 2025 03:51:53 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.181.237])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a7fc5ad3c6sm9858681cf.78.2025.06.27.03.51.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jun 2025 04:05:02 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>,  Jonathan Corbet
- <corbet@lwn.net>,  "Akira Yokosawa" <akiyks@gmail.com>,  "Breno Leitao"
- <leitao@debian.org>,  "David S. Miller" <davem@davemloft.net>,  "Eric
- Dumazet" <edumazet@google.com>,  "Ignacio Encinas Rubio"
- <ignacio@iencinas.com>,  "Jan Stancek" <jstancek@redhat.com>,  "Marco
- Elver" <elver@google.com>,  "Paolo Abeni" <pabeni@redhat.com>,  "Randy
- Dunlap" <rdunlap@infradead.org>,  "Ruben Wauters" <rubenru09@aol.com>,
-  "Shuah Khan" <skhan@linuxfoundation.org>,  joel@joelfernandes.org,
-  linux-kernel-mentees@lists.linux.dev,  linux-kernel@vger.kernel.org,
-  lkmm@lists.linux.dev,  netdev@vger.kernel.org,  peterz@infradead.org,
-  stern@rowland.harvard.edu
-Subject: Re: [PATCH v8 10/13] MAINTAINERS: add netlink_yml_parser.py to
- linux-doc
-In-Reply-To: <a8688cae5edb21b9ebbc508d628c62989a786fb7.1750925410.git.mchehab+huawei@kernel.org>
-Date: Fri, 27 Jun 2025 11:50:39 +0100
-Message-ID: <m2frfl8nls.fsf@gmail.com>
-References: <cover.1750925410.git.mchehab+huawei@kernel.org>
-	<a8688cae5edb21b9ebbc508d628c62989a786fb7.1750925410.git.mchehab+huawei@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        Fri, 27 Jun 2025 03:51:53 -0700 (PDT)
+Date: Fri, 27 Jun 2025 12:51:45 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Will Deacon <will@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Keir Fraser <keirf@google.com>, 
+	Steven Moreland <smoreland@google.com>, Frederick Mayle <fmayle@google.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	netdev@vger.kernel.org, virtualization@lists.linux.dev
+Subject: Re: [PATCH 0/5] vsock/virtio: SKB allocation improvements
+Message-ID: <izmrcafyog7cxvef2nipk5f2vzxxptyc4fopnvl3heqslsp7q6@32ssw2piag6h>
+References: <20250625131543.5155-1-will@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250625131543.5155-1-will@kernel.org>
 
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
-
-> The documentation build depends on the parsing code
-> at ynl_gen_rst.py. Ensure that changes to it will be c/c
-> to linux-doc ML and maintainers by adding an entry for
-> it. This way, if a change there would affect the build,
-> or the minimal version required for Python, doc developers
-> may know in advance.
+On Wed, Jun 25, 2025 at 02:15:38PM +0100, Will Deacon wrote:
+>Hi folks,
 >
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> Reviewed-by: Breno Leitao <leitao@debian.org>
+>We're using vsock extensively in Android as a channel over which we can
+>route binder transactions to/from virtual machines managed by the
+>Android Virtualisation Framework. However, we have been observing some
+>issues in production builds when using vsock in a low-memory environment
+>(on the host and the guest) such as:
+>
+>  * The host receive path hanging forever, despite the guest performing
+>    a successful write to the socket.
+>
+>  * Page allocation failures in the vhost receive path (this is a likely
+>    contributor to the above)
+>
+>  * -ENOMEM coming back from sendmsg()
+>
+>This series aims to improve the vsock SKB allocation for both the host
+>(vhost) and the guest when using the virtio transport to help mitigate
+>these issues. Specifically:
+>
+>  - Avoid single allocations of order > PAGE_ALLOC_COSTLY_ORDER
+>
+>  - Use non-linear SKBs for the transmit and vhost receive paths
+>
+>  - Reduce the guest RX buffers to a single page
+>
+>There are more details in the individual commit messages but overall
+>this results in less wasted memory and puts less pressure on the
+>allocator.
+>
+>This is my first time looking at this stuff, so all feedback is welcome.
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+Thank you very much for this series!
+
+I left some minor comments, but overall LGTM!
+
+Thanks,
+Stefano
+
+>
+>Patches based on v6.16-rc3.
+>
+>Cheers,
+>
+>Will
+>
+>Cc: Keir Fraser <keirf@google.com>
+>Cc: Steven Moreland <smoreland@google.com>
+>Cc: Frederick Mayle <fmayle@google.com>
+>Cc: Stefan Hajnoczi <stefanha@redhat.com>
+>Cc: Stefano Garzarella <sgarzare@redhat.com>
+>Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>Cc: Jason Wang <jasowang@redhat.com>
+>Cc: "Eugenio Pérez" <eperezma@redhat.com>
+>Cc: netdev@vger.kernel.org
+>Cc: virtualization@lists.linux.dev
+>
+>--->8
+>
+>Will Deacon (5):
+>  vhost/vsock: Avoid allocating arbitrarily-sized SKBs
+>  vsock/virtio: Resize receive buffers so that each SKB fits in a page
+>  vhost/vsock: Allocate nonlinear SKBs for handling large receive
+>    buffers
+>  vsock/virtio: Rename virtio_vsock_skb_rx_put() to
+>    virtio_vsock_skb_put()
+>  vhost/vsock: Allocate nonlinear SKBs for handling large transmit
+>    buffers
+>
+> drivers/vhost/vsock.c                   | 21 +++++++++------
+> include/linux/virtio_vsock.h            | 36 +++++++++++++++++++------
+> net/vmw_vsock/virtio_transport.c        |  2 +-
+> net/vmw_vsock/virtio_transport_common.c |  9 +++++--
+> 4 files changed, 49 insertions(+), 19 deletions(-)
+>
+>-- 
+>2.50.0.714.g196bf9f422-goog
+>
+>
+
 
