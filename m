@@ -1,103 +1,107 @@
-Return-Path: <netdev+bounces-201782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0012AEB06C
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 09:46:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87AD5AEB072
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 09:48:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BAC24E1F9E
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 07:46:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A5BE1C236BB
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 07:48:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844F4212B28;
-	Fri, 27 Jun 2025 07:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D661224240;
+	Fri, 27 Jun 2025 07:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RnclplwY"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="dpAqmKjb"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6FFC18A6DB;
-	Fri, 27 Jun 2025 07:46:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F86223316;
+	Fri, 27 Jun 2025 07:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751010397; cv=none; b=sz7FIPjjfMHpaQU9cU7jzvkaaQQFkLZtIWHfwCR9ataQES1QLIvWKwg7ObLvY+bbZdzVaFG3p7BGVnTn8gkfWBs7rdlM6/6f4W0kWn9cN1X2FfzBIt/qoQKEIvtD1JjnZQhGSt43QNDuEGz5nd2Y9KC3p+p9OMaqOTejT5e692o=
+	t=1751010485; cv=none; b=AXV7FypHY6SUluySf8ga0zxOYFr44OPRvx/mocS/BvntBzJPpuiatnubGB/fZxARN+dqHDfP391geeP/04llNvoKXiVzfqim3mLd/K5J6CgrDpTlpZQh8Ii/VLPX61imR3rQFfI3ssY7XwfxzsJKu3PkBFZJuN1TXwJNoBBeVd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751010397; c=relaxed/simple;
-	bh=MjnuYsr9mMsW2TxJ7qqc2j1p+0Vn25jzjwjGDbMIb1Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L1iLBJFc+iN8TcYykJe6E6PKGU5vtSF1ykwi7PNpCDzDQ+ROtwU0r/WV/l3xAJ3ETESk46B4hVcNYgHjW1Ddm2lE7LkfQtH6OeMSCsxzQ0RnDh1uTxTl1IAVmBn1Qxy1934x7QqB8ITeeadowA4oSD8873MRuAakHo9ugugO9PQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RnclplwY; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=sW+Hs3IzTA2qyhfGPDj9o95ND8i+/JEitbctsHCJl1o=; b=RnclplwY03mQ/Ay/NxJ/7P8Aro
-	Ik6w6leKGbJnlwUEsLFdXi5OfvEyl/Mo1J2fgMj9CsPbPAi8+x6aKIwejF/kyIZUrI2lgwqkf+VS+
-	0kdsn2sd3wbirOYxaURPw9Cx4kUIfEZUkLzrqd27SOEoSJOR6s+gjrjoMcv5NpynDgFI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uV3n0-00H7Pq-TD; Fri, 27 Jun 2025 09:46:26 +0200
-Date: Fri, 27 Jun 2025 09:46:26 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] ptp: add Alibaba CIPU PTP clock driver
-Message-ID: <69ee8a60-3134-4b7a-8217-be9bbc79a8fa@lunn.ch>
-References: <20250627072921.52754-1-guwen@linux.alibaba.com>
+	s=arc-20240116; t=1751010485; c=relaxed/simple;
+	bh=e3ZY0/pui2Vz7RrxJYmby3liH1RgnHTQdK37ii9ibXg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=aKyKbmncDvBM6SMiT3gLqhd8MXHQNYRx5eyBdPcyx2ynr5iBi3BrQ+XKm2mfyjHUF2sCRzowHblBPOSJxODolUc2/KHFt+s+GnCq//xbPcx3yqoMkhZfbAhTgRA/b/KfpJNnt6eX7DAfGAa1sxfVxtykQ25eWUEogaL0nhllLac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=dpAqmKjb; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1751010480;
+	bh=fy1EyAnTjmeVxDb3+C3bDInrgdQUJPABqEglxufnHMc=;
+	h=Date:From:To:Cc:Subject:From;
+	b=dpAqmKjbtjoe+0ay92ZjIMNIQNALLlNt8+P8idx0KXqgdZvFw3Xwru4AKmDVSUbUB
+	 Izi7qTq1zLpaVBz0uZxIqfhJTELQKCzKKASYXzs3/xCKS9b3j+dMKPjIFK+n8map6Q
+	 AGOsjEQqy3bYGERWWjChcp4sGLRhI2a9SManYqIkCwhwV/+2xRCWgrXw3Ggg0Gy3J5
+	 lRZhLY2ik7X5+xcozERs6Gn2DiHp/8HRWwJb3jFM6ZjZkILPu9qX+uDl/WManNZTMq
+	 rIFgK2fdpoDv7JFDeptO9RnW/8Ispr3eJlxM7vh0/QvzD8DDSDDiUwK7h5ProzK6fo
+	 sZEXeJGrNAG+A==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bT72S2YNYz4x5d;
+	Fri, 27 Jun 2025 17:47:59 +1000 (AEST)
+Date: Fri, 27 Jun 2025 17:47:59 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>
+Cc: Viktor Malik <vmalik@redhat.com>, bpf <bpf@vger.kernel.org>, Networking
+ <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: build warning after merge of the bpf-next tree
+Message-ID: <20250627174759.3a435f86@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250627072921.52754-1-guwen@linux.alibaba.com>
+Content-Type: multipart/signed; boundary="Sig_/tXxknDF54A1Q.Q8AAv6kdW+";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-> +#define DRV_VER_MAJOR		1
-> +#define DRV_VER_MINOR		3
-> +#define DRV_VER_SUBMINOR	0
+--Sig_/tXxknDF54A1Q.Q8AAv6kdW+
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> +#define LINUX_UPSTREAM		0x1F
+Hi all,
 
-> +static int ptp_cipu_set_drv_version(struct ptp_cipu_ctx *ptp_ctx)
-> +{
-> +	struct ptp_cipu_regs *regs = &ptp_ctx->regs;
-> +	int version, patchlevel, sublevel;
-> +	u32 env_ver, drv_ver;
-> +	int rc;
-> +
-> +	if (sscanf(utsname()->release, "%u.%u.%u",
-> +		   &version, &patchlevel, &sublevel) != 3)
-> +		return -EINVAL;
-> +	sublevel = sublevel < 0xFF ? sublevel : 0xFF;
-> +
-> +	env_ver = (LINUX_UPSTREAM << 27) | (version << 16) |
-> +		  (patchlevel << 8) | sublevel;
-> +
-> +	rc = cipu_iowrite32_and_check(ptp_ctx->reg_addr +
-> +				      PTP_CIPU_REG(env_ver),
-> +				      env_ver, &regs->env_ver);
-> +	if (rc)
-> +		return rc;
-> +
-> +	drv_ver = (DRV_TYPE << 24) | (DRV_VER_MAJOR << 16) |
-> +		  (DRV_VER_MINOR << 8) | DRV_VER_SUBMINOR;
-> +
-> +	return cipu_iowrite32_and_check(ptp_ctx->reg_addr +
-> +					PTP_CIPU_REG(drv_ver), drv_ver,
-> +					&regs->drv_ver);
-> +}
+After merging the bpf-next tree, today's linux-next build (htmldocs)
+produced this warning:
 
-Please could you explain what this is doing.
+kernel/bpf/helpers.c:3465: warning: expecting prototype for bpf_strlen(). P=
+rototype was for bpf_strnlen() instead
+kernel/bpf/helpers.c:3557: warning: expecting prototype for strcspn(). Prot=
+otype was for bpf_strcspn() instead
 
-	Andrew
+Introduced by commit
+
+  e91370550f1f ("bpf: Add kfuncs for read-only string operations")
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/tXxknDF54A1Q.Q8AAv6kdW+
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmheTK8ACgkQAVBC80lX
+0GzBHAf/Tyvc5FiGRv0lq0rtA4R0nVYIOKub58TcVsAZYu2Zu6vMPRHw1tUT8s93
+YSgSDch5CxrCGcNid7d2Lob3JcFI7T7TsdGBSjCthQxZzhbiaR94+oewqq/L02Fj
+lq7vvfV7qJ/1M+mtOMYBB0sCdp9/0jzFeSNV5JJkkibh20K15OU/NizUMfnxytlf
++0QcVRnMc86E3jiJHMac/GuumkHCpxF2nGrPBpg7py32RTJ/q0GdHG8LbsVhcb70
+QP0tiK+IMQMx5IuI+GBHz+JeSlZttw2Hz0hC1RRwajjYXaTzHHF4yuhmtQGptPbA
+wbOIR2QlE90HiFs19Oeo7JW6ZXbaTg==
+=qmkn
+-----END PGP SIGNATURE-----
+
+--Sig_/tXxknDF54A1Q.Q8AAv6kdW+--
 
