@@ -1,111 +1,189 @@
-Return-Path: <netdev+bounces-201784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C88EFAEB085
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 09:50:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F9C3AEB0B4
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 09:57:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 033B116A470
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 07:50:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C2991C2251F
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 07:57:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D90892264A6;
-	Fri, 27 Jun 2025 07:50:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C4002264B2;
+	Fri, 27 Jun 2025 07:57:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="rXkexf8w"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="48NR5Vqn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8AD2264A4;
-	Fri, 27 Jun 2025 07:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38332264A8;
+	Fri, 27 Jun 2025 07:57:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751010639; cv=none; b=pgFY6vxgHHTQAR5eMQjUrGIkPK1alElR4sWIvH32mSgf3JiEtH4kQvvf7Z6jQ7thzduisGnCdK3TuOespJ0fI21FIVB0yg8gy3JBSdN/85ZRIscVy1dd6hmglKE7WzqDdK9BkwJ0sfTNmcbuIOuM8umcyohTsmIhXH+u81ZOdnQ=
+	t=1751011043; cv=none; b=p/iSacZiQeH13/SaEWTf6X99FISz4L3wRQHrc6kb5eEfjvSVG80DsNH/J22nZ6IvmGDV0lLW+wk38VgpPxAAehrznQlhEGKnZ6MtEZst7hBIFYtXGi2ifGlnsPk3ly3psTIzKqATg4Fxw57WQwTvjwirLllmMDZ7qgYh4M3b+k8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751010639; c=relaxed/simple;
-	bh=rkfI3s72IkUqadXiLrDRNWU/eKBpZbHUz0VwmWZ0+rQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qPSVsTW5TguiWm09UDjim63UbJ1RgL0mwCV+TnxRzJB4BF6VJeKAj4BwqotNcoXl1dF8Jla8wQIs3Xc4csteQwgvDslLaydhTtqFu0VZYodUYwoQuXekISj8lf1q8/YMxtmJca317qqg0Or0Z5yPBapm+lUmnqPDWeJhAZRTuX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=rXkexf8w; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1751010635;
-	bh=rkfI3s72IkUqadXiLrDRNWU/eKBpZbHUz0VwmWZ0+rQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rXkexf8wK4g+1ONBAdvINtip4QZs6bHc/XqR7Bs/8OyHpy6vdB8BWTpKGTG9u21iZ
-	 0HplRi82OI0FvrqyRXkBryW7x9rf/tKLAL/DIS9NEjVBn2azmucSAaN27jH20WLnNh
-	 BmZ7jQwa43jmUOapSdwQDhWVmjiHnoahaJAOcYGPHSvfKW+edn4k381pgHOfodMAnW
-	 g0xZkYmUx3Zz22yq8CQMVxGSudwGM6OgG5y/MN2E2vVO8uUPY83OwKusiwbhRam7b8
-	 UWxCSEMmDlllpo9IksgvG2zI8P3wvurkl6wDdWhixPtp3lVAG8WnXbgYaWl7V8Fq5j
-	 OkL0yIotM851g==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bT75R3n0tz4x6r;
-	Fri, 27 Jun 2025 17:50:35 +1000 (AEST)
-Date: Fri, 27 Jun 2025 17:50:35 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
- <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Christian Brauner
- <brauner@kernel.org>, bpf <bpf@vger.kernel.org>, Networking
- <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Song Liu <song@kernel.org>, Viktor Malik
- <vmalik@redhat.com>
-Subject: Re: linux-next: manual merge of the bpf-next tree with the
- vfs-brauner tree
-Message-ID: <20250627175035.3155e118@canb.auug.org.au>
-In-Reply-To: <CAADnVQLo4-jSRh5J=tNeEnN_3Rsxy0zOGccYdfqe934+jteVjA@mail.gmail.com>
-References: <20250627121206.31048e14@canb.auug.org.au>
-	<CAADnVQLo4-jSRh5J=tNeEnN_3Rsxy0zOGccYdfqe934+jteVjA@mail.gmail.com>
+	s=arc-20240116; t=1751011043; c=relaxed/simple;
+	bh=zal9xn7yxFRR41i1coZhjVOWt6/9KGWg0tYzL5ntrWk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TIXNFVTfXlhp4imFh2jYt7Lafq1rQ4GkDDhaTXFpDMA95wUcDv53i0XMavmWxmvri+ASxI8Wq6sorq1NBLXPELEh/IFRc08tGk3VGVSwutM4gJtWSYVvDqjsgitMTGD8TV7IaQ9e12Y+Cj6+aoiGIv03DTKmz+cvL5GTOh0JglE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=48NR5Vqn; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=XWoXZ540RK4D7pND3FhRUN0tuRirGRAX3dKRq7hFvhE=; b=48NR5VqnRS0Ppkmzn2y+ANOZbN
+	SmXSRHG8weg3pfCCBpdavbsV8doOjDFFWsekMm4vd/S03EMVFZ2k9D+ePD/Fxv+0y34Iu2KXPzfE8
+	yZZJM7v1Z3OqHNCRnNEha+uEVxwK+iN6EeQgkzwxSLlbZ2Hw+aDJz9KUsZVl2cazXmis=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uV3xQ-00H7Th-Q8; Fri, 27 Jun 2025 09:57:12 +0200
+Date: Fri, 27 Jun 2025 09:57:12 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Wen Gu <guwen@linux.alibaba.com>
+Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] ptp: add Alibaba CIPU PTP clock driver
+Message-ID: <0b0d3dad-3fe2-4b3a-a018-35a3603f8c10@lunn.ch>
+References: <20250627072921.52754-1-guwen@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/AhR.4B8b5clFJHMoiCMQC6G";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250627072921.52754-1-guwen@linux.alibaba.com>
 
---Sig_/AhR.4B8b5clFJHMoiCMQC6G
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+> +#define PTP_CIPU_LOG_SUB(dev, level, type, event, fmt, ...) \
+> +({ \
+> +	static DEFINE_RATELIMIT_STATE(_rs, \
+> +				      DEFAULT_RATELIMIT_INTERVAL, \
+> +				      DEFAULT_RATELIMIT_BURST); \
+> +	if (__ratelimit(&_rs)) \
+> +		dev_printk(level, dev, "[%02x:%02x]: " fmt, \
+> +			   type, event, ##__VA_ARGS__); \
+> +})
 
-Hi Alexei,
+Please don't use such wrappers. Just use dev_dbg_ratelimited() etc.
 
-On Thu, 26 Jun 2025 19:17:25 -0700 Alexei Starovoitov <alexei.starovoitov@g=
-mail.com> wrote:
->
-> Our emails raced in www :)
-> A minute ago merged vfs's branch into bpf-next/master,
-> resolved this conflict and pushed to /master and /for-next.
+> +static int cipu_iowrite8_and_check(void __iomem *addr,
+> +				   u8 value, u8 *res)
+> +{
+> +	iowrite8(value, addr);
+> +	if (value != ioread8(addr))
+> +		return -EIO;
+> +	*res = value;
+> +	return 0;
+> +}
 
-Thanks.
+This probably needs a comment. I assume the hardware is broken and
+sometimes writes don't work? You should state that.
 
---=20
-Cheers,
-Stephen Rothwell
+> +static void ptp_cipu_print_dev_events(struct ptp_cipu_ctx *ptp_ctx,
+> +				      int event)
+> +{
+> +	struct device *dev = &ptp_ctx->pdev->dev;
+> +	int type = PTP_CIPU_EVT_TYPE_DEV;
+> +
+> +	switch (event) {
+> +	case PTP_CIPU_EVT_H_CLK_ABN:
+> +		PTP_CIPU_LOG_SUB(dev, KERN_ERR, type, event,
+> +				 "Atomic Clock Error Detected\n");
+> +		break;
+> +	case PTP_CIPU_EVT_H_CLK_ABN_REC:
+> +		PTP_CIPU_LOG_SUB(dev, KERN_INFO, type, event,
+> +				 "Atomic Clock Error Recovered\n");
+> +		break;
+> +	case PTP_CIPU_EVT_H_DEV_MT:
+> +		PTP_CIPU_LOG_SUB(dev, KERN_ERR, type, event,
+> +				 "Maintenance Exception Detected\n");
+> +		break;
+> +	case PTP_CIPU_EVT_H_DEV_MT_REC:
+> +		PTP_CIPU_LOG_SUB(dev, KERN_INFO, type, event,
+> +				 "Maintenance Exception Recovered\n");
+> +		break;
+> +	case PTP_CIPU_EVT_H_DEV_MT_TOUT:
+> +		PTP_CIPU_LOG_SUB(dev, KERN_INFO, type, event,
+> +				 "Maintenance Exception Failed to Recover "
+> +				 "within %d us\n", ptp_ctx->regs.mt_tout_us);
+> +		break;
+> +	case PTP_CIPU_EVT_H_DEV_BUSY:
+> +		PTP_CIPU_LOG_SUB(dev, KERN_ERR, type, event,
+> +				 "PHC Busy Detected\n");
+> +		break;
+> +	case PTP_CIPU_EVT_H_DEV_BUSY_REC:
+> +		PTP_CIPU_LOG_SUB(dev, KERN_INFO, type, event,
+> +				 "PHC Busy Recovered\n");
+> +		break;
+> +	case PTP_CIPU_EVT_H_DEV_ERR:
+> +		PTP_CIPU_LOG_SUB(dev, KERN_ERR, type, event,
+> +				 "PHC Error Detected\n");
+> +		break;
+> +	case PTP_CIPU_EVT_H_DEV_ERR_REC:
+> +		PTP_CIPU_LOG_SUB(dev, KERN_INFO, type, event,
+> +				 "PHC Error Recovered\n");
 
---Sig_/AhR.4B8b5clFJHMoiCMQC6G
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Are these fatal? Or can the device still be used after these errors
+occur?
 
------BEGIN PGP SIGNATURE-----
+> +static int ptp_cipu_enable(struct ptp_clock_info *info,
+> +			   struct ptp_clock_request *request, int on)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static int ptp_cipu_settime(struct ptp_clock_info *p,
+> +			    const struct timespec64 *ts)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static int ptp_cipu_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static int ptp_cipu_adjtime(struct ptp_clock_info *ptp, s64 delta)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmheTUsACgkQAVBC80lX
-0Gx5jAf+OyfEy1mVlTadUyfddkuoS5ACvw12CG+GFkpP5J012vH+l1wwF64lcQoj
-LppPftGfSF6rfF3or3RHmOcN5y+Ad2YPFRTghHQZ1J2f7SRBZmNbHSqeVj7O4jOG
-9QTF4fbbh/ClbUKiIZOTLJQ7OqrcajUc28e0DoBY2JkJbYpDO81cXZ5t3Dg3AGXJ
-A66FuPzuFbQJcOwXvT4zB5HBlYAS2MhmL/bFkv90joI3Ry6ploVabXwiuY8TBfgX
-3YkfBCFJ/ZNMIu0f2aEpXUKomA3yQEiiWJQvgndHJw1xIn9CP04vOuTUQkHxzll2
-z0RaHFYzd43Hx5kHjGYY6UKBBCVJew==
-=fcal
------END PGP SIGNATURE-----
+I've not looked at the core. Are these actually required? Or if they
+are missing, does the core default to -EOPNOTSUPP?
 
---Sig_/AhR.4B8b5clFJHMoiCMQC6G--
+> +static ssize_t register_snapshot_show(struct device *dev,
+> +				      struct device_attribute *attr, char *buf)
+> +{
+> +	struct ptp_cipu_ctx *ctx = pci_get_drvdata(to_pci_dev(dev));
+> +	struct ptp_cipu_regs *regs = &ctx->regs;
+> +
+> +	return sysfs_emit(buf, "%s 0x%x %s 0x%x %s 0x%x %s 0x%x "
+> +			  "%s 0x%x %s 0x%x %s 0x%x %s 0x%x %s 0x%x "
+> +			  "%s 0x%x %s 0x%x %s 0x%x\n",
+> +			  "device_features", regs->dev_feat,
+> +			  "guest_features", regs->gst_feat,
+> +			  "driver_version", regs->drv_ver,
+> +			  "environment_version", regs->env_ver,
+> +			  "device_status", regs->dev_stat,
+> +			  "sync_status", regs->sync_stat,
+> +			  "time_precision(ns)", regs->tm_prec_ns,
+> +			  "epoch_base(years)", regs->epo_base_yr,
+> +			  "leap_second(s)", regs->leap_sec,
+> +			  "max_latency(ns)", regs->max_lat_ns,
+> +			  "maintenance_timeout(us)", regs->mt_tout_us,
+> +			  "offset_threshold(us)", regs->thresh_us);
+> +}
+
+Is this debug? Maybe it should be placed in debugfs, rather than
+sysfs.
+
+	Andrew
 
