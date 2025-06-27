@@ -1,169 +1,174 @@
-Return-Path: <netdev+bounces-201752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4861FAEAE63
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 07:14:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 727B2AEAE6A
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 07:23:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B9F8566640
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 05:13:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E00917A80AE
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 05:21:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89C81DE2BF;
-	Fri, 27 Jun 2025 05:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED7231C84C6;
+	Fri, 27 Jun 2025 05:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hnPGvrfS"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047502F1FE2
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 05:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7BE19EED3
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 05:22:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751001246; cv=none; b=jFB69EhF4qLX8BXBS4VYGOApo8TtUCwYPnlX0iqYoneMW5ybCRn5h/T/TooKdQyc8WUPTDunsUtuRImdCVZcRo+KS8MmhYH4z3e5h+fxM+3S7oQa4KL0pzz3PEidJcXcrXBkD2nNt2Hq3/ZvUnlfuPlJY1cSuJQIj2L/fElSgbA=
+	t=1751001781; cv=none; b=kffCrT5Pc+A4TNa1sRy1DK/XNjtT7psSIbOHKPl0iWBjiMuDBUQz89MEc8xG+UlEj1W1y0nYpMP3glknm9NrOuzEPz04ylSenz35VGryQ90VECEwq/ZyAqrNeBKvXmiOD8VY16a5k19anHEe2/ERezb62SJA5vui6D4hUz9teLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751001246; c=relaxed/simple;
-	bh=hZkEnK92kDWug5Thj0Tt1emB9OIed+JIJ9DyrUGQRFI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=siZ9yb6VelpR6f3LulNx7LNCNAHRw86qFu6QGme4Py0T+dL8VBed7UKgYKf//GSyWDJCRlFeZc1DC1ErBP9LUmmcuB45gSDZ56wlyLdFViMzo2OpHYezIx0CH20j3aRiWBi8XAeUscq5mIJulQca7szgkpE5Qqq43dxxAO9ndKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uV1PK-00083P-Fh; Fri, 27 Jun 2025 07:13:50 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uV1PH-005YyH-1I;
-	Fri, 27 Jun 2025 07:13:47 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uV1PH-0019oO-10;
-	Fri, 27 Jun 2025 07:13:47 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
-	Rengarajan Sundararajan <Rengarajan.S@microchip.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	Phil Elwell <phil@raspberrypi.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net v1 1/1] net: usb: lan78xx: fix WARN in __netif_napi_del_locked on disconnect
-Date: Fri, 27 Jun 2025 07:13:46 +0200
-Message-Id: <20250627051346.276029-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1751001781; c=relaxed/simple;
+	bh=aUr8TZECzOn15DZq6wR7TF8mTexxly6x410wdhMAY7E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gU3oiq0gCoG58gGArXBVZfUygEguh/TEwGGgX1eiECVibxmxBe7PInO4nS3e+95iX9XR/Z4szoqNsJkvEcRsaSUGwDw17cGDR2hUn3vpcCVlm1hSyLXsmtz7BqUL5iiOgCcsI7LZ/hkVGmKPiVtaPXefeSJUZAENFsO5BhGTRAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hnPGvrfS; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-553d2eb03a0so3186736e87.1
+        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 22:22:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751001778; x=1751606578; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wMR9DDKVoZLB02tWU9/iY5aDzbALx9JilNraIO+BE6Q=;
+        b=hnPGvrfSfQ3otJOzl5lJbph+h3siZaEjBDky4v2kxmqdRvI3pyd50WNFCp7k2DGEU6
+         1EE2xtoOaE4kOT++FD7hhuzlrSkdPDorjt2GTnTjcv/BIWs5PD3gDs7NRYB3oHBvDsnB
+         78BwRA9rwRESc4/fkuwiQxCY9HFHejbeg5F4NmhZuxZkCvWFjn5sgOZ5tAuXoAO9o2RH
+         5NJTb3uhaaFRKt/VGCWv8Bu0E0LIXZ/UpwGCo8ddK9/2kNuaJ2gNoRCkKSUFaal3tOfT
+         pfYD4nX120P2N1Y/o+CSyQfUPpTI6jaS5Se8upfh5MdX6ibxNf4Xo4AOYCpO04N8CcCk
+         BSGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751001778; x=1751606578;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wMR9DDKVoZLB02tWU9/iY5aDzbALx9JilNraIO+BE6Q=;
+        b=Lj8Ap1qee1/eQTXEhM2rPY61bi8Y9aDVu8wzCF0XWrtdaP+gSpa747RKY9Zj4hU1Sf
+         l2EwhH4HkurPAqBtPhIj4RzKNEGRZYL5vNDQu33qJoOGsLuOL5EkINI0oKpTVM27th8z
+         pSg/eh+3WAFnvPx1qQgBfCn2dBlMtfvJjPVOQlwgaZEkoS0IasrN6fw4vrf04YI4JiW2
+         QmEHiiOHTIvyVT8OWPL2BcAfjpApHB2Dgn8aCwTKuVIQkHmR3OUzPUALZiICmNfjDf5+
+         o52DM6tANyvtwiRTD/C/4B18xNATwBhpWwjqwSePUkxWiUw7uVPGWmlFb5dTEqr4NFWQ
+         ztqw==
+X-Forwarded-Encrypted: i=1; AJvYcCVSo7IhCTG2wVHOQTS+zVa36SZXEkMnxITL94FYc2VtSidNrRzKBmGYrI9ZrFplEuB3w1wBPdM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzr0jj9kpwiV7RjjWiEtKeIKSUNhj1tX1UQdMbUVXHFjZWZfKB9
+	yGhsGdssPTKB07Z2Sy0GRasZSc99zDaK43xpshDHfpri480mwohHZR0M8kgV/4MXQUMALGj5P5u
+	j4W1jxOEZ6o7UVXpdbkUIpk1p4hFW9HpzeGGbC9I=
+X-Gm-Gg: ASbGncsNXlV4yBpjdnuVR5hJZs2AXpO/UwFNnWLd+iojr85mYtYo2fyVgFHMr9SM2sC
+	YKknh5Q8TY63tO6q+fdkCa5u/o1whGAmVaNKzbBYPPpZVs8CQarFjc+bS4o4AnNi6O1Zy6PwFCy
+	xi0PaZt/wvLt5bCGkL8jU4t3tTjszkcqzWCrzLOy9e5x75Sc6cUlHJp2Z4JYKFq3TXNRtyYjww
+X-Google-Smtp-Source: AGHT+IGBUmLHUHlyHy3bRmJvqlQWLFAu6V4YAO5HstEpvKInbDwkITqOvl/+ZrRmAUVfyeJuXU3HuKGr/IzzVao21Hk=
+X-Received: by 2002:ac2:57c5:0:b0:553:cf72:45d3 with SMTP id
+ 2adb3069b0e04-5550c2bfeaemr338971e87.3.1751001777848; Thu, 26 Jun 2025
+ 22:22:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20250626124327.667087805@linutronix.de> <20250626131708.419101339@linutronix.de>
+In-Reply-To: <20250626131708.419101339@linutronix.de>
+From: John Stultz <jstultz@google.com>
+Date: Thu, 26 Jun 2025 22:22:46 -0700
+X-Gm-Features: Ac12FXxEqKGa622Jk3Wd1qpsoRqhXK8q4rXtoQYbAaF1kiVczxTsdIaAUY9DiaU
+Message-ID: <CANDhNCrxj9w+mcKOiGuOuLgJ26SairQTJ0Sqv8XteUtJRyWdwA@mail.gmail.com>
+Subject: Re: [patch 1/3] timekeeping: Provide ktime_get_clock_ts64()
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
+	Richard Cochran <richardcochran@gmail.com>, Christopher Hall <christopher.s.hall@intel.com>, 
+	Frederic Weisbecker <frederic@kernel.org>, Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+	Miroslav Lichvar <mlichvar@redhat.com>, Werner Abt <werner.abt@meinberg-usa.com>, 
+	David Woodhouse <dwmw2@infradead.org>, Stephen Boyd <sboyd@kernel.org>, 
+	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, 
+	Kurt Kanzenbach <kurt@linutronix.de>, Nam Cao <namcao@linutronix.de>, 
+	Antoine Tenart <atenart@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Remove redundant netif_napi_del() call from disconnect path.
+On Thu, Jun 26, 2025 at 6:27=E2=80=AFAM Thomas Gleixner <tglx@linutronix.de=
+> wrote:
+>
+> PTP implements an inline switch case for taking timestamps from various
+> POSIX clock IDs, which already consumes quite some text space. Expanding =
+it
+> for auxiliary clocks really becomes too big for inlining.
+>
+> Provide a out of line version.
+>
+> The function invalidates the timestamp in case the clock is invalid. The
+> invalidation allows to implement a validation check without the need to
+> propagate a return value through deep existing call chains.
+>
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> ---
+>  include/linux/timekeeping.h |    1 +
+>  kernel/time/timekeeping.c   |   34 ++++++++++++++++++++++++++++++++++
+>  2 files changed, 35 insertions(+)
+>
+> --- a/include/linux/timekeeping.h
+> +++ b/include/linux/timekeeping.h
+> @@ -44,6 +44,7 @@ extern void ktime_get_ts64(struct timesp
+>  extern void ktime_get_real_ts64(struct timespec64 *tv);
+>  extern void ktime_get_coarse_ts64(struct timespec64 *ts);
+>  extern void ktime_get_coarse_real_ts64(struct timespec64 *ts);
+> +extern void ktime_get_clock_ts64(clockid_t id, struct timespec64 *ts);
+>
+>  /* Multigrain timestamp interfaces */
+>  extern void ktime_get_coarse_real_ts64_mg(struct timespec64 *ts);
+> --- a/kernel/time/timekeeping.c
+> +++ b/kernel/time/timekeeping.c
+> @@ -1636,6 +1636,40 @@ void ktime_get_raw_ts64(struct timespec6
+>  EXPORT_SYMBOL(ktime_get_raw_ts64);
+>
+>  /**
+> + * ktime_get_clock_ts64 - Returns time of a clock in a timespec
+> + * @id:                POSIX clock ID of the clock to read
+> + * @ts:                Pointer to the timespec64 to be set
+> + *
+> + * The timestamp is invalidated (@ts->sec is set to -1) if the
+> + * clock @id is not available.
+> + */
+> +void ktime_get_clock_ts64(clockid_t id, struct timespec64 *ts)
+> +{
+> +       /* Invalidate time stamp */
+> +       ts->tv_sec =3D -1;
+> +       ts->tv_nsec =3D 0;
+> +
+> +       switch (id) {
+> +       case CLOCK_REALTIME:
+> +               ktime_get_real_ts64(ts);
+> +               return;
+> +       case CLOCK_MONOTONIC:
+> +               ktime_get_ts64(ts);
+> +               return;
+> +       case CLOCK_MONOTONIC_RAW:
+> +               ktime_get_raw_ts64(ts);
+> +               return;
+> +       case CLOCK_AUX ... CLOCK_AUX_LAST:
+> +               if (IS_ENABLED(CONFIG_POSIX_AUX_CLOCKS))
+> +                       ktime_get_aux_ts64(id, ts);
+> +               return;
+> +       default:
+> +               WARN_ON_ONCE(1);
+> +       }
+> +}
+> +EXPORT_SYMBOL_GPL(ktime_get_clock_ts64);
 
-A WARN may be triggered in __netif_napi_del_locked() during USB device
-disconnect:
+While I recognize this is mainly focused on the ptp use case, as the
+interface looks generic from headers point of view, should we add the
+other clockids for completeness?
 
-  WARNING: CPU: 0 PID: 11 at net/core/dev.c:7417 __netif_napi_del_locked+0x2b4/0x350
+Other than that,
+Acked-by: John Stultz <jstultz@google.com>
 
-This happens because netif_napi_del() is called in the disconnect path while
-NAPI is still enabled. However, it is not necessary to call netif_napi_del()
-explicitly, since unregister_netdev() will handle NAPI teardown automatically
-and safely. Removing the redundant call avoids triggering the warning.
-
-Full trace:
- lan78xx 1-1:1.0 enu1: Failed to read register index 0x000000c4. ret = -ENODEV
- lan78xx 1-1:1.0 enu1: Failed to set MAC down with error -ENODEV
- lan78xx 1-1:1.0 enu1: Link is Down
- lan78xx 1-1:1.0 enu1: Failed to read register index 0x00000120. ret = -ENODEV
- ------------[ cut here ]------------
- WARNING: CPU: 0 PID: 11 at net/core/dev.c:7417 __netif_napi_del_locked+0x2b4/0x350
- Modules linked in: flexcan can_dev fuse
- CPU: 0 UID: 0 PID: 11 Comm: kworker/0:1 Not tainted 6.16.0-rc2-00624-ge926949dab03 #9 PREEMPT
- Hardware name: SKOV IMX8MP CPU revC - bd500 (DT)
- Workqueue: usb_hub_wq hub_event
- pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
- pc : __netif_napi_del_locked+0x2b4/0x350
- lr : __netif_napi_del_locked+0x7c/0x350
- sp : ffffffc085b673c0
- x29: ffffffc085b673c0 x28: ffffff800b7f2000 x27: ffffff800b7f20d8
- x26: ffffff80110bcf58 x25: ffffff80110bd978 x24: 1ffffff0022179eb
- x23: ffffff80110bc000 x22: ffffff800b7f5000 x21: ffffff80110bc000
- x20: ffffff80110bcf38 x19: ffffff80110bcf28 x18: dfffffc000000000
- x17: ffffffc081578940 x16: ffffffc08284cee0 x15: 0000000000000028
- x14: 0000000000000006 x13: 0000000000040000 x12: ffffffb0022179e8
- x11: 1ffffff0022179e7 x10: ffffffb0022179e7 x9 : dfffffc000000000
- x8 : 0000004ffdde8619 x7 : ffffff80110bcf3f x6 : 0000000000000001
- x5 : ffffff80110bcf38 x4 : ffffff80110bcf38 x3 : 0000000000000000
- x2 : 0000000000000000 x1 : 1ffffff0022179e7 x0 : 0000000000000000
- Call trace:
-  __netif_napi_del_locked+0x2b4/0x350 (P)
-  lan78xx_disconnect+0xf4/0x360
-  usb_unbind_interface+0x158/0x718
-  device_remove+0x100/0x150
-  device_release_driver_internal+0x308/0x478
-  device_release_driver+0x1c/0x30
-  bus_remove_device+0x1a8/0x368
-  device_del+0x2e0/0x7b0
-  usb_disable_device+0x244/0x540
-  usb_disconnect+0x220/0x758
-  hub_event+0x105c/0x35e0
-  process_one_work+0x760/0x17b0
-  worker_thread+0x768/0xce8
-  kthread+0x3bc/0x690
-  ret_from_fork+0x10/0x20
- irq event stamp: 211604
- hardirqs last  enabled at (211603): [<ffffffc0828cc9ec>] _raw_spin_unlock_irqrestore+0x84/0x98
- hardirqs last disabled at (211604): [<ffffffc0828a9a84>] el1_dbg+0x24/0x80
- softirqs last  enabled at (211296): [<ffffffc080095f10>] handle_softirqs+0x820/0xbc8
- softirqs last disabled at (210993): [<ffffffc080010288>] __do_softirq+0x18/0x20
- ---[ end trace 0000000000000000 ]---
- lan78xx 1-1:1.0 enu1: failed to kill vid 0081/0
-
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
-changes v2:
-- Do not move NAPI enable/disable to link up/down callbacks.
-- Remove redundant netif_napi_del() call from disconnect path.
-- Update commit message to accurately describe the root cause and solution,
-  following feedback from maintainer.
----
- drivers/net/usb/lan78xx.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index f53e255116ea..e3ca6e91efe1 100644
---- a/drivers/net/usb/lan78xx.c
-+++ b/drivers/net/usb/lan78xx.c
-@@ -4567,8 +4567,6 @@ static void lan78xx_disconnect(struct usb_interface *intf)
- 	if (!dev)
- 		return;
- 
--	netif_napi_del(&dev->napi);
--
- 	udev = interface_to_usbdev(intf);
- 	net = dev->net;
- 
--- 
-2.39.5
-
+thanks
+-john
 
