@@ -1,539 +1,256 @@
-Return-Path: <netdev+bounces-201863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92BB2AEB3E0
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 12:11:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C2437AEB459
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 12:21:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AED63A2DC9
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 10:11:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85CAB3B967A
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 10:19:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3ED22BD593;
-	Fri, 27 Jun 2025 10:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A460B2BE7C8;
+	Fri, 27 Jun 2025 10:18:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b="N7S3nKDN"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2epT9zVq"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010012.outbound.protection.outlook.com [52.101.69.12])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2042.outbound.protection.outlook.com [40.107.94.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D681029ACDD;
-	Fri, 27 Jun 2025 10:09:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F90429DB8F;
+	Fri, 27 Jun 2025 10:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751018990; cv=fail; b=K5eR1/2fqjuo3R4OhW1GSJ2JyqFm1J1aaSh2ItvmFO6G+7BPsG7imJkQsd+zYTB9wFaNfb/8yS2n9lf20GEZk2d1erHQkph/RyEFFkgG/JhvaNrj7/zYoUOhcCDr88E5O6VUGnLvL3FgUVz2nexZw49+eDbtPhAE0PYlg28T4Dc=
+	t=1751019514; cv=fail; b=pApuWzZFIsYWSbv+XpolLZneCUK8Lb71Dgg368iRo0iwzE9rpKxa/+VHhse40NiV0E4rp1buRIzVjQ13DTIQxcqIlO8KZHaYFEmuTb/Lcphga2bD3hj/My0MHWyJU89DsPCwwPBYLTzvdvG7U5h4mDudOlAZSMizXE35twOF3G0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751018990; c=relaxed/simple;
-	bh=zg39zxPjzAR45tHt8SLnSLlQoWhDz3LJ8ddKL1dDdxw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CKSlDm/t7BzmIM8KU12DiUAm99O0EeG70cPUGRhYJPPpn4eF4CyurTRZhkmGRkT/Tbhe0ruXJl1KrDk3yWwyUFi69RwiQsu9V32/a/VtBlWIhygQwkq0CCuk00vXJhfou/YWDXQ23zVwl1X0MHOWsBPlq7p8ydcm0PGUGhSuwHM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de; spf=pass smtp.mailfrom=arri.de; dkim=pass (1024-bit key) header.d=arri.de header.i=@arri.de header.b=N7S3nKDN; arc=fail smtp.client-ip=52.101.69.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arri.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arri.de
+	s=arc-20240116; t=1751019514; c=relaxed/simple;
+	bh=dW+s99R2Pu04Y8Cpm7EpFsRn9/pAgqeKuxmpY0t+Td4=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Jx+j4V89bzCIsGVoaLf3L8y94gU5KPLhPIXxsSs+ubNjwtJCXALIVA1nSa2ychYVZgy1L0c7cy4jdblvI8xQIi6Y5Ul4LoxjJ9GbziDeW/gaD/6hT8+Kj+jbormoROKqRdcK9hbCsfz3FECl7GGyymJXadv333il3P8JdSsWEw0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2epT9zVq; arc=fail smtp.client-ip=40.107.94.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=J6oJXaabcbIhwpRhA1ORIUBijONkxspPlEYHIjOULlvYM2hAP01n1fuHiQfYMZsI5YqMCpzS9Yk8Qc21Sob/fCa/N02giP4qVM+Hj8pp07fKtZT58R1uxU8c2ofYRH+lkl9FKuX6BUR0Xa+K0cxDNhhLregHmkW1KpJFPnH5gT8z+qu+yG7zV00eA6koQ3oeaD1kVCkL/ELaQliPn1eGBpvcHgfZS+dwzygZ0AIpy6eCrGIEobVnDeoecEDBxVmvKcScyFZsTA86WPd3M3hUJDwORrl6t+HFe9WUKS1rfKlKjx+m9ogcINBKVFGBbDwxT6cEDnkfl7nMLHoSxVj6YA==
+ b=kBYLPweJLslVjQ1vsUxAhgo6Njd2g5Y6gxYL/mF2oYP7lcdfGdzsewcwR+koyEayIyIwbPbVLn2yyryuYs/n0+OiomRmLk05XukfiowhmHZIAJNeU0dr7oqm1iiJguWfiC6rTBORO/Eq9S61gmBtFIcMJU89IPYKO5ZJhH2TILzf7mf2Z4CcgdouVPxvqiw3T0SX09wVdMwXx4xhJ/ILXC50s6TGeWaPgxjwKi/TlNRKFGHqOHJMN7X6h/5DGOelHTNGaqnC2x42lenXmbrCI+Xyz+StD3eunoLNPohnKqOYkggSNLsiRR3v50s/pd3u+ijt7+Oz0+C9L2mesiePFw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wcAyE+WqoS5o5S7mE1bo9sx7a8Zq+SJoRn4TC1HoaxE=;
- b=W9+rkmyWtyfJ0amH9x/Fa7Xsr7OMHuPbVc/m49hx0uIG7acO4PwIvkgJtdz1Gs0tf2KEAxv+8kCh46n8uZmOgpPvj2UTJbX0gC3DplAfbWrCq2lLXX1wxX0VbfHwsEAd0xj6jKEFGr3vo8YceuyTPeBWRoqhcZWb2yd+ZJi6aglaqZOh9kuoj/adVo39BIX6oaP/oCU+mjf2wvb9gD7CJMcOVCi9GfF0tOjUpDVzX/jxK6dpMOP8RtrxQHvseu8ZW/usFkrwPrbjflXZryBUw8gyPV9GZTxRn14x0SD9OzEFj9+chxgfU5l8pzawUGGLcJYv1xO3foHyXnPX/opXhw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 217.111.95.7) smtp.rcpttodomain=holtmann.org smtp.mailfrom=arri.de;
- dmarc=fail (p=none sp=none pct=100) action=none header.from=arri.de;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arri.de; s=selector1;
+ bh=8seV4XEqi80Yf5Gg3IMajAutQT1j1h1IGQEQ+RsRicE=;
+ b=sn6skCDdMHEe275cOVI5EyUCGc4Dv6LT/yiF5xmsuSYnHPr61CO9e9QdzmVrzs4solJ8lolqd1Lb+pBd0drRQv0sIs16I79pFj+qvNs437UrBKn5mdkIzMQv4lmaa09R1BG03+s49r4mvnzOox7rw0+HQRHaVj3ryAp8ZJUopZOQAdHIKfJ+A4yL0qwGruLXU0Ro0iuyuFVbByrgvoUJT1pMCBhCa0mDRfpt5YIuC4Fie8uuQhSH7p2/pPWKym7/6rqeKUD/3nmy88GA6X3uOqh/SszIYrvgZWaZYq/1aLgI6ABsDL/1JkAGSulq5JlQTXkSyZiihgHcJ1KjIiMdPQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wcAyE+WqoS5o5S7mE1bo9sx7a8Zq+SJoRn4TC1HoaxE=;
- b=N7S3nKDNRyFqUe3FIu1AkBmPTy938jvseSIXd7KlKCTc3b4j9ebXN00lKj2Et05yC6xbIngzETEdxcVJnYSeunsTfzHjlDk7G4aNrKaZ67vpVQKI7ao/YyEb4ulJtUIkpTeIwki0uZQaIXUVeb7U80ftDW00Drr1zaV31erRvRc=
-Received: from AM0PR03CA0010.eurprd03.prod.outlook.com (2603:10a6:208:14::23)
- by DU0PR03MB8266.eurprd03.prod.outlook.com (2603:10a6:10:317::15) with
+ bh=8seV4XEqi80Yf5Gg3IMajAutQT1j1h1IGQEQ+RsRicE=;
+ b=2epT9zVqGQKjNdKjtnAPoRBYRSIex8GxyYXH4qSkpsflVAYN4Pk7ghWOg95wfEHUIxvdefmcS52PXbhjXHn930W/L86xyA3xLTsPMJ2eiOpJMnXgNlY7dQ68rXhjMD1Sa/TkDS9lm/QxmyhH9aLbNVGU3XgZ+pnkQxSIlsq+Fvw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB9066.namprd12.prod.outlook.com (2603:10b6:510:1f6::5)
+ by DM4PR12MB9733.namprd12.prod.outlook.com (2603:10b6:8:225::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.23; Fri, 27 Jun
- 2025 10:09:39 +0000
-Received: from AMS0EPF000001B4.eurprd05.prod.outlook.com
- (2603:10a6:208:14:cafe::5d) by AM0PR03CA0010.outlook.office365.com
- (2603:10a6:208:14::23) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.20 via Frontend Transport; Fri,
- 27 Jun 2025 10:09:39 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
- smtp.mailfrom=arri.de; dkim=none (message not signed)
- header.d=none;dmarc=fail action=none header.from=arri.de;
-Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
- designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
- client-ip=217.111.95.7; helo=mta.arri.de;
-Received: from mta.arri.de (217.111.95.7) by
- AMS0EPF000001B4.mail.protection.outlook.com (10.167.16.168) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8880.14 via Frontend Transport; Fri, 27 Jun 2025 10:09:38 +0000
-Received: from n9w6sw14.localnet (10.30.5.30) by mta.arri.de (10.10.18.5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.38; Fri, 27 Jun
- 2025 12:09:38 +0200
-From: Christian Eggers <ceggers@arri.de>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>
-Subject: Re: [PATCH v3] Bluetooth: HCI: Set extended advertising data synchronously
-Date: Fri, 27 Jun 2025 12:09:38 +0200
-Message-ID: <4990184.OV4Wx5bFTl@n9w6sw14>
-Organization: Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
-In-Reply-To: <20250627070508.13780-1-ceggers@arri.de>
-References: <20250627070508.13780-1-ceggers@arri.de>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.20; Fri, 27 Jun
+ 2025 10:18:29 +0000
+Received: from PH7PR12MB9066.namprd12.prod.outlook.com
+ ([fe80::954d:ca3a:4eac:213f]) by PH7PR12MB9066.namprd12.prod.outlook.com
+ ([fe80::954d:ca3a:4eac:213f%7]) with mapi id 15.20.8880.015; Fri, 27 Jun 2025
+ 10:18:29 +0000
+Message-ID: <f0050f1b-67f9-8a72-9365-2451a6f360ff@amd.com>
+Date: Fri, 27 Jun 2025 15:48:18 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH v3 08/14] RDMA/ionic: Register auxiliary module for ionic
+ ethernet adapter
+Content-Language: en-US
+To: Leon Romanovsky <leon@kernel.org>
+Cc: shannon.nelson@amd.com, brett.creeley@amd.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+ jgg@ziepe.ca, andrew+netdev@lunn.ch, allen.hubbe@amd.com,
+ nikhil.agarwal@amd.com, linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Andrew Boyer <andrew.boyer@amd.com>
+References: <20250624121315.739049-1-abhijit.gangurde@amd.com>
+ <20250624121315.739049-9-abhijit.gangurde@amd.com>
+ <20250626072653.GI17401@unreal>
+From: Abhijit Gangurde <abhijit.gangurde@amd.com>
+In-Reply-To: <20250626072653.GI17401@unreal>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN4P287CA0128.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:c01:2b1::6) To PH7PR12MB9066.namprd12.prod.outlook.com
+ (2603:10b6:510:1f6::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AMS0EPF000001B4:EE_|DU0PR03MB8266:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5af88d30-9851-447e-f1a3-08ddb562ba0e
+X-MS-TrafficTypeDiagnostic: PH7PR12MB9066:EE_|DM4PR12MB9733:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8721eca9-4c92-4649-3f31-08ddb563f5d2
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|30052699003|36860700013|1800799024|376014|13003099007;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?e+V2qQb6KyB9p+TonHNfzZ76Wx8LbOCGLpzz/hB9M16WT34i4g2y4GYEAWBE?=
- =?us-ascii?Q?tyg9D6huISmkPr0gd6om5A2TXcRMmjL1UNWah/Li5A73XFfDqiS0opZbW/AY?=
- =?us-ascii?Q?naRZXItN+KxUfalXR7jXkRkQlXiwCyRi5JDvPCaRsHyEWdiT77Z+5qNvYVhN?=
- =?us-ascii?Q?8IYzC4wB6wznlNuwYV++RtspYbntskBRksLvZBX67Vh4gyf7MuBku0a6WmKn?=
- =?us-ascii?Q?qoivFGaXIeeynwLu0nKVHje6yZySanVMvbhq1O7BLy8jqIdiffUkUHclnog0?=
- =?us-ascii?Q?yL80PxM9I8/ptxe9bhkTe5S9VhWmkt1esgTAgstleT1p7I82m7T86JK+f56v?=
- =?us-ascii?Q?7o3cPImO0PJSniCIRWZTzgIK11ZzwHubVuLIWpsyXc4dv+sAW06ceXnsoYIF?=
- =?us-ascii?Q?+EL7+1bhOfHGMrpSIKORqIOt+wIoeYWnPSfofsMUFs/QWKRJWKdDIpcgCJTc?=
- =?us-ascii?Q?zJ9eG2sgWJCc2OlKKXKR4bIcMDznRiaFXCezRbAVriZE9XRABNpNLYlZYmy/?=
- =?us-ascii?Q?jjphfe7nH0ui+4M4W0nDkh4JnGL/aV1NxyaCFuDrxfD/9y0Sp5b83a+lx0Mm?=
- =?us-ascii?Q?KFD9EKo/eknoGe9pMB+wcHRwrKKsSzU4cOGdsHT4QamoELv6+RuFXgmfOvxa?=
- =?us-ascii?Q?4ufgduuLfs/PNVJcJY7GGXSxBGj7P77o0VB9QiFOxz8g0gwkTUjm00Xl5mYF?=
- =?us-ascii?Q?cFTCtc9exYAD9bmRoRE2tMXbk72yFqphm5Ti2EUN0OSF/PBIHpwZeY7sCgAt?=
- =?us-ascii?Q?kuxzVL9YWcNUADcspPxrI5T9pbKVCrfHqlx/xju8ewlXe5X+aIYkwLUELaGy?=
- =?us-ascii?Q?H6qINXVFJpeHZ0x7amVEqx/v3pdOF8bLhvXbPIL1WEDGXqXh3cQX9Nbh+uJ8?=
- =?us-ascii?Q?dWTDeLNxm+ftQy6iX6mX/rbBWazkCBRmTPFtUh+3DdK3O62sdaov30w+mBc+?=
- =?us-ascii?Q?etTdhg15K7SFD/3FxMFOFbdORmRP3pKYJRE8lOzPkMicE9s4oKe/32T7bO2I?=
- =?us-ascii?Q?rWQZzakI167qlWmqAqAfdCjfZ8OYCT/JUp4rX4nAYRFu55ztY4/BmG1xGYkY?=
- =?us-ascii?Q?ocWMZq4jWpaTNFNm0NJ0+TOZHZ6frzN1gvhA8RyIgBk2D0lt0pd/Gezg3yNP?=
- =?us-ascii?Q?1Fo8auSSGJCv9KJVFb2XWR0kbHA53sabcKnHL6vm49mAlRQFEdyR3XOfDdNv?=
- =?us-ascii?Q?YV1I9Ljzxw0PHQLJE7Jrate8d8JgKCKSkPuwXNFfUnDL+gVYU5cHyQCwrcie?=
- =?us-ascii?Q?1xm+Qs+aIbcA/6eIG0DdvPYgI1kkAPBt/Ylql1RicGf6N6b2l9updK07Wd6F?=
- =?us-ascii?Q?BtNDIyng0NmjrQ2vnCzPH2+JMiTYTr1EfSPUlUrmLGfUHw3U3T5IumfpMYKh?=
- =?us-ascii?Q?TP4r11jWdiGkAY98rz1dda5IEcSXCENoWZW2Zrxrv2n1hlK85pKv9HmoMWhM?=
- =?us-ascii?Q?4Q0AdERNUrF7T3Uq1xd3HqTDsPeBaRkBXhBcKcYHap5pN4W3NfwMfNlqfEF+?=
- =?us-ascii?Q?m3V4jFoZbhmbgNsaHGgNoWpOkQDAgnTQGoYXCFW6BgJRgulXe5eimAZq1g?=
- =?us-ascii?Q?=3D=3D?=
+	=?utf-8?B?VHNxRTVZRlpDZk1TbnlrQ2lFOUd2aVk5cWljWThQcklsT1NTYmdaSm5kNGxl?=
+ =?utf-8?B?eW8yT2szVDgrZS9yd09raG5jMUt5cG12bEhKK1o4K1ZaSmFDd0wwQnZnaG1t?=
+ =?utf-8?B?THlBMDJYb0ZJT2pTR0NUTjBjTXFiWDQrZEJYOTBhL1laS1c2NUdhWlc1ZEdV?=
+ =?utf-8?B?eWFXc0wvc3YrZHpISlhvU21GcndiaWdTZ2xBeEExOVhsd1VhRy9Icm0rZmpr?=
+ =?utf-8?B?NDZDaEE5VDZ4ckVLcjR2eVI5MGhRYWNjbkhteFUvUmVkTVRjNkdFTWo0Zy9n?=
+ =?utf-8?B?ckZtbUc2YnYyY3I1MW85QitVMEltSnJOYTNqRVlXQXpFRlNaZkUwcStrWDVI?=
+ =?utf-8?B?TEdEVE5DMlBNQzVmd2hwVDBpdXNwdWllWVVNRVBpNmMyTEUxTUVPZ3ROZTdi?=
+ =?utf-8?B?SHMwTUdVdmxKM05WZ2NIWXJ6Z1lJVGQ2cXRXYzNLS3ZFZHR6dkpBOWNNdTBp?=
+ =?utf-8?B?eU00cXUwb3dkd1hUQUxnTVBKNU1aYnFXbVdtUlZ2blY1dnVCeXZzRHZFQXhW?=
+ =?utf-8?B?NW8wM1lrSlhsR29hWnVESzVVbDhFRzVIVWZ3bzJFbHQ5RkRLeWJzbVVRY0ta?=
+ =?utf-8?B?dkI2Z3BDTDFJVSt6emtHM0QrNUhYMVI3UHV4c21lbkFZK1l0YmlXNzdGa0ty?=
+ =?utf-8?B?OXdhZWJnYWNWYlpTeDBJb1ZMZzlHVVE2S1hDMTRzNnlmWDc0OEVob1VDNmda?=
+ =?utf-8?B?dEV4YWMwbE01eE5TMnN3UjdOUnh5WGpFT2JNS3lzVG5oM25GaXN0ZXhjVjBC?=
+ =?utf-8?B?N3BnallJS1JRb0FKQUEra0t1dTVlT3U1b3l6TE9oaE1BbUI1SmhFemZLbmdq?=
+ =?utf-8?B?dUxMbTJGMXphUlFLS0VFZmNZTmdyYTYxa0dhNll1U3lwNWROZDNPZXRlSmk5?=
+ =?utf-8?B?WngrUUQwdktQb1NnbDd5VFRHeC9RUEVkVG4yRjNqSHdJeElQSmdVcmhIeWZR?=
+ =?utf-8?B?OUZkczQyNVZ3dHpqWFBCcCt4OUJZcGh0WUNuRmdFeWVDS094YTFZVDd0c0o2?=
+ =?utf-8?B?R0QyZEJ3ZEJCZ0NTZCt5RTVZTnlNMkZVREpPM2hDL0xHRnVzMFhjNnBVbEpt?=
+ =?utf-8?B?aUpzMkVjU3pYY3BCVjZNSTBYL0Vwek8vWENyY1ZIZCtNdVJZNWw2bUJjSitW?=
+ =?utf-8?B?SjJpaHU3VkhwRTU5QytxKzkzYzVTY2NERVF4OEt6V2I5SnZjbXJQbnQ3d2w4?=
+ =?utf-8?B?eWVsVW84WnVxdCtNaEJ2cU1GYXBzVG92dThYZGZxOUxaeHBleG9WeFNJcmQ0?=
+ =?utf-8?B?NmhFVExwSDVsb01xSUZzZnR3d01NQjUvZ2lZdkkyR1JTeTZteWJFWndsSXRN?=
+ =?utf-8?B?dzcxa01NZEdFMW9YS3JDSTB2dzJmdWtxK2ZjZm1wUWEva25pWmozb0IwV05j?=
+ =?utf-8?B?STMwSFN3N3pqUEt6NkZkZ1B2aGxXaGs5UVZDUGlxdmlacldhU2dqREhZWElK?=
+ =?utf-8?B?WFNUeEd0Zng5UW9nenYwYTlteEZQUjZvOTZ1NFg0RGNnNitYRW9hQSsyNG5s?=
+ =?utf-8?B?Z0tRRTBGdGExcGhXMmdsc0FJeDJwdUdvc2dsUHA2N01GQ0R3V3A4bGhsVVp6?=
+ =?utf-8?B?VHIyTXNxYTlIdy84QzQrd1lhb2o2MHFnNlNJOGlrZ1ZCeno0SGFDUDQwd29h?=
+ =?utf-8?B?N2xzRERKd0FDb3VHRFZlczhWSFNPTmtUMHRtSVFzSFA4a2E0WmdFRU9xQjhn?=
+ =?utf-8?B?M05KVytYRlpLeDI5T3FTRHpRcUc5aEJJRnovck1FcUJCK0RVTjlDS21HN0I1?=
+ =?utf-8?B?VTVlRU94R1RQOXRZRHhHMkltR3NVak5lSFdnaElXRmNkSjh1Wk41akc1VXFy?=
+ =?utf-8?B?bWVoMkFsbHhCcGxmclp6eHdFVlF4OUthaXVjRkJCcWdNNENNSnVTckRhdzdo?=
+ =?utf-8?B?K3Y0VHBQWjlnd0VJaWVkVTRGTjQ4cjNlaG42VXViOENSa3I2RC9oKzNHK3pB?=
+ =?utf-8?Q?FcsxpQODVQ4=3D?=
 X-Forefront-Antispam-Report:
-	CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(30052699003)(36860700013)(1800799024)(376014)(13003099007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2025 10:09:38.9016
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB9066.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NmdJSEVjNk5QOVNtWjVGcEpZc1RQdzkvTDFoS1B3eHdNMjkzQW9JbWZIU01D?=
+ =?utf-8?B?K0hJRzhrQjh5NTVBeTJDVVZCbis4SS9qSTZPaEd0aEVrUnFLMmRhYkdiRUc4?=
+ =?utf-8?B?L0tLcFVLK3hVWU95cHNaVEZ2SXh1SFZEc3hzRnVDdFBoOG40Q3c0aUNiSmh2?=
+ =?utf-8?B?cGhYZ25NSGJ5cXRUR0NTbHRRQlJzSm5ZbGFCTEJ6K3ZUTjc0cGpRS2lpR21v?=
+ =?utf-8?B?eEk1NXlIY2tKV0p0N2tRSTU2UWp1aXpDT2lIdGJzSzlrTis5WFNQQ2xZT0to?=
+ =?utf-8?B?U1BVeHZGZ1Q3dlgxS3RjakZ4TEdnR21ITjNsUFVKZDZLU2duU1hwaG9qYi9z?=
+ =?utf-8?B?UHQxTVVUb2NBamN3Q3hyRWVoTThNZzAzYTNNbzhVWlgvTGIyRVRCeDhUTnk1?=
+ =?utf-8?B?NWpIUjBSS29hOFBlRWRYODUwdGkzSTlVWURUZ1VEcjE4OC8wdWNwSkVZTDIz?=
+ =?utf-8?B?RVNHTFM5azNML2lMMWhjbXdsMVhiekxXVk5UeSs4dWNEWTZHTjFBN0h4ekJT?=
+ =?utf-8?B?Z1lxNXdiNlRURk4wU3AvemFVZStkbTkwa1dnVnc2Wm5kZURGeW1DNUVHWmpK?=
+ =?utf-8?B?S2F4eHBzTHB4Uy9yRlEwV2IvRDF1a282TS9ueVNOeUF4UFh5RDRIdTVOT1RO?=
+ =?utf-8?B?OHkvRHhDcVNzOFZlcTUzUXpXQkl1cHc3MGhLNWNBaE9HWis2VGFRVElTK2FE?=
+ =?utf-8?B?SVV2K1Z1ZjlIQUF4WFZ5NW13VjViVTg1N1luRVhmL1kvdmpmZ3JSdi9pMjNU?=
+ =?utf-8?B?MFpNbzZNa0YxQXJ2Qm1DZWk4SlhlZmxkRGlSUXZSbjNNZkE2V3E0YjFwK2ZI?=
+ =?utf-8?B?aThPU2JpZVBsUTc3UWFwSDVyV1Y4MXhKcmpzSU5iM0lkR2tCOXpHY1ZDTXJY?=
+ =?utf-8?B?QzlIK2NCWUlPVDg5cldPSTljbzlCay9zUlNMdys0UDN4aHp0OVlCVFo1ZUxk?=
+ =?utf-8?B?Q3pyYUw5TTlSRW1TUjlHaW1pVElhQTZEVjkzVHN5NzlKU1pXVmR0Nm83a29K?=
+ =?utf-8?B?TTVFZFBvU0ZHTFJyQkRtVWxHWTN2T29BbVNKNDJ1YStRTm8vUnRLY1dtWEZ2?=
+ =?utf-8?B?a29LblRyRHBEMDdiWDBZdGJucjdaMmUxc1J2Q1BCTTVsYTlUSWZWTmh0blZ2?=
+ =?utf-8?B?cnV1NFBUbXBPUTZpUFdWb1ZUaExEZkIxTDg4eDIwUW85SUE0M0FQUG9KTEVz?=
+ =?utf-8?B?WDdZdSt1ZjlLRDVibEFDQktFZndRcHl4Z1o0MlNzYkluYXpHUXNPVXVpS0Zo?=
+ =?utf-8?B?NlFZMW51UFFvWTVaekpGa1JqNVI4ZXlvdFFjQ0hkUXUrZHZOMmptMTVKb1NW?=
+ =?utf-8?B?ekszZnVwQ3NDT1Mrc2dLVkZJbWVKM08ybnhEcHBzK3pkVE9tc0piRTc3dSsx?=
+ =?utf-8?B?TkdiQ3FLU281ZUQ1Z3liNEtxRjFWbm1iUUtOMENvcEhWNlpSWGhESlhjODRM?=
+ =?utf-8?B?bDNVSUdWMGR6TVNoelFjYmF0U1FxU3RSVHUwLzVVamhUcFBybiszdWN3R3do?=
+ =?utf-8?B?ckVQQjhyem8wUS9hRm5mZHZ5d25jMGI5QkxMOTdRV05BQXFyRXJjZ3V3ejVL?=
+ =?utf-8?B?bHQ1TUtQckN5aXBER2phSmVMTWlvZ3ZGTlVxdlFHczZtSVVNaHlUdy82UEho?=
+ =?utf-8?B?TVBCL0MvMWpRdGp4c3FYcmtZZDdkR3JYdDIyMGZySHhtNFY4eWpqMDU5em5Y?=
+ =?utf-8?B?bGY4eDEyUlZUQVRFWnYxSUtLbjIvb1B1WTgyUnYwaC9QbEFVMzFDQ3kyM25w?=
+ =?utf-8?B?Wnh3VC93Q3l2SjhScTVub2FyZmpqbW9yekxZaThtY0dUWlJ2THZMa1VWMSsz?=
+ =?utf-8?B?WWxNNmxDdDBkemJYL2x2VmEwWGM2WjJTY1N2T3pWMFFXTGRpcjA3SGJlZjlV?=
+ =?utf-8?B?WFFpcEZJQ3RJZHZzTFdqVVZPV0ViQW9HUFBtcFJkZUdEcGhnc0NRV1BJNERJ?=
+ =?utf-8?B?MUV5eXlYVW43M3ZzdFRoOW1OMS9pTUI5a0pOYlpRQXRTZ0REYm9PSWlsbUdy?=
+ =?utf-8?B?YUJpb2FWOVpmRnMvN0lKbzJNeXArN3M2Y3BuclpGZzdwUm9DK0dIVVFLU1Zu?=
+ =?utf-8?B?V3R0RUt0ZCtzUkdhbG9pWlNSbzFKVHl6RzgzckxHd2dHTS9jMFE1aWoxc2FD?=
+ =?utf-8?Q?tXb21Lwx2yJirBAbLdxgyEaQt?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8721eca9-4c92-4649-3f31-08ddb563f5d2
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB9066.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2025 10:18:29.0187
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5af88d30-9851-447e-f1a3-08ddb562ba0e
-X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AMS0EPF000001B4.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR03MB8266
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gXxY4ywlNzgwXJmwc5TaklLl27pQ0q19mBuaw83q3sUVMZefiy5b7XKDusT60VLyb15uHGLicWkgqj2wM47CPA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB9733
 
-Hi Luiz,
+On 6/26/25 12:56, Leon Romanovsky wrote:
+> On Tue, Jun 24, 2025 at 05:43:09PM +0530, Abhijit Gangurde wrote:
+>> Register auxiliary module to create ibdevice for ionic
+>> ethernet adapter.
+>>
+>> Co-developed-by: Andrew Boyer <andrew.boyer@amd.com>
+>> Signed-off-by: Andrew Boyer <andrew.boyer@amd.com>
+>> Co-developed-by: Allen Hubbe <allen.hubbe@amd.com>
+>> Signed-off-by: Allen Hubbe <allen.hubbe@amd.com>
+>> Signed-off-by: Abhijit Gangurde <abhijit.gangurde@amd.com>
+>> ---
+>> v1->v2
+>>    - Removed netdev references from ionic RDMA driver
+>>    - Moved to ionic_lif* instead of void* to convey information between
+>>      aux devices and drivers.
+>>
+>>   drivers/infiniband/hw/ionic/ionic_ibdev.c   | 133 ++++++++++++++++++++
+>>   drivers/infiniband/hw/ionic/ionic_ibdev.h   |  21 ++++
+>>   drivers/infiniband/hw/ionic/ionic_lif_cfg.c | 118 +++++++++++++++++
+>>   drivers/infiniband/hw/ionic/ionic_lif_cfg.h |  65 ++++++++++
+>>   4 files changed, 337 insertions(+)
+>>   create mode 100644 drivers/infiniband/hw/ionic/ionic_ibdev.c
+>>   create mode 100644 drivers/infiniband/hw/ionic/ionic_ibdev.h
+>>   create mode 100644 drivers/infiniband/hw/ionic/ionic_lif_cfg.c
+>>   create mode 100644 drivers/infiniband/hw/ionic/ionic_lif_cfg.h
+> <...>
+>
+>> +	rc = ionic_version_check(&ionic_adev->adev.dev, ionic_adev->lif);
+>> +	if (rc)
+>> +		return ERR_PTR(rc);
+> <...>
+>
+>> +struct net_device *ionic_lif_netdev(struct ionic_lif *lif)
+>> +{
+>> +	return lif->netdev;
+>> +}
+> Why do you need to store netdev pointer?
+> Why can't you use existing ib_device_get_netdev/ib_device_set_netdev?
 
-after changing my test setup (I now only use Mesh, no "normal" advertising
-anymore), I get many of these errors:
+We are not storing the netdev in RDMA driver. This function is accessing
+the ethernet copy to set netdev and guid. I can add dev_hold() here
+till netdev is registered with ib device.
 
-bluetooth-meshd[276]: @ MGMT Command: Mesh Send (0x0059) plen 40                                                                   {0x0001} [hci0] 43.846388
-        Address: 00:00:00:00:00:00 (OUI 00-00-00)
-        Addr Type: 2
-        Instant: 0x0000000000000000
-        Delay: 0
-        Count: 1
-        Data Length: 21
-        Data[21]: 142b003a8b6fe779bd4385a94fed0a9cf611880000
-< HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036) plen 25                                                            #479 [hci0] 43.846505
-        Handle: 0x05
-        Properties: 0x0010
-          Use legacy advertising PDUs: ADV_NONCONN_IND
-        Min advertising interval: 1280.000 msec (0x0800)
-        Max advertising interval: 1280.000 msec (0x0800)
-        Channel map: 37, 38, 39 (0x07)
-        Own address type: Random (0x01)
-        Peer address type: Public (0x00)
-        Peer address: 00:00:00:00:00:00 (OUI 00-00-00)
-        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)
-        TX power: Host has no preference (0x7f)
-        Primary PHY: LE 1M (0x01)
-        Secondary max skip: 0x00
-        Secondary PHY: LE 1M (0x01)
-        SID: 0x00
-        Scan request notifications: Disabled (0x00)
-> HCI Event: Command Complete (0x0e) plen 5                                                                                            #480 [hci0] 43.847480
-      LE Set Extended Advertising Parameters (0x08|0x0036) ncmd 2
---->    Status: Command Disallowed (0x0c)
-        TX power (selected): 0 dbm (0x00)
+>
+>> +
+>> +int ionic_version_check(const struct device *dev, struct ionic_lif *lif)
+>> +{
+>> +	union ionic_lif_identity *ident = &lif->ionic->ident.lif;
+>> +
+>> +	if (ident->rdma.version < IONIC_MIN_RDMA_VERSION ||
+>> +	    ident->rdma.version > IONIC_MAX_RDMA_VERSION) {
+>> +		dev_err_probe(dev, -EINVAL,
+>> +			      "ionic_rdma: incompatible version, fw ver %u\n",
+>> +			      ident->rdma.version);
+>> +		dev_err_probe(dev, -EINVAL,
+>> +			      "ionic_rdma: Driver Min Version %u\n",
+>> +			      IONIC_MIN_RDMA_VERSION);
+>> +		dev_err_probe(dev, -EINVAL,
+>> +			      "ionic_rdma: Driver Max Version %u\n",
+>> +			      IONIC_MAX_RDMA_VERSION);
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+> Upstream code has all subsystems in sync, and RDMA driver is always
+> compatible with its netdev counterpart. Please remove this part.
+>
+> This is not full review yet, please wait till next week, so we will
+> review more deeply.
+>
+> Thanks
+I will remove this.
 
-
-From the btmon output it is obvious that advertising is not disabled before updating the parameters.
-
-I added the following debug line in hci_setup_ext_adv_instance_sync():
-
-	printk(KERN_ERR "instance = %u, adv = %p, adv->pending = %d, adv->enabled = %d\n",
-	       instance, adv, adv ? adv->pending : -1, adv ? adv->enabled : -1);
-
-From the debug output I see that adv->pending is still true (so advertising is not disabled
-before setting the advertising params). After changing the check from 
-
-	if (adv && !adv->pending) {
-
-to
-
-	if (adv && adv->enabled) {
-
-it seems to do the job correctly. What do you think?
-
-
-regards,
-Christian
-
-
-On Friday, 27 June 2025, 09:05:08 CEST, Christian Eggers wrote:
-> Currently, for controllers with extended advertising, the advertising
-> data is set in the asynchronous response handler for extended
-> adverstising params. As most advertising settings are performed in a
-> synchronous context, the (asynchronous) setting of the advertising data
-> is done too late (after enabling the advertising).
-> 
-> Move setting of adverstising data from asynchronous response handler
-> into synchronous context to fix ordering of HCI commands.
-> 
-> Signed-off-by: Christian Eggers <ceggers@arri.de>
-> Fixes: a0fb3726ba55 ("Bluetooth: Use Set ext adv/scan rsp data if controller supports")
-> Cc: stable@vger.kernel.org
-> v2: https://lore.kernel.org/linux-bluetooth/20250626115209.17839-1-ceggers@arri.de/
-> ---
-> v3: refactor: store adv_addr_type/tx_power within hci_set_ext_adv_params_sync()
-> 
-> v2: convert setting of adv data into synchronous context (rather than moving
-> more methods into asynchronous response handlers).
-> - hci_set_ext_adv_params_sync: new method
-> - hci_set_ext_adv_data_sync: move within source file (no changes)
-> - hci_set_adv_data_sync: dito
-> - hci_update_adv_data_sync: dito
-> - hci_cc_set_ext_adv_param: remove (performed synchronously now)
-> 
->  net/bluetooth/hci_event.c |  36 -------
->  net/bluetooth/hci_sync.c  | 207 ++++++++++++++++++++++++--------------
->  2 files changed, 130 insertions(+), 113 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 66052d6aaa1d..4d5ace9d245d 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2150,40 +2150,6 @@ static u8 hci_cc_set_adv_param(struct hci_dev *hdev, void *data,
->  	return rp->status;
->  }
->  
-> -static u8 hci_cc_set_ext_adv_param(struct hci_dev *hdev, void *data,
-> -				   struct sk_buff *skb)
-> -{
-> -	struct hci_rp_le_set_ext_adv_params *rp = data;
-> -	struct hci_cp_le_set_ext_adv_params *cp;
-> -	struct adv_info *adv_instance;
-> -
-> -	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
-> -
-> -	if (rp->status)
-> -		return rp->status;
-> -
-> -	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS);
-> -	if (!cp)
-> -		return rp->status;
-> -
-> -	hci_dev_lock(hdev);
-> -	hdev->adv_addr_type = cp->own_addr_type;
-> -	if (!cp->handle) {
-> -		/* Store in hdev for instance 0 */
-> -		hdev->adv_tx_power = rp->tx_power;
-> -	} else {
-> -		adv_instance = hci_find_adv_instance(hdev, cp->handle);
-> -		if (adv_instance)
-> -			adv_instance->tx_power = rp->tx_power;
-> -	}
-> -	/* Update adv data as tx power is known now */
-> -	hci_update_adv_data(hdev, cp->handle);
-> -
-> -	hci_dev_unlock(hdev);
-> -
-> -	return rp->status;
-> -}
-> -
->  static u8 hci_cc_read_rssi(struct hci_dev *hdev, void *data,
->  			   struct sk_buff *skb)
->  {
-> @@ -4164,8 +4130,6 @@ static const struct hci_cc {
->  	HCI_CC(HCI_OP_LE_READ_NUM_SUPPORTED_ADV_SETS,
->  	       hci_cc_le_read_num_adv_sets,
->  	       sizeof(struct hci_rp_le_read_num_supported_adv_sets)),
-> -	HCI_CC(HCI_OP_LE_SET_EXT_ADV_PARAMS, hci_cc_set_ext_adv_param,
-> -	       sizeof(struct hci_rp_le_set_ext_adv_params)),
->  	HCI_CC_STATUS(HCI_OP_LE_SET_EXT_ADV_ENABLE,
->  		      hci_cc_le_set_ext_adv_enable),
->  	HCI_CC_STATUS(HCI_OP_LE_SET_ADV_SET_RAND_ADDR,
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 1f8806dfa556..563614b53485 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -1205,9 +1205,126 @@ static int hci_set_adv_set_random_addr_sync(struct hci_dev *hdev, u8 instance,
->  				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
->  }
->  
-> +static int
-> +hci_set_ext_adv_params_sync(struct hci_dev *hdev, struct adv_info *adv,
-> +			    const struct hci_cp_le_set_ext_adv_params *cp,
-> +			    struct hci_rp_le_set_ext_adv_params *rp)
-> +{
-> +	struct sk_buff *skb;
-> +
-> +	skb = __hci_cmd_sync(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(*cp),
-> +			     cp, HCI_CMD_TIMEOUT);
-> +
-> +	/* If command return a status event, skb will be set to -ENODATA */
-> +	if (skb == ERR_PTR(-ENODATA))
-> +		return 0;
-> +
-> +	if (IS_ERR(skb)) {
-> +		bt_dev_err(hdev, "Opcode 0x%4.4x failed: %ld",
-> +			   HCI_OP_LE_SET_EXT_ADV_PARAMS, PTR_ERR(skb));
-> +		return PTR_ERR(skb);
-> +	}
-> +
-> +	if (skb->len != sizeof(*rp)) {
-> +		bt_dev_err(hdev, "Invalid response length for "
-> +			   "HCI_OP_LE_SET_EXT_ADV_PARAMS: %u", skb->len);
-> +		kfree_skb(skb);
-> +		return -EIO;
-> +	}
-> +
-> +	memcpy(rp, skb->data, sizeof(*rp));
-> +	kfree_skb(skb);
-> +
-> +	if (!rp->status) {
-> +		hdev->adv_addr_type = cp->own_addr_type;
-> +		if (!cp->handle) {
-> +			/* Store in hdev for instance 0 */
-> +			hdev->adv_tx_power = rp->tx_power;
-> +		} else if (adv) {
-> +			adv->tx_power = rp->tx_power;
-> +		}
-> +	}
-> +
-> +	return rp->status;
-> +}
-> +
-> +static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> +{
-> +	DEFINE_FLEX(struct hci_cp_le_set_ext_adv_data, pdu, data, length,
-> +		    HCI_MAX_EXT_AD_LENGTH);
-> +	u8 len;
-> +	struct adv_info *adv = NULL;
-> +	int err;
-> +
-> +	if (instance) {
-> +		adv = hci_find_adv_instance(hdev, instance);
-> +		if (!adv || !adv->adv_data_changed)
-> +			return 0;
-> +	}
-> +
-> +	len = eir_create_adv_data(hdev, instance, pdu->data,
-> +				  HCI_MAX_EXT_AD_LENGTH);
-> +
-> +	pdu->length = len;
-> +	pdu->handle = adv ? adv->handle : instance;
-> +	pdu->operation = LE_SET_ADV_DATA_OP_COMPLETE;
-> +	pdu->frag_pref = LE_SET_ADV_DATA_NO_FRAG;
-> +
-> +	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_DATA,
-> +				    struct_size(pdu, data, len), pdu,
-> +				    HCI_CMD_TIMEOUT);
-> +	if (err)
-> +		return err;
-> +
-> +	/* Update data if the command succeed */
-> +	if (adv) {
-> +		adv->adv_data_changed = false;
-> +	} else {
-> +		memcpy(hdev->adv_data, pdu->data, len);
-> +		hdev->adv_data_len = len;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int hci_set_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> +{
-> +	struct hci_cp_le_set_adv_data cp;
-> +	u8 len;
-> +
-> +	memset(&cp, 0, sizeof(cp));
-> +
-> +	len = eir_create_adv_data(hdev, instance, cp.data, sizeof(cp.data));
-> +
-> +	/* There's nothing to do if the data hasn't changed */
-> +	if (hdev->adv_data_len == len &&
-> +	    memcmp(cp.data, hdev->adv_data, len) == 0)
-> +		return 0;
-> +
-> +	memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
-> +	hdev->adv_data_len = len;
-> +
-> +	cp.length = len;
-> +
-> +	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_ADV_DATA,
-> +				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> +}
-> +
-> +int hci_update_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> +{
-> +	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED))
-> +		return 0;
-> +
-> +	if (ext_adv_capable(hdev))
-> +		return hci_set_ext_adv_data_sync(hdev, instance);
-> +
-> +	return hci_set_adv_data_sync(hdev, instance);
-> +}
-> +
->  int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
->  {
->  	struct hci_cp_le_set_ext_adv_params cp;
-> +	struct hci_rp_le_set_ext_adv_params rp;
->  	bool connectable;
->  	u32 flags;
->  	bdaddr_t random_addr;
-> @@ -1316,8 +1433,12 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
->  		cp.secondary_phy = HCI_ADV_PHY_1M;
->  	}
->  
-> -	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS,
-> -				    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> +	err = hci_set_ext_adv_params_sync(hdev, adv, &cp, &rp);
-> +	if (err)
-> +		return err;
-> +
-> +	/* Update adv data as tx power is known now */
-> +	err = hci_set_ext_adv_data_sync(hdev, cp.handle);
->  	if (err)
->  		return err;
->  
-> @@ -1822,79 +1943,6 @@ int hci_le_terminate_big_sync(struct hci_dev *hdev, u8 handle, u8 reason)
->  				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
->  }
->  
-> -static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> -{
-> -	DEFINE_FLEX(struct hci_cp_le_set_ext_adv_data, pdu, data, length,
-> -		    HCI_MAX_EXT_AD_LENGTH);
-> -	u8 len;
-> -	struct adv_info *adv = NULL;
-> -	int err;
-> -
-> -	if (instance) {
-> -		adv = hci_find_adv_instance(hdev, instance);
-> -		if (!adv || !adv->adv_data_changed)
-> -			return 0;
-> -	}
-> -
-> -	len = eir_create_adv_data(hdev, instance, pdu->data,
-> -				  HCI_MAX_EXT_AD_LENGTH);
-> -
-> -	pdu->length = len;
-> -	pdu->handle = adv ? adv->handle : instance;
-> -	pdu->operation = LE_SET_ADV_DATA_OP_COMPLETE;
-> -	pdu->frag_pref = LE_SET_ADV_DATA_NO_FRAG;
-> -
-> -	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_DATA,
-> -				    struct_size(pdu, data, len), pdu,
-> -				    HCI_CMD_TIMEOUT);
-> -	if (err)
-> -		return err;
-> -
-> -	/* Update data if the command succeed */
-> -	if (adv) {
-> -		adv->adv_data_changed = false;
-> -	} else {
-> -		memcpy(hdev->adv_data, pdu->data, len);
-> -		hdev->adv_data_len = len;
-> -	}
-> -
-> -	return 0;
-> -}
-> -
-> -static int hci_set_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> -{
-> -	struct hci_cp_le_set_adv_data cp;
-> -	u8 len;
-> -
-> -	memset(&cp, 0, sizeof(cp));
-> -
-> -	len = eir_create_adv_data(hdev, instance, cp.data, sizeof(cp.data));
-> -
-> -	/* There's nothing to do if the data hasn't changed */
-> -	if (hdev->adv_data_len == len &&
-> -	    memcmp(cp.data, hdev->adv_data, len) == 0)
-> -		return 0;
-> -
-> -	memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
-> -	hdev->adv_data_len = len;
-> -
-> -	cp.length = len;
-> -
-> -	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_ADV_DATA,
-> -				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> -}
-> -
-> -int hci_update_adv_data_sync(struct hci_dev *hdev, u8 instance)
-> -{
-> -	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED))
-> -		return 0;
-> -
-> -	if (ext_adv_capable(hdev))
-> -		return hci_set_ext_adv_data_sync(hdev, instance);
-> -
-> -	return hci_set_adv_data_sync(hdev, instance);
-> -}
-> -
->  int hci_schedule_adv_instance_sync(struct hci_dev *hdev, u8 instance,
->  				   bool force)
->  {
-> @@ -6269,6 +6317,7 @@ static int hci_le_ext_directed_advertising_sync(struct hci_dev *hdev,
->  						struct hci_conn *conn)
->  {
->  	struct hci_cp_le_set_ext_adv_params cp;
-> +	struct hci_rp_le_set_ext_adv_params rp;
->  	int err;
->  	bdaddr_t random_addr;
->  	u8 own_addr_type;
-> @@ -6310,8 +6359,12 @@ static int hci_le_ext_directed_advertising_sync(struct hci_dev *hdev,
->  	if (err)
->  		return err;
->  
-> -	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS,
-> -				    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> +	err = hci_set_ext_adv_params_sync(hdev, NULL, &cp, &rp);
-> +	if (err)
-> +		return err;
-> +
-> +	/* Update adv data as tx power is known now */
-> +	err = hci_set_ext_adv_data_sync(hdev, cp.handle);
->  	if (err)
->  		return err;
->  
-> 
-
-
-
-
+Thanks,
+Abhijit
 
