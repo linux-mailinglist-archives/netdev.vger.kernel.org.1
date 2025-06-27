@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-202067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F213DAEC290
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 00:19:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3CF5AEC293
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 00:19:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B58D11C4501C
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 22:20:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C58766E697C
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 22:19:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1EB014F9D6;
-	Fri, 27 Jun 2025 22:19:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E3D928D8C2;
+	Fri, 27 Jun 2025 22:19:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rP3lW8ad"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TeVBI21d"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64C2219E8;
-	Fri, 27 Jun 2025 22:19:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03EF14F9D6;
+	Fri, 27 Jun 2025 22:19:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751062780; cv=none; b=pFJp5vkBzqelwEiFi983VPd1ss6r7Oln0nKV2ys2dADTHqMvmsf9dHsFWHxnPU+ChLsAMQCy81HVjj4S0/GHJiu+rA6Hm94A/KY5D+q68s7d5yx8hfuiEDD4Dw3sq0AVDmOxjL/yzbxigjwpm6pS5q98e/qofrClSS33a4MnFwA=
+	t=1751062787; cv=none; b=J4sZ/GMM5O2O4SsqR99cdiwfHCjdD/aQ730UDD1pBwdGNyEDbyo8v/IP37IQrx/KMZ71J3guIqHiJi9u9LPfrhbbVxNRbYJzU5FqJz06Wnds+nnmI61pRajH4YWHLY3Hlwi0/rjPOlWHSAHu8XlSegknnr3BGYZ+opstgVoYUTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751062780; c=relaxed/simple;
-	bh=6quqVvu/Z9JLnoWia/dIUJKzUyovKEVlzIcedxWAH68=;
+	s=arc-20240116; t=1751062787; c=relaxed/simple;
+	bh=N0V4BZdMH/VMOZWlTiUnUi2RLPy+t6c7H7VRP1hkvI4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=X0i7J6Ge/Pa4y3UenMOyqQGnlJFdQ0R0gF8ZPJJ3qAp1g2hgV3J9F4eoKqTwShAwEUIGOeUrS45BC6htObiMkx2iEwEFgMLLzY8B52XodT7SSswQ2xAAeADc7FAFkXmEviFhqSkK12SlLSPtGV1Shkm5NFtq9ob1yBVazNnt9rY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rP3lW8ad; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5152AC4CEE3;
-	Fri, 27 Jun 2025 22:19:40 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Pvvg1sA15DdHU1oTEzJOwMD6sVruAtxMD6ctob0Ue/kILa203NJK414/AXfSwq/+EhO79nf5I5Hhv1vdHHqI3gNioRXrp6zZP35AIHanR8BjemgZdFzBGK6o7lwYsFciPN0Ez1LUrZ0azNIDlcLNXatgd5HxbQLFoqQmvTEzReU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TeVBI21d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49578C4CEE3;
+	Fri, 27 Jun 2025 22:19:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751062780;
-	bh=6quqVvu/Z9JLnoWia/dIUJKzUyovKEVlzIcedxWAH68=;
+	s=k20201202; t=1751062787;
+	bh=N0V4BZdMH/VMOZWlTiUnUi2RLPy+t6c7H7VRP1hkvI4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rP3lW8ad5MjlhUOgE5Z52zH5exQsBOT4ErWWrJhzXupEamVOZCZ/pY9HgaC2cb2wN
-	 FyMtR/JSv42CKkylLDVJIjClemWSo6DzsTTD+QLSmByIkjYw+zVd8ipsAaqZxS2WZs
-	 on7ZrmKQTrHekO6uDXa1Ax3abb2BKb5NEImf+sATLT/B0P09ASFab9Yf6udoW6eGY9
-	 Jdw+16gHmRTkoC9FUdlHPrFL1IzFli6oK1Ja1XkvZf0ty+aZWaFZoI8I8kw+/HcgyR
-	 pcSJ6icMihM16B7b1E+toi8dhkSQ81Lb+tlpxU+E01eul+SURLoomWuHxA4qPS6BFR
-	 lU5Uv5FtY3Q4g==
+	b=TeVBI21dhl1/DYXVMMVKW2B705RhlpboV6f4DisDbPbjiTsap8ypete8NTP5D4fec
+	 pzvE+wXwp/Xm302YK9sP3ZJ+WAn20UiKglAwi/eAfO5BrBX1YBGe6xbt1NhzUO50fP
+	 p9oIAFBcIk1ONe4Smm4GRmG/id1OvEoRFXKKVw/AZ0YhugVKHL/ub6/5vCzdafl10V
+	 x22tJi6dzPbpsrmbVS5zoGNYtVOq428UeFc705zAGJoG4RCRe7rpUn1pHE/d/jr5oS
+	 /C9aBmRP3RcfHvVR/RB9wYfPBRPdXZgwABvdkXdoZnivnunjpcSOH8rVUjzluDqFtP
+	 cFr1fiazE3ZXA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DE338111CE;
-	Fri, 27 Jun 2025 22:20:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DA238111CE;
+	Fri, 27 Jun 2025 22:20:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] MAINTAINERS: update smc section
+Subject: Re: [PATCH v3 0/2] NFC: trf7970a: Add option to reduce antenna gain
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175106280626.2076129.2564280805496966509.git-patchwork-notify@kernel.org>
-Date: Fri, 27 Jun 2025 22:20:06 +0000
-References: <20250626051653.4259-1-jaka@linux.ibm.com>
-In-Reply-To: <20250626051653.4259-1-jaka@linux.ibm.com>
-To: Jan Karcher <jaka@linux.ibm.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, hca@linux.ibm.com, wintera@linux.ibm.com,
- wenjia@linux.ibm.com, twinkler@linux.ibm.com, pasic@linux.ibm.com,
- sidraya@linux.ibm.com, mjambigi@linux.ibm.com, tonylu@linux.alibaba.com,
- guwen@linux.alibaba.com, alibuda@linux.alibaba.com
+ <175106281324.2076129.2162106005861598496.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Jun 2025 22:20:13 +0000
+References: <20250626141242.3749958-1-paul.geurts@prodrive-technologies.com>
+In-Reply-To: <20250626141242.3749958-1-paul.geurts@prodrive-technologies.com>
+To: Paul Geurts <paul.geurts@prodrive-technologies.com>
+Cc: mgreer@animalcreek.com, krzk@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ robh@kernel.org, conor+dt@kernel.org, linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, martijn.de.gouw@prodrive-technologies.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 26 Jun 2025 07:16:53 +0200 you wrote:
-> Due to changes of my responsibilities within IBM i
-> can no longer act as maintainer for smc.
+On Thu, 26 Jun 2025 16:12:40 +0200 you wrote:
+> The TRF7970a device is sensitive to RF disturbances, which can make it
+> hard to pass some EMC immunity tests. By reducing the RX antenna gain,
+> the device becomes less sensitive to EMC disturbances, as a trade-off
+> against antenna performance.
 > 
-> As a result of the co-operation with Alibaba over
-> the last years we decided to, once more, give them
-> more responsibility for smc by appointing
-> D. Wythe <alibuda@linux.alibaba.com> and
-> Dust Li <dust.li@linux.alibaba.com>
-> as maintainers as well.
+> Signed-off-by: Paul Geurts <paul.geurts@prodrive-technologies.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] MAINTAINERS: update smc section
-    https://git.kernel.org/netdev/net/c/8550821a1535
+  - [v3,1/2] dt-bindings: net/nfc: ti,trf7970a: Add ti,rx-gain-reduction-db option
+    https://git.kernel.org/netdev/net-next/c/2bee162a28fb
+  - [v3,2/2] NFC: trf7970a: Create device-tree parameter for RX gain reduction
+    https://git.kernel.org/netdev/net-next/c/5d69351820ea
 
 You are awesome, thank you!
 -- 
