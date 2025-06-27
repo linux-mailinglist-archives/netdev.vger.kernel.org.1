@@ -1,209 +1,173 @@
-Return-Path: <netdev+bounces-201990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBA89AEBE04
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 19:03:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04540AEBE10
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 19:04:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0775817A299
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 17:03:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8921B16AD5D
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 17:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C8D32EA17A;
-	Fri, 27 Jun 2025 17:03:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fCcRrGSN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A82A72EAB8D;
+	Fri, 27 Jun 2025 17:03:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0D329E115;
-	Fri, 27 Jun 2025 17:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A662EA727;
+	Fri, 27 Jun 2025 17:03:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751043787; cv=none; b=WBfCVi70Wu9Oe92Syz6/Qrick4mhqMabUapTJEB+d4ofL9haP+IzlozobSWCtgzePO8NTgAiT9trtR/RhvODOgXof83BplNKcwXb3rPXoYVn4b9Sr8haq9+qNpp+tq/cSa926/v6SnJifCh0SFcYmjEc3oFyKcE4Cj6FvOOMMbc=
+	t=1751043813; cv=none; b=e9CvjCA1kzprXC/qhAwDQMCv+wTaQgCbJFpKqOWXPCn1P9YXOcvOIZXZ5tv7CnJX3Xyn1/n/4BWlW1BPWRWxIXSL/dz5WC0KaGAJx730Arum1Tzb0SqSnFgHgFFG3NOabp0/gwsYQBc9ub1jhdKOa4bw4R+un4TnijuquGfA7H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751043787; c=relaxed/simple;
-	bh=Gn00Ied9mkn/AcZlIyGTQP64hKJHtvhp70miiHH8N1M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RLeH7hRrjwBRwn1vAKSGaZMG3uVsJNMagZ5hPie37UawSkQMVQMMs6pnUGYJdXXyRB8+HvVU1Kbu0JnRizgTU4x3WkxhHXsFFKmGbcEVNzTVSPDj+6gRy8W8ZUD66MzQIsGps92voq3A+q5yf7HanFqO10c3F4DNIR5SxGSC9eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fCcRrGSN; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B1DA744350;
-	Fri, 27 Jun 2025 17:02:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1751043777;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JAnce52V/7SwBr3WQruM3/+NAZWkJnhagjSqlHXqpIA=;
-	b=fCcRrGSN3as1/zQoH2mX7cN5ay6JkjjHj6uY+Su6E4xXpDAJxmy8rmKCgxRjG4rK+Kl3hw
-	7ibhJeoW3YJBaf+bOw5lL9rb2hNcY4CVBZ0aVD3RQwyZyHn7+g5j4PyMJlOLEPuiP12vSJ
-	+s509tkTytzi8jhvwLGK9gUX6/Zz0f5IUI4s3YzbJhVzh4gXlMWHKQsYsfqGkNGCGR+KiK
-	KYO8vNCLDeqg3OPBjehqor0XhVidsSO0rOqkSvPum195Wzzn8pODgQ6hUL4G3gF8LVPrmJ
-	2ON27Whj3Rj4YElvP6C0NrY7/gHK71xrCnkmB2VX7au7GtDFAb1pjHt2eQCeEQ==
-Date: Fri, 27 Jun 2025 19:02:50 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
- Gantois <romain.gantois@bootlin.com>, Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v6 03/14] net: phy: Introduce PHY ports
- representation
-Message-ID: <20250627190250.63a1848a@fedora>
-In-Reply-To: <20250513155325.2f423087@kmaincent-XPS-13-7390>
-References: <20250507135331.76021-1-maxime.chevallier@bootlin.com>
-	<20250507135331.76021-4-maxime.chevallier@bootlin.com>
-	<20250513155325.2f423087@kmaincent-XPS-13-7390>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1751043813; c=relaxed/simple;
+	bh=nXzyxfZtcRzaNJwnGz9ph4RHiCuOGSc2LfYD0Brd4rg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=TWh1FOASNo1iiC+5spgEOSlUbjocEI4rAocla3jK15DB3b+H140B4IwzRKLPMdgTco78p+ddhOFNn5s1YLttk3QXRIJULOwDjaj9nXpNWFSPNpyIZ9C6jP1O5HujhYcj0tRM7Krzhn4Znq53kU73eywGggv7fzcZpo8lAEvYSmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ae0dd7ac1f5so340254566b.2;
+        Fri, 27 Jun 2025 10:03:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751043809; x=1751648609;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v0xTwxPljoQU6BC5F6xmgbkQ4ioFx0ElNXIFan2NZgA=;
+        b=h6YK49pcMwBBc5d8uC8U+EFnl1bJaIuR5DN0UlraYOlH0U3b5nbHds9JXxr/BDfUw/
+         epeX3ee4KRmuxgAtFM3nTMzpng2QJZtEvAETzOqBRrBBBdv0bxO9Wt4zIRpG9fiX0KE+
+         vCWF6M7ZpgK528FbOY/5QDMlJ2INfU+r3Yx9n1hZcdg8QaolQZg5+0a7S4QC+l8VfmZn
+         +ZpC6MtknliwRWXVoxmEmRTRhLuh8RQSEL4ws35q1qeHaijDr/RU0fLycBArnhw751d4
+         TEsbfolrh8FKhAP66qX6Vr8qcg6+sp61hSbH/oBlsW1ioPB2VfYS+kDmsWLk3lO5aTn0
+         ZVlA==
+X-Forwarded-Encrypted: i=1; AJvYcCUU+fisxb1BtZi4DeQNK0QUAaDMUr0bt06Tnd7cjD+r4kKlAFeIWZ/3ir2qWLQEyrFr00w=@vger.kernel.org, AJvYcCXm1AOOI5Hyden8F6XG0etDIpL1Pwd4z1kQU9rx3eCwRCKXjqonuzOuKt7HXQDCeiSI61so+tra@vger.kernel.org, AJvYcCXuwMxiB0t9B1/2GSAReSBNwjIXbqd3GI56/9CayinaDhrFk2yUsd0rcZGpXPi3cti8v3QWDiKpNnqxcadhQRG7@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzvap8+Y6x8YJfqLKFYIrzKqJ90vd+9W6XWXSWBepVivj8RcMn8
+	cd4qoDZSeWrL8FfeuXZ+D5NTdyTNu/5YmWvt84m5fXddP2sylHOl+amr
+X-Gm-Gg: ASbGncu7u9UC2mJZIux/3inoKEBEb34AOGqL5m9sWDW3f+2/4NYDUHozkPS5ED2m2sU
+	HhQP9QHVq0mIs1CTlDY8WL+JzPNd1apq6t9MrpuQCs5grUCxB2TZtwp2mzDYp+T56sPTdzWB7hj
+	sqOrGbdAp8HusxGpcYAGPErFDbeGCPQcqpSDwiqXyFpxawGhXs6v91yND6UHadKRVaQ0hcAekH9
+	eJhLyNCQLY2U8AkGaS260KZCbsAN00epw/uXtZuY+IE2/YzWfEUvASwLfTVR6hr85Yh7SJSiUKA
+	DA2vxm5pqwNXkPJAfWyVeRiLV/Pkjm6b737wlX3l0py0sdHu/QFx
+X-Google-Smtp-Source: AGHT+IECu2XMDjD+UQNxbtS5PzxxaJTKOkwUAthdI095T2fsF1qFqZWS93/+q4MDtb0k5TiVnyfqLQ==
+X-Received: by 2002:a17:907:72d2:b0:ae3:5887:4219 with SMTP id a640c23a62f3a-ae358874ce7mr306786766b.45.1751043809114;
+        Fri, 27 Jun 2025 10:03:29 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:2::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae35363b347sm157052766b.35.2025.06.27.10.03.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Jun 2025 10:03:28 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next v3 0/3] selftest: net: Add selftest for netpoll
+Date: Fri, 27 Jun 2025 10:03:08 -0700
+Message-Id: <20250627-netpoll_test-v3-0-575bd200c8a9@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefieduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeeftddprhgtphhtthhopehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrg
- hdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhmshhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+X-B4-Tracking: v=1; b=H4sIAMzOXmgC/23N0QqCMBTG8VcZ59rFduaaedV7RIS5sxrElG2II
+ b57aDcWXn/8vv8EiaKnBDWbINLgk+8C1EwVDNpnEx7EvYWaAQrU4iiRB8p993rdMqXMG6mwtCi
+ 0aSsoGPSRnB/XuwsEyjzQmOFaMHj6lLv4XjuDXPf9y0FyyUtjSmdP+qSUO1u6+yYcuvhYEl+FY
+ kdpcawqhc6ga7dq6Q+4aaL+08gFL41FY4xGxF89z/MHdaPHjycBAAA=
+X-Change-ID: 20250612-netpoll_test-a1324d2057c8
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, bpf@vger.kernel.org, 
+ ast@kernel.org, Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.15-dev-dd21f
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2727; i=leitao@debian.org;
+ h=from:subject:message-id; bh=nXzyxfZtcRzaNJwnGz9ph4RHiCuOGSc2LfYD0Brd4rg=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoXs7fH2qUQfHFS4Hmm/F6DYpNNfJr+5o3Fx6rN
+ bJROCvhP/uJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaF7O3wAKCRA1o5Of/Hh3
+ bUfCD/0YeFypurws2zvN+N4jAUluSbnbS/0WUV6Z2W367spuyjzHF3pMOPupqlkvJatkjE7jcMX
+ eaGOabBFPPAtjfBtwkx5BMFpEHFl7R7+YvR1rPzSlHsKO2r0+d5y1ywqmTgt0c7Mr1xJpbnU8av
+ BkalY8hKQmTTdijrbEzieSlQJM/sCgzHxfD9Q3kqnfgP/siKTj++VIiAkrxMFKNEhQklaIDUF/J
+ o+Uq8Tw1fQoII+iWl5XDS6p2TzfIeJb4QSuc7ZZjx3k+8BJrPAEnS7wXjxY3pTzOTQsUjhFFxHc
+ 3rJut313wkRX2AwCSfa4mJu5M9SKJA36ry2/nq9crh9nkT9O7x2aJ2lIx0EyJ8emm4WsmoPWNk+
+ OI2pl50gkkcFAgb1jeFdX95/mVhmYLJfJv4bNwciB2YJXJ6NWzhzre16mn+QVOqw22udJRhwmUF
+ fTjVBbdkvN/GS5dBlOYd5pgUagRKO4pD/nPr+BDtSxB9WS8KWXBjhNJzvhkDkfucP84e51Do977
+ DyX1hAT+dVAEhGNF2mOuaRuthcwjVhTf9FvCBE9aGV/B3TuHcaC5Z53tu7To/JxM+MDMJ7L9Gur
+ tzryVcOFlKFPcUA8tnsRC+5rajZC1+IuB9doWVGJgGms08DKP4uRCYqqrjnwii0WjzxCJGgP7Ag
+ UFmJ5oyxhyF2s+A==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Hi Kory,
+I am submitting a new selftest for the netpoll subsystem specifically
+targeting the case where the RX is polling in the TX path, which is
+a case that we don't have any test in the tree today. This is done when
+netpoll_poll_dev() called, and this test creates a scenario when that is
+probably.
 
-On Tue, 13 May 2025 15:53:25 +0200
-Kory Maincent <kory.maincent@bootlin.com> wrote:
+The test does the following:
 
-> On Wed,  7 May 2025 15:53:19 +0200
-> Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
-> 
-> > Ethernet provides a wide variety of layer 1 protocols and standards for
-> > data transmission. The front-facing ports of an interface have their own
-> > complexity and configurability.
-> > 
-> > Introduce a representation of these front-facing ports. The current code
-> > is minimalistic and only support ports controlled by PHY devices, but
-> > the plan is to extend that to SFP as well as raw Ethernet MACs that
-> > don't use PHY devices.
-> > 
-> > This minimal port representation allows describing the media and number
-> > of lanes of a port. From that information, we can derive the linkmodes
-> > usable on the port, which can be used to limit the capabilities of an
-> > interface.
-> > 
-> > For now, the port lanes and medium is derived from devicetree, defined
-> > by the PHY driver, or populated with default values (as we assume that
-> > all PHYs expose at least one port).
-> > 
-> > The typical example is 100M ethernet. 100BaseT can work using only 2
-> > lanes on a Cat 5 cables. However, in the situation where a 10/100/1000
-> > capable PHY is wired to its RJ45 port through 2 lanes only, we have no
-> > way of detecting that. The "max-speed" DT property can be used, but a
-> > more accurate representation can be used :
-> > 
-> > mdi {
-> > 	connector-0 {
-> > 		media = "BaseT";
-> > 		lanes = <2>;
-> > 	};
-> > };
-> > 
-> > From that information, we can derive the max speed reachable on the
-> > port.
-> > 
-> > Another benefit of having that is to avoid vendor-specific DT properties
-> > (micrel,fiber-mode or ti,fiber-mode).
-> > 
-> > This basic representation is meant to be expanded, by the introduction
-> > of port ops, userspace listing of ports, and support for multi-port
-> > devices.
-> > 
-> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>  
-> 
-> ...
-> 
-> > +	for_each_available_child_of_node_scoped(mdi, port_node) {
-> > +		port = phy_of_parse_port(port_node);
-> > +		if (IS_ERR(port)) {
-> > +			err = PTR_ERR(port);
-> > +			goto out_err;
-> > +		}
-> > +
-> > +		port->parent_type = PHY_PORT_PHY;
-> > +		port->phy = phydev;
-> > +		err = phy_add_port(phydev, port);
-> > +		if (err)
-> > +			goto out_err;  
-> 
-> I think of_node_put(port_node) is missing here.
+ 1) Configuring a single RX/TX queue to increase contention on the
+    interface.
+ 2) Generating background traffic to saturate the network, mimicking
+    real-world congestion.
+ 3) Sending netconsole messages to trigger netpoll polling and monitor
+    its behavior.
+ 4) Using dynamic netconsole targets via configfs, with the ability to
+    delete and recreate targets during the test.
+ 5) Running bpftrace in parallel to verify that netpoll_poll_dev() is
+    called when expected. If it is called, then the test passes,
+    otherwise the test is marked as skipped.
 
-I don't think so, this is the _scoped variant so it takes care of
-that for us.
+In order to achieve it, I stole Jakub's bpftrace helper from [1], and
+did some small changes that I found useful to use the helper.
 
-> 
-> ...
-> 
-> > @@ -1968,6 +1997,7 @@ void phy_trigger_machine(struct phy_device *phydev);
-> >  void phy_mac_interrupt(struct phy_device *phydev);
-> >  void phy_start_machine(struct phy_device *phydev);
-> >  void phy_stop_machine(struct phy_device *phydev);
-> > +  
-> 
-> New empty line here?
+So, this patchset basically contains:
 
-Oops, this will be removed
+ 1) The code stolen from Jakub
+ 2) Improvements on bpftrace() helper 
+ 3) The selftest itself
 
-> > +/**
-> > + * struct phy_port - A representation of a network device physical interface
-> > + *
-> > + * @head: Used by the port's parent to list ports
-> > + * @parent_type: The type of device this port is directly connected to
-> > + * @phy: If the parent is PHY_PORT_PHYDEV, the PHY controlling that port
-> > + * @ops: Callback ops implemented by the port controller
-> > + * @lanes: The number of lanes (diff pairs) this port has, 0 if not
-> > applicable
-> > + * @mediums: Bitmask of the physical mediums this port provides access to
-> > + * @supported: The link modes this port can expose, if this port is MDI (not
-> > MII)
-> > + * @interfaces: The MII interfaces this port supports, if this port is MII
-> > + * @active: Indicates if the port is currently part of the active link.
-> > + * @is_serdes: Indicates if this port is Serialised MII (Media Independent
-> > + *	       Interface), or an MDI (Media Dependent Interface).
-> > + */
-> > +struct phy_port {
-> > +	struct list_head head;
-> > +	enum phy_port_parent parent_type;
-> > +	union {
-> > +		struct phy_device *phy;
-> > +	};  
-> 
-> The union is useless here?
+Link: https://lore.kernel.org/all/20250421222827.283737-22-kuba@kernel.org/ [1]
 
-For now yes :( But this will change when adding support for
-non-phy-driver ports.
+---
+Changes in v3:
+- Make pylint happy (Simon)
+- Remove the unnecessary patch in bpftrace to raise an exception when it
+  fails. (Jakub)
+- Improved the bpftrace code (Willem)
+- Stop sending messages if bpftrace is not alive anymore.
+- Link to v2: https://lore.kernel.org/r/20250625-netpoll_test-v2-0-47d27775222c@debian.org
 
-Maxime
+Changes in v2:
+- Stole Jakub's helper to run bpftrace
+- Removed the DEBUG option and moved logs to logging
+- Change the code to have a higher chance of calling netpoll_poll_dev().
+  In my current configuration, it is hitting multiple times during the
+  test.
+- Save and restore TX/RX queue size (Jakub)
+- Link to v1: https://lore.kernel.org/r/20250620-netpoll_test-v1-1-5068832f72fc@debian.org
 
-> 
-> Regards,
+---
+Breno Leitao (2):
+      selftests: drv-net: Strip '@' prefix from bpftrace map keys
+      selftests: net: add netpoll basic functionality test
+
+Jakub Kicinski (1):
+      selftests: drv-net: add helper/wrapper for bpftrace
+
+ tools/testing/selftests/drivers/net/Makefile       |   1 +
+ .../selftests/drivers/net/lib/py/__init__.py       |   3 +-
+ .../testing/selftests/drivers/net/netpoll_basic.py | 345 +++++++++++++++++++++
+ tools/testing/selftests/net/lib/py/utils.py        |  35 +++
+ 4 files changed, 383 insertions(+), 1 deletion(-)
+---
+base-commit: 8efa26fcbf8a7f783fd1ce7dd2a409e9b7758df0
+change-id: 20250612-netpoll_test-a1324d2057c8
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
