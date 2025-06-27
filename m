@@ -1,233 +1,378 @@
-Return-Path: <netdev+bounces-201988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CE9EAEBDDE
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 18:54:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77F55AEBDE1
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 18:54:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7C31646B28
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 16:53:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48C9A1898CCE
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 16:54:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A62D2E9ED4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F9E2EA727;
 	Fri, 27 Jun 2025 16:54:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l8jmZx3k"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HlFqDnEq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B925C2E9746
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 16:54:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751043260; cv=fail; b=oAWCRxxrwTli4kC7nZzniQk0XJewrCbpr8O5DQtKjpmUx9ZdsczQpKZ559Xn0LIOLfkELbGw+C8lusW5eDEg01baod0P9SqDNI8BCAnvcghM6VcsdhzEYn7OFX7qgT/DpZJxw28ae9gQ2BBbCrxxf4ytEMj/WJjw8ZJyMy41g+Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF3E185E7F;
+	Fri, 27 Jun 2025 16:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751043260; cv=none; b=E68rfpx6W+PqKl7gF2nfjrXzSZTUPJKwUf0giwY1Ub6CRS+J0B97nLmLpt9qPIxf80D15kL3tR1GYuOpQHhv16Se+mm3Ty4pgoknZixl3BH/A5+ndHy9kByhlFLdXsPKaEcIUrOuxZrJvygJ7KCNbunZmrgblxASXf08Ad3yZP8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1751043260; c=relaxed/simple;
-	bh=CRknJw2d0DAmv/ki/m8+gXQwrRZUEWng5QK+g91dndY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=mD6Ktfwfk1LCIXtCg06I2QrfhQfM0Cbsj7+p35s2LXYwa50tydcrK8JNiEUwJKt0u+R4sfBdFFBUzNaJZRQbngaietKrmVFMBquAuucnpynrhlfInDK8JExiXkAUjDqaJzNM8vV7gXkHoc9A+PpMdaEx8btD/qshD+z/QnBDkUE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l8jmZx3k; arc=fail smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751043258; x=1782579258;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=CRknJw2d0DAmv/ki/m8+gXQwrRZUEWng5QK+g91dndY=;
-  b=l8jmZx3kpMFn0Og+lGA3QRAJIwtvqTys81BB0vDKdcyqydDrfxeW4EDc
-   AywKkVawjTSrDpfTOpo/HcuIQhOZI2oYId1fK2Wch9scSQTfR2Ky48bLa
-   PaimhNz0jRFm1VaCawGwx5BTKXtB6ZzKrBpj8qT5+H6oWuW5vv/Z/JjLA
-   /oliCpapo+fFa2PLKRyZhNlOiXZSTZ4R/DimsZiRGjiiwAw6JjWWgDaHR
-   yAEDBetCstH0JwjxdBgqfdUJvP0JEx/VBQzslt363Qp19O6076zUboRrE
-   l06aNBYqOSIUZ/L9sy7CZc9YpRLZlKK/V/FkPUEJyE3TqUzB01WLBZVLx
-   A==;
-X-CSE-ConnectionGUID: pfsPM7z0Spumg2ZWdqjkaw==
-X-CSE-MsgGUID: voGCMilNSJuzgKZEP4xc8g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11477"; a="53235043"
-X-IronPort-AV: E=Sophos;i="6.16,270,1744095600"; 
-   d="scan'208";a="53235043"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2025 09:53:48 -0700
-X-CSE-ConnectionGUID: 3AxMP/aoTpCVppb7VYnt5g==
-X-CSE-MsgGUID: UNzuRvvjTkiWD6X12mXgJQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,270,1744095600"; 
-   d="scan'208";a="157236620"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2025 09:53:48 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 27 Jun 2025 09:53:48 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Fri, 27 Jun 2025 09:53:48 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (40.107.220.63)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 27 Jun 2025 09:53:47 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=V0jNm3JvywbeWHAWnjNld2+UcwQFGogIVGeHKwPY8YS+y9dq8yqKw4ZbTk4QFxuBxfCF3zCVDhhHblXRkdyo2LuqCLOeRwn4wl8tEOpKBKbwc8KllHgJeImQOdsbsCDAZ8yQbZDEIUY8driLpJ17hFY3zdKDBOPX2a940/KFAvxLsjJQtxnt2htfIEFY8OeXKHIftMqsQCRq/FVfjoc5iQ3dfYjlGg4unA/uKoSEK3plLolAd0kjP0KEB6ljk+zyytVmGGxA5gigutUuPNBI984i5T+c19VKCCogp/42LQciGn9PRgMWDp6JgzgW7vNrEJxWZ4ursALlGWqXgcwbnQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QVz9NXkcEei6z96JvcDTZeYCEZ1gdCpLRnqTo0E+4AM=;
- b=Fc6zcjroHArL9AgZe5gD1wdTJgvmA4k1130P3DId6eErRMtPi1+8Dicuy/puADALmEpB9k+X3djMT3O8j7kh4CwhjltVWJhX6epgqP9K4c25TKE56MqABSGX1p5Y846z8qr+65i1+dfF1BL7jM/MEHY3jZmuIg1vDk0NKhIi8nQ5Eek7ftUIsMYIG2bodx9yCiC10rDm/tEduuThJpBKcmjAWF9ZHNTQ7IvTnolKpUK2kBDlekHSwBSFOneqHaJJmtfD01lwn/mhMHQxn7Hm4gGo6LSH1VVn9/UkUqNsnbnuZCTGudJoiBgZU0W7c4araWudZ+mJS/n82wxbA+ktRQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
- by CH3PR11MB8590.namprd11.prod.outlook.com (2603:10b6:610:1b8::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.30; Fri, 27 Jun
- 2025 16:53:19 +0000
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::7ac8:884c:5d56:9919%6]) with mapi id 15.20.8880.021; Fri, 27 Jun 2025
- 16:53:19 +0000
-From: "Rinitha, SX" <sx.rinitha@intel.com>
-To: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Knitter, Konrad"
-	<konrad.knitter@intel.com>, Simon Horman <horms@kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2] ice: add E835 device IDs
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2] ice: add E835 device IDs
-Thread-Index: AQHbyWn+tP5H0XkNH06OyypCUqSNG7QXbNZg
-Date: Fri, 27 Jun 2025 16:53:18 +0000
-Message-ID: <IA1PR11MB624152F06275B0400414F7EB8B45A@IA1PR11MB6241.namprd11.prod.outlook.com>
-References: <20250520093059.387511-1-dawid.osuchowski@linux.intel.com>
-In-Reply-To: <20250520093059.387511-1-dawid.osuchowski@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|CH3PR11MB8590:EE_
-x-ms-office365-filtering-correlation-id: 75ceaa4b-a460-424a-26f9-08ddb59b1e51
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018|7053199007;
-x-microsoft-antispam-message-info: =?us-ascii?Q?kfOlac4N2lHZo19ttjD1er+6nyKP5fSCIhyQJvAC7LHa8KZPtNevnsF/QdEO?=
- =?us-ascii?Q?KabOKLHv3sWAjrRpFCQ38I3JHdLEhT3Kby1oAoZjwTH2mfC2mm6URPzk2uec?=
- =?us-ascii?Q?9MrbhrnjiQN8jq6ka7T2OFSLiC4nYmm466Vb/2kCYAOPfC3cDnvJQEmq9W8D?=
- =?us-ascii?Q?sNs3uQGgIBYLkV+66dvnFwkUVkBWmDQfEXdCTW0TeU8SxGnji3GhXQpLvK5s?=
- =?us-ascii?Q?9VC1txx5fxIQhOvF7Wo6J7ezjfhPbI9PofQd7MA2x8BHF7Nzl2Ii4V65khv9?=
- =?us-ascii?Q?Rp3rHLKI7udFhfKss5RgYg12yffktto49ziEEmNZa8pePW1rviHUQDfZYdwc?=
- =?us-ascii?Q?LBoPsPRr6e//QbzY6524CefKvmMGKq2W/8Ih/AB/PqDp3djlgSclULWPhZPL?=
- =?us-ascii?Q?zS/hyuqCs7LuMGKtdNnN0ehw8xyQ+E3ipm60FykdxnQk7uKb6g3/J+JULJRO?=
- =?us-ascii?Q?W008A3BI95nbeDvO2kctxMLFNEaff4Z/W6swKDOTDayVAsjrCULw/RwGQvjn?=
- =?us-ascii?Q?UahcuQLaSORYhctM1/HGDmp0bKBPtp0PKwynYiN9B32lmsFnplFlNTApFpn5?=
- =?us-ascii?Q?vHsgs40STzdc55P9IVvkcdFTR8TzWCubQwBCNpLoLgPwaQ+sqan+CYwT4PKc?=
- =?us-ascii?Q?6/NovCjr0DBXtAb1YSTwqrW+NVaHtw0sCq9TMcDHT616aR1Sa6KqURJU6D48?=
- =?us-ascii?Q?g2JAgQCKl8f8WR9YnrRjz/OvFukgXoPGmFO9ZsFqvw/qzc3WLKw2KkNmJV8+?=
- =?us-ascii?Q?WD/a6RrKiTEAj3htpAo5N7aAX0LZDjsyhegkFm4JbEFquL433iIdniANthwX?=
- =?us-ascii?Q?vVzsAVyxMC1/NyV7avqBvF/bejnCnMOFKPFkyj6dCtVaQOSH5aqz/X7q7Wux?=
- =?us-ascii?Q?8KmLW4P1W/DGvkwTrpjiJuiCxd+ZcjITBJjsxybfqZkoiLyx6kjjnT76CY/X?=
- =?us-ascii?Q?0sUdE6G4InYNXrlTN8NxYe24IzryVvwIVMgZnifK54HV3Oz6OJN3Mo0tVsPP?=
- =?us-ascii?Q?o7dOLoe9/ar4WZHQdczN0OFj1p//Kd1laIWQBBbAAhJ29NbJM+bJuwNzP0RX?=
- =?us-ascii?Q?jrwt4Ps2EPLhfmQUpry5OCylgiw0WeoYHyzzWv0y958cgMInhybc3+fiEB4J?=
- =?us-ascii?Q?G8fmMOkSZvkxOxziiFyMMzf01asAzMQtCalhyQn9K1GGyUjbEdQk6J1k4rqW?=
- =?us-ascii?Q?NFwwhAPSwAkX97wm9Oib7QT/vae2+rWTMJM4JfODKQuzupNirVKZtTq+Z7e6?=
- =?us-ascii?Q?owU0AjxmbdEJ20fu8Q70qJK2GgAvl3O3B8WPeCgU966IhO+0fBYH91Ifphv/?=
- =?us-ascii?Q?/pIVoj8q1vu+M82bcmPrKRm8ilKeZkBG8jAHk8882cd8iJ1EP+W+mtH72Op5?=
- =?us-ascii?Q?56QL9OCRyW7u+Uo+WcjyOr9eBvBLquVc0aH9unyZF4oYRxz/6kOE0zoT2ISs?=
- =?us-ascii?Q?HoNhScmHBJMDton7WWGxh/0qSPSzfYbWunC6nRd7ZVsbhER+6el5VM3L6F77?=
- =?us-ascii?Q?dLRT2b63L5smi5E=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018)(7053199007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?l4RLoAMYI+o3SK3Gel8md22b1ZGbq46XXA6DLvl88UuADAntgtgAzP3/nyxC?=
- =?us-ascii?Q?H14w4F0GdTCFOHhm1a64nOAAOCGibZunwJYfFto34YjXT8xAgXac/ggYTLfY?=
- =?us-ascii?Q?mBkMfqCgISvJ1htUXchdExOJeANQg6SMEEce0O2uLIONApzIp4V8hmNs1Pj8?=
- =?us-ascii?Q?Nj5DKUld5WHhI0Um3BJJTIy9nVoprl44xjVaPvwZq6kqiMvLpZSE1SNeUNPY?=
- =?us-ascii?Q?3Ivr3puMUWrxV8Jpq8r6S8BbWkrBP5RTJCJN/zZ6xlUzoIubksW36n2WDKlX?=
- =?us-ascii?Q?Gh2vBLaB8g6K27i/A9Cs7SiHXVcs2zud9OXJF2f7QKZtPMg1Rdu8Je5KVWzG?=
- =?us-ascii?Q?vtvRc2mftNDUHEWpLiGv8d16GxNH5TKngQWpVdRhKIieTbDyVDNsf7LluiOC?=
- =?us-ascii?Q?r1opqXqIsQGsCJz08Gw8GecAo4qH5S6wvQINGtAsX8JBUnDmGImHU2NRng7x?=
- =?us-ascii?Q?gRM6ATZmc9VXYXsjyMLh96yC7bDN64gbulSgNDaX7QEvg7mAbYA31mSbZ7K+?=
- =?us-ascii?Q?nPcWGllsZgC2qKM6ZhSs5bs0DiQsqpcacBjuHYzB8sd+dcyHOdIe1AKCnPuS?=
- =?us-ascii?Q?8S/5WT50VzQQmx9yptbYGkAPxZm/YOKfmhvlCR9IUzhoM238Idhr+1cCeyTU?=
- =?us-ascii?Q?Bp6/qlVkijHqWVY7Fh1bfaRJPulpw8lTY1AMpZ4aENnq15PFGKyJP5SXP+nv?=
- =?us-ascii?Q?utmxjVjMmkBzd9sy+iCijJPk9oR5auX3mNPyxmd3B7mxnq5yLkJFeXtL2FPn?=
- =?us-ascii?Q?NaOgtto9wE081QFUj7yTCBHOgOXQpE1NM1Qo5fIe+iMA3uUANPrJ2argPc4O?=
- =?us-ascii?Q?tAmiY/SwadBadPK8FSkpC2yMExHHA4fLsYtRA2W380SPQb5A953VzmOHtOQN?=
- =?us-ascii?Q?PadD0mpkP8Up3pg6yFsB11fEDiwj/FLoTDwiGRqs/CorZfRk0OsXaGTKRnPz?=
- =?us-ascii?Q?SizKYRvGP2sFWEr3qXkjkHJVLYqGOBXLgL/6C44h2M1Cj5T6aWblVoOaaazw?=
- =?us-ascii?Q?sBlXKoz3IWHZkNqtcKxdFfq6zc5YyC5ecEqXZEoUE67TVjvtbzONoH4Fc1HM?=
- =?us-ascii?Q?eevLXhP+DI8OCrWKUr4w2QhTW4tFUG4Tml+sqbMQJgIqWQjs8cYI/AUsPAH+?=
- =?us-ascii?Q?ES2HHG1vDTc/4fDHAeknQL/6mdHwP3Yhn/v3FSGHAwriXzaQykT5tZ41yj/j?=
- =?us-ascii?Q?BoTfXRGS8HGenqbvAO2ftlfh3OpIO1WBKhNTeaIo0uIJPVqYi66U6lELC3KK?=
- =?us-ascii?Q?Q8ZKP/HpUQTHRwzcPxg6ZhCszkrb3OnJPCY8qx5jd+JGN4DPC3f0NC5fJtqU?=
- =?us-ascii?Q?H5FSAWvo2eebvalT5ujNrX4S//8bebRQbl7Q6CjxkeFYUysjz0x9aeipUMrE?=
- =?us-ascii?Q?r+vDdt0IjSvM46En5jDP/csL76wadYlxCwAcs+mL2QHFRoHyZbH0/+9yHk6P?=
- =?us-ascii?Q?rf+a7w3B9UrBtrXZcMVFYnhuh0I1tjTVqh1Th1gplI5RJLlE2+YaCor+OlcZ?=
- =?us-ascii?Q?WCWefrQhZyK5kgJny31cSU19sVXKzojJf59ggYXZBArTbS4hzw2lCo9C88V0?=
- =?us-ascii?Q?XUauLSRiwmCCDiYYbEjP6ncYOtwJzyKV/81fGNgy?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	bh=C1M2eCmTRJEnCSOMZJgg+cRJIDXef0XSu5rYNrrk1fA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k308vUJwVLhrvlArpG4R3lH3NwasuBmFp1Qina0189txHnz29pEuwXzeDgVlakLE4NGoJ3Nyrf6I9LkMuzQBpK/0T34Q8z9zQmb7EKAEkFKeJFxdj7kX10XrML+PJR2skFBUMLnvu8y0TJc/nfzentohRaOybTNXG9Ngs5LEngc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HlFqDnEq; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 155E0443CE;
+	Fri, 27 Jun 2025 16:54:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1751043247;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XeSFO9YmP+VkNGWgZDjeNmNRPcvML0v01nWUb6jOpZU=;
+	b=HlFqDnEqkvlG3RejH7/pchC3wYToHai2TPtoWVJHInnRmRTY382TJUp4B9i2cWXv6mCbrD
+	UtMdobSU1Rhc1WtcIs1sf1ef4b8g6h/yb/qYq0z9MDs6QuCIHV7ESwMns/z4/2ttDO0ATO
+	TQdVtivdHisypeWtFdc8LOcHjI2w+pICCCSeyuSDddanF7ufvYRAaName34eCJze+2ouRE
+	prgET+ehViEi0VXPeSE4+Wihe6n2n4jZJWEbjkVgEexCAikjZuje4WDJAr3qA5zKzxZxCJ
+	3zHK32zHwsWuJ7ZDyFWMZ60t02OHT9h+BX0aXLQdGAZpVu/fwA1GXC2g8xCB+w==
+Date: Fri, 27 Jun 2025 18:54:04 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
+ mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
+ devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Daniel Golle
+ <daniel@makrotopia.org>, Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: Re: [PATCH net-next v6 03/14] net: phy: Introduce PHY ports
+ representation
+Message-ID: <20250627185404.7496fbc4@fedora>
+In-Reply-To: <3878435.kQq0lBPeGt@fw-rgant>
+References: <20250507135331.76021-1-maxime.chevallier@bootlin.com>
+	<20250507135331.76021-4-maxime.chevallier@bootlin.com>
+	<3878435.kQq0lBPeGt@fw-rgant>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 75ceaa4b-a460-424a-26f9-08ddb59b1e51
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jun 2025 16:53:18.9346
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2RrGXTMRfHghCJEk1msGDlb9jxpirRDm3WvfY5uKkm2FXl1HzfwPaK6Aoxog37bxt5pDpJvp8dQAk5+Ax/1ifg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8590
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefheelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeeftddprhgtphhtthhopehrohhmrghinhdrghgrnhhtohhishessghoohhtlhhinhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhor
+ hhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqmhhsmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of D=
-awid Osuchowski
-> Sent: 20 May 2025 15:01
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Dawid Osuchowski <dawid.osuchowski@linux.inte=
-l.com>; Knitter, Konrad <konrad.knitter@intel.com>; Simon Horman <horms@ker=
-nel.org>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v2] ice: add E835 device IDs
->
-> E835 is an enhanced version of the E830.
-> It continues to use the same set of commands, registers and interfaces as=
- other devices in the 800 Series.
->
-> Following device IDs are added:
-> - 0x1248: Intel(R) Ethernet Controller E835-CC for backplane
-> - 0x1249: Intel(R) Ethernet Controller E835-CC for QSFP
-> - 0x124A: Intel(R) Ethernet Controller E835-CC for SFP
-> - 0x1261: Intel(R) Ethernet Controller E835-C for backplane
-> - 0x1262: Intel(R) Ethernet Controller E835-C for QSFP
-> - 0x1263: Intel(R) Ethernet Controller E835-C for SFP
-> - 0x1265: Intel(R) Ethernet Controller E835-L for backplane
-> - 0x1266: Intel(R) Ethernet Controller E835-L for QSFP
-> - 0x1267: Intel(R) Ethernet Controller E835-L for SFP
->
-> Reviewed-by: Konrad Knitter <konrad.knitter@intel.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-> ---
-> v2 changes:
-> - v1: https://lore.kernel.org/netdev/20250514104632.331559-1-dawid.osucho=
-wski@linux.intel.com/
-> - Move device IDs to corresponding spot in the file (Tony)
-> - Add Reviewed-by tag from Simon
-> ---
-> drivers/net/ethernet/intel/ice/ice_common.c |  9 +++++++++  drivers/net/e=
-thernet/intel/ice/ice_devids.h | 18 ++++++++++++++++++
-> drivers/net/ethernet/intel/ice/ice_main.c   |  9 +++++++++
-> 3 files changed, 36 insertions(+)
->
+Hi Romain,
 
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+On Mon, 12 May 2025 09:53:09 +0200
+Romain Gantois <romain.gantois@bootlin.com> wrote:
+
+> Hi Maxime,
+
+I'm about to send a V7, but I realise now I didn't address these
+reviews... sorry about that
+
+> On Wednesday, 7 May 2025 15:53:19 CEST Maxime Chevallier wrote:
+> > Ethernet provides a wide variety of layer 1 protocols and standards for
+> > data transmission. The front-facing ports of an interface have their own
+> > complexity and configurability.
+> >   
+> ...
+> > +
+> > +static int phy_default_setup_single_port(struct phy_device *phydev)
+> > +{
+> > +	struct phy_port *port = phy_port_alloc();
+> > +
+> > +	if (!port)
+> > +		return -ENOMEM;
+> > +
+> > +	port->parent_type = PHY_PORT_PHY;
+> > +	port->phy = phydev;
+> > +	linkmode_copy(port->supported, phydev->supported);
+> > +
+> > +	phy_add_port(phydev, port);
+> > +
+> > +	/* default medium is copper */
+> > +	if (!port->mediums)
+> > +		port->mediums |= BIT(ETHTOOL_LINK_MEDIUM_BASET);  
+> 
+> Could this be moved to phy_port_alloc() instead? That way, you'd avoid the 
+> extra conditional and the "default medium == baseT" rule would be enforced as 
+> early as possible.
+
+I'll actually remove that altogether. For a single-port PHY, we can
+actually derive the mediums from the PHY's supported field.
+
+[...]
+
+> > +	for_each_set_bit(i, &port->mediums, __ETHTOOL_LINK_MEDIUM_LAST) {
+> > +		linkmode_zero(supported);  
+> 
+> ethtool_medium_get_supported() can only set bits in "supported", so you could 
+> just do:
+> 
+> ```
+> for_each_set_bit(i, &port->mediums, __ETHTOOL_LINK_MEDIUM_LAST)
+> 	ethtool_medium_get_supported(port->supported, i, port->lanes);
+> ```
+> 
+> unless you're wary of someone modifying ethtool_medium_get_supported() in a 
+> way that breaks this in the future?
+
+Hmm yes, but at least here it makes it obvious we're accumulating the
+linkmodes :/
+
+> 
+> > +		ethtool_medium_get_supported(supported, i, port->lanes);
+> > +		linkmode_or(port->supported, port->supported, supported);
+> > +	}
+> > +}
+> > +EXPORT_SYMBOL_GPL(phy_port_update_supported);
+> > +
+> > +/**
+> > + * phy_port_get_type() - get the PORT_* attribut for that port.
+> > + * @port: The port we want the information from
+> > + *
+> > + * Returns: A PORT_XXX value.
+> > + */
+> > +int phy_port_get_type(struct phy_port *port)
+> > +{
+> > +	if (port->mediums & ETHTOOL_LINK_MEDIUM_BASET)
+> > +		return PORT_TP;
+> > +
+> > +	if (phy_port_is_fiber(port))
+> > +		return PORT_FIBRE;
+> > +
+> > +	return PORT_OTHER;
+> > +}
+> > +EXPORT_SYMBOL_GPL(phy_port_get_type);
+> > diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+> > index c1d805d3e02f..0d3063af5905 100644
+> > --- a/include/linux/ethtool.h
+> > +++ b/include/linux/ethtool.h
+> > @@ -226,6 +226,10 @@ extern const struct link_mode_info link_mode_params[];
+> > 
+> >  extern const char ethtool_link_medium_names[][ETH_GSTRING_LEN];
+> > 
+> > +#define ETHTOOL_MEDIUM_FIBER_BITS (BIT(ETHTOOL_LINK_MEDIUM_BASES) | \
+> > +				   BIT(ETHTOOL_LINK_MEDIUM_BASEL) | \
+> > +				   BIT(ETHTOOL_LINK_MEDIUM_BASEF))
+> > +
+> >  static inline const char *phy_mediums(enum ethtool_link_medium medium)
+> >  {
+> >  	if (medium >= __ETHTOOL_LINK_MEDIUM_LAST)
+> > @@ -234,6 +238,17 @@ static inline const char *phy_mediums(enum
+> > ethtool_link_medium medium) return ethtool_link_medium_names[medium];
+> >  }
+> > 
+> > +static inline int phy_medium_default_lanes(enum ethtool_link_medium medium)
+> > +{
+> > +	/* Let's consider that the default BaseT ethernet is BaseT4, i.e.
+> > +	 * Gigabit Ethernet.
+> > +	 */
+> > +	if (medium == ETHTOOL_LINK_MEDIUM_BASET)
+> > +		return 4;
+> > +
+> > +	return 1;
+> > +}
+> > +
+> >  /* declare a link mode bitmap */
+> >  #define __ETHTOOL_DECLARE_LINK_MODE_MASK(name)		\
+> >  	DECLARE_BITMAP(name, __ETHTOOL_LINK_MODE_MASK_NBITS)
+> > diff --git a/include/linux/phy.h b/include/linux/phy.h
+> > index d62d292024bc..0180f4d4fd7d 100644
+> > --- a/include/linux/phy.h
+> > +++ b/include/linux/phy.h
+> > @@ -299,6 +299,7 @@ static inline long rgmii_clock(int speed)
+> >  struct device;
+> >  struct kernel_hwtstamp_config;
+> >  struct phylink;
+> > +struct phy_port;
+> >  struct sfp_bus;
+> >  struct sfp_upstream_ops;
+> >  struct sk_buff;
+> > @@ -590,6 +591,9 @@ struct macsec_ops;
+> >   * @master_slave_state: Current master/slave configuration
+> >   * @mii_ts: Pointer to time stamper callbacks
+> >   * @psec: Pointer to Power Sourcing Equipment control struct
+> > + * @ports: List of PHY ports structures
+> > + * @n_ports: Number of ports currently attached to the PHY
+> > + * @max_n_ports: Max number of ports this PHY can expose
+> >   * @lock:  Mutex for serialization access to PHY
+> >   * @state_queue: Work queue for state machine
+> >   * @link_down_events: Number of times link was lost
+> > @@ -724,6 +728,10 @@ struct phy_device {
+> >  	struct mii_timestamper *mii_ts;
+> >  	struct pse_control *psec;
+> > 
+> > +	struct list_head ports;
+> > +	int n_ports;
+> > +	int max_n_ports;
+> > +
+> >  	u8 mdix;
+> >  	u8 mdix_ctrl;
+> > 
+> > @@ -1242,6 +1250,27 @@ struct phy_driver {
+> >  	 * Returns the time in jiffies until the next update event.
+> >  	 */
+> >  	unsigned int (*get_next_update_time)(struct phy_device *dev);
+> > +
+> > +	/**
+> > +	 * @attach_port: Indicates to the PHY driver that a port is detected
+> > +	 * @dev: PHY device to notify
+> > +	 * @port: The port being added
+> > +	 *
+> > +	 * Called when a port that needs to be driven by the PHY is found. The
+> > +	 * number of time this will be called depends on phydev->max_n_ports,
+> > +	 * which the driver can change in .probe().
+> > +	 *
+> > +	 * The port that is being passed may or may not be initialized. If it   
+> is
+> > +	 * already initialized, it is by the generic port representation from
+> > +	 * devicetree, which superseeds any strapping or vendor-specific
+> > +	 * properties.
+> > +	 *
+> > +	 * If the port isn't initialized, the port->mediums and port->lanes
+> > +	 * fields must be set, possibly according to stapping information.
+> > +	 *
+> > +	 * Returns 0, or an error code.
+> > +	 */
+> > +	int (*attach_port)(struct phy_device *dev, struct phy_port *port);
+> >  };
+> >  #define to_phy_driver(d) container_of_const(to_mdio_common_driver(d),		  
+> \
+> >  				      struct phy_driver, mdiodrv)
+> > @@ -1968,6 +1997,7 @@ void phy_trigger_machine(struct phy_device *phydev);
+> >  void phy_mac_interrupt(struct phy_device *phydev);
+> >  void phy_start_machine(struct phy_device *phydev);
+> >  void phy_stop_machine(struct phy_device *phydev);
+> > +
+> >  void phy_ethtool_ksettings_get(struct phy_device *phydev,
+> >  			       struct ethtool_link_ksettings *cmd);
+> >  int phy_ethtool_ksettings_set(struct phy_device *phydev,
+> > diff --git a/include/linux/phy_port.h b/include/linux/phy_port.h
+> > new file mode 100644
+> > index 000000000000..70aa75f93096
+> > --- /dev/null
+> > +++ b/include/linux/phy_port.h
+> > @@ -0,0 +1,93 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> > +
+> > +#ifndef __PHY_PORT_H
+> > +#define __PHY_PORT_H
+> > +
+> > +#include <linux/ethtool.h>
+> > +#include <linux/types.h>
+> > +#include <linux/phy.h>
+> > +
+> > +struct phy_port;
+> > +
+> > +/**
+> > + * enum phy_port_parent - The device this port is attached to
+> > + *
+> > + * @PHY_PORT_PHY: Indicates that the port is driven by a PHY device
+> > + */
+> > +enum phy_port_parent {
+> > +	PHY_PORT_PHY,
+> > +};
+> > +
+> > +struct phy_port_ops {
+> > +	/* Sometimes, the link state can be retrieved from physical,
+> > +	 * out-of-band channels such as the LOS signal on SFP. These
+> > +	 * callbacks allows notifying the port about state changes
+> > +	 */
+> > +	void (*link_up)(struct phy_port *port);
+> > +	void (*link_down)(struct phy_port *port);
+> > +
+> > +	/* If the port acts as a Media Independent Interface (Serdes port),
+> > +	 * configures the port with the relevant state and mode. When enable is
+> > +	 * not set, interface should be ignored
+> > +	 */
+> > +	int (*configure_mii)(struct phy_port *port, bool enable,   
+> phy_interface_t
+> > interface); +};
+> > +
+> > +/**
+> > + * struct phy_port - A representation of a network device physical
+> > interface + *
+> > + * @head: Used by the port's parent to list ports
+> > + * @parent_type: The type of device this port is directly connected to
+> > + * @phy: If the parent is PHY_PORT_PHYDEV, the PHY controlling that port
+> > + * @ops: Callback ops implemented by the port controller
+> > + * @lanes: The number of lanes (diff pairs) this port has, 0 if not
+> > applicable + * @mediums: Bitmask of the physical mediums this port provides
+> > access to + * @supported: The link modes this port can expose, if this port
+> > is MDI (not MII) + * @interfaces: The MII interfaces this port supports, if
+> > this port is MII + * @active: Indicates if the port is currently part of
+> > the active link. + * @is_serdes: Indicates if this port is Serialised MII
+> > (Media Independent + *	       Interface), or an MDI (Media Dependent
+> > Interface).
+> > + */
+> > +struct phy_port {
+> > +	struct list_head head;
+> > +	enum phy_port_parent parent_type;
+> > +	union {
+> > +		struct phy_device *phy;
+> > +	};
+> > +
+> > +	const struct phy_port_ops *ops;
+> > +
+> > +	int lanes;
+> > +	unsigned long mediums;
+> > +	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported);
+> > +	DECLARE_PHY_INTERFACE_MASK(interfaces);
+> > +
+> > +	unsigned int active:1;
+> > +	unsigned int is_serdes:1;
+> > +};
+> > +
+> > +struct phy_port *phy_port_alloc(void);
+> > +void phy_port_destroy(struct phy_port *port);
+> > +
+> > +static inline struct phy_device *port_phydev(struct phy_port *port)
+> > +{
+> > +	return port->phy;
+> > +}
+> > +
+> > +struct phy_port *phy_of_parse_port(struct device_node *dn);
+> > +
+> > +static inline bool phy_port_is_copper(struct phy_port *port)
+> > +{
+> > +	return port->mediums == BIT(ETHTOOL_LINK_MEDIUM_BASET);  
+> 
+> BaseC is also "copper" right? Maybe this should be renamed to 
+> "phy_port_is_tp"?
+
+Yeah indeed...
+
+Maxime
+
+> 
+
 
