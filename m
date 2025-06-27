@@ -1,155 +1,137 @@
-Return-Path: <netdev+bounces-201954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEEE1AEB908
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 15:33:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28FBEAEB931
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 15:45:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4A557A254A
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 13:32:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42E65189AE67
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 13:45:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7337293C5B;
-	Fri, 27 Jun 2025 13:33:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D1DA2DBF54;
+	Fri, 27 Jun 2025 13:45:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="xsuym1xS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GwtnV7uD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C8F2F1FDF
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 13:33:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F2122DA75A
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 13:45:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751031223; cv=none; b=uqX09Z/Kii38aoNTKaxkiTmhi3XBv8GmAFOi8U9HnZgOVwP5KfRnL3vpa3bOTFc8fMzeBijUYAZlL5gRXFAYvKcDmUDvBa1lV/mnclWAuoJlOJ+1vMIIlxvbDSsbsA6epSZeA0tJgDfWgq6BEHVhWpc6zysUHAoCIPVVMjfrSNs=
+	t=1751031904; cv=none; b=gb5Zl1BMJJon9LVgDJKiUomlczmtzaPwgWHFKP2wZMUBzfWORNGgQ/3YXrYZnGLy8QQ+DBiHMRYCut0D4Xn6uCFDPQuNDleKqOHOy2Vue5gc0skD4RTmUV+beNz2BLMa0OrqwuTpOjGqhrKXgiost8Lvz7Eppa/LE27ejhiBK/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751031223; c=relaxed/simple;
-	bh=w+yzto0F9H/FN7XuWmwmpyIFyvrjGjwE9RYWqiIwZpQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=afjYjktVYuDS0xavKTHa36fe1tpwF3EWfpqbC+5wg5dc9MD/vfjdz7plAZh7MS6NkxQEYXv/bbQxB1AkHaN/XYznl0mLU0S/p/UPorVfiT9Bb7v8rLLVA7UNL9md2WUoYarnBzK5i9805dYZ/X7nu7ZFJGn5z9oZIacCqI0jaPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=xsuym1xS; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ae0bc7aa21bso453799766b.2
-        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 06:33:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1751031219; x=1751636019; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=T5x4iaYDFJrppb+ZWfgW5X62BF0tQwdQ5wOtDPb3V6U=;
-        b=xsuym1xSIelr4hyVauvifFuOtMWmdTOxef+TrknrY+WB28xtN9tj02z4PW5Gfak+1J
-         FKbh85cKkQuUxbXlcI7s2nNAQjzOKUGALHcfXW/3rTL7SxYmDvj3BiwMKT8pUjy1x7nL
-         nQW+09Avl//PaBvdRmbFz8MvEkGGv8waPw3nOwSzzbzlU9RT9oHqwAxQ9Te/CSS2YqZv
-         NrbzhvR3WNLMNYU3s1wbdzrHEr5CHLtgEGwoxFlHZUD9/G3pPU8A/hB9wECYHtgv7iLE
-         LqWOkYa7pDFqOJljBv6IZb7jb+ewkfooFk+3/58/6QfnBStc6cNCYkIY8UIY3ztQJy5s
-         0aRw==
+	s=arc-20240116; t=1751031904; c=relaxed/simple;
+	bh=8bG3o5gRZA5FwgazcAq8PDL3/TF2VFfzR2zlNp78oD4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m0RbfAgv1cDEPgUQg+HjmNaNX/9uMJ0cpH7pSrzznXq9WwfYesJ36Z+6/xGhRFB1P5QMTboacEjXltkW8p+8RKcTUUpG/vOnpKL4xeJtIvSSuhbX6p2BmQgt3Z4ZrnJN4qQEJFbYIl4HyRxTr3Oi3pvxrUuRXS88p3BtI+2gHyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GwtnV7uD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751031901;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=sfCzCKZHgavpsXvy8TlJ0gEXh9QhrZFiByLFjuD7+iA=;
+	b=GwtnV7uD1KwppUiNHkxloz5KOJbLNR5eX9naqbTzqoIZt1+H+2Ap6Fc/GRWN6bgIUSvopQ
+	O4YSGx8ucSUdlC1LDD1DdiODVkYVXHkfN+45KLFwHAWmdiRdb038S3rZrnLN5c6QNuiInh
+	fe2xGXwVt0lD0ZAfjXqWmKb5iwHWqdA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-624-IdqhVuwoMAeL8WFubcjiDw-1; Fri, 27 Jun 2025 09:44:58 -0400
+X-MC-Unique: IdqhVuwoMAeL8WFubcjiDw-1
+X-Mimecast-MFC-AGG-ID: IdqhVuwoMAeL8WFubcjiDw_1751031898
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-453018b4ddeso12652935e9.3
+        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 06:44:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751031219; x=1751636019;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T5x4iaYDFJrppb+ZWfgW5X62BF0tQwdQ5wOtDPb3V6U=;
-        b=LHaAsKmnv/mmRV2VV9eSwdp3nDepTRYPuTWmZLYnj7NIffHlk36H7pkLf00AAxFn+O
-         XTvBSEjZ4XvhO8PtRAleR7JMngCOxx8//EQELsRRZ5UAUzPtBwkkg21jcI/zMY7TAvuS
-         Vg3SYjzm9czrfjieKRuAcGvSbLSCu/ugsOkI64noB7SgjU8mzh1p4A7ODwc3oaKVc44Y
-         44ybkmsZFQaDyX2pE1NFmTYMVqvApycvEPDOn71fKzan3KwgRGmzI/o8AnDad72B2d7/
-         L2WFYSamLJqERNn7LTBMgCARIB5Ib51V9gv1dpqkyayLzQLYDf3AFU6KU0IzWsIOIzXK
-         qc6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV96e7ta6TRbZN6D+p3dBj5jh0yVq+pm3zosc4aGc//5lQvUPmSTtN3QtzBFqmfYtaBvNKQYXs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBSgvAbQxRBXd4DB5o4xecHak254iKbzjzAQxgvyWGWPh1O59l
-	tfOsbzgMUm9AALasvXJ+XePU+KuqxfJWWC+Xgolpv5HOKRCDwhwCI0uwhOFV9yaLtEw=
-X-Gm-Gg: ASbGnct2bBwvX5x1R0hRBu5XL6rK67J2iyVEPza2oBPmWnW0nCQ4sZgkNwM6uhTu7Qu
-	IpdhgFNXD4ztAGDVBLK616uENmw/Mv3dNyCp+7VHm1XMSgU1l+WOSEiARJ/aDyvEydH3oBlcKgL
-	R7+WE79JYfpuw9CmM0/nXHMWRp2HPgSdObAQYTo/jsNpQohD4h2kSlVZA32cjOCrWbeuMwikEZn
-	vNoNKMCZB20iunvin2bxi0QiU7d87/PikidrqlIQRoas6igaDMh0QFOx9Kw6S42/hsSEfWFO0e+
-	Q3wAXMVFwhIY+4PW/TsgZFwfEHy9E702CnIJ+FsWFepCCNk8xkw0GjBVJXGm91YxedhSNAzAJt1
-	46JRGMyOgRA888hxkd8Tvc03NdK9V
-X-Google-Smtp-Source: AGHT+IFaeZqD2/DDGCamfLi2aqw8VYMKJEfNT8xWZ2ZdHPwcgMx/OFl0AlyE3hPKEPLwReNOL5UBug==
-X-Received: by 2002:a17:907:94ca:b0:ae0:cf01:a9ad with SMTP id a640c23a62f3a-ae35010473bmr339661866b.40.1751031219081;
-        Fri, 27 Jun 2025 06:33:39 -0700 (PDT)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae353c01996sm125415566b.76.2025.06.27.06.33.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Jun 2025 06:33:36 -0700 (PDT)
-Message-ID: <740387fb-ed72-4a6f-9625-c4fccb1f09ab@blackwall.org>
-Date: Fri, 27 Jun 2025 16:33:35 +0300
+        d=1e100.net; s=20230601; t=1751031897; x=1751636697;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sfCzCKZHgavpsXvy8TlJ0gEXh9QhrZFiByLFjuD7+iA=;
+        b=NPYi78lNIaH5avWUfqNN48TXqMm38mx6zOK6qKUEyVQ1SlsHwQ7At4iYfkPcgja+/l
+         uv4/YyqdUyP+wE4gcsae5WHdnwHe+c0Ud/BBiSsOvAL2pR3kPAkT3FSvWeNak9QRf8is
+         cdbq950zWIjP0ErTfBettDvItwvmw9bOYlUoFxDFfFhmG+PORplIdS3jVrGqxV4SE3zu
+         6hcFT5aCz/PmqyAG9Gv5uLXiMhQXQlcxqQqOOikf2OzxWuZQKpthjtMl2QK7hO2si6yd
+         dS9ImA+v+0eaIJTpbwc9MbtnYOwKG8wcsKhhiMUagYSV+DrtMDeqOKuCzfnYxaaaNRCx
+         covg==
+X-Forwarded-Encrypted: i=1; AJvYcCV276BVSKzv0FDtm3bm/WcFXPl2GB7XrY4b1IH/7Skq19O5Z75XNmP3lLelPCNTOaUVEITcUJA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQ/EHShl43FCmXw2ET4k6e8zRMC9W6kMFkZyOqEHCvb1XrCoCw
+	h57R+oAj0owyFAY4kRzNF5g7TK4Ntt9kJEowjO3htbvzCPMVSxxlE2ELlfblSJjRu6DzXikZxjs
+	qDJE3+Sr80X/NDrbfEWNl2PDj7jIdlIBe/0+jNPpWXCDYfGyLYn1McKVeTA==
+X-Gm-Gg: ASbGncv/aF3X3u+Y+E/JIbWPpCq+EIvUrpdkb95BpPPflLz/Y4cBGBnwYjFwQJ/p0Op
+	AeicBXoNCZXZ0WKU+ztKFPNngzXU91SNAQpUdloewZI+ttS4o2/xIAm/YlCzRtzxoeN7LWw3ZcC
+	icVesCsS3u2R6eApWK/c1a/xs7riqrZtJ/Lwo5Xr+pRlBW0T8WIi5TVnmTOcKW/3KReO5hzpt72
+	WrdnPAxqEtF66sDvO+VGnwXzpFftxW2Pexbdpz/tz6tAk2wwpCptW1NB3iQW0l4JiGJbY48hQEx
+	El3H8m1kUQUly1y2ubG54fRlqRNk4ug58TNz56gInjtV99wAfSuYgJ8y3YVa3+yzrWG2
+X-Received: by 2002:a05:600c:1e0d:b0:43c:e478:889 with SMTP id 5b1f17b1804b1-4538edeb1e3mr43906695e9.0.1751031897509;
+        Fri, 27 Jun 2025 06:44:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH5wO7lBzKmrbrRtSD3MlBN7myKwo/CLhGpeObS/nJo2QfYJbjf/v98tsfeefUPIC/qB8O98A==
+X-Received: by 2002:a05:600c:1e0d:b0:43c:e478:889 with SMTP id 5b1f17b1804b1-4538edeb1e3mr43906355e9.0.1751031897103;
+        Fri, 27 Jun 2025 06:44:57 -0700 (PDT)
+Received: from lbulwahn-thinkpadx1carbongen9.rmtde.csb ([2a02:810d:7e01:ef00:b52:2ad9:f357:f709])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4538233bd14sm83028885e9.2.2025.06.27.06.44.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Jun 2025 06:44:56 -0700 (PDT)
+From: Lukas Bulwahn <lbulwahn@redhat.com>
+X-Google-Original-From: Lukas Bulwahn <lukas.bulwahn@redhat.com>
+To: Geert Uytterhoeven <geert+renesas@glider.be>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lukas Bulwahn <lukas.bulwahn@redhat.com>
+Subject: [PATCH] MAINTAINERS: adjust file entry after renaming rzv2h-gbeth dtb
+Date: Fri, 27 Jun 2025 15:44:53 +0200
+Message-ID: <20250627134453.51780-1-lukas.bulwahn@redhat.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ipv6: guard ip6_mr_output() with rcu
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com,
- syzbot+0141c834e47059395621@syzkaller.appspotmail.com,
- Petr Machata <petrm@nvidia.com>, Roopa Prabhu <roopa@nvidia.com>,
- Benjamin Poirier <bpoirier@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
-References: <20250627115822.3741390-1-edumazet@google.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250627115822.3741390-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 6/27/25 14:58, Eric Dumazet wrote:
-> syzbot found at least one path leads to an ip_mr_output()
-> without RCU being held.
-> 
-> Add guard(rcu)() to fix this in a concise way.
-> 
-> WARNING: net/ipv6/ip6mr.c:2376 at ip6_mr_output+0xe0b/0x1040 net/ipv6/ip6mr.c:2376, CPU#1: kworker/1:2/121
-> Call Trace:
->  <TASK>
->   ip6tunnel_xmit include/net/ip6_tunnel.h:162 [inline]
->   udp_tunnel6_xmit_skb+0x640/0xad0 net/ipv6/ip6_udp_tunnel.c:112
->   send6+0x5ac/0x8d0 drivers/net/wireguard/socket.c:152
->   wg_socket_send_skb_to_peer+0x111/0x1d0 drivers/net/wireguard/socket.c:178
->   wg_packet_create_data_done drivers/net/wireguard/send.c:251 [inline]
->   wg_packet_tx_worker+0x1c8/0x7c0 drivers/net/wireguard/send.c:276
->   process_one_work kernel/workqueue.c:3239 [inline]
->   process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3322
->   worker_thread+0x8a0/0xda0 kernel/workqueue.c:3403
->   kthread+0x70e/0x8a0 kernel/kthread.c:464
->   ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
->   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
->  </TASK>
-> 
-> Fixes: 96e8f5a9fe2d ("net: ipv6: Add ip6_mr_output()")
-> Reported-by: syzbot+0141c834e47059395621@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/685e86b3.a00a0220.129264.0003.GAE@google.com/T/#u
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Petr Machata <petrm@nvidia.com>
-> Cc: Roopa Prabhu <roopa@nvidia.com>
-> Cc: Nikolay Aleksandrov <razor@blackwall.org>
-> Cc: Benjamin Poirier <bpoirier@nvidia.com>
-> Cc: Ido Schimmel <idosch@nvidia.com>
-> ---
->  net/ipv6/ip6mr.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
-> index a35f4f1c658960e4b087848461f3ea7af653d070..eb6a00262510f1cd6a9d48fab80bdd0d496bb7ee 100644
-> --- a/net/ipv6/ip6mr.c
-> +++ b/net/ipv6/ip6mr.c
-> @@ -2373,7 +2373,7 @@ int ip6_mr_output(struct net *net, struct sock *sk, struct sk_buff *skb)
->  	int err;
->  	int vif;
->  
-> -	WARN_ON_ONCE(!rcu_read_lock_held());
-> +	guard(rcu)();
->  
->  	if (IP6CB(skb)->flags & IP6SKB_FORWARDED)
->  		goto ip6_output;
+From: Lukas Bulwahn <lukas.bulwahn@redhat.com>
 
-Thanks,
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Commit d53320aeef18 ("dt-bindings: net: Rename
+renesas,r9a09g057-gbeth.yaml") renames the net devicetree binding
+renesas,r9a09g057-gbeth.yaml to renesas,rzv2h-gbeth.yaml, but misses to
+adjust the file entry in the RENESAS RZ/V2H(P) DWMAC GBETH GLUE LAYER
+DRIVER section in MAINTAINERS.
+
+Adjust the file entry after this file renaming.
+
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@redhat.com>
+---
+ MAINTAINERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index d635369a4f6c..bff9651a9a94 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -21271,7 +21271,7 @@ M:	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+ L:	netdev@vger.kernel.org
+ L:	linux-renesas-soc@vger.kernel.org
+ S:	Maintained
+-F:	Documentation/devicetree/bindings/net/renesas,r9a09g057-gbeth.yaml
++F:	Documentation/devicetree/bindings/net/renesas,rzv2h-gbeth.yaml
+ F:	drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+ 
+ RENESAS RZ/V2H(P) USB2PHY PORT RESET DRIVER
+-- 
+2.50.0
 
 
