@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-202077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D6B4AEC2D1
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 00:49:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1EA2AEC2D2
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 00:50:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 374FB17A4E8
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 22:49:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBAFD1C619B1
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 22:50:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34A0E28F527;
-	Fri, 27 Jun 2025 22:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61F5C290BC8;
+	Fri, 27 Jun 2025 22:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cw/4/3/c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FxlOiX4b"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F1F828A1F2
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 22:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4008B290BA2
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 22:49:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751064589; cv=none; b=L8nwGTE56dC6+NHHKmnL6DdeHpXNLJs559sXyTLSiR+eX1PXbFXNnrhsRuImkbHnJJ4qqjrJ+ZT7/ORPgY+FNUXHQ4tEOUzb4f5gQXWTOD/aue6shpS+KBuiCVi9ZwXXw8ynt+JpnKdfIXKJjMnpNdi0RgHUJCiyrFTDJ4/YBs8=
+	t=1751064590; cv=none; b=g931//UH18gEm7tdBHs40d18iXg7VAFXQrQftTQdkjdKBO7pVAjtZIu/Rp9Sx+yl8mpNld04u+fsQZOQlhSUiRrSuZyP1a5lmN3VwCfBsdw3RDaMcV1N5bX1nSnoLZaZ3OouQqs/N97eX41Bn0giLMHHNqP34j2CkWdpOZ67k34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751064589; c=relaxed/simple;
-	bh=e/H6on70NeYRnPwxJgWCdoJFZHsVjB6POqJJZYfWVkg=;
+	s=arc-20240116; t=1751064590; c=relaxed/simple;
+	bh=rY1sh8o5PKFBABlE0sKWshCnhx5CJA1WwVl4vorsnQk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=penk8dwF4gP7Zyuzjs17DGIstEpz0Os3tdZyo8+7JRjH7eQoOuwNd/JTNXvJFQVDWq44IexHxwQeW4/KTnPLCxfiW78nvrX1aeeYjC0fwwR1iQyw0mSs0WYwqlSALtbt9CE34R7ojmckoHd5wdZ9QS4g3wd+4Fpbxdk0cFlULxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cw/4/3/c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86FD3C4CEE3;
-	Fri, 27 Jun 2025 22:49:48 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=KZ14np4oq7ZVOXL1sNBQ3W/xoREMZp01ihgCTP1K7prRpFzGBu/F072ywUDUCp1c9VmeK446cHkFJVUZWjRFB5kikc4M8vFYloPsAK3vTuo0Nqr5EYBD4zXLLnd9WgDpPyyGTCPYP32zR7SSwobTy7bvCsz19HBIKg3oSYBLydE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FxlOiX4b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFAC8C4CEE3;
+	Fri, 27 Jun 2025 22:49:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751064588;
-	bh=e/H6on70NeYRnPwxJgWCdoJFZHsVjB6POqJJZYfWVkg=;
+	s=k20201202; t=1751064589;
+	bh=rY1sh8o5PKFBABlE0sKWshCnhx5CJA1WwVl4vorsnQk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Cw/4/3/cgnIAzDDfgb4622VGqHmq4JLzUMBSiYHkdVnxI71SPUKphMVhgxmEh4MTo
-	 6YbXaCtzHwrDrblMszUWVfa1pJvL3fM04y5e7YhvZnHBI422BApvpXxvQNkakyb83l
-	 6x87nY7N12mSb1CqgEXhm9GqNOiHNcaCuv/fH7x/bkh8h+gT+C6G9Aa8D3TRMEnI5q
-	 Bv4HSWAXVfi/o4N2+Eo8LuZD6ErAVgrP20l4xfilFvImffPmSWJ+y4JIz5XlG+P7hC
-	 7h41bozzhMnKqKJhHNTqpFc3RdmPv/+C/UFcIWiCylMZcwCoSvyGPjwZvv8xzVtRQD
-	 t1IdSrGPmz1HA==
+	b=FxlOiX4bU2xMJYB3c+Yae1AMVQJ+C6HHwRXM2aYHL3xhZTNEZGa8zoQxmjYJBBx3c
+	 ZMGIIbigcd+t/miPyYFXdk9nhakHXW66ZrIdq1y9o9HYrkWi/dt1CJzUdlgx+FZ7Iq
+	 OFMXYfntsaquILkjMAmkjYWXy40uO3CmymYu9Vu0yy+pBQXn7kVylDralRN3sqCK+h
+	 9njwniHRVRgNhvEp2TADkH9CWAtmxDSmOCGIZx4omgwDn1+Yt5qFSq6aAhJgXpHMFC
+	 iwtxpu9thPlfP1ny02uiXM4/4w3MQEI0azM/vC/qFLqJwqx4aYl2Y3behNm5ygZgC2
+	 6Pdy6Lhq4NLqQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC7938111CE;
-	Fri, 27 Jun 2025 22:50:15 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EACD138111CE;
+	Fri, 27 Jun 2025 22:50:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] tcp: fix DSACK bug with non contiguous
- ranges
+Subject: Re: [PATCH net-next] eth: bnxt: take page size into account for page
+ pool
+ recycling rings
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175106461449.2081565.17099512582509919901.git-patchwork-notify@kernel.org>
-Date: Fri, 27 Jun 2025 22:50:14 +0000
-References: <20250626123420.1933835-1-edumazet@google.com>
-In-Reply-To: <20250626123420.1933835-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- ncardwell@google.com, horms@kernel.org, kuniyu@google.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+ <175106461574.2081565.15577176900237342067.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Jun 2025 22:50:15 +0000
+References: <20250626165441.4125047-1-kuba@kernel.org>
+In-Reply-To: <20250626165441.4125047-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ michael.chan@broadcom.com, pavan.chebbi@broadcom.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 26 Jun 2025 12:34:18 +0000 you wrote:
-> This series combines a fix from xin.guo and a new packetdrill test.
-> 
-> Eric Dumazet (1):
->   selftests/net: packetdrill: add tcp_dsack_mult.pkt
-> 
-> xin.guo (1):
->   tcp: fix tcp_ofo_queue() to avoid including too much DUP SACK range
+On Thu, 26 Jun 2025 09:54:41 -0700 you wrote:
+> The Rx rings are filled with Rx buffers. Which are supposed to fit
+> packet headers (or MTU if HW-GRO is disabled). The aggregation buffers
+> are filled with "device pages". Adjust the sizes of the page pool
+> recycling ring appropriately, based on ratio of the size of the
+> buffer on given ring vs system page size. Otherwise on a system
+> with 64kB pages we end up with >700MB of memory sitting in every
+> single page pool cache.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/2] tcp: fix tcp_ofo_queue() to avoid including too much DUP SACK range
-    https://git.kernel.org/netdev/net-next/c/a041f70e573e
-  - [net-next,2/2] selftests/net: packetdrill: add tcp_dsack_mult.pkt
-    https://git.kernel.org/netdev/net-next/c/8cc8d749dc7e
+  - [net-next] eth: bnxt: take page size into account for page pool recycling rings
+    https://git.kernel.org/netdev/net-next/c/f7dbedba6312
 
 You are awesome, thank you!
 -- 
