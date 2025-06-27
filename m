@@ -1,141 +1,159 @@
-Return-Path: <netdev+bounces-201842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8AD9AEB27D
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 11:17:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FE30AEB275
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 11:16:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6D2E188D32F
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 09:15:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7487641162
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 09:15:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A38C2DA75B;
-	Fri, 27 Jun 2025 09:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kQ/Jcgki"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A4CD293C44;
+	Fri, 27 Jun 2025 09:10:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 892CA2D979A;
-	Fri, 27 Jun 2025 09:09:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E44225F787;
+	Fri, 27 Jun 2025 09:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751015399; cv=none; b=cN3rtMyudYxf5L7NV7s38npbLVHQL6XaM7cZ3PbhUpkeGIeijJ7zxi1sXCYfHAy/cUvy6wxf/olaR4sx+Q9ZqKOF/UTn9O+OgWsSagBc8moBcga9HswlJpTzU4qx983WfzTF28u3PdcslhvyAelh7Jiaasuugz/rYt5p9ifeeqc=
+	t=1751015431; cv=none; b=oN6LMgFYR97+BSUhGbcRMRCt6EF+OC8zs+XACa+OJOEevbezYBkk56vzzKLhiG7QrvJNK9IAJhKiI779QCCphTJ6dgpDwE15I4DDT/Q5n9bJB1broCAgyvjU6nVFbeL+iiMXqJVmiqatW02bINumITSfp5/5bVFBzcH5u9Vdxso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751015399; c=relaxed/simple;
-	bh=HMcGeng6GdApxgpmXogy29JLEunDQe70RuYk/d3AUrQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=q7GGabyLE5rKXEk/JnDoj8lOywviHPB2HQIZNftu0xCznImLMgk3ydNmhcDOqfi0gm7fV21AAGJdWiD4LsuTY0bnbAIdv4dyhHgiqx8bq5ekILfh5GUKtVFnmD692O6K30Ioz0I7s2rAVH8PTQHXBzTfyP6P4WDEa3ktlxl+VCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kQ/Jcgki; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C556E4391D;
-	Fri, 27 Jun 2025 09:09:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1751015396;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ASRiFVp5ZFhKvwm/2Lsajqh0Hrof/9pCxPbZ+iqYjHE=;
-	b=kQ/Jcgki2tmSJyior01LIrOt1jFieJEVoPTJGuWxJMaOYnYQF79onv+z57Z5HP6Fe3Rp+3
-	AupmOzJ1ICFrv77bDPt4adn7E9/JduZ3ul6qNrDSgxT+vtoR0GilVi9BTjcNGTJrJsTk5o
-	yUI+myeztHe9jCyl3c980ZIY5eNV4AFFcjoKwLY5DAY2/2AQflVPHZ+kuVQTFqEfAVbYtg
-	ZQlrgTxA36+jLKzMhFLD4GPrUZqntgRj7bIeuYEx/PzKhAwGvvdfOjmY65ROi9KZQxiYQL
-	akWLuyPrNB5x245ewRC9Qspfthp+LegJ5CxADwkwbnk2M6Ge4Aj7N92VUszk2w==
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Date: Fri, 27 Jun 2025 11:09:04 +0200
-Subject: [PATCH net-next v2 18/18] MIPS: mobileye: eyeq5-epm: add two
- Cadence GEM Ethernet PHYs
+	s=arc-20240116; t=1751015431; c=relaxed/simple;
+	bh=x1qlRLAUX2JfC3QK4PWPHOZELj9cF1OUPK7Twf9axK0=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Pl80/X9uOu0gXPj5gIuHdr5aqObye+EPdUgFv5Xx80zio79YVotME83NotgBDSLeS9vx5gfAbTxNYwfaI2LpEjtpbNSorJtydnZtZErz7Y0dXvJ5RD+STXPUwGfPRhz3KjZJQZaoVfagUZgsCc59yzCqo3qvXzI/Brqb9D94Pk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bT8sP3Cccz67g19;
+	Fri, 27 Jun 2025 17:10:17 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8DE9E14011D;
+	Fri, 27 Jun 2025 17:10:26 +0800 (CST)
+Received: from localhost (10.48.153.213) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 27 Jun
+ 2025 11:10:25 +0200
+Date: Fri, 27 Jun 2025 10:10:24 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: <alejandro.lucero-palau@amd.com>
+CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>, Martin Habets
+	<habetsm.xilinx@gmail.com>, Edward Cree <ecree.xilinx@gmail.com>
+Subject: Re: [PATCH v17 12/22] sfc: get endpoint decoder
+Message-ID: <20250627101024.00002585@huawei.com>
+In-Reply-To: <20250624141355.269056-13-alejandro.lucero-palau@amd.com>
+References: <20250624141355.269056-1-alejandro.lucero-palau@amd.com>
+	<20250624141355.269056-13-alejandro.lucero-palau@amd.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250627-macb-v2-18-ff8207d0bb77@bootlin.com>
-References: <20250627-macb-v2-0-ff8207d0bb77@bootlin.com>
-In-Reply-To: <20250627-macb-v2-0-ff8207d0bb77@bootlin.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- Alexandre Ghiti <alex@ghiti.fr>, Samuel Holland <samuel.holland@sifive.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
- Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, 
- Gregory CLEMENT <gregory.clement@bootlin.com>, 
- Cyrille Pitchen <cyrille.pitchen@atmel.com>, 
- Harini Katakam <harini.katakam@xilinx.com>, 
- Rafal Ozieblo <rafalo@cadence.com>, 
- Haavard Skinnemoen <hskinnemoen@atmel.com>, Jeff Garzik <jeff@garzik.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
- linux-mips@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Tawfik Bayouk <tawfik.bayouk@mobileye.com>, 
- =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>, 
- Andrew Lunn <andrew@lunn.ch>
-X-Mailer: b4 0.14.2
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddvieeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhfffugggtgffkfhgjvfevofesthekredtredtjeenucfhrhhomhepvfhhrohoucfnvggsrhhunhcuoehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeelvefhkeeufedvkefghefhgfdukeejlefgtdehtdeivddtteetgedvieelieeuhfenucfkphepvdgrtddumegtsgdugeemheehieemjegrtddtmeeiieegsgemfhdtfhhfmehfvgdutdemlegvfhgunecuvehluhhsthgvrhfuihiivgepudehnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudegmeehheeimeejrgdttdemieeigegsmehftdhffhemfhgvuddtmeelvghfugdphhgvlhhopegludelvddrudeikedruddtrddvudegngdpmhgrihhlfhhrohhmpehthhgvohdrlhgvsghruhhnsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeeffedprhgtphhtthhopehrihgthhgrrhgutghotghhrhgrnhesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehvlhgrughimhhirhdrkhhonhgurhgrthhivghvsehmohgsihhlvgihvgdrt
- ghomhdprhgtphhtthhopegrohhusegvvggtshdrsggvrhhkvghlvgihrdgvughupdhrtghpthhtohepphgruhhlrdifrghlmhhslhgvhiesshhifhhivhgvrdgtohhmpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhssghoghgvnhgusegrlhhphhgrrdhfrhgrnhhkvghnrdguvgdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
-X-GND-Sasl: theo.lebrun@bootlin.com
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-The Mobileye EyeQ5 eval board (EPM) embeds two MDIO PHYs.
+On Tue, 24 Jun 2025 15:13:45 +0100
+<alejandro.lucero-palau@amd.com> wrote:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
----
- arch/mips/boot/dts/mobileye/eyeq5-epm5.dts | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> Use cxl api for getting DPA (Device Physical Address) to use through an
+> endpoint decoder.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
+> Acked-by: Edward Cree <ecree.xilinx@gmail.com>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> ---
+>  drivers/net/ethernet/sfc/Kconfig   |  1 +
+>  drivers/net/ethernet/sfc/efx_cxl.c | 32 +++++++++++++++++++++++++++++-
+>  2 files changed, 32 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/sfc/Kconfig b/drivers/net/ethernet/sfc/Kconfig
+> index 979f2801e2a8..e959d9b4f4ce 100644
+> --- a/drivers/net/ethernet/sfc/Kconfig
+> +++ b/drivers/net/ethernet/sfc/Kconfig
+> @@ -69,6 +69,7 @@ config SFC_MCDI_LOGGING
+>  config SFC_CXL
+>  	bool "Solarflare SFC9100-family CXL support"
+>  	depends on SFC && CXL_BUS >= SFC
+> +	depends on CXL_REGION
+>  	default SFC
+>  	help
+>  	  This enables SFC CXL support if the kernel is configuring CXL for
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+> index e2d52ed49535..c0adfd99cc78 100644
+> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+> @@ -22,6 +22,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  {
+>  	struct efx_nic *efx = &probe_data->efx;
+>  	struct pci_dev *pci_dev = efx->pci_dev;
+> +	resource_size_t max_size;
+>  	struct efx_cxl *cxl;
+>  	u16 dvsec;
+>  	int rc;
+> @@ -86,13 +87,42 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  		return PTR_ERR(cxl->cxlmd);
+>  	}
+>  
+> +	cxl->endpoint = cxl_acquire_endpoint(cxl->cxlmd);
+> +	if (IS_ERR(cxl->endpoint))
+> +		return PTR_ERR(cxl->endpoint);
+> +
+> +	cxl->cxlrd = cxl_get_hpa_freespace(cxl->cxlmd, 1,
+> +					   CXL_DECODER_F_RAM | CXL_DECODER_F_TYPE2,
+> +					   &max_size);
+> +
+> +	if (IS_ERR(cxl->cxlrd)) {
+> +		pci_err(pci_dev, "cxl_get_hpa_freespace failed\n");
+> +		rc = PTR_ERR(cxl->cxlrd);
+> +		goto endpoint_release;
+> +	}
+> +
+> +	if (max_size < EFX_CTPIO_BUFFER_SIZE) {
+> +		pci_err(pci_dev, "%s: not enough free HPA space %pap < %u\n",
+> +			__func__, &max_size, EFX_CTPIO_BUFFER_SIZE);
+> +		rc = -ENOSPC;
+> +		goto put_root_decoder;
+> +	}
+> +
+>  	probe_data->cxl = cxl;
+>  
+> -	return 0;
+> +	goto endpoint_release;
+I'd avoid the spiders nest here and just duplicate the release
+or if you really want to avoid that duplication, factor out everything where
+it is held into another function and have aqcuire/function/release as all that
+is seen here.
 
-diff --git a/arch/mips/boot/dts/mobileye/eyeq5-epm5.dts b/arch/mips/boot/dts/mobileye/eyeq5-epm5.dts
-index 6898b2d8267dfadeea511a84d1df3f70744f17bb..3d8af5b4675b24c2fa284a52e537a4366226acc2 100644
---- a/arch/mips/boot/dts/mobileye/eyeq5-epm5.dts
-+++ b/arch/mips/boot/dts/mobileye/eyeq5-epm5.dts
-@@ -21,3 +21,29 @@ memory@0 {
- 		      <0x8 0x02000000 0x0 0x7E000000>;
- 	};
- };
-+
-+&macb0 {
-+	phy-mode = "sgmii";
-+	phy-handle = <&macb0_phy>;
-+
-+	mdio {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		macb0_phy: ethernet-phy@e {
-+			reg = <0xe>;
-+		};
-+	};
-+};
-+
-+&macb1 {
-+	phy-mode = "rgmii-id";
-+	phy-handle = <&macb1_phy>;
-+
-+	mdio {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		macb1_phy: ethernet-phy@e {
-+			reg = <0xe>;
-+		};
-+	};
-+};
 
--- 
-2.50.0
+> +
+> +put_root_decoder:
+> +	cxl_put_root_decoder(cxl->cxlrd);
+> +endpoint_release:
+> +	cxl_release_endpoint(cxl->cxlmd, cxl->endpoint);
+> +	return rc;
+>  }
+>  
+>  void efx_cxl_exit(struct efx_probe_data *probe_data)
+>  {
+> +	if (probe_data->cxl)
+> +		cxl_put_root_decoder(probe_data->cxl->cxlrd);
+>  }
+>  
+>  MODULE_IMPORT_NS("CXL");
 
 
