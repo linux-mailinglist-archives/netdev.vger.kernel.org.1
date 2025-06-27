@@ -1,132 +1,91 @@
-Return-Path: <netdev+bounces-201799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50907AEB18D
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 10:45:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 82BE9AEB194
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 10:46:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E94434A6145
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 08:45:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCE1D4A5EF1
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 08:46:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0FA24DD12;
-	Fri, 27 Jun 2025 08:44:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A13D127E06A;
+	Fri, 27 Jun 2025 08:45:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88DB917741;
-	Fri, 27 Jun 2025 08:44:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4112279DD9;
+	Fri, 27 Jun 2025 08:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751013896; cv=none; b=WO5QVqyOuEv2lQ2iK0yaLymAzLz97xL5mKedTEkxnO5N4zK4L/OhikP0fqpdK02zoZmvPM3n3h1t/p/gDtkhqvk6uuy+MvJIT0ICoirDKegn/H0SqXpkrMffo4gm5MOI7nabV4xG09aN7OMT+4ir3Z2TE6WMMQPkuyuXfW2iPD8=
+	t=1751013958; cv=none; b=iKF+2KmSe4033yCLnyyd7qgEQuvsUvEjUDbEDybU7LdDBW3SO+esMrEv9rIcM8fCvZO9U0dvpM/Hvp7XADnOkKWI/obOS0G2VoHTQk+FxxH5tpvzABAEEoQSLDj1LxmLvG1dYJtXCXql8saJse0RSZHVoTUT/u++sf5/S1JbUqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751013896; c=relaxed/simple;
-	bh=8ESayO/o4fZLFo6BTDMsLxcg6Akk7tZYwJwweA8EbdQ=;
-	h=From:To:Subject:Date:Message-Id; b=AsSMXq5XCFSzDcl4/q9fqv8gH7+eCtqdwQTgfIEpVpdO9dAc50AeqApxC8lLu4pPwNwGUgRNBLSi+uARQhgkjvk4Qr+5rozRfzQn8gqkSMMiMmkvw2wtlJgpIY9Kc+Zr590B4LXQkpEuTmGBvRhdnOuQY9NjV8pjnI0iMIYftq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1009)
-	id 01BAA204159D; Fri, 27 Jun 2025 01:44:54 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 01BAA204159D
-From: Dexuan Cui <decui@microsoft.com>
-To: niuxuewei97@gmail.com,
-	kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	sgarzare@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-hyperv@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] hv_sock: Return the readable bytes in hvs_stream_has_data()
-Date: Fri, 27 Jun 2025 01:44:49 -0700
-Message-Id: <1751013889-4951-1-git-send-email-decui@microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1751013958; c=relaxed/simple;
+	bh=kDzLvO/h43dz7WnIFcS1RXacW8HL/F0fcjvrszRUqDk=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CURUnCZKOGnjnSY/d5LF63arf1gIFhoWL0/POHyF1Kwu+WonYUrU+/77lhb56UKXsUAxE54EI8lgN6SmJTWKILRZ/FCWSZ9KKo6WdjDXFlp0n4A85l6Q3bEhw9oFltGXrHn0tNPFfU6xuE0/3UCCqZmszwtB1PjO8eKsjWCZ9Eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4bT8K43WDsz6L5XL;
+	Fri, 27 Jun 2025 16:45:44 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8B4AE14038F;
+	Fri, 27 Jun 2025 16:45:53 +0800 (CST)
+Received: from localhost (10.48.153.213) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 27 Jun
+ 2025 10:45:52 +0200
+Date: Fri, 27 Jun 2025 09:45:51 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: <alejandro.lucero-palau@amd.com>
+CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v17 05/22] sfc: setup cxl component regs and set media
+ ready
+Message-ID: <20250627094551.0000360d@huawei.com>
+In-Reply-To: <20250624141355.269056-6-alejandro.lucero-palau@amd.com>
+References: <20250624141355.269056-1-alejandro.lucero-palau@amd.com>
+	<20250624141355.269056-6-alejandro.lucero-palau@amd.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100010.china.huawei.com (7.191.174.197) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-When hv_sock was originally added, __vsock_stream_recvmsg() and
-vsock_stream_has_data() actually only needed to know whether there
-is any readable data or not, so hvs_stream_has_data() was written to
-return 1 or 0 for simplicity.
+On Tue, 24 Jun 2025 15:13:38 +0100
+alejandro.lucero-palau@amd.com wrote:
 
-However, now hvs_stream_has_data() should return the readable bytes
-because vsock_data_ready() -> vsock_stream_has_data() needs to know the
-actual bytes rather than a boolean value of 1 or 0.
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> Use cxl code for registers discovery and mapping regarding cxl component
+> regs and validate registers found are as expected.
+> 
+> Set media ready explicitly as there is no means for doing so without
+> a mailbox, and without the related cxl register, not mandatory for type2.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
 
-The SIOCINQ ioctl support also needs hvs_stream_has_data() to return
-the readable bytes.
+Few things came to mind reading later patches...
 
-Let hvs_stream_has_data() return the readable bytes of the payload in
-the next host-to-guest VMBus hv_sock packet.
+Some of the calls in here register extra devm stuff.  So, given we just
+eat any errors in this cxl setup in my mind we should clean them up.
 
-Note: there may be multpile incoming hv_sock packets pending in the
-VMBus channel's ringbuffer, but so far there is not a VMBus API that
-allows us to know all the readable bytes in total without reading and
-caching the payload of the multiple packets, so let's just return the
-readable bytes of the next single packet. In the future, we'll either
-add a VMBus API that allows us to know the total readable bytes without
-touching the data in the ringbuffer, or the hv_sock driver needs to
-understand the VMBus packet format and parse the packets directly.
+The devres group approach suggested earlier deals with that for you as
+all the CXL devm stuff will end up in that group and you can tear it
+down on error in efx_cxl_init()
 
-Signed-off-by: Dexuan Cui <decui@microsoft.com>
----
 
-Hi maintainers, please don't take the patch for now.
-
-Hi Xuewei Niu, please help to re-post this patch with the next version
-of your patchset "vsock: Introduce SIOCINQ ioctl support". See
-https://lore.kernel.org/virtualization/BL1PR21MB3115F69C544B0FAA145FA4EABF7BA@BL1PR21MB3115.namprd21.prod.outlook.com/#t
-https://lore.kernel.org/virtualization/20250626050219.1847316-1-niuxuewei.nxw@antgroup.com/
-Feel free to add your Signed-off-by, if you need.
-
- net/vmw_vsock/hyperv_transport.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
-
-diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
-index 31342ab502b4..64f1290a9ae7 100644
---- a/net/vmw_vsock/hyperv_transport.c
-+++ b/net/vmw_vsock/hyperv_transport.c
-@@ -694,15 +694,25 @@ static ssize_t hvs_stream_enqueue(struct vsock_sock *vsk, struct msghdr *msg,
- static s64 hvs_stream_has_data(struct vsock_sock *vsk)
- {
- 	struct hvsock *hvs = vsk->trans;
-+	bool need_refill = !hvs->recv_desc;
- 	s64 ret;
- 
- 	if (hvs->recv_data_len > 0)
--		return 1;
-+		return hvs->recv_data_len;
- 
- 	switch (hvs_channel_readable_payload(hvs->chan)) {
- 	case 1:
--		ret = 1;
--		break;
-+		if (!need_refill)
-+			return -EIO;
-+
-+		hvs->recv_desc = hv_pkt_iter_first(hvs->chan);
-+		if (!hvs->recv_desc)
-+			return -ENOBUFS;
-+
-+		ret = hvs_update_recv_data(hvs);
-+		if (ret)
-+			return ret;
-+		return hvs->recv_data_len;
- 	case 0:
- 		vsk->peer_shutdown |= SEND_SHUTDOWN;
- 		ret = 0;
--- 
-2.49.0
 
 
