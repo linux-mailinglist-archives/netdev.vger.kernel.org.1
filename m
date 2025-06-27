@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-201709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31768AEABB1
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 02:20:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10B2DAEABC4
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 02:29:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6460E1C42961
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 00:20:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F1DA4E09D5
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 00:29:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC8B2381BA;
-	Fri, 27 Jun 2025 00:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A63A4C9D;
+	Fri, 27 Jun 2025 00:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gUgrR31X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HJ6gaPot"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06109460;
-	Fri, 27 Jun 2025 00:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6067A2F30;
+	Fri, 27 Jun 2025 00:29:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750983592; cv=none; b=NZEo0Y6Jt7Vjqg/LfrAYZvHrh+5UNifNn9myIIkrQ0kGvyY+UagxdkVTJaq1ke8DNxl1B2qpp0AT/QEWASEeI6UYHpP5ZlEqAzVxfxHauIY5o/hkJpnvWjOX7JXGNekfv6+ObZCyV8gX2rlhgjFj/uHd4dAVWAryCeUR4gbTEh8=
+	t=1750984180; cv=none; b=EJJc9YBpLbZbeuPflTXBDTsunStKOh2/+u2R8U8xneRtjhi6uJ1y3ToKMKrUNktzgmTTIN81i53S76Oyc34xz43k3TTocayZplhReZL6o4XwEcoPAwTkqJYnorxuc2OpHGZE108MfSdL6pz6j3O4OVsWzv8aFPatAeR9EeNtqT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750983592; c=relaxed/simple;
-	bh=RrmsbVmyogoXW9Ko+aax+pPbyYQ0NRNNiGyXTQbNfws=;
+	s=arc-20240116; t=1750984180; c=relaxed/simple;
+	bh=kpOmWqyh2I+6Xk6RjUCcQG3I+QS1vPnHrnO7ToVIJMg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cxJlUQazjLcjFNwWP//soOFmhp/QB3DaKeMb3YwA9DPt/OPYYRlBpNP45jcvAqWcG8xUW3LZLUiRfhBh5llcrDZFOsV6fkONTt4pzUkKIqR7S/JHLSUnBesl2Vwm9XwVThH33l1MVQ8NdYekRpoVR4uuf68iVFO0MXjXKNjvoFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gUgrR31X; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BFAEC4CEEB;
-	Fri, 27 Jun 2025 00:19:52 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=lUMDYluP++IAbrJOb9aWLlAOnFB2HJzazctOVaVmLA/CrhZhtXdxCNrsziYkmn+VGq07typBwgj7jfK6hnIiiZTdn81byA0SCaZQUxhaMR40CaDOA5MhUE+BeL28+7UOPEAhSMSrYrtenh+/NmM1zgUYhE6xLSIcn7Fplga3QqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HJ6gaPot; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB74DC4CEEB;
+	Fri, 27 Jun 2025 00:29:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750983592;
-	bh=RrmsbVmyogoXW9Ko+aax+pPbyYQ0NRNNiGyXTQbNfws=;
+	s=k20201202; t=1750984179;
+	bh=kpOmWqyh2I+6Xk6RjUCcQG3I+QS1vPnHrnO7ToVIJMg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gUgrR31XVX2D9PNxb2xoqJcgtfunntbCmCWaCWUo90b2DiSHb6+7Zz1RoY43IH/Ga
-	 6MlqTnRN8a4gYNVJOuDGUkt4tPFgjSe3nB1ReWEu3nyNagbRTAZa9AIKrxFMIaLzuZ
-	 IvXYj8Aebh6sX0py5t0sb1pzgRVTy/RK5nGZ2K3ye6DTjqH1WPjYdUO/w2xxwPeH9H
-	 SGHI7TCaAJmKl5g84b1mjfzB/PM7A94x6k4a9GoluF8ETPjFwXL+V/EwNKnctyVDEO
-	 BX5LNBShG1naOeSlLGUzIiKTg3VlNtr3P7Cv8j6sMvs8YIjWVOuhztfQNOL6dldaqb
-	 REuTIxh9XOnXw==
+	b=HJ6gaPotiKvqXsto+Bl+IhvIbp4l0/1MtfBq7yd+N2185yfTXuCq/s362lVHUNVcD
+	 lPjSOY7tK32+QZUbAM1mB6qLr2v/JhV3WoKULD0olM0lc+hhn3RxvwkSHZFLgN9hft
+	 g/Dg+Qs1aU5F17HC+X/Vd0E4lEi2V9xYLe3SnFi+/Is6qkpFDb2aYmwh4JxcvqL04f
+	 uSpfyDxro1VHM9/qBWGINCWtlGDMb+RpN41GBha9BMRfOjk9DqXfm7WlyKbqzfTrbQ
+	 2CB3MBhbGBZ/HDux91MFKed6TOsdA7RcTLxQ0rDo2jBBE0YW+4vw5hjQVBtuR0n1jg
+	 AFj6oGTaR55Bg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE1AF3A40FCB;
-	Fri, 27 Jun 2025 00:20:19 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D163A40FCB;
+	Fri, 27 Jun 2025 00:30:07 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: mana: Fix build errors when
- CONFIG_NET_SHAPER is disabled
+Subject: Re: [PATCH v2 net-next] ipv4: fib: Remove unnecessary encap_type
+ check
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175098361824.1380299.7391305111038301717.git-patchwork-notify@kernel.org>
-Date: Fri, 27 Jun 2025 00:20:18 +0000
-References: <1750851355-8067-1-git-send-email-ernis@linux.microsoft.com>
-In-Reply-To: <1750851355-8067-1-git-send-email-ernis@linux.microsoft.com>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <175098420600.1382491.1629775321433934271.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Jun 2025 00:30:06 +0000
+References: <20250625022059.3958215-1-yuehaibing@huawei.com>
+In-Reply-To: <20250625022059.3958215-1-yuehaibing@huawei.com>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kuniyu@google.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 25 Jun 2025 04:35:55 -0700 you wrote:
-> Fix build errors when CONFIG_NET_SHAPER is disabled, including:
+On Wed, 25 Jun 2025 10:20:59 +0800 you wrote:
+> lwtunnel_build_state() has check validity of encap_type,
+> so no need to do this before call it.
 > 
-> drivers/net/ethernet/microsoft/mana/mana_en.c:804:10: error:
-> 'const struct net_device_ops' has no member named 'net_shaper_ops'
-> 
->      804 |         .net_shaper_ops         = &mana_shaper_ops,
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> ---
+> v2: Restore encap_type check in fib_encap_match()
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] net: mana: Fix build errors when CONFIG_NET_SHAPER is disabled
-    https://git.kernel.org/netdev/net-next/c/11cd02069872
+  - [v2,net-next] ipv4: fib: Remove unnecessary encap_type check
+    https://git.kernel.org/netdev/net-next/c/77e12dba07d0
 
 You are awesome, thank you!
 -- 
