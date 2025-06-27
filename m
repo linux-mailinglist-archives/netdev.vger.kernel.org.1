@@ -1,143 +1,141 @@
-Return-Path: <netdev+bounces-202024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C10F0AEC099
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 22:06:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E365AEC09B
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 22:06:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 022011C45B96
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 20:06:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87BFF3B5293
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 20:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 821032ECEA3;
-	Fri, 27 Jun 2025 20:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6E52EBBBF;
+	Fri, 27 Jun 2025 20:06:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TTPV8XGC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kxWXYafm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-vs1-f74.google.com (mail-vs1-f74.google.com [209.85.217.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127D42EBDE5
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 20:05:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A08C2EBDC8
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 20:05:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751054747; cv=none; b=jXsV5t3/3/dITySqi79yyJ3hW61rfnzYS8fApuCBu61BsYwZjk1nUV2WFLAcxdkHW+OCCskmPbtlGV8kUnIwWpgSyETEEkYebmj95hpjLElPvk/HBj9GBOm0mXPQnCOxOoAdSoAxqVinMpp/lPxSsp3aI+TEuxz577yKdTl0hR0=
+	t=1751054760; cv=none; b=PO81Rn/4ywe4KxvLn8nUnCHJr8FLyJAdof4LVITwNtddhhXA8dRbtsnerix0W/FTACCno6o10xSseJNLcugVHMl7a4vIBJM5UjdMOtRN/Kr+ASG1EfXj2MlWVwv9Rkwjr2gmVQasusCXRw/4BqKD+gSpzFpyL8wr94chmoU8Org=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751054747; c=relaxed/simple;
-	bh=LR3FEYO4lseRQoD8fNl9kELElxWTZ4qSpuPKRqnou5E=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BnCH2t0u2gaodWwGJ9feQ6VNvzB0HqfguwnyH0lkyaRS23ukKSrchjzyckkHutNTk7+b6i0tPEWrEo5HnbGScdZ4Kj9xid9V+gw0ir7qGXAnyy39ZIZ+WbDr3x4bQVOBAuJ6S9o2UugLqNGg+5cWoVT2WQWMU7B1X3dHcwK6hnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TTPV8XGC; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1751054760; c=relaxed/simple;
+	bh=KbqouvucJpz7EwLEqXuEVG7KnQlNHLb0kRqfYiF76tw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kAOV6vYTdQIVJGe+pUlIgF1PYtcZoDQRG3WnrhJ+xkqRTuixZ1huqmomKaATQwwmDgakepDpFjSijcHdUc/TSQaDb5Uc+UwJC064842ymoe3mIRrYgXB/0nhpsq1w8YIxtnqcvjtB1ZQNmJPH98PvgR3UlIZdUt228LvlvsKciM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kxWXYafm; arc=none smtp.client-ip=209.85.217.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7489ac848f3so604963b3a.1
-        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 13:05:45 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-vs1-f74.google.com with SMTP id ada2fe7eead31-4e75a8ac11eso56368137.0
+        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 13:05:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751054745; x=1751659545; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZsCnLtPUB1WW+niTlrUm0KWXpbsHYBTnip7qlkFxEqw=;
-        b=TTPV8XGC5LnjKfGOB32kPx6d0GcrGWH1saQhsQ37V89C+j0aW0TypZebJwxwwSU+oG
-         fEohcWwm7o2ofP/+TSLgy12+XFz38B6gygeDe4zPf1x40N3NM9Tf4ohn9qGjzlfCpEoz
-         CMkusz2kBZrf+B7WGoYAMSQUpluBtD7QVZohQWenXiZVZXPufvMP26UJvwdHD8K1PewH
-         RvjgIs6fyFSwBfzyjVuDlx/dQMycJAO+RKRVLQHD0EZgvLIL9IoIIKxVCe6ypvF0bMj0
-         Affzq/y+kzXrMBLPKDyDiSBFdS9dUrXM5V6y+jTngfyKYev7Hptfgq5Fq96t+AYOoVpg
-         eLMA==
+        d=google.com; s=20230601; t=1751054758; x=1751659558; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ZuFKooOn4RLxR4Xu12SBH3wXM32FaQhQhAHZBzkRfxY=;
+        b=kxWXYafmcHv259kR4ZoWrBYdh6s5ilJT/Y8LFf4GtHChni8Yaw+4isZf8E9ddvDMh6
+         hVfX/cE7WZ9a0I42LiWIyJVelXD6pI2cKpxDzTCgNn6wvAaVQbwsjtRWU8FJYBWqMYu0
+         2d/EfCY9Dw5HVRBZgBi38zlbHcYt5ECjuMa/rx/yga2UVMF4Cc1hpAhj5gfJeUzUer0P
+         00qlE+LnpjgxISbT0bsxgIMZ/XgAHV5WHGowUmbf17t3Y8GU1bNChgqaKbKVFVR1snb1
+         AgysNvrRVAi62+BRjc9F8Rm/cye7iGoGR2o7UGisHbZzbymPTDwXYqtDKw2NjK66G4WS
+         tWaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751054745; x=1751659545;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZsCnLtPUB1WW+niTlrUm0KWXpbsHYBTnip7qlkFxEqw=;
-        b=o2wZjyr2DyMbIY+dhjt/wFIFGIKshAWNcSJxE/0HX35q7kdPnnhJZRRhM4C8Mx+R6q
-         H5uIvxtjyQ7PhCBYyfuD78YJ6lCEbE0yNTanFfLfH66edFo5uRAQMtAhXy29JBft7XhR
-         SNSlOASpRDA8llIt5H7APtvl8F8yiV67iJFHzay8MUyCKHbPvsqXpX/SCTtDk8E6E0GD
-         ddAtrvELou4ydbWgg04aj2IR4m+U3JjWVjUZRO7WmxFPC2v60uFztFxqA+xbSPUNpBAx
-         9j1xr9Mmt2zbPzVYIHLz9N6c7wQa9rhVcNoxTNXF4eWgQBg1dRtosAighcb5gemFGKY1
-         HC2w==
-X-Gm-Message-State: AOJu0Yx0eTZihOAYq0RuN6DPhQtxe8ssvNs4canwSivSPcUosb/2jQsM
-	HFcD5ChFDTZzqeInwF2aneKorQQWQBCZfHaBkTkVC6dzshz9qLUn1JH1kU7eZUdmF2cYF59/5R4
-	qtvlyJN8Rle9ZV6BGIjOjCdF4UWWfPoc12q8dQQz8Mvu1oe5JVuDAohnmV8HzWJ0Ismd1aghM6E
-	G3/yxPmpHJGTyZXouVtBWeFC70a0weKDw7zzuTMHiiW3Wrv7vBeiSSXiNQWNlktNM=
-X-Google-Smtp-Source: AGHT+IG/oOX4Ds24NX7C8OYmI3C+kJZrnfuJT15/L/7jauTWcRcnnLkHUgGCREUfwknTXT4g7yRM1bwd9m2A7brqUg==
-X-Received: from pgbfq27.prod.google.com ([2002:a05:6a02:299b:b0:b31:cc05:3c03])
- (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:c704:b0:220:63bd:2bdb with SMTP id adf61e73a8af0-220a16ca7famr7000010637.40.1751054745372;
- Fri, 27 Jun 2025 13:05:45 -0700 (PDT)
-Date: Fri, 27 Jun 2025 20:04:52 +0000
-In-Reply-To: <20250627200501.1712389-1-almasrymina@google.com>
+        d=1e100.net; s=20230601; t=1751054758; x=1751659558;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZuFKooOn4RLxR4Xu12SBH3wXM32FaQhQhAHZBzkRfxY=;
+        b=CEUblkZjfH+UKIN845uPX8XwkTEHFvrBZfScrJE8upZhHHgroV6rD8lg0SqBc1VT3H
+         kd9Fgur6P1vOQGr373DRwA4Ud+AhYfctZlx1G/Cop6St0kDFijWRWz8R0SmLT3DbpFyR
+         z62o2s0giO55NYdctcND0CRuDxraghrW3LAUQY/QXwgwIcM9ExRxQtJg7WIuQcQGHKqA
+         2R24z3ZfpWBiT3eO4XxNHfbQCsxzAFJ7Z6rBvbZwb+9fqd36njSXdqIHnOkvpJ+U/VWo
+         rnOEjxHwfI3KDZUkkE+dkr03+sLZA9PqDlKhdH8uJf8QledhuNiul610SJWT/fNfYXVi
+         Fb/A==
+X-Forwarded-Encrypted: i=1; AJvYcCXVElIOzAnJq/vpbQsUYi4jK16hZDCHUz/yaCtIz19+W+pYJSBCB+ea2AFpshZdZnxlZW56bKo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8m6RoSFRyx0gFKkd/VQZfVjQZjxYVE/zn0CERM4ci3u7R8hqK
+	/5Y0Ch/5olySow6XEkhOhIgs1824Y2xG70twh6EUXcBcnf01S/CUIJRZs4tE99BtTcowRV/9zgw
+	TsNwLWkU0hAuV2A==
+X-Google-Smtp-Source: AGHT+IHBynHra3s5gI1b5133WUMDO6kQ4s3qU+g5xs/PTdV9gNqe7QuaqzXKJFUIN167wjjcYJ4SA+OGIZ+Jqg==
+X-Received: from vsbcr11.prod.google.com ([2002:a05:6102:424b:b0:4ec:b143:86d0])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6102:511e:b0:4da:fc9d:f0c with SMTP id ada2fe7eead31-4ee4f7ad5cdmr4365721137.12.1751054757918;
+ Fri, 27 Jun 2025 13:05:57 -0700 (PDT)
+Date: Fri, 27 Jun 2025 20:05:47 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20250627200501.1712389-1-almasrymina@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250627200501.1712389-2-almasrymina@google.com>
-Subject: [PATCH net-next v1 2/2] selftests: pp-bench: remove
- page_pool_put_page wrapper
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	"=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?=" <toke@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, kernel test robot <lkp@intel.com>
+Message-ID: <20250627200551.348096-1-edumazet@google.com>
+Subject: [PATCH net-next 0/4] net: introduce net_aligned_data
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Minor cleanup: remove the pointless looking _ wrapper around
-page_pool_put_page, and just do the call directly.
+____cacheline_aligned_in_smp on small fields like
+tcp_memory_allocated and udp_memory_allocated is not good enough.
 
-Signed-off-by: Mina Almasry <almasrymina@google.com>
----
- .../net/bench/page_pool/bench_page_pool_simple.c     | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+It makes sure to put these fields at the start of a cache line,
+but does not prevent the linker from using the cache line for other
+fields, with potential performance impact.
 
-diff --git a/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c b/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c
-index 1cd3157fb6a9..cb6468adbda4 100644
---- a/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c
-+++ b/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c
-@@ -16,12 +16,6 @@
- static int verbose = 1;
- #define MY_POOL_SIZE 1024
- 
--static void _page_pool_put_page(struct page_pool *pool, struct page *page,
--				bool allow_direct)
--{
--	page_pool_put_page(pool, page, -1, allow_direct);
--}
--
- /* Makes tests selectable. Useful for perf-record to analyze a single test.
-  * Hint: Bash shells support writing binary number like: $((2#101010)
-  *
-@@ -121,7 +115,7 @@ static void pp_fill_ptr_ring(struct page_pool *pp, int elems)
- 	for (i = 0; i < elems; i++)
- 		array[i] = page_pool_alloc_pages(pp, gfp_mask);
- 	for (i = 0; i < elems; i++)
--		_page_pool_put_page(pp, array[i], false);
-+		page_pool_put_page(pp, array[i], -1, false);
- 
- 	kfree(array);
- }
-@@ -180,14 +174,14 @@ static int time_bench_page_pool(struct time_bench_record *rec, void *data,
- 
- 		} else if (type == type_ptr_ring) {
- 			/* Normal return path */
--			_page_pool_put_page(pp, page, false);
-+			page_pool_put_page(pp, page, -1, false);
- 
- 		} else if (type == type_page_allocator) {
- 			/* Test if not pages are recycled, but instead
- 			 * returned back into systems page allocator
- 			 */
- 			get_page(page); /* cause no-recycling */
--			_page_pool_put_page(pp, page, false);
-+			page_pool_put_page(pp, page, -1, false);
- 			put_page(page);
- 		} else {
- 			BUILD_BUG();
+nm -v vmlinux|egrep -5 "tcp_memory_allocated|udp_memory_allocated"
+
+...
+ffffffff849dd480 B tcp_memory_allocated
+ffffffff849dd488 B google_shared_statistics
+ffffffff849dd4a0 b tcp_orphan_cache
+ffffffff849dd4a4 b tcp_enable_tx_delay.__tcp_tx_delay_enabled
+...
+ffffffff849dddc0 B udp_memory_allocated
+ffffffff849dddc8 B udp_encap_needed_key
+ffffffff849dddd8 B udpv6_encap_needed_key
+ffffffff849dddf0 b inetsw_lock
+
+One solution is to move these sensitive fields to a structure,
+so that the compiler is forced to add empty holes between each member.
+
+nm -v vmlinux|egrep -2 "tcp_memory_allocated|udp_memory_allocated|net_aligned_data"
+
+ffffffff885af970 b mem_id_init
+ffffffff885af980 b __key.0
+ffffffff885af9c0 B net_aligned_data
+ffffffff885afa80 B page_pool_mem_providers
+ffffffff885afa90 b __key.2
+
+
+Eric Dumazet (4):
+  net: add struct net_aligned_data
+  net: move net_cookie into net_aligned_data
+  tcp: move tcp_memory_allocated into net_aligned_data
+  udp: move udp_memory_allocated into net_aligned_data
+
+ include/net/aligned_data.h | 21 +++++++++++++++++++++
+ include/net/tcp.h          |  1 -
+ include/net/udp.h          |  1 -
+ net/core/hotdata.c         |  5 +++++
+ net/core/net_namespace.c   |  8 ++------
+ net/ipv4/tcp.c             |  2 --
+ net/ipv4/tcp_ipv4.c        |  3 ++-
+ net/ipv4/udp.c             |  4 +---
+ net/ipv4/udp_impl.h        |  1 +
+ net/ipv4/udplite.c         |  2 +-
+ net/ipv6/tcp_ipv6.c        |  3 ++-
+ net/ipv6/udp.c             |  2 +-
+ net/ipv6/udp_impl.h        |  1 +
+ net/ipv6/udplite.c         |  2 +-
+ net/mptcp/protocol.c       |  3 ++-
+ 15 files changed, 40 insertions(+), 19 deletions(-)
+ create mode 100644 include/net/aligned_data.h
+
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
