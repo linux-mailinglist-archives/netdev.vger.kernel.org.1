@@ -1,134 +1,151 @@
-Return-Path: <netdev+bounces-201866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97013AEB4A4
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 12:29:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9F65AEB4AC
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 12:30:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63D683B2979
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 10:26:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2DD63B8EC9
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 10:26:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACC5C2DCC10;
-	Fri, 27 Jun 2025 10:22:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D6F4299AA4;
+	Fri, 27 Jun 2025 10:23:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="k2+CuFGi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e/ktNeMf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D2729A301
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 10:22:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D677E299931
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 10:23:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751019754; cv=none; b=RQnjYNtrDmwngmD/JCd2pZNzL9oOh/g8xcWhsQAU5iPhTbdqP66Ru/eMMYA+NyJTJhezOG9PAf7s/37egV2P8wOwrLEz2MFQNuhrwoVTRmFEFRRXckBaMbSDt6lH3jdq13LRROG3knpnWadiqHMcXic+K8IlAUcCcIIU7THiCQA=
+	t=1751019818; cv=none; b=fg8bNg2POsKT5gJdm/9F1cGXNE9CgSLEkgDZ6gZAUbRSfBEOQ3c0gjh8EJsHC/nG63bI3i8ZmYuOYWI4oj6H94BV5nzmuB3+Vd1erKNSLrGM6Ldl0USX+PEUjvIJA2b2HLyNXSbuEFvtiMyFggmJF3piezvSFOkoH1e2SmFgjIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751019754; c=relaxed/simple;
-	bh=s8ZiiE6pHUvr9gtLMt4WDPecDrQRJim5pyRk8EKuUdg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BquViLc/txWOdPPI/uUCT6zgDsYj9yx8krH2viwjARLWpvytAYg3y9pZcYEPvNynEZ+gvZX4bL3iSfMgQzCNs1V9di60+0YCEE8vRf2Cx+upsEspy2wHKNE8D82n2XOiUa9/TSphX1GAZTXvuA5tZyp2+XbjO+FwFwwtTfhjQEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=k2+CuFGi; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ae0b6532345so581787966b.1
-        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 03:22:31 -0700 (PDT)
+	s=arc-20240116; t=1751019818; c=relaxed/simple;
+	bh=V7FnJzBLi3EY72me3A2A+ErukVK7xe42c72R+6Jyi/g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RE6yyC6p8EzkzFxbiIKcPmHyrHZ+Uo/FaczTnB+5ydhoMqPwW17lj2h2vxkETYKifZMBXfA1rcnTfep1d47d7/6HXhrGCxq1YqaV1YmougYC1MHRnGPZ1Pj+NAYYdLwV1abHq2psRynwI4eSRHzgI3oo95lzZLA3+3XSO2kUtzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e/ktNeMf; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4a43e277198so14028351cf.1
+        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 03:23:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1751019750; x=1751624550; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zGUGwnAuhK8MqbgXiShFzJdKHPJL+NaZqgwZsBl0yC4=;
-        b=k2+CuFGi50chqJqdmP1/ruwT3KGhSiLY0i8WUBRnGZr8nKFBbfMRr1mQc1D4zsYxCG
-         ZAoQkKyX1EyJ2F1jKuHCRjUiEuWcLjNd4RUju4/6EPRlhWcvAx0ZzS1feAHOUHjPY2pp
-         rkjL+3txpVJZq48NDVatU0PhMp/x+QaOa5Yt4gPyEtqUAJOXKmnWq/HGQ9Une9i7rx0W
-         ZOiZzpRUi5Pu33mniAA3+oU3LIrSS1rYNsmn1jPqOYpfQDK8ghW8/vidPD7r6awQ7L19
-         2/ifltrdSJWpMCBN3M3thnQoeXv+fSicfKGX46mNDmSily1FrXXeo8whhkrQZ4moZKtY
-         LPjA==
+        d=google.com; s=20230601; t=1751019816; x=1751624616; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0nKxFEYE/UeFFPamRqoXAyJPsV2H+5u5JXw+CSplOKw=;
+        b=e/ktNeMfMu1V1LNTxfGWDxLHpT2pkc8Mr4+riNFRCd44XuCDlhF3r87scfMy+BADY8
+         tI0RngoLspdHouMsEMG1N0c01WW712YfPMlnABRnaJvrlffjbAI5OXi0y74zdP/3NFxo
+         R7RAeRLjG0du7PWwTvD5NB81LxVI8S/hlveUKpUbVzRwLNaWxzrIqEWegFq8oOU/j9mI
+         +socf4glDNor0lSriFDcR5WkPHLqRrsVg7Ml609RSf8UZyVI0tsPL4gDyyRAgnO4ilSv
+         f9otDvuo9bvALCk6z05BUwMQqOm58uz8y1GeIvGJlr7ErhQAW7mULBHVloTlgB7dys6+
+         NFpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751019750; x=1751624550;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zGUGwnAuhK8MqbgXiShFzJdKHPJL+NaZqgwZsBl0yC4=;
-        b=S88W4sJLeL+BGclJuzYkzL+P4JvLh669zNj/mjUWp2jStcrqccGdunHUfTSaA5GA9u
-         2DlcZEDUWhuaY3TCBWZyM2eYQOud5R5SO9NCzmbaPxYz5m+B1bT2IrZPlcGNblsiQNpW
-         P569kIiboJj78cdW/iheQqmpxbCXzR5LyTbjr/u/Kl4h73uxqwUhT+bn2buN7j51mVES
-         HXKmCEwj/G+zh+SBg+1clhUhR2YlW4GHq5I1BM9niKfAsOGsVB8FP8pCgWj2qlg7WfG3
-         rmt+cjMj0Vdx7NbFd+lYXdJLKbDZByPQpt1YjjSUuOaRtvk4oavXg7wmt+I3YlKMjEfM
-         naQQ==
-X-Gm-Message-State: AOJu0YwN/QQW74RSTA1quMejKAFbXmmEHvGCfujc24Hh/B2itOXjGDwO
-	11pnPBpsFo1ooYKPipLnsYcjYSmhsN1TtC2eFk2EQF1g/Sn/ogoTeQd/UUfFuzIBfTxuZkA/Qex
-	NFj+N
-X-Gm-Gg: ASbGnctM8/e++T4qvM8q4KP8syA733eAa4YdsP8NwV1NjN3epRZY9FTkSgSTpJkzdHn
-	ENEdlu6VUNcBcPOfvoqJUfS9TgIPHoYymEavWW/qypQQu2ohJNiBbYka3/iQmC1kIY5yD6iJyM/
-	fMWL/JiK1yB1Ss6sU9+m4caR6Npv3uODTiYE5nvxoX3xN61hX9pRcpVYzB+utkzDRXCmdH4PPQv
-	M3Q7UpUz1G+f/+RKkAaUHX+rngarHngSyyV9UkNAjiw5DkcQOARo9QAxFyMzLqm123Hzrc3tAUR
-	QRBN/ww7JBCHvTaGrEagH3sDT4P1ZOtPhj57v8do1PJ5MY8G262/oZJzzVZ5YZz7TBb0ZZ14kkc
-	MEYFJWEodwz2uxgfzPqH39ar/gu+x
-X-Google-Smtp-Source: AGHT+IE91OPz08IFTkinkt2AHiqhjKg3XMlDuTR8nwgBpzRrkeW2Al5f9bM+VB6od7e4zbBUhZYi+A==
-X-Received: by 2002:a17:907:7fa2:b0:ad8:959c:c567 with SMTP id a640c23a62f3a-ae35024fe25mr244930366b.10.1751019749860;
-        Fri, 27 Jun 2025 03:22:29 -0700 (PDT)
-Received: from localhost (p200300f65f06ab0400000000000001b9.dip0.t-ipconnect.de. [2003:f6:5f06:ab04::1b9])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-ae353c6bbe3sm97297066b.118.2025.06.27.03.22.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jun 2025 03:22:29 -0700 (PDT)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-parisc@vger.kernel.org
-Subject: [PATCH] net: tulip: Rename PCI driver struct to end in _driver
-Date: Fri, 27 Jun 2025 12:22:20 +0200
-Message-ID: <20250627102220.1937649-2-u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.49.0
+        d=1e100.net; s=20230601; t=1751019816; x=1751624616;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0nKxFEYE/UeFFPamRqoXAyJPsV2H+5u5JXw+CSplOKw=;
+        b=fjaxvOgRN90NzyYWArZg5YVO+GNWrbePjegp+SG73Dv0dcLPAyoHTQj/OlictaA4+k
+         HBgb7ZKQ0tw3ZqYquqkmKD+lserWEC+j4I+YOQzMq438CsYosmzsbt7thnMdbO/bYsmZ
+         dTa8Peb6rdGEv6lSmnJQHE7Ofsp4qXtoExM08DPICWAW6QenbWOH0a4k1LUzvMivC25g
+         RcrRHEl07Oj54WZCPMvgSK44CakRcr4mQU8/3ADIwJDzfAARYpnQOCTpKfnFgiZqewJ9
+         ixa04+arpoqnJqd1KzOWpG8sHi7AaQrxL+y4MiHAA4saSPUxMqjitTOTBPR9bh6VTkPr
+         XX6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVSTLZbXi3YR4nLZrlkgnV2l5pBbeQSNMgDRMnXSeU1yxLqr2Gwj8QtHRkBzxDO7do6wXaYcFo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvYZK7R+YolwzOQ+LffZUho+s8hknHQMYBRbHuSsAZyV8OYNju
+	yxqfuR60xWx3JlL5iJicudrATGk5vl+uF0lFqcZAxxtVhUcqNaGubYJGLmUuwFquxpyG4p/o58q
+	IkY/W1O9UYn9iO0KH+hgtI7xHYEvD9oUvjF4VAC6F
+X-Gm-Gg: ASbGncvjOum2p4ru4Nbl1MoEmHrGzzMje/6EKR5RFRHccCP82MNkkvafBt5vIFeTjxE
+	ca5nZQzWvbJMjyOP4i7jG5KVrxxNgpqUbuzomEY6qfxsydVbHXEn3N4uENM9RKwbkG3999OoDDO
+	a9L6KZ8aFcxGylYmmZf7Qax2YTflFtH6s7duQ86oTJKMApJWPSSq4J
+X-Google-Smtp-Source: AGHT+IFRBSu4OSWWwhUA10FKePzkXfzypfFlIilARxDfH6dzTpsWBTUQ/wDOJF5G8OVjrmkSdCmZJ9Dg3DqKmRy3yeY=
+X-Received: by 2002:ac8:5796:0:b0:4a5:a96d:606d with SMTP id
+ d75a77b69052e-4a7fcbe417dmr48902211cf.46.1751019815425; Fri, 27 Jun 2025
+ 03:23:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1245; i=u.kleine-koenig@baylibre.com; h=from:subject; bh=s8ZiiE6pHUvr9gtLMt4WDPecDrQRJim5pyRk8EKuUdg=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBoXnDcMjJBYg5gCFIS22jS0XuNYbfDlnIdAovsd FAxr2zVZF6JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCaF5w3AAKCRCPgPtYfRL+ Tu71B/47n29FL5xDhs0JB0Z6fwiwT6cSBmwA2DKeJN9JTAO52f4BOIn/xG+k4CIL8PDVS1jewQX 4ZxGCTR3gdGmxIUMjPA1XYuao+NRl2J2wHaWPUXh0/QhWIoC1gBaEDKRB+2KR8FYgZLJQbyLxo4 8MCW8ANovTUBEcTQEo2S2/l2PAx6+1Y17ac7WaI7nO6LYBfW5HIm1ki2daioIztAakncfJt6nxT Mi+Np+FwiAY5bFaQ7f7sI09Kjrpe0wdyICVHxk2CvqWGzluN+orNZ+I22mEFD3I5/8EdZ18wY3I 8TD4cWzg4NwQCuxzJP/jpuKey+yk1efSdCTNRW8sjpPc9Gmr
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
+References: <20250627094406.100919-1-yangfeng59949@163.com> <CANn89i+JziB6-WTqyK47=Otn8i6jShTz=kzTJbJdJgC0=Kfw6A@mail.gmail.com>
+In-Reply-To: <CANn89i+JziB6-WTqyK47=Otn8i6jShTz=kzTJbJdJgC0=Kfw6A@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 27 Jun 2025 03:23:24 -0700
+X-Gm-Features: Ac12FXzCqOJALJRgTaH8w7cAG6dXP3Xqdw3LY61OOOtlzGBfz-N8-LGxpyqFxy0
+Message-ID: <CANn89iJs5qX_daLTob17t-ZLUQ5q+x9vvw=DP0CQVdLPGbtpKQ@mail.gmail.com>
+Subject: Re: [PATCH v2] skbuff: Improve the sending efficiency of __skb_send_sock
+To: Feng Yang <yangfeng59949@163.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	willemb@google.com, almasrymina@google.com, kerneljasonxing@gmail.com, 
+	ebiggers@google.com, asml.silence@gmail.com, aleksander.lobakin@intel.com, 
+	stfomichev@gmail.com, yangfeng@kylinos.cn, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This is not only a cosmetic change because the section mismatch checks
-also depend on the name and for drivers the checks are stricter than for
-ops.
+On Fri, Jun 27, 2025 at 3:19=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Fri, Jun 27, 2025 at 2:44=E2=80=AFAM Feng Yang <yangfeng59949@163.com>=
+ wrote:
+> >
+> > From: Feng Yang <yangfeng@kylinos.cn>
+> >
+> > By aggregating skb data into a bvec array for transmission, when using =
+sockmap to forward large packets,
+> > what previously required multiple transmissions now only needs a single=
+ transmission, which significantly enhances performance.
+> > For small packets, the performance remains comparable to the original l=
+evel.
+> >
+> > When using sockmap for forwarding, the average latency for different pa=
+cket sizes
+> > after sending 10,000 packets is as follows:
+> > size    old(us)         new(us)
+> > 512     56              55
+> > 1472    58              58
+> > 1600    106             79
+> > 3000    145             108
+> > 5000    182             123
+> >
+> > Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
+>
+> Instead of changing everything, have you tried strategically adding
+> MSG_MORE in this function ?
 
-However xircom_driver also passes the stricter checks just fine, so no
-further changes needed.
+Untested patch:
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
----
- drivers/net/ethernet/dec/tulip/xircom_cb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index d6420b74ea9c6a9c53a7c16634cce82a1cd1bbd3..b0f5e8898fdf450129948d82924=
+0b570f3cbf9eb
+100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -3252,6 +3252,8 @@ static int __skb_send_sock(struct sock *sk,
+struct sk_buff *skb, int offset,
+                kv.iov_len =3D slen;
+                memset(&msg, 0, sizeof(msg));
+                msg.msg_flags =3D MSG_DONTWAIT | flags;
++               if (slen < len)
++                       msg.msg_flags |=3D MSG_MORE;
 
-diff --git a/drivers/net/ethernet/dec/tulip/xircom_cb.c b/drivers/net/ethernet/dec/tulip/xircom_cb.c
-index 8759f9f76b62..e5d2ede13845 100644
---- a/drivers/net/ethernet/dec/tulip/xircom_cb.c
-+++ b/drivers/net/ethernet/dec/tulip/xircom_cb.c
-@@ -143,7 +143,7 @@ static const struct pci_device_id xircom_pci_table[] = {
- };
- MODULE_DEVICE_TABLE(pci, xircom_pci_table);
- 
--static struct pci_driver xircom_ops = {
-+static struct pci_driver xircom_driver = {
- 	.name		= "xircom_cb",
- 	.id_table	= xircom_pci_table,
- 	.probe		= xircom_probe,
-@@ -1169,4 +1169,4 @@ investigate_write_descriptor(struct net_device *dev,
- 	}
- }
- 
--module_pci_driver(xircom_ops);
-+module_pci_driver(xircom_driver);
+                iov_iter_kvec(&msg.msg_iter, ITER_SOURCE, &kv, 1, slen);
+                ret =3D INDIRECT_CALL_2(sendmsg, sendmsg_locked,
+@@ -3292,6 +3294,8 @@ static int __skb_send_sock(struct sock *sk,
+struct sk_buff *skb, int offset,
+                                             flags,
+                        };
 
-base-commit: e04c78d86a9699d136910cfc0bdcf01087e3267e
--- 
-2.49.0
-
++                       if (slen < len)
++                               msg.msg_flags |=3D MSG_MORE;
+                        bvec_set_page(&bvec, skb_frag_page(frag), slen,
+                                      skb_frag_off(frag) + offset);
+                        iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1,
 
