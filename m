@@ -1,89 +1,88 @@
-Return-Path: <netdev+bounces-201721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FE95AEAC1F
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 03:02:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A8E7AEAC20
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 03:02:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E4213A3D34
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 01:01:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64DF24A5A81
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 01:02:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05AE5219E8;
-	Fri, 27 Jun 2025 01:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49FAA18027;
+	Fri, 27 Jun 2025 01:02:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q/11EOQB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yM9xKz9m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66432145FE0
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 01:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C79A733F6
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 01:02:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750986078; cv=none; b=Fo/5zpSUjdk3ohOMjHqqWrh+WGv9NlUpWnQ6T3HkA9fbF61Xs48HlnJz5KKe7jwGLTIYxGO5x2nmbkqDfAL6zv2/ttPC6emvCRspfStzX2ls89oepez7HWXFGDNwzAiBV+RKEDCPqfdwdKe0/j112neBjeifP0FU6rKRzrAEo58=
+	t=1750986158; cv=none; b=leqg82hhZjFC7yiQ9trGlVzBCqNjDRP8cz7cgq1XbTIQ7yzqBw5TOtKEld5y++VDQSeXdt56LWTaxF1lQNj19IEDP7CVO+a2Vyo70p3TwT/kY/Z6bRXeDUVEYuzwMpOM325cABKi4ZSD82xxOUpvVzNHH6FLrBFSQa5XHT7WdHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750986078; c=relaxed/simple;
-	bh=JUuEWzSsrJvQA/NSb5mgqarAsvIaA4K6b4L1Jtfn9c0=;
+	s=arc-20240116; t=1750986158; c=relaxed/simple;
+	bh=NrNgvrrz81noP6ns453c/1JtNX/1cDG1pootNLpI6S8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b0OsaqbylBg8DBhNnr7P+ZIyz5Tae/x+rNFoCjYHih74doEE4MSu3g2AuHMM6i2z8Z8umEuYSL4okkINyAnHQdolTco4Tb+zVZjIFOjOV66RPdX627uCRZiiovwsd/NInoRQtUX4jkUte2XcRjjBrvJA8HMdrcvswGFYj/DnjLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q/11EOQB; arc=none smtp.client-ip=209.85.216.41
+	 To:Cc:Content-Type; b=sbHz3WtHM657U0txGTKF7LXKbpoxCukbE/ZLF/wMNBSNZ/3nK1C58nHei+JLOsS4/UB/lrvDrzRFPuaymvRXQ8nBs9jQ8Ddd1RyFelNWKpGHnmYTOlzc3w2A1DWxDfihbXjs59lU2AZnNTWeaYde6Kvtzc9SY5ecTT1cbQw3T5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yM9xKz9m; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3138e64b42aso1956824a91.0
-        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 18:01:17 -0700 (PDT)
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b31c978688dso973409a12.1
+        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 18:02:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1750986077; x=1751590877; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1750986154; x=1751590954; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kFCgNkNtLTPi2qftxx19oPErN+QtXy8c4/pxZTBK1RI=;
-        b=q/11EOQBUtEeAQCvSX4ng3djlLn70/+s4UvYA108aUKUgkY5I8CmVKlpYc3DK/xdrj
-         9pCVN0ysS7Y5w+laFAnVJQAE+mhPIDVMfQfxTPudKI4GqFYt6EU/nQz214GerrG3JRFK
-         akjqJhr1C3NRK3ebTmLm/ICSg9lso8A3LH5e4VnAad2ZFKKHJDIezjmIT5IKrYQmdBj7
-         Xc/fP7lGZjaWi79U6Lnqjq9AX1+FMsdFOKvcT0g3y8lDTgCTl69AZBTmwfmVyGQnrK9B
-         81vNbq1Zt4yQpm7qNXgBjxQr9GuXkY957H36zj5IaqdEEWVDa8KmdkX8DGR2wTWn6iEZ
-         aONA==
+        bh=Wsnlm/Qp7khDYn8hr1ZM7th0D2BiyAMEkqWNqTAqFV4=;
+        b=yM9xKz9mgnGqx+CBXynREC4NJupyDXFkY9olSl0O09mI/mThWE3UBiQuCdF9MaoFb/
+         xh6eE5U8CvNNwi0adqXe+xrV5l3v8wUdqe6CzjCxGyxYVrbUJU+qtssAJ2aNW0nlQU/S
+         fa1HECsVsg1meD8ElUE6BSW0TV5l5JOccTHODbQCocMBK7vIm0aisZL+Jdrm7cBQIk9u
+         wLbckT3ZWQtsCITy+3PhFS8Ehw9tTdXMv5Iiqc1F4+kiFci7D9/mZAUE/jeqQzZhNMdO
+         fnFEaW6PscK8C/hHh+FnI7+U8UqUZxEpl1mdpgDkUBWmGt+yDcvmTUK/odekhw18cstD
+         bZxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1750986077; x=1751590877;
+        d=1e100.net; s=20230601; t=1750986154; x=1751590954;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kFCgNkNtLTPi2qftxx19oPErN+QtXy8c4/pxZTBK1RI=;
-        b=qDoTmod5xwfAeYXia4veK4vqjryyvCofcJ/6lMH4NGvCrGEHFnSEoUf/v3QsowTKNe
-         XN76MDqgDVFOJGrZODvE3WRtmVqlKPfKTUOC5HuMfuMB9Ligva8vEnwjEfAZbaLFMU22
-         4sFl18LNPw7SDddoj7hR1JH38BnUmnFXj6xz+ub3uVVuKADccZ0YXV4UgfrOlvmeVNLv
-         4mncNtSq75zzymdWs/S6yiJ6mKqrq/H3/dW4U5auPAQ/m21xyApPeOCl8eTbbDMN9s+/
-         F/u6pl1+2bC7sKDXQ26JnHc721aVrANsN1jo3F1lY/MUhQQn+RhOSVgT1La/avk19Hpe
-         K+jQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWauhaUDsjajnlwVT7rd2hKXrnrY5HT1rbpDToZ/OZXFHwNjwUyquxqa5JPmbe//MPBnX7BTUE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxPxUXHagcudBr+O/OcVL3fnrCW6fWVIJKSBdz6B4f3+7Bg86M
-	pkqjF8FtwNQ5B7G51IpyaBZDitIsYAIpAHOrxIIRRDzrXVXjsvlnQT1SwSrUAl6f83oUXGz6WhY
-	WoLBqySIwwbgAyqp/M7S+x/cbr6fJhGuNIupNoyGz
-X-Gm-Gg: ASbGncsiADA8xLL3fBTpjUN4pS9+zI2xIkB2WF6+8S77MnI2Wn5zZ9fFJVjelmV6oYw
-	ISqj+d3rYZnBRUqNNZuHIcl4iUIAMJR3JFYkTLsGetWZnJvbElLwkUTt5l5svTkV+W8Kf8BrGod
-	DfsezCAauWkHZRVBb4/uIUSMq8Nf3nOo6xeXq/m+6KnbI4eKkp/51FrDulaUlJudXW+uNtcbHHS
-	Td+
-X-Google-Smtp-Source: AGHT+IFNb5tJ01q1Fymb8qgReZd+LFacrQhDkllfDQkLn22VNIRpx4Mw0vpAeff/iEL0Z9IpoU8QDW98sRDnozCQKQo=
-X-Received: by 2002:a17:90b:2252:b0:312:959:dc3f with SMTP id
- 98e67ed59e1d1-318c8ee5339mr1588930a91.3.1750986075940; Thu, 26 Jun 2025
- 18:01:15 -0700 (PDT)
+        bh=Wsnlm/Qp7khDYn8hr1ZM7th0D2BiyAMEkqWNqTAqFV4=;
+        b=AXnOGHi4Rv8fgT2WC07QgL41MLIZ15vdqMjY4G8StNx36WE7YbioaFf677z7Ujuulv
+         sJ1MPjga5f0zJ++nY/DQXoaiPPKW3RRRsQYvsh3m5CCfFFTw8e0BvRLw03Cm2A5a7Q9W
+         6aFcsOhBMl6jU2h1pH8aZkxaH5sWL97TvFmxSSK7D0a9Li2k8bpIWG+pPTDj8mjJOmV8
+         uA0ZEPCgIGw5qzSzpnFGSygiInWKzh+7fnBImImZni5dl73rJ9Kla0CZ9CUyVK1OnIcE
+         LEM1+Sn90GsF8p9c6ydzJaju0euLe5EGQTH0zmsmV4vMA/mKiuLBiHngR+QmHRe7QCUW
+         DnOA==
+X-Forwarded-Encrypted: i=1; AJvYcCW67p1rQRtdccEpp/GYv/vingFuo/PHjrDigkwCINCc61x4rt+eqcqngYPJz8utQewr0lerRiY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlFnXPWdfODYtz5EnnGwKjjJ92AhXCRORjRCiJjWK6wN2fRSsx
+	8v4qtp0S8JBZcDVs1etdRy8w0yqDGz40xC4TosMaqGIrEzf/EYaGiIBFWx2shtt9Nx37Vct4erV
+	60cSwL88mebVhQk1C9JOgSpPD6d8MQEKC+MJ1fLp6
+X-Gm-Gg: ASbGncv+TukGW6w9xG5kofE8LgUD8cQruqNXw9NyOe9aLihg/tiDpNtzeyj0W1Ck8JX
+	BVyYpF2Xji1Q8UsioVg/4OqRIQ2ITpkFSBee/YBnwRDG6KyDWIHDfj68rPwTuWXW0XcqyRe8FyL
+	Vak4zz5OI5JGyCecteCc1pzMcUiayAue6JH0N+MgNv+7/opUIebped+4z/WYorMH6RuNBU0WAH6
+	XnZ
+X-Google-Smtp-Source: AGHT+IGTgKXaAA1x5i6QZoEttLV/x1M1s3bH2xAN2Bfc0MtFN9FAySW0+L6uh0JGag5hNhoSUyT0j9XRU/s5dBj/XT4=
+X-Received: by 2002:a17:90b:278b:b0:316:d69d:49fb with SMTP id
+ 98e67ed59e1d1-318c8edb091mr1778274a91.14.1750986153722; Thu, 26 Jun 2025
+ 18:02:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250624202616.526600-1-kuni1840@gmail.com> <20250624202616.526600-7-kuni1840@gmail.com>
- <CANn89i+aMsdJ+oQmo1y4sbjJM40NJpFNYn2YT5Gf1WrfMc1nOg@mail.gmail.com>
-In-Reply-To: <CANn89i+aMsdJ+oQmo1y4sbjJM40NJpFNYn2YT5Gf1WrfMc1nOg@mail.gmail.com>
+References: <20250624202616.526600-1-kuni1840@gmail.com> <20250624202616.526600-14-kuni1840@gmail.com>
+ <CANn89iJs9Z1PgRUTik63tLwTJATVMzZGe0Cpg1MNwCW0F2Mihg@mail.gmail.com>
+In-Reply-To: <CANn89iJs9Z1PgRUTik63tLwTJATVMzZGe0Cpg1MNwCW0F2Mihg@mail.gmail.com>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Thu, 26 Jun 2025 18:01:04 -0700
-X-Gm-Features: Ac12FXzfJ9coAs9cLOA2TaMhVhqmWkLFZXFXx54cEtCYfs6cGyXyhYqTTBFLfSI
-Message-ID: <CAAVpQUDa8w49-mvf4=nAYLKv0aX9hmAt312_0CD+u4nSWWAv3A@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 06/15] ipv6: mcast: Don't hold RTNL for
- IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP.
+Date: Thu, 26 Jun 2025 18:02:22 -0700
+X-Gm-Features: Ac12FXykTjTmMiLwwcwxRpqKHFXyLGcPo99dIrvD6EJP5dikGwoz_BvoJL8ICvY
+Message-ID: <CAAVpQUBWepaZYZvPjNMzSYiERWuvM15wtBJE+y5iWavO+saCqA@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 13/15] ipv6: anycast: Unify two error paths in ipv6_sock_ac_join().
 To: Eric Dumazet <edumazet@google.com>
 Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
 	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -91,7 +90,7 @@ Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, "David S. Miller" <davem@davemloft.n
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 26, 2025 at 7:37=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+On Thu, Jun 26, 2025 at 7:52=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
 wrote:
 >
 > On Tue, Jun 24, 2025 at 1:26=E2=80=AFPM Kuniyuki Iwashima <kuni1840@gmail=
@@ -99,98 +98,77 @@ wrote:
 > >
 > > From: Kuniyuki Iwashima <kuniyu@google.com>
 > >
-> > In __ipv6_sock_mc_join(), per-socket mld data is protected by lock_sock=
-(),
-> > and only __dev_get_by_index() requires RTNL.
+> > The next patch will replace __dev_get_by_index() and __dev_get_by_flags=
+()
+> > to RCU + refcount version.
 > >
-> > Let's use dev_get_by_index() and drop RTNL for IPV6_ADD_MEMBERSHIP and
-> > MCAST_JOIN_GROUP.
+> > Then, we will need to call dev_put() in some error paths.
 > >
-> > Note that we must call rt6_lookup() and dev_hold() under RCU.
-> >
-> > If rt6_lookup() returns an entry from the exception table, dst_dev_put(=
-)
-> > could change rt->dev.dst to loopback concurrently, and the original dev=
-ice
-> > could lose the refcount before dev_hold() and unblock device registrati=
-on.
-> >
-> > dst_dev_put() is called from NETDEV_UNREGISTER and synchronize_net() fo=
-llows
-> > it, so as long as rt6_lookup() and dev_hold() are called within the sam=
-e
-> > RCU critical section, the dev is alive.
-> >
-> > Even if the race happens, they are synchronised by idev->dead and mcast
-> > addresses are cleaned up.
+> > Let's unify two error paths to make the next patch cleaner.
 > >
 > > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 > > ---
-> > v2: Hold rcu_read_lock() around rt6_lookup & dev_hold()
-> > ---
-> >  net/ipv6/ipv6_sockglue.c |  2 --
-> >  net/ipv6/mcast.c         | 22 ++++++++++++----------
-> >  2 files changed, 12 insertions(+), 12 deletions(-)
+> >  net/ipv6/anycast.c | 22 ++++++++++++++--------
+> >  1 file changed, 14 insertions(+), 8 deletions(-)
 > >
-> > diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
-> > index 1e225e6489ea..cb0dc885cbe4 100644
-> > --- a/net/ipv6/ipv6_sockglue.c
-> > +++ b/net/ipv6/ipv6_sockglue.c
-> > @@ -121,11 +121,9 @@ static bool setsockopt_needs_rtnl(int optname)
+> > diff --git a/net/ipv6/anycast.c b/net/ipv6/anycast.c
+> > index 8440e7b27f6d..e0a1f9d7622c 100644
+> > --- a/net/ipv6/anycast.c
+> > +++ b/net/ipv6/anycast.c
+> > @@ -67,12 +67,11 @@ static u32 inet6_acaddr_hash(const struct net *net,
+> >  int ipv6_sock_ac_join(struct sock *sk, int ifindex, const struct in6_a=
+ddr *addr)
 > >  {
-> >         switch (optname) {
-> >         case IPV6_ADDRFORM:
-> > -       case IPV6_ADD_MEMBERSHIP:
-> >         case IPV6_DROP_MEMBERSHIP:
-> >         case IPV6_JOIN_ANYCAST:
-> >         case IPV6_LEAVE_ANYCAST:
-> > -       case MCAST_JOIN_GROUP:
-> >         case MCAST_LEAVE_GROUP:
-> >         case MCAST_JOIN_SOURCE_GROUP:
-> >         case MCAST_LEAVE_SOURCE_GROUP:
-> > diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
-> > index b3f063b5ffd7..9fc7672926bf 100644
-> > --- a/net/ipv6/mcast.c
-> > +++ b/net/ipv6/mcast.c
-> > @@ -175,14 +175,12 @@ static int unsolicited_report_interval(struct ine=
-t6_dev *idev)
-> >  static int __ipv6_sock_mc_join(struct sock *sk, int ifindex,
-> >                                const struct in6_addr *addr, unsigned in=
-t mode)
-> >  {
-> > -       struct net_device *dev =3D NULL;
-> > -       struct ipv6_mc_socklist *mc_lst;
 > >         struct ipv6_pinfo *np =3D inet6_sk(sk);
-> > +       struct ipv6_mc_socklist *mc_lst;
-> >         struct net *net =3D sock_net(sk);
-> > +       struct net_device *dev =3D NULL;
-> >         int err;
+> > +       struct ipv6_ac_socklist *pac =3D NULL;
+> > +       struct net *net =3D sock_net(sk);
+> >         struct net_device *dev =3D NULL;
+> >         struct inet6_dev *idev;
+> > -       struct ipv6_ac_socklist *pac;
+> > -       struct net *net =3D sock_net(sk);
+> > -       int     ishost =3D !net->ipv6.devconf_all->forwarding;
+> > -       int     err =3D 0;
+> > +       int err =3D 0, ishost;
 > >
-> > -       ASSERT_RTNL();
-> > -
-> >         if (!ipv6_addr_is_multicast(addr))
-> >                 return -EINVAL;
+> >         ASSERT_RTNL();
 > >
-> > @@ -202,13 +200,18 @@ static int __ipv6_sock_mc_join(struct sock *sk, i=
-nt ifindex,
+> > @@ -84,15 +83,22 @@ int ipv6_sock_ac_join(struct sock *sk, int ifindex,=
+ const struct in6_addr *addr)
+> >         if (ifindex)
+> >                 dev =3D __dev_get_by_index(net, ifindex);
 > >
-> >         if (ifindex =3D=3D 0) {
-> >                 struct rt6_info *rt;
+> > -       if (ipv6_chk_addr_and_flags(net, addr, dev, true, 0, IFA_F_TENT=
+ATIVE))
+> > -               return -EINVAL;
+> > +       if (ipv6_chk_addr_and_flags(net, addr, dev, true, 0, IFA_F_TENT=
+ATIVE)) {
+> > +               err =3D -EINVAL;
+> > +               goto error;
+> > +       }
+> >
+> >         pac =3D sock_kmalloc(sk, sizeof(struct ipv6_ac_socklist), GFP_K=
+ERNEL);
+> > -       if (!pac)
+> > -               return -ENOMEM;
+> > +       if (!pac) {
+> > +               err =3D -ENOMEM;
+> > +               goto error;
+> > +       }
 > > +
-> > +               rcu_read_lock();
-> >                 rt =3D rt6_lookup(net, addr, NULL, 0, NULL, 0);
-> >                 if (rt) {
-> >                         dev =3D rt->dst.dev;
+> >         pac->acl_next =3D NULL;
+> >         pac->acl_addr =3D *addr;
+> >
+> > +       ishost =3D !net->ipv6.devconf_all->forwarding;
 >
-> We probably need safety here, READ_ONCE() at minimum.
+> RTNL will no longer protect this read, you should add a READ_ONCE()
 
-Will add it and the corresponding WRITE_ONCE() in dst_dev_put().
+Ah exactly.  Will use it.
+
+Thank you!
+
 
 >
-> This can probably be done in a separate series.
-
-I'll post a follow-up for other rt6_lookup() users and dst.dev
-users under RCU.
-
-Thanks!
+> Other than that :
+>
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
 
