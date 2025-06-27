@@ -1,101 +1,102 @@
-Return-Path: <netdev+bounces-202057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ABFBAEC220
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 23:35:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66CFFAEC239
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 23:44:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0BB027A227A
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 21:34:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEE40172333
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 21:44:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C4E0289E36;
-	Fri, 27 Jun 2025 21:35:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7583A28A1E2;
+	Fri, 27 Jun 2025 21:44:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aCVygikr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X7LZXGuM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF83A272E74
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 21:35:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B875289E2D;
+	Fri, 27 Jun 2025 21:44:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751060152; cv=none; b=CSMVR8K1k/Cft/KKiqRUJBbpVbK3TO2a+LOcn9XRT1iC35vKHNSn4kJnRnZhTE2P5nB1lFY8PSU86kLgU8evr0ndPhKUrtPpMvuu8rIK3P9FZeOcCaQntWT+mALuBU0KlEYhbj/nBE+tKPd3DsjEAYslahqPFx82IZCey/YhYhM=
+	t=1751060679; cv=none; b=dc0lEsi8Y1QZMOvqTjBmPBNbpbfFp0p4+kX/gx8hmUHyfwmC/WEOpQshhA1fl89prYKtNFu9Ek1H1A7ZM2lE8jOPrxVdC9lOgTjyIA4UoDN9VdyhEyt/X7oDb4cFMI8D5Nb4c81adMo1oHdQLBU36EhEVHNSMWmKfxNKBl5BY5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751060152; c=relaxed/simple;
-	bh=Q2IkAZ9vilSvQ6vi419VGdptbP5AYxSKpV2iK4CE/t0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IgV/vY14ZlGjmgJI7I/7izXhs7E9LnLnKOko4O4AeWPYmvzwmAjrqOOkOnMCWIgrPxweYMoaBlfxevreM9I+j8AcD0rblmxAuwKquT1aIuoOuZdgTWmiMQwAB7JFZZL30pwwuXGDHgKs/yJkEmACbUtHe4mu7rPAdZBIlbJkCMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aCVygikr; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-23602481460so25926985ad.0
-        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 14:35:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751060150; x=1751664950; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q2IkAZ9vilSvQ6vi419VGdptbP5AYxSKpV2iK4CE/t0=;
-        b=aCVygikrs7UyanXHA6SfK88wWFnKJhkZROTcP7fLjO+I3l4Dh8eKZuqYNVCS+iin9Q
-         MSdT4arB+s0cpRFghWVuqAHHnQ85ohuReksOSshRqhInZZXPJRnOwUhyIOtl1iDdxP+L
-         7AyknWPA+xV3XPy0NxFLH1FmxtHTJS8+it+roD//8M82s2yegUm+eVTtImYznDGmYNeO
-         tN/TbPHNpVeCZC8LPFH6KMjuPVCAewpDeCn98BTtjJJ+I4BwUzllpeJGWp67a3ozqefa
-         BPBpnvKZnYil0ccn0p+3cGVOieili3o8Ewgc/trnNkU1YR7yJ5+hiLw4MolkB6BrSsCY
-         hCUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751060150; x=1751664950;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q2IkAZ9vilSvQ6vi419VGdptbP5AYxSKpV2iK4CE/t0=;
-        b=akwVkr9t6vj0a0xHTrCIG7VmPsnKVKEM/7os8CNT7Mk4WpK2c4iAnelRoLVc6xrz2H
-         ju9Uo0ZztDFuLRPocXTerx70VOV6d7URELtbTy9XG2VTKl1/oMLDQf+gIq7qh744Y2Wc
-         y4J3BRzJlJKHQvJHlMyjIwEPpJ5t2UH5yqu5dhZ80B0625NtFSSncJWMWShf0gCyxnMP
-         AHgcxzUzHBDV6NiUYK6moQcDZn7f8mLw07+aTQCEC6FoRWvaxUXFyVMp6kGKZGhDehUd
-         L6DWgzupkUYhwr+rjyFYi9WgjG+ozK/LyiyTPrD1iSyGw6qwRDBtyZhxz//dQEnLXUFG
-         nqiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXMNdaVriACJUlWLCDxnLSN7VPmtbeCXXuCwjUTsZJCEuLs2zEO8+J5CteWwFtEIUtnoZqqBG4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmywFbu+gfWUEQpTjYCLwR0eOx8ajoayUoubEdWYAeAecnA6UB
-	dHNGiB50+h0PnQI0HVnBWwIcqS7b0UIqY5gBUI42lOurviiLrONJGM0lzGvfTRpkWl706XUHSU4
-	RyF44bUN30AF+4G4/uzcw4C6kHlbbSeEyz5KA/Yvl
-X-Gm-Gg: ASbGnctE8b5chlVpnFbFoeIjPjgh0/bDJ7O2Slv5c06gQuzWej77WbKem87LCjajwXY
-	+m4ceVjrIxU7dlbmFk9DwuNPCY6r0pTg+qbT0bi3CGTv1K3GDdgLa0fDW0a3BFbKHgnG6vFNJAP
-	GWVoKe/xxlQcG8q6G592cdrLcgCxm+iQeyYfP8u4jYzdGuyCs3JBNVK5OL0rzuBZAABCjW1Pdy3
-	Tv9
-X-Google-Smtp-Source: AGHT+IEQLQuIvYNNe19cO2qoKCg+y+oLEb5lW6DWPu9afSbK4cJ5yqgI6bWFQNNWbfnZGahkTjloz7H26iCwbl1or6E=
-X-Received: by 2002:a17:90b:2745:b0:313:27e5:7ff1 with SMTP id
- 98e67ed59e1d1-318c8ebbb06mr5495765a91.1.1751060149972; Fri, 27 Jun 2025
- 14:35:49 -0700 (PDT)
+	s=arc-20240116; t=1751060679; c=relaxed/simple;
+	bh=b4bjcqtYTMlbCBJkkYv4E30QbkPwT0gz6mXrIsFMar4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mX1KyYIPY+xKR8nFRRl4KMT2TqFkUNqswfwgaRe0w9mFQ+RlMgVkeXMF+uz09Ae2muQtuRQENSZsnk2vNbqvOV90S70t087kag8VH8xVA8lWEoIco7LFRoukOkt/bBhk1UKj7sLI9gSQi8mFwXP+nTC+mWLWjjccGrx4833OFn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X7LZXGuM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4687C4CEE3;
+	Fri, 27 Jun 2025 21:44:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751060678;
+	bh=b4bjcqtYTMlbCBJkkYv4E30QbkPwT0gz6mXrIsFMar4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=X7LZXGuMzoYAPwAVmFLgM9ZXHBrFMbRhTDriRlOw/PJEGiL5TsFIW55+ILevN3XMZ
+	 e0I6+5cJhuher+4bqd+U2LfXSYPU1v+C8ZXAhGEOqJ0SfhsGyEAePZNtQCakduJ0tv
+	 3UTT1loKWWpkGN1J0XT9NCfWxPctHlKYyf4GuAqyB+iDe6ka2AUX82cXGALqIwXk7F
+	 1a/R2EQr9ihzEcrnjSusgAEB93D6/wSeg0xDv4Wy5aDEHyotgzbh+Fg5R3SWQa0qXs
+	 0ka6FS6xpazzLpq5KgRvPF2slmlnFRq1YDEQ/rCtEWQMLOPQH07iLvCdIQjCNuvKhX
+	 JK3kJJ14iL/tg==
+Date: Fri, 27 Jun 2025 16:44:37 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: linux-mediatek@lists.infradead.org,
+	Russell King <linux@armlinux.org.uk>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, devicetree@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Eric Dumazet <edumazet@google.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Simon Horman <horms@kernel.org>,
+	Srinivas Kandagatla <srini@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"Chester A. Unal" <chester.a.unal@arinc9.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [net-next PATCH v15 02/12] dt-bindings: net: Document support
+ for Airoha AN8855 Switch PBUS MDIO
+Message-ID: <175106067736.193475.3574090852380015869.robh@kernel.org>
+References: <20250626212321.28114-1-ansuelsmth@gmail.com>
+ <20250626212321.28114-3-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250626153017.2156274-1-edumazet@google.com> <20250626153017.2156274-3-edumazet@google.com>
-In-Reply-To: <20250626153017.2156274-3-edumazet@google.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Fri, 27 Jun 2025 14:35:38 -0700
-X-Gm-Features: Ac12FXwrTkDNJfKqlKTI-Q9uQT9nJJ7v_k_ePpXDCDrcp3HCmBlPjBzssfhvbjg
-Message-ID: <CAAVpQUDnRmORL-Z=ms3UTDC7cmqbhyKrOe0QDSwzhUvxGVjY3g@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] tcp: remove inet_rtx_syn_ack()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250626212321.28114-3-ansuelsmth@gmail.com>
 
-On Thu, Jun 26, 2025 at 8:30=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> inet_rtx_syn_ack() is a simple wrapper around tcp_rtx_synack(),
-> if we move req->num_retrans update.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+On Thu, 26 Jun 2025 23:23:01 +0200, Christian Marangi wrote:
+> Document support for Airoha AN8855 PBUS MDIO. Airoha AN8855 Switch
+> expose a way to access internal PHYs via Switch register.
+> This is named internally PBUS and does the function of an MDIO bus
+> for the internal PHYs.
+> 
+> It does support a maximum of 5 PHYs (matching the number of port
+> the Switch support)
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+>  .../bindings/net/airoha,an8855-mdio.yaml      | 57 +++++++++++++++++++
+>  1 file changed, 57 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/airoha,an8855-mdio.yaml
+> 
+
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+
 
