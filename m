@@ -1,156 +1,307 @@
-Return-Path: <netdev+bounces-201965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C76FCAEBA0E
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 16:40:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D732AEBA16
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 16:41:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C719217DAF6
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 14:40:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73E395640C6
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 14:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DFBC2E3AF8;
-	Fri, 27 Jun 2025 14:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AE302E54DA;
+	Fri, 27 Jun 2025 14:41:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RtR0Uk0h"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="M/mPOWcQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9990B2E266A
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 14:40:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FEC32E3AF8;
+	Fri, 27 Jun 2025 14:41:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751035212; cv=none; b=fhZNQ3Ddb5vSf14cS+sSZ2AiX1PyweS9qH3xDm+kqLybGXkZNO51F0PQ4v3H7x8Wesf5Jh7EswSRaEn+L+D0zJNXvV0s6DwdTaEA96iAWLGBKbnKCJbKeXkhWdeqUpgT+lAKdO0ksrFnuRiXzx+aq2P+gGf/obu/FV6lb1CJpzc=
+	t=1751035310; cv=none; b=tHVkkwQQe+sgo1EUaMuM0NfOHQAtNB3lUaGNW9w6VdV9WvYrzF5A9vT49JOXUUfk20gsVdEglYcBVD6VUYhJT+tSl3KoLsN9a/E7Nlmi5ihZH12PeH4ey9fh8yJmhtFvwiSXU4DM07+BgBxRGZP3V9t4x6O/dbNyeRuDT3+rpsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751035212; c=relaxed/simple;
-	bh=y6FgFNYfWFVz9xj4J77T0Xzk1ZGop7saqLDIRvLscQQ=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=u4tJmcr/OXA8BhIi9CzOMqH/53qYViZPpOaWWnEMENrJAUvsuYXc7meD6uq3YrGnJfRMaWVvb+dTJTmEGxxKtiSZqEak/BoAOmC7bMry6WHij7mX5tZT591IEozTFy2GoybJu5vHPwcdsFJSu4/3BKmX3/3aF3SBCnKFPL6+84E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RtR0Uk0h; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7fd581c2bf4so1847728a12.3
-        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 07:40:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1751035210; x=1751640010; darn=vger.kernel.org;
-        h=autocrypt:content-transfer-encoding:mime-version:message-id
-         :references:in-reply-to:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=y6FgFNYfWFVz9xj4J77T0Xzk1ZGop7saqLDIRvLscQQ=;
-        b=RtR0Uk0hm3ZBbFbgD15fJ59W47HEeA1JBriZbCB4JFkxWKym5otdCNUA9QuEyA18KH
-         1kqSYgQQz+L1Pb7D6iFphxIzzmUqoVm9Hk00mktGuMrjwiH67eY+1xnuDT1SPGVdMe+E
-         dHY2wYfxJ3OZXaU1/1QCHeqVXtBY9ATVabC+4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751035210; x=1751640010;
-        h=autocrypt:content-transfer-encoding:mime-version:message-id
-         :references:in-reply-to:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=y6FgFNYfWFVz9xj4J77T0Xzk1ZGop7saqLDIRvLscQQ=;
-        b=fkhpm6TO9dEDkO/45p7Sv3tD/VgsRUSMHDJ4IAS8+nisQfvyX0Ui4x9MXoKCr4ojjs
-         S5JcGWkRTc/pyRncD/0SpyPELrbMcOUceoyO/25hxtxvtnHjBRqisziqcppTkv/bXv+W
-         jaxzuHdBvASlyhVcIVRKLhnQ0MVWo4JMD8+LcKCrFbNozszZy6r6gGoBM5Mliopkszb5
-         ODLP+0Cik0wlEyXkw13gPwhVZ128RIknhTb8ThZDYwbWiCkuBDaAJcQ2uXxEoDAxDT47
-         mkwnPUQmblrLgmaD8XNOExr8E4Ovh2YgmDx4eXB7pdsaVWCpGIyB/skkvxHezUWw4OzS
-         X93g==
-X-Gm-Message-State: AOJu0Yzae+JcqEnOd8SXU2I5tyyOF033EAfvT5I79PiU+EV2ieNdAOA4
-	q7bjqV/qukbC5jkjXn3Efx/5N2moYTsSxDPYsCe+83oho6Jmf9JDbXTZQDJz0etx9g==
-X-Gm-Gg: ASbGnctTcNFsdE5d4BFvSXioltrgPTjqQfJ0LbQ4W6mzAqmxsHR1o3sWl5tJdm00hfr
-	Z0W1SdyIeB4I+pkKjCqvliOLBNSTcSFw4qffjv1ku/WmdYRPPOBU/ucuJys0OItAzmTVXvl6+2P
-	qVV1Qk2DxufUFprZBA1KHUCFkb2SIT4xKKLk8cqebmMnpnv0HfxQyvZNeOfFWqndu2PndOuphfe
-	dywSWKHAbDPkdwu6LoIb4O2qkOJfa/s9Sw/7p3QvXJf8T8E2erQ8Do51F2e+/ddsLU0D9lDIXAq
-	8KNTrh0d7qQOanRaHNWfwaXGInu3+xRFCnQZ2NKZGlSaXl+QU7WX6hkSAWfG+cB2z2ImDR5cPAQ
-	=
-X-Google-Smtp-Source: AGHT+IGRvMq4BjB9kb3+iA2gC5GHu/MtQOLx70uk/AMc/uT4Q/s5ywB8MGnfmXdva8v0jdCerV2sVw==
-X-Received: by 2002:a17:90b:4e8f:b0:313:fab4:1df6 with SMTP id 98e67ed59e1d1-318c9280acfmr4490158a91.32.1751035209737;
-        Fri, 27 Jun 2025 07:40:09 -0700 (PDT)
-Received: from ?IPv6:::1? ([2600:8802:b00:ba1:cbcd:eba8:f2f6:b683])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb2e1b54sm17784855ad.15.2025.06.27.07.40.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Jun 2025 07:40:09 -0700 (PDT)
-Date: Fri, 27 Jun 2025 07:40:06 -0700
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-To: Zak Kemble <zakkemble@gmail.com>, Doug Berger <opendmb@gmail.com>
-CC: netdev@vger.kernel.org
-Subject: Re: BUG: bcmgenet transmit queue timeout lockup 6.15+
-In-Reply-To: <CAA+QEuRZXkPjN+=mgeLL8znYsMEpsk8a5omJ+eC1y-0SFnSrCg@mail.gmail.com>
-References: <CAA+QEuRZXkPjN+=mgeLL8znYsMEpsk8a5omJ+eC1y-0SFnSrCg@mail.gmail.com>
-Message-ID: <C87FDFC5-FD31-46EA-B95B-E6BE03530B17@broadcom.com>
+	s=arc-20240116; t=1751035310; c=relaxed/simple;
+	bh=IWhsrUpj3XLzFW/68PQs6OZ5mzzQRDoe+2aqErn6Egc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qaDYBt3gUt/tS1iwr3+L/cgDnKBSU9FEk0j9VNA7T/jMqBw+Al5xBGO2VM9iPk4SCeUr9fDiiMSaKMqc2g8dLBqB+ucwx2s9R1h2JGbhb7gDAhCfRepY2Om7MYCXh/Q4hbWEn74H5V1hM32W/dsIXLZ7RalAqasUr29T+uX7q/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=M/mPOWcQ; arc=none smtp.client-ip=202.12.124.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 720F07A009F;
+	Fri, 27 Jun 2025 10:41:45 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Fri, 27 Jun 2025 10:41:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1751035305; x=
+	1751121705; bh=sRfr9oxgD+UekJ8CAymMSYxljdF93YKHcACrewgtdBQ=; b=M
+	/mPOWcQkS55cRlrcfWBOF0tFEWc78+heDRxfc5OfOCdOKg+YJSprcvOZbewFRqZX
+	9emCPUigPzvwNWBB54IzIMw9xgrW5JmYMmKWYwCMA/WjU4K6K50zkXrYqrz5K38y
+	YXyBvRKcuM1Yk85iSEpTfUcYGVSen6cDwh/sxSndL0beIfM5ggFVCMPtrkhlPSED
+	qPun+koiShiXe7q4Mta/6bMD08X0M23Wr3bjFtRR95UDiYWq08ab4hvPVvcH/EPT
+	bH8xmMC+K9i4v87MRigiqIF8FfdyAEPtJGZsPBKRBMNu7G0nMmkaPpCKp1NtjWMB
+	pJVdFEO0DW7iBDZSBh5cg==
+X-ME-Sender: <xms:p61eaKeis4dYU-bWTNOYDxcDIPGR3oUxIDqvnjzvfrLkMS0aJ94kdQ>
+    <xme:p61eaENniDdto3V58Bwnz7reeKcj6XsnPCWX_g8HExAAK1aBAqh2iIT5K9koU99V0
+    R-80LTRPMsPKgE>
+X-ME-Received: <xmr:p61eaLiB_nRG6ItaWvGby22PXA3_jUtjqoZT5TQToa8UMa4MirCla23cyoru>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdeffedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
+    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
+    epfffhvfevuffkfhggtggugfgjsehtkeertddttddunecuhfhrohhmpefkughoucfutghh
+    ihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtthgvrh
+    hnpeegheekuddvueejvddtvdfgtddvgfevudektddtteevuddvkeetveeftdevueejveen
+    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughosh
+    gthhesihguohhstghhrdhorhhgpdhnsggprhgtphhtthhopedugedpmhhouggvpehsmhht
+    phhouhhtpdhrtghpthhtohepughonhhgtghhvghntghhvghnvdeshhhurgifvghirdgtoh
+    hmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghv
+    vghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgoh
+    hoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhr
+    tghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhhirhhise
+    hrvghsnhhulhhlihdruhhspdhrtghpthhtohepohhstghmrggvshelvdesghhmrghilhdr
+    tghomhdprhgtphhtthhopehlihhnuhigsehtrhgvsghlihhgrdhorhhg
+X-ME-Proxy: <xmx:qK1eaH_3a-MnimvuRT3uDa-QZk2IZHul7G8aYtqtmoblbBO0OcdsMg>
+    <xmx:qK1eaGs_rFw57PSrWzhMDQEYmdz2Em5f3-H9kwHGhcwHL4LpXcyhdw>
+    <xmx:qK1eaOG-2_edUTxn5VNl160HiOYKs0WcOdFjUSt4hbTX8kAoFLHKlw>
+    <xmx:qK1eaFP9F36-8U7nwq3WY5vfABwP3R2XzDX9okbhW_hO1gnUMpHVAw>
+    <xmx:qa1eaE625E9jtfGiEPUsye-_LdI9EwXtIQmgGMiBW-XvpoR8IjOWDdDA>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 27 Jun 2025 10:41:43 -0400 (EDT)
+Date: Fri, 27 Jun 2025 17:41:41 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: "dongchenchen (A)" <dongchenchen2@huawei.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+	jiri@resnulli.us, oscmaes92@gmail.com, linux@treblig.org,
+	pedro.netdev@dondevamos.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
+	zhangchangzhong@huawei.com
+Subject: Re: [PATCH net] net: vlan: fix VLAN 0 refcount imbalance of toggling
+ filtering during runtime
+Message-ID: <aF6tpb4EQaxZ2XAw@shredder>
+References: <20250623113008.695446-1-dongchenchen2@huawei.com>
+ <20250624174252.7fbd3dbe@kernel.org>
+ <900f28da-83db-4b17-b56b-21acde70e47f@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- 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
- 3LBXw4WCw3QhOXY+VnhOn2EcREN7qdAKw0j9Sw==
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <900f28da-83db-4b17-b56b-21acde70e47f@huawei.com>
 
-On June 27, 2025 7:31:23 AM PDT, Zak Kemble <zakkemble@gmail=2Ecom> wrote:
->Hi, I have a Raspberry Pi CM4 setup as a NAT router with the bcmgenet
->ethernet on the LAN side and an RTL8111 on the WAN (although any
->adapter will work fine for this)=2E I've found that downloading
->something from the internet to a PC on the LAN while also running
->iperf3 from the Pi to the same or another PC at the same time will
->cause transmit queue timeouts and queue 1 locks up=2E Network
->connectivity is lost and a reboot is needed to fix it=2E Doing only one
->at a time is fine=2E
->
->6=2E14=2E11-v8+ bcm2711_build
->https://github=2Ecom/raspberrypi/linux/actions/runs/15676052461 is fine,
->no timeouts=2E
->6=2E15=2E3-v8+ bcm2711_build
->https://github=2Ecom/raspberrypi/linux/actions/runs/15845884292 is
->affected=2E
->
->The same occurs when I backport the latest driver code (just
->bcmgenet=2Ec and bcmgenet=2Eh IIRC) from kernel 6=2E16 to 6=2E12=2E
+On Thu, Jun 26, 2025 at 11:41:45AM +0800, dongchenchen (A) wrote:
+> maybe we can fix it by:
+> 
+> diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
+> index 6e01ece0a95c..262f8d3f06ef 100644
+> --- a/net/8021q/vlan.c
+> +++ b/net/8021q/vlan.c
+> @@ -378,14 +378,18 @@ static int vlan_device_event(struct notifier_block *unused, unsigned long event,
+>              return notifier_from_errno(err);
+>      }
+> -    if ((event == NETDEV_UP) &&
+> -        (dev->features & NETIF_F_HW_VLAN_CTAG_FILTER)) {
+> +    if (((event == NETDEV_UP) &&
+> +        (dev->features & NETIF_F_HW_VLAN_CTAG_FILTER)) ||
+> +        (event == NETDEV_CVLAN_FILTER_PUSH_INFO &&
+> +        (dev->flags & IFF_UP))) {
+>          pr_info("adding VLAN 0 to HW filter on device %s\n",
+>              dev->name);
+>          vlan_vid_add(dev, htons(ETH_P_8021Q), 0);
+>      }
+> -    if (event == NETDEV_DOWN &&
+> -        (dev->features & NETIF_F_HW_VLAN_CTAG_FILTER))
+> +    if ((event == NETDEV_DOWN &&
+> +        (dev->features & NETIF_F_HW_VLAN_CTAG_FILTER)) ||
+> +        (event == NETDEV_CVLAN_FILTER_DROP_INFO &&
+> +        (dev->flags & IFF_UP)))
+>          vlan_vid_del(dev, htons(ETH_P_8021Q), 0);
+>     vlan_info = rtnl_dereference(dev->vlan_info);
 
-There have been a fair amount of changes in the 6=2E15 cycle, would you be=
- able to run a bisection on the driver alone so we could come up with a mor=
-e targeted fix? Of particular interest would be these changes:
+As I understand it, there are two issues:
 
-<https://git=2Ekernel=2Eorg/pub/scm/linux/kernel/git/torvalds/linux=2Egit/=
-commit/drivers/net/ethernet/broadcom/genet?id=3D3b5d4f5a820d362dd46472542b2=
-e961fb1f93515>
+1. VID 0 is deleted when it shouldn't. This leads to the crashes you
+shared.
 
-We will see about reproducing this here as well=2E The multi queue impleme=
-ntation has always been a tad peculiar given the unequal sizing of the numb=
-er of descriptors between the priority queues and non priority queue=2E
+2. VID 0 is not deleted when it should. This leads to memory leaks like
+[1] with a reproducer such as [2].
 
-Thanks
-Hi Zak,
-Florian
+AFAICT, your proposed patch solves the second issue, but only partially
+addresses the first issue. The automatic addition of VID 0 is assumed to
+be successful, but it can fail due to hardware issues or memory
+allocation failures. I realize it is not common, but it can happen. If
+you annotate __vlan_vid_add() [3] and inject failures [4], you will see
+that the crashes still happen with your patch.
+
+WDYT about something like [5]? Basically, noting in the VLAN info
+whether VID 0 was automatically added upon NETDEV_UP and based on that
+decide whether it should be deleted upon NETDEV_DOWN, regardless of
+"rx-vlan-filter".
+
+[1]
+unreferenced object 0xffff888007468a00 (size 256):
+  comm "ip", pid 386, jiffies 4294820761
+  hex dump (first 32 bytes):
+    00 20 26 0a 80 88 ff ff 00 00 00 00 00 00 00 00  . &.............
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc 43031ab1):
+    __kmalloc_cache_noprof+0x2b5/0x340
+    vlan_vid_add+0x434/0x940
+    vlan_device_event.cold+0x75/0xa8
+    notifier_call_chain+0xca/0x150
+    __dev_notify_flags+0xe3/0x250
+    rtnl_configure_link+0x193/0x260
+    rtnl_newlink_create+0x383/0x8e0
+    __rtnl_newlink+0x22c/0xa40
+    rtnl_newlink+0x627/0xb00
+    rtnetlink_rcv_msg+0x6fb/0xb70
+    netlink_rcv_skb+0x11f/0x350
+    netlink_unicast+0x426/0x710
+    netlink_sendmsg+0x75a/0xc20
+    __sock_sendmsg+0xc1/0x150
+    ____sys_sendmsg+0x5aa/0x7b0
+    ___sys_sendmsg+0xfc/0x180
+unreferenced object 0xffff888002fc3aa0 (size 32):
+  comm "ip", pid 386, jiffies 4294820761
+  hex dump (first 32 bytes):
+    a0 8a 46 07 80 88 ff ff a0 8a 46 07 80 88 ff ff  ..F.......F.....
+    81 00 00 00 01 00 00 00 cc cc cc cc cc cc cc cc  ................
+  backtrace (crc c2f2186c):
+    __kmalloc_cache_noprof+0x2b5/0x340
+    vlan_vid_add+0x25a/0x940
+    vlan_device_event.cold+0x75/0xa8
+    notifier_call_chain+0xca/0x150
+    __dev_notify_flags+0xe3/0x250
+    rtnl_configure_link+0x193/0x260
+    rtnl_newlink_create+0x383/0x8e0
+    __rtnl_newlink+0x22c/0xa40
+    rtnl_newlink+0x627/0xb00
+    rtnetlink_rcv_msg+0x6fb/0xb70
+    netlink_rcv_skb+0x11f/0x350
+    netlink_unicast+0x426/0x710
+    netlink_sendmsg+0x75a/0xc20
+    __sock_sendmsg+0xc1/0x150
+    ____sys_sendmsg+0x5aa/0x7b0
+    ___sys_sendmsg+0xfc/0x180
+
+[2]
+#!/bin/bash
+
+ip link add bond1 up type bond mode 0
+ethtool -K bond1 rx-vlan-filter off
+ip link del dev bond1
+
+[3]
+diff --git a/net/8021q/vlan_core.c b/net/8021q/vlan_core.c
+index 9404dd551dfd..6dc25c4877f2 100644
+--- a/net/8021q/vlan_core.c
++++ b/net/8021q/vlan_core.c
+@@ -314,6 +314,7 @@ static int __vlan_vid_add(struct vlan_info *vlan_info, __be16 proto, u16 vid,
+ 	*pvid_info = vid_info;
+ 	return 0;
+ }
++ALLOW_ERROR_INJECTION(__vlan_vid_add, ERRNO);
+ 
+ int vlan_vid_add(struct net_device *dev, __be16 proto, u16 vid)
+ {
+
+[4]
+#!/bin/bash
+
+echo __vlan_vid_add > /sys/kernel/debug/fail_function/inject
+printf %#x -12 > /sys/kernel/debug/fail_function/__vlan_vid_add/retval
+echo 100 > /sys/kernel/debug/fail_function/probability
+echo 1 > /sys/kernel/debug/fail_function/times
+echo 1 > /sys/kernel/debug/fail_function/verbose
+ip link add bond1 up type bond mode 0
+ip link add link bond1 name vlan0 type vlan id 0 protocol 802.1q
+ip link set dev bond1 down
+ip link del vlan0
+ip link del dev bond1
+
+[5]
+diff --git a/net/8021q/vlan.c b/net/8021q/vlan.c
+index 06908e37c3d9..9a6df8c1daf9 100644
+--- a/net/8021q/vlan.c
++++ b/net/8021q/vlan.c
+@@ -357,6 +357,35 @@ static int __vlan_device_event(struct net_device *dev, unsigned long event)
+ 	return err;
+ }
+ 
++static void vlan_vid0_add(struct net_device *dev)
++{
++	struct vlan_info *vlan_info;
++	int err;
++
++	if (!(dev->features & NETIF_F_HW_VLAN_CTAG_FILTER))
++		return;
++
++	pr_info("adding VLAN 0 to HW filter on device %s\n", dev->name);
++
++	err = vlan_vid_add(dev, htons(ETH_P_8021Q), 0);
++	if (err)
++		return;
++
++	vlan_info = rtnl_dereference(dev->vlan_info);
++	vlan_info->auto_vid0 = true;
++}
++
++static void vlan_vid0_del(struct net_device *dev)
++{
++	struct vlan_info *vlan_info = rtnl_dereference(dev->vlan_info);
++
++	if (!vlan_info || !vlan_info->auto_vid0)
++		return;
++
++	vlan_info->auto_vid0 = false;
++	vlan_vid_del(dev, htons(ETH_P_8021Q), 0);
++}
++
+ static int vlan_device_event(struct notifier_block *unused, unsigned long event,
+ 			     void *ptr)
+ {
+@@ -378,15 +407,10 @@ static int vlan_device_event(struct notifier_block *unused, unsigned long event,
+ 			return notifier_from_errno(err);
+ 	}
+ 
+-	if ((event == NETDEV_UP) &&
+-	    (dev->features & NETIF_F_HW_VLAN_CTAG_FILTER)) {
+-		pr_info("adding VLAN 0 to HW filter on device %s\n",
+-			dev->name);
+-		vlan_vid_add(dev, htons(ETH_P_8021Q), 0);
+-	}
+-	if (event == NETDEV_DOWN &&
+-	    (dev->features & NETIF_F_HW_VLAN_CTAG_FILTER))
+-		vlan_vid_del(dev, htons(ETH_P_8021Q), 0);
++	if (event == NETDEV_UP)
++		vlan_vid0_add(dev);
++	else if (event == NETDEV_DOWN)
++		vlan_vid0_del(dev);
+ 
+ 	vlan_info = rtnl_dereference(dev->vlan_info);
+ 	if (!vlan_info)
+diff --git a/net/8021q/vlan.h b/net/8021q/vlan.h
+index 5eaf38875554..c7ffe591d593 100644
+--- a/net/8021q/vlan.h
++++ b/net/8021q/vlan.h
+@@ -33,6 +33,7 @@ struct vlan_info {
+ 	struct vlan_group	grp;
+ 	struct list_head	vid_list;
+ 	unsigned int		nr_vids;
++	bool			auto_vid0;
+ 	struct rcu_head		rcu;
+ };
 
