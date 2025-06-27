@@ -1,182 +1,148 @@
-Return-Path: <netdev+bounces-201984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3483AAEBD7B
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 18:33:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92B89AEBD9A
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 18:36:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 409453ADD1E
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 16:32:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DA7A3AB04A
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 16:36:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BEB681720;
-	Fri, 27 Jun 2025 16:32:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EB7D1C6FFD;
+	Fri, 27 Jun 2025 16:36:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i4MQsEtc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KzuF/3X8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1030E3398B
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 16:32:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9E52E9EDF
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 16:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751041966; cv=none; b=Q63a7C9WKxsFbWVtK/156TzpDfaY3iEgS0ePkTPGreqG8K6GQCSX9MOMD2CyEJupSR0xJlORwknnJhCASv2cZE64EphTtrROw7li+D9zJrlPfi4cP9Mo9p7ypQBVKklxCCHxAyXuLEHXIf4vifB/Go7XqkdYvH6uJCy0vkRCv4g=
+	t=1751042177; cv=none; b=qeh7PtxOmxRVu/rh7NXRSQiW27mscTA9gfcZEs2VYMdBBulTug8xQsZbn74/DZfzyD5GM2FZbaYNGZeU7TeDN2QrmEEZJj+UtbwmF1in3oKjCz4OGl0j0TTe80gnhGp4xtNLLHrd8rSaIv3X3sIMgulrP9lx7ER2HAnAa+CIFx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751041966; c=relaxed/simple;
-	bh=tKFgGQfbwoVWIJvxpZIcQ3YzSxEnIsX5INjinrtoy2g=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tK/7kYlGXGKAlAmNl4BUTrRaM3wyRzLf4t+5crpE8NuvgbUR+S6Ij9DKFlIfnwiDb+ZWrQ9Lpx+Yh+01vu6aR1xdFekJGMoLXswGuWbjYZy2zv1PKPr6UrELPUzEgGlRm+mR/V3Pk8lxYVrsab5Ut/AeVrXIVK3zhW6UJPomD1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i4MQsEtc; arc=none smtp.client-ip=209.85.222.202
+	s=arc-20240116; t=1751042177; c=relaxed/simple;
+	bh=SelXsOpJPpBVq3Z1qhmJlyDtW/NcEicHSc7S8A8ke8g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ehlCj3FeJ9Mndc7ii8BKVZYWuqz00CRlnK9v1rvfN4lk4Prt2G+eF03/fwQDnlQ1fJf8lLmyZzHIuBcAP/mVnmFEkxr6kyS7+mQNx34HQiEMuK6iHvvZIVFdA47qHFFdmpoj0+N7j9yd/2DlWBwnO6L7zrte6dW3OagWAeXWDHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KzuF/3X8; arc=none smtp.client-ip=209.85.215.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7d3f0958112so350507585a.0
-        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 09:32:44 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b31befde0a0so62415a12.0
+        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 09:36:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751041964; x=1751646764; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=zYhAsRXe+anL0FLX7VWRba8Q44pCq6siGtCtJV2eksc=;
-        b=i4MQsEtcuLXOzyGFVU/AM99iE3ry74s/bAN8rDhufhwDDJTeeb2d91VCBNHCxzsxBQ
-         +YtMxSkrtd5QpO0gwkfJrHfwh+5iqtXsL7NfCEjC/DtYjXMHg2WA3dyX/HBCqtzk/Al8
-         JaByowKVkznJI5ZwghxyaENPuBj6b1h1x+0hlZkMIr6BZuExbjAHu6uNyR4e5WBYvMXr
-         1rDALux5B67cA2bIge9h4/N+kIileUbLuP5fHuP6mFtOQqP8hnuIKNb9lHP3WvocCQtf
-         +jGytrMXezeHB03axuieEI9vp5VikpZP5tP6iQ6AHpj9u8AqJd6x9PP5+Nx6zyzuFdEh
-         bruQ==
+        d=google.com; s=20230601; t=1751042174; x=1751646974; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j9uFq+Culf2tZDEJLXMXIPEST1YhLiTj+7ujSQkyy7A=;
+        b=KzuF/3X85KN3WtDUiwJnlyUy2eD6AAXW+z4WNJ7Xg14qzrz1Neyyat+hEzybodwNHZ
+         XsXmvCng+rEShiwhpRwcvbIKRAy3SP0dXzaEgDd44v7hqHHTiirCIOffsrX13zS+tISm
+         m0vOJrGr8hLBcZ/nqhCNNNrGd6f2z1XG9ovv/GnT/2cGCEiRej0bAd382igDWxLqtTLv
+         AbythgQKzJBf6/AfuNE15LGhja/e75t2XkWobVR9lr7oNNpRfoRd+/dMoPN12ewpqHML
+         RqQJ/VXwdqvkws8KKIoPbecrhqe2i28rK94dvt17pXzT51Qp1uehUWgupiNotc5KAXjc
+         9XnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751041964; x=1751646764;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zYhAsRXe+anL0FLX7VWRba8Q44pCq6siGtCtJV2eksc=;
-        b=nkXcZd0204kyVw5Et/eUzFVXQvEystGdPORm4agjgiILbnRpXAuA7V67Dcy5jq+zQd
-         PAV8dywPCrX/JAAHZWBgfbmd2wnilZ8FfNBXyA5eWcNveNxIMmJKhmL7rtEavl+rM4aM
-         2ZG8rHk11Jv0eZQ3yR6Uk8Z9DleJF3GyNKmK0ULAD+UvnSunnYLG5ZGphZwTKaKA5DJt
-         xnsA7/v5OOmXmPHXO018DZACPGliFjmTZ3hnpKy9K9qd0ePos1ZAvS3OfYt1qyO3Yd4a
-         j908OHyVguayi2ctQhKV9Hjl83COVpuVzqIehHed2PWoKBBxy44tsj0S29ZTtM+LqWQq
-         XzkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUua9gXLgaiocL17kQ6Q/dRGigqbYOHrtxzSQE28HSaROyN76eu7GzsxPBez2XlJVKt7YFCT9M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEmakIMnrt5zWrPieg6q+iXYhN65mllX9N/gGKeFt5mefMNdiN
-	dBXx3xW9nTqVb+MdCA+Db3Wojet1/TRIIBLOvxeqvpoBOTC7xAAakd29t9eVTDS9WWo53Cy/fqF
-	CAp0nNELIkRlqEA==
-X-Google-Smtp-Source: AGHT+IHi61Vek979v2OG6HUDOnzhOkMzytXT/7jHc9jiW3/agaExxcmIQGt8TWWsbaGiTpZosb/3rDoY5THG2Q==
-X-Received: from qtbcj9.prod.google.com ([2002:a05:622a:2589:b0:47c:de02:b269])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:488a:b0:4a7:face:ce10 with SMTP id d75a77b69052e-4a7fcac4585mr73093891cf.31.1751041963995;
- Fri, 27 Jun 2025 09:32:43 -0700 (PDT)
-Date: Fri, 27 Jun 2025 16:32:42 +0000
+        d=1e100.net; s=20230601; t=1751042174; x=1751646974;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j9uFq+Culf2tZDEJLXMXIPEST1YhLiTj+7ujSQkyy7A=;
+        b=syQtQFkA462si/FHTL+SIGfdhtJYyo4vhGFfpdksmF98XAylSbmGLrQ5NYE8v6jOZ0
+         Ct6hDYissMPWKTuvrl/3FTz2qf0fWoxesyEGKfi923Qro/ijTnGh4wsSgqeYXqSCZaEX
+         sm+EhSWh6zDlEnZwTI+Vm+5cFqWB7RPUc4ZppElqNOOTW0D7VyzMcajIfq1VGT6IgGqb
+         vYn0kSIM0yNp64OUEdIK2KqookHTeGki1XJL5LK3wKvxFcB+VYbIjYc9kfbkwTJ5k2jG
+         oWc+zMo/TNLcxJFCEQsIYwVAAFZ+3QapBdTt/RuKNgGe2gbBHTOKlZxxZ0Ouz4wb4GLc
+         tHBA==
+X-Forwarded-Encrypted: i=1; AJvYcCUWNIhLQdXmUhUqIDDKIA84DCoM1j2dYBzIxkhj7tuhcsJLxTXSKxlXj5t5EakFLeN5KFAC4Fc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqUHgi0KgumWBIJnifTMBtH2z9ditYHFMgWF92QR//q84jhl4b
+	9EL0SkUw4+f+16iLp0zfS/5g80PWHqELJ9FDY7NqCbxcnT8TMNraqW7sVuegBAufu+VfN/1R/Ry
+	iULcgQNC36TfDPZ0LofmwVn42q6HKiJJj84hPNaxD
+X-Gm-Gg: ASbGncs6uqXji33/LwQ7BvXSRK8cI16LPMvJqOxnnDtYB7kUIMylbi38K4r8f+MIrCE
+	mR1f54SSmTEsF4Kwx2GUbplq5JuXQFcwF4UZC4Mu0UFvYguRqJaQiqfDvvoPPQiFUOvHGQ1Bv5d
+	kGDdkKL+2nOJ54/v8zC9D37XR9sUINWCm/9vR8SUNNOQ==
+X-Google-Smtp-Source: AGHT+IFNjKi8C6c7nnx7PGroQNsHo/c52j8M3ikpeGKa5ljuR5VMCkV9Zs+gh94Wq4j24mmnu4wfVgkVXh5eDzISiRU=
+X-Received: by 2002:a17:90b:1dd1:b0:311:e4ff:1810 with SMTP id
+ 98e67ed59e1d1-318c8ec5353mr5151413a91.3.1751042173674; Fri, 27 Jun 2025
+ 09:36:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250627163242.230866-1-edumazet@google.com>
-Subject: [PATCH net-next] net: net->nsid_lock does not need BH safety
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
-	Guillaume Nault <gnault@redhat.com>, Cong Wang <xiyou.wangcong@gmail.com>
+MIME-Version: 1.0
+References: <20250624202616.526600-1-kuni1840@gmail.com> <6c33dd3e-373a-41b3-b67a-1b89ce1ab1b5@redhat.com>
+ <CAAVpQUAT8gs10P9DbwfMNZu2xyzEChgMPMFzO9VKdDJT2oPcrw@mail.gmail.com> <b2484912-e36b-4f04-a6e3-c0b1f92ce1c8@redhat.com>
+In-Reply-To: <b2484912-e36b-4f04-a6e3-c0b1f92ce1c8@redhat.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Fri, 27 Jun 2025 09:36:01 -0700
+X-Gm-Features: Ac12FXwVZeyKUHxt4rBH1mw6gms10jX3-_V3rrzzSWW4mCDIWowkNRn8DKfcIOw
+Message-ID: <CAAVpQUCEU22kbELMYhWk=9SCMz3jbLhhp62fDQjEN7qXHoAqVQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 00/15] ipv6: Drop RTNL from mcast.c and anycast.c
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-At the time of commit bc51dddf98c9 ("netns: avoid disabling irq
-for netns id") peernet2id() was not yet using RCU.
+On Thu, Jun 26, 2025 at 11:32=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> On 6/27/25 2:49 AM, Kuniyuki Iwashima wrote:
+> > On Thu, Jun 26, 2025 at 6:27=E2=80=AFAM Paolo Abeni <pabeni@redhat.com>=
+ wrote:
+> >> On 6/24/25 10:24 PM, Kuniyuki Iwashima wrote:
+> >>> From: Kuniyuki Iwashima <kuniyu@google.com>
+> >>>
+> >>> This is a prep series for RCU conversion of RTM_NEWNEIGH, which needs
+> >>> RTNL during neigh_table.{pconstructor,pdestructor}() touching IPv6
+> >>> multicast code.
+> >>>
+> >>> Currently, IPv6 multicast code is protected by lock_sock() and
+> >>> inet6_dev->mc_lock, and RTNL is not actually needed.
+> >>>
+> >>> In addition, anycast code is also in the same situation and does not
+> >>> need RTNL at all.
+> >>>
+> >>> This series removes RTNL from net/ipv6/{mcast.c,anycast.c} and finall=
+y
+> >>> removes setsockopt_needs_rtnl() from do_ipv6_setsockopt().
+> >>
+> >> I went through the whole series I could not find any obvious bug.
+> >>
+> >> Still this is not trivial matter and I recently missed bugs in similar
+> >> changes, so let me keep the series in PW for a little longer, just in
+> >> case some other pair of eyes would go over it ;)
+> >
+> > Thank you Paolo!
+> >
+> >>
+> >> BTW @Kuniyuki: do you have a somewhat public todo list that others cou=
+ld
+> >> peek at to join this effort?
+> >
+> > I  don't have a public one now, but I can create a public repo on GitHu=
+b
+> > and fill the Issues tab as the todo list.  Do you have any ideas ?
+>
+> Not really, that is way I asked ;) Hopefully someone ~here could help.
 
-Commit 2dce224f469f ("netns: protect netns
-ID lookups with RCU") changed peernet2id() to no longer
-acquire net->nsid_lock (potentially from BH context).
+I'll create Issues as todo in this repo (now importing net-next)
+https://github.com/q2ven/small_rtnl/
 
-We do not need to block soft interrupts when acquiring
-net->nsid_lock anymore.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Guillaume Nault <gnault@redhat.com>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>
----
- net/core/net_namespace.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+>
+> Quickly skimming over the codebase I suspect/hope mroute{4,6} should be
+> doable (to be converted to own lock instead of rtnl).
 
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index d0f607507ee8d0b6d31f11a49421b5f0a985bd3b..419604d9cf32e2e2a9af59dfef1fbcc7fab81e20 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -319,10 +319,10 @@ int peernet2id_alloc(struct net *net, struct net *peer, gfp_t gfp)
- 	if (refcount_read(&net->ns.count) == 0)
- 		return NETNSA_NSID_NOT_ASSIGNED;
- 
--	spin_lock_bh(&net->nsid_lock);
-+	spin_lock(&net->nsid_lock);
- 	id = __peernet2id(net, peer);
- 	if (id >= 0) {
--		spin_unlock_bh(&net->nsid_lock);
-+		spin_unlock(&net->nsid_lock);
- 		return id;
- 	}
- 
-@@ -332,12 +332,12 @@ int peernet2id_alloc(struct net *net, struct net *peer, gfp_t gfp)
- 	 * just been idr_remove()'d from there in cleanup_net().
- 	 */
- 	if (!maybe_get_net(peer)) {
--		spin_unlock_bh(&net->nsid_lock);
-+		spin_unlock(&net->nsid_lock);
- 		return NETNSA_NSID_NOT_ASSIGNED;
- 	}
- 
- 	id = alloc_netid(net, peer, -1);
--	spin_unlock_bh(&net->nsid_lock);
-+	spin_unlock(&net->nsid_lock);
- 
- 	put_net(peer);
- 	if (id < 0)
-@@ -628,20 +628,20 @@ static void unhash_nsid(struct net *net, struct net *last)
- 	for_each_net(tmp) {
- 		int id;
- 
--		spin_lock_bh(&tmp->nsid_lock);
-+		spin_lock(&tmp->nsid_lock);
- 		id = __peernet2id(tmp, net);
- 		if (id >= 0)
- 			idr_remove(&tmp->netns_ids, id);
--		spin_unlock_bh(&tmp->nsid_lock);
-+		spin_unlock(&tmp->nsid_lock);
- 		if (id >= 0)
- 			rtnl_net_notifyid(tmp, RTM_DELNSID, id, 0, NULL,
- 					  GFP_KERNEL);
- 		if (tmp == last)
- 			break;
- 	}
--	spin_lock_bh(&net->nsid_lock);
-+	spin_lock(&net->nsid_lock);
- 	idr_destroy(&net->netns_ids);
--	spin_unlock_bh(&net->nsid_lock);
-+	spin_unlock(&net->nsid_lock);
- }
- 
- static LLIST_HEAD(cleanup_list);
-@@ -880,9 +880,9 @@ static int rtnl_net_newid(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		return PTR_ERR(peer);
- 	}
- 
--	spin_lock_bh(&net->nsid_lock);
-+	spin_lock(&net->nsid_lock);
- 	if (__peernet2id(net, peer) >= 0) {
--		spin_unlock_bh(&net->nsid_lock);
-+		spin_unlock(&net->nsid_lock);
- 		err = -EEXIST;
- 		NL_SET_BAD_ATTR(extack, nla);
- 		NL_SET_ERR_MSG(extack,
-@@ -891,7 +891,7 @@ static int rtnl_net_newid(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	}
- 
- 	err = alloc_netid(net, peer, nsid);
--	spin_unlock_bh(&net->nsid_lock);
-+	spin_unlock(&net->nsid_lock);
- 	if (err >= 0) {
- 		rtnl_net_notifyid(net, RTM_NEWNSID, err, NETLINK_CB(skb).portid,
- 				  nlh, GFP_KERNEL);
--- 
-2.50.0.727.gbf7dc18ff4-goog
+Looks doable to me too :)
 
+
+>
+> /P
+>
 
