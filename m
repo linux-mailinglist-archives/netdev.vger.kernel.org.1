@@ -1,184 +1,285 @@
-Return-Path: <netdev+bounces-202013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EAA6AEBF08
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 20:30:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C027AEBF13
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 20:32:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1140A7ACDA7
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 18:29:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8674B3B8521
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 18:31:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48D262E8E0D;
-	Fri, 27 Jun 2025 18:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B15E2EBDE4;
+	Fri, 27 Jun 2025 18:31:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lxx9ikdG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ecZFF1+F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7136B1EC01B;
-	Fri, 27 Jun 2025 18:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FF92EBBA2
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 18:31:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751049023; cv=none; b=obA5zMzgZqOF3d+9UZK4YvhqS7R+pO4aH4Ya/lm3JV7thv0DRx/CkyY+kXx8kh50lXRTKebacuvuQr2zOwtWVFhaU3MkWRYTGBMh83tetcbibJE9GhXfwRooJwQH/m/16pIFN/kpuYC7m67rHE0wkb727Y2JgKPM3QCjeiyT7Ps=
+	t=1751049115; cv=none; b=Qb71+CqtKvF+ssLqQT8xY1f4IuuGvam4mMZ+LidT1/3vD7HCYCOYd2fGk7BUEVkVcEkaMfm4kKEkVPk/nTw5427fmwNG+cIaoe/MSaVK7LuxPWBxVAayxnyQNQDpxvB3rolmxJPpixjh4bkW7PlWsMjfV9R5zAVSdePFSyTGmgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751049023; c=relaxed/simple;
-	bh=F2kaZL9psam6yAmb7KA4W+jbABJvGz4+PVh9kvOoHJE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AV5Iyi4IeAHwTrqEy5GhOEs271lIG1o7Ysc5aZf1Wgj1NVAF+0OIyj51qICoeRCjf2Hfv4XgqQZtztdrOOXKqwpWyIJMU8Gh9SCBKe76Dj3MczL9KqmgxYxMKAMW5zkUBuJVZcNPB93sSKXMdDMAt9SyIzkrxA3bbbejfMwSOY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lxx9ikdG; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4537fdec33bso1178725e9.1;
-        Fri, 27 Jun 2025 11:30:20 -0700 (PDT)
+	s=arc-20240116; t=1751049115; c=relaxed/simple;
+	bh=HkWCVwJQbfpx8FmLn65kmBBlTCs+zaW3lqttbUJLeJ8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ch3G3QsQ/NcSN+NsBOOSanv9kAo/aBC0ahIIRnAldTKXoaSetYdHPxfbflTSVZGYOm+Au5Qi8bZRmUK+7cUiv2oo8vOKfkmxAbYKQcGfDG8fJLO82DKHjeQQummdL1kaqR0u7WEVIaZRTsxcFMYtzFSI1IuB6jN/jT6/mpdHsKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ecZFF1+F; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-747ddba7c90so151536b3a.0
+        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 11:31:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751049019; x=1751653819; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x7mIMUcA8vt8Z3ShV10cEWd0HnSw9ixn5R7nBQ5IiR4=;
-        b=lxx9ikdGkgaolz4Y3DGXqGj6JB+gQeW543+XDeVO2EdQjILI/Sc3dtUkQinebq6t6y
-         TdgTZe891eGQ8H5nDHn+lnwvxLkh1ZWUG757zVUgLNnEWBY7PtrY2YWn79EvwAF7zdXc
-         4r9e0ZTOmGjlaQkyg4Rv9wIPNiALIfNncamLwYWQ/Wwpkyv+O580eQ27IfYCCB11CVkw
-         GM0vnxEvPwCSpGxZ2B46tGVOzQ6TDupLNptRiXWyxtyi6M0KZacVhicmNImMrsb0RmtT
-         EfemvJrvepq4xhq7ZpF0ynovTppckCeFAJnjMCf4pY13ONRFESCk04OdquvBG/eLtltg
-         vnVQ==
+        d=google.com; s=20230601; t=1751049113; x=1751653913; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=OJo9CtXFcRWuDjas8h65+O0iUteSLSP5tA8EVWt81GY=;
+        b=ecZFF1+FqLRNr1tvL8o19zSIXC4wEb0RuQsSjJF4+fcfwywTQ8gSKXs/AoG0qv18bl
+         FYWtyaR2oHCBhZgTFIGdCuGOm2w3ObOXW7PjLtzITeL49wNrxVfArVX2nzp8CHi2hkIU
+         9GyxU9/36O67V0a5wPKwbH1vM9Da/+Q3MxOkwdD0Eu+HDNfLEMSenrzwVw8q9hwX/axS
+         G5Tes5jlPS+++S/khA2gi1kXmHTB/qYbAeY9QYo/gy8tFNuqgv5m+sC7kwqaYurYeqFR
+         U0sCkhdpfEkdF9ZNDmQB9HKH6ujZ6lsokJBsfSJXOv2V2N2EPzd1EZx0oazlfJ9+h052
+         R3vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751049019; x=1751653819;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x7mIMUcA8vt8Z3ShV10cEWd0HnSw9ixn5R7nBQ5IiR4=;
-        b=rmj9UmJIjZALNar8O/wxR147J71jlsc4MQ99CnMlcuKX1q3LeZtuYjgm2iS3yXfZHk
-         GCBBGXp9+cE/+Jp5hC/gpH/a9W10QeR/g+TUkIa/TfDYV5jBN4c1eoeOFQCnguaH3O1n
-         IsscC3X3NEeG5xkvcrhthHMT2B3Jt8QeKKJ0SMi5FOZMg01uNaf+0v7cdQXNc2+hO3HI
-         dW0RMtuRqaBmxLqb9u9Y8iIfJ4rN6EJpcZ0UF26iQWjupV/Gjx8iuEj1daddBhzIgYxk
-         EmCt65Cus1O4EqDbe8M13+F9cauiJWceUIPlp+Scs6B4mtAxE/WJnHDtwntq1imyMhUh
-         ptJA==
-X-Forwarded-Encrypted: i=1; AJvYcCUpAwAGyKahe+bEL9gCVu04Rhh3ONpxiTpMm0OU0qomW6uaSKTPiniBsZU03h3m8cwG1pVx5kKP@vger.kernel.org, AJvYcCWlgCS447Zr4OLzaKUmgV5BaoRhSlRqbXQK07IMu+WsDTq0GwwZtYLwkMsK7mY5rysAT425MPSd71d+6Tg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLx5r+5IZb5emIPcHhYfYgkyYn16f6CFjT8/b0knR3q4YSsfxP
-	+dXErcu8IfS5DrKWbkHlLzmUkI9Llot9CeBt9PyWADByAkvvRCnwOUECvFmc5UN1F3ZGVnjLQC9
-	8k/Aa7IDfhV0sbA9DBNAYYFQC3VaZpGm10z0y
-X-Gm-Gg: ASbGncsnq7/MJ0LHbnX8nwKS1T/zH76W5U0hnJnuxIsVQnlYJyw5jtkyGYHwZ8xr/il
-	BNZ+qnMUWYXeQBTRavMZLZNOiKISURnYI+fRVd00xJQ/nB6/Z/b65+Ln6GOS+KcaBceyxUhB2JK
-	J0ByNtWyP5ts8KboQWZEvSM+ax18mLOQrVVRdi9DUgd/ykJvLQqpWJWn0ZfJDTQJSToo6+8WfL
-X-Google-Smtp-Source: AGHT+IFi5QtSWxRQLTobs98JpyVNRyqI2s1I9wNiFtZIjauVVuTSgsc9OfjvRILohIVXzIRk5CXnQtZDpFVjhdPXQwU=
-X-Received: by 2002:a05:600c:3152:b0:453:c39:d0c6 with SMTP id
- 5b1f17b1804b1-4538eea44a4mr44044025e9.32.1751049018559; Fri, 27 Jun 2025
- 11:30:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751049113; x=1751653913;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OJo9CtXFcRWuDjas8h65+O0iUteSLSP5tA8EVWt81GY=;
+        b=iPFqMIKIR0bfWRlfR1gcZC3uyJreY9ssMfRZjYFg05hh8+W8itk7gGxfyk9vlbSRna
+         cBNmGrLT8mFxoDPIAOynoqyN/19EfvxIoIn94goQ40ZBUrd2fq8wjuhw2jDtNRVLxdgM
+         087/AODtOZEvzNVt8dQigAmpV5YiJr3yULwi3rJRg5bxer60Ae0iuQ2APbhgld6CSyYu
+         /76eMezBZHsEAPV8KWIgoozOu2ZAxVl9WatD4t84AMQivbO8eDaIrymvGAs4pFtvSVav
+         LwPg5dffqBZHqQPqAHGPp6eagkWCLoEjZ+/WIuoIRIux4YDApOwK7BPGYgXSo9iAxjiX
+         rzZA==
+X-Gm-Message-State: AOJu0YymGnw0vcWHBDFohgG7dzhGA7DEi9tMEhxKP82eazai+JmEXdc/
+	ftUbqKoYC5NcEsC76mucTzV9uO6KYAB9A8XGJL31tcn4PFey2q3iF04PxClW5txA0YlddMe4Q+k
+	BFf7NtrmjH+DbJ3G9Dg4WpwNy2vWr1/6CqnfioBUaXx4KIizIbelS/10K5oe0kNRv2p9YvII0TF
+	wVeXts5IeINBO/v2B3rQGZoBXX49Yrgf3hKh9ypLeEP1df5x+MVWBEbN9UFXmSVfs=
+X-Google-Smtp-Source: AGHT+IGj48GQh4XwsgU2Xo4f83vJ4SZi9wNSVpTXqFST1M+jCyUOENFkEoJDQmfjon74Fce5t0qqkKhLlxuqiBe3Pw==
+X-Received: from pfiu9.prod.google.com ([2002:a05:6a00:1249:b0:748:f627:51c4])
+ (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:889:b0:748:6a1f:6d3b with SMTP id d2e1a72fcca58-74af6f43cb7mr6230462b3a.19.1751049112565;
+ Fri, 27 Jun 2025 11:31:52 -0700 (PDT)
+Date: Fri, 27 Jun 2025 18:31:41 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <1444123482.1827743.1750996347470.JavaMail.zimbra@sjtu.edu.cn>
-In-Reply-To: <1444123482.1827743.1750996347470.JavaMail.zimbra@sjtu.edu.cn>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 27 Jun 2025 11:30:07 -0700
-X-Gm-Features: Ac12FXxwEkxDnRQ8M5fp4bFvaKU9qj0Y_YDaHq7PejEC2_9p-vI4ymrzoYoKo28
-Message-ID: <CAADnVQKwC0OnJMY6ZueA+QnRmmZMB0hDyvX9-gx_0m5TA=o33Q@mail.gmail.com>
-Subject: Re: [BUG][BPF] Kernel Bug Triggered when Ebpf Verifier Check Fails
-To: =?UTF-8?B?6ZmI5LmQ?= <tom2cat@sjtu.edu.cn>, Eduard <eddyz87@gmail.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>
-Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250627183141.3781516-1-hramamurthy@google.com>
+Subject: [PATCH net-next] gve: make IRQ handlers and page allocation NUMA aware
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+To: netdev@vger.kernel.org
+Cc: jeroendb@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	willemb@google.com, bcf@google.com, pkaligineedi@google.com, 
+	joshwash@google.com, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 26, 2025 at 8:58=E2=80=AFPM =E9=99=88=E4=B9=90 <tom2cat@sjtu.ed=
-u.cn> wrote:
->
-> Hi BPF maintainers,
->
-> I'm reporting a bug I encountered in the BPF subsystem on Linux kernel ve=
-rsion <<5.19.5>>, <<6.15.0-rc2-00577-g8066e388be48-dirty>>,  <<6.15.3>>.
->
-> I wrote a BPF program that triggered a verifier rejection, but at the sam=
-e time, the kernel emitted a BUG() warning at <<kernel/bpf/hashtab.c:222>>,=
- suggesting a potential kernel-side issue rather than just verifier rejecti=
-on. Later on, I discovered that constructing any ebpf Verifier rejection be=
-havior within the specified code snippets would trigger this kernel bug.
->
-> - Miniest poc code:
->
-> #include "vmlinux.h"
-> #include <bpf/bpf_helpers.h>
->
-> struct mac_table_entry
-> {
->     struct bpf_timer expiration_timer;
->     __u32 ifindex;
->     __u64 last_seen_timestamp_ns;
->     struct in_addr border_ip;
-> };
->
-> struct
-> {
->     __uint(type, BPF_MAP_TYPE_HASH);
->     __type(key, struct mac_address);
->     __type(value, struct mac_table_entry);
->     __uint(max_entries, 4 * 1024 * 1024);
->     __uint(pinning, LIBBPF_PIN_BY_NAME);
-> } mac_table SEC(".maps");
->
-> SEC("xdp.frags")
-> long mac_xdp_func(struct xdp_md *ctx)
-> {
->     // Constructing any code segment that does not meet the requirements =
-of BPF Validator
->     // can trigger a kernel BUG: sleeping function called from invalid co=
-ntext at kernel/bpf/hashtab.c:222:
->     while(1){
->         __u32 j;
->     }
->     return XDP_PASS;
-> }
->
-> char LICENSE[] SEC("license") =3D "Dual BSD/GPL";
->
-> - Kernel version: <<6.15.3...>>
-> - Architecture: <<x86_64>>
-> - dmesg excerpt: <<BUG: sleeping function called from invalid context at =
-kernel/bpf/hashtab.c:222>>
->
-> Detailed info including reproducible BPF program and kernel logs have bee=
-n filed on Bugzilla:
->
->   https://bugzilla.kernel.org/show_bug.cgi?id=3D220278
+From: Bailey Forrest <bcf@google.com>
 
-Thanks for the report.
+All memory in GVE is currently allocated without regard for the NUMA
+node of the device. Because access to NUMA-local memory access is
+significantly cheaper than access to a remote node, this change attempts
+to ensure that page frags used in the RX path, including page pool
+frags, are allocated on the NUMA node local to the gVNIC device. Note
+that this attempt is best-effort. If necessary, the driver will still
+allocate non-local memory, as __GFP_THISNODE is not passed. Descriptor
+ring allocations are not updated, as dma_alloc_coherent handles that.
 
-The stack trace is the following:
+This change also modifies the IRQ affinity setting to only select CPUs
+from the node local to the device, preserving the behavior that TX and
+RX queues of the same index share CPU affinity.
 
-[  280.376885]  __might_resched+0x494/0x610
-[  280.376892]  ? __pfx___might_resched+0x10/0x10
-[  280.376900]  ? __lock_acquire+0xaab/0xd10
-[  280.376909]  htab_map_free_timers_and_wq+0x413/0xaa0
-[  280.376917]  ? __pfx_i_callback+0x10/0x10
-[  280.376922]  ? rcu_core+0xc6b/0x1760
-[  280.376927]  ? __pfx_htab_map_free_timers_and_wq+0x10/0x10
-[  280.376932]  bpf_map_put_with_uref+0x9f/0xc0
-[  280.376939]  bpf_free_inode+0x118/0x170
-[  280.376945]  rcu_core+0xcdf/0x1760
+Signed-off-by: Bailey Forrest <bcf@google.com>
+Signed-off-by: Joshua Washington <joshwash@google.com>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+---
+ drivers/net/ethernet/google/gve/gve.h         |  1 +
+ .../ethernet/google/gve/gve_buffer_mgmt_dqo.c |  1 +
+ drivers/net/ethernet/google/gve/gve_main.c    | 30 +++++++++++++++----
+ drivers/net/ethernet/google/gve/gve_rx.c      | 15 ++++++----
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c  |  9 +++---
+ 5 files changed, 40 insertions(+), 16 deletions(-)
 
-Here is the issue that the last uref decrement happens in rcu callback
-which is not sleepable, but htab_map_free_timers_and_wq()
-has cond_resched().
+diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
+index 4469442d4940..d99654771487 100644
+--- a/drivers/net/ethernet/google/gve/gve.h
++++ b/drivers/net/ethernet/google/gve/gve.h
+@@ -790,6 +790,7 @@ struct gve_priv {
+ 	struct gve_tx_queue_config tx_cfg;
+ 	struct gve_rx_queue_config rx_cfg;
+ 	u32 num_ntfy_blks; /* split between TX and RX so must be even */
++	int numa_node;
+ 
+ 	struct gve_registers __iomem *reg_bar0; /* see gve_register.h */
+ 	__be32 __iomem *db_bar2; /* "array" of doorbells */
+diff --git a/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c b/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
+index a71883e1d920..6c3c459a1b5e 100644
+--- a/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
+@@ -246,6 +246,7 @@ struct page_pool *gve_rx_create_page_pool(struct gve_priv *priv,
+ 		.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
+ 		.order = 0,
+ 		.pool_size = GVE_PAGE_POOL_SIZE_MULTIPLIER * priv->rx_desc_cnt,
++		.nid = priv->numa_node,
+ 		.dev = &priv->pdev->dev,
+ 		.netdev = priv->dev,
+ 		.napi = &priv->ntfy_blocks[ntfy_id].napi,
+diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+index 28e4795f5f40..0de348605872 100644
+--- a/drivers/net/ethernet/google/gve/gve_main.c
++++ b/drivers/net/ethernet/google/gve/gve_main.c
+@@ -457,10 +457,19 @@ int gve_napi_poll_dqo(struct napi_struct *napi, int budget)
+ 	return work_done;
+ }
+ 
++static const struct cpumask *gve_get_node_mask(struct gve_priv *priv)
++{
++	if (priv->numa_node == NUMA_NO_NODE)
++		return cpu_all_mask;
++	else
++		return cpumask_of_node(priv->numa_node);
++}
++
+ static int gve_alloc_notify_blocks(struct gve_priv *priv)
+ {
+ 	int num_vecs_requested = priv->num_ntfy_blks + 1;
+-	unsigned int active_cpus;
++	const struct cpumask *node_mask;
++	unsigned int cur_cpu;
+ 	int vecs_enabled;
+ 	int i, j;
+ 	int err;
+@@ -499,8 +508,6 @@ static int gve_alloc_notify_blocks(struct gve_priv *priv)
+ 		if (priv->rx_cfg.num_queues > priv->rx_cfg.max_queues)
+ 			priv->rx_cfg.num_queues = priv->rx_cfg.max_queues;
+ 	}
+-	/* Half the notification blocks go to TX and half to RX */
+-	active_cpus = min_t(int, priv->num_ntfy_blks / 2, num_online_cpus());
+ 
+ 	/* Setup Management Vector  - the last vector */
+ 	snprintf(priv->mgmt_msix_name, sizeof(priv->mgmt_msix_name), "gve-mgmnt@pci:%s",
+@@ -529,6 +536,8 @@ static int gve_alloc_notify_blocks(struct gve_priv *priv)
+ 	}
+ 
+ 	/* Setup the other blocks - the first n-1 vectors */
++	node_mask = gve_get_node_mask(priv);
++	cur_cpu = cpumask_first(node_mask);
+ 	for (i = 0; i < priv->num_ntfy_blks; i++) {
+ 		struct gve_notify_block *block = &priv->ntfy_blocks[i];
+ 		int msix_idx = i;
+@@ -545,9 +554,17 @@ static int gve_alloc_notify_blocks(struct gve_priv *priv)
+ 			goto abort_with_some_ntfy_blocks;
+ 		}
+ 		block->irq = priv->msix_vectors[msix_idx].vector;
+-		irq_set_affinity_hint(priv->msix_vectors[msix_idx].vector,
+-				      get_cpu_mask(i % active_cpus));
++		irq_set_affinity_and_hint(block->irq,
++					  cpumask_of(cur_cpu));
+ 		block->irq_db_index = &priv->irq_db_indices[i].index;
++
++		cur_cpu = cpumask_next(cur_cpu, node_mask);
++		/* Wrap once CPUs in the node have been exhausted, or when
++		 * starting RX queue affinities. TX and RX queues of the same
++		 * index share affinity.
++		 */
++		if (cur_cpu >= nr_cpu_ids || (i + 1) == priv->tx_cfg.max_queues)
++			cur_cpu = cpumask_first(node_mask);
+ 	}
+ 	return 0;
+ abort_with_some_ntfy_blocks:
+@@ -1036,7 +1053,7 @@ int gve_alloc_page(struct gve_priv *priv, struct device *dev,
+ 		   struct page **page, dma_addr_t *dma,
+ 		   enum dma_data_direction dir, gfp_t gfp_flags)
+ {
+-	*page = alloc_page(gfp_flags);
++	*page = alloc_pages_node(priv->numa_node, gfp_flags, 0);
+ 	if (!*page) {
+ 		priv->page_alloc_fail++;
+ 		return -ENOMEM;
+@@ -2294,6 +2311,7 @@ static int gve_init_priv(struct gve_priv *priv, bool skip_describe_device)
+ 	 */
+ 	priv->num_ntfy_blks = (num_ntfy - 1) & ~0x1;
+ 	priv->mgmt_msix_idx = priv->num_ntfy_blks;
++	priv->numa_node = dev_to_node(&priv->pdev->dev);
+ 
+ 	priv->tx_cfg.max_queues =
+ 		min_t(int, priv->tx_cfg.max_queues, priv->num_ntfy_blks / 2);
+diff --git a/drivers/net/ethernet/google/gve/gve_rx.c b/drivers/net/ethernet/google/gve/gve_rx.c
+index 90e875c1832f..367f1157fa73 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx.c
++++ b/drivers/net/ethernet/google/gve/gve_rx.c
+@@ -192,8 +192,9 @@ static int gve_rx_prefill_pages(struct gve_rx_ring *rx,
+ 	 */
+ 	slots = rx->mask + 1;
+ 
+-	rx->data.page_info = kvzalloc(slots *
+-				      sizeof(*rx->data.page_info), GFP_KERNEL);
++	rx->data.page_info =
++		kvzalloc_node(array_size(slots, sizeof(*rx->data.page_info)),
++			      GFP_KERNEL, priv->numa_node);
+ 	if (!rx->data.page_info)
+ 		return -ENOMEM;
+ 
+@@ -216,7 +217,8 @@ static int gve_rx_prefill_pages(struct gve_rx_ring *rx,
+ 
+ 	if (!rx->data.raw_addressing) {
+ 		for (j = 0; j < rx->qpl_copy_pool_mask + 1; j++) {
+-			struct page *page = alloc_page(GFP_KERNEL);
++			struct page *page = alloc_pages_node(priv->numa_node,
++							     GFP_KERNEL, 0);
+ 
+ 			if (!page) {
+ 				err = -ENOMEM;
+@@ -303,9 +305,10 @@ int gve_rx_alloc_ring_gqi(struct gve_priv *priv,
+ 
+ 	rx->qpl_copy_pool_mask = min_t(u32, U32_MAX, slots * 2) - 1;
+ 	rx->qpl_copy_pool_head = 0;
+-	rx->qpl_copy_pool = kvcalloc(rx->qpl_copy_pool_mask + 1,
+-				     sizeof(rx->qpl_copy_pool[0]),
+-				     GFP_KERNEL);
++	rx->qpl_copy_pool =
++		kvzalloc_node(array_size(rx->qpl_copy_pool_mask + 1,
++					 sizeof(rx->qpl_copy_pool[0])),
++			      GFP_KERNEL, priv->numa_node);
+ 
+ 	if (!rx->qpl_copy_pool) {
+ 		err = -ENOMEM;
+diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+index 0be41a0cdd15..ecaf1a56e4fb 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+@@ -236,9 +236,10 @@ int gve_rx_alloc_ring_dqo(struct gve_priv *priv,
+ 
+ 	rx->dqo.num_buf_states = cfg->raw_addressing ? buffer_queue_slots :
+ 		gve_get_rx_pages_per_qpl_dqo(cfg->ring_size);
+-	rx->dqo.buf_states = kvcalloc(rx->dqo.num_buf_states,
+-				      sizeof(rx->dqo.buf_states[0]),
+-				      GFP_KERNEL);
++	rx->dqo.buf_states =
++		kvzalloc_node(array_size(rx->dqo.num_buf_states,
++					 sizeof(rx->dqo.buf_states[0])),
++			      GFP_KERNEL, priv->numa_node);
+ 	if (!rx->dqo.buf_states)
+ 		return -ENOMEM;
+ 
+@@ -487,7 +488,7 @@ static int gve_rx_copy_ondemand(struct gve_rx_ring *rx,
+ 				struct gve_rx_buf_state_dqo *buf_state,
+ 				u16 buf_len)
+ {
+-	struct page *page = alloc_page(GFP_ATOMIC);
++	struct page *page = alloc_pages_node(rx->gve->numa_node, GFP_ATOMIC, 0);
+ 	int num_frags;
+ 
+ 	if (!page)
+-- 
+2.50.0.727.gbf7dc18ff4-goog
 
-The fix might be this:
-
-diff --git a/kernel/bpf/inode.c b/kernel/bpf/inode.c
-index 5c2e96b19392..ed8bff8d4684 100644
---- a/kernel/bpf/inode.c
-+++ b/kernel/bpf/inode.c
-@@ -790,7 +790,7 @@ const struct super_operations bpf_super_ops =3D {
-        .statfs         =3D simple_statfs,
-        .drop_inode     =3D generic_delete_inode,
-        .show_options   =3D bpf_show_options,
--       .free_inode     =3D bpf_free_inode,
-+       .destroy_inode  =3D bpf_free_inode,
- };
 
