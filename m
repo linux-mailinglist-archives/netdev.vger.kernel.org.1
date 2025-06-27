@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-201748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 534C9AEAE46
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 07:01:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9141AEAE48
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 07:02:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F42316934D
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 05:01:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6D5D1BC665B
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 05:02:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B050A13AA2F;
-	Fri, 27 Jun 2025 05:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8C21D63FC;
+	Fri, 27 Jun 2025 05:02:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ToLZklSG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ycItnuI8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2781B4236
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 05:01:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C5C13AA2F
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 05:01:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751000462; cv=none; b=p3EwkZlIm0ha1KjL0b9U92bB4x3FfW2ry6cENXZWXlzGvm9wxfEHYxBZeVJpr/eOd3VYBx5n8gbXwuZOKMQvOGujUiNvHSVRTUGo74l5nuYZGy03cK3K7TWOC+pu7h2UgDWSGrL8x8toBwlIGcqI2sUeMWq/65rDg0woaM6HKk8=
+	t=1751000520; cv=none; b=F5dWSzS2if71XznJcpIhO5D+1SWFDz4d/LwSLBTOoyEu0HP55JbTlJq+ClEU5SMNf12vUB09yXi2JV8FoySbLErILK+RSpAjsrNwM7ospVp4a023aQKwJURMAV44WOXnnbsiEaAn/TbZrPW9mgPwmsLyJypj5dbPgxZD6YPiZ7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751000462; c=relaxed/simple;
-	bh=5sxsybdkrGUBKXYDIe9p1RkmhM54REE83fhDh4dcVmw=;
+	s=arc-20240116; t=1751000520; c=relaxed/simple;
+	bh=Z3FbewX8QlK07rvYN/BaaHNV4fDQCo+Jqv86OpCEw0A=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iJWTZUjDIbcuNHhwmpeXeCf0/dJOTH+ocyRx/ftgCG/8HPwWcIyn7AUvuK4vZ9N3YjtMPZR4wChBpegkuljtxqcQlq0hlmPr4sbp8K1TJ3skP1Dk0TGfaCmudiL9lqYN9MW+gg+Dh3qSuRbkcQClF1Z4ezjbnF2XMMEjcoZwwIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ToLZklSG; arc=none smtp.client-ip=209.85.167.52
+	 To:Cc:Content-Type; b=cwL+Bkmpw7HL/NsX8jkz3sy7+bTyjqBShcSjDlMEfQG2kWYwOWVmub5x1xlcszdlQy7exIvxoBHYJjKrD2x6mBul9NdtZPDgHwnTtB0v/+XcUeCPgDfERGK3/6jDhai2AkoDS66nDQY2tmseyBdDg7B43B/L41sa7veezHBxB6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ycItnuI8; arc=none smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-555024588b0so1646221e87.3
-        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 22:01:00 -0700 (PDT)
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-553bcf41440so1809607e87.3
+        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 22:01:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751000459; x=1751605259; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1751000517; x=1751605317; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sR7cWCLMq3WenuSXEigSyJAepuKCkZmxv9Gwd3tBBUg=;
-        b=ToLZklSGOkPtFPZZWuR6NcV5H+o/JuuyEyVpFIY0mM82JdZecd7d7kBfdyR4mFTnSr
-         MHqkRg+v/lo8kSgXXPxs0xLYqI+O4e8FC8rLwgDOnetIctvjzMqTphwVbBu7jD+eIR2U
-         lQSmxx0yC6131nCzrZn3Jw4mDU/OfOnBWBe6Ea9e8KKmxlqJyLfNTAtpyBVutTneP3rI
-         Woo0PGYFnpNSuFAk37dmmh/fnrGotJ/RR0QFn3n25DrSKNRR0kMfqR3NM/EzF49ORsX2
-         ypdJqIH6YuqHcHkMcsbEr6QKYsqsZ7VZLywM6IjG0V86h/RAxA1U5KI0lwzoZAy4uG7b
-         vGVw==
+        bh=UKjKjCy0SRZNvK1D86lVvJiAl2KlWhOCZZnxJO+0yho=;
+        b=ycItnuI8URYG91Se8BXra7inKvQwORHBopONHzSvQhjQvShydgUXO7yz9HNR49ktNy
+         p5PR/c+rqxVPNtrt2kYLyqXyhAfvvFUUKvPJRULSR14P1oAzE4NJUTRBsnJAZCFrVO7s
+         moRbCvV6U04rTTyDGSJ8H2RoctY3Bkrs40FLs3r3KTS0afnav4YQMRpvW/yDJd8/5+Mu
+         9G8WRYXy4oAqVq9QWCcefxSUYB2+PQu2/AqnL6+804ovy/b1TNQ58MjPa0GRBdIucYjy
+         QBHOgTU5KAtTTHNDYain7WRACfZ5lo6/Rxd2IBKzva/l2EEkL+yf9CTIh94rs50SsQyb
+         tIKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751000459; x=1751605259;
+        d=1e100.net; s=20230601; t=1751000517; x=1751605317;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sR7cWCLMq3WenuSXEigSyJAepuKCkZmxv9Gwd3tBBUg=;
-        b=o9XU3DKIPPzNhfLF2yWTElsFRmfYQr04AETyKBz4j1eyF1Y5ft/Eu1YBg+yfoioaCT
-         hmCQakBBHLQPQnV9LOr+PRppMiWbGO+2QRmWumXOJU1xlRgVP0KuajjT0JTd0CBBYlHd
-         rYamYKjI8KHPdXLPRl3h3vmJrSLRsNOoLnHpvUJSestPdGfgJFb7slOfvPZy9L7tur0D
-         ixZuVV5DErXKV86oZoexnN48IedMukDKo7Lf3xasEe7azIQoA/PnSIY85Qhuq8Wq4GBy
-         pZLWYpBnADng2uErRci480yRKyBCYpzIR83pgwGZCLRYGpTCTPy3OmFI3dP9V/8v+xPj
-         Meyg==
-X-Forwarded-Encrypted: i=1; AJvYcCUzdVpq1j2xe+H88VayPRjfjM0SuGy7RfnrBUDNn+FDbaTEpcZjh3abXNrdDwYblf2Dpy9nm9M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztsU5iBGb/iInuDvSxijQmbi2lKy6GgYlVsHhQu5S+XZDU+q1o
-	YebNFLVhv4x/YRsIM/d9+OKYM1K+dzQEL0zJ8Zaqpm30gVLBdI/bja/2Jx4QQgL8u4B2XoSK/po
-	noqq0h+HVaPlKFrOe+O9+ogSxQTl72QFYbW5bc+c=
-X-Gm-Gg: ASbGncsZKdV58iXmZrCnOwjRKAjYRBBv+gnti7rUDdlfR0/0f6oNTuAWym2w7E1hQgs
-	9qEgaEvI2yqlZO/DlAvlXyIMvS7EMu3ySFzQ33BJg/zoNXnXmJTgBEtkV/6k3D2mnv22wYvgZno
-	9cV5PJcNcDCXytLHaRtE9VZ+aSx+1ZbTr/lC8xnw6RsoDezgJzkykOSJ7FaaCO9Ti+axzpGpoR
-X-Google-Smtp-Source: AGHT+IEO2uMlU4rN6MBnIyvwrGM1yh/mJea89i3Hmq8wQ6a2bo5jIt5NoGFTwwlABG8RudFiMl+2V4oucyLUfHnSqjU=
-X-Received: by 2002:a05:6512:138a:b0:553:2d93:d31 with SMTP id
- 2adb3069b0e04-5550b84f9f6mr673078e87.22.1751000458926; Thu, 26 Jun 2025
- 22:00:58 -0700 (PDT)
+        bh=UKjKjCy0SRZNvK1D86lVvJiAl2KlWhOCZZnxJO+0yho=;
+        b=tvvwAzwtl1Q2wRjGyORO5yn0grylWoFCbFlsxu2xzhiNJyaYSfXYr7wlEVg9RIXhRj
+         gKnOqVe+ySy7QNzW0USJHi/zg7jAkUqwdberuYzf/x8jVVKlOtvbsPBBnheyiDdVoEqk
+         7SnVZtXRY6fYvnbNyO1QmsIRxOmAhYW1kIVSoSMcMJD+c4hi5JaGeFQz3oBdJm1CyMgW
+         Eg0FrYEWZgbGA13EiuPIk8Usjz3MEV5dTknUGar/f94I+Zwk0jResdgAf97afegg7vA3
+         kEmF4PZLk/s95X2A8oVVPKCXZj6xyni8vFgJd6aJUTne0S+ejYkMUVPS+AsPX7QVU1NS
+         G49g==
+X-Forwarded-Encrypted: i=1; AJvYcCW92ugylVNYh5yyIfvpBJrJq4SPHfPsJca9tQhDOsxfIo1YLN1MpADKP28BaOSSyRzTh+6y9w8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxnxr3jJ3moD9HsrmxM5h2Fep7w3Kvkbar9c56aTRSul7X8jAwm
+	hBsdjCtYYBZgEWqthnHKbDn2mS1OcolQ9ICmltzlEk1sbnli0f3z58YU2ZQwMYMfNwHY4yP1kD/
+	v02WABqhxhtJ5ECakuhWCVDRkjGHJIrJ6NwIvlBg=
+X-Gm-Gg: ASbGnctJEqFcfaW38xAnqBW5xrFuK65mA2fuUa3bsp1h1faKkVX5psJ3m+owcJCPpFb
+	OlIC3lxA+Hg0stWPWHv2w6lM8+sfoBMgTxtZTOa8wXTUMcANCsqtXyBbyHSQKiX/oI1/r6gkit5
+	NxCd+2/f706LxeQKxB8lV6tA/ix3ET7ErkKqzl07NdB3bt/ahPEmTCtHUEjwy6PU/k4yPXQNee
+X-Google-Smtp-Source: AGHT+IEHs6nVqj1swP5DaPQYt5yJHxac9/Yjg4QyXlE/hTdB/XiNJ3W195Tx8y86sMh3C+YAwIxMBcQtnjr556e4AJE=
+X-Received: by 2002:a05:6512:220d:b0:553:65bc:4232 with SMTP id
+ 2adb3069b0e04-5550b9edf7fmr701066e87.31.1751000516969; Thu, 26 Jun 2025
+ 22:01:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250625182951.587377878@linutronix.de> <20250625183758.253203783@linutronix.de>
-In-Reply-To: <20250625183758.253203783@linutronix.de>
+References: <20250625182951.587377878@linutronix.de> <20250625183758.317946543@linutronix.de>
+In-Reply-To: <20250625183758.317946543@linutronix.de>
 From: John Stultz <jstultz@google.com>
-Date: Thu, 26 Jun 2025 22:00:47 -0700
-X-Gm-Features: Ac12FXybFViwuxBjL7kR7zDd-ff0Ky-2hj1TeYZ2UKuwfof9-sf8-ZR30AbwiSc
-Message-ID: <CANDhNCqY5TzY5qWLrZMJYrmwW3XUStvrut2Dd8pc9T+LMaibpg@mail.gmail.com>
-Subject: Re: [patch V3 08/11] timekeeping: Prepare do_adtimex() for auxiliary clocks
+Date: Thu, 26 Jun 2025 22:01:45 -0700
+X-Gm-Features: Ac12FXzsDWO6JYo14Vvw0pilvx6WlxJJ95tYAxaKnJ44M0hc4eUPKeoJOV22TSU
+Message-ID: <CANDhNCoNCdJoC6X1yz+EHC5dp4+nJ11vnDj_s2Vp5=oHfxXnhw@mail.gmail.com>
+Subject: Re: [patch V3 09/11] timekeeping: Provide adjtimex() for auxiliary clocks
 To: Thomas Gleixner <tglx@linutronix.de>
 Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
 	Richard Cochran <richardcochran@gmail.com>, Christopher Hall <christopher.s.hall@intel.com>, 
@@ -96,68 +96,18 @@ Content-Transfer-Encoding: quoted-printable
 On Wed, Jun 25, 2025 at 11:38=E2=80=AFAM Thomas Gleixner <tglx@linutronix.d=
 e> wrote:
 >
-> Exclude ADJ_TAI, leap seconds and PPS functionality as they make no sense
-> in the context of auxiliary clocks and provide a time stamp based on the
-> actual clock.
+> The behaviour is close to clock_adtime(CLOCK_REALTIME) with the
+> following differences:
+>
+>   1) ADJ_SETOFFSET adjusts the auxiliary clock offset
+>
+>   2) ADJ_TAI is not supported
+>
+>   3) Leap seconds are not supported
+>
+>   4) PPS is not supported
 >
 > Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> ---
->  kernel/time/timekeeping.c |   39 ++++++++++++++++++++++++++++++++++++---
->  1 file changed, 36 insertions(+), 3 deletions(-)
-> ---
->
-> --- a/kernel/time/timekeeping.c
-> +++ b/kernel/time/timekeeping.c
-> @@ -2562,6 +2573,21 @@ static int timekeeping_validate_timex(co
->                         return -EINVAL;
->         }
->
-> +       if (!aux_clock)
-> +               return 0;
-> +
-> +       /* Auxiliary clocks are similar to TAI and do not have leap secon=
-ds */
-> +       if (txc->status & (STA_INS | STA_DEL))
-> +               return -EINVAL;
-> +
-> +       /* No TAI offset setting */
-> +       if (txc->modes & ADJ_TAI)
-> +               return -EINVAL;
-> +
-> +       /* No PPS support either */
-> +       if (txc->status & (STA_PPSFREQ | STA_PPSTIME))
-> +               return -EINVAL;
-> +
 
-Just a taste issue, but I think it would be more clear if these checks
-were nested under the
-  if (aux_clock) {
-      ...
-  }
-
-As otherwise if you read-over and miss the !aux_clock early return it
-seems like you're erroring out on normally valid cases.
-
-But it's a minor thing.
-
-
-> @@ -2592,15 +2618,22 @@ static int __do_adjtimex(struct tk_data
->         struct timekeeper *tks =3D &tkd->shadow_timekeeper;
->         struct timespec64 ts;
->         s32 orig_tai, tai;
-> +       bool aux_clock;
->         int ret;
->
-> +       aux_clock =3D IS_ENABLED(CONFIG_POSIX_AUX_CLOCKS) && tkd->timekee=
-per.id !=3D TIMEKEEPER_CORE;
-> +
-
-Again, the is_core_timekeeper() check would be helpful here (or
-alternatively is_aux_timekeeper())
-
-Otherwise:
 Acked-by: John Stultz <jstultz@google.com>
-
-thanks
--john
 
