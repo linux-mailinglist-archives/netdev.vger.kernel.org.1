@@ -1,173 +1,132 @@
-Return-Path: <netdev+bounces-201798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 177B6AEB188
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 10:44:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50907AEB18D
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 10:45:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A6433ABAC7
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 08:44:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E94434A6145
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 08:45:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65AED248F62;
-	Fri, 27 Jun 2025 08:44:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D8BnQ4a2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0FA24DD12;
+	Fri, 27 Jun 2025 08:44:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3217F17741;
-	Fri, 27 Jun 2025 08:44:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88DB917741;
+	Fri, 27 Jun 2025 08:44:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751013891; cv=none; b=uJFPV6/poyRkcTzn5Q1zCVL57nzYL9sXqY/UiBXsVK5Ths2Ew2tWwGVgwFnIDEb7xmRzM0DwiuvxGjdrZKCvBMoxFmyz8WnJt5SMte8czPWrDzRSJ30vM2QDD5HSg4gQDzKmryWVFOmx2QSSHFvc7IosEFDsmZDbb/yHhIkvZvc=
+	t=1751013896; cv=none; b=WO5QVqyOuEv2lQ2iK0yaLymAzLz97xL5mKedTEkxnO5N4zK4L/OhikP0fqpdK02zoZmvPM3n3h1t/p/gDtkhqvk6uuy+MvJIT0ICoirDKegn/H0SqXpkrMffo4gm5MOI7nabV4xG09aN7OMT+4ir3Z2TE6WMMQPkuyuXfW2iPD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751013891; c=relaxed/simple;
-	bh=RTLLpwAcPZOfKhzKTWv9DijE/pyyo/yM7NlOJeC3mSc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lPkhczQB1QUNksl7zpyRLBGk35nf5nxR+gCUmuDXMN/SpM3Z9gSPDQmO58G1fruMG80wuSVb7NBxprWbacnmzUrROHTm39xOjac00HIT3OQ0ImMcIgouf/hv3f1Jtn4sXTFOsRaG8+FtJD5wnCjVnN6fc2is237gQFG3PFczeOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D8BnQ4a2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C807BC4CEE3;
-	Fri, 27 Jun 2025 08:44:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751013890;
-	bh=RTLLpwAcPZOfKhzKTWv9DijE/pyyo/yM7NlOJeC3mSc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D8BnQ4a2qY+T7f6Nj93ZdhYrpdcPOQOWkuZ8+ABcMmaaalqNwlzCVewwvEgKG6BXN
-	 ELWtADd0yAz+SoTC/LZgdsX4Ushlh5KbRxIGqcRmn+9J+0ZO4TLxmwbgDWK9x6bN+H
-	 10Vsq5P6ufR4FKHGBpEc4FJLcUKby3zlkCiJ+N/vb7jd98zAZkmsowWvFUxuZBy/US
-	 nalHm8bz7WEsfTHX4KPH/CS3zgKjx1DcskmR5Vq0fHOvdrK4oLUi0ln10/uPriktBK
-	 uYQ4uVZUxK8GfgwwpJsTo8mRVpqk+ML+kUwBmHPrMhNHUqt5KImfrhwoJ7SlperKMh
-	 BRGsPXnnQmfTg==
-Date: Fri, 27 Jun 2025 10:44:47 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Laura Nao <laura.nao@collabora.com>, mturquette@baylibre.com, 
-	sboyd@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
-	matthias.bgg@gmail.com, p.zabel@pengutronix.de, richardcochran@gmail.com, 
-	guangjie.song@mediatek.com, wenst@chromium.org, linux-clk@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
-	kernel@collabora.com
-Subject: Re: [PATCH v2 09/29] dt-bindings: clock: mediatek: Describe MT8196
- peripheral clock controllers
-Message-ID: <20250627-camouflaged-utopian-hedgehog-11ea2c@krzk-bin>
-References: <20250624143220.244549-1-laura.nao@collabora.com>
- <20250624143220.244549-10-laura.nao@collabora.com>
- <7dfba01a-6ede-44c2-87e3-3ecb439b48e3@kernel.org>
- <284a4ee5-806b-45f9-8d57-d02ec291e389@collabora.com>
- <0870a2ba-936b-4eb2-a570-f2c9dea471b8@kernel.org>
- <9fc32523-5009-4f48-8d82-6c3fd285801d@collabora.com>
- <86654ad1-a2ab-4add-b9de-4d56c67f377b@kernel.org>
- <ae478fd7-c627-433c-a614-b76dcd4164d2@collabora.com>
+	s=arc-20240116; t=1751013896; c=relaxed/simple;
+	bh=8ESayO/o4fZLFo6BTDMsLxcg6Akk7tZYwJwweA8EbdQ=;
+	h=From:To:Subject:Date:Message-Id; b=AsSMXq5XCFSzDcl4/q9fqv8gH7+eCtqdwQTgfIEpVpdO9dAc50AeqApxC8lLu4pPwNwGUgRNBLSi+uARQhgkjvk4Qr+5rozRfzQn8gqkSMMiMmkvw2wtlJgpIY9Kc+Zr590B4LXQkpEuTmGBvRhdnOuQY9NjV8pjnI0iMIYftq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1009)
+	id 01BAA204159D; Fri, 27 Jun 2025 01:44:54 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 01BAA204159D
+From: Dexuan Cui <decui@microsoft.com>
+To: niuxuewei97@gmail.com,
+	kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	sgarzare@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-hyperv@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] hv_sock: Return the readable bytes in hvs_stream_has_data()
+Date: Fri, 27 Jun 2025 01:44:49 -0700
+Message-Id: <1751013889-4951-1-git-send-email-decui@microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ae478fd7-c627-433c-a614-b76dcd4164d2@collabora.com>
 
-On Wed, Jun 25, 2025 at 02:48:39PM +0200, AngeloGioacchino Del Regno wrote:
-> Il 25/06/25 13:06, Krzysztof Kozlowski ha scritto:
-> > On 25/06/2025 11:45, AngeloGioacchino Del Regno wrote:
-> > > Il 25/06/25 10:57, Krzysztof Kozlowski ha scritto:
-> > > > On 25/06/2025 10:20, AngeloGioacchino Del Regno wrote:
-> > > > > Il 24/06/25 18:02, Krzysztof Kozlowski ha scritto:
-> > > > > > On 24/06/2025 16:32, Laura Nao wrote:
-> > > > > > > +  '#reset-cells':
-> > > > > > > +    const: 1
-> > > > > > > +    description:
-> > > > > > > +      Reset lines for PEXTP0/1 and UFS blocks.
-> > > > > > > +
-> > > > > > > +  mediatek,hardware-voter:
-> > > > > > > +    $ref: /schemas/types.yaml#/definitions/phandle
-> > > > > > > +    description:
-> > > > > > > +      On the MT8196 SoC, a Hardware Voter (HWV) backed by a fixed-function
-> > > > > > > +      MCU manages clock and power domain control across the AP and other
-> > > > > > > +      remote processors. By aggregating their votes, it ensures clocks are
-> > > > > > > +      safely enabled/disabled and power domains are active before register
-> > > > > > > +      access.
-> > > > > > 
-> > > > > > Resource voting is not via any phandle, but either interconnects or
-> > > > > > required opps for power domain.
-> > > > > 
-> > > > > Sorry, I'm not sure who is actually misunderstanding what, here... let me try to
-> > > > > explain the situation:
-> > > > > 
-> > > > > This is effectively used as a syscon - as in, the clock controllers need to perform
-> > > > > MMIO R/W on both the clock controller itself *and* has to place a vote to the clock
-> > > > > controller specific HWV register.
-> > > > 
-> > > > syscon is not the interface to place a vote for clocks. "clocks"
-> > > > property is.
-> > > > 
-> > > > > 
-> > > > > This is done for MUX-GATE and GATE clocks, other than for power domains.
-> > > > > 
-> > > > > Note that the HWV system is inside of the power domains controller, and it's split
-> > > > > on a per hardware macro-block basis (as per usual MediaTek hardware layout...).
-> > > > > 
-> > > > > The HWV, therefore, does *not* vote for clock *rates* (so, modeling OPPs would be
-> > > > > a software quirk, I think?), does *not* manage bandwidth (and interconnect is for
-> > > > > voting BW only?), and is just a "switch to flip".
-> > > > 
-> > > > That's still clocks. Gate is a clock.
-> > > > 
-> > > > > 
-> > > > > Is this happening because the description has to be improved and creating some
-> > > > > misunderstanding, or is it because we are underestimating and/or ignoring something
-> > > > > here?
-> > > > > 
-> > > > 
-> > > > Other vendors, at least qcom, represent it properly - clocks. Sometimes
-> > > > they mix up and represent it as power domains, but that's because
-> > > > downstream is a mess and because we actually (at upstream) don't really
-> > > > know what is inside there - is it a clock or power domain.
-> > > > 
-> > > 
-> > > ....but the hardware voter cannot be represented as a clock, because you use it
-> > > for clocks *or* power domains (but at the same time, and of course in different
-> > > drivers, and in different *intertwined* registers).
-> > 
-> > BTW:
-> > 
-> > git grep mediatek,hardware-voter
-> > 0 results
-> > 
-> > so I do not accept explanation that you use it in different drivers. Now
-> > is the first time this is being upstream, so now is the time when this
-> > is shaped.
-> 
-> I was simply trying to explain how I'm using it in the current design and nothing
-> else; and I am happy to understand what other solution could there be for this and
-> if there's anything cleaner.
-> 
-> You see what I do, and I'm *sure* that you definitely know that my goal is *not* to
-> just tick yet another box, but to make things right, - and with the best possible
-> shape and, especially, community agreement.
+When hv_sock was originally added, __vsock_stream_recvmsg() and
+vsock_stream_has_data() actually only needed to know whether there
+is any readable data or not, so hvs_stream_has_data() was written to
+return 1 or 0 for simplicity.
 
-Ack, I understand. Your case here is really not different from all
-others. Interface is different, hardware is different, but the concept -
-you place votes via some intermediary - is completely the same which
-qcom is doing since years and maybe other vendors as well.
+However, now hvs_stream_has_data() should return the readable bytes
+because vsock_data_ready() -> vsock_stream_has_data() needs to know the
+actual bytes rather than a boolean value of 1 or 0.
 
-And I expect more and more of this in case of Mediatek, so in the future
-you will be plcing votes not only for on/off but also for values.
-Everyone goes there, mobile, automotive... maybe IoT lags behind because
-performance there is not that important, but all others need top
-performance with top energy saving which they cannot do in Linux and
-they move it to firmware (SCMI, hw voter, dedicated blocks, whatever).
+The SIOCINQ ioctl support also needs hvs_stream_has_data() to return
+the readable bytes.
 
-You need to start designing this proper with that future in mind and
-syscon is a strong no-go. Whether this is clocks, power domains or
-interconnects - dunno yet, maybe both.
+Let hvs_stream_has_data() return the readable bytes of the payload in
+the next host-to-guest VMBus hv_sock packet.
 
-Best regards,
-Krzysztof
+Note: there may be multpile incoming hv_sock packets pending in the
+VMBus channel's ringbuffer, but so far there is not a VMBus API that
+allows us to know all the readable bytes in total without reading and
+caching the payload of the multiple packets, so let's just return the
+readable bytes of the next single packet. In the future, we'll either
+add a VMBus API that allows us to know the total readable bytes without
+touching the data in the ringbuffer, or the hv_sock driver needs to
+understand the VMBus packet format and parse the packets directly.
+
+Signed-off-by: Dexuan Cui <decui@microsoft.com>
+---
+
+Hi maintainers, please don't take the patch for now.
+
+Hi Xuewei Niu, please help to re-post this patch with the next version
+of your patchset "vsock: Introduce SIOCINQ ioctl support". See
+https://lore.kernel.org/virtualization/BL1PR21MB3115F69C544B0FAA145FA4EABF7BA@BL1PR21MB3115.namprd21.prod.outlook.com/#t
+https://lore.kernel.org/virtualization/20250626050219.1847316-1-niuxuewei.nxw@antgroup.com/
+Feel free to add your Signed-off-by, if you need.
+
+ net/vmw_vsock/hyperv_transport.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+index 31342ab502b4..64f1290a9ae7 100644
+--- a/net/vmw_vsock/hyperv_transport.c
++++ b/net/vmw_vsock/hyperv_transport.c
+@@ -694,15 +694,25 @@ static ssize_t hvs_stream_enqueue(struct vsock_sock *vsk, struct msghdr *msg,
+ static s64 hvs_stream_has_data(struct vsock_sock *vsk)
+ {
+ 	struct hvsock *hvs = vsk->trans;
++	bool need_refill = !hvs->recv_desc;
+ 	s64 ret;
+ 
+ 	if (hvs->recv_data_len > 0)
+-		return 1;
++		return hvs->recv_data_len;
+ 
+ 	switch (hvs_channel_readable_payload(hvs->chan)) {
+ 	case 1:
+-		ret = 1;
+-		break;
++		if (!need_refill)
++			return -EIO;
++
++		hvs->recv_desc = hv_pkt_iter_first(hvs->chan);
++		if (!hvs->recv_desc)
++			return -ENOBUFS;
++
++		ret = hvs_update_recv_data(hvs);
++		if (ret)
++			return ret;
++		return hvs->recv_data_len;
+ 	case 0:
+ 		vsk->peer_shutdown |= SEND_SHUTDOWN;
+ 		ret = 0;
+-- 
+2.49.0
 
 
