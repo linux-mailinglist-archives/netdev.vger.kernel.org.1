@@ -1,160 +1,183 @@
-Return-Path: <netdev+bounces-201980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19EA8AEBCDF
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 18:11:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F535AEBD10
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 18:22:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C06B87A631F
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 16:09:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21E1B1C482F2
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 16:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83ABA2E1C7A;
-	Fri, 27 Jun 2025 16:10:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EFAD2E9ECE;
+	Fri, 27 Jun 2025 16:21:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ST7iSzkW"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="TBC50qEi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12BA19A288
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 16:10:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2778929992E
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 16:21:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751040636; cv=none; b=drxyL7eUjFrhqBd9+7lEq3VrdroKdl8O/EO5vHEIVxSZAO4vOI1vp7CkQCZai1J8BG1J6LPHTKN4yYMRP4d6NikqxR1XRjHzniMfLnduUhkvUrI3YzQYk0L9bE6APqj5de78CrA9fqQW0LzOFBAT5NtB5pWgTkZJFR36//e3j1A=
+	t=1751041316; cv=none; b=N5aFXo3xzUOMNJfuu9hZS8C7ihvEGrrX143yn2n+tYJP9IvMn/lysDN6xo7B4V9muV5tfa4/wdLroqNnDVcePB8wHeGH2eRe58zKBCHDe7pl1QiVsYcugY1xhZGq1sjiaDyW3uSzv4OwqPVLhCuLKlAfI5zTeVhuTnB6N6FWkhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751040636; c=relaxed/simple;
-	bh=KjiesiOLTJuJUiI4ZuBnTQtJZJtt8CUCC3JATDX1tEw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=SS+ZlAiggIDijhAjvJ3jOSTcgMBKGUYw8XxMp/+RBsv3W0yt+Jp7mfYDl2NAm3xGZcLxmxwNO57ON9maxSF7KXFM623IPd9OefksL2pMJzgmXmU3hhwF/txEYnzii4l4DVEa9z1pX81p3rIih/KtN5gMdYJEg+yqD41vjr95N3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ST7iSzkW; arc=none smtp.client-ip=209.85.219.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e819aa98e7aso2121273276.2
-        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 09:10:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751040634; x=1751645434; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jgiwzzA1R3KYrVtZLzbdtWojSRr/7TuPYyNSR9ly9Us=;
-        b=ST7iSzkWxoX68AaMVE+lgzI1hgvdW52ZmqndHDW4g2nB2h7+b84hJxuAINKdkBX+OE
-         cdxcyHBymQuKiTeMz5JPhHS8gB74cu2JpxNHjshdVTfoPmsQjAW22Y8TXDo0UllyD6XB
-         BtzqUi5LnlpV8SZDW7wQDb3jCIrqYdPaWFm3TlEUPk81KFPUfffkQ1PEt1vvkYhhSfs/
-         h/nypeEyqC2+YKEtUlV5Rc/tAdySli4yxifzNWyQYHZngKWRLRMchPO/mE/DaOAVlWAP
-         3B/ji042OVcpfED9gCIic7UccO1iSPiMbLXzDn4dgPyIpD/SJemox87WKJcqUbZ/3O0u
-         4rZA==
+	s=arc-20240116; t=1751041316; c=relaxed/simple;
+	bh=30vgKdy5n94b1DNeLRG5PLw2PPMa/I/W7Pqq9Wsa51w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rZXskseFM0zU27R9BF4Bvh7IzFgZen8KkXuVKvu97t9lqqFQsUUeJtO2WfwqgN5Pc5bs3+Qy+ED4noNvqkQmMObw5IklXrB9tzPRFyeqMiriH0Z5iA2whoINWPLZf+n0XL5al/yw5f+3PxmEdoCUn+RWRtGB1yXL6cwwtzHzOZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=TBC50qEi; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55RCKnFB011315
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 16:21:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	g8S/q69+hMXzlKm1t8hoFvS7fzscnXnzVXeG/Aysk4A=; b=TBC50qEikpNwSDDm
+	cBrC48K85w4D7KXqQRgKZsP8yS5P+ij4btN1s5LjIA7iIGixJK+TmreJKYmAeXaG
+	IGi7CrpzqKey8wweQalmj7GB7Ht6M4qMPx0CGiWFfhz7LHJmV1NqfDlk6zgIz5p+
+	y+ZxXn68Pr02GC/PyLKaEcw7c7b7jYByvSzfB+b1rZvOb509kss3Kmv0KExAzFUV
+	mhLa8JgaZ/e/zP957DD9sHeIeehrDk+Xz1a9Z1McSVT6e3FYCFPRroe4QpBu15Xr
+	mOWCIbSF7mKXCUWjcIu6iUxA6l9MwPyx00idDae+RTMuTHjODgkZFwTUINcg4Y2M
+	9mN1tQ==
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47f3bgqc8c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 16:21:51 +0000 (GMT)
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7d21080c26fso35917485a.1
+        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 09:21:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751040634; x=1751645434;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jgiwzzA1R3KYrVtZLzbdtWojSRr/7TuPYyNSR9ly9Us=;
-        b=Z1LT5+4NwikyPqqFR50I/8KDdesQuaRUrBIepL0i9ACk28e5pc6C1/Zth09li5ipEo
-         fb00dSMD3Ldc4dUsdMcDlJvkVb2G7JCyyA1U+LVDgJgTq8lCD+00/rAE0HkRT4ynLNUM
-         wv8Bn+wyatMKLYcRmYNcN31TLZmvZoN1CyfL0UxoCwgzcvG9q8YWRfdpK+QJmDoT04FJ
-         giBASKTEgnWyQ1kQZCvztf+Z1RR6ed91PMiKd5yB36ParlBL/KvpimhE9WbRXCAFFz67
-         KdFA/OiL6c6siIMb0ZCM6uPxEOfK7i691tjw8AsxLpesLeu0YUMUvuO8mQj/yoKPRbzj
-         hRtA==
-X-Forwarded-Encrypted: i=1; AJvYcCUmrOVgkazBAJtT1vDIoiZVXUKMRj2SF573zCRYN50iFwGe0KK7MyDYvHAXm7QHUzPx2MtgU08=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzW/zMspSiN5GuWLHMMfEpt8ufCHVEcuMFeDOq09yS5YmY73BeY
-	JIUHq9QA4/Qik7JjPX0nekEBo4vXG3JYq2S9a17pjyxl3qA9lbso8lUb
-X-Gm-Gg: ASbGncuWPJGPXAAGFgeubWuxN9vg+7gE74teNwUB8nwNoCPqjyr3E7pxgP1HNC9fx97
-	g0roNO74IXxMIJ3vjH0LEMJqSGDM8Y3c3RDWw0HrvbV9Wpf8e/EiV/dwEvGxdYUHL84qeoAJCQq
-	fN911rSblrxPJzgtqnlqUheCQ3aRGfClrAxUPxPq1bSS6ZFNzgsXmjJZZCFn+E7CFEblDNPS0nF
-	T89VVqRn/R0tMJHQ1Ds3RbsINDoLH72rBpjjIAD2Hisdu1RsKbtKelSP6TGiOLmBMzFnEn2uRoU
-	HMYI5ZrO116waw9mecOjPYXkCzcuqTaEnqYTcD2oF1ODXvQ/Db5SS6ew8HeylBzIFPh+JealTos
-	Cw9rtUBCvn65q/WDLWtLIubfdZFbnLs3+LrfxWx0=
-X-Google-Smtp-Source: AGHT+IEYLfClkercBc4Tn0hab9hoerKp3xVPT/64DfP5qyI2loCpVoWgG77QA6BGdRjIEVtftFaHFQ==
-X-Received: by 2002:a05:690c:30b:b0:710:e4c4:a92f with SMTP id 00721157ae682-71517154687mr54294707b3.5.1751040633567;
-        Fri, 27 Jun 2025 09:10:33 -0700 (PDT)
-Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-71515c0581bsm4762947b3.41.2025.06.27.09.10.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jun 2025 09:10:32 -0700 (PDT)
-Date: Fri, 27 Jun 2025 12:10:31 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Daniel Zahka <daniel.zahka@gmail.com>, 
- Donald Hunter <donald.hunter@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- Saeed Mahameed <saeedm@nvidia.com>, 
- Leon Romanovsky <leon@kernel.org>, 
- Tariq Toukan <tariqt@nvidia.com>, 
- Boris Pismenny <borisp@nvidia.com>, 
- Kuniyuki Iwashima <kuniyu@google.com>, 
- Willem de Bruijn <willemb@google.com>, 
- David Ahern <dsahern@kernel.org>, 
- Neal Cardwell <ncardwell@google.com>, 
- Patrisious Haddad <phaddad@nvidia.com>, 
- Raed Salem <raeds@nvidia.com>, 
- Jianbo Liu <jianbol@nvidia.com>, 
- Dragos Tatulea <dtatulea@nvidia.com>, 
- Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
- Stanislav Fomichev <sdf@fomichev.me>, 
- =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>, 
- Jacob Keller <jacob.e.keller@intel.com>, 
- netdev@vger.kernel.org
-Message-ID: <685ec277b82b2_4f1ca2948d@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250626165703.0d03f415@kernel.org>
-References: <20250625135210.2975231-1-daniel.zahka@gmail.com>
- <20250625135210.2975231-3-daniel.zahka@gmail.com>
- <685c8c553072b_2a5da429429@willemb.c.googlers.com.notmuch>
- <20250626070047.6567609c@kernel.org>
- <685d5847a57d7_2de3952949b@willemb.c.googlers.com.notmuch>
- <20250626081156.475c14d2@kernel.org>
- <685d816dd20ff_2eacd529452@willemb.c.googlers.com.notmuch>
- <20250626165703.0d03f415@kernel.org>
-Subject: Re: [PATCH v2 02/17] psp: base PSP device support
+        d=1e100.net; s=20230601; t=1751041311; x=1751646111;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=g8S/q69+hMXzlKm1t8hoFvS7fzscnXnzVXeG/Aysk4A=;
+        b=xSOQUvZ25K5CihEJTC2aMXNcb3w5fDDWn37cKX3l5x715u0g/A1awNomw0uJ2OqO4A
+         IHKz/UQVhUMkqFbm/nGWuX2V2vQZpWpzng+nmYyZ5vYOEEVyedYlJucuW65BsqXjb3Zz
+         TtBvykDWX9VRbfifRNbAIt++AxB7F4sA53XW14S8IJdzWRrSkQ2iQoh0012Eg/wjL1WM
+         BrrpZY4n8RUlZVHmSH4sdih/00rs/Tq5PZjRoBhLFbfFxLulB91U6rBt2vgW4/37LMLj
+         bkki1Bswx6pp9+InTGZdsFk8xFKINkmlD0aJGoAKDEdWFD3/X3cPTLQocPKWXw3HOvSe
+         PT8A==
+X-Forwarded-Encrypted: i=1; AJvYcCUwh9wCI8E9zQlJuJo+WYrBzFH91dvwdKRMfcsdC4f7zehdsRz6h5fvhZZQJGckO0mB6l/W+JA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyq8Oo0wx3db0drZ5VDuPBNpGKA4hKd6pT3d35TG9Ab0YB65C/x
+	xhk6VHoCpcBiwdPg/8OQ2hvpuhkNFgqjXyAkFb1Chp/7DEIgfhtiUHOyr/rO5CN0ivA1edYk3ho
+	R9/HfwkVGiKNZ7XwTzv4j6OF3nyKQjblFPaPG8zR9z+zqpI8CHTdQkA5WCKw=
+X-Gm-Gg: ASbGncs9pZ+sg0R0Yh/hgIPypTgF3i4jvcOj1cKVz2QJubcRIpFtQdLYHvDKOkHNe3C
+	hgItB9382DRMYGWN3Jl8YUGdN9iD2EuDHHhdXbZSArOpOC7sP2T8IEF6Nj5OfvrUc45WcdGGrE8
+	uzpiJrEucWi52nA/I0LiHGGdldEbKhADu69q9zSmwg3LJC29MjvtGWN+QpmkdKgeqU6Im6xCJ0A
+	rxzxEucg2zKGpzgKAu06xWmGBoDE7+dtcvZ2/SGGfC4U+n0X+Wz3YttQE74H4O53Jr9uIqom4ok
+	kxAIeh6LHdNsE35aU+qs0mHPM+tDbteYMiItn8ZtRZv1nwZ2WvSBXzIyHy0tzwPqzNTOBkKQzTx
+	uckI=
+X-Received: by 2002:a05:620a:1925:b0:7d4:2901:2b3c with SMTP id af79cd13be357-7d4439b51a3mr212887285a.9.1751041310920;
+        Fri, 27 Jun 2025 09:21:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH1SPxuQsD4kZcYVOTyATUEwOXLUOsQYA3SYR1WoncAoVYNaaL5puLHJyjBBdfcBGSK7mKW7w==
+X-Received: by 2002:a05:620a:1925:b0:7d4:2901:2b3c with SMTP id af79cd13be357-7d4439b51a3mr212884385a.9.1751041310357;
+        Fri, 27 Jun 2025 09:21:50 -0700 (PDT)
+Received: from [192.168.143.225] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae35365a016sm153479966b.57.2025.06.27.09.21.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Jun 2025 09:21:49 -0700 (PDT)
+Message-ID: <4556893f-982b-435d-aed1-d661ee31f862@oss.qualcomm.com>
+Date: Fri, 27 Jun 2025 18:21:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 03/14] net: ethernet: qualcomm: Add PPE driver
+ for IPQ9574 SoC
+To: Luo Jie <quic_luoj@quicinc.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>, Lei Wei <quic_leiwei@quicinc.com>,
+        Suruchi Agarwal <quic_suruchia@quicinc.com>,
+        Pavithra R <quic_pavir@quicinc.com>, Simon Horman <horms@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>
+Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org,
+        quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com
+References: <20250626-qcom_ipq_ppe-v5-0-95bdc6b8f6ff@quicinc.com>
+ <20250626-qcom_ipq_ppe-v5-3-95bdc6b8f6ff@quicinc.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20250626-qcom_ipq_ppe-v5-3-95bdc6b8f6ff@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: G4hW2smP6aC1x2zFn8wZ-EHnNW8Nsipa
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI3MDEzMyBTYWx0ZWRfX06lyeVdbYdp0
+ nyyMGPnfz3QoqgLb1qLupfNmyex+DuXZufAsDazaNU3ATh265gCvEeZYH/9qEXxoV5g+WH6rJXt
+ eLYMTfCl4a+1L2lgRoeGeYTqJdUK59/EiVDvaZh21P+fPnJHJepAiMFRYrdkmRzT2P09/YTkB0z
+ bKey45h2yndozC1jclkMtdARRvE9pQSEPtXAHBQ34etH27TtoyhsaBLDFOPqzEdOvht6esyvtaE
+ +6XeiekSeJNVn9L7exUfb++rl83+4MZnMRx+enewXKw6HjXuK7OoaQGIUXLkQ4O977Z67Nl/i7U
+ 1IcK7B7M/oNhHvfmdVpKMG55cX3bN1DgvhUO3iSi1euhidPwZC1y6RCI4ji03MyhnaGsrIlhMJs
+ GQavChnaa1YJvqwk0TKCJ28D8HbovFcFyui/Updnmk5lyltKTqiP4rAsH6ZbIhBKN/P+nVAe
+X-Authority-Analysis: v=2.4 cv=L4kdQ/T8 c=1 sm=1 tr=0 ts=685ec51f cx=c_pps
+ a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10 a=COk6AnOGAAAA:8 a=JRFc35xCpNCPHeNcAxQA:9
+ a=QEXdDO2ut3YA:10 a=PEH46H7Ffwr30OY-TuGO:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-GUID: G4hW2smP6aC1x2zFn8wZ-EHnNW8Nsipa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-06-27_05,2025-06-26_05,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 malwarescore=0 bulkscore=0 clxscore=1015 suspectscore=0
+ adultscore=0 priorityscore=1501 impostorscore=0 lowpriorityscore=0
+ spamscore=0 phishscore=0 mlxlogscore=999 classifier=spam authscore=0
+ authtc=n/a authcc= route=outbound adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2505280000 definitions=main-2506270133
 
-Jakub Kicinski wrote:
-> On Thu, 26 Jun 2025 13:20:45 -0400 Willem de Bruijn wrote:
-> > > > IDPF does support multiple "vports" (num_alloc_vports), and with that
-> > > > struct net_device, from a single BDF.  
-> > > 
-> > > Upstream? If yes then I'm very bad at reviewing code :D  
-> > 
-> > I then don't think I want to focus your attention on this, but..
-> > 
-> > See use num_alloc_ports in idpf_init_task. Which keeps requeueing
-> > itself until num_default_vports is reached. Which is a variable
-> > received from the device in VIRTCHNL2_OP_GET_CAPS.
+On 6/26/25 4:31 PM, Luo Jie wrote:
+> The PPE (Packet Process Engine) hardware block is available on Qualcomm
+> IPQ SoC that support PPE architecture, such as IPQ9574.
 > 
-> That's not too bad, one of the older drivers had a sysfs interface
-> for creating the sub-interfaces IIRC :/
+> The PPE in IPQ9574 includes six integrated ethernet MAC for 6 PPE ports,
+> buffer management, queue management and scheduler functions. The MACs
+> can connect with the external PHY or switch devices using the UNIPHY PCS
+> block available in the SoC.
 > 
-> We should be able to share one psp_dev if the implementation shares PSP
-> between blocks.
+> The PPE also includes various packet processing offload capabilities
+> such as L3 routing and L2 bridging, VLAN and tunnel processing offload.
+> It also includes Ethernet DMA function for transferring packets between
+> ARM cores and PPE ethernet ports.
+> 
+> This patch adds the base source files and Makefiles for the PPE driver
+> such as platform driver registration, clock initialization, and PPE
+> reset routines.
+> 
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> ---
 
-Great.
+[...]
 
-> I was trying to write the code so that it'd be possible
-> to attach the psp_dev to veth / netkit
-> IIRC the main_netdev was supposed to be special in terms of
-> permissions, the admin in the netns where main_netdev sits is
-> the admin of the device (for rotations and config).
-> But I was planning to add a secondary list of "attached devices"
-> which have access to non-privileged operations. 
+> +static int ppe_clock_init_and_reset(struct ppe_device *ppe_dev)
+> +{
+> +	unsigned long ppe_rate = ppe_dev->clk_rate;
+> +	struct device *dev = ppe_dev->dev;
+> +	struct reset_control *rstc;
+> +	struct clk_bulk_data *clks;
+> +	struct clk *clk;
+> +	int ret, i;
+> +
+> +	for (i = 0; i < ppe_dev->num_icc_paths; i++) {
+> +		ppe_dev->icc_paths[i].name = ppe_icc_data[i].name;
+> +		ppe_dev->icc_paths[i].avg_bw = ppe_icc_data[i].avg_bw ? :
+> +					       Bps_to_icc(ppe_rate);
+> +		ppe_dev->icc_paths[i].peak_bw = ppe_icc_data[i].peak_bw ? :
+> +						Bps_to_icc(ppe_rate);
+> +	}
 
-That makes sense. I like how this approach enables support for such
-devices without having to explicitly pipe through net_device_ops
-(what legacy Google PSP implementation had to do for each of ipvlan,
-bonding, etc).
+Can you not just set ppe_dev->icc_paths to ppe_icc_data?
+
+Konrad
 
