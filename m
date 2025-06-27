@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-202000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBED2AEBE9C
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 19:52:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72ED9AEBEA2
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 19:55:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 079474A5D86
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 17:52:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D44AE7AEFC4
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 17:53:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B4442EAB85;
-	Fri, 27 Jun 2025 17:52:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64AD32EACE5;
+	Fri, 27 Jun 2025 17:54:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0CSBtyGw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4OZVbf2H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D672EA148
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 17:52:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79482EAB9F
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 17:54:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751046729; cv=none; b=kklp4upoykaPoMcaVsYIXe2T8aV5/YBRjZDalnvfdSYPIaF7UFkwA0yRQZ4jIQBfrbkG6E9hwQh5FhF7Kjap5JojPcN+6OwMxwH7o0ztHB9JSE2DuEMqHFMX1n9M7g9D5ah5XWl21W9wjCYWl/T6EKS9KSqFFsxJcXdDqpy+SCk=
+	t=1751046896; cv=none; b=AatadrSRtKSQcTqTijZ4eBoVxe5EOxxdmPvJYCe1n5uEyKA15Ia8PkBlGOhOn14UMtYh9XeTPPBDBzJi1BX0/wvKOCrZQ+pTBdnIe3qGEnfCOXXXCnbVxYjCnCOVJGuIQdV8b1Bzok6WJsHn7dVtQcaVqrRhtefuwgX3mtT5VZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751046729; c=relaxed/simple;
-	bh=dnrAWTPyTlLa1kZjQaQmWIcSAusQR2HZtx15gDk4XgE=;
+	s=arc-20240116; t=1751046896; c=relaxed/simple;
+	bh=b5w+lU9rcQ+RqIIhXyZB3iTmrFa2oB+GQ5tTu0H2RRg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Tb+EbwWBnEB7DfruYveK00nd64MJcjkMsYvFtSdMrXcWqeyRUmS/ah2eLlM1KylSkb2chmu8rKNzPPd8sdoOezSUiJyHfaYrRRa0Bgr5/IhY4k/A31P3RJf4ph8p/ZACx8kMHNggNGlY43zMIloMGgPdpsJiB7ovAjcOPXIyc5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0CSBtyGw; arc=none smtp.client-ip=209.85.215.172
+	 To:Cc:Content-Type; b=GWgJZkg3JJVYS2ML7GqQ/m4sTQsUm6xd2ies1bGsHH3ty5t9CD5xko0CN80NAPhKg/oS15Om47UZPurT7wC+keE4wWBsp1tUwIUUiV4s0PJPkLFjanb7DOQEbeMdl7gOEQ4OQn4q/GsCVCeo4JGa/aAu6rnAcRrf6JBBvGQQD2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4OZVbf2H; arc=none smtp.client-ip=209.85.215.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-b34a71d9208so166425a12.3
-        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 10:52:06 -0700 (PDT)
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b34c068faf8so2822484a12.2
+        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 10:54:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751046726; x=1751651526; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1751046894; x=1751651694; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dnrAWTPyTlLa1kZjQaQmWIcSAusQR2HZtx15gDk4XgE=;
-        b=0CSBtyGwi8b3VjzyvDFZWUUF29zkHlmcTlZMkgiSp7w/X5baKRbEvkh8PgCB6t2vQg
-         RKC2D6dJvaSnX1vL76ocwM0nfh9PT6sjJkowRZhO3aDyXKH8SzFP7CsGcNwwr6rFStjS
-         DhXwgvYXrjOVTeIf+C7AUF1pQOx9LKCbMAdUgXsRQzo41zXZKfHaLL7SjmsoTtZdYQcc
-         JmGucUK+NwIp58+IgY/Gb1er/5Gu+vTcabtzF6Cruahlh/OqjcfgKzKla2xAEQCoong7
-         3rtXcQdKodBpxIClSGGGPyaavcpXSCmsuxdiQa1He0hE74hYhEk1VWO6BI/GJGaWCtKS
-         ZtiA==
+        bh=b5w+lU9rcQ+RqIIhXyZB3iTmrFa2oB+GQ5tTu0H2RRg=;
+        b=4OZVbf2H6xUzhkjlWGg3PMHSuwVtA/R5RRFv6dAb9g05edpVpYsSbXkHkJR4TGs2+F
+         fwGhMUaq/8hrjiUJdK7g47D+s/KrHVTNLnl0P3+B1t0XTcEXoszG/zJSA6yJMAzW6CtX
+         IBEofFt9alXoOYXE/K4JwpwyqnzD2VyFUv+mgka1r9Y/gbhdoXXgYJNvjL1fedXUYS3Z
+         fCkP8G14pkBTEN9KtFt8GUfTPUR5K11zp3FSGnQkAUmQDI4aN9Bqa8dOBD5wO5b8x/lI
+         ggXnw/PwOQT+zwJP7fxQFONq3EGnkjmMu0AwDuKMRhKVwWq1lrjjTspzC+hkPreSXZ2e
+         maYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751046726; x=1751651526;
+        d=1e100.net; s=20230601; t=1751046894; x=1751651694;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dnrAWTPyTlLa1kZjQaQmWIcSAusQR2HZtx15gDk4XgE=;
-        b=l5KhVQyQscsFKMeqrS0WM6O9e17DA1+ifl5/qGDBgUvh8AFxvlJknWNN4j+qITI5uY
-         IhHHfZhBKlUMCquC4oFlFWmOrGtwJdIUQQWNLqnPMpLHt6mWW1gISX6xaMcPr3d/SxpF
-         M7xSDUpdBMfa9EKlD+R37gOA6r2PN/ICmOiv2r5MukE3nraHIGmvEcQXuzlkJKzHB7EM
-         603QCTdVRRExvvHhlv3By0+hmAYqoPr8ZV55xG7Bp/OrFe1RA0BRL3zkd9nzJ+YrfsCf
-         Tlz815Xs/pynorw1kSGlsJNunZMczrQiYGC4MGyvqbUoEdKP0WFJx8Uvy6BwwE+KCCY8
-         WOcA==
-X-Forwarded-Encrypted: i=1; AJvYcCVzcNUuuI6E8I+WB1sgQzBjvoCoJ7FHL9ddaPXoJsMWhe4Ada2+zWD9orMN7ukQfY30ADdrdaY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWS2HvLmed3Nqa5V56Gx0BGcKx1Vv1EZDV9462bzwbWhpbakwk
-	rOoGkr4wNlK0xilTWBBrJl/I1Fn+Axpm5H5veFepe/7L84+z5vwM/T7vrBo+L9d2oLFYCo1SDXx
-	0HMuPTnYn5CRWvZsHv06JkC66mKzP630kRtkO56YLmx+6SjjZPI+4FVfuW3k=
-X-Gm-Gg: ASbGncu5ZcL5IS++euEJ8cZyo7ge9IuDF7xcWQJHhy8DLOkKL1dm9YNj4g3mjJlDVy4
-	fxElT2mbqBqPsINkzvFqgMPjSDd3rkNUc2NYMsxeqHjogLDyuuCfT+koMNnL6Xuv7/MOnnSWuID
-	qmF7gRJJeXmphY7/QJjJSfjweTqbjLKcSuikeNBzGwRSKLa014FA8e47KbS5hIdTmlpMVRPSkLG
-	g==
-X-Google-Smtp-Source: AGHT+IEIlnErc6+CFc8E+cMlUs1MJs9s+oPPgH3yPHlngL89AAuof/hrxElf8aKo01K7foUwLbA+t5J+CoYZQDVX/yA=
-X-Received: by 2002:a17:90b:2ecd:b0:312:f0d0:bb0 with SMTP id
- 98e67ed59e1d1-318c9225deamr7397537a91.12.1751046725867; Fri, 27 Jun 2025
- 10:52:05 -0700 (PDT)
+        bh=b5w+lU9rcQ+RqIIhXyZB3iTmrFa2oB+GQ5tTu0H2RRg=;
+        b=ni+mrOf1CLfl+TKMZbjsKlTDINP/6rmxiRUvBU0iS1SDfeyovxsHiJihdJddIiwHGk
+         RG5fWolNwu8VWhYDPpX2OKOZiOrRbzJml3wyzsdP9WLofEAgNRi7y6zaOeZRB+XW0PaF
+         rYT4d5FWUBaWQk7CsIyOwA8nHaXLJop3w3LTgNLBRZ4kYnZ2KKkXwFiuEkm+iWAXfCt3
+         lAF1Vb8PodEZSEfaJdQGDk4fzRZHMuskY6jY1l1gq9cGi73DIr8jZT31dycdF3v92Ot8
+         9LOgqcjFr6h51Qv91cwCMPJRlG2XoTyNIFwbnJaI+n4/ed97DgsVXjaZpWnsxJp69Y7l
+         Kcfw==
+X-Forwarded-Encrypted: i=1; AJvYcCWlfG5Ft2xZYGt/9iomUdVZg6nMgdMv8EYqBE/pjppkCMozn78pwXk24nufBnm2ToNwMj/cGEc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzh9Y+0FvLxU3BlMWHlrYfP+Qiv9tBcp9tX0PmItU/Ky0zrsVFu
+	OK6CMogCkWQsVWapxH/qAOZM1abjE5ZfuiN1/kEaZiW+VDSWkym6OLT7x93mxOYfolPfEANto7U
+	vszTM/XgFZsErFy3hzazRtJnP3FV2gE60w8eGbOOE
+X-Gm-Gg: ASbGncvmkAy1v9e9c+fbvyUeF3gVgZ8DUlvRX/OngGzKcxjJPw7gK7vhysGbBcheBCf
+	2sRujZyU0fmgPg0D1CgKK583CJmroCAjkjwRBtzIZJDoqgoIDfDinj9jo9kJqEsr3MJwkUZLqut
+	YQoRpv5vpaxxCgrAKwUc0U3SFbAaPnywGtPg+Ky3omulFwsaZ35dOMh50jpfS7RsUSoshBi1AuH
+	A==
+X-Google-Smtp-Source: AGHT+IEz5VXwj1GYmNGJmEDfcwMZtECwIiU/xHxifSuXuaNMZLaxgOrLmS9VATNv/ybdUyfSYt9jmAPqzXMcSURh9x8=
+X-Received: by 2002:a17:90a:f944:b0:311:9c1f:8516 with SMTP id
+ 98e67ed59e1d1-318c90f75a9mr6226632a91.15.1751046894024; Fri, 27 Jun 2025
+ 10:54:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250627112526.3615031-1-edumazet@google.com> <20250627112526.3615031-5-edumazet@google.com>
-In-Reply-To: <20250627112526.3615031-5-edumazet@google.com>
+References: <20250627112526.3615031-1-edumazet@google.com> <20250627112526.3615031-6-edumazet@google.com>
+In-Reply-To: <20250627112526.3615031-6-edumazet@google.com>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Fri, 27 Jun 2025 10:51:53 -0700
-X-Gm-Features: Ac12FXzvagQBOh6JtkPjhaDkKEgMHXByIc31nXURuFgMUWqjWzPUhoiJ5bH5rsQ
-Message-ID: <CAAVpQUCB+7F4rFffLXwzy9808bg6fwaR4mj=BsUtC10r=x7z2w@mail.gmail.com>
-Subject: Re: [PATCH net-next 04/10] net: dst: annotate data-races around dst->input
+Date: Fri, 27 Jun 2025 10:54:42 -0700
+X-Gm-Features: Ac12FXzwA-gz30EXekgtpxH0yBtBkUUnrO6RuFvwWsNFqOqT64HZ8XKz8BlSi1s
+Message-ID: <CAAVpQUCTdDAmfWjz0y0RXkdWuJ-Z9cBGh1rir1GXGBNOxJKvjg@mail.gmail.com>
+Subject: Re: [PATCH net-next 05/10] net: dst: annotate data-races around dst->output
 To: Eric Dumazet <edumazet@google.com>
 Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
@@ -92,13 +92,13 @@ Content-Transfer-Encoding: quoted-printable
 On Fri, Jun 27, 2025 at 4:25=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
 wrote:
 >
-> dst_dev_put() can overwrite dst->input while other
-> cpus might read this field (for instance from dst_input())
+> dst_dev_put() can overwrite dst->output while other
+> cpus might read this field (for instance from dst_output())
 >
 > Add READ_ONCE()/WRITE_ONCE() annotations to suppress
 > potential issues.
 >
-> We will likely need full RCU protection later.
+> We will likely need RCU protection in the future.
 >
 > Fixes: 4a6ce2b6f2ec ("net: introduce a new function dst_dev_put()")
 > Signed-off-by: Eric Dumazet <edumazet@google.com>
