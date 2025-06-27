@@ -1,126 +1,228 @@
-Return-Path: <netdev+bounces-202011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EA20AEBEEF
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 20:16:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97606AEBEF7
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 20:18:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E019D1C4020A
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 18:16:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C32B646217
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 18:17:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E992171092;
-	Fri, 27 Jun 2025 18:16:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B27B1B6CE4;
+	Fri, 27 Jun 2025 18:17:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ALXY9nNw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JEYsBeWg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA33F2F1FF8;
-	Fri, 27 Jun 2025 18:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E92F1DF271;
+	Fri, 27 Jun 2025 18:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751048166; cv=none; b=W5SiClMUrTuxkQ7mlSZfELNF+Pi3Rv72mKPWe10NeXJIovpUDLr3cDhujXD+mPkB7/Imq+tT7O7Odlck8zUWXXlsQKB5Ew5nPVpdgweNPurgWvGf50Vh8Uhil+Yj19xWNgMSH+FHDSqYa8VbbHsdLbUZWOa0lMdMryEG8925Jyo=
+	t=1751048249; cv=none; b=Em4JkHkjhRrjvo/A3rM9CRJvFNAYympc2D0Vdgrq+0C2bv4H4THXyFP2SzgTWmNYNKNN8oa54J5/Bwtf51JogTLqWmPYehldcgleyWfvM35VsFBCf/Sry8etLTuS+EgSTjY/RiX38h1BLP7j9dcZGcf60+4Qodvq40wXxI6O9n8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751048166; c=relaxed/simple;
-	bh=cWfp2bVZlb5/JYVLvEWhQVG2ghTf0X5peEWW2OHHyNA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ElAJQEQVQT5TEh2k6BvJzb8zlXKybQ9vKF+Wguv8rcpMbJSqdbnEvEPyXqcCovNAlulcptbBzmIadz25SEZmik+A9cSl74Iw+jS3u2OFrYX+2MLGfPV4A73xzTYVfsH+xmC+qaTqdC5uVR7hm5YWirvz9/OHsDpL6kqy9yck7hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ALXY9nNw; arc=none smtp.client-ip=209.85.222.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-87ec9a4c86cso675900241.1;
-        Fri, 27 Jun 2025 11:16:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751048164; x=1751652964; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=OREOvp6OrkVWubltBXib1I/xwDpMOns70Qw+MvbSJy8=;
-        b=ALXY9nNwCv9ViRL/qLXXJWqN0Al7XZ9nL8vG135vnEFxTKKPnf9gfkCQKEVEirO9TZ
-         PP5SfiVkecQ6K6sSgeoODFYUX2O2wwv0DzqkNheidxjsNSmymdangYJx/YFZ62tCS956
-         RPEg+oO3g3a1mCH1HOPk47r7VTHQ4dfd7wZlfApoPVlWGjp4MC2jNCV6KA6uRCfhAZBQ
-         GA79bg80CmsT0YWI7ydZ21TA3Y/GBjof1oDxJ7FERq2qbdLS7+HAzT0Roy9cFKLhuxCG
-         Mf9oMCBPKVXdX5SQgjdIxigzHSTAeD5KP6uyl9ROgh7g8Jpf64Oydh8shURCQIsVBvT8
-         Xj1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751048164; x=1751652964;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OREOvp6OrkVWubltBXib1I/xwDpMOns70Qw+MvbSJy8=;
-        b=eOXmhXC7sN0Q/84c3dqPCfl+bH0E22Vp5NduHwchdVhQoHxAvRZy+WgmbMHT91kPML
-         5E0CokbXcsW/9rkEAfpNp0oCMh+BasfcXlP3xhVsZPSJgVMeP0lLuas/wTM1aewXl/GX
-         wdyqXBi8a3tv9DVtkB+lB5LzF3uyeJOy8ucb7/6DRlF2VkcrfctfjE15CLREXbic5MsJ
-         d/6fYBHivW21uL2eniHHA9defg4e450HDysHX7Fqj7JInJogHk0Fwy0xMEpdxga/r/oB
-         SfPtyYYsGS/uOZOGkThr92/WrdI1vQ6pQImA5BXUTGpOBzTE4ToQ45XISVu37dtQPObd
-         JmeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUsgb+dEU0MuySjPhVHuiKx9bnalRqpNz2sR7dItiBGSQsfERauIDru4XuwFZZ8mC7dw9OxtlI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRZ4Fwwf7olSwWKl7eHsjNcGMbvcrvUFkkq9L6he3nLxAeB6Ir
-	NPrkCkRQPwbgH4ASmxaTV0Ran8F8XgLkP44hI0cDaGT41kDneCvrbGEguKQF8KcQ
-X-Gm-Gg: ASbGnctXwvWkHqsZk3IIPpubgCQh3ctSydOHdbRWoBmpiyVRL5lkitgysTyFzjCdfW4
-	3gVYUq5QH+7ufP7he/wiMXuedgHRqhvN5LWt97LPk5Ia3cd+LXRCpJNKrnHL+CN4H1ciK9JkWKh
-	v3lxUzNL4HZ0Sow7qq/GHfRxxSGJyY2CcDIxvd05JUP0KA5myEw1ZaDRUyS08UeyQV1dogzRoVF
-	8eHzamYUOeuvcG71cqKK/RwC/vFbcgZymsSTgqAVRbGKv5e/hDi0xYC7+/p/ysc99BaaR779sDT
-	50CYAVLSPmw6/utAJEXjl9JxFseiAEKo9EVzW+ao+5LH3K+lGzHP33ccQFi8Kf6N14hZ/BxxIP5
-	e426LCuVuMlpT1WmLfz28Y6aqHIDN++CsLSYsEtETUQ==
-X-Google-Smtp-Source: AGHT+IGuHJICDu9mHHzGHdyjQX4ngPApiw/JgpiHVRHDGZjOESn1dKwpw7fJQDy9cr9ZANnPUd/QWw==
-X-Received: by 2002:a05:6102:e08:b0:4bb:eb4a:f9ec with SMTP id ada2fe7eead31-4ee4f78fcd8mr3126961137.16.1751048163625;
-        Fri, 27 Jun 2025 11:16:03 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-050-089-067-214.res.spectrum.com. [50.89.67.214])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-884d1d87dfcsm638021241.17.2025.06.27.11.16.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jun 2025 11:16:02 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] bluetooth 2025-06-27
-Date: Fri, 27 Jun 2025 14:16:01 -0400
-Message-ID: <20250627181601.520435-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1751048249; c=relaxed/simple;
+	bh=Zy+rQDK2Rdtnv+WCJAroA36FonDrfwk2n38XI2RfCDk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t+qlNYTT/RN4AhK0QlNtJtWh5ljCHwCj3uG8O4XKdjrqSlsV10QHYniZsMEmAGr+GKidMU1hcL+YVNJr/ysEpIWZjmWI+iwdu6VZXGNsB7xZyzKYsnQsjXdrJIM5yHeJw0B0uA0Eih0IwElezhShmajPTIymkELvYXPuUtIewFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JEYsBeWg; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751048247; x=1782584247;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Zy+rQDK2Rdtnv+WCJAroA36FonDrfwk2n38XI2RfCDk=;
+  b=JEYsBeWgSWJE47+uH8JbfSf7fZdCAjXLBJWNL/PI53eIoT4F3U1EVkOy
+   uqJ2St0FsqAXzPIN5vyelx7kmFylJa7o4bid72mr41mF2rSXE4dvhZQCP
+   kmRi+PVDfIsM9TfMjHS2ZDYyrH+TLmKpLSAdiGJS4f/llR+H1RvLodXYn
+   LKQ91H0EsvTcBO5fPr5CdP3JpF9nwYMEVo5PWQiTTSo/j22DrEEeHMXgz
+   MP9J9wVpRWc+c0R1jMn9kRbt6zdJgmXK8MA51p0Mv2EyQHbCL/LbKmnkJ
+   4Enzn4EGiE9RfUQBHo1nO/gvswS/xfwqIEZgZjcv70yDhUPiKGEEBTN6E
+   A==;
+X-CSE-ConnectionGUID: Mq9Z7h9QTCyeXAGz9ARuhw==
+X-CSE-MsgGUID: K3bam4oBSpyr4raZMH4hGQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11477"; a="52598116"
+X-IronPort-AV: E=Sophos;i="6.16,271,1744095600"; 
+   d="scan'208";a="52598116"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2025 11:17:26 -0700
+X-CSE-ConnectionGUID: iRakPMNBTpGZzpkHHrRkng==
+X-CSE-MsgGUID: pdPRwQqLQhSljapZMGp3UA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,271,1744095600"; 
+   d="scan'208";a="152485775"
+Received: from cmdeoliv-mobl4.amr.corp.intel.com (HELO [10.125.109.77]) ([10.125.109.77])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2025 11:17:26 -0700
+Message-ID: <30d7f613-4089-4e64-893a-83ebf2e319c1@intel.com>
+Date: Fri, 27 Jun 2025 11:17:24 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v17 10/22] cx/memdev: Indicate probe deferral
+To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+Cc: Alejandro Lucero <alucerop@amd.com>
+References: <20250624141355.269056-1-alejandro.lucero-palau@amd.com>
+ <20250624141355.269056-11-alejandro.lucero-palau@amd.com>
+Content-Language: en-US
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20250624141355.269056-11-alejandro.lucero-palau@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The following changes since commit e34a79b96ab9d49ed8b605fee11099cf3efbb428:
 
-  Merge tag 'net-6.16-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-06-26 09:13:27 -0700)
 
-are available in the Git repository at:
+On 6/24/25 7:13 AM, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> The first step for a CXL accelerator driver that wants to establish new
+> CXL.mem regions is to register a 'struct cxl_memdev'. That kicks off
+> cxl_mem_probe() to enumerate all 'struct cxl_port' instances in the
+> topology up to the root.
+> 
+> If the port driver has not attached yet the expectation is that the
+> driver waits until that link is established. The common cxl_pci driver
+> has reason to keep the 'struct cxl_memdev' device attached to the bus
+> until the root driver attaches. An accelerator may want to instead defer
+> probing until CXL resources can be acquired.
+> 
+> Use the @endpoint attribute of a 'struct cxl_memdev' to convey when a
+> accelerator driver probing should be deferred vs failed. Provide that
+> indication via a new cxl_acquire_endpoint() API that can retrieve the
+> probe status of the memdev.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> ---
+>  drivers/cxl/core/memdev.c | 42 +++++++++++++++++++++++++++++++++++++++
+>  drivers/cxl/core/port.c   |  2 +-
+>  drivers/cxl/mem.c         |  7 +++++--
+>  include/cxl/cxl.h         |  2 ++
+>  4 files changed, 50 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
+> index f43d2aa2928e..e2c6b5b532db 100644
+> --- a/drivers/cxl/core/memdev.c
+> +++ b/drivers/cxl/core/memdev.c
+> @@ -1124,6 +1124,48 @@ struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
+>  }
+>  EXPORT_SYMBOL_NS_GPL(devm_cxl_add_memdev, "CXL");
+>  
+> +/*
+> + * Try to get a locked reference on a memdev's CXL port topology
+> + * connection. Be careful to observe when cxl_mem_probe() has deposited
+> + * a probe deferral awaiting the arrival of the CXL root driver.
+> + */
+> +struct cxl_port *cxl_acquire_endpoint(struct cxl_memdev *cxlmd)
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-06-27
+Annotation of __acquires() is needed here to annotate that this function is taking multiple locks and keeping the locks.
 
-for you to fetch changes up to 89fb8acc38852116d38d721ad394aad7f2871670:
+> +{
+> +	struct cxl_port *endpoint;
+> +	int rc = -ENXIO;
+> +
+> +	device_lock(&cxlmd->dev);
+> +> +	endpoint = cxlmd->endpoint;
+> +	if (!endpoint)
+> +		goto err;
+> +
+> +	if (IS_ERR(endpoint)) {
+> +		rc = PTR_ERR(endpoint);
+> +		goto err;
+> +	}
+> +
+> +	device_lock(&endpoint->dev);
+> +	if (!endpoint->dev.driver)> +		goto err_endpoint;
+> +
+> +	return endpoint;
+> +
+> +err_endpoint:
+> +	device_unlock(&endpoint->dev);
+> +err:
+> +	device_unlock(&cxlmd->dev);
+> +	return ERR_PTR(rc);
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_acquire_endpoint, "CXL");
+> +
+> +void cxl_release_endpoint(struct cxl_memdev *cxlmd, struct cxl_port *endpoint)
 
-  Bluetooth: HCI: Set extended advertising data synchronously (2025-06-27 14:01:20 -0400)
+And __releases() here to release the lock annotations
+> +{
+> +	device_unlock(&endpoint->dev);
+> +	device_unlock(&cxlmd->dev);
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_release_endpoint, "CXL");
+> +
+>  static void sanitize_teardown_notifier(void *data)
+>  {
+>  	struct cxl_memdev_state *mds = data;
+> diff --git a/drivers/cxl/core/port.c b/drivers/cxl/core/port.c
+> index 9acf8c7afb6b..fa10a1643e4c 100644
+> --- a/drivers/cxl/core/port.c
+> +++ b/drivers/cxl/core/port.c
+> @@ -1563,7 +1563,7 @@ static int add_port_attach_ep(struct cxl_memdev *cxlmd,
+>  		 */
+>  		dev_dbg(&cxlmd->dev, "%s is a root dport\n",
+>  			dev_name(dport_dev));
+> -		return -ENXIO;
+> +		return -EPROBE_DEFER;
+>  	}
+>  
+>  	struct cxl_port *parent_port __free(put_cxl_port) =
+> diff --git a/drivers/cxl/mem.c b/drivers/cxl/mem.c
+> index 7f39790d9d98..cda0b2ff73ce 100644
+> --- a/drivers/cxl/mem.c
+> +++ b/drivers/cxl/mem.c
+> @@ -148,14 +148,17 @@ static int cxl_mem_probe(struct device *dev)
+>  		return rc;
+>  
+>  	rc = devm_cxl_enumerate_ports(cxlmd);
+> -	if (rc)
+> +	if (rc) {
+> +		cxlmd->endpoint = ERR_PTR(rc);
+>  		return rc;
+> +	}
+>  
+>  	struct cxl_port *parent_port __free(put_cxl_port) =
+>  		cxl_mem_find_port(cxlmd, &dport);
+>  	if (!parent_port) {
+>  		dev_err(dev, "CXL port topology not found\n");
+> -		return -ENXIO;
+> +		cxlmd->endpoint = ERR_PTR(-EPROBE_DEFER);
 
-----------------------------------------------------------------
-bluetooth pull request for net:
+kdoc to 'struct cxl_memdev' will be needed to explain this change of expectation for the endpoint member.
+ 
+> +		return -EPROBE_DEFER;
 
- - MGMT: set_mesh: update LE scan interval and window
- - MGMT: mesh_send: check instances prior disabling advertising
- - hci_sync: revert some mesh modifications
- - hci_sync: Set extended advertising data synchronously
- - hci_sync: Prevent unintended pause by checking if advertising is active
+Can you please explain how the accelerator driver init path is different in this instance that it requires cxl_mem driver to defer probing? Currently with a type3, the cxl_acpi driver will setup the CXL root, hostbridges and PCI root ports. At that point the memdev driver will enumerate the rest of the ports and attempt to establish the hierarchy. However if cxl_acpi is not done, the mem probe will fail. But, the cxl_acpi probe will trigger a re-probe sequence at the end when it is done. At that point, the mem probe should discover all the necessary ports if things are correct. If the accelerator init path is different, can we introduce some documentation to explain the difference?
 
-----------------------------------------------------------------
-Christian Eggers (4):
-      Bluetooth: hci_sync: revert some mesh modifications
-      Bluetooth: MGMT: set_mesh: update LE scan interval and window
-      Bluetooth: MGMT: mesh_send: check instances prior disabling advertising
-      Bluetooth: HCI: Set extended advertising data synchronously
+Also, it seems as long as port topology is not found, it will always go to deferred probing. At what point do we conclude that things may be missing/broken and we need to fail?
 
-Yang Li (1):
-      Bluetooth: Prevent unintended pause by checking if advertising is active
+DJ
 
- net/bluetooth/hci_event.c |  36 --------
- net/bluetooth/hci_sync.c  | 227 ++++++++++++++++++++++++++++------------------
- net/bluetooth/mgmt.c      |  25 ++++-
- 3 files changed, 162 insertions(+), 126 deletions(-)
+
+>  	}
+>  
+>  	if (cxl_pmem_size(cxlds) && IS_ENABLED(CONFIG_CXL_PMEM)) {
+> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+> index fcdf98231ffb..2928e16a62e2 100644
+> --- a/include/cxl/cxl.h
+> +++ b/include/cxl/cxl.h
+> @@ -234,4 +234,6 @@ int cxl_map_component_regs(const struct cxl_register_map *map,
+>  void cxl_set_capacity(struct cxl_dev_state *cxlds, u64 capacity);
+>  struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
+>  				       struct cxl_dev_state *cxlmds);
+> +struct cxl_port *cxl_acquire_endpoint(struct cxl_memdev *cxlmd);
+> +void cxl_release_endpoint(struct cxl_memdev *cxlmd, struct cxl_port *endpoint);
+>  #endif /* __CXL_CXL_H__ */
+
 
