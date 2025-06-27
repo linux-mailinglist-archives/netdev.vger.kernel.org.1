@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-201906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56BE2AEB641
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 13:26:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49648AEB640
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 13:26:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 315E1189CA95
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 11:26:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8E9B640600
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 11:25:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 044582BD022;
-	Fri, 27 Jun 2025 11:25:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E1052BE7D0;
+	Fri, 27 Jun 2025 11:25:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hSfskGQS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PHUvna2L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62FCD29E0EA
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 11:25:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8628B2BCF45
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 11:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751023544; cv=none; b=b+WECHe4bwe2eXO/LSn+mssHzK7mSkucWKy2BCWt3X86C2RGyqjThDKAaXeKBYsavQtYO5dEMwXnUuWHFqhRvOIoITU1Jezi9RtzrQwkty08U1g9MVmrvDwZvF3B6avNMH612cpEdYNJ/28STdDH2Wgv127rffpMC9zFx9DqAGo=
+	t=1751023546; cv=none; b=XX9+Xb53558r8tayWOILPncC8TGFLMD5fpKe8Lnqe+gc4drqOVU4Z260zy8FwSobaANE12k4ZExtIA2s3uBSjwKGxKCPzZ/5MEiBRkpYHwIsnyvFz+atUMI4MflPzcb3wo6zJHwhNALyXJwVU7nVyX8usMt7lz9ussLL8UlgIUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751023544; c=relaxed/simple;
-	bh=C8QrJmEQD6oz+4iAbyjw1kSamPLSOEIQzKkLNRQXS2g=;
+	s=arc-20240116; t=1751023546; c=relaxed/simple;
+	bh=sut+639XlqNF4pEU2RCiJ776KFrsVV2/SkxL6Xbu6Zw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AzgH/2j65Llo4dMxZwHdOw95vH7BGbC1rvPTOcMHXchAXNI/YwUeD+QqnIXUWxbcwi1cmthBT1dHK4+Goby/u9kWCBrkLDt1Wiqfrqy+smCHnvZ7vdDol0jYiQbtdZ6lcQNQ9G+57PLmm7oAagiJm6VdO69KTVxkeVvoetuyMn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hSfskGQS; arc=none smtp.client-ip=209.85.160.201
+	 To:Cc:Content-Type; b=AcCAdxG1MnN+qn421ZRsnnDuUOPJ+3YBPzjL2G2PCzM/Y9JjPjDrW6o2fT8i9QP5MsMtqUHANSmRfk+x9qjJ33a3DLh9kqm7N7U8bmpO5/aTY05OVMCxNgOyDoVpLJnO41J+NhzxA623mOrqM+36zqmJhnGhnHTdwUyVSSYIx4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PHUvna2L; arc=none smtp.client-ip=209.85.160.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4a58f455cdbso25655671cf.3
-        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 04:25:43 -0700 (PDT)
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4a762876813so34788781cf.2
+        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 04:25:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751023542; x=1751628342; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1751023543; x=1751628343; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AJIiWsnELBzrZIXL2kTZ6lw2YM9yf9e2e3alIoXdXtU=;
-        b=hSfskGQSZEUsz9RfKON54V8hMpy29Kx0H8UTTrX8FqGPqPe0ZP35M/M/42DmUCwyi9
-         IDiI9vxQ2c2tTUQwQW8XwsI1oUuiYQ4P4WKuxp3MfukeTG8e8Ji16qHWsNcDukafQ6oi
-         e9QsfoQlJ6TKZpu/WfvuX8f8+tOAJ2wKj9Jk7kNi7+zi+4n/UYWmD0IvdPARAfvUoHs0
-         UbIUN7VPcYtBoIFnXYJRqmlpIqis4cEob36I+BjtFOoWcarMgDhkYd42dQz+MeIVrP58
-         ihT57kA8fxe1FqT2etL30KDo567JnC6DaSg90vZ5F8XwpQRCr5faPePBvCKLBeHyKcwn
-         SxrA==
+        bh=f3PTnr3/d02QKCFg8yPNMJV9H6s/LAwZ7V1qOZVEpLk=;
+        b=PHUvna2LCoN275QJ8Hu2QY/TvX6Ab74njXHoA7zWltY1x1kR8PnxgiF3Nt0mjKBdhb
+         bPPvOgCui7jVDcfnShGvZj2SKmJp9/kiv8UdDwgxK0UsAO5JcOG41vT8dd9etbHZ94/Z
+         n3yLsvQN29+i0TFMrxm8Wjs6RzP5I/QVGILvAO1T0QCbf9WTWyT+Ql3nVxCRzMb+d7sp
+         Hyb5yqiinLCPBvjDVz2tkbCO/R0CLsQejG9lCNwFi9JY/2gnzA5b5yknMF8D7NrbrPPa
+         c/pu9ZrY0u4YFIf6Lgh65oaMZ+UhSSFpCESJqdC3RrxKhN+NWNtlLNtk1rkyp8vSBDY8
+         rTFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751023542; x=1751628342;
+        d=1e100.net; s=20230601; t=1751023543; x=1751628343;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AJIiWsnELBzrZIXL2kTZ6lw2YM9yf9e2e3alIoXdXtU=;
-        b=dJZ6Ep13aEyfG6W05EhmfNtYyjOxeiFmiJcmI1bNmkIVRfs/U8DQEdR+DxbJ1YwDfI
-         EV6ArDF74xagnihTtVph9vM4pVmO7149dBl4agtQGhhFYl2QDmM4oqpajlvaU8FGyVRi
-         7ovZEVkTHdYEMeojPXkszREepOaktVMcNlcHCl6vculhJv6KivxSdf0MheWmGPuqvLSb
-         o8+r9YcjU70zlCNIX/Dluy9aHulFm/7oBMB/wP3LyGG2wuTKKCLUyzvctcfkGVkO1ABq
-         YCtvhalMrzVRntUwZrfKs9wgP+bbYapPrDoVfgOKaGQD3iTd0vjS4qVnYpn/3/E2T+RA
-         HYLw==
-X-Forwarded-Encrypted: i=1; AJvYcCWQ26fycDZkJdhsypakZD+hE73fLC0PJHJbFfJNAtktUFDrOCShRiDSGLdr1Myj5fQt+qu7ywg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyt5WI3Lh1Tp9Q819XheAfXKZ8WnzMdph8RRFeU8UDfsgxlOeeu
-	bIB90vwFXj8z4c+h1K2DNzKKXQ3yRCv/ZDD8JXTNBjb9008mn96wqYUT/GCwQIOXGwQLGMp3uLR
-	8AIXSDphFSSNHXw==
-X-Google-Smtp-Source: AGHT+IEQ3iurlRI7ifX3DaiVd5hkDU6hIfMfW2uX8ECkC0zkCr2ecJpF97hF1atA9YnVLYEstl1Kwvii/os1WA==
-X-Received: from qtbbz22.prod.google.com ([2002:a05:622a:1e96:b0:4a4:eac7:c1a0])
+        bh=f3PTnr3/d02QKCFg8yPNMJV9H6s/LAwZ7V1qOZVEpLk=;
+        b=uN/s3vdF6wTuwPmiuIQ/yOIQd0FTFRTSKZkj0mt5O+18cKmAZZT4ZABHcm94Aygv3D
+         XvEDIYF2Zirp9sW/KdLahdBoMOfkbWnsv9c2HzkaIqmu37WEhN826YoOhrtkAUPWbiyg
+         RmSxsLdvxAUkozKgIN2/TWSofm7mRZyDkerqO6NCiRAncVb4Igx84fF3GCnlA7Rxmrjh
+         GM7sZ/ciwx50OinSfyLRckxejfWel9nnj/sdGVoxfC2MTmtN/CiF7VHlTXKF8kxSeZSn
+         lc+PUlUAfwKEdTlKW7l6L91HyyVTqCHXKRBFoEbQphiLG9yvhEdmQEP/ZZPB6gNoZFCy
+         IOLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXT0jkcDnZVz96ZSPBThMIn6Xav1XSngIQWShhp5w3PxsZLgOGBSdZeMkjnvpoNzJ+CD8JM6SM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4Ds1wx9yQTwavEXu7N0qgo+03wG1E10/aUBu+Q6MdDz8oyLiy
+	jftO6Sujt9k8c4TVZRVX/Vvp5Tvf1Xpq8BDegDqBSSB5Jh6Y5qPAyS/aZGVlEnVLnILZO/qGFri
+	Rg0zDP4NGoC3KdA==
+X-Google-Smtp-Source: AGHT+IE/tyvbK0xMGcAxQG5nK9N3Nkce34Wgtljl13F+2H/F15IGXF2SMe/zcfkIkqAo8gYj5Fh12FM+njofuw==
+X-Received: from qtbcj9.prod.google.com ([2002:a05:622a:2589:b0:47c:de02:b269])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:1808:b0:4a4:3766:3180 with SMTP id d75a77b69052e-4a7fcbe5b6fmr44707371cf.47.1751023542117;
- Fri, 27 Jun 2025 04:25:42 -0700 (PDT)
-Date: Fri, 27 Jun 2025 11:25:19 +0000
+ 2002:ac8:58d6:0:b0:4a1:3b18:598a with SMTP id d75a77b69052e-4a7fc9d42f6mr46155701cf.5.1751023543425;
+ Fri, 27 Jun 2025 04:25:43 -0700 (PDT)
+Date: Fri, 27 Jun 2025 11:25:20 +0000
 In-Reply-To: <20250627112526.3615031-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250627112526.3615031-1-edumazet@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250627112526.3615031-4-edumazet@google.com>
-Subject: [PATCH net-next 03/10] net: dst: annotate data-races around dst->lastuse
+Message-ID: <20250627112526.3615031-5-edumazet@google.com>
+Subject: [PATCH net-next 04/10] net: dst: annotate data-races around dst->input
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -84,63 +84,77 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-(dst_entry)->lastuse is read and written locklessly,
-add corresponding annotations.
+dst_dev_put() can overwrite dst->input while other
+cpus might read this field (for instance from dst_input())
 
+Add READ_ONCE()/WRITE_ONCE() annotations to suppress
+potential issues.
+
+We will likely need full RCU protection later.
+
+Fixes: 4a6ce2b6f2ec ("net: introduce a new function dst_dev_put()")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/dst.h    | 4 ++--
- net/core/rtnetlink.c | 4 +++-
- net/ipv6/route.c     | 3 ++-
- 3 files changed, 7 insertions(+), 4 deletions(-)
+ include/net/dst.h      | 2 +-
+ include/net/lwtunnel.h | 4 ++--
+ net/core/dst.c         | 2 +-
+ net/ipv4/route.c       | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/include/net/dst.h b/include/net/dst.h
-index 1efe1e5d51a904a0fe907687835b8e07f32afaec..bef2f41c7220437b3cb177ea8c85b81b3f89e8f8 100644
+index bef2f41c7220437b3cb177ea8c85b81b3f89e8f8..c0f8b6d8e70746fe09a68037f14d6e5bf1d1c57e 100644
 --- a/include/net/dst.h
 +++ b/include/net/dst.h
-@@ -240,9 +240,9 @@ static inline void dst_hold(struct dst_entry *dst)
- 
- static inline void dst_use_noref(struct dst_entry *dst, unsigned long time)
+@@ -468,7 +468,7 @@ INDIRECT_CALLABLE_DECLARE(int ip_local_deliver(struct sk_buff *));
+ /* Input packet from network to transport.  */
+ static inline int dst_input(struct sk_buff *skb)
  {
--	if (unlikely(time != dst->lastuse)) {
-+	if (unlikely(time != READ_ONCE(dst->lastuse))) {
- 		dst->__use++;
--		dst->lastuse = time;
-+		WRITE_ONCE(dst->lastuse, time);
- 	}
+-	return INDIRECT_CALL_INET(skb_dst(skb)->input,
++	return INDIRECT_CALL_INET(READ_ONCE(skb_dst(skb)->input),
+ 				  ip6_input, ip_local_deliver, skb);
  }
  
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index c57692eb8da9d47c3b0943bf7b8d8b7f7d347836..a9555bfc372f5709a3b846343986dce1edf935be 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -1026,9 +1026,11 @@ int rtnl_put_cacheinfo(struct sk_buff *skb, struct dst_entry *dst, u32 id,
- 		.rta_error = error,
- 		.rta_id =  id,
- 	};
-+	unsigned long delta;
- 
- 	if (dst) {
--		ci.rta_lastuse = jiffies_delta_to_clock_t(jiffies - dst->lastuse);
-+		delta = jiffies - READ_ONCE(dst->lastuse);
-+		ci.rta_lastuse = jiffies_delta_to_clock_t(delta);
- 		ci.rta_used = dst->__use;
- 		ci.rta_clntref = rcuref_read(&dst->__rcuref);
+diff --git a/include/net/lwtunnel.h b/include/net/lwtunnel.h
+index c306ebe379a0b37ecc5ce54c864824c91aaea273..eaac07d505959e263e479e0fe288424371945f5d 100644
+--- a/include/net/lwtunnel.h
++++ b/include/net/lwtunnel.h
+@@ -142,8 +142,8 @@ static inline void lwtunnel_set_redirect(struct dst_entry *dst)
+ 		dst->output = lwtunnel_output;
  	}
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index 1014dcea1200cb4d4fc63f7b335fd2663c4844a3..375112a59492ea3654d180c504946d96ed1592cd 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -2133,7 +2133,8 @@ static void rt6_age_examine_exception(struct rt6_exception_bucket *bucket,
- 	 * expired, independently from their aging, as per RFC 8201 section 4
- 	 */
- 	if (!(rt->rt6i_flags & RTF_EXPIRES)) {
--		if (time_after_eq(now, rt->dst.lastuse + gc_args->timeout)) {
-+		if (time_after_eq(now, READ_ONCE(rt->dst.lastuse) +
-+				       gc_args->timeout)) {
- 			pr_debug("aging clone %p\n", rt);
- 			rt6_remove_exception(bucket, rt6_ex);
- 			return;
+ 	if (lwtunnel_input_redirect(dst->lwtstate)) {
+-		dst->lwtstate->orig_input = dst->input;
+-		dst->input = lwtunnel_input;
++		dst->lwtstate->orig_input = READ_ONCE(dst->input);
++		WRITE_ONCE(dst->input, lwtunnel_input);
+ 	}
+ }
+ #else
+diff --git a/net/core/dst.c b/net/core/dst.c
+index 8f2a3138d60c7e94f24ab8bc9063d470a825eeb5..13c629dc7123da1eaeb07e4546ae6c3f38265af1 100644
+--- a/net/core/dst.c
++++ b/net/core/dst.c
+@@ -148,7 +148,7 @@ void dst_dev_put(struct dst_entry *dst)
+ 	WRITE_ONCE(dst->obsolete, DST_OBSOLETE_DEAD);
+ 	if (dst->ops->ifdown)
+ 		dst->ops->ifdown(dst, dev);
+-	dst->input = dst_discard;
++	WRITE_ONCE(dst->input, dst_discard);
+ 	dst->output = dst_discard_out;
+ 	dst->dev = blackhole_netdev;
+ 	netdev_ref_replace(dev, blackhole_netdev, &dst->dev_tracker,
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index d7a534a5f1ff8bdaa81a14096f70ef3a83a1ab05..75a1f9eabd6b6350b1ebc9d7dc8166b3d9364a03 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -1687,7 +1687,7 @@ struct rtable *rt_dst_clone(struct net_device *dev, struct rtable *rt)
+ 		else if (rt->rt_gw_family == AF_INET6)
+ 			new_rt->rt_gw6 = rt->rt_gw6;
+ 
+-		new_rt->dst.input = rt->dst.input;
++		new_rt->dst.input = READ_ONCE(rt->dst.input);
+ 		new_rt->dst.output = rt->dst.output;
+ 		new_rt->dst.error = rt->dst.error;
+ 		new_rt->dst.lastuse = jiffies;
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
