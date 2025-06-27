@@ -1,84 +1,103 @@
-Return-Path: <netdev+bounces-202020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1374AEC05C
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 21:48:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 519EFAEC07B
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 21:57:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 916821C25996
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 19:48:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7753A4A6718
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 19:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E648F212D97;
-	Fri, 27 Jun 2025 19:48:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E222EA491;
+	Fri, 27 Jun 2025 19:57:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a2MSRAk2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u0KlnfpA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09331ACED5;
-	Fri, 27 Jun 2025 19:48:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 873A32E92DE;
+	Fri, 27 Jun 2025 19:57:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751053710; cv=none; b=R6bifqOuIvIAGgcL+dZzaI+i/AxBnfCiVo+e2LgkRzYSu50evHE42UfcO+CV9LiY4jpq0Pg1g5Y8PfjcySontQagB6b6n4j8nH3S8Bp99HKLQnjVHo5B9eIRzD3mhjqn10nIsrQ8CpL45m+HN5L2cNITPso+yhcqIU0xSgAkuC8=
+	t=1751054228; cv=none; b=gBrN3QfzVS21qb2kJI9iig2mJXEoyIO3c1cnnrnKp4OZloFtI8La0v9EFTaeKvw6xTcLyl8sTeMeyELjkGgOUPoHjPxaq6aeI/f/n2B63fgbyzOtE7TCQ8/nvBEXd5xHatM/2Qxba76qTB2O4PL9tfH4LVlDjtG9FhTsL1inwTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751053710; c=relaxed/simple;
-	bh=LqxgY1mZIOyQXZp8pJT83YnznvBj9dT37g+kAnvOH2Y=;
+	s=arc-20240116; t=1751054228; c=relaxed/simple;
+	bh=52RIw6noQLlbTckB9hEH3eigLjcCeFsGu7yQ+rD9Iyo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=omfIKwzY7cnnWSLdDAI6kgCpd35ShEuQlwyY0IuJXUtsli7QgPGrOeYLSQS7cvWpAWqflHItPad4yWP8a5V7HW0Rfy09bzC8YluQbg5KAbNvbbKb+Mm0FF4UZqdWddMOxrehEQIDX8erD2HK7qXSVpxcgUCI4IsP1J2sUvL9a58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a2MSRAk2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA975C4CEE3;
-	Fri, 27 Jun 2025 19:48:28 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=HMvB766ULB2HUpiVmmBfiLWbAnylLPyUbqe+VJIKIrT058h20XObfaXyCK0oK1+B/0SE+rzjaeeaJQNcBhVW7r8BtFt/u76ljqvTh663wg9DuBIjhoo+A6blBok2DqmMIjnlyu8K19x7e0s9ozUB1BfGRyDSgGiDDII6TBOn0u0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u0KlnfpA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E505CC4CEEB;
+	Fri, 27 Jun 2025 19:57:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751053710;
-	bh=LqxgY1mZIOyQXZp8pJT83YnznvBj9dT37g+kAnvOH2Y=;
+	s=k20201202; t=1751054228;
+	bh=52RIw6noQLlbTckB9hEH3eigLjcCeFsGu7yQ+rD9Iyo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=a2MSRAk2IcVTsCnDhGAFyfDQKDnd3C4dmUmUza3SL1uX46RiTO4azxWetRwFK5gSU
-	 1JyBpeAK77sviKI9fA10V9sv5NtiGM7dRKI++ljKFJ8rMx9QALzsYfUagjkNz+4Okx
-	 OklfQ1sZVXgIUSiVbsmZ6PQhC6D0R5IX8TUbvAXVUXQXIzu1kAs4rM/Gyb9Mt/VkMn
-	 7KIQgMGph16gwdFgYn3vxmnnFtWdFQcKfFOvAPMhRDlDzxSTY1KUnrMq1bdyYmgo86
-	 SFgSBHMTNOraEHg0KuOpHBceHDGz0gHm04259XWnFaPmBOMAY6QnaGlBH8k1kwwxbg
-	 R0akjyGQ9T8/w==
-Date: Fri, 27 Jun 2025 20:48:26 +0100
-From: Simon Horman <horms@kernel.org>
-To: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	b=u0KlnfpAmh157gMJwfnjdUKE6NE6pF+FX2VU4RCzk7grvCcKcW7sOII36K6qGPo/S
+	 GeMy+sFZszKY/DVgSQpXObGGzjpztEnWYP+pMGeFXPCRXZ1nQXCsvAcul1XFIh7dQ0
+	 T+MLpNPAQlcx51BMue+yS+CYIU5Y0NnGvDqNa/ttGTAShxID8BubGW/6+bj8nSg+5c
+	 U0Zn/0H6CGzejK3rgLShmwo5B0Pt20va+HEJTHBR2kg2L6NfuGxMmll60V624BUhcP
+	 uCZsy10dFPpBOzOCfBaDHP5V4h7d1gbNme0EKbwP8OAraSsFjlQ8TM1X7Zwq5TmaKs
+	 qdwLeSwEr9Y4g==
+Date: Fri, 27 Jun 2025 14:57:07 -0500
+From: Rob Herring <robh@kernel.org>
+To: Kyle Hendry <kylehendrydev@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-parisc@vger.kernel.org
-Subject: Re: [PATCH] net: tulip: Rename PCI driver struct to end in _driver
-Message-ID: <20250627194826.GF1776@horms.kernel.org>
-References: <20250627102220.1937649-2-u.kleine-koenig@baylibre.com>
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, noltari@gmail.com,
+	jonas.gorski@gmail.com, Florian Fainelli <f.fainelli@gmail.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH net-next 3/6] dt-bindings: net: dsa: b53: Document
+ brcm,gpio-ctrl property
+Message-ID: <20250627195707.GA4075889-robh@kernel.org>
+References: <20250620134132.5195-1-kylehendrydev@gmail.com>
+ <20250620134132.5195-4-kylehendrydev@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250627102220.1937649-2-u.kleine-koenig@baylibre.com>
+In-Reply-To: <20250620134132.5195-4-kylehendrydev@gmail.com>
 
-On Fri, Jun 27, 2025 at 12:22:20PM +0200, Uwe Kleine-König wrote:
-> This is not only a cosmetic change because the section mismatch checks
-> also depend on the name and for drivers the checks are stricter than for
-> ops.
+On Fri, Jun 20, 2025 at 06:41:18AM -0700, Kyle Hendry wrote:
+> Add description for bcm63xx gpio-ctrl phandle
 > 
-> However xircom_driver also passes the stricter checks just fine, so no
-> further changes needed.
+> Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
+> ---
+>  Documentation/devicetree/bindings/net/dsa/brcm,b53.yaml | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
+> diff --git a/Documentation/devicetree/bindings/net/dsa/brcm,b53.yaml b/Documentation/devicetree/bindings/net/dsa/brcm,b53.yaml
+> index d6c957a33b48..c40ebd1ddffb 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/brcm,b53.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/brcm,b53.yaml
+> @@ -66,6 +66,11 @@ properties:
+>                - brcm,bcm63268-switch
+>            - const: brcm,bcm63xx-switch
+>  
+> +  brcm,gpio-ctrl:
+> +    description:
+> +      A phandle to the syscon node of the bcm63xx gpio controller
+> +    $ref: /schemas/types.yaml#/definitions/phandle
 
-As per my comment on a similar patch for a different driver:
+GPIO? Why aren't you using the GPIO binding?
 
-From a Networking subsystem point of view
-this feels more like an enhancement than a bug fix.
-Can we drop the Fixes tag?
-
-...
+> +
+>  required:
+>    - compatible
+>    - reg
+> -- 
+> 2.43.0
+> 
 
