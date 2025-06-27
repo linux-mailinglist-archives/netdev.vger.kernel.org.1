@@ -1,113 +1,110 @@
-Return-Path: <netdev+bounces-201736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D200AEAD34
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 05:11:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC0C7AEADA3
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 05:58:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D122B4E23D1
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 03:11:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BC1D5632E4
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 03:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82185192B96;
-	Fri, 27 Jun 2025 03:11:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="K/bJIxMO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39B941A841F;
+	Fri, 27 Jun 2025 03:58:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0E423DE
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 03:11:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+Received: from smtp233.sjtu.edu.cn (smtp233.sjtu.edu.cn [202.120.2.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3473E19F420;
+	Fri, 27 Jun 2025 03:58:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.120.2.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750993897; cv=none; b=p8duu+4h7YDlIV8h0D4DGnfTrBz2nuQLqkuGXAjaLhmK6xddBKcIFCZjah5QCb3q+fm8irgcRAbLk8/gDjbi8jcUpBEMSzmHXCFKHtA0lveKmnEKHX6PthFEEY5MzfsvcCA6GCpPOfMWS/aVnj/Ia44c9i3L+YYmeOmUBcKw4Ek=
+	t=1750996715; cv=none; b=Mkysr/raNNRrA1+sh7ONOaN2eypg9DyuHej5Fe81GpuGFk/G3s+4nPANOIKjt+j0QqME1cZa70uByJLa7OqOg/DSiSXw2m6EbLYyqHOXxUQ1gwQW73ioetNaPag/h7TymN6n+QBRS8XL90pneuKRUPkxIvNmBs33hFE14xrsXbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750993897; c=relaxed/simple;
-	bh=nlcPshRdbToTPxImylc0Vmo/MTHnwfaG8pY4OWRlsic=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=pS7KxEfyiKfK+jNIWxasiEPZvExBwa47ddB8b39NLd2YUbDsZ6B+SWkBy05KB0ToQgiAX/NkfJxlboxbcfVoZYomlgdA9pXDCm1vjVe54RgnWGzTlVA7ohOUzIBut7dCw+eeglCXylOC2JtzdvKJbiLFlOK+mNZT2SpysmH1mnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=K/bJIxMO; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Content-Type:Mime-Version:Subject:From:Date:
-	Message-Id:To; bh=ZsnFS/v+FPgoY3ZK/ydQfXMRZIbNVbcRWC7h/xHkL4c=;
-	b=K/bJIxMOzkvc7X9CbK4sCe14VAXU/gTpk9enfaL/hWQ1jcB1MxHDkeTUEBo3QF
-	oRwXRcnFrWevsebEpnTCymw36mMJ7ZnZsOfPTYpIlkgWcLcEoOoTKapGp1CTjxQN
-	tow7o5fc7p1ECJPtSqL9GYmNamuyoGGqorOu/jvlRDMI4=
-Received: from smtpclient.apple (unknown [])
-	by gzsmtp1 (Coremail) with SMTP id PCgvCgA39BSeC15o43VVAQ--.40850S3;
-	Fri, 27 Jun 2025 11:10:23 +0800 (CST)
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1750996715; c=relaxed/simple;
+	bh=KWYG+KDmZ23DgBo9d2D5szE4ZJeBNWiYsvY7c/LCezw=;
+	h=Date:From:To:Cc:Message-ID:Subject:MIME-Version:Content-Type; b=Ks0TAyNQ1bcWQWeUOjRspvkzHnptVwK6i5IBiRRTU1UJEbCymkbEBW6MIYqDQNZJkJimZVOaytM20O1ScFbm4AIyBYw8FNezG8PdU38sCZZnzP04G8aVkCpLg+X8oKTxSznCK/RgzEsqbFmUxuETfeyGKxbus9jRic629ilsU6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn; spf=pass smtp.mailfrom=sjtu.edu.cn; arc=none smtp.client-ip=202.120.2.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sjtu.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sjtu.edu.cn
+Received: from mta90.sjtu.edu.cn (unknown [10.118.0.90])
+	by smtp233.sjtu.edu.cn (Postfix) with ESMTPS id 1D16D1009E7B2;
+	Fri, 27 Jun 2025 11:52:28 +0800 (CST)
+Received: from mstore132.sjtu.edu.cn (unknown [10.118.0.132])
+	by mta90.sjtu.edu.cn (Postfix) with ESMTP id B834237D65C;
+	Fri, 27 Jun 2025 11:52:27 +0800 (CST)
+Date: Fri, 27 Jun 2025 11:52:27 +0800 (CST)
+From: =?gb2312?B?s8LA1g==?= <tom2cat@sjtu.edu.cn>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-ID: <1444123482.1827743.1750996347470.JavaMail.zimbra@sjtu.edu.cn>
+Subject: [BUG][BPF] Kernel Bug Triggered when Ebpf Verifier Check Fails
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
-Subject: Re: net: openvswitch: incorrect usage in ovs_meters_exit?
-From: lihuawei <lihuawei_zzu@163.com>
-In-Reply-To: <08200104-eda5-47f5-9538-b0be2b7fe1fc@ovn.org>
-Date: Fri, 27 Jun 2025 11:10:12 +0800
-Cc: davem@davemloft.net,
- netdev@vger.kernel.org,
- edumazet@google.com,
- pabeni@redhat.com,
- kuba@kernel.org,
- xiangxia.m.yue@gmail.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <71FB508D-5829-4237-9D8D-727235934971@163.com>
-References: <6B26C96C-1941-4AFF-AEAC-6C7E36CDFF02@163.com>
- <08200104-eda5-47f5-9538-b0be2b7fe1fc@ovn.org>
-To: Ilya Maximets <i.maximets@ovn.org>
-X-Mailer: Apple Mail (2.3826.600.51.1.1)
-X-CM-TRANSID:PCgvCgA39BSeC15o43VVAQ--.40850S3
-X-Coremail-Antispam: 1Uf129KBjvJXoW7tw45ZF17WFy5XF47Gw4UJwb_yoW8GF1fpr
-	ZYga47Krn7ArW7KrnF9w4xZryYvw4fGFy3ur1DC398Cwsxt34xWFW2yrn8GFWYkrWkJr4j
-	93y8twnxua1DtaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UvkskUUUUU=
-X-CM-SenderInfo: 5olk3tpzhls6l2x6il2tof0z/xtbBgBZ5vGheCxwPyQAAs0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=GB2312
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 10.0.14_GA_4767 (ZimbraWebClient - GC137 (Win)/10.0.15_GA_4781)
+Thread-Index: +aKzrn/MfADNs/QCqWSK6DYv606TCw==
+Thread-Topic: Kernel Bug Triggered when Ebpf Verifier Check Fails
 
-Okay=EF=BC=8CI got it, thank you Ilya Maximets.
+Hi BPF maintainers,
 
-> 2025=E5=B9=B46=E6=9C=8827=E6=97=A5 01:16=EF=BC=8CIlya Maximets =
-<i.maximets@ovn.org> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> On 6/26/25 2:59 PM, lihuawei wrote:
->> hi, guys,
->>=20
->> 	Recently, I am working on ovs meter.c, after reading the code, I =
-have two questions about the ovs_meters_exit function as bellow :
->>=20
->> void ovs_meters_exit(struct datapath *dp)
->> {
->> 	struct dp_meter_table *tbl =3D &dp->meter_tbl;
->> 	struct dp_meter_instance *ti =3D rcu_dereference_raw(tbl->ti);
->> 	int i;
->>=20
->> 	for (i =3D 0; i < ti->n_meters; i++)
->> 		ovs_meter_free(rcu_dereference_raw(ti->dp_meters[i]));
->>=20
->> 	dp_meter_instance_free(ti);
->> }
->>=20
->>    1. why use rcu_dereference_raw here and not rcu_dereference_ovsl?
->>    2. why use dp_meter_instance_free here and not =
-dp_meter_instance_free_rcu?
->=20
-> Hi.  AFAICT, the ovs_meters_exit() is called only from two places:
->=20
-> 1. As a cleanup for the datapath that we failed to fully allocate.
-> 2. =46rom the RCU-postponed destroy_dp_rcu() when the datapath is
->   being destroyed.
->=20
-> In both cases there should be no users of this datapath at the time
-> this function is called, so it doesn't make a lot of sense to hold
-> the lock or postpone the destruction of these internal fields again.
-> Half of the datapath structure is already freed here.  So, unless
-> I'm missing something, we can just free the meters directly as well.
->=20
-> Best regards, Ilya Maximets.
+I'm reporting a bug I encountered in the BPF subsystem on Linux kernel version <<5.19.5>>, <<6.15.0-rc2-00577-g8066e388be48-dirty>>,  <<6.15.3>>.
 
+I wrote a BPF program that triggered a verifier rejection, but at the same time, the kernel emitted a BUG() warning at <<kernel/bpf/hashtab.c:222>>, suggesting a potential kernel-side issue rather than just verifier rejection. Later on, I discovered that constructing any ebpf Verifier rejection behavior within the specified code snippets would trigger this kernel bug.
+
+- Miniest poc code:
+
+#include "vmlinux.h"
+#include <bpf/bpf_helpers.h>
+
+struct mac_table_entry
+{
+    struct bpf_timer expiration_timer;
+    __u32 ifindex;
+    __u64 last_seen_timestamp_ns;
+    struct in_addr border_ip;
+};
+
+struct
+{
+    __uint(type, BPF_MAP_TYPE_HASH);
+    __type(key, struct mac_address);
+    __type(value, struct mac_table_entry);
+    __uint(max_entries, 4 * 1024 * 1024);
+    __uint(pinning, LIBBPF_PIN_BY_NAME);
+} mac_table SEC(".maps");
+
+SEC("xdp.frags")
+long mac_xdp_func(struct xdp_md *ctx)
+{
+    // Constructing any code segment that does not meet the requirements of BPF Validator
+    // can trigger a kernel BUG: sleeping function called from invalid context at kernel/bpf/hashtab.c:222:
+    while(1){
+        __u32 j;
+    }
+    return XDP_PASS;
+}
+
+char LICENSE[] SEC("license") = "Dual BSD/GPL";
+
+- Kernel version: <<6.15.3...>>
+- Architecture: <<x86_64>>
+- dmesg excerpt: <<BUG: sleeping function called from invalid context at kernel/bpf/hashtab.c:222>>
+
+Detailed info including reproducible BPF program and kernel logs have been filed on Bugzilla:
+
+  https://bugzilla.kernel.org/show_bug.cgi?id=220278
+
+
+Please let me know if you need more information or if I can help test a patch.
+
+Thanks,  
+Le Chen;  
+tom2cat@sjtu.edu.cn; 
 
