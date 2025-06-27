@@ -1,211 +1,271 @@
-Return-Path: <netdev+bounces-201913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 163CBAEB64F
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 13:27:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21986AEB652
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 13:27:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 671F8189AC4B
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 11:27:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4C067B2C41
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 11:25:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E712D3EC9;
-	Fri, 27 Jun 2025 11:25:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I8eKWMTR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C6B729DB6C;
+	Fri, 27 Jun 2025 11:26:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f73.google.com (mail-ua1-f73.google.com [209.85.222.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E70629DB6E
-	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 11:25:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08BD2BD5B7
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 11:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751023554; cv=none; b=cCJQDtWPr79J53MLY05MNkdR/q3+LjVxq2AegemHMY88s/oNPGvobsub88AvdGUogBceDhLhIcfRgsD/BVYjfc3v4Ku/jR3U+nBcbHh5eUDYTriPrLIHfz0EmUi62LRDUb8hux2HwjjF8UE7vgJ6aBrjwDEVHoQWc7TkpPNdba8=
+	t=1751023572; cv=none; b=MvlBpNk0nkhPVY3/lDmuKWLBqH3PnTRdrIbOplyrvfvtKbdwTuVjmF9+lowOVP7Q1YTl6wZVpdoPuFv+eD1lprqloCK9b1dyI1Dx/EFcRKgVu9bZIss1lIUPQazfNizktyfk/SUnojPzT/svJpA+M+cBWtRoCU0Aig6GxjTgij4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751023554; c=relaxed/simple;
-	bh=FfyRr5l2XHMZb+3zOxqOEXKQqbrEmecdLjDefY4zaCg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ceja7N2ypE8qaKpBHYPeL7gQD1orWwEJz/v58L8jdXulgJkrj4xq5q5k/YkmJJ9+8/HiGL4zpgbolJkcG8NjuvwBlk1FoVK0sbApmAGkhFeY8aAdBr7V29xdkkFY/5LtAuPAOQkYrdeosUyJ08BU3z62X17XMgffzH6nyEu84MQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I8eKWMTR; arc=none smtp.client-ip=209.85.222.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-ua1-f73.google.com with SMTP id a1e0cc1a2514c-87ee00189c5so1922832241.1
-        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 04:25:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751023552; x=1751628352; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ojwz7dNYSjnOL7959/o/HrsXgWZ7ZlI3RJQPgBwNOM0=;
-        b=I8eKWMTRCr8Dzd7cqas86SRQ6QId3waSoKlhryOO5qfGGD0g6otG9C6Z5hsvSekbon
-         ELrTi9xz5dHGnR0WzU0gyJnAwqaqjMdFcTAc48y7CdsuQ4TjpSoTzw2rARgyVAEQ427P
-         TeE6kpNoH9GafI8m3TQUpAkLfrpE6ZO/gPJSOyDixBsdXRhTw3dGRLjT60wyMzvgHQ6J
-         MZfgt4ANaRtQEpnFd0Zrn9KhwXdphEs7X/SU/kqKiqr8fKOoES5dGWf/wmmFV4R9SerH
-         D3neoVUOT0XCCTJzFTipam44a2bp5s0CQQg8wnGxNsQinZVAmjd6QQoE0rBE1tCxHWc5
-         oiWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751023552; x=1751628352;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ojwz7dNYSjnOL7959/o/HrsXgWZ7ZlI3RJQPgBwNOM0=;
-        b=UgfPXqXAA4gSipAD7WKLGIXuK8QJ9nEt54e6kxrm19+NFU4mFWQu3dQyQUvuRoWrpt
-         fMjF2p+D2FX1VxlaB4Z1uHBAyudJz9mIiBnsxJ8ldIzPCWVqrzPkwbQDWmvtkZxjGOXn
-         HgEU2vazFRQACDQQ0trf/QOGjb8LtWEzuUuJvBIdZ1I5QERBtyQItBpamZ+QY0rsNTMe
-         1mHeVTNo/zK7znslhq0ogVae+2qmkPF9Pqe3uhVsck8nByWNiJCKAEHQiBbML7gFykyG
-         IbmhHWaWoYtUwGZs3SEh2z/wPBwa00q7dbXCr6wMHYtpsOOSE6ERlqCIG+s3SdtiMjKL
-         D7jA==
-X-Forwarded-Encrypted: i=1; AJvYcCUXY8pS4VzQMWo7aUrZAYUUsHpne8Eq9cMnMA1RLFua8sEesBAWD9hrBKFls1deoSUGGvEJnCY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzR6pLz+dC8Tn3nW326R0OQS4X8bPYR2NCCWxlb4Dbmb3lm5WJE
-	368tiAGWK5qITFjoFnSginY9SnHMXQCRL5l501Ot8fKizTkJzYoeb+BAbI1HB4ivZ/GcrXUjWdC
-	T0VLgYVcDm+coAA==
-X-Google-Smtp-Source: AGHT+IFGCBa2lrR/swuRfbO56GHFGLRkTCRBKMeBdYQX6yER0l8+aEXRe56Dli1JTcYHqzfvr20yxenJQcvjnA==
-X-Received: from vsbkb21.prod.google.com ([2002:a05:6102:8095:b0:4e7:e350:addb])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6102:4a97:b0:4e2:e5ec:fa09 with SMTP id ada2fe7eead31-4ee508a9943mr1797646137.6.1751023552260;
- Fri, 27 Jun 2025 04:25:52 -0700 (PDT)
-Date: Fri, 27 Jun 2025 11:25:26 +0000
-In-Reply-To: <20250627112526.3615031-1-edumazet@google.com>
+	s=arc-20240116; t=1751023572; c=relaxed/simple;
+	bh=/5sKzhy0U7mWcXv6ol6//8b1xu6weKJCNg0GsKTp2ac=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=R7FciWtz059/2A/z/518siuB6ri3pp7OtSWt6cVKPXzyGiFV8SbPc+Fs3S61aorJFULJlKb9jH1D/2E2VU85gqf3nKswX8hi3KpwwiFyjL5bwukqbo4F6JOhTPFEKOwdR9cyHgZIjCLScGOL10Bk0tz+ag98lRX4ZCCIY3b3Wl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uV7DC-0007OW-HD; Fri, 27 Jun 2025 13:25:42 +0200
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uV7DA-005bYo-34;
+	Fri, 27 Jun 2025 13:25:40 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1uV7DA-003kun-2p;
+	Fri, 27 Jun 2025 13:25:40 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v3 1/1] phy: micrel: add Signal Quality Indicator (SQI) support for KSZ9477 switch PHYs
+Date: Fri, 27 Jun 2025 13:25:39 +0200
+Message-Id: <20250627112539.895255-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250627112526.3615031-1-edumazet@google.com>
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250627112526.3615031-11-edumazet@google.com>
-Subject: [PATCH net-next 10/10] ipv6: ip6_mc_input() and ip6_mr_input() cleanups
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Both functions are always called under RCU.
+Add support for the Signal Quality Indicator (SQI) feature on KSZ9477
+family switches, providing a relative measure of receive signal quality.
 
-We remove the extra rcu_read_lock()/rcu_read_unlock().
+The hardware exposes separate SQI readings per channel. For 1000BASE-T,
+all four channels are read. For 100BASE-TX, only one channel is reported,
+but which receive pair is active depends on Auto MDI-X negotiation, which
+is not exposed by the hardware. Therefore, it is not possible to reliably
+map the measured channel to a specific wire pair.
 
-We use skb_dst_dev_net_rcu() instead of skb_dst_dev_net().
+This resolves an earlier discussion about how to handle multi-channel
+SQI. Originally, the plan was to expose all channels individually.
+However, since pair mapping is sometimes unavailable, this
+implementation treats SQI as a per-link metric instead. This fallback
+avoids ambiguity and ensures consistent behavior. The existing get_sqi()
+UAPI was designed for single-pair Ethernet (SPE), where per-pair and
+per-link are effectively equivalent. Restricting its use to per-link
+metrics does not introduce regressions for existing users.
 
-We use dev_net_rcu() instead of dev_net().
+The raw 7-bit SQI value (0–127, lower is better) is converted to the
+standard 0–7 (high is better) scale. Empirical testing showed that the
+link becomes unstable around a raw value of 8.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+The SQI raw value remains zero if no data is received, even if noise is
+present. This confirms that the measurement reflects the "quality" during
+active data reception rather than the passive line state. User space
+must ensure that traffic is present on the link to obtain valid SQI
+readings.
+
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
- net/ipv6/ip6_input.c | 29 +++++++++++------------------
- net/ipv6/ip6mr.c     |  9 ++++-----
- 2 files changed, 15 insertions(+), 23 deletions(-)
+changes v3:
+- Update commit message
+- drop usleep
+- bring back multi channel support
+changes v2:
+- Reword commit message
+- Fix SQI value inversion
+- Implement an empirically-derived, non-linear mapping to the standard
+  0-7 SQI scale
+---
+ drivers/net/phy/micrel.c | 132 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 132 insertions(+)
 
-diff --git a/net/ipv6/ip6_input.c b/net/ipv6/ip6_input.c
-index 16953bd0096047f9b5fbb8e66bf9cc591e6693aa..0b3b81fd4a58ad62a83b807f38fd51ff24d47117 100644
---- a/net/ipv6/ip6_input.c
-+++ b/net/ipv6/ip6_input.c
-@@ -501,38 +501,32 @@ EXPORT_SYMBOL_GPL(ip6_input);
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index d0429dc8f561..74fd6ff32c6c 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -2173,6 +2173,136 @@ static void kszphy_get_phy_stats(struct phy_device *phydev,
+ 	stats->rx_errors = priv->phy_stats.rx_err_pkt_cnt;
+ }
  
- int ip6_mc_input(struct sk_buff *skb)
++/* Base register for Signal Quality Indicator (SQI) - Channel A
++ *
++ * MMD Address: MDIO_MMD_PMAPMD (0x01)
++ * Register:    0xAC (Channel A)
++ * Each channel (pair) has its own register:
++ *   Channel A: 0xAC
++ *   Channel B: 0xAD
++ *   Channel C: 0xAE
++ *   Channel D: 0xAF
++ */
++#define KSZ9477_MMD_SIGNAL_QUALITY_CHAN_A	0xac
++
++/* SQI field mask for bits [14:8]
++ *
++ * SQI indicates relative quality of the signal.
++ * A lower value indicates better signal quality.
++ */
++#define KSZ9477_MMD_SQI_MASK			GENMASK(14, 8)
++
++#define KSZ9477_MAX_CHANNELS			4
++#define KSZ9477_SQI_MAX				7
++
++/* Number of SQI samples to average for a stable result.
++ *
++ * Reference: KSZ9477S Datasheet DS00002392C, Section 4.1.11 (page 26)
++ * For noisy environments, a minimum of 30–50 readings is recommended.
++ */
++#define KSZ9477_SQI_SAMPLE_COUNT		40
++
++/* The hardware SQI register provides a raw value from 0-127, where a lower
++ * value indicates better signal quality. However, empirical testing has
++ * shown that only the 0-7 range is relevant for a functional link. A raw
++ * value of 8 or higher was measured directly before link drop. This aligns
++ * with the OPEN Alliance recommendation that SQI=0 should represent the
++ * pre-failure state.
++ *
++ * This table provides a non-linear mapping from the useful raw hardware
++ * values (0-7) to the standard 0-7 SQI scale, where higher is better.
++ */
++static const u8 ksz_sqi_mapping[] = {
++	7, /* raw 0 -> SQI 7 */
++	7, /* raw 1 -> SQI 7 */
++	6, /* raw 2 -> SQI 6 */
++	5, /* raw 3 -> SQI 5 */
++	4, /* raw 4 -> SQI 4 */
++	3, /* raw 5 -> SQI 3 */
++	2, /* raw 6 -> SQI 2 */
++	1, /* raw 7 -> SQI 1 */
++};
++
++/**
++ * kszphy_get_sqi - Read, average, and map Signal Quality Index (SQI)
++ * @phydev: the PHY device
++ *
++ * This function reads and processes the raw Signal Quality Index from the
++ * PHY. Based on empirical testing, a raw value of 8 or higher indicates a
++ * pre-failure state and is mapped to SQI 0. Raw values from 0-7 are
++ * mapped to the standard 0-7 SQI scale via a lookup table.
++ *
++ * Return: SQI value (0–7), or a negative errno on failure.
++ */
++static int kszphy_get_sqi(struct phy_device *phydev)
++{
++	int sum[KSZ9477_MAX_CHANNELS] = { 0 };
++	int worst_sqi = KSZ9477_SQI_MAX;
++	int i, val, raw_sqi, ch;
++	u8 channels;
++
++	/* Determine applicable channels based on link speed */
++	if (phydev->speed == SPEED_1000)
++		channels = 4;
++	else if (phydev->speed == SPEED_100)
++		channels = 1;
++	else
++		return -EOPNOTSUPP;
++
++	/* Sample and accumulate SQI readings for each pair (currently only one).
++	 *
++	 * Reference: KSZ9477S Datasheet DS00002392C, Section 4.1.11 (page 26)
++	 * - The SQI register is updated every 2 µs.
++	 * - Values may fluctuate significantly, even in low-noise environments.
++	 * - For reliable estimation, average a minimum of 30–50 samples
++	 *   (recommended for noisy environments)
++	 * - In noisy environments, individual readings are highly unreliable.
++	 *
++	 * We use 40 samples per pair with a delay of 3 µs between each
++	 * read to ensure new values are captured (2 µs update interval).
++	 */
++	for (i = 0; i < KSZ9477_SQI_SAMPLE_COUNT; i++) {
++		for (ch = 0; ch < channels; ch++) {
++			val = phy_read_mmd(phydev, MDIO_MMD_PMAPMD,
++					   KSZ9477_MMD_SIGNAL_QUALITY_CHAN_A + ch);
++			if (val < 0)
++				return val;
++
++			raw_sqi = FIELD_GET(KSZ9477_MMD_SQI_MASK, val);
++			sum[ch] += raw_sqi;
++
++			/* We communicate with the PHY via MDIO via SPI or
++			 * I2C, which is relatively slow. At least slower than
++			 * the update interval of the SQI register.
++			 * So, we can skip the delay between reads.
++			 */
++		}
++	}
++
++	/* Calculate average for each channel and find the worst SQI */
++	for (ch = 0; ch < channels; ch++) {
++		int avg_raw_sqi = sum[ch] / KSZ9477_SQI_SAMPLE_COUNT;
++		int mapped_sqi;
++
++		/* Handle the pre-fail/failed state first. */
++		if (avg_raw_sqi >= ARRAY_SIZE(ksz_sqi_mapping))
++			mapped_sqi = 0;
++		else
++			/* Use the lookup table for the good signal range. */
++			mapped_sqi = ksz_sqi_mapping[avg_raw_sqi];
++
++		if (mapped_sqi < worst_sqi)
++			worst_sqi = mapped_sqi;
++	}
++
++	return worst_sqi;
++}
++
++static int kszphy_get_sqi_max(struct phy_device *phydev)
++{
++	return KSZ9477_SQI_MAX;
++}
++
+ static void kszphy_enable_clk(struct phy_device *phydev)
  {
-+	struct net_device *dev = skb->dev;
- 	int sdif = inet6_sdif(skb);
- 	const struct ipv6hdr *hdr;
--	struct net_device *dev;
- 	bool deliver;
+ 	struct kszphy_priv *priv = phydev->priv;
+@@ -5801,6 +5931,8 @@ static struct phy_driver ksphy_driver[] = {
+ 	.update_stats	= kszphy_update_stats,
+ 	.cable_test_start	= ksz9x31_cable_test_start,
+ 	.cable_test_get_status	= ksz9x31_cable_test_get_status,
++	.get_sqi	= kszphy_get_sqi,
++	.get_sqi_max	= kszphy_get_sqi_max,
+ } };
  
--	__IP6_UPD_PO_STATS(skb_dst_dev_net(skb),
--			 __in6_dev_get_safely(skb->dev), IPSTATS_MIB_INMCAST,
--			 skb->len);
-+	__IP6_UPD_PO_STATS(skb_dst_dev_net_rcu(skb),
-+			   __in6_dev_get_safely(dev), IPSTATS_MIB_INMCAST,
-+			   skb->len);
- 
- 	/* skb->dev passed may be master dev for vrfs. */
- 	if (sdif) {
--		rcu_read_lock();
--		dev = dev_get_by_index_rcu(dev_net(skb->dev), sdif);
-+		dev = dev_get_by_index_rcu(dev_net_rcu(dev), sdif);
- 		if (!dev) {
--			rcu_read_unlock();
- 			kfree_skb(skb);
- 			return -ENODEV;
- 		}
--	} else {
--		dev = skb->dev;
- 	}
- 
- 	hdr = ipv6_hdr(skb);
- 	deliver = ipv6_chk_mcast_addr(dev, &hdr->daddr, NULL);
--	if (sdif)
--		rcu_read_unlock();
- 
- #ifdef CONFIG_IPV6_MROUTE
- 	/*
- 	 *      IPv6 multicast router mode is now supported ;)
- 	 */
--	if (atomic_read(&dev_net(skb->dev)->ipv6.devconf_all->mc_forwarding) &&
-+	if (atomic_read(&dev_net_rcu(skb->dev)->ipv6.devconf_all->mc_forwarding) &&
- 	    !(ipv6_addr_type(&hdr->daddr) &
- 	      (IPV6_ADDR_LOOPBACK|IPV6_ADDR_LINKLOCAL)) &&
- 	    likely(!(IP6CB(skb)->flags & IP6SKB_FORWARDED))) {
-@@ -573,22 +567,21 @@ int ip6_mc_input(struct sk_buff *skb)
- 			/* unknown RA - process it normally */
- 		}
- 
--		if (deliver)
-+		if (deliver) {
- 			skb2 = skb_clone(skb, GFP_ATOMIC);
--		else {
-+		} else {
- 			skb2 = skb;
- 			skb = NULL;
- 		}
- 
--		if (skb2) {
-+		if (skb2)
- 			ip6_mr_input(skb2);
--		}
- 	}
- out:
- #endif
--	if (likely(deliver))
-+	if (likely(deliver)) {
- 		ip6_input(skb);
--	else {
-+	} else {
- 		/* discard */
- 		kfree_skb(skb);
- 	}
-diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
-index a35f4f1c658960e4b087848461f3ea7af653d070..ea326fc33c6973fd60df464f6c8fd2ac70198db2 100644
---- a/net/ipv6/ip6mr.c
-+++ b/net/ipv6/ip6mr.c
-@@ -2301,21 +2301,20 @@ static void ip6_mr_output_finish(struct net *net, struct mr_table *mrt,
- 
- int ip6_mr_input(struct sk_buff *skb)
- {
-+	struct net_device *dev = skb->dev;
-+	struct net *net = dev_net_rcu(dev);
- 	struct mfc6_cache *cache;
--	struct net *net = dev_net(skb->dev);
- 	struct mr_table *mrt;
- 	struct flowi6 fl6 = {
--		.flowi6_iif	= skb->dev->ifindex,
-+		.flowi6_iif	= dev->ifindex,
- 		.flowi6_mark	= skb->mark,
- 	};
- 	int err;
--	struct net_device *dev;
- 
- 	/* skb->dev passed in is the master dev for vrfs.
- 	 * Get the proper interface that does have a vif associated with it.
- 	 */
--	dev = skb->dev;
--	if (netif_is_l3_master(skb->dev)) {
-+	if (netif_is_l3_master(dev)) {
- 		dev = dev_get_by_index_rcu(net, IPCB(skb)->iif);
- 		if (!dev) {
- 			kfree_skb(skb);
+ module_phy_driver(ksphy_driver);
 -- 
-2.50.0.727.gbf7dc18ff4-goog
+2.39.5
 
 
