@@ -1,92 +1,196 @@
-Return-Path: <netdev+bounces-201720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-201721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95A81AEAC17
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 03:01:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FE95AEAC1F
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 03:02:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A1017B1DBA
-	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 00:59:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E4213A3D34
+	for <lists+netdev@lfdr.de>; Fri, 27 Jun 2025 01:01:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30716219E8;
-	Fri, 27 Jun 2025 01:01:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05AE5219E8;
+	Fri, 27 Jun 2025 01:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VGshnAdb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q/11EOQB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62892F1FC7;
-	Fri, 27 Jun 2025 01:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66432145FE0
+	for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 01:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1750986065; cv=none; b=dFRuVECNmhEE+92BnhyAwo94L+7/ZMO8Su5l8e6BpEArqKZZRxAvxgpgVNE4N/f7WSrs4DGpoNqK2epwfa4oHR4mgGNEgkTucTOhG7IE5H+d4kD2cFZ6aDKz5HI/rX9UFDL8lkn2K36/fttnFSwXP1tHuvBy4M3WXkEWyD8GuZg=
+	t=1750986078; cv=none; b=Fo/5zpSUjdk3ohOMjHqqWrh+WGv9NlUpWnQ6T3HkA9fbF61Xs48HlnJz5KKe7jwGLTIYxGO5x2nmbkqDfAL6zv2/ttPC6emvCRspfStzX2ls89oepez7HWXFGDNwzAiBV+RKEDCPqfdwdKe0/j112neBjeifP0FU6rKRzrAEo58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1750986065; c=relaxed/simple;
-	bh=EzNtq1CBfE6D5XU7fFWpxazdWNZ6B3o/QCCjb21UIF0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=prVb+e5cyprr8Hj/KFhrToqd6ywhWcK1ZZhKVRgceu1rYts55RPRDWPij4FBMq+S+rZkIcb/o395rl3/wCm1sxa0mBgrtYQwXYh2HngNZEVhuNgR1Kw/YRR2tgYelCIi2gPGOP1QMFVDGayXqzmBLLWIOjX5XIjRlWNyPk0JXHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VGshnAdb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96A67C4CEEB;
-	Fri, 27 Jun 2025 01:01:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1750986064;
-	bh=EzNtq1CBfE6D5XU7fFWpxazdWNZ6B3o/QCCjb21UIF0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VGshnAdbpQtUmshrVAsTLVnHviXXGbAWSKHEzbkgWJqG5biezICvDrDoDp6ivq7nR
-	 Kt7oKW6t5CDMUCN0P5RwRyO6ldbabAwELZs/8EuBQIHKxcTiv3+1wR9N2JtpH/XK+P
-	 b5m1cMJmrXk3L4Rj+lpW7FN51RkEid/PnmNyvIwOeup20TQdCsh6gfKeqc10xgR31z
-	 Sjzjx+Od8Vt14TIcly1w50TSqOa7LlhMcOvhMH50RjHIR/h98VjWvj0mCX8CkwVnDS
-	 jkoGRYT7UxP77oRu4fxEo1zB1qcTqgiJgmc83qdmbqDU8/0GlaDn7tFiuwAd+TeNfn
-	 VRFMmfg3WQHaA==
-Date: Thu, 26 Jun 2025 18:01:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mark Bloch <mbloch@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew Lunn"
- <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
- <saeedm@nvidia.com>, <gal@nvidia.com>, <leonro@nvidia.com>,
- <tariqt@nvidia.com>, Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Leon Romanovsky
- <leon@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, Jeff Layton
- <jlayton@kernel.org>, NeilBrown <neil@brown.name>, Olga Kornievskaia
- <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
- <tom@talpey.com>, Shuah Khan <shuah@kernel.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
- <linux-rdma@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>, Carolina Jubran <cjubran@nvidia.com>,
- Cosmin Ratiu <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH net-next v11 2/8] devlink: Extend devlink rate API with
- traffic classes bandwidth management
-Message-ID: <20250626180102.497e35a2@kernel.org>
-In-Reply-To: <20250625183018.87065-3-mbloch@nvidia.com>
-References: <20250625183018.87065-1-mbloch@nvidia.com>
-	<20250625183018.87065-3-mbloch@nvidia.com>
+	s=arc-20240116; t=1750986078; c=relaxed/simple;
+	bh=JUuEWzSsrJvQA/NSb5mgqarAsvIaA4K6b4L1Jtfn9c0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b0OsaqbylBg8DBhNnr7P+ZIyz5Tae/x+rNFoCjYHih74doEE4MSu3g2AuHMM6i2z8Z8umEuYSL4okkINyAnHQdolTco4Tb+zVZjIFOjOV66RPdX627uCRZiiovwsd/NInoRQtUX4jkUte2XcRjjBrvJA8HMdrcvswGFYj/DnjLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q/11EOQB; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-3138e64b42aso1956824a91.0
+        for <netdev@vger.kernel.org>; Thu, 26 Jun 2025 18:01:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1750986077; x=1751590877; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kFCgNkNtLTPi2qftxx19oPErN+QtXy8c4/pxZTBK1RI=;
+        b=q/11EOQBUtEeAQCvSX4ng3djlLn70/+s4UvYA108aUKUgkY5I8CmVKlpYc3DK/xdrj
+         9pCVN0ysS7Y5w+laFAnVJQAE+mhPIDVMfQfxTPudKI4GqFYt6EU/nQz214GerrG3JRFK
+         akjqJhr1C3NRK3ebTmLm/ICSg9lso8A3LH5e4VnAad2ZFKKHJDIezjmIT5IKrYQmdBj7
+         Xc/fP7lGZjaWi79U6Lnqjq9AX1+FMsdFOKvcT0g3y8lDTgCTl69AZBTmwfmVyGQnrK9B
+         81vNbq1Zt4yQpm7qNXgBjxQr9GuXkY957H36zj5IaqdEEWVDa8KmdkX8DGR2wTWn6iEZ
+         aONA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1750986077; x=1751590877;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kFCgNkNtLTPi2qftxx19oPErN+QtXy8c4/pxZTBK1RI=;
+        b=qDoTmod5xwfAeYXia4veK4vqjryyvCofcJ/6lMH4NGvCrGEHFnSEoUf/v3QsowTKNe
+         XN76MDqgDVFOJGrZODvE3WRtmVqlKPfKTUOC5HuMfuMB9Ligva8vEnwjEfAZbaLFMU22
+         4sFl18LNPw7SDddoj7hR1JH38BnUmnFXj6xz+ub3uVVuKADccZ0YXV4UgfrOlvmeVNLv
+         4mncNtSq75zzymdWs/S6yiJ6mKqrq/H3/dW4U5auPAQ/m21xyApPeOCl8eTbbDMN9s+/
+         F/u6pl1+2bC7sKDXQ26JnHc721aVrANsN1jo3F1lY/MUhQQn+RhOSVgT1La/avk19Hpe
+         K+jQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWauhaUDsjajnlwVT7rd2hKXrnrY5HT1rbpDToZ/OZXFHwNjwUyquxqa5JPmbe//MPBnX7BTUE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxPxUXHagcudBr+O/OcVL3fnrCW6fWVIJKSBdz6B4f3+7Bg86M
+	pkqjF8FtwNQ5B7G51IpyaBZDitIsYAIpAHOrxIIRRDzrXVXjsvlnQT1SwSrUAl6f83oUXGz6WhY
+	WoLBqySIwwbgAyqp/M7S+x/cbr6fJhGuNIupNoyGz
+X-Gm-Gg: ASbGncsiADA8xLL3fBTpjUN4pS9+zI2xIkB2WF6+8S77MnI2Wn5zZ9fFJVjelmV6oYw
+	ISqj+d3rYZnBRUqNNZuHIcl4iUIAMJR3JFYkTLsGetWZnJvbElLwkUTt5l5svTkV+W8Kf8BrGod
+	DfsezCAauWkHZRVBb4/uIUSMq8Nf3nOo6xeXq/m+6KnbI4eKkp/51FrDulaUlJudXW+uNtcbHHS
+	Td+
+X-Google-Smtp-Source: AGHT+IFNb5tJ01q1Fymb8qgReZd+LFacrQhDkllfDQkLn22VNIRpx4Mw0vpAeff/iEL0Z9IpoU8QDW98sRDnozCQKQo=
+X-Received: by 2002:a17:90b:2252:b0:312:959:dc3f with SMTP id
+ 98e67ed59e1d1-318c8ee5339mr1588930a91.3.1750986075940; Thu, 26 Jun 2025
+ 18:01:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250624202616.526600-1-kuni1840@gmail.com> <20250624202616.526600-7-kuni1840@gmail.com>
+ <CANn89i+aMsdJ+oQmo1y4sbjJM40NJpFNYn2YT5Gf1WrfMc1nOg@mail.gmail.com>
+In-Reply-To: <CANn89i+aMsdJ+oQmo1y4sbjJM40NJpFNYn2YT5Gf1WrfMc1nOg@mail.gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Thu, 26 Jun 2025 18:01:04 -0700
+X-Gm-Features: Ac12FXzfJ9coAs9cLOA2TaMhVhqmWkLFZXFXx54cEtCYfs6cGyXyhYqTTBFLfSI
+Message-ID: <CAAVpQUDa8w49-mvf4=nAYLKv0aX9hmAt312_0CD+u4nSWWAv3A@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 06/15] ipv6: mcast: Don't hold RTNL for
+ IPV6_ADD_MEMBERSHIP and MCAST_JOIN_GROUP.
+To: Eric Dumazet <edumazet@google.com>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 25 Jun 2025 21:30:12 +0300 Mark Bloch wrote:
-> Introduce support for specifying relative bandwidth shares between
-> traffic classes (TC) in the devlink-rate API. This new option allows
-> users to allocate bandwidth across multiple traffic classes in a
-> single command.
+On Thu, Jun 26, 2025 at 7:37=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Tue, Jun 24, 2025 at 1:26=E2=80=AFPM Kuniyuki Iwashima <kuni1840@gmail=
+.com> wrote:
+> >
+> > From: Kuniyuki Iwashima <kuniyu@google.com>
+> >
+> > In __ipv6_sock_mc_join(), per-socket mld data is protected by lock_sock=
+(),
+> > and only __dev_get_by_index() requires RTNL.
+> >
+> > Let's use dev_get_by_index() and drop RTNL for IPV6_ADD_MEMBERSHIP and
+> > MCAST_JOIN_GROUP.
+> >
+> > Note that we must call rt6_lookup() and dev_hold() under RCU.
+> >
+> > If rt6_lookup() returns an entry from the exception table, dst_dev_put(=
+)
+> > could change rt->dev.dst to loopback concurrently, and the original dev=
+ice
+> > could lose the refcount before dev_hold() and unblock device registrati=
+on.
+> >
+> > dst_dev_put() is called from NETDEV_UNREGISTER and synchronize_net() fo=
+llows
+> > it, so as long as rt6_lookup() and dev_hold() are called within the sam=
+e
+> > RCU critical section, the dev is alive.
+> >
+> > Even if the race happens, they are synchronised by idev->dead and mcast
+> > addresses are cleaned up.
+> >
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> > ---
+> > v2: Hold rcu_read_lock() around rt6_lookup & dev_hold()
+> > ---
+> >  net/ipv6/ipv6_sockglue.c |  2 --
+> >  net/ipv6/mcast.c         | 22 ++++++++++++----------
+> >  2 files changed, 12 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
+> > index 1e225e6489ea..cb0dc885cbe4 100644
+> > --- a/net/ipv6/ipv6_sockglue.c
+> > +++ b/net/ipv6/ipv6_sockglue.c
+> > @@ -121,11 +121,9 @@ static bool setsockopt_needs_rtnl(int optname)
+> >  {
+> >         switch (optname) {
+> >         case IPV6_ADDRFORM:
+> > -       case IPV6_ADD_MEMBERSHIP:
+> >         case IPV6_DROP_MEMBERSHIP:
+> >         case IPV6_JOIN_ANYCAST:
+> >         case IPV6_LEAVE_ANYCAST:
+> > -       case MCAST_JOIN_GROUP:
+> >         case MCAST_LEAVE_GROUP:
+> >         case MCAST_JOIN_SOURCE_GROUP:
+> >         case MCAST_LEAVE_SOURCE_GROUP:
+> > diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+> > index b3f063b5ffd7..9fc7672926bf 100644
+> > --- a/net/ipv6/mcast.c
+> > +++ b/net/ipv6/mcast.c
+> > @@ -175,14 +175,12 @@ static int unsolicited_report_interval(struct ine=
+t6_dev *idev)
+> >  static int __ipv6_sock_mc_join(struct sock *sk, int ifindex,
+> >                                const struct in6_addr *addr, unsigned in=
+t mode)
+> >  {
+> > -       struct net_device *dev =3D NULL;
+> > -       struct ipv6_mc_socklist *mc_lst;
+> >         struct ipv6_pinfo *np =3D inet6_sk(sk);
+> > +       struct ipv6_mc_socklist *mc_lst;
+> >         struct net *net =3D sock_net(sk);
+> > +       struct net_device *dev =3D NULL;
+> >         int err;
+> >
+> > -       ASSERT_RTNL();
+> > -
+> >         if (!ipv6_addr_is_multicast(addr))
+> >                 return -EINVAL;
+> >
+> > @@ -202,13 +200,18 @@ static int __ipv6_sock_mc_join(struct sock *sk, i=
+nt ifindex,
+> >
+> >         if (ifindex =3D=3D 0) {
+> >                 struct rt6_info *rt;
+> > +
+> > +               rcu_read_lock();
+> >                 rt =3D rt6_lookup(net, addr, NULL, 0, NULL, 0);
+> >                 if (rt) {
+> >                         dev =3D rt->dst.dev;
+>
+> We probably need safety here, READ_ONCE() at minimum.
 
-net/devlink/rate.c:390:33: warning: variable 'total' set but not used [-Wunused-but-set-variable]
-  390 |         int rem, err = -EOPNOTSUPP, i, total = 0;
-      |                                        ^
+Will add it and the corresponding WRITE_ONCE() in dst_dev_put().
 
+>
+> This can probably be done in a separate series.
 
-Documentation/netlink/specs/devlink.yaml
-  1277:8    error    wrong indentation: expected 8 but found 7  (indentation)
-  1279:8    error    wrong indentation: expected 8 but found 7  (indentation)
--- 
-pw-bot: cr
+I'll post a follow-up for other rt6_lookup() users and dst.dev
+users under RCU.
+
+Thanks!
 
