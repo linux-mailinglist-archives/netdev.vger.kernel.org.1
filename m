@@ -1,102 +1,133 @@
-Return-Path: <netdev+bounces-202130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06A16AEC5DC
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 10:40:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F47AAEC5E4
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 10:45:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED5B06E2779
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 08:39:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7E3B17C4FE
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 08:45:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9DB0221D96;
-	Sat, 28 Jun 2025 08:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D78A224B00;
+	Sat, 28 Jun 2025 08:45:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="A9DBfYVV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B08+/v2f"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC69288A0;
-	Sat, 28 Jun 2025 08:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9349222584
+	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 08:45:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751100013; cv=none; b=bvggUFyO1rZmeOJ5LkoiJJpr4AIdeLpdZC5zYtZswCm+iIOAFD1BQnSWruLSZQXu/4uYv/KgNc6tX+EBx3/WdloThJ+4G64IUW8sSCVrBUtoXKGbpG32kZUal6SoY/6Rcwa4cOZKnTI0VvP424U0xFLcORUgNfTbZ3fFGqxqCv0=
+	t=1751100303; cv=none; b=YKKWYWylyHU3iHURPs+r218f5gJX5CarFZOpEFDTfq26dG8q8XiOQn6+HFYi3vv2UnWb98CEc5p2UrrfZlGPimASCnR41EIltUQUadlDY+vSoZIm8Zcpz8ya+bQbiF5N+IkQzrSvrEKYRvoP4PupTDt6eUTLkVrFa3AYsPO1Ev0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751100013; c=relaxed/simple;
-	bh=seYJ+h3ptgXyrs/Ol/cIp8Sn6+8xe6POhQhfvKZYpOo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CJyCCa0E561WIF7UmK0QP/MH8+OVFWzwygEsMOwFJz3373MPvrv29i/D1VHlgarxV/mphnwXdCeldnNoo0Cg0ed7bxEeFchHjf4GUgfUSicXMln3GDucR6A6GQEXk14umQHA1DrOj990y9XWkIUwi7AyBB/epcDCuOLIL/oHzu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=A9DBfYVV; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KsixbDkdM3PEAz+rUYpeXnOwGsmmR9wNcvEDjtbPvJw=; b=A9DBfYVVRHTLvgbeQmK9fE6SPw
-	qEdD2qnstz1flvG5tClmk9Q28P2ngpbiJ1BQfWL1C/+ZLkS7usvsl4tpNCsbYhwEwEduA6PyyhXpV
-	D8aeBiWRmd58poQrfWsI3D+8XRo+L6ZX9Jc1z1+kD8x/I3EvKYVeYa2bCMT76L7dapjU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uVR6Q-00HDxH-Uj; Sat, 28 Jun 2025 10:40:02 +0200
-Date: Sat, 28 Jun 2025 10:40:02 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Asmaa Mnebhi <asmaa@nvidia.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	David Thompson <davthompson@nvidia.com>
-Subject: Re: [PATCH net v1] mlxbf-gige: Support workaround for MDIO GPIO
- degradation bug
-Message-ID: <668cd20c-3863-4d16-ab05-30399e4449f6@lunn.ch>
-References: <20241122224829.457786-1-asmaa@nvidia.com>
- <7c7e94dc-a87f-425b-b833-32e618497cf8@lunn.ch>
- <CH3PR12MB7738C758D2A87A9263414AFBD78BA@CH3PR12MB7738.namprd12.prod.outlook.com>
- <6e3435a0-b04e-44cc-9e9d-981a8e9c3165@lunn.ch>
- <CH3PR12MB7738C25C6403C3C29538DA4BD78BA@CH3PR12MB7738.namprd12.prod.outlook.com>
- <CH3PR12MB773870BA2AA47223FF9A72D7D745A@CH3PR12MB7738.namprd12.prod.outlook.com>
+	s=arc-20240116; t=1751100303; c=relaxed/simple;
+	bh=f3o9OoZUEbBDeBbUxOB3GnLGKqZpAG8HFhx3v3nlo/s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Xhzly47OYXF+LjSY17l09LX/ffdvvJkjiRR2cfpOcahr8RM23Fx+Ssr17d7EEnCPhZMv+vxNWcm2ouWPvlp8PL3FLZlhU+VFRQj+LHIkFDtMSMACUDiR6M+3fJjw/qGAb4xPEDIFCLYRlD/PMysCBBZQbgIGQt2yfB/UGVCKXOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B08+/v2f; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4a6f3f88613so5798011cf.1
+        for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 01:45:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751100301; x=1751705101; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/nmnfrusCNXdjpYHJ43O4MY52XtsNNDAe7B32gXZR/A=;
+        b=B08+/v2fGg+9DMi96O5lWHnkIwL9hBfG/wZVW11A3dfylVQAL7PBgRCbPFXewsYolW
+         TBOPcyswj4KZIA3xmvaUE3mScm81a1s1Xg3IkUvcShQSgi10WLhImnOKPbKQP+0c9kN+
+         NA/19wHB6OkvJYnmEH1Olmu3rsHPSbCsOxJ2dYdPWM8IO9p3NLF6phfpO1TjYKiR9qlz
+         Gf6JBgLNnYVnsO1okmSa9xLVtEOOG4yMg/tn7QMq2oixJch0oRuiagCEDZEuvLUW5NbU
+         8Ik5rbUzyAbfojkRH2WYm+HS8X6Zq8+dWOr36Gslq5o8wuN4aPC8wZNS9xW0OVoTo9W+
+         zQxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751100301; x=1751705101;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/nmnfrusCNXdjpYHJ43O4MY52XtsNNDAe7B32gXZR/A=;
+        b=qWnFczXqEApA1DKMWvxI7MnCFC31Va28nMXUpc8t8n6ALudd11lFl3nDDwDYGQOrH4
+         f69yQeDAf5NefGowh8o0+vCNknvFaDzFYL0p+bZcHxGnkIgAcGgsXSScd5HLjoM32rpb
+         ym5O7IAwe6Rz0b1pIO1JlmyZJTW1UytUglVtKFCSCHTlW9037f7afu94A/XAr5/I+RV4
+         XhhbLgFhO0bG+sFV4A+jcxaAVqR2bbDrVJh1C+KabLJ/lvscERvWCkDAIGzpLZ1ZevDD
+         Y6IGmqxM09VL4JLj7xHqj7Di9ajQcMzCBzLrNUADYQ4HJbcI3ha42NDetgETEfYrFYK/
+         mxoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXYF6g38Z6gH3imW1d4apoTyW73ghPt7fIXZjNaFp2kq3V+r17JTWReAK/R2OwC5Sb3QYSLmU0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWRTNlnUwAOoLGxaP3yRlEWinMvr7vCN5DXFler0CLQO94Tt4L
+	Dos3BkS+/+JwHf4azldKNs6KO2cxY6xaUYHxIGpx32inOJRj8ATo5aG70hF4ly4YsShBTWFG5AN
+	kze96Xy/qzebgIC7OYUWG+7+WDnUnX2OBllaVlmQs
+X-Gm-Gg: ASbGncutKw7/eFc3uGwLpTJA2UGO21i3rDkI0mMAzYCW+sOGYeEezdwQ7OR/2kSI1yN
+	R35lBpc9FPvms+sxxysGmUX+7xIY+U+/0gf9FfUfwkH4QfEshcvFDeRII8il2DZCC2ZmYlNUpjy
+	47ejIqR59WndZZdRzdEyWiwdgBgwvrkxS8SjFK0giaMU4E
+X-Google-Smtp-Source: AGHT+IEOmVnyFajIJ8a0GhgPX2/JYD/n70Gv15+Urivpy9ZmnV3HQI05bvkqKXfOyYfw16w5ldtEaRL1UFR0A99MQpw=
+X-Received: by 2002:a05:622a:1a27:b0:494:993d:ec2f with SMTP id
+ d75a77b69052e-4a7fcab93bcmr96209851cf.12.1751100300350; Sat, 28 Jun 2025
+ 01:45:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CH3PR12MB773870BA2AA47223FF9A72D7D745A@CH3PR12MB7738.namprd12.prod.outlook.com>
+References: <20250626083512.GT1562@horms.kernel.org> <20250628081918.523857-1-malayarout91@gmail.com>
+In-Reply-To: <20250628081918.523857-1-malayarout91@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat, 28 Jun 2025 01:44:49 -0700
+X-Gm-Features: Ac12FXx7HbqsaSi67Ecn8j0W_HA9gHLw_rRrRWO3BQVTSD-WwmLZmje0U1gXKqQ
+Message-ID: <CANn89iJUz2EXu_h-YbiNswixHo6z1EwcmQrfSk6o-MmBznWfWA@mail.gmail.com>
+Subject: Re: [PATCH v2] selftests: net: fix resource leak in napi_id_helper.c
+To: Malaya Kumar Rout <malayarout91@gmail.com>
+Cc: horms@kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Hi Andrew, 
-> 
+On Sat, Jun 28, 2025 at 1:19=E2=80=AFAM Malaya Kumar Rout
+<malayarout91@gmail.com> wrote:
+>
+> Resolve minor resource leaks reported by cppcheck in napi_id_helper.c
+>
+> cppcheck output before this patch:
+> tools/testing/selftests/drivers/net/napi_id_helper.c:37:3: error: Resourc=
+e leak: server [resourceLeak]
+> tools/testing/selftests/drivers/net/napi_id_helper.c:46:3: error: Resourc=
+e leak: server [resourceLeak]
+> tools/testing/selftests/drivers/net/napi_id_helper.c:51:3: error: Resourc=
+e leak: server [resourceLeak]
+> tools/testing/selftests/drivers/net/napi_id_helper.c:59:3: error: Resourc=
+e leak: server [resourceLeak]
+> tools/testing/selftests/drivers/net/napi_id_helper.c:67:3: error: Resourc=
+e leak: server [resourceLeak]
+> tools/testing/selftests/drivers/net/napi_id_helper.c:76:3: error: Resourc=
+e leak: server [resourceLeak]
+>
+> cppcheck output after this patch:
+> No resource leaks found
+>
+> Signed-off-by: Malaya Kumar Rout <malayarout91@gmail.com>
+> ---
+>  .../selftests/drivers/net/napi_id_helper.c    | 19 +++++++++++++------
+>  1 file changed, 13 insertions(+), 6 deletions(-)
+>
+> diff --git a/tools/testing/selftests/drivers/net/napi_id_helper.c b/tools=
+/testing/selftests/drivers/net/napi_id_helper.c
+> index eecd610c2109..47dd3291bd55 100644
+> --- a/tools/testing/selftests/drivers/net/napi_id_helper.c
+> +++ b/tools/testing/selftests/drivers/net/napi_id_helper.c
+> @@ -34,7 +34,7 @@ int main(int argc, char *argv[])
+>
+>         if (setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt=
+))) {
+>                 perror("setsockopt");
+> -               return 1;
+> +               goto failure;
 
-> I implemented and tested the changes you suggested and the
-> runtime_resume/suspend work smoothly for MDIO.
-
-> However, we have another issue. I noticed that even if
-> mdio_read/write() functions are not being called,
-> runtime_resume/suspend() are still called regularly. After
-> investigation, I found out that this is due to ethtool being called
-> regularly. Ethtool automatically triggers the resume/suspend even if
-> we do no MDIO access. A different team wrote a script which monitors
-> "ethtool -S eth0" every 60 seconds. So every minute, we are running
-> resume/suspend and enabling/disabling the MDIO clock. Seems counter
-> productive. That team said that it is a requirement that they
-> collect these statistics about the mlxbf_gige interface.
-
-> Is there any way to prevent ethtool from calling resume/suspend
-> without changing core kernel code?
-
-> If not, what would you suggest? 
-
-You need to put the MDIO bus device into its own pm_domain. Try
-calling dev_pm_domain_set() to separate the MDIO bus from the MAC
-driver in terms of power domains. ethtool will then power on/off the
-MAC but leave the MDIO bus alone.
-
-	Andrew
+client variable is uninitialized at this point.
 
