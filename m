@@ -1,226 +1,109 @@
-Return-Path: <netdev+bounces-202169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C772DAEC795
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 16:21:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34F80AEC7D0
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 16:49:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86CF41899BD9
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 14:21:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 838F017CB6C
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 14:49:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E36421C186;
-	Sat, 28 Jun 2025 14:21:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7164C24888A;
+	Sat, 28 Jun 2025 14:49:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HG1UzxK0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IGXE5oG3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD21B17799F;
-	Sat, 28 Jun 2025 14:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E428124676B
+	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 14:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751120498; cv=none; b=tUhG90qHBVoTFFROocdC6cpAaO+DQv8APvN/PSwhs/iUsTov/e/K6XWD/Hfs7kr8okHisYG7wVt2VSeTMIAk8L+Ba61419sNJzmau2emDrwTq8TTsQ/U3MtmOgqch0ItOPfsUM+e5uVP0UhwhABosHUqD7v8O/xoozDcRw/pmwk=
+	t=1751122141; cv=none; b=Yityt1fWnnFLlQO1+wKw0TUgmpEQCDaeBgRI+Z1G+musfeDhv5F+RvngulkNtmeqY4D81CWsO9fomaZhvyLQdTd0NzJiAGQ6hiWVk9MqxWjxJTZUV3e7tyYJMno7ZY4whYQQGloU5dlaYjnJqgVbx+BiZ4e7u5tWm7doltjDbyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751120498; c=relaxed/simple;
-	bh=7guzmn0y3Uw2E2oN/ica6GoK0GT09gtminZYHaPXseI=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=fSogEPW61oAOTbAD2QBxHgo+xzw9orEkWYk7bIyBuSpEaZ2+Nm5kshl0KbTirblPK9UQ1JrfgPQ1BtKDZrRkR8BdJMaKmoK/NvB+qormRspD40TZAohVbYsimCTuKAO3XLAyzTDFNHamdZbtfaDGKzG09sNWP98WAnwEpgTte8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HG1UzxK0; arc=none smtp.client-ip=209.85.218.54
+	s=arc-20240116; t=1751122141; c=relaxed/simple;
+	bh=WkX0dwZXK33LK2H6RLAuDqTRYZrytcTCLu7lpXlS2BA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=fBPzme40e6EgGT9bnZV74+P9Y3HQBBTtiOvpY6lzbaUzzEkb5vnu0GfveGXAnSlg90QfUKlaMHEBCUhcTa8yxw5SvSQ7ARF3jet6tqkDW5Ud8xKTTslSW+EG3WisXNq05yCck4eRjIscYxYeROS7AUvlNtCK2MGpgcrlBdxjjus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IGXE5oG3; arc=none smtp.client-ip=209.85.219.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ad56cbc7b07so112960666b.0;
-        Sat, 28 Jun 2025 07:21:35 -0700 (PDT)
+Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e73e9e18556so3178537276.0
+        for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 07:48:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751120494; x=1751725294; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=cOFYFwTuqfFVnwMxVqk0n5iUPlamNNN/0+Br9x/oBUE=;
-        b=HG1UzxK0yWxHdNkB59GspVdOAIruFwsVW4DyR7Es/ww2hMXfB9lLkkte6d5GVrIMGZ
-         7g0K4m3YUgr7Tk6qqPZTlXhsDPLS3BvUUGfpJOsaRTQifYFeSKBNmBBCtGsQbhi/h2cP
-         HpATkbRAfTZYlw9bBvl5a6M60rZQ2He0PeqIC4FPqnhTRZwWoGNxElSr0Nl9zQoduMzn
-         1o/GnWjth3nWykhcHK8V56RN0dQoXhzi2Jdd0fjc2Hp8nJkNfxoIzVOaIwBpN3nfMSwa
-         sHJqzJ1b4zpac9rGGyENsZexROndlgrYXr47vvF+3n6efyXS9/RyXmLS5gxWgdjO4tje
-         jN5A==
+        d=gmail.com; s=20230601; t=1751122139; x=1751726939; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5cZFBog71uQHawRLRh+uAWxKVmzteB/Z8SFpAcvGjUY=;
+        b=IGXE5oG3CpN33/dVDVTaemODodO615W1KhU3BVYfPsl05iDiNqJ5Z1A+qwcV45npko
+         F6Dx+WgrGQxzo+fJi0zlVU6fGakmUWXzASmQ+ewhpRKo9tGSoBs+/HM6BupYPOK4SNmq
+         G0llRLYknJJqTuk76eLaFxSXsH6svze0w0WuP/NA9V1xhwcDeaFVqnq2Bf/R8ZfwfYC2
+         sFlZIVDVivxWylgU4Xm/rE+baV5s1gKEoAH2/uTv1cwLUVJrFrdC4PmX5dtrKvtQLHN6
+         2vUkXifsHqgnpzFMeDKzl5Rxxgm6IW3qhtLW8SkyMSaZKw2XO/boDdOmCYeUVI5RCCs3
+         yRwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751120494; x=1751725294;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cOFYFwTuqfFVnwMxVqk0n5iUPlamNNN/0+Br9x/oBUE=;
-        b=a1AHLRDwMWDxUmjxoWQceFyytm9/VpsBjWXAAJlg+7hPM0vLZqXhgVSOTRE/B2QOO0
-         Z6b2qSVHZKb7idiw5lV3nPHzfryc3NePVi15wEonFlp+tQMnFD5XyK1qdkONOlu36eYy
-         IPo9wWbOLwY9gnZgUlzUhsx7mXniaz4Vkh0DYpMARtwxMsaUtZYK54COkDMNZVaqHmtg
-         ssQWxFE14nT0AYoy449V7XEoTY0thJk7GYpYdOyfqaP4ZUBkcsvPO37n/2ZK7gdbZLwO
-         /eXWTvcW+cFRypDs6ZbwZpAdoD940vbglYJEnoHlzXvSU8NDZOKPjXxdvvF5br2ywHji
-         a8ww==
-X-Forwarded-Encrypted: i=1; AJvYcCVraYoD+5NXbjQ56x8D11NDDpAwbizLW42viYBU8n5w8XVU8a/otBwrf8T7lXCa/11FZWqTapE=@vger.kernel.org, AJvYcCWfQXzmk/LcbLtiAb+UrnXGl+HaKbLqmKl/A/OpjJ4U4ppwad0ZCPfPGIFdRviFITiRIAq2Fw8hv2tfFPX2hZ05@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7U8NN6K9271Od/MoHHIdN3IfPvHqQ2GqEo1cptgRImmmkafLx
-	k5sp2eHr6MkDv8jKkMp5I677/epICgQuyaJWBs/nTQFMcBG3h5Agk7T6
-X-Gm-Gg: ASbGncuZ9SKf/vx05psibpyZHf7xt3ooMv/e91yRjwzK7gY2ZBOu2Gi+NMKuYH3DwGI
-	iY3pcneaIc7I/qNXoHHa7QDjTnM8xWQuLzPKWkBR4oKzK6kzD5Qc65zj32p6m0/75ulvc4JqeDz
-	i30NtRJXvQ7aRlt5HsgAODis0oW6Ltp/URotFFF2OzPmZy3t9R8pkSINIw2Vc+70kA8ZIVM74tq
-	OGercrpqb2/3mcjdMSqqkLs+PcSPhrhZb1j/ad4DGZS1Ch7BRHmVWBYVhQu8vP64ba6HXuNLdHs
-	uiDnHB4L4Tc81RQq2Kq6cao230Vk/tx8lQr5OtEBo1jI0/htIoJgY5iF9t4eRGldDfLgpfeloNu
-	UhqcDBAJqipq1XkOqmh9sn8991JMNRabyqlhTO3QALrl8sXHxvTUvudF1TrGPguhl5ueS9c5p3a
-	7e6prI2sWV6fg2gNO65l4pLSqOBXWGYv2qBc4S
-X-Google-Smtp-Source: AGHT+IGhTyxFeqR9igVeBqBWn+wUpKZqJaNd+eYzO2qyYs02RGa4YjcZR/aWps1y1BeKKPbYGZ8Tzw==
-X-Received: by 2002:a17:907:3c89:b0:ade:3b84:8ef6 with SMTP id a640c23a62f3a-ae34fd9327fmr706973666b.23.1751120493828;
-        Sat, 28 Jun 2025 07:21:33 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60c831ed361sm3047060a12.59.2025.06.28.07.21.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 28 Jun 2025 07:21:32 -0700 (PDT)
-Message-ID: <753902f3-4b11-44f7-9478-02459365a8ef@gmail.com>
-Date: Sat, 28 Jun 2025 16:21:31 +0200
+        d=1e100.net; s=20230601; t=1751122139; x=1751726939;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=5cZFBog71uQHawRLRh+uAWxKVmzteB/Z8SFpAcvGjUY=;
+        b=Ci5W7JxEOhD7ArY2kVxptlggu38D/2whITWpOum8wtLKzxaiJKe1GXJzXEyV2jjpsU
+         VlHnxvGclOJybwmOimkBw17GJI5j4L+YXU6iRANQHPjNd0L/EAy1fhzlpzYu+VAOrivi
+         GoNAXSGlsA4XHKN+jUAp1lo5F6CED9EYUmIpLT2GDuv4ivh5JnuChglzdop89L8JBWza
+         kE8QxV1ras3z45c2HZZofmlB4bqpHb7a1XPWSgZR9ZaQe8Zt7k9KvC+4PtnI6jtK3cPz
+         YADgcLX4V7WwOU4obMzCBAKRufCTrEMVLu0pCKzhPX5vf91upQyOsw18q1RTLmhIjK7K
+         ExCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW5MhzEVmytR8eSLYUmZtXX1YdwOhzSCQheT5Xp0rMPGvjfm1mUcB2EACB6O3xvzBxvIy7sah8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBk4FQVNKfV3gRa0TIq7kkiL1AgLRHTyWfWm601gzu9suqMHwH
+	MXsRHM6kluc1D5TR3KXGd07WqSldEyAdOc2qdbsuSs3l5yMwql0ZkOCc
+X-Gm-Gg: ASbGncvJlj2fBj8nYJhgxsyPqZyvjK2Ff6xsCpHX0VsMk8IZE8bkGKcQVyJSLSxi1uD
+	20m3ek4+EPe2ykhYIS0/RZbPxyJc/PWGp14lCg3bsmkECnl+MrhymAZTGq4FwihtLi/zXvWDtww
+	pj4wGMI9mkqDUzVTvSMmHTFKCxDTtcqtpRi/FyUUSHFSxZbjkJpLY7qgGvFxdPiHT2ETgOhuqVU
+	NJ8KTwaeXHrRU23uiBQw4bFUzYB/BKD7gqzxdzCLdC7Y0d3tYhoO5kbi+fJx5/5fLzcigvbAni9
+	4aXoAfT/YPHZorJ16Y4Cva3eiCWhdtVZfpRXTAxM8NKpS18FqnJRJHTsGJ9nIbVXtR6jkZrqGE2
+	J4CX8Ri1Mf6rVQQAMncy1bcmclfej6A6d5nI8OZu3ApFFzsVi4g==
+X-Google-Smtp-Source: AGHT+IGistoat8x5l0JQQZ7vpIluaQcaJCt7hSOVW7ki34v+zZYKS5ztBYAYlhjNSLLKO5sQ5NMQUQ==
+X-Received: by 2002:a05:6902:460a:b0:e81:b89f:3fb with SMTP id 3f1490d57ef6-e87a8502571mr8773447276.24.1751122138826;
+        Sat, 28 Jun 2025 07:48:58 -0700 (PDT)
+Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e87a6b4c9aesm1205654276.10.2025.06.28.07.48.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Jun 2025 07:48:58 -0700 (PDT)
+Date: Sat, 28 Jun 2025 10:48:57 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com, 
+ Eric Dumazet <edumazet@google.com>
+Message-ID: <686000d9a7c7c_a131d294bd@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250627200551.348096-2-edumazet@google.com>
+References: <20250627200551.348096-1-edumazet@google.com>
+ <20250627200551.348096-2-edumazet@google.com>
+Subject: Re: [PATCH net-next 1/4] net: add struct net_aligned_data
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 nf-next 1/2] netfilter: bridge: Add conntrack double
- vlan and pppoe
-From: Eric Woudstra <ericwouds@gmail.com>
-To: Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>,
- Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
- bridge@lists.linux.dev, netdev@vger.kernel.org
-References: <20250617065835.23428-1-ericwouds@gmail.com>
- <20250617065835.23428-2-ericwouds@gmail.com> <aFhksV47fCiriwJ4@strlen.de>
- <9866f2d2-eda8-470f-99fb-5a8d6756de56@gmail.com>
-Content-Language: en-US
-In-Reply-To: <9866f2d2-eda8-470f-99fb-5a8d6756de56@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
+Eric Dumazet wrote:
+> This structure will hold networking data that must
+> consume a full cache line to avoid accidental false sharing.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-
-On 6/28/25 3:27 PM, Eric Woudstra wrote:
-> 
-> 
-> On 6/22/25 10:16 PM, Florian Westphal wrote:
->> Eric Woudstra <ericwouds@gmail.com> wrote:
->>> -	if (ret != NF_ACCEPT)
->>> -		return ret;
->>> +	if (ret == NF_ACCEPT)
->>> +		ret = nf_conntrack_in(skb, &bridge_state);
->>>  
->>> -	return nf_conntrack_in(skb, &bridge_state);
->>> +do_not_track:
->>> +	if (offset) {
->>> +		__skb_push(skb, offset);
->>
->> nf_conntrack_in() can free the skb, or steal it.
->>
->> But aside from this, I'm not sure this is a good idea to begin with,
->> it feels like we start to reimplement br_netfilter.c .
->>
->> Perhaps it would be better to not push/pull but instead rename
->>
->> unsigned int
->> nf_conntrack_in(struct sk_buff *skb, const struct nf_hook_state *state)
->>
->>  to
->>
->> unsigned int 
->> nf_conntrack_inner(struct sk_buff *skb, const struct nf_hook_state *state,
->> 		   unsigned int nhoff)
->>
->> and add
->>
->> unsigned int 
->> nf_conntrack_in(struct sk_buff *skb, const struct nf_hook_state *state)
->> {
->> 	return nf_conntrack_inner(skb, state, skb_network_offset(skb));
->> }
->>
->> Or, alternatively, add
->> struct nf_ct_pktoffs {
->> 	u16 nhoff;
->> 	u16 thoff;
->> };
->>
->> then populate that from nf_ct_bridge_pre(), then pass that to
->> nf_conntrack_inner() (all names are suggestions, if you find something
->> better thats fine).
->>
->> Its going to be more complicated than this, but my point is that e.g.
->> nf_ct_get_tuple() already gets the l4 offset, so why not pass l3
->> offset too?
-> 
-> So I've tried nf_conntrack_inner(). The thing is:
-> 
->>  	switch (skb->protocol) {
->>  	case htons(ETH_P_IP):
->>  		if (!pskb_may_pull(skb, sizeof(struct iphdr)))
->> -			return NF_ACCEPT;
->> +			goto do_not_track;
->>
->>  		len = skb_ip_totlen(skb);
->> +		if (data_len < len)
->> +			len = data_len;
->>  		if (pskb_trim_rcsum(skb, len))
->> -			return NF_ACCEPT;
->> +			goto do_not_track;
->>
->>  		if (nf_ct_br_ip_check(skb))
->> -			return NF_ACCEPT;
->> +			goto do_not_track;
->>
->>  		bridge_state.pf = NFPROTO_IPV4;
->>  		ret = nf_ct_br_defrag4(skb, &bridge_state);
->>  		break;
->>  	case htons(ETH_P_IPV6):
->>  		if (!pskb_may_pull(skb, sizeof(struct ipv6hdr)))
->> -			return NF_ACCEPT;
->> +			goto do_not_track;
->>
->>  		len = sizeof(struct ipv6hdr) + ntohs(ipv6_hdr(skb)->payload_len);
->> +		if (data_len < len)
->> +			len = data_len;
->>  		if (pskb_trim_rcsum(skb, len))
->> -			return NF_ACCEPT;
->> +			goto do_not_track;
->>
->>  		if (nf_ct_br_ipv6_check(skb))
->> -			return NF_ACCEPT;
->> +			goto do_not_track;
->>
->>  		bridge_state.pf = NFPROTO_IPV6;
->>  		ret = nf_ct_br_defrag6(skb, &bridge_state);
->>  		break;
-> 
-> This part all use ip_hdr(skb) and ipv6_hdr(skb). I could add offset to
-> skb->network_header temporarily for this part of the code. Do you think
-> that is okay?
-> 
-> Adding offset to skb->network_header during the call to
-> nf_conntrack_in() does not work, but, as you mentioned, adding the
-> offset through the nf_conntrack_inner() function, that does work. Except
-> for 1 piece of code, I found so far:
-
-A small correction, Adding offset to skb->network_header during to call
-to nf_conntrack_in() also works. Then skb->network_header can be
-restored after this call and nf_conntrack_inner() is not needed.
-
-> 
-> nf_checksum() reports an error when it is called from
-> nf_conntrack_tcp_packet(). It also uses ip_hdr(skb) and ipv6_hdr(skb).
-> Strangely, It only gives the error when dealing with a pppoe packet or
-> pppoe-in-q packet. There is no error when q-in-q (double q) or 802.1ad
-> are involved.
-> 
-> Do you have any suggestion how you want to handle this failure in
-> nf_checksum()?
-> 
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
