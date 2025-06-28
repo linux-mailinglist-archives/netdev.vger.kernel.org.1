@@ -1,112 +1,126 @@
-Return-Path: <netdev+bounces-202173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AC53AEC7DC
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 16:50:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3C8DAEC802
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 16:57:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AA01189F813
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 14:50:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C5187A91B1
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 14:55:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0EFE255F22;
-	Sat, 28 Jun 2025 14:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3696247291;
+	Sat, 28 Jun 2025 14:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y88+V+8+"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="QsXDyBOW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A5924EA8E
-	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 14:49:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB07248F70
+	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 14:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751122173; cv=none; b=MQZVK6WHpbQ61PmDT9UnD/ihbLxOOci+EkakmRaTUb0P2bQ+8UaEfGD7u/b1duVuWw67j6ptO8L1NixB7fU1NcnLDEEXqdZfjR/tUaa95rnlll1xvW3vXXTYFl/KPjcSc/xBvoA91XmQBVRKLoE/WgCmfuyLzJ3Lhx4+bcorz9k=
+	t=1751122630; cv=none; b=t3l2T0O5gMXGX8jmkndKfdy72cXVI/Ug2Giyj2YYzvlNR92QCQtpPpXlLMCWNy25tb2WpOmiG3RLkrDYmKUHxWtMTjPVzLuEvxBvvqpZjUB5PSMJt0d8KtVFf0/RD2wLbn3zBWuZbzOz2BhCwaTtFX9mwszpg8RSgsWoFMKogsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751122173; c=relaxed/simple;
-	bh=6+KZoMVc5l3O0E2jVAKspFsGkvQhoeVjIimapKumKLA=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=OG4NIKjveN3s4jbvzOw/4XifvVrFqcyUAn81t5igEt2vABLHcHOfvQZoEt+o/gdUwnJyLFgmhCSViPnaZePOjWNQUvwOf6O26HHC3PbqS1Vs+YhD0C9lcLwD6KlP3DIvoVAvRBfyMhNSPseMI1TjFTNuUrTF8L9zwoOS1ugiv8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y88+V+8+; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e7dc89108bfso2530178276.3
-        for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 07:49:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751122171; x=1751726971; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yOfGqVPC2oK99EsGKD/1zJLmPY9MS1I4kN6eRD0TFQ0=;
-        b=Y88+V+8+Tst4UazzlREenjcqvORf/bZqZuNOoDNIPjhOcn8pDNGbcib/jKm3eIj6xk
-         xiex+8X82cplUYgNRj567tRyMw6KB4bWxD04oe3lzIgLUaNgW0yAgYLnXlwGJWoGKUaZ
-         Gx0GletBl2Fs553I48Fx91/5jr3lI/IqstVJixIV+k/TYiTaihL27SDdDt/B3CAr2LE5
-         nf9bZDC0RyahTDr6UvT/ivgxI71FdhqRMtphTKc+VU3qbwJJpBhS2zlDWFHyOtz5knUW
-         7++XvZwLg/ZrN0VlptqwT1PRWUEGgcezQSEnHgQIThzSePSk7IlQurBep0DBxNEHxaz1
-         4BMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751122171; x=1751726971;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yOfGqVPC2oK99EsGKD/1zJLmPY9MS1I4kN6eRD0TFQ0=;
-        b=TQHjAXBJsydnbyj6JgMwFcVtWyvkq0tZCJN2EAyY9eLgqvnKUmvr0v00/fUXuNWDYw
-         y7+hvBj2vtOetfZf8Dfjsc4SK4miriRfH56UNSUsbTFTwHTG2xtVu0ItO14o5rh4/rIB
-         FUs8BwbligjhpS/bJ9xeFE4X886fMSNPcCEPHmIbPWP/h/6cVgAphxMwetSvGT/7SJ0b
-         eWbVjUcRKYF4Dug7GoaA2o7ayz2JvdQvg/u5tg5Zr5Kc+RPgj8fNlljILeT4MIkTct2U
-         j3Ltz1p6X/492GkDZmXazdxsuJLhR6P3W9eLAbJhpjsuWYbGW2g7eI53cRn5nNet33eB
-         Wn0g==
-X-Forwarded-Encrypted: i=1; AJvYcCUYGxBs2Zp4gn2urI678J0MKQidq2Nz9D+FJkTZhnVbjZibyM4zIEuPWH+pxnXtyNqcPUhT/XQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBzevdD3z/A3LXC5u0rmUtZ3Ld5Fcv1wr7bocwMaAKrOm4xIqz
-	22GOf7CUUlhsxuPevE2jp7dJQ1PNbnDQwyTdAX+c/NfNkYSah/gPvJZb
-X-Gm-Gg: ASbGncvA0AGMtg3Xf1b3CZVzVIqS7eBkVkEe2qc1Lb5/vKxFueG8hDOZIzcXtBROf7g
-	lOtivhFfQjNICc9eMCQLktrKcs98MbeP6xKJT0GxvYzndbbpVkcyX0IGGb/BicFzp1MEV4o3HDE
-	q42NrO5Y1bFPe/35bhkSAoqdkCEYO6zXhFwb0QBXeEpTS2t7Us/kYMC6SPg3dUiZjfc6n+kBP0H
-	ULtQZwFpnMuZkQBSQKgSxks7cZ87O81e1J2LRCRQKOfopVXWRB/mqNs9RvhL+LLpKRb7AAyx4Rv
-	5C3PrB51/4spaBbTuLFwORRr93K9TcboQNTwHXpJzyetrOQEwewoLWicWr2CGzXcOWRQyrVJ0o7
-	U5+0XJTdXCFSLkFOhAQmEIccFFD+iX1rF0cDTYVM=
-X-Google-Smtp-Source: AGHT+IF+viCic+ce8WWlaH+bh8xCfkA7X0e9kF5ARabZJMwkUA579Yu4S7oicXz32XBh58Q8HLg6Qg==
-X-Received: by 2002:a05:6902:3006:b0:e84:2001:2779 with SMTP id 3f1490d57ef6-e87a7c02d9amr6516353276.43.1751122171068;
-        Sat, 28 Jun 2025 07:49:31 -0700 (PDT)
-Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e87a6bf02bcsm1199359276.50.2025.06.28.07.49.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Jun 2025 07:49:30 -0700 (PDT)
-Date: Sat, 28 Jun 2025 10:49:30 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- netdev@vger.kernel.org, 
- eric.dumazet@gmail.com, 
- Eric Dumazet <edumazet@google.com>
-Message-ID: <686000fa42469_a131d2946c@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250627200551.348096-5-edumazet@google.com>
-References: <20250627200551.348096-1-edumazet@google.com>
- <20250627200551.348096-5-edumazet@google.com>
-Subject: Re: [PATCH net-next 4/4] udp: move udp_memory_allocated into
- net_aligned_data
+	s=arc-20240116; t=1751122630; c=relaxed/simple;
+	bh=uXBO9wGx9824iq79q6QS6/MyRkKkCvxDbtA1w7r++fo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TZWPEqXk3xC+ZajMYwESjOxtrkIO+IVWxCRwnpfglYrjn5S51vPzkHKpmdq2V51A/V/KTLbObYdGT1w192/qqE6ofMwaznvM5b9l10dgsMcpIL6DuMo6GtPEM3Y0GJLjSTsJhY20bKehIucqBzmLFeaAbRYKMN8eRyR+Ajfq2lQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=QsXDyBOW; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55SE3LMB016125;
+	Sat, 28 Jun 2025 14:56:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=NL7IwHrdNNI6ATINK+RRt3S4EACGJ
+	BBVPSu+vEzfDmo=; b=QsXDyBOW8zojno26JohZ5fqOUGK5QnqnTQBCVDzbrehd7
+	NNpnVcERtHilDsICvIGoefF+SoRHK6Ah6ny/Cva39xD31ulD6kE4keScVhMDUFCt
+	Nd/tXLl5h7/H+5YQK85gmlYyxx0mzwH0pbrXkyG2db0n9hdxCvRoZg8vkq/PVM9r
+	q+TIKezTltH6c24SaGLZTM/0A3S7Oy2e3G1xEWxS14nlfWBUoOmRcgtGR2nQws2s
+	3FaSWvVPjua8lKb+z2tCRlj7PWg+nIuuxAOP/+gy/XjqYGBSe5KqTZrmqnDQH9VS
+	mmKVlO1CDZXLehx5W+hDyIVLM1C5GL6oJ5vmDC8JQ==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47j8ef0apn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 28 Jun 2025 14:56:43 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55SCHU2x028984;
+	Sat, 28 Jun 2025 14:56:42 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 47j6u6vvbb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 28 Jun 2025 14:56:42 +0000
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55SEufAl037459;
+	Sat, 28 Jun 2025 14:56:41 GMT
+Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 47j6u6vvb2-1;
+	Sat, 28 Jun 2025 14:56:41 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: johndale@cisco.com, neescoba@cisco.com, benve@cisco.com,
+        satishkh@cisco.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        horms@kernel.org, netdev@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com
+Subject: [PATCH net] enic: fix incorrect MTU comparison in enic_change_mtu()
+Date: Sat, 28 Jun 2025 07:56:05 -0700
+Message-ID: <20250628145612.476096-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-06-27_05,2025-06-27_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 spamscore=0 adultscore=0
+ mlxlogscore=999 phishscore=0 suspectscore=0 mlxscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
+ definitions=main-2506280124
+X-Proofpoint-GUID: n9rfWQuKq6PvOtqVxSYrCCF8eIPH4dlE
+X-Proofpoint-ORIG-GUID: n9rfWQuKq6PvOtqVxSYrCCF8eIPH4dlE
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI4MDEyNSBTYWx0ZWRfX0xVi/R5QG2OL HZn1XsYTLoB2JQq35XH0GWETv7TUytrNrtZ84InKisy/juY+rUCDs5xyoSbqO32Qyn38SFErGHr LxJ35oOJXnY5oIhPAtW8uxEhDpGVplzoXft4RgX77fgpnVI3T4sKuC1nChkCPzAilAJeQGVwAFw
+ fFkNE/GfJkyUBTfUT0eOFjfTomL8Cn9MG+QiyzTVV+ZgYBybq64lSTQkKvf1CBiKlmZ/+m0E5hC uIEKrGymVrU+W+0hJ8kPFjHjxd7EQE52u9ha5XaO6eREetaG/3yWFDcTBIoiEvWGr/OMhNZjfa2 CprY0VzER81YUcjPaOCyRsJbHnQe10oJdi+e5jAMKQK4ngMVm7qUaCi0AjwRfJdLopnhfXZykK+
+ 1yfbrT2XDb7pybPMSi8nViUCgJ38r8pcTDEvVC+eSttTQYhWNOK2Eym2ruAjsEyvegXKCXHi
+X-Authority-Analysis: v=2.4 cv=ONgn3TaB c=1 sm=1 tr=0 ts=686002ab cx=c_pps a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17 a=6IFa9wvqVegA:10 a=yPCof4ZbAAAA:8 a=BaBcy4A32iMVqfrlXGUA:9
 
-Eric Dumazet wrote:
-> ____cacheline_aligned_in_smp attribute only makes sure to align
-> a field to a cache line. It does not prevent the linker to use
-> the remaining of the cache line for other variables, causing
-> potential false sharing.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+The comparison in enic_change_mtu() incorrectly used the current
+netdev->mtu instead of the new new_mtu value when warning about
+an MTU exceeding the port MTU. This could suppress valid warnings
+or issue incorrect ones.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Fix the condition and log to properly reflect the new_mtu.
+
+Fixes: ab123fe071c9 ("enic: handle mtu change for vf properly")
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+ drivers/net/ethernet/cisco/enic/enic_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
+index 773f5ad972a24..6bc8dfdb3d4be 100644
+--- a/drivers/net/ethernet/cisco/enic/enic_main.c
++++ b/drivers/net/ethernet/cisco/enic/enic_main.c
+@@ -1864,10 +1864,10 @@ static int enic_change_mtu(struct net_device *netdev, int new_mtu)
+ 	if (enic_is_dynamic(enic) || enic_is_sriov_vf(enic))
+ 		return -EOPNOTSUPP;
+ 
+-	if (netdev->mtu > enic->port_mtu)
++	if (new_mtu > enic->port_mtu)
+ 		netdev_warn(netdev,
+ 			    "interface MTU (%d) set higher than port MTU (%d)\n",
+-			    netdev->mtu, enic->port_mtu);
++			    new_mtu, enic->port_mtu);
+ 
+ 	return _enic_change_mtu(netdev, new_mtu);
+ }
+-- 
+2.46.0
+
 
