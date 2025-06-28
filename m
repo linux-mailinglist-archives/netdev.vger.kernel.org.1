@@ -1,112 +1,267 @@
-Return-Path: <netdev+bounces-202155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9A9EAEC669
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 11:38:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20146AEC66E
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 11:47:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B72C61BC78AC
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 09:38:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EFD63B4C9B
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 09:47:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952D01E8332;
-	Sat, 28 Jun 2025 09:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3C0A1D5AC0;
+	Sat, 28 Jun 2025 09:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hC6GdpR3"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E833B198A09;
-	Sat, 28 Jun 2025 09:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4311AC88B
+	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 09:47:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751103507; cv=none; b=g9Fk3j9B99NGF98A4Vtwxu48Hymy10Oog/hGIAGFCKqGZqBVYiKSCE4optAOAFagFqHnCvzvYgnwt2tyNDOiJS5Pe8NFLRvM1vczEtooO0GNlNJn7IYNrdus3foB5FxAXUgNHjumXRRPnhZcaCRJsm/AqCDJZ7iYJUn4GzqMB/o=
+	t=1751104061; cv=none; b=fmsbmTMs5n6jKcxfglpwgfvzYavLbVJg4Ri9wA4rq5R/fxFxJ5QtQVJqfsiJ0o30+o3EyjDhiNoEoviSb3i5635J/9DHX1lruOtNXg4yxhteVwevtpVIV6i+r2kTZxhFD2JJLonCgMnzGttGrXsot22jk5BqQpBUeCX0bQ9Dwv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751103507; c=relaxed/simple;
-	bh=qmD57pNlU8IpA3r0Rhf/560u+TtYPik1mEAgDEbnZPw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lQCY1Iy0DgzLZgYD2nxkE6TWZ9m+6nDtMKrEOysviJGrQ+/u1rIO/t2sQhwj0xZrR5SBTr8l2yvMJRAyVPq8utqVaX7WnBvTeAG2YBSLNZh4eEKTkDYiKiMvgC4JHW64vF403Cpqm+URkrUXO5h51wk2teSnC/5dRgZv1Q6/ZBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4bTnSH0JCqz27hQC;
-	Sat, 28 Jun 2025 17:39:11 +0800 (CST)
-Received: from kwepemk100010.china.huawei.com (unknown [7.202.194.58])
-	by mail.maildlp.com (Postfix) with ESMTPS id 52B3B1A016C;
-	Sat, 28 Jun 2025 17:38:15 +0800 (CST)
-Received: from workspace-z00536909-5022804397323726849.huawei.com
- (7.151.123.135) by kwepemk100010.china.huawei.com (7.202.194.58) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 28 Jun
- 2025 17:38:14 +0800
-From: zhangjianrong <zhangjianrong5@huawei.com>
-To: <michael.jamet@intel.com>, <mika.westerberg@linux.intel.com>,
-	<YehezkelShB@gmail.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <guhengsheng@hisilicon.com>, <caiyadong@huawei.com>,
-	<xuetao09@huawei.com>, <lixinghang1@huawei.com>
-Subject: [PATCH v2] net: thunderbolt: Enable end-to-end flow control also in transmit
-Date: Sat, 28 Jun 2025 17:38:13 +0800
-Message-ID: <20250628093813.647005-1-zhangjianrong5@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1751104061; c=relaxed/simple;
+	bh=FvNANRgAUQCZOaligUivTNMC/C09uHbzbtj8UE09jRw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GJrDiIvIwhdy1Xb/mrlJp4io5tIdlCPumS6a90Hf1KjyIdt1Sz4kyhgdaXVrZmWZ2ZrIF57ngv3aNU+VQoOfqNYZ51ayBV0SbOVSpFQ0dCNYFuMlrWsmviICpJMnE88tnCyrtWwVMYJSJp+8DUPldYze/XTho0NShMRhdmrVv/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hC6GdpR3; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751104059;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Newn7o3dJEXSCt9x7hxL+sCIMSg/cs7zXE+Q+oYj0hQ=;
+	b=hC6GdpR3dsxcJrBxDr7iIgWNsVbdyoEivq8B6T0DZD1q0a2gf3RxC6dZUmE3ovpdafJHwq
+	kcPdGnwDEvc+VDYKqJCJ+/0Ve2GV8nteqiPDRN+UcBLyAC1ziKZX6g9clE0PUpFqhOh4QA
+	guWvgvVpAvlkpapCqx6nT0tl/YXUmhk=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-628-4vpl_vfYOVmzAQP-eOHQuA-1; Sat, 28 Jun 2025 05:47:35 -0400
+X-MC-Unique: 4vpl_vfYOVmzAQP-eOHQuA-1
+X-Mimecast-MFC-AGG-ID: 4vpl_vfYOVmzAQP-eOHQuA_1751104054
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a6d1394b07so1822147f8f.3
+        for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 02:47:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751104054; x=1751708854;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Newn7o3dJEXSCt9x7hxL+sCIMSg/cs7zXE+Q+oYj0hQ=;
+        b=EwyP6txDArRiZ2bFWQmqjBLfZXeQTnr9M30ybG3BQ7DMEgkHrHQzALEbCaDnfgHJjn
+         IESD8XY4q2wdG9HguW8wyTOMMBzGlKG6fXQtKnEd4AjQ1YlkXlgipkk5nhmONZINKbIu
+         j+ujiybcps4d2os4aEaGRUjennxysnufy0G2RpZCmqxdlY8qaxV0Xcw8++W0Xm+CAbCQ
+         BlXkBTSMPYMj9fnENplxFYN1Du1xac2e1SV9gOqO7AttoqdFs2Tpr3d3h98E2tqLT6Ya
+         ojg+xfeHaigEJdlQlim0MW6EoWQsznCFTM3mVvvI0AljWZs8fI1xfUeNliCUNgGOICtk
+         ttQw==
+X-Forwarded-Encrypted: i=1; AJvYcCWWMHCLNETJGBjr2dKBpgRi+lDZnrLzUmpa26ofCbGwfF6KKrSDO83PS0iQeQcZLEv2qXgkTf8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzg5foyDOytrMAm2yULKssOMu8rsdbHtEok1lGbBL//ywZMwZ1K
+	id/7+rj2fodxR0bNSI5Zye1759GMZverJEupFup96Zp1+vIFsstUaVa/FcUFuUZbkd9mL07Ffxp
+	z+Nicr0RyVwi8E+kvFiJdu3TetDZdc/Ax1a16LDamZ0sOqveD1HTX80qAhg==
+X-Gm-Gg: ASbGnctemT42vezdqquAEsQMcVx38NSecQhov39scE2sexO6SW7sRHKQjsdyKinuzT5
+	NlNezgiWaLNM7KKsn1DG8XfD9mPoJ9zNsmCI4tw6x5Z3YCQ2orLDiA6qO+oCoTMda0ZzKIWN8FE
+	XJ6yhg2WIp/hhcUwXN0MN28UojR9mrgRU1wqTglMusyy7Pmh6g8YJQc5QAig2YqbrDud4n259v/
+	2k/Ih0efcBriS9dWjbUXwFPjTo2qd8vh4y2ujOlM87EIwgLmxw7hGDlNCSTexhPL0SiGGuHtSh/
+	eqTsKvHbA00hzacsEdy6kmtOfvmLLiD5grIpjIaddyiQKtpP36P/tOgRO5CCjId9VlW1hw==
+X-Received: by 2002:a05:6000:ce:b0:3a3:7115:5e7a with SMTP id ffacd0b85a97d-3a917bc7ab8mr4198322f8f.42.1751104053744;
+        Sat, 28 Jun 2025 02:47:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGPCiFHgAK5wt7p4Rs7GA4RpWRlbpxaRtGvpYL7+8IH+T0T+ExhA+LWl94toLj7uMxCJICU3A==
+X-Received: by 2002:a05:6000:ce:b0:3a3:7115:5e7a with SMTP id ffacd0b85a97d-3a917bc7ab8mr4198301f8f.42.1751104053264;
+        Sat, 28 Jun 2025 02:47:33 -0700 (PDT)
+Received: from localhost (net-130-25-105-15.cust.vodafonedsl.it. [130.25.105.15])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a892e61f48sm4943473f8f.93.2025.06.28.02.47.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Jun 2025 02:47:32 -0700 (PDT)
+Date: Sat, 28 Jun 2025 11:47:31 +0200
+From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] net: netfilter: Add IPIP flowtable SW
+ acceleration
+Message-ID: <aF-6M-4SjQgRQw1j@lore-desk>
+References: <20250627-nf-flowtable-ipip-v2-0-c713003ce75b@kernel.org>
+ <20250627-nf-flowtable-ipip-v2-1-c713003ce75b@kernel.org>
+ <aF6ygRse7xSy949F@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemk100010.china.huawei.com (7.202.194.58)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="hvp15xVDHhMV55GV"
+Content-Disposition: inline
+In-Reply-To: <aF6ygRse7xSy949F@calendula>
 
-According to USB4 specification, if E2E flow control is disabled for
-the Transmit Descriptor Ring, the Host Interface Adapter Layer shall
-not require any credits to be available before transmitting a Tunneled
-Packet from this Transmit Descriptor Ring, so e2e flow control should
-be enabled in both directions.
 
-Signed-off-by: zhangjianrong <zhangjianrong5@huawei.com>
----
-v2: update subject and commit message
-v1: initial submission
+--hvp15xVDHhMV55GV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- drivers/net/thunderbolt/main.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+> On Fri, Jun 27, 2025 at 02:45:28PM +0200, Lorenzo Bianconi wrote:
+> > Introduce SW acceleration for IPIP tunnels in the netfilter flowtable
+> > infrastructure.
+> > IPIP SW acceleration can be tested running the following scenario where
+> > the traffic is forwarded between two NICs (eth0 and eth1) and an IPIP
+> > tunnel is used to access a remote site (using eth1 as the underlay devi=
+ce):
+> >=20
+> > ETH0 -- TUN0 <=3D=3D> ETH1 -- [IP network] -- TUN1 (192.168.100.2)
+> >=20
+> > $ip addr show
+> > 6: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state=
+ UP group default qlen 1000
+> >     link/ether 00:00:22:33:11:55 brd ff:ff:ff:ff:ff:ff
+> >     inet 192.168.0.2/24 scope global eth0
+> >        valid_lft forever preferred_lft forever
+> > 7: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state=
+ UP group default qlen 1000
+> >     link/ether 00:11:22:33:11:55 brd ff:ff:ff:ff:ff:ff
+> >     inet 192.168.1.1/24 scope global eth1
+> >        valid_lft forever preferred_lft forever
+> > 8: tun0@NONE: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1480 qdisc noqueue st=
+ate UNKNOWN group default qlen 1000
+> >     link/ipip 192.168.1.1 peer 192.168.1.2
+> >     inet 192.168.100.1/24 scope global tun0
+> >        valid_lft forever preferred_lft forever
+> >=20
+> > $ip route show
+> > default via 192.168.100.2 dev tun0
+> > 192.168.0.0/24 dev eth0 proto kernel scope link src 192.168.0.2
+> > 192.168.1.0/24 dev eth1 proto kernel scope link src 192.168.1.1
+> > 192.168.100.0/24 dev tun0 proto kernel scope link src 192.168.100.1
+> >=20
+> > $nft list ruleset
+> > table inet filter {
+> >         flowtable ft {
+> >                 hook ingress priority filter
+> >                 devices =3D { eth0, eth1 }
+> >         }
+> >=20
+> >         chain forward {
+> >                 type filter hook forward priority filter; policy accept;
+> >                 meta l4proto { tcp, udp } flow add @ft
+> >         }
+> > }
+>=20
+> Is there a proof that this accelerates forwarding?
 
-diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
-index 0a53ec293d04..643cf67840b5 100644
---- a/drivers/net/thunderbolt/main.c
-+++ b/drivers/net/thunderbolt/main.c
-@@ -924,8 +924,12 @@ static int tbnet_open(struct net_device *dev)
- 
- 	netif_carrier_off(dev);
- 
--	ring = tb_ring_alloc_tx(xd->tb->nhi, -1, TBNET_RING_SIZE,
--				RING_FLAG_FRAME);
-+	flags = RING_FLAG_FRAME;
-+	/* Only enable full E2E if the other end supports it too */
-+	if (tbnet_e2e && net->svc->prtcstns & TBNET_E2E)
-+		flags |= RING_FLAG_E2E;
-+
-+	ring = tb_ring_alloc_tx(xd->tb->nhi, -1, TBNET_RING_SIZE, flags);
- 	if (!ring) {
- 		netdev_err(dev, "failed to allocate Tx ring\n");
- 		return -ENOMEM;
-@@ -944,11 +948,6 @@ static int tbnet_open(struct net_device *dev)
- 	sof_mask = BIT(TBIP_PDF_FRAME_START);
- 	eof_mask = BIT(TBIP_PDF_FRAME_END);
- 
--	flags = RING_FLAG_FRAME;
--	/* Only enable full E2E if the other end supports it too */
--	if (tbnet_e2e && net->svc->prtcstns & TBNET_E2E)
--		flags |= RING_FLAG_E2E;
--
- 	ring = tb_ring_alloc_rx(xd->tb->nhi, -1, TBNET_RING_SIZE, flags,
- 				net->tx_ring.ring->hop, sof_mask,
- 				eof_mask, tbnet_start_poll, net);
--- 
-2.34.1
+I reproduced the scenario described above using veths (something similar to
+what is done in nft_flowtable.sh) and I got the following results:
+
+- flowtable configured as above between the two router interfaces
+- TCP stream between client and server going via the IPIP tunnel
+- TCP stream transmitted into the IPIP tunnel:
+  - net-next:				~41Gbps
+  - net-next + IPIP flowtbale support:	~40Gbps
+- TCP stream received from the IPIP tunnel:
+  - net-next:				~35Gbps
+  - net-next + IPIP flowtbale support:	~49Gbps
+
+>=20
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > ---
+> >  net/ipv4/ipip.c                  | 21 +++++++++++++++++++++
+> >  net/netfilter/nf_flow_table_ip.c | 28 ++++++++++++++++++++++++++--
+> >  2 files changed, 47 insertions(+), 2 deletions(-)
+> >=20
+
+[...]
+
+> >  static bool nf_flow_skb_encap_protocol(struct sk_buff *skb, __be16 pro=
+to,
+> >  				       u32 *offset)
+> >  {
+> >  	struct vlan_ethhdr *veth;
+> >  	__be16 inner_proto;
+> > +	u16 size;
+> > =20
+> >  	switch (skb->protocol) {
+> > +	case htons(ETH_P_IP):
+> > +		if (nf_flow_ip4_encap_proto(skb, &size))
+> > +			*offset +=3D size;
+>=20
+> This is blindly skipping the outer IP header.
+
+Do you mean we are supposed to validate the outer IP header performing the
+sanity checks done in nf_flow_tuple_ip()?
+
+Regards,
+Lorenzo
+
+>=20
+> > +		return true;
+> >  	case htons(ETH_P_8021Q):
+> >  		if (!pskb_may_pull(skb, skb_mac_offset(skb) + sizeof(*veth)))
+> >  			return false;
+> > @@ -310,6 +328,7 @@ static void nf_flow_encap_pop(struct sk_buff *skb,
+> >  			      struct flow_offload_tuple_rhash *tuplehash)
+> >  {
+> >  	struct vlan_hdr *vlan_hdr;
+> > +	u16 size;
+> >  	int i;
+> > =20
+> >  	for (i =3D 0; i < tuplehash->tuple.encap_num; i++) {
+> > @@ -331,6 +350,12 @@ static void nf_flow_encap_pop(struct sk_buff *skb,
+> >  			break;
+> >  		}
+> >  	}
+> > +
+> > +	if (skb->protocol =3D=3D htons(ETH_P_IP) &&
+> > +	    nf_flow_ip4_encap_proto(skb, &size)) {
+> > +		skb_pull(skb, size);
+> > +		skb_reset_network_header(skb);
+> > +	}
+>=20
+> I have a similar patch from 2023, I think I keep somewhere in my trees.
+>=20
+> >  }
+> > =20
+> >  static unsigned int nf_flow_queue_xmit(struct net *net, struct sk_buff=
+ *skb,
+> > @@ -357,8 +382,7 @@ nf_flow_offload_lookup(struct nf_flowtable_ctx *ctx,
+> >  {
+> >  	struct flow_offload_tuple tuple =3D {};
+> > =20
+> > -	if (skb->protocol !=3D htons(ETH_P_IP) &&
+> > -	    !nf_flow_skb_encap_protocol(skb, htons(ETH_P_IP), &ctx->offset))
+> > +	if (!nf_flow_skb_encap_protocol(skb, htons(ETH_P_IP), &ctx->offset))
+> >  		return NULL;
+> > =20
+> >  	if (nf_flow_tuple_ip(ctx, skb, &tuple) < 0)
+> >=20
+> > --=20
+> > 2.50.0
+> >=20
+>=20
+
+--hvp15xVDHhMV55GV
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaF+6MwAKCRA6cBh0uS2t
+rMAKAQDdLVBCjzjGwTELy9gE6FJi7/rBBB3yteHjlxdsqx575AEA7P4CVJ+rtMwc
+A14JuSb+7zq7U1Bzl0zOAbgz7oglngU=
+=Tb0o
+-----END PGP SIGNATURE-----
+
+--hvp15xVDHhMV55GV--
 
 
