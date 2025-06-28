@@ -1,111 +1,189 @@
-Return-Path: <netdev+bounces-202126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB5BAAEC5BE
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 10:14:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A710EAEC5C2
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 10:19:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B78C7A47DD
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 08:12:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE2E16E4350
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 08:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BB11221F26;
-	Sat, 28 Jun 2025 08:14:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1178D22128C;
+	Sat, 28 Jun 2025 08:19:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y7O3ZS+k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B7tmBUqa"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C6A043AA1;
-	Sat, 28 Jun 2025 08:14:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837B1194C96;
+	Sat, 28 Jun 2025 08:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751098449; cv=none; b=W4yutaXTM9WPgZmP8Dau0qxJXpyStkAEBBcCFSWmtaS7KRWmju1yPOl8RDJwNgY5s7U4xSGvwdHtMDWQ2mv8M+ISqzJtuyGmydg58n/IrxnltqMAbqyBxlfB1BnujivJVT7T5h/gonPxMl9XdVBbYg8r03YPFbDguh6mU16lnw8=
+	t=1751098774; cv=none; b=gYXChT75bhL08l4GDbSyxuVDwiXdY7Vy+AuLJGNGHgWj4pj6wQqGUPGWD+99ydVspq7fMmWBtgVDG6b/CFc6r7O5chNjansDRWX6SLSEcc4cwKnwDr/atFM4Ha6Xq00Kp8V2KUyWb4E0tN8PGP8iyAZIGAFm/sfQ8aPX0JEUTJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751098449; c=relaxed/simple;
-	bh=SIQH7VRbD0Uzwp1VMHZwhtyTf8NgBvkSohUTtWyPLqc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GJpwtYuiaVX5xclwcUEEN5g9J7jjjzpu2Wi1Da10xbKpLItQ2bdLS0vkKwNyLKtVSUDOCvifWxYnARPaxZA6qBymk1U7B8Qn6dkCNfqmagg2R1M2gRPW0JRKdWebz6oY9QlAQVIPxsIeSJYuRYaZUB9RBaXDe4XsTSAEfl4ncEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y7O3ZS+k; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=CpQ5LeQKLn8DmQkgnLVtZRFeuVCA8DvcNVHpHbSb/zo=; b=Y7O3ZS+kX6ozjbiZFxL/E7Aiyb
-	qhUaXUzRpe4wxEySlH4Pzl3f3E/nJNucCdluAS7TjBczAA5/tbO40+Jl3IAbaAb3NKhnzcFmpIh4M
-	edGZyyZAQYvS3yr2fgMLBguNF2D8983l2oHX7k3zQm29+qffImlGIhpWrdjevUrWqM1A=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uVQh5-00HDrs-JU; Sat, 28 Jun 2025 10:13:51 +0200
-Date: Sat, 28 Jun 2025 10:13:51 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Felix Fietkau <nbd@nbd.name>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Eric Woudstra <ericwouds@gmail.com>, Elad Yifee <eladwf@gmail.com>,
-	Bo-Cun Chen <bc-bocun.chen@mediatek.com>,
-	Sky Huang <skylake.huang@mediatek.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
+	s=arc-20240116; t=1751098774; c=relaxed/simple;
+	bh=vGNfRkI1Ht/vZZSyNnRPELCivIfmFv4UkOlehvExCuw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DgXkcCMmywJglUiUMmclLrhhwMr9c5Pi8Jfb0rkS8UuLfT+pvkRWEkAAnDHVtmM5HOVJEqKIZHevCiw1gvE1jZK8mr+BiBNb+NPuAh4kL8vrgPcZTX20EixEQkHI/g0xQf6W0jBGOb4O7ZlohyxEoyMLV9obiUgAgzeUOKkvX8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B7tmBUqa; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-23649faf69fso2692125ad.0;
+        Sat, 28 Jun 2025 01:19:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751098772; x=1751703572; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gSplCVftVr/wTrQpkKjU5PeSgpWAa37BgkpUhHExLMM=;
+        b=B7tmBUqa3O4l0YcnzUMEGEzQ0D8bRU6iBmgiFteEZl3bXsTWJ5A2YmbfT105YyYz9+
+         9RJVApGvzvzxmGxk5d+mHSpO/83rWr3QZBp9jCSm9wUtTceCVVdPJm0IRZWQ3OiGfvbx
+         1jbfcwt3w9p8el73bZfydJsnYpYypl9pORgukM2ezLv/d6fgs3cZ9zZ7wW+0SHCHeESg
+         lbMGp4wZJje45Ys8vq/K55tmKsffmR7MWyOnlN6fgYW+uwmovgM75d5FX4gMHnTXGo22
+         Ht3/jAWKac+onYJXbrwHdVwBM4QPCzNUyr167LKmyX3cd/wa2cG7pYMTpMqSKyCE7Eaj
+         ShBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751098772; x=1751703572;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gSplCVftVr/wTrQpkKjU5PeSgpWAa37BgkpUhHExLMM=;
+        b=bM0hk41apXYeWjsvffAHtUvudBWKXqmid0iAC5rTeMzJjCoD43c29OTN4Hn801BKPm
+         ddFltmrCOgAjc5KY1NhF4/tXvYVb0W8a1prTFCfdjFfnbms74qS71E1QDJ/mQWk3jbaZ
+         tNMD62btVDWP4X0DA5QtaSD13YlvC5WUV7ZEj4EgglN9DsdCNmBburSTvvVokQ6hrLkI
+         TdRZcNj3ySPyh7voAUSsS28KsJe8kBtrPW0Cu2IKh905aUG6yOewZS4u3sgIPq3cJk3S
+         YPL5PRNoQ3aTOr3sOqyLoMYSVV+xuR0EbbLioM8WRYckZdOtYhanXn+hTj8QgQk/SiP/
+         79xQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUPCUPoFXrujrClREqRmRoJ1FEAHD9HrlLruJIlFMBpCUcQj2XDj+sURzvPVh8qbIyJ0d9yp/uo0RmRea1veG9a@vger.kernel.org, AJvYcCX7+VrzaJKpeWYEvQt2kiGHPvBob90WQ1UbE3zyJcGryItjKep6Q0w3F5qwz2eGf+oxqz8zvVZi+sO7pzo=@vger.kernel.org, AJvYcCXzkv2BKVKuyubi+hX8gCPQWIFCSVcg9XSVSyiW0h4iGq6++XCff+7Nx/UwrE3t89sVZgR7jpmK@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhEfN4auJ8Qb5qNiGeINnjXphVek4BpU/BC8fbm2n8hgI0tTU4
+	VJY5Up6js47Sl5gE3ejISl2rU8f17IsdkggcSuJCBw6jk9iu9GoGBCAX
+X-Gm-Gg: ASbGncuJfHohy02uW1nlXf1S+q3NEBvgh9gpW69oNzVNHUxccWZ2T7cN0i6U8V6GcgO
+	qu54apWNhJU43dcScjtjL4P8DhCQL+iA4BNMxRQVvik8g7pz62TFTDwHYEKbpAiWyQxnI1aGLll
+	E85neUQrK5mboZzyyC2wCa85j2uAMbSCxXnkNvyZ/5SmSlasMlPDhQh0X4TDTF8RQLpHN8MWKEh
+	/6R1Ew4aCVzf+fb3KZGPm0LbeeKWSFtb4dBCaqatnJZSnpXQ5+DZ6jUtltDlI4IopQ2K3S38vwU
+	z1bPdGOlLj3G0fc42RnpgtNEirfUHtj6u8Bv/37gdeW+TCFdjT1r/hK/X6KpAbkDNTSUNRPkPNJ
+	r+6fnHosz11BVDPnN3/dsxCySzFtt60mXebc/3D2Y3YdQ
+X-Google-Smtp-Source: AGHT+IF6qXl72BIwujEzmJ3ZOgtwyVgnob0Ze3maCTk80T3RK4dcMIbcG7yRFp+0VlCYmQYS2Vp2IQ==
+X-Received: by 2002:a17:903:3c23:b0:235:eb71:a37b with SMTP id d9443c01a7336-23ac48833dcmr91556825ad.46.1751098771715;
+        Sat, 28 Jun 2025 01:19:31 -0700 (PDT)
+Received: from malayaVM.mrout-thinkpadp16vgen1.punetw6.csb ([103.133.229.223])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb3b78dcsm33566855ad.171.2025.06.28.01.19.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Jun 2025 01:19:31 -0700 (PDT)
+From: Malaya Kumar Rout <malayarout91@gmail.com>
+To: horms@kernel.org
+Cc: Malaya Kumar Rout <malayarout91@gmail.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net/next 3/3] net: ethernet: mtk_eth_soc: use genpool
- allocator for SRAM
-Message-ID: <f9bec387-1858-4c79-bb4b-60e744457c9f@lunn.ch>
-References: <cover.1751072868.git.daniel@makrotopia.org>
- <566ca90fc59ad0d3aff8bc8dc22ebaf0544bce47.1751072868.git.daniel@makrotopia.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] selftests: net: fix resource leak  in napi_id_helper.c
+Date: Sat, 28 Jun 2025 13:49:16 +0530
+Message-ID: <20250628081918.523857-1-malayarout91@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250626083512.GT1562@horms.kernel.org>
+References: <20250626083512.GT1562@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <566ca90fc59ad0d3aff8bc8dc22ebaf0544bce47.1751072868.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
 
-> +static void *mtk_dma_ring_alloc(struct mtk_eth *eth, size_t size,
-> +				dma_addr_t *dma_handle)
-> +{
-> +	void *dma_ring;
-> +
-> +	if (WARN_ON(mtk_use_legacy_sram(eth)))
-> +		return -ENOMEM;
-> +
-> +	if (eth->sram_pool) {
-> +		dma_ring = (void *)gen_pool_alloc(eth->sram_pool, size);
-> +		if (!dma_ring)
-> +			return dma_ring;
-> +		*dma_handle = gen_pool_virt_to_phys(eth->sram_pool, (unsigned long)dma_ring);
+Resolve minor resource leaks reported by cppcheck in napi_id_helper.c
 
-I don't particularly like all the casting backwards and forwards
-between unsigned long and void *. These two APIs are not really
-compatible with each other. So any sort of wrapping is going to be
-messy.
+cppcheck output before this patch:
+tools/testing/selftests/drivers/net/napi_id_helper.c:37:3: error: Resource leak: server [resourceLeak]
+tools/testing/selftests/drivers/net/napi_id_helper.c:46:3: error: Resource leak: server [resourceLeak]
+tools/testing/selftests/drivers/net/napi_id_helper.c:51:3: error: Resource leak: server [resourceLeak]
+tools/testing/selftests/drivers/net/napi_id_helper.c:59:3: error: Resource leak: server [resourceLeak]
+tools/testing/selftests/drivers/net/napi_id_helper.c:67:3: error: Resource leak: server [resourceLeak]
+tools/testing/selftests/drivers/net/napi_id_helper.c:76:3: error: Resource leak: server [resourceLeak]
 
-Maybe define a cookie union:
+cppcheck output after this patch:
+No resource leaks found
 
-struct mtk_dma_cookie {
-	union {
-		unsigned long gen_pool;
-		void *coherent;
-	}
-}
+Signed-off-by: Malaya Kumar Rout <malayarout91@gmail.com>
+---
+ .../selftests/drivers/net/napi_id_helper.c    | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
 
-Only dma_handle appears to be used by the rest of the code, so only
-the _alloc and _free need to know about the union.
+diff --git a/tools/testing/selftests/drivers/net/napi_id_helper.c b/tools/testing/selftests/drivers/net/napi_id_helper.c
+index eecd610c2109..47dd3291bd55 100644
+--- a/tools/testing/selftests/drivers/net/napi_id_helper.c
++++ b/tools/testing/selftests/drivers/net/napi_id_helper.c
+@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
+ 
+ 	if (setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
+ 		perror("setsockopt");
+-		return 1;
++		goto failure;
+ 	}
+ 
+ 	address.sin_family = AF_INET;
+@@ -43,12 +43,12 @@ int main(int argc, char *argv[])
+ 
+ 	if (bind(server, (struct sockaddr *)&address, sizeof(address)) < 0) {
+ 		perror("bind failed");
+-		return 1;
++		goto failure;
+ 	}
+ 
+ 	if (listen(server, 1) < 0) {
+ 		perror("listen");
+-		return 1;
++		goto failure;
+ 	}
+ 
+ 	ksft_ready();
+@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
+ 	client = accept(server, NULL, 0);
+ 	if (client < 0) {
+ 		perror("accept");
+-		return 1;
++		goto failure;
+ 	}
+ 
+ 	optlen = sizeof(napi_id);
+@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
+ 			 &optlen);
+ 	if (ret != 0) {
+ 		perror("getsockopt");
+-		return 1;
++		goto failure;
+ 	}
+ 
+ 	read(client, buf, 1024);
+@@ -73,11 +73,18 @@ int main(int argc, char *argv[])
+ 
+ 	if (napi_id == 0) {
+ 		fprintf(stderr, "napi ID is 0\n");
+-		return 1;
++		goto failure;
+ 	}
+ 
+ 	close(client);
+ 	close(server);
+ 
+ 	return 0;
++
++failure:
++	if (client >= 0)
++		close(client);
++	if (server >= 0)
++		close(server);
++	return 1;
+ }
+-- 
+2.43.0
 
-	Andrew
 
