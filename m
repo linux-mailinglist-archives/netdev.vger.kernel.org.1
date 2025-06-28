@@ -1,133 +1,209 @@
-Return-Path: <netdev+bounces-202131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F47AAEC5E4
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 10:45:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D794AEC601
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 11:04:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7E3B17C4FE
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 08:45:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A096917B79F
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 09:04:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D78A224B00;
-	Sat, 28 Jun 2025 08:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6027722DFA8;
+	Sat, 28 Jun 2025 09:03:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B08+/v2f"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VvYviVDe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9349222584
-	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 08:45:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21F5C22ACE3
+	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 09:03:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751100303; cv=none; b=YKKWYWylyHU3iHURPs+r218f5gJX5CarFZOpEFDTfq26dG8q8XiOQn6+HFYi3vv2UnWb98CEc5p2UrrfZlGPimASCnR41EIltUQUadlDY+vSoZIm8Zcpz8ya+bQbiF5N+IkQzrSvrEKYRvoP4PupTDt6eUTLkVrFa3AYsPO1Ev0=
+	t=1751101430; cv=none; b=r7nK46eAUDxMJurTCy5bzTiybZ+0Pz0/3SjgKy5K3QAxFUDBx8rS/ay6/tld3KWdfdYcLgraFPo20Vzg+6ngSDCd3fMs1AAC/GqlrbMwbJhY5ZqtMtkOy4RH7/idllUxBSyec3eIkRngh8rCB1X1rKmr8180gKNree6Efgq/wqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751100303; c=relaxed/simple;
-	bh=f3o9OoZUEbBDeBbUxOB3GnLGKqZpAG8HFhx3v3nlo/s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Xhzly47OYXF+LjSY17l09LX/ffdvvJkjiRR2cfpOcahr8RM23Fx+Ssr17d7EEnCPhZMv+vxNWcm2ouWPvlp8PL3FLZlhU+VFRQj+LHIkFDtMSMACUDiR6M+3fJjw/qGAb4xPEDIFCLYRlD/PMysCBBZQbgIGQt2yfB/UGVCKXOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B08+/v2f; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4a6f3f88613so5798011cf.1
-        for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 01:45:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751100301; x=1751705101; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/nmnfrusCNXdjpYHJ43O4MY52XtsNNDAe7B32gXZR/A=;
-        b=B08+/v2fGg+9DMi96O5lWHnkIwL9hBfG/wZVW11A3dfylVQAL7PBgRCbPFXewsYolW
-         TBOPcyswj4KZIA3xmvaUE3mScm81a1s1Xg3IkUvcShQSgi10WLhImnOKPbKQP+0c9kN+
-         NA/19wHB6OkvJYnmEH1Olmu3rsHPSbCsOxJ2dYdPWM8IO9p3NLF6phfpO1TjYKiR9qlz
-         Gf6JBgLNnYVnsO1okmSa9xLVtEOOG4yMg/tn7QMq2oixJch0oRuiagCEDZEuvLUW5NbU
-         8Ik5rbUzyAbfojkRH2WYm+HS8X6Zq8+dWOr36Gslq5o8wuN4aPC8wZNS9xW0OVoTo9W+
-         zQxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751100301; x=1751705101;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/nmnfrusCNXdjpYHJ43O4MY52XtsNNDAe7B32gXZR/A=;
-        b=qWnFczXqEApA1DKMWvxI7MnCFC31Va28nMXUpc8t8n6ALudd11lFl3nDDwDYGQOrH4
-         f69yQeDAf5NefGowh8o0+vCNknvFaDzFYL0p+bZcHxGnkIgAcGgsXSScd5HLjoM32rpb
-         ym5O7IAwe6Rz0b1pIO1JlmyZJTW1UytUglVtKFCSCHTlW9037f7afu94A/XAr5/I+RV4
-         XhhbLgFhO0bG+sFV4A+jcxaAVqR2bbDrVJh1C+KabLJ/lvscERvWCkDAIGzpLZ1ZevDD
-         Y6IGmqxM09VL4JLj7xHqj7Di9ajQcMzCBzLrNUADYQ4HJbcI3ha42NDetgETEfYrFYK/
-         mxoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXYF6g38Z6gH3imW1d4apoTyW73ghPt7fIXZjNaFp2kq3V+r17JTWReAK/R2OwC5Sb3QYSLmU0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWRTNlnUwAOoLGxaP3yRlEWinMvr7vCN5DXFler0CLQO94Tt4L
-	Dos3BkS+/+JwHf4azldKNs6KO2cxY6xaUYHxIGpx32inOJRj8ATo5aG70hF4ly4YsShBTWFG5AN
-	kze96Xy/qzebgIC7OYUWG+7+WDnUnX2OBllaVlmQs
-X-Gm-Gg: ASbGncutKw7/eFc3uGwLpTJA2UGO21i3rDkI0mMAzYCW+sOGYeEezdwQ7OR/2kSI1yN
-	R35lBpc9FPvms+sxxysGmUX+7xIY+U+/0gf9FfUfwkH4QfEshcvFDeRII8il2DZCC2ZmYlNUpjy
-	47ejIqR59WndZZdRzdEyWiwdgBgwvrkxS8SjFK0giaMU4E
-X-Google-Smtp-Source: AGHT+IEOmVnyFajIJ8a0GhgPX2/JYD/n70Gv15+Urivpy9ZmnV3HQI05bvkqKXfOyYfw16w5ldtEaRL1UFR0A99MQpw=
-X-Received: by 2002:a05:622a:1a27:b0:494:993d:ec2f with SMTP id
- d75a77b69052e-4a7fcab93bcmr96209851cf.12.1751100300350; Sat, 28 Jun 2025
- 01:45:00 -0700 (PDT)
+	s=arc-20240116; t=1751101430; c=relaxed/simple;
+	bh=MalP5h8rY+8ddDd4DqsyBCGkvFe9zBKO7a3DZScqIDg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rEd6L7I0Ys7CIwIWCKtDDtGXz971uZi+ARSWnO1DPhWaOCwI62ygfe29fe9kMWW+EH5CERJyPq6f/KUB3eERcl8Zwv/Fj5Mwa481bGdZgpXuW5S2WF0Nej0lPBD3ffjxqWqMkXU/L6sbnoP9Dg8GrJXqWMCfmEbSQ3WwNCYi9Hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VvYviVDe; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751101416;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=cg6t0GmzXyLQwVr+cFNcsHeCoMT3E75vS7FIvnaXPx0=;
+	b=VvYviVDe590rbGNhEBRSisMwRdgi+FBV1JFAvLsSSi4xvgRuzZwsuLQMVwNaUuIC9d6ygw
+	RVhbZjoqS4dRbBqtXCLZw1ROh8H7kVGNt92/Q8BGzqv+tVxdwX0LkvdjAdVXfq/T1W4C4N
+	604tYVcNXe6PyxT0pfNSm2kWikDsYIM=
+From: Frank Wunderlich <frank.wunderlich@linux.dev>
+To: MyungJoo Ham <myungjoo.ham@samsung.com>,
+	Kyungmin Park <kyungmin.park@samsung.com>,
+	Chanwoo Choi <cw00.choi@samsung.com>,
+	Georgi Djakov <djakov@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Frank Wunderlich <frank-w@public-files.de>,
+	Johnson Wang <johnson.wang@mediatek.com>,
+	=?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Felix Fietkau <nbd@nbd.name>,
+	linux-pm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH v6 00/15] further mt7988 devicetree work
+Date: Sat, 28 Jun 2025 11:03:11 +0200
+Message-ID: <20250628090330.57264-1-frank.wunderlich@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250626083512.GT1562@horms.kernel.org> <20250628081918.523857-1-malayarout91@gmail.com>
-In-Reply-To: <20250628081918.523857-1-malayarout91@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 28 Jun 2025 01:44:49 -0700
-X-Gm-Features: Ac12FXx7HbqsaSi67Ecn8j0W_HA9gHLw_rRrRWO3BQVTSD-WwmLZmje0U1gXKqQ
-Message-ID: <CANn89iJUz2EXu_h-YbiNswixHo6z1EwcmQrfSk6o-MmBznWfWA@mail.gmail.com>
-Subject: Re: [PATCH v2] selftests: net: fix resource leak in napi_id_helper.c
-To: Malaya Kumar Rout <malayarout91@gmail.com>
-Cc: horms@kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, Jun 28, 2025 at 1:19=E2=80=AFAM Malaya Kumar Rout
-<malayarout91@gmail.com> wrote:
->
-> Resolve minor resource leaks reported by cppcheck in napi_id_helper.c
->
-> cppcheck output before this patch:
-> tools/testing/selftests/drivers/net/napi_id_helper.c:37:3: error: Resourc=
-e leak: server [resourceLeak]
-> tools/testing/selftests/drivers/net/napi_id_helper.c:46:3: error: Resourc=
-e leak: server [resourceLeak]
-> tools/testing/selftests/drivers/net/napi_id_helper.c:51:3: error: Resourc=
-e leak: server [resourceLeak]
-> tools/testing/selftests/drivers/net/napi_id_helper.c:59:3: error: Resourc=
-e leak: server [resourceLeak]
-> tools/testing/selftests/drivers/net/napi_id_helper.c:67:3: error: Resourc=
-e leak: server [resourceLeak]
-> tools/testing/selftests/drivers/net/napi_id_helper.c:76:3: error: Resourc=
-e leak: server [resourceLeak]
->
-> cppcheck output after this patch:
-> No resource leaks found
->
-> Signed-off-by: Malaya Kumar Rout <malayarout91@gmail.com>
-> ---
->  .../selftests/drivers/net/napi_id_helper.c    | 19 +++++++++++++------
->  1 file changed, 13 insertions(+), 6 deletions(-)
->
-> diff --git a/tools/testing/selftests/drivers/net/napi_id_helper.c b/tools=
-/testing/selftests/drivers/net/napi_id_helper.c
-> index eecd610c2109..47dd3291bd55 100644
-> --- a/tools/testing/selftests/drivers/net/napi_id_helper.c
-> +++ b/tools/testing/selftests/drivers/net/napi_id_helper.c
-> @@ -34,7 +34,7 @@ int main(int argc, char *argv[])
->
->         if (setsockopt(server, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt=
-))) {
->                 perror("setsockopt");
-> -               return 1;
-> +               goto failure;
+From: Frank Wunderlich <frank-w@public-files.de>
 
-client variable is uninitialized at this point.
+This series continues mt7988 devicetree work
+
+- Extend cpu frequency scaling with CCI
+- GPIO leds
+- Basic network-support (ethernet controller + builtin switch + SFP Cages)
+
+depencies (i hope this list is complete and latest patches/series linked):
+
+support interrupt-names is optional again as i re-added the reserved IRQs
+(they are not unusable as i thought and can allow features in future)
+https://patchwork.kernel.org/project/netdevbpf/patch/20250619132125.78368-2-linux@fw-web.de/
+
+needs change in mtk ethernet driver for the sram to be read from separate node:
+https://patchwork.kernel.org/project/netdevbpf/patch/566ca90fc59ad0d3aff8bc8dc22ebaf0544bce47.1751072868.git.daniel@makrotopia.org/
+
+for SFP-Function (macs currently disabled):
+
+PCS clearance which is a 1.5 year discussion currently ongoing
+
+Daniel asked netdev for a way 2 go:
+https://lore.kernel.org/netdev/aEwfME3dYisQtdCj@pidgin.makrotopia.org/
+
+e.g. something like this (one of):
+* https://patchwork.kernel.org/project/netdevbpf/patch/20250610233134.3588011-4-sean.anderson@linux.dev/ (v6)
+* https://patchwork.kernel.org/project/netdevbpf/patch/20250511201250.3789083-4-ansuelsmth@gmail.com/ (v4)
+* https://patchwork.kernel.org/project/netdevbpf/patch/ba4e359584a6b3bc4b3470822c42186d5b0856f9.1721910728.git.daniel@makrotopia.org/
+
+full usxgmii driver:
+https://patchwork.kernel.org/project/netdevbpf/patch/07845ec900ba41ff992875dce12c622277592c32.1702352117.git.daniel@makrotopia.org/
+
+first PCS-discussion is here:
+https://patchwork.kernel.org/project/netdevbpf/patch/8aa905080bdb6760875d62cb3b2b41258837f80e.1702352117.git.daniel@makrotopia.org/
+some more here:
+https://lore.kernel.org/netdev/20250511201250.3789083-4-ansuelsmth@gmail.com/
+
+and then dts nodes for sgmiisys+usxgmii+2g5 firmware
+
+when above depencies are solved the mac1/2 can be enabled and 2.5G phy/SFP slots will work.
+
+changes:
+v6:
+binding:
+- split out the interrupt-names into separate patch
+- update irq(name) min count to 4
+- move interrupt-names up
+- add sram-property
+- drop second reg entry and minitems as there is only 1 item left
+
+dts:
+- fix whitespace-errors for pdma irqs (spaces vs. tabs)
+- move sram from eth reg to own sram node (needs CONFIG_SRAM)
+
+v5:
+- add reserved irqs and change names
+- update binding for 8 irqs with different names (rx,tx => fe1+fe2, rx-ringX => pdmaX)
+(dropped Robs RB due to this change again, sorry)
+
+v4:
+net-binding:
+- allow interrupt names and increase max interrupts to 6 because of RSS/LRO interrupts
+  (dropped Robs RB due to this change)
+
+dts-patches:
+- add interrupts for RSS/LRO and interrupt-names for ethernet node
+- eth-reg and clock whitespace-fix
+- comment for fixed-link on gmac0
+- drop phy-mode properties as suggested by andrew
+- drop phy-connection-type on 2g5 board
+- reorder some properties
+- update 2g5 phy node
+- unit-name dec instead of hex to match reg property
+- move compatible before reg
+- drop phy-mode
+
+v3:
+- dropped patches already applied (SPI+thermal)
+- added soc specific cci compatible (new binding patch + changed dts)
+- enable 2g5 phy because driver is now merged
+- add patch for cleaning up unnecessary pins
+- add patch for gpio-leds
+- add patch for adding ethernet aliases
+
+v2:
+- change reg to list of items in eth binding
+- changed mt7530 binding:
+- unevaluatedProperties=false
+- mediatek,pio subproperty
+- from patternProperty to property
+- board specific properties like led function and labels moved to bpi-r4 dtsi
+
+
+Frank Wunderlich (15):
+  dt-bindings: net: mediatek,net: update for mt7988
+  dt-bindings: net: mediatek,net: allow irq names
+  dt-bindings: net: mediatek,net: update for mt7988
+  dt-bindings: net: dsa: mediatek,mt7530: add dsa-port definition for
+    mt7988
+  dt-bindings: net: dsa: mediatek,mt7530: add internal mdio bus
+  dt-bindings: interconnect: add mt7988-cci compatible
+  arm64: dts: mediatek: mt7988: add cci node
+  arm64: dts: mediatek: mt7988: add basic ethernet-nodes
+  arm64: dts: mediatek: mt7988: add switch node
+  arm64: dts: mediatek: mt7988a-bpi-r4: add proc-supply for cci
+  arm64: dts: mediatek: mt7988a-bpi-r4: drop unused pins
+  arm64: dts: mediatek: mt7988a-bpi-r4: add gpio leds
+  arm64: dts: mediatek: mt7988a-bpi-r4: add aliases for ethernet
+  arm64: dts: mediatek: mt7988a-bpi-r4: add sfp cages and link to gmac
+  arm64: dts: mediatek: mt7988a-bpi-r4: configure switch phys and leds
+
+ .../bindings/interconnect/mediatek,cci.yaml   |  11 +-
+ .../bindings/net/dsa/mediatek,mt7530.yaml     |  24 +-
+ .../devicetree/bindings/net/mediatek,net.yaml |  47 ++-
+ .../mediatek/mt7988a-bananapi-bpi-r4-2g5.dts  |  11 +
+ .../dts/mediatek/mt7988a-bananapi-bpi-r4.dts  |  19 ++
+ .../dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi | 198 ++++++-----
+ arch/arm64/boot/dts/mediatek/mt7988a.dtsi     | 318 +++++++++++++++++-
+ 7 files changed, 529 insertions(+), 99 deletions(-)
+
+-- 
+2.43.0
+
 
