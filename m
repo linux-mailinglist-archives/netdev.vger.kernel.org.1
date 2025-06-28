@@ -1,50 +1,74 @@
-Return-Path: <netdev+bounces-202158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25F86AEC673
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 11:50:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 25FE9AEC676
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 11:53:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73F3D1BC005F
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 09:50:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1769A189FF9F
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 09:53:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B593221F05;
-	Sat, 28 Jun 2025 09:49:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C19122F75B;
+	Sat, 28 Jun 2025 09:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pNHt6feo"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cZwka4bp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F531EF39F
-	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 09:49:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B9B2236EE;
+	Sat, 28 Jun 2025 09:53:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751104181; cv=none; b=VH67C9fU7xqRfgzaEAW1TGVlhfC5Nha1nXGbwvpOL/ZNMHs/U67N6PXrS92/jWVC3TD67lSS+IBjW0MPKlXIVHPF6oIz2+8HsbLI11KtenqJ2PuQ5Dz/PDtN/rUhuB8TbPanSKrU49F7AywuibahCygPyVFyWggkFYzxg4rDxac=
+	t=1751104390; cv=none; b=tGRW8gJ/Xhon4lNhU68kg2hrKoEgmLu6mQHVLm8iPgif3AfcPGRYXqXRT3RBFKtFRt5XxnuAf7C09b1pFfR6DqR6jxaaHHfTZ/7Om4qaRnwQ7/0Vo/ng3sFd1Zli0qm3STW9fagIL0TvATH/VWo844o8waNBz0KAZTwJ0RcxuoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751104181; c=relaxed/simple;
-	bh=W9jCImTJ0gzGOltdiW9uge4Ir2GuO0+/Drxm3n9kR3Y=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nZnRzSB4txKXsHMtggTvicUghhIxFQRQbvjhzKimQmG6QH+EOla8r4AJQjND6v3nn9V/zKu9suJ8uZk6fj1mjB15UwZ8UZL1sU3wj6XAUyfF9qgZoWvxIcnCuSHntNadNONwlDF1lb2XzmhHQbN/2sbMD6Qhqw3fcOh4GbqkS4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pNHt6feo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A91A9C4CEEA;
-	Sat, 28 Jun 2025 09:49:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751104180;
-	bh=W9jCImTJ0gzGOltdiW9uge4Ir2GuO0+/Drxm3n9kR3Y=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pNHt6feoD/zGocw3LEzNnWJFc1zXm68Kwx4spWzyBrBMRyocuzmrCaBaHj15f1zyI
-	 /lgQgpXoQ0hMO0kXCNFFvJAjR0XN1x7mb5s1693UMtjGlGeE8xBJuscxcsvX9QCRx7
-	 xy1l4mj4bgse8dps395C/ol6kFjBCNNTLFghtWD9mYOcKFcRuprS4rWIUXL6behm99
-	 unWQW8RP4gTyVX/isf7uTsjPJsC5UnsVlv5ZqiMoyyBRL3a/6UI6jwYFGxCy7wU3wm
-	 ICPrYm6M6n6wFdkasSBeMYnL/8xtiKO+Tt8Q8mCxLBnZP6Xh5F3rZScxIPnPsk/5Gl
-	 JdXAw6pPT16cQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF3A38111CE;
-	Sat, 28 Jun 2025 09:50:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1751104390; c=relaxed/simple;
+	bh=Qz+vgWNHPP5vF6coYhtws3bEQ6ML7SD4vFoXMIuSgAI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hGC8jKq7k+JiT+O4n24XxsWPclcZurZLuQ07tbj3O8H9x0b8VZdOWdaklc3HdNYn0JGP7iyDLwM34PMkO6yAYSJUd7xPWjfVPyhM3CXHbQpGK0J1AuX8DojOD3YJrG4OIfDF9Pb4eGgo9+hHSYF8VXMK7beW/CXcYTNpWgeZZzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=cZwka4bp; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55S5f6hg012201;
+	Sat, 28 Jun 2025 09:52:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=Ae72umgiYtiNIqSIpFA7MtGiQ10aN
+	aJ+Z7V+1qQL1rM=; b=cZwka4bpy0oVFlkVdr0I0snQlXojMCEJTqmskNX4np85u
+	EP7uLfVXgCqslQsdWEOMERkZexWMPOO9eDUv0gD9pxkC0NCR16WafurL/bxWs9+Q
+	yp4Y8phbqg5I5c0zTyhzkvZScUw7XJIjBXqhDsxSDzLIBVR6PpW6vNGRuE4usaj/
+	ueaq2L7tV+wNPcGDiA83BwMVqLTz9OqyUZcX1aX08dECFJUt0d4iiflZZ8QVtOpu
+	jozq8C2DHF9pGxtAOB26meYDQ3Zpc5khCjVzpcq2cmSGgZiAuiV7qiZZNHmqH+ww
+	YfwHaHlZVAPhk2v7K8CgLP8lczJViJ/uvvBRNAFJg==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47j76687kc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 28 Jun 2025 09:52:54 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55S9LeYF014207;
+	Sat, 28 Jun 2025 09:52:53 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 47j6u6r8f8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 28 Jun 2025 09:52:53 +0000
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55S9qqR2009214;
+	Sat, 28 Jun 2025 09:52:52 GMT
+Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 47j6u6r8er-1;
+	Sat, 28 Jun 2025 09:52:52 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: sgoutham@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        horms@kernel.org, netdev@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] net: thunderx: avoid direct MTU assignment after WRITE_ONCE()
+Date: Sat, 28 Jun 2025 02:52:19 -0700
+Message-ID: <20250628095221.461991-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,60 +76,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: ipv4: guard ip_mr_output() with rcu
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175110420652.2189604.6501161970436026959.git-patchwork-notify@kernel.org>
-Date: Sat, 28 Jun 2025 09:50:06 +0000
-References: <20250627114641.3734397-1-edumazet@google.com>
-In-Reply-To: <20250627114641.3734397-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- kuniyu@google.com, dsahern@kernel.org, netdev@vger.kernel.org,
- eric.dumazet@gmail.com,
- syzbot+f02fb9e43bd85c6c66ae@syzkaller.appspotmail.com, petrm@nvidia.com,
- roopa@nvidia.com, razor@blackwall.org, bpoirier@nvidia.com, idosch@nvidia.com
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-06-27_05,2025-06-27_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 suspectscore=0
+ phishscore=0 mlxlogscore=999 mlxscore=0 adultscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
+ definitions=main-2506280080
+X-Proofpoint-GUID: 28NGkk0EG0roxnsCG4rY-kj-ROsDwQTD
+X-Proofpoint-ORIG-GUID: 28NGkk0EG0roxnsCG4rY-kj-ROsDwQTD
+X-Authority-Analysis: v=2.4 cv=b82y4sGx c=1 sm=1 tr=0 ts=685fbb76 b=1 cx=c_pps a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17 a=6IFa9wvqVegA:10 a=yPCof4ZbAAAA:8 a=6GJOchzy3z8SWhoumhsA:9 cc=ntf awl=host:14723
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI4MDA4MSBTYWx0ZWRfX7T9s0A92THvT DX3/F38hBL3wrkdQj1tm0eOzavSjF4r5NyyJKLZa80w+ITNTA159pJEtgZVOsuT/mBgyXuy5u92 h/Rk+1Z091eBZ8b+SbFdPkleE478Mrs4CxDXLTLxWRhrsFkOr+ceIUaQdlLZPao/UVaSZWwjQd1
+ 2qN9DFLlHJ5L9XoCHUo5xZs2hTuub29ak1kQoUdFAxu4F+R/LUIxtR2S4bNgZNSGH8OHtRJHKKZ f/+QmcEo9E7CrV+ueeQaalmwJa0yUcIDFJH2PU5r4EQ2xnsMFYW1JY+NeUCyilA8NS/umCi+CfT oHTqMUesPWoEFnNt5ZQ6rTLBrXr65yJ4ACkYKw9KDooEkHHiNYDvxPA+ASgmo+gkjDDjVHH0iFf
+ /rwyrLZNb1wYeCNAf9b8j9OG4BiayVy6YI/3vZpJMPmNF1lldcNc9r1kbPz3kBRcM5Num4GT
 
-Hello:
+The current logic in nicvf_change_mtu() writes the new MTU to
+netdev->mtu using WRITE_ONCE() before verifying if the hardware
+update succeeds. However on hardware update failure, it attempts
+to revert to the original MTU using a direct assignment
+(netdev->mtu = orig_mtu)
+which violates the intended of WRITE_ONCE protection introduced in
+commit 1eb2cded45b3 ("net: annotate writes on dev->mtu from
+ndo_change_mtu()")
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Additionally, WRITE_ONCE(netdev->mtu, new_mtu) is unnecessarily
+performed even when the device is not running.
 
-On Fri, 27 Jun 2025 11:46:41 +0000 you wrote:
-> syzbot found at least one path leads to an ip_mr_output()
-> without RCU being held.
-> 
-> Add guard(rcu)() to fix this in a concise way.
-> 
-> WARNING: CPU: 0 PID: 0 at net/ipv4/ipmr.c:2302 ip_mr_output+0xbb1/0xe70 net/ipv4/ipmr.c:2302
-> Call Trace:
->  <IRQ>
->   igmp_send_report+0x89e/0xdb0 net/ipv4/igmp.c:799
->  igmp_timer_expire+0x204/0x510 net/ipv4/igmp.c:-1
->   call_timer_fn+0x17e/0x5f0 kernel/time/timer.c:1747
->   expire_timers kernel/time/timer.c:1798 [inline]
->   __run_timers kernel/time/timer.c:2372 [inline]
->   __run_timer_base+0x61a/0x860 kernel/time/timer.c:2384
->   run_timer_base kernel/time/timer.c:2393 [inline]
->   run_timer_softirq+0xb7/0x180 kernel/time/timer.c:2403
->   handle_softirqs+0x286/0x870 kernel/softirq.c:579
->   __do_softirq kernel/softirq.c:613 [inline]
->   invoke_softirq kernel/softirq.c:453 [inline]
->   __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:680
->   irq_exit_rcu+0x9/0x30 kernel/softirq.c:696
->   instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1050 [inline]
->   sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1050
-> 
-> [...]
+Fix this by:
+  Only writing netdev->mtu after successfully updating the hardware.
+  Skipping hardware update when the device is down, and setting MTU
+directly.
 
-Here is the summary with links:
-  - [net-next] net: ipv4: guard ip_mr_output() with rcu
-    https://git.kernel.org/netdev/net-next/c/beead7eea896
+This ensures that all writes to netdev->mtu are consistent with
+WRITE_ONCE expectations and avoids unintended state corruption
+on failure paths.
 
-You are awesome, thank you!
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+Note: This change is not tested due to hardware availability.
+---
+ drivers/net/ethernet/cavium/thunder/nicvf_main.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/cavium/thunder/nicvf_main.c b/drivers/net/ethernet/cavium/thunder/nicvf_main.c
+index aebb9fef3f6eb..ba26ba31a28bf 100644
+--- a/drivers/net/ethernet/cavium/thunder/nicvf_main.c
++++ b/drivers/net/ethernet/cavium/thunder/nicvf_main.c
+@@ -1589,16 +1589,18 @@ static int nicvf_change_mtu(struct net_device *netdev, int new_mtu)
+ 		return -EINVAL;
+ 	}
+ 
+-	WRITE_ONCE(netdev->mtu, new_mtu);
+ 
+-	if (!netif_running(netdev))
++	if (!netif_running(netdev)) {
++		WRITE_ONCE(netdev->mtu, new_mtu);
+ 		return 0;
++	}
+ 
+ 	if (nicvf_update_hw_max_frs(nic, new_mtu)) {
+-		netdev->mtu = orig_mtu;
+ 		return -EINVAL;
+ 	}
+ 
++	WRITE_ONCE(netdev->mtu, new_mtu);
++
+ 	return 0;
+ }
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.46.0
 
 
