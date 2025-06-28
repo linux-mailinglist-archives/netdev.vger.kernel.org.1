@@ -1,89 +1,55 @@
-Return-Path: <netdev+bounces-202145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57ACDAEC62C
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 11:12:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9A9EAEC669
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 11:38:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB60D1BC63A0
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 09:12:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B72C61BC78AC
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 09:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E5822FE10;
-	Sat, 28 Jun 2025 09:11:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="r/s3poRq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952D01E8332;
+	Sat, 28 Jun 2025 09:38:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout1.routing.net (mxout1.routing.net [134.0.28.11])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A452253A0;
-	Sat, 28 Jun 2025 09:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E833B198A09;
+	Sat, 28 Jun 2025 09:38:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751101864; cv=none; b=XhIaWT7qycSSebmwQUKMtChnW8wbB4+3NKsJOP+uaOChBXKBsPP9ls5ZLXr0xNV8+1s3B+EpALIKEER7OX+MAhneTko7FQQ8yITf/FL8EjxONhKBdjeEaQFSgVihJaIa/HYJGLuTGpk72dBXv6V+lWoeYfDhuMVndFzQo9pzSj8=
+	t=1751103507; cv=none; b=g9Fk3j9B99NGF98A4Vtwxu48Hymy10Oog/hGIAGFCKqGZqBVYiKSCE4optAOAFagFqHnCvzvYgnwt2tyNDOiJS5Pe8NFLRvM1vczEtooO0GNlNJn7IYNrdus3foB5FxAXUgNHjumXRRPnhZcaCRJsm/AqCDJZ7iYJUn4GzqMB/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751101864; c=relaxed/simple;
-	bh=owery2Y9xho1bAvAYoxF0F6uDfB7KsKdTzyV/Nr07xM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=odQqimo6clDhICdUEiuUvXNrzI9pYuF5sVu9dS3KUij4qS59He4BIdPLMaS/K6a3yTWOmeeeYZr4Pp6GYZxsuoHgrOwoKpRP0Uq+aYNb1FBQhE4tJbqVZoqCFr7XRRJF8DWtJTZxxgeQaiupIRlGN7oA9xw8bhsOIUYVEFF+gT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=r/s3poRq; arc=none smtp.client-ip=134.0.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
-	by mxout1.routing.net (Postfix) with ESMTP id 6597441B9A;
-	Sat, 28 Jun 2025 09:10:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1751101856;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Mw75z6h4HeFha6AF7YI1R1VXg23z1dS7Y1C1o8vw7rQ=;
-	b=r/s3poRqq/VChsGtyFgPlDXqq72CLYUbSfojrYIpQDxm+axAk4IYVdvqL65kjsb/WoIQRt
-	ZFIo6bZfqpyao7+yjmEacYygPp80IJuKzIWRvKSHKjcta8uI3rUCW0bRZUwo9OkjOy9Q8V
-	1NcshjhY4uxuASOq5MabTXLHPmLZN/s=
-Received: from frank-u24.. (fttx-pool-217.61.150.139.bambit.de [217.61.150.139])
-	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 0AAB512272D;
-	Sat, 28 Jun 2025 09:10:56 +0000 (UTC)
-From: Frank Wunderlich <linux@fw-web.de>
-To: MyungJoo Ham <myungjoo.ham@samsung.com>,
-	Kyungmin Park <kyungmin.park@samsung.com>,
-	Chanwoo Choi <cw00.choi@samsung.com>,
-	Georgi Djakov <djakov@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
-	Johnson Wang <johnson.wang@mediatek.com>,
-	=?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>,
-	linux-pm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH v6 15/15] arm64: dts: mediatek: mt7988a-bpi-r4: configure switch phys and leds
-Date: Sat, 28 Jun 2025 11:10:39 +0200
-Message-ID: <20250628091043.57645-16-linux@fw-web.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250628091043.57645-1-linux@fw-web.de>
-References: <20250628091043.57645-1-linux@fw-web.de>
+	s=arc-20240116; t=1751103507; c=relaxed/simple;
+	bh=qmD57pNlU8IpA3r0Rhf/560u+TtYPik1mEAgDEbnZPw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lQCY1Iy0DgzLZgYD2nxkE6TWZ9m+6nDtMKrEOysviJGrQ+/u1rIO/t2sQhwj0xZrR5SBTr8l2yvMJRAyVPq8utqVaX7WnBvTeAG2YBSLNZh4eEKTkDYiKiMvgC4JHW64vF403Cpqm+URkrUXO5h51wk2teSnC/5dRgZv1Q6/ZBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4bTnSH0JCqz27hQC;
+	Sat, 28 Jun 2025 17:39:11 +0800 (CST)
+Received: from kwepemk100010.china.huawei.com (unknown [7.202.194.58])
+	by mail.maildlp.com (Postfix) with ESMTPS id 52B3B1A016C;
+	Sat, 28 Jun 2025 17:38:15 +0800 (CST)
+Received: from workspace-z00536909-5022804397323726849.huawei.com
+ (7.151.123.135) by kwepemk100010.china.huawei.com (7.202.194.58) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 28 Jun
+ 2025 17:38:14 +0800
+From: zhangjianrong <zhangjianrong5@huawei.com>
+To: <michael.jamet@intel.com>, <mika.westerberg@linux.intel.com>,
+	<YehezkelShB@gmail.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <guhengsheng@hisilicon.com>, <caiyadong@huawei.com>,
+	<xuetao09@huawei.com>, <lixinghang1@huawei.com>
+Subject: [PATCH v2] net: thunderbolt: Enable end-to-end flow control also in transmit
+Date: Sat, 28 Jun 2025 17:38:13 +0800
+Message-ID: <20250628093813.647005-1-zhangjianrong5@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,103 +57,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemk100010.china.huawei.com (7.202.194.58)
 
-From: Frank Wunderlich <frank-w@public-files.de>
+According to USB4 specification, if E2E flow control is disabled for
+the Transmit Descriptor Ring, the Host Interface Adapter Layer shall
+not require any credits to be available before transmitting a Tunneled
+Packet from this Transmit Descriptor Ring, so e2e flow control should
+be enabled in both directions.
 
-Assign pinctrl to switch phys and leds.
-
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Signed-off-by: zhangjianrong <zhangjianrong5@huawei.com>
 ---
-v4:
-- reorder switch phy(-led) properties
-v2:
-- add labels and led-function and include after dropping from soc dtsi
----
- .../dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi | 61 +++++++++++++++++++
- 1 file changed, 61 insertions(+)
+v2: update subject and commit message
+v1: initial submission
 
-diff --git a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-index 4d709ee527df..7c9df606f60d 100644
---- a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-+++ b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-@@ -4,6 +4,7 @@
+ drivers/net/thunderbolt/main.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
+index 0a53ec293d04..643cf67840b5 100644
+--- a/drivers/net/thunderbolt/main.c
++++ b/drivers/net/thunderbolt/main.c
+@@ -924,8 +924,12 @@ static int tbnet_open(struct net_device *dev)
  
- #include <dt-bindings/gpio/gpio.h>
- #include <dt-bindings/regulator/richtek,rt5190a-regulator.h>
-+#include <dt-bindings/leds/common.h>
+ 	netif_carrier_off(dev);
  
- #include "mt7988a.dtsi"
+-	ring = tb_ring_alloc_tx(xd->tb->nhi, -1, TBNET_RING_SIZE,
+-				RING_FLAG_FRAME);
++	flags = RING_FLAG_FRAME;
++	/* Only enable full E2E if the other end supports it too */
++	if (tbnet_e2e && net->svc->prtcstns & TBNET_E2E)
++		flags |= RING_FLAG_E2E;
++
++	ring = tb_ring_alloc_tx(xd->tb->nhi, -1, TBNET_RING_SIZE, flags);
+ 	if (!ring) {
+ 		netdev_err(dev, "failed to allocate Tx ring\n");
+ 		return -ENOMEM;
+@@ -944,11 +948,6 @@ static int tbnet_open(struct net_device *dev)
+ 	sof_mask = BIT(TBIP_PDF_FRAME_START);
+ 	eof_mask = BIT(TBIP_PDF_FRAME_END);
  
-@@ -152,6 +153,66 @@ &gmac2 {
- 	sfp = <&sfp1>;
- };
- 
-+&gsw_phy0 {
-+	pinctrl-0 = <&gbe0_led0_pins>;
-+	pinctrl-names = "gbe-led";
-+};
-+
-+&gsw_phy0_led0 {
-+	function = LED_FUNCTION_WAN;
-+	color = <LED_COLOR_ID_GREEN>;
-+	status = "okay";
-+};
-+
-+&gsw_port0 {
-+	label = "wan";
-+};
-+
-+&gsw_phy1 {
-+	pinctrl-0 = <&gbe1_led0_pins>;
-+	pinctrl-names = "gbe-led";
-+};
-+
-+&gsw_phy1_led0 {
-+	function = LED_FUNCTION_LAN;
-+	color = <LED_COLOR_ID_GREEN>;
-+	status = "okay";
-+};
-+
-+&gsw_port1 {
-+	label = "lan1";
-+};
-+
-+&gsw_phy2 {
-+	pinctrl-0 = <&gbe2_led0_pins>;
-+	pinctrl-names = "gbe-led";
-+};
-+
-+&gsw_phy2_led0 {
-+	function = LED_FUNCTION_LAN;
-+	color = <LED_COLOR_ID_GREEN>;
-+	status = "okay";
-+};
-+
-+&gsw_port2 {
-+	label = "lan2";
-+};
-+
-+&gsw_phy3 {
-+	pinctrl-0 = <&gbe3_led0_pins>;
-+	pinctrl-names = "gbe-led";
-+};
-+
-+&gsw_phy3_led0 {
-+	function = LED_FUNCTION_LAN;
-+	color = <LED_COLOR_ID_GREEN>;
-+	status = "okay";
-+};
-+
-+&gsw_port3 {
-+	label = "lan3";
-+};
-+
- &i2c0 {
- 	pinctrl-names = "default";
- 	pinctrl-0 = <&i2c0_pins>;
+-	flags = RING_FLAG_FRAME;
+-	/* Only enable full E2E if the other end supports it too */
+-	if (tbnet_e2e && net->svc->prtcstns & TBNET_E2E)
+-		flags |= RING_FLAG_E2E;
+-
+ 	ring = tb_ring_alloc_rx(xd->tb->nhi, -1, TBNET_RING_SIZE, flags,
+ 				net->tx_ring.ring->hop, sof_mask,
+ 				eof_mask, tbnet_start_poll, net);
 -- 
-2.43.0
+2.34.1
 
 
