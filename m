@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-202120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46E68AEC53A
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 07:45:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A66AAEC53E
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 07:45:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57DBE1C22F22
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 05:45:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B28621C22E24
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 05:45:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C42E21D3FD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEF28220F4F;
 	Sat, 28 Jun 2025 05:44:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vn1IiSQb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mX4bCDJD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A60621C185;
-	Sat, 28 Jun 2025 05:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E54220F32;
+	Sat, 28 Jun 2025 05:44:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751089487; cv=none; b=luYs3D/uKttOCSXAc1fXeRw3KHjEiTtg1gJKYhu8YC58NP+KSUKfAdrj4b2LlJiur5LBlpjp5zkE3Od1pk5eXDxqYBYY7Sgj01ejUjqW3h39fbKSQpiqcvyl2kn2WCH/wIZ9zrC6PA3pfecCDPkwcFjyDkAod4MY53+KNXJIauI=
+	t=1751089487; cv=none; b=WKdSwkr7NH7VqFnE98a0q9kr9ADbRdcGjioh+6ggtyK7xe8cAeE/gOlhNaGHG/SQ7L9pqRHPpcC0uwVRiGphQtQqojm+gJDhF48spwgeQrY7ybEzQnuJZJFpah3Jba19A7DjG7UeCTwgy2WJ7MokB2buObscH3F+1zwSg38VEzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1751089487; c=relaxed/simple;
-	bh=mYZq/vP+pCKa5Srrcf2wrhmjIPn3LNdwFBkoYlVxsJg=;
+	bh=WKX6UPJG1JKK2C5l7RGoc2IVvdGkeOSZ82VyvukU8Ok=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qT+MjShp0HKsDB7OAFL5zFxwIPutoUNQtH2UHve7hYxb9HW237K0KfPOmGk1k5E9Vf5a1w77gZelMAxafD1gLAJMpYMw7pD8UJzOnFNMWEElr/ZsqsPpxyz+sXlGA1NvMDc76vlcs901hqPhy6ug/+kmyZ62HlcKyXnENnoO7E4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vn1IiSQb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DC7DC4CEEA;
+	 MIME-Version; b=rbi5Cv+Gf0Exazq1aF4Vk9jde6+Lc6KBlhWdd3RmlMslzVH/El8Didt5FIhh8GnRY6g5uPjKjjpJASIGI/PulyIF57RdluHMHRIu0vt61tuM5cLuqTgHE2Wl4akTLAZgan+i/r3NzDm34wSWiJHj+6+BRY/OADGyDx8hVuTAp0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mX4bCDJD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F16D3C4CEF4;
 	Sat, 28 Jun 2025 05:44:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751089486;
-	bh=mYZq/vP+pCKa5Srrcf2wrhmjIPn3LNdwFBkoYlVxsJg=;
+	s=k20201202; t=1751089487;
+	bh=WKX6UPJG1JKK2C5l7RGoc2IVvdGkeOSZ82VyvukU8Ok=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Vn1IiSQbeMP6wuA2F27dtSqdbp2ArbL00yPePouVZSblzDKNG8yXiOgK+nnkNuJaU
-	 RnLf+f1S3+2cm5EFSVwrYLxHVkJUnAHPMHb95uceI3iP8OsmV0CPFEWP0vKpb94jtY
-	 MM9eU+jbuPpIDvleBvdNxN6GQLh5Fq5mdutZKuXAdNnLyXAiR9tv4K+1MzQatOHG1R
-	 NANJ+P5LgkglaGAmnQKcbSIdkd0REHSyfETz6YqgPpmhciSz8BrFG+9HkmWeNAomdV
-	 2xHC+zSqtOic8OqyBGAv0nwayAAKBADruI0Ots7SIlBd3y1OSV8/Oj5ZPrQSiGwh8E
-	 aNO7paZO7eUSQ==
+	b=mX4bCDJDLs0dK9C86qRB66iAJTv77tTOiAaMz6rER9I1XC3Wq4YXoi57TBk0/oCzS
+	 o8ajQdLDEx0z7a40jaY4FXFFWhPGJVV+cN5dF5nmHlh8Qtu7h2p01DDthOgiyW8CCU
+	 +uCqKyZKwTJoyMKJkvjo/Xkk5LXOruYPrfYOKDDcHOt18eIGQdPkSgqW/iz9DzLBJm
+	 EdruJnU1YTHXUWC213Y7PyiuGgKJqCZf4yQYRkf0rkqeb2N6anfhOnI4jV0M+txMVQ
+	 KHKHvEaC6Sr4mTJfjISFccfB71xlDNykXwqM+H0qlBb3r1FjqHA8KkFUxfYOVlGAbZ
+	 Eyl/9f0sMusMg==
 Received: by wens.tw (Postfix, from userid 1000)
-	id 469805FA91; Sat, 28 Jun 2025 13:44:44 +0800 (CST)
+	id 583A25FE35; Sat, 28 Jun 2025 13:44:44 +0800 (CST)
 From: Chen-Yu Tsai <wens@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -60,9 +60,9 @@ Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-sunxi@lists.linux.dev
-Subject: [PATCH net 1/2] dt-bindings: net: sun8i-emac: Rename A523 EMAC0 to GMAC0
-Date: Sat, 28 Jun 2025 13:44:37 +0800
-Message-Id: <20250628054438.2864220-2-wens@kernel.org>
+Subject: [PATCH net 2/2] arm64: dts: allwinner: a523: Rename emac0 to gmac0
+Date: Sat, 28 Jun 2025 13:44:38 +0800
+Message-Id: <20250628054438.2864220-3-wens@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250628054438.2864220-1-wens@kernel.org>
 References: <20250628054438.2864220-1-wens@kernel.org>
@@ -79,28 +79,88 @@ From: Chen-Yu Tsai <wens@csie.org>
 The datasheets refer to the first Ethernet controller as GMAC0, not
 EMAC0.
 
-Rename the compatible string to align with the datasheets. A fix for
-the device trees will be sent separately.
+Fix the compatible string, node label and pinmux function name to match
+what the datasheets use. A change to the device tree binding is sent
+separately.
 
-Fixes: 0454b9057e98 ("dt-bindings: net: sun8i-emac: Add A523 EMAC0 compatible")
+Fixes: 56766ca6c4f6 ("arm64: dts: allwinner: a523: Add EMAC0 ethernet MAC")
+Fixes: acca163f3f51 ("arm64: dts: allwinner: a527: add EMAC0 to Radxa A5E board")
+Fixes: c6800f15998b ("arm64: dts: allwinner: t527: add EMAC0 to Avaota-A1 board")
 Signed-off-by: Chen-Yu Tsai <wens@csie.org>
 ---
- .../devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml      | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi          | 6 +++---
+ arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts | 4 ++--
+ arch/arm64/boot/dts/allwinner/sun55i-t527-avaota-a1.dts | 4 ++--
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml b/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
-index 7b6a2fde8175..19934d5c24e5 100644
---- a/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
-+++ b/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
-@@ -23,7 +23,7 @@ properties:
-               - allwinner,sun20i-d1-emac
-               - allwinner,sun50i-h6-emac
-               - allwinner,sun50i-h616-emac0
--              - allwinner,sun55i-a523-emac0
-+              - allwinner,sun55i-a523-gmac0
-           - const: allwinner,sun50i-a64-emac
+diff --git a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
+index 8b7cbc2e78f5..51cd148f4227 100644
+--- a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
+@@ -131,7 +131,7 @@ rgmii0_pins: rgmii0-pins {
+ 				       "PH5", "PH6", "PH7", "PH9", "PH10",
+ 				       "PH14", "PH15", "PH16", "PH17", "PH18";
+ 				allwinner,pinmux = <5>;
+-				function = "emac0";
++				function = "gmac0";
+ 				drive-strength = <40>;
+ 				bias-disable;
+ 			};
+@@ -540,8 +540,8 @@ ohci1: usb@4200400 {
+ 			status = "disabled";
+ 		};
  
-   reg:
+-		emac0: ethernet@4500000 {
+-			compatible = "allwinner,sun55i-a523-emac0",
++		gmac0: ethernet@4500000 {
++			compatible = "allwinner,sun55i-a523-gmac0",
+ 				     "allwinner,sun50i-a64-emac";
+ 			reg = <0x04500000 0x10000>;
+ 			clocks = <&ccu CLK_BUS_EMAC0>;
+diff --git a/arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts b/arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts
+index 0f58d92a6adc..8bc0f2c72a24 100644
+--- a/arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts
++++ b/arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts
+@@ -12,7 +12,7 @@ / {
+ 	compatible = "radxa,cubie-a5e", "allwinner,sun55i-a527";
+ 
+ 	aliases {
+-		ethernet0 = &emac0;
++		ethernet0 = &gmac0;
+ 		serial0 = &uart0;
+ 	};
+ 
+@@ -55,7 +55,7 @@ &ehci1 {
+ 	status = "okay";
+ };
+ 
+-&emac0 {
++&gmac0 {
+ 	phy-mode = "rgmii-id";
+ 	phy-handle = <&ext_rgmii_phy>;
+ 	phy-supply = <&reg_cldo3>;
+diff --git a/arch/arm64/boot/dts/allwinner/sun55i-t527-avaota-a1.dts b/arch/arm64/boot/dts/allwinner/sun55i-t527-avaota-a1.dts
+index 08127f0cdd35..142177c1f737 100644
+--- a/arch/arm64/boot/dts/allwinner/sun55i-t527-avaota-a1.dts
++++ b/arch/arm64/boot/dts/allwinner/sun55i-t527-avaota-a1.dts
+@@ -12,7 +12,7 @@ / {
+ 	compatible = "yuzukihd,avaota-a1", "allwinner,sun55i-t527";
+ 
+ 	aliases {
+-		ethernet0 = &emac0;
++		ethernet0 = &gmac0;
+ 		serial0 = &uart0;
+ 	};
+ 
+@@ -65,7 +65,7 @@ &ehci1 {
+ 	status = "okay";
+ };
+ 
+-&emac0 {
++&gmac0 {
+ 	phy-mode = "rgmii-id";
+ 	phy-handle = <&ext_rgmii_phy>;
+ 	phy-supply = <&reg_dcdc4>;
 -- 
 2.39.5
 
