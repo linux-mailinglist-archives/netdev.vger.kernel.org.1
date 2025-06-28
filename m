@@ -1,351 +1,135 @@
-Return-Path: <netdev+bounces-202202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5F42AECA69
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 23:43:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98FC0AECA9C
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 00:15:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 124E13B76AC
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 21:43:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEB137A5BE8
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 22:13:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2DF2222A8;
-	Sat, 28 Jun 2025 21:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471101B0416;
+	Sat, 28 Jun 2025 22:15:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="i2kFNNF2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PiOhmEKH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347937DA66
-	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 21:43:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3BF21E7C27
+	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 22:15:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751147021; cv=none; b=OaGosRUZxxaHCt9MxuqikcmUC3vNVOPHa63jGeylBqU6gzdpPClgu+Xnvh5M3mXVDyTES03GFBIEiTPB/kYD58NAcHG0s93Y1EJlLLDAximgBLdvFgMza36KrJ+9iBWJ6qJxuOh9+eYL9AwmRRuwyqi4m2uTYhM3KS4UWm/0sYE=
+	t=1751148918; cv=none; b=EHuzRjneyra4ELUOIOdf+0wUQ/Pg2ohON1TihPa77dP/oYlvWFq9xFQcVI1RUSzLCQJQ5IsX4nr/eFmVHysEoXLK3978gYre+8pOfW6wGTeZELuVHTscCsFtE08pFDDAiuRfOCHUOvq1gpi3dyWsVYqU6I8rslk/B+hezXa2euE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751147021; c=relaxed/simple;
-	bh=8qpfupX9YM+cPjJYUBH2kd5c0PcyqN/5Z8aODDgIleA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B1H5I79f48+fIC0hSbXAYJsdsts8cN4VHKtFhJv9amgbB8aetCAvUl6AW0rSUFDzICFkp8EI8XCPl/cI7FUWK2+ClbnixLSdq9ji4zC+BYtDNT9F1GeA65IBr7pCeMiGa9H+IhqaHJ5uz4NXX7C+y9kPDmLmU80XLnM3eRJtYok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=i2kFNNF2; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-73972a54919so966069b3a.3
-        for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 14:43:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1751147016; x=1751751816; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MU6rUaXd/jwIT7Zn2GEQQNo0DhvukKg2e5GHoI2EbLc=;
-        b=i2kFNNF2XfvvmFqXnfPLS/gi/HlifkML3+zohWJVgxwQStz9PB2Qq3ofiac/Sq7wsU
-         I8dfvPpByNH3u+IZKfTN5MLHRU0Qoq3lKyzVe/79cgWYtGGWO394Yp2kYz5Xff9RgxOX
-         RFxt4vqu95xlrwrHk+FBrRLYGgYMeUpbPZIwyf3ls1miGJ21tQATnMJHvt28Vp5czg0b
-         jRJuVgxb79mTnG2PPqYafgr0LuqBmHSd4YQGBs81n2bo5HC/ZcXcxFYTjM6qfEZh/0oz
-         Oe40/fpx/oOmjikeQpcRkatItuv6vS749eM7Ohb+YzwMuWd1WxKgJg3dv23mQ8RyF+vb
-         ITMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751147016; x=1751751816;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MU6rUaXd/jwIT7Zn2GEQQNo0DhvukKg2e5GHoI2EbLc=;
-        b=uVfM9UZ968qX8bnMwQV+ebld7hA+DbX42mLeFgS77a9N/aVquqArY1UgcsUeda9bWu
-         gJ+1CJB/biyOlU29oD4/oS8pv11DYgK1g7jLi+4dL+EzYdYPBzpfzapAEl5CGXZIyOPg
-         bSYBHwPByWV4DafDiLCXOW5rmpZ/JAG9TR1OV7Lq6gSCU+HQULK4vAPdB22IfZMgSup2
-         LTy2DE3kXckB6ttgftjW/OM1my8FjikS9JTez61dw1b9qlvdRIx+Ft1i/oMqRMaWZrfe
-         atvyqLd3AXqX0r3aB/2ez+eM2ZDuT1Zg7Gkz0N9XCFrvQcFQagh9f7M+lV/vPlqcXr+W
-         KL2g==
-X-Forwarded-Encrypted: i=1; AJvYcCVi+lZ9vF1kVZWeEo2D1LbdNVn8wplYiWyrL/8rxoUQu+1xE5OH0ZvcbscYbWkHfpwiwPVk4fY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+rqacR/2kbhay0q+NOKeY6H030SdLKMi9UrzQDJFLRdRkVi3N
-	H4oYSR6kvcouLCDZkIDDTukIpJJeuPjIDNbK1k8Sj17aP02sw87fDwCWcY74jslI7Kq/mnhXszo
-	BD9nNvkCkyUimb9Gma0HHLuhWzn7A35jkteXoE143drXPti9+TY7yrg==
-X-Gm-Gg: ASbGncth7pc+gkYyz5xBKkHSDvzqG7dCi6+lvnMQ3BdKmVDHejmLJ16kHrh7UahxT7J
-	qeBDm7z6ASj8ftEeMicRtRj63FT0P2q/E2a9a+Gx0D6NmRTJEsWx9cl8yGgRkwm0xIAKhyf1SWk
-	HAXsNXe/YQSQuL+Zo6LQA92tTrvzdOfu56kt9oyVNu3w==
-X-Google-Smtp-Source: AGHT+IGZg4IXlxL3x10Kvx/31X16LC0IBK3hyvWl1q3uyu38lUVpfO1zW6/k8WY4u0FaRG1Zos9RGuga160MtQC5pJ4=
-X-Received: by 2002:a05:6a20:2449:b0:1f5:95a7:8159 with SMTP id
- adf61e73a8af0-220a12d3834mr12486991637.10.1751147015798; Sat, 28 Jun 2025
- 14:43:35 -0700 (PDT)
+	s=arc-20240116; t=1751148918; c=relaxed/simple;
+	bh=i7+EmW2a/ovIfkqGuD41eAsx98c0Dx6zctfDs0y//2I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nu1fH5IgvviOD+oKpDQPSIYf4VeOgTBDoCQSqRcXOaYHwEeVOI7a6pwtZhlvAQAsS7rp8gAcvJ2H5mg/0rMnmEIPOs+U/DmZYsG5MBz/vcUqwZ1T/MJUhVT5crD00xogP+8l3AUbo4fODNL8DVtwFKNEQYfpoucd94ncWY8eL2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PiOhmEKH; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751148916; x=1782684916;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=i7+EmW2a/ovIfkqGuD41eAsx98c0Dx6zctfDs0y//2I=;
+  b=PiOhmEKHrqKD89VHnKMacriEzKqIF0reivFB3auPaNCfaRwIO2DAEbxc
+   tUpNnmuS/rLWLE9BT3szszarkmRwEJGE70c6NZEtbqJg87Q8kpNTRZ7KP
+   73NKqTan9+TGEBexbtsGvX9Kpr+XvIW3gTSkJu18c9AfZV3m2Iz2wgt2i
+   QlBO1OjJQpZqBWtt9yQt8tq9oID7v3ftbQ7svACwOJkbr4tq/ZEzAY/j+
+   8EH/uDXiSNziYxVVBjd730i5DrLqIoGr2BB3l14XksUPVn9wDUyAqcA4Z
+   ZCaCERdm7XOTYhxLVHsjvCBPOnukEp1xJeP/D4/lE7kets6OPVebOhD0M
+   A==;
+X-CSE-ConnectionGUID: mNQ+cByVSLa6o9pyhh6feA==
+X-CSE-MsgGUID: Ul+B53eYRvSGDOegW8FDSA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11478"; a="41047638"
+X-IronPort-AV: E=Sophos;i="6.16,273,1744095600"; 
+   d="scan'208";a="41047638"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2025 15:15:15 -0700
+X-CSE-ConnectionGUID: O24xXQUETYSn4YNSIwQYbg==
+X-CSE-MsgGUID: N9vwVKmaTTCpjSDZKQwMYg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,273,1744095600"; 
+   d="scan'208";a="152835100"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 28 Jun 2025 15:15:12 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uVdpG-000XQs-20;
+	Sat, 28 Jun 2025 22:15:10 +0000
+Date: Sun, 29 Jun 2025 06:14:28 +0800
+From: kernel test robot <lkp@intel.com>
+To: Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next 3/4] tcp: move tcp_memory_allocated into
+ net_aligned_data
+Message-ID: <202506290837.0mGwXgmy-lkp@intel.com>
+References: <20250627200551.348096-4-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <45876f14-cf28-4177-8ead-bb769fd9e57a@gmail.com>
- <aFosjBOUlOr0TKsd@pop-os.localdomain> <3af4930b-6773-4159-8a7a-e4f6f6ae8109@gmail.com>
- <5e4490da-3f6c-4331-af9c-0e6d32b6fc75@gmail.com> <CAM0EoMm+xgb0vkTDMAWy9xCvTF+XjGQ1xO5A2REajmBN1DKu1Q@mail.gmail.com>
- <d23fe619-240a-4790-9edd-bec7ab22a974@gmail.com>
-In-Reply-To: <d23fe619-240a-4790-9edd-bec7ab22a974@gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sat, 28 Jun 2025 17:43:24 -0400
-X-Gm-Features: Ac12FXw6fj0AJ6Skf1_AaURBAmblgPpYqxtIRjRAgmxwJWtNAKxP_R1eZAQ6tuQ
-Message-ID: <CAM0EoM=rU91P=9QhffXShvk-gnUwbRHQrwpFKUr9FZFXbbW1gQ@mail.gmail.com>
-Subject: Re: Incomplete fix for recent bug in tc / hfsc
-To: Lion Ackermann <nnamrec@gmail.com>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org, 
-	Jiri Pirko <jiri@resnulli.us>, Mingi Cho <mincho@theori.io>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250627200551.348096-4-edumazet@google.com>
 
-On Thu, Jun 26, 2025 at 4:08=E2=80=AFAM Lion Ackermann <nnamrec@gmail.com> =
-wrote:
->
-> Hi,
->
-> On 6/25/25 4:22 PM, Jamal Hadi Salim wrote:
-> > On Tue, Jun 24, 2025 at 6:43=E2=80=AFAM Lion Ackermann <nnamrec@gmail.c=
-om> wrote:
-> >>
-> >> Hi,
-> >>
-> >> On 6/24/25 11:24 AM, Lion Ackermann wrote:
-> >>> Hi,
-> >>>
-> >>> On 6/24/25 6:41 AM, Cong Wang wrote:
-> >>>> On Mon, Jun 23, 2025 at 12:41:08PM +0200, Lion Ackermann wrote:
-> >>>>> Hello,
-> >>>>>
-> >>>>> I noticed the fix for a recent bug in sch_hfsc in the tc subsystem =
-is
-> >>>>> incomplete:
-> >>>>>     sch_hfsc: Fix qlen accounting bug when using peek in hfsc_enque=
-ue()
-> >>>>>     https://lore.kernel.org/all/20250518222038.58538-2-xiyou.wangco=
-ng@gmail.com/
-> >>>>>
-> >>>>> This patch also included a test which landed:
-> >>>>>     selftests/tc-testing: Add an HFSC qlen accounting test
-> >>>>>
-> >>>>> Basically running the included test case on a sanitizer kernel or w=
-ith
-> >>>>> slub_debug=3DP will directly reveal the UAF:
-> >>>>
-> >>>> Interesting, I have SLUB debugging enabled in my kernel config too:
-> >>>>
-> >>>> CONFIG_SLUB_DEBUG=3Dy
-> >>>> CONFIG_SLUB_DEBUG_ON=3Dy
-> >>>> CONFIG_SLUB_RCU_DEBUG=3Dy
-> >>>>
-> >>>> But I didn't catch this bug.
-> >>>>
-> >>>
-> >>> Technically the class deletion step which triggered the sanitizer was=
- not
-> >>> present in your testcase. The testcase only left the stale pointer wh=
-ich was
-> >>> never accessed though.
-> >>>
-> >>>>> To be completely honest I do not quite understand the rationale beh=
-ind the
-> >>>>> original patch. The problem is that the backlog corruption propagat=
-es to
-> >>>>> the parent _before_ parent is even expecting any backlog updates.
-> >>>>> Looking at f.e. DRR: Child is only made active _after_ the enqueue =
-completes.
-> >>>>> Because HFSC is messing with the backlog before the enqueue complet=
-ed,
-> >>>>> DRR will simply make the class active even though it should have al=
-ready
-> >>>>> removed the class from the active list due to qdisc_tree_backlog_fl=
-ush.
-> >>>>> This leaves the stale class in the active list and causes the UAF.
-> >>>>>
-> >>>>> Looking at other qdiscs the way DRR handles child enqueues seems to=
- resemble
-> >>>>> the common case. HFSC calling dequeue in the enqueue handler violat=
-es
-> >>>>> expectations. In order to fix this either HFSC has to stop using de=
-queue or
-> >>>>> all classful qdiscs have to be updated to catch this corner case wh=
-ere
-> >>>>> child qlen was zero even though the enqueue succeeded. Alternativel=
-y HFSC
-> >>>>> could signal enqueue failure if it sees child dequeue dropping pack=
-ets to
-> >>>>> zero? I am not sure how this all plays out with the re-entrant case=
- of
-> >>>>> netem though.
-> >>>>
-> >>>> I think this may be the same bug report from Mingi in the security
-> >>>> mailing list. I will take a deep look after I go back from Open Sour=
-ce
-> >>>> Summit this week. (But you are still very welcome to work on it by
-> >>>> yourself, just let me know.)
-> >>>>
-> >>>> Thanks!
-> >>>
-> >>>> My suggestion is we go back to a proposal i made a few moons back (w=
-as
-> >>>> this in a discussion with you? i dont remember): create a mechanism =
-to
-> >>>> disallow certain hierarchies of qdiscs based on certain attributes,
-> >>>> example in this case disallow hfsc from being the ancestor of "qdisc=
-s that may
-> >>>> drop during peek" (such as netem). Then we can just keep adding more
-> >>>> "disallowed configs" that will be rejected via netlink. Similar idea
-> >>>> is being added to netem to disallow double duplication, see:
-> >>>> https://lore.kernel.org/netdev/20250622190344.446090-1-will@willsroo=
-t.io/
-> >>>>
-> >>>> cheers,
-> >>>> jamal
-> >>>
-> >>> I vaguely remember Jamal's proposal from a while back, and I believe =
-there was
-> >>> some example code for this approach already?
-> >>> Since there is another report you have a better overview, so it is pr=
-obably
-> >>> best you look at it first. In the meantime I can think about the solu=
-tion a
-> >>> bit more and possibly draft something if you wish.
-> >>>
-> >>> Thanks,
-> >>> Lion
-> >>
-> >> Actually I was intrigued, what do you think about addressing the root =
-of the
-> >> use-after-free only and ignore the backlog corruption (kind of). After=
- the
-> >> recent patches where qlen_notify may get called multiple times, we cou=
-ld simply
-> >> loosen qdisc_tree_reduce_backlog to always notify when the qdisc is em=
-pty.
-> >> Since deletion of all qdiscs will run qdisc_reset / qdisc_purge_queue =
-at one
-> >> point or another, this should always catch left-overs. And we need not=
- care
-> >> about all the complexities involved of keeping the backlog right and /=
- or
-> >> prevent certain hierarchies which seems rather tedious.
-> >> This requires some more testing, but I was imagining something like th=
-is:
-> >>
-> >> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-> >> --- a/net/sched/sch_api.c
-> >> +++ b/net/sched/sch_api.c
-> >> @@ -780,15 +780,12 @@ static u32 qdisc_alloc_handle(struct net_device =
-*dev)
-> >>
-> >>  void qdisc_tree_reduce_backlog(struct Qdisc *sch, int n, int len)
-> >>  {
-> >> -       bool qdisc_is_offloaded =3D sch->flags & TCQ_F_OFFLOADED;
-> >>         const struct Qdisc_class_ops *cops;
-> >>         unsigned long cl;
-> >>         u32 parentid;
-> >>         bool notify;
-> >>         int drops;
-> >>
-> >> -       if (n =3D=3D 0 && len =3D=3D 0)
-> >> -               return;
-> >>         drops =3D max_t(int, n, 0);
-> >>         rcu_read_lock();
-> >>         while ((parentid =3D sch->parent)) {
-> >> @@ -797,17 +794,8 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch,=
- int n, int len)
-> >>
-> >>                 if (sch->flags & TCQ_F_NOPARENT)
-> >>                         break;
-> >> -               /* Notify parent qdisc only if child qdisc becomes emp=
-ty.
-> >> -                *
-> >> -                * If child was empty even before update then backlog
-> >> -                * counter is screwed and we skip notification because
-> >> -                * parent class is already passive.
-> >> -                *
-> >> -                * If the original child was offloaded then it is allo=
-wed
-> >> -                * to be seem as empty, so the parent is notified anyw=
-ay.
-> >> -                */
-> >> -               notify =3D !sch->q.qlen && !WARN_ON_ONCE(!n &&
-> >> -                                                      !qdisc_is_offlo=
-aded);
-> >> +               /* Notify parent qdisc only if child qdisc becomes emp=
-ty. */
-> >> +               notify =3D !sch->q.qlen;
-> >>                 /* TODO: perform the search on a per txq basis */
-> >>                 sch =3D qdisc_lookup(qdisc_dev(sch), TC_H_MAJ(parentid=
-));
-> >>                 if (sch =3D=3D NULL) {
-> >> @@ -816,6 +804,9 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, =
-int n, int len)
-> >>                 }
-> >>                 cops =3D sch->ops->cl_ops;
-> >>                 if (notify && cops->qlen_notify) {
-> >> +                       /* Note that qlen_notify must be idempotent as=
- it may get called
-> >> +                        * multiple times.
-> >> +                        */
-> >>                         cl =3D cops->find(sch, parentid);
-> >>                         cops->qlen_notify(sch, cl);
-> >>                 }
-> >>
-> >
-> > I believe this will fix the issue. My concern is we are not solving
-> > the root cause. I also posted a bunch of fixes on related issues for
-> > something Mingi Cho (on Cc) found - see attachments, i am not in favor
-> > of these either.
-> > Most of these setups are nonsensical. After seeing so many of these my
-> > view is we start disallowing such hierarchies.
-> >
-> > cheers,
-> > jamal
->
-> I would also disagree with the attached patches for various reasons:
-> - The QFQ patch relies on packet size backlog, which is not to be
->   trusted because of several sources that may make this unreliable
->   (netem, size tables, GSO, etc.)
-> - In the TBF variant the ret may get overwritten during the loop,
->   so it only relies on the final packet status. I would not trust
->   this always working either.
-> - DRR fix seems fine, but it still requires all other qdiscs to
->   be correct (and something similar needs to be applied to all
->   classfull qdiscs?)
-> - The changes to qdisc_tree_reduce_backlog do not really make sense
->   to me I must be missing something here..
->
-> What do you think the root cause is here? AFAIK what all the issues
-> have in common is that eventually qlen_notify is _not_ called,
-> thus leaving stale class pointers. Naturally the consequence
-> could be to simply always call qlen_notify on class deletion and
-> make classfull qdiscs aware that it may get called on inactive
-> classes. And this is what I tried with my proposal.
-> This does not solve the backlog issues though. But the pressing
-> issue seems to be the uaf and not the statistic counters?
->
-> My concern with preventing certain hierarchies is that we would
-> hide the backlog issues and we would be chasing bad hierarchies.
-> Still it would also solve all the problems eventually I guess.
->
+Hi Eric,
 
-On "What do you think the root cause is here?"
+kernel test robot noticed the following build errors:
 
-I believe the root cause is that qdiscs like hfsc and qfq are dropping
-all packets in enqueue (mostly in relation to peek()) and that result
-is not being reflected in the return code returned to its parent
-qdisc.
-So, in the example you described in this thread, drr is oblivious to
-the fact that the child qdisc dropped its packet because the call to
-its child enqueue returned NET_XMIT_SUCCESS. This causes drr to
-activate a class that shouldn't have been activated at all.
+[auto build test ERROR on net-next/main]
 
-You can argue that drr (and other similar qdiscs) may detect this by
-checking the call to qlen_notify (as the drr patch was
-doing), but that seems really counter-intuitive. Imagine writing a new
-qdisc and having to check for that every time you call a child's
-enqueue. Sure  your patch solves this, but it also seems like it's not
-fixing the underlying issue (which is drr activating the class in the
-first place). Your patch is simply removing all the classes from their
-active lists when you delete them. And your patch may seem ok for now,
-but I am worried it might break something else in the future that we
-are not seeing.
+url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-add-struct-net_aligned_data/20250628-040753
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250627200551.348096-4-edumazet%40google.com
+patch subject: [PATCH net-next 3/4] tcp: move tcp_memory_allocated into net_aligned_data
+config: riscv-randconfig-002-20250629 (https://download.01.org/0day-ci/archive/20250629/202506290837.0mGwXgmy-lkp@intel.com/config)
+compiler: riscv32-linux-gcc (GCC) 13.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250629/202506290837.0mGwXgmy-lkp@intel.com/reproduce)
 
-And do note: All of the examples of the hierarchy I have seen so far,
-that put us in this situation, are nonsensical
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506290837.0mGwXgmy-lkp@intel.com/
 
-cheers,
-jamal
+All errors (new ones prefixed by >>):
+
+   In file included from net/core/hotdata.c:5:
+   include/net/aligned_data.h:12:9: error: unknown type name 'atomic64_t'
+      12 |         atomic64_t      net_cookie ____cacheline_aligned_in_smp;
+         |         ^~~~~~~~~~
+>> include/net/aligned_data.h:14:9: error: unknown type name 'atomic_long_t'
+      14 |         atomic_long_t tcp_memory_allocated ____cacheline_aligned_in_smp;
+         |         ^~~~~~~~~~~~~
+
+
+vim +/atomic_long_t +14 include/net/aligned_data.h
+
+     6	
+     7	/* Structure holding cacheline aligned fields on SMP builds.
+     8	 * Each field or group should have an ____cacheline_aligned_in_smp
+     9	 * attribute to ensure no accidental false sharing can happen.
+    10	 */
+    11	struct net_aligned_data {
+    12		atomic64_t	net_cookie ____cacheline_aligned_in_smp;
+    13	#if defined(CONFIG_INET)
+  > 14		atomic_long_t tcp_memory_allocated ____cacheline_aligned_in_smp;
+    15	#endif
+    16	};
+    17	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
