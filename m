@@ -1,113 +1,96 @@
-Return-Path: <netdev+bounces-202119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77161AEC520
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 07:16:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C24BCAEC51C
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 07:14:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E61A617DDDB
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 05:16:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B15947A3E61
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 05:12:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86A0B1487D1;
-	Sat, 28 Jun 2025 05:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 720BC21C18D;
+	Sat, 28 Jun 2025 05:14:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from baidu.com (mx24.baidu.com [111.206.215.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE2E2111;
-	Sat, 28 Jun 2025 05:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E93904A33
+	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 05:14:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751087764; cv=none; b=XVyaNomVP1wIyB7iIBSnlTtQSI5AcoyNQpEH9rG3H/Zp5AfGnGQ8umcFu5jszW9SK/0GoM1u+XTM2GrKQ0ggX5nLGGx1IYY1FIOqXH/Nq101MMbbZbS3Ya3T6xjntScHYOTclEBp2Y17VweScyBiZ63IEnnAbbnzppXG2b7BTxw=
+	t=1751087644; cv=none; b=qVSR1onYMarFQ+FJa9yKHfJO2V4wU9kVc8CrCVR2qrnDk1uV4UhVcbGpu6im2wXfTMB97qcYaFkhVO1hE9TxvoykVaN7EbLnRyERWMloWcCRoer6v5ok1Z4VP7VVTr5JcA+fGQIj64FX8Xh7tsRMackUkJQn7ZWEO80+chyV18E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751087764; c=relaxed/simple;
-	bh=znJpnjGHe9qC23nhYpBqirFXtlcJ2hX0/8+ege+12fE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tADjoIrpitQsxmHRwzhxNlVfLmkjK9livHefHPqF/QLzW5VHlAKA7jtVcGYUk6WTGZrkJCsNflOEbJuC28DtZ0vsqilQ+sfbpNuHMqJxcLdROtFue3qrdhEpS8HZDs7RX7ucunegjy7dBJBipPwtdxe46eU3V3+zp0+LcCFQs5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-From: Fushuai Wang <wangfushuai@baidu.com>
-To: <ecree.xilinx@gmail.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-net-drivers@amd.com>,
-	<linux-kernel@vger.kernel.org>, Fushuai Wang <wangfushuai@baidu.com>
-Subject: [PATCH net-next v2] sfc: siena: eliminate xdp_rxq_info_valid using XDP base API
-Date: Sat, 28 Jun 2025 13:10:33 +0800
-Message-ID: <20250628051033.51133-1-wangfushuai@baidu.com>
-X-Mailer: git-send-email 2.39.2 (Apple Git-143)
+	s=arc-20240116; t=1751087644; c=relaxed/simple;
+	bh=ImkOohW0xoy7J25xzFN6PO5huhiGY4VN5yzgFbX+u30=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=flVOGsiKo1QFP8Jo9Cb2qOAePSkG8O+evLPRvLmNKbKOAlNh3QiWoHCKaf64w1PNVStEsG9GU4MpJuMY3WBW/Tc7wbPtRg+4KfrUoEZude7uNcphCYmftwkQKjm+OZQgDuDNNN90MIix3Rb+FPNKKRDs5wASUM+EvT2v+It3l2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3df2e89fd03so4890535ab.0
+        for <netdev@vger.kernel.org>; Fri, 27 Jun 2025 22:14:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751087642; x=1751692442;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nQtYV1Gyi68LVjdcfdU/eNq3IyRRwC3uv1igzI3erFc=;
+        b=NpWtt9vIug0tHrERtwFAF5tvVzYVffTu/9EqJFfnvxiBiqYUMW4Icw2A/75RWjCY06
+         PsVKbgvge0G1sGRxCm/3yXjFUD/uXvnd1UTRHLiluLkbA0eLyxMOZxbSSTpLA4xllr5r
+         sU0pS/osLRpLZTwhOpuN155kuQfhxYmZkwmwtMaC+BxyF9lGKCzDHJGxrt2+2RTfRZBG
+         ET7nbRGdKGZ2JxxmUFhzf7dbykjp+dVGBxjWH/6ElBOhB8b7QmjiCU/nVcEJXj0Wit+5
+         zxO45YMvkmt0+ZOm8SkoSoeaw+KzhyUrg9w9ILisFeFgdXyjBPnAmKYBUMLbf51GLEVX
+         4anQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU4BHYCOPDaT5uNn2d/r6CeXZ0kYAaSTwmuPNSHe3Urijdc5KhXpAv12cM2Q3+zxNwCJAXuGbw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5L5e1aYBHSJkStesBPjAp/OEyAHOFBtWwIFCgymxdOy35ogF1
+	raWfyTuhJkAaX6iVGILJWn8YvZtUiUKQd7t5Qksx4ornbTWO5a1py/BO0Rbuk2mxUz1f93Z6YMP
+	ZViWqnC11DSKrxK8emk/NhxXOYGvS/yHUuJ4swEzOOV+M/XhXwCMC9x9OjwA=
+X-Google-Smtp-Source: AGHT+IHhgdgQNjS1nBnWLUNfiv7EE/EHoONqacRJkEf60gWH4jWoK7OhxwwDZCx0AkY52S0u7NOzrVPLBmfL6upFVifarVyjRBcy
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: bjhj-exc8.internal.baidu.com (172.31.3.18) To
- bjkjy-mail-ex22.internal.baidu.com (172.31.50.16)
-X-FEAS-Client-IP: 172.31.50.16
-X-FE-Policy-ID: 52:10:53:SYSTEM
+X-Received: by 2002:a05:6e02:3189:b0:3dc:7f3b:acb1 with SMTP id
+ e9e14a558f8ab-3df4ab85c3dmr77735685ab.13.1751087642190; Fri, 27 Jun 2025
+ 22:14:02 -0700 (PDT)
+Date: Fri, 27 Jun 2025 22:14:02 -0700
+In-Reply-To: <685e86b3.a00a0220.129264.0003.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <685f7a1a.a70a0220.2f4de1.0007.GAE@google.com>
+Subject: Re: [syzbot] [net?] WARNING in ip6_mr_output
+From: syzbot <syzbot+0141c834e47059395621@syzkaller.appspotmail.com>
+To: bpoirier@nvidia.com, davem@davemloft.net, dsahern@kernel.org, 
+	edumazet@google.com, eric.dumazet@gmail.com, horms@kernel.org, 
+	idosch@nvidia.com, kuba@kernel.org, kuniyu@google.com, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	petrm@nvidia.com, razor@blackwall.org, roopa@nvidia.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Commit d48523cb88e0 ("sfc: Copy shared files needed for Siena (part 2)")
-use xdp_rxq_info_valid to track failures of xdp_rxq_info_reg().
-However, this driver-maintained state becomes redundant since the XDP
-framework already provides xdp_rxq_info_is_reg() for checking registration
-status.
+syzbot has bisected this issue to:
 
-Signed-off-by: Fushuai Wang <wangfushuai@baidu.com>
----
- drivers/net/ethernet/sfc/siena/net_driver.h | 2 --
- drivers/net/ethernet/sfc/siena/rx_common.c  | 6 +-----
- 2 files changed, 1 insertion(+), 7 deletions(-)
+commit 96e8f5a9fe2d91b9f9eb8b45cc13ce1ca6a8af82
+Author: Petr Machata <petrm@nvidia.com>
+Date:   Mon Jun 16 22:44:18 2025 +0000
 
-diff --git a/drivers/net/ethernet/sfc/siena/net_driver.h b/drivers/net/ethernet/sfc/siena/net_driver.h
-index 2be3bad3c993..4cf556782133 100644
---- a/drivers/net/ethernet/sfc/siena/net_driver.h
-+++ b/drivers/net/ethernet/sfc/siena/net_driver.h
-@@ -384,7 +384,6 @@ struct efx_rx_page_state {
-  * @recycle_count: RX buffer recycle counter.
-  * @slow_fill: Timer used to defer efx_nic_generate_fill_event().
-  * @xdp_rxq_info: XDP specific RX queue information.
-- * @xdp_rxq_info_valid: Is xdp_rxq_info valid data?.
-  */
- struct efx_rx_queue {
- 	struct efx_nic *efx;
-@@ -417,7 +416,6 @@ struct efx_rx_queue {
- 	/* Statistics to supplement MAC stats */
- 	unsigned long rx_packets;
- 	struct xdp_rxq_info xdp_rxq_info;
--	bool xdp_rxq_info_valid;
- };
- 
- enum efx_sync_events_state {
-diff --git a/drivers/net/ethernet/sfc/siena/rx_common.c b/drivers/net/ethernet/sfc/siena/rx_common.c
-index 98d27174015d..4ae09505e417 100644
---- a/drivers/net/ethernet/sfc/siena/rx_common.c
-+++ b/drivers/net/ethernet/sfc/siena/rx_common.c
-@@ -268,8 +268,6 @@ void efx_siena_init_rx_queue(struct efx_rx_queue *rx_queue)
- 			  "Failure to initialise XDP queue information rc=%d\n",
- 			  rc);
- 		efx->xdp_rxq_info_failed = true;
--	} else {
--		rx_queue->xdp_rxq_info_valid = true;
- 	}
- 
- 	/* Set up RX descriptor ring */
-@@ -299,10 +297,8 @@ void efx_siena_fini_rx_queue(struct efx_rx_queue *rx_queue)
- 
- 	efx_fini_rx_recycle_ring(rx_queue);
- 
--	if (rx_queue->xdp_rxq_info_valid)
-+	if (xdp_rxq_info_is_reg(&rx_queue->xdp_rxq_info))
- 		xdp_rxq_info_unreg(&rx_queue->xdp_rxq_info);
--
--	rx_queue->xdp_rxq_info_valid = false;
- }
- 
- void efx_siena_remove_rx_queue(struct efx_rx_queue *rx_queue)
--- 
-2.36.1
+    net: ipv6: Add ip6_mr_output()
 
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13bcfb70580000
+start commit:   5d4809e25903 Add linux-next specific files for 20250620
+git tree:       linux-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=107cfb70580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=17bcfb70580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=58afc4b78b52b7e3
+dashboard link: https://syzkaller.appspot.com/bug?extid=0141c834e47059395621
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=138a2dd4580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=171c5b0c580000
+
+Reported-by: syzbot+0141c834e47059395621@syzkaller.appspotmail.com
+Fixes: 96e8f5a9fe2d ("net: ipv6: Add ip6_mr_output()")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
