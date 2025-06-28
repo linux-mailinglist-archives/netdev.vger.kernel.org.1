@@ -1,55 +1,50 @@
-Return-Path: <netdev+bounces-202157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D07BAEC671
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 11:49:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25F86AEC673
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 11:50:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B3D417DDC0
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 09:49:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73F3D1BC005F
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 09:50:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5001722156C;
-	Sat, 28 Jun 2025 09:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B593221F05;
+	Sat, 28 Jun 2025 09:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pNHt6feo"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4608B1EF39F;
-	Sat, 28 Jun 2025 09:49:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F531EF39F
+	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 09:49:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751104173; cv=none; b=b3RJNmN5cvXIGgIuvKC657i9F1V8oKxpEqIjq/Qhv6AGZPY1UALMB2ZXhfMMiUIcpkfPKCaowJAYZaaVkajB/OewDTNZ5C+kMHJwanUprgXCVd4exYOLpNAFjtJH3yfcliYJLIZuFQ07qLY4ori/lql4+qKK3WWZShRh2NYdX/k=
+	t=1751104181; cv=none; b=VH67C9fU7xqRfgzaEAW1TGVlhfC5Nha1nXGbwvpOL/ZNMHs/U67N6PXrS92/jWVC3TD67lSS+IBjW0MPKlXIVHPF6oIz2+8HsbLI11KtenqJ2PuQ5Dz/PDtN/rUhuB8TbPanSKrU49F7AywuibahCygPyVFyWggkFYzxg4rDxac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751104173; c=relaxed/simple;
-	bh=nOOWoV01N7bOxZty/tGuJqK+VI+KOzlbuwhA9piXDJA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GHhypi90XsenRqHfdS5JXlILgXZT4NvD5xnjSMmipV5P2koAX8ppYEzFRrDdPD3t7Jccb55+jofgzAzPAAANNPfvx+gsyL5YcZIhIRnYu5kuO6kYLDE9FoCQmSfrucTnFWmlKrlTBDqeetlu2EqHW4rxIzMGz6BwMTjjE+biIeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bTnbQ4HqCz2CfCX;
-	Sat, 28 Jun 2025 17:45:22 +0800 (CST)
-Received: from kwepemk100010.china.huawei.com (unknown [7.202.194.58])
-	by mail.maildlp.com (Postfix) with ESMTPS id 777F01402C4;
-	Sat, 28 Jun 2025 17:49:21 +0800 (CST)
-Received: from workspace-z00536909-5022804397323726849.huawei.com
- (7.151.123.135) by kwepemk100010.china.huawei.com (7.202.194.58) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 28 Jun
- 2025 17:49:20 +0800
-From: zhangjianrong <zhangjianrong5@huawei.com>
-To: <michael.jamet@intel.com>, <mika.westerberg@linux.intel.com>,
-	<YehezkelShB@gmail.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <guhengsheng@hisilicon.com>, <caiyadong@huawei.com>,
-	<xuetao09@huawei.com>, <lixinghang1@huawei.com>
-Subject: [PATCH v2] net: thunderbolt: Fix the parameter passing of tb_xdomain_enable_paths()/tb_xdomain_disable_paths()
-Date: Sat, 28 Jun 2025 17:49:20 +0800
-Message-ID: <20250628094920.656658-1-zhangjianrong5@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1751104181; c=relaxed/simple;
+	bh=W9jCImTJ0gzGOltdiW9uge4Ir2GuO0+/Drxm3n9kR3Y=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=nZnRzSB4txKXsHMtggTvicUghhIxFQRQbvjhzKimQmG6QH+EOla8r4AJQjND6v3nn9V/zKu9suJ8uZk6fj1mjB15UwZ8UZL1sU3wj6XAUyfF9qgZoWvxIcnCuSHntNadNONwlDF1lb2XzmhHQbN/2sbMD6Qhqw3fcOh4GbqkS4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pNHt6feo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A91A9C4CEEA;
+	Sat, 28 Jun 2025 09:49:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751104180;
+	bh=W9jCImTJ0gzGOltdiW9uge4Ir2GuO0+/Drxm3n9kR3Y=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pNHt6feoD/zGocw3LEzNnWJFc1zXm68Kwx4spWzyBrBMRyocuzmrCaBaHj15f1zyI
+	 /lgQgpXoQ0hMO0kXCNFFvJAjR0XN1x7mb5s1693UMtjGlGeE8xBJuscxcsvX9QCRx7
+	 xy1l4mj4bgse8dps395C/ol6kFjBCNNTLFghtWD9mYOcKFcRuprS4rWIUXL6behm99
+	 unWQW8RP4gTyVX/isf7uTsjPJsC5UnsVlv5ZqiMoyyBRL3a/6UI6jwYFGxCy7wU3wm
+	 ICPrYm6M6n6wFdkasSBeMYnL/8xtiKO+Tt8Q8mCxLBnZP6Xh5F3rZScxIPnPsk/5Gl
+	 JdXAw6pPT16cQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF3A38111CE;
+	Sat, 28 Jun 2025 09:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,52 +52,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemk100010.china.huawei.com (7.202.194.58)
+Subject: Re: [PATCH net-next] net: ipv4: guard ip_mr_output() with rcu
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175110420652.2189604.6501161970436026959.git-patchwork-notify@kernel.org>
+Date: Sat, 28 Jun 2025 09:50:06 +0000
+References: <20250627114641.3734397-1-edumazet@google.com>
+In-Reply-To: <20250627114641.3734397-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ kuniyu@google.com, dsahern@kernel.org, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com,
+ syzbot+f02fb9e43bd85c6c66ae@syzkaller.appspotmail.com, petrm@nvidia.com,
+ roopa@nvidia.com, razor@blackwall.org, bpoirier@nvidia.com, idosch@nvidia.com
 
-According to the description of tb_xdomain_enable_paths(), the third
-parameter represents the transmit ring and the fifth parameter represents
-the receive ring. tb_xdomain_disable_paths() is the same case.
+Hello:
 
-Fixes: ff7cd07f3064 ("net: thunderbolt: Enable DMA paths only after rings are enabled")
-Signed-off-by: zhangjianrong <zhangjianrong5@huawei.com>
----
-v2: add fixes tag
-v1: initial submission
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
- drivers/net/thunderbolt/main.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+On Fri, 27 Jun 2025 11:46:41 +0000 you wrote:
+> syzbot found at least one path leads to an ip_mr_output()
+> without RCU being held.
+> 
+> Add guard(rcu)() to fix this in a concise way.
+> 
+> WARNING: CPU: 0 PID: 0 at net/ipv4/ipmr.c:2302 ip_mr_output+0xbb1/0xe70 net/ipv4/ipmr.c:2302
+> Call Trace:
+>  <IRQ>
+>   igmp_send_report+0x89e/0xdb0 net/ipv4/igmp.c:799
+>  igmp_timer_expire+0x204/0x510 net/ipv4/igmp.c:-1
+>   call_timer_fn+0x17e/0x5f0 kernel/time/timer.c:1747
+>   expire_timers kernel/time/timer.c:1798 [inline]
+>   __run_timers kernel/time/timer.c:2372 [inline]
+>   __run_timer_base+0x61a/0x860 kernel/time/timer.c:2384
+>   run_timer_base kernel/time/timer.c:2393 [inline]
+>   run_timer_softirq+0xb7/0x180 kernel/time/timer.c:2403
+>   handle_softirqs+0x286/0x870 kernel/softirq.c:579
+>   __do_softirq kernel/softirq.c:613 [inline]
+>   invoke_softirq kernel/softirq.c:453 [inline]
+>   __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:680
+>   irq_exit_rcu+0x9/0x30 kernel/softirq.c:696
+>   instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1050 [inline]
+>   sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1050
+> 
+> [...]
 
-diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
-index 0a53ec293d04..f4c782759566 100644
---- a/drivers/net/thunderbolt/main.c
-+++ b/drivers/net/thunderbolt/main.c
-@@ -396,9 +396,9 @@ static void tbnet_tear_down(struct tbnet *net, bool send_logout)
- 
- 		ret = tb_xdomain_disable_paths(net->xd,
- 					       net->local_transmit_path,
--					       net->rx_ring.ring->hop,
-+					       net->tx_ring.ring->hop,
- 					       net->remote_transmit_path,
--					       net->tx_ring.ring->hop);
-+					       net->rx_ring.ring->hop);
- 		if (ret)
- 			netdev_warn(net->dev, "failed to disable DMA paths\n");
- 
-@@ -662,9 +662,9 @@ static void tbnet_connected_work(struct work_struct *work)
- 		goto err_free_rx_buffers;
- 
- 	ret = tb_xdomain_enable_paths(net->xd, net->local_transmit_path,
--				      net->rx_ring.ring->hop,
-+				      net->tx_ring.ring->hop,
- 				      net->remote_transmit_path,
--				      net->tx_ring.ring->hop);
-+				      net->rx_ring.ring->hop);
- 	if (ret) {
- 		netdev_err(net->dev, "failed to enable DMA paths\n");
- 		goto err_free_tx_buffers;
+Here is the summary with links:
+  - [net-next] net: ipv4: guard ip_mr_output() with rcu
+    https://git.kernel.org/netdev/net-next/c/beead7eea896
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
