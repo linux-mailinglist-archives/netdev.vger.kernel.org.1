@@ -1,62 +1,80 @@
-Return-Path: <netdev+bounces-202111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0642EAEC3D6
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 03:31:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9E3BAEC412
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 04:16:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45A275646D0
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 01:31:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA19E189BC76
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 02:16:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A100A1D6187;
-	Sat, 28 Jun 2025 01:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93404145FE0;
+	Sat, 28 Jun 2025 02:16:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DCwxwCW/"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7981C8630;
-	Sat, 28 Jun 2025 01:30:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7A85661
+	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 02:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751074250; cv=none; b=Jd3Uxitt8WIZ6ZGbNuZKE81Ax42rD4H8bFqGU/WyTSevuiFGwYXBuqtw2LUnifCoVB9fUMQ6V8IiGSh60Sm+XAwPZYpHftRiQ98affjoH/Q7ROo/bgbwZ39sY6ermxsb2RdnjMIfStAzLTLkJPqK4wLwlz0NoJ1yRUexAVScjKM=
+	t=1751076972; cv=none; b=LGQrRcg2ra1M8W5YSnTzR2f8NPlxBeMrl5diarBNNLCZpbXza51oZKar6xFu/ByDeGGh2YfWrd7qpx5UUossQqf2yjdMsBtgJmmo2d8fq1tfOTFQZSgZH7q/yl8tOkpkyte/qvA1Va5+H9UJGWZ67TBlXZtC7UjXFcj7Qcl09Vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751074250; c=relaxed/simple;
-	bh=Qs0cJx8xGxWvi4fuqclCqvGoSIziieVdMSjPqHy7t3A=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fOqe+LhGgW8RT9n+xaanQVVIzai7qFrNX/Bk//va92q1kIUoXxJtI4IcGbpST9vF7rFEZQjT5cPiTkgKeQi+/Vm/sVBlBcrV3M1vaOaVgOyVHiiqwkqPDbmQ1bEb581psN9L5SEjZEBgsMazSIF6q0C7ufELMyXYjhQ5QQ6ubtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1uVKOx-000000004Qv-36TR;
-	Sat, 28 Jun 2025 01:30:43 +0000
-Date: Sat, 28 Jun 2025 02:30:40 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Felix Fietkau <nbd@nbd.name>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Eric Woudstra <ericwouds@gmail.com>, Elad Yifee <eladwf@gmail.com>,
-	Bo-Cun Chen <bc-bocun.chen@mediatek.com>,
-	Sky Huang <skylake.huang@mediatek.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net/next 3/3] net: ethernet: mtk_eth_soc: use genpool
- allocator for SRAM
-Message-ID: <566ca90fc59ad0d3aff8bc8dc22ebaf0544bce47.1751072868.git.daniel@makrotopia.org>
-References: <cover.1751072868.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1751076972; c=relaxed/simple;
+	bh=ag7Kr6KM9qZ+uPV1cOWPb3YE+2clOt88Kxu8Wy0cy6g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aT7xrZS+vSu7NX/2UacvHmVjoCy4fhN1jlSA9INbMxp+KwIszhg2Xhl0ymv8ccILmOHjAZKjXDqjm79DrMTs3OaY6s6SShNwtAbv7xzXT8jsS5F4b3BxQTWcID14MBNhdrXNZIR3JvOKWgRHqg3zIXc7WwCbMjEh4kUarvwjRN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DCwxwCW/; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751076970; x=1782612970;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ag7Kr6KM9qZ+uPV1cOWPb3YE+2clOt88Kxu8Wy0cy6g=;
+  b=DCwxwCW/jHivOd6DzCkFG+0RBLbJe2iBhmuTlwPb7V7/ggd15UyemPUk
+   08VDROhTXQgpq9WXsag/u2KK2ebgNR4oo37EijGXt//8KrG+asSc0J33f
+   QgRbEhvJoWFNMIUiHQp/fNrLfGE9LXN5xdXboZNVhJhyqosRlsl0B2622
+   jgmiZOf1IPRCP2hvRUAhx3e9wgMa6MxWUTTv4TaGo+hAluHd1cZuM9fTQ
+   3jHgjbS2aH4pTqfuR9Q2i0K7zAfcar/cWSq1X7TSB4H5thSy1MduLS57k
+   VQzKEyGmWxgHCZqGOFTJ1QNYUNzc3o5A9gIC5A4q1P+MybJTb4nXLHyjG
+   g==;
+X-CSE-ConnectionGUID: QZdCHlaLTIOzwkgaJMZSHQ==
+X-CSE-MsgGUID: 0PR4x3sWSYW3SO/nYj0ADw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11477"; a="75938876"
+X-IronPort-AV: E=Sophos;i="6.16,272,1744095600"; 
+   d="scan'208";a="75938876"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2025 19:16:10 -0700
+X-CSE-ConnectionGUID: qP/hKwJASHG3oi12STQ0Gw==
+X-CSE-MsgGUID: /6MyDilPSx6eBCfjfgwgag==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,272,1744095600"; 
+   d="scan'208";a="152340632"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 27 Jun 2025 19:16:06 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uVL6r-000Wfa-0d;
+	Sat, 28 Jun 2025 02:16:05 +0000
+Date: Sat, 28 Jun 2025 10:15:42 +0800
+From: kernel test robot <lkp@intel.com>
+To: Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next 09/10] ipv6: adopt skb_dst_dev() and
+ skb_dst_dev_net[_rcu]() helpers
+Message-ID: <202506281042.86fCDDNl-lkp@intel.com>
+References: <20250627112526.3615031-10-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,248 +83,251 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1751072868.git.daniel@makrotopia.org>
+In-Reply-To: <20250627112526.3615031-10-edumazet@google.com>
 
-Use a dedicated "mmio-sram" and the genpool allocator instead of
-open-coding SRAM allocation for DMA rings.
-Keep support for legacy device trees but notify the user via a
-warning.
+Hi Eric,
 
-Co-developed-by: Frank Wunderlich <frank-w@public-files.de>
-Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 119 +++++++++++++-------
- drivers/net/ethernet/mediatek/mtk_eth_soc.h |   4 +-
- 2 files changed, 83 insertions(+), 40 deletions(-)
+kernel test robot noticed the following build errors:
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 8f55069441f4..adae59a3dfa4 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -27,6 +27,7 @@
- #include <net/dsa.h>
- #include <net/dst_metadata.h>
- #include <net/page_pool/helpers.h>
-+#include <linux/genalloc.h>
- 
- #include "mtk_eth_soc.h"
- #include "mtk_wed.h"
-@@ -1267,6 +1268,44 @@ static void *mtk_max_lro_buf_alloc(gfp_t gfp_mask)
- 	return (void *)data;
- }
- 
-+static bool mtk_use_legacy_sram(struct mtk_eth *eth)
-+{
-+	return !eth->sram_pool && MTK_HAS_CAPS(eth->soc->caps, MTK_SRAM);
-+}
-+
-+static void *mtk_dma_ring_alloc(struct mtk_eth *eth, size_t size,
-+				dma_addr_t *dma_handle)
-+{
-+	void *dma_ring;
-+
-+	if (WARN_ON(mtk_use_legacy_sram(eth)))
-+		return -ENOMEM;
-+
-+	if (eth->sram_pool) {
-+		dma_ring = (void *)gen_pool_alloc(eth->sram_pool, size);
-+		if (!dma_ring)
-+			return dma_ring;
-+		*dma_handle = gen_pool_virt_to_phys(eth->sram_pool, (unsigned long)dma_ring);
-+	} else {
-+		dma_ring = dma_alloc_coherent(eth->dma_dev, size, dma_handle,
-+					      GFP_KERNEL);
-+	}
-+
-+	return dma_ring;
-+}
-+
-+static void mtk_dma_ring_free(struct mtk_eth *eth, size_t size, void *dma_ring,
-+			      dma_addr_t dma_handle)
-+{
-+	if (WARN_ON(mtk_use_legacy_sram(eth)))
-+		return;
-+
-+	if (eth->sram_pool)
-+		gen_pool_free(eth->sram_pool, (unsigned long)dma_ring, size);
-+	else
-+		dma_free_coherent(eth->dma_dev, size, dma_ring, dma_handle);
-+}
-+
- /* the qdma core needs scratch memory to be setup */
- static int mtk_init_fq_dma(struct mtk_eth *eth)
- {
-@@ -1276,13 +1315,12 @@ static int mtk_init_fq_dma(struct mtk_eth *eth)
- 	dma_addr_t dma_addr;
- 	int i, j, len;
- 
--	if (MTK_HAS_CAPS(eth->soc->caps, MTK_SRAM))
-+	if (!mtk_use_legacy_sram(eth)) {
-+		eth->scratch_ring = mtk_dma_ring_alloc(eth, cnt * soc->tx.desc_size,
-+						       &eth->phy_scratch_ring);
-+	} else {
- 		eth->scratch_ring = eth->sram_base;
--	else
--		eth->scratch_ring = dma_alloc_coherent(eth->dma_dev,
--						       cnt * soc->tx.desc_size,
--						       &eth->phy_scratch_ring,
--						       GFP_KERNEL);
-+	}
- 
- 	if (unlikely(!eth->scratch_ring))
- 		return -ENOMEM;
-@@ -2620,12 +2658,11 @@ static int mtk_tx_alloc(struct mtk_eth *eth)
- 	if (!ring->buf)
- 		goto no_tx_mem;
- 
--	if (MTK_HAS_CAPS(soc->caps, MTK_SRAM)) {
-+	if (!mtk_use_legacy_sram(eth)) {
-+		ring->dma = mtk_dma_ring_alloc(eth, ring_size * sz, &ring->phys);
-+	} else {
- 		ring->dma = eth->sram_base + soc->tx.fq_dma_size * sz;
- 		ring->phys = eth->phy_scratch_ring + soc->tx.fq_dma_size * (dma_addr_t)sz;
--	} else {
--		ring->dma = dma_alloc_coherent(eth->dma_dev, ring_size * sz,
--					       &ring->phys, GFP_KERNEL);
- 	}
- 
- 	if (!ring->dma)
-@@ -2726,9 +2763,9 @@ static void mtk_tx_clean(struct mtk_eth *eth)
- 		kfree(ring->buf);
- 		ring->buf = NULL;
- 	}
--	if (!MTK_HAS_CAPS(soc->caps, MTK_SRAM) && ring->dma) {
--		dma_free_coherent(eth->dma_dev,
--				  ring->dma_size * soc->tx.desc_size,
-+
-+	if (!mtk_use_legacy_sram(eth) && ring->dma) {
-+		mtk_dma_ring_free(eth, ring->dma_size * soc->tx.desc_size,
- 				  ring->dma, ring->phys);
- 		ring->dma = NULL;
- 	}
-@@ -2793,6 +2830,9 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
- 		ring->dma = dma_alloc_coherent(eth->dma_dev,
- 				rx_dma_size * eth->soc->rx.desc_size,
- 				&ring->phys, GFP_KERNEL);
-+	} else if (eth->sram_pool) {
-+		ring->dma = mtk_dma_ring_alloc(eth, rx_dma_size * eth->soc->rx.desc_size,
-+					       &ring->phys);
- 	} else {
- 		struct mtk_tx_ring *tx_ring = &eth->tx_ring;
- 
-@@ -2921,6 +2961,11 @@ static void mtk_rx_clean(struct mtk_eth *eth, struct mtk_rx_ring *ring, bool in_
- 				  ring->dma_size * eth->soc->rx.desc_size,
- 				  ring->dma, ring->phys);
- 		ring->dma = NULL;
-+	} else if (!mtk_use_legacy_sram(eth) && ring->dma) {
-+		mtk_dma_ring_free(eth,
-+				  ring->dma_size * eth->soc->rx.desc_size,
-+				  ring->dma, ring->phys);
-+		ring->dma = NULL;
- 	}
- 
- 	if (ring->page_pool) {
-@@ -3287,9 +3332,8 @@ static void mtk_dma_free(struct mtk_eth *eth)
- 			netdev_tx_reset_subqueue(eth->netdev[i], j);
- 	}
- 
--	if (!MTK_HAS_CAPS(soc->caps, MTK_SRAM) && eth->scratch_ring) {
--		dma_free_coherent(eth->dma_dev,
--				  MTK_QDMA_RING_SIZE * soc->tx.desc_size,
-+	if (!mtk_use_legacy_sram(eth) && eth->scratch_ring) {
-+		mtk_dma_ring_free(eth, soc->tx.fq_dma_size * soc->tx.desc_size,
- 				  eth->scratch_ring, eth->phy_scratch_ring);
- 		eth->scratch_ring = NULL;
- 		eth->phy_scratch_ring = 0;
-@@ -5009,7 +5053,7 @@ static int mtk_sgmii_init(struct mtk_eth *eth)
- 
- static int mtk_probe(struct platform_device *pdev)
- {
--	struct resource *res = NULL, *res_sram;
-+	struct resource *res = NULL;
- 	struct device_node *mac_np;
- 	struct mtk_eth *eth;
- 	int err, i;
-@@ -5029,20 +5073,6 @@ static int mtk_probe(struct platform_device *pdev)
- 	if (MTK_HAS_CAPS(eth->soc->caps, MTK_SOC_MT7628))
- 		eth->ip_align = NET_IP_ALIGN;
- 
--	if (MTK_HAS_CAPS(eth->soc->caps, MTK_SRAM)) {
--		/* SRAM is actual memory and supports transparent access just like DRAM.
--		 * Hence we don't require __iomem being set and don't need to use accessor
--		 * functions to read from or write to SRAM.
--		 */
--		if (mtk_is_netsys_v3_or_greater(eth)) {
--			eth->sram_base = (void __force *)devm_platform_ioremap_resource(pdev, 1);
--			if (IS_ERR(eth->sram_base))
--				return PTR_ERR(eth->sram_base);
--		} else {
--			eth->sram_base = (void __force *)eth->base + MTK_ETH_SRAM_OFFSET;
--		}
--	}
--
- 	if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA)) {
- 		err = dma_set_mask(&pdev->dev, DMA_BIT_MASK(36));
- 		if (!err)
-@@ -5117,16 +5147,27 @@ static int mtk_probe(struct platform_device *pdev)
- 			err = -EINVAL;
- 			goto err_destroy_sgmii;
- 		}
-+
- 		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SRAM)) {
--			if (mtk_is_netsys_v3_or_greater(eth)) {
--				res_sram = platform_get_resource(pdev, IORESOURCE_MEM, 1);
--				if (!res_sram) {
--					err = -EINVAL;
--					goto err_destroy_sgmii;
-+			eth->sram_pool = of_gen_pool_get(pdev->dev.of_node, "sram", 0);
-+			if (!eth->sram_pool) {
-+				if (!mtk_is_netsys_v3_or_greater(eth)) {
-+					/*
-+					 * Legacy support for missing 'sram' node in DT.
-+					 * SRAM is actual memory and supports transparent access
-+					 * just like DRAM. Hence we don't require __iomem being
-+					 * set and don't need to use accessor functions to read from
-+					 * or write to SRAM.
-+					 */
-+					eth->sram_base = (void __force *)eth->base +
-+							 MTK_ETH_SRAM_OFFSET;
-+					eth->phy_scratch_ring = res->start + MTK_ETH_SRAM_OFFSET;
-+					dev_warn(&pdev->dev,
-+						 "legacy DT: using hard-coded SRAM offset.\n");
-+				} else {
-+					dev_err(&pdev->dev, "Could not get SRAM pool\n");
-+					return -ENODEV;
- 				}
--				eth->phy_scratch_ring = res_sram->start;
--			} else {
--				eth->phy_scratch_ring = res->start + MTK_ETH_SRAM_OFFSET;
- 			}
- 		}
- 	}
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-index 1ad9075a9b69..0104659e37f0 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-@@ -1245,7 +1245,8 @@ struct mtk_soc_data {
-  * @dev:		The device pointer
-  * @dma_dev:		The device pointer used for dma mapping/alloc
-  * @base:		The mapped register i/o base
-- * @sram_base:		The mapped SRAM base
-+ * @sram_base:		The mapped SRAM base (deprecated)
-+ * @sram_pool:		Pointer to SRAM pool used for DMA descriptor rings
-  * @page_lock:		Make sure that register operations are atomic
-  * @tx_irq__lock:	Make sure that IRQ register operations are atomic
-  * @rx_irq__lock:	Make sure that IRQ register operations are atomic
-@@ -1292,6 +1293,7 @@ struct mtk_eth {
- 	struct device			*dma_dev;
- 	void __iomem			*base;
- 	void				*sram_base;
-+	struct gen_pool			*sram_pool;
- 	spinlock_t			page_lock;
- 	spinlock_t			tx_irq_lock;
- 	spinlock_t			rx_irq_lock;
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-dst-annotate-data-races-around-dst-obsolete/20250627-192850
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250627112526.3615031-10-edumazet%40google.com
+patch subject: [PATCH net-next 09/10] ipv6: adopt skb_dst_dev() and skb_dst_dev_net[_rcu]() helpers
+config: x86_64-buildonly-randconfig-006-20250628 (https://download.01.org/0day-ci/archive/20250628/202506281042.86fCDDNl-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250628/202506281042.86fCDDNl-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202506281042.86fCDDNl-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   net/ipv6/exthdrs.c: In function 'ipv6_rthdr_rcv':
+>> net/ipv6/exthdrs.c:786:41: error: too many arguments to function 'dev_net'
+     786 |                 if (!ipv6_chk_home_addr(dev_net(skb_dst_dev(skb), addr)) {
+         |                                         ^~~~~~~
+   In file included from net/ipv6/exthdrs.c:25:
+   include/linux/netdevice.h:2711:13: note: declared here
+    2711 | struct net *dev_net(const struct net_device *dev)
+         |             ^~~~~~~
+>> net/ipv6/exthdrs.c:786:22: error: too few arguments to function 'ipv6_chk_home_addr'
+     786 |                 if (!ipv6_chk_home_addr(dev_net(skb_dst_dev(skb), addr)) {
+         |                      ^~~~~~~~~~~~~~~~~~
+   In file included from include/net/ip6_route.h:5,
+                    from net/ipv6/exthdrs.c:40:
+   include/net/addrconf.h:122:5: note: declared here
+     122 | int ipv6_chk_home_addr(struct net *net, const struct in6_addr *addr);
+         |     ^~~~~~~~~~~~~~~~~~
+>> net/ipv6/exthdrs.c:786:73: error: expected ')' before '{' token
+     786 |                 if (!ipv6_chk_home_addr(dev_net(skb_dst_dev(skb), addr)) {
+         |                    ~                                                    ^~
+         |                                                                         )
+>> net/ipv6/exthdrs.c:795:9: error: expected expression before '}' token
+     795 |         }
+         |         ^
+
+
+vim +/dev_net +786 net/ipv6/exthdrs.c
+
+   642	
+   643	/********************************
+   644	  Routing header.
+   645	 ********************************/
+   646	
+   647	/* called with rcu_read_lock() */
+   648	static int ipv6_rthdr_rcv(struct sk_buff *skb)
+   649	{
+   650		struct inet6_dev *idev = __in6_dev_get(skb->dev);
+   651		struct inet6_skb_parm *opt = IP6CB(skb);
+   652		struct in6_addr *addr = NULL;
+   653		int n, i;
+   654		struct ipv6_rt_hdr *hdr;
+   655		struct rt0_hdr *rthdr;
+   656		struct net *net = dev_net(skb->dev);
+   657		int accept_source_route;
+   658	
+   659		accept_source_route = READ_ONCE(net->ipv6.devconf_all->accept_source_route);
+   660	
+   661		if (idev)
+   662			accept_source_route = min(accept_source_route,
+   663						  READ_ONCE(idev->cnf.accept_source_route));
+   664	
+   665		if (!pskb_may_pull(skb, skb_transport_offset(skb) + 8) ||
+   666		    !pskb_may_pull(skb, (skb_transport_offset(skb) +
+   667					 ((skb_transport_header(skb)[1] + 1) << 3)))) {
+   668			__IP6_INC_STATS(net, idev, IPSTATS_MIB_INHDRERRORS);
+   669			kfree_skb(skb);
+   670			return -1;
+   671		}
+   672	
+   673		hdr = (struct ipv6_rt_hdr *)skb_transport_header(skb);
+   674	
+   675		if (ipv6_addr_is_multicast(&ipv6_hdr(skb)->daddr) ||
+   676		    skb->pkt_type != PACKET_HOST) {
+   677			__IP6_INC_STATS(net, idev, IPSTATS_MIB_INADDRERRORS);
+   678			kfree_skb(skb);
+   679			return -1;
+   680		}
+   681	
+   682		switch (hdr->type) {
+   683		case IPV6_SRCRT_TYPE_4:
+   684			/* segment routing */
+   685			return ipv6_srh_rcv(skb);
+   686		case IPV6_SRCRT_TYPE_3:
+   687			/* rpl segment routing */
+   688			return ipv6_rpl_srh_rcv(skb);
+   689		default:
+   690			break;
+   691		}
+   692	
+   693	looped_back:
+   694		if (hdr->segments_left == 0) {
+   695			switch (hdr->type) {
+   696	#if IS_ENABLED(CONFIG_IPV6_MIP6)
+   697			case IPV6_SRCRT_TYPE_2:
+   698				/* Silently discard type 2 header unless it was
+   699				 * processed by own
+   700				 */
+   701				if (!addr) {
+   702					__IP6_INC_STATS(net, idev,
+   703							IPSTATS_MIB_INADDRERRORS);
+   704					kfree_skb(skb);
+   705					return -1;
+   706				}
+   707				break;
+   708	#endif
+   709			default:
+   710				break;
+   711			}
+   712	
+   713			opt->lastopt = opt->srcrt = skb_network_header_len(skb);
+   714			skb->transport_header += (hdr->hdrlen + 1) << 3;
+   715			opt->dst0 = opt->dst1;
+   716			opt->dst1 = 0;
+   717			opt->nhoff = (&hdr->nexthdr) - skb_network_header(skb);
+   718			return 1;
+   719		}
+   720	
+   721		switch (hdr->type) {
+   722	#if IS_ENABLED(CONFIG_IPV6_MIP6)
+   723		case IPV6_SRCRT_TYPE_2:
+   724			if (accept_source_route < 0)
+   725				goto unknown_rh;
+   726			/* Silently discard invalid RTH type 2 */
+   727			if (hdr->hdrlen != 2 || hdr->segments_left != 1) {
+   728				__IP6_INC_STATS(net, idev, IPSTATS_MIB_INHDRERRORS);
+   729				kfree_skb(skb);
+   730				return -1;
+   731			}
+   732			break;
+   733	#endif
+   734		default:
+   735			goto unknown_rh;
+   736		}
+   737	
+   738		/*
+   739		 *	This is the routing header forwarding algorithm from
+   740		 *	RFC 2460, page 16.
+   741		 */
+   742	
+   743		n = hdr->hdrlen >> 1;
+   744	
+   745		if (hdr->segments_left > n) {
+   746			__IP6_INC_STATS(net, idev, IPSTATS_MIB_INHDRERRORS);
+   747			icmpv6_param_prob(skb, ICMPV6_HDR_FIELD,
+   748					  ((&hdr->segments_left) -
+   749					   skb_network_header(skb)));
+   750			return -1;
+   751		}
+   752	
+   753		/* We are about to mangle packet header. Be careful!
+   754		   Do not damage packets queued somewhere.
+   755		 */
+   756		if (skb_cloned(skb)) {
+   757			/* the copy is a forwarded packet */
+   758			if (pskb_expand_head(skb, 0, 0, GFP_ATOMIC)) {
+   759				__IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)),
+   760						IPSTATS_MIB_OUTDISCARDS);
+   761				kfree_skb(skb);
+   762				return -1;
+   763			}
+   764			hdr = (struct ipv6_rt_hdr *)skb_transport_header(skb);
+   765		}
+   766	
+   767		if (skb->ip_summed == CHECKSUM_COMPLETE)
+   768			skb->ip_summed = CHECKSUM_NONE;
+   769	
+   770		i = n - --hdr->segments_left;
+   771	
+   772		rthdr = (struct rt0_hdr *) hdr;
+   773		addr = rthdr->addr;
+   774		addr += i - 1;
+   775	
+   776		switch (hdr->type) {
+   777	#if IS_ENABLED(CONFIG_IPV6_MIP6)
+   778		case IPV6_SRCRT_TYPE_2:
+   779			if (xfrm6_input_addr(skb, (xfrm_address_t *)addr,
+   780					     (xfrm_address_t *)&ipv6_hdr(skb)->saddr,
+   781					     IPPROTO_ROUTING) < 0) {
+   782				__IP6_INC_STATS(net, idev, IPSTATS_MIB_INADDRERRORS);
+   783				kfree_skb(skb);
+   784				return -1;
+   785			}
+ > 786			if (!ipv6_chk_home_addr(dev_net(skb_dst_dev(skb), addr)) {
+   787				__IP6_INC_STATS(net, idev, IPSTATS_MIB_INADDRERRORS);
+   788				kfree_skb(skb);
+   789				return -1;
+   790			}
+   791			break;
+   792	#endif
+   793		default:
+   794			break;
+ > 795		}
+   796	
+   797		if (ipv6_addr_is_multicast(addr)) {
+   798			__IP6_INC_STATS(net, idev, IPSTATS_MIB_INADDRERRORS);
+   799			kfree_skb(skb);
+   800			return -1;
+   801		}
+   802	
+   803		swap(*addr, ipv6_hdr(skb)->daddr);
+   804	
+   805		ip6_route_input(skb);
+   806		if (skb_dst(skb)->error) {
+   807			skb_push(skb, -skb_network_offset(skb));
+   808			dst_input(skb);
+   809			return -1;
+   810		}
+   811	
+   812		if (skb_dst_dev(skb)->flags & IFF_LOOPBACK) {
+   813			if (ipv6_hdr(skb)->hop_limit <= 1) {
+   814				__IP6_INC_STATS(net, idev, IPSTATS_MIB_INHDRERRORS);
+   815				icmpv6_send(skb, ICMPV6_TIME_EXCEED, ICMPV6_EXC_HOPLIMIT,
+   816					    0);
+   817				kfree_skb(skb);
+   818				return -1;
+   819			}
+   820			ipv6_hdr(skb)->hop_limit--;
+   821			goto looped_back;
+   822		}
+   823	
+   824		skb_push(skb, -skb_network_offset(skb));
+   825		dst_input(skb);
+   826		return -1;
+   827	
+   828	unknown_rh:
+   829		__IP6_INC_STATS(net, idev, IPSTATS_MIB_INHDRERRORS);
+   830		icmpv6_param_prob(skb, ICMPV6_HDR_FIELD,
+   831				  (&hdr->type) - skb_network_header(skb));
+   832		return -1;
+   833	}
+   834	
+
 -- 
-2.50.0
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
