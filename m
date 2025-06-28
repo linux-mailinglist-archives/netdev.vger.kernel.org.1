@@ -1,192 +1,149 @@
-Return-Path: <netdev+bounces-202176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A2B5AEC82D
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 17:15:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D991EAEC887
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 18:06:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A80207A5873
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 15:13:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51AC9189E8B9
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 16:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A9B20E328;
-	Sat, 28 Jun 2025 15:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0762512EF;
+	Sat, 28 Jun 2025 16:05:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="FKZCL9a0"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="VK1gFjsN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61727EEA8
-	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 15:15:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DDE253941
+	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 16:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751123717; cv=none; b=OutiqPndsMG1pywbt+1QeiOQ0DaMiJuG9oQdxarQAktUX65YtKn9/8YIFRZKzAy7fFzw21S7ShDGXCXyQtXvkrB07z+QUdVak7q1yHryDUh72u+wMiH15bD+UbA9byoU7lFjzzOCnivo3vbreQEu83ivmoW+GQ1HNVlPP0ykxFE=
+	t=1751126730; cv=none; b=OylTiqpN7o7q5UGL6tRnUM1G37ilzdPi1I41iFZqvbBLmgIYjgbbkWkfOsFqDrp4BkfIcHsaj7GLUTaBgMKHebQxpU7hZn0VjRTMNrrbD/iswmNw4Xe/i+0/85ijtmZbGQS09hOKamgGhaQrpt3ML2yZwaXu+ftZ8QdlNbVPyG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751123717; c=relaxed/simple;
-	bh=G7UVRSgxzuhZbkoIFcSCapCevOtNNz5dlwAPHJQ1BXA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MFV58fim+yOvFsGSmsBQDzXBR5HrrEyCPqfSEjxD+NpJcEupNaI0zp5yVcL1crmABGom0CHl1QZPJCTWgs9r2ymjDsVK4LpXwDrBBZtIpRfosPhGBez+TqmO7fyjSVX2RQe4AVgGFtn9qG/7LPGDB9ab8TVtsJ81MCGpodhQstQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=FKZCL9a0; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6fd0a3cd326so9929416d6.1
-        for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 08:15:15 -0700 (PDT)
+	s=arc-20240116; t=1751126730; c=relaxed/simple;
+	bh=IYQnZ0xX+BmakKQBYlECXS9SG5XXZLN/8mo9eMtZm7E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d74MYFHK4voJ/ITPLC6XNFwcaJZA2rVUs4rRHvVzdZhZGdXhwntK8bDmwtm7CoGM094zFndmigy+wnm50jMgaTyqy0bOgwG+hqs3kM6o0t9oDoCi5mjCQPQZeuVDhsIR3kmhc8KgCbxhRIZWa71EDxG2ZZTLRq3zIJkZhjzTiPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=VK1gFjsN; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-312f53d0609so384471a91.1
+        for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 09:05:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1751123714; x=1751728514; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v1gsAVVlyI6mTUQAO3yPNBzPWEoEL/3yhZmBnqrYyKw=;
-        b=FKZCL9a0A7x6ij82yvZiBT0fvZfV0Qk7bhVtgYB5fXGBd8KRqAOlc5KalYDWP0TYEG
-         vI6MlhP/iS6/AaJBS9wvpme4HUp+wfntpn1i/VR8jUCivHudH20gtTaRIqYool8CF4u6
-         rNbUDWbQ3xO1VtXXLfgBRWDqBdFozaXJFp/3TmwanPge4MbVqMBbk0tVIjuGbhX+yGK/
-         YdfMQvwT4HnuLyq1yhF2s3k0OBuBASbdD18z/4kxv6zyYwAfyF4oBwbXp6lkpe892csm
-         KG6ofivvJE/WO+4E99/fTBVrilmMMAsu7l9EEWG8L5VeW4/Bo+W07bZ2yyHHGoDFLX83
-         tDnA==
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1751126728; x=1751731528; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=6aezSHN45uDXxhfwLny8MywH/f96jqDnbUNyp4IJzeo=;
+        b=VK1gFjsN03MgAsOAuDi+0tOTbBLRbPYjfZQ7Ye/zLcbRMpnG2VFdmt0zD6UnrfYiMf
+         +gp9Wjdnv/6wt6Z4enmdLdOOYsJ1CR3c6kfB0VQU47gnStONZBdf81AXbFBLAAs1k2sm
+         F+ZIeG+zBjLyJaC7URuXjE+rg5NhoZMBomYfzR0CjzlM1ytmNe3uWsDGnSIunDJ7vEu3
+         Vbt8JL6+IXV669/3fW2/pqCuWrKneHclaHNuxlLBekkxtrJXfu0bqO02ZFBtCkXR5tWI
+         ER5BsHiZnEaeMpYJQSBTrTCRU2EIPI67CMCfcHpKWFhSnVangkcP3cbei10Q6D+EhsO1
+         lCeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751123714; x=1751728514;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v1gsAVVlyI6mTUQAO3yPNBzPWEoEL/3yhZmBnqrYyKw=;
-        b=uz0fmo2Cu+symL4Wy4rw7s/okABuFAnaGslAXyWZ5gcNcq85KKHKcdN/VkO6x+Wz2F
-         IBzEpAArq6JGLIY4H8jUk3Oqlzo/I+AMx75Ab5Xd/SFd/nQ4fMhJWj5BYno4xb4GmHWc
-         oidJbdMyIdH1yuUhAWZZpst1avh4JE+KipVefgnsn4r8MN3pH2+peBFWn8aytuAhzsU8
-         izA1ooTEehRc/YFQGOZPXTLYRdLYgm4X20IcmkPUrmlXNCYtwNZ8DLgNEKLf62EezQOU
-         KYG1BpiNB6V+DLbIy6G7iQ2iq+IygDVmhee/EPNE+Y9rmYSI7r1RVea9Ssrp1Mo1wdEZ
-         H1JQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVIJDdklEZFHhoHksC1QS79Ev4CEPnMlvk6Qm9KFiEpCjRmJbfGk5KKAF5R3CYWdkQlebGksvo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyc7Vt7MtLCf7EP9KAxJ2Dlcu3nDkAj6jHdhtKV1gGCEf8v7Qg9
-	4MNKCMcvk/EjcwMll5t9PgiMzQTecJPqCuBl1hNojEiuuGedGBhYg7O03GolBN3BWj4=
-X-Gm-Gg: ASbGncvi+YhuCnAtllc0GG8yMzLt6UAVnmLiMrF02wOZchXOELnhVxz+yzURGuKws6h
-	GJBBFx0wXrQEdZ/bPyZwAY8M0lVg+Vb9Qhc0gCU4sEWbNs+jgYII9GE+ueqaxWv1BZ6uprohspI
-	3Gggcmrivxjt948L6ZYtzNZWK/8kbtAz452SqTa3J66DCSg4t1UV8t3PQw/pIAAJuLNcc5siBOB
-	92S60k4Nk+vHX4nO4xmK7KisTKJrozshHTmiL/+1ktbvy44qFB5gwV2cHUTUBtX3rSDKUG3kIzC
-	WcFCFkG8RZgA90OSOW1urkAuy5ISN0m8dmvL1um66fSgOz+NgBvEeMy4SJ8HGGv6I19UK2wUm4M
-	Jp3xgCYIDiHNUb7uic64erAgUoRtB9RPLI00xmSc=
-X-Google-Smtp-Source: AGHT+IHYlBdp5uC9/Ujjqa2LmEWKLCXO8GI943qUKi+QebbVWT+rUakFkx7ykX3YG8JlRSkcqy1cpg==
-X-Received: by 2002:a05:6214:4b04:b0:6fa:c653:5da8 with SMTP id 6a1803df08f44-6ffe433b290mr116138446d6.0.1751123714197;
-        Sat, 28 Jun 2025 08:15:14 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd773245d8sm37784726d6.123.2025.06.28.08.15.12
+        d=1e100.net; s=20230601; t=1751126728; x=1751731528;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6aezSHN45uDXxhfwLny8MywH/f96jqDnbUNyp4IJzeo=;
+        b=nt4myhO5Yl8eG1oizjK0NGtSfPZhdG9tGEVA8h48/PUIZcIQBrhGjGNdJTRY+RxqkY
+         fUCVMd1rPk/s8vjVByw544e7cYKQ+52MCyFv0/KgLz6D27le2+z5EULfidgkvzqFXgyv
+         j+9dl0QPZkKWwMYQbdQ8vdr0xU1CCNKI/hOKeZB+5Z+JS5h3UMYh3FVCSZGDIjITNynl
+         KZY6wwZkXfxlaIVFG/2fTkRYcFtMztZXCmO/B12F3V1ytnJSS03c0+cldfo+kS+pUIt0
+         v4MzlI7bY4jmcYCCg05nq+y+NSFX69oBsLDov+VqllIeCAg5ANsRSRjO7nTfC4/Yo8hU
+         CMSw==
+X-Forwarded-Encrypted: i=1; AJvYcCUsLIoH6IZv0oQE8HQxPKP/37AlEPBJJN0G6XRC1FR1yrzK7or3n5Wd+HbgH17v5tSatuSu18s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXAAOIwebORFfTWD5Ie1cYRxoDT2WfhdAn7on7xhabcSsOVgMY
+	3rX9t0LDTTBbVrIiuO2CGbnhR4CIKI169uKi5/DJV4YA9eTFXxQ2SKKRIYGsU6kN1Ss=
+X-Gm-Gg: ASbGnctTzkUbwDZ6L5lXUHVvIB+oR77O/ZcVTWaSpfnGz2qp1DfYVMfeUOrEIms+gs0
+	tnm5j7rs9MsK2S+TpD8+swbexYY5dmWU1Gf/k2n5wkwyof2a+kKPk9XkeaK8BEGrD1MQLuk82ue
+	nMCZw3Owrc0RMjwvLOtpjNtZubMZ0om/y+iY3oSNyrOLMGJkjpBrRL98zggFCfyynTNb6qzOxdB
+	mETberhl9TRl+IFKcVEA0kFMME6V5VG+OuhR5KQ95negItdUzR1lxw3TBQvt0SK81mqqpxhcoOT
+	D6MJeB43uug8WF2tq59xA81UUueIrXTAMqIgnAWmZ7PpTXo=
+X-Google-Smtp-Source: AGHT+IHYYhe26HLPNKoBVcnNOy6/jkpQn8WfKdz60I6/TVd500pn0InVU9KvudOTGbI9ixjvqF8axQ==
+X-Received: by 2002:a05:6a20:258b:b0:1f0:d1b3:7b39 with SMTP id adf61e73a8af0-220b050049cmr2367369637.1.1751126728462;
+        Sat, 28 Jun 2025 09:05:28 -0700 (PDT)
+Received: from t14 ([2001:5a8:4528:b100:c6fe:2091:41f:3e3f])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74af55786efsm4894673b3a.82.2025.06.28.09.05.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Jun 2025 08:15:14 -0700 (PDT)
-Date: Sat, 28 Jun 2025 08:15:10 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: William Liu <will@willsroot.io>, netdev@vger.kernel.org,
- jhs@mojatatu.com, victor@mojatatu.com, pctammela@mojatatu.com,
- pabeni@redhat.com, kuba@kernel.org, dcaratti@redhat.com,
- savy@syst3mfailure.io, jiri@resnulli.us, davem@davemloft.net,
- edumazet@google.com, horms@kernel.org
-Subject: Re: [PATCH net v4 1/2] net/sched: Restrict conditions for adding
- duplicating netems to qdisc tree
-Message-ID: <20250628081510.6973c39f@hermes.local>
-In-Reply-To: <aF80DNslZSX7XT3l@pop-os.localdomain>
-References: <20250627061600.56522-1-will@willsroot.io>
-	<aF80DNslZSX7XT3l@pop-os.localdomain>
+        Sat, 28 Jun 2025 09:05:28 -0700 (PDT)
+Date: Sat, 28 Jun 2025 09:05:24 -0700
+From: Jordan Rife <jordan@jrife.io>
+To: Kyle Evans <kevans@freebsd.org>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, wireguard@lists.zx2c4.com, 
+	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>
+Subject: Re: [RESEND PATCH v1 wireguard-tools] ipc: linux: Support
+ incremental allowed ips updates
+Message-ID: <hxqd4mhg6wir7oaatgtdshimtzdwkhlhdje2xet7mcj25g7zzt@jyhmin2ovram>
+References: <20250517192955.594735-1-jordan@jrife.io>
+ <aCzirk7xt3K-5_ql@zx2c4.com>
+ <aCzvxmD5eHRTIoAF@zx2c4.com>
+ <vq4hbaffjqdgdvzszf5j56mikssy2v2qtqn2s5vxap3q5gi4kz@ydrbhsdfeocr>
+ <CAHmME9rbRpNZ1pP-y_=EzPxRMqBbPobjpBazec+swr+2wwDCWg@mail.gmail.com>
+ <d309fd3a-daf1-4fd5-98aa-2920f50146fd@FreeBSD.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d309fd3a-daf1-4fd5-98aa-2920f50146fd@FreeBSD.org>
 
-On Fri, 27 Jun 2025 17:15:08 -0700
-Cong Wang <xiyou.wangcong@gmail.com> wrote:
-
-> On Fri, Jun 27, 2025 at 06:17:31AM +0000, William Liu wrote:
-> > netem_enqueue's duplication prevention logic breaks when a netem
-> > resides in a qdisc tree with other netems - this can lead to a
-> > soft lockup and OOM loop in netem_dequeue, as seen in [1].
-> > Ensure that a duplicating netem cannot exist in a tree with other
-> > netems.
-> >  
-> 
-> Thanks for providing more details.
-> 
-> > Previous approaches suggested in discussions in chronological order:
+On Wed, Jun 25, 2025 at 10:37:55PM -0500, Kyle Evans wrote:
+> On 5/21/25 18:51, Jason A. Donenfeld wrote:
+> > On Thu, May 22, 2025 at 1:02 AM Jordan Rife <jordan@jrife.io> wrote:
+> > > > > Merged here:
+> > > > > https://git.zx2c4.com/wireguard-tools/commit/?id=0788f90810efde88cfa07ed96e7eca77c7f2eedd
+> > > > > 
+> > > > > With a followup here:
+> > > > > https://git.zx2c4.com/wireguard-tools/commit/?id=dce8ac6e2fa30f8b07e84859f244f81b3c6b2353
+> > > > 
+> > > > Also,
+> > > > https://git.zx2c4.com/wireguard-go/commit/?id=256bcbd70d5b4eaae2a9f21a9889498c0f89041c
+> > > 
+> > > Nice, cool to see this extended to wireguard-go as well. As a follow up,
+> > > I was planning to also create a patch for golang.zx2c4.com/wireguard/wgctrl
+> > > so the feature can be used from there too.
 > > 
-> > 1) Track duplication status or ttl in the sk_buff struct. Considered
-> > too specific a use case to extend such a struct, though this would
-> > be a resilient fix and address other previous and potential future
-> > DOS bugs like the one described in loopy fun [2].
+> > Wonderful, please do! Looking forward to merging that.
 > > 
-> > 2) Restrict netem_enqueue recursion depth like in act_mirred with a
-> > per cpu variable. However, netem_dequeue can call enqueue on its
-> > child, and the depth restriction could be bypassed if the child is a
-> > netem.
-> > 
-> > 3) Use the same approach as in 2, but add metadata in netem_skb_cb
-> > to handle the netem_dequeue case and track a packet's involvement
-> > in duplication. This is an overly complex approach, and Jamal
-> > notes that the skb cb can be overwritten to circumvent this
-> > safeguard.  
+> > There's already an open PR in FreeBSD too.
 > 
-> This approach looks most elegant to me since it is per-skb and only
-> contained for netem. Since netem_skb_cb is shared among qdisc's, what
-> about just extending qdisc_skb_cb? Something like:
+> FreeBSD support landed as of:
 > 
-> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-> index 638948be4c50..4c5505661986 100644
-> --- a/include/net/sch_generic.h
-> +++ b/include/net/sch_generic.h
-> @@ -436,6 +436,7 @@ struct qdisc_skb_cb {
->                 unsigned int            pkt_len;
->                 u16                     slave_dev_queue_mapping;
->                 u16                     tc_classid;
-> +               u32                     reserved;
->         };
->  #define QDISC_CB_PRIV_LEN 20
->         unsigned char           data[QDISC_CB_PRIV_LEN];
+> https://cgit.freebsd.org/src/commit/?id=f6d9e22982a
 > 
+> It will be available in FreeBSD 15.0 and probably 14.4 (to be released next
+> year) as well.  I have pushed a branch, ke/fbsd_aip, to the wireguard-tools
+> repository for your consideration.
 > 
-> Then we just set and check it for duplicated skbs:
+> Aside: this is a really neat feature.
 > 
+> Thanks!
 > 
-> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> index fdd79d3ccd8c..4290f8fca0e9 100644
-> --- a/net/sched/sch_netem.c
-> +++ b/net/sched/sch_netem.c
-> @@ -486,7 +486,7 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
->          * If we need to duplicate packet, then clone it before
->          * original is modified.
->          */
-> -       if (count > 1)
-> +       if (count > 1 && !qdisc_skb_cb(skb)->reserved)
->                 skb2 = skb_clone(skb, GFP_ATOMIC);
-> 
->         /*
-> @@ -540,9 +540,8 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
->                 struct Qdisc *rootq = qdisc_root_bh(sch);
->                 u32 dupsave = q->duplicate; /* prevent duplicating a dup... */
-> 
-> -               q->duplicate = 0;
-> +               qdisc_skb_cb(skb2)->reserved = dupsave;
->                 rootq->enqueue(skb2, rootq, to_free);
-> -               q->duplicate = dupsave;
->                 skb2 = NULL;
->         }
-> 
-> 
-> Could this work? It looks even shorter than your patch. :-)
-> 
-> Note, I don't even compile test it, I just show it to you for discussion.
-> 
-> Regards,
-> Cong Wang
+> Kyle Evans
 
-Looks like an ok workaround, but the name 'reserved' is most often used
-as placeholder in API's. Maybe something like 'duplicated'?
+That's great news. It's nice to see this feature percolating through
+the WireGuard ecosystem.
 
-Why a whole u32 for one flag?
+I was working on adding support for direct IP removal to wgctrl-go too,
+a Go library for controlling WireGuard devices:
 
-This increases qdisc_skb_cb from 28 bytes to 32 bytes.
-So still ok, but there should be a build check that it is less than
-space in skb->cb.
+https://github.com/WireGuard/wgctrl-go/pull/156
+
+While I'm at it, I'll try to add native support for IP removal on
+FreeBSD if I can get a dev build working with the latest and greatest
+( I am a FreeBSD noob :) ).
+
+Jordan
 
 
