@@ -1,98 +1,136 @@
-Return-Path: <netdev+bounces-202106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A4B0AEC3A3
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 02:50:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1FFDAEC3B5
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 03:03:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0830017992F
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 00:49:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECAED1C27FA8
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 01:03:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F35013B58A;
-	Sat, 28 Jun 2025 00:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76E1419F461;
+	Sat, 28 Jun 2025 01:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c4e40/HA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GHEZ5xZr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04BCE12FF69;
-	Sat, 28 Jun 2025 00:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52CEA19E992
+	for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 01:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751071789; cv=none; b=TqUEUVkkutcjkz8Hk3df4FATCMuVbzM8b3kjfhfYfCxhdVS7MDTwpn3uRRHpO1MhLaj8u3uH3xFMcCFlDL5/DOKsnEMbMT0DLaEEiPG11L9i+nm/YPHoArLwUUEatt7ez6yykgw6TS/zatL//ZwDxCXNd0ZlEalL/+hMos+uStw=
+	t=1751072602; cv=none; b=gGwWqP1pxmKS//PUkeqkNC1YYIbOtlt3d75fWpsvQuorbKOqcoIde8a90wUaYw/d36sz2dPJgcripplUyzIkv1zgR5ZohZRQx0hYfDTNxgVbJZDHoQLSEqwPZYg0Mxz+XmABaXiumlbczWEtgNEgJcAAFIm5soZ/iLsO9uY1Gks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751071789; c=relaxed/simple;
-	bh=sKVQDxPUVDqKRWk+/07tX7T6mTDs3vsnsy9Cqk07Rkk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Wbe51OjqDw13fjgLDVExn+NNc/0lnWxZiS/HqQDmUpxx/uULvzBU9rPI15AUYepXxq61vkcsY2eJDOzwGd6n8t/sVO6ybnasPiYONBkI7SOHPo3ppbhe45gcItLY6lP6n+WqkdWVoxzuyHHZH7PpPMIrI84c8FgXnjgLncnDQJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c4e40/HA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8075AC4CEE3;
-	Sat, 28 Jun 2025 00:49:48 +0000 (UTC)
+	s=arc-20240116; t=1751072602; c=relaxed/simple;
+	bh=hT995olCCiK8O+OrX2pV6hMiJU2+mfjhkM9/pNzUN+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=N8ySza7RDlFXGdiE4w2or1dOlWp+iF/PZ+tbjCDBUwFmekb27AAEuNpDJCpzdwCkZPnwSPOyLLoayZgXV3a9Ww2lPZ6oTY4ZW2tK/WNtoycJjyhB+LwDEJbGRT4sONUHtlO9ULbSJXJGN+vwcwOFJhwPjsnuuh1lds1CuFOJKxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GHEZ5xZr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6DABC4CEE3;
+	Sat, 28 Jun 2025 01:03:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751071788;
-	bh=sKVQDxPUVDqKRWk+/07tX7T6mTDs3vsnsy9Cqk07Rkk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=c4e40/HApu5DLQO5BsfLbXGzYp8j0b0frpHx2jDj0AIwNQLx5JtZylbWU6XMlEOU7
-	 s7NIMOdbb3eMvb2foUcyQEgBUXlKUDN3lEU10B2H4EGlNcxFPA6yaE4YuBECfMu2qX
-	 nZk2ML5bNQOo/b6qq6uD/bBPSJn8oKTOpx7p+GqmU+GeYSF0HzaK/NPFxV6yIYmW5I
-	 vCeCej2qG06F2zPQGq2EQ3jS2YtcyWzoa5THWH2GL4AnAeWdY2jPrBgKXn/XnBEV7C
-	 QXfMledC8ieUCHGmPgw70VcsrrnDWrfYD3KgYDHLEwYPbcPN3sd4O1BDkQu+F9S78P
-	 yDcijjyA7OtuQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDB838111CE;
-	Sat, 28 Jun 2025 00:50:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1751072602;
+	bh=hT995olCCiK8O+OrX2pV6hMiJU2+mfjhkM9/pNzUN+Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GHEZ5xZrZXV2rfKFbXpo7AwJuQNjJ78RBrMxczzIg7cGxCo0C1KIxihLEPqzLW3VG
+	 hkTn+mQHDRd9beLQbcpN3UfpeEr/S/uwEIrVwUmbX18qajRdRhrQt4GM35GefQoXFF
+	 JknGwbzDDDghOibfsjYJ4VziDE1X/3ouDTZt2Bj6seoKeNmarY0BdMYV2oJyqnXGVT
+	 9XEeaBsXbZbwCaKZDyOLxfzPKAxIdDRzxE2Qqv4lhriLHPKxz1mAnxYMQlyboxS6qa
+	 tFRN8B1TVjiaiBXS63zjQfWNniMrJ+oprWdbMeTL7vFyGaJCMjE0R9dJYrerexxB+x
+	 OqG7bvqp5fr5g==
+Date: Fri, 27 Jun 2025 18:03:21 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Wilder <wilder@us.ibm.com>
+Cc: netdev@vger.kernel.org, jv@jvosburgh.net, pradeeps@linux.vnet.ibm.com,
+ pradeep@us.ibm.com, i.maximets@ovn.org, amorenoz@redhat.com,
+ haliu@redhat.com
+Subject: Re: [PATCH net-next v4 0/7] bonding: Extend arp_ip_target format to
+ allow for a list of vlan tags.
+Message-ID: <20250627180321.57f4da7f@kernel.org>
+In-Reply-To: <20250627201914.1791186-1-wilder@us.ibm.com>
+References: <20250627201914.1791186-1-wilder@us.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next 0/3] Octeontx2-pf: extend link modes support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175107181424.2100647.2766113809321238145.git-patchwork-notify@kernel.org>
-Date: Sat, 28 Jun 2025 00:50:14 +0000
-References: <20250625092107.9746-1-hkelam@marvell.com>
-In-Reply-To: <20250625092107.9746-1-hkelam@marvell.com>
-To: Hariprasad Kelam <hkelam@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
- davem@davemloft.net, sgoutham@marvell.com, gakula@marvell.com,
- jerinj@marvell.com, lcherian@marvell.com, sbhatta@marvell.com,
- naveenm@marvell.com, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, bbhushan2@marvell.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 25 Jun 2025 14:51:04 +0530 you wrote:
-> This series of patches adds multi advertise mode support along with
-> other improvements in link mode management code flow.
+On Fri, 27 Jun 2025 13:17:13 -0700 David Wilder wrote:
+> The current implementation of the arp monitor builds a list of vlan-tags by
+> following the chain of net_devices above the bond. See bond_verify_device_path().
+> Unfortunately, with some configurations, this is not possible. One example is
+> when an ovs switch is configured above the bond.
 > 
-> Patch1: Currently all SGMII modes 10/100/1000baseT are mapped with
->         single firmware mode. This patch updates these link modes
->         with corresponding firmware modes.
+> This change extends the "arp_ip_target" parameter format to allow for a list of
+> vlan tags to be included for each arp target. This new list of tags is optional
+> and may be omitted to preserve the current format and process of discovering
+> vlans.
 > 
-> [...]
+> The new format for arp_ip_target is:
+> arp_ip_target ipv4-address[vlan-tag\...],...
+> 
+> For example:
+> arp_ip_target 10.0.0.1[10/20]
+> arp_ip_target 10.0.0.1[] (used to disable vlan discovery)
+> 
+> The extended format of arp_ip_target is only supported by using the ip command when
+> creating the bond. Module parameters and the sysfs file do not allow the use of the
+> extended format.
+> 
+> Changes since V3:
+> 
+> 1) Moved the parsing of the extended arp_ip_target out of the kernel and into
+>    userspace (ip command). A separate patch to iproute2 to follow shortly.
+> 2) Split up the patch set to make review easier.
 
-Here is the summary with links:
-  - [net-next,1/3] Octeontx-pf: Update SGMII mode mapping
-    https://git.kernel.org/netdev/net-next/c/1df77da01b63
-  - [net-next,2/3] Octeontx2-af: Introduce mode group index
-    https://git.kernel.org/netdev/net-next/c/ad97e72f1c30
-  - [net-next,3/3] Octeontx2-pf: ethtool: support multi advertise mode
-    https://git.kernel.org/netdev/net-next/c/5f21226b79fd
+This appears to trigger the following warning when running the newly
+added tests (BTW please run shellcheck on the test, too):
 
-You are awesome, thank you!
+[ 1315.127007][ T9889] WARNING: CPU: 2 PID: 9889 at lib/vsprintf.c:2802 vsnprintf+0xa76/0x1050
+[ 1315.127471][ T9889] Modules linked in: [last unloaded: netdevsim]
+[ 1315.127908][ T9889] CPU: 2 UID: 0 PID: 9889 Comm: grep Not tainted 6.16.0-rc3-virtme #1 PREEMPT(full) 
+[ 1315.128709][ T9889] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+[ 1315.129070][ T9889] RIP: 0010:vsnprintf+0xa76/0x1050
+[ 1315.129378][ T9889] Code: 01 89 44 24 50 83 e8 01 89 44 24 7c 85 c0 7f c2 4c 89 f8 48 c1 e8 03 42 0f b6 04 08 84 c0 0f 85 72 fa ff ff e9 75 fa ff ff 90 <0f> 0b 90 e9 f1 f7 ff ff 48 8b 44 24 28 80 38 00 0f 85 a7 04 00 00
+[ 1315.130388][ T9889] RSP: 0018:ffffc90001227970 EFLAGS: 00010286
+[ 1315.130749][ T9889] RAX: 0000000000000000 RBX: fffff52000244f4c RCX: ffffc90001227a80
+[ 1315.131233][ T9889] RDX: ffffffffb80db4e0 RSI: ffffffffffffffff RDI: 1ffff92000244f39
+[ 1315.131654][ T9889] RBP: ffffc90001227a50 R08: ffffffffb80db4a1 R09: ffffffffb6e54d12
+[ 1315.132073][ T9889] R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000000
+[ 1315.132509][ T9889] R13: 000000000000000c R14: ffffffffb6e54ce0 R15: ffffc90001227ba0
+[ 1315.132937][ T9889] FS:  00007f554d21e740(0000) GS:ffff88807bb4d000(0000) knlGS:0000000000000000
+[ 1315.133437][ T9889] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[ 1315.133794][ T9889] CR2: 000055c1198c67f8 CR3: 000000000ca1b001 CR4: 0000000000772ef0
+[ 1315.134244][ T9889] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[ 1315.134968][ T9889] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[ 1315.135406][ T9889] PKRU: 55555554
+[ 1315.135626][ T9889] Call Trace:
+[ 1315.135843][ T9889]  <TASK>
+[ 1315.136005][ T9889]  ? __pfx_vsnprintf+0x10/0x10
+[ 1315.136310][ T9889]  ? __pfx_bond_opt_parse+0x10/0x10
+[ 1315.136602][ T9889]  snprintf+0xa1/0xd0
+[ 1315.136823][ T9889]  ? __pfx_snprintf+0x10/0x10
+[ 1315.137133][ T9889]  ? bond_opt_parse+0x32/0x6e0
+[ 1315.137414][ T9889]  ? bond_opt_parse+0x30/0x6e0
+[ 1315.137696][ T9889]  bond_info_show_master+0x84c/0x1140
+[ 1315.137977][ T9889]  ? bond_opt_parse+0x32/0x6e0
+[ 1315.138276][ T9889]  ? __pfx_bond_info_show_master+0x10/0x10
+[ 1315.138625][ T9889]  ? __pfx_seq_printf+0x10/0x10
+[ 1315.138917][ T9889]  ? __pfx_bond_info_seq_start+0x10/0x10
+[ 1315.139218][ T9889]  bond_info_seq_show+0x43/0x50
+[ 1315.139507][ T9889]  seq_read_iter+0x40e/0x1090
+[ 1315.139805][ T9889]  proc_reg_read_iter+0x1a3/0x270
+[ 1315.140100][ T9889]  vfs_read+0x75a/0xce0
+[ 1315.140324][ T9889]  ? vfs_getattr_nosec+0x2c0/0x3e0
+[ 1315.140608][ T9889]  ? __pfx_vfs_read+0x10/0x10
+[ 1315.140896][ T9889]  ? __do_sys_newfstat+0x7b/0xc0
+[ 1315.141201][ T9889]  ksys_read+0xf7/0x1d0
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
