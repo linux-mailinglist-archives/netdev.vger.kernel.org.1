@@ -1,64 +1,66 @@
-Return-Path: <netdev+bounces-202129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D039BAEC5D5
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 10:33:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06A16AEC5DC
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 10:40:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B2D57A27D3
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 08:32:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED5B06E2779
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 08:39:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B00D221FBD;
-	Sat, 28 Jun 2025 08:33:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9DB0221D96;
+	Sat, 28 Jun 2025 08:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="qa0Ud+B+"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="A9DBfYVV"
 X-Original-To: netdev@vger.kernel.org
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 736271A727D;
-	Sat, 28 Jun 2025 08:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC69288A0;
+	Sat, 28 Jun 2025 08:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751099629; cv=none; b=kernBs1PNDOKcAI6JPOU/2HVKjISUWWSWHLSwkFNsxlqRar7l3hEQf2AdR696HO4bEcDF3pJknTuFf9u1b+4oeugKVQlfCKuHjCCgafklwagJrE2+oey5x5VfcEkAtEWKvvvahRtsqj1SB0BeCohAcQO0UYa9ywubJnrWOu9muk=
+	t=1751100013; cv=none; b=bvggUFyO1rZmeOJ5LkoiJJpr4AIdeLpdZC5zYtZswCm+iIOAFD1BQnSWruLSZQXu/4uYv/KgNc6tX+EBx3/WdloThJ+4G64IUW8sSCVrBUtoXKGbpG32kZUal6SoY/6Rcwa4cOZKnTI0VvP424U0xFLcORUgNfTbZ3fFGqxqCv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751099629; c=relaxed/simple;
-	bh=b7u6Bwt2ZNSo2618uyhqFbiGYaGohf8fOBCJfzXeq9U=;
+	s=arc-20240116; t=1751100013; c=relaxed/simple;
+	bh=seYJ+h3ptgXyrs/Ol/cIp8Sn6+8xe6POhQhfvKZYpOo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NWognonHVUNBYFCpCDZfRWIhqdt69j7N/timmXiE4k029jzuwZxbXtE+b8hXv1SWM4W13w/eNsJ3KtLlxh4npD/nqdojGmM4UroNeXGWy6LmSTAAGyfgh+V3J4IJ7umIIg19zpuPcLqLScZcThyfQolMnqae0psJwZti8WVDO0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=qa0Ud+B+; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1751099625;
-	bh=b7u6Bwt2ZNSo2618uyhqFbiGYaGohf8fOBCJfzXeq9U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qa0Ud+B+6b9dNWaEi9O95+hKP+rTkjJNpVCcAMW9KiKHVw2XrN7E5ApXmAFc7Tiya
-	 qTSkyFNOLsK3HL9jCiH5ZDkh23GpMXuH0BuxHRLNSXAQ/neriRsm1CNKXlOEwYLDLu
-	 ACKUuPkED8q09senM2ahGCO4A8ZRzYI1HQ8P2Rlo=
-Date: Sat, 28 Jun 2025 10:33:44 +0200
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	Srinivas Kandagatla <srini@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "Chester A. Unal" <chester.a.unal@arinc9.com>, 
-	Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
-	Sean Wang <sean.wang@mediatek.com>, Simon Horman <horms@kernel.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v15 08/12] net: dsa: Add Airoha AN8855 5-Port
- Gigabit DSA Switch driver
-Message-ID: <9f60809e-ad8c-4f97-961a-d13fa5031981@t-8ch.de>
-References: <20250626212321.28114-1-ansuelsmth@gmail.com>
- <20250626212321.28114-9-ansuelsmth@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=CJyCCa0E561WIF7UmK0QP/MH8+OVFWzwygEsMOwFJz3373MPvrv29i/D1VHlgarxV/mphnwXdCeldnNoo0Cg0ed7bxEeFchHjf4GUgfUSicXMln3GDucR6A6GQEXk14umQHA1DrOj990y9XWkIUwi7AyBB/epcDCuOLIL/oHzu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=A9DBfYVV; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=KsixbDkdM3PEAz+rUYpeXnOwGsmmR9wNcvEDjtbPvJw=; b=A9DBfYVVRHTLvgbeQmK9fE6SPw
+	qEdD2qnstz1flvG5tClmk9Q28P2ngpbiJ1BQfWL1C/+ZLkS7usvsl4tpNCsbYhwEwEduA6PyyhXpV
+	D8aeBiWRmd58poQrfWsI3D+8XRo+L6ZX9Jc1z1+kD8x/I3EvKYVeYa2bCMT76L7dapjU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uVR6Q-00HDxH-Uj; Sat, 28 Jun 2025 10:40:02 +0200
+Date: Sat, 28 Jun 2025 10:40:02 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Asmaa Mnebhi <asmaa@nvidia.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	David Thompson <davthompson@nvidia.com>
+Subject: Re: [PATCH net v1] mlxbf-gige: Support workaround for MDIO GPIO
+ degradation bug
+Message-ID: <668cd20c-3863-4d16-ab05-30399e4449f6@lunn.ch>
+References: <20241122224829.457786-1-asmaa@nvidia.com>
+ <7c7e94dc-a87f-425b-b833-32e618497cf8@lunn.ch>
+ <CH3PR12MB7738C758D2A87A9263414AFBD78BA@CH3PR12MB7738.namprd12.prod.outlook.com>
+ <6e3435a0-b04e-44cc-9e9d-981a8e9c3165@lunn.ch>
+ <CH3PR12MB7738C25C6403C3C29538DA4BD78BA@CH3PR12MB7738.namprd12.prod.outlook.com>
+ <CH3PR12MB773870BA2AA47223FF9A72D7D745A@CH3PR12MB7738.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,61 +69,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250626212321.28114-9-ansuelsmth@gmail.com>
+In-Reply-To: <CH3PR12MB773870BA2AA47223FF9A72D7D745A@CH3PR12MB7738.namprd12.prod.outlook.com>
 
-On 2025-06-26 23:23:07+0200, Christian Marangi wrote:
-> Add Airoha AN8855 5-Port Gigabit DSA switch. Switch can support
-> 10M, 100M, 1Gb, 2.5G and 5G Ethernet Speed but 5G is currently error out
-> as it's not currently supported as requires additional configuration for
-> the PCS.
+> Hi Andrew, 
 > 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->  drivers/net/dsa/Kconfig  |    9 +
->  drivers/net/dsa/Makefile |    1 +
->  drivers/net/dsa/an8855.c | 2386 ++++++++++++++++++++++++++++++++++++++
->  drivers/net/dsa/an8855.h |  773 ++++++++++++
->  4 files changed, 3169 insertions(+)
->  create mode 100644 drivers/net/dsa/an8855.c
->  create mode 100644 drivers/net/dsa/an8855.h
 
-<snip>
+> I implemented and tested the changes you suggested and the
+> runtime_resume/suspend work smoothly for MDIO.
 
-> +static int an8855_switch_probe(struct platform_device *pdev)
-> +{
-> +	struct an8855_priv *priv;
-> +
-> +	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
-> +	if (!priv)
-> +		return -ENOMEM;
-> +
-> +	/* Get regmap from MFD */
-> +	priv->regmap = dev_get_regmap(pdev->dev.parent, NULL);
-> +	if (!priv->regmap)
-> +		return -ENOENT;
-> +
-> +	priv->ds = devm_kzalloc(&pdev->dev, sizeof(*priv->ds), GFP_KERNEL);
-> +	if (!priv->ds)
-> +		return -ENOMEM;
-> +
-> +	priv->ds->dev = &pdev->dev;
-> +	priv->ds->num_ports = AN8855_NUM_PORTS;
-> +	priv->ds->priv = priv;
-> +	priv->ds->ops = &an8855_switch_ops;
-> +	devm_mutex_init(&pdev->dev, &priv->reg_mutex);
+> However, we have another issue. I noticed that even if
+> mdio_read/write() functions are not being called,
+> runtime_resume/suspend() are still called regularly. After
+> investigation, I found out that this is due to ethtool being called
+> regularly. Ethtool automatically triggers the resume/suspend even if
+> we do no MDIO access. A different team wrote a script which monitors
+> "ethtool -S eth0" every 60 seconds. So every minute, we are running
+> resume/suspend and enabling/disabling the MDIO clock. Seems counter
+> productive. That team said that it is a requirement that they
+> collect these statistics about the mlxbf_gige interface.
 
-Check the return value of devm_mutex_init().
-This will become a compile error soon.
+> Is there any way to prevent ethtool from calling resume/suspend
+> without changing core kernel code?
 
-> +	priv->ds->phylink_mac_ops = &an8855_phylink_mac_ops;
-> +
-> +	priv->pcs.ops = &an8855_pcs_ops;
-> +	priv->pcs.poll = true;
-> +
-> +	dev_set_drvdata(&pdev->dev, priv);
-> +
-> +	return dsa_register_switch(priv->ds);
-> +}
+> If not, what would you suggest? 
 
-<snip>
+You need to put the MDIO bus device into its own pm_domain. Try
+calling dev_pm_domain_set() to separate the MDIO bus from the MAC
+driver in terms of power domains. ethtool will then power on/off the
+MAC but leave the MDIO bus alone.
+
+	Andrew
 
