@@ -1,202 +1,284 @@
-Return-Path: <netdev+bounces-202102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1F17AEC38E
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 02:38:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BB50AEC397
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 02:45:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70AEE3A7C9C
-	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 00:38:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8167B1C2577A
+	for <lists+netdev@lfdr.de>; Sat, 28 Jun 2025 00:45:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB02A4D8D1;
-	Sat, 28 Jun 2025 00:38:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF84481B1;
+	Sat, 28 Jun 2025 00:45:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BmcmYqo/"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="bXaKWkvj";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="EwM+VSYu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099031E505;
-	Sat, 28 Jun 2025 00:38:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751071120; cv=none; b=VHFXcP9sqNYg7jh1vzw6llqcBRLiGpXC6MCZIl6+RbKQKrn9hoSetCnU1tg5Pg1D45Ul29hiJxo4rykgt0gyPfNMvTXWKCJzP9rUvXHaydaoVA4ekQ9+5WmOupG1Knj0DNaGaKLXnSMaLoSp+nkXEqNEDBNttrKxWF1DP+SkYUc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751071120; c=relaxed/simple;
-	bh=qMnr3KPr9Xn+lfvxXZlzLkavCtcmOsXL2ErlM9xNhNo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NA26Go99RA4P57GVI4kjEDpCATWngArvL8BhTKIAAk1p3eNF8uthnSiv/yrhOBanVaZR0vcP9Vh0eGJ9D1B85cAas7AQFiIrWlZPZqhZJsX6ZYAyE0W33nhz2ETGgkV9+/cDjHqirUleFldQXhpHvHtGRr6UROQvodCzMnnNkMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BmcmYqo/; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6fada2dd785so4606846d6.2;
-        Fri, 27 Jun 2025 17:38:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5238A2F1FCB;
+	Sat, 28 Jun 2025 00:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751071521; cv=fail; b=H8g6oTUShev2X3FPFfGo2C+xEc7y4J2HpdDhmwDXktqjdXFcVPoJ9GpBiiU2WgTBOWKxOVpGCgW7CxTV1so8DhceFOMtGxSbHorzcX6ApimNosVzdhTKdsfUle7fN+qicRQLrmvNrHLVOJWytTQiZ9F+PzQO8ga7ksiKyXtSCbg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751071521; c=relaxed/simple;
+	bh=XawHKTpNJuFzaayGEBo1pOHg/26ltkgeJdvat0LIjoc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=qgUWCwx91Q3wYjSTf4KPirHhRobfu4aapYnzePl+BundSUuJ5mf256cVnuIY7IP8MpJlSvhJlSx3GeyJHnrf5vfca9draFqzfKOMn96StNYIYcRcQxTIhZwotLQjN6P4Cke1b9Vg0ekwJ80UX+tKDXQTYfO/7LvwZK5CGUGlk3s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=bXaKWkvj; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=EwM+VSYu; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55S0QYUE016968;
+	Sat, 28 Jun 2025 00:45:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2025-04-25; bh=5RBKiA3xIhAu4WGvvj
+	Fib4cSW3v0dUpbXbZxr5xHfis=; b=bXaKWkvjkRVDunTXPBw13fsJGUu3WIlbxM
+	bgkW4294Rx0HH7zpX3M2nDyk1EKxDR6Szt8MAs3v5S4a2RTT2tJnYjG9v2yTOCPV
+	dfJQrQ09zrSx7GGWs0b5+KRI7YzDP0aCy9VFui54un8zvf5Jh9+IRa7ntku042ja
+	qDF3RGx6rcRNgmMGbThgQRvDzGDpHKEl1cggnGuDNw9mQRLIuJnNYlX5kQ06fNUm
+	swIGeNJUJF6oD53uGRRtAyibTEixkax4wcN3ISUpfDASJ4qEFalhLAL0pQ1vZuKP
+	sWCMfsIdyy8R+84zyb781ZiIADgJlVyLtI1Qy2Hd7y0THl5nTU1Q==
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47egt1kkau-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 28 Jun 2025 00:45:10 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55RMjRJM017876;
+	Sat, 28 Jun 2025 00:45:10 GMT
+Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10on2063.outbound.protection.outlook.com [40.107.93.63])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 47ehw206hr-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 28 Jun 2025 00:45:10 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=DSN2Dsc9amf9S/tGMO4/bSGNbFq4uHC7paBj5FBgwHdzOJseF2eu1NC4ZPmBHJ76toOM0udsY5vwxnkcunG6tK0fSjeHKOsP4YmfFQaMEbeiTsL4kIhD4ZJHg9+2VVFqVk0EY40yA9ijIRYhj6po+/CgBu2Co48R2llzXcCN2pM13Egl/FMC6GPa3Z+LPTSfyAD+lQPuxRcNviYHyiAGuFmTkOWzwdFiqPIPK+ir9UV2iLlvCWRJyZyWImY7W/qeCRWJKHVSqlKSgqmUXen9vEpcLt1VUEl0XUoWB8GfpB7BYIlEeQgvETnGpTLzoCWSA3Wl7dOSTTVCSzroo5RZEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5RBKiA3xIhAu4WGvvjFib4cSW3v0dUpbXbZxr5xHfis=;
+ b=bZxyXCJ57HdgJXEnSC1qPMWMlXYTYoHIEYIQsYDVpvPSLdofKK/7prBSBPcrkFwQ0VYaq0Ip8sPjo+q3miVXoeD0J+VIgceEaFsP8FxpwMXWApM2VS03q+Ui0fAF1QSl+qz2L5pWZxjDCllfX/rRDCVJHnNpsmlLGYPXnKp2MnLIPpmHGV4MvVcFZfz+Z0XL8eDlBlK5RHK0RJmD+HbFfhk6k2LTF9HDmsRbwopU5NjT7oO1oZL+I8HMZPRqUkMqmKzkM3yhaD1SvO/HcUIbsiI8ukJSragDxSRV8hCt8uzVUsx0zSXwGFjtMtwqz8URkc/PJl8lV04TFiFONSH2Yw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751071118; x=1751675918; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=3KmbYvv/p8QkJFOIHHC4rmh9tFFrEsA16VC6+yNOxFU=;
-        b=BmcmYqo/JRT6fB9EhmRfqJ5EfUqIHkAwjpBkXcZJTRebsQfVyq9QVBepVU6C90hRMo
-         VEPWYFRK1Ri0c5txlCCi69vb+6esDRqfk0sSqXSP/IoSYA9uY6d0SK2yx7Fcxrlv1Q0l
-         xd6QrunwaBQcGGBV6TXqiUdlSdAaeBVIG5g7q1GseApaWmbOuBEfbRkTyxYs9De7Pd7q
-         9gP9eKS97lvnpdqaT8MTgkDhNJ1gxVtk87lS5DBibxerWuMSuw7LK96pPWjJgXBo0DES
-         VkHJmDAHMEbSaJV/EQhGCnPyDjjFApemSrydygLALT53nQYy0HbgwHiES6HaO8La+ohX
-         /J7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751071118; x=1751675918;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3KmbYvv/p8QkJFOIHHC4rmh9tFFrEsA16VC6+yNOxFU=;
-        b=gNoAdl1RSMN0RRBlpr3Rb0fG66//Xm4M2H7gxR1srwBpg/eHOdl5oTVHRNZgLirjWc
-         DlrH4KKjsXVDtl9G/gzEMfbi1hWvQDQTVRbzl/519rAiC87Wt6rGYEk2NvNxxQLts1Pa
-         bA6+NpJs1I6EiVsJ9A+UbohlS+GVpTHxdzKMOOTm2pIF6mvqAVR74CATNAoe4pBXq280
-         MSpQBQ+LFb38E60XncFXUQqtd7QE0XYZRCqnpROLXHHRNvgavxo5WR0RrljZof72BuSL
-         sCPYXpOYVOv6RrzAfP3lbhjH+YhffuJZLPxUxOl95KMDGdvWzgQrowHXT6GSfMZVxBCm
-         YkmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU5nZAWNMwgWpwo4nTEXA7wxO3tPNSPOUqppDIHbw1qDj3c8r8ywfOwpJJOiprvdIvr8HUWE9Ti@vger.kernel.org, AJvYcCUf000A5yLsYP0yZrzLqH5PdjYCjQkRbufILpaWBoHSFQq+hca2MwbYAeO+e5+Bm6ICj/Cg2Bm4iuvoNtQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVtXd9naKa0wK1asXtFugf1wl0yBCtE6k7fzR3/GdntNdUObhR
-	wX1KS6x5lcbml7iEsP4rltIsiRRTDr7wR4iKIEPBVCuM0W9WnQQEnLwOV22dxKcoJRzeQi1ruF/
-	nOXmnDkRuumwqzwiEpY0kvABIm0EJwBo=
-X-Gm-Gg: ASbGncsYnnggVld7g5RKILhY53hz3ByyaiiTkinMSry/go7GIDcmUqnenZzA48DNT7v
-	V/7hNehrDyFMH5Qkf484ktm/OSiL41MxTXLvcm7xg/XDhioPmcTeQ1gcj9Xgk/u+11sOblih8hQ
-	/rKLTojSG8FZsGIvRJrNp/DFs/1pJpQ4Pqc6+DWoJC7A==
-X-Google-Smtp-Source: AGHT+IHeXX/ytyIIvpN2oIAb6FB+uwhRuxKdFeJOBggJqqTAJfOjXYxpwE1kJmxFrPksbUis4eMEEXus7Y5v6Tmz1/Q=
-X-Received: by 2002:a05:6214:262f:b0:6fd:cbbb:b02 with SMTP id
- 6a1803df08f44-6ffffd77b1emr97546376d6.15.1751071117860; Fri, 27 Jun 2025
- 17:38:37 -0700 (PDT)
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5RBKiA3xIhAu4WGvvjFib4cSW3v0dUpbXbZxr5xHfis=;
+ b=EwM+VSYuHMEN64Z4JHxFZU1xvohnpJ1Q7oMzCnDuf1Rc4PWN+rA1Sfh1vadQAOWatFiOHOTWBKSDp/iPU6fmRXkK4evtvLJPjaIDhXBLoXEmaY9iAd+lelWIGyuMfgSaxxoLjbEo09J63RgrgNrSZ58JNxM3aoZ/s0e3Tez1IG4=
+Received: from IA1PR10MB8211.namprd10.prod.outlook.com (2603:10b6:208:463::7)
+ by CH3PR10MB7332.namprd10.prod.outlook.com (2603:10b6:610:130::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.27; Sat, 28 Jun
+ 2025 00:45:07 +0000
+Received: from IA1PR10MB8211.namprd10.prod.outlook.com
+ ([fe80::ec0a:e847:383e:1c40]) by IA1PR10MB8211.namprd10.prod.outlook.com
+ ([fe80::ec0a:e847:383e:1c40%7]) with mapi id 15.20.8857.026; Sat, 28 Jun 2025
+ 00:45:07 +0000
+Date: Fri, 27 Jun 2025 20:44:49 -0400
+From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: allison.henderson@oracle.com, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, tj@kernel.org,
+        andrew@lunn.ch, hannes@cmpxchg.org, mkoutny@suse.com,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4.1] rds: Expose feature parameters via sysfs
+ (and ELF)
+Message-ID: <aF87ATSJH3Q9rkju@char.us.oracle.com>
+References: <20250623155305.3075686-1-konrad.wilk@oracle.com>
+ <20250623155305.3075686-2-konrad.wilk@oracle.com>
+ <20250625163009.7b3a9ae1@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250625163009.7b3a9ae1@kernel.org>
+X-ClientProxiedBy: BYAPR04CA0022.namprd04.prod.outlook.com
+ (2603:10b6:a03:40::35) To IA1PR10MB8211.namprd10.prod.outlook.com
+ (2603:10b6:208:463::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250410163022.3695-1-ansuelsmth@gmail.com> <aF7xlqRLXlZu0DZr@makrotopia.org>
-In-Reply-To: <aF7xlqRLXlZu0DZr@makrotopia.org>
-From: "Christian Marangi (Ansuel)" <ansuelsmth@gmail.com>
-Date: Sat, 28 Jun 2025 02:38:25 +0200
-X-Gm-Features: Ac12FXxOGlOHKTJ_xVAxIcad2hrEhIUVAWgcdm3E86cKjX76u9mT4U48z3XgCjA
-Message-ID: <CA+_ehUwzyEXvOj2J2vXaSj0tSsEH-+cktHLkSZ1ieeuK5+NN-A@mail.gmail.com>
-Subject: Re: [net-next PATCH 0/6] net: dsa: mt7530: modernize MIB handling + fix
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: "Chester A. Unal" <chester.a.unal@arinc9.com>, DENG Qingfang <dqfext@gmail.com>, 
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Frank Wunderlich <frank-w@public-files.de>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR10MB8211:EE_|CH3PR10MB7332:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2fe325ff-5e49-421c-61d0-08ddb5dd073c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?bmFx5f+voRgO+xEeYYWpHINs9FdqCrKAPAXVWrNFxXXQLrlFXqlJsRoqfraH?=
+ =?us-ascii?Q?1qoofBBxDofr6UGCeuDlVM8NSsXjeWHljK+Y9PNccKffAWFD663ZSqAVSfli?=
+ =?us-ascii?Q?wGsoftpHAq+H6JM7o4hWGa1aWslp8TJCqAdIrgMChUMTcul4TafBKC8MgXcW?=
+ =?us-ascii?Q?lZuNcXQb7xQavaBLdP7ylgmD7QDCB0uVVXhppkN2guH+0QS8XpBN7/5L+A7e?=
+ =?us-ascii?Q?sZsGRAKD4HhKef3StcgaPld4d2m+Dk909gxlMulwVjYmp13o7Ew8M+l4SIUW?=
+ =?us-ascii?Q?d+WmreJw/Jnotmo157yCqDUPjWv2sXKBeBGAVSQdLihdNHSwZFpHiWMyVqWB?=
+ =?us-ascii?Q?gFrwJOg1HiMgV5YL0MWGUiXyJLGm6LGcc8G9bOm/IKRsY5tJatqPFBlCgQVW?=
+ =?us-ascii?Q?MdOoZnwUa36GLjeKGeZAo8UDA054p+hD/4NSdIk2exbUS4CZY71qMTTQ5a9h?=
+ =?us-ascii?Q?F0mCsrRVSlqxCoAYNAhlKB/WMi2ChcYUhWMw+/obuPg7hBCYHUPnlsHTW7a/?=
+ =?us-ascii?Q?ggnOqfsau0jrC1Bma56lZAuGwyEureYk/GNeZwF7/wcIKnieaaovOu5KD90m?=
+ =?us-ascii?Q?qYGZLR4PYEX5d5O49tL64Pup13aUkNqYZXY1qhc8cEUlPfmMaacyBV0ZLCZF?=
+ =?us-ascii?Q?uavA4hAB/+xgnHxkpFGQekF0tAJX1PnkU4+Yn5rKAd5c8sG2c+I9GtlkNhCx?=
+ =?us-ascii?Q?dsjBoCPYZic8fdnBw6xXyoGlRQc4KA5GOX2Q1zHrUKSWG6dTAGYzEb2XpIgR?=
+ =?us-ascii?Q?PWoORCB1a1J5hX0e9FsNY7GWSGdc+6K4Fyg+XQV9YYUMpTHyRrQ14cEsjiwy?=
+ =?us-ascii?Q?H11FBsrewSMRJ0GWSJpYEAwpiwviooAT7qzayFdp5S+L6mfAd1P2yGk6Dii8?=
+ =?us-ascii?Q?0hX8t2Xa8/wWqumwKEADowgDnGZY+v/DSZUIJ/aDYDPQeySctZEtYUFce5tC?=
+ =?us-ascii?Q?Uqw9ulsuWgzvVlIq4KgJ4IwpFD3mpSrZiUQk5t7zngB7D2aZuovwyRXILuWW?=
+ =?us-ascii?Q?S6lCtQiUt3zacbPhjHjV8e9QL/sbg2hfCq2xkEjsYb7zXWq7VBjHwi6bCKco?=
+ =?us-ascii?Q?cDVRY5RZALy2U+PzJda3PiavLJoiLiZmLLjTrCjZSFUA96ZHwfmYh2a7VLEa?=
+ =?us-ascii?Q?Zyz7oZQg7h90DdQ80QGDUS06iM90f2gA8w/TIuGeNoqsuCmlPHagYIe4BVPA?=
+ =?us-ascii?Q?2bDvYivbViG6k+MipM0VRt8WgBP/Sv0TPg3CCcBkGciX03WXuOgEAgP4yeJC?=
+ =?us-ascii?Q?/ouoGVEPyd2JiOUtz4dYWSWLUXr4a7zG3Gr/WJpsvfsEjp5TfHiNbPJ22hnk?=
+ =?us-ascii?Q?loZiQePaU2PsBoWhrBw9XKPts2pjPVGkfMtAn6NhNv5XYottfE5cNUmHeVuJ?=
+ =?us-ascii?Q?3S941jnxXzN6zsrz1D5h2uyrgydsoklrzb/ILUKuNHrBzLdYibsjbU64DfPo?=
+ =?us-ascii?Q?sIJLeVdvJl4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR10MB8211.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?gmrFZSvpN/ojNXfU2UWPK+jkwrYomO1lm75QLpOygXvM0wS7L2lXqD7hmxhA?=
+ =?us-ascii?Q?V6WWVirMhViHDquLHIKcaPLBLLIpKy9QX+37XdUFYY1O8uiM1NhjKPPTMlaK?=
+ =?us-ascii?Q?O9nwNSp/7hY8KXTvrN+qfiJld42ro3fQbD1nifm0Q+Z/TmE30h68miNMlnXx?=
+ =?us-ascii?Q?DQBoJiOapaSoFzFUIc+Qh+5bXxtwNBp7iUER6XoeN9Plbge0SO99E6hm5mlc?=
+ =?us-ascii?Q?0J3m+CfBqiec441UF09khc7Y3F9WbI76armxzDIq3Bn8LcXo8CtS7LLzkHWk?=
+ =?us-ascii?Q?CpZezIRIpkzQaTOxkOL+xZ3rqLtR09C/9z26cDPG4wC6N92ZGBIdEyo/sIAF?=
+ =?us-ascii?Q?zxXKWlQtsJwPidyHS9g8SOcn4QQtdt1z15R4ANfQo9yuXpU0ABrVkEdssXVI?=
+ =?us-ascii?Q?oZSbPWezDTJzkkU5S6PzhuuvwV4GdzBzuJhAYudF83vtznYXoMVH1cemRZZl?=
+ =?us-ascii?Q?SkDcGYdU6HFqSQ4wH49ujmtalRlttXYXZZxed2fKF/9++3ZDCX0KG0SR9wm2?=
+ =?us-ascii?Q?rAQrLGRwID7MhHUy+tZOh9/CQuZ9GEBOPJR1X/5BifQ5WlcMGOkDV2BbETww?=
+ =?us-ascii?Q?jRC5/rt+W5H9/XgcUn6a0IU2akBO8G7rbr+8r6aHAEXZDyaGB2qPNK7Vtnam?=
+ =?us-ascii?Q?py7yi2mM64gHy+XiY/ObVUn15k59exCrkbcqZe9Jy0Q2PKfVYB+FnGpPIY78?=
+ =?us-ascii?Q?7QKW22tAjKOQHkwr9MkytFJgTisjG9t2En6yxn5z4cDT5I5pOvZoC8cYef4b?=
+ =?us-ascii?Q?NfjnbjVt2kQ4hxSQtOP44g5eHy/oMmsJivfqPsXKeHwcV+GE1q0aQ5ULScd/?=
+ =?us-ascii?Q?fQ6aBCA6k/NiGs25B9Z6/CWhDSssHUd9A+9BxQblHzlJoeDjsGa13ptMKk7R?=
+ =?us-ascii?Q?Y6+s8u6ctGXnwvS3MMeOmhnCPSSLyYR2M1VWVkH1vO2TezwM4aUr7XJhj+YO?=
+ =?us-ascii?Q?jnlMX7k6g2vsYWVUs2uRJQwCSXvZKvMkg4Kw6Lo9wIBjdu7H4sRggque5U79?=
+ =?us-ascii?Q?dYgAoKFb1j62+xQhvxvLB8HuZc/+eGYJc2sb3H/QSpe99cFPfT4XnaUIw7AF?=
+ =?us-ascii?Q?ipQCYCh9HxtLtCj2Fj/vqPBhoWSas8S8/S/vReD/IQWElRX1qF058BGyKNJu?=
+ =?us-ascii?Q?Ii8WkhLXTpHP5DzJeBxj4RCGNGdSFBey68c7BjWQfGiPr1ZxcqybV6IYSC4l?=
+ =?us-ascii?Q?FkJc/MvvR3UtYMoF83xtuZwjy4Xo6IU5FBOL4QtBU8q7Ml3uFpsAzqQtcEWi?=
+ =?us-ascii?Q?hK2zT4lvoAwOk/xi4/UlJHnMkk+nNocBwr+ZhN6AUQSeLsbk34e9s2xlRWGn?=
+ =?us-ascii?Q?IumriBaCe6pzjgvF11euDfXNlXzMmNuiap1i3q/QKrC41h8kGX46/a36ABCP?=
+ =?us-ascii?Q?A+BLO3ePJbkKIuAKxL+qZgD+sbrTNOQeeufRL8s5xRojKy0pPQIS6JtKRfQ4?=
+ =?us-ascii?Q?ZHMAAOO0DwO9T5VqeTA2iINeDFMxcRd1NaLprj2sd3bfdNVAzIiv6upBVJiS?=
+ =?us-ascii?Q?YA45J6nmEgAA0MqoxM7tV3leSXnJG8k3CRUegIVaUnNmumLdr70xQjNt9Cu0?=
+ =?us-ascii?Q?MJHzyFj1J+FZ/Ye8CLv754FkZCA/72iMQ6j3YPlg7yjJwY9KnT9d4IKO8jse?=
+ =?us-ascii?Q?Ng=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	Y7GNUvCDZBWFub3ywCi8xfPE8ECkrJp+KuFvibz36GLg3gbYftkPd3tFZY8OJOIgS/DUrw4cYsmTpXhD4zh3Kkn3F4eJbzlh5Rc8RDcJOOA9RBIl/V86tdvocF+Z4UPYXcpQK0j1fZo7Lo25y9UElAUgtnV1GL+kS4YR93tw+UQ3aNKc6H2x6jxyrcnyIz5fbwzs1g730QU/tt7Awo/AwanEvZgGfvWnV2MI7dcJBW+oz6pn5HQJoAFbbHFdBv9TxkPmUATCvI1ihlEMuUR5T/VwSY4grkxrACII2f/5KaDM606tSr0cmblz3N6f2gVxFbUxXB9DiUzgvOKpGVthamKu2cFGDPzqoBaDn4+HcL3cZzwkY1EbqNBi7+kOW6/ohTNHvtPqN/sQge91vmrxdCeIhZHP4Ihuz1U+7Ga0B00hR9XBIj7QwN69KO3J9gjTozFLEAjK2clgRtfFP3kTMQIt91XyFcZvprS5dCrPU/93EmbO9YfedA/7LVodRRrjxd7rBQmwzKvHOhKg3gP6FR3BPztZKA+cDXECQjRfYKRu7Zf3VKs9oTu3LoYPbMy4a2w0GA08WiVnpraz2npLU1DJPWXsx1SLiCMEnTAWjwY=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2fe325ff-5e49-421c-61d0-08ddb5dd073c
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR10MB8211.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2025 00:45:07.1800
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /ennLq8b8qSaCcV3HWPCy99jQR1K9FNPSYnjtNUByjYVvLyvOIlgz85g8mGWD6HPqW2IZkRsCXAKwmcyOeJrwQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR10MB7332
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-06-27_05,2025-06-27_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 spamscore=0
+ phishscore=0 adultscore=0 malwarescore=0 suspectscore=0 mlxlogscore=978
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
+ definitions=main-2506280003
+X-Proofpoint-GUID: bxN4YUIPGY_9puHueg3XDWFWa9B0KkUZ
+X-Proofpoint-ORIG-GUID: bxN4YUIPGY_9puHueg3XDWFWa9B0KkUZ
+X-Authority-Analysis: v=2.4 cv=cpebk04i c=1 sm=1 tr=0 ts=685f3b16 b=1 cx=c_pps a=e1sVV491RgrpLwSTMOnk8w==:117 a=e1sVV491RgrpLwSTMOnk8w==:17 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19
+ a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10 a=6IFa9wvqVegA:10 a=GoEa3M9JfhUA:10 a=VwQbUJbxAAAA:8 a=OdtpqN1j7cOETiBu9_AA:9 a=CjuIK1q_8ugA:10 cc=ntf awl=host:14723
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI4MDAwMyBTYWx0ZWRfX2JKDn5ejBuKR 9SCNSQSvNxyQQZ2Hi8KqJda9iNZ5Fsys8o383MAGGhysr7zSiG9Jg2mi8EW8gk2hVM2VAUWbUov dHGk5S+yCEJqqoGfJCmm4PXNeAoCWvPxqqkkX4A7bj6LVLKv1jUVhoieHWg3+ZkfkeeQDGLNlNo
+ uLZSgR4aRn1o6v75Zb68OLTik5M6l5VeIvrONZjvTYwOthPlsY7gsAefLNrV0veAurSoIOePJvR 4SGiHUFscUfVUhl8AMPe7XUiPjmhvSDO75HOtOpDB4YBMmbWETWGmMkESFbKBCQVDda0XluLVtO YfZ+AQ0w3O0or+9lFQ1S3fiuIY+woIjfADWRwtFFAJigfJdXpkeKVvWFrEmebvUJVIpcAxHk5Zl
+ SfmUR9B4O9tAOnx0cFiAO/UvqeA3hq7uQVfrJhyQxB3xseUevvaP4NmUClXuvWPB6/D2LKYI
 
->
-> Hi Christian,
->
-> On Thu, Apr 10, 2025 at 06:30:08PM +0200, Christian Marangi wrote:
-> > This small series modernize MIB handling for MT7530 and also
-> > implement .get_stats64.
-> >
-> > It was reported that kernel and Switch MIB desync in scenario where
-> > a packet is forwarded from a port to another. In such case, the
-> > forwarding is offloaded and the kernel is not aware of the
-> > transmitted packet. To handle this, read the counter directly
-> > from Switch registers.
-> >
-> > Christian Marangi (6):
-> >   net: dsa: mt7530: generalize read port stats logic
-> >   net: dsa: mt7530: move pkt size and rx err MIB counter to rmon stats
-> >     API
-> >   net: dsa: mt7530: move pause MIB counter to eth_ctrl stats API
-> >   net: dsa: mt7530: move pkt stats and err MIB counter to eth_mac stats
-> >     API
-> >   net: dsa: mt7530: move remaining MIB counter to define
-> >   net: dsa: mt7530: implement .get_stats64
->
-> After this series being applied I see lockdep warnings every time
-> the interface counters are being read on MT7531 connected via MDIO:
->
+On Wed, Jun 25, 2025 at 04:30:09PM -0700, Jakub Kicinski wrote:
+> On Mon, 23 Jun 2025 11:51:36 -0400 Konrad Rzeszutek Wilk wrote:
+> > With the value of 'supported' in them. In the future this value
+> > could change to say 'deprecated' or have other values (for example
+> > different versions) or can be runtime changed.
+> 
+> I'm curious how this theoretical 'deprecated' value would work
+> in context of uAPI which can never regress..
 
-Thanks for the report, I will try to fix this and post a followup
-patch for this.
-Also I assume this is only present for MDIO and MMIO is not affected.
+Kind of sad considering there are some APIs that should really
+be fixed. Perhaps more of 'it-is-busted-use-this-other-API'?
 
-> [  234.374708] BUG: sleeping function called from invalid context at kernel/locking/mutex.c:579
-> [  234.383200] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 3667, name: ifconfig
-> [  234.391202] preempt_count: 1, expected: 0
-> [  234.395226] INFO: lockdep is turned off.
-> [  234.399150] CPU: 3 UID: 0 PID: 3667 Comm: ifconfig Tainted: G        W  O        6.16.0-rc1+ #0 NONE
-> [  234.399158] Tainted: [W]=WARN, [O]=OOT_MODULE
-> [  234.399160] Hardware name: Bananapi BPI-R3 (DT)
-> [  234.399162] Call trace:
-> [  234.399165]  show_stack+0x28/0x78 (C)
-> [  234.399179]  dump_stack_lvl+0x68/0x8c
-> [  234.399184]  dump_stack+0x14/0x1c
-> [  234.399188]  __might_resched+0x138/0x250
-> [  234.399197]  __might_sleep+0x44/0x80
-> [  234.399201]  __mutex_lock+0x4c/0x934
-> [  234.399209]  mutex_lock_nested+0x20/0x28
-> [  234.399215]  mt7530_get_stats64+0x40/0x2ac
-> [  234.399222]  dsa_user_get_stats64+0x2c/0x40
-> [  234.399229]  dev_get_stats+0x44/0x1e0
-> [  234.399237]  dev_seq_printf_stats+0x24/0xe0
-> [  234.399244]  dev_seq_show+0x14/0x40
-> [  234.399248]  seq_read_iter+0x368/0x464
-> [  234.399257]  seq_read+0xd0/0xfc
-> [  234.399263]  proc_reg_read+0xa8/0xf0
-> [  234.399268]  vfs_read+0x98/0x2b0
-> [  234.399275]  ksys_read+0x54/0xdc
-> [  234.399280]  __arm64_sys_read+0x18/0x20
-> [  234.399286]  invoke_syscall.constprop.0+0x4c/0xd0
-> [  234.399293]  do_el0_svc+0x3c/0xd0
-> [  234.399298]  el0_svc+0x34/0xa0
-> [  234.399303]  el0t_64_sync_handler+0x104/0x138
-> [  234.399308]  el0t_64_sync+0x158/0x15c
->
-> Note that this only shows with some lock debugging options being set
-> and may not actually be a problem, but I believe it anyway should be
-> fixed somehow.
->
-> #
-> # Lock Debugging (spinlocks, mutexes, etc...)
-> #
-> CONFIG_LOCK_DEBUGGING_SUPPORT=y
-> CONFIG_PROVE_LOCKING=y
-> CONFIG_PROVE_RAW_LOCK_NESTING=y
-> # CONFIG_LOCK_STAT is not set
-> CONFIG_DEBUG_RT_MUTEXES=y
-> CONFIG_DEBUG_SPINLOCK=y
-> CONFIG_DEBUG_MUTEXES=y
-> CONFIG_DEBUG_WW_MUTEX_SLOWPATH=y
-> CONFIG_DEBUG_RWSEMS=y
-> CONFIG_DEBUG_LOCK_ALLOC=y
-> CONFIG_LOCKDEP=y
-> CONFIG_LOCKDEP_BITS=15
-> CONFIG_LOCKDEP_CHAINS_BITS=16
-> CONFIG_LOCKDEP_STACK_TRACE_BITS=19
-> CONFIG_LOCKDEP_STACK_TRACE_HASH_BITS=14
-> CONFIG_LOCKDEP_CIRCULAR_QUEUE_BITS=12
-> # CONFIG_DEBUG_LOCKDEP is not set
-> CONFIG_DEBUG_ATOMIC_SLEEP=y
-> # CONFIG_DEBUG_LOCKING_API_SELFTESTS is not set
-> # CONFIG_LOCK_TORTURE_TEST is not set
-> # CONFIG_WW_MUTEX_SELFTEST is not set
-> # CONFIG_SCF_TORTURE_TEST is not set
-> # CONFIG_CSD_LOCK_WAIT_DEBUG is not set
-> # end of Lock Debugging (spinlocks, mutexes, etc...)
->
-> CONFIG_TRACE_IRQFLAGS=y
-> CONFIG_TRACE_IRQFLAGS_NMI=y
-> # CONFIG_DEBUG_IRQFLAGS is not set
-> CONFIG_STACKTRACE=y
-> # CONFIG_WARN_ALL_UNSEEDED_RANDOM is not set
-> # CONFIG_DEBUG_KOBJECT is not set
->
->
-> Cheers
->
->
-> Daniel
+> 
+> > The choice to use sysfs and this particular way is modeled on the
+> > filesystems usage exposing their features.
+> > 
+> > Alternative solution such as exposing one file ('features') with
+> > each feature enumerated (which cgroup does) is a bit limited in
+> > that it does not provide means to provide extra content in the future
+> > for each feature. For example if one of the features had three
+> > modes and one wanted to set a particular one at runtime - that
+> > does not exist in cgroup (albeit it can be implemented but it would
+> > be quite hectic to have just one single attribute).
+> > 
+> > Another solution of using an ioctl to expose a bitmask has the
+> > disadvantage of being less flexible in the future and while it can
+> > have a bit of supported/unsupported, it is not clear how one would
+> > change modes or expose versions. It is most certainly feasible
+> > but it can get seriously complex fast.
+> > 
+> > As such this mechanism offers the basic support we require
+> > now and offers the flexibility for the future.
+> > 
+> > Lastly, we also utilize the ELF note macro to expose these via
+
+.. <missing>
+
+> > so that applications that have not yet initialized RDS transport
+> > can inspect the kernel module to see if they have the appropiate
+> > support and choose an alternative protocol if they wish so.
+> 
+> Looks like this paragraph had a line starting with #, presumably
+> talking about the ELF note and it got eaten by git? Please fix.
+
+Yup
+> 
+> 
+> FWIW to me this series has a strong whiff of "we have an OOT module
+> which has much more functionality and want to support a degraded /
+> upstream-only mode in the user space stack". I'm probably over-
+> -interpreting, and you could argue this will help you make real
+> use of the upstream RDS. I OTOH would argue that it's a technical
+> solution to a non-technical problem of not giving upstreaming 
+> sufficient priority; I'd prefer to see code flowing upstream _first_ 
+> and then worry about compatibility.
+
+The goal here was to lay the groundwork for another patch series that
+Allison had in her backlog which was to introduce the reset functionality.
+
+Let me work with Allison on adding this to that patch series.
+
+> 
+> $ git log --oneline --since='6 months ago' -- net/rds/ 
+> 433dce0692a0 rds: Correct spelling
+> 6e307a873d30 rds: Correct endian annotation of port and addr assignments
+> 5bccdc51f90c replace strncpy with strscpy_pad
+> c50d295c37f2 rds: Use nested-BH locking for rds_page_remainder
+> 0af5928f358c rds: Acquire per-CPU pointer within BH disabled section
+> aaaaa6639cf5 rds: Disable only bottom halves in rds_page_remainder_alloc()
+> 357660d7596b Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+> 5c70eb5c593d net: better track kernel sockets lifetime
+> c451715d78e3 net/rds: Replace deprecated strncpy() with strscpy_pad()
+> 7f5611cbc487 rds: sysctl: rds_tcp_{rcv,snd}buf: avoid using current->nsproxy
+> $
+> 
+> IOW applying this patch is a bit of a leap of faith that RDS
+> upstreaming will restart. I don't have anything against the patch
+
+It has to. We have to make the RDS TCP be bug-free as there are
+customers demanding that. 
+
+> per se, but neither do I have much faith in this. So if v5 is taking 
+> a long time to get applied it will be because its waiting for DaveM or
+> Paolo to take it.
 
