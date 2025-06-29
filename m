@@ -1,170 +1,183 @@
-Return-Path: <netdev+bounces-202219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 316D7AECC18
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 12:09:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EECBAECC32
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 12:43:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EEF43B1539
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 10:09:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57BF01894D00
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 10:44:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029001DF994;
-	Sun, 29 Jun 2025 10:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D3A1DF75C;
+	Sun, 29 Jun 2025 10:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="A9sBVcZc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RGrQyoAY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DC9FA93D
-	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 10:09:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D6578F2E;
+	Sun, 29 Jun 2025 10:43:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751191784; cv=none; b=JjvxlS9q6Pg/XSIlW91K2MJuKo8UHRt66Wg2L4F+17qn7xrw88DmCywMilUWxylItcNeT23yHQJKDH63d1/+A/AnbgqjnTWgpP7li5vZ9MxIK2bvwc2rmOg/XbFVmPj6vtdtFqSWnpx3laxGUMJOvM28oL3FpI3cSB4M7GzOvzw=
+	t=1751193825; cv=none; b=As6waPnZJC5fFzBxajFILAbsxQyo5KfjwbmJdyumw8uXytx25GpycA4FgZvhWy4KLQ1MbO1/m9cQaX4yjPJY5dQHQ5gnLXwGd+aca+YZB87mY+AuntvR4QidYx5VqJe3hj9qxPAxd85Xy+exUKyhB5k/PUdGk9/cmD/Lrb8PgzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751191784; c=relaxed/simple;
-	bh=Objn0qkkDOaz6NCNuPx7j09YEN0QasjHDxNQrM+Klvc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xy+DIG06YG48lOH1TmCyRCXSk+6Z8BE/SbB3ScurEYu0Usi9g6Fw5r1IA6QqL6iaTcBp4T6gbv9pqpzIcK49U/y6CMF4rn2eT/QMqXfh5I5z83Ddv1CP9uuaJlL8vY7zNM13m5cGTe6zHAPYv79yXpvX8c2cMeEo+xKK586avXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=A9sBVcZc; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-6097d144923so7395545a12.1
-        for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 03:09:40 -0700 (PDT)
+	s=arc-20240116; t=1751193825; c=relaxed/simple;
+	bh=ZpLtuh86E89zYh29URqnIcZ1DiSLHtt+B+iIBE6z0Fc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uoJu9/RuLXmtiF0CmGqpwXt9SAa3/eH7O78stNSfjFEZCUqeBB2mjrNG4YQE06ea66f+W3M15dQwtroRFVByMdqfzigb2y3uQqM2RzwV7io0/Og5VEXdOD0JUx7GaLL+dj1UaU+qWeHqO7x7+qXuOqcq0hAD/r6bfXIMjbG/TBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RGrQyoAY; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3df2fb6378cso11444875ab.0;
+        Sun, 29 Jun 2025 03:43:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1751191779; x=1751796579; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=u3lhF8Ko0I6L/wnaOj8OO3hWgcZ+KtGsArNvPGKpoSg=;
-        b=A9sBVcZcF6niT5gMlh3wSbLIr+AZiXw1SjW3TSst3CRIBCPfoPTU/4C83BnjIZSAIM
-         LDqP7R7vwcdr14R9oH48lsi4qVyoUgree65eE1nxczK1xyKFgTcD807jITHqJ3Dvks1O
-         LmBS/l0e75uXOtun61xuCioMWVG/T6/7TbXhcLWPHwKOOjx8XoJ7LhTloyh7B/z6zTso
-         sIfRyWdtG17Ulo3Iz26FHqPDMM3fGb2BaZZxeMX5xdPE0ROuGBZDwZS5IR5s3kQ8aSY3
-         kGcm5Bfbf/Jx0qcNiHPBKV3AKSjTzQC7tVLmBIVYZ6zDvgLXkgS/yETN6oPgyHGSaaHh
-         JoFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751191779; x=1751796579;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1751193822; x=1751798622; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=u3lhF8Ko0I6L/wnaOj8OO3hWgcZ+KtGsArNvPGKpoSg=;
-        b=xOsqdlJlN0W5x3uoUB8A/GBYC8akqRTvcjW3OF0vN616fEIRy2yMW31qKoKNTkPG41
-         ivfySJ2hRHt12I5JlET9dN5gjfcgwC7lpI4lh5AXttYKKIJkcInGSLWO2x3kP4ZzKKQh
-         MmfW2IIezr9QAi2QbnMtVmD2arID2jZiYTPCTb8TFhgPbeKT3gJqbq6ra+Fh2oZzvjb6
-         ulHVyz7/RDxM9Wq4fq9trR1UCxLwlqXa6WTlr1oNQpo0PpJmxs0YVqIuR4SJC7gJZbcE
-         wKgvX03FY1ShIzKbRwj9S3TkA53B9d0Erw0b87sxkKcwY7YtfVFKRdd9pDndYBs2D9Lv
-         Qb6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU1f4dEcykRs+EuNTB+NaP9lpSg4uh44HnRrxYv2xjZX0JzqBGThisuPTHvt6ng88q2NUwFUJE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyh/Qo164gAR1z63mnaMTxs8O19YCzkWAryMKp2PgH2VTTNfe1B
-	EUwzOcJ0PTWy3SSafITGbOBdZ5UUdGjqMtsU/1Gccy7M/5PgvspgtlNKiOZeG6HbmFZD7+e+yuH
-	0rIYL
-X-Gm-Gg: ASbGnct2AIJfChJNip06ZjoIuH2bV65EjGkxHMWLfb+lSnDP2FLyfrEIvWMMrst9D7W
-	Dzy1gRMpNLSZKOQP6ywGrymu080/VNcXnqsjdvL93ZWf/RL/Kalg1pW+4v5R3k9EilMr2zi2pvz
-	f+J9yvLHjqbUnvRiQ9XtLFsEDcjCleQi7f0BWbX2IFSywmMi8RJnKmQxnfXuHj0qZFyomIZDiWA
-	ml+8CZeOEf02cipB2NVgJd1KnUObgDKxwmjSfGcnKwW6j3gextp9Pk7uUkCOa2lkzda88Je8/ub
-	iwLBHgLStStj8Qt9HobuNFr5M8JYhjFf3/dCb+A68ILUD9sueCdCWqhTH3KTIvLu0q0=
-X-Google-Smtp-Source: AGHT+IHX59f5eZ5DuWfM4j43TQIKm9gkCD7DITVR2ntH5B8idPSfwFsT1XuIFCaYQ0RvSF+jsBcusw==
-X-Received: by 2002:a05:6402:3514:b0:604:b87f:88b4 with SMTP id 4fb4d7f45d1cf-60c88e858f2mr8055235a12.2.1751191779121;
-        Sun, 29 Jun 2025 03:09:39 -0700 (PDT)
-Received: from localhost ([2a02:8071:b783:6940:36f3:9aff:fec2:7e46])
-        by smtp.gmail.com with UTF8SMTPSA id 4fb4d7f45d1cf-60c828bb60fsm4128515a12.3.2025.06.29.03.09.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Jun 2025 03:09:38 -0700 (PDT)
-Date: Sun, 29 Jun 2025 12:09:34 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Igor Russkikh <irusskikh@marvell.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexander Loktionov <Alexander.Loktionov@aquantia.com>, David VomLehn <vomlehn@texas.net>, 
-	Dmitry Bezrukov <Dmitry.Bezrukov@aquantia.com>, Pavel Belous <Pavel.Belous@aquantia.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH] net: atlantic: Rename PCI driver struct to end in _driver
-Message-ID: <atr3nxbqeor5azeajgk5qwmnxuxm7q3qsn3pk53j4mbzvqsdc3@qxa3cgbfxdbc>
-References: <20250627094642.1923993-2-u.kleine-koenig@baylibre.com>
- <20250627163652.01104ff4@kernel.org>
+        bh=AGCrUUFVv/kt95mYSv6XUlmbedZRctqevQjAWxYlvOY=;
+        b=RGrQyoAYCgTt4i2A3ZXqyEtoawq7CCnkJd/Q6jwDdQ0VLPQBntJWuHAvOa4+y+YZ5+
+         mPxwIeSnC/EygLOrxF/m8XMWj70qs6N3xQC+2LDefB7QqRNpnxPu0HSIgKlrGNICJx5G
+         X2PiO8BLierJeCS3GdB9nIJXsfiBPCLJzWLNstOkHySOIMysqUYe9BsvYwujbqXyztaG
+         jgXA4Z+ZWmrCa4wRqbM0tS3erDaEMXTsLBC7BOeGh7UMGy9zm0wngXf09ElS6MAO79CH
+         vZ1/IHteG+avUI9RxJTHD+XAGbhQSLC65ZHKZ4hosVkBmLfRa71SGjH5+DMNrtD2p9S/
+         EOIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751193822; x=1751798622;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AGCrUUFVv/kt95mYSv6XUlmbedZRctqevQjAWxYlvOY=;
+        b=JYrbt0JiMwlflY7OykvW0s++YD9kaHjWrfU5ucIGc9dCmZax3lljNzzbOdRAr2E12h
+         KpJpcuuci7YXwIHKnqEUzvhjzMpPRS2mNf8SYYFeqw99wlHeOcEICJ1QNGkofG07CJYB
+         59y3BMlLQC+BnT7OFvb2dpWBDKJi1RLP2Kg0tQVKAKQ1PKO3Ni0JHJjWR+Pafi7nxtzi
+         Aj47Gzj3RkvP8OdoR3WFR185Eq+4nkQ9bmpMoyx7ztVQYbn3JMwJd7tVIYkDNWLTop+l
+         FW9XY0HQS+JjArs+Nb2mB0z2lWA9EOOoNfxDVcsv8lZGHtfT7Cz3xw/u5x/rTDIXN/fU
+         a3xA==
+X-Forwarded-Encrypted: i=1; AJvYcCWmPci+Q9WFB1yGrqAg4dUbfwUP6UZOSUo8OcgLh0k9efExFEoWisSCNBf1S0g57xjkSJC9mW0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtZnxMuEp7hwwGRge4j7qexeTqPoMiLRm7lugwW3liamAFYEbu
+	Qg6DVq8ozWohAGTNeyj8iL4psdF7auwvWb2XExH+gQFqg19GauaPfhYG6b2Zy0SmSxlXoVQ7BMm
+	2drziuqjHo5GSVv+AuYTcAqAsTu/nTHY=
+X-Gm-Gg: ASbGncuAHEaqHOv+I4KJmgW7HXZ5JywTlyfzdSlpgbWLBvoZOVwHc3r/2bw2XKTJkE7
+	u53NLTumBp9EbEfYTRDmuf6h8PwvH/6Nx45Eo7wfMytDqbLvjzmo5hy2g3Pdh1k0R5bkI2mMPUI
+	O5I9SQ4eK80pNnCatgUw+CR0ZzN3BTbngBl3i2lmHhBnc=
+X-Google-Smtp-Source: AGHT+IFzgtIpomD9pkXx6GJ8emNiPPiO+ni4u8S/c2UNTWfgRW7sSbDgmW8AdiQqHgvF24F8ODl6wxnl3ZbOvPq69V8=
+X-Received: by 2002:a05:6e02:1294:b0:3df:2f9e:3da8 with SMTP id
+ e9e14a558f8ab-3df3e2e3fb5mr118518555ab.9.1751193821839; Sun, 29 Jun 2025
+ 03:43:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="nrttdanqafyp3xwq"
-Content-Disposition: inline
-In-Reply-To: <20250627163652.01104ff4@kernel.org>
-
-
---nrttdanqafyp3xwq
-Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
-Content-Disposition: inline
+References: <20250627110121.73228-1-kerneljasonxing@gmail.com> <CAL+tcoCSd_LA8w9ov7+_sOWLt3EU1rcqK8Sa6UF5S-xgfAGPnA@mail.gmail.com>
+In-Reply-To: <CAL+tcoCSd_LA8w9ov7+_sOWLt3EU1rcqK8Sa6UF5S-xgfAGPnA@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sun, 29 Jun 2025 18:43:05 +0800
+X-Gm-Features: Ac12FXzDVHky2GUp1Dyr5emkdivA8dA5KnWfhWBtS0FNntjcXwcbH66zhXt79iM
+Message-ID: <CAL+tcoCCM+m6eJ1VNoeF2UMdFOhMjJ1z2FVUoMJk=js++hk0RQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v6] net: xsk: introduce XDP_MAX_TX_BUDGET set/getsockopt
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH] net: atlantic: Rename PCI driver struct to end in _driver
-MIME-Version: 1.0
 
-On Fri, Jun 27, 2025 at 04:36:52PM -0700, Jakub Kicinski wrote:
-> On Fri, 27 Jun 2025 11:46:41 +0200 Uwe Kleine-K=F6nig wrote:
-> > This is not only a cosmetic change because the section mismatch checks
-> > also depend on the name and for drivers the checks are stricter than for
-> > ops.
->=20
-> Could you add more info about what check you're talking about or quote
-> the warning you're fixing? I'm not following..
+On Sun, Jun 29, 2025 at 10:51=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
+com> wrote:
+>
+> On Fri, Jun 27, 2025 at 7:01=E2=80=AFPM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > This patch provides a setsockopt method to let applications leverage to
+> > adjust how many descs to be handled at most in one send syscall. It
+> > mitigates the situation where the default value (32) that is too small
+> > leads to higher frequency of triggering send syscall.
+> >
+> > Considering the prosperity/complexity the applications have, there is n=
+o
+> > absolutely ideal suggestion fitting all cases. So keep 32 as its defaul=
+t
+> > value like before.
+> >
+> > The patch does the following things:
+> > - Add XDP_MAX_TX_BUDGET socket option.
+> > - Convert TX_BATCH_SIZE to tx_budget_spent.
+> > - Set tx_budget_spent to 32 by default in the initialization phase as a
+> >   per-socket granular control. 32 is also the min value for
+> >   tx_budget_spent.
+> > - Set the range of tx_budget_spent as [32, xs->tx->nentries].
+> >
+> > The idea behind this comes out of real workloads in production. We use =
+a
+> > user-level stack with xsk support to accelerate sending packets and
+> > minimize triggering syscalls. When the packets are aggregated, it's not
+> > hard to hit the upper bound (namely, 32). The moment user-space stack
+> > fetches the -EAGAIN error number passed from sendto(), it will loop to =
+try
+> > again until all the expected descs from tx ring are sent out to the dri=
+ver.
+> > Enlarging the XDP_MAX_TX_BUDGET value contributes to less frequency of
+> > sendto() and higher throughput/PPS.
+> >
+> > Here is what I did in production, along with some numbers as follows:
+> > For one application I saw lately, I suggested using 128 as max_tx_budge=
+t
+> > because I saw two limitations without changing any default configuratio=
+n:
+> > 1) XDP_MAX_TX_BUDGET, 2) socket sndbuf which is 212992 decided by
+> > net.core.wmem_default. As to XDP_MAX_TX_BUDGET, the scenario behind
+> > this was I counted how many descs are transmitted to the driver at one
+> > time of sendto() based on [1] patch and then I calculated the
+> > possibility of hitting the upper bound. Finally I chose 128 as a
+> > suitable value because 1) it covers most of the cases, 2) a higher
+> > number would not bring evident results. After twisting the parameters,
+> > a stable improvement of around 4% for both PPS and throughput and less
+> > resources consumption were found to be observed by strace -c -p xxx:
+> > 1) %time was decreased by 7.8%
+> > 2) error counter was decreased from 18367 to 572
+>
+> More interesting numbers are arriving here as I run some benchmarks
+> from xdp-project/bpf-examples/AF_XDP-example/ in my VM.
+>
+> Running "sudo taskset -c 2 ./xdpsock -i eth0 -q 1 -l -N -t -b 256"
+>
+> Using the default configure 32 as the max budget iteration:
+>  sock0@eth0:1 txonly xdp-drv
+>                    pps            pkts           1.01
+> rx                 0              0
+> tx                 48,574         49,152
+>
+> Enlarging the value to 256:
+>  sock0@eth0:1 txonly xdp-drv
+>                    pps            pkts           1.00
+> rx                 0              0
+> tx                 148,277        148,736
+>
+> Enlarging the value to 512:
+>  sock0@eth0:1 txonly xdp-drv
+>                    pps            pkts           1.00
+> rx                 0              0
+> tx                 226,306        227,072
+>
+> The performance of pps goes up by 365% (with max budget set as 512)
+> which is an incredible number :)
 
-If you do=20
+Weird thing. I purchased another VM and didn't manage to see such a
+huge improvement.... Good luck is that I own that good machine which
+is still reproducible and I'm still digging in it. So please ignore
+this noise for now :|
 
-diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_pci_func.c b/drivers=
-/net/ethernet/aquantia/atlantic/aq_pci_func.c
-index ed5231dece3f..2ee5900337bb 100644
---- a/drivers/net/ethernet/aquantia/atlantic/aq_pci_func.c
-+++ b/drivers/net/ethernet/aquantia/atlantic/aq_pci_func.c
-@@ -208,7 +208,7 @@ static void aq_pci_free_irq_vectors(struct aq_nic_s *se=
-lf)
- 	pci_free_irq_vectors(self->pdev);
- }
-=20
--static int aq_pci_probe(struct pci_dev *pdev,
-+static int __init aq_pci_probe(struct pci_dev *pdev,
- 			const struct pci_device_id *pci_id)
- {
- 	struct net_device *ndev;
-
-this is buggy; so it's justified that you get:
-
-	WARNING: modpost: vmlinux: section mismatch in reference: aq_pci_driver+0x=
-8 (section: .data) -> aq_pci_probe (section: .init.text)
-	ERROR: modpost: Section mismatches detected.
-
-=2E However if the driver struct is named "aq_pci_ops", the warning is
-suppressed due to
-
-        /* symbols in data sections that may refer to any init/exit section=
-s */
-        if (match(fromsec, PATTERNS(DATA_SECTIONS)) &&
-            match(tosec, PATTERNS(ALL_INIT_SECTIONS, ALL_EXIT_SECTIONS)) &&
-            match(fromsym, PATTERNS("*_ops", "*_probe", "*_console")))
-                return 0;
-
-in scripts/mod/modpost.c.
-
-Best regards
-Uwe
-
---nrttdanqafyp3xwq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmhhENsACgkQj4D7WH0S
-/k6whAgAu6+On8DMXZrNQE/D/SCWkiyNrP6ZOavkGXobKMfkZaSCK4EHoFCUgORw
-IGMWKpJotjbldrrNwbuCliXPdlZyGtOPRTRshoE5cP4Z0RvhLJbuhPh6NqC/kC6E
-zJJjc/6pU/PtH+54553fc7w7WHsOeEOsUm01PLAcw+sqcldg2NROQLGaV7Mne2vm
-dSRic8sEg7FaMyjk1pt6k3iI7F7tqDYtRuaew9IhVNrOCORhfOBWr72mn7rJaitg
-qWdz0OtOYX6eyMVeEZqCXWogBSd4JZgV7gikWA1GNZ3ZP6uzu2VgiUNTJ+PWSBBf
-lXW06KhwO19tLB1gsDXVhO9TBksp6A==
-=mS1g
------END PGP SIGNATURE-----
-
---nrttdanqafyp3xwq--
+Thanks,
+Jason
 
