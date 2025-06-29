@@ -1,195 +1,121 @@
-Return-Path: <netdev+bounces-202285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AC9FAED12F
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 23:08:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 191B8AED132
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 23:08:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0146D3B1727
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 21:07:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 480CC3B1521
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 21:07:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A15E23B622;
-	Sun, 29 Jun 2025 21:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B56223BCF2;
+	Sun, 29 Jun 2025 21:08:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="eccaXeAA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RSDtTFhW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-28.smtpout.orange.fr [80.12.242.28])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3ADD3D6F;
-	Sun, 29 Jun 2025 21:07:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF0223BD13
+	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 21:08:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751231277; cv=none; b=OSl3NqmGDHcv6onuPQidBlqG5mO6m7ZeEgrvfdoxGJmjJBIR023YDQy8F4KETCCNwt8HA//NXf3bt+xg358qydI6dpQ+stvIayOC5n5x574Q3JeQvXByPzJqGls3iuwX7+/hmaPWHJ8d+bHfpsLp/nca2EHOCCgAtj35t73Wvts=
+	t=1751231299; cv=none; b=D4k9A9blSelX47zb7zhCHhb1I91Tc2/pR4UxvWeNMdtEpQwF/311P2k57jE7TVlHvQpKDtBQZn8+q5bIbVUMpayqEIp2N/uR87kEzln12ZfEbVFjZZkyAoAvwpJwEnqtq6Z/eQL8P6XBX1CP5kYfTvvPDmnAw8nAb+wClhTujzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751231277; c=relaxed/simple;
-	bh=IKofi0z/34lvlEXdPoxgt/LEYmwJ0XbFBt1OJO1u/08=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hv2KNGIEOc8Hzooqo9XkW2pRt/QHF1d63CnlTqiZA7oCOv3tQ2sbuhB4+OdHvzwvfqrymPHLDBwsGQrGh98mHrs3TeHYDXC6V8qeMS8JPhzqHL8/phKNNuHQ6vtrErQ71WnZn1ET4x7C4HmTxuKI8uP3dsbfrbHIgIwfHU980zE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=eccaXeAA; arc=none smtp.client-ip=80.12.242.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from fedora.home ([IPv6:2a01:cb10:785:b00:8347:f260:7456:7662])
-	by smtp.orange.fr with ESMTPA
-	id VzEYuDauZBAWEVzEYuViuU; Sun, 29 Jun 2025 23:06:45 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1751231205;
-	bh=oN1+0ceBwvNVnPdeWRjShc9rKMxoodAlltZcZme4N18=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=eccaXeAAiLaY+pmMDTZaKcrNIvicOfe0/j9jQFzMYuHY9WMXeWEyeTMAeiUZdAcge
-	 xSmm1jzHA/WombCIYKDHQWpipXUK9dm94u/bDgvEISkZ2r/kgZ/KpLoAubBcJ/VWGM
-	 AF6JA94PvBVhruofSxQ0aV/17W7hMdDuMU7vZkVNTa733tc3H3QTbtsA6RguXkx2sz
-	 yAju20voimcU1dgioH4++0qliEWEnqdfJvgdFUTMiNstWBKftbXMNOPi3RZw2uvxZT
-	 OLyZeAGiuqoonJVnYDm6wsdXo+4LtDWdYTo+LYX5kG/MEELgdgo1ZppGUqM01OEl5y
-	 AwZriaREJ7fnw==
-X-ME-Helo: fedora.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sun, 29 Jun 2025 23:06:45 +0200
-X-ME-IP: 2a01:cb10:785:b00:8347:f260:7456:7662
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: Kurt Kanzenbach <kurt@linutronix.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	netdev@vger.kernel.org
-Subject: [PATCH] net: dsa: hellcreek: Constify struct devlink_region_ops and struct hellcreek_fdb_entry
-Date: Sun, 29 Jun 2025 23:06:38 +0200
-Message-ID: <2f7e8dc30db18bade94999ac7ce79f333342e979.1751231174.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.50.0
+	s=arc-20240116; t=1751231299; c=relaxed/simple;
+	bh=8Jtr1a0AMbnvFSo6RXF5lfHcwUj6EgGlOo8eeCRXn1w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KbRi8CD9IVhjC3N0gPY9Rvda86nAksBtEu+jbEwN4I3LDT9HB2mZ6YzKFa2NgxFol1HnDO8oa5ZemBz/gz4IINw/OZR4RwyktTWwEEeGqA04fw4Xg/tAgSV7x52ErtiiWlXCtmDvYfMDRwF0sgmgAZmFRy5QKLzfXMsdwGJ1z8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RSDtTFhW; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-313154270bbso1337856a91.2
+        for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 14:08:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751231297; x=1751836097; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ftptFlA60oVbaXxpWxPgb3mXBKHNjLkISbQ2O83wJVk=;
+        b=RSDtTFhWV8HGd+maw7699XCJXXTfHpEA5TA/unVXoVVqit9F+Vz4ISDH7VE9s5fGzK
+         pTY9mvmV63F9ie0+R/L/3Wm9mIbCIFUMm0rob3KWDXt+yLSAasW5TzT/00KLgUuGk8gv
+         6WM/hr07stcl75LIWEzz0vKvXpk+enfD3Akll8DfQZeV8od7MztefCdsWuAsde0Xcpxt
+         lrntU1aPN030vX3VqyqF/Zs+F+YqlJBi2wYmokUFGy5eoJIP/SwgxNtCrnbCDHxTd5/S
+         A73YfzypipUKKacRx5NL+76yiCTU66DaPZ45fLWBzqmoCiHdS9V6s48UoSHFmXe5NxcR
+         dyyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751231297; x=1751836097;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ftptFlA60oVbaXxpWxPgb3mXBKHNjLkISbQ2O83wJVk=;
+        b=Cl/G3CllE28RkhA5jmOVu8a4We3bvhWga01wkfJ+/wHOyWQh9L3pjLAghlgtl4pPJp
+         o+exIxD/RRrN9UFm1HFjsuWAcnNW12YC2WpEtmnh/5qgjYdiSO3RKHocu7bFXrjB+clU
+         RbvclBnSJ1ptUNzTqLm3knA2ZZyVjGx6I0pJnCremVdqa2pjiLX9vSNkbH1vRoCnP6//
+         kHFhx6ITsQu7HmoKVv5kZxUUL16T7gpYrzUj2ZIeeYTjH/Z//9To0cLZd6nPMXuQqCDN
+         DyRr34Wn/8xE6IkDEAr+9vtLd3ekoI7N/ZPEF6Os2/+/5FX5tSLOSezxPbnRmw+VxdFp
+         6gow==
+X-Forwarded-Encrypted: i=1; AJvYcCUUl8T90wLjjBa9QcShvRe0+1YejdeE9DUb+zhrU1bi0JIDi5dpgliZbTq7qBgPzJiB5OA5wwc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGjJKB2N9EeyHG2hKgi1nI8hXP/ClMLFosEDVjW4H3x3kS1eWA
+	uMT3yA5VMm3qQcy07Xcqc4My6STlcYvSZ3UoDg8k2DU+GAhnVLYeGryL
+X-Gm-Gg: ASbGncvqnj5O1DfM19Eg4Q0SUDGeLxSXFmKHqPdIHsSX3QHvz5XEA3Ra9U/cMHug2Hg
+	oL+JGt6eyw89ZunB5w7Nd8UVSMyJFXD0hexg8wfvQp4UVIyV08cCSxprMQ1MQCxAmula45RXv+u
+	0Z5NoUPFXKqatNdE/dKRIsFcolCyQ3Kxvq5AoYdbuBM64t6IMEfDo9s5jTP2Mspw0Q41KG3/5eu
+	B6lAqfMiFCE5Wx2EafCY7Qy8IeeWrZzEP7O2KKzqUp4CnqjRi/m3NIvKydVSGMZggIWq0VGUZ6Y
+	0Ow0NuJmAtrmXRj7PLN0uRzvmSHSEUwaBRj43/40JLUKOM0MNHjWlDc8oC5Wsy15WU68fDyLbyr
+	Hwv9L1WWau4oZMjQTNV/2ZXhK2Q9SrJB+/Q==
+X-Google-Smtp-Source: AGHT+IE0HZkYcdb3WF0P9vSez2pBOJhODrzW8f3PmiBl/mDoKnq9PuFfadAntRKfHv3ar4hLYw0Elg==
+X-Received: by 2002:a17:90b:1dcf:b0:311:baa0:89ce with SMTP id 98e67ed59e1d1-318c8eed1a0mr20594922a91.12.1751231297379;
+        Sun, 29 Jun 2025 14:08:17 -0700 (PDT)
+Received: from localhost (college9-169-233-124-66.resnet.ucsc.edu. [169.233.124.66])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-315f5426bf0sm12056065a91.23.2025.06.29.14.08.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Jun 2025 14:08:16 -0700 (PDT)
+Date: Sun, 29 Jun 2025 14:08:15 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Mingi Cho <mgcho.minic@gmail.com>, security@kernel.org,
+	Jiri Pirko <jiri@resnulli.us>,
+	Linux Kernel Network Developers <netdev@vger.kernel.org>
+Subject: Re: Use-after-free in Linux tc subsystem (v6.15)
+Message-ID: <aGGrP91mBRuN2y0h@pop-os.localdomain>
+References: <CAE1YQVoTz5REkvZWzq_X5f31Sr6NzutVCxxmLfWtmVZkjiingA@mail.gmail.com>
+ <CAM_iQpV8NpK_L2_697NccDPfb9SPYhQ7BT1Ssueh7nT-rRKJRA@mail.gmail.com>
+ <CAM_iQpXVaxTVALH9_Lki+O=1cMaVx4uQhcRvi4VcS2rEdYkj5Q@mail.gmail.com>
+ <CAM_iQpVi0V7DNQFiNWWMr+crM-1EFbnvWV5_L-aOkFsKaA3JBQ@mail.gmail.com>
+ <CAM0EoMm4D+q1eLzfKw3gKbQF43GzpBcDFY3w2k2OmtohJn=aJw@mail.gmail.com>
+ <CAM0EoMkFzD0gKfJM2-Dtgv6qQ8mjGRFmWF7+oe=qGgBEkVSimg@mail.gmail.com>
+ <CAE1YQVq=FmrGw56keHQ2gEGtrdg3H5Nf_OcPb8_Rn5NVQ4AoHg@mail.gmail.com>
+ <CAM0EoMnv6YAUJVEFx2mGrP75G8wzRiN+Z=hSfRAz8ia0Fe4vBw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM0EoMnv6YAUJVEFx2mGrP75G8wzRiN+Z=hSfRAz8ia0Fe4vBw@mail.gmail.com>
 
-'struct devlink_region_ops' and 'struct hellcreek_fdb_entry' are not
-modified in this driver.
+On Sat, Jun 28, 2025 at 05:26:59PM -0400, Jamal Hadi Salim wrote:
+> On Thu, Jun 26, 2025 at 1:11 AM Mingi Cho <mgcho.minic@gmail.com> wrote:
+> > Hello,
+> >
+> > I think the testcase I reported earlier actually contains two
+> > different bugs. The first is returning SUCCESS with an empty TBF qdisc
+> > in tbf_segment, and the second is returning SUCCESS with an empty QFQ
+> > qdisc in qfq_enqueue.
+> >
+> 
+> Please join the list where a more general solution is being discussed here:
+> https://lore.kernel.org/netdev/aF847kk6H+kr5kIV@pop-os.localdomain/
 
-Constifying these structures moves some data to a read-only section, so
-increases overall security, especially when the structure holds some
-function pointers.
+I think that one is different, the one here is related to GSO, the above
+linked one is not. Let me think about the GSO issue, since I already
+looked into it before.
 
-On a x86_64, with allmodconfig:
-Before:
-======
-   text	   data	    bss	    dec	    hex	filename
-  55320	  19216	    320	  74856	  12468	drivers/net/dsa/hirschmann/hellcreek.o
-
-After:
-=====
-   text	   data	    bss	    dec	    hex	filename
-  55960	  18576	    320	  74856	  12468	drivers/net/dsa/hirschmann/hellcreek.o
-
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
-Compile tested only
----
- drivers/net/dsa/hirschmann/hellcreek.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/net/dsa/hirschmann/hellcreek.c b/drivers/net/dsa/hirschmann/hellcreek.c
-index 283ec5a6e23c..e0b4758ca583 100644
---- a/drivers/net/dsa/hirschmann/hellcreek.c
-+++ b/drivers/net/dsa/hirschmann/hellcreek.c
-@@ -1061,7 +1061,7 @@ static void hellcreek_setup_tc_identity_mapping(struct hellcreek *hellcreek)
- 
- static int hellcreek_setup_fdb(struct hellcreek *hellcreek)
- {
--	static struct hellcreek_fdb_entry l2_ptp = {
-+	static const struct hellcreek_fdb_entry l2_ptp = {
- 		/* MAC: 01-1B-19-00-00-00 */
- 		.mac	      = { 0x01, 0x1b, 0x19, 0x00, 0x00, 0x00 },
- 		.portmask     = 0x03,	/* Management ports */
-@@ -1072,7 +1072,7 @@ static int hellcreek_setup_fdb(struct hellcreek *hellcreek)
- 		.reprio_tc    = 6,	/* TC: 6 as per IEEE 802.1AS */
- 		.reprio_en    = 1,
- 	};
--	static struct hellcreek_fdb_entry udp4_ptp = {
-+	static const struct hellcreek_fdb_entry udp4_ptp = {
- 		/* MAC: 01-00-5E-00-01-81 */
- 		.mac	      = { 0x01, 0x00, 0x5e, 0x00, 0x01, 0x81 },
- 		.portmask     = 0x03,	/* Management ports */
-@@ -1083,7 +1083,7 @@ static int hellcreek_setup_fdb(struct hellcreek *hellcreek)
- 		.reprio_tc    = 6,
- 		.reprio_en    = 1,
- 	};
--	static struct hellcreek_fdb_entry udp6_ptp = {
-+	static const struct hellcreek_fdb_entry udp6_ptp = {
- 		/* MAC: 33-33-00-00-01-81 */
- 		.mac	      = { 0x33, 0x33, 0x00, 0x00, 0x01, 0x81 },
- 		.portmask     = 0x03,	/* Management ports */
-@@ -1094,7 +1094,7 @@ static int hellcreek_setup_fdb(struct hellcreek *hellcreek)
- 		.reprio_tc    = 6,
- 		.reprio_en    = 1,
- 	};
--	static struct hellcreek_fdb_entry l2_p2p = {
-+	static const struct hellcreek_fdb_entry l2_p2p = {
- 		/* MAC: 01-80-C2-00-00-0E */
- 		.mac	      = { 0x01, 0x80, 0xc2, 0x00, 0x00, 0x0e },
- 		.portmask     = 0x03,	/* Management ports */
-@@ -1105,7 +1105,7 @@ static int hellcreek_setup_fdb(struct hellcreek *hellcreek)
- 		.reprio_tc    = 6,	/* TC: 6 as per IEEE 802.1AS */
- 		.reprio_en    = 1,
- 	};
--	static struct hellcreek_fdb_entry udp4_p2p = {
-+	static const struct hellcreek_fdb_entry udp4_p2p = {
- 		/* MAC: 01-00-5E-00-00-6B */
- 		.mac	      = { 0x01, 0x00, 0x5e, 0x00, 0x00, 0x6b },
- 		.portmask     = 0x03,	/* Management ports */
-@@ -1116,7 +1116,7 @@ static int hellcreek_setup_fdb(struct hellcreek *hellcreek)
- 		.reprio_tc    = 6,
- 		.reprio_en    = 1,
- 	};
--	static struct hellcreek_fdb_entry udp6_p2p = {
-+	static const struct hellcreek_fdb_entry udp6_p2p = {
- 		/* MAC: 33-33-00-00-00-6B */
- 		.mac	      = { 0x33, 0x33, 0x00, 0x00, 0x00, 0x6b },
- 		.portmask     = 0x03,	/* Management ports */
-@@ -1127,7 +1127,7 @@ static int hellcreek_setup_fdb(struct hellcreek *hellcreek)
- 		.reprio_tc    = 6,
- 		.reprio_en    = 1,
- 	};
--	static struct hellcreek_fdb_entry stp = {
-+	static const struct hellcreek_fdb_entry stp = {
- 		/* MAC: 01-80-C2-00-00-00 */
- 		.mac	      = { 0x01, 0x80, 0xc2, 0x00, 0x00, 0x00 },
- 		.portmask     = 0x03,	/* Management ports */
-@@ -1320,13 +1320,13 @@ static int hellcreek_devlink_region_fdb_snapshot(struct devlink *dl,
- 	return 0;
- }
- 
--static struct devlink_region_ops hellcreek_region_vlan_ops = {
-+static const struct devlink_region_ops hellcreek_region_vlan_ops = {
- 	.name	    = "vlan",
- 	.snapshot   = hellcreek_devlink_region_vlan_snapshot,
- 	.destructor = kfree,
- };
- 
--static struct devlink_region_ops hellcreek_region_fdb_ops = {
-+static const struct devlink_region_ops hellcreek_region_fdb_ops = {
- 	.name	    = "fdb",
- 	.snapshot   = hellcreek_devlink_region_fdb_snapshot,
- 	.destructor = kfree,
-@@ -1335,7 +1335,7 @@ static struct devlink_region_ops hellcreek_region_fdb_ops = {
- static int hellcreek_setup_devlink_regions(struct dsa_switch *ds)
- {
- 	struct hellcreek *hellcreek = ds->priv;
--	struct devlink_region_ops *ops;
-+	const struct devlink_region_ops *ops;
- 	struct devlink_region *region;
- 	u64 size;
- 	int ret;
--- 
-2.50.0
-
+Thanks.
 
