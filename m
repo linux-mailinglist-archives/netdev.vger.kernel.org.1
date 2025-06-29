@@ -1,274 +1,83 @@
-Return-Path: <netdev+bounces-202253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B4BDAECE6E
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 18:00:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64041AECF3B
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 19:32:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B66873B00D3
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 15:59:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9746F3B1E49
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 17:32:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC9F236429;
-	Sun, 29 Jun 2025 16:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B5621AC88B;
+	Sun, 29 Jun 2025 17:32:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4A02356B9
-	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 16:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587C03B7A8;
+	Sun, 29 Jun 2025 17:32:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751212806; cv=none; b=qLzB58G/XWWFqDpmClBvy36FWTDlfijQkMJZT/RI503YDoCf1z+u5oFFLmXZPNRdxQuqkgtYv5Wpmd66JJhXbLepG0wia1kJl52QnofQSEtyvvOVYeUpws7b5Fxowb2PC1fwc72mc1vgdfBQWlKWsn/2eJzPAMazE79tUz8+kWQ=
+	t=1751218367; cv=none; b=IlpCKL80wUf32Fy/nEVQdAS3AOHj2NoLHgqr68SdP6MFz8RIjMJxM9RmRE/ZsnUdMvka7EOBpoLD7YhVkQx9VHU9/uuzmZQ4p4u8LW8L7jIv2RdjYhfGqWSVKwJnRx49tw2brWFq6gw55ehng/NSCu2W6YlVk8wlOvcxvK8te6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751212806; c=relaxed/simple;
-	bh=RdX76I8Jtbco4EHRpcErR5wyT9kP9gH35W2Qq58wcRs=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=eKFUkzwa0EvesXrRpADp4KczRfHZXD6ag2LeG4pgqC9iSx3R1QqQ736rRF8pdMk1lCnisfTkp9ml6ofyIUaxCQT//Rl6kb6dtoiLvCbkJ+efwf+fwjuD3NWf9OOtIFhx+dCtd9ODqm+qNEZdapVDc/d0AM91UwKlM7TJoZT3AuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3ddd97c04f4so53887165ab.2
-        for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 09:00:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751212803; x=1751817603;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/md0O0bsDN1yE9cV3610rKJ+Q88r7SDmqU6eKa8w6h0=;
-        b=Qz9kYauHRM4y4iESLkN9dzRVG7dUYkv59mwOiAvPUOWZA3uvfOYVvKWL6819c9HPYv
-         gnPOaR8em0C61XkJaAfk2ya1Nc6UB4CNpIdPJI1xSHKTlUZwEWQmR8B69kUTQBYjnXt9
-         hxmg6OMacNAH9q+Qtuw1BCPs3wSYRx9t3u4bkXAkJGysNVQFpMoVBIOn4D5+tEiwvG3X
-         dUu81lToSlUU4B3ot1cENmW2fJpwfAr0R6eofoX8H+SMJ3Q4nvPOCEjFOB1WKbLu7Y+q
-         0I+kkd9+aXee+4Z83BCXoyRxlxis5PjfFLoWv725X/ws5VCPzi7Di+gw/Zku/k1Hh2Ab
-         Ldog==
-X-Forwarded-Encrypted: i=1; AJvYcCXVcp9d7bOyad0EPiqVP9Z/fdRQes/xYG9ZbLtkKsj6a1kjED8HtH3ZPC0C7+d1GP42fDGTVhU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZ8Czrpv1sFp2FqRV2s/NvO3DlNlEf0yeMcetxznvO7bhyA1Wz
-	r/XoFADSsGEbo4dsre5V+mR0T+l/w6dwjwIrKAhoyDrCU4R52fo8OD/EbZaT3EKShsBadvXpxRw
-	jT17ivdgbERFPXUqmJSgXV7illAIqgTNIHDWsiqVtnx854TouJlKAej0vtTQ=
-X-Google-Smtp-Source: AGHT+IHiNHd675Er2iND1VfHmPsBnABv98ZRFXGLT3s92fDhW/rvCd4Emr7bmzsom/Bwq+s2MW5uf2n6H57Rs7k1Oj19cDnkq3oP
+	s=arc-20240116; t=1751218367; c=relaxed/simple;
+	bh=iRRBDWS7fH+DB1fmRlKKTFUe1wy/pIKEUTSTVJMi0ls=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HeCYeviSc58sddxVauXls+ub0ritsSvesmR6xgceTLhk3FXmVctQUomm6dXT17Avm6XchttN6MdoZJfL/2QDOnbXXrNFJRp0dJflefFvY0AVFHY9LGkGH68zDGVPp/IvmyHhsrKd3QmxZ9ta3teoefqcq7ISA6Y58OyihmzOnbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; arc=none smtp.client-ip=160.80.4.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
+Received: from localhost.localdomain ([160.80.103.126])
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 55THDW58007121
+	(version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Sun, 29 Jun 2025 19:13:33 +0200
+From: Andrea Mayer <andrea.mayer@uniroma2.it>
+To: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
+        Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Stefano Salsano <stefano.salsano@uniroma2.it>,
+        Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
+        Andrea Mayer <andrea.mayer@uniroma2.it>
+Subject: [PATCH net-next 0/2] seg6: fix typos in comments within the SRv6 subsystem 
+Date: Sun, 29 Jun 2025 19:12:24 +0200
+Message-Id: <20250629171226.4988-1-andrea.mayer@uniroma2.it>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3046:b0:3dd:d189:6511 with SMTP id
- e9e14a558f8ab-3df4acca120mr131241825ab.21.1751212803450; Sun, 29 Jun 2025
- 09:00:03 -0700 (PDT)
-Date: Sun, 29 Jun 2025 09:00:03 -0700
-In-Reply-To: <20250629151042.50986-1-contact@arnaud-lcm.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68616303.a00a0220.c1739.000a.GAE@google.com>
-Subject: Re: [syzbot] [smc?] KASAN: null-ptr-deref Read in smc_tcp_syn_recv_sock
-From: syzbot <syzbot+827ae2bfb3a3529333e9@syzkaller.appspotmail.com>
-To: agordeev@linux.ibm.com, alibuda@linux.alibaba.com, contact@arnaud-lcm.com, 
-	davem@davemloft.net, edumazet@google.com, guwen@linux.alibaba.com, 
-	horms@kernel.org, jaka@linux.ibm.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, tonylu@linux.alibaba.com, 
-	wenjia@linux.ibm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
+X-Virus-Status: Clean
 
-Hello,
+In this patchset, we correct some typos found both in the SRv6 Endpoints
+implementation (i.e., seg6local) and in some SRv6 selftests, using
+codespell.
 
-syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-possible deadlock in inet_child_forget
+The patchset is organized as follows:
+  Patch 1/2: seg6: fix lenghts typo in a comment
+  Patch 2/2: selftests: seg6: fix instaces typo in comments
 
-======================================================
-WARNING: possible circular locking dependency detected
-6.16.0-rc3-syzkaller-gdfba48a70cb6-dirty #0 Not tainted
-------------------------------------------------------
-syz.2.23/6591 is trying to acquire lock:
-ffff88805b87ac70 (k-clock-AF_INET6){++.-}-{3:3}, at: sock_orphan include/net/sock.h:2075 [inline]
-ffff88805b87ac70 (k-clock-AF_INET6){++.-}-{3:3}, at: inet_child_forget+0x7e/0x2e0 net/ipv4/inet_connection_sock.c:1383
+Thanks,
+Andrea
 
-but task is already holding lock:
-ffff88805b87aa58 (k-slock-AF_INET6){+.-.}-{3:3}, at: spin_lock include/linux/spinlock.h:351 [inline]
-ffff88805b87aa58 (k-slock-AF_INET6){+.-.}-{3:3}, at: inet_csk_listen_stop+0x203/0x1090 net/ipv4/inet_connection_sock.c:1495
+Andrea Mayer (2):
+  seg6: fix lenghts typo in a comment
+  selftests: seg6: fix instaces typo in comments
 
-which lock already depends on the new lock.
+ net/ipv6/seg6_local.c                                          | 2 +-
+ tools/testing/selftests/net/srv6_end_next_csid_l3vpn_test.sh   | 2 +-
+ tools/testing/selftests/net/srv6_end_x_next_csid_l3vpn_test.sh | 2 +-
+ tools/testing/selftests/net/srv6_hencap_red_l3vpn_test.sh      | 2 +-
+ tools/testing/selftests/net/srv6_hl2encap_red_l2vpn_test.sh    | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
 
-
-the existing dependency chain (in reverse order) is:
-
--> #1 (k-slock-AF_INET6){+.-.}-{3:3}:
-       __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-       _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
-       spin_lock include/linux/spinlock.h:351 [inline]
-       sk_clone_lock+0x334/0x1330 net/core/sock.c:2499
-       inet_csk_clone_lock+0x2a/0x750 net/ipv4/inet_connection_sock.c:1232
-       tcp_create_openreq_child+0x34/0x1980 net/ipv4/tcp_minisocks.c:526
-       tcp_v4_syn_recv_sock+0x115/0x1250 net/ipv4/tcp_ipv4.c:1774
-       tcp_v6_syn_recv_sock+0x1353/0x2480 net/ipv6/tcp_ipv6.c:1382
-       smc_tcp_syn_recv_sock+0x24b/0x500 net/smc/af_smc.c:144
-       tcp_check_req+0x69d/0x1f80 net/ipv4/tcp_minisocks.c:874
-       tcp_v4_rcv+0x19b0/0x4650 net/ipv4/tcp_ipv4.c:2283
-       ip_protocol_deliver_rcu+0xba/0x4c0 net/ipv4/ip_input.c:205
-       ip_local_deliver_finish+0x316/0x570 net/ipv4/ip_input.c:233
-       NF_HOOK include/linux/netfilter.h:317 [inline]
-       NF_HOOK include/linux/netfilter.h:311 [inline]
-       ip_local_deliver+0x18e/0x1f0 net/ipv4/ip_input.c:254
-       dst_input include/net/dst.h:469 [inline]
-       ip_rcv_finish net/ipv4/ip_input.c:447 [inline]
-       NF_HOOK include/linux/netfilter.h:317 [inline]
-       NF_HOOK include/linux/netfilter.h:311 [inline]
-       ip_rcv+0x2c3/0x5d0 net/ipv4/ip_input.c:567
-       __netif_receive_skb_one_core+0x197/0x1e0 net/core/dev.c:5977
-       __netif_receive_skb+0x1d/0x160 net/core/dev.c:6090
-       process_backlog+0x442/0x15e0 net/core/dev.c:6442
-       __napi_poll.constprop.0+0xba/0x550 net/core/dev.c:7414
-       napi_poll net/core/dev.c:7478 [inline]
-       net_rx_action+0xa9f/0xfe0 net/core/dev.c:7605
-       handle_softirqs+0x219/0x8e0 kernel/softirq.c:579
-       do_softirq kernel/softirq.c:480 [inline]
-       do_softirq+0xb2/0xf0 kernel/softirq.c:467
-       __local_bh_enable_ip+0x100/0x120 kernel/softirq.c:407
-       local_bh_enable include/linux/bottom_half.h:33 [inline]
-       rcu_read_unlock_bh include/linux/rcupdate.h:910 [inline]
-       __dev_queue_xmit+0x8ab/0x43e0 net/core/dev.c:4740
-       dev_queue_xmit include/linux/netdevice.h:3355 [inline]
-       neigh_hh_output include/net/neighbour.h:523 [inline]
-       neigh_output include/net/neighbour.h:537 [inline]
-       ip_finish_output2+0xc38/0x21a0 net/ipv4/ip_output.c:235
-       __ip_finish_output net/ipv4/ip_output.c:313 [inline]
-       __ip_finish_output+0x49e/0x950 net/ipv4/ip_output.c:295
-       ip_finish_output+0x35/0x380 net/ipv4/ip_output.c:323
-       NF_HOOK_COND include/linux/netfilter.h:306 [inline]
-       ip_output+0x13b/0x2a0 net/ipv4/ip_output.c:433
-       dst_output include/net/dst.h:459 [inline]
-       ip_local_out net/ipv4/ip_output.c:129 [inline]
-       __ip_queue_xmit+0x1d7d/0x26c0 net/ipv4/ip_output.c:527
-       __tcp_transmit_skb+0x2686/0x3e90 net/ipv4/tcp_output.c:1479
-       __tcp_send_ack.part.0+0x3de/0x700 net/ipv4/tcp_output.c:4279
-       __tcp_send_ack net/ipv4/tcp_output.c:4285 [inline]
-       tcp_send_ack+0x84/0xa0 net/ipv4/tcp_output.c:4285
-       tcp_rcv_synsent_state_process net/ipv4/tcp_input.c:6632 [inline]
-       tcp_rcv_state_process+0x4236/0x4ed0 net/ipv4/tcp_input.c:6826
-       tcp_v4_do_rcv+0x1ad/0xa90 net/ipv4/tcp_ipv4.c:1948
-       sk_backlog_rcv include/net/sock.h:1148 [inline]
-       __release_sock+0x31b/0x400 net/core/sock.c:3213
-       release_sock+0x5a/0x220 net/core/sock.c:3767
-       mptcp_connect+0xccd/0xfe0 net/mptcp/protocol.c:3695
-       __inet_stream_connect+0x3c8/0x1020 net/ipv4/af_inet.c:677
-       inet_stream_connect+0x57/0xa0 net/ipv4/af_inet.c:748
-       __sys_connect_file+0x141/0x1a0 net/socket.c:2038
-       __sys_connect+0x13b/0x160 net/socket.c:2057
-       __do_sys_connect net/socket.c:2063 [inline]
-       __se_sys_connect net/socket.c:2060 [inline]
-       __x64_sys_connect+0x72/0xb0 net/socket.c:2060
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (k-clock-AF_INET6){++.-}-{3:3}:
-       check_prev_add kernel/locking/lockdep.c:3168 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3287 [inline]
-       validate_chain kernel/locking/lockdep.c:3911 [inline]
-       __lock_acquire+0x126f/0x1c90 kernel/locking/lockdep.c:5240
-       lock_acquire kernel/locking/lockdep.c:5871 [inline]
-       lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5828
-       __raw_write_lock_bh include/linux/rwlock_api_smp.h:202 [inline]
-       _raw_write_lock_bh+0x33/0x40 kernel/locking/spinlock.c:334
-       sock_orphan include/net/sock.h:2075 [inline]
-       inet_child_forget+0x7e/0x2e0 net/ipv4/inet_connection_sock.c:1383
-       inet_csk_listen_stop+0x323/0x1090 net/ipv4/inet_connection_sock.c:1523
-       tcp_disconnect+0x18a4/0x1ec0 net/ipv4/tcp.c:3340
-       inet_shutdown+0x26f/0x440 net/ipv4/af_inet.c:935
-       smc_close_active+0xc2a/0x1070 net/smc/smc_close.c:223
-       __smc_release+0x634/0x880 net/smc/af_smc.c:282
-       smc_release+0x1fc/0x5f0 net/smc/af_smc.c:349
-       __sock_release+0xb3/0x270 net/socket.c:647
-       sock_close+0x1c/0x30 net/socket.c:1391
-       __fput+0x402/0xb70 fs/file_table.c:465
-       task_work_run+0x150/0x240 kernel/task_work.c:227
-       resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
-       exit_to_user_mode_loop+0xeb/0x110 kernel/entry/common.c:114
-       exit_to_user_mode_prepare include/linux/entry-common.h:330 [inline]
-       syscall_exit_to_user_mode_work include/linux/entry-common.h:414 [inline]
-       syscall_exit_to_user_mode include/linux/entry-common.h:449 [inline]
-       do_syscall_64+0x3f6/0x4c0 arch/x86/entry/syscall_64.c:100
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(k-slock-AF_INET6);
-                               lock(k-clock-AF_INET6);
-                               lock(k-slock-AF_INET6);
-  lock(k-clock-AF_INET6);
-
- *** DEADLOCK ***
-
-4 locks held by syz.2.23/6591:
- #0: ffff88805b065608 (&sb->s_type->i_mutex_key#11){+.+.}-{4:4}, at: inode_lock include/linux/fs.h:869 [inline]
- #0: ffff88805b065608 (&sb->s_type->i_mutex_key#11){+.+.}-{4:4}, at: __sock_release+0x86/0x270 net/socket.c:646
- #1: ffff888058b0a4d8 (sk_lock-AF_SMC/1){+.+.}-{0:0}, at: smc_release+0x378/0x5f0 net/smc/af_smc.c:341
- #2: ffff88805b878fd8 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1667 [inline]
- #2: ffff88805b878fd8 (k-sk_lock-AF_INET6){+.+.}-{0:0}, at: inet_shutdown+0x67/0x440 net/ipv4/af_inet.c:905
- #3: ffff88805b87aa58 (k-slock-AF_INET6){+.-.}-{3:3}, at: spin_lock include/linux/spinlock.h:351 [inline]
- #3: ffff88805b87aa58 (k-slock-AF_INET6){+.-.}-{3:3}, at: inet_csk_listen_stop+0x203/0x1090 net/ipv4/inet_connection_sock.c:1495
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 6591 Comm: syz.2.23 Not tainted 6.16.0-rc3-syzkaller-gdfba48a70cb6-dirty #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_circular_bug+0x275/0x350 kernel/locking/lockdep.c:2046
- check_noncircular+0x14c/0x170 kernel/locking/lockdep.c:2178
- check_prev_add kernel/locking/lockdep.c:3168 [inline]
- check_prevs_add kernel/locking/lockdep.c:3287 [inline]
- validate_chain kernel/locking/lockdep.c:3911 [inline]
- __lock_acquire+0x126f/0x1c90 kernel/locking/lockdep.c:5240
- lock_acquire kernel/locking/lockdep.c:5871 [inline]
- lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5828
- __raw_write_lock_bh include/linux/rwlock_api_smp.h:202 [inline]
- _raw_write_lock_bh+0x33/0x40 kernel/locking/spinlock.c:334
- sock_orphan include/net/sock.h:2075 [inline]
- inet_child_forget+0x7e/0x2e0 net/ipv4/inet_connection_sock.c:1383
- inet_csk_listen_stop+0x323/0x1090 net/ipv4/inet_connection_sock.c:1523
- tcp_disconnect+0x18a4/0x1ec0 net/ipv4/tcp.c:3340
- inet_shutdown+0x26f/0x440 net/ipv4/af_inet.c:935
- smc_close_active+0xc2a/0x1070 net/smc/smc_close.c:223
- __smc_release+0x634/0x880 net/smc/af_smc.c:282
- smc_release+0x1fc/0x5f0 net/smc/af_smc.c:349
- __sock_release+0xb3/0x270 net/socket.c:647
- sock_close+0x1c/0x30 net/socket.c:1391
- __fput+0x402/0xb70 fs/file_table.c:465
- task_work_run+0x150/0x240 kernel/task_work.c:227
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- exit_to_user_mode_loop+0xeb/0x110 kernel/entry/common.c:114
- exit_to_user_mode_prepare include/linux/entry-common.h:330 [inline]
- syscall_exit_to_user_mode_work include/linux/entry-common.h:414 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:449 [inline]
- do_syscall_64+0x3f6/0x4c0 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fec9fd7e719
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fec9effe038 EFLAGS: 00000246 ORIG_RAX: 00000000000001b4
-RAX: 0000000000000000 RBX: 00007fec9ff35f80 RCX: 00007fec9fd7e719
-RDX: 0000000000000000 RSI: ffffffffffffffff RDI: 0000000000000003
-RBP: 00007fec9fdf132e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fec9ff35f80 R15: 00007ffd574ead88
- </TASK>
-
-
-Tested on:
-
-commit:         dfba48a7 Merge tag 'i2c-for-6.16-rc4' of git://git.ker..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11cd688c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d3e0d55231e0c89c
-dashboard link: https://syzkaller.appspot.com/bug?extid=827ae2bfb3a3529333e9
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=10e2a982580000
+-- 
+2.20.1
 
 
