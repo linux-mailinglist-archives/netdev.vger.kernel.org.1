@@ -1,82 +1,63 @@
-Return-Path: <netdev+bounces-202239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34F69AECDEC
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 16:26:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3985BAECDF1
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 16:26:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A4ED172A9E
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 14:26:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93EEC172C78
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 14:26:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C93D22A1CF;
-	Sun, 29 Jun 2025 14:23:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V61K5kZ3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 386E7227B9A;
+	Sun, 29 Jun 2025 14:25:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865B822540A;
-	Sun, 29 Jun 2025 14:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3454227BA4;
+	Sun, 29 Jun 2025 14:25:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751207019; cv=none; b=CmeEvvOwPSXL82OKf+rUdZPaqEg1ThQ6xtXOlcHHMjo4zOXQuDawLkU29dtTWiC3oTOI82k1j014AklbSj/btVSu87P/ZodHXfuGLfkGx5DXtF2BVt3IGRlQkgSLnmsOocKSyJPGj25H4vM8Xs3w/hhUDBQHomnf9V/N3xkh8eY=
+	t=1751207150; cv=none; b=ub3eNmKkMjNwyOa2TVaCPJsumxD7JEqiZBYjFo/F3zPncO5beaaqGIX5e4konkSUdhKjp1kvIjlzTxOhDueWD55IaKpiKiO0KHewGsjxzlMjJXjpA5EILxlwJkquq6upCCFRYwHxtTe0Tiz9SPHGiMAT4+2R94uqvXV1ofi5xgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751207019; c=relaxed/simple;
-	bh=3IXZMlLqYK+fUUIJj6j+HqWjW2huSssVwLxqNpAYLfs=;
+	s=arc-20240116; t=1751207150; c=relaxed/simple;
+	bh=E6AUdqXg1UQebluQC1Qcloluh833TMA6tD31kT9MSCc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DiCCKIDLJQMhAQ9xpuQEuhhHxnUWCD6T5N5QdlBsFcggKomOgeMRAoTtnc+LCnQqxXLkQtSYWybwAzK6wnXiiZOVsb9ZhGXvuFAy/AbjPRa1fBpNpnhaaYkAEX4eD9ajgTNnVzQYCs5bYuoHWa2269wpoItjzy8h+n2ZN/HE6Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V61K5kZ3; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751207016; x=1782743016;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=3IXZMlLqYK+fUUIJj6j+HqWjW2huSssVwLxqNpAYLfs=;
-  b=V61K5kZ3Myi64vdV2M0tstjpdVArQ/0P4syDuSgA2IoC3KWeMDsFGKV+
-   u0dx4RskcPMt/rztI3fwJRKAYu/1J03MqfXst1j65+sKtG5TMxbl7b073
-   ESWEHYWtkfSPPigFSon/BZGoEdJewg4d0/FqbFo7nmVagt2FXDUrISzRI
-   vyM0PGHSj7SxyZdOfaV+OeCRiSmx8Q4q+vHEZlHY9LLuVwfvHQBRJ2uRc
-   dzODH2+5Hnf/SIvTa5r20d6i9kKeGYh43XrmaQtECOsQhr4TqYQuVKqBx
-   RAOLIokUXfE1nGYRWiazgkgtW6IbH7caDlVe++xcStLH77ZkKfzFyal4r
-   g==;
-X-CSE-ConnectionGUID: GkEdYgviQPyftOtgUwHm+A==
-X-CSE-MsgGUID: 8/iWhMdgSIi6uGYFTK0UeA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11479"; a="57126380"
-X-IronPort-AV: E=Sophos;i="6.16,275,1744095600"; 
-   d="scan'208";a="57126380"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2025 07:23:36 -0700
-X-CSE-ConnectionGUID: x+PxDHTZRiimHaKV1OkFyw==
-X-CSE-MsgGUID: B9V29v5aTvy1XkNs/n+NsA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,275,1744095600"; 
-   d="scan'208";a="152969829"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 29 Jun 2025 07:23:31 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uVswL-000Xzm-1f;
-	Sun, 29 Jun 2025 14:23:29 +0000
-Date: Sun, 29 Jun 2025 22:23:03 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Lucien.Jheng" <lucienzx159@gmail.com>, linux-clk@vger.kernel.org,
-	andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, daniel@makrotopia.org, ericwouds@gmail.com
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, joseph.lin@airoha.com,
-	wenshin.chung@airoha.com, lucien.jheng@airoha.com,
-	albert-al.lee@airoha.com, "Lucien.Jheng" <lucienzx159@gmail.com>
-Subject: Re: [PATCH v1 net-next PATCH 1/1] net: phy: air_en8811h: Introduce
- resume/suspend and clk_restore_context to ensure correct CKO settings after
- network interface reinitialization.
-Message-ID: <202506292222.nBaJywJw-lkp@intel.com>
-References: <20250629115911.51392-1-lucienzx159@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pX577WlsD30HHpsPN1MrhSx5F5vYRSNSNX1QqlJJrQ/VNhhHBs0F/kOyMc+lbh6xaGUzCVhHgWThPvJ3HHiTRTtyWW+XbHyPt3wBXBteFLqf9nMWMSLS4PPJYROEb4lpdDv22MLjOugLmFaE5y5nljHZgDZhrIR58+pJFHxYn2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1uVsyM-0000000015j-3WGk;
+	Sun, 29 Jun 2025 14:25:34 +0000
+Date: Sun, 29 Jun 2025 15:25:25 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Sky Huang <skylake.huang@mediatek.com>, netdev@vger.kernel.org,
+	Sean Wang <sean.wang@mediatek.com>,
+	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Bo-Cun Chen <bc-bocun.chen@mediatek.com>,
+	Eric Woudstra <ericwouds@gmail.com>, Elad Yifee <eladwf@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Felix Fietkau <nbd@nbd.name>
+Subject: Re: [PATCH net/next 3/3] net: ethernet: mtk_eth_soc: use genpool
+ allocator for SRAM
+Message-ID: <aGFM1UQ1P3IQjoex@makrotopia.org>
+References: <cover.1751072868.git.daniel@makrotopia.org>
+ <566ca90fc59ad0d3aff8bc8dc22ebaf0544bce47.1751072868.git.daniel@makrotopia.org>
+ <f9bec387-1858-4c79-bb4b-60e744457c9f@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,32 +66,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250629115911.51392-1-lucienzx159@gmail.com>
+In-Reply-To: <f9bec387-1858-4c79-bb4b-60e744457c9f@lunn.ch>
 
-Hi Lucien.Jheng,
+On Sat, Jun 28, 2025 at 10:13:51AM +0200, Andrew Lunn wrote:
+> > +static void *mtk_dma_ring_alloc(struct mtk_eth *eth, size_t size,
+> > +				dma_addr_t *dma_handle)
+> > +{
+> > +	void *dma_ring;
+> > +
+> > +	if (WARN_ON(mtk_use_legacy_sram(eth)))
+> > +		return -ENOMEM;
+> > +
+> > +	if (eth->sram_pool) {
+> > +		dma_ring = (void *)gen_pool_alloc(eth->sram_pool, size);
+> > +		if (!dma_ring)
+> > +			return dma_ring;
+> > +		*dma_handle = gen_pool_virt_to_phys(eth->sram_pool, (unsigned long)dma_ring);
+> 
+> I don't particularly like all the casting backwards and forwards
+> between unsigned long and void *. These two APIs are not really
+> compatible with each other. So any sort of wrapping is going to be
+> messy.
+> 
+> Maybe define a cookie union:
+> 
+> struct mtk_dma_cookie {
+> 	union {
+> 		unsigned long gen_pool;
+> 		void *coherent;
+> 	}
+> }
 
-kernel test robot noticed the following build errors:
+I've implemented that idea and the diffstat grew quite a lot. Also,
+it didn't really make the code more readable (see below why).
 
-[auto build test ERROR on net-next/main]
+> 
+> Only dma_handle appears to be used by the rest of the code, so only
+> the _alloc and _free need to know about the union.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Lucien-Jheng/net-phy-air_en8811h-Introduce-resume-suspend-and-clk_restore_context-to-ensure-correct-CKO-settings-after-network-interf/20250629-200137
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250629115911.51392-1-lucienzx159%40gmail.com
-patch subject: [PATCH v1 net-next PATCH 1/1] net: phy: air_en8811h: Introduce resume/suspend and clk_restore_context to ensure correct CKO settings after network interface reinitialization.
-config: arm-randconfig-004-20250629 (https://download.01.org/0day-ci/archive/20250629/202506292222.nBaJywJw-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 12.4.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250629/202506292222.nBaJywJw-lkp@intel.com/reproduce)
+That's not true. The void* ring->dma is used to access the RX and TX
+descriptors, so keeping it void* is useful and using the struct you
+are suggesting will make things even more messy than they already are.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202506292222.nBaJywJw-lkp@intel.com/
+See all the places in the code where we assume ring->dma being void*.
+Converting all of those to use struct mtk_dma_cookie will not make things
+better imho.
 
-All errors (new ones prefixed by >>, old ones prefixed by <<):
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/mediatek/mtk_eth_soc.c#n1337
 
->> ERROR: modpost: "__clk_get_enable_count" [drivers/net/phy/air_en8811h.ko] undefined!
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/mediatek/mtk_eth_soc.c#n1345
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/mediatek/mtk_eth_soc.c#n1358
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/mediatek/mtk_eth_soc.c#n1804
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/mediatek/mtk_eth_soc.c#n2172
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/mediatek/mtk_eth_soc.c#n2490
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/mediatek/mtk_eth_soc.c#n2638
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/mediatek/mtk_eth_soc.c#n2668
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/mediatek/mtk_eth_soc.c#n2904
+
+I think keeping the two casts in mtk_dma_ring_alloc() and
+mtk_dma_ring_free() is the better option.
 
