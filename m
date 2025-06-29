@@ -1,183 +1,213 @@
-Return-Path: <netdev+bounces-202220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EECBAECC32
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 12:43:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19663AECC3A
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 13:18:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57BF01894D00
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 10:44:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9C011722FE
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 11:18:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D3A1DF75C;
-	Sun, 29 Jun 2025 10:43:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C5D11D7995;
+	Sun, 29 Jun 2025 11:18:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RGrQyoAY"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FtM26qEx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2088.outbound.protection.outlook.com [40.107.212.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D6578F2E;
-	Sun, 29 Jun 2025 10:43:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751193825; cv=none; b=As6waPnZJC5fFzBxajFILAbsxQyo5KfjwbmJdyumw8uXytx25GpycA4FgZvhWy4KLQ1MbO1/m9cQaX4yjPJY5dQHQ5gnLXwGd+aca+YZB87mY+AuntvR4QidYx5VqJe3hj9qxPAxd85Xy+exUKyhB5k/PUdGk9/cmD/Lrb8PgzI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751193825; c=relaxed/simple;
-	bh=ZpLtuh86E89zYh29URqnIcZ1DiSLHtt+B+iIBE6z0Fc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uoJu9/RuLXmtiF0CmGqpwXt9SAa3/eH7O78stNSfjFEZCUqeBB2mjrNG4YQE06ea66f+W3M15dQwtroRFVByMdqfzigb2y3uQqM2RzwV7io0/Og5VEXdOD0JUx7GaLL+dj1UaU+qWeHqO7x7+qXuOqcq0hAD/r6bfXIMjbG/TBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RGrQyoAY; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3df2fb6378cso11444875ab.0;
-        Sun, 29 Jun 2025 03:43:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751193822; x=1751798622; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AGCrUUFVv/kt95mYSv6XUlmbedZRctqevQjAWxYlvOY=;
-        b=RGrQyoAYCgTt4i2A3ZXqyEtoawq7CCnkJd/Q6jwDdQ0VLPQBntJWuHAvOa4+y+YZ5+
-         mPxwIeSnC/EygLOrxF/m8XMWj70qs6N3xQC+2LDefB7QqRNpnxPu0HSIgKlrGNICJx5G
-         X2PiO8BLierJeCS3GdB9nIJXsfiBPCLJzWLNstOkHySOIMysqUYe9BsvYwujbqXyztaG
-         jgXA4Z+ZWmrCa4wRqbM0tS3erDaEMXTsLBC7BOeGh7UMGy9zm0wngXf09ElS6MAO79CH
-         vZ1/IHteG+avUI9RxJTHD+XAGbhQSLC65ZHKZ4hosVkBmLfRa71SGjH5+DMNrtD2p9S/
-         EOIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751193822; x=1751798622;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AGCrUUFVv/kt95mYSv6XUlmbedZRctqevQjAWxYlvOY=;
-        b=JYrbt0JiMwlflY7OykvW0s++YD9kaHjWrfU5ucIGc9dCmZax3lljNzzbOdRAr2E12h
-         KpJpcuuci7YXwIHKnqEUzvhjzMpPRS2mNf8SYYFeqw99wlHeOcEICJ1QNGkofG07CJYB
-         59y3BMlLQC+BnT7OFvb2dpWBDKJi1RLP2Kg0tQVKAKQ1PKO3Ni0JHJjWR+Pafi7nxtzi
-         Aj47Gzj3RkvP8OdoR3WFR185Eq+4nkQ9bmpMoyx7ztVQYbn3JMwJd7tVIYkDNWLTop+l
-         FW9XY0HQS+JjArs+Nb2mB0z2lWA9EOOoNfxDVcsv8lZGHtfT7Cz3xw/u5x/rTDIXN/fU
-         a3xA==
-X-Forwarded-Encrypted: i=1; AJvYcCWmPci+Q9WFB1yGrqAg4dUbfwUP6UZOSUo8OcgLh0k9efExFEoWisSCNBf1S0g57xjkSJC9mW0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtZnxMuEp7hwwGRge4j7qexeTqPoMiLRm7lugwW3liamAFYEbu
-	Qg6DVq8ozWohAGTNeyj8iL4psdF7auwvWb2XExH+gQFqg19GauaPfhYG6b2Zy0SmSxlXoVQ7BMm
-	2drziuqjHo5GSVv+AuYTcAqAsTu/nTHY=
-X-Gm-Gg: ASbGncuAHEaqHOv+I4KJmgW7HXZ5JywTlyfzdSlpgbWLBvoZOVwHc3r/2bw2XKTJkE7
-	u53NLTumBp9EbEfYTRDmuf6h8PwvH/6Nx45Eo7wfMytDqbLvjzmo5hy2g3Pdh1k0R5bkI2mMPUI
-	O5I9SQ4eK80pNnCatgUw+CR0ZzN3BTbngBl3i2lmHhBnc=
-X-Google-Smtp-Source: AGHT+IFzgtIpomD9pkXx6GJ8emNiPPiO+ni4u8S/c2UNTWfgRW7sSbDgmW8AdiQqHgvF24F8ODl6wxnl3ZbOvPq69V8=
-X-Received: by 2002:a05:6e02:1294:b0:3df:2f9e:3da8 with SMTP id
- e9e14a558f8ab-3df3e2e3fb5mr118518555ab.9.1751193821839; Sun, 29 Jun 2025
- 03:43:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBDCC7263B;
+	Sun, 29 Jun 2025 11:18:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.88
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751195923; cv=fail; b=p+9MgA49CC184XukulP5jR0YFyXJwaVZF/hldA5mg/LkyMMy1NOqkCmlfa+slLcjYqCPpzJs0umb9eQMT9BxPjM3qM9ZYZILfzCI4ZHXJ4kI0l+cGTzAYAkI2AMKGOyCZjzhnDay3degOm62ONQyyVgveW8HOa872ORW8NcKL0I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751195923; c=relaxed/simple;
+	bh=Gn7/rcYFJ1FG53sos7I9RciZkI52NthduLh430RJ7T4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h3rL5j4iHbszjK+ZN6dHVCbqRxKqHww8dQeNiHdOEaeEBdxuHf9Y2uK+0ZuIYDbmIUOrQj/CYmfM4501IqpAFDz3IrU5vUkIAf2b4Y9SbYqzhhPL7pwtmaSM4pLagYGKZknmYVGkFvfPuRLsF9vN9PmRYSO+w68qef57A+Ry0L4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FtM26qEx; arc=fail smtp.client-ip=40.107.212.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=p51SLEyw5u2aG7oFT3uOXyWZw2qKGzERAKa2ghsbUu3zMQ2oPes8TFHaMzY7Kl/pFusf25ShdWTK6yfXnqBV9kOx6rX64voES6tdYn2Ggj5KnIh4WLWk1yLg/kBYZlWXpNBv8c/mVk1GR4gXUkZG9Ix0y86ZaPTi9YFiSU/NTxev3YVL4F/Q2yYGNzB74ycAFR1KmkiB9Zt29/4HGy0Pm3772CVoGRq6Eg79DrnfkMLfmyhEEJwuGdyRmsppcxE6SOvuHaWgDTANPxcE5UpMVWICMo8waYo4pyIYNLV4tWjNxoi5Fv7LCLNIf3C/FtAVMyemE0XZqjedkg5gdctxhA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fZnZp73qHYZyKMlQSTy3c/51G1Pj+Mbsuk1YXnIiMbk=;
+ b=uGQvRF0LP6ue63TiiC96lBi7Fi5zJPTvNGLH/gPfwQ+HZgDWC3lvgLTEHydzF0GFcEmrJvSbQJ9ncI04u+RoeWZoGay5q8qbP1bQKVVOSNiGpL97A9LdRFlRAMquByfVtb552Fjp1i+1KVWP07q5475ii2wN/3l9TKENrjrgxTwpOFp4CORU1j0h/UWB3IU6Hzz3hMNdIvvp/rNfw3m4zqIuyuvRwkBqsqKPQT1d9xtv0mFAI8NZvvSFNr0gNojtXCjb5/T2YNXXi4h03hon6LBVFa7qzCgHnvEEVMwokNDsdB0Of0pYl5Uap9x3z6ucUTpUQDcK2iPPjXZeldrVFg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=lunn.ch smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fZnZp73qHYZyKMlQSTy3c/51G1Pj+Mbsuk1YXnIiMbk=;
+ b=FtM26qExnV5aTgQ07NAiJzomv6nJBSxQGAxeqxXURvZ/a+Lka873mHd8GQ8tfQ9Z1hnjuxLXyla6MFQ4VLS/NN26ieUVLc72naP+3mgMabQuDEEcvGWvkLxSlK4Pf8HPHKemxbeWq+SYxXwaV+GUFHp8oBnCOgfdnTL5EfZNum7cLEjYnbjtJYJinJ+1LY28s8PHQnOj/eSidprVKKX9dEjjlt6IjxnvgSGzd01fKqropiAD+J9Gg/RCEEwR8L3hWsCbYd5MfjaVrZfbP55FjiFYZxsZ8c+jIEMOaR0DdTQi1My2jhPZR5us4Csx8glUqzJLlkSHnruFZFSHtuET0g==
+Received: from BN0PR10CA0012.namprd10.prod.outlook.com (2603:10b6:408:143::10)
+ by DM4PR12MB5772.namprd12.prod.outlook.com (2603:10b6:8:63::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.30; Sun, 29 Jun
+ 2025 11:18:37 +0000
+Received: from BN1PEPF00005FFF.namprd05.prod.outlook.com
+ (2603:10b6:408:143:cafe::ad) by BN0PR10CA0012.outlook.office365.com
+ (2603:10b6:408:143::10) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.25 via Frontend Transport; Sun,
+ 29 Jun 2025 11:18:36 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN1PEPF00005FFF.mail.protection.outlook.com (10.167.243.231) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8901.15 via Frontend Transport; Sun, 29 Jun 2025 11:18:36 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 29 Jun
+ 2025 04:18:27 -0700
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Sun, 29 Jun
+ 2025 04:18:27 -0700
+Received: from vdi.nvidia.com (10.127.8.14) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Sun, 29
+ Jun 2025 04:18:24 -0700
+From: Nimrod Oren <noren@nvidia.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+	<shuah@kernel.org>, Willem de Bruijn <willemb@google.com>,
+	<netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
+CC: Nimrod Oren <noren@nvidia.com>, Gal Pressman <gal@nvidia.com>, "Carolina
+ Jubran" <cjubran@nvidia.com>
+Subject: [PATCH net] selftests: drv-net: rss_ctx: Add short delay between per-context traffic checks
+Date: Sun, 29 Jun 2025 14:18:12 +0300
+Message-ID: <20250629111812.644282-1-noren@nvidia.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250627110121.73228-1-kerneljasonxing@gmail.com> <CAL+tcoCSd_LA8w9ov7+_sOWLt3EU1rcqK8Sa6UF5S-xgfAGPnA@mail.gmail.com>
-In-Reply-To: <CAL+tcoCSd_LA8w9ov7+_sOWLt3EU1rcqK8Sa6UF5S-xgfAGPnA@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 29 Jun 2025 18:43:05 +0800
-X-Gm-Features: Ac12FXzDVHky2GUp1Dyr5emkdivA8dA5KnWfhWBtS0FNntjcXwcbH66zhXt79iM
-Message-ID: <CAL+tcoCCM+m6eJ1VNoeF2UMdFOhMjJ1z2FVUoMJk=js++hk0RQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v6] net: xsk: introduce XDP_MAX_TX_BUDGET set/getsockopt
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF00005FFF:EE_|DM4PR12MB5772:EE_
+X-MS-Office365-Filtering-Correlation-Id: 15f3afe5-b86f-4c4d-7c9b-08ddb6feb0e2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?e08wAsjDC8GAjNimwz0Qa3iGscqHadvv7Ltmh241169bf1lJ6PyGQAiXUZB7?=
+ =?us-ascii?Q?70upwAYQ43P6fJOI/Kt9f2JO5Ttm6doXAgmfhxwCswfN+ZKhCATeX5OtUB2o?=
+ =?us-ascii?Q?33Q8574l6y9Yph6E0oKGzb2pIOWAcGecLZcb49AmT/lryUwk1xaH5z3BdYcO?=
+ =?us-ascii?Q?K5qFnX/cp1qhqKmPsRYDbLsKkFvKbJLhKP3OAQV9OXiY0poorl/oqY7d1Hwm?=
+ =?us-ascii?Q?rH9igO4ejZmi3t6mdaivnEhanZEf+89/828qfMwUerzaAqlLySmA1F1v5s55?=
+ =?us-ascii?Q?ReMhBfsz716neuM2FImoQNCmY7i46C5tGiqRY1eAcDa7TpCXWK07Rp93k4EQ?=
+ =?us-ascii?Q?OdKY4J3Hqk4TkxtXQJRbqEVqllwqtink4n78OeuS9c5wFUUKoATYlKalFYTr?=
+ =?us-ascii?Q?vpO9gZeMkcy3TpydR0AFXDG4Qbn2jS/kR2p97knaBJxUlw0wSUoaSa6NbnzS?=
+ =?us-ascii?Q?5u8IM7fCztNyv5Xpjfq8YE6YSAVnETRbmtkqa7R5mMhlK5Xa38u9lslnpxRD?=
+ =?us-ascii?Q?RnKAYw0pD94iSDUOG8iyGfTyUOy/x4mR/UdL7E5KNqLy3or4gTWtfR7cV6vU?=
+ =?us-ascii?Q?b7XqCmsCwtWA2pawv0vbWu0FlHklbrJ1bgKuXpqPshJVIvtpRNbo0G43vBca?=
+ =?us-ascii?Q?jT/t8Xes9g35TTNlgaR2ULxuXfRRNfrIguX4b6Meh7At3kDbqR/r7Fqq9ZJ1?=
+ =?us-ascii?Q?cw4Yhn6todPz2UP1jptuUR8nFBNQ2GSbcJCg0c/nPKUSKD5uPFQ7qCrRT+B+?=
+ =?us-ascii?Q?SD1AV+W3kZ6/mSInHVye3abjwuDQW5DoFJt0CbSyaaySfQxSCHg0BepJZIxE?=
+ =?us-ascii?Q?OkA496TvqIxqEpcQnlumTInqmWQFyzWf/N2jBYhPPRWZ3GiMxCPUh7rna1/a?=
+ =?us-ascii?Q?QuI4yyjT5aibMEqyw0Xhx8FhSYc+jnIzgc12V1lCjihJmAa/HJyNqlKz11Qd?=
+ =?us-ascii?Q?CihHj1z0CDmUKevxqVzE0AKNuutldndfaJfTvmVGwSmDAJxrF+rkR8d38HBJ?=
+ =?us-ascii?Q?ArPbDfoTieJbbLXkKohRmILi82mR3vdASnqOGJj1NRIrDSZeC7pzrRVUe/1a?=
+ =?us-ascii?Q?0h/s+S20cYyR0f1Gb5nljWpc1PRPBjAi6V/Ghc/l7SSC0XtLtIeJOGjY7ZGT?=
+ =?us-ascii?Q?M4qiE3/6Qm0TGrrGnCFxvvbsIn1LNYNpJU0Glwd8NoAYZrBBOAgD3vNlJPpO?=
+ =?us-ascii?Q?qU44dIq5tQqDne/VBdFh1J/hqAT/0Yb8Lyd3plZ8pIUY/iTvHcyJMgV4EUIs?=
+ =?us-ascii?Q?u6LCsgp+iDWlH4wLvHGuEAeXXL57L/9vDc3vgN5sezVY4+WpxNYqWHd5koJ6?=
+ =?us-ascii?Q?E4xexrqavE8CwMSgY937QkStlYoiquwBtEHsh3H/DgTmMDlmcKfHtvu5xzaR?=
+ =?us-ascii?Q?lVvANbD0rf9qmuKUhKqvaXTy2gY1q40x1MG6icb2CdksQgeAejFW8bfyLhOE?=
+ =?us-ascii?Q?MK4zgKBtHefZud5/fuQhWZX3xBZ3Py78gwHK2o7c2AIvZT02KbCE6A8Blt7E?=
+ =?us-ascii?Q?rOKKiTSYMHHkCh9e0cVAUoYH4FYk+xhenqAX?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jun 2025 11:18:36.0240
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 15f3afe5-b86f-4c4d-7c9b-08ddb6feb0e2
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF00005FFF.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5772
 
-On Sun, Jun 29, 2025 at 10:51=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
->
-> On Fri, Jun 27, 2025 at 7:01=E2=80=AFPM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
-> >
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > This patch provides a setsockopt method to let applications leverage to
-> > adjust how many descs to be handled at most in one send syscall. It
-> > mitigates the situation where the default value (32) that is too small
-> > leads to higher frequency of triggering send syscall.
-> >
-> > Considering the prosperity/complexity the applications have, there is n=
-o
-> > absolutely ideal suggestion fitting all cases. So keep 32 as its defaul=
-t
-> > value like before.
-> >
-> > The patch does the following things:
-> > - Add XDP_MAX_TX_BUDGET socket option.
-> > - Convert TX_BATCH_SIZE to tx_budget_spent.
-> > - Set tx_budget_spent to 32 by default in the initialization phase as a
-> >   per-socket granular control. 32 is also the min value for
-> >   tx_budget_spent.
-> > - Set the range of tx_budget_spent as [32, xs->tx->nentries].
-> >
-> > The idea behind this comes out of real workloads in production. We use =
-a
-> > user-level stack with xsk support to accelerate sending packets and
-> > minimize triggering syscalls. When the packets are aggregated, it's not
-> > hard to hit the upper bound (namely, 32). The moment user-space stack
-> > fetches the -EAGAIN error number passed from sendto(), it will loop to =
-try
-> > again until all the expected descs from tx ring are sent out to the dri=
-ver.
-> > Enlarging the XDP_MAX_TX_BUDGET value contributes to less frequency of
-> > sendto() and higher throughput/PPS.
-> >
-> > Here is what I did in production, along with some numbers as follows:
-> > For one application I saw lately, I suggested using 128 as max_tx_budge=
-t
-> > because I saw two limitations without changing any default configuratio=
-n:
-> > 1) XDP_MAX_TX_BUDGET, 2) socket sndbuf which is 212992 decided by
-> > net.core.wmem_default. As to XDP_MAX_TX_BUDGET, the scenario behind
-> > this was I counted how many descs are transmitted to the driver at one
-> > time of sendto() based on [1] patch and then I calculated the
-> > possibility of hitting the upper bound. Finally I chose 128 as a
-> > suitable value because 1) it covers most of the cases, 2) a higher
-> > number would not bring evident results. After twisting the parameters,
-> > a stable improvement of around 4% for both PPS and throughput and less
-> > resources consumption were found to be observed by strace -c -p xxx:
-> > 1) %time was decreased by 7.8%
-> > 2) error counter was decreased from 18367 to 572
->
-> More interesting numbers are arriving here as I run some benchmarks
-> from xdp-project/bpf-examples/AF_XDP-example/ in my VM.
->
-> Running "sudo taskset -c 2 ./xdpsock -i eth0 -q 1 -l -N -t -b 256"
->
-> Using the default configure 32 as the max budget iteration:
->  sock0@eth0:1 txonly xdp-drv
->                    pps            pkts           1.01
-> rx                 0              0
-> tx                 48,574         49,152
->
-> Enlarging the value to 256:
->  sock0@eth0:1 txonly xdp-drv
->                    pps            pkts           1.00
-> rx                 0              0
-> tx                 148,277        148,736
->
-> Enlarging the value to 512:
->  sock0@eth0:1 txonly xdp-drv
->                    pps            pkts           1.00
-> rx                 0              0
-> tx                 226,306        227,072
->
-> The performance of pps goes up by 365% (with max budget set as 512)
-> which is an incredible number :)
+A few packets may still be sent and received during the termination of
+the iperf processes. These late packets cause failures when they arrive
+on queues expected to be empty.
 
-Weird thing. I purchased another VM and didn't manage to see such a
-huge improvement.... Good luck is that I own that good machine which
-is still reproducible and I'm still digging in it. So please ignore
-this noise for now :|
+Add a one second delay between repeated _send_traffic_check() calls in
+rss_ctx tests to ensure such packets are processed before the next
+traffic checks are performed.
 
-Thanks,
-Jason
+Example failure observed:
+
+  Check failed 2 != 0 traffic on inactive queues (context 1):
+  [0, 0, 1, 1, 386385, 397196, 0, 0, 0, 0, ...]
+
+  Check failed 4 != 0 traffic on inactive queues (context 2):
+  [0, 0, 0, 0, 2, 2, 247152, 253013, 0, 0, ...]
+
+  Check failed 2 != 0 traffic on inactive queues (context 3):
+  [0, 0, 0, 0, 0, 0, 1, 1, 282434, 283070, ...]
+
+Note: While the `noise` parameter could be used to tolerate these late
+packets, it would be inappropriate here. `noise` tolerates far more
+traffic than acceptable in this case, risking false positives.
+Inactive queues are supposed to see zero traffic.
+
+Fixes: 847aa551fa78 ("selftests: drv-net: rss_ctx: factor out send traffic and check")
+Reviewed-by: Gal Pressman <gal@nvidia.com>
+Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+Signed-off-by: Nimrod Oren <noren@nvidia.com>
+---
+ tools/testing/selftests/drivers/net/hw/rss_ctx.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tools/testing/selftests/drivers/net/hw/rss_ctx.py b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
+index 7bb552f8b182..19be69227693 100755
+--- a/tools/testing/selftests/drivers/net/hw/rss_ctx.py
++++ b/tools/testing/selftests/drivers/net/hw/rss_ctx.py
+@@ -4,6 +4,7 @@
+ import datetime
+ import random
+ import re
++import time
+ from lib.py import ksft_run, ksft_pr, ksft_exit
+ from lib.py import ksft_eq, ksft_ne, ksft_ge, ksft_in, ksft_lt, ksft_true, ksft_raises
+ from lib.py import NetDrvEpEnv
+@@ -492,6 +493,7 @@ def test_rss_context(cfg, ctx_cnt=1, create_with_cfg=None):
+                             { 'target': (2+i*2, 3+i*2),
+                               'noise': (0, 1),
+                               'empty': list(range(2, 2+i*2)) + list(range(4+i*2, 2+2*ctx_cnt)) })
++        time.sleep(1)
+ 
+     if requested_ctx_cnt != ctx_cnt:
+         raise KsftSkipEx(f"Tested only {ctx_cnt} contexts, wanted {requested_ctx_cnt}")
+@@ -559,6 +561,7 @@ def test_rss_context_out_of_order(cfg, ctx_cnt=4):
+                 }
+ 
+             _send_traffic_check(cfg, ports[i], f"context {i}", expected)
++            time.sleep(1)
+ 
+     # Use queues 0 and 1 for normal traffic
+     ethtool(f"-X {cfg.ifname} equal 2")
+-- 
+2.37.1
+
 
