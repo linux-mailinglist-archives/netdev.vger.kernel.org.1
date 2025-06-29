@@ -1,168 +1,173 @@
-Return-Path: <netdev+bounces-202206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6389EAECB1C
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 04:50:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92FC3AECB1D
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 04:52:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7EB117745C
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 02:50:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E71618996D2
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 02:52:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74D633770B;
-	Sun, 29 Jun 2025 02:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C48778F4B;
+	Sun, 29 Jun 2025 02:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="IfjSA3ly"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ifdxIhbF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E54F68F54
-	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 02:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990A52F1FE2;
+	Sun, 29 Jun 2025 02:52:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751165433; cv=none; b=qVS9w8E5mMluRb2ZPIPaRenbGBTvqeku+4V6bCCJj2L4M5CRO4zjZhQd/hFq/4M0wlZ82NWCO4vjlEGW83BX+QYkSdxDnfGSlV9RQEzZb+4a7olGrM/RVCwTCP2ItqDIKw7D/ZJyOdsCLOMiTzDJv0BbobQAA0D3YI9WMGI7dgU=
+	t=1751165556; cv=none; b=olfSzwU8dEI6vKsgPZZccsFeP33KrBoD4HA2AapORf19YxK9JmrkM4VBEjGWMN8PXdNSV9eZB3Qlo3CKj63dFL9C4bAVrLmPNGFORxF3wDq9bYqwnRq9tk/nXyZFbxyqyZx9HJuFaih6MReFUznXGNylCjGGO1E5NSFAyTZ6MeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751165433; c=relaxed/simple;
-	bh=SZ3WelT84TIF+hZlmtN0iz4c58cHv4E32QHp4fX580c=;
+	s=arc-20240116; t=1751165556; c=relaxed/simple;
+	bh=JUu4d6Lu/r48ANhRNx+jrIxyrNppEQqkxSGp6HYToIw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=syWkID+H9ctbDBafBOcYtYEzmT6oK12pu+LC4P/YtIIsUNJZJTMVjOgQhqOfnzPEllFY8YSZ1fv95c6+Ox35Br3C41czAqLI8sIZxoDHDUmRJYPnJga1jOnvnN2YAQydFJ9L9mNO2mWqii7rrMaJmK0q1GUINbSfyrhOHULLqp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=IfjSA3ly; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55T2LZcP004323
-	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 02:50:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	i9JVOf8bKYOZXSHoakkXpMm2sgNl0m6sGyRz0jx2MQ4=; b=IfjSA3lygR3iU2Fo
-	3hqH7dd+iNOtFFe9zf5XiFV8VlvHZF2GJZwSzqtFomu27TyULxtu9QJ7sPvVje/q
-	ZZjTGZfr05E1w8YquwkRVRurEdvpQgGiuPEohWMTuyj3jeXm4TW9AWqXrBLmJsCV
-	trAyOuXGdcZ7dAd8jZn4smP/1cTPpGc7qeLQfGr0XSiZN6Bw3B/dz11hy5sWn65G
-	kvOjw69acL3ZXUwb7OqNIBEdsQqgTuyi3j9aNTqYjc5B+CpzAeX7qEcu8Xf6YrqQ
-	gnkI0HvBYdBTt+0zzLpzLFT5eANqRXaQgCfikTDu6fzYN3L6KodvUquxPObD0FWt
-	2lVWSw==
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47j8fx9ker-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 02:50:30 +0000 (GMT)
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4a6f89098cfso23784771cf.0
-        for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 19:50:30 -0700 (PDT)
+	 To:Cc:Content-Type; b=VGP38tsnmgvaX0O/SOjt1yDTCapNIMjHrZH+7DoF4MH7vFJfxQP6qaBby5imuLhP5s71TK21XZpBbOT9qMsZn5jj7lFksrKTR8JcbwXuATDNt4cPT8HoVZC/mD6hpjiTKGfYzDBXFqoMO4AToxT62OifPdBmutUq1rCUZrclm2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ifdxIhbF; arc=none smtp.client-ip=209.85.166.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3d948ce7d9dso5795595ab.2;
+        Sat, 28 Jun 2025 19:52:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751165554; x=1751770354; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xTIn6bX/pcDrl5VzI3z6pvqx/3sHwV7Go2abDrLLtgs=;
+        b=ifdxIhbF97Ghv2rg73t8CoUUR2kIZHKH1yjLtcwV/7IKiXmrR1hAnS4c/MTfl8jmum
+         Nd9px+aVH8jn/u/4Uw69NrF7YzEeY9MdKokgLpSaXJS+oILgXMYixLFkGUgpudvePbm5
+         xVBoeAoIXh7dU/6rDONTa6gTIcScTtfnEXaL5OVJWtsb4R9bIT30fE7t6edJ5z5okw0w
+         3vyWWXiESdS+NFAjR8KQcUdCIv7uNkVxERNvvdeXFgfxfk9ihg2llJMPJA5TwTlre/fn
+         FM3d+ZEufP4NhmGelWU1lf2PL2W612bLGt0M9Gkt5ZALVQE2g5PS1EOC/EVyEg6vqRes
+         sHTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751165430; x=1751770230;
+        d=1e100.net; s=20230601; t=1751165554; x=1751770354;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=i9JVOf8bKYOZXSHoakkXpMm2sgNl0m6sGyRz0jx2MQ4=;
-        b=CiuqdEsHh0/TQZY/oDvCt/MG76FanKNmaVd4+JnmBo7yz0PSlyn1FZrsWgGKyb0mge
-         lOrSYXknZ2AmXZk6l0HMIICtTcPiEHU9lEaDFIxy2QLNw9KllToyYC/eGuaTnpUNWCtb
-         tI6S+7wRx4cDBRq2zePhEpbU8+lFVYX8rCBRbcKxPjug3T93MykbDmkb6dxwDjcIvE1f
-         dOqFs6oA6FXALQQ3jCjlXu7YkEx+gazgm3njymqMvGpgVw5Cwohu2DF/jNosOx8dCSxl
-         FsId2JDqWuhplodrYdvonk+INiHzlxXCvLojyN17THQn95WZFxuV0eVLfpderEUCjaHK
-         NrDA==
-X-Forwarded-Encrypted: i=1; AJvYcCVuNkXVg2m/BirTOo1j8zXnPYFT7BK0A0P8ffwZAKdMmqweWTshT+6srugwHVcU/v8BtpD1qWk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnhQzWL044UhagiVx1yzZDFo9ycA1AyaOZrbODaxQWdGBpAU3s
-	ljlWXurgJstsqbwcZUgXYnfjP6r2+8IjVG3xarexJQPlb5zZJMrHv+pj5BPONxzzw86ab4n7pMt
-	9If5BUWNs7Jn5+OlxsCsq3F2wRPtdhc4bvMrNSQDR/EaG4BWc8C84MmGkBfg/7M36SQL1B3lTCG
-	mdno4R+L7aloFRal00KXazK2wmaE+KkkeQdQ==
-X-Gm-Gg: ASbGncuzOyG/grN0Y4J53cm2kF7PohKfki0nXqP4HzkSCM2X/i1pK7m9DGDkPFIp+LF
-	8omHtvbjxjT0LAXVO6v5x6ZWDfCLDPlVFoMfbmmYXESuJGD+kOhd9T0a2xRQL1V2hGTz6IV6LU/
-	nL5yaL8Q==
-X-Received: by 2002:a05:622a:2c9:b0:4a5:aa42:49f3 with SMTP id d75a77b69052e-4a7fcadb7b8mr150204971cf.20.1751165429809;
-        Sat, 28 Jun 2025 19:50:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEmJnbRXFH3gg/Nd7+ZF6ivi7RKazfCJZm5OiWiEeHsXmQj+ixig9E5TZsifKgQBXEsrpFz6v9gPyPxFqCXn8Y=
-X-Received: by 2002:a05:622a:2c9:b0:4a5:aa42:49f3 with SMTP id
- d75a77b69052e-4a7fcadb7b8mr150204721cf.20.1751165429404; Sat, 28 Jun 2025
- 19:50:29 -0700 (PDT)
+        bh=xTIn6bX/pcDrl5VzI3z6pvqx/3sHwV7Go2abDrLLtgs=;
+        b=vZa6Ehs6E0xXAQ2+h4aJPiMNF/Na6IEbQcM0t7u9YmlLY/RSD1zzXUz6TB7pXiddTA
+         6Vu+dOPFCxJcmoZGixJkUbYFCmaCwP7o6ZLDmBQes1DotY4avlLTQyy5O60RouXg6LYG
+         kZTGYyG+MgAXIHBG4LZ7+Z9BHMGt933OspqI8Z5uGgsYFQEUyP6Pwk00r+EG1SmcdJkQ
+         PqZ1bUaMa8i5Fh1zHKU/Ox+OmpQ8bCIsAzB0NE3H2ZdOUY+nP8AOp3SXk3rlaOClGBoB
+         NSKlgFGn6kuqUa1vzDKvbmoFzNh4XT52CL8p83WK4FDYtl9xKkFvLh+2aaKcTkAGXgXU
+         EOSw==
+X-Forwarded-Encrypted: i=1; AJvYcCX3g0I8vCdkg7g6v8N2/PJn1M90xqUsUtVDTen5C5xep+t3yybKEDETeEhRLUMIuKPLWd3t2dg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCaQ5rx62Rm7enwBZjT7PfeMJvPFvRzsqWEU3pi7JU+tUCutNB
+	UOk/wrLEAtLt+7WS5kQ1xsSwAeLFPNqmrMi+0Q5ouiZWMBED1+0ZVUdfvg9XhzXHCmgtfGxNfuj
+	j1si8HE23My6QGyCkPOInz96273sMGDg=
+X-Gm-Gg: ASbGncuwRON0bgfI4YzeGXUUS8tPrH29Q7wcZparnUC4Vq2+jJVe5xVg0Wdi6ebhyce
+	1uUMcwLznYoKHedsVblo/XgFpSQAEQJmIb150ihRBS40HHfZlo4kNIlCBEBJx+xoFtQ1Ys51S0T
+	dhILgs7zCwy8lIzEMI6YxoHWc+JWN5xzLMR287OxBFtA==
+X-Google-Smtp-Source: AGHT+IEDnvtHrTUWB+UWMUfEOhNVfh7lXsYxCnJn28f/nA63rMKiq21nBJTuGZstL87WpOyv9xciulcXGNXmHhJRuIE=
+X-Received: by 2002:a05:6e02:1a0c:b0:3dd:b4b5:5c9f with SMTP id
+ e9e14a558f8ab-3df4ace8ef5mr102247725ab.19.1751165553620; Sat, 28 Jun 2025
+ 19:52:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250624213801.31702-1-ryazanov.s.a@gmail.com>
-In-Reply-To: <20250624213801.31702-1-ryazanov.s.a@gmail.com>
-From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Sun, 29 Jun 2025 04:50:18 +0200
-X-Gm-Features: Ac12FXwTvwXy-7P9RZLkGbTa8wSDID66dwjJ4_9agyN7BuXABGlvR6pgMlijDII
-Message-ID: <CAFEp6-08JX1gDDn2-hP5AjXHCGsPYHe05FscQoyiP_OaSQfzqQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 0/6] net: wwan: add NMEA port type support
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        netdev@vger.kernel.org, Slark Xiao <slark_xiao@163.com>,
-        Muhammad Nuzaihan <zaihan@unrealasia.net>,
-        Qiang Yu <quic_qianyu@quicinc.com>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Johan Hovold <johan@kernel.org>
+References: <20250627110121.73228-1-kerneljasonxing@gmail.com>
+In-Reply-To: <20250627110121.73228-1-kerneljasonxing@gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sun, 29 Jun 2025 10:51:57 +0800
+X-Gm-Features: Ac12FXznGNTBxfDxAHPTXZ8dubaXwFW_NkSg8bJ_Qa2xDiQ471BbpIT3R-dIqZg
+Message-ID: <CAL+tcoCSd_LA8w9ov7+_sOWLt3EU1rcqK8Sa6UF5S-xgfAGPnA@mail.gmail.com>
+Subject: Re: [PATCH net-next v6] net: xsk: introduce XDP_MAX_TX_BUDGET set/getsockopt
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI5MDAyMiBTYWx0ZWRfX4z1mqmequ3ru
- T+VP4VJQ7I60+WZxgn5tAls8ExJt0+QiR49ub33BuYcBkYxDvC9Tj/Fd8kSCJRbo5vsPyvF1VNu
- Xw+XNV8UYVl6MprjAKgIAcPMKFzDx8LR2ed0l5SaFxVKqh92noTYNvSgcIHxsckSki5iBcteanF
- TGkKLEcUCuL367/617asoKNuOIYNy3NXCzG8u9L4MRuIobnciRLunYe19TYcZBrmJWy5R1Esh3r
- c7e3uYA537Nz3aGYaUsC9ThG6YMEQFXqS2VWoQNYj6H5ayLaIHCzAQ9g3e0S9Q13wd3tINv9qMm
- kEa4WSBSs0qx1qTFGUmSmta1/6eXebAcQyZ6ax0Jv8wH/vHYgq1FxghHQHwXfDCp/wF6HARrCvN
- mgrigwD3lXkBdZvRVgdfwfy30Elx5VBPmbrDXmalSso8WAfTx1JqgfeRNpZvP0qgBZYv6mK4
-X-Proofpoint-GUID: 1DfQmI2pc5o28xcpPo6gPZaOmYxWc7ge
-X-Proofpoint-ORIG-GUID: 1DfQmI2pc5o28xcpPo6gPZaOmYxWc7ge
-X-Authority-Analysis: v=2.4 cv=TqPmhCXh c=1 sm=1 tr=0 ts=6860a9f6 cx=c_pps
- a=JbAStetqSzwMeJznSMzCyw==:117 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10
- a=pGLkceISAAAA:8 a=1APRVNvs_67XWry2tgoA:9 a=QEXdDO2ut3YA:10
- a=uxP6HrT_eTzRwkO_Te1X:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-27_05,2025-06-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 bulkscore=0 mlxlogscore=855 suspectscore=0 adultscore=0
- phishscore=0 malwarescore=0 clxscore=1015 lowpriorityscore=0 mlxscore=0
- impostorscore=0 spamscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2506290022
 
-Hi Sergey,
+On Fri, Jun 27, 2025 at 7:01=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> From: Jason Xing <kernelxing@tencent.com>
+>
+> This patch provides a setsockopt method to let applications leverage to
+> adjust how many descs to be handled at most in one send syscall. It
+> mitigates the situation where the default value (32) that is too small
+> leads to higher frequency of triggering send syscall.
+>
+> Considering the prosperity/complexity the applications have, there is no
+> absolutely ideal suggestion fitting all cases. So keep 32 as its default
+> value like before.
+>
+> The patch does the following things:
+> - Add XDP_MAX_TX_BUDGET socket option.
+> - Convert TX_BATCH_SIZE to tx_budget_spent.
+> - Set tx_budget_spent to 32 by default in the initialization phase as a
+>   per-socket granular control. 32 is also the min value for
+>   tx_budget_spent.
+> - Set the range of tx_budget_spent as [32, xs->tx->nentries].
+>
+> The idea behind this comes out of real workloads in production. We use a
+> user-level stack with xsk support to accelerate sending packets and
+> minimize triggering syscalls. When the packets are aggregated, it's not
+> hard to hit the upper bound (namely, 32). The moment user-space stack
+> fetches the -EAGAIN error number passed from sendto(), it will loop to tr=
+y
+> again until all the expected descs from tx ring are sent out to the drive=
+r.
+> Enlarging the XDP_MAX_TX_BUDGET value contributes to less frequency of
+> sendto() and higher throughput/PPS.
+>
+> Here is what I did in production, along with some numbers as follows:
+> For one application I saw lately, I suggested using 128 as max_tx_budget
+> because I saw two limitations without changing any default configuration:
+> 1) XDP_MAX_TX_BUDGET, 2) socket sndbuf which is 212992 decided by
+> net.core.wmem_default. As to XDP_MAX_TX_BUDGET, the scenario behind
+> this was I counted how many descs are transmitted to the driver at one
+> time of sendto() based on [1] patch and then I calculated the
+> possibility of hitting the upper bound. Finally I chose 128 as a
+> suitable value because 1) it covers most of the cases, 2) a higher
+> number would not bring evident results. After twisting the parameters,
+> a stable improvement of around 4% for both PPS and throughput and less
+> resources consumption were found to be observed by strace -c -p xxx:
+> 1) %time was decreased by 7.8%
+> 2) error counter was decreased from 18367 to 572
 
-On Tue, Jun 24, 2025 at 11:39=E2=80=AFPM Sergey Ryazanov <ryazanov.s.a@gmai=
-l.com> wrote:
->
-> The series introduces a long discussed NMEA port type support for the
-> WWAN subsystem. There are two goals. From the WWAN driver perspective,
-> NMEA exported as any other port type (e.g. AT, MBIM, QMI, etc.). From
-> user space software perspective, the exported chardev belongs to the
-> GNSS class what makes it easy to distinguish desired port and the WWAN
-> device common to both NMEA and control (AT, MBIM, etc.) ports makes it
-> easy to locate a control port for the GNSS receiver activation.
->
-> Done by exporting the NMEA port via the GNSS subsystem with the WWAN
-> core acting as proxy between the WWAN modem driver and the GNSS
-> subsystem.
->
-> The series starts from a cleanup patch. Then two patches prepares the
-> WWAN core for the proxy style operation. Followed by a patch introding a
-> new WWNA port type, integration with the GNSS subsystem and demux. The
-> series ends with a couple of patches that introduce emulated EMEA port
-> to the WWAN HW simulator.
->
-> The series is the product of the discussion with Loic about the pros and
-> cons of possible models and implementation. Also Muhammad and Slark did
-> a great job defining the problem, sharing the code and pushing me to
-> finish the implementation. Many thanks.
->
-> Comments are welcomed.
->
-> Slark, Muhammad, if this series suits you, feel free to bundle it with
-> the driver changes and (re-)send for final inclusion as a single series.
->
-> Changes RFCv1->RFCv2:
-> * Uniformly use put_device() to release port memory. This made code less
->   weird and way more clear. Thank you, Loic, for noticing and the fix
->   discussion!
+More interesting numbers are arriving here as I run some benchmarks
+from xdp-project/bpf-examples/AF_XDP-example/ in my VM.
 
-I think you can now send that series without the RFC tag. It looks good to =
-me.
+Running "sudo taskset -c 2 ./xdpsock -i eth0 -q 1 -l -N -t -b 256"
+
+Using the default configure 32 as the max budget iteration:
+ sock0@eth0:1 txonly xdp-drv
+                   pps            pkts           1.01
+rx                 0              0
+tx                 48,574         49,152
+
+Enlarging the value to 256:
+ sock0@eth0:1 txonly xdp-drv
+                   pps            pkts           1.00
+rx                 0              0
+tx                 148,277        148,736
+
+Enlarging the value to 512:
+ sock0@eth0:1 txonly xdp-drv
+                   pps            pkts           1.00
+rx                 0              0
+tx                 226,306        227,072
+
+The performance of pps goes up by 365% (with max budget set as 512)
+which is an incredible number :)
+
+If the next-respin is needed, I will attach those convincing numbers
+in the commit message.
+
+Thanks,
+Jason
 
