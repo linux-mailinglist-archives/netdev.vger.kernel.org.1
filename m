@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-202277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0463FAED00F
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 21:16:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF129AED011
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 21:16:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3E083B56D3
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 19:14:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A7B43B614D
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 19:14:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8935723B63C;
-	Sun, 29 Jun 2025 19:12:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC7823F292;
+	Sun, 29 Jun 2025 19:12:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GoxtIcA8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fjktXBUf"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E82323AE83
-	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 19:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D3123E25A
+	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 19:12:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751224356; cv=none; b=tWsbZAyKct2H90+M6VP9qbE8Ja78XZKzb7paR2T/XGfhxiV5YADSgKL+zdWK6k82kJRQ04XHMJjz9kaChrm8M+DH/O04oLFTfRfX1ceWjvc9O1UMaXUoV7bcfwZy0kexBpwnh2g+njfy+Q4FEoO2OdfLCR2jLpRqvlSxZoErwx8=
+	t=1751224361; cv=none; b=jp7zdA1Fnh7oNNnKTTQdroJ1VoMS7A/jbAtAgTYg3A9KhY6GnTebxpTrBrEXbenGpDxKdAssM1k96Zjrx3x9wVXEqEOWTnIkTgk0XdG4JYDk+f3mAHlymg/iLV/bbT+evyzZvq84nqhXH9/tJWfvvf7s4/lwj06E6vIUAHmYjfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751224356; c=relaxed/simple;
-	bh=DmT4Bise/vCChRzplVSqDd2BI/p2bI1iSO9roexnDw0=;
+	s=arc-20240116; t=1751224361; c=relaxed/simple;
+	bh=HnsH/ZxorLCwcDbZ3NK9O9V5IuP3Tx2tCfXeYAKJ1Ao=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A+u0yus7EgJKrLGGiCdVxJQ8wtzh20okIOXsqhV8I0TiqXHBkgIZ9y86KwSm8DhoAIOELFFihbUU9N/5FMN7iyYf6TXs/dM+ksZHdrwBY8Tl/aqX9v9LTaUSkpG7sKBBkM62E1991PPuM6jY7ogVgf64S5rLurONKj5G3eD5Ero=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GoxtIcA8; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=qQn6D0U4ohPKSn79x/miRHB550IpUVwO4qFzL7xtzDoDuqmCRLud+M24tZ4WIEZQ5OMJoI4Z7HjMRufFR/wN/vk9hshwJjt6FBgVkJGDw8puemT3i1fxfMbg3ykq29QmE1xhtHccyYoWnmMfiYuskHdYi4/7C43AIZ3phMwQ/jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fjktXBUf; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751224351;
+	s=mimecast20190719; t=1751224355;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4XK1DvpuFfEECjOWlQarzmEVhfydKQ9Mv1sIMUipbGI=;
-	b=GoxtIcA80uSeWt3AzOmyAJAS2GZU0bM3PjrLwlFUYRxteRvcYwU/Dn3er1vz1vuayrsDRp
-	uBEh5nwqwA3MHat9/hhjuiap6gXprGfhPpqzU8trotygkuEjw+bujV0QG2w3gbNW8I6a57
-	OEFjwQiIy3IAW02LL+EW/OiYIO250Es=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=BpMnD4vTEtqsD6gPnBLQ85vMgB5ChkQ1tos1OcMmekg=;
+	b=fjktXBUfomFPM6bu/xxWC9jc1nbls0cSIGcO3Y+LyAwcS0DxuflGjqdi+snSS6hcRuIRoh
+	A5JE2j1bw36KFM3hah7Ucd5LxHOLnjJ20Xn3SDGzdBQzXnkZOngEXoJQybhqJYaSTTHlV9
+	wOMo8pp1S61CQnIcXn37sL0qptj+bhk=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-641-q2Xtx-tPOZuVAqnRsgfBzw-1; Sun,
- 29 Jun 2025 15:12:26 -0400
-X-MC-Unique: q2Xtx-tPOZuVAqnRsgfBzw-1
-X-Mimecast-MFC-AGG-ID: q2Xtx-tPOZuVAqnRsgfBzw_1751224344
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-163-bNJjo1gDNYKf9kR4DelZZQ-1; Sun,
+ 29 Jun 2025 15:12:33 -0400
+X-MC-Unique: bNJjo1gDNYKf9kR4DelZZQ-1
+X-Mimecast-MFC-AGG-ID: bNJjo1gDNYKf9kR4DelZZQ_1751224351
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3A10919560AE;
-	Sun, 29 Jun 2025 19:12:24 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1BBFB18DA5C2;
+	Sun, 29 Jun 2025 19:12:31 +0000 (UTC)
 Received: from p16v.luc.cera.cz (unknown [10.45.224.33])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BF7E0180035C;
-	Sun, 29 Jun 2025 19:12:17 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8C3E7180045B;
+	Sun, 29 Jun 2025 19:12:24 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+Cc: Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
 	Jiri Pirko <jiri@resnulli.us>,
 	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -81,9 +81,9 @@ Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	linux-doc@vger.kernel.org,
 	Michal Schmidt <mschmidt@redhat.com>,
 	Petr Oros <poros@redhat.com>
-Subject: [PATCH net-next v12 12/14] dpll: zl3073x: Implement input pin state setting in automatic mode
-Date: Sun, 29 Jun 2025 21:10:47 +0200
-Message-ID: <20250629191049.64398-13-ivecera@redhat.com>
+Subject: [PATCH net-next v12 13/14] dpll: zl3073x: Add support to get/set frequency on input pins
+Date: Sun, 29 Jun 2025 21:10:48 +0200
+Message-ID: <20250629191049.64398-14-ivecera@redhat.com>
 In-Reply-To: <20250629191049.64398-1-ivecera@redhat.com>
 References: <20250629191049.64398-1-ivecera@redhat.com>
 Precedence: bulk
@@ -95,65 +95,192 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Implement input pin state setting when the DPLL is running in automatic
-mode. Unlike manual mode, the DPLL mode switching is not used here and
-the implementation uses special priority value (15) to make the given
-pin non-selectable.
+Add support to get/set frequency on input pins. The frequency for input
+pins (references) is computed in the device according this formula:
 
-When the user sets state of the pin as disconnected the driver
-internally sets its priority in HW to 15 that prevents the DPLL to
-choose this input pin. Conversely, if the pin status is set to
-selectable, the driver sets the pin priority in HW to the original saved
-value.
+ freq = base_freq * multiplier * (nominator / denominator)
 
+where the base_freq comes from the list of supported base frequencies
+and other parameters are arbitrary numbers. All these parameters are
+16-bit unsigned integers.
+
+Co-developed-by: Prathosh Satish <Prathosh.Satish@microchip.com>
+Signed-off-by: Prathosh Satish <Prathosh.Satish@microchip.com>
 Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
- drivers/dpll/zl3073x/dpll.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+v12:
+* Use mul_u64_u32_div() to compute input reference frequency to avoid
+  potential overflow
+---
+ drivers/dpll/zl3073x/dpll.c | 124 ++++++++++++++++++++++++++++++++++++
+ drivers/dpll/zl3073x/regs.h |   5 ++
+ 2 files changed, 129 insertions(+)
 
 diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
-index e67ef37479910..f78a5b209fce7 100644
+index f78a5b209fce7..355f900816023 100644
 --- a/drivers/dpll/zl3073x/dpll.c
 +++ b/drivers/dpll/zl3073x/dpll.c
-@@ -439,6 +439,38 @@ zl3073x_dpll_input_pin_state_on_dpll_set(const struct dpll_pin *dpll_pin,
+@@ -8,6 +8,7 @@
+ #include <linux/dpll.h>
+ #include <linux/err.h>
+ #include <linux/kthread.h>
++#include <linux/math64.h>
+ #include <linux/mod_devicetable.h>
+ #include <linux/module.h>
+ #include <linux/netlink.h>
+@@ -84,6 +85,127 @@ zl3073x_dpll_pin_direction_get(const struct dpll_pin *dpll_pin, void *pin_priv,
+ 	return 0;
+ }
  
- 		rc = zl3073x_dpll_selected_ref_set(zldpll, new_ref);
- 		break;
++/**
++ * zl3073x_dpll_input_ref_frequency_get - get input reference frequency
++ * @zldpll: pointer to zl3073x_dpll
++ * @ref_id: reference id
++ * @frequency: pointer to variable to store frequency
++ *
++ * Reads frequency of given input reference.
++ *
++ * Return: 0 on success, <0 on error
++ */
++static int
++zl3073x_dpll_input_ref_frequency_get(struct zl3073x_dpll *zldpll, u8 ref_id,
++				     u32 *frequency)
++{
++	struct zl3073x_dev *zldev = zldpll->dev;
++	u16 base, mult, num, denom;
++	int rc;
 +
-+	case ZL_DPLL_MODE_REFSEL_MODE_AUTO:
-+		if (state == DPLL_PIN_STATE_SELECTABLE) {
-+			if (pin->selectable)
-+				return 0; /* Pin is already selectable */
++	guard(mutex)(&zldev->multiop_lock);
 +
-+			/* Restore pin priority in HW */
-+			rc = zl3073x_dpll_ref_prio_set(pin, pin->prio);
-+			if (rc)
-+				return rc;
++	/* Read reference configuration */
++	rc = zl3073x_mb_op(zldev, ZL_REG_REF_MB_SEM, ZL_REF_MB_SEM_RD,
++			   ZL_REG_REF_MB_MASK, BIT(ref_id));
++	if (rc)
++		return rc;
 +
-+			/* Mark pin as selectable */
-+			pin->selectable = true;
-+		} else if (state == DPLL_PIN_STATE_DISCONNECTED) {
-+			if (!pin->selectable)
-+				return 0; /* Pin is already disconnected */
++	/* Read registers to compute resulting frequency */
++	rc = zl3073x_read_u16(zldev, ZL_REG_REF_FREQ_BASE, &base);
++	if (rc)
++		return rc;
++	rc = zl3073x_read_u16(zldev, ZL_REG_REF_FREQ_MULT, &mult);
++	if (rc)
++		return rc;
++	rc = zl3073x_read_u16(zldev, ZL_REG_REF_RATIO_M, &num);
++	if (rc)
++		return rc;
++	rc = zl3073x_read_u16(zldev, ZL_REG_REF_RATIO_N, &denom);
++	if (rc)
++		return rc;
 +
-+			/* Set pin priority to none in HW */
-+			rc = zl3073x_dpll_ref_prio_set(pin,
-+						       ZL_DPLL_REF_PRIO_NONE);
-+			if (rc)
-+				return rc;
++	/* Sanity check that HW has not returned zero denominator */
++	if (!denom) {
++		dev_err(zldev->dev,
++			"Zero divisor for ref %u frequency got from device\n",
++			ref_id);
++		return -EINVAL;
++	}
 +
-+			/* Mark pin as non-selectable */
-+			pin->selectable = false;
-+		} else {
-+			NL_SET_ERR_MSG(extack,
-+				       "Invalid pin state for automatic mode");
-+			return -EINVAL;
-+		}
-+		break;
++	/* Compute the frequency */
++	*frequency = mul_u64_u32_div(base * mult, num, denom);
 +
- 	default:
- 		/* In other modes we cannot change input reference */
- 		NL_SET_ERR_MSG(extack,
++	return rc;
++}
++
++static int
++zl3073x_dpll_input_pin_frequency_get(const struct dpll_pin *dpll_pin,
++				     void *pin_priv,
++				     const struct dpll_device *dpll,
++				     void *dpll_priv, u64 *frequency,
++				     struct netlink_ext_ack *extack)
++{
++	struct zl3073x_dpll *zldpll = dpll_priv;
++	struct zl3073x_dpll_pin *pin = pin_priv;
++	u32 ref_freq;
++	u8 ref;
++	int rc;
++
++	/* Read and return ref frequency */
++	ref = zl3073x_input_pin_ref_get(pin->id);
++	rc = zl3073x_dpll_input_ref_frequency_get(zldpll, ref, &ref_freq);
++	if (!rc)
++		*frequency = ref_freq;
++
++	return rc;
++}
++
++static int
++zl3073x_dpll_input_pin_frequency_set(const struct dpll_pin *dpll_pin,
++				     void *pin_priv,
++				     const struct dpll_device *dpll,
++				     void *dpll_priv, u64 frequency,
++				     struct netlink_ext_ack *extack)
++{
++	struct zl3073x_dpll *zldpll = dpll_priv;
++	struct zl3073x_dev *zldev = zldpll->dev;
++	struct zl3073x_dpll_pin *pin = pin_priv;
++	u16 base, mult;
++	u8 ref;
++	int rc;
++
++	/* Get base frequency and multiplier for the requested frequency */
++	rc = zl3073x_ref_freq_factorize(frequency, &base, &mult);
++	if (rc)
++		return rc;
++
++	guard(mutex)(&zldev->multiop_lock);
++
++	/* Load reference configuration */
++	ref = zl3073x_input_pin_ref_get(pin->id);
++	rc = zl3073x_mb_op(zldev, ZL_REG_REF_MB_SEM, ZL_REF_MB_SEM_RD,
++			   ZL_REG_REF_MB_MASK, BIT(ref));
++
++	/* Update base frequency, multiplier, numerator & denominator */
++	rc = zl3073x_write_u16(zldev, ZL_REG_REF_FREQ_BASE, base);
++	if (rc)
++		return rc;
++	rc = zl3073x_write_u16(zldev, ZL_REG_REF_FREQ_MULT, mult);
++	if (rc)
++		return rc;
++	rc = zl3073x_write_u16(zldev, ZL_REG_REF_RATIO_M, 1);
++	if (rc)
++		return rc;
++	rc = zl3073x_write_u16(zldev, ZL_REG_REF_RATIO_N, 1);
++	if (rc)
++		return rc;
++
++	/* Commit reference configuration */
++	return zl3073x_mb_op(zldev, ZL_REG_REF_MB_SEM, ZL_REF_MB_SEM_WR,
++			     ZL_REG_REF_MB_MASK, BIT(ref));
++}
++
+ /**
+  * zl3073x_dpll_selected_ref_get - get currently selected reference
+  * @zldpll: pointer to zl3073x_dpll
+@@ -592,6 +714,8 @@ zl3073x_dpll_mode_get(const struct dpll_device *dpll, void *dpll_priv,
+ 
+ static const struct dpll_pin_ops zl3073x_dpll_input_pin_ops = {
+ 	.direction_get = zl3073x_dpll_pin_direction_get,
++	.frequency_get = zl3073x_dpll_input_pin_frequency_get,
++	.frequency_set = zl3073x_dpll_input_pin_frequency_set,
+ 	.prio_get = zl3073x_dpll_input_pin_prio_get,
+ 	.prio_set = zl3073x_dpll_input_pin_prio_set,
+ 	.state_on_dpll_get = zl3073x_dpll_input_pin_state_on_dpll_get,
+diff --git a/drivers/dpll/zl3073x/regs.h b/drivers/dpll/zl3073x/regs.h
+index 34e905053a1ef..09dd314663dff 100644
+--- a/drivers/dpll/zl3073x/regs.h
++++ b/drivers/dpll/zl3073x/regs.h
+@@ -135,6 +135,11 @@
+ #define ZL_REF_MB_SEM_WR			BIT(0)
+ #define ZL_REF_MB_SEM_RD			BIT(1)
+ 
++#define ZL_REG_REF_FREQ_BASE			ZL_REG(10, 0x05, 2)
++#define ZL_REG_REF_FREQ_MULT			ZL_REG(10, 0x07, 2)
++#define ZL_REG_REF_RATIO_M			ZL_REG(10, 0x09, 2)
++#define ZL_REG_REF_RATIO_N			ZL_REG(10, 0x0b, 2)
++
+ #define ZL_REG_REF_CONFIG			ZL_REG(10, 0x0d, 1)
+ #define ZL_REF_CONFIG_ENABLE			BIT(0)
+ #define ZL_REF_CONFIG_DIFF_EN			BIT(2)
 -- 
 2.49.0
 
