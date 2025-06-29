@@ -1,169 +1,138 @@
-Return-Path: <netdev+bounces-202280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 961E6AED02A
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 21:43:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF6EDAED02B
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 21:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DE2F1892CEB
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 19:43:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4F0C18911F8
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 19:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64F102253AE;
-	Sun, 29 Jun 2025 19:43:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 941061EA7C9;
+	Sun, 29 Jun 2025 19:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dUzLxHBS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H1uw5iGv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1BD116E863
-	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 19:43:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F531E32D6
+	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 19:50:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751226201; cv=none; b=Eo2Yikd5cqsP6OKe3Tvnekgb/D4YAzmCuAVQ/w3y7LQI4FbFT1u6nCiFJawjRAOkJESzCZEy6nXxGMcSNr08m4d/eh8qI6+TWCNR7AlsHEym2KU4PcJRcHlSFHh4wFzuTPVCiYVT4K81BxdatyJ2EXsXCu1q4ftiArWY+EJKXvA=
+	t=1751226634; cv=none; b=H1u1hCcn6kjW5bg5u2HGoHMyqbw+PE7xoZnPSeIkN9xu+WZ06Q/ukUndmypHh0Qq4Xk40o5vzjsf04fRtLL1ZnlIo9TWz9vFkALLQEGHIcOweBHFvuW+Qb42666nvepooosYb+X/ziIlk/Pu/h0pn7bieYwssmgiWR83g2kLqhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751226201; c=relaxed/simple;
-	bh=TIy+P/3YS6u22xOkoVLpO4ehcRXV+KJmVjZ8BPNpx6k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I1flZVDyRsfC88MWLuBBqkBQ005QtuuHYxGT2JIHQNBoucU/jJsozqC1kfZun18JBkp3ph8OVlY6HE5WxKTI4sCO1V8UUkQnE81RHJWtLlJZgKR6e2rJhv6gE+uCm+84SPfBaUaRPYTo21T40vYvJoNzOD/vk3yfQqD+LsS4zQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dUzLxHBS; arc=none smtp.client-ip=209.85.221.180
+	s=arc-20240116; t=1751226634; c=relaxed/simple;
+	bh=C8mqdScJmc/LY2iSLt7YomPtZiRBML+wFNz3jA7tfUY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F15+NY6XjJJ6rreGjSv2VSqzgcq8pGIpq39kp864IAqmtYVxl1SprFPsAu0k4GbNygUgXdtHZxAKCq/uoceTICuYrqqtzLgR2Jw4FhKNMGldcx8OFHIQrwV3l5e2AXxdmzQ2NtQDMoOY9blwpsHog0aCe/WrpoJCSFu5LsRnDPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H1uw5iGv; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-5315972826dso2403511e0c.1
-        for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 12:43:18 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-235f9e87f78so12440985ad.2
+        for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 12:50:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751226198; x=1751830998; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=00gfp8O9oE4quHfT3JpHFNXmQu+7dEOFbgWYkEVqZmM=;
-        b=dUzLxHBS3+5V/C9M7Z0CAASVwZwX9J6pxZjDc8IQ6GIxPmAjrB8N2axjR5sq7PtRZP
-         c5w4l47WPZ6DAutY4ptSpKLL/0B5vt89u9h66sZ6g66O0JWmPNH9MMgcdPEuPXt3O4W1
-         91gOXVbxY5dG+vC9WV3Kk+RFbi626J0KD31tNH9Kio7BiQjs0ehH+CEnzS3plQxASs2u
-         KWVHZR7KyFT6VhvwhaWB5uod7QLfugVWZkXLiS3keyxzyVCcyxxhkEJWHm2NDFvNm/tn
-         NghXFGXUPiLE1mY71swsRzSELUW2vchmAKXTEZRoftH39lLEU8fiFAzQvtfDiX/RrvsY
-         suig==
+        d=gmail.com; s=20230601; t=1751226632; x=1751831432; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=scEpvMRNJcRA7SEybT/FzGXA00Dk4ouygtr6rwr7LCo=;
+        b=H1uw5iGvetlH2Cbs3NqSu0hlfCKJHd4EuaRcp3cR3OOLFRoi0ppSzrkHH+eV6sK1p8
+         oel4yBzQSQpAckiHzJ4z5b69OK/PDq8SNoCaIC+hCHDTMVG5UsAFIPAyNC55QIkbuoJH
+         Yx08261mBL80/oQGmjeWOA5yMKCSMAWAk37MH+eTNIV5DkyLdnSVWBFy2iL6RbXiMWNe
+         51KRPrYsXud5Tbn2Tqo6ZoYtYeeUAsN/txo+kD00glo3Etcri+O3A+XDTrrSpMPm/M/z
+         XR6uCwLf37FS2m/xL51Ofe2ZZaclNYCvqmKAvUbyJp0lW8Bc1G7mpna1MBp4i8xfvW7U
+         yR/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751226198; x=1751830998;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=00gfp8O9oE4quHfT3JpHFNXmQu+7dEOFbgWYkEVqZmM=;
-        b=bVPk/QkPlLRqsssH4LdFLVUcmhnsvGtHqV9UiK57Wwe/rLuT+8vvLuhRHRGtPHRI0k
-         /bUTFU34/y/8GKQe48kr9xaz9tOmGizTH9yfmEGez+/2kjHjNJRn0hsBSm5EtWTBggjR
-         d6w4lBBfE1MkoaslAXFPNdRBLAZEt1Yx8s3AVRXvEm4S/flcWLVRo0ssUN+ChCuOEwkN
-         AIwhrcnFqm8cClalitRqt9QMxX4AC3KAeEyi3mebTcAVpt/m457QtPneLhB3W0yxq0XL
-         kp3YFObYaAichudULtENAibLtMBsQku2bVR8J+yQrrFaTKHL3y52Sr0bsYz1MNYkBPO0
-         slVA==
-X-Forwarded-Encrypted: i=1; AJvYcCXUKRE0zdCiivWHLYgxuaKUdhyu4p1wxWXUmyYwBapQnjKGrGrTmJkDMkIR5VMPsba5UJlABNk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMfvctIOatBBCVS995pSoWqJfJmI4higM325vam8LtiiC6zWn1
-	apOjkvfv9xyhckCUgr6vUtZ7vRMubZ6ntw9ZvSxzNlwvCwLIbfG6DfM20GIe0+j5vv2vsFp8QJH
-	zgNOHuk9SYO9X9NLSOkb8ofIx/ddwNl4+mHRs
-X-Gm-Gg: ASbGncsbpK7JtDfXYbvA5oOZN6fe2q+DDuVwYAkIwjI2tcilrr9kNxnA5VVV2E4ynmu
-	Sbnt9cZIeZMWYm6zw6S0uojYJATV9sAEl0zia1yFMSQxsQqUTv5qctOWUXi3WjireZTR7OlbjYt
-	z6p7075CdeKJ5glEQY+7U9P0q3Ua3IdUBCJFp7R0Z65FeY
-X-Google-Smtp-Source: AGHT+IEkk+HbFQqFHiqm9WiJTg3VL03mg+fYp8LGh6fGsZwFcCpYzzeiQc1CohHr/irlht/pjSv6SLIX8ZifcilBRjU=
-X-Received: by 2002:a05:6122:7cb:b0:527:67d9:100d with SMTP id
- 71dfb90a1353d-5330c667622mr6561837e0c.4.1751226197634; Sun, 29 Jun 2025
- 12:43:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751226632; x=1751831432;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=scEpvMRNJcRA7SEybT/FzGXA00Dk4ouygtr6rwr7LCo=;
+        b=Qg4wPIghKjwvuRlX9oF94Q2Kg8YE+iixdS9VUEfGPTl/twp2uQJhGNB/Ce2fKX0yVm
+         1kqUYJkEzoyrUExeubLUsngUNpPeXKXgvDIFy8XtH0guZDUNmi7Y2WIYLcvPH3nzust/
+         zFxVmo8STmzpa0e5+1oUvy8mD60u5Q3+nHhAV8ZBjOKDJq1pcUJfHowG8H/Tmf/+dQQj
+         ylZanvfnNwDhGMQlE5cIM6IGs9ySjDQJ7xT4T4vjFqWSQz30u1B/4ogDEtnG9RENqRDO
+         F99LH1Gy0SV1TYLFtcmmB08Qp6cT3cbexLgOuEMjt5e+qkhBlaWL6GkQHyZxORPhMzyd
+         snqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV6C4UtgdmdaFfbKmGVGLcr+IUG51+zpGhMsM8DHmspFbF18yETT1AZf7ZWsbu9eF11B5AZ49w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEzlLYP+pf3y3srXNIsjpiyMuyjOGo88laTzQfQIqpvka6o84P
+	75dvhzTeyMpuE6S54t0iQT5rKnGaxd55+ilnM4U6M1nwKZxt4UQJlQtKAWP41w==
+X-Gm-Gg: ASbGncvmaLyVKtU/+dBsZU1RonhXALTeDDTP7ms+DUzLVBaY5SGCy8MFfX+3LfNSuZs
+	MBvnV0TQNihPDFfTH16kbQyHka5JBqxKIW5UmnHVItykveLz5c/JwbPQj8j81qEckglrSjmzKPA
+	bhTFxD1AVbbNgIqWVHMCrWnnLLtgzwxkhMDf9Wtmr+3vbXa67vvPxLwSocBREuYnmg6bdstDDr/
+	tS5wFTjXmKA/8T7MWHKYTbdSSmDQZIZSmsBMXJHQo8kLnTtnoViVtsyVOj9gSC06VFFowgQKghJ
+	8EHdV8ou8xe0QEeG8bccvDoBpnmCwSlSdMqdALmIR/XhwrtVsdmNpBlEIxaexrHqqObToaGrviH
+	qBa877GH+75S1f+9aEnNjNgdP+urEF4E/Ljkjbg==
+X-Google-Smtp-Source: AGHT+IE1ntpM49tmpxjsylOclww2bx/cpYBW+VqYTmc0aMZYkTdx4uAjUq/CYd4NthPwkkTBidHMBw==
+X-Received: by 2002:a17:903:1aab:b0:235:eefe:68f4 with SMTP id d9443c01a7336-23ac46066bcmr181298885ad.29.1751226632386;
+        Sun, 29 Jun 2025 12:50:32 -0700 (PDT)
+Received: from localhost (ucsc-guest-169-233-124-66.ucsc.edu. [169.233.124.66])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb2f21fesm64960525ad.73.2025.06.29.12.50.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Jun 2025 12:50:31 -0700 (PDT)
+Date: Sun, 29 Jun 2025 12:50:30 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Lion Ackermann <nnamrec@gmail.com>, netdev@vger.kernel.org,
+	Jiri Pirko <jiri@resnulli.us>, Mingi Cho <mincho@theori.io>
+Subject: Re: Incomplete fix for recent bug in tc / hfsc
+Message-ID: <aGGZBpA3Pn4ll7FO@pop-os.localdomain>
+References: <45876f14-cf28-4177-8ead-bb769fd9e57a@gmail.com>
+ <aFosjBOUlOr0TKsd@pop-os.localdomain>
+ <3af4930b-6773-4159-8a7a-e4f6f6ae8109@gmail.com>
+ <5e4490da-3f6c-4331-af9c-0e6d32b6fc75@gmail.com>
+ <CAM0EoMm+xgb0vkTDMAWy9xCvTF+XjGQ1xO5A2REajmBN1DKu1Q@mail.gmail.com>
+ <d23fe619-240a-4790-9edd-bec7ab22a974@gmail.com>
+ <CAM0EoM=rU91P=9QhffXShvk-gnUwbRHQrwpFKUr9FZFXbbW1gQ@mail.gmail.com>
+ <CAM0EoM=mey1f596GS_9-VkLyTmMqM0oJ7TuGZ6i73++tEVFAKg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250627042352.921-1-markovicbudimir@gmail.com>
-In-Reply-To: <20250627042352.921-1-markovicbudimir@gmail.com>
-From: Cong Wang <xiyou.wangcong@gmail.com>
-Date: Sun, 29 Jun 2025 12:43:06 -0700
-X-Gm-Features: Ac12FXyoD72WYHCXqPXOxuMzIWzgu-ptP5EpvmloDLAa3CxBqsDzJZwYGlalfKY
-Message-ID: <CAM_iQpVm66ErGcm+WriMSoudh8-XYt+GiEH48b0un3G9vpA=oA@mail.gmail.com>
-Subject: Re: Use-after-free in hfsc_enqueue()
-To: Budimir Markovic <markovicbudimir@gmail.com>
-Cc: security@kernel.org, jhs@mojatatu.com, Mingi Cho <mincho@theori.io>, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAM0EoM=mey1f596GS_9-VkLyTmMqM0oJ7TuGZ6i73++tEVFAKg@mail.gmail.com>
 
-Hi Budimir,
+On Sun, Jun 29, 2025 at 10:29:44AM -0400, Jamal Hadi Salim wrote:
+> > On "What do you think the root cause is here?"
+> >
+> > I believe the root cause is that qdiscs like hfsc and qfq are dropping
+> > all packets in enqueue (mostly in relation to peek()) and that result
+> > is not being reflected in the return code returned to its parent
+> > qdisc.
+> > So, in the example you described in this thread, drr is oblivious to
+> > the fact that the child qdisc dropped its packet because the call to
+> > its child enqueue returned NET_XMIT_SUCCESS. This causes drr to
+> > activate a class that shouldn't have been activated at all.
+> >
+> > You can argue that drr (and other similar qdiscs) may detect this by
+> > checking the call to qlen_notify (as the drr patch was
+> > doing), but that seems really counter-intuitive. Imagine writing a new
+> > qdisc and having to check for that every time you call a child's
+> > enqueue. Sure  your patch solves this, but it also seems like it's not
+> > fixing the underlying issue (which is drr activating the class in the
+> > first place). Your patch is simply removing all the classes from their
+> > active lists when you delete them. And your patch may seem ok for now,
+> > but I am worried it might break something else in the future that we
+> > are not seeing.
+> >
+> > And do note: All of the examples of the hierarchy I have seen so far,
+> > that put us in this situation, are nonsensical
+> >
+> 
+> At this point my thinking is to apply your patch and then we discuss a
+> longer term solution. Cong?
 
-On Thu, Jun 26, 2025 at 9:23=E2=80=AFPM Budimir Markovic
-<markovicbudimir@gmail.com> wrote:
->
-> The use-after-free referenced in commit 3f981138109f ("sch_hfsc: Fix qlen
-> accounting bug when using peek in hfsc_enqueue()") is still possible.  Th=
-at
-> commit ensured that qlen_notify is called on sch's parent class during pe=
-ek(),
-> but that class has not yet been added to its active list at this point. I=
-t is
-> only added after hfsc_enqueue() returns, and since no packets are enqueue=
-d it
-> will never be removed. The same applies to any classes further up the
-> hierarchy.
->
-> These commands trigger the bug causing a use-after-free and often a kerne=
-l
-> crash:
->
-> ip link set dev lo up
-> tc qdisc add dev lo root handle 1: drr
-> tc filter add dev lo parent 1: basic classid 1:1
-> tc class add dev lo parent 1: classid 1:1 drr
-> tc qdisc add dev lo parent 1:1 handle 2: hfsc def 1
-> tc class add dev lo parent 2: classid 2:1 hfsc rt m1 8 d 1 m2 0
-> tc qdisc add dev lo parent 2:1 handle 3: netem
-> tc qdisc add dev lo parent 3:1 handle 4: blackhole
-> ping -c1 -W0.01 localhost
-> tc class del dev lo classid 1:1
-> tc filter add dev lo parent 1: basic classid 1:1
-> ping -c1 -W0.01 localhost
->
-> It can be fixed with the following change:
->
-> diff --git a/net/sched/sch_hfsc.c b/net/sched/sch_hfsc.c
-> index 5a7745170..8e25fae48 100644
-> --- a/net/sched/sch_hfsc.c
-> +++ b/net/sched/sch_hfsc.c
-> @@ -1589,8 +1589,13 @@ hfsc_enqueue(struct sk_buff *skb, struct Qdisc *sc=
-h, struct sk_buff **to_free)
->                  * head drop before the first dequeue operation has no ch=
-ance
->                  * to invalidate the deadline.
->                  */
-> -               if (cl->cl_flags & HFSC_RSC)
-> +               if (cl->cl_flags & HFSC_RSC) {
->                         cl->qdisc->ops->peek(cl->qdisc);
-> +                       if (!cl->qdisc->q.qlen) {
-> +                               qdisc_tree_reduce_backlog(sch, -1, -len);
-> +                               return NET_XMIT_DROP;
-> +                       }
-> +               }
->
->         }
->
-> Returning __NET_XMIT_BYPASS prevents sch's parent class from being added =
-to its
-> active list when no packets have been enqueued. It also prevents it from
-> updating its queue length, so we need to do this manually with
-> qdisc_tree_reduce_backlog(). This is necessary because netem_dequeue() as=
-sumes
-> the packet has already been enqueued to its ancestor qdiscs and decreases=
- their
-> queue lengths when dropping the packet.
->
-> qdisc_tree_reduce_backlog() will end up calling qlen_notify on non-active
-> classes, but after the recent hardening of the qlen_notify methods this s=
-hould
-> be safe.
+I agree. If Lion's patch works, it is certainly much better as a bug fix
+for both -net and -stable.
 
-I think this is probably the same as the one reported by Mingi a few
-weeks ago. Your above patch looks reasonable from my glance.
-
-Do you mind submitting a formal patch? Ideally, send it together
-with a selftest (in the same patchset).
+Also for all of those ->qlen_notify() craziness, I think we need to
+rethink about the architecture, _maybe_ there are better architectural
+solutions.
 
 Thanks!
 
