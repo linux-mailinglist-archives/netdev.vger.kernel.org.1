@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-202298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51A4FAED159
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 23:45:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88A71AED15A
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 23:45:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CBD53A160A
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 21:44:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BFE81895276
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 21:45:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84371242909;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F278724293C;
 	Sun, 29 Jun 2025 21:45:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="i3abdx+p"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="ib8FcY9L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBC029B0
-	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 21:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528E123BD13
+	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 21:45:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751233506; cv=none; b=keZjIXfMP7TebOfNa4iQR9Vl9n5A5yKBQ6J4s0i2iMHtoeZ16y5eSFqd+hba+QYz1L8OEG/aX4D39wuSMAm/59tJrp0BgJPyRgRn5av9BSAOUHhfkANP+0woa1JyFYCOtXbc16hhXNG4Nf6vS/K1B27T6KsyvgISMo2XrS16qDw=
+	t=1751233506; cv=none; b=JjQBBtO/LNE6PRJ9pi+rwiEn6y7lBHyD+rj6MCOpplLTftIa2CRCaTsE+81Sd2/JmH+s3Y5PRnIGnKkzM85Co3oeHm+WI2W4T4/6nt2rdYcyyDRKPkNtTfBJQ72CE2AI2hrC6kaWkBOZLtUmaiFSunOIXo2l5W9VuTJamqPESO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1751233506; c=relaxed/simple;
-	bh=EifaHAoAApf7q/Mkx9Mw3DETHvUJ2q8UmDQ+dVcocek=;
+	bh=TdHSpDKAJsP8MFQsAqAYBhsn02nXa3EymYXhSGpLXcs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CWlclhrrMJm0v66moflzsUgHR9VUyBGzxB1zZTgeIjt3WjgON1WRVwM1MmRP7WJ87ezPtrlqB8GWI5O98I3KWmm3DSPJazI5ZAHqNbAMEdGangnoGI6xLNsbWAU/IYhl9XS4Ql9bEWL6RMZEE0bJXU1hWpQNzJ2Y23bR4vMi4XQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=i3abdx+p; arc=none smtp.client-ip=185.125.188.123
+	 MIME-Version; b=FzT797/NwOR54IEiUZ4SVh+G7VCqD29HUyw921VTmZhvDS8LDcwTfYYUQ7eW9UsVS33JeAomdQMMeqYjkL/N4oMSw4A9rRnuKScOcBN/H3VysOS4pFLwVjQQCdWtP2Aw057Dk9wyuJhfWbS2aUjOOdyEZJa27SMK5/s1YpDGxyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=ib8FcY9L; arc=none smtp.client-ip=185.125.188.122
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com [209.85.208.70])
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com [209.85.208.72])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 1BC053F91C
-	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 21:45:02 +0000 (UTC)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id BF5473FE25
+	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 21:45:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1751233502;
-	bh=G60zTzgwmIGQw3RA46ispul5I6p3fmOYvxZfvnCsXEE=;
+	s=20210705; t=1751233503;
+	bh=RRIGUpCZvKb+B8PoLoEDlD3ZTey+s+col6Ou5XQorys=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version;
-	b=i3abdx+pC395RdsIxRGi6wy1GOX1wyFYTjLFMemho0SqpDqI2z6xuvzcVBRfZJzFt
-	 Nt5ci8bFQNWnri3QijJpRco7HKzxHRIvnvVlT9CcWhg0ZjJDxjcDr3SYsrsS9s0P1U
-	 K+aYaXs3XqZV/4NzdDZQu+RkdxSTGU+sz7voTfHuvjY2lK9wTsrMhQpjP01i5GxvEq
-	 AIhkrZJL0Srzsjn5ni/NZp57+Rc9CdJwwm+yjRkyhdDmjiRyq3lLOmD2m0AWUM0r25
-	 B/pZYklRqT+xdb7H3OS5BL/Q3mpeEhIi7V0wuYLsMAgV4OT2ABcaJAt1JH3iB5za/e
-	 585qzCTnqIoig==
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-60c5ed14785so2876373a12.0
-        for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 14:45:02 -0700 (PDT)
+	b=ib8FcY9LDB6r8xJmLsqlDQ2VH0mSEV/lkzmkyx3PUrXedfVByrfFjfmuiCw0DpEgH
+	 rswxTmi//57Kc4oTpEvJU+hXMHZEiKs/vcbX8q2dQ7HIPNCR5IVbLc/O/Z1O7pH9x8
+	 qoGTAm9wXOkOpEGsCnf6L1h+stwg4Lpmxm6TLxquC5jo52cxqoBp+OxjYwZefQ852f
+	 YGnfcWVWN1mT6Y2zlKuzqSekGxYgTLDAbu/CzFRbJ+/vqp2uSw8qIUUDYxmRgpV5B7
+	 yiBR5UuMVGK4MSK9zxHfjp3Vv9rNyZukSvOGdT6XQ/pO4h7moj9qZq9M3aSwSdFvpu
+	 1T8uV+h5P/LmQ==
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-60785c45274so1074017a12.2
+        for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 14:45:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751233500; x=1751838300;
+        d=1e100.net; s=20230601; t=1751233503; x=1751838303;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=G60zTzgwmIGQw3RA46ispul5I6p3fmOYvxZfvnCsXEE=;
-        b=SWCExiklOvcmHDa8H+bg7avIFMbvQIavUEKZzAc4WjC3K0YhtyZWVb/LXuKQJ6kzPL
-         q1S+JvXg5CPThQpWDaqgIanpPfcfpG14Rpt3ZFjHbSX0J8EhJr86qLcv8ngYjduMd0L+
-         UNBjVwsL6fdeRhglqBipeCvDLbCcHT3IzVhKxq7tm2QFGO5c3Hl/xeNQZqgthtis7d9c
-         o7an5nckQwqneVmy6Axkn0+0sOnWoWxVLNbqfbwZRg86Cazb/ljrxxOeZIF0lXhnm/4p
-         F0x9J3i4bOW2bIyhaL3yFEhOcEImoZ8VkYk+dfmsINkcixjQuQhsXeAmGgP32Tkh5hd7
-         RgIw==
-X-Forwarded-Encrypted: i=1; AJvYcCUM5BYkYwPzBquv5DMTy3VUbdF6SdygNDRhM5zbXUptp64chhaEAGUAD5vTa+m2O4p41szt24c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtfHmH/lIJAx9vxz+0rL+ON542ExFcuxFjoTzzIkZKjAXq80B3
-	mzsFzG/Bfs7dfk9SXFlbzmttjmtjm1X6EnjLc2qBKCmBZwYvl9vcMcTXd3uT45i9URqnKSe6EBT
-	ycVZcySARNIUEwzoOBXZXN9QuyHp0hnopVdkscxLAgsd3nthy3474C7VIFukXQi2gKX8CAQzISg
+        bh=RRIGUpCZvKb+B8PoLoEDlD3ZTey+s+col6Ou5XQorys=;
+        b=rPAsusVPuBUO5A2i3hHV+6S+jkOWJQbP9aGDDOMyVEBoJYO0CtanSEsYuvBg4ZDYbK
+         v57xU4I9W46FODHvBWDL8ITMNhl67jTtLzbtN7NbzJJtLG+CsCBjwt/Z63QecV8ovkxe
+         4gUMmELMUyi7VctLs5QuC2HAWWHs5WrwtlkLaAsgF+4AlPm9sgU+V6o7moLXtk9P+Z3j
+         7snKgPE6E0ZNmyOCixgAjLp5p5Coea5MpV7rg0g9wWSfGh+lKuh51Mq/RhUpL8g435N5
+         C/oC5983l/JPowR5tAeVn6UO5f7QR/P6DqQy3j4QotPZn9mm8PsmvwwlcT5S6GjC5PpN
+         JO3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUDHqaxMa7f+Hod58MBr5QI78v3A883BcM+4XkXoOZxU45bp7FOu5i59BpUG8uw0fB6gX16I6M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWT3F4WecUIQ8lHOqJ+b7AlSpu2nGOUuKoc783OxUy1lR2pvKT
+	jD4FEMPpdEfo6IMHuW8H5LsO5qho/vRyRxAY+iKF/Jd/VC5in9ZOzXZ1ijCKG3bGvprUVJIG/Kw
+	iedt6DNSSIhlSaIOqEhSsFc3bDrQa12Is6jmjkuBj0tvAglS8ORTIC0UyvqCeDfFRb9Ko3HpUyg
 	==
-X-Gm-Gg: ASbGncvK9NVHoeAYsyBPk1zEKjzAZ/l3C3PecDuIjZheV1apeg4uYs9q/dRxYReHwys
-	7O8WFLp6Sn9+YqLgyV8GUB1WbqtEv+cqah+34dpF9HnpBsHvDjXUHhOadXhMrbzhdcyYTUYTf3B
-	f2/ZVh6q3wDX6/qsxT5Ta3Q40NJptys5OxlLq8opF2BWzKQgGQt44Uyielz1/P6HMgkZ6e7GoRZ
-	0wltVCvJNWE5+JNAFn7k3NmYQAyXxdpRz3WWxYYKFvotBkqBe7HLV2eKPFJ2tRfRaey3ZZgTM+p
-	DzK5k7MUAU1SSx/Lr6c0hdGorcCp4x7IEd/h0++oSrwNaVPpyQ==
-X-Received: by 2002:a05:6402:2101:b0:60c:4bc0:453e with SMTP id 4fb4d7f45d1cf-60c88b38471mr8622082a12.2.1751233500224;
-        Sun, 29 Jun 2025 14:45:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH2xPyY82dEZPtNOjLLgnJHoQ4Iup9xB3PZexu/WprfMu8neYWm8eCcLIXuCERFbcQhVsIVLg==
-X-Received: by 2002:a05:6402:2101:b0:60c:4bc0:453e with SMTP id 4fb4d7f45d1cf-60c88b38471mr8622063a12.2.1751233499849;
-        Sun, 29 Jun 2025 14:44:59 -0700 (PDT)
+X-Gm-Gg: ASbGncsakBEhDCBFi7oTb3zJ14qyT7g2ML/NMP7Nmsw5OBladrUoviGiUtuFoVhyKzQ
+	wcD6T6jjZMRrgILmYO+Zw1d9zf4ng+g4McYfziS67L/261AFGWsCgXybgHMoQ0rAhbp0wBM/YIc
+	HtGOtb9N8YsiGaY07+rmDzs59+ofCUDmQ2p7Dnw04GUYBeUa47bcjbxH2hgmxZ7uCoDFiWzEsM2
+	0WdQNhlNpt/sTSQrinxuhotBn61tISgTx+vln38O7AvVW4+flXqi+B0d5TbEZqsdEwJTh1xfnkh
+	HsD5EaboMIQmKlWxNWimLYV3bbmizjfcgBHTXaOxZ1KjL+oaSg==
+X-Received: by 2002:a05:6402:5192:b0:604:e6fb:e2e1 with SMTP id 4fb4d7f45d1cf-60c88e8ea14mr9052246a12.33.1751233503129;
+        Sun, 29 Jun 2025 14:45:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH9xBDB9NgljSr2Dmn9+gkgZzFKRns66Vls9DnddU65DI4e8vmYDTMY48hrh5jBiTpMmnrXjQ==
+X-Received: by 2002:a05:6402:5192:b0:604:e6fb:e2e1 with SMTP id 4fb4d7f45d1cf-60c88e8ea14mr9052222a12.33.1751233502705;
+        Sun, 29 Jun 2025 14:45:02 -0700 (PDT)
 Received: from amikhalitsyn.lan ([178.24.219.243])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60c828e1a96sm4712037a12.19.2025.06.29.14.44.58
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60c828e1a96sm4712037a12.19.2025.06.29.14.45.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Jun 2025 14:44:58 -0700 (PDT)
+        Sun, 29 Jun 2025 14:45:02 -0700 (PDT)
 From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
 To: kuniyu@google.com
 Cc: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
@@ -98,9 +98,9 @@ Cc: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
 	Luca Boccassi <bluca@debian.org>,
 	David Rheinsberg <david@readahead.eu>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>
-Subject: [RESEND PATCH net-next 1/6] af_unix: rework unix_maybe_add_creds() to allow sleep
-Date: Sun, 29 Jun 2025 23:44:38 +0200
-Message-ID: <20250629214449.14462-2-aleksandr.mikhalitsyn@canonical.com>
+Subject: [RESEND PATCH net-next 2/6] af_unix: introduce unix_skb_to_scm helper
+Date: Sun, 29 Jun 2025 23:44:39 +0200
+Message-ID: <20250629214449.14462-3-aleksandr.mikhalitsyn@canonical.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250629214449.14462-1-aleksandr.mikhalitsyn@canonical.com>
 References: <20250629214449.14462-1-aleksandr.mikhalitsyn@canonical.com>
@@ -112,11 +112,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-As a preparation for the next patches we need to allow sleeping
-in unix_maybe_add_creds() and also return err. Currently, we can't do
-that as unix_maybe_add_creds() is being called under unix_state_lock().
-There is no need for this, really. So let's move call sites of
-this helper a bit and do necessary function signature changes.
+Instead of open-coding let's consolidate this logic in a separate
+helper. This will simplify further changes.
 
 Cc: linux-kernel@vger.kernel.org
 Cc: netdev@vger.kernel.org
@@ -134,101 +131,46 @@ Cc: Luca Boccassi <bluca@debian.org>
 Cc: David Rheinsberg <david@readahead.eu>
 Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
 ---
- net/unix/af_unix.c | 28 +++++++++++++++++++++-------
- 1 file changed, 21 insertions(+), 7 deletions(-)
+ net/unix/af_unix.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 129388c309b0..6072d89ce2e7 100644
+index 6072d89ce2e7..5efe6e44abdf 100644
 --- a/net/unix/af_unix.c
 +++ b/net/unix/af_unix.c
-@@ -1955,21 +1955,26 @@ static int unix_scm_to_skb(struct scm_cookie *scm, struct sk_buff *skb, bool sen
+@@ -1955,6 +1955,12 @@ static int unix_scm_to_skb(struct scm_cookie *scm, struct sk_buff *skb, bool sen
  	return err;
  }
  
--/*
-+/* unix_maybe_add_creds() adds current task uid/gid and struct pid to skb if needed.
-+ *
++static void unix_skb_to_scm(struct sk_buff *skb, struct scm_cookie *scm)
++{
++	scm_set_cred(scm, UNIXCB(skb).pid, UNIXCB(skb).uid, UNIXCB(skb).gid);
++	unix_set_secdata(scm, skb);
++}
++
+ /* unix_maybe_add_creds() adds current task uid/gid and struct pid to skb if needed.
+  *
   * Some apps rely on write() giving SCM_CREDENTIALS
-  * We include credentials if source or destination socket
-  * asserted SOCK_PASSCRED.
-+ *
-+ * Context: May sleep.
-  */
--static void unix_maybe_add_creds(struct sk_buff *skb, const struct sock *sk,
--				 const struct sock *other)
-+static int unix_maybe_add_creds(struct sk_buff *skb, const struct sock *sk,
-+				const struct sock *other)
- {
- 	if (UNIXCB(skb).pid)
--		return;
-+		return 0;
+@@ -2561,8 +2567,7 @@ int __unix_dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t size,
  
- 	if (unix_may_passcred(sk) || unix_may_passcred(other)) {
- 		UNIXCB(skb).pid = get_pid(task_tgid(current));
- 		current_uid_gid(&UNIXCB(skb).uid, &UNIXCB(skb).gid);
- 	}
-+
-+	return 0;
- }
+ 	memset(&scm, 0, sizeof(scm));
  
- static bool unix_skb_scm_eq(struct sk_buff *skb,
-@@ -2104,6 +2109,10 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
- 		goto out_sock_put;
- 	}
+-	scm_set_cred(&scm, UNIXCB(skb).pid, UNIXCB(skb).uid, UNIXCB(skb).gid);
+-	unix_set_secdata(&scm, skb);
++	unix_skb_to_scm(skb, &scm);
  
-+	err = unix_maybe_add_creds(skb, sk, other);
-+	if (err)
-+		goto out_sock_put;
-+
- restart:
- 	sk_locked = 0;
- 	unix_state_lock(other);
-@@ -2212,7 +2221,6 @@ static int unix_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
- 	if (sock_flag(other, SOCK_RCVTSTAMP))
- 		__net_timestamp(skb);
- 
--	unix_maybe_add_creds(skb, sk, other);
- 	scm_stat_add(other, skb);
- 	skb_queue_tail(&other->sk_receive_queue, skb);
- 	unix_state_unlock(other);
-@@ -2256,6 +2264,10 @@ static int queue_oob(struct sock *sk, struct msghdr *msg, struct sock *other,
- 	if (err < 0)
- 		goto out;
- 
-+	err = unix_maybe_add_creds(skb, sk, other);
-+	if (err)
-+		goto out;
-+
- 	skb_put(skb, 1);
- 	err = skb_copy_datagram_from_iter(skb, 0, &msg->msg_iter, 1);
- 
-@@ -2275,7 +2287,6 @@ static int queue_oob(struct sock *sk, struct msghdr *msg, struct sock *other,
- 		goto out_unlock;
- 	}
- 
--	unix_maybe_add_creds(skb, sk, other);
- 	scm_stat_add(other, skb);
- 
- 	spin_lock(&other->sk_receive_queue.lock);
-@@ -2369,6 +2380,10 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
- 
- 		fds_sent = true;
- 
-+		err = unix_maybe_add_creds(skb, sk, other);
-+		if (err)
-+			goto out_free;
-+
- 		if (unlikely(msg->msg_flags & MSG_SPLICE_PAGES)) {
- 			skb->ip_summed = CHECKSUM_UNNECESSARY;
- 			err = skb_splice_from_iter(skb, &msg->msg_iter, size,
-@@ -2399,7 +2414,6 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
- 			goto out_free;
+ 	if (!(flags & MSG_PEEK)) {
+ 		if (UNIXCB(skb).fp)
+@@ -2947,8 +2952,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+ 				break;
+ 		} else if (unix_may_passcred(sk)) {
+ 			/* Copy credentials */
+-			scm_set_cred(&scm, UNIXCB(skb).pid, UNIXCB(skb).uid, UNIXCB(skb).gid);
+-			unix_set_secdata(&scm, skb);
++			unix_skb_to_scm(skb, &scm);
+ 			check_creds = true;
  		}
  
--		unix_maybe_add_creds(skb, sk, other);
- 		scm_stat_add(other, skb);
- 		skb_queue_tail(&other->sk_receive_queue, skb);
- 		unix_state_unlock(other);
 -- 
 2.43.0
 
