@@ -1,183 +1,92 @@
-Return-Path: <netdev+bounces-202243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9944AECE0C
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 16:47:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 499C1AECE0E
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 16:48:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D28E21896B41
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 14:47:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 769E03B03C3
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 14:47:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05AEC2248BF;
-	Sun, 29 Jun 2025 14:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDB022AE75;
+	Sun, 29 Jun 2025 14:48:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from plesk.hostmyservers.fr (plesk.hostmyservers.fr [45.145.164.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 206694437A;
-	Sun, 29 Jun 2025 14:47:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54FC21CFF6;
+	Sun, 29 Jun 2025 14:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.164.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751208434; cv=none; b=RFeH/9IlAJA0Ccgu07xZxWVxUogjo2XLM/pvgX04U1wSMaM7jr1nKQfUFtAIV5WltM3WdIGll9j6BnF6Gifjcp88OH4lmKmMgcuq88dc5XdDfqsoWAZmIV4CKjCCn2SvD/LksZ8QpY+lRz+4x1G2CxQ2DB4NDn2KDwKMXyj89V8=
+	t=1751208480; cv=none; b=BCn7e+S2CR0ubsT9llaEFNQqLlZIGNnsDa3z35Kpsy84wcwuK7Hx/vVmjFuCSLY7lOUr+rD+zjXjug4hIAVVl1Q69fJjBQo9zX5dPHpd9Z4cj9CfGbyxT1kIzOO0aRTYiAMJue74t3XUBgCvIu8cdmvYZh8F/axgVEtKHw5bRUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751208434; c=relaxed/simple;
-	bh=KClsNYwfxeyKw0Nv6uUMfVDKlblzETmDZmLERrHHVgE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OB2ioMZBvbXpuOBi+zzWKXs+P4MZc/LTjYKyl8b6oueQJSMrdzpCaU5/mkLql/2mrPUggDeRK9EqcemtS2fGEi3xCgu35xkgQTcR2LJ82LHPS0hQK5j0Aes/ftWsUFJiBiQqlNOjk7hgzX06o7LcIJRj6GgmiQO8/xy7iy4w8jQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1uVtJ6-000000001Bw-12Mh;
-	Sun, 29 Jun 2025 14:47:00 +0000
-Date: Sun, 29 Jun 2025 15:46:56 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Frank Wunderlich <linux@fw-web.de>
-Cc: MyungJoo Ham <myungjoo.ham@samsung.com>,
-	Kyungmin Park <kyungmin.park@samsung.com>,
-	Chanwoo Choi <cw00.choi@samsung.com>,
-	Georgi Djakov <djakov@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Johnson Wang <johnson.wang@mediatek.com>,
-	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH v7 07/14] arm64: dts: mediatek: mt7988: add basic
- ethernet-nodes
-Message-ID: <aGFR4PJv0pdKdD94@makrotopia.org>
-References: <20250628165451.85884-1-linux@fw-web.de>
- <20250628165451.85884-8-linux@fw-web.de>
+	s=arc-20240116; t=1751208480; c=relaxed/simple;
+	bh=eM2liCDKnARzi9AhLRurJabRqtSureLL4r0eETuZHvk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=aR+auD4t5o3mJlWBDVShlWc0O1oV61jzVNIwxRwmm9Yaa3ez9ldGYjwjRj2OfRUPn5aY2J+u74F86pJZyEoUoSCXYL6b2Vsl9nsWJ0Mlt/BXwXgOS99utjYvDih+4ZLS3YzC4sB7jlBqxYS9HzHkDtUE4HmE7JyeNmPdnVIaO2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arnaud-lcm.com; spf=pass smtp.mailfrom=arnaud-lcm.com; arc=none smtp.client-ip=45.145.164.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arnaud-lcm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arnaud-lcm.com
+Received: from arnaudlcm-X570-UD.. (unknown [IPv6:2a02:8084:255b:aa00:d1f3:4f54:4c66:bf44])
+	by plesk.hostmyservers.fr (Postfix) with ESMTPSA id ECA7A405BA;
+	Sun, 29 Jun 2025 14:47:54 +0000 (UTC)
+Authentication-Results: Plesk;
+	spf=pass (sender IP is 2a02:8084:255b:aa00:d1f3:4f54:4c66:bf44) smtp.mailfrom=contact@arnaud-lcm.com smtp.helo=arnaudlcm-X570-UD..
+Received-SPF: pass (Plesk: connection is authenticated)
+From: Arnaud Lecomte <contact@arnaud-lcm.com>
+To: syzbot+827ae2bfb3a3529333e9@syzkaller.appspotmail.com
+Cc: agordeev@linux.ibm.com,
+	alibuda@linux.alibaba.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	guwen@linux.alibaba.com,
+	horms@kernel.org,
+	jaka@linux.ibm.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com,
+	tonylu@linux.alibaba.com,
+	wenjia@linux.ibm.com
+Subject: syztest
+Date: Sun, 29 Jun 2025 15:47:48 +0100
+Message-ID: <20250629144748.45117-1-contact@arnaud-lcm.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <67eaf9b8.050a0220.3c3d88.004a.GAE@google.com>
+References: <67eaf9b8.050a0220.3c3d88.004a.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250628165451.85884-8-linux@fw-web.de>
+Content-Transfer-Encoding: 8bit
+X-PPP-Message-ID: <175120847594.11582.8826915060601164203@Plesk>
+X-PPP-Vhost: arnaud-lcm.com
 
-On Sat, Jun 28, 2025 at 06:54:42PM +0200, Frank Wunderlich wrote:
-> From: Frank Wunderlich <frank-w@public-files.de>
-> 
-> Add basic ethernet related nodes.
-> 
-> Mac1+2 needs pcs (sgmii+usxgmii) to work correctly which will be linked
-> later when driver is merged.
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-> ---
-> v6:
-> - fix whitespace-errors for pdma irqs (spaces vs. tabs)
-> - move sram from eth reg to own sram node (needs CONFIG_SRAM)
-> 
-> v5:
-> - add reserved irqs and change names to fe0..fe3
-> - change rx-ringX to pdmaX to be closer to documentation
-> 
-> v4:
-> - comment for fixed-link on gmac0
-> - update 2g5 phy node
->   - unit-name dec instead of hex to match reg property
->   - move compatible before reg
->   - drop phy-mode
-> - add interrupts for RSS
-> - add interrupt-names and drop reserved irqs for ethernet
-> - some reordering
-> - eth-reg and clock whitespace-fix based on angelos review
-> ---
->  arch/arm64/boot/dts/mediatek/mt7988a.dtsi | 137 +++++++++++++++++++++-
->  1 file changed, 134 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi b/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-> index 560ec86dbec0..cf765a6b1fa8 100644
-> --- a/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-> +++ b/arch/arm64/boot/dts/mediatek/mt7988a.dtsi
-> @@ -680,7 +680,28 @@ xphyu3port0: usb-phy@11e13000 {
->  			};
->  		};
->  
-> -		clock-controller@11f40000 {
-> +		xfi_tphy0: phy@11f20000 {
-> +			compatible = "mediatek,mt7988-xfi-tphy";
-> +			reg = <0 0x11f20000 0 0x10000>;
-> +			clocks = <&xfi_pll CLK_XFIPLL_PLL_EN>,
-> +				 <&topckgen CLK_TOP_XFI_PHY_0_XTAL_SEL>;
-> +			clock-names = "xfipll", "topxtal";
-> +			resets = <&watchdog 14>;
-> +			mediatek,usxgmii-performance-errata;
-> +			#phy-cells = <0>;
-> +		};
-> +
-> +		xfi_tphy1: phy@11f30000 {
-> +			compatible = "mediatek,mt7988-xfi-tphy";
-> +			reg = <0 0x11f30000 0 0x10000>;
-> +			clocks = <&xfi_pll CLK_XFIPLL_PLL_EN>,
-> +				 <&topckgen CLK_TOP_XFI_PHY_1_XTAL_SEL>;
-> +			clock-names = "xfipll", "topxtal";
-> +			resets = <&watchdog 15>;
-> +			#phy-cells = <0>;
-> +		};
-> +
-> +		xfi_pll: clock-controller@11f40000 {
->  			compatible = "mediatek,mt7988-xfi-pll";
->  			reg = <0 0x11f40000 0 0x1000>;
->  			resets = <&watchdog 16>;
-> @@ -714,19 +735,129 @@ phy_calibration_p3: calib@97c {
->  			};
->  		};
->  
-> -		clock-controller@15000000 {
-> +		ethsys: clock-controller@15000000 {
->  			compatible = "mediatek,mt7988-ethsys", "syscon";
->  			reg = <0 0x15000000 0 0x1000>;
->  			#clock-cells = <1>;
->  			#reset-cells = <1>;
->  		};
->  
-> -		clock-controller@15031000 {
-> +		ethwarp: clock-controller@15031000 {
->  			compatible = "mediatek,mt7988-ethwarp";
->  			reg = <0 0x15031000 0 0x1000>;
->  			#clock-cells = <1>;
->  			#reset-cells = <1>;
->  		};
-> +
-> +		eth: ethernet@15100000 {
-> +			compatible = "mediatek,mt7988-eth";
-> +			reg = <0 0x15100000 0 0x80000>;
+#syz test
 
-I think this should be
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -126,8 +126,12 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
+ 	struct smc_sock *smc;
+ 	struct sock *child;
+ 
++	lockdep_assert_held_read(&sk->sk_callback_lock);
+ 	smc = smc_clcsock_user_data(sk);
+ 
++	if (!smc)
++		goto drop;
++
+ 	if (READ_ONCE(sk->sk_ack_backlog) + atomic_read(&smc->queued_smc_hs) >
+ 				sk->sk_max_ack_backlog)
+ 		goto drop;
+-- 
+2.43.0
 
-reg = <0 0x15100000 0 0x40000>;
-
-as the range from 15140000 ~ 1517ffff is used as SRAM on MT7981/MT7986 and
-doesn't seem to be used at all on MT7988.
-
-root@OpenWrt:~# devmem 0x15140000 32
-0xDEADBEEF
-...
-root@OpenWrt:~# devmem 0x1517fffc 32
-0xDEADBEEF
-(with 0xDEADBEEF all that range)
 
