@@ -1,70 +1,64 @@
-Return-Path: <netdev+bounces-202227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E4A3AECCA1
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 14:47:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD2D8AECCE8
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 15:35:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58DA918910C0
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 12:47:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06A0D3B6612
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 13:34:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D48214A94;
-	Sun, 29 Jun 2025 12:47:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="fuioOJEB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F211622127B;
+	Sun, 29 Jun 2025 13:35:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-20.smtpout.orange.fr [80.12.242.20])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from plesk.hostmyservers.fr (plesk.hostmyservers.fr [45.145.164.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75DC62AD1C;
-	Sun, 29 Jun 2025 12:47:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1527E1F92A;
+	Sun, 29 Jun 2025 13:35:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.164.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751201222; cv=none; b=rMd/zwQc0iTZbrCtBANDbOWcY4TN3aBNEZwwZZ6oxRind2mhKOMOrKKFGY3BMdwHWve/uoAVDrHby1NOdivwm2Ws29ERK7eKT4lHySG4jL29iv+rFyqm0/OWsikHMEetb0AOAMPYXq+8WB5S67+2L2gojc3jHOZET8Tg8xRteIM=
+	t=1751204111; cv=none; b=qAEeIxOmHksQ1mOWEm3porL95xTeru+dozEFwkm5SM2EDLwdlZGDbj1ChSwYFJx9RnBAzqtMrAYw17OoQJqpHWwxC0LCU+28pmRX/L1dGw1YVw9SU5yQUFDhsqKdkxavDXGUcr+3pu3tDn5aTnB/gGcXG9LPCFBE4zfvNtVa5Yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751201222; c=relaxed/simple;
-	bh=Ip7hnQPOpGF9wXLlvKTRbOv0ZV/zi9h56UqKTQhsm9c=;
+	s=arc-20240116; t=1751204111; c=relaxed/simple;
+	bh=tcug8XrJIcCuYfiSBxqFOEwin4mfCE6UNDWtr7RJpYQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XGOQEp4Y3JGzGlQDmrnww+Vdc75+D/CQR0VRvm4L+fyKqpMMsSQZckWJ4/QbI+wAk7HVpGbiInrKa4AZqDI3pG0SpzsgGrTwFZUfNNyHm05IL956Idw3U+Ff3LTdDiaG+oLm/SM+iFK+3dc/st4a2ZzXrY7LyHeo4vT43ksQ1lA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=fuioOJEB; arc=none smtp.client-ip=80.12.242.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from fedora.home ([IPv6:2a01:cb10:785:b00:8347:f260:7456:7662])
-	by smtp.orange.fr with ESMTPA
-	id VrHvu4ESL84Z8VrI6uRtOD; Sun, 29 Jun 2025 14:37:51 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1751200671;
-	bh=U2KNLOTVqBb7xYxBtu5LEwvC5LnUw+sbt8wZBMJoIcA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=fuioOJEBsQCPcmq+MwQ6AEShAuXOPl3NcGoVlDv4s7ImHWrmTjLrLSPc1ZXF2yDu3
-	 9sajVftQDEdNAik8Y3k0BXIVD82Cnk55/2QaSQ71KtX2ejwFzMd4AB4Sp8LxgA/Uqp
-	 a3IgLUVyTEaYj7kLxo0tUuTv4N8ZazjpqFrjQ1IOIKeGx6Ch5O6UuIYSwXx/0+XLkf
-	 7SJj2MgiYxSqRFXCxYNO7p54KztMJ/S3sJsU9U3tAXvBaYYVJ2Qw8ORrUE83nQRcKS
-	 EGBRLexSqCGsQ58h32S9cxnXbX3I41ovT2gNj9ron0zEhfe44ir5MSLNorKICf58Yv
-	 HU1F7dEs5GXOw==
-X-ME-Helo: fedora.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sun, 29 Jun 2025 14:37:51 +0200
-X-ME-IP: 2a01:cb10:785:b00:8347:f260:7456:7662
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next 2/2] net: dsa: mv88e6xxx: Use kcalloc()
-Date: Sun, 29 Jun 2025 14:35:50 +0200
-Message-ID: <2f4fca4ff84950da71e007c9169f18a0272476f3.1751200453.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <46040062161dda211580002f950a6d60433243dc.1751200453.git.christophe.jaillet@wanadoo.fr>
-References: <46040062161dda211580002f950a6d60433243dc.1751200453.git.christophe.jaillet@wanadoo.fr>
+	 MIME-Version; b=FsvrUuRMbbFYl5LJIRG+uXJMZPd5jE02DS6pMLnDF5JhAE2mvt9Su2SLqKhhWQSjdqeJJP/jzvhU3lNV3d+UNuE3OvtHMzAFlHIj0raKKu3jHmmT2vypvOEVqYl7TAul2JgylJ/3puexfpUShbnK9QxbShySzEq9SKChtTGJk6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arnaud-lcm.com; spf=pass smtp.mailfrom=arnaud-lcm.com; arc=none smtp.client-ip=45.145.164.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arnaud-lcm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arnaud-lcm.com
+Received: from arnaudlcm-X570-UD.. (unknown [IPv6:2a02:8084:255b:aa00:d1f3:4f54:4c66:bf44])
+	by plesk.hostmyservers.fr (Postfix) with ESMTPSA id 0692241B49;
+	Sun, 29 Jun 2025 13:29:39 +0000 (UTC)
+Authentication-Results: Plesk;
+	spf=pass (sender IP is 2a02:8084:255b:aa00:d1f3:4f54:4c66:bf44) smtp.mailfrom=contact@arnaud-lcm.com smtp.helo=arnaudlcm-X570-UD..
+Received-SPF: pass (Plesk: connection is authenticated)
+From: Arnaud Lecomte <contact@arnaud-lcm.com>
+To: syzbot+827ae2bfb3a3529333e9@syzkaller.appspotmail.com
+Cc: agordeev@linux.ibm.com,
+	alibuda@linux.alibaba.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	guwen@linux.alibaba.com,
+	horms@kernel.org,
+	jaka@linux.ibm.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com,
+	tonylu@linux.alibaba.com,
+	wenjia@linux.ibm.com
+Subject: syztest
+Date: Sun, 29 Jun 2025 14:29:32 +0100
+Message-ID: <20250629132933.33599-1-contact@arnaud-lcm.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <67eaf9b8.050a0220.3c3d88.004a.GAE@google.com>
+References: <67eaf9b8.050a0220.3c3d88.004a.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,58 +66,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-PPP-Message-ID: <175120378100.6050.10331989249896580154@Plesk>
+X-PPP-Vhost: arnaud-lcm.com
 
-Use kcalloc() instead of hand writing it. This is less verbose.
+#syz test
 
-Also move the initialization of 'count' to save some LoC.
-
-On a x86_64, with allmodconfig, as an example:
-Before:
-======
-   text	   data	    bss	    dec	    hex	filename
-  18652	   5920	     64	  24636	   603c	drivers/net/dsa/mv88e6xxx/devlink.o
-
-After:
-=====
-   text	   data	    bss	    dec	    hex	filename
-  18498	   5920	     64	  24482	   5fa2	drivers/net/dsa/mv88e6xxx/devlink.o
-
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
-Compile tested only
----
- drivers/net/dsa/mv88e6xxx/devlink.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/dsa/mv88e6xxx/devlink.c b/drivers/net/dsa/mv88e6xxx/devlink.c
-index aec652e33fc1..da69e0b85879 100644
---- a/drivers/net/dsa/mv88e6xxx/devlink.c
-+++ b/drivers/net/dsa/mv88e6xxx/devlink.c
-@@ -376,19 +376,14 @@ static int mv88e6xxx_region_atu_snapshot(struct devlink *dl,
- 	struct dsa_switch *ds = dsa_devlink_to_ds(dl);
- 	struct mv88e6xxx_devlink_atu_entry *table;
- 	struct mv88e6xxx_chip *chip = ds->priv;
--	int fid = -1, err = 0, count;
-+	int fid = -1, err = 0, count = 0;
- 
--	table = kmalloc_array(mv88e6xxx_num_databases(chip),
--			      sizeof(struct mv88e6xxx_devlink_atu_entry),
--			      GFP_KERNEL);
-+	table = kcalloc(mv88e6xxx_num_databases(chip),
-+			sizeof(struct mv88e6xxx_devlink_atu_entry),
-+			GFP_KERNEL);
- 	if (!table)
- 		return -ENOMEM;
- 
--	memset(table, 0, mv88e6xxx_num_databases(chip) *
--	       sizeof(struct mv88e6xxx_devlink_atu_entry));
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -123,11 +123,14 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
+ 					  struct request_sock *req_unhash,
+ 					  bool *own_req)
+ {
++        read_lock_bh(&((struct sock *)sk)->sk_callback_lock);
+ 	struct smc_sock *smc;
+ 	struct sock *child;
 -
--	count = 0;
--
- 	mv88e6xxx_reg_lock(chip);
+ 	smc = smc_clcsock_user_data(sk);
  
- 	while (1) {
++	if (!smc)
++		goto drop;
++
+ 	if (READ_ONCE(sk->sk_ack_backlog) + atomic_read(&smc->queued_smc_hs) >
+ 				sk->sk_max_ack_backlog)
+ 		goto drop;
+@@ -148,9 +151,11 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
+ 		if (inet_csk(child)->icsk_af_ops == inet_csk(sk)->icsk_af_ops)
+ 			inet_csk(child)->icsk_af_ops = smc->ori_af_ops;
+ 	}
++	read_unlock_bh(&((struct sock *)sk)->sk_callback_lock);
+ 	return child;
+ 
+ drop:
++	read_unlock_bh(&((struct sock *)sk)->sk_callback_lock);
+ 	dst_release(dst);
+ 	tcp_listendrop(sk);
+ 	return NULL;
+@@ -2613,7 +2618,7 @@ int smc_listen(struct socket *sock, int backlog)
+ 	int rc;
+ 
+ 	smc = smc_sk(sk);
+-	lock_sock(sk);
++	lock_sock(sock->sk);
+ 
+ 	rc = -EINVAL;
+ 	if ((sk->sk_state != SMC_INIT && sk->sk_state != SMC_LISTEN) ||
 -- 
-2.50.0
+2.43.0
 
 
