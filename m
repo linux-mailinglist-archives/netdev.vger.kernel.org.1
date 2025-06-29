@@ -1,92 +1,74 @@
-Return-Path: <netdev+bounces-202211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC7ACAECB79
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 07:54:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22612AECB63
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 07:16:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 313983B43A9
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 05:54:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 260F1189838D
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 05:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DF411C5D53;
-	Sun, 29 Jun 2025 05:54:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1F10184E;
+	Sun, 29 Jun 2025 05:16:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nnSXKexx"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="maTAq/EX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AE01F92A
-	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 05:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6654CEC4;
+	Sun, 29 Jun 2025 05:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751176475; cv=none; b=XEVh/r8en3ZY/ByGCIX/TztE0HI/MmC499mU0R2gyWjMoIglU79pc5dI0Sm+jsti87g5M6z6Us/9+VdtYjkL0c77OEtcM4sU5hhm4Ye0Cj0+xZBucz8OhVvh7+eOhCsMJwmD6iLvaVecNBgoLoznCzQZ4zigX3AdDY4NxONDMKM=
+	t=1751174201; cv=none; b=Op4ZB+4QFHJRXJ7YpQE6lAPaYulcK1SsqpladRF9pd2Fu+YB/Uy4r+igU7rUhPvjY/cRAglWTrWef9ON8x1jIh9l4Qw+whmUMy+YuaPJPj/A3n8Eltzqzdapjpi3vmeliPX50B7RuxwQwGwJDfiH2dZ+v39zRYI3iZAOoyo1iHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751176475; c=relaxed/simple;
-	bh=acRO77bmGgaltNrloiJVwPAJzzJZa7ZshYnMyoKmwUw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PoNkvZaKSxn24ag/vbs5X7SqWaeIIV+LzyOSKMnkPiPjiRCCh2D8405YMpkHULmgXCsZlVYJO2IvWmh54cXCiv9R/6bCEP5vPVLR9z3/gvWspN86KzZHnprpoW++jaXTb05JVCDQMZYBPViyDdeewjPCjWGNH9eYDjBQUNRSG5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nnSXKexx; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b2fd091f826so3117002a12.1
-        for <netdev@vger.kernel.org>; Sat, 28 Jun 2025 22:54:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751176472; x=1751781272; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZM7xZ6DHY+WfrWlrzC9MhyQMj+5i/LhY63UoQQGbUpU=;
-        b=nnSXKexxtJQGOjkoyrevGVhWQYflTe+HlECYPSEDj6SZ9Pa/hCYqgc37ZTnezNiAuB
-         Og3wVEbMmnerJRbP6vBWH4Pup6cpq0gRrj+m8n0Opj+XDa7NB62EiZHVNCAZPlSX4jpi
-         yfmX58apmCyt014JS8hfKz6ON+4K8qA2nlCB/vT5WXYv8LvDuOrvMBTXLdQWlmOSkY/i
-         zwgLMDexEkHBKOtcpe+Q+CCysNFGqLnlA3VRXSR05u3QG4+Rtz6WrjJOjrs8C/jWYwH9
-         cZ9Jv/ihrCenHjGyXMCiGvjm+dgHA1Kf+jm042gjWroGN96Ek6wu1Kewy0cylhAwI8Rf
-         ANxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751176472; x=1751781272;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZM7xZ6DHY+WfrWlrzC9MhyQMj+5i/LhY63UoQQGbUpU=;
-        b=rsPOkmN/ASeAkRHi+3Fpu2oMPjlMSRRXgbefdNUhx7aW7dUh5CO3HNmAh2rVM3Mb8a
-         3BJV1J1wYyyXhy4iMyH7NgkS9fCbHu5KI9jfOi6uTigemCj0ssczNQuCieoH98ObLBNG
-         pWizxgpLYNnBHq2FJyU2xeNmsUHNZsg/pMmh/iLedjJKiHWZiQpBjYIJADAaYebCF6ZZ
-         CLZt9DZh/jYsWkvKoKEZymzfsR5XS/vyRfQJ6Vp8NaPZemBCK8dR9am/OsQW7mEDaMgz
-         o0apc0JrTLyzfDPJsaRYgEEx7SwqJRUeSuIKyDmUGbMvRzORHd1HFY922AFumnDlUTTQ
-         aDXA==
-X-Gm-Message-State: AOJu0Yzhvw1kc0N999zHTsKnMfoZvBUePfWgMkpsmda9z3WNou2znWlz
-	qwIWjilIrMzYI3qSnS5GH/H86AVPm3UW8zhQhncOr/cZI5QH4qBlhnc+mf3ZD0xqqZM=
-X-Gm-Gg: ASbGnctMY48z3nevIfrsRsxCDYMRmY+t+rZpwgZ93u5yse8xfUoVo3AG13oP2dQkIN2
-	WdpGcpd3PNWoRBvuUb6qNkX7aoN2PCe+K2hlIz+ipBR4aXrtA5dpQCV9D7uw5UWnVRhAWl3T1q7
-	PsW2UtL6nD8XNJynH2IZonVXcQVer+VjnSXe2iaeMiTj9fLFZwxprFXu5DC4DrD7wA4UsY1IS21
-	M9F9P+AwnHqScdGK1Vb8/+BOXIWe5MsU2sdPGCfDvVnwFTmJF3/8J8SUo2u7gXpzUVDIIi5KJW/
-	IDq3kzRu7SG0tWyuymkkxoAOdff8M8cdgYc9D17rNEFkyctafqkzHm2xGADzg3wnrwTGk5ArIQ=
-	=
-X-Google-Smtp-Source: AGHT+IFiWcZgwmidMSylItrnMnXJQ7ccbjNL3ueUAETsON3wPFWI1hiESx20H9ohf11nThhotIPptg==
-X-Received: by 2002:a17:90b:55d0:b0:311:482a:f956 with SMTP id 98e67ed59e1d1-316d69bf0cbmr18474486a91.5.1751176472206;
-        Sat, 28 Jun 2025 22:54:32 -0700 (PDT)
-Received: from dustpuppy.laguna.lan ([47.156.206.103])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-315f539e6b5sm10054237a91.13.2025.06.28.22.54.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Jun 2025 22:54:31 -0700 (PDT)
-From: Eric Work <work.eric@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Work <work.eric@gmail.com>,
-	Igor Russkikh <irusskikh@marvell.com>,
-	Mark Starovoitov <mstarovoitov@marvell.com>,
-	Dmitry Bogdanov <dbogdanov@marvell.com>,
-	Pavel Belous <pbelous@marvell.com>,
-	Nikita Danilov <ndanilov@marvell.com>
-Subject: [PATCH net-next] net: atlantic: add set_power to fw_ops for atl2 to fix wol
-Date: Sat, 28 Jun 2025 22:15:28 -0700
-Message-ID: <20250629051535.5172-1-work.eric@gmail.com>
-X-Mailer: git-send-email 2.50.0
+	s=arc-20240116; t=1751174201; c=relaxed/simple;
+	bh=5YCtt4xWoE2sFZbqLhmFUZNY5xZBfrLF3umVblZJwhs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GPuZ1qEjmHSOOLSiRu3nv5UYoOX6prmBW4ZneUgxEHvTiYIKGG8T5nR1dNEkM2Mc/jmitDPUS7/dGHNMjwe01rbHV7RWvEw/aCBmgRy0vuPLsqcy8RR8+JuZeMnhmAInKXlgcI3rl/N60qZ3Y7uvL1xu8EW/27o21WeX1Jvl6F0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=maTAq/EX; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55T01Ivl011733;
+	Sun, 29 Jun 2025 05:16:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=PF3DZSZbA4tBUtEFvdIVO9kArXETg
+	OS8vUkIBIamiuY=; b=maTAq/EX1k5GlkKyZO1ehQsgN3jQR6Nv7VD9+jJer3dyL
+	KMJzWSfGNnjVkd0FMYct8WckbAdjjoqOzitmqTKDWKQQ4NLtzGDZxkq5b8rHlZB0
+	auvO/Pvgqa2QzYiOdJg0+mH7QUoY1+C3QX9f+y/6y2kfrNqbFkzwvyDOjQ9YV9lC
+	/rViAfbMq+NWfngAxp5UZ75eVPhWd0xwmehkXVj6ieRbRrN3zmQT2nHdnbCV5ly4
+	D+0UotUYLjoh9hk5zq48bY0udJ7vQZEy9VHNxfXX+J8JiE9ZoKh1i3ZE2IN1kcml
+	SZwrEPmLSBQtIEnkW2+Uttoth4pDcb1tW5L4H20Og==
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47j7af0u4x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 29 Jun 2025 05:16:19 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55T57ZGT038552;
+	Sun, 29 Jun 2025 05:16:10 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 47j6u78t87-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 29 Jun 2025 05:16:10 +0000
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55T5BM8A020395;
+	Sun, 29 Jun 2025 05:16:09 GMT
+Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 47j6u78t82-1;
+	Sun, 29 Jun 2025 05:16:09 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: sgoutham@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        horms@kernel.org, netdev@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH net v2] net: thunderx: avoid direct MTU assignment after WRITE_ONCE()
+Date: Sat, 28 Jun 2025 22:15:37 -0700
+Message-ID: <20250629051540.518216-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,125 +76,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-06-27_05,2025-06-27_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0
+ mlxlogscore=999 malwarescore=0 mlxscore=0 adultscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2505160000 definitions=main-2506290041
+X-Proofpoint-ORIG-GUID: E4FMocrkEVo34wSxTFAcXpK3dmRZfjCk
+X-Proofpoint-GUID: E4FMocrkEVo34wSxTFAcXpK3dmRZfjCk
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI5MDA0MiBTYWx0ZWRfX1XzUF28HmOio 3Rmpgb3lys6DDXLsPaDs2C8BdToQupenPxVwilEZUjN6j1z+mgE3cV+C17Gs/h/KsHwZwlzlQk3 Dz0sbvmmGSeLKzlFlN7i3+jBAedgCI5s/9Dn7BvnQgjAwmRY7Ao5AmNydKibehN+tnwr+1zhWX1
+ kWNcaOY0pO8H1nbC0VOYgnqrszm/vi0ryUWmGbXeoFdVn42Te73mcy6CyaWHbKBK/+VHCjvsKmF mKR0uEhZMq+Bazpseg6BOue+YtJevqe2DjOscAlg4PCJh3FLfsvupHT17mJj4hNP5ns/l9r0TEd C7fXIudW81WXFZGrI1ZBPaRgE0tDAbP055bofUCtw4kBj9Rcq3ZDGocNL/3NYGbQbtr3dsdl38j
+ Tflqtq0xuuZjKuDJ0ARtF5I0GEOmdBPvYFV+wEEJwgHWsuKGu+lj0p/rNNyOkYDa9IftfG6H
+X-Authority-Analysis: v=2.4 cv=b5Cy4sGx c=1 sm=1 tr=0 ts=6860cc23 cx=c_pps a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17 a=6IFa9wvqVegA:10 a=yPCof4ZbAAAA:8 a=Heg8zcIur3sJgoQ754cA:9
 
-Aquantia AQC113(C) using ATL2FW doesn't properly prepare the NIC for
-enabling wake-on-lan. The FW operation `set_power` was only implemented
-for `hw_atl` and not `hw_atl2`. Implement the `set_power` functionality
-for `hw_atl2`.
+The current logic in nicvf_change_mtu() writes the new MTU to
+netdev->mtu using WRITE_ONCE() before verifying if the hardware
+update succeeds. However on hardware update failure, it attempts
+to revert to the original MTU using a direct assignment
+(netdev->mtu = orig_mtu)
+which violates the intended of WRITE_ONCE protection introduced in
+commit 1eb2cded45b3 ("net: annotate writes on dev->mtu from
+ndo_change_mtu()")
 
-Tested with both AQC113 and AQC113C devices. Confirmed you can shutdown
-the system and wake from S5 using magic packets. NIC was previously
-powered off when entering S5. If the NIC was configured for WOL by the
-Windows driver, loading the atlantic driver would disable WOL.
+Additionally, WRITE_ONCE(netdev->mtu, new_mtu) is unnecessarily
+performed even when the device is not running.
 
-Partially cherry-picks changes from commit,
-https://github.com/Aquantia/AQtion/commit/37bd5cc
+Fix this by:
+  Only writing netdev->mtu after successfully updating the hardware.
+  Skipping hardware update when the device is down, and setting MTU
+  directly.
+  Remove unused variable orig_mtu.
 
-Attributing original authors from Marvell for the referenced commit.
+This ensures that all writes to netdev->mtu are consistent with
+WRITE_ONCE expectations and avoids unintended state corruption
+on failure paths.
 
-Closes: https://github.com/Aquantia/AQtion/issues/70
-Co-developed-by: Igor Russkikh <irusskikh@marvell.com>
-Co-developed-by: Mark Starovoitov <mstarovoitov@marvell.com>
-Co-developed-by: Dmitry Bogdanov <dbogdanov@marvell.com>
-Co-developed-by: Pavel Belous <pbelous@marvell.com>
-Co-developed-by: Nikita Danilov <ndanilov@marvell.com>
-Signed-off-by: Eric Work <work.eric@gmail.com>
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
 ---
+Note: This change is not tested due to hardware availability.
+v1 -> v2
+remove unused variable orig_mtu.
+---
+ drivers/net/ethernet/cavium/thunder/nicvf_main.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-Notes:
-    The changes within this patch were originally written by developers from
-    Marvell (formerly Aquantia) as mentioned in the patch trailer using
-    Co-developed-by. Adding the `set_power` function for ATL2FW was one of
-    many changes that were released as part of the v2.4.7 update for the
-    vendor atlantic driver. I have only copied the functions necessary to
-    enable WoL and modified the required functions to work with the upstream
-    Linux kernel and followed netdev conventions (reverse xmas).
-    
-    The latest driver from Marvell can be obtained from the following page,
-    https://www.marvell.com/support/downloads.html, resulting in the link,
-    https://www.marvell.com/content/dam/marvell/en/drivers/07-18-24_Marvell_Linux_2.5.12.zip
-    
-    An earlier version of the driver was published by Aquantia on GitHub at
-    https://github.com/aquantia/AQtion. The community has been using this
-    GitHub project to discuss issues with the atlantic driver (even those
-    not present in the GitHub repo), including the lack of WoL support in
-    the upstream Linux kernel.
-
- .../net/ethernet/aquantia/atlantic/aq_hw.h    |  2 +
- .../atlantic/hw_atl2/hw_atl2_utils_fw.c       | 39 +++++++++++++++++++
- 2 files changed, 41 insertions(+)
-
-diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_hw.h b/drivers/net/ethernet/aquantia/atlantic/aq_hw.h
-index 42c0efc1b455..4e66fd9b2ab1 100644
---- a/drivers/net/ethernet/aquantia/atlantic/aq_hw.h
-+++ b/drivers/net/ethernet/aquantia/atlantic/aq_hw.h
-@@ -113,6 +113,8 @@ struct aq_stats_s {
- #define AQ_HW_POWER_STATE_D0   0U
- #define AQ_HW_POWER_STATE_D3   3U
+diff --git a/drivers/net/ethernet/cavium/thunder/nicvf_main.c b/drivers/net/ethernet/cavium/thunder/nicvf_main.c
+index aebb9fef3f6eb..633244bc00f35 100644
+--- a/drivers/net/ethernet/cavium/thunder/nicvf_main.c
++++ b/drivers/net/ethernet/cavium/thunder/nicvf_main.c
+@@ -1578,7 +1578,6 @@ int nicvf_open(struct net_device *netdev)
+ static int nicvf_change_mtu(struct net_device *netdev, int new_mtu)
+ {
+ 	struct nicvf *nic = netdev_priv(netdev);
+-	int orig_mtu = netdev->mtu;
  
-+#define	AQ_FW_WAKE_ON_LINK_RTPM BIT(10)
+ 	/* For now just support only the usual MTU sized frames,
+ 	 * plus some headroom for VLAN, QinQ.
+@@ -1589,16 +1588,18 @@ static int nicvf_change_mtu(struct net_device *netdev, int new_mtu)
+ 		return -EINVAL;
+ 	}
+ 
+-	WRITE_ONCE(netdev->mtu, new_mtu);
+ 
+-	if (!netif_running(netdev))
++	if (!netif_running(netdev)) {
++		WRITE_ONCE(netdev->mtu, new_mtu);
+ 		return 0;
++	}
+ 
+ 	if (nicvf_update_hw_max_frs(nic, new_mtu)) {
+-		netdev->mtu = orig_mtu;
+ 		return -EINVAL;
+ 	}
+ 
++	WRITE_ONCE(netdev->mtu, new_mtu);
 +
- #define AQ_HW_FLAG_STARTED     0x00000004U
- #define AQ_HW_FLAG_STOPPING    0x00000008U
- #define AQ_HW_FLAG_RESETTING   0x00000010U
-diff --git a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c
-index 52e2070a4a2f..7370e3f76b62 100644
---- a/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c
-+++ b/drivers/net/ethernet/aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c
-@@ -462,6 +462,44 @@ static int aq_a2_fw_get_mac_temp(struct aq_hw_s *self, int *temp)
- 	return aq_a2_fw_get_phy_temp(self, temp);
+ 	return 0;
  }
  
-+static int aq_a2_fw_set_wol_params(struct aq_hw_s *self, const u8 *mac, u32 wol)
-+{
-+	struct mac_address_aligned_s mac_address;
-+	struct link_control_s link_control;
-+	struct wake_on_lan_s wake_on_lan;
-+
-+	memcpy(mac_address.aligned.mac_address, mac, ETH_ALEN);
-+	hw_atl2_shared_buffer_write(self, mac_address, mac_address);
-+
-+	memset(&wake_on_lan, 0, sizeof(wake_on_lan));
-+
-+	if (wol & WAKE_MAGIC)
-+		wake_on_lan.wake_on_magic_packet = 1U;
-+
-+	if (wol & (WAKE_PHY | AQ_FW_WAKE_ON_LINK_RTPM))
-+		wake_on_lan.wake_on_link_up = 1U;
-+
-+	hw_atl2_shared_buffer_write(self, sleep_proxy, wake_on_lan);
-+
-+	hw_atl2_shared_buffer_get(self, link_control, link_control);
-+	link_control.mode = AQ_HOST_MODE_SLEEP_PROXY;
-+	hw_atl2_shared_buffer_write(self, link_control, link_control);
-+
-+	return hw_atl2_shared_buffer_finish_ack(self);
-+}
-+
-+static int aq_a2_fw_set_power(struct aq_hw_s *self, unsigned int power_state,
-+			      const u8 *mac)
-+{
-+	u32 wol = self->aq_nic_cfg->wol;
-+	int err = 0;
-+
-+	if (wol)
-+		err = aq_a2_fw_set_wol_params(self, mac, wol);
-+
-+	return err;
-+}
-+
- static int aq_a2_fw_set_eee_rate(struct aq_hw_s *self, u32 speed)
- {
- 	struct link_options_s link_options;
-@@ -605,6 +643,7 @@ const struct aq_fw_ops aq_a2_fw_ops = {
- 	.set_state          = aq_a2_fw_set_state,
- 	.update_link_status = aq_a2_fw_update_link_status,
- 	.update_stats       = aq_a2_fw_update_stats,
-+	.set_power          = aq_a2_fw_set_power,
- 	.get_mac_temp       = aq_a2_fw_get_mac_temp,
- 	.get_phy_temp       = aq_a2_fw_get_phy_temp,
- 	.set_eee_rate       = aq_a2_fw_set_eee_rate,
 -- 
-2.49.0
+2.46.0
 
 
