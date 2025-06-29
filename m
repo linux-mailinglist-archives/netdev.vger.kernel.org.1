@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-202299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88A71AED15A
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 23:45:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 46FE4AED15E
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 23:46:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BFE81895276
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 21:45:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F123189660A
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 21:46:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F278724293C;
-	Sun, 29 Jun 2025 21:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E45123FC68;
+	Sun, 29 Jun 2025 21:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="ib8FcY9L"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="n5A1C9jZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528E123BD13
-	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 21:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5933233D64
+	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 21:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751233506; cv=none; b=JjQBBtO/LNE6PRJ9pi+rwiEn6y7lBHyD+rj6MCOpplLTftIa2CRCaTsE+81Sd2/JmH+s3Y5PRnIGnKkzM85Co3oeHm+WI2W4T4/6nt2rdYcyyDRKPkNtTfBJQ72CE2AI2hrC6kaWkBOZLtUmaiFSunOIXo2l5W9VuTJamqPESO8=
+	t=1751233517; cv=none; b=XawVLitYEz1pugLawHbbbx7OYW58CC/yxQqZqBueJJE80Eop8oOWPAxlg5kBbDO1crPtUFN6O84vTq28IQo4vuJCZ6NnXT2TJurtvR1Gc9QKSOq/50ibEr7286XY+5LkFu4Po7y+sc2f3Q5okVJXgQ+VJVeroykC2xwU8VK/DV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751233506; c=relaxed/simple;
-	bh=TdHSpDKAJsP8MFQsAqAYBhsn02nXa3EymYXhSGpLXcs=;
+	s=arc-20240116; t=1751233517; c=relaxed/simple;
+	bh=VRa2MsmaJdr/14P5DkDEck3hvc0gsQ2yKcWjIECRYOo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FzT797/NwOR54IEiUZ4SVh+G7VCqD29HUyw921VTmZhvDS8LDcwTfYYUQ7eW9UsVS33JeAomdQMMeqYjkL/N4oMSw4A9rRnuKScOcBN/H3VysOS4pFLwVjQQCdWtP2Aw057Dk9wyuJhfWbS2aUjOOdyEZJa27SMK5/s1YpDGxyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=ib8FcY9L; arc=none smtp.client-ip=185.125.188.122
+	 MIME-Version; b=Xgc3PZ+X9PHVIuAE32AamkO5QlnImU9LK+iJoWjc+cLpYDANZJMy62rQBF/qmkLvROZacVKYwfXfcbWcVMIvCz8yBSchkhEHKDb2kgXYoaLDGRIdqkv3ex7xv+0/yHAglzLxSd6HRSKSjdePONj0zM44nRU+QWtIoW2eIrYGy2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=n5A1C9jZ; arc=none smtp.client-ip=185.125.188.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com [209.85.208.72])
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id BF5473FE25
-	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 21:45:03 +0000 (UTC)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 598353F943
+	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 21:45:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1751233503;
-	bh=RRIGUpCZvKb+B8PoLoEDlD3ZTey+s+col6Ou5XQorys=;
+	s=20210705; t=1751233508;
+	bh=JxsSezFVcVddszGhnOOW8/cd5yQH/kkJ8Bo6svEZqIk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version;
-	b=ib8FcY9LDB6r8xJmLsqlDQ2VH0mSEV/lkzmkyx3PUrXedfVByrfFjfmuiCw0DpEgH
-	 rswxTmi//57Kc4oTpEvJU+hXMHZEiKs/vcbX8q2dQ7HIPNCR5IVbLc/O/Z1O7pH9x8
-	 qoGTAm9wXOkOpEGsCnf6L1h+stwg4Lpmxm6TLxquC5jo52cxqoBp+OxjYwZefQ852f
-	 YGnfcWVWN1mT6Y2zlKuzqSekGxYgTLDAbu/CzFRbJ+/vqp2uSw8qIUUDYxmRgpV5B7
-	 yiBR5UuMVGK4MSK9zxHfjp3Vv9rNyZukSvOGdT6XQ/pO4h7moj9qZq9M3aSwSdFvpu
-	 1T8uV+h5P/LmQ==
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-60785c45274so1074017a12.2
-        for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 14:45:03 -0700 (PDT)
+	b=n5A1C9jZQ5UoEJvJ5P627/qUdcJgj9kzBOQ5EkhxlvsWXq2PyrczYQlOpy3SfUvLL
+	 tZR8os71wQIAmmFbusmRd2PReB9zgGKDHSBWSBumPoaKevlSpxhJFdvnw1RGRaZdtt
+	 Fvs0JCKHh/pHjr3GgcxBqwFCQimKZXtizrqup+A9Bl4aLq/dpsYFLZ2Nptcc4FDvys
+	 viKhhWkDQRyT7fUZn/Z9xUkFm4DGppwQCSqDhEuZb3SYKUpoQuvZcqzUG/3oiGo3MY
+	 NrBnewBSqISeDfJb2cKo1FXicGepx95qAIq51D48fyaJj66ivGDqfXwVTDc7UssIm6
+	 d4DPtrC05lSxA==
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-60c9d8a169cso1338068a12.0
+        for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 14:45:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751233503; x=1751838303;
+        d=1e100.net; s=20230601; t=1751233506; x=1751838306;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RRIGUpCZvKb+B8PoLoEDlD3ZTey+s+col6Ou5XQorys=;
-        b=rPAsusVPuBUO5A2i3hHV+6S+jkOWJQbP9aGDDOMyVEBoJYO0CtanSEsYuvBg4ZDYbK
-         v57xU4I9W46FODHvBWDL8ITMNhl67jTtLzbtN7NbzJJtLG+CsCBjwt/Z63QecV8ovkxe
-         4gUMmELMUyi7VctLs5QuC2HAWWHs5WrwtlkLaAsgF+4AlPm9sgU+V6o7moLXtk9P+Z3j
-         7snKgPE6E0ZNmyOCixgAjLp5p5Coea5MpV7rg0g9wWSfGh+lKuh51Mq/RhUpL8g435N5
-         C/oC5983l/JPowR5tAeVn6UO5f7QR/P6DqQy3j4QotPZn9mm8PsmvwwlcT5S6GjC5PpN
-         JO3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUDHqaxMa7f+Hod58MBr5QI78v3A883BcM+4XkXoOZxU45bp7FOu5i59BpUG8uw0fB6gX16I6M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWT3F4WecUIQ8lHOqJ+b7AlSpu2nGOUuKoc783OxUy1lR2pvKT
-	jD4FEMPpdEfo6IMHuW8H5LsO5qho/vRyRxAY+iKF/Jd/VC5in9ZOzXZ1ijCKG3bGvprUVJIG/Kw
-	iedt6DNSSIhlSaIOqEhSsFc3bDrQa12Is6jmjkuBj0tvAglS8ORTIC0UyvqCeDfFRb9Ko3HpUyg
+        bh=JxsSezFVcVddszGhnOOW8/cd5yQH/kkJ8Bo6svEZqIk=;
+        b=NBras/L3Djo0/h3MWjDAWBJqr8lMZe45ZFUMk1tBx2WA5Cm92IzCnJhy0JsVjpVy0/
+         9hed9eZHonoWTgxs5JEgXL6TCTr3YOUPXjoqmRVHorL1UG3OrdMKwo50WowofzOGdKXF
+         FFvCfT9HXv0wkk4u10Qg/a4R+vYwMFmAHvnFpSBlbn0MYaJ2/hN0O2no5V+yzP7UaDDU
+         Mc9lsC7D2iCd78IS5a9YsU85nIufsf601YCvBJUc+DNQJYjRiFm7OOkfmJ/EVb5F8dG6
+         Zki0gyOShCVc/9W/0TUZEKvWYFRQ0dEH60nmG5zLV/xgH46rWI3AteuZLh6b2AEEHeeD
+         eN4A==
+X-Forwarded-Encrypted: i=1; AJvYcCVD7ZC542rYkHBbOoCpsdyUxACeqPCiVFezi5QC9F13ao4ehSubD4OThoolh4NJ45+hbPDN8fk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNKhA6dsNnEFRtkBcmIDKjWLkRGoPjzM/k/v08d/nceoBiC2Pv
+	jhOw9sklCtGsayzHy1ZmQd/awZF3xXSa87Q4ZfZvOr3XREcz4+zboudE+VeSjMa2YxmJhFlmxZV
+	lKJ6XS2tLupGlwbHQLsXNQflZcxotFEPfwR2cCFm5cdAKjdxPvmTTZxGay160D9wG8k/vvaVkvw
 	==
-X-Gm-Gg: ASbGncsakBEhDCBFi7oTb3zJ14qyT7g2ML/NMP7Nmsw5OBladrUoviGiUtuFoVhyKzQ
-	wcD6T6jjZMRrgILmYO+Zw1d9zf4ng+g4McYfziS67L/261AFGWsCgXybgHMoQ0rAhbp0wBM/YIc
-	HtGOtb9N8YsiGaY07+rmDzs59+ofCUDmQ2p7Dnw04GUYBeUa47bcjbxH2hgmxZ7uCoDFiWzEsM2
-	0WdQNhlNpt/sTSQrinxuhotBn61tISgTx+vln38O7AvVW4+flXqi+B0d5TbEZqsdEwJTh1xfnkh
-	HsD5EaboMIQmKlWxNWimLYV3bbmizjfcgBHTXaOxZ1KjL+oaSg==
-X-Received: by 2002:a05:6402:5192:b0:604:e6fb:e2e1 with SMTP id 4fb4d7f45d1cf-60c88e8ea14mr9052246a12.33.1751233503129;
-        Sun, 29 Jun 2025 14:45:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH9xBDB9NgljSr2Dmn9+gkgZzFKRns66Vls9DnddU65DI4e8vmYDTMY48hrh5jBiTpMmnrXjQ==
-X-Received: by 2002:a05:6402:5192:b0:604:e6fb:e2e1 with SMTP id 4fb4d7f45d1cf-60c88e8ea14mr9052222a12.33.1751233502705;
-        Sun, 29 Jun 2025 14:45:02 -0700 (PDT)
+X-Gm-Gg: ASbGncsvM4UjongAGle4j/qELH09NuVIIJ66xDhtcBaAEWj+MuOB+tEOxVmOEUrY29/
+	JmRUV0bFRbjF0sWWNKw+eEDRg4qg6b6v/RpNynmbJ/SPGBsN8ctCK9uiYKYto3IiMy+TiZnSPru
+	JkR/IDDUzOg1su126NiN9VRaOVEnGB0aCQfJ/j04eCADmCHuIK3MmfwSto01W8/CO9aVUc97YbA
+	lSMBKEQ623wjiBvu/u0hul9GFJJ0286JpJGTv03O8PA9fTegnN1nen7M5S3wrWjhqKNrIEGuXBA
+	P5uj9ZIuTHv4Z05TQSmgG0L4Tjx9lIOlNn7S5jWWJBQD1/45gA==
+X-Received: by 2002:a50:d6c4:0:b0:60e:f46:326d with SMTP id 4fb4d7f45d1cf-60e0f46379fmr524106a12.33.1751233506001;
+        Sun, 29 Jun 2025 14:45:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGeG0HXUZS+VZqUBDBm8csLUlE85Zu71t9cWNi9cmpg397iu6ZGZalKE0CjWDY0LX20CtiqaA==
+X-Received: by 2002:a50:d6c4:0:b0:60e:f46:326d with SMTP id 4fb4d7f45d1cf-60e0f46379fmr524095a12.33.1751233505618;
+        Sun, 29 Jun 2025 14:45:05 -0700 (PDT)
 Received: from amikhalitsyn.lan ([178.24.219.243])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60c828e1a96sm4712037a12.19.2025.06.29.14.45.01
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60c828e1a96sm4712037a12.19.2025.06.29.14.45.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Jun 2025 14:45:02 -0700 (PDT)
+        Sun, 29 Jun 2025 14:45:05 -0700 (PDT)
 From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
 To: kuniyu@google.com
 Cc: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
@@ -91,6 +91,7 @@ Cc: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
 	Leon Romanovsky <leon@kernel.org>,
 	Arnd Bergmann <arnd@arndb.de>,
 	Christian Brauner <brauner@kernel.org>,
@@ -98,9 +99,9 @@ Cc: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
 	Luca Boccassi <bluca@debian.org>,
 	David Rheinsberg <david@readahead.eu>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>
-Subject: [RESEND PATCH net-next 2/6] af_unix: introduce unix_skb_to_scm helper
-Date: Sun, 29 Jun 2025 23:44:39 +0200
-Message-ID: <20250629214449.14462-3-aleksandr.mikhalitsyn@canonical.com>
+Subject: [RESEND PATCH net-next 3/6] af_unix: introduce and use __scm_replace_pid() helper
+Date: Sun, 29 Jun 2025 23:44:40 +0200
+Message-ID: <20250629214449.14462-4-aleksandr.mikhalitsyn@canonical.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250629214449.14462-1-aleksandr.mikhalitsyn@canonical.com>
 References: <20250629214449.14462-1-aleksandr.mikhalitsyn@canonical.com>
@@ -112,8 +113,10 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Instead of open-coding let's consolidate this logic in a separate
-helper. This will simplify further changes.
+Existing logic in __scm_send() related to filling an struct scm_cookie
+with a proper struct pid reference is already pretty tricky. Let's
+simplify it a bit by introducing a new helper. This helper will be
+extended in one of the next patches.
 
 Cc: linux-kernel@vger.kernel.org
 Cc: netdev@vger.kernel.org
@@ -122,6 +125,7 @@ Cc: Eric Dumazet <edumazet@google.com>
 Cc: Jakub Kicinski <kuba@kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>
 Cc: Simon Horman <horms@kernel.org>
+Cc: Willem de Bruijn <willemb@google.com>
 Cc: Leon Romanovsky <leon@kernel.org>
 Cc: Arnd Bergmann <arnd@arndb.de>
 Cc: Christian Brauner <brauner@kernel.org>
@@ -131,46 +135,59 @@ Cc: Luca Boccassi <bluca@debian.org>
 Cc: David Rheinsberg <david@readahead.eu>
 Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
 ---
- net/unix/af_unix.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ include/net/scm.h | 10 ++++++++++
+ net/core/scm.c    | 11 ++++++++---
+ 2 files changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 6072d89ce2e7..5efe6e44abdf 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -1955,6 +1955,12 @@ static int unix_scm_to_skb(struct scm_cookie *scm, struct sk_buff *skb, bool sen
- 	return err;
+diff --git a/include/net/scm.h b/include/net/scm.h
+index 84c4707e78a5..856eb3a380f6 100644
+--- a/include/net/scm.h
++++ b/include/net/scm.h
+@@ -88,6 +88,16 @@ static __inline__ void scm_destroy(struct scm_cookie *scm)
+ 		__scm_destroy(scm);
  }
  
-+static void unix_skb_to_scm(struct sk_buff *skb, struct scm_cookie *scm)
++static __inline__ int __scm_replace_pid(struct scm_cookie *scm, struct pid *pid)
 +{
-+	scm_set_cred(scm, UNIXCB(skb).pid, UNIXCB(skb).uid, UNIXCB(skb).gid);
-+	unix_set_secdata(scm, skb);
++	/* drop all previous references */
++	scm_destroy_cred(scm);
++
++	scm->pid = get_pid(pid);
++	scm->creds.pid = pid_vnr(pid);
++	return 0;
 +}
 +
- /* unix_maybe_add_creds() adds current task uid/gid and struct pid to skb if needed.
-  *
-  * Some apps rely on write() giving SCM_CREDENTIALS
-@@ -2561,8 +2567,7 @@ int __unix_dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t size,
+ static __inline__ int scm_send(struct socket *sock, struct msghdr *msg,
+ 			       struct scm_cookie *scm, bool forcecreds)
+ {
+diff --git a/net/core/scm.c b/net/core/scm.c
+index 0225bd94170f..0e71d5a249a1 100644
+--- a/net/core/scm.c
++++ b/net/core/scm.c
+@@ -189,15 +189,20 @@ int __scm_send(struct socket *sock, struct msghdr *msg, struct scm_cookie *p)
+ 			if (err)
+ 				goto error;
  
- 	memset(&scm, 0, sizeof(scm));
+-			p->creds.pid = creds.pid;
+ 			if (!p->pid || pid_vnr(p->pid) != creds.pid) {
+ 				struct pid *pid;
+ 				err = -ESRCH;
+ 				pid = find_get_pid(creds.pid);
+ 				if (!pid)
+ 					goto error;
+-				put_pid(p->pid);
+-				p->pid = pid;
++
++				err = __scm_replace_pid(p, pid);
++				/* Release what we get from find_get_pid() as
++				 * __scm_replace_pid() takes all necessary refcounts.
++				 */
++				put_pid(pid);
++				if (err)
++					goto error;
+ 			}
  
--	scm_set_cred(&scm, UNIXCB(skb).pid, UNIXCB(skb).uid, UNIXCB(skb).gid);
--	unix_set_secdata(&scm, skb);
-+	unix_skb_to_scm(skb, &scm);
- 
- 	if (!(flags & MSG_PEEK)) {
- 		if (UNIXCB(skb).fp)
-@@ -2947,8 +2952,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
- 				break;
- 		} else if (unix_may_passcred(sk)) {
- 			/* Copy credentials */
--			scm_set_cred(&scm, UNIXCB(skb).pid, UNIXCB(skb).uid, UNIXCB(skb).gid);
--			unix_set_secdata(&scm, skb);
-+			unix_skb_to_scm(skb, &scm);
- 			check_creds = true;
- 		}
- 
+ 			err = -EINVAL;
 -- 
 2.43.0
 
