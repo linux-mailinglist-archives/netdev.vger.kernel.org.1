@@ -1,90 +1,115 @@
-Return-Path: <netdev+bounces-202216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E50EAAECC0C
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 12:01:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 601D2AECC10
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 12:04:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28C3C7A288E
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 10:00:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52E9818877CC
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 10:05:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BF0920ADF8;
-	Sun, 29 Jun 2025 10:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B814221770D;
+	Sun, 29 Jun 2025 10:04:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cQjUOkTK"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="UBRLnn4f"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1180117A30F;
-	Sun, 29 Jun 2025 10:01:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91A31B6CE3
+	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 10:04:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751191279; cv=none; b=l801pOpUhnl0hfzeu0oVugejZf12CBdo6JTZ8VwKx6i/ugcUHkbQFw2Osc6tGUvqmqC37I8vm8LdAhFG0fX0ntMxYej3HKP4qG0Nic+GCeHK27XZZUiGP3j+efCEElnOX+fOoH2AO+AttopIzWfqDbinoDGcbT+m6wBlznYuGls=
+	t=1751191481; cv=none; b=hBpwQ/E3pMxHlmbONyGzg2jNA+wfvPE+kkkN3LVIgrDqAr6moerE6I0ORP/kDoWgZsQ/eVu81PBWyuthIGvPNRwiPz5OXIT+nTq7Pt2m5HUS6e9C7wtgIkhJvBzDzGJL/G6vKtn4a2X5TUUtk6XQY5b6T5gvWFbKmSIuluBRpgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751191279; c=relaxed/simple;
-	bh=K7nid7pX0MchgdtwTmBOugLK+wyPztiQQ+cOV64xZJM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mVNFM5bucYDoMot9NZwVCArA0ihcTTU4hbhoWP4+BG7n2PgKz2gNLHwgIfgBOJerXELXtWi5cIRMKmq6ncYlpuUVENKAybEaPur1L+rBdNT/iMT+AdguKUXMbALmV9GAsLNA396c7Z11szG77If+Yv5RnIyO7ic4byS+PmhmLEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cQjUOkTK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6E7CC4CEEB;
-	Sun, 29 Jun 2025 10:01:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751191278;
-	bh=K7nid7pX0MchgdtwTmBOugLK+wyPztiQQ+cOV64xZJM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=cQjUOkTKt80zjHWs/9616cRbQVAIzS0CSZtyKxtV2ed2MiCMnY8mqzfyLyiiNx8SA
-	 FJg1U5CqoLxiMgjlBerRWaJD4k3MgJz1npTzly9NU0l4J7ixbwB9/cMlH8q8YIqTAu
-	 F2WR3CFGWdjdJBIGxBwID9ZiExMEr+yY2h7DuoOQwIsQ7s4RhWmeLwfgNP8fp91mzk
-	 Xb0bmoxiqTY9kT7ttefcxVjntZ1Z7C9QXyoMrXOe/0e0Bum9xD0mVyr+KM93UDp2OT
-	 CVArBQArCJLElbqFYBQgqBDYnJ01Cm67c49q6Tw+i+kp62GIlPUIXFJs3Z8yXa7lX0
-	 uCLO/3Re25jIQ==
-From: Jisheng Zhang <jszhang@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: stmmac: add support for dwmac 5.20
-Date: Sun, 29 Jun 2025 17:44:25 +0800
-Message-ID: <20250629094425.718-1-jszhang@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1751191481; c=relaxed/simple;
+	bh=MHUw+Ea6EVN75dCPT0C0rNMMDUosxpqkUHin2ZSK5Io=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=POglapA0XXmjX8SRyutQz/WVNi6WqGm99/jJ2pSx+R0a0B2wtTThxLrevBS0tZWVFSwMcubElizo07VR051wtk6HMuRq0efy0pRNts4wbhIpVc5/2C3PQ2pcNMqkaKRXKFnfwxO0FeOThjro6q17y3joii+/WQjUBTmtGp5dYAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=UBRLnn4f; arc=none smtp.client-ip=202.12.124.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id AFC261D00193;
+	Sun, 29 Jun 2025 06:04:38 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Sun, 29 Jun 2025 06:04:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1751191478; x=1751277878; bh=ZzomQUF6p5nxj1MqjuH+Qbz4WFD2Eei7Mng
+	8tsp4RSA=; b=UBRLnn4fKanzl7ivCaB//U5+iQqC/ogwx9sIbOQSPFwgPlMi0Eq
+	aYVwYpjY+ZMEZDYAZA5FfUmsE+wjm234kQGHKWDoeWcwqMc/quEEbUtLu6OacQsr
+	NhPWlSMIqJxKf6aXzOq5IZtTMTkva4k8LWwYU1uKy1BJLAq9uqT0nd1heaAH1XvM
+	Gbhj6u/zQpw3iFxMOOf1ag8RMXhFbWsHntlxcneS3jcbroDktGj676RcFlMpuZ5P
+	fBdJ/kSeGJ05l6ii4EbFpzyyhji3ZsVCyr5IEPGJuXFAN2rBZ8qNzR4QoLdZdROM
+	Mz9Uw8+vNGDOMyctl09eEbL0IuPP2NVxGCg==
+X-ME-Sender: <xms:tg9haGOkViDZXza4bDD52Hp0HfX3t1D_492VAjfwDojycVSsYsvbZA>
+    <xme:tg9haE8Mz0mW6A63_k_qZIFQ1HfXJGXqCTCQgmn-me7gyc_8uHpjkdJqB_YDb9rJK
+    lgk-pPqQubmjsM>
+X-ME-Received: <xmr:tg9haNSPa0SPfYGhTzT6iFhbQi1oBd_BUH-J2z_GoqRVPXuS4pqV8j413g8e>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdekheefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
+    lhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttd
+    dvnecuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghh
+    rdhorhhgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduieefud
+    eifefgleekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgr
+    mhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtph
+    htthhopedutddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepkhhusggrsehkvghr
+    nhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpd
+    hrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
+    ohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnih
+    esrhgvughhrghtrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhu
+    nhhnrdgthhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehshiiisghothdogeeftdhflehfjeeiieeffeeigedurgeivddvudejsehshiiikhgr
+    lhhlvghrrdgrphhpshhpohhtmhgrihhlrdgtohhmpdhrtghpthhtoheprghnughrvgifse
+    hluhhnnhdrtghh
+X-ME-Proxy: <xmx:tg9haGshWHlg-H6anZ-Ja2jskz-cxhyQqGWPeXEUlJ5kAjrJ_07Shw>
+    <xmx:tg9haOcgdK05F7rcSGkCfW_O5RWlgD1BZDby_KHdnXCi9xtAPHFy_g>
+    <xmx:tg9haK0o3FcoZKDSWmB7qINUmiv7w5vMypxhwzB8mBJVEUXi879izQ>
+    <xmx:tg9haC9RYi20X7hE1YD6nTuYPoRe57ywSDLGt_rYRupkWvNi27q10w>
+    <xmx:tg9haIVPWYMC0OCDVzprXdFnjbxtRHFXMitQdIgOWmpspspCplL-l35a>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 29 Jun 2025 06:04:37 -0400 (EDT)
+Date: Sun, 29 Jun 2025 13:04:35 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	syzbot+430f9f76633641a62217@syzkaller.appspotmail.com,
+	andrew@lunn.ch, maxime.chevallier@bootlin.com
+Subject: Re: [PATCH net-next] net: ethtool: avoid OOB accesses in PAUSE_SET
+Message-ID: <aGEPszpq9eojNF4Y@shredder>
+References: <20250626233926.199801-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250626233926.199801-1-kuba@kernel.org>
 
-The dwmac 5.20 IP can be found on some synaptics SoCs. Add a
-compatibility flag, and extend coverage of the dwmac-generic driver
-for the 5.20 IP.
+On Thu, Jun 26, 2025 at 04:39:26PM -0700, Jakub Kicinski wrote:
+> We now reuse .parse_request() from GET on SET, so we need to make sure
+> that the policies for both cover the attributes used for .parse_request().
+> genetlink will only allocate space in info->attrs for ARRAY_SIZE(policy).
+> 
+> Reported-by: syzbot+430f9f76633641a62217@syzkaller.appspotmail.com
+> Fixes: 963781bdfe20 ("net: ethtool: call .parse_request for SET handlers")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c | 1 +
- 1 file changed, 1 insertion(+)
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Tested-by: Ido Schimmel <idosch@nvidia.com>
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c
-index b9218c07eb6b..cecce6ed9aa6 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c
-@@ -59,6 +59,7 @@ static const struct of_device_id dwmac_generic_match[] = {
- 	{ .compatible = "snps,dwmac-3.72a"},
- 	{ .compatible = "snps,dwmac-4.00"},
- 	{ .compatible = "snps,dwmac-4.10a"},
-+	{ .compatible = "snps,dwmac-5.20"},
- 	{ .compatible = "snps,dwmac"},
- 	{ .compatible = "snps,dwxgmac-2.10"},
- 	{ .compatible = "snps,dwxgmac"},
--- 
-2.49.0
+Thanks, we hit that as well.
 
+BTW, shouldn't you also release the reference from the net device if
+ethnl_default_parse() fails in ethnl_default_set_doit()?
 
