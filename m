@@ -1,51 +1,52 @@
-Return-Path: <netdev+bounces-202226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6D2BAECC80
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 14:39:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E4A3AECCA1
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 14:47:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44EC916F48C
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 12:39:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58DA918910C0
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 12:47:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D67F21B8F7;
-	Sun, 29 Jun 2025 12:38:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D48214A94;
+	Sun, 29 Jun 2025 12:47:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="CZnPodQB"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="fuioOJEB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-19.smtpout.orange.fr [80.12.242.19])
+Received: from smtp.smtpout.orange.fr (smtp-20.smtpout.orange.fr [80.12.242.20])
 	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2981D5147;
-	Sun, 29 Jun 2025 12:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75DC62AD1C;
+	Sun, 29 Jun 2025 12:47:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751200735; cv=none; b=BHIE057CZbJpSx5c77bA+FWYekJJzI0UrBSvngMj59VQbYlVaqUq9l6xgnMkLIB+lJ5NrO+VgWFGRv+Y0mFG9qtjog+y1uBdu2ElVTDBBqdH15AfPJTRdT8WutIX2zsCP+F+bIAMPyD5XzN19VtoSlevHEgJkJgL1h1YQlAe+P0=
+	t=1751201222; cv=none; b=rMd/zwQc0iTZbrCtBANDbOWcY4TN3aBNEZwwZZ6oxRind2mhKOMOrKKFGY3BMdwHWve/uoAVDrHby1NOdivwm2Ws29ERK7eKT4lHySG4jL29iv+rFyqm0/OWsikHMEetb0AOAMPYXq+8WB5S67+2L2gojc3jHOZET8Tg8xRteIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751200735; c=relaxed/simple;
-	bh=1DdA58ZvfVyvyJne9xRI6nI4Y07XDp6bvgXl/BpBMvs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CYLkxZiJce7ByD8ou1KNBSW8ByIOAug3VhB0XCKUgkhVHTRJpAgSAlK7x1xMHeSTR33EGGNrR9jWoQMwyRhQdh6jPm0b4IUdYBFp/H1+jGitmJSM8ig3oqObfg65kVamhWHuGr49jQ6lAaku9GM+9eNWnq8em7LixoksjxnRFro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=CZnPodQB; arc=none smtp.client-ip=80.12.242.19
+	s=arc-20240116; t=1751201222; c=relaxed/simple;
+	bh=Ip7hnQPOpGF9wXLlvKTRbOv0ZV/zi9h56UqKTQhsm9c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=XGOQEp4Y3JGzGlQDmrnww+Vdc75+D/CQR0VRvm4L+fyKqpMMsSQZckWJ4/QbI+wAk7HVpGbiInrKa4AZqDI3pG0SpzsgGrTwFZUfNNyHm05IL956Idw3U+Ff3LTdDiaG+oLm/SM+iFK+3dc/st4a2ZzXrY7LyHeo4vT43ksQ1lA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=fuioOJEB; arc=none smtp.client-ip=80.12.242.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
 Received: from fedora.home ([IPv6:2a01:cb10:785:b00:8347:f260:7456:7662])
 	by smtp.orange.fr with ESMTPA
-	id VrHvu4ESL84Z8VrHvuRtCb; Sun, 29 Jun 2025 14:37:41 +0200
+	id VrHvu4ESL84Z8VrI6uRtOD; Sun, 29 Jun 2025 14:37:51 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1751200661;
-	bh=44hnpk8QrNSS6VHiUDSP4T2PPRW+akObYkldAFkniy8=;
+	s=t20230301; t=1751200671;
+	bh=U2KNLOTVqBb7xYxBtu5LEwvC5LnUw+sbt8wZBMJoIcA=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=CZnPodQBdNXT9Mr/sMliR8L8M3B2O9YmcmRwUvSGvGfZhKQqGwsx/W949L8HaBRzF
-	 5lI+xSU5Oh1MExu7B4mhsUwlgERFYbpQszo5XMUdvFE4zF87rQTBHicnEtJsAXeP+v
-	 Drq5OSP9unjeMaDBskJFujZSlwngw+25j0eIrlJZprFPSw5+cNOoOwhRs1BxgiM1Fq
-	 miqpmitAljqyn95n98RIjIJmw8VWM4qN0ahuTE7LCxSv8QteRWCSL/9PbpEa/ZIHdh
-	 mtybCwbmOxJDOIHtx/ZRJWPN/K4FUNjPqJvxp79+Q8/gsWAwyOPcLNsWqRwiSSJuid
-	 awnSn1PHQL2tQ==
+	b=fuioOJEBsQCPcmq+MwQ6AEShAuXOPl3NcGoVlDv4s7ImHWrmTjLrLSPc1ZXF2yDu3
+	 9sajVftQDEdNAik8Y3k0BXIVD82Cnk55/2QaSQ71KtX2ejwFzMd4AB4Sp8LxgA/Uqp
+	 a3IgLUVyTEaYj7kLxo0tUuTv4N8ZazjpqFrjQ1IOIKeGx6Ch5O6UuIYSwXx/0+XLkf
+	 7SJj2MgiYxSqRFXCxYNO7p54KztMJ/S3sJsU9U3tAXvBaYYVJ2Qw8ORrUE83nQRcKS
+	 EGBRLexSqCGsQ58h32S9cxnXbX3I41ovT2gNj9ron0zEhfe44ir5MSLNorKICf58Yv
+	 HU1F7dEs5GXOw==
 X-ME-Helo: fedora.home
 X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sun, 29 Jun 2025 14:37:41 +0200
+X-ME-Date: Sun, 29 Jun 2025 14:37:51 +0200
 X-ME-IP: 2a01:cb10:785:b00:8347:f260:7456:7662
 From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 To: Andrew Lunn <andrew@lunn.ch>,
@@ -58,10 +59,12 @@ Cc: linux-kernel@vger.kernel.org,
 	kernel-janitors@vger.kernel.org,
 	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next 1/2] net: dsa: mv88e6xxx: Constify struct devlink_region_ops and struct mv88e6xxx_region
-Date: Sun, 29 Jun 2025 14:35:49 +0200
-Message-ID: <46040062161dda211580002f950a6d60433243dc.1751200453.git.christophe.jaillet@wanadoo.fr>
+Subject: [PATCH net-next 2/2] net: dsa: mv88e6xxx: Use kcalloc()
+Date: Sun, 29 Jun 2025 14:35:50 +0200
+Message-ID: <2f4fca4ff84950da71e007c9169f18a0272476f3.1751200453.git.christophe.jaillet@wanadoo.fr>
 X-Mailer: git-send-email 2.50.0
+In-Reply-To: <46040062161dda211580002f950a6d60433243dc.1751200453.git.christophe.jaillet@wanadoo.fr>
+References: <46040062161dda211580002f950a6d60433243dc.1751200453.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,107 +73,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-'struct devlink_region_ops' and 'struct mv88e6xxx_region' are not modified
-in this driver.
+Use kcalloc() instead of hand writing it. This is less verbose.
 
-Constifying these structures moves some data to a read-only section, so
-increases overall security, especially when the structure holds some
-function pointers.
+Also move the initialization of 'count' to save some LoC.
 
 On a x86_64, with allmodconfig, as an example:
 Before:
 ======
    text	   data	    bss	    dec	    hex	filename
-  18076	   6496	     64	  24636	   603c	drivers/net/dsa/mv88e6xxx/devlink.o
+  18652	   5920	     64	  24636	   603c	drivers/net/dsa/mv88e6xxx/devlink.o
 
 After:
 =====
    text	   data	    bss	    dec	    hex	filename
-  18652	   5920	     64	  24636	   603c	drivers/net/dsa/mv88e6xxx/devlink.o
+  18498	   5920	     64	  24482	   5fa2	drivers/net/dsa/mv88e6xxx/devlink.o
 
 Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 ---
 Compile tested only
 ---
- drivers/net/dsa/mv88e6xxx/devlink.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ drivers/net/dsa/mv88e6xxx/devlink.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/net/dsa/mv88e6xxx/devlink.c b/drivers/net/dsa/mv88e6xxx/devlink.c
-index 195460a0a0d4..aec652e33fc1 100644
+index aec652e33fc1..da69e0b85879 100644
 --- a/drivers/net/dsa/mv88e6xxx/devlink.c
 +++ b/drivers/net/dsa/mv88e6xxx/devlink.c
-@@ -647,7 +647,7 @@ static struct mv88e6xxx_region_priv mv88e6xxx_region_global1_priv = {
- 	.id = MV88E6XXX_REGION_GLOBAL1,
- };
- 
--static struct devlink_region_ops mv88e6xxx_region_global1_ops = {
-+static const struct devlink_region_ops mv88e6xxx_region_global1_ops = {
- 	.name = "global1",
- 	.snapshot = mv88e6xxx_region_global_snapshot,
- 	.destructor = kfree,
-@@ -658,32 +658,32 @@ static struct mv88e6xxx_region_priv mv88e6xxx_region_global2_priv = {
- 	.id = MV88E6XXX_REGION_GLOBAL2,
- };
- 
--static struct devlink_region_ops mv88e6xxx_region_global2_ops = {
-+static const struct devlink_region_ops mv88e6xxx_region_global2_ops = {
- 	.name = "global2",
- 	.snapshot = mv88e6xxx_region_global_snapshot,
- 	.destructor = kfree,
- 	.priv = &mv88e6xxx_region_global2_priv,
- };
- 
--static struct devlink_region_ops mv88e6xxx_region_atu_ops = {
-+static const struct devlink_region_ops mv88e6xxx_region_atu_ops = {
- 	.name = "atu",
- 	.snapshot = mv88e6xxx_region_atu_snapshot,
- 	.destructor = kfree,
- };
- 
--static struct devlink_region_ops mv88e6xxx_region_vtu_ops = {
-+static const struct devlink_region_ops mv88e6xxx_region_vtu_ops = {
- 	.name = "vtu",
- 	.snapshot = mv88e6xxx_region_vtu_snapshot,
- 	.destructor = kfree,
- };
- 
--static struct devlink_region_ops mv88e6xxx_region_stu_ops = {
-+static const struct devlink_region_ops mv88e6xxx_region_stu_ops = {
- 	.name = "stu",
- 	.snapshot = mv88e6xxx_region_stu_snapshot,
- 	.destructor = kfree,
- };
- 
--static struct devlink_region_ops mv88e6xxx_region_pvt_ops = {
-+static const struct devlink_region_ops mv88e6xxx_region_pvt_ops = {
- 	.name = "pvt",
- 	.snapshot = mv88e6xxx_region_pvt_snapshot,
- 	.destructor = kfree,
-@@ -696,13 +696,13 @@ static const struct devlink_port_region_ops mv88e6xxx_region_port_ops = {
- };
- 
- struct mv88e6xxx_region {
--	struct devlink_region_ops *ops;
-+	const struct devlink_region_ops *ops;
- 	u64 size;
- 
- 	bool (*cond)(struct mv88e6xxx_chip *chip);
- };
- 
--static struct mv88e6xxx_region mv88e6xxx_regions[] = {
-+static const struct mv88e6xxx_region mv88e6xxx_regions[] = {
- 	[MV88E6XXX_REGION_GLOBAL1] = {
- 		.ops = &mv88e6xxx_region_global1_ops,
- 		.size = 32 * sizeof(u16)
-@@ -768,7 +768,7 @@ int mv88e6xxx_setup_devlink_regions_global(struct dsa_switch *ds)
- {
- 	bool (*cond)(struct mv88e6xxx_chip *chip);
+@@ -376,19 +376,14 @@ static int mv88e6xxx_region_atu_snapshot(struct devlink *dl,
+ 	struct dsa_switch *ds = dsa_devlink_to_ds(dl);
+ 	struct mv88e6xxx_devlink_atu_entry *table;
  	struct mv88e6xxx_chip *chip = ds->priv;
--	struct devlink_region_ops *ops;
-+	const struct devlink_region_ops *ops;
- 	struct devlink_region *region;
- 	u64 size;
- 	int i, j;
+-	int fid = -1, err = 0, count;
++	int fid = -1, err = 0, count = 0;
+ 
+-	table = kmalloc_array(mv88e6xxx_num_databases(chip),
+-			      sizeof(struct mv88e6xxx_devlink_atu_entry),
+-			      GFP_KERNEL);
++	table = kcalloc(mv88e6xxx_num_databases(chip),
++			sizeof(struct mv88e6xxx_devlink_atu_entry),
++			GFP_KERNEL);
+ 	if (!table)
+ 		return -ENOMEM;
+ 
+-	memset(table, 0, mv88e6xxx_num_databases(chip) *
+-	       sizeof(struct mv88e6xxx_devlink_atu_entry));
+-
+-	count = 0;
+-
+ 	mv88e6xxx_reg_lock(chip);
+ 
+ 	while (1) {
 -- 
 2.50.0
 
