@@ -1,165 +1,132 @@
-Return-Path: <netdev+bounces-202213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FDC9AECBF2
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 11:29:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D23FAECBFA
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 11:36:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FDBD173568
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 09:28:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68F611717AD
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 09:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FCF71F8725;
-	Sun, 29 Jun 2025 09:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B836202C40;
+	Sun, 29 Jun 2025 09:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="E+ohbllL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k+N2729e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB711C862C
-	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 09:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4208A93D;
+	Sun, 29 Jun 2025 09:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751189327; cv=none; b=ObDl/WDG2Fw/qFGfmR48mkYyWKMgU/WCfgy7l1ct34rw89ve+hZanJnr8rFUjdWplFdW8iPIy2YmPBTYs/5w14GtEQd/zabgFtDqQTfBeNHhzEJInIpeObk46FxgG3t2OQ6wzmZAXZyKRBiFiHxBDHeVtDG3lRRaz+TLL/ka86s=
+	t=1751189785; cv=none; b=oMGzAeSvB3jXQxWCdSDjFxbRZzfC57D/hcUugGtT2iZ/So2yH8cb3XtjwUgIlIUoCGWKW9I7mHzFax4WDBlFHNVnbFRGwno+erBuiKfUKdeztw4sVWOWDZTEA94oW5Y7rYLhl9BDCUT1lRZhwdeF3qTZuqbO9IlkebF4sNj/gKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751189327; c=relaxed/simple;
-	bh=ItBj2nJLgw8h/vhJK7CphXVocbVKnddEEqYo0xyH2KA=;
+	s=arc-20240116; t=1751189785; c=relaxed/simple;
+	bh=Ry1uJCu62CkLW9LcbZeSR7YaJJlm1KONhJOR6UVwkuE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uHAu2bgbycJQbNyNbN5rA/sQxL94qHulYPf0o++ov3XoAVJNibsE6Xnp512AZU5063XBKTnbYqvsHZnqwJZDPDlAOcXuDwxJuoGnN1PT2IA+AhOqoGjUi67+132AWgV3q2Sl1UUEoXX3vGJZMKcU3o4q7krF37SCP4HXMsguaMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=E+ohbllL; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 33964103972A7;
-	Sun, 29 Jun 2025 11:28:32 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1751189315; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=bN2XdK2JtRKrax35HcE2dpvOfEKHL/3xM/Eu27Ki9xM=;
-	b=E+ohbllL7ADAqSYQxA3PQGncZPoM5DwfLn/MAUlpblfB+K8tNSRm01g7eI5WOEUWHp7+ly
-	qxNFUzUz1PG9Ck4UNBHdG/JJyxmSwVOUKS9UQfkUxo0kg+xFHazIyoo8geywQwJv9qrEGA
-	ADUQ9/MCRTDjC+b9ValcYMI9gpMOVUHnTL0WJxYebatLz4/oP4rwFNtgjcpSSOEOh85+0h
-	RZyKw5Kw+Vz9n4IxlJ55Mn7wZln5Klr4UX7x6ylrPPML/SQIWy1mesrHCSO9W3/C56HemR
-	+aqMrbctBneE5w2NmLc1nlKSOstJD9s3cSheehrTeLgaN7ym0JNeaFa2d7T2xA==
-Date: Sun, 29 Jun 2025 11:28:30 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Richard Cochran
- <richardcochran@gmail.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- netdev@vger.kernel.org, Arun Ramadoss <arun.ramadoss@microchip.com>,
- Tristram.Ha@microchip.com, Christian Eggers <ceggers@arri.de>
-Subject: Re: [PTP][KSZ9477][p2p1step] Questions for PTP support on KSZ9477
- device
-Message-ID: <20250629112830.79975f4a@wsk>
-In-Reply-To: <20250627215804.mcqsav2x6gbngkib@skbuf>
-References: <20250616172501.00ea80c4@wsk>
-	<aFD8VDUgRaZ3OZZd@pengutronix.de>
-	<b4f057ea-5e48-478d-999b-0b5faebc774c@linux.dev>
-	<aFJJlGzu4DrmqH3P@hoboy.vegasvil.org>
-	<aFJcP74s0xprhWLz@pengutronix.de>
-	<20250626233325.559e48a6@wsk>
-	<20250627215804.mcqsav2x6gbngkib@skbuf>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	 MIME-Version:Content-Type; b=MiXXFOsuO67faHZk5VADx+Ie682bQoQbUUPjDEuTVwqgByuRr8QJHM8HRD3vc6PA2XoM0pyyU4k0ZXTzweyFIFaXaEmTRWgmNqN6dmCaPFsK6DSTNxG3M8ppyo6qI7/Wv7q6yjVXkPMQDtyhCfPlWBYMA/dcS0Tz6ynlpZfm20M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k+N2729e; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3a4f379662cso944790f8f.0;
+        Sun, 29 Jun 2025 02:36:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751189782; x=1751794582; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r7IZF6P2H3Qklyp7Y946TAOUCcx7EHumDWuBAo4Oo5Q=;
+        b=k+N2729eVRxUJFZfa1zUb7W3N6HGbhmiSKTCREGTcV1cWeilQPCN0LOZJPNXunRbwO
+         Ze9DAClgh5c+2ATmaXbHariVmHkTuS3rABPywQ3DwBCov5gPIYRDexMDB8HgJ23navFc
+         AaoJ/AxYSVAvP99QjmXkjBf5hZdpSDkbbUf0qpHjyIkqlfaq3mDesRFb3/J/NqwFIlE2
+         ZzSFIlme0VwrO8GZo3yISDMasTXF65chjDI/z72+fxuyT9vuFOw70m4V69Oje9WFjcPR
+         4YX4Kyr2QKUtOnfTEaoilE5CE39DtTPzcD3YJtgV/1jOyK47nohKE7vmr0HhD3Ceo6uq
+         ijIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751189782; x=1751794582;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r7IZF6P2H3Qklyp7Y946TAOUCcx7EHumDWuBAo4Oo5Q=;
+        b=QTJ4qpzHA/R7TGc0eZ8XRhtIfpvuYjW1aZ7lbQr0tkrmViTe776b3azayfgPslMh4e
+         B6ZvlpJIav3R/cWf0fAsTJ78+nOZRmGgYK8f0+eppmTF091mBjx/LK2iXc5Y/p6/4zdC
+         rqSJuxEEcOPmWeZds4Qi9se8qlcIZGJay8X9DaCo1QEDfCir7gjrRk9NSbNdfOaEdkJF
+         TNbeisC+zaIKihJOunV43FS+6aw1WrLjjgXf2DdoaQbLEe1tgaq5YP6MYlq/nQpX+k0W
+         fmL8E4lcw0k1CGIDKHw7JRk/fRFkGWnH6JrBxoYQbwAkKFlIyKb0S6JpIC5325dlOTbM
+         eICg==
+X-Forwarded-Encrypted: i=1; AJvYcCV+krIUHpGCpJ+pRZAqY1LaG7CCwbVTcI4rBRvjDCZ2ZPcezDrcRW2D/wFaeaNShDCCF/tJiYEv@vger.kernel.org, AJvYcCV2a9d2j+5hey+IndTNfsBM0rbOIQMfdxoEfI/whWejo6XhBGhG4azJziijaHLWMWpX4ilsJ48oNju5tWw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMgfh+5ikbS2K/Y2gEatSynstrecC6tEm1+KRHatrzUyKd+k2Z
+	QYXc2U5GArclwsKNPT+GlviYdFurfU1zQCgjswSStFs6iejAvVVQmcgD
+X-Gm-Gg: ASbGncvvL1Za9gT8ifLhQVvDgLFOCaIjlvhcA3sDE/8uEK+8bE2gt/5j+M9lHq9W3rB
+	ODFMS5KYJwyJv/jiP29uksymaWWzasu4VB7wL1nBzTA1tvthfl/e+39ARC95jZ79g6OQNuLMOku
+	4e0nfhWkyOnqvko8ukdwey0dS51Soa40W7AsB6HDHRG0oMCSzBGiCuOq7ap1OGz7+631EjCCsFd
+	MA+SFAq2FWGlAnzTrFidcstb2qhGQjJ1uqHFXT5dO+Nw5yPTd0SNfzji+DlCGOPHD7mYYvk0ZL3
+	8abBrf0RdTdixCJTVhf9XILHAaXHtZDIFB3pDS2A+HP23Esja2xHy/LlKvPoCf9HyWMtI5qZg0x
+	+qlAq+ZKCl/3tI5JQzA==
+X-Google-Smtp-Source: AGHT+IEOnc57iTWUFaDPB8HVttZZBXkGceicoCUz2ChQ8zSFsL0MhttY/Cd1T4mxAOtbASHj5+U7yA==
+X-Received: by 2002:a05:6000:2893:b0:3a9:dc5:df15 with SMTP id ffacd0b85a97d-3a90dc5df54mr8669775f8f.13.1751189781866;
+        Sun, 29 Jun 2025 02:36:21 -0700 (PDT)
+Received: from pumpkin (host-92-21-58-28.as13285.net. [92.21.58.28])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a88c7e7396sm7208499f8f.9.2025.06.29.02.36.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Jun 2025 02:36:21 -0700 (PDT)
+Date: Sun, 29 Jun 2025 10:36:20 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Jacek Kowalski <jacek@jacekk.info>
+Cc: Simon Horman <horms@kernel.org>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Vlad URSU <vlad@ursu.me>
+Subject: Re: [PATCH v3 2/2] e1000e: ignore factory-default checksum value on
+ TGP platform
+Message-ID: <20250629103620.186ea33d@pumpkin>
+In-Reply-To: <613026c7-319c-480f-83da-ffc85faaf42b@jacekk.info>
+References: <91030e0c-f55b-4b50-8265-2341dd515198@jacekk.info>
+	<5c75ef9b-12f5-4923-aef8-01d6c998f0af@jacekk.info>
+	<20250624194237.GI1562@horms.kernel.org>
+	<0407b67d-e63f-4a85-b3b4-1563335607dc@jacekk.info>
+	<20250625094411.GM1562@horms.kernel.org>
+	<613026c7-319c-480f-83da-ffc85faaf42b@jacekk.info>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/XFd5tjONOoZf=xt=2VCrVlT";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
-
---Sig_/XFd5tjONOoZf=xt=2VCrVlT
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-Hi Vladimir,
+On Wed, 25 Jun 2025 15:05:01 +0200
+Jacek Kowalski <jacek@jacekk.info> wrote:
 
-> On Thu, Jun 26, 2025 at 11:33:25PM +0200, Lukasz Majewski wrote:
-> > The second problem which I've found after some debugging:
-> > - One device is selected as grandmaster clock. Another one tries to
-> >   synchronize (for the simpler setup I've used two the same boards
-> > with identical kernel and KSZ9477 setup).
-> >=20
-> > - tshark from host on which we do have grandmaster running:
-> >   IEEEI&MS_00:00:00 PTPv2 58 Sync Message
-> >   LLDP_Multicast PTPv2 68 Peer_Delay_Req Message
-> >   IEEEI&MS_00:00:00 PTPv2 58 Sync Message
-> >   LLDP_Multicast PTPv2 68 Peer_Delay_Req Message
-> >=20
-> > So the SYNC is send, then the "slave" responds correctly with
-> > Peer_Delay_Req_Message. =20
->=20
-> Peer delay measurement is an independent process, not a response to
-> Sync messages.
->=20
-> > But then the "grandmaster" is NOT replying with PER_DELAY_RESPONSE.
-> >=20
-> > After some digging into the code it turned out that
-> > dsa_skb_defer_rx_timestamp() (from net/dsa/tag.c) calls
-> > ptp_classify_raw(skb), which is a bpf program.
-> >=20
-> > Instead of returning 0x42 I do receive "PTP_CLASS_NONE" and the
-> > frame is dropped.
-> >=20
-> > That is why grandmaster cannot send reply and finish the PTP clock
-> > adjustment process.
-> >=20
-> > The CONFIG_NET_PTP_CLASSIFY=3Dy.
-> >=20
-> > Any hints on how to proceed? If this would help - I'm using linux
-> > kernel with PREEMPT_RT applied to it. =20
->=20
-> Which frame is classified as PTP_CLASS_NONE? The peer delay request?
-> That doesn't sound convincing, can you place a call to skb_dump() and
-> show the contents of the PTP packets that don't pass this BPF filter?
-> Notably, the filter matches for event messages and doesn't match for
-> general messages, maybe that confused your debugging process in some
-> way.
+> >>>> +#define NVM_CHECKSUM_FACTORY_DEFAULT 0xFFFF  
+> >>>
+> >>> Perhaps it is too long, but I liked Vlad's suggestion of naming this
+> >>> NVM_CHECKSUM_WORD_FACTORY_DEFAULT.  
+> 
+> So the proposals are:
+> 
+> 1. NVM_CHECKSUM_WORD_FACTORY_DEFAULT
+> 2. NVM_CHECKSUM_FACTORY_DEFAULT
+> 3. NVM_CHECKSUM_INVALID
+> 4. NVM_CHECKSUM_MISSING
+> 5. NVM_CHECKSUM_EMPTY
+> 6. NVM_NO_CHECKSUM
+> 
+> Any other contenders?
+> 
 
-It looks like PER_DELAY_REQ goes from one KSZ9477 device (with DA:
-01:80:C2:00:00:0E) and then it is not visible (i.e. is dropped) in the
-tshark output on the other KSZ9477 device.
+0xffff
 
-=46rom what I've read on the Internet - those multicast frames are
-dropped by default by switches, but I'm using KSZ9477 ports in
-stand alone mode - i.e. bridge is not created).
+With a comment saying some manufacturers don't calculate the checksum.
+Then you don't needs to search the definition to find out what is going on.
 
-On the other hand - the frames with DA: 01:16:19:00:00:00 (other
-multicast "set" of address) are delivered correctly (so the grandmaster
-clock is elected).
-
-This is under further investigation.
-(setting KSZ9477 lan3s as promisc doesn't help).
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/XFd5tjONOoZf=xt=2VCrVlT
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmhhBz4ACgkQAR8vZIA0
-zr1ZOQgAoNiDQqxj7aDNrm2SbIfv/muo/LP0cPWjX1HoLtFyjVmFnOityPabUCdj
-+0otg2cpnHzjTmI+9CNuSXm6NPrWQ6b79XDe5alE727iggUW5aFl0Pmq2pbCPqWs
-3hXKmCpNYiM8iAfaNc687XuKr8L/wxGQU+WcEYixX90DE5hYkiXcrC5id+cVKE4O
-LFXo3z8fwNcCMmBTIz6oJUFWPD3TEc0qOWDhR2IUeP9c6hPwqPLd88039xRPuTA0
-uxCCKvCnd79KlRwvoo888GPYJNEmNUUboXFrgV1fkj/Ytc+JyX331sI77kj8iplJ
-ZEiXG6jFlcAMXQOKDKYumJEut49WAA==
-=NSXe
------END PGP SIGNATURE-----
-
---Sig_/XFd5tjONOoZf=xt=2VCrVlT--
+	David
 
