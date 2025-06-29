@@ -1,104 +1,147 @@
-Return-Path: <netdev+bounces-202248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA187AECE44
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 17:10:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35F27AECE5E
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 17:49:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E899189250F
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 15:11:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B8801895612
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 15:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A8E6230D2B;
-	Sun, 29 Jun 2025 15:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD48722D781;
+	Sun, 29 Jun 2025 15:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v+kESv11"
 X-Original-To: netdev@vger.kernel.org
-Received: from plesk.hostmyservers.fr (plesk.hostmyservers.fr [45.145.164.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD9927456;
-	Sun, 29 Jun 2025 15:10:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.164.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856C313790B
+	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 15:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751209852; cv=none; b=BCnPzKK8HOyFgAUCHouODMqqxVI5S9CzY9ZQ+zvRiRR6485KZn3YTcy7tdOV6oUSXzTCaVpfXgsLUSw8dNKodP+MUMAgTZuTFMK8gSBQkIxRTi3BB564KsH1TI/DhI8o10dMJG8KU8LRkgkhvpb6CK32swZ4BSssilJzg7n72Bw=
+	t=1751212176; cv=none; b=GaVFdZSdpHca8D4s+MfH/oeALS9D1ArLMWoOiY5pMwmm5mF/e4MKrILnL54aKkkDhuOAgXiybZqTHhq+It9+YP+1JnvjrNEg8/6wfM8t2ThvN9j8c4JrzHBUEa/dIcHL4r2YplldOG6Tjg+5YdSZ2odLzgAtO6cBdG1RGwEYOQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751209852; c=relaxed/simple;
-	bh=+XqR8bvOHxkPqaJepQHhIXbhpGpTPU9EP0Oa/KDkYuU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FL879nnDJpS53kmWtkpBoiborRI29ED8Ma9t3qGKKOj3/BN5HVbk0ohcOuh4iojgLRsZZLTjd0aPu1Ozo0olmoa9KPfEMrzgIsKLfA8L6XjG8aTYifnRuGZxI0w3iEudkswRxNwz/qfBZ13FVpMAbwFvwVJdOfOydjOemshhjjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arnaud-lcm.com; spf=pass smtp.mailfrom=arnaud-lcm.com; arc=none smtp.client-ip=45.145.164.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arnaud-lcm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arnaud-lcm.com
-Received: from arnaudlcm-X570-UD.. (unknown [IPv6:2a02:8084:255b:aa00:d1f3:4f54:4c66:bf44])
-	by plesk.hostmyservers.fr (Postfix) with ESMTPSA id A51A841E5E;
-	Sun, 29 Jun 2025 15:10:48 +0000 (UTC)
-Authentication-Results: Plesk;
-	spf=pass (sender IP is 2a02:8084:255b:aa00:d1f3:4f54:4c66:bf44) smtp.mailfrom=contact@arnaud-lcm.com smtp.helo=arnaudlcm-X570-UD..
-Received-SPF: pass (Plesk: connection is authenticated)
-From: Arnaud Lecomte <contact@arnaud-lcm.com>
-To: syzbot+827ae2bfb3a3529333e9@syzkaller.appspotmail.com
-Cc: agordeev@linux.ibm.com,
-	alibuda@linux.alibaba.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	guwen@linux.alibaba.com,
-	horms@kernel.org,
-	jaka@linux.ibm.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com,
-	tonylu@linux.alibaba.com,
-	wenjia@linux.ibm.com
-Subject: syztest
-Date: Sun, 29 Jun 2025 16:10:42 +0100
-Message-ID: <20250629151042.50986-1-contact@arnaud-lcm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <67eaf9b8.050a0220.3c3d88.004a.GAE@google.com>
-References: <67eaf9b8.050a0220.3c3d88.004a.GAE@google.com>
+	s=arc-20240116; t=1751212176; c=relaxed/simple;
+	bh=GQLr7xchKK1viEfYMHygrCDLhlsEOMPIMYaTzu19GIY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kKh/KKYu4XbnH8Xg7uc/3ryratbYUD9QhmpQPM5IzH5rUVnpSQsg8MOmRmGqK2cwVLc4Tgc8xgn+dxOa5+5IxLOtO7pV/DYV04P08VdAv49t/4IZfH3pfEBQj64HDwVqICUu+Wq34gMsgKN115yu9Zb6iCVlclULxComOklJzTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v+kESv11; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <745fd720-4cf5-42c4-9cb6-a4932c6f68ee@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751212172;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=imiGuD/gOJUll+b4BS//Yom8mQki/dKUk35+LdByEn4=;
+	b=v+kESv11z0HGmpL45RAXvRBHnh0k134yrqjPIbNq6jgueBGrKJlRUqj053Ydn7zDBUIx9d
+	9sBG+0wB4Ao6K09Gb2WFe1SXSgLFLMWla+z/bCKfvP9XL6RN9KjVeA/d4ObLuYSLKC/TlJ
+	zA/fIOpGMm7LU8m87fp4tcsrKAo887I=
+Date: Sun, 29 Jun 2025 16:49:14 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-PPP-Message-ID: <175120984960.24200.8751488680677029462@Plesk>
-X-PPP-Vhost: arnaud-lcm.com
+Subject: Re: [patch 1/3] timekeeping: Provide ktime_get_clock_ts64()
+To: Thomas Gleixner <tglx@linutronix.de>, LKML <linux-kernel@vger.kernel.org>
+Cc: netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>,
+ Christopher Hall <christopher.s.hall@intel.com>,
+ John Stultz <jstultz@google.com>, Frederic Weisbecker <frederic@kernel.org>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Miroslav Lichvar <mlichvar@redhat.com>,
+ Werner Abt <werner.abt@meinberg-usa.com>,
+ David Woodhouse <dwmw2@infradead.org>, Stephen Boyd <sboyd@kernel.org>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
+ Kurt Kanzenbach <kurt@linutronix.de>, Nam Cao <namcao@linutronix.de>,
+ Antoine Tenart <atenart@kernel.org>
+References: <20250626124327.667087805@linutronix.de>
+ <20250626131708.419101339@linutronix.de>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250626131708.419101339@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-#syz test
+On 26/06/2025 14:27, Thomas Gleixner wrote:
+> PTP implements an inline switch case for taking timestamps from various
+> POSIX clock IDs, which already consumes quite some text space. Expanding it
+> for auxiliary clocks really becomes too big for inlining.
+> 
+> Provide a out of line version.
+> 
+> The function invalidates the timestamp in case the clock is invalid. The
+> invalidation allows to implement a validation check without the need to
+> propagate a return value through deep existing call chains.
+> 
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> ---
+>   include/linux/timekeeping.h |    1 +
+>   kernel/time/timekeeping.c   |   34 ++++++++++++++++++++++++++++++++++
+>   2 files changed, 35 insertions(+)
+> 
+> --- a/include/linux/timekeeping.h
+> +++ b/include/linux/timekeeping.h
+> @@ -44,6 +44,7 @@ extern void ktime_get_ts64(struct timesp
+>   extern void ktime_get_real_ts64(struct timespec64 *tv);
+>   extern void ktime_get_coarse_ts64(struct timespec64 *ts);
+>   extern void ktime_get_coarse_real_ts64(struct timespec64 *ts);
+> +extern void ktime_get_clock_ts64(clockid_t id, struct timespec64 *ts);
+>   
+>   /* Multigrain timestamp interfaces */
+>   extern void ktime_get_coarse_real_ts64_mg(struct timespec64 *ts);
+> --- a/kernel/time/timekeeping.c
+> +++ b/kernel/time/timekeeping.c
+> @@ -1636,6 +1636,40 @@ void ktime_get_raw_ts64(struct timespec6
+>   EXPORT_SYMBOL(ktime_get_raw_ts64);
+>   
+>   /**
+> + * ktime_get_clock_ts64 - Returns time of a clock in a timespec
+> + * @id:		POSIX clock ID of the clock to read
+> + * @ts:		Pointer to the timespec64 to be set
+> + *
+> + * The timestamp is invalidated (@ts->sec is set to -1) if the
+> + * clock @id is not available.
+> + */
+> +void ktime_get_clock_ts64(clockid_t id, struct timespec64 *ts)
+> +{
+> +	/* Invalidate time stamp */
+> +	ts->tv_sec = -1;
+> +	ts->tv_nsec = 0;
+> +
+> +	switch (id) {
+> +	case CLOCK_REALTIME:
+> +		ktime_get_real_ts64(ts);
+> +		return;
+> +	case CLOCK_MONOTONIC:
+> +		ktime_get_ts64(ts);
+> +		return;
+> +	case CLOCK_MONOTONIC_RAW:
+> +		ktime_get_raw_ts64(ts);
+> +		return;
+> +	case CLOCK_AUX ... CLOCK_AUX_LAST:
+> +		if (IS_ENABLED(CONFIG_POSIX_AUX_CLOCKS))
+> +			ktime_get_aux_ts64(id, ts);
+> +		return;
+> +	default:
+> +		WARN_ON_ONCE(1);
+> +	}
+> +}
+> +EXPORT_SYMBOL_GPL(ktime_get_clock_ts64);
+> +
+> +/**
+>    * timekeeping_valid_for_hres - Check if timekeeping is suitable for hres
+>    */
+>   int timekeeping_valid_for_hres(void)
+> 
 
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -125,9 +125,12 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
- {
- 	struct smc_sock *smc;
- 	struct sock *child;
--
-+	read_lock_bh(&((struct sock *)sk)->sk_callback_lock);
- 	smc = smc_clcsock_user_data(sk);
- 
-+	if (!smc)
-+		goto drop;
-+
- 	if (READ_ONCE(sk->sk_ack_backlog) + atomic_read(&smc->queued_smc_hs) >
- 				sk->sk_max_ack_backlog)
- 		goto drop;
-@@ -148,9 +151,11 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
- 		if (inet_csk(child)->icsk_af_ops == inet_csk(sk)->icsk_af_ops)
- 			inet_csk(child)->icsk_af_ops = smc->ori_af_ops;
- 	}
-+	read_unlock_bh(&((struct sock *)sk)->sk_callback_lock);
- 	return child;
- 
- drop:
-+	read_unlock_bh(&((struct sock *)sk)->sk_callback_lock);
- 	dst_release(dst);
- 	tcp_listendrop(sk);
- 	return NULL;
--- 
-2.43.0
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
