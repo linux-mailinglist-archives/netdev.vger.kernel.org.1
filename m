@@ -1,133 +1,179 @@
-Return-Path: <netdev+bounces-202246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0E11AECE2B
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 16:54:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 64916AECE3F
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 17:07:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB7A83A432D
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 14:54:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D3503B27EB
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 15:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A64A122FDE8;
-	Sun, 29 Jun 2025 14:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bg7hi60p"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3E3C22B584;
+	Sun, 29 Jun 2025 15:07:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5854249641
-	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 14:54:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0294221A455
+	for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 15:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751208880; cv=none; b=i71iSlCcl6nO2hNpldOCeHpE58zksdRlnyoSSG8g2p9DaEU+W6T1qL0lXxgyE6Pl+OfR7PHmDwSbOoia2NrFLMQTjjome0g+xl3/1FTPthWTnvAQNM+lA94m++0lcw2tRsQECKl9RmOZTtSN9lbm1dtA219ZyXPH5w6B8Ydeh20=
+	t=1751209626; cv=none; b=pYsmdpEkbwed/9ZAQTXwOJ9gUlHzBEBFfqkxEHwWQ8rbOa8+HzQg90IeGeULJC1O9wUBvP+bQqeEbYjeg9SzpIdPU/gZ2D77PUd0P58DUhgURZYEDMhgickWZOg4OiLD+IO+GxEmDaS1ki7svfnzqu9g19B5wOMlJTabkFnXWXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751208880; c=relaxed/simple;
-	bh=l9tHexwvz31Lw4jhr7OsllrHqICq0FQTtmKSRYkqDj4=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=Ec6l4eHvlZhRgQ/A3xuoSBtjbcclLxmZFVf1HLz09vyl9+uVnsY79KOq1UYfGoxSfopg2L+hQtBdtLdoP9XXWIIObv4Q0YhzrS7MARcOeZanpSr01aCmjGLkYqaHIC7kbg30xPjSHnICDwRnFJLn/0F7+VujG9RGaWbh6ogIZu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bg7hi60p; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1751209626; c=relaxed/simple;
+	bh=9p5j+1mqqo5eGutd7ZZOQQP7oR71COV1J6XL55ODfMM=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=KK0IV14nRUObvUbM3sE0pI40E/LS9//Y6zcluNOH3adE7H1eGq8UJ+RSEZlN02grAGLBCOvzSBLRTtUlVt6ZzaUPLI+j0Mi/AJfgNFrHX4j9bbndRojQLXr26P84EqFLAxvkqamI3G7uUTQ1OCMtb4nCYJpH8MS6IMZBifcnsac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-86d1218df67so134172539f.1
+        for <netdev@vger.kernel.org>; Sun, 29 Jun 2025 08:07:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751209624; x=1751814424;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DWCEYgKLzJgMoXu54KGP51OMmYjuso0+KqTEW+OYlfo=;
+        b=ckYmCsQ1toUa2kOQ5NYE1ZzwXa1W/U11eecphKEXfjxGux9QmIbbnWMTyDLmlkVQPf
+         dmQop2jK6MPVwZxm8vWsGiqbRHsmWwkq1Xpl5mqI5dyD/RjalvFXQcvzIBMaCPWFwVPd
+         NPwarUVDPsibGkgMWymMJqXijy/b3rGdZym2/LIx3bFDjMzFcdG7JdnL0ehrFpJrF9ZV
+         tQ+kxZK7JD1ggp5bLBGgHuT1pj5T0xrisVf6v7j+tA5BT4tAQCTkQyRPHHZhWMCffjmE
+         ThrbqYC79Y/7mvlyyS/b+jl2xTLdZTrCc2ztIWQ5CgffBrriwIHvmbuq+WzhbSKz9oQN
+         Sc4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXJC/FMZhe9IG3LhNIXsEr5URKF4W8No+wgq8zRNlPAr/8j+yBKhCRwgf93MLJfDP1geP1o+lo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdxQ8ECBeBY2YrQY+cZ03GCHDkzUpNvM/l30cymnbXiIjzEGsn
+	2C3dIJBt2WIKJh/dRYDseIz4zn7EA6S0qWdPq8adwV2aNhl1evNVsAAkPSnpgucOYgzd3KnE7kw
+	KRPg846XXQ74wnVsLzIvT1COq+fblaZyi0ifvvUYNITt4vk71q53PDnpUV20=
+X-Google-Smtp-Source: AGHT+IGWB1npyb29iI1ZO3MCGbLX3x+ye5sX50XhZiUh3LBadwlVb8sgFlBy1w3tabtXlXnJjewVuth6lsR7dHcOuouFd7eqPPvx
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751208864;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kDcARP6CMmcJuYEL59wH4tdcs7qBxPVhWeD7yb9xdM4=;
-	b=bg7hi60p2EvQw+jlWo+D3xjgX3zrQRNhTbhDlO2wcFmGjZP6cjHZZte79RK5shv08wZFFW
-	Io3C9z+9mSq5aFk4vnqW/l3baxaua94shRPOGy5pkw/B7FtOK25wuGiLe/m+p2BISHHFYV
-	GstmwT4CHBvok5WTwh3dVZQDgQooqi8=
-Date: Sun, 29 Jun 2025 14:54:19 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Frank Wunderlich" <frank.wunderlich@linux.dev>
-Message-ID: <15a39258ece1eee5f42ef6d244befd88f9671a08@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net/next 3/3] net: ethernet: mtk_eth_soc: use genpool
- allocator for SRAM
-To: "Andrew Lunn" <andrew@lunn.ch>, "Daniel Golle" <daniel@makrotopia.org>
-Cc: "Sky Huang" <skylake.huang@mediatek.com>, netdev@vger.kernel.org, "Sean
- Wang" <sean.wang@mediatek.com>, linux-mediatek@lists.infradead.org,
- linux-kernel@vger.kernel.org, "Andrew Lunn" <andrew+netdev@lunn.ch>,
- "Eric Dumazet" <edumazet@google.com>, "Matthias Brugger"
- <matthias.bgg@gmail.com>, linux-arm-kernel@lists.infradead.org, "Bo-Cun
- Chen" <bc-bocun.chen@mediatek.com>, "Eric Woudstra"
- <ericwouds@gmail.com>, "Elad Yifee" <eladwf@gmail.com>, "Jakub Kicinski"
- <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Lorenzo Bianconi"
- <lorenzo@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- "AngeloGioacchino Del Regno" <angelogioacchino.delregno@collabora.com>,
- "Felix Fietkau" <nbd@nbd.name>
-In-Reply-To: <f9bec387-1858-4c79-bb4b-60e744457c9f@lunn.ch>
-References: <cover.1751072868.git.daniel@makrotopia.org>
- <566ca90fc59ad0d3aff8bc8dc22ebaf0544bce47.1751072868.git.daniel@makrotopia.org>
- <f9bec387-1858-4c79-bb4b-60e744457c9f@lunn.ch>
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6e02:3308:b0:3df:49b4:8cd6 with SMTP id
+ e9e14a558f8ab-3df4ab7811bmr116149255ab.7.1751209624226; Sun, 29 Jun 2025
+ 08:07:04 -0700 (PDT)
+Date: Sun, 29 Jun 2025 08:07:04 -0700
+In-Reply-To: <20250629144748.45117-1-contact@arnaud-lcm.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68615698.a00a0220.274b5f.0013.GAE@google.com>
+Subject: Re: [syzbot] [smc?] KASAN: null-ptr-deref Read in smc_tcp_syn_recv_sock
+From: syzbot <syzbot+827ae2bfb3a3529333e9@syzkaller.appspotmail.com>
+To: agordeev@linux.ibm.com, alibuda@linux.alibaba.com, contact@arnaud-lcm.com, 
+	davem@davemloft.net, edumazet@google.com, guwen@linux.alibaba.com, 
+	horms@kernel.org, jaka@linux.ibm.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, tonylu@linux.alibaba.com, 
+	wenjia@linux.ibm.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Andrew,
+Hello,
 
-> Gesendet: Samstag, 28. Juni 2025 um 10:13
-> Von: "Andrew Lunn" <andrew@lunn.ch>
-> Betreff: Re: [PATCH net/next 3/3] net: ethernet: mtk_eth_soc: use genpo=
-ol allocator for SRAM
->
-> > +static void *mtk_dma_ring_alloc(struct mtk_eth *eth, size_t size,
-> > +				dma_addr_t *dma_handle)
-> > +{
-> > +	void *dma_ring;
-> > +
-> > +	if (WARN_ON(mtk_use_legacy_sram(eth)))
-> > +		return -ENOMEM;
-> > +
-> > +	if (eth->sram_pool) {
-> > +		dma_ring =3D (void *)gen_pool_alloc(eth->sram_pool, size);
-> > +		if (!dma_ring)
-> > +			return dma_ring;
-> > +		*dma_handle =3D gen_pool_virt_to_phys(eth->sram_pool, (unsigned lo=
-ng)dma_ring);
->=20
->=20I don't particularly like all the casting backwards and forwards
-> between unsigned long and void *. These two APIs are not really
-> compatible with each other. So any sort of wrapping is going to be
-> messy.
->=20
->=20Maybe define a cookie union:
->=20
->=20struct mtk_dma_cookie {
-> 	union {
-> 		unsigned long gen_pool;
-> 		void *coherent;
-> 	}
-> }
->=20
->=20Only dma_handle appears to be used by the rest of the code, so only
-> the _alloc and _free need to know about the union.
+syzbot has tested the proposed patch but the reproducer is still triggering an issue:
+WARNING in smc_tcp_syn_recv_sock
 
-do you mean use the union only for the casts or using it globally for all=
- the access
-to the dma struct (and so changing the return type of the alloc function)=
-?
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 6792 at net/smc/af_smc.c:129 smc_tcp_syn_recv_sock+0x3f8/0x570 net/smc/af_smc.c:129
+Modules linked in:
+CPU: 1 UID: 0 PID: 6792 Comm: syz.1.16 Not tainted 6.16.0-rc3-syzkaller-gdfba48a70cb6-dirty #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+RIP: 0010:smc_tcp_syn_recv_sock+0x3f8/0x570 net/smc/af_smc.c:129
+Code: 48 8d bb f0 03 00 00 be 01 00 00 00 e8 21 c0 57 00 31 ff 89 c5 89 c6 e8 96 88 a2 f6 85 ed 0f 85 81 fc ff ff e8 49 8d a2 f6 90 <0f> 0b 90 e9 73 fc ff ff e8 3b 8d a2 f6 4c 89 fa 48 b8 00 00 00 00
+RSP: 0018:ffffc90000a08780 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: ffff888034d95e80 RCX: ffffffff8b198ffa
+RDX: ffff88802825da00 RSI: ffffffff8b199007 RDI: 0000000000000005
+RBP: 0000000000000000 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000000
+R13: ffff8880352e89e0 R14: ffffc90000a08850 R15: ffff888034d95e80
+FS:  00007fba98e0c6c0(0000) GS:ffff888124ab5000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000040 CR3: 0000000032bf6000 CR4: 0000000000350ef0
+Call Trace:
+ <IRQ>
+ tcp_check_req+0x69d/0x1f80 net/ipv4/tcp_minisocks.c:874
+ tcp_v4_rcv+0x19b0/0x4650 net/ipv4/tcp_ipv4.c:2283
+ ip_protocol_deliver_rcu+0xba/0x4c0 net/ipv4/ip_input.c:205
+ ip_local_deliver_finish+0x316/0x570 net/ipv4/ip_input.c:233
+ NF_HOOK include/linux/netfilter.h:317 [inline]
+ NF_HOOK include/linux/netfilter.h:311 [inline]
+ ip_local_deliver+0x18e/0x1f0 net/ipv4/ip_input.c:254
+ dst_input include/net/dst.h:469 [inline]
+ ip_rcv_finish net/ipv4/ip_input.c:447 [inline]
+ NF_HOOK include/linux/netfilter.h:317 [inline]
+ NF_HOOK include/linux/netfilter.h:311 [inline]
+ ip_rcv+0x2c3/0x5d0 net/ipv4/ip_input.c:567
+ __netif_receive_skb_one_core+0x197/0x1e0 net/core/dev.c:5977
+ __netif_receive_skb+0x1d/0x160 net/core/dev.c:6090
+ process_backlog+0x442/0x15e0 net/core/dev.c:6442
+ __napi_poll.constprop.0+0xba/0x550 net/core/dev.c:7414
+ napi_poll net/core/dev.c:7478 [inline]
+ net_rx_action+0xa9f/0xfe0 net/core/dev.c:7605
+ handle_softirqs+0x219/0x8e0 kernel/softirq.c:579
+ do_softirq kernel/softirq.c:480 [inline]
+ do_softirq+0xb2/0xf0 kernel/softirq.c:467
+ </IRQ>
+ <TASK>
+ __local_bh_enable_ip+0x100/0x120 kernel/softirq.c:407
+ local_bh_enable include/linux/bottom_half.h:33 [inline]
+ rcu_read_unlock_bh include/linux/rcupdate.h:910 [inline]
+ __dev_queue_xmit+0x8ab/0x43e0 net/core/dev.c:4740
+ dev_queue_xmit include/linux/netdevice.h:3355 [inline]
+ neigh_hh_output include/net/neighbour.h:523 [inline]
+ neigh_output include/net/neighbour.h:537 [inline]
+ ip_finish_output2+0xc38/0x21a0 net/ipv4/ip_output.c:235
+ __ip_finish_output net/ipv4/ip_output.c:313 [inline]
+ __ip_finish_output+0x49e/0x950 net/ipv4/ip_output.c:295
+ ip_finish_output+0x35/0x380 net/ipv4/ip_output.c:323
+ NF_HOOK_COND include/linux/netfilter.h:306 [inline]
+ ip_output+0x13b/0x2a0 net/ipv4/ip_output.c:433
+ dst_output include/net/dst.h:459 [inline]
+ ip_local_out net/ipv4/ip_output.c:129 [inline]
+ __ip_queue_xmit+0x1d7d/0x26c0 net/ipv4/ip_output.c:527
+ __tcp_transmit_skb+0x2686/0x3e90 net/ipv4/tcp_output.c:1479
+ __tcp_send_ack.part.0+0x3de/0x700 net/ipv4/tcp_output.c:4279
+ __tcp_send_ack net/ipv4/tcp_output.c:4285 [inline]
+ tcp_send_ack+0x84/0xa0 net/ipv4/tcp_output.c:4285
+ tcp_rcv_synsent_state_process net/ipv4/tcp_input.c:6632 [inline]
+ tcp_rcv_state_process+0x4236/0x4ed0 net/ipv4/tcp_input.c:6826
+ tcp_v4_do_rcv+0x1ad/0xa90 net/ipv4/tcp_ipv4.c:1948
+ sk_backlog_rcv include/net/sock.h:1148 [inline]
+ __release_sock+0x31b/0x400 net/core/sock.c:3213
+ release_sock+0x5a/0x220 net/core/sock.c:3767
+ mptcp_connect+0xccd/0xfe0 net/mptcp/protocol.c:3695
+ __inet_stream_connect+0x3c8/0x1020 net/ipv4/af_inet.c:677
+ inet_stream_connect+0x57/0xa0 net/ipv4/af_inet.c:748
+ __sys_connect_file+0x141/0x1a0 net/socket.c:2038
+ __sys_connect+0x13b/0x160 net/socket.c:2057
+ __do_sys_connect net/socket.c:2063 [inline]
+ __se_sys_connect net/socket.c:2060 [inline]
+ __x64_sys_connect+0x72/0xb0 net/socket.c:2060
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0x4c0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fba97f7e719
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fba98e0c038 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+RAX: ffffffffffffffda RBX: 00007fba98135f80 RCX: 00007fba97f7e719
+RDX: 0000000000000010 RSI: 0000000020000000 RDI: 0000000000000004
+RBP: 00007fba97ff132e R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007fba98135f80 R15: 00007ffdbf9fe0b8
+ </TASK>
 
-first i made here [1]
 
-second was tried by daniel and is much more change.
+Tested on:
 
-OT: btw. have you took a look in the PCS decision case [1]?
+commit:         dfba48a7 Merge tag 'i2c-for-6.16-rc4' of git://git.ker..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1622a982580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d3e0d55231e0c89c
+dashboard link: https://syzkaller.appspot.com/bug?extid=827ae2bfb3a3529333e9
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=1097888c580000
 
-regards Frank
-
-[1] https://github.com/frank-w/BPI-Router-Linux/commit/ea963012375e4ac989=
-47a703b5eaf21fdf221ee1
-[2] https://lore.kernel.org/netdev/24c4dfe9-ae3a-4126-b4ec-baac7754a669@l=
-inux.dev/
 
