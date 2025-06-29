@@ -1,161 +1,162 @@
-Return-Path: <netdev+bounces-202209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22612AECB63
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 07:16:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60874AECB71
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 07:31:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 260F1189838D
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 05:17:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B38018985CE
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 05:31:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1F10184E;
-	Sun, 29 Jun 2025 05:16:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FE201C84DC;
+	Sun, 29 Jun 2025 05:31:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="maTAq/EX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jMSqAJAU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6654CEC4;
-	Sun, 29 Jun 2025 05:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BC940BF5;
+	Sun, 29 Jun 2025 05:31:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751174201; cv=none; b=Op4ZB+4QFHJRXJ7YpQE6lAPaYulcK1SsqpladRF9pd2Fu+YB/Uy4r+igU7rUhPvjY/cRAglWTrWef9ON8x1jIh9l4Qw+whmUMy+YuaPJPj/A3n8Eltzqzdapjpi3vmeliPX50B7RuxwQwGwJDfiH2dZ+v39zRYI3iZAOoyo1iHA=
+	t=1751175077; cv=none; b=fWXG4Ihovfz+1uBPLKvSrpAKcA2ypFRmZgiKa6Uxsj+xUsq3ZVTKBquyeUOATnkzwyr2txyRVe/3EfoLTjTIK8hULgMUTdX6LL2DIdAzr96Uha7BWzHCX+sON793njoAOME9G++E56iCC+tmZifLdYtQshKmFpTUTatutyLpk1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751174201; c=relaxed/simple;
-	bh=5YCtt4xWoE2sFZbqLhmFUZNY5xZBfrLF3umVblZJwhs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GPuZ1qEjmHSOOLSiRu3nv5UYoOX6prmBW4ZneUgxEHvTiYIKGG8T5nR1dNEkM2Mc/jmitDPUS7/dGHNMjwe01rbHV7RWvEw/aCBmgRy0vuPLsqcy8RR8+JuZeMnhmAInKXlgcI3rl/N60qZ3Y7uvL1xu8EW/27o21WeX1Jvl6F0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=maTAq/EX; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55T01Ivl011733;
-	Sun, 29 Jun 2025 05:16:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=PF3DZSZbA4tBUtEFvdIVO9kArXETg
-	OS8vUkIBIamiuY=; b=maTAq/EX1k5GlkKyZO1ehQsgN3jQR6Nv7VD9+jJer3dyL
-	KMJzWSfGNnjVkd0FMYct8WckbAdjjoqOzitmqTKDWKQQ4NLtzGDZxkq5b8rHlZB0
-	auvO/Pvgqa2QzYiOdJg0+mH7QUoY1+C3QX9f+y/6y2kfrNqbFkzwvyDOjQ9YV9lC
-	/rViAfbMq+NWfngAxp5UZ75eVPhWd0xwmehkXVj6ieRbRrN3zmQT2nHdnbCV5ly4
-	D+0UotUYLjoh9hk5zq48bY0udJ7vQZEy9VHNxfXX+J8JiE9ZoKh1i3ZE2IN1kcml
-	SZwrEPmLSBQtIEnkW2+Uttoth4pDcb1tW5L4H20Og==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47j7af0u4x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 29 Jun 2025 05:16:19 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 55T57ZGT038552;
-	Sun, 29 Jun 2025 05:16:10 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 47j6u78t87-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 29 Jun 2025 05:16:10 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 55T5BM8A020395;
-	Sun, 29 Jun 2025 05:16:09 GMT
-Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 47j6u78t82-1;
-	Sun, 29 Jun 2025 05:16:09 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: sgoutham@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        horms@kernel.org, netdev@vger.kernel.org
-Cc: alok.a.tiwari@oracle.com, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] net: thunderx: avoid direct MTU assignment after WRITE_ONCE()
-Date: Sat, 28 Jun 2025 22:15:37 -0700
-Message-ID: <20250629051540.518216-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1751175077; c=relaxed/simple;
+	bh=ETOpPQhKUGbb3m1DQNXZ9d1API2efLKRSgFfw3wjXYA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c+2KghDc2Ou4GX2myjryngDUXiNqzVkco6BzY2v/wgsQbAxaq01f6jsFmCPN69cbisF3zphRudZ0yqwoLq/ZCTC3S2hL+17K+WIA5JGhvPXNJuWAxAFoKlC8OQ1K0zMoRn128+kj/0N5r9V02a8SHnM3hDxV4duWA68WTK/TcyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jMSqAJAU; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b34a8f69862so1089186a12.2;
+        Sat, 28 Jun 2025 22:31:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751175074; x=1751779874; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4KxQw+8wrv6WHqC8EiMCQt88wHvecAR5EAJYKEAI9aQ=;
+        b=jMSqAJAUBjP/nfinIh9SMcf36rg5zUxHFHAYzeW3TvNgk0EBjCEmCw+lrc0ZpiqCBT
+         iWWWwTS4Fta7Q5+HUNitu9mmn2cujl5D50+oCKV5ryvQ7fAK1qtpp1eXudFB+Q1axHJM
+         6zS8Z0+LC1wQKPPF4N5ItEgxV0gF7SopjAAELpm9Q9bxONndAIrIwWSNzaPvroh51rv4
+         u3tnqIhj97vIFhC5p+ldMqO6bZ09DLSu0jeQfvFy0LXHBgOTPQH2IikrlPpx1G87GiG6
+         J5ony19EYjcwfxRsrEzV5mEpqWzXfHupOGN3pl0/97WwF/bp4Mt+2qK4FPSubvPi5MBK
+         wzuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751175074; x=1751779874;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4KxQw+8wrv6WHqC8EiMCQt88wHvecAR5EAJYKEAI9aQ=;
+        b=AhoNv7AXEwnRju8CgE/ImKqzRjo8jiePu92e2n83Ed1dMnv6Rj8TizCT81lM8150ql
+         3yzGpyZoPbXM6Ms6zxVQHIcAgvd2pu34n3ZT1AZEuAA9FeoLbCsGvZeU+JwBfgzvGaPd
+         oNdWhQ7nV7Yp0WfpPf2mExdE8zLpGcvutwqvIxhdVigt6Ooo5byownUvb4n89PzLbW1i
+         FoeUpw54PVt8+QjLz5h1S7V6Cl0iMBnyLFT1Do253CFseznPvPxbaaZu4SC0JyAW0t+e
+         S8R/J31fFFFe5zjLBaLHqN0/OcTANi1IbFXFc9eSJmMMrX4SdK+Zlnynk7okwSu+9HSs
+         w9Cg==
+X-Forwarded-Encrypted: i=1; AJvYcCUgILvvIHGFWO12qFeqKYvUe35tpqU36OyC5k8BThKxYmQghyJrQUj7Q0Zc9wfo2Km5cWA4OQKu@vger.kernel.org, AJvYcCWqle11UdvkZ0p0wysWrNk4RKZo4F4stNOXTb5w0XG6bfr7gfD58tPWgY1oh5oOxiJGcflRy4+ZaqkN2eRs@vger.kernel.org, AJvYcCXn351xr/6lCNX0bxhg9Sr4rjmoYiP5I0SINk7xjRlO37YswKmiFB4IoDe7wyeVl6j4Rjw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxW7qaazX/KCH95X/pfO60adSJfQv4ycXjessoD42zeggNkvaNk
+	usfqmM69MJb1DFwL6ZcL+sMxrjd0wTS5Zk/Qd/BIQRqowBAn+p7muFj26QgUiA==
+X-Gm-Gg: ASbGncsyZmaT1PJZcLT14jhFhf9usEX6KA663UzDJbbCDoFe2O7fQEKmGB3nsRQ1ray
+	ximu2NBLWjESVKmHecb/ERDjqjN9TGiQooehN/fbnR/Yc5ATX3PMNmC8HX3mq35frj1nIR+JB79
+	sBFzgBNoJxhyKLfl6B8Kp87uRMd7CG3ER+SEjvOkz2sWBcwdPQQW4mRo2151LMzZaCOfacOOlUX
+	PFryWXTdM7mhFrEnmXqfMcNbMbYpRQbh4f4833hWpkU0GQWLcRgPCq9q6VKvpDp5FnWpvKXc7x+
+	9Va3yX0SgSkrqL5Pf9pThupGxY9+p1oLy+GbSkOc1voy90ktjXruDyz6IMMc20VAl5MPbXslmXQ
+	S/gHeuZl3iJ+KvU3nskNxmDdDhepRQpTwlKaxcmpv
+X-Google-Smtp-Source: AGHT+IEVZEItwhAmpQ7qT5rj0OSH/4b+v0bHuKzDVzS/4Qq/q+fKX3xbk/96CMChuM4cXxPSEAR6mA==
+X-Received: by 2002:a17:90b:4c89:b0:312:29e:9ec9 with SMTP id 98e67ed59e1d1-318c92ee68dmr14182999a91.24.1751175073661;
+        Sat, 28 Jun 2025 22:31:13 -0700 (PDT)
+Received: from ?IPV6:2001:ee0:4f0e:fb30:6051:fd69:c29f:10f6? ([2001:ee0:4f0e:fb30:6051:fd69:c29f:10f6])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-315f54414acsm10901024a91.47.2025.06.28.22.31.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 28 Jun 2025 22:31:13 -0700 (PDT)
+Message-ID: <c207a343-7e08-4a2f-9163-2d64dd47d906@gmail.com>
+Date: Sun, 29 Jun 2025 12:31:07 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-27_05,2025-06-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0
- mlxlogscore=999 malwarescore=0 mlxscore=0 adultscore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2505160000 definitions=main-2506290041
-X-Proofpoint-ORIG-GUID: E4FMocrkEVo34wSxTFAcXpK3dmRZfjCk
-X-Proofpoint-GUID: E4FMocrkEVo34wSxTFAcXpK3dmRZfjCk
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjI5MDA0MiBTYWx0ZWRfX1XzUF28HmOio 3Rmpgb3lys6DDXLsPaDs2C8BdToQupenPxVwilEZUjN6j1z+mgE3cV+C17Gs/h/KsHwZwlzlQk3 Dz0sbvmmGSeLKzlFlN7i3+jBAedgCI5s/9Dn7BvnQgjAwmRY7Ao5AmNydKibehN+tnwr+1zhWX1
- kWNcaOY0pO8H1nbC0VOYgnqrszm/vi0ryUWmGbXeoFdVn42Te73mcy6CyaWHbKBK/+VHCjvsKmF mKR0uEhZMq+Bazpseg6BOue+YtJevqe2DjOscAlg4PCJh3FLfsvupHT17mJj4hNP5ns/l9r0TEd C7fXIudW81WXFZGrI1ZBPaRgE0tDAbP055bofUCtw4kBj9Rcq3ZDGocNL/3NYGbQbtr3dsdl38j
- Tflqtq0xuuZjKuDJ0ARtF5I0GEOmdBPvYFV+wEEJwgHWsuKGu+lj0p/rNNyOkYDa9IftfG6H
-X-Authority-Analysis: v=2.4 cv=b5Cy4sGx c=1 sm=1 tr=0 ts=6860cc23 cx=c_pps a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17 a=6IFa9wvqVegA:10 a=yPCof4ZbAAAA:8 a=Heg8zcIur3sJgoQ754cA:9
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 2/2] virtio-net: xsk: rx: move the xdp->data
+ adjustment to buf_to_xdp()
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+References: <20250621144952.32469-1-minhquangbui99@gmail.com>
+ <20250621144952.32469-3-minhquangbui99@gmail.com>
+ <e6654755-3aa1-4f4b-a6ab-c7568d8a5d4e@redhat.com>
+Content-Language: en-US
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+In-Reply-To: <e6654755-3aa1-4f4b-a6ab-c7568d8a5d4e@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The current logic in nicvf_change_mtu() writes the new MTU to
-netdev->mtu using WRITE_ONCE() before verifying if the hardware
-update succeeds. However on hardware update failure, it attempts
-to revert to the original MTU using a direct assignment
-(netdev->mtu = orig_mtu)
-which violates the intended of WRITE_ONCE protection introduced in
-commit 1eb2cded45b3 ("net: annotate writes on dev->mtu from
-ndo_change_mtu()")
+On 6/24/25 17:17, Paolo Abeni wrote:
+> On 6/21/25 4:49 PM, Bui Quang Minh wrote:
+>> This commit does not do any functional changes. It moves xdp->data
+>> adjustment for buffer other than first buffer to buf_to_xdp() helper so
+>> that the xdp_buff adjustment does not scatter over different functions.
+>>
+>> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+>> ---
+>>   drivers/net/virtio_net.c | 16 ++++++++++++++--
+>>   1 file changed, 14 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>> index 1eb237cd5d0b..4e942ea1bfa3 100644
+>> --- a/drivers/net/virtio_net.c
+>> +++ b/drivers/net/virtio_net.c
+>> @@ -1159,7 +1159,19 @@ static struct xdp_buff *buf_to_xdp(struct virtnet_info *vi,
+>>   		return NULL;
+>>   	}
+>>   
+>> -	xsk_buff_set_size(xdp, len);
+>> +	if (first_buf) {
+>> +		xsk_buff_set_size(xdp, len);
+>> +	} else {
+>> +		/* This is the same as xsk_buff_set_size but with the adjusted
+>> +		 * xdp->data.
+>> +		 */
+>> +		xdp->data = xdp->data_hard_start + XDP_PACKET_HEADROOM;
+>> +		xdp->data -= vi->hdr_len;
+>> +		xdp->data_meta = xdp->data;
+>> +		xdp->data_end = xdp->data + len;
+>> +		xdp->flags = 0;
+>> +	}
+>> +
+>>   	xsk_buff_dma_sync_for_cpu(xdp);
+>>   
+>>   	return xdp;
+>> @@ -1284,7 +1296,7 @@ static int xsk_append_merge_buffer(struct virtnet_info *vi,
+>>   			goto err;
+>>   		}
+>>   
+>> -		memcpy(buf, xdp->data - vi->hdr_len, len);
+>> +		memcpy(buf, xdp->data, len);
+>>   
+>>   		xsk_buff_free(xdp);
+>>   
+> I'm unsure if this change is in the right direction because it almost
+> open-code the existing xsk_buff_set_size() helper - any changes there
+> should be reflected here, too.
 
-Additionally, WRITE_ONCE(netdev->mtu, new_mtu) is unnecessarily
-performed even when the device is not running.
+I've found out that there is xdp_prepare_buff helper which gives more 
+control over the headroom so it can be used here. I'll update in the 
+next version.
 
-Fix this by:
-  Only writing netdev->mtu after successfully updating the hardware.
-  Skipping hardware update when the device is down, and setting MTU
-  directly.
-  Remove unused variable orig_mtu.
-
-This ensures that all writes to netdev->mtu are consistent with
-WRITE_ONCE expectations and avoids unintended state corruption
-on failure paths.
-
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
-Note: This change is not tested due to hardware availability.
-v1 -> v2
-remove unused variable orig_mtu.
----
- drivers/net/ethernet/cavium/thunder/nicvf_main.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/cavium/thunder/nicvf_main.c b/drivers/net/ethernet/cavium/thunder/nicvf_main.c
-index aebb9fef3f6eb..633244bc00f35 100644
---- a/drivers/net/ethernet/cavium/thunder/nicvf_main.c
-+++ b/drivers/net/ethernet/cavium/thunder/nicvf_main.c
-@@ -1578,7 +1578,6 @@ int nicvf_open(struct net_device *netdev)
- static int nicvf_change_mtu(struct net_device *netdev, int new_mtu)
- {
- 	struct nicvf *nic = netdev_priv(netdev);
--	int orig_mtu = netdev->mtu;
- 
- 	/* For now just support only the usual MTU sized frames,
- 	 * plus some headroom for VLAN, QinQ.
-@@ -1589,16 +1588,18 @@ static int nicvf_change_mtu(struct net_device *netdev, int new_mtu)
- 		return -EINVAL;
- 	}
- 
--	WRITE_ONCE(netdev->mtu, new_mtu);
- 
--	if (!netif_running(netdev))
-+	if (!netif_running(netdev)) {
-+		WRITE_ONCE(netdev->mtu, new_mtu);
- 		return 0;
-+	}
- 
- 	if (nicvf_update_hw_max_frs(nic, new_mtu)) {
--		netdev->mtu = orig_mtu;
- 		return -EINVAL;
- 	}
- 
-+	WRITE_ONCE(netdev->mtu, new_mtu);
-+
- 	return 0;
- }
- 
--- 
-2.46.0
+Thanks,
+Quang Minh.
 
 
