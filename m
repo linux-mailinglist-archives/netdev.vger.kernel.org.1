@@ -1,173 +1,162 @@
-Return-Path: <netdev+bounces-202207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92FC3AECB1D
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 04:52:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 740E1AECB23
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 05:09:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E71618996D2
-	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 02:52:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EB707A334E
+	for <lists+netdev@lfdr.de>; Sun, 29 Jun 2025 03:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C48778F4B;
-	Sun, 29 Jun 2025 02:52:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BFDE15C15F;
+	Sun, 29 Jun 2025 03:09:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ifdxIhbF"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="iUIUOTk+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990A52F1FE2;
-	Sun, 29 Jun 2025 02:52:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1256EEAA;
+	Sun, 29 Jun 2025 03:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751165556; cv=none; b=olfSzwU8dEI6vKsgPZZccsFeP33KrBoD4HA2AapORf19YxK9JmrkM4VBEjGWMN8PXdNSV9eZB3Qlo3CKj63dFL9C4bAVrLmPNGFORxF3wDq9bYqwnRq9tk/nXyZFbxyqyZx9HJuFaih6MReFUznXGNylCjGGO1E5NSFAyTZ6MeA=
+	t=1751166540; cv=none; b=UQmJ/7Aq/XowLRF1GRKEPvsukOQsh6i+4UwL74akX9VXEqXJiKN05aUTmAzudQMxuyvVHN+VpFmU95Y+lRpy5fp5ZrKiEEhTkKjVxHH+PXuc8YPJDHqMCD5pW8PdVOnXQAgSRqyaqNSPynkzTOcL8bQVJhSHUY6s3FvYOeteJj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751165556; c=relaxed/simple;
-	bh=JUu4d6Lu/r48ANhRNx+jrIxyrNppEQqkxSGp6HYToIw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VGP38tsnmgvaX0O/SOjt1yDTCapNIMjHrZH+7DoF4MH7vFJfxQP6qaBby5imuLhP5s71TK21XZpBbOT9qMsZn5jj7lFksrKTR8JcbwXuATDNt4cPT8HoVZC/mD6hpjiTKGfYzDBXFqoMO4AToxT62OifPdBmutUq1rCUZrclm2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ifdxIhbF; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3d948ce7d9dso5795595ab.2;
-        Sat, 28 Jun 2025 19:52:34 -0700 (PDT)
+	s=arc-20240116; t=1751166540; c=relaxed/simple;
+	bh=RK5Z/8V0Cvn5MyQ2lvLJ5kvvK7okLP7oTJeIK/QJzCY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uIqU6tL5bN6cUarMTZUEfMgeCO5mErstlPbXKCizmHSFkjOxmJKZ7o/s0xjl/3qg7iMLP3WdXGJHrtdbtOTYTXeSfKnRZ2UgH3xdOotA0BKK2h9qC5S4k1w5TOGLtEifUHJs7usBkBo2EEIP8x/eRayO7KTEi5WnPykPSSAQK7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=iUIUOTk+; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751165554; x=1751770354; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xTIn6bX/pcDrl5VzI3z6pvqx/3sHwV7Go2abDrLLtgs=;
-        b=ifdxIhbF97Ghv2rg73t8CoUUR2kIZHKH1yjLtcwV/7IKiXmrR1hAnS4c/MTfl8jmum
-         Nd9px+aVH8jn/u/4Uw69NrF7YzEeY9MdKokgLpSaXJS+oILgXMYixLFkGUgpudvePbm5
-         xVBoeAoIXh7dU/6rDONTa6gTIcScTtfnEXaL5OVJWtsb4R9bIT30fE7t6edJ5z5okw0w
-         3vyWWXiESdS+NFAjR8KQcUdCIv7uNkVxERNvvdeXFgfxfk9ihg2llJMPJA5TwTlre/fn
-         FM3d+ZEufP4NhmGelWU1lf2PL2W612bLGt0M9Gkt5ZALVQE2g5PS1EOC/EVyEg6vqRes
-         sHTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751165554; x=1751770354;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xTIn6bX/pcDrl5VzI3z6pvqx/3sHwV7Go2abDrLLtgs=;
-        b=vZa6Ehs6E0xXAQ2+h4aJPiMNF/Na6IEbQcM0t7u9YmlLY/RSD1zzXUz6TB7pXiddTA
-         6Vu+dOPFCxJcmoZGixJkUbYFCmaCwP7o6ZLDmBQes1DotY4avlLTQyy5O60RouXg6LYG
-         kZTGYyG+MgAXIHBG4LZ7+Z9BHMGt933OspqI8Z5uGgsYFQEUyP6Pwk00r+EG1SmcdJkQ
-         PqZ1bUaMa8i5Fh1zHKU/Ox+OmpQ8bCIsAzB0NE3H2ZdOUY+nP8AOp3SXk3rlaOClGBoB
-         NSKlgFGn6kuqUa1vzDKvbmoFzNh4XT52CL8p83WK4FDYtl9xKkFvLh+2aaKcTkAGXgXU
-         EOSw==
-X-Forwarded-Encrypted: i=1; AJvYcCX3g0I8vCdkg7g6v8N2/PJn1M90xqUsUtVDTen5C5xep+t3yybKEDETeEhRLUMIuKPLWd3t2dg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCaQ5rx62Rm7enwBZjT7PfeMJvPFvRzsqWEU3pi7JU+tUCutNB
-	UOk/wrLEAtLt+7WS5kQ1xsSwAeLFPNqmrMi+0Q5ouiZWMBED1+0ZVUdfvg9XhzXHCmgtfGxNfuj
-	j1si8HE23My6QGyCkPOInz96273sMGDg=
-X-Gm-Gg: ASbGncuwRON0bgfI4YzeGXUUS8tPrH29Q7wcZparnUC4Vq2+jJVe5xVg0Wdi6ebhyce
-	1uUMcwLznYoKHedsVblo/XgFpSQAEQJmIb150ihRBS40HHfZlo4kNIlCBEBJx+xoFtQ1Ys51S0T
-	dhILgs7zCwy8lIzEMI6YxoHWc+JWN5xzLMR287OxBFtA==
-X-Google-Smtp-Source: AGHT+IEDnvtHrTUWB+UWMUfEOhNVfh7lXsYxCnJn28f/nA63rMKiq21nBJTuGZstL87WpOyv9xciulcXGNXmHhJRuIE=
-X-Received: by 2002:a05:6e02:1a0c:b0:3dd:b4b5:5c9f with SMTP id
- e9e14a558f8ab-3df4ace8ef5mr102247725ab.19.1751165553620; Sat, 28 Jun 2025
- 19:52:33 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1751166538; x=1782702538;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=/1wU96fFlsrJiBIUTivDC2RYxvB3smo0WTj2uzdXEmY=;
+  b=iUIUOTk+t112J/eMsveGxNR4emEA8LKNy8JKatb/O3scM08YuW3jXknc
+   yfasVGhTsHGtXhsdk4qZQOVKYT7ohY8xW9/IVBnV7j5QK8exHHT7OUu+V
+   X1FonQPqpeVAgGKzZVMdef7B1WVcUJCzvppdS6vr31X/2p4t/YlXdBUaG
+   06Jcl/IgCrqLeHnDDuJ9bfQfSEoQHuOlYAScUMrALGWWkVhvZ/rvdJ3f6
+   STzVncbcTmO46s73RC+gf9USjUxeEm4+Q0r2LPz84cuGZWbBNDzFpYWnf
+   MQVcLPw+40c6tsoVrDP+e0+CbvLOLh4UAULXTSMPtXJJnotddvIWopXKN
+   g==;
+X-IronPort-AV: E=Sophos;i="6.16,274,1744070400"; 
+   d="scan'208";a="215563240"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2025 03:08:58 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:61997]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.172:2525] with esmtp (Farcaster)
+ id db2f4156-a369-4273-8671-a3bddd2ec5a6; Sun, 29 Jun 2025 03:08:57 +0000 (UTC)
+X-Farcaster-Flow-ID: db2f4156-a369-4273-8671-a3bddd2ec5a6
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Sun, 29 Jun 2025 03:08:57 +0000
+Received: from b0be8375a521.amazon.com (10.37.244.14) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Sun, 29 Jun 2025 03:08:55 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: <linux-hams@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, <kohei.enju@gmail.com>,
+	Kohei Enju <enjuk@amazon.com>,
+	<syzbot+e04e2c007ba2c80476cb@syzkaller.appspotmail.com>
+Subject: [PATCH net v2] rose: fix dangling neighbour pointers in rose_rt_device_down()
+Date: Sun, 29 Jun 2025 12:06:31 +0900
+Message-ID: <20250629030833.6680-1-enjuk@amazon.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250627110121.73228-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20250627110121.73228-1-kerneljasonxing@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 29 Jun 2025 10:51:57 +0800
-X-Gm-Features: Ac12FXznGNTBxfDxAHPTXZ8dubaXwFW_NkSg8bJ_Qa2xDiQ471BbpIT3R-dIqZg
-Message-ID: <CAL+tcoCSd_LA8w9ov7+_sOWLt3EU1rcqK8Sa6UF5S-xgfAGPnA@mail.gmail.com>
-Subject: Re: [PATCH net-next v6] net: xsk: introduce XDP_MAX_TX_BUDGET set/getsockopt
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWC004.ant.amazon.com (10.13.139.246) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-On Fri, Jun 27, 2025 at 7:01=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> This patch provides a setsockopt method to let applications leverage to
-> adjust how many descs to be handled at most in one send syscall. It
-> mitigates the situation where the default value (32) that is too small
-> leads to higher frequency of triggering send syscall.
->
-> Considering the prosperity/complexity the applications have, there is no
-> absolutely ideal suggestion fitting all cases. So keep 32 as its default
-> value like before.
->
-> The patch does the following things:
-> - Add XDP_MAX_TX_BUDGET socket option.
-> - Convert TX_BATCH_SIZE to tx_budget_spent.
-> - Set tx_budget_spent to 32 by default in the initialization phase as a
->   per-socket granular control. 32 is also the min value for
->   tx_budget_spent.
-> - Set the range of tx_budget_spent as [32, xs->tx->nentries].
->
-> The idea behind this comes out of real workloads in production. We use a
-> user-level stack with xsk support to accelerate sending packets and
-> minimize triggering syscalls. When the packets are aggregated, it's not
-> hard to hit the upper bound (namely, 32). The moment user-space stack
-> fetches the -EAGAIN error number passed from sendto(), it will loop to tr=
-y
-> again until all the expected descs from tx ring are sent out to the drive=
-r.
-> Enlarging the XDP_MAX_TX_BUDGET value contributes to less frequency of
-> sendto() and higher throughput/PPS.
->
-> Here is what I did in production, along with some numbers as follows:
-> For one application I saw lately, I suggested using 128 as max_tx_budget
-> because I saw two limitations without changing any default configuration:
-> 1) XDP_MAX_TX_BUDGET, 2) socket sndbuf which is 212992 decided by
-> net.core.wmem_default. As to XDP_MAX_TX_BUDGET, the scenario behind
-> this was I counted how many descs are transmitted to the driver at one
-> time of sendto() based on [1] patch and then I calculated the
-> possibility of hitting the upper bound. Finally I chose 128 as a
-> suitable value because 1) it covers most of the cases, 2) a higher
-> number would not bring evident results. After twisting the parameters,
-> a stable improvement of around 4% for both PPS and throughput and less
-> resources consumption were found to be observed by strace -c -p xxx:
-> 1) %time was decreased by 7.8%
-> 2) error counter was decreased from 18367 to 572
+There are two bugs in rose_rt_device_down() that can cause
+use-after-free:
 
-More interesting numbers are arriving here as I run some benchmarks
-from xdp-project/bpf-examples/AF_XDP-example/ in my VM.
+1. The loop bound `t->count` is modified within the loop, which can
+   cause the loop to terminate early and miss some entries.
 
-Running "sudo taskset -c 2 ./xdpsock -i eth0 -q 1 -l -N -t -b 256"
+2. When removing an entry from the neighbour array, the subsequent entries
+   are moved up to fill the gap, but the loop index `i` is still
+   incremented, causing the next entry to be skipped.
 
-Using the default configure 32 as the max budget iteration:
- sock0@eth0:1 txonly xdp-drv
-                   pps            pkts           1.01
-rx                 0              0
-tx                 48,574         49,152
+For example, if a node has three neighbours (A, A, B) with count=3 and A
+is being removed, the second A is not checked.
 
-Enlarging the value to 256:
- sock0@eth0:1 txonly xdp-drv
-                   pps            pkts           1.00
-rx                 0              0
-tx                 148,277        148,736
+    i=0: (A, A, B) -> (A, B) with count=2
+          ^ checked
+    i=1: (A, B)    -> (A, B) with count=2
+             ^ checked (B, not A!)
+    i=2: (doesn't occur because i < count is false)
 
-Enlarging the value to 512:
- sock0@eth0:1 txonly xdp-drv
-                   pps            pkts           1.00
-rx                 0              0
-tx                 226,306        227,072
+This leaves the second A in the array with count=2, but the rose_neigh
+structure has been freed. Code that accesses these entries assumes that
+the first `count` entries are valid pointers, causing a use-after-free
+when it accesses the dangling pointer.
 
-The performance of pps goes up by 365% (with max budget set as 512)
-which is an incredible number :)
+Fix both issues by iterating over the array in reverse order with a fixed
+loop bound. This ensures that all entries are examined and that the removal
+of an entry doesn't affect subsequent iterations.
 
-If the next-respin is needed, I will attach those convincing numbers
-in the commit message.
+Reported-by: syzbot+e04e2c007ba2c80476cb@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=e04e2c007ba2c80476cb
+Tested-by: syzbot+e04e2c007ba2c80476cb@syzkaller.appspotmail.com
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Kohei Enju <enjuk@amazon.com>
+---
+Changes:
+  v2:
+    - Change commit message to describe the UAF scenario correctly
+    - Replace for loop with memmove() for array shifting
+  v1: https://lore.kernel.org/all/20250625095005.66148-2-enjuk@amazon.com/
+---
+ net/rose/rose_route.c | 15 ++++-----------
+ 1 file changed, 4 insertions(+), 11 deletions(-)
 
-Thanks,
-Jason
+diff --git a/net/rose/rose_route.c b/net/rose/rose_route.c
+index 2dd6bd3a3011..b72bf8a08d48 100644
+--- a/net/rose/rose_route.c
++++ b/net/rose/rose_route.c
+@@ -497,22 +497,15 @@ void rose_rt_device_down(struct net_device *dev)
+ 			t         = rose_node;
+ 			rose_node = rose_node->next;
+ 
+-			for (i = 0; i < t->count; i++) {
++			for (i = t->count - 1; i >= 0; i--) {
+ 				if (t->neighbour[i] != s)
+ 					continue;
+ 
+ 				t->count--;
+ 
+-				switch (i) {
+-				case 0:
+-					t->neighbour[0] = t->neighbour[1];
+-					fallthrough;
+-				case 1:
+-					t->neighbour[1] = t->neighbour[2];
+-					break;
+-				case 2:
+-					break;
+-				}
++				memmove(&t->neighbour[i], &t->neighbour[i + 1],
++					sizeof(t->neighbour[0]) *
++						(t->count - i));
+ 			}
+ 
+ 			if (t->count <= 0)
+-- 
+2.49.0
+
 
