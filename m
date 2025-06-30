@@ -1,394 +1,240 @@
-Return-Path: <netdev+bounces-202641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87218AEE708
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 20:57:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9069FAEE70B
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 20:58:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19C293B8BAD
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 18:57:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EE02189B313
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 18:58:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27F22292B4D;
-	Mon, 30 Jun 2025 18:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9661E299957;
+	Mon, 30 Jun 2025 18:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D/tNMn2n"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QoK9Sg1d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D79879D2
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 18:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751309859; cv=fail; b=TeMtntsdw+1gXUNAunmLzGKi2ovffGH+Bq7Y6CObNYdUNX3Avgm+RmodPmlUjiW+XfSv4tizNY71b9NpPGdKqAiwdPEtdBjZHjRQvA4ueejie1pPHd+b3IF3ZgJuWBU/RQuhXLoO65G9XD8Dl73tQ663uKsiua1ypoOR2MqY0sM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751309859; c=relaxed/simple;
-	bh=lsorS/qzznObArOy9TnAfoFKlc1Iwa3DgDhiP1/bvxk=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=OTWTqTmvbO+rPmN8JuPNVadO8OuK5ys4uFSkJ5X90+3//nBgmCxECqpG1aDIDiuViEGQ6FDEIjaoSG3m1MFdSJ2iB5kw/M7nvE8XJheMsU69Kof/ELjm8nFwS7hfuGbxvi6U2kjeAQZuqlVeY9+offB52rQRogfX5GJYJx2cY4I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D/tNMn2n; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751309857; x=1782845857;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:mime-version;
-  bh=lsorS/qzznObArOy9TnAfoFKlc1Iwa3DgDhiP1/bvxk=;
-  b=D/tNMn2nTUy5fvWShc8D8oXDnMSPz5/7knuqDOw8Kqu1nkEVhMFRgyYn
-   Vtd6CHvIfwnsTX6k7+WFVyckSwkxon0ALYAlZATLQqQHrhGyT14yDjbVt
-   jSvJq17Xs+TMJhwTi604f/9RKil0AaUrNKbmdxTW/enFBbHN2LEr9BPJm
-   18PA36jNdWm0nqyhLUGLA9TzXpIbQnl+vXyMXdQKyoDIAOjCo93j7XJy3
-   djQvQPHRgbBSD6xZxMGle7ybTkopQpzWWI6Z2zbFoJq6L81wiybwJNTYe
-   zN6GkT4UIo7dc0AmTGjCxLvgLVROMVpeaZypeS3me1C8gKGQWBXI0aCGf
-   w==;
-X-CSE-ConnectionGUID: mRpRsD9JRqOxuswW5+ujiw==
-X-CSE-MsgGUID: 9W81jubRS8iAtPtJRXYmeA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11480"; a="57356208"
-X-IronPort-AV: E=Sophos;i="6.16,278,1744095600"; 
-   d="asc'?scan'208";a="57356208"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 11:57:36 -0700
-X-CSE-ConnectionGUID: wQewwgW+SXiqb9XyctFDnA==
-X-CSE-MsgGUID: q3a1TGsQRe+2xMG6xap0Mg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,278,1744095600"; 
-   d="asc'?scan'208";a="184561720"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 11:57:36 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 30 Jun 2025 11:57:35 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Mon, 30 Jun 2025 11:57:35 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (40.107.94.62) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 30 Jun 2025 11:57:34 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GnslNAsQjilsz6shLs4zk8ofofdSRn4hNbQommq3qwtGvdeOX7RU/X6R3LQkKzihn/jWVCzv9CMGkCVYsx9ulEIL10fWuOA1L4pAZs+W3DHU0pwB1UIdVWsMFq7fG0bFwr7FJFYDdUWaBQfeVO2KnJC5A80KIGf6cNL3yrSZou0OiM51zpMa0NgHTLmTafVs6nvQRycnaZav8KDY7gdfDVQgQ81HsN6L2nCccHx5yRuTqcOG7+rQceyBB/Z/yBLYL0FXuE7KKihxckF7eopXTWq3z1FwG7CpeUUGaisMyzGFwII4MF6k8GOT6gag1JZ1lou2rLrb/ujjA9axefDcPw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cutFLNNIQe94SZSbKQJPWOtmQxAatb4NfZ7nXZPTx9U=;
- b=xuzZZdLjTiFKgYwb96xCfjj6C4z0ChBf2tlXNUg4wUqF05dH5H1iVLQuca3qO7c/akMsIS6a7rukuVcnrH7WTpkvF7MP6DfPEEGZXJTSkdfDbMdxwPtpoykeDunMouk9G3I726lGWcMRa5Ecw7VL+65iuhDoVXMUUWAKx71Ba9YMvbNUFrWDt6pBRllAAm/hhFyNlMiyNaBfdy1PjoncDwVCLoQYfzdIq4PXF/3ULLCEJ5ct5v4f8TgxWN/WPYcUnaLiUbLVoIaVeGvxLNiNrY3GeVuuejTyLYx8pt/Yzy3PNmmfHngkmvhYofl+YusHj55oO2zrZPCUGCPuYMu6NA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by SJ0PR11MB4893.namprd11.prod.outlook.com (2603:10b6:a03:2ac::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.22; Mon, 30 Jun
- 2025 18:56:47 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3%4]) with mapi id 15.20.8880.029; Mon, 30 Jun 2025
- 18:56:47 +0000
-Message-ID: <7d330d84-42ab-43aa-94f1-5240b67c49dc@intel.com>
-Date: Mon, 30 Jun 2025 11:56:44 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next 4/5] ixgbe: convert to ndo_hwtstamp_get() and
- ndo_hwtstamp_set()
-To: Vladimir Oltean <vladimir.oltean@nxp.com>,
-	<intel-wired-lan@lists.osuosl.org>, Tony Nguyen <anthony.l.nguyen@intel.com>
-CC: <netdev@vger.kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Vinicius Costa Gomes
-	<vinicius.gomes@intel.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Richard Cochran <richardcochran@gmail.com>
-References: <20250513101132.328235-1-vladimir.oltean@nxp.com>
- <20250513101132.328235-5-vladimir.oltean@nxp.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-Autocrypt: addr=jacob.e.keller@intel.com; keydata=
- xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
- J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
- qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
- CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
- UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
- MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
- apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
- cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
-In-Reply-To: <20250513101132.328235-5-vladimir.oltean@nxp.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="------------hQSzwhGBd7E9fiWdmWWbqYzz"
-X-ClientProxiedBy: MW3PR06CA0021.namprd06.prod.outlook.com
- (2603:10b6:303:2a::26) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03ACC1D54F7
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 18:58:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751309889; cv=none; b=tyEB8BxjIoAOuqyTvilhQczqlAWzzge5Cjjf0Ta1CFWN0Qq5s0MR1FtTYrfyx9Uf13dZls33wD04mFft1r3qbR5Hjy8+yyICVomC09c73esceyemAJC7Ij5Dm2byGOYy0XnawKUuqygMK4QVwroMKHboCulBS+TYq/2KhhwzrA0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751309889; c=relaxed/simple;
+	bh=TZiHnx5DHZRPZ8KegtBxOajJhgILmh3ZAFEMmgWmHsc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QqwXc3ltgAgtJDeFHKtiq9Gn7yP1M6mp74Iq0cNR8Wdfag7GpN5v0zZu+2ZdmEKvCLlmmc1Iaw7vHvpkvW+SXiFnf0TWiYUaLWJu+m+q5V4n1RYXlnnmkIX8SW/JBVrDx//qGDhOc5JmNxGsL0IWVW/B33jTD+GzMmXjhpHLxGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QoK9Sg1d; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-23636167afeso21612875ad.3
+        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 11:58:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751309885; x=1751914685; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=faYx6HWB5dve4xDPBWFV8si/a4Y1nrpnWe89ZEp52tc=;
+        b=QoK9Sg1dlXX207Dw7W5qx60TudfnIjAOH9rjvt6sKfDao45DOL5k47nBQ4lg4BM5vX
+         TmMxHec1+cG1Vkxn/xfghUjUi3e4EQhEmVynjoYZ0kNulBVHoRHsw8x2H6WU9XfRS5PB
+         XoauiFCzDRkMCNmKD9HTdllnIM+dXWnkWe8YqdrZlYXae4miP4wZoNjQK+0yVlEpEz6y
+         /C+ZhjFY+rBXnTE13PixK6nyRyrbmKW5dfDBi99NrhkZ0iIo7GNANG5brwM+o5SWF6r3
+         E5+2pvq8XjnEd0BpGCSDc8/OYlSBHpK0a4m6EUu64Gsf2wGpRopdXNVFNJFaJtnftDFk
+         X61w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751309885; x=1751914685;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=faYx6HWB5dve4xDPBWFV8si/a4Y1nrpnWe89ZEp52tc=;
+        b=Fs8UeEXEeVzWExH+n+sWAPM54jnDgD2ESMrqHsb1NYXxFgdvSECcgoEivSqd5lHICb
+         vvRN2uvd219TgzTFn+DVvZ1I7m5vHT08rQ/1t2aMc9e95nVEq2HMx400JRTB+JulJKvS
+         EyfJbR/OxYtJJauOGRpEdZIAWucVG2VH4LtcO+DwWQhZsx1RkBgYh9sx5ckBCA48ql94
+         3ag1hdvwiribveE/IAFYyZS5sAoKonUCXEDl6mReOfU3ZAX80R3FoEzmNLwlnEmEYYpc
+         cCmn0dchxFLeIK7k+Et/3jAxzyDI37uAK7y+K21kgYg1HNH2RkqI7Rh2UL/NxIxlAQr6
+         7eEA==
+X-Forwarded-Encrypted: i=1; AJvYcCXXEEtwX/xOwiaOm+0X0zhOEDE70UyFAAGkmatu1ZAsGmOhi4lwfIvoDCW06K0O1MbgIW0joco=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTx/NjyWbOJVa4W+e/lBQjlaFqZCH3yOAFRB1iFgeMCpDj6JlF
+	GFTARpfYk8GsPYW0fPbNgW82oJ7pnV1UCNhF1i7eMi0y3t8rH85+gIqrzD32HGlrBXVu7hCfvqM
+	Zm9oEqAlfx2FryoyE3HSQIjdKw42vmtzIC7y/p0aK
+X-Gm-Gg: ASbGncsBoxu9A5+6efQCKhzEooTunx1KKKQWMqUaGoOGCVrkFgfUHy9d+JOZNj0/97i
+	rpBY6xAxDaSyxXVrmYV862X0su0TzfzqvYRAojV9/imlCt3OjfcuFf3IUrmSsskXuiHgLygQWB9
+	vOH2y+TXQCilLiMl9keF8U/zV6+NN7OJc8SBJHH7jF+V07QgOd8Rc2gTfajENLwxl3cvRWs/F0f
+	g==
+X-Google-Smtp-Source: AGHT+IEAcjcyKWLX8IGw8wTUppJZH4i7riBtc0RQCt/3/8ykZlolN/mjYOEf8ClvOWFxxd7su6ESR0M7s/2qrfOsepo=
+X-Received: by 2002:a17:90b:2f88:b0:311:ba32:164f with SMTP id
+ 98e67ed59e1d1-318c9223bc9mr22173186a91.8.1751309885135; Mon, 30 Jun 2025
+ 11:58:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SJ0PR11MB4893:EE_
-X-MS-Office365-Filtering-Correlation-Id: a3e609ef-8d40-4656-e077-08ddb807dc74
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?UC9INVJjS2ZRdDhrQmFHVkVzbXc5M0JsOXNSQTh3WXVMNGRwVzhzQTBmRTRD?=
- =?utf-8?B?czNlVmx2MEZmaCtHRk5oRThyRnZFRThXWnpMN1NXMzZmZ3J3YjZCZVIyMEJD?=
- =?utf-8?B?RFBHVzkzZEluSDErcS9mb0ZzbXdrNnlGeVkzdDFjV3dnQXVZVlkvblZRaFk5?=
- =?utf-8?B?b1M4WlBxb014Y2hMZzNuOWpIS1J0bEFDU0hsN2dFZXNCbmVRbUtwa2hLTG5R?=
- =?utf-8?B?RERmQjBkTEhWU1lDY2lXZEdPbzFVNjFTMnMwSVQ2d0hzeXB1MDZweko1bnJv?=
- =?utf-8?B?c0dUejdXUi85UVc5WWNpRnphTGRMUDUwK3RCZFoxM1pieVVQcUFrVzRKakp0?=
- =?utf-8?B?cStMWURXY0FUMWVwTlBrS0loUXUwZjg4MFBlQit1a2VsV0RtY21rMXdiRVR3?=
- =?utf-8?B?cXZVdlF0ZGQ1eFBrTHBFdkRXcE9CcllhT3N1QWlyblhMTklTSlNTZ0RyZi9y?=
- =?utf-8?B?N0pzM0hlSW5BMndrZFBmb2pVSCtpSTd6NnVwVHhnSFp2c1A1ekwrVW9yaFZX?=
- =?utf-8?B?OU9vRncrQ3VnbmtMTmJrbmY4V1NtM1BNV2ROVDg2SDR4bEhBS0RKaWZiU3pX?=
- =?utf-8?B?UnZ5RUlOMEd3UmdkZmU4VExHZ1VPVWtVNTYyTDh1WmtEaEJ1NnZqN0NQVjFk?=
- =?utf-8?B?RFNzYTl3TnBPREdjRDBVWDRJaWNpYi9tRGloeE15aE9VYVZGNHBsbU5oVEdX?=
- =?utf-8?B?eFdYVkhXcXp6K05tUWovblhiSDlYOW9TYmNtY0k1WmNIanRZT1dTZk1WZmFo?=
- =?utf-8?B?MHBaOEp1VzFRUm5JV3U0YnFLMVBCMGp0SlJDcVVUb0ZJSzlrZEJkbzlOb1Bs?=
- =?utf-8?B?aEZjT2xKTyt0Rm1XdU45R3g4RThJYmFQSGJYdzR5QjlQZUlZR2hQazRLMFhU?=
- =?utf-8?B?Vm52dHdUb21sV1dwQ1NQTkpkV1hBQ25pZkpjc25LbGFVSGl4Mm1QaWQwTE9w?=
- =?utf-8?B?VWJSMjhXdW1TMzlGRTRvVnFRY0Q3UldLRzltUUQ0SXFrUXViODJkSUthbHh6?=
- =?utf-8?B?MVhCNVFVdVprRkkvS2xhRWsyVEx0NDRLNkNZZHl1WVRrai9ObkR4dklsMzZs?=
- =?utf-8?B?MFZMOURUN0haVXh5NFFwM2hCeWY2eUZrSFFzUmJiWGxpa3NEcHJ3Z2lVS2VS?=
- =?utf-8?B?ZFQ0K2ovWFNpTXRGV1Bod0RFaTVYVkRPSkRVZURkUmZDSzZCVDI3b01hbThl?=
- =?utf-8?B?VTJEeFRCQzJvL1IzY3BIZHZ4VnJ1c1RwcGRUemFpT3Z4UktyeUQ4dlFVOHF4?=
- =?utf-8?B?aDg3SFgxSFo4TzFYdUxDWXJjYjY2Wm9JNEtDeW5aend3QlJsUzlPc3dwVzJY?=
- =?utf-8?B?NXNUMzYycWhubFptcE5kNFE1SUsvbm03VjdOYzN5Q3dPbG5SMHNKTFRhMWRh?=
- =?utf-8?B?Y0pVb0NMZTQvOHYrV2FHVUYzcGtGTXdtZ1FPOHRsdS83TWhVTk9OcHFGWmt0?=
- =?utf-8?B?NkJFZlQvbUQ0azhaeDVsNjdOeHdnb1N4QXJ4RUdoK2dHV1RidDhpTnVSeW9V?=
- =?utf-8?B?czVHd1VYZFRKU3l3cmNiQTB6M3FhTGRTTTkvWGNtWlkrQ0VFNVFQT2gwZEUw?=
- =?utf-8?B?b1I5enk3Ym1nQmMvWDMvWFdEZ2tRN3lzRCszeWpXcm9WOUdveFdncEhyenJ6?=
- =?utf-8?B?UWs0Nng2NnRkSkljRFF6Vk1PRGVGRGdIQThXS2drYXlyR0c4WC9jSmc2M0NX?=
- =?utf-8?B?SjI3TEFpcFRxdTNRZG5EdlhzcDhKV1NWZ0F1bHNORVBOMm1tN3NvWnpTR1dX?=
- =?utf-8?B?Z3p3QTNuZGp2eDgwSHRZc1k3ODA2V1ByWFZYRU9YNUF4VFZidGlRWmhMenZk?=
- =?utf-8?B?R3hLVTRlYUVtcEdEU2plTTVlRGVVazhBaWsxOXN0ZFYyS3Z5UkpQVUxtZmdK?=
- =?utf-8?B?eXlqenhqZkd3VVBpWE9Cci9EU3Roa0w3NWtwZW14Q3liUzZMTUtMR2pZelFX?=
- =?utf-8?Q?eddxmmJHtkg=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UUhUTkppVEtzWDQraVVOTCtORVM3VnV2eGJSUGtBQ0F4T1ZGYVg1K0dwdEFs?=
- =?utf-8?B?MEppNHRqQWVFUE43T1FiYnp0VkxhSDlWbEJ6TlM3U203VWtwaVFLSHFBVVd0?=
- =?utf-8?B?ajV2UklNeXBaRGtySTJMak41eURFNm9MazBiU3FtN29rYnVnMVJJZjJtVGNC?=
- =?utf-8?B?WU8xcWRXNnlscCtRR1hUK2xSTkVYTE14ZHczUTRFd0g4dmUzcFJzOEVhTGp2?=
- =?utf-8?B?KzhYOWFNako5U3Y1Y3hpUmZCRW1hUkd3T1ZsRC9DK1RqUmhNVlZOUXd1U045?=
- =?utf-8?B?d1k2c000R1EvTnB3MUlqOXcwUFZhUFBVdWhxVVh0TC9RMUxlcytZUmxBUUFr?=
- =?utf-8?B?YVlSNktOblQ0elNjdlRmbHcwc3V0eE9MMFJqYTRaOUFWTSszcmFYL2lRdjdu?=
- =?utf-8?B?cm9aTWIzbkVScGpLdjVndWVnNTVXMVpZaGpadWc4QnlYYi9rUXpmWjV4b2Rh?=
- =?utf-8?B?NmRDUXJ1TnNGRGM2dk9sMjN6WkpSMEFkWHhrbEI1MU5tcXZvanUwb0k4UUt2?=
- =?utf-8?B?alZjVVowdHJZWGUvZXRqNjlxbisvdmtFcW1DNHN4ZFFzaGVLRis0OVFqNThP?=
- =?utf-8?B?KzhucUltRmU5by9WTTQ2MHcrNmJZVDlIWDEySmV2N3d5Z0F4dk5JS3hsK3Fu?=
- =?utf-8?B?NjY4L0s0ZmJrOS9kaENYNTJ3bmFCeVA4RXpIZTdTaDVVS2FOdDhwNU45Zk93?=
- =?utf-8?B?RmRjRmxDR0FnLzg2TTZlOCsxVXNkcFJYMmRLUk9VaGYxZmVsakV2RFR2NWxa?=
- =?utf-8?B?R2VVb0RMdEJIVkZPcEczNFd5Y2hkdUJqSm92bEQ0OHFRNzI5TUliV0FCSEFt?=
- =?utf-8?B?NGhHUkdKeG9MUlpsR09YR1ZBVklpalBROTJXQ3dZOFdKb2M1emF3aFVyYWJC?=
- =?utf-8?B?Ulp0UG5STW1EWWQxZG8zbXgyRlFpNXV5V3hDcXNkWk1lWmtKaUJVWDl1TWhG?=
- =?utf-8?B?SlpKZXQ2aDdTM2poRCt1ZjlIWUREVzc0czFSTk15b3ppQXIxWEt6WnIwSFg0?=
- =?utf-8?B?OE1qQkwzcUZEUS9TSm5NdUlrVWhpd1FCM0t0UUhOaFdBT1JKT1hWQ3IrKzdi?=
- =?utf-8?B?VmQ4eFc4WlhBeWRVVm5rVEdJdUJJVVVPOXl2Tjc3L2JldTRxSUkya0d1enNC?=
- =?utf-8?B?TFYwMFVDTEtaMWRmNzRWb0ExbGFqbUVMMGtVQ3ZTeklZRnJ1VDMyZnk4MnVB?=
- =?utf-8?B?cXhPcEtZMzgzdHcrZThaeU5FR0lKVWRndk51UDJKS3ljc3UwMXc4Z0ZxcDJr?=
- =?utf-8?B?TU1JeFhNRkRRV2hhK1lhU0Z1Si9JYVlZWEtyQmRSdDNOak9LYkl3SHNvaFll?=
- =?utf-8?B?d3VWb0FKbGd4TG9PZHA4NXdQck9SN2xTMll4VWZVbWRSNlhYRHN5Zk1Uc1lm?=
- =?utf-8?B?Y3p0SmR6clRtNmY1bCtSakhmQXQ4TW9QMDNKamN3b1ZrcERGZEJSMWxuZFl4?=
- =?utf-8?B?Q1pxSjNuMkd1RDZJSXljR3J1ZlhwazN6M1VLVHYvdG9oRDk5UGtUUDF4bGxD?=
- =?utf-8?B?OGJPc0s3cWQvMFVIZmsxOXZ6TVpyU3loSytEZjFCVmRDd3hleFZQb2tTQjNv?=
- =?utf-8?B?NGx6UjdQNDFCK2d3ZnFPa0s3Nk9kNzhwdmRFb1hjWTE0cVZOK3I0VGFuWVhM?=
- =?utf-8?B?YWRhSk5ZQjFLTnpWMWduQXRuNTIrbk5qYUk3V29wa1ZuckwrSWtaZ09HUU9a?=
- =?utf-8?B?SlVWWk1JbVJMdTJoM2d0NE1MaklzN2xQR3BnZ3cwRmRESWJRNm1WaFUwVUFL?=
- =?utf-8?B?VlVSajlMcERid3pPMHlYWVdJTW9pYTUzaWFWTmNtc2twMm1GWndabnpxT0lH?=
- =?utf-8?B?c2lXVkdOMWRMZ1FCS0dFL24zbXZPWm8yb3BHQUdHUTRxd1pLVGZ3RXN5eDdn?=
- =?utf-8?B?UjlJSmNDdlQ3dUVyRGxHSUZVdHZxTFRjRGU3VlkyUW4reFg5L1JoUjR2VzFy?=
- =?utf-8?B?VUE3cENQSGxHb29aMnZ6WnJMMkt3S0R3elpFMDVHM0s2emFyZ0xIVDVSbEh3?=
- =?utf-8?B?K29oSUxXdHBQRlMxS05ZNGNScnREMEYvRVBodmJRZVBEVjh2SW0yWFZheXI1?=
- =?utf-8?B?S2lnLytza3AxbTl5YUJEWWZ5TlA5M0MyZXgySklIeE1BSWc0bVBIenA2ZEJp?=
- =?utf-8?B?WTduSDhOWnA1RUQ0U3A4ZGJycVptRWkzTVdBTFB5b0ZrbjBVZUZFMUhsQlNF?=
- =?utf-8?B?b0E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a3e609ef-8d40-4656-e077-08ddb807dc74
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 18:56:47.4207
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Y/GvKV3jYBQfzUNMIWIIHzrq24LoMmK2IqvkfuUJ7wx8GWwHr3wysemn2f274WbUl+GRVbNnmpweTD7E9GnQzHm2hychWNSg8YASKctX/RM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4893
-X-OriginatorOrg: intel.com
-
---------------hQSzwhGBd7E9fiWdmWWbqYzz
-Content-Type: multipart/mixed; boundary="------------OeYUTEKuQrWxhDtmudrBfURZ";
- protected-headers="v1"
-From: Jacob Keller <jacob.e.keller@intel.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>,
- intel-wired-lan@lists.osuosl.org, Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Richard Cochran <richardcochran@gmail.com>
-Message-ID: <7d330d84-42ab-43aa-94f1-5240b67c49dc@intel.com>
-Subject: Re: [PATCH iwl-next 4/5] ixgbe: convert to ndo_hwtstamp_get() and
- ndo_hwtstamp_set()
-References: <20250513101132.328235-1-vladimir.oltean@nxp.com>
- <20250513101132.328235-5-vladimir.oltean@nxp.com>
-In-Reply-To: <20250513101132.328235-5-vladimir.oltean@nxp.com>
-
---------------OeYUTEKuQrWxhDtmudrBfURZ
-Content-Type: text/plain; charset=UTF-8
+References: <20250629214449.14462-1-aleksandr.mikhalitsyn@canonical.com> <20250629214449.14462-2-aleksandr.mikhalitsyn@canonical.com>
+In-Reply-To: <20250629214449.14462-2-aleksandr.mikhalitsyn@canonical.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 30 Jun 2025 11:57:52 -0700
+X-Gm-Features: Ac12FXw7A4SVhNMJuauAUOYKSoANG8Z2rhgG2M1ftidVrx3qT2zTFy6SN-2Ltqo
+Message-ID: <CAAVpQUC1Z=eUcX9RqE7PLRvUPVHeuc8X7dnk1Vr_6w0_t+V84A@mail.gmail.com>
+Subject: Re: [RESEND PATCH net-next 1/6] af_unix: rework unix_maybe_add_creds()
+ to allow sleep
+To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Leon Romanovsky <leon@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Christian Brauner <brauner@kernel.org>, 
+	Lennart Poettering <mzxreary@0pointer.de>, Luca Boccassi <bluca@debian.org>, 
+	David Rheinsberg <david@readahead.eu>, Kuniyuki Iwashima <kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-
-
-On 5/13/2025 3:11 AM, Vladimir Oltean wrote:
-> New timestamping API was introduced in commit 66f7223039c0 ("net: add
-> NDOs for configuring hardware timestamping") from kernel v6.6.
->=20
-> It is time to convert the Intel ixgbe driver to the new API, so that
-> timestamping configuration can be removed from the ndo_eth_ioctl() path=
-
-> completely.
->=20
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+On Sun, Jun 29, 2025 at 2:45=E2=80=AFPM Alexander Mikhalitsyn
+<aleksandr.mikhalitsyn@canonical.com> wrote:
+>
+> As a preparation for the next patches we need to allow sleeping
+> in unix_maybe_add_creds() and also return err. Currently, we can't do
+> that as unix_maybe_add_creds() is being called under unix_state_lock().
+> There is no need for this, really. So let's move call sites of
+> this helper a bit and do necessary function signature changes.
+>
+> Cc: linux-kernel@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: Leon Romanovsky <leon@kernel.org>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Christian Brauner <brauner@kernel.org>
+> Cc: Kuniyuki Iwashima <kuniyu@google.com>
+> Cc: Lennart Poettering <mzxreary@0pointer.de>
+> Cc: Luca Boccassi <bluca@debian.org>
+> Cc: David Rheinsberg <david@readahead.eu>
+> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com=
+>
 > ---
+>  net/unix/af_unix.c | 28 +++++++++++++++++++++-------
+>  1 file changed, 21 insertions(+), 7 deletions(-)
+>
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index 129388c309b0..6072d89ce2e7 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -1955,21 +1955,26 @@ static int unix_scm_to_skb(struct scm_cookie *scm=
+, struct sk_buff *skb, bool sen
+>         return err;
+>  }
+>
+> -/*
+> +/* unix_maybe_add_creds() adds current task uid/gid and struct pid to sk=
+b if needed.
 
-Ugh. Apologies for the late reply here, but this took for ever to track
-down what was wrong in our testing.
+This is not a correct kdoc format.
+https://www.kernel.org/doc/html/latest/doc-guide/kernel-doc.html#function-d=
+ocumentation
 
-The ixgbe patch has a somewhat subtle bug which lead to failed timestamp
-configuration and likely other forms of memory corruption.
+> + *
+>   * Some apps rely on write() giving SCM_CREDENTIALS
+>   * We include credentials if source or destination socket
+>   * asserted SOCK_PASSCRED.
+> + *
+> + * Context: May sleep.
 
->  drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  9 ++--
->  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  6 +--
->  drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c  | 42 +++++++++----------=
+This should be added later when this function starts to sleep.
 
->  3 files changed, 29 insertions(+), 28 deletions(-)
->=20
 
-> =20
->  /**
-> - * ixgbe_ptp_get_ts_config - get current hardware timestamping configu=
-ration
-> - * @adapter: pointer to adapter structure
-> - * @ifr: ioctl data
-> + * ixgbe_ptp_hwtstamp_get - get current hardware timestamping configur=
-ation
-> + * @netdev: pointer to net device structure
-> + * @config: timestamping configuration structure
->   *
->   * This function returns the current timestamping settings. Rather tha=
-n
->   * attempt to deconstruct registers to fill in the values, simply keep=
- a copy
->   * of the old settings around, and return a copy when requested.
 >   */
-> -int ixgbe_ptp_get_ts_config(struct ixgbe_adapter *adapter, struct ifre=
-q *ifr)
-> +int ixgbe_ptp_hwtstamp_get(struct net_device *netdev,
-> +			   struct kernel_hwtstamp_config *config)
+> -static void unix_maybe_add_creds(struct sk_buff *skb, const struct sock =
+*sk,
+> -                                const struct sock *other)
+> +static int unix_maybe_add_creds(struct sk_buff *skb, const struct sock *=
+sk,
+> +                               const struct sock *other)
 >  {
-> -	struct hwtstamp_config *config =3D &adapter->tstamp_config;
-> +	struct ixgbe_adapter *adapter =3D netdev_priv(netdev);
-> =20
-
-ixgbe doesn't directly assign the adapter to netdev_priv and this needs
-to be ixgbe_from_netdev, since there is a wrapper ixgbe_netdev_priv
-structure. I didn't dig into why, but both get and set are wrong here,
-and are misinterpreting the ixgbe_netdev_priv structure as
-ixgbe_adapter, which is obviously wrong.
-
-See its definition quoted here:
-> static inline struct ixgbe_adapter *ixgbe_from_netdev(struct net_device=
- *netdev)
-> {
->         struct ixgbe_netdevice_priv *priv =3D netdev_priv(netdev);
->=20
->         return priv->adapter;
-> }
->=20
-
-Whats odd is that the netdev priv structure is just a wrapper around a
-pointer to the adapter:
-
-> struct ixgbe_netdevice_priv {
->         struct ixgbe_adapter *adapter;
-> };
-
-
-> -	return copy_to_user(ifr->ifr_data, config,
-> -			    sizeof(*config)) ? -EFAULT : 0;
-> +	*config =3D adapter->tstamp_config;
+>         if (UNIXCB(skb).pid)
+> -               return;
+> +               return 0;
+>
+>         if (unix_may_passcred(sk) || unix_may_passcred(other)) {
+>                 UNIXCB(skb).pid =3D get_pid(task_tgid(current));
+>                 current_uid_gid(&UNIXCB(skb).uid, &UNIXCB(skb).gid);
+>         }
 > +
-> +	return 0;
+> +       return 0;
 >  }
-
-Because we're completely pointing to the wrong memory, this overwrites
-who knows what since the ixgbe_netdev_priv is just the pointer address.
-
-> =20
->  /**
-> @@ -978,7 +980,7 @@ int ixgbe_ptp_get_ts_config(struct ixgbe_adapter *a=
-dapter, struct ifreq *ifr)
->   * mode, if required to support the specifically requested mode.
->   */
->  static int ixgbe_ptp_set_timestamp_mode(struct ixgbe_adapter *adapter,=
-
-> -				 struct hwtstamp_config *config)
-> +					struct kernel_hwtstamp_config *config)
->  {
->  	struct ixgbe_hw *hw =3D &adapter->hw;
->  	u32 tsync_tx_ctl =3D IXGBE_TSYNCTXCTL_ENABLED;
-> @@ -1129,31 +1131,29 @@ static int ixgbe_ptp_set_timestamp_mode(struct =
-ixgbe_adapter *adapter,
->  }
-> =20
->  /**
-> - * ixgbe_ptp_set_ts_config - user entry point for timestamp mode
-> - * @adapter: pointer to adapter struct
-> - * @ifr: ioctl data
-> + * ixgbe_ptp_hwtstamp_set - user entry point for timestamp mode
-> + * @netdev: pointer to net device structure
-> + * @config: timestamping configuration structure
-> + * @extack: netlink extended ack structure for error reporting
->   *
->   * Set hardware to requested mode. If unsupported, return an error wit=
-h no
->   * changes. Otherwise, store the mode for future reference.
->   */
-> -int ixgbe_ptp_set_ts_config(struct ixgbe_adapter *adapter, struct ifre=
-q *ifr)
-> +int ixgbe_ptp_hwtstamp_set(struct net_device *netdev,
-> +			   struct kernel_hwtstamp_config *config,
-> +			   struct netlink_ext_ack *extack)
->  {
-> -	struct hwtstamp_config config;
-> +	struct ixgbe_adapter *adapter =3D netdev_priv(netdev);
->  	int err;
-
-
-Same here, the current code would need ixgbe_from_netdev()
-
-I think the right thing to do is submit a patch/fix which drops the
-completely useless ixgbe_netdevice_priv structure, but I'll have to dig
-into git history to see why it was ever there in the first place.
-
-
---------------OeYUTEKuQrWxhDtmudrBfURZ--
-
---------------hQSzwhGBd7E9fiWdmWWbqYzz
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaGLd7AUDAAAAAAAKCRBqll0+bw8o6IZS
-AP9NyFFWdu6qskI+qcA03f0T0q4Gpy1wzmGQTIqos0Ha6gEA5gy5GO8/O+R6DtavDrE2ubrDv4U7
-NR5prMluI+uRQA8=
-=yKhs
------END PGP SIGNATURE-----
-
---------------hQSzwhGBd7E9fiWdmWWbqYzz--
+>
+>  static bool unix_skb_scm_eq(struct sk_buff *skb,
+> @@ -2104,6 +2109,10 @@ static int unix_dgram_sendmsg(struct socket *sock,=
+ struct msghdr *msg,
+>                 goto out_sock_put;
+>         }
+>
+> +       err =3D unix_maybe_add_creds(skb, sk, other);
+> +       if (err)
+> +               goto out_sock_put;
+> +
+>  restart:
+>         sk_locked =3D 0;
+>         unix_state_lock(other);
+> @@ -2212,7 +2221,6 @@ static int unix_dgram_sendmsg(struct socket *sock, =
+struct msghdr *msg,
+>         if (sock_flag(other, SOCK_RCVTSTAMP))
+>                 __net_timestamp(skb);
+>
+> -       unix_maybe_add_creds(skb, sk, other);
+>         scm_stat_add(other, skb);
+>         skb_queue_tail(&other->sk_receive_queue, skb);
+>         unix_state_unlock(other);
+> @@ -2256,6 +2264,10 @@ static int queue_oob(struct sock *sk, struct msghd=
+r *msg, struct sock *other,
+>         if (err < 0)
+>                 goto out;
+>
+> +       err =3D unix_maybe_add_creds(skb, sk, other);
+> +       if (err)
+> +               goto out;
+> +
+>         skb_put(skb, 1);
+>         err =3D skb_copy_datagram_from_iter(skb, 0, &msg->msg_iter, 1);
+>
+> @@ -2275,7 +2287,6 @@ static int queue_oob(struct sock *sk, struct msghdr=
+ *msg, struct sock *other,
+>                 goto out_unlock;
+>         }
+>
+> -       unix_maybe_add_creds(skb, sk, other);
+>         scm_stat_add(other, skb);
+>
+>         spin_lock(&other->sk_receive_queue.lock);
+> @@ -2369,6 +2380,10 @@ static int unix_stream_sendmsg(struct socket *sock=
+, struct msghdr *msg,
+>
+>                 fds_sent =3D true;
+>
+> +               err =3D unix_maybe_add_creds(skb, sk, other);
+> +               if (err)
+> +                       goto out_free;
+> +
+>                 if (unlikely(msg->msg_flags & MSG_SPLICE_PAGES)) {
+>                         skb->ip_summed =3D CHECKSUM_UNNECESSARY;
+>                         err =3D skb_splice_from_iter(skb, &msg->msg_iter,=
+ size,
+> @@ -2399,7 +2414,6 @@ static int unix_stream_sendmsg(struct socket *sock,=
+ struct msghdr *msg,
+>                         goto out_free;
+>                 }
+>
+> -               unix_maybe_add_creds(skb, sk, other);
+>                 scm_stat_add(other, skb);
+>                 skb_queue_tail(&other->sk_receive_queue, skb);
+>                 unix_state_unlock(other);
+> --
+> 2.43.0
+>
 
