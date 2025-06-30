@@ -1,181 +1,371 @@
-Return-Path: <netdev+bounces-202667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D43BDAEE8FD
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 23:01:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D7FEAEE889
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 22:48:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11A30442396
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 21:00:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEF9D189E8DE
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 20:48:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4035221D3F2;
-	Mon, 30 Jun 2025 21:00:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F5B4206F2A;
+	Mon, 30 Jun 2025 20:47:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="glMyIbnz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SmBT+oHA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156E21865FA;
-	Mon, 30 Jun 2025 21:00:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751317256; cv=none; b=ICYNKtP+zVL4+5kxY+BuMuNXRe/fjwKnDMsHe13N3Ewwos7HBSwLlvXXVeWXCQOBzZVnXAXuDFZy5l5iCWJCmEQ2Qbd2uN56Ec4hwFzPngn357lw0X86cpqryKAEyfJfGXtOPO3wz5ZMb4ih8stYA3KqRBP0NePTK0T/IuVLLOc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751317256; c=relaxed/simple;
-	bh=bgJMQE4amCsw0R8LqhB2mlYyLenEe+lgnpfI+NB2hLc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kfsWDHUHnT9GpfEYa68e67DVjR3LJIhFuHg8Umev5Zl/tEIrqW4qgCpSmQdQ5MBouQCEbK05lkAzZyFl9YjyOdqqexIjq6DCpnWY/8Ql4Q90UWG+JRy3TFVvXZBDrHP1YX4C7BKNNrSshEAapLeRBm4qEgCkPwv6Dzb/j7ZrlcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=glMyIbnz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF230C4CEE3;
-	Mon, 30 Jun 2025 21:00:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751317256;
-	bh=bgJMQE4amCsw0R8LqhB2mlYyLenEe+lgnpfI+NB2hLc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=glMyIbnzKoQqYUS/Q2JPAaALgaROeHCEQjUvy58x44ISO0v+CKcI7NIynBplhlK6s
-	 eXWuKJpV2SBGD1h5A4+rLFJoX9WQUbk+D4XyeSjAu8uy5YPXTwEeqNaY5JTrFt/4MR
-	 7FZENH51OrHHkUlrOSCXBXuoTLpbQ1vd10o2E2LAAADsNdFqhOUXTEbKNZsA6/JW+P
-	 6qtzLDWKjdrqxd5fItfFI+bD4ON1EPUBDVzetZF1P1dlFxz7ZwepCw7tx3iCab2SOd
-	 nyGgq5D+S6CxWUIRh+PTiLQC5GyLiQbyIpEYzguHWNDFB9nukDLNcH7PGglECrnaxI
-	 eSP1GP3HxslAg==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Xiaowei Li <xiaowei.li@simcom.com>,
-	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 07/14] net: usb: qmi_wwan: add SIMCom 8230C composition
-Date: Mon, 30 Jun 2025 16:46:32 -0400
-Message-Id: <20250630204639.1358777-7-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250630204639.1358777-1-sashal@kernel.org>
-References: <20250630204639.1358777-1-sashal@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C93F1EA7DB
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 20:47:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751316479; cv=fail; b=t3/A3H/pMzuTRArxTqZszcVpctaTE4Ww2MVzOvHy4pQbEI2OR4cmL5IaTV0z4THHq7OivQivQEZb8JopzSgAhQU+mgu5ocxH2cl7j7+QSzWPsVjRUZSbuo86qPO3B3teF70ui6pDeyQ4/h4sPVfJlWb+QwIsCpqCvYTtvLu4kps=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751316479; c=relaxed/simple;
+	bh=ra8O6F/8kDwjNV4yD+50SFT9fn6S9x+pcaImPis5FIQ=;
+	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=uIc9rO9P7StjRJfd7//ibixrI9WHoPF9HeqmHR0ujZN+r7japZdY2WJ6jdMCbUsrm1QmtHzMbLEx7XUjtB17Bc37dJot5IwqDa43zv30opWZZc7iJDtoFmk+B11jpZd5kGTmLktuGMIKqpLRygOEB+s4K21/ZS2qBPEIBpo6+CE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SmBT+oHA; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751316477; x=1782852477;
+  h=message-id:date:subject:from:to:cc:references:
+   in-reply-to:mime-version;
+  bh=ra8O6F/8kDwjNV4yD+50SFT9fn6S9x+pcaImPis5FIQ=;
+  b=SmBT+oHAYxrylCag7VuUd1ggxMtvRfK2hVPrHJJtrAmHDvkBWRvQWiOl
+   3DOpdudwHiRR2FNHvJWa1bCcd4JLF7pKQWpVlmBYW7sHSPztloOn5HsEo
+   i4mWvBG3o+drZAKBDKx/LrzMJ7JKc3iwp05hukTulJrLIi0JLuit9CNve
+   cMdoGiqGPoxuxOdl2vXgVIGuQ3cVJPifV4rM5gFs6uNlAaRiPv9A1fMiM
+   poW8NdpnRHYX6Gm/aOYD58ethKnbev2nq47/eO8wePtjE5V4cX5o9VOUy
+   zftlf2j2HVRDKQO1FQWZFIC0fGSg4+w7NhksTXCbDvoT9ELRGS/fbslsi
+   g==;
+X-CSE-ConnectionGUID: VcohGMdbTxeHb4o8wuOX4Q==
+X-CSE-MsgGUID: eWcKssOHQ/uKxm/zjWsNBQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11480"; a="64909731"
+X-IronPort-AV: E=Sophos;i="6.16,278,1744095600"; 
+   d="asc'?scan'208";a="64909731"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 13:47:56 -0700
+X-CSE-ConnectionGUID: NPEqUv/HQnK07F1mHCuy1g==
+X-CSE-MsgGUID: 2pzMjtN6RTSQge0fIVlbbg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,278,1744095600"; 
+   d="asc'?scan'208";a="184498831"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 13:47:56 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 30 Jun 2025 13:47:55 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Mon, 30 Jun 2025 13:47:55 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (40.107.95.80) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 30 Jun 2025 13:47:54 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=tEXb8OABZ2d7e45giFDOmWzVwzbE8evopDTYtn7UYa7cJoYUBn3/aS5EvjLXb1OmT4NCrDy9vNiybH4pBENgFUVzYLIAJwIyK/R7ZmUA+HM0hYMA43zZGW7RoqBDwDZXNb7832N7GObxjkcJvOpZ1nF+SMDseN1JhnP+IfbFe+fHQy50+HTwZeWuOZA9iIkLnXQhGi73x0RktLTmHOWnmOC3nvvhxOdZnBks1mOdJN2tokQvB6S5DEr2xrIqksXOvoartMtpb+zR99OCzsvm6cjLXzOX34uxESmZLGW0mjxa3F3kCA3BWE2cgQIY/OqtNZt4voSyfq1fsip66f4jIw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DlqQxHvuDEidP7Kdux9Qfv4nDditvuiak5oZh0KJYOk=;
+ b=SV9ewQGZqVEUGph3hUAArtzwJjoQX0cPWTpDwwmXbCyLwaGrlWjop5smJmCOQaIN526d2ir/zDVNOdxunkDFX4JBGwWxDzP44GPAHXd6TqCdchMX7HFgJG69oksdgpJ01ZHZpYFvtIIgGsCGUZ+lseZaB7hi/Ek+a1wZ0A9ADpBaYYBsSAZdKvi/4HWlwUhGd2W8SDDZRkW6Vq12cQNiCEi+9l2lghy00Ug4FJFzPWnj4GeYTTxCWct0NVGwAu8G8It29jOyZ8fgmAjsxqfb+y0xOD2FA41KIv/51YhWXR1r2ovlj/9LQg5rTeElA2uuv9gMpw/sNMHpfMnewT/KlQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by SJ5PPFBD6B1667A.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::84f) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.28; Mon, 30 Jun
+ 2025 20:47:10 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3%4]) with mapi id 15.20.8880.029; Mon, 30 Jun 2025
+ 20:47:10 +0000
+Message-ID: <a9d50186-bffa-4b3c-9d97-831269a84fbe@intel.com>
+Date: Mon, 30 Jun 2025 13:47:07 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next 4/5] ixgbe: convert to ndo_hwtstamp_get() and
+ ndo_hwtstamp_set()
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>,
+	<intel-wired-lan@lists.osuosl.org>, Tony Nguyen <anthony.l.nguyen@intel.com>
+CC: <netdev@vger.kernel.org>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>, Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>, Richard Cochran <richardcochran@gmail.com>
+References: <20250513101132.328235-1-vladimir.oltean@nxp.com>
+ <20250513101132.328235-5-vladimir.oltean@nxp.com>
+ <7d330d84-42ab-43aa-94f1-5240b67c49dc@intel.com>
+Content-Language: en-US
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <7d330d84-42ab-43aa-94f1-5240b67c49dc@intel.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="------------DuZSDPVGkBlljkQMVjvAUxoc"
+X-ClientProxiedBy: MW4PR04CA0205.namprd04.prod.outlook.com
+ (2603:10b6:303:86::30) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SJ5PPFBD6B1667A:EE_
+X-MS-Office365-Filtering-Correlation-Id: cd03db0f-ca88-48c6-4d5d-08ddb8174876
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?V29mZk1BNDVncnQ3NTZoWVMwbmhRQTNrZnhyRUhza2R6T0d5KzJpTnVEUnJr?=
+ =?utf-8?B?SGo1MkhaSVZQRHRhb29Fa0NmQ3VhYXVRZWFpblpVdmlLUEk0dU9wM3lPVHNp?=
+ =?utf-8?B?d2ZjK1dXN3JEZkkrU055VGxwdWM3UTlGM1pmdTFEUmgvYmtQNjVQRjI3SzR6?=
+ =?utf-8?B?N2VTeHdBVjdFZFpCWlN5dHdRdUZlakZ3cjBzSTY4My8zYXFiQytJSC9QUlEr?=
+ =?utf-8?B?NXRmbS9UdndNaXQ2M2RHS0ZXa3RzWVhnZ29wcjJoZjVJaXRlOEROZ0Joa0Vu?=
+ =?utf-8?B?cS80ditZRXIzTGxxZ1N5dm1hd21HRkgyOEowQkhDVDY0dHVsZ1NWRVM1bkdT?=
+ =?utf-8?B?bXA1eEpZU2VNbWJjdVJ2ZmVSR0cxQmltZ3N6THdPS2F3NG5qci9adzVHM2Vp?=
+ =?utf-8?B?Wjh3UnY4WmcxdnRqbGRHNmNZZTRaNTVSdkNKdysyRmlyUEdHUURsTVkvczdv?=
+ =?utf-8?B?Z1YrODBqSkllZTRWbnBQUTlreFI2WVAwQTUzTEgyNjZGUHA5VjNQRWpWUlNN?=
+ =?utf-8?B?bWsrK1JxNGxEMERKU2NmVDJoeGhZNExoN1RXTDhpZFNhQkY5ZFAxYWlpMTRP?=
+ =?utf-8?B?bVUrY2RUSFlSMU5TRjR4VUsvWU84bzhSVDhKYjdLV3pzZ0g0YnJpT0lkN1Nl?=
+ =?utf-8?B?RGI2ZnpveFhURUxrUFdmbWcwSmVQSE9ZUWR0ckJSNjVqdTNjZFFBcktvS2I1?=
+ =?utf-8?B?bCs2aFdYc0xPVzloTU8vR0lZbzJ6NEZtbGJCcU9lSEFXdFZyQ1ZaQmZXZWZ4?=
+ =?utf-8?B?Y2xSTGxxajhCMEU2WXFYbU03aVB1V0xyd0JsQUw1VU9DSWswOWNSK1A1WlZD?=
+ =?utf-8?B?U1lRVDlhWHg4OHRoU1JHMm1pQlc2TC8yZDJCZ0tOa3QvNzVCWEt6N0xoVExl?=
+ =?utf-8?B?WmUxK1dhKzFjdVNDdERhSEJ2SWpXalBSK0Q4bGd5U2ppWlNnNVNHbXlOZWww?=
+ =?utf-8?B?bDRaaVMxZTRjenpjYkNOMXlkNVNPZlFlWWo0cy80OGJZdmhBdG9qdTZVR1o1?=
+ =?utf-8?B?S200dHNySFA1SGROWHlLeUpzK3h5V0hTMGFVU1R1eGFqYlo3OE9keEFJb21m?=
+ =?utf-8?B?S1FvNWdIMlJkVDdVTGg5UmRzTkJQTzNCeVRRRWxRUHdTSVBEQXlCWEpJWXl2?=
+ =?utf-8?B?SEFJM2wrRERxbjVnLytHbWszZkNodEY4UWtWTnhxekwzMFUrYmJJV1NKbXRL?=
+ =?utf-8?B?bGNaSFY0bEpjWE5uNmZpY2djci9nckwvcllaSWhpbWVPeFYyNmh5TkMzNmlu?=
+ =?utf-8?B?SUFKUm1KaHR5bU5tYzI1SVhsaGlXK3JKQkpmbE1wK2ZjY2hCWkZVTTF5VGFn?=
+ =?utf-8?B?VXVmZEp3TVAzWHB6Wlh3Wml4YWhtcndHTnVwUXhPMFc4OWhSWjZQbmtUdGlY?=
+ =?utf-8?B?cWw3aEdIM2NPVVFZWEVpazRwL2RwOHZNTUdFWUZVWWg0bXU2MUp6OUdSUnhM?=
+ =?utf-8?B?d3pvTGZ6anhISUxIR2poc05CVVFjRE0zUDVBa1BQR0piaWZGZTd5TjVleTVo?=
+ =?utf-8?B?TCtFNktqK0E0Zm4xSjN6VUp6N2E5SjF0a21ob3BMaGtiODZ0a3BPd3REM1Ft?=
+ =?utf-8?B?NVhybkNnSU9UMm05Q2h3aVJ1QmVzcjZEd1MyZllaUVFyckRvWWJaR2Ivbnpt?=
+ =?utf-8?B?VjJJVmxsN1JSRVFYK0F5SHVpdGFmTkZleGF5a3J6UUIzR3VDd3R1eEtXMXVm?=
+ =?utf-8?B?MlBFZEdXZklmaGxpdmJ1V2pJSDV2Mzd4MmJPYjZ3cWxPNDZtS0tZekZQSVhs?=
+ =?utf-8?B?R1dxRFBtbHB1SmVNenl1dTd4M3FnRVV6a1pPS3ZldXordjZlaWRiQk9KYnhK?=
+ =?utf-8?B?M3pHSkZBaksyU2tPNE1vSzVFdWNzc2J0eVQ0V0RCK1kvczU5K0hrdTVpR2Ex?=
+ =?utf-8?B?djBTNEQ4RUplZ3prRFFJK1c0L2JSSGp2Sm1UQXM5OVdnT2ZHdDVUNi9WcWw3?=
+ =?utf-8?Q?lpuPqpTyvqU=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NUFYTFZmUEwrVmE1SzluZzh5Vks3REJoY0FwU2wvTTRYRERWelBnZUVLdlZr?=
+ =?utf-8?B?Nno3WEV3bW1vekRuOWdYdE5CWXRtTVBCUlB6NmI4eHgyVWdWWmhlVVMrbHNj?=
+ =?utf-8?B?SlRxQXFSOWxCUnJIc2c1cEhISVZXRFFPRW5VNTZRMDBTUXNmaFBoZjY4Nmo3?=
+ =?utf-8?B?d1lQems0U2RUam9hUjJYa0t2Z2lHbXJtVFdZR2RWeHRjbjJUcHcwWFpTY0Nz?=
+ =?utf-8?B?NExmanNMTzEya1dFdVBwQytYSWNyOHNBUXNOdGRaVnNYQXN2aXFqY1Vsb3Vl?=
+ =?utf-8?B?d3B4cHBjNXJxVXpuNFhsZERXQkFKT2Zhc1ArcTN4aCtzQ0F3SUk0VXBhYXoz?=
+ =?utf-8?B?WEErZ0lJUG9xMytpRE1FeHlwcEd6Z2dmZ0VPaVUyQXQwQnZnUFQrcWI0RzFG?=
+ =?utf-8?B?YzdYc0FOWXZDU3BPMkNTcUM5TjN0Z1YzM3FJNEZKSktLQ0FrbHY0NEVUNFJp?=
+ =?utf-8?B?dWgvVUZYU25Bc1Q3TnFpeis1KzlLVjlaRTM0Ukp0dkRnKzl4YVdsV0VvaGJG?=
+ =?utf-8?B?TUpTeFBpaGd5UUtSbDdlUTNYOTF5T3JqRERUMTZUalo3V240Q0ZtYzhYUElU?=
+ =?utf-8?B?N2V0UVRlcnVscEMyS0xzd3ZIYUZKQXp2Sldhb0ZYdXkzNjlkTUtIdGkrTXBy?=
+ =?utf-8?B?RjQ4RzJxTU1pL0FSWUhLZmJVdHJKUERTdUZxRzUxTXBEZjBtZ1pOR29sNEF4?=
+ =?utf-8?B?Y0FCN0xKOWU2OVlqSUVJdjZ5cVd6d2xERGpGdFpVc3YvK3hhR0I4aHlsTjAw?=
+ =?utf-8?B?QWt6QkpSYXU3MTlXV0dIMFdPTDJ3VWZOQ1l0MUo3RTRSUGY2TkxkTEhFVGta?=
+ =?utf-8?B?RlR2NjRQOXhubXNuZnMvZkF1bUIxOTV6enFFcmdIcEcwK2ZEZnZQTFdzMEUx?=
+ =?utf-8?B?SHVTY3RvOWxjTUc5YzhNMXJMcm5HcVc1ZmlGckRETVkvVjN3cmtsTTRhdUlH?=
+ =?utf-8?B?dDZXSy9YMzNoWWRRRnkrcSsvVWVXTU9yb1J1RXhZQUlOYjBWQmRjeWs1bW5l?=
+ =?utf-8?B?aFJTSmhPbXJONm16TlI4Sm91SlljeitGVk95c3oyclB5TUY2eUVUVlVGaU5M?=
+ =?utf-8?B?U1E4QWpGbkZjeUpWNEYxbEJDSGFmZjZQelY1cWZFY0FIdzBIeXNpeXJRdkJI?=
+ =?utf-8?B?Nlhud05NNkh5S2I5bU5SZWlaWDhiWVZnZE5lMHEvanN0ZzdMWmJGbEdSZXlk?=
+ =?utf-8?B?dzhFK3pkYVJGVU1MMEFjaEFNQUlzeDVkWFp2MEdrcmxuV3g4VkpHTlNSdjFy?=
+ =?utf-8?B?SHAzTklqSUNGQUhveTViYmZTbWpWdzBpRGNJK0J1THR6WmphUEgxZmRjbDcv?=
+ =?utf-8?B?RDhKMTcwVVV2YTdaaGd0YXYrR2kzN3YwZ3JnQXVIRkVZUTFMUVpJNHlTVTVE?=
+ =?utf-8?B?N3RqSlJzc0lFTXVaci9SR0hSWG45TThMVVR5dW9oS3lMdXRhVy9Wd0dMRzlE?=
+ =?utf-8?B?b3FsWXgxTVluemdmSWVRLzJoQXdYcVBxclpaRVh0aXZKVEtGc3BZcTVOczEx?=
+ =?utf-8?B?dndpOTVGU05lM3BMMjJOZWpHdnJUVm9JWTdZMXgrM0pNbjB5VDJoVFVoN3V1?=
+ =?utf-8?B?elJRVW5rRHMybTBNejN2WDhTeTFRZEJ2RFI1ZzB1WGRBVEltMU53ek1oLzRw?=
+ =?utf-8?B?WTJ4V2dmN0J4UGVKcWxRTTEwSnMwMjdnMFVOYmovMHdJemRkc1FCUXNxRDNK?=
+ =?utf-8?B?TDh6RFl2V21KU1dGLzNGMk94a0NUUCtxYTdNZHVxQkkwUDNWNnhWOExsYUYx?=
+ =?utf-8?B?akFUYWFya3NhNGlSNitZekQydW02WTU1TEdhci9nUGg3ZjF2cFdvYW5qQXhl?=
+ =?utf-8?B?Q1dUYWVLdTZiUStmd2U1V2NGeitlL3VCTFlvVWlaZXJtaW94SjFZejVaWVhJ?=
+ =?utf-8?B?Q2dOQnVhL3NOWCs0K08zb2E5S0F6UWtDdUpucEpBdjZ5VjZTQXZHdG9jYmtu?=
+ =?utf-8?B?aWM2Ulh2Ky9hK0dFclErSUJaTlpKNGVkQjZlV1k4SnZQbTdkbktKWVdmUU9x?=
+ =?utf-8?B?N3JxSWJMQUdlNThHZE15TW4zMFZMQTU2a3pMMlZyaHFwODZXWER0MlJMYmc2?=
+ =?utf-8?B?bllUUEtIUThYRUZQamxpck9Tazk2UzdKZ3pTU1hZMTJzS0htTUlLV1p1eUFj?=
+ =?utf-8?B?aFBzdGpMaFN5eTh0VGVHQlhhTENTa1VuWnNObWlVVlQyTmtmSGtRRXY5b2dN?=
+ =?utf-8?B?TGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: cd03db0f-ca88-48c6-4d5d-08ddb8174876
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 20:47:10.0325
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iPc5/L3qTDmGEolsoOJDL2RRZn7gHX99kmo3yuRyoihHpIgoA9SvaHiMxUYD08bANfOwazdkrT4vUp859Z5K2nGKl04J8IO+KqRS98Hl1xQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPFBD6B1667A
+X-OriginatorOrg: intel.com
+
+--------------DuZSDPVGkBlljkQMVjvAUxoc
+Content-Type: multipart/mixed; boundary="------------lL9PUQvVgcOxRAS0J5pCF03p";
+ protected-headers="v1"
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>,
+ intel-wired-lan@lists.osuosl.org, Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: netdev@vger.kernel.org, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Richard Cochran <richardcochran@gmail.com>
+Message-ID: <a9d50186-bffa-4b3c-9d97-831269a84fbe@intel.com>
+Subject: Re: [PATCH iwl-next 4/5] ixgbe: convert to ndo_hwtstamp_get() and
+ ndo_hwtstamp_set()
+References: <20250513101132.328235-1-vladimir.oltean@nxp.com>
+ <20250513101132.328235-5-vladimir.oltean@nxp.com>
+ <7d330d84-42ab-43aa-94f1-5240b67c49dc@intel.com>
+In-Reply-To: <7d330d84-42ab-43aa-94f1-5240b67c49dc@intel.com>
+
+--------------lL9PUQvVgcOxRAS0J5pCF03p
 Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.95
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 
-From: Xiaowei Li <xiaowei.li@simcom.com>
 
-[ Upstream commit 0b39b055b5b48cbbdf5746a1ca6e3f6b0221e537 ]
 
-Add support for SIMCom 8230C which is based on Qualcomm SDX35 chip.
-0x9071: tty (DM) + tty (NMEA) + tty (AT) + rmnet
-T:  Bus=01 Lev=01 Prnt=01 Port=05 Cnt=02 Dev#=  8 Spd=480  MxCh= 0
-D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=1e0e ProdID=9071 Rev= 5.15
-S:  Manufacturer=SIMCOM
-S:  Product=SDXBAAGHA-IDP _SN:D744C4C5
-S:  SerialNumber=0123456789ABCDEF
-C:* #Ifs= 5 Cfg#= 1 Atr=a0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
-E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=00 Prot=00 Driver=option
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
-E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 3 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
-E:  Ad=86(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
-E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 4 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=42 Prot=01 Driver=none
-E:  Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+On 6/30/2025 11:56 AM, Jacob Keller wrote:
+>=20
+>=20
+> On 5/13/2025 3:11 AM, Vladimir Oltean wrote:
+>> New timestamping API was introduced in commit 66f7223039c0 ("net: add
+>> NDOs for configuring hardware timestamping") from kernel v6.6.
+>>
+>> It is time to convert the Intel ixgbe driver to the new API, so that
+>> timestamping configuration can be removed from the ndo_eth_ioctl() pat=
+h
+>> completely.
+>>
+>> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+>> ---
+>=20
+> Ugh. Apologies for the late reply here, but this took for ever to track=
 
-Signed-off-by: Xiaowei Li <xiaowei.li@simcom.com>
-Acked-by: Bjørn Mork <bjorn@mork.no>
-Link: https://patch.msgid.link/tencent_21D781FAA4969FEACA6ABB460362B52C9409@qq.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
+> down what was wrong in our testing.
+>=20
+> The ixgbe patch has a somewhat subtle bug which lead to failed timestam=
+p
+> configuration and likely other forms of memory corruption.
+>=20
+>>  drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  9 ++--
+>>  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  6 +--
+>>  drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c  | 42 +++++++++---------=
+-
+>>  3 files changed, 29 insertions(+), 28 deletions(-)
+>>
+>=20
+>> =20
+>>  /**
+>> - * ixgbe_ptp_get_ts_config - get current hardware timestamping config=
+uration
+>> - * @adapter: pointer to adapter structure
+>> - * @ifr: ioctl data
+>> + * ixgbe_ptp_hwtstamp_get - get current hardware timestamping configu=
+ration
+>> + * @netdev: pointer to net device structure
+>> + * @config: timestamping configuration structure
+>>   *
+>>   * This function returns the current timestamping settings. Rather th=
+an
+>>   * attempt to deconstruct registers to fill in the values, simply kee=
+p a copy
+>>   * of the old settings around, and return a copy when requested.
+>>   */
+>> -int ixgbe_ptp_get_ts_config(struct ixgbe_adapter *adapter, struct ifr=
+eq *ifr)
+>> +int ixgbe_ptp_hwtstamp_get(struct net_device *netdev,
+>> +			   struct kernel_hwtstamp_config *config)
+>>  {
+>> -	struct hwtstamp_config *config =3D &adapter->tstamp_config;
+>> +	struct ixgbe_adapter *adapter =3D netdev_priv(netdev);
+>> =20
+>=20
+> ixgbe doesn't directly assign the adapter to netdev_priv and this needs=
 
-**YES**
+> to be ixgbe_from_netdev, since there is a wrapper ixgbe_netdev_priv
+> structure. I didn't dig into why, but both get and set are wrong here,
+> and are misinterpreting the ixgbe_netdev_priv structure as
+> ixgbe_adapter, which is obviously wrong.
+>=20
+> See its definition quoted here:
+>> static inline struct ixgbe_adapter *ixgbe_from_netdev(struct net_devic=
+e *netdev)
+>> {
+>>         struct ixgbe_netdevice_priv *priv =3D netdev_priv(netdev);
+>>
+>>         return priv->adapter;
+>> }
+>>
+>=20
+> Whats odd is that the netdev priv structure is just a wrapper around a
+> pointer to the adapter:
+>=20
+>> struct ixgbe_netdevice_priv {
+>>         struct ixgbe_adapter *adapter;
+>> };
+>=20
+>=20
+>> -	return copy_to_user(ifr->ifr_data, config,
+>> -			    sizeof(*config)) ? -EFAULT : 0;
+>> +	*config =3D adapter->tstamp_config;
+>> +
+>> +	return 0;
+>>  }
+>=20
+> Because we're completely pointing to the wrong memory, this overwrites
+> who knows what since the ixgbe_netdev_priv is just the pointer address.=
 
-This commit should be backported to stable kernel trees. Here's my
-detailed analysis:
+>=20
+This is an artifact of the work to refactor ixgbe to support devlink:
 
-## Rationale for Backporting:
+Both netdev and devlink want a private structure allocated as a flexible
+array member of their parent structure. They cannot both directly be
+ice_adapter, so we chose to have devlink be ice_adapter, and netdev gets
+the wrapper structure. I suspect the patches you wrote were based on a
+tree before this refactor, and/or you just did not spot the refactor
+happened.
 
-1. **Stable kernel rules explicitly allow device ID additions**:
-   According to Documentation/process/stable-kernel-rules.rst line 15,
-   patches must "either fix a real bug that bothers people or just add a
-   device ID." This commit clearly falls into the "add a device ID"
-   category.
+a0285236ab93 ("ixgbe: add initial devlink support") is where the change
+took place, which merged relatively recently.
 
-2. **Simple, low-risk change**: The commit adds exactly one line:
-  ```c
-  {QMI_QUIRK_SET_DTR(0x1e0e, 0x9071, 3)}, /* SIMCom 8230C ++ */
-  ```
-  This is a minimal change that only affects users with this specific
-  hardware (vendor ID 0x1e0e, product ID 0x9071).
+@Tony, I think this is a pretty trivial fixup on your tree if you want
+to handle it instead of forcing Vladimir to make a v2?
 
-3. **Enables hardware that would otherwise not work**: Without this
-   device ID entry, users with the SIMCom 8230C modem cannot use their
-   hardware with the qmi_wwan driver. This directly impacts
-   functionality for those users.
+its really just switching netdev_priv to ixgbe_from_netdev in these two
+functions.
 
-4. **Follows established patterns**: The commit uses `QMI_QUIRK_SET_DTR`
-   macro, consistent with the existing SIMCom entry at line 1428:
-  ```c
-  {QMI_QUIRK_SET_DTR(0x1e0e, 0x9001, 5)}, /* SIMCom 7100E, 7230E, 7600E
-  ++ */
-  ```
-  This shows the vendor has a history of requiring the DTR quirk for
-  their devices.
+--------------lL9PUQvVgcOxRAS0J5pCF03p--
 
-5. **Historical precedent supports backporting**: Of the 5 similar
-   commits analyzed, 4 were backported to stable:
-   - Fibocom FG132 (YES)
-   - MeiG Smart SRM825L (YES)
-   - Telit FN912 compositions (YES)
-   - Telit FN920C04 compositions (YES)
-   - Quectel RG255C (NO)
+--------------DuZSDPVGkBlljkQMVjvAUxoc
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-   The 80% backport rate for similar device ID additions suggests this
-type of change is generally considered appropriate for stable.
+-----BEGIN PGP SIGNATURE-----
 
-6. **No risk to existing functionality**: The change only adds support
-   for a new device ID (0x9071) and doesn't modify any existing device
-   support or core driver functionality.
+wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaGL3zAUDAAAAAAAKCRBqll0+bw8o6Kbt
+AP43oUI1jZBeFY3nAZZxYPWJ9Xkv3aPubM7IQcuAKAA4CAEA4PCK5QXvEy6xoKzMVXLuiSB8yHcG
+PJfO9T8MLps8DAo=
+=w6kX
+-----END PGP SIGNATURE-----
 
-The commit meets all criteria for stable backporting: it's obviously
-correct, tested (as evidenced by the detailed USB descriptor output in
-the commit message), small (1 line), and enables hardware support that
-users need.
-
- drivers/net/usb/qmi_wwan.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-index dc84d9029c2c7..3976bc4295dd1 100644
---- a/drivers/net/usb/qmi_wwan.c
-+++ b/drivers/net/usb/qmi_wwan.c
-@@ -1432,6 +1432,7 @@ static const struct usb_device_id products[] = {
- 	{QMI_QUIRK_SET_DTR(0x22de, 0x9051, 2)}, /* Hucom Wireless HM-211S/K */
- 	{QMI_FIXED_INTF(0x22de, 0x9061, 3)},	/* WeTelecom WPD-600N */
- 	{QMI_QUIRK_SET_DTR(0x1e0e, 0x9001, 5)},	/* SIMCom 7100E, 7230E, 7600E ++ */
-+	{QMI_QUIRK_SET_DTR(0x1e0e, 0x9071, 3)},	/* SIMCom 8230C ++ */
- 	{QMI_QUIRK_SET_DTR(0x2c7c, 0x0121, 4)},	/* Quectel EC21 Mini PCIe */
- 	{QMI_QUIRK_SET_DTR(0x2c7c, 0x0191, 4)},	/* Quectel EG91 */
- 	{QMI_QUIRK_SET_DTR(0x2c7c, 0x0195, 4)},	/* Quectel EG95 */
--- 
-2.39.5
-
+--------------DuZSDPVGkBlljkQMVjvAUxoc--
 
