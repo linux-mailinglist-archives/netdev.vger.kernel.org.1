@@ -1,94 +1,94 @@
-Return-Path: <netdev+bounces-202535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4611DAEE2A5
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 17:34:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 476A7AEE2CF
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 17:39:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EE103BCEA2
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 15:33:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63CFF3BA597
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 15:39:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B26B28ECE8;
-	Mon, 30 Jun 2025 15:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F4028FA9E;
+	Mon, 30 Jun 2025 15:39:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="gKoyOmU2";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="2/f4PDK8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pmKMNjZS"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2EB24503F;
-	Mon, 30 Jun 2025 15:33:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E79328FA85
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 15:39:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751297626; cv=none; b=hmpXiZ74O7f4RXAMdBp4h2dydDye9EsDn62/83MN/4hAG2xDQ9XVb4f5DJJvGdB/vLNVvw1OSWZJff31NDqeH2nX0dPzu7fyNHAduKGBlhPjpu8q/YgtO7cbFTpwYtYtAfKi9bVErx03QqD/W9z+nqBQV5aWCok4u74J4voF568=
+	t=1751297982; cv=none; b=rEepiIMCD4i31fts1Tj13bX6a+9FFe2sl8AsicSrPNVZUf7WLmV+MTLekWMC5B6DiGzVgHx9YQHj94wsLqGu3pLnrCniDLYwgHOa09lD0hJ0R4i349VoER9i4OWWRqu0hnaRL2MUoJ4vOIgTF7JLtEF+AupgnTaEXY9ogXQqdU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751297626; c=relaxed/simple;
-	bh=aTCWkLwi+CtG92KLSxHM3rbUvvoD4pC+7AK/RGo+FQs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=i/eb/F1zw4Rrj35mLK3Bj3CSUCz5sk0n6FAfm3nfoCDQIMtwRpFu0a5ZLwOxNM972c2mcP5sEtJYVrR4DFNFuPs79Z8n+K+RVj+saqlGqC1czDlirNG+0AkbOzcgo0a4sYqB3yHAbpfIBYXs8zpuYJvK8U3EAMcZ+SSWwJaHyvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=gKoyOmU2; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=2/f4PDK8; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Mon, 30 Jun 2025 17:33:41 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1751297623;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=cxiu0ZRDOamv5dWbxC+oQlVwTHqvEsO05LOM+OvHFdc=;
-	b=gKoyOmU2f+xVUKMrphwmzSGIYh3WgYHKIDWD0octaxXmXA3hnMKA2MyMssmgo9i7Qqlqtl
-	gkc2Xc38VPF45VuykPDhlHgm/jqzftvIEPWTeePbrnbcINQcWk3GgFRkbEMm71bzZ0lrgO
-	Ed7tPqMt+KJ3lR/VmuNQ5oMTtANV7JSVG14kMVqOxNLizPhxfi5ZmjjJFlJDicXNpgRBzD
-	3fKOOrRAyaOmlFYA/SEH3wm9iB3ILcPiiHV/LhU8eMCaOtlrkhBY9kvIx03DH0ES375GYu
-	4/6pDkPeOta7wvwe+75o8svVGUN9y5JaIYOVzuffyk4xSxbdpgkE6UKWu06Csw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1751297623;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=cxiu0ZRDOamv5dWbxC+oQlVwTHqvEsO05LOM+OvHFdc=;
-	b=2/f4PDK8/NoKiZcoyKCFPbovyCH3vRrlJuFonZBIDV50Fxk2acj5jnAAeJ3YM61lKE2SjU
-	Db9w1UTL9iNO5yBA==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	Shuah Khan <shuah@kernel.org>
-Subject: [PATCH net-next] selftests/tc-testing: Enable CONFIG_IP_SET
-Message-ID: <20250630153341.Wgh3SzGi@linutronix.de>
+	s=arc-20240116; t=1751297982; c=relaxed/simple;
+	bh=mt6iKyNy2SgOPfZV9hnPbIl/LQwJ6ZQIG9sEZOWdQhQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=fa+4f23QbUMMDeWrWbKU90HG3ygGnUWMzm22/xmq3JzfS1IDRfwNj+1KiS8GUaGjfBVhMfXwHWvi2w42yVJGGQYJ55lxlMwKUwZRYFMj0Di5KRgC6Ucz9cYnkurp1JMvdDJtxu2+JkA0zzEXleEMTrPDY5XO6gN7wQY8ySEGsIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pmKMNjZS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C91B7C4CEF3;
+	Mon, 30 Jun 2025 15:39:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751297981;
+	bh=mt6iKyNy2SgOPfZV9hnPbIl/LQwJ6ZQIG9sEZOWdQhQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pmKMNjZSVqEURWihleW1G6Wn9OUExYe1p07l1Ez1WbaBE4Du0NtiQ6ClEulyawpLS
+	 wXDjAUt8JlILLwY4yg9INdwM4yx2KB+QTLp1xlGTxnapUdrsrM8wOg2tzisdm52V/A
+	 faXZRQWAzgZoAw9NTg7u3y8AUYyPlW40ws3EHgMHhDYKK4pz+kJiNqwRlMjseNq+/w
+	 c4yzuO06FlMJRrhv9Ae9et6QGgEahmRVi/WZkiHyzgq6wSavrUdBYcDCd1z7Bu7Ok0
+	 1Rx+N/kuCyI9TN7oMzIx46+U+EyNWaMZb/elZBF1mWP4qs9dqrGMkaKLBNEmyNdISN
+	 VgSdXjy1vMTjQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B1B383BA00;
+	Mon, 30 Jun 2025 15:40:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: ethtool: avoid OOB accesses in PAUSE_SET
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175129800702.3427864.3419337801355734142.git-patchwork-notify@kernel.org>
+Date: Mon, 30 Jun 2025 15:40:07 +0000
+References: <20250626233926.199801-1-kuba@kernel.org>
+In-Reply-To: <20250626233926.199801-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ syzbot+430f9f76633641a62217@syzkaller.appspotmail.com, andrew@lunn.ch,
+ maxime.chevallier@bootlin.com
 
-The config snippet specifies CONFIG_NET_EMATCH_IPSET. This option
-depends on CONFIG_IP_SET.
+Hello:
 
-Set CONFIG_IP_SET to be enabled at part for tc-testing.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- tools/testing/selftests/tc-testing/config | 1 +
- 1 file changed, 1 insertion(+)
+On Thu, 26 Jun 2025 16:39:26 -0700 you wrote:
+> We now reuse .parse_request() from GET on SET, so we need to make sure
+> that the policies for both cover the attributes used for .parse_request().
+> genetlink will only allocate space in info->attrs for ARRAY_SIZE(policy).
+> 
+> Reported-by: syzbot+430f9f76633641a62217@syzkaller.appspotmail.com
+> Fixes: 963781bdfe20 ("net: ethtool: call .parse_request for SET handlers")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> [...]
 
-diff --git a/tools/testing/selftests/tc-testing/config b/tools/testing/selftests/tc-testing/config
-index db176fe7d0c3f..8e902f7f1a181 100644
---- a/tools/testing/selftests/tc-testing/config
-+++ b/tools/testing/selftests/tc-testing/config
-@@ -21,6 +21,7 @@ CONFIG_NF_NAT=m
- CONFIG_NETFILTER_XT_TARGET_LOG=m
- 
- CONFIG_NET_SCHED=y
-+CONFIG_IP_SET=m
- 
- #
- # Queueing/Scheduling
+Here is the summary with links:
+  - [net-next] net: ethtool: avoid OOB accesses in PAUSE_SET
+    https://git.kernel.org/netdev/net-next/c/99e3eb454cc4
+
+You are awesome, thank you!
 -- 
-2.50.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
