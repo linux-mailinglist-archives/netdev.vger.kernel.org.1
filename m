@@ -1,107 +1,105 @@
-Return-Path: <netdev+bounces-202620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3814AEE5BC
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 19:25:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3944FAEE5D2
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 19:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 686BC441433
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 17:24:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EB2F179405
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 17:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC55A2E3B09;
-	Mon, 30 Jun 2025 17:25:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="YETbN4qM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 170452DBF45;
+	Mon, 30 Jun 2025 17:30:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93F452C3273;
-	Mon, 30 Jun 2025 17:25:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F602D320B;
+	Mon, 30 Jun 2025 17:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751304300; cv=none; b=feLGTdTuQlx1mt8Qhl+zapIu0BqPBSMFQ2KuzmQsDLrJtFb/57gx3xBtA9avk07FjsIiKXJlaIMi1SKqTHTTuxV5YQ6yoaviFq1VaumMMkxT0KPqDimSYLROGnWImR0IRzhyuUt5H7cZCuZdVmGJDSlbkw3TCFPb6l/48ErCqos=
+	t=1751304622; cv=none; b=uINJg2J44c0sTGmOCRokGvUjPeSfTFFj40tX8k67gBmH6YRjZKW2Unr72Bg71DemSjjNhHwIOJNtjlSqBR1Oywk8lE9T9xPRa9LmEmz3qv5dP1Uey97sLjWMTrRWtAhaMxNqZ1P143lr3wAUAgM+jpVy1ApFdMUljch6YwA5eIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751304300; c=relaxed/simple;
-	bh=uehCu0PQ3Rt5UP3Eqg8DxWd06wirGlh5cnhD9O7bFeg=;
+	s=arc-20240116; t=1751304622; c=relaxed/simple;
+	bh=mRaBmnvlcM9HhFflwQ0sq0WRnSWdPwBoSeN4WoeVGec=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fXyNK8N4nvLmoyuajOVfXO3XbAaEKLZcbHFVorNHLUkeg80cwM/ANQO1/f32E8KtQeuJ8PsrauVT6ftdjq/9P8TglVgJSBIcjnJNDfF5MaLzN7xV7DNtHjJFNmc8Qn1a4wIJHknEQp4aRVlTV4MBrpXTn4YuyOb135b+31kXcis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=YETbN4qM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E5EEC4CEE3;
-	Mon, 30 Jun 2025 17:24:59 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="YETbN4qM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1751304298;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mmwZNE2u/jLWQ97nyzsa8bOnYBvTHITQRZ6hjwPm9kM=;
-	b=YETbN4qM+f1cBb669m1/hT7Q4hRI2+0z525cA9bYYlRfOYah39n5n+zgwzsVs0gbBi9NIU
-	M0yaSxKCDBssANSv6sXIfguOLhdf2+vNn3N+VpC3WaXidp2KGUdR6N0dutVq2bSHWVo22D
-	ft0Ay9OF7nLQl4y180ov5VQDK1aOpS8=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 21b57f64 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Mon, 30 Jun 2025 17:24:57 +0000 (UTC)
-Date: Mon, 30 Jun 2025 19:24:33 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Yury Norov <yury.norov@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JJAsFR5ZJe3VZ4Z5AM4dOYTKdVl4Mui69m7ZYO231pVRr9mXRR8PqcGt3SSM6sJFevXacGVhZfXSUr5YRv2kVOjUEoP3S67p2RjQyHVsJdKtWO4nAgUj6EksWpYtHQ0NS5577g+2P7VsGZuw1w7JvaGplPjjwTElQqiwc7vmVjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-60c4f796446so8110032a12.1;
+        Mon, 30 Jun 2025 10:30:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751304617; x=1751909417;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yYtk+tdJ9WigmCX8UmH7nwOlbF/EiYv5z8fJ4XdRj4A=;
+        b=ZB8ay0FbowQBSdeLgki/bYkMQHwNQ9Q4FsUqBbMVnfmcuawEldXJLc43la3Bk8tHLW
+         kNk8WqyUY5BTn2C90UzwZKBx0HMzVS7vMUlCOh7M0FXTKqXUbZxuAZXKAVmTf+od/7t2
+         8saT8/HmlWO9bck1lUXzmExQN0l7ajHSi1wsI/hWgb/0da15l7f9BkoPdq4uH/IIFevR
+         EzsSkMTGj5QdmZSN236q/b1Pkknrh4XGO6WjoZskHQ/sP3BFPiD3gIMxER0QHWYnBDIY
+         7+sNdiaZvTv7evM4R6wGNy/8A7z6/axGRebhqJy/L++mZj0djt6PNGwp6NhCket2w54b
+         Uv1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVSW+vnXFw2gduEGL/SFkbLKvmezWI69JyS/Q/b3CSLjddDxNCmww79vRsVegWlP/UonZU12WJUU7G84WCQ@vger.kernel.org, AJvYcCWfDclUzNJQT8D7LXj+j4zBUcdeTdc9JUmbLIPg+wkU9FSf0H8pbVz2BRVC6VMY7YaR8fdNpRDNH8OgDFQkT3Qf@vger.kernel.org, AJvYcCWjE317XdTnGhiRM3eMMQuFYzFxAkJg/9iYrAVKBXHRURzq28l2//YaQ34QGGVZx7SzigknfZKL@vger.kernel.org, AJvYcCXMK87R5H6JfxRCWnqmy6TCYGUM6sVQnlQYytBIn0GWzjHgwHkWNxRWIe2UoTI+hibubfg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzu+YgkPTF0UQGaF0+lH4VI+EIvFeyOel5n7ACuQCvVINFMIDRs
+	8mJO/qQ5wGi645uCPUw0en2xJawN1j1GMEOoFMydhiFNMMylGAD9Elc3
+X-Gm-Gg: ASbGncv3S4QUQVMzasa4ZE91+9xHmlKJdExhAoMXx1Yv9nWVV1wHA6msPrSmXFXmNo9
+	vCvnXU/evEqVqBLKAW5kBz8uRM0AOuFalRfnA4dFov0kRneACJU0UPYDjI4V7+afQ4ZK8OeZ7KL
+	WlTwvNaRb00I6I/b6DjQKJBuOZMzsSWvb9PxoATiC4FegdaxwEvPnp+OmXH/vPs+9asdAfHXhH1
+	x5MEdYJ6E4TbHgjchj60QKvAdxD0b3HYJ4+4WWAz1LCLUtpZ3hjhu7zijL+MMs08wjyTTJ5DV3N
+	fOIS+PV47HxBxg79rbpEWgOEr3OCMNnidvje7jgPB9E7PaRoWZckvA==
+X-Google-Smtp-Source: AGHT+IGF+65MB7naW9INIqJ01bu/2rGvf85Aln8gTluXMpbflQC+TqF6pJY7DHbPTg7s06gu5viM2Q==
+X-Received: by 2002:a17:907:3f8a:b0:ad8:9c97:c2e5 with SMTP id a640c23a62f3a-ae34fb22a33mr1389506366b.0.1751304616377;
+        Mon, 30 Jun 2025 10:30:16 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:71::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae353c01262sm700489966b.87.2025.06.30.10.30.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jun 2025 10:30:16 -0700 (PDT)
+Date: Mon, 30 Jun 2025 10:30:13 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] wireguard: queueing: simplify wg_cpumask_next_online()
-Message-ID: <aGLIUZXHyBTG4zjm@zx2c4.com>
-References: <20250619145501.351951-1-yury.norov@gmail.com>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	bpf@vger.kernel.org, ast@kernel.org
+Subject: Re: [PATCH net-next v3 3/3] selftests: net: add netpoll basic
+ functionality test
+Message-ID: <aGLJpaNLPYnPwKYV@gmail.com>
+References: <20250627-netpoll_test-v3-0-575bd200c8a9@debian.org>
+ <20250627-netpoll_test-v3-3-575bd200c8a9@debian.org>
+ <20250627113854.04c13ace@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250619145501.351951-1-yury.norov@gmail.com>
+In-Reply-To: <20250627113854.04c13ace@kernel.org>
 
-On Thu, Jun 19, 2025 at 10:54:59AM -0400, Yury Norov wrote:
-> From: Yury Norov [NVIDIA] <yury.norov@gmail.com>
+On Fri, Jun 27, 2025 at 11:38:54AM -0700, Jakub Kicinski wrote:
+> On Fri, 27 Jun 2025 10:03:11 -0700 Breno Leitao wrote:
+> > +    raise KsftSkipEx("netpoll_poll_dev() was not called. Skipping test")
 > 
-> wg_cpumask_choose_online() opencodes cpumask_nth(). Use it and make the
-> function significantly simpler. While there, fix opencoded cpu_online()
-> too.
-> 
-> Signed-off-by: Yury Norov [NVIDIA] <yury.norov@gmail.com>
-> ---
-> v1: https://lore.kernel.org/all/20250604233656.41896-1-yury.norov@gmail.com/
-> v2:
->  - fix 'cpu' undeclared;
->  - change subject (Jason);
->  - keep the original function structure (Jason);
-> 
->  drivers/net/wireguard/queueing.h | 13 ++++---------
->  1 file changed, 4 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/net/wireguard/queueing.h b/drivers/net/wireguard/queueing.h
-> index 7eb76724b3ed..56314f98b6ba 100644
-> --- a/drivers/net/wireguard/queueing.h
-> +++ b/drivers/net/wireguard/queueing.h
-> @@ -104,16 +104,11 @@ static inline void wg_reset_packet(struct sk_buff *skb, bool encapsulating)
->  
->  static inline int wg_cpumask_choose_online(int *stored_cpu, unsigned int id)
->  {
-> -	unsigned int cpu = *stored_cpu, cpu_index, i;
-> +	unsigned int cpu = *stored_cpu;
-> +
-> +	if (unlikely(cpu >= nr_cpu_ids || !cpu_online(cpu)))
-> +		cpu = *stored_cpu = cpumask_nth(id % num_online_cpus(), cpu_online_mask);
+> As discussed offline SKIPing is not an option for SW tests.
 
-I was about to apply this but then it occurred to me: what happens if
-cpu_online_mask changes (shrinks) after num_online_cpus() is evaluated?
-cpumask_nth() will then return nr_cpu_ids?
+Sure, I will move it to failure.
 
-Jason
+Unfortunately the expected path didn't hit in vmtest. I am still trying
+to reproduce the failure on my side, but no luck. It hits from 10 to 16
+times per run. 
+
+Do you want me to send it as a failure, or, wait until we get something
+better that pass 100% of the time?
+
+Thanks
+--breno
 
