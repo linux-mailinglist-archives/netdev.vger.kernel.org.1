@@ -1,219 +1,135 @@
-Return-Path: <netdev+bounces-202399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A318AEDBA6
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:51:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8ACBAEDBAB
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:52:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 931A41711CD
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:51:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7E8E188FA61
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:52:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 399E1283680;
-	Mon, 30 Jun 2025 11:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C28B277CBD;
+	Mon, 30 Jun 2025 11:52:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EcWiQuLF"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="dtlUjWVw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82998280338;
-	Mon, 30 Jun 2025 11:51:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C5054918
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 11:52:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751284288; cv=none; b=MZ8pdO/wQmDEL4FZxRmR+ffGrlqvFSNk7dVviiCPuz29VMG4v/MsAXIWstxdWv+gJT+GjivBtgqoinkm1h1l4GMS5lpsuK+t7phoUgtsKSip5hUqmpDq+6EGtoBMMM0zGj8rkbx/z9TNbOWFZL96ftw7UHPuGERjf/SV+BXDkto=
+	t=1751284348; cv=none; b=rgtT6crzpzplsF0eSx+CewhZdXA6EzaL99I4JK2o+Brxkm7FhHzjlHkWTbjPoE1NY1Felxrlqa1j1WTR8uZqV2+7fRixQ0e+xbE9sNVT81jeXTWiev5Ki7G+TdQG0Rc2Bk0MeoCdcTncQ4J1LKA/k53QrK7m0xhsh7pIPY+fx6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751284288; c=relaxed/simple;
-	bh=HUbdQ19sl514KfajAwJVU7L3W1cY3+nFral3SJF0RbI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pPfjrDdE4Ih8endqPDdB0F3MpXuMNM/Hk4WEQJgaweovLcSdOxawAyJMaTLvwWhC+QdjzP4oDNLNyejouQZQBSCGVFknezQo/Ayr+1en7L+tt6iVAT3jXJx5OmcRiPdXxjDQcFCXjI94vGBqfu6t7s1x86T78tnJGuPJGmegOCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EcWiQuLF; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3ddd2710d14so21186175ab.2;
-        Mon, 30 Jun 2025 04:51:26 -0700 (PDT)
+	s=arc-20240116; t=1751284348; c=relaxed/simple;
+	bh=AhYEdZNiuImuszvLlVPrFupwQ7/XmZGuzny+xHoh3H0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=neHKZVMlewP1huFnI7oYU/jGbjTT9nw7fSEBavY5AVWeBqHOaECHcgbiCyasRDwffXWi9IvnwGz6tHtNPkG09ZJsV7Yir0aWNYqCTMDQj9VlNXXA4cfId9KFpkrQSIjHGvhG1BEa4gy9IYSerDfhc0zb0I/OCyNrEKY9CxSD4pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=dtlUjWVw; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7d21cecc11fso741747585a.3
+        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 04:52:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751284285; x=1751889085; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hVoVStbXU6ccjSQ1NePiUp1BW7p4LaA0FGyVw4Z6EYA=;
-        b=EcWiQuLFr7gEeEsSJY/0tM5vdOJ4RY/JuvtjttiBnJlz8YSbbtn1jhfzckLogYe8xq
-         jdP92s3ptt39zc/qNZ7PuFAUNROWk8c2lri48BnxF4V9zOhQuqoo+QZkKWeiq/FfX1jp
-         spwdu0fR+l0nquYkEzwk38mIlyez871S3URIGEvLKqrthyKyCA44XJhJN0DKOCXyAWTW
-         kQXFkhQ26lmzSgpZ7BwqpSZKyRXQfNgzICvGtEwN+Tg/J7n/pF2YXUP4K5QPvRfE6SJR
-         Fy2yg7ltow+aCE3feTbxmwn/KJWxkXFimkFJvY9a3Q5NURZLjq5qCusNfMeg1f37OxX9
-         l3XA==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1751284345; x=1751889145; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FHVXbyXuiwtB2/73cWxg7OdkkEX1KH9/l8aDMD4iqb0=;
+        b=dtlUjWVwIo6dknq2kxKvZTYNu8vKJyT2xbJL+y+9CGyb5vgCnvTvxDFt/gJdo4WzwL
+         uS2iyvZ9CNc4SuOjK48Yk8DeF7i7SnpnQV5A7IC7plVhmr7epYcae4I92wUqejQmC9eW
+         TOY9DVEmJ7dcIhNgn7SN/YDi5Q3Lf9oa+SE82FM3laHN41htE8grK+TZrR0kPatUk5RT
+         +c1Dyf+gVn2ZhlrqIZD6XIsJC5PniB/dVAK8PHPK0/Pt1qzJfER+nKNEi3B3GkXX084E
+         J0ESV3j1I2UgafBm42U8pQKKXY6e39oRuG4jEbngwSiWt6dw1mAq1N3eWpwSO73GPeFU
+         WZKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751284285; x=1751889085;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hVoVStbXU6ccjSQ1NePiUp1BW7p4LaA0FGyVw4Z6EYA=;
-        b=UMvIEPfuInpg9pW7gMP17HQ8YwYpDry9S/8lphjkLY3RDx1w8zNoWqwWl0zqiOzkHv
-         BDLkSy49attuGdnixoygXSoK9tFM/LITGivuUEnfm8WY2ZtSZfi6CbNCLLgRhEbMLJFy
-         VEVj9g6De5wZnFajIWqSHMebRGNJYfrJgZZKJzq96ahfKYR6zqJCs+D63NjHM51gxmqL
-         yZIKAeYDYT2JBY328drSVCKpLSgpekVsw4R3HN9+GtRmSvysWUjEF7jPvyUo28zIkiN4
-         0nYa63oZGpnMBCwGsRMg2iycX4SLubc1dwMcG5gby98InBYQomNw+gMQNRAXkRoBro39
-         CScQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXp8Ybu03RdVq7QsEwAK2AZHgtWS8Fn+qbVgxGmR0YOyY3MNxGSuYh/di+fn1jv9lxUbXqTKV6q@vger.kernel.org, AJvYcCXqR1lhWaUJhvg3S9au8Oety0h5EguRHPTbPhGj2ecspqH/wRvjE4+XXBYHICs9rMQ/s1Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMnECsyheQ8d1r39jL7Eknc34Rh9C8lScWHItLuIpjuAR2DAyi
-	T2hwLowBWePGXfFLLXvM4vCcVpHSK1GxNJ/6Z2IGA5gTu8UT923t+/yDGZtMC4K2ZRkqWzluUuN
-	Hu5AEPRo99iRpAcFW1NA/OZ4AQU986FI=
-X-Gm-Gg: ASbGncviExDB9cfyA2wNvj+WIRdidebcZCxGwGcSznh3cP6ZQ5Nm2KimXIA3fR3rj75
-	lX8FHJwh+vYOlX8HZjk2WR6kuOasS1yHUQqBdSejwZOCO+phVJ7lEMlpdo3/vyDdMIGbbhBMj0G
-	kbw644/17Ycu1ATBphXWSlsR8HUemH/v0HR1ix+0qf/OE=
-X-Google-Smtp-Source: AGHT+IErVhEJ6O9QU/koTNJ7LOED3GK7DckGsViLXOhiJh57scg13qi7yQVVENlnKQUHtlM+4GytxCJiL9kzu2K5TxM=
-X-Received: by 2002:a05:6e02:3d85:b0:3df:3d4c:be27 with SMTP id
- e9e14a558f8ab-3df4ab2c7dfmr143342265ab.5.1751284285471; Mon, 30 Jun 2025
- 04:51:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751284345; x=1751889145;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FHVXbyXuiwtB2/73cWxg7OdkkEX1KH9/l8aDMD4iqb0=;
+        b=lfUjbO0/uW7ek0e7EvDrRwwpBSnOjyQXEF/XTcwfxK58vc0cZx5a+W9+p9+ArOGPjx
+         dBm/zEI37+o5Nr+MpMiuY7iKw7tngdyCiRfjqRH8QTGXjT6uhogVjBkoLdoT22g1WEia
+         Cn5bu8MS+a+aiRgTHMCW+MKByzgb86Sg7e96bUkcwZRc0FsDpLdElrQYZl2RYPZdmciz
+         wzk1OS86hAt9kg6nHHWoE0zLuYXEcAzOEZBCY6gJYGW5UFmo+jyi7OEJAulqvj8oufto
+         AFs9PDENhnll+Nt062AZnAg4UkHImJ0LudR+gxo1NoqqG0NMeyOzmuClT3dMTpn3hENe
+         eyVg==
+X-Forwarded-Encrypted: i=1; AJvYcCW27m235JEufYcEl+qpdE07ZJiOUSgcheVCpcRbD7pz+kag4ycYV+8XEVmIs52yuc79gEFZNGQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxU5jv05kp4HOhYF4d08jx5ysajCNkiHfjdVmA09pcc14KKlNJU
+	z0oDnZrorKEUSyruDUmE+5oAFDIW6boQMb+TU6aSANnzj9V4i6LMcay04egSJxqXmA==
+X-Gm-Gg: ASbGncuDhCEqwjM+K7yEFZq+4ftxbrhhaTCIoTI19ZPBts/Lbd8PZE6uZbdJMiP/Njo
+	vJ3nn+XNhx8l1s+VlX+XXjkaIdpU0aIRjRs0WHz55iTxX4cXSJ+sT3+6Mz278AsmTHuz5AfeRnW
+	YglMavP6hF0F2ATdB9kaKtO2krmqKqKaniaAYMk8p/653kCXtC8yW6z2+URXmsHci2Hxd4zCINK
+	7WGhXk8Yos0gca//YkExh/we4xARgS2YfNosIg+y6dIEY82tuOq688Fko//w9Ux+Jq9RVk0LP20
+	3CteLchV9DSzBhv+V2HiNK2OKp0aodZY6mJNr5I6pwLr0bP6Z3x8XI7Jg9RRIH7DkA9J8z3vaku
+	V9ULCtShh16JyNnsLBjQXV79lfzO5Uw==
+X-Google-Smtp-Source: AGHT+IEkaSqwK3rMvbVNWZk/IPnSOuFiw+dNFfDf72TzfSpKXhaAaJ9DW42fpSdJhV2jCkfLOa3e1A==
+X-Received: by 2002:a05:620a:2984:b0:7d3:d8d6:1c89 with SMTP id af79cd13be357-7d4439a669bmr2011721085a.43.1751284345554;
+        Mon, 30 Jun 2025 04:52:25 -0700 (PDT)
+Received: from ?IPV6:2804:7f1:e2c1:ca4a:289:b941:38b9:cf01? ([2804:7f1:e2c1:ca4a:289:b941:38b9:cf01])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d44317e285sm580145285a.45.2025.06.30.04.52.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Jun 2025 04:52:25 -0700 (PDT)
+Message-ID: <1a169adc-fe99-4058-a6a7-e32bb694e997@mojatatu.com>
+Date: Mon, 30 Jun 2025 08:52:22 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250628120841.12421-1-kerneljasonxing@gmail.com> <aGJ4ohHA3Cs45wCp@boxer>
-In-Reply-To: <aGJ4ohHA3Cs45wCp@boxer>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 30 Jun 2025 19:50:48 +0800
-X-Gm-Features: Ac12FXx5tgVmEb0LnF7RrqgCktSLhkoEGze3OOXZPE1n-NGE2XuQW2tLm9Nh9gc
-Message-ID: <CAL+tcoA6if=S3592=V503vo_BFxEJ1FgOdDA+SGOrNWtuAQuTg@mail.gmail.com>
-Subject: Re: [PATCH net-next] Documentation: xsk: correct the obsolete
- references and examples
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, joe@dama.to, 
-	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: Use-after-free in Linux tc subsystem (v6.15)
+To: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>
+Cc: Mingi Cho <mgcho.minic@gmail.com>, security@kernel.org,
+ Jiri Pirko <jiri@resnulli.us>,
+ Linux Kernel Network Developers <netdev@vger.kernel.org>
+References: <CAE1YQVoTz5REkvZWzq_X5f31Sr6NzutVCxxmLfWtmVZkjiingA@mail.gmail.com>
+ <CAM_iQpV8NpK_L2_697NccDPfb9SPYhQ7BT1Ssueh7nT-rRKJRA@mail.gmail.com>
+ <CAM_iQpXVaxTVALH9_Lki+O=1cMaVx4uQhcRvi4VcS2rEdYkj5Q@mail.gmail.com>
+ <CAM_iQpVi0V7DNQFiNWWMr+crM-1EFbnvWV5_L-aOkFsKaA3JBQ@mail.gmail.com>
+ <CAM0EoMm4D+q1eLzfKw3gKbQF43GzpBcDFY3w2k2OmtohJn=aJw@mail.gmail.com>
+ <CAM0EoMkFzD0gKfJM2-Dtgv6qQ8mjGRFmWF7+oe=qGgBEkVSimg@mail.gmail.com>
+ <CAE1YQVq=FmrGw56keHQ2gEGtrdg3H5Nf_OcPb8_Rn5NVQ4AoHg@mail.gmail.com>
+ <CAM0EoMnv6YAUJVEFx2mGrP75G8wzRiN+Z=hSfRAz8ia0Fe4vBw@mail.gmail.com>
+ <aGGrP91mBRuN2y0h@pop-os.localdomain>
+ <CAM0EoM=jc7=JdHMdXM9hmcP2ZGF0BnByXWbMZUN44LvaGHe-DQ@mail.gmail.com>
+Content-Language: en-US
+From: Victor Nogueira <victor@mojatatu.com>
+In-Reply-To: <CAM0EoM=jc7=JdHMdXM9hmcP2ZGF0BnByXWbMZUN44LvaGHe-DQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 30, 2025 at 7:44=E2=80=AFPM Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> On Sat, Jun 28, 2025 at 08:08:40PM +0800, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > The modified lines are mainly related to the following commits[1][2]
-> > which remove those tests and examples. Since samples/bpf has been
-> > deprecated, we can refer to more examples that are easily searched
-> > in the various xdp-projects.
-> >
-> > [1]: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.gi=
-t/commit/?id=3Df36600634
-> > [2]: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.gi=
-t/commit/?id=3Dcfb5a2dbf14
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >  Documentation/networking/af_xdp.rst | 45 ++++++++---------------------
-> >  1 file changed, 12 insertions(+), 33 deletions(-)
-> >
-> > diff --git a/Documentation/networking/af_xdp.rst b/Documentation/networ=
-king/af_xdp.rst
-> > index dceeb0d763aa..37711619e89e 100644
-> > --- a/Documentation/networking/af_xdp.rst
-> > +++ b/Documentation/networking/af_xdp.rst
-> > @@ -209,13 +209,10 @@ Libbpf
-> >
-> >  Libbpf is a helper library for eBPF and XDP that makes using these
-> >  technologies a lot simpler. It also contains specific helper functions
-> > -in tools/lib/bpf/xsk.h for facilitating the use of AF_XDP. It
-> > -contains two types of functions: those that can be used to make the
-> > -setup of AF_XDP socket easier and ones that can be used in the data
-> > -plane to access the rings safely and quickly. To see an example on how
-> > -to use this API, please take a look at the sample application in
-> > -samples/bpf/xdpsock_usr.c which uses libbpf for both setup and data
-> > -plane operations.
-> > +in ./tools/testing/selftests/bpf/xsk.h for facilitating the use of
-> > +AF_XDP. It contains two types of functions: those that can be used to
-> > +make the setup of AF_XDP socket easier and ones that can be used in th=
-e
-> > +data plane to access the rings safely and quickly.
-> >
-> >  We recommend that you use this library unless you have become a power
-> >  user. It will make your program a lot simpler.
-> > @@ -372,8 +369,7 @@ needs to explicitly notify the kernel to send any p=
-ackets put on the
-> >  TX ring. This can be accomplished either by a poll() call, as in the
-> >  RX path, or by calling sendto().
-> >
-> > -An example of how to use this flag can be found in
-> > -samples/bpf/xdpsock_user.c. An example with the use of libbpf helpers
-> > +An example with the use of libbpf helpers
-> >  would look like this for the TX path:
-> >
-> >  .. code-block:: c
-> > @@ -551,10 +547,9 @@ Usage
-> >
-> >  In order to use AF_XDP sockets two parts are needed. The
-> >  user-space application and the XDP program. For a complete setup and
-> > -usage example, please refer to the sample application. The user-space
-> > -side is xdpsock_user.c and the XDP side is part of libbpf.
-> > +usage example, please refer to the xdp-project.
-> >
-> > -The XDP code sample included in tools/lib/bpf/xsk.c is the following:
-> > +The XDP code sample is the following:
-> >
-> >  .. code-block:: c
-> >
-> > @@ -753,27 +748,11 @@ to facilitate extending a zero-copy driver with m=
-ulti-buffer support.
-> >  Sample application
-> >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> > -There is a xdpsock benchmarking/test application included that
-> > -demonstrates how to use AF_XDP sockets with private UMEMs. Say that
-> > -you would like your UDP traffic from port 4242 to end up in queue 16,
-> > -that we will enable AF_XDP on. Here, we use ethtool for this::
-> > -
-> > -      ethtool -N p3p2 rx-flow-hash udp4 fn
-> > -      ethtool -N p3p2 flow-type udp4 src-port 4242 dst-port 4242 \
-> > -          action 16
-> > -
-> > -Running the rxdrop benchmark in XDP_DRV mode can then be done
-> > -using::
-> > -
-> > -      samples/bpf/xdpsock -i p3p2 -q 16 -r -N
-> > -
-> > -For XDP_SKB mode, use the switch "-S" instead of "-N" and all options
-> > -can be displayed with "-h", as usual.
->
-> Hi Jason,
->
-> these commands above should be kept as-is imho and we should point users
-> to new xdpsock's location:
->
-> https://github.com/xdp-project/bpf-examples/tree/main/AF_XDP-example
+On 6/30/25 08:06, Jamal Hadi Salim wrote:
+> On Sun, Jun 29, 2025 at 5:08 PM Cong Wang <xiyou.wangcong@gmail.com> wrote:
+>>
+>> On Sat, Jun 28, 2025 at 05:26:59PM -0400, Jamal Hadi Salim wrote:
+>>> On Thu, Jun 26, 2025 at 1:11 AM Mingi Cho <mgcho.minic@gmail.com> wrote:
+>>>> Hello,
+>>>>
+>>>> I think the testcase I reported earlier actually contains two
+>>>> different bugs. The first is returning SUCCESS with an empty TBF qdisc
+>>>> in tbf_segment, and the second is returning SUCCESS with an empty QFQ
+>>>> qdisc in qfq_enqueue.
+>>>>
+>>>
+>>> Please join the list where a more general solution is being discussed here:
+>>> https://lore.kernel.org/netdev/aF847kk6H+kr5kIV@pop-os.localdomain/
+>>
+>> I think that one is different, the one here is related to GSO, the above
+>> linked one is not. Let me think about the GSO issue, since I already
+>> looked into it before.
+> 
+> TBH, they all look the same to me - at minimal, they should be tested
+> against Lion's patch first. Maybe there's a GSO corner case but wasnt
+> clear to me.
 
-I thought we'd better not refer to an external link that might be
-unreliable in the future. It turns out I was wrong.
+I did a quick test of Lion's patch using Mingi's C reproducer.
+The patch seems to fix the UAF.
 
-No problem. I will revise them because for now it's still working well.
-
-Thanks,
-Jason
-
->
-> > -
-> > -This sample application uses libbpf to make the setup and usage of
-> > -AF_XDP simpler. If you want to know how the raw uapi of AF_XDP is
-> > -really used to make something more advanced, take a look at the libbpf
-> > -code in tools/lib/bpf/xsk.[ch].
-> > +Xdpsock benchmarking/test application can be found through googling
-> > +the various xdp-project repositories connected to libxdp. If you want
-> > +to know how the raw uapi of AF_XDP is really used to make something
-> > +more advanced, take a look at the libbpf code in
-> > +tools/testing/selftests/bpf/xsk.[ch].
-> >
-> >  FAQ
-> >  =3D=3D=3D=3D=3D=3D=3D
-> > --
-> > 2.41.3
-> >
-> >
+cheers,
+Victor
 
