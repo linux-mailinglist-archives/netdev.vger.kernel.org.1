@@ -1,300 +1,331 @@
-Return-Path: <netdev+bounces-202396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A00DCAEDB8A
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:47:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D7EFAEDB89
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:47:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0C461889AC0
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:47:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D12F418872A0
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:47:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0B8A27F163;
-	Mon, 30 Jun 2025 11:47:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2969925EFB7;
+	Mon, 30 Jun 2025 11:47:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MZ+egiPW"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="SEJupScf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE9C27F012;
-	Mon, 30 Jun 2025 11:47:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751284033; cv=fail; b=p0S6rsfe8dxUlG9A7czgiG213tbEJnkgTyVJVDGZ/T8sYrPoF7fRSICwmNAT6alch+IeZxP5aOJLkshaaiI6BtywNmtB6fs30T7hDLjf90SzvP2xqbpuDbs0ZW952jmCDXNjA60zEGJPCLiHHHK4CDfhyPv1HDUrYtxqlDWim4k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751284033; c=relaxed/simple;
-	bh=HR4goAxdTwL1Cndsvh7L2mVkzmu6tfhuydgMmhBxcjA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=S/Qf/f2TYEq5pBhAqbK33v1eG8KuKMZSkLS2+zpqz0O+1J8VCnK/EZsuUwHaY5HvYMvjiG1jb/330lXzq6Hy0/MQgfq+NjlNUvZYATZxb6DTlAneHQPsFFX1ZMGvsoiebwn+zw/JjTmUoxgRGqThL/TmB5JStieLwK/9X8r38xI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MZ+egiPW; arc=fail smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751284032; x=1782820032;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=HR4goAxdTwL1Cndsvh7L2mVkzmu6tfhuydgMmhBxcjA=;
-  b=MZ+egiPWdLuLSVKfl+VX9DOu/2TybLmFb88VMg4vxU8NmsmZ9TkN2wRb
-   A9UJOb0F8OCRcz9s5h6JjEyOVtpbs49Wd9zqg9Gpu71b8YP1UbYxNDYG5
-   HZxiv95bzpQq1YsgzysKSTdHi9i4mkJUUbjXXEmQ2dkqhv6pPsPSjQKBp
-   6ReNzaWxaZ+aIJqdBLyu7BwFc/uNbVEHEMqRytOgAqxdndpgyOEkGU3pR
-   cItbAcUGLCcb4GYcVpIROS7C3fZ8mb5ceriElJ6Mg8uYWLMa7y2JeJMgy
-   KrHfC2vbdxA/Z2i95+T2egzLN6MGTyDyKSN3vJI6Q6QsZtnQeFoy88pNW
-   g==;
-X-CSE-ConnectionGUID: /ZdOhQQMTcKqlG11ZsI2bQ==
-X-CSE-MsgGUID: 16rHEUPWR7yrz5Afmc9mGw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11479"; a="64102756"
-X-IronPort-AV: E=Sophos;i="6.16,277,1744095600"; 
-   d="scan'208";a="64102756"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 04:47:10 -0700
-X-CSE-ConnectionGUID: 4mnj/EPeSXmUeZEnjAdylA==
-X-CSE-MsgGUID: N1UbMDvqSpG/7p5PTkgNEw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,277,1744095600"; 
-   d="scan'208";a="184460182"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 04:47:10 -0700
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 30 Jun 2025 04:47:09 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Mon, 30 Jun 2025 04:47:09 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (40.107.220.80)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 30 Jun 2025 04:47:09 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XIaQhwHC2FdXmyQAOUg+Rv5QpjH2kKzCuW9ZrTrfs+eEzKTq1u7Ccfh+819UkNYs71gEnYi/ax9cTw+XuEOBoQAK8A1V542ThuFXnhcaNP0rntZd+o5NPDrBw44Kd5aOsphH2T8J0DGm/FoH5yQVwma1xkc8DTYdNCSv1G4ZVCJh9RJiuHXkbVE0fWCGbo0HS9QSYwB12DVUrxmxRB5WmWtsf/GRrRpsNOYuL1vdVK8Sxx17xLQeqOZSPYCbYa+eAqEz2PXMeFakcSMnl4l4FFzA9dAWaniN9A8mxKVPfDx9DAIL4iv+hLbt/QZw0BAsDEuYqpQoVBIqkKOJpEojmg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/hKXeNHOQBalrH7Hi/KRxi/yJbRmoMVduqHaE5Pxtqo=;
- b=KvTY+g0qoo4oZWV4Ck5iML2YTVevMgSIWzPafKt6Rkajh8UU6gsZ6qJLsWHi3wkKjcfhWhVYqbs0XMagfTfuxOpWj5bDn1XmDDLe+G1cihfUNevsuK/ASmulLqs9qj4dKP0INwvM7V09VBhrXbhV5hsyVhcoxTcjaE/i/tq1EhloxhU/EM550N/zw9LQrgMMt6nGjQocuLxL4DXi3sfvksoDTzLjKuWrU9Og4C6/139h8lbHmz9HnyxmMaIX/qRBBf+oGN8XQh4pjzQ6TBZnqMVF154PmatzDrsBwNwngIIQo8JTpMOWdaU4KCMMsjHQQ67M1GGQ2Q1CsM9dzK8Wfg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- MN2PR11MB4663.namprd11.prod.outlook.com (2603:10b6:208:26f::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.30; Mon, 30 Jun
- 2025 11:46:27 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%2]) with mapi id 15.20.8880.024; Mon, 30 Jun 2025
- 11:46:27 +0000
-Date: Mon, 30 Jun 2025 13:46:20 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <bjorn@kernel.org>, <magnus.karlsson@intel.com>,
-	<jonathan.lemon@gmail.com>, <sdf@fomichev.me>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
-	<joe@dama.to>, <willemdebruijn.kernel@gmail.com>, <bpf@vger.kernel.org>,
-	<netdev@vger.kernel.org>, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v6] net: xsk: introduce XDP_MAX_TX_BUDGET
- set/getsockopt
-Message-ID: <aGJ5DDtFAZ/IsE0B@boxer>
-References: <20250627110121.73228-1-kerneljasonxing@gmail.com>
- <CAL+tcoCSd_LA8w9ov7+_sOWLt3EU1rcqK8Sa6UF5S-xgfAGPnA@mail.gmail.com>
- <CAL+tcoCCM+m6eJ1VNoeF2UMdFOhMjJ1z2FVUoMJk=js++hk0RQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL+tcoCCM+m6eJ1VNoeF2UMdFOhMjJ1z2FVUoMJk=js++hk0RQ@mail.gmail.com>
-X-ClientProxiedBy: WA2P291CA0006.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1e::18) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D181323ABAE
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 11:47:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751284031; cv=none; b=i+84kw/UaYGAZlHpZwlJ1uSBEPZfPuNj0P35VMR8vqtEcQrNPwsN0ijOeYkdy71tZRC0F55TauwGR70iiUUBUUWlUNgSwL8LOccQa3fHEF9aS4DbMCywAKQ+sZbDJs6HYeNKjmJtSD9Wms/LzUneimJmBFqa1H/uJPMmES6ghoo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751284031; c=relaxed/simple;
+	bh=rqbrjCNKn3KHG3+9t9zpO3ksRTyhZgf9+T0RREv3SNY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PpJB4UAqAWd2S2AZZBmdMYCTN2/+GuXt3EgCOGsPMwq0c3jqUitK5PxZuI0/hmt5pWp7xN8XVKvUON8AkNyp95awG6h1OZ0odnnJsYxkv+8PiHObZHSdidUqAxPgfW/oGAVZT9+kMnh9kRdp7dkKbxzB3C5+Mlk8kq6llNlFQ4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=SEJupScf; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7d45b80368dso105250585a.1
+        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 04:47:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1751284028; x=1751888828; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=onG20wvAwyBwrMa/g5Ijmo4hq2IkwUJh2CUNeZM4HqQ=;
+        b=SEJupScfXn8P9H8ODLHtR/vbx12EEecx2eOylXtAy53J9txgNtB1keQLTdeCvFlxm1
+         IQhMpi9JjyDHZMOOucuE8ObJ0jhs58sYAW4ohNvQNDTSe58GLieaz7swYJJ0dqfP1YFl
+         qpFbfherE8CbE25Y5LbOwWNrC/NJDfEhxY1SsxuiBa/UFPyl80XH5bg1bi1sp+rZ9BQq
+         MoltnryhAraDm8Uy14+5DlokjzqYZ4ISY9kCNdMThOz6iMANGkeyqLVl7BTYjpHA40pr
+         tzKZH63rEBAq/5ZZmfsjK0OwqUG4ELqKLLGFqrXScE6OLCxrhw3qmVKd4slsjPVb4PKp
+         HvwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751284028; x=1751888828;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=onG20wvAwyBwrMa/g5Ijmo4hq2IkwUJh2CUNeZM4HqQ=;
+        b=jsRD3gfIEwL33DY68eNrfQtup1NfGh2x/cE7i71fxc75W9/IHuYF8TAMzKI9p3M3Vm
+         pjl1tBkS7zHr37T0F+9h3LpM/ILombNnxGdM073BQPdR03ppMJtodU+iiyiXaLru6hEd
+         s2GGESDw8nIXx1KCs+qw8cvANnliDwveYuzDvpR6KXrD4ns5Y6Vy3tUxrY2claX1jtJd
+         odET/apDO2ff+R6BHD4e2Qdz2mXPcH7A0Rn978vNdn772ajHGeYmxh+dlPbwnlKeDK0a
+         bC0gK9EbnPSw4KaYMkhqhUpGZxXWO0Z+sBShcclcIJOLTACGsYduumaBmoofsRTraFgG
+         agdw==
+X-Forwarded-Encrypted: i=1; AJvYcCUm9IrS0lph96ZXz3vJwcwU3+P17PgG2B8/D2e2KlJVo1lEzFkDYegpkez9IFXrWIqEA6BhsRk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmD+lVpEKssq+Ut3PMK+zgxTBbbLZMP/UkPjQuRfju0cbM0XiL
+	71pSfPZXNnepVXf7ZWELNAmjuKRg8Bq+ZjLhJDTlcWXNP1Ol2JU4CIeASdM9maleYVEC0A2RnL0
+	jDwI=
+X-Gm-Gg: ASbGncssuVgNhYshzrl4O0Iwuq1NT72X69KkqMA46Gjo4frA7Q0tttmbM8fiRDrpT6s
+	zf4qyF+hQRZiZQ0xcsjQGdWhOGhMQAx20uiRwqGR6F3Vh1zG3MvJGH/gDquPQ9HQzGKeuhx5c/S
+	BKEQ+jz0g6/ab9C2BvBPwFXEW8183zePR4FF8Ynx4U9SejuU+pIQubFiyFW0soyBxGsY9qTomGj
+	MQNYvSkcOlaT1V7759UnbO0RDLDfiwP45j9B/BbpnsRwvd8IS6PAE/aIaXRSKH6Ys3JefVS6Bn+
+	hqrd42BY8geadkTbBBYiwQJBWvpEU+Rmzfy9N95+bM3VpZoGwIYfVKyfZKad2klnnZzecbXNBQm
+	4Yhue/56blqKnpLS19pLSb3TNXEpeZA==
+X-Google-Smtp-Source: AGHT+IHTXRCMOdaSKxmlyjmh23Hmlc0rE+6X26SqPbJRMex6OajxVDRbg9AnsMmJiLyEiJLtyhijgA==
+X-Received: by 2002:a05:620a:7016:b0:7d2:27b0:370d with SMTP id af79cd13be357-7d44398a220mr1604388785a.42.1751284027536;
+        Mon, 30 Jun 2025 04:47:07 -0700 (PDT)
+Received: from ?IPV6:2804:7f1:e2c1:ca4a:289:b941:38b9:cf01? ([2804:7f1:e2c1:ca4a:289:b941:38b9:cf01])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d44323be1fsm580086285a.105.2025.06.30.04.47.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Jun 2025 04:47:06 -0700 (PDT)
+Message-ID: <13f558f2-3c0d-4ec7-8a73-c36d8962fecc@mojatatu.com>
+Date: Mon, 30 Jun 2025 08:47:03 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|MN2PR11MB4663:EE_
-X-MS-Office365-Filtering-Correlation-Id: 09f6e908-846d-40ed-a549-08ddb7cbbf32
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?bWVud0VFbUlWd3RsQkF6OEpoRStPSERTU2d5SEowdU82UXB2eXZiWWFrclQv?=
- =?utf-8?B?SU4xRW9IQ0hST3hVQzI4TmM1cXFZNmpkbDh3N1BUNHNYeGdjSlZDak16ZFlU?=
- =?utf-8?B?dFdvbUNqcHZnc1NMK1FiZ0VmVnF3bEExclVNQ0J1dDhrS3U0dUpERG1zU3Iy?=
- =?utf-8?B?SnRvNnB4V3lZdUhmVG5jdTJoWlB1ZExFeWxHTmNrQUtzQ0ZSWEUxdVI1Y1dl?=
- =?utf-8?B?YnZDMkdRQnZPcFJFM1V1OGlVN1lML3lqSkJqL1NJMzRXNVBuN1J4VnE3ZDA1?=
- =?utf-8?B?M1VycDByRUlKajhSOEUyR3VsY0RmdlNwamxKdHRybFF1TDdFMDBxbXBtN0JG?=
- =?utf-8?B?Y0FOTEY4djQ3VU8rMmdoRk1HYnFSeFl1bERsSmF0dmJXVnJ1YThPRVhDaFBM?=
- =?utf-8?B?UjRsWm1CU1BpOGpFTkxobjNCczM4eVg5dTJhK3QrZkFXd3VEaWhNRTBCOGFa?=
- =?utf-8?B?VUlMdlg0ZmtUNVJsVkl4OWhBUXJqZjZOUFcxSzBNYmhOaWlTM2hsNTMzOC9i?=
- =?utf-8?B?dHlkWkNWb2VUa0pGeXJKaEZneTNZczRVZndVZlk3R1A5K1lFYm1KcklOK21h?=
- =?utf-8?B?YWkwM28vdGZkMFlXbDl6V01zYjQ1N2VLNCtlZEpIWDJGREY2TlZMVGl3SmdY?=
- =?utf-8?B?Vms0YW9ka0VEZWlLQ2dyTGpiN1IzK2prNFdPR1pIR3FYZGVWUkxtMXdzOXFO?=
- =?utf-8?B?aXEvSXN1WVY0UXdTMFJETThSek5VSXpvRXNGdjE1U3FGbWRsNE9pTzJ5K2xG?=
- =?utf-8?B?TDY0cm1YcHlsSTlId25Qci9GZjJHWVJaLzgyeHVyL0crblgveWVBSThZVUoz?=
- =?utf-8?B?R00zcEVkaTJIU2Q2VzNiMVU2NFlqWXVZaUdnUWtBQTlQaE1wTjNCb3JlYStj?=
- =?utf-8?B?SjlJNk1BcUxRS3FsWmNCLzIrMExiTCtEejlYNGFucy9UY1J5a0F3aCtxU2lN?=
- =?utf-8?B?MnZxQXFLMmw5VitEWm5mc3hrREpXaUU4VFVzdGg1OWg4cDhRd1lhblZwNWMw?=
- =?utf-8?B?WjFpMldCM3JDeUxBalpOa3NXZ0dtY2lFL2lDb29zbGxHbHZsSmhCaUh5UWF1?=
- =?utf-8?B?MjFJNXp4cXA5QUNTdk1GWldwRDIvMHNZdmtocFFaOHJITlRkTUJIUzR4SitY?=
- =?utf-8?B?aTFDbW4wSzJPY0lIdTRZTUFrbnRNSE93cU02N1JuYmZ1NWhGMkdrT0RUWkdU?=
- =?utf-8?B?Uk9oZUtDdFZXOFBPTzJzU1IzUFg5eFZ5RmxSSTNsK2lJanliR01tdFFDbkVI?=
- =?utf-8?B?L3kvVlo1YWs5bDRqWFoxRHlsblZSampaUEhvSUduRW85bkV1OTZKM0M5UktY?=
- =?utf-8?B?UnZYSitIR0VUdGdXcnFQYWJobDdzOXBVZSt3S0IvUkdwZDdNcjFyVGE4eWlR?=
- =?utf-8?B?NWVxSFQzMU5SRitVVStGWGJRUWxuSGVGWVlyMlpDczNpSE9aT3drcktHdGF3?=
- =?utf-8?B?YjFOYWdoazZFMFFNVHNpMkpCSjZtdmF4amI3Z0d4NGNvTDMyZUdkM0UzNEhq?=
- =?utf-8?B?czFNTGp1UUJFM3FXZ2ZHdW9VNEtSaXgzMFB6eU82dWl2Y2g1YXkyeGRxcHZU?=
- =?utf-8?B?NTdVWXUwc3REQlRnZnhYVFZVY2JoNFl1QW1kMEZpYkR5WnFmY0VjRkJXUTlW?=
- =?utf-8?B?eW1KeWM4UzlyMkJxbGZvQVJPMTd0ZXNldnVrSHg2azhqSDJhcU02dEVOcFJn?=
- =?utf-8?B?K1pXS1FqWWYvMDFNNEJ2TW14Ulg3WGs0V3VTMlBjMkFDUzI4cld0RXNjM2Jz?=
- =?utf-8?B?WWNkMEJOMWdQNXRRN00xaEpSd3BFVHZIZkFWYlpMc2N0SHY4N01lRTNEay9i?=
- =?utf-8?B?ZnNkc1VML05pdGkwNWlYdmd0TXZ2aE5kWGR0RnZzTllBWWN3OHlrU1p6NmpD?=
- =?utf-8?B?bDA3YWdIbXBvN2hkVWg5cDdVcmN0ZEJNTE1mb3NZa1FMSEttNDl0WXVHQUpC?=
- =?utf-8?Q?LeBYo8K+C0U=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VEVXa01weGRNV1AvTk5lRVFOYk9sR3BkT3dSNGlGSStmUlg0OTBJSWxWbnRD?=
- =?utf-8?B?N0c1dXZVdllZNEM5Qnk0RGlwZ25Zdk9tdXFncjA0L0xNN1RkUzdsTnowVXJL?=
- =?utf-8?B?UzNtNUxIS1VqYjE2QkZqZVZmUDBqQWhiS2FPbGNFZFlzaHNPZnY0QzVUWTVQ?=
- =?utf-8?B?WnN2MG84OGIxaG9GcUpmbDd3KzhaMFRNeFN0KzNnTUxrMmNNeWkzOENRL05a?=
- =?utf-8?B?ZmNOSkRvOS8vSFdyTVBtWE5ocHZVWEFLMXFXWktxbVA1UncvdFhsTTNyRXhF?=
- =?utf-8?B?eWlkSGk3VDdGRHF0NUN2Nmwra2hoUUxIekNBczNuemxpTThDbnJsNHlMZVRz?=
- =?utf-8?B?MTVGN2NjaEd0ZGxPalVJamRPRzE2NWhzZU9EWkJueStzMFFrd1hrZ2Y4U1pN?=
- =?utf-8?B?dFp2UGVETEprajVOOTVoYXpoMUFsSThhL1UrMncvTnpMYWw0MUNTdU1tVTFO?=
- =?utf-8?B?aDRDODhvc1JqSDZvcmxVdjRPbWk4dTl3enl3bzZrWUs2dUxtSERoUk9rcEVu?=
- =?utf-8?B?ejZSZis3dlg5NmwxbTVJZ0N2OFE1bmRLalBQVjkzd3BPVE9DVVN1UDFTczB6?=
- =?utf-8?B?TEd5TkdMQjdBMld4YmhKNDd1YkQ5aXdhMW9pTnVwNE4vcks5MUxjbTdydkEy?=
- =?utf-8?B?VnRBcGJTV2djWGdlTVdRaTVaZHJIazVlVkYxZlE1b1QzeGxLdjc3TXgzTXhy?=
- =?utf-8?B?bkJ5dk42K2EwcUZTR0lKQjFLOExnclRUcnhIdjNic2NDckdqcTFYQ0hSSG9T?=
- =?utf-8?B?bnhoeDRiVXFTRnBWR0UvNHJtZkZIMmFBRWl0MEJZbjl6cmpCbWMvcGI3THli?=
- =?utf-8?B?YlVkVGNqUGpLRE9RQjdNNVNiQXhKN1ZqSmhpYmxkcHBqUlZ6YVkzUEZEN0Js?=
- =?utf-8?B?TkFmNzhiVFpxRU4ra0RkUXVwUGZ0M3JBb1lKNkNOVDVwYXAzV0xWTnAwNnI5?=
- =?utf-8?B?TG9TbHNsVk1TUVBtVXNvaCtkdTJDZmVTcEdLMVg1K3M1ZnNTc0FPSzcrM1Fp?=
- =?utf-8?B?RDdEbVhCcndxbmpZSFQwVTJldmx3eG9VaEZzS25ITWpFOUd2Vy9FNEFIaVpj?=
- =?utf-8?B?ekgxMGloNXlxNnhuSXBUNmFWQkpNd1hSclNxWVRNaE1WUkFKa2traXBFdUdC?=
- =?utf-8?B?TEtRODY4RVRtZ2dDcmVYbzNvZkE0ejlncmJibWxsV2ZpMU9ManZSL2VwNzN4?=
- =?utf-8?B?Y1poU0tKdUE1bTlWNktUM2NvbXE2dFhxTlVDWjJBb2JzZDllUUdOMkd1Ry85?=
- =?utf-8?B?UU1RTkx4VmJIQ1F0YzJCNWRLQ05waEN3Tld3d2FwcnQvbzN2WjhhVWhGdmoy?=
- =?utf-8?B?VjV5SnJFbVp4TDhQU1YrOG41YUVlcWNnN0VVcFRzTlZtSWUzZXNUZ1JxNkJQ?=
- =?utf-8?B?UDlhZVdIMU9Fd0JaZHk3Y1VJcTc0dVQ1V2E1WGI2WHdMT1hPMW5YM1pSTG5Y?=
- =?utf-8?B?WEo2QmR3MytrTlgwR2dMQ1E3SmlXUjlUanVINWxxcEpRZk5ibGdGQmhsQmIy?=
- =?utf-8?B?VmtybHMreFZaSWtPSHZiZGRrVWZwZzRlUlFQWUh2bFI1Q1Q4UFdnNU9uVXlH?=
- =?utf-8?B?bzNmYjRBRFVZc0Q4d2p6U0lzWWVlUVVRaWxpMHRTN3IyUE9PaGlhTVNzd2xy?=
- =?utf-8?B?WWo1bCtOQmV6UTNnU3JsRThJSmZyaG0xbXNwMUwvWFViUXh2VnYvVHhSb2Fm?=
- =?utf-8?B?M2IxMzA5d1p4NjBVNFBHOTVZQnBRbTNMZldHUmtJWjE3Q0lpcy94NGhEd3Vh?=
- =?utf-8?B?a2w4OVFZVU9rNE9NTFZlYWEwcWRXakp2UDZ4SnpGWGp6WXBFeG1oUFFDWDVG?=
- =?utf-8?B?b3ZGUFNzSU5iNysyN0I0cmI4bFJXNEQzTWpEK0hPY3B0SFExTW5CcW5tNVR2?=
- =?utf-8?B?YUJsdDdkaDgySmNVME5LWG5TbHVyVUJHdFJjSlVUcGtwYlRiZFRGckdNZ2d5?=
- =?utf-8?B?c3IwYWNOUndMM1V6NkFSV1V2WDBvOU8xM1ZUbFpGWTFGOTY0MWlyK1lERlRT?=
- =?utf-8?B?akRBNHQzSndoUE94eDhoeTVDL25wN05QRWdma1MzenQ5NERyVkZsZXZiK2pI?=
- =?utf-8?B?K0lIaTFGcFArak11WkcxNDZlb3NmTVRtTHFHWVQ4ODVZOXlJbVN0RzI2eC9P?=
- =?utf-8?B?NHRwZktHaUhJQ1owQ2N6WUpaZkVEcjR4bXZJZnVUOWVaTG5ib1RBNFJqZjg0?=
- =?utf-8?B?Umc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 09f6e908-846d-40ed-a549-08ddb7cbbf32
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 11:46:27.1462
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /Abycmu8sT9bnB29AIaWFxPj/FmW5sSLhYDqC9VfBq4g/ZhMRAKCKXE+EC/Rq5wxXRSkLACXCu88jvi4WkH1Y35p05Vtr8exKOqa2SZ4Fwk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4663
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: Incomplete fix for recent bug in tc / hfsc
+To: Jamal Hadi Salim <jhs@mojatatu.com>, Lion Ackermann <nnamrec@gmail.com>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org,
+ Jiri Pirko <jiri@resnulli.us>, Mingi Cho <mincho@theori.io>
+References: <45876f14-cf28-4177-8ead-bb769fd9e57a@gmail.com>
+ <aFosjBOUlOr0TKsd@pop-os.localdomain>
+ <3af4930b-6773-4159-8a7a-e4f6f6ae8109@gmail.com>
+ <5e4490da-3f6c-4331-af9c-0e6d32b6fc75@gmail.com>
+ <CAM0EoMm+xgb0vkTDMAWy9xCvTF+XjGQ1xO5A2REajmBN1DKu1Q@mail.gmail.com>
+ <d23fe619-240a-4790-9edd-bec7ab22a974@gmail.com>
+ <CAM0EoM=rU91P=9QhffXShvk-gnUwbRHQrwpFKUr9FZFXbbW1gQ@mail.gmail.com>
+ <CAM0EoM=mey1f596GS_9-VkLyTmMqM0oJ7TuGZ6i73++tEVFAKg@mail.gmail.com>
+Content-Language: en-US
+From: Victor Nogueira <victor@mojatatu.com>
+In-Reply-To: <CAM0EoM=mey1f596GS_9-VkLyTmMqM0oJ7TuGZ6i73++tEVFAKg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sun, Jun 29, 2025 at 06:43:05PM +0800, Jason Xing wrote:
-> On Sun, Jun 29, 2025 at 10:51 AM Jason Xing <kerneljasonxing@gmail.com> wrote:
-> >
-> > On Fri, Jun 27, 2025 at 7:01 PM Jason Xing <kerneljasonxing@gmail.com> wrote:
-> > >
-> > > From: Jason Xing <kernelxing@tencent.com>
-> > >
-> > > This patch provides a setsockopt method to let applications leverage to
-> > > adjust how many descs to be handled at most in one send syscall. It
-> > > mitigates the situation where the default value (32) that is too small
-> > > leads to higher frequency of triggering send syscall.
-> > >
-> > > Considering the prosperity/complexity the applications have, there is no
-> > > absolutely ideal suggestion fitting all cases. So keep 32 as its default
-> > > value like before.
-> > >
-> > > The patch does the following things:
-> > > - Add XDP_MAX_TX_BUDGET socket option.
-> > > - Convert TX_BATCH_SIZE to tx_budget_spent.
-> > > - Set tx_budget_spent to 32 by default in the initialization phase as a
-> > >   per-socket granular control. 32 is also the min value for
-> > >   tx_budget_spent.
-> > > - Set the range of tx_budget_spent as [32, xs->tx->nentries].
-> > >
-> > > The idea behind this comes out of real workloads in production. We use a
-> > > user-level stack with xsk support to accelerate sending packets and
-> > > minimize triggering syscalls. When the packets are aggregated, it's not
-> > > hard to hit the upper bound (namely, 32). The moment user-space stack
-> > > fetches the -EAGAIN error number passed from sendto(), it will loop to try
-> > > again until all the expected descs from tx ring are sent out to the driver.
-> > > Enlarging the XDP_MAX_TX_BUDGET value contributes to less frequency of
-> > > sendto() and higher throughput/PPS.
-> > >
-> > > Here is what I did in production, along with some numbers as follows:
-> > > For one application I saw lately, I suggested using 128 as max_tx_budget
-> > > because I saw two limitations without changing any default configuration:
-> > > 1) XDP_MAX_TX_BUDGET, 2) socket sndbuf which is 212992 decided by
-> > > net.core.wmem_default. As to XDP_MAX_TX_BUDGET, the scenario behind
-> > > this was I counted how many descs are transmitted to the driver at one
-> > > time of sendto() based on [1] patch and then I calculated the
-> > > possibility of hitting the upper bound. Finally I chose 128 as a
-> > > suitable value because 1) it covers most of the cases, 2) a higher
-> > > number would not bring evident results. After twisting the parameters,
-> > > a stable improvement of around 4% for both PPS and throughput and less
-> > > resources consumption were found to be observed by strace -c -p xxx:
-> > > 1) %time was decreased by 7.8%
-> > > 2) error counter was decreased from 18367 to 572
-> >
-> > More interesting numbers are arriving here as I run some benchmarks
-> > from xdp-project/bpf-examples/AF_XDP-example/ in my VM.
-> >
-> > Running "sudo taskset -c 2 ./xdpsock -i eth0 -q 1 -l -N -t -b 256"
-
-do you have a patch against xdpsock that does setsockopt you're
-introducing here?
-
--B -b 256 was for enabling busy polling and giving it 256 budget, which is
-not what you wanted to achieve.
-
-> >
-> > Using the default configure 32 as the max budget iteration:
-> >  sock0@eth0:1 txonly xdp-drv
-> >                    pps            pkts           1.01
-> > rx                 0              0
-> > tx                 48,574         49,152
-> >
-> > Enlarging the value to 256:
-> >  sock0@eth0:1 txonly xdp-drv
-> >                    pps            pkts           1.00
-> > rx                 0              0
-> > tx                 148,277        148,736
-> >
-> > Enlarging the value to 512:
-> >  sock0@eth0:1 txonly xdp-drv
-> >                    pps            pkts           1.00
-> > rx                 0              0
-> > tx                 226,306        227,072
-> >
-> > The performance of pps goes up by 365% (with max budget set as 512)
-> > which is an incredible number :)
+On 6/29/25 11:29, Jamal Hadi Salim wrote:
+> On Sat, Jun 28, 2025 at 5:43 PM Jamal Hadi Salim <jhs@mojatatu.com> wrote:
+>>
+>> On Thu, Jun 26, 2025 at 4:08 AM Lion Ackermann <nnamrec@gmail.com> wrote:
+>>>
+>>> Hi,
+>>>
+>>> On 6/25/25 4:22 PM, Jamal Hadi Salim wrote:
+>>>> On Tue, Jun 24, 2025 at 6:43 AM Lion Ackermann <nnamrec@gmail.com> wrote:
+>>>>>
+>>>>> Hi,
+>>>>>
+>>>>> On 6/24/25 11:24 AM, Lion Ackermann wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> On 6/24/25 6:41 AM, Cong Wang wrote:
+>>>>>>> On Mon, Jun 23, 2025 at 12:41:08PM +0200, Lion Ackermann wrote:
+>>>>>>>> Hello,
+>>>>>>>>
+>>>>>>>> I noticed the fix for a recent bug in sch_hfsc in the tc subsystem is
+>>>>>>>> incomplete:
+>>>>>>>>      sch_hfsc: Fix qlen accounting bug when using peek in hfsc_enqueue()
+>>>>>>>>      https://lore.kernel.org/all/20250518222038.58538-2-xiyou.wangcong@gmail.com/
+>>>>>>>>
+>>>>>>>> This patch also included a test which landed:
+>>>>>>>>      selftests/tc-testing: Add an HFSC qlen accounting test
+>>>>>>>>
+>>>>>>>> Basically running the included test case on a sanitizer kernel or with
+>>>>>>>> slub_debug=P will directly reveal the UAF:
+>>>>>>>
+>>>>>>> Interesting, I have SLUB debugging enabled in my kernel config too:
+>>>>>>>
+>>>>>>> CONFIG_SLUB_DEBUG=y
+>>>>>>> CONFIG_SLUB_DEBUG_ON=y
+>>>>>>> CONFIG_SLUB_RCU_DEBUG=y
+>>>>>>>
+>>>>>>> But I didn't catch this bug.
+>>>>>>>
+>>>>>>
+>>>>>> Technically the class deletion step which triggered the sanitizer was not
+>>>>>> present in your testcase. The testcase only left the stale pointer which was
+>>>>>> never accessed though.
+>>>>>>
+>>>>>>>> To be completely honest I do not quite understand the rationale behind the
+>>>>>>>> original patch. The problem is that the backlog corruption propagates to
+>>>>>>>> the parent _before_ parent is even expecting any backlog updates.
+>>>>>>>> Looking at f.e. DRR: Child is only made active _after_ the enqueue completes.
+>>>>>>>> Because HFSC is messing with the backlog before the enqueue completed,
+>>>>>>>> DRR will simply make the class active even though it should have already
+>>>>>>>> removed the class from the active list due to qdisc_tree_backlog_flush.
+>>>>>>>> This leaves the stale class in the active list and causes the UAF.
+>>>>>>>>
+>>>>>>>> Looking at other qdiscs the way DRR handles child enqueues seems to resemble
+>>>>>>>> the common case. HFSC calling dequeue in the enqueue handler violates
+>>>>>>>> expectations. In order to fix this either HFSC has to stop using dequeue or
+>>>>>>>> all classful qdiscs have to be updated to catch this corner case where
+>>>>>>>> child qlen was zero even though the enqueue succeeded. Alternatively HFSC
+>>>>>>>> could signal enqueue failure if it sees child dequeue dropping packets to
+>>>>>>>> zero? I am not sure how this all plays out with the re-entrant case of
+>>>>>>>> netem though.
+>>>>>>>
+>>>>>>> I think this may be the same bug report from Mingi in the security
+>>>>>>> mailing list. I will take a deep look after I go back from Open Source
+>>>>>>> Summit this week. (But you are still very welcome to work on it by
+>>>>>>> yourself, just let me know.)
+>>>>>>>
+>>>>>>> Thanks!
+>>>>>>
+>>>>>>> My suggestion is we go back to a proposal i made a few moons back (was
+>>>>>>> this in a discussion with you? i dont remember): create a mechanism to
+>>>>>>> disallow certain hierarchies of qdiscs based on certain attributes,
+>>>>>>> example in this case disallow hfsc from being the ancestor of "qdiscs that may
+>>>>>>> drop during peek" (such as netem). Then we can just keep adding more
+>>>>>>> "disallowed configs" that will be rejected via netlink. Similar idea
+>>>>>>> is being added to netem to disallow double duplication, see:
+>>>>>>> https://lore.kernel.org/netdev/20250622190344.446090-1-will@willsroot.io/
+>>>>>>>
+>>>>>>> cheers,
+>>>>>>> jamal
+>>>>>>
+>>>>>> I vaguely remember Jamal's proposal from a while back, and I believe there was
+>>>>>> some example code for this approach already?
+>>>>>> Since there is another report you have a better overview, so it is probably
+>>>>>> best you look at it first. In the meantime I can think about the solution a
+>>>>>> bit more and possibly draft something if you wish.
+>>>>>>
+>>>>>> Thanks,
+>>>>>> Lion
+>>>>>
+>>>>> Actually I was intrigued, what do you think about addressing the root of the
+>>>>> use-after-free only and ignore the backlog corruption (kind of). After the
+>>>>> recent patches where qlen_notify may get called multiple times, we could simply
+>>>>> loosen qdisc_tree_reduce_backlog to always notify when the qdisc is empty.
+>>>>> Since deletion of all qdiscs will run qdisc_reset / qdisc_purge_queue at one
+>>>>> point or another, this should always catch left-overs. And we need not care
+>>>>> about all the complexities involved of keeping the backlog right and / or
+>>>>> prevent certain hierarchies which seems rather tedious.
+>>>>> This requires some more testing, but I was imagining something like this:
+>>>>>
+>>>>> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+>>>>> --- a/net/sched/sch_api.c
+>>>>> +++ b/net/sched/sch_api.c
+>>>>> @@ -780,15 +780,12 @@ static u32 qdisc_alloc_handle(struct net_device *dev)
+>>>>>
+>>>>>   void qdisc_tree_reduce_backlog(struct Qdisc *sch, int n, int len)
+>>>>>   {
+>>>>> -       bool qdisc_is_offloaded = sch->flags & TCQ_F_OFFLOADED;
+>>>>>          const struct Qdisc_class_ops *cops;
+>>>>>          unsigned long cl;
+>>>>>          u32 parentid;
+>>>>>          bool notify;
+>>>>>          int drops;
+>>>>>
+>>>>> -       if (n == 0 && len == 0)
+>>>>> -               return;
+>>>>>          drops = max_t(int, n, 0);
+>>>>>          rcu_read_lock();
+>>>>>          while ((parentid = sch->parent)) {
+>>>>> @@ -797,17 +794,8 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, int n, int len)
+>>>>>
+>>>>>                  if (sch->flags & TCQ_F_NOPARENT)
+>>>>>                          break;
+>>>>> -               /* Notify parent qdisc only if child qdisc becomes empty.
+>>>>> -                *
+>>>>> -                * If child was empty even before update then backlog
+>>>>> -                * counter is screwed and we skip notification because
+>>>>> -                * parent class is already passive.
+>>>>> -                *
+>>>>> -                * If the original child was offloaded then it is allowed
+>>>>> -                * to be seem as empty, so the parent is notified anyway.
+>>>>> -                */
+>>>>> -               notify = !sch->q.qlen && !WARN_ON_ONCE(!n &&
+>>>>> -                                                      !qdisc_is_offloaded);
+>>>>> +               /* Notify parent qdisc only if child qdisc becomes empty. */
+>>>>> +               notify = !sch->q.qlen;
+>>>>>                  /* TODO: perform the search on a per txq basis */
+>>>>>                  sch = qdisc_lookup(qdisc_dev(sch), TC_H_MAJ(parentid));
+>>>>>                  if (sch == NULL) {
+>>>>> @@ -816,6 +804,9 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, int n, int len)
+>>>>>                  }
+>>>>>                  cops = sch->ops->cl_ops;
+>>>>>                  if (notify && cops->qlen_notify) {
+>>>>> +                       /* Note that qlen_notify must be idempotent as it may get called
+>>>>> +                        * multiple times.
+>>>>> +                        */
+>>>>>                          cl = cops->find(sch, parentid);
+>>>>>                          cops->qlen_notify(sch, cl);
+>>>>>                  }
+>>>>>
+>>>>
+>>>> I believe this will fix the issue. My concern is we are not solving
+>>>> the root cause. I also posted a bunch of fixes on related issues for
+>>>> something Mingi Cho (on Cc) found - see attachments, i am not in favor
+>>>> of these either.
+>>>> Most of these setups are nonsensical. After seeing so many of these my
+>>>> view is we start disallowing such hierarchies.
+>>>>
+>>>> cheers,
+>>>> jamal
+>>>
+>>> I would also disagree with the attached patches for various reasons:
+>>> - The QFQ patch relies on packet size backlog, which is not to be
+>>>    trusted because of several sources that may make this unreliable
+>>>    (netem, size tables, GSO, etc.)
+>>> - In the TBF variant the ret may get overwritten during the loop,
+>>>    so it only relies on the final packet status. I would not trust
+>>>    this always working either.
+>>> - DRR fix seems fine, but it still requires all other qdiscs to
+>>>    be correct (and something similar needs to be applied to all
+>>>    classfull qdiscs?)
+>>> - The changes to qdisc_tree_reduce_backlog do not really make sense
+>>>    to me I must be missing something here..
+>>>
+>>> What do you think the root cause is here? AFAIK what all the issues
+>>> have in common is that eventually qlen_notify is _not_ called,
+>>> thus leaving stale class pointers. Naturally the consequence
+>>> could be to simply always call qlen_notify on class deletion and
+>>> make classfull qdiscs aware that it may get called on inactive
+>>> classes. And this is what I tried with my proposal.
+>>> This does not solve the backlog issues though. But the pressing
+>>> issue seems to be the uaf and not the statistic counters?
+>>>
+>>> My concern with preventing certain hierarchies is that we would
+>>> hide the backlog issues and we would be chasing bad hierarchies.
+>>> Still it would also solve all the problems eventually I guess.
+>>>
+>>
+>> On "What do you think the root cause is here?"
+>>
+>> I believe the root cause is that qdiscs like hfsc and qfq are dropping
+>> all packets in enqueue (mostly in relation to peek()) and that result
+>> is not being reflected in the return code returned to its parent
+>> qdisc.
+>> So, in the example you described in this thread, drr is oblivious to
+>> the fact that the child qdisc dropped its packet because the call to
+>> its child enqueue returned NET_XMIT_SUCCESS. This causes drr to
+>> activate a class that shouldn't have been activated at all.
+>>
+>> You can argue that drr (and other similar qdiscs) may detect this by
+>> checking the call to qlen_notify (as the drr patch was
+>> doing), but that seems really counter-intuitive. Imagine writing a new
+>> qdisc and having to check for that every time you call a child's
+>> enqueue. Sure  your patch solves this, but it also seems like it's not
+>> fixing the underlying issue (which is drr activating the class in the
+>> first place). Your patch is simply removing all the classes from their
+>> active lists when you delete them. And your patch may seem ok for now,
+>> but I am worried it might break something else in the future that we
+>> are not seeing.
+>>
+>> And do note: All of the examples of the hierarchy I have seen so far,
+>> that put us in this situation, are nonsensical
+>>
 > 
-> Weird thing. I purchased another VM and didn't manage to see such a
-> huge improvement.... Good luck is that I own that good machine which
-> is still reproducible and I'm still digging in it. So please ignore
-> this noise for now :|
-> 
-> Thanks,
-> Jason
+> At this point my thinking is to apply your patch and then we discuss a
+> longer term solution. Cong?
+
+I tested Lion's patch quickly with the reproducers:
+
+https://lore.kernel.org/netdev/CAM0EoMnv6YAUJVEFx2mGrP75G8wzRiN+Z=hSfRAz8ia0Fe4vBw@mail.gmail.com/
+https://lore.kernel.org/netdev/45876f14-cf28-4177-8ead-bb769fd9e57a@gmail.com/
+https://lore.kernel.org/netdev/CAM0EoMmA1WLUtamjYNFVZ75NYKznL3K2h8HSv=2z4D3=ZDS83Q@mail.gmail.com/#r
+
+The patch seems to fix the repros.
+Also ran tdc on it and the tests passed.
+
+cheers,
+Victor
 
