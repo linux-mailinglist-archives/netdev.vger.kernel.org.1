@@ -1,252 +1,317 @@
-Return-Path: <netdev+bounces-202653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ECCDAEE7E4
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 22:01:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18815AEE7E7
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 22:03:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73BA1189C8D2
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 20:01:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58CAA1785FE
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 20:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C3619ADBF;
-	Mon, 30 Jun 2025 20:01:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DCDF1DB125;
+	Mon, 30 Jun 2025 20:03:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="Jd7w0bXa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wmlw2H9K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 938D33F9FB
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 20:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC398C0B
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 20:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751313697; cv=none; b=WVJ2HPkK8ufz3GExY74WNXY7uG9EJ+oK9xH8YGGtqKJ5o/r5XPm1MugEqVrbU3SqRtPenigozL1I8N/UGsZYPm7V8Y3gtJEYO2uoqoyt7FUw+E2xq7C7mGs+fFuLevGJvGBIJkemj//xO2sZSwdyZMD64fxT/PRttgE/Qp61kow=
+	t=1751313797; cv=none; b=dGHIMRr8Ilk+ke9IJh6Mh4bLEVx2Ztr9jmMDvqeFUbdnaTFItLtZgVUMTM3Hjt2yqSlsjuQPTx0FszP31bFLu60p+6ph+z2UQGW3j9qKUszEgrFM8hZQaiozdkOLGys2jEGo2P2ZcM4/gGSVhA376ItStZN5sAhWt1r23/is814=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751313697; c=relaxed/simple;
-	bh=ILctP1S3u7RsJrVBncWHA46LdRpa2Ge+n/Ov/y/GQLQ=;
+	s=arc-20240116; t=1751313797; c=relaxed/simple;
+	bh=tc2/CY30+WQ0GQaPSkxHMOOSP7nL34U4xOYcQqcJLKg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qC5FIrr5gb1gUodkZ87kR+kjhN3vFfwlNQG3rCi1DnQFuARckfzbg/adfqVnLjSGnwJg8cbZwkn8Syuh5HCmvkzlWCjv6fX+O8YTD8WVNXeYXGOxuYuiGx5ZX+d23S4suq7vEMAnX5bPj0rc0JOOvvGIEdJolIeFY0X2N21X6rA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=Jd7w0bXa; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ae0d4451a3fso454057966b.1
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 13:01:34 -0700 (PDT)
+	 To:Cc:Content-Type; b=HbuX91rM6OT7qSs/H4KTsIJJwrkROkqz2GdMLyT6hW0kzIyeFuNDL3Z7WWOKua0TDleBFe1TggmxB+AKcol+ZjDZuCq0fLMA2eeQwDWFloGwZzLYBEW+nPNMJQFeGVujp246PW48NR/WNBwRyuG+7DNK2mAqPCVHrs8lHq2OyWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wmlw2H9K; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-234c5b57557so23170775ad.3
+        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 13:03:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gooddata.com; s=google; t=1751313693; x=1751918493; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1751313795; x=1751918595; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BlQ2m16Y3O+4FLK0sWsRcUlnrU677a1UxDGZmWmdDyc=;
-        b=Jd7w0bXaP2XTlbveLof3Xl/eRj4Nigln4JbbfqQI+jLY1FwuJrDC90oWapmCzeuMLv
-         HhjBkC+Y3FuUuAfusLp9zvf+2FtojfzHo+vQ5qJsvxmTIQj0Xl4RsKcxSm63vqo46NhY
-         jG1w0oxVb76Sis3gXdv5aJFNlzPZluidgazq0=
+        bh=Eqa+cWKwP/5ITYlS+q2fI743OuEkJnUTonzPltQGs2Y=;
+        b=wmlw2H9KMK384nuHGpcNSqWvm644zD0V9d1nqBzmw55ISzg3LEQPNTQDZ9uXq35K2j
+         /YiWwtp4GX200shb80Dy4anbUQcaMjhD+eSljrzwvxFHfhB9ilPlOtsGUe95fFkvtH/U
+         SPgfNnn5aGAYGTrLrQVVoTzNVO14efv96zSv/kZ690FaL/Aqtpl+i5cCOhrzmifiZ8rR
+         gpmH4rnZagOkl6CkLDJ2uVIR6DC7wMP0EWRzhA+/ViEx7edwe01vcDi8ZqkL1rCD9gLf
+         KqLK1gF1lTgBSE6UlMapF0IrPlNCe/R+iK7tfu1EOq3plGUygLxa7OJ56mumQBCa+GeZ
+         6rog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751313693; x=1751918493;
+        d=1e100.net; s=20230601; t=1751313795; x=1751918595;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BlQ2m16Y3O+4FLK0sWsRcUlnrU677a1UxDGZmWmdDyc=;
-        b=nhtrI+XUd4+0M9DsNKzHSRsV6DyyUyFH81StuUytsN3IwtSdmGCyqRr/YtcoipVoi9
-         WReJSnaIMNkbWYp9nxvg0kErVPjPVI8uyxU7wzHVDeFGow24gYeCAS3bnvPB7WQTvkMD
-         KbN8o3/knHXMJ2ntfrd/R7zqM/gafmWWHM+UgOIs0LJGD77YGeVqLDAspwgGcHi5AfKq
-         IWSNAmy0mP8RnxBKh5NnCebmkce53ALXs/d9Dza38EkWdulDgobb2zWCjCv34wFAIjvT
-         /mUOhgEkVtmcJFVZTL1jpRjlwskdx3e0OZpNDnvsqvusuE7pIy/5FrncDUz7fXmUDtOE
-         p1Dw==
-X-Forwarded-Encrypted: i=1; AJvYcCUKRP+CbKFO6t1U/AfS+1QeMeuFbVpWdLaUkcpWjxfNFJlzEuDTOTkzA1sAF1f8evOQuGtK1Yw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyAg7y7DtZgJLW+DyejpMi3dBq3kck2cf1yrVpT0Vcnlwdf1iR
-	4CWKHo8sHjzseHgWp/6/m5vDzmGql8pRsb4Nh1SX1EBpOCBHsUAah1BLCi7nrpZ56CrQfrS5IRA
-	G2tk3XVn2V3yYSx83Lyi4k8i1RTK9T4fx/o12PIWf
-X-Gm-Gg: ASbGnct+BhAphlgzv2VtlPF+h5cWm0y8JGk4vbO6/ySqauHKGnjtKlkK57x0EioYR8O
-	pAy+3xrZfhu2+9rPfEanzUzENu39HXIwYjy3/JEb11p6LljghLsAnzb8KOSLDUArshXTlqjB1i+
-	MivXpifwfOPNkthVuRxeKdoQLL0ZJokACzTiNItv1vDTiR
-X-Google-Smtp-Source: AGHT+IElA7dwjNbAavQXRtpBC9F2bhPVHqdZJXJsYTHmqi/cCpFGET8t/NC37vfXEi+HwRaum3IhHyi2gEvxQcZcvck=
-X-Received: by 2002:a17:907:d16:b0:ae0:d97d:7fa0 with SMTP id
- a640c23a62f3a-ae3500caf35mr1426578666b.38.1751313692704; Mon, 30 Jun 2025
- 13:01:32 -0700 (PDT)
+        bh=Eqa+cWKwP/5ITYlS+q2fI743OuEkJnUTonzPltQGs2Y=;
+        b=U5uitXa/4VNtnHaF5CPoojupU1iuOFzQvBYq6JZL2jy6iYqPD1OSH0gF2CodjiEU9B
+         a1cSLLvzNqqO9rqCuR6JQ5c5VMLPGBO9AM0r5nwkaRgyXtEdSxDlbqQ5J5lo1jRW3H8x
+         f0U+tTIbNp5qeOWgK7CSjt/FyjD9ohOHFXC2x96/OGAV24ZdfU28BK/l5eT4QEmS8K0R
+         xYXfNop6p2xoSV1+/uvcNnvA92WSHH7kHbwuP33FW1qeQonY9eaG3j2ezewBgvRV1aEH
+         RbgPJeJNUX4HxCcZyS9sUTLIV8XKXL1aAX3Mx4Hd0Pdte7TFDYfMNP9L8sNJADz1eClH
+         Q7UA==
+X-Forwarded-Encrypted: i=1; AJvYcCVRmm4AE/YleU6lyq7s16zvS7y9pvd2ThGMkLfIHk3rZfQZIP8zflRdyAy63DmnVuJZeypDnlM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUBI3CmX/f1uXR/JDYBaFmTz035eAiEP1J0ufl//zt+GoOhIBP
+	FtiBnIzAxu76WoCNtm3aLOIwTz8J00BFjRk4TxPSLdHsR6nun1e1uKx532SbU1rrnx0MDEJmEnA
+	rvPOHSVr8uwR+3TJYf3If0jGBk8hLkwwP5IHfGrCFk8wESIMQI/3mJFpSl6w=
+X-Gm-Gg: ASbGncvVo1wiKnMbxJeS6BnybFyz630f8f4+UPnBj3v+EJMThX7QDMyuPHi8/YEoVFy
+	t0HYq+ygyGYahVA9RMD9UVBo7U7rRWbM07hIQR7DPkbh4IHWfvX6WK2u9dnmrRYcYlAPieMbkyD
+	QU9OchwAytWSBSzMAyMh9KZNYfpFBUj9NgYTO5DPeaVbSDC8XClY4uXvWEteO7mdCgI2to0mMNU
+	w==
+X-Google-Smtp-Source: AGHT+IF6iVcyvQjj2ld6N8UoG4ykSX9aDn1bYdC40Iledyddo74UK6tAqLO/YIb80svJEBjHYnqen4lxC/AUpi7EOf8=
+X-Received: by 2002:a17:902:e84a:b0:234:8f5d:e3a4 with SMTP id
+ d9443c01a7336-23ac3817878mr246272035ad.2.1751313794880; Mon, 30 Jun 2025
+ 13:03:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
- <CAK8fFZ4bKHa8L6iF7dZNBRxujdmsoFN05p73Ab6mkPf6FGhmMQ@mail.gmail.com>
- <CO1PR11MB5089365F31BCD97E59CCFA83D6BD2@CO1PR11MB5089.namprd11.prod.outlook.com>
- <20250416171311.30b76ec1@kernel.org> <CO1PR11MB508931FBA3D5DFE7D8F07844D6BC2@CO1PR11MB5089.namprd11.prod.outlook.com>
- <CAK8fFZ6+BNjNdemB+P=SuwU6X9a9CmtkR8Nux-XG7QHdcswvQQ@mail.gmail.com>
- <CAK8fFZ4BJ-T40eNzO1rDLLpSRkeaHGctATsGLKD3bqVCa4RFEQ@mail.gmail.com>
- <CAK8fFZ5XTO9dGADuMSV0hJws-6cZE9equa3X6dfTBgDyzE1pEQ@mail.gmail.com>
- <b3eb99da-9293-43e8-a24d-f4082f747d6c@intel.com> <CAK8fFZ7LREBEdhXjBAKuaqktOz1VwsBTxcCpLBsa+dkMj4Pyyw@mail.gmail.com>
- <20250625132545.1772c6ab@kernel.org> <CAK8fFZ7KDaPk_FVDbTdFt8soEWrpJ_g0_fiKEg1WzjRp1BC0Qg@mail.gmail.com>
- <CAK8fFZ5rS8Xg11LvyQHzFh3aVHbKdRHpuhrpV_Wc7oYRcMZFRA@mail.gmail.com>
- <c764ad97-9c6a-46f5-a03b-cfa812cdb8e1@intel.com> <CAK8fFZ4bRJz2WnhoYdG8PVYi6=EKYTXBE5tu8pR4=CQoifqUuA@mail.gmail.com>
- <f2e43212-dc49-4f87-9bbc-53a77f3523e5@intel.com>
-In-Reply-To: <f2e43212-dc49-4f87-9bbc-53a77f3523e5@intel.com>
-From: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Date: Mon, 30 Jun 2025 22:01:06 +0200
-X-Gm-Features: Ac12FXwYZ6bg3FIRduOrsQ66EGDolpQyCt5LC8AL-VXPejF5bGVLo-KSRrZ392A
-Message-ID: <CAK8fFZ6FU1+1__FndEoFQgHqSXN+330qvNTWMvMfiXc2DpN8NQ@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
- driver after upgrade to 6.13.y (regression in commit 492a044508ad)
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "Damato, Joe" <jdamato@fastly.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, 
-	"Czapnik, Lukasz" <lukasz.czapnik@intel.com>, "Dumazet, Eric" <edumazet@google.com>, 
-	"Zaki, Ahmed" <ahmed.zaki@intel.com>, Martin Karsten <mkarsten@uwaterloo.ca>, 
-	Igor Raits <igor@gooddata.com>, Daniel Secik <daniel.secik@gooddata.com>, 
-	Zdenek Pesek <zdenek.pesek@gooddata.com>
+References: <20250629214449.14462-1-aleksandr.mikhalitsyn@canonical.com> <20250629214449.14462-5-aleksandr.mikhalitsyn@canonical.com>
+In-Reply-To: <20250629214449.14462-5-aleksandr.mikhalitsyn@canonical.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 30 Jun 2025 13:03:03 -0700
+X-Gm-Features: Ac12FXw0qkm9zmzcyDd_siUWWPQolY0UkEUyAzMbFXyy0LUDcdpbCwLpUNcaFzM
+Message-ID: <CAAVpQUD0_HcYQ-DBSFSgjdoQLAS2bjXkLhPfYpH8z+Rt17U_sQ@mail.gmail.com>
+Subject: Re: [RESEND PATCH net-next 4/6] af_unix: stash pidfs dentry when needed
+To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Leon Romanovsky <leon@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Christian Brauner <brauner@kernel.org>, 
+	Lennart Poettering <mzxreary@0pointer.de>, Luca Boccassi <bluca@debian.org>, 
+	David Rheinsberg <david@readahead.eu>, Kuniyuki Iwashima <kuniyu@amazon.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
+On Sun, Jun 29, 2025 at 2:45=E2=80=AFPM Alexander Mikhalitsyn
+<aleksandr.mikhalitsyn@canonical.com> wrote:
 >
+> We need to ensure that pidfs dentry is allocated when we meet any
+> struct pid for the first time. This will allows us to open pidfd
+> even after the task it corresponds to is reaped.
 >
+> Basically, we need to identify all places where we fill skb/scm_cookie
+> with struct pid reference for the first time and call pidfs_register_pid(=
+).
 >
-> On 6/30/2025 10:24 AM, Jaroslav Pulchart wrote:
-> >>
-> >>
-> >>
-> >> On 6/30/2025 12:35 AM, Jaroslav Pulchart wrote:
-> >>>>
-> >>>>>
-> >>>>> On Wed, 25 Jun 2025 19:51:08 +0200 Jaroslav Pulchart wrote:
-> >>>>>> Great, please send me a link to the related patch set. I can apply=
- them in
-> >>>>>> our kernel build and try them ASAP!
-> >>>>>
-> >>>>> Sorry if I'm repeating the question - have you tried
-> >>>>> CONFIG_MEM_ALLOC_PROFILING? Reportedly the overhead in recent kerne=
-ls
-> >>>>> is low enough to use it for production workloads.
-> >>>>
-> >>>> I try it now, the fresh booted server:
-> >>>>
-> >>>> # sort -g /proc/allocinfo| tail -n 15
-> >>>>     45409728   236509 fs/dcache.c:1681 func:__d_alloc
-> >>>>     71041024    17344 mm/percpu-vm.c:95 func:pcpu_alloc_pages
-> >>>>     71524352    11140 kernel/dma/direct.c:141 func:__dma_direct_allo=
-c_pages
-> >>>>     85098496     4486 mm/slub.c:2452 func:alloc_slab_page
-> >>>>    115470992   101647 fs/ext4/super.c:1388 [ext4] func:ext4_alloc_in=
-ode
-> >>>>    134479872    32832 kernel/events/ring_buffer.c:811 func:perf_mmap=
-_alloc_page
-> >>>>    141426688    34528 mm/filemap.c:1978 func:__filemap_get_folio
-> >>>>    191594496    46776 mm/memory.c:1056 func:folio_prealloc
-> >>>>    360710144      172 mm/khugepaged.c:1084 func:alloc_charge_folio
-> >>>>    444076032    33790 mm/slub.c:2450 func:alloc_slab_page
-> >>>>    530579456   129536 mm/page_ext.c:271 func:alloc_page_ext
-> >>>>    975175680      465 mm/huge_memory.c:1165 func:vma_alloc_anon_foli=
-o_pmd
-> >>>>   1022427136   249616 mm/memory.c:1054 func:folio_prealloc
-> >>>>   1105125376   139252 drivers/net/ethernet/intel/ice/ice_txrx.c:681
-> >>>> [ice] func:ice_alloc_mapped_page
-> >>>>   1621598208   395848 mm/readahead.c:186 func:ractl_alloc_folio
-> >>>>
-> >>>
-> >>> The "drivers/net/ethernet/intel/ice/ice_txrx.c:681 [ice]
-> >>> func:ice_alloc_mapped_page" is just growing...
-> >>>
-> >>> # uptime ; sort -g /proc/allocinfo| tail -n 15
-> >>>  09:33:58 up 4 days, 6 min,  1 user,  load average: 6.65, 8.18, 9.81
-> >>>
-> >>> # sort -g /proc/allocinfo| tail -n 15
-> >>>     85216896   443838 fs/dcache.c:1681 func:__d_alloc
-> >>>    106156032    25917 mm/shmem.c:1854 func:shmem_alloc_folio
-> >>>    116850096   102861 fs/ext4/super.c:1388 [ext4] func:ext4_alloc_ino=
-de
-> >>>    134479872    32832 kernel/events/ring_buffer.c:811 func:perf_mmap_=
-alloc_page
-> >>>    143556608     6894 mm/slub.c:2452 func:alloc_slab_page
-> >>>    186793984    45604 mm/memory.c:1056 func:folio_prealloc
-> >>>    362807296    88576 mm/percpu-vm.c:95 func:pcpu_alloc_pages
-> >>>    530579456   129536 mm/page_ext.c:271 func:alloc_page_ext
-> >>>    598237184    51309 mm/slub.c:2450 func:alloc_slab_page
-> >>>    838860800      400 mm/huge_memory.c:1165 func:vma_alloc_anon_folio=
-_pmd
-> >>>    929083392   226827 mm/filemap.c:1978 func:__filemap_get_folio
-> >>>   1034657792   252602 mm/memory.c:1054 func:folio_prealloc
-> >>>   1262485504      602 mm/khugepaged.c:1084 func:alloc_charge_folio
-> >>>   1335377920   325970 mm/readahead.c:186 func:ractl_alloc_folio
-> >>>   2544877568   315003 drivers/net/ethernet/intel/ice/ice_txrx.c:681
-> >>> [ice] func:ice_alloc_mapped_page
-> >>>
-> >> ice_alloc_mapped_page is the function used to allocate the pages for t=
-he
-> >> Rx ring buffers.
-> >>
-> >> There were a number of fixes for the hot path from Maciej which might =
-be
-> >> related. Although those fixes were primarily for XDP they do impact th=
-e
-> >> regular hot path as well.
-> >>
-> >> These were fixes on top of work he did which landed in v6.13, so it
-> >> seems plausible they might be related. In particular one which mention=
-s
-> >> a missing buffer put:
-> >>
-> >> 743bbd93cf29 ("ice: put Rx buffers after being done with current frame=
-")
-> >>
-> >> It says the following:
-> >>>     While at it, address an error path of ice_add_xdp_frag() - we wer=
-e
-> >>>     missing buffer putting from day 1 there.
-> >>>
-> >>
-> >> It seems to me the issue must be somehow related to the buffer cleanup
-> >> logic for the Rx ring, since thats the only thing allocated by
-> >> ice_alloc_mapped_page.
-> >>
-> >> It might be something fixed with the work Maciej did.. but it seems ve=
-ry
-> >> weird that 492a044508ad ("ice: Add support for persistent NAPI config"=
-)
-> >> would affect that logic at all....
-> >
-> > I believe there were/are at least two separate issues. Regarding
-> > commit 492a044508ad (=E2=80=9Cice: Add support for persistent NAPI conf=
-ig=E2=80=9D):
-> > * On 6.13.y and 6.14.y kernels, this change prevented us from lowering
-> > the driver=E2=80=99s initial, large memory allocation immediately after=
- server
-> > power-up. A few hours (max few days) later, this inevitably led to an
-> > out-of-memory condition.
-> > * Reverting the commit in those series only delayed the OOM, it
-> > allowed the queue size (and thus memory footprint) to shrink on boot
-> > just as it did in 6.12.y but didn=E2=80=99t eliminate the underlying 'l=
-eak'.
-> > * In 6.15.y, however, that revert isn=E2=80=99t required (and isn=E2=80=
-=99t even
-> > applicable). The after boot allocation can once again be tuned down
-> > without patching. Still, we observe the same increase in memory use
-> > over time, as shown in the 'allocmap' output.
-> > Thus, commit 492a044508ad led us down a false trail, or at the very
-> > least hastened the inevitable OOM.
+> Tricky thing here is that we have a few places where this happends
+> depending on what userspace is doing:
+> - [__scm_replace_pid()] explicitly sending an SCM_CREDENTIALS message
+>                         and specified pid in a numeric format
+> - [unix_maybe_add_creds()] enabled SO_PASSCRED/SO_PASSPIDFD but
+>                            didn't send SCM_CREDENTIALS explicitly
+> - [scm_send()] force_creds is true. Netlink case.
 >
-> That seems reasonable. I'm still surprised the specific commit leads to
-> any large increase in memory, since it should only be a few bytes per
-> NAPI. But there may be some related driver-specific issues.
+> Cc: linux-kernel@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: Leon Romanovsky <leon@kernel.org>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Christian Brauner <brauner@kernel.org>
+> Cc: Kuniyuki Iwashima <kuniyu@google.com>
+> Cc: Lennart Poettering <mzxreary@0pointer.de>
+> Cc: Luca Boccassi <bluca@debian.org>
+> Cc: David Rheinsberg <david@readahead.eu>
+> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com=
+>
+> ---
+>  include/net/scm.h  | 35 ++++++++++++++++++++++++++++++-----
+>  net/unix/af_unix.c | 36 +++++++++++++++++++++++++++++++++---
+>  2 files changed, 63 insertions(+), 8 deletions(-)
+>
+> diff --git a/include/net/scm.h b/include/net/scm.h
+> index 856eb3a380f6..d1ae0704f230 100644
+> --- a/include/net/scm.h
+> +++ b/include/net/scm.h
+> @@ -8,6 +8,7 @@
+>  #include <linux/file.h>
+>  #include <linux/security.h>
+>  #include <linux/pid.h>
+> +#include <linux/pidfs.h>
+>  #include <linux/nsproxy.h>
+>  #include <linux/sched/signal.h>
+>  #include <net/compat.h>
+> @@ -66,19 +67,37 @@ static __inline__ void unix_get_peersec_dgram(struct =
+socket *sock, struct scm_co
+>  { }
+>  #endif /* CONFIG_SECURITY_NETWORK */
+>
+> -static __inline__ void scm_set_cred(struct scm_cookie *scm,
+> -                                   struct pid *pid, kuid_t uid, kgid_t g=
+id)
+> +static __inline__ int __scm_set_cred(struct scm_cookie *scm,
+> +                                    struct pid *pid, bool pidfs_register=
+,
+> +                                    kuid_t uid, kgid_t gid)
 
-Actually, the large base allocation has existed for quite some time,
-the mentioned commit didn=E2=80=99t suddenly grow our memory usage, it only
-prevented us from shrinking it via "ethtool -L <iface> combined
-<small-number>"
-after boot. In other words, we=E2=80=99re still stuck with the same big
-allocation, we just can=E2=80=99t tune it down (till reverting the commit)
+scm_set_cred() is only called from 3 places, and I think you can simply
+pass pidfd_register =3D=3D false from one of the places.
 
+while at it, please replace s/__inline__/inline/
+
+>  {
+> -       scm->pid  =3D get_pid(pid);
+> +       if (pidfs_register) {
+> +               int err;
+> +
+> +               err =3D pidfs_register_pid(pid);
+
+nit: int err =3D pidfs_...();
+
+> +               if (err)
+> +                       return err;
+> +       }
+> +
+> +       scm->pid =3D get_pid(pid);
+> +
+>         scm->creds.pid =3D pid_vnr(pid);
+>         scm->creds.uid =3D uid;
+>         scm->creds.gid =3D gid;
+> +       return 0;
+> +}
+> +
+> +static __inline__ void scm_set_cred(struct scm_cookie *scm,
+> +                                   struct pid *pid, kuid_t uid, kgid_t g=
+id)
+> +{
+> +       /* __scm_set_cred() can't fail when pidfs_register =3D=3D false *=
+/
+> +       (void) __scm_set_cred(scm, pid, false, uid, gid);
+
+I think this (void) style is unnecessary for recent compilers.
+
+>  }
 >
-> Either way, we clearly need to isolate how we're leaking memory in the
-> hot path. I think it might be related to the fixes from Maciej which are
-> pretty recent so might not be in 6.13 or 6.14
+>  static __inline__ void scm_destroy_cred(struct scm_cookie *scm)
+>  {
+>         put_pid(scm->pid);
+> -       scm->pid  =3D NULL;
+> +       scm->pid =3D NULL;
+>  }
+>
+>  static __inline__ void scm_destroy(struct scm_cookie *scm)
+> @@ -90,9 +109,15 @@ static __inline__ void scm_destroy(struct scm_cookie =
+*scm)
+>
+>  static __inline__ int __scm_replace_pid(struct scm_cookie *scm, struct p=
+id *pid)
+>  {
+> +       int err;
+> +
+>         /* drop all previous references */
+>         scm_destroy_cred(scm);
+>
+> +       err =3D pidfs_register_pid(pid);
+> +       if (err)
+> +               return err;
+> +
+>         scm->pid =3D get_pid(pid);
+>         scm->creds.pid =3D pid_vnr(pid);
+>         return 0;
+> @@ -105,7 +130,7 @@ static __inline__ int scm_send(struct socket *sock, s=
+truct msghdr *msg,
+>         scm->creds.uid =3D INVALID_UID;
+>         scm->creds.gid =3D INVALID_GID;
+>         if (forcecreds)
+> -               scm_set_cred(scm, task_tgid(current), current_uid(), curr=
+ent_gid());
+> +               __scm_set_cred(scm, task_tgid(current), true, current_uid=
+(), current_gid());
+>         unix_get_peersec_dgram(sock, scm);
+>         if (msg->msg_controllen <=3D 0)
+>                 return 0;
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index 5efe6e44abdf..1f4a5fe8a1f7 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -1924,12 +1924,34 @@ static void unix_peek_fds(struct scm_cookie *scm,=
+ struct sk_buff *skb)
+>         scm->fp =3D scm_fp_dup(UNIXCB(skb).fp);
+>  }
+>
+> +static int __skb_set_pid(struct sk_buff *skb, struct pid *pid, bool pidf=
+s_register)
 
-I=E2=80=99m fine with the fix for the mainline (now 6.15.y), the 6.13.y and
-6.14.y are already EOL. Could you please tell me which 6.15.y stable
-release first incorporates that patch? Is it included in current
-6.15.5, or will it arrive in a later point release?
+unix_set_pid_to_skb ?
+
+> +{
+> +       if (pidfs_register) {
+> +               int err;
+> +
+> +               err =3D pidfs_register_pid(pid);
+> +               if (err)
+> +                       return err;
+> +       }
+> +
+> +       UNIXCB(skb).pid =3D get_pid(pid);
+> +       return 0;
+> +}
+> +
+>  static void unix_destruct_scm(struct sk_buff *skb)
+>  {
+>         struct scm_cookie scm;
+>
+>         memset(&scm, 0, sizeof(scm));
+> -       scm.pid  =3D UNIXCB(skb).pid;
+> +
+> +       /* Pass ownership of struct pid from skb to scm cookie.
+> +        *
+> +        * We rely on scm_destroy() -> scm_destroy_cred() to properly
+> +        * release everything.
+> +        */
+> +       scm.pid =3D UNIXCB(skb).pid;
+> +       UNIXCB(skb).pid =3D NULL;
+
+The skb is under destruction and we no longer touch it, so
+this chunk is not needed.
+
+
+> +
+>         if (UNIXCB(skb).fp)
+>                 unix_detach_fds(&scm, skb);
+>
+> @@ -1943,7 +1965,10 @@ static int unix_scm_to_skb(struct scm_cookie *scm,=
+ struct sk_buff *skb, bool sen
+>  {
+>         int err =3D 0;
+>
+> -       UNIXCB(skb).pid =3D get_pid(scm->pid);
+> +       err =3D __skb_set_pid(skb, scm->pid, false);
+> +       if (unlikely(err))
+> +               return err;
+> +
+>         UNIXCB(skb).uid =3D scm->creds.uid;
+>         UNIXCB(skb).gid =3D scm->creds.gid;
+>         UNIXCB(skb).fp =3D NULL;
+> @@ -1976,7 +2001,12 @@ static int unix_maybe_add_creds(struct sk_buff *sk=
+b, const struct sock *sk,
+>                 return 0;
+>
+>         if (unix_may_passcred(sk) || unix_may_passcred(other)) {
+> -               UNIXCB(skb).pid =3D get_pid(task_tgid(current));
+> +               int err;
+> +
+> +               err =3D __skb_set_pid(skb, task_tgid(current), true);
+> +               if (unlikely(err))
+> +                       return err;
+> +
+>                 current_uid_gid(&UNIXCB(skb).uid, &UNIXCB(skb).gid);
+>         }
+>
+> --
+> 2.43.0
+>
 
