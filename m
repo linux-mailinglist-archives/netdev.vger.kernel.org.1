@@ -1,155 +1,233 @@
-Return-Path: <netdev+bounces-202347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E360AED76C
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 10:35:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 528B8AED77E
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 10:38:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E07C3A5B71
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 08:34:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8FAC7A24E5
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 08:37:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A93226165;
-	Mon, 30 Jun 2025 08:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25608242D96;
+	Mon, 30 Jun 2025 08:38:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="SVTph91T"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O7OJk7zB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5865D224AFB
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 08:35:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E83C1DE4FF;
+	Mon, 30 Jun 2025 08:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751272505; cv=none; b=nPNERR4rUaFGiO9DJAQzovQ5Lv6J413kv2AcgEBNhLZ9oBAo1tzUOQPmjFVunRLPco7f06a2C16a8xNJxGOV5i0J7SVcox2cvfPRXlrD4/6gtVJ/rCZxkFrZeSfM5sBokytPzkfbu/Q8I3dCMs8gB2OwvBQg6BVULJCtHGcDyNU=
+	t=1751272706; cv=none; b=V5N7VPdx5DeiuHAOyTwTl8t2vqT7e75VLV21ha9anG5ecv7KVCzSmiZ48yxXWi90rp3S7fVX9iMBkVwBLQc+69evP+668Q55wyvGsdemRET0R9jigVVHm/0bsDbwv39CsiMs+QbtmWzFzxS45atjb2jW4VHE9+795RbeBSTzq+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751272505; c=relaxed/simple;
-	bh=rMBOamKLbu321mtPz7aZ7dYFuOxhTfaXxuqipbsdKeY=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ElGbT0XWxFUpGI06x7MZ7RqQkHNh1bTeaeojSfAjdBnVkIM2tr8Ppb7w53W5VokkNvzV1rBQ+s1z1qVMQ5wwPL+2/OCg+/lAEh2M3tGlbiRYrLysDDVIXHqozu+6zB9vOw3QpfAZ0ToqpQulEtsrz3BJN5N7BGBscGyJH+fHQYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=SVTph91T; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jacekk.info
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-60c9d8a16e5so4097310a12.0
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 01:35:03 -0700 (PDT)
+	s=arc-20240116; t=1751272706; c=relaxed/simple;
+	bh=fOKokE5xSIuSezXDL92+Q446InjaoHoc0T4fTEZ/Fd4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vDHj2RtQ2Rh1bkdaIXpGfVSfv/ZHbUuA18Rx4njTjVWVEJRFyDqyJwREO6iKIxUz6as5A+O2iFIn/auwgrXEKAt7JuTyeFBcgwpRVcK9fec/grVPpcRvPCUBe1sEs/ScB/dJdWuSI7gyD2GRrGi17ApJ52C4iHihqGMIbBdav1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O7OJk7zB; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3a4e62619afso455565f8f.1;
+        Mon, 30 Jun 2025 01:38:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jacekk.info; s=g2024; t=1751272502; x=1751877302; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=C+gUbT9aHifoGPBMBwjpCJyvBKNl1VAoZReu69+v/wE=;
-        b=SVTph91T9BoR12pIYhuO5IAj4GVpDBGktp1BRZQXPhWTq5y/enI+OhEXXOdSmkv4kZ
-         Dj/O4cwoxSIkZpy8GyzUsD7PrZOdJG/gN3VOX0FEvffk0FDYWtK75zCxRfVtJCVhsXzD
-         TvMXZhzLjB4uMMT11Cbh64agUVInMOO9haM4vIDTFVT+vhfMfd/1hsQXkKZzzQYa+0sm
-         qnNqjZceCrZ9AwtJIty8tQmHh5wCfg8DHWUUYAT94+Sc5q9QhxUcj5vXOR3+Rt15jLV+
-         nWc26syED7NUYw0p6LI/tp+RGCUk1qXg335hyXVBA2/zai9Byl7DqCMAmJBZ3/Qo4kQG
-         8ffg==
+        d=gmail.com; s=20230601; t=1751272702; x=1751877502; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rFdfcEftPl4kbBYI2AsD040dwGd/MXL2A6FySR4WqJg=;
+        b=O7OJk7zBkH0OE2RFz5Wf2SObaxW6+bpZ+qrKwkGB9sTy37VsSrnxBC6mwMFxKaj0PB
+         Hxpvhq/j7xWmwYxlxLyOJuUCdNxSAD8CnjdTP0nNJUb5qNzliZsI4A8kO3j40rz0xxoG
+         Ta+ydBndjlzkqNArqOMUTwi4GFmUJNfxEn+NurR5buS5LigUuu/qvi6m72SJHdwJ1ug6
+         auyYfpaGlRdvJVXfLiTLMTZdTiR+cJlTS2kOmtAuMfisYhWSrVbpD2hd6ie5JQJ5py3+
+         5okFVImN9mkYRJXq/0KH0et/J0JpLAAwH5DY/GauvY10nc67KbKW7ZNEobGYa/jZs0bO
+         4FmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751272502; x=1751877302;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C+gUbT9aHifoGPBMBwjpCJyvBKNl1VAoZReu69+v/wE=;
-        b=OB5mzLW84nxAexjddyJNszBo6Dfw2QhBm3lmIYofdjuMI1D9VqPmZnzKPtrst3SUwV
-         f+TupxQyHdbH4D9/4dwb1pOblF9iqMlEY/y9ZlPRUpaXfYTGkm75UZ1XTamwiCb/OZnS
-         GmNPybSvyDxNvauTGsOwiQPjTjq1Ye1VFweeGMuWFF6kgpq/9UB8qE+RQ0g4BiIb5CyR
-         DSj/8zrtFcVjjDmh3QMwXPfMK0oABg6g5hgmeE/PLEF2p8Hj5E6Y+MtLpcEONMBHBqfL
-         MeHBG6X2cCUMQdVJ2Hqx1mZQZ8XJo02yjBiVvJyU+3pvctj8zph5bfMm2K3c0wL3+AW8
-         vbEw==
-X-Forwarded-Encrypted: i=1; AJvYcCXLYNb5/iAG+AyNFbjtTaTZFLHPTuNfJOS7Be7PseJJV3rtbQEPBLAiFDfiZw2yNglQGe1t3xM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxN0LxA9S3oM6Dz+H8nA3YGaUzD2142hFVaFUJ3mJI1Z9tj3r7X
-	i9poN0id2V199kr64uLgMag+g+92AvW2kF1/G5a6f96wBRrMcyvddabUNrfog/OF6Q==
-X-Gm-Gg: ASbGncthIbHEqwTD8SY77oTXcEhSvZVBeyR/6OJqGzVz5eDGAocG0pT7q05EqAbMdTt
-	UgIp39+gYtdjc3jq6RZ0fIMBbXH26pwhD4XHFK+RPF7ACBZEK6VxgjPi9sBL+k9lDKNsI4a0EA6
-	gvNSTQxDnzbCxm8KMiAK6EccV0NU/UgTOSLb9VM6xhFNx6Kp9SfcdX0gTNkC/LGTpkYCzXnVG3q
-	VVNy26O2H1GP/d5J7P1yyStTmHab/ovYj8gvl/X940qG7xGDwV1E0M4qMmumMZXNnN5/H1P06SE
-	e+EhtJuqCX562PPVCcdXqrYWGI2SsaFMS8eerCJ7AEPa0s4cA2YD6ThJBQMjyiic
-X-Google-Smtp-Source: AGHT+IH/T30kQj3wWajjJInTipqkpt/+zHcGETsFy1EeW1ixfGoQnxnikZCFVF0R9CqSva1q7DNB0w==
-X-Received: by 2002:a17:907:9802:b0:ae0:e065:ddfb with SMTP id a640c23a62f3a-ae34fd8932cmr1006397166b.18.1751272501411;
-        Mon, 30 Jun 2025 01:35:01 -0700 (PDT)
-Received: from [192.168.0.114] ([91.196.212.106])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae35363a75csm623995166b.7.2025.06.30.01.35.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Jun 2025 01:35:01 -0700 (PDT)
-From: Jacek Kowalski <jacek@jacekk.info>
-X-Google-Original-From: Jacek Kowalski <Jacek@jacekk.info>
-Message-ID: <28347e4f-c6a7-4194-8a80-34508891c8ec@jacekk.info>
-Date: Mon, 30 Jun 2025 10:35:00 +0200
+        d=1e100.net; s=20230601; t=1751272702; x=1751877502;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rFdfcEftPl4kbBYI2AsD040dwGd/MXL2A6FySR4WqJg=;
+        b=ElQAv90EmpaLDSTANyYXJJRszO0DAXxJVSH0MxTXTg8IFKhc7Sf9MIFSVb6NyknzVe
+         BpfQuA0ubpkmzGcUZ7xtdYBgwKzk/ndThc7xlvpd0eAK7gNVu4muowoCAJAKtOsFt1df
+         3VYi0UrqjCLri6EaAKBYt5poDiO0e5xIgTM4Qj9t1so+PRTHsi9Ds2jGFNLlRJVsxZ/L
+         R99T8zu6UE2ECk9b5N5AbeNbOVsX613JMjg5nzPD0LYuLW1eCbCxPdS7ZOdVZrgqJ6X6
+         M3Ga5hyAPlWW4WUwOeXZkZK0MSlqbLth9CtYrU9mTnzhWGbPSbOPtg9LJ9c2Be1ZrAaX
+         z5/w==
+X-Forwarded-Encrypted: i=1; AJvYcCUoyP+nCGtBOcYOli1R9a0IwCbcVVkhqlW++NQI30S3rRkLh87oGI0LOw+Myn6RTFn8dx1NmA+xTbJGF0w=@vger.kernel.org, AJvYcCXtL5xKZS+AEJggNBmWJpkcGcJuKX6P08rtgxBAQg+iyML3C5Ur8RLoOIB6uNXmcbtJmziHW/Fd@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsHjjDymMrqVdiQ5HLo16z8H1pFhwd6sybUwPRk1HoVPyp7pWO
+	aGf8nPJdQo9LNxWvMXCxqQQJ67GobAv1xz999l75QgehYE4zxHZTWNNN
+X-Gm-Gg: ASbGncswcfxc/+VuKisQm9+R0IKzkZjEw4+htM3MG1Iz+Wm1f1ZE0EdvBID8pzL/kMp
+	q4YcKy9b9qZCuR/2dFVsIShsuQNl2qwYVTgdcnJa6Sqe3MMC/OBJ2oFt1wHwYz6Pn2GXWH1BgFn
+	vpoPI/hr0kj1xJPnkBGuUDbuL0+lM/OuavFnFWjwVJsQYdxVadDhng9Y/XSU1urNASH3xgXpJcu
+	bI+RBZ3TTEB57WLIB7iBQ7fimM29yaCuGBrCY3VYIqN8sjmh7CsWmKt7MHj0nS2OVakBaqg6/Te
+	NyeHv/4po160X/LgilUTyzODPVrlIde3CSDAN8Oty7LY3g7JWDCk3Rq90kCqiitoKXwO4+VKAOv
+	YidfMPH1umsnoQOEskkf6pp8EbQ==
+X-Google-Smtp-Source: AGHT+IEvKJqj/TVkGPGZ7v2Ha99spyvgOhQJ0B2GO5apmK6qXsAj7Vj46oKjzqw7IdEg+Na1JMjhHg==
+X-Received: by 2002:a05:600d:7:b0:43d:fa58:81d2 with SMTP id 5b1f17b1804b1-4539585f938mr22180605e9.9.1751272701911;
+        Mon, 30 Jun 2025 01:38:21 -0700 (PDT)
+Received: from thomas-precision3591.imag.fr ([2001:660:5301:24:234c:3c9a:efe4:2b60])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3a88c800eaasm9946144f8f.37.2025.06.30.01.38.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jun 2025 01:38:21 -0700 (PDT)
+From: Thomas Fourier <fourier.thomas@gmail.com>
+To: 
+Cc: Thomas Fourier <fourier.thomas@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@kernel.org>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Jonathan Currier <dullfire@yahoo.com>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v2] nui: Fix dma_mapping_error() check
+Date: Mon, 30 Jun 2025 10:36:43 +0200
+Message-ID: <20250630083650.47392-2-fourier.thomas@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH v4 2/2] e1000e: ignore uninitialized checksum word on tgp
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Vlad URSU <vlad@ursu.me>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-References: <3fb71ecc-9096-4496-9152-f43b8721d937@jacekk.info>
-Content-Language: en-US
-In-Reply-To: <3fb71ecc-9096-4496-9152-f43b8721d937@jacekk.info>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-As described by Vitaly Lifshits:
+dma_map_XXX() functions return values DMA_MAPPING_ERROR as error values
+which is often ~0.  The error value should be tested with
+dma_mapping_error().
 
-> Starting from Tiger Lake, LAN NVM is locked for writes by SW, so the
-> driver cannot perform checksum validation and correction. This means
-> that all NVM images must leave the factory with correct checksum and
-> checksum valid bit set.
+This patch creates a new function in niu_ops to test if the mapping
+failed.  The test is fixed in niu_rbr_add_page(), added in
+niu_start_xmit() and the successfully mapped pages are unmaped upon error.
 
-Unfortunately some systems have left the factory with an uninitialized
-value of 0xFFFF at register address 0x3F (checksum word location).
-So on Tiger Lake platform we ignore the computed checksum when such
-condition is encountered.
-
-Signed-off-by: Jacek Kowalski <Jacek@jacekk.info>
-Tested-by: Vlad URSU <vlad@ursu.me>
-Fixes: 4051f68318ca9 ("e1000e: Do not take care about recovery NVM checksum")
-Cc: stable@vger.kernel.org
+Fixes: ec2deec1f352 ("niu: Fix to check for dma mapping errors.")
+Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
 ---
- drivers/net/ethernet/intel/e1000e/defines.h | 3 +++
- drivers/net/ethernet/intel/e1000e/nvm.c     | 6 ++++++
- 2 files changed, 9 insertions(+)
+ drivers/net/ethernet/sun/niu.c | 31 ++++++++++++++++++++++++++++++-
+ drivers/net/ethernet/sun/niu.h |  4 ++++
+ 2 files changed, 34 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/e1000e/defines.h b/drivers/net/ethernet/intel/e1000e/defines.h
-index 8294a7c4f122..ba331899d186 100644
---- a/drivers/net/ethernet/intel/e1000e/defines.h
-+++ b/drivers/net/ethernet/intel/e1000e/defines.h
-@@ -638,6 +638,9 @@
- /* For checksumming, the sum of all words in the NVM should equal 0xBABA. */
- #define NVM_SUM                    0xBABA
+diff --git a/drivers/net/ethernet/sun/niu.c b/drivers/net/ethernet/sun/niu.c
+index ddca8fc7883e..26119d02a94d 100644
+--- a/drivers/net/ethernet/sun/niu.c
++++ b/drivers/net/ethernet/sun/niu.c
+@@ -3336,7 +3336,7 @@ static int niu_rbr_add_page(struct niu *np, struct rx_ring_info *rp,
  
-+/* Uninitialized ("empty") checksum word value */
-+#define NVM_CHECKSUM_UNINITIALIZED 0xFFFF
-+
- /* PBA (printed board assembly) number words */
- #define NVM_PBA_OFFSET_0           8
- #define NVM_PBA_OFFSET_1           9
-diff --git a/drivers/net/ethernet/intel/e1000e/nvm.c b/drivers/net/ethernet/intel/e1000e/nvm.c
-index e609f4df86f4..16369e6d245a 100644
---- a/drivers/net/ethernet/intel/e1000e/nvm.c
-+++ b/drivers/net/ethernet/intel/e1000e/nvm.c
-@@ -558,6 +558,12 @@ s32 e1000e_validate_nvm_checksum_generic(struct e1000_hw *hw)
- 		checksum += nvm_data;
+ 	addr = np->ops->map_page(np->device, page, 0,
+ 				 PAGE_SIZE, DMA_FROM_DEVICE);
+-	if (!addr) {
++	if (np->ops->mapping_error(np->device, addr)) {
+ 		__free_page(page);
+ 		return -ENOMEM;
  	}
+@@ -6676,6 +6676,8 @@ static netdev_tx_t niu_start_xmit(struct sk_buff *skb,
+ 	len = skb_headlen(skb);
+ 	mapping = np->ops->map_single(np->device, skb->data,
+ 				      len, DMA_TO_DEVICE);
++	if (np->ops->mapping_error(np->device, mapping))
++		goto out_drop;
  
-+	if (hw->mac.type == e1000_pch_tgp &&
-+	    nvm_data == NVM_CHECKSUM_UNINITIALIZED) {
-+		e_dbg("Uninitialized NVM Checksum on TGP platform - ignoring\n");
-+		return 0;
+ 	prod = rp->prod;
+ 
+@@ -6717,6 +6719,8 @@ static netdev_tx_t niu_start_xmit(struct sk_buff *skb,
+ 		mapping = np->ops->map_page(np->device, skb_frag_page(frag),
+ 					    skb_frag_off(frag), len,
+ 					    DMA_TO_DEVICE);
++		if (np->ops->mapping_error(np->device, mapping))
++			goto out_unmap;
+ 
+ 		rp->tx_buffs[prod].skb = NULL;
+ 		rp->tx_buffs[prod].mapping = mapping;
+@@ -6741,6 +6745,19 @@ static netdev_tx_t niu_start_xmit(struct sk_buff *skb,
+ out:
+ 	return NETDEV_TX_OK;
+ 
++out_unmap:
++	while (i--) {
++		const skb_frag_t *frag;
++
++		prod = PREVIOUS_TX(rp, prod);
++		frag = &skb_shinfo(skb)->frags[i];
++		np->ops->unmap_page(np->device, rp->tx_buffs[prod].mapping,
++				    skb_frag_size(frag), DMA_TO_DEVICE);
 +	}
 +
- 	if (checksum != (u16)NVM_SUM) {
- 		e_dbg("NVM Checksum Invalid\n");
- 		return -E1000_ERR_NVM;
++	np->ops->unmap_single(np->device, rp->tx_buffs[rp->prod].mapping,
++			      skb_headlen(skb), DMA_TO_DEVICE);
++
+ out_drop:
+ 	rp->tx_errors++;
+ 	kfree_skb(skb);
+@@ -9644,6 +9661,11 @@ static void niu_pci_unmap_single(struct device *dev, u64 dma_address,
+ 	dma_unmap_single(dev, dma_address, size, direction);
+ }
+ 
++static int niu_pci_mapping_error(struct device *dev, u64 addr)
++{
++	return dma_mapping_error(dev, addr);
++}
++
+ static const struct niu_ops niu_pci_ops = {
+ 	.alloc_coherent	= niu_pci_alloc_coherent,
+ 	.free_coherent	= niu_pci_free_coherent,
+@@ -9651,6 +9673,7 @@ static const struct niu_ops niu_pci_ops = {
+ 	.unmap_page	= niu_pci_unmap_page,
+ 	.map_single	= niu_pci_map_single,
+ 	.unmap_single	= niu_pci_unmap_single,
++	.mapping_error	= niu_pci_mapping_error,
+ };
+ 
+ static void niu_driver_version(void)
+@@ -10019,6 +10042,11 @@ static void niu_phys_unmap_single(struct device *dev, u64 dma_address,
+ 	/* Nothing to do.  */
+ }
+ 
++static int niu_phys_mapping_error(struct device *dev, u64 dma_address)
++{
++	return false;
++}
++
+ static const struct niu_ops niu_phys_ops = {
+ 	.alloc_coherent	= niu_phys_alloc_coherent,
+ 	.free_coherent	= niu_phys_free_coherent,
+@@ -10026,6 +10054,7 @@ static const struct niu_ops niu_phys_ops = {
+ 	.unmap_page	= niu_phys_unmap_page,
+ 	.map_single	= niu_phys_map_single,
+ 	.unmap_single	= niu_phys_unmap_single,
++	.mapping_error	= niu_phys_mapping_error,
+ };
+ 
+ static int niu_of_probe(struct platform_device *op)
+diff --git a/drivers/net/ethernet/sun/niu.h b/drivers/net/ethernet/sun/niu.h
+index 04c215f91fc0..0b169c08b0f2 100644
+--- a/drivers/net/ethernet/sun/niu.h
++++ b/drivers/net/ethernet/sun/niu.h
+@@ -2879,6 +2879,9 @@ struct tx_ring_info {
+ #define NEXT_TX(tp, index) \
+ 	(((index) + 1) < (tp)->pending ? ((index) + 1) : 0)
+ 
++#define PREVIOUS_TX(tp, index) \
++	(((index) - 1) >= 0 ? ((index) - 1) : (((tp)->pending) - 1))
++
+ static inline u32 niu_tx_avail(struct tx_ring_info *tp)
+ {
+ 	return (tp->pending -
+@@ -3140,6 +3143,7 @@ struct niu_ops {
+ 			  enum dma_data_direction direction);
+ 	void (*unmap_single)(struct device *dev, u64 dma_address,
+ 			     size_t size, enum dma_data_direction direction);
++	int (*mapping_error)(struct device *dev, u64 dma_address);
+ };
+ 
+ struct niu_link_config {
 -- 
-2.47.2
+2.43.0
 
 
