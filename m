@@ -1,97 +1,99 @@
-Return-Path: <netdev+bounces-202380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0098AAEDA80
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:10:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25E44AEDA9E
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:18:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6E157A73DE
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:08:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 121AD1899794
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:18:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 089722459D7;
-	Mon, 30 Jun 2025 11:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6836223323;
+	Mon, 30 Jun 2025 11:18:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LVGdMSXQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZcMD0xQf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8733226188
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 11:09:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B321DC988;
+	Mon, 30 Jun 2025 11:18:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751281798; cv=none; b=uLGKqZCzUnzi1nwXHdl7hnee0AixuOz0ch8csIjxrtAHNgUg7S4DenvjQGPwpflssWB1TquOpmWFWKnbvj9kZMAKsti6mfHDninRaHhBrV4ctoKZxooXvI2br4sexEGfjrTD8ZRe7E4W4lonGzQ/emoTqybcbDXhKF3xe1SavfA=
+	t=1751282311; cv=none; b=uUOpI3tXP5IFKLBus/A9a2UD3ZICQpfA0ngn4vqq1CXW2mzs/jP5CbGpViy8RAhqYq0+bmJfmErFARdjwOwwnEvp1QA5UKz6YwcfXf1X+ES5qgLP9E+txKwbQyax2qqa/6dxNwhsp1BQzsREvGGf+HiVG8QtV4enKoZUk+fSAww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751281798; c=relaxed/simple;
-	bh=Z7RaH/zHoejIheWXv39PKihpKmi4WpMDGX4n9lr+LlE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T5z7JvnXNu41foHQEKqIVp8ZIqabAVIfpCw8sPONvSUSo5bvtLWHoy4RQlsia/z6xP3olx0RhC/oHymsLcfy8LHQMUl4kfTC4qEYC8T/WESukAiFzpw1upwheHmuTuEAMCeGPBaoX6pFO8OJd/r9FjiJumLGlCdilCnTmKhuuQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LVGdMSXQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4431C4CEE3;
-	Mon, 30 Jun 2025 11:09:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751281798;
-	bh=Z7RaH/zHoejIheWXv39PKihpKmi4WpMDGX4n9lr+LlE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LVGdMSXQa1HOEZ44TcXavlTkw59qfsjG3A2YRoIPPGSOwNXlqj8Oy0FIxPVe+FPGE
-	 z6pEQdnroLt8dtaC/Jm3Ce0hPSU0oKxrpAZn3dqBGveGuzHfl9incFNU/gKYEsTSVk
-	 uvVN6WnsDardZwoBnMeI/EoiJxalNMXd5MS/oZhOopTYQrbgdrzzux9uqiC4A3STYr
-	 tyAR1iWw+z3DliTmaEQromaDiBqQeiQt8hrtXDxZXEwTZ1ib1xDeuZ2PpWRQuPs+cc
-	 jAZvHJEmuTkVwFefFeNJNq60NWd9uZoi7Fjf0Yo28hyVPoV2wFKKRcEZ98xEKhhnEU
-	 p2qidaUREj9kA==
-Date: Mon, 30 Jun 2025 12:09:53 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com, netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>,
-	kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH net] bnxt_en: eliminate the compile warning in
- bnxt_request_irq due to CONFIG_RFS_ACCEL
-Message-ID: <20250630110953.GD41770@horms.kernel.org>
-References: <20250629003616.23688-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1751282311; c=relaxed/simple;
+	bh=9gThfWOSowAx4Kc3l4vZYGdweF31noC/qdGXalTIOPw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jDSnALMlgXAMuUsYTtowgC644jxjY8lWBU75VXmVZdvx9v7l7pmpa2KbL+Y1lXbrbthXyXSH+SIRVayS4ZKjFPOMMSRBjXLfLn9OLEMvP1L76+0YnqUj8DEU3jfkCkfhpGbOttzZE+KcXXl5fUxF6CPNrnaMh09izl0lnqRaHjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZcMD0xQf; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751282310; x=1782818310;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=9gThfWOSowAx4Kc3l4vZYGdweF31noC/qdGXalTIOPw=;
+  b=ZcMD0xQfT7hcnZsmF2N2rNtkSw1RLQrtLZs5LIdsShpGg5WfTn/FKcuG
+   e7ExDAg2A/CkhBY1EU7o2g436dGtiw+eYuHsNiKuJmPQ5Pa/VM7hib+ix
+   IepY9yj1g68muFSoaUrJ3j7pEqAY24Od8xYGW5J0pOwpvZOPu2uLSLjbU
+   6wx0FRqNq9vA1owfTTKAEq3MtjmDkuIirtvRxpEgfdOCORI5K1dvmHY5K
+   a8pyDZ+TyzuvqWAFeSpwEWRhtXnq+13WygZToCxdbguTXZoYbpIrS1co4
+   PhasiP8U9QGyZ/Uwawj7/Dleq5+a94OED4ibuu18dsD0UPUmPTki4bus8
+   Q==;
+X-CSE-ConnectionGUID: oYZaErT9TSmBjdM6C8hjhg==
+X-CSE-MsgGUID: hJjjoEqwQYCYeU3fDfA2ew==
+X-IronPort-AV: E=McAfee;i="6800,10657,11479"; a="53227976"
+X-IronPort-AV: E=Sophos;i="6.16,277,1744095600"; 
+   d="scan'208";a="53227976"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 04:18:30 -0700
+X-CSE-ConnectionGUID: 3hy1gCpjRsmQrnY/oWw3CQ==
+X-CSE-MsgGUID: Nj6v/XxrTP+AYrscaB7dTA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,277,1744095600"; 
+   d="scan'208";a="153736522"
+Received: from mdsouz-mobl2.amr.corp.intel.com (HELO [10.246.2.119]) ([10.246.2.119])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 04:18:26 -0700
+Message-ID: <ecd14fd4-91b2-4bdf-af9c-cc6f555f989b@linux.intel.com>
+Date: Mon, 30 Jun 2025 13:18:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250629003616.23688-1-kerneljasonxing@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH mlx5-next] net/mlx5: Check device memory pointer before
+ usage
+To: Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>
+Cc: Stav Aviram <saviram@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ linux-rdma@vger.kernel.org, Mark Bloch <markb@mellanox.com>,
+ netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
+References: <e389fa6ef075af1049cd7026b912d736ebe3ad23.1751279408.git.leonro@nvidia.com>
+Content-Language: pl, en-US
+From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+In-Reply-To: <e389fa6ef075af1049cd7026b912d736ebe3ad23.1751279408.git.leonro@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Jun 29, 2025 at 08:36:16AM +0800, Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
+On 2025-06-30 12:35 PM, Leon Romanovsky wrote:
+> From: Stav Aviram <saviram@nvidia.com>
 > 
-> I received a kernel-test-bot report[1] that shows the
-> [-Wunused-but-set-variable] warning. Since the previous commit[2] I made
-> gives users an option to turn on and off the CONFIG_RFS_ACCEL, the issue
-> then can be discovered and reproduced. Move the @i into the protection
-> of CONFIG_RFS_ACCEL.
+> Add a NULL check before accessing device memory to prevent a crash if
+> dev->dm allocation in mlx5_init_once() fails.
 > 
-> [1]
-> All warnings (new ones prefixed by >>):
-> 
->    drivers/net/ethernet/broadcom/bnxt/bnxt.c: In function 'bnxt_request_irq':
-> >> drivers/net/ethernet/broadcom/bnxt/bnxt.c:10703:9: warning: variable 'j' set but not used [-Wunused-but-set-variable]
->    10703 |  int i, j, rc = 0;
->          |         ^
-> 
-> [2]
-> commit 9b6a30febddf ("net: allow rps/rfs related configs to be switched")
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202506282102.x1tXt0qz-lkp@intel.com/
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> Fixes: c9b9dcb430b3 ("net/mlx5: Move device memory management to mlx5_core")
+> Signed-off-by: Stav Aviram <saviram@nvidia.com>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Given this is a fix, the net tree should be targeted instead of next.
 
-Not for net, but it would be nice to factor the #ifdefs out of this
-function entirely.  E.g. by using a helper to perform that part of the
-initialisation.
-
-...
+Best regards,
+Dawid
 
