@@ -1,80 +1,89 @@
-Return-Path: <netdev+bounces-202621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3944FAEE5D2
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 19:30:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C778AEE5E6
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 19:33:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EB2F179405
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 17:30:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4002217E779
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 17:33:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 170452DBF45;
-	Mon, 30 Jun 2025 17:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2064928F95F;
+	Mon, 30 Jun 2025 17:33:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BbQuXh/C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F602D320B;
-	Mon, 30 Jun 2025 17:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C9348BF8;
+	Mon, 30 Jun 2025 17:33:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751304622; cv=none; b=uINJg2J44c0sTGmOCRokGvUjPeSfTFFj40tX8k67gBmH6YRjZKW2Unr72Bg71DemSjjNhHwIOJNtjlSqBR1Oywk8lE9T9xPRa9LmEmz3qv5dP1Uey97sLjWMTrRWtAhaMxNqZ1P143lr3wAUAgM+jpVy1ApFdMUljch6YwA5eIg=
+	t=1751304824; cv=none; b=ejSnvdAc3v6qP6BQJY5u+OUpPEBMU+e4HBmN3c2gVJhuUQAly+IcTrbn2fuHuypTfhxPL/66CWV4cKAmAn4wiNf9Yw2Ivu/eR605glUwaOnf0PWmgNngv/EKNzLUm9A9BR5Ul/aPwwhO2WRm3wGqlqbwWGz9oCBxR+pWBPRY1yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751304622; c=relaxed/simple;
-	bh=mRaBmnvlcM9HhFflwQ0sq0WRnSWdPwBoSeN4WoeVGec=;
+	s=arc-20240116; t=1751304824; c=relaxed/simple;
+	bh=kJ5bREYguj3nAd9Wz5lWj+IXItcoVGjyv8NbLSrd7Ws=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JJAsFR5ZJe3VZ4Z5AM4dOYTKdVl4Mui69m7ZYO231pVRr9mXRR8PqcGt3SSM6sJFevXacGVhZfXSUr5YRv2kVOjUEoP3S67p2RjQyHVsJdKtWO4nAgUj6EksWpYtHQ0NS5577g+2P7VsGZuw1w7JvaGplPjjwTElQqiwc7vmVjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=W//G3fstwsLfGI25eySu5YaQ0ELT22ryLB+cAHGCGBzEr2Oaj4cc5CyUQl6idDU9FwEqDJh64E/MAgmi8X5VXLbEukieRXkIBdcUvyljQqtPzJdrqnQBx0aNDIg1xb/Y3JupprHVZRY98/BV+1x+kCF43glrJSZDsASVKI9xh6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BbQuXh/C; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-60c4f796446so8110032a12.1;
-        Mon, 30 Jun 2025 10:30:18 -0700 (PDT)
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-31223a4cddeso1238335a91.1;
+        Mon, 30 Jun 2025 10:33:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751304821; x=1751909621; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HbxVGgcvP6OMrt/mkiJLM3OwkDNoJLobRkyzsMgrhcs=;
+        b=BbQuXh/C/k4/pebJ4q5WQrE4YLST9Sd2TdvMQLLjyMAZ+IKM/YWJ/YWNObS1CAVtb2
+         aFWjQpTDYxkRkbaf1VBoOOGDnl24EP4gcnzGvspkFsWqvtDI/6qcqbikQWYkeYQJZK/0
+         xBlXcf9hjW+ypEdofNhGz1SHDl+Z6pkpoPFx+7DH35bfN+WBNO0GcNZt4ODwIKgCSfy+
+         ub94fE1egMW0GUkCz23czFf0c9EoT/Ex1D/vVevrli/nekH4oVQ6clzuXnhNcouMDD7+
+         2miwWnOACr6KIK9pu77ZBojyyS7bpNxBk4BF+BPBTUTgeV2oi/2cIfCoB/U3wrknLgSh
+         cGhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751304617; x=1751909417;
+        d=1e100.net; s=20230601; t=1751304821; x=1751909621;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yYtk+tdJ9WigmCX8UmH7nwOlbF/EiYv5z8fJ4XdRj4A=;
-        b=ZB8ay0FbowQBSdeLgki/bYkMQHwNQ9Q4FsUqBbMVnfmcuawEldXJLc43la3Bk8tHLW
-         kNk8WqyUY5BTn2C90UzwZKBx0HMzVS7vMUlCOh7M0FXTKqXUbZxuAZXKAVmTf+od/7t2
-         8saT8/HmlWO9bck1lUXzmExQN0l7ajHSi1wsI/hWgb/0da15l7f9BkoPdq4uH/IIFevR
-         EzsSkMTGj5QdmZSN236q/b1Pkknrh4XGO6WjoZskHQ/sP3BFPiD3gIMxER0QHWYnBDIY
-         7+sNdiaZvTv7evM4R6wGNy/8A7z6/axGRebhqJy/L++mZj0djt6PNGwp6NhCket2w54b
-         Uv1A==
-X-Forwarded-Encrypted: i=1; AJvYcCVSW+vnXFw2gduEGL/SFkbLKvmezWI69JyS/Q/b3CSLjddDxNCmww79vRsVegWlP/UonZU12WJUU7G84WCQ@vger.kernel.org, AJvYcCWfDclUzNJQT8D7LXj+j4zBUcdeTdc9JUmbLIPg+wkU9FSf0H8pbVz2BRVC6VMY7YaR8fdNpRDNH8OgDFQkT3Qf@vger.kernel.org, AJvYcCWjE317XdTnGhiRM3eMMQuFYzFxAkJg/9iYrAVKBXHRURzq28l2//YaQ34QGGVZx7SzigknfZKL@vger.kernel.org, AJvYcCXMK87R5H6JfxRCWnqmy6TCYGUM6sVQnlQYytBIn0GWzjHgwHkWNxRWIe2UoTI+hibubfg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzu+YgkPTF0UQGaF0+lH4VI+EIvFeyOel5n7ACuQCvVINFMIDRs
-	8mJO/qQ5wGi645uCPUw0en2xJawN1j1GMEOoFMydhiFNMMylGAD9Elc3
-X-Gm-Gg: ASbGncv3S4QUQVMzasa4ZE91+9xHmlKJdExhAoMXx1Yv9nWVV1wHA6msPrSmXFXmNo9
-	vCvnXU/evEqVqBLKAW5kBz8uRM0AOuFalRfnA4dFov0kRneACJU0UPYDjI4V7+afQ4ZK8OeZ7KL
-	WlTwvNaRb00I6I/b6DjQKJBuOZMzsSWvb9PxoATiC4FegdaxwEvPnp+OmXH/vPs+9asdAfHXhH1
-	x5MEdYJ6E4TbHgjchj60QKvAdxD0b3HYJ4+4WWAz1LCLUtpZ3hjhu7zijL+MMs08wjyTTJ5DV3N
-	fOIS+PV47HxBxg79rbpEWgOEr3OCMNnidvje7jgPB9E7PaRoWZckvA==
-X-Google-Smtp-Source: AGHT+IGF+65MB7naW9INIqJ01bu/2rGvf85Aln8gTluXMpbflQC+TqF6pJY7DHbPTg7s06gu5viM2Q==
-X-Received: by 2002:a17:907:3f8a:b0:ad8:9c97:c2e5 with SMTP id a640c23a62f3a-ae34fb22a33mr1389506366b.0.1751304616377;
-        Mon, 30 Jun 2025 10:30:16 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:71::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae353c01262sm700489966b.87.2025.06.30.10.30.15
+        bh=HbxVGgcvP6OMrt/mkiJLM3OwkDNoJLobRkyzsMgrhcs=;
+        b=oKHQUSoFyq8OhcPwNPkNcMFRPiScCgSbUSSEeFMOMSQ1+elugx1j2B14LskHV4u+8p
+         EahYiPICGK0pypqsWv6oDCLtQzBjMXfULsgfei4mFnI0/AhhBTQmQ+nWJevP+FFa6Xag
+         fkq6c0UTZgllZqxBCTu0S4gf2qo08uSwklItBmbN4vTFyqj55+5nRcYtsv1VOKIuvhaj
+         0qrj/mFuhod5XH4oL0GLsFcf0J1H4N3jMZmEla1t/ZUDgAhp/NOr5Q1zVy6jzleeu7Bx
+         85OT1BVQZnX4gDnXfqLSVxEKRiJ4oo9iXmeScEubAVR1AcC5TC4dcuYZ1MvtAKM1YaAp
+         XWoA==
+X-Forwarded-Encrypted: i=1; AJvYcCUwMDrQNyew1x9aZJQMCLI4kw2/YudDzlaZMfAwh1lWule7nqSGwCuSemy8C6RPPZQUE33wCcZ0qiZ6Pq8=@vger.kernel.org, AJvYcCWhsie3JjItjbeX9ySn+QaC2zX64ReKwC6v1qJFBVANJomG1nmBiiqYc8Xm50voQoNSSTpcLETi@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpEBdsY6UqQ6ViOv4Z2Ev6x3fieCsvxb0N6KLp1ts1SfzcA8Nw
+	gZXSjzVj9YcGyYkkspdxo2n2UISvhnHBAPJB4WGbM/sqU+2SVIsaIXKB
+X-Gm-Gg: ASbGncu1N2IaRsjOccU76QDjzH2pBmcaeh/q3gd4H0mk6m3Ppv0qqs4D36BJAJyB8Ay
+	/FwAKSitp/1ItHxXK0mhkSn1mHut6MpHNTcCxYhBgcUSMeejVOnNB22E6a1rl54j/z6GT1xJImF
+	8ruQ7/DWSJUqz2J4mnz4LSt3UXWQlVWyfYQEIcc2ZS4gfegW+hEweVsxYkjwdzSAPnsLUrZNBfa
+	WwE70x5lmYDCAE1gBrwRCRsYuHDCPV43qtO8tS3iTUeBd540HKuu0xBJhZSVOg24zKIrhlfUJfg
+	x8hMzx4/J5+Bp+IXCJtECSzrs+iJFyT8d5tkA/fElQ1/j/8X43vGREJP9Xc8qky6BsYH8FnJ
+X-Google-Smtp-Source: AGHT+IHxwfs1tneuBNRJHj9AainQycwiHovhSKVrs9FnHQypaUW4br4XdYSWpdOhHL9jUZJPzIIlyA==
+X-Received: by 2002:a17:90b:2c83:b0:315:cc22:68d9 with SMTP id 98e67ed59e1d1-318c927f2e4mr19601212a91.31.1751304820832;
+        Mon, 30 Jun 2025 10:33:40 -0700 (PDT)
+Received: from localhost ([216.228.127.130])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3193a5d7e8fsm74846a91.1.2025.06.30.10.33.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jun 2025 10:30:16 -0700 (PDT)
-Date: Mon, 30 Jun 2025 10:30:13 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
+        Mon, 30 Jun 2025 10:33:40 -0700 (PDT)
+Date: Mon, 30 Jun 2025 13:33:37 -0400
+From: Yury Norov <yury.norov@gmail.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	bpf@vger.kernel.org, ast@kernel.org
-Subject: Re: [PATCH net-next v3 3/3] selftests: net: add netpoll basic
- functionality test
-Message-ID: <aGLJpaNLPYnPwKYV@gmail.com>
-References: <20250627-netpoll_test-v3-0-575bd200c8a9@debian.org>
- <20250627-netpoll_test-v3-3-575bd200c8a9@debian.org>
- <20250627113854.04c13ace@kernel.org>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	wireguard@lists.zx2c4.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] wireguard: queueing: simplify wg_cpumask_next_online()
+Message-ID: <aGLKcbR6QmrQ7HE8@yury>
+References: <20250619145501.351951-1-yury.norov@gmail.com>
+ <aGLIUZXHyBTG4zjm@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,23 +92,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250627113854.04c13ace@kernel.org>
+In-Reply-To: <aGLIUZXHyBTG4zjm@zx2c4.com>
 
-On Fri, Jun 27, 2025 at 11:38:54AM -0700, Jakub Kicinski wrote:
-> On Fri, 27 Jun 2025 10:03:11 -0700 Breno Leitao wrote:
-> > +    raise KsftSkipEx("netpoll_poll_dev() was not called. Skipping test")
+On Mon, Jun 30, 2025 at 07:24:33PM +0200, Jason A. Donenfeld wrote:
+> On Thu, Jun 19, 2025 at 10:54:59AM -0400, Yury Norov wrote:
+> > From: Yury Norov [NVIDIA] <yury.norov@gmail.com>
+> > 
+> > wg_cpumask_choose_online() opencodes cpumask_nth(). Use it and make the
+> > function significantly simpler. While there, fix opencoded cpu_online()
+> > too.
+> > 
+> > Signed-off-by: Yury Norov [NVIDIA] <yury.norov@gmail.com>
+> > ---
+> > v1: https://lore.kernel.org/all/20250604233656.41896-1-yury.norov@gmail.com/
+> > v2:
+> >  - fix 'cpu' undeclared;
+> >  - change subject (Jason);
+> >  - keep the original function structure (Jason);
+> > 
+> >  drivers/net/wireguard/queueing.h | 13 ++++---------
+> >  1 file changed, 4 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/drivers/net/wireguard/queueing.h b/drivers/net/wireguard/queueing.h
+> > index 7eb76724b3ed..56314f98b6ba 100644
+> > --- a/drivers/net/wireguard/queueing.h
+> > +++ b/drivers/net/wireguard/queueing.h
+> > @@ -104,16 +104,11 @@ static inline void wg_reset_packet(struct sk_buff *skb, bool encapsulating)
+> >  
+> >  static inline int wg_cpumask_choose_online(int *stored_cpu, unsigned int id)
+> >  {
+> > -	unsigned int cpu = *stored_cpu, cpu_index, i;
+> > +	unsigned int cpu = *stored_cpu;
+> > +
+> > +	if (unlikely(cpu >= nr_cpu_ids || !cpu_online(cpu)))
+> > +		cpu = *stored_cpu = cpumask_nth(id % num_online_cpus(), cpu_online_mask);
 > 
-> As discussed offline SKIPing is not an option for SW tests.
+> I was about to apply this but then it occurred to me: what happens if
+> cpu_online_mask changes (shrinks) after num_online_cpus() is evaluated?
+> cpumask_nth() will then return nr_cpu_ids?
 
-Sure, I will move it to failure.
+It will return >= nd_cpu_ids. The original version based a for-loop
+does the same, so I decided that the caller is safe against it.
 
-Unfortunately the expected path didn't hit in vmtest. I am still trying
-to reproduce the failure on my side, but no luck. It hits from 10 to 16
-times per run. 
+If not, I can send a v3. But, what should we do - retry, or return a
+local cpu? Or something else?
 
-Do you want me to send it as a failure, or, wait until we get something
-better that pass 100% of the time?
-
-Thanks
---breno
+Thanks,
+Yury
 
