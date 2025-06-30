@@ -1,115 +1,207 @@
-Return-Path: <netdev+bounces-202443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9444EAEDF6E
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 15:43:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17BB4AEDF88
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 15:50:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AE561634A3
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:43:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2549F3A5E0A
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:49:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5939828B7E9;
-	Mon, 30 Jun 2025 13:42:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D265E25D21A;
+	Mon, 30 Jun 2025 13:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vne9Uuo1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jiP2bjk7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD0628B7E5;
-	Mon, 30 Jun 2025 13:42:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF06F1917ED;
+	Mon, 30 Jun 2025 13:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751290964; cv=none; b=dvSqtTDoTHTQ/2UTmGlKnO9KqMVEyl34oP/n3ARogDxsR5RJ+2iEeRXYMGMGOxAMPBHY0ebnSXLqbY3tpYWjYvxI0MbBcp2oPrf05Ja+a/aEqsQ0PVHbvgSRvuJMO3tykIr9hDcRfv4fyaDboBtuhW7egTmlEfUnLbDgN+3xQ/I=
+	t=1751291395; cv=none; b=VJdGNbL1+G2bkhKi7YNBK4peZULg/lRxm/0wQ9/rofLT50TA2oAsCEMt99uu/eCxEuEqaQ4T1h6FUHK1BIQN8c+7lFiaUf3WdFuGiWwxWL9gtfkeixbEwFCA6O9EjsOO49EhC/ikiDi21++m6kGaDf/0X1fn0sm06sWnCOS/DgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751290964; c=relaxed/simple;
-	bh=xaF5EDSvK/zHIHe3sz8pMJUK3FPEF75i6oTG2ovAT6I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ceHAg7ODQu+VrG2pZaIzzJwdyjcoMU25Mbg7GZZBK30g4Spx07PqW/lTEoSGSn0E+CTui3dWRLRS8HLFi/0DXk125wDsOLGgzJraPXzupT8nNRPxgGBYmpYtT/cXVejiY9nRo5b/iUpVRJxxMI/Ja9nmW2TMM4NmbX00/geu8TQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vne9Uuo1; arc=none smtp.client-ip=209.85.128.174
+	s=arc-20240116; t=1751291395; c=relaxed/simple;
+	bh=bzoIOlWuvbbMCyXu6/siE/mgcgtZLTWB1WkT/gOYcOs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WLhtYTNBUiHS4RUOYUeJRFipq4DztOHAO5ijuBzszAEvc5fOMs670pFPbujbi7/QZw4Tuq+sVSM7NstgVeL4i7Dhdvt3MXLwQ+NOrO1T4VAhjbCljdaaOUenoLfUiPPEIcaN5I1WMUl4G/BIrhfXAy2dnr+EHpdMuCR5Ks5+QGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jiP2bjk7; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-70e3980757bso38934747b3.1;
-        Mon, 30 Jun 2025 06:42:42 -0700 (PDT)
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-32cd0dfbdb8so18611171fa.0;
+        Mon, 30 Jun 2025 06:49:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751290962; x=1751895762; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xaF5EDSvK/zHIHe3sz8pMJUK3FPEF75i6oTG2ovAT6I=;
-        b=Vne9Uuo1ZCKaFaQoCH3sEJUBBbuCaKAJiFFDmCUScU7qsTioTVw/qhTY0hHwkoE5nW
-         J7aSFC74NtEJwZsyyn9fA5wwQcBhMFJkHMvtEQ7wPD65FVkP4EPvjZKBPhNJN3hHdgaq
-         r7eBdPj1bFEGUOlBA5MHdFvCd5Yl+iNIxiLQgUnlHXmfNQGHcctyw1RjB9GQRHwhGGyF
-         3iQD+HJEk7u27NmKxf6rY+i82Q8crWvPxfswepLoXmuI4MJ5xVwu+2+x2rrjsb0Hfqqj
-         2njNrR5Ww/O/Zm4yRYjWPMctsNi7eH1jge1CEz3yfeRIKqGr2n3zKmHtHlfmyGnZSujp
-         a31A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751290962; x=1751895762;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1751291392; x=1751896192; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xaF5EDSvK/zHIHe3sz8pMJUK3FPEF75i6oTG2ovAT6I=;
-        b=L/Dy2loZtY3luDC3KEQFvf8wlVu7t5dXEoGiB+w3ilPPremHWx7Z6lZYoxu6P+9nWl
-         aKWsKKb8Ebf7h/I0/bV6T2NZO/2MvSdCRjosjd0Y5+eOiqAKPt3veGSvbvAYGiUANGMa
-         Puhbqsy9hdcuxS8zcDuHxaHjs/LCp0CHfNQ86ripcB8Cm2Uw3UyZW0qSVwNoKDov+Gh+
-         mwcG+vvlCsPvV3W7FIdPe0wp7SnJdQcTYQmabgvu5yKKtWBd8hAIZzfPy2E+PNqdj6UM
-         MosiFJHAX1dHwJ70V2+j+ypyAYAuQ5RF2cpbbvMj3Kp5vPG9Xe59yssqUUdDkcqrFdsb
-         /FwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX7DokWDX8oarLkhLW/aIFYL+NnefJZpvPoX4ZciJ+rzfzwGRdBFyFRVGr8XarcM/4z4vxk7Z8T@vger.kernel.org, AJvYcCXWYaCwrc3sKWbIqFVnXnLlMb0OQF3imKHuuGmOgYPdL4VmgnV9+hNIiLmQpyXAVyAI1sBKoteyutmPeRU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYVgQR2UrLBb56NWEMQQtCCr224MG28NJ3mI0TawflW3VTLgl/
-	HL493nQ0310p+dhfwEuBytfWzeX+jU+xh3E3CklbhTWaYj4iwAut8IcZ
-X-Gm-Gg: ASbGncts6P+lKIwyke2gExXXXJ+3M1UcJffH6XgMeGMm5UozuR4dOx7edHGkGIdiMNZ
-	xIMvzPMZA/9MQQmRKhpnTFHEZRPAoFfUIYLZTGF1iKCtyHDN/1myKQPASUMVtnJQhX6IAxzPAET
-	XW4Fx6+VVXCamLgj2JmNLnPpIT7lmgzuDoeQqoXXbsI1y2uST8G2zGUYEb8iipmbymaDyQH4HXL
-	0jlYX2axhZY3KMlDmiBawNxwNBcE8AowG5Ei6T7HVAVO1qlhLMVHz2asRRPIY/bqdZ0NU/mkz+q
-	yl6lSycdQI5TZspb5Mj2re1xmUNygkFTSpwUWocMUUQXQDgw9VW5/jJA26HhIw+6eRkJqN0201l
-	IwrwQjg==
-X-Google-Smtp-Source: AGHT+IHigeY4bV+AT0u4W1yAkmi0nLia3YxSj10siM/FS0VfQd/Fuqb1Ode8LaGi98/9iFH4ESyguQ==
-X-Received: by 2002:a05:690c:9418:10b0:70c:ceba:16 with SMTP id 00721157ae682-71509602bdfmr182753447b3.17.1751290961690;
-        Mon, 30 Jun 2025 06:42:41 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-71515cc6e76sm15303997b3.111.2025.06.30.06.42.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jun 2025 06:42:41 -0700 (PDT)
-Date: Mon, 30 Jun 2025 06:42:38 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Andrew Lunn <andrew@lunn.ch>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, xuanzhuo@linux.alibaba.com,
-	dust.li@linux.alibaba.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] ptp: add Alibaba CIPU PTP clock driver
-Message-ID: <aGKUThtBfPvlWL35@hoboy.vegasvil.org>
-References: <20250627072921.52754-1-guwen@linux.alibaba.com>
- <0b0d3dad-3fe2-4b3a-a018-35a3603f8c10@lunn.ch>
- <99debaac-3768-45f5-b7e0-ec89704e39eb@linux.dev>
- <ea85f778-a2d4-439c-abbd-2a8ecea0e928@linux.alibaba.com>
+        bh=wmpyaTUE2J4jAFO05Ukiw9Q7CdozXE2TovrP208ubCc=;
+        b=jiP2bjk7cvVwGUhGL0cHeV894ADW0fCTji5lVZQ9GOmiOPdt4W96ve7Z1l+tLDirEg
+         Aq+1tAB3gqXO1ae8aJTxneJ33XN1vEl2/ZI4pGGY5uclTzKxdldjpTqgq6sFPqhAbyBm
+         ZuGCjfBhqvx5STrRo+B+alszfsMURz7Hm1fJrvtjb2gvGyom/33I6HW7jNy8HBwXAYKq
+         EjfdSI9XZmrV5J0DWuCaTvvr4nktytgdiDowHxhPYIPkecfJPbsdAqI7kGlN7zrVhzPx
+         UIodCbRk9K70XfluGXZbwaFqXlb2OKeqCe9O6wzW2jfncNPFLj+9ZFG83M2jC6NZ/7lP
+         i9Yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751291392; x=1751896192;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wmpyaTUE2J4jAFO05Ukiw9Q7CdozXE2TovrP208ubCc=;
+        b=U8CUV9d7vz37iEr4+/fr+UVbd9ljhYUudst4qlEZ8qwAmFUK3rWnQMvuN76wNOe1t+
+         XjYd8iHgk5qR6Xv49e267B6yeuJUtBYPPIIbirXCbxlbufOuaekchntXC+Jk2eBbIA60
+         8w/1EzcqdrwlcAOXaKs+AEpnosHCdkmRCy19hS+yo7hz9Xx+caO0C77CcPT482MaqP2u
+         PQDunjdEUoo7Mp2XmkxEgtX8B2gG824FwUEzAFTnqAcHBVL8w1ZX7HQH6XQenl0etVVz
+         6iibVz/vDOWU6x+z5F4J74jbvjbd1HEaXdho+qUPCG8BUbo5UVDDpaJMe5H4tsVeiYB1
+         xFiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU2FDDpEDn5E1vor1oOwOIOaa4OMUPB3wNxGnG+Gjk+MyJsM+0ptFpTLqs86VtQa0/8T6eB7ZZG@vger.kernel.org, AJvYcCVwy4ggzt24eOzlKqmpcDKNsPEK7/hzZfw5dqABnOBMJP84d4Tc2FIah5NQFrA3lv7sbxNSc1qexldP2dp4hNo=@vger.kernel.org, AJvYcCWfQWtff5gG5PYiQuOZDOfflj+wxNMrQitDrkL215VqaN/hx8NABRy8vZoEHLRW1M/kZ6ck6fi9Vk0N8rCH@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNSE4f7CX9V2lKJOmL1Lu7plR3uBkIoVY84HcVzM0bC7M9YUaB
+	6uIRlATA71JNhCUGL/LLzjZTwg3jvKtF3KXX6Yy7btEN9C3f5VDgN2or1UqRqjuVoddma0Nh0Gm
+	3xRhJ7eTGKN1GuihDNmC8AF2P2217T+U=
+X-Gm-Gg: ASbGncvTn/dXuhGCMwzoXMAlkXyBqJ3rCyyEmI4vS3vopNI9FKk2oa1cHlVaPmun1//
+	+cxJ+PH30LXHwRlse0U0k4RrNIjJI8jh/2HzWi6yvQTfru00WKac4etpS7EttlKW37g9+JoN2FT
+	RHUDq0hxrpusMQz81vnZyQAgefcaLk3p7I9JGFN5y6Uw==
+X-Google-Smtp-Source: AGHT+IGgaFLlKjjjCVMs+nZMIcXtZfFfNJ4BOpKnsZq/5dFH8MCARTKArHPB5BccAdKnh/MymRY+aAHrIQd0Mn9XZ2A=
+X-Received: by 2002:a05:651c:40cf:b0:32a:8bf4:3a54 with SMTP id
+ 38308e7fff4ca-32cdc482b7amr30192051fa.2.1751291391775; Mon, 30 Jun 2025
+ 06:49:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ea85f778-a2d4-439c-abbd-2a8ecea0e928@linux.alibaba.com>
+References: <20250630075656.8970-1-shpakovskiip@gmail.com>
+In-Reply-To: <20250630075656.8970-1-shpakovskiip@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 30 Jun 2025 09:49:39 -0400
+X-Gm-Features: Ac12FXw3PmrFKjrpDjyEBaBsLe1XDWNEu8EQrup3HMVbUT8LYY__w7LU958fRLU
+Message-ID: <CABBYNZ+HzCDakR18naDA1dw-PwGn_F-r7yCK+EXUodmtKmawhg@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: L2CAP: Introduce minimum limit of
+ rx_credits value
+To: Pavel Shpakovskiy <shpakovskiip@gmail.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kernel@salutedevices.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 30, 2025 at 07:23:49PM +0800, Wen Gu wrote:
+Hi Pavel,
 
-> In ptp_clock.c, ops.clock_settime() is assigned to ptp_clock_settime(),
-> and it will call ptp->info->settime64() without checks. So I think these
-> 'return -EOPNOTSUPP' functions are needed. Did I miss something?
+On Mon, Jun 30, 2025 at 3:57=E2=80=AFAM Pavel Shpakovskiy
+<shpakovskiip@gmail.com> wrote:
+>
+> The commit 96cd8eaa131f
+> ("Bluetooth: L2CAP: Derive rx credits from MTU and MPS")
+> removed the static rx_credits setup to improve BLE packet
+> communication for high MTU values. However, due to vendor-specific
+> issues in the Bluetooth module firmware, using low MTU values
+> (especially less than 256 bytes) results in dynamically calculated
+> rx_credits being too low, causing slow speeds and occasional BLE
+> connection failures.
 
-Right, for the essential clock related callbacks, stubs are expected
-by the ptp class layer.
+You will have to be more specific here, what is the use case and model
+that doesn't work depending on the number of credits? If the idea is
+to just disable flow control to allow the remote side to pipe more
+data then the MTU that sort of defeats the purpose of using CoC, but
+maybe the use case requires or the remote side is too slow to process
+the updates of credits?
 
-Some of the newer, non-essential clock methods do indeed check the
-function pointer, simply to accommodate existing drivers.
+> This change aims to improve BLE connection stability and speed
+> for low MTU values. It is possible to tune minimum value
+> of rx credits with debugfs handle.
+>
+> Signed-off-by: Pavel Shpakovskiy <shpakovskiip@gmail.com>
+> ---
+>  include/net/bluetooth/l2cap.h |  2 ++
+>  net/bluetooth/l2cap_core.c    | 17 +++++++++++++++--
+>  2 files changed, 17 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.=
+h
+> index 4bb0eaedda180..8648d9324a654 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -437,6 +437,8 @@ struct l2cap_conn_param_update_rsp {
+>  #define L2CAP_CONN_PARAM_ACCEPTED      0x0000
+>  #define L2CAP_CONN_PARAM_REJECTED      0x0001
+>
+> +#define L2CAP_LE_MIN_CREDITS           10
+> +
+>  struct l2cap_le_conn_req {
+>         __le16     psm;
+>         __le16     scid;
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index c88f69dde995e..392d7ba0f0737 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -50,6 +50,8 @@ static u32 l2cap_feat_mask =3D L2CAP_FEAT_FIXED_CHAN | =
+L2CAP_FEAT_UCD;
+>  static LIST_HEAD(chan_list);
+>  static DEFINE_RWLOCK(chan_list_lock);
+>
+> +static u16 le_min_credits =3D L2CAP_LE_MIN_CREDITS;
+> +
+>  static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
+>                                        u8 code, u8 ident, u16 dlen, void =
+*data);
+>  static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u=
+16 len,
+> @@ -547,8 +549,17 @@ static __u16 l2cap_le_rx_credits(struct l2cap_chan *=
+chan)
+>         /* If we don't know the available space in the receiver buffer, g=
+ive
+>          * enough credits for a full packet.
+>          */
+> -       if (chan->rx_avail =3D=3D -1)
+> -               return (chan->imtu / chan->mps) + 1;
+> +       if (chan->rx_avail =3D=3D -1) {
+> +               u16 rx_credits =3D (chan->imtu / chan->mps) + 1;
+> +
+> +               if (rx_credits < le_min_credits) {
+> +                       rx_credits =3D le_min_credits;
+> +                       BT_DBG("chan %p: set rx_credits to minimum value:=
+ %u",
+> +                              chan, chan->rx_credits);
 
-Thanks,
-Richard
+This doesn't make much sense in my opinion, if we want to disable flow
+control then we shall allow the remote to pipe as many packets without
+waiting for more credits, note though rx_credits handling changes
+after receiving the first packet then the credits are updated based on
+the socket receiving buffer:
 
+https://github.com/bluez/bluetooth-next/commit/ce60b9231b66710b6ee24042ded2=
+6efee120ecfc
+
+So perhaps it is the socket receiving buffer that needs to be
+adjusted, which is something the process has control over.
+
+> +               }
+> +
+> +               return rx_credits;
+> +       }
+>
+>         /* If we know how much space is available in the receive buffer, =
+give
+>          * out as many credits as would fill the buffer.
+> @@ -7661,6 +7672,8 @@ int __init l2cap_init(void)
+>         l2cap_debugfs =3D debugfs_create_file("l2cap", 0444, bt_debugfs,
+>                                             NULL, &l2cap_debugfs_fops);
+>
+> +       debugfs_create_u16("l2cap_le_min_credits", 0644, bt_debugfs,
+> +                          &le_min_credits);
+>         return 0;
+>  }
+>
+> --
+> 2.34.1
+>
+
+
+--=20
+Luiz Augusto von Dentz
 
