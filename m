@@ -1,92 +1,139 @@
-Return-Path: <netdev+bounces-202526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00007AEE209
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 17:12:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A2F0AEE233
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 17:17:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E39A016BE1A
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 15:12:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 291717A717B
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 15:12:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48FFB28C5D9;
-	Mon, 30 Jun 2025 15:12:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCF5D28DEEC;
+	Mon, 30 Jun 2025 15:13:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OgoRlPs5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eVnM5hXu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1807E131E49;
-	Mon, 30 Jun 2025 15:12:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B3728DB58;
+	Mon, 30 Jun 2025 15:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751296344; cv=none; b=IWAnlXIGT+Q/SV4QtpZrEtw9/BcsJdWFtKbfYmtjD1Ynmv5mbg8y3HxZ4B0oXdB85Bd5KW0TFCl1CxAyqw2Bu+pjroOjDL9nqP0c1hKA+tJO2pCtBlwQehz2YoG0gWkZf7Gm3FijXLXFt86kJP4RX9H+fom8Ucr/EN79nbb/Ch4=
+	t=1751296418; cv=none; b=tA1u8eHjAZstURJGu3aJ33uwbJB23M7zMcBvMHu69GK1a2xTKEHb9hJ2xCQsvCWOcU4fkruR27B9AUeu5ruYVPrM9wOqI52n0y5YBtqnuMlpt/DL+R9Htjqxa5lvW2xn1HgVxGW5YyouTV+FImYAbZr88+Y4GUJhMfwCaMDwCoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751296344; c=relaxed/simple;
-	bh=vQ7MLkyR5CPwGHiWJj2+NB7J2sHwL9h4ZGqLqdgQX6k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G56+oBnnWerZaDOZq/F+zT9jTHc5xvPNa5285dftwb9R+2Lrv/f1IJJ9T6Msk+MTbalTiq2/is5s0q89JlmqtVpYjl++zTnjQ4l6+CD1U5xXrd4PyBXvO21klWT5axcvqSCbDGOVSSZiAuqDHQ39Zim4EIoxa42Qwyz1VTIhFkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OgoRlPs5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D784EC4CEE3;
-	Mon, 30 Jun 2025 15:12:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751296343;
-	bh=vQ7MLkyR5CPwGHiWJj2+NB7J2sHwL9h4ZGqLqdgQX6k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OgoRlPs5/saSRuriCeNt2MIQA4qNengUU0m34QLwInAgDUceqpsgwYDW40B15vmkd
-	 QRqrRJ/9DDucNM3IP8sgz9OLb5gmuscF9N7DzB0F3f4D3aVehl5XAphLSnAO5hz8ev
-	 PpUb+QJsei5egQ7hHd087ywmXz2SyXdL0whpGnnxU8iURN9ITknbREDUTL8/CMR74f
-	 perG+JHga0rXSSY9Dsddr+CUoy1Blr6oT8H95CX1yuyxKlvZ6Vj+3o7h+bpkc5kspo
-	 OQcFl62PZtrC8R5F3m/aeDLAudMmaubzihSTdcFmIOiIqBcYQ2ku29b/EHyFbFrqPg
-	 Y6F1UzWKbW+bQ==
-Date: Mon, 30 Jun 2025 08:12:22 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
-Cc: "alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>,
- "pctammela@mojatatu.com" <pctammela@mojatatu.com>, "horms@kernel.org"
- <horms@kernel.org>, "donald.hunter@gmail.com" <donald.hunter@gmail.com>,
- "xandfury@gmail.com" <xandfury@gmail.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "dave.taht@gmail.com" <dave.taht@gmail.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "jhs@mojatatu.com"
- <jhs@mojatatu.com>, "stephen@networkplumber.org"
- <stephen@networkplumber.org>, "xiyou.wangcong@gmail.com"
- <xiyou.wangcong@gmail.com>, "jiri@resnulli.us" <jiri@resnulli.us>,
- "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
- <edumazet@google.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "ast@fiberby.net" <ast@fiberby.net>, "liuhangbin@gmail.com"
- <liuhangbin@gmail.com>, "shuah@kernel.org" <shuah@kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "ij@kernel.org" <ij@kernel.org>, "ncardwell@google.com"
- <ncardwell@google.com>, "Koen De Schepper (Nokia)"
- <koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
- <g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
- <ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
- <mirja.kuehlewind@ericsson.com>, "cheshire@apple.com" <cheshire@apple.com>,
- "rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
- <Jason_Livingood@comcast.com>, "vidhi_goel@apple.com"
- <vidhi_goel@apple.com>
-Subject: Re: [PATCH v20 net-next 6/6] Documentation: netlink: specs: tc: Add
- DualPI2 specification
-Message-ID: <20250630081222.528202d5@kernel.org>
-In-Reply-To: <PAXPR07MB79842E86F802F227C79C05F6A347A@PAXPR07MB7984.eurprd07.prod.outlook.com>
-References: <20250621193331.16421-1-chia-yu.chang@nokia-bell-labs.com>
-	<20250621193331.16421-7-chia-yu.chang@nokia-bell-labs.com>
-	<20250627161930.385554c0@kernel.org>
-	<PAXPR07MB79842E86F802F227C79C05F6A347A@PAXPR07MB7984.eurprd07.prod.outlook.com>
+	s=arc-20240116; t=1751296418; c=relaxed/simple;
+	bh=k58GZuJHYrRAhM90IDPE06kWAdBsf2cIPBiCOV5OIrU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Tn8ebZSuAtPCogSevmU7v1SYGPA9NxmiPrEC5jMjzCua8TLUftsz06nxItfddbBDC7IsA8w5L1S4uPDfvHn2j9FiEylWHUUrPWfK8pBsUgzjYO1IqjP4KNjCoyPbFHa4oaiOOqF7vjhmuqjbrPlazJ1xQbJ6zTNOk3KvfFaZDqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eVnM5hXu; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7490acf57b9so1640330b3a.2;
+        Mon, 30 Jun 2025 08:13:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751296416; x=1751901216; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NlH2qMX5NPIfuMoovjH0+8ChqNtC7Dxioix+iTeV5vU=;
+        b=eVnM5hXugdFhPS/48DKqRjQxRbtOPzmXKCCMmVoGcPlzVJGDdDTfLHGOoLagPC8Rmq
+         1TUUZ4lebUD+sNmiRDpGVgrWMPecJJ95z9r1ot0+ta2wfyjqEtpxPJbKIvGP9yUBVxhk
+         LD5eihPEB6bsC046Fz1VhPQujg4G44ZBfln50z6S3OSVigoyBWTF796YGqQOJUt4AoOj
+         kr5+D37KnCywi74qiFMskCmBActtFonNKTrw12hvbPwt+VL23jT1wi3NXnqHmqqlCTXN
+         Ye4GFhfKvATCA5+jBipd1PPrjWoA6PEC0hoYHxOMuQVy8SFOBGtF/h3CaH5oaDloEi54
+         2kTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751296416; x=1751901216;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NlH2qMX5NPIfuMoovjH0+8ChqNtC7Dxioix+iTeV5vU=;
+        b=K+JQsG6l6gVrg2HpKqfe0iiiRFYL7srmhLwgpDd93ii6J+UUWTNttHXFdjqrfKkzZr
+         o2bzQi0ZlM4eoxhZwe4Bzt2ucbbbJx62e211iNudnpq1jH/Eycumq+j3uJiZDm2EQ+en
+         Sk66VbI34gdGJjv68iIFZTwT0wORK5gcyGTXMiGNM8CHBYtNgufHnXvjbw4T+IHpxLBd
+         sqdBh/EiDtrKR17Shq6Llx1KJPUKXJzdlBvkdtDxmvYLbWk0NoGlOfSCqx8CDKil7Joc
+         GWtfqTGGyMDdN2ik+Yy3vwy4ZCFuUDRycdPpQl6Hq9bNhQNZKOZG0Np4ZlyTGGbquiDd
+         nXHg==
+X-Forwarded-Encrypted: i=1; AJvYcCV4iGN4iNHnJ6mGnBSaqHSS6XpkGybt4l2qVfvHClszDPYlX1TUHVMpdUw8QTAL8ycvZ1FUGjQn/I6ghtnw@vger.kernel.org, AJvYcCX+PBLrTxfT5JZ9M/g8ZqKt5wVy4Zx9jsvib0WlpQpXv9qFMh2aFsvN3NeNzKfDDVcTtcg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAC80asjNCLmlfWbruBytAHSJbGzomzIa9gnmNXMkvzEMJlVcf
+	l8nZnUOgyEWiTB9zHroWvvTTx0ybmHiMIQ+RirwNJTYBsPD/v3LbJ3feqfTFNg==
+X-Gm-Gg: ASbGncvXwBBijW/AGU4Ep5vRdu5e1A1FWylxbD7PGVGgDrZwRFpx0wLe4e8tmaBPwMT
+	tY704A23JIgPX+m42AFZOJfeumZ8E9ildtSHxTTbzOBquB1eBWdZkio/RcNELBMS7Pde2b7qU5E
+	5RcbBRzozu2rAqwIsr5eJdKkHMNKA8baj1DNoxaPh/KR5gmhAwSYvout7kKL1qWi7tw8rs570J/
+	FGY6TQfiV2eNrjOsiudg0x+Xobw+EHzoaiYR2qbzcFx2H7f92ePKTf/i8zO74GEkeS9ZysJdxOR
+	kF8vCEct5GKTH6cfCEDNQP8Y4/jzdeph+Hw+OVPN5y+OvZfuufdYunPTcDXaZzoVjaCdsrULgf/
+	p0TEN65YELl4=
+X-Google-Smtp-Source: AGHT+IEHjdsV4PX3mnbaFgc3eupt/9KtFkjn673YTl/KgF76XdRC/TOJHwt51lirmUp+LYcjy0ZpgQ==
+X-Received: by 2002:a05:6a21:9ccb:b0:21c:f778:6736 with SMTP id adf61e73a8af0-220a16ebad9mr20642436637.27.1751296416016;
+        Mon, 30 Jun 2025 08:13:36 -0700 (PDT)
+Received: from minh.192.168.1.1 ([2001:ee0:4f0e:fb30:2f51:de71:60e:eca9])
+        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-b34e31bea17sm8323340a12.46.2025.06.30.08.13.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jun 2025 08:13:35 -0700 (PDT)
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Bui Quang Minh <minhquangbui99@gmail.com>
+Subject: [PATCH net v3 0/2] virtio-net: xsk: rx: fix the frame's length check
+Date: Mon, 30 Jun 2025 22:13:13 +0700
+Message-ID: <20250630151315.86722-1-minhquangbui99@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Sun, 29 Jun 2025 22:32:15 +0000 Chia-Yu Chang (Nokia) wrote:
-> I was thinking could we keep the same strucutre? As we already have
-> several rounds of review for both net-next and iproute2-next.
+Hi everyone,
 
-Not a valid argument, uAPI is forever.
+This series contains 2 patches for the zerocopy XDP receive path in virtio
+net
+- Patch 1: there is a difference between first buffer and the following
+buffers in this receive path. While the first buffer contains virtio
+header, the following ones do not. So the length of the remaining region
+for frame data is also different in 2 cases. The current maximum frame's
+length check is only correct for the following buffers not the first one.
+- Patch 2: no functional change. The tricky xdp->data adjustment due to
+the above difference is moved to buf_to_xdp() so that this helper contains
+all logic to build xdp_buff and the tricky adjustment does not scatter
+over different functions.
+
+Version 3 changes:
+- Patch 2: use xdp_prepare_buff helper to initialize xdp_buff
+
+Version 2 changes:
+- Patch 1: fix kdoc
+
+Thanks,
+Quang Minh.
+
+Bui Quang Minh (2):
+  virtio-net: xsk: rx: fix the frame's length check
+  virtio-net: xsk: rx: move the xdp->data adjustment to buf_to_xdp()
+
+ drivers/net/virtio_net.c | 33 +++++++++++++++++++++++++++------
+ 1 file changed, 27 insertions(+), 6 deletions(-)
+
+-- 
+2.43.0
+
 
