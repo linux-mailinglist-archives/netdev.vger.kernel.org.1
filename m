@@ -1,75 +1,77 @@
-Return-Path: <netdev+bounces-202649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4706EAEE7B3
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 21:43:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31078AEE7B2
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 21:43:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6A9A1BC287D
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 19:43:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1497C3A8649
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 19:43:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8AC2292B4D;
-	Mon, 30 Jun 2025 19:43:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32BC22E3B0E;
+	Mon, 30 Jun 2025 19:43:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EaYW5Pox"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dXJA7JVk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548BB23ABB1
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 19:43:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8344B28EA63
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 19:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751312600; cv=none; b=eejjh1GhusPnkuc5drs+i3jbi2f+IChtq7pEpaOK5KXI5dTS2sXhwA5bbgIIvMiPI4ie5o9WHvuYCiDyLJ+WiMLDwSHjDWVMhHscjfVt5vPsf7kIaNhTzK9SW8Tsj7qaz7I0biHUQa/FVFr9s+7PxEWUvyfzI9ljyQVsCmHZwwc=
+	t=1751312601; cv=none; b=AisFbYTI6/+Zfg2XIO0nMNtVy5D8oLZpxzDZClB/fLXXcdTi9ulWO0yUc0N8j2qlkHi6GfOxFKDcaxKJg42CyIReUMU0mvaSTl7Y220wG6PojZ/DARhza+0ta/EHX+MaO8lUuPKCMbmqz71nMxhv7gK4MLTSPEdwYhZYxguRWUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751312600; c=relaxed/simple;
-	bh=vglCAmp/XtqiKVOs6kO1PyXcNO1MMYPnV5bMxK0EyrI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K0zmTBSm4fg/ixcqzMC+nFLdF0qqYQbsmC39e2kmrt38DNu//S4RsQaV08KPVhsELdbtMk6k8ndPxIQ51Bs0XZqpDVpbvdR0DtPRy6t9oxvXD5G14S12dF7oQAWJuSAeM8uUqPDuDQpKQ+QrdMvLyfAqU30/UNPid7Wrx+cD3gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EaYW5Pox; arc=none smtp.client-ip=209.85.219.181
+	s=arc-20240116; t=1751312601; c=relaxed/simple;
+	bh=D9jqQaGbvVKBUijTmZ6CXZvkT1Skld/+JDsPAOQe4rc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hJlF+vmu3W4cpwTta++RFO9F62xqNUNtMATUQcXKiKMQJp6R0X4J6UxpdH4pt+xRDc3rKguV5W8JSvzzMKQjiYtzXVevakYrxnCdi9ZNBQF7zzv1RhQg+H8Rn854S5vYnBKhzfrgVTz4WqccTrpgLcjIdU5TESdlntWcEftMfEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dXJA7JVk; arc=none smtp.client-ip=209.85.128.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-e733e25bfc7so2166374276.3
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 12:43:18 -0700 (PDT)
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-70e302191a3so48552037b3.2
+        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 12:43:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751312597; x=1751917397; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=skJ3Mm0AIUR2CiTBtYkfersaKq1mjbDkMWFVEAf+jx0=;
-        b=EaYW5Pox07MrzHT3dpHsODjag89nzK53lKKxMmwTZ5nHcRH+ATyTrj+ubQMVRJIie6
-         xSkekfyk9xoL/EBbOqbdPmvg5VD4DOtoCYCsuqMOCaUb3bu4TySneh3N0q1gwdN77nfn
-         Gf2vC+xE1chyHXA0SteX5DeviBuMtfvvEft/JJXqW7ypIi1RxqQ3/lbIDMoHo3/G4d5b
-         tEQoYvesgemS1rdWi1UBJTkoRKfhr8CYTTimbkefENtqhqmU+PV93Ej/cnBxV9CoUlBy
-         T75g0ZlC3mwtd134eKETimBgchxmW4L/oTojlcLG4Ev6p5ZKiaKIlF1V8gIyt2wbrj4C
-         9HzQ==
+        d=gmail.com; s=20230601; t=1751312598; x=1751917398; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=laaBDXIT6luJUV05biWXU7/Zt7eiNpztDEtTLptVCqY=;
+        b=dXJA7JVklPD1FrbMitKOA+HV+gtdvq+WJnZ3T4gtlG0WhxKzxS9ylwQ4yKuyKEK1CC
+         7Wv9NZg9Oob0o0kbncVkf5GvSetsa5Zu8AC8dZxIoV57BHwphoEUtO4AhSSfk4Oni6qQ
+         kkcJ4cZuyu9ITack/KdUp0kCOGvzn/8HqWlzewhh4MzO/w8SA0mZtIXntATC7Q7G7W/z
+         pEimjcg+Nv5nrWId8laZIfU87Rcsz1wMLeUvNvku2KlB6WdWmMgNQLAQvKaegjhP+sdY
+         vzga25gNk50C4L3TC96NeGNaHgENk2eVvsk89uPACmcMEjjd7FULlVPi3dXJSu1vngqM
+         Oaaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751312597; x=1751917397;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=skJ3Mm0AIUR2CiTBtYkfersaKq1mjbDkMWFVEAf+jx0=;
-        b=k7CFNlxlkmhUpnHDFz6qZ2Oxvz5Nw1CxDNzdKEtc1MhGrmRqWWQDoyo4dY2wHoKZ0c
-         fedVjuXnTGcu5nsxtICuSBJqlXgiVirtKRSAqDg2mhsFBcgpM0sDmNoGupwb0FptQpmX
-         GmgxFuNezs0mG7l7sMcZCKBFRYiwUbL74SF1h1j/x10StUBnEhid6RDJXEyn5PxRJ2we
-         9B9QKOsB2IDYl0tOdsE70DxPFwdhB3++m+o65IcaOFP537NfLYten1HyW7oR/0e1Rn84
-         MyajD1wCiQZxfKkBn4qLTnzb2HfpUQitWh1KaIlRwBMFRVN6sWxnoV1hLx5GGnxAL1ij
-         vBuQ==
-X-Gm-Message-State: AOJu0YyigEhDYPHWz9QVPKh+CUZXh56qKBFK/95sUJjYTetVG18wAH4G
-	LRwxI7DsRHyHLUh41hAoZRwsT3TGKSgCRd9VbdHoKqLFL3cpC2TQYgAc1s0jbA==
-X-Gm-Gg: ASbGncuMMst1G+m1qQOuJcccc88ye9wNHY3rn+WrhlDUiYgM+AN7uPcH1LRgEicQJJy
-	Hudd56gJxn3J1UrDwjzOwZ2Gaf9mqcSJ2Bp5Te4T9r+H6pIXTJWCVectvJ0tfTxjuq9GWAuWFtX
-	GrNAznYdJ3p6ZkGAQ4+ZDuc2TS0hiOtE1ClsDelPuXQr7+Qp5CI7+C5rYYvLxIdisqC9ltMplM4
-	1sWB1475Qmf7XHj2ZydNZCtoVViS44hqaf++9xlQz8u8PbqHzyod+IyrsNPQWVpSePNpraJAkk8
-	cFOVRiu4nmGNcnBXNnAqCuoL18oXPwrGxVEQnueCRVwFZVIeRdoCOm7x+YjjQLcZHVNeAXVQb4S
-	IYwXvPo3rZhtRHNVQEgq1+GZG+V6M77bOHzP8SM2gFsbMz2VyrVe59WoFoUxzZA==
-X-Google-Smtp-Source: AGHT+IFUEU2Svc4SQalIl6BEpy4J37ZQJhQbXz25bvDmJ/vthg56uVgxvgZ4Em1PffUzuiDFt/i/Vw==
-X-Received: by 2002:a05:690c:fd0:b0:70e:2c7f:2ed4 with SMTP id 00721157ae682-715170b9004mr214989637b3.0.1751312597437;
-        Mon, 30 Jun 2025 12:43:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751312598; x=1751917398;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=laaBDXIT6luJUV05biWXU7/Zt7eiNpztDEtTLptVCqY=;
+        b=FhcEuWwXpUBZds5soUbJwigSKfugl/7OUClLpn2jRox69z3XpdCMUqrPbFJFHAxVOt
+         iSN1syjmxMtQPWmAfXI4ZCL13UhF0ydcfECQhFvBsuz5BA2S01EJuCfEsumvn2/UpQIM
+         c/DhTC9L2z0Bfi7sN1kBOQjJHKgI8T6KgiATyawzm8uxEYgkwg+SUCw85Xvu6tvh8yw4
+         PXIEvrsyCcPN29uzJwxjUaH763pjxqXGUl+Dh0qg3Dlz3QrekCLBP4Jlny+n2CuYJiGN
+         kqiaYDJx6vY7DhuSKiiV0U+gNJ3ZebS4ZQWrNrZYgO3vc3CuhICnKLrSUOO2MfN4am9d
+         RYHg==
+X-Gm-Message-State: AOJu0YxHPumiSUj9JFzqqnmDyOeyN9xHn9ef1aX6KQq8vK5f5ZK+Mwni
+	gc7HYZm8CGvJMYzUIxhtQu92TMCpdhQHvHvT/Q2+dDJkLpj/Z0f9Z64XPiMVTQ==
+X-Gm-Gg: ASbGncs7Aub9fwJ2yqmpJM6JCjI9DZtGKUU06N3nx2XTdEYLMofM7ds9BklihEcwc0D
+	K/h3388htD7f7XH8urFw0SJ9xD7DB2J3wEqgvQR+0zjELjXx8QiSpDqpyq/VRBeSAM/IQWyFzTd
+	6v9r1gUBZFNEbOxsbzWq0stoOYDczpVZnsnyRS4UrulTDzry7SOF+FzOAPZekLVmnnDfF2QtfJK
+	wjXs7umLrFD7Jh7/Cw07FdTe5U3yQx10Jr/MYlwSQ0b/m001KPOG3S/xGltQgypL1vXNMdJvtjt
+	+JWJTj8ykBF9/RG4HpRAWwXJE4jHTlww6BPvRd8aon8wm2Zlgim8Bu76a2RwBg1kgzO4hTBvKEO
+	AuqrBAdiwSMeqlh7iyPWX0YANfphoz4krTV14zqrTh3m0PAZ8Tkrh15sGS/8Fog==
+X-Google-Smtp-Source: AGHT+IGx5IFkVxGaO50oYB/ZEEc/KIxFtDxRIG/Euv3KUcmgEv6n+IcawH2OkHHV5YuxW1xpTfceXQ==
+X-Received: by 2002:a05:690c:6c0b:b0:70e:7638:a3a9 with SMTP id 00721157ae682-7151719250dmr223009377b3.18.1751312598106;
+        Mon, 30 Jun 2025 12:43:18 -0700 (PDT)
 Received: from willemb.c.googlers.com.com (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-71515cb2661sm16884177b3.85.2025.06.30.12.43.16
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-71515cb2661sm16884177b3.85.2025.06.30.12.43.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jun 2025 12:43:16 -0700 (PDT)
+        Mon, 30 Jun 2025 12:43:17 -0700 (PDT)
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -78,10 +80,12 @@ Cc: davem@davemloft.net,
 	pabeni@redhat.com,
 	horms@kernel.org,
 	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next 0/2] preserve MSG_ZEROCOPY with forwarding
-Date: Mon, 30 Jun 2025 15:42:10 -0400
-Message-ID: <20250630194312.1571410-1-willemdebruijn.kernel@gmail.com>
+Subject: [PATCH net-next 1/2] net: preserve MSG_ZEROCOPY with forwarding
+Date: Mon, 30 Jun 2025 15:42:11 -0400
+Message-ID: <20250630194312.1571410-2-willemdebruijn.kernel@gmail.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+In-Reply-To: <20250630194312.1571410-1-willemdebruijn.kernel@gmail.com>
+References: <20250630194312.1571410-1-willemdebruijn.kernel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,25 +96,73 @@ Content-Transfer-Encoding: 8bit
 
 From: Willem de Bruijn <willemb@google.com>
 
-Avoid false positive copying of zerocopy skb frags when entering the
-ingress path if the skb is not queued locally but forwarded.
+MSG_ZEROCOPY data must be copied before data is queued to local
+sockets, to avoid indefinite timeout until memory release.
 
-Patch 1 for more details and feature.
+This test is performed by skb_orphan_frags_rx, which is called when
+looping an egress skb to packet sockets, error queue or ingress path.
 
-Patch 2 converts the existing selftest to a pass/fail test and adds
-        coverage for this new feature.
+To preserve zerocopy for skbs that are looped to ingress but are then
+forwarded to an egress device rather than delivered locally, defer
+this last check until an skb enters the local IP receive path.
 
-Willem de Bruijn (2):
-  net: preserve MSG_ZEROCOPY with forwarding
-  selftest: net: extend msg_zerocopy test with forwarding
+This is analogous to existing behavior of skb_clear_delivery_time.
 
- net/core/dev.c                              |  2 -
- net/ipv4/ip_input.c                         |  6 ++
- net/ipv6/ip6_input.c                        |  7 ++
- tools/testing/selftests/net/msg_zerocopy.c  | 24 +++---
- tools/testing/selftests/net/msg_zerocopy.sh | 84 +++++++++++++++------
- 5 files changed, 90 insertions(+), 33 deletions(-)
+Signed-off-by: Willem de Bruijn <willemb@google.com>
+---
+ net/core/dev.c       | 2 --
+ net/ipv4/ip_input.c  | 6 ++++++
+ net/ipv6/ip6_input.c | 7 +++++++
+ 3 files changed, 13 insertions(+), 2 deletions(-)
 
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 7ee808eb068e..96d33dead604 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -5937,8 +5937,6 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
+ 	}
+ 
+ 	if (pt_prev) {
+-		if (unlikely(skb_orphan_frags_rx(skb, GFP_ATOMIC)))
+-			goto drop;
+ 		*ppt_prev = pt_prev;
+ 	} else {
+ drop:
+diff --git a/net/ipv4/ip_input.c b/net/ipv4/ip_input.c
+index 30a5e9460d00..f8696e67def4 100644
+--- a/net/ipv4/ip_input.c
++++ b/net/ipv4/ip_input.c
+@@ -226,6 +226,12 @@ void ip_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, int protocol)
+ 
+ static int ip_local_deliver_finish(struct net *net, struct sock *sk, struct sk_buff *skb)
+ {
++	if (unlikely(skb_orphan_frags_rx(skb, GFP_ATOMIC))) {
++		__IP_INC_STATS(net, IPSTATS_MIB_INDISCARDS);
++		kfree_skb_reason(skb, SKB_DROP_REASON_NOMEM);
++		return 0;
++	}
++
+ 	skb_clear_delivery_time(skb);
+ 	__skb_pull(skb, skb_network_header_len(skb));
+ 
+diff --git a/net/ipv6/ip6_input.c b/net/ipv6/ip6_input.c
+index 39da6a7ce5f1..0f7fddc89658 100644
+--- a/net/ipv6/ip6_input.c
++++ b/net/ipv6/ip6_input.c
+@@ -476,6 +476,13 @@ void ip6_protocol_deliver_rcu(struct net *net, struct sk_buff *skb, int nexthdr,
+ 
+ static int ip6_input_finish(struct net *net, struct sock *sk, struct sk_buff *skb)
+ {
++	if (unlikely(skb_orphan_frags_rx(skb, GFP_ATOMIC))) {
++		__IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)),
++				IPSTATS_MIB_INDISCARDS);
++		kfree_skb_reason(skb, SKB_DROP_REASON_NOMEM);
++		return 0;
++	}
++
+ 	skb_clear_delivery_time(skb);
+ 	ip6_protocol_deliver_rcu(net, skb, 0, false);
+ 
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
