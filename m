@@ -1,170 +1,179 @@
-Return-Path: <netdev+bounces-202332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97C1BAED610
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 09:47:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5CB8AED639
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 09:54:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6F8D16A060
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 07:47:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B41837A34AA
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 07:53:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54C3239E7F;
-	Mon, 30 Jun 2025 07:47:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F8423717C;
+	Mon, 30 Jun 2025 07:54:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z+07wnDG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VrrhH6Im"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1437A238178
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 07:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCBDC223338;
+	Mon, 30 Jun 2025 07:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751269641; cv=none; b=s0rLrzZ2v6Saw5c6Gvd0LenjS6dKlgBuZas+TPfm3Wuh1lNAOWxdc41KI2ybIJwdjXtdPZg8iRzPWhjHFcPiK87T4/jTJnGOXCyxDcJRnRR6tFZPqzO0SLho7LBQGLnaiWHTuYzI7nGSOcT9680/rYiwM+BJ0h4naNpl4cLombM=
+	t=1751270071; cv=none; b=Hr93khtI3XNhdscve+AaWiV11047MTWORn2hArS4SVyUSizF8H+/hWnBulifIfqvAyov3xrF3M+TZzDJLVsXFUGVbJxkYHfsSR2nNTTg1NdaRMUFMt+R/DGjorVK1tc7znn46bT/UgsCnanzELrXUbRiIeomMdGeb+dkHG9ZGF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751269641; c=relaxed/simple;
-	bh=3WCJLLv4RhnKEvcl21V/JHUYDcouCFwoRzhLS4CQ9mA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=etmKKVa7WWL7KdUeHJtEvJjnIAHT7Gw0aWWO0VQT+yNP/wjXkHreftVjBE8F9HYIlpybfZqkXUKQfwxpoNX+ciTqtiJlH/6zkmJoZ8/NgT5bczcIjew4UvBSpMWZkgiP/LPI/nIBtlsDnHBTtDBu6iKV4gmpf2DCtGnabLNxD9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z+07wnDG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751269638;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7ktNPhfijuEzODMwYTiQC+VuJwh6IE4+mAtetQ6pS/E=;
-	b=Z+07wnDGYHQgJxeMEr4EXfJz1TH1ZAArOBZS62ZwOzxrlGlRh5inm5P2ggNcfYjz4E87IX
-	Bf2on51Ldpem93qlp2Ag5kayZo++/5+7UUgALffPPusuNZRP3ZporDVEkdHaXl/Z2OZ9gc
-	A3Zva7xxlNt0a3uslcadP7s3oKelciY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-472-eizU6xHlNxy0m5h3GdFn1Q-1; Mon, 30 Jun 2025 03:47:17 -0400
-X-MC-Unique: eizU6xHlNxy0m5h3GdFn1Q-1
-X-Mimecast-MFC-AGG-ID: eizU6xHlNxy0m5h3GdFn1Q_1751269636
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a4ff581df3so1988103f8f.1
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 00:47:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751269636; x=1751874436;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1751270071; c=relaxed/simple;
+	bh=Qu4BKUUZZQUC3bM147FV56y9K9VT5HonDkFSvdwo1nU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Y5Z5enk0LLcIMCAhFIoMjmV32A8vVkuwh6nYEJnWjI6RKWF9sp/FInwL2xhku43tX1D8w2SB/q0xfhra+IqK/I8QGJG4/nywYUF/wnE2kYvtL8xExBZ4TPIgdr8KUDmnWXgqUkfUaGIbZFihHJ08w8oc5xRYxObGEG3XyGXS5Es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VrrhH6Im; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-235ef62066eso48502855ad.3;
+        Mon, 30 Jun 2025 00:54:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751270069; x=1751874869; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7ktNPhfijuEzODMwYTiQC+VuJwh6IE4+mAtetQ6pS/E=;
-        b=QmmLaUb5LxoM95kK2xnV6vxFBPZwVkj4rBCfpY8UEaJO0J449l+SBMuB53OaBiL/BR
-         hOWi5kukbjQR/i5QYkIfqcCna0AYbdoHkaeEW0PHWTvox3Mgka5Yed+HSC8aF37OjCfy
-         hkpBhfyYb6+zNxdSmmixl8NQntHS8XgLJbMjKYfXZdZgiDpElgJhx+XoyR+nYgvtVmgf
-         XaGOrAFnSF076DQp81VrEukQgF4CDmJw6fMsG7OIlL1IqoExQ/xZk0bZyv79/E7ENU8g
-         JCXDQ8Gk/M1Lw2MW+uE82CUHUgo1+3M1dlpGs4uBzNQx0vfIJiH7RKXGVeA6LwtjtL2Q
-         zPhw==
-X-Forwarded-Encrypted: i=1; AJvYcCWsK1Qs8BiSjRu5z/9YqdS0UuXPJU+qfuiUsY/9FA2BODFl5A4Stgc0lEJSbANPRMihoqiN7vw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPQdAY0wc95IA7WY0vdlv2cvhbFUmCOUdUoTG9DpZxzpyPRqke
-	J1sRzvvM39uWSX6nkJUmu9obDLMRJNsIWE6TPHgHQ2gmP4nqiL9K7+C06aTT1eujxmjOI7F7JgO
-	SdNq+VspQB4R8cDPRmNRHuAeDfp2QizqMKIZ+Uep9Kmm5ECVL6dOsiqemoQ==
-X-Gm-Gg: ASbGncvP45atoJKilVuoMMNtxuA4zbBe+V2Gj/O72/w4t6ePQU7vS3gMF1HPumNLwlO
-	2Sh32jkCFc7uSBpe2DLtaE8ForOAc42Sk2PxFp5thBS3Rf6M5C0tWEyzVdrTC0zZY4TyIhTu9eN
-	wrCz6VzRsvaCVZFAebOzufxEevllNKEi8i+gOhQyX+ljTb7UxewUxEEjk+z2WHNWXLbgY2Oofol
-	6rmd+UTeJToGq67BDQdtgWEU6oD0B4jCvqbOUErAKMiAKAq7SiIaK12fJah2mI516zOyELqLs0Y
-	E0uiBCakV1kNIp0QXRRNAP84Cc74
-X-Received: by 2002:a05:6000:418a:b0:3a4:f70d:aff0 with SMTP id ffacd0b85a97d-3a6f312df2bmr9022666f8f.14.1751269635646;
-        Mon, 30 Jun 2025 00:47:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGxPyEI4vtDCAHmMrt9Bgdg2700Ez6oVkN9Z1NlWqAtZ1aXzxk700hjPBCX6uj4jbe2vAmlKg==
-X-Received: by 2002:a05:6000:418a:b0:3a4:f70d:aff0 with SMTP id ffacd0b85a97d-3a6f312df2bmr9022638f8f.14.1751269635049;
-        Mon, 30 Jun 2025 00:47:15 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.177.127])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453814a6275sm105907065e9.1.2025.06.30.00.47.12
+        bh=2husDRPyYglRpELzS6mWxDDH6zO8JWO9HlqXQ8aytvQ=;
+        b=VrrhH6ImqmZKP7pSRzPDeOJNIqsCqix/iPzVVPDtCXKQETLMp9VhxDuZjWZV4LD6Hw
+         F5UPMwq1BYm3kf3RSRFiepqo36HF7KNcicE9SVw4gRJTcC0SSlX6gRsxZHw+7jLy98jS
+         hc/jtB4D2yZMYDlPmtMEN1b98oY3CtpkHMZNX5gmYowmV3VGjYfnYl75dPEUu0nasBgF
+         IuHMLpn8xFmjTwFeCY4UCvNqh846w1p3pVEw3sw9HisDN2Lty2AmfV8ATF8gr9wCqk/a
+         Onmsu9iKr7T1QJkl6DS5dj1W+99ijYcdT868kPZgdTkCMeJ6ii5VF/Gpfi0Jg2zcpKyA
+         WZdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751270069; x=1751874869;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2husDRPyYglRpELzS6mWxDDH6zO8JWO9HlqXQ8aytvQ=;
+        b=TNnEjj9nxDibkbtO/6fKDunOPULHFbonEnDhgyIX/TthPnILqFO066YYZTI9aMFio/
+         bAQl43I0RLZDFY3v/vC2OKqDNxL5Hp+FBn91Iven6yLJ8scgzeGvnWhPwDd0RUJezVyk
+         JxKvs/vL6gbt+weI7KEGIM60S12Li6/rznNVvNvKwsFvwVYFM/NDvEgoTP9e3Dp3YbHI
+         if687fcDShwX1XlZ5fvzV7TqsfywB8bqlSX3jHzms6X+KnJhwpRP3aqrAswKw9waFZrp
+         FZDrVLxI/SCJvLqwH/1mMxZR1jb3c9aE2mljIbLKaET5U6jE0WklAD5MNcn5GfjhRj6o
+         Gq3w==
+X-Forwarded-Encrypted: i=1; AJvYcCUJWzRlqLQtDQRA9RJLoDJiUcKxbXrCWBAMvoaSqT4cwoCyoJ91mvgEYe6kIBgPrFWbZ6I=@vger.kernel.org, AJvYcCWf+5uU5128P4yzE7JTcCLA7VgFMa6JnWxdSmHVSnvFft64XcbaXkiXO0znyPwX2uYr8NiWyjl7UGHO2u6e@vger.kernel.org, AJvYcCXApddKkju3JrQ3mhuMbTjvuwtksrPKpw87MioDbdr4s4E2ulUs3UqjgKaUs+QkRWgoIYftlio8@vger.kernel.org
+X-Gm-Message-State: AOJu0Yygv19yRnHtjfHF63ILU1leaOnqqE8bm8Cji9I1dbCHS4RCGErH
+	7171bTSPL5z7IfpLhEKBy4x7/5vqEPwQc2BoUxLCK7TLqtEtYOGmecIs
+X-Gm-Gg: ASbGncv4/L6mOyEZX0AbjqsOMxJCy4A3UgK5LNbSnjWfR7Aphl+db1hzE37S+a+ibg0
+	oKBKZxYe4/W1EdXSD0adRUr9uiGamTTfrMJ0Zs0+ttW5H9J0L2VXAtzt6sK9VO79kQlUWtnLvea
+	MjlRwyB6YBVwVujB4HogGC6SQEnrCuKwrEMX50+Ns5ta4DTBG64gQsdgAeztVnQAHbWVFGvMWoz
+	B0qb46Qx+/dkhnIIVzhGVk1qF+ZrUvD9at+NYaDkp8TTn3VRIWndn7BbptuJBuZvbhLsZl0mNym
+	/KudONCBXqYbZgPY1CBk1px20Vufm6l686eR120v+M1OXKEdk3vKIggWChFKKF1jh3AKiccwb16
+	hC6mUT/Yh
+X-Google-Smtp-Source: AGHT+IEZr3xbQKLTkP0IjxZrSMRNxBeFyMR2/3Jbw4FnoAZ37eaI6AARNvB9QQwQ1MQVoMMLZszg1A==
+X-Received: by 2002:a17:902:e746:b0:234:d292:be7a with SMTP id d9443c01a7336-23ac3bffdbdmr186477195ad.1.1751270069004;
+        Mon, 30 Jun 2025 00:54:29 -0700 (PDT)
+Received: from devant.antgroup-inc.local ([47.89.83.0])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-315f544050csm13450541a91.42.2025.06.30.00.54.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jun 2025 00:47:14 -0700 (PDT)
-Date: Mon, 30 Jun 2025 09:47:06 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Xuewei Niu <niuxuewei97@gmail.com>
-Cc: mst@redhat.com, pabeni@redhat.com, jasowang@redhat.com, 
-	xuanzhuo@linux.alibaba.com, davem@davemloft.net, netdev@vger.kernel.org, stefanha@redhat.com, 
-	leonardi@redhat.com, decui@microsoft.com, virtualization@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, fupan.lfp@antgroup.com, 
-	Xuewei Niu <niuxuewei.nxw@antgroup.com>
-Subject: Re: [PATCH net-next v4 0/3] vsock: Introduce SIOCINQ ioctl support
-Message-ID: <gv5ovr6b4jsesqkrojp7xqd6ihgnxdycmohydbndligdjfrotz@bdauudix7zoq>
-References: <20250630073827.208576-1-niuxuewei.nxw@antgroup.com>
+        Mon, 30 Jun 2025 00:54:28 -0700 (PDT)
+From: Xuewei Niu <niuxuewei97@gmail.com>
+X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+To: sgarzare@redhat.com
+Cc: davem@davemloft.net,
+	decui@microsoft.com,
+	fupan.lfp@antgroup.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	leonardi@redhat.com,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	netdev@vger.kernel.org,
+	niuxuewei.nxw@antgroup.com,
+	niuxuewei97@gmail.com,
+	pabeni@redhat.com,
+	stefanha@redhat.com,
+	virtualization@lists.linux.dev,
+	xuanzhuo@linux.alibaba.com
+Subject: [PATCH net-next v4 0/3] vsock: Introduce SIOCINQ ioctl support
+Date: Mon, 30 Jun 2025 15:54:11 +0800
+Message-Id: <20250630075411.209928-1-niuxuewei.nxw@antgroup.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <gv5ovr6b4jsesqkrojp7xqd6ihgnxdycmohydbndligdjfrotz@bdauudix7zoq>
+References: <gv5ovr6b4jsesqkrojp7xqd6ihgnxdycmohydbndligdjfrotz@bdauudix7zoq>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250630073827.208576-1-niuxuewei.nxw@antgroup.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 30, 2025 at 03:38:24PM +0800, Xuewei Niu wrote:
->Introduce SIOCINQ ioctl support for vsock, indicating the length of unread
->bytes.
+> On Mon, Jun 30, 2025 at 03:38:24PM +0800, Xuewei Niu wrote:
+> >Introduce SIOCINQ ioctl support for vsock, indicating the length of unread
+> >bytes.
+> 
+> I think something went wrong with this version of the series, because I 
+> don't see the patch introducing support for SIOCINQ ioctl in af_vsock.c, 
+> or did I miss something?
 
-I think something went wrong with this version of the series, because I 
-don't see the patch introducing support for SIOCINQ ioctl in af_vsock.c, 
-or did I miss something?
+Oh yes. Since adding a patch for hyper-v, I forgot to update the `git
+format-patch` command...
+
+Please ignore this patchset and I'll resend a new one.
 
 Thanks,
-Stefano
+Xuewei
 
->
->Similar with SIOCOUTQ ioctl, the information is transport-dependent.
->
->The first patch adds SIOCINQ ioctl support in AF_VSOCK.
->
->Thanks to @dexuan, the second patch is to fix the issue where hyper-v
->`hvs_stream_has_data()` doesn't return the readable bytes.
->
->The third patch wraps the ioctl into `ioctl_int()`, which implements a
->retry mechanism to prevent immediate failure.
->
->The last one adds two test cases to check the functionality. The changes
->have been tested, and the results are as expected.
->
->Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
->
->--
->
->v1->v2:
->https://lore.kernel.org/lkml/20250519070649.3063874-1-niuxuewei.nxw@antgroup.com/
->- Use net-next tree.
->- Reuse `rx_bytes` to count unread bytes.
->- Wrap ioctl syscall with an int pointer argument to implement a retry
->  mechanism.
->
->v2->v3:
->https://lore.kernel.org/netdev/20250613031152.1076725-1-niuxuewei.nxw@antgroup.com/
->- Update commit messages following the guidelines
->- Remove `unread_bytes` callback and reuse `vsock_stream_has_data()`
->- Move the tests to the end of array
->- Split the refactoring patch
->- Include <sys/ioctl.h> in the util.c
->
->v3->v4:
->https://lore.kernel.org/netdev/20250617045347.1233128-1-niuxuewei.nxw@antgroup.com/
->- Hyper-v `hvs_stream_has_data()` returns the readable bytes
->- Skip testing the null value for `actual` (int pointer)
->- Rename `ioctl_int()` to `vsock_ioctl_int()`
->- Fix a typo and a format issue in comments
->- Remove the `RECEIVED` barrier.
->- The return type of `vsock_ioctl_int()` has been changed to bool
->
->Xuewei Niu (3):
->  hv_sock: Return the readable bytes in hvs_stream_has_data()
->  test/vsock: Add retry mechanism to ioctl wrapper
->  test/vsock: Add ioctl SIOCINQ tests
->
-> net/vmw_vsock/hyperv_transport.c | 16 +++++--
-> tools/testing/vsock/util.c       | 32 +++++++++----
-> tools/testing/vsock/util.h       |  1 +
-> tools/testing/vsock/vsock_test.c | 80 ++++++++++++++++++++++++++++++++
-> 4 files changed, 117 insertions(+), 12 deletions(-)
->
->-- 
->2.34.1
->
-
+> >Similar with SIOCOUTQ ioctl, the information is transport-dependent.
+> >
+> >The first patch adds SIOCINQ ioctl support in AF_VSOCK.
+> >
+> >Thanks to @dexuan, the second patch is to fix the issue where hyper-v
+> >`hvs_stream_has_data()` doesn't return the readable bytes.
+> >
+> >The third patch wraps the ioctl into `ioctl_int()`, which implements a
+> >retry mechanism to prevent immediate failure.
+> >
+> >The last one adds two test cases to check the functionality. The changes
+> >have been tested, and the results are as expected.
+> >
+> >Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+> >
+> >--
+> >
+> >v1->v2:
+> >https://lore.kernel.org/lkml/20250519070649.3063874-1-niuxuewei.nxw@antgroup.com/
+> >- Use net-next tree.
+> >- Reuse `rx_bytes` to count unread bytes.
+> >- Wrap ioctl syscall with an int pointer argument to implement a retry
+> >  mechanism.
+> >
+> >v2->v3:
+> >https://lore.kernel.org/netdev/20250613031152.1076725-1-niuxuewei.nxw@antgroup.com/
+> >- Update commit messages following the guidelines
+> >- Remove `unread_bytes` callback and reuse `vsock_stream_has_data()`
+> >- Move the tests to the end of array
+> >- Split the refactoring patch
+> >- Include <sys/ioctl.h> in the util.c
+> >
+> >v3->v4:
+> >https://lore.kernel.org/netdev/20250617045347.1233128-1-niuxuewei.nxw@antgroup.com/
+> >- Hyper-v `hvs_stream_has_data()` returns the readable bytes
+> >- Skip testing the null value for `actual` (int pointer)
+> >- Rename `ioctl_int()` to `vsock_ioctl_int()`
+> >- Fix a typo and a format issue in comments
+> >- Remove the `RECEIVED` barrier.
+> >- The return type of `vsock_ioctl_int()` has been changed to bool
+> >
+> >Xuewei Niu (3):
+> >  hv_sock: Return the readable bytes in hvs_stream_has_data()
+> >  test/vsock: Add retry mechanism to ioctl wrapper
+> >  test/vsock: Add ioctl SIOCINQ tests
+> >
+> > net/vmw_vsock/hyperv_transport.c | 16 +++++--
+> > tools/testing/vsock/util.c       | 32 +++++++++----
+> > tools/testing/vsock/util.h       |  1 +
+> > tools/testing/vsock/vsock_test.c | 80 ++++++++++++++++++++++++++++++++
+> > 4 files changed, 117 insertions(+), 12 deletions(-)
+> >
+> >-- 
+> >2.34.1
+> >
 
