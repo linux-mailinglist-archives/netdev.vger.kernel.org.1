@@ -1,199 +1,307 @@
-Return-Path: <netdev+bounces-202554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90437AEE447
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 18:22:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A69A1AEE433
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 18:21:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEE511BC149A
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 16:15:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2357C3AB89B
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 16:16:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5E92293C6E;
-	Mon, 30 Jun 2025 16:12:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C01F8290080;
+	Mon, 30 Jun 2025 16:16:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sAYQNAgd"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="e7gOXzxY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AS8PR03CU001.outbound.protection.outlook.com (mail-westeuropeazon11012047.outbound.protection.outlook.com [52.101.71.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ADB329344F
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 16:12:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751299929; cv=none; b=DEMozOdtvbHOSQOoFnOWLu7WxYSskpJDjbrf5vj7StRefM+zQ1Y+K2uwNC0cs5RNqesUgi/Ojg3rOlop3Nq3oSaXchnHx/wcTst+Y6vrgo0OqxhigtYw9k6wpV8TjXR5H0MNjQT1qB/gLN/LumA8kf3vFDwznWa35z0QcFNRcYc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751299929; c=relaxed/simple;
-	bh=PCJyNTLH7Jg8C1gYIlHHucvSuf2Gopz4c8HoJCfZMJA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NsYzkTUPsRZTTip6a2DCHOoGXpog/e5pYNYOWF2ejAxhMWCynvphz3izycz38AtEZX8Cs/a3PJJ+mBmh6a4kRI3X8FG9GQFZVID0iJrFdW4G/kXWw8lnDFlhlOI7QVCq7CCDFcKRihuTIZVvlmlFNrJ4wMJDkQx14M5e4JbUafo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sAYQNAgd; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-237f270513bso322205ad.1
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 09:12:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751299927; x=1751904727; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l7BxjnsxuOM0CL9z4MQbMFwea7KaqP5DI3gVwQBqPDc=;
-        b=sAYQNAgds0BBHLJt71i2huOT84gbJrDQour+xPGRXkC2gYCRNX2RE9KyoaiKN9WAW8
-         VrG93U7+B03DsX5Od3Rwbo7nrdAI6YgegnqD9riAB2jzckUWnuWR6iIkCe7i1pSSXbTv
-         qMTARPxFz1Ud2IfHgC+Rn7nDzNfjdoqqIIO/rAddo5z3IHix+62Jgce+pZg3bK5NydSE
-         NgkwkRSx82bsQ+Ts2tULbm2D5jvqsJQdkkqx+rN/SS/Z5QRsAgqlQDWG7I8kb8YE+WeA
-         k6toSk99zqCwUyYd14BEBeDExYCtMIX8WNs4XsZPT7uACxh0ism84rcV/5GiO0b7YY8W
-         /yqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751299927; x=1751904727;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l7BxjnsxuOM0CL9z4MQbMFwea7KaqP5DI3gVwQBqPDc=;
-        b=qsROSFmHF3CwaP/Dx8ws00HhyHEU+XXWKf04oLXyRMgO1ZK2N1oIt4pwH/2jvIYDmF
-         dgvduC2l0aIko4aFLaBhrKXj3ClR725ho54cv3Iq+3NvAAnUHTUGhVC9nRJ87KC+Xy28
-         u0UtI6TimglA6qbYj64x1EWo3Y7WNcPFYPLRrRWnwVnntY39JGQrll3zDFi2qmwDxeMF
-         rVCFCziYrZbjdAX8serWfxdsXNNUyJoP8q8deaZBNV/ZLVEfi6rwDbR8/ahMl3uMeYpH
-         awLCFQLQoTHnTEl+N1Sn1DdIgevmdwoCXqY05nrVmATLlIKdXnMu0H2v9mIRoP/DPz3O
-         qNjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUurqowdNMw2b9CT7rDfbq9oy8x1n6p55x61gabKxvBzsNOsbajNBeKwoHlsLhipunjXmWgLOM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrQC1gv82bA5FtIS6h57h7sVt+zFbSrQMpDVC4iTMnbHG3ZKuO
-	CegAsPD93mC402uuXevTF7c+6tbAmmxMV/s26MPUJR7V/BRTeGDd69NV5hW73mvw5GhSRBOCc1r
-	PhrD2oKxJhkRcPgt3QYP/QElnvYGj5762IBleeSiK
-X-Gm-Gg: ASbGnctB8caDYgUFkulCFvx0P9FnlTy+uQFTt5gVPcVrahwVAoJftzjaePIZnxQsQaq
-	1vfjPTaYkXOp2bKDq0s25fnwwhNQ3d1Ya4+A5s5WCoI9Ure8F6j8PXv3S7RmWJpTr8IWOG0wJdi
-	AayGoPl+SZAGicR92+1bZQOjqS2NXc7sYhVV+FN9tnNKBC
-X-Google-Smtp-Source: AGHT+IF8J0J76MOIb3DZGKGp4t47LLfeSRmXENjgq0heD66UgbUhctGKXAPxwJn9vBXMNX32PWRCS+R2LlHZQ5u+jBA=
-X-Received: by 2002:a17:902:c40d:b0:235:e1fa:1fbc with SMTP id
- d9443c01a7336-23ae8d6e607mr5216235ad.0.1751299926903; Mon, 30 Jun 2025
- 09:12:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD6128DB68;
+	Mon, 30 Jun 2025 16:16:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.71.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751300192; cv=fail; b=Dfuj7Joypl4uiwojuPDSA1tC463C9vHQk8B189ozo9M2IX77KejWn57+zU4+Je65j48CEGtuXNa/iyc0p3qJyTdIXhgCMyAieIOHAkzr0sOEm/2CYba5WvBgOLBmynQunsqCgZjLr4UFGMdF3ltIibU+Wl0LXL0QtYlQFXNper4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751300192; c=relaxed/simple;
+	bh=9yqiV2i0/bHt53RUon3EyIajOAPHTuaR5Ujyua+iW4A=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=m7FYwaIL3dyd5Ey7hhAtcPi+DOuvpuRwgc9aotFB/rJFXDikAVbWb7YaXhcQnArWPox2rV0qFHuAL91xGdvqDrm36xwB++vH5RL2adurnefKU1LlZ8ROPz7rkz1dIV15y0FDqqvOtRPZ+NRcA/oCnWKoNqjWxCprXGG+/zIG8tQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=e7gOXzxY; arc=fail smtp.client-ip=52.101.71.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ryrFweWi/8DzJxSNquGXnjgw9kCcqg5Xa360r4T2S/uxy7TxJtnZdHgR625XwL5rjUxrx/i9lWDP7OoFPF0Tua6M0KQuCv2t1V5xWbkUb+XgurX6gqEkI56gq7zfNsjj22IvfvnIzf14jDIRcQT2zlkTiv0KY4CfcV3JEP4WRUaEbfguPk46W5JODEomoe9gn8iJFYBbKM7Hl03iNcvQTc8dORUyezkbndZ8O1026RBTve86LTdIbir/K9YwugPSxzJmjZbbl1nbDWTe42SWUrhnpxXmvsVz0gQIFcQRdw1bFydMU/OkFEjeirMg8xThibyfNwVnR3guZj21mx13Pw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XHISNHExruPOttpTn5np1SevZGH2TmNOTks1P4rz9so=;
+ b=oMfry2JUWPOW/uzKp9mwphNTaYuPAXJbpX+M0iVXeNQk7Ah8ODPBqnvRA/cWw5OdXPhrUXZS+HAcDvZsjH+ILmDJKr5TWy1633oKGijUvEeubA/zO39W2A79YyVGnFXR2v6DHTphN+BGwsz47yVF8JNeU96uNgHQCqIA8vUBeuUILcjVyEc4Y9B3WK1Gn5IdZL9qORbpzeQnzMJf7L0qFid123mJjqUMWgzGVYABO69VbntSVY6xPjPwcdHWCrmF3LCLuwpauermgNLDGLifP0EIt6w4AWrjVwx2tCala5whVTGlhFK0tfNYdTORnCKsB3D/1wAc1DRO3LMUZLr6RA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XHISNHExruPOttpTn5np1SevZGH2TmNOTks1P4rz9so=;
+ b=e7gOXzxYVZjB53PgpFpFkMYYdTySxIE2mrUs+L16bWuZ6GmE0QN2Vu8jCphWblgcbE76suuea2QA7eiDuSH75qUv0xIFwgT4nOJBVsagsSoi2TlHDxO8dlXM1q4imRx33UnTR3hX0hjf+ChpEeqzsb6fmyNbZ+jJf/yInNq6z+mXLOYDmep+DXfcaXG7nj2s72v4x/lCiewDfiVXpq3R7DZOSlFkZlSFiCWuGczjyCPDk5rAEUSVfuMGvKm/8uCnHd3SxS9yr062S5033g4MvDOSAVgaM+hIZoJVSFDTE9FrnSl7+xApn1W9rjRsLTFDxMqCZnBg7ZkTNLz0L1JIeA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DB9PR04MB9626.eurprd04.prod.outlook.com (2603:10a6:10:309::18)
+ by PA4PR04MB7839.eurprd04.prod.outlook.com (2603:10a6:102:c9::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.31; Mon, 30 Jun
+ 2025 16:16:27 +0000
+Received: from DB9PR04MB9626.eurprd04.prod.outlook.com
+ ([fe80::e81:b393:ebc5:bc3d]) by DB9PR04MB9626.eurprd04.prod.outlook.com
+ ([fe80::e81:b393:ebc5:bc3d%4]) with mapi id 15.20.8880.027; Mon, 30 Jun 2025
+ 16:16:27 +0000
+From: Frank Li <Frank.Li@nxp.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS),
+	linux-kernel@vger.kernel.org (open list)
+Cc: imx@lists.linux.dev,
+	vz@mleia.com
+Subject: [PATCH v2 1/1] dt-bindings: net: convert nxp,lpc1850-dwmac.txt to yaml format
+Date: Mon, 30 Jun 2025 12:16:12 -0400
+Message-Id: <20250630161613.2838039-1-Frank.Li@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AS4PR09CA0021.eurprd09.prod.outlook.com
+ (2603:10a6:20b:5d4::19) To DB9PR04MB9626.eurprd04.prod.outlook.com
+ (2603:10a6:10:309::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250630092818.1449599-1-ap420073@gmail.com>
-In-Reply-To: <20250630092818.1449599-1-ap420073@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 30 Jun 2025 09:11:53 -0700
-X-Gm-Features: Ac12FXzO9s36LkozDrT_BcqjTROlBBiE_WqB--UMdgwaC2la8YC3Lyb0q4yomdE
-Message-ID: <CAHS8izN9CWwwUk0tfDy1iGrfwYLTD9paiF622jP4z4mgD844uw@mail.gmail.com>
-Subject: Re: [PATCH net-next] selftests: devmem: configure HDS threshold
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, andrew+netdev@lunn.ch, shuah@kernel.org, sdf@fomichev.me, 
-	jdamato@fastly.com, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB9PR04MB9626:EE_|PA4PR04MB7839:EE_
+X-MS-Office365-Filtering-Correlation-Id: dd6bf146-5a91-4e45-f00a-08ddb7f176f9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|7416014|52116014|376014|19092799006|921020|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?cBKOjYcX1G81nDUy+ZaBbH39OO1UA52rsgVJeFqSUlYWHMJT7Xfc3XBH642T?=
+ =?us-ascii?Q?mArpukmQO7LNAjfCq8M1jEuv+fXBganaUHgS0fa67WXlzYY6mmS3C/6KQYZB?=
+ =?us-ascii?Q?O0yM3nLZ7UHwmI/JPM9EGR8V6UVX5O7KzwDx0NqrbP6C8yptnxDD3kZXp4jL?=
+ =?us-ascii?Q?RbCkeJ+qVb2jAiIYMgkwnzbv7kK7KCHX1nFv2mMvmXyVmMMurG2L1d36c0aR?=
+ =?us-ascii?Q?Z7h9YiZDioo51uO20Mgm1KBW/6bA3vHwkb3hc80TzId1545TNcilfOV5DirU?=
+ =?us-ascii?Q?+GpGv27xymW6r0lmphf09QN/nj3otD7CExciwg0gLsEEHf3I1jKekCRIQ/ft?=
+ =?us-ascii?Q?zYm+UwF1B8dr15ncinup1dxIGnGDDTx3QtjyzShb2LYLVcdPHJaQvB70L35n?=
+ =?us-ascii?Q?oQg/xquqrs1SK04QXdJjQ1T8xmmo5z2dA5wxVxqAHP/KpZNsY2nU/HiPNrYJ?=
+ =?us-ascii?Q?fxhswqW11T3P6GEgWHfiQ7vnr/1hp+FBeMq+rstBmF3qksp30DEbeC2RhlKA?=
+ =?us-ascii?Q?7Xkg8eB2vONQa7h/7/V7s4KPjsO/ZYCTqGLNxfZvGZBPcpL9XAcFZnlf8kZS?=
+ =?us-ascii?Q?367sba8hhzCYeDPYHJaYGcRrLffHkQYd3Znf3vykDCBD3W1mNrRLxAG+OHWk?=
+ =?us-ascii?Q?lSjO20dHFUFVrnCxo1CagvOxW9ZifUbSnoKLv2dNHVma9a19M9aXbKs8y+qJ?=
+ =?us-ascii?Q?RwFqfedJgljcP5Px8L5F/RC55l4XOcYTiQPRZGyeb3Q0QMzA5GwOSB13v/dM?=
+ =?us-ascii?Q?td7Et2JymLGG1VJ0pbOsL0vfh6XXTImU7MWXW6kb9yR3QfkxwyzfouqYm4DP?=
+ =?us-ascii?Q?Lv7uho04bKpydqvsDX9OQbXI063HZdM9tUjwVUnZFgnrQIhBedjHxcbq1/dU?=
+ =?us-ascii?Q?qpcDO8FwA4HVDS6/Erc4KlMJqHrx+86ROCCAMvaT+D7ye/O6pf462PoH6lDO?=
+ =?us-ascii?Q?LEoAqyIGp5iVzTJ+FVJON+tp3iqsMbcmPUe6seEqUGOJvNBhUfDhhYXDG9tb?=
+ =?us-ascii?Q?tFw+Vkeuj/X6G4UgeDOoOxTYGjiOZ5FN/4WYhaNA9tQdXw2hmEQQX8yQQde+?=
+ =?us-ascii?Q?/h7R9M3QB9nVuJBOjiYICVIT8DCpHNkA1sVA3AjKQFjrPhAYRnNt/ISm4NxY?=
+ =?us-ascii?Q?GgHYhYO+z0ikircdwiyVgs8emX9wUp8LuKHQL7ku3JUC4e3wetaSYCAU7PQz?=
+ =?us-ascii?Q?y2fuQuMGGPRZOgTxPW3NnDHKi5wWbmy/IErf8RMwS/43szuwvW/oLke9ddMB?=
+ =?us-ascii?Q?mwwU/WJCO0Veq7TLpLUXJ12NJXzyOuwK1l/6rJUmjR0imSCyf+xdwCSklK6/?=
+ =?us-ascii?Q?+5YcPvoNTvNaeLknqLOJ1h/Xz2n6oAsQRrGhXLGpB53ON1A8rDKXaSexp1nz?=
+ =?us-ascii?Q?sYyv+ZXp8hKlGMu72bMrvQHgreRHoqx0jJav6GHFxV0KOQ4P+gwjcmzhI8JW?=
+ =?us-ascii?Q?ukGgqJzyM4hRjQO/bI4mWW0b2fwdnNM4?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR04MB9626.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(52116014)(376014)(19092799006)(921020)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?50u4TyvTxUosPhw/7+AWKQ3V6UU4IrqAovxRCZKQym1XOfCE4ljaDPDiUTeh?=
+ =?us-ascii?Q?A3rnah0U0ioMXjvzrfjs5MyRT9NRyS2iHuGihlxcLL6XJ1aF9UBHvjpZASM1?=
+ =?us-ascii?Q?6BF+W13uh62IWh9CzAma2HBzY4HxxVeOJjSMv05RA7ZuDp1v3bv7oHaNYlX3?=
+ =?us-ascii?Q?8JcE+2M28cm3pFBqGwILxd6ZR4lMhFOBwcObxqIhOqTVbf5a7dz3Gam/7RiV?=
+ =?us-ascii?Q?x8Q48OoBLlENSmvhanE+RK8P5qPPyIV7gtG97bz9XGLtAFfuZNGZqwR2Ok3V?=
+ =?us-ascii?Q?KLlouv22lcgK5yqKhuzmQ48YxW9ZzIxE3bEbgVy59LaelMCNROjf3gCWdGLb?=
+ =?us-ascii?Q?R2PeriQbnaR7/4kJuo2ptqqIPEWN0ATNvkpWTftjgxXABMeBjrYbOUaES9ob?=
+ =?us-ascii?Q?Pwwe4aL4yzZTNh6EDKdGNUzqC7oNc4X3CQf7zRG3NaP4fGV9ILupa61KKYAo?=
+ =?us-ascii?Q?pn7Ll9cDJ8LZQNB3sA+/7Z7AmozIb7DhOc1cNwigZ+joegOoKmbB/PjAV4rf?=
+ =?us-ascii?Q?ej6UXm8HzFyCDfsgRxa/LX3N8FFI/svclAgCiZAPoegnEVBsWBXH+hLon3GO?=
+ =?us-ascii?Q?UdASN2S+bCT0Yh58A3UqLhWyOVnAsSZJvzWV417yTrrWy31WJC3yroHE/bhS?=
+ =?us-ascii?Q?6Fw9CUGwS5WL0gN6BxK14GHKZGuBsrYXkf4NWbUJZGdEY0dRvhSPObGXeYPW?=
+ =?us-ascii?Q?wRCGVQjNh96I2Ki143HSuW8JzIH+UwtVMyDHe75hQqwfVgq6R6p8yns53xGl?=
+ =?us-ascii?Q?Y2fCAdsUwvQsw2nEQMy1b2sQpw3myitE5JeZUA6AUfhFatr0KwnCwt3689di?=
+ =?us-ascii?Q?P4UHMR9/WIDnT/c7JidpSEzKuAAO6aOYbK6GvOEK49FuLhDPuv3NpOlOYvyy?=
+ =?us-ascii?Q?bi4s6NfM4YNd3WWnH4hyn6f2S43c+OGiG56ZGU5bGtKFQgZdHkJsIJzk/rqk?=
+ =?us-ascii?Q?Vy3CDLcrZP8DiURPvLS6MFVGFhlFhInUUux8cDMFFVyYTf1HXZ6IjqupZhRv?=
+ =?us-ascii?Q?6++ufnt/8Bdb63SSAuk3McRa23104jBPxQNXFVleNVav3KoxfOTXKQxoDSyq?=
+ =?us-ascii?Q?qfE26JyJZb74SWSrdbqivqDkLoArPCzOYuRIE23az5rHimgRftxHpLKNuJEr?=
+ =?us-ascii?Q?ROY5aK0SJQ/AO7DxR1w+5611+7Va8uu3FurSu1UtMt2CHCcxz4WmKOct1DL5?=
+ =?us-ascii?Q?LNp6UFoVv9kVRYTafU2WNVAtDIW72/JOj8ArPeIVwZKMz4pLzYjnpr7eY4vF?=
+ =?us-ascii?Q?N8uOJHHtAZCPzzyVlGQESUeNFpZ7Lsps9cifqc419UOzKnoaQX7zpOBkXIKw?=
+ =?us-ascii?Q?qzYMrrtxFYHRAS1t/liV1GQTQjaIQDkZ2wUdn+tjugYmS0QnuoH0SFecDAgM?=
+ =?us-ascii?Q?jC+JapDD3rW1BdxG42JwjbwZdU53ZP+0NrNX1m8AMPSGgRy2CkrtwVEdJTX0?=
+ =?us-ascii?Q?ZkV25xriWR9Fm8sX6vg/xNRCX6vO4ko50voCrPWVTGHb7vCfrNEbz0KK76sm?=
+ =?us-ascii?Q?ctLy8fhTVOLPpmRSFF30WMKtPU1D4/L+W5DYQ/4/CPeqW4MfJT95mvD+4v3m?=
+ =?us-ascii?Q?MFQWq5OEafmwEJj1+Og=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dd6bf146-5a91-4e45-f00a-08ddb7f176f9
+X-MS-Exchange-CrossTenant-AuthSource: DB9PR04MB9626.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 16:16:27.0497
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dd9OXIq3EQCvOSg2QkOBzuWjv+Vr+SgFHXfa6Y+rsFKADW5zaFc/+iHwXjKFm6NNOBDHMC1SMLHIHq9Ig+0hXw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7839
 
-On Mon, Jun 30, 2025 at 2:28=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wro=
-te:
->
-> The devmem TCP requires the hds-thresh value to be 0, but it doesn't
-> change it automatically.
-> Therefore, configure_hds_thresh() is added to handle this.
->
-> The run_devmem_tests() now tests hds_thresh, but it skips test if the
-> hds_thresh_max value is 0.
->
-> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> ---
->  .../selftests/drivers/net/hw/ncdevmem.c       | 86 +++++++++++++++++++
->  1 file changed, 86 insertions(+)
->
-> diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/te=
-sting/selftests/drivers/net/hw/ncdevmem.c
-> index cc9b40d9c5d5..d78b5e5697d7 100644
-> --- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-> +++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-> @@ -349,6 +349,72 @@ static int configure_headersplit(bool on)
->         return ret;
->  }
->
-> +static int configure_hds_thresh(int len)
-> +{
-> +       struct ethtool_rings_get_req *get_req;
-> +       struct ethtool_rings_get_rsp *get_rsp;
-> +       struct ethtool_rings_set_req *req;
-> +       struct ynl_error yerr;
-> +       struct ynl_sock *ys;
-> +       int ret;
-> +
-> +       ys =3D ynl_sock_create(&ynl_ethtool_family, &yerr);
-> +       if (!ys) {
-> +               fprintf(stderr, "YNL: %s\n", yerr.msg);
-> +               return -1;
-> +       }
-> +
-> +       req =3D ethtool_rings_set_req_alloc();
-> +       ethtool_rings_set_req_set_header_dev_index(req, ifindex);
-> +       ethtool_rings_set_req_set_hds_thresh(req, len);
-> +       ret =3D ethtool_rings_set(ys, req);
-> +       if (ret < 0)
-> +               fprintf(stderr, "YNL failed: %s\n", ys->err.msg);
-> +       ethtool_rings_set_req_free(req);
-> +
-> +       if (ret =3D=3D 0) {
-> +               get_req =3D ethtool_rings_get_req_alloc();
-> +               ethtool_rings_get_req_set_header_dev_index(get_req, ifind=
-ex);
-> +               get_rsp =3D ethtool_rings_get(ys, get_req);
-> +               ethtool_rings_get_req_free(get_req);
-> +               if (get_rsp)
-> +                       fprintf(stderr, "HDS threshold: %d\n",
-> +                               get_rsp->hds_thresh);
-> +               ethtool_rings_get_rsp_free(get_rsp);
-> +       }
-> +
-> +       ynl_sock_destroy(ys);
-> +
-> +       return ret;
-> +}
-> +
-> +static int get_hds_thresh_max(void)
-> +{
-> +       struct ethtool_rings_get_req *get_req;
-> +       struct ethtool_rings_get_rsp *get_rsp;
-> +       struct ynl_error yerr;
-> +       unsigned int ret =3D 0;
-> +       struct ynl_sock *ys;
-> +
-> +       ys =3D ynl_sock_create(&ynl_ethtool_family, &yerr);
-> +       if (!ys) {
-> +               fprintf(stderr, "YNL: %s\n", yerr.msg);
-> +               return -1;
-> +       }
-> +
-> +       get_req =3D ethtool_rings_get_req_alloc();
-> +       ethtool_rings_get_req_set_header_dev_index(get_req, ifindex);
-> +       get_rsp =3D ethtool_rings_get(ys, get_req);
-> +       ethtool_rings_get_req_free(get_req);
-> +       if (get_rsp)
-> +               ret =3D get_rsp->hds_thresh_max;
-> +       ethtool_rings_get_rsp_free(get_rsp);
-> +
-> +       ynl_sock_destroy(ys);
-> +
-> +       return ret;
-> +}
-> +
->  static int configure_rss(void)
->  {
->         return run_command("sudo ethtool -X %s equal %d >&2", ifname, sta=
-rt_queue);
-> @@ -565,6 +631,9 @@ static int do_server(struct memory_buffer *mem)
->         if (configure_headersplit(1))
->                 error(1, 0, "Failed to enable TCP header split\n");
->
-> +       if (configure_hds_thresh(0))
-> +               error(1, 0, "Failed to set HDS threshold\n");
-> +
+Convert nxp,lpc1850-dwmac.txt to yaml format.
 
-hds_thresh should probably be part of configuring headersplit.
+Additional changes:
+- compatible string add fallback as "nxp,lpc1850-dwmac", "snps,dwmac-3.611"
+"snps,dwmac".
+- add common interrupts, interrupt-names, clocks, clock-names, resets and
+  reset-names properties.
+- add ref snps,dwmac.yaml.
+- add phy-mode in example to avoid dt_binding_check warning.
+- update examples to align lpc18xx.dtsi.
 
-But also, failing to set hds_thresh should not fail the test, to
-maintain compatibility with drivers that don't support configuring
-hds_thresh.
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+Signed-off-by: Frank Li <Frank.Li@nxp.com>
+---
+changes in v2
+- add Rob's review tags.
+- change phy-mode to rgmii-id according to Andrew's suggestions.
+---
+ .../bindings/net/nxp,lpc1850-dwmac.txt        | 20 -----
+ .../bindings/net/nxp,lpc1850-dwmac.yaml       | 85 +++++++++++++++++++
+ 2 files changed, 85 insertions(+), 20 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/net/nxp,lpc1850-dwmac.txt
+ create mode 100644 Documentation/devicetree/bindings/net/nxp,lpc1850-dwmac.yaml
+
+diff --git a/Documentation/devicetree/bindings/net/nxp,lpc1850-dwmac.txt b/Documentation/devicetree/bindings/net/nxp,lpc1850-dwmac.txt
+deleted file mode 100644
+index 7edba1264f6f2..0000000000000
+--- a/Documentation/devicetree/bindings/net/nxp,lpc1850-dwmac.txt
++++ /dev/null
+@@ -1,20 +0,0 @@
+-* NXP LPC1850 GMAC ethernet controller
+-
+-This device is a platform glue layer for stmmac.
+-Please see stmmac.txt for the other unchanged properties.
+-
+-Required properties:
+- - compatible:  Should contain "nxp,lpc1850-dwmac"
+-
+-Examples:
+-
+-mac: ethernet@40010000 {
+-	compatible = "nxp,lpc1850-dwmac", "snps,dwmac-3.611", "snps,dwmac";
+-	reg = <0x40010000 0x2000>;
+-	interrupts = <5>;
+-	interrupt-names = "macirq";
+-	clocks = <&ccu1 CLK_CPU_ETHERNET>;
+-	clock-names = "stmmaceth";
+-	resets = <&rgu 22>;
+-	reset-names = "stmmaceth";
+-}
+diff --git a/Documentation/devicetree/bindings/net/nxp,lpc1850-dwmac.yaml b/Documentation/devicetree/bindings/net/nxp,lpc1850-dwmac.yaml
+new file mode 100644
+index 0000000000000..05acd9bc76163
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/nxp,lpc1850-dwmac.yaml
+@@ -0,0 +1,85 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/nxp,lpc1850-dwmac.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: NXP LPC1850 GMAC ethernet controller
++
++maintainers:
++  - Frank Li <Frank.Li@nxp.com>
++
++# We need a select here so we don't match all nodes with 'snps,dwmac'
++select:
++  properties:
++    compatible:
++      contains:
++        enum:
++          - nxp,lpc1850-dwmac
++  required:
++    - compatible
++
++properties:
++  compatible:
++    items:
++      - enum:
++          - nxp,lpc1850-dwmac
++      - const: snps,dwmac-3.611
++      - const: snps,dwmac
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    maxItems: 1
++
++  clock-names:
++    items:
++      - const: stmmaceth
++
++  interrupts:
++    maxItems: 1
++
++  interrupt-names:
++    items:
++      - const: macirq
++
++  resets:
++    maxItems: 1
++
++  reset-names:
++    items:
++      - const: stmmaceth
++
++required:
++  - compatible
++  - reg
++  - clocks
++  - clock-names
++  - interrupts
++  - interrupt-names
++
++allOf:
++  - $ref: snps,dwmac.yaml#
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/clock/lpc18xx-ccu.h>
++
++    ethernet@40010000 {
++        compatible = "nxp,lpc1850-dwmac", "snps,dwmac-3.611", "snps,dwmac";
++        reg = <0x40010000 0x2000>;
++        interrupts = <5>;
++        interrupt-names = "macirq";
++        clocks = <&ccu1 CLK_CPU_ETHERNET>;
++        clock-names = "stmmaceth";
++        resets = <&rgu 22>;
++        reset-names = "stmmaceth";
++        rx-fifo-depth = <256>;
++        tx-fifo-depth = <256>;
++        snps,pbl = <4>;
++        snps,force_thresh_dma_mode;
++        phy-mode = "rgmii-id";
++    };
+-- 
+2.34.1
+
 
