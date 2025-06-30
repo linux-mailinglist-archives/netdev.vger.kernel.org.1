@@ -1,130 +1,94 @@
-Return-Path: <netdev+bounces-202473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 156E5AEE08E
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 16:24:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 492A8AEE0B9
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 16:29:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1726C3B19CC
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 14:23:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C5D5163811
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 14:29:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7067728C027;
-	Mon, 30 Jun 2025 14:21:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BA9028C2AA;
+	Mon, 30 Jun 2025 14:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k0RJ2bbt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GxL45HdI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F8F244688;
-	Mon, 30 Jun 2025 14:21:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5006218FDBE;
+	Mon, 30 Jun 2025 14:29:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751293295; cv=none; b=KQ4HfidTGEescWmpejOHCJdOAUCHKyNDrWdqC/ZOyxetlQ/FxtQNbOBWQGoL2YmJdCKDaRHkiLQ67g26zkIWzQx/0HcRCnnlmb0sDw1y/yMNdG/kEQAS7uWIp5TfVIroAZ/Cu0DH7VvxU3uKRNaDuf6BNaYjYFD8Y6EtYjXYM8s=
+	t=1751293785; cv=none; b=bo54EqEA2S6SHg0lwBrqveQ2rDt5hwnP+NI448Qt5HcnQyoLAGm7dEAaD3RzXym8b+IVJCy+S6CctwZYpiduEtNTUPfCXkSxejLiHWNTv9chr1q9rGRdLMePsQ7YWeXsgcLnV1gT8WLYvy1MoNoRvXt4k+tRVXAH5WIlEt+dOb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751293295; c=relaxed/simple;
-	bh=V9TfuuiZ4q/Le7XiKFng/PtZN3ZlbZa4Vm3P4ayPSvw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d1PdLjcxt+PtdWf1barrTgCqwVeu4hdYjoxZhXEo/v5mbAlX5zwK+xUnaYz+HOZpUQEEVQURSA25bEFuGtkuPs/bjFiH6RzdTcKKG6qz2QbCW63KVrnLNZ1g0I7kb8DlrUs21BFmQC6f2Np+0sVpqcljI+a7v3ZdJk7HVe+fA2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k0RJ2bbt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD003C4CEE3;
-	Mon, 30 Jun 2025 14:21:32 +0000 (UTC)
+	s=arc-20240116; t=1751293785; c=relaxed/simple;
+	bh=LiBFZaqfXZuYTsBTBH2ULjzAIDtzQXyKkx6tEetHjqc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rY281NL/35GLUt8JF5xKF66WbPDE2wm0akMTaRpE03smRV8HBriMhI5t+WxGo+oGo8J4QJvhrIKBPT3pMLbTbvMInFM6dzPjjGt0/LcjC9blIXiGhssiILaNhIVwu/I3XTP9dvrFR2zycEApM+jikbGBQrADm6OmIxiU5/lPgWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GxL45HdI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1CC9C4CEE3;
+	Mon, 30 Jun 2025 14:29:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751293294;
-	bh=V9TfuuiZ4q/Le7XiKFng/PtZN3ZlbZa4Vm3P4ayPSvw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k0RJ2bbtkGszCeK5c0FHngKD6P0fQYiv24FvjYSD1XrXAQFUp43rlaiBMYi9qpP7D
-	 R6cLvIvU5RiSa7d/TVYDnqBG12epdvMZVATGqZ77KW9/e4cL39uk8/wROXJOzprxWI
-	 HqPlmz9VdBpgBesE6Jl0yjaqAfkUXSqKNH76vajhknnkvt8utr2QJGZDZGzbO0lMyF
-	 kN/ISpQQ8gY6F4zjBqNYXhiXdX/y0Q5pllOPUhEM+RKsV5/lvLIvhNCGsdFK88Kwqb
-	 rzh5YYPK1WvVYBi6wilerG4B1YdFZ6pxYCfP6xx754qkqnk2UgAu2QnZo8PcIcKtnK
-	 MLNhaT8ykn+2A==
-Date: Mon, 30 Jun 2025 15:21:29 +0100
-From: Will Deacon <will@kernel.org>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Keir Fraser <keirf@google.com>,
-	Steven Moreland <smoreland@google.com>,
-	Frederick Mayle <fmayle@google.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	netdev@vger.kernel.org, virtualization@lists.linux.dev
-Subject: Re: [PATCH 5/5] vhost/vsock: Allocate nonlinear SKBs for handling
- large transmit buffers
-Message-ID: <aGKdaZp0zpEimAgn@willie-the-truck>
-References: <20250625131543.5155-1-will@kernel.org>
- <20250625131543.5155-6-will@kernel.org>
- <cuqzmhjjakvmbwvcyub75vvjxorjkmzxkuvwvwowhec6wuaghj@uyq6glnhxp5n>
+	s=k20201202; t=1751293784;
+	bh=LiBFZaqfXZuYTsBTBH2ULjzAIDtzQXyKkx6tEetHjqc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=GxL45HdI06gzqzqj9bgi9Fpxw8BzrDahNjX21wsZhgdUDZha7Or1gVTUbnXH3rTGM
+	 IdQRIpDaMKoAqyw5XWB9E8mcZSxBh+na9kONK5PLWEPZIbeGdF0zaEDCEdAZ26l04U
+	 9b26A8xFFbF9JSUIv020653bGXD/CMzcXAk3FGu/hzh6QBUo91DnZaNxr4MEmGO1sn
+	 UEaMw1eAyYRF9/ZiX7l4MloWEM+iHK9+U7TFgwT4QhNDWwrfRr1l6buko8EvC/Ty4+
+	 gSfiOSruclMXrYKrl+re/WJ01H6VqmjxDfFXeiMX5DeLjP6Vkaa1a1XGgxIwobSZM8
+	 KrGBnnWUjeLTg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FA5383BA00;
+	Mon, 30 Jun 2025 14:30:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cuqzmhjjakvmbwvcyub75vvjxorjkmzxkuvwvwowhec6wuaghj@uyq6glnhxp5n>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: HCI: fix disabling of adv instance before
+ updating
+ params
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <175129380974.3403730.2401095205165807740.git-patchwork-notify@kernel.org>
+Date: Mon, 30 Jun 2025 14:30:09 +0000
+References: <20250630075848.14857-1-ceggers@arri.de>
+In-Reply-To: <20250630075848.14857-1-ceggers@arri.de>
+To: Christian Eggers <ceggers@arri.de>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Fri, Jun 27, 2025 at 12:50:27PM +0200, Stefano Garzarella wrote:
-> nit: I'd use `vsock/virtio: ` prefix since we are touching the virtio
-> transport common code. Maybe we can mention that this will affect both
-> virtio and vhost transports.
+Hello:
 
-Sure, I'll do that.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-> On Wed, Jun 25, 2025 at 02:15:43PM +0100, Will Deacon wrote:
-> > When transmitting a vsock packet, virtio_transport_send_pkt_info() calls
-> > virtio_transport_alloc_skb() to allocate and fill SKBs with the transmit
-> > data. Unfortunately, these are always linear allocations and can
-> > therefore result in significant pressure on kmalloc() considering that
-> > the maximum packet size (VIRTIO_VSOCK_MAX_PKT_BUF_SIZE +
-> > VIRTIO_VSOCK_SKB_HEADROOM) is a little over 64KiB, resulting in a 128KiB
-> > allocation for each packet.
-> > 
-> > Rework the vsock SKB allocation so that, for sizes with page order
-> > greater than PAGE_ALLOC_COSTLY_ORDER, a nonlinear SKB is allocated
-> > instead with the packet header in the SKB and the transmit data in the
-> > fragments.
-> > 
-> > Signed-off-by: Will Deacon <will@kernel.org>
-> > ---
-> > net/vmw_vsock/virtio_transport_common.c | 9 +++++++--
-> > 1 file changed, 7 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> > index 1b5d9896edae..424eb69e84f9 100644
-> > --- a/net/vmw_vsock/virtio_transport_common.c
-> > +++ b/net/vmw_vsock/virtio_transport_common.c
-> > @@ -109,7 +109,8 @@ static int virtio_transport_fill_skb(struct sk_buff *skb,
-> > 		return __zerocopy_sg_from_iter(info->msg, NULL, skb,
-> > 					       &info->msg->msg_iter, len, NULL);
-> > 
-> > -	return memcpy_from_msg(skb_put(skb, len), info->msg, len);
-> > +	virtio_vsock_skb_put(skb);
-> > +	return skb_copy_datagram_from_iter(skb, 0, &info->msg->msg_iter, len);
-> > }
-> > 
-> > static void virtio_transport_init_hdr(struct sk_buff *skb,
-> > @@ -261,7 +262,11 @@ static struct sk_buff *virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *
-> > 	if (!zcopy)
-> > 		skb_len += payload_len;
-> > 
-> > -	skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
-> > +	if (skb_len > SKB_WITH_OVERHEAD(PAGE_SIZE << PAGE_ALLOC_COSTLY_ORDER))
-> > +		skb = virtio_vsock_alloc_skb_with_frags(skb_len, GFP_KERNEL);
-> > +	else
-> > +		skb = virtio_vsock_alloc_skb(skb_len, GFP_KERNEL);
-> > +
+On Mon, 30 Jun 2025 09:58:48 +0200 you wrote:
+> struct adv_info::pending doesn't tell whether advertising is currently
+> enabled. This is already checked in hci_disable_ext_adv_instance_sync().
 > 
-> As I mentioned in the other patch, we may avoid this code duplication hiding
-> this in virtio_vsock_alloc_skb() or adding a new function that
-> we can use when we want to allocate frags or not.
+> Fixes: cba6b758711c ("Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 2")
+> Signed-off-by: Christian Eggers <ceggers@arri.de>
+> ---
+>  net/bluetooth/hci_sync.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-That would be good. I had a crack at it in the diff I sent in reply to
-the earlier patch, so please take a look.
+Here is the summary with links:
+  - Bluetooth: HCI: fix disabling of adv instance before updating params
+    https://git.kernel.org/bluetooth/bluetooth-next/c/2a0ae2f6cd36
 
-Will
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
