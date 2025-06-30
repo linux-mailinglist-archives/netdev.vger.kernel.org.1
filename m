@@ -1,78 +1,81 @@
-Return-Path: <netdev+bounces-202360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3526DAED8D7
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:35:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77FAFAED8D8
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:35:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 789BE1638DE
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 09:35:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C7531886E42
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 09:36:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02CEC23C4FA;
-	Mon, 30 Jun 2025 09:35:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6253246BAF;
+	Mon, 30 Jun 2025 09:35:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CWDShCdi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s35wKdMn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67306204C0C
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 09:35:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27EDC24679D
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 09:35:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751276144; cv=none; b=pluKYMmN1EhAyJnT3Nd+zB6pdVh0XRJfnVR5VaGEnW4Kp81Edeg6oEWCdYltdm4p2HNTwKJ9RtqH6UDXLkcYNGbx1PIGSargOKlK7zQwkn5su3PQDoghOETwCExALXT40Is0keH0wimc0pyEhlLw9ddKw4NCPQ130bGlThp2LHM=
+	t=1751276147; cv=none; b=KpUrH5WWltoQV/cqaR0rcAHbV16V+8Yd5+PHqX7fiBHEiFHtAvsgtqclJ0OAe33yM+yUHTSGnNMq2vmPrW2YraLOUjJHkNxXnmqsgPdVgMSoOQYPhJl1B9ePVN1apzGld5Xda+q4ZT9AmjsueMXmboVt07u0OFX6mNcGrHRKyG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751276144; c=relaxed/simple;
-	bh=V0W3LhscVzTtTBQWkhmsO+3n4/Vmh1SFaTxfMx5+bNw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=YnCBUCHBhwqmGa3UzPnMqTgcS+wyupP51q6FHztnnzW6TGOmW2zPLuBALY4XalM39lvVWqYZZMspXBNLrd6pDJ9EWP2bewxv5OJypxWl7smy4oHOc752v0fSfkLho9Lk1CRBzyJlL+mmwj17BMT6ImUBZBO5YnV9ExMwIM4uEwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CWDShCdi; arc=none smtp.client-ip=209.85.222.202
+	s=arc-20240116; t=1751276147; c=relaxed/simple;
+	bh=ox1mnmNRyeX2rX6eJiBs/6xcHWU1+ilcr8oDrL8Nht4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=DDgrshzGnOu0z4fTE6k3ATJRGjA7S5GGI7IfiS7jMPUwoT900ifX+Ny95t0Qb81jPzaN5sn1pcR7KrKGXKbCdx9YNagSPoeriFAa0bX+QOMiZfQh1YVCuArswtJPb7kzHgPklMNdbJC/VpaiA90Pc6hRnQwgePakV/Hn48wYrxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s35wKdMn; arc=none smtp.client-ip=209.85.219.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7d3e90c3a81so178048685a.1
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 02:35:43 -0700 (PDT)
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-6fb1f84a448so18525076d6.0
+        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 02:35:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751276142; x=1751880942; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BhdgPn9J98Q7K9jKHb7eQgI5If9r8AF2olDO6DUfmHg=;
-        b=CWDShCdiWBrks4qUEubLwwyN/zdtmRmyRH3SCD7zH1PqmIVActWKncIkTohZeFFsau
-         3DiNa95hW5KuUG5lbeRUOtEC26uIlu5R2YwX0/sp1kuNUbUr2r4MElQW7051Xswr0lvb
-         Bjr9rDo/uBkHm/YG18oVlGSMTtpv0NEzUVx6y7tlm5yfEARkhXil6TRnzRb6VQzuuC2z
-         VfApWNd0+PzF5Z5zc+lb1XE9Apquea0fZPOhGBSGmLQGzl3rYvanTW+Lbsc3+ojMXmVm
-         n3EqTQpueKkd7W0SP+OEHEr8uqNASbmtE17xBuie3Fi1T7xHMKaFptrUdHWPAF6OKREr
-         DWlA==
+        d=google.com; s=20230601; t=1751276145; x=1751880945; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=N1+nhCRwmQCGzufOp3Ydp6B4HR8f8fk/P6h2k76BTvw=;
+        b=s35wKdMnVlq70RLAWribNgMOANaXdpIkMfdMQEbXXVr8eW6nSKGf1/JFzfKWRTwAae
+         r57ZqWtwhRN8Ix6a57gEJIJeWP5mm3zGXV1Q1hKfKkfDeQ3DiXtrCGKNC7+5iosnFZvi
+         zxu4jEs8QTiTeHY1F9tH1cFfOV6JMBtnhCYPRrAmWhwRMGCX7eNZDGPOa81fvrnJrJ4g
+         p45UG0UYWXQv5WiqhL8OuV9vkJvOUnN31kQMdnZ65gU6dziWmz/fxQ5PaHqLykJFnbLR
+         IcDyMKfHnsRWs462r144kX4IUT5y8jHAl1cirK7+4of19A8kk1TN18btQQn0953B2Bcw
+         rxbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751276142; x=1751880942;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BhdgPn9J98Q7K9jKHb7eQgI5If9r8AF2olDO6DUfmHg=;
-        b=E7gnzl3myW1oZG8lcQ30VNET+b67EMlsMN/iEEx+qYTIGMNPaj0VjDDkI83jmJnGtl
-         u6oDKBs6u9bJveaWMuMEC7Dl7noFJfxWwyP0T9d94s6Z4GUOVK/EVmAVUgDK0CpY59+h
-         c6BfE0A4ryTTSAHYjx7VTTOeVTxoMPcUjnXobhZHFA8XFT6tYLlzodjetPsnMjX+WuqY
-         tecuSdh2RI2h6HunJo1pYUnervzeaDix9HuPeNEy3tD5JQpzUX7Lxc9mE9554M4aDIzk
-         4P+c+AhARVnBwGKZpWq/VOeBaqde92s1wX6AbN2LjxCn8aEssEOIZdptmAXlA5XTzs00
-         sa4g==
-X-Forwarded-Encrypted: i=1; AJvYcCWb9Be8Vlpcn5ILFw0tukYv11j2f5hzn3/cHnAMYUipXmjOvpv8g7R03SUbWwznctNy28M3Nis=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2aH+JIRN7ngTJ2ehTSs0SlFxYyOh6D8J072LnsWbgv8FvwwPs
-	4FIMft6QJQHKXjlcqfQroY1VGW2g38YigQnAKla5sH9z/oPm2vEMRGY62P3OD6E6npdTxQdABM+
-	6Ac7PfZT5mqcodw==
-X-Google-Smtp-Source: AGHT+IEQPpRqyGm/atQWp4HsrUsMvYHnfFvxlMbtWbcLntRcRSNr1CfVJxPNxBkCt+/jjTgwL5fR27naX3bP1Q==
-X-Received: from qknpw10.prod.google.com ([2002:a05:620a:63ca:b0:7d4:f7:3ba4])
+        d=1e100.net; s=20230601; t=1751276145; x=1751880945;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N1+nhCRwmQCGzufOp3Ydp6B4HR8f8fk/P6h2k76BTvw=;
+        b=fSW+Y9BWu1bs3iCiKc3Td7lOhyTYQcfKfCYhg+6rOu91p5rVKH1heNUDUupo/XnzNx
+         Ff90pLJtYSUgxgl27DQ6P2Mh0grk3VBzbiJhOfBXN83wmeCG7oKItKGqhcQ1g9BeZyDV
+         9r3yS3cbX8oipE5mSBbCMs014+JKIfCyHs8/5JrqO+NBTx0houLnKvg3fm5A0tts5Pov
+         gSzjToI7REh2fKkbgZS15FpuDn3pjhduUeA0s3mcCn2PdHGP7VW9U6HuHznykf5FFap3
+         n2J5J/YNnd7NUQ8CQfN8aLGFMk+Ggpbc+COktC/7tOVFpaDywyvBnHktKzr3dHkijFE/
+         6gPw==
+X-Forwarded-Encrypted: i=1; AJvYcCUhdOu96rN0Y0FtIEDrm84hcflu6LfJFpr/28HwrQdY83h4zu2iTAPLNtwUEgy1j24hrwBgEng=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyx0DNXnShwiKdzc+n7yqh3AI221obvEfkAljnJVtWYE4t5+3Q8
+	La9WORiZTGwP30w+Uuz8zu7RuubZVyIeYpqnA/52iIBtxobxjtRHqKBUZ2ZitkauUykGmxk0jr2
+	IWFd8WxTghuunMg==
+X-Google-Smtp-Source: AGHT+IGhI8DtjEUDksWPtAUsmR1bQkEd2UZGQKE+LI5a8DetzGdcy4O/Myzb8we3idAMc6W+Il7T1zDJTtY+zQ==
+X-Received: from qvac21.prod.google.com ([2002:a05:6214:8215:b0:6fb:4dd0:2483])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:4052:b0:7cd:4dbf:3c49 with SMTP id af79cd13be357-7d4439fda12mr1753259285a.43.1751276142134;
- Mon, 30 Jun 2025 02:35:42 -0700 (PDT)
-Date: Mon, 30 Jun 2025 09:35:36 +0000
+ 2002:a05:6214:76f:b0:6fa:c81a:6204 with SMTP id 6a1803df08f44-6fffdcff257mr185025526d6.10.1751276144955;
+ Mon, 30 Jun 2025 02:35:44 -0700 (PDT)
+Date: Mon, 30 Jun 2025 09:35:37 +0000
+In-Reply-To: <20250630093540.3052835-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250630093540.3052835-1-edumazet@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250630093540.3052835-1-edumazet@google.com>
-Subject: [PATCH v2 net-next 0/4] net: introduce net_aligned_data
+Message-ID: <20250630093540.3052835-2-edumazet@google.com>
+Subject: [PATCH v2 net-next 1/4] net: add struct net_aligned_data
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -80,64 +83,57 @@ Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, netd
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-____cacheline_aligned_in_smp on small fields like
-tcp_memory_allocated and udp_memory_allocated is not good enough.
+This structure will hold networking data that must
+consume a full cache line to avoid accidental false sharing.
 
-It makes sure to put these fields at the start of a cache line,
-but does not prevent the linker from using the cache line for other
-fields, with potential performance impact.
-
-nm -v vmlinux|egrep -5 "tcp_memory_allocated|udp_memory_allocated"
-
-...
-ffffffff83e35cc0 B tcp_memory_allocated
-ffffffff83e35cc8 b __key.0
-ffffffff83e35cc8 b __tcp_tx_delay_enabled.1
-ffffffff83e35ce0 b tcp_orphan_timer
-...
-ffffffff849dddc0 B udp_memory_allocated
-ffffffff849dddc8 B udp_encap_needed_key
-ffffffff849dddd8 B udpv6_encap_needed_key
-ffffffff849dddf0 b inetsw_lock
-
-One solution is to move these sensitive fields to a structure,
-so that the compiler is forced to add empty holes between each member.
-
-nm -v vmlinux|egrep -2 "tcp_memory_allocated|udp_memory_allocated|net_aligned_data"
-
-ffffffff885af970 b mem_id_init
-ffffffff885af980 b __key.0
-ffffffff885af9c0 B net_aligned_data
-ffffffff885afa80 B page_pool_mem_providers
-ffffffff885afa90 b __key.2
-
-v2: added <linux/atomic.h>, report from kernel test robot <lkp@intel.com>
-v1: https://lore.kernel.org/netdev/20250627200551.348096-1-edumazet@google.com/
-
-Eric Dumazet (4):
-  net: add struct net_aligned_data
-  net: move net_cookie into net_aligned_data
-  tcp: move tcp_memory_allocated into net_aligned_data
-  udp: move udp_memory_allocated into net_aligned_data
-
- include/net/aligned_data.h | 22 ++++++++++++++++++++++
- include/net/tcp.h          |  1 -
- include/net/udp.h          |  1 -
- net/core/hotdata.c         |  5 +++++
- net/core/net_namespace.c   |  8 ++------
- net/ipv4/tcp.c             |  2 --
- net/ipv4/tcp_ipv4.c        |  3 ++-
- net/ipv4/udp.c             |  4 +---
- net/ipv4/udp_impl.h        |  1 +
- net/ipv4/udplite.c         |  2 +-
- net/ipv6/tcp_ipv6.c        |  3 ++-
- net/ipv6/udp.c             |  2 +-
- net/ipv6/udp_impl.h        |  1 +
- net/ipv6/udplite.c         |  2 +-
- net/mptcp/protocol.c       |  3 ++-
- 15 files changed, 41 insertions(+), 19 deletions(-)
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+---
+ include/net/aligned_data.h | 16 ++++++++++++++++
+ net/core/hotdata.c         |  3 +++
+ 2 files changed, 19 insertions(+)
  create mode 100644 include/net/aligned_data.h
 
+diff --git a/include/net/aligned_data.h b/include/net/aligned_data.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..cf3329d7c2272ec4424e89352626800cbc282663
+--- /dev/null
++++ b/include/net/aligned_data.h
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#ifndef _NET_ALIGNED_DATA_H
++#define _NET_ALIGNED_DATA_H
++
++#include <linux/types.h>
++
++/* Structure holding cacheline aligned fields on SMP builds.
++ * Each field or group should have an ____cacheline_aligned_in_smp
++ * attribute to ensure no accidental false sharing can happen.
++ */
++struct net_aligned_data {
++};
++
++extern struct net_aligned_data net_aligned_data;
++
++#endif /* _NET_ALIGNED_DATA_H */
+diff --git a/net/core/hotdata.c b/net/core/hotdata.c
+index 0bc893d5f07b03b31e08967a2238f63d218020d7..e9c03491ab001cc85fd60ad28533649b32d8a003 100644
+--- a/net/core/hotdata.c
++++ b/net/core/hotdata.c
+@@ -2,6 +2,7 @@
+ #include <linux/cache.h>
+ #include <linux/jiffies.h>
+ #include <linux/list.h>
++#include <net/aligned_data.h>
+ #include <net/hotdata.h>
+ #include <net/proto_memory.h>
+ 
+@@ -22,3 +23,5 @@ struct net_hotdata net_hotdata __cacheline_aligned = {
+ 	.sysctl_mem_pcpu_rsv = SK_MEMORY_PCPU_RESERVE
+ };
+ EXPORT_SYMBOL(net_hotdata);
++
++struct net_aligned_data net_aligned_data;
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
