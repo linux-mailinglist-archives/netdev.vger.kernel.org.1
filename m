@@ -1,202 +1,200 @@
-Return-Path: <netdev+bounces-202325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6183AED5A3
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 09:30:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C11DAED5D2
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 09:36:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 298CC16A64A
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 07:30:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6D4416D46A
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 07:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A70801F866A;
-	Mon, 30 Jun 2025 07:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FF75222597;
+	Mon, 30 Jun 2025 07:35:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="KEbBY7Gu"
+	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="LtomjhuQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0331FBCB0
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 07:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA66190072
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 07:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751268629; cv=none; b=ib7xIvIj6DoalUiJKtNPlJF1bM2gIBdiD4v+KVfvGZ5LVbrhjtMyTwHgv8HXcgIsuIdR46vs2gjhwz6QqbUE3UTwSOFNEkNUYxC35LlI9PnP3h47Cs1HohOFvZVdEMBTky2l0tfQrLTxJ65Mu+9NIpU4Vv4UWQpLX/RU5Q7vQIo=
+	t=1751268942; cv=none; b=ABuIajTeoO4tbAxoJ51af79YUFQ4vVGLuDGBmNG9HBWWKNfCFplO34bzOUp/50XdqrBh6PiCj80j4vtf6qe+1fQMaCLNp9ImRZRKFqVsE68rMT5AaHTxWeqrPgWGNV8BkEiPqdB3XVORhPIHG9ys3Q3o/P+3uGpR8WvBbInvajc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751268629; c=relaxed/simple;
-	bh=rPeB+5Ycwh9FNWzFSBU0ZrdJKV+Sjr3Ks1H7BGUhkek=;
+	s=arc-20240116; t=1751268942; c=relaxed/simple;
+	bh=JhmOV40O+bSL2M90/npeI2Kz5q0Bnw0/S4OJW03R4b8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eSmc6MTttjw3hD7ZwG/JP2kOvoaJA1h1P/79BXLNrn1aQjmlAY6Bgp5mLoSJTAMoRF+TIP64Zd3/2YGars7gQZaOYoojroI0gwl7mngfSPwkBumlM3wasgSHmYcv7pFYwkiUl21R7/42By0+tkeCCiEOGXVc5MoMh8gG2YtODn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=KEbBY7Gu; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55TMALkm025217
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 07:30:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	dbiU4WeJlxPr07x14qAPgklL7r+joI6II3iSXHyOuX8=; b=KEbBY7GuZgH86Cm9
-	B0tnDbXpIXEPOQOavsMqYAKT6JVu9BQnI5lWecTZ8lVjKs8ewflbSMZBDhGKxcGq
-	ezNDUUj0J4ebuj2SSxih2QYMBRfm8UibQvM0D9cFpmFMU5kKcYcjdU3mEEQdTuCP
-	/nOGv5GQOfvun/kmj6ZGqs/P3C3YivlycmKzZ0LpTGDtIsKdLlymchT3n0TwnU7I
-	cTofOHFJ2uqBVXTv0E+jxJGcofQxikWiuPNYEF7+MGHe4V5XijgzM6QEGqtjSu9x
-	+DWEBBbqXUkFUFrjIdGeWv1u2IjJDoIhGLN3qBEKOocOL31euDBGRHliRogXwQ8Z
-	kQGB+g==
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com [209.85.219.69])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47j8s9bq9r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 07:30:26 +0000 (GMT)
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6face45b58dso32433686d6.3
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 00:30:26 -0700 (PDT)
+	 To:Cc:Content-Type; b=U2K1jKoS/Lm7KP/rJU1450yYadLupAy1w/q0UAr6AqrZ+luSN7QmNm5f11TIifdiuT1ZhuOx17sXT5h5F0VArsvRVat2HkE10Euz8urNjRcrP2O1ZzLEFh8z/8G0c92rmX0NE7ORlqi6TaHDgx2KP+kMIuXQCntktUJQ0Avm5yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=LtomjhuQ; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-60c93c23b08so3339727a12.3
+        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 00:35:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gooddata.com; s=google; t=1751268935; x=1751873735; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FJjHWRQFQERSX4N8A4WdlcHVSnGx7v+vOq1gWp3YDfQ=;
+        b=LtomjhuQSUBTpMOtBXBe1p7o3NIOZ0u14YTtmhLx0vfaGKuCLKPnu/GQgKS+nRaawL
+         cRTR3dPIeTYxAQDt/K/5M9uVyD0WJLuu+ppr93ruQKFi/I8TzOr88FGeFfPK20xQgVSG
+         9jgTjEyP36U2IJn5mUbZrc/DvQ3BDu3CV07/M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751268625; x=1751873425;
+        d=1e100.net; s=20230601; t=1751268935; x=1751873735;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dbiU4WeJlxPr07x14qAPgklL7r+joI6II3iSXHyOuX8=;
-        b=gsNFuaTh1JP6YhG27JrCCcnPPybPmZCn536DxXXDgVcvGAOXFlj86PQhSzA09gdlt/
-         OUNeRnbpPiF2d39T4rCYMiDhl9uCV8w2cz+XWQr690nLkTw9SJR0Oq2BBILSohHiW9ul
-         /W39WEHudHMpAeY1TtIUJq4muzSAs9BKEEgCpfl2UwUOXRbmbAO+dXmMHE6gTGQDhBFk
-         BREhDJOLAAFMbl5MxJ3go3D2QkfQGGp367VV8TDzFod0IFRpWBATn0TCWm3HWqsbbazq
-         KgFG0t3HiEYrqLBULCC/1i8NBFZ0extDAC+22DTH17haPPNJMSFvf29uXVnEafK0bMNG
-         KxaA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5tpP/aphAuPSvr8ZrE71k4OZsIgFJVv9uyIfFJt/Q3eH+4tiotsOt57f/TT8orylyLGGS7Q0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQxNTKcZF0N5wD6wHpK4CMqxfFoUUeeN/jloBRj9Vz8pFy6O8r
-	LR8+roLuhTQjIqNf4mU+k/2lO8V54QgwJbAem3zqXMaxEiiHomNvWap0rUb1z7iNGMEwUPkLjET
-	LkA4jRnlip5VL8gCrlZNLJxZYYyBGOZwG7lPwaZuhqUesDhABuecbTOCsGewTJZy/kwPwRvc0Ez
-	BNYYS5w9T2WdRE0r3OBhdw66CtqIc4Mfwskw==
-X-Gm-Gg: ASbGncsiWc/6IxpsyezjkfcfIwzaoRcfSzrBJkHzJ+8oGjqbjDPl75M2mB4vyqWaKVz
-	rG68eP/1e3aHlLlkfFmQQXGs4v94prIvXlygHu2OsZlvP00q/P789PJyTUywWFJeB3UtvQyo1Xq
-	6ZanB/
-X-Received: by 2002:a05:622a:144c:b0:476:95dd:520e with SMTP id d75a77b69052e-4a7fcac0b51mr202341121cf.16.1751268625480;
-        Mon, 30 Jun 2025 00:30:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF6U1CBAmzCpNigMlBWbP9zLpWdvxuVFoIPok+2G4N7Dxw18rxgwdwma8B/pYjZMexoPzVyDKklYgN3Uu2KeJE=
-X-Received: by 2002:a05:622a:144c:b0:476:95dd:520e with SMTP id
- d75a77b69052e-4a7fcac0b51mr202340561cf.16.1751268625006; Mon, 30 Jun 2025
- 00:30:25 -0700 (PDT)
+        bh=FJjHWRQFQERSX4N8A4WdlcHVSnGx7v+vOq1gWp3YDfQ=;
+        b=M7urd3GClcYk3W3M97xYv5JlRNRpDpLuojhb2s+EYfuctHbp7BHhQEbqivuDn/gWBJ
+         mBPfz5O8lR81+5PBO7ajfVsEdrbu6AGnomW8hcbI+3AR04jNRKCVh6eNXNvU/DtYU/QP
+         s7/b+QbVVG3wjFdoZmq9UrEg4dQ1RD++CSucZb1WH33da6i5vRlULTNT4K8QCaWqJrwP
+         MRfGH7nw5ZFaU7PaRFT388NrxnKYYkx5cxDyt3RrnzeheQtYW4yn3JlYxcJwROz7Wb6k
+         DCLs6CrYv40ANol7lC7pPhWLgnvWfIxVSomm+0OIysasxy8GHKWHptdIUunThqz6w0I4
+         7WBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWprXjnkWZbjyw0xi+DYPKec42AqjEf315SohYKRsJRofKvRTDA+Kb5NXRTz70lyEfOssodL4E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxc22oHF8I6dvUtdZgXLngoO/ISGSkHQFNqBtPX4JXdqU+0dSfg
+	eLnHjeAjITLg6pgDUru5mxB0J9yuVLb8b2SqfnX4HYTSEFTlikjEQm1GqyA+HHDhF/gOsIEu3V4
+	1pEBcteev/YwrEKwXBRfS6VnBkCopVWkJLBkzSUae
+X-Gm-Gg: ASbGncvNWCOsmzLhjuQrfxC31ymP3m6E8TVMOUqJFX0QkfkFD52yUc1hO5d+i7mrFAy
+	P5/Q9RGm/HSXRUThHt7pI0SdHFL9giS/HKy9IHvrZLC+5Hdq9nDZWY2/tBBvhay1uccii7Oa0la
+	GBcAlx0L65+PbLudV6f1lQvqxiy4qC0fnXXQJKmJJLD28K
+X-Google-Smtp-Source: AGHT+IFMO9vHwLlWhqFkVz4+FGrfY8iZ2eqXMm803NsyFasOLkn+3FGD3IdYRV5I0g/CF4qb6/D0+Zkfi0DytQwrHaI=
+X-Received: by 2002:a17:907:9d17:b0:ae0:ad8c:a559 with SMTP id
+ a640c23a62f3a-ae34fd336d5mr1176803866b.4.1751268935410; Mon, 30 Jun 2025
+ 00:35:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250624213801.31702-1-ryazanov.s.a@gmail.com>
- <CAFEp6-08JX1gDDn2-hP5AjXHCGsPYHe05FscQoyiP_OaSQfzqQ@mail.gmail.com> <fc1f5d15-163c-49d7-ab94-90e0522b0e57@gmail.com>
-In-Reply-To: <fc1f5d15-163c-49d7-ab94-90e0522b0e57@gmail.com>
-From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Mon, 30 Jun 2025 09:30:14 +0200
-X-Gm-Features: Ac12FXx5BYOM-yVp2ZpK01KHDHWSv79Wjk8GBosrNxsDB7eezvz5US1a5aVp2DU
-Message-ID: <CAFEp6-1xoFW6xpQHPN4_XNtbjwvW=TUdFrOkFKwM+-rEH7WqMg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 0/6] net: wwan: add NMEA port type support
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        netdev@vger.kernel.org, Slark Xiao <slark_xiao@163.com>,
-        Muhammad Nuzaihan <zaihan@unrealasia.net>,
-        Qiang Yu <quic_qianyu@quicinc.com>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Johan Hovold <johan@kernel.org>
+References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
+ <4a061a51-8a6c-42b8-9957-66073b4bc65f@intel.com> <20250415175359.3c6117c9@kernel.org>
+ <CAK8fFZ6ML1v8VCjN3F-r+SFT8oF0xNpi3hjA77aRNwr=HcWqNA@mail.gmail.com>
+ <20250416064852.39fd4b8f@kernel.org> <CAK8fFZ4bKHa8L6iF7dZNBRxujdmsoFN05p73Ab6mkPf6FGhmMQ@mail.gmail.com>
+ <CO1PR11MB5089365F31BCD97E59CCFA83D6BD2@CO1PR11MB5089.namprd11.prod.outlook.com>
+ <20250416171311.30b76ec1@kernel.org> <CO1PR11MB508931FBA3D5DFE7D8F07844D6BC2@CO1PR11MB5089.namprd11.prod.outlook.com>
+ <CAK8fFZ6+BNjNdemB+P=SuwU6X9a9CmtkR8Nux-XG7QHdcswvQQ@mail.gmail.com>
+ <CAK8fFZ4BJ-T40eNzO1rDLLpSRkeaHGctATsGLKD3bqVCa4RFEQ@mail.gmail.com>
+ <CAK8fFZ5XTO9dGADuMSV0hJws-6cZE9equa3X6dfTBgDyzE1pEQ@mail.gmail.com>
+ <b3eb99da-9293-43e8-a24d-f4082f747d6c@intel.com> <CAK8fFZ7LREBEdhXjBAKuaqktOz1VwsBTxcCpLBsa+dkMj4Pyyw@mail.gmail.com>
+ <20250625132545.1772c6ab@kernel.org> <CAK8fFZ7KDaPk_FVDbTdFt8soEWrpJ_g0_fiKEg1WzjRp1BC0Qg@mail.gmail.com>
+In-Reply-To: <CAK8fFZ7KDaPk_FVDbTdFt8soEWrpJ_g0_fiKEg1WzjRp1BC0Qg@mail.gmail.com>
+From: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Date: Mon, 30 Jun 2025 09:35:09 +0200
+X-Gm-Features: Ac12FXy0zTWCIUI055ElkQjsOkkMKHSQo1G-_vNnBe4EjUhDGc4Z9aQ9tsVUJsk
+Message-ID: <CAK8fFZ5rS8Xg11LvyQHzFh3aVHbKdRHpuhrpV_Wc7oYRcMZFRA@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
+ driver after upgrade to 6.13.y (regression in commit 492a044508ad)
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, 
+	"Keller, Jacob E" <jacob.e.keller@intel.com>, "Damato, Joe" <jdamato@fastly.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, 
+	"Czapnik, Lukasz" <lukasz.czapnik@intel.com>, "Dumazet, Eric" <edumazet@google.com>, 
+	"Zaki, Ahmed" <ahmed.zaki@intel.com>, Martin Karsten <mkarsten@uwaterloo.ca>, 
+	Igor Raits <igor@gooddata.com>, Daniel Secik <daniel.secik@gooddata.com>, 
+	Zdenek Pesek <zdenek.pesek@gooddata.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Authority-Analysis: v=2.4 cv=H/Pbw/Yi c=1 sm=1 tr=0 ts=68623d12 cx=c_pps
- a=wEM5vcRIz55oU/E2lInRtA==:117 a=IkcTkHD0fZMA:10 a=6IFa9wvqVegA:10
- a=pGLkceISAAAA:8 a=wfLqw5Yj37XQ_N0w6NkA:9 a=QEXdDO2ut3YA:10
- a=OIgjcC2v60KrkQgK7BGD:22
-X-Proofpoint-ORIG-GUID: NKrjVLJ09YwL02A8hzYU02eXErkL4aiR
-X-Proofpoint-GUID: NKrjVLJ09YwL02A8hzYU02eXErkL4aiR
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjMwMDA2MSBTYWx0ZWRfX5xNlrPA+L9NS
- 4xKrQ0MLFvnV434qqQFSQ5ofbvmz+dmrkPSOwpgz2Q7I8p07YxeKfzVEobTSELQEjAg3v8+lx7x
- u/hRv+rd880OGzN543QllRBWGFw4Fd9Wu3r2pp6A45pgN17r+bwrhSlfpCvCmj4EXCcL4qAj21t
- SLIo23JmFgPHc73TsaBWdL/yErGprjPGy6oTdg2MIDSNfiXrvwMt1NUw6Zgr3ISxXQV1rvFVzlV
- 2/xcxKOqUdYvKLSiRK0TEtNBT4jQ30JnRUSik4A9ojkO6ndni3bGLpPOKWi2xoCetXlOJ5njqxn
- apI454t9OzsIyLhQwlC/HtYR0uPdNasLhyCHW0BmJ7NAbehJbLo1EsYF1iC9BTz0lKzFnPuJMZ4
- cVvawIFpqwVGKc9cKlluEEVffYpjqXJSyxd9nHMCpv5I5CK9a8AKBT4jh2jP2XE8ONk03h7V
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-30_01,2025-06-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0 malwarescore=0 suspectscore=0 mlxlogscore=973
- priorityscore=1501 clxscore=1015 mlxscore=0 lowpriorityscore=0 spamscore=0
- adultscore=0 bulkscore=0 phishscore=0 classifier=spam authscore=0 authtc=n/a
- authcc= route=outbound adjust=0 reason=mlx scancount=1
- engine=8.19.0-2505280000 definitions=main-2506300061
 
-Hi Sergey,
-
-
-On Sun, Jun 29, 2025 at 12:07=E2=80=AFPM Sergey Ryazanov <ryazanov.s.a@gmai=
-l.com> wrote:
 >
-> Hi Loic,
->
-> On 6/29/25 05:50, Loic Poulain wrote:
-> > Hi Sergey,
 > >
-> > On Tue, Jun 24, 2025 at 11:39=E2=80=AFPM Sergey Ryazanov <ryazanov.s.a@=
-gmail.com> wrote:
-> >> The series introduces a long discussed NMEA port type support for the
-> >> WWAN subsystem. There are two goals. From the WWAN driver perspective,
-> >> NMEA exported as any other port type (e.g. AT, MBIM, QMI, etc.). From
-> >> user space software perspective, the exported chardev belongs to the
-> >> GNSS class what makes it easy to distinguish desired port and the WWAN
-> >> device common to both NMEA and control (AT, MBIM, etc.) ports makes it
-> >> easy to locate a control port for the GNSS receiver activation.
-> >>
-> >> Done by exporting the NMEA port via the GNSS subsystem with the WWAN
-> >> core acting as proxy between the WWAN modem driver and the GNSS
-> >> subsystem.
-> >>
-> >> The series starts from a cleanup patch. Then two patches prepares the
-> >> WWAN core for the proxy style operation. Followed by a patch introding=
- a
-> >> new WWNA port type, integration with the GNSS subsystem and demux. The
-> >> series ends with a couple of patches that introduce emulated EMEA port
-> >> to the WWAN HW simulator.
-> >>
-> >> The series is the product of the discussion with Loic about the pros a=
-nd
-> >> cons of possible models and implementation. Also Muhammad and Slark di=
-d
-> >> a great job defining the problem, sharing the code and pushing me to
-> >> finish the implementation. Many thanks.
-> >>
-> >> Comments are welcomed.
-> >>
-> >> Slark, Muhammad, if this series suits you, feel free to bundle it with
-> >> the driver changes and (re-)send for final inclusion as a single serie=
-s.
-> >>
-> >> Changes RFCv1->RFCv2:
-> >> * Uniformly use put_device() to release port memory. This made code le=
-ss
-> >>    weird and way more clear. Thank you, Loic, for noticing and the fix
-> >>    discussion!
+> > On Wed, 25 Jun 2025 19:51:08 +0200 Jaroslav Pulchart wrote:
+> > > Great, please send me a link to the related patch set. I can apply th=
+em in
+> > > our kernel build and try them ASAP!
 > >
-> > I think you can now send that series without the RFC tag. It looks good=
- to me.
+> > Sorry if I'm repeating the question - have you tried
+> > CONFIG_MEM_ALLOC_PROFILING? Reportedly the overhead in recent kernels
+> > is low enough to use it for production workloads.
 >
-> Thank you for reviewing it. Do you think it makes sense to introduce new
-> API without an actual user? Ok, we have two drivers potentially ready to
-> use GNSS port type, but they are not yet here. That is why I have send
-> as RFC. On another hand, testing with simulator has not revealed any
-> issue and GNSS port type implementation looks ready to be merged.
+> I try it now, the fresh booted server:
+>
+> # sort -g /proc/allocinfo| tail -n 15
+>     45409728   236509 fs/dcache.c:1681 func:__d_alloc
+>     71041024    17344 mm/percpu-vm.c:95 func:pcpu_alloc_pages
+>     71524352    11140 kernel/dma/direct.c:141 func:__dma_direct_alloc_pag=
+es
+>     85098496     4486 mm/slub.c:2452 func:alloc_slab_page
+>    115470992   101647 fs/ext4/super.c:1388 [ext4] func:ext4_alloc_inode
+>    134479872    32832 kernel/events/ring_buffer.c:811 func:perf_mmap_allo=
+c_page
+>    141426688    34528 mm/filemap.c:1978 func:__filemap_get_folio
+>    191594496    46776 mm/memory.c:1056 func:folio_prealloc
+>    360710144      172 mm/khugepaged.c:1084 func:alloc_charge_folio
+>    444076032    33790 mm/slub.c:2450 func:alloc_slab_page
+>    530579456   129536 mm/page_ext.c:271 func:alloc_page_ext
+>    975175680      465 mm/huge_memory.c:1165 func:vma_alloc_anon_folio_pmd
+>   1022427136   249616 mm/memory.c:1054 func:folio_prealloc
+>   1105125376   139252 drivers/net/ethernet/intel/ice/ice_txrx.c:681
+> [ice] func:ice_alloc_mapped_page
+>   1621598208   395848 mm/readahead.c:186 func:ractl_alloc_folio
+>
 
-Right, we need a proper user for it, I think some MHI PCIe modems already
-have this NMEA port available, so it can easily be added to this PR. For su=
-re
-we will need someone to test this.
+The "drivers/net/ethernet/intel/ice/ice_txrx.c:681 [ice]
+func:ice_alloc_mapped_page" is just growing...
 
-> Let's wait a month or so and if no actual driver patch going to be send,
-> then I will resend as formal patch to have the functionality in the
-> kernel in advance.
+# uptime ; sort -g /proc/allocinfo| tail -n 15
+ 09:33:58 up 4 days, 6 min,  1 user,  load average: 6.65, 8.18, 9.81
 
-ack.
+# sort -g /proc/allocinfo| tail -n 15
+    85216896   443838 fs/dcache.c:1681 func:__d_alloc
+   106156032    25917 mm/shmem.c:1854 func:shmem_alloc_folio
+   116850096   102861 fs/ext4/super.c:1388 [ext4] func:ext4_alloc_inode
+   134479872    32832 kernel/events/ring_buffer.c:811 func:perf_mmap_alloc_=
+page
+   143556608     6894 mm/slub.c:2452 func:alloc_slab_page
+   186793984    45604 mm/memory.c:1056 func:folio_prealloc
+   362807296    88576 mm/percpu-vm.c:95 func:pcpu_alloc_pages
+   530579456   129536 mm/page_ext.c:271 func:alloc_page_ext
+   598237184    51309 mm/slub.c:2450 func:alloc_slab_page
+   838860800      400 mm/huge_memory.c:1165 func:vma_alloc_anon_folio_pmd
+   929083392   226827 mm/filemap.c:1978 func:__filemap_get_folio
+  1034657792   252602 mm/memory.c:1054 func:folio_prealloc
+  1262485504      602 mm/khugepaged.c:1084 func:alloc_charge_folio
+  1335377920   325970 mm/readahead.c:186 func:ractl_alloc_folio
+  2544877568   315003 drivers/net/ethernet/intel/ice/ice_txrx.c:681
+[ice] func:ice_alloc_mapped_page
 
-Regards,
-Loic
+>
+> >
+> > > st 25. 6. 2025 v 16:03 odes=C3=ADlatel Przemek Kitszel <
+> > > przemyslaw.kitszel@intel.com> napsal:
+> > >
+> > > > On 6/25/25 14:17, Jaroslav Pulchart wrote:
+> > > > > Hello
+> > > > >
+> > > > > We are still facing the memory issue with Intel 810 NICs (even on=
+ latest
+> > > > > 6.15.y).
+> > > > >
+> > > > > Our current stabilization and solution is to move everything to a=
+ new
+> > > > > INTEL-FREE server and get rid of last Intel sights there (after I=
+ntel's
+> > > > > CPU vulnerabilities fuckups NICs are next step).
+> > > > >
+> > > > > Any help welcomed,
+> > > > > Jaroslav P.
+> > > > >
+> > > > >
+> > > >
+> > > > Thank you for urging us, I can understand the frustration.
+> > > >
+> > > > We have identified some (unrelated) memory leaks, will soon ship fi=
+xes.
+> > > > And, as there were no clear issue with any commit/version you have
+> > > > posted to be a culprit, there is a chance that our random findings =
+could
+> > > > help. Anyway going to zero kmemleak reports is good in itself, that=
+ is
+> > > > a good start.
+> > > >
+> > > > Will ask my VAL too to increase efforts in this area too.
+> >
 
