@@ -1,216 +1,137 @@
-Return-Path: <netdev+bounces-202364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03B38AED8DB
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:36:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49B1DAED8EE
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:42:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CC5E3B6D36
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 09:35:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3157F3A8B06
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 09:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF009242D6C;
-	Mon, 30 Jun 2025 09:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kCPOKOw/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D74D6BFC0;
+	Mon, 30 Jun 2025 09:42:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288BA246BB5
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 09:35:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C628FC1D;
+	Mon, 30 Jun 2025 09:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751276152; cv=none; b=fvTWw1+4CYxER2AHooUCeRXmtsMPn5cjwZ98Oq27CMmgMTOWL2PEl20GfoNcQWGni1SkI9Io0lEFLj212lBaC1eicN47qvQwhcxM7NwO4Zo/RGxQXLdMUwsXHLXKiQ0Nfse/0hQk9GzVRYPsQ1c3DGWwycsxzmK5IWKIzpezxiw=
+	t=1751276554; cv=none; b=g9ZwAVncvulwOG/Ym2sH7mVsX4kYYaXo3ltCc+4x84yMsvMT83pbl1XqcBcflSq0vIlth/T+5Yqb9F/kaJeKCnQGnvBfDyMjg/w62kkxoT2n47YcU+Sw6H7Qji+Mt9UjZ3LAFwdXFd4zWaBMu2JjMBfTfJ4PnBjwAGSX7DzY/94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751276152; c=relaxed/simple;
-	bh=h3heU2K0GsXbz0FHFyzN4/B/IwFDOuqk/6bnzHBPOF4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UTBqh9e1FqCb6UfbN7k91MB7uZrA2LecrxEbZym9dycYq0/4B+HkKNIQga3geknVBsf+vLyuJzS8kCF3/U2q6d2hoFm9YVhD90rrO53Es2eEGQThAJsX/BSL7vNNqv253YBnWHfetZ4GSQMRkPe6l+iAb5VDyJaPgesA9lfkoQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kCPOKOw/; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-70e649662deso23746337b3.2
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 02:35:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751276150; x=1751880950; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1kYmMm4FiOHgXVZCZzdvmjZJcyMUaNZWKvL+31mKlDk=;
-        b=kCPOKOw/M/eIq1wLrMqgjEYMxof/xipTmgtVx8XPqjE67JVy14LkU8RHEFHBhI97nL
-         3RPoN4Nd+6Pfvj8xcx3ae2EvRnMj8FSMgwrNT1uRe4AUV4wNrkwXttF0hhCpYtVNz5Ef
-         fMPlTNGjB1WXuzFNvd+aslUb1nHbrAw73OmeFLUI5tOls8gj6UBp5QBLidrI95xJ2ein
-         AFXKnGZFL65HGC+EnMi0nSm3pk18ONjR6XDKf3zTg2NYfDrIwGk/38/YgNk6/1K4nbOW
-         uHsLN0ovL73X86A168gUmuCPxauwuG9OaEqD4DL44I6lZ1sjzU7Nh4zgwdMc8K1x1Ft5
-         PtiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751276150; x=1751880950;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1kYmMm4FiOHgXVZCZzdvmjZJcyMUaNZWKvL+31mKlDk=;
-        b=JBlKrPMmFf71wfr/raftiBwEBraiBoyJizP6bDaJG/JfEo0lUFUXADfDzdNqHUIyEc
-         W1v0MyZInEtqnjwjuR/Ghvya8Sq3qw/Danrg05BivLCbB8ASZLlBwQwZjOcq7epA3zVi
-         +B7HOAIIOiMoUqZA2N/11oZRjZH7C5spui8fQnkOYZ626ykvPcxnLgYOd91HGYcYZySR
-         XllNhWmEDO+80MkjYANe8LzdahjIu6x8mL42GZgwwzCpkSaYWfYrVFMXbSx4mLL/7UMe
-         0fjTOJdfOmKq8NBgr5VmpyaXyrE4F21W1wBD/mOJs0wWyQ4BCN+nYOOZKp1FmRUL1Lg3
-         oiqA==
-X-Forwarded-Encrypted: i=1; AJvYcCUsaG34GWmdRnWsCHc0+DZ4B4CU1bedn3MXGdJgwDnYFBDupqmi5YJ6kvXFEufBaRjuCr0t/ec=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPJ4qS1R3Z3ldYkc8nZ8ZBXGDjJXSmIofgdJTuU3eaKq8TpVjz
-	2hvWzwMpPyv35Jij4kSKFgdswDSC83gXmBifyIntGN6Po271qAq3BBlsvFumfoG2AcM1JXytM/s
-	fK2zZO6X2OZDgBw==
-X-Google-Smtp-Source: AGHT+IGa8jxvaIVFZ29RhZEnRP5NWiDGEXZzYWVfZfP/q0jLZZ20xX+qQWNmRefRE1KkV0lnhoZ1lXOpLZjYJA==
-X-Received: from ybaa7.prod.google.com ([2002:a05:6902:4807:b0:e82:466b:5564])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6902:1507:b0:e82:4ad:10c7 with SMTP id 3f1490d57ef6-e87a7b533f2mr16688910276.28.1751276149927;
- Mon, 30 Jun 2025 02:35:49 -0700 (PDT)
-Date: Mon, 30 Jun 2025 09:35:40 +0000
-In-Reply-To: <20250630093540.3052835-1-edumazet@google.com>
+	s=arc-20240116; t=1751276554; c=relaxed/simple;
+	bh=ouLFgmRvYWHiYjRbi0QKE+hRqzA8wYBedRhl6jY4HNY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jKBcY44ZwV9HxeNbwm8DeRb1egJYCSyN24473FsNyz55xKPIUS1RGn8xG0tOrQyS0OO2MLJ1pkmxMQnlFpxvMVDuNHoM9LJXyHlDzyElN/1N6IVO1H6HuDa4aGlLp3EHqcBKWV3Fbp2RnGE+EakRM4Pc2HygabavGmKDukskUDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: esmtpsz16t1751276476t83dedbc1
+X-QQ-Originating-IP: wB8ILOyR8jZl/vHVC7KPmfZjJkgAgDakoffsBLAVl1M=
+Received: from w-MS-7E16.trustnetic.com ( [125.120.151.178])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 30 Jun 2025 17:41:10 +0800 (CST)
+X-QQ-SSF: 0001000000000000000000000000000
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 106915942635377542
+EX-QQ-RecipientCnt: 11
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: mengyuanlou@net-swift.com,
+	duanqiangwen@net-swift.com,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net] net: libwx: fix double put of page to page_pool
+Date: Mon, 30 Jun 2025 17:41:02 +0800
+Message-ID: <C8A23A11DB646E60+20250630094102.22265-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250630093540.3052835-1-edumazet@google.com>
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250630093540.3052835-5-edumazet@google.com>
-Subject: [PATCH v2 net-next 4/4] udp: move udp_memory_allocated into net_aligned_data
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: NYlggeZuI0UG1AEP5h9/MiWHNUNwK8W/x/Q0TKVIPxS7c0ZRIH+mXXgX
+	SFTDwIy4RNzWiEVtkebgt4rekD1NzopKtZiAk0QM8z9lU6SO9lVRxJpNwwPwt69oCUsO+w3
+	y+HL/cH6ZNaaMoWUzYJW0rPfPH5aViqrpPEXcTT2bJvz1oPNDDxLlBUmNCmJQfP/1hHButc
+	T4dQsYE8RQCCNog4t2tiXXAlYpd2BHOh+mAY3UdIjeiIGC5hnxgyqy6tL+foaNPWQiKKtVU
+	T/dGCdBHMJPUWkcDXb7Pic9tWZYOTkdRK1w29DT3yeSRUiQiMKsLXYEtgrm7gC5ZVkDw0/b
+	3MHzqM2mPUTvrrr085LZZrO7h6I2punl2miLjY57zjTZ+6B9fr3s7DygLG2IqhOBjBUJWob
+	6ZkkST3uh/Yyv8lIUQgAg5JJ9f5zIhR8cSWrRpl15hfNpr+n19aGs5VwGQTizzIB9mVho/8
+	2ezDSDEpVEPGP920xna0Mj9T99ZXRQZibc4yldBS9aE8SKabi7iGlXfJl4/QwrU6SSCSc0u
+	8lB6dJVAXLukZyTnPMRKLA/bxif7THu+rgYzfdjzcrEOmZ+RRlG/gt6DQ6WtJUAlMp8ydKE
+	a68wz7u2MUDUZg80gC2wKiCBHVZ0cuw9dU1hCI5fIVv09Ut7GIk766vaPSn+k5HWwVCaBm9
+	BMUNQMSJimhDfysP4MAVhAbdmjJPhVWM5zVcuxwPtGVMkok+ebAVRovMKZc/COAeIFSiv3z
+	06UUPUF0nwMoAdPworvL5hx6gzjP9fq0wxyNp0fVENDuH1uMdbdHxD5QkfT/3bj7TEHDQnv
+	YaypGyXxt/jjyFYFRu7sDKR5rvKuSPgTb1+QT+ETj9UfcgBNtC8mTTtLQsXoOjttGZ8Kbf5
+	U9EhuSbV2+YzijUrQqtvp7MFQkUA/7c8fMqBneaYoFMLsGYrXrAmIse41LWSyIDWRMzK1Fp
+	G13vsLlRF2r2y3dpU9jzuhAVTDnPOdfWcf/PsYIqTNZYMG5p10E6Q0rwTa6DfAVAV61FsCS
+	W1+YCLDMRO2Naz9FsKjtU9w3ojHdoyCfkIWVYGl2CLrPAAr3ufKHFm4FZa3Co=
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+X-QQ-RECHKSPAM: 0
 
-____cacheline_aligned_in_smp attribute only makes sure to align
-a field to a cache line. It does not prevent the linker to use
-the remaining of the cache line for other variables, causing
-potential false sharing.
+wx_dma_sync_frag() incorrectly attempted to return the page to
+page_pool, which is already handled via buffer reuse or wx_build_skb()
+paths. Under high MTU and high throughput, this causes list corruption
+inside page_pool due to double free.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+[  876.949950] Call Trace:
+[  876.949951]  <IRQ>
+[  876.949952]  __rmqueue_pcplist+0x53/0x2c0
+[  876.949955]  alloc_pages_bulk_noprof+0x2e0/0x660
+[  876.949958]  __page_pool_alloc_pages_slow+0xa9/0x400
+[  876.949961]  page_pool_alloc_pages+0xa/0x20
+[  876.949963]  wx_alloc_rx_buffers+0xd7/0x110 [libwx]
+[  876.949967]  wx_clean_rx_irq+0x262/0x430 [libwx]
+[  876.949971]  wx_poll+0x92/0x130 [libwx]
+[  876.949975]  __napi_poll+0x28/0x190
+[  876.949977]  net_rx_action+0x301/0x3f0
+[  876.949980]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  876.949981]  ? profile_tick+0x30/0x70
+[  876.949983]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  876.949984]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  876.949986]  ? timerqueue_add+0xa3/0xc0
+[  876.949988]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  876.949989]  ? __raise_softirq_irqoff+0x16/0x70
+[  876.949991]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  876.949993]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  876.949994]  ? wx_msix_clean_rings+0x41/0x50 [libwx]
+[  876.949998]  handle_softirqs+0xf9/0x2c0
+
+Fixes: 3c47e8ae113a ("net: libwx: Support to receive packets in NAPI")
+Cc: stable@vger.kernel.org
+Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- include/net/aligned_data.h | 1 +
- include/net/udp.h          | 1 -
- net/ipv4/udp.c             | 4 +---
- net/ipv4/udp_impl.h        | 1 +
- net/ipv4/udplite.c         | 2 +-
- net/ipv6/udp.c             | 2 +-
- net/ipv6/udp_impl.h        | 1 +
- net/ipv6/udplite.c         | 2 +-
- 8 files changed, 7 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/include/net/aligned_data.h b/include/net/aligned_data.h
-index bedb4f86b0fea1ce13a10895182681c37ef7e904..e1a1c8aedc79753f63eb7c81757639ea20829f0d 100644
---- a/include/net/aligned_data.h
-+++ b/include/net/aligned_data.h
-@@ -13,6 +13,7 @@ struct net_aligned_data {
- 	atomic64_t	net_cookie ____cacheline_aligned_in_smp;
- #if defined(CONFIG_INET)
- 	atomic_long_t tcp_memory_allocated ____cacheline_aligned_in_smp;
-+	atomic_long_t udp_memory_allocated ____cacheline_aligned_in_smp;
- #endif
- };
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+index c57cc4f27249..246b18a0285e 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+@@ -174,10 +174,6 @@ static void wx_dma_sync_frag(struct wx_ring *rx_ring,
+ 				      skb_frag_off(frag),
+ 				      skb_frag_size(frag),
+ 				      DMA_FROM_DEVICE);
+-
+-	/* If the page was released, just unmap it. */
+-	if (unlikely(WX_CB(skb)->page_released))
+-		page_pool_put_full_page(rx_ring->page_pool, rx_buffer->page, false);
+ }
  
-diff --git a/include/net/udp.h b/include/net/udp.h
-index a772510b2aa58a922dc4dd5bd7cb7f7f0c1ce0e3..f8ae2c4ade141d27e4af3376f5a177e46d5b39ea 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -205,7 +205,6 @@ static inline void udp_hash4_dec(struct udp_hslot *hslot2)
- 
- extern struct proto udp_prot;
- 
--extern atomic_long_t udp_memory_allocated;
- DECLARE_PER_CPU(int, udp_memory_per_cpu_fw_alloc);
- 
- /* sysctl variables for udp */
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 19573ee64a0f18cf55df34ace1956e9c3e20172c..49f43c54cfb0e3ac85c1a6202f3d6a2f1ca6d0ba 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -127,8 +127,6 @@ struct udp_table udp_table __read_mostly;
- long sysctl_udp_mem[3] __read_mostly;
- EXPORT_IPV6_MOD(sysctl_udp_mem);
- 
--atomic_long_t udp_memory_allocated ____cacheline_aligned_in_smp;
--EXPORT_IPV6_MOD(udp_memory_allocated);
- DEFINE_PER_CPU(int, udp_memory_per_cpu_fw_alloc);
- EXPORT_PER_CPU_SYMBOL_GPL(udp_memory_per_cpu_fw_alloc);
- 
-@@ -3235,7 +3233,7 @@ struct proto udp_prot = {
- #ifdef CONFIG_BPF_SYSCALL
- 	.psock_update_sk_prot	= udp_bpf_update_proto,
- #endif
--	.memory_allocated	= &udp_memory_allocated,
-+	.memory_allocated	= &net_aligned_data.udp_memory_allocated,
- 	.per_cpu_fw_alloc	= &udp_memory_per_cpu_fw_alloc,
- 
- 	.sysctl_mem		= sysctl_udp_mem,
-diff --git a/net/ipv4/udp_impl.h b/net/ipv4/udp_impl.h
-index e1ff3a37599614b18a0b621534019a7bd71ea901..c7142213fc2112c9e423caa5e6d84bafeaca9936 100644
---- a/net/ipv4/udp_impl.h
-+++ b/net/ipv4/udp_impl.h
-@@ -1,6 +1,7 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- #ifndef _UDP4_IMPL_H
- #define _UDP4_IMPL_H
-+#include <net/aligned_data.h>
- #include <net/udp.h>
- #include <net/udplite.h>
- #include <net/protocol.h>
-diff --git a/net/ipv4/udplite.c b/net/ipv4/udplite.c
-index af37af3ab727bffeebe5c41d84cb7c130f49c50d..d3e621a11a1aa4cafb62eb53ddc0ed1ca517a7fe 100644
---- a/net/ipv4/udplite.c
-+++ b/net/ipv4/udplite.c
-@@ -60,7 +60,7 @@ struct proto 	udplite_prot = {
- 	.rehash		   = udp_v4_rehash,
- 	.get_port	   = udp_v4_get_port,
- 
--	.memory_allocated  = &udp_memory_allocated,
-+	.memory_allocated  = &net_aligned_data.udp_memory_allocated,
- 	.per_cpu_fw_alloc  = &udp_memory_per_cpu_fw_alloc,
- 
- 	.sysctl_mem	   = sysctl_udp_mem,
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index ebb95d8bc6819f72842fd1567e73fcef4f1e0ed0..6bbdadbd5fecccfb7de99f05c6fb179393e162f2 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -1925,7 +1925,7 @@ struct proto udpv6_prot = {
- 	.psock_update_sk_prot	= udp_bpf_update_proto,
- #endif
- 
--	.memory_allocated	= &udp_memory_allocated,
-+	.memory_allocated	= &net_aligned_data.udp_memory_allocated,
- 	.per_cpu_fw_alloc	= &udp_memory_per_cpu_fw_alloc,
- 
- 	.sysctl_mem		= sysctl_udp_mem,
-diff --git a/net/ipv6/udp_impl.h b/net/ipv6/udp_impl.h
-index 0590f566379d7d07dfdd1b0ae808b9d8964eb5aa..8a406be25a3a6dee687a6a02ea0b6a28428abb86 100644
---- a/net/ipv6/udp_impl.h
-+++ b/net/ipv6/udp_impl.h
-@@ -1,6 +1,7 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- #ifndef _UDP6_IMPL_H
- #define _UDP6_IMPL_H
-+#include <net/aligned_data.h>
- #include <net/udp.h>
- #include <net/udplite.h>
- #include <net/protocol.h>
-diff --git a/net/ipv6/udplite.c b/net/ipv6/udplite.c
-index a60bec9b14f14a5b2d271f9965b5fca3d2a440c8..2cec542437f74eba9540fc464ee70d8b0bc0be79 100644
---- a/net/ipv6/udplite.c
-+++ b/net/ipv6/udplite.c
-@@ -59,7 +59,7 @@ struct proto udplitev6_prot = {
- 	.rehash		   = udp_v6_rehash,
- 	.get_port	   = udp_v6_get_port,
- 
--	.memory_allocated  = &udp_memory_allocated,
-+	.memory_allocated  = &net_aligned_data.udp_memory_allocated,
- 	.per_cpu_fw_alloc  = &udp_memory_per_cpu_fw_alloc,
- 
- 	.sysctl_mem	   = sysctl_udp_mem,
+ static struct wx_rx_buffer *wx_get_rx_buffer(struct wx_ring *rx_ring,
 -- 
-2.50.0.727.gbf7dc18ff4-goog
+2.48.1
 
 
