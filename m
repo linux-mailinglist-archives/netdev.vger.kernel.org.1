@@ -1,62 +1,60 @@
-Return-Path: <netdev+bounces-202429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6181CAEDD84
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 14:51:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F41A1AEDD8D
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 14:52:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C6CC18858ED
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 12:51:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0875716AAB4
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 12:52:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC535286D7E;
-	Mon, 30 Jun 2025 12:51:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678BB286D49;
+	Mon, 30 Jun 2025 12:52:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PlhRXnPe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Au3cC2lT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A855B2868B4;
-	Mon, 30 Jun 2025 12:51:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E29A2701D2;
+	Mon, 30 Jun 2025 12:52:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751287873; cv=none; b=QbckDRITaNBPLulxIcrRayq/4ZBMjj9xjQKmjJEVYauWfvKEFWtu8wj8iPL/8z9LkeYlazm+LpiEsk+ClobDo3V4mGumqu9CIYhF2wOuiY/bdOmbBdlDXoCmuiNSHAxgXR79AkbdgothNpl/XDaF1R24WSwm2/xwiHjSFM6k7Yk=
+	t=1751287924; cv=none; b=O7B8yJFD/bVyLJvvYfebRhiN/yy3yobHMj0h7ksDmmoOtvZGz9UvKCIKJ8527zHVjz+9g55rQTRd1ptRNveKODRfpkQQ4olW3nNFIMhBPQ2kiRIi/dwhM1CZ6cYUzIZjtCc6PK+N2EC9bvFMNf+4LbfYEcbiNwJXfzFxrjTFD7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751287873; c=relaxed/simple;
-	bh=mjYSJoVT5dvUajn3ent2ZGoDomPuTp34GeIy2fuO5Uk=;
+	s=arc-20240116; t=1751287924; c=relaxed/simple;
+	bh=KFAC8BKzF2DZUXxOABkXUwBHPs4HuhbfQUlHbK0UpdM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LRGG/CvcGhyt0zMf9DVaZ0Wk2p4Xbvw4V5Mbb0boszJ1Mj45X7DFkKCiILOawxAxkG4sMmXMjKJ/WDk8eHZQkJEdPV80xK/7hbwJMtBd0f7gOkAhb5Hxe0O24uj0Aq06/hOPdBnrx3Gylx9W/XSPbXLNSkfbvzuDzuBJUB4ocwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PlhRXnPe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DE95C4CEE3;
-	Mon, 30 Jun 2025 12:51:11 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=A6PjRMsTr86dY2iiNjgw0x4wjurYetVr6LxYHJqy+Ho09NuSHvWNMoOMW0rb+ZvgBGmGAeI36j3iDInAUZuO8wGXpJ6xHmFZJ80WMEDnwr0k1Blhz2jkPMK/TDPGq70NBzi0hr44CFxPF4q6MmGnUSDYCvaNhx3MWk/NGNJf4LE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Au3cC2lT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C5D9C4CEE3;
+	Mon, 30 Jun 2025 12:52:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751287873;
-	bh=mjYSJoVT5dvUajn3ent2ZGoDomPuTp34GeIy2fuO5Uk=;
+	s=k20201202; t=1751287923;
+	bh=KFAC8BKzF2DZUXxOABkXUwBHPs4HuhbfQUlHbK0UpdM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PlhRXnPe7VN1ZFx/PfCeWEX6PWR/KvKgKLv26S3Uq2qJf+waGpea2WiM54qYNeh9b
-	 CupCx+SoGDvTP/xviAkFDBib3Ms759TwYgn5tozfka5l4s9vCCrAfOYazi+OcniP/y
-	 vbSAZ0UuHPvPFXmsfQN0ZdvEeMwcjVhTCYLJkvpmVknAuKprvfY4+ebs7NjOkFlgxb
-	 /fUNhywQf2gtfls0WV6QbdR2UBGAc6nBBKsi8lbo9X8RRn321vrMMX2SXUZ8Zfff/v
-	 /ojN7VoiiIF96ewVmHzwtPWf5BQKgTrD0DEZsbeyULiqon99jiIYtYSQGdv91QZWBS
-	 g+NMdGum12SGA==
-Date: Mon, 30 Jun 2025 13:51:07 +0100
-From: Will Deacon <will@kernel.org>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Keir Fraser <keirf@google.com>,
-	Steven Moreland <smoreland@google.com>,
-	Frederick Mayle <fmayle@google.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	netdev@vger.kernel.org, virtualization@lists.linux.dev
-Subject: Re: [PATCH 1/5] vhost/vsock: Avoid allocating arbitrarily-sized SKBs
-Message-ID: <aGKIO8yqBSxXZrE2@willie-the-truck>
-References: <20250625131543.5155-1-will@kernel.org>
- <20250625131543.5155-2-will@kernel.org>
- <7byn5byoqlpcebhahnkpln3o2w2es2ae3jpzocffkni3mfhcd5@b5hfo66jn64o>
+	b=Au3cC2lTfKlYYBCrTsewr80JrUm4PIpNVMHbrR9/36yW1v4lYxKTsWf6V3kqsN0Hg
+	 KfHcs/uy5eGriYOxvdrksOsqEW1/mXzhCyANBCzP3DBo0yoKPrltl9Tz5XyQ1QVvAg
+	 KpWn3WXc3SDHcC9dKfG/fTbvAclXpXmet9Lv/MchaPdOriX7cMr5acCkMOn9QRIxg1
+	 z9R5iyDW9pVRJurw90lBkQee6NIIk89i3qdNS4uvMROGAXsrgcoHTgD+qMwhh8WIj1
+	 FcwgWHtNagdrkPWGjwqEyuURNycwk/3gthT9BIAIXQjn8MbZADzloyHtiGVzp+gWeS
+	 lO/8WBPpG0fzA==
+Date: Mon, 30 Jun 2025 13:51:58 +0100
+From: Simon Horman <horms@kernel.org>
+To: Kohei Enju <enjuk@amazon.com>
+Cc: linux-hams@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kohei.enju@gmail.com,
+	syzbot+e04e2c007ba2c80476cb@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v2] rose: fix dangling neighbour pointers in
+ rose_rt_device_down()
+Message-ID: <20250630125158.GG41770@horms.kernel.org>
+References: <20250629030833.6680-1-enjuk@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,34 +63,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7byn5byoqlpcebhahnkpln3o2w2es2ae3jpzocffkni3mfhcd5@b5hfo66jn64o>
+In-Reply-To: <20250629030833.6680-1-enjuk@amazon.com>
 
-On Fri, Jun 27, 2025 at 12:36:46PM +0200, Stefano Garzarella wrote:
-> On Wed, Jun 25, 2025 at 02:15:39PM +0100, Will Deacon wrote:
-> > vhost_vsock_alloc_skb() returns NULL for packets advertising a length
-> > larger than VIRTIO_VSOCK_MAX_PKT_BUF_SIZE in the packet header. However,
-> > this is only checked once the SKB has been allocated and, if the length
-> > in the packet header is zero, the SKB may not be freed immediately.
-> > 
-> > Hoist the size check before the SKB allocation so that an iovec larger
-> > than VIRTIO_VSOCK_MAX_PKT_BUF_SIZE + the header size is rejected
-> > outright. The subsequent check on the length field in the header can
-> > then simply check that the allocated SKB is indeed large enough to hold
-> > the packet.
+On Sun, Jun 29, 2025 at 12:06:31PM +0900, Kohei Enju wrote:
+> There are two bugs in rose_rt_device_down() that can cause
+> use-after-free:
 > 
-> LGTM, but should we consider this as stable material adding a Fixes tag?
+> 1. The loop bound `t->count` is modified within the loop, which can
+>    cause the loop to terminate early and miss some entries.
+> 
+> 2. When removing an entry from the neighbour array, the subsequent entries
+>    are moved up to fill the gap, but the loop index `i` is still
+>    incremented, causing the next entry to be skipped.
+> 
+> For example, if a node has three neighbours (A, A, B) with count=3 and A
+> is being removed, the second A is not checked.
+> 
+>     i=0: (A, A, B) -> (A, B) with count=2
+>           ^ checked
+>     i=1: (A, B)    -> (A, B) with count=2
+>              ^ checked (B, not A!)
+>     i=2: (doesn't occur because i < count is false)
+> 
+> This leaves the second A in the array with count=2, but the rose_neigh
+> structure has been freed. Code that accesses these entries assumes that
+> the first `count` entries are valid pointers, causing a use-after-free
+> when it accesses the dangling pointer.
+> 
+> Fix both issues by iterating over the array in reverse order with a fixed
+> loop bound. This ensures that all entries are examined and that the removal
+> of an entry doesn't affect subsequent iterations.
+> 
+> Reported-by: syzbot+e04e2c007ba2c80476cb@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=e04e2c007ba2c80476cb
+> Tested-by: syzbot+e04e2c007ba2c80476cb@syzkaller.appspotmail.com
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Kohei Enju <enjuk@amazon.com>
+> ---
+> Changes:
+>   v2:
+>     - Change commit message to describe the UAF scenario correctly
+>     - Replace for loop with memmove() for array shifting
+>   v1: https://lore.kernel.org/all/20250625095005.66148-2-enjuk@amazon.com/
 
-Yup, absolutely. I put it first so that it can be backported easily but,
-for some reason, I thought networking didn't CC stable. I have no idea
-_why_ I thought that, so I'll add it (and a Fixes: line) for v2!
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-That seems to be:
-
-  Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
-
-from what I can tell.
-
-Cheers,
-
-Will
 
