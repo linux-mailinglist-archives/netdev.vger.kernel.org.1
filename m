@@ -1,206 +1,373 @@
-Return-Path: <netdev+bounces-202401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D910AEDC0D
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:55:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04865AEDC3B
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 14:06:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE03B16C963
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:55:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D00113A1897
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 12:06:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CCAB284665;
-	Mon, 30 Jun 2025 11:55:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F45288CA6;
+	Mon, 30 Jun 2025 12:06:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NQBL7A6z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dSqpevnS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD1C1B4F1F
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 11:55:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751284509; cv=none; b=r20zIjuqC90R1YrX1R9ggtPn/Hh5FeAFbyq2YV/B6AR8bp5mo61jPNxF6QSPlMWEKNBI9czg/C55585EDEFWmntZ3XZUiFJe6JfWWjtohmmw+rc/mWlNtTUPmZZP2Fwaxc+BvCJaWXANsLBM9ufVEPzlp1r1maI99pmnoIYLwMI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751284509; c=relaxed/simple;
-	bh=LzTFpWpxZyHI92NgPPBbfs4npMCQOd7bT2TOc4DXqPs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JU3hO1wqN+ezVhzrox5HBjrQb444JeoB2HqsMPB+ZcS/TWzl0VgEiWd+3A8HuAeo4WjxCIFALt5xXTd9x/1laRajZ4D2iHZHPiR34+QzAEqpaBo4IxrcXKBfiSYMOf6CFi+OXv5mEa9B2GCScJ4vgeEEidL/En47v/0/X0A+e/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NQBL7A6z; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751284506;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i3UpL9XpHPaPQprAYLhgHMcy3HDDwfmg1McyZZUeR4U=;
-	b=NQBL7A6ztAALUIyEI5rClGASM/hNz9FI67q1XcZxE09tq25abA+3JG+ACHcUVZEI1QZRGY
-	W2s1tDoYRrtSwGjfRkn1XTCRxi4BpJUqGaE3WGWfqg5oEugATpIASFF8HvrV0bY410rWGM
-	e61KyILEeDn0OL7AUuA5PVUdViNyUKQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-222-n1BxGc12M7iih4onufrvDQ-1; Mon, 30 Jun 2025 07:55:03 -0400
-X-MC-Unique: n1BxGc12M7iih4onufrvDQ-1
-X-Mimecast-MFC-AGG-ID: n1BxGc12M7iih4onufrvDQ_1751284502
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a58939191eso640632f8f.0
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 04:55:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751284502; x=1751889302;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i3UpL9XpHPaPQprAYLhgHMcy3HDDwfmg1McyZZUeR4U=;
-        b=FEFn66IIl+A3GKxAxTbC7k0zcLD62LNgVo9G3Ibz20pIDoiGYLWP1yZT3YG6NTuuo2
-         u2NX+TGjB/fHpTAOc8ieBzgj/eZWhK/rZzRT+ENZRsr1YmlLogXhDmV5TNWsN98YIu3Z
-         BGCUt/vFxTUTGavYabYCM9yc4IA6+6S2nRzSDaO8A7246BUOzFUTfxPTQUaK/eQVnNtY
-         XRHBQr1xXazHZNZfR1ZSK2y7ikxC1cKf8oOkBcHx9T3DZcTaakhzBzKwgXHNpshIQK2a
-         vCWTnfNZjC2Q8ZL59/+KsSRB/z3RfWX+ZWO9XKZLLU/K/3h/e1eO1CvRwSVA0tIepnxm
-         7MEA==
-X-Forwarded-Encrypted: i=1; AJvYcCW2WSSt5O+ZFF7LqvBcO4Jy1tvK8Yozd3ccd8MTml+W56TPrxSQFQCO9FQo+irMKfoSlxPXmKY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdBjzbR8jkWe8+oowov72d2B20eKNZZuQsdvYpkBDwWHRLwL9e
-	fNsjeIuB6ARiBzdbQ2POei6cenFFwhkT6d1JXYZ/4nwpQvmuF1NjITv7FQMNojuZL+zX6ZmhJcB
-	M8WtYKm+PWv9dSG2Mi/Nq+qNEwc6aKIw8r9NiuCIF7OiBnmB/C14j2zKzZg==
-X-Gm-Gg: ASbGncsFvipQbAAzprk6FzhuuaRibRj0gvnUjfaxLP//ihAyc9Muy4N/xltroElXKgZ
-	yuEkNQYCwyy+4FtRI747QHzHJDW6CHr2ijWfCybZStmoWkzms+QeAeyahww+lpKbWkR3158NNnc
-	U4U5zk6CYBAI8yNZblKax3kyw5EJEhWfJgoCMhpbdG6xXhwNK2y78i+3bRfdIKkZ2LEwU/p+x9H
-	xgYoDhk7FWeJLy8jRUvFyfXyQUlVkfbWlTeGWIRpb7f7YFP8HGU8x7jONBWAw6if0BC7/AQgwKv
-	39ifPBDWCLPhgUt4XQnebAHqF5gAqBIWsCmy4gvGthuCMl+EXbx1yFCt3uTklTCXxRvMeKQ0+vO
-	tPw==
-X-Received: by 2002:a05:6000:2dc4:b0:3a5:2182:bce2 with SMTP id ffacd0b85a97d-3a8f4c00b15mr11300699f8f.17.1751284501872;
-        Mon, 30 Jun 2025 04:55:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE5tP4Rk1GFfnasgGCow+Z8e0y7nuejBBHDuHkx9VTSZZb2kZ8DK5QzhCOqGdnsGGXOfGZ69Q==
-X-Received: by 2002:a05:6000:2dc4:b0:3a5:2182:bce2 with SMTP id ffacd0b85a97d-3a8f4c00b15mr11300675f8f.17.1751284501442;
-        Mon, 30 Jun 2025 04:55:01 -0700 (PDT)
-Received: from debian (2a01cb058d23d60071afe2302af9653a.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:71af:e230:2af9:653a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a892e5f34csm10028500f8f.85.2025.06.30.04.55.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jun 2025 04:55:00 -0700 (PDT)
-Date: Mon, 30 Jun 2025 13:54:58 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@idosch.org>
-Cc: Aiden Yang <ling@moedove.com>, netdev@vger.kernel.org, kuba@kernel.org,
-	pabeni@redhat.com, davem@davemloft.net,
-	MoeDove NOC <noc@moedove.com>
-Subject: Re: [BUG] net: gre: IPv6 link-local multicast is silently dropped
- (Regression)
-Message-ID: <aGJ7EvpKRWVzPm4Y@debian>
-References: <CANR=AhRM7YHHXVxJ4DmrTNMeuEOY87K2mLmo9KMed1JMr20p6g@mail.gmail.com>
- <aGFSgDRR8kLc1GxP@shredder>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CDD2257435;
+	Mon, 30 Jun 2025 12:06:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751285181; cv=fail; b=QaAGVzz8pnrriR+q8Ve3KTijQEW9gNFJdP1jodv0pPROYJ7oNHe7mKt+RGJqapQafUiAVDgtC62I9D5sAPzjgzPlimNFJej34JVq6e+pdpghpPW6ZERGkJwJUqXNd7NEARV42A5MwuIii/a5tk/tJp41TY9MREStFpw0nfEYIwI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751285181; c=relaxed/simple;
+	bh=jMxug1GXrSg+1fkKoQS1nrNOTsG2HVvNorvDzdYpPJU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Y0WlbVciciKOqVZLiMk15wyNkSq6Rjva/VK3d9BVpDrlUQihDY+mivXN7Af6woNG6f9DZy7aQ/nARL25jneAchAFIIw3V9bSyIHbarBGMhxZb8XSqOz9c35+Ut8q/kAkjndSPeRxhxYlhqCWErJZl7s/whO5c9zR6FqGB0qcfmY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dSqpevnS; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751285180; x=1782821180;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=jMxug1GXrSg+1fkKoQS1nrNOTsG2HVvNorvDzdYpPJU=;
+  b=dSqpevnS2uL77zxWMUfqJidJF1Mn5n3YiiMIQuy3s3v22wvGgwvAggEZ
+   F7CQsswrytRxtBxLqhf990bN3otEN/V3o1up72Kf6oJ/8CUdbhhzRdoIc
+   JUqtuWuWOJKDAiNoGGNOiA0dB1/FWfMBtiTvV4+9LRt7ir9XSCeNzep0A
+   UHn5zd7auvPgSAs8F+plm6E0jP1qLgrzARiPtxLjLzS0vOO3oxVb7rGrL
+   3pHg361a2u+sSTOHzq7Dpokyo3txYyGslTr7pDl9AkNC2LL8EKds6egPJ
+   qGubLqs98BfDiZ4zBj1m8LO82E78u6FNqDvhUYpJmBiapQDZNzTONI9qO
+   g==;
+X-CSE-ConnectionGUID: OlxvjpgNRDyqNwmhklhVyQ==
+X-CSE-MsgGUID: KeLW4qzWQtCUc1630jgUVQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11479"; a="63763632"
+X-IronPort-AV: E=Sophos;i="6.16,277,1744095600"; 
+   d="scan'208";a="63763632"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 05:06:19 -0700
+X-CSE-ConnectionGUID: fzue7+/LS/atYwTabzuNYQ==
+X-CSE-MsgGUID: P7udOnBASg+UODUa6YFW9w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,277,1744095600"; 
+   d="scan'208";a="153532857"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 05:06:18 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 30 Jun 2025 05:06:17 -0700
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Mon, 30 Jun 2025 05:06:17 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (40.107.220.56)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 30 Jun 2025 05:06:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZFy0LNd8ZLGK4KyM8fQHVcvygGKvpG9PrNHw/2Uv/8tfQDqvARQ68RcAMKRCbBuJVNkbnpZg1GKtsFORdYBXtOrwFiuMwC60HQ7KDiLio/RG8jw1/XNuswTDqUcZzZo1/bZHzXGwhyWHBLmbIFDyNoZZrt6u0J8B5CpISWXbG1GNfwREJzPrfNcCiO1hLEO8Wo9jW0RF3mtde6ilBJ57E2HMHHxTNNoBMwcSmsYJqx/ai1dHv1rOld708FxvrBtaniBv04Dt/fzl0tVQ2NrTHrVLTOsy25Ik4DAb6mxcy0ytki/2186T1GwUpLZ2VZU3zt29sGZ5CJxy+YvayUajPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ijJYVpMKDUaWNYdEZba4tO2n3NjZgqsuXMdyagPQuxY=;
+ b=JTdFfOGQUwfIvggdhgDf0y06i5W6V5wEbnXbS2oBnWgb7UVSsbf/QPi/+3ZTmEQrUxvidt3FHSv4VyzS7iWhP0DGMhTLbKdMbqcSQWJwUebOoFBCC1lJ/fBghFsBbtLj5B8W3qgnTzuIah6ZMGXHLIxxuoO+qAG7pEIOA2OQ1/h/eb1WL4cx6f8Qu1BXw7KBBMz5mg3S1pICzCJmxunskcM5gVdti9xpRoBd39lM7SMG/I8VKumcMDVWCF6EoPUKepVgHzN/l9OvWX/jYwl+g5Clq13zaHv5WE8o98Lq5LmDTBWHllOYmcSGKCdcrXaJrtS1IMWlfxbtNX9x7BqlAg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ BL3PR11MB6507.namprd11.prod.outlook.com (2603:10b6:208:38e::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8880.27; Mon, 30 Jun 2025 12:06:15 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%2]) with mapi id 15.20.8880.024; Mon, 30 Jun 2025
+ 12:06:15 +0000
+Date: Mon, 30 Jun 2025 14:06:02 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <bjorn@kernel.org>, <magnus.karlsson@intel.com>,
+	<jonathan.lemon@gmail.com>, <sdf@fomichev.me>, <ast@kernel.org>,
+	<daniel@iogearbox.net>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
+	<joe@dama.to>, <willemdebruijn.kernel@gmail.com>, <bpf@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v4 2/2] selftests/bpf: check if the global
+ consumer updates in time
+Message-ID: <aGJ9qiwNe5HBFxr2@boxer>
+References: <20250627085745.53173-1-kerneljasonxing@gmail.com>
+ <20250627085745.53173-3-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250627085745.53173-3-kerneljasonxing@gmail.com>
+X-ClientProxiedBy: VI1PR06CA0149.eurprd06.prod.outlook.com
+ (2603:10a6:803:a0::42) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aGFSgDRR8kLc1GxP@shredder>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|BL3PR11MB6507:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0dbe0f9e-91ba-4336-ac2a-08ddb7ce838f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?IOQfWPrNUFgN1WVhv3c5PHGQKQWmN/sVDWuKXr4sHC0bBxDXTimqpKCCpxom?=
+ =?us-ascii?Q?JzoxUINfd860YZ3jtneBo3ZCLt0COMOkWYJInwmlr1IBEHSZNqMnyTD95MrU?=
+ =?us-ascii?Q?ADXwvCvB/I5rF2d/39q/Wt33b1DfBLeEtC5+/1GyGHxzw0zoFLp71H0VpBgd?=
+ =?us-ascii?Q?iFX/CQpygWxnlWn3H6jx7TUIobFFPYRpMgtP2oSHS6ytOX91nqZ7Xw/1MjdR?=
+ =?us-ascii?Q?DnRcntKZga0zDyTomP73fryFDozsUY6nw+oDah+4x0qHdAVdn+50rw1fLF2D?=
+ =?us-ascii?Q?KWeAorRoxFgGgKcCZk7+v3+UDsbjewOVYaCHj56uTD387H5wSs8LFkSSElBZ?=
+ =?us-ascii?Q?NUqAUo+bb8m4QlaVRtV7HLEtbzLgcVt924cB6Eaz7aPPd21KB/bH4/r8VvF4?=
+ =?us-ascii?Q?IgmXTPbkMNdMB3oWunoQFWYVh5sHJSg24Tcg7463tkm1vUuR98qCfcn6v0ak?=
+ =?us-ascii?Q?JezPvJ/tTQy5wCIofT104GupLU7WTHenwmHTH6QOjSRQLjx0TiokeCXg9kj/?=
+ =?us-ascii?Q?Z2NDAaWv7u2F5rRaR7pK1pJnSLiW8duuzE7NuXWS1xj41bIs0dQnO1d/KdFV?=
+ =?us-ascii?Q?g0V9aXUiJ9Lk53PjEnHLlryL5h0tMHwVYw5ibllY9EgPkD1slAGJC4vRw5WZ?=
+ =?us-ascii?Q?kBa+KHsp0MwZbmqS+8QC3lhINSsb8KJaZcK4s/8GIVMmAyyXSbHYpDBDAAG8?=
+ =?us-ascii?Q?OAmgCeM7cHvmgUv1C+JcKXLEhOyI8afIShwkfVkLiy90uUq0CeunqC++YWHA?=
+ =?us-ascii?Q?OEgvaaiHurftFdkrwt/hGlS3FmWVZwETdYilQJ6kksMKiQUMF9uxmHq2TDP2?=
+ =?us-ascii?Q?foTH8RdcHpugCN2t0AQ76lkIHTOhlbsnjZh5Cjyp5HPg9U3wuyeVlmVdc9+T?=
+ =?us-ascii?Q?3g1nSFgVxyswETHAORl9W2ualX1k1Mof3tvHztONoIs8KaKCJ8ElxR1/Nmoz?=
+ =?us-ascii?Q?E4CbFO4VM6yc8hdqUnI35wrNc8LKDI30f2FKmNmM3gb3rgjUlUpi75mxCS7C?=
+ =?us-ascii?Q?We+Hg2fWV655JipQ4MWtHBJUlHbQv+prWdscMYLIDYZciHS6Zqkfz2CfJIoW?=
+ =?us-ascii?Q?y4zzXSTwoaXLpQgxuJ5gnECKn0pz1AalCVq9QhyNsn3ykmbMQhGMA/NiIhor?=
+ =?us-ascii?Q?CxZ1gGoENeheIt1UfVjK1RS36ttR43jtOXZT875R0xS1ExmSJXPPfOqzKlBh?=
+ =?us-ascii?Q?W6q+hcT8QP1HGr6GwFmgOJfZcg6Q1TAwHx3EFtQNSFlfqbKt1YPWs5gHR0MF?=
+ =?us-ascii?Q?ti8ceCZzoZN2a2qb5F7lFXmbmsCr1CotvgLDd2RYX6JsS/3YGqv6hysotlTo?=
+ =?us-ascii?Q?IpqOM7Conj/JiMFce4+kFbA3EoA25w7Ck5431GqVPuHUMK2a2U7P+YYX3bTU?=
+ =?us-ascii?Q?Cq57Cg8mqGohlkau/B9BTmkSoJkRzY9/hjMYCU10xSU+47mFNw=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?dmhbQLQupYbwPnHvWBsYFH8jWLxZerPQo4h1HDktN+DDSIJKsMSO9lurVohr?=
+ =?us-ascii?Q?2zrPO5JS9rywtELo7DFASKZOlx2tCszGsLlFuHnod7yey4J/qZgUA1omocnm?=
+ =?us-ascii?Q?JB+K+rdutFcCmOY7n5aYm0lpDzklZN0J9KJN/zZKNH5VX14CNc+2HiUWn2li?=
+ =?us-ascii?Q?r7KcPANR0oKyIYh0u5EyXs7AY2IoXHL7++5f5tc9MQQMWeyjyjN+DNaaLczO?=
+ =?us-ascii?Q?VciQL2QCUm5LvOjP/ZJBEGiDo/driLZGGeSSVi4MGlgZdJOJUDHbZLV/Egnn?=
+ =?us-ascii?Q?SxMPVuMkTLQE4KzJ1/7m5TqEooI9GIG/PdoLMJM07s1RCeGW8vly03PSHufO?=
+ =?us-ascii?Q?XBEmgFsH8h5IcdYsYTyrYxa4S5Gby4mdwzNIfFvoEBLhDqpxpyaWmnV/Rf5E?=
+ =?us-ascii?Q?AXvdZ16D8qKe0E5djHrQtFW9pRU5A5E3fOhmTIEc+HzdyvQAc3ZH3iO0cNFN?=
+ =?us-ascii?Q?Phqi5xHArg5m/P7JhhDw23qfSF87GSN+HqmLZlF9abGbCYLUXwOLCHRWQypP?=
+ =?us-ascii?Q?pLGEIO0IXfco4AbBVcndrPEt8ujYyni1jGpFN2Fv3OTxNp8USngj0J9oSIh2?=
+ =?us-ascii?Q?OjK8uWy1Tis5KyOjsfnLmx8YGYWCANZtrGBfaw2eQsflh0NdAXzGo3YR9jPB?=
+ =?us-ascii?Q?wpLl9qrtq5bnW2GzVf4N8N/DVQSYplnVw5SsGwN8sSlZju43KXaqfwzl5+pU?=
+ =?us-ascii?Q?vUR3xaloTvkdYmNGgBJdS6I5PAicBG2lxAKE7wtMc3H8udO9z58KMd0WcMIi?=
+ =?us-ascii?Q?veBKIguZIKgtQbCyxdZCJYKDaczqfDEqwpO+3UCQG2oFzRZQ6tsB3+IF38lK?=
+ =?us-ascii?Q?e5jARGSFnkuRu1b0Y4ZnE9uMn9sqSC0v4fji1VwlDQvu/vtXYDZHZnRS/LuG?=
+ =?us-ascii?Q?goLYdBKflJT7cj9EPBXMSztbDrjgfmsPavgWonT5P9V0GxeP5GrssSjOt/gA?=
+ =?us-ascii?Q?MHtGogDciz4L0+++Vcmvq2Cc1TQ7EdJk803NVsLMnLqimDKgRGtkRXKVirAb?=
+ =?us-ascii?Q?J2K+OpFcv6W8G0DFVipPxJHtK56SQjK7iAWgWjbihxuQ/TmwQUSLt6yylUub?=
+ =?us-ascii?Q?kZzgtTz3QmcvYNFSs4bracjRDUQ18FpRlYhRbLwKMgaY/cbikhdLfkjZI1Lp?=
+ =?us-ascii?Q?5qnIiucN39kYTDmfZeQe2lY0g0oKUvt0reeQR4MbnYOT2USpWAenYkhUFg+C?=
+ =?us-ascii?Q?Q1fdvvK/llECFnWxBX5l4wy5wgQAHe/5WbZKdVWrTWfrlYjz6582stPni750?=
+ =?us-ascii?Q?w6JPfa4qmqmOWsfVJz+G70OkjMkfXzvw1+3k3Nt+Bpj/7SHi2eFGNj+zGzZ9?=
+ =?us-ascii?Q?b/D9ZdsNN3mpWJ+53JNFeCD548807W/Mb+zCpoCH5Wn2YX6uupu2IugrwF/E?=
+ =?us-ascii?Q?T9+NGravKjbwv0vWobtyVhvyJ8kBXErdTKZZy2n3R2HqWPGLv2NMPU1WY91k?=
+ =?us-ascii?Q?EIphMrzYwmybiqeCyoB/jDJV6NIBYcmAr8BYbXFkOddk3RNEJqfW2vB+rJLs?=
+ =?us-ascii?Q?k/QBN9XIigtDoSN0WFPV3FrvjbRkx1fvRQ+IArrY0HeaSC9r/jn7cejDQGhM?=
+ =?us-ascii?Q?TD3gAz5gXsCCy2+91AQA9WdP3zan8qNMzF+XqhdhxfwVg56dDVARMVUzI0+I?=
+ =?us-ascii?Q?GA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0dbe0f9e-91ba-4336-ac2a-08ddb7ce838f
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 12:06:15.5938
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Bk9U8dD25GOwV/QFf2lktm7xhPchaZHiF7hWe78Z2mmB+3+yXdbo4BbuckLmKgE38l42lvkDQmzXIU4/XbD4VpXG/ye4T9mC1qByu0B0IY4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6507
+X-OriginatorOrg: intel.com
 
-On Sun, Jun 29, 2025 at 05:49:36PM +0300, Ido Schimmel wrote:
-> + Guillaume
+On Fri, Jun 27, 2025 at 04:57:45PM +0800, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
 > 
-> Report is here: https://lore.kernel.org/netdev/CANR=AhRM7YHHXVxJ4DmrTNMeuEOY87K2mLmo9KMed1JMr20p6g@mail.gmail.com/
+> This patch only checks non-zc mode and non STAT_TX_INVALID testcase. The
+> conditions are included in check_consumer().
 > 
-> On Sun, Jun 29, 2025 at 02:40:27PM +0800, Aiden Yang wrote:
-> > This report details a regression in the Linux kernel that prevents
-> > IPv6 link-local all-nodes multicast packets (ff02::1) from being
-> > transmitted over a GRE tunnel. The issue is confirmed to have been
-> > introduced between kernel versions 6.1.0-35-cloud-amd64 (working) and
-> > 6.1.0-37-cloud-amd64 (failing) on Debian 12 (Bookworm).
+> The policy of testing the issue is to recognize the max budget case where
+> the number of descs in the tx queue is larger than the default max budget,
+> namely, 32, to make sure that 1) the max_batch error is triggered in
+> __xsk_generic_xmit(), 2) xskq_cons_peek_desc() doesn't have the chance
+> to update the global state of consumer at last. Hitting max budget case
+> is just one of premature exit cases but has the same result/action in
+> __xsk_generic_xmit().
 > 
-> Apparently 6.1.0-35-cloud-amd64 is v6.1.137 and 6.1.0-37-cloud-amd64 is
-> v6.1.140. Probably started with:
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>  tools/testing/selftests/bpf/xskxceiver.c | 60 +++++++++++++++++++-----
+>  1 file changed, 48 insertions(+), 12 deletions(-)
 > 
-> a51dc9669ff8 gre: Fix again IPv6 link-local address generation.
-> 
-> In v6.1.139.
-> 
-> It skips creating an IPv6 multicast route for some ipgre devices. Can
-> you try the following diff?
-> 
-> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-> index ba2ec7c870cc..d0a202d0d93e 100644
-> --- a/net/ipv6/addrconf.c
-> +++ b/net/ipv6/addrconf.c
-> @@ -3537,12 +3537,10 @@ static void addrconf_gre_config(struct net_device *dev)
->  	 * case). Such devices fall back to add_v4_addrs() instead.
->  	 */
->  	if (!(dev->type == ARPHRD_IPGRE && *(__be32 *)dev->dev_addr == 0 &&
-> -	      idev->cnf.addr_gen_mode == IN6_ADDR_GEN_MODE_EUI64)) {
-> +	      idev->cnf.addr_gen_mode == IN6_ADDR_GEN_MODE_EUI64))
->  		addrconf_addr_gen(idev, true);
-> -		return;
-> -	}
-> -
-> -	add_v4_addrs(idev);
-> +	else
-> +		add_v4_addrs(idev);
+> diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
+> index 0ced4026ee44..694b0c0e1217 100644
+> --- a/tools/testing/selftests/bpf/xskxceiver.c
+> +++ b/tools/testing/selftests/bpf/xskxceiver.c
+> @@ -109,6 +109,8 @@
 >  
->  	if (dev->flags & IFF_POINTOPOINT)
->  		addrconf_add_mroute(dev);
+>  #include <network_helpers.h>
+>  
+> +#define MAX_TX_BUDGET_DEFAULT 32
+> +
+>  static bool opt_verbose;
+>  static bool opt_print_tests;
+>  static enum test_mode opt_mode = TEST_MODE_ALL;
+> @@ -1091,11 +1093,34 @@ static bool is_pkt_valid(struct pkt *pkt, void *buffer, u64 addr, u32 len)
+>  	return true;
+>  }
+>  
+> -static int kick_tx(struct xsk_socket_info *xsk)
+> +static u32 load_value(u32 *a)
+>  {
+> -	int ret;
+> +	return __atomic_load_n(a, __ATOMIC_ACQUIRE);
+> +}
+> +
+> +static int kick_tx_with_check(struct xsk_socket_info *xsk)
+> +{
+> +	int ret, cons_delta;
+> +	u32 prev_cons;
+>  
+> +	prev_cons = load_value(xsk->tx.consumer);
+>  	ret = sendto(xsk_socket__fd(xsk->xsk), NULL, 0, MSG_DONTWAIT, NULL, 0);
+> +	cons_delta = load_value(xsk->tx.consumer) - prev_cons;
+> +	if (cons_delta != MAX_TX_BUDGET_DEFAULT)
+> +		return TEST_FAILURE;
+> +
+> +	return ret;
+> +}
+> +
+> +static int kick_tx(struct xsk_socket_info *xsk, bool check_cons)
+> +{
+> +	u32 ready_to_send = load_value(xsk->tx.producer) - load_value(xsk->tx.consumer);
+> +	int ret;
+> +
+> +	if (!check_cons || ready_to_send <= MAX_TX_BUDGET_DEFAULT)
+> +		ret = sendto(xsk_socket__fd(xsk->xsk), NULL, 0, MSG_DONTWAIT, NULL, 0);
+> +	else
+> +		ret = kick_tx_with_check(xsk);
+>  	if (ret >= 0)
+>  		return TEST_PASS;
+>  	if (errno == ENOBUFS || errno == EAGAIN || errno == EBUSY || errno == ENETDOWN) {
+> @@ -1116,14 +1141,14 @@ static int kick_rx(struct xsk_socket_info *xsk)
+>  	return TEST_PASS;
+>  }
+>  
+> -static int complete_pkts(struct xsk_socket_info *xsk, int batch_size)
+> +static int complete_pkts(struct xsk_socket_info *xsk, int batch_size, bool check_cons)
 
-I believe that should fix the problem indeed. But, to me, the root
-cause is that addrconf_gre_config() doesn't call addrconf_add_dev().
+instead of sprinkling the booleans around the internals maybe you could
+achieve the same thing via flag added to xsk_socket_info?
 
-Ido, What do you think of something like the following (untested,
-hand-written) diff:
+you could set this new flag to true for standalone test case then? so we
+would be sort of back to initial approach.
 
- #if IS_ENABLED(CONFIG_NET_IPGRE)
- static void addrconf_gre_config(struct net_device *dev)
- {
- 	struct inet6_dev *idev;
- 
- 	ASSERT_RTNL();
- 
--	idev = ipv6_find_idev(dev);
--	if (IS_ERR(idev)) {
--		pr_debug("%s: add_dev failed\n", __func__);
--		return;
--	}
-+	idev = addrconf_add_dev(dev);
-+	if (IS_ERR(idev))
-+		return;
- 
- 	/* Generate the IPv6 link-local address using addrconf_addr_gen(),
- 	 * unless we have an IPv4 GRE device not bound to an IP address and
- 	 * which is in EUI64 mode (as __ipv6_isatap_ifid() would fail in this
- 	 * case). Such devices fall back to add_v4_addrs() instead.
- 	 */
- 	if (!(*(__be32 *)dev->dev_addr == 0 &&
- 	      idev->cnf.addr_gen_mode == IN6_ADDR_GEN_MODE_EUI64)) {
- 		addrconf_addr_gen(idev, true);
- 		return;
- 	}
- 
- 	add_v4_addrs(idev);
--
--	if (dev->flags & IFF_POINTOPOINT)
--		addrconf_add_mroute(dev);
- }
- #endif
+now you have nicely narrowed it down to kick_tx() being modified. Just the
+matter of passing the flag down.
 
-This way, we would create the multicast route and also respect
-disable_ipv6. That would bring GRE yet a bit closer to normal IPv6
-lladdr generation code.
-
-Note: this diff is based on net-next, but, without all the extra
-context lines, a real patch would probably apply to both net and
-next-next and could be backported to -stable.
-
-> Guillaume, AFAICT, after commit d3623dd5bd4e ("ipv6: Simplify link-local
-> address generation for IPv6 GRE.") in net-next an IPv6 multicast route
-> will be created for every ip6gre device, regardless of IFF_POINTOPOINT.
-> It should restore the behavior before commit e5dd729460ca ("ip/ip6_gre:
-> use the same logic as SIT interfaces when computing v6LL address"). We
-> can extend gre_ipv6_lladdr.sh to test this once the fix is in net-next.
-
-Yes, I fully agree.
-
-Long term, I'd really like to remove these special GRE and SIT cases
-(SIT certainly has the same problems we're currently fixing on GRE).
-
+>  {
+>  	unsigned int rcvd;
+>  	u32 idx;
+>  	int ret;
+>  
+>  	if (xsk_ring_prod__needs_wakeup(&xsk->tx)) {
+> -		ret = kick_tx(xsk);
+> +		ret = kick_tx(xsk, check_cons);
+>  		if (ret)
+>  			return TEST_FAILURE;
+>  	}
+> @@ -1323,7 +1348,17 @@ static int receive_pkts(struct test_spec *test)
+>  	return TEST_PASS;
+>  }
+>  
+> -static int __send_pkts(struct ifobject *ifobject, struct xsk_socket_info *xsk, bool timeout)
+> +bool check_consumer(struct test_spec *test)
+> +{
+> +	if (test->mode & TEST_MODE_ZC ||
+> +	    !strncmp("STAT_TX_INVALID", test->name, MAX_TEST_NAME_SIZE))
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+> +static int __send_pkts(struct test_spec *test, struct ifobject *ifobject,
+> +		       struct xsk_socket_info *xsk, bool timeout)
+>  {
+>  	u32 i, idx = 0, valid_pkts = 0, valid_frags = 0, buffer_len;
+>  	struct pkt_stream *pkt_stream = xsk->pkt_stream;
+> @@ -1336,7 +1371,7 @@ static int __send_pkts(struct ifobject *ifobject, struct xsk_socket_info *xsk, b
+>  	/* pkts_in_flight might be negative if many invalid packets are sent */
+>  	if (pkts_in_flight >= (int)((umem_size(umem) - xsk->batch_size * buffer_len) /
+>  	    buffer_len)) {
+> -		ret = kick_tx(xsk);
+> +		ret = kick_tx(xsk, check_consumer(test));
+>  		if (ret)
+>  			return TEST_FAILURE;
+>  		return TEST_CONTINUE;
+> @@ -1365,7 +1400,7 @@ static int __send_pkts(struct ifobject *ifobject, struct xsk_socket_info *xsk, b
+>  			}
+>  		}
+>  
+> -		complete_pkts(xsk, xsk->batch_size);
+> +		complete_pkts(xsk, xsk->batch_size, check_consumer(test));
+>  	}
+>  
+>  	for (i = 0; i < xsk->batch_size; i++) {
+> @@ -1437,7 +1472,7 @@ static int __send_pkts(struct ifobject *ifobject, struct xsk_socket_info *xsk, b
+>  	}
+>  
+>  	if (!timeout) {
+> -		if (complete_pkts(xsk, i))
+> +		if (complete_pkts(xsk, i, check_consumer(test)))
+>  			return TEST_FAILURE;
+>  
+>  		usleep(10);
+> @@ -1447,7 +1482,7 @@ static int __send_pkts(struct ifobject *ifobject, struct xsk_socket_info *xsk, b
+>  	return TEST_CONTINUE;
+>  }
+>  
+> -static int wait_for_tx_completion(struct xsk_socket_info *xsk)
+> +static int wait_for_tx_completion(struct xsk_socket_info *xsk, bool check_cons)
+>  {
+>  	struct timeval tv_end, tv_now, tv_timeout = {THREAD_TMOUT, 0};
+>  	int ret;
+> @@ -1466,7 +1501,7 @@ static int wait_for_tx_completion(struct xsk_socket_info *xsk)
+>  			return TEST_FAILURE;
+>  		}
+>  
+> -		complete_pkts(xsk, xsk->batch_size);
+> +		complete_pkts(xsk, xsk->batch_size, check_cons);
+>  	}
+>  
+>  	return TEST_PASS;
+> @@ -1492,7 +1527,7 @@ static int send_pkts(struct test_spec *test, struct ifobject *ifobject)
+>  				__set_bit(i, bitmap);
+>  				continue;
+>  			}
+> -			ret = __send_pkts(ifobject, &ifobject->xsk_arr[i], timeout);
+> +			ret = __send_pkts(test, ifobject, &ifobject->xsk_arr[i], timeout);
+>  			if (ret == TEST_CONTINUE && !test->fail)
+>  				continue;
+>  
+> @@ -1502,7 +1537,8 @@ static int send_pkts(struct test_spec *test, struct ifobject *ifobject)
+>  			if (ret == TEST_PASS && timeout)
+>  				return ret;
+>  
+> -			ret = wait_for_tx_completion(&ifobject->xsk_arr[i]);
+> +			ret = wait_for_tx_completion(&ifobject->xsk_arr[i],
+> +						     check_consumer(test));
+>  			if (ret)
+>  				return TEST_FAILURE;
+>  		}
+> -- 
+> 2.41.3
+> 
 
