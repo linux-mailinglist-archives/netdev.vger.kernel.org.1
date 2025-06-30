@@ -1,321 +1,218 @@
-Return-Path: <netdev+bounces-202646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F052AAEE76D
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 21:24:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A2D5AEE77A
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 21:27:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 094443BE031
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 19:23:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB98617CC48
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 19:27:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3072E28E571;
-	Mon, 30 Jun 2025 19:24:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C2A2E7198;
+	Mon, 30 Jun 2025 19:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hp4dGBuS"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="BgM92YfU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2052.outbound.protection.outlook.com [40.107.244.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6C928F514;
-	Mon, 30 Jun 2025 19:24:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751311462; cv=none; b=FWGnZ7MdaF0goGW+6WRpU8uF9EWaHaAYtWjjeigH+hiogfwjAZrqf82t5ruu8ulnE37OTReGRua2wJg+IkSVSGy7FfAmPu2tto0CVs2gnMcqm8cDuJ8Hh5JVaqkWX5P5/i0lvKjtXsOE9MMyUTHt3UlmdanDZ++6wc6qqGoGWjM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751311462; c=relaxed/simple;
-	bh=hgJGruXRln0HIU1QewagyaTXUW8ytMVv5FSc58v3gk4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g6mp1giIkWS99WLpnh2jl0vOG+YfeuITmfrWshBso1xAC9qtks4wnhN+s/cceODbXauCIK+71EOPOARQLfa3eK6xm5aTdSNUE/eq3l8ismJM+sDrVFPUko12SSgNGo4AT2jB2fBNWF30CiB2oMNNw1oIwt1RsHeQqgojdGBElLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hp4dGBuS; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-32ac42bb4e4so21993031fa.0;
-        Mon, 30 Jun 2025 12:24:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751311458; x=1751916258; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I3iXjTxlr7wRgS/7gvePRNwHH5SCq/n2+EMHRv3w9tw=;
-        b=hp4dGBuSiruoppNF9DuyDEjwLFdD6twEA3HY6A6xQL0wS8gAe20otl+ncKXdJr87Pr
-         NSUWagUj11Y7xkjM626wteWwnb7vUzqYEF/4slhwHHm5hb1COs9khx8NXtoEEuhkRApj
-         IjXAdxJVTrKWQNhzEG1iBZY2icYw4Eeeewnen8kR/XY4icJEHh5Bo/Y/drvjGHjC1aNe
-         nZw7s9yskMD2JnVMYQixXuY50ie7rGLsvRqO+aWvVMXBOGlLFzATAZMrZWxXGglR6QIK
-         OEmlog8iVqG6OMSQr3xzbF5M0aam2QIsuFiSVQPgCw7vqITpllvoi5PDksWhwAkO1mP5
-         sGCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751311458; x=1751916258;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I3iXjTxlr7wRgS/7gvePRNwHH5SCq/n2+EMHRv3w9tw=;
-        b=XdJDD99Y38fO3mbRcLAUQegqBESXGTrcV4mY0XUo7V53fFgRaYl1VOsTUgFeDuxl3E
-         0ppiyqx2ZHsp1iWSePuSGL8AC8wLvmSqzQqoeG7zr+ka52EIx3pjjnvJiIPVW1ocu6W3
-         ZOs6+LmEqQ/rApWHlut6Duu6IWYmuVHCMNME/YDhFzRz7nBvwOuzxzhE268QRNpnzJRD
-         DVMBmEMOD1YMV8SgqI0aKpj4iUMPhKwQiC0HhrSg7Cgtzxa5OSFstHcMW6p3+VmMafvZ
-         nFMfQaFtiz4iCCuokeiyUbLNlKRpW+Wp/RYwWBR8BfbeoxrBc363Fv+WjL2rwCG1nypy
-         k3ig==
-X-Forwarded-Encrypted: i=1; AJvYcCVBOMGeqWvoddi1UNwhrin8VyHE0/8bY623tXh1c8HcFapXNr62s6VkJ71gGTsU/YhkH/KIceCk@vger.kernel.org, AJvYcCWIQbhU69iCg8FAiv4EGd+xIjvYVg45mVw6BGrTPUheOanyKVwVhQ/KKV7MKhWKWFKajTCNnLXLMbUMfajf@vger.kernel.org, AJvYcCXzOTcFrYhoYU8BpL5el/ac+LxEX9uZydB9OxZWiw/Yaes3xh1f9sdFiyfIBZuZ2AK8kRjquan9zWqeZki9EW4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6xIpulYb19Rpz4nuW7JvpH06+RIOZuM3Pj/X8fE0U1yidEKeb
-	GLPS9YPeDlWZPW8w02rJwi9zYw8C9Wi2Ug7UqZUIkkTLbNwbn54BvmeCJlF4c5H/y5nkTrVpsrj
-	E1Sb/X1V6jyiDJDjvlS7NMcJFmUUmQu4=
-X-Gm-Gg: ASbGnctu5BtdkaIS6aQUUrbR0gQQkPiOPoLjL+srW4s/hp9eCHLT9h8W0OGDLOGMv2Q
-	aZz8FVkSb00R6zG/VmpIlflozx3R5x47upJNwQERUho+2snKbv6AICracMFGbkhjjkt+YhZnmB7
-	jaZhDKmbxA8UMdbSBGQNVOnkY1ssloM92Au1OlXTT/AFQ7
-X-Google-Smtp-Source: AGHT+IHnGmU+g8CW1VpOTSmBwexfp7kaHHdSDT+IQ7WxVBjgwQJF+0cMNvBk+wdrYs9n5iInkcIXpftXxRQioXwer7E=
-X-Received: by 2002:a05:651c:4190:b0:32a:88a3:a98 with SMTP id
- 38308e7fff4ca-32cdc50f025mr35560791fa.38.1751311457822; Mon, 30 Jun 2025
- 12:24:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 984301EBA0D
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 19:27:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751311634; cv=fail; b=AB+IyrRwGHa2K9igeEwjWmjsBZrkxyJe2PjjiUD1oVl4JkR8lE+9RYzKkSJheCs/QU9RYkQQUqvqCEKcARAHZJOr+GxeFjEq31J8ZINgb8h6ncXXkEKmpaNx64SDK43ygnkKjuURM+RgNbVUfCwFNhuQIB2uw00LpLQNzqL1XOs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751311634; c=relaxed/simple;
+	bh=DS2IatLFQHqzTU/gPlyxO3Lu3UYSRTKQymQrnDylPCo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rxIp9oGCOLbFjzi9TW7jFwKsWw42h1P9nguownEM5JKCZVJL9s3ZSCJ8NeqabsQdECQIcp++/1fg7ErPuhRt/uACWNmbcFausZF0MVwOxBQUR61us3MHRxQy8xBNdcpNyYgLvn8dX1czfR+jAB/d1F3NmbGl2Pcsq+vhpE7P/dA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=BgM92YfU; arc=fail smtp.client-ip=40.107.244.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JlYxAC2pYye7xTUeo/4pOtGHbi7m54/WiqenTwL5S6f9uwv3OVZyIReLb1mWYtxJ3SkHmRVCiklAXPL9ySK6yvnoFZzQ/a66BpEC/srw5hfIRfBmEZZ5neU3bNiHpkmy6uajcXI7tkVDyocWggUv5+HowNRnmvFwV6lqD9pk/UVGB9UwBNQHuYSIW0x9DHdqi4Ddk+WpDDT0ekzmLI4mSITN+1woc0yYjZgZmaIEv4FTV57HlzC3Hf+pdgYHn4EvdLo0t9uUZRBWH/Y6LvU/OnaJ9akkCkR5LTM6Ul1SAoU8crc03CiUpsW7DIblEOOi/PoJiAbUHaEufCAPVFyTlA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NRmN9hHyj+53YcXnm4B4okzR6VHKfc/brBCDzyC4Wrk=;
+ b=wvBBxVfDqi49S37b+aQm77AtDcr6/0Q5pWnrBP0f8PZ437IlXJdOTztcLiz5Et6GTICZkEVxugx3f5JJZQSvM16zm8hr+7qkc666Gvk+t2HEAFTNhaHLOdxELV9k4RsyqpMqcymx9qHrLGAJac5p7/XMKdNNAFEraqZpyOUTpSkYt6sw3bcgytW0ENJUC3J3mqVSz9UBvjSgf1MN73LSSYc3qJ7A4RYBWGtZ3O0fyhDUWRks2d1rCg4AcBJc7QGQya/gW1+9zTLHY4la1FQXT6PzF9YMVSUcpI6k4jG8AxXjXF5LQaP8wdVvxt2wJeCk2daLy3N6PCBbkpBBvUPbTA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NRmN9hHyj+53YcXnm4B4okzR6VHKfc/brBCDzyC4Wrk=;
+ b=BgM92YfUPcNfrm/Urr/nS8Bk1sQGJqYcSoFx+uPDm8xPVMevdbGenCWwxpSRazumxO35tRe5tallFc4x3PynJwxLx+eqB3VYjN0B1Ln9QuCdUHVuN8v4CAbe7NBWLGBgf4HuwnPCQbUMY1AC3eLqVTsiedlUBf5jnZgK+TJNa10=
+Received: from MN0P222CA0004.NAMP222.PROD.OUTLOOK.COM (2603:10b6:208:531::11)
+ by PH0PR12MB5607.namprd12.prod.outlook.com (2603:10b6:510:142::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.32; Mon, 30 Jun
+ 2025 19:27:09 +0000
+Received: from BN2PEPF000044A7.namprd04.prod.outlook.com
+ (2603:10b6:208:531:cafe::99) by MN0P222CA0004.outlook.office365.com
+ (2603:10b6:208:531::11) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.30 via Frontend Transport; Mon,
+ 30 Jun 2025 19:27:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN2PEPF000044A7.mail.protection.outlook.com (10.167.243.101) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8901.15 via Frontend Transport; Mon, 30 Jun 2025 19:27:08 +0000
+Received: from airavat.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 30 Jun
+ 2025 14:27:05 -0500
+From: Raju Rangoju <Raju.Rangoju@amd.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <thomas.lendacky@amd.com>,
+	<Shyam-sundar.S-k@amd.com>, Raju Rangoju <Raju.Rangoju@amd.com>
+Subject: [net] amd-xgbe: align CL37 AN sequence as per databook
+Date: Tue, 1 Jul 2025 00:56:36 +0530
+Message-ID: <20250630192636.3838291-1-Raju.Rangoju@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250630-handle_big_sync_lost_event-v3-1-a4cf5bf6ec82@amlogic.com>
-In-Reply-To: <20250630-handle_big_sync_lost_event-v3-1-a4cf5bf6ec82@amlogic.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 30 Jun 2025 15:24:03 -0400
-X-Gm-Features: Ac12FXyO2klQJe7tvwu1OmJf8ds4Pvpt3K3aJ0Cbaw2wuxlMkDYORr-4wEq5hhA
-Message-ID: <CABBYNZ+eVbYr4+08-qCccV+2BpUibV7jA55jJti9+PFS_4L1yg@mail.gmail.com>
-Subject: Re: [PATCH v3] Bluetooth: hci_event: Add support for handling LE BIG
- Sync Lost event
-To: yang.li@amlogic.com
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044A7:EE_|PH0PR12MB5607:EE_
+X-MS-Office365-Filtering-Correlation-Id: 72debe82-8edd-4286-8873-08ddb80c1af6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?AjWeJgI6fmBQGdSGoMZ5sDvejDFcU7NbsNh2dseQTy8ikgdKSVIk89zOgsQK?=
+ =?us-ascii?Q?hpyQ7DOhR30saU+2nxebezHvFx59yDrm9/kzYpKg2Hh3riChqXS/dcJLBAeR?=
+ =?us-ascii?Q?jSqEyJO1AWLPbxvHCdVJPtskVKUxqMAW2Mr6rOJXbCGzX7MkDarXDGFpMvLY?=
+ =?us-ascii?Q?0AEEFR4HrKEs60hOjz97hfcDy5VFPwXZowC1mrD92CkycntLXi5ARyU/GQFH?=
+ =?us-ascii?Q?Rj/0ObtCFzKnRsLTh4KWXaIfpmmozkBwq9hPPy+FW2IBYv1RZGe961oH4gsv?=
+ =?us-ascii?Q?q4BZpzU/7YWBZoMJgzHEfdZKV89UkwqsBY6zG63gA7FPOlN6IvaY4rpzf9LP?=
+ =?us-ascii?Q?Gm+Gh6jZp5nBokV5n0YEbUqSKTkpeY43QdsmW0FeOC4+CZO57cU8CewEaZ4L?=
+ =?us-ascii?Q?xvX4mS8tc316anmjuaqnl3m3d22P7+o/E8rIjpKiJJ3trLq5FEQ47nz1uPmq?=
+ =?us-ascii?Q?dOJS5FgXbiXorgqj4bZGPEqXyWjV8AvZMQ2SGzj9f7IXi5QBy/Hn684TTuBX?=
+ =?us-ascii?Q?BIz4yj+up+6ChBFumXNLBcYVHBjQB4ZnoRen1uaz0fGzUgmqJxKeb0A8WnIQ?=
+ =?us-ascii?Q?8t/K+zsJBdmiYBJk4CU/l6H0ukEeAn/guRabZUnWMphufuYSSfIdqDp3CdXT?=
+ =?us-ascii?Q?RwKNznqsiYL0Fsd8DqwiFY83twhmwx6thM1YsE8fSjRL09mnTiVjn9wK6u/T?=
+ =?us-ascii?Q?cE5iZN6B2qGjVedizMmQ7tNnUH/VbdI4XpmXUaa8qhE1MCoLbuKs4uM4bEYq?=
+ =?us-ascii?Q?lU75nwGMwsOJwR5L8NqIyCDM1Zg2MD+2ThCU7zPuagRUjevzBUxXVjiFFbFy?=
+ =?us-ascii?Q?2PFJg+XTJnbylbqKuVFlaK9MFRqB8wxmj5O546vJeVER0v8/+Tk4n4ru9Qtb?=
+ =?us-ascii?Q?ZwhEO+5Co7BFj4Ki4DeZ3nhBdnVzfHuz2fKtGs1717r8lJV0HZ3ZUVQuyukD?=
+ =?us-ascii?Q?2nbWmQ1Tyc4HeVNDKht3jPYEPmtXoSR0zOL+4ZDVlT5rFfgKF6TxmkLNM7JO?=
+ =?us-ascii?Q?fXBB5b4eJuLw6pomD0duNP/Pa3eyIVDYQOvoV2Rp9OA8IvMURdY8PgNFqWoK?=
+ =?us-ascii?Q?9G49r1JUyJEx9RnApHCX1ZKIkWYiCLgQmjP4WCZHD5zDkVlZOGvt6WebTkBS?=
+ =?us-ascii?Q?xWpjK96CQIn6Jumb+VX3hiK+tyCK0W4Bd/log90+R6j36joHeX+EeJE/ZWBO?=
+ =?us-ascii?Q?GDooJSB7npvsEx+7+API70FhL/Jk6L1djHzs+WVbV1f0trQZWwo6zQrkhLKo?=
+ =?us-ascii?Q?Tv02/JGCfM7KIl77P7FgjriIhoLp3xkgjdjVWm8yXgwV8MJ1x6eqpPYWwtaO?=
+ =?us-ascii?Q?n8ngaLb3h/Gutpbt73beRU0XJzOeL7SLGIteuAqAAP6UJtAYmwwTPIEHtV57?=
+ =?us-ascii?Q?cXve90zI/K0dk416VGSzS3vnEkI5lAYqq6X8AGrxvRBWBcl3Zu/iM7z00C6T?=
+ =?us-ascii?Q?4QiIPwMemJpVvhkQV1U2fYoVIeC94xM9mcjvOHGo0KCyLmlc1XSjnRQph5nr?=
+ =?us-ascii?Q?D8Rw+Io9RngoxPOILvVedhoGXmRwmcb7NLdy?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 19:27:08.7530
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 72debe82-8edd-4286-8873-08ddb80c1af6
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF000044A7.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5607
 
-Hi,
+Update the Clause 37 Auto-Negotiation implementation to properly align
+with the PCS hardware specifications:
+- Fix incorrect bit settings in Link Status and Link Duplex fields
+- Implement missing sequence steps 2 and 7
 
-On Mon, Jun 30, 2025 at 2:45=E2=80=AFAM Yang Li via B4 Relay
-<devnull+yang.li.amlogic.com@kernel.org> wrote:
->
-> From: Yang Li <yang.li@amlogic.com>
->
-> When the BIS source stops, the controller sends an LE BIG Sync Lost
-> event (subevent 0x1E). Currently, this event is not handled, causing
-> the BIS stream to remain active in BlueZ and preventing recovery.
->
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
-> ---
-> Changes in v3:
-> - Delete the PA sync connection separately.
-> - Add state and role check when lookup BIS connections
-> - Link to v2: https://lore.kernel.org/r/20250625-handle_big_sync_lost_eve=
-nt-v2-1-81f163057a21@amlogic.com
->
-> Changes in v2:
-> - Matching the BIG handle is required when looking up a BIG connection.
-> - Use ev->reason to determine the cause of disconnection.
-> - Call hci_conn_del after hci_disconnect_cfm to remove the connection ent=
-ry
-> - Delete the big connection
-> - Link to v1: https://lore.kernel.org/r/20250624-handle_big_sync_lost_eve=
-nt-v1-1-c32ce37dd6a5@amlogic.com
-> ---
->  include/net/bluetooth/hci.h      |  6 ++++++
->  include/net/bluetooth/hci_core.h | 16 ++++++++++++----
->  net/bluetooth/hci_conn.c         |  3 ++-
->  net/bluetooth/hci_event.c        | 39 ++++++++++++++++++++++++++++++++++=
-++++-
->  4 files changed, 58 insertions(+), 6 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 82cbd54443ac..48389a64accb 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -2849,6 +2849,12 @@ struct hci_evt_le_big_sync_estabilished {
->         __le16  bis[];
->  } __packed;
->
-> +#define HCI_EVT_LE_BIG_SYNC_LOST 0x1e
-> +struct hci_evt_le_big_sync_lost {
-> +       __u8    handle;
-> +       __u8    reason;
-> +} __packed;
-> +
->  #define HCI_EVT_LE_BIG_INFO_ADV_REPORT 0x22
->  struct hci_evt_le_big_info_adv_report {
->         __le16  sync_handle;
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
-_core.h
-> index a760f05fa3fb..5ab19d4fef93 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -1340,7 +1340,8 @@ hci_conn_hash_lookup_big_sync_pend(struct hci_dev *=
-hdev,
->  }
->
->  static inline struct hci_conn *
-> -hci_conn_hash_lookup_big_state(struct hci_dev *hdev, __u8 handle,  __u16=
- state)
-> +hci_conn_hash_lookup_big_state(struct hci_dev *hdev, __u8 handle,
-> +                              __u16 state, __u8 role)
->  {
->         struct hci_conn_hash *h =3D &hdev->conn_hash;
->         struct hci_conn  *c;
-> @@ -1348,9 +1349,16 @@ hci_conn_hash_lookup_big_state(struct hci_dev *hde=
-v, __u8 handle,  __u16 state)
->         rcu_read_lock();
->
->         list_for_each_entry_rcu(c, &h->list, list) {
-> -               if (c->type !=3D BIS_LINK || bacmp(&c->dst, BDADDR_ANY) |=
-|
-> -                   c->state !=3D state)
-> -                       continue;
-> +               if (role =3D=3D HCI_ROLE_MASTER) {
-> +                       if (c->type !=3D BIS_LINK || bacmp(&c->dst, BDADD=
-R_ANY) ||
-> +                               c->state !=3D state || c->role !=3D role)
-> +                               continue;
+These changes ensure CL37 auto-negotiation protocol follows the exact
+sequence patterns as specified in the hardware databook.
 
-We don't really need to compare the address anymore since we now have
-dedicated types for CIS and BIS, Id probably fix that in a leading
-patch since that should have been added as a Fixes to the commit that
-introduced the separate types, I will send a fix for it just make sure
-you rebase your tree on top of bluetooth-next.
+Fixes: 1bf40ada6290 ("amd-xgbe: Add support for clause 37 auto-negotiation")
+Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+---
+ drivers/net/ethernet/amd/xgbe/xgbe-common.h | 2 ++
+ drivers/net/ethernet/amd/xgbe/xgbe-mdio.c   | 9 +++++++++
+ drivers/net/ethernet/amd/xgbe/xgbe.h        | 4 ++--
+ 3 files changed, 13 insertions(+), 2 deletions(-)
 
-> +               } else {
-> +                       if (c->type !=3D BIS_LINK ||
-> +                               c->state !=3D state ||
-> +                               c->role !=3D role)
-> +                               continue;
-> +               }
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-common.h b/drivers/net/ethernet/amd/xgbe/xgbe-common.h
+index e1296cbf4ff3..9316de4126cf 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-common.h
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-common.h
+@@ -1269,6 +1269,8 @@
+ #define MDIO_VEND2_CTRL1_SS13		BIT(13)
+ #endif
+ 
++#define XGBE_VEND2_MAC_AUTO_SW		BIT(9)
++
+ /* MDIO mask values */
+ #define XGBE_AN_CL73_INT_CMPLT		BIT(0)
+ #define XGBE_AN_CL73_INC_LINK		BIT(1)
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c b/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c
+index 71449edbb76d..fb5b7eceb73f 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c
+@@ -266,6 +266,10 @@ static void xgbe_an37_set(struct xgbe_prv_data *pdata, bool enable,
+ 		reg |= MDIO_VEND2_CTRL1_AN_RESTART;
+ 
+ 	XMDIO_WRITE(pdata, MDIO_MMD_VEND2, MDIO_CTRL1, reg);
++
++	reg = XMDIO_READ(pdata, MDIO_MMD_VEND2, MDIO_PCS_DIG_CTRL);
++	reg |= XGBE_VEND2_MAC_AUTO_SW;
++	XMDIO_WRITE(pdata, MDIO_MMD_VEND2, MDIO_PCS_DIG_CTRL, reg);
+ }
+ 
+ static void xgbe_an37_restart(struct xgbe_prv_data *pdata)
+@@ -894,6 +898,11 @@ static void xgbe_an37_init(struct xgbe_prv_data *pdata)
+ 
+ 	netif_dbg(pdata, link, pdata->netdev, "CL37 AN (%s) initialized\n",
+ 		  (pdata->an_mode == XGBE_AN_MODE_CL37) ? "BaseX" : "SGMII");
++
++	reg = XMDIO_READ(pdata, MDIO_MMD_AN, MDIO_CTRL1);
++	reg &= ~MDIO_AN_CTRL1_ENABLE;
++	XMDIO_WRITE(pdata, MDIO_MMD_AN, MDIO_CTRL1, reg);
++
+ }
+ 
+ static void xgbe_an73_init(struct xgbe_prv_data *pdata)
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
+index 6359bb87dc13..057379cd43ba 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe.h
++++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
+@@ -183,12 +183,12 @@
+ #define XGBE_LINK_TIMEOUT		5
+ #define XGBE_KR_TRAINING_WAIT_ITER	50
+ 
+-#define XGBE_SGMII_AN_LINK_STATUS	BIT(1)
++#define XGBE_SGMII_AN_LINK_DUPLEX	BIT(1)
+ #define XGBE_SGMII_AN_LINK_SPEED	(BIT(2) | BIT(3))
+ #define XGBE_SGMII_AN_LINK_SPEED_10	0x00
+ #define XGBE_SGMII_AN_LINK_SPEED_100	0x04
+ #define XGBE_SGMII_AN_LINK_SPEED_1000	0x08
+-#define XGBE_SGMII_AN_LINK_DUPLEX	BIT(4)
++#define XGBE_SGMII_AN_LINK_STATUS	BIT(4)
+ 
+ /* ECC correctable error notification window (seconds) */
+ #define XGBE_ECC_LIMIT			60
+-- 
+2.34.1
 
-Then all we need to do is add the role check.
-
->
->                 if (handle =3D=3D c->iso_qos.bcast.big) {
->                         rcu_read_unlock();
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 4f379184df5b..6bb1ab42db39 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -2146,7 +2146,8 @@ struct hci_conn *hci_bind_bis(struct hci_dev *hdev,=
- bdaddr_t *dst, __u8 sid,
->         struct hci_link *link;
->
->         /* Look for any BIS that is open for rebinding */
-> -       conn =3D hci_conn_hash_lookup_big_state(hdev, qos->bcast.big, BT_=
-OPEN);
-> +       conn =3D hci_conn_hash_lookup_big_state(hdev, qos->bcast.big,
-> +                                            BT_OPEN, HCI_ROLE_MASTER);
->         if (conn) {
->                 memcpy(qos, &conn->iso_qos, sizeof(*qos));
->                 conn->state =3D BT_CONNECTED;
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 66052d6aaa1d..f3e3e4964677 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -3903,6 +3903,8 @@ static u8 hci_cc_le_setup_iso_path(struct hci_dev *=
-hdev, void *data,
->                 goto unlock;
->         }
->
-> +       conn->state =3D BT_CONNECTED;
-> +
->         switch (cp->direction) {
->         /* Input (Host to Controller) */
->         case 0x00:
-> @@ -6913,7 +6915,7 @@ static void hci_le_create_big_complete_evt(struct h=
-ci_dev *hdev, void *data,
->
->         /* Connect all BISes that are bound to the BIG */
->         while ((conn =3D hci_conn_hash_lookup_big_state(hdev, ev->handle,
-> -                                                     BT_BOUND))) {
-> +                                       BT_BOUND, HCI_ROLE_MASTER))) {
->                 if (ev->status) {
->                         hci_connect_cfm(conn, ev->status);
->                         hci_conn_del(conn);
-> @@ -6968,6 +6970,7 @@ static void hci_le_big_sync_established_evt(struct =
-hci_dev *hdev, void *data,
->         }
->
->         clear_bit(HCI_CONN_CREATE_BIG_SYNC, &conn->flags);
-> +       conn->state =3D BT_CONNECTED;
-
-Wrong line, anyway I have fixed this upstream already so you need to rebase=
-.
-
->         conn->num_bis =3D 0;
->         memset(conn->bis, 0, sizeof(conn->num_bis));
-> @@ -7026,6 +7029,35 @@ static void hci_le_big_sync_established_evt(struct=
- hci_dev *hdev, void *data,
->         hci_dev_unlock(hdev);
->  }
->
-> +static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
-> +                                    struct sk_buff *skb)
-> +{
-> +       struct hci_evt_le_big_sync_lost *ev =3D data;
-> +       struct hci_conn *bis, *conn;
-> +
-> +       bt_dev_dbg(hdev, "big handle 0x%2.2x", ev->handle);
-> +
-> +       hci_dev_lock(hdev);
-> +
-> +       /* Delete the pa sync connection */
-> +       bis =3D hci_conn_hash_lookup_pa_sync_big_handle(hdev, ev->handle)=
-;
-> +       if (bis) {
-> +               conn =3D hci_conn_hash_lookup_pa_sync_handle(hdev, bis->s=
-ync_handle);
-> +               if (conn)
-> +                       hci_conn_del(conn);
-> +       }
-> +
-> +       /* Delete each bis connection */
-> +       while ((bis =3D hci_conn_hash_lookup_big_state(hdev, ev->handle,
-> +                                               BT_CONNECTED, HCI_ROLE_SL=
-AVE))) {
-> +               clear_bit(HCI_CONN_BIG_SYNC, &bis->flags);
-> +               hci_disconn_cfm(bis, ev->reason);
-> +               hci_conn_del(bis);
-> +       }
-> +
-> +       hci_dev_unlock(hdev);
-> +}
-> +
->  static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *d=
-ata,
->                                            struct sk_buff *skb)
->  {
-> @@ -7149,6 +7181,11 @@ static const struct hci_le_ev {
->                      hci_le_big_sync_established_evt,
->                      sizeof(struct hci_evt_le_big_sync_estabilished),
->                      HCI_MAX_EVENT_SIZE),
-> +       /* [0x1e =3D HCI_EVT_LE_BIG_SYNC_LOST] */
-> +       HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_LOST,
-> +                    hci_le_big_sync_lost_evt,
-> +                    sizeof(struct hci_evt_le_big_sync_lost),
-> +                    HCI_MAX_EVENT_SIZE),
-
-After you fix the comments I do expect some code to introduce support
-into our emulator and then add some test to iso-tester that causes the
-test to generate HCI_EVT_LE_BIG_SYNC_LOST so we can confirm this is
-working as intended.
-
->         /* [0x22 =3D HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
->         HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
->                      hci_le_big_info_adv_report_evt,
->
-> ---
-> base-commit: bd35cd12d915bc410c721ba28afcada16f0ebd16
-> change-id: 20250612-handle_big_sync_lost_event-4c7dc64390a2
->
-> Best regards,
-> --
-> Yang Li <yang.li@amlogic.com>
->
->
-
-
---=20
-Luiz Augusto von Dentz
 
