@@ -1,99 +1,103 @@
-Return-Path: <netdev+bounces-202381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25E44AEDA9E
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:18:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92CD1AEDAA0
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:18:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 121AD1899794
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:18:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6661818998D5
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:19:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6836223323;
-	Mon, 30 Jun 2025 11:18:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1301235056;
+	Mon, 30 Jun 2025 11:18:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZcMD0xQf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VgtoOB9v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B321DC988;
-	Mon, 30 Jun 2025 11:18:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776F61E9915;
+	Mon, 30 Jun 2025 11:18:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751282311; cv=none; b=uUOpI3tXP5IFKLBus/A9a2UD3ZICQpfA0ngn4vqq1CXW2mzs/jP5CbGpViy8RAhqYq0+bmJfmErFARdjwOwwnEvp1QA5UKz6YwcfXf1X+ES5qgLP9E+txKwbQyax2qqa/6dxNwhsp1BQzsREvGGf+HiVG8QtV4enKoZUk+fSAww=
+	t=1751282321; cv=none; b=CwcD/LAjW9uCbU0Q3SXTswGUlDVCjGK4z4rufThnb/25hdzVXace9YYcT3OrIcccrCOGAcAB1uLxNkGLinKZHkhfag4c/U/u7vgB83YNGuGdMLhwyTBM66JhkW9T7b4HA0JZ+Ql7T/YfUjgzlgV7Nz+ccix/s60KsK2RE9MjtcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751282311; c=relaxed/simple;
-	bh=9gThfWOSowAx4Kc3l4vZYGdweF31noC/qdGXalTIOPw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jDSnALMlgXAMuUsYTtowgC644jxjY8lWBU75VXmVZdvx9v7l7pmpa2KbL+Y1lXbrbthXyXSH+SIRVayS4ZKjFPOMMSRBjXLfLn9OLEMvP1L76+0YnqUj8DEU3jfkCkfhpGbOttzZE+KcXXl5fUxF6CPNrnaMh09izl0lnqRaHjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZcMD0xQf; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751282310; x=1782818310;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=9gThfWOSowAx4Kc3l4vZYGdweF31noC/qdGXalTIOPw=;
-  b=ZcMD0xQfT7hcnZsmF2N2rNtkSw1RLQrtLZs5LIdsShpGg5WfTn/FKcuG
-   e7ExDAg2A/CkhBY1EU7o2g436dGtiw+eYuHsNiKuJmPQ5Pa/VM7hib+ix
-   IepY9yj1g68muFSoaUrJ3j7pEqAY24Od8xYGW5J0pOwpvZOPu2uLSLjbU
-   6wx0FRqNq9vA1owfTTKAEq3MtjmDkuIirtvRxpEgfdOCORI5K1dvmHY5K
-   a8pyDZ+TyzuvqWAFeSpwEWRhtXnq+13WygZToCxdbguTXZoYbpIrS1co4
-   PhasiP8U9QGyZ/Uwawj7/Dleq5+a94OED4ibuu18dsD0UPUmPTki4bus8
-   Q==;
-X-CSE-ConnectionGUID: oYZaErT9TSmBjdM6C8hjhg==
-X-CSE-MsgGUID: hJjjoEqwQYCYeU3fDfA2ew==
-X-IronPort-AV: E=McAfee;i="6800,10657,11479"; a="53227976"
-X-IronPort-AV: E=Sophos;i="6.16,277,1744095600"; 
-   d="scan'208";a="53227976"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 04:18:30 -0700
-X-CSE-ConnectionGUID: 3hy1gCpjRsmQrnY/oWw3CQ==
-X-CSE-MsgGUID: Nj6v/XxrTP+AYrscaB7dTA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,277,1744095600"; 
-   d="scan'208";a="153736522"
-Received: from mdsouz-mobl2.amr.corp.intel.com (HELO [10.246.2.119]) ([10.246.2.119])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 04:18:26 -0700
-Message-ID: <ecd14fd4-91b2-4bdf-af9c-cc6f555f989b@linux.intel.com>
-Date: Mon, 30 Jun 2025 13:18:22 +0200
+	s=arc-20240116; t=1751282321; c=relaxed/simple;
+	bh=/zPtV6dESq3W/I9QbMckyTu4GDaEL5TPBWwywPJ32S0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LApTW+3mqC52v4GTLQxnrqCwbUeeKBaq5hdaDwT3DzUC+r3sbno2zPHGDbHcFrQMVeheugwRZfT4Doh37ea4adz0oyLpD5MGwbOTmGsJ9SgF4LEhhzUlMLq2WK8YNwlXShdD8/tcYwBJKKCk+SPktuDv+6fm9D4birwHIhyxnsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VgtoOB9v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D31D3C4CEE3;
+	Mon, 30 Jun 2025 11:18:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751282321;
+	bh=/zPtV6dESq3W/I9QbMckyTu4GDaEL5TPBWwywPJ32S0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VgtoOB9vsslvh2n8Etqblw7N5AJFVaQmiRZrFoPCTCh4i54PbjXwP+1ZC7y2HP1qP
+	 AkFlhmywwhYYtPjDbPQyjbq6Twn2Wiw2r6TQKe3zb0VmytVO8KInWYObJXlIUPOxeM
+	 sxethmiiN5Ne2KMx7N2VEBGnwT7CYc6aST1+rBYyErzNzOZnQYxiIPdhqBGz+OXpeb
+	 ZnaGaoK2Eo+AKvWXrjsmmgcH3djTIuhmpxf/Y+/V1H9dxKw0ZC52nN68VnqbX7aPfm
+	 0J8u3TdNq9laFK3F5ZA6RqfFMdme1keMqYIZ7pNdzkAMGn3g6R85/uwXYskmzCceEv
+	 d/RH8Id6k1YNA==
+Date: Mon, 30 Jun 2025 12:18:36 +0100
+From: Simon Horman <horms@kernel.org>
+To: Alok Tiwari <alok.a.tiwari@oracle.com>
+Cc: sgoutham@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net: thunderx: avoid direct MTU assignment after
+ WRITE_ONCE()
+Message-ID: <20250630111836.GE41770@horms.kernel.org>
+References: <20250629051540.518216-1-alok.a.tiwari@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH mlx5-next] net/mlx5: Check device memory pointer before
- usage
-To: Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>
-Cc: Stav Aviram <saviram@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- linux-rdma@vger.kernel.org, Mark Bloch <markb@mellanox.com>,
- netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
-References: <e389fa6ef075af1049cd7026b912d736ebe3ad23.1751279408.git.leonro@nvidia.com>
-Content-Language: pl, en-US
-From: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-In-Reply-To: <e389fa6ef075af1049cd7026b912d736ebe3ad23.1751279408.git.leonro@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250629051540.518216-1-alok.a.tiwari@oracle.com>
 
-On 2025-06-30 12:35 PM, Leon Romanovsky wrote:
-> From: Stav Aviram <saviram@nvidia.com>
-> 
-> Add a NULL check before accessing device memory to prevent a crash if
-> dev->dm allocation in mlx5_init_once() fails.
-> 
-> Fixes: c9b9dcb430b3 ("net/mlx5: Move device memory management to mlx5_core")
-> Signed-off-by: Stav Aviram <saviram@nvidia.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+On Sat, Jun 28, 2025 at 10:15:37PM -0700, Alok Tiwari wrote:
 
-Given this is a fix, the net tree should be targeted instead of next.
+...
 
-Best regards,
-Dawid
+> @@ -1589,16 +1588,18 @@ static int nicvf_change_mtu(struct net_device *netdev, int new_mtu)
+>  		return -EINVAL;
+>  	}
+>  
+> -	WRITE_ONCE(netdev->mtu, new_mtu);
+>  
+> -	if (!netif_running(netdev))
+> +	if (!netif_running(netdev)) {
+> +		WRITE_ONCE(netdev->mtu, new_mtu);
+>  		return 0;
+> +	}
+>  
+>  	if (nicvf_update_hw_max_frs(nic, new_mtu)) {
+> -		netdev->mtu = orig_mtu;
+>  		return -EINVAL;
+>  	}
+
+nit: curly brackets should be removed here, but see further comment below.
+
+>  
+> +	WRITE_ONCE(netdev->mtu, new_mtu);
+> +
+>  	return 0;
+>  }
+
+Could this be more succinctly expressed as follows?
+(Completely untested!)
+
+	if (netif_running(netdev) && nicvf_update_hw_max_frs(nic, new_mtu))
+		return -ENIVAL;
+
+	WRITE_ONCE(netdev->mtu, new_mtu);
+
+	return 0;
 
