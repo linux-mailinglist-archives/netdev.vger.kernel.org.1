@@ -1,173 +1,120 @@
-Return-Path: <netdev+bounces-202692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16A52AEEADD
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 01:19:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 97F16AEEB01
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 01:43:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 141393BD8F6
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 23:19:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8E8F4405FB
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 23:42:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D7D22571B3;
-	Mon, 30 Jun 2025 23:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D271025C838;
+	Mon, 30 Jun 2025 23:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U1u/p5l0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LgNu55Fl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09F95242D8B
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 23:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C2125B1FC;
+	Mon, 30 Jun 2025 23:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751325567; cv=none; b=sNZ8lHDj4GHlYHhWVFXYgR57Bg+X6KQ5fyNecHwsPT4WiO515x2rQCxi6zHOGW1KCa6ab4fwd0VHFZozAlzT5jwBYqcfjhxLKw6mcO6LLm34rVHyPLb8ZqNwWn2QDL6P3robaNFijV7Ivqfx5jXWEghuQOSi9hhoU/hUzURndGw=
+	t=1751326991; cv=none; b=UYFrb1IuEIFGo5ymnfwgbQPbSyKzikQcsUuHD8VQb2FO3gyeNo683Pgs3KPtFxRPIJE+Lp/uvlNSRKTgW4dIYO/nkXMgK465dt+hD5Cq8tXVUoqqZkXQD/jRYdLJQMH/7D5HrODgKrrWa9qsdQVlzDJo0/mTE5lGNCzyKq3Jcic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751325567; c=relaxed/simple;
-	bh=ZOWwMkPugCqYb4okP6m2GQK0+ZqfJg4uuM3P81LTZA4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l8PgJjFaBSKdTE68CKIHtzgmQAi4SFLKA3U91i1NWWAvbdELMLayfHoaemdGN+e3FiCTIis6VbGtQA5knhg+JQCpzttTLpyP3xAZEhrt/UCC3ew7AncxXoZ5IgpdJfWhpTfx7Qm9Zu5VXnL54nE/wTDkipKojV8ZuYQ7iJQ9K1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U1u/p5l0; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2366e5e4dbaso50602215ad.1
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 16:19:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751325565; x=1751930365; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FKYycyQNJc2kuyAEeFDjHNHU1XJSG9fuKpxnG6NwmAQ=;
-        b=U1u/p5l0JjJb3x7obp1hJVnUGjw2U6sXpp77oxwquv8RQFf1H3cc04ujwRKJSpcJNA
-         hwpeeZcluHqJsO82O835RZTVuV9nweao56o7TMQwaLS+5VgBxmdOn/vALX8u7AkwEMoh
-         qvOVFtHQoS1W0PrQatlVUnMTdbb+VTGtaoGqBfhodTT9R6kekRW4aXn8vj7d3fqfBdjL
-         vmfKhbk5+KiugEek4WexIVlmaYTUEAkVKgu/5cfXIPgKORvjit8VtYy4M6jwiZuCbwbr
-         7QBbOcfoSbP/J71Ey4YNqDc2DPiDsfmutSUIYYCjccQxDjz7QJNdjGbXrDLfz9m68UKv
-         M69Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751325565; x=1751930365;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FKYycyQNJc2kuyAEeFDjHNHU1XJSG9fuKpxnG6NwmAQ=;
-        b=ILzDltLsVBhoEaxnl3M/wjESnILuDTtM5gfWIbzqNQ/bVOBwBxOyvxRKJn+QFj1lU3
-         g5OBcKqu46NjYFtjFQh0+GSo3cDQNQHL+dJ1UR3puGTJ7d9fXbeQ7NiU45cRx9Z2OH1q
-         cleEh43Kfx9KGebp/iRYKF1X19Fu8Nbsa8f+4vKABeTUdrycXJLo8CpP0dNGlCkAakgm
-         b/rvP/HfU3A+FrYLSfYzu72oTc17JvVEet6Vm8QfOY8l71+UyOt78uMHZmthUCXTCU6X
-         8xDOHANTtCZWEfpJwa2Zg6sgdQyofPLohNS+w/HFkIIEilHm3/5D/NTDOofz/UlW7gDP
-         ijQg==
-X-Forwarded-Encrypted: i=1; AJvYcCUWhPhI+AlNb+TbzHI97V+5GS8nqM+XHwiv1umZbFzQohS2ravdo37BqbN/JL0BVAPPWm+hh8k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yygwx/baY+23jwAbpH5KVqiBwKQ1yNm6BoVWDkrT6dUKCvcG9L3
-	9Mwdcywl6X++ViFd2m9tnbvoRaBMa4kX3O6GWDIHSsJSPjTiBzdlD5w=
-X-Gm-Gg: ASbGncu0czSmfvEeo9GiuJ36intP4I2TZ3iKXTU+G8YCphp7mVqwU3iif60vdMFwvW5
-	Pd4VTc/ScZqXyhfnkili/pcUk+6KFgwvtxbFtOEHQKNlXUaKvaHCIaqn1JjWS2aH9VB23AoA5ko
-	xIETZLuU23AqiR8HsQQfCUqulNJpUx0axCqdD+3WlVU9xiq3tljSmUXIfCvAqMtKqUkHuAhnAFT
-	So5WVbmXakgHRdvo6NsNnluMIElrqeKpPLVOsNCvDiJuMC8IcZ79qBi+pri8RAqc1XoYYetEVnr
-	2P7LP0BC8lL3BaWsWSS9k945IlfRk/gq3pb8Th02PE3c3ToOwQGhqQrwyYkU00IwcysHdLCVEFt
-	9i74Fjchqgc7tue77+L9fMuY=
-X-Google-Smtp-Source: AGHT+IHiJjKJX94x+EVwBcooR5SIpxszLcIvPYZHKiBFwZZ0JNHQfqNzlYCeBwzBe+5CPAG05IStHg==
-X-Received: by 2002:a17:902:ea0d:b0:22e:457d:3989 with SMTP id d9443c01a7336-23b35389dfemr21812585ad.0.1751325565197;
-        Mon, 30 Jun 2025 16:19:25 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-23acb3b7abdsm94158585ad.169.2025.06.30.16.19.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jun 2025 16:19:24 -0700 (PDT)
-Date: Mon, 30 Jun 2025 16:19:23 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH net-next v2 3/8] net:
- s/dev_get_mac_address/netif_get_mac_address/
-Message-ID: <aGMbe0hxH78xQvD8@mini-arch>
-References: <20250630164222.712558-1-sdf@fomichev.me>
- <20250630164222.712558-4-sdf@fomichev.me>
- <6862fb095090_183f832945b@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1751326991; c=relaxed/simple;
+	bh=z2pyI1MGiNQCqmI8ox9qC+8jJG78zwYkgfVG5ZSxqac=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f+ytxvfvudanDnBDne8NMOoh7qPVLNkd3ADDi/grQWG8Li8FMRFzK5BaYZ1m2TPFMbNBVRtiATAmDffVAxsqrmfB/B+QCZ6pRatuCuRcYZgH5Fks0yTB1hrfQGJrdvSSx8oFT2ZLyX5b5eQHOGN+P+HWXQ/Pnh+g5AU9ofx0XOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LgNu55Fl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E802C4CEE3;
+	Mon, 30 Jun 2025 23:43:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751326991;
+	bh=z2pyI1MGiNQCqmI8ox9qC+8jJG78zwYkgfVG5ZSxqac=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LgNu55FlvR+lfc2TfQXzguVYRMqOr5vi+EwfzF3V/O82wZY4mmySK/UNiEDyN7ND+
+	 NniQ/5xnBU3HKEkdurGGz1nBZJ8oZ+6eIhw/usHYZVt1ZdWzso/roLaCOOBsnFyDBi
+	 +hACKK31PcCFzDJCU5Qnm0FmXEH7HtCiyvLfLQ1gZ80BB/Kw179KjFZc8047RalZrh
+	 0+jKJL+ltuyecnSYJ9kY4Qa2RMGBDoyxMAOv656oMMWCErUZznhXxFyDppRMAPdgfl
+	 jyMV4Ac0pi11lK7Yc0+HpugRhuwai5mXnYIjjdKV8tihn4WIk4Dy2RjWDYGUjkI9zY
+	 4xg8MopnbmCOg==
+Date: Mon, 30 Jun 2025 16:43:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
+Cc: "alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>,
+ "pctammela@mojatatu.com" <pctammela@mojatatu.com>, "horms@kernel.org"
+ <horms@kernel.org>, "donald.hunter@gmail.com" <donald.hunter@gmail.com>,
+ "xandfury@gmail.com" <xandfury@gmail.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "dave.taht@gmail.com" <dave.taht@gmail.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "jhs@mojatatu.com"
+ <jhs@mojatatu.com>, "stephen@networkplumber.org"
+ <stephen@networkplumber.org>, "xiyou.wangcong@gmail.com"
+ <xiyou.wangcong@gmail.com>, "jiri@resnulli.us" <jiri@resnulli.us>,
+ "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+ <edumazet@google.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "ast@fiberby.net" <ast@fiberby.net>, "liuhangbin@gmail.com"
+ <liuhangbin@gmail.com>, "shuah@kernel.org" <shuah@kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ "ij@kernel.org" <ij@kernel.org>, "ncardwell@google.com"
+ <ncardwell@google.com>, "Koen De Schepper (Nokia)"
+ <koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
+ <g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
+ <ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
+ <mirja.kuehlewind@ericsson.com>, "cheshire@apple.com" <cheshire@apple.com>,
+ "rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
+ <Jason_Livingood@comcast.com>, "vidhi_goel@apple.com"
+ <vidhi_goel@apple.com>
+Subject: Re: [PATCH v20 net-next 1/6] sched: Struct definition and parsing
+ of dualpi2 qdisc
+Message-ID: <20250630164309.724b9ba1@kernel.org>
+In-Reply-To: <PAXPR07MB798410A4142386C43B2E0B1DA346A@PAXPR07MB7984.eurprd07.prod.outlook.com>
+References: <20250621193331.16421-1-chia-yu.chang@nokia-bell-labs.com>
+	<20250621193331.16421-2-chia-yu.chang@nokia-bell-labs.com>
+	<20250627162502.0a82accf@kernel.org>
+	<PAXPR07MB79849FDC079A2ECB144D75D1A347A@PAXPR07MB7984.eurprd07.prod.outlook.com>
+	<20250630081349.4c9d7976@kernel.org>
+	<PAXPR07MB7984F85A786D9B35898ECEBDA346A@PAXPR07MB7984.eurprd07.prod.outlook.com>
+	<20250630092316.031b29d8@kernel.org>
+	<PAXPR07MB798410A4142386C43B2E0B1DA346A@PAXPR07MB7984.eurprd07.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <6862fb095090_183f832945b@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 06/30, Willem de Bruijn wrote:
-> Stanislav Fomichev wrote:
-> > Commit cc34acd577f1 ("docs: net: document new locking reality")
-> > introduced netif_ vs dev_ function semantics: the former expects locked
-> > netdev, the latter takes care of the locking. We don't strictly
-> > follow this semantics on either side, but there are more dev_xxx handlers
-> > now that don't fit. Rename them to netif_xxx where appropriate.
+On Mon, 30 Jun 2025 17:04:56 +0000 Chia-Yu Chang (Nokia) wrote:
+> > > This still needs 2 WRITE_ONCE even "step_thresh" (NLA_U32) and 
+> > > "step_in_packtes" (NLA_FLAG) are replaced with "step_pkt_thresh"
+> > > (NLA_U32) and "step_time_thresh" (NLA_U32) - which was proposed in my 
+> > > another email.  
 > > 
-> > netif_get_mac_address is used only by tun/tap, so move it into
-> > NETDEV_INTERNAL namespace.
-> > 
-> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> > ---
-> >  drivers/net/tap.c         | 6 ++++--
-> >  drivers/net/tun.c         | 4 +++-
-> >  include/linux/netdevice.h | 2 +-
-> >  net/core/dev.c            | 4 ++--
-> >  net/core/dev_ioctl.c      | 3 ++-
-> >  net/core/net-sysfs.c      | 2 +-
-> >  6 files changed, 13 insertions(+), 8 deletions(-)
-> > 
-> > diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-> > index bdf0788d8e66..4c85770c809b 100644
-> > --- a/drivers/net/tap.c
-> > +++ b/drivers/net/tap.c
-> > @@ -28,6 +28,8 @@
-> >  
-> >  #include "tun_vnet.h"
-> >  
-> > +MODULE_IMPORT_NS("NETDEV_INTERNAL");
-> > +
-> >  #define TAP_IFFEATURES (IFF_VNET_HDR | IFF_MULTI_QUEUE)
-> >  
-> >  static struct proto tap_proto = {
-> > @@ -1000,8 +1002,8 @@ static long tap_ioctl(struct file *file, unsigned int cmd,
-> >  			return -ENOLINK;
-> >  		}
-> >  		ret = 0;
-> > -		dev_get_mac_address((struct sockaddr *)&ss, dev_net(tap->dev),
-> > -				    tap->dev->name);
-> > +		netif_get_mac_address((struct sockaddr *)&ss, dev_net(tap->dev),
-> > +				      tap->dev->name);
-> >  		if (copy_to_user(&ifr->ifr_name, tap->dev->name, IFNAMSIZ) ||
-> >  		    copy_to_user(&ifr->ifr_hwaddr, &ss, sizeof(ifr->ifr_hwaddr)))
-> >  			ret = -EFAULT;
-> > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> > index f8c5e2fd04df..4509ae68decf 100644
-> > --- a/drivers/net/tun.c
-> > +++ b/drivers/net/tun.c
-> > @@ -85,6 +85,8 @@
-> >  
-> >  #include "tun_vnet.h"
-> >  
-> > +MODULE_IMPORT_NS("NETDEV_INTERNAL");
-> > +
+> > If you don't understand the question - ask for clarifications :/  
 > 
-> Thanks for giving this a go. Now that you've implemented it, does the
-> risk (of overlooking callers, mainly) indeed seem acceptable?
+> You are right.
 > 
-> Documentation/core-api/symbol-namespaces.rst says
+> Could you elaborate on the orignal comment "And the block under which
+> I'm responding is performing two dependent writes, one to
+> ->step_in_packets and the other to ->step_thresh a change which is
+> definitely not atomic.."?
 > 
->   It is advisable to add the MODULE_IMPORT_NS() statement close to other module
->   metadata definitions like MODULE_AUTHOR() or MODULE_LICENSE().
+> I don't see we access the same atomic variable multiple times in a
+> single expression, the 2 WRITE_ONCE() are in different expressions.
 > 
-> No need to respin just for this from me. Something to consider,
-> especially if anything else comes up.
+> And, in the last WRITE_ONCE(), what we access are local variables:
+> "step_pkt" "step_th", will it create problem?
 
-I put it at the top because it was at the top in bnxt. But it is
-at the top in bnxt is because the MODULE_LICENSE is there :-(
-Thanks for pointing it out, I'll definitely address that to be
-consistent.
+Not really a problem, but what I'm saying is that I don't understand
+why all the writes are sprinkled with WRITE_ONCE(). You take
 
-> Just curious, did you use the modpost and make nsdeps, or was it
-> sufficient to find the callers with tools like cscope and grep?
+	sch_tree_lock(sch);
 
-Only grep. I'm hoping the build bots will tell me if missed something.
+to block data path and the control path is under rtnl_lock. So why the
+WRITE_ONCE()? WRITE_ONCE() is used to annotate writes which can be read
+concurrently without holding relevant locks.
 
