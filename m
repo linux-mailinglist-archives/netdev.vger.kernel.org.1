@@ -1,197 +1,321 @@
-Return-Path: <netdev+bounces-202645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E50B5AEE764
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 21:19:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F052AAEE76D
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 21:24:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9293A7A5B93
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 19:18:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 094443BE031
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 19:23:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3615A1A3178;
-	Mon, 30 Jun 2025 19:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3072E28E571;
+	Mon, 30 Jun 2025 19:24:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="iggQb9vb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hp4dGBuS"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2051.outbound.protection.outlook.com [40.107.243.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA69519067C
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 19:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751311167; cv=fail; b=S9GqmCeknzMUodnME+dTThr5Kxq75/w3Or3PPwL590RHjUkuAOM/sdj7KJB3yY0vStEoj4uZKLdoQzQjDfShjfCMRaDVjAZ/rs+ErTG/jqDtcR3iLcoCxkyyrKzIf6EAoBWDTFsqRcIkF5ZLA1MuOdtzG4hKBOEIoK5TIq8QFZc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751311167; c=relaxed/simple;
-	bh=wtYFEp+ibYriG1YH7js94QsNVkd9FlFBWrKp7vu7p6E=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=pp12Mg/DKCsoIAOA1SxqQiQcqNCDqdl4tuZTasmAtgIoBrz6R18AwR9+yD5gsSU6y5/v6zN8BNNYuhkTrSTDyhbgaM6+KEOZmS2SGebMTfbKxCnlkjfDxI0rOgEnLyuoF2eYouVyWbguShxLHCZDpGruFvB79VZpUR9dw0QSxhc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=iggQb9vb; arc=fail smtp.client-ip=40.107.243.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=G1qqh46P5Re3G4/21hO4DFqpVlKV+Gr0yVN3ra3sPLrfZeOGLy7c/BL/IeAgWgJdLQPOl9MHL0E2IeFRNqbXRm3anet67M7BvBLd7HsOh0yUE674F0GTyCmiGE+3Tro+K/nRJGHsjmA9psQVjndVU8VzPxx/JgwgA3zcMrj4ldkbiRvEiZMsmtWGggnSsSwZGaomQacB4uI8jbGd6JvTv71U+Yt4wo/Vghld1JSW0gM+BDA/FubrBYO18pP/CQSeeLhZ4wPjnTOKryjk5sVkFx2ZcQ09NO105mZ9hjhJMRfbRBj7DLza+I3Na+kAqQTIsqQCEFWmizO4SXD2EHko9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nEgVDKRqCTr4pICXTVVEbpzS2X6Y5etGA3T92wgy8yo=;
- b=O3jB1se30nwsqHCoqDHiEu7Se2TOm6C3Gui2eRsaY9kNQqcw7H6R8um0Wf61pRd2Vvd4L+zVK4cc8whvVpDWx4Pl2h43r7UR2Y9Z0GhvOyaADEoOtvyedzRpoxAbGuQBEYgQ2wS9UzoTDdL7gUj3Y18V07PklKsPJgpRfYJcX9gVA3A05zHOxA3TlMgeUXpdVY8XlsDh10Mhesx+8gNC0ES777fGhxmIf4RCY5YB2W6CUt/qCQo8poy4j5gqdzXw3HAdjFUQfGrSMQtCgDbBbEiGJUDwuDBCJBqq4ucdIOnGGOh8EPFH2BwS+VpKPQ+cOuwT8RhIUQj13EX6d+BzBA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nEgVDKRqCTr4pICXTVVEbpzS2X6Y5etGA3T92wgy8yo=;
- b=iggQb9vb+XKWoRVA/RK9eReTAOq37oxvg8U8MvxB5eCVmjqoWktJQVE++J9WTuUY6fdjZJCh1PRUemQL/dpuzQpffv5djDKZLTHl6zwG00pXxiCBVwlZ+QBd2cPKorHbW5+eCcZa9eue2UHlJdOQl1jj3YtdfhwvUFAQ+y7tOgs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB6395.namprd12.prod.outlook.com (2603:10b6:510:1fd::14)
- by CH3PR12MB8284.namprd12.prod.outlook.com (2603:10b6:610:12e::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.30; Mon, 30 Jun
- 2025 19:19:23 +0000
-Received: from PH7PR12MB6395.namprd12.prod.outlook.com
- ([fe80::5a9e:cee7:496:6421]) by PH7PR12MB6395.namprd12.prod.outlook.com
- ([fe80::5a9e:cee7:496:6421%4]) with mapi id 15.20.8880.021; Mon, 30 Jun 2025
- 19:19:23 +0000
-Message-ID: <b9f6ef83-5bca-42e6-bc32-865c667e7e5c@amd.com>
-Date: Tue, 1 Jul 2025 00:49:14 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] amd-xgbe: add support for giant packet size
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- Shyam-sundar.S-k@amd.com
-References: <20250630152901.2644294-1-Raju.Rangoju@amd.com>
- <679e9678-8c9a-49ea-87a8-a38650a82e19@lunn.ch>
-Content-Language: en-US
-From: "Rangoju, Raju" <raju.rangoju@amd.com>
-In-Reply-To: <679e9678-8c9a-49ea-87a8-a38650a82e19@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0193.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:be::22) To PH7PR12MB6395.namprd12.prod.outlook.com
- (2603:10b6:510:1fd::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6C928F514;
+	Mon, 30 Jun 2025 19:24:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751311462; cv=none; b=FWGnZ7MdaF0goGW+6WRpU8uF9EWaHaAYtWjjeigH+hiogfwjAZrqf82t5ruu8ulnE37OTReGRua2wJg+IkSVSGy7FfAmPu2tto0CVs2gnMcqm8cDuJ8Hh5JVaqkWX5P5/i0lvKjtXsOE9MMyUTHt3UlmdanDZ++6wc6qqGoGWjM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751311462; c=relaxed/simple;
+	bh=hgJGruXRln0HIU1QewagyaTXUW8ytMVv5FSc58v3gk4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=g6mp1giIkWS99WLpnh2jl0vOG+YfeuITmfrWshBso1xAC9qtks4wnhN+s/cceODbXauCIK+71EOPOARQLfa3eK6xm5aTdSNUE/eq3l8ismJM+sDrVFPUko12SSgNGo4AT2jB2fBNWF30CiB2oMNNw1oIwt1RsHeQqgojdGBElLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hp4dGBuS; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-32ac42bb4e4so21993031fa.0;
+        Mon, 30 Jun 2025 12:24:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751311458; x=1751916258; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I3iXjTxlr7wRgS/7gvePRNwHH5SCq/n2+EMHRv3w9tw=;
+        b=hp4dGBuSiruoppNF9DuyDEjwLFdD6twEA3HY6A6xQL0wS8gAe20otl+ncKXdJr87Pr
+         NSUWagUj11Y7xkjM626wteWwnb7vUzqYEF/4slhwHHm5hb1COs9khx8NXtoEEuhkRApj
+         IjXAdxJVTrKWQNhzEG1iBZY2icYw4Eeeewnen8kR/XY4icJEHh5Bo/Y/drvjGHjC1aNe
+         nZw7s9yskMD2JnVMYQixXuY50ie7rGLsvRqO+aWvVMXBOGlLFzATAZMrZWxXGglR6QIK
+         OEmlog8iVqG6OMSQr3xzbF5M0aam2QIsuFiSVQPgCw7vqITpllvoi5PDksWhwAkO1mP5
+         sGCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751311458; x=1751916258;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I3iXjTxlr7wRgS/7gvePRNwHH5SCq/n2+EMHRv3w9tw=;
+        b=XdJDD99Y38fO3mbRcLAUQegqBESXGTrcV4mY0XUo7V53fFgRaYl1VOsTUgFeDuxl3E
+         0ppiyqx2ZHsp1iWSePuSGL8AC8wLvmSqzQqoeG7zr+ka52EIx3pjjnvJiIPVW1ocu6W3
+         ZOs6+LmEqQ/rApWHlut6Duu6IWYmuVHCMNME/YDhFzRz7nBvwOuzxzhE268QRNpnzJRD
+         DVMBmEMOD1YMV8SgqI0aKpj4iUMPhKwQiC0HhrSg7Cgtzxa5OSFstHcMW6p3+VmMafvZ
+         nFMfQaFtiz4iCCuokeiyUbLNlKRpW+Wp/RYwWBR8BfbeoxrBc363Fv+WjL2rwCG1nypy
+         k3ig==
+X-Forwarded-Encrypted: i=1; AJvYcCVBOMGeqWvoddi1UNwhrin8VyHE0/8bY623tXh1c8HcFapXNr62s6VkJ71gGTsU/YhkH/KIceCk@vger.kernel.org, AJvYcCWIQbhU69iCg8FAiv4EGd+xIjvYVg45mVw6BGrTPUheOanyKVwVhQ/KKV7MKhWKWFKajTCNnLXLMbUMfajf@vger.kernel.org, AJvYcCXzOTcFrYhoYU8BpL5el/ac+LxEX9uZydB9OxZWiw/Yaes3xh1f9sdFiyfIBZuZ2AK8kRjquan9zWqeZki9EW4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6xIpulYb19Rpz4nuW7JvpH06+RIOZuM3Pj/X8fE0U1yidEKeb
+	GLPS9YPeDlWZPW8w02rJwi9zYw8C9Wi2Ug7UqZUIkkTLbNwbn54BvmeCJlF4c5H/y5nkTrVpsrj
+	E1Sb/X1V6jyiDJDjvlS7NMcJFmUUmQu4=
+X-Gm-Gg: ASbGnctu5BtdkaIS6aQUUrbR0gQQkPiOPoLjL+srW4s/hp9eCHLT9h8W0OGDLOGMv2Q
+	aZz8FVkSb00R6zG/VmpIlflozx3R5x47upJNwQERUho+2snKbv6AICracMFGbkhjjkt+YhZnmB7
+	jaZhDKmbxA8UMdbSBGQNVOnkY1ssloM92Au1OlXTT/AFQ7
+X-Google-Smtp-Source: AGHT+IHnGmU+g8CW1VpOTSmBwexfp7kaHHdSDT+IQ7WxVBjgwQJF+0cMNvBk+wdrYs9n5iInkcIXpftXxRQioXwer7E=
+X-Received: by 2002:a05:651c:4190:b0:32a:88a3:a98 with SMTP id
+ 38308e7fff4ca-32cdc50f025mr35560791fa.38.1751311457822; Mon, 30 Jun 2025
+ 12:24:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB6395:EE_|CH3PR12MB8284:EE_
-X-MS-Office365-Filtering-Correlation-Id: f59160f9-b8fd-4466-7ee6-08ddb80b0546
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?c3A0WjVzZlMxeFk5RnNnZCtHK2xCdjBscXF4WW9ZY1d1SUJJLzNTNHFjSkpZ?=
- =?utf-8?B?SUloWDBtcE5tNXVyU1RKUDg0V0FIY2l2Z0JGRThMMkZVMFFZMnk3MVdDY1Fp?=
- =?utf-8?B?MTVvSmZIQlgyZ1pTTFRsVjJMOStVaVNBVjRzdDlxZEN5eldDVzlQT05CaDFl?=
- =?utf-8?B?ajhHTENUV2N5NHMzNnRRaTdxU3duRDl5MEZzNlUzNDk5Z0xZSXoyN04yTkhK?=
- =?utf-8?B?Zk5wT0tRSTgxTnJzZEdOaGw0VzRyVHZkUXA0K0FpbWJQTUhLM3J0SFp3V09j?=
- =?utf-8?B?bExTdHA0c01TZTd4V0RWb0RLZitkYkdKQlNiN2F0NjJaaCtiSXgvNThYOXJR?=
- =?utf-8?B?TEVzNENoeVJHOWtMNHNVN0JSZThhNHJiLzYwOHpGK0I2YitaS2Y1ajU0UDhy?=
- =?utf-8?B?V3FwYlM2MzFEeEI2SXVkWVl1dmFDdlUzQ3VYRU53SkVPM0RSdG1LYk53ZEVn?=
- =?utf-8?B?eUY3SDZDWnExNnhrSnc2Ukk3T0lIa29mN2lLUDV2Y0dIYVpkMTUzdVl1MzZX?=
- =?utf-8?B?RFdJbW9BQjFIbjd6dVF4T2NrYk5JczRXK0d0UE1RYTI1MWFROGkxU21iQS9V?=
- =?utf-8?B?YStKL2RmRFZ3SjVMUmxTeEpqTlFpY3lVb1NxYmVkVjRwVFdhRFNpeUQ1c1Ja?=
- =?utf-8?B?bTZSeHIzKzc2WVFpeDVSK25sN2pZaTl0bXhYdk1WQnlMUFlCZWhDSFk1bTJx?=
- =?utf-8?B?WU1xZFpKK2lJRXFHRVFaWVU0R2NKdmdZbXJacnNFTjl1YTNKdHM4VkNGVng5?=
- =?utf-8?B?RkhIeFdOVU5jY29GaDBRSW1nKzRFSUIrOUl3ekZiSUY1aWk4VzRKYlB2M0lH?=
- =?utf-8?B?T2dJZFZvelYwTW5wSFBYSXV2M2dUa3BLSW1UYnovOEdpYnRvRzBqSlZlNU9Y?=
- =?utf-8?B?b1lONVpZOEZsVVBRZEtTaEd0bjlmMG52dVdTeEExemwrem9CRkxxYlR2N2RZ?=
- =?utf-8?B?ZHNSQlBTNDJNZUhrcGsranBQMHFPZHlpMFZJNy9mQUZuekE1U3FvcUdVOWFw?=
- =?utf-8?B?T24rdVRabTJLejJhbDc5eXlSRzUyU0ZjcUFpcnY5Z2NOcnpYOHNiK3cwdzVx?=
- =?utf-8?B?bDlxMG9SUkErVnNEbElPM0lJVU9Ec3hITGY0UEZMVnJmOXA5QjRCSWo3S3ZE?=
- =?utf-8?B?RVNhK1ZlNnJEeWRwbitaS2hjMWQ2dE05cVJxenlYN1BhaFhVQlJMaHVQa2pY?=
- =?utf-8?B?NHFIWnFydW9vVWh3cU8xMkZ2YzVNL3JFdlY4cERHUjh6S2N6Ukk3VDJXZlR3?=
- =?utf-8?B?d2pvcnBXMlBqU3FFeGFaS0w0Q3BObnJpZk5xYi9kQjExMk1ZMGlnd1dLR1Bk?=
- =?utf-8?B?d25EZ2Q2aEIwTzVBZTd2ZThSaDM2cVRHeDUzeFFSY0poeEcwc3A1Y0RQL1Fj?=
- =?utf-8?B?akdvRHBMcXNBMHFNeE9BYU43RDY5OCs0TnFrOU0rY01DTG1BcFFzYThhUWhm?=
- =?utf-8?B?QytqSWVlZXZJNnZzbVpDM2NhTWdWWjRveUJKcCtNS28rd2JJSEtBVGk4TG9G?=
- =?utf-8?B?SEJ5L2JvdWhiYjlJOW5idGhrTy9USU9MOHJ2cVNWeHZrZStQa00wbnArdm81?=
- =?utf-8?B?clBwSTRRMWtqZkZ5UWxLaUUyZ3h6dVBVd3FmcXIyanBjSk9MRXJLeVU1SkM4?=
- =?utf-8?B?ZmVWYVpLQXRUdFdReGZ5alBZdWRjenVvbldjckh3QldvRE5EekNFaWVYenVY?=
- =?utf-8?B?UHZlbTNma1BYLzgvWWpja3dSOUcra3JFSExYM3VReGVEbDVuZ3psR2NlaFZz?=
- =?utf-8?B?Sk1mNjc2R253enA0YUJKcXF6WXJFVlA2RGxaU3gyS01CZ2ZLaUhPZWJpZllu?=
- =?utf-8?B?MUZuK3BYOURCUmMxU3p1eGsweFZ0S1hUaGV2Rnc4VitBa2Y3T25zTUM3eitN?=
- =?utf-8?B?blRhRFJLVExyZ3gvQWxaa0lqQm43ZFNLMUl3b3dSTHV1MDJwRi9kUHhXcW16?=
- =?utf-8?Q?Kbor0+y0scE=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB6395.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eDM0WXU4T0ZqcGhtRWpSenczSlg4SW5VQ29WMDg3dHBoNm83VWFidnAwWHd1?=
- =?utf-8?B?aWRxeEZUODFQd2pmdnF6VmNHUS9CKzdnV1RwdXdOVkFaaVlvdjUzNzdCT0ds?=
- =?utf-8?B?SnlFMEpHZ3ZNRzZtZnZnMjgzRzI1dHdZM3ZrYmZtNUprbzlkdkZWaURaY3k2?=
- =?utf-8?B?RjhCVTJPbHlxdVFPTXllQS9TcWFhVUYvOVhIQTZTM1c2Q3IwcjdzWjF6WDA5?=
- =?utf-8?B?bkQ0MDhJWHV5aTZkdElibENmNlhIbzJsVEhpeEh6VGVKRFdjNk45SzhKOE5h?=
- =?utf-8?B?VE5zNTMxdkI1WVRXSFhaeUNpTCtEaHFzMUtDaVVId090UkZVT0c2cWV2M3dm?=
- =?utf-8?B?MEhWa2tFMkFxb0hockdvNmlrNU9qTk1qR2hmVVoyZDk4c28vWmw4czlYb1E3?=
- =?utf-8?B?SDNMRCtaMEFLOUVNbEppTHpXZHErMGZYaGx3UkI2dWYrWlVmM1ZNL0F3Z0Z0?=
- =?utf-8?B?MGhxWU1rbzZtS0NrUWIzN2ZCZ2VLaWtmZG5ENzdaNUFyTFF3dVROTlRFWExo?=
- =?utf-8?B?TVZjUktGekNCbHZCRkdVdnRjdzl5bW9MclhjdXBldCtmRGQ2QkhmSWFDaVVQ?=
- =?utf-8?B?NkJPS2ZxS1czT2JFQ1VRRExwYVVaNFFnNDVidUJWV1pDWXI1N1poM0J3MndI?=
- =?utf-8?B?R0FtWmhsSEtXR3JYRWx0M3BMd1RnS25PSjhsb2FCUjFUcC9tUTdLSldad3Jt?=
- =?utf-8?B?SjhNUVBtYXdRcVJZTlorYzV5V2c4a2tqVktDbXFCbllETkJjZU1QV1N5ZElq?=
- =?utf-8?B?K2tyNlZxeHYrcXZNL3RaQXZzSyt5UUswSmhURStMSWZscGx5VkZrRGczeGpj?=
- =?utf-8?B?NU5QV09JenJhUDR6WkdUWFR4NHRJaHR0VlowM1JIbUxWMGRMTDBUVUJ1RGNx?=
- =?utf-8?B?S1ExQUI3NW56QnV6UXNyQzY2cWpzblhXSEw1TEpMcmhwWXh0NVZmdUlIRlc1?=
- =?utf-8?B?U0hPS01kQlhmYkcvNVFwZGNWNXRvOVBBUFdIRENxaGVrUXFJUzlOSjJpNFI2?=
- =?utf-8?B?cGRyWjZUR05BWUUyUjZ5aHJiSXhuS01vN0w1Q01kUjFIN0paU0Jva253ZGM3?=
- =?utf-8?B?d04rSk1yOVBDWXA4K2Q5K2k1emlibXZscnY2eTlEMWU2MEZaZTdQZFJzNXFn?=
- =?utf-8?B?NXorRUZXNnRLNkRsYkthdFlrVzN6TUk5S3RNNXF3MzA4VjFPNGFnK05DL2p5?=
- =?utf-8?B?am9peGNxUU9sbDdXbzh2U2xQejBYUGp0QUlNZHNvU2t0U0NwMEZ5MkxFNkNF?=
- =?utf-8?B?STVSb2dHZ2NIdXRDMFdmdlJKWGF3VTZsdkpmanRhejJCbHFGSEViME9rdVIy?=
- =?utf-8?B?YzRBR3BDd21ITmgzRzAxWkZnNXM5WjY4d3lCZGJneXFnWUgvV0laWlJhdldH?=
- =?utf-8?B?cE5nZHVzTVVUVHB4WTZleVJDdExwT0NOeUIvWjNNMXAzTmEyZlJNQVJMbHJS?=
- =?utf-8?B?SlhZaHJxN1ptR2FTd3h5cTd2am82cWkxNUJuZWZWLzZrWWlYWVZDUStrZXc1?=
- =?utf-8?B?dWh4clJDMXYwVmFCa1ZDL0FEWDZDZW9KWkZPWUlVb29EOS9paUlhaVd0ektW?=
- =?utf-8?B?N2dGUGlIWkVMdDJtR0IzcFo1MjFmRzBwbktwSUFnWGpWOGVkSXEvZUZBM0FS?=
- =?utf-8?B?SmlSNy8rNDM2MDVDYjZRTnBrekNNY2ZEOHB2YmxEdlYyeEdRbXlqazR4cGNy?=
- =?utf-8?B?cGtjczd4cEJJMTluamZ6b3RrNURianEvWDRQQTJrbWpqaFdma29CbjVHeHZB?=
- =?utf-8?B?NXJBMUpkb3FHRUFKZVk2b1NEakJUQzFOUllvMHdvQ2djQis1cTQ2RnpzbzFP?=
- =?utf-8?B?eHNlUzY1S09SUkw0YzljSDQvSzRZanlsMUNYZ0xnVzB5dDYyVEVrczR5cnZB?=
- =?utf-8?B?c25na1l3M29KTDVFd2U3QTFJd0ZLbG5Pa3NzN095Rmpic25FYjRLRm9vWEZV?=
- =?utf-8?B?N0lxVnVaWFdPRnJkS0JVRUhpUVZwVi9nU1RBQVp1dEFhWHAvU0UvMGhJdFdj?=
- =?utf-8?B?SS93ME1YT09xdHZIRUk5anZMVlZkaFR6cG5WSUdiQkUxRldrcmhIczR0bTY2?=
- =?utf-8?B?S3ppaXhmZjZWNmM2Sy9YZlY2QUllY1BRUFROazM1WlJsV3BQS2ZScnVUcUYx?=
- =?utf-8?Q?rInMA4WcOzptn1XSWWTTOsZnT?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f59160f9-b8fd-4466-7ee6-08ddb80b0546
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB6395.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 19:19:23.0768
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KWXVy/bAn+l7ccHrnSVexjrv3RuJ1Zl1FE8Wtx8x9aGevy87WbGhbPY9a8jBqjpfQ8DFSXnwrfKpKvb34LVG3A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8284
+References: <20250630-handle_big_sync_lost_event-v3-1-a4cf5bf6ec82@amlogic.com>
+In-Reply-To: <20250630-handle_big_sync_lost_event-v3-1-a4cf5bf6ec82@amlogic.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 30 Jun 2025 15:24:03 -0400
+X-Gm-Features: Ac12FXyO2klQJe7tvwu1OmJf8ds4Pvpt3K3aJ0Cbaw2wuxlMkDYORr-4wEq5hhA
+Message-ID: <CABBYNZ+eVbYr4+08-qCccV+2BpUibV7jA55jJti9+PFS_4L1yg@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: hci_event: Add support for handling LE BIG
+ Sync Lost event
+To: yang.li@amlogic.com
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+On Mon, Jun 30, 2025 at 2:45=E2=80=AFAM Yang Li via B4 Relay
+<devnull+yang.li.amlogic.com@kernel.org> wrote:
+>
+> From: Yang Li <yang.li@amlogic.com>
+>
+> When the BIS source stops, the controller sends an LE BIG Sync Lost
+> event (subevent 0x1E). Currently, this event is not handled, causing
+> the BIS stream to remain active in BlueZ and preventing recovery.
+>
+> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> ---
+> Changes in v3:
+> - Delete the PA sync connection separately.
+> - Add state and role check when lookup BIS connections
+> - Link to v2: https://lore.kernel.org/r/20250625-handle_big_sync_lost_eve=
+nt-v2-1-81f163057a21@amlogic.com
+>
+> Changes in v2:
+> - Matching the BIG handle is required when looking up a BIG connection.
+> - Use ev->reason to determine the cause of disconnection.
+> - Call hci_conn_del after hci_disconnect_cfm to remove the connection ent=
+ry
+> - Delete the big connection
+> - Link to v1: https://lore.kernel.org/r/20250624-handle_big_sync_lost_eve=
+nt-v1-1-c32ce37dd6a5@amlogic.com
+> ---
+>  include/net/bluetooth/hci.h      |  6 ++++++
+>  include/net/bluetooth/hci_core.h | 16 ++++++++++++----
+>  net/bluetooth/hci_conn.c         |  3 ++-
+>  net/bluetooth/hci_event.c        | 39 ++++++++++++++++++++++++++++++++++=
+++++-
+>  4 files changed, 58 insertions(+), 6 deletions(-)
+>
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 82cbd54443ac..48389a64accb 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -2849,6 +2849,12 @@ struct hci_evt_le_big_sync_estabilished {
+>         __le16  bis[];
+>  } __packed;
+>
+> +#define HCI_EVT_LE_BIG_SYNC_LOST 0x1e
+> +struct hci_evt_le_big_sync_lost {
+> +       __u8    handle;
+> +       __u8    reason;
+> +} __packed;
+> +
+>  #define HCI_EVT_LE_BIG_INFO_ADV_REPORT 0x22
+>  struct hci_evt_le_big_info_adv_report {
+>         __le16  sync_handle;
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
+_core.h
+> index a760f05fa3fb..5ab19d4fef93 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1340,7 +1340,8 @@ hci_conn_hash_lookup_big_sync_pend(struct hci_dev *=
+hdev,
+>  }
+>
+>  static inline struct hci_conn *
+> -hci_conn_hash_lookup_big_state(struct hci_dev *hdev, __u8 handle,  __u16=
+ state)
+> +hci_conn_hash_lookup_big_state(struct hci_dev *hdev, __u8 handle,
+> +                              __u16 state, __u8 role)
+>  {
+>         struct hci_conn_hash *h =3D &hdev->conn_hash;
+>         struct hci_conn  *c;
+> @@ -1348,9 +1349,16 @@ hci_conn_hash_lookup_big_state(struct hci_dev *hde=
+v, __u8 handle,  __u16 state)
+>         rcu_read_lock();
+>
+>         list_for_each_entry_rcu(c, &h->list, list) {
+> -               if (c->type !=3D BIS_LINK || bacmp(&c->dst, BDADDR_ANY) |=
+|
+> -                   c->state !=3D state)
+> -                       continue;
+> +               if (role =3D=3D HCI_ROLE_MASTER) {
+> +                       if (c->type !=3D BIS_LINK || bacmp(&c->dst, BDADD=
+R_ANY) ||
+> +                               c->state !=3D state || c->role !=3D role)
+> +                               continue;
+
+We don't really need to compare the address anymore since we now have
+dedicated types for CIS and BIS, Id probably fix that in a leading
+patch since that should have been added as a Fixes to the commit that
+introduced the separate types, I will send a fix for it just make sure
+you rebase your tree on top of bluetooth-next.
+
+> +               } else {
+> +                       if (c->type !=3D BIS_LINK ||
+> +                               c->state !=3D state ||
+> +                               c->role !=3D role)
+> +                               continue;
+> +               }
+
+Then all we need to do is add the role check.
+
+>
+>                 if (handle =3D=3D c->iso_qos.bcast.big) {
+>                         rcu_read_unlock();
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 4f379184df5b..6bb1ab42db39 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -2146,7 +2146,8 @@ struct hci_conn *hci_bind_bis(struct hci_dev *hdev,=
+ bdaddr_t *dst, __u8 sid,
+>         struct hci_link *link;
+>
+>         /* Look for any BIS that is open for rebinding */
+> -       conn =3D hci_conn_hash_lookup_big_state(hdev, qos->bcast.big, BT_=
+OPEN);
+> +       conn =3D hci_conn_hash_lookup_big_state(hdev, qos->bcast.big,
+> +                                            BT_OPEN, HCI_ROLE_MASTER);
+>         if (conn) {
+>                 memcpy(qos, &conn->iso_qos, sizeof(*qos));
+>                 conn->state =3D BT_CONNECTED;
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 66052d6aaa1d..f3e3e4964677 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -3903,6 +3903,8 @@ static u8 hci_cc_le_setup_iso_path(struct hci_dev *=
+hdev, void *data,
+>                 goto unlock;
+>         }
+>
+> +       conn->state =3D BT_CONNECTED;
+> +
+>         switch (cp->direction) {
+>         /* Input (Host to Controller) */
+>         case 0x00:
+> @@ -6913,7 +6915,7 @@ static void hci_le_create_big_complete_evt(struct h=
+ci_dev *hdev, void *data,
+>
+>         /* Connect all BISes that are bound to the BIG */
+>         while ((conn =3D hci_conn_hash_lookup_big_state(hdev, ev->handle,
+> -                                                     BT_BOUND))) {
+> +                                       BT_BOUND, HCI_ROLE_MASTER))) {
+>                 if (ev->status) {
+>                         hci_connect_cfm(conn, ev->status);
+>                         hci_conn_del(conn);
+> @@ -6968,6 +6970,7 @@ static void hci_le_big_sync_established_evt(struct =
+hci_dev *hdev, void *data,
+>         }
+>
+>         clear_bit(HCI_CONN_CREATE_BIG_SYNC, &conn->flags);
+> +       conn->state =3D BT_CONNECTED;
+
+Wrong line, anyway I have fixed this upstream already so you need to rebase=
+.
+
+>         conn->num_bis =3D 0;
+>         memset(conn->bis, 0, sizeof(conn->num_bis));
+> @@ -7026,6 +7029,35 @@ static void hci_le_big_sync_established_evt(struct=
+ hci_dev *hdev, void *data,
+>         hci_dev_unlock(hdev);
+>  }
+>
+> +static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
+> +                                    struct sk_buff *skb)
+> +{
+> +       struct hci_evt_le_big_sync_lost *ev =3D data;
+> +       struct hci_conn *bis, *conn;
+> +
+> +       bt_dev_dbg(hdev, "big handle 0x%2.2x", ev->handle);
+> +
+> +       hci_dev_lock(hdev);
+> +
+> +       /* Delete the pa sync connection */
+> +       bis =3D hci_conn_hash_lookup_pa_sync_big_handle(hdev, ev->handle)=
+;
+> +       if (bis) {
+> +               conn =3D hci_conn_hash_lookup_pa_sync_handle(hdev, bis->s=
+ync_handle);
+> +               if (conn)
+> +                       hci_conn_del(conn);
+> +       }
+> +
+> +       /* Delete each bis connection */
+> +       while ((bis =3D hci_conn_hash_lookup_big_state(hdev, ev->handle,
+> +                                               BT_CONNECTED, HCI_ROLE_SL=
+AVE))) {
+> +               clear_bit(HCI_CONN_BIG_SYNC, &bis->flags);
+> +               hci_disconn_cfm(bis, ev->reason);
+> +               hci_conn_del(bis);
+> +       }
+> +
+> +       hci_dev_unlock(hdev);
+> +}
+> +
+>  static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *d=
+ata,
+>                                            struct sk_buff *skb)
+>  {
+> @@ -7149,6 +7181,11 @@ static const struct hci_le_ev {
+>                      hci_le_big_sync_established_evt,
+>                      sizeof(struct hci_evt_le_big_sync_estabilished),
+>                      HCI_MAX_EVENT_SIZE),
+> +       /* [0x1e =3D HCI_EVT_LE_BIG_SYNC_LOST] */
+> +       HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_LOST,
+> +                    hci_le_big_sync_lost_evt,
+> +                    sizeof(struct hci_evt_le_big_sync_lost),
+> +                    HCI_MAX_EVENT_SIZE),
+
+After you fix the comments I do expect some code to introduce support
+into our emulator and then add some test to iso-tester that causes the
+test to generate HCI_EVT_LE_BIG_SYNC_LOST so we can confirm this is
+working as intended.
+
+>         /* [0x22 =3D HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
+>         HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
+>                      hci_le_big_info_adv_report_evt,
+>
+> ---
+> base-commit: bd35cd12d915bc410c721ba28afcada16f0ebd16
+> change-id: 20250612-handle_big_sync_lost_event-4c7dc64390a2
+>
+> Best regards,
+> --
+> Yang Li <yang.li@amlogic.com>
+>
+>
 
 
-
-On 6/30/2025 10:17 PM, Andrew Lunn wrote:
-> On Mon, Jun 30, 2025 at 08:59:01PM +0530, Raju Rangoju wrote:
->> AMD XGBE HW supports Giant packets up to 16K bytes. Add necessary
->> changes to enable the giant packet support.
-> 
-> How does v2 differ from v1? You should include a change history.
-
-There are minor changes between v1 and v2. I'll capture those in the 
-changes log and resend v2.
-
-> 
-> You also need to wait 24 hours between posts.
-Sure.
-
-Thanks,
-Raju
-
-> 
->      Andrew
-
+--=20
+Luiz Augusto von Dentz
 
