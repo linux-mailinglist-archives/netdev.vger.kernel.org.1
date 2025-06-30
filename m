@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-202695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F4E0AEEB07
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 01:48:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9F66AEEB08
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 01:48:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1230F1BC3C02
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 23:48:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B975344083A
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 23:48:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF34923F43C;
-	Mon, 30 Jun 2025 23:48:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46B7525A2A2;
+	Mon, 30 Jun 2025 23:48:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nSTlZv6N"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FKywpvIc"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA82258CD4
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 23:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0CB20F07C
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 23:48:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751327300; cv=none; b=ABGPfI3trjPJqw42p0VtMpx3Y7+aA7jtPmqFpVT4rGE7Z7G9nj2Yp5yEvI7LsHLsi75jjxg3NuagXU4T/cvNHuWkGQACsuLnLad+vYkHag/STIN8zpZOdNGBtg2+MsB/KOtHusBvqsna2B2f6OPqzmn/j9cyCGzE+43IMA5R1Ic=
+	t=1751327302; cv=none; b=gPnLkO1s2Y15f1SoULwfzbHTqa4C9v3VELr1liHd2mwp9kfmtFxig7HthE5FmyLZwNv/KCIXBgLaQzg48POTbyZImTsJAq1q6r4JCRbrr5s8cNgN4s+H2yp3xA5BBWOK6fJmyWLEwJIZfHdhytFczpwLBN2i93Mao01lH9Raga8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751327300; c=relaxed/simple;
-	bh=OtSICl8sCeS42dQVhpmNHJZoCz+aYtuxKQDZENokLI8=;
+	s=arc-20240116; t=1751327302; c=relaxed/simple;
+	bh=pl0lTeuqfn0jX9MQFyAL9hyVcan65BfbBb0njSAOGso=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=u5jCAdNMUghRW8C08x5HgDpbdyA/ALINe66Ou6ABc1wr+pj2+QL8K+Id/LVjF6fbYkAaWbCqTf0w8c9LySRW5aO50H2KwVJxWRfr7UtJhYJwvOfws3sjGZwgRxV4LF7YQNKSa6qGWG7aUnFTEq1+mZ+oExNHAPSFP0jBnqcxbcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nSTlZv6N; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=rwfndt6eM87bXtmjQ1BIt5v+cz2dBuKCYQTClRQ2nAySyj5MUMZxcWfLBg0TYef3pDKpmU1jdaovXJ2FgEXzYyZQmd/iAfa2LOcquD6KnR/Vj4WnVhE24jctf4uiICQW6ndE2boeIu3P2MkpYbUPQ+QeiclSgIvcWhok8FcNfQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FKywpvIc; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55UJhxeD008074
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 23:48:17 GMT
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55UDgKMA000747
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 23:48:20 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=9gjxAHh/xyAifyTbi
-	tfxdKS+w2bnnXoWdmCl+EKqqvc=; b=nSTlZv6NDg8UI1L/Dsa/Pvvrj625MKEkR
-	gV5ERq3p1wRH5zQAh1DjgKwtkSQCP2lxbNWp9j0m0xhj9RvtMIE1p5gFgtZrkJxj
-	PDPAKcfL4dCM5bwzqpRUrx1q8y3f6y1UV8FYOl3clvasJaYatJuFio/xqSHhTnI0
-	zAygB5Qrtm+e/FAZKQISDZ1Rr+kEOCZokJF4M41H/AWyvZv0oez/RmaRXZh8+xLu
-	nQ0ZFbeYVtCvvAch+TB8JBbwrSwoxnC1GkLBwS/w8/zGdJ7lzBGlwEtnHPHc2IrR
-	Tm1X+kwCB+XG6JsoenLjhV5btNyLw5DCkCtc8s1nTjrA0xVIUxplw==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j7wrcaxe-1
+	:mime-version:references:subject:to; s=pp1; bh=W0x/HeIhyjh7GW+up
+	bzBDs/qraxsEB0BXQf/EzAwWFM=; b=FKywpvIcNrXi5aU5ztyMMDEMjI6fk+xUP
+	2W9NsaeIJBmIydHdXMgwNBm/hsD3sZq3zIC1aAW4a4FKauWEQCUK2vaunqb0ACXj
+	0K2e6+L70gFybbqmQ6YCH9UyjosrV72GyJsOjBW7XEcOmHM0/zimk+ZrvgEdznU9
+	Uklmah7VuYT1zZtiaEU43xVf+CuW9v7Wfv5pOViCzMvD28EaTdUiq4NvowOPnPop
+	J1mrC22/NQNojck4EvcQiO5mD++MLe6GhlulxFMPVEB6YWFQid/tgo3oxYl0huB3
+	vzrhm81JgQEDTVBJCXjOk21BBXbmQ+3fZ3HQ1eQx41xReFyp2Gx6g==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47j84d4ah2-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 23:48:17 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55UJqsjH021430
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 23:48:16 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 47jwe37ud4-1
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 23:48:19 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 55UMGRJm011802
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 23:48:18 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47jv7mr21c-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 23:48:16 +0000
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 23:48:18 +0000
 Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55UNmFkx524860
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 55UNmGFG29688376
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 30 Jun 2025 23:48:15 GMT
+	Mon, 30 Jun 2025 23:48:17 GMT
 Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E8EBD58059;
-	Mon, 30 Jun 2025 23:48:14 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id A38EE5805B;
+	Mon, 30 Jun 2025 23:48:16 +0000 (GMT)
 Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3566758058;
-	Mon, 30 Jun 2025 23:48:14 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id EE7C358058;
+	Mon, 30 Jun 2025 23:48:15 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.61.253.36])
 	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 30 Jun 2025 23:48:14 +0000 (GMT)
+	Mon, 30 Jun 2025 23:48:15 +0000 (GMT)
 From: Mingming Cao <mmc@linux.ibm.com>
 To: netdev@vger.kernel.org
 Cc: bjking1@linux.ibm.com, haren@linux.ibm.com, ricklind@linux.ibm.com,
-        mmc@linux.ibm.com, Dave Marquardt <davemarq@linux.ibm.com>
-Subject: [PATCH net-next 2/4] ibmvnic: Use atomic64_t for queue stats
-Date: Mon, 30 Jun 2025 16:48:04 -0700
-Message-Id: <20250630234806.10885-3-mmc@linux.ibm.com>
+        mmc@linux.ibm.com
+Subject: [PATCH net-next 3/4] ibmvnic: Use ndo_get_stats64 to fix inaccurate SAR reporting
+Date: Mon, 30 Jun 2025 16:48:05 -0700
+Message-Id: <20250630234806.10885-4-mmc@linux.ibm.com>
 X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 In-Reply-To: <20250630234806.10885-1-mmc@linux.ibm.com>
 References: <20250630234806.10885-1-mmc@linux.ibm.com>
@@ -85,157 +85,113 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=E/PNpbdl c=1 sm=1 tr=0 ts=68632241 cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=5vo5R605__eMTnwomzYA:9
-X-Proofpoint-GUID: wfv4-KS8-Fph_moIMZuALJBP9DDLWnNm
-X-Proofpoint-ORIG-GUID: wfv4-KS8-Fph_moIMZuALJBP9DDLWnNm
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjMwMDE5NiBTYWx0ZWRfXyc5rMHBxSQQl f/+gTWNMsFy1xEg9uhZjc5ZHPhuOPwMp0i2248gxNQoRXMie0wPvx4+XpSXECIpAx/XzcChp/VC 6heHz6mJmDwANHTSIgYy4BNq+f/wbpXvopR2xtp0bHtBUDt1kBEb2v5t798Y/EjOFxGcbdoWF9N
- cEEnmvkdOt9wGj//EQBc2brHGCXEg6C+50uKVBiu7Rhmwhvc3WYcI20PIzgrIDMjoZh/w47iAl3 WYjLcHU+HYljDDhGSJEMn8m2nRvq3aKwThE5Ciyq0SXpjQNJtftXAySxrwiMMjtJRDcd3humQa3 CmumdWewXJNIy9qVOaLTXaWjKIFK7XZDlZqWwllVhpoILZ++OoKajIsmSXOYvn2hmNGwCD0g6SR
- uBGPJMGSbCEhHVbL0MUfXrRVjkGs2BAciB0s4wrgrj5dEcfJ5cRMOeirWdNEvZKuOgJCl/UT
+X-Proofpoint-ORIG-GUID: 6bt_ERTudV0k7qJxsLN-UOgGJZgw4Uor
+X-Proofpoint-GUID: 6bt_ERTudV0k7qJxsLN-UOgGJZgw4Uor
+X-Authority-Analysis: v=2.4 cv=Ib6HWXqa c=1 sm=1 tr=0 ts=68632243 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=6IFa9wvqVegA:10 a=VnNF1IyMAAAA:8 a=ghiumMNqhBYHs4yLu9sA:9
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjMwMDE5NiBTYWx0ZWRfX1mcoJwlf6Hyx 5vGu90u1ZO+GbvCsSg4sHHCx5NNsWcZ1szScW7Cn2urSZtHOAs2RdhhnIjtAYRBQ4yc9LNmPU4d 2hK593m3p6RKpflevBxPRIfAU0gkN/xFQrXPAbzgmDrbxq47t6VbY9MEH354JfkzZNCeGTPNG+H
+ k3lnOR5VVEcH0GrDTTb9uvNf6S16n6Ns92IjX5fO+6nTLnfq4h4WTnMVpaiZgxldTS4nongLSRg yclJ5XUB4MmsIHY2QxR2RKPQkMAsIfyfFuADRT5cY4Gv6JtpCfr2pfwZ+/T6mMQfcccwMvfSkO/ eTHri+PVMJnsvjoKQaK69a806iyvR9Zf+Cs5Lj3bpvZJ9ePmgZ7cIoSxw4nvyXFMX9tMOWGlA0D
+ ASLTeFKXkzdN5g5OJz/OfhM3kA4hgafGdadVuGG4tAersLK6N9pSbByyc3A4LXImQbpzVtCU
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
  definitions=2025-06-30_06,2025-06-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- bulkscore=0 priorityscore=1501 phishscore=0 suspectscore=0 mlxlogscore=999
- lowpriorityscore=0 mlxscore=0 clxscore=1015 adultscore=0 impostorscore=0
- classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2505280000
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
+ clxscore=1015 mlxlogscore=999 lowpriorityscore=0 impostorscore=0
+ mlxscore=0 malwarescore=0 spamscore=0 priorityscore=1501 adultscore=0
+ bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
  definitions=main-2506300196
 
-This patch improves the ibmvnic driver by changing the per-queue
-packet and byte counters to atomic64_t types. This makes updates
-thread-safe and easier to manage across multiple cores.
+VNIC testing on multi-core Power systems showed SAR stats drift
+and packet rate inconsistencies under load.
 
-It also updates the ethtool statistics to safely read these new counters.
+Implements ndo_get_stats64 to provide safe aggregation of queue-level
+atomic64 counters into rtnl_link_stats64 for use by tools like 'ip -s',
+'ifconfig', and 'sar'. Switch to ndo_get_stats64 to align SAR reporting
+with the standard kernel interface for retrieving netdev stats.
+
+This removes redundant per-adapter stat updates, reduces overhead,
+eliminates cacheline bouncing from hot path updates, and improves
+the accuracy of reported packet rates.
 
 Signed-off-by: Mingming Cao <mmc@linux.ibm.com>
-Reviewed-by: Brian King <bjking1@linux.ibm.com>
-Reviewed-by: Dave Marquardt <davemarq@linux.ibm.com>
-Reviewed by: Rick Lindsley <ricklind@linux.ibm.com>
+Reviewed by: Brian King <bjking1@linux.ibm.com>
+Reviewed by: Dave Marquardt <davemarq@linux.ibm.com>
 ---
- drivers/net/ethernet/ibm/ibmvnic.c | 34 +++++++++++++++---------------
- drivers/net/ethernet/ibm/ibmvnic.h | 14 ++++++------
- 2 files changed, 24 insertions(+), 24 deletions(-)
+ drivers/net/ethernet/ibm/ibmvnic.c | 29 +++++++++++++++++++++--------
+ 1 file changed, 21 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-index 92647e137c..7b2be8eeb5 100644
+index 7b2be8eeb5..8c959d5db2 100644
 --- a/drivers/net/ethernet/ibm/ibmvnic.c
 +++ b/drivers/net/ethernet/ibm/ibmvnic.c
-@@ -69,6 +69,7 @@
- #include <linux/if_vlan.h>
- #include <linux/utsname.h>
- #include <linux/cpu.h>
-+#include <linux/atomic.h>
- 
- #include "ibmvnic.h"
- 
-@@ -2314,9 +2315,8 @@ static void ibmvnic_tx_scrq_clean_buffer(struct ibmvnic_adapter *adapter,
+@@ -2313,13 +2313,11 @@ static void ibmvnic_tx_scrq_clean_buffer(struct ibmvnic_adapter *adapter,
+ 					  tx_pool->num_buffers - 1 :
+ 					  tx_pool->consumer_index - 1;
  		tx_buff = &tx_pool->tx_buff[index];
- 		adapter->netdev->stats.tx_packets--;
- 		adapter->netdev->stats.tx_bytes -= tx_buff->skb->len;
--		adapter->tx_stats_buffers[queue_num].batched_packets--;
--		adapter->tx_stats_buffers[queue_num].bytes -=
--						tx_buff->skb->len;
-+		atomic64_dec(&adapter->tx_stats_buffers[queue_num].batched_packets);
-+		atomic64_sub(tx_buff->skb->len, &adapter->tx_stats_buffers[queue_num].bytes);
+-		adapter->netdev->stats.tx_packets--;
+-		adapter->netdev->stats.tx_bytes -= tx_buff->skb->len;
+ 		atomic64_dec(&adapter->tx_stats_buffers[queue_num].batched_packets);
+ 		atomic64_sub(tx_buff->skb->len, &adapter->tx_stats_buffers[queue_num].bytes);
++		atomic64_inc(&adapter->tx_stats_buffers[queue_num].dropped_packets);
  		dev_kfree_skb_any(tx_buff->skb);
  		tx_buff->skb = NULL;
- 		adapter->netdev->stats.tx_dropped++;
-@@ -2652,10 +2652,10 @@ out:
- 	netdev->stats.tx_packets += tx_bpackets + tx_dpackets;
+-		adapter->netdev->stats.tx_dropped++;
+ 	}
+ 
+ 	ind_bufp->index = 0;
+@@ -2647,9 +2645,6 @@ tx_err:
+ 	}
+ out:
+ 	rcu_read_unlock();
+-	netdev->stats.tx_dropped += tx_dropped;
+-	netdev->stats.tx_bytes += tx_bytes;
+-	netdev->stats.tx_packets += tx_bpackets + tx_dpackets;
  	adapter->tx_send_failed += tx_send_failed;
  	adapter->tx_map_failed += tx_map_failed;
--	adapter->tx_stats_buffers[queue_num].batched_packets += tx_bpackets;
--	adapter->tx_stats_buffers[queue_num].direct_packets += tx_dpackets;
--	adapter->tx_stats_buffers[queue_num].bytes += tx_bytes;
--	adapter->tx_stats_buffers[queue_num].dropped_packets += tx_dropped;
-+	atomic64_add(tx_bpackets, &adapter->tx_stats_buffers[queue_num].batched_packets);
-+	atomic64_add(tx_dpackets, &adapter->tx_stats_buffers[queue_num].direct_packets);
-+	atomic64_add(tx_bytes, &adapter->tx_stats_buffers[queue_num].bytes);
-+	atomic64_add(tx_dropped, &adapter->tx_stats_buffers[queue_num].dropped_packets);
- 
- 	return ret;
+ 	atomic64_add(tx_bpackets, &adapter->tx_stats_buffers[queue_num].batched_packets);
+@@ -3452,6 +3447,25 @@ err:
+ 	return -ret;
  }
-@@ -3569,8 +3569,8 @@ restart_poll:
+ 
++static void ibmvnic_get_stats64(struct net_device *netdev,
++				struct rtnl_link_stats64 *stats)
++{
++	struct ibmvnic_adapter *adapter = netdev_priv(netdev);
++	int i;
++
++	for (i = 0; i < adapter->req_rx_queues; i++) {
++		stats->rx_packets += atomic64_read(&adapter->rx_stats_buffers[i].packets);
++		stats->rx_bytes   += atomic64_read(&adapter->rx_stats_buffers[i].bytes);
++	}
++
++	for (i = 0; i < adapter->req_tx_queues; i++) {
++		stats->tx_packets += atomic64_read(&adapter->tx_stats_buffers[i].batched_packets);
++		stats->tx_packets += atomic64_read(&adapter->tx_stats_buffers[i].direct_packets);
++		stats->tx_bytes   += atomic64_read(&adapter->tx_stats_buffers[i].bytes);
++		stats->tx_dropped += atomic64_read(&adapter->tx_stats_buffers[i].dropped_packets);
++	}
++}
++
+ static void ibmvnic_tx_timeout(struct net_device *dev, unsigned int txqueue)
+ {
+ 	struct ibmvnic_adapter *adapter = netdev_priv(dev);
+@@ -3567,8 +3581,6 @@ restart_poll:
+ 
+ 		length = skb->len;
  		napi_gro_receive(napi, skb); /* send it up */
- 		netdev->stats.rx_packets++;
- 		netdev->stats.rx_bytes += length;
--		adapter->rx_stats_buffers[scrq_num].packets++;
--		adapter->rx_stats_buffers[scrq_num].bytes += length;
-+		atomic64_inc(&adapter->rx_stats_buffers[scrq_num].packets);
-+		atomic64_add(length, &adapter->rx_stats_buffers[scrq_num].bytes);
+-		netdev->stats.rx_packets++;
+-		netdev->stats.rx_bytes += length;
+ 		atomic64_inc(&adapter->rx_stats_buffers[scrq_num].packets);
+ 		atomic64_add(length, &adapter->rx_stats_buffers[scrq_num].bytes);
  		frames_processed++;
- 	}
- 
-@@ -3874,22 +3874,22 @@ static void ibmvnic_get_ethtool_stats(struct net_device *dev,
- 				      (adapter, ibmvnic_stats[i].offset));
- 
- 	for (j = 0; j < adapter->req_tx_queues; j++) {
--		data[i] = adapter->tx_stats_buffers[j].batched_packets;
-+		data[i] = atomic64_read(&adapter->tx_stats_buffers[j].batched_packets);
- 		i++;
--		data[i] = adapter->tx_stats_buffers[j].direct_packets;
-+		data[i] = atomic64_read(&adapter->tx_stats_buffers[j].direct_packets);
- 		i++;
--		data[i] = adapter->tx_stats_buffers[j].bytes;
-+		data[i] = atomic64_read(&adapter->tx_stats_buffers[j].bytes);
- 		i++;
--		data[i] = adapter->tx_stats_buffers[j].dropped_packets;
-+		data[i] = atomic64_read(&adapter->tx_stats_buffers[j].dropped_packets);
- 		i++;
- 	}
- 
- 	for (j = 0; j < adapter->req_rx_queues; j++) {
--		data[i] = adapter->rx_stats_buffers[j].packets;
-+		data[i] = atomic64_read(&adapter->rx_stats_buffers[j].packets);
- 		i++;
--		data[i] = adapter->rx_stats_buffers[j].bytes;
-+		data[i] = atomic64_read(&adapter->rx_stats_buffers[j].bytes);
- 		i++;
--		data[i] = adapter->rx_stats_buffers[j].interrupts;
-+		data[i] = atomic64_read(&adapter->rx_stats_buffers[j].interrupts);
- 		i++;
- 	}
- }
-@@ -4307,7 +4307,7 @@ static irqreturn_t ibmvnic_interrupt_rx(int irq, void *instance)
- 	if (unlikely(adapter->state != VNIC_OPEN))
- 		return IRQ_NONE;
- 
--	adapter->rx_stats_buffers[scrq->scrq_num].interrupts++;
-+	atomic64_inc(&adapter->rx_stats_buffers[scrq->scrq_num].interrupts);
- 
- 	if (napi_schedule_prep(&adapter->napi[scrq->scrq_num])) {
- 		disable_scrq_irq(adapter, scrq);
-diff --git a/drivers/net/ethernet/ibm/ibmvnic.h b/drivers/net/ethernet/ibm/ibmvnic.h
-index 246ddce753..1cc6e2d13a 100644
---- a/drivers/net/ethernet/ibm/ibmvnic.h
-+++ b/drivers/net/ethernet/ibm/ibmvnic.h
-@@ -212,19 +212,19 @@ struct ibmvnic_statistics {
- } __packed __aligned(8);
- 
- struct ibmvnic_tx_queue_stats {
--	u64 batched_packets;
--	u64 direct_packets;
--	u64 bytes;
--	u64 dropped_packets;
-+	atomic64_t batched_packets;
-+	atomic64_t direct_packets;
-+	atomic64_t bytes;
-+	atomic64_t dropped_packets;
- };
- 
- #define NUM_TX_STATS \
- 	(sizeof(struct ibmvnic_tx_queue_stats) / sizeof(u64))
- 
- struct ibmvnic_rx_queue_stats {
--	u64 packets;
--	u64 bytes;
--	u64 interrupts;
-+	atomic64_t packets;
-+	atomic64_t bytes;
-+	atomic64_t interrupts;
- };
- 
- #define NUM_RX_STATS \
+@@ -3678,6 +3690,7 @@ static const struct net_device_ops ibmvnic_netdev_ops = {
+ 	.ndo_set_rx_mode	= ibmvnic_set_multi,
+ 	.ndo_set_mac_address	= ibmvnic_set_mac,
+ 	.ndo_validate_addr	= eth_validate_addr,
++	.ndo_get_stats64	= ibmvnic_get_stats64,
+ 	.ndo_tx_timeout		= ibmvnic_tx_timeout,
+ 	.ndo_change_mtu		= ibmvnic_change_mtu,
+ 	.ndo_features_check     = ibmvnic_features_check,
 -- 
 2.39.3 (Apple Git-146)
 
