@@ -1,237 +1,222 @@
-Return-Path: <netdev+bounces-202426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93CA8AEDD4A
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 14:43:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 660AEAEDD5A
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 14:45:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77F977ACB09
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 12:41:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A134216FC35
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 12:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9E2A2857FF;
-	Mon, 30 Jun 2025 12:40:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E8111DF974;
+	Mon, 30 Jun 2025 12:45:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Msm+Zl6m"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="piYlEXJy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D13286439
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 12:40:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B6B1DFF7;
+	Mon, 30 Jun 2025 12:45:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751287223; cv=none; b=WJ6C0AkEmJEvMLrmIIo8wxaZKd6ExH4RiPDXJ4KN/z/bsrIH25bMUo4HU/aXI9O+vMxBkhjdRZ1ZynALqDnIHxI/ceG/RIlnGn/YGKnf6vRraz+YBimpuVF8qPfcpmF8lCRq4xSMXbO2NPnuGBA83KSLJ93siH4vLZTMKgVvAwE=
+	t=1751287542; cv=none; b=c2Qpm0i1mDZceYuxF8MTyUH0N3aIVjdfbuUfsPay3zaUIWEmbwxeQhgmhXYrDOOuv8eQ+y+xB52WQ0/FtBiV82KzYqT1dGhtYgYTw9LBMp95IExkAXON9PtZbsXwJVrk7syUe6Z/UmaVCub5oUuKZY0CJnzeG2NSvQ1JHut/XSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751287223; c=relaxed/simple;
-	bh=Hpvy8t9wTo9E/h0YcjG6qn2O5/OoiyUzLSiUPmNyOQk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bdOhW5uxyKML/GHXcYr3+8qYszc58F+HiR5cgyoTJoeYkvsHQGWB0VFS3dFwoU7KfCT8PDs/1Vj4QxJVgfYTl+kJAMjcmbKgz1hZTD6N56nkg2LVgRqzyWVPJem3r74hzpASVYRF0br/PHwEKS7PwuaCn3vsOjtw/AMpqQwphs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Msm+Zl6m; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 55UAk81R004916;
-	Mon, 30 Jun 2025 05:39:06 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=OJxeVJTqA0mRGuf7tl7qBXI
-	MkNzRkvwFjGh/rL4EQTM=; b=Msm+Zl6m68KVKQ9xgfiH5qwPszN1ETlDajoijCs
-	F4+AStpgtR1Ls0a8/VmbkyHSTS8Im7P5Ol8z1tEEn+h21FClfoe4/dOxIjdu7Ur+
-	BOOO7QXXNyJk6HqnSwtDz0n6WXG5QxYhWGq+5HwUr9OGkxfNEjVt9culmCUqjgEx
-	aX2QizC3a+/v/OsB2p8coFDOfvGnZMy3eXtJScJB6g+fyygLYbClkm8NP8oH6VZk
-	Prag+G4ThR46uEgCUV54zKR9xdvEVtGN5WMQCxUbWbW3Q2iU/JfHObZ1yqOzVagq
-	ZCf4lPG7mIeohDgYvqtivBaATbgnKhbvAiQYeX9gx2DA3OQ==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 47ks43g660-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 30 Jun 2025 05:39:05 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 30 Jun 2025 05:39:04 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Mon, 30 Jun 2025 05:39:04 -0700
-Received: from cavium-System-i9-11 (unknown [10.28.38.183])
-	by maili.marvell.com (Postfix) with ESMTP id 951B05B6921;
-	Mon, 30 Jun 2025 05:39:01 -0700 (PDT)
-From: Aakash Kumar S <saakashkumar@marvell.com>
-To: <netdev@vger.kernel.org>
-CC: <steffen.klassert@secunet.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>, <saakashkumar@marvell.com>,
-        <akamaluddin@marvell.com>, <antony@phenome.org>
-Subject: [PATCH] xfrm: Duplicate SPI Handling
-Date: Mon, 30 Jun 2025 18:08:56 +0530
-Message-ID: <20250630123856.1750366-1-saakashkumar@marvell.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1751287542; c=relaxed/simple;
+	bh=nI6ubp+e9wwWOQEzFxWxfJ8iVfs97f4UpsJdUisnoxQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P2F+O+fUSFtfJstWy6ySqxHHn0BPaVzazLgTW4jyBLlNnJBLomKhKlMYHuHsCYiuo/Q80J5pLufrx4+1wcKhrHPIj3TkUAri0sXX0ksC6+HH027pvMMdr9X7TPPfbuIuPs/VRfub47Pz9Mp1Hz6UH/vmgudHorCKurhiV9v7mig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=piYlEXJy; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1751287536; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=CHy/aj7Sn9juzFVwa9OaHVeiczeTLceLUFgOEXprNU0=;
+	b=piYlEXJypkwW3L2h79WCrH+NQRt5qT/2o4djgi1ztWKISRVF86qqjDf83Cjy4AOQDOpwjket1nrEYKszwgHauxVFUzEg/Tjt2Cvkb1mm48Gn75LiLwFlQj9bN2rs7NyS/fzPkt6uxWrN9dREflKKaEYUWTXfKL/J2DU0CiswDXg=
+Received: from 30.221.128.140(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WgCGO0A_1751287534 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 30 Jun 2025 20:45:34 +0800
+Message-ID: <b13fd9f0-6f65-404b-9625-e431ee45ed17@linux.alibaba.com>
+Date: Mon, 30 Jun 2025 20:45:33 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNjMwMDEwMyBTYWx0ZWRfX8KggS4zEeSWu wByldHchvtkwyb4dJ4ep+AkZbHNFPPR2MtrRquTO0WPntF+6RDNsN90XhcRxJMDtxXnSu/RRTNN 119ue+2NSAv6tdaLSlL3UkJ2RmEc0I3+RypZh4kO30cAVw/ZqdCRdHs4RmO2Gc/yLdad+RY0Zf/
- RKVFgOf6N+nhNvd0/XIl8kQ3+55dND18thzvJR7YW2RiWRIuqBUiIctK4kc97Ewfx3o8SQhgKtH tUcsKEbsisCNHVBT4043alLuTC+hOGRxc8mPX2qwikDkdV3oBbIQGLJCzQkn7DUkFdRbxGpJwzn Hdm4l/1ySaUfXdQBfSJxuT9+oBvBqeQtHrodMZvl6M0AEVTjKe07sRqWyZM+/vPWcuqh34qPiMW
- OT01AMySMVNEGnPeUdziVwGNSu8K5UumJ1RdTHukeBKnoO1VKaiOvKSLYYY2Z3zTt2RAWuSB
-X-Proofpoint-GUID: 3-aHxNUAM8tQfJPiEJjyO9palZxsIza4
-X-Proofpoint-ORIG-GUID: 3-aHxNUAM8tQfJPiEJjyO9palZxsIza4
-X-Authority-Analysis: v=2.4 cv=Lbc86ifi c=1 sm=1 tr=0 ts=68628569 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=6IFa9wvqVegA:10 a=M5GUcnROAAAA:8 a=UX3akyHuaT3hde3hHWgA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-06-30_03,2025-06-27_01,2025-03-28_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] ptp: add Alibaba CIPU PTP clock driver
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250627072921.52754-1-guwen@linux.alibaba.com>
+ <0b0d3dad-3fe2-4b3a-a018-35a3603f8c10@lunn.ch>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <0b0d3dad-3fe2-4b3a-a018-35a3603f8c10@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The issue originates when Strongswan initiates an XFRM_MSG_ALLOCSPI
-Netlink message, which triggers the kernel function xfrm_alloc_spi().
-This function is expected to ensure uniqueness of the Security Parameter
-Index (SPI) for inbound Security Associations (SAs). However, it can
-return success even when the requested SPI is already in use, leading
-to duplicate SPIs assigned to multiple inbound SAs, differentiated
-only by their destination addresses.
 
-This behavior causes inconsistencies during SPI lookups for inbound packets.
-Since the lookup may return an arbitrary SA among those with the same SPI,
-packet processing can fail, resulting in packet drops.
 
-According to RFC 4301 section 4.4.2 , for inbound processing a unicast SA
-is uniquely identified by the SPI and optionally protocol.
+On 2025/6/27 15:57, Andrew Lunn wrote:
+>> +#define PTP_CIPU_LOG_SUB(dev, level, type, event, fmt, ...) \
+>> +({ \
+>> +	static DEFINE_RATELIMIT_STATE(_rs, \
+>> +				      DEFAULT_RATELIMIT_INTERVAL, \
+>> +				      DEFAULT_RATELIMIT_BURST); \
+>> +	if (__ratelimit(&_rs)) \
+>> +		dev_printk(level, dev, "[%02x:%02x]: " fmt, \
+>> +			   type, event, ##__VA_ARGS__); \
+>> +})
+> 
+> Please don't use such wrappers. Just use dev_dbg_ratelimited() etc.
+> 
 
-Reproducing the Issue Reliably:
-To consistently reproduce the problem, restrict the available SPI range in
-charon.conf : spi_min = 0x10000000 spi_max = 0x10000002
-This limits the system to only 2 usable SPI values.
-Next, create more than 2 Child SA. each using unique pair of src/dst address.
-As soon as the 3rd Child SA is initiated, it will be assigned a duplicate
-SPI, since the SPI pool is already exhausted.
-With a narrow SPI range, the issue is consistently reproducible.
-With a broader/default range, it becomes rare and unpredictable.
+Agree. This was for compatibility with older kernels, I should
+change it to new helpers.. Will fix in next version. Thanks!
 
-Current implementation:
-xfrm_spi_hash() lookup function computes hash using daddr, proto, and family.
-So if two SAs have the same SPI but different destination addresses, then
-they will:
-a. Hash into different buckets
-b. Be stored in different linked lists (byspi + h)
-c. Not be seen in the same hlist_for_each_entry_rcu() iteration.
-As a result, the lookup will result in NULL and kernel allows that Duplicate SPI
+>> +static int cipu_iowrite8_and_check(void __iomem *addr,
+>> +				   u8 value, u8 *res)
+>> +{
+>> +	iowrite8(value, addr);
+>> +	if (value != ioread8(addr))
+>> +		return -EIO;
+>> +	*res = value;
+>> +	return 0;
+>> +}
+> 
+> This probably needs a comment. I assume the hardware is broken and
+> sometimes writes don't work? You should state that.
+> 
 
-Proposed Change:
-xfrm_state_lookup_spi_proto() does a truly global search - across all states,
-regardless of hash bucket and matches SPI and proto.
+Yes, If the cloud device thinks the written value is not what it
+expected, the write will fail. I will add a comment about that, thanks.
 
-Signed-off-by: Aakash Kumar S <saakashkumar@marvell.com>
----
- net/xfrm/xfrm_state.c | 72 ++++++++++++++++++++++++++-----------------
- 1 file changed, 43 insertions(+), 29 deletions(-)
+>> +static void ptp_cipu_print_dev_events(struct ptp_cipu_ctx *ptp_ctx,
+>> +				      int event)
+>> +{
+>> +	struct device *dev = &ptp_ctx->pdev->dev;
+>> +	int type = PTP_CIPU_EVT_TYPE_DEV;
+>> +
+>> +	switch (event) {
+>> +	case PTP_CIPU_EVT_H_CLK_ABN:
+>> +		PTP_CIPU_LOG_SUB(dev, KERN_ERR, type, event,
+>> +				 "Atomic Clock Error Detected\n");
+>> +		break;
+>> +	case PTP_CIPU_EVT_H_CLK_ABN_REC:
+>> +		PTP_CIPU_LOG_SUB(dev, KERN_INFO, type, event,
+>> +				 "Atomic Clock Error Recovered\n");
+>> +		break;
+>> +	case PTP_CIPU_EVT_H_DEV_MT:
+>> +		PTP_CIPU_LOG_SUB(dev, KERN_ERR, type, event,
+>> +				 "Maintenance Exception Detected\n");
+>> +		break;
+>> +	case PTP_CIPU_EVT_H_DEV_MT_REC:
+>> +		PTP_CIPU_LOG_SUB(dev, KERN_INFO, type, event,
+>> +				 "Maintenance Exception Recovered\n");
+>> +		break;
+>> +	case PTP_CIPU_EVT_H_DEV_MT_TOUT:
+>> +		PTP_CIPU_LOG_SUB(dev, KERN_INFO, type, event,
+>> +				 "Maintenance Exception Failed to Recover "
+>> +				 "within %d us\n", ptp_ctx->regs.mt_tout_us);
+>> +		break;
+>> +	case PTP_CIPU_EVT_H_DEV_BUSY:
+>> +		PTP_CIPU_LOG_SUB(dev, KERN_ERR, type, event,
+>> +				 "PHC Busy Detected\n");
+>> +		break;
+>> +	case PTP_CIPU_EVT_H_DEV_BUSY_REC:
+>> +		PTP_CIPU_LOG_SUB(dev, KERN_INFO, type, event,
+>> +				 "PHC Busy Recovered\n");
+>> +		break;
+>> +	case PTP_CIPU_EVT_H_DEV_ERR:
+>> +		PTP_CIPU_LOG_SUB(dev, KERN_ERR, type, event,
+>> +				 "PHC Error Detected\n");
+>> +		break;
+>> +	case PTP_CIPU_EVT_H_DEV_ERR_REC:
+>> +		PTP_CIPU_LOG_SUB(dev, KERN_INFO, type, event,
+>> +				 "PHC Error Recovered\n");
+> 
+> Are these fatal? Or can the device still be used after these errors
+> occur?
 
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 341d79ecb5c2..0b8168a30c2e 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -1714,6 +1714,26 @@ struct xfrm_state *xfrm_state_lookup_byspi(struct net *net, __be32 spi,
- }
- EXPORT_SYMBOL(xfrm_state_lookup_byspi);
- 
-+static struct xfrm_state *xfrm_state_lookup_spi_proto(struct net *net, __be32 spi, u8 proto)
-+{
-+	struct xfrm_state *x;
-+	unsigned int i;
-+
-+	rcu_read_lock();
-+	for (i = 0; i <= net->xfrm.state_hmask; i++) {
-+		hlist_for_each_entry_rcu(x, &net->xfrm.state_byspi[i], byspi) {
-+			if (x->id.spi == spi && x->id.proto == proto) {
-+				if (!xfrm_state_hold_rcu(x))
-+					continue;
-+				rcu_read_unlock();
-+				return x;
-+			}
-+		}
-+	}
-+	rcu_read_unlock();
-+	return NULL;
-+}
-+
- static void __xfrm_state_insert(struct xfrm_state *x)
- {
- 	struct net *net = xs_net(x);
-@@ -2547,10 +2567,8 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
- 	unsigned int h;
- 	struct xfrm_state *x0;
- 	int err = -ENOENT;
--	__be32 minspi = htonl(low);
--	__be32 maxspi = htonl(high);
-+	u32 range = high - low + 1;
- 	__be32 newspi = 0;
--	u32 mark = x->mark.v & x->mark.m;
- 
- 	spin_lock_bh(&x->lock);
- 	if (x->km.state == XFRM_STATE_DEAD) {
-@@ -2564,38 +2582,34 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high,
- 
- 	err = -ENOENT;
- 
--	if (minspi == maxspi) {
--		x0 = xfrm_state_lookup(net, mark, &x->id.daddr, minspi, x->id.proto, x->props.family);
--		if (x0) {
--			NL_SET_ERR_MSG(extack, "Requested SPI is already in use");
--			xfrm_state_put(x0);
-+	for (h = 0; h < range; h++) {
-+		u32 spi = (low == high) ? low : get_random_u32_inclusive(low, high);
-+		newspi = htonl(spi);
-+
-+		spin_lock_bh(&net->xfrm.xfrm_state_lock);
-+		x0 = xfrm_state_lookup_spi_proto(net, newspi, x->id.proto);
-+		if (!x0) {
-+			x->id.spi = newspi;
-+			h = xfrm_spi_hash(net, &x->id.daddr, newspi, x->id.proto, x->props.family);
-+			XFRM_STATE_INSERT(byspi, &x->byspi, net->xfrm.state_byspi + h, x->xso.type);
-+			spin_unlock_bh(&net->xfrm.xfrm_state_lock);
-+			err = 0;
- 			goto unlock;
- 		}
--		newspi = minspi;
--	} else {
--		u32 spi = 0;
--		for (h = 0; h < high-low+1; h++) {
--			spi = get_random_u32_inclusive(low, high);
--			x0 = xfrm_state_lookup(net, mark, &x->id.daddr, htonl(spi), x->id.proto, x->props.family);
--			if (x0 == NULL) {
--				newspi = htonl(spi);
--				break;
--			}
--			xfrm_state_put(x0);
-+		xfrm_state_put(x0);
-+		spin_unlock_bh(&net->xfrm.xfrm_state_lock);
-+
-+		if (signal_pending(current)) {
-+			err = -ERESTARTSYS;
-+			goto unlock;
- 		}
-+
-+		if (low == high)
-+			break;
- 	}
--	if (newspi) {
--		spin_lock_bh(&net->xfrm.xfrm_state_lock);
--		x->id.spi = newspi;
--		h = xfrm_spi_hash(net, &x->id.daddr, x->id.spi, x->id.proto, x->props.family);
--		XFRM_STATE_INSERT(byspi, &x->byspi, net->xfrm.state_byspi + h,
--				  x->xso.type);
--		spin_unlock_bh(&net->xfrm.xfrm_state_lock);
- 
--		err = 0;
--	} else {
-+	if (err)
- 		NL_SET_ERR_MSG(extack, "No SPI available in the requested range");
--	}
- 
- unlock:
- 	spin_unlock_bh(&x->lock);
--- 
-2.43.0
+The clock can't work as expected if these events happened.
+
+The gettime operation will get an invalid timestamp whose
+PTP_CIPU_M_TS_ABN bit is set and return -EIO.
+
+> 
+>> +static int ptp_cipu_enable(struct ptp_clock_info *info,
+>> +			   struct ptp_clock_request *request, int on)
+>> +{
+>> +	return -EOPNOTSUPP;
+>> +}
+>> +
+>> +static int ptp_cipu_settime(struct ptp_clock_info *p,
+>> +			    const struct timespec64 *ts)
+>> +{
+>> +	return -EOPNOTSUPP;
+>> +}
+>> +
+>> +static int ptp_cipu_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
+>> +{
+>> +	return -EOPNOTSUPP;
+>> +}
+>> +
+>> +static int ptp_cipu_adjtime(struct ptp_clock_info *ptp, s64 delta)
+>> +{
+>> +	return -EOPNOTSUPP;
+>> +}
+> 
+> I've not looked at the core. Are these actually required? Or if they
+> are missing, does the core default to -EOPNOTSUPP?
+> 
+
+See reply to Vadim :)
+
+>> +static ssize_t register_snapshot_show(struct device *dev,
+>> +				      struct device_attribute *attr, char *buf)
+>> +{
+>> +	struct ptp_cipu_ctx *ctx = pci_get_drvdata(to_pci_dev(dev));
+>> +	struct ptp_cipu_regs *regs = &ctx->regs;
+>> +
+>> +	return sysfs_emit(buf, "%s 0x%x %s 0x%x %s 0x%x %s 0x%x "
+>> +			  "%s 0x%x %s 0x%x %s 0x%x %s 0x%x %s 0x%x "
+>> +			  "%s 0x%x %s 0x%x %s 0x%x\n",
+>> +			  "device_features", regs->dev_feat,
+>> +			  "guest_features", regs->gst_feat,
+>> +			  "driver_version", regs->drv_ver,
+>> +			  "environment_version", regs->env_ver,
+>> +			  "device_status", regs->dev_stat,
+>> +			  "sync_status", regs->sync_stat,
+>> +			  "time_precision(ns)", regs->tm_prec_ns,
+>> +			  "epoch_base(years)", regs->epo_base_yr,
+>> +			  "leap_second(s)", regs->leap_sec,
+>> +			  "max_latency(ns)", regs->max_lat_ns,
+>> +			  "maintenance_timeout(us)", regs->mt_tout_us,
+>> +			  "offset_threshold(us)", regs->thresh_us);
+>> +}
+> 
+> Is this debug? Maybe it should be placed in debugfs, rather than
+> sysfs.
+
+These are considered attributes of the CIPU ptp device, so I perfer
+to put them in sysfs.
+
+But I found sysfs prefers only one value per file [1]. The format
+here may need to be improved.
+
+[1] https://docs.kernel.org/filesystems/sysfs.html
+
+Thank you for these comments!
+
+Wen Gu
+
+> 
+> 	Andrew
 
 
