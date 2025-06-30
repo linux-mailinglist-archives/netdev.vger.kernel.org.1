@@ -1,167 +1,126 @@
-Return-Path: <netdev+bounces-202378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7807CAEDA66
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:03:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8B28AEDA77
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:06:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71B2F1893107
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:03:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0782216F852
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:06:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD422459F3;
-	Mon, 30 Jun 2025 11:03:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA8E1258CC1;
+	Mon, 30 Jun 2025 11:06:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="tEptvDfp"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="02ldjveY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605AC23D2B2;
-	Mon, 30 Jun 2025 11:02:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E4D1126BF7
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 11:06:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751281380; cv=none; b=HicFmgWxaiDTLVKXVAkL4PUmItKy2JFQ8sUEKRWx63bKBERfboC1dziBMdp8cHwf3KIAKmEl3GXTOSPJQbJG3+NHNrSJXvf44MurZZ3OoP72FsIj2ac2ZroJ+iSzRUOPAhFKoKiCXmHBwmhQv4IGMR31U214fRKnCpWqC/VLP9k=
+	t=1751281613; cv=none; b=eHKU64HDnCSLBdZHb7+hqeYCUqxkJIqSQNL3jKQEff+gaFjdyEDEf0BV+GKoj4pcKLqjI1JNWL980WdQ1ty6WC/OlFZcTCi5jIop/q2GyIB5/Ll/9Wa3Y/U1YSYw66mQf5WiVNtr4mBZDaVUZwsx1DawPYoI7hhJpqTfKpOSDvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751281380; c=relaxed/simple;
-	bh=AlSQ9a6gEH3m835ZIvulgwzUplQSlrSnDhFVTi8drVY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rc0tD4VB1exhAL4OoYgd6a5G98RsPU/ZcRl85Qs+cZf6mG9U9oLSGLVb9k9HDusCS/dMZ1An70urBJM4GU658THrN+CIS8wM6+YV22qUQKLrCsHuo6TsYNUZcLCus27b+ORLb8HW2hL1suM5KkSYDfuifQg1Lw3UgUPSdvRSHmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=tEptvDfp; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1uWCHg-00APYr-PG; Mon, 30 Jun 2025 13:02:48 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=UiDvWzuJibTX7nYpjLjXINACy88/q5T4ttTyWRwRY/I=; b=tEptvDfpnSJ+EdNd3vDiXqDCq/
-	zZSpIX1DacMGukWX6wz7uCe5GCjuLfpbzGnN4kp/LGSp0g3FhkVLqhDRmg28PFFASI0xbnxDyC808
-	N7hzMPY5kGWHbO4SvQdEdl5nJzeu6//Oz0C5ewshu1QcdXflhfwl0gYjrLYL5j2Eq5nbSw2oTOIfw
-	LZPJKdo1F5DiEqBecTPSj51TPt7HO0qmQbkSlLph9dlvqbYLeMC3cvTxbtai4rSLwFmRcxPjGdJwK
-	bJM1PbmXbrs3JLpBkajLBu4KpThvSCnqW64KPAqn/FJ45fHDyj5SPQ03OrYHnQ+O83lRngOLSvyDp
-	4Qeb8ZAg==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1uWCHf-0003Hn-SX; Mon, 30 Jun 2025 13:02:48 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1uWCHL-00EJVL-AU; Mon, 30 Jun 2025 13:02:27 +0200
-Message-ID: <c39f22fd-9ede-4cdd-956b-29856e9db20a@rbox.co>
-Date: Mon, 30 Jun 2025 13:02:26 +0200
+	s=arc-20240116; t=1751281613; c=relaxed/simple;
+	bh=1R9OTrrSkwazrojI6llJHWHnwbroyoZOwj924B9ePvY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FKs8lL41U8hUcjcQaVMnzmxej4Lh28LY9iFUKwxU4efmGwGlvhxsQ9+BrDl5AeyL0N/yB1FlFMJoyvDv3FfmOZ2iDe+gzkp0qskGEBsocs15qjO2AnJGehB/E4j+gvIOnyKxLfV1y61W/EKXixKhc8bnmCNhup1f96GX7SsHFQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=02ldjveY; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-74924255af4so1740747b3a.1
+        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 04:06:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1751281611; x=1751886411; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1R9OTrrSkwazrojI6llJHWHnwbroyoZOwj924B9ePvY=;
+        b=02ldjveY8Ukp/8o4UkNHDJsOfgI45g0f80QEpaiDyNLqG1TesdQnxYl7WPy+Tjz3V1
+         yNgDrZQ4H7gtq3tvc5JUCKLpeiEONHZtoc1KTfdcbbFAB76OxRI/RnjCPqVihu5ud+iz
+         X+qTEzDeFvcJQrpRvvxVF1Pv/Nge5manwCX4s0qPGSY3/i+4HIgEgL1UZlHvqB53SeHG
+         sJMOAT11pa7JALQqqWB502rWmEq4+QoYmQiDrjYXvaaE30uMWT9czE+Npj1iAxpPaMew
+         zVzS9K+BcipdV2n1781VsYQSkvK+2fi9c2Ha9A49f5HH6yWn8ABqixXkOvEewB9ExvFR
+         NPYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751281611; x=1751886411;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1R9OTrrSkwazrojI6llJHWHnwbroyoZOwj924B9ePvY=;
+        b=sLKfV+gjoeocu0yNjC0wPIHK+b+rUCqVFnYZ8YqYHzQ5JNYU9YAOEb+vjF5Yxj31NE
+         a/Hs0uVNW45NWjs6ht+XA0xmQU90phng/91v8Vz6uy0W7Ic3nFJ2DVh2DO2/umCqa6LA
+         seHx4Jay+8B/A4iRknY+5WGugPGR7AZxttBTwQCbFSG5IMEDjU8HJ6foZ4suD38S8Kb5
+         e6mAz5ulxfV3Dp0TL+9Y9u0k8k88SZOMCZviKyH95OAFUjd4OSrVg3VXm93M+Tod8TN+
+         Rm36aCyZw6hwpryEPrOZZDPl5dfGhZdUIHnBs3wuXHGlMBZYOpCC+YZij1EagWfqVpDN
+         SXDA==
+X-Forwarded-Encrypted: i=1; AJvYcCXnZZb270q2bMnQuzjA5rYYq9P2Dp0aFPayIVpg30zo2PQ9IOZanMKZmqA9MPfvYtdnm+RJAyQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCvxUSqroIi8xnaQuWsMuFF/P+FMrPnBQM10ogpcNLpKnEysiU
+	WNP5Uqul5RRNOrqRNJKxcEQe1NGPIyvydrGY1UhwXi8i2rVpPqMyZXIC40vqoWLmTb5et5eQt/e
+	G+G5ODUDFXzFLS5ZCWOrYhQnJcYOpdT2PRoH/YzmA
+X-Gm-Gg: ASbGncu//UbL0thkb8gZvWzDCx48hA7Zc00nOAR4FRY0rZu/6TZ0RU8sWm/8GVKg+iS
+	Esum97Oko83typPI+RttWvE2A8qHwM4nHxsJogOlaTLgupb/1fNbM3KXZ4KsUyMzluKqLzD/g3k
+	72xgsRgGOn0tnSo1X9mymTBWkImBAWFZ3E5ERAhtx95w==
+X-Google-Smtp-Source: AGHT+IHX6Dv3BEPiK4HEe8rArUBWkyWHlCVtP+Y3kHg6O1WIkYwO4mgHlHfmsOV3i+URtCrtoe+6QBzIYvCqX6XZfN4=
+X-Received: by 2002:a05:6a00:1953:b0:74a:d1ac:dd48 with SMTP id
+ d2e1a72fcca58-74af6f80730mr21823803b3a.23.1751281611629; Mon, 30 Jun 2025
+ 04:06:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net v2 1/3] vsock: Fix transport_{g2h,h2g} TOCTOU
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250620-vsock-transports-toctou-v2-0-02ebd20b1d03@rbox.co>
- <20250620-vsock-transports-toctou-v2-1-02ebd20b1d03@rbox.co>
- <zdiqu6pszqwb4y5o7oqzdovfvzkbrvc6ijuxoef2iloklahyoy@njsnvn7hfwye>
- <d8d4edb2-bf14-42b2-8592-79d7b014e1a7@rbox.co>
- <owafhdinyjdnol4zwpcdqsz26nfndawl53wnosdhhgmfz6t25n@2dualdqgpq3q>
- <e97b5cae-f6ef-4221-98e1-6efd7fdc6676@rbox.co>
- <4vsrtxs3uttx6w2zyk6rxescpwvrikypiw6tvjheplht6yzonc@ch6k3xlftikw>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <4vsrtxs3uttx6w2zyk6rxescpwvrikypiw6tvjheplht6yzonc@ch6k3xlftikw>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <CAE1YQVoTz5REkvZWzq_X5f31Sr6NzutVCxxmLfWtmVZkjiingA@mail.gmail.com>
+ <CAM_iQpV8NpK_L2_697NccDPfb9SPYhQ7BT1Ssueh7nT-rRKJRA@mail.gmail.com>
+ <CAM_iQpXVaxTVALH9_Lki+O=1cMaVx4uQhcRvi4VcS2rEdYkj5Q@mail.gmail.com>
+ <CAM_iQpVi0V7DNQFiNWWMr+crM-1EFbnvWV5_L-aOkFsKaA3JBQ@mail.gmail.com>
+ <CAM0EoMm4D+q1eLzfKw3gKbQF43GzpBcDFY3w2k2OmtohJn=aJw@mail.gmail.com>
+ <CAM0EoMkFzD0gKfJM2-Dtgv6qQ8mjGRFmWF7+oe=qGgBEkVSimg@mail.gmail.com>
+ <CAE1YQVq=FmrGw56keHQ2gEGtrdg3H5Nf_OcPb8_Rn5NVQ4AoHg@mail.gmail.com>
+ <CAM0EoMnv6YAUJVEFx2mGrP75G8wzRiN+Z=hSfRAz8ia0Fe4vBw@mail.gmail.com> <aGGrP91mBRuN2y0h@pop-os.localdomain>
+In-Reply-To: <aGGrP91mBRuN2y0h@pop-os.localdomain>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 30 Jun 2025 07:06:40 -0400
+X-Gm-Features: Ac12FXyUp40h20YQiCRBY0CTEfQVzcjPEvkUlYCY2EmiXZ-AtWuBYTnFJKQu0jM
+Message-ID: <CAM0EoM=jc7=JdHMdXM9hmcP2ZGF0BnByXWbMZUN44LvaGHe-DQ@mail.gmail.com>
+Subject: Re: Use-after-free in Linux tc subsystem (v6.15)
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: Mingi Cho <mgcho.minic@gmail.com>, security@kernel.org, 
+	Jiri Pirko <jiri@resnulli.us>, Linux Kernel Network Developers <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 6/30/25 11:05, Stefano Garzarella wrote:
-> On Sun, Jun 29, 2025 at 11:26:12PM +0200, Michal Luczaj wrote:
->> On 6/27/25 10:02, Stefano Garzarella wrote:
->>> On Wed, Jun 25, 2025 at 11:23:30PM +0200, Michal Luczaj wrote:
->>>> On 6/25/25 10:43, Stefano Garzarella wrote:
->>>>> On Fri, Jun 20, 2025 at 09:52:43PM +0200, Michal Luczaj wrote:
->>>>>> vsock_find_cid() and vsock_dev_do_ioctl() may race with module unload.
->>>>>> transport_{g2h,h2g} may become NULL after the NULL check.
->>>>>>
->>>>>> Introduce vsock_transport_local_cid() to protect from a potential
->>>>>> null-ptr-deref.
->>>>>>
->>>>>> KASAN: null-ptr-deref in range [0x0000000000000118-0x000000000000011f]
->>>>>> RIP: 0010:vsock_find_cid+0x47/0x90
->>>>>> Call Trace:
->>>>>> __vsock_bind+0x4b2/0x720
->>>>>> vsock_bind+0x90/0xe0
->>>>>> __sys_bind+0x14d/0x1e0
->>>>>> __x64_sys_bind+0x6e/0xc0
->>>>>> do_syscall_64+0x92/0x1c0
->>>>>> entry_SYSCALL_64_after_hwframe+0x4b/0x53
->>>>>>
->>>>>> KASAN: null-ptr-deref in range [0x0000000000000118-0x000000000000011f]
->>>>>> RIP: 0010:vsock_dev_do_ioctl.isra.0+0x58/0xf0
->>>>>> Call Trace:
->>>>>> __x64_sys_ioctl+0x12d/0x190
->>>>>> do_syscall_64+0x92/0x1c0
->>>>>> entry_SYSCALL_64_after_hwframe+0x4b/0x53
->>>>>>
->>>>>> Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
->>>>>> Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
->>>>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-...
->> Oh, and come to think of it, we don't really need that (easily contended?)
->> mutex here. Same can be done with RCU. Which should speed up vsock_bind()
->> -> __vsock_bind() -> vsock_find_cid(), right? This is what I mean, roughly:
->>
->> +static u32 vsock_registered_transport_cid(const struct vsock_transport
->> __rcu **trans_ptr)
->> +{
->> +	const struct vsock_transport *transport;
->> +	u32 cid = VMADDR_CID_ANY;
->> +
->> +	rcu_read_lock();
->> +	transport = rcu_dereference(*trans_ptr);
->> +	if (transport)
->> +		cid = transport->get_local_cid();
->> +	rcu_read_unlock();
->> +
->> +	return cid;
->> +}
->> ...
->> @@ -2713,6 +2726,7 @@ void vsock_core_unregister(const struct
->> vsock_transport *t)
->> 		transport_local = NULL;
->>
->> 	mutex_unlock(&vsock_register_mutex);
->> +	synchronize_rcu();
->> }
->>
->> I've realized I'm throwing multiple unrelated ideas/questions, so let me
->> summarise:
->> 1. Hackish macro can be used to guard against calling
->> vsock_registered_transport_cid() on a non-static variable.
->> 2. We can comment the function to add some context and avoid confusion.
-> 
-> I'd go with 2.
+On Sun, Jun 29, 2025 at 5:08=E2=80=AFPM Cong Wang <xiyou.wangcong@gmail.com=
+> wrote:
+>
+> On Sat, Jun 28, 2025 at 05:26:59PM -0400, Jamal Hadi Salim wrote:
+> > On Thu, Jun 26, 2025 at 1:11=E2=80=AFAM Mingi Cho <mgcho.minic@gmail.co=
+m> wrote:
+> > > Hello,
+> > >
+> > > I think the testcase I reported earlier actually contains two
+> > > different bugs. The first is returning SUCCESS with an empty TBF qdis=
+c
+> > > in tbf_segment, and the second is returning SUCCESS with an empty QFQ
+> > > qdisc in qfq_enqueue.
+> > >
+> >
+> > Please join the list where a more general solution is being discussed h=
+ere:
+> > https://lore.kernel.org/netdev/aF847kk6H+kr5kIV@pop-os.localdomain/
+>
+> I think that one is different, the one here is related to GSO, the above
+> linked one is not. Let me think about the GSO issue, since I already
+> looked into it before.
 
-All right, will do.
+TBH, they all look the same to me - at minimal, they should be tested
+against Lion's patch first. Maybe there's a GSO corner case but wasnt
+clear to me.
 
->> 3. Instead of taking mutex in vsock_registered_transport_cid() we can use RCU.
-> 
-> Since the vsock_bind() is not in the hot path, maybe a mutex is fine.
-> WDYT?
-
-I wrote a benchmark that attempts (and fails due to a non-existing CID) to
-bind() 100s of vsocks in multiple threads. `perf lock con` shows that this
-mutex is contended, and things are slowed down by 100+% compared with RCU
-approach. Which makes sense: every explicit vsock bind() across the whole
-system would need to acquire the mutex. And now we're also taking the same
-mutex in vsock_assign_transport(), i.e. during connect(). But maybe such
-stress testing is just unrealistic, I really don't know.
-
+cheers,
+jamal
 
