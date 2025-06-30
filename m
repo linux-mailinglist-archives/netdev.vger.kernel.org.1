@@ -1,412 +1,195 @@
-Return-Path: <netdev+bounces-202384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2077AEDACE
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:24:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D4B3AEDB03
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:31:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 890D31886008
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:24:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79F623B8B75
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F987245014;
-	Mon, 30 Jun 2025 11:24:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA32525743B;
+	Mon, 30 Jun 2025 11:30:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tpd+UT8e"
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="h/J4umIS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011069.outbound.protection.outlook.com [52.101.65.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3609E23F43C;
-	Mon, 30 Jun 2025 11:24:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751282658; cv=none; b=YW+tG2Kd8jZ7KE+y+pVdwsJgGXB03EdW8Xyk88KqVIvZ32d+Fd5faBdux2JIY7+5NuaWKZG0No62sarcOdZialWBwYuuxh7LNqjbJ8ELbJxIORULkPFCBSog/Q1L4aDO7xsSVf35mMJFBEzKWPd45V8a7k413MU6rDhDiCjAO+0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751282658; c=relaxed/simple;
-	bh=30Pfe3K/0ULXHT6Ngu68BVu+1Fkyxw7HsC2jentrXJk=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vp9PnHC6Jjk+R+Wg6Ap5ruFSjrbYPo7jI/0RZM5q4kxqTjigxRSkeEKt86uI87Popguw1E+voz0wiuaRGK9yHY9SAOeeFJTNEd712qPnxAr2ZtQKhe3D7csPnaz46KE1yaABpsVcsup+6b3oaTJJKAY6t9GE4EQ35tezIbNhZ8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tpd+UT8e; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-60768f080d8so4272904a12.1;
-        Mon, 30 Jun 2025 04:24:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751282654; x=1751887454; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=xjv/TRLGDGPIQELelbprN6OpsnoW9wWLI6zBeF+8h4g=;
-        b=Tpd+UT8etFh9zMPgBpUoY4CQNGDd22GCS3LfGXI9SyPl9Tta7GHjFjn+GOsAg7wjGO
-         nNniH/6L1D4oTncBIOR8vdS7ZEoBGdKEBfkuczE8Hvc/7vqt88HgitIbhETSkAQmk41B
-         7a5uBnk4T+9CI4ccCKorakBnBfRsvJasdH1gM45GJvA78FcQ5fe6oFcLg8fJimzqWGvJ
-         +iaz0HfbIfGk6TsQrC18sZEhj/GO0fJFtYraB1YNqMwdlGAY8HUS+ug11y6x//WeZrqB
-         HvnrXnd1rRwLFcnRrWhhgUwQ2JJ1jVQ/v1YKpz5pIBcDESYRjckLuj2gkbaxYy2eS+Zt
-         OQYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751282654; x=1751887454;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xjv/TRLGDGPIQELelbprN6OpsnoW9wWLI6zBeF+8h4g=;
-        b=m3nA3oWd6slAGaL4maZEkiN3sLkgbpc51whdojBdszCWHHKIGXA1ugeElKZo1hgF5b
-         fM07uWqcuLzLxg+7hd9k/y4xqgjfr/inm3SvCPPapAjOUI+E3/zL6jAuZoZwc8GS+csK
-         Tz3lfvjHYbsdfgRki/9Y/DabA8QYq0Xq2oci9rGv9ep16v7Qjn2MmpQ3Ln2yy0flLzJ1
-         JHqoh1gXi9EMhLyRlCl0t+6l0pvAKv4IJ77URnG5+rlmoXTtrWmeEDrWy3ncspdFXU/Z
-         ZvXbrXKupEOC9ZhEEE8ycDeCU+54X8VShoYbT0j66bkkmwDqHhh5+YrOO3y2PtW94ugc
-         oC0g==
-X-Forwarded-Encrypted: i=1; AJvYcCXl4Njm1O9aFhotyABLAXh5tCx6dGuNYVON0/ZKkOj26BEDsGo7H5L3VxdHwNjfkhhODQU8Jdk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwE/gjoLHL1r7SYfeN2vmAWp60Ch63VzVnq01pekeMUFTUv/xlu
-	HlXX97giPAdjNQ1iCzBa+AE6mRf0Kq2VhruDx8+W2scKGfvdEaQKRMtG
-X-Gm-Gg: ASbGncunruf25pG96WjoH/E2RqwRuGut6AL6V5hFCc4Af7t4yLBNWiMJfclJ+rnaQkt
-	BwbioWheLExdj8b+31TPHTwxFS89hFsTE3hWi2UheerE0FOd6GsEnnF0KM2PR+aGU4qdnXh5V63
-	7Ux9Lr8oWzbGJbPS+z+G6gJNzRnajO+PvNgArhMohvXhtoGALeNNVOJXmBNLeMKnAbqVmceT3rH
-	F9KFHaf1ky2v4V9Ee+Nst90RdozKKkYbF2PjFSMrX1pNl202Qa0EeDxf2Bjqcddk3gQrES/v+cn
-	Zivuu9LQMoNJpcSaJAHppwL+QFtZPr9NfZhv9vJYHTX1BIkM
-X-Google-Smtp-Source: AGHT+IFmWF77qP1a7Dic+ZXeWIHypUq+U4/gKKHRfyVPRRvCrtF30lfis37cUliVlDw8+L+tg737vg==
-X-Received: by 2002:a17:907:930a:b0:ad8:914b:7d15 with SMTP id a640c23a62f3a-ae34fd33136mr1142862166b.7.1751282654007;
-        Mon, 30 Jun 2025 04:24:14 -0700 (PDT)
-Received: from krava ([173.38.220.57])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae35aad8275sm624735066b.23.2025.06.30.04.24.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jun 2025 04:24:13 -0700 (PDT)
-From: Jiri Olsa <olsajiri@gmail.com>
-X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
-Date: Mon, 30 Jun 2025 13:24:11 +0200
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
-	alexei.starovoitov@gmail.com, andrii@kernel.org,
-	daniel@iogearbox.net, tj@kernel.org, memxor@gmail.com,
-	martin.lau@kernel.org, kernel-team@meta.com
-Subject: Re: [PATCH bpf-next v5 2/3] selftests/bpf: Test basic task local
- data operations
-Message-ID: <aGJz2waYK8mhvB49@krava>
-References: <20250627233958.2602271-1-ameryhung@gmail.com>
- <20250627233958.2602271-3-ameryhung@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CCEE231858;
+	Mon, 30 Jun 2025 11:30:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751283059; cv=fail; b=cAdQgKkO8Bgeh1s0BB5d7S/WASFKpiftVg3Cz5ab7GgApEIEj2JmYtXroQqmmF8cTCN6M3OgYiS+/Rg/N9ZOZZDAporS7+8CRQ09EFtlYOMmlWwTGZMKbEd529MEIaLUdeWCZFANyquMTbrhpQ4nnmwcjmuLVTggYjt3ffauVzU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751283059; c=relaxed/simple;
+	bh=KiIbifbixQcG/JBkbf4WKrEzQYqst9RQExjTLr4Fg1g=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dOoEPJmm8eqaRjSajzRbY8m3JGphfeGmK/622E4/vq9LvHIuFN8WziJCNLEmk6977YTvH6KL5d645PuhUrj6aHDNPNjhN46yiZksGYjudUpXDkBOBLFQyUySbKBW5R7I/fnyF5uYNH2/oRVcQkllkhf5yqP3afPMGpzXgO26Fp0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=2n.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=h/J4umIS; arc=fail smtp.client-ip=52.101.65.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=2n.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Lxpa5aVNasayINaKfBLMlgdrDTmKg0DdzzNSk6sclqzNuAeLSNRBeCmkAjNWK0+HmTJI+zP/n6sr+cagBG3b9bFVs4iBabxR3/lYLbFrfRIEXkX6Y13O7sl6XsEigS/nzEOzu+PNTNTBz5SEUiZhRNYWbfJhRyD80ynzW7EAVInjOZtx7Soepl/yJ9ZMqRkKqylP86XuOBm7Zv9nrgiESWb9GRskbVnI9BCV15GQbV6x75ZEBoCU29GTgiynxBfzqZeHWW3VvFWPi7tdJxuUTIwPjYs3z2ZPEP25PtMcPmZbjwrbHXKwgYZgwdWpRWN7mVg+vpJpjkKJ82TAJNDXzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ow7NKXsGuVhjBtaukSiXs0U3ynFs+EKO3pdSc/CK+oU=;
+ b=h3qYs492I2/ea8TjY3alVcFkglXuBwHdlkQm9Kixy/4tyDusGrWkA9SRIN7zMeB6af1J9zNe1Rw37hFrQK/d2Dgo7f03z0POOR0E2SidobNsDkWGgW36ADIifxAh0NcL7K+VVWNbUAKVAEghBq0hLKSmhA9/Pq7Av7JWaS5DNkwMI9+4GyoqkOHmqGnYWBSDIF0A9O5Ii6/nmzVmGKmNWrK2Qt5TrUy4GsZW6eXKQR93d/SAJq1+yDkBCmsBvMj+fOTuR+7r1VmEC9Im6HEqUssd5FhkallKbyzBjbdmvnO4AsTQB1b4mrpxDibJb0wg9/Map9vutFtOAKJ4ESj/mQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 195.60.68.100) smtp.rcpttodomain=broadcom.com smtp.mailfrom=2n.com;
+ dmarc=fail (p=none sp=none pct=100) action=none header.from=axis.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ow7NKXsGuVhjBtaukSiXs0U3ynFs+EKO3pdSc/CK+oU=;
+ b=h/J4umIS9sHHwMIbzIkLfYJVw2uo7nLSIAS27vpv20ruR9PHFLFtpUb55nCJvnWpLnb4Yb1TljgswOvqyfxzY8TOpbccqRLOOLcuNypDv+DVMn8zYaeXYZLiVDj6Xyw+9M1ZcqCy1K6nBDweSZv15tHB1C5WKFlxHymE2tyBGAs=
+Received: from AS4PR10CA0017.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:5d8::7)
+ by DBAPR02MB6134.eurprd02.prod.outlook.com (2603:10a6:10:18c::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.26; Mon, 30 Jun
+ 2025 11:30:54 +0000
+Received: from AM2PEPF0001C70A.eurprd05.prod.outlook.com
+ (2603:10a6:20b:5d8:cafe::5f) by AS4PR10CA0017.outlook.office365.com
+ (2603:10a6:20b:5d8::7) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.30 via Frontend Transport; Mon,
+ 30 Jun 2025 11:30:54 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 195.60.68.100)
+ smtp.mailfrom=2n.com; dkim=none (message not signed) header.d=none;dmarc=fail
+ action=none header.from=axis.com;
+Received-SPF: Pass (protection.outlook.com: domain of 2n.com designates
+ 195.60.68.100 as permitted sender) receiver=protection.outlook.com;
+ client-ip=195.60.68.100; helo=mail.axis.com; pr=C
+Received: from mail.axis.com (195.60.68.100) by
+ AM2PEPF0001C70A.mail.protection.outlook.com (10.167.16.198) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8901.15 via Frontend Transport; Mon, 30 Jun 2025 11:30:54 +0000
+Received: from pcczc3457tyd.2n.cz.axis.com (10.4.0.13) by se-mail01w.axis.com
+ (10.20.40.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.44; Mon, 30 Jun
+ 2025 13:30:53 +0200
+From: =?UTF-8?q?Kamil=20Hor=C3=A1k=20-=202N?= <kamilh@axis.com>
+To: <florian.fainelli@broadcom.com>, <bcm-kernel-feedback-list@broadcom.com>,
+	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>
+CC: <kamilh@axis.com>, <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <f.fainelli@gmail.com>, <robh@kernel.org>,
+	<andrew+netdev@lunn.ch>
+Subject: [PATCH net v3 0/4] net: phy: bcm54811: Fix the PHY initialization
+Date: Mon, 30 Jun 2025 13:30:29 +0200
+Message-ID: <20250630113033.978455-1-kamilh@axis.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250627233958.2602271-3-ameryhung@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: se-mail02w.axis.com (10.20.40.8) To se-mail01w.axis.com
+ (10.20.40.7)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM2PEPF0001C70A:EE_|DBAPR02MB6134:EE_
+X-MS-Office365-Filtering-Correlation-Id: f8167624-5b45-44a0-cd46-08ddb7c99334
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014|7416014|19092799006|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?WFRDSWx1THR5NGp4Nys2SkZNbnc5WEhYa1FjN1BUWmV3ZXVlb0NLUnYzU2pl?=
+ =?utf-8?B?L1B0TXErekFpdlpNYllTL2VjcENFbjVJVWF6RFgyRWJNMEFlam1oZklEZmYy?=
+ =?utf-8?B?Qy84bkpiWVVOZlVGQ01nb0kvTzdvaHRwbmlPZGl2dURsV05jTUxFNUNETG5a?=
+ =?utf-8?B?MTV5TXVNOUVZUWwzZ3FYZWFVZ2Fza0dCK09GVldvVE9RT0xscUR1MnZwSFdK?=
+ =?utf-8?B?OXBYVUluZDFoZXdycHQyQ1kwSjRQR1hIZnBBb0JZWnNKYmtrZ09abjN5cEc2?=
+ =?utf-8?B?R3dKcTgyTUdvZ0ZKMXk4NDZaQ0Jva3Q4Wmc2TGhUYmt4RmhIY0FRQ2lwN1p6?=
+ =?utf-8?B?WHA0RnFMc21tdzRCZGVwMkNiZVlYNVp2ak5WMStTVEpWMmRPb1VkOHg3M2lT?=
+ =?utf-8?B?TWYzNitDZTZUZ0lDdllqR1JrMVoxaWxsNGN5REJSKzd5YmtDTE5LZlNlb1Rw?=
+ =?utf-8?B?bHEzUGZMQy9hSmY2VzNXVmxuZVlYVkx0T25MZ05yWkxpYVgwWTFPMWtMQ0NI?=
+ =?utf-8?B?eEE1L0FZWE9VV2txR1F1dGZZSjdGWXhqYmhTcmZFWDU0SENWVng0cklLaW9G?=
+ =?utf-8?B?TmtsS0hWNnp0UzczRjZNUWtIN296cWFLY0NoaDlPYnNSVzI5N09ZRmtxUlhP?=
+ =?utf-8?B?VnhpUjVrNE1FRysyeUFhVjViU0QvWEhhZ01HdEp0eEdkSWJZOWh1VWlJLytW?=
+ =?utf-8?B?cElubjhXQ0hOYUlnZ2xhU2liMlVoQlkrQ1VuYS93V1JTdFpmT3JIL3JuWFBr?=
+ =?utf-8?B?L0gxbjFRQmY5OE9mYTZFMVVxbitvamxBTnpodjh4TGNOSGxXdk5wZGVYUkwx?=
+ =?utf-8?B?aS9OMUxpc05kV2VEVUc0dVBtQ2p5L2lyNGFPRHRPem9LaHdBY1FOTHJiOXJj?=
+ =?utf-8?B?ekpKK2dPV2UvQ0ZzYUFVWEdKWk1qckZQNkxiejRoSXZGa0ZXbUtOZEhoajcz?=
+ =?utf-8?B?UlRaVnprQkxUM0NEK2Y2Z3JKZ1llUXUyWmdodWJRUmRTaTFjeE9vcjRLUjYw?=
+ =?utf-8?B?TTFMQXZtZkdQWEJyNnppVTZvMWZvWURLVGI2TWVObm1vb3N4SlAyUTVIUEkx?=
+ =?utf-8?B?WUEwUms0SGVCak9UMGVab3pZYUhWQnQ2SzdSNmJlWm10VVNtN0hyaEo1S2hC?=
+ =?utf-8?B?N1MvSUVveEU3TkdXZC9uWDVxeWxTcDFKVlpURHRTS2xUZ21XaGw5elZLQVlD?=
+ =?utf-8?B?dlNha0Rqc25LUTJGZTZ4WDRYQldEYmF5SDNXYjRGNUI0NnpsT3EwaXJBSnp0?=
+ =?utf-8?B?ZUpoUGkxMW50ZkdkWk0rVmJOSGZyalEwTDlJTU1Td0Z4U2Z0VkFhajh2ZWw0?=
+ =?utf-8?B?SmN5YWxKeWNHYnN6azJsbk1NT1BvdEx2NHh2UnE5bEg1QlRjN3dzVlk5aVcy?=
+ =?utf-8?B?clF1bkY1RE4rVDUzNmlFN1crQ2NURmNZWjg5ZGlqRkpUaS9jTlIrZWRpN2F5?=
+ =?utf-8?B?UnFtbDVSYkpJRWluTTlkcndibW0yeDRRaGlQVkpDVU9kcVlRbGhKQ3lQZ3VG?=
+ =?utf-8?B?d2R1OFZnV1laN3U5Qlh4azh3cGdTRG5FcXNMVU4xS2RVV2RKOTNjcVRKTGlU?=
+ =?utf-8?B?Ky93K2s0K1RTdk1RUTZPcGpvQ3BjSkxaSlhEZTNCVHVha1Y4UFl0WTh6T01k?=
+ =?utf-8?B?aDJpTDJEYnJLQ0RrZEp2bldaUkUyUE4vRXEyd2VucC8zeWI0UFJVV20vZy9y?=
+ =?utf-8?B?MzdoUW5ZZ1BHQU9QYmk0ZTlSNm9wS0JyL0RHNThtVDFMYlUzRHFib2E0R0wr?=
+ =?utf-8?B?Z0NsM3ZRYi9BZUJQSXhFR3FaQnNYc2d5TkhRd0R0TE1ERmZKOW90RFhZWG5p?=
+ =?utf-8?B?bnMyeHo3bXlMQlhPVW92bzNXYVQzSWpIZjdlOS9SQ0R1Q0h2dkEvNm51YUxP?=
+ =?utf-8?B?K05PeG5Da3JKUUZPcmhDNWNFd1Q1VHVvVnlNejNYbUtzVFo5enJJWE5tMTBI?=
+ =?utf-8?B?QlFlMElDQU9hdkptN1d6ZXNpZTJRT0ZHMnF4Y2NsaW5kNXV0ZTZEL29nZGFu?=
+ =?utf-8?B?YnhtR2NieVZERm14Um00Nkk0RGU1YjkvVGhQVTYyOVN1djVXcXJ6L3BTaHNp?=
+ =?utf-8?B?NWVoR3NtWjFLdDAxTWdRNE85Z1p4dnpaS1VUQT09?=
+X-Forefront-Antispam-Report:
+	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014)(7416014)(19092799006)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: axis.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 11:30:54.2087
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f8167624-5b45-44a0-cd46-08ddb7c99334
+X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AM2PEPF0001C70A.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR02MB6134
 
-On Fri, Jun 27, 2025 at 04:39:56PM -0700, Amery Hung wrote:
-> Test basic operations of task local data with valid and invalid
-> tld_create_key().
-> 
-> For invalid calls, make sure they return the right error code and check
-> that the TLDs are not inserted by running tld_get_data("
-> value_not_exists") on the bpf side. The call should a null pointer.
-> 
-> For valid calls, first make sure the TLDs are created by calling
-> tld_get_data() on the bpf side. The call should return a valid pointer.
-> 
-> Finally, verify that the TLDs are indeed task-specific (i.e., their
-> addresses do not overlap) with multiple user threads. This done by
-> writing values unique to each thread, reading them from both user space
-> and bpf, and checking if the value read back matches the value written.
-> 
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> ---
->  .../bpf/prog_tests/test_task_local_data.c     | 191 ++++++++++++++++++
->  .../bpf/progs/test_task_local_data.c          |  65 ++++++
->  2 files changed, 256 insertions(+)
->  create mode 100644 tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
->  create mode 100644 tools/testing/selftests/bpf/progs/test_task_local_data.c
-> 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c b/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
-> new file mode 100644
-> index 000000000000..53cdb8466f8e
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/prog_tests/test_task_local_data.c
-> @@ -0,0 +1,191 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#include <pthread.h>
-> +#include <bpf/btf.h>
-> +#include <test_progs.h>
-> +
-> +struct test_struct {
-> +	__u64 a;
-> +	__u64 b;
-> +	__u64 c;
-> +	__u64 d;
-> +};
+PATCH 1 - Add MII-Lite PHY interface mode as defined by Broadcom for
+   their two-wire PHYs. It can be used with most Ethernet controllers
+   under certain limitations (no half-duplex link modes etc.).
 
-hi,
-I can't compile this on my config, bacause of the KGDB_TESTS config
-that defines struct test_struct
+PATCH 2 - Add MII-Lite PHY interface type
 
-progs/test_task_local_data.c:16:8: error: redefinition of 'test_struct'
-   16 | struct test_struct {
-      |        ^
-/home/jolsa/kernel/linux-qemu-1/tools/testing/selftests/bpf/tools/include/vmlinux.h:141747:8: note: previous definition is here
- 141747 | struct test_struct {
+PATCH 3 - Activation of MII-Lite interface mode on Broadcom bcm5481x
+   PHYs
+
+PATCH 4 - Fix the BCM54811 PHY initialization so that it conforms
+   to the datasheet regarding a reserved bit in the LRE Control
+   register, which must be written to zero after every device reset.
+   Also fix the LRE Status register reading, there is another bit to
+   be ignored on bcm54811.
+
+Changes in v2:
+  - Applied reviewers' comments
+  - Divided into more patches (separated common and Broadcom
+   PHY specific code)
+
+Changes in v3:
+  - Added MII-Lite documentation
 
 
-also I have these tests passing localy, but it's failing CI:
-  https://github.com/kernel-patches/bpf/actions/runs/15939264078/job/44964987935
+Kamil Horák - 2N (4):
+  net: phy: MII-Lite PHY interface mode
+  dt-bindings: ethernet-phy: add MII-Lite phy interface type
+  net: phy: bcm5481x: MII-Lite activation
+  net: phy: bcm54811: Fix the PHY initialization
 
-thanks,
-jirka
+ .../bindings/net/ethernet-controller.yaml     |  1 +
+ Documentation/networking/phy.rst              |  7 ++++
+ drivers/net/phy/broadcom.c                    | 39 ++++++++++++++++---
+ drivers/net/phy/phy-core.c                    |  1 +
+ drivers/net/phy/phy_caps.c                    |  4 ++
+ drivers/net/phy/phylink.c                     |  1 +
+ include/linux/brcmphy.h                       |  7 ++++
+ include/linux/phy.h                           |  4 ++
+ 8 files changed, 59 insertions(+), 5 deletions(-)
 
+-- 
+2.39.5
 
-> +
-> +#define TLD_FREE_DATA_ON_THREAD_EXIT
-> +#define TLD_DYN_DATA_SIZE 4096
-> +#include "task_local_data.h"
-> +
-> +#include "test_task_local_data.skel.h"
-> +
-> +TLD_DEFINE_KEY(value0_key, "value0", sizeof(int));
-> +
-> +/*
-> + * Reset task local data between subtests by clearing metadata. This is safe
-> + * as subtests run sequentially. Users of task local data libraries
-> + * should not do this.
-> + */
-> +static void reset_tld(void)
-> +{
-> +	if (TLD_READ_ONCE(tld_metadata_p)) {
-> +		/* Remove TLDs created by tld_create_key() */
-> +		tld_metadata_p->cnt = 1;
-> +		tld_metadata_p->size = TLD_DYN_DATA_SIZE;
-> +		memset(&tld_metadata_p->metadata[1], 0,
-> +		       (TLD_MAX_DATA_CNT - 1) * sizeof(struct tld_metadata));
-> +	}
-> +}
-> +
-> +/* Serialize access to bpf program's global variables */
-> +static pthread_mutex_t global_mutex;
-> +
-> +static tld_key_t *tld_keys;
-> +
-> +#define TEST_BASIC_THREAD_NUM TLD_MAX_DATA_CNT
-> +
-> +void *test_task_local_data_basic_thread(void *arg)
-> +{
-> +	LIBBPF_OPTS(bpf_test_run_opts, opts);
-> +	struct test_task_local_data *skel = (struct test_task_local_data *)arg;
-> +	int fd, err, tid, *value0, *value1;
-> +	struct test_struct *value2;
-> +
-> +	fd = bpf_map__fd(skel->maps.tld_data_map);
-> +
-> +	value0 = tld_get_data(fd, value0_key);
-> +	if (!ASSERT_OK_PTR(value0, "tld_get_data"))
-> +		goto out;
-> +
-> +	value1 = tld_get_data(fd, tld_keys[0]);
-> +	if (!ASSERT_OK_PTR(value1, "tld_get_data"))
-> +		goto out;
-> +
-> +	value2 = tld_get_data(fd, tld_keys[1]);
-> +	if (!ASSERT_OK_PTR(value2, "tld_get_data"))
-> +		goto out;
-> +
-> +	tid = gettid();
-> +
-> +	*value0 = tid + 0;
-> +	*value1 = tid + 1;
-> +	value2->a = tid + 2;
-> +	value2->b = tid + 3;
-> +	value2->c = tid + 4;
-> +	value2->d = tid + 5;
-> +
-> +	pthread_mutex_lock(&global_mutex);
-> +	/* Run task_main that read task local data and save to global variables */
-> +	err = bpf_prog_test_run_opts(bpf_program__fd(skel->progs.task_main), &opts);
-> +	ASSERT_OK(err, "run task_main");
-> +	ASSERT_OK(opts.retval, "task_main retval");
-> +
-> +	ASSERT_EQ(skel->bss->test_value0, tid + 0, "tld_get_data value0");
-> +	ASSERT_EQ(skel->bss->test_value1, tid + 1, "tld_get_data value1");
-> +	ASSERT_EQ(skel->bss->test_value2.a, tid + 2, "tld_get_data value2.a");
-> +	ASSERT_EQ(skel->bss->test_value2.b, tid + 3, "tld_get_data value2.b");
-> +	ASSERT_EQ(skel->bss->test_value2.c, tid + 4, "tld_get_data value2.c");
-> +	ASSERT_EQ(skel->bss->test_value2.d, tid + 5, "tld_get_data value2.d");
-> +	pthread_mutex_unlock(&global_mutex);
-> +
-> +	/* Make sure valueX are indeed local to threads */
-> +	ASSERT_EQ(*value0, tid + 0, "value0");
-> +	ASSERT_EQ(*value1, tid + 1, "value1");
-> +	ASSERT_EQ(value2->a, tid + 2, "value2.a");
-> +	ASSERT_EQ(value2->b, tid + 3, "value2.b");
-> +	ASSERT_EQ(value2->c, tid + 4, "value2.c");
-> +	ASSERT_EQ(value2->d, tid + 5, "value2.d");
-> +
-> +	*value0 = tid + 5;
-> +	*value1 = tid + 4;
-> +	value2->a = tid + 3;
-> +	value2->b = tid + 2;
-> +	value2->c = tid + 1;
-> +	value2->d = tid + 0;
-> +
-> +	/* Run task_main again */
-> +	pthread_mutex_lock(&global_mutex);
-> +	err = bpf_prog_test_run_opts(bpf_program__fd(skel->progs.task_main), &opts);
-> +	ASSERT_OK(err, "run task_main");
-> +	ASSERT_OK(opts.retval, "task_main retval");
-> +
-> +	ASSERT_EQ(skel->bss->test_value0, tid + 5, "tld_get_data value0");
-> +	ASSERT_EQ(skel->bss->test_value1, tid + 4, "tld_get_data value1");
-> +	ASSERT_EQ(skel->bss->test_value2.a, tid + 3, "tld_get_data value2.a");
-> +	ASSERT_EQ(skel->bss->test_value2.b, tid + 2, "tld_get_data value2.b");
-> +	ASSERT_EQ(skel->bss->test_value2.c, tid + 1, "tld_get_data value2.c");
-> +	ASSERT_EQ(skel->bss->test_value2.d, tid + 0, "tld_get_data value2.d");
-> +	pthread_mutex_unlock(&global_mutex);
-> +
-> +out:
-> +	pthread_exit(NULL);
-> +}
-> +
-> +static void test_task_local_data_basic(void)
-> +{
-> +	struct test_task_local_data *skel;
-> +	pthread_t thread[TEST_BASIC_THREAD_NUM];
-> +	char dummy_key_name[TLD_NAME_LEN];
-> +	tld_key_t key;
-> +	int i, err;
-> +
-> +	reset_tld();
-> +
-> +	ASSERT_OK(pthread_mutex_init(&global_mutex, NULL), "pthread_mutex_init");
-> +
-> +	skel = test_task_local_data__open_and_load();
-> +	if (!ASSERT_OK_PTR(skel, "skel_open_and_load"))
-> +		return;
-> +
-> +	tld_keys = calloc(TEST_BASIC_THREAD_NUM, sizeof(tld_key_t));
-> +	if (!ASSERT_OK_PTR(tld_keys, "calloc tld_keys"))
-> +		goto out;
-> +
-> +	ASSERT_FALSE(tld_key_is_err(value0_key), "TLD_DEFINE_KEY");
-> +	tld_keys[0] = tld_create_key("value1", sizeof(int));
-> +	ASSERT_FALSE(tld_key_is_err(tld_keys[0]), "tld_create_key");
-> +	tld_keys[1] = tld_create_key("value2", sizeof(struct test_struct));
-> +	ASSERT_FALSE(tld_key_is_err(tld_keys[1]), "tld_create_key");
-> +
-> +	/*
-> +	 * Shouldn't be able to store data exceed a page. Create a TLD just big
-> +	 * enough to exceed a page. TLDs already created are int value0, int
-> +	 * value1, and struct test_struct value2.
-> +	 */
-> +	key = tld_create_key("value_not_exist",
-> +			     TLD_PAGE_SIZE - 2 * sizeof(int) - sizeof(struct test_struct) + 1);
-> +	ASSERT_EQ(tld_key_err_or_zero(key), -E2BIG, "tld_create_key");
-> +
-> +	key = tld_create_key("value2", sizeof(struct test_struct));
-> +	ASSERT_EQ(tld_key_err_or_zero(key), -EEXIST, "tld_create_key");
-> +
-> +	/* Shouldn't be able to create the (TLD_MAX_DATA_CNT+1)-th TLD */
-> +	for (i = 3; i < TLD_MAX_DATA_CNT; i++) {
-> +		snprintf(dummy_key_name, TLD_NAME_LEN, "dummy_value%d", i);
-> +		tld_keys[i] = tld_create_key(dummy_key_name, sizeof(int));
-> +		ASSERT_FALSE(tld_key_is_err(tld_keys[i]), "tld_create_key");
-> +	}
-> +	key = tld_create_key("value_not_exist", sizeof(struct test_struct));
-> +	ASSERT_EQ(tld_key_err_or_zero(key), -ENOSPC, "tld_create_key");
-> +
-> +	/* Access TLDs from multiple threads and check if they are thread-specific */
-> +	for (i = 0; i < TEST_BASIC_THREAD_NUM; i++) {
-> +		err = pthread_create(&thread[i], NULL, test_task_local_data_basic_thread, skel);
-> +		if (!ASSERT_OK(err, "pthread_create"))
-> +			goto out;
-> +	}
-> +
-> +out:
-> +	for (i = 0; i < TEST_BASIC_THREAD_NUM; i++)
-> +		pthread_join(thread[i], NULL);
-> +
-> +	if (tld_keys) {
-> +		free(tld_keys);
-> +		tld_keys = NULL;
-> +	}
-> +	tld_free();
-> +	test_task_local_data__destroy(skel);
-> +}
-> +
-> +void test_task_local_data(void)
-> +{
-> +	if (test__start_subtest("task_local_data_basic"))
-> +		test_task_local_data_basic();
-> +}
-> diff --git a/tools/testing/selftests/bpf/progs/test_task_local_data.c b/tools/testing/selftests/bpf/progs/test_task_local_data.c
-> new file mode 100644
-> index 000000000000..94d1745dd8d4
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/progs/test_task_local_data.c
-> @@ -0,0 +1,65 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +#include <vmlinux.h>
-> +#include <errno.h>
-> +#include <bpf/bpf_helpers.h>
-> +
-> +#include "task_local_data.bpf.h"
-> +
-> +struct tld_keys {
-> +	tld_key_t value0;
-> +	tld_key_t value1;
-> +	tld_key_t value2;
-> +	tld_key_t value_not_exist;
-> +};
-> +
-> +struct test_struct {
-> +	unsigned long a;
-> +	unsigned long b;
-> +	unsigned long c;
-> +	unsigned long d;
-> +};
-> +
-> +int test_value0;
-> +int test_value1;
-> +struct test_struct test_value2;
-> +
-> +SEC("syscall")
-> +int task_main(void *ctx)
-> +{
-> +	struct tld_object tld_obj;
-> +	struct test_struct *struct_p;
-> +	struct task_struct *task;
-> +	int err, *int_p;
-> +
-> +	task = bpf_get_current_task_btf();
-> +	err = tld_object_init(task, &tld_obj);
-> +	if (err)
-> +		return 1;
-> +
-> +	int_p = tld_get_data(&tld_obj, value0, "value0", sizeof(int));
-> +	if (int_p)
-> +		test_value0 = *int_p;
-> +	else
-> +		return 2;
-> +
-> +	int_p = tld_get_data(&tld_obj, value1, "value1", sizeof(int));
-> +	if (int_p)
-> +		test_value1 = *int_p;
-> +	else
-> +		return 3;
-> +
-> +	struct_p = tld_get_data(&tld_obj, value2, "value2", sizeof(struct test_struct));
-> +	if (struct_p)
-> +		test_value2 = *struct_p;
-> +	else
-> +		return 4;
-> +
-> +	int_p = tld_get_data(&tld_obj, value_not_exist, "value_not_exist", sizeof(int));
-> +	if (int_p)
-> +		return 5;
-> +
-> +	return 0;
-> +}
-> +
-> +char _license[] SEC("license") = "GPL";
-> -- 
-> 2.47.1
-> 
-> 
 
