@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-202576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C903AEE4D8
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 18:43:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9837AEE4D9
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 18:43:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E5A03A9677
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 16:42:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D49F18988D7
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 16:43:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6958028F94E;
-	Mon, 30 Jun 2025 16:42:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB0242900B2;
+	Mon, 30 Jun 2025 16:42:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC70291C2D
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 16:42:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BC628FFEC
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 16:42:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751301750; cv=none; b=Kmc1MUhtS3AdHG/4Q0HWB1k4JFI4rsN/yLeXWwR2N76Tc0e7XJlZ4JbMkdWWIjlilxlcPTGJP20CQQw2o/00o3AC9ppHYNTLtrapIuy5Vt2eTRAvLNj+7KBaMAsqrRB1ameT8qxApBwFFOPXChECV6LMxZ+3eTDQKwKKhI7BDTY=
+	t=1751301753; cv=none; b=MlBul6/GsGWxeH+rqMY2JSmXABFGzlxbcHDj1XPA/cUY2iaFJSWEdG1UcZIoT4r6cWXquO903IMxarPGlHfEAm21Z5TAa15Pq5Dwohl1hXiDIpBzs/bwILHFrj0BXf3HWxALekXd079nalUdmyY4GS1Kuo9G2UdNOvgEMmAgEZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751301750; c=relaxed/simple;
-	bh=5R9QlSbFa8phGGAzbqGIYFRtxsGSvtGjxuxy8Bi2g8g=;
+	s=arc-20240116; t=1751301753; c=relaxed/simple;
+	bh=e6gu8kppvkVMD/xiFfa9P8SrzVpJGusodKuuVFNY7qw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LgIkyxVsWsrD+cUky8UAMw2/t2evAp+PfFVmtXr8BWBtshHwdEJsDu33qMQK/bzjwRPHeJEayAzbM8WKuH7fDevQ/y6xYk3bW0wIhI1ZNcAoAIIdgBcY9iMy++D2CkYkdyNhIPusejwF69LkSLj5YZyZ0XDXJ1vvFK02wlzo/7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.171
+	 MIME-Version; b=IP/Gk6SYxUgL2TbtX/XzFNEz/4jNYMoGK4FW8AkoLBD1+K9tHsKV/X8utlEsEDVexsfdCtd+815NWknnYnSze3D28PlxYUxbE2DgbRsMogD9Xfg+7MTtSQ8whv+2Zf0mYtEqhCiiUOMmy1fkCpIbARH/zaFi2gBjRSw+bOSUE9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b321bd36a41so2046794a12.2
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 09:42:28 -0700 (PDT)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-23636167afeso19978655ad.3
+        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 09:42:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751301748; x=1751906548;
+        d=1e100.net; s=20230601; t=1751301751; x=1751906551;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7t2TkT2MztR/qNKtDy+95EAKsYdzj6boxSl4hTJoqQE=;
-        b=g+TZvIKNBgzHfcYhCb2h7oU5Gm0dJOwxanrQQBgFGuLw0Kw3VV9NwSZeCTbffPBHJH
-         YvgMDIEHHrBE41GFo/3L9XslT+L5Jb6phfGyT+qG4D/xaqxv6V+oda7yy/1T6TlpFzjA
-         52FUVboaygsZkIosKzryY0kcAHaEqCeKD63VkYJ+615Y5lFDA4BKU3qvtDjgbfdJ8kgS
-         ZSPMH8Yol/gCZ1WPj+q27oLMBgo0YW4IW1OfmLxLlMKpGAFCbmPcTBekCGhQtbJZRt74
-         UScElVvXFQbDvQE9z9gqtl7T6vw7cBvT04amRnbgL5MWfi2bNF58xQQi7intAvdSLWPr
-         zV9A==
-X-Gm-Message-State: AOJu0Yy3YPTVANvviVKxDwwHjeBaAV+Afm66rYZ5ZUXN1UoU/dHedZHh
-	s7icuYA8j0rsYxOMKOQLDbSJhq5/OXyOXQHS6nBODLq432LX9glHWyC9s3ai
-X-Gm-Gg: ASbGncstCf0KCK9eKqVN79kXX8gOxJGE07ibq8drVgAH1mZMRp0exWqKr4dmR8/jfQP
-	MgyqaSI01Jgr2UMwyGh25Kbrt57eP4UOAJwDfmT9S+CpPytuknF5yRgd5YM3XxaCRfw7m7tJXSY
-	SOPjTLPlvh8V7Qzen516wNZ7SgpfASKg0kcr/DWZ0eJ88JAQXqnhTxsfu+j6AEADQpJUkQ6K7yR
-	vXRzTwO4zlfy3/3uaTUIeHZJm2dyJ7cL/4zUzoD2qckOLGIBBQ46XvhPIEhLOH3TJN5Y6bRglJ9
-	APtPx7OBT7Cd5A38NmiCuN9+CiVr25J3osEfdWwLHQukp/GqV8Qt5MeublL6m6R6qobWPdlmhvc
-	8eyeUoBSrN43KU7/uD7wlFR8=
-X-Google-Smtp-Source: AGHT+IGxFIpjkc37XTEMlhxE/Xf3+mQKjSlYPlUg6bMXo5PxG952ARs1VmLjqNhs2snK71fONW1lqA==
-X-Received: by 2002:a17:90b:5405:b0:311:9c9a:58ca with SMTP id 98e67ed59e1d1-318c8ee50e5mr21487768a91.8.1751301747693;
-        Mon, 30 Jun 2025 09:42:27 -0700 (PDT)
+        bh=qJCS+ao8Xhj12sZylwaVZVSOZFbjMsK5DtPTgsdyY3w=;
+        b=En+QsTRfCkJ9J9HKjgI0SgnEkwqiIF+zFVzLUL+wlqW4TLmMO6r0hgQRgFggmBKURZ
+         nqELul7JHDsMbn5GFD1YFPn2BVR1138Svkz9lPYPgthQUZlm/QOPqy9gdfHV7jWSXPx7
+         wS7HuLwemTahyfQYZxoxacRVZSteW9914JJ6rzyoKIxhxswTT2KfR/aJT3zXjiQzwCIr
+         8Tc5+SZ6l6b+871yRuDcJ8jUQYrY8Xnx2qZeXWDcFOm9c2EwviEKcJY825ozO1AL8q9q
+         gmjGB/JJGVqAgybhhqrYz6DvVrn0ckI3gBzd7TW0p1VAqOuQXuYAgUiRC2HV1HPA++/n
+         d11g==
+X-Gm-Message-State: AOJu0YwZPyxmIpEzN4tcsv1/7bxiU4yP2Zn1ixHlBcEuPmGNHA0TSdqK
+	s0sh4D3Y/JgXba9DOWI4KMcqKjmfJjNaOYfJPbqHefR7zfIU4GWTf9eZyNu9
+X-Gm-Gg: ASbGncvifsWj0ivdSq/MqHmrmHoo0eZ/RxS9+6UwuAjGr6jwqmh25BSRzM4UO7QZ7c5
+	mP6UHaVDGojkuW9QHt1uvgWbqq2LWjMp7Tjh6gXgQUpkjLAbujNN0MPguhr2g0w+2/mROq4MUk3
+	hKCLpxGCoKA/OhL395hHLpqhPmrbYlPAiZEVx2/zAuCNr7G6elB89LtDUho/3LoKSvDkgdu1uzy
+	qUW4wDPeMAwdv0ofr5/NN0kY0UjAOgN8r3WxXITD9DOSWEYSSx9qzMGwlfr0S7PAafbkXoymP67
+	b3dFSKOSCO240aeXx8GiGiJFCGOP8fO7WVuUOn+8ZqwxTaMlSvp9CsUkkmvcHNK7OxSG7bV/bYQ
+	BB5AQRO8kaPiHQPm4scN3uQU=
+X-Google-Smtp-Source: AGHT+IH/8OXZgbs4ZX/tbm+awHinVDvS4S3sq3k4Vx6LtAitUXfOznQKY9dDCUugFYUcceE3LgJNyw==
+X-Received: by 2002:a17:902:d2cf:b0:235:be0:db6b with SMTP id d9443c01a7336-23ac46072cdmr220311335ad.45.1751301750799;
+        Mon, 30 Jun 2025 09:42:30 -0700 (PDT)
 Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-318c14e2a85sm9734579a91.28.2025.06.30.09.42.27
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-23acb39b8easm83219425ad.96.2025.06.30.09.42.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jun 2025 09:42:27 -0700 (PDT)
+        Mon, 30 Jun 2025 09:42:28 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Subject: [PATCH net-next v2 3/8] net: s/dev_get_mac_address/netif_get_mac_address/
-Date: Mon, 30 Jun 2025 09:42:17 -0700
-Message-ID: <20250630164222.712558-4-sdf@fomichev.me>
+Subject: [PATCH net-next v2 4/8] net: s/dev_pre_changeaddr_notify/netif_pre_changeaddr_notify/
+Date: Mon, 30 Jun 2025 09:42:18 -0700
+Message-ID: <20250630164222.712558-5-sdf@fomichev.me>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250630164222.712558-1-sdf@fomichev.me>
 References: <20250630164222.712558-1-sdf@fomichev.me>
@@ -84,127 +84,169 @@ netdev, the latter takes care of the locking. We don't strictly
 follow this semantics on either side, but there are more dev_xxx handlers
 now that don't fit. Rename them to netif_xxx where appropriate.
 
-netif_get_mac_address is used only by tun/tap, so move it into
+netif_pre_changeaddr_notify is used only by ipvlan/bond, so move it into
 NETDEV_INTERNAL namespace.
 
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- drivers/net/tap.c         | 6 ++++--
- drivers/net/tun.c         | 4 +++-
- include/linux/netdevice.h | 2 +-
- net/core/dev.c            | 4 ++--
- net/core/dev_ioctl.c      | 3 ++-
- net/core/net-sysfs.c      | 2 +-
- 6 files changed, 13 insertions(+), 8 deletions(-)
+ drivers/net/bonding/bond_main.c  |  4 +++-
+ drivers/net/ipvlan/ipvlan_main.c |  8 +++++---
+ include/linux/netdevice.h        |  4 ++--
+ net/bridge/br.c                  |  6 +++---
+ net/bridge/br_if.c               |  3 ++-
+ net/core/dev.c                   | 16 ++++++++--------
+ net/core/dev_addr_lists.c        |  2 +-
+ 7 files changed, 24 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index bdf0788d8e66..4c85770c809b 100644
---- a/drivers/net/tap.c
-+++ b/drivers/net/tap.c
-@@ -28,6 +28,8 @@
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 43a580a444af..805e50eee979 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -95,6 +95,8 @@
  
- #include "tun_vnet.h"
+ #include "bonding_priv.h"
  
 +MODULE_IMPORT_NS("NETDEV_INTERNAL");
 +
- #define TAP_IFFEATURES (IFF_VNET_HDR | IFF_MULTI_QUEUE)
+ /*---------------------------- Module parameters ----------------------------*/
  
- static struct proto tap_proto = {
-@@ -1000,8 +1002,8 @@ static long tap_ioctl(struct file *file, unsigned int cmd,
- 			return -ENOLINK;
+ /* monitor all links that often (in milliseconds). <=0 disables monitoring */
+@@ -1038,7 +1040,7 @@ static int bond_set_dev_addr(struct net_device *bond_dev,
+ 
+ 	slave_dbg(bond_dev, slave_dev, "bond_dev=%p slave_dev=%p slave_dev->addr_len=%d\n",
+ 		  bond_dev, slave_dev, slave_dev->addr_len);
+-	err = dev_pre_changeaddr_notify(bond_dev, slave_dev->dev_addr, NULL);
++	err = netif_pre_changeaddr_notify(bond_dev, slave_dev->dev_addr, NULL);
+ 	if (err)
+ 		return err;
+ 
+diff --git a/drivers/net/ipvlan/ipvlan_main.c b/drivers/net/ipvlan/ipvlan_main.c
+index 0ed2fd833a5d..c951f0ee3cf9 100644
+--- a/drivers/net/ipvlan/ipvlan_main.c
++++ b/drivers/net/ipvlan/ipvlan_main.c
+@@ -7,6 +7,8 @@
+ 
+ #include "ipvlan.h"
+ 
++MODULE_IMPORT_NS("NETDEV_INTERNAL");
++
+ static int ipvlan_set_port_mode(struct ipvl_port *port, u16 nval,
+ 				struct netlink_ext_ack *extack)
+ {
+@@ -784,9 +786,9 @@ static int ipvlan_device_event(struct notifier_block *unused,
+ 	case NETDEV_PRE_CHANGEADDR:
+ 		prechaddr_info = ptr;
+ 		list_for_each_entry(ipvlan, &port->ipvlans, pnode) {
+-			err = dev_pre_changeaddr_notify(ipvlan->dev,
+-						    prechaddr_info->dev_addr,
+-						    extack);
++			err = netif_pre_changeaddr_notify(ipvlan->dev,
++							  prechaddr_info->dev_addr,
++							  extack);
+ 			if (err)
+ 				return notifier_from_errno(err);
  		}
- 		ret = 0;
--		dev_get_mac_address((struct sockaddr *)&ss, dev_net(tap->dev),
--				    tap->dev->name);
-+		netif_get_mac_address((struct sockaddr *)&ss, dev_net(tap->dev),
-+				      tap->dev->name);
- 		if (copy_to_user(&ifr->ifr_name, tap->dev->name, IFNAMSIZ) ||
- 		    copy_to_user(&ifr->ifr_hwaddr, &ss, sizeof(ifr->ifr_hwaddr)))
- 			ret = -EFAULT;
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index f8c5e2fd04df..4509ae68decf 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -85,6 +85,8 @@
- 
- #include "tun_vnet.h"
- 
-+MODULE_IMPORT_NS("NETDEV_INTERNAL");
-+
- static void tun_default_link_ksettings(struct net_device *dev,
- 				       struct ethtool_link_ksettings *cmd);
- 
-@@ -3186,7 +3188,7 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
- 
- 	case SIOCGIFHWADDR:
- 		/* Get hw address */
--		dev_get_mac_address(&ifr.ifr_hwaddr, net, tun->dev->name);
-+		netif_get_mac_address(&ifr.ifr_hwaddr, net, tun->dev->name);
- 		if (copy_to_user(argp, &ifr, ifreq_len))
- 			ret = -EFAULT;
- 		break;
 diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index ac6b9e68e858..2f3fba5c67c2 100644
+index 2f3fba5c67c2..85c0dec0177e 100644
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
-@@ -4221,7 +4221,7 @@ int dev_set_mac_address(struct net_device *dev, struct sockaddr_storage *ss,
- 			struct netlink_ext_ack *extack);
- int dev_set_mac_address_user(struct net_device *dev, struct sockaddr_storage *ss,
- 			     struct netlink_ext_ack *extack);
--int dev_get_mac_address(struct sockaddr *sa, struct net *net, char *dev_name);
-+int netif_get_mac_address(struct sockaddr *sa, struct net *net, char *dev_name);
- int netif_get_port_parent_id(struct net_device *dev,
- 			     struct netdev_phys_item_id *ppid, bool recurse);
- bool netdev_port_same_parent_id(struct net_device *a, struct net_device *b);
+@@ -4213,8 +4213,8 @@ int dev_change_net_namespace(struct net_device *dev, struct net *net,
+ int __dev_set_mtu(struct net_device *, int);
+ int netif_set_mtu(struct net_device *dev, int new_mtu);
+ int dev_set_mtu(struct net_device *, int);
+-int dev_pre_changeaddr_notify(struct net_device *dev, const char *addr,
+-			      struct netlink_ext_ack *extack);
++int netif_pre_changeaddr_notify(struct net_device *dev, const char *addr,
++				struct netlink_ext_ack *extack);
+ int netif_set_mac_address(struct net_device *dev, struct sockaddr_storage *ss,
+ 			  struct netlink_ext_ack *extack);
+ int dev_set_mac_address(struct net_device *dev, struct sockaddr_storage *ss,
+diff --git a/net/bridge/br.c b/net/bridge/br.c
+index 0adeafe11a36..9d3748396795 100644
+--- a/net/bridge/br.c
++++ b/net/bridge/br.c
+@@ -74,9 +74,9 @@ static int br_device_event(struct notifier_block *unused, unsigned long event, v
+ 		if (br->dev->addr_assign_type == NET_ADDR_SET)
+ 			break;
+ 		prechaddr_info = ptr;
+-		err = dev_pre_changeaddr_notify(br->dev,
+-						prechaddr_info->dev_addr,
+-						extack);
++		err = netif_pre_changeaddr_notify(br->dev,
++						  prechaddr_info->dev_addr,
++						  extack);
+ 		if (err)
+ 			return notifier_from_errno(err);
+ 		break;
+diff --git a/net/bridge/br_if.c b/net/bridge/br_if.c
+index 2450690f98cf..98c5b9c3145f 100644
+--- a/net/bridge/br_if.c
++++ b/net/bridge/br_if.c
+@@ -668,7 +668,8 @@ int br_add_if(struct net_bridge *br, struct net_device *dev,
+ 		/* Ask for permission to use this MAC address now, even if we
+ 		 * don't end up choosing it below.
+ 		 */
+-		err = dev_pre_changeaddr_notify(br->dev, dev->dev_addr, extack);
++		err = netif_pre_changeaddr_notify(br->dev, dev->dev_addr,
++						  extack);
+ 		if (err)
+ 			goto err6;
+ 	}
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 7d38d080efe0..ff7fde1a1ac9 100644
+index ff7fde1a1ac9..fc3720d11267 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -9737,7 +9737,7 @@ int netif_set_mac_address(struct net_device *dev, struct sockaddr_storage *ss,
- DECLARE_RWSEM(dev_addr_sem);
- 
- /* "sa" is a true struct sockaddr with limited "sa_data" member. */
--int dev_get_mac_address(struct sockaddr *sa, struct net *net, char *dev_name)
-+int netif_get_mac_address(struct sockaddr *sa, struct net *net, char *dev_name)
- {
- 	size_t size = sizeof(sa->sa_data_min);
- 	struct net_device *dev;
-@@ -9763,7 +9763,7 @@ int dev_get_mac_address(struct sockaddr *sa, struct net *net, char *dev_name)
- 	up_read(&dev_addr_sem);
- 	return ret;
+@@ -9688,13 +9688,13 @@ void netif_set_group(struct net_device *dev, int new_group)
  }
--EXPORT_SYMBOL(dev_get_mac_address);
-+EXPORT_SYMBOL_NS_GPL(netif_get_mac_address, "NETDEV_INTERNAL");
  
- int netif_change_carrier(struct net_device *dev, bool new_carrier)
+ /**
+- *	dev_pre_changeaddr_notify - Call NETDEV_PRE_CHANGEADDR.
+- *	@dev: device
+- *	@addr: new address
+- *	@extack: netlink extended ack
++ * netif_pre_changeaddr_notify() - Call NETDEV_PRE_CHANGEADDR.
++ * @dev: device
++ * @addr: new address
++ * @extack: netlink extended ack
+  */
+-int dev_pre_changeaddr_notify(struct net_device *dev, const char *addr,
+-			      struct netlink_ext_ack *extack)
++int netif_pre_changeaddr_notify(struct net_device *dev, const char *addr,
++				struct netlink_ext_ack *extack)
  {
-diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-index 616479e71466..ceb2d63a818a 100644
---- a/net/core/dev_ioctl.c
-+++ b/net/core/dev_ioctl.c
-@@ -728,7 +728,8 @@ int dev_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr,
- 	switch (cmd) {
- 	case SIOCGIFHWADDR:
- 		dev_load(net, ifr->ifr_name);
--		ret = dev_get_mac_address(&ifr->ifr_hwaddr, net, ifr->ifr_name);
-+		ret = netif_get_mac_address(&ifr->ifr_hwaddr, net,
-+					    ifr->ifr_name);
- 		if (colon)
- 			*colon = ':';
- 		return ret;
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index ebb5a6a11bb8..c2783323b589 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -256,7 +256,7 @@ static ssize_t name_assign_type_show(struct device *dev,
+ 	struct netdev_notifier_pre_changeaddr_info info = {
+ 		.info.dev = dev,
+@@ -9706,7 +9706,7 @@ int dev_pre_changeaddr_notify(struct net_device *dev, const char *addr,
+ 	rc = call_netdevice_notifiers_info(NETDEV_PRE_CHANGEADDR, &info.info);
+ 	return notifier_to_errno(rc);
  }
- static DEVICE_ATTR_RO(name_assign_type);
+-EXPORT_SYMBOL(dev_pre_changeaddr_notify);
++EXPORT_SYMBOL_NS_GPL(netif_pre_changeaddr_notify, "NETDEV_INTERNAL");
  
--/* use same locking rules as GIFHWADDR ioctl's (dev_get_mac_address()) */
-+/* use same locking rules as GIFHWADDR ioctl's (netif_get_mac_address()) */
- static ssize_t address_show(struct device *dev, struct device_attribute *attr,
- 			    char *buf)
- {
+ int netif_set_mac_address(struct net_device *dev, struct sockaddr_storage *ss,
+ 			  struct netlink_ext_ack *extack)
+@@ -9720,7 +9720,7 @@ int netif_set_mac_address(struct net_device *dev, struct sockaddr_storage *ss,
+ 		return -EINVAL;
+ 	if (!netif_device_present(dev))
+ 		return -ENODEV;
+-	err = dev_pre_changeaddr_notify(dev, ss->__data, extack);
++	err = netif_pre_changeaddr_notify(dev, ss->__data, extack);
+ 	if (err)
+ 		return err;
+ 	if (memcmp(dev->dev_addr, ss->__data, dev->addr_len)) {
+diff --git a/net/core/dev_addr_lists.c b/net/core/dev_addr_lists.c
+index 90716bd736f3..76c91f224886 100644
+--- a/net/core/dev_addr_lists.c
++++ b/net/core/dev_addr_lists.c
+@@ -603,7 +603,7 @@ int dev_addr_add(struct net_device *dev, const unsigned char *addr,
+ 
+ 	ASSERT_RTNL();
+ 
+-	err = dev_pre_changeaddr_notify(dev, addr, NULL);
++	err = netif_pre_changeaddr_notify(dev, addr, NULL);
+ 	if (err)
+ 		return err;
+ 	err = __hw_addr_add(&dev->dev_addrs, addr, dev->addr_len, addr_type);
 -- 
 2.49.0
 
