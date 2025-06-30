@@ -1,142 +1,183 @@
-Return-Path: <netdev+bounces-202568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5C64AEE490
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 18:30:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79E42AEE4BA
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 18:36:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C86BC7A6C96
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 16:28:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F196117B88D
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 16:35:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E558291C05;
-	Mon, 30 Jun 2025 16:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070D428F514;
+	Mon, 30 Jun 2025 16:33:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GWS6p1Zq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ApYPHPZz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06CCD290D9C;
-	Mon, 30 Jun 2025 16:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184842857F8
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 16:33:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751301007; cv=none; b=P15rIAduxD9IG7rqGRdA4lLU5mmMhU9Ty0oYehBXxVxDaMlAlqG7rut2b2GpAlkNHUrpvdtyyCIKZjuA6YPWd91tAUVu4exGDXUcYz7Mz7o3ZNFx3Wz8q7tonQuZtZkGy0l5FLscWni7/K8AShODIu4O03PRf+i34d+g9L5WGyQ=
+	t=1751301196; cv=none; b=HSrZP9rzLgS1zrXRUYM6VS45pbeKrnQGEnewZnki3B0xdEb3VRANzkPJW4UMTtLQaA81tovgBK2WGtgG4cF1fQ55bPAMv37KuLqAT9iy2PQpMtoA/i5bTqW115gMPkz4rlve69IxMC3/FdX9yu4m4tD6Ezld9d668RnCniby/Ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751301007; c=relaxed/simple;
-	bh=0HxkYgJxPovw38S/ncV1y0Tb+2e4bvKdNpiGuJwX7+k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ELoba10+obbUhEY+bXiMUVeIBG30mWWwbA3Y8mEh+3DlqtfyrZItuV3iwJ9GYcZ2kzBY+rX6wCvNJef9xSq8Xigdl8mMJ5neN8DPqKYfB+0rPwayhbyZjZrotoe5HV2huySukQMT58RNBcAR3VbFR7FFIV+1ixVmF3OuOTK3xHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GWS6p1Zq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B14FC4CEE3;
-	Mon, 30 Jun 2025 16:30:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751301006;
-	bh=0HxkYgJxPovw38S/ncV1y0Tb+2e4bvKdNpiGuJwX7+k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GWS6p1ZqJY1wyPDCa5Q+4k7uUZFH7e1dhC6M0vVyKzT0AWn1SyJC1X1g/4Hqu/63a
-	 3WJAloRinPotqkJKcJxkD7KgWvhkyIcaKT8cfy6pTMBVbKyFRUTqRrNd51K/P+gy3G
-	 8Yp58LunVtmh0MFDS+s35dAS32ijVX60vAV6hmVTY0b2dHAbKmPBb7v1XH58A29SGo
-	 H3hoDDjwJ5fUR/VD9TgSokq65t0ANmV6I8CsnYSpRaJmBF/i7wY3OS+jRqqxRiefw/
-	 qzfYVjeL+W/AC+4ihwgUS1oDXrhHGh9KWunYqEVkUDgyXYkIoQDFOg+b98ZAZmbje9
-	 Vdsgs/5TwzvlQ==
-Date: Mon, 30 Jun 2025 17:29:59 +0100
-From: Simon Horman <horms@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Felix Fietkau <nbd@nbd.name>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Eric Woudstra <ericwouds@gmail.com>, Elad Yifee <eladwf@gmail.com>,
-	Bo-Cun Chen <bc-bocun.chen@mediatek.com>,
-	Sky Huang <skylake.huang@mediatek.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2 3/3] net: ethernet: mtk_eth_soc: use genpool
- allocator for SRAM
-Message-ID: <20250630162959.GA57523@horms.kernel.org>
-References: <cover.1751229149.git.daniel@makrotopia.org>
- <61897c7a3dcc0b2976ec2118226c06c220b00a80.1751229149.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1751301196; c=relaxed/simple;
+	bh=TlBBWhjw66vU0WVncgBo0ciJaAdFdenxkE0NF7pgGLU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=P5XYsJCXtfLDtNc3EQ9xe2STP1x401xm8lZwXdvNwy6f4QmaUQejA4dBu5/pf/k8kyPdfMMdvQvCtbXApMoyd65ywtzTNMOHTxUpQ9FyoMLP++6z6cFKuoV7+u/NVQNLjLIShfN9MPbolyFu60fRXDWd1E0ArXuaY2/HKqRCjzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ApYPHPZz; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751301193;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=PCXz84xtjif+9AQOmzcJZnqlDzRDa6bAl/lnTU35pOE=;
+	b=ApYPHPZze4CWGUk2cNGvw32uP8Rk7MhR8tH9Y8Bkd5cCP3ml1/GRgReKWd72jUqqi/Li55
+	rnKbMobahY/3hs5PMyITgkoDGAGnfOaueYnouGau9BDAhbBIuYUExmJHO3KacmGTVVG4sF
+	E+8l+cy9fRRSlP/+pJlcxjSrTKhbmto=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-232-NVZQR-UDMg2fS9DHGwPmtw-1; Mon, 30 Jun 2025 12:33:12 -0400
+X-MC-Unique: NVZQR-UDMg2fS9DHGwPmtw-1
+X-Mimecast-MFC-AGG-ID: NVZQR-UDMg2fS9DHGwPmtw_1751301191
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-450de98b28eso26312765e9.0
+        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 09:33:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751301191; x=1751905991;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PCXz84xtjif+9AQOmzcJZnqlDzRDa6bAl/lnTU35pOE=;
+        b=MXuVEnHMb5s+56XP6wNB+Yli4R0xjYt2FQXLb/rcxD/8vQV8IfBdIH5L7YLmzpBG/L
+         AJHCOhgyrosfs/mO++0LpvDq98BpeBmzBIiVz9yWmM/IcmDj3NbdIMAumfY4XME4kgtl
+         G91IJKL2Fqxm6chja/sApH27mbMTJOlC3PvgrVSZQrvOxPXoLQoIDtbwmfbpQ0D0xQ+K
+         zdLdolIXtWhP4kNht3bzm4XDP0/ZrpJcmmC4H+piquaD0/JDNgdlN/KdlTuFeBE/WWpt
+         9jC4FssVSgd6Hw4a0VP/FUz2EsAqbk2BhE+5p0pOi2id3bO7lO9B6MnTlBpE13w8KnkM
+         ntZg==
+X-Forwarded-Encrypted: i=1; AJvYcCUXswk1oQNco9tIE9rlxJkkPZzss5YdNRgP+Clj5Yhr+NKN2RYMcnfkszKZfohx60tsoNI4dIc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5axcezSu7msEeOfGUnFO52PSXAXep23b8iS0F9REMnfKRtYiW
+	XJsDIYim7QyG4mDwyubIwsxJZZGH8+YOZ1U6zlQ4sqQtFMG9C09KlLAIvytYWm2NAD1Pfrbe7gV
+	Op280du22YK7ecYMAGtiCsWayVv1IiiJaY9t+CWWhZQdUEJxLXogrt8XTPc7F9FSs+Yz6ZUHf3I
+	EpHw7VQWdMglVrbczlbPj8G1yuuQ2dCM/uKQy7xctEvTd7
+X-Gm-Gg: ASbGncsYuqQfLwtk1O1z/NiDfskVFWOLoIcvbPBQD7yxHDjdenAcGqXIkypoOJXxS/W
+	MuMaLupQ/d/q1cDX4lQftWgv4ziXkofJpBASW6kEJZAZBbODbOyf+LyTNS9F3IIiaxb5i8mp9TP
+	WrJu81+QFCjMMQkVabPH+Mr+DltbGzz06Z/xTDkfR0u7PJUe6TbzRixGh3eA9LNmmyJMf/T8zLo
+	wcXldO1RldAONsUHcQgS24R8+Zcp9LWTsmIb0RgIfRSXX36qRbo71OhlWxUAN3R4iLaNmbfgPhy
+	kEpNRH3gAP3kd7Y/nIEya60d5S4RLVNzN32KGPjec9tEUiMbPUHFmg==
+X-Received: by 2002:a05:600c:548a:b0:442:f904:1305 with SMTP id 5b1f17b1804b1-453a7912cabmr2232295e9.6.1751301190620;
+        Mon, 30 Jun 2025 09:33:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHSfXHhHLnv7HHQ+5LMg0eJpi2fcwuM4hIgZV34bWufMI5k6opX1s+0mXAanNIxjpTh6gD5WQ==
+X-Received: by 2002:a05:600c:548a:b0:442:f904:1305 with SMTP id 5b1f17b1804b1-453a7912cabmr2231815e9.6.1751301190105;
+        Mon, 30 Jun 2025 09:33:10 -0700 (PDT)
+Received: from lleonard-thinkpadp16vgen1.rmtit.csb ([176.206.17.146])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4538a406ab6sm142554375e9.30.2025.06.30.09.33.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jun 2025 09:33:09 -0700 (PDT)
+From: Luigi Leonardi <leonardi@redhat.com>
+Subject: [PATCH net-next v5 0/2] vsock/test: check for null-ptr-deref when
+ transport changes
+Date: Mon, 30 Jun 2025 18:33:02 +0200
+Message-Id: <20250630-test_vsock-v5-0-2492e141e80b@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <61897c7a3dcc0b2976ec2118226c06c220b00a80.1751229149.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAD68YmgC/23NwWrEIBQF0F8ZXNeiT42mq/5HGcrr86WR0qSoy
+ AxD/r2STSdMl5fLufcmCufERbycbiJzSyWtSw/u6SRoxuWTZYo9C1DglFGDrFzqeysrfUnD3uN
+ IHsE60cFP5ild9rE3sXCVC1+qOPdmTqWu+bq/NL33/w02LZVUBtSHQ6JphNfMccb6TOv3vtPgz
+ mp7sCC1NKRQx+ADDvHBmj87aH2wpttgtUWINk7D46+9s3D8td2q4GmkwODwaLdt+wVA6J2CYwE
+ AAA==
+X-Change-ID: 20250306-test_vsock-3e77a9c7a245
+To: Stefano Garzarella <sgarzare@redhat.com>, Michal Luczaj <mhal@rbox.co>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Luigi Leonardi <leonardi@redhat.com>, 
+ Hyunwoo Kim <v4bel@theori.io>
+X-Mailer: b4 0.14.2
 
-On Sun, Jun 29, 2025 at 11:22:44PM +0100, Daniel Golle wrote:
-> Use a dedicated "mmio-sram" and the genpool allocator instead of
-> open-coding SRAM allocation for DMA rings.
-> Keep support for legacy device trees but notify the user via a
-> warning to update.
-> 
-> Co-developed-by: Frank Wunderlich <frank-w@public-files.de>
-> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
-> v2: fix return type of mtk_dma_ring_alloc() in case of error
-> 
->  drivers/net/ethernet/mediatek/mtk_eth_soc.c | 120 +++++++++++++-------
->  drivers/net/ethernet/mediatek/mtk_eth_soc.h |   4 +-
->  2 files changed, 84 insertions(+), 40 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+This series introduces a new test that checks for a null pointer 
+dereference that may happen when there is a transport change[1]. This 
+bug was fixed in [2].
 
-...
+Note that this test *cannot* fail, it hangs if it triggers a kernel
+oops. The intended use-case is to run it and then check if there is any 
+oops in the dmesg.
 
-> @@ -5117,16 +5148,27 @@ static int mtk_probe(struct platform_device *pdev)
->  			err = -EINVAL;
->  			goto err_destroy_sgmii;
->  		}
-> +
->  		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SRAM)) {
-> -			if (mtk_is_netsys_v3_or_greater(eth)) {
-> -				res_sram = platform_get_resource(pdev, IORESOURCE_MEM, 1);
-> -				if (!res_sram) {
-> -					err = -EINVAL;
-> -					goto err_destroy_sgmii;
-> +			eth->sram_pool = of_gen_pool_get(pdev->dev.of_node, "sram", 0);
-> +			if (!eth->sram_pool) {
-> +				if (!mtk_is_netsys_v3_or_greater(eth)) {
-> +					/*
-> +					 * Legacy support for missing 'sram' node in DT.
-> +					 * SRAM is actual memory and supports transparent access
-> +					 * just like DRAM. Hence we don't require __iomem being
-> +					 * set and don't need to use accessor functions to read from
-> +					 * or write to SRAM.
-> +					 */
-> +					eth->sram_base = (void __force *)eth->base +
-> +							 MTK_ETH_SRAM_OFFSET;
-> +					eth->phy_scratch_ring = res->start + MTK_ETH_SRAM_OFFSET;
-> +					dev_warn(&pdev->dev,
-> +						 "legacy DT: using hard-coded SRAM offset.\n");
-> +				} else {
-> +					dev_err(&pdev->dev, "Could not get SRAM pool\n");
-> +					return -ENODEV;
+This test is based on Hyunwoo Kim's[3] and Michal's python 
+reproducers[4].
 
-Hi Daniel,
+[1]https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/
+[2]https://lore.kernel.org/netdev/20250110083511.30419-1-sgarzare@redhat.com/
+[3]https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/#t
+[4]https://lore.kernel.org/netdev/2b3062e3-bdaa-4c94-a3c0-2930595b9670@rbox.co/
 
-Rather than returning, should this
-jump to err_destroy_sgmii to avoid leaking resources?
+Signed-off-by: Luigi Leonardi <leonardi@redhat.com>
+---
+Changes in v5:
+- Addressed Stefano's comments:
+    - Use a macro for G2H transport detection
+    - Improved commits and comments text
+    - Rebased on latest net-next
+- Link to v4: 
+https://lore.kernel.org/r/20250624-test_vsock-v4-1-087c9c8e25a2@redhat.com
 
-Flagged by Smatch.
+Changes in v4:
+- Addressed Stefano's comments:
+    - Minor style changes
+    - Use `get_transports()` to print a warning when a G2H transport is 
+    loaded
+    - Removed check on second connect: Because the first connect is 
+    interrupted, the socket is in an unspecified state (see man connect) 
+    . This can cause strange and unexpected behaviors (connect returning 
+    success on a non-existing CID).
 
->  				}
-> -				eth->phy_scratch_ring = res_sram->start;
-> -			} else {
-> -				eth->phy_scratch_ring = res->start + MTK_ETH_SRAM_OFFSET;
->  			}
->  		}
->  	}
+- Link to v3: 
+https://lore.kernel.org/r/20250611-test_vsock-v3-1-8414a2d4df62@redhat.com
+
+Sorry, this took waaay longer than expected.
+
+Changes in v3:
+Addressed Stefano's and Michal's comments:
+    - Added the splat text to the commit commessage.
+    - Introduced commit hash that fixes the bug.
+    - Not using perror anymore on pthread_* functions.
+    - Listener is just created once.
+
+- Link to v2:
+https://lore.kernel.org/r/20250314-test_vsock-v2-1-3c0a1d878a6d@redhat.com
+
+Changes in v2:
+- Addressed Stefano's comments:
+    - Timeout is now using current_nsec()
+    - Check for return values
+    - Style issues
+- Added Hyunwoo Kim to Suggested-by
+- Link to v1: 
+https://lore.kernel.org/r/20250306-test_vsock-v1-0-0320b5accf92@redhat.com
+
+---
+Luigi Leonardi (2):
+      vsock/test: Add macros to identify transports
+      vsock/test: Add test for null ptr deref when transport changes
+
+ tools/testing/vsock/Makefile     |   1 +
+ tools/testing/vsock/util.h       |   4 +
+ tools/testing/vsock/vsock_test.c | 170 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 175 insertions(+)
+---
+base-commit: 647496422ba9d2784fb8e15b3fda7fe801b1f2ff
+change-id: 20250306-test_vsock-3e77a9c7a245
+
+Best regards,
+-- 
+Luigi Leonardi <leonardi@redhat.com>
+
 
