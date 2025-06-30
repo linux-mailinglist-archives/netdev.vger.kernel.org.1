@@ -1,268 +1,165 @@
-Return-Path: <netdev+bounces-202624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED959AEE61C
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 19:52:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D78D6AEE61F
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 19:54:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D697E3B7726
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 17:52:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE87A3B0A81
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 17:53:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E7BD28DB5E;
-	Mon, 30 Jun 2025 17:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B5682951D4;
+	Mon, 30 Jun 2025 17:54:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="iH633Arn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ly3gIhns"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB6F23ABB1
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 17:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DEF242D76;
+	Mon, 30 Jun 2025 17:54:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751305947; cv=none; b=u6OVfjmu/F2BuBroOYgVSfTYFS0JrQaQPqb/Rz/bJjqPJlgsILYvi+8gLLMxqwwJ1o7hs3vySWt6zEVc8Veu7/UMlrh01tK1P9VNaEg4vbwIUVxGVHTHcqge/B+QV4rk5G29NlFiJJNnrpiVQ3ZiltUT4sC/fgctr22K9GCn7yM=
+	t=1751306042; cv=none; b=HncPjvdJzA+KPK0wb5fcdH14b/0VN/5Phn0VYOdSp7pvwn2jsLb0r+DRCipejQ5eIsCsZQwv4ZquqqNQdd/b0LYGtnoZoVtCW/12plz2WWrGckFOSKpLQi4VoL3yoFoOVfWKo+FyAC9jK3ZPKT/VNOTyhwghFtWgwOX4Z+wL1SA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751305947; c=relaxed/simple;
-	bh=1N5xLrxk9GoQacZGAZSwF1aR4ySTOr8ROVYq12+JXWg=;
-	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=UmkuSpuEDEidwkBO/bOzUGwz/ZGAFK55VQuW58bUGftvqRDpdBWBqGPmS2tXw4gikeu66Rxo3QkgmOO1QAXPSbZLxlsyaZyFn/YemBhezZhH11ERT51PZ04Z7YQ2KWVNFQzV0J95UFIfjvJ9mopHr0CbWWoYhToLN38bdbh9g5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=iH633Arn; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-701046cfeefso16929286d6.2
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 10:52:24 -0700 (PDT)
+	s=arc-20240116; t=1751306042; c=relaxed/simple;
+	bh=x+YSlI7VytRXhxbdrep65VDqbh/BQdR9Q3jWy4WuTeE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=T2Vl0Wn7eMVr75FQHTwkqAqEI/0Ob/IyATzs0sYCTx3T0Sb8hXBNJGfYcMrnRl+Kk+VhdxfEo8bHfJBrBCvPh5BJFfbdYKFLE4a/ciHZyLP91o2l0G+Tq48bTMazvcTSEyhmWS3ecnhqojN9GIH3spUYVGX/V6jCZx76PEMIXFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ly3gIhns; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-710bbd7a9e2so24228727b3.0;
+        Mon, 30 Jun 2025 10:54:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1751305944; x=1751910744; darn=vger.kernel.org;
-        h=in-reply-to:from:content-language:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1751306040; x=1751910840; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=02Zam0e3KNqojJdnyqloOPyLPTfsNUfImxirSjgeMv0=;
-        b=iH633ArnnTwyuG7DG+sSO6dK3FYTBM/YAhykYDX5DC4AY/5bBU53CcjAnc+MyTr4Ha
-         36gSmxN1cyvXCJ0y55x3R5cZa+hZVS7NsfUxVc20w5+qbq2dLZdAeviCpnrWMvJMDcQH
-         1aL9HgqN6uiq6PKsojME+no812gYTGbNIUyf5Fq8jlsKOQ8LAhpqyrEEIS0Hjyx4ksLz
-         L6P3C3417UBEHqnB/uqVB3m7Sr7g7PEIfD0QuFTqwZ94AycV4ZsDTMedUU/IP2RVMs0Q
-         8ppzaIqi4//BjwmBYIYP3brTgFc0tuSDmrwPCzpCV0qSoixtydT6LpsUxnBOysQMGWoj
-         pwog==
+        bh=tzKVoMY2Tti8DrCv+qU2/jwZeY1NQ0avwn4qkKdjcUs=;
+        b=ly3gIhnsqrUmjKxCmjafC5C9naWbHKazrEv9Vj79YkFr1cxINcKlmCD9GlWrMtpDxC
+         7qesUWRFEpX7WGP0sgSpZ2LP3OGKlYwBt/NylNRtD+x65Z3govS/9Aq9eo6ajQngnJ9e
+         5O2JFqw4q0KVoC3EilPmFG7TNN0luIuCeCMiTSwqNZms9MyE5KtOagTqnz5G09HthL70
+         VRxAGP4meEq0VLcI9+W72kU6OQI087ChHcRmaws52KPWN2+KKmDfDsk13duhPLnO+41N
+         S3LrGemrP1DuLI35i8FKa8Uq4Nb25T8cKUJzXwB6MpKMnhDI050o/k3BUl9v2FeY9ziF
+         2yVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751305944; x=1751910744;
-        h=in-reply-to:from:content-language:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+        d=1e100.net; s=20230601; t=1751306040; x=1751910840;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=02Zam0e3KNqojJdnyqloOPyLPTfsNUfImxirSjgeMv0=;
-        b=Z0uIAd83nG227eQM3gI+1gNEhp2kN5IQoIgKoepp6cFSQZZpJINZHMYOA9RBzBDePK
-         0WM2aRsxWdih99bj+0NU9b+oW3zhrj0c9eRsKKU9tcH6sBJkjlZhboueFsrJo64w6HNi
-         aTGc6NFASH/LaDvNH7+F+wj2htngb6fAQRiw4S0OdiK/jdVGRUZ1p/zRslFBHj9XAHPM
-         Hq9JCjaF8rhQpwvxKxQCbFTo+Yaqbc9O8QM4WhRxyntmT3ni91tgQsS+FEuc/hIBp4QW
-         lIzK6I22mx8wqPtGm3IrHF58/04rOo1gn5lcf+Jg6JkkLS6EAAHlJNXFwIc28am+wS8y
-         +0Fg==
-X-Forwarded-Encrypted: i=1; AJvYcCWx8bprASh0XU1orUhikWmYNK/sZJLizrMTR/sYfj5jZVnM7+cBhjq4UxzmOB5EJmCZkaJNBLA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxc8xxzcJGQgZ8f63iiYNHDP+ELnBeGNw75J59aHubrajHztTR2
-	VWsrLAMU105nCGngy21Ka4fmRiHNHKPbx/x8A8LPQMps4Z8AWZXVg04M4FaxLCcocQ==
-X-Gm-Gg: ASbGncvWlXHjEdvhtPkVQB8qHh8mwnfAZFpYt9Cb66bNY4N4xyovJh/xsU2N3ENI/uW
-	U4yVxXtWTL0V8YTabCyhAMPc35BhM62JFmKheCsi6/6IV4jQld+iPu+BWNh3bybAlNE6OWMmq93
-	IwyRlrx0xY5MMnPmzWgi9qPZUI1W9AUnNVJ2oygcilLlw/SUaJlxOD4CNscJ13qRN4fF66czSu/
-	0BlRxjvkVVtvI4HHt7H6sfmv5ekLXsUKf4X1nOGAQ5Y2/SF80on7sPH/t4pIkxV7jjKb3ZRiR9v
-	qUSxjo9bfO2Lw2Y+2QbVC2YZ5vdU7vpcDRNKw3pvZpHur/rDYeAla5V9ACuLvI5/4UYg44ziaM3
-	urk7vF7q9S7ENd3QJvqmGA1ik1gZiIg==
-X-Google-Smtp-Source: AGHT+IHRHYfXwfCIcleVAOzVdLMNonumxdDEu3UOlEsfIMtqZxBs/MJzZQIqFehSXVCtB63ypEVA+g==
-X-Received: by 2002:a05:6214:3015:b0:6e8:ddf6:d11e with SMTP id 6a1803df08f44-70002247794mr217017546d6.21.1751305943584;
-        Mon, 30 Jun 2025 10:52:23 -0700 (PDT)
-Received: from ?IPV6:2804:7f1:e2c1:ca4a:289:b941:38b9:cf01? ([2804:7f1:e2c1:ca4a:289:b941:38b9:cf01])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6fd772e434bsm71797996d6.67.2025.06.30.10.52.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Jun 2025 10:52:23 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="------------9XN1Kb46LNeDZwuePxkMKgGJ"
-Message-ID: <442716ca-ae2e-4fac-8a01-ced3562fd588@mojatatu.com>
-Date: Mon, 30 Jun 2025 14:52:19 -0300
+        bh=tzKVoMY2Tti8DrCv+qU2/jwZeY1NQ0avwn4qkKdjcUs=;
+        b=TGlazjmrAKLld0w8k1R4XWCmz0bEMmlbTs6z7vP+NzAwifohe5QKnq4ieXBEyBbPi3
+         QcC32ca1gYuMRjU/L58fV5QxIfIDLYUP9nnWOMu8CEb3HShXXWBzFZxVcJFb616XOWX+
+         RHucriYItBfHYVZmn1VElRc2ZPQFe+Fa2cG0hKk21v82Ggd8R251nb6fPGVgF+EylX3K
+         DCUthyTJTrywikvOxqNQ3FkVSPruxJurnhigF402/n69NYKxNBWg/1L/MmlVm1Dt/7QD
+         Iq0zXu96DMgENrhZcOqEo772GbhQvLslXd53RMXwILw30XS8XM5diLPxyKH8T/zWZUJ8
+         PJog==
+X-Forwarded-Encrypted: i=1; AJvYcCUwQYgA8AkMRQtFDJemJr9Ycpz3PFQdQGFF3+r5ZgAT5Kr/6BNbZlcIvfgGSLbXq4C/T3pg1cr+rJvyR7p0@vger.kernel.org, AJvYcCVhpi+4JkZrsf9TzR6MEM7zUAoWEiQ8qIHB8V9hjdvW0Ztqej9jBt1Y1smfb1vGsEy0RS+VepHN@vger.kernel.org, AJvYcCVqSyEVSB+JnN0Tcx2jOCDO4XVCOoCkLBJhPOW51cl/YfPHYdcNkemvlNQwSqyqQ1IJvrcSOsA8rT5KnwjA8atz@vger.kernel.org, AJvYcCX+A/hp9j4sxJQqkGgdCArrD1y58XrUDNDZLPmZvOeBYR0Wtfc5XD6pRQqaQ+wNGUZ9WGY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGv/Rq0YoOko2PvX1ShuUH5q+ZGEW/ytXz4X/sJ5AEmOMXwwjz
+	lRnHTnw4uRYhzcx9eCHhEYyeD3cEZakBdLASi8MvLyX4mZtOp5U0mxbU
+X-Gm-Gg: ASbGncufP4IzyoBlOfJJQvHCqhaw0js/s7XAEz3ECkrOukwJsOsEpp/W0CeQYa5ASAv
+	If8Uo5MntTSma6TQ6u4JaWbI9ZQs8kjObFvEnuGL7XT6ZwTT4x6NIkMdDsDlD2L2uMe+gRt7kli
+	vRL8LwLLmud3cVNKv2/Nq2DkSPt2dRqMFmHsOGIgvueU6/sHotijVoe4uybxvADr2QjuicTy+gS
+	277fN9Qc7PQQ/bSEAHHJZPW6WxXStjd+7tIMRcbDj/bcTQApAFkPdvKYTjUDwcr+yKZr53/kpSq
+	4krwSL903yi7tr3tnQZRb8d0HVF7PMNm2BFat/VTeJpiZ7N34xdL/3D5dLjg7PvAvqFcwfxvzyq
+	ZSh/xaqEIF2WObBq9XPwPlC0j9mJR0+cHB7hNLS8=
+X-Google-Smtp-Source: AGHT+IECTL3RoUV2TcnuP7TkMjm+s+TzIbFnBWoR5EqNlbGHSjor4CVYrDzKwwQkr41xGvXtTTaM5A==
+X-Received: by 2002:a05:690c:4a12:b0:712:d70b:45d5 with SMTP id 00721157ae682-715171af5cemr209495367b3.33.1751306039784;
+        Mon, 30 Jun 2025 10:53:59 -0700 (PDT)
+Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-71515bf09cesm16493027b3.24.2025.06.30.10.53.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jun 2025 10:53:59 -0700 (PDT)
+Date: Mon, 30 Jun 2025 13:53:58 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Breno Leitao <leitao@debian.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Simon Horman <horms@kernel.org>, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ ast@kernel.org
+Message-ID: <6862cf369fbcd_162c24294b@willemb.c.googlers.com.notmuch>
+In-Reply-To: <aGKgG+uE+UXEIIbf@gmail.com>
+References: <20250627-netpoll_test-v3-0-575bd200c8a9@debian.org>
+ <20250627-netpoll_test-v3-3-575bd200c8a9@debian.org>
+ <686002d028f_a131d29458@willemb.c.googlers.com.notmuch>
+ <aGKgG+uE+UXEIIbf@gmail.com>
+Subject: Re: [PATCH net-next v3 3/3] selftests: net: add netpoll basic
+ functionality test
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Incomplete fix for recent bug in tc / hfsc
-To: Jamal Hadi Salim <jhs@mojatatu.com>, Lion Ackermann <nnamrec@gmail.com>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org,
- Jiri Pirko <jiri@resnulli.us>, Mingi Cho <mincho@theori.io>
-References: <45876f14-cf28-4177-8ead-bb769fd9e57a@gmail.com>
- <aFosjBOUlOr0TKsd@pop-os.localdomain>
- <3af4930b-6773-4159-8a7a-e4f6f6ae8109@gmail.com>
- <5e4490da-3f6c-4331-af9c-0e6d32b6fc75@gmail.com>
- <CAM0EoMm+xgb0vkTDMAWy9xCvTF+XjGQ1xO5A2REajmBN1DKu1Q@mail.gmail.com>
- <d23fe619-240a-4790-9edd-bec7ab22a974@gmail.com>
- <CAM0EoM=rU91P=9QhffXShvk-gnUwbRHQrwpFKUr9FZFXbbW1gQ@mail.gmail.com>
- <CAM0EoM=mey1f596GS_9-VkLyTmMqM0oJ7TuGZ6i73++tEVFAKg@mail.gmail.com>
- <aGGZBpA3Pn4ll7FO@pop-os.localdomain>
- <8e19395d-b6d6-47d4-9ce0-e2b59e109b2b@gmail.com>
- <CAM0EoMmoQuRER=eBUO+Th02yJUYvfCKu_g7Ppcg0trnA_m6v1Q@mail.gmail.com>
- <c13c3b00-cd15-4dcd-b060-eb731619034f@gmail.com>
- <CAM0EoMnwxMAdoPyqFVUPsNXE33ibw6O4_UE1TcWYUZKjwy3V6A@mail.gmail.com>
-Content-Language: en-US
-From: Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <CAM0EoMnwxMAdoPyqFVUPsNXE33ibw6O4_UE1TcWYUZKjwy3V6A@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-This is a multi-part message in MIME format.
---------------9XN1Kb46LNeDZwuePxkMKgGJ
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-
-On 6/30/25 11:57, Jamal Hadi Salim wrote:
-> On Mon, Jun 30, 2025 at 9:36 AM Lion Ackermann <nnamrec@gmail.com> wrote:
->>
->> Hi,
->>
->> On 6/30/25 1:34 PM, Jamal Hadi Salim wrote:
->>> Hi,
->>>
->>> On Mon, Jun 30, 2025 at 5:04 AM Lion Ackermann <nnamrec@gmail.com> wrote:
->>>>
->>>> Hi,
->>>>
->>>> On 6/29/25 9:50 PM, Cong Wang wrote:
->>>>> On Sun, Jun 29, 2025 at 10:29:44AM -0400, Jamal Hadi Salim wrote:
->>>>>>> On "What do you think the root cause is here?"
->>>>>>>
->>>>>>> I believe the root cause is that qdiscs like hfsc and qfq are dropping
->>>>>>> all packets in enqueue (mostly in relation to peek()) and that result
->>>>>>> is not being reflected in the return code returned to its parent
->>>>>>> qdisc.
->>>>>>> So, in the example you described in this thread, drr is oblivious to
->>>>>>> the fact that the child qdisc dropped its packet because the call to
->>>>>>> its child enqueue returned NET_XMIT_SUCCESS. This causes drr to
->>>>>>> activate a class that shouldn't have been activated at all.
->>>>>>>
->>>>>>> You can argue that drr (and other similar qdiscs) may detect this by
->>>>>>> checking the call to qlen_notify (as the drr patch was
->>>>>>> doing), but that seems really counter-intuitive. Imagine writing a new
->>>>>>> qdisc and having to check for that every time you call a child's
->>>>>>> enqueue. Sure  your patch solves this, but it also seems like it's not
->>>>>>> fixing the underlying issue (which is drr activating the class in the
->>>>>>> first place). Your patch is simply removing all the classes from their
->>>>>>> active lists when you delete them. And your patch may seem ok for now,
->>>>>>> but I am worried it might break something else in the future that we
->>>>>>> are not seeing.
->>>>>>>
->>>>>>> And do note: All of the examples of the hierarchy I have seen so far,
->>>>>>> that put us in this situation, are nonsensical
->>>>>>>
->>>>>>
->>>>>> At this point my thinking is to apply your patch and then we discuss a
->>>>>> longer term solution. Cong?
->>>>>
->>>>> I agree. If Lion's patch works, it is certainly much better as a bug fix
->>>>> for both -net and -stable.
->>>>>
->>>>> Also for all of those ->qlen_notify() craziness, I think we need to
->>>>> rethink about the architecture, _maybe_ there are better architectural
->>>>> solutions.
->>>>>
->>>>> Thanks!
->>>>
->>>> Just for the record, I agree with all your points and as was stated this
->>>> patch really only does damage prevention. Your proposal of preventing
->>>> hierarchies sounds useful in the long run to keep the backlogs sane.
->>>>
->>>> I did run all the tdc tests on the latest net tree and they passed. Also
->>>> my HFSC reproducer does not trigger with the proposed patch. I do not have
->>>> a simple reproducer at hand for the QFQ tree case that you mentioned. So
->>>> please verify this too if you can.
->>>>
->>>> Otherwise please feel free to go forward with the patch. If I can add
->>>> anything else to the discussion please let me know.
->>>>
->>>
->>> Please post the patch formally as per Cong request. A tdc test case of
->>> the reproducer would also help.
->>>
->>> cheers,
->>> jamal
->>
->> I sent a patch, though I am not terribly familiar with the tdc test case
->> infrastructure. If it is a no-op for you to translate the repro above into
->> the required format, please feel free to do that and post a patch for that.
->> Otherwise I can have a closer look at it tomorrow.
->>
+Breno Leitao wrote:
+> Hello Willem,
 > 
-> We'll help out this time - but it is a good idea to for you to learn
-> how to do it if you are going to keep finding issues on tc ;->
+> On Sat, Jun 28, 2025 at 10:57:20AM -0400, Willem de Bruijn wrote:
+> > Breno Leitao wrote:
+> > > +NETCONSOLE_CONFIGFS_PATH: str = "/sys/kernel/config/netconsole"
+> > > +NETCONS_REMOTE_PORT: int = 6666
+> > > +NETCONS_LOCAL_PORT: int = 1514
+> > > +# Max number of netcons messages to send. Each iteration will setup
+> > > +# netconsole and send 10 messages
+> > > +ITERATIONS: int = 20
+> > > +# MAPS contains the information coming from bpftrace
+> > > +# it will have only one key: @hits, which tells the number of times
+> > > +# netpoll_poll_dev() was called
+> > 
+> > nit: no longer has ampersand prefix
+> 
+> Good catch. I will update.
+> 
+> > > +def ethtool_read_rx_tx_queue(interface_name: str) -> tuple[int, int]:
+> > > +    """
+> > > +    Read the number of RX and TX queues using ethtool. This will be used
+> > > +    to restore it after the test
+> > > +    """
+> > > +    rx_queue = 0
+> > > +    tx_queue = 0
+> > > +
+> > > +    try:
+> > > +        ethtool_result = ethtool(f"-g {interface_name}").stdout
+> > > +        for line in ethtool_result.splitlines():
+> > > +            if line.startswith("RX:"):
+> > > +                rx_queue = int(line.split()[1])
+> > > +            if line.startswith("TX:"):
+> > > +                tx_queue = int(line.split()[1])
+> > 
+> > Does this work on devices that use combined?
+> 
+> Not sure. This is suppossed to work mostly on netdevsim (for now).
 
-Lion, I attached a patch to this email that edits Cong's original tdc test
-case to account for your reproducer. Please resend your patch with it (after
-the 24 hour wait period).
+Okay. Given that the test targets that. LGTM.
+ 
+> Since I am not familiar with combined TX/RX, I've looked at ethtool
+> code, and it seems RX and TX wil always be printed?
+> 
+> This is what I found when `-g` is passed to ethtool.
 
-cheers,
-Victor
+I'm also a bit confused about how combined is supposed to work. This
+was discussed or documented somewhere recently, but I can't seem to
+find an authoritative reference.
 
---------------9XN1Kb46LNeDZwuePxkMKgGJ
-Content-Type: text/x-patch; charset=UTF-8;
- name="0001-selftests-tc-testing-Fix-test-case-831d-to-reproduce.patch"
-Content-Disposition: attachment;
- filename*0="0001-selftests-tc-testing-Fix-test-case-831d-to-reproduce.pa";
- filename*1="tch"
-Content-Transfer-Encoding: base64
+To my intuition, "tx N rx M" is equivalent to "combined min(N, M)"
+plus the remainder of the larger ones. So "tx 1 rx 1" is equivalent
+to "combined 1". But not sure if this is true for all drivers.
 
-RnJvbSAwMmI2NDNmNDc3N2M0Yzc4MjI3MTgzNGMwNWE0Zjk4OTM3OTc2N2EwIE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBWaWN0b3IgTm9ndWVpcmEgPHZpY3RvckBtb2phdGF0
-dS5jb20+CkRhdGU6IE1vbiwgMzAgSnVuIDIwMjUgMTc6Mjc6NDQgKzAwMDAKU3ViamVjdDog
-W1BBVENIIG5ldC1uZXh0XSBzZWxmdGVzdHMvdGMtdGVzdGluZzogRml4IHRlc3QgY2FzZSA4
-MzFkIHRvIHJlcHJvZHVjZSBVQUYgc2NlbmFyaW8KCk1ha2UgdGVzdCBjYXNlIDgzMWQgZGVs
-ZXRlIHRoZSBIRlNDIGNsYXNzIGFuZCB0aGVuIHNlbmQgcGFja2V0cyBzbyB0aGF0IGl0CmNh
-biByZXByb2R1Y2UgdGhlIHJlcG9ydGVkIFVBRiBzY2VuYXJpbyBbMV0uCgpbMV0gaHR0cHM6
-Ly9sb3JlLmtlcm5lbC5vcmcvbmV0ZGV2LzQ1ODc2ZjE0LWNmMjgtNDE3Ny04ZWFkLWJiNzY5
-ZmQ5ZTU3YUBnbWFpbC5jb20vCgpTaWduZWQtb2ZmLWJ5OiBWaWN0b3IgTm9ndWVpcmEgPHZp
-Y3RvckBtb2phdGF0dS5jb20+Ci0tLQogLi4uL3RjLXRlc3RpbmcvdGMtdGVzdHMvaW5mcmEv
-cWRpc2NzLmpzb24gICAgIHwgMzUgKysrKysrKysrLS0tLS0tLS0tLQogMSBmaWxlIGNoYW5n
-ZWQsIDE2IGluc2VydGlvbnMoKyksIDE5IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL3Rv
-b2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL3RjLXRlc3RpbmcvdGMtdGVzdHMvaW5mcmEvcWRpc2Nz
-Lmpzb24gYi90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy90Yy10ZXN0aW5nL3RjLXRlc3RzL2lu
-ZnJhL3FkaXNjcy5qc29uCmluZGV4IDlhYTQ0ZDgxNzZkOS4uMGQzOTc5MzM0YTRlIDEwMDY0
-NAotLS0gYS90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy90Yy10ZXN0aW5nL3RjLXRlc3RzL2lu
-ZnJhL3FkaXNjcy5qc29uCisrKyBiL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL3RjLXRlc3Rp
-bmcvdGMtdGVzdHMvaW5mcmEvcWRpc2NzLmpzb24KQEAgLTU4MCwyNiArNTgwLDIzIEBACiAg
-ICAgICAgICJjYXRlZ29yeSI6IFsicWRpc2MiLCAiaGZzYyIsICJkcnIiLCAibmV0ZW0iLCAi
-YmxhY2tob2xlIl0sCiAgICAgICAgICJwbHVnaW5zIjogeyAicmVxdWlyZXMiOiBbIm5zUGx1
-Z2luIiwgInNjYXB5UGx1Z2luIl0gfSwKICAgICAgICAgInNldHVwIjogWwotICAgICAgICAg
-ICAgIiRJUCBsaW5rIHNldCBkZXYgJERFVjEgdXAgfHwgdHJ1ZSIsCi0gICAgICAgICAgICAi
-JFRDIHFkaXNjIGFkZCBkZXYgJERFVjEgcm9vdCBoYW5kbGUgMTogZHJyIiwKLSAgICAgICAg
-ICAgICIkVEMgZmlsdGVyIGFkZCBkZXYgJERFVjEgcGFyZW50IDE6IGJhc2ljIGNsYXNzaWQg
-MToxIiwKLSAgICAgICAgICAgICIkVEMgY2xhc3MgYWRkIGRldiAkREVWMSBwYXJlbnQgMTog
-Y2xhc3NpZCAxOjEgZHJyIiwKLSAgICAgICAgICAgICIkVEMgcWRpc2MgYWRkIGRldiAkREVW
-MSBwYXJlbnQgMToxIGhhbmRsZSAyOiBoZnNjIGRlZiAxIiwKLSAgICAgICAgICAgICIkVEMg
-Y2xhc3MgYWRkIGRldiAkREVWMSBwYXJlbnQgMjogY2xhc3NpZCAyOjEgaGZzYyBydCBtMSA4
-IGQgMSBtMiAwIiwKLSAgICAgICAgICAgICIkVEMgcWRpc2MgYWRkIGRldiAkREVWMSBwYXJl
-bnQgMjoxIGhhbmRsZSAzOiBuZXRlbSIsCi0gICAgICAgICAgICAiJFRDIHFkaXNjIGFkZCBk
-ZXYgJERFVjEgcGFyZW50IDM6MSBoYW5kbGUgNDogYmxhY2tob2xlIgorICAgICAgICAgICAg
-IiRJUCBsaW5rIHNldCBkZXYgJERVTU1ZIHVwIHx8IHRydWUiLAorICAgICAgICAgICAgIiRJ
-UCBhZGRyIGFkZCAxMC4xMC4xMS4xMC8yNCBkZXYgJERVTU1ZIHx8IHRydWUiLAorICAgICAg
-ICAgICAgIiRUQyBxZGlzYyBhZGQgZGV2ICREVU1NWSByb290IGhhbmRsZSAxOiBkcnIiLAor
-ICAgICAgICAgICAgIiRUQyBmaWx0ZXIgYWRkIGRldiAkRFVNTVkgcGFyZW50IDE6IGJhc2lj
-IGNsYXNzaWQgMToxIiwKKyAgICAgICAgICAgICIkVEMgY2xhc3MgYWRkIGRldiAkRFVNTVkg
-cGFyZW50IDE6IGNsYXNzaWQgMToxIGRyciIsCisgICAgICAgICAgICAiJFRDIHFkaXNjIGFk
-ZCBkZXYgJERVTU1ZIHBhcmVudCAxOjEgaGFuZGxlIDI6IGhmc2MgZGVmIDEiLAorICAgICAg
-ICAgICAgIiRUQyBjbGFzcyBhZGQgZGV2ICREVU1NWSBwYXJlbnQgMjogY2xhc3NpZCAyOjEg
-aGZzYyBydCBtMSA4IGQgMSBtMiAwIiwKKyAgICAgICAgICAgICIkVEMgcWRpc2MgYWRkIGRl
-diAkRFVNTVkgcGFyZW50IDI6MSBoYW5kbGUgMzogbmV0ZW0iLAorICAgICAgICAgICAgIiRU
-QyBxZGlzYyBhZGQgZGV2ICREVU1NWSBwYXJlbnQgMzoxIGhhbmRsZSA0OiBibGFja2hvbGUi
-LAorICAgICAgICAgICAgInBpbmcgLWMxIC1XMC4wMSAtSSAkRFVNTVkgMTAuMTAuMTEuMTEg
-fHwgdHJ1ZSIsCisgICAgICAgICAgICAiJFRDIGNsYXNzIGRlbCBkZXYgJERVTU1ZIGNsYXNz
-aWQgMToxIgogICAgICAgICBdLAotICAgICAgICAic2NhcHkiOiB7Ci0gICAgICAgICAgICAi
-aWZhY2UiOiAiJERFVjAiLAotICAgICAgICAgICAgImNvdW50IjogNSwKLSAgICAgICAgICAg
-ICJwYWNrZXQiOiAiRXRoZXIoKS9JUChkc3Q9JzEwLjEwLjEwLjEnLCBzcmM9JzEwLjEwLjEw
-LjEwJykvSUNNUCgpIgotICAgICAgICB9LAotICAgICAgICAiY21kVW5kZXJUZXN0IjogIiRU
-QyAtcyBxZGlzYyBzaG93IGRldiAkREVWMSIsCi0gICAgICAgICJleHBFeGl0Q29kZSI6ICIw
-IiwKLSAgICAgICAgInZlcmlmeUNtZCI6ICIkVEMgLXMgcWRpc2Mgc2hvdyBkZXYgJERFVjEi
-LAotICAgICAgICAibWF0Y2hQYXR0ZXJuIjogInFkaXNjIGhmc2MiLAotICAgICAgICAibWF0
-Y2hDb3VudCI6ICIxIiwKLSAgICAgICAgInRlYXJkb3duIjogWyIkVEMgcWRpc2MgZGVsIGRl
-diAkREVWMSByb290IGhhbmRsZSAxOiBkcnIiXQorICAgICAgICAiY21kVW5kZXJUZXN0Ijog
-InBpbmcgLWMxIC1XMC4wMSAtSSAkRFVNTVkgMTAuMTAuMTEuMTEiLAorICAgICAgICAiZXhw
-RXhpdENvZGUiOiAiMSIsCisgICAgICAgICJ2ZXJpZnlDbWQiOiAiJFRDIC1qIGNsYXNzIGxz
-IGRldiAkRFVNTVkgY2xhc3NpZCAxOjEiLAorICAgICAgICAibWF0Y2hKU09OIjogW10sCisg
-ICAgICAgICJ0ZWFyZG93biI6IFsiJFRDIHFkaXNjIGRlbCBkZXYgJERVTU1ZIHJvb3QgaGFu
-ZGxlIDE6IGRyciJdCiAgICAgfSwKICAgICB7CiAgICAgICAgICJpZCI6ICIzMDllIiwKLS0g
-CjIuMzQuMQoK
-
---------------9XN1Kb46LNeDZwuePxkMKgGJ--
+Anyway, as said, targeting netdevsim, so can leave out of scope.
 
