@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-202385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D4B3AEDB03
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:31:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF1CFAEDB05
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:31:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79F623B8B75
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:30:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF7DF1782FB
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:31:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA32525743B;
-	Mon, 30 Jun 2025 11:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CACFB25F968;
+	Mon, 30 Jun 2025 11:31:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="h/J4umIS"
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="At8pOnC+"
 X-Original-To: netdev@vger.kernel.org
-Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011069.outbound.protection.outlook.com [52.101.65.69])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012063.outbound.protection.outlook.com [52.101.66.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CCEE231858;
-	Mon, 30 Jun 2025 11:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49A5B1DF73C;
+	Mon, 30 Jun 2025 11:30:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.63
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751283059; cv=fail; b=cAdQgKkO8Bgeh1s0BB5d7S/WASFKpiftVg3Cz5ab7GgApEIEj2JmYtXroQqmmF8cTCN6M3OgYiS+/Rg/N9ZOZZDAporS7+8CRQ09EFtlYOMmlWwTGZMKbEd529MEIaLUdeWCZFANyquMTbrhpQ4nnmwcjmuLVTggYjt3ffauVzU=
+	t=1751283063; cv=fail; b=VD9aSUIBBfEyQZt/jT/t1CAbdKcZyhN97YV7qrlRnLotJu1n9tpH/JHnY0mTAcFfX2T5xFfect6TAXKOCtqgB2OzGcFJllz/7Kx6YuPDmFcm1XV02Yi4Af4pmPEOILfFNWuczUuC0ZZgOYlA1v6ZGJs6vDZvKB6A9tkRdxMCmqM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751283059; c=relaxed/simple;
-	bh=KiIbifbixQcG/JBkbf4WKrEzQYqst9RQExjTLr4Fg1g=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dOoEPJmm8eqaRjSajzRbY8m3JGphfeGmK/622E4/vq9LvHIuFN8WziJCNLEmk6977YTvH6KL5d645PuhUrj6aHDNPNjhN46yiZksGYjudUpXDkBOBLFQyUySbKBW5R7I/fnyF5uYNH2/oRVcQkllkhf5yqP3afPMGpzXgO26Fp0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=2n.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=h/J4umIS; arc=fail smtp.client-ip=52.101.65.69
+	s=arc-20240116; t=1751283063; c=relaxed/simple;
+	bh=kyDwrgfelgd6Pcao5lOBIvpZdobINgHiB1Y8GKO13pE=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=S3CehWL/8mBsSNr90C8SHbk4Zl/rf827CP8jgv9ZhGYQmWWGmvjobw7vT613KisIPXtMNElgM+geEIWQIfqDdylskPXBoitrnvU8ACUu6v30N5AdYv+5nbnVJf91cI4bHXyVCUcksTb/HqZdt/Gc9dC1k0LAK96ulqRxvnjCtsw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=2n.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=At8pOnC+; arc=fail smtp.client-ip=52.101.66.63
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=2n.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Lxpa5aVNasayINaKfBLMlgdrDTmKg0DdzzNSk6sclqzNuAeLSNRBeCmkAjNWK0+HmTJI+zP/n6sr+cagBG3b9bFVs4iBabxR3/lYLbFrfRIEXkX6Y13O7sl6XsEigS/nzEOzu+PNTNTBz5SEUiZhRNYWbfJhRyD80ynzW7EAVInjOZtx7Soepl/yJ9ZMqRkKqylP86XuOBm7Zv9nrgiESWb9GRskbVnI9BCV15GQbV6x75ZEBoCU29GTgiynxBfzqZeHWW3VvFWPi7tdJxuUTIwPjYs3z2ZPEP25PtMcPmZbjwrbHXKwgYZgwdWpRWN7mVg+vpJpjkKJ82TAJNDXzQ==
+ b=hXawjqFc6oTNqeN1njyiRAIqZ0MsIVxK5FnihB/FWFfl7gBjjLWhTzSDPjp6C1HxVU5aInASfjgv8VoDeXO1JUa8nub56EVDOhvQpb1DgTA/nS3rBTbPAglsJnJ/0jyWYuZpt0CPGLhB2oMcGtFdD2DQy2wpEh+CTaDsF7+aQqi7eP0hfy3+7xv8Fh+WAJiXr0RpNPU91hoIQ+VP4+InOgV5fChozMfb6J1I1aUTu+MMSsjUj1cLtU+UY9El0FaJ1sz3QrvaeWMjKOWo9rfOnHjiqhm1Nww57up+wK1lNLrgAqyZfwpByNF7qw8Lr3ZPZnhxL4Rw6ELxeP9HKbn6aQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ow7NKXsGuVhjBtaukSiXs0U3ynFs+EKO3pdSc/CK+oU=;
- b=h3qYs492I2/ea8TjY3alVcFkglXuBwHdlkQm9Kixy/4tyDusGrWkA9SRIN7zMeB6af1J9zNe1Rw37hFrQK/d2Dgo7f03z0POOR0E2SidobNsDkWGgW36ADIifxAh0NcL7K+VVWNbUAKVAEghBq0hLKSmhA9/Pq7Av7JWaS5DNkwMI9+4GyoqkOHmqGnYWBSDIF0A9O5Ii6/nmzVmGKmNWrK2Qt5TrUy4GsZW6eXKQR93d/SAJq1+yDkBCmsBvMj+fOTuR+7r1VmEC9Im6HEqUssd5FhkallKbyzBjbdmvnO4AsTQB1b4mrpxDibJb0wg9/Map9vutFtOAKJ4ESj/mQ==
+ bh=f/Q4khuupCDjG70AcbVcBr2t7jliAHS+WQfeKQj2wfU=;
+ b=bvl8MgBjF2POVUc0PRnzRHgm9Rl2ngDmJPviIkDQGW3X/N29Y2MemGUJvbyUVnSvP1t+6tCrxPJ1rUTqao+qQlPmhrCOLdMUvaMZUDbAciMrh5FY/PS3JSrSt1ZmrD1K2fS0QyqVtMVsNCAPCv+c0XAEo3l+b33YGA2B66MpHeEhfDSuIjKP+EabAcTurcNwdy+pyM+rHcezNhQ3i4XaaXW5w1SEoNOLme4RzRRRc7kQMJ0qmIoweqNe6zFElxaM0nf2Wpy4TPTrXxDVNtPeDgZAgtDESQbLFBir3b5vmHTebQ6WXhGEiuKXUfSP3vzw7B8dcsJZZhtv757jqSEMsw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  195.60.68.100) smtp.rcpttodomain=broadcom.com smtp.mailfrom=2n.com;
  dmarc=fail (p=none sp=none pct=100) action=none header.from=axis.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ow7NKXsGuVhjBtaukSiXs0U3ynFs+EKO3pdSc/CK+oU=;
- b=h/J4umIS9sHHwMIbzIkLfYJVw2uo7nLSIAS27vpv20ruR9PHFLFtpUb55nCJvnWpLnb4Yb1TljgswOvqyfxzY8TOpbccqRLOOLcuNypDv+DVMn8zYaeXYZLiVDj6Xyw+9M1ZcqCy1K6nBDweSZv15tHB1C5WKFlxHymE2tyBGAs=
-Received: from AS4PR10CA0017.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:5d8::7)
- by DBAPR02MB6134.eurprd02.prod.outlook.com (2603:10a6:10:18c::18) with
+ bh=f/Q4khuupCDjG70AcbVcBr2t7jliAHS+WQfeKQj2wfU=;
+ b=At8pOnC+ZbYtrU7N02Z77fGWozwEa71t0TzBjpcUVCgvaPHJ/T6zILD7ACOZbvl3PwZxcQaVNN1nrUoNX/7bJbMYKWP0X3+5DwL2F/F8Od0D3tMlRy/vPvlakiTGJS7rAq3S1MCi/uDlbJ+XUpClCd29YuA09tk8DYi/ohFdERg=
+Received: from AS4PR10CA0027.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:5d8::17)
+ by VI1PR02MB10250.eurprd02.prod.outlook.com (2603:10a6:800:1ca::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.26; Mon, 30 Jun
- 2025 11:30:54 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.25; Mon, 30 Jun
+ 2025 11:30:55 +0000
 Received: from AM2PEPF0001C70A.eurprd05.prod.outlook.com
- (2603:10a6:20b:5d8:cafe::5f) by AS4PR10CA0017.outlook.office365.com
- (2603:10a6:20b:5d8::7) with Microsoft SMTP Server (version=TLS1_3,
+ (2603:10a6:20b:5d8:cafe::38) by AS4PR10CA0027.outlook.office365.com
+ (2603:10a6:20b:5d8::17) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.30 via Frontend Transport; Mon,
- 30 Jun 2025 11:30:54 +0000
+ 30 Jun 2025 11:30:55 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 195.60.68.100)
  smtp.mailfrom=2n.com; dkim=none (message not signed) header.d=none;dmarc=fail
  action=none header.from=axis.com;
@@ -68,7 +69,7 @@ Received: from mail.axis.com (195.60.68.100) by
 Received: from pcczc3457tyd.2n.cz.axis.com (10.4.0.13) by se-mail01w.axis.com
  (10.20.40.7) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.44; Mon, 30 Jun
- 2025 13:30:53 +0200
+ 2025 13:30:54 +0200
 From: =?UTF-8?q?Kamil=20Hor=C3=A1k=20-=202N?= <kamilh@axis.com>
 To: <florian.fainelli@broadcom.com>, <bcm-kernel-feedback-list@broadcom.com>,
 	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
@@ -77,10 +78,12 @@ To: <florian.fainelli@broadcom.com>, <bcm-kernel-feedback-list@broadcom.com>,
 CC: <kamilh@axis.com>, <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <f.fainelli@gmail.com>, <robh@kernel.org>,
 	<andrew+netdev@lunn.ch>
-Subject: [PATCH net v3 0/4] net: phy: bcm54811: Fix the PHY initialization
-Date: Mon, 30 Jun 2025 13:30:29 +0200
-Message-ID: <20250630113033.978455-1-kamilh@axis.com>
+Subject: [PATCH net v3 1/4] net: phy: MII-Lite PHY interface mode
+Date: Mon, 30 Jun 2025 13:30:30 +0200
+Message-ID: <20250630113033.978455-2-kamilh@axis.com>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250630113033.978455-1-kamilh@axis.com>
+References: <20250630113033.978455-1-kamilh@axis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,102 +96,167 @@ X-ClientProxiedBy: se-mail02w.axis.com (10.20.40.8) To se-mail01w.axis.com
  (10.20.40.7)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM2PEPF0001C70A:EE_|DBAPR02MB6134:EE_
-X-MS-Office365-Filtering-Correlation-Id: f8167624-5b45-44a0-cd46-08ddb7c99334
+X-MS-TrafficTypeDiagnostic: AM2PEPF0001C70A:EE_|VI1PR02MB10250:EE_
+X-MS-Office365-Filtering-Correlation-Id: 44e276d2-2738-4ed8-4d0b-08ddb7c993a7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014|7416014|19092799006|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?WFRDSWx1THR5NGp4Nys2SkZNbnc5WEhYa1FjN1BUWmV3ZXVlb0NLUnYzU2pl?=
- =?utf-8?B?L1B0TXErekFpdlpNYllTL2VjcENFbjVJVWF6RFgyRWJNMEFlam1oZklEZmYy?=
- =?utf-8?B?Qy84bkpiWVVOZlVGQ01nb0kvTzdvaHRwbmlPZGl2dURsV05jTUxFNUNETG5a?=
- =?utf-8?B?MTV5TXVNOUVZUWwzZ3FYZWFVZ2Fza0dCK09GVldvVE9RT0xscUR1MnZwSFdK?=
- =?utf-8?B?OXBYVUluZDFoZXdycHQyQ1kwSjRQR1hIZnBBb0JZWnNKYmtrZ09abjN5cEc2?=
- =?utf-8?B?R3dKcTgyTUdvZ0ZKMXk4NDZaQ0Jva3Q4Wmc2TGhUYmt4RmhIY0FRQ2lwN1p6?=
- =?utf-8?B?WHA0RnFMc21tdzRCZGVwMkNiZVlYNVp2ak5WMStTVEpWMmRPb1VkOHg3M2lT?=
- =?utf-8?B?TWYzNitDZTZUZ0lDdllqR1JrMVoxaWxsNGN5REJSKzd5YmtDTE5LZlNlb1Rw?=
- =?utf-8?B?bHEzUGZMQy9hSmY2VzNXVmxuZVlYVkx0T25MZ05yWkxpYVgwWTFPMWtMQ0NI?=
- =?utf-8?B?eEE1L0FZWE9VV2txR1F1dGZZSjdGWXhqYmhTcmZFWDU0SENWVng0cklLaW9G?=
- =?utf-8?B?TmtsS0hWNnp0UzczRjZNUWtIN296cWFLY0NoaDlPYnNSVzI5N09ZRmtxUlhP?=
- =?utf-8?B?VnhpUjVrNE1FRysyeUFhVjViU0QvWEhhZ01HdEp0eEdkSWJZOWh1VWlJLytW?=
- =?utf-8?B?cElubjhXQ0hOYUlnZ2xhU2liMlVoQlkrQ1VuYS93V1JTdFpmT3JIL3JuWFBr?=
- =?utf-8?B?L0gxbjFRQmY5OE9mYTZFMVVxbitvamxBTnpodjh4TGNOSGxXdk5wZGVYUkwx?=
- =?utf-8?B?aS9OMUxpc05kV2VEVUc0dVBtQ2p5L2lyNGFPRHRPem9LaHdBY1FOTHJiOXJj?=
- =?utf-8?B?ekpKK2dPV2UvQ0ZzYUFVWEdKWk1qckZQNkxiejRoSXZGa0ZXbUtOZEhoajcz?=
- =?utf-8?B?UlRaVnprQkxUM0NEK2Y2Z3JKZ1llUXUyWmdodWJRUmRTaTFjeE9vcjRLUjYw?=
- =?utf-8?B?TTFMQXZtZkdQWEJyNnppVTZvMWZvWURLVGI2TWVObm1vb3N4SlAyUTVIUEkx?=
- =?utf-8?B?WUEwUms0SGVCak9UMGVab3pZYUhWQnQ2SzdSNmJlWm10VVNtN0hyaEo1S2hC?=
- =?utf-8?B?N1MvSUVveEU3TkdXZC9uWDVxeWxTcDFKVlpURHRTS2xUZ21XaGw5elZLQVlD?=
- =?utf-8?B?dlNha0Rqc25LUTJGZTZ4WDRYQldEYmF5SDNXYjRGNUI0NnpsT3EwaXJBSnp0?=
- =?utf-8?B?ZUpoUGkxMW50ZkdkWk0rVmJOSGZyalEwTDlJTU1Td0Z4U2Z0VkFhajh2ZWw0?=
- =?utf-8?B?SmN5YWxKeWNHYnN6azJsbk1NT1BvdEx2NHh2UnE5bEg1QlRjN3dzVlk5aVcy?=
- =?utf-8?B?clF1bkY1RE4rVDUzNmlFN1crQ2NURmNZWjg5ZGlqRkpUaS9jTlIrZWRpN2F5?=
- =?utf-8?B?UnFtbDVSYkpJRWluTTlkcndibW0yeDRRaGlQVkpDVU9kcVlRbGhKQ3lQZ3VG?=
- =?utf-8?B?d2R1OFZnV1laN3U5Qlh4azh3cGdTRG5FcXNMVU4xS2RVV2RKOTNjcVRKTGlU?=
- =?utf-8?B?Ky93K2s0K1RTdk1RUTZPcGpvQ3BjSkxaSlhEZTNCVHVha1Y4UFl0WTh6T01k?=
- =?utf-8?B?aDJpTDJEYnJLQ0RrZEp2bldaUkUyUE4vRXEyd2VucC8zeWI0UFJVV20vZy9y?=
- =?utf-8?B?MzdoUW5ZZ1BHQU9QYmk0ZTlSNm9wS0JyL0RHNThtVDFMYlUzRHFib2E0R0wr?=
- =?utf-8?B?Z0NsM3ZRYi9BZUJQSXhFR3FaQnNYc2d5TkhRd0R0TE1ERmZKOW90RFhZWG5p?=
- =?utf-8?B?bnMyeHo3bXlMQlhPVW92bzNXYVQzSWpIZjdlOS9SQ0R1Q0h2dkEvNm51YUxP?=
- =?utf-8?B?K05PeG5Da3JKUUZPcmhDNWNFd1Q1VHVvVnlNejNYbUtzVFo5enJJWE5tMTBI?=
- =?utf-8?B?QlFlMElDQU9hdkptN1d6ZXNpZTJRT0ZHMnF4Y2NsaW5kNXV0ZTZEL29nZGFu?=
- =?utf-8?B?YnhtR2NieVZERm14Um00Nkk0RGU1YjkvVGhQVTYyOVN1djVXcXJ6L3BTaHNp?=
- =?utf-8?B?NWVoR3NtWjFLdDAxTWdRNE85Z1p4dnpaS1VUQT09?=
+	=?utf-8?B?M09UT2x1Q3R4K2lSbHUvRDJ5cTA4bWYvYmJIbER1ZmdCUnVGZmxOL2tVMmh2?=
+ =?utf-8?B?N2cwcWo4VGpwUTBkL0RzdEdwUFU3dGhGT1N5bUczNWwzM0ZYU2sxRU55OGxj?=
+ =?utf-8?B?TEcvTldtWHAvUzV6clNqUWlsRWUreUVITUxLZ2ZTOUZsakV4Z0R0SWE5WkVQ?=
+ =?utf-8?B?RElHMFFqeXdDOG9SMkw3bGkrNU5nZGkzdzNsUSt1c2ZFRWtENXRpOWx5L1Bn?=
+ =?utf-8?B?ZDRXM09DTXFkRnI0R1pLMTRmeTN3eWN4dTBHSkZZR2pGVEIvQjRPMnUvSFE5?=
+ =?utf-8?B?SDRNTEptWkJuZERJUy9XQkxQSkZLQnFCeWFuTllQb1RRMUFuN3U1amF6clpO?=
+ =?utf-8?B?TjE1WWRmVEd5UDJYWkVTLzg3dnhaV2h5eHpLWnFPR3ZlY1ByaVFEUWpieEhU?=
+ =?utf-8?B?aEpReVRBWTBIR1JuYXN6TW5vZHNiL3NUNGlOTHFmcWdteDdsYkF0NWZWRjFS?=
+ =?utf-8?B?T3JxbTE3RzFYUHErbkV0M1hzOWsvMXVtUmF6Wnl5MDY3SWovNjVJNHlvUWl4?=
+ =?utf-8?B?VFo2QkIyUWNVZnZtcWVCNDRNZDJ6NVUvRy9zVVMvWTdmL2pMeGF0amVDcXFG?=
+ =?utf-8?B?UmhsN2RwSUFlc2lHdXFqSVlTczZoSnM5RFI2TVNOdXVSOUlMZ1c4amNjNHpS?=
+ =?utf-8?B?eGlGaitIKzhraHd6SEkvV1U5bS83WHRIQlIvc1FBYUlsblJTcTN4VWh3cll5?=
+ =?utf-8?B?SmNWMXJwS05MbDJuMWNqRk4yMDBsYWRPMmpaNnlVSkRoTmJkeE1icytta251?=
+ =?utf-8?B?MWlyNmRQeFFoSnVsMSszT283RVZOQlB3SUI4N3EvNEpKdkFiZEE4TFN2bWxy?=
+ =?utf-8?B?dGdGOG0xblFwTStXNkxSWUFqKzU0WERBUXVXNFZFcWdZcld0NVdCR0M3OFAr?=
+ =?utf-8?B?Y3M3enlzUElqelR0cTNkcHlpODhtWWVTZkJOV3B3eWxucVpoMW5WOGpqYWRI?=
+ =?utf-8?B?OEIyeEUyS0ZrOXAvQmoycFNlbHBuangvYnN2bzMyMDgzV3VSOTBabVE1RkRH?=
+ =?utf-8?B?MXNWeHY4Y1kvQXVaVDBzdnEvWkxiNjJwSzdEQ2xvT1YxODUydCtSd3BFNDRH?=
+ =?utf-8?B?dVNoMHl6R0ZsSW9VZkpQU0d1WFNnMXZPTGovVGVMWnJjd2FVMHpHdWpPZk9m?=
+ =?utf-8?B?S0J1WFhyTzJ4azMxeWJyRlEvY000VWZYUFlUSXR4U0tGMGhFMzV0aUp6V3lB?=
+ =?utf-8?B?bmVyNHVjb0dyLzA0aDlja1dsemVwWG5xT3ZFNzJUeHg2U2VIU0NROGk1OEJz?=
+ =?utf-8?B?K2lnQ21KY0RGRW5zcWZZNkpiclkweGtuRU9ici9DNDgweHZDaVc5QzNzK3Bs?=
+ =?utf-8?B?ckYvdmkrWVBGZGtaS1RIUTlES0RkcUxYT1ZicDVDT1kyaDhKeTZzQlNRYU54?=
+ =?utf-8?B?REFzcHAvb1dsQ0NjaG9wQ2xoUTRZRURlMFEwdlpDNHhnd1ZVNHZEN1BFMU9B?=
+ =?utf-8?B?azVMNGZhbnRrRXZsMWlzMm1udWpPaU92M3FCbjRKUENRVE4vQ3NIM21vT2pE?=
+ =?utf-8?B?S3ZRSWs3SVRuWG1tbEdKbWEwN3o4bE9kM3huZmxvQzFGWlhDcmNiZUQ0ZzB2?=
+ =?utf-8?B?MFVUeVpIcDZITXEzNFV5eGhpcW9FYUp0Rml6NXBSc3c2NzdFWVdwYTdJcDlp?=
+ =?utf-8?B?K2szSFVZUVR2dkJyR2Q0RU1yMWNpTzVzU3BsczhFTGZ0YzVYUUpVVm8rT0Uw?=
+ =?utf-8?B?R0VjTUQ3Z2RSeWtrMkNxcU5USDQ0K0R0czZUR3lVOUwwenp6aGlYOWlOSGhZ?=
+ =?utf-8?B?bzNmSy9mVDF5c0FjV0VvNCs3czZBc2xOa0RkY3FlR0JDR3hyTXdNSFlhelZi?=
+ =?utf-8?B?T3hMeHFpQ0kyY2dOc3pNcHpIdmJ6SzkrU1MzTU9pMG1lQzRIU0RkU2t3cmZX?=
+ =?utf-8?B?QTY0RWZXSnFvQThsdENsLytDeW9tV2g5TzZJMjBQMzlBelZpNUFwSjZOZS81?=
+ =?utf-8?B?RG4xTXRNdy9OYlZWUzc3OHh6WDJDLzZFNThoK2NndG1kZktJeUlkM25QQW5p?=
+ =?utf-8?B?WStOZVVmSlNyYmk1Zk5FZm02RVc5UHRGaGJBVzhuUHlTWEkvcHpxRjA3WHNS?=
+ =?utf-8?B?bG0yUEM4OTdQYVZZczNqOXlnWkFjV0hwaHhXdz09?=
 X-Forefront-Antispam-Report:
 	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014)(7416014)(19092799006)(921020);DIR:OUT;SFP:1101;
 X-OriginatorOrg: axis.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 11:30:54.2087
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 11:30:54.9588
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f8167624-5b45-44a0-cd46-08ddb7c99334
+X-MS-Exchange-CrossTenant-Network-Message-Id: 44e276d2-2738-4ed8-4d0b-08ddb7c993a7
 X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	AM2PEPF0001C70A.eurprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR02MB6134
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR02MB10250
 
-PATCH 1 - Add MII-Lite PHY interface mode as defined by Broadcom for
-   their two-wire PHYs. It can be used with most Ethernet controllers
-   under certain limitations (no half-duplex link modes etc.).
+Some Broadcom PHYs are capable to operate in simplified MII mode,
+without TXER, RXER, CRS and COL signals as defined for the MII.
+The MII-Lite mode can be used on most Ethernet controllers with full
+MII interface by just leaving the input signals (RXER, CRS, COL)
+inactive. The absence of COL signal makes half-duplex link modes
+impossible but does not interfere with BroadR-Reach link modes on
+Broadcom PHYs, because they are all full-duplex only.
 
-PATCH 2 - Add MII-Lite PHY interface type
+Add MII-Lite interface mode, especially for Broadcom two-wire PHYs.
 
-PATCH 3 - Activation of MII-Lite interface mode on Broadcom bcm5481x
-   PHYs
+Signed-off-by: Kamil Horák - 2N <kamilh@axis.com>
+---
+ Documentation/networking/phy.rst | 7 +++++++
+ drivers/net/phy/phy-core.c       | 1 +
+ drivers/net/phy/phy_caps.c       | 4 ++++
+ drivers/net/phy/phylink.c        | 1 +
+ include/linux/phy.h              | 4 ++++
+ 5 files changed, 17 insertions(+)
 
-PATCH 4 - Fix the BCM54811 PHY initialization so that it conforms
-   to the datasheet regarding a reserved bit in the LRE Control
-   register, which must be written to zero after every device reset.
-   Also fix the LRE Status register reading, there is another bit to
-   be ignored on bcm54811.
-
-Changes in v2:
-  - Applied reviewers' comments
-  - Divided into more patches (separated common and Broadcom
-   PHY specific code)
-
-Changes in v3:
-  - Added MII-Lite documentation
-
-
-Kamil Horák - 2N (4):
-  net: phy: MII-Lite PHY interface mode
-  dt-bindings: ethernet-phy: add MII-Lite phy interface type
-  net: phy: bcm5481x: MII-Lite activation
-  net: phy: bcm54811: Fix the PHY initialization
-
- .../bindings/net/ethernet-controller.yaml     |  1 +
- Documentation/networking/phy.rst              |  7 ++++
- drivers/net/phy/broadcom.c                    | 39 ++++++++++++++++---
- drivers/net/phy/phy-core.c                    |  1 +
- drivers/net/phy/phy_caps.c                    |  4 ++
- drivers/net/phy/phylink.c                     |  1 +
- include/linux/brcmphy.h                       |  7 ++++
- include/linux/phy.h                           |  4 ++
- 8 files changed, 59 insertions(+), 5 deletions(-)
-
+diff --git a/Documentation/networking/phy.rst b/Documentation/networking/phy.rst
+index f64641417c54..7f159043ad5a 100644
+--- a/Documentation/networking/phy.rst
++++ b/Documentation/networking/phy.rst
+@@ -333,6 +333,13 @@ Some of the interface modes are described below:
+     SerDes lane, each port having speeds of 2.5G / 1G / 100M / 10M achieved
+     through symbol replication. The PCS expects the standard USXGMII code word.
+ 
++``PHY_INTERFACE_MODE_MIILITE``
++    Non-standard, simplified MII mode, without TXER, RXER, CRS and COL signals
++    as defined for the MII. The absence of COL signal makes half-duplex link
++    modes impossible but does not interfere with BroadR-Reach link modes on
++    Broadcom (and other two-wire Ethernet) PHYs, because they are full-duplex
++    only.
++
+ Pause frames / flow control
+ ===========================
+ 
+diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
+index e177037f9110..b2df06343b7e 100644
+--- a/drivers/net/phy/phy-core.c
++++ b/drivers/net/phy/phy-core.c
+@@ -115,6 +115,7 @@ int phy_interface_num_ports(phy_interface_t interface)
+ 		return 0;
+ 	case PHY_INTERFACE_MODE_INTERNAL:
+ 	case PHY_INTERFACE_MODE_MII:
++	case PHY_INTERFACE_MODE_MIILITE:
+ 	case PHY_INTERFACE_MODE_GMII:
+ 	case PHY_INTERFACE_MODE_TBI:
+ 	case PHY_INTERFACE_MODE_REVMII:
+diff --git a/drivers/net/phy/phy_caps.c b/drivers/net/phy/phy_caps.c
+index 38417e288611..b4a4dea3e756 100644
+--- a/drivers/net/phy/phy_caps.c
++++ b/drivers/net/phy/phy_caps.c
+@@ -316,6 +316,10 @@ unsigned long phy_caps_from_interface(phy_interface_t interface)
+ 		link_caps |= BIT(LINK_CAPA_100HD) | BIT(LINK_CAPA_100FD);
+ 		break;
+ 
++	case PHY_INTERFACE_MODE_MIILITE:
++		link_caps |= BIT(LINK_CAPA_10FD) | BIT(LINK_CAPA_100FD);
++		break;
++
+ 	case PHY_INTERFACE_MODE_TBI:
+ 	case PHY_INTERFACE_MODE_MOCA:
+ 	case PHY_INTERFACE_MODE_RTBI:
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 0faa3d97e06b..766cad40f1b8 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -234,6 +234,7 @@ static int phylink_interface_max_speed(phy_interface_t interface)
+ 	case PHY_INTERFACE_MODE_SMII:
+ 	case PHY_INTERFACE_MODE_REVMII:
+ 	case PHY_INTERFACE_MODE_MII:
++	case PHY_INTERFACE_MODE_MIILITE:
+ 		return SPEED_100;
+ 
+ 	case PHY_INTERFACE_MODE_TBI:
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index e194dad1623d..6aad4b741c01 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -103,6 +103,7 @@ extern const int phy_basic_ports_array[3];
+  * @PHY_INTERFACE_MODE_QUSGMII: Quad Universal SGMII
+  * @PHY_INTERFACE_MODE_1000BASEKX: 1000Base-KX - with Clause 73 AN
+  * @PHY_INTERFACE_MODE_10G_QXGMII: 10G-QXGMII - 4 ports over 10G USXGMII
++ * @PHY_INTERFACE_MODE_MIILITE: MII-Lite - MII without RXER TXER CRS COL
+  * @PHY_INTERFACE_MODE_MAX: Book keeping
+  *
+  * Describes the interface between the MAC and PHY.
+@@ -144,6 +145,7 @@ typedef enum {
+ 	PHY_INTERFACE_MODE_QUSGMII,
+ 	PHY_INTERFACE_MODE_1000BASEKX,
+ 	PHY_INTERFACE_MODE_10G_QXGMII,
++	PHY_INTERFACE_MODE_MIILITE,
+ 	PHY_INTERFACE_MODE_MAX,
+ } phy_interface_t;
+ 
+@@ -260,6 +262,8 @@ static inline const char *phy_modes(phy_interface_t interface)
+ 		return "qusgmii";
+ 	case PHY_INTERFACE_MODE_10G_QXGMII:
+ 		return "10g-qxgmii";
++	case PHY_INTERFACE_MODE_MIILITE:
++		return "mii-lite";
+ 	default:
+ 		return "unknown";
+ 	}
 -- 
 2.39.5
 
