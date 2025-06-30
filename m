@@ -1,143 +1,225 @@
-Return-Path: <netdev+bounces-202532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 185E9AEE245
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 17:23:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C10CDAEE260
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 17:28:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C7CD168268
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 15:23:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8174A188A219
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 15:28:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2248D28CF44;
-	Mon, 30 Jun 2025 15:23:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2D1D28DF2F;
+	Mon, 30 Jun 2025 15:27:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XbwcMsN7"
+	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="dSg5uLnk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011024.outbound.protection.outlook.com [52.101.65.24])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69411284679;
-	Mon, 30 Jun 2025 15:23:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751297029; cv=none; b=K3Mnj3FJgd/jFflkAQGrR7rSLc1vUuS+1n94V7D29ZIp6/BUFF/I41G0smOlDwtfEeikW56Lcl0+zwKkVwgKoI/T/ABPO7SyvRvilGa2QOVQoPWrYMAF/LbIANI+sUWKPPA56t92NzLH4CumS2k+ADXZPa9un3Qa/OhTuMmCdkY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751297029; c=relaxed/simple;
-	bh=WridHKWMSH3/3DHi6VOoVFI5yEywRU4M1EeYGx6uplc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tqbFmmn16EMoyb+n93a/QPvTGXDaeq2mX7RayaAGngjrKZCqW2QWPsb4OniOPUi7ziGQchVilDUqd6JSISj6PfEmhNyytI0qSZWdAhk8M5qj2GcrMpvtwoUB7+w0EjXMgygFPbuySX1sb7AYIRS4gav1pf2ceeBd5ddpgxihb8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XbwcMsN7; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3122368d7cfso2919153a91.1;
-        Mon, 30 Jun 2025 08:23:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751297027; x=1751901827; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kSp9mfEjlX0kZ4Q6UH6CG7ddVH5ZdVCTMUB3Iwz+3MU=;
-        b=XbwcMsN7kDNmbTAptJe3bV0pV0nSp9bp0nuEdoOcftl4RwQ82kfuj5T6k4NSdo+wF5
-         zFy3iV3monxUw9dM32VCW+mD98PVkKIRNmT1jt+sygMjdx5w4+xVjsDClyre1tQcFIwu
-         sNp55LyUM/wC1MfnHCtCgSEz/ZBHaFEtUuvx1VOJdkyEGNG+M+mjxpuQZQZTyNHJYcvz
-         UMmDcbAaMN1zd+lpIUwdZW1eUQvVJhUm5oW3e3EohhSc0P07aFMihers90QhzQ7chPcX
-         bSbLZaunxTaJqj79brKsJLRUMyUffu7VrmJiL6fWtRTNgQZROWbE1CbNxeBWBJ6BElku
-         18KA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751297027; x=1751901827;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kSp9mfEjlX0kZ4Q6UH6CG7ddVH5ZdVCTMUB3Iwz+3MU=;
-        b=uhRAmPDPJBcjdFdY5Wbl5VE8boDWtJQdA3r1YaUZlnLojLo6rCFb4hkyyC6/lex9Ev
-         zxUqdBMeSvkPs8UKbZjEqeHNS2QdQ6YD9rGWNU/d86d81H9xS8kNGAw7YftF7TPLcE4j
-         3fsuxhN1FF9tvjwlc2XAR5O3nNGSrqqxICOrZptpS8xkTBsGqRp8XBku+CUeWrdGyT4a
-         GM9k9AGVvgK7NfuK/SSbrFZ6lTEYnynGRDFRGMbHV8CVgH/Zy4dIvfOHvqropkqT3zpC
-         wyyyyiIBmOP/U9WPzKujNWwcNWFBzUyhd3jSxdhak/kT6YZFo5jWcfLK9WyRAcf/nrKn
-         0q+g==
-X-Forwarded-Encrypted: i=1; AJvYcCWk6b8JBnfWs2LgF9ilVWeAc5MkpVtdq3na/y+GuyKkyws3Jjvg1KqVqJw47mTfWPKMko2FYIxa@vger.kernel.org, AJvYcCX+cGbc4wl5yomdm3Tc5LqJGQgYCyOQg0NUC4qWlZIvOmihSIlbJNn7KGUyToWncsD+bSs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx03z/BJcaZyHYZ5o1QU2tIfUHE2T/4WhSOtnYnY92w1xJt82tw
-	5Gk3QIMMYeRGGaynZAtzomVadzJb6K+5UTqR3hzMZx+KuuvC/5Nb4gs=
-X-Gm-Gg: ASbGncvE0LdQmee8rUIqvdbTFqqoZDWN6IvlkoOdHX9r3Ggq+h/2OlDvyiRTlIQMYGO
-	I0izcrei9l7rIN6uf+VlnWue09FBiwFD5DTsUwIqJenHLo8Kb1dD9R4wwYLcSCxOe8O8eL9UbWT
-	9TSvuHkb5gfevHm8jcclw1rt7nRZnbeViWU1YdEIBfgyVxygSYBJvXY0l9E6C49jiFWbTgaW76f
-	i4qRXGLKcXPpsjYqTEinXTqU/Qe42iqxxdD1yAFXaJ82VCSle1opZewv86hRtahCHXs0rKSHigX
-	NCeUIilQFC+d4imi4CzifqL6L+ACv80rE7UKom+/D8I2PYfagrDeMkTUWiH+hDO2aJ8b6rXPo38
-	vjHHlrUuttSNljleGOVa3AcI=
-X-Google-Smtp-Source: AGHT+IG8o0IEqGbychOj+zwyXb6twai8wIxcXDDb7EfuCDwZ9cbrEXbCyLhSOapzoM/vaWEnw1KvbA==
-X-Received: by 2002:a17:90b:3890:b0:315:6f2b:ce53 with SMTP id 98e67ed59e1d1-318c92e317amr19245157a91.25.1751297026512;
-        Mon, 30 Jun 2025 08:23:46 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-315f5426bf0sm14150838a91.23.2025.06.30.08.23.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jun 2025 08:23:46 -0700 (PDT)
-Date: Mon, 30 Jun 2025 08:23:45 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	bjorn@kernel.org, magnus.karlsson@intel.com,
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
-	joe@dama.to, willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v4 1/2] net: xsk: update tx queue consumer
- immediately after transmission
-Message-ID: <aGKsASYLRO0P5npe@mini-arch>
-References: <20250627085745.53173-1-kerneljasonxing@gmail.com>
- <20250627085745.53173-2-kerneljasonxing@gmail.com>
- <aGJ5t2hvN9wX+vxh@boxer>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827EC42AA4;
+	Mon, 30 Jun 2025 15:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.24
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751297278; cv=fail; b=ikujSpVaO5MjPBlv8hj+nx6tWxVJfb4dRJo9ByIcMis9mSR9kgOoc8/z9w+y5vzF0JBnRmJXFyoNUmOnsObdkjq8oufrkpSad1X9RIHaZ/5BS8BIU9nZtgC1RLY+zzz+zfd4CjJqDIqLdkvCeWxmbg0AURrvCCcTTt7BBIXMeSw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751297278; c=relaxed/simple;
+	bh=cYo+Sj0vkhSG+tKuKGdNfxnXsHbgj59wtUYGnEXatos=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=n1qkYwdAjTtUcHH/rL/AJmIOGeupLNt3pTaPJKuZLSeghDTuX9eFaBMjF1kyx6iQughNOsqQcmCzWo+58wYP9endqmgtr/kESthBw1sHCxMiJZ+ButgHViMUhzDCOd9Z8pbMUYx+cFxs8CZZz8c6VPxGKRD7x4qI2Ztr9F7DfJs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=dSg5uLnk; arc=fail smtp.client-ip=52.101.65.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JizuwP9QsloY5fcRmFZ1HEvnZhI+eNPYj68yZHC4W1PPOm+FJ2WOP6gg5wG73DbgR29awPoTuTZIff89mYCMLz0NjTlLTdQbt5OK1CK9O+UaQoSzXalzeeYtg5eiPFlIHXzdolivl9Qv/K+V3yj7O6Ecz89OGaA/gbApuei+1fu5BD3ZfbvZygwaUFdIkXem7z7Ff5haRuCW20n/jYlZxuB1feVgzCgwoCa5qkaJz55ciZapbaonsmUn5ZgpUGcVcE6ZJzLOBmgBTEXI3bxrbUfDgS5qlqOiwh3A2an0cWG6gWJ1o29NEnD9n0ltorjE+ZnRDABO+0fQeJiE0u0jWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cYo+Sj0vkhSG+tKuKGdNfxnXsHbgj59wtUYGnEXatos=;
+ b=NA9UpU3Exiv/S+OPjiYhLBqGQ7sBMXF8kitn/OwVdTxW/ihaL7hdD82m1IpsvPIgPU2ZybkM3WrD6vG7wRIEJ3J1Ep7AYYX2Gza5dGM+4NQ5ViQST1x+0+w69Z1Rw4kqhN1D7R1ymytNkVnFEwUdOHe4cBwUKScYDxOJZpDMhnF4qwkUhcWQUSifw6JxvkMG6OjEzFaYjZh7xClvtFo4ZWXL68hYfoK3/9UJT9VD0GoxeHhd7T/RWIrN3aOPFtOFFP0frZWS07Dm9AIqX7BaHkboSuxMZ3HXXWI0knM8eeN0O5PilGVfduS8M/HlaeHyj5muciJ1qMRP7Fs/Ge/hjA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nokia-bell-labs.com; dmarc=pass action=none
+ header.from=nokia-bell-labs.com; dkim=pass header.d=nokia-bell-labs.com;
+ arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cYo+Sj0vkhSG+tKuKGdNfxnXsHbgj59wtUYGnEXatos=;
+ b=dSg5uLnk2D5XmxX3dDCsm7bCneLySSQSYOVAwvwCaQ/mKMRLeEeYeYTxVucYoX/IGyHk093OX1Kih8F63RBuddg7XwS6Drln8Hc1Yum/L0RfoBTwAgxAV4hgkx4ut6edWDlemvjeH+XVyjRWq7sYZa4vNyPJUeJ5ATQxWBF4jS98eSmzYJSQyX7xtMPAhdGJ5xlyf7HU7XZ01Ezk0Ft9jwI5yVb7ICmkiW2a1aD3as2mzJxDV9NevfrdmaaFJEK35QyRZctUuedk6Qu/K2j+rCGG/gpuCHC3FrwvNLBdh3JgtJttuSEO6U1xdhpMcEEWSkNZHom5D2upqjLWxHauFQ==
+Received: from PAXPR07MB7984.eurprd07.prod.outlook.com (2603:10a6:102:133::12)
+ by DU2PR07MB9435.eurprd07.prod.outlook.com (2603:10a6:10:499::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.26; Mon, 30 Jun
+ 2025 15:27:53 +0000
+Received: from PAXPR07MB7984.eurprd07.prod.outlook.com
+ ([fe80::b7f8:dc0a:7e8d:56]) by PAXPR07MB7984.eurprd07.prod.outlook.com
+ ([fe80::b7f8:dc0a:7e8d:56%6]) with mapi id 15.20.8880.026; Mon, 30 Jun 2025
+ 15:27:53 +0000
+From: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>,
+	"pctammela@mojatatu.com" <pctammela@mojatatu.com>, "horms@kernel.org"
+	<horms@kernel.org>, "donald.hunter@gmail.com" <donald.hunter@gmail.com>,
+	"xandfury@gmail.com" <xandfury@gmail.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "dave.taht@gmail.com" <dave.taht@gmail.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "jhs@mojatatu.com"
+	<jhs@mojatatu.com>, "stephen@networkplumber.org"
+	<stephen@networkplumber.org>, "xiyou.wangcong@gmail.com"
+	<xiyou.wangcong@gmail.com>, "jiri@resnulli.us" <jiri@resnulli.us>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"ast@fiberby.net" <ast@fiberby.net>, "liuhangbin@gmail.com"
+	<liuhangbin@gmail.com>, "shuah@kernel.org" <shuah@kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"ij@kernel.org" <ij@kernel.org>, "ncardwell@google.com"
+	<ncardwell@google.com>, "Koen De Schepper (Nokia)"
+	<koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
+	<g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
+	<ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
+	<mirja.kuehlewind@ericsson.com>, "cheshire@apple.com" <cheshire@apple.com>,
+	"rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
+	<Jason_Livingood@comcast.com>, "vidhi_goel@apple.com" <vidhi_goel@apple.com>
+Subject: RE: [PATCH v20 net-next 6/6] Documentation: netlink: specs: tc: Add
+ DualPI2 specification
+Thread-Topic: [PATCH v20 net-next 6/6] Documentation: netlink: specs: tc: Add
+ DualPI2 specification
+Thread-Index: AQHb4uNqIs45AgjdskKJnV37K9wpJrQXrhYAgAMXXaCAAReHAIAAAq3g
+Date: Mon, 30 Jun 2025 15:27:52 +0000
+Message-ID:
+ <PAXPR07MB7984777E0A2438D287B4A3DBA346A@PAXPR07MB7984.eurprd07.prod.outlook.com>
+References: <20250621193331.16421-1-chia-yu.chang@nokia-bell-labs.com>
+	<20250621193331.16421-7-chia-yu.chang@nokia-bell-labs.com>
+	<20250627161930.385554c0@kernel.org>
+	<PAXPR07MB79842E86F802F227C79C05F6A347A@PAXPR07MB7984.eurprd07.prod.outlook.com>
+ <20250630081222.528202d5@kernel.org>
+In-Reply-To: <20250630081222.528202d5@kernel.org>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nokia-bell-labs.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR07MB7984:EE_|DU2PR07MB9435:EE_
+x-ms-office365-filtering-correlation-id: bae0b4a4-f602-49c6-9426-08ddb7eaae3a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?+lPVGS8bgfm2zr9hifPcGMMkHm6MFK4Ryif1C+gIBp80zK/54vAOMeUIsBGx?=
+ =?us-ascii?Q?kKgiu1AzeYpMaFTyWSZaKf+0j080ierfa++qM+F3uXAoO9LwM2ZsyT8x33Hd?=
+ =?us-ascii?Q?eLlrlzJHWVdnliRa6uNcQwQTOJyopp/NROZ+ZtAV9KDHoFC6dhHyTM0XlZ99?=
+ =?us-ascii?Q?4WiAZkCHjzLz5Xt8/mt5Eu5ZytkfKWsPAV4oMGGM4Nm0zV3vdcTBDMT8Bk21?=
+ =?us-ascii?Q?E5oMjY9ADf/JD7MRHIXN/ZZsR9P46B6CW3ntocZZ8YWn/UJJdVdhoGI+Miqv?=
+ =?us-ascii?Q?ZRTJbhjLFLKJS/tfXuvTSGOVQEz521o/IKpP7MoIOV0nh3wyfn6M9Hpb26p5?=
+ =?us-ascii?Q?iN2TDgghO6e1OV8khMVA+K4m+8exlj0y088tqgN9Jk7hlzx5xpkfiOidB80z?=
+ =?us-ascii?Q?ajXJXdlLtSeGzDWge0lJqaPK/OzQG37QVNDPkJ9M0+t59LgDE9+pbBay9LQc?=
+ =?us-ascii?Q?2yUeN3uL0OuCj4B1sq0+g70ztlli73Qbq/RDJ4LY6+kVyHiic1Z6PGd5Y8Xq?=
+ =?us-ascii?Q?geia861W7vVjR403PJdgX1WQjBejZ7nRYER7MzA+ZHckVRtPpsGmrLTgEY2F?=
+ =?us-ascii?Q?WQtZeFIY8nIcNmSh4KLz0E+h0sWCkD4bgKFHPuvqfcGJhCEhcjOOvl9xJASO?=
+ =?us-ascii?Q?XQ4QefCaRPSmvW+oKqrjh24wVSSM8A7q0d2fytlbS6HcOaKmmKVyWaIn/cw3?=
+ =?us-ascii?Q?AhvB+VLF1lcVL8uU861Smf3Al46GA+F1/Du5g6nK2Kqv7/bm75INmhMxXjqW?=
+ =?us-ascii?Q?dcMkPhmheDPRDWOfWtCb+kUV+4wdIYEhWp+INZeT1frmLRM6H7Aq+O8mvAq+?=
+ =?us-ascii?Q?YzWhChDg+7Ak8ZWuf+5IaW4R/wSLHGwwkQwNPj/enZoCfzU8/JkJnTB3djAo?=
+ =?us-ascii?Q?xDaXz4CED2R6JLmW0zblUaJf3nXBOL6BMN4TAFD/rw07TfhSr7+PvgkQg116?=
+ =?us-ascii?Q?YMZupHS8ZCPzdcWR8XspjE5lzsa6+euwCYmiF6+I5COSEnaaN1LZr8HGKBzD?=
+ =?us-ascii?Q?eWV8PL9T806q/SkExlMnqIFcXPO1vrSZNshlkqvNZGZKAtQ/OMdclHbg0SBY?=
+ =?us-ascii?Q?bLxBD9jpP24xWU9N+cu+F30il2mEi6p11erx7qMnSj0D8jE/o7E3jigcV40h?=
+ =?us-ascii?Q?qrzxOsFsQubIPm1MVBjbXnuVRiLAGQFXrJBIgNmlpt1B08eBs85In/MpWmZ0?=
+ =?us-ascii?Q?Z1M3D8PjNQG5YxAXE0mf/+kGvMwo7E1iWZCrdMb1QWJxnxub6lla042vY9i2?=
+ =?us-ascii?Q?KnFLZUKA1pq1FTrhDOf1tIr2ko9f1muupTx3rxmjFVCc7Q2JN+7y+mXs+wiv?=
+ =?us-ascii?Q?UZWrJLc/YxuZZx5+rkH74UsV9mJzgzKFRTsj3uij40a0cYI51MM/WCVlADnv?=
+ =?us-ascii?Q?WCNgR1KpU/3wDjJaBwbtUDVmeYuAKdRg14EzX7UxRL2AF6auP3F9ScXITkwQ?=
+ =?us-ascii?Q?fhSrqBmAAF4J2KOtdYbmuie6a+kfY1ZYDweYli4Jou3xvInaEgEiJEx0sQsn?=
+ =?us-ascii?Q?H3LsDBwJ0Ix99kE=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR07MB7984.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?5tI+x9ibV0pk/J3M1i2tb9iVf6D/8Ov8mJCxPFVqvJYDucZAT/6DgGbrc483?=
+ =?us-ascii?Q?YUwrqBHHY1oLvvpbPU60pcEaVmF05q/Z80tfCukxD55m7g9qu0wWS8/qrB7W?=
+ =?us-ascii?Q?YtZIEApf77TtNDnJ5YaYFY7gU6HY7uLClTOdM1sQALE0c66tCuvsli81pu83?=
+ =?us-ascii?Q?SEdyEjFVYNOcK0Gp007jlz2tRQH+4OesQnBcIPQaffxrXiHEQvRuWFejmiWG?=
+ =?us-ascii?Q?+HaQArp2RjJpMkHFm4iQ0I8FNKUDw0i3HB7/BnKnQ4dJRxWFhv9QLlrRkHll?=
+ =?us-ascii?Q?XykQCk/462VhdZzdYerTYAnKqBR2rafdOXPn0ZE+X+9WE2KDdfRqFy8ImaQB?=
+ =?us-ascii?Q?BWb+Mp6YGglLo7HBi+wFs1wAkk8s3cU2m8UWt/TU5TQzqUoR0wYFFFPujEc5?=
+ =?us-ascii?Q?8HpUhaARRr5n+SxZhQ3QtMSisn0lxFMWo/7TAIwAhQs2DNbuiEwT9ewO7/+5?=
+ =?us-ascii?Q?T1iS14NSKMsuHh4QNgtEanYXx30g+Bbk//ZxugsV/MFzlE7lv5PtT0rkg9ie?=
+ =?us-ascii?Q?pEMSkSWN0ejTjumIhR8Sp9gimPIcr0U+qAubwUpP5NMs/CPyGdLBBCtZi0au?=
+ =?us-ascii?Q?DOYsqQBVjJkkNa6zSma09gXLBG7PPjwJceahEO4UI1ec8eE83LuAx2s2m1Sk?=
+ =?us-ascii?Q?NoHaW/X3ivN8pONUCpMAbeDxqxqZuVkG9UJTqndHkntHoWQTI1tmeE37eo4J?=
+ =?us-ascii?Q?c0y3/IyoXyF2m4FGxrnC/oK0dTsgox+vDMIio+rZANlRRaMX6S78+C+Fh9rK?=
+ =?us-ascii?Q?nzOyqUYVDgjtfsQG4jrH+xaF2YYQHhdtBc0nbhS+EZVd1Jl1WoM+vJVA1J0I?=
+ =?us-ascii?Q?9A6/CO4z+VY7Y2wN0D6EqZHXNuz8cUjXqtg1U68kstBJBiVG0EhsFM1j+7ZU?=
+ =?us-ascii?Q?I+d33Ls0afcftmr3dNOvZQmU2Amd/Fe+qPLJXHYsXXGdUbvbVQf0np01ovNK?=
+ =?us-ascii?Q?8pgNMnjejSieS05HW4PUQmV4Uliefcm5Fn85/NNNN/HUaQrjP8g9rkJgsjDV?=
+ =?us-ascii?Q?pe8TzqBbhGHMw0nqeNePFf6LsUR5dtrGlRnQbmErNFXx1gXg/qxwE0WIYdvn?=
+ =?us-ascii?Q?sBLDchn9qMGg+g9UTJJiHx1+vOs4z3I+uxWr98orYAdtEcgd70Fnmgz+ITj3?=
+ =?us-ascii?Q?IU82+2qGH0jZ/v+ZBONmgbJ/HwgBCXqTPLHlV2WECXtIbyd8V6pDgSQqpDDe?=
+ =?us-ascii?Q?dyCCm6VaTphuzFhF9PdEuxkudKe2pgEvp4CQuzEc8tPBCVyG/XT4CRyC8taT?=
+ =?us-ascii?Q?8i3erDpQjyQCqdMjTyRqhxkrMdxvx8V35mSepRKW0dDqOTJYtjGOmQY/wPe2?=
+ =?us-ascii?Q?r1ILu9W9sJiwWKbWRHOGgphbU5nfOioHd+ynjc92c2aJ26yja6ONkoi77MTe?=
+ =?us-ascii?Q?ZX0GEUR1W2ckh0ppz9P7Yjq7Q4d/7cVS4DGj8m52ah0YWGrBHdM3OvASfQlq?=
+ =?us-ascii?Q?FWihcIQbx8sCdSsObnUYxGeYrKp3ehVbxFimoCGa8JGZyh2GskjYrkjFwk44?=
+ =?us-ascii?Q?EXzg5jecZAbDO+K9yePeHWuulsRRsesk0ujUVIwJbdkr3qp7KPK6XQ0JY6aG?=
+ =?us-ascii?Q?ZBiU3vzyNu7QlarFIUWVNYHbmy16DB/4QdOtgz/BZpxFxS2sTRtDlpXgr+CY?=
+ =?us-ascii?Q?mA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aGJ5t2hvN9wX+vxh@boxer>
+X-OriginatorOrg: nokia-bell-labs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR07MB7984.eurprd07.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bae0b4a4-f602-49c6-9426-08ddb7eaae3a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jun 2025 15:27:52.9392
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 0LMpP1N5sKF/2s03d9GtVZm8qxinpGFiPAF6eZ0myzjSrDVrJWo1XGKcSaH9R9DZIllUYn5V8n1VD/DKC4z5cebTIMMzfoje6pX61DQw+0GN7JibFGEbEX+H5sNusk/K
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR07MB9435
 
-On 06/30, Maciej Fijalkowski wrote:
-> On Fri, Jun 27, 2025 at 04:57:44PM +0800, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> > 
-> > For afxdp, the return value of sendto() syscall doesn't reflect how many
-> > descs handled in the kernel. One of use cases is that when user-space
-> > application tries to know the number of transmitted skbs and then decides
-> > if it continues to send, say, is it stopped due to max tx budget?
-> > 
-> > The following formular can be used after sending to learn how many
-> > skbs/descs the kernel takes care of:
-> > 
-> >   tx_queue.consumers_before - tx_queue.consumers_after
-> > 
-> > Prior to the current patch, in non-zc mode, the consumer of tx queue is
-> > not immediately updated at the end of each sendto syscall when error
-> > occurs, which leads to the consumer value out-of-dated from the perspective
-> > of user space. So this patch requires store operation to pass the cached
-> > value to the shared value to handle the problem.
-> > 
-> > More than those explicit errors appearing in the while() loop in
-> > __xsk_generic_xmit(), there are a few possible error cases that might
-> > be neglected in the following call trace:
-> > __xsk_generic_xmit()
-> >     xskq_cons_peek_desc()
-> >         xskq_cons_read_desc()
-> > 	    xskq_cons_is_valid_desc()
-> > It will also cause the premature exit in the while() loop even if not
-> > all the descs are consumed.
-> > 
-> > Based on the above analysis, using @sent_frame could cover all the possible
-> > cases where it might lead to out-of-dated global state of consumer after
-> > finishing __xsk_generic_xmit().
-> > 
-> > The patch also adds a common helper __xsk_tx_release() to keep align
-> > with the zc mode usage in xsk_tx_release().
-> > 
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> 
-> Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>=20
+> Sent: Monday, June 30, 2025 5:12 PM
+> To: Chia-Yu Chang (Nokia) <chia-yu.chang@nokia-bell-labs.com>
+> Cc: alok.a.tiwari@oracle.com; pctammela@mojatatu.com; horms@kernel.org; d=
+onald.hunter@gmail.com; xandfury@gmail.com; netdev@vger.kernel.org; dave.ta=
+ht@gmail.com; pabeni@redhat.com; jhs@mojatatu.com; stephen@networkplumber.o=
+rg; xiyou.wangcong@gmail.com; jiri@resnulli.us; davem@davemloft.net; edumaz=
+et@google.com; andrew+netdev@lunn.ch; ast@fiberby.net; liuhangbin@gmail.com=
+; shuah@kernel.org; linux-kselftest@vger.kernel.org; ij@kernel.org; ncardwe=
+ll@google.com; Koen De Schepper (Nokia) <koen.de_schepper@nokia-bell-labs.c=
+om>; g.white@cablelabs.com; ingemar.s.johansson@ericsson.com; mirja.kuehlew=
+ind@ericsson.com; cheshire@apple.com; rs.ietf@gmx.at; Jason_Livingood@comca=
+st.com; vidhi_goel@apple.com
+> Subject: Re: [PATCH v20 net-next 6/6] Documentation: netlink: specs: tc: =
+Add DualPI2 specification
+>=20
+>=20
+> CAUTION: This is an external email. Please be very careful when clicking =
+links or opening attachments. See the URL nok.it/ext for additional informa=
+tion.
+>=20
+>=20
+>=20
+> On Sun, 29 Jun 2025 22:32:15 +0000 Chia-Yu Chang (Nokia) wrote:
+> > I was thinking could we keep the same strucutre? As we already have=20
+> > several rounds of review for both net-next and iproute2-next.
+>=20
+> Not a valid argument, uAPI is forever.
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+OK, then I will replace "step_thresh" (NLA_U32) and "step_in_packtes" (NLA_=
+FLAG) with "step_pkt_thresh" (NLA_U32) and "step_time_thresh" (NLA_U32).
+
+Does it make more sense yo you?
+
+Chia-Yu
 
