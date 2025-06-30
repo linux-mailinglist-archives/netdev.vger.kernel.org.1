@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-202505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75D75AEE193
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 16:56:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76EEAAEE19C
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 16:57:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E00987AFB3C
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 14:55:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7BEA3A4D81
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 14:56:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1047828D8DA;
-	Mon, 30 Jun 2025 14:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E8328C2DC;
+	Mon, 30 Jun 2025 14:56:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="RSwe9nu+"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="dcOeAaTN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2847528B50A
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 14:55:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8C828D8E2
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 14:55:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751295359; cv=none; b=sl0g2J/FUMkG/RaA/XxEsAQSobfmLj0tQf2q+gPx4RoQAy7Q3kyxMVZ+2cUvT0yAvA5DDpQN1Y2dmjUaZP6PAB/pjsKCY9aPl0TgEJkxi3CXvOdINnx5zBUDHgC5n9KLu/06+YES6o/6j5xVbCZGr/iFmhnkkrUrtEYjtR1iIMs=
+	t=1751295360; cv=none; b=RTPfYheiX3+wrqW0sjYROC2aBy6OKZplU/5LmYoYc2tPYG17+48vqao6Vt4dlqeQE2ZlUM3p9LxlCjy9XvSfiZw+vimNzcdPCfobSEYtGIrRodeTsF0jBWcA2MY64MZO6DrsKQ1Aw7aL3JDLXWhTIreW1hNWo8zYUJ+gVxGKy80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751295359; c=relaxed/simple;
-	bh=B6hi8UJdS/91tfUz8NPuk7AP1HsaWN7DpiVgT46qJgw=;
+	s=arc-20240116; t=1751295360; c=relaxed/simple;
+	bh=tp0/7pjFjNfAWAFW/C1KWpYZ2QVz/ZHonLAAPV1x7es=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=b53CdeBfrYg4uPnFD7cZSE08ydtvd8scJqz9f1WyQzPZbmYxL9GBYbGATgtPO5mCHCYOq5UxQCk8y/yYvG7eQBw0cPY00er56uLknnrxNSYwEknJTJwdDeHBAjGB/JHB+DXadK555DK1abJFjwB72q0ugNRTXwhfZOYNHaZBIY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=RSwe9nu+; arc=none smtp.client-ip=209.85.208.46
+	 In-Reply-To:To:Cc; b=TEIALP/P1cqO+ByRQB8+EuTbhCFIgrmwIKECn1ErdDk532G5duL5o9xF91X5R5jLMKZnz0w3701vXIPyYsIuNsaGYmnFkSukv66VZH+Wgh9VyOSEiBiHHIW+5ofOsukL+nRErqwjJtB2C+pLaolA0JnDyi62zvwwBFRvQAOM1Qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=dcOeAaTN; arc=none smtp.client-ip=209.85.218.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-606b58241c9so3674734a12.3
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 07:55:56 -0700 (PDT)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-adfb562266cso746809466b.0
+        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 07:55:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1751295355; x=1751900155; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1751295357; x=1751900157; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=NlIbe9mz1zIjrLBHTd1sB7RGqdyUqcPSFiaIgYjy3cE=;
-        b=RSwe9nu+himGyyN2nE1rfLlC3P/7XDs0AQ5DLJx4nWWQPy53bENq7ardocuLuU14xx
-         6HMWKhb1bDxcpMMS/Te0gHt/RPIipaT8DEFoFG1weAPjsb182NFEEraHTzwxTzEsHGyZ
-         KVxXGWqYeMhpEhAk1cgYlEE6TmlYcuwed6E+W2MRVc/GYz8cl6m7pEPZsLl/KP3iRO+v
-         kCxVIOoSgTUAEFdxLX1JXTJLPN7dlxNy9MC5fhqppQZNk7q77wswNxrAmcgtrNwzRAdb
-         eoykRb1OL9Gto/bKMXBX5mspo5vF0Zv1MN89cnQUNEiYGfGzh8JM/pEkIA1Z5uG/dLJI
-         +lAQ==
+        bh=k41AK/lAB3G+/40Ifa0LxNODOQcU+nxAOMTyMqx8QrE=;
+        b=dcOeAaTNqNtL70NY790AgE+Jr0qbBsgUUeEiTy/T1X4zOlntf8VMHzDzRWH0dWjmnw
+         pHOf4t4Seo7xi6l6lY5CLj7due3ftTR/k78j9YcOoI7Zdpk8Ne9GDaMWi+b6L8MGGzoo
+         mLxSjS7nMb4k7U6MEJz2XHzOFhNJBBN35Wk10JJF6tozV6K3+yhtwiUqMCJ9ziDBQH44
+         si3vg/tmJEmB9z7RGtf6qzqg3mq3QHEU2q7X47UL6XaR1wSkkgCwUxuXXmMCu6DuvjhC
+         LO73/sW8nUX1RYrOiPiRodXItOzhcD0575xW6fMaaib20DOAfxtSVORmOHIh/W4qy1gj
+         PXWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751295355; x=1751900155;
+        d=1e100.net; s=20230601; t=1751295357; x=1751900157;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NlIbe9mz1zIjrLBHTd1sB7RGqdyUqcPSFiaIgYjy3cE=;
-        b=dS0gBGKn2/L/XI5k6czKxvYHs71clw2jJdw3+F1XBVcWEAHLXgIm9m7o3YiNf3gbVd
-         Tt8h46wxb8qbD2JCSsICM4VkwrTzt4aXaUzzlQretQlF/bSq26zJ0ZAiSzFcz1fpVMk7
-         lANifK6FmVMRKQ94IIMMgdqQyqUfKW7ikLApWYxKTvT/iHYIhF2ZAS0r1UYe87DImOPP
-         gYueTMDlXtMyDZiGYRehLXV6xwLzlG17/nIJ+XdELkWbDYQflr6X9A41p/wDnIchTOCc
-         OBwnmLKVtvI/BIIpsFSRMOwTM/Em12B798XMwQnmOPEza0kkzfU2w13flxGf69EqjrAh
-         DnJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUebFsE28/fMBGhqxnoXjPAfUTjCeWPhDOzevmRV4vqOG1a+Had6tlnySwYA2zLyosqrl7bhkc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDI+MUqCvuLbAw0mcxZqZmzjcDmZsX473YUm51o7fFAT0671bz
-	tKLjPNk/Rq9TEJCKTrxBZFlcw+d+NHzs3LZek4eznv6autkAWWm+oHcmdBuIbsgjdn4=
-X-Gm-Gg: ASbGnctIRuqY1OriLTl6mvg9TVOQda+K8UzFJZzrph0Utvi1mrs6GGDzq2JLxQb1xzQ
-	sBpr2e6MMO/wn5TdFTL3oytnzYAv9y/eP/W7M8RnV1Cbd+DQCHRTWUcgdIGFZYC+jqSM8eSHL28
-	HCJvecpTgBq7UL4EZMSXe+KY7bailAUsbK9U5eekYY29XP9437sEd/AytgLQxtGcM9Wtj8cQRcY
-	nI14GzlRLGt16ZtACz1ElW2EGDfmDLj//8YPvGrFQS3fVbdtU4WdO47LvrlLc946M5NQOKA8ExR
-	0LX32tohDQHtNDEbxchZWel5lYXSuqV+FUJynwDQBMQUf+HunFqCYs3cfmWNSdd6
-X-Google-Smtp-Source: AGHT+IGeTBkUosZLoytxs0Tfq8MMSuUcoZgSqN31sdajHJBhMa7RSu3whCiHKouayHo91pdYvwA7+g==
-X-Received: by 2002:a05:6402:26d2:b0:609:9115:60f8 with SMTP id 4fb4d7f45d1cf-60c88e72fd3mr10798142a12.21.1751295355384;
-        Mon, 30 Jun 2025 07:55:55 -0700 (PDT)
+        bh=k41AK/lAB3G+/40Ifa0LxNODOQcU+nxAOMTyMqx8QrE=;
+        b=GAk70KGTZYeSpTb1p1qpzigSp2e63IP94rxMYSoGQqtagoAbWVxqjJUfR55EXi6824
+         tySaXvwJiVSiajEYDa4cRsOAlarotXZluO3A590DDvL8ZsKOa5cGPyyUowap93u2ob+T
+         EgqRLu2andL3dS6Qv2A9q9BgVgQ6ExWO/wnDO3O6bZ7sA37iSuabPhbtcSKt7AZEBNQV
+         vAIR8fPtjGTjlC07pdufB9a+sxgBxNv0GiMrPDO8mj1iYx7wga+Xn5tzpgKXwIRvswQC
+         5aej9B8f7LOWnbx29dHHHAVgqTXHXvA+CHF/2U0IplEbs8f9rAspGwf1P80SY+6hlcSe
+         wqaw==
+X-Forwarded-Encrypted: i=1; AJvYcCVNQzfXZKBcp0YOi+edQ0Tk0gBqQ6oPGieYqGd0sAU0AUIJkxjQdRo7Two+1OISP1C4t2RsX3c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFI8DoOYRCzNcvkDLPUkaAD5yOOn8pea1k1BJyoF5EfYgm/r2t
+	LPAmv+UbmrKOo9y2rUYdJ+dCvOwUz0T8a4Y8S+ccYVrHhYtGLoSBBmZH7Eqip+9IpW8=
+X-Gm-Gg: ASbGnct6ZlbpfIFwa1k0wijKRWOrRdaapZQQlisJVvHzM4kHeMh3WhI0x072R5qXLfV
+	xNFp59ZiUzERrwBrvcLjEZRmfVuAExIWU/8D3h14eeQu8kz7ntXcajnPYdwt2tyfVUprpVGCTog
+	rZTabQrO8fM1xMo/4QmwKi5EQFX5ja0SmP66RcpV2GfaoDi8eHIQNiSqqEPXcUpS65IgFDOh6Cp
+	8uA/qFLnwZIG5RbJ4nACcG5xVGauvVW727kgkIIpRIeIFQbvojn22B4nyFGhITc4iSvKWsSulWj
+	cpOcuSK3FS0Zsktq353MMLQjtD6ieHfyCr4FDzSy26w4nUQ3rcbQw6TdxNijtAgW
+X-Google-Smtp-Source: AGHT+IEpSFErIgm6d8K8Dy8kPG6FK9iw/JChQUjUTnZ195PoQpTGZUwpwACE1W5B9PCdsQxcVSB9Ew==
+X-Received: by 2002:a17:907:3f97:b0:ae3:6cc8:e431 with SMTP id a640c23a62f3a-ae36cc94000mr999635866b.57.1751295357381;
+        Mon, 30 Jun 2025 07:55:57 -0700 (PDT)
 Received: from cloudflare.com ([2a09:bac5:5063:2dc::49:10a])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60c828bbd29sm6038576a12.16.2025.06.30.07.55.54
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae353c6bca2sm691248166b.111.2025.06.30.07.55.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jun 2025 07:55:54 -0700 (PDT)
+        Mon, 30 Jun 2025 07:55:56 -0700 (PDT)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Mon, 30 Jun 2025 16:55:36 +0200
-Subject: [PATCH bpf-next 03/13] bpf: Add new variant of skb dynptr for the
- metadata area
+Date: Mon, 30 Jun 2025 16:55:37 +0200
+Subject: [PATCH bpf-next 04/13] bpf: Enable read access to skb metadata
+ with bpf_dynptr_read
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,7 +84,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250630-skb-metadata-thru-dynptr-v1-3-f17da13625d8@cloudflare.com>
+Message-Id: <20250630-skb-metadata-thru-dynptr-v1-4-f17da13625d8@cloudflare.com>
 References: <20250630-skb-metadata-thru-dynptr-v1-0-f17da13625d8@cloudflare.com>
 In-Reply-To: <20250630-skb-metadata-thru-dynptr-v1-0-f17da13625d8@cloudflare.com>
 To: bpf@vger.kernel.org
@@ -99,136 +99,39 @@ Cc: Alexei Starovoitov <ast@kernel.org>,
  kernel-team@cloudflare.com, Stanislav Fomichev <sdf@fomichev.me>
 X-Mailer: b4 0.15-dev-07fe9
 
-Add a new flag for the bpf_dynptr_from_skb helper to let users to create
-dynptrs to skb metadata area. Access paths are stubbed out. Implemented by
-the following changes.
+Make it possible to read from skb metadata area using the
+bpf_dynptr_read() BPF helper.
+
+This prepares ground for access to skb metadata from all BPF hooks
+which operate on __sk_buff context.
 
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- include/uapi/linux/bpf.h |  9 ++++++++
- net/core/filter.c        | 60 +++++++++++++++++++++++++++++++++++++++++-------
- 2 files changed, 61 insertions(+), 8 deletions(-)
+ net/core/filter.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-index 719ba230032f..ab5730d2fb29 100644
---- a/include/uapi/linux/bpf.h
-+++ b/include/uapi/linux/bpf.h
-@@ -7591,4 +7591,13 @@ enum bpf_kfunc_flags {
- 	BPF_F_PAD_ZEROS = (1ULL << 0),
- };
- 
-+/**
-+ * enum bpf_dynptr_from_skb_flags - Flags for bpf_dynptr_from_skb()
-+ *
-+ * @BPF_DYNPTR_F_SKB_METADATA: Create dynptr to the SKB metadata area
-+ */
-+enum bpf_dynptr_from_skb_flags {
-+	BPF_DYNPTR_F_SKB_METADATA = (1ULL << 0),
-+};
-+
- #endif /* _UAPI__LINUX_BPF_H__ */
 diff --git a/net/core/filter.c b/net/core/filter.c
-index 1fee51b72220..3c2948517838 100644
+index 3c2948517838..f71b4b6b09fb 100644
 --- a/net/core/filter.c
 +++ b/net/core/filter.c
-@@ -11967,12 +11967,27 @@ bpf_sk_base_func_proto(enum bpf_func_id func_id, const struct bpf_prog *prog)
- 	return func;
- }
+@@ -11981,9 +11981,15 @@ int bpf_dynptr_skb_read(const struct bpf_dynptr_kern *src, u32 offset,
+ 	case SKB_DYNPTR_PAYLOAD:
+ 		return ____bpf_skb_load_bytes(skb, offset, dst, len);
  
-+enum skb_dynptr_offset {
-+	SKB_DYNPTR_METADATA	= -1,
-+	SKB_DYNPTR_PAYLOAD	= 0,
-+};
+-	case SKB_DYNPTR_METADATA:
+-		return -EOPNOTSUPP; /* not implemented */
++	case SKB_DYNPTR_METADATA: {
++		u32 meta_len = skb_metadata_len(skb);
 +
- int bpf_dynptr_skb_read(const struct bpf_dynptr_kern *src, u32 offset,
- 			void *dst, u32 len)
- {
- 	const struct sk_buff *skb = src->data;
++		if (len > meta_len || offset > meta_len - len)
++			return -E2BIG; /* out of bounds */
  
--	return ____bpf_skb_load_bytes(skb, offset, dst, len);
-+	switch (src->offset) {
-+	case SKB_DYNPTR_PAYLOAD:
-+		return ____bpf_skb_load_bytes(skb, offset, dst, len);
-+
-+	case SKB_DYNPTR_METADATA:
-+		return -EOPNOTSUPP; /* not implemented */
-+
-+	default:
-+		WARN_ONCE(true, "%s: unknown skb dynptr offset %d\n", __func__, src->offset);
-+		return -EFAULT;
++		memmove(dst, skb_metadata_end(skb) - meta_len + offset, len);
++		return 0;
 +	}
- }
- 
- int bpf_dynptr_skb_write(const struct bpf_dynptr_kern *dst, u32 offset,
-@@ -11980,7 +11995,17 @@ int bpf_dynptr_skb_write(const struct bpf_dynptr_kern *dst, u32 offset,
- {
- 	struct sk_buff *skb = dst->data;
- 
--	return ____bpf_skb_store_bytes(skb, offset, src, len, flags);
-+	switch (dst->offset) {
-+	case SKB_DYNPTR_PAYLOAD:
-+		return ____bpf_skb_store_bytes(skb, offset, src, len, flags);
-+
-+	case SKB_DYNPTR_METADATA:
-+		return -EOPNOTSUPP; /* not implemented */
-+
-+	default:
-+		WARN_ONCE(true, "%s: unknown skb dynptr offset %d\n", __func__, dst->offset);
-+		return -EFAULT;
-+	}
- }
- 
- void *bpf_dynptr_skb_slice(const struct bpf_dynptr_kern *ptr, u32 offset,
-@@ -11988,10 +12013,20 @@ void *bpf_dynptr_skb_slice(const struct bpf_dynptr_kern *ptr, u32 offset,
- {
- 	const struct sk_buff *skb = ptr->data;
- 
--	if (buf)
--		return skb_header_pointer(skb, offset, len, buf);
--	else
--		return skb_pointer_if_linear(skb, offset, len);
-+	switch (ptr->offset) {
-+	case SKB_DYNPTR_PAYLOAD:
-+		if (buf)
-+			return skb_header_pointer(skb, offset, len, buf);
-+		else
-+			return skb_pointer_if_linear(skb, offset, len);
-+
-+	case SKB_DYNPTR_METADATA:
-+		return NULL;	/* not implemented */
-+
-+	default:
-+		WARN_ONCE(true, "%s: unknown skb dynptr offset %d\n", __func__, ptr->offset);
-+		return NULL;
-+	}
- }
- 
- __bpf_kfunc_start_defs();
-@@ -12000,13 +12035,22 @@ __bpf_kfunc int bpf_dynptr_from_skb(struct __sk_buff *s, u64 flags,
- {
- 	struct bpf_dynptr_kern *ptr = (struct bpf_dynptr_kern *)ptr__uninit;
- 	struct sk_buff *skb = (struct sk_buff *)s;
-+	u32 offset, size;
- 
--	if (flags) {
-+	if (unlikely(flags & ~BPF_DYNPTR_F_SKB_METADATA)) {
- 		bpf_dynptr_set_null(ptr);
- 		return -EINVAL;
- 	}
- 
--	bpf_dynptr_init(ptr, skb, BPF_DYNPTR_TYPE_SKB, 0, skb->len);
-+	if (flags & BPF_DYNPTR_F_SKB_METADATA) {
-+		offset = SKB_DYNPTR_METADATA;
-+		size = skb_metadata_len(skb);
-+	} else {
-+		offset = SKB_DYNPTR_PAYLOAD;
-+		size = skb->len;
-+	}
-+
-+	bpf_dynptr_init(ptr, skb, BPF_DYNPTR_TYPE_SKB, offset, size);
- 
- 	return 0;
- }
+ 	default:
+ 		WARN_ONCE(true, "%s: unknown skb dynptr offset %d\n", __func__, src->offset);
+ 		return -EFAULT;
 
 -- 
 2.43.0
