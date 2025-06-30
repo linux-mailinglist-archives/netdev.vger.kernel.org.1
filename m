@@ -1,317 +1,140 @@
-Return-Path: <netdev+bounces-202654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18815AEE7E7
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 22:03:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1DE1AEE84E
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 22:30:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58CAA1785FE
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 20:03:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E14DC189C0E4
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 20:30:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DCDF1DB125;
-	Mon, 30 Jun 2025 20:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDBFF221710;
+	Mon, 30 Jun 2025 20:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wmlw2H9K"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Ow1vygOL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC398C0B
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 20:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F358B20FA9C
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 20:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751313797; cv=none; b=dGHIMRr8Ilk+ke9IJh6Mh4bLEVx2Ztr9jmMDvqeFUbdnaTFItLtZgVUMTM3Hjt2yqSlsjuQPTx0FszP31bFLu60p+6ph+z2UQGW3j9qKUszEgrFM8hZQaiozdkOLGys2jEGo2P2ZcM4/gGSVhA376ItStZN5sAhWt1r23/is814=
+	t=1751315431; cv=none; b=ULhqaitVhBSeCaIow6wHrPwVOxdvrRTrnylSu5lxOAiknDioCUkEIb5A36+1ueWccvDB5GH20HZcyapuvFmqFFCyzp20aBH3WVD2Zf8nFIZmdYF0ih18aXb8DOrpBpElIDEtXZUKW+HQQtfO+W9mUXCWpql5l8y77QjgMECIq90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751313797; c=relaxed/simple;
-	bh=tc2/CY30+WQ0GQaPSkxHMOOSP7nL34U4xOYcQqcJLKg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HbuX91rM6OT7qSs/H4KTsIJJwrkROkqz2GdMLyT6hW0kzIyeFuNDL3Z7WWOKua0TDleBFe1TggmxB+AKcol+ZjDZuCq0fLMA2eeQwDWFloGwZzLYBEW+nPNMJQFeGVujp246PW48NR/WNBwRyuG+7DNK2mAqPCVHrs8lHq2OyWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wmlw2H9K; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-234c5b57557so23170775ad.3
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 13:03:15 -0700 (PDT)
+	s=arc-20240116; t=1751315431; c=relaxed/simple;
+	bh=h+Mc6pJAi9ivbHwTbXp7FIv58m+7zjdedWczhF69Ah4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=tARqXV+fUs1uqTjpdu8fe2jQygV7N0/yjCYGX0rR4vwRB71pQtmXuUshEvnpegECcjtV0SNXKRwH7vtJcVll9shGkvdziIgteqF2UtyCrx9V/pJxTwz0Kse6YFmLgNYWxFHcS14PtXC/9R1FsLCApZEnWvOpndqDb21LvFbC3QE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Ow1vygOL; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-60c9d8a169bso4460733a12.1
+        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 13:30:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751313795; x=1751918595; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Eqa+cWKwP/5ITYlS+q2fI743OuEkJnUTonzPltQGs2Y=;
-        b=wmlw2H9KMK384nuHGpcNSqWvm644zD0V9d1nqBzmw55ISzg3LEQPNTQDZ9uXq35K2j
-         /YiWwtp4GX200shb80Dy4anbUQcaMjhD+eSljrzwvxFHfhB9ilPlOtsGUe95fFkvtH/U
-         SPgfNnn5aGAYGTrLrQVVoTzNVO14efv96zSv/kZ690FaL/Aqtpl+i5cCOhrzmifiZ8rR
-         gpmH4rnZagOkl6CkLDJ2uVIR6DC7wMP0EWRzhA+/ViEx7edwe01vcDi8ZqkL1rCD9gLf
-         KqLK1gF1lTgBSE6UlMapF0IrPlNCe/R+iK7tfu1EOq3plGUygLxa7OJ56mumQBCa+GeZ
-         6rog==
+        d=cloudflare.com; s=google09082023; t=1751315428; x=1751920228; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=elCM+oF9Z0IdOGQ7xKJIbBaSxMaf81dbIGi1GWq89Uw=;
+        b=Ow1vygOLBWZu4XhRdv+2B1RJLa3gb8w2dvpRzcQSTzLIhtqNV2g+RPIUfT4x1pA6zd
+         g8rmkJD6TLFdUSI9ynzh+LsThZN2pz4cKBDFgM9ymQ6qbuVAPfBZzgskjGvKe3attyZ+
+         myGvYmGoi8U6oaacqDtwrHvpUhb+37Mk2rVaqPkMjAzy1JsT3ktnboGgtkloi3syJUgV
+         IaLXLQhVvnGrHi6nTExNz8+GewLl6dzypeCOjYA8ZQfMwGHNvRnIwFMSdV1LToYbMnOe
+         t8LJ6gNyWBykbJFSh+XgBz8wAgmx5U+rPJV7it2OtahrSwjKZCT6sKlXRu1D+v4fnw1p
+         q3Lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751313795; x=1751918595;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Eqa+cWKwP/5ITYlS+q2fI743OuEkJnUTonzPltQGs2Y=;
-        b=U5uitXa/4VNtnHaF5CPoojupU1iuOFzQvBYq6JZL2jy6iYqPD1OSH0gF2CodjiEU9B
-         a1cSLLvzNqqO9rqCuR6JQ5c5VMLPGBO9AM0r5nwkaRgyXtEdSxDlbqQ5J5lo1jRW3H8x
-         f0U+tTIbNp5qeOWgK7CSjt/FyjD9ohOHFXC2x96/OGAV24ZdfU28BK/l5eT4QEmS8K0R
-         xYXfNop6p2xoSV1+/uvcNnvA92WSHH7kHbwuP33FW1qeQonY9eaG3j2ezewBgvRV1aEH
-         RbgPJeJNUX4HxCcZyS9sUTLIV8XKXL1aAX3Mx4Hd0Pdte7TFDYfMNP9L8sNJADz1eClH
-         Q7UA==
-X-Forwarded-Encrypted: i=1; AJvYcCVRmm4AE/YleU6lyq7s16zvS7y9pvd2ThGMkLfIHk3rZfQZIP8zflRdyAy63DmnVuJZeypDnlM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUBI3CmX/f1uXR/JDYBaFmTz035eAiEP1J0ufl//zt+GoOhIBP
-	FtiBnIzAxu76WoCNtm3aLOIwTz8J00BFjRk4TxPSLdHsR6nun1e1uKx532SbU1rrnx0MDEJmEnA
-	rvPOHSVr8uwR+3TJYf3If0jGBk8hLkwwP5IHfGrCFk8wESIMQI/3mJFpSl6w=
-X-Gm-Gg: ASbGncvVo1wiKnMbxJeS6BnybFyz630f8f4+UPnBj3v+EJMThX7QDMyuPHi8/YEoVFy
-	t0HYq+ygyGYahVA9RMD9UVBo7U7rRWbM07hIQR7DPkbh4IHWfvX6WK2u9dnmrRYcYlAPieMbkyD
-	QU9OchwAytWSBSzMAyMh9KZNYfpFBUj9NgYTO5DPeaVbSDC8XClY4uXvWEteO7mdCgI2to0mMNU
-	w==
-X-Google-Smtp-Source: AGHT+IF6iVcyvQjj2ld6N8UoG4ykSX9aDn1bYdC40Iledyddo74UK6tAqLO/YIb80svJEBjHYnqen4lxC/AUpi7EOf8=
-X-Received: by 2002:a17:902:e84a:b0:234:8f5d:e3a4 with SMTP id
- d9443c01a7336-23ac3817878mr246272035ad.2.1751313794880; Mon, 30 Jun 2025
- 13:03:14 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751315428; x=1751920228;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=elCM+oF9Z0IdOGQ7xKJIbBaSxMaf81dbIGi1GWq89Uw=;
+        b=W0ScLNtN+vxZ4Nos9J47JPijlR3VmzHjrOmOJzQf6WxpdUgtoOGRCOZ/XJyt9ALJGo
+         oOKRyL/UDarbfljgBzAFFAzYGfynBIet1RQQcATuSLjGbC82u0k5wQcsL/aw+hQPdkIH
+         gDSfQwb8yBD9e3HTDm8Eauh/rwzxwhnO2XKxOJ9Owl75YudcT1KkvpI3VwrcWy6ffxKw
+         1LbKpBOb4XRcS7YjePLpmIqpySGFhOktYXIFW1Y8EtTnZeHEHXrR/aCqHPd3DcWJ8oAj
+         VRYOnwRfZTa3UwA93qqit9quJjyoNolyltXrijQGSoteGqLhBhWba+dMtcdwiFWn58e1
+         UIpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVk2B62s642b15/0vB4cKNN8JjLYJWafTuhxlnEkMi1/1WYuu0WXSZQpE3y9hgtA0QgOVy1YE0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyG1ibQbimrvG6leGOkPxCMq8o/0Rw8U7L8mz53Kg4FffeT52t
+	eT9FI5yNpcQ12bAtcC2QY4Xv4HqQf6b2PWQDxBLGM4fuJfTeTgRbZgIEtjvabxwrCuo=
+X-Gm-Gg: ASbGnct5rm3N7CYDshaOLgz5OfEMZg/x6AW9oFt8SLg0Wh6yCY3Gx4DJxaD06+Kr40J
+	5PIXgkDdgw41y9TrTUygdoASkYGiMVVJudAz2oNyIALIfE0+dlpSWevRGvgEdNpilKwvGx2QxX2
+	oF+pJRnmMjrLZf9FwhqOOJ7k3AQFRuEs0WMcBHxBbn/LX8wfD9uSlx/mwtH05Ri1sSE3IL1gAvN
+	Nh2H7VDPJbb0MH6qo2UIMXz3d9EX3bvI4jvhz2q9HSz/CMVU1WNLt1AJOYQEMyWcF/9uQnH80v2
+	rpdsjy0QLlQRlTeE8o85SJf0G5gwSh8REhT/+aPB/Z9LFRKHXGGV8g==
+X-Google-Smtp-Source: AGHT+IHXbStwUwhue6mULs4NhRSntv//JjrAdkWxN+/rbT9QEVTAP8vDqK8QfKQta/W83NCjG9XMQw==
+X-Received: by 2002:a17:907:c018:b0:ae3:595f:91a2 with SMTP id a640c23a62f3a-ae3595f9724mr1328108766b.57.1751315428228;
+        Mon, 30 Jun 2025 13:30:28 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2dc::49:10a])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae35363afdcsm725086066b.29.2025.06.30.13.30.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jun 2025 13:30:27 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: bpf@vger.kernel.org,  Alexei Starovoitov <ast@kernel.org>,  Arthur Fabre
+ <arthur@arthurfabre.com>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Jesper Dangaard Brouer <hawk@kernel.org>,
+  Jesse Brandeburg <jbrandeburg@cloudflare.com>,  Joanne Koong
+ <joannelkoong@gmail.com>,  Lorenzo Bianconi <lorenzo@kernel.org>,  Toke
+ =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <thoiland@redhat.com>,  Yan Zhai
+ <yan@cloudflare.com>,
+  netdev@vger.kernel.org,  kernel-team@cloudflare.com,  Stanislav Fomichev
+ <sdf@fomichev.me>
+Subject: Re: [PATCH bpf-next 07/13] net: Clear skb metadata on handover from
+ device to protocol
+In-Reply-To: <aGK6hdOwBSC7r4gF@mini-arch> (Stanislav Fomichev's message of
+	"Mon, 30 Jun 2025 09:25:41 -0700")
+References: <20250630-skb-metadata-thru-dynptr-v1-0-f17da13625d8@cloudflare.com>
+	<20250630-skb-metadata-thru-dynptr-v1-7-f17da13625d8@cloudflare.com>
+	<aGK6hdOwBSC7r4gF@mini-arch>
+Date: Mon, 30 Jun 2025 22:30:26 +0200
+Message-ID: <87o6u5nfa5.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250629214449.14462-1-aleksandr.mikhalitsyn@canonical.com> <20250629214449.14462-5-aleksandr.mikhalitsyn@canonical.com>
-In-Reply-To: <20250629214449.14462-5-aleksandr.mikhalitsyn@canonical.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 30 Jun 2025 13:03:03 -0700
-X-Gm-Features: Ac12FXw0qkm9zmzcyDd_siUWWPQolY0UkEUyAzMbFXyy0LUDcdpbCwLpUNcaFzM
-Message-ID: <CAAVpQUD0_HcYQ-DBSFSgjdoQLAS2bjXkLhPfYpH8z+Rt17U_sQ@mail.gmail.com>
-Subject: Re: [RESEND PATCH net-next 4/6] af_unix: stash pidfs dentry when needed
-To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Leon Romanovsky <leon@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Christian Brauner <brauner@kernel.org>, 
-	Lennart Poettering <mzxreary@0pointer.de>, Luca Boccassi <bluca@debian.org>, 
-	David Rheinsberg <david@readahead.eu>, Kuniyuki Iwashima <kuniyu@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Sun, Jun 29, 2025 at 2:45=E2=80=AFPM Alexander Mikhalitsyn
-<aleksandr.mikhalitsyn@canonical.com> wrote:
+On Mon, Jun 30, 2025 at 09:25 AM -07, Stanislav Fomichev wrote:
+> On 06/30, Jakub Sitnicki wrote:
+>> With the extension of bpf_dynptr_from_skb(BPF_DYNPTR_F_SKB_METADATA), all
+>> BPF programs authorized to call this kfunc now have access to the skb
+>> metadata area.
+>> 
+>> These programs can read up to skb_shinfo(skb)->meta_len bytes located just
+>> before skb_mac_header(skb), regardless of what data is currently there.
+>> 
+>> However, as the network stack processes the skb, headers may be added or
+>> removed. Hence, we cannot assume that skb_mac_header() always marks the end
+>> of the metadata area.
+>> 
+>> To avoid potential pitfalls, reset the skb metadata length to zero before
+>> passing the skb to the protocol layers. This is a temporary measure until
+>> we can make metadata persist through protocol processing.
+>> 
+>> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+>> ---
+>>  net/core/dev.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>> 
+>> diff --git a/net/core/dev.c b/net/core/dev.c
+>> index be97c440ecd5..4a2389997535 100644
+>> --- a/net/core/dev.c
+>> +++ b/net/core/dev.c
+>> @@ -5839,6 +5839,7 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
+>>  	}
+>>  #endif
+>>  	skb_reset_redirect(skb);
+>> +	skb_metadata_clear(skb);
 >
-> We need to ensure that pidfs dentry is allocated when we meet any
-> struct pid for the first time. This will allows us to open pidfd
-> even after the task it corresponds to is reaped.
->
-> Basically, we need to identify all places where we fill skb/scm_cookie
-> with struct pid reference for the first time and call pidfs_register_pid(=
-).
->
-> Tricky thing here is that we have a few places where this happends
-> depending on what userspace is doing:
-> - [__scm_replace_pid()] explicitly sending an SCM_CREDENTIALS message
->                         and specified pid in a numeric format
-> - [unix_maybe_add_creds()] enabled SO_PASSCRED/SO_PASSPIDFD but
->                            didn't send SCM_CREDENTIALS explicitly
-> - [scm_send()] force_creds is true. Netlink case.
->
-> Cc: linux-kernel@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Simon Horman <horms@kernel.org>
-> Cc: Leon Romanovsky <leon@kernel.org>
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Christian Brauner <brauner@kernel.org>
-> Cc: Kuniyuki Iwashima <kuniyu@google.com>
-> Cc: Lennart Poettering <mzxreary@0pointer.de>
-> Cc: Luca Boccassi <bluca@debian.org>
-> Cc: David Rheinsberg <david@readahead.eu>
-> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com=
->
-> ---
->  include/net/scm.h  | 35 ++++++++++++++++++++++++++++++-----
->  net/unix/af_unix.c | 36 +++++++++++++++++++++++++++++++++---
->  2 files changed, 63 insertions(+), 8 deletions(-)
->
-> diff --git a/include/net/scm.h b/include/net/scm.h
-> index 856eb3a380f6..d1ae0704f230 100644
-> --- a/include/net/scm.h
-> +++ b/include/net/scm.h
-> @@ -8,6 +8,7 @@
->  #include <linux/file.h>
->  #include <linux/security.h>
->  #include <linux/pid.h>
-> +#include <linux/pidfs.h>
->  #include <linux/nsproxy.h>
->  #include <linux/sched/signal.h>
->  #include <net/compat.h>
-> @@ -66,19 +67,37 @@ static __inline__ void unix_get_peersec_dgram(struct =
-socket *sock, struct scm_co
->  { }
->  #endif /* CONFIG_SECURITY_NETWORK */
->
-> -static __inline__ void scm_set_cred(struct scm_cookie *scm,
-> -                                   struct pid *pid, kuid_t uid, kgid_t g=
-id)
-> +static __inline__ int __scm_set_cred(struct scm_cookie *scm,
-> +                                    struct pid *pid, bool pidfs_register=
-,
-> +                                    kuid_t uid, kgid_t gid)
+> And the assumption that it's not gonna break the existing cases is
+> because there is currently no way to read that metadata out afterwards?
 
-scm_set_cred() is only called from 3 places, and I think you can simply
-pass pidfd_register =3D=3D false from one of the places.
+Correct, only tc_cls_act_is_valid_access tags the register as
+PTR_TO_PACKET_META when loading __skb->data_meta, which allows access.
 
-while at it, please replace s/__inline__/inline/
-
->  {
-> -       scm->pid  =3D get_pid(pid);
-> +       if (pidfs_register) {
-> +               int err;
-> +
-> +               err =3D pidfs_register_pid(pid);
-
-nit: int err =3D pidfs_...();
-
-> +               if (err)
-> +                       return err;
-> +       }
-> +
-> +       scm->pid =3D get_pid(pid);
-> +
->         scm->creds.pid =3D pid_vnr(pid);
->         scm->creds.uid =3D uid;
->         scm->creds.gid =3D gid;
-> +       return 0;
-> +}
-> +
-> +static __inline__ void scm_set_cred(struct scm_cookie *scm,
-> +                                   struct pid *pid, kuid_t uid, kgid_t g=
-id)
-> +{
-> +       /* __scm_set_cred() can't fail when pidfs_register =3D=3D false *=
-/
-> +       (void) __scm_set_cred(scm, pid, false, uid, gid);
-
-I think this (void) style is unnecessary for recent compilers.
-
->  }
->
->  static __inline__ void scm_destroy_cred(struct scm_cookie *scm)
->  {
->         put_pid(scm->pid);
-> -       scm->pid  =3D NULL;
-> +       scm->pid =3D NULL;
->  }
->
->  static __inline__ void scm_destroy(struct scm_cookie *scm)
-> @@ -90,9 +109,15 @@ static __inline__ void scm_destroy(struct scm_cookie =
-*scm)
->
->  static __inline__ int __scm_replace_pid(struct scm_cookie *scm, struct p=
-id *pid)
->  {
-> +       int err;
-> +
->         /* drop all previous references */
->         scm_destroy_cred(scm);
->
-> +       err =3D pidfs_register_pid(pid);
-> +       if (err)
-> +               return err;
-> +
->         scm->pid =3D get_pid(pid);
->         scm->creds.pid =3D pid_vnr(pid);
->         return 0;
-> @@ -105,7 +130,7 @@ static __inline__ int scm_send(struct socket *sock, s=
-truct msghdr *msg,
->         scm->creds.uid =3D INVALID_UID;
->         scm->creds.gid =3D INVALID_GID;
->         if (forcecreds)
-> -               scm_set_cred(scm, task_tgid(current), current_uid(), curr=
-ent_gid());
-> +               __scm_set_cred(scm, task_tgid(current), true, current_uid=
-(), current_gid());
->         unix_get_peersec_dgram(sock, scm);
->         if (msg->msg_controllen <=3D 0)
->                 return 0;
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index 5efe6e44abdf..1f4a5fe8a1f7 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -1924,12 +1924,34 @@ static void unix_peek_fds(struct scm_cookie *scm,=
- struct sk_buff *skb)
->         scm->fp =3D scm_fp_dup(UNIXCB(skb).fp);
->  }
->
-> +static int __skb_set_pid(struct sk_buff *skb, struct pid *pid, bool pidf=
-s_register)
-
-unix_set_pid_to_skb ?
-
-> +{
-> +       if (pidfs_register) {
-> +               int err;
-> +
-> +               err =3D pidfs_register_pid(pid);
-> +               if (err)
-> +                       return err;
-> +       }
-> +
-> +       UNIXCB(skb).pid =3D get_pid(pid);
-> +       return 0;
-> +}
-> +
->  static void unix_destruct_scm(struct sk_buff *skb)
->  {
->         struct scm_cookie scm;
->
->         memset(&scm, 0, sizeof(scm));
-> -       scm.pid  =3D UNIXCB(skb).pid;
-> +
-> +       /* Pass ownership of struct pid from skb to scm cookie.
-> +        *
-> +        * We rely on scm_destroy() -> scm_destroy_cred() to properly
-> +        * release everything.
-> +        */
-> +       scm.pid =3D UNIXCB(skb).pid;
-> +       UNIXCB(skb).pid =3D NULL;
-
-The skb is under destruction and we no longer touch it, so
-this chunk is not needed.
-
-
-> +
->         if (UNIXCB(skb).fp)
->                 unix_detach_fds(&scm, skb);
->
-> @@ -1943,7 +1965,10 @@ static int unix_scm_to_skb(struct scm_cookie *scm,=
- struct sk_buff *skb, bool sen
->  {
->         int err =3D 0;
->
-> -       UNIXCB(skb).pid =3D get_pid(scm->pid);
-> +       err =3D __skb_set_pid(skb, scm->pid, false);
-> +       if (unlikely(err))
-> +               return err;
-> +
->         UNIXCB(skb).uid =3D scm->creds.uid;
->         UNIXCB(skb).gid =3D scm->creds.gid;
->         UNIXCB(skb).fp =3D NULL;
-> @@ -1976,7 +2001,12 @@ static int unix_maybe_add_creds(struct sk_buff *sk=
-b, const struct sock *sk,
->                 return 0;
->
->         if (unix_may_passcred(sk) || unix_may_passcred(other)) {
-> -               UNIXCB(skb).pid =3D get_pid(task_tgid(current));
-> +               int err;
-> +
-> +               err =3D __skb_set_pid(skb, task_tgid(current), true);
-> +               if (unlikely(err))
-> +                       return err;
-> +
->                 current_uid_gid(&UNIXCB(skb).uid, &UNIXCB(skb).gid);
->         }
->
-> --
-> 2.43.0
->
+Something worth adding to the description. Thanks.
 
