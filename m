@@ -1,207 +1,197 @@
-Return-Path: <netdev+bounces-202444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17BB4AEDF88
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 15:50:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7909EAEDFCA
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 15:59:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2549F3A5E0A
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:49:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40D297A60E1
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:57:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D265E25D21A;
-	Mon, 30 Jun 2025 13:49:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9738828B7F4;
+	Mon, 30 Jun 2025 13:58:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jiP2bjk7"
+	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="Z1XRF+Sd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013018.outbound.protection.outlook.com [40.107.162.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF06F1917ED;
-	Mon, 30 Jun 2025 13:49:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751291395; cv=none; b=VJdGNbL1+G2bkhKi7YNBK4peZULg/lRxm/0wQ9/rofLT50TA2oAsCEMt99uu/eCxEuEqaQ4T1h6FUHK1BIQN8c+7lFiaUf3WdFuGiWwxWL9gtfkeixbEwFCA6O9EjsOO49EhC/ikiDi21++m6kGaDf/0X1fn0sm06sWnCOS/DgI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751291395; c=relaxed/simple;
-	bh=bzoIOlWuvbbMCyXu6/siE/mgcgtZLTWB1WkT/gOYcOs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WLhtYTNBUiHS4RUOYUeJRFipq4DztOHAO5ijuBzszAEvc5fOMs670pFPbujbi7/QZw4Tuq+sVSM7NstgVeL4i7Dhdvt3MXLwQ+NOrO1T4VAhjbCljdaaOUenoLfUiPPEIcaN5I1WMUl4G/BIrhfXAy2dnr+EHpdMuCR5Ks5+QGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jiP2bjk7; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-32cd0dfbdb8so18611171fa.0;
-        Mon, 30 Jun 2025 06:49:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751291392; x=1751896192; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wmpyaTUE2J4jAFO05Ukiw9Q7CdozXE2TovrP208ubCc=;
-        b=jiP2bjk7cvVwGUhGL0cHeV894ADW0fCTji5lVZQ9GOmiOPdt4W96ve7Z1l+tLDirEg
-         Aq+1tAB3gqXO1ae8aJTxneJ33XN1vEl2/ZI4pGGY5uclTzKxdldjpTqgq6sFPqhAbyBm
-         ZuGCjfBhqvx5STrRo+B+alszfsMURz7Hm1fJrvtjb2gvGyom/33I6HW7jNy8HBwXAYKq
-         EjfdSI9XZmrV5J0DWuCaTvvr4nktytgdiDowHxhPYIPkecfJPbsdAqI7kGlN7zrVhzPx
-         UIodCbRk9K70XfluGXZbwaFqXlb2OKeqCe9O6wzW2jfncNPFLj+9ZFG83M2jC6NZ/7lP
-         i9Yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751291392; x=1751896192;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wmpyaTUE2J4jAFO05Ukiw9Q7CdozXE2TovrP208ubCc=;
-        b=U8CUV9d7vz37iEr4+/fr+UVbd9ljhYUudst4qlEZ8qwAmFUK3rWnQMvuN76wNOe1t+
-         XjYd8iHgk5qR6Xv49e267B6yeuJUtBYPPIIbirXCbxlbufOuaekchntXC+Jk2eBbIA60
-         8w/1EzcqdrwlcAOXaKs+AEpnosHCdkmRCy19hS+yo7hz9Xx+caO0C77CcPT482MaqP2u
-         PQDunjdEUoo7Mp2XmkxEgtX8B2gG824FwUEzAFTnqAcHBVL8w1ZX7HQH6XQenl0etVVz
-         6iibVz/vDOWU6x+z5F4J74jbvjbd1HEaXdho+qUPCG8BUbo5UVDDpaJMe5H4tsVeiYB1
-         xFiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU2FDDpEDn5E1vor1oOwOIOaa4OMUPB3wNxGnG+Gjk+MyJsM+0ptFpTLqs86VtQa0/8T6eB7ZZG@vger.kernel.org, AJvYcCVwy4ggzt24eOzlKqmpcDKNsPEK7/hzZfw5dqABnOBMJP84d4Tc2FIah5NQFrA3lv7sbxNSc1qexldP2dp4hNo=@vger.kernel.org, AJvYcCWfQWtff5gG5PYiQuOZDOfflj+wxNMrQitDrkL215VqaN/hx8NABRy8vZoEHLRW1M/kZ6ck6fi9Vk0N8rCH@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNSE4f7CX9V2lKJOmL1Lu7plR3uBkIoVY84HcVzM0bC7M9YUaB
-	6uIRlATA71JNhCUGL/LLzjZTwg3jvKtF3KXX6Yy7btEN9C3f5VDgN2or1UqRqjuVoddma0Nh0Gm
-	3xRhJ7eTGKN1GuihDNmC8AF2P2217T+U=
-X-Gm-Gg: ASbGncvTn/dXuhGCMwzoXMAlkXyBqJ3rCyyEmI4vS3vopNI9FKk2oa1cHlVaPmun1//
-	+cxJ+PH30LXHwRlse0U0k4RrNIjJI8jh/2HzWi6yvQTfru00WKac4etpS7EttlKW37g9+JoN2FT
-	RHUDq0hxrpusMQz81vnZyQAgefcaLk3p7I9JGFN5y6Uw==
-X-Google-Smtp-Source: AGHT+IGgaFLlKjjjCVMs+nZMIcXtZfFfNJ4BOpKnsZq/5dFH8MCARTKArHPB5BccAdKnh/MymRY+aAHrIQd0Mn9XZ2A=
-X-Received: by 2002:a05:651c:40cf:b0:32a:8bf4:3a54 with SMTP id
- 38308e7fff4ca-32cdc482b7amr30192051fa.2.1751291391775; Mon, 30 Jun 2025
- 06:49:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6249528B7DF;
+	Mon, 30 Jun 2025 13:58:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751291939; cv=fail; b=JlVUiGBBTGpFVk347yKLcLe/cJrhLGl9amPCIdsp+gpcSHNZ2d7LszTPRrkss+uedC1/8H7ToGt6kZdgCHuHuwTUhx3gMQOgwD9MU09UY+2ogqM0XpaNQGvgjkHwUH8r1vn1oDthIfnfNRVr8GhUcN6Iaas+Z3fQthci22ekxNQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751291939; c=relaxed/simple;
+	bh=xce+MpHzEwJliYk0xmo6AdG0IruXd0WX4LPpFM3b578=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YkqnsvtizirBFEWAUQenqHjbg1r2Bw94bF2MVykgCaRmH56hyWFFqf8MYJAK7Q1SfyqeHJdiWUmVVch4MODJiagTcdQ5kwuhOU+JwJEt4003HbFKsyHuCCNvlAsgF4C9Et2T7eFe0G7/SBjMQs7ghkLzHT16aJNxM6v0CcAxQ0M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=2n.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=Z1XRF+Sd; arc=fail smtp.client-ip=40.107.162.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=2n.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MIjtum65xmem3cA90xOr51dEvRf2UsqzIO2+XQmj+tuW8OfbN0chvXRrOSWfVkpS2FuW14oFh9Aw4ELsuvMqw7PxT4l9bsivN5YkSjjwXxB08bOl1vqRvoCcvbmGplIBZVYJaiubrNoELh2fP6eC90bmWSa1RId8JJ6yFLgwJkZ0Zd0bKURBQUDmtpEOfGQlez8j4AuVSaHA9/e+tpSIixqJfZcu8fVf9P93fVi0IIzz9H58xlap9WUjQuvXUeTsBw4RSSZsxP7+STxqy4tvh5V24/nyKihNBLwzdJG+97NuBtxXsTM+OeplJrcA/Q/7o7jRe0jwPCcEAZk9NoUZeQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lbvlDC6LuUGEfBOGTC/Fn234HntBvlSU/d6fFWEQQSk=;
+ b=N5lfaU7SphBoPzF94ysTV9onuoZfXsbevRkLYtyOlSBUlPUW8+A+rM7olRd1kSlySB/3cZ3iqh+Vvq3m7ym2XawMGLgLcVHEIjmkuNAv1ayjDQcRyzpsc+3Qp2+JbFhcL8Uh6fkSP6w4hiUPChagPzxo0uch9MQMBQGpTJ1jnZzONgCXpDvpLGDRHh60K3GdMejuqA1S08zk1KbtmaHby8TCBwKsXg8zH2eWcNLjliQqh6Z/Db+UgtPXyFnGACJhajuR6XAgE18Lkmjrm38yEiTlcooS/PYVb6JRKA01MfERW4KOhFnpyM2ustui7/Zf0lVBy5r4nHt7CnzCu3+aLg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 195.60.68.100) smtp.rcpttodomain=broadcom.com smtp.mailfrom=2n.com;
+ dmarc=fail (p=none sp=none pct=100) action=none header.from=axis.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lbvlDC6LuUGEfBOGTC/Fn234HntBvlSU/d6fFWEQQSk=;
+ b=Z1XRF+SdG237vHPZjcGxt95I6WkSjAqKUjLAJkWyXuZqdgDMo5LA1hL2noiwwTRy7g2K3ngHqn0ebNYig68erLJM9qbt8LNLQsP6fRvuFFBzDVApsHSs1pLAjYApM1um8d430VM2NumSTdfekPCvUSPZbNTu8yw+S6lgV0KcUyc=
+Received: from DU6P191CA0041.EURP191.PROD.OUTLOOK.COM (2603:10a6:10:53f::21)
+ by VI1PR02MB6317.eurprd02.prod.outlook.com (2603:10a6:800:17e::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.28; Mon, 30 Jun
+ 2025 13:58:54 +0000
+Received: from DB1PEPF000509F8.eurprd02.prod.outlook.com
+ (2603:10a6:10:53f:cafe::ad) by DU6P191CA0041.outlook.office365.com
+ (2603:10a6:10:53f::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.30 via Frontend Transport; Mon,
+ 30 Jun 2025 13:58:54 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 195.60.68.100)
+ smtp.mailfrom=2n.com; dkim=none (message not signed) header.d=none;dmarc=fail
+ action=none header.from=axis.com;
+Received-SPF: Pass (protection.outlook.com: domain of 2n.com designates
+ 195.60.68.100 as permitted sender) receiver=protection.outlook.com;
+ client-ip=195.60.68.100; helo=mail.axis.com; pr=C
+Received: from mail.axis.com (195.60.68.100) by
+ DB1PEPF000509F8.mail.protection.outlook.com (10.167.242.154) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8901.15 via Frontend Transport; Mon, 30 Jun 2025 13:58:53 +0000
+Received: from pcczc3457tyd.2n.cz.axis.com (10.4.0.13) by se-mail01w.axis.com
+ (10.20.40.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.44; Mon, 30 Jun
+ 2025 15:58:52 +0200
+From: =?UTF-8?q?Kamil=20Hor=C3=A1k=20-=202N?= <kamilh@axis.com>
+To: <florian.fainelli@broadcom.com>, <bcm-kernel-feedback-list@broadcom.com>,
+	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>
+CC: <kamilh@axis.com>, <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <f.fainelli@gmail.com>, <robh@kernel.org>,
+	<andrew+netdev@lunn.ch>
+Subject: [PATCH net v4 0/4] net: phy: bcm54811: Fix the PHY initialization
+Date: Mon, 30 Jun 2025 15:58:33 +0200
+Message-ID: <20250630135837.1173063-1-kamilh@axis.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250630075656.8970-1-shpakovskiip@gmail.com>
-In-Reply-To: <20250630075656.8970-1-shpakovskiip@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 30 Jun 2025 09:49:39 -0400
-X-Gm-Features: Ac12FXw3PmrFKjrpDjyEBaBsLe1XDWNEu8EQrup3HMVbUT8LYY__w7LU958fRLU
-Message-ID: <CABBYNZ+HzCDakR18naDA1dw-PwGn_F-r7yCK+EXUodmtKmawhg@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: L2CAP: Introduce minimum limit of
- rx_credits value
-To: Pavel Shpakovskiy <shpakovskiip@gmail.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel@salutedevices.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: se-mail01w.axis.com (10.20.40.7) To se-mail01w.axis.com
+ (10.20.40.7)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB1PEPF000509F8:EE_|VI1PR02MB6317:EE_
+X-MS-Office365-Filtering-Correlation-Id: a44044be-0abf-49e2-9d63-08ddb7de3fd7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|19092799006|7416014|82310400026|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?OWNLZkdvclVVYzhQSGtCKzZzaVpVcm1zMzFYVVlGN3dwRjM2VU90RXhWMVVT?=
+ =?utf-8?B?K2NYVjl3NnNHdGdzcEZsaS8rTjFPWEU5V3NYaTBzYUd1ZExYMkZIaVkyYWdP?=
+ =?utf-8?B?OEZYVFN2OEFIMW9tOE0wVjd6endZOUVxYUpJS2ZUWFVNdVBBTkZoeG9Ia2F4?=
+ =?utf-8?B?UmlSYjJ6V1FCaURocjlTdHVQNHZGZlZCdlMrcCtob2dGRmVaUzc0eEowOWNt?=
+ =?utf-8?B?V2dOeU51SEZkdW9NeS9KZDh6QmhCYmR0NytNZXpLa1hxMlU0Q2hLTExvdU9S?=
+ =?utf-8?B?Z1AyMmdxMXZrdVlLYjY4RThwbDJCU012d1l6ZFhoNkR3NHFRLzNINFBjbThx?=
+ =?utf-8?B?eFc4L0Z0VElxbjJyenB6dWozQ2ljMTV4L25KV1lkR1B4TjRmb2pSVDVGRm1O?=
+ =?utf-8?B?SkFLZU1yWVF4RmkzTFphYTBGclpUY1RIQkkvRGZrc2xxd2xBd0wvSVovaHpp?=
+ =?utf-8?B?SmIxUU5YSXJEM2s2R1pKZ3A4QWtTbDNLZnovOXdpRjIvRVRJNGpFZkQ2OGhh?=
+ =?utf-8?B?WkVIQUdWZkVGNWR6QlBDaS9rYnZKeUFqaFJGQ2lKSTdlRlJJaG9Ob0g2TVZy?=
+ =?utf-8?B?NDd2RWZoMkNYNXlZMTRkbVBScE43eUZmL0lBbVFSU3FYT1pPc2owQXd0aTZK?=
+ =?utf-8?B?MEw4Q2ljTDZVRzRTZzVYVWpNYng4Tm1UODBqR2hSNFRnNUkzZ0hzMGNMTmhJ?=
+ =?utf-8?B?dVJFSU5sMXA4K2k4RGtQMm5HMW9OeXdKVXBPOE5zcHZzZUNoQ0xSL2RmS2M1?=
+ =?utf-8?B?WHNqeHhMay9iKzZLWHBKYWxJN3ptOTNjZUtRNnBlUWdDVG0yTDNNVHE3c2tX?=
+ =?utf-8?B?UXFGU1YyWUYvRnpaVFFYR1FkMk0zZmc4T1UrS1Rhd1V4TU5FZFNKeGtVOHhQ?=
+ =?utf-8?B?MFNTOTFlWmxYbjdkeHMzQmdpS2RBWlVUWUFUZ29uN1dyNk1HVFpiQXhGbFFs?=
+ =?utf-8?B?MDU5djRkMjU0TlJVRFpvUlRrSjU0NmQxMDNiZEJ6ZkFIMUdtUG5lUHpQTU5j?=
+ =?utf-8?B?Ym5nVnd0aXV0UGsxOVJJYTJWemZkZVIvamlNTWl6QVhpNkVBWjI0WUhmWXh3?=
+ =?utf-8?B?SCtSZUVRaW9iZ1Z5ZXZ1SXRoZjBzWTROV0s3UWhBTUpUbU1CMmxXMTNhandF?=
+ =?utf-8?B?ckNCdmtSUUhBWWlDT2ZJaERhaUhyN0VKOFBpR042YXVkY0VRZDlMODBuK1RS?=
+ =?utf-8?B?UEFsNWZOSm5Td2wvMnJqUHg5UFRZcnpycmZZUXlCTlhQSUY4clVhSWZmQVph?=
+ =?utf-8?B?VWdPNFVDOFdNdXRWL1Y3Mi9Xbnh1cWlhbHFmb1JOcmo5T3ZLWTN3cTRuMEZE?=
+ =?utf-8?B?V09BZDNJSDludFdWV1RiUVluZjd0VngyYnZRRTcwRmtib3FMVGtrM1VLNVRD?=
+ =?utf-8?B?TnBObWVmSXZvdXJuRTRicEVwa3pSM25aZ0xjcnpNbURSajJwZVUxclorY3VP?=
+ =?utf-8?B?OTAzYW9NL214TU5yRmpORFlOaUJGRG5nREUrNnRjQm52VFdSTVg3eDJaV1F5?=
+ =?utf-8?B?dUtvYm5RSDJWZnJQblBrTXJERHlSclFyTlY3T1U2eDJpYy9Hc3lZZGQ1ZTVy?=
+ =?utf-8?B?ZW8xbVFMeElDY0w3RVVEVytOQXRqQWVuKzRUMkZqcFRpMkZnYkxIS0pXemk0?=
+ =?utf-8?B?UjRBU1hGendVS1dOenBRbUQrWEQ3S3ZGQTVuaS9nVnU2QmIzTkRsL2hOdjh1?=
+ =?utf-8?B?eXVpOHJJWWpuVExlS3V3ZkxaVkcvWmJZcmt0T3ZoTDF1aXdwSGJjREluT2kv?=
+ =?utf-8?B?ZURhaUlXdDMrOE9iT0kwblVGQUlFOXJIZEM3bUxwU05UWHFqKzlHTG94Ykp4?=
+ =?utf-8?B?cGpXK2w3dDliWm01TEhtQUVURHFXdGhSNFNZalJvUHNLOWxjYnU5cHdPYWdl?=
+ =?utf-8?B?YVFucFNTblZOZDgwajZWdDgvekZzZ3o1aHI4UjhGbnZ1S1I4YjRBNlFWbkFs?=
+ =?utf-8?B?THFwaXF4cWtuN25SRjhVTEg5Z1hYYm5mdWJuYXIwNmNrLzE2d3puQ2RWVkl4?=
+ =?utf-8?B?K2x5UzZGcWlZZmZjMXoxYmdDUE8rM3g4NzRrS2YzekFzYmJOU0lEWWg2NC9x?=
+ =?utf-8?B?RldiQjlDUDU2SDE5akRrb1ViUFJpYjJjUGtEdz09?=
+X-Forefront-Antispam-Report:
+	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(19092799006)(7416014)(82310400026)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: axis.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 13:58:53.7675
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a44044be-0abf-49e2-9d63-08ddb7de3fd7
+X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DB1PEPF000509F8.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR02MB6317
 
-Hi Pavel,
+PATCH 1 - Add MII-Lite PHY interface mode as defined by Broadcom for
+   their two-wire PHYs. It can be used with most Ethernet controllers
+   under certain limitations (no half-duplex link modes etc.).
 
-On Mon, Jun 30, 2025 at 3:57=E2=80=AFAM Pavel Shpakovskiy
-<shpakovskiip@gmail.com> wrote:
->
-> The commit 96cd8eaa131f
-> ("Bluetooth: L2CAP: Derive rx credits from MTU and MPS")
-> removed the static rx_credits setup to improve BLE packet
-> communication for high MTU values. However, due to vendor-specific
-> issues in the Bluetooth module firmware, using low MTU values
-> (especially less than 256 bytes) results in dynamically calculated
-> rx_credits being too low, causing slow speeds and occasional BLE
-> connection failures.
+PATCH 2 - Add MII-Lite PHY interface type
 
-You will have to be more specific here, what is the use case and model
-that doesn't work depending on the number of credits? If the idea is
-to just disable flow control to allow the remote side to pipe more
-data then the MTU that sort of defeats the purpose of using CoC, but
-maybe the use case requires or the remote side is too slow to process
-the updates of credits?
+PATCH 3 - Activation of MII-Lite interface mode on Broadcom bcm5481x
+   PHYs
 
-> This change aims to improve BLE connection stability and speed
-> for low MTU values. It is possible to tune minimum value
-> of rx credits with debugfs handle.
->
-> Signed-off-by: Pavel Shpakovskiy <shpakovskiip@gmail.com>
-> ---
->  include/net/bluetooth/l2cap.h |  2 ++
->  net/bluetooth/l2cap_core.c    | 17 +++++++++++++++--
->  2 files changed, 17 insertions(+), 2 deletions(-)
->
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.=
-h
-> index 4bb0eaedda180..8648d9324a654 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -437,6 +437,8 @@ struct l2cap_conn_param_update_rsp {
->  #define L2CAP_CONN_PARAM_ACCEPTED      0x0000
->  #define L2CAP_CONN_PARAM_REJECTED      0x0001
->
-> +#define L2CAP_LE_MIN_CREDITS           10
-> +
->  struct l2cap_le_conn_req {
->         __le16     psm;
->         __le16     scid;
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index c88f69dde995e..392d7ba0f0737 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -50,6 +50,8 @@ static u32 l2cap_feat_mask =3D L2CAP_FEAT_FIXED_CHAN | =
-L2CAP_FEAT_UCD;
->  static LIST_HEAD(chan_list);
->  static DEFINE_RWLOCK(chan_list_lock);
->
-> +static u16 le_min_credits =3D L2CAP_LE_MIN_CREDITS;
-> +
->  static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
->                                        u8 code, u8 ident, u16 dlen, void =
-*data);
->  static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u=
-16 len,
-> @@ -547,8 +549,17 @@ static __u16 l2cap_le_rx_credits(struct l2cap_chan *=
-chan)
->         /* If we don't know the available space in the receiver buffer, g=
-ive
->          * enough credits for a full packet.
->          */
-> -       if (chan->rx_avail =3D=3D -1)
-> -               return (chan->imtu / chan->mps) + 1;
-> +       if (chan->rx_avail =3D=3D -1) {
-> +               u16 rx_credits =3D (chan->imtu / chan->mps) + 1;
-> +
-> +               if (rx_credits < le_min_credits) {
-> +                       rx_credits =3D le_min_credits;
-> +                       BT_DBG("chan %p: set rx_credits to minimum value:=
- %u",
-> +                              chan, chan->rx_credits);
+PATCH 4 - Fix the BCM54811 PHY initialization so that it conforms
+   to the datasheet regarding a reserved bit in the LRE Control
+   register, which must be written to zero after every device reset.
+   Also fix the LRE Status register reading, there is another bit to
+   be ignored on bcm54811.
 
-This doesn't make much sense in my opinion, if we want to disable flow
-control then we shall allow the remote to pipe as many packets without
-waiting for more credits, note though rx_credits handling changes
-after receiving the first packet then the credits are updated based on
-the socket receiving buffer:
+Changes in v2:
+  - Applied reviewers' comments
+  - Divided into more patches (separated common and Broadcom
+   PHY specific code)
 
-https://github.com/bluez/bluetooth-next/commit/ce60b9231b66710b6ee24042ded2=
-6efee120ecfc
+Changes in v3:
+  - Added MII-Lite documentation
 
-So perhaps it is the socket receiving buffer that needs to be
-adjusted, which is something the process has control over.
+Changes in v4:
+  - Added missing Fixes headers
 
-> +               }
-> +
-> +               return rx_credits;
-> +       }
->
->         /* If we know how much space is available in the receive buffer, =
-give
->          * out as many credits as would fill the buffer.
-> @@ -7661,6 +7672,8 @@ int __init l2cap_init(void)
->         l2cap_debugfs =3D debugfs_create_file("l2cap", 0444, bt_debugfs,
->                                             NULL, &l2cap_debugfs_fops);
->
-> +       debugfs_create_u16("l2cap_le_min_credits", 0644, bt_debugfs,
-> +                          &le_min_credits);
->         return 0;
->  }
->
-> --
-> 2.34.1
->
+Kamil Horák - 2N (4):
+  net: phy: MII-Lite PHY interface mode
+  dt-bindings: ethernet-phy: add MII-Lite phy interface type
+  net: phy: bcm5481x: MII-Lite activation
+  net: phy: bcm54811: Fix the PHY initialization
 
+ .../bindings/net/ethernet-controller.yaml     |  1 +
+ Documentation/networking/phy.rst              |  7 ++++
+ drivers/net/phy/broadcom.c                    | 39 ++++++++++++++++---
+ drivers/net/phy/phy-core.c                    |  1 +
+ drivers/net/phy/phy_caps.c                    |  4 ++
+ drivers/net/phy/phylink.c                     |  1 +
+ include/linux/brcmphy.h                       |  7 ++++
+ include/linux/phy.h                           |  4 ++
+ 8 files changed, 59 insertions(+), 5 deletions(-)
 
---=20
-Luiz Augusto von Dentz
+-- 
+2.39.5
+
 
