@@ -1,80 +1,58 @@
-Return-Path: <netdev+bounces-202530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F606AEE21F
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 17:15:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E66AAEE23F
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 17:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B93BD188637D
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 15:15:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 376763A3D55
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 15:20:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F20A28FFCB;
-	Mon, 30 Jun 2025 15:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1414C242D77;
+	Mon, 30 Jun 2025 15:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ioyQ5V7m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sqBqH8bq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0E128FABA;
-	Mon, 30 Jun 2025 15:13:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E30282FA
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 15:20:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751296432; cv=none; b=INgF6Of2MbNC2SYwhmRd6A1/esMmjc5wNvyUcBwRrH0d9OD25yDbNdqTeZBfxmkmQ94grOWkyb/8og50RP7dFyK4STASuuDg5/OdN+VLS1jbKto7MYY79+cVMsCHaP4oqrVbIJ+yv0eA8a5lAgfXFQ60pL9ma+RYuexGiy6OCk8=
+	t=1751296839; cv=none; b=pV3yv0LDV50aQIHzM9dSbGdi2ApNDHt8OzK3BJBPaS5aaTMZWKb8Z344XwLewn+33YDqH6uYLUsvdLccOEVPdeVuHuX1AqqWlQCWEIgmbT1W+F7zT1/JyRIAAJ5kcH4nai5k0KIO1+CzTSAz8vq4gQAGzbtgL9ZrDhVjzQ3KM48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751296432; c=relaxed/simple;
-	bh=o8tOuhd+OpL1cIInVhjPeCY5JXANds12HcZjna7/oD4=;
+	s=arc-20240116; t=1751296839; c=relaxed/simple;
+	bh=BBMJSzf3dC4dVy55RFgPwMX3/eT+aAKvAiClcEBUNcY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SKEFuJn1To/wPx54WXlVgs2stL4eS2bDgTAXfVDfsa6CL5PJxlNiTUnWWyEbYzEyY6wHmRuycKMhcRgxTBNC8jwb+uMu/p/9cJx1pXUlomJfn8U/AAAB0S4rXcMxEpa8542Te1aKk2aLd9jOd0H8XpvdRnfxMnOe3iODTdzNh54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ioyQ5V7m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94D8AC4CEE3;
-	Mon, 30 Jun 2025 15:13:50 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ujdbTtbxD69OtqgTQXc0SnD3b5xh1DYX65C6hGTHT8Zd8SIH7WTafJg3TCL/nmbe992VlxJknktVYF4ptLK8odHS3TiaVW6UTJVKK29RlqkBc5oWxWdD7gNrTLuVvpH7sCK4ATrBEmeoSTNmoa0GYJ5rDQE3lalFA06Y+GXBLTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sqBqH8bq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EAA1C4CEEF;
+	Mon, 30 Jun 2025 15:20:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751296431;
-	bh=o8tOuhd+OpL1cIInVhjPeCY5JXANds12HcZjna7/oD4=;
+	s=k20201202; t=1751296838;
+	bh=BBMJSzf3dC4dVy55RFgPwMX3/eT+aAKvAiClcEBUNcY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ioyQ5V7m/6ApNiJjWe6Sut1mFufXBJgTef4rjukEzHcB1EycXqjfBF/pk+gvmi5S0
-	 XdVm10Mx+ZCnGS38OLuUB2rydwNugHBMlPnhibhQxsTKg4iwkPiauee5D/8hqewnSK
-	 jHm1AXYwB4LEdo4urEoTLVNSNvlbXe8wPpgjxgg2RvLlO5/GV0bDnGMeQeX7YNbM6z
-	 FIamvKPZsMfLMRNxuFWQjnaKituk9U26mZpo20yo7bIBXGlzEYNTfPRzetA4OB/dzc
-	 DRUrgWHKy40v04lZZPb1xA/3WTCF5lTqg3tuHcCDth3c0yrs/Usc3STYfX7j6hv1IJ
-	 H+gPN4YvOB25w==
-Date: Mon, 30 Jun 2025 08:13:49 -0700
+	b=sqBqH8bqbHa7CqkxWEVfPKtVW6Py5CwSIJ5q1a4UIIS7GApWTXJ4WGEIqSFMxP5fa
+	 q9xJkRlqq0hse9biqFbnMg2iX06R7u12y7ZPXktQnGVIlKa6UUM4MfB0KQDEtJmTT4
+	 1UC0Yrf46/X2cdniuOUG8dUTMYVZJ1PeYGQiiJVw5BhMezZd49s2IQFGPKnuAoSMBb
+	 YQc2bWV+Iu8JZiwNc+DzZ7mJ7/A5gL5jZFgvghh8M8a8FMXFwr5XAI0z6yWmgnDELa
+	 xFOGQibJPC+cgAI3+UoA8Oi6eZC5UZqyO8vk+bPexKc/Ne9yyZyGen5VBrp3jL3GCh
+	 7voQDOT5bDLEg==
+Date: Mon, 30 Jun 2025 08:20:37 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
-Cc: "alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>,
- "pctammela@mojatatu.com" <pctammela@mojatatu.com>, "horms@kernel.org"
- <horms@kernel.org>, "donald.hunter@gmail.com" <donald.hunter@gmail.com>,
- "xandfury@gmail.com" <xandfury@gmail.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "dave.taht@gmail.com" <dave.taht@gmail.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "jhs@mojatatu.com"
- <jhs@mojatatu.com>, "stephen@networkplumber.org"
- <stephen@networkplumber.org>, "xiyou.wangcong@gmail.com"
- <xiyou.wangcong@gmail.com>, "jiri@resnulli.us" <jiri@resnulli.us>,
- "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
- <edumazet@google.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "ast@fiberby.net" <ast@fiberby.net>, "liuhangbin@gmail.com"
- <liuhangbin@gmail.com>, "shuah@kernel.org" <shuah@kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "ij@kernel.org" <ij@kernel.org>, "ncardwell@google.com"
- <ncardwell@google.com>, "Koen De Schepper (Nokia)"
- <koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
- <g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
- <ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
- <mirja.kuehlewind@ericsson.com>, "cheshire@apple.com" <cheshire@apple.com>,
- "rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
- <Jason_Livingood@comcast.com>, "vidhi_goel@apple.com"
- <vidhi_goel@apple.com>
-Subject: Re: [PATCH v20 net-next 1/6] sched: Struct definition and parsing
- of dualpi2 qdisc
-Message-ID: <20250630081349.4c9d7976@kernel.org>
-In-Reply-To: <PAXPR07MB79849FDC079A2ECB144D75D1A347A@PAXPR07MB7984.eurprd07.prod.outlook.com>
-References: <20250621193331.16421-1-chia-yu.chang@nokia-bell-labs.com>
-	<20250621193331.16421-2-chia-yu.chang@nokia-bell-labs.com>
-	<20250627162502.0a82accf@kernel.org>
-	<PAXPR07MB79849FDC079A2ECB144D75D1A347A@PAXPR07MB7984.eurprd07.prod.outlook.com>
+To: Ido Schimmel <idosch@idosch.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ syzbot+430f9f76633641a62217@syzkaller.appspotmail.com, andrew@lunn.ch,
+ maxime.chevallier@bootlin.com
+Subject: Re: [PATCH net-next] net: ethtool: avoid OOB accesses in PAUSE_SET
+Message-ID: <20250630082037.4ac5d518@kernel.org>
+In-Reply-To: <aGEPszpq9eojNF4Y@shredder>
+References: <20250626233926.199801-1-kuba@kernel.org>
+	<aGEPszpq9eojNF4Y@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,21 +62,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 29 Jun 2025 22:49:24 +0000 Chia-Yu Chang (Nokia) wrote:
-> > I don't get the reason for all these WRITE_ONCE()s.
-> > You lock the qdisc to make modifications, right?
-> > And the block under which I'm responding is performing two dependent writes, one to ->step_in_packets and the other to ->step_thresh a change which is definitely not atomic..  
+On Sun, 29 Jun 2025 13:04:35 +0300 Ido Schimmel wrote:
+> On Thu, Jun 26, 2025 at 04:39:26PM -0700, Jakub Kicinski wrote:
+> > We now reuse .parse_request() from GET on SET, so we need to make sure
+> > that the policies for both cover the attributes used for .parse_request().
+> > genetlink will only allocate space in info->attrs for ARRAY_SIZE(policy).
+> > 
+> > Reported-by: syzbot+430f9f76633641a62217@syzkaller.appspotmail.com
+> > Fixes: 963781bdfe20 ("net: ethtool: call .parse_request for SET handlers")
+> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>  
 > 
-> Thanks again for other comments again, and I will take actions in the next version.
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+> Tested-by: Ido Schimmel <idosch@nvidia.com>
 > 
-> As there is only one step marking in L-queue, so we still need two
-> WRITE_ONCE even two attributes (one for threshold in packets and one
-> in time) are used.
+> Thanks, we hit that as well.
 > 
-> When applying the step marking, we need to know either the
-> computation is based on the sojourn time or queue length.
+> BTW, shouldn't you also release the reference from the net device if
+> ethnl_default_parse() fails in ethnl_default_set_doit()?
 
-Let me ask again - why do you use WRITE_ONCE() at all if 
-the modification takes the qdisc lock? Which reader are
-you afraid of racing with?
+Oof, good catch! Let me remove this trap of an API :S
 
