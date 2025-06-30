@@ -1,167 +1,169 @@
-Return-Path: <netdev+bounces-202391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CC0EAEDB26
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:34:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8F87AEDB2A
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 13:34:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F11E3A885E
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:34:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2C35189A64F
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 11:35:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54AAE25F7A6;
-	Mon, 30 Jun 2025 11:34:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BC6C25DD07;
+	Mon, 30 Jun 2025 11:34:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="DDSvJ7h7"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="AQKIf/Ud"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D6F25E827
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 11:34:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689BD242D83;
+	Mon, 30 Jun 2025 11:34:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751283261; cv=none; b=aGfoKR0JHSMMHoIC1CyPI73L2HcZXD7j91w8qgZ0A5Z0t3CERVma0++ec02ZP+zRG1B9IgBy2a0MF53t58r8Y0dwnpPUdJ1ey/leaKX7tK9asv33uWs97lfSmVxLq6GpMbwL/9FvBKKScYIdjXJVyh6nu7VrGGJp9La7Irk02og=
+	t=1751283293; cv=none; b=NJiE6OxQUi49rfplt0uUWtx/aihZRc2HD/GK9F01gH0cWS2xfup8s6+SJurEfHebIRMiPbuYasGHSnEgSzHNcLlNRjEXx0O2lgzFccrV7TjiEVQxNMEXVSXx/RfVnepkRj2FwrJj4qOhjzJ3v3r+WyNbaIu+DhjBwdXpAJ49DHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751283261; c=relaxed/simple;
-	bh=PuucDEXdElMl2LXXetGT+YaBlmlXvYx8GrwmBkmp1oY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Gsg5ldkxjZLysH6gOGVsPHSwOwJ+UmSL0kv+df8E9vt+zNTBSxe0eX8M1dRzVCLtzaG61vDIttEuhuTdMvSY9VlVb6LCLPgsbMIh0tan0RgCn8wCxb8/trh9eapkuDaEPHlJDJOu0L/diCxXTougC/V6qPVPUHxXHKgNR0xTjt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=DDSvJ7h7; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-749248d06faso4521823b3a.2
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 04:34:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1751283259; x=1751888059; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VmDDTn+kk7zPY32MQypCfgx0gvGJYf4dOkvfGVm0t/Q=;
-        b=DDSvJ7h71wu4JNEe4ucfXOmTTKSurYN8eHb2yFKI9yBDU0eF7CMec+xdxeVn2WA5J/
-         XBIhxcisw9coKpD/LcW7sZ+5sWbPGppQc831ygpvWxOiOYu4B5r4Tax2i+EwMet1Y+on
-         7wkrisXTISkzp7UFPlBcaK2g1HiyEI9fxrQFTaN+Vv80Rwgl2dM/rvrzlrvK/GUe47Cm
-         OwmgKoU/RHjtpy6X+pxwIeFeC5eItV1b0oF6sNhcTHhp581Bh+rqV23dFtOR5+vMEdx7
-         oyeuTswUdlnD8Q61yLTJoL2FXNSMgk2Iv63nzBxsn8eucjL2tblFyBioonLF0b5e79Ch
-         xEIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751283259; x=1751888059;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VmDDTn+kk7zPY32MQypCfgx0gvGJYf4dOkvfGVm0t/Q=;
-        b=sI/J/a4mFUcdXuCAs7pFdFvHEkcWQE11UoyV8Kt2qzBACj315vkm/63LvORi4G4bpM
-         dmTetl/7e3zYqujtKcjYedrtOp7xbpkFJY6epWgRluiAIR/lhl1d3h/LShW68k4nK8nv
-         Xw/HBClZrt5wjh4o2w5HRu6Ks/h+AptjaLFlM8B654YfTnD0g30BP964lZcD8xp8+1as
-         2JFkusG9wbgPeI6oukgoBoZvTOGzfdrkgnsf3i3HZgze4HPv+7IZu46osqPgScEHW/WA
-         dj7vc39chh01/VNaaM66phg3Q7tFw/3NExNeXPbtqf/YFusJkFRRQK6ulK7NWTovVTo5
-         Jeeg==
-X-Forwarded-Encrypted: i=1; AJvYcCUpIQ0oBc9ULyx0KeWDkgjXvCynZTE6/hxCxSGH5lIGDTgaYtD0Pq9CY5+Cc8K4u6DKVkddLbI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpzYlPCUve1btN2Nzfhdl976+5aRaCcGFu6mHp6sMqAFEmesJI
-	eUlmlPTfbM0WgByfRRPNN7omh5LvjpeMzQGZnmEOO07W451dYpZZhqg5rCcY8QtC14J6gZkIl+O
-	ZSAUOpsWI/6vcNQNJlkyy7cADZSy+oaHK6qsvwBOA
-X-Gm-Gg: ASbGncs25msL5CbzwCg2Bvc3ORWDzNlwOLNJAZcIpQ6lxAMUUe0Y8nOqgchF6artYBo
-	/l1oJICGiUg3oUAFUAF+hj7MrSG2RSZFtHpafY2IRjmUUmqEt5veIyW31+dr6l+I+xttpU3IgBv
-	KvGC9IfjBIHWgShNnqK0igyiRcYgvb20cvjMBxc0efv+p1BQdt39Vt
-X-Google-Smtp-Source: AGHT+IEhAzaHopVsnLFQbixGoV0+h1TlOeoZgtwdX1pF9Lowhq5wUnGCqa0OH7JWT1cw8opTzeFowDD3vfMFTtjuyHU=
-X-Received: by 2002:a05:6a00:1992:b0:749:ad1:ac8a with SMTP id
- d2e1a72fcca58-74af6f409ddmr18606118b3a.11.1751283259047; Mon, 30 Jun 2025
- 04:34:19 -0700 (PDT)
+	s=arc-20240116; t=1751283293; c=relaxed/simple;
+	bh=iw/9MNGT+/hEj/TbjYC3Nc/+P3EMi/fr0CrtpPGl+MA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eLFvhJi7txdGadCneGhm/W8BHiUddrLcfB9+jepn8qwYT0Vc+7HVhHFzMyrYZYmR7E+MFA0NZMqVy/m8JjRXbBiXUsj2IEdKHqi8EY6feim4cbTmdmVp9hVYE3tfW0DpH/3ABflPszEWS/cd+2FVhzb7jNNgfls94bg2G0yYs4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=AQKIf/Ud; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8878A10380104;
+	Mon, 30 Jun 2025 13:34:38 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1751283283; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=obn1fFptpDWsfOTGxxja0aYNB+v0Pa/lgexMoMKfewU=;
+	b=AQKIf/Udw+b5eHV6+NEZhbR5iX7W6bnm9XB4i+kaxnIFF7ccKGLFWIWC5uMO3mJ8qit8Ip
+	syY2HMQgXz/9DhT8zh6n3gqlEnCwMxdalNKZL19Gt5E11nFXihxyA9tVQ1ln9KP7QE6Aid
+	swuQKBUviYdIb5tD18Ii2WK8aE1RDLUjJz6jKzA4KZNNfcKsqkRf39KQKht9qDteCaiYkk
+	1lMb68+r+Yd8p9pXy44vqdcBKerwNy6x7dyMARVmvWFTWu921/6iGCr9nFM/LXTunUVRKp
+	jF18ykoSo/sMQUVo7s8rX8Azv5fFl096GpeWJulsTb5gJ1QmdssrG9NCTqk8vw==
+Date: Mon, 30 Jun 2025 13:34:36 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
+ <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
+ <wahrenst@gmx.net>, Simon Horman <horms@kernel.org>, =?UTF-8?B?xYF1a2Fz?=
+ =?UTF-8?B?eg==?= Majewski <lukasz.majewski@mailbox.org>
+Subject: Re: [net-next v13 06/11] net: mtip: Add mtip_switch_{rx|tx}
+ functions to the L2 switch driver
+Message-ID: <20250630133436.71238a65@wsk>
+In-Reply-To: <0de412ee-c9ce-463b-92ef-58a33fd132d1@redhat.com>
+References: <20250622093756.2895000-1-lukma@denx.de>
+	<20250622093756.2895000-7-lukma@denx.de>
+	<0de412ee-c9ce-463b-92ef-58a33fd132d1@redhat.com>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <45876f14-cf28-4177-8ead-bb769fd9e57a@gmail.com>
- <aFosjBOUlOr0TKsd@pop-os.localdomain> <3af4930b-6773-4159-8a7a-e4f6f6ae8109@gmail.com>
- <5e4490da-3f6c-4331-af9c-0e6d32b6fc75@gmail.com> <CAM0EoMm+xgb0vkTDMAWy9xCvTF+XjGQ1xO5A2REajmBN1DKu1Q@mail.gmail.com>
- <d23fe619-240a-4790-9edd-bec7ab22a974@gmail.com> <CAM0EoM=rU91P=9QhffXShvk-gnUwbRHQrwpFKUr9FZFXbbW1gQ@mail.gmail.com>
- <CAM0EoM=mey1f596GS_9-VkLyTmMqM0oJ7TuGZ6i73++tEVFAKg@mail.gmail.com>
- <aGGZBpA3Pn4ll7FO@pop-os.localdomain> <8e19395d-b6d6-47d4-9ce0-e2b59e109b2b@gmail.com>
-In-Reply-To: <8e19395d-b6d6-47d4-9ce0-e2b59e109b2b@gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 30 Jun 2025 07:34:08 -0400
-X-Gm-Features: Ac12FXwpqNUX5SjyhA34p-svHSBT6dsArCtgS9xyumEFFugk-ZmDNBv4z5VpfZo
-Message-ID: <CAM0EoMmoQuRER=eBUO+Th02yJUYvfCKu_g7Ppcg0trnA_m6v1Q@mail.gmail.com>
-Subject: Re: Incomplete fix for recent bug in tc / hfsc
-To: Lion Ackermann <nnamrec@gmail.com>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org, 
-	Jiri Pirko <jiri@resnulli.us>, Mingi Cho <mincho@theori.io>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/ft7tAwYwUt/T1YMHVHAewjX";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Last-TLS-Session-Version: TLSv1.3
+
+--Sig_/ft7tAwYwUt/T1YMHVHAewjX
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Paolo,
 
-On Mon, Jun 30, 2025 at 5:04=E2=80=AFAM Lion Ackermann <nnamrec@gmail.com> =
-wrote:
->
-> Hi,
->
-> On 6/29/25 9:50 PM, Cong Wang wrote:
-> > On Sun, Jun 29, 2025 at 10:29:44AM -0400, Jamal Hadi Salim wrote:
-> >>> On "What do you think the root cause is here?"
-> >>>
-> >>> I believe the root cause is that qdiscs like hfsc and qfq are droppin=
-g
-> >>> all packets in enqueue (mostly in relation to peek()) and that result
-> >>> is not being reflected in the return code returned to its parent
-> >>> qdisc.
-> >>> So, in the example you described in this thread, drr is oblivious to
-> >>> the fact that the child qdisc dropped its packet because the call to
-> >>> its child enqueue returned NET_XMIT_SUCCESS. This causes drr to
-> >>> activate a class that shouldn't have been activated at all.
-> >>>
-> >>> You can argue that drr (and other similar qdiscs) may detect this by
-> >>> checking the call to qlen_notify (as the drr patch was
-> >>> doing), but that seems really counter-intuitive. Imagine writing a ne=
-w
-> >>> qdisc and having to check for that every time you call a child's
-> >>> enqueue. Sure  your patch solves this, but it also seems like it's no=
-t
-> >>> fixing the underlying issue (which is drr activating the class in the
-> >>> first place). Your patch is simply removing all the classes from thei=
-r
-> >>> active lists when you delete them. And your patch may seem ok for now=
-,
-> >>> but I am worried it might break something else in the future that we
-> >>> are not seeing.
-> >>>
-> >>> And do note: All of the examples of the hierarchy I have seen so far,
-> >>> that put us in this situation, are nonsensical
-> >>>
-> >>
-> >> At this point my thinking is to apply your patch and then we discuss a
-> >> longer term solution. Cong?
-> >
-> > I agree. If Lion's patch works, it is certainly much better as a bug fi=
-x
-> > for both -net and -stable.
-> >
-> > Also for all of those ->qlen_notify() craziness, I think we need to
-> > rethink about the architecture, _maybe_ there are better architectural
-> > solutions.
-> >
-> > Thanks!
->
-> Just for the record, I agree with all your points and as was stated this
-> patch really only does damage prevention. Your proposal of preventing
-> hierarchies sounds useful in the long run to keep the backlogs sane.
->
-> I did run all the tdc tests on the latest net tree and they passed. Also
-> my HFSC reproducer does not trigger with the proposed patch. I do not hav=
-e
-> a simple reproducer at hand for the QFQ tree case that you mentioned. So
-> please verify this too if you can.
->
-> Otherwise please feel free to go forward with the patch. If I can add
-> anything else to the discussion please let me know.
->
+> >  static void mtip_switch_tx(struct net_device *dev)
+> >  {
+> > +	struct mtip_ndev_priv *priv =3D netdev_priv(dev);
+> > +	struct switch_enet_private *fep =3D priv->fep;
+> > +	unsigned short status;
+> > +	struct sk_buff *skb;
+> > +	unsigned long flags;
+> > +	struct cbd_t *bdp;
+> > +
+> > +	spin_lock_irqsave(&fep->hw_lock, flags); =20
+>=20
+> This is called from napi (bh) context, and every other caller
+> is/should be BH, too. You should use
+>=20
+> 	spin_lock_bh()
 
-Please post the patch formally as per Cong request. A tdc test case of
-the reproducer would also help.
+I've double check the spin locking in the driver - I've also consult
+the fec_main.c.
 
-cheers,
-jamal
+It looks like the mtip_switch_rx() and fec_enet_rx() are not using
+explicit locks and rely on NAPI locking.
+
+On the other hand - the fec_enet_tx (and corresponding MTIP variant)
+use spin_lock(), not the _bh() variant.
+
+>=20
+> Also please test your patches with CONFIG_LOCKDEP and
+> CONFIG_DEBUG_SPINLOCK enabled, thet will help finding this king of
+> issues.
+
+This was enabled by default. By changing all locks to _bh() there were
+deadlocks observed.
+
+On the MTIP driver (due to this HW IP block) there are some locks which
+must disable interrupts:
+
+1. One is when mtip_adjust_link() is called - as it is the same for
+both switch ports. Moreover, at some use cases it is required that the
+switch IP block is reset.
+
+2. The mtip_atable_dynamicms_learn_migration() - it changes the content
+of dynamic switching table. IRQ from switch shall not be possible at
+this time as it can be called from mtip_switch_rx() (from NAPI) and
+from timer/kthread (at specified period).
+
+
+To sum up:
+
+I'm going to prepare the v14 with changes around the timer / kthread
+running mtip_atable_dynamicms_learn_migration() and use time stamps
+extracted from jiffies.
+
+Locks will be optimized and following paradigm used with fec_main.c
+driver.
+
+>=20
+> /P
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/ft7tAwYwUt/T1YMHVHAewjX
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmhidkwACgkQAR8vZIA0
+zr1gIwgA5RFaOOf/zToxgLklld0AgiA7amktt6Vm7D+yrAK4VbOKEnAMTahAU7iE
+Z/aSDSy3TmQ6p+k7SOMCK/W7UyAGi4nIffvLFo5N4PGTYmBqVhq+qlpjSm7bnFAU
+mUKTz6s/N3KoneKHrKRf6ogC4PubkGH4RqQ4gVbr0YZgwd4XsA6uEFVoPYeUQ25U
+EVRkOV9W2ouDS/MpoHsQoFN35ottbyK0i2kVUqywK/QGPuQtLXOEfswnnqQ6B692
+nRkf9dcbOPJqCiabDst66cODEgmDJ5brs7f6SZ7nPIB1ASnGmjDaVgIzuT9CuA4G
+LfMIlP/XANgIKp/dLSJtVT7sdEdmDA==
+=eCtd
+-----END PGP SIGNATURE-----
+
+--Sig_/ft7tAwYwUt/T1YMHVHAewjX--
 
