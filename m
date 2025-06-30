@@ -1,278 +1,344 @@
-Return-Path: <netdev+bounces-202660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86C0FAEE8A7
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 22:56:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A7F9AEE8BD
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 22:59:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 967EB1BC1377
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 20:57:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54E3F7A4FBE
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 20:57:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A49F123497B;
-	Mon, 30 Jun 2025 20:56:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EF1324E4D4;
+	Mon, 30 Jun 2025 20:59:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="V8NreWXs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VGvQTsAd"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010050.outbound.protection.outlook.com [52.101.69.50])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70FF11F3B97
-	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 20:56:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9808F156678
+	for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 20:59:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751317007; cv=fail; b=ixwvv0LiJJaIoBaDM5/IqkFTldjkVtSG0MD2P1SSay8MJDIgo25oQO5UdP6Mu9ObVYb+lrbCq19td8PC5ELUR7bKTWYsWYVys2/Nu9EYGd7XnzQMQlAdvEadqWG452McSf9gmVXz1Tygs+hTaz+DNFdDJCGbTzEoclvrM5wTD8s=
+	t=1751317142; cv=fail; b=i7GUgX4ASEwkEPTQtljPDDraFklvA0fvw3kc+Boo036RqbUuIDnQxCc0nBX31yzLqiHPhWTwMMzbyrqfqwfo2/JjfQl59p2MoTZai1keCDZ49XbL5myVsEdIIcYtOVsUKx6wJuqXH+W0F2tH19gvDSpV44uZWuhoGexHbIIKecs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751317007; c=relaxed/simple;
-	bh=7yHugjsUFH9SiNPiVLgM8gsPffSPLG2fR34hU4Lb0kY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=GbG3YzUsDEO4B1nfEkcfXH1/TbL6blkIJBTMpM7hOBDU9ALsT6sXcnS5QnwDdqkUI7EcfsgSKlK08htEjqhksR8hNV0oS9Q4RpYHGObpML8vyWbemqRl+FEveTIGnTIRWUEPWDF/xfh9uXJTqr2l9N0aztV3LtS4HWgmBtWvKhM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=V8NreWXs; arc=fail smtp.client-ip=52.101.69.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	s=arc-20240116; t=1751317142; c=relaxed/simple;
+	bh=0EzAU4PgLDApHMNLSdwA5qyFSfvIPCY62JITaXMwRqw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=trsEVQaIdou+wLrEf0/dyYMahwnkTS5C04HhxNm2XC8HetihloHv8HYB3vZ1s4IvgViO8zFDEyUU1G2gmwzpGhEib973iPMbO56+WSR5Gotxi7cB0W0xIf9GeuLPDfqD0ROiAK4P0lQvqaKyDmvk5AarIQMOualU/r54yvnrTUE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VGvQTsAd; arc=fail smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751317140; x=1782853140;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=0EzAU4PgLDApHMNLSdwA5qyFSfvIPCY62JITaXMwRqw=;
+  b=VGvQTsAdmPFuS5Z2icRrXoJnU0ABBWuhUfSwe23de8xIL1P2FgsR3NQN
+   XCNZKvdeViD4IbFLz9iTkeSxfXi/cfAviNsJJdwq04VJNbQlsSKymrNyQ
+   9HLTG20oFeb4PT+b/byNPyvHtpQYxDkA9Z+t1HqcRbspyxEnTmI6DSuRg
+   h0QeUF8iJ896FiFxCGnWOOVhE5DgXOobvRgekujOde9Cyjo0hX/wQhZ2T
+   T+Fd7HTNHXjr7SY/sD+ufbhAd0sj7EcPJ9ps8yGPy6jdPhZO6PVptzlX+
+   jPG3tFRHbfM6MNIRTuPaiVZWV4hTrOePEWQB5wCYfnP+TA4qIyEUItRQ8
+   w==;
+X-CSE-ConnectionGUID: FxQD+NxKQVyBEjL8QNEH5w==
+X-CSE-MsgGUID: OqRN1FvuQi+ztioTkZVAWA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11480"; a="52785410"
+X-IronPort-AV: E=Sophos;i="6.16,278,1744095600"; 
+   d="scan'208";a="52785410"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 13:59:00 -0700
+X-CSE-ConnectionGUID: 1qQXaneuRvqVSZhI8fxfXg==
+X-CSE-MsgGUID: 3rJC1TzSRLuF7ff3H+Ls1A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,278,1744095600"; 
+   d="scan'208";a="153188465"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 13:59:00 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 30 Jun 2025 13:58:59 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Mon, 30 Jun 2025 13:58:59 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (40.107.244.53)
+ by edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Mon, 30 Jun 2025 13:58:59 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pe357pJfvHmyepStPv5dJm/QkILMWOs62gA/FMm8QVT6LUB+HuUBapWEciuFt3OZourXZrBLwqgRcXenwfRoIxKJmq/2uVuFx3NPSLivUSOZ+B3O/yC6vOiheOZYbETBBeG7ZvlWNCVVuOw16Z1sVT5WLj1DUvyaZVkVZWfpl3D2pUrkZA+09+xZ1A8f+0rYb/EmW4A8rZ/X/Hs4vg9AV0WCXoKAUvq3YxRqD/yQo/ZZ6c/6YbkH6VLjTF9mH4OFx9GqrWC8dNBLpsj0exWoG/fAgsVx7TGdmN1oW9H7LMJqVAr/1ldrc/8JtBVWStKURSjP3QVfV9vyJcH+KchMdw==
+ b=FReLFIjSMtP+gdY+aaYOU8Pt5sWhxbeUyIcQweFzI99lR5Q4AtzAYWFxqCwwQnbzowu+nEUT9DtGFjeRQkc4gYPP2Sj5Hk8YaCOOzopJibpZncXolSn3hofu9dKBh0b0ghOOFkF9M+PumaAfF80QLaDF12S3a1D5kNeDe6hBPKVu/QPoUWnnWAxSsisvfOYWwnC4bKe8yDY87U5tgfZTlQKmFrutQLiA1++hsjH/mU/kovKje78BBBiX1l3WZINV7TZ4xcbFaL34RB0d/+cMcH/hEq+j351zMy/IZOc2V+9XKw3SjkyfJOYJJcsDgagWbeLG76UuvQ3GlWq0JJKMJg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DE8GKubG4DyXTyEr05INcKThMPj46bFstezt/WO7MSA=;
- b=E+2xrzVrOkWRwZYl9O+7kF0G0FMdtfVWAofQO5JVRQVsCabsSyC+LH+zLCJo07iux59w0lT475wfXigo4XYuCRhLeY21EegiVag89h1AWcbSWj0FL/NC0BfpOz2+n4o5OzGTCP4Fu87XI+TNDhpY//5yIhyU1lXn5wqJabIhErk3LfGIFHX98yCecENoS6NWsfvQAz1IU6c42LgB6KFbHnYp+4DtOqijf8vbMIL/boTeKlScE+kOE+4PZGCk46I4STFfECAqameQpe0+WYBCPOudGAxklCoJefJ9sjgUY3bCdx3vjqH01at/A2Rgmx92F+AxNDNI0TAwZ3jn3IkHEw==
+ bh=UZLs218Bhga3CN4iNyl0IbQUTt0opYMjSw8dl7gb9T0=;
+ b=UGHDNgELeU7xLa87mBtu3/NjjQC2QWFn4Mfexx5cKLLHV2VJXydWq8df6CbGekw18066l3nmMhRIevrhdQ2d2caUTv3eeHeGuD78BEi0i0GiGG0tX4nZn2891CrGH8U9kNQSC7ZPwJxSD7FVPg1iIPusLVzdWkWUqJPxvwYu8zSW4DaTC8+D4Lfw6PxtCcsV65+4GVG+dsqSm9QciRmctaik4ExdTDUQ/TBoVti6RUtlMLy3Xur/xfbHG+r6RIJmFfSgcNaFlhk6ta7iqgmLkSstZHBhG8K0D6BX2rak1PrWrsL5ZGbZo5k6UvZ4j3Z+vBnHdAP911Yi7efRqyOuYw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DE8GKubG4DyXTyEr05INcKThMPj46bFstezt/WO7MSA=;
- b=V8NreWXsUkG90xZAchGjXeVqjq/uuqo+0LSFucc/ULICHSXo99B2b1Q0FU+iBLelIrLYBmuPHSanO8gk64EzlIaXy0XLqomDaJyglb6fF8QYWIkf9f4qsevvVjRj3KhqyFik9BaQ0thMvVOcMfo3PZFIZeMmAEpEwJeaYmhQPLWAGjMdgv85EjSS/XjbXbgXeikNJ6hWNmJHzjw3bvMxOAebKZyWhEwKpFaHdIK7sBI6JumJlsgYRXVt6bQvYgTadnk1PnkTXwqkM/zAh7qh8KN97punyLXBo5wZR7wC/cWOrycJodzh0VZ6VXFweKZaM7JgzDEQ/E9olFcES0gAIg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by GV4PR04MB11379.eurprd04.prod.outlook.com (2603:10a6:150:29b::20) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
+ by IA1PR11MB6396.namprd11.prod.outlook.com (2603:10b6:208:3ab::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.31; Mon, 30 Jun
- 2025 20:56:42 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%7]) with mapi id 15.20.8880.030; Mon, 30 Jun 2025
- 20:56:42 +0000
-Date: Mon, 30 Jun 2025 23:56:39 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH iwl-next 4/5] ixgbe: convert to ndo_hwtstamp_get() and
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.27; Mon, 30 Jun
+ 2025 20:58:57 +0000
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::24ab:bc69:995b:e21]) by BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::24ab:bc69:995b:e21%4]) with mapi id 15.20.8857.026; Mon, 30 Jun 2025
+ 20:58:57 +0000
+From: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, "Keller, Jacob E"
+	<jacob.e.keller@intel.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Gomes, Vinicius" <vinicius.gomes@intel.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, Richard Cochran
+	<richardcochran@gmail.com>
+Subject: RE: [PATCH iwl-next 4/5] ixgbe: convert to ndo_hwtstamp_get() and
  ndo_hwtstamp_set()
-Message-ID: <20250630205639.ayydzdmh6et2zlyb@skbuf>
+Thread-Topic: [PATCH iwl-next 4/5] ixgbe: convert to ndo_hwtstamp_get() and
+ ndo_hwtstamp_set()
+Thread-Index: AQHbw++AVYyDs0qTtk6/w90XlfVhLrQcWZIAgAAe14CAAAKqgIAAADmQ
+Date: Mon, 30 Jun 2025 20:58:57 +0000
+Message-ID: <BL3PR11MB643584D780C953B0060E29E6C646A@BL3PR11MB6435.namprd11.prod.outlook.com>
 References: <20250513101132.328235-1-vladimir.oltean@nxp.com>
  <20250513101132.328235-5-vladimir.oltean@nxp.com>
  <7d330d84-42ab-43aa-94f1-5240b67c49dc@intel.com>
  <a9d50186-bffa-4b3c-9d97-831269a84fbe@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a9d50186-bffa-4b3c-9d97-831269a84fbe@intel.com>
-X-ClientProxiedBy: VI1PR03CA0045.eurprd03.prod.outlook.com
- (2603:10a6:803:50::16) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+ <20250630205639.ayydzdmh6et2zlyb@skbuf>
+In-Reply-To: <20250630205639.ayydzdmh6et2zlyb@skbuf>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL3PR11MB6435:EE_|IA1PR11MB6396:EE_
+x-ms-office365-filtering-correlation-id: 32a23f05-9465-4dfd-4216-08ddb818ee2c
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?qvjoFaAX0rkOeFI8gacyuD4XWdwQSuAcDwA+5K2RaGnlxd9h+XsUlKE7d96Q?=
+ =?us-ascii?Q?6M3Yxp8G30vfbk4uVbqRFSXuE0UQqx5genRi7XkYJTfGcLldfQKcKAUpUCpc?=
+ =?us-ascii?Q?5r3Y6vaPx83fGmg6htMSp1zMsWCvbFxm6wJtPkiZyRdFVAfI6pkfq1nnMrVb?=
+ =?us-ascii?Q?H+rjaSYdTnmJwSf6RLZolchcy+9Sr+hSlMlU5rJpBr+2RpMGZ1lRqjMFKkiM?=
+ =?us-ascii?Q?6Ecar3izdVOaalnzrEtQiUYHuRrYvApjgSA4aNRSs9E7KGCkDdQGBD21l8zL?=
+ =?us-ascii?Q?oRyD7QG3SCf5MX0IVWhsCBuT/vbr/ANyJJLH/8kR6vzowhtph19/OK5Zcaxd?=
+ =?us-ascii?Q?pHdZNNL42sgH+H5boU2ZBcMVknBLOhyRqBdM+eSz2zKCbudFx+aDcAZVuVSj?=
+ =?us-ascii?Q?vOA0Ah8t0qeZbc28rBILyyM8iuSUXNyRbZl87DSmpuiOeYp5Uv/GmmRntlMV?=
+ =?us-ascii?Q?qlP7zse85RmKXuekq5HweEmglJ3l8oVqP/hd7bKUq67ufmPaH835/JTp51r3?=
+ =?us-ascii?Q?PA7wsVIsXL7g4wmxxa5AhMDxliP0xFdXRXLddPSdXxOMy+Mt4nwEhEf42iUa?=
+ =?us-ascii?Q?gsy+WXq61qX+odAO4MsX9HiNO+TbgWSOdihrd4ihD58ksnwF1ezri5VQLiTz?=
+ =?us-ascii?Q?XlOTfPFeTN5IKUmclU2KTcjgk/LK6PYhiCYDpwGivRPQMWzAo1eSzf3na+no?=
+ =?us-ascii?Q?PIBqqaZRIewkqi8QmAQdcIUMNxfQikKNfNfRLPqSO+bnb6Rel4RQAjcKyYWC?=
+ =?us-ascii?Q?Fj4R/EmkGpqBsPD7YDLnlpt9biVwoSCU1V87n91Bxls/dSmnt5yc8+OW24Aj?=
+ =?us-ascii?Q?mCJbERL2QL7eE7JhCYhctehmht6EnyFWwHJ9yM0MWOyhylKI5PCV4vVHI7VH?=
+ =?us-ascii?Q?mT2780HZsn2ZK39+Y4oqfy5jQn/lgeM4a6eGHP2qRNYoTA5ww2DxXXhsH+/B?=
+ =?us-ascii?Q?mj1UBQuT2J15ynXv3ava6FmEYzjDBicwFOcGkff9E4h/+OdMCLPCaN1WJ2BW?=
+ =?us-ascii?Q?k2HUJZrQnzvqwhCF4r/TVpc55HWrdeDXK0iNyYvb6TWPJGY1AXXvrLFF7k6T?=
+ =?us-ascii?Q?2a/EQ/jF43Kgn0eCYbFwoMKELU11F1OrYuCUIqpcQEVW6P1bHuQTGRWnRExN?=
+ =?us-ascii?Q?qojzuZf5wUt/ZXtMhvbGAox8sxYUWHbouyzJ3EEc7XcalBms/C7RzFtsbBMa?=
+ =?us-ascii?Q?6PY7CN61L7bXO/DzyIRczL0MvV8cphyyPHYVGTTiw82Pxzw08f8FtwO3zUJs?=
+ =?us-ascii?Q?JzfQULvZdw7ephW+WbSQqz9OI4k6wSPjE9BINrmwgn0Soj4aVJHIZuGA4C4Y?=
+ =?us-ascii?Q?tpF9DG4TSDxSjBQpCez6hDyuSRPkkufy22nPqe/3qwjgyE0EFpi0Q575X1Bq?=
+ =?us-ascii?Q?R2zdrouqcF2S/6ufph3riGPsw6tDdJ9Q/1aDDt9NFsmdvGh7l6qZ0Ce5W6YN?=
+ =?us-ascii?Q?95Ch0rZ8A3CZ1pfdM1hUrXXvsHecFRGssAJ4iPdOgdWJJpoxLcoL9+T8uWCZ?=
+ =?us-ascii?Q?INbBQm3z4TfaRBY=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?5WVsVK/rR+IbrqBreB/KhoHyCs1Uws7ORliktK2tDPlzcuI+FI+JE1gqVA1G?=
+ =?us-ascii?Q?YgaHUcC57IxMk/NiXeau8YLcgzveClTkEmsy0m2ue+pQ4znKZ2nQM6EfbSHG?=
+ =?us-ascii?Q?ZM5fHzuWw4ekPuauzlsP0ZRNsqmPuoxQoyhOzWVpuo/je1Phej5kxBSs6S1T?=
+ =?us-ascii?Q?wjses5lLuDj53juiWni1qr1AueGm/FqP3/GADoKn/TxoldxbFNqNJJowHStN?=
+ =?us-ascii?Q?8cSTvaZVh87L5sdjiOGYZ+ov88sPWVfxlc3jfNlgE0U5eSn+O9wi5V7QqzFe?=
+ =?us-ascii?Q?ChsDeetVFdnD3w0nIj3sujSNPwPmN/cHx8wEK+6E2OKQiq85I0GyPNJ0V8I5?=
+ =?us-ascii?Q?aAolZ5A1bhfXak4dFF6TlhNOAFsqKjiaZJ/makttOTZG3S2fCGDA+85R9IzK?=
+ =?us-ascii?Q?JOjqtdzSrqtOsYOIhOwvNPd9q7UHzOzuwkznVV5xwnKBV5r5/tAHRwx6kRVj?=
+ =?us-ascii?Q?2V9yZGuhv31H7zOPvcAJk6cbEMV9/KXAHjESIP6BXktds3Q9sG5tAfG2qr8f?=
+ =?us-ascii?Q?vL/GdTo/xQ8x1vTZ/CTYlvVrZVmUwoHbUnENppDQIU4XgtdpOcu9hPLwa0Kv?=
+ =?us-ascii?Q?Xc7jKy+R/75Uh0V/F/UHF8SKBmrt7po4tS6M9he0GWUBCwXJc8j6TwuTHjw3?=
+ =?us-ascii?Q?E/LdVFQ0gAnznbKlaTtxgBTRbpywHeoOB0YkldfqGdmGz3A1pRq45nG9n4H3?=
+ =?us-ascii?Q?ZX/nYcB4ZzXhWVSy5anPUU4wyiSYyr3Nl+ZRtZwtIW803ng34zXwUUGDpYb7?=
+ =?us-ascii?Q?GgG9Ce3DZkY+I8p9bkN6dMRG8v+tUjWKOngdOuQ3m8/riJpRh3tO83l8UyhA?=
+ =?us-ascii?Q?HNtb1Oi8diqZFm4bObwKzNSG7CSL4bB3PU5pMXYQhxVJYx3uH9Cb6zC01F+c?=
+ =?us-ascii?Q?RPDYFR1UVdXnO9kdiIenZlQ6R0akYyXUl8x5d26i3vaAA2YkvxHxcwoOTOyz?=
+ =?us-ascii?Q?uHcjh0Ui0cbZ/5r2OieZfYxoLEl+QXURvH1TQwmzt4mmq5jTi+9BpDBVcnBZ?=
+ =?us-ascii?Q?ViYfa4u3GS/2kNLdBnmNrNvRhxiBSvRiOP0yl+VI2ISBdHOJj2V/LXPD8X2w?=
+ =?us-ascii?Q?3arzn+Pn4uCv7UOvJfWxL11X0knMdmWER4fCQueOUr0s5PFzYNzThvCC8kTw?=
+ =?us-ascii?Q?lHuM/2GKOT80DTwE5a1XXoCWVn0sC7roKBkyT8um0nH0Vp44Ap9t5/p20P9x?=
+ =?us-ascii?Q?4Jd1dSNLBYZ4o3MP5pqx/RwHd0ZU1g1qBXU6RsaCiglXmsKLtojrdEomhrs/?=
+ =?us-ascii?Q?CX1yx0/ykTmpInU96bf+769C3G9TlEzTVUJj4SV1E12MF+mXZSnmdO+YVXml?=
+ =?us-ascii?Q?kKjKv6a1oYJuANKMY3WXiLkmvR+k/FN2a/1VVyolHooW9VKvWWlsGUGpSQe5?=
+ =?us-ascii?Q?jAqJAxxIPd/mTMxZLj5Ps3s2JUcvl4M+WGmoAr4rsSUaG0jESXGnc8k99aFZ?=
+ =?us-ascii?Q?AHu/kCQtBluK9y5mMWiwCW7SUDT1RM19iJUXjv1ttSFd/VL273lWVSRv/+SB?=
+ =?us-ascii?Q?4LEgpQ2/vuziS+j75Lut4b0Rjt/VCuk6m5zMK5NcelzNOPl7IfRhnraUJUZD?=
+ =?us-ascii?Q?EdViTcgJvOLoT1GG0WJ6iQueXaBnSvaaMaXHiRkr?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|GV4PR04MB11379:EE_
-X-MS-Office365-Filtering-Correlation-Id: fde16e37-fb73-4b31-8d69-08ddb8189dab
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|10070799003|1800799024|366016|376014|19092799006;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?OM8nM7p4ieC3caadkOl5gPkA3FKCVWgxx4C+OmHtQTlrqPfqS4NPQdJ9yKAe?=
- =?us-ascii?Q?ZHihXyADV4DGbFeHqX4g+QQroCmi2+JA5oW7UMk8+vhGiLkl/D7TjgAwLbog?=
- =?us-ascii?Q?T5RJkNpW04HWq8me+mFBp41N8+M/9m8S5WjjoooxzttBvzwJ6zJXrR7imfs6?=
- =?us-ascii?Q?zcHmQ9y66nDr0V1z8T80dJ/bUy3rZI12uPs81RbZP4l8sXa9DKAD0Dl7cH/7?=
- =?us-ascii?Q?porMv/ouJicxU61zxnUXZOWmOG7Hbijr0zFCc+6fylNlVQEpJCZbZNc/dMGE?=
- =?us-ascii?Q?3deWBP55XTVRlfVObXce8YrQgm3YwOtBNmTvslYN59CkrR4kMRpDc9TzwwKo?=
- =?us-ascii?Q?wpSn4FPZ1cGi0pZSqY+HQVQEuIVueAwZ3bgeAonmbW1MbpI9J+sBROc4PHjU?=
- =?us-ascii?Q?7bCSE2WitblD2q4Q6YoM6ZQBYhMmz8PaEhzbl4e9gQJGK45M+wMF3CwfpDbN?=
- =?us-ascii?Q?+q4UDlf/cEgSQf6Jka3mqFdqly4bw/2kV63BhmfunieT8byf6rHP5NVNtuen?=
- =?us-ascii?Q?6swp5S2zo/v/dpP3QHF46TUoNaIVxfE1WsL62fUKjy8je+K9pfyp56NUJZQL?=
- =?us-ascii?Q?nD6osAvW9rNaUHENi5S9cOpEUiUCB9yYiixLAWkEb/yf5zcHKLaSqNllgagg?=
- =?us-ascii?Q?HkKMSA5BgpRAqWCDiwcZMemJK72HiWuAKmQDMsITfDPUvzVdEem2dLYjWGny?=
- =?us-ascii?Q?wbjvlOJN/E6u31r8yg3cIUEwiyVS/1YI2x/fr3Q1tXwyKY9HYxw0Q2Rc7uzI?=
- =?us-ascii?Q?7DgAUVgCaxIxrbvOlm5C6zBevG67H+ozb3F4DErOlyytj9KndzoxLraX1NPe?=
- =?us-ascii?Q?e1G3HBA9pfAF8dksSXzZ4HwKySXYMqIjbhWkxFHZC+kz+uHWuni5UZYe9/OH?=
- =?us-ascii?Q?akzeK0vOVmVOysmRDGWtlj0OyTUP51aAE0WPTfVLdyGfV+bsux5gWq7cx/OS?=
- =?us-ascii?Q?ROduUL76r4/LuGXgu0Si+Z3qczG7zpqnNovho8j9C8U0s6jn4XMlQtJzq+Qc?=
- =?us-ascii?Q?X+MuEZ/LkgiUIJPiUOV0TKt5ki/dcMoqaiOcu4P/p+aQSYUmlkQV1QOCI0Lg?=
- =?us-ascii?Q?qqlrF7gvsWKkbrPEUUK3ulCJ6D+v58Rbn8/tTfU2JTPOYnizPOap8PdmTgfC?=
- =?us-ascii?Q?hc8ua/pgFmsW+YRUc/I8YkX9bMY+n+AMypiZlK3C7RlYDIQ4sCkz2TPKCFag?=
- =?us-ascii?Q?KgDSeu92SknpjlgGmhw7KNnT84XWGTBB6u+7/MXjju5Dw1axoL2FdKdobEzh?=
- =?us-ascii?Q?SXRh1La8pKrqwlTEvV0fPIVCc4hba4BQjz70Vgp4iSS8qDELYiAety4H8+et?=
- =?us-ascii?Q?OfNrlPW6agHeDZaCj43HnTJ/ACP4kDL/xw1ePCSoXyAO2VaW73GxQKKrMsSk?=
- =?us-ascii?Q?tAbP2OtQ4ECdAJAITTSxqJZpW+KU7MG+aE5FAT2CbqL9YQFkOCEDznwbNnIk?=
- =?us-ascii?Q?y7GC5X8Je7M=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(1800799024)(366016)(376014)(19092799006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?BrnGlb+RS09Ud5DIDbxute9Fr0oUt0OZZpDsr2erQxKDmq/e9a0cyMbNvlos?=
- =?us-ascii?Q?OFfRvbEUzhTmecQQ6CKE0baKcs0LyEq32SbewY3J1Tt9lIrf9+Q24/inYPA0?=
- =?us-ascii?Q?eY9BaXsN9a0cEq18nddE14Zk+KALQDfxTExyc46kTm5i1+1+wQFofmiySErR?=
- =?us-ascii?Q?vXFM+Aq8lb7XpvDOW9u++WEjh+9+asM2i7xvQwJx2TWCVkGiJvXjsaAFRqlz?=
- =?us-ascii?Q?rXifmZGLYv4WHwlo1ejEEkt0VSkZHpH+URM0QiPnQq6HhYe80kld+JPEtyXN?=
- =?us-ascii?Q?FeGRimBGSj/hDEJ+zBpSRI4Lz0ffbs7nOIqpWo7ZjC51YdIlJmJy+3u0+7L9?=
- =?us-ascii?Q?RWOIe502UHmSN3dZ3CxCFM5tynLPlxzPkdRmzYRfAxZ/GNsJZRpcgzLo1mWs?=
- =?us-ascii?Q?u1sOkWNWpESBUGn90p5U7HGd//IH7jalxFS4ovUtZeQtlXDGxy+vImB0ZjNv?=
- =?us-ascii?Q?peAGoS/gdtZMWK+Wplv3jHbye7/WHX2xSO1FHkbP9HRnwHunOqNv5XlxAMZA?=
- =?us-ascii?Q?V3FGYj562pdGas/b377/ZzAMBwGwfQGom5g0ynSBH2h0QeB6AN0QmcBHJuVY?=
- =?us-ascii?Q?50MQGJpUrvud94AdBlkNc/T2qThB+zfIakWrsStRTexMs9dGvLHAQgqTWitT?=
- =?us-ascii?Q?Av+1IAy99BaL1XgaCBECmDA69N0OuKrGKFBJMP8vZddDQlhUZ/dtjTUUxhRw?=
- =?us-ascii?Q?Bl3oQNSVlwMBR5imB+PT0BVThqYgH80Qsnst8oPquWgbtBTZh/OZJPA9Kp+h?=
- =?us-ascii?Q?eSeAWJeSzToiIlMFWA6QwwWMAzaW/2uNcs0fMCNpFAHmtOm2NZXzOdYZhf47?=
- =?us-ascii?Q?2r5vVeplwy0qrGwL7hR6hsl5SwNl4J63Pax59Cwh3EQuUldkUWPHZVxAxGIW?=
- =?us-ascii?Q?eYh3RjDJfbnSHn/2HSXhiAfG6fT6yc27j+Z07Q7Sc3cOkZR8a2DLdjaQ+WzW?=
- =?us-ascii?Q?Jot7pLGZmbUl5tqz5GxEHOMh6WfEZPSqtL4fyuskrIRpScqx90qE+KhF9N+Q?=
- =?us-ascii?Q?77aQTl8ivcz4gMUt2cyL9Ac26vpEXeu3V0tdxfO17yxWw7oLA1gK011Tcv9J?=
- =?us-ascii?Q?yAndspnmjugEhlmjvioSsxwSY0e7W32eC0orTnDx1dhkRoLLe4mLjZfGP8e/?=
- =?us-ascii?Q?r0Y60hC4b71423D9I6eWX0lYquff4EoN4NkQxOzg29Q/kwPqwjNCCDAeWV8J?=
- =?us-ascii?Q?KaBEnnw/bmmdhu5/tgLwa8VbIQeTG/mCRa4a2FWYnSfgZOvC04VnpO7iiGGs?=
- =?us-ascii?Q?nAPKRyjFCcuFdKnNSrtqNV77sOCgkq4d3GkVLMzsmXyVYAwhNUTTuC1LCJVJ?=
- =?us-ascii?Q?cT0DoVp8FrRSaK1jtqN9ocS3JcvG9aIi/15R36x7aGwsCxpVmS9kiHzIhqkN?=
- =?us-ascii?Q?bQ/47e3TXdMUW3SBrMoqHdo18x+x7lhZpDgqdNWNiMYcKdR0l3xdjLiONjvb?=
- =?us-ascii?Q?k/+ycZAsuQd4iYXv7z5AKOpjKnkWK6ZLK16qqmV1CZ8GWnjPJVDwpI55GdZW?=
- =?us-ascii?Q?sLQmUdKS1ewBF47LjNzR6AUnk5W4dE3ha0X5NreIH+cQzPLKFDRM0PFaZtTz?=
- =?us-ascii?Q?jDSODnNVrMAClAS0c76mLU6ffflz+iWVM/OShhVHqG2YHvZJ1mjXXHXq6zM7?=
- =?us-ascii?Q?Xx+q+ZGH2Fu7+pos9zwzjPuuctFj8at4/uO00JjbLObMRNgDjhAjISr4U+0+?=
- =?us-ascii?Q?cx9ZnQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fde16e37-fb73-4b31-8d69-08ddb8189dab
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2025 20:56:42.1662
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32a23f05-9465-4dfd-4216-08ddb818ee2c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jun 2025 20:58:57.0855
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OiPTkq0jWY3BujekFg1EvwM9LJQvna1Bn4oOutVrN6MTEn8OTTIpJve5Zb5O8XFnhT1SEP4ByNxuMFS9qyB3Tg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV4PR04MB11379
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: o/Ki/qWWRZzJixbGOHvwBiE7T9nDYFUeDbmzFANZlGD2tJ36vb05xoRCSIFK9mwSplY7R2aY6txmuX8xuuseVKVr0I9o2D1jQJ0LxZQyMyc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6396
+X-OriginatorOrg: intel.com
 
-On Mon, Jun 30, 2025 at 01:47:07PM -0700, Jacob Keller wrote:
-> On 6/30/2025 11:56 AM, Jacob Keller wrote:
-> > On 5/13/2025 3:11 AM, Vladimir Oltean wrote:
-> >> New timestamping API was introduced in commit 66f7223039c0 ("net: add
-> >> NDOs for configuring hardware timestamping") from kernel v6.6.
-> >>
-> >> It is time to convert the Intel ixgbe driver to the new API, so that
-> >> timestamping configuration can be removed from the ndo_eth_ioctl() path
-> >> completely.
-> >>
-> >> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> >> ---
-> > 
-> > Ugh. Apologies for the late reply here, but this took for ever to track
-> > down what was wrong in our testing.
-> > 
-> > The ixgbe patch has a somewhat subtle bug which lead to failed timestamp
-> > configuration and likely other forms of memory corruption.
-> > 
-> >>  drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  9 ++--
-> >>  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  6 +--
-> >>  drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c  | 42 +++++++++----------
-> >>  3 files changed, 29 insertions(+), 28 deletions(-)
-> >>
-> > 
-> >>  
-> >>  /**
-> >> - * ixgbe_ptp_get_ts_config - get current hardware timestamping configuration
-> >> - * @adapter: pointer to adapter structure
-> >> - * @ifr: ioctl data
-> >> + * ixgbe_ptp_hwtstamp_get - get current hardware timestamping configuration
-> >> + * @netdev: pointer to net device structure
-> >> + * @config: timestamping configuration structure
-> >>   *
-> >>   * This function returns the current timestamping settings. Rather than
-> >>   * attempt to deconstruct registers to fill in the values, simply keep a copy
-> >>   * of the old settings around, and return a copy when requested.
-> >>   */
-> >> -int ixgbe_ptp_get_ts_config(struct ixgbe_adapter *adapter, struct ifreq *ifr)
-> >> +int ixgbe_ptp_hwtstamp_get(struct net_device *netdev,
-> >> +			   struct kernel_hwtstamp_config *config)
-> >>  {
-> >> -	struct hwtstamp_config *config = &adapter->tstamp_config;
-> >> +	struct ixgbe_adapter *adapter = netdev_priv(netdev);
-> >>  
-> > 
-> > ixgbe doesn't directly assign the adapter to netdev_priv and this needs
-> > to be ixgbe_from_netdev, since there is a wrapper ixgbe_netdev_priv
-> > structure. I didn't dig into why, but both get and set are wrong here,
-> > and are misinterpreting the ixgbe_netdev_priv structure as
-> > ixgbe_adapter, which is obviously wrong.
-> > 
-> > See its definition quoted here:
-> >> static inline struct ixgbe_adapter *ixgbe_from_netdev(struct net_device *netdev)
-> >> {
-> >>         struct ixgbe_netdevice_priv *priv = netdev_priv(netdev);
-> >>
-> >>         return priv->adapter;
-> >> }
-> >>
-> > 
-> > Whats odd is that the netdev priv structure is just a wrapper around a
-> > pointer to the adapter:
-> > 
-> >> struct ixgbe_netdevice_priv {
-> >>         struct ixgbe_adapter *adapter;
-> >> };
-> > 
-> > 
-> >> -	return copy_to_user(ifr->ifr_data, config,
-> >> -			    sizeof(*config)) ? -EFAULT : 0;
-> >> +	*config = adapter->tstamp_config;
-> >> +
-> >> +	return 0;
-> >>  }
-> > 
-> > Because we're completely pointing to the wrong memory, this overwrites
-> > who knows what since the ixgbe_netdev_priv is just the pointer address.
-> > 
-> This is an artifact of the work to refactor ixgbe to support devlink:
-> 
-> Both netdev and devlink want a private structure allocated as a flexible
-> array member of their parent structure. They cannot both directly be
-> ice_adapter, so we chose to have devlink be ice_adapter, and netdev gets
-> the wrapper structure. I suspect the patches you wrote were based on a
-> tree before this refactor, and/or you just did not spot the refactor
-> happened.
-> 
-> a0285236ab93 ("ixgbe: add initial devlink support") is where the change
-> took place, which merged relatively recently.
-> 
-> @Tony, I think this is a pretty trivial fixup on your tree if you want
-> to handle it instead of forcing Vladimir to make a v2?
-> 
-> its really just switching netdev_priv to ixgbe_from_netdev in these two
-> functions.
 
-Ugh :-/ sorry for the trouble, and thanks for doing the hard work of
-characterizing this.
 
-Indeed, my first conversion of ixgbe was in August 2023, as this commit
-can attest:
-https://github.com/vladimiroltean/linux/commit/0351ebf1eee3381ccfba9d31a924d1dd887a316f
+> -----Original Message-----
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Sent: Monday, June 30, 2025 1:57 PM
+> To: Keller, Jacob E <jacob.e.keller@intel.com>
+> Cc: intel-wired-lan@lists.osuosl.org; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; netdev@vger.kernel.org; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Gomes, Vinicius
+> <vinicius.gomes@intel.com>; Vadim Fedorenko
+> <vadim.fedorenko@linux.dev>; Richard Cochran <richardcochran@gmail.com>
+> Subject: Re: [PATCH iwl-next 4/5] ixgbe: convert to ndo_hwtstamp_get() an=
+d
+> ndo_hwtstamp_set()
+>=20
+> On Mon, Jun 30, 2025 at 01:47:07PM -0700, Jacob Keller wrote:
+> > On 6/30/2025 11:56 AM, Jacob Keller wrote:
+> > > On 5/13/2025 3:11 AM, Vladimir Oltean wrote:
+> > >> New timestamping API was introduced in commit 66f7223039c0 ("net:
+> > >> add NDOs for configuring hardware timestamping") from kernel v6.6.
+> > >>
+> > >> It is time to convert the Intel ixgbe driver to the new API, so
+> > >> that timestamping configuration can be removed from the
+> > >> ndo_eth_ioctl() path completely.
+> > >>
+> > >> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> > >> ---
+> > >
+> > > Ugh. Apologies for the late reply here, but this took for ever to
+> > > track down what was wrong in our testing.
+> > >
+> > > The ixgbe patch has a somewhat subtle bug which lead to failed
+> > > timestamp configuration and likely other forms of memory corruption.
+> > >
+> > >>  drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  9 ++--
+> > >>  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  6 +--
+> > >> drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c  | 42
+> > >> +++++++++----------
+> > >>  3 files changed, 29 insertions(+), 28 deletions(-)
+> > >>
+> > >
+> > >>
+> > >>  /**
+> > >> - * ixgbe_ptp_get_ts_config - get current hardware timestamping
+> > >> configuration
+> > >> - * @adapter: pointer to adapter structure
+> > >> - * @ifr: ioctl data
+> > >> + * ixgbe_ptp_hwtstamp_get - get current hardware timestamping
+> > >> + configuration
+> > >> + * @netdev: pointer to net device structure
+> > >> + * @config: timestamping configuration structure
+> > >>   *
+> > >>   * This function returns the current timestamping settings. Rather =
+than
+> > >>   * attempt to deconstruct registers to fill in the values, simply k=
+eep a copy
+> > >>   * of the old settings around, and return a copy when requested.
+> > >>   */
+> > >> -int ixgbe_ptp_get_ts_config(struct ixgbe_adapter *adapter, struct
+> > >> ifreq *ifr)
+> > >> +int ixgbe_ptp_hwtstamp_get(struct net_device *netdev,
+> > >> +			   struct kernel_hwtstamp_config *config)
+> > >>  {
+> > >> -	struct hwtstamp_config *config =3D &adapter->tstamp_config;
+> > >> +	struct ixgbe_adapter *adapter =3D netdev_priv(netdev);
+> > >>
+> > >
+> > > ixgbe doesn't directly assign the adapter to netdev_priv and this
+> > > needs to be ixgbe_from_netdev, since there is a wrapper
+> > > ixgbe_netdev_priv structure. I didn't dig into why, but both get and
+> > > set are wrong here, and are misinterpreting the ixgbe_netdev_priv
+> > > structure as ixgbe_adapter, which is obviously wrong.
+> > >
+> > > See its definition quoted here:
+> > >> static inline struct ixgbe_adapter *ixgbe_from_netdev(struct
+> > >> net_device *netdev) {
+> > >>         struct ixgbe_netdevice_priv *priv =3D netdev_priv(netdev);
+> > >>
+> > >>         return priv->adapter;
+> > >> }
+> > >>
+> > >
+> > > Whats odd is that the netdev priv structure is just a wrapper around
+> > > a pointer to the adapter:
+> > >
+> > >> struct ixgbe_netdevice_priv {
+> > >>         struct ixgbe_adapter *adapter; };
+> > >
+> > >
+> > >> -	return copy_to_user(ifr->ifr_data, config,
+> > >> -			    sizeof(*config)) ? -EFAULT : 0;
+> > >> +	*config =3D adapter->tstamp_config;
+> > >> +
+> > >> +	return 0;
+> > >>  }
+> > >
+> > > Because we're completely pointing to the wrong memory, this overwrite=
+s
+> > > who knows what since the ixgbe_netdev_priv is just the pointer addres=
+s.
+> > >
+> > This is an artifact of the work to refactor ixgbe to support devlink:
+> >
+> > Both netdev and devlink want a private structure allocated as a flexibl=
+e
+> > array member of their parent structure. They cannot both directly be
+> > ice_adapter, so we chose to have devlink be ice_adapter, and netdev get=
+s
+> > the wrapper structure. I suspect the patches you wrote were based on a
+> > tree before this refactor, and/or you just did not spot the refactor
+> > happened.
+> >
+> > a0285236ab93 ("ixgbe: add initial devlink support") is where the change
+> > took place, which merged relatively recently.
+> >
+> > @Tony, I think this is a pretty trivial fixup on your tree if you want
+> > to handle it instead of forcing Vladimir to make a v2?
+> >
+> > its really just switching netdev_priv to ixgbe_from_netdev in these two
+> > functions.
+>=20
+> Ugh :-/ sorry for the trouble, and thanks for doing the hard work of
+> characterizing this.
+>=20
+> Indeed, my first conversion of ixgbe was in August 2023, as this commit
+> can attest:
+> https://github.com/vladimiroltean/linux/commit/0351ebf1eee3381ccfba9d3
+> 1a924d1dd887a316f
+>=20
+> At that time, Przemyslaw's commit fd5ef5203ce6 ("ixgbe: wrap
+> netdev_priv() usage") didn't exist, and "struct ixgbe_adapter *adapter =
+=3D
+> netdev_priv(netdev);" was the de facto idiom in the driver, which I then
+> replicated two more times, in the new ixgbe_ptp_hwtstamp_set() and
+> ixgbe_ptp_hwtstamp_get() functions. Not only did I not notice that this
+> change took place, but it also compiled just fine, making me completely
+> unsuspecting...
+>=20
+> Tony, let me know how you would like to proceed.
 
-At that time, Przemyslaw's commit fd5ef5203ce6 ("ixgbe: wrap
-netdev_priv() usage") didn't exist, and "struct ixgbe_adapter *adapter =
-netdev_priv(netdev);" was the de facto idiom in the driver, which I then
-replicated two more times, in the new ixgbe_ptp_hwtstamp_set() and
-ixgbe_ptp_hwtstamp_get() functions. Not only did I not notice that this
-change took place, but it also compiled just fine, making me completely
-unsuspecting...
+I think it's easiest for me to make the change.
 
-Tony, let me know how you would like to proceed.
+Thanks,
+Tony
 
