@@ -1,175 +1,180 @@
-Return-Path: <netdev+bounces-202669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 144A8AEE90E
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 23:02:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAE26AEE912
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 23:02:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A4BF3A960F
-	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 21:01:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 726853E1754
+	for <lists+netdev@lfdr.de>; Mon, 30 Jun 2025 21:01:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D05242D75;
-	Mon, 30 Jun 2025 21:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA125292B4D;
+	Mon, 30 Jun 2025 21:01:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="buZ2/pfe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PdLvdKeT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1FC71E1DE5;
-	Mon, 30 Jun 2025 21:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9AE2629D;
+	Mon, 30 Jun 2025 21:01:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751317279; cv=none; b=SH00N7tgstpMNGusykA49Vnpatd0pyKoYZCRL3xl3u2YJcfqD/LMznQErloN8PgYIzn5Yjeh1qN2g6CfE0oDTJXP/qoYejAdEQefuBqEzL6exbKZDj+SbnlgFi1Dw51oHqYsRm0ttnhiYriJnXd12JyY8A2OVS5VtGCT28sHkvo=
+	t=1751317291; cv=none; b=AxjPGcBwdL9UrsnBur2wZ0Zz3zkCfs2ccH52Mi+aM3IrgWA72/7vtEXiIKgo4aj2LRtEszhZgNIrmI1gUnK9Rt4MvS0MhQOZhU8gT8ogxpkxOeJMd4BOfhEmA7V6Ryie4vD5wR0nyJUgu+Og+BJ2ncbNHqz+eWJQoMhjGzfd9mE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751317279; c=relaxed/simple;
-	bh=SamdNGppUiINvuhSrfUmG2vy1KDD8uY/v/DqHqQec9E=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=C8j7/OVVLYlLai5/KFAtdwKldazx4EAGqxDSyvBtGCBsFBYSedX6OSlWgs2rnZFbYeXfpxcmoxtoHzrt585LvOmiQBkzNZnEbMziGA8V9oHWPzq1qqaU9ufjcE6H4Vwoe6iz1IMJ2iis6Tn5Idg/jbcxLgX2mMdBT3TGxrPvPn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=buZ2/pfe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59992C4CEE3;
-	Mon, 30 Jun 2025 21:01:16 +0000 (UTC)
+	s=arc-20240116; t=1751317291; c=relaxed/simple;
+	bh=VXSv/KS7ixKFffjIMR2L2/rajLtP1PiJqm1cCs8hZSA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gc7rvbIAQAXCH13hPQrOuHi1oojCELMj7nvsXtR2jJLX4YMuoTVxAVaBpvT/UpsZg2gl65Ty3snN/cEyiQhmcIRJKXNMB6wP4c2lHDArdN+OJLUaeoVibVKdXche9nR6T5JpjtOgwTT86nkiR9b0wqyN4p7fkHVUF3EKPsK70to=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PdLvdKeT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A112AC4CEE3;
+	Mon, 30 Jun 2025 21:01:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751317277;
-	bh=SamdNGppUiINvuhSrfUmG2vy1KDD8uY/v/DqHqQec9E=;
-	h=From:To:Cc:Subject:Date:From;
-	b=buZ2/pfePIITCkb38SmUs0GJjQq+G51lWgywDZscK/T3B5zAZgEw8s61THQyKnw4b
-	 H8jdx+vpq83Wv3O5aZjwnqK3N5t/wXTXf9QfVt6Ut3fZU676246ySlWe0EDsO+y9rP
-	 Fbffw4Svjz4dsjdw1CRmF9TOoO96dhr5r3NDTzRaW7P57UbIqpCbdmxYMwwpXrRh/i
-	 wB7KrkJO1fZJHMpM4v5uNpaAnK8Dti8ZWB2VL6MYy8CpuINT1X1pAx/wfn5d8v+Ree
-	 tOvllbN+dm7bYiAyJhdcRUJw/3c4hN+ZM2EguJsZzHOlrJhN7xLceAB1DQOh7hFtxJ
-	 YfQ50FR7f9OMQ==
+	s=k20201202; t=1751317291;
+	bh=VXSv/KS7ixKFffjIMR2L2/rajLtP1PiJqm1cCs8hZSA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=PdLvdKeTPBilWrvQjOcvouClZNg2ASSc1XbkAJUHej1E1GVUee5RvvcrpvU06sY77
+	 OvuW6ecuTp1jzMPlNGTY7S6jZwJuuMr3CC8lH4r7+tOcFjNYUxYJP6ykfcUEQixOCK
+	 kWGSjk/p+bjLZNsKMC0zdAwzYR2LB5TzwJp1Pf3bKIdruvhZIt880oU0BT3UpsV5Ub
+	 kInY9dGboihQ7gY6vH91mRswsgh/u568GN5fkVobMRs54lml0mOzkV7o+a79UewbVB
+	 dm1vUTV5EWD8C/v9wtM+0TEvF2MZ/YQ7xfwXZ8D79C+Y3bZIjPkX853o7+yFC1qeOA
+	 sETPlKWZbH4wA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Thomas Fourier <fourier.thomas@gmail.com>,
-	Simon Horman <horms@kernel.org>,
+Cc: Xiaowei Li <xiaowei.li@simcom.com>,
+	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	3chas3@gmail.com,
-	linux-atm-general@lists.sourceforge.net,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 01/10] atm: idt77252: Add missing `dma_map_error()`
-Date: Mon, 30 Jun 2025 16:47:08 -0400
-Message-Id: <20250630204718.1359222-1-sashal@kernel.org>
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 05/10] net: usb: qmi_wwan: add SIMCom 8230C composition
+Date: Mon, 30 Jun 2025 16:47:12 -0400
+Message-Id: <20250630204718.1359222-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250630204718.1359222-1-sashal@kernel.org>
+References: <20250630204718.1359222-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.1.142
 Content-Transfer-Encoding: 8bit
 
-From: Thomas Fourier <fourier.thomas@gmail.com>
+From: Xiaowei Li <xiaowei.li@simcom.com>
 
-[ Upstream commit c4890963350dcf4e9a909bae23665921fba4ad27 ]
+[ Upstream commit 0b39b055b5b48cbbdf5746a1ca6e3f6b0221e537 ]
 
-The DMA map functions can fail and should be tested for errors.
+Add support for SIMCom 8230C which is based on Qualcomm SDX35 chip.
+0x9071: tty (DM) + tty (NMEA) + tty (AT) + rmnet
+T:  Bus=01 Lev=01 Prnt=01 Port=05 Cnt=02 Dev#=  8 Spd=480  MxCh= 0
+D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=1e0e ProdID=9071 Rev= 5.15
+S:  Manufacturer=SIMCOM
+S:  Product=SDXBAAGHA-IDP _SN:D744C4C5
+S:  SerialNumber=0123456789ABCDEF
+C:* #Ifs= 5 Cfg#= 1 Atr=a0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=00 Prot=00 Driver=option
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 3 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
+E:  Ad=86(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 4 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=42 Prot=01 Driver=none
+E:  Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
 
-Signed-off-by: Thomas Fourier <fourier.thomas@gmail.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/20250624064148.12815-3-fourier.thomas@gmail.com
+Signed-off-by: Xiaowei Li <xiaowei.li@simcom.com>
+Acked-by: Bjørn Mork <bjorn@mork.no>
+Link: https://patch.msgid.link/tencent_21D781FAA4969FEACA6ABB460362B52C9409@qq.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 **YES**
 
-This commit should be backported to stable kernel trees.
+This commit should be backported to stable kernel trees. Here's my
+detailed analysis:
 
-## Detailed Analysis:
+## Rationale for Backporting:
 
-**Nature of the fix:**
-The commit adds missing error checking for `dma_map_single()` calls in
-two locations within the idt77252 ATM driver:
+1. **Stable kernel rules explicitly allow device ID additions**:
+   According to Documentation/process/stable-kernel-rules.rst line 15,
+   patches must "either fix a real bug that bothers people or just add a
+   device ID." This commit clearly falls into the "add a device ID"
+   category.
 
-1. **In `queue_skb()` function (line 853-854):**
+2. **Simple, low-risk change**: The commit adds exactly one line:
   ```c
-  IDT77252_PRV_PADDR(skb) = dma_map_single(&card->pcidev->dev,
-  skb->data,
-  skb->len, DMA_TO_DEVICE);
-  +if (dma_mapping_error(&card->pcidev->dev, IDT77252_PRV_PADDR(skb)))
-  +    return -ENOMEM;
+  {QMI_QUIRK_SET_DTR(0x1e0e, 0x9071, 3)}, /* SIMCom 8230C ++ */
   ```
-  This correctly returns -ENOMEM before reaching the errout label,
-  avoiding any cleanup issues since the DMA mapping never succeeded.
+  This is a minimal change that only affects users with this specific
+  hardware (vendor ID 0x1e0e, product ID 0x9071).
 
-2. **In `add_rx_skb()` function (line 1857-1860):**
+3. **Enables hardware that would otherwise not work**: Without this
+   device ID entry, users with the SIMCom 8230C modem cannot use their
+   hardware with the qmi_wwan driver. This directly impacts
+   functionality for those users.
+
+4. **Follows established patterns**: The commit uses `QMI_QUIRK_SET_DTR`
+   macro, consistent with the existing SIMCom entry at line 1428:
   ```c
-  paddr = dma_map_single(&card->pcidev->dev, skb->data,
-  skb_end_pointer(skb) - skb->data,
-  DMA_FROM_DEVICE);
-  +if (dma_mapping_error(&card->pcidev->dev, paddr))
-  +    goto outpoolrm;
+  {QMI_QUIRK_SET_DTR(0x1e0e, 0x9001, 5)}, /* SIMCom 7100E, 7230E, 7600E
+  ++ */
   ```
-  This properly jumps to the new `outpoolrm` label which removes the SKB
-  from the pool before freeing it, maintaining correct cleanup order.
+  This shows the vendor has a history of requiring the DTR quirk for
+  their devices.
 
-**Why this qualifies for stable backporting:**
+5. **Historical precedent supports backporting**: Of the 5 similar
+   commits analyzed, 4 were backported to stable:
+   - Fibocom FG132 (YES)
+   - MeiG Smart SRM825L (YES)
+   - Telit FN912 compositions (YES)
+   - Telit FN920C04 compositions (YES)
+   - Quectel RG255C (NO)
 
-1. **Fixes a real bug**: Missing DMA mapping error checks can cause
-   system crashes or data corruption, especially on systems with IOMMU
-   or SWIOTLB where DMA mapping failures are more likely.
+   The 80% backport rate for similar device ID additions suggests this
+type of change is generally considered appropriate for stable.
 
-2. **Simple and contained**: The fix adds only 5 lines of error checking
-   code with no architectural changes.
+6. **No risk to existing functionality**: The change only adds support
+   for a new device ID (0x9071) and doesn't modify any existing device
+   support or core driver functionality.
 
-3. **Similar to approved backports**: This follows the exact same
-   pattern as Similar Commits #1 (eni driver) and #2 (aic94xx driver)
-   which were both marked "YES" for backporting.
+The commit meets all criteria for stable backporting: it's obviously
+correct, tested (as evidenced by the detailed USB descriptor output in
+the commit message), small (1 line), and enables hardware support that
+users need.
 
-4. **Long-standing issue**: The driver has existed since at least 2005
-   (Linux 2.6.12-rc2), meaning this bug has been present for nearly 20
-   years.
+ drivers/net/usb/qmi_wwan.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-5. **Minimal regression risk**: The changes only add error checking;
-   they don't modify any existing logic paths.
-
-6. **Proper error handling**: Both error paths are correctly implemented
-   with appropriate cleanup sequences.
-
-The commit clearly meets all stable tree criteria as an important bug
-fix with minimal risk and should be backported to protect users from
-potential DMA-related crashes.
-
- drivers/atm/idt77252.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/atm/idt77252.c b/drivers/atm/idt77252.c
-index 7810f974b2ca9..d9ee20f0048fe 100644
---- a/drivers/atm/idt77252.c
-+++ b/drivers/atm/idt77252.c
-@@ -852,6 +852,8 @@ queue_skb(struct idt77252_dev *card, struct vc_map *vc,
- 
- 	IDT77252_PRV_PADDR(skb) = dma_map_single(&card->pcidev->dev, skb->data,
- 						 skb->len, DMA_TO_DEVICE);
-+	if (dma_mapping_error(&card->pcidev->dev, IDT77252_PRV_PADDR(skb)))
-+		return -ENOMEM;
- 
- 	error = -EINVAL;
- 
-@@ -1857,6 +1859,8 @@ add_rx_skb(struct idt77252_dev *card, int queue,
- 		paddr = dma_map_single(&card->pcidev->dev, skb->data,
- 				       skb_end_pointer(skb) - skb->data,
- 				       DMA_FROM_DEVICE);
-+		if (dma_mapping_error(&card->pcidev->dev, paddr))
-+			goto outpoolrm;
- 		IDT77252_PRV_PADDR(skb) = paddr;
- 
- 		if (push_rx_skb(card, skb, queue)) {
-@@ -1871,6 +1875,7 @@ add_rx_skb(struct idt77252_dev *card, int queue,
- 	dma_unmap_single(&card->pcidev->dev, IDT77252_PRV_PADDR(skb),
- 			 skb_end_pointer(skb) - skb->data, DMA_FROM_DEVICE);
- 
-+outpoolrm:
- 	handle = IDT77252_PRV_POOL(skb);
- 	card->sbpool[POOL_QUEUE(handle)].skb[POOL_INDEX(handle)] = NULL;
- 
+diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+index b4c0413c6522a..96656e56e809f 100644
+--- a/drivers/net/usb/qmi_wwan.c
++++ b/drivers/net/usb/qmi_wwan.c
+@@ -1431,6 +1431,7 @@ static const struct usb_device_id products[] = {
+ 	{QMI_QUIRK_SET_DTR(0x22de, 0x9051, 2)}, /* Hucom Wireless HM-211S/K */
+ 	{QMI_FIXED_INTF(0x22de, 0x9061, 3)},	/* WeTelecom WPD-600N */
+ 	{QMI_QUIRK_SET_DTR(0x1e0e, 0x9001, 5)},	/* SIMCom 7100E, 7230E, 7600E ++ */
++	{QMI_QUIRK_SET_DTR(0x1e0e, 0x9071, 3)},	/* SIMCom 8230C ++ */
+ 	{QMI_QUIRK_SET_DTR(0x2c7c, 0x0121, 4)},	/* Quectel EC21 Mini PCIe */
+ 	{QMI_QUIRK_SET_DTR(0x2c7c, 0x0191, 4)},	/* Quectel EG91 */
+ 	{QMI_QUIRK_SET_DTR(0x2c7c, 0x0195, 4)},	/* Quectel EG95 */
 -- 
 2.39.5
 
