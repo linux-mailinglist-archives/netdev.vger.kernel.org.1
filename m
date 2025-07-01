@@ -1,180 +1,137 @@
-Return-Path: <netdev+bounces-202822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48F3CAEF2B3
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 11:09:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DE0EAEF2F2
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 11:16:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73FB7169676
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 09:09:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38E324480F8
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 09:15:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E6B6269CF1;
-	Tue,  1 Jul 2025 09:09:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E26260585;
+	Tue,  1 Jul 2025 09:15:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RWBF/aL9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NUd876Yr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC07F223716;
-	Tue,  1 Jul 2025 09:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7F4245022
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 09:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751360945; cv=none; b=qoVbX9stopa86gEqL+B7USEOskTlByeWs5843buRmni5/L2wGoejBJOG9c4DnK855KK5BY7BOSrjGmyu6T5twfd2ObiWz5+Ihz8vOHLaKcdaBgjVThqQwt+B7KuVGhOcV2CGb2OM2uUBQFowx2Ov5EgYfVCDAtK/6Oz9BgiGBao=
+	t=1751361340; cv=none; b=OpRhckE/tp9CiPaajiDcZ81+oXjBHO7kIPPO+VsrTPLjrPy7gk8OL2e7uKHDwSplQbxwXnhE+x8MLL1w8zYADqIjLaAqcjqzdb6XmSG6K4xP1fGsB3tlGUG6TXXu6aL0VpnjHBwHe6GtOnOlkY9f9miw1qbqkbGISoz1sqY0ooI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751360945; c=relaxed/simple;
-	bh=6UDM5fNF57aJf6DmBghu+lhkpkzxGnJVIa2mlP4nq4w=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GaVMwEAIALjG+093Dq9M/44D1VAadTq/UmhAWAEUpkcu6iI9Kk4le8BQ8dzXyE6gZ6B/kyG7PtBXDI6e9SwrGNhg5DJhg6HC1lZcAVth1UWmf12PVBdWQeK4ktFomM+eCpUHOlakjf5/xGZOfEARpxup08swpJth035eep5ijUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RWBF/aL9; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-236192f8770so34420895ad.0;
-        Tue, 01 Jul 2025 02:09:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751360943; x=1751965743; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NWlbP5Cgher1hLjR8FaEXf/IQPBYBpXZBtIHixSbQv0=;
-        b=RWBF/aL9KYhzkwdrl251fDfGgZfE4J30C0eV5nZCVrJbf7SOtWGkLQllKycWr+saWm
-         B0m2qEwKrfP+wCjG3zFVAb79GQ4HbPFY/QX2bKc2WdrdzbbDY2TkRZy7714LuZDOPTgn
-         4g2Ae8AubkBuumy7OTGnWPsI6MFe+THn9HHoLyXBfPYNMdEfHTk7QjAhPGLzKSDT8MLW
-         kB+A8nD6QpnTNDI+X1ALdhYZPY5U/IHZEtBm5UIMSZNiws+38G209fiadkhwhaGnnslo
-         d3aE+qQjOV/8vwpb9bpNBMnf8sNifCcG5ViIS8LSLQ6NXLCfleXfzjQgDjwsjxEGcBlk
-         gV5A==
+	s=arc-20240116; t=1751361340; c=relaxed/simple;
+	bh=ezfXSHuhu9Sfb5a0gaNDiCPb89N/ZDg7kI93quY/1HU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lNdjW4yNGS7hRvXbXKGycJBNARGJPDZOQvCtHBiSYqwsCn05ClTuCSY/uO9vVHzw8os4WkFP4zcxD0a0qjnXFe+ywUHtYylqk2EKkSL/EqxPbGSf/0QjPIghWF2MBbjPN4xoRNm/hH+eEk/7b+68ibC9WMaQCn1/JjxX6tRajNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NUd876Yr; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751361336;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jan/Z3DTLxwVO5Mfsu41/us04DIzAuMZQLApYN5eBrM=;
+	b=NUd876YrwR9mWkm0DVW+ceExeAE1aGAJE3UF+R8ej9wTW6O55LXUy14uOb0tDyeRD9HYUX
+	W3DUl439i5GXwX/5TcMDngRqPOrQBxD2MTu8gtgh20iTK1S1n8vBUUCfHs0afiP1WxF/wL
+	NbHQCDbqn0pdySoDSISwKt3Glajx/Fc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-491-nahXXR3WMBauH5Elfac87Q-1; Tue, 01 Jul 2025 05:15:33 -0400
+X-MC-Unique: nahXXR3WMBauH5Elfac87Q-1
+X-Mimecast-MFC-AGG-ID: nahXXR3WMBauH5Elfac87Q_1751361333
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-451d7de4ae3so26049645e9.2
+        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 02:15:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751360943; x=1751965743;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NWlbP5Cgher1hLjR8FaEXf/IQPBYBpXZBtIHixSbQv0=;
-        b=nc9C5ppkZjG9Y4l3ahY10r/MI9+6OLsRQDReYqdSWY2/XL+iOK0PogMnilKixrmvXu
-         3k1Yxv/vqJEvnOfRCeiz5EPRBBZK01MWiPjmwn74FzBDSqQgeame7NOMXzepJvt9Nexl
-         BLSzj9160kdyAqBwLpufnGyG4Sm9grsdyFlNOdBHNPH2TsWH8nEld56AYpigVdgaR0h2
-         +hOzS7aaLnTJ+TeUaN8g25Mpfy/CBZQ5xPqIiCfVDExXeZPWwVv9HQwt8ZRZsslPrCB6
-         le7bkEb1sYfzjHqx4L2znOIJ61sfwYdyvBPhqXLR1mHowPcWx9ALS7plKajGPqTVcmDk
-         9+lg==
-X-Forwarded-Encrypted: i=1; AJvYcCVOyMHDrcjNnI8J9PixdZVGuUrKQ4djtVbWqmiLg7+AmyYtUvpxCHj3zc2/53DWmJ2bui5GYNwL@vger.kernel.org, AJvYcCWB+gpu/dGRdRu4BEvRnKLRWfuj2A6npSSBRNID2+9QNpHIX1EwpAJLX0EEyD3vNISxeM+cZeXUhJMUvLY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwN24AkCkcuK04+ALcCCo6OsNlW/kA7YIjInda9rf/QIBvIQdDi
-	EAqOgEh/bsRtRGD9UpZLcOjONQPZbbXJneyGHxsAYAR7Ua46OAoibrLq
-X-Gm-Gg: ASbGncteChIaifGN9NUvxja5lVN8ga94EypTG/AliqqnOGHebSlqBetxuRRBZJdZqYF
-	Iz+GGdASEYuHLjThFKM1/Vu4Dkg88xaaGmiMYOrGCG6cvwLNIloEfbirrOxA+wIP8D11FeeXxvb
-	GJc1oXL9mNCR0DedtkkKks69N+jbs2CIB2YfJHFjtB3pDEmAtiyqC8Ol5GptwE2Dz/BQD7r4tUJ
-	tYFEJd/wcKrh4wRHxG4LNVVQx3Yez2Ykkvbk3PXlyylvpTSS/O5vof+4rtbqbmXC4h4cp8RVIsD
-	SHNc8wVXZoB5azb0J41Gcdz00HOVO+SKSfzTn6H2HvRzf6OMPHbIQDBmJUrRhrLkGMwmcDA12jI
-	8XGZ7dZs5nUcyMwfyddZub0cOsu5Gmt0e
-X-Google-Smtp-Source: AGHT+IH4br/vkS1TA5kOB0JT6na6FWAWji5Ksq2QJ8zm41vhk8hFAwkD6uASfLWv3LauaAlZIzweIQ==
-X-Received: by 2002:a17:902:da48:b0:235:e94b:62dd with SMTP id d9443c01a7336-23b355469f9mr44669715ad.12.1751360943048;
-        Tue, 01 Jul 2025 02:09:03 -0700 (PDT)
-Received: from DESKTOP-NBGHJ1C.local.valinux.co.jp (vagw.valinux.co.jp. [210.128.90.14])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb39bcbcsm99758425ad.134.2025.07.01.02.09.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jul 2025 02:09:02 -0700 (PDT)
-From: Ryo Takakura <ryotkkr98@gmail.com>
-To: horms@kernel.org
-Cc: andrew+netdev@lunn.ch,
-	bcm-kernel-feedback-list@broadcom.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	florian.fainelli@broadcom.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	opendmb@gmail.com,
-	pabeni@redhat.com,
-	ryotkkr98@gmail.com,
-	zakkemble@gmail.com
-Subject: Re: [PATCH] net: bcmgenet: Initialize u64 stats seq counter
-Date: Tue,  1 Jul 2025 18:08:58 +0900
-Message-Id: <20250701090858.7954-1-ryotkkr98@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250630162147.GJ41770@horms.kernel.org>
-References: <20250630162147.GJ41770@horms.kernel.org>
+        d=1e100.net; s=20230601; t=1751361332; x=1751966132;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jan/Z3DTLxwVO5Mfsu41/us04DIzAuMZQLApYN5eBrM=;
+        b=K0DTIW89bpt9evQMQ6KnOid8ogx5NHoNy5qznskGcNUrmzGk1uHgcHzp4ONIYYM1fW
+         1eMzTayAm0FZ62OURFFQSTGLsUqieNf47tGGv5dsqmWRt6FoG/ReM1qK7jtimGynZdQh
+         Hk15Ahb8E6bW3az2rsotkY5DfeYGsgFoZYpsaQiy0kKPbX2yWtZ0SzRfJGk7t07TKQ0S
+         Tv5mpHQO5yiD8WvA69oCq2XjxbErVimDwMoD1eQ3gKc9ejYz+5CAS+gRxZ//6yZ8XSAP
+         dT0L4llY8rnDl5t5IQoHcsoMPe5fHtEq5MiJxjJ/ko3LFLMNiENsBGkfm1k6+/Chrduo
+         qAfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWRyXgJgPyOR4ZHK0Me4P6b0Jw37N/RCYiXE8g4NI1wLY5j0OozOHmNR4oWwjg2K4LvJN2Yo/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaNB90eD4T4c37udVMdNbiq2+ygcBXYqTW3R/mXXf6U2m55vm9
+	bkhYziLGZlGDlY4CINsDWzovFSWe8HPFgsePQTdbYEeNs6Mga2tDQALqFsaJamqS7DPON6y9rD/
+	ZBNJQcDT2AcEEdpcohrsIlrvyzXcaW3P/zAtRDqQsAqqXUnVvuBI9BgX//Q==
+X-Gm-Gg: ASbGncsBAB/Pmilq0k+t/0hK2En2mPlj+lmoxmeYeDl0FT7Qo+RCffus9+TkyeBbg4G
+	ojb1ZYE0Uiy1S8/T/r5oRGU8vFN7Bale507ENb9FGP79vDcrNWLg+J0pm9ADkQWZx1coCTY6qs2
+	N7hDF6KAhexterLxb6lHziJB6NFrU/jD97YktPUdNNoN0gCbrBHYR1piFR1yDAVlZoivUBlD0sL
+	FObwZc04p/j4yd80XOidyUJph0a0USJNbGX50HNopalUKcLS0RHRx7K5sYtyZPuOIc3KzldX5XH
+	QFxjkPF8YgmYThPI/GlhBsuueNwK08VKV8eqqj521CLanVb2JfqrnI/crAY/IfSzvzUwgg==
+X-Received: by 2002:a05:600c:8b6f:b0:43c:fe15:41dd with SMTP id 5b1f17b1804b1-4538f9b3107mr143524935e9.6.1751361332474;
+        Tue, 01 Jul 2025 02:15:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH1+hhiGD2TdhbjM5rCKiCBttXAuLX4uPrW3umLUj3ZjRQ1AlwZwCo9b7DK/NCeCb3VsFrpgQ==
+X-Received: by 2002:a05:600c:8b6f:b0:43c:fe15:41dd with SMTP id 5b1f17b1804b1-4538f9b3107mr143524595e9.6.1751361332010;
+        Tue, 01 Jul 2025 02:15:32 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:247b:5810:4909:7796:7ec9:5af2? ([2a0d:3344:247b:5810:4909:7796:7ec9:5af2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453a85b3d44sm11486255e9.0.2025.07.01.02.15.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Jul 2025 02:15:31 -0700 (PDT)
+Message-ID: <7c9c7be7-af3c-4f40-80b4-5b420ebbfca3@redhat.com>
+Date: Tue, 1 Jul 2025 11:15:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 1/1] net: usb: lan78xx: fix possible NULL
+ pointer dereference in lan78xx_phy_init()
+To: Oleksij Rempel <o.rempel@pengutronix.de>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Woojung Huh <woojung.huh@microchip.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Russell King <rmk+kernel@armlinux.org.uk>,
+ Thangaraj Samynathan <Thangaraj.S@microchip.com>,
+ Rengarajan Sundararajan <Rengarajan.S@microchip.com>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ UNGLinuxDriver@microchip.com, Phil Elwell <phil@raspberrypi.org>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Simon Horman <horms@kernel.org>
+References: <20250626103731.3986545-1-o.rempel@pengutronix.de>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250626103731.3986545-1-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello Horman-san!
+On 6/26/25 12:37 PM, Oleksij Rempel wrote:
+> If no PHY device is found (e.g., for LAN7801 in fixed-link mode),
+> lan78xx_phy_init() may proceed to dereference a NULL phydev pointer,
+> leading to a crash.
+> 
+> Update the logic to perform MAC configuration first, then check for the presence
+> of a PHY. For the fixed-link case, set up the fixed link and return early,
+> bypassing any code that assumes a valid phydev pointer.
+> 
+> It is safe to move lan78xx_mac_prepare_for_phy() earlier because this function
+> only uses information from dev->interface, which is configured by
+> lan78xx_get_phy() beforehand. The function does not access phydev or any data
+> set up by later steps.
+> 
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-On Mon, 30 Jun 2025 17:21:47 +0100, Simon Horman wrote:
->On Sun, Jun 29, 2025 at 11:41:09AM +0000, Ryo Takakura wrote:
->> Initialize u64 stats as it uses seq counter on 32bit machines
->> as suggested by lockdep below.
->> 
->> [    1.830953][    T1] INFO: trying to register non-static key.
->> [    1.830993][    T1] The code is fine but needs lockdep annotation, or maybe
->> [    1.831027][    T1] you didn't initialize this object before use?
->> [    1.831057][    T1] turning off the locking correctness validator.
->> [    1.831090][    T1] CPU: 1 UID: 0 PID: 1 Comm: swapper/0 Tainted: G        W           6.16.0-rc2-v7l+ #1 PREEMPT
->> [    1.831097][    T1] Tainted: [W]=WARN
->> [    1.831099][    T1] Hardware name: BCM2711
->> [    1.831101][    T1] Call trace:
->> [    1.831104][    T1]  unwind_backtrace from show_stack+0x18/0x1c
->> [    1.831120][    T1]  show_stack from dump_stack_lvl+0x8c/0xcc
->> [    1.831129][    T1]  dump_stack_lvl from register_lock_class+0x9e8/0x9fc
->> [    1.831141][    T1]  register_lock_class from __lock_acquire+0x420/0x22c0
->> [    1.831154][    T1]  __lock_acquire from lock_acquire+0x130/0x3f8
->> [    1.831166][    T1]  lock_acquire from bcmgenet_get_stats64+0x4a4/0x4c8
->> [    1.831176][    T1]  bcmgenet_get_stats64 from dev_get_stats+0x4c/0x408
->> [    1.831184][    T1]  dev_get_stats from rtnl_fill_stats+0x38/0x120
->> [    1.831193][    T1]  rtnl_fill_stats from rtnl_fill_ifinfo+0x7f8/0x1890
->> [    1.831203][    T1]  rtnl_fill_ifinfo from rtmsg_ifinfo_build_skb+0xd0/0x138
->> [    1.831214][    T1]  rtmsg_ifinfo_build_skb from rtmsg_ifinfo+0x48/0x8c
->> [    1.831225][    T1]  rtmsg_ifinfo from register_netdevice+0x8c0/0x95c
->> [    1.831237][    T1]  register_netdevice from register_netdev+0x28/0x40
->> [    1.831247][    T1]  register_netdev from bcmgenet_probe+0x690/0x6bc
->> [    1.831255][    T1]  bcmgenet_probe from platform_probe+0x64/0xbc
->> [    1.831263][    T1]  platform_probe from really_probe+0xd0/0x2d4
->> [    1.831269][    T1]  really_probe from __driver_probe_device+0x90/0x1a4
->> [    1.831273][    T1]  __driver_probe_device from driver_probe_device+0x38/0x11c
->> [    1.831278][    T1]  driver_probe_device from __driver_attach+0x9c/0x18c
->> [    1.831282][    T1]  __driver_attach from bus_for_each_dev+0x84/0xd4
->> [    1.831291][    T1]  bus_for_each_dev from bus_add_driver+0xd4/0x1f4
->> [    1.831303][    T1]  bus_add_driver from driver_register+0x88/0x120
->> [    1.831312][    T1]  driver_register from do_one_initcall+0x78/0x360
->> [    1.831320][    T1]  do_one_initcall from kernel_init_freeable+0x2bc/0x314
->> [    1.831331][    T1]  kernel_init_freeable from kernel_init+0x1c/0x144
->> [    1.831339][    T1]  kernel_init from ret_from_fork+0x14/0x20
->> [    1.831344][    T1] Exception stack(0xf082dfb0 to 0xf082dff8)
->> [    1.831349][    T1] dfa0:                                     00000000 00000000 00000000 00000000
->> [    1.831353][    T1] dfc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
->> [    1.831356][    T1] dfe0: 00000000 00000000 00000000 00000000 00000013 00000000
->> 
->> Fixes: 59aa6e3072aa ("net: bcmgenet: switch to use 64bit statistics")
->> Signed-off-by: Ryo Takakura <ryotkkr98@gmail.com>
->
->Hi Takakura-san,
->
->Thanks for your patch.
->
->Unfortunately it doesn't apply cleanly which is needed by our CI to process
->your patch.
->
->Please:
->
->* Rebase and repost your patch on the net tree
->
->* Target your patch at net (as opposed to net-next) like this
->
->	Subject: [PATCH net v2] ...
->
->* And include Florian's tag in v2
->
->* Post v2 as a new thread
->
->For more information please see
->https://docs.kernel.org/process/maintainer-netdev.html
+Looks good, but this IMHO deserves a Fixes tag - yep, even for net-next!
 
-Thank you for elaborating.
-I'll resend v2 accordingly!
+Could you please share it?
 
-Sincerely,
-Ryo Takakura
+Thanks,
+
+Paolo
+
 
