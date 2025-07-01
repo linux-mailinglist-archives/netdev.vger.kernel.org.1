@@ -1,91 +1,101 @@
-Return-Path: <netdev+bounces-202794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F99EAEF04B
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 09:59:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58B79AEF04D
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 09:59:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AE9F3B2482
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 07:58:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A57601BC0F9B
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 08:00:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAFCE26463B;
-	Tue,  1 Jul 2025 07:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2ACD23507C;
+	Tue,  1 Jul 2025 07:59:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Viy9vkbn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qfXO3EcW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0C21F4634;
-	Tue,  1 Jul 2025 07:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852D01EA6F;
+	Tue,  1 Jul 2025 07:59:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751356752; cv=none; b=XqcLtecQX4/IQbYLmjDxd5n3g7RK80MF6jNMg68efqHzReHBJBP/IYqu0fVQ4ElZ77tbpE5x3MiG9o7Fb7YS9GrGMQA0+EqZYxJ/XcJ4a9wmBzwnJCs5xAdcbpxPpf116pbPmBLqcICqJPg0x98bS91YG5XovmYut7sSFPwDStY=
+	t=1751356787; cv=none; b=MJndQonp+21O3qu7NcruCBySN/aYauxzxZDxfsU97blX/9OELViZMi68iSSsHVDEq7ucmq2ezpQUoRX95kcJA0dv+7/7rjI38Ouj9+yyaOpNUTpad+XNhkTlRISpulL0Z3NQyKjoUbIWJI/iBntdFcSN7N1Wdde5mxElLsRnuWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751356752; c=relaxed/simple;
-	bh=FXBWxhP5fNGtBm2G4g6rXmgO0yrGa9otmQ9GR7xU75k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ACYA2lac68OxXEOaDKTajlxxslfqcpj1hF6O+TauQjv/ZLmwEVyq4g+GC+LfmTcWjIcfT58nPa159pla4wzmo5gKPFurCxRUDdkMNszG32kA3rarAdrLFVVXq99E5rFgDSVa1LNMH/KQ+VuH9h4WrFHDWy2fJtaktCxNV342CZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Viy9vkbn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD081C4CEEB;
-	Tue,  1 Jul 2025 07:59:08 +0000 (UTC)
+	s=arc-20240116; t=1751356787; c=relaxed/simple;
+	bh=/bVoCC58KjG3tC81okaYbYmNMbCNmMB+vqNzzJFatKI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=p6LfGhpX87bHZhSVcZUx5/qfFfqJJgrZ8AddYiqzkJVGffdsg/FlowfsshjLfKg8Z4pQVl6EbfQV/oB2NU9TyOz/p4w3FEQROQ2jMQVbXUiLfEPLtrNYi6ZTfu33oGS4hxaJZhjGPg3CTTbc+B03afsPQPtCnobXW3zlzpQS3QU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qfXO3EcW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B68AC4CEEB;
+	Tue,  1 Jul 2025 07:59:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751356752;
-	bh=FXBWxhP5fNGtBm2G4g6rXmgO0yrGa9otmQ9GR7xU75k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Viy9vkbn78lvxRSqN7M+AQw2siZL00zdOnTEMzkiuxEOf/g4acgwErRlouO7iuBCu
-	 R5THugv8Rq3ntYhQXN9/+i45eWAbVgOTOH1RL9vlcEHiMOy4IeXKp3AOtnqli4y/r5
-	 EXdZO1a+G/DN3utIigl0ClMAeTaLQGtqDfABTAf7SWV782WuIdrOq8AaSvN40iMBlI
-	 RSEvEXwCAhm/Rx4CChGcbvRssNLLD+Nd1Yte72HQNlmoawjJufPc2pXReBmZu6nq0z
-	 AH28R0LYJSmKWeReoxtG6qrq47Y8smxzJqzqReyP6h0cD3jqJuGq99amuGqvSIGQ+g
-	 AXwq/1kdKvsJg==
-Date: Tue, 1 Jul 2025 09:59:05 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Cc: kuniyu@google.com, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Shuah Khan <shuah@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Lennart Poettering <mzxreary@0pointer.de>, Luca Boccassi <bluca@debian.org>, 
-	David Rheinsberg <david@readahead.eu>, Kuniyuki Iwashima <kuniyu@amazon.com>
-Subject: Re: [RESEND PATCH net-next 6/6] selftests: net: extend SCM_PIDFD
- test to cover stale pidfds
-Message-ID: <20250701-gehege-portrait-c098442c73d1@brauner>
-References: <20250629214449.14462-1-aleksandr.mikhalitsyn@canonical.com>
- <20250629214449.14462-7-aleksandr.mikhalitsyn@canonical.com>
+	s=k20201202; t=1751356787;
+	bh=/bVoCC58KjG3tC81okaYbYmNMbCNmMB+vqNzzJFatKI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qfXO3EcWcBlEGCrTpt5uKHXK8DfkcUhr1pYikCl9KK1EI2ZE/AxMqqpLjT2Klk9Bh
+	 NTt6QZ3eqkVRKf6tQdmYBO7/V3pXH8pVDjBtFAigesbYVom5XIxRL/nV8J20M/UhpI
+	 hahOX74ujDSDSWuErWqU6amgZJkj/BOrazJFfK5GKjqrDFFU2Dqqbhc2Jl+0Hx6X5A
+	 HerOnwsCI8CQ5duL+B3dmp024gKYqyGa+JSvl+p+4R8wJA7TkRUSOoiT+qIqLqNz8v
+	 2/KbGDcsTsJ5U955QoCb9uPZDjAb2iLTbwAfoKp8bBxhq5Cs27FHAx5wi55/TqsbLd
+	 oaCF+xLL1MsRQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D6D38111CE;
+	Tue,  1 Jul 2025 08:00:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250629214449.14462-7-aleksandr.mikhalitsyn@canonical.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/2] Clean up usage of ffi types
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175135681200.3705465.5362877571191623980.git-patchwork-notify@kernel.org>
+Date: Tue, 01 Jul 2025 08:00:12 +0000
+References: <20250625-correct-type-cast-v2-0-6f2c29729e69@gmail.com>
+In-Reply-To: <20250625-correct-type-cast-v2-0-6f2c29729e69@gmail.com>
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: fujita.tomonori@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+ alex.gaynor@gmail.com, boqun.feng@gmail.com, gary@garyguo.net,
+ bjorn3_gh@protonmail.com, lossin@kernel.org, a.hindborg@kernel.org,
+ aliceryhl@google.com, dakr@kernel.org, davem@davemloft.net, andrew@lunn.ch,
+ netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Sun, Jun 29, 2025 at 11:44:43PM +0200, Alexander Mikhalitsyn wrote:
-> Extend SCM_PIDFD test scenarios to also cover dead task's
-> pidfd retrieval and reading its exit info.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Wed, 25 Jun 2025 05:25:37 -0700 you wrote:
+> Remove qualification of ffi types which are included in the prelude and
+> change `as` casts to target the proper ffi type alias rather than the
+> underlying primitive.
 > 
-> Cc: linux-kselftest@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: Shuah Khan <shuah@kernel.org>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Simon Horman <horms@kernel.org>
-> Cc: Christian Brauner <brauner@kernel.org>
-> Cc: Kuniyuki Iwashima <kuniyu@google.com>
-> Cc: Lennart Poettering <mzxreary@0pointer.de>
-> Cc: Luca Boccassi <bluca@debian.org>
-> Cc: David Rheinsberg <david@readahead.eu>
-> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 > ---
+> Changes in v2:
+> - Use unqualified types.
+> - Remove Fixes tag.
+> - Link to v1: https://lore.kernel.org/r/20250611-correct-type-cast-v1-1-06c1cf970727@gmail.com
+> 
+> [...]
 
-Thanks for the tests!
-Reviewed-by: Christian Brauner <brauner@kernel.org>
+Here is the summary with links:
+  - [net-next,v2,1/2] Use unqualified references to ffi types
+    https://git.kernel.org/netdev/net-next/c/22955d942f28
+  - [net-next,v2,2/2] Cast to the proper type
+    https://git.kernel.org/netdev/net-next/c/c9a7bcd2c016
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
