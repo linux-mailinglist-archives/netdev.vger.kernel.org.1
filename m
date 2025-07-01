@@ -1,166 +1,109 @@
-Return-Path: <netdev+bounces-203034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35785AF03F6
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 21:39:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFCBCAF03F2
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 21:39:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF3C544309E
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 19:38:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E642D4422E8
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 19:38:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A580280317;
-	Tue,  1 Jul 2025 19:39:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2895283137;
+	Tue,  1 Jul 2025 19:39:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="FzNCjAkQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FTLGOU1P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7183013774D;
-	Tue,  1 Jul 2025 19:39:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7977A27BF95;
+	Tue,  1 Jul 2025 19:39:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751398749; cv=none; b=LeRuoLdl4AyWPmLt1Re3t2tVs5ptkEwEvarky8t0b+KBgtCAAv3ANH3/gQ0+MspZmriSup5SQjT1M4lYvm0GnVassh+iq8k544yU91RAbbdmxg2839DhkYY4P9FT63gZkE6Jj/9nQ4hP7AJa6AjtVdbscWI5cURQXTKpTj4B9Ws=
+	t=1751398743; cv=none; b=YU8ciOAVMijm54jWGiSZxylVlTGA1wjuixwvgGimKaLeOzsFlqyjXFn8xiY0R1cP7nst0RL/KOOrdyMwa8klXj3b8k4hqTTe/EjRQb2tEvdHzRtqXstx1EI0AbQ8W/WgZyh8sbTL9BCM2ErZEgrZMTtoaggZRsLRSfQHmyyC4pI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751398749; c=relaxed/simple;
-	bh=X+oi+C+NeJe0ml2XjWB+XRwl9npgqiPcTQFoe7MgV48=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qa/y11iL3dyRP4aaQZp15am803DUVRErPKMD9g40HRfBxpXDpfo+x6ZJ7GVMISYHGC8cPCur4yeGiu3Fi31kk22xuNtzVL1isQrBjC4DVXKWgeEq8vwpyAEhHlDw/dkAvz++q4FNDBM+dOm9EP8LHhTNCiGCZjxdSp7qjifU87w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=FzNCjAkQ; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 561IUh8p029335;
-	Tue, 1 Jul 2025 19:38:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	qKfngTAurT4iyRTa3Xwc9PG5gvvKSpNISdr2PCKKsdM=; b=FzNCjAkQo1yDLX1S
-	3M+3T0aI1LhYSlk0i6ZJ0T8ekgCNmOyJUcf4DFB64X3QWKmxE1464L9phQX/Gkfc
-	ZgxL4Ys+pdoZo76SkVQ87gpgAACesoFbuBBkU361rwMYnGfmIUuO0n8thG8zKeV5
-	7OAVmwmf+vDFF4yIfV74tGILXmaADUchmxl8PeBfojhWwNDqDcpIUKuHV4Le5QGs
-	ywLJVi2NMJlnuLrAMnSefAVatjiMMSm96W1mbo4bSPfyDbo8NuP9mrEg6IXj7e6Q
-	LjOVcS/CnvIxIHB/78GhSZnUmS82iEke3OGNFW0qozvy+gbp7d1MKxXtuUNVa0GN
-	53HRJw==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47j95j1vmc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 01 Jul 2025 19:38:50 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 561Jco54017956
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 1 Jul 2025 19:38:50 GMT
-Received: from [10.110.78.36] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Tue, 1 Jul
- 2025 12:38:49 -0700
-Message-ID: <4d87c56e-f198-4abf-a414-4b226178d164@quicinc.com>
-Date: Tue, 1 Jul 2025 12:38:49 -0700
+	s=arc-20240116; t=1751398743; c=relaxed/simple;
+	bh=Ed025CxpWSPP6daJsGglhqW98uwy5F6d/hMXtJMezqE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LKAMNGpI31G5862YZwBFAT7IFnm9O8QCzKJ9GqgNFt/7jaAxd6rqY9+4SdTaD+H7eaI3W9tzRzJYOHlOb+NDHV8ImG6Y+L2DciOwEYE/hHLNEuQziRN+iBeWggI0PQRXiSaemVK5ykVBODhGBy4d2YMhgDuUVImD1OTdXkGZPgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FTLGOU1P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94E6CC4CEEE;
+	Tue,  1 Jul 2025 19:39:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751398743;
+	bh=Ed025CxpWSPP6daJsGglhqW98uwy5F6d/hMXtJMezqE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FTLGOU1PdCGypePZ3j/6y9Ckj80gCs2rbEZiMQPMT7WCu24k9TeCh4pfHezNB8CtH
+	 KUCMi8cy6fjswPFQUTmxkyPiHkfaNAKwCBFU9e97Fnl7g1fEVyajuE88Qfg2XqcgY+
+	 yYlUIrJ/1Y0qmDBEgkN/I0pe2qLD1FjYBkjM6NrDg0REPymy3sGOMYIuldU2Qdvdor
+	 bd/9jG7rhhioBoJiRxQI2qeToQLH4KcUDdmrDcP0kNzt2MARjFQkbRlh/y3cXQgyqb
+	 T7wm20R9rBeHN1FM0hY44NgnqD6GMa26gBNX2aYRjU3yYC+WiNLVprEpbZ1Mi0DJHf
+	 ZCwmIRRmfly2w==
+Date: Tue, 1 Jul 2025 20:38:58 +0100
+From: Simon Horman <horms@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Stav Aviram <saviram@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, linux-rdma@vger.kernel.org,
+	Mark Bloch <markb@mellanox.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: Re: [PATCH mlx5-next v1] net/mlx5: Check device memory pointer
+ before usage
+Message-ID: <20250701193858.GA41770@horms.kernel.org>
+References: <c88711327f4d74d5cebc730dc629607e989ca187.1751370035.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [DESIGN RFC] wifi: Robust AV streaming Design Proposal for AP
-To: Ben Greear <greearb@candelatech.com>, <linux-wireless@vger.kernel.org>
-CC: <netdev@vger.kernel.org>, <ath12k@lists.infradead.org>
-References: <20250624205716.1052329-1-quic_rchoodam@quicinc.com>
- <0bc6c957-a0c4-c0f7-ed37-c8b44852c26c@candelatech.com>
-Content-Language: en-US
-From: Ramanathan Choodamani <quic_rchoodam@quicinc.com>
-In-Reply-To: <0bc6c957-a0c4-c0f7-ed37-c8b44852c26c@candelatech.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzAxMDEzNiBTYWx0ZWRfX8i+amyYdqwGq
- 6xZ0ml/tbqFl8DqhBxSSgNw2omD6nyiWsBrKb6MZL+9LaVywF8s/ecoTBEhme2aHxSOEqYM8lcS
- xZCRuBnJhFcNZdLJY1T87yzfgvDCmRGmIa//03llnzNPmNu2oF2VLQGnOIImEayaDlAgD9E+Inh
- mscCV6g3Yay8MhjIo04h8YuDB82xt9099bsmqsEFesMMKahg58+60XxWCle53PlRgS+nF9Kbjrc
- wc9ixnEGSJTp3vsezhDgzMToyT8LF9TN4IT6ldpvNfAhTbOD8DuVMhyNxqOZEdtDQeFTmOm8/pa
- GYmwQ4HW2cgO3gLUpFG0++wXLjb4n1Q8uAuQn1L1TLqXJ04AYV8OJleSFd1E0wbRAXokN5qNx4J
- 5Wr3uu2T3z2+NsA4Cqn8tJMHxmFol/Quh+TuDjfp3Tg/FLm5ia0a7/rc21NSS7ShTagU/PlX
-X-Proofpoint-ORIG-GUID: HFrjexPZOzL_bbnfJgOFo7qbQxIebGD6
-X-Authority-Analysis: v=2.4 cv=EuHSrTcA c=1 sm=1 tr=0 ts=6864394a cx=c_pps
- a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10
- a=Ry8CqEVe23a1TkwwDiUA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-Proofpoint-GUID: HFrjexPZOzL_bbnfJgOFo7qbQxIebGD6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-01_02,2025-06-27_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- clxscore=1011 mlxlogscore=963 malwarescore=0 mlxscore=0 phishscore=0
- spamscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0 priorityscore=1501
- impostorscore=0 bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507010136
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c88711327f4d74d5cebc730dc629607e989ca187.1751370035.git.leon@kernel.org>
 
-
-
-On 6/24/2025 3:31 PM, Ben Greear wrote:
-> On 6/24/25 13:57, Ramanathan Choodamani wrote:
->> ===================================
->> Robust AV streaming protocols - QoS
->> ===================================
->>
->> The Robust AV stream protocols are mobile centric protocols - meaning they
->> are initiated by a non-AP STA to the AP. These protocols are implemented
->> at the Access Point (AP) to classify packets sent to the non-AP STA which requests
->> classification using action frames. The non-AP STA initiates Robust AV streaming
->> action frames requesting for specific classification for the IP packets
->> destined to the non-AP STA from the AP. These parameters can be negotiated by both
->> AP and non-AP STA.
->>
->> Upon successful handshake, The AP classifies incoming individually addressed MSDUs
->> (Mac Service Data Unit) based upon parameters provided by the non-AP STA or
->> notifies the non-AP STA to transmit MSDUs with preferred parameters based upon
->> what was exchanged.
->>
->> Robust AV streaming improves AV (Audio and Video) streaming performance when
->> using IEEE Std 802.11 for consumer and enterprise applications.
->>
->> Let's look at the Robust AV streaming protocols which are implemented as a
->> part of this design.
+On Tue, Jul 01, 2025 at 03:08:12PM +0300, Leon Romanovsky wrote:
+> From: Stav Aviram <saviram@nvidia.com>
 > 
-> Thank you for posting this and for the beautiful ascii diagrams!
+> Add a NULL check before accessing device memory to prevent a crash if
+> dev->dm allocation in mlx5_init_once() fails.
 > 
-> Since this will be poking netfilter rules into the kernel,
-> is there a good way to clean up all rules created by a previous
-> hostapd process in case hostapd crashes or is killed hard and
-> cannot do its own cleanup?  Maybe the rules could have some
-> special marking that is configurable per hostapd (or per AP or BSS or something)
-> so that a (re)started hostapd could clean up any leftovers from a
-> previous instance?
+> Fixes: c9b9dcb430b3 ("net/mlx5: Move device memory management to mlx5_core")
+> Signed-off-by: Stav Aviram <saviram@nvidia.com>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+> Changelog:
+> v1:
+>  * Removed extra IS_ERR(dm) check.
+> v0:
+> https://lore.kernel.org/all/e389fa6ef075af1049cd7026b912d736ebe3ad23.1751279408.git.leonro@nvidia.com
+> ---
+>  drivers/infiniband/hw/mlx5/dm.c                  | 2 +-
+>  drivers/net/ethernet/mellanox/mlx5/core/lib/dm.c | 4 ++--
+>  drivers/net/ethernet/mellanox/mlx5/core/main.c   | 2 +-
+>  3 files changed, 4 insertions(+), 4 deletions(-)
 > 
-hostapd does its own cleanup (cleanup of stations and interfaces) 
-when it receives SIGTERM.
+> diff --git a/drivers/infiniband/hw/mlx5/dm.c b/drivers/infiniband/hw/mlx5/dm.c
+> index b4c97fb62abf..9ded2b7c1e31 100644
+> --- a/drivers/infiniband/hw/mlx5/dm.c
+> +++ b/drivers/infiniband/hw/mlx5/dm.c
+> @@ -282,7 +282,7 @@ static struct ib_dm *handle_alloc_dm_memic(struct ib_ucontext *ctx,
+>  	int err;
+>  	u64 address;
+>  
+> -	if (!MLX5_CAP_DEV_MEM(dm_db->dev, memic))
+> +	if (!dm_db || !MLX5_CAP_DEV_MEM(dm_db->dev, memic))
+>  		return ERR_PTR(-EOPNOTSUPP);
 
-An nft chain is created for each AP netdev/interface.
+nit: -EOPNOTSUPP doesn't feel like the right error code
+     in the !dm_db case.
 
-The nft rule handle (stored in internal hostapd data structure) and 
-nft chain metadata can be used to cleanup/flush the nft rules as part of the 
-interface cleanup.
+>  
+>  	dm = kzalloc(sizeof(*dm), GFP_KERNEL);
 
-> And, is there a mechanism to clean up flows that a buggy non-AP STA
-> has requested but then forgot to terminate (like phone starts a video call,
-> requests some QoS, then forgets to tell AP that it is done with the call
-> and packets no longer need to be classified?)
-> 
-> Thanks,
-> Ben
-> 
-The scs objects of the stations will be cleaned up during the station 
-disconnect (by the AP which is maintaining them).
-As part of this deletion, the nft rules are also deleted, using the 
-stored nft rule handle.
-
-/ram
-
+...
 
