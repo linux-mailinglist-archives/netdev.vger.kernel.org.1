@@ -1,213 +1,124 @@
-Return-Path: <netdev+bounces-202739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68321AEECD0
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 05:11:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6AF3AEECD3
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 05:13:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F3D43A8781
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 03:11:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0150441754
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 03:12:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEC3E1DB154;
-	Tue,  1 Jul 2025 03:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 211171E1E16;
+	Tue,  1 Jul 2025 03:13:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dS1KsWxF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="flxsh5/h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C60A926;
-	Tue,  1 Jul 2025 03:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94120125B9;
+	Tue,  1 Jul 2025 03:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751339513; cv=none; b=G9vXQ9Yue35q170Q/NrA9VeJ1SqWCSj4vK/1jh7s0oN4gMvLBv6xytQ9jDFZKF32Rn8Gx3GIlI8Btsin28vt5jCQwywagNj64aFXJ+gfZqCelunl+duntnP4SwBu/1B3tTVxt3MQNDFsLVFH206YNfxRlBRxtRee2CJAuukJSMw=
+	t=1751339591; cv=none; b=nZEoOV9tEVIy4/6ZhAHUecWJs1fIT4vZJf1sa4S4VWCeJpwge2icN4fSF84I0BBwK3Gz7NNtldNg7+LZjaPPeGPxfaRcdz/n+aKV4jp6XXQ+lsxZfPuCHvnXBMcsQ1Ir8RtS8SH/HkPT/ZuORzM1XvsRgPhLshSKh/jI+6msCbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751339513; c=relaxed/simple;
-	bh=gUyGOCch3gn6XpxWY5QNQhH2EQOnOeQtq0QEk9FAvLA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GQeuQN++7jscF4Zlf3q6pruhN8Isa9ZCqnd79bdBH3qaf+A4TYCwIngxWNJW3EhSTM8pa3TSLMy4M1QY3PoBrZ08XHsnsgWNK/YNdSGvpSbj8NWXXicuM1XrkNwe56noznFtLa+m+eqGIOb42bsSNERw1t+zgcrJceg61Dv/KFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dS1KsWxF; arc=none smtp.client-ip=209.85.218.48
+	s=arc-20240116; t=1751339591; c=relaxed/simple;
+	bh=Eth0w3o4ZE5ziArkgh7wzfD6qXOvot937GZQX90T1T0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=so5jzsqx7VQQJSSdRBUni8XRS6oJMJodqmMwk0i7840b7/8+QciiJ6sNwMMpRXZ9UcNpVzgJIZjrhKIuvWCR4CX3cIx1lcf2Ck2iVDRGgzzTTGIPmLG64N6jA2uNUd/s6MZdPNHnIeDQ0NVmesXPQs9+MI9IjEwPAWxJWIo/ftI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=flxsh5/h; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-addda47ebeaso1094254766b.1;
-        Mon, 30 Jun 2025 20:11:51 -0700 (PDT)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-73972a54919so2605736b3a.3;
+        Mon, 30 Jun 2025 20:13:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751339510; x=1751944310; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P4dYyADSCBeNUgmcTsT7e0/hHvL9bx+mynbmUEp3saw=;
-        b=dS1KsWxFzkeE2pLMGL2O/tPmTy/4BmWN/XVq26K7aEJKVEbvpA/DCqR8EaV6gRHDL9
-         opOwktBE7qtJ1ySKtAbsAHlDqI/pNYskOCC4y0ANiyau5FGnlOYL6+RVVsNu5PFQNRRW
-         RbYL8g3b3Hf/gLNiX0NnKBFSd+07GVSBaqm5VadjM7bejjR6UoyFKAp3/qnNACbVMYQj
-         ahVWQEnogdPx8H+zSfuIXEcypxZ7EpziweHVl5+TCWnVgYy0BLpsnrA2vHBYsmThvbaC
-         m/wK+jC1n0jA7d7ifV82hlxWFw3Edutc54Gd85jrS615d/ycNMpUh8D+XCk/IFvuguTi
-         fXQQ==
+        d=gmail.com; s=20230601; t=1751339589; x=1751944389; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=t0svKt70TJ64HpokkkxMf+6tPJJXYwddBDnBCXSeWtA=;
+        b=flxsh5/hjXfwNc1G9Bnvtxz+pyZ844+3yIgiv+BtuLPSq7+i1i8uO+4KMU3rAMHp1F
+         FrBZFN0GDdgbvpQT4mzTjY4BiqxxyvRJKbf7ep6eEV5AgvEREnfvHsMPpxxs4Zo1g2FT
+         OKwbGL7VDcu4uVUaTFhuLK9y/mxnv02hvJwTdysJaP3nHdfGnEt0VPKe0VJF0n0KS0F6
+         /hX5IBfJLgcn+qRgadCzbgPSZJt7ErgnlzrbPhNWjCUsa7+nihLm+MGU+Lutj99pcdM+
+         rTgu7+Teytrk+j8THy3tgJ7yi43YPDjfRI2MaqkolT6y0/UEgHfXDpKOiAhX0pjAznkN
+         wCLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751339510; x=1751944310;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P4dYyADSCBeNUgmcTsT7e0/hHvL9bx+mynbmUEp3saw=;
-        b=D1tBPnWyltlgyYA96u4AXaWOG64GZCjs1BouFI4O8pDmMAbKzQ4rOsTlAC6Ky0n2BA
-         4Sn5cnXTUNLYn/WQpKUEfRsyxrCuh4st2t6E2CbAOS6gFnu7G/mVuWuml17Ok3dJDuC5
-         cnXbO699d9AZdf9aOJyFnDUQI/p8pMk8g2Tv+cebEwHxhZC1sygFseRoJUtyg9Pcm/u7
-         1X+M/237i18EdUWBaHL+bOeBEkbyNFNuNXMLvgsTXBiYCul0w/QNXkKbsZ7faEeRi4mw
-         UdxHC9pISRHQfmKEtvqsgMc67FkSKQmkzrDJB9/oeGAa9AjYY9cHoc1qDAVYUU//veui
-         6+zQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUYeZALwYnW9FC+Tqd3UruCOxom1D0ajCWy9/VvxiBz5Vg6Q/Wev4WQ5I9uWhJjztKLw33NYth/TVHt8SStKnM=@vger.kernel.org, AJvYcCXgj8Qzg2UbCWB5TWzuCIQy9wW2Liv6MruVH/rDv+npF2u0iEHC8/acSu4qaZtfo+/AxkIqXneE@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx28fu9UwuMcQZS611FkgUJNKb9pdKQjoVMbevJ8Q0CttE+sRki
-	mNpJoltptvUhnVlkRWxqaFiSUIdYhBO0KtLGxxVy4fW46pFsCfu8mTVJxf8jFgr+KKsZsZ0UOt+
-	PV33ZEKWOty7LUb495mh6FQ876BabQqY=
-X-Gm-Gg: ASbGnctkBa6GDauNO7Ymfv7VWk0uLIA59ciJF5Q1CDaWiTC6e+4uaB46t30l3B+L7qM
-	yqAJve6K+wMt5VaMdMQPxnrbwgLkyZ1iJqjwgB85FQXo9kiNosibIsmitGSx4dTw/v6ejKIEZUe
-	vsCh8q8GGyLB+Md7QogA7r2/2CuRearue1wNCjt8DcIt46Nw==
-X-Google-Smtp-Source: AGHT+IFbZbVlTWYVBHL5VhIDsI0Id1Oth13L2v+d+EmtgTqLRBKDxudncNmWv6124BztoDICBTK944lyqJBFnqi9SLs=
-X-Received: by 2002:a17:907:3d16:b0:ae3:7255:ba53 with SMTP id
- a640c23a62f3a-ae37255bcd3mr974720966b.53.1751339509891; Mon, 30 Jun 2025
- 20:11:49 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751339589; x=1751944389;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=t0svKt70TJ64HpokkkxMf+6tPJJXYwddBDnBCXSeWtA=;
+        b=EZTXmqNQFsIJnM7qo6hmp08ALUzcEc8+cpL9Y9mYiq4k2j81CVZTEEHY3jwtsELm+j
+         Zp0XvqXUSSVdcvQkDqdso5fc09+NxSjwvquVYm+H5KghcjxEYXYWcRt9HiP/hr0tPJFv
+         7GW7zNvzaJVeyL0t8D0VOkwQWPv1SHrpDF29OOoguPJA+UaBzeUpKZUu4lQeSRjvMjKt
+         OBjEO3MCAdUZzjbIKGfB5V8SOahxHf1W36H0til9h1UprcWaqLm+nCY8oCWa1IDw1D/z
+         hEQQg9+dOAegbMPkSCZEtGNbn1qnxBBtp5ICyq61s21a9pO+9OXBA8vFJuaHKUU/C+QP
+         QFXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU73XJGExXd4SKA14L+Q7ulAgkoU8HkSFHxq0ZLiXgdkq4adno7d4zxPWGvtcnA3NXSigVQUQyUYf8=@vger.kernel.org, AJvYcCXYXZMEJqq2qxMenWR/1/9Vry9UthREV3BNgEe86LOIrtHuEyfFX29aIYGTHUSGhqVxy6sqcSUt@vger.kernel.org
+X-Gm-Message-State: AOJu0YxC8zBgtycwPapyR9koY4vAvOFKL/TPFXvZ+u2V0sq002auBjC0
+	iNzFtnD2OEbLQ7rN9S5O1pvprjV1RNJQFbNNTQnFtVYl/CdvjC/2CZ7v
+X-Gm-Gg: ASbGncvIvz1P1nhpCmlLkb1xoAZlH1/JeeEqTIohHzcKU/L5eXUaJGb5N95F12aSkKD
+	jwogJJ0O7UMQktAFXzZD7bu/wjaGGZCBP8O522rdOxNJV8bj4MOVoEAO+iVWdVAe/jDLBvM5h32
+	Wn5ug2y+YDjzgse0l12UgtsuncoBpKks/NR3dEyHD77NYlA316jcGRX7LoafHHMtrCMl7elOltE
+	9JIBfPGVaPY8QQK+PabZV3q4fmGmCAo+7HTl0sAesCeT5vdXAFAZZhNrLi6nEK+fJmSWLm/Bf8k
+	4AIgaFviB9UcjWVGBkrPbVIDt1ExHQMVHWRN6niAs8M00rLGeROGQ7nVCtQ/DQ==
+X-Google-Smtp-Source: AGHT+IGNXHwZZAqGBzOg/9mbbMseeLadAsgDKzJXeSzP/pGloPvuLPOr+pDv/wKljbznPkpyn8zl3g==
+X-Received: by 2002:a05:6a20:3d92:b0:1fe:5e67:21af with SMTP id adf61e73a8af0-220a16e45e3mr26431653637.30.1751339588764;
+        Mon, 30 Jun 2025 20:13:08 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74af56cffe4sm10010408b3a.138.2025.06.30.20.13.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jun 2025 20:13:08 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id E43D2420A783; Tue, 01 Jul 2025 10:13:02 +0700 (WIB)
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Abdelrahman Fekry <abdelrahmanfekry375@gmail.com>,
+	Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: [PATCH net-next 0/5] Another ip-sysctl docs cleanup
+Date: Tue,  1 Jul 2025 10:12:55 +0700
+Message-ID: <20250701031300.19088-1-bagasdotme@gmail.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250630092818.1449599-1-ap420073@gmail.com> <CAHS8izN9CWwwUk0tfDy1iGrfwYLTD9paiF622jP4z4mgD844uw@mail.gmail.com>
-In-Reply-To: <CAHS8izN9CWwwUk0tfDy1iGrfwYLTD9paiF622jP4z4mgD844uw@mail.gmail.com>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Tue, 1 Jul 2025 12:11:37 +0900
-X-Gm-Features: Ac12FXzT1tAKGjWECnijrdEPAwV7DdNlNjCX9AImkD8tQEcVkQV9tT0EdZJoRVA
-Message-ID: <CAMArcTWf7pRi+qVAhTTTEG8cZjBteeNk=EtLns-=RPoKRmeKWQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] selftests: devmem: configure HDS threshold
-To: Mina Almasry <almasrymina@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, andrew+netdev@lunn.ch, shuah@kernel.org, sdf@fomichev.me, 
-	jdamato@fastly.com, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Developer-Signature: v=1; a=openpgp-sha256; l=845; i=bagasdotme@gmail.com; h=from:subject; bh=Eth0w3o4ZE5ziArkgh7wzfD6qXOvot937GZQX90T1T0=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDBnJ/gff7HbnWHCpw7HlRtq0qBkvvqRK6UydfJ5jx8Zti 1wO3Vlt01HKwiDGxSArpsgyKZGv6fQuI5EL7WsdYeawMoEMYeDiFICJZOky/HfplNBzndIf1nMq t5j9VuVxY+9+b4WXV1cUZdy8wjb5TwvDH651z0zfuhwysRH/vcpRrGthtLJ1fbvdtUUWGxsuzbX i5wQA
+X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 1, 2025 at 1:12=E2=80=AFAM Mina Almasry <almasrymina@google.com=
-> wrote:
->
+Inspired by Abdelrahman's cleanup [1]. This time, mostly formatting
+conversion to bullet lists.
 
-Hi Mina,
-Thanks a lot for your review!
+[1]: https://lore.kernel.org/linux-doc/20250624150923.40590-1-abdelrahmanfekry375@gmail.com/
 
-> On Mon, Jun 30, 2025 at 2:28=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> w=
-rote:
-> >
-> > The devmem TCP requires the hds-thresh value to be 0, but it doesn't
-> > change it automatically.
-> > Therefore, configure_hds_thresh() is added to handle this.
-> >
-> > The run_devmem_tests() now tests hds_thresh, but it skips test if the
-> > hds_thresh_max value is 0.
-> >
-> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> > ---
-> >  .../selftests/drivers/net/hw/ncdevmem.c       | 86 +++++++++++++++++++
-> >  1 file changed, 86 insertions(+)
-> >
-> > diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/=
-testing/selftests/drivers/net/hw/ncdevmem.c
-> > index cc9b40d9c5d5..d78b5e5697d7 100644
-> > --- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-> > +++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-> > @@ -349,6 +349,72 @@ static int configure_headersplit(bool on)
-> >         return ret;
-> >  }
-> >
-> > +static int configure_hds_thresh(int len)
-> > +{
-> > +       struct ethtool_rings_get_req *get_req;
-> > +       struct ethtool_rings_get_rsp *get_rsp;
-> > +       struct ethtool_rings_set_req *req;
-> > +       struct ynl_error yerr;
-> > +       struct ynl_sock *ys;
-> > +       int ret;
-> > +
-> > +       ys =3D ynl_sock_create(&ynl_ethtool_family, &yerr);
-> > +       if (!ys) {
-> > +               fprintf(stderr, "YNL: %s\n", yerr.msg);
-> > +               return -1;
-> > +       }
-> > +
-> > +       req =3D ethtool_rings_set_req_alloc();
-> > +       ethtool_rings_set_req_set_header_dev_index(req, ifindex);
-> > +       ethtool_rings_set_req_set_hds_thresh(req, len);
-> > +       ret =3D ethtool_rings_set(ys, req);
-> > +       if (ret < 0)
-> > +               fprintf(stderr, "YNL failed: %s\n", ys->err.msg);
-> > +       ethtool_rings_set_req_free(req);
-> > +
-> > +       if (ret =3D=3D 0) {
-> > +               get_req =3D ethtool_rings_get_req_alloc();
-> > +               ethtool_rings_get_req_set_header_dev_index(get_req, ifi=
-ndex);
-> > +               get_rsp =3D ethtool_rings_get(ys, get_req);
-> > +               ethtool_rings_get_req_free(get_req);
-> > +               if (get_rsp)
-> > +                       fprintf(stderr, "HDS threshold: %d\n",
-> > +                               get_rsp->hds_thresh);
-> > +               ethtool_rings_get_rsp_free(get_rsp);
-> > +       }
-> > +
-> > +       ynl_sock_destroy(ys);
-> > +
-> > +       return ret;
-> > +}
-> > +
-> > +static int get_hds_thresh_max(void)
-> > +{
-> > +       struct ethtool_rings_get_req *get_req;
-> > +       struct ethtool_rings_get_rsp *get_rsp;
-> > +       struct ynl_error yerr;
-> > +       unsigned int ret =3D 0;
-> > +       struct ynl_sock *ys;
-> > +
-> > +       ys =3D ynl_sock_create(&ynl_ethtool_family, &yerr);
-> > +       if (!ys) {
-> > +               fprintf(stderr, "YNL: %s\n", yerr.msg);
-> > +               return -1;
-> > +       }
-> > +
-> > +       get_req =3D ethtool_rings_get_req_alloc();
-> > +       ethtool_rings_get_req_set_header_dev_index(get_req, ifindex);
-> > +       get_rsp =3D ethtool_rings_get(ys, get_req);
-> > +       ethtool_rings_get_req_free(get_req);
-> > +       if (get_rsp)
-> > +               ret =3D get_rsp->hds_thresh_max;
-> > +       ethtool_rings_get_rsp_free(get_rsp);
-> > +
-> > +       ynl_sock_destroy(ys);
-> > +
-> > +       return ret;
-> > +}
-> > +
-> >  static int configure_rss(void)
-> >  {
-> >         return run_command("sudo ethtool -X %s equal %d >&2", ifname, s=
-tart_queue);
-> > @@ -565,6 +631,9 @@ static int do_server(struct memory_buffer *mem)
-> >         if (configure_headersplit(1))
-> >                 error(1, 0, "Failed to enable TCP header split\n");
-> >
-> > +       if (configure_hds_thresh(0))
-> > +               error(1, 0, "Failed to set HDS threshold\n");
-> > +
->
-> hds_thresh should probably be part of configuring headersplit.
->
-> But also, failing to set hds_thresh should not fail the test, to
-> maintain compatibility with drivers that don't support configuring
-> hds_thresh.
+Bagas Sanjaya (5):
+  net: ip-sysctl: Format Private VLAN proxy arp aliases as bullet list
+  net: ip-sysctl: Format possible value range of ioam6_id{,_wide} as
+    bullet list
+  net: ip-sysctl: Format pf_{enable,expose} boolean lists as bullet
+    lists
+  net: ip-sysctl: Format SCTP-related memory parameters description as
+    bullet list
+  net: ip-sysctl: Add link to SCTP IPv4 scoping draft
 
-Okay, I will add the setting hds-thresh part into
-configure_headersplit(). hds-thresh value will be set to 0 when
-tcp-data-split is being enabled.
+ Documentation/networking/ip-sysctl.rst | 76 +++++++++++++-------------
+ 1 file changed, 38 insertions(+), 38 deletions(-)
 
-Thanks a lot!
-Taehee Yoo
+
+base-commit: 647496422ba9d2784fb8e15b3fda7fe801b1f2ff
+-- 
+An old man doll... just what I always wanted! - Clara
+
 
