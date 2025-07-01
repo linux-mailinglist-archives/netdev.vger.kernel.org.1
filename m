@@ -1,106 +1,118 @@
-Return-Path: <netdev+bounces-202900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B003BAEF988
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 15:01:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3210AAEF9A0
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 15:05:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A4D24E0CDB
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 13:01:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9C43447CFB
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 13:02:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105A7264627;
-	Tue,  1 Jul 2025 13:01:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04FAE263F30;
+	Tue,  1 Jul 2025 13:02:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="gmPLdk/O";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="WxUo7Zx/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uhMQ2Yq+"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663221487E9;
-	Tue,  1 Jul 2025 13:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F0D29D0D;
+	Tue,  1 Jul 2025 13:02:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751374861; cv=none; b=iP1+k0Y6KU7yzYHtgO7YdPwR7oH+KT2hKiWy323OWuBdj/zFDcGEA+PZt+8zL8DOcy8c689hu1sp5LMy7zNR1FVHXyUcXmTDL1wC5pVRTsn7qMt/Tlun6PdYVOcoQ7civQ+jH8x2yNo8CvsdzzJGXVq0WZU+puhmZBiAtZ4sv6w=
+	t=1751374970; cv=none; b=SWjKPdM9FdTz21kY+pyV0isG4ynISPyrn5/WfTDWFt5Y2dqXfE7HeyYM2UCcVqV328C+Ln1dWcppL2jV1qNVu9I/QXYs1IVmRYU682L02BztlQA9/vuYr7YPv9UT1kgPt+m0gXUgzmR1LR9/ZYv+cioNX+fIuf0I3Mh/FXG1tAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751374861; c=relaxed/simple;
-	bh=0xEo39UYir8VKYvKmSgF6qdDFKOYaTcqdh87szu1JXM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=qTnRasj/OmwW3bCxhUL79b4XaBFmSWFRmZnK28NVJRWRujYpFScKWiLsY3l/5Il8DRBZTx1M4RnzaBeEPUQzGikMRyyFPrKwATkLElU2bA9j2ai+34C8SV38tit6pgSeCTCgYQ2/IBxGzfj6JB4X8NY1oKM2z2nzj6vvCqBN7qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=gmPLdk/O; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=WxUo7Zx/; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1751374857;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FlvDxm3AAf2lx7IpXIWXQXvmn9EsYxBzEGSE1FPW2Zk=;
-	b=gmPLdk/O8Riwcbqrmk61cvhCIuZimwcLa0VvVMoNOpY/7tZbRz10kQwuHTRkf58BQl8tSf
-	L1+EGPFCvzLtMJY2Zz57Gy32m6HVGuoEPlQEhJzFuLJyj+M7OQBzLLoiKO69Z4bCPUXD4r
-	ospDaqL988WKn8oru8PXZsP49IpmgrhTVKxDoryUulLUwYkOKZyh07P87ASAc3ikCngCpq
-	tr5VBSeP4OMDznPt/KxwSvCxRRlVtfME7fvvd0PFGaZJ8lx/7nbZ8YSEOZnDZihmgqCHWw
-	OgujMli+wPV2ouC5QO/lsYYmZspxkrsXs2oZzoDqJTr3O/WQpKZP0/nWcxXFLw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1751374857;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FlvDxm3AAf2lx7IpXIWXQXvmn9EsYxBzEGSE1FPW2Zk=;
-	b=WxUo7Zx/cQ6ItR0BYa1GCORtan58Jzu2mpQTU7vlL0vwkbbuX3NgcFCqNjw2s+kqo4SszN
-	t3eAcv2CDorEHbAg==
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>,
- Christopher Hall <christopher.s.hall@intel.com>, John Stultz
- <jstultz@google.com>, Frederic Weisbecker <frederic@kernel.org>,
- Anna-Maria Behnsen <anna-maria@linutronix.de>, Miroslav Lichvar
- <mlichvar@redhat.com>, Werner Abt <werner.abt@meinberg-usa.com>, David
- Woodhouse <dwmw2@infradead.org>, Stephen Boyd <sboyd@kernel.org>, Thomas
- =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, Kurt
- Kanzenbach
- <kurt@linutronix.de>, Nam Cao <namcao@linutronix.de>, Antoine Tenart
- <atenart@kernel.org>
-Subject: Re: [patch 3/3] ptp: Enable auxiliary clocks for
- PTP_SYS_OFFSET_EXTENDED
-In-Reply-To: <20250626131708.544227586@linutronix.de>
-References: <20250626124327.667087805@linutronix.de>
- <20250626131708.544227586@linutronix.de>
-Date: Tue, 01 Jul 2025 15:00:56 +0200
-Message-ID: <87tt3wkquv.ffs@tglx>
+	s=arc-20240116; t=1751374970; c=relaxed/simple;
+	bh=F/84wrFwoijHU+FufPitkE6z85i1QdM2oq4GmNNuc+E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tqU1fvTr0Tfy6zjLw9a+nQEYd7odvZBTaxmzUYQIGE5EFD+UZ3TUdVPAvXwjo+tVzE5PSlJP4sQedRb3hYPZVyC6LZqhwklKiWoE+7xl8jTqWsTNVtWfLxBO5LqN4s4rPbtHTUfiPHkfrSAluvTIZDXHwPM2UJL6v9Pc4bVQcFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uhMQ2Yq+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 221F4C4CEEB;
+	Tue,  1 Jul 2025 13:02:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751374970;
+	bh=F/84wrFwoijHU+FufPitkE6z85i1QdM2oq4GmNNuc+E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uhMQ2Yq+o7XnI05VtPbOaoIlF3tDHhi+binHqry62SGJq8NNmJHGvv9m+EdyYwzR7
+	 IahUmrjXhg248tMGQ1OHGRC7N7VmNU/V2007UfApE+MA2EhRPpuKXR7Rt4liEV4c4P
+	 JNM702/9rWgab8vLg0hezsMOojEIWvRh55CFXymv+IQrcF3r9J6gW8d+qWTmCjYoov
+	 CcXo4C8TxxvPo2Pj0jDPhts3Q8BLjsPMFb100lhTASoBrbgdt1LXD3v3PvbNnPA0ax
+	 zgnbXP6KsUZkj98sG0EGz7rXlMJA3DTLO+jbei3nFlFViaQcXohJJP68WqNxEf6uGT
+	 8Ls51CrVOOhfg==
+Date: Tue, 1 Jul 2025 14:02:43 +0100
+From: Simon Horman <horms@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?utf-8?Q?Nicol=C3=B2?= Veronese <nicveronese@gmail.com>,
+	mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
+	devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: Re: [PATCH net-next v7 04/15] net: phy: Introduce PHY ports
+ representation
+Message-ID: <20250701130243.GA130037@horms.kernel.org>
+References: <20250630143315.250879-1-maxime.chevallier@bootlin.com>
+ <20250630143315.250879-5-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250630143315.250879-5-maxime.chevallier@bootlin.com>
 
-On Thu, Jun 26 2025 at 15:27, Thomas Gleixner wrote:
-> +	switch (extoff->clockid) {
-> +	case CLOCK_REALTIME:
-> +	case CLOCK_MONOTONIC:
-> +	case CLOCK_MONOTONIC_RAW:
-> +	case CLOCK_AUX ... CLOCK_AUX_LAST:
-> +		break;
+On Mon, Jun 30, 2025 at 04:33:03PM +0200, Maxime Chevallier wrote:
 
-While trying to solve the merge logistics problem I noticed that this
-should be:
+...
 
-	switch (extoff->clockid) {
-	case CLOCK_REALTIME:
-	case CLOCK_MONOTONIC:
-	case CLOCK_MONOTONIC_RAW:
-        	break;
-	case CLOCK_AUX ... CLOCK_AUX_LAST:
-        	if (IS_ENABLED(CONFIG_POSIX_AUX_CLOCKS))
-			break;
-		fallthrough;
+> +/**
+> + * phy_port_get_type() - get the PORT_* attribut for that port.
+> + * @port: The port we want the information from
+> + *
+> + * Returns: A PORT_XXX value.
+> + */
+> +int phy_port_get_type(struct phy_port *port)
+> +{
+> +	if (port->mediums & ETHTOOL_LINK_MEDIUM_BASET)
 
-obviously as there is no point in going all the way down into the time
-stamping code to figure out that this is disabled.
+Hi Maxime,
 
-I blame it all on the heat wave of course :)
+Should this be:
+
+	if (port->mediums & BIT(ETHTOOL_LINK_MEDIUM_BASET))
+
+Flagged by Smatch (because ETHTOOL_LINK_MEDIUM_BASET is 0,
+so as-is the condition is always false).
+
+> +		return PORT_TP;
+> +
+> +	if (phy_port_is_fiber(port))
+> +		return PORT_FIBRE;
+> +
+> +	return PORT_OTHER;
+> +}
+> +EXPORT_SYMBOL_GPL(phy_port_get_type);
+
+...
 
