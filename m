@@ -1,151 +1,213 @@
-Return-Path: <netdev+bounces-202738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8A8AAEECB5
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 05:07:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68321AEECD0
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 05:11:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A26131BC111B
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 03:07:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F3D43A8781
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 03:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BFE01DB154;
-	Tue,  1 Jul 2025 03:07:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEC3E1DB154;
+	Tue,  1 Jul 2025 03:11:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JCT+O9xE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dS1KsWxF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0451DFD8F;
-	Tue,  1 Jul 2025 03:07:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C60A926;
+	Tue,  1 Jul 2025 03:11:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751339243; cv=none; b=bXKVkcv28y6r8CEs1bsRM+A+NdwT6y61Em00e9d/iSH7fvRUhY0ZGMzJ434frshJzJOtAxB+90ZPB1yxvX8U2dzrQ6szq1T3wXp2fmpVfvcnSWd8HIvZWYkYIXLPSn5BDZsT3kmG/IbAI5vWnjMquUMa23pcVeDgvItrkmAqDpk=
+	t=1751339513; cv=none; b=G9vXQ9Yue35q170Q/NrA9VeJ1SqWCSj4vK/1jh7s0oN4gMvLBv6xytQ9jDFZKF32Rn8Gx3GIlI8Btsin28vt5jCQwywagNj64aFXJ+gfZqCelunl+duntnP4SwBu/1B3tTVxt3MQNDFsLVFH206YNfxRlBRxtRee2CJAuukJSMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751339243; c=relaxed/simple;
-	bh=1KpvVeS3qFIsYooM0nMl4TF5Db0B7YddNOvZu/Qgbbc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P+iyJPWdwdkeEYvTOx8Iy4sOt01gzso8p+A/3Wd/ZAufDsxIgzmr5MvoInN7Tr05eFH9pJAIslg14iMWkbH6i78v9A61cwfPg1r6GbO2kTpbmv5/IIuBU5yQPycBjgN/W748T+p32yNI/hYomkaFnHcYvlhqOU8MOAlOorRCeKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JCT+O9xE; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751339242; x=1782875242;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=1KpvVeS3qFIsYooM0nMl4TF5Db0B7YddNOvZu/Qgbbc=;
-  b=JCT+O9xESn1sOozcvO6zkuvV0uwuLI8zmuecwhVGZCnckNNFfidRgFXB
-   /eDRTu+U8GZoyDiBo2tzW0ncMgqw+DAsaDd3CEJthk7YdCh25iWqa3ykg
-   ZNIDhfEN2X+5c6/vjo/DsfQxHBk9jx1VnO8fKvB43ptkBHmqilwZUWEbb
-   2teCEYcuafPOf2Ro1mlTr5GNiwjxNpJP3ScLA3ppOcnFmjOg6hSDAWN4K
-   b6bZeonHgDHuQ87ZUmji3A0XXVBTaTsViYbSBGsBJBu9/WtKCjZ856Mlk
-   3RGBydXTuZiksETxLvkb6QNVxNX+HO++s6iaiscFzd6ZLlg1H32A7vqkh
-   g==;
-X-CSE-ConnectionGUID: uISB+mjDS9qMsnTQAipOIw==
-X-CSE-MsgGUID: H1KJxmDtRLO5g/M8xYlP+A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11480"; a="64184367"
-X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
-   d="scan'208";a="64184367"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 20:07:21 -0700
-X-CSE-ConnectionGUID: MyKt0ACIQCq3O+TCzow1hw==
-X-CSE-MsgGUID: 62B+ZbGKTBqSHpoG33YrKw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
-   d="scan'208";a="153928743"
-Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
-  by fmviesa009.fm.intel.com with ESMTP; 30 Jun 2025 20:07:18 -0700
-Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uWRL1-000ZbK-1w;
-	Tue, 01 Jul 2025 03:07:15 +0000
-Date: Tue, 1 Jul 2025 11:06:46 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>, bpf@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Alexei Starovoitov <ast@kernel.org>,
-	Arthur Fabre <arthur@arthurfabre.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Jesse Brandeburg <jbrandeburg@cloudflare.com>,
-	Joanne Koong <joannelkoong@gmail.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <thoiland@redhat.com>,
-	Yan Zhai <yan@cloudflare.com>, netdev@vger.kernel.org,
-	kernel-team@cloudflare.com, Stanislav Fomichev <sdf@fomichev.me>
-Subject: Re: [PATCH bpf-next 02/13] bpf: Helpers for skb dynptr
- read/write/slice
-Message-ID: <202507011044.vjYugeUq-lkp@intel.com>
-References: <20250630-skb-metadata-thru-dynptr-v1-2-f17da13625d8@cloudflare.com>
+	s=arc-20240116; t=1751339513; c=relaxed/simple;
+	bh=gUyGOCch3gn6XpxWY5QNQhH2EQOnOeQtq0QEk9FAvLA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GQeuQN++7jscF4Zlf3q6pruhN8Isa9ZCqnd79bdBH3qaf+A4TYCwIngxWNJW3EhSTM8pa3TSLMy4M1QY3PoBrZ08XHsnsgWNK/YNdSGvpSbj8NWXXicuM1XrkNwe56noznFtLa+m+eqGIOb42bsSNERw1t+zgcrJceg61Dv/KFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dS1KsWxF; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-addda47ebeaso1094254766b.1;
+        Mon, 30 Jun 2025 20:11:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751339510; x=1751944310; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P4dYyADSCBeNUgmcTsT7e0/hHvL9bx+mynbmUEp3saw=;
+        b=dS1KsWxFzkeE2pLMGL2O/tPmTy/4BmWN/XVq26K7aEJKVEbvpA/DCqR8EaV6gRHDL9
+         opOwktBE7qtJ1ySKtAbsAHlDqI/pNYskOCC4y0ANiyau5FGnlOYL6+RVVsNu5PFQNRRW
+         RbYL8g3b3Hf/gLNiX0NnKBFSd+07GVSBaqm5VadjM7bejjR6UoyFKAp3/qnNACbVMYQj
+         ahVWQEnogdPx8H+zSfuIXEcypxZ7EpziweHVl5+TCWnVgYy0BLpsnrA2vHBYsmThvbaC
+         m/wK+jC1n0jA7d7ifV82hlxWFw3Edutc54Gd85jrS615d/ycNMpUh8D+XCk/IFvuguTi
+         fXQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751339510; x=1751944310;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=P4dYyADSCBeNUgmcTsT7e0/hHvL9bx+mynbmUEp3saw=;
+        b=D1tBPnWyltlgyYA96u4AXaWOG64GZCjs1BouFI4O8pDmMAbKzQ4rOsTlAC6Ky0n2BA
+         4Sn5cnXTUNLYn/WQpKUEfRsyxrCuh4st2t6E2CbAOS6gFnu7G/mVuWuml17Ok3dJDuC5
+         cnXbO699d9AZdf9aOJyFnDUQI/p8pMk8g2Tv+cebEwHxhZC1sygFseRoJUtyg9Pcm/u7
+         1X+M/237i18EdUWBaHL+bOeBEkbyNFNuNXMLvgsTXBiYCul0w/QNXkKbsZ7faEeRi4mw
+         UdxHC9pISRHQfmKEtvqsgMc67FkSKQmkzrDJB9/oeGAa9AjYY9cHoc1qDAVYUU//veui
+         6+zQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUYeZALwYnW9FC+Tqd3UruCOxom1D0ajCWy9/VvxiBz5Vg6Q/Wev4WQ5I9uWhJjztKLw33NYth/TVHt8SStKnM=@vger.kernel.org, AJvYcCXgj8Qzg2UbCWB5TWzuCIQy9wW2Liv6MruVH/rDv+npF2u0iEHC8/acSu4qaZtfo+/AxkIqXneE@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx28fu9UwuMcQZS611FkgUJNKb9pdKQjoVMbevJ8Q0CttE+sRki
+	mNpJoltptvUhnVlkRWxqaFiSUIdYhBO0KtLGxxVy4fW46pFsCfu8mTVJxf8jFgr+KKsZsZ0UOt+
+	PV33ZEKWOty7LUb495mh6FQ876BabQqY=
+X-Gm-Gg: ASbGnctkBa6GDauNO7Ymfv7VWk0uLIA59ciJF5Q1CDaWiTC6e+4uaB46t30l3B+L7qM
+	yqAJve6K+wMt5VaMdMQPxnrbwgLkyZ1iJqjwgB85FQXo9kiNosibIsmitGSx4dTw/v6ejKIEZUe
+	vsCh8q8GGyLB+Md7QogA7r2/2CuRearue1wNCjt8DcIt46Nw==
+X-Google-Smtp-Source: AGHT+IFbZbVlTWYVBHL5VhIDsI0Id1Oth13L2v+d+EmtgTqLRBKDxudncNmWv6124BztoDICBTK944lyqJBFnqi9SLs=
+X-Received: by 2002:a17:907:3d16:b0:ae3:7255:ba53 with SMTP id
+ a640c23a62f3a-ae37255bcd3mr974720966b.53.1751339509891; Mon, 30 Jun 2025
+ 20:11:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250630-skb-metadata-thru-dynptr-v1-2-f17da13625d8@cloudflare.com>
+References: <20250630092818.1449599-1-ap420073@gmail.com> <CAHS8izN9CWwwUk0tfDy1iGrfwYLTD9paiF622jP4z4mgD844uw@mail.gmail.com>
+In-Reply-To: <CAHS8izN9CWwwUk0tfDy1iGrfwYLTD9paiF622jP4z4mgD844uw@mail.gmail.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Tue, 1 Jul 2025 12:11:37 +0900
+X-Gm-Features: Ac12FXzT1tAKGjWECnijrdEPAwV7DdNlNjCX9AImkD8tQEcVkQV9tT0EdZJoRVA
+Message-ID: <CAMArcTWf7pRi+qVAhTTTEG8cZjBteeNk=EtLns-=RPoKRmeKWQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] selftests: devmem: configure HDS threshold
+To: Mina Almasry <almasrymina@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, andrew+netdev@lunn.ch, shuah@kernel.org, sdf@fomichev.me, 
+	jdamato@fastly.com, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jakub,
+On Tue, Jul 1, 2025 at 1:12=E2=80=AFAM Mina Almasry <almasrymina@google.com=
+> wrote:
+>
 
-kernel test robot noticed the following build warnings:
+Hi Mina,
+Thanks a lot for your review!
 
-[auto build test WARNING on bpf-next/master]
+> On Mon, Jun 30, 2025 at 2:28=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> w=
+rote:
+> >
+> > The devmem TCP requires the hds-thresh value to be 0, but it doesn't
+> > change it automatically.
+> > Therefore, configure_hds_thresh() is added to handle this.
+> >
+> > The run_devmem_tests() now tests hds_thresh, but it skips test if the
+> > hds_thresh_max value is 0.
+> >
+> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> > ---
+> >  .../selftests/drivers/net/hw/ncdevmem.c       | 86 +++++++++++++++++++
+> >  1 file changed, 86 insertions(+)
+> >
+> > diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/=
+testing/selftests/drivers/net/hw/ncdevmem.c
+> > index cc9b40d9c5d5..d78b5e5697d7 100644
+> > --- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
+> > +++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
+> > @@ -349,6 +349,72 @@ static int configure_headersplit(bool on)
+> >         return ret;
+> >  }
+> >
+> > +static int configure_hds_thresh(int len)
+> > +{
+> > +       struct ethtool_rings_get_req *get_req;
+> > +       struct ethtool_rings_get_rsp *get_rsp;
+> > +       struct ethtool_rings_set_req *req;
+> > +       struct ynl_error yerr;
+> > +       struct ynl_sock *ys;
+> > +       int ret;
+> > +
+> > +       ys =3D ynl_sock_create(&ynl_ethtool_family, &yerr);
+> > +       if (!ys) {
+> > +               fprintf(stderr, "YNL: %s\n", yerr.msg);
+> > +               return -1;
+> > +       }
+> > +
+> > +       req =3D ethtool_rings_set_req_alloc();
+> > +       ethtool_rings_set_req_set_header_dev_index(req, ifindex);
+> > +       ethtool_rings_set_req_set_hds_thresh(req, len);
+> > +       ret =3D ethtool_rings_set(ys, req);
+> > +       if (ret < 0)
+> > +               fprintf(stderr, "YNL failed: %s\n", ys->err.msg);
+> > +       ethtool_rings_set_req_free(req);
+> > +
+> > +       if (ret =3D=3D 0) {
+> > +               get_req =3D ethtool_rings_get_req_alloc();
+> > +               ethtool_rings_get_req_set_header_dev_index(get_req, ifi=
+ndex);
+> > +               get_rsp =3D ethtool_rings_get(ys, get_req);
+> > +               ethtool_rings_get_req_free(get_req);
+> > +               if (get_rsp)
+> > +                       fprintf(stderr, "HDS threshold: %d\n",
+> > +                               get_rsp->hds_thresh);
+> > +               ethtool_rings_get_rsp_free(get_rsp);
+> > +       }
+> > +
+> > +       ynl_sock_destroy(ys);
+> > +
+> > +       return ret;
+> > +}
+> > +
+> > +static int get_hds_thresh_max(void)
+> > +{
+> > +       struct ethtool_rings_get_req *get_req;
+> > +       struct ethtool_rings_get_rsp *get_rsp;
+> > +       struct ynl_error yerr;
+> > +       unsigned int ret =3D 0;
+> > +       struct ynl_sock *ys;
+> > +
+> > +       ys =3D ynl_sock_create(&ynl_ethtool_family, &yerr);
+> > +       if (!ys) {
+> > +               fprintf(stderr, "YNL: %s\n", yerr.msg);
+> > +               return -1;
+> > +       }
+> > +
+> > +       get_req =3D ethtool_rings_get_req_alloc();
+> > +       ethtool_rings_get_req_set_header_dev_index(get_req, ifindex);
+> > +       get_rsp =3D ethtool_rings_get(ys, get_req);
+> > +       ethtool_rings_get_req_free(get_req);
+> > +       if (get_rsp)
+> > +               ret =3D get_rsp->hds_thresh_max;
+> > +       ethtool_rings_get_rsp_free(get_rsp);
+> > +
+> > +       ynl_sock_destroy(ys);
+> > +
+> > +       return ret;
+> > +}
+> > +
+> >  static int configure_rss(void)
+> >  {
+> >         return run_command("sudo ethtool -X %s equal %d >&2", ifname, s=
+tart_queue);
+> > @@ -565,6 +631,9 @@ static int do_server(struct memory_buffer *mem)
+> >         if (configure_headersplit(1))
+> >                 error(1, 0, "Failed to enable TCP header split\n");
+> >
+> > +       if (configure_hds_thresh(0))
+> > +               error(1, 0, "Failed to set HDS threshold\n");
+> > +
+>
+> hds_thresh should probably be part of configuring headersplit.
+>
+> But also, failing to set hds_thresh should not fail the test, to
+> maintain compatibility with drivers that don't support configuring
+> hds_thresh.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jakub-Sitnicki/bpf-Ignore-dynptr-offset-in-skb-data-access/20250630-225941
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
-patch link:    https://lore.kernel.org/r/20250630-skb-metadata-thru-dynptr-v1-2-f17da13625d8%40cloudflare.com
-patch subject: [PATCH bpf-next 02/13] bpf: Helpers for skb dynptr read/write/slice
-config: i386-buildonly-randconfig-002-20250701 (https://download.01.org/0day-ci/archive/20250701/202507011044.vjYugeUq-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250701/202507011044.vjYugeUq-lkp@intel.com/reproduce)
+Okay, I will add the setting hds-thresh part into
+configure_headersplit(). hds-thresh value will be set to 0 when
+tcp-data-split is being enabled.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507011044.vjYugeUq-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from kernel/bpf/helpers.c:15:
-   include/linux/filter.h:1788:1: error: expected identifier or '(' before '{' token
-    1788 | {
-         | ^
-   include/linux/filter.h:1795:1: error: expected identifier or '(' before '{' token
-    1795 | {
-         | ^
-   kernel/bpf/helpers.c: In function '____bpf_snprintf':
-   kernel/bpf/helpers.c:1068:9: warning: function '____bpf_snprintf' might be a candidate for 'gnu_printf' format attribute [-Wsuggest-attribute=format]
-    1068 |         err = bstr_printf(str, str_size, fmt, data.bin_args);
-         |         ^~~
-   include/linux/filter.h: At top level:
->> include/linux/filter.h:1785:19: warning: 'bpf_dynptr_skb_write' used but never defined
-    1785 | static inline int bpf_dynptr_skb_write(const struct bpf_dynptr_kern *dst,
-         |                   ^~~~~~~~~~~~~~~~~~~~
->> include/linux/filter.h:1792:21: warning: 'bpf_dynptr_skb_slice' used but never defined
-    1792 | static inline void *bpf_dynptr_skb_slice(const struct bpf_dynptr_kern *ptr,
-         |                     ^~~~~~~~~~~~~~~~~~~~
-
-
-vim +/bpf_dynptr_skb_write +1785 include/linux/filter.h
-
-  1784	
-> 1785	static inline int bpf_dynptr_skb_write(const struct bpf_dynptr_kern *dst,
-  1786					       u32 offset, const void *src, u32 len,
-  1787					       u64 flags);
-  1788	{
-  1789		return -EOPNOTSUPP;
-  1790	}
-  1791	
-> 1792	static inline void *bpf_dynptr_skb_slice(const struct bpf_dynptr_kern *ptr,
-  1793						 u32 offset, void *buf, u32 len);
-  1794	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks a lot!
+Taehee Yoo
 
