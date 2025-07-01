@@ -1,160 +1,251 @@
-Return-Path: <netdev+bounces-202792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBF3BAEF039
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 09:55:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 143D2AEF03C
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 09:56:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BDB6E7AB84A
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 07:54:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 134893AA166
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 07:56:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBE632153E1;
-	Tue,  1 Jul 2025 07:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AA0423507C;
+	Tue,  1 Jul 2025 07:56:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="RPCVe6qW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GX5gZq/c"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2EB9264628;
-	Tue,  1 Jul 2025 07:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12F11E51EB;
+	Tue,  1 Jul 2025 07:56:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751356528; cv=none; b=WopNewf9+6UIKd3UDQdV8qbxvrWZC4le2kEgSzFKMAkSQ6JjE8LLFgdiP/gQJAT9KcGPSTKVwY2jrxEeI4tnPLbv7Sessr5SScZdNBB12M0uyQtHimqO8LmZRGAzXNZOdYWTaeqGl6JABi2xpNUvdN7aCvHlJqdtkkWseai6/V8=
+	t=1751356588; cv=none; b=NNhoCnpfRuAVpHOpRP1CiWSe4Kw80b6wJ1deuZf660gC/OttZvSgsWj8sohGmhb4yxiRh5tdPHIkcSb2fv9rf7/x2Bg8eQfR1NoXNizlMdUGFy0jJ0mqVOSwd26xLUJB1VfXKuEMane6lg2LIt2VpBrBuoPYReUy7Sr2yZ4nCmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751356528; c=relaxed/simple;
-	bh=9ec1u3X1hswUlL/D+46m55ZLYNmlwFlrlevyxirbW94=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ANOKtGVKc9F81SQ3D8QugsZquq3VWPQfUTPKVd+jlroqjRpHP7/2OvV8ytA/9Zhj9JKD0dC8X/FwW9LlFas0WfX86eHTfbaTgx090kGIx+3dnj49ovWbA8TJKmltzgTugHIpWg0Wt6w9zETZdFgYVHJ9eZCTzF4a1LptX97koOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=RPCVe6qW; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1751356516;
-	bh=kVonl+PK1ESVmG9azZvdAt29T3vBY7t0t1HKeM85rhI=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To;
-	b=RPCVe6qWMeh0L1KoCAaUpToeJF73nl/4uaOz8Tesl0qQkVZxkF7smEdDfSJZicN5s
-	 fxui5Td9gen7am0Z4N9YAqtA5nGts/xMLZA3Ws5sbXKfXFkKXB6sb0d9HGnL6x9VNJ
-	 phgkYjSch/FgCZuJpUk4ufBea22s/ZA7lPoN4Hb0=
-X-QQ-mid: esmtpgz11t1751356511t3eee1c54
-X-QQ-Originating-IP: uIMIDLdsZ/D1XDMaTtdpyHRjJA4q6V7tfk6huzd3aRk=
-Received: from mail-yw1-f174.google.com ( [209.85.128.174])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 01 Jul 2025 15:55:09 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 13363238083336646326
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-710bbd7a9e2so30045547b3.0;
-        Tue, 01 Jul 2025 00:55:10 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCW0bEt/iv64aiNz+f2jdKskcFb2/32SuqHi5zIgUN0ehYP9MzpFdj49uP1QPf5UEn+4uG793Pka@vger.kernel.org, AJvYcCWTc8nspshMCLgdF7o6ZUYzjq7nZ8VSlMa6oe7DwxOlfoLNrBx+yTEVVjbSoMBEr97pX4YgQOxM2xBpgwg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmxLDX982cRFLjUyVX8vaGxCrc5VAwOSqB+fWm/JMaomNCjiBT
-	pJ2+SXnn+t5yoetWS0soNb/H2kwKJlzBczhsjG0Uzb0y4+vsp93BxfHUa61DMUF3uoFqxZRD+eX
-	gOgDo3DdbushoPat7Jf8VqaQaBOwKS7g=
-X-Google-Smtp-Source: AGHT+IF/JrE6CmFtz4xVWDk4L0eQar4iOXSbDoU2gCX5TO7LfKfgwY1Hcpg+2UwgYT4HAN5Wey2cPhMzu7MT0Sf0EwM=
-X-Received: by 2002:a05:690c:319:b0:712:d824:9202 with SMTP id
- 00721157ae682-715171471femr202620807b3.9.1751356508652; Tue, 01 Jul 2025
- 00:55:08 -0700 (PDT)
+	s=arc-20240116; t=1751356588; c=relaxed/simple;
+	bh=ghofPNa9c7NhRKlEjAFogqLFD2G4KZ+5gCkEvh+/XdM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tKNV/cSi59YM05l8hdncp5KzEWtRVh2eaonSa2EUAAsddPu0aOpUX0K/cxzaUUNbyNDmBl9apLdL/WDbx9hiCp7JAxKUf1OdDNvtsCvTqED9xIH99KU6gWs2Fxkfe2xL4pIn4qyfBEyO9JzlrvdWFgAERtI/O7JdcyPa0eyC+aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GX5gZq/c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7E120C4CEEB;
+	Tue,  1 Jul 2025 07:56:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751356587;
+	bh=ghofPNa9c7NhRKlEjAFogqLFD2G4KZ+5gCkEvh+/XdM=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=GX5gZq/cvzr4VxiKPHcdYjUdRTPMkH9s4cG/QsZZh/iU5+7yA+MfoaVxrjXuca445
+	 N/ArwdXAsa3mJVb2lFRg9+FVmQ6IOSIeP1pkb4bX6GHafbA17zXKOd29TK0980ao+j
+	 dwF7bvCeiWv4owruDCLhG6FLGITwiSzDhbFZ4totwBOhJf35tpbNjR+6HauJ6ZlP3e
+	 ENDkvkKKjjZkhEIuF1ylQigXa9sALarmI6Jvwg3RX/z6oyY8GwiDjYYMV8BCHOI8rP
+	 d7bFNZCUpAqdaHZWxXDO4l6GVaN3z/OrL5SwJv+BA1MCO2Y/j6oTyD1A71rr44DlXB
+	 RNK5vvmruRlVg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 683C2C83038;
+	Tue,  1 Jul 2025 07:56:27 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Date: Tue, 01 Jul 2025 15:56:22 +0800
+Subject: [PATCH v4] Bluetooth: hci_event: Add support for handling LE BIG
+ Sync Lost event
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <9EE5B02BB2EF6895+20250623041104.61044-1-wangyuli@uniontech.com>
- <20250623131141.332c631c@kernel.org> <CAC1kPDMkYdPVy-dG3uv92-JG2Ui8BxRqYt2U86ey7fKuJxBa0w@mail.gmail.com>
-In-Reply-To: <CAC1kPDMkYdPVy-dG3uv92-JG2Ui8BxRqYt2U86ey7fKuJxBa0w@mail.gmail.com>
-From: Chen Linxuan <chenlinxuan@uniontech.com>
-Date: Tue, 1 Jul 2025 15:54:57 +0800
-X-Gmail-Original-Message-ID: <0F513DA3FF23E8A1+CAC1kPDNE+io5=KEXZkLq5DOQi2qzBEmgAwOj6x4qvhiNmC1rtQ@mail.gmail.com>
-X-Gm-Features: Ac12FXxOBex4Jesig6QUABAVCPRvvFOqEWQBN0RMoBwV77dRdQuVcwEsTNxzev8
-Message-ID: <CAC1kPDNE+io5=KEXZkLq5DOQi2qzBEmgAwOj6x4qvhiNmC1rtQ@mail.gmail.com>
-Subject: Re: [PATCH] nfp: nfp_alloc_bar: Fix double unlock
-To: Chen Linxuan <chenlinxuan@uniontech.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, WangYuli <wangyuli@uniontech.com>, louis.peens@corigine.com, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, viro@zeniv.linux.org.uk, oss-drivers@corigine.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	guanwentao@uniontech.com, niecheng1@uniontech.com, 
-	Jun Zhan <zhanjun@uniontech.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-QQ-XMAILINFO: Mtnmbwz1r7Eqqjl1CQl6m32qcgPJFhDXzPap09HT4oh6a0GfGQS9QuZT
-	D8Q56fOUGzNceoSYjYYLfA+5NzFTmlCOI7zv+kE29qfBXvB2yMFkZb6E1nrH5AcFHh+Xo8U
-	PrWaEKdPgXqtQAuT75YacrRTQ8b7z1rrNVjggNi/VItZjX3fydy5WkKadTfym2Xy4Si50wV
-	XxJMbGzZk2PT/kEON8wIlDceyNlaq93c0yuLbUU40yyRPtq3u1L3ed77bdUYaxO6CMAbMBK
-	o+yhQmLnpmgdMoOAZqsgBgEllHj2FnsJrKZ7VNDtAputjLasCs1wzWzhv/m8MoLXhwS0Rtn
-	9OM0nykb9D3uozgkmt+ZMzHGmTi2nHkrbdp7Q3Ry75WCyN10HbDculP7ypLVv7SEUKwY3oG
-	oGnxCiQiZmSGXMNXY9G9lw95Ix8Qa4U1Rxuv6cBprk9uqBF4Q0SkKv5L30J4ieHWQg+2xKE
-	o98rBjsF+OrhijPsdcpmObgxssOEslik6Uw+vlqRxq2wmAqb5R43piHH31WyBHL8QURT1Ba
-	zlzMDS6rtwY+gPujmvXAAb9JzlwzVTBEMal/KE8o1mcnmqgNOaUdQTjtmpcqWJnoY8D3yQC
-	xe8mbgv5Xtbtdbv9/C8t6kRtl25+dR4QxnJU8r4CHeJh5wjV5/FV3Y/17nEFe+UKYHonoll
-	53jHkbF9bEuFsuPIEjKVSuB8c4nnKm/an1HBIF8/FvSmj7rF+CJO0kEkKW2K0+7vRhP+EQh
-	iNZCh75ccuFmTDS1WpqSv8e7UOxXyohF+cn2NovW+PvwQhlaMmiGn810IiGQ+NxIb6n3Ej4
-	dkkXIpD5WA76M3gis1d/MHMdmol2gHGOBXAPS4O7GCNzm5TOmG2PdJ57sElTm3+BkzYxlBx
-	BNofIoB+vPY2Lymi/wp0aZ0sBQowpwP9HdTLH9Sub4KB3kSCzUIYLKljDAva05zU1R14E+j
-	xdgH9mBP17Req7KEBXXIL1ub3Kya4Vwq5QBFTDkfyjwYg+yO6+ndC22M2o/8rDxE8kIzJ7n
-	3D2wjvaQR21a5ass+7pW8l7PHfY9QUol8LaAF4ynwfNftaIRdm4f4tSVsfCt3hWVQS/54zy
-	BzVqGZS8aNW3cFO77qvK2jNQJMZ/mJSVPXJWfkwg7XXNNlWEuc+2Lo=
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250701-handle_big_sync_lost_event-v4-1-f0ed2d77c203@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAKWUY2gC/33NSwrCMBSF4a1IxkaSm0fVkfsQKfHmtgZqI00JF
+ unejeJAETr8z+A7D5ZoCJTYfvVgA+WQQuxL6PWK4cX1LfHgSzMQYISVwMvoO6rPoa3T1GPdxTT
+ WlKkfucbKo9VqJxywAtwGasL9jR9PpS8hjXGY3l9ZvtYPC3qJzZJLjgqQVOW9debgrl1sA24wX
+ tkLzvCNmUUMCraVjbRKmMqB/MfUF6bEIqYK5jQ25txYwi38YvM8PwGJKgjOYAEAAA==
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1751356584; l=5953;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=g1GzVxQHwngpNT6ZeSBkKOq4Yr48SHOPUOISO/Exh7Q=;
+ b=ASkTPKkn++TcIRapJtQuWCDLKYl2l9dJb5WEnxeK+okAqqmcRmHx7mNDDUc3Momz96l5ZRNpA
+ Ozxtcq8WMOXDtCmkgbyGUw2/yOEVo7SNeTI223Rr6SGik+lbrM/+k8X
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-On Tue, Jul 1, 2025 at 3:45=E2=80=AFPM Chen Linxuan <chenlinxuan@uniontech.=
-com> wrote:
->
-> On Tue, Jun 24, 2025 at 4:12=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> >
-> > On Mon, 23 Jun 2025 12:11:04 +0800 WangYuli wrote:
-> > > The lock management in the nfp_alloc_bar function is problematic:
-> > >
-> > >  *1. The function acquires the lock at the beginning:
-> > > spin_lock_irqsave(&nfp->bar_lock, irqflags).
-> > >
-> > >   2. When barnum < 0 and in non-blocking mode, the code jumps to
-> > > the err_nobar label. However, in this non-blocking path, if
-> > > barnum < 0, the code releases the lock and calls nfp_wait_for_bar.
-> > >
-> > >   3. Inside nfp_wait_for_bar, find_unused_bar_and_lock is called,
-> > > which holds the lock upon success (indicated by the __release
-> > > annotation). Consequently, when nfp_wait_for_bar returns
-> > > successfully, the lock is still held.
-> > >
-> > >   4. But at the err_nobar label, the code always executes
-> > > spin_unlock_irqrestore(&nfp->bar_lock, irqflags).
-> > >
-> > >   5. The problem arises when nfp_wait_for_bar successfully finds a
-> > > BAR: the lock is still held, but if a subsequent reconfigure_bar
-> > > fails, the code will attempt to unlock it again at err_nobar,
-> > > leading to a double unlock.
-> >
-> > I don't understand what you're trying to say.
-> > If you think your analysis is correct please provide a more exact
-> > execution path with a code listing.
->
-> In nfp_alloc_bar(), if
->
-> - find_matching_bar() fails to find a bar
-> - find_unused_bar_noblock also fails to find a bar
-> - nonblocking =3D=3D false
-> - nfp_wait_for_bar returns 0
->
-> In this situation, when executing nfp_bar_get(nfp, &nfp->bar[barnum]),
-> the code does not hold &nfp->bar_lock.
-> We referred to similar logic in other drivers:
-> https://elixir.bootlin.com/linux/v6.13/source/sound/usb/line6/driver.c#L5=
-65
-> It seems that a lock should be acquired here again.
+From: Yang Li <yang.li@amlogic.com>
 
-Sorry, I found that find_unused_bar_and_lock already re-locks it. I
-didn't notice it before. Please ignore the entire thread.
+When the BIS source stops, the controller sends an LE BIG Sync Lost
+event (subevent 0x1E). Currently, this event is not handled, causing
+the BIS stream to remain active in BlueZ and preventing recovery.
 
->
-> > --
-> > pw-bot: cr
-> >
-> >
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+---
+Changes in v4:
+- Rebase the code and improve it
+- Link to v3: https://lore.kernel.org/r/20250630-handle_big_sync_lost_event-v3-1-a4cf5bf6ec82@amlogic.com
+
+Changes in v3:
+- Delete the PA sync connection separately.
+- Add state and role check when lookup BIS connections
+- Link to v2: https://lore.kernel.org/r/20250625-handle_big_sync_lost_event-v2-1-81f163057a21@amlogic.com
+
+Changes in v2:
+- Matching the BIG handle is required when looking up a BIG connection.
+- Use ev->reason to determine the cause of disconnection.
+- Call hci_conn_del after hci_disconnect_cfm to remove the connection entry
+- Delete the big connection
+- Link to v1: https://lore.kernel.org/r/20250624-handle_big_sync_lost_event-v1-1-c32ce37dd6a5@amlogic.com
+---
+ include/net/bluetooth/hci.h      |  6 ++++++
+ include/net/bluetooth/hci_core.h |  8 +++++---
+ net/bluetooth/hci_conn.c         |  3 ++-
+ net/bluetooth/hci_event.c        | 38 +++++++++++++++++++++++++++++++++++++-
+ 4 files changed, 50 insertions(+), 5 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 82cbd54443ac..48389a64accb 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -2849,6 +2849,12 @@ struct hci_evt_le_big_sync_estabilished {
+ 	__le16  bis[];
+ } __packed;
+ 
++#define HCI_EVT_LE_BIG_SYNC_LOST 0x1e
++struct hci_evt_le_big_sync_lost {
++	__u8    handle;
++	__u8    reason;
++} __packed;
++
+ #define HCI_EVT_LE_BIG_INFO_ADV_REPORT	0x22
+ struct hci_evt_le_big_info_adv_report {
+ 	__le16  sync_handle;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index b47c74080b9e..d555042fc39c 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1342,7 +1342,8 @@ hci_conn_hash_lookup_big_sync_pend(struct hci_dev *hdev,
+ }
+ 
+ static inline struct hci_conn *
+-hci_conn_hash_lookup_big_state(struct hci_dev *hdev, __u8 handle,  __u16 state)
++hci_conn_hash_lookup_big_state(struct hci_dev *hdev, __u8 handle,
++			       __u16 state, __u8 role)
+ {
+ 	struct hci_conn_hash *h = &hdev->conn_hash;
+ 	struct hci_conn  *c;
+@@ -1350,8 +1351,9 @@ hci_conn_hash_lookup_big_state(struct hci_dev *hdev, __u8 handle,  __u16 state)
+ 	rcu_read_lock();
+ 
+ 	list_for_each_entry_rcu(c, &h->list, list) {
+-		if (c->type != BIS_LINK || bacmp(&c->dst, BDADDR_ANY) ||
+-		    c->state != state)
++		if (c->type != BIS_LINK ||
++			c->state != state ||
++			c->role != role)
+ 			continue;
+ 
+ 		if (handle == c->iso_qos.bcast.big) {
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 4f379184df5b..6bb1ab42db39 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -2146,7 +2146,8 @@ struct hci_conn *hci_bind_bis(struct hci_dev *hdev, bdaddr_t *dst, __u8 sid,
+ 	struct hci_link *link;
+ 
+ 	/* Look for any BIS that is open for rebinding */
+-	conn = hci_conn_hash_lookup_big_state(hdev, qos->bcast.big, BT_OPEN);
++	conn = hci_conn_hash_lookup_big_state(hdev, qos->bcast.big,
++					     BT_OPEN, HCI_ROLE_MASTER);
+ 	if (conn) {
+ 		memcpy(qos, &conn->iso_qos, sizeof(*qos));
+ 		conn->state = BT_CONNECTED;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index a66013418488..c1c870c19e13 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3869,6 +3869,8 @@ static u8 hci_cc_le_setup_iso_path(struct hci_dev *hdev, void *data,
+ 		goto unlock;
+ 	}
+ 
++	conn->state = BT_CONNECTED;
++
+ 	switch (cp->direction) {
+ 	/* Input (Host to Controller) */
+ 	case 0x00:
+@@ -6877,7 +6879,7 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
+ 
+ 	/* Connect all BISes that are bound to the BIG */
+ 	while ((conn = hci_conn_hash_lookup_big_state(hdev, ev->handle,
+-						      BT_BOUND))) {
++					BT_BOUND, HCI_ROLE_MASTER))) {
+ 		if (ev->status) {
+ 			hci_connect_cfm(conn, ev->status);
+ 			hci_conn_del(conn);
+@@ -6993,6 +6995,35 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static void hci_le_big_sync_lost_evt(struct hci_dev *hdev, void *data,
++				     struct sk_buff *skb)
++{
++	struct hci_evt_le_big_sync_lost *ev = data;
++	struct hci_conn *bis, *conn;
++
++	bt_dev_dbg(hdev, "big handle 0x%2.2x", ev->handle);
++
++	hci_dev_lock(hdev);
++
++	/* Delete the pa sync connection */
++	bis = hci_conn_hash_lookup_pa_sync_big_handle(hdev, ev->handle);
++	if (bis) {
++		conn = hci_conn_hash_lookup_pa_sync_handle(hdev, bis->sync_handle);
++		if (conn)
++			hci_conn_del(conn);
++	}
++
++	/* Delete each bis connection */
++	while ((bis = hci_conn_hash_lookup_big_state(hdev, ev->handle,
++						BT_CONNECTED, HCI_ROLE_SLAVE))) {
++		clear_bit(HCI_CONN_BIG_SYNC, &bis->flags);
++		hci_disconn_cfm(bis, ev->reason);
++		hci_conn_del(bis);
++	}
++
++	hci_dev_unlock(hdev);
++}
++
+ static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *data,
+ 					   struct sk_buff *skb)
+ {
+@@ -7116,6 +7147,11 @@ static const struct hci_le_ev {
+ 		     hci_le_big_sync_established_evt,
+ 		     sizeof(struct hci_evt_le_big_sync_estabilished),
+ 		     HCI_MAX_EVENT_SIZE),
++	/* [0x1e = HCI_EVT_LE_BIG_SYNC_LOST] */
++	HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_LOST,
++		     hci_le_big_sync_lost_evt,
++		     sizeof(struct hci_evt_le_big_sync_lost),
++		     HCI_MAX_EVENT_SIZE),
+ 	/* [0x22 = HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
+ 	HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
+ 		     hci_le_big_info_adv_report_evt,
+
+---
+base-commit: 2a0ae2f6cd36497496b71b83b1af55e8eb5a799b
+change-id: 20250612-handle_big_sync_lost_event-4c7dc64390a2
+
+Best regards,
+-- 
+Yang Li <yang.li@amlogic.com>
+
+
 
