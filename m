@@ -1,176 +1,246 @@
-Return-Path: <netdev+bounces-203021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F3E5AF0255
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 19:57:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF3E2AF026A
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 20:04:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 557001C06B60
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 17:58:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE9EE4A0487
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 18:04:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D51C4A0F;
-	Tue,  1 Jul 2025 17:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BE1122D7B5;
+	Tue,  1 Jul 2025 18:04:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iUsIsFLR"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="E4t9QCy7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2058.outbound.protection.outlook.com [40.107.236.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2792B3596B;
-	Tue,  1 Jul 2025 17:57:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751392662; cv=none; b=hieCgyydzGkjwPcD8uxGP22c05kiSoDYcvzKBR+6BnA9VJ2goKSQYjkhigzd7raXHIG9mOR96HX5cuMNKinC0oQTYft0fmBHTpnsSV7JCKmllFA4T+NNhCKDTBhys5KNXsSUSzxzUv2Ai2FNGushiQuXS/dKee+d+84raoi61/Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751392662; c=relaxed/simple;
-	bh=Xcj3t8dS0FcmInmyKWAR0WJhIMN9tZ31T0nM7EtTJpo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CSXhZya4XURCXoKlKZ2QVG4sUG50x0Ww+OmXOfg7ZBKh8r6EG6kZklDtTW0FsRJNa4Cjk8TcBCwVmpOIDs9KM8w8bAmezXKn7pyvCN0UIdsUlm95N1H2EWBkHWLVdhNg6t51QM/bQfDB6ftINs+mThT6dPW7nHogvlT5g81PwLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iUsIsFLR; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ae360b6249fso750356066b.1;
-        Tue, 01 Jul 2025 10:57:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751392659; x=1751997459; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pXjfR544OdpbJ9besQg+JvGQxJKjojQewq85hiTyzvw=;
-        b=iUsIsFLRo0peJdxeIvjPC8w2Xj21cg7MZDINLIla+fLfS+v6bxkabM0H5Q0Osishi6
-         UUZ0SIUnGa3fiaE92Kz9bd1QGsNVTiEUW7FC0cJAcQn8H2dWljRcmYm342h5SyAc7WYD
-         KqWdMNgAui9YjsBXz8kWTWXfusZPEsmVJ5W9YOuhJgjNMxn7LBHvK9uwRhHF2HBdkREW
-         JyaWKNDQFmkjUI1gVZGrzA0IRQP8ikXGo0yg/a2ayPKPWvncq08QgBIqPIhK2Vu3qLtd
-         iCvF63w9b454hh9W3pn+da87v1Icl0ZsNiR8NFKteNWoXUJAjGwMih5M48U+TeoxYK20
-         GaDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751392659; x=1751997459;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pXjfR544OdpbJ9besQg+JvGQxJKjojQewq85hiTyzvw=;
-        b=sVQ6LM1uKdTcWsRpvmMhCSfsZwekWzdzyAEGqF8nx/+e43poG2GrBssYpijs4DPwMB
-         QUNakoVVkmn225dhJ2Ah/fFMmeClmzouSEQzrdd1M2NfgHh4z4wniTIb26uWp7HYNR80
-         ypL/jFPrpSJBTaX4+QSggho1PaEY6+PhbjvGuDan5G+d0fG8sUrkV40y3sNQujk6p2LG
-         gLAELKO8H4/wwTSkqtFVN9qjeazgpAza5eA6DHLeS0JDX8JkVgZYLR3eu1KOMdf4BXWN
-         aqK4V1f01Ywyx4jzW6BmXAgYQAc11bgj79buSnm5gZ3SXEEJo+AxxZTRyo1R7amZYLWL
-         yTiw==
-X-Forwarded-Encrypted: i=1; AJvYcCUVy8txv5hM/+hSuI/nBkFn6sciUTOqmrIza6Z4MATGQRkWFZPHh6W7PFNMx62aS6WlENBSrOqzIqeG@vger.kernel.org, AJvYcCUYh/3YBv1eIHq8DRInHDBLAEmFMrOHWEueom13cLFsHpUWSBNjlr7B6a+L6qKXgil2tFStF96/ruPB@vger.kernel.org, AJvYcCUl/4+2LXagdrLUZ4u7f72e6Lw4rnyfO5dvFXvIj5SJV6GO9v66Gmgj5XJCgwld5BaBtigVz4Exz5csvw==@vger.kernel.org, AJvYcCVFajyBuFXmkHXMd12duyPWRVtLNot+iVJQ2/IPuCb0uJa6gCxkp4Xkk/ft5W0fJT69wnudFVsmiKLEeL8=@vger.kernel.org, AJvYcCVMM3qVPM93ghaLpM94wGg5djBKPtTjyghvV1y+wLFBTHwzMfa0QcrZJ3IT7iPcOPzh6XbhrlcJ@vger.kernel.org, AJvYcCVt3PauObtJgxRsytfRrfMRFYs7meOcw+YLXThV5ovyMad35OjbXCTm19HPF2x6XwLMSTY31TeHUin2@vger.kernel.org, AJvYcCWB9zAKg780CCcyghYnGyjDgwjPFyRtwiyVNldF8EJZDybh2g6wAI3sXIXtCCbbxCEM2rc5gx0I9QGd@vger.kernel.org, AJvYcCWTNg+wfy1z8mCD/919h9pxLk1WnuRvq7nQEHVTb+YIQlxIIMMcSaDFEScU+TWli8hRxmyvjL1rnjwj@vger.kernel.org, AJvYcCWTpf8edLOE12O7ljWgLR1PoBD5Q7pOH8XFMSO+qt2/9teyviBV2fMzn7mGHCIuU9DGKvZV4APecTn7DKhO@vger.kernel.org, AJvYcCWzLpehFBsFncirw4f3Yls10idYvrVYh6PTlarY
- FrlhboAOP9dq940VxmBDv6HlojJ4MnjRJgaw/EojpYg=@vger.kernel.org, AJvYcCX8hXB5mHBGjXE9tjVKBh1TE5C+51yE8VZwpkR2qotdZT0wmSKs2VYLJPSkhtwd3yf5cHdR46Uw8GncsOVa@vger.kernel.org, AJvYcCXDRYSqXJ9Ezu1RLo/SwxjSTIOa/G647ySbDPIqsfabcfI1xpy/1byYgi/ax+deLZwvzjkQxVtJO/8=@vger.kernel.org, AJvYcCXHNeWhtB4b5p5dsm0EflF1uQSI0DCPqiqflvwdZpVNDEoUPUnTeenoQg43EbD3X1JkuCC8J6x9j15Cq04v3L6T4yQ=@vger.kernel.org, AJvYcCXQAeJiMLfoDPN1XJ/5u6UnekWspCCP8LCUjucfOzv6fQofiveJmpcQjqKQVxTofwCIlK2J1vnSUX3y@vger.kernel.org, AJvYcCXrE5T3PSv+5HSh8qBMPdanjt4Q+ZYuWu0sb91nyrb0Nc90DWuATXDPnaGVQL53Hf582iw30kTfkbPqLQ==@vger.kernel.org, AJvYcCXrP5dOej6d3xvPVaf+mLWcS6a71IXhslX1x9UZphNsd6XgtvfbDD5VmpKc16cnh6EgdR7JjSx6YfxCpg==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7MPPdXThqK15+abUr6j6KjvMcKc59g+Qv1fDXLHKI7HAX/iUd
-	y++Eq+5rPUGBreX7Jh1RwPNwHTEc+XB0b29HZJbs5/hVVzXp8FYlul82NNbM3MO4aM2ph4eWdXx
-	m50Vhz7xoDL74S+Ri/CTZZaS7IFVIswI=
-X-Gm-Gg: ASbGnctGtb3rAmJjJkxzrhubY3ksEybJjyB+5oLMHM8qciye+1xs+zPjo2zIb48G12U
-	PxQAG7NjFxDPU5bzK7Q3RFur/3s00DJBgthiyETtX3VTvj4o+HYi5OFKE+hDXqdACYbnOXOHVl+
-	hj7YhjckPnuLlO204B0V1gG7mAj5AhXebUfjMnqmXLjHM=
-X-Google-Smtp-Source: AGHT+IFi2mQZLuvuKUJ5Vmbx2bMFhgEtTB1rODdhMnUJkkTAqMfdBOcO66FNReafO5ChqP0c8B6r5Lro21q2uCkd3k4=
-X-Received: by 2002:a17:907:1c18:b0:ae0:4410:47e3 with SMTP id
- a640c23a62f3a-ae3501a58a6mr1915225466b.51.1751392659068; Tue, 01 Jul 2025
- 10:57:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C9B51B95B;
+	Tue,  1 Jul 2025 18:03:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751393040; cv=fail; b=KdV597IQHBVKIfEPJCYll0bz7D+mVRNzyAkauedtk/lb+28IfBpwlJzX+kjXeIzKQIeIvuUoq20Prne+l//jIQFJYVcrYB8sJYMURyxpyMnRGFkPrt3SX+oEZDdB6Ww6qmXbsbrk5Hg0yDsTIYTyudsnnNRPYQ/J0g3Rcnstvvc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751393040; c=relaxed/simple;
+	bh=qeJd6zCKkRuSwYXNZ3SbsY5uGK/+uYOw+MSyFtazziY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=czVVT7wqNA7R9IU2x3f7nI7lQxnQpvpzGrg1OOXrQNF45c+V4V+uKntlnMVHmMfNKmi4CF4gQnXWRjt/3qlmGh6RfO4bld9fNFqhq4mNZYM2HMKXpkwrMWrnor0uZWD2WXSyAyQwmUrR/S8398fsiMrGqDVh7yCZ37OuA2CnGHY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=E4t9QCy7; arc=fail smtp.client-ip=40.107.236.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jrNL4xkAr5q+UcJtAdpzHGJvrr09bXGGPBQg3vV7rNmpa8AlrNxBkfgX7M5jES1NJvAlbKMx0eSd8AQxZdOhbyKWIzNms+Wl0amvrKH6UP3iJGOqrUCWhhmPXp9e0XxozfucaCZHTKSikK+NWkhazl++zqeYb3vsJJSak3w3ga4YxvdAKTSIJ8tTjCVzK82oOt2axEGpdgqS6AvhI5pbCm7MvxUIdX3Pzxhjlz8DqWm8x6T5aQMdfGZJAN6uZELxONZRpF5Tt9K8L5GUKjNcz9MyoP53p4Fxp5NMrUi4QMcl3mCbaZKrJFW1q8O+7uwll6F9wX3ICjL4GpACXRIowg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Uhhf/sbKPfhGgAEZ95mduy9BRy9KubpaT+mtdCqn8AQ=;
+ b=HfmdcCD7rH1t2CVZdXy0KeLP2nFvj18HSqy3IF0p+UCuf1RdNyNcc+DwZubVYPvFGP1+y341mBPEChQCJwuHjLFve29bzozC/dTmAcvE70VTDRwI4k5AARLEdmVx+nuGRzCBJnAqdQG4UIatBo0haRc/0JS8+tLHiWCXYqg/pGrq5JtpLm3hOkJPFLyP5pvF6MTeRiiYR9x600RUt4lbo4QIW2hvPQ4cdasRMyefoNHHUosnFkDy6NWwUxlUra82zyG42xv5MWj7xbgvI/DTwYHKgDxfYZrvIq3LPpp34JfMea9gpjvRGOkarEcbL7P/ZD5YZzgaqv8KGhxDcBK5jQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=lunn.ch smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Uhhf/sbKPfhGgAEZ95mduy9BRy9KubpaT+mtdCqn8AQ=;
+ b=E4t9QCy7oGfS6hNnG1fYHBRR2Q94ogcl2gIHrKj8jIAxOQ/181haNEsmGWou7ImTSiotZHMhrYiUANLCQDIa9deH3Nbgqj1Dg8m4m/06MwCEDWky4Q6Ui9QA9c9969ab9TXU/91u9/jHqQHneJiziDvvC8Wvc8G8CH16vP5ac+VjurM8XV8p4zN4xj1PLqU+2GBqxO0zEaoBLDjUgVMmJXtL8zS+kY1/8Puqz1UnMT6q6F1BacB5EvtEL6B16/Ued0gthYdNQ0fQcmUO/coUZ+G7XIEKxjlbwMekvRBJpXhWxbLzMEhVlsRlCPVTl83fPxBt9tYS+CaByDg0Jt39+A==
+Received: from SJ0PR03CA0065.namprd03.prod.outlook.com (2603:10b6:a03:331::10)
+ by MN0PR12MB6128.namprd12.prod.outlook.com (2603:10b6:208:3c4::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.23; Tue, 1 Jul
+ 2025 18:03:53 +0000
+Received: from CY4PEPF0000E9D5.namprd05.prod.outlook.com
+ (2603:10b6:a03:331:cafe::37) by SJ0PR03CA0065.outlook.office365.com
+ (2603:10b6:a03:331::10) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.29 via Frontend Transport; Tue,
+ 1 Jul 2025 18:03:53 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ CY4PEPF0000E9D5.mail.protection.outlook.com (10.167.241.68) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8901.15 via Frontend Transport; Tue, 1 Jul 2025 18:03:53 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 1 Jul 2025
+ 11:03:32 -0700
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Tue, 1 Jul 2025 11:03:32 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.180) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
+ Transport; Tue, 1 Jul 2025 11:03:30 -0700
+From: David Thompson <davthompson@nvidia.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<asmaa@nvidia.com>, <u.kleine-koenig@baylibre.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, David Thompson
+	<davthompson@nvidia.com>
+Subject: [PATCH net-next v2] mlxbf_gige: emit messages during open and probe failures
+Date: Tue, 1 Jul 2025 14:03:24 -0400
+Message-ID: <20250701180324.29683-1-davthompson@nvidia.com>
+X-Mailer: git-send-email 2.30.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <pnd7c0s6ji2.fsf@axis.com> <ylr7cuxldwb24ccenen4khtyddzq3owgzzfblbohkdxb7p7eeo@qpuddn6wrz3x>
-In-Reply-To: <ylr7cuxldwb24ccenen4khtyddzq3owgzzfblbohkdxb7p7eeo@qpuddn6wrz3x>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Tue, 1 Jul 2025 20:57:02 +0300
-X-Gm-Features: Ac12FXyruF9twzstORuqQqTbcXFq7Oy0k32bhmiSfPFWKw8o7JRMkyPmwEAJIYk
-Message-ID: <CAHp75Ve=Zas8=6YKoPeTRrvjCaTyyRAyJG1gBLripqZgQpfg7g@mail.gmail.com>
-Subject: Re: [PATCH] Remove error prints for devm_add_action_or_reset()
-To: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <ukleinek@kernel.org>
-Cc: Waqar Hameed <waqar.hameed@axis.com>, Vignesh Raghavendra <vigneshr@ti.com>, 
-	Julien Panis <jpanis@baylibre.com>, William Breathitt Gray <wbg@kernel.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, Peter Rosin <peda@axentia.se>, 
-	Jonathan Cameron <jic23@kernel.org>, David Lechner <dlechner@baylibre.com>, 
-	=?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
-	Andy Shevchenko <andy@kernel.org>, Cosmin Tanislav <cosmin.tanislav@analog.com>, 
-	Lars-Peter Clausen <lars@metafoo.de>, Michael Hennerich <Michael.Hennerich@analog.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Matteo Martelli <matteomartelli3@gmail.com>, Heiko Stuebner <heiko@sntech.de>, 
-	Francesco Dolcini <francesco@dolcini.it>, 
-	=?UTF-8?Q?Jo=C3=A3o_Paulo_Gon=C3=A7alves?= <jpaulo.silvagoncalves@gmail.com>, 
-	Hugo Villeneuve <hvilleneuve@dimonoff.com>, Subhajit Ghosh <subhajit.ghosh@tweaklogic.com>, 
-	Mudit Sharma <muditsharma.info@gmail.com>, Gerald Loacker <gerald.loacker@wolfvision.net>, 
-	Song Qiang <songqiang1304521@gmail.com>, Crt Mori <cmo@melexis.com>, 
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>, Ulf Hansson <ulf.hansson@linaro.org>, 
-	Karol Gugala <kgugala@antmicro.com>, Mateusz Holenko <mholenko@antmicro.com>, 
-	Gabriel Somlo <gsomlo@gmail.com>, Joel Stanley <joel@jms.id.au>, 
-	Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
-	Wei Fang <wei.fang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, 
-	Krzysztof Kozlowski <krzk@kernel.org>, Alim Akhtar <alim.akhtar@samsung.com>, 
-	Sebastian Reichel <sre@kernel.org>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>, 
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Han Xu <han.xu@nxp.com>, 
-	Haibo Chen <haibo.chen@nxp.com>, Yogesh Gaur <yogeshgaur.83@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, Avri Altman <avri.altman@wdc.com>, 
-	Bart Van Assche <bvanassche@acm.org>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Souradeep Chowdhury <quic_schowdhu@quicinc.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Peter Ujfalusi <peter.ujfalusi@linux.intel.com>, 
-	Bard Liao <yung-chuan.liao@linux.intel.com>, 
-	Ranjani Sridharan <ranjani.sridharan@linux.intel.com>, Daniel Baluta <daniel.baluta@nxp.com>, 
-	Kai Vehmanen <kai.vehmanen@linux.intel.com>, 
-	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Jaroslav Kysela <perex@perex.cz>, 
-	Takashi Iwai <tiwai@suse.com>, Shawn Guo <shawnguo@kernel.org>, 
-	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
-	Fabio Estevam <festevam@gmail.com>, kernel@axis.com, linux-iio@vger.kernel.org, 
-	linux-omap@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
-	linux-rockchip@lists.infradead.org, linux-input@vger.kernel.org, 
-	linux-mmc@vger.kernel.org, imx@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-phy@lists.infradead.org, linux-samsung-soc@vger.kernel.org, 
-	linux-pm@vger.kernel.org, linux-pwm@vger.kernel.org, 
-	linux-amlogic@lists.infradead.org, linux-spi@vger.kernel.org, 
-	linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-usb@vger.kernel.org, sound-open-firmware@alsa-project.org, 
-	linux-sound@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D5:EE_|MN0PR12MB6128:EE_
+X-MS-Office365-Filtering-Correlation-Id: b3fe16e5-c775-4f79-12da-08ddb8c9a3c1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?V8FDruQVWWhR6kezGfLSbJAFm1JMquRheqS4BRsvRkIRJ+mBmWf19sxe8xpS?=
+ =?us-ascii?Q?fjPGtvPpsmY6XUhVf4S2L0bgkWyP4TM9pzu+MxMY5pwYkRmSJvsJN4enSuog?=
+ =?us-ascii?Q?TGpCtMH6U0p0CYO9BVnO/H7StCifQgUaqtQF3frs0jiSzjwJ3i3YFDI/hap9?=
+ =?us-ascii?Q?UPHI8sjGAMC/wFvEoqY78ZU1ZcWaeYjGryFZZ7s6fw/7oijGTHUhleQwRBqb?=
+ =?us-ascii?Q?+Vxnwa1BYWl/ygD0yklu+sq5ANn3SlfcRpJr/nzsOn+eGo5tJ4uEeWvLdHXo?=
+ =?us-ascii?Q?XGsJJnWTJpOhDM9OC7QSkwxAAJDuC/A9wl+E55imUNBKviLMNVGcZAOZ+YQZ?=
+ =?us-ascii?Q?ygqtYSoLjXRUnaLLug7zfa58i7P72t3vKGoX6eU6iEAD4NPrugIUg1a3Pr8A?=
+ =?us-ascii?Q?9X/2QDXzvd4vct4XrqrbSk3lI/Z1neIALwx0E11QVAiW3HSvQeq/e4jFut2c?=
+ =?us-ascii?Q?Hjp9PcyTfo12HUauBa0C1H0C53+9IxPpzRppGKDi9ZsuYUS/IkbZYzx7Z5vu?=
+ =?us-ascii?Q?QG3Jq6TG4S6ouBCrgn7LxyWyTVNk9PIR/dnHt+2tMCBoBQ9dwv9yHaHnZjfg?=
+ =?us-ascii?Q?e+Vi8uRloYcPRNaxlO19ftdtFDrfD4eWAE2mc1KmhDhkkF6MgmzsbWWVTqb+?=
+ =?us-ascii?Q?adXSLFGpxIoA9DIGALXCyAiGxP30JgFJZpd0X4piuPm9Gla04kOeU9W4TGh8?=
+ =?us-ascii?Q?5776G4aDYC9kRNoAES83JcCW9yKQtnuxyGv0ylLUaHBbeXS8qWYT3lCgT4eL?=
+ =?us-ascii?Q?l2aPDTsNXdswi9M5EaZ/YWHFk2VbxVwM4E6/w/g60HXIcxJBhFrGcxVzEngM?=
+ =?us-ascii?Q?71ELIeFHhE/4d3rnCgaaH6fdeafNLKLupb4R/jg/mHs8nDd4hp/XkWaEotF6?=
+ =?us-ascii?Q?SAzQFBGa0oGrUnXYXEmUIYnHf/mN8M3OTYpy5T0jPjxKfiv4VJ97BH01ylY+?=
+ =?us-ascii?Q?PyzJFdR1Qxp4kn1UZHYlGldZWVi50AIOV7+b/NMtCrS18/zQV4ZX/Ee0eEow?=
+ =?us-ascii?Q?Vb7260I9G+24/5ZvpKwjllgky1jCxf9EDz1/dit5nLdTKPtGokiybR1VUS9V?=
+ =?us-ascii?Q?qT9ovUdgozkykT5+IedojIGi9ZoVk3/yad3TpBmfINTaeWE1Gxwuk9TZL8oi?=
+ =?us-ascii?Q?nt1ad5NuE17bxrDb8YfT9/6AaPcXM9Na2TW8EzQe6tHPzVsF2vq4PQHvvZdw?=
+ =?us-ascii?Q?062OkWf6CO7SI2zKP9KhbxsAIcZS2Ozo3JLt+i2ze8kfsuzDlnhoItu/d+r4?=
+ =?us-ascii?Q?vN1/mGZy/FcmtedTL35i8UEq0J+j/3ex56k8t4D4HRpS++b9NcYt/gDqJr9u?=
+ =?us-ascii?Q?dPMw22IXcj2ngbweTsfkDyfGPWqGi3jfeLcqbEEtXoRYYv98oDM6iUnkGgaN?=
+ =?us-ascii?Q?FRFMS7A2RHXwZizwrDP6JLuNYGLSw43i03AHrKlQnhN2c/T9xXNCSHX8PIai?=
+ =?us-ascii?Q?cX6jZri4TvKrsdiUHAb1I9MbyAurGtqxRcp5oj6V/oufnU4g3z1g7tldQmyq?=
+ =?us-ascii?Q?6Itc2q7wJdAprAh+Sj3Cew6yMZaAu8U7QoOn?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2025 18:03:53.1001
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b3fe16e5-c775-4f79-12da-08ddb8c9a3c1
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000E9D5.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6128
 
-On Tue, Jul 1, 2025 at 8:44=E2=80=AFPM Uwe Kleine-K=C3=B6nig <ukleinek@kern=
-el.org> wrote:
-> On Tue, Jul 01, 2025 at 05:03:33PM +0200, Waqar Hameed wrote:
+The open() and probe() functions of the mlxbf_gige driver
+check for errors during initialization, but do not provide
+details regarding the errors. The mlxbf_gige driver should
+provide error details in the kernel log, noting what step
+of initialization failed.
 
-...
+Signed-off-by: David Thompson <davthompson@nvidia.com>
+---
+ .../mellanox/mlxbf_gige/mlxbf_gige_main.c     | 26 +++++++++++++------
+ 1 file changed, 18 insertions(+), 8 deletions(-)
 
-> With that
->
->         ret =3D devm_add_action_or_reset(dev, meson_pwm_s4_put_clk,
->                                        meson->channels[i].clk);
->         if (ret)
->                 return dev_err_probe(dev, ret,
->                                      "Failed to add clk_put action\n");
->
-> from drivers/pwm/pwm-meson.c is optimized to
->
->         ret =3D devm_add_action_or_reset(dev, meson_pwm_s4_put_clk,
->                                        meson->channels[i].clk);
->         if (ret)
->                 return ret;
->
-> .
->
-> I would prefer this approach, because a) there is no need to drop all
-> dev_err_probe()s after devm_add_action_or_reset() and b) the
-> dev_err_probe()s could stay for consistency in the error paths of a
-> driver.
+diff --git a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c
+index d76d7a945899..d1f8a72cae53 100644
+--- a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c
++++ b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c
+@@ -142,8 +142,10 @@ static int mlxbf_gige_open(struct net_device *netdev)
+ 
+ 	mlxbf_gige_cache_stats(priv);
+ 	err = mlxbf_gige_clean_port(priv);
+-	if (err)
++	if (err) {
++		dev_err(priv->dev, "open: clean_port failed: %pe\n", ERR_PTR(err));
+ 		return err;
++	}
+ 
+ 	/* Clear driver's valid_polarity to match hardware,
+ 	 * since the above call to clean_port() resets the
+@@ -154,19 +156,25 @@ static int mlxbf_gige_open(struct net_device *netdev)
+ 	phy_start(phydev);
+ 
+ 	err = mlxbf_gige_tx_init(priv);
+-	if (err)
++	if (err) {
++		dev_err(priv->dev, "open: tx_init failed: %pe\n", ERR_PTR(err));
+ 		goto phy_deinit;
++	}
+ 	err = mlxbf_gige_rx_init(priv);
+-	if (err)
++	if (err) {
++		dev_err(priv->dev, "open: rx_init failed: %pe\n", ERR_PTR(err));
+ 		goto tx_deinit;
++	}
+ 
+ 	netif_napi_add(netdev, &priv->napi, mlxbf_gige_poll);
+ 	napi_enable(&priv->napi);
+ 	netif_start_queue(netdev);
+ 
+ 	err = mlxbf_gige_request_irqs(priv);
+-	if (err)
++	if (err) {
++		dev_err(priv->dev, "open: request_irqs failed: %pe\n", ERR_PTR(err));
+ 		goto napi_deinit;
++	}
+ 
+ 	mlxbf_gige_enable_mac_rx_filter(priv, MLXBF_GIGE_BCAST_MAC_FILTER_IDX);
+ 	mlxbf_gige_enable_mac_rx_filter(priv, MLXBF_GIGE_LOCAL_MAC_FILTER_IDX);
+@@ -418,8 +426,10 @@ static int mlxbf_gige_probe(struct platform_device *pdev)
+ 
+ 	/* Attach MDIO device */
+ 	err = mlxbf_gige_mdio_probe(pdev, priv);
+-	if (err)
++	if (err) {
++		dev_err(priv->dev, "probe: mdio_probe failed: %pe\n", ERR_PTR(err));
+ 		return err;
++	}
+ 
+ 	priv->base = base;
+ 	priv->llu_base = llu_base;
+@@ -438,7 +448,7 @@ static int mlxbf_gige_probe(struct platform_device *pdev)
+ 
+ 	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
+ 	if (err) {
+-		dev_err(&pdev->dev, "DMA configuration failed: 0x%x\n", err);
++		dev_err(&pdev->dev, "DMA configuration failed: %pe\n", ERR_PTR(err));
+ 		goto out;
+ 	}
+ 
+@@ -468,7 +478,7 @@ static int mlxbf_gige_probe(struct platform_device *pdev)
+ 				 mlxbf_gige_link_cfgs[priv->hw_version].adjust_link,
+ 				 mlxbf_gige_link_cfgs[priv->hw_version].phy_mode);
+ 	if (err) {
+-		dev_err(&pdev->dev, "Could not attach to PHY\n");
++		dev_err(&pdev->dev, "Could not attach to PHY: %pe\n", ERR_PTR(err));
+ 		goto out;
+ 	}
+ 
+@@ -479,7 +489,7 @@ static int mlxbf_gige_probe(struct platform_device *pdev)
+ 
+ 	err = register_netdev(netdev);
+ 	if (err) {
+-		dev_err(&pdev->dev, "Failed to register netdev\n");
++		dev_err(&pdev->dev, "Failed to register netdev: %pe\n", ERR_PTR(err));
+ 		phy_disconnect(phydev);
+ 		goto out;
+ 	}
+-- 
+2.43.2
 
-Why do we need a dev_err_probe() after devm_add_action*()? I would
-expect that the original call (if needed) can spit out a message.
-
-
---=20
-With Best Regards,
-Andy Shevchenko
 
