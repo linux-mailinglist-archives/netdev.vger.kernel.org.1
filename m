@@ -1,161 +1,376 @@
-Return-Path: <netdev+bounces-203037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F29AAF049A
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 22:18:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FBC9AF051F
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 22:49:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A55D71C06F1B
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 20:19:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 518BB441065
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 20:48:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7F6263C6A;
-	Tue,  1 Jul 2025 20:17:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0DCF2FEE0B;
+	Tue,  1 Jul 2025 20:49:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="CBGlmTAS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ndNXpGyP"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [67.231.154.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C261821660D;
-	Tue,  1 Jul 2025 20:17:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.154.183
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751401079; cv=none; b=OgF/j+v0cdmWAehWWa7YwS8zpYVpF5KUf3IIimp3DZrirZ+/hSem6MxmgEk8cMgKO0VMXyygGxu8UcUuoKQw+4v7FiSpfoBtYcEB12lfpkbPFzSgKYgnKzWp3Z01StOfm9aQ9nxPcfs4vudlxa7oP35AwA+mKsoFDfimz5xlgVc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751401079; c=relaxed/simple;
-	bh=XlitTrfvHOqrCzioarncmPUvFSxf/3wpOSSQGRNsKMw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aLRPsJ6U2mh4x8CgwVRBLuxodhUmoBjpJEDHEpGsUW5L+YtRts6RrYDIYnqYvDMMndg8OECCsTFkbH+J1iKhlOP7m7/WJMgaOYLjxCalaxQ0aB4W/f7VeAP90AoEP80gRDPzRDNInPBH2aysh4x01QUG+DVdgERitT7itLbGOQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=CBGlmTAS; arc=none smtp.client-ip=67.231.154.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
-	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 3839D8000A5;
-	Tue,  1 Jul 2025 20:17:50 +0000 (UTC)
-Received: from [192.168.100.159] (unknown [50.251.239.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mail3.candelatech.com (Postfix) with ESMTPSA id 0664D13C2B0;
-	Tue,  1 Jul 2025 13:17:46 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 0664D13C2B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
-	s=default; t=1751401066;
-	bh=XlitTrfvHOqrCzioarncmPUvFSxf/3wpOSSQGRNsKMw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=CBGlmTASTOuty4t+WUurGRVcJBMiOcvoyMnOKA9uHSeNB8/wqBR8qlzk26f3EhEr4
-	 SMTnHL17kLA8wwr5I8cx3GrIpUcRDdQNfi2AIDi1YAeYwa6Jn1b5h1LKh74FPyNUqG
-	 e7x0sxk+eoQ+D75S4eTiyC14iAnuH7YQK1LtWu4I=
-Message-ID: <65a4f2fe-7336-0116-6f32-4fcd2a8c4c72@candelatech.com>
-Date: Tue, 1 Jul 2025 13:17:45 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A6B2EE61A
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 20:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751402944; cv=fail; b=GVPWPn5cfFvU6Tg7EcFRUSm1PaMzxlAbRj8goLKR1RMJkbDCEm/9zX02btDXjeSBk5iLmaEnVjlMyYvACIu/W9cQtpNnfqzLjMYBxmS9zZYgPllXUywSWTGmvKLe4ysskh0w1GUIGHCr6wF4Ks+VPRPUb0MlEmepBr67gycSvGs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751402944; c=relaxed/simple;
+	bh=x8/YOXNdEy/aDecJPXJfOWR7lIMA8IkMKkNP26mig7w=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=iryo/MkfI05irgh9Q2/+cmn6lvzwEJ+HETUGK8++nKsFx5cTwmzUVV4z2WTFAnlSPi88AnLDADL4SNErE4cS1tWB1C9JmDkOdy91R4BeU/MjCKp7uX++BRf71D47civFEeEtfkX7R94c1pVAWPSJCJZlNbS7klkl7rUbkHR0Og0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ndNXpGyP; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751402943; x=1782938943;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:mime-version;
+  bh=x8/YOXNdEy/aDecJPXJfOWR7lIMA8IkMKkNP26mig7w=;
+  b=ndNXpGyP49pmcq3s5aCFUbuhOOA1qEUXmcXhMuU0SLJ3w5tXHpV/TWbd
+   5LH8eBbugPblpz66up8dJ6LgfJYnhsobIAg+WSq0PPo3n8F7p7TQzX+3j
+   W+nRRb0aXAYOSev0UoLH46UF6CNpFFQ7eX8uCLjPc3KyrwMGOT+t/DLoT
+   UO/W2M4KZVH3eOihBLYx5TtgAoTtwXZrVA5VE3r4K28VEZnJdqbZpZMQE
+   hQ+XtGNIAxXP13wASXOtdElzRPjFl7ZeDFWlsH9TEb+yOOpa+3vam3gLB
+   hmYjgt9J1U4/IL2Zcg1bT6GMFC0hnwGbhS3frIIoKHwTpFwI2fWZI8NyA
+   Q==;
+X-CSE-ConnectionGUID: WOTMaeUgTSeLQOBZiKlp3A==
+X-CSE-MsgGUID: dSePSjomRlKYnHoqsiPswA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11481"; a="57494673"
+X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
+   d="asc'?scan'208";a="57494673"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2025 13:49:02 -0700
+X-CSE-ConnectionGUID: fiTBiGN5RDSveMZcNtBBXQ==
+X-CSE-MsgGUID: Uzo/Q6y5RrKjxKSuLACLYg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
+   d="asc'?scan'208";a="154415304"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2025 13:49:02 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 1 Jul 2025 13:49:02 -0700
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Tue, 1 Jul 2025 13:49:01 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (40.107.93.44) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Tue, 1 Jul 2025 13:49:01 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LS3n3ytTRtB6iOFodnCdOmCr/aVkw7q7DQn/BQgd7gVF2RBlqBkx/4JeZ/MDfYd8o2K/1NKSMqqSfWSzRN3qBZ11kh26RvikZhcxZRNsBClIq0RPELqdAgtzG6q88Cmhn/B4SFeR94U5sTuL5IcpS3UeyydMPqdoPjh5xehp4xI0JHGrgSGrgiPfcRk3kZGj59x22+o+rY7Y7Q+oLGUU2t6V6kgXYF2zdfenmREc5IBWdHNykjyizCvMbLUYdSIwWjZe0Wf2SZuGxntgvs+Qo850e2BovV7HhansUClfF0lAQTTNk+RLrGUYQ3fB8wxQBfEqRDndCF1C2LhibFTPDQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=I2oEZn6nP1WzZotfoy9UZZbvBJaZAiuMjzHPGAJN5Gg=;
+ b=n5qDcdCSZCuAKdRlP6Oik1M+csc0ih+K9D10vbz+KcjspeOzXMX7aEQEgJYpZmu9uarFGELX+cL+B8/86CX9sBeNgtogtPN7vOFRmrsdiMrwPiKJQ7i+8DTUCPwaSXlvQaeMPb+xl65m9FQKwY0stvRMCRD+HvSrYSkwCzgTk6aLEk6GTfasSPzwzKpTORkG3S71lDVbdJ8YsB40nAlhp1xgNkGN8kuq0mUYYWq+v/xvcN7jFHcS0Do0gH2yzZyg/eJaeKcHZZkW9iIvR64S+LaqQajIIhOVzMRTj+WKTwc/8GNocfEY+U1X1NVVSvp3LlRYg6pyO74mb/+UEfgHpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by DM4PR11MB6018.namprd11.prod.outlook.com (2603:10b6:8:5e::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.16; Tue, 1 Jul
+ 2025 20:48:28 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3%4]) with mapi id 15.20.8880.029; Tue, 1 Jul 2025
+ 20:48:28 +0000
+Message-ID: <bdab5970-0701-4ba7-abd2-2009a92c130a@intel.com>
+Date: Tue, 1 Jul 2025 13:48:26 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
+ driver after upgrade to 6.13.y (regression in commit 492a044508ad)
+To: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+CC: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jakub Kicinski
+	<kuba@kernel.org>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Damato, Joe" <jdamato@fastly.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, "Czapnik, Lukasz"
+	<lukasz.czapnik@intel.com>, "Dumazet, Eric" <edumazet@google.com>, "Zaki,
+ Ahmed" <ahmed.zaki@intel.com>, Martin Karsten <mkarsten@uwaterloo.ca>, "Igor
+ Raits" <igor@gooddata.com>, Daniel Secik <daniel.secik@gooddata.com>, "Zdenek
+ Pesek" <zdenek.pesek@gooddata.com>
+References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
+ <CAK8fFZ6+BNjNdemB+P=SuwU6X9a9CmtkR8Nux-XG7QHdcswvQQ@mail.gmail.com>
+ <CAK8fFZ4BJ-T40eNzO1rDLLpSRkeaHGctATsGLKD3bqVCa4RFEQ@mail.gmail.com>
+ <CAK8fFZ5XTO9dGADuMSV0hJws-6cZE9equa3X6dfTBgDyzE1pEQ@mail.gmail.com>
+ <b3eb99da-9293-43e8-a24d-f4082f747d6c@intel.com>
+ <CAK8fFZ7LREBEdhXjBAKuaqktOz1VwsBTxcCpLBsa+dkMj4Pyyw@mail.gmail.com>
+ <20250625132545.1772c6ab@kernel.org>
+ <CAK8fFZ7KDaPk_FVDbTdFt8soEWrpJ_g0_fiKEg1WzjRp1BC0Qg@mail.gmail.com>
+ <CAK8fFZ5rS8Xg11LvyQHzFh3aVHbKdRHpuhrpV_Wc7oYRcMZFRA@mail.gmail.com>
+ <c764ad97-9c6a-46f5-a03b-cfa812cdb8e1@intel.com>
+ <CAK8fFZ4bRJz2WnhoYdG8PVYi6=EKYTXBE5tu8pR4=CQoifqUuA@mail.gmail.com>
+ <f2e43212-dc49-4f87-9bbc-53a77f3523e5@intel.com>
+ <CAK8fFZ6FU1+1__FndEoFQgHqSXN+330qvNTWMvMfiXc2DpN8NQ@mail.gmail.com>
+ <08fae312-2e3e-4622-94ab-7960accc8008@intel.com>
+ <366dbe9f-af4d-48ec-879e-1ac54cd5f3b6@intel.com>
+ <CAK8fFZ6PPw1nshtSp+QZ_2VVWVrsCKZDdsxdPF9Tjc0=_gi=Wg@mail.gmail.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <CAK8fFZ6PPw1nshtSp+QZ_2VVWVrsCKZDdsxdPF9Tjc0=_gi=Wg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="------------IeyMGg9bZ83KAjflHZVcXumt"
+X-ClientProxiedBy: MW4P223CA0023.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:303:80::28) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [DESIGN RFC] wifi: Robust AV streaming Design Proposal for AP
-Content-Language: en-US
-To: Ramanathan Choodamani <quic_rchoodam@quicinc.com>,
- linux-wireless@vger.kernel.org
-Cc: netdev@vger.kernel.org, ath12k@lists.infradead.org
-References: <20250624205716.1052329-1-quic_rchoodam@quicinc.com>
- <0bc6c957-a0c4-c0f7-ed37-c8b44852c26c@candelatech.com>
- <4d87c56e-f198-4abf-a414-4b226178d164@quicinc.com>
-From: Ben Greear <greearb@candelatech.com>
-Organization: Candela Technologies
-In-Reply-To: <4d87c56e-f198-4abf-a414-4b226178d164@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-MDID: 1751401071-p7muVIt97cYT
-X-PPE-STACK: {"stack":"us5"}
-X-MDID-O:
- us5;at1;1751401071;p7muVIt97cYT;<greearb@candelatech.com>;42e86d0922d5c97226149d09277a2a40
-X-PPE-TRUSTED: V=1;DIR=OUT;
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DM4PR11MB6018:EE_
+X-MS-Office365-Filtering-Correlation-Id: 51ec6126-f406-40f7-e30f-08ddb8e0a195
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?QTE4NFlEV0toUnl0U0FhNHlNNmJOd0tDVWpVbnExeE1PUVgwUExMbUp2UnFy?=
+ =?utf-8?B?VWM5Y3N5cE9hb282TEZMaDlCTCtMYkNHREUydU5HaDBFa3pqaERZWVA0WjRY?=
+ =?utf-8?B?M0lPczBJWFV3MEN4UTI2aWdhZHFzWms0aVVRQm9OdzdhcjFNS3ZXNFc2Q2ZB?=
+ =?utf-8?B?UUNDRUdvWXE0b1dycjlBZHdVWWJJWHhLdGsxN2lwdURGbzFYVW0wVFJOcllu?=
+ =?utf-8?B?c3BsYzM4NlNkMTNmcGI3SFQ1ZXpPUFdaaW5HaXBOb2NEUnEreWlYTytFNG92?=
+ =?utf-8?B?bTRNS1ZkSHFyQVI2akNZSnBCaVlHcUVQTElKWCtLNjlWMlRWWFM1QXA3NHNB?=
+ =?utf-8?B?SE0xa2tYdTM3R1h2Qk5PK25zc1Z4ZmhHS1BEZTA1YW5RdGpaSGdmUEtqeE9I?=
+ =?utf-8?B?aXUyOU1CQnNuczRXSzNRL3VIc1BiTURSelE1WGdSZU9IR1J2S0Q0RDBGYlho?=
+ =?utf-8?B?TFFOZFJYMkZkVlNsL2Z6eFVHZEx2MnpERU55TzcrUVo5Nk1Ld2pUMUtBRU1Q?=
+ =?utf-8?B?TndwRGtjSy9FWW1oTUtadzU4QXJWUUM0YWEyWWtwcUp6UnBxc3VQQTJrUFd0?=
+ =?utf-8?B?NWxGdmFUNXhwQkVJdC91V1VwOHg2OERRNTFvR1JnSjBsYVM2Mi9NUllZdTJC?=
+ =?utf-8?B?NGk2dDB4NmloRmtrenkzZzFxUFFib1F2M21YQjZ5OHExRDl1T3hFc3h5MFYx?=
+ =?utf-8?B?a3dUbjJudmFSUWRWUjY4azQ2U3dHeWE5S28vcnhvNTloU1RPb3ZtZWoxVmZj?=
+ =?utf-8?B?WXR1ZFMrMTVyY3VTdGEvU2ZOUE5CZ3NORWIvTnU5TVdHa1RIUW9WM3h3YmFR?=
+ =?utf-8?B?K3RjcDlBekk0bEZiZjBkVWhFbVkwUWFEcktIdlA1dWl0Y2J5aUprWHJRMzFO?=
+ =?utf-8?B?cGF1bTRma3JCaHZTcExhOW45Q0pnSlVwMjFzZkhrd2xRWlpoc283MXJjWUxh?=
+ =?utf-8?B?dkJrclZhOE5HQ2poZFpDRnJpdmNxai8rWWxOL01LVHVmdDZUYXJhMXZoakIy?=
+ =?utf-8?B?YncwVFU0TFFsYkl0UTMwclRwQlVrNTRuZnA4S1lneW1rNVNZdlR3SlYzeUJV?=
+ =?utf-8?B?UndqQnFYN05DNlhVYWtadmJ2Q2hWaG9qLzRUVGlTTWFvN2pOTGF0UHNoeTBO?=
+ =?utf-8?B?ZWZNNFBKWW5qeFF0WUp3TldpN3Z2OW1EanlsM0U3WHFoeWJ3SDdxY09EdS9q?=
+ =?utf-8?B?aTlKWDlwWDFQQ2p2aFdKRGc1cEVHbGNGWlFtNktZME1JSmdlbFcwQXdmQ0lK?=
+ =?utf-8?B?cldDK2lDOUJoUmZTMGRqZXhGMFdmM3BtdkhPR2drWkdiQVhXNXBwVE0yd3Vu?=
+ =?utf-8?B?cklKSXF4NmgyS2xwWHFKZkE2eVdtVXdxOXV6cmpGVFhnTUxqbXR1K0tZdmFT?=
+ =?utf-8?B?aVV1ZlhFQVBhaGRUR0F4UzZ6S2VxajZaOHNsQmRtMkhmZ0phZ3RrVEhMeUYv?=
+ =?utf-8?B?N1l6dE9IZW90c3E5bGdkSWEzRTNwZmZjeDArYU5pNFA5ZUtDVHpzQ2lycFM1?=
+ =?utf-8?B?cmlibWZ5ckZpRFdqT3ppME12U2RqYWVOcUhjUjVXa05CNzZVcE5FRmp0Zzln?=
+ =?utf-8?B?V2FNUmlrYzRsQThCQXFoVFV5WTBzK3hUMlc5RWc0d2s2Y0pkclVYOTJhQjhZ?=
+ =?utf-8?B?djNaN1o0Q0srQSt2N0dpczczVG5hWlJXUENqaVpnYWdDTVhFaFpmdlcvUVY1?=
+ =?utf-8?B?cS9hTS9UL2daOU95U21KcXF4ZkVTaXdoR2VqUW9Ba3VCcmxha1hrcmI1ZE45?=
+ =?utf-8?B?MnltV0dzRjJBa1BPbzY2enJhR1NIRjZPK2FkRlBSN0lvN1U5QnFGTXhKQWd4?=
+ =?utf-8?B?UVc1bFh5dDZVbkNQVUQxMHBWYjFXRlNBWStXbHdtdEtjQ2N1b3huK0ZTL05V?=
+ =?utf-8?B?UlZJOTZ2V0trYzlRYWRLcmlZcHRCYXl6YXFQeHpMdXVtNldjdkZSUUlSVFVX?=
+ =?utf-8?Q?U033HTwuORw=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UDZRZ1gxYWFnN04wQk1EMWhSYUxacjZTWVJsVlBsbXZ2MlJEckZVdHVwdnl0?=
+ =?utf-8?B?NmpscjV1bCt3S1MvNWRaMWhKb1Uva1FWaVBOcTRPUlJWTENicWZaTUduM3JJ?=
+ =?utf-8?B?Qjh6RTIrcEF4UDZvT0xJTEJZTVYxZ2tPaGdrOGhqc1BnOG5RUXpqSks0S3ZF?=
+ =?utf-8?B?MS9MbGxOaTR5SVkrazBDWVhtcEQraHdtZkE5RVdyTGJYdjFoeVdSTkJiSFY2?=
+ =?utf-8?B?UkJJRlFWVndsc2dIcEI1bjFlMTllbFFZMTBaVXkxS0RrbXVmWnZqdkRDcE1X?=
+ =?utf-8?B?WWwyQndrdTJRSFFOcGNaVE5zTW5EWUF1RHI4NkFSMzJRVjhMRWpTV2xwWjdS?=
+ =?utf-8?B?UXdiRnU1MG81aVZiWGxTOHcrSGFCc2VvZUNuTnZCOE1xWDNsQjA4NE8rMTVP?=
+ =?utf-8?B?VkprUXlTWFJ1OFJBVTNtNC9MSXhySms5Vm1kNHRTYjdmT3hrbW54WUJSSnFP?=
+ =?utf-8?B?RGlHQ2RnVnI4eVNseXlQUTl2Rmsxck01ZTdZUnVtVk5lYUppdmFDRW9zb0U5?=
+ =?utf-8?B?RUQ0TDdXY0x3ZGpkUDNBaEU2KytqQ2FWZW5LTWgwaFhMSklJYlFadnQzVSta?=
+ =?utf-8?B?SlhyRlNaKzhqclVuMy9RM25HaThNQUwxYWdJNS9Nd1dGbkt0Ri9MMStPdzRy?=
+ =?utf-8?B?azJ1SmJ0QmplR2d1VmlSYnRVS1RIUmhBMlJyYm1pdjNoTVNic1dHSHFScEtN?=
+ =?utf-8?B?NmNHdUV2Z3R6cm15dFp2Rmp6WFg5YTF6Nm5vSTA3L0VRT1JsVlF1aHBacjBt?=
+ =?utf-8?B?aHNDZTRLcS9OMTFYOXYyckpoU1o4R2VFOHNXaHgvelBWTCtIejBrM2Z3OTZo?=
+ =?utf-8?B?Q2xBcFJreXMwVFJ4T1pXTmtBam5rM09GQ3BtcGNBK2FSQ3pkZy9NRFpCL1dZ?=
+ =?utf-8?B?cnlmd3VJM2k1a3QxQU4vU25TaUdjSTM0bVZmMmI1QklIM3BjN2JWaVk2eTFw?=
+ =?utf-8?B?dE44ckxPUnk1bVdjTmJ5RHYzMEZCK1JKNEw1eXZGTE5wcEhFbG9pRitXcXdw?=
+ =?utf-8?B?cGtETFpXTGhSQXFXcWgvZnA2ZStEa0t6U2JKbFJnSTJkZ1ZFTG0rUDB6WHFT?=
+ =?utf-8?B?TEZLME5LOEhoVnl3ZmJLQTMzb09ucEM3TEpVVURXY0Z3U1hTN0taeWlVb0Nt?=
+ =?utf-8?B?RnAvQ2V1TDZPbFJFdHpySCtNbUpvd3QxaVFhZVBBYkVxYldNZSsvYXFJdUIz?=
+ =?utf-8?B?eGdQNyswblVJbGhxNEVMeUVJMCthMlRYdSsvakkwSjRSejdWZFExcmdyM1FN?=
+ =?utf-8?B?TjlWS1dTUHdJVWJRQ0pqeFBWeTJySGpoYzFlbTc3d1VYS3hrRkk1YmY1ZGlP?=
+ =?utf-8?B?NXplQnpBb0Jia0hCMXNrb0VNaU1kUm1VMC9BSVRPT2Q1VFJHcnJNQzdIYWF6?=
+ =?utf-8?B?TklPeVVhc1JValVhK2M3Sm1mRXVIdGFmU0xLNFJRNDVjT0ZrajVGTGFsbHdu?=
+ =?utf-8?B?S0tGSGZpQ3VFSWZseVZzZ05RMmJ0ZklITlJLYzVuUUlrN1ZaK0VycWRQRVNU?=
+ =?utf-8?B?Uks3VDQzbGRST0pYT00rVHowNHQ1Tmw0ZTA3K05LUGR2Z3dWSnZFTkxmY3ZG?=
+ =?utf-8?B?K1lnTmdKTkRzOEtQRjAvc2RxTDRvNWxSYTcvaXY2OWdBMVRzSzQxT3hGeGcv?=
+ =?utf-8?B?WEFLUXBBTFVLTFJRU0Npd0V4eUVwV0ZicjFld1d4VVJjaldSMkVDdldtQ0Rx?=
+ =?utf-8?B?clNHS1RCMXJpVG5WcE5GYWNXL05LQ3NTR0t5K1pKYTF5cWVlT0w0RWdOcC9h?=
+ =?utf-8?B?SmROK0lkSVMwS3JDOHMwM2VMSzNsdXZLZDZSNmNHZCtZVDhXTkJuMjVwcHI4?=
+ =?utf-8?B?ZDFXSDk5K0tUNGlZUVNxU2FWU0cvRklSeUxqYTU0Q2FlSHNPM0dzOEJkUmdT?=
+ =?utf-8?B?RjA5c2VDYkVzWGtWZXEyRE1VaFBWSVBGTFJvR3JySlNQSjJiVDBUQ3hFUFV0?=
+ =?utf-8?B?NjZRZmdXS2xXYk1OeEx6Tzk5eHJ2d25hT3BTSDJlQmduc0dlMEJ4VkF3c1Nv?=
+ =?utf-8?B?aVBFZDdWendtcUw0MHc4K2E3bUcwUnRaOEIvSmNlNkRJeS81Z2o1cWlJSlV5?=
+ =?utf-8?B?a2tlNm96b2l1a3ZqVHRLSTB6aG5FLzkydG80bitrc3hleEVHV0dxRjZzTmhV?=
+ =?utf-8?B?Ylk3SG8vK2hJL3MyMHVLeEx0VmxhNjVraWUyaWtldXZaby9WOHAvdFgwSEhm?=
+ =?utf-8?B?cEE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 51ec6126-f406-40f7-e30f-08ddb8e0a195
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2025 20:48:28.1137
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SO0E5vq2eq7KWLidJ8HDMGp+ka32lbn9Q7SeRw1QDVxjCFLAvXWs8flgRDor4J31FoQre/X05suhChQU/wU76cYWGN92yoNgYA1uoqsQpV0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6018
+X-OriginatorOrg: intel.com
 
-On 7/1/25 12:38, Ramanathan Choodamani wrote:
-> 
-> 
-> On 6/24/2025 3:31 PM, Ben Greear wrote:
->> On 6/24/25 13:57, Ramanathan Choodamani wrote:
->>> ===================================
->>> Robust AV streaming protocols - QoS
->>> ===================================
+--------------IeyMGg9bZ83KAjflHZVcXumt
+Content-Type: multipart/mixed; boundary="------------lHvCjxPmiV0XrS0pYS4bwsL1";
+ protected-headers="v1"
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ "Damato, Joe" <jdamato@fastly.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+ "Czapnik, Lukasz" <lukasz.czapnik@intel.com>,
+ "Dumazet, Eric" <edumazet@google.com>, "Zaki, Ahmed" <ahmed.zaki@intel.com>,
+ Martin Karsten <mkarsten@uwaterloo.ca>, Igor Raits <igor@gooddata.com>,
+ Daniel Secik <daniel.secik@gooddata.com>,
+ Zdenek Pesek <zdenek.pesek@gooddata.com>
+Message-ID: <bdab5970-0701-4ba7-abd2-2009a92c130a@intel.com>
+Subject: Re: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
+ driver after upgrade to 6.13.y (regression in commit 492a044508ad)
+References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
+ <20250416171311.30b76ec1@kernel.org>
+ <CO1PR11MB508931FBA3D5DFE7D8F07844D6BC2@CO1PR11MB5089.namprd11.prod.outlook.com>
+ <CAK8fFZ6+BNjNdemB+P=SuwU6X9a9CmtkR8Nux-XG7QHdcswvQQ@mail.gmail.com>
+ <CAK8fFZ4BJ-T40eNzO1rDLLpSRkeaHGctATsGLKD3bqVCa4RFEQ@mail.gmail.com>
+ <CAK8fFZ5XTO9dGADuMSV0hJws-6cZE9equa3X6dfTBgDyzE1pEQ@mail.gmail.com>
+ <b3eb99da-9293-43e8-a24d-f4082f747d6c@intel.com>
+ <CAK8fFZ7LREBEdhXjBAKuaqktOz1VwsBTxcCpLBsa+dkMj4Pyyw@mail.gmail.com>
+ <20250625132545.1772c6ab@kernel.org>
+ <CAK8fFZ7KDaPk_FVDbTdFt8soEWrpJ_g0_fiKEg1WzjRp1BC0Qg@mail.gmail.com>
+ <CAK8fFZ5rS8Xg11LvyQHzFh3aVHbKdRHpuhrpV_Wc7oYRcMZFRA@mail.gmail.com>
+ <c764ad97-9c6a-46f5-a03b-cfa812cdb8e1@intel.com>
+ <CAK8fFZ4bRJz2WnhoYdG8PVYi6=EKYTXBE5tu8pR4=CQoifqUuA@mail.gmail.com>
+ <f2e43212-dc49-4f87-9bbc-53a77f3523e5@intel.com>
+ <CAK8fFZ6FU1+1__FndEoFQgHqSXN+330qvNTWMvMfiXc2DpN8NQ@mail.gmail.com>
+ <08fae312-2e3e-4622-94ab-7960accc8008@intel.com>
+ <366dbe9f-af4d-48ec-879e-1ac54cd5f3b6@intel.com>
+ <CAK8fFZ6PPw1nshtSp+QZ_2VVWVrsCKZDdsxdPF9Tjc0=_gi=Wg@mail.gmail.com>
+In-Reply-To: <CAK8fFZ6PPw1nshtSp+QZ_2VVWVrsCKZDdsxdPF9Tjc0=_gi=Wg@mail.gmail.com>
+
+--------------lHvCjxPmiV0XrS0pYS4bwsL1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+
+
+On 6/30/2025 11:48 PM, Jaroslav Pulchart wrote:
+>> On 6/30/2025 2:56 PM, Jacob Keller wrote:
+>>> Unfortunately it looks like the fix I mentioned has landed in 6.14, s=
+o
+>>> its not a fix for your issue (since you mentioned 6.14 has failed
+>>> testing in your system)
 >>>
->>> The Robust AV stream protocols are mobile centric protocols - meaning they
->>> are initiated by a non-AP STA to the AP. These protocols are implemented
->>> at the Access Point (AP) to classify packets sent to the non-AP STA which requests
->>> classification using action frames. The non-AP STA initiates Robust AV streaming
->>> action frames requesting for specific classification for the IP packets
->>> destined to the non-AP STA from the AP. These parameters can be negotiated by both
->>> AP and non-AP STA.
+>>> $ git describe --first-parent --contains --match=3Dv* --exclude=3D*rc=
+*
+>>> 743bbd93cf29f653fae0e1416a31f03231689911
+>>> v6.14~251^2~15^2~2
 >>>
->>> Upon successful handshake, The AP classifies incoming individually addressed MSDUs
->>> (Mac Service Data Unit) based upon parameters provided by the non-AP STA or
->>> notifies the non-AP STA to transmit MSDUs with preferred parameters based upon
->>> what was exchanged.
->>>
->>> Robust AV streaming improves AV (Audio and Video) streaming performance when
->>> using IEEE Std 802.11 for consumer and enterprise applications.
->>>
->>> Let's look at the Robust AV streaming protocols which are implemented as a
->>> part of this design.
+>>> I don't see any other relevant changes since v6.14. I can try to see =
+if
+>>> I see similar issues with CONFIG_MEM_ALLOC_PROFILING on some test
+>>> systems here.
 >>
->> Thank you for posting this and for the beautiful ascii diagrams!
+>> On my system I see this at boot after loading the ice module from
 >>
->> Since this will be poking netfilter rules into the kernel,
->> is there a good way to clean up all rules created by a previous
->> hostapd process in case hostapd crashes or is killed hard and
->> cannot do its own cleanup?  Maybe the rules could have some
->> special marking that is configurable per hostapd (or per AP or BSS or something)
->> so that a (re)started hostapd could clean up any leftovers from a
->> previous instance?
+>> $ grep -F "/ice/" /proc/allocinfo | sort -g | tail | numfmt --to=3Diec=
+>
+>>       26K      230 drivers/net/ethernet/intel/ice/ice_irq.c:84 [ice]
+>> func:ice_get_irq_res
+>>>          48K        2 drivers/net/ethernet/intel/ice/ice_arfs.c:565 [=
+ice] func:ice_init_arfs
+>>>          57K      226 drivers/net/ethernet/intel/ice/ice_lib.c:397 [i=
+ce] func:ice_vsi_alloc_ring_stats
+>>>          57K      226 drivers/net/ethernet/intel/ice/ice_lib.c:416 [i=
+ce] func:ice_vsi_alloc_ring_stats
+>>>          85K      226 drivers/net/ethernet/intel/ice/ice_lib.c:1398 [=
+ice] func:ice_vsi_alloc_rings
+>>>         339K      226 drivers/net/ethernet/intel/ice/ice_lib.c:1422 [=
+ice] func:ice_vsi_alloc_rings
+>>>         678K      226 drivers/net/ethernet/intel/ice/ice_base.c:109 [=
+ice] func:ice_vsi_alloc_q_vector
+>>>         1.1M      257 drivers/net/ethernet/intel/ice/ice_fwlog.c:40 [=
+ice] func:ice_fwlog_alloc_ring_buffs
+>>>         7.2M      114 drivers/net/ethernet/intel/ice/ice_txrx.c:493 [=
+ice] func:ice_setup_rx_ring
+>>>         896M   229264 drivers/net/ethernet/intel/ice/ice_txrx.c:680 [=
+ice] func:ice_alloc_mapped_page
 >>
-> hostapd does its own cleanup (cleanup of stations and interfaces)
-> when it receives SIGTERM.
+>> Its about 1GB for the mapped pages. I don't see any increase moment to=
 
-hostapd could crash without being able to clean up, though.
-So I think you need a way to query the kernel's state and
-clean it up in this case.
-
-> An nft chain is created for each AP netdev/interface.
-> 
-> The nft rule handle (stored in internal hostapd data structure) and
-> nft chain metadata can be used to cleanup/flush the nft rules as part of the
-> interface cleanup.
-> 
->> And, is there a mechanism to clean up flows that a buggy non-AP STA
->> has requested but then forgot to terminate (like phone starts a video call,
->> requests some QoS, then forgets to tell AP that it is done with the call
->> and packets no longer need to be classified?)
+>> moment. I've started an iperf session to simulate some traffic, and I'=
+ll
+>> leave this running to see if anything changes overnight.
 >>
->> Thanks,
->> Ben
+>> Is there anything else that you can share about the traffic setup or
+>> otherwise that I could look into?  Your system seems to use ~2.5 x the=
+
+>> buffer size as mine, but that might just be a smaller number of CPUs.
 >>
-> The scs objects of the stations will be cleaned up during the station
-> disconnect (by the AP which is maintaining them).
-> As part of this deletion, the nft rules are also deleted, using the
-> stored nft rule handle.
+>> Hopefully I'll get some more results overnight.
+>=20
+> The traffic is random production workloads from VMs, using standard
+> Linux or OVS bridges. There is no specific pattern to it. I haven=E2=80=
+=99t
+> had any luck reproducing (or was not patient enough) this with iperf3
+> myself. The two active (UP) interfaces are in an LACP bonding setup.
+> Here are our ethtool settings for the two member ports (em1 and p3p1)
+>=20
 
-A station may be long lived, and it may be bad at cleaning up
-its sessions, so the AP may end up with a large amount of classification rules
-that are not actually needed, possibly slowing down performance
-and/or limiting other stations from being able to add their own
-flows.
+I had iperf3 running overnight and the memory usage for
+ice_alloc_mapped_pages is constant here. Mine was direct connections
+without bridge or bonding. From your description I assume there's no XDP
+happening either.
 
-Can you add time duration and/or detect idle flows and clean them
-up automatically on the AP?
+I guess the traffic patterns of an iperf session are too regular, or
+something to do with bridge or bonding.. but I also struggle to see how
+those could play a role in the buffer management in the ice driver...
 
-Thanks,
-Ben
+--------------lHvCjxPmiV0XrS0pYS4bwsL1--
 
--- 
-Ben Greear <greearb@candelatech.com>
-Candela Technologies Inc  http://www.candelatech.com
+--------------IeyMGg9bZ83KAjflHZVcXumt
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
+wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaGRJmgUDAAAAAAAKCRBqll0+bw8o6AAS
+AQCH8c7aNwzI+wXI6RdAlY2uhqcg9+Jc5SSyhIPbBkP0uAEAvsXAkwAYKioqJiEBzYA9gx76g5KC
+1MV3R2dZk6/BnAU=
+=BDRb
+-----END PGP SIGNATURE-----
+
+--------------IeyMGg9bZ83KAjflHZVcXumt--
 
