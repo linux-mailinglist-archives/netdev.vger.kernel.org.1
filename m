@@ -1,101 +1,151 @@
-Return-Path: <netdev+bounces-202706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F458AEEBCC
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 03:06:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91DF1AEEBD0
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 03:12:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8BC818897B8
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 01:06:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAFCB3B7246
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 01:12:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C17145B16;
-	Tue,  1 Jul 2025 01:05:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95D39153BE8;
+	Tue,  1 Jul 2025 01:12:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RObX+mQf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OdMLcnAW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E94551E4A4;
-	Tue,  1 Jul 2025 01:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09CDB1CAB3;
+	Tue,  1 Jul 2025 01:12:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751331955; cv=none; b=CUxEuoLkywli2vXtYIbMx7c5g5ZdoYyKMVEeFkfFqyKHvYxG8TV/cKfAmsaaNrPvMmcBPPgnKZkpUK4kNX5LrCHNwNNAIPVKCu592Rw9pX2ZVn7PePmroylDfbdO9knHBoAtseOqUETstekyNBJFB1A6QvhjAsJY0h2KLLGyvUY=
+	t=1751332346; cv=none; b=VxDj0k3WHqr8pDOzlUNGXzjk9u6tU7ngbuS/dxNsbC3dE9At/HlBnoqZATKPgk+A611rIQfwbss93t9Kw6NS7Ct3FUuRPEY0q4hpqscrARkKyXFMvFZTb0D287sWa9ZC5DoUTHvury+jvoaVnFbBsx5OfGuJxTqnzxeQdFJtIko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751331955; c=relaxed/simple;
-	bh=iI2aTGNA3c7KUOp3mEmuzi+6XcgZXj+IEo9Fcm/BwHc=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
-	 To:Date:Message-ID; b=YXYTC1qsOEzapfsRqVBqkiDgze49dEekzKqJIstV7U/c4+r1LZ0GfLOc7VGTn11nQKyPydTdO3rJTFzUKrMHWErdDk5VFOtWlkRrvk1t2d7Zj9LAOAWg5b39654DjwBGj+FHg+shno5no5Plf9FL+b0plU34F77kxTSZ17lnNLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RObX+mQf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CC73C4CEE3;
-	Tue,  1 Jul 2025 01:05:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751331954;
-	bh=iI2aTGNA3c7KUOp3mEmuzi+6XcgZXj+IEo9Fcm/BwHc=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=RObX+mQfMOTd+dnkK5YqCpzEIgFOn9B+oK+NLutuToTH0vH6N/z62Sa2vQAG6MKGf
-	 iZs+0b7PbJZKO2gMrjc/ArMxKPuWgLjIj1GZp/cZcr6KQBMohxy025W0aYssHFuB5K
-	 saiaaGmKE0xfznqO8xtZfwSen/CvqHYHz5lqsM9h032Q4k7bU3SBfvZayKiTQAdly8
-	 e8+qFYf5fP7GW2yUvztieaFZNxLHJ8lGfEb1t3pmPCkFn6DNLDhlz9KSL/hZtTlkHK
-	 jPV3XWLrtV5owsBtPjfXOsSuAjqfJbUUT9hUZwF5EElXEqjj5KL73C82/6imiluDTk
-	 cKYQiF7jo71Tw==
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1751332346; c=relaxed/simple;
+	bh=OnES28WQihJmhS8qmhKIwC2/bLRQ/l2ImwS6wEdOW7k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=d1z7n9mapcw8PY7Xv2nLsqOTXesfxVfNlgZzawGz+5VTrLaLm7N0C7ZIzd4E2IXCkSgDAWibCW7XLix78C7W4XZTn/CEOt2gv/j/2G5zQIUV0EThmS0cfN6w7vGUfm1vZCBfPtqRnyZcENLnRsB7CgQO3BJc46Pr4EjdvZ/e620=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OdMLcnAW; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-311da0bef4aso2823499a91.3;
+        Mon, 30 Jun 2025 18:12:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751332344; x=1751937144; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wjtYZ36tAvjB0zry3ZSZH+1/EcQXRIsXI5tMq7yYLHE=;
+        b=OdMLcnAW2L+gDH0jOdICsfDfLcAjCTWX/edZ/1sooMJDn5qBEy2A/m6+i7A5QDhiER
+         GzysgrJvSG77xB/Xy6vhDTi50oC0itd0sqYjD8eM+ICeBccD7rGanVFUyR7mpSSJDtwG
+         0nxUNwZuOXymNVq5OyR/zvyuyO+wFk51LFTf/4eHSvEWTOBWx0CB0vRPOILSiNp8DoLw
+         zWmeoNQoXcOwt0CavtJoocsjwuvqZVnkdXbCvS2Z6BKWgzzKVpPnfEu1TCRtO1o3LSRZ
+         xGSddB4DySIhcsLnHuwo6UVzNUYLm24IBi23xE/X+WuFiEs8wz6jDuhyOGpe0hR0As+T
+         FW2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751332344; x=1751937144;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wjtYZ36tAvjB0zry3ZSZH+1/EcQXRIsXI5tMq7yYLHE=;
+        b=HVRMliN6GqlGxrVKcZEADv1hqESfLhF+bX0+9uohmaz9zUgaDsXGOj5035SVDvojn/
+         +GpHiS9bSc3pEdEl2u9qJRduFF2I7JsPdmg0tswSSXZ1b4i1p9gLdT4vLrCJpQNGyvZY
+         nCAM5M4Qp7Q3PWNEAM8nx58fKXAMDd6XpVZHGxBkP7xYTnfCHWqGLc+5MhQg34pNK/6u
+         lKnA1e3YttlNgTggGseKluyXmycJw26f8rnbKAMaDHAdibzhb2zBPwmx34bGoqgTkuTS
+         o8k+5h8QLaUXAA6czcVuI6BO1DhACWMHgK1ePslx9pCGbLlsPZbnCVd65IXQm61pEt3a
+         q7EQ==
+X-Gm-Message-State: AOJu0YzauY7EZPWxjB71ty+fS6042aLTf3/g4iHbUZ9bMpS8//cJa0KE
+	fSYLosokIcavrh8fVFfw4CkDCY5a7FL4itKJSgbQeMECNfB+mz4lqrsN/nM8VQ==
+X-Gm-Gg: ASbGncv76nD2aTFuGCSY2S3vRH9nHTYKQP9cbTnQkTpqcvR+PX3rSZ2790Yb9aqppU0
+	uocNIqdyvG1tN6jbkH7acECl03wsX5bZf67z0z5ZEr9ucNMqiG2G9IV2xQAG1eYPRRXC6SU9Y4a
+	1fyazYNu4Rkr1KAjeJze9xXK2lXCbpwYmgGKDp4LJwG6ukb0E1R9o2//Oz85IyX0CmCFHBtiWzy
+	koVknN32g3cH9HNmBkPwJyzUczt99oIn36410RVgc7zF7UByOlpCpypjBSrILn5rWoYoF89Mivv
+	mk0VzKeSH1MWKrjXZbUe7b/FpXkJx7Y4cZQ/rVKwqx19aXP+Y2NZm9YoNfEsdmBKzJlVGPv1+rS
+	Lng/mjHs=
+X-Google-Smtp-Source: AGHT+IErhKdws2nEf95XEZjjp1Z2Tu4X6P2O4iAgq9k7oU25Lo27wyBEb8gBjgG1Ne8gu7SKlX2iKA==
+X-Received: by 2002:a17:90b:2550:b0:311:e9ac:f5ce with SMTP id 98e67ed59e1d1-318c92a2e3amr20010372a91.21.1751332343616;
+        Mon, 30 Jun 2025 18:12:23 -0700 (PDT)
+Received: from pop-os.scu.edu ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb39bfbesm100007455ad.109.2025.06.30.18.12.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jun 2025 18:12:23 -0700 (PDT)
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org,
+	john.fastabend@gmail.com,
+	jakub@cloudflare.com,
+	zijianzhang@bytedance.com,
+	zhoufeng.zf@bytedance.com,
+	Cong Wang <xiyou.wangcong@gmail.com>
+Subject: [Patch bpf-next v4 0/4] tcp_bpf: improve ingress redirection performance with message corking
+Date: Mon, 30 Jun 2025 18:11:57 -0700
+Message-Id: <20250701011201.235392-1-xiyou.wangcong@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20250513234837.2859-1-matthew.gerlach@altera.com>
-References: <20250513234837.2859-1-matthew.gerlach@altera.com>
-Subject: Re: [PATCH v5] clk: socfpga: agilex: add support for the Intel Agilex5
-From: Stephen Boyd <sboyd@kernel.org>
-Cc: Niravkumar L Rabara <niravkumar.l.rabara@intel.com>, Teh Wen Ping <wen.ping.teh@intel.com>, Matthew Gerlach <matthew.gerlach@altera.com>
-To: Matthew Gerlach <matthew.gerlach@altera.com>, dinguyen@kernel.org, linux-clk@vger.kernel.org, linux-kernel@vger.kernel.org, mturquette@baylibre.com, netdev@vger.kernel.org, richardcochran@gmail.com
-Date: Mon, 30 Jun 2025 18:05:55 -0700
-Message-ID: <175133195554.4372.1414444579635929023@lazor>
-User-Agent: alot/0.11
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Quoting Matthew Gerlach (2025-05-13 16:48:37)
-> diff --git a/drivers/clk/socfpga/clk-agilex.c b/drivers/clk/socfpga/clk-a=
-gilex.c
-> index 8dd94f64756b..43c1e4e26cf0 100644
-> --- a/drivers/clk/socfpga/clk-agilex.c
-> +++ b/drivers/clk/socfpga/clk-agilex.c
-> @@ -1,6 +1,7 @@
->  // SPDX-License-Identifier: GPL-2.0
->  /*
-> - * Copyright (C) 2019, Intel Corporation
-> + * Copyright (C) 2019-2024, Intel Corporation
-> + * Copyright (C) 2025, Altera Corporation
->   */
->  #include <linux/slab.h>
->  #include <linux/clk-provider.h>
-> @@ -8,6 +9,7 @@
->  #include <linux/platform_device.h>
-> =20
->  #include <dt-bindings/clock/agilex-clock.h>
-> +#include <dt-bindings/clock/intel,agilex5-clkmgr.h>
-> =20
->  #include "stratix10-clk.h"
-> =20
-> @@ -334,6 +336,375 @@ static const struct stratix10_gate_clock agilex_gat=
-e_clks[] =3D {
->           10, 0, 0, 0, 0, 0, 4},
->  };
-> =20
-> +static const struct clk_parent_data agilex5_pll_mux[] =3D {
-> +       { .name =3D "osc1", },
-> +       { .name =3D "cb-intosc-hs-div2-clk", },
-> +       { .name =3D "f2s-free-clk", },
+This patchset improves skmsg ingress redirection performance by a)
+sophisticated batching with kworker; b) skmsg allocation caching with
+kmem cache.
 
-Please don't use clk_parent_data with only .name set with dot
-initializers. This is actually { .index =3D 0, .name =3D "..." } which means
-the core is looking at the DT node for the first index of the 'clocks'
-property. If you're using clk_parent_data you should have a DT node that
-has a 'clocks' property. If the clks are all internal to the device then
-use clk_hw pointers directly with clk_hws.
+As a result, our patches significantly outperforms the vanilla kernel
+in terms of throughput for almost all packet sizes. The percentage
+improvement in throughput ranges from 3.13% to 160.92%, with smaller
+packets showing the highest improvements.
+
+For latency, it induces slightly higher latency across most packet sizes
+compared to the vanilla, which is also expected since this is a natural
+side effect of batching.
+
+Here are the detailed benchmarks:
+
++-------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+--------+--------+
+| Throughput  | 64     | 128    | 256    | 512    | 1k     | 4k     | 16k    | 32k    | 64k    | 128k   | 256k   |
++-------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+--------+--------+
+| Vanilla     | 0.17±0.02 | 0.36±0.01 | 0.72±0.02 | 1.37±0.05 | 2.60±0.12 | 8.24±0.44 | 22.38±2.02 | 25.49±1.28 | 43.07±1.36 | 66.87±4.14 | 73.70±7.15 |
+| Patched     | 0.41±0.01 | 0.82±0.02 | 1.62±0.05 | 3.33±0.01 | 6.45±0.02 | 21.50±0.08 | 46.22±0.31 | 50.20±1.12 | 45.39±1.29 | 68.96±1.12 | 78.35±1.49 |
+| Percentage  | 141.18%   | 127.78%   | 125.00%   | 143.07%   | 148.08%   | 160.92%   | 106.52%    | 97.00%     | 5.38%      | 3.13%      | 6.32%      |
++-------------+--------+--------+--------+--------+--------+--------+--------+--------+--------+--------+--------+
+
++-------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+| Latency     | 64        | 128       | 256       | 512       | 1k        | 4k        | 16k       | 32k       | 63k       |
++-------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+| Vanilla     | 5.80±4.02 | 5.83±3.61 | 5.86±4.10 | 5.91±4.19 | 5.98±4.14 | 6.61±4.47 | 8.60±2.59 | 10.96±5.50| 15.02±6.78|
+| Patched     | 6.18±3.03 | 6.23±4.38 | 6.25±4.44 | 6.13±4.35 | 6.32±4.23 | 6.94±4.61 | 8.90±5.49 | 11.12±6.10| 14.88±6.55|
+| Percentage  | 6.55%     | 6.87%     | 6.66%     | 3.72%     | 5.68%     | 4.99%     | 3.49%     | 1.46%     |-0.93%     |
++-------------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------+
+
+---
+v4: pass false instead of 'redir_ingress' to tcp_bpf_sendmsg_redir()
+
+v3: no change, just rebase
+
+v2: improved commit message of patch 3/4
+    changed to 'u8' for bitfields, as suggested by Jakub
+
+Cong Wang (2):
+  skmsg: rename sk_msg_alloc() to sk_msg_expand()
+  skmsg: save some space in struct sk_psock
+
+Zijian Zhang (2):
+  skmsg: implement slab allocator cache for sk_msg
+  tcp_bpf: improve ingress redirection performance with message corking
+
+ include/linux/skmsg.h |  48 +++++++---
+ net/core/skmsg.c      | 173 ++++++++++++++++++++++++++++++++---
+ net/ipv4/tcp_bpf.c    | 204 +++++++++++++++++++++++++++++++++++++++---
+ net/tls/tls_sw.c      |   6 +-
+ net/xfrm/espintcp.c   |   2 +-
+ 5 files changed, 394 insertions(+), 39 deletions(-)
+
+-- 
+2.34.1
+
 
