@@ -1,135 +1,131 @@
-Return-Path: <netdev+bounces-202980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51ED5AF0074
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 18:48:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0921AF007A
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 18:48:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33C465244C2
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:46:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7ED6488092
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:45:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B2E6280017;
-	Tue,  1 Jul 2025 16:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7312F27FD52;
+	Tue,  1 Jul 2025 16:45:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Wzp5qGce"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HQn8m6WV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD2427F736
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 16:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46E7827F01B;
+	Tue,  1 Jul 2025 16:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751388317; cv=none; b=sXBLeUHI+nF/8+3tJxJ7t7F8tpoGo5rb2dXP99BN/LaydRB0AwuD0I8/Z4156fx/Eh9SlALyVYh+QAfATXCQuAg0MAMCRwwfhdZN0h72PWApW+Rm5yD1KyI4vBfSwkLaQ8lEPfCyowyE0JXF0TYlhtT8qd2b+fegE6iK8X2zfVk=
+	t=1751388315; cv=none; b=DDuY060GrL89fiqNTVypFzRTUGolwk4Qua84A7QeG1UNlNpsf1Syf73i6Ki0QzemWPiYwIs5+D29q/2Be0Gnq5fxaS3P+ljnA5L5j6aECxxA2QlOLtQS7/J1o6/ZqjbUGp7fs60UdpUIIiTXVbc3plT9m3rneK+eU5yhz2dTke0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751388317; c=relaxed/simple;
-	bh=GSh1yLctr/h7mt17iCABMV7donflOQ990q9vmjYKMeY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PttptsX1kiyzXgvkntVG2IXrO8x5ryeb3yW5MI4K7nSORLVyx1yaHeT3ppuLuAbLWJoXV/7MmaJaYirnJodakjIdSAUeGFEJpfXh9h3DSF/3KZs7Y1Jh3dE/3pF3kwGYGOxCNxnkRuzdzHXH75l2FqIQwDdiuP/+B+58ABHUMvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Wzp5qGce; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <34647b2e-3d9d-42db-9851-34ad8621af02@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751388303;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hdTOqogTp5JqM4b0+vAKcrKmgEFcq8WvFyC5EnR/3bg=;
-	b=Wzp5qGceGGl95r7D/0lKItVPsPO6qNrVY7lEmWjLAGnLkqaIy2i+/rkJvKWAmC7S0fs0w0
-	yTIWAk7S2uKU5znFYHxgjaUy2KY+6aBQepouQEfpE4CtempkqY8gkBezWqdM0GPVlkJYWK
-	sD7ARAAqL74oHVw5FGR3QlI77hxl8ig=
-Date: Tue, 1 Jul 2025 12:44:55 -0400
+	s=arc-20240116; t=1751388315; c=relaxed/simple;
+	bh=bxI5qbwmKxZE1pRGbFIvQ8nrVkIao+568lXrN4xQxSM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=cu3pbAuZ7nzH8iwEU6aNyHg3xyymRSNBpiBef2BazkQbng63Yho4EGo4ntoYMPyBfgxCPh0CDYROIT+onX6xOX7qd51ntaOAE8adLGnmiQKn28Fhu/Qq4ZqYbbflg4Q+LqrSyHr6JjVnQisNm1JPuBGPDvnHd3Kxb38O3gWZLfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HQn8m6WV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD5B9C4CEF1;
+	Tue,  1 Jul 2025 16:45:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751388315;
+	bh=bxI5qbwmKxZE1pRGbFIvQ8nrVkIao+568lXrN4xQxSM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=HQn8m6WVXBPUHMF0G0fk6gAKLg9QzbQRzvJGura4rtZsXjTz1c8/v9aZZPrjrWS9O
+	 BF7XLwBY+Ln3dezfssuajShLP5BCv95w0/l26n7im/kOL2xTWU6WNQePrABdKc3gnC
+	 Pv228FVyqH9L7bJgstW0xmTZQyMZYkNzkxX6CoFwNaFUflG1zY60+qOQtQygRR+yu9
+	 dZHSKilzCBT68+LzkZIJACEmD0Nf6O48T4CA6urdeBQYLn0piFkmRtqTgUsXRnNlkD
+	 weUkQ2HW9bQkAJV0hEh3KUl79yCNdTyIbDpibWRp+ao5IzDb5DuuQbB67PXDxFtly2
+	 qWyZaI7C05nnw==
+From: Will Deacon <will@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: Will Deacon <will@kernel.org>,
+	Keir Fraser <keirf@google.com>,
+	Steven Moreland <smoreland@google.com>,
+	Frederick Mayle <fmayle@google.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	netdev@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: [PATCH v2 0/8] vsock/virtio: SKB allocation improvements
+Date: Tue,  1 Jul 2025 17:44:59 +0100
+Message-Id: <20250701164507.14883-1-will@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2 13/18] net: macb: avoid double endianness swap
- in macb_set_hwaddr()
-To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Ghiti <alex@ghiti.fr>, Samuel Holland <samuel.holland@sifive.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Russell King <linux@armlinux.org.uk>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>,
- Gregory CLEMENT <gregory.clement@bootlin.com>,
- Cyrille Pitchen <cyrille.pitchen@atmel.com>,
- Harini Katakam <harini.katakam@xilinx.com>,
- Rafal Ozieblo <rafalo@cadence.com>,
- Haavard Skinnemoen <hskinnemoen@atmel.com>, Jeff Garzik <jeff@garzik.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-mips@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Tawfik Bayouk <tawfik.bayouk@mobileye.com>
-References: <20250627-macb-v2-0-ff8207d0bb77@bootlin.com>
- <20250627-macb-v2-13-ff8207d0bb77@bootlin.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <20250627-macb-v2-13-ff8207d0bb77@bootlin.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-On 6/27/25 05:08, Théo Lebrun wrote:
-> writel() does a CPU->LE conversion. Drop manual cpu_to_le*() calls.
-> 
-> On little-endian system:
->  - cpu_to_le32() is a no-op (LE->LE),
->  - writel() is a no-op (LE->LE),
->  - dev_addr will therefore not be swapped and written as-is.
-> 
-> On big-endian system:
->  - cpu_to_le32() is a swap (BE->LE),
->  - writel() is a swap (BE->LE),
->  - dev_addr will therefore be swapped twice and written as a BE value.
-> 
-> This was found using sparse:
->    ⟩ make C=2 drivers/net/ethernet/cadence/macb_main.o
->    warning: incorrect type in assignment (different base types)
->       expected unsigned int [usertype] bottom
->       got restricted __le32 [usertype]
->    warning: incorrect type in assignment (different base types)
->       expected unsigned short [usertype] top
->       got restricted __le16 [usertype]
->    ...
-> 
-> Fixes: 89e5785fc8a6 ("[PATCH] Atmel MACB ethernet driver")
-> Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
-> ---
->  drivers/net/ethernet/cadence/macb_main.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index 578e72c7727d4f578478ff2b3d0a6316327271b1..34223dad2d01ae4bcefc0823c868a67f59435638 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -265,9 +265,9 @@ static void macb_set_hwaddr(struct macb *bp)
->  	u32 bottom;
->  	u16 top;
->  
-> -	bottom = cpu_to_le32(*((u32 *)bp->dev->dev_addr));
-> +	bottom = *((u32 *)bp->dev->dev_addr);
->  	macb_or_gem_writel(bp, SA1B, bottom);
-> -	top = cpu_to_le16(*((u16 *)(bp->dev->dev_addr + 4)));
-> +	top = *((u16 *)(bp->dev->dev_addr + 4));>  	macb_or_gem_writel(bp, SA1T, top);
->  
->  	if (gem_has_ptp(bp)) {
-> 
+Hello again,
 
-Reviewed-by: Sean Anderson <sean.anderson@linux.dev>
+Here is version two of the patches I previously posted here:
+
+  https://lore.kernel.org/r/20250625131543.5155-1-will@kernel.org
+
+Changes since v1 include:
+
+  * Remove virtio_vsock_alloc_skb_with_frags() and instead push decision
+    to allocate nonlinear SKBs into virtio_vsock_alloc_skb()
+
+  * Remove VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE and inline its definition
+    along with a comment
+
+  * Validate the length advertised by the packet header on the guest
+    receive path
+
+  * Minor tweaks to the commit messages and addition of stable tags
+
+Thanks to Stefano for all the review feedback so far.
+
+Cheers,
+
+Will
+
+Cc: Keir Fraser <keirf@google.com>
+Cc: Steven Moreland <smoreland@google.com>
+Cc: Frederick Mayle <fmayle@google.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: "Eugenio Pérez" <eperezma@redhat.com>
+Cc: linux-kernel@vger.kernel.org 
+Cc: netdev@vger.kernel.org 
+Cc: virtualization@lists.linux.dev
+
+--->8
+
+Will Deacon (8):
+  vhost/vsock: Avoid allocating arbitrarily-sized SKBs
+  vsock/virtio: Validate length in packet header before skb_put()
+  vsock/virtio: Move length check to callers of
+    virtio_vsock_skb_rx_put()
+  vsock/virtio: Resize receive buffers so that each SKB fits in a page
+  vsock/virtio: Add vsock helper for linear SKB allocation
+  vhost/vsock: Allocate nonlinear SKBs for handling large receive
+    buffers
+  vsock/virtio: Rename virtio_vsock_skb_rx_put() to
+    virtio_vsock_skb_put()
+  vsock/virtio: Allocate nonlinear SKBs for handling large transmit
+    buffers
+
+ drivers/vhost/vsock.c                   | 15 +++++-----
+ include/linux/virtio_vsock.h            | 37 +++++++++++++++++++------
+ net/vmw_vsock/virtio_transport.c        | 25 +++++++++++++----
+ net/vmw_vsock/virtio_transport_common.c |  3 +-
+ 4 files changed, 59 insertions(+), 21 deletions(-)
+
+-- 
+2.50.0.727.gbf7dc18ff4-goog
+
 
