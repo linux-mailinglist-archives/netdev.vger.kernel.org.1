@@ -1,170 +1,244 @@
-Return-Path: <netdev+bounces-202961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3BC7AEFEC3
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 17:59:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EF51AEFF0A
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 18:07:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C8C81BC8291
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 15:59:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BE1B481FF3
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:05:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 748AD27AC3E;
-	Tue,  1 Jul 2025 15:58:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0191727CB16;
+	Tue,  1 Jul 2025 16:02:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="NyELBZvB"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="YwQcdwlX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2082.outbound.protection.outlook.com [40.107.212.82])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7472E27B4F2
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 15:58:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751385530; cv=none; b=XeSUwZUPoVygdXaOQ0Y/JbCQHdT13qyPIUPLfwl/6AN3RB9NYYGxqocgYuk1rOq1O/dzP9LdxWioS2DxPk8REA11sMz8lT/sCj9r4e/1hP/ujEos2Lj998SM89XeEKUcmi2vE4BTavO0jzjX47rq6TYsZfjNtT/6II/GMSuT4ZU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751385530; c=relaxed/simple;
-	bh=QSAY2cavr+hAtXa06F5WuFx/c09q1MQ9F8YFB1GGlxA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NRiyHZMg9FXPKof2T/5UynUSHaMl0600u6ChnpnOTOuPrd+tTXW8/lf/2JTyuN2VbQN5fQwDeJdVq3+Tv8KAyUNWsOwr+keS/iLUOCjv8a8NwHqT/2uY+eLxtYZKHQToJyFEn0VjgubhkWSRbQ9e2xWT+KXjFW/EsWEnklzBSaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=NyELBZvB; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3a4f64cdc2dso909734f8f.1
-        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 08:58:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1751385527; x=1751990327; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=YhrekkuV81u85I0nCYoyFYWO/iQISbDoWTniOveqI+w=;
-        b=NyELBZvBrHycyMWM1vTcTDddjbbJVdm+b9HYHFBktbGVHdgTePCtzZDjdWdV0Ah/vP
-         Q8fesE9oqpdkA7Ji74z/t90QaVhzuWwBGuSIlckEazZAcDawlnZ8nC0LZh/g9PClw9tp
-         RwQzM4D0qJc4X9jXzBDRTPdqjhcG/2u6YqrIDJjDTLqoUWRT3uyIMHZaVw+D1ZCdH698
-         loQPti7htEhOEY+VlDX23yS0LPjzApS110pi5jw/PYUkCcYoQLF4NDwaX8BI3jFQg0uq
-         u4n4rQ5XyXSJb+foXeXFBZEUNVQcIC6yLUlitTaQExoahg2msvRohSdiUkxrT59GeSMt
-         iMwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751385527; x=1751990327;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YhrekkuV81u85I0nCYoyFYWO/iQISbDoWTniOveqI+w=;
-        b=I0ScY198/PHbTmcvyJD3hQsbcGPNTEgy1ZaEFMKEbli6namRyoVExSHKqVukAnyvxS
-         nRxOwnUm+mdCgbLo26VRtQ8Sl83j8xpYe0krbgLpUklPn3nX05k/RNBLzj1cT+1TK9it
-         kvMp6/5IdXYPi45gda2Ab1qefc12yjTyPI8Ic8fuAUW6YRwbGtVFXXwC9Z272FKWUBKi
-         fRXpmAo1g4Xy2KXgfs4ui1MeGtnvqonBfVR6IeR+V77BxFVXcYrBeoizKjA6DGtJf3Zt
-         xoOc6QV0WgDQlAjr76g9oW8i5fGIOHpp6sihX4Bh5dVL3DrXQYNIR6m+hk2bvxx1h31x
-         4f6A==
-X-Gm-Message-State: AOJu0Yyq2WoOujihOwxLL67JNIzvox0LIXJv0qRmNXUqcusVIhEnPK7d
-	dvYwoC+7+e5XypVSmedllginr+CCMCK8Nl1VGmED7BRsC3dehYnAAWxQay4RJ/QssFxd3vZ2UUE
-	Ixp8jlmg=
-X-Gm-Gg: ASbGncvvnPdhLadqMeh/IFagXBGN5zWa+TYLGrB24ivdoycjYuGSn0d5rninsUzsU+/
-	csa8qIQ+cQc8xxzoLXavQ9sJV4TU3JcHmq/PksfO6rtSkBsooZZSM05ZghpeO/l8IgCg6O44Hey
-	fzlb116S0jouifcLhcPrK+k3/n0nXN1Ket7Z63T8f82fOymgvWgHhIkY9EXA8WT8aDcQodFQwCs
-	FMB0cL4HXMB/Fcl9J5UCezwMyTHuBNNQF++i4ee2+SuOTLyFrbgh2nwzudvhyCleLhHnvBsCOw/
-	rWAL5mBkASy6PezixEEW6VvxVHzyuLuZWrJA2TnXvrvQpfeiUVbxqSUPqshbgH3KJJ3W4jVPqou
-	H6R7QJhA5hb6q/o0JVPYF1l3l1+Wl2f70+J/T
-X-Google-Smtp-Source: AGHT+IEgqW2tesitKhmnUcBygNXVUscrvykBlr5WbS8x1oTHDseSXjU/Z8mwQaDABjFVm8GOa4CGSA==
-X-Received: by 2002:a05:6000:18a9:b0:3a4:f912:86af with SMTP id ffacd0b85a97d-3af23ad08d1mr1306061f8f.2.1751385526598;
-        Tue, 01 Jul 2025 08:58:46 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:3c4c:7e68:5ff:ce49? ([2a01:e0a:b41:c160:3c4c:7e68:5ff:ce49])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4538233c523sm198939125e9.6.2025.07.01.08.58.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Jul 2025 08:58:45 -0700 (PDT)
-Message-ID: <40dffba2-6dbd-442d-ba02-3803f305acb3@6wind.com>
-Date: Tue, 1 Jul 2025 17:58:45 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BFF627C863;
+	Tue,  1 Jul 2025 16:02:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.82
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751385748; cv=fail; b=fwnDbqrdbf7gWryAPv053PvFrjk3KU+xR0K49YTowciZkk/19Q2/FtNzZYAvMNm5DaB1ZSDNUUZR/jbwYJo0niFn0MV2ra8nGIyf9SGDGiFcvWZEU1AQa7wg7dM2aiC/fd1OI+f4LltGsdqiS2vZPWaJb779i/Oc2vtqRTuikkc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751385748; c=relaxed/simple;
+	bh=tPESlRljyzlcmE0IfyheCvCw4hA92fkUf+zccj+i7YE=;
+	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=d03vqQuz2JsIb0C05qaO8KcE9BCw71lUtlkDhCSXOngbzhn7VaRMjh/MRB5LBDFcWbrP4MfY3nBnEtqhzXHcfBRuVLfnxJI9ND9UEqtNjmKm7S8pvptnPa0wH/qr4AVgR+8jo+0I6WS0qpjVkpWqrOMCGuE31rpOqLdM1vpkdOE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=YwQcdwlX; arc=fail smtp.client-ip=40.107.212.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=v83GEUtSbKj0ZGl/bTPc/DAh1GvO3KCZgJMkDOrRAJWfP3Ot2Z1odHO9EWV8dxE+/pUxUyzFdI7BMHTk9/9iJBdOLXgcZEdezy5nf/UJO0M4gmRbkmxMaE0mwCQDfwtrRZhPLo7xqWjLZTtRAu5DodjqgDDb3SDCX5LIMo9CVbcrZNvrAt0TRD3aGvM8EcI/dYklwkFS4X5IiRERQBuur0EQeFThGAEr2CEiR1TGTySlcH40bdtVZzmeu9zN1TDjZ80+t5P6gVy0vCe2Pi3pzCVodxNGirC+5NB5cCMktdO44ismmeEFKbor2au8O8RwgxWlm4WnYqDBhuRXDJGm0Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=arCOLD9ND0Wswb2RcrNYWGl5R8sfxfmA53ttr4e9qS4=;
+ b=UOFjI8c4gEM+q9x9ZAPPs9kIiCLGy3EeQSnpkbtHpI2A1yrgi9qeeIz0fDW1g2n624K4y+aOnSxgbrNwAZrloYvLVayzDC+UIXu5SQzjYLjQ1FJJIpjptUFG4rOLdBPIWXtOfAKCTCUKxvtx0Uy1MH/C5jdg7+UTZ1hWLNadcX5ge5ojvfZ9CX0j0w1mq16geacgaA1lJhIGyR8NGqeJvRsNhIfe5AHY5A0qlRDHMgEwHlAAi9nMlE1jneZafDTY4ViJ25ss9yJ3czd0eMtmSmjyflmQ1RJgUINiukyTO3iEP26xapUJtapWScFYeo+TjafBvvpcBGBMi3cABnYOjw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=arCOLD9ND0Wswb2RcrNYWGl5R8sfxfmA53ttr4e9qS4=;
+ b=YwQcdwlXuT++d4ASIMozNtplhymTZmJtBcJY9/cfyE8UfG7CMtqGdg3Kj1YTvTWyO1YJRV94T5fUaT3PbEsHDQ3dYNY+bZnRC6u1rTSbGlASMeMq6gEWgmihJZelz2zJmSWCJ/S6jCzi2ujUkDUaexP20pwEKD32FAjXkbtttho=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by PH7PR12MB9125.namprd12.prod.outlook.com (2603:10b6:510:2f4::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.17; Tue, 1 Jul
+ 2025 16:02:23 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%6]) with mapi id 15.20.8880.021; Tue, 1 Jul 2025
+ 16:02:23 +0000
+Message-ID: <a548d317-887f-4b95-a911-4178eee92f0f@amd.com>
+Date: Tue, 1 Jul 2025 17:02:17 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v17 10/22] cx/memdev: Indicate probe deferral
+Content-Language: en-US
+To: Dave Jiang <dave.jiang@intel.com>, alejandro.lucero-palau@amd.com,
+ linux-cxl@vger.kernel.org, netdev@vger.kernel.org, dan.j.williams@intel.com,
+ edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com
+References: <20250624141355.269056-1-alejandro.lucero-palau@amd.com>
+ <20250624141355.269056-11-alejandro.lucero-palau@amd.com>
+ <30d7f613-4089-4e64-893a-83ebf2e319c1@intel.com>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <30d7f613-4089-4e64-893a-83ebf2e319c1@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DU7PR01CA0010.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:50f::23) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH v2] ipv6: add `force_forwarding` sysctl to enable
- per-interface forwarding
-To: Gabriel Goller <g.goller@proxmox.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250701140423.487411-1-g.goller@proxmox.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <20250701140423.487411-1-g.goller@proxmox.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|PH7PR12MB9125:EE_
+X-MS-Office365-Filtering-Correlation-Id: fc6aa71f-d4e5-4c6f-7420-08ddb8b8aa79
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?aTZ1a0ZsZEYxS0M1dXZTWUNYb1AyT3c3b1dNNGVuOTRTa2pqcWl1aVdIN2xP?=
+ =?utf-8?B?dXZCNEtmMkVYbFdSVlFPb0FkNUR5TzZwN2JDZEdMTVBVbkhsNGlva2VCSit2?=
+ =?utf-8?B?V25rR1Vzb0tCVWVlcEpaNDBKUVpsMkpIaSs3blBCTnlTZ3Q4b2hFSzVhdXNa?=
+ =?utf-8?B?dFpxc05rdWs3V2N2NG1BbVUrZzBOL2JrWkk3ZThLZnM5ZlBPRm5zbWZCTVRT?=
+ =?utf-8?B?MmFid09tTllZcWZBTEh5OXdJWVRJRkZvUEdGMHpibzRjNEZHbUpsZnpQQnpV?=
+ =?utf-8?B?YkxJb3VWV0REZk1jbHdWbjY0NFVXWEZQSG84bjZWWkpGZUx6NHJoRTJSaldD?=
+ =?utf-8?B?N0s1Qi9TQldhQWxnSXRsMHpOZU5pRk5CejhkNXc4cEY3TTlsNjRPcVV3V1VU?=
+ =?utf-8?B?T1NydUhDSG83SXBvU3JnVDlQS1B2RUFhd3Vxd2ZnRFZvbGJtS3dkRzNqWFJa?=
+ =?utf-8?B?VFV2OURmYVJyZDVNL3ZJK29RcXkrVzIydmMrL1djcEpKTWppcjBPZThyZ29F?=
+ =?utf-8?B?OVRqeVA5endpcVNDTGZwTTNxd1FmT2NCL3NtNys0UDNsQ29Xa2pLUXhSdC94?=
+ =?utf-8?B?dlIvUisrbnJ1MjVKc1Rpdm9EWStrLzByN1VWUFd0QnVDNWpZeGo3UDAxMUw5?=
+ =?utf-8?B?aXR2aGV4cWZWQUhwQTZXUXkzeVI5Z0dkNXA1Y2FMK0xPZFkzZ0ZWZTVrS28w?=
+ =?utf-8?B?VWFpbGsxR29BdFBmbktFV3hRQlBTUmp3U3F3dUpTZWlrSTBmVkxZbDlNNGF4?=
+ =?utf-8?B?Um1vWjFwMXJQOFBuc3ZkMVYrM05wNnlKcTV0ZnlsSlJxdnk5T21Nb01ZUUFJ?=
+ =?utf-8?B?TkRwb3FKcW4yaUNEK1ZDSFZWb1NjQTlibDFQcVFtUFBJc0ViZnZtSzd4bWR2?=
+ =?utf-8?B?RkxkeVJZWCtpN1lBRDZ0SThNWXozaTZoeXFFeFRRUDVhMDEvN1BlRDFBNkoy?=
+ =?utf-8?B?WW5pM0tIa3RlS29tMERVaXQramh6RTBlVnQ3OWcydDdsalhmUmRXL2dWbkJS?=
+ =?utf-8?B?SVd5RTVBQ09NdUVIMEE2WTJEMmtRRzNuTy9VZXpZcnlnc0JVTUtUWXdHT29E?=
+ =?utf-8?B?aWdlM0kweUlDYzVIcWQ1d1lLSzg4blhPUmhwYThDUzR0eHRMdnRiUXN5YTNr?=
+ =?utf-8?B?SXZESzJua1JTZnBRUzBjV01sU1FzRkF0Um1hTnErcXFOdGV2bzJYb0dTVkVE?=
+ =?utf-8?B?UnU2eFI4NGJKYTEwMGFKcUxUNnJzMHBHTmxXdWJqeVNYNVRpdVl4Q3RwbmV4?=
+ =?utf-8?B?SUxQSmZZRWJVWjRqa3dTTlBqWURSR2RxNjFSTC9CS1I0MTJSU281MWlkdkZp?=
+ =?utf-8?B?MTRlZ0pUTzVoOHRHUGFRdEp5emlYQkR1Sng3NGlUaWlZNHdPdmkwR01HQXY3?=
+ =?utf-8?B?ZUc1d3czWDZhUDkvNkhNd1lNVFdOQkU5V1QwZXdCUG5IL2dSWkZJUWxpOTk1?=
+ =?utf-8?B?Ym5ycmRwOE9SVU5hTVdmamkxNUpqNnREQ3JRelFhdXhyMHpkUWk0R2lBZW9v?=
+ =?utf-8?B?TUFyV2FRd2hnTms4R21NODl0WjRkcjNKSzQ5NEdtcHRsMXd6VmFQRnpwcjc2?=
+ =?utf-8?B?MVJucW5lUVo2bG40TjBTUDBubVo4b003WCtZV2ZYRWVzMnkzUW5jYy9ub2dV?=
+ =?utf-8?B?UVZVOWtDcitOTTF1NEVWWXNQVUJLYzFPOTN6bDBJQm1sRmNhVi9LN3VpRXJK?=
+ =?utf-8?B?c3dvLzdCUk9PUFRuVFVXVVR2V3JkMHNpOGZ3OVJZQ0NMb2UxRFV2WG12b1Rw?=
+ =?utf-8?B?Z0VxbU80T2U1bzlGbmt4ZUVqSUhrTVBWODc5UTNLMTliZjRacTNIdDd4bTBj?=
+ =?utf-8?B?ci9pM3g0N0RpK3crcm85aGtZWU1lU2VjSGtXejJBZkU0THdYaTk3R2xlbHg4?=
+ =?utf-8?B?L0xNSWttc0l6eVNLRkxFUnFNNFNUZVhRcWtsZlpoY1dBWGU5VFNqMy84Qllz?=
+ =?utf-8?B?VzcvSENHcDUvOCtPQWpMTUZrQkFFV1VNV0tyMUZYUlRLN3Fhc0FTem5VRHlU?=
+ =?utf-8?B?eWdwQ1VlOHZBPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?akxwOFJsM29pUVVmNUllQTg5cWlHNEtuSHN0TTUySkZYRzFFMitwQUFxRXlE?=
+ =?utf-8?B?bHlyNUl5NzNWZTNYSFl0YlgrTkd2em9vM2RjUHNROE9CNUVvUGJwSjR0Zndq?=
+ =?utf-8?B?cEFuZFNySmIrNHRRUU9VSWRmR0Z3UnVXZG9PcTBZN0w0TkprYWh5RWtxV1FH?=
+ =?utf-8?B?VHg5UXd2WGwwWUl3OU1qUHRCZGhNc2FmdnlZQnZMaTZEUWJzN1QzenZXVkpR?=
+ =?utf-8?B?L3o4YVA5MjRBNEdIKzd0MjhFem9FYXZHNkhlMzNVb3JKVS90UDU5SXdqekJP?=
+ =?utf-8?B?YzZoVlVRUDdjRXRMSXhvbStoMWhsZU80MFA5bnBWL3lqVG1mcE1QN1pzT3c0?=
+ =?utf-8?B?UFNWUkh5SzJtZ3gvWU9CZmlONzlDK0lLL2JWNURjbk12TFJpOWE1dEw3Tkov?=
+ =?utf-8?B?U0RGR1l3K0dMN2FyZm5Ga2tnc21FVFFLejIzQWxlRUlJTWxrR3N2cUtVL1pE?=
+ =?utf-8?B?WmpvbGs3ZWpUdzVaOXpSVW03VlpBaFRiSnF2VFFRd0s3bFJCWmlqWmNTc2M2?=
+ =?utf-8?B?dTlWdjhVN1ZldDlUV01oU0NQR1Yzc0pZRkVkY2wzV0NuQ2lJY1FQZGZwQ3cr?=
+ =?utf-8?B?RUU5MEpwZGJjVzlBRmpZZmlQLy80ckVLcTBhS2ZrazZlcmQ4SFJUSCtNdzZa?=
+ =?utf-8?B?QjVZUE9xRFhuL0JsOXNhYURjdTRYM0Zuc0ZndXNzYWhCOVo2UWRyeERUMERC?=
+ =?utf-8?B?YnJhamhUdnlhVkpTeCtMbkIyQ0dRTCtpSElsNDN0RFQwYTl3ZzY3MGRIYXB5?=
+ =?utf-8?B?Sk9xa3ZNaFRyL1dqQ3BvNGsxY1R1Y3k1MHdkbmM2YXJvak4xM3NHM3ByOThk?=
+ =?utf-8?B?UFRlVlNZN0xtRm9GcC9WQVBaNU0xRUpQWFJ2b29pVThRd3d1Wm1HUzBhZEps?=
+ =?utf-8?B?aXhsenJLVVZGUUE5MmYzbEpINmlQZERzQnVtUzVLNE8rdG1NRDZNRWppZEov?=
+ =?utf-8?B?QWFGKzFUMmZGdWFxb0hJY1lCMStBdFdZRkxmem1VZUxIWG4vNTg0dGo0TC9l?=
+ =?utf-8?B?cmIvcEZaUHpaMDNjS21MejNxQVpVZ25CVFNjTWVNYnpTcEVreTZVVHJaa0hB?=
+ =?utf-8?B?RGtZbmx5NUJGcWNXOTVMZzV2RVpSRVFGSWN3S3RHRGIwdmtNQ2Q5S1MyTExK?=
+ =?utf-8?B?dmdOaC93VmxqM0NtMFRLdEljakFEMmF3c3hLUW1sWElOSjdOZjA0YVJWRjZn?=
+ =?utf-8?B?bE5OOE5wZVRsNUNUVzRDZmt1T3BmQ1JxbUVGSVFsbGE3Y2pHRGNPMDQ5Rkc4?=
+ =?utf-8?B?ai8zK2cwWElrUjMyUUhncjVKZHBjcGNMMkhJMnVHQWpwSEhidUErL1h4RnRk?=
+ =?utf-8?B?VDJDY3U1UWhqcDNwVmVLTmdHcjFVdlo3eXFFOXo2SEQ1R3plS29MbkNNWGJk?=
+ =?utf-8?B?MkdicUx2QitLbUtZY2ZXbjdQNW4rSkIvZk11aUJUNlpMOStqZjZSaDRvNjhE?=
+ =?utf-8?B?SXdldGo1Znc5djM5VUhDRllOc3Fqb0lSNk15Z0svQ2pKdkZvdE5TenNRUXBl?=
+ =?utf-8?B?eFBlNFpZQlBGQkEvOWRIbjlDYmFJdGJ6MEczemltSDgybEZORlNWT3k5cnFv?=
+ =?utf-8?B?NThXemxKSEdxL3RUK2UrdzdWQ2VMMlY2dHQycGVnOVNISkV0cGVyMTc0S25u?=
+ =?utf-8?B?eHc5ZFNydG9NQmtUWk43bXpPeVFtcUtvUkpyQlBSOEpsY01mYzMwMisyeWtI?=
+ =?utf-8?B?dFYyejV1LzJBRGdRUXYzY2cvTmVwTlB4b3l1R2Zid2twUTFaNmpxeWRjLysv?=
+ =?utf-8?B?ODdyZTlsQlFXSTNlMllodDhGcWdLWVpYbHdpNmNJVm43Zys2UVRkMkRHZHAx?=
+ =?utf-8?B?RlZFZlUxUzBHbnRPMFVOTnUxeTEzR2hnYitCS25xVUNGRW1XbEpENlJXVXhx?=
+ =?utf-8?B?R2F2RS9YYmFOdE9xNUJzWmhUQitEdEIrOFVibFlVeTYzazc3MlJGS3FTWmNU?=
+ =?utf-8?B?QUJzblJVdWhwZXF4a1pSajU2Vkt0UndqNk1QUktqRXY2Y1lsUGU3Q2RtcW9a?=
+ =?utf-8?B?VDU5Mnowa1VFTGtYNjBOREh4ZklKUDVTQnRVOXkrUFMzNVZmZGI0TloxWFA2?=
+ =?utf-8?B?Rm8wc0JEOERUOEJPalVYbkYvSC9WWXhLYUJncFVrdGpxby8yVHh6bStmU1Za?=
+ =?utf-8?Q?O7UUyB2p43LrpEVBistSwAMj8?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc6aa71f-d4e5-4c6f-7420-08ddb8b8aa79
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2025 16:02:23.2445
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 64YfEUkXhEphQo9Kd0VVz3cQfO8B016IiiMAi98+HgbTdd18fr48zEM93D+2utnrMnviWHn6dicnoKVZq5s3FA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9125
 
-Le 01/07/2025 à 16:04, Gabriel Goller a écrit :
-> It is currently impossible to enable ipv6 forwarding on a per-interface
-> basis like in ipv4. To enable forwarding on an ipv6 interface we need to
-> enable it on all interfaces and disable it on the other interfaces using
-> a netfilter rule. This is especially cumbersome if you have lots of
-> interface and only want to enable forwarding on a few. According to the
-> sysctl docs [0] the `net.ipv6.conf.all.forwarding` enables forwarding
-> for all interfaces, while the interface-specific
-> `net.ipv6.conf.<interface>.forwarding` configures the interface
-> Host/Router configuration.
-> 
-> Introduce a new sysctl flag `force_forwarding`, which can be set on every
-> interface. The ip6_forwarding function will then check if the global
-> forwarding flag OR the force_forwarding flag is active and forward the
-> packet.
-> 
-> To preserver backwards-compatibility reset the flag (global and on all
-> interfaces) to 0 if the net.ipv6.conf.all.forwarding flag is set to 0.
-> 
-> [0]: https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt
-> 
-> Signed-off-by: Gabriel Goller <g.goller@proxmox.com>
-> ---
 
-[snip]
-
-> @@ -896,6 +907,16 @@ static int addrconf_fixup_forwarding(const struct ctl_table *table, int *p, int
->  						     NETCONFA_IFINDEX_DEFAULT,
->  						     net->ipv6.devconf_dflt);
->  
-> +		/*
-> +		 * With the introduction of force_forwarding, we need to be backwards
-> +		 * compatible, so that means we need to set the force_forwarding global
-> +		 * flag to 0 if the global forwarding flag is set to 0. Below in
-> +		 * addrconf_forward_change(), we also set the force_forwarding flag on every
-> +		 * interface to 0 if the global forwarding flag is set to 0.
-> +		 */
-> +		if (newf == 0)
-> +			WRITE_ONCE(net->ipv6.devconf_all->force_forwarding, newf);
-Hmm, is this true? Configuring the default value only impacts new interfaces.
-And before your patch, only the 'all' entry is took into account. In other
-words, configuring the default entry today doesn't change the current behavior,
-so I don't see the backward compat point.
-
-> +
->  		addrconf_forward_change(net, newf);
->  		if ((!newf) ^ (!old))
->  			inet6_netconf_notify_devconf(net, RTM_NEWNETCONF,
-
-[snip]
-
-> +static int addrconf_sysctl_force_forwarding(const struct ctl_table *ctl, int write,
-> +					    void *buffer, size_t *lenp, loff_t *ppos)
-> +{
-> +	int *valp = ctl->data;
-> +	int ret;
-> +	int old, new;
-> +
-> +	old = *valp;
-> +	ret = proc_douintvec(ctl, write, buffer, lenp, ppos);
-> +	new = *valp;
-Maybe you can limit values to 0 and 1, like it was done in the v1.
+On 6/27/25 19:17, Dave Jiang wrote:
+>
+> On 6/24/25 7:13 AM, alejandro.lucero-palau@amd.com wrote:
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>> The first step for a CXL accelerator driver that wants to establish new
+>> CXL.mem regions is to register a 'struct cxl_memdev'. That kicks off
+>> cxl_mem_probe() to enumerate all 'struct cxl_port' instances in the
+>> topology up to the root.
+>>
+>> If the port driver has not attached yet the expectation is that the
+>> driver waits until that link is established. The common cxl_pci driver
+>> has reason to keep the 'struct cxl_memdev' device attached to the bus
+>> until the root driver attaches. An accelerator may want to instead defer
+>> probing until CXL resources can be acquired.
+>>
+>> Use the @endpoint attribute of a 'struct cxl_memdev' to convey when a
+>> accelerator driver probing should be deferred vs failed. Provide that
+>> indication via a new cxl_acquire_endpoint() API that can retrieve the
+>> probe status of the memdev.
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> ---
+>>   drivers/cxl/core/memdev.c | 42 +++++++++++++++++++++++++++++++++++++++
+>>   drivers/cxl/core/port.c   |  2 +-
+>>   drivers/cxl/mem.c         |  7 +++++--
+>>   include/cxl/cxl.h         |  2 ++
+>>   4 files changed, 50 insertions(+), 3 deletions(-)
+>>
+<snip>
 
 
-Regards,
-Nicolas
+> Can you please explain how the accelerator driver init path is different in this instance that it requires cxl_mem driver to defer probing? Currently with a type3, the cxl_acpi driver will setup the CXL root, hostbridges and PCI root ports. At that point the memdev driver will enumerate the rest of the ports and attempt to establish the hierarchy. However if cxl_acpi is not done, the mem probe will fail. But, the cxl_acpi probe will trigger a re-probe sequence at the end when it is done. At that point, the mem probe should discover all the necessary ports if things are correct. If the accelerator init path is different, can we introduce some documentation to explain the difference?
+>
+> Also, it seems as long as port topology is not found, it will always go to deferred probing. At what point do we conclude that things may be missing/broken and we need to fail?
+>
+> DJ
+>
+>
+>
+
+Hi Dave,
+
+
+The patch commit comes from Dan's original one, so I'm afraid I can not 
+explain it better myself.
+
+
+I added this patch again after Dan suggesting with cxl_acquire_endpoint 
+the initialization by a Type2 can obtain some protection against cxl_mem 
+or cxl_acpi being removed. I added later protection or handling against 
+this by the sfc driver after initialization. So this is the main reason 
+for this patch at least to me.
+
+
+Regarding the goal from the original patch, being honest, I can not see 
+the cxl_acpi problem, although I'm not saying it does not exist. But it 
+is quite confusing to me and as I said in another patch regarding probe 
+deferral, supporting that option would add complexity to the current sfc 
+driver probing. If there exists another workaround for avoiding it, that 
+would be the way I prefer to follow.
+
+
+Adding documentation about all this would definitely help, even without 
+the Type2 case.
+
 
