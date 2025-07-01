@@ -1,80 +1,63 @@
-Return-Path: <netdev+bounces-202884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77D18AEF862
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 14:27:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24C65AEF873
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 14:29:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB0F01C03428
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:27:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9B38165406
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49215274653;
-	Tue,  1 Jul 2025 12:24:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC4362749EE;
+	Tue,  1 Jul 2025 12:25:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T4NnV64h"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Q0nmBEXC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F05273D8D;
-	Tue,  1 Jul 2025 12:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35AE2749C9;
+	Tue,  1 Jul 2025 12:25:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751372659; cv=none; b=ci1H7fj2MQqMIHFV48fsXy9jLQ5MkAvsGCBId+h5qbXRUpB+cBDojjsZXv1FJEVVP3Q8Dv2kQnI6ADtu1e1Z/r0zHtC0kbVhyo1y2zA+z3tEw1pkvRMUr8Y6ZYoMcQONR/3dGSRj5+ydJ7kWg1BpEq/d1BfZTZcXwT6gLPyoOQc=
+	t=1751372715; cv=none; b=F6c3ptdrfmRcB8YOqlSmbP+A4759bBcUDbQsIZr/Aoxa5YMbDORzxve8PH294w4WOmeknHadtBbHWmmLR1FWQOCb5bd+Ag1zgyr0zfP93t5OUDdX6JdgJ3Mz1fiGuMQdHgWqDtK/mXy03B8/R81vemwiWk5SKeNsX5pNGdyeN8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751372659; c=relaxed/simple;
-	bh=INulgcH/nzHPzEw+6nx7yLO32379I/EfVJ0SS1QNbJs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dAn4UXAMc5dEytmjjNCzld0u6XRXOqHdLCwkyNK984R9HDuwirXacb4ey3qlM+aMdUjAZ8F8tX2Fdcrp3li7ypBSwNcbZv0g9Uu8XWwP9jAPN0lWC21KvBXNKaVjHGDIx/Mq0KiGKy9BqCOLOTUanAJ6JnKz6tO3RfQFBHV25lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T4NnV64h; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a50fc819f2so4038321f8f.2;
-        Tue, 01 Jul 2025 05:24:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751372656; x=1751977456; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=J3Wtg2aGHhRy0M6H8IQ6x3ipYCPJsyzm0Bs4otQB+Po=;
-        b=T4NnV64hbTHJUSPimdGt6vMDp5+63nczOttfPLL9qNP+OyHoZYgRJlzUBqdyvOwNCi
-         SJZofkkUOP7n2vIIQm9DmYAIg4k/u/S+qd/XoXNagKiqpRwyeVv/88yZUozGUfD5oEDk
-         zYHVR0exRNCrrREbVpYd5ocL6VAGiod2IVKn/tpsmhS/n1OQKZf+93A2tyXffeZKVJ50
-         N6rnjfUuSLTY+V1/gtlNKLrYiIDeDUL7qENFrYklauq0mnqrssttqUCSW8WjB8f11Y7Q
-         Y4OIScHqTvVBSFEXqUlUt6endcv/kmrQPJgQMlSbPN1B1XAqDHP2wnpKTx2Rj0EMEb3n
-         znsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751372656; x=1751977456;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J3Wtg2aGHhRy0M6H8IQ6x3ipYCPJsyzm0Bs4otQB+Po=;
-        b=dG+cLtb2BOR5usfcrk2xEAX+YNEu5vIsrMdh1QNV7Zcq1PbA+w/zWUHmu4hgtcauSE
-         xC/w+oBvvS33D38Aa2cMzohcurHg/LETPFpet480nPhZrOQfNTBSSFkbdVuEXQWXL44K
-         qjdWfRPlGyF5SuVbr9EfkvUwxsUl5kMsgFaNZEpCZxNyeFG0f/yLauEyCTUcSB8dEVNK
-         OXAbw22eCR/hYGobpIxI6qX+4F5gn4eu8uN5zao0gcEwefODgAfsQx+Z58f9Z+5XdNKL
-         Tj1+YwMrO3qJ8OoE7TJ3x7RdWFojQ1Zn4PobPmH/Wi3ECZru9MZktLw/g2wE7kD8Uj2K
-         KQaA==
-X-Forwarded-Encrypted: i=1; AJvYcCXSIzhFHSIOuip0GPFvNYY84ttvND6Y6iDu8U9+hAvJbULW1ULIga1kRx3zvqhC54l50XAYRn7VQ5/8x0k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDOtfdxibH1kKsRfDHO8OIs2v6mhL8/yi7zaP5bQ6cyY1opQ/w
-	lIy3pe6Nt5ufA3wZXp5KmBjl2kLqA/PVLTodtFETrBXCBL0l5tp37OcZ
-X-Gm-Gg: ASbGncvqu6X4nZPNM9dE6jCZnh0YX0Ou1OSMFBjMaZhKU93MmcIQif6WXYlxIonI1Z9
-	Qwta1HKOp7mou+m0mccEGLWcK0FxadrvdgkcEljV1crDLjBrMv8a3M/akq0yk9C9mO4nfjBcpZc
-	tEECcesCXAs409cjkly1XnpZraD06xoSOZEJPUMjWbZ+2Q5wfJ4hvofSta9AcXlSNjYJo7ntsMI
-	39VVvq1sbktdI5klZysc15Z0pB2lrgtcdI3KKQ/Ab/U5Kve4zqZn2bE7YxDkNSEm/7aihDmRHwV
-	oG0x9DaScVJsHaHx43Mf0y97ZWFiibcjCNSC1Ush1zk3O2pGGabISnJe6/GTldpsuadoIqm1HBF
-	mC683qVgR0jcYcmUp8YxPcYAC4uMyNGh09ABhlxB1dz2uAt0ndg==
-X-Google-Smtp-Source: AGHT+IFVht3relObZqzWGT0XDyqUreLeTVUjvPsi4ZEg5WYRJLxoFHN8VFWY3YEcwMK3EIrI4A8Ghw==
-X-Received: by 2002:a05:6000:3c1:b0:3a4:d722:5278 with SMTP id ffacd0b85a97d-3a917bc77dfmr15264267f8f.39.1751372655503;
-        Tue, 01 Jul 2025 05:24:15 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a88c7fab7asm13077348f8f.24.2025.07.01.05.24.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Jul 2025 05:24:14 -0700 (PDT)
-Message-ID: <d152a6ae-4303-4889-b68b-25e29ea8eddb@gmail.com>
-Date: Tue, 1 Jul 2025 13:24:13 +0100
+	s=arc-20240116; t=1751372715; c=relaxed/simple;
+	bh=ZfLRBlA2GXkaE/VO2K/FwkaVy6TzTJYLHSCfKwRcEYc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=aMgGbKzaXYL7E//RE9UFPMlaOm3VknlI+8MeS/WfB9yMLnf80VIFgQz3+i0AqnFDLMvLaP//Rvik6rpsZ8U9B9x1oKwDGMv1WQCDSu1fwasRhc0Ct6lsrYFcsIq7iGqmHKyOJoPayclTYnEp+beaim/CN5qtCNfNEXJ99+gz8fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Q0nmBEXC; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 561AS4cV025180;
+	Tue, 1 Jul 2025 12:25:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	VLfCL1rkHHgT9uUOPYI/+4UoWa4a8cDmu5VDzDonpos=; b=Q0nmBEXC8OyJe4Q6
+	6wy8de192wCOGtxsw4UcXZAXrrrVaB4j/tDvANBkuYMdgm7nKdstguZJ6b7JyPKq
+	+/AA6Nalt4YupTM8Jlri3CRJpZB68U0twE4ucq35IQCD2w3bYKeMEz+UMmFXLakw
+	AaFutyH2qh+hbxqqfFQUQvbW3eb1+eh1qlClzQIF9pR2K5Ww1IlrIE0B4TgWPLhm
+	8GKKrCoDxCSiWCl+Bfy8jeVTYZMExZ98USLD/jvFBf/wjuBEP3YWR7N32yV9nHw0
+	mxCtIXD/rL/UNYbNS0bQ8xgSj7LaHAY5/aXLNHxmkCToR5anjodQwvesNm+grpsR
+	lVU0ZA==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47kd64p3na-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 01 Jul 2025 12:24:59 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 561COwqI015223
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 1 Jul 2025 12:24:58 GMT
+Received: from [10.235.9.75] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Tue, 1 Jul
+ 2025 05:24:52 -0700
+Message-ID: <e768d295-843c-431d-b439-e2ed07de638e@quicinc.com>
+Date: Tue, 1 Jul 2025 20:24:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,79 +65,117 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] sfc: eliminate xdp_rxq_info_valid using XDP base
- API
-To: Fushuai Wang <wangfushuai@baidu.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com,
- linux-kernel@vger.kernel.org
-References: <20250628051016.51022-1-wangfushuai@baidu.com>
-Content-Language: en-GB
-From: Edward Cree <ecree.xilinx@gmail.com>
-In-Reply-To: <20250628051016.51022-1-wangfushuai@baidu.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH net-next v5 03/14] net: ethernet: qualcomm: Add PPE driver
+ for IPQ9574 SoC
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Andrew Lunn
+	<andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Eric
+ Dumazet" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>, Lei Wei
+	<quic_leiwei@quicinc.com>,
+        Suruchi Agarwal <quic_suruchia@quicinc.com>,
+        Pavithra R <quic_pavir@quicinc.com>, Simon Horman <horms@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>,
+        "Gustavo A. R.
+ Silva" <gustavoars@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>
+CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>
+References: <20250626-qcom_ipq_ppe-v5-0-95bdc6b8f6ff@quicinc.com>
+ <20250626-qcom_ipq_ppe-v5-3-95bdc6b8f6ff@quicinc.com>
+ <4556893f-982b-435d-aed1-d661ee31f862@oss.qualcomm.com>
+Content-Language: en-US
+From: Luo Jie <quic_luoj@quicinc.com>
+In-Reply-To: <4556893f-982b-435d-aed1-d661ee31f862@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Authority-Analysis: v=2.4 cv=Z+PsHGRA c=1 sm=1 tr=0 ts=6863d39c cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=COk6AnOGAAAA:8
+ a=7dPGx68Ngd3I7BFEivgA:9 a=QEXdDO2ut3YA:10 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzAxMDA3NyBTYWx0ZWRfX4IEn9JSUGS2L
+ aNJr6xWle08pZAmNdDBPdZeCIkNMtnn39GhzKsq4J544L1f1vXbWDKR4Z7NZ+uozrW7hnfRUfpR
+ rZ606b4PDQmGV4mV/ExgeN50BQQRSgc5KzY3y4PEXzOiSQqhYbhkH/ZvSpyxIcL+9CnqQdFWtWE
+ L52ZwCs30nD/OB9eg5gdwRr+C+wFj1djfQvrdbSx15EuWfiCYQqCJmj8ZzcVuTTIsz0UG8Ctlq8
+ TRF8wnyaUYn8EACuNmX/H46wdjsJHF89v82lfRhMp+PdLADCE++Tf4v32uGAB/JQHtdpNOZXU3e
+ RfG+I8K2Rrcs+H3P4WJFuo6TEQMucpVEpOqAwHLqqlcGV06p31cugGK0QVA4I81UAZoOPV8fe+P
+ VtYi288h4UcS9258SzF8EjyRndTdf+ZsMhSJ3P5K87gJf7nFjNC3Tvf48pJXQa9jW9Fg264i
+X-Proofpoint-GUID: lEGc_dr8qa8_dsrASY2Y2WkGC8eRWqHq
+X-Proofpoint-ORIG-GUID: lEGc_dr8qa8_dsrASY2Y2WkGC8eRWqHq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-01_02,2025-06-27_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 lowpriorityscore=0 clxscore=1015 malwarescore=0 mlxlogscore=886
+ spamscore=0 adultscore=0 mlxscore=0 priorityscore=1501 bulkscore=0
+ impostorscore=0 suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507010077
 
-On 28/06/2025 06:10, Fushuai Wang wrote:
-> Commit eb9a36be7f3e ("sfc: perform XDP processing on received packets")
-> use xdp_rxq_info_valid to track failures of xdp_rxq_info_reg().
-> However, this driver-maintained state becomes redundant since the XDP
-> framework already provides xdp_rxq_info_is_reg() for checking registration
-> status.
+
+
+On 6/28/2025 12:21 AM, Konrad Dybcio wrote:
+> On 6/26/25 4:31 PM, Luo Jie wrote:
+>> The PPE (Packet Process Engine) hardware block is available on Qualcomm
+>> IPQ SoC that support PPE architecture, such as IPQ9574.
+>>
+>> The PPE in IPQ9574 includes six integrated ethernet MAC for 6 PPE ports,
+>> buffer management, queue management and scheduler functions. The MACs
+>> can connect with the external PHY or switch devices using the UNIPHY PCS
+>> block available in the SoC.
+>>
+>> The PPE also includes various packet processing offload capabilities
+>> such as L3 routing and L2 bridging, VLAN and tunnel processing offload.
+>> It also includes Ethernet DMA function for transferring packets between
+>> ARM cores and PPE ethernet ports.
+>>
+>> This patch adds the base source files and Makefiles for the PPE driver
+>> such as platform driver registration, clock initialization, and PPE
+>> reset routines.
+>>
+>> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+>> ---
 > 
-> Signed-off-by: Fushuai Wang <wangfushuai@baidu.com>
-
-Acked-by: Edward Cree <ecree.xilinx@gmail.com>
-
-> ---
->  drivers/net/ethernet/sfc/net_driver.h | 2 --
->  drivers/net/ethernet/sfc/rx_common.c  | 6 +-----
->  2 files changed, 1 insertion(+), 7 deletions(-)
+> [...]
 > 
-> diff --git a/drivers/net/ethernet/sfc/net_driver.h b/drivers/net/ethernet/sfc/net_driver.h
-> index 5c0f306fb019..b98c259f672d 100644
-> --- a/drivers/net/ethernet/sfc/net_driver.h
-> +++ b/drivers/net/ethernet/sfc/net_driver.h
-> @@ -404,7 +404,6 @@ struct efx_rx_page_state {
->   * @old_rx_packets: Value of @rx_packets as of last efx_init_rx_queue()
->   * @old_rx_bytes: Value of @rx_bytes as of last efx_init_rx_queue()
->   * @xdp_rxq_info: XDP specific RX queue information.
-> - * @xdp_rxq_info_valid: Is xdp_rxq_info valid data?.
->   */
->  struct efx_rx_queue {
->  	struct efx_nic *efx;
-> @@ -443,7 +442,6 @@ struct efx_rx_queue {
->  	unsigned long old_rx_packets;
->  	unsigned long old_rx_bytes;
->  	struct xdp_rxq_info xdp_rxq_info;
-> -	bool xdp_rxq_info_valid;
->  };
->  
->  enum efx_sync_events_state {
-> diff --git a/drivers/net/ethernet/sfc/rx_common.c b/drivers/net/ethernet/sfc/rx_common.c
-> index f4f75299dfa9..5306f4c44be4 100644
-> --- a/drivers/net/ethernet/sfc/rx_common.c
-> +++ b/drivers/net/ethernet/sfc/rx_common.c
-> @@ -269,8 +269,6 @@ void efx_init_rx_queue(struct efx_rx_queue *rx_queue)
->  			  "Failure to initialise XDP queue information rc=%d\n",
->  			  rc);
->  		efx->xdp_rxq_info_failed = true;
-> -	} else {
-> -		rx_queue->xdp_rxq_info_valid = true;
->  	}
->  
->  	/* Set up RX descriptor ring */
-> @@ -302,10 +300,8 @@ void efx_fini_rx_queue(struct efx_rx_queue *rx_queue)
->  
->  	efx_fini_rx_recycle_ring(rx_queue);
->  
-> -	if (rx_queue->xdp_rxq_info_valid)
-> +	if (xdp_rxq_info_is_reg(&rx_queue->xdp_rxq_info))
->  		xdp_rxq_info_unreg(&rx_queue->xdp_rxq_info);
-> -
-> -	rx_queue->xdp_rxq_info_valid = false;
->  }
->  
->  void efx_remove_rx_queue(struct efx_rx_queue *rx_queue)
+>> +static int ppe_clock_init_and_reset(struct ppe_device *ppe_dev)
+>> +{
+>> +	unsigned long ppe_rate = ppe_dev->clk_rate;
+>> +	struct device *dev = ppe_dev->dev;
+>> +	struct reset_control *rstc;
+>> +	struct clk_bulk_data *clks;
+>> +	struct clk *clk;
+>> +	int ret, i;
+>> +
+>> +	for (i = 0; i < ppe_dev->num_icc_paths; i++) {
+>> +		ppe_dev->icc_paths[i].name = ppe_icc_data[i].name;
+>> +		ppe_dev->icc_paths[i].avg_bw = ppe_icc_data[i].avg_bw ? :
+>> +					       Bps_to_icc(ppe_rate);
+>> +		ppe_dev->icc_paths[i].peak_bw = ppe_icc_data[i].peak_bw ? :
+>> +						Bps_to_icc(ppe_rate);
+>> +	}
+> 
+> Can you not just set ppe_dev->icc_paths to ppe_icc_data?
+> 
+> Konrad
 
+The `avg_bw` and `peak_bw` for two of the PPE ICC clocks ('ppe' and
+'ppe_cfg') vary across different SoCs and they need to be read from
+platform data. They are not pre-defined in `ppe_icc_data` array.
+Therefore, we use this format to assign `icc_paths`, allowing us to
+accommodate cases where `avg_bw` and `peak_bw` are not predefined.
+Hope this is fine. Thanks.
 
