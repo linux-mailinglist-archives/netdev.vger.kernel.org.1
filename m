@@ -1,118 +1,141 @@
-Return-Path: <netdev+bounces-202922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 661E0AEFAE0
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 15:39:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 235F8AEFB31
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 15:53:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D83E2165850
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 13:38:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD0237B1D94
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 13:51:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26C27274661;
-	Tue,  1 Jul 2025 13:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7202750FA;
+	Tue,  1 Jul 2025 13:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iqKuCiIq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jOG8dPmW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B52149C4A;
-	Tue,  1 Jul 2025 13:38:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DCD226FA52;
+	Tue,  1 Jul 2025 13:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751377115; cv=none; b=Gpy3YjnadEnhjBqvRgyLqE2qujXcCgQ5BkFZRaiJ79/MiSjIGFGU7gN1sJTAuX+yrMlOWTXYtGECkpd8zO2IubzkYrZzMixz02bym9IfUjbcGQTlR6x9E82FGh044T4W+X/BAoLMdnKcrB1L595a3C6d/ZnSHWB85VQOaWMjeDo=
+	t=1751377985; cv=none; b=DcN/ZVYgW6Ba9HMpYRZhP2b6Q1o+oy3AH3qYBGAOuAjdQCA4Z4MZzpYS6HMnFwLxekEtPh80ctP9z7Qyo/iXkkJoUxmXpvyPNIz/thu4lwpOLopPTe+fiRKrr47//A8rwFG0w639HY+sJKHE15rVtIRVEu79pngft2K1TutpfqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751377115; c=relaxed/simple;
-	bh=ky8QQKUkLUeo9kQ2DpMPnzJve9+QP9MZpm3w/wowHOE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z4BtazOB92VoPUzW4NJbWw0OwUNFLVjkkJ0VLdCmJADNOYfF11SnaWaWzbrYmFGeudqxd9NmVJA7UO5GNBMHSVRvhUoD3fv4tLPC19O0a1J2ZxW1+SHxyOw4EhufkazLvbxw7B+YIdCaZ1IEhxgq0uJgPJYXf5QbDH/a+O8FCrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iqKuCiIq; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-453608ed113so33731395e9.0;
-        Tue, 01 Jul 2025 06:38:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751377112; x=1751981912; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=f9FP0m4sJ7CU9BSLCQyAkJvmbq4Wt41GfyUXSn+7VCA=;
-        b=iqKuCiIqSNIYxiq0o02s5b6FOL/vVUsCNyCU27AKbL9b6nLvhGOcjFC2FfW9JGTXpF
-         clqAW2ORkcMfuLQls0jZdtemK2lldCutPswZB02EUDKoHJbosrtQ3YX8swkIfRhz5ykc
-         71+hO66W1Aw9A2phYJ4cYu8MwIsyjUe8Kwmo+UrP0NK62abaNq+TGrEeTduNJljNLjHM
-         NVyHLEbMZkNYToKj4bx9NZo0+B1IcfrUdWjeYUS4ZhJjLVIT5IMnfZ5lbMKDfs22dRIB
-         Z4Fy5ncxhe/AX6jzhPBP3N7Cbaszipws2ikKx9RNldzDrOGXn8myFpOxUI0zPltGgmTW
-         DsWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751377112; x=1751981912;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f9FP0m4sJ7CU9BSLCQyAkJvmbq4Wt41GfyUXSn+7VCA=;
-        b=CDXHSi/DmnsglohcT1bM6hklYT2c9Ua7pAD3Z5NsrpXTGdXH5U9VyBH0+lBD51Dx+d
-         bIpNONdkSVI/idCGDq1Qx0bs4MHcg4c9yamM8AvhoanTFCig4Fd5trWC2MT/nDOnx/HF
-         CQgfy813vkJNVbPXT9ti7K0SUDNnhSw7u66k4RGJKcWK5TLBVgKtM7PUP9X8LyZQvmaS
-         TGs1BQbZIJYcwMkH0PIxXsggC2W8c7Wy4i0vBQnoLCqhvx5a/GLn1j5W6B8pfIqgA2vt
-         Vug8rDLz0RQfPbRClju19KwW1Bw+K08RSZUdhQHkk7W7GUyjhN5rdn+x5bJ4qrLp4jJo
-         4Xtg==
-X-Forwarded-Encrypted: i=1; AJvYcCU30BmfxjBbIiGy21sIy3PTcdhtS2FYh6Rb+2dDBNp23ftFObdMNyL1F9fFypaqFSJFntaiVVV6@vger.kernel.org, AJvYcCVHwHWZTGiEUy9yYzI5vt5DgZhLr6HooGKWxZR1dsZTvwY3Qtmzk9SFd4ARSzbHsrqqgh10e8MO8DDS3Z8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOU61toZhZNT+EaHg3CJk0uvfZ8cGzIYP4BCYUe9kPtCN3AIoY
-	Z8581gYmYEXzI1wxaAe3XidVN8WOwhmdp2ufAYPNzkKgTHOFbdnBrrwz
-X-Gm-Gg: ASbGncvXIDTOF7UU0qQAfjV0EI70v3HJ6YhBPHZrGJ+tXbY6PcuHR7hHafjaqCXMnvu
-	IEUUOIu6lFA5sw7m3Zyo9adgZt98CUWrrPeuSL5T/PaCRdhp2Vro/O3ZApAqfYKfUZY00guzrwF
-	J5ja7GHU67HQas7K+LcqcQ5dOR+ZkrH6gDqwUwdr7/+0l5QfRD0cn/sB0BaiVO07CCbtojZjnoM
-	JoZ0Oqz6pwuHQ7XY1Rnwx7tqHTmx+yQ8HnlfDgYJHD+rRkCAmSrRicryQdel1MCTnfbla/eqeiY
-	kV8hIMRhit7FaJJv5rQ84EK1Q5D7bdmJfvtdEJWuAbcL6npvCsqsgWUve7pKofgPr9CDqnP2qJF
-	os7do6zLi2pLQOVzMmuejMLMVd/dnlFMhwYsvo6WjlpMJqAFHYw==
-X-Google-Smtp-Source: AGHT+IHaFf0Kw7NnYflYgrVPZhks6XoL/+RtlTxnQ9ccF2rkKiyPzeCKe7KHzLRHAEAQpbzFnNfzOw==
-X-Received: by 2002:a05:600c:1c94:b0:43d:1b74:e89a with SMTP id 5b1f17b1804b1-453a9171809mr33540925e9.9.1751377111387;
-        Tue, 01 Jul 2025 06:38:31 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453823ad01csm197629375e9.22.2025.07.01.06.38.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Jul 2025 06:38:31 -0700 (PDT)
-Message-ID: <cc3dd44a-b94a-4537-b68b-49a800acc935@gmail.com>
-Date: Tue, 1 Jul 2025 14:38:30 +0100
+	s=arc-20240116; t=1751377985; c=relaxed/simple;
+	bh=m7sesd7WZao4ANfBHtgTBNHJfjxLhDp8nQ60oP0kpq8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GYKyDNGnTfHteFQw35NTd9NifG2WMuxVgSVJs+pFB05Xs7kDWISMA3HbjKlsIVSWMcex25KAmCw9cqdpWi5z8w9EYbYoIR5tXfNkvK165x6aLV3cZ9NHGNVNHwRr9gXPxcckiA/pNxMz5Ktk7kTrvQQrxhpzRPNNM4TsB84a0Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jOG8dPmW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F998C4CEEB;
+	Tue,  1 Jul 2025 13:53:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751377985;
+	bh=m7sesd7WZao4ANfBHtgTBNHJfjxLhDp8nQ60oP0kpq8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jOG8dPmWELlnis88AUsjh/9Qi7u/M2FxtzjhEivb5869aRtLzxsdNF4LQ7vIIjNBd
+	 rBKnJp0sBUF0ftRUHeOPtUvzx7q8ZX3LEWy3pCIfweUbuM84E9Ayl4IU7B5Fg4HliE
+	 IjEVNDOKbrhaSPYifsGvMWiwZdTxBCn1Tg/53BYbT6LwRovUzuGNjksh8zSuXXxhB5
+	 ANKeDach72GtI3WEYIJGfS4bzKL7Jc/TeTBD6vHNqd/OSu1VEr/+2F2dVwMT/qTyb5
+	 wMYasPDV+rZBZfPCo9g5ys9I6cLy2ilJJBfso181Xv9us7JPcsHhP56W4/M7zeoQnl
+	 lzdQfOmu4K1WQ==
+Date: Tue, 1 Jul 2025 14:52:59 +0100
+From: Will Deacon <will@kernel.org>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Keir Fraser <keirf@google.com>,
+	Steven Moreland <smoreland@google.com>,
+	Frederick Mayle <fmayle@google.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	netdev@vger.kernel.org, virtualization@lists.linux.dev
+Subject: Re: [PATCH 3/5] vhost/vsock: Allocate nonlinear SKBs for handling
+ large receive buffers
+Message-ID: <aGPoO4G75ZGuxjlM@willie-the-truck>
+References: <20250625131543.5155-1-will@kernel.org>
+ <20250625131543.5155-4-will@kernel.org>
+ <orht2imwke5xhnmeewxrbey3xbn2ivjzujksqnrtfe3cjtgrg2@6ls6dyexnkvc>
+ <aGKdSVJTjg_vi-12@willie-the-truck>
+ <6shb4fowdw43df7pod5kstmtynhrqigd3wdcyrqnni4svgfor2@dgiqw3t2zhfx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] sfc: siena: eliminate xdp_rxq_info_valid
- using XDP base API
-To: Larysa Zaremba <larysa.zaremba@intel.com>,
- Fushuai Wang <wangfushuai@baidu.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-net-drivers@amd.com, linux-kernel@vger.kernel.org
-References: <20250628051033.51133-1-wangfushuai@baidu.com>
- <aGPiqlNRMBsQQCgt@soc-5CG4396X81.clients.intel.com>
-Content-Language: en-GB
-From: Edward Cree <ecree.xilinx@gmail.com>
-In-Reply-To: <aGPiqlNRMBsQQCgt@soc-5CG4396X81.clients.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6shb4fowdw43df7pod5kstmtynhrqigd3wdcyrqnni4svgfor2@dgiqw3t2zhfx>
 
-On 01/07/2025 14:29, Larysa Zaremba wrote:
-> On Sat, Jun 28, 2025 at 01:10:33PM +0800, Fushuai Wang wrote:
->> Commit d48523cb88e0 ("sfc: Copy shared files needed for Siena (part 2)")
->> use xdp_rxq_info_valid to track failures of xdp_rxq_info_reg().
->> However, this driver-maintained state becomes redundant since the XDP
->> framework already provides xdp_rxq_info_is_reg() for checking registration
->> status.
->>
->> Signed-off-by: Fushuai Wang <wangfushuai@baidu.com>
+On Tue, Jul 01, 2025 at 12:44:58PM +0200, Stefano Garzarella wrote:
+> On Mon, Jun 30, 2025 at 03:20:57PM +0100, Will Deacon wrote:
+> > On Fri, Jun 27, 2025 at 12:45:45PM +0200, Stefano Garzarella wrote:
+> > > On Wed, Jun 25, 2025 at 02:15:41PM +0100, Will Deacon wrote:
+> > > > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > > > index 66a0f060770e..cfa4e1bcf367 100644
+> > > > --- a/drivers/vhost/vsock.c
+> > > > +++ b/drivers/vhost/vsock.c
+> > > > @@ -344,11 +344,16 @@ vhost_vsock_alloc_skb(struct vhost_virtqueue *vq,
+> > > >
+> > > > 	len = iov_length(vq->iov, out);
+> > > >
+> > > > -	if (len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE + VIRTIO_VSOCK_SKB_HEADROOM)
+> > > > +	if (len < VIRTIO_VSOCK_SKB_HEADROOM ||
+> > > 
+> > > Why moving this check here?
+> > 
+> > I moved it here because virtio_vsock_alloc_skb_with_frags() does:
+> > 
+> > +       size -= VIRTIO_VSOCK_SKB_HEADROOM;
+> > +       return __virtio_vsock_alloc_skb_with_frags(VIRTIO_VSOCK_SKB_HEADROOM,
+> > +                                                  size, mask);
+> > 
+> > and so having the check in __virtio_vsock_alloc_skb_with_frags() looks
+> > strange as, by then, it really only applies to the linear case. It also
+> > feels weird to me to have the upper-bound of the length checked by the
+> > caller but the lower-bound checked in the callee. I certainly find it
+> > easier to reason about if they're in the same place.
+> > 
+> > Additionally, the lower-bound check is only needed by the vhost receive
+> > code, as the transmit path uses virtio_vsock_alloc_skb(), which never
+> > passes a size smaller than VIRTIO_VSOCK_SKB_HEADROOM.
+> > 
+> > Given all that, moving it to the one place that needs it seemed like the
+> > best option. What do you think?
 > 
-> You could have sent those patches in a single patchset, but the patches 
-> themselves are fine.
+> Okay, I see now. Yep, it's fine, but please mention in the commit
+> description.
 
-I asked him to split it, for a few reasons (different blamed commits,
- clearer Subject: lines, Siena is EOL).
-So if you don't like it, blame me ;-)
+Great, I'll do that.
 
-> Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> > > > 	len = le32_to_cpu(virtio_vsock_hdr(skb)->len);
+> > > >
+> > > > -	if (len > 0)
+> > > 
+> > > Why removing this check?
+> > 
+> > I think it's redundant: len is a u32, so we're basically just checking
+> > to see if it's non-zero. All the callers have already checked for this
+> > but, even if they didn't, skb_put(skb, 0) is harmless afaict.
+> 
+> Yep, I see, but now I don't remember why we have it, could it be more
+> expensive to call `skb_put(skb, 0)`, instead of just having the if for
+> control packets with no payload?
+
+That sounds like a questionable optimisation, but I can preserve it in
+the only caller that doesn't already check for a non-zero size
+(virtio_transport_rx_work()). I mistakenly thought that it was already
+checking it, but on closer inspection it only checks the size of the
+virtqueue buffer and doesn't look at the packet header at all.
+
+In fact, that is itself a bug because nothing prevents an SKB overflow
+on the put path...
+
+I'll add an extra fix for that in v2 so that it can be backported
+independently.
+
+Will
 
