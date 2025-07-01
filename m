@@ -1,138 +1,131 @@
-Return-Path: <netdev+bounces-202845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F242AEF542
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:38:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35735AEF562
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:44:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A755B1BC6D9B
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 10:39:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06F873A8208
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 10:43:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78444246BC5;
-	Tue,  1 Jul 2025 10:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA7AA270552;
+	Tue,  1 Jul 2025 10:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZeOqMyNG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yAXGl2UE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 461F91DED52;
-	Tue,  1 Jul 2025 10:38:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B214526FDA4
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 10:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751366329; cv=none; b=e7uE4jpNnG3A91/3bF8ZB9ui8ZcAQ++3CEu6w0Ueu4R7qre9CT+GLq2Kozzj6jCVKRPnoSIrL0p0s1U/Kvh06dy199J6obulyPiNuUDMDZHrVqYCC3QWTCHkNezxOhrqBWlVvHlZ/WDS1d3nVVzqmbKvm3QZCBXxnDR3zfoofAE=
+	t=1751366655; cv=none; b=bpJQmjMtWf5kvym1x+BvnBXn7Wpi4tBw1Ctp/8aYZ5czT/IYhjp+868T72zNviavp2oUQP+tVkiCYly63tVb+jo9HDQGb4VMU+RVIG0xfouRK1Bx53jg2gG7d14XpnbycAc4C05ZUh9FEOyYyJP9T9a9qpjSTdQlETkXV5bCi6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751366329; c=relaxed/simple;
-	bh=yPNa7uEfUMjgDyJRDFdMre2nt/VrGx/fqW5DHixzKC8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ts5Dl/ZGW0SVODhAyMsjQFEt+aIiXBkCFla+L3auxRr5zdkMVSNbei2TNt4rGNPbwuaABvJ/c+nZiRKpa6HUGmp9Z0dcdApiJpwi9tcVptLLz30AGNyjU47mUGRI5d/g9ZEaaXeaFtVcKxTDS+dZb/ZmoTH91Qu7tMeY/W1uGFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZeOqMyNG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4E25C4CEEB;
-	Tue,  1 Jul 2025 10:38:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751366328;
-	bh=yPNa7uEfUMjgDyJRDFdMre2nt/VrGx/fqW5DHixzKC8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZeOqMyNGI8+KkXU73chcalCuVbwdpK5eeKEPc+y+kpK77IzclAvE0yQEs/xgwW2SC
-	 iw/sC2kNd5uE4690zw8PXGfLakcfRhwWSdojnl/tCXQOYRLRmXmss89B0irt2TueEX
-	 NWNqpD/tJRQhvo6sB+4+vBwzGrs4dBR3sArwMdkFcXvO8vUpH9oze0/Bb9cNRHgcvD
-	 THC4V2Unf+P6KrvwJ67/amGe3neg9rK1l3PEKFUANAeB2nka5k2Ifstg8JJFzWs5Ow
-	 klClJfAfAQpVnhNioayHgTMlreRepAwbJGdZBrQ6t5cfslf9d0U0rZjQ8/MWVF4HAP
-	 CrzQQ6Jk0eiiA==
-Date: Tue, 1 Jul 2025 13:38:44 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Abhijit Gangurde <abhijit.gangurde@amd.com>
-Cc: shannon.nelson@amd.com, brett.creeley@amd.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	corbet@lwn.net, jgg@ziepe.ca, andrew+netdev@lunn.ch,
-	allen.hubbe@amd.com, nikhil.agarwal@amd.com,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Andrew Boyer <andrew.boyer@amd.com>
-Subject: Re: [PATCH v3 10/14] RDMA/ionic: Register device ops for control path
-Message-ID: <20250701103844.GB118736@unreal>
-References: <20250624121315.739049-1-abhijit.gangurde@amd.com>
- <20250624121315.739049-11-abhijit.gangurde@amd.com>
+	s=arc-20240116; t=1751366655; c=relaxed/simple;
+	bh=FjNNJQuNFHz/e6yt6+QF01AIHDz6pY4OvsUX2LurgSk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=hLvlMJZW263sCPYgCtVJVUoR1sugUqc+sfxVJBUDgL1yH30VwjnUtgnySH/y5IYcn8IDwZytt10ZgJRxzFh3EIzZSJ+VOcyjc4ikwUfTWws/ZA7DJGLiS7P0sC6XihwCK12IQtryEZKgyCE1F7uFkrauBi4zQWqoPx7jZjISGsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yAXGl2UE; arc=none smtp.client-ip=209.85.208.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--aliceryhl.bounces.google.com
+Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-607c239c7f0so2926891a12.3
+        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 03:44:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751366652; x=1751971452; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KkP3Q/mrHcTXpi5jFAQSRZZTttwkOM8RfBay5zssxDs=;
+        b=yAXGl2UE0qGFLEXo8I/Q2Me+hvVbD7mps4Qv0pBulP64GzRp969FW+u0lywERoqpQ1
+         ZjN7Z+eLDoqa7yoDrhFaRojz57rhL6Rir/zpwzCWKuPEEyGre87w/lCKpfuIR13kFpKf
+         yCy6wzZ6QgkBK/ptREQ02Xm5pvimoCLIT3982qRqrBRkaoOSTgjddPD2/M0krisx/I70
+         x0/3GmhDt3zFn+6ov2RP3FHOBkSbhkVi2tlA2nKgBkQh2lw7FMQ85VQvaFylCsDlB98p
+         buq6+GFlh7eDHsEvqV3s+Q8LCNNNGNncnj2SKXdG6kY62ZswTAKQnbbWL2vwc+JqJ/ZV
+         lw0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751366652; x=1751971452;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KkP3Q/mrHcTXpi5jFAQSRZZTttwkOM8RfBay5zssxDs=;
+        b=j77btZ7CkAqD0s/3MwS/C9JeAPKUF8O5vc8+A7z1+9R0ZR+kF1delEz5IXsB+hdaDt
+         SG5lVgNgpPXBhwtoGp+oBKs1xkx0gWwKXHKKAocULuIXjaXlutGZTY4ipMYGUDjxZC7n
+         IJeWGaXePpFS3G2D8Moxk8nb/lEqohWLpxW0wiXKc1Kctvh5nLmyqeQiAFOykO3A4VX2
+         KPh8jd+n591zXRe07Z8CiRxAL6zpkXxJn6GxiJfh+/C7tSexOUYsqM5/3n+oZxEcAZLG
+         XzBjnQu12yNRSUJoKSxXNRTe5s/M82dDzlJ2c4QNZA7b2fBaJyS6CvM52sUy65lvTiPA
+         kr4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVLk/2uqz1madCyAUqjLCQ++nOtul80AXz5aHeE94RZ3XuT60ZrOuDQzJVrN4Eq+stzOsoCr88=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBfik3n1l4f72oTHwnN0rL2lpw8LEZNwEEW9qWPdwzW07m4D6M
+	RBA9qqC2OFBdgyHnnjUjWea30td4ItGv5uJLRJDmcqnm8HOclhlUhEUtZui55keG9Oy77qr9jBb
+	0ZeZAMeetg5fJ3MVQ0g==
+X-Google-Smtp-Source: AGHT+IFVVYwcwXIW2+rs+LXCKTLno19A5yuxBI/UefmvL0JcGML1UYLUePmSmcmNLPYFZsBsDSZ4dtmzcyM66Ug=
+X-Received: from edwf17.prod.google.com ([2002:a05:6402:1511:b0:60c:3b8e:c3eb])
+ (user=aliceryhl job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6402:26d4:b0:607:f431:33fb with SMTP id 4fb4d7f45d1cf-60c88b26b30mr16470283a12.3.1751366650570;
+ Tue, 01 Jul 2025 03:44:10 -0700 (PDT)
+Date: Tue, 1 Jul 2025 10:44:09 +0000
+In-Reply-To: <20250619-cstr-core-v12-0-80c9c7b45900@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250624121315.739049-11-abhijit.gangurde@amd.com>
+Mime-Version: 1.0
+References: <20250619-cstr-core-v12-0-80c9c7b45900@gmail.com>
+Message-ID: <aGO7-SQUUgg6kSVU@google.com>
+Subject: Re: [PATCH v12 0/5] rust: replace kernel::str::CStr w/ core::ffi::CStr
+From: Alice Ryhl <aliceryhl@google.com>
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Michal Rostecki <vadorovsky@protonmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, 
+	"=?utf-8?B?QmrDtnJu?= Roy Baron" <bjorn3_gh@protonmail.com>, Andreas Hindborg <a.hindborg@kernel.org>, 
+	Trevor Gross <tmgross@umich.edu>, Brendan Higgins <brendan.higgins@linux.dev>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+	Danilo Krummrich <dakr@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, Benno Lossin <lossin@kernel.org>, 
+	"Krzysztof =?utf-8?Q?Wilczy=C5=84ski?=" <kwilczynski@kernel.org>, Dave Ertman <david.m.ertman@intel.com>, 
+	Ira Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>, Breno Leitao <leitao@debian.org>, 
+	Viresh Kumar <viresh.kumar@linaro.org>, Michael Turquette <mturquette@baylibre.com>, 
+	Stephen Boyd <sboyd@kernel.org>, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, dri-devel@lists.freedesktop.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, llvm@lists.linux.dev, 
+	linux-pci@vger.kernel.org, nouveau@lists.freedesktop.org, 
+	linux-block@vger.kernel.org, linux-pm@vger.kernel.org, 
+	linux-clk@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
 
-On Tue, Jun 24, 2025 at 05:43:11PM +0530, Abhijit Gangurde wrote:
-> Implement device supported verb APIs for control path.
+On Thu, Jun 19, 2025 at 11:06:24AM -0400, Tamir Duberstein wrote:
+> This picks up from Michal Rostecki's work[0]. Per Michal's guidance I
+> have omitted Co-authored tags, as the end result is quite different.
 > 
-> Co-developed-by: Andrew Boyer <andrew.boyer@amd.com>
-> Signed-off-by: Andrew Boyer <andrew.boyer@amd.com>
-> Co-developed-by: Allen Hubbe <allen.hubbe@amd.com>
-> Signed-off-by: Allen Hubbe <allen.hubbe@amd.com>
-> Signed-off-by: Abhijit Gangurde <abhijit.gangurde@amd.com>
-> ---
-> v2->v3
->   - Registered main ib ops at once
->   - Removed uverbs_cmd_mask
->   - Removed uverbs_cmd_mask
->   - Used rdma_user_mmap_* APIs for mappings
->   - Removed rw locks around xarrays
->   - Fixed sparse checks
+> Link: https://lore.kernel.org/rust-for-linux/20240819153656.28807-2-vadorovsky@protonmail.com/t/#u [0]
+> Closes: https://github.com/Rust-for-Linux/linux/issues/1075
 > 
->  drivers/infiniband/hw/ionic/ionic_admin.c     |  101 +
->  .../infiniband/hw/ionic/ionic_controlpath.c   | 2530 +++++++++++++++++
->  drivers/infiniband/hw/ionic/ionic_fw.h        |  717 +++++
->  drivers/infiniband/hw/ionic/ionic_ibdev.c     |   44 +
->  drivers/infiniband/hw/ionic/ionic_ibdev.h     |  249 +-
->  drivers/infiniband/hw/ionic/ionic_pgtbl.c     |   19 +
->  include/uapi/rdma/ionic-abi.h                 |  115 +
->  7 files changed, 3767 insertions(+), 8 deletions(-)
->  create mode 100644 include/uapi/rdma/ionic-abi.h
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 
-<...>
+Overall LGTM. Only question is whether we should re-export
+core::ffi::CStr from kernel::ffi. Reason being that right now we are
+telling people to never use core::ffi as the integer types are wrong,
+and I think it would be nice if we can continue to tell people "never
+use core::ffi".
 
-> +static void ionic_flush_qs(struct ionic_ibdev *dev)
-> +{
-> +	struct ionic_qp *qp, *qp_tmp;
-> +	struct ionic_cq *cq, *cq_tmp;
-> +	LIST_HEAD(flush_list);
-> +	unsigned long index;
-> +
-> +	/* Flush qp send and recv */
-> +	rcu_read_lock();
-> +	xa_for_each(&dev->qp_tbl, index, qp) {
-> +		kref_get(&qp->qp_kref);
-> +		list_add_tail(&qp->ibkill_flush_ent, &flush_list);
-> +	}
-> +	rcu_read_unlock();
+Either way, for the whole series:
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 
-Same question as for CQ. What does RCU lock protect here?
-
-> +
-> +	list_for_each_entry_safe(qp, qp_tmp, &flush_list, ibkill_flush_ent) {
-> +		ionic_flush_qp(dev, qp);
-> +		kref_put(&qp->qp_kref, ionic_qp_complete);
-> +		list_del(&qp->ibkill_flush_ent);
-> +	}
-
-<...>
-
-> +err_buf:
-> +err_hdr:
-
-Please don't use empty goto labels.
-
-> +	return rc;
-> +}
-
-<...>
-
-> +#define IONIC_ABI_VERSION	4
-
-For us it is 1.
-
-Thanks
+Alice
 
