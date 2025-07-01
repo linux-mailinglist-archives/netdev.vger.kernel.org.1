@@ -1,208 +1,347 @@
-Return-Path: <netdev+bounces-202840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7E75AEF4D3
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:17:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A6F0DAEF4F0
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:24:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAAEF440319
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 10:16:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6633C3A83C8
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 10:23:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C182126FA4E;
-	Tue,  1 Jul 2025 10:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EFE42701AE;
+	Tue,  1 Jul 2025 10:24:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V5B+84TY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NQdpYFeM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2CBE21771F
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 10:16:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A53626F477;
+	Tue,  1 Jul 2025 10:24:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751365018; cv=none; b=ARdQorC1Oy9q2PTVGxitE1sccGieJUNi4/FlOXRKbR9ZCnYwgxsPaxJTA5kvHToWo3tw9uq6jSOF9RYLwCPDfMi+rdzTurM+LMjFnbgS+UPxS9zEtxmILJ8TtMy+Zzpr+suBwvtvk4kd7Wvbb/nOmKff4+0NUh4thyx/1eClKuk=
+	t=1751365456; cv=none; b=K3XP8Xjrx4m34zL0C2e9bV4pTnC/gE0v2f3F9uBheB6OP6MZCf8qcn24fNa7dBQxyoxGstT38FOj0QdNb5PpsoS5N5mptwSVh/2HzcsH9QL2TwATkrKYbfpha/4kObORHMfT/Vh4KVHKsUOfv4pnVPeWQrRWzPCORP6qgQM1jp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751365018; c=relaxed/simple;
-	bh=TQC9+oQxqblFVDB80MxY1iCatqzGsHJIWGTarUSRBKQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GryogDs+xT9Z7CcCTMMhrmBwCUlYX5BCDku3pLNFCtdfgf7B7mnQEIIb7EEOGXs6IwPSzfist2ifjoqvRs81HxYhb+v3kddTx8WXvXiwgTHlzQREXJvr9w/Yp/2dRTdNfQfEkUIUsnOjBwbzqtSgzYgDr59uGziE6lAaRCNmCYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V5B+84TY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751365015;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kHo/cFymct4LXXFJUfJvxL32X6eCwnlTq+zBpWThbJs=;
-	b=V5B+84TYbHUWR+rbHyPcTaqsyukICVkqxiNgbiwAeGx/7aN4olCd3H6KDnDyKQq8DgJMRc
-	K/me1WASCfaJFTiARQERgVCKZqbmPXJ6drp59Sp9qfzLmq+jhAddlyUm0G33UPjpQ5zIHG
-	2I4xXd2lWui/V+EYXCmTZAVCXIgitVU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-441-KCwMwZ8COaWRY9G5j8YrWA-1; Tue, 01 Jul 2025 06:16:54 -0400
-X-MC-Unique: KCwMwZ8COaWRY9G5j8YrWA-1
-X-Mimecast-MFC-AGG-ID: KCwMwZ8COaWRY9G5j8YrWA_1751365013
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-450eaae2934so22408785e9.2
-        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 03:16:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751365013; x=1751969813;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kHo/cFymct4LXXFJUfJvxL32X6eCwnlTq+zBpWThbJs=;
-        b=NyPB3QGOgClb1Krl2BwffmhnI/5JjTz4W2fpZZXE9f01/5w0bSz1bDhuozjeWpu4xx
-         TMbgJtaHpdn8bhnxJBabustCmF9kB9tPGPKkGKdmCL0mmfGfjx1KOHSHav6tjPc1lGvq
-         lqo8eKYeLi6h02BHUJ68llrgbG9OQp5CYL9iQlNmxdBLJUu5Ik6qq7gGUH8RFA2/BqFE
-         0w5lRbeh7VndZ9Kx6PffUckZ+KE+n7cEZexOMcklA3Yh0jojbv1iBOu6UhfWTNtn3up5
-         61gSRJ2ETWCjphsdxm+x1NqsihzS99sm7mdyrc0Y/HusbuMLDTb6F1GGyKTCKQ/x7BvD
-         5Rxg==
-X-Gm-Message-State: AOJu0Yx8TaaqAW3xa6B7Qe1Addb8GDmIjm8RqfyNkw4DsthqRbURAuQN
-	z9wVJ8tGIW+8Xmd7Q6aF8OO9tX4w2Z8HCeK1PJAGKZvSjKlj39K/0qax4ekG3Vo+d/jApEaSwgX
-	dgfdh3AR4Pvi98/Kg39FiOKAb4rP6LpH6uOI0FWmxHfB8mx5/TbZ4ACDIOA==
-X-Gm-Gg: ASbGnctrjSUeuk0+EqLvAIwMV1cjAFy5h+6gDrwTVBMHDRenRZPbCOaZ/McKouyTsb6
-	H/wHUvZ62UaljQZiDobjdURwOfXXyuAr48cofwddKYZknXbMhLDlx/frnuZrbkSVqG2Bg4V0KZa
-	tRlIy3E2aCfYNWw1zsCMA41TX9EndOQ4h7K21Xz3zlypD6yXRo6DXtV7Opyc22ECd/jcJXCasrs
-	6yuo+5XE21OYMoreSptjHpXZ35GOcRymgukm3wYpjdJV6vNvnU9kXAT9UOhqlk6Ufrwb5+Tl6Kc
-	cP4wBm0sand9+dZQfgOxMQ4bW9JerzA0HSgB5l8/Zug2JEC5f0lyStlWpfuVMq0WdIU3Fw==
-X-Received: by 2002:a05:600c:4ed3:b0:43d:45a:8fc1 with SMTP id 5b1f17b1804b1-4538f244121mr174638555e9.4.1751365013241;
-        Tue, 01 Jul 2025 03:16:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEEJq4NPlQOANeFkcDdpPTn2V1nB2CZt1s+DQ2EMmFxhbNZ3FodkuTpK5r3gou56aXsP2YbRQ==
-X-Received: by 2002:a05:600c:4ed3:b0:43d:45a:8fc1 with SMTP id 5b1f17b1804b1-4538f244121mr174638105e9.4.1751365012686;
-        Tue, 01 Jul 2025 03:16:52 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:247b:5810:4909:7796:7ec9:5af2? ([2a0d:3344:247b:5810:4909:7796:7ec9:5af2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453962dd8besm100899005e9.31.2025.07.01.03.16.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Jul 2025 03:16:52 -0700 (PDT)
-Message-ID: <852d45b4-d53d-42b6-bcd9-62d95aa1f39d@redhat.com>
-Date: Tue, 1 Jul 2025 12:16:50 +0200
+	s=arc-20240116; t=1751365456; c=relaxed/simple;
+	bh=Ap6a6/7zWEFfGBEq3+BTor3vbcQo4WoX9hvuGKvl4a0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YQgsVEuCu3H5j1IS/zWi6gQPQBVYTlimOdOnwty9fZ4xzxh1BDmJivhNRt+UhmJAl0xNX3M7A2Bsex6ALR6mXm5C5PTGaINm+Va3cIc4nkT8nBlAKtzmQUweedjgefKaRFfMU0eGuNWoSt906IQIOOW4oDOSMYHKO7giOQq/nxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NQdpYFeM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BEAFC4CEEB;
+	Tue,  1 Jul 2025 10:24:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751365454;
+	bh=Ap6a6/7zWEFfGBEq3+BTor3vbcQo4WoX9hvuGKvl4a0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NQdpYFeMlE7Bvb0e5MK0NruLB8i8jbzC6TIe1pnsgvKaSzy4EGs81zdh921v12kJf
+	 fnEWuEJSf/alOJC7Ty+Zd3q8jf9bumf/qGyVYCwk8/zA8EEfZsRLMK4sA2VbVdZNS1
+	 3lxRSHB4P5i6uHaWTTF9/siyJfhHw3C/oTbPw69MuRMbeIUt8waYh7c1NAyYXMmTXh
+	 kztlCzsyK8peHsTcgOtfLEQjr95dM4FFsHkuv2ksVB0xyGcWck5JEoiTJh3qvJV4KN
+	 vT//YY6rN35RQcIx9475MfeyxgGwzEil7bZgHBmcIxeNVj4SP3gPVsA91PV+gc4Qt3
+	 3jbaWIGczQl8A==
+Date: Tue, 1 Jul 2025 13:24:09 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Abhijit Gangurde <abhijit.gangurde@amd.com>
+Cc: shannon.nelson@amd.com, brett.creeley@amd.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	corbet@lwn.net, jgg@ziepe.ca, andrew+netdev@lunn.ch,
+	allen.hubbe@amd.com, nikhil.agarwal@amd.com,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Andrew Boyer <andrew.boyer@amd.com>
+Subject: Re: [PATCH v3 09/14] RDMA/ionic: Create device queues to support
+ admin operations
+Message-ID: <20250701102409.GA118736@unreal>
+References: <20250624121315.739049-1-abhijit.gangurde@amd.com>
+ <20250624121315.739049-10-abhijit.gangurde@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [patch 0/3] ptp: Provide support for auxiliary clocks for
- PTP_SYS_OFFSET_EXTENDED
-To: Thomas Gleixner <tglx@linutronix.de>, LKML <linux-kernel@vger.kernel.org>
-Cc: netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>,
- Christopher Hall <christopher.s.hall@intel.com>,
- John Stultz <jstultz@google.com>, Frederic Weisbecker <frederic@kernel.org>,
- Anna-Maria Behnsen <anna-maria@linutronix.de>,
- Miroslav Lichvar <mlichvar@redhat.com>,
- Werner Abt <werner.abt@meinberg-usa.com>,
- David Woodhouse <dwmw2@infradead.org>, Stephen Boyd <sboyd@kernel.org>,
- =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
- Kurt Kanzenbach <kurt@linutronix.de>, Nam Cao <namcao@linutronix.de>,
- Antoine Tenart <atenart@kernel.org>
-References: <20250626124327.667087805@linutronix.de>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250626124327.667087805@linutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250624121315.739049-10-abhijit.gangurde@amd.com>
 
-On 6/26/25 3:27 PM, Thomas Gleixner wrote:
-> This small series enables support for auxiliary clocks on top of the
-> timekeeping core infrastructure, which has been paritially merged. The
-> remaining outstanding patches can be found here:
+On Tue, Jun 24, 2025 at 05:43:10PM +0530, Abhijit Gangurde wrote:
+> Setup RDMA admin queues using device command exposed over
+> auxiliary device and manage these queues using ida.
 > 
->      https://lore.kernel.org/all/20250625182951.587377878@linutronix.de
+> Co-developed-by: Andrew Boyer <andrew.boyer@amd.com>
+> Signed-off-by: Andrew Boyer <andrew.boyer@amd.com>
+> Co-developed-by: Allen Hubbe <allen.hubbe@amd.com>
+> Signed-off-by: Allen Hubbe <allen.hubbe@amd.com>
+> Signed-off-by: Abhijit Gangurde <abhijit.gangurde@amd.com>
+> ---
+> v2->v3
+>   - Fixed lockdep warning
+>   - Used IDA for resource id allocation
+>   - Removed rw locks around xarrays
 > 
-> Auxiliary clocks are required to support TSN use cases in automation,
-> automotive, audio and other areas. They utilize PTP for synchronizing nodes
-> in a network accurately, but the underlying master clock is not necessarily
-> related to clock TAI. They are completely independent and just represent a
-> common notion of time in a network for an application specific
-> purpose. This comes with problems obvioulsy:
-> 
->    1) Applications have no fast access to the time of such independent PTP
->       clocks. The only way is to utilize the file descriptor of the PTP
->       device with clock_gettime(). That's slow as it has to go all the way
->       out to the hardware.
-> 
->    2) The network stack cannot access PTP time at all because accessing the
->       PTP hardware requires preemptible task context in quite some cases.
-> 
-> The timekeeper core changes provide support for this including the ability
-> to steer these clocks independently from the core timekeeper via
-> clock_adjtimex(2).
-> 
-> This is obviously incomplete as the user space steering daemon needs to be
-> able to correlate timestamps from these auxiliary clocks with the
-> associated PTP device timestamp. The PTP_SYS_OFFSET_EXTENDED IOCTL command
-> already supports to select clock IDs for pre and post hardware timestamps,
-> so the first step for correlation is to extend that IOCTL to allow
-> selecting auxiliary clocks.
-> 
-> Auxiliary clocks do not provide a seperate CLOCK_MONOTONIC_RAW variant as
-> they are internally utilizing the same clocksource and therefore the
-> existing CLOCK_MONOTONIC_RAW correlation is valid for them too, if user
-> space wants to determine the correlation to the underlying clocksource raw
-> initial conversion factor:
-> 
-> CLOCK_MONOTONIC_RAW:
-> 
->   The clocksource readout is converted to nanoseconds by a conversion
->   factor, which has been determined at setup time. This factor does not
->   change over the lifetime of the system.
-> 
-> CLOCK_REALTIME, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_TAI:
-> 
->   The clocksource readout is converted to nanoseconds by a conversion
->   factor, which starts with the CLOCK_MONOTONIC_RAW conversion factor at
->   setup time. This factor can be steered via clock_adjtimex(CLOCK_REALTIME).
-> 
->   All related clocks use the same conversion factor and internally these
->   clocks are built on top of CLOCK_MONOTONIC by adding a clock specific
->   offset after the conversion. The CLOCK_REALTIME and CLOCK_TAI offsets can
->   be set via clock_settime(2) or clock_adjtimex(2). The CLOCK_BOOTTIME
->   offset is modified after a suspend/resume cycle to take the suspend time
->   into account.
-> 
-> CLOCK_AUX:
-> 
->   The clocksource readout is converted to nanoseconds by a conversion
->   factor, which starts with the CLOCK_MONOTONIC_RAW conversion factor at
->   setup time. This factor can be steered via clock_adjtimex(CLOCK_AUX[n]).
-> 
->   Each auxiliary clock uses its own conversion factor and offset. The
->   offset can be set via clock_settime(2) or clock_adjtimex(2) for each
->   clock ID.
-> 
-> The series applies on top of the above mentioned timekeeper core changes
-> and the PTP character device spring cleaning series, which can be found
-> here:
-> 
->   https://lore.kernel.org/all/20250625114404.102196103@linutronix.de
-> 
-> It is also available via git with all prerequisite patches:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/tglx/devel.git timers/ptp/driver-auxclock
-> 
-> Miroslav: This branch should enable you to test the actual steering via a
-> 	  PTP device which has PTP_SYS_OFFSET_EXTENDED support in the driver.
+>  drivers/infiniband/hw/ionic/ionic_admin.c     | 1169 +++++++++++++++++
+>  .../infiniband/hw/ionic/ionic_controlpath.c   |  184 +++
+>  drivers/infiniband/hw/ionic/ionic_fw.h        |  164 +++
+>  drivers/infiniband/hw/ionic/ionic_ibdev.c     |   56 +
+>  drivers/infiniband/hw/ionic/ionic_ibdev.h     |  225 ++++
+>  drivers/infiniband/hw/ionic/ionic_pgtbl.c     |  113 ++
+>  drivers/infiniband/hw/ionic/ionic_queue.c     |   52 +
+>  drivers/infiniband/hw/ionic/ionic_queue.h     |  234 ++++
+>  drivers/infiniband/hw/ionic/ionic_res.h       |  154 +++
+>  9 files changed, 2351 insertions(+)
+>  create mode 100644 drivers/infiniband/hw/ionic/ionic_admin.c
+>  create mode 100644 drivers/infiniband/hw/ionic/ionic_controlpath.c
+>  create mode 100644 drivers/infiniband/hw/ionic/ionic_fw.h
+>  create mode 100644 drivers/infiniband/hw/ionic/ionic_pgtbl.c
+>  create mode 100644 drivers/infiniband/hw/ionic/ionic_queue.c
+>  create mode 100644 drivers/infiniband/hw/ionic/ionic_queue.h
+>  create mode 100644 drivers/infiniband/hw/ionic/ionic_res.h
 
-I have some dumb issues merging this on net-next.
+<...>
 
-It looks like we should pull from the above URL, but it looks like the
-prereq series there has different hashes WRT the tip tree. Pulling from
-there will cause good bunch of duplicate commits - the pre-req series vs
-the tip tree and the ptp cleanup series vs already merge commits on
-net-next.
+> +static void ionic_admin_timedout(struct ionic_aq *aq)
+> +{
+> +	struct ionic_cq *cq = &aq->vcq->cq[0];
+> +	struct ionic_ibdev *dev = aq->dev;
+> +	unsigned long irqflags;
+> +	u16 pos;
+> +
+> +	spin_lock_irqsave(&aq->lock, irqflags);
+> +	if (ionic_queue_empty(&aq->q))
+> +		goto out;
+> +
+> +	/* Reset ALL adminq if any one times out */
+> +	if (aq->admin_state < IONIC_ADMIN_KILLED)
+> +		queue_work(ionic_evt_workq, &dev->reset_work);
+> +
+> +	ibdev_err(&dev->ibdev, "admin command timed out, aq %d\n", aq->aqid);
+> +
+> +	ibdev_warn(&dev->ibdev, "admin timeout was set for %ums\n",
+> +		   (u32)jiffies_to_msecs(IONIC_ADMIN_TIMEOUT));
+> +	ibdev_warn(&dev->ibdev, "admin inactivity for %ums\n",
+> +		   (u32)jiffies_to_msecs(jiffies - aq->stamp));
+> +
+> +	ibdev_warn(&dev->ibdev, "admin commands outstanding %u\n",
+> +		   ionic_queue_length(&aq->q));
+> +	ibdev_warn(&dev->ibdev, "%s more commands pending\n",
+> +		   list_empty(&aq->wr_post) ? "no" : "some");
+> +
+> +	pos = cq->q.prod;
+> +
+> +	ibdev_warn(&dev->ibdev, "admin cq pos %u (next to complete)\n", pos);
+> +	print_hex_dump(KERN_WARNING, "cqe ", DUMP_PREFIX_OFFSET, 16, 1,
+> +		       ionic_queue_at(&cq->q, pos),
+> +		       BIT(cq->q.stride_log2), true);
+> +
+> +	pos = (pos - 1) & cq->q.mask;
+> +
+> +	ibdev_warn(&dev->ibdev, "admin cq pos %u (last completed)\n", pos);
+> +	print_hex_dump(KERN_WARNING, "cqe ", DUMP_PREFIX_OFFSET, 16, 1,
+> +		       ionic_queue_at(&cq->q, pos),
+> +		       BIT(cq->q.stride_log2), true);
+> +
+> +	pos = aq->q.cons;
+> +
+> +	ibdev_warn(&dev->ibdev, "admin pos %u (next to complete)\n", pos);
+> +	print_hex_dump(KERN_WARNING, "cmd ", DUMP_PREFIX_OFFSET, 16, 1,
+> +		       ionic_queue_at(&aq->q, pos),
+> +		       BIT(aq->q.stride_log2), true);
+> +
+> +	pos = (aq->q.prod - 1) & aq->q.mask;
+> +	if (pos == aq->q.cons)
+> +		goto out;
+> +
+> +	ibdev_warn(&dev->ibdev, "admin pos %u (last posted)\n", pos);
+> +	print_hex_dump(KERN_WARNING, "cmd ", DUMP_PREFIX_OFFSET, 16, 1,
+> +		       ionic_queue_at(&aq->q, pos),
+> +		       BIT(aq->q.stride_log2), true);
+> +
+> +out:
+> +	spin_unlock_irqrestore(&aq->lock, irqflags);
+> +}
 
-I guess we want to avoid such duplicates, but I don't see how to avoid
-all of them. A stable branch on top of current net-next will avoid the
-ptp cleanup series duplicates, but will not avoid duplicates for
-prereqs. Am I missing something obvious?
+Please reduce number of debug prints. You are supposed to send driver
+that works and not for the debug session.
 
-Thanks,
+> +
+> +static void ionic_admin_reset_dwork(struct ionic_ibdev *dev)
+> +{
+> +	if (atomic_read(&dev->admin_state) >= IONIC_ADMIN_KILLED)
+> +		return;
 
-Paolo
+<...>
 
+> +	if (aq->admin_state >= IONIC_ADMIN_KILLED)
+> +		return;
+
+<...>
+
+> +	ibdev_dbg(&dev->ibdev, "poll admin cq %u prod %u\n",
+> +		  cq->cqid, cq->q.prod);
+> +	print_hex_dump_debug("cqe ", DUMP_PREFIX_OFFSET, 16, 1,
+> +			     qcqe, BIT(cq->q.stride_log2), true);
+
+We have restrack to print CQE and other objects, please use it.
+
+> +	*cqe = qcqe;
+> +
+> +	return true;
+> +}
+> +
+> +static void ionic_admin_poll_locked(struct ionic_aq *aq)
+> +{
+> +	struct ionic_cq *cq = &aq->vcq->cq[0];
+> +	struct ionic_admin_wr *wr, *wr_next;
+> +	struct ionic_ibdev *dev = aq->dev;
+> +	u32 wr_strides, avlbl_strides;
+> +	struct ionic_v1_cqe *cqe;
+> +	u32 qtf, qid;
+> +	u16 old_prod;
+> +	u8 type;
+> +
+> +	lockdep_assert_held(&aq->lock);
+> +
+> +	if (aq->admin_state >= IONIC_ADMIN_KILLED) {
+
+IONIC_ADMIN_KILLED is the last, there is no ">" option.
+
+> +		list_for_each_entry_safe(wr, wr_next, &aq->wr_prod, aq_ent) {
+> +			INIT_LIST_HEAD(&wr->aq_ent);
+> +			aq->q_wr[wr->status].wr = NULL;
+> +			wr->status = aq->admin_state;
+> +			complete_all(&wr->work);
+> +		}
+> +		INIT_LIST_HEAD(&aq->wr_prod);
+
+<...>
+
+> +	if (do_reset)
+> +		/* Reset device on a timeout */
+> +		ionic_admin_timedout(bad_aq);
+
+I wonder why RDMA driver resets device and not the one who owns PCI.
+
+> +	else if (do_reschedule)
+> +		/* Try to poll again later */
+> +		ionic_admin_reset_dwork(dev);
+> +}
+
+<...>
+
+> +	vcq = kzalloc(sizeof(*vcq), GFP_KERNEL);
+> +	if (!vcq) {
+> +		rc = -ENOMEM;
+> +		goto err_alloc;
+> +	}
+> +
+> +	vcq->ibcq.device = &dev->ibdev;
+> +	vcq->ibcq.uobject = NULL;
+
+1. There is no need in explicit NULL here, vcq was allocated with kzalloc()
+2. Maybe rdma_zalloc_drv_obj() should be used here.
+
+> +	vcq->ibcq.comp_handler = ionic_rdma_admincq_comp;
+> +	vcq->ibcq.event_handler = ionic_rdma_admincq_event;
+> +	vcq->ibcq.cq_context = NULL;
+> +	atomic_set(&vcq->ibcq.usecnt, 0);
+
+<...>
+
+> +	aq->admin_state = IONIC_ADMIN_KILLED;
+
+<...>
+
+> +	old_state = atomic_cmpxchg(&dev->admin_state, IONIC_ADMIN_ACTIVE,
+> +				   IONIC_ADMIN_PAUSED);
+> +	if (old_state != IONIC_ADMIN_ACTIVE)
+
+In all these places you are mixing enum_admin_state and atomic_t for
+same values, but different variable. Please chose or atomic_t or enum.
+
+> +		return;
+> +
+> +	/* Pause all the AQs */
+> +	local_irq_save(irqflags);
+> +	for (i = 0; i < dev->lif_cfg.aq_count; i++) {
+> +		struct ionic_aq *aq = dev->aq_vec[i];
+> +
+> +		spin_lock(&aq->lock);
+> +		/* pause rdma admin queues to reset device */
+> +		if (aq->admin_state == IONIC_ADMIN_ACTIVE)
+> +			aq->admin_state = IONIC_ADMIN_PAUSED;
+> +		spin_unlock(&aq->lock);
+> +	}
+> +	local_irq_restore(irqflags);
+> +
+> +	rc = ionic_rdma_reset_devcmd(dev);
+> +	if (unlikely(rc)) {
+> +		ibdev_err(&dev->ibdev, "failed to reset rdma %d\n", rc);
+> +		ionic_request_rdma_reset(dev->lif_cfg.lif);
+> +	}
+> +
+> +	ionic_kill_ibdev(dev, fatal_path);
+> +}
+
+<...>
+
+> +static void ionic_cq_event(struct ionic_ibdev *dev, u32 cqid, u8 code)
+> +{
+> +	struct ib_event ibev;
+> +	struct ionic_cq *cq;
+> +
+> +	rcu_read_lock();
+> +	cq = xa_load(&dev->cq_tbl, cqid);
+> +	if (cq)
+> +		kref_get(&cq->cq_kref);
+> +	rcu_read_unlock();
+
+What and how does this RCU protect?
+
+> +
+> +	if (!cq) {
+
+Is it possible?
+
+> +		ibdev_dbg(&dev->ibdev,
+> +			  "missing cqid %#x code %u\n", cqid, code);
+> +		return;
+> +	}
+
+<...>
+
+>  module_init(ionic_mod_init);
+> diff --git a/drivers/infiniband/hw/ionic/ionic_ibdev.h b/drivers/infiniband/hw/ionic/ionic_ibdev.h
+> index e13adff390d7..e7563c0429fc 100644
+> --- a/drivers/infiniband/hw/ionic/ionic_ibdev.h
+> +++ b/drivers/infiniband/hw/ionic/ionic_ibdev.h
+> @@ -4,18 +4,243 @@
+>  #ifndef _IONIC_IBDEV_H_
+>  #define _IONIC_IBDEV_H_
+>  
+> +#include <rdma/ib_umem.h>
+>  #include <rdma/ib_verbs.h>
+> +
+>  #include <ionic_api.h>
+> +#include <ionic_regs.h>
+> +
+> +#include "ionic_fw.h"
+> +#include "ionic_queue.h"
+> +#include "ionic_res.h"
+>  
+>  #include "ionic_lif_cfg.h"
+>  
+> +#define DRIVER_NAME		"ionic_rdma"
+
+It is KBUILD_MODNAME, please use it.
+
+> +#define DRIVER_SHORTNAME	"ionr"
+> +
+>  #define IONIC_MIN_RDMA_VERSION	0
+>  #define IONIC_MAX_RDMA_VERSION	2
+
+Nothing from the above is applicable to upstream code.
+
+Thanks
 
