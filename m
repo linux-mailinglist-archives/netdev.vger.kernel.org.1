@@ -1,484 +1,151 @@
-Return-Path: <netdev+bounces-203050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49A32AF0684
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 00:24:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0222AF0686
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 00:26:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D798644721D
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 22:24:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7093445361
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 22:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 032A1302CC6;
-	Tue,  1 Jul 2025 22:24:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04822FE365;
+	Tue,  1 Jul 2025 22:26:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Okf35a/m"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="2SW0JO/Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35BF2857FC
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 22:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B1B288C17
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 22:26:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751408654; cv=none; b=d+tWXq+MzST4BQedwXgtTRmK8HGxJkTEOAK+NtF2YT7G1VBpX//ghE/hROsVKoz4AfZeBqjRLRH/t1j1jmoLKLbUR1QDOoZAg2e7Hiv0mNnywcFNfbvFMCUEz2zC2ha6m8JlzhZu0v/7j69kw09FacWYjaLFx/lV/eVlnVuaaJA=
+	t=1751408772; cv=none; b=UyYR1rakND5Zo3s03hQOJuQ8RJFbbsujGwsriffiyFnQO2bY3EgWmE8E0HjHo8Bx1izMTpTLq/ax+jl9JBmBjVdRVgQWvyzxDcIxV0J5pYtxLyu9z9wYCT5ne6Jdz7T9BDtP+MGZBaMcuVHjGuPSsLHeYhrp1kjddM1L5gDHNTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751408654; c=relaxed/simple;
-	bh=ioy5WpVEp/hb8T6iEC04eOhiEoRTknTmHlH1RErJhSA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=F6n41iigTWvp0NGXgexmoeip5mN/cBXtROrZZSupD6LeIHYIuyuhflY0l2Nx4Z9/iVVLcaTyWJpSw4CkHIWc+DXS2m2P3S12/v71VznBfjU/RTB50XpF+3FemUVOHH1/DT6fDifqIUzo0L+oX4uuqLqFVh7BlZwLWiTqdfRX9vE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Okf35a/m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57E10C4CEEB;
-	Tue,  1 Jul 2025 22:24:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751408654;
-	bh=ioy5WpVEp/hb8T6iEC04eOhiEoRTknTmHlH1RErJhSA=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Okf35a/mQap60A5U4aGk0h3/lRltBMzwOGvBvd116Hyooe7LVIEziA6titUvfFX0D
-	 vc1lsMBFf7ddFWIBP3XDTbtPmCfrZrpORV8o2YPs+Ai6OfQleizVBtSNvPfjMf1Thg
-	 3EODJyfYmWHtm9ws71plEJDXtt+0FeKmASk7G/xZc1QCQEQoSSqXQuZNdAWvtpXyS9
-	 rqe5QkInDnklWMkgUsAZfp/8FWu2/Y85kKx64ZMZGXr9/8BkbpL1PnS4I6qPZO3PZn
-	 9ST9nOdKUOm66A9DFD/b/s6Wq+iyOrk11PWAiSo7/cgs1zWVlzjtBr2WHMAgg+caaH
-	 xM/Yjcgwi7RLA==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Wed, 02 Jul 2025 00:23:35 +0200
-Subject: [PATCH net-next 6/6] net: airoha: Add airoha_offload.h header
+	s=arc-20240116; t=1751408772; c=relaxed/simple;
+	bh=S7um119OlGEp+L1DpTv7Q2BzznTSM4uwD3vtSqsIPjY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WvyP8iirmfEtAk+/3ONOWbXRlGlKgvOj0IHHe6ahotxMvuNpzQEd+yir+Hq5I8C9lb8BDZj0rgCsFlwtBSn8dRPMXhRT1SvdQ9gI9ksBK7E9hL1N8Z50J66Don4twFuBtBj4jKWTRDVTZnV59U0D9O1PtdSAn+niar4/RAYUaJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=2SW0JO/Y; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-234c5b57557so37375655ad.3
+        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 15:26:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1751408769; x=1752013569; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eZ0FtMh8plkQ6cBwz5EDQ1RWIaCqoL7pfct627Zqe18=;
+        b=2SW0JO/YKHKJ49qdqpG05BZdL70u9J6zoU69i9GcFCQUCh0+1wJdcvkB0wd69Z65gB
+         sNSLuI5PaNtrsw2QjPWN7yi5bTBZr/spdty8UhTH3nuK9Ho8merH2pDmgl+azqLKOk05
+         pmLy5AwZpDRO4SmHfpzaNAsfSJTtA1atL+fMDMUuF29B+7SLboRjlXSI4UbaOo+DfVt2
+         ORyfZXIj8LRqQ8qDc/M8tBnVUxR8ii2K4jbgR9IQDoIbMVqDgF7NFq5vOzKFCal0g4mK
+         cstHQ9nOmRWyJA/xsocYGtKAWqA/RYtgpGvRH1fUv490n2azttJkJ5l7zCSmrpJMObP2
+         a55Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751408769; x=1752013569;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eZ0FtMh8plkQ6cBwz5EDQ1RWIaCqoL7pfct627Zqe18=;
+        b=oPXfGOUvZPw6Gbq3Ofjhe4umKNMKeMmkSOtXslB1/GhzOPaj+2O4CyaYxg//Esmucu
+         GJgK8TbzAcGQtq80Sbh/qnaCl7Al5/hTCe9jE7hAnsuUFy9ky3oFda5RVU2QCiV5F6sJ
+         oSu7Xfbq710Qk6efDJSzvp68+v3w/u8RnmiCeWstkcpRYUAEboJXSlDWfwS+TGNj1DzM
+         YD/8OMdZZm2R95raAMPGAZSzsIJlFeUQB990C1+qA4PugmbultNX+N0l01I38jTHLURP
+         j3lmnddHdJB7RKjj0zRZNBij5aBl9TCEyALk6WbaUefiOPKf8wvH2kBTBqT63N4+9rG/
+         kEug==
+X-Gm-Message-State: AOJu0YwNj6FZLCixvcTa85wpihuAMN9matd/yh6Mu5wf4su4ivxnXddf
+	MKuebEALvgPEZDFQ6kKSu5sPi+NythoBykEYAZtvNhOEFoKM1unbLmUggzMP+IZTEnk=
+X-Gm-Gg: ASbGnctxxM9FWzSt/DKuPYO/u23UMfp0eGQh0cT6n5nptpPs6yd0w/Wpg3Zdw1G2yQd
+	mJCu25T//MK9bOGxXZ/sa+yrkrASeg7DjJeHBL0EN0rct/SRk/a+SQaxU43gweDHvCIAmUxu4CJ
+	LtoXkstWQfG0FXn/HeIPsrdzaCjFaVHdxolaYlyjlueMjF7029Oat7UhOaKIDM1FySPjwvwVXAP
+	FayHTYwTHOVXRIpE23dpGjZQeY1+/O4LWAgw5N5gByE7gdNGienKDfBp5Y8eO56nZYUmGWEsB5E
+	SiVJgD08Acgy23hpVkAfU153poPbhWc/e/8QCgIyK6VhUjy73y2rlNicylxc05FQuoXyYfpWerO
+	KCPqvZRJg9qrlTgjg12gZoL5a
+X-Google-Smtp-Source: AGHT+IG2GZC/wIK2IRgxEjaLzVJYUtHtJXmpJX/0sP6DRQsY+cqN7gpywPgJgreiqH8gwDqme/WlgA==
+X-Received: by 2002:a17:903:46c8:b0:235:1171:6d1d with SMTP id d9443c01a7336-23c6e49117cmr6380065ad.9.1751408769513;
+        Tue, 01 Jul 2025 15:26:09 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1156:1:14f8:5a41:7998:a806? ([2620:10d:c090:500::6:a23e])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb3adeabsm109580385ad.159.2025.07.01.15.26.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Jul 2025 15:26:09 -0700 (PDT)
+Message-ID: <e87a5ba3-956e-401e-9a1e-fc40dadf3d87@davidwei.uk>
+Date: Tue, 1 Jul 2025 15:26:07 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] netdevsim: implement peer queue flow control
+To: Breno Leitao <leitao@debian.org>, Jakub Kicinski <kuba@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com
+References: <20250701-netdev_flow_control-v1-1-240329fc91b1@debian.org>
+Content-Language: en-US
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20250701-netdev_flow_control-v1-1-240329fc91b1@debian.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250702-airoha-en7581-wlan-offlaod-v1-6-803009700b38@kernel.org>
-References: <20250702-airoha-en7581-wlan-offlaod-v1-0-803009700b38@kernel.org>
-In-Reply-To: <20250702-airoha-en7581-wlan-offlaod-v1-0-803009700b38@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
 
-Move NPU definitions to airoha_offload.h in include/linux/soc/airoha/ in
-order to allow the MT76 driver to access the callback definitions.
+On 2025-07-01 11:10, Breno Leitao wrote:
+> Add flow control mechanism between paired netdevsim devices to stop the
+> TX queue during high traffic scenarios. When a receive queue becomes
+> congested (approaching NSIM_RING_SIZE limit), the corresponding transmit
+> queue on the peer device is stopped using netif_subqueue_try_stop().
+> 
+> Once the receive queue has sufficient capacity again, the peer's
+> transmit queue is resumed with netif_tx_wake_queue().
+> 
+> Key changes:
+>    * Add nsim_stop_peer_tx_queue() to pause peer TX when RX queue is full
+>    * Add nsim_start_peer_tx_queue() to resume peer TX when RX queue drains
+>    * Implement queue mapping validation to ensure TX/RX queue count match
+>    * Wake all queues during device unlinking to prevent stuck queues
+>    * Use RCU protection when accessing peer device references
+> 
+> The flow control only activates when devices have matching TX/RX queue
+> counts to ensure proper queue mapping.
+> 
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+>   drivers/net/netdevsim/bus.c    | 16 +++++++++++
+>   drivers/net/netdevsim/netdev.c | 62 ++++++++++++++++++++++++++++++++++++++++--
+>   2 files changed, 76 insertions(+), 2 deletions(-)
+> 
+[...]> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+> index e36d3e846c2dc..43f31bc134b0a 100644
+> --- a/drivers/net/netdevsim/netdev.c
+> +++ b/drivers/net/netdevsim/netdev.c
+> @@ -351,6 +406,9 @@ static int nsim_rcv(struct nsim_rq *rq, int budget)
+>   			dev_dstats_rx_dropped(dev);
+>   	}
+>   
+> +	rcu_read_lock();
+> +	nsim_start_peer_tx_queue(dev, rq);
+> +	rcu_read_unlock();
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_npu.c  |   2 +-
- drivers/net/ethernet/airoha/airoha_npu.h  |  65 -------
- drivers/net/ethernet/airoha/airoha_ppe.c  |   2 +-
- include/linux/soc/airoha/airoha_offload.h | 295 ++++++++++++++++++++++++++++++
- 4 files changed, 297 insertions(+), 67 deletions(-)
+Could the rcu_read_{un}lock() be moved into the
+nsim_start/stop_peer_tx_queue() functions to keep it together with
+rcu_dereference()?
 
-diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
-index 3e30cd424085d882aad98a0e751743de73f135fe..46cc3598defa409f0465de0362883ec0e59280fc 100644
---- a/drivers/net/ethernet/airoha/airoha_npu.c
-+++ b/drivers/net/ethernet/airoha/airoha_npu.c
-@@ -11,9 +11,9 @@
- #include <linux/of_platform.h>
- #include <linux/of_reserved_mem.h>
- #include <linux/regmap.h>
-+#include <linux/soc/airoha/airoha_offload.h>
- 
- #include "airoha_eth.h"
--#include "airoha_npu.h"
- 
- #define NPU_EN7581_FIRMWARE_DATA		"airoha/en7581_npu_data.bin"
- #define NPU_EN7581_FIRMWARE_RV32		"airoha/en7581_npu_rv32.bin"
-diff --git a/drivers/net/ethernet/airoha/airoha_npu.h b/drivers/net/ethernet/airoha/airoha_npu.h
-deleted file mode 100644
-index 19cfc6b7fb52f4a176d91c7b39383b4c3e13d777..0000000000000000000000000000000000000000
---- a/drivers/net/ethernet/airoha/airoha_npu.h
-+++ /dev/null
-@@ -1,65 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0-only */
--/*
-- * Copyright (c) 2025 AIROHA Inc
-- * Author: Lorenzo Bianconi <lorenzo@kernel.org>
-- */
--
--#define NPU_NUM_CORES		8
--#define NPU_NUM_IRQ		6
--
--struct airoha_npu {
--	struct device *dev;
--	struct regmap *regmap;
--
--	struct airoha_npu_core {
--		struct airoha_npu *npu;
--		/* protect concurrent npu memory accesses */
--		spinlock_t lock;
--		struct work_struct wdt_work;
--	} cores[NPU_NUM_CORES];
--
--	int irqs[NPU_NUM_IRQ];
--
--	struct airoha_foe_stats __iomem *stats;
--
--	struct {
--		int (*ppe_init)(struct airoha_npu *npu);
--		int (*ppe_deinit)(struct airoha_npu *npu);
--		int (*ppe_flush_sram_entries)(struct airoha_npu *npu,
--					      dma_addr_t foe_addr,
--					      int sram_num_entries);
--		int (*ppe_foe_commit_entry)(struct airoha_npu *npu,
--					    dma_addr_t foe_addr,
--					    u32 entry_size, u32 hash,
--					    bool ppe2);
--		int (*wlan_init_reserved_memory)(struct airoha_npu *npu);
--		int (*wlan_set_txrx_reg_addr)(struct airoha_npu *npu,
--					      int ifindex, u32 dir,
--					      u32 in_counter_addr,
--					      u32 out_status_addr,
--					      u32 out_counter_addr);
--		int (*wlan_set_pcie_port_type)(struct airoha_npu *npu,
--					       int ifindex, u32 port_type);
--		int (*wlan_set_pcie_addr)(struct airoha_npu *npu, int ifindex,
--					  u32 addr);
--		int (*wlan_set_desc)(struct airoha_npu *npu, int ifindex,
--				     u32 desc);
--		int (*wlan_set_tx_ring_pcie_addr)(struct airoha_npu *npu,
--						  int ifindex, u32 addr);
--		int (*wlan_get_rx_desc_base)(struct airoha_npu *npu,
--					     int ifindex, u32 *data);
--		int (*wlan_set_tx_buf_space_base)(struct airoha_npu *npu,
--						  int ifindex, u32 addr);
--		int (*wlan_set_rx_ring_for_txdone)(struct airoha_npu *npu,
--						   int ifindex, u32 addr);
--		u32 (*wlan_get_queue_addr)(struct airoha_npu *npu, int qid,
--					   bool xmit);
--		void (*wlan_set_irq_status)(struct airoha_npu *npu, u32 val);
--		u32 (*wlan_get_irq_status)(struct airoha_npu *npu, int q);
--		void (*wlan_enable_irq)(struct airoha_npu *npu, int q);
--		void (*wlan_disable_irq)(struct airoha_npu *npu, int q);
--	} ops;
--};
--
--struct airoha_npu *airoha_npu_get(struct device *dev, dma_addr_t *stats_addr);
--void airoha_npu_put(struct airoha_npu *npu);
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index c354d536bc66e97ab853792e4ab4273283d2fb91..5d12bde6b20a89b3037ae4405b383d75307e8239 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -7,10 +7,10 @@
- #include <linux/ip.h>
- #include <linux/ipv6.h>
- #include <linux/rhashtable.h>
-+#include <linux/soc/airoha/airoha_offload.h>
- #include <net/ipv6.h>
- #include <net/pkt_cls.h>
- 
--#include "airoha_npu.h"
- #include "airoha_regs.h"
- #include "airoha_eth.h"
- 
-diff --git a/include/linux/soc/airoha/airoha_offload.h b/include/linux/soc/airoha/airoha_offload.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..d2353da154d7ab1ae97901a46062ef49fcefa74d
---- /dev/null
-+++ b/include/linux/soc/airoha/airoha_offload.h
-@@ -0,0 +1,295 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (c) 2025 AIROHA Inc
-+ * Author: Lorenzo Bianconi <lorenzo@kernel.org>
-+ */
-+#ifndef AIROHA_OFFLOAD_H
-+#define AIROHA_OFFLOAD_H
-+
-+#define NPU_NUM_CORES		8
-+#define NPU_NUM_IRQ		6
-+#define NPU_RX0_DESC_NUM	512
-+#define NPU_RX1_DESC_NUM	512
-+
-+/* CTRL */
-+#define NPU_RX_DMA_DESC_LAST_MASK	BIT(29)
-+#define NPU_RX_DMA_DESC_LEN_MASK	GENMASK(28, 15)
-+#define NPU_RX_DMA_DESC_CUR_LEN_MASK	GENMASK(14, 1)
-+#define NPU_RX_DMA_DESC_DONE_MASK	BIT(0)
-+/* INFO */
-+#define NPU_RX_DMA_PKT_COUNT_MASK	GENMASK(31, 28)
-+#define NPU_RX_DMA_PKT_ID_MASK		GENMASK(28, 26)
-+#define NPU_RX_DMA_SRC_PORT_MASK	GENMASK(25, 21)
-+#define NPU_RX_DMA_CRSN_MASK		GENMASK(20, 16)
-+#define NPU_RX_DMA_FOE_ID_MASK		GENMASK(15, 0)
-+/* DATA */
-+#define NPU_RX_DMA_SID_MASK		GENMASK(31, 16)
-+#define NPU_RX_DMA_FRAG_TYPE_MASK	GENMASK(15, 14)
-+#define NPU_RX_DMA_PRIORITY_MASK	GENMASK(13, 10)
-+#define NPU_RX_DMA_RADIO_ID_MASK	GENMASK(9, 6)
-+#define NPU_RX_DMA_VAP_ID_MASK		GENMASK(5, 2)
-+#define NPU_RX_DMA_FRAME_TYPE_MASK	GENMASK(1, 0)
-+
-+struct airoha_npu_rx_dma_desc {
-+	u32 ctrl;
-+	u32 info;
-+	u32 data;
-+	u32 addr;
-+	u64 rsv;
-+} __packed;
-+
-+/* CTRL */
-+#define NPU_TX_DMA_DESC_SCHED_MASK	BIT(31)
-+#define NPU_TX_DMA_DESC_LEN_MASK	GENMASK(30, 18)
-+#define NPU_TX_DMA_DESC_VEND_LEN_MASK	GENMASK(17, 1)
-+#define NPU_TX_DMA_DESC_DONE_MASK	BIT(0)
-+
-+#define NPU_TXWI_LEN	192
-+
-+struct airoha_npu_tx_dma_desc {
-+	u32 ctrl;
-+	u32 addr;
-+	u64 rsv;
-+	u8 txwi[NPU_TXWI_LEN];
-+} __packed;
-+
-+struct airoha_npu {
-+#if (IS_BUILTIN(CONFIG_NET_AIROHA_NPU) || IS_MODULE(CONFIG_NET_AIROHA_NPU))
-+	struct device *dev;
-+	struct regmap *regmap;
-+
-+	struct airoha_npu_core {
-+		struct airoha_npu *npu;
-+		/* protect concurrent npu memory accesses */
-+		spinlock_t lock;
-+		struct work_struct wdt_work;
-+	} cores[NPU_NUM_CORES];
-+
-+	int irqs[NPU_NUM_IRQ];
-+
-+	struct airoha_foe_stats __iomem *stats;
-+
-+	struct {
-+		int (*ppe_init)(struct airoha_npu *npu);
-+		int (*ppe_deinit)(struct airoha_npu *npu);
-+		int (*ppe_flush_sram_entries)(struct airoha_npu *npu,
-+					      dma_addr_t foe_addr,
-+					      int sram_num_entries);
-+		int (*ppe_foe_commit_entry)(struct airoha_npu *npu,
-+					    dma_addr_t foe_addr,
-+					    u32 entry_size, u32 hash,
-+					    bool ppe2);
-+		int (*wlan_init_reserved_memory)(struct airoha_npu *npu);
-+		int (*wlan_set_txrx_reg_addr)(struct airoha_npu *npu,
-+					      int ifindex, u32 dir,
-+					      u32 in_counter_addr,
-+					      u32 out_status_addr,
-+					      u32 out_counter_addr);
-+		int (*wlan_set_pcie_port_type)(struct airoha_npu *npu,
-+					       int ifindex, u32 port_type);
-+		int (*wlan_set_pcie_addr)(struct airoha_npu *npu, int ifindex,
-+					  u32 addr);
-+		int (*wlan_set_desc)(struct airoha_npu *npu, int ifindex,
-+				     u32 desc);
-+		int (*wlan_set_tx_ring_pcie_addr)(struct airoha_npu *npu,
-+						  int ifindex, u32 addr);
-+		int (*wlan_get_rx_desc_base)(struct airoha_npu *npu,
-+					     int ifindex, u32 *data);
-+		int (*wlan_set_tx_buf_space_base)(struct airoha_npu *npu,
-+						  int ifindex, u32 addr);
-+		int (*wlan_set_rx_ring_for_txdone)(struct airoha_npu *npu,
-+						   int ifindex, u32 addr);
-+		u32 (*wlan_get_queue_addr)(struct airoha_npu *npu, int qid,
-+					   bool xmit);
-+		void (*wlan_set_irq_status)(struct airoha_npu *npu, u32 val);
-+		u32 (*wlan_get_irq_status)(struct airoha_npu *npu, int q);
-+		void (*wlan_enable_irq)(struct airoha_npu *npu, int q);
-+		void (*wlan_disable_irq)(struct airoha_npu *npu, int q);
-+	} ops;
-+#endif
-+};
-+
-+#if (IS_BUILTIN(CONFIG_NET_AIROHA_NPU) || IS_MODULE(CONFIG_NET_AIROHA_NPU))
-+struct airoha_npu *airoha_npu_get(struct device *dev, dma_addr_t *stats_addr);
-+void airoha_npu_put(struct airoha_npu *npu);
-+
-+static inline int airoha_npu_wlan_init_reserved_memory(struct airoha_npu *npu)
-+{
-+	return npu->ops.wlan_init_reserved_memory(npu);
-+}
-+
-+static inline int airoha_npu_wlan_set_txrx_reg_addr(struct airoha_npu *npu,
-+						    int ifindex, u32 dir,
-+						    u32 in_counter_addr,
-+						    u32 out_status_addr,
-+						    u32 out_counter_addr)
-+{
-+	return npu->ops.wlan_set_txrx_reg_addr(npu, ifindex, dir,
-+					       in_counter_addr,
-+					       out_status_addr,
-+					       out_counter_addr);
-+}
-+
-+static inline int airoha_npu_wlan_set_pcie_port_type(struct airoha_npu *npu,
-+						     int ifindex,
-+						     u32 port_type)
-+{
-+	return npu->ops.wlan_set_pcie_port_type(npu, ifindex, port_type);
-+}
-+
-+static inline int airoha_npu_wlan_set_pcie_addr(struct airoha_npu *npu,
-+						int ifindex, u32 addr)
-+{
-+	return npu->ops.wlan_set_pcie_addr(npu, ifindex, addr);
-+}
-+
-+static inline int airoha_npu_wlan_set_desc(struct airoha_npu *npu, int ifindex,
-+					   u32 desc)
-+{
-+	return npu->ops.wlan_set_desc(npu, ifindex, desc);
-+}
-+
-+static inline int airoha_npu_wlan_set_tx_ring_pcie_addr(struct airoha_npu *npu,
-+							int ifindex, u32 addr)
-+{
-+	return npu->ops.wlan_set_tx_ring_pcie_addr(npu, ifindex, addr);
-+}
-+
-+static inline int airoha_npu_wlan_get_rx_desc_base(struct airoha_npu *npu, int ifindex,
-+						   u32 *data)
-+{
-+	return npu->ops.wlan_get_rx_desc_base(npu, ifindex, data);
-+}
-+
-+static inline int airoha_npu_wlan_set_tx_buf_space_base(struct airoha_npu *npu,
-+							int ifindex, u32 addr)
-+{
-+	return npu->ops.wlan_set_tx_buf_space_base(npu, ifindex, addr);
-+}
-+
-+static inline int airoha_npu_wlan_set_rx_ring_for_txdone(struct airoha_npu *npu,
-+							 int ifindex, u32 addr)
-+{
-+	return npu->ops.wlan_set_rx_ring_for_txdone(npu, ifindex, addr);
-+}
-+
-+static inline u32 airoha_npu_wlan_get_queue_addr(struct airoha_npu *npu, int qid,
-+						 bool xmit)
-+{
-+	return npu->ops.wlan_get_queue_addr(npu, qid, xmit);
-+}
-+
-+static inline void airoha_npu_wlan_set_irq_status(struct airoha_npu *npu,
-+						  u32 val)
-+{
-+	npu->ops.wlan_set_irq_status(npu, val);
-+}
-+
-+static inline u32 airoha_npu_wlan_get_irq_status(struct airoha_npu *npu, int q)
-+{
-+	return npu->ops.wlan_get_irq_status(npu, q);
-+}
-+
-+static inline void airoha_npu_wlan_enable_irq(struct airoha_npu *npu, int q)
-+{
-+	npu->ops.wlan_enable_irq(npu, q);
-+}
-+
-+static inline void airoha_npu_wlan_disable_irq(struct airoha_npu *npu, int q)
-+{
-+	npu->ops.wlan_disable_irq(npu, q);
-+}
-+#else
-+static inline struct airoha_npu *airoha_npu_get(struct device *dev,
-+						dma_addr_t *foe_stats_addr)
-+{
-+	return NULL;
-+}
-+
-+static inline void airoha_npu_put(struct airoha_npu *npu)
-+{
-+}
-+
-+static inline int airoha_npu_wlan_init_reserved_memory(struct airoha_npu *npu)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int airoha_npu_wlan_set_txrx_reg_addr(struct airoha_npu *npu,
-+						    int ifindex, u32 dir,
-+						    u32 in_counter_addr,
-+						    u32 out_status_addr,
-+						    u32 out_counter_addr)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int airoha_npu_wlan_set_pcie_port_type(struct airoha_npu *npu,
-+						     int ifindex, u32 port_type)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int airoha_npu_wlan_set_pcie_addr(struct airoha_npu *npu,
-+						int ifindex, u32 addr)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int airoha_npu_wlan_set_desc(struct airoha_npu *npu, int ifindex,
-+					   u32 desc)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int airoha_npu_wlan_set_tx_ring_pcie_addr(struct airoha_npu *npu,
-+							int ifindex, u32 addr)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int airoha_npu_wlan_get_rx_desc_base(struct airoha_npu *npu,
-+						   int ifindex, u32 *data)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int airoha_npu_wlan_set_tx_buf_space_base(struct airoha_npu *npu,
-+							int ifindex, u32 addr)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int airoha_npu_wlan_set_rx_ring_for_txdone(struct airoha_npu *npu,
-+							 int ifindex, u32 addr)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline u32 airoha_npu_wlan_get_queue_addr(struct airoha_npu *npu,
-+						 int qid, bool xmit)
-+{
-+	return 0;
-+}
-+
-+static inline void airoha_npu_wlan_set_irq_status(struct airoha_npu *npu,
-+						  u32 val)
-+{
-+}
-+
-+static inline u32 airoha_npu_wlan_get_irq_status(struct airoha_npu *npu,
-+						 int q)
-+{
-+	return 0;
-+}
-+
-+static inline void airoha_npu_wlan_enable_irq(struct airoha_npu *npu, int q)
-+{
-+}
-+
-+static inline void airoha_npu_wlan_disable_irq(struct airoha_npu *npu, int q)
-+{
-+}
-+#endif
-+
-+#endif /* AIROHA_OFFLOAD_H */
-
--- 
-2.50.0
-
+>   	return i;
+>   }
+>   
+> 
+> ---
+> base-commit: f6e98f17ad6829c48573952ede3f52ed00c1377f
+> change-id: 20250630-netdev_flow_control-2b2d37965377
+> 
+> Best regards,
+> --
+> Breno Leitao <leitao@debian.org>
+> 
 
