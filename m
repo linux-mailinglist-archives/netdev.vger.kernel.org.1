@@ -1,78 +1,161 @@
-Return-Path: <netdev+bounces-203036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DC04AF0408
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 21:44:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F29AAF049A
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 22:18:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60A774A2F1C
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 19:44:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A55D71C06F1B
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 20:19:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 864C8242930;
-	Tue,  1 Jul 2025 19:44:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7F6263C6A;
+	Tue,  1 Jul 2025 20:17:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cd2qj/7M"
+	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="CBGlmTAS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [67.231.154.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628531E5B6D
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 19:44:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C261821660D;
+	Tue,  1 Jul 2025 20:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.154.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751399063; cv=none; b=KoZAvIw01pjc5eVHEdFxLuvHTMTKEiCs8KoMNkVts/Hy3wGT/hepcrnCi9gCsXrotNW5V1bSz0ssOIqpIRoW4n9BATQrcFHZEmOKvlSHTb//M+MCltdKON4Ke/qzahZZsxWzE74xb51CwIKo5FC254Q/r2RMvVb8igf7bHcUBxM=
+	t=1751401079; cv=none; b=OgF/j+v0cdmWAehWWa7YwS8zpYVpF5KUf3IIimp3DZrirZ+/hSem6MxmgEk8cMgKO0VMXyygGxu8UcUuoKQw+4v7FiSpfoBtYcEB12lfpkbPFzSgKYgnKzWp3Z01StOfm9aQ9nxPcfs4vudlxa7oP35AwA+mKsoFDfimz5xlgVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751399063; c=relaxed/simple;
-	bh=rOnItsWbwsqBZlNi7WNmPsFgwdDzG2ZNGlzI5qR99a8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p2DDQis9cv+vA/wQCBk4n6ds/UNjLLK1dSq5wF/TXnDQeMAsNDmSMU9YsaVXbaIvRnkuEI79sju4Y45fw2nXDSfKbh63VdTbdUy/t7HfDuXEcC8hG0lijeDlBv7V+bBn5Zi3MOqsVm0xmd7ZrQZITl8wtomo3f/+/QqGLStJhcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cd2qj/7M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42A38C4CEEB;
-	Tue,  1 Jul 2025 19:44:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751399062;
-	bh=rOnItsWbwsqBZlNi7WNmPsFgwdDzG2ZNGlzI5qR99a8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Cd2qj/7M0rfrLu+b4rXDwXMePQiw7FoB0PqfYOM62oCuUxZ78rJhYumJFD/eBlywT
-	 Iug39ilmsK/J35JCwRMig7Jp2pEYV+t19cOStuCdBY6j6y3qiu/PHmycXoIhXGCAgU
-	 qHZMgIdhUj+JnUHOCl9RLhmaD36c2Yc0tI1/Ad63j09VaUizkzg5fZKTvyMlLzl2oM
-	 9h0eynbkEZSauzGp3FLaXruQrTvfCsq4pKK/lWNVgfnBIfZnhLJZhBLM6V0yV/dWSK
-	 bxWGSmv+kYcwc3m4aSyG9mcwDnWsk9piF1Wt3x39SOodcaEyJrjc5eQSpBOwn88Pbs
-	 DgsSYedFB4BGg==
-Date: Tue, 1 Jul 2025 20:44:19 +0100
-From: Simon Horman <horms@kernel.org>
-To: Raju Rangoju <Raju.Rangoju@amd.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	Shyam-sundar.S-k@amd.com
-Subject: Re: [RESEND PATCH net-next v2] amd-xgbe: add support for giant
- packet size
-Message-ID: <20250701194419.GC41770@horms.kernel.org>
-References: <20250701121929.319690-1-Raju.Rangoju@amd.com>
+	s=arc-20240116; t=1751401079; c=relaxed/simple;
+	bh=XlitTrfvHOqrCzioarncmPUvFSxf/3wpOSSQGRNsKMw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aLRPsJ6U2mh4x8CgwVRBLuxodhUmoBjpJEDHEpGsUW5L+YtRts6RrYDIYnqYvDMMndg8OECCsTFkbH+J1iKhlOP7m7/WJMgaOYLjxCalaxQ0aB4W/f7VeAP90AoEP80gRDPzRDNInPBH2aysh4x01QUG+DVdgERitT7itLbGOQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=CBGlmTAS; arc=none smtp.client-ip=67.231.154.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
+X-Virus-Scanned: Proofpoint Essentials engine
+Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
+	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 3839D8000A5;
+	Tue,  1 Jul 2025 20:17:50 +0000 (UTC)
+Received: from [192.168.100.159] (unknown [50.251.239.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by mail3.candelatech.com (Postfix) with ESMTPSA id 0664D13C2B0;
+	Tue,  1 Jul 2025 13:17:46 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 0664D13C2B0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
+	s=default; t=1751401066;
+	bh=XlitTrfvHOqrCzioarncmPUvFSxf/3wpOSSQGRNsKMw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CBGlmTASTOuty4t+WUurGRVcJBMiOcvoyMnOKA9uHSeNB8/wqBR8qlzk26f3EhEr4
+	 SMTnHL17kLA8wwr5I8cx3GrIpUcRDdQNfi2AIDi1YAeYwa6Jn1b5h1LKh74FPyNUqG
+	 e7x0sxk+eoQ+D75S4eTiyC14iAnuH7YQK1LtWu4I=
+Message-ID: <65a4f2fe-7336-0116-6f32-4fcd2a8c4c72@candelatech.com>
+Date: Tue, 1 Jul 2025 13:17:45 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250701121929.319690-1-Raju.Rangoju@amd.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [DESIGN RFC] wifi: Robust AV streaming Design Proposal for AP
+Content-Language: en-US
+To: Ramanathan Choodamani <quic_rchoodam@quicinc.com>,
+ linux-wireless@vger.kernel.org
+Cc: netdev@vger.kernel.org, ath12k@lists.infradead.org
+References: <20250624205716.1052329-1-quic_rchoodam@quicinc.com>
+ <0bc6c957-a0c4-c0f7-ed37-c8b44852c26c@candelatech.com>
+ <4d87c56e-f198-4abf-a414-4b226178d164@quicinc.com>
+From: Ben Greear <greearb@candelatech.com>
+Organization: Candela Technologies
+In-Reply-To: <4d87c56e-f198-4abf-a414-4b226178d164@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-MDID: 1751401071-p7muVIt97cYT
+X-PPE-STACK: {"stack":"us5"}
+X-MDID-O:
+ us5;at1;1751401071;p7muVIt97cYT;<greearb@candelatech.com>;42e86d0922d5c97226149d09277a2a40
+X-PPE-TRUSTED: V=1;DIR=OUT;
 
-On Tue, Jul 01, 2025 at 05:49:29PM +0530, Raju Rangoju wrote:
-> AMD XGBE hardware supports giant Ethernet frames up to 16K bytes.
-> Add support for configuring and enabling giant packet handling
-> in the driver.
+On 7/1/25 12:38, Ramanathan Choodamani wrote:
 > 
-> - Define new register fields and macros for giant packet support.
-> - Update the jumbo frame configuration logic to enable giant
->   packet mode when MTU exceeds the jumbo threshold.
 > 
-> Acked-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+> On 6/24/2025 3:31 PM, Ben Greear wrote:
+>> On 6/24/25 13:57, Ramanathan Choodamani wrote:
+>>> ===================================
+>>> Robust AV streaming protocols - QoS
+>>> ===================================
+>>>
+>>> The Robust AV stream protocols are mobile centric protocols - meaning they
+>>> are initiated by a non-AP STA to the AP. These protocols are implemented
+>>> at the Access Point (AP) to classify packets sent to the non-AP STA which requests
+>>> classification using action frames. The non-AP STA initiates Robust AV streaming
+>>> action frames requesting for specific classification for the IP packets
+>>> destined to the non-AP STA from the AP. These parameters can be negotiated by both
+>>> AP and non-AP STA.
+>>>
+>>> Upon successful handshake, The AP classifies incoming individually addressed MSDUs
+>>> (Mac Service Data Unit) based upon parameters provided by the non-AP STA or
+>>> notifies the non-AP STA to transmit MSDUs with preferred parameters based upon
+>>> what was exchanged.
+>>>
+>>> Robust AV streaming improves AV (Audio and Video) streaming performance when
+>>> using IEEE Std 802.11 for consumer and enterprise applications.
+>>>
+>>> Let's look at the Robust AV streaming protocols which are implemented as a
+>>> part of this design.
+>>
+>> Thank you for posting this and for the beautiful ascii diagrams!
+>>
+>> Since this will be poking netfilter rules into the kernel,
+>> is there a good way to clean up all rules created by a previous
+>> hostapd process in case hostapd crashes or is killed hard and
+>> cannot do its own cleanup?  Maybe the rules could have some
+>> special marking that is configurable per hostapd (or per AP or BSS or something)
+>> so that a (re)started hostapd could clean up any leftovers from a
+>> previous instance?
+>>
+> hostapd does its own cleanup (cleanup of stations and interfaces)
+> when it receives SIGTERM.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+hostapd could crash without being able to clean up, though.
+So I think you need a way to query the kernel's state and
+clean it up in this case.
+
+> An nft chain is created for each AP netdev/interface.
+> 
+> The nft rule handle (stored in internal hostapd data structure) and
+> nft chain metadata can be used to cleanup/flush the nft rules as part of the
+> interface cleanup.
+> 
+>> And, is there a mechanism to clean up flows that a buggy non-AP STA
+>> has requested but then forgot to terminate (like phone starts a video call,
+>> requests some QoS, then forgets to tell AP that it is done with the call
+>> and packets no longer need to be classified?)
+>>
+>> Thanks,
+>> Ben
+>>
+> The scs objects of the stations will be cleaned up during the station
+> disconnect (by the AP which is maintaining them).
+> As part of this deletion, the nft rules are also deleted, using the
+> stored nft rule handle.
+
+A station may be long lived, and it may be bad at cleaning up
+its sessions, so the AP may end up with a large amount of classification rules
+that are not actually needed, possibly slowing down performance
+and/or limiting other stations from being able to add their own
+flows.
+
+Can you add time duration and/or detect idle flows and clean them
+up automatically on the AP?
+
+Thanks,
+Ben
+
+-- 
+Ben Greear <greearb@candelatech.com>
+Candela Technologies Inc  http://www.candelatech.com
+
 
 
