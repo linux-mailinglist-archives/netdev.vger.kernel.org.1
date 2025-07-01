@@ -1,87 +1,97 @@
-Return-Path: <netdev+bounces-202721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23A96AEEC15
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 03:31:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A700AEEC1E
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 03:39:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 358123A4F75
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 01:31:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A30CE17C00D
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 01:39:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EA6754279;
-	Tue,  1 Jul 2025 01:31:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31F2718C00B;
+	Tue,  1 Jul 2025 01:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rIgrU53c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DZ7SeQ1g"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A1322301;
-	Tue,  1 Jul 2025 01:31:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0761641AAC;
+	Tue,  1 Jul 2025 01:39:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751333488; cv=none; b=foXXQrZCpDExc+XM8s1aFlnj4k/dyf4W5StDJSULBQitOmAu4FVfQy/YzhO1CODj/HM9Sc2s8XcGF8hU67e+73WBK1F/9l+XP7oZjsCj4pEtVmAu/fzmvnnxF9llZGq1NANyg69e9QSugh8OLmOt4vcQOEaI2rPHyJNyLNHxbAQ=
+	t=1751333985; cv=none; b=Gb8NXfsHHIengKrULfjLr1WHMJUlob2q/6t5NQUUtAzmFjnrlSAjPLQXGkbjJf0Cwbohc4ZiE+1JDPIvMqnvursfcXrSn1M8MGVoA5qqbRjUDtqXRw3vFN0q4iQaLC6i7+k6oqGq0zcI7MxBoIfTQQ3SXJ4cv9F0Iv9rBTV6mRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751333488; c=relaxed/simple;
-	bh=e7bKistve7YivYNZJKLgWgbkpZ/EM+fxOApOd2EJ2hs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H8izK3oThYv4kgHmpBxCUBlA1i02x2TKoqRCgcgXKiw9mMAIZ+pYhfGSvyPbTUbZi09adGZmsDzOtWbZ11BUuwsihn7GNHCPhLxTT11WRGcSZx0sSjEO9oKoHWsHyF1dEdZ6fDG/6/wy1pJxrweokCMtoO/UyET+rl5+ORt6xZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rIgrU53c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE8EDC4CEE3;
-	Tue,  1 Jul 2025 01:31:27 +0000 (UTC)
+	s=arc-20240116; t=1751333985; c=relaxed/simple;
+	bh=lpXn/IbPmBztt3EyZclDY209c4/2IE+H8dNAxJfAwLw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=fMc7fXsfhzGbg4WXf0UsasF2kjRzFMvjUxTiwljPGWZNusEFMEh35WCZ4HMitoimea4/APaOYrpR6O/BcsyEdaQVFzQLeYkb11MzLCvOKwVS0rQDkXZIPrg8RUIaCY6aNiGy543jdEvyiW6WjiOTtcgBcJXMFc61WOaUbKN5A4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DZ7SeQ1g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70CF8C4CEE3;
+	Tue,  1 Jul 2025 01:39:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751333488;
-	bh=e7bKistve7YivYNZJKLgWgbkpZ/EM+fxOApOd2EJ2hs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rIgrU53cbbjPQIRetD7V7EB1bzCO0cgD02IxMFjBxmBFJOswyXp61LlnEXkNluk8b
-	 XwFVUEKpYNpQl7hPRX7vK0Pfr8hdNwXxDCtW6260cpNPgJjXA/1CLTjPKpzD6B+2lo
-	 4o+9LOIBsCr2oz2h8kxTPeh8UqKmt0JhQI5XqsMQaYA8bG1F9eph12rxg4CKfdGLFU
-	 rOv/YqgNAngtXM7DBO3AI0zzjfOXJHLCb15+IO9q5nAvBN27Wchk+N0vV0oD6XG/Td
-	 bhi38ooB+xO0NjON64MCbq2DxIAKdjWWUUwRn/CYfRF8rr95NrXHlJ3LOgON0LA61f
-	 9z9bgfIQTtbGA==
-Date: Mon, 30 Jun 2025 18:31:27 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- mengyuanlou@net-swift.com, stable@vger.kernel.org
-Subject: Re: [PATCH] net: libwx: fix the incorrect display of the queue
- number
-Message-ID: <20250630183127.0eea7b0b@kernel.org>
-In-Reply-To: <7F26D304FEA08514+20250627080938.84883-1-jiawenwu@trustnetic.com>
-References: <7F26D304FEA08514+20250627080938.84883-1-jiawenwu@trustnetic.com>
+	s=k20201202; t=1751333984;
+	bh=lpXn/IbPmBztt3EyZclDY209c4/2IE+H8dNAxJfAwLw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DZ7SeQ1gwGAxE8bRE09IhTsmn1IZ8YKF8iEV5UAh9m41T7L4uLeyuHA7tvdMBy9D+
+	 OM0yDvwTh8ekRp5nSyvrw6/nq0IAse3vYwVmoQ6vGQ1Nmts+VR9HPK0QtpwoytksgZ
+	 NOFp7M5B5fnJ46ByfJ6Vv3UDR+9+z1o9bkQ4lI5G4+ynH6FAaExSDk/7BhcN7u+WA4
+	 1ooYiiX6kXplnSvOwDrvB4bXoygcqPrdP5X5ZQYuZ7DGaYXGuSoUABWGGWxNenxr1H
+	 /E71qlnjI1Hwz3I3YhaIXznjDCuRilAD75pNbjxAZ+NI8i8dOan91DwinlqCiEeOXa
+	 RNCxZ9SDOTV2g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE0BC38111CE;
+	Tue,  1 Jul 2025 01:40:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v1 1/1] net: usb: lan78xx: fix WARN in
+ __netif_napi_del_locked on disconnect
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175133400951.3632945.7814356575110770254.git-patchwork-notify@kernel.org>
+Date: Tue, 01 Jul 2025 01:40:09 +0000
+References: <20250627051346.276029-1-o.rempel@pengutronix.de>
+In-Reply-To: <20250627051346.276029-1-o.rempel@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, woojung.huh@microchip.com, andrew+netdev@lunn.ch,
+ rmk+kernel@armlinux.org.uk, Thangaraj.S@microchip.com,
+ Rengarajan.S@microchip.com, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ UNGLinuxDriver@microchip.com, phil@raspberrypi.org,
+ maxime.chevallier@bootlin.com, horms@kernel.org
 
-On Fri, 27 Jun 2025 16:09:38 +0800 Jiawen Wu wrote:
-> When setting "ethtool -L eth0 combined 1", the number of RX/TX queue is
-> changed to be 1. RSS is disabled at this moment, and the indices of FDIR
-> have not be changed in wx_set_rss_queues(). So the combined count still
-> shows the previous value. This issue was introduced when supporting
-> FDIR. Fix it for those devices that support FDIR.
+Hello:
 
-Why are you hacking up the get_channels rather than making _F_FDIR be
-sane in all situations? I mean why not:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -1709,6 +1709,7 @@ static void wx_set_rss_queues(struct wx *wx)
-         * distribution of flows across cores, even when an FDIR flow
-         * isn't matched.
-         */
-+       wx->ring_feature[RING_F_FDIR].indices = 1;
-        if (f->indices > 1) {
-                f = &wx->ring_feature[RING_F_FDIR];
- 
-?
+On Fri, 27 Jun 2025 07:13:46 +0200 you wrote:
+> Remove redundant netif_napi_del() call from disconnect path.
+> 
+> A WARN may be triggered in __netif_napi_del_locked() during USB device
+> disconnect:
+> 
+>   WARNING: CPU: 0 PID: 11 at net/core/dev.c:7417 __netif_napi_del_locked+0x2b4/0x350
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v1,1/1] net: usb: lan78xx: fix WARN in __netif_napi_del_locked on disconnect
+    https://git.kernel.org/netdev/net/c/6c7ffc9af718
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
