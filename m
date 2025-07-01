@@ -1,123 +1,135 @@
-Return-Path: <netdev+bounces-202957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EBDEAEFE75
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 17:37:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47195AEFEA9
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 17:49:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FD733AF71E
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 15:37:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9232A1BC483E
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 15:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FEC82797B8;
-	Tue,  1 Jul 2025 15:37:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37645278E71;
+	Tue,  1 Jul 2025 15:49:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ENigJ1dn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ckeuEBs3"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5356B42AAF
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 15:37:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B5A1946AA;
+	Tue,  1 Jul 2025 15:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751384254; cv=none; b=DFx7HOh0uPODNK94MrSqmKQ5B65jWwq/FnsYHwqAAJpZSCVIjyoJ3BFYHUdXkBq5gDtlIsY1CX7eYWq2l7Mzab9LfXhpm7k5gE7xQww575MM0q35JA1nZaM87WNQBejFW3xv7eE9S/tJh27EOlqE52t3jvqqOp/dWMIh69FkUn8=
+	t=1751384961; cv=none; b=IBEXlXcMsUUT3xnfORH6VrbBd1CRmDBRuKok2wJ0LZBAU2Ph3ecy3wEVqWtScZ9AHmyuaAQnYW3PEPDX5oCB73Je9Mi5bhoNGKF/atAjy2CMxnkS1hOgR4tp6qEwQdg/nWBIN69M4uzkJs5ShzospB8GnMsu6AatkMTne050au8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751384254; c=relaxed/simple;
-	bh=ovi6ehXHRg2OXhTGZqfDtxC1wNJZkJuNbs9Djf+CFco=;
+	s=arc-20240116; t=1751384961; c=relaxed/simple;
+	bh=G3D82sMsG5UoCCrWfqBE3G+QkuojXnHxAxlbRr9EbmI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BrLpK+2774SrijxqQjYmFixA34cFg27qsqsLRS2vAaf1z3AspTCnPpLAT0Wh74JbXCYr+PDJzZsQBR96PYU+qg2hnJuEGfa52busW9aWgrFPhoamtEK0kTy4GUwRtmB4E+yIASjnkqy4yaBW7D4k/pjctTcP3J1THUYc5gqRT/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ENigJ1dn; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <62111125-c1f5-41ff-ba32-75ec41508906@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751384250;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E82KrJwgWkOW+NmsBbXPBqs/aYg5/5kQ8qZzeEJKY/I=;
-	b=ENigJ1dn2PFqbh4WbpieVYCLw8kAqUSRORgmHFVwvcLzQUCmm37tmyM9RCqNIwY3042XND
-	lRqt4HEbDBXfxS0seaC8MGUTWpORbZ8HArRvGGuENOgfaMmJHs9hx9XFlaHZIAXJFXEMqQ
-	mcU+JKqCuk7RbxuM6eF/9c9xBvWQikM=
-Date: Tue, 1 Jul 2025 11:37:21 -0400
+	 In-Reply-To:Content-Type; b=KUiFHRHFDrE9pj64unjQBuJFGjazDPIFhzZisSOkgqXBSWjYPKstgrDnzQnxnp+IXvpI7zFRvMh9h8veKMeyAstwCDGauLlJaURN1XHac/szQDx9CoLJ8llWkIdPyoDPGgEnQLNy55Y5VhLMBo269noLyI8DfyP2CzlFZhORud4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ckeuEBs3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AD41C4CEEB;
+	Tue,  1 Jul 2025 15:49:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751384960;
+	bh=G3D82sMsG5UoCCrWfqBE3G+QkuojXnHxAxlbRr9EbmI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ckeuEBs3+JdC+t5srxUqZzkwQz4CZhUihLkd8Bx1+Q/KGPkep3wFy++GDTFssJAOP
+	 8oSuBMfGWi22WgYKGEaZrtTuAO7E3RSzbuAeD6bWwgLf/OLKmR3pBwebXSB29I5u+H
+	 Tvj2pY5Vph+bBx6dcJMKnOq7vp2fD2Z2NXNkcyJBVcq0/8uCgiIW/NZMcmWhEeXnDf
+	 luVc0RcbqZiJRSb4sedSykEvB2sK6Llo7GU1iMUJUnJfLl9qoGd5Jr522Gp3aEz0Kg
+	 WvkuI6aVK87SIAKJ//c4et86V7kGze8e9h3nxI+734nVyeqYiQiJYBeLxyEQeBnsJc
+	 OMeL8e3YP/yIQ==
+Message-ID: <3bd1e6ef-cf3d-4ace-85e8-7f98cf92cc1f@kernel.org>
+Date: Tue, 1 Jul 2025 17:49:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2 07/18] net: macb: drop macb_config NULL
- checking
-To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Ghiti <alex@ghiti.fr>, Samuel Holland <samuel.holland@sifive.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Russell King <linux@armlinux.org.uk>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>,
- Gregory CLEMENT <gregory.clement@bootlin.com>,
- Cyrille Pitchen <cyrille.pitchen@atmel.com>,
- Harini Katakam <harini.katakam@xilinx.com>,
- Rafal Ozieblo <rafalo@cadence.com>,
- Haavard Skinnemoen <hskinnemoen@atmel.com>, Jeff Garzik <jeff@garzik.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-mips@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Tawfik Bayouk <tawfik.bayouk@mobileye.com>
-References: <20250627-macb-v2-0-ff8207d0bb77@bootlin.com>
- <20250627-macb-v2-7-ff8207d0bb77@bootlin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 2/2] selftests: pp-bench: remove
+ page_pool_put_page wrapper
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <toke@redhat.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ kernel test robot <lkp@intel.com>
+References: <20250627200501.1712389-1-almasrymina@google.com>
+ <20250627200501.1712389-2-almasrymina@google.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <20250627-macb-v2-7-ff8207d0bb77@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20250627200501.1712389-2-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 6/27/25 05:08, Théo Lebrun wrote:
-> Remove NULL checks on macb_config as it is always valid:
->  - either it is its default value &default_gem_config,
->  - or it got overridden using match data.
+
+
+On 27/06/2025 22.04, Mina Almasry wrote:
+> Minor cleanup: remove the pointless looking _ wrapper around
+> page_pool_put_page, and just do the call directly.
 > 
-> Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
 > ---
->  drivers/net/ethernet/cadence/macb_main.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+>   .../net/bench/page_pool/bench_page_pool_simple.c     | 12 +++---------
+>   1 file changed, 3 insertions(+), 9 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index 6c8a34e40b77ea37ed25c2b0414440cd3f6962c3..6926ea11d71adae7a25d5ee329c148f5882d4184 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -5227,15 +5227,13 @@ static int macb_probe(struct platform_device *pdev)
->  	}
->  	bp->num_queues = num_queues;
->  	bp->queue_mask = queue_mask;
-> -	if (macb_config)
-> -		bp->dma_burst_length = macb_config->dma_burst_length;
-> +	bp->dma_burst_length = macb_config->dma_burst_length;
->  	bp->pclk = pclk;
->  	bp->hclk = hclk;
->  	bp->tx_clk = tx_clk;
->  	bp->rx_clk = rx_clk;
->  	bp->tsu_clk = tsu_clk;
-> -	if (macb_config)
-> -		bp->jumbo_max_len = macb_config->jumbo_max_len;
-> +	bp->jumbo_max_len = macb_config->jumbo_max_len;
->  
->  	if (!hw_is_gem(bp->regs, bp->native_io))
->  		bp->max_tx_length = MACB_MAX_TX_LEN;
-> 
+> diff --git a/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c b/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c
+> index 1cd3157fb6a9..cb6468adbda4 100644
+> --- a/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c
+> +++ b/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c
+> @@ -16,12 +16,6 @@
+>   static int verbose = 1;
+>   #define MY_POOL_SIZE 1024
+>   
+> -static void _page_pool_put_page(struct page_pool *pool, struct page *page,
+> -				bool allow_direct)
+> -{
+> -	page_pool_put_page(pool, page, -1, allow_direct);
+> -}
+> -
+>   /* Makes tests selectable. Useful for perf-record to analyze a single test.
+>    * Hint: Bash shells support writing binary number like: $((2#101010)
+>    *
+> @@ -121,7 +115,7 @@ static void pp_fill_ptr_ring(struct page_pool *pp, int elems)
+>   	for (i = 0; i < elems; i++)
+>   		array[i] = page_pool_alloc_pages(pp, gfp_mask);
+>   	for (i = 0; i < elems; i++)
+> -		_page_pool_put_page(pp, array[i], false);
+> +		page_pool_put_page(pp, array[i], -1, false);
+>   
+>   	kfree(array);
+>   }
+> @@ -180,14 +174,14 @@ static int time_bench_page_pool(struct time_bench_record *rec, void *data,
+>   
+>   		} else if (type == type_ptr_ring) {
+>   			/* Normal return path */
+> -			_page_pool_put_page(pp, page, false);
+> +			page_pool_put_page(pp, page, -1, false);
+>   
+>   		} else if (type == type_page_allocator) {
+>   			/* Test if not pages are recycled, but instead
+>   			 * returned back into systems page allocator
+>   			 */
+>   			get_page(page); /* cause no-recycling */
+> -			_page_pool_put_page(pp, page, false);
+> +			page_pool_put_page(pp, page, -1, false);
+>   			put_page(page);
 
-Reviewed-by: Sean Anderson <sean.anderson@linux.dev>
+The get_page() + put_page() trick is a fairly ugly workaround that I
+added when Jakub removed page_pool_release_page() in commit 535b9c61bdef
+("net: page_pool: hide page_pool_release_page()").
+
+These extra refcnt increments will make the test slower, but if we are
+just aware of this, then we can still compare incremental changes.
+
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+
+>   		} else {
+>   			BUILD_BUG();
 
