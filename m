@@ -1,160 +1,119 @@
-Return-Path: <netdev+bounces-202882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88790AEF858
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 14:27:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 238B9AEF85B
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 14:27:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B33DB1C022CA
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:27:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1ABA87B1910
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:25:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1A1A27381E;
-	Tue,  1 Jul 2025 12:23:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08E7A2741AB;
+	Tue,  1 Jul 2025 12:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jGAMvX4p"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="I1JISI0m";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="mqCkYBBY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28B02737FC;
-	Tue,  1 Jul 2025 12:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37EDC2741A6;
+	Tue,  1 Jul 2025 12:23:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751372618; cv=none; b=Co8MOvwNqD6YnluwKQkPu3Y5ZEQUMBqOvq2eytEAoNgBXKiWwe3scnfWYznj1IiVMe66BepNkkvdtH52R559r5liXYST2L5oxlb6XfPXPcCKqtK1nTz8GZl64g0xe3EozpAFV8g2g3gih7+IjXIN2ODJvaYSfXg3OkUMlCiBBzY=
+	t=1751372625; cv=none; b=s1UpjoNzDgZBYtxJSRN8NpnZ2oRVXubGZMpI8fmKMNlHT42dYeHZ/8TZ9JyobWGQ7OeMTZ6LaSPX9H5Y9mIkW/i/UfCKMHMOEVBuq7PzlVP1GtEmMlCBruvPSyB0FvHS+nb/ft1G9nJAskO3+3uptvtLFio1rnXCH0dzhO1tDZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751372618; c=relaxed/simple;
-	bh=1IJZmycdygb2FNMX3Uuv4XKld9BxDXJf7I34c2THYzE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KbAw4hsV9MzhyffLNIwuqjviAtDIDk31r8XyxLLurNS0FIxF/S/dsPu4+l7qVzjbNtApC1taNc89DaOqKgAOd2oW/dvz0SR2x6Y4e5g+ZRw9Gk7LtqXRc/5IVE1xWJj1+CB6nFiOZxwmL/TbgoSQDUGLjpt4DVdpXTO7HSv37jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jGAMvX4p; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4537edf2c3cso55573765e9.3;
-        Tue, 01 Jul 2025 05:23:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751372615; x=1751977415; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1OeOZKa+V1VR3U9TmZkrX8cCU7YzI//R+gnVShUPhgI=;
-        b=jGAMvX4psJ+9GnF5N53URavy0izagKypJJXXfWldEJJUL/IvuWYsm8wWKHiNNL/ArR
-         j4xDtaKKdQhN9SmBVKWJ+ReUVU3fb5+xI4ZIyA6Rq1buSlA+U41W9s6TbXgOFGXsQg/B
-         Fht2VZ/TC6vpMB84fy/aXa0GaoYHhESh1kXQJI6oLFxhTjGkn1JWMWNNQp5En02aaJYx
-         y2lR6BuLh0TtbukaoH2DueZuGXuPZ3hTCPWq/UUDCtsYm+LGQSDG+VC6ejCzmYhrUqX3
-         KcDSiLOUlAAPeocw1YhPMiVrPGyEeWnp2orw7iiNZYzbuV7Xf+gkX8SvXOQMau9adtt0
-         KPRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751372615; x=1751977415;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1OeOZKa+V1VR3U9TmZkrX8cCU7YzI//R+gnVShUPhgI=;
-        b=D+MDM9ib0mTivNY5XHuFuGSMOydifOLpblQM2H9jabInDXSKDBrdRZA03nf9C4+1Wp
-         nk6AvdTcwZi5SDuRjlNF8Q4WljewAhOeeRZRsQDbgDu9po90r6SZesNDsG6t5k4ic6do
-         NYmyv/GBqBd9o27aWb6XTY6eDhwSIi+/VJCobZUAPdLVIUzsxw1Be83gc3VUZ6jMJbgg
-         cs+1t7CzJaxepQcBjFFeUg6fLjzORUjHL4wihQNS+VzByipAEzCisgrVJjwfaOlm8WHX
-         2BEWFHsE05mmgzh9RNg58kUheWFPIOqHA0W8vwfmm20qYpTsOj/0qvz5CO/N7eq3ALY5
-         LlDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUyX47wQA4citBqCv4Ka/4sisjisp3ZF7G/uWCSDCUpKlXynrgmsXjBoKBOZooXk+Fe7c8flHHsYSNoq1w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxcdCahb7Qpk/nXx3CqcaNZeMAnpJ/A5mihdfXWvfPqtn0pTbz
-	/5aYxgA8ljP+ImzdZ06yt0LRW/nFS57WskHu/SgAZ2KnigAJnG9t+5ys
-X-Gm-Gg: ASbGnctUQAGoBd4ZQtr9isnwC9p1rRDXkcyn3IMZckwf9weAEC8TaARXnknPVnxkskX
-	oGC43/YXGyz3cv1WQp/IGLgDJpmavSeAshlmPogPsCDmmF8zuavd0ic0dtXb6QQvmwB/j0yO7lp
-	x/jfcecMEKLB0U7eVs6OKEj05m6Xs1WZPjMHDcTudsBZikHbOoQuKXrVyndmFw5KUSWyPqAu7fU
-	3QdxS6v7Vf5HwHjwoCVX+MVXrRPRJrfeuoo+V8o4WzB/DYY2xMEebc/TT+2rCpjqD+A53eoA+7z
-	uvC8GXmhQKdaFWFcvEMLZ3R7M7gIZUMH+TNWqSw3f2Vtzq/aoV5piDUL/g8qEwAGz0Xay/zBsHo
-	ZLqdzvXOB8YpGBW5/FdO5Da3lxFP+5ydllkM+v1dsErih+j2S2Q==
-X-Google-Smtp-Source: AGHT+IEI8DrVM5bM76qZ1eWDUC0X+amlHQWQ4U0tbSmI4ccGNui2QsTm1Y2Im3xc0PZ2bueeF8L6WQ==
-X-Received: by 2002:a05:600c:1d1c:b0:451:833f:483c with SMTP id 5b1f17b1804b1-4538ee15b83mr174442105e9.7.1751372614689;
-        Tue, 01 Jul 2025 05:23:34 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453823ba553sm190420435e9.31.2025.07.01.05.23.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Jul 2025 05:23:34 -0700 (PDT)
-Message-ID: <c84d46e5-7aae-4110-9b81-76a0d73bc12c@gmail.com>
-Date: Tue, 1 Jul 2025 13:23:32 +0100
+	s=arc-20240116; t=1751372625; c=relaxed/simple;
+	bh=9nlou7VVvbnpibGWPZLlU8AW7nEx/UkPOp8/VdZdEbU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=sOYpjMhweZMfcVX1B80pCZSBRMsKN8diDpaPD4rUY0IwT5gi9v3/wGFFhAG7/4WUyckbozNdopMChAIfIh34wQDK4/WZEBwH1wHgJDTH8wdDAnSaRHo/JFRxqAYYfwC03wdXgLeSJJSVYbkRko1AnIJwWIMy2gWbkqkUb2T01tY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=I1JISI0m; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=mqCkYBBY; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1751372621;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YynLe9Y0R1ZnzK2pV6bI4BTlb8INUrb2JzuFOPMblXM=;
+	b=I1JISI0mzO9078e3C6dz/XhRJlBWIdbS/XedG5tYz5RRi0Hal1aOBKIpkGs1aUucpjWLE3
+	TO9VWvbnfSPfLrWCnU/D+18cmUS068gt6q0mOjXKGy89DCpwWVTmZ6lOLxpC6j01S4vte3
+	KcGwAHEscOU5tTgyBAJP3iH78Q0wbxeIACdCDm/172+Lmlvxe9EOyNB61XNXy7oy1ldfM2
+	3/FHEYo6sE4p4QC4QY/AxNO9PU1IcNdeu67hrJURuX5HvjlIJ6K81RFBF1zn4H4AQTGyec
+	UyHuKuDQ6CbfpMyJR7LVVxaScJ7Vh4mOjCrJnHScETMvSnB9V+gaYTElCXJQgQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1751372621;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YynLe9Y0R1ZnzK2pV6bI4BTlb8INUrb2JzuFOPMblXM=;
+	b=mqCkYBBY5g+6cne3JW8WimKDgXSelqerYl9xFT0naQKu5HMVicZy+L3eCmsLOkp2193ET7
+	024j8edbTqJD0bBw==
+To: Paolo Abeni <pabeni@redhat.com>, LKML <linux-kernel@vger.kernel.org>
+Cc: netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>,
+ Christopher Hall <christopher.s.hall@intel.com>, John Stultz
+ <jstultz@google.com>, Frederic Weisbecker <frederic@kernel.org>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>, Miroslav Lichvar
+ <mlichvar@redhat.com>, Werner Abt <werner.abt@meinberg-usa.com>, David
+ Woodhouse <dwmw2@infradead.org>, Stephen Boyd <sboyd@kernel.org>, Thomas
+ =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>, Kurt
+ Kanzenbach
+ <kurt@linutronix.de>, Nam Cao <namcao@linutronix.de>, Antoine Tenart
+ <atenart@kernel.org>
+Subject: Re: [patch 0/3] ptp: Provide support for auxiliary clocks for
+ PTP_SYS_OFFSET_EXTENDED
+In-Reply-To: <852d45b4-d53d-42b6-bcd9-62d95aa1f39d@redhat.com>
+References: <20250626124327.667087805@linutronix.de>
+ <852d45b4-d53d-42b6-bcd9-62d95aa1f39d@redhat.com>
+Date: Tue, 01 Jul 2025 14:23:39 +0200
+Message-ID: <871pr0m75g.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] sfc: siena: eliminate xdp_rxq_info_valid
- using XDP base API
-To: Fushuai Wang <wangfushuai@baidu.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com,
- linux-kernel@vger.kernel.org
-References: <20250628051033.51133-1-wangfushuai@baidu.com>
-Content-Language: en-GB
-From: Edward Cree <ecree.xilinx@gmail.com>
-In-Reply-To: <20250628051033.51133-1-wangfushuai@baidu.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 28/06/2025 06:10, Fushuai Wang wrote:
-> Commit d48523cb88e0 ("sfc: Copy shared files needed for Siena (part 2)")
-> use xdp_rxq_info_valid to track failures of xdp_rxq_info_reg().
-> However, this driver-maintained state becomes redundant since the XDP
-> framework already provides xdp_rxq_info_is_reg() for checking registration
-> status.
-> 
-> Signed-off-by: Fushuai Wang <wangfushuai@baidu.com>
+On Tue, Jul 01 2025 at 12:16, Paolo Abeni wrote:
+> On 6/26/25 3:27 PM, Thomas Gleixner wrote:
+>> It is also available via git with all prerequisite patches:
+>> 
+>>   git://git.kernel.org/pub/scm/linux/kernel/git/tglx/devel.git timers/ptp/driver-auxclock
+>> 
+>> Miroslav: This branch should enable you to test the actual steering via a
+>> 	  PTP device which has PTP_SYS_OFFSET_EXTENDED support in the driver.
+>
+> I have some dumb issues merging this on net-next.
+>
+> It looks like we should pull from the above URL, but it looks like the
+> prereq series there has different hashes WRT the tip tree. Pulling from
+> there will cause good bunch of duplicate commits - the pre-req series vs
+> the tip tree and the ptp cleanup series vs already merge commits on
+> net-next.
+>
+> I guess we want to avoid such duplicates, but I don't see how to avoid
+> all of them. A stable branch on top of current net-next will avoid the
+> ptp cleanup series duplicates, but will not avoid duplicates for
+> prereqs. Am I missing something obvious?
 
-Acked-by: Edward Cree <ecree.xilinx@gmail.com>
+No. I messed that up by not telling that the PTP series should be
+applied as a seperate branch, which is merged into net-next. That way I
+could have merged that branch back into tip and apply this pile on top.
 
-> ---
->  drivers/net/ethernet/sfc/siena/net_driver.h | 2 --
->  drivers/net/ethernet/sfc/siena/rx_common.c  | 6 +-----
->  2 files changed, 1 insertion(+), 7 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/sfc/siena/net_driver.h b/drivers/net/ethernet/sfc/siena/net_driver.h
-> index 2be3bad3c993..4cf556782133 100644
-> --- a/drivers/net/ethernet/sfc/siena/net_driver.h
-> +++ b/drivers/net/ethernet/sfc/siena/net_driver.h
-> @@ -384,7 +384,6 @@ struct efx_rx_page_state {
->   * @recycle_count: RX buffer recycle counter.
->   * @slow_fill: Timer used to defer efx_nic_generate_fill_event().
->   * @xdp_rxq_info: XDP specific RX queue information.
-> - * @xdp_rxq_info_valid: Is xdp_rxq_info valid data?.
->   */
->  struct efx_rx_queue {
->  	struct efx_nic *efx;
-> @@ -417,7 +416,6 @@ struct efx_rx_queue {
->  	/* Statistics to supplement MAC stats */
->  	unsigned long rx_packets;
->  	struct xdp_rxq_info xdp_rxq_info;
-> -	bool xdp_rxq_info_valid;
->  };
->  
->  enum efx_sync_events_state {
-> diff --git a/drivers/net/ethernet/sfc/siena/rx_common.c b/drivers/net/ethernet/sfc/siena/rx_common.c
-> index 98d27174015d..4ae09505e417 100644
-> --- a/drivers/net/ethernet/sfc/siena/rx_common.c
-> +++ b/drivers/net/ethernet/sfc/siena/rx_common.c
-> @@ -268,8 +268,6 @@ void efx_siena_init_rx_queue(struct efx_rx_queue *rx_queue)
->  			  "Failure to initialise XDP queue information rc=%d\n",
->  			  rc);
->  		efx->xdp_rxq_info_failed = true;
-> -	} else {
-> -		rx_queue->xdp_rxq_info_valid = true;
->  	}
->  
->  	/* Set up RX descriptor ring */
-> @@ -299,10 +297,8 @@ void efx_siena_fini_rx_queue(struct efx_rx_queue *rx_queue)
->  
->  	efx_fini_rx_recycle_ring(rx_queue);
->  
-> -	if (rx_queue->xdp_rxq_info_valid)
-> +	if (xdp_rxq_info_is_reg(&rx_queue->xdp_rxq_info))
->  		xdp_rxq_info_unreg(&rx_queue->xdp_rxq_info);
-> -
-> -	rx_queue->xdp_rxq_info_valid = false;
->  }
->  
->  void efx_siena_remove_rx_queue(struct efx_rx_queue *rx_queue)
+Let me think about an elegant way to make this work without creating an
+utter mess in either of the trees (or both).
+
+Thanks,
+
+        tglx
+
+
+
+
+
 
 
