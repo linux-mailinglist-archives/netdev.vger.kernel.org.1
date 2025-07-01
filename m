@@ -1,213 +1,134 @@
-Return-Path: <netdev+bounces-202816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0E5AAEF1AB
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 10:47:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4518CAEF1B1
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 10:48:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D08D7AACCE
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 08:46:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0D2A441DEB
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 08:47:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D197222590;
-	Tue,  1 Jul 2025 08:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D96262459C5;
+	Tue,  1 Jul 2025 08:47:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nB+wXDpJ"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="pfGJpfmM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50AF7223327;
-	Tue,  1 Jul 2025 08:47:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57777220F20
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 08:47:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751359649; cv=none; b=L9EghG0Oya9lox2iwZWLDqHrCIYVx7oEFs09Vy8630XV18v+JV95Znhe+kT1yta/Htpdd1IbI1vbj1mGumUfoUnnhqoKezHPyZPByZbtdL5yW5TO/U7luGoXASmElevA5T51aqZ3IvHYYtENqijYZeODVqWzs+NiiJIta7X6R0M=
+	t=1751359670; cv=none; b=S9okxBIUPbSr4irzHCKBpDK1PAQglZ2fQAjjWAP7AXnlQKPxY4ud2145HW4eMVh5mtV4kAYCbowJCjZbZQ76qSqh77O2NhV5MTGhEiag8qUmiF19DtE7xSsKVCFyEm+qfJqD9+GrN7Sv06wVCH4BBTalJgEMInJytrfog46oCPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751359649; c=relaxed/simple;
-	bh=XQ+f6cDEDaX5fw9hlM7XL9SW1PnvQSB/e3VpIAkFu8k=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=dmoCIJxFFxGoi3NZYWX98tUhHdhgt28KIfxNAcIkBIqbf9vCEjiceErCQr2VsRdgbGa7DgC2riPDxu9rcXAxqPfmh/nlCWcmhi0tKU6RMsYXztSBV7O/oiZkcW0lwi5Zy3wOBudbpy72pPv2/+3Cz6gpWAYEs9s2JfF3bzuay/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nB+wXDpJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CA6A3C4CEEB;
-	Tue,  1 Jul 2025 08:47:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751359648;
-	bh=XQ+f6cDEDaX5fw9hlM7XL9SW1PnvQSB/e3VpIAkFu8k=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=nB+wXDpJubGkHZYNFTDtLCZQztEiAPPQbudMKb9tC/JJJpzTiPhXJoifF15D6Jfk8
-	 JboAljYIltUiH9BN5Oe8d5IqVX9bRAUiQrcg0xV7rDXgBJ9fYHUOUef764JNTRfaNm
-	 Ncp16a8wT+4lRRlYPlM3ypFxr14sS/X8g/vUm/CgR39g+z8eCi6+eP4DOsd/01Mo6T
-	 6YVbKYRGojxy52EWScqoWUR8FM5BYrWtMVjfm1fwR3MwPy8bYU99btJr54TRCSbhoa
-	 e/YV0DccePtp8jS8GXavPfVKLdGL7EhzLYbH5gnCq0TPzv4+Z+M6M5jxhHJLdsDlCL
-	 JJPoBnFnnWApQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B378CC8302F;
-	Tue,  1 Jul 2025 08:47:28 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Tue, 01 Jul 2025 16:47:26 +0800
-Subject: [PATCH] Bluetooth: Fix spelling mistakes
+	s=arc-20240116; t=1751359670; c=relaxed/simple;
+	bh=5ikLTc8iKzNYke9+vz4Tcgp3xgvRhKTpysolE+c/wEA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uTamF/iBVjC/yZNJV2wwN5LiizuvKE9gXBBhk6nNEx1ZSqGYrCAFGqLL1Mx41sM0ThExqQpg8TZbOjTKVKGfHbRvAI0/fXmoSXXaQEtxMfO9kp5zKuwwON2CBSIlzr5AjScqzwUjAxs+dc0y/KAQ4Y9mySxuCxSJgliaRXne2QI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=pfGJpfmM; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com [209.85.217.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 485F83FE25
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 08:47:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1751359666;
+	bh=5ikLTc8iKzNYke9+vz4Tcgp3xgvRhKTpysolE+c/wEA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=pfGJpfmM3gGQcYVU3MNZq4J+HMfYB9lOhlIDNK3eB2cnZUXqJUIbQWuGgRZPYnK4Z
+	 rmFHbM6D78EbZVI9jzRks3T3Z3lfWOFEGme1CzAEfw2kjHvMFsGTOflEmkrDYZMI7Q
+	 KGAu9aOy+4F1ciMGh6gHknpZfUIzqDUHm8IAKcQHZYitcg2aJswCMbPck9ATPFZ8ch
+	 CC4WENlGyVH0eY8x+OmctrtplzOmKHOCB6/bQzNn53KYCto4hDAT0LQKEmuvhZomAj
+	 ZPLkyQMDkTbaViMcvPbHR5gJrZdjYDl3XBID+zVrdfqTsl9JtaDp9hqDbM3nsZV6l4
+	 fc728y0ASDjGw==
+Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-4e9ba1b4658so4186011137.0
+        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 01:47:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751359665; x=1751964465;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5ikLTc8iKzNYke9+vz4Tcgp3xgvRhKTpysolE+c/wEA=;
+        b=eZJNpLG7Rhs618FP1cUyCabbJfoefHUgL1Ez0xnVHQR6pD4dQtGnK3+0fBIZTFFEuH
+         cy0KiR28viTPfYYWIn60vqDaq+0iVcwQ4FBBHtuwHr/nUWXerswD4SfGvReW8UEnCSAC
+         squTX+ZBcOuSSiBMkRBm5tWs82pidWWFhoNqS49wfKs3amg4up6ad5rvTCain9fs47gD
+         V3qZ/UsacfOkZSVkcoEfh6kSPbnT+YedDwW5/ydOg3PskAXpK58G4G3cwIGQtLzW1+5w
+         3QDw1UkOis++mHzDoJetPKidDI96dlG5ixIykzTlgNUb9apjxlnrgmn0m8M30QSgCk9v
+         gsBg==
+X-Forwarded-Encrypted: i=1; AJvYcCX6d7GEMznja+qq3NouALzFfFPa16TAlIsqM64YVP+tNa9cR47m066/ZhfncvnTe7HOPLimAYo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4z/dXtbVo3OyzbPttkNsR/6lQ7p62bpJsusRD5fKk/HI4ygDi
+	w+8XlWD8WwUwilfIg4U7gBdzEfFCSR5leBPvUXzBicCMe3lOkd5a8Ug0Y4zrtQQrbaqlET0haBO
+	lrUR25QwXhJjtgYnkR9tO2KxI0nW4GwPx8I1OhNbxp4LuhG2cF1QY60xD8lmDqO9bOu3RSM+jW+
+	cNCemaAVRuaEI09OkaXKy48IRmPQsI04z5thIvmmV0Bw9cWnyapU3N39x3ppU=
+X-Gm-Gg: ASbGnct8ZuUgOpxpSn2ZaJAVKr5lVEpbfEiyl/X2tTkg0Wx2C+G3MiAR6A3UVe2lAdM
+	DtNz/GiRHQwlq8inffDIUoJa3XBRgf2AzCsSHNQq5olq4tRyhy/jsUxL3n+TCb8gUgUrWh73J9J
+	tNO2fe
+X-Received: by 2002:a05:6102:2b8d:b0:4e2:a235:24d1 with SMTP id ada2fe7eead31-4f143b1764dmr1631174137.4.1751359664857;
+        Tue, 01 Jul 2025 01:47:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG/XfNIm44PW5VunFf6h0jOcW1yP6L42lTuRUgGXOj4POf34vLlfU9zPs6f8E7vyoPOSBamW1MimVgR8iVOnwE=
+X-Received: by 2002:a05:6102:2b8d:b0:4e2:a235:24d1 with SMTP id
+ ada2fe7eead31-4f143b1764dmr1631166137.4.1751359664487; Tue, 01 Jul 2025
+ 01:47:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250701-fix_typos-v1-1-090f06fdfaea@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAJ2gY2gC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI1MDcwND3bTMiviSyoL8Yl1LC2Mj00QTEzPzRFMloPqColSgJNis6NjaWgB
- oh1BFWwAAAA==
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Johan Hedberg <johan.hedberg@gmail.com>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1751359647; l=5289;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=VQIDv2I4hUGURzA15ufBv8DnkunpA/1+l0Qi7aaRxGw=;
- b=/K6FSfTrL0eD/O5Jjt0xg/7Swn27fMtrIeOCy5Inv13sPcG45X3L7zuicjdW2I/wiJWvn8PYd
- yPoJ3lrSEQQDlkYO6gTY1L1n6KBRq+F7T5KD5sarBJUatMilfRSdBwr
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
+References: <20250629214449.14462-1-aleksandr.mikhalitsyn@canonical.com>
+ <20250629214449.14462-7-aleksandr.mikhalitsyn@canonical.com> <20250701-gehege-portrait-c098442c73d1@brauner>
+In-Reply-To: <20250701-gehege-portrait-c098442c73d1@brauner>
+From: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Date: Tue, 1 Jul 2025 10:47:31 +0200
+X-Gm-Features: Ac12FXyvlb-oWVV4ZdKdWiFUglPTeWBh1qsmwVkifm-1RfJ3O1YjwqQVr7X_3U8
+Message-ID: <CAEivzxfULsywKKuYM+T-5AMSQdF7ZyG85=PEJ0KZ0__j-B6=xw@mail.gmail.com>
+Subject: Re: [RESEND PATCH net-next 6/6] selftests: net: extend SCM_PIDFD test
+ to cover stale pidfds
+To: Christian Brauner <brauner@kernel.org>
+Cc: kuniyu@google.com, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Luca Boccassi <bluca@debian.org>, David Rheinsberg <david@readahead.eu>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Yang Li <yang.li@amlogic.com>
+On Tue, Jul 1, 2025 at 9:59=E2=80=AFAM Christian Brauner <brauner@kernel.or=
+g> wrote:
+>
+> On Sun, Jun 29, 2025 at 11:44:43PM +0200, Alexander Mikhalitsyn wrote:
+> > Extend SCM_PIDFD test scenarios to also cover dead task's
+> > pidfd retrieval and reading its exit info.
+> >
+> > Cc: linux-kselftest@vger.kernel.org
+> > Cc: linux-kernel@vger.kernel.org
+> > Cc: netdev@vger.kernel.org
+> > Cc: Shuah Khan <shuah@kernel.org>
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> > Cc: Eric Dumazet <edumazet@google.com>
+> > Cc: Jakub Kicinski <kuba@kernel.org>
+> > Cc: Paolo Abeni <pabeni@redhat.com>
+> > Cc: Simon Horman <horms@kernel.org>
+> > Cc: Christian Brauner <brauner@kernel.org>
+> > Cc: Kuniyuki Iwashima <kuniyu@google.com>
+> > Cc: Lennart Poettering <mzxreary@0pointer.de>
+> > Cc: Luca Boccassi <bluca@debian.org>
+> > Cc: David Rheinsberg <david@readahead.eu>
+> > Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.c=
+om>
+> > ---
+>
+> Thanks for the tests!
+> Reviewed-by: Christian Brauner <brauner@kernel.org>
 
-Correct the misspelling of “estabilished” in the code.
-
-Signed-off-by: Yang Li <yang.li@amlogic.com>
----
- include/net/bluetooth/hci.h |  2 +-
- net/bluetooth/hci_event.c   | 12 ++++++------
- net/bluetooth/iso.c         |  8 ++++----
- 3 files changed, 11 insertions(+), 11 deletions(-)
-
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index fe932ca3bc8c..887db7b4edd9 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -2767,7 +2767,7 @@ struct hci_evt_le_create_big_complete {
- } __packed;
- 
- #define HCI_EVT_LE_BIG_SYNC_ESTABILISHED 0x1d
--struct hci_evt_le_big_sync_estabilished {
-+struct hci_evt_le_big_sync_established {
- 	__u8    status;
- 	__u8    handle;
- 	__u8    latency[3];
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index a487f9df8145..3f939a3cdb86 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -6335,7 +6335,7 @@ static int hci_le_pa_term_sync(struct hci_dev *hdev, __le16 handle)
- 	return hci_send_cmd(hdev, HCI_OP_LE_PA_TERM_SYNC, sizeof(cp), &cp);
- }
- 
--static void hci_le_pa_sync_estabilished_evt(struct hci_dev *hdev, void *data,
-+static void hci_le_pa_sync_established_evt(struct hci_dev *hdev, void *data,
- 					    struct sk_buff *skb)
- {
- 	struct hci_ev_le_pa_sync_established *ev = data;
-@@ -6652,7 +6652,7 @@ static void hci_le_phy_update_evt(struct hci_dev *hdev, void *data,
- 	hci_dev_unlock(hdev);
- }
- 
--static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
-+static void hci_le_cis_established_evt(struct hci_dev *hdev, void *data,
- 					struct sk_buff *skb)
- {
- 	struct hci_evt_le_cis_established *ev = data;
-@@ -6875,7 +6875,7 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
- static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
- 					    struct sk_buff *skb)
- {
--	struct hci_evt_le_big_sync_estabilished *ev = data;
-+	struct hci_evt_le_big_sync_established *ev = data;
- 	struct hci_conn *bis;
- 	int i;
- 
-@@ -7030,7 +7030,7 @@ static const struct hci_le_ev {
- 		     HCI_MAX_EVENT_SIZE),
- 	/* [0x0e = HCI_EV_LE_PA_SYNC_ESTABLISHED] */
- 	HCI_LE_EV(HCI_EV_LE_PA_SYNC_ESTABLISHED,
--		  hci_le_pa_sync_estabilished_evt,
-+		  hci_le_pa_sync_established_evt,
- 		  sizeof(struct hci_ev_le_pa_sync_established)),
- 	/* [0x0f = HCI_EV_LE_PER_ADV_REPORT] */
- 	HCI_LE_EV_VL(HCI_EV_LE_PER_ADV_REPORT,
-@@ -7041,7 +7041,7 @@ static const struct hci_le_ev {
- 	HCI_LE_EV(HCI_EV_LE_EXT_ADV_SET_TERM, hci_le_ext_adv_term_evt,
- 		  sizeof(struct hci_evt_le_ext_adv_set_term)),
- 	/* [0x19 = HCI_EVT_LE_CIS_ESTABLISHED] */
--	HCI_LE_EV(HCI_EVT_LE_CIS_ESTABLISHED, hci_le_cis_estabilished_evt,
-+	HCI_LE_EV(HCI_EVT_LE_CIS_ESTABLISHED, hci_le_cis_established_evt,
- 		  sizeof(struct hci_evt_le_cis_established)),
- 	/* [0x1a = HCI_EVT_LE_CIS_REQ] */
- 	HCI_LE_EV(HCI_EVT_LE_CIS_REQ, hci_le_cis_req_evt,
-@@ -7054,7 +7054,7 @@ static const struct hci_le_ev {
- 	/* [0x1d = HCI_EV_LE_BIG_SYNC_ESTABILISHED] */
- 	HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_ESTABILISHED,
- 		     hci_le_big_sync_established_evt,
--		     sizeof(struct hci_evt_le_big_sync_estabilished),
-+		     sizeof(struct hci_evt_le_big_sync_established),
- 		     HCI_MAX_EVENT_SIZE),
- 	/* [0x22 = HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
- 	HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index cc055b952ce6..706a47357363 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -1728,7 +1728,7 @@ struct iso_list_data {
- 
- static bool iso_match_big(struct sock *sk, void *data)
- {
--	struct hci_evt_le_big_sync_estabilished *ev = data;
-+	struct hci_evt_le_big_sync_established *ev = data;
- 
- 	return ev->handle == iso_pi(sk)->qos.bcast.big;
- }
-@@ -1742,7 +1742,7 @@ static void iso_conn_ready(struct iso_conn *conn)
- {
- 	struct sock *parent = NULL;
- 	struct sock *sk = conn->sk;
--	struct hci_ev_le_big_sync_estabilished *ev = NULL;
-+	struct hci_ev_le_big_sync_established *ev = NULL;
- 	struct hci_ev_le_pa_sync_established *ev2 = NULL;
- 	struct hci_ev_le_per_adv_report *ev3 = NULL;
- 	struct hci_conn *hcon;
-@@ -1844,7 +1844,7 @@ static void iso_conn_ready(struct iso_conn *conn)
- 		hci_conn_hold(hcon);
- 		iso_chan_add(conn, sk, parent);
- 
--		if ((ev && ((struct hci_evt_le_big_sync_estabilished *)ev)->status) ||
-+		if ((ev && ((struct hci_evt_le_big_sync_established *)ev)->status) ||
- 		    (ev2 && ev2->status)) {
- 			/* Trigger error signal on child socket */
- 			sk->sk_err = ECONNREFUSED;
-@@ -1900,7 +1900,7 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- 	 * proceed to establishing a BIG sync:
- 	 *
- 	 * 1. HCI_EV_LE_PA_SYNC_ESTABLISHED: The socket may specify a specific
--	 * SID to listen to and once sync is estabilished its handle needs to
-+	 * SID to listen to and once sync is established its handle needs to
- 	 * be stored in iso_pi(sk)->sync_handle so it can be matched once
- 	 * receiving the BIG Info.
- 	 * 2. HCI_EVT_LE_BIG_INFO_ADV_REPORT: When connect_ind is triggered by a
-
----
-base-commit: df8c0b8a03e871431587a13a6765cb4c601e1573
-change-id: 20250701-fix_typos-98325a4467a5
-
-Best regards,
--- 
-Yang Li <yang.li@amlogic.com>
-
-
+Thanks for off-list discussions/review and help too, Christian! ;-)
 
