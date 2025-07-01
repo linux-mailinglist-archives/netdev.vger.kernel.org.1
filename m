@@ -1,207 +1,208 @@
-Return-Path: <netdev+bounces-202839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C38A3AEF4AE
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:13:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7E75AEF4D3
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:17:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93BBC4A38F2
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 10:13:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAAEF440319
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 10:16:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B856726FA7B;
-	Tue,  1 Jul 2025 10:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C182126FA4E;
+	Tue,  1 Jul 2025 10:16:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="FVrEZznS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V5B+84TY"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D579C26F478
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 10:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2CBE21771F
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 10:16:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751364809; cv=none; b=R0CtOXIfOGkI0/CTgBjDyWHxUoC26yEHL7v1LAV5Hpgi5QD70TV3i7hD4konCYDYhGyBmGvwpYVoN8RmlrM4uRirMbQeREdagTbhPEyMJrJmrbQqTXIo4WF10KhT4upswgloGet0GnJpRyj9L8+ROglMJX+lGFG8sBVGbR4WXoo=
+	t=1751365018; cv=none; b=ARdQorC1Oy9q2PTVGxitE1sccGieJUNi4/FlOXRKbR9ZCnYwgxsPaxJTA5kvHToWo3tw9uq6jSOF9RYLwCPDfMi+rdzTurM+LMjFnbgS+UPxS9zEtxmILJ8TtMy+Zzpr+suBwvtvk4kd7Wvbb/nOmKff4+0NUh4thyx/1eClKuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751364809; c=relaxed/simple;
-	bh=fzJjIzRNC5ZlE4xpeBAyKgQnKiPz+VkSrT8w7VE2fpE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=czHkUDufBUhVURVjPlsLFemCU1j22IAg8UfqzYyuHHI0fOeqSssSUI+BGaWgusK/HJwbgvhu9SL/qUcOmivh7Jtmy1vVRe9XKTYAvoqJ2l7ge/NMyY1tPX44oal8QHlmVkTnMVevOL9iNoMBseaMvzko3ABBrpHdkio64Isj5OE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=FVrEZznS; arc=none smtp.client-ip=202.12.124.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfout.stl.internal (Postfix) with ESMTP id C09C71D0021D;
-	Tue,  1 Jul 2025 06:13:26 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Tue, 01 Jul 2025 06:13:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1751364806; x=1751451206; bh=TC15ZCyOpbfoe3LvQKTdVTUkTU0MfI3a99z
-	G+q0/Goo=; b=FVrEZznSiMu15S4Cu862KjZCq1VFLecwi7qTkw9x7/d+N2++rVj
-	psh3sUZaX+At2Cw0MguQS2rfeUYKyzhB9UQ0ocCzm8rGT3ksoExHjkcUuJFAIMXl
-	tRMqZl8UJFmi8izIjKMdJRkHg+ALNh/KxQvhglQje5kTK03wV1x/K2HW5dJL9HxU
-	Y0hQASmOrmyA5M59CdsjhOEJ6ExgT5NEC+6LbTRGKGqqKNr+zq4KHkSrQ7sqdxHH
-	3xL4zkWkZOBchaBQtQixwpRu7sIBp5BLcHqwnDPrWP5kInL69eHPSNrCzDLLR43p
-	sLcooVJ65adxgIdFwSWgZ4K3KGHcwjOTH6w==
-X-ME-Sender: <xms:xbRjaJBcSaA2r1LHbg_GYSJDeZeOX2fvdyhc6YBXw1jmOQua94MJ2w>
-    <xme:xbRjaHjlG6XUoQ_LvCeCEZDoUJuogA_SWE5fQ9qDlkkwMMVbZylqKZ4Kswl3ZTT3X
-    4e_RAD9iOOEY2I>
-X-ME-Received: <xmr:xbRjaEncCu9-TFhjYoxjnAl1auVnI-SeOsrIwwTrRuN64uvESKgxzuc_orWw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddugedvjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfutghh
-    ihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtthgvrh
-    hnpeehudekfeetieekkeejveehhfdtveegheetteehgfekieeiffegvdekfeeglefggfen
-    ucffohhmrghinhepkhgvrhhnvghlrdhorhhgpddufeelrdhithenucevlhhushhtvghruf
-    hiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghh
-    rdhorhhgpdhnsggprhgtphhtthhopeejpdhmohguvgepshhmthhpohhuthdprhgtphhtth
-    hopehgnhgruhhlthesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhgsehmohgv
-    ughovhgvrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrd
-    horhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
-    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmh
-    hlohhfthdrnhgvthdprhgtphhtthhopehnohgtsehmohgvughovhgvrdgtohhm
-X-ME-Proxy: <xmx:xbRjaDzNuC_2Nuk2oe3tbwNUZHerXDZQC7Lej5sEkzqq6VdUEKITGw>
-    <xmx:xbRjaOQOp9G_LFqISgM4VW2H7xCVaqzu8V2mcz4uzHAwyGRRAaBA2Q>
-    <xmx:xbRjaGbLmE7Isi9DpoI2Phw5KSd5FDrYbZXx7tkBtcc7Acwh4wtRDg>
-    <xmx:xbRjaPTPcSb8wwRLsclzy5alXQ6pjhKyt8BkSFVb-kIdH9JDVzL-qQ>
-    <xmx:xrRjaCQF4bP84NL97QFMJ858BMvcKczcyXc1b6eyz16x9gbwaP9lwsb_>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 1 Jul 2025 06:13:25 -0400 (EDT)
-Date: Tue, 1 Jul 2025 13:13:22 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Guillaume Nault <gnault@redhat.com>
-Cc: Aiden Yang <ling@moedove.com>, netdev@vger.kernel.org, kuba@kernel.org,
-	pabeni@redhat.com, davem@davemloft.net,
-	MoeDove NOC <noc@moedove.com>
-Subject: Re: [BUG] net: gre: IPv6 link-local multicast is silently dropped
- (Regression)
-Message-ID: <aGO0whOGhE4LmVo2@shredder>
-References: <CANR=AhRM7YHHXVxJ4DmrTNMeuEOY87K2mLmo9KMed1JMr20p6g@mail.gmail.com>
- <aGFSgDRR8kLc1GxP@shredder>
- <aGJ7EvpKRWVzPm4Y@debian>
+	s=arc-20240116; t=1751365018; c=relaxed/simple;
+	bh=TQC9+oQxqblFVDB80MxY1iCatqzGsHJIWGTarUSRBKQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GryogDs+xT9Z7CcCTMMhrmBwCUlYX5BCDku3pLNFCtdfgf7B7mnQEIIb7EEOGXs6IwPSzfist2ifjoqvRs81HxYhb+v3kddTx8WXvXiwgTHlzQREXJvr9w/Yp/2dRTdNfQfEkUIUsnOjBwbzqtSgzYgDr59uGziE6lAaRCNmCYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V5B+84TY; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751365015;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kHo/cFymct4LXXFJUfJvxL32X6eCwnlTq+zBpWThbJs=;
+	b=V5B+84TYbHUWR+rbHyPcTaqsyukICVkqxiNgbiwAeGx/7aN4olCd3H6KDnDyKQq8DgJMRc
+	K/me1WASCfaJFTiARQERgVCKZqbmPXJ6drp59Sp9qfzLmq+jhAddlyUm0G33UPjpQ5zIHG
+	2I4xXd2lWui/V+EYXCmTZAVCXIgitVU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-441-KCwMwZ8COaWRY9G5j8YrWA-1; Tue, 01 Jul 2025 06:16:54 -0400
+X-MC-Unique: KCwMwZ8COaWRY9G5j8YrWA-1
+X-Mimecast-MFC-AGG-ID: KCwMwZ8COaWRY9G5j8YrWA_1751365013
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-450eaae2934so22408785e9.2
+        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 03:16:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751365013; x=1751969813;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kHo/cFymct4LXXFJUfJvxL32X6eCwnlTq+zBpWThbJs=;
+        b=NyPB3QGOgClb1Krl2BwffmhnI/5JjTz4W2fpZZXE9f01/5w0bSz1bDhuozjeWpu4xx
+         TMbgJtaHpdn8bhnxJBabustCmF9kB9tPGPKkGKdmCL0mmfGfjx1KOHSHav6tjPc1lGvq
+         lqo8eKYeLi6h02BHUJ68llrgbG9OQp5CYL9iQlNmxdBLJUu5Ik6qq7gGUH8RFA2/BqFE
+         0w5lRbeh7VndZ9Kx6PffUckZ+KE+n7cEZexOMcklA3Yh0jojbv1iBOu6UhfWTNtn3up5
+         61gSRJ2ETWCjphsdxm+x1NqsihzS99sm7mdyrc0Y/HusbuMLDTb6F1GGyKTCKQ/x7BvD
+         5Rxg==
+X-Gm-Message-State: AOJu0Yx8TaaqAW3xa6B7Qe1Addb8GDmIjm8RqfyNkw4DsthqRbURAuQN
+	z9wVJ8tGIW+8Xmd7Q6aF8OO9tX4w2Z8HCeK1PJAGKZvSjKlj39K/0qax4ekG3Vo+d/jApEaSwgX
+	dgfdh3AR4Pvi98/Kg39FiOKAb4rP6LpH6uOI0FWmxHfB8mx5/TbZ4ACDIOA==
+X-Gm-Gg: ASbGnctrjSUeuk0+EqLvAIwMV1cjAFy5h+6gDrwTVBMHDRenRZPbCOaZ/McKouyTsb6
+	H/wHUvZ62UaljQZiDobjdURwOfXXyuAr48cofwddKYZknXbMhLDlx/frnuZrbkSVqG2Bg4V0KZa
+	tRlIy3E2aCfYNWw1zsCMA41TX9EndOQ4h7K21Xz3zlypD6yXRo6DXtV7Opyc22ECd/jcJXCasrs
+	6yuo+5XE21OYMoreSptjHpXZ35GOcRymgukm3wYpjdJV6vNvnU9kXAT9UOhqlk6Ufrwb5+Tl6Kc
+	cP4wBm0sand9+dZQfgOxMQ4bW9JerzA0HSgB5l8/Zug2JEC5f0lyStlWpfuVMq0WdIU3Fw==
+X-Received: by 2002:a05:600c:4ed3:b0:43d:45a:8fc1 with SMTP id 5b1f17b1804b1-4538f244121mr174638555e9.4.1751365013241;
+        Tue, 01 Jul 2025 03:16:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEEJq4NPlQOANeFkcDdpPTn2V1nB2CZt1s+DQ2EMmFxhbNZ3FodkuTpK5r3gou56aXsP2YbRQ==
+X-Received: by 2002:a05:600c:4ed3:b0:43d:45a:8fc1 with SMTP id 5b1f17b1804b1-4538f244121mr174638105e9.4.1751365012686;
+        Tue, 01 Jul 2025 03:16:52 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:247b:5810:4909:7796:7ec9:5af2? ([2a0d:3344:247b:5810:4909:7796:7ec9:5af2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453962dd8besm100899005e9.31.2025.07.01.03.16.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Jul 2025 03:16:52 -0700 (PDT)
+Message-ID: <852d45b4-d53d-42b6-bcd9-62d95aa1f39d@redhat.com>
+Date: Tue, 1 Jul 2025 12:16:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aGJ7EvpKRWVzPm4Y@debian>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [patch 0/3] ptp: Provide support for auxiliary clocks for
+ PTP_SYS_OFFSET_EXTENDED
+To: Thomas Gleixner <tglx@linutronix.de>, LKML <linux-kernel@vger.kernel.org>
+Cc: netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>,
+ Christopher Hall <christopher.s.hall@intel.com>,
+ John Stultz <jstultz@google.com>, Frederic Weisbecker <frederic@kernel.org>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Miroslav Lichvar <mlichvar@redhat.com>,
+ Werner Abt <werner.abt@meinberg-usa.com>,
+ David Woodhouse <dwmw2@infradead.org>, Stephen Boyd <sboyd@kernel.org>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
+ Kurt Kanzenbach <kurt@linutronix.de>, Nam Cao <namcao@linutronix.de>,
+ Antoine Tenart <atenart@kernel.org>
+References: <20250626124327.667087805@linutronix.de>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250626124327.667087805@linutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 30, 2025 at 01:54:58PM +0200, Guillaume Nault wrote:
-> On Sun, Jun 29, 2025 at 05:49:36PM +0300, Ido Schimmel wrote:
-> > + Guillaume
-> > 
-> > Report is here: https://lore.kernel.org/netdev/CANR=AhRM7YHHXVxJ4DmrTNMeuEOY87K2mLmo9KMed1JMr20p6g@mail.gmail.com/
-> > 
-> > On Sun, Jun 29, 2025 at 02:40:27PM +0800, Aiden Yang wrote:
-> > > This report details a regression in the Linux kernel that prevents
-> > > IPv6 link-local all-nodes multicast packets (ff02::1) from being
-> > > transmitted over a GRE tunnel. The issue is confirmed to have been
-> > > introduced between kernel versions 6.1.0-35-cloud-amd64 (working) and
-> > > 6.1.0-37-cloud-amd64 (failing) on Debian 12 (Bookworm).
-> > 
-> > Apparently 6.1.0-35-cloud-amd64 is v6.1.137 and 6.1.0-37-cloud-amd64 is
-> > v6.1.140. Probably started with:
-> > 
-> > a51dc9669ff8 gre: Fix again IPv6 link-local address generation.
-> > 
-> > In v6.1.139.
-> > 
-> > It skips creating an IPv6 multicast route for some ipgre devices. Can
-> > you try the following diff?
-> > 
-> > diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-> > index ba2ec7c870cc..d0a202d0d93e 100644
-> > --- a/net/ipv6/addrconf.c
-> > +++ b/net/ipv6/addrconf.c
-> > @@ -3537,12 +3537,10 @@ static void addrconf_gre_config(struct net_device *dev)
-> >  	 * case). Such devices fall back to add_v4_addrs() instead.
-> >  	 */
-> >  	if (!(dev->type == ARPHRD_IPGRE && *(__be32 *)dev->dev_addr == 0 &&
-> > -	      idev->cnf.addr_gen_mode == IN6_ADDR_GEN_MODE_EUI64)) {
-> > +	      idev->cnf.addr_gen_mode == IN6_ADDR_GEN_MODE_EUI64))
-> >  		addrconf_addr_gen(idev, true);
-> > -		return;
-> > -	}
-> > -
-> > -	add_v4_addrs(idev);
-> > +	else
-> > +		add_v4_addrs(idev);
-> >  
-> >  	if (dev->flags & IFF_POINTOPOINT)
-> >  		addrconf_add_mroute(dev);
+On 6/26/25 3:27 PM, Thomas Gleixner wrote:
+> This small series enables support for auxiliary clocks on top of the
+> timekeeping core infrastructure, which has been paritially merged. The
+> remaining outstanding patches can be found here:
 > 
-> I believe that should fix the problem indeed. But, to me, the root
-> cause is that addrconf_gre_config() doesn't call addrconf_add_dev().
+>      https://lore.kernel.org/all/20250625182951.587377878@linutronix.de
 > 
-> Ido, What do you think of something like the following (untested,
-> hand-written) diff:
+> Auxiliary clocks are required to support TSN use cases in automation,
+> automotive, audio and other areas. They utilize PTP for synchronizing nodes
+> in a network accurately, but the underlying master clock is not necessarily
+> related to clock TAI. They are completely independent and just represent a
+> common notion of time in a network for an application specific
+> purpose. This comes with problems obvioulsy:
 > 
->  #if IS_ENABLED(CONFIG_NET_IPGRE)
->  static void addrconf_gre_config(struct net_device *dev)
->  {
->  	struct inet6_dev *idev;
->  
->  	ASSERT_RTNL();
->  
-> -	idev = ipv6_find_idev(dev);
-> -	if (IS_ERR(idev)) {
-> -		pr_debug("%s: add_dev failed\n", __func__);
-> -		return;
-> -	}
-> +	idev = addrconf_add_dev(dev);
-> +	if (IS_ERR(idev))
-> +		return;
->  
->  	/* Generate the IPv6 link-local address using addrconf_addr_gen(),
->  	 * unless we have an IPv4 GRE device not bound to an IP address and
->  	 * which is in EUI64 mode (as __ipv6_isatap_ifid() would fail in this
->  	 * case). Such devices fall back to add_v4_addrs() instead.
->  	 */
->  	if (!(*(__be32 *)dev->dev_addr == 0 &&
->  	      idev->cnf.addr_gen_mode == IN6_ADDR_GEN_MODE_EUI64)) {
->  		addrconf_addr_gen(idev, true);
->  		return;
->  	}
->  
->  	add_v4_addrs(idev);
-> -
-> -	if (dev->flags & IFF_POINTOPOINT)
-> -		addrconf_add_mroute(dev);
->  }
->  #endif
+>    1) Applications have no fast access to the time of such independent PTP
+>       clocks. The only way is to utilize the file descriptor of the PTP
+>       device with clock_gettime(). That's slow as it has to go all the way
+>       out to the hardware.
 > 
-> This way, we would create the multicast route and also respect
-> disable_ipv6. That would bring GRE yet a bit closer to normal IPv6
-> lladdr generation code.
+>    2) The network stack cannot access PTP time at all because accessing the
+>       PTP hardware requires preemptible task context in quite some cases.
+> 
+> The timekeeper core changes provide support for this including the ability
+> to steer these clocks independently from the core timekeeper via
+> clock_adjtimex(2).
+> 
+> This is obviously incomplete as the user space steering daemon needs to be
+> able to correlate timestamps from these auxiliary clocks with the
+> associated PTP device timestamp. The PTP_SYS_OFFSET_EXTENDED IOCTL command
+> already supports to select clock IDs for pre and post hardware timestamps,
+> so the first step for correlation is to extend that IOCTL to allow
+> selecting auxiliary clocks.
+> 
+> Auxiliary clocks do not provide a seperate CLOCK_MONOTONIC_RAW variant as
+> they are internally utilizing the same clocksource and therefore the
+> existing CLOCK_MONOTONIC_RAW correlation is valid for them too, if user
+> space wants to determine the correlation to the underlying clocksource raw
+> initial conversion factor:
+> 
+> CLOCK_MONOTONIC_RAW:
+> 
+>   The clocksource readout is converted to nanoseconds by a conversion
+>   factor, which has been determined at setup time. This factor does not
+>   change over the lifetime of the system.
+> 
+> CLOCK_REALTIME, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_TAI:
+> 
+>   The clocksource readout is converted to nanoseconds by a conversion
+>   factor, which starts with the CLOCK_MONOTONIC_RAW conversion factor at
+>   setup time. This factor can be steered via clock_adjtimex(CLOCK_REALTIME).
+> 
+>   All related clocks use the same conversion factor and internally these
+>   clocks are built on top of CLOCK_MONOTONIC by adding a clock specific
+>   offset after the conversion. The CLOCK_REALTIME and CLOCK_TAI offsets can
+>   be set via clock_settime(2) or clock_adjtimex(2). The CLOCK_BOOTTIME
+>   offset is modified after a suspend/resume cycle to take the suspend time
+>   into account.
+> 
+> CLOCK_AUX:
+> 
+>   The clocksource readout is converted to nanoseconds by a conversion
+>   factor, which starts with the CLOCK_MONOTONIC_RAW conversion factor at
+>   setup time. This factor can be steered via clock_adjtimex(CLOCK_AUX[n]).
+> 
+>   Each auxiliary clock uses its own conversion factor and offset. The
+>   offset can be set via clock_settime(2) or clock_adjtimex(2) for each
+>   clock ID.
+> 
+> The series applies on top of the above mentioned timekeeper core changes
+> and the PTP character device spring cleaning series, which can be found
+> here:
+> 
+>   https://lore.kernel.org/all/20250625114404.102196103@linutronix.de
+> 
+> It is also available via git with all prerequisite patches:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/tglx/devel.git timers/ptp/driver-auxclock
+> 
+> Miroslav: This branch should enable you to test the actual steering via a
+> 	  PTP device which has PTP_SYS_OFFSET_EXTENDED support in the driver.
 
-Makes sense. So you will submit it to net and extend gre_ipv6_lladdr.sh
-to test for the presence of a multicast route?
+I have some dumb issues merging this on net-next.
 
-> 
-> Note: this diff is based on net-next, but, without all the extra
-> context lines, a real patch would probably apply to both net and
-> next-next and could be backported to -stable.
-> 
-> > Guillaume, AFAICT, after commit d3623dd5bd4e ("ipv6: Simplify link-local
-> > address generation for IPv6 GRE.") in net-next an IPv6 multicast route
-> > will be created for every ip6gre device, regardless of IFF_POINTOPOINT.
-> > It should restore the behavior before commit e5dd729460ca ("ip/ip6_gre:
-> > use the same logic as SIT interfaces when computing v6LL address"). We
-> > can extend gre_ipv6_lladdr.sh to test this once the fix is in net-next.
-> 
-> Yes, I fully agree.
-> 
-> Long term, I'd really like to remove these special GRE and SIT cases
-> (SIT certainly has the same problems we're currently fixing on GRE).
-> 
+It looks like we should pull from the above URL, but it looks like the
+prereq series there has different hashes WRT the tip tree. Pulling from
+there will cause good bunch of duplicate commits - the pre-req series vs
+the tip tree and the ptp cleanup series vs already merge commits on
+net-next.
+
+I guess we want to avoid such duplicates, but I don't see how to avoid
+all of them. A stable branch on top of current net-next will avoid the
+ptp cleanup series duplicates, but will not avoid duplicates for
+prereqs. Am I missing something obvious?
+
+Thanks,
+
+Paolo
+
 
