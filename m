@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-203004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65BBEAF0106
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 19:01:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3940DAF0110
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 19:02:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 544741663DD
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:58:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1915016A023
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:59:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4205C27F727;
-	Tue,  1 Jul 2025 16:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0132828312E;
+	Tue,  1 Jul 2025 16:58:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZmNrt4MU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dnrhBQMj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0042F27E7DB;
-	Tue,  1 Jul 2025 16:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1CF22820A7;
+	Tue,  1 Jul 2025 16:58:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751389089; cv=none; b=SjSSXJDnUG5w/AgbnShTVpN8Bk72rQWBemFmI8acbJ1+TJeR1SVD3Tfkf6SVQ2tuFjyPNqScnCKq8Id6zUB2gs12oN63TVNiZn7PxT2WK1DuZ2LuTmj4W5ePonTbHJ6ameyCDLJkNmuGvluoGRYuCNpNAnocdZk2RsGiDatJRDE=
+	t=1751389090; cv=none; b=UbVtiRuNN6pZZJJNsi0kO0OZ178kL7F1TRtramQ62nYpPEUBsp1RALG+KS2J52oWbIJqcdfEp/iXFblgSX6U7lhdZ6BiDzXr966v7sv8iw2XYEOu0+8Kr7w5rmV+wrRKKQpvAgj0EyZy2RyR2ZiDvbqsO1PQE9KKvGGjSxP22Ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751389089; c=relaxed/simple;
-	bh=I/bJFFYuJYTgGBIDN+smaPh81pdclQ4NTY0/0vTHG0Q=;
+	s=arc-20240116; t=1751389090; c=relaxed/simple;
+	bh=BQIohLNyX6fFH5M+mDocAy98v2BgzyzdocJ6lj2XgXY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nUHA8xQN/io/hx6p9jK2PRdEOi6U4UGOv7waEHqAA2QSVK4CiakWPpFpC8ZfWoTtoE7Y8SIWJBBAS6gnwXCTeYGncI0Ao3ZGxzhtmXktcZU7Me0JjCn9hb838l065Y5iOSk5jl/+3hukzgss0xaAHnE6ny9bFQ0K791Wuqew4cQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZmNrt4MU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53288C4CEF8;
-	Tue,  1 Jul 2025 16:58:08 +0000 (UTC)
+	 MIME-Version; b=YtcAGiiglfp7E3Cb8hFYC5Ike9zrBCTJMxdTnlvF2JfQmyVHz3HWzv5O3Zk4JDZ+r6DAZz4V48hPNr5Xsbb2I956zsBiT6bXR2kt0jsFgc1E14jd5tvwCM+lxtXf+ZRqUbDU5nkb4+tfIvCKDVRsjZR9tbXrN+7nIQ2C4LBmoaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dnrhBQMj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28309C4CEF6;
+	Tue,  1 Jul 2025 16:58:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751389088;
-	bh=I/bJFFYuJYTgGBIDN+smaPh81pdclQ4NTY0/0vTHG0Q=;
+	s=k20201202; t=1751389090;
+	bh=BQIohLNyX6fFH5M+mDocAy98v2BgzyzdocJ6lj2XgXY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZmNrt4MUMKTDeLpB9MdnSdSE18qRibwY8Nbtz/Isya33gvsd8q4Pkzx8o2FY7QY23
-	 SF70tJKMuR70mbxPbgxJ+OB2jTM4ieHcxzYC89iAxmEd5LYUVdoVYQ4pz1Ig512DPh
-	 GvGRXMHs154G81LOE2/Fdng7K4HVDTb+e/ZT2JBluFArZ00QQck7u5rxkcSc/1eTlz
-	 f1bC6E2NJZm7uSCtKL1Z2heRMhw6DHwT21YnOVz74U8AIdaq6I4WjYpN6AiUZdlxo7
-	 2mhy1zKf2y3EAzRZcNbtZvjA49GA6fwiTFEwQ4WGCuUQAgzBxGDLgt1im6e/n/1QMC
-	 Xe79bZgFiuqOw==
+	b=dnrhBQMjibtH8o+b43mbPrGzj/EnBoOCbPRS8XHKnGWFnmMogRJ7/vO5rBrcAQHLY
+	 3aVB/5d71QOBFmHnGk6dIk6EbM/ImTxzhjeSVZlBa5SJTnGYigRQcTtYSHkutZMz/0
+	 2eLSuolosC1YiX9+CixV0fNRVhzLaxea9LhBvo8vyyhWAXs8iaxg/6ZAGZbImAiEpH
+	 IYJ1as6z/GB7yCdtO+E4hJbopKq4zzsPg5T2imJ82fVnAtu8JfR3hSNaR0gmmbsDdv
+	 Obb01FMwBf6kIMvU7UF0UTw4dBysctgiSuKJYXkEHKA54nXcC96OYgQrP7janHhga+
+	 KPxBMfC5YZgOQ==
 Received: by wens.tw (Postfix, from userid 1000)
-	id E2E595FF71; Wed,  2 Jul 2025 00:58:05 +0800 (CST)
+	id EC24E5FFD1; Wed,  2 Jul 2025 00:58:05 +0800 (CST)
 From: Chen-Yu Tsai <wens@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -61,9 +61,9 @@ Cc: netdev@vger.kernel.org,
 	linux-sunxi@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH RFT net-next 04/10] soc: sunxi: sram: register regmap as syscon
-Date: Wed,  2 Jul 2025 00:57:50 +0800
-Message-Id: <20250701165756.258356-5-wens@kernel.org>
+Subject: [PATCH RFT net-next 05/10] arm64: dts: allwinner: a523: Add GMAC200 ethernet controller
+Date: Wed,  2 Jul 2025 00:57:51 +0800
+Message-Id: <20250701165756.258356-6-wens@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250701165756.258356-1-wens@kernel.org>
 References: <20250701165756.258356-1-wens@kernel.org>
@@ -77,46 +77,90 @@ Content-Transfer-Encoding: 8bit
 
 From: Chen-Yu Tsai <wens@csie.org>
 
-Until now, if the system controller had a ethernet controller glue layer
-control register, a limited access regmap would be registered and tied
-to the system controller struct device for the ethernet driver to use.
+The A523 SoC family has a second ethernet controller, called the
+GMAC200. It is not exposed on all the SoCs in the family.
+
+Add a device node for it. All the hardware specific settings are from
+the vendor BSP.
 
 Signed-off-by: Chen-Yu Tsai <wens@csie.org>
 ---
- drivers/soc/sunxi/sunxi_sram.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ .../arm64/boot/dts/allwinner/sun55i-a523.dtsi | 55 +++++++++++++++++++
+ 1 file changed, 55 insertions(+)
 
-diff --git a/drivers/soc/sunxi/sunxi_sram.c b/drivers/soc/sunxi/sunxi_sram.c
-index 4f8d510b7e1e..63c23bdffa78 100644
---- a/drivers/soc/sunxi/sunxi_sram.c
-+++ b/drivers/soc/sunxi/sunxi_sram.c
-@@ -12,6 +12,7 @@
+diff --git a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
+index 65779754427d..5787ad72a918 100644
+--- a/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi
+@@ -165,6 +165,16 @@ rgmii0_pins: rgmii0-pins {
+ 				bias-disable;
+ 			};
  
- #include <linux/debugfs.h>
- #include <linux/io.h>
-+#include <linux/mfd/syscon.h>
- #include <linux/module.h>
- #include <linux/of.h>
- #include <linux/of_address.h>
-@@ -377,6 +378,7 @@ static int __init sunxi_sram_probe(struct platform_device *pdev)
- 	const struct sunxi_sramc_variant *variant;
- 	struct device *dev = &pdev->dev;
- 	struct regmap *regmap;
-+	int ret;
- 
- 	sram_dev = &pdev->dev;
- 
-@@ -394,6 +396,10 @@ static int __init sunxi_sram_probe(struct platform_device *pdev)
- 		regmap = devm_regmap_init_mmio(dev, base, &sunxi_sram_regmap_config);
- 		if (IS_ERR(regmap))
- 			return PTR_ERR(regmap);
++			rgmii1_pins: rgmii1-pins {
++				pins = "PJ0", "PJ1", "PJ2", "PJ3", "PJ4",
++				       "PJ5", "PJ6", "PJ7", "PJ8", "PJ9",
++				       "PJ11", "PJ12", "PJ13", "PJ14", "PJ15";
++				allwinner,pinmux = <5>;
++				function = "gmac1";
++				drive-strength = <40>;
++				bias-disable;
++			};
 +
-+		ret = of_syscon_register_regmap(dev->of_node, regmap);
-+		if (IS_ERR(ret))
-+			return ret;
- 	}
+ 			uart0_pb_pins: uart0-pb-pins {
+ 				pins = "PB9", "PB10";
+ 				allwinner,pinmux = <2>;
+@@ -619,6 +629,51 @@ mdio0: mdio {
+ 			};
+ 		};
  
- 	of_platform_populate(dev->of_node, NULL, NULL, dev);
++		gmac1: ethernet@4510000 {
++			compatible = "allwinner,sun55i-a523-gmac200",
++				     "snps,dwmac-4.20a";
++			reg = <0x04510000 0x10000>;
++			clocks = <&ccu CLK_BUS_EMAC1>, <&ccu CLK_MBUS_EMAC1>;
++			clock-names = "stmmaceth", "mbus";
++			resets = <&ccu RST_BUS_EMAC1>;
++			reset-names = "stmmaceth";
++			interrupts = <GIC_SPI 47 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "macirq";
++			pinctrl-names = "default";
++			pinctrl-0 = <&rgmii1_pins>;
++			power-domains = <&pck600 PD_VO1>;
++			syscon = <&syscon>;
++			snps,fixed-burst;
++			snps,axi-config = <&gmac1_stmmac_axi_setup>;
++			snps,mtl-rx-config = <&gmac1_mtl_rx_setup>;
++			snps,mtl-tx-config = <&gmac1_mtl_tx_setup>;
++			status = "disabled";
++
++			mdio1: mdio {
++				compatible = "snps,dwmac-mdio";
++				#address-cells = <1>;
++				#size-cells = <0>;
++			};
++
++			gmac1_mtl_rx_setup: rx-queues-config {
++				snps,rx-queues-to-use = <1>;
++
++				queue0 {};
++			};
++
++			gmac1_stmmac_axi_setup: stmmac-axi-config {
++				snps,wr_osr_lmt = <0xf>;
++				snps,rd_osr_lmt = <0xf>;
++				snps,blen = <256 128 64 32 16 8 4>;
++			};
++
++			gmac1_mtl_tx_setup: tx_queues-config {
++				snps,tx-queues-to-use = <1>;
++
++				queue0 {};
++			};
++		};
++
+ 		ppu: power-controller@7001400 {
+ 			compatible = "allwinner,sun55i-a523-ppu";
+ 			reg = <0x07001400 0x400>;
 -- 
 2.39.5
 
