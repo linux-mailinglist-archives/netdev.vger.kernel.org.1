@@ -1,213 +1,153 @@
-Return-Path: <netdev+bounces-202766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20ECDAEEECB
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 08:32:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5DFDAEEEE1
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 08:36:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6211A3E110B
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 06:32:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6B487A4497
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 06:35:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C2B71E5B6D;
-	Tue,  1 Jul 2025 06:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988BE25A640;
+	Tue,  1 Jul 2025 06:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gguqPsN7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAEE190477
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 06:32:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF15619ABAC
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 06:36:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751351575; cv=none; b=Xp3NLi9xfzFyvUn5G5tUkzhwtIvP+ETb8id7pRs10hijfo3XzoHZBYVeEYMMR+pSxM8kUClVOj1nAuImfLVc2Qditj+viHvS6aldN0ooKdqANmOGhJxpD8lI3Bm3N9dkINMvJjyTz8LioW1sCsFmSnnclt3og2fCvFlgMs9qv0Y=
+	t=1751351793; cv=none; b=c9LvDe0U1GNWm9927U2YEmBdzeVQiQtJhOvGfD0yGuzylpjCazP2pKW4HAN5htT3PyyeKtcyM+qTmtE4y1/bSv1PmwKn6s+L+iBbS7cHnMKmufhZomp/5J4Jh06OOe4INScVcPb2OloEcDjnsscIKDAgKLs5733k6AyqsMTvP9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751351575; c=relaxed/simple;
-	bh=huv7EyBAbRLClZXipGCNggqV1/llwO0Qn/TW+uVAcTA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=F0BXLjua8dMsqP6cJqBaB2artjHdgdUpeIKD50Wln+PTjecwy6Jv/USsQd1lNoT4p0C0EnpEdo7GnYcT341kHzqAOxbrL3ZITuFkaHUHfA93yXi7MtnAP3YdPBpqdKtJ5y9pc01TJ4EU0IoZLngkIV4Qu0z7dLzxzGhl8UH6CwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.92.39.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: esmtpgz13t1751351489t7ab4a541
-X-QQ-Originating-IP: /XJtDk+ruDBwNgcSWFg/4uWhr9U3HyJY9/KOEoS2iRY=
-Received: from lap-jiawenwu.trustnetic.com ( [125.120.151.178])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 01 Jul 2025 14:31:27 +0800 (CST)
-X-QQ-SSF: 0001000000000000000000000000000
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 5692066625932100706
-EX-QQ-RecipientCnt: 12
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	michal.swiatkowski@linux.intel.com,
-	larysa.zaremba@intel.com
-Cc: mengyuanlou@net-swift.com,
-	duanqiangwen@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net v4 3/3] net: ngbe: specify IRQ vector when the number of VFs is 7
-Date: Tue,  1 Jul 2025 14:30:30 +0800
-Message-Id: <20250701063030.59340-4-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20250701063030.59340-1-jiawenwu@trustnetic.com>
-References: <20250701063030.59340-1-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1751351793; c=relaxed/simple;
+	bh=S6cjipfxAita73V6JkLosCs6f9j35AYf4JtRigU5I9E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eWy6Wr5ZUr1UrDlfd8lG59yT8HwcOiwI36zL7pAsVQpEhn8psXJ1lPdowbebyNHJGcBWUIrYYXo1qH4MYnmKXGIzyNIkFr+8QDuIGupg0v/3xB5bEgRvb622E0Uml8NpqXDELtiGR3RNuJ8AinDxrNC1QMwEQmVUP6+f9OaSIjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gguqPsN7; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a4e749d7b2so894019f8f.0
+        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 23:36:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1751351790; x=1751956590; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EZS2dGfFhz4DV5h9FGWwFN5DAtPdX96LRkBj81DNpcM=;
+        b=gguqPsN7Tsz336dNL6RoQmqQZiom3ibRshTpot3aaoFy6CUsqqJ+8gg0psuvuLvPVs
+         ILT+QiA04ertZ2Jmo3uwHnoLt5jO7x2Sry9igp/kT/hOIR5qzq2VmG73TYl/d6Y/WCM2
+         X7rzBxbCkGjvlNvKK6yZPwAlIbud4PwxBgj9fH6bssN32tL/5IwaTZVUPlXJQkNZUrs7
+         DAvRFu7omm6pywA1ZjS9mTH8Jgles4cXVeWoiEYPjLVUW2/hWMtAW4GLZQlXcqGz0yAr
+         F6vZEFoq6qN85HJfXCF7tRc4hWkf+sRgM23hkKOwS1aL7RWjIUWIoFVR6xILUbj/AEyE
+         FiHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751351790; x=1751956590;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EZS2dGfFhz4DV5h9FGWwFN5DAtPdX96LRkBj81DNpcM=;
+        b=p5AeGUyyvOYUl1Vo7WsZCvgIpMe2hONJA7XLDMPisjJtKn1wHBGkjNCbzLXR7wMofB
+         eyZnzf5pyVZ6qRsj29qwW2lwcG2/7zrLuLbbZTYwgMVyes4cIwFQZOYvRsGIfUTI8Cym
+         m6XRfwJTVAR2LZpVcITUDBJNgiEd4VR7Hw2fsBAyPPQtT4i8f1Fn+gDmKEgl8FkqUA+e
+         aK29wJUfqZeBgqgN01u6umk/ya/ckp94MA4il9inxv1lWk/PkL3tEjqzqBgoGV+dSLj4
+         xi8tE2Uwy6fL2ekW+zZP/I/TpWowJd372gzCgtah2/AlIIIhxLqYbemMU/gj43npLAak
+         ckXA==
+X-Forwarded-Encrypted: i=1; AJvYcCU9NbIvJ28tDoKV32KJdjaTLIv4K0ZselhJMdrMEUzGikJGJoAUKdw/tiVXiFPPhIKpPLL1tVY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzh1Abqo84mM9YK66Zsu9sZJxC7xA/WwT8fVdwXxiPlJsViO5yt
+	GCr2JybCVf4HD6FQ+sTorhRqjZfxbzbGTx4bzIpB3W9Kik3NvAq/SuNRRf9Nla61Rec=
+X-Gm-Gg: ASbGncvclLPsuUc8FXkR0CbYVjrGat6GBWdjyYb8chuz14hG7UudDW+Stlicn+WDzck
+	DJiOZSeXOfKE4vEQTtmFmW3QD3pVLlEROFsSxlTjCyPV1fBzfUbvUKl6z05v0izkg+HpkGoyMm9
+	SSWDRLoYlHFA1SoaK1ZfkUdeRiXBM+DYNPLXFTQAebxSoKnaqRA15Bjt/Q5s3TO5z+2gaXZdG03
+	FeSUkdMi312pJ++5VUfIMEZlH99Tis5jHrhWN39XixfqOGqyNIceVYEfbOB+RyaGcUwDqOjpaon
+	TBQy5N7zHU/kh/GS/EPPlMbnZuSnCYttGHbxQaiG8SGimvENGaEHXqA4W5Y1Mq4eS6zv2EhQjfs
+	=
+X-Google-Smtp-Source: AGHT+IFtrU4YoQ/j7QsTLU6w1l0Gl0/puRBtn5UoLC4Rc4bLHeuG9LgcLkzyP525KKRGuBzuEKPP5w==
+X-Received: by 2002:a05:6000:178e:b0:3a5:8b43:2c19 with SMTP id ffacd0b85a97d-3af48a83a9dmr416781f8f.4.1751351790022;
+        Mon, 30 Jun 2025 23:36:30 -0700 (PDT)
+Received: from krzk-bin.. ([178.197.222.89])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a892e5963csm12294776f8f.79.2025.06.30.23.36.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jun 2025 23:36:29 -0700 (PDT)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Inochi Amaoto <inochiama@gmail.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	sophgo@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	stable@vger.kernel.org
+Subject: [PATCH net] dt-bindings: net: sophgo,sg2044-dwmac: Drop status from the example
+Date: Tue,  1 Jul 2025 08:36:22 +0200
+Message-ID: <20250701063621.23808-2-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1527; i=krzysztof.kozlowski@linaro.org;
+ h=from:subject; bh=S6cjipfxAita73V6JkLosCs6f9j35AYf4JtRigU5I9E=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBoY4Hl6oFY6MC1mYY3tYMqGk+Xq4qtbynXG0VKf
+ o4z8NuGJQ6JAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaGOB5QAKCRDBN2bmhouD
+ 17vkD/4lwb76qcvbDpG1bX92LByyYKigIiXJxiNcw7iJhyOz/uTjY3I9NhZuyiOIqxv40YBYzuJ
+ ZvAx5nw8qpRLROL2Lhc+UAZSKriUlMxsZMRuIxDSAG0nUrspxP4Apb2LCGFCDuymBn9X1M6NNx5
+ UR3Q7hIMidIXmsBG0EOH28pOoW43+XPX5dEcPYkyYCG0hi5QWCdY+fWzzf9pbbFWBffc6sm/gMG
+ 6gHkizBuTkNgvf9OQ+6ESUAglErh4kwOyIhcujG18uNr72N1nBHBz74USDZKbEPKznsXaQDbuij
+ K0g+2gF503iGxuI8vtSaiA6tpUshj9B8WBDxrUngLZROQs8aJLfrfAUx01OmVzsmGZRIIg57N+g
+ Fx+08WIJnvdLlB2Uvv8eoO028JJxeDMsQq/LLs8S1AACMdjEcx5H4mZT+Wplh0QGURXG1t6XFv0
+ +w3T6moXyOLD/t3SgDHBwr7lWEnjO5QpbNh0zC+i7WVAxJHc42cbj2q+Lwh6yRKLSKmBcih/yHW
+ /TmuvZeauEYDJ35dM5omlLWntZKOpjEt5VDIQkCqrmzb6g5UcWCNBJycKM4ifQxhFLko+XjdaqT
+ lXew70S8oxXEXXJm3f/QHfk3pnRDaKIjwDUU030X+Z8KTFueHnKOSEmkf3oAw2Pp6PsRjOTYlhu NSGDdhRSScXbykw==
+X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp; fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: McJfg7Aee/FZC/RsbfmcWhbtmS5VJWFaxmPxPTukpfHeogt0/ujcTqD1
-	ECBr7ElRQRGZkubPserj1QRxqEpg1vLKUpVKQ/fwU9YmTHYj6RFztsK9kYPsDeebmskQjal
-	Jq9j36O3z8j0VrHktoKRNc5G7zBRzkaPCOcvR/0oxrAtBP5nS/oyWFtNYXVhhK7uU29+61A
-	kZ6D2A6dc57cUHxDPs/nn9VvQpXWetJ0mNk9aHWLXmc7KIq3Kw1Amy0x9WskEuuiwJ7+sZi
-	UgMTEoQa4BsyJ/xPeD21WJDmKTJ2bSSNJVwplG8aV4nCeIUWI0Zrb1SB6wgDicTZ2jeE6nA
-	ExK1J59yZBHrwKdXS3Pg7rDd6doaJD5Z0dal9NAMwTSuGq7kRPtPxJoZZCT0swelulyaaOO
-	PIVT0j+wUl4e5cGcaOZ6bfacaI+MVKohtYCXiVvTLU1SSlIs89T3b4l3erhR6QZ+TsExyUZ
-	yyQn7YAOt8mFrnut5FZfnSIxHtMuJdOBD5twHnOVtimAmIGloWjhU0AyfFjn5X0rFAL+c7c
-	3TBq6LyQjhITc8q1tmB9RBTsV0PDH7vUNYszLJNshDhpKgNzc7IYenoYsTCJL7QPKruPsx8
-	qW2kEildvFqZ5jl8uZ9kMMzUwamplfnj3eFhirHr5A+3sQnDtFDOASqG/1luAYebYqfVOPD
-	2HCSdFUcmNg1yyY8uHrHRO0FY+u+PdKDayVgXIEPoflhATEd4HSiS1SwLwNzAl24WVcqyW6
-	9Pc4Dy/g1DSJn394cOJX0+1oC3u7gWqo9xaPt079Ob3HRj4uTbxMJgqnw6HevTBpPB4XMdr
-	IknxZm4NsMwWbXOYULqf47wg9n51EF0HRIZmjbVwETOxfWFBQyL6rQ50Ti2NHtSlOSepo7i
-	qlzHKITkNCf7+8/hm3rA2LhTqFaIzo+KFF8vcndERvXp60uCml1+yuOfLZOOYVhpbcGvQbI
-	RB/DQWFTD3wOdQqYgJ9yOXEaIsGCOPiDHjE+6grgSNVLyvxg540TSWy24iX/V443vwDIhvt
-	DiiSsbt8prxWdseuYMryJoN7AeueCgb3BXo1+Vrg+A9lQ7YtVQF/x65Stv7SqzjauFUKxtG
-	A79iHbrs97f
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
 
-For NGBE devices, the queue number is limited to be 1 when SRIOV is
-enabled. In this case, IRQ vector[0] is used for MISC and vector[1] is
-used for queue, based on the previous patches. But for the hardware
-design, the IRQ vector[1] must be allocated for use by the VF[6] when
-the number of VFs is 7. So the IRQ vector[0] should be shared for PF
-MISC and QUEUE interrupts.
+Examples should be complete and should not have a 'status' property,
+especially a disabled one because this disables the dt_binding_check of
+the example against the schema.  Dropping 'status' property shows
+missing other properties - phy-mode and phy-handle.
 
-+-----------+----------------------+
-| Vector    | Assigned To          |
-+-----------+----------------------+
-| Vector 0  | PF MISC and QUEUE    |
-| Vector 1  | VF 6                 |
-| Vector 2  | VF 5                 |
-| Vector 3  | VF 4                 |
-| Vector 4  | VF 3                 |
-| Vector 5  | VF 2                 |
-| Vector 6  | VF 1                 |
-| Vector 7  | VF 0                 |
-+-----------+----------------------+
-
-Minimize code modifications, only adjust the IRQ vector number for this
-case.
-
-Fixes: 877253d2cbf2 ("net: ngbe: add sriov function support")
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+Fixes: 114508a89ddc ("dt-bindings: net: Add support for Sophgo SG2044 dwmac")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 9 +++++++++
- drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 4 ++++
- drivers/net/ethernet/wangxun/libwx/wx_type.h  | 1 +
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c | 2 +-
- drivers/net/ethernet/wangxun/ngbe/ngbe_type.h | 2 +-
- 5 files changed, 16 insertions(+), 2 deletions(-)
+ Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-index 66eaf5446115..7b53169cd216 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-@@ -1794,6 +1794,13 @@ static int wx_acquire_msix_vectors(struct wx *wx)
- 	wx->msix_entry->entry = nvecs;
- 	wx->msix_entry->vector = pci_irq_vector(wx->pdev, nvecs);
+diff --git a/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml b/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
+index 4dd2dc9c678b..8afbd9ebd73f 100644
+--- a/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
+@@ -80,6 +80,8 @@ examples:
+       interrupt-parent = <&intc>;
+       interrupts = <296 IRQ_TYPE_LEVEL_HIGH>;
+       interrupt-names = "macirq";
++      phy-handle = <&phy0>;
++      phy-mode = "rgmii-id";
+       resets = <&rst 30>;
+       reset-names = "stmmaceth";
+       snps,multicast-filter-bins = <0>;
+@@ -91,7 +93,6 @@ examples:
+       snps,mtl-rx-config = <&gmac0_mtl_rx_setup>;
+       snps,mtl-tx-config = <&gmac0_mtl_tx_setup>;
+       snps,axi-config = <&gmac0_stmmac_axi_setup>;
+-      status = "disabled";
  
-+	if (test_bit(WX_FLAG_IRQ_VECTOR_SHARED, wx->flags)) {
-+		wx->msix_entry->entry = 0;
-+		wx->msix_entry->vector = pci_irq_vector(wx->pdev, 0);
-+		wx->msix_q_entries[0].entry = 0;
-+		wx->msix_q_entries[0].vector = pci_irq_vector(wx->pdev, 1);
-+	}
-+
- 	return 0;
- }
- 
-@@ -2292,6 +2299,8 @@ static void wx_set_ivar(struct wx *wx, s8 direction,
- 
- 	if (direction == -1) {
- 		/* other causes */
-+		if (test_bit(WX_FLAG_IRQ_VECTOR_SHARED, wx->flags))
-+			msix_vector = 0;
- 		msix_vector |= WX_PX_IVAR_ALLOC_VAL;
- 		index = 0;
- 		ivar = rd32(wx, WX_PX_MISC_IVAR);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-index e8656d9d733b..c82ae137756c 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-@@ -64,6 +64,7 @@ static void wx_sriov_clear_data(struct wx *wx)
- 	wr32m(wx, WX_PSR_VM_CTL, WX_PSR_VM_CTL_POOL_MASK, 0);
- 	wx->ring_feature[RING_F_VMDQ].offset = 0;
- 
-+	clear_bit(WX_FLAG_IRQ_VECTOR_SHARED, wx->flags);
- 	clear_bit(WX_FLAG_SRIOV_ENABLED, wx->flags);
- 	/* Disable VMDq flag so device will be set in NM mode */
- 	if (wx->ring_feature[RING_F_VMDQ].limit == 1)
-@@ -78,6 +79,9 @@ static int __wx_enable_sriov(struct wx *wx, u8 num_vfs)
- 	set_bit(WX_FLAG_SRIOV_ENABLED, wx->flags);
- 	dev_info(&wx->pdev->dev, "SR-IOV enabled with %d VFs\n", num_vfs);
- 
-+	if (num_vfs == 7 && wx->mac.type == wx_mac_em)
-+		set_bit(WX_FLAG_IRQ_VECTOR_SHARED, wx->flags);
-+
- 	/* Enable VMDq flag so device will be set in VM mode */
- 	set_bit(WX_FLAG_VMDQ_ENABLED, wx->flags);
- 	if (!wx->ring_feature[RING_F_VMDQ].limit)
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index d392394791b3..c363379126c0 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -1191,6 +1191,7 @@ enum wx_pf_flags {
- 	WX_FLAG_VMDQ_ENABLED,
- 	WX_FLAG_VLAN_PROMISC,
- 	WX_FLAG_SRIOV_ENABLED,
-+	WX_FLAG_IRQ_VECTOR_SHARED,
- 	WX_FLAG_FDIR_CAPABLE,
- 	WX_FLAG_FDIR_HASH,
- 	WX_FLAG_FDIR_PERFECT,
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index 68415a7ef12f..e0fc897b0a58 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -286,7 +286,7 @@ static int ngbe_request_msix_irqs(struct wx *wx)
- 	 * for queue. But when num_vfs == 7, vector[1] is assigned to vf6.
- 	 * Misc and queue should reuse interrupt vector[0].
- 	 */
--	if (wx->num_vfs == 7)
-+	if (test_bit(WX_FLAG_IRQ_VECTOR_SHARED, wx->flags))
- 		err = request_irq(wx->msix_entry->vector,
- 				  ngbe_misc_and_queue, 0, netdev->name, wx);
- 	else
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-index 6eca6de475f7..3b2ca7f47e33 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_type.h
-@@ -87,7 +87,7 @@
- #define NGBE_PX_MISC_IC_TIMESYNC		BIT(11) /* time sync */
- 
- #define NGBE_INTR_ALL				0x1FF
--#define NGBE_INTR_MISC(A)			BIT((A)->num_q_vectors)
-+#define NGBE_INTR_MISC(A)			BIT((A)->msix_entry->entry)
- 
- #define NGBE_PHY_CONFIG(reg_offset)		(0x14000 + ((reg_offset) * 4))
- #define NGBE_CFG_LAN_SPEED			0x14440
+       gmac0_mtl_rx_setup: rx-queues-config {
+         snps,rx-queues-to-use = <8>;
 -- 
-2.48.1
-
+2.43.0
 
 
