@@ -1,337 +1,229 @@
-Return-Path: <netdev+bounces-202772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A8EFAEEF36
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 08:48:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FF9BAEEF3E
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 08:51:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 304E17AEF88
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 06:47:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D92F77A59C8
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 06:50:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C00971B0435;
-	Tue,  1 Jul 2025 06:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 434891E51FB;
+	Tue,  1 Jul 2025 06:51:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="E+QCFwdj"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NaLGYwNi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2084.outbound.protection.outlook.com [40.107.223.84])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2662BCFB
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 06:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751352514; cv=none; b=TTkTKuFPll9Ob1BkTD0MEEVhxs19yFlZbJ6Izzi0CFRGPvHKL9OBtWTf+Z/Ct1+d9KaWHVAh4v5H9ZAJdzo5FpGNa5NZC+KJtVqtA+GvcPAFXrjeB59gsJowHAEgMCoxKLUR1dOkSFSpvFx5rb9zwrCK4VAnnhsRmL494pKsJ8s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751352514; c=relaxed/simple;
-	bh=j3eMKfYHSCMGzJkr9IZ8a5L7Kf27fpo85gC69JgUINk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TEvQGVofafSG2SPNuZBcH/1Vy468iKN0LN/2w6m6g60unRBxAcvEPTPpXopKgCjddTwCElw3GxHK1je2aAxwteiO/0I7KeVcQKIT7hUSfMBA0hg5hfU/nHHe87IdWnL8ydOrUXdMUgzoxc9FgOVSf13KmTvj9bDmHO4NHBQ12+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=E+QCFwdj; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-607cf70b00aso10675037a12.2
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 23:48:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gooddata.com; s=google; t=1751352511; x=1751957311; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nIZLjW1XMx+pKp+NrR7RPp6IM9NoOEGeAb13fitOSPM=;
-        b=E+QCFwdjX9c1MrdUUxW0FNSmDiNq4fjvKoHtJYT11R5bvASf5nrulzsBnHuu688NO8
-         ghKB7vii+2YyV5VsB1HYyBdZScdsb3Bo2ZiuvJnRcHCb4HIg22Z9+r3i+26hQhtKSRFM
-         46Zo/1Hqu5Tl3sgz43MsqWkEpZK4YFFnNq+B8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751352511; x=1751957311;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nIZLjW1XMx+pKp+NrR7RPp6IM9NoOEGeAb13fitOSPM=;
-        b=GTZrv9TBpSDU+112Vvqt5uef/RYOyToQ0bgRTRr7DwYX8Px36P9IAC1yWRKIfwNrcx
-         GMlC4RAV4kXoY2/zO8bgwo/UhwRrOvAgZwsmp8OCTTZz3Wbz4PQZ3E/jKX7hAjG6CwXg
-         PsiZ8CGbtM72fg7H9ASCEWyHVPq93vuUJNZolmDhjKIaCPaeW5UPh8TvQLPSiRHO26gx
-         mc0MHFzyrXF/Zvmt8pL1FUXf/UYseyYuRR7Vll4lLvwgbnv8F+sJhl9pxGcGwdvsNOtN
-         ZvyMSmQ8YWrjpEbEooAh6nKpedEj4DWIvDMnh+DAC7+yMR3xD1Af9ESgO02Q7ZrlTI3x
-         aPRA==
-X-Forwarded-Encrypted: i=1; AJvYcCWnFB/InysOIW+v3zrpc8+ssDGa4G3MNlQMXgLYsEzSUtm551816CA5neJPKYA7Fr9xwwDMzhw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAMNeBAHMnRLu+oJet2fxCMS/ahPWWHxYrOb2kIgk/SJpSZ0Ja
-	SWahyX23noarY4M3dsZNbi1F2pua7qo0ZsXv19paCcSytFUR2coWUTEyFI+7Cr/N7yY1NgA99xn
-	N6rbJhBF5fWoIcrhAy4aQEmqBlZMwbEiL5s2KDV+4
-X-Gm-Gg: ASbGncuNYo0PunKflUISWjtNxEee1dJkkgWRIRNqtuGYDXJSU94abIYVLRrmAgbDLo4
-	M8l931Sdmkg/3yLmPThNPkyF48iOv8CM2s5YLbT608FDDDeb4qwKxJAJYq/1Hhwb8Wotf4auwy1
-	bubJh2437Co2PDaYafouykPa47a3bCWv3zF2Y8KaAGzGdb
-X-Google-Smtp-Source: AGHT+IF+OqcSSD3Nw9Hf49glIxKVsNYDBRhFFcGncL9jkkz2Cy6zyPDjRDtP3Xu7JHrOpO01kiGeSUAGPL+gTKkvBwo=
-X-Received: by 2002:a17:906:478b:b0:ad5:78ca:2126 with SMTP id
- a640c23a62f3a-ae3501f7b1amr1639667266b.59.1751352510723; Mon, 30 Jun 2025
- 23:48:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADEE11DF987
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 06:51:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.84
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751352681; cv=fail; b=FwL6lXHuQ2KTyJ3T2k7rdb2VQJ7j3q0raEnXQUJ0xFDKGjriYA7gajZyKahymOfEVF5RuouiIYlVLS5Q2dAydAMO6dkz57LkBfMWSUq89ggih85hCGtOz1T6rrHjLgJozpTSSFXQO2XoN2iTDazp8VTVZf8//cCSseLQCRjG8/U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751352681; c=relaxed/simple;
+	bh=zKl7gV+y6viTiXrJL0jtjb1qh05qwWgTkJPi1T4DXrI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HwfNHsn3d2IVo5uUEsSpzZA4AR1jBCxc0Gh2Mo6qP6DwKzlcOK0jVdGKDgUFkmMCVqg5pEdGXFfwBLuAgFH155SBIMOzhK+g4UPWYW6yLS9y5WpGaHw/K5JH3yFYZKKTYsdVq1unI+vjlU6T9CF+lvCC5PeA0Dz5Y7RPw9f3nCI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=NaLGYwNi; arc=fail smtp.client-ip=40.107.223.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qgT99VgCGZaxdu7Kwj0jzNVX0uLRxafDB0zz4XlK0cPqnkr2Mg4AruJ9uv0/PtGZVHsuyf4CtVF8GbX8qJ4UTLZtd/Dl6w0v4iJSoEe3Fb5WtMERiMw34Hi+LSnl10Or0yw0dVauu5+F/j+qXMYaf4zbaf2eNFsRyxHw/2kDNZu9D8z3NVZNBjvqdq0Ds90MOklIOlGBnc8igL56A1Rdr3LGtzFn7UPswfjOdVTsUVE8AGeNYyJXdtS1USi6QxP5PRkMtj7FZ8DlQgmjyln8PhcMjaKA7k7qIgyG2cXZOgVYhqpzpckSJznJsXvrGBm/PAA6llAk22z43o1bZWufBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GTAsLFtXDYOY7fm4UjmQJz2tNMXmOAAzXjkXZQMePFQ=;
+ b=Sg8H5Crog431dz/Xk9p1Z9ntvqsKtWNPulfgqJ1VChi1nOmFDNadx1ztoDEMYc0HWUA3duaQye2xLYBqY6ETS8yctqtfQsTw7NES3w/ES+/SNl6/35gi7WtUXMiZH7aaEtmzTornjqT9ju+oyPZ4k/LUqZs7nUQD3eZDw3MlOGk3B3p2NozuSAonTIac0WPwjg24d3MKyddQUA0SZAtmMEFQQEyFTg/Ud0xhOjikVO0sOV/583lxNwpWA1vAc4v5iffNjWfenyG5Pdhogn8/Cd7ovaMmH+GqmWvEQw4bZ34I84enpOWID+gULNzqfbK4ntYUxQG6Ft+mPKXi1/Qi8A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GTAsLFtXDYOY7fm4UjmQJz2tNMXmOAAzXjkXZQMePFQ=;
+ b=NaLGYwNiX8VQU+ZvNtpI/+PEpyXdvkS5mDZQpD4tUL+IiMvAFUvqdornLMvmGGFn887y7Fg+C7pzCOJYC6VU8UCM8NvYfmVjUVFRH2iT46ot1dtcdiStk+2UxN7+ABUI61vKFWza3dRIjOVyc4JP2+WUM55GZ2FAo4qTcadTQqQ=
+Received: from DS7PR03CA0104.namprd03.prod.outlook.com (2603:10b6:5:3b7::19)
+ by DS0PR12MB7900.namprd12.prod.outlook.com (2603:10b6:8:14e::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.19; Tue, 1 Jul
+ 2025 06:51:13 +0000
+Received: from CY4PEPF0000E9D1.namprd03.prod.outlook.com
+ (2603:10b6:5:3b7:cafe::c1) by DS7PR03CA0104.outlook.office365.com
+ (2603:10b6:5:3b7::19) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8880.30 via Frontend Transport; Tue,
+ 1 Jul 2025 06:51:13 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000E9D1.mail.protection.outlook.com (10.167.241.136) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8901.15 via Frontend Transport; Tue, 1 Jul 2025 06:51:12 +0000
+Received: from airavat.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 1 Jul
+ 2025 01:51:05 -0500
+From: Raju Rangoju <Raju.Rangoju@amd.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <Shyam-sundar.S-k@amd.com>, Raju Rangoju
+	<Raju.Rangoju@amd.com>
+Subject: [PATCH net v3] amd-xgbe: do not double read link status
+Date: Tue, 1 Jul 2025 12:20:16 +0530
+Message-ID: <20250701065016.4140707-1-Raju.Rangoju@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
- <20250416171311.30b76ec1@kernel.org> <CO1PR11MB508931FBA3D5DFE7D8F07844D6BC2@CO1PR11MB5089.namprd11.prod.outlook.com>
- <CAK8fFZ6+BNjNdemB+P=SuwU6X9a9CmtkR8Nux-XG7QHdcswvQQ@mail.gmail.com>
- <CAK8fFZ4BJ-T40eNzO1rDLLpSRkeaHGctATsGLKD3bqVCa4RFEQ@mail.gmail.com>
- <CAK8fFZ5XTO9dGADuMSV0hJws-6cZE9equa3X6dfTBgDyzE1pEQ@mail.gmail.com>
- <b3eb99da-9293-43e8-a24d-f4082f747d6c@intel.com> <CAK8fFZ7LREBEdhXjBAKuaqktOz1VwsBTxcCpLBsa+dkMj4Pyyw@mail.gmail.com>
- <20250625132545.1772c6ab@kernel.org> <CAK8fFZ7KDaPk_FVDbTdFt8soEWrpJ_g0_fiKEg1WzjRp1BC0Qg@mail.gmail.com>
- <CAK8fFZ5rS8Xg11LvyQHzFh3aVHbKdRHpuhrpV_Wc7oYRcMZFRA@mail.gmail.com>
- <c764ad97-9c6a-46f5-a03b-cfa812cdb8e1@intel.com> <CAK8fFZ4bRJz2WnhoYdG8PVYi6=EKYTXBE5tu8pR4=CQoifqUuA@mail.gmail.com>
- <f2e43212-dc49-4f87-9bbc-53a77f3523e5@intel.com> <CAK8fFZ6FU1+1__FndEoFQgHqSXN+330qvNTWMvMfiXc2DpN8NQ@mail.gmail.com>
- <08fae312-2e3e-4622-94ab-7960accc8008@intel.com> <366dbe9f-af4d-48ec-879e-1ac54cd5f3b6@intel.com>
-In-Reply-To: <366dbe9f-af4d-48ec-879e-1ac54cd5f3b6@intel.com>
-From: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Date: Tue, 1 Jul 2025 08:48:04 +0200
-X-Gm-Features: Ac12FXx8i-r4XL6AH8JArrtqr3FiBrKnCdYFS637S081l7EBmmk9YeriRAMYxaI
-Message-ID: <CAK8fFZ6PPw1nshtSp+QZ_2VVWVrsCKZDdsxdPF9Tjc0=_gi=Wg@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
- driver after upgrade to 6.13.y (regression in commit 492a044508ad)
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "Damato, Joe" <jdamato@fastly.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, 
-	"Czapnik, Lukasz" <lukasz.czapnik@intel.com>, "Dumazet, Eric" <edumazet@google.com>, 
-	"Zaki, Ahmed" <ahmed.zaki@intel.com>, Martin Karsten <mkarsten@uwaterloo.ca>, 
-	Igor Raits <igor@gooddata.com>, Daniel Secik <daniel.secik@gooddata.com>, 
-	Zdenek Pesek <zdenek.pesek@gooddata.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D1:EE_|DS0PR12MB7900:EE_
+X-MS-Office365-Filtering-Correlation-Id: e886220c-13fe-4f31-53b1-08ddb86baaf0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?TopEiR2j75wQQW6rlw22QprLMwFK3ZtwqkCf/kAPnzD9x2YacOmE5BbidlsR?=
+ =?us-ascii?Q?ZufsOkaJy9hgTjZwl81nxN54h7LQb7s+Ue+tSc+w/Jhbvkuzv6F08PvDPODx?=
+ =?us-ascii?Q?d+PkdL6TGT8aGBBreIvOlQnCiU9HRJtbZAqn51IJeZhw7GyJ/l22EvlDLjTL?=
+ =?us-ascii?Q?/lDpGogmR7wNnsN1ipdSp+FKGZ2pNOIiOhQKopZazTE0KN0N+0P0Ttplfe7b?=
+ =?us-ascii?Q?LNqcQkgrN7JnwlshH6Cr5PN7pz1OAYW/ResRIJw6d8BkG1k7IfC8OFjdh57t?=
+ =?us-ascii?Q?Cu4McRqrACTSrcBVICnTx2TXgq+uJNMsUJ3sgRgbPnh5bn9WyDUBHh6Xjc2e?=
+ =?us-ascii?Q?p40WQSLZ3beYSqFrAFBRwuJabAap+KTgmiw7y6Zc79PicL5svAgKiWTzhpyZ?=
+ =?us-ascii?Q?GKeiPt8loNhJAVdnWsAHXfobnPuKogH3OXbvV2GFtDgFS5CbUtF1IoOnbOK/?=
+ =?us-ascii?Q?WUZuvngt/uv2xmmgfeChEFLg+vkf45Qx7yd1ONWrCEB5lupca9UEU17BJUQx?=
+ =?us-ascii?Q?seMDpusHW+ABfGCJz9yvxcqnmCu/BMj/MLm0ctexnNW7K3NXqin2EBSNqme1?=
+ =?us-ascii?Q?wKMb7knKq2Llh5mNyiIcwRlMjYwEwLQfKLKgqpc1D9fY0NfOLTyR8Jknpd/T?=
+ =?us-ascii?Q?LCW9rTmBZOwLjI/OetN/hnNqkB8PTMnww3tJxj3FrSGSb67dowzCFxlq+Mgg?=
+ =?us-ascii?Q?+wHwiThVRGlz6vtiH7oKKwTk4Nc/IzIg64XoMuTmHyVMVN0lQ22Jh5vnRZiM?=
+ =?us-ascii?Q?F5jEOIQQF7lEO+pJiFfsStlUTpt1J4YoDJ7OjW+5/WG6g/8ggDbb5s893ncf?=
+ =?us-ascii?Q?m0KimQRMjAZfOPR2GqVum6WzFpeBZvNdG9pyF5P+MS7MmYDzI/IocqJF9vH3?=
+ =?us-ascii?Q?Te5cRhFfvvrc5zyxeme4ljhIFY7S7ssE2VXfuVUuyWpTOcLrYjU9YOnvBVhP?=
+ =?us-ascii?Q?VDRGPmx1nlBPUaM4ardfewB81A4dR5CNWrgxpWUEMYQRZ//M03Jjvea7UeZ0?=
+ =?us-ascii?Q?9A7DnfdZu73baW985mZx1siqURE5yt8oLArvVj6YRQ4q62KFPZANmbzsByEm?=
+ =?us-ascii?Q?auMsBXLwmy9uhHlluXsceLa20hRKPSuAC0A+9Ah86cm9T0BvIiDxbNhFyWyJ?=
+ =?us-ascii?Q?0U3qDa9AvQpjtgvMFK4qVfgAdAaidOHx+Xww4BVcf8pE5u899W4FWZXC9BL7?=
+ =?us-ascii?Q?D97ZUN7KHKVMkQ+3fY6XnuBlf0udk3RozaKMfG/yCpjyEYRQMPy34YmgH2v5?=
+ =?us-ascii?Q?CG7yd54Mq+XR7UrobZBpWqrl80wjb9UsG1yx9Jdi2Jso7yLv0X2XJ30/m+n4?=
+ =?us-ascii?Q?JizF+4oagxZWUun9Ri60EEI2n0pnPO4gm00xmC5W+mKCmY8lbEeKEoMQNh3h?=
+ =?us-ascii?Q?+oTpIxfahp4jvwZkLfSwhRw97lhG+dn+3tEvSaB5h9vl8gfJlRNcfFnMga8d?=
+ =?us-ascii?Q?Bdnsnk+6FWN9e9L/M3v+VZazJiqn2z+yXbrCVOWO2p+f1Z6AEjIHtE/4+PNt?=
+ =?us-ascii?Q?dZTZzyVPvmwSPqSGCHFgXCi+Lcg+QcADEazS?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2025 06:51:12.4502
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: e886220c-13fe-4f31-53b1-08ddb86baaf0
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000E9D1.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7900
 
-> On 6/30/2025 2:56 PM, Jacob Keller wrote:
-> > Unfortunately it looks like the fix I mentioned has landed in 6.14, so
-> > its not a fix for your issue (since you mentioned 6.14 has failed
-> > testing in your system)
-> >
-> > $ git describe --first-parent --contains --match=3Dv* --exclude=3D*rc*
-> > 743bbd93cf29f653fae0e1416a31f03231689911
-> > v6.14~251^2~15^2~2
-> >
-> > I don't see any other relevant changes since v6.14. I can try to see if
-> > I see similar issues with CONFIG_MEM_ALLOC_PROFILING on some test
-> > systems here.
->
-> On my system I see this at boot after loading the ice module from
->
-> $ grep -F "/ice/" /proc/allocinfo | sort -g | tail | numfmt --to=3Diec>
->       26K      230 drivers/net/ethernet/intel/ice/ice_irq.c:84 [ice]
-> func:ice_get_irq_res
-> >          48K        2 drivers/net/ethernet/intel/ice/ice_arfs.c:565 [ic=
-e] func:ice_init_arfs
-> >          57K      226 drivers/net/ethernet/intel/ice/ice_lib.c:397 [ice=
-] func:ice_vsi_alloc_ring_stats
-> >          57K      226 drivers/net/ethernet/intel/ice/ice_lib.c:416 [ice=
-] func:ice_vsi_alloc_ring_stats
-> >          85K      226 drivers/net/ethernet/intel/ice/ice_lib.c:1398 [ic=
-e] func:ice_vsi_alloc_rings
-> >         339K      226 drivers/net/ethernet/intel/ice/ice_lib.c:1422 [ic=
-e] func:ice_vsi_alloc_rings
-> >         678K      226 drivers/net/ethernet/intel/ice/ice_base.c:109 [ic=
-e] func:ice_vsi_alloc_q_vector
-> >         1.1M      257 drivers/net/ethernet/intel/ice/ice_fwlog.c:40 [ic=
-e] func:ice_fwlog_alloc_ring_buffs
-> >         7.2M      114 drivers/net/ethernet/intel/ice/ice_txrx.c:493 [ic=
-e] func:ice_setup_rx_ring
-> >         896M   229264 drivers/net/ethernet/intel/ice/ice_txrx.c:680 [ic=
-e] func:ice_alloc_mapped_page
->
-> Its about 1GB for the mapped pages. I don't see any increase moment to
-> moment. I've started an iperf session to simulate some traffic, and I'll
-> leave this running to see if anything changes overnight.
->
-> Is there anything else that you can share about the traffic setup or
-> otherwise that I could look into?  Your system seems to use ~2.5 x the
-> buffer size as mine, but that might just be a smaller number of CPUs.
->
-> Hopefully I'll get some more results overnight.
+The link status is latched low so that momentary link drops
+can be detected. Always double-reading the status defeats this
+design feature. Only double read if link was already down
 
-The traffic is random production workloads from VMs, using standard
-Linux or OVS bridges. There is no specific pattern to it. I haven=E2=80=99t
-had any luck reproducing (or was not patient enough) this with iperf3
-myself. The two active (UP) interfaces are in an LACP bonding setup.
-Here are our ethtool settings for the two member ports (em1 and p3p1)
+This prevents unnecessary duplicate readings of the link status.
 
-# ethtool -l em1
-Channel parameters for em1:
-Pre-set maximums:
-RX: 64
-TX: 64
-Other: 1
-Combined: 64
-Current hardware settings:
-RX: 0
-TX: 0
-Other: 1
-Combined: 8
+Fixes: 4f3b20bfbb75 ("amd-xgbe: add support for rx-adaptation")
+Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+---
+Changes since v2:
+- update the commit message
+- avoid using gotos for normal function control flow
 
-# ethtool -g em1
-Ring parameters for em1:
-Pre-set maximums:
-RX: 8160
-RX Mini: n/a
-RX Jumbo: n/a
-TX: 8160
-TX push buff len: n/a
-Current hardware settings:
-RX: 8160
-RX Mini: n/a
-RX Jumbo: n/a
-TX: 8160
-RX Buf Len: n/a
-CQE Size: n/a
-TX Push: off
-RX Push: off
-TX push buff len: n/a
-TCP data split: n/a
+Changes since v1:
+- skip double-read to detect short link drops
+- refine the subject line for clarity
 
-# ethtool -c em1
-Coalesce parameters for em1:
-Adaptive RX: off  TX: off
-stats-block-usecs: n/a
-sample-interval: n/a
-pkt-rate-low: n/a
-pkt-rate-high: n/a
+ drivers/net/ethernet/amd/xgbe/xgbe-mdio.c   |  4 ++++
+ drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c | 24 +++++++++++++--------
+ 2 files changed, 19 insertions(+), 9 deletions(-)
 
-rx-usecs: 12
-rx-frames: n/a
-rx-usecs-irq: n/a
-rx-frames-irq: n/a
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c b/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c
+index fb5b7eceb73f..1a37ec45e650 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c
+@@ -1304,6 +1304,10 @@ static void xgbe_phy_status(struct xgbe_prv_data *pdata)
+ 
+ 	pdata->phy.link = pdata->phy_if.phy_impl.link_status(pdata,
+ 							     &an_restart);
++	/* bail out if the link status register read fails */
++	if (pdata->phy.link < 0)
++		return;
++
+ 	if (an_restart) {
+ 		xgbe_phy_config_aneg(pdata);
+ 		goto adjust_link;
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+index 7a4dfa4e19c7..23c39e92e783 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+@@ -2746,8 +2746,7 @@ static bool xgbe_phy_valid_speed(struct xgbe_prv_data *pdata, int speed)
+ static int xgbe_phy_link_status(struct xgbe_prv_data *pdata, int *an_restart)
+ {
+ 	struct xgbe_phy_data *phy_data = pdata->phy_data;
+-	unsigned int reg;
+-	int ret;
++	int reg, ret;
+ 
+ 	*an_restart = 0;
+ 
+@@ -2781,11 +2780,20 @@ static int xgbe_phy_link_status(struct xgbe_prv_data *pdata, int *an_restart)
+ 			return 0;
+ 	}
+ 
+-	/* Link status is latched low, so read once to clear
+-	 * and then read again to get current state
+-	 */
+-	reg = XMDIO_READ(pdata, MDIO_MMD_PCS, MDIO_STAT1);
+ 	reg = XMDIO_READ(pdata, MDIO_MMD_PCS, MDIO_STAT1);
++	if (reg < 0)
++		return reg;
++
++	/* Link status is latched low so that momentary link drops
++	 * can be detected. If link was already down read again
++	 * to get the latest state.
++	 */
++
++	if (!pdata->phy.link && !(reg & MDIO_STAT1_LSTATUS)) {
++		reg = XMDIO_READ(pdata, MDIO_MMD_PCS, MDIO_STAT1);
++		if (reg < 0)
++			return reg;
++	}
+ 
+ 	if (pdata->en_rx_adap) {
+ 		/* if the link is available and adaptation is done,
+@@ -2804,9 +2812,7 @@ static int xgbe_phy_link_status(struct xgbe_prv_data *pdata, int *an_restart)
+ 			xgbe_phy_set_mode(pdata, phy_data->cur_mode);
+ 		}
+ 
+-		/* check again for the link and adaptation status */
+-		reg = XMDIO_READ(pdata, MDIO_MMD_PCS, MDIO_STAT1);
+-		if ((reg & MDIO_STAT1_LSTATUS) && pdata->rx_adapt_done)
++		if (pdata->rx_adapt_done)
+ 			return 1;
+ 	} else if (reg & MDIO_STAT1_LSTATUS)
+ 		return 1;
+-- 
+2.34.1
 
-tx-usecs: 28
-tx-frames: n/a
-tx-usecs-irq: n/a
-tx-frames-irq: n/a
-
-rx-usecs-low: n/a
-rx-frame-low: n/a
-tx-usecs-low: n/a
-tx-frame-low: n/a
-
-rx-usecs-high: 0
-rx-frame-high: n/a
-tx-usecs-high: n/a
-tx-frame-high: n/a
-
-CQE mode RX: n/a  TX: n/a
-
-tx-aggr-max-bytes: n/a
-tx-aggr-max-frames: n/a
-tx-aggr-time-usecs: n/a
-
-# ethtool -k em1
-Features for em1:
-rx-checksumming: on
-tx-checksumming: on
-tx-checksum-ipv4: on
-tx-checksum-ip-generic: off [fixed]
-tx-checksum-ipv6: on
-tx-checksum-fcoe-crc: off [fixed]
-tx-checksum-sctp: on
-scatter-gather: on
-tx-scatter-gather: on
-tx-scatter-gather-fraglist: off [fixed]
-tcp-segmentation-offload: on
-tx-tcp-segmentation: on
-tx-tcp-ecn-segmentation: on
-tx-tcp-mangleid-segmentation: off
-tx-tcp6-segmentation: on
-tx-tcp-accecn-segmentation: off [fixed]
-generic-segmentation-offload: on
-generic-receive-offload: on
-large-receive-offload: off [fixed]
-rx-vlan-offload: on
-tx-vlan-offload: on
-ntuple-filters: on
-receive-hashing: on
-highdma: on
-rx-vlan-filter: on
-vlan-challenged: off [fixed]
-tx-gso-robust: off [fixed]
-tx-fcoe-segmentation: off [fixed]
-tx-gre-segmentation: on
-tx-gre-csum-segmentation: on
-tx-ipxip4-segmentation: on
-tx-ipxip6-segmentation: on
-tx-udp_tnl-segmentation: on
-tx-udp_tnl-csum-segmentation: on
-tx-gso-partial: on
-tx-tunnel-remcsum-segmentation: off [fixed]
-tx-sctp-segmentation: off [fixed]
-tx-esp-segmentation: off [fixed]
-tx-udp-segmentation: on
-tx-gso-list: off [fixed]
-tx-nocache-copy: off
-loopback: off
-rx-fcs: off
-rx-all: off [fixed]
-tx-vlan-stag-hw-insert: off
-rx-vlan-stag-hw-parse: off
-rx-vlan-stag-filter: on
-l2-fwd-offload: off [fixed]
-hw-tc-offload: off
-esp-hw-offload: off [fixed]
-esp-tx-csum-hw-offload: off [fixed]
-rx-udp_tunnel-port-offload: on
-tls-hw-tx-offload: off [fixed]
-tls-hw-rx-offload: off [fixed]
-rx-gro-hw: off [fixed]
-tls-hw-record: off [fixed]
-rx-gro-list: off
-macsec-hw-offload: off [fixed]
-rx-udp-gro-forwarding: off
-hsr-tag-ins-offload: off [fixed]
-hsr-tag-rm-offload: off [fixed]
-hsr-fwd-offload: off [fixed]
-hsr-dup-offload: off [fixed]
-
-# ethtool -i em1
-driver: ice
-version: 6.15.3-3.gdc.el9.x86_64
-firmware-version: 4.51 0x8001e501 23.0.8
-expansion-rom-version:
-bus-info: 0000:63:00.0
-supports-statistics: yes
-supports-test: yes
-supports-eeprom-access: yes
-supports-register-dump: yes
-supports-priv-flags: yes
-
-# ethtool em1
-Settings for em1:
-Supported ports: [ FIBRE ]
-Supported link modes:   1000baseT/Full
-                25000baseCR/Full
-                25000baseSR/Full
-                1000baseX/Full
-                10000baseCR/Full
-                10000baseSR/Full
-                10000baseLR/Full
-Supported pause frame use: Symmetric
-Supports auto-negotiation: Yes
-Supported FEC modes: None RS BASER
-Advertised link modes:  25000baseCR/Full
-                10000baseCR/Full
-Advertised pause frame use: No
-Advertised auto-negotiation: Yes
-Advertised FEC modes: None RS BASER
-Speed: 25000Mb/s
-Duplex: Full
-Auto-negotiation: off
-Port: Direct Attach Copper
-PHYAD: 0
-Transceiver: internal
-Supports Wake-on: g
-Wake-on: d
-Current message level: 0x00000007 (7)
-                       drv probe link
-Link detected: yes
-
-
->
-> Thanks,
-> Jake
 
