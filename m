@@ -1,69 +1,61 @@
-Return-Path: <netdev+bounces-202878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95158AEF83D
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 14:22:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39482AEF84C
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 14:25:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8246D3A7B17
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:22:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EC8C4A763B
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:25:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3C222749C0;
-	Tue,  1 Jul 2025 12:22:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FAC72749F6;
+	Tue,  1 Jul 2025 12:23:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ck7JKnL2"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18ADD273D7E
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 12:22:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C15273D7E;
+	Tue,  1 Jul 2025 12:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751372522; cv=none; b=iOeZJmvbmO/QtSvIAArbmSIGq6STPep0j/7fYI2LwdnrKsPjCPpEWMONHlWigjNepnR3pUa5CeN1NokfBx6Vo6vqQVoHaWMRDWh+6M0En5KUZKM3+D4hw25P7U9H50DRfWgpEvPLf98SjCOH3uhr7jSnSK8EMmXvT9jpV4a1ju4=
+	t=1751372589; cv=none; b=gYBkPqKpHifEVz3Kku9vBlYbPQoBk2BIu1D4rySpQr+GoCuMm3SOtJyrUw0YFuDmuZH0CbfgX1T1XPFob56JI84vK48CS3U2mOB6MrcaRsh+duzGJ6Hm8DrWpbBeDTIH9EHeBBOTnIfMua2AMwePBBvcBTA1enm69QJlRtA25bM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751372522; c=relaxed/simple;
-	bh=GVxzOmbuteW1CLn6leGWX8qffFDbE9Jux5PfpkbHWh8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=umRDt9fYXAqxPBqwbu1uYsN4vhPAOlei+slabcBI/o6oL+2+RvXei+eIskoCU1W8L8V2tMWCkGYRKnO1AOj4cfqCAMU7hhEmP4QQNZnJ6SLb45PvszgXCqJm4tZ8ECMuu1o0iIl0HjCevn6RgqIMqU4N0c3JgCeRxeTM27IiGTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uWZzh-0007K4-6O; Tue, 01 Jul 2025 14:21:49 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uWZzf-006GdH-2U;
-	Tue, 01 Jul 2025 14:21:47 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uWZzf-0009Gw-2C;
-	Tue, 01 Jul 2025 14:21:47 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	s=arc-20240116; t=1751372589; c=relaxed/simple;
+	bh=I07NkhytVT3vjKtgU8JtRK5xwzfDuVb4MvGSttIHb8w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fWpVV8bUIY/9gZIT4f9bKNoXgWmlTfm7ltGDS+G6byKGexZclAhXUDLwM0e+KMYIgDZaKNNn73mi4FAoWIf5amjbirx7tz0xaikk2kyPaBw4Bzp4YqJuQzVVHDtIK0fdgo0+WUdALUNlwyXfahZamUnrIM0rS50ZSsI0FOUdcjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ck7JKnL2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA3BBC4CEEB;
+	Tue,  1 Jul 2025 12:23:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1751372588;
+	bh=I07NkhytVT3vjKtgU8JtRK5xwzfDuVb4MvGSttIHb8w=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ck7JKnL2W2dDD80xo9Y9b4D26oDKRtcla4rp1cuJkKgNuXrBe5W365nDeLbZVRTsV
+	 bwfkKBBX5vMam2fuhLe588ELWxmqtPX0b3Bif35t+vWsyBGc4654DIXEHTtQS/Bi8q
+	 6aotE3+dHVCxa45cBexYmuJKDVhvr9Zd5oBYNqno=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: HarshaVardhana S A <harshavardhana.sa@broadcom.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Lukas Wunner <lukas@wunner.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>,
-	netdev@vger.kernel.org,
-	Andre Edich <andre.edich@microchip.com>
-Subject: [PATCH net v1 4/4] net: phy: smsc: Disable IRQ support to prevent link state corruption
-Date: Tue,  1 Jul 2025 14:21:46 +0200
-Message-Id: <20250701122146.35579-5-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250701122146.35579-1-o.rempel@pengutronix.de>
-References: <20250701122146.35579-1-o.rempel@pengutronix.de>
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	virtualization@lists.linux.dev,
+	stable <stable@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH net] vsock/vmci: Clear the vmci transport packet properly when initializing it
+Date: Tue,  1 Jul 2025 14:22:54 +0200
+Message-ID: <20250701122254.2397440-1-gregkh@linuxfoundation.org>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,43 +63,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Disable interrupt handling for the LAN87xx PHY to prevent the network
-interface from entering a corrupted state after rapid configuration
-changes.
+From: HarshaVardhana S A <harshavardhana.sa@broadcom.com>
 
-When the link configuration is changed quickly, the PHY can get stuck in
-a non-functional state. In this state, 'ethtool' reports that a link is
-present, but 'ip link' shows NO-CARRIER, and the interface is unable to
-transfer data.
+In vmci_transport_packet_init memset the vmci_transport_packet before
+populating the fields to avoid any uninitialised data being left in the
+structure.
 
-Fixes: 1ce8b37241ed ("usbnet: smsc95xx: Forward PHY interrupts to PHY driver to avoid polling")
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Lukas Wunner <lukas@wunner.de>
+Cc: Bryan Tan <bryan-bt.tan@broadcom.com>
+Cc: Vishnu Dasa <vishnu.dasa@broadcom.com>
+Cc: Broadcom internal kernel review list
+Cc: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: virtualization@lists.linux.dev
+Cc: netdev@vger.kernel.org
+Cc: stable <stable@kernel.org>
+Signed-off-by: HarshaVardhana S A <harshavardhana.sa@broadcom.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- drivers/net/phy/smsc.c | 4 ----
- 1 file changed, 4 deletions(-)
+Tweaked from original version by rewording the text and adding a blank
+line and correctly sending it to the proper people for inclusion in net.
 
-diff --git a/drivers/net/phy/smsc.c b/drivers/net/phy/smsc.c
-index b6489da5cfcd..dac6bf156d15 100644
---- a/drivers/net/phy/smsc.c
-+++ b/drivers/net/phy/smsc.c
-@@ -746,10 +746,6 @@ static struct phy_driver smsc_phy_driver[] = {
- 	.soft_reset	= smsc_phy_reset,
- 	.config_aneg	= lan87xx_config_aneg,
+ net/vmw_vsock/vmci_transport.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/vmw_vsock/vmci_transport.c b/net/vmw_vsock/vmci_transport.c
+index b370070194fa..7eccd6708d66 100644
+--- a/net/vmw_vsock/vmci_transport.c
++++ b/net/vmw_vsock/vmci_transport.c
+@@ -119,6 +119,8 @@ vmci_transport_packet_init(struct vmci_transport_packet *pkt,
+ 			   u16 proto,
+ 			   struct vmci_handle handle)
+ {
++	memset(pkt, 0, sizeof(*pkt));
++
+ 	/* We register the stream control handler as an any cid handle so we
+ 	 * must always send from a source address of VMADDR_CID_ANY
+ 	 */
+@@ -131,8 +133,6 @@ vmci_transport_packet_init(struct vmci_transport_packet *pkt,
+ 	pkt->type = type;
+ 	pkt->src_port = src->svm_port;
+ 	pkt->dst_port = dst->svm_port;
+-	memset(&pkt->proto, 0, sizeof(pkt->proto));
+-	memset(&pkt->_reserved2, 0, sizeof(pkt->_reserved2));
  
--	/* IRQ related */
--	.config_intr	= smsc_phy_config_intr,
--	.handle_interrupt = smsc_phy_handle_interrupt,
--
- 	/* Statistics */
- 	.get_sset_count = smsc_get_sset_count,
- 	.get_strings	= smsc_get_strings,
+ 	switch (pkt->type) {
+ 	case VMCI_TRANSPORT_PACKET_TYPE_INVALID:
 -- 
-2.39.5
+2.50.0
 
 
