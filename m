@@ -1,89 +1,174 @@
-Return-Path: <netdev+bounces-202806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FC5FAEF0F6
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 10:24:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 163E1AEF165
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 10:39:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 758C3189D265
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 08:24:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6037A1889D1C
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 08:40:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB01C269B01;
-	Tue,  1 Jul 2025 08:24:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF4C26B768;
+	Tue,  1 Jul 2025 08:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZtwZOxjL"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="Ckt+g1s9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CB824503F;
-	Tue,  1 Jul 2025 08:24:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96BD26A0AB
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 08:39:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751358251; cv=none; b=ra7F2iVfaJ6N3plL4NlIIVNYJWqCAY2+SmocgkuftIGDYylEd8rOmRwjowTr+lQnsF1hC4HvPz6G/NuLW9GWpxT71087lBPXpqzBxx99rTaAxRGnWQAWwRYyLwLGOIFQXAqKr6Mp2Nn6AtS0Xq8XHtVDGktLJTFlVxEBCFu4blg=
+	t=1751359183; cv=none; b=XmRjPEGcJxzwzbN4Fqmy41y+2HkorW3PSuhT+E9ENZRdZ4wzMX1KgMuL4JABXy0L7rRrpC2HoEZOvSfx0lG1qXn5GHDsPChw9oRGkX7mbo/0xndyiHEkIgcL6F8WQIMasFpRik5K/keUHcgdryfZHmQewkYhJD154CjTwlSlY3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751358251; c=relaxed/simple;
-	bh=R2mIkacQGW2O2sU10/Kr7qil4EtR9Jqg+Wkl3QVALp8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A48iJsZnaZR35Dxf7OQaREb3ake2xSK8WEbi8PWSrSBMhXTaiyaWKvXT/jHnnf/ZEYidE1yYrjGdJB19LMPkCjXpbRb2FTqsp+E6LAFjDBZnVh+gCekX9tRMHTnxC1mLnr5mihKdJVcEUqxYdLGupjzGF+s7n3CZa5btnUkpmqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZtwZOxjL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31A01C4CEEB;
-	Tue,  1 Jul 2025 08:24:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751358250;
-	bh=R2mIkacQGW2O2sU10/Kr7qil4EtR9Jqg+Wkl3QVALp8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZtwZOxjLbIKJVbGF5ex09ZhO8xeq+x1L/RpREDlu6zXAh4ZwfBKTwdkIzMgbW8Vry
-	 FPeuit6qCx+iMWnzoHTmrFoWA7H9pI1QGGmL1N25gtdAXBFcYXz8SRvg9bhf4y47Nv
-	 2mW6IF4eGEmfn7vgHLkal4YEEWwHSNJWM+pu7HaibXl5GqzfeoBopBw7SxoBGFLbYt
-	 aqkfBKlTvhOFIH9MFj08OfQYaViDkx6oYa/O2nrj0AjeLspscEOrje0Njb4lPgKt46
-	 +MWEDQEqhupgdvKj00CsBPqGZaWHRVHuYA/69m4ZRC6zwgl/ZHqJnznR1/77gNApHb
-	 ishLTHoy+nwoQ==
-Date: Tue, 1 Jul 2025 10:24:06 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: Bjorn Andersson <andersson@kernel.org>, 
-	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Georgi Djakov <djakov@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Richard Cochran <richardcochran@gmail.com>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Anusha Rao <quic_anusha@quicinc.com>, linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, quic_kkumarcs@quicinc.com, 
-	quic_linchen@quicinc.com, quic_leiwei@quicinc.com, quic_suruchia@quicinc.com, 
-	quic_pavir@quicinc.com
-Subject: Re: [PATCH v2 8/8] arm64: defconfig: Build NSS clock controller
- driver for IPQ5424
-Message-ID: <20250701-divergent-cream-okapi-83181d@krzk-bin>
-References: <20250627-qcom_ipq5424_nsscc-v2-0-8d392f65102a@quicinc.com>
- <20250627-qcom_ipq5424_nsscc-v2-8-8d392f65102a@quicinc.com>
+	s=arc-20240116; t=1751359183; c=relaxed/simple;
+	bh=dNFssYStWjlkvyhvt83/IFm0+gTNQR2fGINvxCNov/o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KidHv+e+hDbbg935BV698jXpIgn+f1YUFTWgeFSgrsofvJsdRzSfyKShmIE4uFVzn2r1lo/JCVCdetsw6NJc7fwLl2/92fVpnLcg/g8qxJ+E/L0h/Mux8VAEaY57OZTYruzVfXOdPmUJLlZH8GzjcnWpfdGvvgkpcV0WSOZpr/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=Ckt+g1s9; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com [209.85.218.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id B8E043F697
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 08:39:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1751359178;
+	bh=4yp1+vuew+zECrTXb7RcSP/djBI2o2M9gov6DQJnyao=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
+	b=Ckt+g1s97M2NpPHPActBKVnDMPJJ6wsekaY+LmY14i6rx37PH/84lZh4WjYp47dof
+	 V4S5WdnD0UqDI/QvJ2wFdlIroAgLljK59Bt6NX8jyauTvvr4lbggGEAYj5mruSj5Hf
+	 dGi0KNH7j7vzyIDAtanUEVAdApgGlyNTDrCrlxLxB3Y5u5tYNC8O148yF0z9byI9Yt
+	 quuyXjD+dS0g7k1/kI6txssaLfAEqmbanXIT95jUOOFlfDmxevV7f62jYs+U6O8Mdf
+	 UX08cJ4aX300fWGimVELJgOrH6sn4thsEWonpXiYRuwC+rT+lxglWWnofMHHf3zu2T
+	 BYFePOs0N1ZPw==
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ae0b2bbd8bfso212090766b.2
+        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 01:39:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751359176; x=1751963976;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4yp1+vuew+zECrTXb7RcSP/djBI2o2M9gov6DQJnyao=;
+        b=CnK0dhuujKsKSPjTEhbtXtyfmtd2JfLUz6jfRvg6nd2nqS5G8NUHHEe80zAbW1tIJF
+         3iEL0+Bcys7GHmqjKjshHfOErI2KCE8eT8sC6sdybrj/7oxRXGGC6mAZDUP/F464/WPE
+         kI6vnxsmdCzYQfRIkYMf0gOYHM2OYXDfvhlL9Sp2/t0YJ5erhBEpemRt8O1vckDRv6QI
+         zvuQZxeG7YZyaH2+6VcuPNhUpFA3ht+0Yk2w/EFFrpTUC1+VZ/AWNz6m7cFI1StCQ1yy
+         shF6zrAQIqj4xZyWFrOjqD2y/BMGt49oOqgDVNXzZILTUuYHQVASLMwBkyqeEDXiHYSk
+         Cy9w==
+X-Forwarded-Encrypted: i=1; AJvYcCVJZfvoVlNpyGFKBJuOSa9eCgwfRzRbxzv4Gc5SUa/WO/JyVOyiGYizmkkXuA9VQ//V5A/I96Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPO+u8Qxz/tZwhZDaTwzW+kOYdW37DSyT38gmVrKXDqoGnc0Dk
+	wfyOWrqtdBamqhWx6s+IFopgPSSve6W8Dlf8NZ3mKiWWC3bf8RynAP0LvKrd4Vu4Wpe8qJN+BCz
+	k5NUoddRsTVAky1NCnY/e5xsKx0UFt4hGXBSnz/A8KL1/wBwb3T3EwloupcaD/esv32gS2OMPPA
+	==
+X-Gm-Gg: ASbGncv/XTR9XMqolL/8HURxroWo6fdW/TgN/QXsYu7CCOg21ysRmrzx3h6z3vJmcBf
+	QmP5BYi5AkQPy3PKpyZXiMpZwQhOeLMy+k5R3o5SpMNJdYdiK5b7WgP34OEFhWceIErlUCQV5sR
+	sDLa7e/vD5EInmH9q9lftakeCuo5a5iMM/IhsYMAr1SYoVNcQs8Jx8icxi7WozQgUZeFJOo7246
+	2tDHK5Pv6FzwXIGevnveRegHyZFj1oDk+rrWLDwDXEV9JslCsipRdMRHOIqg/Bk1WTKEPWWiCVB
+	s0mCwSF4feFCKYmkGM5h8zkH/TgYnFrWY0epR78/jKvLTBSsJA==
+X-Received: by 2002:a17:907:1c1d:b0:ae0:c803:c96 with SMTP id a640c23a62f3a-ae34fddefb3mr1615648866b.24.1751359176484;
+        Tue, 01 Jul 2025 01:39:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGNYW89qpdmfY3sZqsrYphW2DREJSdqhOYO6cQ7meUyqCU15mTrlKFcHLmzEEQga566TkO9uw==
+X-Received: by 2002:a17:907:1c1d:b0:ae0:c803:c96 with SMTP id a640c23a62f3a-ae34fddefb3mr1615645566b.24.1751359176025;
+        Tue, 01 Jul 2025 01:39:36 -0700 (PDT)
+Received: from amikhalitsyn.lan ([178.24.219.243])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae35363b416sm812427166b.28.2025.07.01.01.39.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Jul 2025 01:39:35 -0700 (PDT)
+From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+To: kuniyu@google.com
+Cc: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Christian Brauner <brauner@kernel.org>,
+	Lennart Poettering <mzxreary@0pointer.de>,
+	Luca Boccassi <bluca@debian.org>,
+	David Rheinsberg <david@readahead.eu>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next v2 0/6] allow reaped pidfds receive in SCM_PIDFD
+Date: Tue,  1 Jul 2025 10:39:09 +0200
+Message-ID: <20250701083922.97928-1-aleksandr.mikhalitsyn@canonical.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250627-qcom_ipq5424_nsscc-v2-8-8d392f65102a@quicinc.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jun 27, 2025 at 08:09:24PM +0800, Luo Jie wrote:
-> NSS clock controller is needed for supplying clocks and resets to the
-> networking blocks for the Ethernet functions on the IPQ5424 platforms.
-> 
-> All boards based on the IPQ5424 SoC will require this driver to be enabled.
-> 
-> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
-> ---
->  arch/arm64/configs/defconfig | 1 +
->  1 file changed, 1 insertion(+)
+This is a logical continuation of a story from [1], where Christian
+extented SO_PEERPIDFD to allow getting pidfds for a reaped tasks.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Git tree (based on vfs/vfs-6.17.pidfs):
+v2: https://github.com/mihalicyn/linux/commits/scm_pidfd_stale.v2
+current: https://github.com/mihalicyn/linux/commits/scm_pidfd_stale
 
-Best regards,
-Krzysztof
+Changelog for version 2:
+ - renamed __skb_set_pid() -> unix_set_pid_to_skb() [ as Kuniyuki suggested ]
+ - get rid of extra helper (__scm_set_cred()) I've introduced before [ as Kuniyuki suggested ]
+ - s/__inline__/inline/ for functions I touched [ as Kuniyuki suggested ]
+ - get rid of chunk in unix_destruct_scm() with NULLifying UNIXCB(skb).pid [ as Kuniyuki suggested ]
+ - added proper error handling in scm_send() for scm_set_cred() return value [ found by me during rework ]
+ - don't do get_pid() in __scm_replace_pid() [ as Kuniyuki suggested ]
+ - move __scm_replace_pid() from scm.h to scm.c [ as Kuniyuki suggested ]
+ - fixed kdoc for unix_maybe_add_creds() [ thanks to Kuniyuki's review ]
+ - added RWB tags from Christian and Kuniyuki
+
+Links to previous versions:
+v1: https://lore.kernel.org/netdev/20250629214449.14462-1-aleksandr.mikhalitsyn@canonical.com
+tree: https://github.com/mihalicyn/linux/commits/scm_pidfd_stale.v1
+
+/!\ Notice
+Series based on https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git/log/?h=vfs-6.17.pidfs
+It does not use pidfs_get_pid()/pidfs_put_pid() API as these were removed in a scope of [2].
+I've checked that net-next branch currently (still) has these obsolete functions, but it
+will eventually include changes from [2], so it's not a big problem.
+
+Link: https://lore.kernel.org/all/20250425-work-pidfs-net-v2-0-450a19461e75@kernel.org/ [1]
+Link: https://lore.kernel.org/all/20250618-work-pidfs-persistent-v2-0-98f3456fd552@kernel.org/ [2]
+
+Cc: linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Willem de Bruijn <willemb@google.com>
+Cc: Leon Romanovsky <leon@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Christian Brauner <brauner@kernel.org>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: Lennart Poettering <mzxreary@0pointer.de>
+Cc: Luca Boccassi <bluca@debian.org>
+Cc: David Rheinsberg <david@readahead.eu>
+
+Alexander Mikhalitsyn (6):
+  af_unix: rework unix_maybe_add_creds() to allow sleep
+  af_unix: introduce unix_skb_to_scm helper
+  af_unix: introduce and use __scm_replace_pid() helper
+  af_unix: stash pidfs dentry when needed
+  af_unix: enable handing out pidfds for reaped tasks in SCM_PIDFD
+  selftests: net: extend SCM_PIDFD test to cover stale pidfds
+
+ include/net/scm.h                             |  33 ++-
+ net/core/scm.c                                |  30 ++-
+ net/unix/af_unix.c                            |  75 ++++--
+ .../testing/selftests/net/af_unix/scm_pidfd.c | 217 ++++++++++++++----
+ 4 files changed, 285 insertions(+), 70 deletions(-)
+
+-- 
+2.43.0
 
 
