@@ -1,457 +1,108 @@
-Return-Path: <netdev+bounces-202813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00138AEF182
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 10:43:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA352AEF19E
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 10:45:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8F0E4A14DA
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 08:42:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6E133A9DFB
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 08:45:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1055E26B972;
-	Tue,  1 Jul 2025 08:42:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8126D22CBE9;
+	Tue,  1 Jul 2025 08:45:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="IwLO2DOS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F8iXJviE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323BE26B975
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 08:41:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC621FDE19
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 08:45:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751359319; cv=none; b=Z3kUyZqTHl1PHzmQ+iS5sbOMkHgAzHpCmDkjCinfSiRlholQ9+Kg9HsQsGkzqEqXFhERFVzY/2Uye8ioJJp68aZN/QlFnqa2YQX3dRMWpR1W2iz6FdUmTMM5U8OGkpAjcOqK0cjcErhllc/OspusL7U1LO6X5fmv9kzQ4qqhLc0=
+	t=1751359544; cv=none; b=X4MUAd7pzu5edGCs3umR9JdfEKFAqiS0j+QWmjZMNToyBNaR2Q1/05gH/ic6T01b0lae5oMv6Ufhp01CwXxjW11lmzwcSmhBvQmXZ2ZjomHL9/WArpXWlZbz7HnwsizhnFG/dcOuW9BmdpCIuJkI4Cz9BiT0KOnKU24snxDsYDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751359319; c=relaxed/simple;
-	bh=sNMgYuRRHDM5tU1JOzxhsMgU93et6+sqxnzyafhvyOg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qjVS3WhSHpsHNPPlrBu51/oUdV9vIxDLuRK67aD/OsiHfclrQ3Wn1lETBhupG9Dhnk1DK/8ogRAQNeC6n0M20Kk3dFsRIETa0gB1FUYjK/+RCwFsW5uVN0TQVHKr4kF4yBxcdzZPqZwjZeD2hDIQyrfaHQx6Wn+fdEu5AbivJ4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=IwLO2DOS; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com [209.85.208.69])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id E3BD73F72F
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 08:41:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1751359314;
-	bh=3ACJj1pibTp1hDCcnssHwfTz2N2iBLhUH85nRukXflM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version;
-	b=IwLO2DOSbEE9JAN5RFK+sg2E/NohE+4e20KzNP6m9jHmyBJFKNBhNc5D9gy02/WY9
-	 dqy5Rpfk2Of1HcZjBA5OkW0J+B0Rcv5LUwQK9s61XR8wb5DPEyo+vEEswbDEMx4qyP
-	 6kwga7yfGi5XpdVVIX+GYpCWop6352eXqLY/+JQMQ51pfBAAMm01CgoktOagvABpUh
-	 KQpx2GWreLyrLkwILZjZQoeSXMI1t+SmYo5o/PRuIFOSHZrFwmYyBhBG0GElYmFfOk
-	 dZTXZDPuKpvGw6HkPsANnxA8u9VT7PsfQPox/6wvu/IyZBv9UjP0ClS/nV23M3YfWT
-	 qLSNs/UYNzwGw==
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-606b62ce2d4so5242339a12.3
-        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 01:41:54 -0700 (PDT)
+	s=arc-20240116; t=1751359544; c=relaxed/simple;
+	bh=SuXcd4PtrLa/k1pRkA5GoGK5jg5M473qJl6hJMm1oDQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=NxcZ+8r1d+nqoKkCXvr5acOQErFNLTYsFdAc+alVUCzzHHnKCqGTOf3SOP88L37wOvg6wCM9v+vHowiKVvZ4wa+Hyud3t6NMBUfDy4odH2PCEDxNfi9fWDu27gsU9Z+6U0t32Kz42mqM9L6nGQhRYlmdTTBl7IgUWmjZiEpxei4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F8iXJviE; arc=none smtp.client-ip=209.85.222.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7d44a260e45so599911885a.1
+        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 01:45:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751359541; x=1751964341; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rr1yO4Lr/8tJk8PW4Ef+0vqq+Av6E3FNkXy3PpPHSdU=;
+        b=F8iXJviEMZXRxEPNxSTYn8l5APuTPNVbxfqezu+cr9RNWavVjbK6v3wxlMkXs27ohY
+         Idkon08SGCXtnsoLRODUpiFkFEtSi67yQ82TONcp20s1q6ICtVO3Rp1OU59CCao5oB+C
+         VW/JH1arL4XEmL/LGY7nCA4/v3latJDiDLnCRovgK0PWlky8hgUdN3hpgELKhWIkysSV
+         nPpCNUiq55pdNrmyVjerWPzUVJikabnyF3c0q9cPfuvSD4UJiS1a18U0lf7sOqOH+xHa
+         6bFk1cbarvU78b411rKBO0NJDciwDncFh+fXtuYd/GWLJhfovJNlHl1YXIx+t04IjA8r
+         3FAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751359309; x=1751964109;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3ACJj1pibTp1hDCcnssHwfTz2N2iBLhUH85nRukXflM=;
-        b=Ip5n37H8xeI7umDML0G3EOS9ffu/Wk7/Xh6wmInkW2KM8GB5feBKI8y0iINeHj2B0g
-         H5o7Y+BvRM4msxsPVnwp33WtYPWmdEUJl2X98/twgY2fsgJ+zxTHINRcRaikF98EJOya
-         1F4yQmoU5JhaQSc5VEaICShSwc5y0tHxw+hFLW7jX3x6MFI34xO0Cd8JS/zVAi7z87cV
-         BJgwx/FnBnOHC6oJkwDb8Gd2xw99pAI6LmyGRoBgAHkd/snRKhLfIVdiDhnaiFWThjIa
-         s2Y7XQf0NkRShkdjcJCtVJ11Tc9vg7ohLsXZellLeGDETJE2J9Q40nXg/jMkxWwz6C32
-         NDZA==
-X-Forwarded-Encrypted: i=1; AJvYcCWWeyShW7xEUyTUCmpi+i4SPlXNp8gG7uLv0RQUm0h2ANl9esaUdlJMx/gzrZZhuMctT0R1UmM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7ZlSstx0QyVWe7JN9ecL+ucqrOxMd/R10/OyMTDAQdXEJNhDS
-	/Z/4s0WVv7pK/28SwwZHszQ8CYtceMsvGZ6XajWlngEQpVokku3KJPw3p4PTV1ka4mC1mBOjS6y
-	9qmx6ufmaRgHEYKXnpbUiG/E8LgfqOYOzlRuUIgTJfOOSjxmoSEltfryK8DT+H+SGAzXZPa/VRg
-	==
-X-Gm-Gg: ASbGnctFxIffNZLs56TGw8KSh32klMYwEB8l6JXRd0OGoKfwtVYXDuyhnkqKgE3gPcm
-	KghKLzbwWLAB87G+GpCHDSznmOHi38CwjQo+Fj2HsFSEnjkzPaCMuCS3M80I4jjBqjlK7nzClXN
-	+HYuagw+YXmI90oI+UecgjgS5PgNm2mWaFDyry1gWHkLC28FB1xswuwlRYb6hVzvPgw9CEwXzHH
-	ntrnltFKBNC8q3pzVpBrF7jpHq4VME2Ee2+MnZjbWl1+CuXTTCRt4p245ndQYZnts4EoA4OzYvk
-	VgEJXmtAnqjNjzXAVX7T4uxgD8ENudfMQLqcFLeBLzxFbyswNQ==
-X-Received: by 2002:a17:907:d2c8:b0:ae3:b654:165b with SMTP id a640c23a62f3a-ae3b6542a2bmr37281266b.24.1751359309002;
-        Tue, 01 Jul 2025 01:41:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGPvyXkJ7xxlUFVfvGUBKe1qmn9gYzE1YPTdbDiV+whqqCBKDQi+KNw6Dqm3Yw3xYlwRh9jZg==
-X-Received: by 2002:a17:907:d2c8:b0:ae3:b654:165b with SMTP id a640c23a62f3a-ae3b6542a2bmr37278266b.24.1751359308447;
-        Tue, 01 Jul 2025 01:41:48 -0700 (PDT)
-Received: from amikhalitsyn.lan ([178.24.219.243])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae35363b416sm812427166b.28.2025.07.01.01.41.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jul 2025 01:41:48 -0700 (PDT)
-From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-To: kuniyu@google.com
-Cc: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Lennart Poettering <mzxreary@0pointer.de>,
-	Luca Boccassi <bluca@debian.org>,
-	David Rheinsberg <david@readahead.eu>
-Subject: [PATCH net-next v2 6/6] selftests: net: extend SCM_PIDFD test to cover stale pidfds
-Date: Tue,  1 Jul 2025 10:39:21 +0200
-Message-ID: <20250701083922.97928-13-aleksandr.mikhalitsyn@canonical.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250701083922.97928-1-aleksandr.mikhalitsyn@canonical.com>
-References: <20250701083922.97928-1-aleksandr.mikhalitsyn@canonical.com>
+        d=1e100.net; s=20230601; t=1751359541; x=1751964341;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rr1yO4Lr/8tJk8PW4Ef+0vqq+Av6E3FNkXy3PpPHSdU=;
+        b=U/hPdfDkNfxsH91W6ERsq/oGWXM88kbcg8xseFCkh2kNmoBmmxUp6ad8QxK8tEF6f1
+         G3ujZmnfJUVYoawHYGLFO1iNJ2aeZxprWt3gU0xVrFmxWtkHvq0DpMZZzfjYwxggsGQ7
+         6aNB9eRssWgF2VgSU76t5Tmwsec3AnC6to2gnR7aRgp47aWfwQsNInCIMhOn425Q+E/C
+         k6o1IuyPNJU/BKfRGbgq70V2KSMJPicwQy1ZU0BM+mVjoUDjap6PTnLasjcBcnejpE6O
+         wqEnE+SYIqQbBraKH2xHZaWsVcBWcCk+o60mhOfNPhICkEnUUJhoEcMGUvi91Kql8Ekq
+         pWYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVHqohKwu2nJJug15rwVjG4Wc0J+gzl8uQO9g2NmYeXmfpdgXe+L8PG+GqZfLzmt43HCtgXXsI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxoap9nDv1xeWD9QytZqHceHjhRJOqXjO1MVqSudrKpf53x9i/q
+	RMgLp5r/CYt9u6sAjAlNz1qqu4ehGygwhB3GybVogIsRUnmk0CBkgTRbPiPM+wC9iSV7yDs3Bk5
+	/CPjEAHPQ8gkFNw==
+X-Google-Smtp-Source: AGHT+IHg/dM+7X9a31CHLY2KIari8ao1Smn7YpEpMU6oHcHz/A4glnWSQiUcTG1O6pxhp2zGhz3pWe8kr7W9Ug==
+X-Received: from qkpl3.prod.google.com ([2002:a05:620a:28c3:b0:7d4:61d0:dabc])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:179f:b0:7d3:acfa:de46 with SMTP id af79cd13be357-7d466e317demr351324685a.21.1751359541579;
+ Tue, 01 Jul 2025 01:45:41 -0700 (PDT)
+Date: Tue,  1 Jul 2025 08:45:40 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250701084540.459261-1-edumazet@google.com>
+Subject: [PATCH net-next] net: ifb: support BIG TCP packets
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Extend SCM_PIDFD test scenarios to also cover dead task's
-pidfd retrieval and reading its exit info.
+Set the driver limit to GSO_MAX_SIZE (512 KB).
 
-Cc: linux-kselftest@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: Shuah Khan <shuah@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: Christian Brauner <brauner@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Lennart Poettering <mzxreary@0pointer.de>
-Cc: Luca Boccassi <bluca@debian.org>
-Cc: David Rheinsberg <david@readahead.eu>
-Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Reviewed-by: Christian Brauner <brauner@kernel.org>
+This allows the admin/user to set a GSO limit up to this value, to
+avoid segmenting too large GRO packets in the netem -> ifb path.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- .../testing/selftests/net/af_unix/scm_pidfd.c | 217 ++++++++++++++----
- 1 file changed, 173 insertions(+), 44 deletions(-)
+ drivers/net/ifb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tools/testing/selftests/net/af_unix/scm_pidfd.c b/tools/testing/selftests/net/af_unix/scm_pidfd.c
-index 7e534594167e..37e034874034 100644
---- a/tools/testing/selftests/net/af_unix/scm_pidfd.c
-+++ b/tools/testing/selftests/net/af_unix/scm_pidfd.c
-@@ -15,6 +15,7 @@
- #include <sys/types.h>
- #include <sys/wait.h>
+diff --git a/drivers/net/ifb.c b/drivers/net/ifb.c
+index 67424888ff0aad4ca3d6980950f54f2c4b7fdf33..d3dc0914450a87a491c2f634739b324a96d0a9a0 100644
+--- a/drivers/net/ifb.c
++++ b/drivers/net/ifb.c
+@@ -333,6 +333,7 @@ static void ifb_setup(struct net_device *dev)
  
-+#include "../../pidfd/pidfd.h"
- #include "../../kselftest_harness.h"
- 
- #define clean_errno() (errno == 0 ? "None" : strerror(errno))
-@@ -26,6 +27,8 @@
- #define SCM_PIDFD 0x04
- #endif
- 
-+#define CHILD_EXIT_CODE_OK 123
-+
- static void child_die()
- {
- 	exit(1);
-@@ -126,16 +129,65 @@ static pid_t get_pid_from_fdinfo_file(int pidfd, const char *key, size_t keylen)
- 	return result;
+ 	dev->min_mtu = 0;
+ 	dev->max_mtu = 0;
++	netif_set_tso_max_size(dev, GSO_MAX_SIZE);
  }
  
-+struct cmsg_data {
-+	struct ucred *ucred;
-+	int *pidfd;
-+};
-+
-+static int parse_cmsg(struct msghdr *msg, struct cmsg_data *res)
-+{
-+	struct cmsghdr *cmsg;
-+	int data = 0;
-+
-+	if (msg->msg_flags & (MSG_TRUNC | MSG_CTRUNC)) {
-+		log_err("recvmsg: truncated");
-+		return 1;
-+	}
-+
-+	for (cmsg = CMSG_FIRSTHDR(msg); cmsg != NULL;
-+	     cmsg = CMSG_NXTHDR(msg, cmsg)) {
-+		if (cmsg->cmsg_level == SOL_SOCKET &&
-+		    cmsg->cmsg_type == SCM_PIDFD) {
-+			if (cmsg->cmsg_len < sizeof(*res->pidfd)) {
-+				log_err("CMSG parse: SCM_PIDFD wrong len");
-+				return 1;
-+			}
-+
-+			res->pidfd = (void *)CMSG_DATA(cmsg);
-+		}
-+
-+		if (cmsg->cmsg_level == SOL_SOCKET &&
-+		    cmsg->cmsg_type == SCM_CREDENTIALS) {
-+			if (cmsg->cmsg_len < sizeof(*res->ucred)) {
-+				log_err("CMSG parse: SCM_CREDENTIALS wrong len");
-+				return 1;
-+			}
-+
-+			res->ucred = (void *)CMSG_DATA(cmsg);
-+		}
-+	}
-+
-+	if (!res->pidfd) {
-+		log_err("CMSG parse: SCM_PIDFD not found");
-+		return 1;
-+	}
-+
-+	if (!res->ucred) {
-+		log_err("CMSG parse: SCM_CREDENTIALS not found");
-+		return 1;
-+	}
-+
-+	return 0;
-+}
-+
- static int cmsg_check(int fd)
- {
- 	struct msghdr msg = { 0 };
--	struct cmsghdr *cmsg;
-+	struct cmsg_data res;
- 	struct iovec iov;
--	struct ucred *ucred = NULL;
- 	int data = 0;
- 	char control[CMSG_SPACE(sizeof(struct ucred)) +
- 		     CMSG_SPACE(sizeof(int))] = { 0 };
--	int *pidfd = NULL;
- 	pid_t parent_pid;
- 	int err;
- 
-@@ -158,53 +210,99 @@ static int cmsg_check(int fd)
- 		return 1;
- 	}
- 
--	for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL;
--	     cmsg = CMSG_NXTHDR(&msg, cmsg)) {
--		if (cmsg->cmsg_level == SOL_SOCKET &&
--		    cmsg->cmsg_type == SCM_PIDFD) {
--			if (cmsg->cmsg_len < sizeof(*pidfd)) {
--				log_err("CMSG parse: SCM_PIDFD wrong len");
--				return 1;
--			}
-+	/* send(pfd, "x", sizeof(char), 0) */
-+	if (data != 'x') {
-+		log_err("recvmsg: data corruption");
-+		return 1;
-+	}
- 
--			pidfd = (void *)CMSG_DATA(cmsg);
--		}
-+	if (parse_cmsg(&msg, &res)) {
-+		log_err("CMSG parse: parse_cmsg() failed");
-+		return 1;
-+	}
- 
--		if (cmsg->cmsg_level == SOL_SOCKET &&
--		    cmsg->cmsg_type == SCM_CREDENTIALS) {
--			if (cmsg->cmsg_len < sizeof(*ucred)) {
--				log_err("CMSG parse: SCM_CREDENTIALS wrong len");
--				return 1;
--			}
-+	/* pidfd from SCM_PIDFD should point to the parent process PID */
-+	parent_pid =
-+		get_pid_from_fdinfo_file(*res.pidfd, "Pid:", sizeof("Pid:") - 1);
-+	if (parent_pid != getppid()) {
-+		log_err("wrong SCM_PIDFD %d != %d", parent_pid, getppid());
-+		close(*res.pidfd);
-+		return 1;
-+	}
- 
--			ucred = (void *)CMSG_DATA(cmsg);
--		}
-+	close(*res.pidfd);
-+	return 0;
-+}
-+
-+static int cmsg_check_dead(int fd, int expected_pid)
-+{
-+	int err;
-+	struct msghdr msg = { 0 };
-+	struct cmsg_data res;
-+	struct iovec iov;
-+	int data = 0;
-+	char control[CMSG_SPACE(sizeof(struct ucred)) +
-+		     CMSG_SPACE(sizeof(int))] = { 0 };
-+	pid_t client_pid;
-+	struct pidfd_info info = {
-+		.mask = PIDFD_INFO_EXIT,
-+	};
-+
-+	iov.iov_base = &data;
-+	iov.iov_len = sizeof(data);
-+
-+	msg.msg_iov = &iov;
-+	msg.msg_iovlen = 1;
-+	msg.msg_control = control;
-+	msg.msg_controllen = sizeof(control);
-+
-+	err = recvmsg(fd, &msg, 0);
-+	if (err < 0) {
-+		log_err("recvmsg");
-+		return 1;
- 	}
- 
--	/* send(pfd, "x", sizeof(char), 0) */
--	if (data != 'x') {
-+	if (msg.msg_flags & (MSG_TRUNC | MSG_CTRUNC)) {
-+		log_err("recvmsg: truncated");
-+		return 1;
-+	}
-+
-+	/* send(cfd, "y", sizeof(char), 0) */
-+	if (data != 'y') {
- 		log_err("recvmsg: data corruption");
- 		return 1;
- 	}
- 
--	if (!pidfd) {
--		log_err("CMSG parse: SCM_PIDFD not found");
-+	if (parse_cmsg(&msg, &res)) {
-+		log_err("CMSG parse: parse_cmsg() failed");
- 		return 1;
- 	}
- 
--	if (!ucred) {
--		log_err("CMSG parse: SCM_CREDENTIALS not found");
-+	/*
-+	 * pidfd from SCM_PIDFD should point to the client_pid.
-+	 * Let's read exit information and check if it's what
-+	 * we expect to see.
-+	 */
-+	if (ioctl(*res.pidfd, PIDFD_GET_INFO, &info)) {
-+		log_err("%s: ioctl(PIDFD_GET_INFO) failed", __func__);
-+		close(*res.pidfd);
- 		return 1;
- 	}
- 
--	/* pidfd from SCM_PIDFD should point to the parent process PID */
--	parent_pid =
--		get_pid_from_fdinfo_file(*pidfd, "Pid:", sizeof("Pid:") - 1);
--	if (parent_pid != getppid()) {
--		log_err("wrong SCM_PIDFD %d != %d", parent_pid, getppid());
-+	if (!(info.mask & PIDFD_INFO_EXIT)) {
-+		log_err("%s: No exit information from ioctl(PIDFD_GET_INFO)", __func__);
-+		close(*res.pidfd);
- 		return 1;
- 	}
- 
-+	err = WIFEXITED(info.exit_code) ? WEXITSTATUS(info.exit_code) : 1;
-+	if (err != CHILD_EXIT_CODE_OK) {
-+		log_err("%s: wrong exit_code %d != %d", __func__, err, CHILD_EXIT_CODE_OK);
-+		close(*res.pidfd);
-+		return 1;
-+	}
-+
-+	close(*res.pidfd);
- 	return 0;
- }
- 
-@@ -291,6 +389,24 @@ static void fill_sockaddr(struct sock_addr *addr, bool abstract)
- 	memcpy(sun_path_buf, addr->sock_name, strlen(addr->sock_name));
- }
- 
-+static int sk_enable_cred_pass(int sk)
-+{
-+	int on = 0;
-+
-+	on = 1;
-+	if (setsockopt(sk, SOL_SOCKET, SO_PASSCRED, &on, sizeof(on))) {
-+		log_err("Failed to set SO_PASSCRED");
-+		return 1;
-+	}
-+
-+	if (setsockopt(sk, SOL_SOCKET, SO_PASSPIDFD, &on, sizeof(on))) {
-+		log_err("Failed to set SO_PASSPIDFD");
-+		return 1;
-+	}
-+
-+	return 0;
-+}
-+
- static void client(FIXTURE_DATA(scm_pidfd) *self,
- 		   const FIXTURE_VARIANT(scm_pidfd) *variant)
- {
-@@ -299,7 +415,6 @@ static void client(FIXTURE_DATA(scm_pidfd) *self,
- 	struct ucred peer_cred;
- 	int peer_pidfd;
- 	pid_t peer_pid;
--	int on = 0;
- 
- 	cfd = socket(AF_UNIX, variant->type, 0);
- 	if (cfd < 0) {
-@@ -322,14 +437,8 @@ static void client(FIXTURE_DATA(scm_pidfd) *self,
- 		child_die();
- 	}
- 
--	on = 1;
--	if (setsockopt(cfd, SOL_SOCKET, SO_PASSCRED, &on, sizeof(on))) {
--		log_err("Failed to set SO_PASSCRED");
--		child_die();
--	}
--
--	if (setsockopt(cfd, SOL_SOCKET, SO_PASSPIDFD, &on, sizeof(on))) {
--		log_err("Failed to set SO_PASSPIDFD");
-+	if (sk_enable_cred_pass(cfd)) {
-+		log_err("sk_enable_cred_pass() failed");
- 		child_die();
- 	}
- 
-@@ -340,6 +449,12 @@ static void client(FIXTURE_DATA(scm_pidfd) *self,
- 		child_die();
- 	}
- 
-+	/* send something to the parent so it can receive SCM_PIDFD too and validate it */
-+	if (send(cfd, "y", sizeof(char), 0) == -1) {
-+		log_err("Failed to send(cfd, \"y\", sizeof(char), 0)");
-+		child_die();
-+	}
-+
- 	/* skip further for SOCK_DGRAM as it's not applicable */
- 	if (variant->type == SOCK_DGRAM)
- 		return;
-@@ -398,7 +513,13 @@ TEST_F(scm_pidfd, test)
- 		close(self->server);
- 		close(self->startup_pipe[0]);
- 		client(self, variant);
--		exit(0);
-+
-+		/*
-+		 * It's a bit unusual, but in case of success we return non-zero
-+		 * exit code (CHILD_EXIT_CODE_OK) and then we expect to read it
-+		 * from ioctl(PIDFD_GET_INFO) in cmsg_check_dead().
-+		 */
-+		exit(CHILD_EXIT_CODE_OK);
- 	}
- 	close(self->startup_pipe[1]);
- 
-@@ -421,9 +542,17 @@ TEST_F(scm_pidfd, test)
- 		ASSERT_NE(-1, err);
- 	}
- 
--	close(pfd);
- 	waitpid(self->client_pid, &child_status, 0);
--	ASSERT_EQ(0, WIFEXITED(child_status) ? WEXITSTATUS(child_status) : 1);
-+	/* see comment before exit(CHILD_EXIT_CODE_OK) */
-+	ASSERT_EQ(CHILD_EXIT_CODE_OK, WIFEXITED(child_status) ? WEXITSTATUS(child_status) : 1);
-+
-+	err = sk_enable_cred_pass(pfd);
-+	ASSERT_EQ(0, err);
-+
-+	err = cmsg_check_dead(pfd, self->client_pid);
-+	ASSERT_EQ(0, err);
-+
-+	close(pfd);
- }
- 
- TEST_HARNESS_MAIN
+ static netdev_tx_t ifb_xmit(struct sk_buff *skb, struct net_device *dev)
 -- 
-2.43.0
+2.50.0.727.gbf7dc18ff4-goog
 
 
