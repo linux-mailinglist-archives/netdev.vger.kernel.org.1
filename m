@@ -1,137 +1,166 @@
-Return-Path: <netdev+bounces-202941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8EBDAEFCA9
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:33:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BD0BAEFCD7
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:43:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB988189968A
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 14:33:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2B543AA686
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 14:42:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3831C2737FB;
-	Tue,  1 Jul 2025 14:33:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A5AA277818;
+	Tue,  1 Jul 2025 14:43:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="irP1kLzG";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="U+MmPHZZ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="l5nrwUBA"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2088.outbound.protection.outlook.com [40.107.95.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3DD03C47B
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 14:33:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751380393; cv=none; b=eUdgaEbIvh77sLKDpTJekjwYAcMtj6lncG38MfHWTH7q2/QBHFGq6wugUPQZR/o/ZiXMWFsiLkFmMUptsuJwvY7RHMEsb6I7fXf0cEaBb5XFl5mM5nDTe8Ux8JEjYAQMKqhnaXaPfsF3Zwp6pyrOXBgPUSe8bi02/9uNlXMJPus=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751380393; c=relaxed/simple;
-	bh=xhoyR0CNPKxbgsZtKH9XLz+2Tk+c/3ZFzUNaYyNRsbM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pz3pRng4sTmnJfdIXRi1bh/TM3rI7l5DQBOjWjahIIUdN56GKYj+ld67xyA8WYJ8xjzkouS9460ppRxd0evdqwtqvLTO90w7z20qhfnmLvOVuB5Pr3vQYfH3zzTarWZ/TZDFPPEOyo7XnAwDTlBzi1E07wR0dnlAoAnImbtlthU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=irP1kLzG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=U+MmPHZZ; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfout.stl.internal (Postfix) with ESMTP id BD1B31D0014A;
-	Tue,  1 Jul 2025 10:33:08 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Tue, 01 Jul 2025 10:33:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1751380388; x=
-	1751466788; bh=M5LRWx9bVGNHVJf4kXtD7I0Z8IU6nJMKvhV8HCxkvZM=; b=i
-	rP1kLzGboLqwwRlt6x8QvoWpBtug3yCVveX2YXXmkfatPo3KKyoGVoEwKRqlkDTF
-	1Hy8D/eVXAmJkdNbYkEfBZXCUj4VkHDAr2adPn++1UvoWhIoEY+J7BfnYvWQK5Ce
-	4hebw8oIPcz9Fl5nr/gi8ppUzBhkYa34rD1LwQlugW1ICI8JF+kARUf0m/+fBZk4
-	vMCodEijk9k4F8L6bRjSOPXVN0ATBa1+kK3m/Y2jMqGsoffJf3lcDX8EW6siDxg4
-	2T7xad1mpzskjxgYTsrCDiE1daGicNcPOJ8r+n9V/MWUCjMmPyDt4ENlpv3dwEEL
-	SZSWK40r5bXT9B4unLnPg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1751380388; x=1751466788; bh=M5LRWx9bVGNHVJf4kXtD7I0Z8IU6nJMKvhV
-	8HCxkvZM=; b=U+MmPHZZJ0FWyvaR/KRRmxB8nw+U9vz5kypGzLg7Ca2V1Iky2WN
-	2RXjPK1PUTo896IixboH3WLrIBou9zXzRvLCHR3pfkP1kSAPSlEtyUK3vRjYf1jo
-	5g0MYP26NOzPJELHEy/5837+lW3EXduMwnxTZtNDHHh+y6+Yu8Yt89kPI5mY+63s
-	CrkJtyrXpCTWfsngIqsuZQdBF7KFUNx5ipAx07b1HSQjGy0iBz1aoLAX8DvsoU4p
-	T+bDVCz+xidlteVQqXymo5bnWSLsBW7J55VT1kVeaJyF7MweXn7EopkJ3UgMAQL+
-	PrMfZJ8g2uTKsc7K+/osnXFlYBGP2MoPSJg==
-X-ME-Sender: <xms:o_FjaHcWfh5NdgSxNGcbgO4rorLAxJWbgjgL-96kQ_eSToP6JALW6A>
-    <xme:o_FjaNOWiHM_JjzWBLo-hwiCEP2gw5lNlmE6KSBZZl6Dn7iqI0aFOKdf6jzh-Jv0t
-    QcV2IPXw_Zl4Yvhxk4>
-X-ME-Received: <xmr:o_FjaAgijuThUM1WdDDjEi-SsreDrWW3cjwQVuFHKp07THwWC5cC4umV6oSZ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddugeejjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
-    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
-    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
-    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepjedpmhhouggv
-    pehsmhhtphhouhhtpdhrtghpthhtoheprghtvghnrghrtheskhgvrhhnvghlrdhorhhgpd
-    hrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehk
-    uhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrth
-    drtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghp
-    thhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmh
-    gvnhhglhhonhhgkedrughonhhgsehgmhgrihhlrdgtohhm
-X-ME-Proxy: <xmx:o_FjaI8ZW5eLYfbAp2ErXHg7VgqIA_drh40nfI82eHhtPY8wketYTg>
-    <xmx:o_FjaDsg2BhfIulXfvLpoW_IztCEuXJsT0VDhqwqe5WH_9UerN90pA>
-    <xmx:o_FjaHFXRSJ9ZVwtgL8vS-nF4S0K_4FLKSRJBRl4Y9L2igc1jEA__Q>
-    <xmx:o_FjaKNS3_BrL4LAyR3MEqjJct1dXKZejBpt3N5xV2JPnSA8YOehjQ>
-    <xmx:pPFjaEDt0Yl5JtyCe-aOcIBxhjw5siABX_Yu0rU8u8xQmFTmA1rD-4zc>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 1 Jul 2025 10:33:07 -0400 (EDT)
-Date: Tue, 1 Jul 2025 16:33:05 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antoine Tenart <atenart@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, netdev@vger.kernel.org,
-	Menglong Dong <menglong8.dong@gmail.com>
-Subject: Re: [PATCH net v2] net: ipv4: fix stat increase when udp early demux
- drops the packet
-Message-ID: <aGPxoZsW8_qa5gyF@krikkit>
-References: <20250701074935.144134-1-atenart@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96FC277800
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 14:43:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.88
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751380984; cv=fail; b=rVLws5Bh2Kcc4kv5Fs433WlGKwuo61+WK+H1P212z2sdVnZFNflxWk8lYMgX/stV6SpvXcgfzXWAJ7y15oDfwNlLnXJh9aaAcG0ka7agSUpLP2PErbvO/vCjkUUJeQPac1HdIAhovcGIIBHDR2ZZW8zuWPjj/U4vRpWZTZJD8W8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751380984; c=relaxed/simple;
+	bh=Hsn7S3CgX594UD3IYMbqACWWni0JYK12GZItk5UUq+I=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ejOCw4NpsR5dJadbM4KQ5aO5h5qjplTDJkxK/ZfnPrjdRG639DWRV14p8lsIgBd0GGK36seKerW2Muj5yMHMl3n+WCdKguGC+pO1nuvhAvvcp9ycWZ2uTcSHgoNdPEzsHiUTAjrlUiDeyDqBiXW3tIRj8cSp4gK6wBFrbvIIxCs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=l5nrwUBA; arc=fail smtp.client-ip=40.107.95.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UuRmtw0d8hVdk1kT3lydgSf/OEUoEzlZPTBHe0y0pLOBt5CytXpSzWkaaAYfx0pF1v8Yvx00t5oNQCtLB4thaLZrxG1keSlmDlCE/IH7XFnUMzqlqssGJJtRk+kFL7grXaJtXLqO25V8uqTS8mqMR6iDXuscAQMcu1qHezGHzeV7HAm7FgQeq+MqseM1utu8dkxn39FChpReLWXOx6Y1hb41W1ZgZg2maITHszHwH3eJWc0Ffe1pw9CvFVm84MauNSlo11+x4IRJ8O6LbI+c0bV3uo9z+4UCrfCMUNkxWmEvRcfNJLLu7hchwo5eXz9ui35LfHyp7vqIoipwQKD6aA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ed9AkrIs8GV5HjNq3mXwso3VAFoZAnf5gZ1sg7jT7dU=;
+ b=R9bo5yklY3Z4zhOFsHNIb7rW9Zene0KoQfIJRjqoYriM3X/2YxnfF/7zqQo+TLuLtkf2hPap+HYnWKjInL4xIHb9jTgKIc0LUFimGiNjqlljl3t8pLDkFZ9TM6M9YL0KHqYxAhsfMXBJb76wXxti/Jo9styromZ7TuPlLYf+fuMdnV7n+u0/idUhxYjS0236erYDaoS8k+b5Xe4GISk/TL0GjaImQQi2hsuFixCtkYmHWBXGOo5uVIK35HrECvRGL/QDT2EZn1AGjEIVMp10QKCb2DgvVf8dGaJ90MF/hOEwbHoqIEbN2WjpfwKOjtyawQbM4qnIzwgJ4V1JDQkvtQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ed9AkrIs8GV5HjNq3mXwso3VAFoZAnf5gZ1sg7jT7dU=;
+ b=l5nrwUBAnzuWF7VOo2KT8F4hBHFpSXB+IVbE4r571WmPLHmZ33EFxDILtVrRs6S5g+uSph8/357KElbortkQPONQPOILdkr20Q9uI+v61NfH+yuw/2G461K6ge73HPZFatlulqV3dLfBYIrym5LcF4tG8FWLZox01janS64eFcQHTc3FsC4ox47yOkQYFoh1bGrpBS47X10arrI0ZNhRqZTLradMSnqXAPdL/9N9A8qRw/kY2bVCJX8Rb5TQs3ogzwyMd0Y20SO/mTKSM9TnytLCZPamfnSd51BnpG4NajsdJTc8uFn/TkAHohba71M7oGpSNU60BcKLcT2p1aalYQ==
+Received: from DS7PR03CA0189.namprd03.prod.outlook.com (2603:10b6:5:3b6::14)
+ by SJ0PR12MB6733.namprd12.prod.outlook.com (2603:10b6:a03:477::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.31; Tue, 1 Jul
+ 2025 14:42:58 +0000
+Received: from CH3PEPF00000013.namprd21.prod.outlook.com
+ (2603:10b6:5:3b6:cafe::25) by DS7PR03CA0189.outlook.office365.com
+ (2603:10b6:5:3b6::14) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8901.20 via Frontend Transport; Tue,
+ 1 Jul 2025 14:42:58 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CH3PEPF00000013.mail.protection.outlook.com (10.167.244.118) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8922.1 via Frontend Transport; Tue, 1 Jul 2025 14:42:58 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 1 Jul 2025
+ 07:42:40 -0700
+Received: from shredder.lan (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 1 Jul
+ 2025 07:42:38 -0700
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <dsahern@gmail.com>, <stephen@networkplumber.org>, <petrm@nvidia.com>,
+	"Ido Schimmel" <idosch@nvidia.com>
+Subject: [PATCH iproute2-next 0/2] ip neigh: Add support for "extern_valid" flag
+Date: Tue, 1 Jul 2025 17:42:14 +0300
+Message-ID: <20250701144216.823867-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250701074935.144134-1-atenart@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PEPF00000013:EE_|SJ0PR12MB6733:EE_
+X-MS-Office365-Filtering-Correlation-Id: ab9d98bd-4e36-47ef-07a3-08ddb8ad926e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?YdDC4OtXwh0W+5H4uk/RMM95meTqAlsmd1v/hHQflEC7kgePHCiwUoUIme2L?=
+ =?us-ascii?Q?YesNAB4rvsIMLjIcAm1lnOqb2e/fcnC4fuuwvwp8hom5nb7QzK1kuVBmrNs+?=
+ =?us-ascii?Q?xLdtJVyVNm0c6dEarggCA2q6ogk2oSbTq4ao73ZtX2fxmX+1Pv5Qq3JrgP0o?=
+ =?us-ascii?Q?ShqfBga0AKn9keeIgKnp9dOLAkUQ6GK5eoNOWiU1YoqwQ8OkZOxi0I2jawnP?=
+ =?us-ascii?Q?3nPPsHjo0+ZHpEefIfE11UnYxV2llBrWZgeK/VpR2vHbpo+ohY2zzBLKedNk?=
+ =?us-ascii?Q?/Eo4rvk79sqtQQvz5l4LA8p3BN0volZEXvePlIym8sKRxhrhp9E3MEsbhAIY?=
+ =?us-ascii?Q?mLF3Rr5ZfgdNtMYJGA3+e6iNLJ0+6XF5Pfv954tMDlunUhevO1xwUZJZgUQ+?=
+ =?us-ascii?Q?qC+szFxJKrRUCR/Q1Ql9ePq2nRrKLzo/YJ1Zgq2jaNWh/I/3tvVzaRq8tpzq?=
+ =?us-ascii?Q?MbTizFwzpIQclnslkLw/3a/Zulc09ug7YVfrZTj1UeOv8nE7rW9timm3jJxo?=
+ =?us-ascii?Q?0W80A0eEFTO3LQ4B1h5ZsPnaiOEco9zR10Q+8JmafDBqPROLl3Ik+U4+U3Bf?=
+ =?us-ascii?Q?E+Zu82DML9cZmzglnuFvE3qattLOlW9nqsr5DQTmTZE7uwzcx0FbWpK4y6P3?=
+ =?us-ascii?Q?xaFhPdHoybBU6f6gJSNMBdsNsgLrvdHHr22ckH71Ny0hAnoM6XUxOb44HS/b?=
+ =?us-ascii?Q?9XWKGgBsgZp5NM4LG25DuRpxsSNwajuz9f5vCVJc839uj2w+vO2raEX9gXGD?=
+ =?us-ascii?Q?QCzME3dTe7Zb6DTOtZ+PhNiBwunxZvjNUiUgm9YFutwFYUOpM7sWSY/JJKln?=
+ =?us-ascii?Q?QkwgJHfLqWngAsg2vUc25Hf8dfGefdVKLEcRP/nxHgv9AZMudd/WN3k678YX?=
+ =?us-ascii?Q?dmnatwQXsmCgAklrNHWRe7kPoGFrniNBFf/LgpHcTGTEY8jYIDRnIHjea4We?=
+ =?us-ascii?Q?fZ1T/7QQsmat353IFo9RNsXYLRZ5e3+fVk6vP6WrpTcWmeTszXRIFBI0TVSB?=
+ =?us-ascii?Q?/Fsduh2x62S/q2i7+VnkZsqv2ttl0Z+/qStuIgFL2L9ooNyoIGUQisV8/WYb?=
+ =?us-ascii?Q?BFFw+74XgapUaLvuzH+TXKDGGYXgsGDi7fF/KiWR6buznEGcYfNUslTZQVfQ?=
+ =?us-ascii?Q?zcLoX8VV6OV77r+7arpjqNGH2HcyPzXeU8LSp9wKV4iioxy7VzXNcZz8w/p2?=
+ =?us-ascii?Q?8kAYlo5nH3VGS07INX5+HTp3ZjrCHZDW6r2rA3Lis6bcsrfhssywuBrpDR4Z?=
+ =?us-ascii?Q?3Iy4Nw0T0JlWCfIGFw7LJok5FhmCoUQxf4/dTBRPFoNFvDSBZ3JqkJH8RCxF?=
+ =?us-ascii?Q?x9DdeTQxkwochUa3NwfBSevdF9sqA8wa1Jp4epQVbIDsLIaYkr5SOHN92XKr?=
+ =?us-ascii?Q?xGULg2VWxJ9mOGCMEJYKNFXQb2+w3J7fZSu7BUyqWigodA288s14kLcsgUuP?=
+ =?us-ascii?Q?GXH8LHX+RAAT0bNDxe13A2AexLEvf93ARh77jIfXd61QlkY0cunbdrQujQA0?=
+ =?us-ascii?Q?D5JortIb5BY8veicfGIGJVkQ1qpcD0qq0Y1caZTCr58UM8toA6tgRv7CyQ?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2025 14:42:58.0476
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ab9d98bd-4e36-47ef-07a3-08ddb8ad926e
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH3PEPF00000013.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6733
 
-2025-07-01, 09:49:34 +0200, Antoine Tenart wrote:
-> udp_v4_early_demux now returns drop reasons as it either returns 0 or
-> ip_mc_validate_source, which returns itself a drop reason. However its
-> use was not converted in ip_rcv_finish_core and the drop reason is
-> ignored, leading to potentially skipping increasing LINUX_MIB_IPRPFILTER
-> if the drop reason is SKB_DROP_REASON_IP_RPFILTER.
-> 
-> This is a fix and we're not converting udp_v4_early_demux to explicitly
-> return a drop reason to ease backports; this can be done as a follow-up.
-> 
-> Fixes: d46f827016d8 ("net: ip: make ip_mc_validate_source() return drop reason")
-> Cc: Menglong Dong <menglong8.dong@gmail.com>
-> Reported-by: Sabrina Dubroca <sd@queasysnail.net>
-> Signed-off-by: Antoine Tenart <atenart@kernel.org>
-> ---
-> Changes in v2:
->   - Reset the drop reason to NOT_SPECIFIED if not returning early. The
->     diff remains small and this aligns with the rest of the function.
-> ---
->  net/ipv4/ip_input.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+Add support for the new "extern_valid" neighbor flag [1].
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Patch #1 updates the uAPI headers.
 
-Thanks Antoine.
+Patch #2 adds support for the new flag. See the commit message for
+example usage and output.
+
+[1] https://lore.kernel.org/all/20250626073111.244534-1-idosch@nvidia.com/
+
+Ido Schimmel (2):
+  Sync uAPI headers
+  ip neigh: Add support for "extern_valid" flag
+
+ include/uapi/linux/neighbour.h |  5 +++++
+ ip/ipneigh.c                   |  6 +++++-
+ man/man8/ip-neighbour.8        | 10 +++++++++-
+ 3 files changed, 19 insertions(+), 2 deletions(-)
 
 -- 
-Sabrina
+2.50.0
+
 
