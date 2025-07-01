@@ -1,185 +1,278 @@
-Return-Path: <netdev+bounces-202970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 300AAAEFFE5
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 18:32:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 01132AEFFF2
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 18:33:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B9273AB238
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:31:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0278483F4D
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:32:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC11C2797B7;
-	Tue,  1 Jul 2025 16:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502DF27CCCD;
+	Tue,  1 Jul 2025 16:33:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fKtlXMSc"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ju+xTz/G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554931F428F;
-	Tue,  1 Jul 2025 16:31:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313BB27A114
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 16:33:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751387490; cv=none; b=XDfnDY7RAKN5jSs2+ZtCnHpfM+Renn9TyesYf8nE0N/z+X7dTOO7WJrvwxgBjQJN9lF7mbKBt3oFEWy5nbn8HBtWbxvBoqzyQ2j9c5GL/gEuI6DZfcOil0ahUs5ThV2zJruVgEzSsCgRLUTJ7lC7bobGK9jCiEO858F3JBLDYjs=
+	t=1751387594; cv=none; b=HxmkyZErJcqztqw3auH8xGszZ25ZDqd1eetlqxvYaU04kBYbQdIzj8xbKT3kub/mkMTTJoUmTQw4ruD/2rntxQB5S5EIziJbxyqyRWl94e5eiO742tC2rX2KAQ6ZfEI3V9q8V0y/pj89Cc3YcU+t2Y6TU1X8oQYiSK8owLq/h2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751387490; c=relaxed/simple;
-	bh=CcoZ+jyWrjgQXqI90PfN7uvuJcq1zdmr0lpBisf7mWA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WGnb1oJXgcbNxBZa1SPYwovBtT7pHS0XlN38k5e8XizXg4q1hJht+uabA1AxISmUrlbtqolttx1FzhPYWLE7m0iu6M4uMGC2pv4bsf/oG6CyLYR5S7b0snUMcT2d+qXzm25w30eiqtj6bP0ERSpCJ/btXc8yY/QSHMGVBA1gD/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fKtlXMSc; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-235ef62066eso72450465ad.3;
-        Tue, 01 Jul 2025 09:31:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751387488; x=1751992288; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KGjQHDXTl52XkzXC5aSP4R+Ng9QPOvHno+hnhDfXbCI=;
-        b=fKtlXMScBm/nqHVW99CVzt5otrDA3zUBKuH+TZYIzEvMY6AsFgOjiy6jnm/k6HQTMT
-         NvlPa2U6wdvqErJ3GGfyUQ0JFM44izJ9peLkTE4DCOI7HHKQsqBSHYHdewHP27Xejalp
-         PbebwUFaREgXPxYHF71IIR2EYoWKZMQi80nMJWIl78941LSeT6VTV2/wcTTKxZ7uhTZ2
-         Ild1NEcE+tq1+CUk/+t7v5e7yiiyMFLLav5eit6NV8F6ck/Gyzez6p59frP8IAH5LMqg
-         ZFWtnI4mdyHqsjMe90C7IFgOHus1U9JcrJFWxJTukxJHn9zu8uZAf6468RW118pK0gSL
-         l1rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751387488; x=1751992288;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KGjQHDXTl52XkzXC5aSP4R+Ng9QPOvHno+hnhDfXbCI=;
-        b=IMFTVpgsMCldNthJVQJOAm/cyRkC2Jij5f5xR3H+1wohvi4u2n40fGOMUOH+A/GFQf
-         awHpupOZuv+A5CBnAXksd3PpKSZr7X5YYB3WB6oqPlQN6bH8vG/6hR8Wq+oNlOUwZs4s
-         z6VS87EmjkTR8EEaDOdau7JI87k8jLyLr/3hfNJI4qsAmOJmQT5pzAnyTHz27xh+UkAD
-         6nG/aITc+1lB9nx2LE9OEYNekTOwtnyN5297/jqG26j4Ts5vaRQtBWJq/mCq2AEE6PXA
-         zdKCBC7hVsfReOnL8MuJajiPiCtaJPeZ4+9v2YsWeYYvUWtkHjCMVyP6xW10cHUl/wZO
-         udtw==
-X-Forwarded-Encrypted: i=1; AJvYcCUBxmHBHdUa2bs0InKSzWaKBeVm21vWrl2mYfdMpZUzwiLeyBsqEeG1uiDZZmJggjxUni6pnj8/UtzlLJZF@vger.kernel.org, AJvYcCV2YOGz3WU67ffw4VZl/qS+iS77ghB4FixaxKEdU3I1aUpkn+vGsFoIhlR0G4huHF78+aufXlYUIonw@vger.kernel.org, AJvYcCWuF+v1rNEt/XLQ89q6rO8dcIjV+9vh3ESpGvMEJ+ScMKurS727NMmv6k+u/7MhxbCw9GHEsphH@vger.kernel.org, AJvYcCX740mU+OKASh/wtjtEIEvP44yOyHyT/k3ftfoTlYq12eof9Ax7sU3/2KxAzINonNSGaYQuURTn2hVC7AR+UIco@vger.kernel.org, AJvYcCXdxQdabllHEznDwTNFtHIWMJpR6Lu+j+rNvqJzRnyL/zojfqlTHG0T34wzNS+EGuVxXDI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzP+Ns4t6QdJVt1IYypqMGQmnyjpS6jmCXHxY0VkHF/BXNjUwxh
-	YHhIPhGYIjSru1FRzmxE5BQ/nov8+1+0xy0paM7xj/2SafjmoZ6MBx8=
-X-Gm-Gg: ASbGncss0ZQ6VrT8CR+iN8yRLbsGMhojlR79W0uCYJgnGmQvhXpk0WbMHIOjrruTJbu
-	iheXZfKnLdL9ihy2UnxJiTop4SEG5GdI+KyqrALTG+mgiqYtdKA8yd2+0p8rfvKqoNBfN9usyhv
-	j9OpBjGA1ievMVG89acIsUO8AkuON26PogRFEMYrt8zknTC3XQ6x6wk9nIhVzmGP38FxffyZeg2
-	h/QHwN688oTOhevj+Foy8HMa+R4C8GPhCsqFoNIWFDeiC2TUCubJR/Xdi8qFCpFS8QdKZnXj7pO
-	Eod36sTSCdtOhPfHJJ4W2afnceMuLp7pkPDR9DgF6i2g85jQ0DqRrA86s/fYLe4GQv1OnK7YsYU
-	1YS9BVnI66s7C0zftbpwD/SY=
-X-Google-Smtp-Source: AGHT+IE42p+bvXcIC/EYegYCnbHHAI3uzv2WW7ETzX20cqGvD5/lHwRMjETv8b5lYWoWaTAuYCqLHg==
-X-Received: by 2002:a17:903:7cb:b0:236:15b7:62e8 with SMTP id d9443c01a7336-23ac46244b8mr180664355ad.25.1751387488444;
-        Tue, 01 Jul 2025 09:31:28 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-23acb3c54b8sm115331295ad.217.2025.07.01.09.31.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jul 2025 09:31:27 -0700 (PDT)
-Date: Tue, 1 Jul 2025 09:31:21 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Song Yoong Siang <yoong.siang.song@intel.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf-next 2/2] selftests/bpf: Enhance XDP Rx Metadata
- Handling
-Message-ID: <aGQNWXe6FBks8D3U@mini-arch>
-References: <20250701042940.3272325-1-yoong.siang.song@intel.com>
- <20250701042940.3272325-3-yoong.siang.song@intel.com>
+	s=arc-20240116; t=1751387594; c=relaxed/simple;
+	bh=cYcTvErTdUiGz4HGSo3g3lV+5DJH+CuVIJXqNpULwPg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HnPiseRFxPhyXGMBYOK4VSmWo+mBuFBy0QdEXQonevLGjG6/Y4ZMy0MjZiNCcBFJ1SL0c7uCFbfE4/x8YtdkhYh8Y1twBWKFtDF9CGCqHN0cOqRaQe1rCWo2lKZ5yy1elBVfmgnmVvywjUSBMmpmKlxovPXh/wWB6GFoTmTSdNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ju+xTz/G; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <7752e805-0a06-46ed-b4ac-a51081a73f78@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751387579;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j04zcoZXlPQ2qOZxAyDtyKIp/7+XM+QSiGk1gGR0QUc=;
+	b=Ju+xTz/G5fb+wlJYkXEWRGHEdx3g5TOUDlmIH2PwBRPG4cQMJTl6eX/sqDpUGXVxFEkgBC
+	Bla3HiZYfX21Sl+v4RhprTORRrTEgRIOJeeN9eDj8TlE8KEfZY5IpB5Vur9C7ZVPT6PXw8
+	ToHrkIH3HW+qSrP4qbfirHzI3OBhGSE=
+Date: Tue, 1 Jul 2025 12:32:51 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250701042940.3272325-3-yoong.siang.song@intel.com>
+Subject: Re: [PATCH net-next v2 11/18] net: macb: single dma_alloc_coherent()
+ for DMA descriptors
+To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Ghiti <alex@ghiti.fr>, Samuel Holland <samuel.holland@sifive.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>,
+ Gregory CLEMENT <gregory.clement@bootlin.com>,
+ Cyrille Pitchen <cyrille.pitchen@atmel.com>,
+ Harini Katakam <harini.katakam@xilinx.com>,
+ Rafal Ozieblo <rafalo@cadence.com>,
+ Haavard Skinnemoen <hskinnemoen@atmel.com>, Jeff Garzik <jeff@garzik.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-mips@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Tawfik Bayouk <tawfik.bayouk@mobileye.com>
+References: <20250627-macb-v2-0-ff8207d0bb77@bootlin.com>
+ <20250627-macb-v2-11-ff8207d0bb77@bootlin.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <20250627-macb-v2-11-ff8207d0bb77@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 07/01, Song Yoong Siang wrote:
-> Introduce the XDP_METADATA_SIZE macro to ensure that user applications can
-> consistently retrieve the correct location of struct xdp_meta.
+On 6/27/25 05:08, Théo Lebrun wrote:
+> Move from two (Tx/Rx) dma_alloc_coherent() for DMA descriptor rings *per
+> queue* to two dma_alloc_coherent() overall.
 > 
-> Prior to this commit, the XDP program adjusted the data_meta backward by
-> the size of struct xdp_meta, while the user application retrieved the data
-> by calculating backward from the data pointer. This approach only worked if
-> xdp_buff->data_meta was equal to xdp_buff->data before calling
-> bpf_xdp_adjust_meta.
+> Issue is with how all queues share the same register for configuring the
+> upper 32-bits of Tx/Rx descriptor rings. For example, with Tx, notice
+> how TBQPH does *not* depend on the queue index:
 > 
-> With the introduction of XDP_METADATA_SIZE, both the XDP program and user
-> application now calculate and identify the location of struct xdp_meta from
-> the data pointer. This ensures the implementation remains functional even
-> when there is device-reserved metadata, making the tests more portable
-> across different NICs.
+> 	#define GEM_TBQP(hw_q)		(0x0440 + ((hw_q) << 2))
+> 	#define GEM_TBQPH(hw_q)		(0x04C8)
 > 
-> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
+> 	queue_writel(queue, TBQP, lower_32_bits(queue->tx_ring_dma));
+> 	#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+> 	if (bp->hw_dma_cap & HW_DMA_CAP_64B)
+> 		queue_writel(queue, TBQPH, upper_32_bits(queue->tx_ring_dma));
+> 	#endif
+> 
+> To maxime our chances of getting valid DMA addresses, we do a single
+
+maximize
+
+> dma_alloc_coherent() across queues.
+
+Is there really any chance involved (other than avoiding ENOMEM)?
+
+> This improves the odds because
+> alloc_pages() guarantees natural alignment. It cannot ensure valid DMA
+> addresses because of IOMMU or codepaths that don't go through
+> alloc_pages().
+> 
+> We error out if all rings don't have the same upper 32 bits, which is
+> better than the current (theoretical, not reproduced) silent corruption
+> caused by hardware that accesses invalid addresses.
+
+I think this is addressed by the previous patch.
+
+> Two considerations:
+>  - dma_alloc_coherent() gives us page alignment. Here we remove this
+>    containst meaning each queue's ring won't be page-aligned anymore.
+
+constraint
+
+>  - This can save some memory. Less allocations means less overhead
+
+fewer
+
+>    (constant cost per alloc) and less wasted bytes due to alignment
+>    constraints.
+
+I think it's probably a bit of a wash with reasonably-sized rings.
+Although the prefetch probably interacts poorly with the default "round"
+power-of-two ring sizes.
+
+> Fixes: 02c958dd3446 ("net/macb: add TX multiqueue support for gem")
+> Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
 > ---
->  tools/testing/selftests/bpf/prog_tests/xdp_metadata.c |  2 +-
->  tools/testing/selftests/bpf/progs/xdp_hw_metadata.c   | 10 +++++++++-
->  tools/testing/selftests/bpf/progs/xdp_metadata.c      |  8 +++++++-
->  tools/testing/selftests/bpf/xdp_hw_metadata.c         |  2 +-
->  tools/testing/selftests/bpf/xdp_metadata.h            |  7 +++++++
->  5 files changed, 25 insertions(+), 4 deletions(-)
+>  drivers/net/ethernet/cadence/macb_main.c | 83 ++++++++++++++++++--------------
+>  1 file changed, 46 insertions(+), 37 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-> index 19f92affc2da..8d6c2633698b 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-> @@ -302,7 +302,7 @@ static int verify_xsk_metadata(struct xsk *xsk, bool sent_from_af_xdp)
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index d3b3635998cad095246edf8a75faebbcf7115355..48b75d95861317b9925b366446c7572c7e186628 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -2445,33 +2445,32 @@ static void macb_free_rx_buffers(struct macb *bp)
 >  
->  	/* custom metadata */
->  
-> -	meta = data - sizeof(struct xdp_meta);
-> +	meta = data - XDP_METADATA_SIZE;
->  
->  	if (!ASSERT_NEQ(meta->rx_timestamp, 0, "rx_timestamp"))
->  		return -1;
-> diff --git a/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c b/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-> index 330ece2eabdb..72242ac1cdcd 100644
-> --- a/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-> +++ b/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-> @@ -27,6 +27,7 @@ extern int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx,
->  SEC("xdp.frags")
->  int rx(struct xdp_md *ctx)
+>  static void macb_free_consistent(struct macb *bp)
 >  {
-> +	int metalen_used, metalen_to_adjust;
->  	void *data, *data_meta, *data_end;
->  	struct ipv6hdr *ip6h = NULL;
->  	struct udphdr *udp = NULL;
-> @@ -72,7 +73,14 @@ int rx(struct xdp_md *ctx)
->  		return XDP_PASS;
+> -	struct macb_queue *queue;
+> +	size_t size, tx_size_per_queue, rx_size_per_queue;
+> +	struct macb_queue *queue, *queue0 = bp->queues;
+> +	struct device *dev = &bp->pdev->dev;
+>  	unsigned int q;
+> -	int size;
+>  
+>  	if (bp->rx_ring_tieoff) {
+> -		dma_free_coherent(&bp->pdev->dev, macb_dma_desc_get_size(bp),
+> +		dma_free_coherent(dev, macb_dma_desc_get_size(bp),
+>  				  bp->rx_ring_tieoff, bp->rx_ring_tieoff_dma);
+>  		bp->rx_ring_tieoff = NULL;
 >  	}
 >  
-> -	err = bpf_xdp_adjust_meta(ctx, -(int)sizeof(struct xdp_meta));
+>  	bp->macbgem_ops.mog_free_rx_buffers(bp);
+>  
+> +	tx_size_per_queue = TX_RING_BYTES(bp) + bp->tx_bd_rd_prefetch;
+> +	size = bp->num_queues * tx_size_per_queue;
 
-[..]
+Can you refactor the size calculation into a helper function?
 
-> +	metalen_used = ctx->data - ctx->data_meta;
+> +	dma_free_coherent(dev, size, queue0->tx_ring, queue0->tx_ring_dma);
+> +
+> +	rx_size_per_queue = RX_RING_BYTES(bp) + bp->rx_bd_rd_prefetch;
+> +	size = bp->num_queues * rx_size_per_queue;
+> +	dma_free_coherent(dev, size, queue0->rx_ring, queue0->rx_ring_dma);
+> +
+>  	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+>  		kfree(queue->tx_skb);
+>  		queue->tx_skb = NULL;
+> -		if (queue->tx_ring) {
+> -			size = TX_RING_BYTES(bp) + bp->tx_bd_rd_prefetch;
+> -			dma_free_coherent(&bp->pdev->dev, size,
+> -					  queue->tx_ring, queue->tx_ring_dma);
+> -			queue->tx_ring = NULL;
+> -		}
+> -		if (queue->rx_ring) {
+> -			size = RX_RING_BYTES(bp) + bp->rx_bd_rd_prefetch;
+> -			dma_free_coherent(&bp->pdev->dev, size,
+> -					  queue->rx_ring, queue->rx_ring_dma);
+> -			queue->rx_ring = NULL;
+> -		}
+> +		queue->tx_ring = NULL; /* Single buffer owned by queue0 */
+> +		queue->rx_ring = NULL; /* Single buffer owned by queue0 */
 
-Is the intent here to query how much metadata has been consumed/reserved
-by the driver? Looking at IGC it has the following code/comment:
+OK, but queue0 doesn't own the ring either at this point (it's free'd).
 
-	bi->xdp->data += IGC_TS_HDR_LEN;
+>  	}
+>  }
+>  
+> @@ -2513,37 +2512,47 @@ static int macb_alloc_rx_buffers(struct macb *bp)
+>  
+>  static int macb_alloc_consistent(struct macb *bp)
+>  {
+> +	size_t size, tx_size_per_queue, rx_size_per_queue;
+> +	dma_addr_t tx_dma, rx_dma;
+> +	struct device *dev = &bp->pdev->dev;
+>  	struct macb_queue *queue;
+>  	unsigned int q;
+> -	int size;
+> +	void *tx, *rx;
+> +
+> +	/*
+> +	 * Upper 32-bits of Tx/Rx DMA descriptor for each queues much match!
+> +	 * We cannot enforce this guarantee, the best we can do is do a single
+> +	 * allocation and hope it will land into alloc_pages() that guarantees
+> +	 * natural alignment of physical addresses.
+> +	 */
+> +
+> +	tx_size_per_queue = TX_RING_BYTES(bp) + bp->tx_bd_rd_prefetch;
+> +	size = bp->num_queues * tx_size_per_queue;
+> +	tx = dma_alloc_coherent(dev, size, &tx_dma, GFP_KERNEL);
+> +	if (!tx || upper_32_bits(tx_dma) != upper_32_bits(tx_dma + size - 1))
+> +		goto out_err;
+> +	netdev_dbg(bp->dev, "Allocated %zu bytes for %u TX rings at %08lx (mapped %p)\n",
+> +		   size, bp->num_queues, (unsigned long)tx_dma, tx);
+> +
+> +	rx_size_per_queue = RX_RING_BYTES(bp) + bp->rx_bd_rd_prefetch;
+> +	size = bp->num_queues * rx_size_per_queue;
+> +	rx = dma_alloc_coherent(dev, size, &rx_dma, GFP_KERNEL);
+> +	if (!rx || upper_32_bits(rx_dma) != upper_32_bits(rx_dma + size - 1))
+> +		goto out_err;
+> +	netdev_dbg(bp->dev, "Allocated %zu bytes for %u RX rings at %08lx (mapped %p)\n",
+> +		   size, bp->num_queues, (unsigned long)rx_dma, rx);
+>  
+>  	for (q = 0, queue = bp->queues; q < bp->num_queues; ++q, ++queue) {
+> -		size = TX_RING_BYTES(bp) + bp->tx_bd_rd_prefetch;
+> -		queue->tx_ring = dma_alloc_coherent(&bp->pdev->dev, size,
+> -						    &queue->tx_ring_dma,
+> -						    GFP_KERNEL);
+> -		if (!queue->tx_ring ||
+> -		    upper_32_bits(queue->tx_ring_dma) != upper_32_bits(bp->queues->tx_ring_dma))
+> -			goto out_err;
+> -		netdev_dbg(bp->dev,
+> -			   "Allocated TX ring for queue %u of %d bytes at %08lx (mapped %p)\n",
+> -			   q, size, (unsigned long)queue->tx_ring_dma,
+> -			   queue->tx_ring);
+> +		queue->tx_ring = tx + tx_size_per_queue * q;
+> +		queue->tx_ring_dma = tx_dma + tx_size_per_queue * q;
+> +
+> +		queue->rx_ring = rx + rx_size_per_queue * q;
+> +		queue->rx_ring_dma = rx_dma + rx_size_per_queue * q;
+>  
+>  		size = bp->tx_ring_size * sizeof(struct macb_tx_skb);
+>  		queue->tx_skb = kmalloc(size, GFP_KERNEL);
+>  		if (!queue->tx_skb)
+>  			goto out_err;
+> -
+> -		size = RX_RING_BYTES(bp) + bp->rx_bd_rd_prefetch;
+> -		queue->rx_ring = dma_alloc_coherent(&bp->pdev->dev, size,
+> -						 &queue->rx_ring_dma, GFP_KERNEL);
+> -		if (!queue->rx_ring ||
+> -		    upper_32_bits(queue->rx_ring_dma) != upper_32_bits(bp->queues->rx_ring_dma))
+> -			goto out_err;
+> -		netdev_dbg(bp->dev,
+> -			   "Allocated RX ring of %d bytes at %08lx (mapped %p)\n",
+> -			   size, (unsigned long)queue->rx_ring_dma, queue->rx_ring);
+>  	}
+>  	if (bp->macbgem_ops.mog_alloc_rx_buffers(bp))
+>  		goto out_err;
+> 
 
-	/* HW timestamp has been copied into local variable. Metadata
-	 * length when XDP program is called should be 0.
-	 */
-	bi->xdp->data_meta += IGC_TS_HDR_LEN;
-
-Are you sure that metadata size is correctly exposed to the bpf program?
-
-My assumptions was that we should just unconditionally do bpf_xdp_adjust_meta
-with -XDP_METADATA_SIZE and that should be good enough.
+Reviewed-by: Sean Anderson <sean.anderson@linux.dev>
 
