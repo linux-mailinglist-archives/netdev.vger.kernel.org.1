@@ -1,188 +1,113 @@
-Return-Path: <netdev+bounces-202973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92C6AAF005B
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 18:45:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34FA2AF0069
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 18:46:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB2C63B3759
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:43:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DD7C1759F4
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E95D227F198;
-	Tue,  1 Jul 2025 16:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07CE727E7DB;
+	Tue,  1 Jul 2025 16:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RLgFCTGL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R0p6SFZq"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B2B27CCCD
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 16:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3830727CCE7
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 16:43:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751388031; cv=none; b=TWatIkFvt5DDe66FsI8j3OLEFFNAGTwsEDDF9vs7yUxF4oFjcZrJi7mfZDDEi2YfMFB9oC91usOAXV6aLjw0lb2gL6N3Rq0D+hGyM/4emquutavm3/TnUS35eimd/7o0t/Pbo233wLp9vbQf9OKPd6uCnDeCuyUVDYlYW05v4mM=
+	t=1751388202; cv=none; b=K+rh4hqjbGtj8tIHitVO13lgMWVohAozWJHV/bdKFdo5R7H8C/8duJfnTcjOK7p/OsN1tU4YFbmSD5OcxtzbU2CPk4EwAKBld0/SF7LEzqOrM5axiblQpLqsQjuMD4gJXXtL4rZWXMgIyEXjIGgHZ4MzwDn9ihPb5rqDccjlXcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751388031; c=relaxed/simple;
-	bh=hk/shajpqhbI5aSCnWtJ+BEGb1jgnvRLCCAWvwffxH8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ln7nsRsyaj+6xQLIV8jxeXWKsZpxikSvLm6Jlzkvt1bLkb1dd8mI88MfqrlMm1CZuJoHWIzMlSKeUHQRhg+zjSKfaNcRQ0XOBq1WKiKeKnMIXNGmaiDD1+kGwHuwpkbrdtrhRBDqdL3johvq1RFFxYJ8015J/4FUYbDgl0aPi6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RLgFCTGL; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <1a4fe95a-f029-43b2-aed1-594365254b6a@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751388026;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b4v8Xkp+c9mceTr0Q8v7/zrK1IVjBYCeckNhf49+7xs=;
-	b=RLgFCTGLYZGv7GE+j3tCpdemaHKjOPsy83ZDnu3AOOXA8PZ6TwJihlUBHoT7RsdgGvY6rs
-	iSal0Uk/kJUOk03z5i/GAeuQMbCS3TEj1la5NEJxKz28cXHvOKvXg3HkEhsMlGBvKe6R30
-	aQ6wK1DMkfzkt1bFhcGJmZpmKTI4P2o=
-Date: Tue, 1 Jul 2025 12:40:17 -0400
+	s=arc-20240116; t=1751388202; c=relaxed/simple;
+	bh=nGi/BPIpExyC348UM0rCfhpZI7u2sgslkBIZbDq8O8w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JfJa/G7SSAj2BCYhv0GKYVRLBtKRtMW6yTX1OWgJRKQMeli97TvrjIDQo9jy0OXA4ja8XxBgdZcoSQp2rANUGKEkpFptKlf0t0n8kzgw7kYdxk43xulxXOcsVwOJ85J7GvG1nWBD7kJzCbag8VWczDgry+PfED0UEiQxO4C0WdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R0p6SFZq; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751388201; x=1782924201;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=nGi/BPIpExyC348UM0rCfhpZI7u2sgslkBIZbDq8O8w=;
+  b=R0p6SFZq4dg78vI3UwZvoOxXEPlp0HvuHeS66+n+eOD/mljKWI8KPABh
+   jJvJLmn4m+td3UrBeMMinNvUshnb0ktGgGxTBwwG9allBPSMtd0ZGujCx
+   NQS7qoBYsFi8pPQP7tM4T6E1zN/bH2P0vneAlymL1n6w1ek2KDEH51aqF
+   nXF2wqnPM2eHp9AUUmMVzC1iNzfQe49V3BvY+0CEeh8Wr12RCxIqJ1qxg
+   iZT7ZcOmrmevV1kXd+rEmtu2jCoTMO2jsdsCIg6pYqPikjh1aF3Ar4sHJ
+   4gj5F0rfjnq7tNEPFrwYFOATvuKU8DNMwRyIjBho238KfUt7ZpdpZfROG
+   Q==;
+X-CSE-ConnectionGUID: NJqdlIMyScWnyITQj8Pwbw==
+X-CSE-MsgGUID: ZTiIE1vPRqGnS1SHf1/I/g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11481"; a="41296648"
+X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
+   d="scan'208";a="41296648"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2025 09:43:20 -0700
+X-CSE-ConnectionGUID: sXvelDb+T1OYRJ7eRNRZ7g==
+X-CSE-MsgGUID: w+c8sTFBRqyw4BMw93OAWA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
+   d="scan'208";a="153594084"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa009.jf.intel.com with ESMTP; 01 Jul 2025 09:43:20 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net 0/3][pull request] Intel Wired LAN Driver Updates 2025-07-01 (idpf, igc)
+Date: Tue,  1 Jul 2025 09:43:12 -0700
+Message-ID: <20250701164317.2983952-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2 12/18] net: macb: match skb_reserve(skb,
- NET_IP_ALIGN) with HW alignment
-To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Ghiti <alex@ghiti.fr>, Samuel Holland <samuel.holland@sifive.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Russell King <linux@armlinux.org.uk>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>,
- Gregory CLEMENT <gregory.clement@bootlin.com>,
- Cyrille Pitchen <cyrille.pitchen@atmel.com>,
- Harini Katakam <harini.katakam@xilinx.com>,
- Rafal Ozieblo <rafalo@cadence.com>,
- Haavard Skinnemoen <hskinnemoen@atmel.com>, Jeff Garzik <jeff@garzik.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-mips@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Tawfik Bayouk <tawfik.bayouk@mobileye.com>
-References: <20250627-macb-v2-0-ff8207d0bb77@bootlin.com>
- <20250627-macb-v2-12-ff8207d0bb77@bootlin.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <20250627-macb-v2-12-ff8207d0bb77@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-On 6/27/25 05:08, Théo Lebrun wrote:
-> If HW is RSC capable, it cannot add dummy bytes at the start of IP
+For idpf:
+Michal returns 0 for key size when RSS is not supported.
 
-Receive-side coalescing? Can you add a brief description of this
-feature to your commit message?
+Ahmed changes control queue to a spinlock due to sleeping calls.
 
-> packets. Alignment (ie number of dummy bytes) is configured using the
-> RBOF field inside the NCFGR register.
-> 
-> On the software side, the skb_reserve(skb, NET_IP_ALIGN) call must only
-> be done if those dummy bytes are added by the hardware; notice the
-> skb_reserve() is done AFTER writing the address to the device.
-> 
-> We cannot do the skb_reserve() call BEFORE writing the address because
-> the address field ignores the low 2/3 bits. Conclusion: in some cases,
-> we risk not being able to respect the NET_IP_ALIGN value (which is
-> picked based on unaligned CPU access performance).
-> 
-> Fixes: 4df95131ea80 ("net/macb: change RX path for GEM")
+For igc:
+Vitaly disables L1.2 PCI-E link substate on I226 devices to resolve
+performance issues.
 
-Do any existing MACBs support RSC? Is this a fix? 
+The following are changes since commit 72fb83735c71e3f6f025ab7f5dbfec7c9e26b6cc:
+  Merge tag 'for-net-2025-06-27' of git://.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 200GbE
 
-> Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
-> ---
->  drivers/net/ethernet/cadence/macb.h      |  3 +++
->  drivers/net/ethernet/cadence/macb_main.c | 21 ++++++++++++++++++---
->  2 files changed, 21 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-> index adc70b6efd52b0b11e436c2c95bb5108c40f3490..d42c81cf441ce435cad38e2dfd779b0e6a141bf3 100644
-> --- a/drivers/net/ethernet/cadence/macb.h
-> +++ b/drivers/net/ethernet/cadence/macb.h
-> @@ -523,6 +523,8 @@
->  /* Bitfields in DCFG6. */
->  #define GEM_PBUF_LSO_OFFSET			27
->  #define GEM_PBUF_LSO_SIZE			1
-> +#define GEM_PBUF_RSC_OFFSET			26
-> +#define GEM_PBUF_RSC_SIZE			1
->  #define GEM_PBUF_CUTTHRU_OFFSET			25
->  #define GEM_PBUF_CUTTHRU_SIZE			1
->  #define GEM_DAW64_OFFSET			23
-> @@ -733,6 +735,7 @@
->  #define MACB_CAPS_MIIONRGMII			BIT(9)
->  #define MACB_CAPS_NEED_TSUCLK			BIT(10)
->  #define MACB_CAPS_QUEUE_DISABLE			BIT(11)
-> +#define MACB_CAPS_RSC_CAPABLE			BIT(12)
+Ahmed Zaki (1):
+  idpf: convert control queue mutex to a spinlock
 
-No need to be _CAPABLE, we're already _CAPS_
+Michal Swiatkowski (1):
+  idpf: return 0 size for RSS key if not supported
 
->  #define MACB_CAPS_PCS				BIT(24)
->  #define MACB_CAPS_HIGH_SPEED			BIT(25)
->  #define MACB_CAPS_CLK_HW_CHG			BIT(26)
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index 48b75d95861317b9925b366446c7572c7e186628..578e72c7727d4f578478ff2b3d0a6316327271b1 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -1317,8 +1317,19 @@ static void gem_rx_refill(struct macb_queue *queue)
->  			dma_wmb();
->  			macb_set_addr(bp, desc, paddr);
->  
-> -			/* properly align Ethernet header */
-> -			skb_reserve(skb, NET_IP_ALIGN);
-> +			/* Properly align Ethernet header.
-> +			 *
-> +			 * Hardware can add dummy bytes if asked using the RBOF
-> +			 * field inside the NCFGR register. That feature isn't
-> +			 * available if hardware is RSC capable.
-> +			 *
-> +			 * We cannot fallback to doing the 2-byte shift before
-> +			 * DMA mapping because the address field does not allow
-> +			 * setting the low 2/3 bits.
-> +			 * It is 3 bits if HW_DMA_CAP_PTP, else 2 bits.
-> +			 */
-> +			if (!(bp->caps & MACB_CAPS_RSC_CAPABLE))
-> +				skb_reserve(skb, NET_IP_ALIGN);
->  		} else {
->  			desc->ctrl = 0;
->  			dma_wmb();
-> @@ -2787,7 +2798,9 @@ static void macb_init_hw(struct macb *bp)
->  	macb_set_hwaddr(bp);
->  
->  	config = macb_mdc_clk_div(bp);
-> -	config |= MACB_BF(RBOF, NET_IP_ALIGN);	/* Make eth data aligned */
-> +	/* Make eth data aligned. If RSC capable, that offset is ignored by HW. */
-> +	if (!(bp->caps & MACB_CAPS_RSC_CAPABLE))
-> +		config |= MACB_BF(RBOF, NET_IP_ALIGN);
->  	config |= MACB_BIT(DRFCS);		/* Discard Rx FCS */
->  	if (bp->caps & MACB_CAPS_JUMBO)
->  		config |= MACB_BIT(JFRAME);	/* Enable jumbo frames */
-> @@ -4108,6 +4121,8 @@ static void macb_configure_caps(struct macb *bp,
->  		dcfg = gem_readl(bp, DCFG2);
->  		if ((dcfg & (GEM_BIT(RX_PKT_BUFF) | GEM_BIT(TX_PKT_BUFF))) == 0)
->  			bp->caps |= MACB_CAPS_FIFO_MODE;
-> +		if (GEM_BFEXT(PBUF_RSC, gem_readl(bp, DCFG6)))
-> +			bp->caps |= MACB_CAPS_RSC_CAPABLE;
->  		if (gem_has_ptp(bp)) {
->  			if (!GEM_BFEXT(TSU, gem_readl(bp, DCFG5)))
->  				dev_err(&bp->pdev->dev,
-> 
+Vitaly Lifshits (1):
+  igc: disable L1.2 PCI-E link substate to avoid performance issue
+
+ .../net/ethernet/intel/idpf/idpf_controlq.c   | 23 +++++++++----------
+ .../ethernet/intel/idpf/idpf_controlq_api.h   |  2 +-
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    |  4 ++--
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    | 12 ++++++----
+ drivers/net/ethernet/intel/igc/igc_main.c     | 10 ++++++++
+ 5 files changed, 32 insertions(+), 19 deletions(-)
+
+-- 
+2.47.1
 
 
