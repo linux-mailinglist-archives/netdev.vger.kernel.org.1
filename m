@@ -1,299 +1,108 @@
-Return-Path: <netdev+bounces-203013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FC98AF0140
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 19:09:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0D10AF01B1
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 19:24:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD5127A28B4
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 17:07:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6749E188249A
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 17:21:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCC5D275AFF;
-	Tue,  1 Jul 2025 17:09:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BCF41F1905;
+	Tue,  1 Jul 2025 17:20:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="IncesFOQ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="b8Y0VNQP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qGjFIWTq"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E809F1F3B83
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 17:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F7681DD529
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 17:20:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751389742; cv=none; b=WIB9OFPw5XUJPBH4sQeI2GzvDrglu3hzAl5cJmcTglV+2z+IxnNKlt7B3I555FuJ2+sNojq0bAgbVJ0iAhgKFzaKEk0lsge07vn/ql3KVpoGaqCblRCcdmIbM4XhvzuGfncRhokXF7EF9tYsPkKb2zgqddKx/5UQ75D/zI4ar7A=
+	t=1751390453; cv=none; b=uyeujlpNLnhUAChnlh+oS2S2unBBgbnsLbCNEkP82xPX8UstdyqmLB5gWoLzOWkDs+9f+GNoGzGb7e+nCPv8hKt6wiTzXAn2Yi2U9uU9SJPe9yTnIHdYvTvzw5RSQjELInDd/QLgU9uMmViWQ1TbVS3CI74MTAxhadn3oYiLHYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751389742; c=relaxed/simple;
-	bh=stPEYuSXMksOaRfGrTlnY2dVNscW+UN81rFC3yPYPQo=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=rKwfPSH2zjrXAjqeq/LH9AI2zROAkuDaoN61QtUENfO1iKyrlyxtua+XYByTrN8UeGW1WWAUGHZDfKB+cF6WuS1383VySbJeTPg9Xs7tTN+TY4BuCSrlCBa2tzklkQnzNLEnI1oJjHbUIEGI7uvMuu9NjQPXM6cvTzO/DZF/NRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=IncesFOQ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=b8Y0VNQP; arc=none smtp.client-ip=103.168.172.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id ECB781400221;
-	Tue,  1 Jul 2025 13:08:58 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Tue, 01 Jul 2025 13:08:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm3;
-	 t=1751389738; x=1751476138; bh=hkbTUVwVEKnKid2hJwEnBAYsQo86IhSu
-	xGdodEPDaDs=; b=IncesFOQEhn3/TfrHeuVRzlp4MQlbmZcYwJHH5ytnCzYZvuW
-	ZlpTMHe7l6LIr0oJjQ2JU3Gc21Nusx+lLE1b2sSr3dJ1aHkuAri89vJziyhSWrhV
-	bw4S1Tbn99eZpVn/ThLxmKIs1jwzAVOzWSrQYtaYJLDJNl7b3F1vD5VleewRM+iJ
-	0sRS49KhYcv/kJHSXqeHeekzWZC7tBurX45hXEfLaEv5QNu0aMg94zWQ/3cM0/y2
-	2Wqad7OWIHfGpEliaS4tW+SuGwgGu1r6OKvKgH+xl2AlsO5SO7Fs19onOl7nJf0v
-	GRS37lw1CAna/OxIVRcb4GvWEebRVBl640KYdA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1751389738; x=
-	1751476138; bh=hkbTUVwVEKnKid2hJwEnBAYsQo86IhSuxGdodEPDaDs=; b=b
-	8Y0VNQPeIss7SRbJOVURbir3KaheMLfNWCMVzSTKE/Cd2o4RJODB8yTa66y0itwE
-	XCS/jiWB6P86+Qaw0Ge+YmZoXbr2ts2lP0Wm1igllHVQcvn7CK7cVOdqUJMI3PCF
-	eXFoqj2cjHsYliM8LPsivT3ykciod8gXjeuDndL+KDR76LnbNBfSacilqyYUau4v
-	H03eXr+mkFITii4N+D2IWXSj+JMGuaQ46iuGkIBrw9nP3KAhphyQ4S+rYwT3+QD8
-	bgVzTIzJAqMbCytGSc2CoPTxE2iZOTv5ktzst0H5FgLQsuDsppZ2Fh3AYjMvJgbr
-	SZV6DuSSNw5LIfxyrN/Yw==
-X-ME-Sender: <xms:KhZkaOAC8L7RDy4OPZ_XKQlomxPXR3QEUlUNkl2DmOZiMAPJeI79hw>
-    <xme:KhZkaIiVPB1Bx7UwTQOY4MksJnP7m_4SanpFRIGb_9khx8ryqfdYTuT3ODV8yRgjG
-    hsdJuJaSVOqVFAJ9RY>
-X-ME-Received: <xmr:KhZkaBkz5KHINyq0_3DZgAG7yuvCK_fWjLlrJp1g3QXB4Q1Fz6afIBWYe7iuM2RamgHPng>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduhedtjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefhvfevufgjfhfogggtgfffkfesthhqredtredtjeenucfhrhhomheplfgrhicuggho
-    shgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrh
-    hnpeegfefghffghffhjefgveekhfeukeevffethffgtddutdefffeuheelgeelieeuhfen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjh
-    hvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtohepkedpmhhouggvpehsmhhtphho
-    uhhtpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtth
-    hopehlihhuhhgrnhhgsghinhesghhmrghilhdrtghomhdprhgtphhtthhopegvughumhgr
-    iigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdroh
-    hrghdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghp
-    thhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehjihhrihesrh
-    gvshhnuhhllhhirdhushdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgv
-    lhdrohhrgh
-X-ME-Proxy: <xmx:KhZkaMyjAQKAllGUKG8YzNQVGAhFqErBL0sVyN_BD8WgO0AjXQtFvA>
-    <xmx:KhZkaDTKL3haNoMWdf76BN762KRyaEV1H8I13PhvGIcARWEe3FNrHg>
-    <xmx:KhZkaHZs2hz0ihc3XZUfKkJ2QDcfNMDfAPSxN-09dcyOpYlNuV49Og>
-    <xmx:KhZkaMTD10mSEqyvPgxuWhGz2KftZC5qo62BUM8tc9I1BbVdrIuoDw>
-    <xmx:KhZkaMiyTeBBImZi3H17tO8zz9dEfOLNn6b1WYyUVLo-I-cXT2zcckfY>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 1 Jul 2025 13:08:57 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id CF0429FCB3; Tue,  1 Jul 2025 10:08:56 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id CB67E9FBDC;
-	Tue,  1 Jul 2025 10:08:56 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Hangbin Liu <liuhangbin@gmail.com>
-cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
-    netdev@vger.kernel.org
-Subject: Re: [Bonding Draft Proposal] Add lacp_prio Support for ad_select?
-In-reply-to: <aF4fEGySN8Pwpnab@fedora>
-References: <aFpLXdT4_zbqvUTd@fedora> <2627546.1750980515@famine> <aF4fEGySN8Pwpnab@fedora>
-Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
-   message dated "Fri, 27 Jun 2025 04:33:20 -0000."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1751390453; c=relaxed/simple;
+	bh=YtIpNltsU1T6ENOfW/WWBB2owbV9hnv2w6WtyE6PymU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hIJxcpQNPqh8l6AB6dZ65a9kFBP76U2jGIt56Mo6Idcu1PGQuiExZtkjG5TuuBa0U34poBhnL4LIYVJ9Un/N9ndTB5jlRIey7RbgzF7TctUquk8KGOsi4cJGXV20tqAfgXnxW4C4Pk6pW8Qk5SGy/DO7XyNrz9uN4ZRXDq6Jcfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qGjFIWTq; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b31c84b8052so7142226a12.1
+        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 10:20:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751390451; x=1751995251; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YtIpNltsU1T6ENOfW/WWBB2owbV9hnv2w6WtyE6PymU=;
+        b=qGjFIWTqNJH8qPKVSKZQKqhq9qQVtz0Lg7v9jXyJUJGIA/PVoI5yhD1l7IHxHE+7Rc
+         Rk9R/XA1YoXXnVq+piFbT9cHD/WE/2CHkj+wTNBJeMQWF21zki94DE2phYHoDXUnQmfd
+         hhhAnvWtUuOEAXNhRR/emgqNKZu+G43ETgHqfg/ssh1qSjHBArXDSReyuhvlxBBzA+69
+         GHDuuz2OeWpyHvEiopkT2KOITOFOtNXYNH6Eb6h49msSbyVDH+L+XDDiec4E2zRrdbDR
+         iSZqa59lAZLtsN8ARJhr0GJ+AT0hY8CSIDenMC/MNGrS/KXkYJ9l/e3/L/DhUdCmp3oe
+         HeKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751390451; x=1751995251;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YtIpNltsU1T6ENOfW/WWBB2owbV9hnv2w6WtyE6PymU=;
+        b=Jy31qX34kBuau+xc7tlMA2biM7Pn47jhyYjQ/YD7agvwnksEfH/HCJm6zvEf760EF/
+         ZHAkXfYv2ax/Fm00cctbDFkADxpde5YzMWXUsayFRDcseEhwaR0c2RNXKzLfft4224sq
+         H4YI+gGBu7RGt0E3y8+RT0qlHBp8imut2Xaq/lmDrqa1l6u8cPPrkuutlctwJyWVAK+E
+         wRNts2zBPLRkcPMdJJ9r9fXqyiNFDdwg4qcyS/b00OelkK7aTY1AtBCUxbakWz45/Ju7
+         f6JCO5GK0Ca8K92LkPXwv/1PZ6DQvngl5IJi0UWwcNTbScasRU8/4wlXpZT6l2K0xgfQ
+         Zh9g==
+X-Forwarded-Encrypted: i=1; AJvYcCVgZ/9ghx/gDuRQ43KBLyzHqMebYYNeDvQeLOz6a/G43H3JCu/h9cpiuw44EME5W8xjD6+eMoA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOSPLJAYJ9lbLsULnTBDefm6/ZofJyYWmPIoWsmxzR5T7wp82/
+	tTcvWYpYmd0e6dHCMudHvMVFIHSRRxQRYrJwtScuDMo+kOwSGS/iTpgkhX1hYtu/0LA8KuLYLOX
+	xDsdALYFYu8N814O+6qdDAKLSE5OClbnKsHugt0lY
+X-Gm-Gg: ASbGncuLHWRUmBUBzEvjvW4cPHDO8M2mK3KNUUsyYqb1kddUJXJB6H40ElVMuECLX2y
+	jbUZjfgwpXdwHuTVft0OIQsZ7birrNvvK36CfOZJKA2SlDc7LwaWa6o9TGAtjmyAlzFkrUHqa+t
+	cW7ERkt8cU96gQaPzVtHgnLZue9/Vrj9+EJIgOIO/IyGVDaLJPNL0z4fHG97kupzwaqxFcjtpoE
+	9UtNbI+mDo=
+X-Google-Smtp-Source: AGHT+IH1dI2kJBHFzj9usRQqk/CPtOc3u2z5SlqrwUEZN8ve9DbedB7bMbZ2uO4unltY6TCzSz6V3mCY7L9eB3RD0/I=
+X-Received: by 2002:a17:90b:1fc5:b0:311:ad7f:329c with SMTP id
+ 98e67ed59e1d1-318c92ec020mr30652120a91.18.1751390451071; Tue, 01 Jul 2025
+ 10:20:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20250701133006.812702-1-edumazet@google.com>
+In-Reply-To: <20250701133006.812702-1-edumazet@google.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 1 Jul 2025 10:20:37 -0700
+X-Gm-Features: Ac12FXwg9xLLFzBoL2cXay4jogx6Rmikf83x1Ic51lpKsty8yCXiWCRJSH30cdA
+Message-ID: <CAAVpQUAb62eubAvt=u9WMVv8W6XcxuQF58o+QJ3P=HoPdmoZAA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net/sched: acp_api: no longer acquire RTNL in tc_action_net_exit()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Vlad Buslov <vladbu@nvidia.com>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 01 Jul 2025 10:08:56 -0700
-Message-ID: <2946319.1751389736@famine>
 
-Hangbin Liu <liuhangbin@gmail.com> wrote:
-
->On Thu, Jun 26, 2025 at 04:28:35PM -0700, Jay Vosburgh wrote:
->> Hangbin Liu <liuhangbin@gmail.com> wrote:
->>=20
->> >Hi Jay,
->> >
->> >We have a customer setup involving two separate switches with identical
->> >L2/VLAN configurations. Each switch forms an independent aggregator
->> >(port-channel), and the end host connects to both with the same number =
-of
->> >links and equivalent bandwidth.
->> >
->> >As a result, the host ends up with two aggregators under a single bond
->> >interface. Since the user cannot arbitrarily override port count or
->> >bandwidth, they are asking for a new mechanism, lacp_prio, to influence
->> >aggregator selection via ad_select.
->> >
->> >Do you think this is a reasonable addition?
->>=20
->> 	In principle, I don't see a reason not to use the system
->> priority, et al, to influence the aggregator selection when bonding ends
->> up with multiple aggregators.  I'm undecided as to whether it should be
->> a separate ad_select policy or a "tiebreaker," but a separate policy is
->> probably simpler to deal with.
+On Tue, Jul 1, 2025 at 6:30=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+rote:
 >
->There is only one system priority in the bond, which means all aggregators
->share the same system priority =E2=80=94 right?
+> tc_action_net_exit() got an rtnl exclusion in commit
+> a159d3c4b829 ("net_sched: acquire RTNL in tc_action_net_exit()")
 >
->Or do you mean we should also take the partner's system priority into acco=
-unt?
-
-	Ok, this is what I get for reading the standard and not checking
-the code carefully while I do it.
-
-	That said, I still think that:
-
-	(a) the system priority is the logical fit for this purpose, at
-least from what the standard seems to intend, given that "System" there
-means "Aggregation System," and,
-
-	(b) the implementation we have (as well as few switches I
-checked) is totally impractical for using system priority in this
-manner, as all of them implement it as a global, or at least not on a
-per-Aggregation System basis.
-
-	Granted, the switches I have are pretty old, but even those that
-require ports to be explicitly configured for particular channel groups
-don't permit setting the system priority on a per-channel group (i.e.,
-Aggregation System) basis.
-
->> >If yes, what would be the best way to compare priorities?
->> >
->> >1. Port Priority Only. Currently initialized to 0xff. We could add a pa=
-rameter
->> >   allowing users to configure it.
->> >   a) Use the highest port priority within each aggregator for comparis=
-on
->> >   b) Sum all port priorities in each aggregator and compare the totals
->>=20
->> 	I'm not a fan of this, as explained below.
->>=20
->> 	Also, note that in LACP-land, when comparing priorities, the
->> higher priority is numerically smaller, which makes "add them up and
->> compare" a little counter intuitive to me.
+> Since then, commit 16af6067392c ("net: sched: implement reference
+> counted action release") made this RTNL exclusion obsolete.
 >
->Yeah..
->
->>=20
->> >2. Full LACP Info Comparison. Compare fields such as system_priority, s=
-ystem,
->> >   port_priority, port_id, etc.
->>=20
->> 	I think it makes more sense to use the System ID (system
->> priority and aggregator MAC address) from the LAG ID of the local
->> aggregator.  In the bonding implementation, an aggregator is assigned a
->> MAC when an interface is added, so the only aggregators lacking a MAC
->> are ones that have no ports (which can't be active).
->
->Same question, the system priority and aggregator MAC address are all same
->in the same bonding interface. So how can we prioritize between two
->aggregators within the same bond?
->
->Unless we take the partner's System ID into account. Which looks like, if
->we want to choose a better aggregator in bond, we need to config the switc=
-h side...
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-	Again, moving on from my lack of paying complete attention,
-looking at the teamd implementation, I think that's what it does:
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
-static void get_lacp_port_prio_info(struct lacp_port *lacp_port,
-				    struct lacpdu_info *prio_info)
-{
-	int prio_diff;
-	int system_diff;
-
-	prio_diff =3D ntohs(lacp_port->actor.system_priority) -
-		    ntohs(lacp_port->partner.system_priority);
-	system_diff =3D memcmp(lacp_port->actor.system,
-			     lacp_port->partner.system, ETH_ALEN);
-	if (prio_diff < 0 || (prio_diff =3D=3D 0 && system_diff < 0))
-		*prio_info =3D lacp_port->actor;
-	if (prio_diff > 0 || (prio_diff =3D=3D 0 && system_diff >=3D 0))
-		*prio_info =3D lacp_port->partner;
-
-	Right here, it chooses between returning the actor or partner
-data based on comparisons of the actor and partner System Identifier,
-returning the data for whichever is higher priority after comparing the
-System Identifiers (which is the System Priority plus Partner System,
-the latter of which is the MAC address, 802.1AX-2014 6.3.2).
-
-	I would hazard to guess that Jiri did it this way for the same
-reason we're having this conversation: there's not really a better way
-without rearranging a lot of the innards of how configuration of this
-stuff is done.
-
-	It looks like lacp_find_new_agg_lead() runs though all of the
-ports in all of the aggregators and chooses the aggregator with the
-"best" port of all.
-
-	One downside if we were to adapt this logic or something similar
-to bonding is that there's currently no way to set the Port Priority of
-interfaces in the bond.  There is a "prio" that can be set via ip set
-... type bond_slave prio X, which is IFLA_BOND_SLAVE_PRIO, but that's a
-failover priority, not the LACP Port Priority.
-
-	So right now, if the above logic were put into bonding, the
-local selection criteria would end up based entirely on the port number,
-which isn't configurable, and so doesn't seem especially better than
-what we have now.
-
->> 	If we want to use the partner System ID, that's a little more
->> complicated.  If aggregators in question both have LACP partners, then
->> the System IDs will be unique, since the MAC addresses will differ.  If
->> the aggregators don't have LACP partners, then they'll be individual
->> ports, and the partner information won't be available.
->
->Can we active a aggregator that don't have LACP partner? If not, then
->we don't need to compare that aggregator.
-
-	Yes, we can.  If no ports have a LACP partner, then all of the
-ports are "individual," which act like an aggregator with just one port.
-If all ports in the bond are individual, then one is chosen to become
-active.
-
-	The rationale behind this is to permit LACP-unaware hosts or
-things like PXE to be able to communicate when LACP is not up and
-running on the host system.
-
->> 	Modulo the fact that bonding assigns a MAC to an aggregator
->> before the standard does (for the System ID), this is approximately
->> what's described in 802.1AX-2014 6.7.1, although the context there is
->> criteria for prioritizing between ports during selection for aggregation
->> when limited capabilities exist (i.e., 6 ports but only the ability to
->> accomodate 4 in an aggregrator).
->>=20
->> 	FWIW, the 802.1AX standard is pretty quiet on this whole
->> situation.  It recognises that "A System may contain multiple
->> Aggregators, serving multiple Aggregator Clients" (802.1AX-2014 6.2.1)
->> but doesn't have any verbiage that I can find on requirements for
->> choosing between multiple such Aggregators if only one can be active.  I
->> think the presumption in the standard is that the multiple aggregators
->> would or could be active simultaneously as independent entities.
->>=20
->> 	Anyway, the upshot is that we can pretty much choose as we see
->> fit for this particular case.
->
->Yes
-
-	From the above, I suspect we'll have to add some additional
-configuration parameters somewhere.  It would be nice if the System
-Priority were configurable on a per-aggregator basis, but that seems
-complicated from a UI perspective (other than something like a mapping
-of agg ID to system prio).
-
-	-J
-
----
-	-Jay Vosburgh, jv@jvosburgh.net
+Thank you!
 
