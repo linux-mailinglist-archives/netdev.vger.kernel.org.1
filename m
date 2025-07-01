@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-202975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18B99AF006E
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 18:47:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0021AF006A
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 18:47:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B571C3A2D28
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:44:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 640F9179008
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:45:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D900227CCE7;
-	Tue,  1 Jul 2025 16:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 880DB27FB18;
+	Tue,  1 Jul 2025 16:43:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BXyPG1HM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iM/tomNT"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1985327F18C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB66827F4D5
 	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 16:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751388204; cv=none; b=FHEsLtGfk5PhcW7o5n1NBnGEzTfuk+8AEFUYSHz5iMb1PQSDAvYgyesvEgA5dBd/G3Eg0VWpuCma76IGTmfklxrpwGJzzkDi6hl1qMUT9QpY+dk7JBukUpw15zwALzOx/bKfhproWj6a/m2vbW6hVr3vf+6VWe3inQuWLDKsiJ8=
+	t=1751388205; cv=none; b=aryjWmpRkYz+x6QH+f6o2BAenbSfcqEnTPZQT2ATOpGZIm7lmvQulhAOX8Xxp/p4oTZ93DlljIVerAlKnyd7+CbHCHq0RnZiC8fuxFaKdb/iz1rtSFZJmr3G3dqzbxiFqyqS0WG7Z6GaYAq78FzUBh7XXUdfPMjKE5ld1ULMQsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751388204; c=relaxed/simple;
-	bh=7yYJUV6ppNgeRKLNbMeePZM9iPdG1PLQjiAiERP22z8=;
+	s=arc-20240116; t=1751388205; c=relaxed/simple;
+	bh=+NZ57ZbFh+VZ7S17wnlmCKf7pZU58AfKU1x2avc3MHA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SCtDjCo/X6duK8JyAjzGPXGuNLKeCL75kpWBbGqiF85HfPvYn2vZym6na55Z6Kiz+7mtkC8QFOxcz1bPx8q6QoeYTtDMIUtSWLQaXxoWon9ywe4RakfFxbeh2Pp0ceO2afPFtxGltauuKLR1r4firKsPYHtd89ZZgiK9VHANTu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BXyPG1HM; arc=none smtp.client-ip=192.198.163.16
+	 MIME-Version; b=gkspFE8UuUYnDXvoQzYtjazW5yAHsfQL1LnfOKXx+XnOQ9m8TqKf4Z9COvEKn7ZuKNHKyNErpCH+RwM/MiRiTRSX8DYbrH8WLbNyXKmi5MPzKSqJBhoxul7ZNQ9hkPAVyDxnKyHTiomVSXRHXgcPcZPaKMjuc1RMdAbN7r6lNw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iM/tomNT; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,26 +36,26 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1751388203; x=1782924203;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=7yYJUV6ppNgeRKLNbMeePZM9iPdG1PLQjiAiERP22z8=;
-  b=BXyPG1HMOHqdF8Py5H0nBjNtIRfs6nkF66XGODr4ssWx89XRulQubStc
-   LHUk5/1wSfb9hq9gBeX9iE2CnRKBKlZj2P3l2TXllnB60YAkusIzJnvSu
-   XrWRZj+dr9wj35fC4bui+JzwwU9cXhKRlpIQOFsEUMMjt05LVBbqZwzSM
-   WKJT5k1Okpext9dXRKlUupBpZW3FChLxcoRqZhwNFXG1Yda05ybC4tqUe
-   CynjzzQLSJIA4PMdNwxUndxegnkBlan4uuGIIkvdp8Y8Jbgi2QSxDRY4x
-   5K1lKJRshVenIin4bIircGFvjmhib7R6IG7uttctarMda+x5vOqLohdOl
-   w==;
-X-CSE-ConnectionGUID: 8udPOGjtT4CD3m23vwtZKQ==
-X-CSE-MsgGUID: R8NkP/i8QkmS4KCepUujEw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11481"; a="41296653"
+  bh=+NZ57ZbFh+VZ7S17wnlmCKf7pZU58AfKU1x2avc3MHA=;
+  b=iM/tomNT7nqb/sGmv9RLFdC/pTizHSJ1nH4hpS5MUevEjcKjqy9hdtih
+   jxIKzsY1urx1btnqmA1hPC/GfF8lV68oN31dTFYECcXjLEkKcbgpkIMlm
+   pAWEotpw962/ROXl61kqMPPPfh5I98W3cUmQNFWu9HDXDwrvE2Ca+ZiiT
+   KWUqhYt1knxg0QvWxrgkV2DdR7A2h0jQgLCbOWg2DtGmANPwMKMLNlJA+
+   +bG2eYH06ytsPhYeDpQNYnl643SVf/zg3zffR4xbkcnqEfIXmkbOxa/Lp
+   Ndlia0QrbO0mvEdX7oDPD2CZK69QQK7/4rbrEia/QX/zPq8aZBTh+/rIB
+   A==;
+X-CSE-ConnectionGUID: KNzPEggzQ4O+omuOy/Lhuw==
+X-CSE-MsgGUID: JUjCmZRsTOS/mx4dZYnhtw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11481"; a="41296657"
 X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
-   d="scan'208";a="41296653"
+   d="scan'208";a="41296657"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
   by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2025 09:43:20 -0700
-X-CSE-ConnectionGUID: u/2tqb/zQ5qtdQ2CHVg3YA==
-X-CSE-MsgGUID: Z0R0bZEbTK+E4Wp6MWVJkg==
+X-CSE-ConnectionGUID: Tqq4SG1JRo2uLD9NoEYAIg==
+X-CSE-MsgGUID: WoaUsbO2SBi8lZLLk0KwSQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
-   d="scan'208";a="153594087"
+   d="scan'208";a="153594090"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa009.jf.intel.com with ESMTP; 01 Jul 2025 09:43:21 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,15 +65,15 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+Cc: Ahmed Zaki <ahmed.zaki@intel.com>,
 	anthony.l.nguyen@intel.com,
 	willemb@google.com,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
 	Simon Horman <horms@kernel.org>,
 	Samuel Salin <Samuel.salin@intel.com>
-Subject: [PATCH net 1/3] idpf: return 0 size for RSS key if not supported
-Date: Tue,  1 Jul 2025 09:43:13 -0700
-Message-ID: <20250701164317.2983952-2-anthony.l.nguyen@intel.com>
+Subject: [PATCH net 2/3] idpf: convert control queue mutex to a spinlock
+Date: Tue,  1 Jul 2025 09:43:14 -0700
+Message-ID: <20250701164317.2983952-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250701164317.2983952-1-anthony.l.nguyen@intel.com>
 References: <20250701164317.2983952-1-anthony.l.nguyen@intel.com>
@@ -85,96 +85,227 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+From: Ahmed Zaki <ahmed.zaki@intel.com>
 
-Returning -EOPNOTSUPP from function returning u32 is leading to
-cast and invalid size value as a result.
+With VIRTCHNL2_CAP_MACFILTER enabled, the following warning is generated
+on module load:
 
--EOPNOTSUPP as a size probably will lead to allocation fail.
+[  324.701677] BUG: sleeping function called from invalid context at kernel/locking/mutex.c:578
+[  324.701684] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 1582, name: NetworkManager
+[  324.701689] preempt_count: 201, expected: 0
+[  324.701693] RCU nest depth: 0, expected: 0
+[  324.701697] 2 locks held by NetworkManager/1582:
+[  324.701702]  #0: ffffffff9f7be770 (rtnl_mutex){....}-{3:3}, at: rtnl_newlink+0x791/0x21e0
+[  324.701730]  #1: ff1100216c380368 (_xmit_ETHER){....}-{2:2}, at: __dev_open+0x3f0/0x870
+[  324.701749] Preemption disabled at:
+[  324.701752] [<ffffffff9cd23b9d>] __dev_open+0x3dd/0x870
+[  324.701765] CPU: 30 UID: 0 PID: 1582 Comm: NetworkManager Not tainted 6.15.0-rc5+ #2 PREEMPT(voluntary)
+[  324.701771] Hardware name: Intel Corporation M50FCP2SBSTD/M50FCP2SBSTD, BIOS SE5C741.86B.01.01.0001.2211140926 11/14/2022
+[  324.701774] Call Trace:
+[  324.701777]  <TASK>
+[  324.701779]  dump_stack_lvl+0x5d/0x80
+[  324.701788]  ? __dev_open+0x3dd/0x870
+[  324.701793]  __might_resched.cold+0x1ef/0x23d
+<..>
+[  324.701818]  __mutex_lock+0x113/0x1b80
+<..>
+[  324.701917]  idpf_ctlq_clean_sq+0xad/0x4b0 [idpf]
+[  324.701935]  ? kasan_save_track+0x14/0x30
+[  324.701941]  idpf_mb_clean+0x143/0x380 [idpf]
+<..>
+[  324.701991]  idpf_send_mb_msg+0x111/0x720 [idpf]
+[  324.702009]  idpf_vc_xn_exec+0x4cc/0x990 [idpf]
+[  324.702021]  ? rcu_is_watching+0x12/0xc0
+[  324.702035]  idpf_add_del_mac_filters+0x3ed/0xb50 [idpf]
+<..>
+[  324.702122]  __hw_addr_sync_dev+0x1cf/0x300
+[  324.702126]  ? find_held_lock+0x32/0x90
+[  324.702134]  idpf_set_rx_mode+0x317/0x390 [idpf]
+[  324.702152]  __dev_open+0x3f8/0x870
+[  324.702159]  ? __pfx___dev_open+0x10/0x10
+[  324.702174]  __dev_change_flags+0x443/0x650
+<..>
+[  324.702208]  netif_change_flags+0x80/0x160
+[  324.702218]  do_setlink.isra.0+0x16a0/0x3960
+<..>
+[  324.702349]  rtnl_newlink+0x12fd/0x21e0
 
-Command: ethtool -x eth0
-It is visible on all devices that don't have RSS caps set.
+The sequence is as follows:
+	rtnl_newlink()->
+	__dev_change_flags()->
+	__dev_open()->
+	dev_set_rx_mode() - >  # disables BH and grabs "dev->addr_list_lock"
+	idpf_set_rx_mode() ->  # proceed only if VIRTCHNL2_CAP_MACFILTER is ON
+	__dev_uc_sync() ->
+	idpf_add_mac_filter ->
+	idpf_add_del_mac_filters ->
+	idpf_send_mb_msg() ->
+	idpf_mb_clean() ->
+	idpf_ctlq_clean_sq()   # mutex_lock(cq_lock)
 
-[  136.615917] Call Trace:
-[  136.615921]  <TASK>
-[  136.615927]  ? __warn+0x89/0x130
-[  136.615942]  ? __alloc_frozen_pages_noprof+0x322/0x330
-[  136.615953]  ? report_bug+0x164/0x190
-[  136.615968]  ? handle_bug+0x58/0x90
-[  136.615979]  ? exc_invalid_op+0x17/0x70
-[  136.615987]  ? asm_exc_invalid_op+0x1a/0x20
-[  136.616001]  ? rss_prepare_get.constprop.0+0xb9/0x170
-[  136.616016]  ? __alloc_frozen_pages_noprof+0x322/0x330
-[  136.616028]  __alloc_pages_noprof+0xe/0x20
-[  136.616038]  ___kmalloc_large_node+0x80/0x110
-[  136.616072]  __kmalloc_large_node_noprof+0x1d/0xa0
-[  136.616081]  __kmalloc_noprof+0x32c/0x4c0
-[  136.616098]  ? rss_prepare_get.constprop.0+0xb9/0x170
-[  136.616105]  rss_prepare_get.constprop.0+0xb9/0x170
-[  136.616114]  ethnl_default_doit+0x107/0x3d0
-[  136.616131]  genl_family_rcv_msg_doit+0x100/0x160
-[  136.616147]  genl_rcv_msg+0x1b8/0x2c0
-[  136.616156]  ? __pfx_ethnl_default_doit+0x10/0x10
-[  136.616168]  ? __pfx_genl_rcv_msg+0x10/0x10
-[  136.616176]  netlink_rcv_skb+0x58/0x110
-[  136.616186]  genl_rcv+0x28/0x40
-[  136.616195]  netlink_unicast+0x19b/0x290
-[  136.616206]  netlink_sendmsg+0x222/0x490
-[  136.616215]  __sys_sendto+0x1fd/0x210
-[  136.616233]  __x64_sys_sendto+0x24/0x30
-[  136.616242]  do_syscall_64+0x82/0x160
-[  136.616252]  ? __sys_recvmsg+0x83/0xe0
-[  136.616265]  ? syscall_exit_to_user_mode+0x10/0x210
-[  136.616275]  ? do_syscall_64+0x8e/0x160
-[  136.616282]  ? __count_memcg_events+0xa1/0x130
-[  136.616295]  ? count_memcg_events.constprop.0+0x1a/0x30
-[  136.616306]  ? handle_mm_fault+0xae/0x2d0
-[  136.616319]  ? do_user_addr_fault+0x379/0x670
-[  136.616328]  ? clear_bhb_loop+0x45/0xa0
-[  136.616340]  ? clear_bhb_loop+0x45/0xa0
-[  136.616349]  ? clear_bhb_loop+0x45/0xa0
-[  136.616359]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[  136.616369] RIP: 0033:0x7fd30ba7b047
-[  136.616376] Code: 0c 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 80 3d bd d5 0c 00 00 41 89 ca 74 10 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 71 c3 55 48 83 ec 30 44 89 4c 24 2c 4c 89 44
-[  136.616381] RSP: 002b:00007ffde1796d68 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
-[  136.616388] RAX: ffffffffffffffda RBX: 000055d7bd89f2a0 RCX: 00007fd30ba7b047
-[  136.616392] RDX: 0000000000000028 RSI: 000055d7bd89f3b0 RDI: 0000000000000003
-[  136.616396] RBP: 00007ffde1796e10 R08: 00007fd30bb4e200 R09: 000000000000000c
-[  136.616399] R10: 0000000000000000 R11: 0000000000000202 R12: 000055d7bd89f340
-[  136.616403] R13: 000055d7bd89f3b0 R14: 000055d78943f200 R15: 0000000000000000
+Fix by converting cq_lock to a spinlock. All operations under the new
+lock are safe except freeing the DMA memory, which may use vunmap(). Fix
+by requesting a contiguous physical memory for the DMA mapping.
 
-Fixes: 02cbfba1add5 ("idpf: add ethtool callbacks")
-Reviewed-by: Ahmed Zaki <ahmed.zaki@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Fixes: a251eee62133 ("idpf: add SRIOV support and other ndo_ops")
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Tested-by: Samuel Salin <Samuel.salin@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_ethtool.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ .../net/ethernet/intel/idpf/idpf_controlq.c   | 23 +++++++++----------
+ .../ethernet/intel/idpf/idpf_controlq_api.h   |  2 +-
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    | 12 ++++++----
+ 3 files changed, 20 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-index 9bdb309b668e..eaf7a2606faa 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-@@ -47,7 +47,7 @@ static u32 idpf_get_rxfh_key_size(struct net_device *netdev)
- 	struct idpf_vport_user_config_data *user_config;
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_controlq.c b/drivers/net/ethernet/intel/idpf/idpf_controlq.c
+index b28991dd1870..48b8e184f3db 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_controlq.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_controlq.c
+@@ -96,7 +96,7 @@ static void idpf_ctlq_init_rxq_bufs(struct idpf_ctlq_info *cq)
+  */
+ static void idpf_ctlq_shutdown(struct idpf_hw *hw, struct idpf_ctlq_info *cq)
+ {
+-	mutex_lock(&cq->cq_lock);
++	spin_lock(&cq->cq_lock);
  
- 	if (!idpf_is_cap_ena_all(np->adapter, IDPF_RSS_CAPS, IDPF_CAP_RSS))
--		return -EOPNOTSUPP;
-+		return 0;
+ 	/* free ring buffers and the ring itself */
+ 	idpf_ctlq_dealloc_ring_res(hw, cq);
+@@ -104,8 +104,7 @@ static void idpf_ctlq_shutdown(struct idpf_hw *hw, struct idpf_ctlq_info *cq)
+ 	/* Set ring_size to 0 to indicate uninitialized queue */
+ 	cq->ring_size = 0;
  
- 	user_config = &np->adapter->vport_config[np->vport_idx]->user_config;
+-	mutex_unlock(&cq->cq_lock);
+-	mutex_destroy(&cq->cq_lock);
++	spin_unlock(&cq->cq_lock);
+ }
  
-@@ -66,7 +66,7 @@ static u32 idpf_get_rxfh_indir_size(struct net_device *netdev)
- 	struct idpf_vport_user_config_data *user_config;
+ /**
+@@ -173,7 +172,7 @@ int idpf_ctlq_add(struct idpf_hw *hw,
  
- 	if (!idpf_is_cap_ena_all(np->adapter, IDPF_RSS_CAPS, IDPF_CAP_RSS))
--		return -EOPNOTSUPP;
-+		return 0;
+ 	idpf_ctlq_init_regs(hw, cq, is_rxq);
  
- 	user_config = &np->adapter->vport_config[np->vport_idx]->user_config;
+-	mutex_init(&cq->cq_lock);
++	spin_lock_init(&cq->cq_lock);
  
+ 	list_add(&cq->cq_list, &hw->cq_list_head);
+ 
+@@ -272,7 +271,7 @@ int idpf_ctlq_send(struct idpf_hw *hw, struct idpf_ctlq_info *cq,
+ 	int err = 0;
+ 	int i;
+ 
+-	mutex_lock(&cq->cq_lock);
++	spin_lock(&cq->cq_lock);
+ 
+ 	/* Ensure there are enough descriptors to send all messages */
+ 	num_desc_avail = IDPF_CTLQ_DESC_UNUSED(cq);
+@@ -332,7 +331,7 @@ int idpf_ctlq_send(struct idpf_hw *hw, struct idpf_ctlq_info *cq,
+ 	wr32(hw, cq->reg.tail, cq->next_to_use);
+ 
+ err_unlock:
+-	mutex_unlock(&cq->cq_lock);
++	spin_unlock(&cq->cq_lock);
+ 
+ 	return err;
+ }
+@@ -364,7 +363,7 @@ int idpf_ctlq_clean_sq(struct idpf_ctlq_info *cq, u16 *clean_count,
+ 	if (*clean_count > cq->ring_size)
+ 		return -EBADR;
+ 
+-	mutex_lock(&cq->cq_lock);
++	spin_lock(&cq->cq_lock);
+ 
+ 	ntc = cq->next_to_clean;
+ 
+@@ -397,7 +396,7 @@ int idpf_ctlq_clean_sq(struct idpf_ctlq_info *cq, u16 *clean_count,
+ 
+ 	cq->next_to_clean = ntc;
+ 
+-	mutex_unlock(&cq->cq_lock);
++	spin_unlock(&cq->cq_lock);
+ 
+ 	/* Return number of descriptors actually cleaned */
+ 	*clean_count = i;
+@@ -435,7 +434,7 @@ int idpf_ctlq_post_rx_buffs(struct idpf_hw *hw, struct idpf_ctlq_info *cq,
+ 	if (*buff_count > 0)
+ 		buffs_avail = true;
+ 
+-	mutex_lock(&cq->cq_lock);
++	spin_lock(&cq->cq_lock);
+ 
+ 	if (tbp >= cq->ring_size)
+ 		tbp = 0;
+@@ -524,7 +523,7 @@ int idpf_ctlq_post_rx_buffs(struct idpf_hw *hw, struct idpf_ctlq_info *cq,
+ 		wr32(hw, cq->reg.tail, cq->next_to_post);
+ 	}
+ 
+-	mutex_unlock(&cq->cq_lock);
++	spin_unlock(&cq->cq_lock);
+ 
+ 	/* return the number of buffers that were not posted */
+ 	*buff_count = *buff_count - i;
+@@ -552,7 +551,7 @@ int idpf_ctlq_recv(struct idpf_ctlq_info *cq, u16 *num_q_msg,
+ 	u16 i;
+ 
+ 	/* take the lock before we start messing with the ring */
+-	mutex_lock(&cq->cq_lock);
++	spin_lock(&cq->cq_lock);
+ 
+ 	ntc = cq->next_to_clean;
+ 
+@@ -614,7 +613,7 @@ int idpf_ctlq_recv(struct idpf_ctlq_info *cq, u16 *num_q_msg,
+ 
+ 	cq->next_to_clean = ntc;
+ 
+-	mutex_unlock(&cq->cq_lock);
++	spin_unlock(&cq->cq_lock);
+ 
+ 	*num_q_msg = i;
+ 	if (*num_q_msg == 0)
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_controlq_api.h b/drivers/net/ethernet/intel/idpf/idpf_controlq_api.h
+index 9642494a67d8..3414c5f9a831 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_controlq_api.h
++++ b/drivers/net/ethernet/intel/idpf/idpf_controlq_api.h
+@@ -99,7 +99,7 @@ struct idpf_ctlq_info {
+ 
+ 	enum idpf_ctlq_type cq_type;
+ 	int q_id;
+-	struct mutex cq_lock;		/* control queue lock */
++	spinlock_t cq_lock;		/* control queue lock */
+ 	/* used for interrupt processing */
+ 	u16 next_to_use;
+ 	u16 next_to_clean;
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+index 4eb20ec2accb..80382ff4a5fa 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+@@ -2314,8 +2314,12 @@ void *idpf_alloc_dma_mem(struct idpf_hw *hw, struct idpf_dma_mem *mem, u64 size)
+ 	struct idpf_adapter *adapter = hw->back;
+ 	size_t sz = ALIGN(size, 4096);
+ 
+-	mem->va = dma_alloc_coherent(&adapter->pdev->dev, sz,
+-				     &mem->pa, GFP_KERNEL);
++	/* The control queue resources are freed under a spinlock, contiguous
++	 * pages will avoid IOMMU remapping and the use vmap (and vunmap in
++	 * dma_free_*() path.
++	 */
++	mem->va = dma_alloc_attrs(&adapter->pdev->dev, sz, &mem->pa,
++				  GFP_KERNEL, DMA_ATTR_FORCE_CONTIGUOUS);
+ 	mem->size = sz;
+ 
+ 	return mem->va;
+@@ -2330,8 +2334,8 @@ void idpf_free_dma_mem(struct idpf_hw *hw, struct idpf_dma_mem *mem)
+ {
+ 	struct idpf_adapter *adapter = hw->back;
+ 
+-	dma_free_coherent(&adapter->pdev->dev, mem->size,
+-			  mem->va, mem->pa);
++	dma_free_attrs(&adapter->pdev->dev, mem->size,
++		       mem->va, mem->pa, DMA_ATTR_FORCE_CONTIGUOUS);
+ 	mem->size = 0;
+ 	mem->va = NULL;
+ 	mem->pa = 0;
 -- 
 2.47.1
 
