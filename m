@@ -1,108 +1,81 @@
-Return-Path: <netdev+bounces-202779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E828AEEFBE
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 09:28:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 164DFAEEFC9
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 09:34:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F7131BC5451
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 07:28:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 500861BC5778
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 07:34:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B4725B1F4;
-	Tue,  1 Jul 2025 07:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C20571FBEB9;
+	Tue,  1 Jul 2025 07:33:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="GfhxbFUk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="P//OOnOm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735C772627;
-	Tue,  1 Jul 2025 07:28:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E54428F1;
+	Tue,  1 Jul 2025 07:33:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751354892; cv=none; b=NO7CBtgCQqj9PjnTDT7GLIYv4N11pnRiGV21ge4gC56UNbdGevtFB0fjbL0QjvOewiJZ8mnhhy/eTt/g3iRIVPaTH9upS1c9PCPCx4vC85FJtBt1DsrIDgtsPB/l3xgoyXvR0STC59BMDxblI65JL7sPqMZ1ul96+C0LqHPfLQI=
+	t=1751355232; cv=none; b=B4D3+bLe+LPkYBr/b+VG4AHqVoFY2hKYKlAb8TjWCWJqyAqPuUgncRgpFhgV+1fURMgB2tRppeSeI5j66ylXnZu7f+EHHKQ/fnJTjzl1+/dZ2cnB2IQzuNwiUUN33TubfVVEA+glyPksKkbXtIKrcKkNEJI2BhyqnmMGaewOA10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751354892; c=relaxed/simple;
-	bh=YDEbnGhuOWLsVA+sCNJxV/TpybCXlMAB4+pgRB4AFgQ=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=VoLulGQ7m6deCn8WSj1nKxct2k+BnPCjJWmcwivO8C+54LHZwLpX5d8MygqIyKl7aaSCv0wQ/wdr+XzFTRDkhuwkJ+1JXdWja5QA58K3FLMjJpMdKQg7hq4OkRqKJtRA8BJJm76xoYFPMlEYazk55C7mkVCTqDA1hEEGr3G8o5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=GfhxbFUk; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1uWVOt-00DBu9-Kt; Tue, 01 Jul 2025 09:27:31 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=Rkdk2rPksLpTTEM7JfKIBHo3x2rKNHPrlN3G2XHmJyE=; b=GfhxbFUkoy8GS/INc8QHy3peIx
-	zAk3bRrn5f22LX1XhffCbRVtSG+IYOYUXmC1eqG8GcYmhckSwbJ6DPzJVW2/NkXn6DVcg571sDI8W
-	SBaiZX9KdVOX2NxHUQvl+wMDViHZz+OPBtof82UPBLiSEM906u4K3k6c1hYe96ZxN3+JUQszHcP30
-	j7791qWTu0J4Msgw5d5I38wcYToDoRC4UNlZx+N+vEju0IE6ooDRvIDj1jqHLXZ0yOUpE4D9BC9kb
-	7m3+oUF+k2A1/XqBip9cjSX6OsFA5oEZIEudkXa+7eB/myI6rAi/i8cQTYcTNp3/as9IzM1JwI7rp
-	7p/Am+Xw==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1uWVOs-0000QG-4G; Tue, 01 Jul 2025 09:27:30 +0200
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1uWVOZ-001vyL-CH; Tue, 01 Jul 2025 09:27:11 +0200
-Message-ID: <beea4b9f-657f-4f98-a853-e40a503e2274@rbox.co>
-Date: Tue, 1 Jul 2025 09:27:09 +0200
+	s=arc-20240116; t=1751355232; c=relaxed/simple;
+	bh=2VqbAPJtUfnkDlAF8rcNfBYvaCT+VVnZ4zdP9Nu994k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NDCys0VNrbBY+zVXHykusoV3L6YrXJzxLvsy1+P4yr26mCaMXW+rPvJX1VZXVfbsu8w/jlyw+j6EEyladrAQoUtJ9WhKVAwDLlutL4VbClMGBTCmaSNVPiYugdZcheRngI293Ygg84QwbBd0NiK4eRAhKih8xIRUv/auW4Z6axw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=P//OOnOm; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=6Lcv9nTvAgKsJXFRPrOjjHvHtdAeBlh7A4eHDwh00wk=; b=P//OOnOm5stv/kbXHC5u15pFPT
+	IYA2JY03mW/qZZm/KKowsf07U1qsvHsCf6ZTgovpvKth50CI8ZbWdoSKlxbdt4dVR+0NoV26w3YHV
+	Eb3hDqmH4FBWNMztMtM0D/4HHuHt72VL1SK7Dj8FIn1bg84nO9t8DkzgSIAOSFae8pbk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uWVUZ-00HRFJ-L8; Tue, 01 Jul 2025 09:33:23 +0200
+Date: Tue, 1 Jul 2025 09:33:23 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Lucien.Jheng" <lucienzx159@gmail.com>
+Cc: linux-clk@vger.kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, daniel@makrotopia.org, ericwouds@gmail.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	joseph.lin@airoha.com, wenshin.chung@airoha.com,
+	lucien.jheng@airoha.com, albert-al.lee@airoha.com
+Subject: Re: [PATCH v2 net-next PATCH 1/1] net: phy: air_en8811h: Introduce
+ resume/suspend and clk_restore_context to ensure correct CKO settings after
+ network interface reinitialization.
+Message-ID: <90321dbf-cca3-4f00-9f2e-3d09756761f6@lunn.ch>
+References: <20250630154147.80388-1-lucienzx159@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH net-next v2 0/9] net: Remove unused function parameters in
- skbuff.c
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, David Ahern <dsahern@kernel.org>,
- Boris Pismenny <borisp@nvidia.com>, John Fastabend
- <john.fastabend@gmail.com>, Ayush Sawal <ayush.sawal@chelsio.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Wenjia Zhang <wenjia@linux.ibm.com>,
- Jan Karcher <jaka@linux.ibm.com>, "D. Wythe" <alibuda@linux.alibaba.com>,
- Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20250626-splice-drop-unused-v2-0-3268fac1af89@rbox.co>
- <20250630181847.525a0ad6@kernel.org>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <20250630181847.525a0ad6@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250630154147.80388-1-lucienzx159@gmail.com>
 
-On 7/1/25 03:18, Jakub Kicinski wrote:
-> On Thu, 26 Jun 2025 10:33:33 +0200 Michal Luczaj wrote:
->> Couple of cleanup patches to get rid of unused function parameters around
->> skbuff.c, plus little things spotted along the way.
->>
->> Offshoot of my question in [1], but way more contained. Found by adding
->> "-Wunused-parameter -Wno-error" to KBUILD_CFLAGS and grepping for specific
->> skbuff.c warnings.
+On Mon, Jun 30, 2025 at 11:41:47PM +0800, Lucien.Jheng wrote:
+> If the user reinitializes the network interface, the PHY will reinitialize,
+> and the CKO settings will revert to their initial configuration(be enabled).
+> To prevent CKO from being re-enabled,
+> en8811h_clk_restore_context and en8811h_resume were added
+> to ensure the CKO settings remain correct.
 > 
-> I feel a little ambivalent about the removal of the flags arguments.
-> I understand that they are unused now, but theoretically the operation
-> as a whole has flags so it's not crazy to pass them along.. Dunno.
+> Signed-off-by: Lucien.Jheng <lucienzx159@gmail.com>
 
-I suspect you can say the same about @gfp. Even though they've both became
-irrelevant for the functions that define them. But I understand your
-hesitation. Should I post v3 without this/these changes?
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-What's netdev's stance on using __always_unused in such cases?
-
-Thanks,
-Michal
-
+    Andrew
 
