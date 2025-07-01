@@ -1,187 +1,160 @@
-Return-Path: <netdev+bounces-202790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30B3CAEF02C
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 09:53:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBF3BAEF039
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 09:55:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8CC63E2445
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 07:53:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BDB6E7AB84A
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 07:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5AF62620D3;
-	Tue,  1 Jul 2025 07:52:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBE632153E1;
+	Tue,  1 Jul 2025 07:55:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RS3a9aUY"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="RPCVe6qW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2ED326059F
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 07:52:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2EB9264628;
+	Tue,  1 Jul 2025 07:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751356369; cv=none; b=V2/RKEIRX7XttXufcrIkIUnDeRQ1CNI/i+kYIfEEg2fC1dVnEMr1w41KDcPm4lQjbjhm1viNodHHifxtHkDyQT3T/W3kGGoBCPnqKzKQuaMwnqOGt8ifPp9oxixucY25Sv64eELJtV809eT4TPXU7XLy9WCpMEzIILuW875NVgs=
+	t=1751356528; cv=none; b=WopNewf9+6UIKd3UDQdV8qbxvrWZC4le2kEgSzFKMAkSQ6JjE8LLFgdiP/gQJAT9KcGPSTKVwY2jrxEeI4tnPLbv7Sessr5SScZdNBB12M0uyQtHimqO8LmZRGAzXNZOdYWTaeqGl6JABi2xpNUvdN7aCvHlJqdtkkWseai6/V8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751356369; c=relaxed/simple;
-	bh=iqtTO7BdgSOS0hugcE5p2vfRNGvtKPLOW4//tI8bFOo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pZELzmFzmQbkmfaFYDkH+VRj8mKQZfk3y2lxg24K6u6oMev7d32mPO2e+hbynq6N9g3gptevkdHI962tlc1juPppw4x6aWYAt3tAV+OswGut9sdgbZuHpeEEDvHYIM4L18A9Bsm2jaF1iJnoY3dG8Eg1JgKDxKezrYhVSdUcmVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RS3a9aUY; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751356366;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5W4qfJP5trIgKgYi+NpmwjcNUOZanDpnOGZEn8fp13E=;
-	b=RS3a9aUYB+ijGanu5LQ3UWpdEQ9RpQfBIYeCSNYyoL5ji4Sk7pB5r/SvghNHo6o9e35BM9
-	IZCT8j/bOBV4ir01Oj2sMlA97tCAqTKqaRvK3GQ6qi9QJ8dUO0lKBfz2XN8rk8vQ2EDXYU
-	l7k+Wes8PXQH/yfwG7oHfnBS8ktihpQ=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-642-y9OUIqqdPeS60ulFMiflFA-1; Tue, 01 Jul 2025 03:52:45 -0400
-X-MC-Unique: y9OUIqqdPeS60ulFMiflFA-1
-X-Mimecast-MFC-AGG-ID: y9OUIqqdPeS60ulFMiflFA_1751356364
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-450d6768d4dso18182885e9.2
-        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 00:52:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751356364; x=1751961164;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5W4qfJP5trIgKgYi+NpmwjcNUOZanDpnOGZEn8fp13E=;
-        b=kDzezKL3fIdR80XW570DPXdxxLMHSbcRqpLo67zRd8bprH+aLvjDoNzZopwvfodWkc
-         fdDQgwgTVBYKBvCZ8eKl4gkz71JdCIhtIXVHE15BbFJtDEiZdlELNlHV+0PhG3Js4rWn
-         7mbw4o/7kJPCg+qTALOxehaaDsGyBerqOFdBLRxC7dCXOysMKpH+ZzDJs6Nr6DC5w8pp
-         7pmAb8VvktRDpYquZ2j1DTUoX/DuXaKPo3oMZ5LoxTPFmPqmyn/vhGA48laURD++ZZW6
-         XiIz3FHpwnZY2Debyty8kh3I74VLCACUMVViiVoslTOM7zKSNEpQjZv7Wv8nOIkRZCAS
-         gZGA==
-X-Forwarded-Encrypted: i=1; AJvYcCUVjEJI8+dcpUfEVUtClKb6x54VT/tdw0HSXWwRvUIc0c4X2hq0P09reZOSL+Ir1LEgfShICa0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwE7zo+rUEHxFhQ7vqU2PWIUArjVM1kD9RZDj1Ah6zbloYtfjPa
-	gvvLxNFHh96w43wcTU3FCq8UMlucwsaS9Qhx2t7zM18+iocoH5MHbWJF2zpNgP8c7SU0YCFnVT/
-	KoKS8u0qi6166stxZtOJF+Rdp+ek5Zi0yx6t3F0VIxyoC4BKU+ki8lBturQ==
-X-Gm-Gg: ASbGnctpXWdxPiKnWQmGal29vc1IiXP0kXzX754cEIb1Rz2JJUFkRCubm8u/FZTdH6s
-	yXe6dewyeuj6eHWxIW5Az7BBCrglFXLfHHPfkFVdxX4v5mJeUiRLxhRhvtLUvl6vzgtCJ7LkUEG
-	hhvASX45EBohUdbcVPcZY8J1aVS+ejKfyGaHgQUDbzOxk0CJqMGb8XpV+K5X9W7GZl8276TTjgU
-	mBH1BNAYU24NKXJt1mxXxDcI4YAmfTvD7BnIYa6BGWPEkIMGUX7davoE03bfjU23HMPX0uaJqhB
-	HZeQ9WZCVRf+gyrQ
-X-Received: by 2002:a05:6000:25ca:b0:3a4:ed2f:e82d with SMTP id ffacd0b85a97d-3a8f51c1a81mr12478144f8f.22.1751356364395;
-        Tue, 01 Jul 2025 00:52:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFXOoMiKZEJq6ceWK4Q10DrkD7JlKwDdbKrLj6V8anCMySNXNp0lfxDJ0dXtxq9+6g1HirIxw==
-X-Received: by 2002:a05:6000:25ca:b0:3a4:ed2f:e82d with SMTP id ffacd0b85a97d-3a8f51c1a81mr12478113f8f.22.1751356363901;
-        Tue, 01 Jul 2025 00:52:43 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:152e:1400:856d:9957:3ec3:1ddc])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a892e52a5asm12587008f8f.54.2025.07.01.00.52.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jul 2025 00:52:43 -0700 (PDT)
-Date: Tue, 1 Jul 2025 03:52:40 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Zigit Zo <zuozhijie@bytedance.com>
-Cc: jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [External] Re: [PATCH net] virtio-net: fix a rtnl_lock()
- deadlock during probing
-Message-ID: <20250701035110-mutt-send-email-mst@kernel.org>
-References: <20250630095109.214013-1-zuozhijie@bytedance.com>
- <20250630103240-mutt-send-email-mst@kernel.org>
- <20250630105328-mutt-send-email-mst@kernel.org>
- <f1f68fbd-e2cf-40c5-a6b8-533cb3ec798f@bytedance.com>
+	s=arc-20240116; t=1751356528; c=relaxed/simple;
+	bh=9ec1u3X1hswUlL/D+46m55ZLYNmlwFlrlevyxirbW94=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ANOKtGVKc9F81SQ3D8QugsZquq3VWPQfUTPKVd+jlroqjRpHP7/2OvV8ytA/9Zhj9JKD0dC8X/FwW9LlFas0WfX86eHTfbaTgx090kGIx+3dnj49ovWbA8TJKmltzgTugHIpWg0Wt6w9zETZdFgYVHJ9eZCTzF4a1LptX97koOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=RPCVe6qW; arc=none smtp.client-ip=54.207.22.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1751356516;
+	bh=kVonl+PK1ESVmG9azZvdAt29T3vBY7t0t1HKeM85rhI=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To;
+	b=RPCVe6qWMeh0L1KoCAaUpToeJF73nl/4uaOz8Tesl0qQkVZxkF7smEdDfSJZicN5s
+	 fxui5Td9gen7am0Z4N9YAqtA5nGts/xMLZA3Ws5sbXKfXFkKXB6sb0d9HGnL6x9VNJ
+	 phgkYjSch/FgCZuJpUk4ufBea22s/ZA7lPoN4Hb0=
+X-QQ-mid: esmtpgz11t1751356511t3eee1c54
+X-QQ-Originating-IP: uIMIDLdsZ/D1XDMaTtdpyHRjJA4q6V7tfk6huzd3aRk=
+Received: from mail-yw1-f174.google.com ( [209.85.128.174])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 01 Jul 2025 15:55:09 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 13363238083336646326
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-710bbd7a9e2so30045547b3.0;
+        Tue, 01 Jul 2025 00:55:10 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCW0bEt/iv64aiNz+f2jdKskcFb2/32SuqHi5zIgUN0ehYP9MzpFdj49uP1QPf5UEn+4uG793Pka@vger.kernel.org, AJvYcCWTc8nspshMCLgdF7o6ZUYzjq7nZ8VSlMa6oe7DwxOlfoLNrBx+yTEVVjbSoMBEr97pX4YgQOxM2xBpgwg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmxLDX982cRFLjUyVX8vaGxCrc5VAwOSqB+fWm/JMaomNCjiBT
+	pJ2+SXnn+t5yoetWS0soNb/H2kwKJlzBczhsjG0Uzb0y4+vsp93BxfHUa61DMUF3uoFqxZRD+eX
+	gOgDo3DdbushoPat7Jf8VqaQaBOwKS7g=
+X-Google-Smtp-Source: AGHT+IF/JrE6CmFtz4xVWDk4L0eQar4iOXSbDoU2gCX5TO7LfKfgwY1Hcpg+2UwgYT4HAN5Wey2cPhMzu7MT0Sf0EwM=
+X-Received: by 2002:a05:690c:319:b0:712:d824:9202 with SMTP id
+ 00721157ae682-715171471femr202620807b3.9.1751356508652; Tue, 01 Jul 2025
+ 00:55:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f1f68fbd-e2cf-40c5-a6b8-533cb3ec798f@bytedance.com>
+References: <9EE5B02BB2EF6895+20250623041104.61044-1-wangyuli@uniontech.com>
+ <20250623131141.332c631c@kernel.org> <CAC1kPDMkYdPVy-dG3uv92-JG2Ui8BxRqYt2U86ey7fKuJxBa0w@mail.gmail.com>
+In-Reply-To: <CAC1kPDMkYdPVy-dG3uv92-JG2Ui8BxRqYt2U86ey7fKuJxBa0w@mail.gmail.com>
+From: Chen Linxuan <chenlinxuan@uniontech.com>
+Date: Tue, 1 Jul 2025 15:54:57 +0800
+X-Gmail-Original-Message-ID: <0F513DA3FF23E8A1+CAC1kPDNE+io5=KEXZkLq5DOQi2qzBEmgAwOj6x4qvhiNmC1rtQ@mail.gmail.com>
+X-Gm-Features: Ac12FXxOBex4Jesig6QUABAVCPRvvFOqEWQBN0RMoBwV77dRdQuVcwEsTNxzev8
+Message-ID: <CAC1kPDNE+io5=KEXZkLq5DOQi2qzBEmgAwOj6x4qvhiNmC1rtQ@mail.gmail.com>
+Subject: Re: [PATCH] nfp: nfp_alloc_bar: Fix double unlock
+To: Chen Linxuan <chenlinxuan@uniontech.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, WangYuli <wangyuli@uniontech.com>, louis.peens@corigine.com, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, viro@zeniv.linux.org.uk, oss-drivers@corigine.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	guanwentao@uniontech.com, niecheng1@uniontech.com, 
+	Jun Zhan <zhanjun@uniontech.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz5a-1
+X-QQ-XMAILINFO: Mtnmbwz1r7Eqqjl1CQl6m32qcgPJFhDXzPap09HT4oh6a0GfGQS9QuZT
+	D8Q56fOUGzNceoSYjYYLfA+5NzFTmlCOI7zv+kE29qfBXvB2yMFkZb6E1nrH5AcFHh+Xo8U
+	PrWaEKdPgXqtQAuT75YacrRTQ8b7z1rrNVjggNi/VItZjX3fydy5WkKadTfym2Xy4Si50wV
+	XxJMbGzZk2PT/kEON8wIlDceyNlaq93c0yuLbUU40yyRPtq3u1L3ed77bdUYaxO6CMAbMBK
+	o+yhQmLnpmgdMoOAZqsgBgEllHj2FnsJrKZ7VNDtAputjLasCs1wzWzhv/m8MoLXhwS0Rtn
+	9OM0nykb9D3uozgkmt+ZMzHGmTi2nHkrbdp7Q3Ry75WCyN10HbDculP7ypLVv7SEUKwY3oG
+	oGnxCiQiZmSGXMNXY9G9lw95Ix8Qa4U1Rxuv6cBprk9uqBF4Q0SkKv5L30J4ieHWQg+2xKE
+	o98rBjsF+OrhijPsdcpmObgxssOEslik6Uw+vlqRxq2wmAqb5R43piHH31WyBHL8QURT1Ba
+	zlzMDS6rtwY+gPujmvXAAb9JzlwzVTBEMal/KE8o1mcnmqgNOaUdQTjtmpcqWJnoY8D3yQC
+	xe8mbgv5Xtbtdbv9/C8t6kRtl25+dR4QxnJU8r4CHeJh5wjV5/FV3Y/17nEFe+UKYHonoll
+	53jHkbF9bEuFsuPIEjKVSuB8c4nnKm/an1HBIF8/FvSmj7rF+CJO0kEkKW2K0+7vRhP+EQh
+	iNZCh75ccuFmTDS1WpqSv8e7UOxXyohF+cn2NovW+PvwQhlaMmiGn810IiGQ+NxIb6n3Ej4
+	dkkXIpD5WA76M3gis1d/MHMdmol2gHGOBXAPS4O7GCNzm5TOmG2PdJ57sElTm3+BkzYxlBx
+	BNofIoB+vPY2Lymi/wp0aZ0sBQowpwP9HdTLH9Sub4KB3kSCzUIYLKljDAva05zU1R14E+j
+	xdgH9mBP17Req7KEBXXIL1ub3Kya4Vwq5QBFTDkfyjwYg+yO6+ndC22M2o/8rDxE8kIzJ7n
+	3D2wjvaQR21a5ass+7pW8l7PHfY9QUol8LaAF4ynwfNftaIRdm4f4tSVsfCt3hWVQS/54zy
+	BzVqGZS8aNW3cFO77qvK2jNQJMZ/mJSVPXJWfkwg7XXNNlWEuc+2Lo=
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-RECHKSPAM: 0
 
-On Tue, Jul 01, 2025 at 03:48:41PM +0800, Zigit Zo wrote:
-> On 6/30/25 10:54 PM, Michael S. Tsirkin wrote:
-> > On Mon, Jun 30, 2025 at 10:50:55AM -0400, Michael S. Tsirkin wrote:
-> >> On Mon, Jun 30, 2025 at 05:51:09PM +0800, Zigit Zo wrote:
-> >>> This bug happens if the VMM sends a VIRTIO_NET_S_ANNOUNCE request while
-> >>> the virtio-net driver is still probing with rtnl_lock() hold, this will
-> >>> cause a recursive mutex in netdev_notify_peers().
-> >>>
-> >>> Fix it by skip acking the annouce in virtnet_config_changed_work() when
-> >>> probing. The annouce will still get done when ndo_open() enables the
-> >>> virtio_config_driver_enable().
-> >>
-> >> I am not so sure it will be - while driver is not loaded, device does
-> >> not have to send interrupts, and there's no rule I'm aware of that says
-> >> we'll get one after DRIVER_OK.
-> 
-> Yep, at first we're thinking that when the VIRTIO_NET_S_ANNOUNCE flag set,
-> we can always assure an interrupt has fired by VMM, to notify the driver
-> to do the announcement.
-> 
-> But later we realized that the S_ANNOUNCE flag can be sent before the
-> driver's probing, and for QEMU seems to set the status flag regardless of
-> whether driver is ready, so the problem you're talking still may happens.
-> >> How about, we instead just schedule the work to do it later?I'm not sure if scheduling the work later will break df28de7b0050, the work
-> was being scheduled before that commit, and we have no much idea of why that
-> commit removes the schedule_work, we just keep it for safe...
+On Tue, Jul 1, 2025 at 3:45=E2=80=AFPM Chen Linxuan <chenlinxuan@uniontech.=
+com> wrote:
+>
+> On Tue, Jun 24, 2025 at 4:12=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+> > On Mon, 23 Jun 2025 12:11:04 +0800 WangYuli wrote:
+> > > The lock management in the nfp_alloc_bar function is problematic:
+> > >
+> > >  *1. The function acquires the lock at the beginning:
+> > > spin_lock_irqsave(&nfp->bar_lock, irqflags).
+> > >
+> > >   2. When barnum < 0 and in non-blocking mode, the code jumps to
+> > > the err_nobar label. However, in this non-blocking path, if
+> > > barnum < 0, the code releases the lock and calls nfp_wait_for_bar.
+> > >
+> > >   3. Inside nfp_wait_for_bar, find_unused_bar_and_lock is called,
+> > > which holds the lock upon success (indicated by the __release
+> > > annotation). Consequently, when nfp_wait_for_bar returns
+> > > successfully, the lock is still held.
+> > >
+> > >   4. But at the err_nobar label, the code always executes
+> > > spin_unlock_irqrestore(&nfp->bar_lock, irqflags).
+> > >
+> > >   5. The problem arises when nfp_wait_for_bar successfully finds a
+> > > BAR: the lock is still held, but if a subsequent reconfigure_bar
+> > > fails, the code will attempt to unlock it again at err_nobar,
+> > > leading to a double unlock.
+> >
+> > I don't understand what you're trying to say.
+> > If you think your analysis is correct please provide a more exact
+> > execution path with a code listing.
+>
+> In nfp_alloc_bar(), if
+>
+> - find_matching_bar() fails to find a bar
+> - find_unused_bar_noblock also fails to find a bar
+> - nonblocking =3D=3D false
+> - nfp_wait_for_bar returns 0
+>
+> In this situation, when executing nfp_bar_get(nfp, &nfp->bar[barnum]),
+> the code does not hold &nfp->bar_lock.
+> We referred to similar logic in other drivers:
+> https://elixir.bootlin.com/linux/v6.13/source/sound/usb/line6/driver.c#L5=
+65
+> It seems that a lock should be acquired here again.
 
-Well managing async things is always tricky. Direct call is safer.
-If you reintroduce it, you need to audit all call paths for safely.
+Sorry, I found that find_unused_bar_and_lock already re-locks it. I
+didn't notice it before. Please ignore the entire thread.
 
-
-> Then, for plan A, we change the check_announce to schedule_announce, and if
-> that's true, we do another schedule_work to call virtnet_config_changed_work
-> again to finish the announcement, like
-> 
-> 	if (v & VIRTIO_NET_S_ANNOUNCE) {
-> 		if (unlikely(schedule_announce))
-> 			schedule_work(&vi->config_work);
-> 		else {
-> 			netdev_notify_peers(vi->dev);
-> 			virtnet_ack_link_announce(vi);
-> 		}
-> 	}
-> 
-> >>
-> >> Also, there is another bug here.
-> >> If ndo_open did not run, we actually should not send any announcements.
-> >>
-> >> Do we care if carrier on is set on probe or on open?
-> >> If not, let's just defer this to ndo_open?
-> > 
-> > Hmm yes I think we do, device is visible to userspace is it not?
-> > 
-> > Hmm.  We can keep the announce bit set in vi->status and on open, check
-> > it and then schedule a work to do the announcement.
-> 
-> Okay, so there's a plan B, we save the bit and re-check it in ndo_open, like
-> 
-> 	/* __virtnet_config_changed_work() */
-> 	if (v & VIRTIO_NET_S_ANNOUNCE) {
-> 		vi->status |= VIRTIO_NET_S_ANNOUNCE;
-> 		if (unlikely(!check_announce))
-> 			goto check_link;
-> 
-> 		netdev_notify_peers(vi->dev);
-> 		virtnet_ack_link_announce(vi);
-> 		vi->status &= ~VIRTIO_NET_S_ANNOUNCE;
-> 	}
-> 
-> 	/* virtnet_open() */
-> 	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
-> 		if (vi->status & VIRTIO_NET_S_LINK_UP)
-> 			netif_carrier_on(vi->dev);
-> 		if
-> 		if (vi->status & VIRTIO_NET_S_ANNOUNCE)
-> 			schedule_work(&vi->config_work);
-> 		virtio_config_driver_enable(vi->vdev);
-> 	}
-> 
-> This is a dirty demo, any ideas are welcomed :)
-> 
-> (I think in virtnet_open() we can make the S_LINK_UP being scheduled as well?)
-
+>
+> > --
+> > pw-bot: cr
+> >
+> >
 
