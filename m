@@ -1,47 +1,48 @@
-Return-Path: <netdev+bounces-203000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0A4BAF013A
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 19:08:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54772AF00F0
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 18:58:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A6081885301
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:58:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F4097AD8B9
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB9027D76E;
-	Tue,  1 Jul 2025 16:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F6E27F72D;
+	Tue,  1 Jul 2025 16:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fyzMTYrM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KKksomHT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB12279359;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F415E27E7DA;
 	Tue,  1 Jul 2025 16:58:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751389088; cv=none; b=u/VfC34pq1OxT1RwCcdfXGAToD/MjZWLI7pcAyKpWMb0twYEFDli9RSfUdmbx7dHXk0C7CLK+JxhsH4l5fS8Tc7g5W8/JJ8Zy5xFvPIFCKdnlCnLQ7EtZKHgVFhoeQyPv4IpaIVtY+yzd0VWMt7aGWWLd1SWTJBYgAUdX7//efQ=
+	t=1751389089; cv=none; b=bXCISWv9I4LDWpGaHWOVNrrfGaQXvSadAfL7meJxrAz4V3g9rZBFqUMkmToAQiSwpSW7fsWaaA4CAwF0CEctJjWXQqMQ0iN9dxiFhkNrdo8v3AeCE1EnIDiNI7SlaIKUX3LCNrFfbEuHE6VCD93gRTgOXYIyb5pBfS0GTvwssjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751389088; c=relaxed/simple;
-	bh=7tKU8mbeBFPiVXyw6Vc2kkpcWX8Ozxa1iNVQlgBGIy4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QiQztsOhSDG3AMWRYaVEsvwrXuEifZyk8VfbMKunUfSxTMbp75kGRP4c+l15uHpkYff20z3IUwObA39MOIQ65AIEzcOC+W4IMNUCIqlO63LPR0E1M5m2bBv810a+sMaOWs6AaLzJmCnXbfZp8Ym+GHNEXAzA/2FSmKIhkL8NZ8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fyzMTYrM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4479C4CEF3;
-	Tue,  1 Jul 2025 16:58:07 +0000 (UTC)
+	s=arc-20240116; t=1751389089; c=relaxed/simple;
+	bh=8pDXLMIdjg7l7iGhqLIn7yMNQfVsnJSkhXUt6bPrRgU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=BNUCJJGJIWHg/r+xAJRbZTqdiI+ljiqM2QyvcIumnypow4ROUFKZaEZqU0wBnD8qYc20strBGHr4nnGMSo+JuRlE7MS4utmv5HT5AKUgbKhXL/SaO8DttsMGSSthsHiEVfT3Os215kBfKL5ZxdC476bBGntfqoHe1AaCG76oY3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KKksomHT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 566BFC4AF09;
+	Tue,  1 Jul 2025 16:58:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751389087;
-	bh=7tKU8mbeBFPiVXyw6Vc2kkpcWX8Ozxa1iNVQlgBGIy4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=fyzMTYrMKeOY/Rxhzjg2PDRq6aztluP+y0Ql8VFL/+j1tiT0ctqzCRo0kXDDxoQ5K
-	 RsbbHb8yL4beSJwz8soyMOOH96pEJS9s0sWMudZfl3R+I8HvW6/szuI9WrjJf4DSyr
-	 NdN6umVIGzokkIjlCuSTz69IXSJfWiYYvU+57pTBduYxfHuqcmrNQ3W5mHBjW+M5iN
-	 Wj6aKkhl0CZotUj9xKw+dqzaHgkrI2wa4wczL1ThsHjKBkGRBd9moCqLs6Mt+SAfPn
-	 0wufODKQphu+2Rox+7jByDp8ObFJrXo22eKAS7W27MFSJw46y2cdp1ousLYcFcMPeP
-	 tp/+lVv6+Ko+w==
+	s=k20201202; t=1751389088;
+	bh=8pDXLMIdjg7l7iGhqLIn7yMNQfVsnJSkhXUt6bPrRgU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=KKksomHTMgLqBBFiBPxvB+hjcKob5ZBWNC+cf16cQnyeN3zn7FNwg3T1Se4O+HUbb
+	 XAKnJ4ZG56d4vJHn7SY8I5qNigfV+X/m2QHqEq8ynCnTzZKRv0DtEaePp4CaOJypQp
+	 HNiQTRNGM8falFXgu8tEfwPu55FsNlptolffnikgexSorzEWkX6aCUDZrS2Haxr08Z
+	 RF3WJ4cVoxjOCqY6Qs7CeNNdplPKBf9QuFNwibYOPVEamFGS92IFIaQxYJqZDhsd16
+	 WXN8NekLqQ1lNX4GVTfGN4fM2FGflCkHtx/b8NmQPtvX5yt322IN9Y3JA1ZeRgZYGL
+	 N04+sQXcqxt5g==
 Received: by wens.tw (Postfix, from userid 1000)
-	id A92CF5FDF8; Wed,  2 Jul 2025 00:58:05 +0800 (CST)
+	id B3A745F71D; Wed,  2 Jul 2025 00:58:05 +0800 (CST)
 From: Chen-Yu Tsai <wens@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -60,10 +61,12 @@ Cc: netdev@vger.kernel.org,
 	linux-sunxi@lists.linux.dev,
 	linux-kernel@vger.kernel.org,
 	Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH RFT net-next 0/10] net: stmmac: Add support for Allwinner A523 GMAC200
-Date: Wed,  2 Jul 2025 00:57:46 +0800
-Message-Id: <20250701165756.258356-1-wens@kernel.org>
+Subject: [PATCH RFT net-next 01/10] dt-bindings: net: sun8i-emac: Add A523 GMAC200 compatible
+Date: Wed,  2 Jul 2025 00:57:47 +0800
+Message-Id: <20250701165756.258356-2-wens@kernel.org>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250701165756.258356-1-wens@kernel.org>
+References: <20250701165756.258356-1-wens@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,89 +77,136 @@ Content-Transfer-Encoding: 8bit
 
 From: Chen-Yu Tsai <wens@csie.org>
 
-Hi everyone,
+The Allwinner A523 SoC family has a second Ethernet controller, called
+the GMAC200 in the BSP and T527 datasheet, and referred to as GMAC1 for
+numbering. This controller, according to BSP sources, is fully
+compatible with a slightly newer version of the Synopsys DWMAC core.
+The glue layer around the controller is the same as found around older
+DWMAC cores on Allwinner SoCs. The only slight difference is that since
+this is the second controller on the SoC, the register for the clock
+delay controls is at a different offset. Last, the integration includes
+a dedicated clock gate for the memory bus and the whole thing is put in
+a separately controllable power domain.
 
-This series adds support for the second Ethernet controller found on the
-Allwinner A523 SoC family. This controller, dubbed GMAC200, is a DWMAC4
-core with an integration layer around it. The integration layer is
-similar to older Allwinner generations, but with an extra memory bus
-gate and separate power domain.
+Add a compatible string entry for it, and work in the requirements for
+a second clock and a power domain.
 
-The series stacks on top of three other series inflight:
+Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+---
+ .../net/allwinner,sun8i-a83t-emac.yaml        | 68 ++++++++++++++++++-
+ 1 file changed, 66 insertions(+), 2 deletions(-)
 
-  - Orangepi 4A series
-    https://lore.kernel.org/all/20250628161608.3072968-1-wens@kernel.org/
-  - A523 power controller support series
-    https://lore.kernel.org/all/20250627152918.2606728-1-wens@kernel.org/
-  - Rename emac0 to gmac0 for A523 series
-    https://lore.kernel.org/all/20250628054438.2864220-1-wens@kernel.org/
-
-Patch 1 adds a new compatible string combo to the existing Allwinner
-EMAC binding.
-
-Patch 2 adds a new driver for this core and integration combo.
-
-Patch 3 extends the sunxi SRAM driver to allow access to the clock delay
-controls for the second Ethernet controller.
-
-Patch 4 registers the special regmap for the clock delay controls as a
-syscon. This allows the new network driver to use the syscon interface,
-instead of the following dance which the existing dwmac-sun8i driver
-does:
-
-    of_parse_phandle();
-    of_find_device_by_node();
-    dev_get_regmap();
-
-With this change in place we can also drop the above from the
-dwmac-sun8i driver.
-
-Patch 5 adds a device node and pinmux settings for the GMAC200.
-
-Patches 6 and 8 add missing Ethernet PHY reset settings for the
-already enabled controller.
-
-Patches 7, 9, and 10 enable the GMAC200 on three boards. I only
-have the Orangepi 4A, so I am asking for people to help test the
-two other boards. The RX/TX clock delay settings were taken from
-their respective BSPs, though those numbers don't always work, as
-is was the case for the Orangepi 4A.
-
-
-Please have a look and help test.
-
-Patches 1 and 2 should go through net-next, and I will take all the
-other patches through the sunxi tree.
-
-
-Thanks
-ChenYu
-
-
-Chen-Yu Tsai (10):
-  dt-bindings: net: sun8i-emac: Add A523 GMAC200 compatible
-  net: stmmac: Add support for Allwinner A523 GMAC200
-  soc: sunxi: sram: add entry for a523
-  soc: sunxi: sram: register regmap as syscon
-  arm64: dts: allwinner: a523: Add GMAC200 ethernet controller
-  arm64: dts: allwinner: a527: cubie-a5e: Add ethernet PHY reset setting
-  arm64: dts: allwinner: a527: cubie-a5e: Enable second Ethernet port
-  arm64: dts: allwinner: t527: avaota-a1: Add ethernet PHY reset setting
-  arm64: dts: allwinner: t527: avaota-a1: enable second Ethernet port
-  arm64: dts: allwinner: t527: orangepi-4a: Enable Ethernet port
-
- .../net/allwinner,sun8i-a83t-emac.yaml        |  68 +++++++-
- .../arm64/boot/dts/allwinner/sun55i-a523.dtsi |  55 ++++++
- .../dts/allwinner/sun55i-a527-cubie-a5e.dts   |  29 +++-
- .../dts/allwinner/sun55i-t527-avaota-a1.dts   |  29 +++-
- .../dts/allwinner/sun55i-t527-orangepi-4a.dts |  23 +++
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |  12 ++
- drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
- .../ethernet/stmicro/stmmac/dwmac-sun55i.c    | 161 ++++++++++++++++++
- drivers/soc/sunxi/sunxi_sram.c                |  14 ++
- 9 files changed, 386 insertions(+), 6 deletions(-)
- create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c
-
+diff --git a/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml b/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
+index 2ac709a4c472..1058e5af92ba 100644
+--- a/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
++++ b/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
+@@ -26,6 +26,9 @@ properties:
+               - allwinner,sun50i-h616-emac0
+               - allwinner,sun55i-a523-gmac0
+           - const: allwinner,sun50i-a64-emac
++      - items:
++          - const: allwinner,sun55i-a523-gmac200
++          - const: snps,dwmac-4.20a
+ 
+   reg:
+     maxItems: 1
+@@ -37,14 +40,19 @@ properties:
+     const: macirq
+ 
+   clocks:
+-    maxItems: 1
++    minItems: 1
++    maxItems: 2
+ 
+   clock-names:
+-    const: stmmaceth
++    minItems: 1
++    maxItems: 2
+ 
+   phy-supply:
+     description: PHY regulator
+ 
++  power-domains:
++    maxItems: 1
++
+   syscon:
+     $ref: /schemas/types.yaml#/definitions/phandle
+     description:
+@@ -75,6 +83,7 @@ allOf:
+               - allwinner,sun8i-h3-emac
+               - allwinner,sun8i-v3s-emac
+               - allwinner,sun50i-a64-emac
++              - allwinner,sun55i-a523-gmac200
+ 
+     then:
+       properties:
+@@ -191,6 +200,31 @@ allOf:
+             - mdio-parent-bus
+             - mdio@1
+ 
++  - if:
++      properties:
++        compatible:
++          contains:
++            const: allwinner,sun55i-a523-gmac200
++    then:
++      properties:
++        clocks:
++          minItems: 2
++        clock-names:
++          items:
++            - const: stmmaceth
++            - const: mbus
++      required:
++        - power-domains
++    else:
++      properties:
++        clocks:
++          maxItems: 1
++        clock-names:
++          items:
++            - const: stmmaceth
++        power-domains: false
++
++
+ unevaluatedProperties: false
+ 
+ examples:
+@@ -323,4 +357,34 @@ examples:
+         };
+     };
+ 
++  - |
++    ethernet@4510000 {
++        compatible = "allwinner,sun55i-a523-gmac200",
++                     "snps,dwmac-4.20a";
++        reg = <0x04510000 0x10000>;
++        clocks = <&ccu 117>, <&ccu 79>;
++        clock-names = "stmmaceth", "mbus";
++        resets = <&ccu 43>;
++        reset-names = "stmmaceth";
++        interrupts = <0 47 4>;
++        interrupt-names = "macirq";
++        pinctrl-names = "default";
++        pinctrl-0 = <&rgmii1_pins>;
++        power-domains = <&pck600 4>;
++        syscon = <&syscon>;
++        phy-handle = <&ext_rgmii_phy_1>;
++        phy-mode = "rgmii-id";
++        snps,fixed-burst;
++        snps,axi-config = <&gmac1_stmmac_axi_setup>;
++
++        mdio {
++            compatible = "snps,dwmac-mdio";
++            #address-cells = <1>;
++            #size-cells = <0>;
++
++            ext_rgmii_phy_1: ethernet-phy@1 {
++                reg = <1>;
++            };
++        };
++    };
+ ...
 -- 
 2.39.5
 
