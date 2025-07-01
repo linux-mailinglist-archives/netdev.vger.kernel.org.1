@@ -1,153 +1,146 @@
-Return-Path: <netdev+bounces-202768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5DFDAEEEE1
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 08:36:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91269AEEEFF
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 08:42:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6B487A4497
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 06:35:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B05261BC493C
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 06:42:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988BE25A640;
-	Tue,  1 Jul 2025 06:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E046225C81F;
+	Tue,  1 Jul 2025 06:41:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gguqPsN7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eMwivqhB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF15619ABAC
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 06:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD37B25BF16;
+	Tue,  1 Jul 2025 06:41:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751351793; cv=none; b=c9LvDe0U1GNWm9927U2YEmBdzeVQiQtJhOvGfD0yGuzylpjCazP2pKW4HAN5htT3PyyeKtcyM+qTmtE4y1/bSv1PmwKn6s+L+iBbS7cHnMKmufhZomp/5J4Jh06OOe4INScVcPb2OloEcDjnsscIKDAgKLs5733k6AyqsMTvP9w=
+	t=1751352106; cv=none; b=oHDVg2IjM59quXIbZjBXoy1HZXOjOpx/WhUgdLTesk0/eK8NaEDgta6K8KoyFj624b2a3jrt6qZ+NuGs05xe6ZQ+0khyJnaP+aTYsHd7O22Uy/qu94mDIiSWJc10ob3VeoRiEOBP36Sqp9P6WIxjowIIAHxdPdRXh+uWXh5sjLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751351793; c=relaxed/simple;
-	bh=S6cjipfxAita73V6JkLosCs6f9j35AYf4JtRigU5I9E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eWy6Wr5ZUr1UrDlfd8lG59yT8HwcOiwI36zL7pAsVQpEhn8psXJ1lPdowbebyNHJGcBWUIrYYXo1qH4MYnmKXGIzyNIkFr+8QDuIGupg0v/3xB5bEgRvb622E0Uml8NpqXDELtiGR3RNuJ8AinDxrNC1QMwEQmVUP6+f9OaSIjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gguqPsN7; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a4e749d7b2so894019f8f.0
-        for <netdev@vger.kernel.org>; Mon, 30 Jun 2025 23:36:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1751351790; x=1751956590; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=EZS2dGfFhz4DV5h9FGWwFN5DAtPdX96LRkBj81DNpcM=;
-        b=gguqPsN7Tsz336dNL6RoQmqQZiom3ibRshTpot3aaoFy6CUsqqJ+8gg0psuvuLvPVs
-         ILT+QiA04ertZ2Jmo3uwHnoLt5jO7x2Sry9igp/kT/hOIR5qzq2VmG73TYl/d6Y/WCM2
-         X7rzBxbCkGjvlNvKK6yZPwAlIbud4PwxBgj9fH6bssN32tL/5IwaTZVUPlXJQkNZUrs7
-         DAvRFu7omm6pywA1ZjS9mTH8Jgles4cXVeWoiEYPjLVUW2/hWMtAW4GLZQlXcqGz0yAr
-         F6vZEFoq6qN85HJfXCF7tRc4hWkf+sRgM23hkKOwS1aL7RWjIUWIoFVR6xILUbj/AEyE
-         FiHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751351790; x=1751956590;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EZS2dGfFhz4DV5h9FGWwFN5DAtPdX96LRkBj81DNpcM=;
-        b=p5AeGUyyvOYUl1Vo7WsZCvgIpMe2hONJA7XLDMPisjJtKn1wHBGkjNCbzLXR7wMofB
-         eyZnzf5pyVZ6qRsj29qwW2lwcG2/7zrLuLbbZTYwgMVyes4cIwFQZOYvRsGIfUTI8Cym
-         m6XRfwJTVAR2LZpVcITUDBJNgiEd4VR7Hw2fsBAyPPQtT4i8f1Fn+gDmKEgl8FkqUA+e
-         aK29wJUfqZeBgqgN01u6umk/ya/ckp94MA4il9inxv1lWk/PkL3tEjqzqBgoGV+dSLj4
-         xi8tE2Uwy6fL2ekW+zZP/I/TpWowJd372gzCgtah2/AlIIIhxLqYbemMU/gj43npLAak
-         ckXA==
-X-Forwarded-Encrypted: i=1; AJvYcCU9NbIvJ28tDoKV32KJdjaTLIv4K0ZselhJMdrMEUzGikJGJoAUKdw/tiVXiFPPhIKpPLL1tVY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh1Abqo84mM9YK66Zsu9sZJxC7xA/WwT8fVdwXxiPlJsViO5yt
-	GCr2JybCVf4HD6FQ+sTorhRqjZfxbzbGTx4bzIpB3W9Kik3NvAq/SuNRRf9Nla61Rec=
-X-Gm-Gg: ASbGncvclLPsuUc8FXkR0CbYVjrGat6GBWdjyYb8chuz14hG7UudDW+Stlicn+WDzck
-	DJiOZSeXOfKE4vEQTtmFmW3QD3pVLlEROFsSxlTjCyPV1fBzfUbvUKl6z05v0izkg+HpkGoyMm9
-	SSWDRLoYlHFA1SoaK1ZfkUdeRiXBM+DYNPLXFTQAebxSoKnaqRA15Bjt/Q5s3TO5z+2gaXZdG03
-	FeSUkdMi312pJ++5VUfIMEZlH99Tis5jHrhWN39XixfqOGqyNIceVYEfbOB+RyaGcUwDqOjpaon
-	TBQy5N7zHU/kh/GS/EPPlMbnZuSnCYttGHbxQaiG8SGimvENGaEHXqA4W5Y1Mq4eS6zv2EhQjfs
-	=
-X-Google-Smtp-Source: AGHT+IFtrU4YoQ/j7QsTLU6w1l0Gl0/puRBtn5UoLC4Rc4bLHeuG9LgcLkzyP525KKRGuBzuEKPP5w==
-X-Received: by 2002:a05:6000:178e:b0:3a5:8b43:2c19 with SMTP id ffacd0b85a97d-3af48a83a9dmr416781f8f.4.1751351790022;
-        Mon, 30 Jun 2025 23:36:30 -0700 (PDT)
-Received: from krzk-bin.. ([178.197.222.89])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a892e5963csm12294776f8f.79.2025.06.30.23.36.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jun 2025 23:36:29 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chen Wang <unicorn_wang@outlook.com>,
-	Inochi Amaoto <inochiama@gmail.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	sophgo@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	stable@vger.kernel.org
-Subject: [PATCH net] dt-bindings: net: sophgo,sg2044-dwmac: Drop status from the example
-Date: Tue,  1 Jul 2025 08:36:22 +0200
-Message-ID: <20250701063621.23808-2-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1751352106; c=relaxed/simple;
+	bh=d4M1ipo/BpY2fq2FFDmvRZtLeK+GPtRI5SDJlqTCwgk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jb46Q1Abzvy4oysxAI0BvyAWGM5IXh/MZWwd1lM/tFNvBVlp0VqNhbrvXDSadqFdh5/tXzk06SPw3R4F/WQvZcztGoMTvEfB9HEfNIPq6N7O/lRfP7JuMYz0JpVwI6qVQEA5uW+tegES43CnHPzfXCLg8KBHLzVEl3h6rM7LwUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eMwivqhB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 293A8C4CEEE;
+	Tue,  1 Jul 2025 06:41:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751352106;
+	bh=d4M1ipo/BpY2fq2FFDmvRZtLeK+GPtRI5SDJlqTCwgk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eMwivqhBRxQZvzeiAF6cYrziYyySpvSnAN9nqOZ3tyn7zFJZMCRwYfOtfKRX8Dmt/
+	 rv8OOOXQB8aDwqXx4JP+AacsdynnnFrYoKV6ftYOOV/tqCcGnDppocqF3pcaiWhHnR
+	 V+yyTfTeiPL9xHhnGRQm3ZTx2oGQ+/iRxnZaIx/Xd1lMb/F/vT49YYUPaHz6h2GGEg
+	 HtTGvtTPt2KjJDF6godQRokbsAmUyVkYtzYmhqQpJLaC0nhZX/cpz/iJ1b17ccXeYI
+	 xjGWPVyQNhmeS4gJVcQiybqQgpw7UEWPOU6mI8LoTkBh/CCKE+ckAC2qclYbzEvvjh
+	 RW4mssWEqSN1w==
+Date: Tue, 1 Jul 2025 08:41:42 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Frank Wunderlich <linux@fw-web.de>
+Cc: MyungJoo Ham <myungjoo.ham@samsung.com>, 
+	Kyungmin Park <kyungmin.park@samsung.com>, Chanwoo Choi <cw00.choi@samsung.com>, 
+	Georgi Djakov <djakov@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Frank Wunderlich <frank-w@public-files.de>, 
+	Johnson Wang <johnson.wang@mediatek.com>, =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>, 
+	Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>, linux-pm@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH v7 02/14] dt-bindings: net: mediatek,net: update for
+ mt7988
+Message-ID: <20250701-rebel-mellow-parrot-fda216@krzk-bin>
+References: <20250628165451.85884-1-linux@fw-web.de>
+ <20250628165451.85884-3-linux@fw-web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1527; i=krzysztof.kozlowski@linaro.org;
- h=from:subject; bh=S6cjipfxAita73V6JkLosCs6f9j35AYf4JtRigU5I9E=;
- b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBoY4Hl6oFY6MC1mYY3tYMqGk+Xq4qtbynXG0VKf
- o4z8NuGJQ6JAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCaGOB5QAKCRDBN2bmhouD
- 17vkD/4lwb76qcvbDpG1bX92LByyYKigIiXJxiNcw7iJhyOz/uTjY3I9NhZuyiOIqxv40YBYzuJ
- ZvAx5nw8qpRLROL2Lhc+UAZSKriUlMxsZMRuIxDSAG0nUrspxP4Apb2LCGFCDuymBn9X1M6NNx5
- UR3Q7hIMidIXmsBG0EOH28pOoW43+XPX5dEcPYkyYCG0hi5QWCdY+fWzzf9pbbFWBffc6sm/gMG
- 6gHkizBuTkNgvf9OQ+6ESUAglErh4kwOyIhcujG18uNr72N1nBHBz74USDZKbEPKznsXaQDbuij
- K0g+2gF503iGxuI8vtSaiA6tpUshj9B8WBDxrUngLZROQs8aJLfrfAUx01OmVzsmGZRIIg57N+g
- Fx+08WIJnvdLlB2Uvv8eoO028JJxeDMsQq/LLs8S1AACMdjEcx5H4mZT+Wplh0QGURXG1t6XFv0
- +w3T6moXyOLD/t3SgDHBwr7lWEnjO5QpbNh0zC+i7WVAxJHc42cbj2q+Lwh6yRKLSKmBcih/yHW
- /TmuvZeauEYDJ35dM5omlLWntZKOpjEt5VDIQkCqrmzb6g5UcWCNBJycKM4ifQxhFLko+XjdaqT
- lXew70S8oxXEXXJm3f/QHfk3pnRDaKIjwDUU030X+Z8KTFueHnKOSEmkf3oAw2Pp6PsRjOTYlhu NSGDdhRSScXbykw==
-X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp; fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250628165451.85884-3-linux@fw-web.de>
 
-Examples should be complete and should not have a 'status' property,
-especially a disabled one because this disables the dt_binding_check of
-the example against the schema.  Dropping 'status' property shows
-missing other properties - phy-mode and phy-handle.
+On Sat, Jun 28, 2025 at 06:54:37PM +0200, Frank Wunderlich wrote:
+> From: Frank Wunderlich <frank-w@public-files.de>
+> 
+> Update binding for mt7988 which has 3 gmac and a sram for dma
+> operations.
 
-Fixes: 114508a89ddc ("dt-bindings: net: Add support for Sophgo SG2044 dwmac")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
----
- Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+I asked why you are updating. You claim you update because it has 3
+GMAC... but that's irrelevant, because it is easy to answer with: it did
+not have 3 GMAC before?
 
-diff --git a/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml b/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
-index 4dd2dc9c678b..8afbd9ebd73f 100644
---- a/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
-+++ b/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
-@@ -80,6 +80,8 @@ examples:
-       interrupt-parent = <&intc>;
-       interrupts = <296 IRQ_TYPE_LEVEL_HIGH>;
-       interrupt-names = "macirq";
-+      phy-handle = <&phy0>;
-+      phy-mode = "rgmii-id";
-       resets = <&rst 30>;
-       reset-names = "stmmaceth";
-       snps,multicast-filter-bins = <0>;
-@@ -91,7 +93,6 @@ examples:
-       snps,mtl-rx-config = <&gmac0_mtl_rx_setup>;
-       snps,mtl-tx-config = <&gmac0_mtl_tx_setup>;
-       snps,axi-config = <&gmac0_stmmac_axi_setup>;
--      status = "disabled";
- 
-       gmac0_mtl_rx_setup: rx-queues-config {
-         snps,rx-queues-to-use = <8>;
--- 
-2.43.0
+So same question: Provide real reason why you are making updates. That's
+why you have commit msg.
+
+
+> 
+> MT7988 has 4 FE IRQs (currently only 2 are used) and 4 IRQs for use
+
+mt7988 or MT7988? gmac or GMAC? SRAM or SRAM? and so on... it is not
+easy to read and understand your commit msgs.
+
+> with RSS/LRO later.
+> 
+> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
+> ---
+> v6:
+> - split out the interrupt-names into separate patch
+> - update irq(name) min count to 4
+> - add sram-property
+> - drop second reg entry and minitems as there is only 1 item left again
+> 
+> v5:
+> - fix v4 logmessage and change description a bit describing how i get
+>   the irq count.
+> - update binding for 8 irqs with different names (rx,tx => fe0..fe3)
+>   including the 2 reserved irqs which can be used later
+> - change rx-ringX to pdmaX to be closer to hardware documentation
+> 
+> v4:
+> - increase max interrupts to 6 because of adding RSS/LRO interrupts (4)
+>   and dropping 2 reserved irqs (0+3) around rx+tx
+> - dropped Robs RB due to this change
+> - allow interrupt names
+> - add interrupt-names without reserved IRQs on mt7988
+>   this requires mtk driver patch:
+>   https://patchwork.kernel.org/project/netdevbpf/patch/20250616080738.117993-2-linux@fw-web.de/
+> 
+> v2:
+> - change reg to list of items
+> ---
+>  Documentation/devicetree/bindings/net/mediatek,net.yaml | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/mediatek,net.yaml b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+> index 6672db206b38..74a139000f60 100644
+> --- a/Documentation/devicetree/bindings/net/mediatek,net.yaml
+> +++ b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+> @@ -28,7 +28,8 @@ properties:
+>        - ralink,rt5350-eth
+>  
+>    reg:
+> -    maxItems: 1
+> +    items:
+> +      - description: Register for accessing the MACs.
+
+Why making this change? It's redundant and nothing in commit msg
+explains that.
+
+Best regards,
+Krzysztof
 
 
