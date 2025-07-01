@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-202743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7D05AEECDB
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 05:13:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D23DAEECE2
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 05:14:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A57F11BC46CA
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 03:14:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E110B17F4D9
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 03:14:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C66381F4634;
-	Tue,  1 Jul 2025 03:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE5A2253AE;
+	Tue,  1 Jul 2025 03:13:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="amjmgf1G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bpx/354K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7441E834C;
-	Tue,  1 Jul 2025 03:13:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2571E3775;
+	Tue,  1 Jul 2025 03:13:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751339593; cv=none; b=T8m8MM40ouFEkkbfgPyfOgluW2s6dA/0olw9FUAKrZKhN+ijQJuQ6ldPToBXVLP7btMlee3wZ1JVcvihwzaLKFXNGTjmxPdYyLW7tmZGxv1oTl3a5l0aWFjzr0lWfnxkPiEhIkAiwwwEmMx6bSCEKtcKZM9SkbzMfc6aMUgubSs=
+	t=1751339595; cv=none; b=FfWDo5veUZx8oJJMszjix62NJI3G+KPxofK5y1yVagQ02t2NpxXj6kAQ0gmVaDevxAF/LqB0UFfHCLddjOh/nWUPPDvSFbvJczQ4AkAlJnMK0DdtmWQX2ei3t4/+yN92Uw4vswQ1ISwAKFkkSddJ3FS2FUVQ2byNwZt52/1C+co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751339593; c=relaxed/simple;
-	bh=nS/NTSuPs88jg1URWrCr30ZzpSYqdiIYV17z2elsRmA=;
+	s=arc-20240116; t=1751339595; c=relaxed/simple;
+	bh=tt4xPwThColuT0sWgTtJnspBQawlBFXF7CVILAZJ2Os=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=arVVsw1xXstw1+Ag3hJhWqsbRUUUAUtsLCzeahApJErPxjNOjzjiVLg0XIoVeCMferhesLxywAluQ1upq3i19sFkzWIgrkHQ2KR/w9UN04cdJRH56OVpoDH0UMgWo/59t+MqCfxHbJrRtV1rsk5JgJrAU68rdCEECJNr7hf9nqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=amjmgf1G; arc=none smtp.client-ip=209.85.215.175
+	 MIME-Version; b=QXg6xu1TWSH/R1qccIBqfwvqWBa+4nmx7KuaR384vJZtf/cRIfFg4YmSjXvP4OFYat7pzwMraaIC9jW8v0CNPnwyejtDDRIjZTf0++nEgIhGwbgBBkD3Wcz9n48aaMf3AD4hrXM82m3k97Qose5aldTMKYbTWcj4tDPk9DFovzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bpx/354K; arc=none smtp.client-ip=209.85.215.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-b34a78bb6e7so2062282a12.3;
-        Mon, 30 Jun 2025 20:13:11 -0700 (PDT)
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b2fd091f826so4503338a12.1;
+        Mon, 30 Jun 2025 20:13:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751339591; x=1751944391; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1751339593; x=1751944393; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=y5WSgjCKP1WBN2c2e+KmwFrodJbjd4SEl3Pp7kvf7f4=;
-        b=amjmgf1GUZztOomJjkTtPUcjO3UlV5GKphBf2UAYkDduVKJGIN7vZgO+r9OQ7s9f0r
-         BySr5y8kuL6ou6f6og/5+LeuKbc31RvAZJkov7B6amjTOkYBORSyxfBLNe2nQO33dZbZ
-         lPgRcfhMat0c8/8yq+I3VP7cPZ47yKRGGJprBL8x4pXLR+RcOB2BJyRS3Gl2cycLLoh9
-         x/Bx8Ry86tHiUfcade4UZMvVO+E/IzX5Vxo3tQrp35ylVSgal8fq+fmeN+SKJkflyYL7
-         PxmMU1iaHk2vbPku8iWCJAR8ItQavhoyxtl/M0L4aTsSSTYN56Ojb6ZjT8EsGCAYhu7n
-         EBgg==
+        bh=nyWb1ImwLrAx81v7mjCYlqpwND105yRaO7PKd9BUXDc=;
+        b=bpx/354Kv/hTvcz1wCKeYfmDuGb4jbXT2d8a+SC9L4ntdq7q3KiCQe++RJv2IjW7Ak
+         G5Be3Tf6h6m2eOIq6qd89/ahlGKFiQuCjxLRpQcyV/u5ibg8pHMsMxcoc7Q0D7NrkZWl
+         wxY1xCsZpI1SJq8+zXUQ0LZ/xemJnw6TkVEEe2gTpiKzltA30uVdjqz1eAbxyyg/I01i
+         8hlZq8RW+qjNzTI98p6NGAR6NJLNQVJWypD0UkWzdW0nMhyuB3Jg0yoBZyVE8KltTFnz
+         G0QxdmMiLnqG1O9aeuLbrsVlP5V4OGYiSciz5OH7EV+294DKcGo7yidRfe3qVASkaOP4
+         RdwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751339591; x=1751944391;
+        d=1e100.net; s=20230601; t=1751339593; x=1751944393;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=y5WSgjCKP1WBN2c2e+KmwFrodJbjd4SEl3Pp7kvf7f4=;
-        b=hRCKAymdHbQXPDsUD63+0oiAdpef3LCaGR4lfJqDjrIpek07tHJ8sLnn1wVm1+97/b
-         /eNvwhaw2uJ1goL8+R1FvLeq5B2CJoZEoBofwzs/5gvthQEFGeRL6ui+4XLG+2HnNgT9
-         WO2U954APTM69JEUiqDkFBSg/rgM6ve9urT08tszu39Q3blK3jlYv3d/V+ROS/iqWiN5
-         BfJ3mc9G/u+SoSxEdeT1OjnDg8w0n9rOoyssA7pM1KGxMQnIkBNdrPfRYf2g/IE3SFzB
-         pGUlzwX9d+GNaxS7Bd45A5tNWXTtT2s8QLCLgjXdjpX/kg057ERY4UTOK9NRpj7yR4u6
-         +vmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW0rTi4mflVMggf/ybBP9hyCz9LO0XOwljC8Xf6xRAESHBXS07+TBccfDtGAsEFykcWRWGbMxzHeq0=@vger.kernel.org, AJvYcCXKvj+bdC6b9FMow9jw4DManuYuaLUKTx8a4Le3/xCdbvl88ShIOYpESNyThTzsRfZKevI90+9T@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywb6nyVJoh/MeU4ewZUV5pS5hJS1mP4wK2fkf2aWmlra6DNikh1
-	XYBz40k3t1q0l7JJdqCNfbAivjzCsZI5ejRm+1EVirkIHqP/On9YDQt9
-X-Gm-Gg: ASbGncvBSZ5XIfM/2oeITyNg+iwTc4jVu4SO0AlYjoD64qseCc12fElWVmmU6+9LHbD
-	3tuCIk7vOqVZt0C9eKaEnOGXP2cc00vS8FE7joZEWZ4vF+Prtt8Xh0YchI4kvf5d1L5lo6ytqZP
-	fedHJRMmA5RsZGkwNJMFMVgavkMSd4YntvTJQK/3VH9Zygvqc7SnEqCKqmJ0fxmpJNj6lFVc/x7
-	GJegTIYYSCKzLR507r1KZt4n2wFRRqYDtZ1RkGb4XcCQWfUecu+n9zFdGPKhhIgmOP37YGAGPMQ
-	Y2wwwKgasYaHB0BkseCTTknfYkZQJtZqJuy+qa0PB7abVGLRifsFd+t5sFquCg==
-X-Google-Smtp-Source: AGHT+IGsbHbDLP4vTSZ831gE0/BF8Wg2PYwslcfB+I390l+J1xredhihPZYg9krTcJVKSQL501d5/A==
-X-Received: by 2002:a17:90b:1f87:b0:311:fde5:c4be with SMTP id 98e67ed59e1d1-318c9316409mr20798224a91.35.1751339591271;
-        Mon, 30 Jun 2025 20:13:11 -0700 (PDT)
+        bh=nyWb1ImwLrAx81v7mjCYlqpwND105yRaO7PKd9BUXDc=;
+        b=vB8DPh4cLyczmvfxqHodzwZnfhKGBStYodmA5CN5X276k23Ronu6VR+LVOwgiPvEjp
+         KOuQyYtgbiNCu1gtKVkXcNUoQIRCLMlxWJlN8taqD+UHOqnTkuOXjkztcQtpwKPgplMe
+         jMuaOOtXIMFtwAA+XxUiwg50etolpxInCc+uXabg0dD8y2YsAINwe3Tyumy3/meYxxtL
+         qH3RPncAJUFk+jnTLxwhUiO0QuOPSmz12uZE/hjChBFYw62U3hUlnJs/V2jQi1yfU1N9
+         BnqTe1kEHQJMNbAcKYc+sZQyzNjgKDOaEBSro2a+EgyUierhp0UMh/9vkCWdOe5qdrQp
+         1OFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUPYEfvotXp8TyTfVOOVluaQj0tdkpd44qQL15ycmghJtkDF9IMcO8f++gOvUKCXVBTK3fwyQs5YAo=@vger.kernel.org, AJvYcCUQjn3WVucGW4iXW3DVo3Y7iy+M93exuzvfUbRYD4RJ4OEx73iTJmV2hRa26n26WcH6nP5ItNJ+@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywbi88b3I2eY92jWOBabUf5gVMIjlLsp8Z6mpmDiRhq8vh6Djkn
+	jo8YeacAmcay87xtq6lfBZlHhfTTEEoH4AjmPVKa2OgVoCd32A1czvxh
+X-Gm-Gg: ASbGncvum+nTE3JD9GZghSUotUWjtlnYuIcj5RmkZyLc8qeLEJ7x7aJHsPPU3hvPx3A
+	cTD1Jz4aCMuNpwv89fkOCq1W/1HeuedemMhySljHFyOvGt/tLeuRqQbQxwh+A8V/Lsh/nCaEoNv
+	2eMIgQB1/THr4dmotLHfhwHUiPjyW4yh2SH5oIetDp3Rgqj2SXBVVsLlhSdvfP4jgWksl8HIlJK
+	b0KZ0mi6b7NJmbP25TJurd0OQs04wZRB7sCIsEqUj/Sdqf4drOOl3c8wk9AeQf7gFXWC6T/i00Q
+	qqxHZtpcH50VjcG01HZK5vPU41znNnCBrBU1Yj0BJiq9h6VBhoAcctiE8jI+PA==
+X-Google-Smtp-Source: AGHT+IEiudH6PlCzTDc0Wb1Pnkx08WHWvxpm/tc7SoxOcDxOliP4sy/UBldpzX8Ue5Iw9mAMstE6aw==
+X-Received: by 2002:a17:903:b4e:b0:234:595d:a58e with SMTP id d9443c01a7336-23b355b357dmr30496235ad.25.1751339593303;
+        Mon, 30 Jun 2025 20:13:13 -0700 (PDT)
 Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-318c13a15c2sm10054694a91.12.2025.06.30.20.13.08
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b34e31c39fbsm9385138a12.42.2025.06.30.20.13.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jun 2025 20:13:09 -0700 (PDT)
+        Mon, 30 Jun 2025 20:13:11 -0700 (PDT)
 Received: by archie.me (Postfix, from userid 1000)
-	id CF556420A82A; Tue, 01 Jul 2025 10:13:03 +0700 (WIB)
+	id EFCC4420A82B; Tue, 01 Jul 2025 10:13:03 +0700 (WIB)
 From: Bagas Sanjaya <bagasdotme@gmail.com>
 To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux Documentation <linux-doc@vger.kernel.org>,
@@ -86,9 +86,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jonathan Corbet <corbet@lwn.net>,
 	Abdelrahman Fekry <abdelrahmanfekry375@gmail.com>,
 	Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: [PATCH net-next 4/5] net: ip-sysctl: Format SCTP-related memory parameters description as bullet list
-Date: Tue,  1 Jul 2025 10:12:59 +0700
-Message-ID: <20250701031300.19088-5-bagasdotme@gmail.com>
+Subject: [PATCH net-next 5/5] net: ip-sysctl: Add link to SCTP IPv4 scoping draft
+Date: Tue,  1 Jul 2025 10:13:00 +0700
+Message-ID: <20250701031300.19088-6-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250701031300.19088-1-bagasdotme@gmail.com>
 References: <20250701031300.19088-1-bagasdotme@gmail.com>
@@ -98,68 +98,33 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2578; i=bagasdotme@gmail.com; h=from:subject; bh=nS/NTSuPs88jg1URWrCr30ZzpSYqdiIYV17z2elsRmA=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDBnJ/sdMz/H4b2FgWvnp3k27m/cFFF4k9FR27t3cuuV7r Fy0t9i7jlIWBjEuBlkxRZZJiXxNp3cZiVxoX+sIM4eVCWQIAxenAEzE4QTDP8t3J40reDRPP97m +iS3K/mPxtY3Olun/Z//kpdDIkJ9qwfDP7s2c6kM6dorTI9K513N1/868YwXryZ/2D27FZvP/2N R4AEA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=968; i=bagasdotme@gmail.com; h=from:subject; bh=tt4xPwThColuT0sWgTtJnspBQawlBFXF7CVILAZJ2Os=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDBnJ/seEnfrT+NeurpAzm7cqZmdq6FOHO0sfS5U9KM9Yw vz++PxrHaUsDGJcDLJiiiyTEvmaTu8yErnQvtYRZg4rE8gQBi5OAZiI1iVGhh2ee3XeB3ZsT4hi uGsqHcW95NvaTNOalDD1nJaH5a9YCxj+Jx86Oe0F9x+dpPJPW8rKe1bJOm3RrKtwqLjIenGzbY8 AIwA=
 X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
 
-The description for vector elements of SCTP-related memory usage
-parameters (sctp{r,w,}mem) is formatted as normal paragraphs rather than
-bullet list. Convert the description to the latter.
+addr_scope_policy description contains pointer to SCTP IPv4 scoping
+draft but not its IETF Datatracker link. Add it.
 
 Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
- Documentation/networking/ip-sysctl.rst | 24 +++++++++++-------------
- 1 file changed, 11 insertions(+), 13 deletions(-)
+ Documentation/networking/ip-sysctl.rst | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index 774fbf462ccd65..12c8a236456e4e 100644
+index 12c8a236456e4e..2cad74e18f717d 100644
 --- a/Documentation/networking/ip-sysctl.rst
 +++ b/Documentation/networking/ip-sysctl.rst
-@@ -3542,13 +3542,11 @@ sndbuf_policy - INTEGER
- sctp_mem - vector of 3 INTEGERs: min, pressure, max
- 	Number of pages allowed for queueing by all SCTP sockets.
- 
--	min: Below this number of pages SCTP is not bothered about its
--	memory appetite. When amount of memory allocated by SCTP exceeds
--	this number, SCTP starts to moderate memory usage.
--
--	pressure: This value was introduced to follow format of tcp_mem.
--
--	max: Number of pages allowed for queueing by all SCTP sockets.
-+	* min: Below this number of pages SCTP is not bothered about its
-+	  memory usage. When amount of memory allocated by SCTP exceeds
-+	  this number, SCTP starts to moderate memory usage.
-+	* pressure: This value was introduced to follow format of tcp_mem.
-+	* max: Maximum number of allowed pages.
- 
- 	Default is calculated at boot time from amount of available memory.
- 
-@@ -3556,9 +3554,9 @@ sctp_rmem - vector of 3 INTEGERs: min, default, max
- 	Only the first value ("min") is used, "default" and "max" are
- 	ignored.
- 
--	min: Minimal size of receive buffer used by SCTP socket.
--	It is guaranteed to each SCTP socket (but not association) even
--	under moderate memory pressure.
-+	* min: Minimal size of receive buffer used by SCTP socket.
-+	  It is guaranteed to each SCTP socket (but not association) even
-+	  under moderate memory pressure.
- 
+@@ -3571,7 +3571,9 @@ sctp_wmem  - vector of 3 INTEGERs: min, default, max
  	Default: 4K
  
-@@ -3566,9 +3564,9 @@ sctp_wmem  - vector of 3 INTEGERs: min, default, max
- 	Only the first value ("min") is used, "default" and "max" are
- 	ignored.
+ addr_scope_policy - INTEGER
+-	Control IPv4 address scoping - draft-stewart-tsvwg-sctp-ipv4-00
++	Control IPv4 address scoping (see
++	https://datatracker.ietf.org/doc/draft-stewart-tsvwg-sctp-ipv4/00/
++	for details).
  
--	min: Minimum size of send buffer that can be used by SCTP sockets.
--	It is guaranteed to each SCTP socket (but not association) even
--	under moderate memory pressure.
-+	* min: Minimum size of send buffer that can be used by SCTP sockets.
-+	  It is guaranteed to each SCTP socket (but not association) even
-+	  under moderate memory pressure.
- 
- 	Default: 4K
- 
+ 	- 0   - Disable IPv4 address scoping
+ 	- 1   - Enable IPv4 address scoping
 -- 
 An old man doll... just what I always wanted! - Clara
 
