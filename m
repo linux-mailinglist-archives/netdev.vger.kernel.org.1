@@ -1,96 +1,109 @@
-Return-Path: <netdev+bounces-202774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1079AEEF40
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 08:51:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0344AEEF5A
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 09:03:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E46BE7A6059
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 06:50:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C0A13BFE81
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 07:03:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7B71F4285;
-	Tue,  1 Jul 2025 06:51:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3002C25DAEA;
+	Tue,  1 Jul 2025 07:03:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1572538B;
-	Tue,  1 Jul 2025 06:51:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D41222FE0F;
+	Tue,  1 Jul 2025 07:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751352705; cv=none; b=Azbr5I56jY80JZBeuhsACWygi5UeI6Vnvm1iU/32ddocomsMzdMfJz/GUeBg8cbwq/zLpkcfZmMz51SX5qAqGrx7z5W4Fp2YEJOU/w3nknQ5wvvJQRBi0D+aac0CFA+WhtrxkyvYXbTVN7vORwwOujZ6o7dfN1oGdwhECQfn3Xo=
+	t=1751353399; cv=none; b=dNjbajtMXBRnotj3k+UYiiV8zV+oNw/qtAsEwskJ05KhZh4eCVJ9uLx/9k8YZHnOnYwS2vmHLH6o30lR00eGXTluinqLfMVyzZzQGNrwcwVgrRMVgAH+PfOMESetN1esGNO2HOfLB07GV1ByLpC1aMZu6o0LRfWs0sUp1HhCPes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751352705; c=relaxed/simple;
-	bh=bk9XEM4QGki6UTP9OfPqIKQU8e82uGZABUr0WbPGwDk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E79WHPKT0HVqx9cwQfw90nLMfKc/CK3V1ZXztDEi4du8kS48VzmdDWMOHSPb0JrWh2vufx+OWk1dOwEUe3rZCZWboM5cMflVOD2bgTGvy83nn+XF9N+WQaUO7H6s7Bks9qzexmgiyclq9OYKhCYoJ2lDJ5dZzybdeIAjcuwRvZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4bWYVC40Hzz14LsS;
-	Tue,  1 Jul 2025 14:46:59 +0800 (CST)
-Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id 821BE1800EC;
-	Tue,  1 Jul 2025 14:51:39 +0800 (CST)
-Received: from DESKTOP-F6Q6J7K.china.huawei.com (10.174.175.220) by
- kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 1 Jul 2025 14:51:38 +0800
-From: Fan Gong <gongfan1@huawei.com>
-To: <vadim.fedorenko@linux.dev>
-CC: <andrew+netdev@lunn.ch>, <christophe.jaillet@wanadoo.fr>,
-	<corbet@lwn.net>, <davem@davemloft.net>, <edumazet@google.com>,
-	<gongfan1@huawei.com>, <guoxin09@huawei.com>, <gur.stavi@huawei.com>,
-	<helgaas@kernel.org>, <horms@kernel.org>, <jdamato@fastly.com>,
-	<kuba@kernel.org>, <lee@trager.us>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <luosifu@huawei.com>,
-	<meny.yossefi@huawei.com>, <mpe@ellerman.id.au>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>,
-	<shenchenyang1@hisilicon.com>, <shijing34@huawei.com>, <sumang@marvell.com>,
-	<wulike1@huawei.com>, <zhoushuai28@huawei.com>, <zhuyikai1@h-partners.com>
-Subject: Re: [PATCH net-next v06 6/8] hinic3: Mailbox framework
-Date: Tue, 1 Jul 2025 14:51:26 +0800
-Message-ID: <20250701065126.8668-1-gongfan1@huawei.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <7c2ab3be-3b7b-49a5-82d2-99c8001ef635@linux.dev>
-References: <7c2ab3be-3b7b-49a5-82d2-99c8001ef635@linux.dev>
+	s=arc-20240116; t=1751353399; c=relaxed/simple;
+	bh=ejfpJOVIN5K+OygLQzL72YQqZRYVi5tW95D8dsQO/As=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Yf6Rcgbe9ou1XPMPAiOmDViXGu8kh35z+/7GeGFS0eSKohsElGL1Os0c+U1ApPcXNbZWf3XgCl+903zwhI5rapD8sGLs3ZhIF2gntp5ztcLK2kbvjcIMhGkq2uuybCP1I43iGhariXtDaYVkb6WjgRo4FgpFXIsJWo2MN+Y8JrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.22.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas9t1751353335t209t60929
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [125.120.151.178])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 5655527937148675839
+To: "'Jakub Kicinski'" <kuba@kernel.org>
+Cc: <netdev@vger.kernel.org>,
+	<andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<pabeni@redhat.com>,
+	<horms@kernel.org>,
+	<mengyuanlou@net-swift.com>,
+	<stable@vger.kernel.org>
+References: <7F26D304FEA08514+20250627080938.84883-1-jiawenwu@trustnetic.com> <20250630183127.0eea7b0b@kernel.org>
+In-Reply-To: <20250630183127.0eea7b0b@kernel.org>
+Subject: RE: [PATCH] net: libwx: fix the incorrect display of the queue number
+Date: Tue, 1 Jul 2025 15:02:07 +0800
+Message-ID: <050201dbea56$0f357410$2da05c30$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemf100013.china.huawei.com (7.202.181.12)
+Content-Type: text/plain;
+	charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQEtzzkUZBccSc4HJFOXyE1ELYYWYQE9pEdZtW8ftqA=
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: NImvdRhE6fHpQ41SCYPOfStBbLfZabgcZYRjj64n0tyypzFw/Zy7mlc6
+	3+ce0bJpa7uKdz1tge1H0OvNzzO3xj8ZYoGtrScNrwnEa/iCE72nqhUw1/F+4UX+vGyRi1w
+	6iQKsCR6ujIU0JWNm1g0uSGSvYyfqB2taO1d30L3Ri9ZftADINY+MuvLKIgCJmWJanNYLDT
+	BtTIRtXPVeYp2UnT2uOZegycB0VIz03240jdjDOyxKvOPxnRmEDbyhIu/pHVFfmAr/3VT9E
+	cOdMK1nqBM8yu/Ackj8JIuYj7lR0qVo/Qg6bzgOg3hRCr2J9IvSdTUG2+IVlqYiTBJs+hGx
+	0jYMv8srwVsYbXKAViAlp83KdNDfCdFf3ZnHb8mwtkFZQ3EtYFxJRSWloabjjoC8IocskDp
+	KNXSEnVGViQaqNedOaXU/SLb0Y64/q0bMiKqn7nHhPqOvQYFZYbRGBvYGw4oxmO/zTxv9rk
+	Y+wQGuXekbkmej3IsXvIZsyO+Ix+PG1XXpZ5gU8JRuPRbVzSv2oDPk6egCvHFBZXuTH5NCY
+	7cfxY0aL2V4EMY4EtAV1MZB8IqsbBp/IcjgTn7xeZicfmnaChcPR2JfWkG7OEtnhf8LoXkO
+	vE64fHra69hae8tTUM91MEIBnQ/p8RY88L2qc+sWkOAr7k6YQh9ZxFe82lvl98RJRB9REJo
+	IsPcIZjTHO+bxCb1ugLjF7TyaN3rzzCoMfVQ1wbw9TdSNwXpPl5S7iOpzaw5FRs09EJ7z0U
+	Khix5sn34BHHNb2LkjEQdEr6/prwWNWVWdjaL6ZR+7ucmUTjTsZcrBJTwL3YypnXQzs+9eE
+	2Lo0dCiKYOc8kMGL+j/1aCOpRjae4yhKB30yww7kKv7wvTu5uTJx7N1+pAkGQwe2QLYHhug
+	DH7yQgX/dDckpuaSlilzN/89uDYbdmky5piUvuqIZRm62fdzhxuF3XkxW4xdItNH0cxyUg5
+	vJi+CH0E2Sc/vMztCWxh9XsRmhtno0ctIKCcyu7y1zBOrEFo7eJ47pffXFHbG/6L0ElY2zk
+	ISZ1bTVszu2TtJe5ObGhaj/lKRQMlMTDkBJ3HAMw==
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+X-QQ-RECHKSPAM: 0
 
-> > +void hinic3_mbox_func_aeqe_handler(struct hinic3_hwdev *hwdev, u8 *header,
-> > +				   u8 size)
-> > +{
-> > +	u64 mbox_header = *((u64 *)header);
->
-> The question here is how will it work with different endianess? AFAIU,
-> u8 *header is a buffer filled in by FW with device's endianess, which
-> you directly  convert into host's endianess into u64 value. If the 
-> endianess doesn't match, this conversion will fail.
+On Tue, Jul 1, 2025 9:31 AM, Jakub Kicinski wrote:
+> On Fri, 27 Jun 2025 16:09:38 +0800 Jiawen Wu wrote:
+> > When setting "ethtool -L eth0 combined 1", the number of RX/TX queue is
+> > changed to be 1. RSS is disabled at this moment, and the indices of FDIR
+> > have not be changed in wx_set_rss_queues(). So the combined count still
+> > shows the previous value. This issue was introduced when supporting
+> > FDIR. Fix it for those devices that support FDIR.
+> 
+> Why are you hacking up the get_channels rather than making _F_FDIR be
+> sane in all situations? I mean why not:
+> 
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+> @@ -1709,6 +1709,7 @@ static void wx_set_rss_queues(struct wx *wx)
+>          * distribution of flows across cores, even when an FDIR flow
+>          * isn't matched.
+>          */
+> +       wx->ring_feature[RING_F_FDIR].indices = 1;
+>         if (f->indices > 1) {
+>                 f = &wx->ring_feature[RING_F_FDIR];
+> 
+> ?
 
-The mbox data filled by HW is little-endian and our driver is currently supported
-on little endian. So they work with the same endianess and header's conversion
-will success.
+This is quite reasonable, thanks.
 
-> I cannot find any code which calls hinic3_mbox_func_aeqe_handler(),
-> neither in this patch, nor further in the patchset. What is the reason
-> to have it in this series?
-
-Besides hinic3_mbox_func_aeqe_handler, hinic3_init_mbox and hinic3_free_mbox
-are not called in this patchset because of LoC limit. They will be called in
-next patchset which includes HW capabilities probing and initialization.
-The reason why we place them in this patch is that these three functions are
-basic funcions of mbox framework, representing initialization, release and
-firmware-triggered callbacks. A complete mbox framework requires these three
-parts of code logic.
 
