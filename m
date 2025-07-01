@@ -1,191 +1,155 @@
-Return-Path: <netdev+bounces-202954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA9CFAEFE7A
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 17:38:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8848AEFE85
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 17:40:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D089188E83F
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 15:31:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 625311881EFE
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 15:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C7E2797AC;
-	Tue,  1 Jul 2025 15:31:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792FD27814F;
+	Tue,  1 Jul 2025 15:35:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uqUFvrVH"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HZW+nI2M"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2079.outbound.protection.outlook.com [40.107.237.79])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D5A1DDC15;
-	Tue,  1 Jul 2025 15:31:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.79
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751383864; cv=fail; b=EoQZsRTNhosSPGFyUzapjBeoh46l0cFeiUANhL/4wVbdbw7PrE6MatabzrtCrd/lLIAZ1uHt8u9FgzwEsE/rEmqHXmfwA2Ri4iOinf7Xh+vZc2V7Arg1N3LbzPgSuxZJUPxxbBM/TQ2VLUQRUlVrVMKej9j85gj1qwtMCaEOAy0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751383864; c=relaxed/simple;
-	bh=XzDPyuFjRXuWODKUfaEj0RqoyshwrZYNL0wRkpvGDI8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Vup6jJcgdnsx8WwzCdfVKuHytTC6wOTfYXGJaxNxyUHvbGpD+RnuQolAR3teuUYS+fhtmhBMt08XJr1ke/P25WSTZl0aV36jNsO41ozkcQ2rCKYEm5O2LSNxhnb/5GbJsaWmS2e36T2DiN8XHW29/OEyvgU0DrSTrOhadnQRcRA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uqUFvrVH; arc=fail smtp.client-ip=40.107.237.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SGilQo5KmnDZiZg4Pn5S5IIhs3cHISnnlY/jSUJVvvXkMNG993eQOfRJTiU2Ogj+ld3DtB7+tXEA+1t+EgeePLbJHWrChOcBnRRVvPwmw/Vsf7XyeWb9JeV8idlJQTu7ZU2Pf7s2qzmhnKw4oA/L8X+dr8uq8fIZNaVhQfLioyiDaepS3owBUzUYBM5uM4WvLD/PtvdZqqBfEJVLxITvubzYcX67xKQFO0aZPKo34y950Nmy3bCC/gQWDLNB76Cs2WSJWuI9pRaFcLMkSv1z/Wo7MOfTGtQD/07w/GvWG54WyhMNZTiotSSbKyqg2ZpIj9rEc2mP6MEDbcudHBkeag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XzDPyuFjRXuWODKUfaEj0RqoyshwrZYNL0wRkpvGDI8=;
- b=hfm7LLQY8e+OqkU79IhYwceZhvRN3SeaEWM4qXLtQmI1mzIJCpN53iK4jV+iG8VsPy04+kFeuIhBoLduyljn+TRFs7hSKS5G/exmcllGCFoWSvHjZ6dOg810K+L6QJcpZuxpGfq/S2V/W2+8+90l9d4cwgDfv4H3rIEdsGuGCfeCAtk4p8efVQrr6ajLavHVn0Ceool7UClRMOfmff6qRQ5vsRVXWxFuG6kgRUViXLvceAQ0ADJBgJolgV32wAYRv2wxI1P+e5jfxpgu50T+0JNfvJqFrnJVa+A63q89uTjbKdELOLPCHblDrZdrp84Sy+nH3ECYWxCR7f+fsuOywA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XzDPyuFjRXuWODKUfaEj0RqoyshwrZYNL0wRkpvGDI8=;
- b=uqUFvrVHOrxqHbBKM3g9fYXibv8jygmmfIKjXZP3keSznabBnrL+RB75TSvOVPZ/tzfFxmRiSJpMcKSyfcapdOKAZTVr9PJSRqx9yw3Ddl9+mlaJ7sESrRNM9ELvWTtuK2/6i2gbdn3h7oFhUw9W17xgQcL6hionDCARlVGfbZA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by CH2PR12MB4294.namprd12.prod.outlook.com (2603:10b6:610:a9::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.20; Tue, 1 Jul
- 2025 15:31:01 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%6]) with mapi id 15.20.8880.021; Tue, 1 Jul 2025
- 15:31:00 +0000
-Message-ID: <ba684c79-d073-40f2-979e-4535db3ab8b9@amd.com>
-Date: Tue, 1 Jul 2025 16:30:57 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 10/22] cx/memdev: Indicate probe deferral
-Content-Language: en-US
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
- dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
-References: <20250624141355.269056-1-alejandro.lucero-palau@amd.com>
- <20250624141355.269056-11-alejandro.lucero-palau@amd.com>
- <20250627104233.00005c5e@huawei.com>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <20250627104233.00005c5e@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DU7P194CA0001.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:10:553::16) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50DC0274B58;
+	Tue,  1 Jul 2025 15:35:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751384127; cv=none; b=F6xHTZklS5rFrTMihYMFTPP8TTODocLqZ3H9sZYdLj7rr/Y8pxzSII3whOz5Sn9BrkFB5pC2eMYYEli4DOhyJpQGaZCW21o6VeNyP4C109Qh0ovksz9A5xdNnk0M8JbBRInz1F3i+VhKT80AVDGMvv6b2S0HtD6jP9L+6a29ljk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751384127; c=relaxed/simple;
+	bh=Dpe36OfClugyKwIMcaBC3dcK7aOGRu8qtIlgMAQ+2ro=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZqoonSgxLGbCl4iYpGB/7eHJbpnf7/0/pj7RFZe2njykUw9PA4vfALNL/ImHgmq34Q83myKSUjf7V1PjyoHpUXTq+otdZ70TOs11aUyzuHoD+rctUwHHEj2ikjhmQ8RWx9Trz5FP06b+Nv4ZED41rYZ0QDvqOg/IvtMm5OriP9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HZW+nI2M; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <fd88c994-c4f0-4ba1-bc8a-908cfb3b5498@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751384121;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+INSP/GK6T+8bv6Vx93kwG7+YR+IlBFm0hRiAEEEXmI=;
+	b=HZW+nI2MTAledHyxlbBKwh7aSa9Lm5EiIUfLAfvH9NMJgPJieoRCcoNNRHtX3e+mw71sFd
+	4NOewdCxEfciPMKGTCz8e/Yg7H/3mHMEyWf20a0ZlW8cmuQ90oufqHW7gZk6d8Sw7M25gv
+	TQpuKFw/O3FnJLya2Tl1WY3AHBRcnbc=
+Date: Tue, 1 Jul 2025 11:35:10 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|CH2PR12MB4294:EE_
-X-MS-Office365-Filtering-Correlation-Id: a68fdc8a-5175-4ce4-e8b6-08ddb8b447f1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dWhYOXNZc2M3MFZKZTBvMForTm9ublljTld3NnFMK0ZzV05xemtISStoaEcy?=
- =?utf-8?B?Q3FUQnNycHNlS1NKZEx6ZVhCM0w5dlY4S1JiUWdnemJCRVlqOXFuTGZwbUVs?=
- =?utf-8?B?OVZ1enJjUzRDTXp6Y0xTeS9tOHZmenBMVGxiWG5iOFMrdDRSVE5FQlJ1Q0la?=
- =?utf-8?B?YjlsQ0ZWbEtaUkp1SnhpMUx3VFNkT0FnZjVWUG05eURWeS9tOHNwSk55aW1R?=
- =?utf-8?B?VjdyRzFGSjR3Rzg0dkFRTzA1REJGalNXbGI3eWMxdmJDaTYzcEY3dkI0YXFv?=
- =?utf-8?B?YXRCT2Z0NFpTTlQ3NlZ3R25MU0l0a1dkdzVwUHRXRUl5dFJrc3Fvc0k4RnZY?=
- =?utf-8?B?SkptTm9EZkpLbXVLYXFvVWdlK0lJZVlIdmRLYWNPbUNLWEZlQXZrbXRiUTc1?=
- =?utf-8?B?b25xVlkvejBDeTZHYkJ1VERzdU9zUDZ4VTN3c0RrcnMvaDlzaW1EZGdoaWtp?=
- =?utf-8?B?cXhsZDFLc01DQVBzcGNsN21FSHQwYzF1QjRQbU85UFNyV01rN3FiZFNPbWV0?=
- =?utf-8?B?Vm5uNkFMeFRjWjRSM1N0UVBzaGFvcVZLWFRPZlVVM1kyTXFSR00xL3BCMnB3?=
- =?utf-8?B?ZTVWdS83RXcwdm8yZWNhWnBKaHRnbzVyajVOUmV3YkxOUG95dFY2M2JqK2Jv?=
- =?utf-8?B?d1k3T1pPbTVzU3dIeHk2QTJVTEVRdjdZRVVWSkpVV2ZUaVZqMTFxM1VBMGdw?=
- =?utf-8?B?UXN0bGZVSzlEYW01ekdxRjdndEtud0dHNElMKzhMTTM3V21obVkxSCt1Tzkz?=
- =?utf-8?B?bkg0Qm5YczUwYVBOemVMa0RWQy9RSmZCTW51cit1ZTg5Ums4V0lvYkV2VVZr?=
- =?utf-8?B?SmptSUxDNlRiSFNiMmMwSjJ0SGR6bmZYUjNONWM3MG9jbzlKQU96OVU5dFFQ?=
- =?utf-8?B?MzIwbTJPU3d4YTliL2J1b3ZicXh2TncvUUIvc2U2em54Q1Y1b2luRkwvU05Y?=
- =?utf-8?B?RjlhcEVWOWNOVjJ5UllPUS9hRjVSemU2Y2tramRIMXkyZHltbTBxb1pkNjRO?=
- =?utf-8?B?Y0hFVUNneTVPdlViSEJycHRvOUZOQmRMTW5uWFV4QUV0MGJVcDVtZ0ptT1ZK?=
- =?utf-8?B?amtWc1F5NzVRaWtYbTh3cThrenEyN05aQXQ3Q2YrTVFkclpqSFhCM3VlcHVG?=
- =?utf-8?B?c09JWkNzM0VCV3RQVGZTL3pidUNhZWMxK2duV2J0d1laVDRBMjNUa1FEZ2E2?=
- =?utf-8?B?aUNHK2crRTJFWlY4eG9oZ21NZ1N5eUo2U2NiQkR3VmJDMm4rZ0FZTkhBTTM3?=
- =?utf-8?B?MTBESmQva0pMQ3FTWjhLSkZzVW1mTWs1R1ZUTjcwY21hTmcxbTZmM25iTVFw?=
- =?utf-8?B?d3ltUmg1S2NhdFM5RGx0NlVLekszN1hhbEtqNWxmRXgrYTNlVmRzVWlHdUtj?=
- =?utf-8?B?ZTlsQVNGSE5sK0VON2ticHh3dXhjZ1JzTml0aEZHRXhERlV4MWI0ZW9NVEtW?=
- =?utf-8?B?TW9XcHhYNE9xMmNQN1F6elorV0txMkN4S3phQ2RsUzU2WnA4dTNUTVRQNytl?=
- =?utf-8?B?SWRuS01XbFRnbmM3NWhJMkQ3dHZFcmNRNDU5YzlHMFArQU9FZHJRVWxiNitG?=
- =?utf-8?B?SW1WUmh0NHNJUEF3OUVwQVNwY0doZzM4bVNxOUpYSDlCYlZsUFFmQjVRMHY3?=
- =?utf-8?B?NVhBK3ZteVk2UVNjdzNmb0F6NndLQVFnZldjOW9Sa2txU0VaanFBODBQczFJ?=
- =?utf-8?B?YW40SDliTThnVXFLTXpydFJOTDhnM2hycEhhbXhnQkNXS2JDZUpQNUpRNHla?=
- =?utf-8?B?TXdZNnVqd2lsc3l6UktGMW9sZDhyRVY2cjRFaklaalFlQWJvNmxFR3d2a1RD?=
- =?utf-8?B?MlRLdGFKdkY5UFVmZWFrSnd1YkIvbTB3Zlp6STc1ZklJRjFFd0s5clR6aThJ?=
- =?utf-8?B?N3l5Mmp1bUFDenU2b1d0QlBnOWhiUXlYNEtQdFZrNWdYdmtjTEFuUFFlbExZ?=
- =?utf-8?Q?7Hw7iB3eeVw=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WHU1aGRIa2pqRGZtWVhvd1k1UFlzUTdqNVFHU1JCRHBRSUNlWHJLdnI1RkVm?=
- =?utf-8?B?Wmg1VGJTWWlDdDMwcTBXbjhVKzMxSzRzWEt4U1VhamFjOFZOVmJyeWZ3Q3dS?=
- =?utf-8?B?WUhHZFBBU0JpZFcxSUdPWFZaUTdUNHhWSWwwUnFidjhZblNpeEc0S2JMTHF6?=
- =?utf-8?B?bnlvUXg0UDJpMzJlWmJLTjFzOXpSd2M4T1MxSW9RR2x0SVl6Q1J4YWZFWmRt?=
- =?utf-8?B?VFlEKzkzaldINUpHajF2VUQycTJ5WGFyK2pqTHFhV2Zvcll5clZRMWhXQ2NW?=
- =?utf-8?B?elJVVVQyOGtiSCtTeHJOUm5kQU9IRVAycXI0Q1N1UFBDVEltbjZaZURid0RH?=
- =?utf-8?B?VDBLNW5VK3RRTzNkSEo0QktnQi9LNnhub241aG96NHo5WTRsS28zTkR5dVUr?=
- =?utf-8?B?VExxMythSVkxNU91bWRyMVNTbTBPalFxWnp2U0pneHVZUDdKOGVZMTlqS1N2?=
- =?utf-8?B?ZU9jeUJod05xQUxOWmpJem1vcEtIWVhyM0JVTXg0TW1ET2JvZ2Z3a2YxSmF3?=
- =?utf-8?B?aGVpckF0S0dKNmdzb0lnR2VDNGE0ZTNYLzhEWjhjVmFKOWgrWFJQUXpSeU4y?=
- =?utf-8?B?U1gvT0lTeTlIS3kxSDd2ZElML1RsYlI4cDJtZEpvbkdid0V3VnlIL1hPUlh1?=
- =?utf-8?B?MTkwaWRGV2ZqRnpNRUQ1QWtYcVFIczJ6N3B5ZnM1Y1QxRGlVOVU0eEs5TVFL?=
- =?utf-8?B?ZTBwYURhQ0krZCtBdU8xbUlVTEJ2cGVVRkZDZENpTy9DV1I1OUZ3NGJtVUg5?=
- =?utf-8?B?VVEwM0NrdWJKNGdGcFdmYmNxaTZQZmVwOVN0RUJxcGhkOXZPeFNEOFptYXNY?=
- =?utf-8?B?S01vS1pod2RKRS9XVVhxWUc2aUJtazNYZ0hRc0g4V1h4Qnprd1pnVmd2U29q?=
- =?utf-8?B?ZGozdkhIUW5TWmx4RW9RVWVtcnRKOXZVSGtpVnU4Z3JaRUNncXJNZkRDbCt0?=
- =?utf-8?B?VGpKOHVJM3lNVVVtSS81ckIraTl0RHBsTnU4S0lFWStkOHF1V3hMcEhaeFdK?=
- =?utf-8?B?WnhYbFNHbkVleFhnL3pwaHM0VUhXNGl6NXVOVjFZamxRUldzdWpzalk2a3Y1?=
- =?utf-8?B?cmxHTmszQitKWVEyRVZWSDdRVDNTV2ZTUnRwOExSQ09NQWdrVUV3alNLckd4?=
- =?utf-8?B?ZktGWVNQRTllejVRV2h0WVdvYlcvRHBtNTRGQUdpd3NYMEZxRVZiRCsxUXlv?=
- =?utf-8?B?RFJzcGs3MmZoZU4zYTVvMVhoL0l1akV1TE1rT0FodVl1SkljeXFiNHZES0xn?=
- =?utf-8?B?V1ozVzF2M2h1cDhIMDIydTV3MGtCZXdNZGFpSGw4cDFtZ3VubkN4ZXo3c0Vw?=
- =?utf-8?B?cVdFbUQ1cGYvV1FEVjVsYnJDLzhreWV6LzZIZU5VRlVZbkhNbU5xSjc0c0E3?=
- =?utf-8?B?aTl5OXozK2JZN0hZcStNUHVLdG1MVGc3b003WmFpeUFSVWFMZitXN3FqN0tj?=
- =?utf-8?B?dHJsS2o0OW5WRk1BLzhNd1huVU9aclEvVHFPK3duSXorb1JKaTlmekRRU0JZ?=
- =?utf-8?B?MmpESzY5SkRON20yd2dTd0JGeG5BTENtVzlteHkxbVorMmxiU0d5S3hYVjlh?=
- =?utf-8?B?OVJodWswYTgycWZzNVQ3cE96RTlRUytBa1dwT2ZrbXd2RGRxZVJMdjNJTDkw?=
- =?utf-8?B?YUFJOVFSVE5DQnk5elZaMFhjNDVEY1U0d2RFay9UNm5zUHB1WEV0YjNReTY0?=
- =?utf-8?B?MUxKRlpzV0Z2S1djcmNpYXFZSFJkcExVTUVTWCt0SDFETHd6VC9BbTR3STI4?=
- =?utf-8?B?TW1tSjU3cUNJUVF3OWlhajNqUHB2SlEyTTFoNnBOODNWQUcxSzRGY1ZHVWV3?=
- =?utf-8?B?L2pLelJrNVMxcEkwYlk2bW1PK3RXVk9uWXhhTW15YStsTWtrWXRTcjlLb0Z2?=
- =?utf-8?B?K1NFdi9LQWhYMEl2TEJmenp2UTI5L1lzWUI5bHp2bUxuTDNSWVEzdGdqWjhO?=
- =?utf-8?B?aVJ4cVRQSncrMFU3UldzcmhrT1dwaFArRUh3MzR6VjBSamk1ZnlDSSszVjZS?=
- =?utf-8?B?V3RoRGpMdFVQVVoyWkYyQW4zaUloMEs2Yjh4ejd1QkxDYmZLR1c0d3QwWGNu?=
- =?utf-8?B?SVVXc3hRYUduMlNoTmpXT0dxLy93YWJFQlRCdnBjb0dmSTcvSzFSbk1ZWU4w?=
- =?utf-8?Q?05koE3nAuQGTIhLn+QOA3d+2j?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a68fdc8a-5175-4ce4-e8b6-08ddb8b447f1
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2025 15:31:00.2381
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UGWWMGlZW6h69WDbmQYicCRh/ALUf7fj3JcDfZOf8hU0V/Cf0bb1FeJVsqR9BI2cYfVzaeKdofzIBROhPD/TPA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4294
+Subject: Re: [PATCH net-next v2 05/18] net: macb: use BIT() macro for
+ capability definitions
+To: =?UTF-8?Q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Ghiti <alex@ghiti.fr>, Samuel Holland <samuel.holland@sifive.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>,
+ Gregory CLEMENT <gregory.clement@bootlin.com>,
+ Cyrille Pitchen <cyrille.pitchen@atmel.com>,
+ Harini Katakam <harini.katakam@xilinx.com>,
+ Rafal Ozieblo <rafalo@cadence.com>,
+ Haavard Skinnemoen <hskinnemoen@atmel.com>, Jeff Garzik <jeff@garzik.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-mips@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Tawfik Bayouk <tawfik.bayouk@mobileye.com>, Andrew Lunn <andrew@lunn.ch>
+References: <20250627-macb-v2-0-ff8207d0bb77@bootlin.com>
+ <20250627-macb-v2-5-ff8207d0bb77@bootlin.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <20250627-macb-v2-5-ff8207d0bb77@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
+On 6/27/25 05:08, Théo Lebrun wrote:
+> Replace all capabilities values by calls to the BIT() macro.
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Théo Lebrun <theo.lebrun@bootlin.com>
+> ---
+>  drivers/net/ethernet/cadence/macb.h | 40 ++++++++++++++++++-------------------
+>  1 file changed, 20 insertions(+), 20 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
+> index c9a5c8beb2fa8166195d1d83f187d2d0c62668a8..3b43cb9468e3618754ff2bc6c5f360447bdeeed0 100644
+> --- a/drivers/net/ethernet/cadence/macb.h
+> +++ b/drivers/net/ethernet/cadence/macb.h
+> @@ -727,26 +727,26 @@
+>  #define MACB_MAN_C45_CODE			2
+>  
+>  /* Capability mask bits */
+> -#define MACB_CAPS_ISR_CLEAR_ON_WRITE		0x00000001
+> -#define MACB_CAPS_USRIO_HAS_CLKEN		0x00000002
+> -#define MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII	0x00000004
+> -#define MACB_CAPS_NO_GIGABIT_HALF		0x00000008
+> -#define MACB_CAPS_USRIO_DISABLED		0x00000010
+> -#define MACB_CAPS_JUMBO				0x00000020
+> -#define MACB_CAPS_GEM_HAS_PTP			0x00000040
+> -#define MACB_CAPS_BD_RD_PREFETCH		0x00000080
+> -#define MACB_CAPS_NEEDS_RSTONUBR		0x00000100
+> -#define MACB_CAPS_MIIONRGMII			0x00000200
+> -#define MACB_CAPS_NEED_TSUCLK			0x00000400
+> -#define MACB_CAPS_QUEUE_DISABLE			0x00000800
+> -#define MACB_CAPS_PCS				0x01000000
+> -#define MACB_CAPS_HIGH_SPEED			0x02000000
+> -#define MACB_CAPS_CLK_HW_CHG			0x04000000
+> -#define MACB_CAPS_MACB_IS_EMAC			0x08000000
+> -#define MACB_CAPS_FIFO_MODE			0x10000000
+> -#define MACB_CAPS_GIGABIT_MODE_AVAILABLE	0x20000000
+> -#define MACB_CAPS_SG_DISABLED			0x40000000
+> -#define MACB_CAPS_MACB_IS_GEM			0x80000000
+> +#define MACB_CAPS_ISR_CLEAR_ON_WRITE		BIT(0)
+> +#define MACB_CAPS_USRIO_HAS_CLKEN		BIT(1)
+> +#define MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII	BIT(2)
+> +#define MACB_CAPS_NO_GIGABIT_HALF		BIT(3)
+> +#define MACB_CAPS_USRIO_DISABLED		BIT(4)
+> +#define MACB_CAPS_JUMBO				BIT(5)
+> +#define MACB_CAPS_GEM_HAS_PTP			BIT(6)
+> +#define MACB_CAPS_BD_RD_PREFETCH		BIT(7)
+> +#define MACB_CAPS_NEEDS_RSTONUBR		BIT(8)
+> +#define MACB_CAPS_MIIONRGMII			BIT(9)
+> +#define MACB_CAPS_NEED_TSUCLK			BIT(10)
+> +#define MACB_CAPS_QUEUE_DISABLE			BIT(11)
+> +#define MACB_CAPS_PCS				BIT(24)
+> +#define MACB_CAPS_HIGH_SPEED			BIT(25)
+> +#define MACB_CAPS_CLK_HW_CHG			BIT(26)
+> +#define MACB_CAPS_MACB_IS_EMAC			BIT(27)
+> +#define MACB_CAPS_FIFO_MODE			BIT(28)
+> +#define MACB_CAPS_GIGABIT_MODE_AVAILABLE	BIT(29)
+> +#define MACB_CAPS_SG_DISABLED			BIT(30)
+> +#define MACB_CAPS_MACB_IS_GEM			BIT(31)
+>  
+>  /* LSO settings */
+>  #define MACB_LSO_UFO_ENABLE			0x01
+> 
 
-On 6/27/25 10:42, Jonathan Cameron wrote:
-> On Tue, 24 Jun 2025 15:13:43 +0100
-> <alejandro.lucero-palau@amd.com> wrote:
->
->> From: Alejandro Lucero <alucerop@amd.com>
->>
-> Typo in patch title.
+Reviewed-by: Sean Anderson <sean.anderson@linux.dev>
 
-
-Upps. I'll fix it.
-
-Thanks
-
+But since these capabilities don't correspond to hardware registers, can
+you add a follow-up patch to remove the gap between QUEUE_DISABLE and
+PCS?
 
