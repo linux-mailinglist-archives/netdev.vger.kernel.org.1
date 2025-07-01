@@ -1,151 +1,247 @@
-Return-Path: <netdev+bounces-203051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0222AF0686
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 00:26:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 656B5AF06AA
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 00:47:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7093445361
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 22:25:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A1871C071CD
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 22:48:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04822FE365;
-	Tue,  1 Jul 2025 22:26:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFF2326AA82;
+	Tue,  1 Jul 2025 22:47:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="2SW0JO/Y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bWXJ66oB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44B1B288C17
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 22:26:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3E3C23F28D;
+	Tue,  1 Jul 2025 22:47:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751408772; cv=none; b=UyYR1rakND5Zo3s03hQOJuQ8RJFbbsujGwsriffiyFnQO2bY3EgWmE8E0HjHo8Bx1izMTpTLq/ax+jl9JBmBjVdRVgQWvyzxDcIxV0J5pYtxLyu9z9wYCT5ne6Jdz7T9BDtP+MGZBaMcuVHjGuPSsLHeYhrp1kjddM1L5gDHNTg=
+	t=1751410060; cv=none; b=D2pCrD8ejkcRZAnpmG43OCC+dPm11LfGpf7yjRJqthc0pXIyMDDwaTvD5fBQrXfJqucg+4qdi8qWrujyMKqHNK7OSxdS0B5g4eo+i9YhK1vXyqWe+jyeNo+1iscz65/SazkWbj3zlOGfFX4X+YpGxyuw6EfV6SPwr/x0BFTdcGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751408772; c=relaxed/simple;
-	bh=S7um119OlGEp+L1DpTv7Q2BzznTSM4uwD3vtSqsIPjY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WvyP8iirmfEtAk+/3ONOWbXRlGlKgvOj0IHHe6ahotxMvuNpzQEd+yir+Hq5I8C9lb8BDZj0rgCsFlwtBSn8dRPMXhRT1SvdQ9gI9ksBK7E9hL1N8Z50J66Don4twFuBtBj4jKWTRDVTZnV59U0D9O1PtdSAn+niar4/RAYUaJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=2SW0JO/Y; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-234c5b57557so37375655ad.3
-        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 15:26:09 -0700 (PDT)
+	s=arc-20240116; t=1751410060; c=relaxed/simple;
+	bh=BfFOBs68JeQYk1q7e48hF/Xe2WhQQeFYHLQC3hg5O2s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iymXZNNRsoyy6aJ7sVsiheiPndO0G8hVBer5WIYUfp6tswcLLWB/N623l6nss6sEONGB82z5BgilRCSHDoK6ZL61ufgx1mzRZ/bnQnh92haV9woMicPpeedGsrJAtawR2vQTo7ABn0fAWfA+z4qDYW8ckNLLyU+cLfOEZd0t3WM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bWXJ66oB; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-70e3e0415a7so60166707b3.0;
+        Tue, 01 Jul 2025 15:47:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1751408769; x=1752013569; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eZ0FtMh8plkQ6cBwz5EDQ1RWIaCqoL7pfct627Zqe18=;
-        b=2SW0JO/YKHKJ49qdqpG05BZdL70u9J6zoU69i9GcFCQUCh0+1wJdcvkB0wd69Z65gB
-         sNSLuI5PaNtrsw2QjPWN7yi5bTBZr/spdty8UhTH3nuK9Ho8merH2pDmgl+azqLKOk05
-         pmLy5AwZpDRO4SmHfpzaNAsfSJTtA1atL+fMDMUuF29B+7SLboRjlXSI4UbaOo+DfVt2
-         ORyfZXIj8LRqQ8qDc/M8tBnVUxR8ii2K4jbgR9IQDoIbMVqDgF7NFq5vOzKFCal0g4mK
-         cstHQ9nOmRWyJA/xsocYGtKAWqA/RYtgpGvRH1fUv490n2azttJkJ5l7zCSmrpJMObP2
-         a55Q==
+        d=gmail.com; s=20230601; t=1751410058; x=1752014858; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XBHNYo68NWEG2CkgAtv5wIPMjOu/mIg9DJZaW8zmUJE=;
+        b=bWXJ66oBRQyCuFeGastjMAGbL3jBCFeA7XNF/hzb7SgKC10qO6VALJWfe01HOHOLOM
+         UKxYLROi7Mq1OpPNAS45udITCSgpfxoyaHUNU9PXNsLnvRPRXvpUQLtRPoJL4fNwL0oL
+         RET35JjWqddya9KT/gmYZK2+gJLy5Dg9lCRaeshECqAgKH6rnGcN4nL2tHVmgsQ8x40A
+         UE4MYwxoJTRjWAucqlPhCsujaURk9Uo3LXEOXMAx2BryGuqFNH3y2mfkbpoYW1oMEqFK
+         8goEOg5AXEIYD8o9QoQx03EiNVPWL80k4yH/eXWhl+C+q7sozwxcZhhxQOmFA7LS6utD
+         CbZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751408769; x=1752013569;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eZ0FtMh8plkQ6cBwz5EDQ1RWIaCqoL7pfct627Zqe18=;
-        b=oPXfGOUvZPw6Gbq3Ofjhe4umKNMKeMmkSOtXslB1/GhzOPaj+2O4CyaYxg//Esmucu
-         GJgK8TbzAcGQtq80Sbh/qnaCl7Al5/hTCe9jE7hAnsuUFy9ky3oFda5RVU2QCiV5F6sJ
-         oSu7Xfbq710Qk6efDJSzvp68+v3w/u8RnmiCeWstkcpRYUAEboJXSlDWfwS+TGNj1DzM
-         YD/8OMdZZm2R95raAMPGAZSzsIJlFeUQB990C1+qA4PugmbultNX+N0l01I38jTHLURP
-         j3lmnddHdJB7RKjj0zRZNBij5aBl9TCEyALk6WbaUefiOPKf8wvH2kBTBqT63N4+9rG/
-         kEug==
-X-Gm-Message-State: AOJu0YwNj6FZLCixvcTa85wpihuAMN9matd/yh6Mu5wf4su4ivxnXddf
-	MKuebEALvgPEZDFQ6kKSu5sPi+NythoBykEYAZtvNhOEFoKM1unbLmUggzMP+IZTEnk=
-X-Gm-Gg: ASbGnctxxM9FWzSt/DKuPYO/u23UMfp0eGQh0cT6n5nptpPs6yd0w/Wpg3Zdw1G2yQd
-	mJCu25T//MK9bOGxXZ/sa+yrkrASeg7DjJeHBL0EN0rct/SRk/a+SQaxU43gweDHvCIAmUxu4CJ
-	LtoXkstWQfG0FXn/HeIPsrdzaCjFaVHdxolaYlyjlueMjF7029Oat7UhOaKIDM1FySPjwvwVXAP
-	FayHTYwTHOVXRIpE23dpGjZQeY1+/O4LWAgw5N5gByE7gdNGienKDfBp5Y8eO56nZYUmGWEsB5E
-	SiVJgD08Acgy23hpVkAfU153poPbhWc/e/8QCgIyK6VhUjy73y2rlNicylxc05FQuoXyYfpWerO
-	KCPqvZRJg9qrlTgjg12gZoL5a
-X-Google-Smtp-Source: AGHT+IG2GZC/wIK2IRgxEjaLzVJYUtHtJXmpJX/0sP6DRQsY+cqN7gpywPgJgreiqH8gwDqme/WlgA==
-X-Received: by 2002:a17:903:46c8:b0:235:1171:6d1d with SMTP id d9443c01a7336-23c6e49117cmr6380065ad.9.1751408769513;
-        Tue, 01 Jul 2025 15:26:09 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1156:1:14f8:5a41:7998:a806? ([2620:10d:c090:500::6:a23e])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb3adeabsm109580385ad.159.2025.07.01.15.26.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Jul 2025 15:26:09 -0700 (PDT)
-Message-ID: <e87a5ba3-956e-401e-9a1e-fc40dadf3d87@davidwei.uk>
-Date: Tue, 1 Jul 2025 15:26:07 -0700
+        d=1e100.net; s=20230601; t=1751410058; x=1752014858;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XBHNYo68NWEG2CkgAtv5wIPMjOu/mIg9DJZaW8zmUJE=;
+        b=ibAk1bt0Ph82VC2MusCwDXCTqFZenDYq4sJqQlXGyEW6vjsqImOq2B/TIgMPPM+ehZ
+         OZI2yt8ucHSlGNsrOAAwOts17g+jJPuZ/9A07CGIoaN9V5TeNejPzW6lbVO6zgDeVR+Y
+         LFaIag+HrFJQmjh6UAgzQlNL+jbLozf3hIOpIsXfKpBR8txghlsOzRwmytJ0vWMQ5UKF
+         ILab4CvNGzmftHHKhl2ybdxTtum5B0SlOY9IHx9efS+FcS71rWTbztHbnt6rbOUIjpSC
+         a7b85PDwQpvNa2bdDANGHY5FbckMj9Dh9bCOxB2MDKmaiDqXwtmU1YUwDLgdcnScU2oM
+         aHpA==
+X-Forwarded-Encrypted: i=1; AJvYcCV9MslO7ddiKZUXdSM8ONPtFUVor5g/E0tbVNGLQOjkuqemekmGbADzZNk/6xPfkRc4pqrJNhA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxv2TElvpQ7oCmBA9JNrA4SMMl8Ehl0d3Cndg1nJtBfYmdodnJ6
+	1DTXyeuSMYyQ2NeuXbb0ZPDooAULkWOT0fYbry/mSCuZLQYwVJhLi4Qamc5scuY/f/1D8JZCu2j
+	dxWucCOiBly+1Fl292AmQceBdDTPBujU=
+X-Gm-Gg: ASbGncs6zLHpaWvgC9l6Sb4SJEEn45dghciaanY1uNMGxJ1cWl8tAsuEXCOHtR+D9m/
+	uV5o19dVy2yayHkoQt73mn3irn0nse8b/KxMH8Er85v/eQaai4XN2MoPXwggvPUDOkXn7+vyH0X
+	KQrnHGLfLT8yCcVlY+vFDHKe7iYSWIQ4H7TM1zDXghzN0ZHYRVR6tZpQrrUyM=
+X-Google-Smtp-Source: AGHT+IH+AhxC/ReHnZs7OqgGk3EBPJbnPC01EHvnPb+FIafxkEVGsMynYAIRvxvsiBVkGhQGrLAlcy5oKm7vGvWH3MM=
+X-Received: by 2002:a05:690c:7105:b0:70e:77df:f2f9 with SMTP id
+ 00721157ae682-7164d7f1fe9mr5887377b3.15.1751410057936; Tue, 01 Jul 2025
+ 15:47:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] netdevsim: implement peer queue flow control
-To: Breno Leitao <leitao@debian.org>, Jakub Kicinski <kuba@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com
-References: <20250701-netdev_flow_control-v1-1-240329fc91b1@debian.org>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20250701-netdev_flow_control-v1-1-240329fc91b1@debian.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250627233958.2602271-1-ameryhung@gmail.com> <20250627233958.2602271-2-ameryhung@gmail.com>
+ <CAEf4BzYFdiQX3gz8Nd2T2cGm6NCZPzTVCRh+eh_C2gYd=cEMpA@mail.gmail.com>
+In-Reply-To: <CAEf4BzYFdiQX3gz8Nd2T2cGm6NCZPzTVCRh+eh_C2gYd=cEMpA@mail.gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Tue, 1 Jul 2025 15:47:24 -0700
+X-Gm-Features: Ac12FXwzqslpdsbJ68KlZojcsFCcedhT_QF3_fb4kxGluZ73xDNMPNBXgOVfX1c
+Message-ID: <CAMB2axPuRgPg_mhEW7ZbmjexFEqLkfnfSpVHuCZ-j4U3UxYtTA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v5 1/3] selftests/bpf: Introduce task local data
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, memxor@gmail.com, 
+	martin.lau@kernel.org, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025-07-01 11:10, Breno Leitao wrote:
-> Add flow control mechanism between paired netdevsim devices to stop the
-> TX queue during high traffic scenarios. When a receive queue becomes
-> congested (approaching NSIM_RING_SIZE limit), the corresponding transmit
-> queue on the peer device is stopped using netif_subqueue_try_stop().
-> 
-> Once the receive queue has sufficient capacity again, the peer's
-> transmit queue is resumed with netif_tx_wake_queue().
-> 
-> Key changes:
->    * Add nsim_stop_peer_tx_queue() to pause peer TX when RX queue is full
->    * Add nsim_start_peer_tx_queue() to resume peer TX when RX queue drains
->    * Implement queue mapping validation to ensure TX/RX queue count match
->    * Wake all queues during device unlinking to prevent stuck queues
->    * Use RCU protection when accessing peer device references
-> 
-> The flow control only activates when devices have matching TX/RX queue
-> counts to ensure proper queue mapping.
-> 
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->   drivers/net/netdevsim/bus.c    | 16 +++++++++++
->   drivers/net/netdevsim/netdev.c | 62 ++++++++++++++++++++++++++++++++++++++++--
->   2 files changed, 76 insertions(+), 2 deletions(-)
-> 
-[...]> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-> index e36d3e846c2dc..43f31bc134b0a 100644
-> --- a/drivers/net/netdevsim/netdev.c
-> +++ b/drivers/net/netdevsim/netdev.c
-> @@ -351,6 +406,9 @@ static int nsim_rcv(struct nsim_rq *rq, int budget)
->   			dev_dstats_rx_dropped(dev);
->   	}
->   
-> +	rcu_read_lock();
-> +	nsim_start_peer_tx_queue(dev, rq);
-> +	rcu_read_unlock();
+On Tue, Jul 1, 2025 at 3:02=E2=80=AFPM Andrii Nakryiko
+<andrii.nakryiko@gmail.com> wrote:
+>
+> On Fri, Jun 27, 2025 at 4:40=E2=80=AFPM Amery Hung <ameryhung@gmail.com> =
+wrote:
+> >
+> > Task local data defines an abstract storage type for storing task-
+> > specific data (TLD). This patch provides user space and bpf
+> > implementation as header-only libraries for accessing task local data.
+> >
+> > Task local data is a bpf task local storage map with two UPTRs:
+> > 1) u_tld_metadata, shared by all tasks of the same process, consists of
+> > the total count of TLDs and an array of metadata of TLDs. A metadata of
+> > a TLD comprises the size and the name. The name is used to identify a
+> > specific TLD in bpf 2) u_tld_data points to a task-specific memory regi=
+on
+> > for storing TLDs.
+> >
+> > Below are the core task local data API:
+> >
+> >                      User space                           BPF
+> > Define TLD    TLD_DEFINE_KEY(), tld_create_key()           -
+> > Get data           tld_get_data()                    tld_get_data()
+> >
+> > A TLD is first defined by the user space with TLD_DEFINE_KEY() or
+> > tld_create_key(). TLD_DEFINE_KEY() defines a TLD statically and allocat=
+es
+> > just enough memory during initialization. tld_create_key() allows
+> > creating TLDs on the fly, but has a fix memory budget, TLD_DYN_DATA_SIZ=
+E.
+> > Internally, they all go through the metadata array to check if the TLD =
+can
+> > be added. The total TLD size needs to fit into a page (limited by UPTR)=
+,
+> > and no two TLDs can have the same name. It also calculates the offset, =
+the
+> > next available space in u_tld_data, by summing sizes of TLDs. If the TL=
+D
+> > can be added, it increases the count using cmpxchg as there may be othe=
+r
+> > concurrent tld_create_key(). After a successful cmpxchg, the last
+> > metadata slot now belongs to the calling thread and will be updated.
+> > tld_create_key() returns the offset encapsulated as a opaque object key
+> > to prevent user misuse.
+> >
+> > Then, user space can pass the key to tld_get_data() to get a pointer
+> > to the TLD. The pointer will remain valid for the lifetime of the
+> > thread.
+> >
+> > BPF programs can also locate the TLD by tld_get_data(), but with both
+> > name and key. The first time tld_get_data() is called, the name will
+> > be used to lookup the metadata. Then, the key will be saved to a
+> > task_local_data map, tld_keys_map. Subsequent call to tld_get_data()
+> > will use the key to quickly locate the data.
+> >
+> > User space task local data library uses a light way approach to ensure
+> > thread safety (i.e., atomic operation + compiler and memory barriers).
+> > While a metadata is being updated, other threads may also try to read i=
+t.
+> > To prevent them from seeing incomplete data, metadata::size is used to
+> > signal the completion of the update, where 0 means the update is still
+> > ongoing. Threads will wait until seeing a non-zero size to read a
+> > metadata.
+> >
+> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> > ---
+> >  .../bpf/prog_tests/task_local_data.h          | 397 ++++++++++++++++++
+> >  .../selftests/bpf/progs/task_local_data.bpf.h | 232 ++++++++++
+> >  2 files changed, 629 insertions(+)
+> >  create mode 100644 tools/testing/selftests/bpf/prog_tests/task_local_d=
+ata.h
+> >  create mode 100644 tools/testing/selftests/bpf/progs/task_local_data.b=
+pf.h
+> >
+>
+> [...]
+>
+> > +               /*
+> > +                * Only one tld_create_key() can increase the current c=
+nt by one and
+> > +                * takes the latest available slot. Other threads will =
+check again if a new
+> > +                * TLD can still be added, and then compete for the new=
+ slot after the
+> > +                * succeeding thread update the size.
+> > +                */
+> > +               if (!atomic_compare_exchange_strong(&tld_metadata_p->cn=
+t, &cnt, cnt + 1))
+> > +                       goto retry;
+> > +
+> > +               strncpy(tld_metadata_p->metadata[i].name, name, TLD_NAM=
+E_LEN);
+>
+> from man page:
+>
+> Warning: If there is no null byte among the first n bytes of src, the
+> string placed in dest will not be null-terminated.
+>
+> is that a concern?
+>
 
-Could the rcu_read_{un}lock() be moved into the
-nsim_start/stop_peer_tx_queue() functions to keep it together with
-rcu_dereference()?
+It should be fine as the BPF side uses strncmp. So, a TLD can have a
+name that is TLD_NAME_LEN-char long, not including the null
+terminator.
 
->   	return i;
->   }
->   
-> 
-> ---
-> base-commit: f6e98f17ad6829c48573952ede3f52ed00c1377f
-> change-id: 20250630-netdev_flow_control-2b2d37965377
-> 
-> Best regards,
-> --
-> Breno Leitao <leitao@debian.org>
-> 
+> > +               atomic_store(&tld_metadata_p->metadata[i].size, size);
+> > +               return (tld_key_t) {.off =3D (__s16)off};
+> > +       }
+> > +
+> > +       return (tld_key_t) {.off =3D -ENOSPC};
+>
+> I don't know if C++ compiler will like this, but in C just
+> `(tld_key_t){-ENOSPC}` should work fine
+>
+
+Designated initializers has been supported since C++20, but I can also
+just use (tld_key_t){-ENOSPC} to make it less verbose.
+
+> > +}
+> > +
+> > +/**
+> > + * TLD_DEFINE_KEY() - Defines a TLD and a file-scope key associated wi=
+th the TLD.
+> > + *
+> > + * @name: The name of the TLD
+> > + * @size: The size of the TLD
+> > + * @key: The variable name of the key. Cannot exceed TLD_NAME_LEN
+> > + *
+> > + * The macro can only be used in file scope.
+> > + *
+> > + * A file-scope key of opaque type, tld_key_t, will be declared and in=
+itialized before
+>
+> what's "file-scope"? it looks like a global (not even static)
+> variable, so you can even reference it from other files with extern,
+> no?
+>
+
+It is a global variable. File-scope is just the terminology used in
+the C language standard
+https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3220.pdf
+
+> > + * main() starts. Use tld_key_is_err() or tld_key_err_or_zero() later =
+to check if the key
+> > + * creation succeeded. Pass the key to tld_get_data() to get a pointer=
+ to the TLD.
+> > + * bpf programs can also fetch the same key by name.
+> > + *
+> > + * The total size of TLDs created using TLD_DEFINE_KEY() cannot exceed=
+ a page. Just
+> > + * enough memory will be allocated for each thread on the first call t=
+o tld_get_data().
+> > + */
+>
+> [...]
 
