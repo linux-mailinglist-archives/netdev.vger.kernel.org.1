@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-202986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B34BDAF0088
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 18:50:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E758AF0096
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 18:50:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A654525D1D
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:47:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E2955233B1
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 16:47:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FAFA28507B;
-	Tue,  1 Jul 2025 16:45:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEF452857D7;
+	Tue,  1 Jul 2025 16:45:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dnu8kSMM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QTxyQjfz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336C0285074;
-	Tue,  1 Jul 2025 16:45:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E052853F7;
+	Tue,  1 Jul 2025 16:45:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751388332; cv=none; b=AYAlcD7u4I1pAP3prXPPSpV2jCE23vWW9XWcR4z7ma2Q2NYSCORd4PM7XVCN8pcaDPdS8DawzOvRw9LTKDZYeq0BpRumxHPvgl3J0wkeAqGQuJ2z95t/+ONnmxSwomPewt3R2Et+FN50oqXcREOvy3ywtIKXSopjolWl5OFPqrw=
+	t=1751388334; cv=none; b=lvhF9F15ibpxXWJgXXi4jxwC8sTyWEFJlt7aEoGThbWqkpr37K5oqT6fwEcPjrS/dIa9UQ2Ts+HaKkoMzXwiQOdSx3l0qbpigIFUVk922XTsS/dThB8NkiKvoAH+GDJBOwGIXaq77MHsHfzISoaomdatMzQ3bqGOTMncoEkPHzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751388332; c=relaxed/simple;
-	bh=WW0Oy/HLwiKqJEO7w3O99UJACNVQrCQ/O89R8zhmn8M=;
+	s=arc-20240116; t=1751388334; c=relaxed/simple;
+	bh=04XFkYAVsDTo05+5VTb2GZyNBXtBavyJjtbY6aD1Ra0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dQsxGlR2iM5lXjzszTSf+OwapVX8h+ygH+SXJsP04SPtFOljdonLEJcBt189SHbiTcfO7ZYBiygnpgajOmBRqiFcm9G8GQw+5XNnVBnS6WQYvWpOMu4Vz75OA78ocz98QqWuVTRl+TZBwYrr/JdRivjI6eiG/58UfIE7XqWDVmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dnu8kSMM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 883AFC4CEF1;
-	Tue,  1 Jul 2025 16:45:29 +0000 (UTC)
+	 MIME-Version; b=kyKvSAo7UpeQSHNDSG4DSgqA5rXZh2udHJXRqJgKpH2XJtjbbaOiojZ0nyfda1KWXbAYUN1PbJ6MNOmynWHbYOCDfOCUqmrO1eaWyALa4x5MivEi3XR2o3HKHNnc4yrv+5pa1ESBSdBPbolEoJ0Wn5VPG2uN59lUObNtPUTuTMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QTxyQjfz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D6D6C4CEEB;
+	Tue,  1 Jul 2025 16:45:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751388331;
-	bh=WW0Oy/HLwiKqJEO7w3O99UJACNVQrCQ/O89R8zhmn8M=;
+	s=k20201202; t=1751388334;
+	bh=04XFkYAVsDTo05+5VTb2GZyNBXtBavyJjtbY6aD1Ra0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Dnu8kSMMtJ3xfoOanUIdgAEQh2nmF0yLNOuZrcyhW+JGpIiGU7uEtEfJkOYsyEjP0
-	 +WF+m25K4ZPIH3S433be3X9J6ItMKqKZxPlY+DWpH7Vcq3o3BvIWebfi8C/3cAYAKx
-	 UlZInKiM5Z78Q4YVgEJ65zVe+GE7Daqcd+PA57XOGzwgEXGZmZyjwU+mrsoZ4svnWY
-	 S75hpaaxIy56PbIjzaIESjzryQERzI2SjuO0N0uDbocHMxUdtYbD6Atu3AwmwyH1cM
-	 g0zZj5yrbZ0vhVwrZIfDoqk26zudURykM+woIQCUlAZ2F4glkjRQqxNZ4EjXgJI0Lf
-	 j0oyZGaZf73HQ==
+	b=QTxyQjfz6Si2y+b0Yw73V9GCBZqG+bR6QGNoRuArgc6P4Zi/Kxum7A9jf2wujCJfG
+	 hb2Oial7dTUKfMuWXsxBlR7CSR9ZNvUiFpqo/cD/odY8bpKhlLPtMU9jh5dxafgC7Z
+	 s85EU6W3WLalMai341O75MckawkDXeM+vUkiSCFmmgpFX6W2ifJzEfPugBfV1HW3IF
+	 jSemwd1ybxmKroMvL5yMtb5m0qc1Y71rw4tShwSouZ67sh1rGOr1d/5auHDsH4IIt/
+	 WGu/Izgskibu5Q2CnnHSFYY2sXq899fAmX7f43R/Vide3ONx1/5kX5Dz4fKRN1AQzy
+	 nxGezQQGZafVA==
 From: Will Deacon <will@kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: Will Deacon <will@kernel.org>,
@@ -54,9 +54,9 @@ Cc: Will Deacon <will@kernel.org>,
 	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
 	netdev@vger.kernel.org,
 	virtualization@lists.linux.dev
-Subject: [PATCH v2 6/8] vhost/vsock: Allocate nonlinear SKBs for handling large receive buffers
-Date: Tue,  1 Jul 2025 17:45:05 +0100
-Message-Id: <20250701164507.14883-7-will@kernel.org>
+Subject: [PATCH v2 7/8] vsock/virtio: Rename virtio_vsock_skb_rx_put() to virtio_vsock_skb_put()
+Date: Tue,  1 Jul 2025 17:45:06 +0100
+Message-Id: <20250701164507.14883-8-will@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250701164507.14883-1-will@kernel.org>
 References: <20250701164507.14883-1-will@kernel.org>
@@ -68,119 +68,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When receiving a packet from a guest, vhost_vsock_handle_tx_kick()
-calls vhost_vsock_alloc_linear_skb() to allocate and fill an SKB with
-the receive data. Unfortunately, these are always linear allocations and
-can therefore result in significant pressure on kmalloc() considering
-that the maximum packet size (VIRTIO_VSOCK_MAX_PKT_BUF_SIZE +
-VIRTIO_VSOCK_SKB_HEADROOM) is a little over 64KiB, resulting in a 128KiB
-allocation for each packet.
+In preparation for using virtio_vsock_skb_rx_put() when populating SKBs
+on the vsock TX path, rename virtio_vsock_skb_rx_put() to
+virtio_vsock_skb_put().
 
-Rework the vsock SKB allocation so that, for sizes with page order
-greater than PAGE_ALLOC_COSTLY_ORDER, a nonlinear SKB is allocated
-instead with the packet header in the SKB and the receive data in the
-fragments. Move the VIRTIO_VSOCK_SKB_HEADROOM check out of the
-allocation function and into the single caller that needs it and add a
-debug warning if virtio_vsock_skb_rx_put() is ever called on an SKB with
-a non-zero length, as this would be destructive for the nonlinear case.
+No functional change.
 
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Will Deacon <will@kernel.org>
 ---
- drivers/vhost/vsock.c        | 11 +++++------
- include/linux/virtio_vsock.h | 32 +++++++++++++++++++++++++-------
- 2 files changed, 30 insertions(+), 13 deletions(-)
+ drivers/vhost/vsock.c            | 2 +-
+ include/linux/virtio_vsock.h     | 2 +-
+ net/vmw_vsock/virtio_transport.c | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index b13f6be452ba..f3c2ea1d0ae7 100644
+index f3c2ea1d0ae7..a6cd72a32f63 100644
 --- a/drivers/vhost/vsock.c
 +++ b/drivers/vhost/vsock.c
-@@ -344,11 +344,12 @@ vhost_vsock_alloc_skb(struct vhost_virtqueue *vq,
- 
- 	len = iov_length(vq->iov, out);
- 
--	if (len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE + VIRTIO_VSOCK_SKB_HEADROOM)
-+	if (len < VIRTIO_VSOCK_SKB_HEADROOM ||
-+	    len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE + VIRTIO_VSOCK_SKB_HEADROOM)
- 		return NULL;
- 
- 	/* len contains both payload and hdr */
--	skb = virtio_vsock_alloc_linear_skb(len, GFP_KERNEL);
-+	skb = virtio_vsock_alloc_skb(len, GFP_KERNEL);
- 	if (!skb)
- 		return NULL;
- 
-@@ -377,10 +378,8 @@ vhost_vsock_alloc_skb(struct vhost_virtqueue *vq,
- 
- 	virtio_vsock_skb_rx_put(skb);
- 
--	nbytes = copy_from_iter(skb->data, payload_len, &iov_iter);
--	if (nbytes != payload_len) {
--		vq_err(vq, "Expected %zu byte payload, got %zu bytes\n",
--		       payload_len, nbytes);
-+	if (skb_copy_datagram_from_iter(skb, 0, &iov_iter, payload_len)) {
-+		vq_err(vq, "Failed to copy %zu byte payload\n", payload_len);
- 		kfree_skb(skb);
+@@ -376,7 +376,7 @@ vhost_vsock_alloc_skb(struct vhost_virtqueue *vq,
  		return NULL;
  	}
+ 
+-	virtio_vsock_skb_rx_put(skb);
++	virtio_vsock_skb_put(skb);
+ 
+ 	if (skb_copy_datagram_from_iter(skb, 0, &iov_iter, payload_len)) {
+ 		vq_err(vq, "Failed to copy %zu byte payload\n", payload_len);
 diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
-index 6d4a933c895a..ad69668f6b91 100644
+index ad69668f6b91..ed5eab46e3dc 100644
 --- a/include/linux/virtio_vsock.h
 +++ b/include/linux/virtio_vsock.h
-@@ -51,29 +51,47 @@ static inline void virtio_vsock_skb_rx_put(struct sk_buff *skb)
+@@ -47,7 +47,7 @@ static inline void virtio_vsock_skb_clear_tap_delivered(struct sk_buff *skb)
+ 	VIRTIO_VSOCK_SKB_CB(skb)->tap_delivered = false;
+ }
+ 
+-static inline void virtio_vsock_skb_rx_put(struct sk_buff *skb)
++static inline void virtio_vsock_skb_put(struct sk_buff *skb)
  {
  	u32 len;
  
-+	DEBUG_NET_WARN_ON_ONCE(skb->len);
- 	len = le32_to_cpu(virtio_vsock_hdr(skb)->len);
--	skb_put(skb, len);
-+
-+	if (skb_is_nonlinear(skb))
-+		skb->len = len;
-+	else
-+		skb_put(skb, len);
- }
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 2959db0404ed..44751cf8dfca 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -662,7 +662,7 @@ static void virtio_transport_rx_work(struct work_struct *work)
+ 			}
  
--static inline struct sk_buff *virtio_vsock_alloc_skb(unsigned int size, gfp_t mask)
-+static inline struct sk_buff *
-+__virtio_vsock_alloc_skb_with_frags(unsigned int header_len,
-+				    unsigned int data_len,
-+				    gfp_t mask)
- {
- 	struct sk_buff *skb;
-+	int err;
+ 			if (payload_len)
+-				virtio_vsock_skb_rx_put(skb);
++				virtio_vsock_skb_put(skb);
  
--	if (size < VIRTIO_VSOCK_SKB_HEADROOM)
--		return NULL;
--
--	skb = alloc_skb(size, mask);
-+	skb = alloc_skb_with_frags(header_len, data_len,
-+				   PAGE_ALLOC_COSTLY_ORDER, &err, mask);
- 	if (!skb)
- 		return NULL;
- 
- 	skb_reserve(skb, VIRTIO_VSOCK_SKB_HEADROOM);
-+	skb->data_len = data_len;
- 	return skb;
- }
- 
- static inline struct sk_buff *
- virtio_vsock_alloc_linear_skb(unsigned int size, gfp_t mask)
- {
--	return virtio_vsock_alloc_skb(size, mask);
-+	return __virtio_vsock_alloc_skb_with_frags(size, 0, mask);
-+}
-+
-+static inline struct sk_buff *virtio_vsock_alloc_skb(unsigned int size, gfp_t mask)
-+{
-+	if (size <= SKB_WITH_OVERHEAD(PAGE_SIZE << PAGE_ALLOC_COSTLY_ORDER))
-+		return virtio_vsock_alloc_linear_skb(size, mask);
-+
-+	size -= VIRTIO_VSOCK_SKB_HEADROOM;
-+	return __virtio_vsock_alloc_skb_with_frags(VIRTIO_VSOCK_SKB_HEADROOM,
-+						   size, mask);
- }
- 
- static inline void
+ 			virtio_transport_deliver_tap_pkt(skb);
+ 			virtio_transport_recv_pkt(&virtio_transport, skb);
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
