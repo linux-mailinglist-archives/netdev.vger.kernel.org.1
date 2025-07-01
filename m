@@ -1,117 +1,114 @@
-Return-Path: <netdev+bounces-203059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1D82AF06F9
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 01:31:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8694EAF06FC
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 01:39:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0576E1C04870
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 23:31:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 475F04E01D2
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 23:39:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F7162459DD;
-	Tue,  1 Jul 2025 23:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1929F26E701;
+	Tue,  1 Jul 2025 23:39:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pc5qO9Bq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AIJwu/i5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75CC34CF5;
-	Tue,  1 Jul 2025 23:30:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC37226D14
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 23:39:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751412656; cv=none; b=oN6MhnjJ5GAo5j2i0lqHXlrjx7cU4v8NlFEsh+4P3ub4Rr9ZL2hLrl/zDNQxBWTHlSWilJOVYzHifBk0/Ak+LGa+MAdBNe0DIzdievKvbzlYPtXsfTYoLzT99esxIPBwr9NHwjEKgZ5DYp8jTj7DF3bNaTMY3CxmiQ13+dMRyF4=
+	t=1751413167; cv=none; b=Dh2QTXjrCJC3/KUQwei6VR8OOH5EKuQ3JtqLpsVfLZkyu6r79qdAHbkOH51rN6V3s5Srm/IHqQSiqZK5vbcHpUz0LGjRdPjrb2O/R1LVid72YVxTTCgTem1dqmn54xeQ7nYcqV7EKrCEZthk3s4pUNcsqjzI1SscdbHBGMSWraM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751412656; c=relaxed/simple;
-	bh=TY30PNu4AlL/QLy4cmWva9DbUS7ZxnqGZwrQEcvuy6M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dhA+QRWk8d6nAc9AHliZvcGSSWEALq6ElXniLAA6qIqJkO2tbiKs08H4gsOZbQkyBEM3+90nW2KlQtNxlgw9Pkx/OO81oazhhQ+C5roqJUcJ1P2vlO2iqRVc1k0pHDE4HAqSm+w7+/sVu3izkmpkIwWIvUNDsLx/zuhF/Ka750U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pc5qO9Bq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A29CC4CEEB;
-	Tue,  1 Jul 2025 23:30:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751412655;
-	bh=TY30PNu4AlL/QLy4cmWva9DbUS7ZxnqGZwrQEcvuy6M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pc5qO9BqzG7/Kr+h7c5Gt2NgW8DtB+3JlU8uIqcgj3aZjF/9YZYuoTLW+Wn3GeqTi
-	 QAkiC9pwMjszkg7hy2wT5X+TEE2Kz5zDg7ztLbodjujEcS+UQAAIR3b/uD4SKJDhWr
-	 8+wKtimjbiZ9Ch3izTjsbEivm7fTnd4bY6AlTrbbF3ntAIoVAswlS8v6N/UitLq9nj
-	 NRMcrsG7WNPQUIo1NmQuSSyJDmrz4yNMxQgyJSSbUJUqWyexwmi1IZQXVYRUui1WOf
-	 sPsG7XG5cEAuTvjthlzDSz8sWhPJJfFhcVHT/Um57Io2XUlql7PCSAdTw4iHewc5I1
-	 F1efeHT6+IoMQ==
-Date: Tue, 1 Jul 2025 16:30:53 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
-Cc: "alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>,
- "pctammela@mojatatu.com" <pctammela@mojatatu.com>, "horms@kernel.org"
- <horms@kernel.org>, "donald.hunter@gmail.com" <donald.hunter@gmail.com>,
- "xandfury@gmail.com" <xandfury@gmail.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "dave.taht@gmail.com" <dave.taht@gmail.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "jhs@mojatatu.com"
- <jhs@mojatatu.com>, "stephen@networkplumber.org"
- <stephen@networkplumber.org>, "xiyou.wangcong@gmail.com"
- <xiyou.wangcong@gmail.com>, "jiri@resnulli.us" <jiri@resnulli.us>,
- "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
- <edumazet@google.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "ast@fiberby.net" <ast@fiberby.net>, "liuhangbin@gmail.com"
- <liuhangbin@gmail.com>, "shuah@kernel.org" <shuah@kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "ij@kernel.org" <ij@kernel.org>, "ncardwell@google.com"
- <ncardwell@google.com>, "Koen De Schepper (Nokia)"
- <koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
- <g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
- <ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
- <mirja.kuehlewind@ericsson.com>, "cheshire@apple.com" <cheshire@apple.com>,
- "rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
- <Jason_Livingood@comcast.com>, "vidhi_goel@apple.com"
- <vidhi_goel@apple.com>
-Subject: Re: [PATCH v20 net-next 1/6] sched: Struct definition and parsing
- of dualpi2 qdisc
-Message-ID: <20250701163053.22113645@kernel.org>
-In-Reply-To: <PAXPR07MB798432A7A8B078F2619EB8F8A341A@PAXPR07MB7984.eurprd07.prod.outlook.com>
-References: <20250621193331.16421-1-chia-yu.chang@nokia-bell-labs.com>
-	<20250621193331.16421-2-chia-yu.chang@nokia-bell-labs.com>
-	<20250627162502.0a82accf@kernel.org>
-	<PAXPR07MB79849FDC079A2ECB144D75D1A347A@PAXPR07MB7984.eurprd07.prod.outlook.com>
-	<20250630081349.4c9d7976@kernel.org>
-	<PAXPR07MB7984F85A786D9B35898ECEBDA346A@PAXPR07MB7984.eurprd07.prod.outlook.com>
-	<20250630092316.031b29d8@kernel.org>
-	<PAXPR07MB798410A4142386C43B2E0B1DA346A@PAXPR07MB7984.eurprd07.prod.outlook.com>
-	<20250630164309.724b9ba1@kernel.org>
-	<PAXPR07MB798432A7A8B078F2619EB8F8A341A@PAXPR07MB7984.eurprd07.prod.outlook.com>
+	s=arc-20240116; t=1751413167; c=relaxed/simple;
+	bh=yYf9EOICqZsl+xCkOeF5qUltMH5rv9OAeeVhXj8Ajd4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YFnZG7dsQMbMzf5il9fMMYho8jPyBGlVKLRPOtTiT652D5VGtps3ioDJ2C53QYsCrKC/jquGe06nyxq/BMYsSYeEUsMrCxiUJ/322OUR3RkCnZx2CFiuIaN+hqn57Pbrug0fB4dHiySSXmrCdFDE2AJMB6igudaCxCKYqe7P2X0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AIJwu/i5; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751413164; x=1782949164;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=yYf9EOICqZsl+xCkOeF5qUltMH5rv9OAeeVhXj8Ajd4=;
+  b=AIJwu/i5quJUJsF0S6hj0Cm/MyDaI5Ayq4wCSxAqR9NmcfhHi0RbHTYw
+   j4CJi056056f4pbPOKhCbvSD4xIdz0trgo9iHcFKakA2GPQZNGy8Rj3F6
+   w7prw5Vu+AvSBVd7+za0Xuh+GuAveVFjm19jkQM7BqFPz3JRVCV/RgA+N
+   kHMzS4OU0J9Ijp6BPGVtfYPFzGxWYq3B3VX0xBii3bOyDqSWLv3HAHQ1d
+   FqDczQPG0pwjRoNLcRbRRTsEHgLnNw2ab/sPU62BlIIBGPeL34Zv4M80Z
+   D47LKaGtK2S7Ohbgd6p43c9FMZspWrtIsacxjd82gbfNizqLoWSTvHdjb
+   w==;
+X-CSE-ConnectionGUID: 27fiC20OS0u4PgTFZKnVsw==
+X-CSE-MsgGUID: aMa39cxXRCWWZkmOdTJG7Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11481"; a="64744818"
+X-IronPort-AV: E=Sophos;i="6.16,280,1744095600"; 
+   d="scan'208";a="64744818"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2025 16:39:22 -0700
+X-CSE-ConnectionGUID: ciClxTy/RtaiPxv8HpaACw==
+X-CSE-MsgGUID: lAVSRqjxQZupZ8SU76PVeA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,280,1744095600"; 
+   d="scan'208";a="153374470"
+Received: from lkp-server01.sh.intel.com (HELO e8142ee1dce2) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 01 Jul 2025 16:39:22 -0700
+Received: from kbuild by e8142ee1dce2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uWkZL-000amY-1Q;
+	Tue, 01 Jul 2025 23:39:19 +0000
+Date: Wed, 2 Jul 2025 07:39:17 +0800
+From: kernel test robot <lkp@intel.com>
+To: Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	intel-wired-lan@lists.osuosl.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	Przemyslaw Korba <przemyslaw.korba@intel.com>,
+	Milena Olech <milena.olech@intel.com>,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>
+Subject: Re: [PATCH v3 iwl-next] ice: add recovery clock and clock 1588
+ control for E825c
+Message-ID: <202507020615.CBjCysqA-lkp@intel.com>
+References: <20250701152244.366226-1-grzegorz.nitka@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250701152244.366226-1-grzegorz.nitka@intel.com>
 
-On Tue, 1 Jul 2025 05:41:53 +0000 Chia-Yu Chang (Nokia) wrote:
-> > > I don't see we access the same atomic variable multiple times in a 
-> > > single expression, the 2 WRITE_ONCE() are in different expressions.
-> > >
-> > > And, in the last WRITE_ONCE(), what we access are local variables:
-> > > "step_pkt" "step_th", will it create problem?  
-> > 
-> > Not really a problem, but what I'm saying is that I don't understand why all the writes are sprinkled with WRITE_ONCE(). You take
-> > 
-> >         sch_tree_lock(sch);
-> > 
-> > to block data path and the control path is under rtnl_lock. So why the WRITE_ONCE()? WRITE_ONCE() is used to annotate writes which can be read concurrently without holding relevant locks.  
-> 
-> This follows series https://lore.kernel.org/netdev/20240415132054.3822230-1-edumazet@google.com/ to use READ_ONCE in dual2_dump() and WRITE_ONCE in dualpi2_change.
-> 
-> And because of one previous chnage request (https://lore.kernel.org/all/26f2f366-aa14-4879-978a-58d46f9d83a4@redhat.com/) to split single dualpi2.c into 3 patches, so you can find them in the 2nd patch of this series.
-> 
-> What I can do is either move these WRITE_ONCE also to the next patch or merge these patches.
-> 
-> I would prefer the first approach to make it still 3 patches, any other suggestion?
+Hi Grzegorz,
 
-I see. With the change to use two separate fields for packets and time 
-I think this should be fine. We will hopefully report one or the other,
-but not one misinterpreted as the other.
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on 7d0ed75968573290cf921ae6f6ee0e985d8beab9]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Grzegorz-Nitka/ice-add-recovery-clock-and-clock-1588-control-for-E825c/20250701-232553
+base:   7d0ed75968573290cf921ae6f6ee0e985d8beab9
+patch link:    https://lore.kernel.org/r/20250701152244.366226-1-grzegorz.nitka%40intel.com
+patch subject: [PATCH v3 iwl-next] ice: add recovery clock and clock 1588 control for E825c
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20250702/202507020615.CBjCysqA-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 15.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250702/202507020615.CBjCysqA-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507020615.CBjCysqA-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> Warning: drivers/net/ethernet/intel/ice/ice_dpll.c:2115 Excess function parameter 'divider' description in 'ice_dpll_cfg_synce_ethdiv_e825c'
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
