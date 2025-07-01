@@ -1,60 +1,58 @@
-Return-Path: <netdev+bounces-202896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34D92AEF961
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 14:56:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 470FFAEF971
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 14:58:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE2EE178F85
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:56:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 568631884294
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C52CC2741A0;
-	Tue,  1 Jul 2025 12:56:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="1aI2r3+e"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55341274657;
+	Tue,  1 Jul 2025 12:58:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9562F25B301;
-	Tue,  1 Jul 2025 12:56:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AAC32741DA;
+	Tue,  1 Jul 2025 12:58:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751374577; cv=none; b=ja8RTEqB7QcheZthZnUhhTCeuECZq5m5UxlZ4/EbVBvgNdofW45FNmA3WQoD7dPhBrRvwRaEt/XeTe1m8i6xNFCIg8CwnHKUUoPE4ZfHzEr2lMbTeiuL0cbRyLwryzwsMfc/rEJl3wZYzbkjYEsi1HNFgk0EbqDU5SM+hYh/IBA=
+	t=1751374704; cv=none; b=CzMs35NdrNJ3Bl4a1IKSijL1juBxcI1UyIj4m++80wRzjqyNC8mQumlk/uqM218qtsYQA1dH/nD+zNa+CGi6bk6TYlPjVUwTzcIpyhGgxMZ1RzaatTc2J45CvfBSd5HMnQjuGs3M19Ssk38dcktvTv+ZZhNL2yDHN00Mz0iJXUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751374577; c=relaxed/simple;
-	bh=s0tZBS8Wvibesn5JPiCnaxtrVXPMb1Ijnjksqr8QASI=;
+	s=arc-20240116; t=1751374704; c=relaxed/simple;
+	bh=uU7hVrkEHJIapRUtdI+BFAxixg3nluKlyKz9/mybDgg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DOESyv34UYAOm1MiJfEf8+gjAybYBqYOt3IuCdhsVgmoiz3pl2C+W76gmN9P2bi/Xd38TIEtWNugnnjj5FrcAY9jV6+p4Ks1N8fRh4zjFOdr19fy8mdRuybh3eMOh7QhKB2xJGz1HLMfnLP0qi1XyN/AMKLzugmk0qUUK8RnA9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=1aI2r3+e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C03DCC4CEEB;
-	Tue,  1 Jul 2025 12:56:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1751374577;
-	bh=s0tZBS8Wvibesn5JPiCnaxtrVXPMb1Ijnjksqr8QASI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=1aI2r3+e8OpzwbjoJonbdisURE4LfHxOoeSl6h+EJiKPt17aHCtkG9wYWUjzEvCBi
-	 Q2E12BpT2NlF/FDMmFEQw2yr6G4MKYV7Dua/hmA2lz7Zerz8sjoy2wgXio5pzifunH
-	 KBkk6veQSbclCaxDEqYKp24kLcNpNoVqYzdKk3Rc=
-Date: Tue, 1 Jul 2025 14:56:14 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	HarshaVardhana S A <harshavardhana.sa@broadcom.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=JjkMgHRRlrd+1vgyLB0QgQZD/SVAv+IbQb2IRTDc0InhdGBvAys5ndE3oey9AI1tFoXl3NPpL2Z84CvTkyJmljn2REZbUPu3nwKw+OH46a2Edj/9D1wp2ps4FC/cZFVhN52x9k7A6ACqwO4wlls4S/bH5/K3kG6efVRSpf0ywEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout2.hostsharing.net (Postfix) with ESMTPS id A80192009187;
+	Tue,  1 Jul 2025 14:58:19 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 9EE25316325; Tue,  1 Jul 2025 14:58:19 +0200 (CEST)
+Date: Tue, 1 Jul 2025 14:58:19 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, virtualization@lists.linux.dev,
-	stable <stable@kernel.org>
-Subject: Re: [PATCH net] vsock/vmci: Clear the vmci transport packet properly
- when initializing it
-Message-ID: <2025070144-brussels-revisit-9aa3@gregkh>
-References: <20250701122254.2397440-1-gregkh@linuxfoundation.org>
- <37t6cnaqt2g7dyl6lauf7tccm5yzpv3dvxbngv7f7omiah35rr@nl35itdnhuda>
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	Andre Edich <andre.edich@microchip.com>
+Subject: Re: [PATCH net v1 4/4] net: phy: smsc: Disable IRQ support to
+ prevent link state corruption
+Message-ID: <aGPba6fX1bqgVfYC@wunner.de>
+References: <20250701122146.35579-1-o.rempel@pengutronix.de>
+ <20250701122146.35579-5-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,28 +61,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <37t6cnaqt2g7dyl6lauf7tccm5yzpv3dvxbngv7f7omiah35rr@nl35itdnhuda>
+In-Reply-To: <20250701122146.35579-5-o.rempel@pengutronix.de>
 
-On Tue, Jul 01, 2025 at 02:42:10PM +0200, Stefano Garzarella wrote:
-> On Tue, Jul 01, 2025 at 02:22:54PM +0200, Greg Kroah-Hartman wrote:
-> > From: HarshaVardhana S A <harshavardhana.sa@broadcom.com>
-> > 
-> > In vmci_transport_packet_init memset the vmci_transport_packet before
-> > populating the fields to avoid any uninitialised data being left in the
-> > structure.
+On Tue, Jul 01, 2025 at 02:21:46PM +0200, Oleksij Rempel wrote:
+> Disable interrupt handling for the LAN87xx PHY to prevent the network
+> interface from entering a corrupted state after rapid configuration
+> changes.
 > 
-> Usually I would suggest inserting a Fixes tag, but if you didn't put it,
-> there's probably a reason :-)
-> 
-> If we are going to add it, I think it should be:
-> 
-> Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
+> When the link configuration is changed quickly, the PHY can get stuck in
+> a non-functional state. In this state, 'ethtool' reports that a link is
+> present, but 'ip link' shows NO-CARRIER, and the interface is unable to
+> transfer data.
+[...]
+> --- a/drivers/net/phy/smsc.c
+> +++ b/drivers/net/phy/smsc.c
+> @@ -746,10 +746,6 @@ static struct phy_driver smsc_phy_driver[] = {
+>  	.soft_reset	= smsc_phy_reset,
+>  	.config_aneg	= lan87xx_config_aneg,
+>  
+> -	/* IRQ related */
+> -	.config_intr	= smsc_phy_config_intr,
+> -	.handle_interrupt = smsc_phy_handle_interrupt,
+> -
 
-Yeah, I didn't think it was needed as this is obviously a "ever since
-this file has been there" type of thing, so it will be backported
-everywhere once it hits Linus's tree.
+Well, that's not good.  I guess this means that the interrupt is
+polled again, so we basically go back to the suboptimal behavior
+prior to 1ce8b37241ed?
 
-thanks,
+Without support for interrupt handling, we can't take advantage
+of the GPIOs on the chip for interrupt generation.  Nor can we
+properly support runtime PM if no cable is attached.
 
-greg k-h
+What's the actual root cause?  Is it the issue described in this
+paragraph of 1ce8b37241ed's commit message?
+
+    Normally the PHY interrupt should be masked until the PHY driver has
+    cleared it.  However masking requires a (sleeping) USB transaction and
+    interrupts are received in (non-sleepable) softirq context.  I decided
+    not to mask the interrupt at all (by using the dummy_irq_chip's noop
+    ->irq_mask() callback):  The USB interrupt endpoint is polled in 1 msec
+    intervals and normally that's sufficient to wake the PHY driver's IRQ
+    thread and have it clear the interrupt.  If it does take longer, worst
+    thing that can happen is the IRQ thread is woken again.  No big deal.
+
+There must be better options than going back to polling.
+E.g. inserting delays to avoid the PHY getting wedged.
+
+TBH I did test this thoroughly back in the day and never
+witnessed the issue.
+
+Thanks,
+
+Lukas
 
