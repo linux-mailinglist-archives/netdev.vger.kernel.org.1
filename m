@@ -1,101 +1,97 @@
-Return-Path: <netdev+bounces-202842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFD19AEF52E
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:34:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AFA7AEF53F
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:37:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33D0E17F8C4
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 10:34:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87EFC7A3AAA
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 10:36:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F39246BC5;
-	Tue,  1 Jul 2025 10:34:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA12F26F477;
+	Tue,  1 Jul 2025 10:37:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bywyXmmP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bg3kZWqr"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B2D26D4D4
-	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 10:34:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9092356C6
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 10:37:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751366081; cv=none; b=Kdc/zwpVnL1qKEpr1oCwIA0C41Hhxu8RqDBVwHs260+52utaTUeLMHUemKpln5zKxhOW62eEHyI/TtmkXG4sDlPL1WmGaQiFTBD8L6aBOTt5WLvl1bQUd0CaC+4aRMvafsi8ingJZ2jB/e8Q9jx3CfUYt90LbhP1O6OjLWDHXgA=
+	t=1751366252; cv=none; b=TJOxlNLouNHcX7fx9WniBShPyo7vLcRR08LWjsXA1AxncUPgmBucELFnFr0WwY26CS0yhN1PYdPdHmmXUHUltxLTCGaCgwzov7kKGPgMN56DuZiNyZUpkXpXCIExIggMn84iuUAk+ij9Jg+VASDKrG85vEAiz+Od63vC2VopVns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751366081; c=relaxed/simple;
-	bh=Mb60PZKCxPrLuQXD+nGMXcS0bI1nvcxKixTXpIJ6UOs=;
+	s=arc-20240116; t=1751366252; c=relaxed/simple;
+	bh=heXSovKMp8WMZ4/NmKFQEomaA05X7Vw0t+hCl43nhvk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sV4iwG28m4ZOUycXnQaTKZNYobAftP/0CdTMosX4NVLIk1UfPNHUZjVbw3p6aCLBcdheqs5msilPag+FUHWDexZxC6p5jaS4IpiXZXvlH82VDnXymjBUxJsM/nUZJCJQ20ChvSBmEXQCUX0KIDODI0wlstkfQt/6oFZCRpRkwh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bywyXmmP; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=FBttfq2HYxoG+GpkgXQ25XhyJwj+12wJtkp3eW4SWl2T6Nk8SxVKjMfDB7X+Bj9XsFfprQZkEAnc3t1ct3AEdt/NJFR38PXXLGKcB/7W1AD5M9PCaezIZ8RsRtaHs2oW6UfZYbhRFK6yD59hyXZZx0LUvzDiEl6ASMtGQiCwqDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bg3kZWqr; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751366078;
+	s=mimecast20190719; t=1751366249;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UpDQ5tS+XCWfCgRZS/6IKZjsLJANA+xHzrICS0TndYM=;
-	b=bywyXmmPGd8Jf/bYt0iPnYnVXau8opLr4ddAWQCCeh/SMpHESF2PiQmb7Mz25J6i5g8qX1
-	4ehbvZTflV3O1Ht3wjPaZRjyAwlivqfh+gJCZCcy1Kl5KkNt0Frj5YZNvwP5QY/lf1QSfj
-	mLtU70HsrjJCsb2MmADunIhMFol//nQ=
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
- [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=n2ir46AUDqqNyeG2en8npeW9OEH0djU5Wi0RBd8xUlA=;
+	b=Bg3kZWqrGMOkDohS2MVzZHxtsKyyqExL6zEhzvzELiCI+wUmUWsRqFqVGGG9lWMdm1Si6S
+	Vqzb+N7/MuVWfBe5WTyimxIoMkzW7O0tHflqmj265QfhOVnr4SPOCs3gZqeSjcfCKlub6k
+	yPC8ARjVy5+OzjPJLWTogNak1AmTeQA=
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
+ [209.85.161.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-381-S_HIhRZ8N7S4sYjQfUPJEA-1; Tue, 01 Jul 2025 06:34:36 -0400
-X-MC-Unique: S_HIhRZ8N7S4sYjQfUPJEA-1
-X-Mimecast-MFC-AGG-ID: S_HIhRZ8N7S4sYjQfUPJEA_1751366076
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-61198604baeso4074349eaf.1
-        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 03:34:36 -0700 (PDT)
+ us-mta-151-r5XpKKadMQCBPFnFJjpEFg-1; Tue, 01 Jul 2025 06:37:28 -0400
+X-MC-Unique: r5XpKKadMQCBPFnFJjpEFg-1
+X-Mimecast-MFC-AGG-ID: r5XpKKadMQCBPFnFJjpEFg_1751366248
+Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-60d60b8ef64so2348089eaf.3
+        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 03:37:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751366076; x=1751970876;
+        d=1e100.net; s=20230601; t=1751366248; x=1751971048;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UpDQ5tS+XCWfCgRZS/6IKZjsLJANA+xHzrICS0TndYM=;
-        b=Q0jClfOy4mCaoCryMDJB3mwwuQ4WZvFMJhJAouDJ76nnJ3DGWFrokLBO1yXkja4Ynd
-         4RvjPbwo3bYVEkOInyT+qszmn9/TMi0RE/irOpPody639SBXlLw/fOc+xMlsivn/vsg3
-         c5xGIc1k/whB21Ce+xPKz19Vbr3Cblxl3MUZC4cZJbL+uz8QJSSUX+YyAAKQqOW13XrG
-         9yKhgdPWpdIFyTySCNYfOddYcTSYF7kiBF3RGmtM/9RIul55wbWaul4vSRu9Lj7ZGBhX
-         PygFlcZaf6/LNM3ZrnWFzWV+MKU++DdmmOaGInBLe3Dz4m1iH4c+LBZvQRufyeVzO5zj
-         sBRw==
-X-Forwarded-Encrypted: i=1; AJvYcCXQW5s9afdDXOby0XbdtcjmZRnstRkuR0TiCFwPTbclfoR5pj+Vg+qewUyf0TULuEwbAfDuq2w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIlI4kIQIVOmwSr734tvGBbevbTAqD9/O9T9qBUi8in6t/UMzw
-	t7Bl7zDND8LoYnOgczoX6KIv4RSDLFZKiDNTFrmZP6YOz/SQNo+m9fBXsmDk+Ec7TTrpAw/7OXk
-	V9BmkJKXaIaAGx5r6D0mfg9K7k6lOKqhAEkZbEuD2Cd+lB1tqavm7Snw/dA==
-X-Gm-Gg: ASbGncuCGpZLjNzsLezz93+ycm13JaeIX4qh482dKOVE2tbyfjwfLWPBa/0u3y46cHC
-	9wqNUxBf4ZaT4jJSH76z3yXHDnAvs+Cu4/c+lUms/Ns/r1dscImUiIa98paxxroNsGaMZZn+R2s
-	gYSaVfAcBvQE9/KTgE74/YYGM6amxFWfoCCQzcxslMpkpfvhH/UP1p4NE9lVSlTB1e70f8i3L2y
-	/6uIJr20Csg3Djy32sC8UdTN+3y1yqvz+LLbLDu0O20oZiI/38QJvUJAvB8JZPHg0z+PYIRrwYg
-	zuWaOzxl+02+zRs6x6za7pE1uHIY
-X-Received: by 2002:a05:6820:994:b0:611:aabf:2b7d with SMTP id 006d021491bc7-611b91b8ba5mr12929316eaf.7.1751366075927;
-        Tue, 01 Jul 2025 03:34:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEvOyh3XEeOqocDMGLPkqu+zdtIY+/LP4pPv1rkoavjsw1qeTINbjxyfJNBqMBK5Rn7C+6dEQ==
-X-Received: by 2002:a05:6820:994:b0:611:aabf:2b7d with SMTP id 006d021491bc7-611b91b8ba5mr12929286eaf.7.1751366075453;
-        Tue, 01 Jul 2025 03:34:35 -0700 (PDT)
+        bh=n2ir46AUDqqNyeG2en8npeW9OEH0djU5Wi0RBd8xUlA=;
+        b=hiPOYSPCbAnisakAiLBCUi1Ib/Td+tOui1+ojDgne8GQjI5YhYni2pXu0t/PuHe0ZQ
+         Ef4V2KyqJSO11r/WMYke+2AR9mlavmcxeIEpmSxhS9C/bXgPoWq82ZLI9ZO4dFPKvyPp
+         5nXqBEzLs0LNVhCV5C4bTua1GsImpEhqL0KhtS7pRREGY1NahQZ3ANmjcQagtriXUzoV
+         ZDc038hFGExFW/XPCPwFHAassImVTR+LkG9DMrw+jQLz8YlHl1rq2kHK4rW/ulkNtaw2
+         Rdey8UBZ/fzJvTaws+T/I3jVlfUFkfmqMTty+zntjNSooiOUb1Tcwa9z4lGSV+qvBBjR
+         cXtA==
+X-Forwarded-Encrypted: i=1; AJvYcCXUxAo09WFIwmbQd1OpLGN3WUqQDcnLaRLh2DxjT2bp8XwMED/1BLRfwlBwd4zeGGfAGhKhWKY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCdxMMP3hDZiHYwb+33GF/Ay3n1ytRjPPCQbTju8LyrDDgHc4C
+	uiIY2+xLlgeV65txwOIOAdVe1lXPfEyckrwHZhBd0Vl9OZTmidGE0jQTyiEdrF9zR6uR+U9/4Gi
+	adcjuCLPjKViNwCBbdS/4zfnCZ9gQxYqTDtD3AxDGl7b/VZ6g3ANtGgpTqQ==
+X-Gm-Gg: ASbGncvUwtkJtau52Ng7igubCXEPpigQwCz+M9vgdRZX309ICklonFcPlKsAjMcEhxJ
+	pBuxP+vIzyBVlCIGXX6lYrayqD3vGwAZKMsLphkemnZbHjUzqkaSRm3RvlANvVv3Htg0H+E9Ud/
+	Z7urUb682TcleRkp/MhLQHzMF14LMdz4ksWrUAiTZSHER+ddHZsz1v9mZfYNZ2oBusLWmOdDDzo
+	15pZIXTSobFEwsObG+WLFNNSPnuvxzbCY4upJN6IuGRFljeVnLx9d6SC2j3XNUv6FIc28afOWTK
+	DVpwY/NZOCeEc3w2IaMztpedmeKh
+X-Received: by 2002:a05:6830:4d87:b0:731:cac7:364e with SMTP id 46e09a7af769-73afc63c25dmr9915275a34.22.1751366247250;
+        Tue, 01 Jul 2025 03:37:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHyVKJMDrLHZZIEx6Kk38/Nas6gM9Ud+smX4Ebygc9Zz6lBqLLrkX5YBPiqMFvYh1w2+bHAbw==
+X-Received: by 2002:a05:6830:4d87:b0:731:cac7:364e with SMTP id 46e09a7af769-73afc63c25dmr9915263a34.22.1751366246892;
+        Tue, 01 Jul 2025 03:37:26 -0700 (PDT)
 Received: from sgarzare-redhat ([193.207.144.202])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-611b8474da2sm1366811eaf.6.2025.07.01.03.34.31
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-73afb107871sm2055408a34.58.2025.07.01.03.37.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jul 2025 03:34:35 -0700 (PDT)
-Date: Tue, 1 Jul 2025 12:34:23 +0200
+        Tue, 01 Jul 2025 03:37:26 -0700 (PDT)
+Date: Tue, 1 Jul 2025 12:37:13 +0200
 From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net v2 1/3] vsock: Fix transport_{g2h,h2g} TOCTOU
-Message-ID: <fruzxj3ju4nmm3uipuqq3gcn3jh5et4qpnldzsdahfdcachtyl@o3k7lo2gxzyb>
-References: <20250620-vsock-transports-toctou-v2-0-02ebd20b1d03@rbox.co>
- <20250620-vsock-transports-toctou-v2-1-02ebd20b1d03@rbox.co>
- <zdiqu6pszqwb4y5o7oqzdovfvzkbrvc6ijuxoef2iloklahyoy@njsnvn7hfwye>
- <d8d4edb2-bf14-42b2-8592-79d7b014e1a7@rbox.co>
- <owafhdinyjdnol4zwpcdqsz26nfndawl53wnosdhhgmfz6t25n@2dualdqgpq3q>
- <e97b5cae-f6ef-4221-98e1-6efd7fdc6676@rbox.co>
- <4vsrtxs3uttx6w2zyk6rxescpwvrikypiw6tvjheplht6yzonc@ch6k3xlftikw>
- <c39f22fd-9ede-4cdd-956b-29856e9db20a@rbox.co>
+To: Will Deacon <will@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Keir Fraser <keirf@google.com>, 
+	Steven Moreland <smoreland@google.com>, Frederick Mayle <fmayle@google.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	netdev@vger.kernel.org, virtualization@lists.linux.dev
+Subject: Re: [PATCH 1/5] vhost/vsock: Avoid allocating arbitrarily-sized SKBs
+Message-ID: <njwfflmq7swifmc5gwbovtju4bg2zg4cibpichtjhlkqkprvtb@5r5giy2irbzd>
+References: <20250625131543.5155-1-will@kernel.org>
+ <20250625131543.5155-2-will@kernel.org>
+ <7byn5byoqlpcebhahnkpln3o2w2es2ae3jpzocffkni3mfhcd5@b5hfo66jn64o>
+ <aGKIO8yqBSxXZrE2@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,96 +100,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <c39f22fd-9ede-4cdd-956b-29856e9db20a@rbox.co>
+In-Reply-To: <aGKIO8yqBSxXZrE2@willie-the-truck>
 
-On Mon, Jun 30, 2025 at 01:02:26PM +0200, Michal Luczaj wrote:
->On 6/30/25 11:05, Stefano Garzarella wrote:
->> On Sun, Jun 29, 2025 at 11:26:12PM +0200, Michal Luczaj wrote:
->>> On 6/27/25 10:02, Stefano Garzarella wrote:
->>>> On Wed, Jun 25, 2025 at 11:23:30PM +0200, Michal Luczaj wrote:
->>>>> On 6/25/25 10:43, Stefano Garzarella wrote:
->>>>>> On Fri, Jun 20, 2025 at 09:52:43PM +0200, Michal Luczaj wrote:
->>>>>>> vsock_find_cid() and vsock_dev_do_ioctl() may race with module unload.
->>>>>>> transport_{g2h,h2g} may become NULL after the NULL check.
->>>>>>>
->>>>>>> Introduce vsock_transport_local_cid() to protect from a potential
->>>>>>> null-ptr-deref.
->>>>>>>
->>>>>>> KASAN: null-ptr-deref in range [0x0000000000000118-0x000000000000011f]
->>>>>>> RIP: 0010:vsock_find_cid+0x47/0x90
->>>>>>> Call Trace:
->>>>>>> __vsock_bind+0x4b2/0x720
->>>>>>> vsock_bind+0x90/0xe0
->>>>>>> __sys_bind+0x14d/0x1e0
->>>>>>> __x64_sys_bind+0x6e/0xc0
->>>>>>> do_syscall_64+0x92/0x1c0
->>>>>>> entry_SYSCALL_64_after_hwframe+0x4b/0x53
->>>>>>>
->>>>>>> KASAN: null-ptr-deref in range [0x0000000000000118-0x000000000000011f]
->>>>>>> RIP: 0010:vsock_dev_do_ioctl.isra.0+0x58/0xf0
->>>>>>> Call Trace:
->>>>>>> __x64_sys_ioctl+0x12d/0x190
->>>>>>> do_syscall_64+0x92/0x1c0
->>>>>>> entry_SYSCALL_64_after_hwframe+0x4b/0x53
->>>>>>>
->>>>>>> Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
->>>>>>> Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
->>>>>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->...
->>> Oh, and come to think of it, we don't really need that (easily contended?)
->>> mutex here. Same can be done with RCU. Which should speed up vsock_bind()
->>> -> __vsock_bind() -> vsock_find_cid(), right? This is what I mean, roughly:
->>>
->>> +static u32 vsock_registered_transport_cid(const struct vsock_transport
->>> __rcu **trans_ptr)
->>> +{
->>> +	const struct vsock_transport *transport;
->>> +	u32 cid = VMADDR_CID_ANY;
->>> +
->>> +	rcu_read_lock();
->>> +	transport = rcu_dereference(*trans_ptr);
->>> +	if (transport)
->>> +		cid = transport->get_local_cid();
->>> +	rcu_read_unlock();
->>> +
->>> +	return cid;
->>> +}
->>> ...
->>> @@ -2713,6 +2726,7 @@ void vsock_core_unregister(const struct
->>> vsock_transport *t)
->>> 		transport_local = NULL;
->>>
->>> 	mutex_unlock(&vsock_register_mutex);
->>> +	synchronize_rcu();
->>> }
->>>
->>> I've realized I'm throwing multiple unrelated ideas/questions, so let me
->>> summarise:
->>> 1. Hackish macro can be used to guard against calling
->>> vsock_registered_transport_cid() on a non-static variable.
->>> 2. We can comment the function to add some context and avoid confusion.
+On Mon, Jun 30, 2025 at 01:51:07PM +0100, Will Deacon wrote:
+>On Fri, Jun 27, 2025 at 12:36:46PM +0200, Stefano Garzarella wrote:
+>> On Wed, Jun 25, 2025 at 02:15:39PM +0100, Will Deacon wrote:
+>> > vhost_vsock_alloc_skb() returns NULL for packets advertising a length
+>> > larger than VIRTIO_VSOCK_MAX_PKT_BUF_SIZE in the packet header. However,
+>> > this is only checked once the SKB has been allocated and, if the length
+>> > in the packet header is zero, the SKB may not be freed immediately.
+>> >
+>> > Hoist the size check before the SKB allocation so that an iovec larger
+>> > than VIRTIO_VSOCK_MAX_PKT_BUF_SIZE + the header size is rejected
+>> > outright. The subsequent check on the length field in the header can
+>> > then simply check that the allocated SKB is indeed large enough to hold
+>> > the packet.
 >>
->> I'd go with 2.
+>> LGTM, but should we consider this as stable material adding a Fixes tag?
 >
->All right, will do.
->
->>> 3. Instead of taking mutex in vsock_registered_transport_cid() we can use RCU.
->>
->> Since the vsock_bind() is not in the hot path, maybe a mutex is fine.
->> WDYT?
->
->I wrote a benchmark that attempts (and fails due to a non-existing CID) to
->bind() 100s of vsocks in multiple threads. `perf lock con` shows that this
->mutex is contended, and things are slowed down by 100+% compared with RCU
->approach. Which makes sense: every explicit vsock bind() across the whole
->system would need to acquire the mutex. And now we're also taking the same
->mutex in vsock_assign_transport(), i.e. during connect(). But maybe such
->stress testing is just unrealistic, I really don't know.
->
+>Yup, absolutely. I put it first so that it can be backported easily but,
+>for some reason, I thought networking didn't CC stable. I have no idea
+>_why_ I thought that, so I'll add it (and a Fixes: line) for v2!
 
-I still don't think it's a hot path to optimize, but I'm not totally 
-against it. If you want to do it though, I would say do it in a separate 
-patch.
+yeah, this was the case till last year IIRC, but we always used Fixes 
+tag, also if we didn't cc stable.
+
+>
+>That seems to be:
+>
+>  Fixes: 71dc9ec9ac7d ("virtio/vsock: replace virtio_vsock_pkt with sk_buff")
+>
+>from what I can tell.
+
+I think so!
 
 Thanks,
 Stefano
