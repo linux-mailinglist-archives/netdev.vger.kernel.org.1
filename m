@@ -1,224 +1,99 @@
-Return-Path: <netdev+bounces-202752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B217EAEED49
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 06:31:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65207AEED65
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 06:57:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C3D017EC6C
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 04:31:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 687B47AB2D0
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 04:55:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168D123F28D;
-	Tue,  1 Jul 2025 04:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B8EC1F2BBB;
+	Tue,  1 Jul 2025 04:57:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HEuaWSUe"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="IuQ5vBiJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC541F30A4;
-	Tue,  1 Jul 2025 04:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 037001F239B
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 04:57:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751344236; cv=none; b=aBCZ5CfqU9sqqJAbIp2AHWCW7E7j9TdKGMcYYtuJzV1Yn40cICnb4YeJ9e/uqp02YSXz8A/dDDSL1fAKETZkUOHZdDvh/TxayOo+7RfniM7n2goUQcQg0WA7Y4LKow/K4eubw9kf+FAcPIaXpU68/4MwClPDIdNu4SsbjsrD9qE=
+	t=1751345826; cv=none; b=B+0HkNZh9IohVot3n7gHmA9BDyy6B+ZUB1tb/qvEdNm8dfAF4GqyJpirJh8QOVCwltj8kDfQvODsbtx+6XFYHbROA3yuToCDayJAHkj9vU2Isf3xOmgchCMO5U69YDNM5WxGpItoLUvB5frewpE05oiGEix7YM+E/cfMjVDSzs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751344236; c=relaxed/simple;
-	bh=yUhVeNxdkmKD+O9VsLaYb0eZmmOxIaA8qvBCe1VT2GA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ifObpOO8hVmWILpA/c+Zw8PW9aycoeuexUOQtp785R7Z0uYxoK6ODfwwFE6PDqKNdYPkXpffLsEXqtU9zekaupSMZL/ruCGHk77a7DwerS85rJRH4Bie+TtJmwLFp1FKB98p8LKuUHSAUw0f7Sus8/TPy0bsILcIwTalOaF3dtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HEuaWSUe; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751344234; x=1782880234;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=yUhVeNxdkmKD+O9VsLaYb0eZmmOxIaA8qvBCe1VT2GA=;
-  b=HEuaWSUelAnnfkdmxbhB6DzzHtLpzj125th7proGw7RqPauhQxJKU613
-   VNjxlrIa95hSrzvMqtIJEdm7IUFidgLua5wX3tquUySaAN6pLnJSWAmPR
-   YoE21hsM+ghj1Fezchess8ByMSsNCR+2LiU5IhJ7lM8ebBKNfqbejRpkH
-   KNpigsQftH4Km3w5xNZqOEPqGENjsjFmU+jZI9NeHC7mQqn5yzVy6F4iD
-   O0zKL2t9Ac3SiHBnQHiQSP7Rwb337PmstLzmpbkrWO4gmRaf2ZeLHxaJZ
-   WyrJqKk/PGgKacOtGgItspzur61TPprjx3Sj6OqOcIn46N3dH4NDTUewI
-   g==;
-X-CSE-ConnectionGUID: WoHD9zB3TMykQDQ2Cxs24Q==
-X-CSE-MsgGUID: VXktZWvGT/yzd6Z6GT7mvg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11480"; a="56210258"
-X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
-   d="scan'208";a="56210258"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2025 21:30:33 -0700
-X-CSE-ConnectionGUID: 1GVvgBZ+Q46TnzFyc3frmQ==
-X-CSE-MsgGUID: 5XpjMaIaSZGPuyI+9+LpCQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,279,1744095600"; 
-   d="scan'208";a="177309029"
-Received: from p12ill20yoongsia.png.intel.com ([10.88.227.38])
-  by fmviesa002.fm.intel.com with ESMTP; 30 Jun 2025 21:30:28 -0700
-From: Song Yoong Siang <yoong.siang.song@intel.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf-next 2/2] selftests/bpf: Enhance XDP Rx Metadata Handling
-Date: Tue,  1 Jul 2025 12:29:40 +0800
-Message-Id: <20250701042940.3272325-3-yoong.siang.song@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250701042940.3272325-1-yoong.siang.song@intel.com>
-References: <20250701042940.3272325-1-yoong.siang.song@intel.com>
+	s=arc-20240116; t=1751345826; c=relaxed/simple;
+	bh=sIalOvU0IZjWGEvFmMEZXjZhgYNrj4Lp8vde0AUoUJA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=kZNwuPwFY0HSldOR9c4VKk+0zlWzT/DmLGoipHKoWIE+wSrGvjnMBvZGaNg8RElm3l8pIzvgAOQrrDbxu8Pu2+FfWkW5vfCb1G4YDKqmrfXmOeTzk0MRtCSgB5imJH5P/rxxrbYCR1MqpJd8r4H2bsceCOf1jh7DTj50cymy02o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=IuQ5vBiJ; arc=none smtp.client-ip=198.47.23.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllvem-sh03.itg.ti.com ([10.64.41.86])
+	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTP id 5614upI03525618;
+	Mon, 30 Jun 2025 23:56:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1751345811;
+	bh=SwIs49mn0joPRRpBmEaKnHCDKZw87rwwcjS2b6w3Oww=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=IuQ5vBiJZB+0DD3cc/PkxPANhsnvq7KgVXgG9Xw/1g5JmvpThBD7rnGYDoPZsg1OD
+	 6mgE3TMyfEe9Wp9LLTzLFeWljdAwKGtmxhgPDgKQEAnXCiBkHU7vzXNl+HFr+lXUo0
+	 Lav3uYC67phh8LSsz98ANs2/OSKtiHXUVLWehUOQ=
+Received: from DLEE106.ent.ti.com (dlee106.ent.ti.com [157.170.170.36])
+	by fllvem-sh03.itg.ti.com (8.18.1/8.18.1) with ESMTPS id 5614upOv2231536
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-SHA256 bits=128 verify=FAIL);
+	Mon, 30 Jun 2025 23:56:51 -0500
+Received: from DLEE107.ent.ti.com (157.170.170.37) by DLEE106.ent.ti.com
+ (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55; Mon, 30
+ Jun 2025 23:56:50 -0500
+Received: from lelvem-mr06.itg.ti.com (10.180.75.8) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.55 via
+ Frontend Transport; Mon, 30 Jun 2025 23:56:50 -0500
+Received: from [172.24.227.220] (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.227.220])
+	by lelvem-mr06.itg.ti.com (8.18.1/8.18.1) with ESMTP id 5614umTB653906;
+	Mon, 30 Jun 2025 23:56:49 -0500
+Message-ID: <b202725b-49a7-4d61-a61a-13e4529dd6a1@ti.com>
+Date: Tue, 1 Jul 2025 10:26:48 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH ethtool-next v2] pretty: Add support for TI K3 CPSW
+ registers and ALE table dump
+To: Siddharth Vadapalli <s-vadapalli@ti.com>
+CC: <mkubecek@suse.cz>, <danishanwar@ti.com>, <netdev@vger.kernel.org>
+References: <20250619171920.826125-1-c-vankar@ti.com>
+ <182fd7c0-52ad-4ff6-b08d-43480ee660f7@ti.com>
+Content-Language: en-US
+From: Chintan Vankar <c-vankar@ti.com>
+In-Reply-To: <182fd7c0-52ad-4ff6-b08d-43480ee660f7@ti.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Introduce the XDP_METADATA_SIZE macro to ensure that user applications can
-consistently retrieve the correct location of struct xdp_meta.
+Hello Michal, Can we please merge this series since there are no further
+comments.
 
-Prior to this commit, the XDP program adjusted the data_meta backward by
-the size of struct xdp_meta, while the user application retrieved the data
-by calculating backward from the data pointer. This approach only worked if
-xdp_buff->data_meta was equal to xdp_buff->data before calling
-bpf_xdp_adjust_meta.
+Regards,
+Chintan.
 
-With the introduction of XDP_METADATA_SIZE, both the XDP program and user
-application now calculate and identify the location of struct xdp_meta from
-the data pointer. This ensures the implementation remains functional even
-when there is device-reserved metadata, making the tests more portable
-across different NICs.
-
-Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
----
- tools/testing/selftests/bpf/prog_tests/xdp_metadata.c |  2 +-
- tools/testing/selftests/bpf/progs/xdp_hw_metadata.c   | 10 +++++++++-
- tools/testing/selftests/bpf/progs/xdp_metadata.c      |  8 +++++++-
- tools/testing/selftests/bpf/xdp_hw_metadata.c         |  2 +-
- tools/testing/selftests/bpf/xdp_metadata.h            |  7 +++++++
- 5 files changed, 25 insertions(+), 4 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-index 19f92affc2da..8d6c2633698b 100644
---- a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-+++ b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-@@ -302,7 +302,7 @@ static int verify_xsk_metadata(struct xsk *xsk, bool sent_from_af_xdp)
- 
- 	/* custom metadata */
- 
--	meta = data - sizeof(struct xdp_meta);
-+	meta = data - XDP_METADATA_SIZE;
- 
- 	if (!ASSERT_NEQ(meta->rx_timestamp, 0, "rx_timestamp"))
- 		return -1;
-diff --git a/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c b/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-index 330ece2eabdb..72242ac1cdcd 100644
---- a/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-+++ b/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-@@ -27,6 +27,7 @@ extern int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx,
- SEC("xdp.frags")
- int rx(struct xdp_md *ctx)
- {
-+	int metalen_used, metalen_to_adjust;
- 	void *data, *data_meta, *data_end;
- 	struct ipv6hdr *ip6h = NULL;
- 	struct udphdr *udp = NULL;
-@@ -72,7 +73,14 @@ int rx(struct xdp_md *ctx)
- 		return XDP_PASS;
- 	}
- 
--	err = bpf_xdp_adjust_meta(ctx, -(int)sizeof(struct xdp_meta));
-+	metalen_used = ctx->data - ctx->data_meta;
-+	metalen_to_adjust = XDP_METADATA_SIZE - metalen_used;
-+	if (metalen_to_adjust < (int)sizeof(struct xdp_meta)) {
-+		__sync_add_and_fetch(&pkts_skip, 1);
-+		return XDP_PASS;
-+	}
-+
-+	err = bpf_xdp_adjust_meta(ctx, -metalen_to_adjust);
- 	if (err) {
- 		__sync_add_and_fetch(&pkts_fail, 1);
- 		return XDP_PASS;
-diff --git a/tools/testing/selftests/bpf/progs/xdp_metadata.c b/tools/testing/selftests/bpf/progs/xdp_metadata.c
-index 09bb8a038d52..a0ba4ef4bbd8 100644
---- a/tools/testing/selftests/bpf/progs/xdp_metadata.c
-+++ b/tools/testing/selftests/bpf/progs/xdp_metadata.c
-@@ -37,6 +37,7 @@ extern int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx,
- SEC("xdp")
- int rx(struct xdp_md *ctx)
- {
-+	int metalen_used, metalen_to_adjust;
- 	void *data, *data_meta, *data_end;
- 	struct ipv6hdr *ip6h = NULL;
- 	struct ethhdr *eth = NULL;
-@@ -73,7 +74,12 @@ int rx(struct xdp_md *ctx)
- 
- 	/* Reserve enough for all custom metadata. */
- 
--	ret = bpf_xdp_adjust_meta(ctx, -(int)sizeof(struct xdp_meta));
-+	metalen_used = ctx->data - ctx->data_meta;
-+	metalen_to_adjust = XDP_METADATA_SIZE - metalen_used;
-+	if (metalen_to_adjust < (int)sizeof(struct xdp_meta))
-+		return XDP_DROP;
-+
-+	ret = bpf_xdp_adjust_meta(ctx, -metalen_to_adjust);
- 	if (ret != 0)
- 		return XDP_DROP;
- 
-diff --git a/tools/testing/selftests/bpf/xdp_hw_metadata.c b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-index 3d8de0d4c96a..a529d55d4ff4 100644
---- a/tools/testing/selftests/bpf/xdp_hw_metadata.c
-+++ b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-@@ -223,7 +223,7 @@ static void verify_xdp_metadata(void *data, clockid_t clock_id)
- {
- 	struct xdp_meta *meta;
- 
--	meta = data - sizeof(*meta);
-+	meta = data - XDP_METADATA_SIZE;
- 
- 	if (meta->hint_valid & XDP_META_FIELD_RSS)
- 		printf("rx_hash: 0x%X with RSS type:0x%X\n",
-diff --git a/tools/testing/selftests/bpf/xdp_metadata.h b/tools/testing/selftests/bpf/xdp_metadata.h
-index 87318ad1117a..2dfd3bf5e7bb 100644
---- a/tools/testing/selftests/bpf/xdp_metadata.h
-+++ b/tools/testing/selftests/bpf/xdp_metadata.h
-@@ -50,3 +50,10 @@ struct xdp_meta {
- 	};
- 	enum xdp_meta_field hint_valid;
- };
-+
-+/* XDP_METADATA_SIZE must be at least the size of struct xdp_meta. An additional
-+ * 32 bytes of padding is included as a conservative measure to accommodate any
-+ * metadata areas reserved by Ethernet devices. If the device-reserved metadata
-+ * exceeds 32 bytes, this value will need adjustment.
-+ */
-+#define XDP_METADATA_SIZE	(sizeof(struct xdp_meta) + 32)
--- 
-2.34.1
-
+On 25/06/25 15:21, Siddharth Vadapalli wrote:
+> On Thu, Jun 19, 2025 at 10:49:20PM +0530, Chintan Vankar wrote:
+>> Add support to dump CPSW registers and ALE table for the CPSW instances on
+>> K3 SoCs that are configured using the am65-cpsw-nuss.c device-driver in
+>> Linux.
+>>
+>> Signed-off-by: Chintan Vankar <c-vankar@ti.com>
+> 
+> Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
+> 
+> Regards,
+> Siddharth.
 
