@@ -1,175 +1,205 @@
-Return-Path: <netdev+bounces-202903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 912DDAEF996
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 15:02:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18B5DAEF95E
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 14:56:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EFA24E0C74
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 13:02:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CEB5443A7E
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 12:55:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4CA274B57;
-	Tue,  1 Jul 2025 13:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AADD2741CE;
+	Tue,  1 Jul 2025 12:56:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UpTKZY0l"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D36D719006B;
-	Tue,  1 Jul 2025 13:01:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B5321D5BC
+	for <netdev@vger.kernel.org>; Tue,  1 Jul 2025 12:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751374904; cv=none; b=jEcTEwbFvGY2DFvmBsdchDu/kTkzgNzv7x8JAgJc3trClPjVFWr41Xg+Bpp3oNHJzgwugcUsnp+7s7z1NxwG2R1xVvmxOrVsB1wqqZzrnUupr0PyYdUdEPaRdd3fa5I4mteugVqQIt60caD0Pp4YfkXTzBxMv3+oCwoyiV7LugM=
+	t=1751374569; cv=none; b=pctdvrnw7GoVzvz5KjxmWC3K921KGhrPzjmdwgKWQkUeOxFf4p0YSsVRdYh1FchcL55x/UF6Rm5YP/ONu17th5KDQHjNJ9F6VlsAwIjxdaEwihwmpzBSw1rohn5DTDbt3qNH653MKpMLE6lgWVnFXX7TFTrd/pV9BrPVYmKA2uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751374904; c=relaxed/simple;
-	bh=T9HkFnDBMvtvh+rx8Kod6hT1Ps6qQGtTGTjHSzPg5hY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NCZGpwtF6T/udg3RGpIK3upciNOwa0eoSJMWWTO+zivS4BFVzH04Tz8aV9QDAo8aHOyw5UlhbpsLZNg4ANnGBLuzWyRg6p5larGVtvwUj8PwCJGcOaN18D3Mr8ifpDv4FCbd9BGKue5aQaFDu4FJxkW76Boi/ooHaVSDuARLTro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4bWjlh3Xq7z13MWv;
-	Tue,  1 Jul 2025 20:59:12 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1D7A41800EC;
-	Tue,  1 Jul 2025 21:01:41 +0800 (CST)
-Received: from localhost.localdomain (10.90.31.46) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 1 Jul 2025 21:01:40 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<shaojijie@huawei.com>
-Subject: [PATCH v4 net-next 3/3] net: hibmcge: configure FIFO thresholds according to the MAC controller documentation
-Date: Tue, 1 Jul 2025 20:54:46 +0800
-Message-ID: <20250701125446.720176-4-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20250701125446.720176-1-shaojijie@huawei.com>
-References: <20250701125446.720176-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1751374569; c=relaxed/simple;
+	bh=TKG5IymVnkXJex1Gwu3CospUcoxQz3nNTflPsWghNUs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TDDOuwUtT7a4cal8o9e61e12anZztGMnTru64DHFhOwrrqB9mz1T/gdiwg7IqRyNj1DSnmkPQZ8Aa/qo+HiyBpmnoMXT53/0TWOTqJhXXzf6jSzDmsHpNpHB2TxTJPyWINleV0Kw1J6xmGt3aCH5QVwLjlY2MCz653HQ1q9ZUeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UpTKZY0l; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751374566;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZBTTVjLLJBrVGUELHkLxjKRb9WdjU8gNsqCCuiEsmE4=;
+	b=UpTKZY0lWq/di5n9flfildEPiDACfJxCz7AXgfORlUIra4Ni41EXN/jqltnP6aUWkXmOEl
+	V+Skv/ulqxWiacWD06IZOWlfIYH7sgwM0qV/pNxaCeB+oznzxi9AMu9FD+5ixfcpJ7JjD9
+	f3nud99PN3PNJeUWB5vhCeA2xGij0Lw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-447-_K4fz0QwMtqFGQomdJ5wVA-1; Tue, 01 Jul 2025 08:56:05 -0400
+X-MC-Unique: _K4fz0QwMtqFGQomdJ5wVA-1
+X-Mimecast-MFC-AGG-ID: _K4fz0QwMtqFGQomdJ5wVA_1751374564
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4538f375e86so29811935e9.3
+        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 05:56:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751374564; x=1751979364;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZBTTVjLLJBrVGUELHkLxjKRb9WdjU8gNsqCCuiEsmE4=;
+        b=H1RWWDE41nabAxjQXSVa3fWfQ6PKL+/qAwXjLQkB9jPKA5/bDCEGPDGhA31gao8X+0
+         GVTLSM3PPqEbvYBVXpb3c13C9XO4EzjyZtP9slLldQsfz2UaGd7u3aw1fmEae72TUnBQ
+         avm4qnHM/ma5FD4tFTmMfLGWh2oevKo1fpO4rw+2Ws8aAeNkHdBty4oL36V+OsEeOYMm
+         2DyxqXCda8yg22zWWqlrnkmJ9YgPIMPZKN2IBLThLPqE8TCjdLrhfQkmrH0HfCNK5p92
+         LRjsL3rLgCtWNaAQsBbG8A4rBrh9jjlGBhDgSD26ndLPKdJxGRyOT0REqpgPep+yBUob
+         kWVg==
+X-Gm-Message-State: AOJu0YxsJ/iMsmLy2M3SVektj2HriC5w3fxb7LOd1bqWZ91qEgfxIhdk
+	KmrzuWC+1bqks1SRc+QeO68TIlzFfR9KDlSyQcTQHWPZDdrxxj/8prV3NTL2WFWCPWfOHRY+tAq
+	xFv1+fUBW4ZqoXZIUZ+A50Y0W/i/2lcFAp2P8xFsB3CrcVCJFFdIBH+PB8A==
+X-Gm-Gg: ASbGncsDLv+wQb62ejFx2evpUxSBvSlBeBmu3BzuJJ8iA/8x1L8dWfWumhNN7ALqwn3
+	eQtpitXWSM+fUEQuvcn86g6Kdu9kFcEyK8IhLkLeAYkSE90tBdLLTjWbSyAyexSJkOXZm6JqOrb
+	pzT9/T1P5p2CBMD2MZCc9IoOWAyfB8KeM8hhLAL3s7Fk7XGtSkDqdbpcBWJ9pxBW/WhAsQX3z/D
+	HzzTPv5otJdCDKFoF3ChVbd28/llg6VCcvyWlxmGY1D7HSK9aDfrLVETlO2uSVZ6DE/MdQ7F1vc
+	cocYohFfsM9SIIFLhRQqkZVlSX1VOQzkkd8Rk8VxjNC6WqOYDbijyBAxZV783mjvLAUmGA==
+X-Received: by 2002:a05:600c:4752:b0:453:a95:f07d with SMTP id 5b1f17b1804b1-4538ee27811mr225406175e9.10.1751374563662;
+        Tue, 01 Jul 2025 05:56:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFaw4kk4Kktx3Hecxbs6t1i/0jp4a/LW9tAythw2vOj1c39nlQ1UxxFJwKx+MpgP7+zm22KQw==
+X-Received: by 2002:a05:600c:4752:b0:453:a95:f07d with SMTP id 5b1f17b1804b1-4538ee27811mr225405765e9.10.1751374563208;
+        Tue, 01 Jul 2025 05:56:03 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:247b:5810:4909:7796:7ec9:5af2? ([2a0d:3344:247b:5810:4909:7796:7ec9:5af2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a892e595c6sm13522571f8f.66.2025.07.01.05.56.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Jul 2025 05:56:02 -0700 (PDT)
+Message-ID: <f875faa2-718d-4244-bb86-2178fed55922@redhat.com>
+Date: Tue, 1 Jul 2025 14:56:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v06 4/8] hinic3: Command Queue interfaces
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, linux-doc@vger.kernel.org,
+ Jonathan Corbet <corbet@lwn.net>, Bjorn Helgaas <helgaas@kernel.org>,
+ luosifu <luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>,
+ Shen Chenyang <shenchenyang1@hisilicon.com>,
+ Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
+ Shi Jing <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>,
+ Gur Stavi <gur.stavi@huawei.com>, Lee Trager <lee@trager.us>,
+ Michael Ellerman <mpe@ellerman.id.au>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, Suman Ghosh
+ <sumang@marvell.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Joe Damato <jdamato@fastly.com>,
+ Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+References: <cover.1750937080.git.zhuyikai1@h-partners.com>
+ <6c5406f1e4981a5c4eb3345199f480e37a5e7223.1750937080.git.zhuyikai1@h-partners.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <6c5406f1e4981a5c4eb3345199f480e37a5e7223.1750937080.git.zhuyikai1@h-partners.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Configure FIFO thresholds according to the MAC controller documentation
+On 6/27/25 8:12 AM, Fan Gong wrote:
+> +static void cmdq_sync_cmd_handler(struct hinic3_cmdq *cmdq,
+> +				  struct cmdq_wqe *wqe, u16 ci)
+> +{
+> +	spin_lock(&cmdq->cmdq_lock);
+> +	cmdq_update_cmd_status(cmdq, ci, wqe);
+> +	if (cmdq->cmd_infos[ci].cmpt_code) {
+> +		*cmdq->cmd_infos[ci].cmpt_code = CMDQ_DIRECT_SYNC_CMPT_CODE;
+> +		cmdq->cmd_infos[ci].cmpt_code = NULL;
+> +	}
+> +
+> +	/* Ensure that completion code has been updated before updating done */
+> +	smp_rmb();
 
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
-ChangeLog:
-v1 -> v2:
-  - Fix code formatting errors, reported by Jakub Kicinski
-  v1: https://lore.kernel.org/all/20250619144423.2661528-1-shaojijie@huawei.com/
----
- .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   | 49 +++++++++++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  |  6 +++
- 2 files changed, 55 insertions(+)
+There is something off with the above barrier. It's not clear where is
+the paired wmb() and the comment looks misleading as this barrier order
+reads operation and not writes (as implied by 'updating').
 
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-index 6e5602591554..8cca8316ba40 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-@@ -18,6 +18,13 @@
- #define HBG_ENDIAN_CTRL_LE_DATA_BE	0x0
- #define HBG_PCU_FRAME_LEN_PLUS 4
- 
-+#define HBG_FIFO_TX_FULL_THRSLD		0x3F0
-+#define HBG_FIFO_TX_EMPTY_THRSLD	0x1F0
-+#define HBG_FIFO_RX_FULL_THRSLD		0x240
-+#define HBG_FIFO_RX_EMPTY_THRSLD	0x190
-+#define HBG_CFG_FIFO_FULL_THRSLD	0x10
-+#define HBG_CFG_FIFO_EMPTY_THRSLD	0x01
-+
- static bool hbg_hw_spec_is_valid(struct hbg_priv *priv)
- {
- 	return hbg_reg_read(priv, HBG_REG_SPEC_VALID_ADDR) &&
-@@ -272,6 +279,41 @@ void hbg_hw_set_rx_pause_mac_addr(struct hbg_priv *priv, u64 mac_addr)
- 	hbg_reg_write64(priv, HBG_REG_FD_FC_ADDR_LOW_ADDR, mac_addr);
- }
- 
-+static void hbg_hw_set_fifo_thrsld(struct hbg_priv *priv,
-+				   u32 full, u32 empty, enum hbg_dir dir)
-+{
-+	u32 value = 0;
-+
-+	value |= FIELD_PREP(HBG_REG_FIFO_THRSLD_FULL_M, full);
-+	value |= FIELD_PREP(HBG_REG_FIFO_THRSLD_EMPTY_M, empty);
-+
-+	if (dir & HBG_DIR_TX)
-+		hbg_reg_write(priv, HBG_REG_TX_FIFO_THRSLD_ADDR, value);
-+
-+	if (dir & HBG_DIR_RX)
-+		hbg_reg_write(priv, HBG_REG_RX_FIFO_THRSLD_ADDR, value);
-+}
-+
-+static void hbg_hw_set_cfg_fifo_thrsld(struct hbg_priv *priv,
-+				       u32 full, u32 empty, enum hbg_dir dir)
-+{
-+	u32 value;
-+
-+	value = hbg_reg_read(priv, HBG_REG_CFG_FIFO_THRSLD_ADDR);
-+
-+	if (dir & HBG_DIR_TX) {
-+		value |= FIELD_PREP(HBG_REG_CFG_FIFO_THRSLD_TX_FULL_M, full);
-+		value |= FIELD_PREP(HBG_REG_CFG_FIFO_THRSLD_TX_EMPTY_M, empty);
-+	}
-+
-+	if (dir & HBG_DIR_RX) {
-+		value |= FIELD_PREP(HBG_REG_CFG_FIFO_THRSLD_RX_FULL_M, full);
-+		value |= FIELD_PREP(HBG_REG_CFG_FIFO_THRSLD_RX_EMPTY_M, empty);
-+	}
-+
-+	hbg_reg_write(priv, HBG_REG_CFG_FIFO_THRSLD_ADDR, value);
-+}
-+
- static void hbg_hw_init_transmit_ctrl(struct hbg_priv *priv)
- {
- 	u32 ctrl = 0;
-@@ -332,5 +374,12 @@ int hbg_hw_init(struct hbg_priv *priv)
- 
- 	hbg_hw_init_rx_control(priv);
- 	hbg_hw_init_transmit_ctrl(priv);
-+
-+	hbg_hw_set_fifo_thrsld(priv, HBG_FIFO_TX_FULL_THRSLD,
-+			       HBG_FIFO_TX_EMPTY_THRSLD, HBG_DIR_TX);
-+	hbg_hw_set_fifo_thrsld(priv, HBG_FIFO_RX_FULL_THRSLD,
-+			       HBG_FIFO_RX_EMPTY_THRSLD, HBG_DIR_RX);
-+	hbg_hw_set_cfg_fifo_thrsld(priv, HBG_CFG_FIFO_FULL_THRSLD,
-+				   HBG_CFG_FIFO_EMPTY_THRSLD, HBG_DIR_TX_RX);
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-index d40880beb2f8..a39d1e796e4a 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-@@ -141,7 +141,13 @@
- /* PCU */
- #define HBG_REG_TX_FIFO_THRSLD_ADDR		(HBG_REG_SGMII_BASE + 0x0420)
- #define HBG_REG_RX_FIFO_THRSLD_ADDR		(HBG_REG_SGMII_BASE + 0x0424)
-+#define HBG_REG_FIFO_THRSLD_FULL_M		GENMASK(25, 16)
-+#define HBG_REG_FIFO_THRSLD_EMPTY_M		GENMASK(9, 0)
- #define HBG_REG_CFG_FIFO_THRSLD_ADDR		(HBG_REG_SGMII_BASE + 0x0428)
-+#define HBG_REG_CFG_FIFO_THRSLD_TX_FULL_M	GENMASK(31, 24)
-+#define HBG_REG_CFG_FIFO_THRSLD_TX_EMPTY_M	GENMASK(23, 16)
-+#define HBG_REG_CFG_FIFO_THRSLD_RX_FULL_M	GENMASK(15, 8)
-+#define HBG_REG_CFG_FIFO_THRSLD_RX_EMPTY_M	GENMASK(7, 0)
- #define HBG_REG_CF_INTRPT_MSK_ADDR		(HBG_REG_SGMII_BASE + 0x042C)
- #define HBG_INT_MSK_WE_ERR_B			BIT(31)
- #define HBG_INT_MSK_RBREQ_ERR_B			BIT(30)
--- 
-2.33.0
++static int cmdq_sync_cmd_direct_resp(struct hinic3_cmdq *cmdq, u8 mod,
+u8 cmd,
+> +				     struct hinic3_cmd_buf *buf_in,
+> +				     u64 *out_param)
+> +{
+> +	struct hinic3_cmdq_cmd_info *cmd_info, saved_cmd_info;
+> +	int cmpt_code = CMDQ_SEND_CMPT_CODE;
+> +	struct cmdq_wqe *curr_wqe, wqe = {};
+> +	struct hinic3_wq *wq = &cmdq->wq;
+> +	u16 curr_prod_idx, next_prod_idx;
+> +	struct completion done;
+> +	u64 curr_msg_id;
+> +	int errcode;
+> +	u8 wrapped;
+> +	int err;
+> +
+> +	spin_lock_bh(&cmdq->cmdq_lock);
+> +	curr_wqe = cmdq_get_wqe(wq, &curr_prod_idx);
+> +	if (!curr_wqe) {
+> +		spin_unlock_bh(&cmdq->cmdq_lock);
+> +		return -EBUSY;
+> +	}
+> +
+> +	wrapped = cmdq->wrapped;
+> +	next_prod_idx = curr_prod_idx + CMDQ_WQE_NUM_WQEBBS;
+> +	if (next_prod_idx >= wq->q_depth) {
+> +		cmdq->wrapped ^= 1;
+> +		next_prod_idx -= wq->q_depth;
+> +	}
+> +
+> +	cmd_info = &cmdq->cmd_infos[curr_prod_idx];
+> +	init_completion(&done);
+> +	refcount_inc(&buf_in->ref_cnt);
+> +	cmd_info->cmd_type = HINIC3_CMD_TYPE_DIRECT_RESP;
+> +	cmd_info->done = &done;
+> +	cmd_info->errcode = &errcode;
+> +	cmd_info->direct_resp = out_param;
+> +	cmd_info->cmpt_code = &cmpt_code;
+> +	cmd_info->buf_in = buf_in;
+> +	saved_cmd_info = *cmd_info;
+> +	cmdq_set_lcmd_wqe(&wqe, CMDQ_CMD_DIRECT_RESP, buf_in, NULL,
+> +			  wrapped, mod, cmd, curr_prod_idx);
+> +
+> +	cmdq_wqe_fill(curr_wqe, &wqe);
+> +	(cmd_info->cmdq_msg_id)++;
+> +	curr_msg_id = cmd_info->cmdq_msg_id;
+> +	cmdq_set_db(cmdq, HINIC3_CMDQ_SYNC, next_prod_idx);
+> +	spin_unlock_bh(&cmdq->cmdq_lock);
+> +
+> +	err = wait_cmdq_sync_cmd_completion(cmdq, cmd_info, &saved_cmd_info,
+> +					    curr_msg_id, curr_prod_idx,
+> +					    curr_wqe, CMDQ_CMD_TIMEOUT);
+> +	if (err) {
+> +		dev_err(cmdq->hwdev->dev,
+> +			"Cmdq sync command timeout, mod: %u, cmd: %u, prod idx: 0x%x\n",
+> +			mod, cmd, curr_prod_idx);
+> +		err = -ETIMEDOUT;
+> +	}
+> +
+> +	if (cmpt_code == CMDQ_FORCE_STOP_CMPT_CODE) {
+> +		dev_dbg(cmdq->hwdev->dev,
+> +			"Force stop cmdq cmd, mod: %u, cmd: %u\n", mod, cmd);
+> +		err = -EAGAIN;
+> +	}
+> +
+> +	smp_rmb(); /* read error code after completion */
+
+Isn't the errcode updated under the spinlock protection? Why is this
+barrier neeed?
+
+/P
 
 
