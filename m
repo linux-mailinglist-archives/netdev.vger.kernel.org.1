@@ -1,69 +1,65 @@
-Return-Path: <netdev+bounces-202803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-202804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C33AAAEF0C6
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 10:19:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 242E2AEF0D7
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 10:21:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 082234A0520
-	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 08:19:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F18537AE2FA
+	for <lists+netdev@lfdr.de>; Tue,  1 Jul 2025 08:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D6E026A09F;
-	Tue,  1 Jul 2025 08:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8D3426772A;
+	Tue,  1 Jul 2025 08:21:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xa+mrao6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XPgII8Bp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BDFC202995;
-	Tue,  1 Jul 2025 08:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF66D202995;
+	Tue,  1 Jul 2025 08:21:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751357987; cv=none; b=OlVgKB2vndmcq7y2KDtB/9zGDUM5S0P/0iCAz1v2MLXUZl74KgHlGetCWQWBBiQJTuAuQQdi3LpvHx0MmISe5695lXdz4Qaz6lSJqLWTdl6DO4j6Rp20hSgah4MdBfeUg/U+VWavH3PMJTiGtClLveHRwzlCdRTFHF3PLMe06TU=
+	t=1751358063; cv=none; b=N/5uAvFO7XdVozACOIEIHP1m8fiQxkrTnoIzMvjyxPVQT8KYQufrrxp7gS7FAB5sauLNlD0kWLF/G3Gel2g1UMeUiA19mjSDG09DwrOhf+CWVLDTPCFmClDYqwYJ4U7358BvPJsgGwGCa5Wih+oW6OWjGVmGsLNprly0rNROeVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751357987; c=relaxed/simple;
-	bh=noDPpUqNBlR3C1l21VfaQdGGoXDiw11U2/HL+tU819c=;
+	s=arc-20240116; t=1751358063; c=relaxed/simple;
+	bh=IKeZCcNNQbdeaNTVppkO6cUdRxq1Vqd2h///xUYe4Is=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CnMvziQkhejnj7S+frqb/pbS/1w1davMf6w3NkVMuEoVBLFTQQazSvAPE4yZrRkZC8KDiWrSZXrSaePwplGIz5qWhoJsqNosiYbawNYNSUNmI3j1avmpiTwxnwccSscE1Qy/g0Ue+iet3s4dPVQiN8P6PdT3jPwZVVpgLTXyBJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xa+mrao6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22F7DC4CEEB;
-	Tue,  1 Jul 2025 08:19:46 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=uVOeRyFYqtnNwu/I7GBDyUKj+PrglrYgV2ai5s/sVBPdt6a4+2Cj0kWZEraIxHPqubyFoCZGQNpmPjPQeZmfwS3qgpZpXayjGSrxxO7OolqBlQJpInSrf17M8QRFus3OBbWlOhxYW4y5pGiJjHkrB4EgcVjLGqYd/Un1oXwDJk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XPgII8Bp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB7D7C4CEEE;
+	Tue,  1 Jul 2025 08:21:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751357987;
-	bh=noDPpUqNBlR3C1l21VfaQdGGoXDiw11U2/HL+tU819c=;
+	s=k20201202; t=1751358063;
+	bh=IKeZCcNNQbdeaNTVppkO6cUdRxq1Vqd2h///xUYe4Is=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Xa+mrao6L0WNrIkAf7cSiPnL+A0XZrn96x1cTOaBOzHD5akO255zfXAJYH/HCP5nW
-	 4tX+mCvc/HL9m/CfiK9p0ZcqpP6wLKg/MgvLFEdZmcfxizOLmLNJK3OKM1klOZ+/11
-	 p7/yYB3jnApoK8yp2NoEa2jrQ8bREGd9n/E4z+kPVH4FtIZZvCVtBbz2YqlQlmkTPq
-	 R3G+UXVUUECJI/tyNQgmCBgoMa17+Esa/eZnTLS0uWQi4XuvvvlwA/JHKc2Goa/Gk8
-	 Fyar7I34ltkPlyO6CjGZiVT0fvKw50OBTPq1GFIVFkPE8IuB1w7aSRWu5uo6l7oO0A
-	 3YLh26PiUW5IQ==
-Date: Tue, 1 Jul 2025 10:19:43 +0200
+	b=XPgII8Bp2xOLTGJFW4oR2RScTDXxzOla0kh5UQCZWPcqXs4g8Mq4TvkEGuz1gyNb3
+	 4yIZxBXluNgK/ZI1Y61dL9DGvwxiiNiEne95SYwtywSf49qza7R86NoMXxDE82KKB8
+	 +BMDw6JqkvhohxYRLnb7Jd8zqgki7QGFOnFHyjqUsiIJDfe0AHUO1YkkrGMHwNEU64
+	 V+v3k+vmEHGP4dDHGi1yIndszJqq12EQ1CIYTREdjxtQIrJvHg7CuPWUukFAXSQmcl
+	 0a39IoVA31UeaxTKEShRW/ORjm+U6+Pg4oMDL6xlODTRsnL3vYQDaouC7u9TczXH9a
+	 GBm50AC+6/yhQ==
+Date: Tue, 1 Jul 2025 10:21:00 +0200
 From: Krzysztof Kozlowski <krzk@kernel.org>
-To: =?utf-8?B?VGjDqW8=?= Lebrun <theo.lebrun@bootlin.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: Bjorn Andersson <andersson@kernel.org>, 
+	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>, 
 	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alex@ghiti.fr>, 
-	Samuel Holland <samuel.holland@sifive.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	Vladimir Kondratiev <vladimir.kondratiev@mobileye.com>, Gregory CLEMENT <gregory.clement@bootlin.com>, 
-	Cyrille Pitchen <cyrille.pitchen@atmel.com>, Harini Katakam <harini.katakam@xilinx.com>, 
-	Rafal Ozieblo <rafalo@cadence.com>, Haavard Skinnemoen <hskinnemoen@atmel.com>, 
-	Jeff Garzik <jeff@garzik.org>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, linux-mips@vger.kernel.org, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, Tawfik Bayouk <tawfik.bayouk@mobileye.com>
-Subject: Re: [PATCH net-next v2 03/18] dt-bindings: net: cdns,macb: allow
- tsu_clk without tx_clk
-Message-ID: <20250701-spotted-crimson-puffin-dffabd@krzk-bin>
-References: <20250627-macb-v2-0-ff8207d0bb77@bootlin.com>
- <20250627-macb-v2-3-ff8207d0bb77@bootlin.com>
+	Georgi Djakov <djakov@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Richard Cochran <richardcochran@gmail.com>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Anusha Rao <quic_anusha@quicinc.com>, linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, quic_kkumarcs@quicinc.com, 
+	quic_linchen@quicinc.com, quic_leiwei@quicinc.com, quic_suruchia@quicinc.com, 
+	quic_pavir@quicinc.com
+Subject: Re: [PATCH v2 1/8] dt-bindings: interconnect: Add Qualcomm IPQ5424
+ NSSNOC IDs
+Message-ID: <20250701-devious-pony-of-prowess-ff36c9@krzk-bin>
+References: <20250627-qcom_ipq5424_nsscc-v2-0-8d392f65102a@quicinc.com>
+ <20250627-qcom_ipq5424_nsscc-v2-1-8d392f65102a@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,21 +68,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20250627-macb-v2-3-ff8207d0bb77@bootlin.com>
+In-Reply-To: <20250627-qcom_ipq5424_nsscc-v2-1-8d392f65102a@quicinc.com>
 
-On Fri, Jun 27, 2025 at 11:08:49AM +0200, Th=C3=A9o Lebrun wrote:
-> Allow providing tsu_clk without a tx_clk as both are optional.
->=20
-> This is about relaxing unneeded constraints. It so happened that in the
-> past HW that needed a tsu_clk always needed a tx_clk.
->=20
-> Signed-off-by: Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>
+On Fri, Jun 27, 2025 at 08:09:17PM +0800, Luo Jie wrote:
+> Add the NSSNOC master/slave ids for Qualcomm IPQ5424 network subsystem
+> (NSS) hardware blocks. These will be used by the gcc-ipq5424 driver
+> that provides the interconnect services by using the icc-clk framework.
+> 
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
 > ---
->  Documentation/devicetree/bindings/net/cdns,macb.yaml | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  include/dt-bindings/interconnect/qcom,ipq5424.h | 6 ++++++
+>  1 file changed, 6 insertions(+)
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Best regards,
 Krzysztof
