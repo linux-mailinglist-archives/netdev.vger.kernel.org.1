@@ -1,358 +1,123 @@
-Return-Path: <netdev+bounces-203537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0147BAF6530
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 00:27:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8D48AF6556
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 00:37:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05CD4486EC9
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 22:26:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E01C1C43AF7
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 22:37:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E2326B960;
-	Wed,  2 Jul 2025 22:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F2BA2F5C3B;
+	Wed,  2 Jul 2025 22:36:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eR+3u2IO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cPceMjAG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B15324E01F;
-	Wed,  2 Jul 2025 22:26:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755D828FAA5
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 22:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751495200; cv=none; b=P32a7eUNNe2odY4ivqzn0veg2SaVFYu7rF5VxzosURlDIUXHiXLdENTgrWQ5Txy7atb0rKzZfsM+uxkfHDC1XN4YOvyf4BHjgA7PVGSeqNfyi1C3rWMSIcZvE1/nTHd9BiV/hsGuso8UXWspNYmZvZZIzVOfq4548tDMWpD97MQ=
+	t=1751495770; cv=none; b=gIipwcLOpT11vzbVEFBhdfqau3/VsYbAT/SFK1RksvKffIHqbNZ7JY0QSacquCyUj3ohNdtau1vYUdz3viUT5NRcYB15iKgoDk9LIN3KYicvXwLAfK7l/2GvD901PLTWWKg0t85nXoh+xMXuBScBmEkM5HIf42nu+ZUX/8+Yqcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751495200; c=relaxed/simple;
-	bh=qycsZr+lcd6kILxhf/Lt8ju90j4/nzR6AMhAdaCKaqI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bJg4OhzZfNRbBg2LcTqVeXUzdm53sMrFaTEEZiiZG1tzZQ3rxuoTkPmSbYP7ClrAoTIU2gXm0NZKS+eSO7WXs0NkR2MDMmb8HXFIONiQ8wObzY3nuJnjJsHoeBvlhuaJTAOqU+tbeA0at5436stNNLUxTankfLRs0JNRkh5vnLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eR+3u2IO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2527C4CEF0;
-	Wed,  2 Jul 2025 22:26:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751495199;
-	bh=qycsZr+lcd6kILxhf/Lt8ju90j4/nzR6AMhAdaCKaqI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=eR+3u2IODuxJzvOeghOYQ4bDvhLLZIqeRVCkqj3Rlcc3sBmBzet0EQppAzkWUNmOI
-	 LtGtQ9SE+0IZhFaZTor+32Xic/Esz4XANfod+gTZA1Mvq30131pTW6vDtnPOZMTfq7
-	 uddo+Oq3SSO62PfPixsJ3Ip7lmkS12Hk78K3555I0BxJOhT6tnBgiQeggKO6bTkGPM
-	 AlQfix15KlTCeLuVRBVhGzOMj/r3oXHCZck1CvkHq9uBiEkkDIB7Opvh0n3TkU2gHy
-	 S3U1zwiIo5h4ePEQZyNHMUBfopML/vOT9yQF8HYTOBtJFGCnzEKwCTCRSWUFayZkDo
-	 uxQtMkGrdfRNQ==
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] dt-bindings: net: Convert Marvell Armada NETA and BM to DT schema
-Date: Wed,  2 Jul 2025 17:26:24 -0500
-Message-ID: <20250702222626.2761199-1-robh@kernel.org>
-X-Mailer: git-send-email 2.47.2
+	s=arc-20240116; t=1751495770; c=relaxed/simple;
+	bh=UuGCJtoWtvRkjfOL0i3eMt88ioxIQr7lDItP3Fcqrrw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kwp5OuiObRjNLsIYAOIsTKrO1ShzuX6l/MjanIulO+Jb2XNH9HGrv1PLdsDCzbyadxv5H+w3GS83JgixHd/JE7qFD4WOwGgY4p8ElSBaJoC+laAT6uiMwuF20+z0gjlfZEe/Ob+r1+x7LTyvQXHrcN50pAKQXMckstW/hAEWPVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cPceMjAG; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-313fab41f4bso10211047a91.0
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 15:36:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751495769; x=1752100569; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Db75e96LplUcDlQItcgQ6vAr3c7eoV187JQSAseinaw=;
+        b=cPceMjAGgDPV+Hos41EG83lWztO0+R+ocS8yWdBjVuFjjZYFhMzdVxN7AD/OykC/H5
+         sXRSlaZ032EGTSwwYSlM0PEqW8uLhnwctVRrgE44W7egMXsxMBSJT2o5KnqUzabg+sIX
+         FCTaHSB5nDybiyg3csEeWNTwrfbxc8lGxbh/2XJRrh8ZgbYD1gyB9F/S7ktramVZwJsX
+         iKdufC7jM/26xUSAXKW3LR7YmSmlv7gUkV71yxZqMtHrZuxAjTLRIQU/k5MEXD9K+phW
+         z3cDLERaOHa5a9vETwR5jIEuRl8bi3DtH/qE1XsA7UaI6x0i7wuckUbMSyQI8CqBFKzL
+         fuyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751495769; x=1752100569;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Db75e96LplUcDlQItcgQ6vAr3c7eoV187JQSAseinaw=;
+        b=v+s3w1EScsxLENf9nz5yGuqA2iR6OZhysV+FAf7S7W1EtlujPCUW/U1DM6Q8wwFV6S
+         PnSsSpKOc2cyHFlSmm1MIRJ2LsnlkX2CFs/lRDJQzN5BSv/j8bSChMInS1FRAXPGvUVI
+         D+HC+E1WwHFAGfyyuzuBfLpfg+6QL4Gy5T8m3KrnqmKQ47ijSSoLLEap5kCNTYZ2F0lQ
+         hdHAxCFd7d2bAILKJekLrlQOjFXWmkqhS0EEdzPPigBxmgL6gksrxMYm2mc9Z1bq3t6X
+         hg1sIpCUJFKls8KqYVAI3qqe/EuMHOyWFSjweSsq3MbtoY/ErSeSHKKXVj/CJExYIxeT
+         7U0A==
+X-Forwarded-Encrypted: i=1; AJvYcCU4hxh7lAxQ1CGeKKL2ACYP08cPoF0yFaWV59H9Xwf1eVtpJFVNDO7LWYCAgdFkv/ipBa3WYSw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDGsW+bbSSO4gOP1wWVBWdrIJEbLqWfjd+FSmUYaMh1lK53TPM
+	XJOpp7xI0n9+QI1EprgcZcpK5E33nsvZEpjmq4CEw+bel8gSyswpqAYZIqhCbNCLSQyVz0GLL99
+	Qo5OdfQ==
+X-Google-Smtp-Source: AGHT+IHm9uXieWaJfcTxpXx1OfqgG356EVxJIlvQMBSsORXa5Kr8VLMbi+jQtVZScWPt0TPeDGzxlo7QwmA=
+X-Received: from pjbkl12.prod.google.com ([2002:a17:90b:498c:b0:312:14e5:174b])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:28c7:b0:313:176b:3d4b
+ with SMTP id 98e67ed59e1d1-31a90bcad1bmr5504740a91.22.1751495768732; Wed, 02
+ Jul 2025 15:36:08 -0700 (PDT)
+Date: Wed,  2 Jul 2025 22:35:12 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250702223606.1054680-1-kuniyu@google.com>
+Subject: [PATCH v1 net-next 0/7] af_unix: Introduce SO_INQ & SCM_INQ.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Convert Marvell Armada NETA Ethernet Controller and Buffer Manager
-bindings to schema. It is a straight forward conversion.
+We have an application that uses almost the same code for TCP and
+AF_UNIX (SOCK_STREAM).
 
-Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
----
- .../bindings/net/marvell,armada-370-neta.yaml | 79 +++++++++++++++++++
- .../net/marvell,armada-380-neta-bm.yaml       | 60 ++++++++++++++
- .../bindings/net/marvell-armada-370-neta.txt  | 50 ------------
- .../bindings/net/marvell-neta-bm.txt          | 47 -----------
- .../devicetree/bindings/vendor-prefixes.yaml  |  1 +
- 5 files changed, 140 insertions(+), 97 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/marvell,armada-370-neta.yaml
- create mode 100644 Documentation/devicetree/bindings/net/marvell,armada-380-neta-bm.yaml
- delete mode 100644 Documentation/devicetree/bindings/net/marvell-armada-370-neta.txt
- delete mode 100644 Documentation/devicetree/bindings/net/marvell-neta-bm.txt
+The application uses TCP_INQ for TCP, but AF_UNIX doesn't have it
+and requires an extra syscall, ioctl(SIOCINQ) or getsockopt(SO_MEMINFO)
+as an alternative.
 
-diff --git a/Documentation/devicetree/bindings/net/marvell,armada-370-neta.yaml b/Documentation/devicetree/bindings/net/marvell,armada-370-neta.yaml
-new file mode 100644
-index 000000000000..8814977da024
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/marvell,armada-370-neta.yaml
-@@ -0,0 +1,79 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/marvell,armada-370-neta.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Marvell Armada 370/XP/3700/AC5 Ethernet Controller (NETA)
-+
-+maintainers:
-+  - Marcin Wojtas <marcin.s.wojtas@gmail.com>
-+
-+allOf:
-+  - $ref: /schemas/net/ethernet-controller.yaml#
-+
-+properties:
-+  compatible:
-+    enum:
-+      - marvell,armada-370-neta
-+      - marvell,armada-xp-neta
-+      - marvell,armada-3700-neta
-+      - marvell,armada-ac5-neta
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  clocks:
-+    minItems: 1
-+    maxItems: 2
-+
-+  clock-names:
-+    minItems: 1
-+    items:
-+      - const: core
-+      - const: bus
-+
-+  phys:
-+    maxItems: 1
-+
-+  tx-csum-limit:
-+    description: Maximum MTU in bytes for Tx checksum offload; default is 1600 for
-+      armada-370-neta and 9800 for others.
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+
-+  buffer-manager:
-+    description: Phandle to hardware buffer manager.
-+    $ref: /schemas/types.yaml#/definitions/phandle
-+
-+  bm,pool-long:
-+    description: Pool ID for packets larger than the short threshold.
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+
-+  bm,pool-short:
-+    description: Pool ID for packets smaller than the long threshold.
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+
-+required:
-+  - compatible
-+  - reg
-+  - clocks
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    ethernet@70000 {
-+        compatible = "marvell,armada-370-neta";
-+        reg = <0x70000 0x2500>;
-+        interrupts = <8>;
-+        clocks = <&gate_clk 4>;
-+        tx-csum-limit = <9800>;
-+        phy = <&phy0>;
-+        phy-mode = "rgmii-id";
-+        buffer-manager = <&bm>;
-+        bm,pool-long = <0>;
-+        bm,pool-short = <1>;
-+    };
-diff --git a/Documentation/devicetree/bindings/net/marvell,armada-380-neta-bm.yaml b/Documentation/devicetree/bindings/net/marvell,armada-380-neta-bm.yaml
-new file mode 100644
-index 000000000000..9392e7126e3e
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/marvell,armada-380-neta-bm.yaml
-@@ -0,0 +1,60 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/marvell,armada-380-neta-bm.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Marvell Armada 380/XP Buffer Manager (BM)
-+
-+maintainers:
-+  - Marcin Wojtas <marcin.s.wojtas@gmail.com>
-+
-+description:
-+  In order to see how to hook the BM to a given ethernet port, please refer to
-+  Documentation/devicetree/bindings/net/marvell,armada-370-neta.yaml.
-+
-+properties:
-+  compatible:
-+    const: marvell,armada-380-neta-bm
-+
-+  reg:
-+    maxItems: 1
-+
-+  clocks:
-+    maxItems: 1
-+
-+  internal-mem:
-+    description: Phandle to internal SRAM region
-+    $ref: /schemas/types.yaml#/definitions/phandle
-+
-+patternProperties:
-+  "^pool[0-3],capacity$":
-+    description:
-+      size of external buffer pointers' ring maintained in DRAM for pool 0-3
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    minimum: 128
-+    maximum: 16352
-+
-+  "^pool[0-3],pkt-size$":
-+    description:
-+      maximum packet size for a short buffer pool entry (pool 0-3)
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+
-+required:
-+  - compatible
-+  - reg
-+  - clocks
-+  - internal-mem
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    bm@c8000 {
-+        compatible = "marvell,armada-380-neta-bm";
-+        reg = <0xc8000 0xac>;
-+        clocks = <&gateclk 13>;
-+        internal-mem = <&bm_bppi>;
-+        pool2,capacity = <4096>;
-+        pool1,pkt-size = <512>;
-+    };
-diff --git a/Documentation/devicetree/bindings/net/marvell-armada-370-neta.txt b/Documentation/devicetree/bindings/net/marvell-armada-370-neta.txt
-deleted file mode 100644
-index 2bf31572b08d..000000000000
---- a/Documentation/devicetree/bindings/net/marvell-armada-370-neta.txt
-+++ /dev/null
-@@ -1,50 +0,0 @@
--* Marvell Armada 370 / Armada XP / Armada 3700 Ethernet Controller (NETA)
--
--Required properties:
--- compatible: could be one of the following:
--	"marvell,armada-370-neta"
--	"marvell,armada-xp-neta"
--	"marvell,armada-3700-neta"
--	"marvell,armada-ac5-neta"
--- reg: address and length of the register set for the device.
--- interrupts: interrupt for the device
--- phy: See ethernet.txt file in the same directory.
--- phy-mode: See ethernet.txt file in the same directory
--- clocks: List of clocks for this device. At least one clock is
--  mandatory for the core clock. If several clocks are given, then the
--  clock-names property must be used to identify them.
--
--Optional properties:
--- tx-csum-limit: maximum mtu supported by port that allow TX checksum.
--  Value is presented in bytes. If not used, by default 1600B is set for
--  "marvell,armada-370-neta" and 9800B for others.
--- clock-names: List of names corresponding to clocks property; shall be
--  "core" for core clock and "bus" for the optional bus clock.
--- phys: comphy for the ethernet port, see ../phy/phy-bindings.txt
--
--Optional properties (valid only for Armada XP/38x):
--
--- buffer-manager: a phandle to a buffer manager node. Please refer to
--  Documentation/devicetree/bindings/net/marvell-neta-bm.txt
--- bm,pool-long: ID of a pool, that will accept all packets of a size
--  higher than 'short' pool's threshold (if set) and up to MTU value.
--  Obligatory, when the port is supposed to use hardware
--  buffer management.
--- bm,pool-short: ID of a pool, that will be used for accepting
--  packets of a size lower than given threshold. If not set, the port
--  will use a single 'long' pool for all packets, as defined above.
--
--Example:
--
--ethernet@70000 {
--	compatible = "marvell,armada-370-neta";
--	reg = <0x70000 0x2500>;
--	interrupts = <8>;
--	clocks = <&gate_clk 4>;
--	tx-csum-limit = <9800>
--	phy = <&phy0>;
--	phy-mode = "rgmii-id";
--	buffer-manager = <&bm>;
--	bm,pool-long = <0>;
--	bm,pool-short = <1>;
--};
-diff --git a/Documentation/devicetree/bindings/net/marvell-neta-bm.txt b/Documentation/devicetree/bindings/net/marvell-neta-bm.txt
-deleted file mode 100644
-index 07b31050dbe5..000000000000
---- a/Documentation/devicetree/bindings/net/marvell-neta-bm.txt
-+++ /dev/null
-@@ -1,47 +0,0 @@
--* Marvell Armada 380/XP Buffer Manager driver (BM)
--
--Required properties:
--
--- compatible: should be "marvell,armada-380-neta-bm".
--- reg: address and length of the register set for the device.
--- clocks: a pointer to the reference clock for this device.
--- internal-mem: a phandle to BM internal SRAM definition.
--
--Optional properties (port):
--
--- pool<0 : 3>,capacity: size of external buffer pointers' ring maintained
--  in DRAM. Can be set for each pool (id 0 : 3) separately. The value has
--  to be chosen between 128 and 16352 and it also has to be aligned to 32.
--  Otherwise the driver would adjust a given number or choose default if
--  not set.
--- pool<0 : 3>,pkt-size: maximum size of a packet accepted by a given buffer
--  pointers' pool (id 0 : 3). It will be taken into consideration only when pool
--  type is 'short'. For 'long' ones it would be overridden by port's MTU.
--  If not set a driver will choose a default value.
--
--In order to see how to hook the BM to a given ethernet port, please
--refer to Documentation/devicetree/bindings/net/marvell-armada-370-neta.txt.
--
--Example:
--
--- main node:
--
--bm: bm@c8000 {
--	compatible = "marvell,armada-380-neta-bm";
--	reg = <0xc8000 0xac>;
--	clocks = <&gateclk 13>;
--	internal-mem = <&bm_bppi>;
--	pool2,capacity = <4096>;
--	pool1,pkt-size = <512>;
--};
--
--- internal SRAM node:
--
--bm_bppi: bm-bppi {
--	compatible = "mmio-sram";
--	reg = <MBUS_ID(0x0c, 0x04) 0 0x100000>;
--	ranges = <0 MBUS_ID(0x0c, 0x04) 0 0x100000>;
--	#address-cells = <1>;
--	#size-cells = <1>;
--	clocks = <&gateclk 13>;
--};
-diff --git a/Documentation/devicetree/bindings/vendor-prefixes.yaml b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-index 5d2a7a8d3ac6..741b545e3ab0 100644
---- a/Documentation/devicetree/bindings/vendor-prefixes.yaml
-+++ b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-@@ -21,6 +21,7 @@ patternProperties:
-   "^(pciclass|pinctrl-single|#pinctrl-single|PowerPC),.*": true
-   "^(pl022|pxa-mmc|rcar_sound|rotary-encoder|s5m8767|sdhci),.*": true
-   "^(simple-audio-card|st-plgpio|st-spics|ts),.*": true
-+  "^pool[0-3],.*": true
- 
-   # Keep list in alphabetical order.
-   "^100ask,.*":
+Also, ioctl(SIOCINQ) for AF_UNIX SOCK_STREAM is more expensive because
+it needs to iterate all skb in the receive queue.
+
+This series adds a cached field for SIOCINQ to speed it up and introduce
+SO_INQ, the generic version of TCP_INQ to get the queue length as cmsg in
+each recvmsg().
+
+
+Kuniyuki Iwashima (7):
+  af_unix: Don't hold unix_state_lock() in __unix_dgram_recvmsg().
+  af_unix: Don't check SOCK_DEAD in unix_stream_read_skb().
+  af_unix: Don't use skb_recv_datagram() in unix_stream_read_skb().
+  af_unix: Use cached value for SOCK_STREAM in unix_inq_len().
+  af_unix: Cache state->msg in unix_stream_read_generic().
+  af_unix: Introduce SO_INQ.
+  selftest: af_unix: Add test for SO_INQ.
+
+ arch/alpha/include/uapi/asm/socket.h          |   3 +
+ arch/mips/include/uapi/asm/socket.h           |   3 +
+ arch/parisc/include/uapi/asm/socket.h         |   3 +
+ arch/sparc/include/uapi/asm/socket.h          |   3 +
+ include/net/af_unix.h                         |   2 +
+ include/uapi/asm-generic/socket.h             |   3 +
+ net/unix/af_unix.c                            | 180 ++++++++++++------
+ tools/testing/selftests/net/.gitignore        |   1 +
+ tools/testing/selftests/net/af_unix/Makefile  |   2 +-
+ tools/testing/selftests/net/af_unix/scm_inq.c | 125 ++++++++++++
+ 10 files changed, 269 insertions(+), 56 deletions(-)
+ create mode 100644 tools/testing/selftests/net/af_unix/scm_inq.c
+
 -- 
-2.47.2
+2.50.0.727.gbf7dc18ff4-goog
 
 
