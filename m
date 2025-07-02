@@ -1,211 +1,116 @@
-Return-Path: <netdev+bounces-203236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1728AAF0E00
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:29:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B86DEAF0E03
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:29:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42A1718891C2
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:29:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0B0B1C25A02
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15FC223BCEF;
-	Wed,  2 Jul 2025 08:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0591D238171;
+	Wed,  2 Jul 2025 08:28:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LNodZ4nY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QYLmw7dE"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay15.mail.gandi.net (relay15.mail.gandi.net [217.70.178.235])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89799238C16;
-	Wed,  2 Jul 2025 08:28:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8FF01EDA12;
+	Wed,  2 Jul 2025 08:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751444906; cv=none; b=Vn26NhkSxOEoJv9QL1Xu+lchCF++Y+VrvQk3HXOjWBtvjnztElhznQYRWBnqTCsonV2u2+JV4VfOtxqCvUpfsOpFUBS0Rmxi5PGu/ERhM+nb6kHtzXQgPGf0f+4hrn4D4PnjOot7wHohJQgcQhnThcikaKUgktIfSE0f8JvXPQo=
+	t=1751444933; cv=none; b=jhobTm1oMoGQaP+RNEnqNaZf8sw5pnoPrY1vvpspM7v/jUDOfS0luHr5a32JeuLGBUNFmpRpIDNzCHOiJOvSA9XHWpr11iBcZpPiav7gkmmhLZ5tzlXTmdKce9tOTGWOEk+Usi7hB38S2p8KeG5y7gMyAKDTmqQVR8nZJ6NC1eI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751444906; c=relaxed/simple;
-	bh=qHk9m++LBoQx3yiAbc9n1ih8ke/7OTNO0TG9b0fRLmg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qAXsEaF+gz1Z2mmNW0zA4FDNh/szBqpBtIlTyyhXU4f6kkBf2nuGqnxdQNJ9ui+npLkUkuv6e7APsXTIz0LmhMcM3SFqoUqZ6vc1AkgrvxVG/rR4IZ5komPHOhMn1DX8EIiwXVNAUQ2ylSWfqsavttDqtr5nzImAE3RmLB6dIVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LNodZ4nY; arc=none smtp.client-ip=217.70.178.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BE9A443184;
-	Wed,  2 Jul 2025 08:28:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1751444895;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Tj6eZS5+WFS158/nz+Vj1Mv/y1Y7UeIf31eukYPIixI=;
-	b=LNodZ4nYYCUz4vO99K3G5/Cmr5ybFCmpiOy0Jc23cyvaeK9ygWD1kTx30M+LZ5M0m4lx0x
-	lNoTTvr8Q/4TXRSgFhDen7kfv4xJJnSaiuL11bvIVL54Lzwaje3lT4Pkt8rNBiFhYn+GYk
-	nWLR+ngRCeuz19zN/P+YcnvAbn5v8U89ZUjcoxU8UiFaxjDp4mDli1n/OQruLgglV91jyA
-	xMxrcWHC9ovBMVjzx7n/wNTkMi5ik1phKh4Kd109SCLEUqNPtDzHpUT086/iyqbPlOZFBx
-	x6YLiDnhlA6YNs95nUd7sPdIqusr+LkYmxlS3l0Xaj0R9sF7hsc1JY74tBMgIw==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1751444933; c=relaxed/simple;
+	bh=HMhGhl+nGkttwlmKfCx46IPS/kNi+zmx1F2ZQiHf9Zk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m2O7atUdTY3RzciZURQ3QZDdOroicJNRDb0/+Q4bM2aL8W/RukWUsLH/CN1GcgXNU2/oFH6hb3BFPT/32I910ytceSXr3blGFi6mOkoUNGvxfAQC9ufghawkE9WZaqPZb5jxM2izioDoCoXmsMfIQci4sLZhl7lFe3h8PFuTvGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QYLmw7dE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42C57C4CEEE;
+	Wed,  2 Jul 2025 08:28:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751444933;
+	bh=HMhGhl+nGkttwlmKfCx46IPS/kNi+zmx1F2ZQiHf9Zk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QYLmw7dEmPsd6RF01Odg6OhL8C5zww8nQEXsxMjQbj9dWVzEcfSKNY22SDl4f/iGB
+	 NBXf4bO3vGiwxCpLL5vB0E0UiTzCz/WS2k2ixoSoPDh1tFMQ1s9HnX2K0MRyQReNzm
+	 Q8IxVG1oxMhoYst9Jq8Kpz9K/D4wY2eWNCNlZKbJ6Ike6iaU43rewyK+0vOkF2ktTI
+	 Uomv+dqLF0K4ipfwh/TfUYZfThQnhE3olG7YyD4Mo6uthJpNLGxI54KgTc1nurCBL6
+	 v46SF7ofRJ92PF5DexJ3hsEuvretl7/w8TLC3cWmVNb771QKYhHHi6OqzNx0oSCONz
+	 aon1AfQTIeI3A==
+Date: Wed, 2 Jul 2025 11:28:47 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Stav Aviram <saviram@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next 3/3] selftests: ethtool: Introduce ethernet PHY selftests on netdevsim
-Date: Wed,  2 Jul 2025 10:28:05 +0200
-Message-ID: <20250702082806.706973-4-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250702082806.706973-1-maxime.chevallier@bootlin.com>
-References: <20250702082806.706973-1-maxime.chevallier@bootlin.com>
+	Jakub Kicinski <kuba@kernel.org>, linux-rdma@vger.kernel.org,
+	Mark Bloch <markb@mellanox.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: Re: [PATCH mlx5-next v1] net/mlx5: Check device memory pointer
+ before usage
+Message-ID: <20250702082847.GH6278@unreal>
+References: <c88711327f4d74d5cebc730dc629607e989ca187.1751370035.git.leon@kernel.org>
+ <20250701193858.GA41770@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduieelvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeevgedtffelffelveeuleelgfejfeevvdejhfehgeefgfffvdefteegvedutefftdenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedvnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedukedprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkv
- ghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250701193858.GA41770@horms.kernel.org>
 
-Now that netdevsim supports PHY device simulation, we can start writing
-some tests to cover a little bit all PHY-related ethtool commands.
+On Tue, Jul 01, 2025 at 08:38:58PM +0100, Simon Horman wrote:
+> On Tue, Jul 01, 2025 at 03:08:12PM +0300, Leon Romanovsky wrote:
+> > From: Stav Aviram <saviram@nvidia.com>
+> > 
+> > Add a NULL check before accessing device memory to prevent a crash if
+> > dev->dm allocation in mlx5_init_once() fails.
+> > 
+> > Fixes: c9b9dcb430b3 ("net/mlx5: Move device memory management to mlx5_core")
+> > Signed-off-by: Stav Aviram <saviram@nvidia.com>
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > ---
+> > Changelog:
+> > v1:
+> >  * Removed extra IS_ERR(dm) check.
+> > v0:
+> > https://lore.kernel.org/all/e389fa6ef075af1049cd7026b912d736ebe3ad23.1751279408.git.leonro@nvidia.com
+> > ---
+> >  drivers/infiniband/hw/mlx5/dm.c                  | 2 +-
+> >  drivers/net/ethernet/mellanox/mlx5/core/lib/dm.c | 4 ++--
+> >  drivers/net/ethernet/mellanox/mlx5/core/main.c   | 2 +-
+> >  3 files changed, 4 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/drivers/infiniband/hw/mlx5/dm.c b/drivers/infiniband/hw/mlx5/dm.c
+> > index b4c97fb62abf..9ded2b7c1e31 100644
+> > --- a/drivers/infiniband/hw/mlx5/dm.c
+> > +++ b/drivers/infiniband/hw/mlx5/dm.c
+> > @@ -282,7 +282,7 @@ static struct ib_dm *handle_alloc_dm_memic(struct ib_ucontext *ctx,
+> >  	int err;
+> >  	u64 address;
+> >  
+> > -	if (!MLX5_CAP_DEV_MEM(dm_db->dev, memic))
+> > +	if (!dm_db || !MLX5_CAP_DEV_MEM(dm_db->dev, memic))
+> >  		return ERR_PTR(-EOPNOTSUPP);
+> 
+> nit: -EOPNOTSUPP doesn't feel like the right error code
+>      in the !dm_db case.
 
-So far we only test the basic use of "ethtool --show-phys", with :
- - A simple command to get a PHY we just added
- - A DUMP command listing PHYs on multiple netdevsim instances
- - A Filtered DUMP command listing all PHYs on a netdevsim
+Why? This error is returned to the user through mlx5_ib_alloc_dm().
 
-Introduce some helpers to create netdevsim PHYs, and a new test file.
+Thanks
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- .../selftests/drivers/net/netdevsim/config    |  1 +
- .../drivers/net/netdevsim/ethtool-common.sh   | 15 +++++
- .../drivers/net/netdevsim/ethtool-phy.sh      | 64 +++++++++++++++++++
- 3 files changed, 80 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/netdevsim/ethtool-phy.sh
-
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/config b/tools/testing/selftests/drivers/net/netdevsim/config
-index 5117c78ddf0a..223e82cb7759 100644
---- a/tools/testing/selftests/drivers/net/netdevsim/config
-+++ b/tools/testing/selftests/drivers/net/netdevsim/config
-@@ -6,6 +6,7 @@ CONFIG_NETDEVSIM=m
- CONFIG_NET_SCH_MQPRIO=y
- CONFIG_NET_SCH_MULTIQ=y
- CONFIG_NET_SCH_PRIO=y
-+CONFIG_PHYLIB=m
- CONFIG_PSAMPLE=y
- CONFIG_PTP_1588_CLOCK_MOCK=y
- CONFIG_VXLAN=m
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/ethtool-common.sh b/tools/testing/selftests/drivers/net/netdevsim/ethtool-common.sh
-index d9c7a3d397a9..1bd0ac5e7bba 100644
---- a/tools/testing/selftests/drivers/net/netdevsim/ethtool-common.sh
-+++ b/tools/testing/selftests/drivers/net/netdevsim/ethtool-common.sh
-@@ -53,3 +53,18 @@ function make_netdev {
-     # get new device name
-     ls /sys/bus/netdevsim/devices/netdevsim${NSIM_ID}/net/
- }
-+
-+function make_phydev_on_netdev {
-+    local parent_ndev_nsim_id=$1
-+    local parent=$2
-+
-+    local ndev_dfs=/sys/kernel/debug/netdevsim/netdevsim$parent_ndev_nsim_id/ports/0
-+
-+    old_dev_dfs=$(find $ndev_dfs -type d)
-+    echo $parent > $ndev_dfs/phy_add
-+    new_dev_dfs=$(find $ndev_dfs -type d)
-+
-+    # The new phydev name corresponds to the new file that was created. Its
-+    # name isn't predictable.
-+    echo $old_dev_dfs $new_dev_dfs | xargs -n1 | sort  | uniq -u
-+}
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/ethtool-phy.sh b/tools/testing/selftests/drivers/net/netdevsim/ethtool-phy.sh
-new file mode 100755
-index 000000000000..7b740a3fda1d
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/netdevsim/ethtool-phy.sh
-@@ -0,0 +1,64 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0-only
-+
-+source ethtool-common.sh
-+
-+# Bail if ethtool is too old
-+if ! ethtool -h | grep show-phys 2>&1 >/dev/null; then
-+    echo "SKIP: No --show-phys support in ethtool"
-+    exit 4
-+fi
-+
-+function make_netdev_from_id {
-+    local new_nsim_id="$1"
-+    # Make a netdevsim
-+    echo $new_nsim_id > /sys/bus/netdevsim/new_device
-+    udevadm settle
-+    # get new device name
-+    ls /sys/bus/netdevsim/devices/netdevsim${new_nsim_id}/net/
-+}
-+
-+function cleanup_netdev_from_id {
-+    local to_del_nsim_id="$1"
-+    echo $to_del_nsim_id > /sys/bus/netdevsim/del_device
-+}
-+
-+NSIM_NETDEV=$(make_netdev)
-+
-+set -o pipefail
-+
-+# Check simple PHY addition and listing
-+
-+# Parent == 0 means that the PHY's parent is the netdev
-+PHY_DFS=$(make_phydev_on_netdev $NSIM_ID 0)
-+
-+# First PHY gets index 1
-+index=$(ethtool --show-phys $NSIM_NETDEV | grep "PHY index" | cut -d ' ' -f 3)
-+check $? "$index" "1"
-+
-+# Insert a second PHY, same parent. It gets index 2.
-+PHY2_DFS=$(make_phydev_on_netdev $NSIM_ID 0)
-+
-+# Create another netdev
-+NSIM_ID2=$((RANDOM % 1024))
-+NSIM_NETDEV_2=$(make_netdev_from_id "$NSIM_ID2")
-+
-+PHY3_DFS=$(make_phydev_on_netdev $NSIM_ID2 0);
-+
-+# Check unfiltered PHY Dump
-+n_phy=$(ethtool --show-phys '*' | grep "PHY index" | wc -l)
-+check $? "$n_phy" "3"
-+
-+# Check filtered Dump
-+n_phy=$(ethtool --show-phys $NSIM_NETDEV | grep "PHY index" | wc -l)
-+check $? "$n_phy" "2"
-+
-+cleanup_netdev_from_id $NSIM_ID2
-+
-+if [ $num_errors -eq 0 ]; then
-+    echo "PASSED all $((num_passes)) checks"
-+    exit 0
-+else
-+    echo "FAILED $num_errors/$((num_errors+num_passes)) checks"
-+    exit 1
-+fi
--- 
-2.49.0
-
+> 
+> >  
+> >  	dm = kzalloc(sizeof(*dm), GFP_KERNEL);
+> 
+> ...
 
