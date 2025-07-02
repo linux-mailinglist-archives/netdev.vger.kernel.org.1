@@ -1,143 +1,146 @@
-Return-Path: <netdev+bounces-203386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8780DAF5BAE
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 16:52:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CB78AF5BE3
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 16:58:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 359941C43EEE
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:52:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1D4B177F15
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B8BC30AAA5;
-	Wed,  2 Jul 2025 14:52:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31C630AAD2;
+	Wed,  2 Jul 2025 14:58:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gYE/WQSY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c/fvOfLn"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8534F3093D8
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 14:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8810D30AAC3;
+	Wed,  2 Jul 2025 14:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751467924; cv=none; b=eJrZIrITutWWiAG98UTrtJDEHNP/BGLnkOZdTwQ6bD6SEjl1j2yCoWvWC65G+hGahzDV/RW81jeWrZ1ClJpTHZFMQt1Tjuc7eYzWDv+PloG9vK/fgsCwX+EHAxns+DpH1YrLwDGFNgEBJVxtPb5+FefeeF04lEmSD/EfuKqEAaM=
+	t=1751468298; cv=none; b=Nt14NPAW8AQcIbvKQDyIpQJO2GRzpPC14bS9HAjJYAYmrQ/iijxsAQ2C3JRwR2xC63APwUcl3/JptQ4PlOwuvPjMTjCNu5glaB7WJp9zXM36twFEyxRBABVRHRrKWhtYN74zTjUWk7IRPg69jHZWIRmnM85vipsch1nz4Io3uSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751467924; c=relaxed/simple;
-	bh=Rm4uKekevq9QVlWcJTU8YYPuS+Ao27X0DY45UpImAO0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YLzrpTg9JcfmB03neUiAE88WY9O75TDUiaAzsuvPzDoUTEJn757dmDLhPeeUIgFnn+FwOXvYpfYIqOpUYQdnIaN6NT3aZjdfBQ5ShS+uw9GCnWPKmGJUVVAipm82kzou9nzPC60eW7xfm9fHFYxLY+ZCS2tRZtVvApz3szDnXr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gYE/WQSY; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751467921;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GD9a+U7xk2HtEH8u7J5QH3o1jHrobpwDVeF+J5TvPOY=;
-	b=gYE/WQSYvSZGs7Q5Zw/LLrSSJVO++wH8UsbHkcGkjZWqd7naulfB3xZF/6D6ZdEuhkct6M
-	KeOo1Dw9PXELlwhfG1dUXSYxVxChzgjhTKceDZw4nYTTJY1Goklef6BmMXBmhqsRm7K5ol
-	zPJKKK80ZzJ/CkhKwvIkEcRSE8harwo=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-84-uepZUSRPOmKXasvFohXj5Q-1; Wed,
- 02 Jul 2025 10:52:00 -0400
-X-MC-Unique: uepZUSRPOmKXasvFohXj5Q-1
-X-Mimecast-MFC-AGG-ID: uepZUSRPOmKXasvFohXj5Q_1751467917
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8067D1978C9A;
-	Wed,  2 Jul 2025 14:51:56 +0000 (UTC)
-Received: from [10.45.226.95] (unknown [10.45.226.95])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7888630001B9;
-	Wed,  2 Jul 2025 14:51:49 +0000 (UTC)
-Message-ID: <4f2e040b-3761-441c-b8b1-3d6aa90c77fc@redhat.com>
-Date: Wed, 2 Jul 2025 16:51:47 +0200
+	s=arc-20240116; t=1751468298; c=relaxed/simple;
+	bh=2HtvpdknLcJGK7pMASC/gnPCo3BIfqDcGzsSm6pwrbE=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=aLeqtPChHZbhy4GlMhJVFLEbi3AqUfqn7mlf2Gz2M31J+XDBNQXEfXnUyVGgVDH5F4J/P+hLkNNDGhJ78M/jqNlLJCbqMp2tHyFr3t4bMe9uOvmBPZVjh9LA+s96C5g0r8ldY1IfJoKj5I7yGpV+l9iY23VyuJuClsRCnNztSXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c/fvOfLn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9158BC4CEE7;
+	Wed,  2 Jul 2025 14:58:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751468298;
+	bh=2HtvpdknLcJGK7pMASC/gnPCo3BIfqDcGzsSm6pwrbE=;
+	h=Subject:From:To:Cc:Date:From;
+	b=c/fvOfLnt/ZiYz51pY94OSLS/BLJUnSNgT+0MJtpFFpgeE40eK0WfancXzbDxMcSg
+	 qtt1E9fpLRs1dkkK+xz78HSudxmwGeuptEqKIn6aliPoNowV6eA9tkX7utBcQGEHs/
+	 w5Sb+iDVRQf4/rIhYWkvspy1112NUOa0Hu930L9WPXHJFkw94GVC2KNbHgpByNyh2M
+	 THE3ps4nwml5XXcFNv3MyHUtF6upbsG9zrov9qFXWCkBTwvVW8Lr09aJ7vi2PfSpUn
+	 VpxqZeDB6kBqHL/vR035b0vhScml89OyZuehXkt5krHPqLDUFeOU+zGsqI25D1wWuc
+	 MScwygnpq0q6A==
+Subject: [PATCH bpf-next V2 0/7] xdp: Allow BPF to set RX hints for
+ XDP_REDIRECTed packets
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>, lorenzo@kernel.org
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <borkmann@iogearbox.net>,
+ Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ sdf@fomichev.me, kernel-team@cloudflare.com, arthur@arthurfabre.com,
+ jakub@cloudflare.com
+Date: Wed, 02 Jul 2025 16:58:12 +0200
+Message-ID: <175146824674.1421237.18351246421763677468.stgit@firesoul>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 07/14] dpll: zl3073x: Add clock_id field
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Prathosh Satish <Prathosh.Satish@microchip.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Jason Gunthorpe <jgg@ziepe.ca>, Shannon Nelson <shannon.nelson@amd.com>,
- Dave Jiang <dave.jiang@intel.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
-References: <20250629191049.64398-1-ivecera@redhat.com>
- <20250629191049.64398-8-ivecera@redhat.com>
- <amsh2xeltgadepx22kvcq4cfyhb3psnxafqhr33ra6nznswsaq@hfq6yrb4zvo7>
- <e5e3409e-b6a8-4a63-97ac-33e6b1215979@redhat.com>
- <cpgoccukn5tuespqse5fep4gzzaeggth2dkzqh6l5jjchumfyc@5kjorwx57med>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <cpgoccukn5tuespqse5fep4gzzaeggth2dkzqh6l5jjchumfyc@5kjorwx57med>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On 02. 07. 25 2:01 odp., Jiri Pirko wrote:
-> Wed, Jul 02, 2025 at 01:43:38PM +0200, ivecera@redhat.com wrote:
->>
->> On 02. 07. 25 12:31 odp., Jiri Pirko wrote:
->>> Sun, Jun 29, 2025 at 09:10:42PM +0200, ivecera@redhat.com wrote:
->>>> Add .clock_id to zl3073x_dev structure that will be used by later
->>>> commits introducing DPLL feature. The clock ID is required for DPLL
->>>> device registration.
->>>>
->>>> To generate this ID, use chip ID read during device initialization.
->>>> In case where multiple zl3073x based chips are present, the chip ID
->>>> is shifted and lower bits are filled by an unique value - using
->>>> the I2C device address for I2C connections and the chip-select value
->>>> for SPI connections.
->>>
->>> You say that multiple chips may have the same chip ID? How is that
->>> possible? Isn't it supposed to be unique?
->>> I understand clock ID to be invariant regardless where you plug your
->>> device. When you construct it from i2c address, sounds wrong.
->>
->> The chip id is not like serial number but it is like device id under
->> PCI. So if you will have multiple chips with this chip id you have to
->> distinguish somehow between them, this is the reason why I2C address
->> is added into the final value.
->>
->> Anyway this device does not have any attribute that corresponds to
->> clock id (as per our previous discussion) and it will be better to NOT
->> require clock id from DPLL core side.
-> 
-> Yes, better not to require it comparing to having it wrong.
+This patch series introduces a mechanism for an XDP program to store RX
+metadata hints - specifically rx_hash, rx_vlan_tag, and rx_timestamp -
+into the xdp_frame. These stored hints are then used to populate the
+corresponding fields in the SKB that is created from the xdp_frame
+following an XDP_REDIRECT.
 
-It looks that using clock_id==0 is safe from DPLL API point of view.
-The problem is if you will have multiple zl3073x based chips because
-the driver would call dpll_device_get(0 /* clock_id */, channel, module)
+The chosen RX metadata hints intentionally map to the existing NIC
+hardware metadata that can be read via kfuncs [1]. While this design
+allows a BPF program to read and propagate existing hardware hints, our
+primary motivation is to enable setting custom values. This is important
+for use cases where the hardware-provided information is insufficient or
+needs to be calculated based on packet contents unavailable to the
+hardware.
 
-For 1st chip (e.g. 2 channel) the driver will call:
-dpll_device_get(0, 0, module);
-dpll_device_get(0, 1, module);
+The primary motivation for this feature is to enable scalable load
+balancing of encapsulated tunnel traffic at the XDP layer. When tunnelled
+packets (e.g., IPsec, GRE) are redirected via cpumap or to a veth device,
+the networking stack later calculates a software hash based on the outer
+headers. For a single tunnel, these outer headers are often identical,
+causing all packets to be assigned the same hash. This collapses all
+traffic onto a single RX queue, creating a performance bottleneck and
+defeating receive-side scaling (RSS).
 
-and for the second the same that is wrong. The clock_id would help to
-distinguish between them.
+Our immediate use case involves load balancing IPsec traffic. For such
+tunnelled traffic, any hardware-provided RX hash is calculated on the
+outer headers and is therefore incorrect for distributing inner flows.
+There is no reason to read the existing value, as it must be recalculated.
+In our XDP program, we perform a partial decryption to access the inner
+headers and calculate a new load-balancing hash, which provides better
+flow distribution. However, without this patch set, there is no way to
+persist this new hash for the network stack to use post-redirect.
 
-Wouldn't it be better to use a random number for clock_id from the
-driver?
+This series solves the problem by introducing new BPF kfuncs that allow an
+XDP program to write e.g. the hash value into the xdp_frame. The
+__xdp_build_skb_from_frame() function is modified to use this stored value
+to set skb->hash on the newly created SKB. As a result, the veth driver's
+queue selection logic uses the BPF-supplied hash, achieving proper
+traffic distribution across multiple CPU cores. This also ensures that
+consumers, like the GRO engine, can operate effectively.
 
-Ivan
+We considered XDP traits as an alternative to adding static members to
+struct xdp_frame. Given the immediate need for this functionality and the
+current development status of traits, we believe this approach is a
+pragmatic solution. We are open to migrating to a traits-based
+implementation if and when they become a generally accepted mechanism for
+such extensions.
+
+[1] https://docs.kernel.org/networking/xdp-rx-metadata.html
+---
+V1: https://lore.kernel.org/all/174897271826.1677018.9096866882347745168.stgit@firesoul/
+
+Jesper Dangaard Brouer (2):
+      selftests/bpf: Adjust test for maximum packet size in xdp_do_redirect
+      net: xdp: update documentation for xdp-rx-metadata.rst
+
+Lorenzo Bianconi (5):
+      net: xdp: Add xdp_rx_meta structure
+      net: xdp: Add kfuncs to store hw metadata in xdp_buff
+      net: xdp: Set skb hw metadata from xdp_frame
+      net: veth: Read xdp metadata from rx_meta struct if available
+      bpf: selftests: Add rx_meta store kfuncs selftest
+
+
+ Documentation/networking/xdp-rx-metadata.rst  |  77 ++++++--
+ drivers/net/veth.c                            |  12 ++
+ include/net/xdp.h                             | 134 ++++++++++++--
+ net/core/xdp.c                                | 107 ++++++++++-
+ net/xdp/xsk_buff_pool.c                       |   4 +-
+ .../bpf/prog_tests/xdp_do_redirect.c          |   6 +-
+ .../selftests/bpf/prog_tests/xdp_rxmeta.c     | 166 ++++++++++++++++++
+ .../selftests/bpf/progs/xdp_rxmeta_receiver.c |  44 +++++
+ .../selftests/bpf/progs/xdp_rxmeta_redirect.c |  43 +++++
+ 9 files changed, 558 insertions(+), 35 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/xdp_rxmeta.c
+ create mode 100644 tools/testing/selftests/bpf/progs/xdp_rxmeta_receiver.c
+ create mode 100644 tools/testing/selftests/bpf/progs/xdp_rxmeta_redirect.c
+
+--
 
 
