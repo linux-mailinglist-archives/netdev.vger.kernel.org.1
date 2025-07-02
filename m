@@ -1,227 +1,95 @@
-Return-Path: <netdev+bounces-203395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D6C4AF5BFB
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 17:00:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC016AF5C06
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 17:02:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08769523110
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:59:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AB194A7994
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 15:00:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C5430B9BD;
-	Wed,  2 Jul 2025 14:59:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20AE32D0C6E;
+	Wed,  2 Jul 2025 15:00:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b8jJjDLo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AHqy0wjl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FEC22620D5;
-	Wed,  2 Jul 2025 14:59:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C032D0C65
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 15:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751468345; cv=none; b=dymLfEAr+NlNefNEFyAEp5z4WQcWsDEsEH/h4Sv+u6n6qnnBE0JkudI+2HoodbyoGtfQDuZ7NmND1BZpv5H1sKDMnqNrfX8C88YKc3mIWvAvpNRMnKTfpN03bbSK6VjRWtEPnyrWhNjJvzLrH/T+/2G1b2GacRGiQfcIeSSS5NQ=
+	t=1751468403; cv=none; b=n8ZxACirl3UO7XmrVelTlqfStGicdvVHdH4JSuwSShbwGnTpBFm76d34Vyda3Tal6IBQXtNO8IGQwUDzJ2f0J8muLUiMXjK3FAg7hbF7+GAxfZSdlfXu1Cw2E10HYGCRwd1q1EFwq99qeDLP9XZQTmE44KnOs0E/yHrP5zekBRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751468345; c=relaxed/simple;
-	bh=iU8cjkbiD1V8rEfkQhLFyDJqS2/+nK4xq+1ZWRs13lg=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BzQRZkbyogLzEa+lRQRogcpV3dahxiD0ZxbE8IuL4/mN7w2OvivjSv8fnMv6dy+SWW8wG4D743d4yf4LGoTAkBEqYx05Xd/4tmz2KUUuXQXwPUZMOC/Jt8+6TOBHcMdMBldrKRXZi/tv4RA9lgMbGmudv/+x5QpJIr+j340lKhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b8jJjDLo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75647C4CEE7;
-	Wed,  2 Jul 2025 14:59:01 +0000 (UTC)
+	s=arc-20240116; t=1751468403; c=relaxed/simple;
+	bh=6g2eecq0ydRb7QyId9Z/QMdDlzEHAch6LZVEgA1ub7A=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=CgKbLzTfblbV6bqomnU95pOF6DxBUxaTpaOM99S5H0SaQBbdCLUBv7Pxcgxs+5/B/U/X5wl4X1SNQkHdzGaj24LrPMyZAEeM0lnkIwbn1uUaDd6rGouvbwFUisWgaKaERQkv7rBoTT7iHTQEcXL+FiA7zMUnXcPAoIrigHv/5LU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AHqy0wjl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 840F6C4CEED;
+	Wed,  2 Jul 2025 15:00:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751468345;
-	bh=iU8cjkbiD1V8rEfkQhLFyDJqS2/+nK4xq+1ZWRs13lg=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=b8jJjDLoT8GowzlULHqZPtmlNy/bMuYhpYPSkQ3qWHwNuHQeh7EQra4MLuilbGgII
-	 ugc9yWT3xatpkrw7XfJIqKdBDBGFJivH1BAal1clX+++Rh8hkK2VA5fcjBYiM1qKWl
-	 81jO+iYM18B/aLrzBD7qPh9bGVl2a1HC/EE+n4y4+1+rSfP+z5MaStlWEDyQLIv0lF
-	 RjbVRPfFZ5lwxODyuFFVY01aTeNjLHm0KoQU3NUcOoXUeA9JYqxAuLHqvcN8a7zVEL
-	 v6OoThwpJoia7M93zzomr32GCDEgXLaWpwhLNAfZPd8DIMXlFTgZN+xNfousCymmdO
-	 fcr/aps7yJPSQ==
-Subject: [PATCH bpf-next V2 7/7] net: xdp: update documentation for
- xdp-rx-metadata.rst
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-To: bpf@vger.kernel.org, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, lorenzo@kernel.org
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <borkmann@iogearbox.net>,
- Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- sdf@fomichev.me, kernel-team@cloudflare.com, arthur@arthurfabre.com,
- jakub@cloudflare.com
-Date: Wed, 02 Jul 2025 16:58:59 +0200
-Message-ID: <175146833962.1421237.12791103620310340595.stgit@firesoul>
-In-Reply-To: <175146824674.1421237.18351246421763677468.stgit@firesoul>
-References: <175146824674.1421237.18351246421763677468.stgit@firesoul>
-User-Agent: StGit/1.5
+	s=k20201202; t=1751468402;
+	bh=6g2eecq0ydRb7QyId9Z/QMdDlzEHAch6LZVEgA1ub7A=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AHqy0wjlTw6/AHbXKGISVg1p3+jv0p9xVIXMbDfne8KQM2pbXED6Y14XU5LG2xtUK
+	 yyqkjomcLp28zrseCu9IN+0Hf/NUVjpxIl8+Sc0lvQdSxwMSNbSAHqC34xv6EsnNuv
+	 gWCGDRY3yFrOGl9WmranRzYRKHdZahmB6WefTehUGsCUQ6hw9cCdZg9Wbof+Cuo97b
+	 VZxmuLBHSq7NTS13mx3IclXw8kC1huKYtvtWRu89OUGsCSNEV/3oQe8n4/w4RphnB2
+	 UcUh4Co731rD+yd3bWLsTaEVpkqrp/JPFpBP4wXLh7edn1iobCWdrKBljF4WvLTS1j
+	 +SA5hiepoIL6g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33ECB383B273;
+	Wed,  2 Jul 2025 15:00:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2-next 0/2] ip neigh: Add support for
+ "extern_valid"
+ flag
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175146842699.753088.3341392203351627196.git-patchwork-notify@kernel.org>
+Date: Wed, 02 Jul 2025 15:00:26 +0000
+References: <20250701144216.823867-1-idosch@nvidia.com>
+In-Reply-To: <20250701144216.823867-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, dsahern@gmail.com, stephen@networkplumber.org,
+ petrm@nvidia.com
 
-Update the documentation[1] based on the changes in this patchset.
+Hello:
 
-[1] https://docs.kernel.org/networking/xdp-rx-metadata.html
+This series was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
 
-Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
----
- Documentation/networking/xdp-rx-metadata.rst |   77 +++++++++++++++++++++-----
- net/core/xdp.c                               |   32 +++++++++++
- 2 files changed, 93 insertions(+), 16 deletions(-)
+On Tue, 1 Jul 2025 17:42:14 +0300 you wrote:
+> Add support for the new "extern_valid" neighbor flag [1].
+> 
+> Patch #1 updates the uAPI headers.
+> 
+> Patch #2 adds support for the new flag. See the commit message for
+> example usage and output.
+> 
+> [...]
 
-diff --git a/Documentation/networking/xdp-rx-metadata.rst b/Documentation/networking/xdp-rx-metadata.rst
-index a6e0ece18be5..e2b89c066a82 100644
---- a/Documentation/networking/xdp-rx-metadata.rst
-+++ b/Documentation/networking/xdp-rx-metadata.rst
-@@ -90,22 +90,67 @@ the ``data_meta`` pointer.
- In the future, we'd like to support a case where an XDP program
- can override some of the metadata used for building ``skbs``.
- 
--bpf_redirect_map
--================
--
--``bpf_redirect_map`` can redirect the frame to a different device.
--Some devices (like virtual ethernet links) support running a second XDP
--program after the redirect. However, the final consumer doesn't have
--access to the original hardware descriptor and can't access any of
--the original metadata. The same applies to XDP programs installed
--into devmaps and cpumaps.
--
--This means that for redirected packets only custom metadata is
--currently supported, which has to be prepared by the initial XDP program
--before redirect. If the frame is eventually passed to the kernel, the
--``skb`` created from such a frame won't have any hardware metadata populated
--in its ``skb``. If such a packet is later redirected into an ``XSK``,
--that will also only have access to the custom metadata.
-+XDP_REDIRECT
-+============
-+
-+The ``XDP_REDIRECT`` action forwards an XDP frame (``xdp_frame``) to another net
-+device or a CPU (via cpumap/devmap) for further processing. It is invoked using
-+BPF helpers like ``bpf_redirect_map()`` or ``bpf_redirect()``.  When an XDP
-+frame is redirected, the recipient (e.g., an XDP program on a veth device, or
-+the kernel stack via cpumap) naturally loses direct access to the original NIC's
-+hardware descriptor and thus its hardware metadata hints.
-+
-+By default, if an ``xdp_frame`` is redirected and then converted to an ``skb``,
-+its fields for hardware-derived metadata like ``skb->hash`` are not
-+populated. When this occurs, the network stack recalculates the hash in
-+software. This is particularly problematic for encapsulated tunnel traffic
-+(e.g., IPsec, GRE), as the software hash is based on the outer headers. For a
-+single tunnel, this can cause all flows to receive the same hash, leading to
-+poor load balancing when redirected to a veth device or processed by cpumap.
-+
-+To solve this, a BPF program can calculate a more appropriate hint from the
-+packet data (e.g., from the inner headers of a tunnel) and store it for later
-+use. While it is also possible for the BPF program to propagate existing
-+hardware hints, this is not useful for the tunnel use case; it is unnecessary to
-+read the existing hardware metadata hint, as it is based on the outer headers
-+and must be recalculated to correctly reflect the inner flow.
-+
-+For example, a BPF program can perform partial decryption on an IPsec packet,
-+calculate a hash from the inner headers, and use ``bpf_xdp_store_rx_hash()`` to
-+save it. This ensures that when the packet is redirected to a veth device, it is
-+placed on the correct RX queue, achieving proper load balancing.
-+
-+When these kfuncs are used to store hints before redirection:
-+
-+* If the ``xdp_frame`` is converted to an ``skb``, the networking stack will use
-+  the stored hints to populate the corresponding ``skb`` fields (e.g.,
-+  ``skb->hash``, ``skb->vlan_tci``, timestamps).
-+
-+* When running a second XDP-program after the redirect. The veth driver supports
-+  access to the previous stored metadata is accessed though the normal reader
-+  kfuncs.
-+
-+The BPF programmer must explicitly call these "store" kfuncs to save the desired
-+hints. The NIC driver is responsible for ensuring sufficient headroom is
-+available; kfuncs may return ``-ENOSPC`` if space is inadequate.
-+
-+Kfuncs are available for storing RX hash (``bpf_xdp_store_rx_hash()``),
-+VLAN information (``bpf_xdp_store_rx_vlan()``), and hardware timestamps
-+(``bpf_xdp_store_rx_ts()``). Consult the kfunc API documentation for usage
-+details, expected data, return codes, and relevant XDP flags that may
-+indicate success or metadata availability.
-+
-+Kfuncs for **store** operations:
-+
-+.. kernel-doc:: net/core/xdp.c
-+   :identifiers: bpf_xdp_store_rx_timestamp
-+
-+.. kernel-doc:: net/core/xdp.c
-+   :identifiers: bpf_xdp_store_rx_hash
-+
-+.. kernel-doc:: net/core/xdp.c
-+   :identifiers: bpf_xdp_store_rx_vlan_tag
-+
- 
- bpf_tail_call
- =============
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index f1b2a3b4ba95..e8faf9f6fc7e 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -990,6 +990,18 @@ __bpf_kfunc int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx,
- 	return -EOPNOTSUPP;
- }
- 
-+/**
-+ * bpf_xdp_store_rx_hash - Store XDP frame RX hash.
-+ * @ctx: XDP context pointer.
-+ * @hash: 32-bit hash value.
-+ * @rss_type: RSS hash type.
-+ *
-+ * The RSS hash type (@rss_type) is as descibed in bpf_xdp_metadata_rx_hash.
-+ *
-+ * Return:
-+ * * Returns 0 on success or ``-errno`` on error.
-+ * * ``-NOSPC``   : means device driver doesn't provide enough headroom for storing
-+ */
- __bpf_kfunc int bpf_xdp_store_rx_hash(struct xdp_md *ctx, u32 hash,
- 				      enum xdp_rss_hash_type rss_type)
- {
-@@ -1005,6 +1017,18 @@ __bpf_kfunc int bpf_xdp_store_rx_hash(struct xdp_md *ctx, u32 hash,
- 	return 0;
- }
- 
-+/**
-+ * bpf_xdp_store_rx_vlan_tag - Store XDP packet outermost VLAN tag
-+ * @ctx: XDP context pointer.
-+ * @vlan_proto: VLAN protocol stored in **network byte order (BE)**
-+ * @vlan_tci: VLAN TCI (VID + DEI + PCP) stored in **host byte order**
-+ *
-+ * See bpf_xdp_metadata_rx_vlan_tag() for byte order reasoning.
-+ *
-+ * Return:
-+ * * Returns 0 on success or ``-errno`` on error.
-+ * * ``-NOSPC``   : means device driver doesn't provide enough headroom for storing
-+ */
- __bpf_kfunc int bpf_xdp_store_rx_vlan(struct xdp_md *ctx, __be16 vlan_proto,
- 				      u16 vlan_tci)
- {
-@@ -1020,6 +1044,14 @@ __bpf_kfunc int bpf_xdp_store_rx_vlan(struct xdp_md *ctx, __be16 vlan_proto,
- 	return 0;
- }
- 
-+/**
-+ * bpf_xdp_metadata_rx_timestamp - Store XDP frame RX timestamp.
-+ * @ctx: XDP context pointer.
-+ * @timestamp: Timestamp value.
-+ *
-+ * Return:
-+ * * Returns 0 on success or ``-errno`` on error.
-+ */
- __bpf_kfunc int bpf_xdp_store_rx_ts(struct xdp_md *ctx, u64 ts)
- {
- 	struct xdp_buff *xdp = (struct xdp_buff *)ctx;
+Here is the summary with links:
+  - [iproute2-next,1/2] Sync uAPI headers
+    (no matching commit)
+  - [iproute2-next,2/2] ip neigh: Add support for "extern_valid" flag
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=1ac42adcb600
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
