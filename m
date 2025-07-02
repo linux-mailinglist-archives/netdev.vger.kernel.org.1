@@ -1,97 +1,95 @@
-Return-Path: <netdev+bounces-203383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0968AF5B47
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 16:39:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF151AF5B55
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 16:41:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D02A486F62
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:39:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57C004A236E
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:41:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4873F2F432B;
-	Wed,  2 Jul 2025 14:39:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD2F309DAB;
+	Wed,  2 Jul 2025 14:41:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n0l+QKx4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mx+t9G6j"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22EB026C3A3
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 14:39:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D20309DA2;
+	Wed,  2 Jul 2025 14:41:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751467186; cv=none; b=kgfZbp3Z45lrROKmS87ZPrfXLvIZyhiMHZSb/4WH/HrJ4lL8jrEpsQyjO6Dqob9blsEfgu8+pkKDUpkHKs8JcbYrf0cxhxsQoItreM8/AwzbG3bo/nOpQbtCMDUBoGmCGLw+6t0/WHYtqX6SRevJhzyxjaaTKI04NFzYE2HO1aY=
+	t=1751467271; cv=none; b=XCUh2JRaxpz+YVPd3wpYT0fJyTB4Kq1V3VLb9/Ah8YN8IsUC89F8PwoSv4iYU8DJDPTWFTfgJLDCvBzpuOaj6cK68YfUIg1gZz2PGAuBjixHREFU/pA9sjx+V+rdTBBtETfmac7Eq7U5hoQ897S4jN693mGBbgxABDoB3scDGUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751467186; c=relaxed/simple;
-	bh=R19ihR/OzC6bqGGAFeNWZKeZX9q7baXzFvYHJPRF9Po=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QdC5CU9IQKrFd0Tc6/A4mxuzK6ZgAg335GKLhTF9y1XgWRsiBxLIHcuw3oiYpZSN5cdBQUy8YxoD4ZeXih65LH0ydFpp1W4NYDlBLHOxlvhHXnGMqHoEspTVw0qzUv02spbbeOAR1m0OqTumDAXb4ow4lRmBEovJgB3dQMSllYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n0l+QKx4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DD1CC4CEE7;
-	Wed,  2 Jul 2025 14:39:45 +0000 (UTC)
+	s=arc-20240116; t=1751467271; c=relaxed/simple;
+	bh=GuwRVD/Uyg3Uu3CqWllUlTZS5g06hIK2uOZsGz6LAgA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=coJXlZLCVQAGZqhsxyqKMYGow+IZr3jYhNEd9MjWYy86+lQoUczyP6aMwB/Rt/i8X4nIU2ROfBJux/gZqt6KUih1U49F30LS1q0ad+4AHWwvM7dUMCmvOGuqqOYtlq/foc4/3R2gX259Z87Tp8PiZlPOSH4IH3ajq/tmKua7Hi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mx+t9G6j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93CD3C4CEE7;
+	Wed,  2 Jul 2025 14:41:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751467185;
-	bh=R19ihR/OzC6bqGGAFeNWZKeZX9q7baXzFvYHJPRF9Po=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=n0l+QKx4kkKS37EgfPZ2gZQy8Qe/TRE0QBf9SRUvqIMsTbK8s/rXQdvi+uMsLgHcf
-	 wfC9OaE11W2N80JPNTB51ZpD9dmabCme0o6OgwKdcRk/tE06gHDKeyNJkX8RNOMN2s
-	 zQoJdNgZdANzJYtqG7ZxnDHU1Ujma2ACeHERa2uZZuM8pTtblxRhV2l5d+9Nvo033v
-	 pE1J5kQQWCdsNhoGWRTU/YlGZ+L58IgAqTfpuTjSa5FDW9LlH1aH6tkU4BTJlgc6L5
-	 Aiwxx11abTwbw58Ld24D4DkRPw4UT9Hw9zkCVg3dTCiZT7woMpJ9jnUaM1JFNR/zyW
-	 g8EEhO+JCmaDg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C4C383B273;
-	Wed,  2 Jul 2025 14:40:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1751467270;
+	bh=GuwRVD/Uyg3Uu3CqWllUlTZS5g06hIK2uOZsGz6LAgA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mx+t9G6jLcvfp9KBRuE6eWMP0bw732dFZIQa4cvx2vLeYTWD3TYnU/1oFaUDXPZyT
+	 8j4mZlB6NJsTi+BFqxQgBp9xD9AU/tMihhSIRT/BmihXYd70DmBFSge8YUPx9MnGuk
+	 lm5q3Y6CpAQ5/XwS0CVGVV3YiviwDdv6tzsJhSUzAolgzbODnKwTJdd2dwOUfpW0Tk
+	 rNJNz+dagsFCS0c1DFN69L86an5d69fl6745fp9FHGhYP3jLfe7Okc3AR+s/XHreD0
+	 2JBthzule/XwSXHQAf3RaZ6ElGShvnkjQW+BmEHMswEgHF+P3WIVTUJGHmy2eEwmZw
+	 p6cQuQfbdtH9w==
+Date: Wed, 2 Jul 2025 15:41:06 +0100
+From: Simon Horman <horms@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Patrisious Haddad <phaddad@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH mlx5-next] net/mlx5: fs, fix RDMA TRANSPORT init cleanup
+ flow
+Message-ID: <20250702144106.GF41770@horms.kernel.org>
+References: <78cf89b5d8452caf1e979350b30ada6904362f66.1751451780.git.leon@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next v6 0/3] bridge: dump mcast querier state per
- vlan
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175146721025.744720.14595669667124615372.git-patchwork-notify@kernel.org>
-Date: Wed, 02 Jul 2025 14:40:10 +0000
-References: <20250625-mcast-querier-vlan-lib-v6-0-03659be44d48@pengutronix.de>
-In-Reply-To: 
- <20250625-mcast-querier-vlan-lib-v6-0-03659be44d48@pengutronix.de>
-To: Fabian Pfitzner <f.pfitzner@pengutronix.de>
-Cc: netdev@vger.kernel.org, entwicklung@pengutronix.de, razor@blackwall.org,
- bridge@lists.linux-foundation.org, dsahern@gmail.com, idosch@nvidia.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <78cf89b5d8452caf1e979350b30ada6904362f66.1751451780.git.leon@kernel.org>
 
-Hello:
-
-This series was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
-
-On Wed, 25 Jun 2025 10:39:12 +0200 you wrote:
-> Dump the multicast querier state per vlan.
-> This commit is almost identical to [1].
+On Wed, Jul 02, 2025 at 01:24:04PM +0300, Leon Romanovsky wrote:
+> From: Patrisious Haddad <phaddad@nvidia.com>
 > 
-> The querier state can be seen with:
+> Failing during the initialization of root_namespace didn't cleanup
+> the priorities of the namespace on which the failure occurred.
 > 
-> bridge -d vlan global
+> Properly cleanup said priorities on failure.
 > 
-> [...]
+> Fixes: e6746b0c7423 ("net/mlx5: fs, add multiple prios to RDMA TRANSPORT steering domain")
 
-Here is the summary with links:
-  - [iproute2-next,v6,1/3] bridge: move mcast querier dumping code into a shared function
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=da6fbcf63c13
-  - [iproute2-next,v6,2/3] bridge: dump mcast querier per vlan
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=baeeb9a8e184
-  - [iproute2-next,v6,3/3] bridge: refactor bridge mcast querier function
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=cdc027cb7f47
+Hi Leon and Patrisious,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Maybe there has been a rebase, there is something weird on my side, or for
+some reason it doesn't matter. But I see a different hash in mlx5-next [1].
 
+Fixes: 52931f55159e ("net/mlx5: fs, add multiple prios to RDMA TRANSPORT steering domain")
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git/log/?h=mlx5-next
+
+> Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+
+Otherwise, LGTM.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
