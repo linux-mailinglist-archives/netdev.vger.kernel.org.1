@@ -1,123 +1,112 @@
-Return-Path: <netdev+bounces-203312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84B78AF144A
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 13:44:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1E36AF146A
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 13:47:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 412784A233F
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:43:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2AF71C284FE
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:47:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F398F267700;
-	Wed,  2 Jul 2025 11:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61F252676E6;
+	Wed,  2 Jul 2025 11:46:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PuOSjVRY"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="SyqiSTPh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1AD255E4E
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 11:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DAC5125B9
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 11:46:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751456643; cv=none; b=I5fNkkR7RjbrcConGO4E0/pblxCpFbyiV5mtm2PJmFUb+WMCbNY5/iNvIPqsIyhPo2ej/HcHx0VIVMobdbLEPhoAWbqg0CiM2FDdXsbTv5XjTNCSrT2OQu1RF9Az8KiekDhGvCuf0KgkmeP3RK8lAXzRte/6b9ne3bfCuiJ4ezI=
+	t=1751456814; cv=none; b=O5lv9c0AGgQ1FFyrFJ3fK8IYK1qAj1C14DILkOdK7XnmK/YqYz9sHOnGt97+ORq3w8bjviniJPVqpYB/VoZ8pnfOzGFzkpzZ2kaJMdcVtGErwatmXb8PKTj5BRmDd/fqWG8xswT+vU2Nbxu8Dwtxira5B7FEl0M5Hn2zeyacNRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751456643; c=relaxed/simple;
-	bh=lQ5pOB3PF0Ozj2m53e3VhTH0wmfKLgTVASK5lMyhgEI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IBs2aqrOB1SHcwykwmtV6GFTp41fITkJBh50woiyT7xOIPW8jKbmI+0TE+FHAIu0N4W2zH0i12E+vrqVuMPd9meEd8hOP0WUP99SCtFXH10+STnE/5InQX+t/v6pqVIWFK4rJHMwMpSWMJc/LEQn7v5kKs3yMmn927zbAkWY19Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PuOSjVRY; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751456638;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dwvTGYy8qX0iUTJggFcHacmEi3yRTYRCFkLK9Jl7i5c=;
-	b=PuOSjVRYMvpSEOOesEFYcJVK6x7J2SDujw9W+TaKj25g1u6+/Sw2jtf6pOE0W7lCCYkoxQ
-	AvT1BiK140UI3lNruVmHl2KRJv9vBG0fXBYnjG144Z14AQRDZQloxll30wGdN1Go9SCRSX
-	nvLOhDmy0GXrLDunT9Ri9ZzGE2m94NE=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-328-b07H8pFiO_mvNmbmdKQTUw-1; Wed,
- 02 Jul 2025 07:43:51 -0400
-X-MC-Unique: b07H8pFiO_mvNmbmdKQTUw-1
-X-Mimecast-MFC-AGG-ID: b07H8pFiO_mvNmbmdKQTUw_1751456627
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 852EF18011FE;
-	Wed,  2 Jul 2025 11:43:46 +0000 (UTC)
-Received: from [10.45.226.95] (unknown [10.45.226.95])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A0E02195608F;
-	Wed,  2 Jul 2025 11:43:39 +0000 (UTC)
-Message-ID: <e5e3409e-b6a8-4a63-97ac-33e6b1215979@redhat.com>
-Date: Wed, 2 Jul 2025 13:43:38 +0200
+	s=arc-20240116; t=1751456814; c=relaxed/simple;
+	bh=B+ckTwhERKNBb1gQw1U8u0g+Bc8f/814LWyhbI7jr8Y=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=OraYcG0qJMX01c81hVtaXyzwLi2CdJdDKTzoX+RXuIPrC4vls0Mpqo5fMETll85M5PQewBCyN6x+I70yg/vWA4IFdP8tFDVpXvoOuCTKRbo+To+ayYeL3zeYlKuCTzx9V/l6BGkWqVtSCR8amGlgwsU7IZnwLNJyMaQ6Jv3ukyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=SyqiSTPh; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-ae3be3eabd8so199888866b.1
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 04:46:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1751456810; x=1752061610; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=B+ckTwhERKNBb1gQw1U8u0g+Bc8f/814LWyhbI7jr8Y=;
+        b=SyqiSTPhhIys5zaHLq6k61MH5pjvQFvzQwjMnE6mm2ds65agR+c6FkHWDCYk7JH3aC
+         MYh4wzsRIRShF3PVpdNYuSITR3R40cW5u9D1YDtQ7fIvmQREHbqrS1whhKij2DQYNK50
+         gD1lFUVz51D5Gk+mCT9GvUuExmDlO9A+9AflC6PS9VNmj13VYxzi5gcDhXZJ6Sb4n2gD
+         8pjzhIvSMpvLUQDd2C8rpZTLmmNIWFf7khQgpTqpd0dewsqvPn/lwl9Pk8AatBGJU9k8
+         6tmCDhNBv/GojB7ojr7f7b+3D0N4S7Y3ISPIeFxNZhxlF5u4oEmrJPLGJGAlaMo7hvYF
+         0NXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751456810; x=1752061610;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B+ckTwhERKNBb1gQw1U8u0g+Bc8f/814LWyhbI7jr8Y=;
+        b=H5IQWnr3FzY39V/jHtb0MYPTE6/kZPlZV6w+9wuAka4WwePURC/3RO5y/dHWsMXpjH
+         SSCvItmD/iWtNUkbclXvD4P3NcONqUlxFnBAGctn+c734ZVnUUN+b07ivh78q6J/4ZnS
+         Pzn0AhDElnOJxRc+Fdq3TTj/zDy6qjGbc2vDwAkCDMk/WQGrA3NKq5JcdGH3QBsZiGHx
+         A1T4ukFNrCLthjHeBMY3HS4nA3/3frkSg7JWT1DmPSfhmTkPyJBRalO2BwQYLyDMZ1PP
+         U3LOM/edTt0kzUsabSNUZhp2HuoNz8OXYKdnkpNm1mIpG6CwGxNswgGRISnSzokJatM1
+         gQdQ==
+X-Gm-Message-State: AOJu0YxtEQlxFpHU2h4E47HhjfTH+5UXnvjdO+fYIGx35eEktGxYjcGU
+	/YN2Ua+npVANmMIWeP3EyQCxaYMc0/q5wg3fbKLJY+jxPvntWP9KZPMHjprMvMq+SMw=
+X-Gm-Gg: ASbGncswMlo3O+joh/xWwyyKuuvMdUB6wwRb17Q7zVehBz7I5r9RwpsavW/U9IJxPBD
+	ssPfJftOfHkv1ep1rYKNJpNcU48kre0A1o4cCDMjWJngtqNevPWDdPkOTCG4S5SErqMnJW6D/wE
+	kzBrwNCYNyLpjEm0sjrNz+rXx9VFNWPXYid7io+zqOCYgxAlY3ZbqB7mkhjs9Gbq0BW9gsYwlaX
+	AzJ9OGac4odigiwXkv/bbNcpbnq/keZ9yFTdCh2xRCDNRPXg/TOI1HKKGsalwEPRP23WDvk7PI0
+	34maApmYsTclUV15d4q80jyF+mOWdEUEJX/v3bSQjsHCfSOnRhqiWbs=
+X-Google-Smtp-Source: AGHT+IHn9IHAQjBFlntquHq7U7auo8n8gfpvyxwY1QPzU89J2geG4r9cCc7SijhW0jMSezFMElSy9A==
+X-Received: by 2002:a17:906:c14c:b0:ae0:7e95:fb with SMTP id a640c23a62f3a-ae3c3843a2fmr207138766b.5.1751456810074;
+        Wed, 02 Jul 2025 04:46:50 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:e7])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae35365a02csm1061393766b.70.2025.07.02.04.46.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jul 2025 04:46:49 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org,  bpf@vger.kernel.org,  john.fastabend@gmail.com,
+  zijianzhang@bytedance.com,  zhoufeng.zf@bytedance.com,  Cong Wang
+ <cong.wang@bytedance.com>
+Subject: Re: [Patch bpf-next v4 3/4] skmsg: save some space in struct sk_psock
+In-Reply-To: <20250701011201.235392-4-xiyou.wangcong@gmail.com> (Cong Wang's
+	message of "Mon, 30 Jun 2025 18:12:00 -0700")
+References: <20250701011201.235392-1-xiyou.wangcong@gmail.com>
+	<20250701011201.235392-4-xiyou.wangcong@gmail.com>
+Date: Wed, 02 Jul 2025 13:46:48 +0200
+Message-ID: <87ikkan7br.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 07/14] dpll: zl3073x: Add clock_id field
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Prathosh Satish <Prathosh.Satish@microchip.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Jason Gunthorpe <jgg@ziepe.ca>, Shannon Nelson <shannon.nelson@amd.com>,
- Dave Jiang <dave.jiang@intel.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
-References: <20250629191049.64398-1-ivecera@redhat.com>
- <20250629191049.64398-8-ivecera@redhat.com>
- <amsh2xeltgadepx22kvcq4cfyhb3psnxafqhr33ra6nznswsaq@hfq6yrb4zvo7>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <amsh2xeltgadepx22kvcq4cfyhb3psnxafqhr33ra6nznswsaq@hfq6yrb4zvo7>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain
 
+On Mon, Jun 30, 2025 at 06:12 PM -07, Cong Wang wrote:
+> From: Cong Wang <cong.wang@bytedance.com>
+>
+> This patch aims to save some space in struct sk_psock and prepares for
+> the next patch which will add more fields.
+>
+> psock->eval can only have 4 possible values, make it 8-bit is
+> sufficient.
+>
+> psock->redir_ingress is just a boolean, using 1 bit is enough.
+>
+> Reviewed-by: John Fastabend <john.fastabend@gmail.com>
+> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+> ---
 
-On 02. 07. 25 12:31 odp., Jiri Pirko wrote:
-> Sun, Jun 29, 2025 at 09:10:42PM +0200, ivecera@redhat.com wrote:
->> Add .clock_id to zl3073x_dev structure that will be used by later
->> commits introducing DPLL feature. The clock ID is required for DPLL
->> device registration.
->>
->> To generate this ID, use chip ID read during device initialization.
->> In case where multiple zl3073x based chips are present, the chip ID
->> is shifted and lower bits are filled by an unique value - using
->> the I2C device address for I2C connections and the chip-select value
->> for SPI connections.
-> 
-> You say that multiple chips may have the same chip ID? How is that
-> possible? Isn't it supposed to be unique?
-> I understand clock ID to be invariant regardless where you plug your
-> device. When you construct it from i2c address, sounds wrong.
+We could probably tweak sk_psock_map_verd to map (SK_PASS, redir=true,
+ingress=true) in to something like __SK_REDIR_INGRESS in the future, and
+do away with psock->redir_ingress field completely.
 
-The chip id is not like serial number but it is like device id under
-PCI. So if you will have multiple chips with this chip id you have to
-distinguish somehow between them, this is the reason why I2C address
-is added into the final value.
-
-Anyway this device does not have any attribute that corresponds to
-clock id (as per our previous discussion) and it will be better to NOT
-require clock id from DPLL core side.
-
-Ivan
-
+Reviewed-by: Jakub Sitnicki <jakub@cloudflare.com>
 
