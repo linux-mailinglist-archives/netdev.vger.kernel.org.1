@@ -1,158 +1,161 @@
-Return-Path: <netdev+bounces-203227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EB3BAF0D6D
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:03:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E34AFAF0D82
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:10:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E15B1C24001
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:03:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03ABD4A7572
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:10:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5315B2356DB;
-	Wed,  2 Jul 2025 08:03:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1Tw4tUHH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD9123505F;
+	Wed,  2 Jul 2025 08:10:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com [209.85.128.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B101E2343AF
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 08:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E7B199FAB;
+	Wed,  2 Jul 2025 08:10:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751443386; cv=none; b=pCFIz0KY0WMJSct9QjkDRtaxT4pwNEnRzppUWH1bTf0BFC+wS+NvzGz9tdyaN4o5BJYnbBZyyyP7Do5Ft0ndqb48GVtc/Q1yxP6grPEgtVjuUBRqr+Opmcwnj46HrSRf0Rkt71lPBdaK2qOWu40PQ6CWm7NthnSZZSH03wK88oE=
+	t=1751443841; cv=none; b=CKAB4sGbA5L8SRVT2LmlfDalDEhUaJCdgKEP8vTITgxDRZ+zDU5jSxwlNfwaqtHGRBzCc+hH+jrULVJL6iaPGYESZyIbK8ov1tdOuZ8ibANrctSXzG1m9Xph1Jrh2cOd7Amvcx4gUmR4uvU+GlPqL7YS2KznONfYZCcAqMZz3OU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751443386; c=relaxed/simple;
-	bh=k5rRe3xa5VlcBs3acQkW7OBTqBGq71i2uzhF8vuv0ao=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DHiZICxOETL4J3CGdgIVPAUZL3tKpJFszuOagMzifC5f6emAT0fBq8kZuqvH6VVuzbH6r9EyUstswq/8fsci5WlvVfgbbXyVKp4xwlPJvnOG/1JHVWmM36htP5dZhPGleABPU6vRIpGIms0C+YFQ/u1SrmIT9IaXQksFvjFN+KI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1Tw4tUHH; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4a8244e897fso29291171cf.1
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 01:03:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751443383; x=1752048183; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qBZuk3H+46fxs/MVm+reaCZ2EIrEk1+0jJRknjvGIxs=;
-        b=1Tw4tUHHlmyn9nBgfvABW/B2HXHpVP1/UC84idzP+0uDc3LlsBmqRu6jVycDjPR95s
-         FrAY/iXCfJ7zzdawLEiUmMhKiZpci/AoIAe2BQGaOLGHTVeexdGB896HJlmS6hB9JO2t
-         lAYFbAeV0B0fm1JCHm+3lLE9owByQZ5ttzgni9f/weDNeqlBxxGi7mkkNMEn+229sO6Q
-         fF2nEh9GR13uhGcxzsN8oFlc2S6/20+xU5BXQqmaTZDATqfL1AdSsu3+ZKDRGVed2/mO
-         +D9Y6JdqW13VVRKyCZLZH90ZSdQGfsmCHRq9OCAbt0xCpaY19q4OKlUkr3SJcwYwNafe
-         +Bhg==
+	s=arc-20240116; t=1751443841; c=relaxed/simple;
+	bh=IYdvsYFoOUmuWzYIFan9Coo0HGpRMXkdIvOtm1XmZtI=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=sBMjh84L8rWnp7Qhf3S0aogMHZkwCG0w6CQ1UyU/vLywwRYdwdIO0AotgG2QTBtW6J6Es+Joo+VWe14BBM7vxv4/oHSpBd+g4i7cBhpEUgQNFmLW08rNycAdPoh4dw1FLZNK5DtZvXN+1N8OKLnO3GXoAmj2ifDXBPWR/Phev0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f68.google.com with SMTP id 5b1f17b1804b1-453643020bdso56211425e9.1;
+        Wed, 02 Jul 2025 01:10:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751443383; x=1752048183;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qBZuk3H+46fxs/MVm+reaCZ2EIrEk1+0jJRknjvGIxs=;
-        b=I2+I+9EY0VLtdhWDZn1Ys1/cBAg81SCRnUj2JhzH4tgErQJ4oOAJvqAvO9W8xH2SBv
-         45HsYBYdNk8bLiUxlyvanIBOHrF+l3gip1apvVGECr9hrVL/tYqWwvDFmSVClfk+zvN4
-         3K8R2VZylSnzYbhOu0OWW9aGfgQRcOMmIxao0+GFBOZkevCjByNXVM3ebo8qiK8CyWAj
-         amFHDvJX+E80ULh9Dku3crx5SDwkPm7T7nCtSZaUjUBi1ex66Enlgo4XtLYvYE+zjuNm
-         ZcjzsMTlbac4DVuq7A0NoH1tl67Et5LFJioBwyKK/XJaGCPwk6UAMZ2EndXTlXsUlKdO
-         xSlA==
-X-Forwarded-Encrypted: i=1; AJvYcCWyi5qv4IBqNvrxRco2B6JMmOrsfmbGAaVTVwHbg/83PbitML94nqlPba9ln8Nt64nnfuw+apY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcjUa5gpcPtVmV/EM4zjGFcVIbj7uhv1VncnQHN7UXNoTSnmgT
-	wIVWBmSC0b4OYkzDSOdBibCvTlmyLTAk969jWWCJDDzR6cGcrHo3GJ/tc5OUVllHBGCw5Bkl68g
-	QE+aJJUyRqzqGMPCiD09WXvW3YeUr9IdefvtRl27c
-X-Gm-Gg: ASbGnctHnmUgb1nTi6V4d6LsXHteSKXXc5SSfNOGQHDb0XCgcibUCvsECsL99a/Eo/J
-	YmABEulx15/+3VHidBcN4a7H0X+KX10SL/TfiKuubveD83ILEdltx75KVbOTHbvMTolgrclYW8c
-	s1vJYLe18UGafOk3OTMostH86pQGU0FshcjvmvvdZWMSg=
-X-Google-Smtp-Source: AGHT+IEWbarWvhofM/Pc12nISnSJw5RsRYduWp+QpexvsV9hogHcgiiuS7H42Qn0RZOWso9jMo9yKjhsiKGhVcygTSE=
-X-Received: by 2002:a05:622a:28c:b0:494:75f7:b0fa with SMTP id
- d75a77b69052e-4a976a6ef2dmr36464411cf.41.1751443383082; Wed, 02 Jul 2025
- 01:03:03 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751443835; x=1752048635;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:cc:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r4qNZUHHOq7vIov1oUqkCmQg1k5Vs9lKcvLglpbvPJE=;
+        b=QUOgfC92I2+RhyAo03TZqW5moBRrBev+K1j7/uPHwZJZ99MjqrVPqW2LBSzb0qXyY0
+         dQFX/kx5/4+AzuGt17UMefXCPojxgpPQkpHpyrf+q0qgdlMlyJW5ftq3RhrQnxcd+3OQ
+         H0nQ76T6fxpP54+UVNycXio6B3NJt+fJgyXtRUXd+4TJCx8YT96V/App/oQHlCDv/FcW
+         UPJ/En3IC0aVY1tMa0HR/EDNBE9H9mn4wkCys5kSL8FCA0JtBc/FxS4RYua4JPJyQf3l
+         iCQ6bsW9HCg4Lus04Ozlz2xvaaeP72V6/jyzDuX7Thn0vTloAdSPW0qJPV+u12KeGVUp
+         x+EQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUMnqkeAx0Ke/4ZFY1ylgsG/7ZRaHxrN4ipcTQEprXbH9aJogg9N9TPqDmRhwRWG2ucDR72/U6F@vger.kernel.org, AJvYcCWQI1fUcy9KYKRiu3CLsgftbEJs8Nr5SiryIOq2+8rH+W1/nU/ks+9zSgWFpivU7o+I1B2Jcvlh7Q0hFNE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4lgb7WRB/OzZ3Ol2ouDg6jFNbwIrGfOUzZmQHdPmnXnMn9ZfS
+	0nnc5UUQ8SmX3Qn7Eq1YBW879ikE+sCQ+afr4xj3JX9nxKqitkEb2B/U
+X-Gm-Gg: ASbGnct6V5vJ5be6lxyHWcabVgdO27axB3VksgUmkK6mfyHZI5NMh3UBhldDZq2cjpY
+	PZJayFqUN8V+8PK3c4usT2Gr1rEoz2OqxJ7T5dqEwJZVmxz5biFuZucfQwUZCZSMl1MaIU7h/Tp
+	0jPEkXoWO7ixBrl4tNjBoZhJS/BjXrcdXTO6YbDW63qiQ6Rw6s1BJWxf/BgtGCgExjvDCXEVri7
+	1i7Agp6fgRZOopnnWIaRExL31NNqJFRJqYNP+ql49js+olngy9lWXHt0RHjdUMfA/rj6g36kRaB
+	DLTx3rLzizRFKX7qEvcWKDLSvAMXbJr/+MnY6lfPzKk1BnUEHOU6dtXNsnzXLv0Uu6ePEd2epPQ
+	L3ZV9Y3xYm47Qn2NDoqnwckNwCGF+Oyw=
+X-Google-Smtp-Source: AGHT+IGbHZ0eATGm/cLpijHlH7XRGb1emK4wOWRsjwB6YvW8gqEFhowwHkPbKbDFQ67cgFgAZjE4oA==
+X-Received: by 2002:a05:600c:3b01:b0:453:99f:b1b0 with SMTP id 5b1f17b1804b1-454a3706e45mr17164755e9.20.1751443835437;
+        Wed, 02 Jul 2025 01:10:35 -0700 (PDT)
+Received: from [192.168.88.252] (78-80-97-102.customers.tmcz.cz. [78.80.97.102])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453b35349f0sm32966705e9.1.2025.07.02.01.10.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Jul 2025 01:10:34 -0700 (PDT)
+Message-ID: <1040d742-35b3-443d-bcb4-5df0eeb42f93@ovn.org>
+Date: Wed, 2 Jul 2025 10:10:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250702020437.703698-1-kuniyu@google.com> <20250702020437.703698-2-kuniyu@google.com>
-In-Reply-To: <20250702020437.703698-2-kuniyu@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 2 Jul 2025 01:02:51 -0700
-X-Gm-Features: Ac12FXzPFJ3gtxBFYVfZfFoTLtrIri7P5W-UntjWVFvR3CMrQaKtvPUYFwIjZ6I
-Message-ID: <CANn89iKmA41ERK2VFScyrJ7PNNwqH4VBK9kpzNgxO3oFTRq=mQ@mail.gmail.com>
-Subject: Re: [PATCH v1 net 1/2] atm: clip: Fix infinite recursive call of clip_push().
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzbot+0c77cccd6b7cd917b35a@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Cc: i.maximets@ovn.org, netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ dev@openvswitch.org, linux-kernel@vger.kernel.org,
+ Eelco Chaudron <echaudro@redhat.com>, Aaron Conole <aconole@redhat.com>
+Subject: Re: [PATCH net-next] net: openvswitch: allow providing upcall pid for
+ the 'execute' command
+To: Jakub Kicinski <kuba@kernel.org>
+References: <20250627220219.1504221-1-i.maximets@ovn.org>
+ <20250701192136.6b8f9569@kernel.org>
+Content-Language: en-US
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <20250701192136.6b8f9569@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 1, 2025 at 7:04=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.com=
-> wrote:
->
-> syzbot reported the splat below. [0]
->
-> This happens if we call ioctl(ATMARP_MKIP) more than once.
->
-> During the first call, clip_mkip() sets clip_push() to vcc->push(),
-> and the second call copies it to clip_vcc->old_push().
->
-> Later, when a NULL skb is passed to clip_push(), it calls
-> clip_vcc->old_push(), triggering the infinite recursion.
->
-> Let's prevent the second ioctl(ATMARP_MKIP) by checking
-> vcc->user_back, which is allocated by the first call as clip_vcc.
->
-> Note also that we use lock_sock() to prevent racy calls.
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: syzbot+0c77cccd6b7cd917b35a@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3D2371d94d248d126c1eb1
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
-> ---
->  net/atm/clip.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/net/atm/clip.c b/net/atm/clip.c
-> index b234dc3bcb0d..250b3c7f4305 100644
-> --- a/net/atm/clip.c
-> +++ b/net/atm/clip.c
-> @@ -417,6 +417,8 @@ static int clip_mkip(struct atm_vcc *vcc, int timeout=
-)
->
->         if (!vcc->push)
->                 return -EBADFD;
-> +       if (vcc->user_back)
-> +               return -EINVAL;
->         clip_vcc =3D kmalloc(sizeof(struct clip_vcc), GFP_KERNEL);
->         if (!clip_vcc)
->                 return -ENOMEM;
-> @@ -655,6 +657,7 @@ static int atm_init_atmarp(struct atm_vcc *vcc)
->  static int clip_ioctl(struct socket *sock, unsigned int cmd, unsigned lo=
-ng arg)
->  {
->         struct atm_vcc *vcc =3D ATM_SD(sock);
-> +       struct sock *sk =3D sock->sk;
->         int err =3D 0;
->
->         switch (cmd) {
-> @@ -682,7 +685,9 @@ static int clip_ioctl(struct socket *sock, unsigned i=
-nt cmd, unsigned long arg)
->                 }
->                 break;
->         case ATMARP_MKIP:
-> +               lock_sock(sk);
->                 err =3D clip_mkip(vcc, arg);
-> +               release_sock(sk);
+On 7/2/25 4:21 AM, Jakub Kicinski wrote:
+> On Sat, 28 Jun 2025 00:01:33 +0200 Ilya Maximets wrote:
+>> @@ -616,6 +618,7 @@ static int ovs_packet_cmd_execute(struct sk_buff *skb, struct genl_info *info)
+>>  	struct sw_flow_actions *sf_acts;
+>>  	struct datapath *dp;
+>>  	struct vport *input_vport;
+>> +	u32 upcall_pid = 0;
+>>  	u16 mru = 0;
+>>  	u64 hash;
+>>  	int len;
+>> @@ -651,6 +654,10 @@ static int ovs_packet_cmd_execute(struct sk_buff *skb, struct genl_info *info)
+>>  			       !!(hash & OVS_PACKET_HASH_L4_BIT));
+>>  	}
+>>  
+>> +	if (a[OVS_PACKET_ATTR_UPCALL_PID])
+>> +		upcall_pid = nla_get_u32(a[OVS_PACKET_ATTR_UPCALL_PID]);
+>> +	OVS_CB(packet)->upcall_pid = upcall_pid;
+> 
+> sorry for a late nit:
+> 
+> 	OVS_CB(packet)->upcall_pid =
+> 		nla_get_u32_default(a[OVS_PACKET_ATTR_UPCALL_PID], 0);
+> 
+> ?
 
-This will still race with atm_init_atmarp(), which (ab)uses RTNL ?
+No worries.  I was actually looking for ways to collapse this
+block, but somehow missed these "new" accessors.  I'll send a
+v2 a bit later today in case there will be no further feedback.
 
->                 break;
->         case ATMARP_SETENTRY:
->                 err =3D clip_setentry(vcc, (__force __be32)arg);
-> --
-> 2.50.0.727.gbf7dc18ff4-goog
->
+Best regards, Ilya Maximets.
 
