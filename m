@@ -1,143 +1,345 @@
-Return-Path: <netdev+bounces-203275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9033DAF115D
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:12:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF2D3AF1175
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:17:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBACC1C24E03
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:12:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBFA55235DF
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:17:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54AFD24A064;
-	Wed,  2 Jul 2025 10:12:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0BA024DD15;
+	Wed,  2 Jul 2025 10:17:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VB1L180q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RtGRBAsP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F4ADF42
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 10:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F0123D2B5;
+	Wed,  2 Jul 2025 10:17:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751451152; cv=none; b=Bym6mzsU+Rad/6/wp3pVLAWKUDZFvNcqu5voKendSc2EiDF4b/54zNE89vFjOEEWDFfgZC6xV/IjgvDWX5py6lYU+8y+WhJuJPqhgNy6wbiMknU2NFFCWs0FNsdlqe/USzJEZz2O5h3BM9lv938xuVZGghNFTdKpiYCuxkd9rAw=
+	t=1751451467; cv=none; b=jIi1vCDZ3xSO2jX1p2GCs0mKnXCA0k+GLijHzoX6h8r2INbP1cj7z+oS868AiSen4cwPSt9NE3nPcGcjhYQMN8CiScnO0hyK1SxOHtitnlS2IV+3c16kz93qNpPl6CoCRXMjFiXvLmZicS+Lt03AYVI4AL6SEnMHild5NYgv38s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751451152; c=relaxed/simple;
-	bh=f7+FI0iNSUmIxIMhPsNF0+U4GL6/zYxqVsQivBG+ev4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qntJSu49Z7dBHhuhgYfM7YvMpXX4IkCM2yEO15Ps/rtA09lXSu+UtejsCTF/0DMer9PpBdaYuyyUvMdpzZknpTjdI4Iqf/gVRvy/RjSukoYuj8n8o0KnlMDUcBUEUyij7opgCktKorIt4nkGHagcq5mxlvFtXImU/L53CgZd+0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VB1L180q; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751451149;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rW/ve4fITH+t2k4lpIjQkl/5ZS7BQkmYLbS75wlyfu0=;
-	b=VB1L180qDtcMnQhNOKTJ71xUarqivNvxJ/3nv1dA9XZHQ0DWHULFRQ725gtmdDFos2ynna
-	mVUwng6lZjhKELSnKX4OObUsho+mU8hZwQGT1CykD+srz/9V9IwroJ2vH9cu8OqPd2Ayi5
-	PzysrmQVRg67ZBEIKvTqGI2ip494kWE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-97-TURemWyWM4eZ98yUZVrkFg-1; Wed, 02 Jul 2025 06:12:27 -0400
-X-MC-Unique: TURemWyWM4eZ98yUZVrkFg-1
-X-Mimecast-MFC-AGG-ID: TURemWyWM4eZ98yUZVrkFg_1751451146
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4535ee06160so32078025e9.3
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 03:12:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751451145; x=1752055945;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rW/ve4fITH+t2k4lpIjQkl/5ZS7BQkmYLbS75wlyfu0=;
-        b=Z+hkbhh6aqoe35h73NMhfHeHHsSDChekYbRUrDNMJ5GdyWfQH5nWuUu52E0+zH0UNK
-         5xqIaCe4aaankiOiGKnttkDmCI2ZiSw55408sDVtOLdeN4WIPXDDmBOcpIXLW5HYvUYH
-         AAjPpNNobh0Od7RgMrT3zVsh5soR0XeRrORZja9S/6bLmgYwotQq75LXlREcA6G1dJzD
-         j6RQa+PeghUzSmHy55eJ80lUO3Y0Cwm89LT+SSNWtJPl6+GHbu7gGn2S50KHv7HR2YNZ
-         rMtOFpvootjcZsJIxz5KQ6ltw0BLvhDRzgHoK0sGhAU0aG6oqUy4deBF8D06597r+qAZ
-         oJTQ==
-X-Gm-Message-State: AOJu0YwaMxySXn34QlY9hxmxrhExAjNAS1JgfQkvrDHF1BFgpNDbLFpc
-	QER4GFFFTFaLxmF+lomc6JiXJb7lX3X0yA/Jroog7rlhTLiB2rMrdInO00LOTv63j0Kd6aZmNGV
-	dhg4p9G5gvbRAiV1Nc0+ngmT7kNUt2GDHegvdzoFke6WEYT6iwQpF7xI89N7lsi1/Tg==
-X-Gm-Gg: ASbGncsWmCUO84M3hIRzwS81tXFtXxgzBR3IWb2rNGOk/x9uxB2TTccEtkEdsZdZl/k
-	i+Mc+rVqTZx5vyuwkeGPEK8MGB9hSuYVQhKSrsIBu+y+hPCLXT4rffA6ff72udvBwS3Tnq2CJnT
-	iUNh1/nU1G+OgeIp38AXaS/UDVhU7qN+t7wzAsxe96hTSjLZLM47aJge3JXMoKiOvX0CH58C6C2
-	PJnH9TiEb1kjeCZFyUGIYMeFdAZoMgEFSK1D7YM8Bbv7e2TPkftDTA2w+BU27kly9+n78DjOz8d
-	nf5cY1vjttHOmtuI8MHi6p9grthQi5/lgZResO/z+GOMCSLULcLVac0ZYzWds6E5AhaOfmMLIsq
-	YAQ==
-X-Received: by 2002:a05:600c:a105:b0:44a:b478:1387 with SMTP id 5b1f17b1804b1-454a370c077mr22090245e9.17.1751451145409;
-        Wed, 02 Jul 2025 03:12:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGOgvufspVbwhR7emxYMBzfljMqsW9U9kwM7nHO45T9yM3Xq82gPk8KUgWPuyy9a/J1a1AZlw==
-X-Received: by 2002:a05:600c:a105:b0:44a:b478:1387 with SMTP id 5b1f17b1804b1-454a370c077mr22090005e9.17.1751451145054;
-        Wed, 02 Jul 2025 03:12:25 -0700 (PDT)
-Received: from debian (2a01cb058d23d600e5b568f376de6917.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:e5b5:68f3:76de:6917])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453823b6e9esm228086305e9.28.2025.07.02.03.12.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 03:12:24 -0700 (PDT)
-Date: Wed, 2 Jul 2025 12:12:22 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@idosch.org>, Aiden Yang <ling@moedove.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, MoeDove NOC <noc@moedove.com>
-Subject: Re: [BUG] net: gre: IPv6 link-local multicast is silently dropped
- (Regression)
-Message-ID: <aGUGBjVZZPBWcRlA@debian>
-References: <CANR=AhRM7YHHXVxJ4DmrTNMeuEOY87K2mLmo9KMed1JMr20p6g@mail.gmail.com>
- <aGFSgDRR8kLc1GxP@shredder>
- <aGJ7EvpKRWVzPm4Y@debian>
- <aGO0whOGhE4LmVo2@shredder>
+	s=arc-20240116; t=1751451467; c=relaxed/simple;
+	bh=dpWeEtX1mRle3l03ElDpyIk2fOl1EYbNOjdX7vVp0V4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rFi05aSxcZtZ8tKMhtA8/3h4X+dmreUDJkupQgN1sftSzxRZJrr7fBexVHHQhAyaeWjKsuQ1ErcvOZx+WOlUfduS+oGoktYCZHsj4r5gkg+CCt9pzXzr54jzuOLWEPju9yAPeXfOQ5bj0Q0hwjSsBS/XeHp//SZITDMutzRSR7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RtGRBAsP; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751451466; x=1782987466;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=dpWeEtX1mRle3l03ElDpyIk2fOl1EYbNOjdX7vVp0V4=;
+  b=RtGRBAsPtgeAEekMOoepJom1M2EM334AVbIiO8aWga9dxXZLZU+wrdYm
+   KUgwrDykOlX3JGEwHjWwiPuEaau2EkUv4emPHzfiJyNGkOctk2RPk0UGa
+   jllDIi0MTbfgB+0bOVHGJ74zr1DAbkRRtMNPzzSlryWHEZXHBTnU7a9cv
+   lDuDir+7dDn8K7OS+/yfRxEvloZWjAkxqi0ObwYspoqQ6r0yxiYLjoCzd
+   2b34tKDw1jkeM6xAfrbulm2wl3Xo7J2RujNy/vTfqp2dHjUNxBJbe8WwF
+   Qnu56rLD0s0xli9hFDB1+Wa5rK77k7dttgkex8IME9yZUlpSRAQsgUhnp
+   w==;
+X-CSE-ConnectionGUID: HvAGbQVLS1ez+BFE05aYJQ==
+X-CSE-MsgGUID: 9BDTsyxYRwqQRiwKhrKMFQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11481"; a="64338838"
+X-IronPort-AV: E=Sophos;i="6.16,281,1744095600"; 
+   d="scan'208";a="64338838"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2025 03:17:45 -0700
+X-CSE-ConnectionGUID: 9GsAksglSrKIbZwlg0plJg==
+X-CSE-MsgGUID: 8aKl+nWiSLC7BX6UA8ppDw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,281,1744095600"; 
+   d="scan'208";a="184975326"
+Received: from boxer.igk.intel.com ([10.102.20.173])
+  by fmviesa001.fm.intel.com with ESMTP; 02 Jul 2025 03:17:43 -0700
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: bpf@vger.kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org
+Cc: netdev@vger.kernel.org,
+	magnus.karlsson@intel.com,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Eryk Kubanski <e.kubanski@partner.samsung.com>
+Subject: [PATCH bpf] xsk: fix immature cq descriptor production
+Date: Wed,  2 Jul 2025 12:16:48 +0200
+Message-Id: <20250702101648.1942562-1-maciej.fijalkowski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aGO0whOGhE4LmVo2@shredder>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 01, 2025 at 01:13:22PM +0300, Ido Schimmel wrote:
-> Makes sense. So you will submit it to net and extend gre_ipv6_lladdr.sh
-> to test for the presence of a multicast route?
+Eryk reported an issue that I have put under Closes: tag, related to
+umem addrs being prematurely produced onto pool's completion queue.
+Let us make the skb's destructor responsible for producing all addrs
+that given skb used.
 
-Yes. I'd just like to have a confirmation from Aiden first.
+Commit from fixes tag introduced the buggy behavior, it was not broken
+from day 1, but rather when xsk multi-buffer got introduced.
 
-Aiden, can you confirm that the following patch fixes the issue on your
-side?
+Store addrs at the beginning of skb's linear part and have a sanity
+check if in any case driver would encapsulate headers in a way that data
+would overwrite the [head, head + sizeof(xdp_desc::addr) *
+(MAX_SKB_FRAGS + 1)] region, which we dedicate for umem addresses that
+will be produced onto xsk_buff_pool's completion queue.
 
----- >8 ----
+This approach appears to survive scenario where underlying driver
+linearizes the skb because pskb_pull_tail() under the hood will copy
+header part to newly allocated memory. If this array would live in
+tailroom it would get overridden when pulling frags onto linear part.
+This happens when driver receives skb with frag count higher than what
+HW is able to swallow (I came across this case on ice driver that has
+maximum s/g count equal to 8).
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index ba2ec7c870cc..870a0bd6c2ba 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -3525,11 +3525,9 @@ static void addrconf_gre_config(struct net_device *dev)
+Initially we also considered storing 8-byte addr at the end of page
+allocated by frag but xskxceiver has a test which writes full 4k to frag
+and this resulted in corrupted addr.
+
+xsk_cq_submit_addr_locked() has to use xsk_get_num_desc() to find out
+frag count as skb that we deal with within destructor might not have the
+frags at all - as mentioned earlier drivers in their ndo_start_xmit()
+might linearize the skb. We will not use cached_prod to update
+producer's global state as its value might already have been increased,
+which would result in too many addresses being submitted onto cq.
+
+Fixes: b7f72a30e9ac ("xsk: introduce wrappers and helpers for supporting multi-buffer in Tx path")
+Reported-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
+Closes: https://lore.kernel.org/netdev/20250530103456.53564-1-e.kubanski@partner.samsung.com/
+Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+---
+ net/xdp/xsk.c       | 92 +++++++++++++++++++++++++++++++--------------
+ net/xdp/xsk_queue.h | 12 ++++++
+ 2 files changed, 75 insertions(+), 29 deletions(-)
+
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index 72c000c0ae5f..86473073513c 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -528,27 +528,18 @@ static int xsk_wakeup(struct xdp_sock *xs, u8 flags)
+ 	return dev->netdev_ops->ndo_xsk_wakeup(dev, xs->queue_id, flags);
+ }
  
- 	ASSERT_RTNL();
+-static int xsk_cq_reserve_addr_locked(struct xsk_buff_pool *pool, u64 addr)
++static int xsk_cq_reserve_locked(struct xsk_buff_pool *pool)
+ {
+ 	unsigned long flags;
+ 	int ret;
  
--	idev = ipv6_find_idev(dev);
--	if (IS_ERR(idev)) {
--		pr_debug("%s: add_dev failed\n", __func__);
-+	idev = addrconf_add_dev(dev);
-+	if (IS_ERR(idev))
- 		return;
+ 	spin_lock_irqsave(&pool->cq_lock, flags);
+-	ret = xskq_prod_reserve_addr(pool->cq, addr);
++	ret = xskq_prod_reserve(pool->cq);
+ 	spin_unlock_irqrestore(&pool->cq_lock, flags);
+ 
+ 	return ret;
+ }
+ 
+-static void xsk_cq_submit_locked(struct xsk_buff_pool *pool, u32 n)
+-{
+-	unsigned long flags;
+-
+-	spin_lock_irqsave(&pool->cq_lock, flags);
+-	xskq_prod_submit_n(pool->cq, n);
+-	spin_unlock_irqrestore(&pool->cq_lock, flags);
+-}
+-
+ static void xsk_cq_cancel_locked(struct xsk_buff_pool *pool, u32 n)
+ {
+ 	unsigned long flags;
+@@ -563,19 +554,6 @@ static u32 xsk_get_num_desc(struct sk_buff *skb)
+ 	return skb ? (long)skb_shinfo(skb)->destructor_arg : 0;
+ }
+ 
+-static void xsk_destruct_skb(struct sk_buff *skb)
+-{
+-	struct xsk_tx_metadata_compl *compl = &skb_shinfo(skb)->xsk_meta;
+-
+-	if (compl->tx_timestamp) {
+-		/* sw completion timestamp, not a real one */
+-		*compl->tx_timestamp = ktime_get_tai_fast_ns();
 -	}
+-
+-	xsk_cq_submit_locked(xdp_sk(skb->sk)->pool, xsk_get_num_desc(skb));
+-	sock_wfree(skb);
+-}
+-
+ static void xsk_set_destructor_arg(struct sk_buff *skb)
+ {
+ 	long num = xsk_get_num_desc(xdp_sk(skb->sk)->skb) + 1;
+@@ -600,11 +578,52 @@ static void xsk_drop_skb(struct sk_buff *skb)
+ 	xsk_consume_skb(skb);
+ }
  
- 	/* Generate the IPv6 link-local address using addrconf_addr_gen(),
- 	 * unless we have an IPv4 GRE device not bound to an IP address and
-@@ -3543,9 +3541,6 @@ static void addrconf_gre_config(struct net_device *dev)
++static void xsk_cq_submit_addr_locked(struct xsk_buff_pool *pool,
++				      struct sk_buff *skb)
++{
++	unsigned long flags;
++	u32 num_desc, i;
++	u64 *addr;
++	u32 idx;
++
++	if (unlikely(skb->data <= skb->head + sizeof(u64) * (MAX_SKB_FRAGS + 1))) {
++		WARN(1, "possible corruption of umem addr array; dropping skb");
++		xsk_drop_skb(skb);
++		return;
++	}
++
++	num_desc = xsk_get_num_desc(skb);
++
++	spin_lock_irqsave(&pool->cq_lock, flags);
++	idx = xskq_get_prod(pool->cq);
++
++	for (i = 0, addr = (u64 *)(skb->head); i < num_desc; i++, addr++, idx++)
++		xskq_prod_write_addr(pool->cq, idx, *addr);
++	xskq_prod_submit_n(pool->cq, num_desc);
++
++	spin_unlock_irqrestore(&pool->cq_lock, flags);
++}
++
++static void xsk_destruct_skb(struct sk_buff *skb)
++{
++	struct xsk_tx_metadata_compl *compl = &skb_shinfo(skb)->xsk_meta;
++
++	if (compl->tx_timestamp) {
++		/* sw completion timestamp, not a real one */
++		*compl->tx_timestamp = ktime_get_tai_fast_ns();
++	}
++
++	xsk_cq_submit_addr_locked(xdp_sk(skb->sk)->pool, skb);
++	sock_wfree(skb);
++}
++
+ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+ 					      struct xdp_desc *desc)
+ {
++	size_t addr_arr_sz = sizeof(desc->addr) * (MAX_SKB_FRAGS + 1);
+ 	struct xsk_buff_pool *pool = xs->pool;
+ 	u32 hr, len, ts, offset, copy, copied;
++	size_t addr_sz = sizeof(desc->addr);
+ 	struct sk_buff *skb = xs->skb;
+ 	struct page *page;
+ 	void *buffer;
+@@ -614,11 +633,11 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+ 	if (!skb) {
+ 		hr = max(NET_SKB_PAD, L1_CACHE_ALIGN(xs->dev->needed_headroom));
+ 
+-		skb = sock_alloc_send_skb(&xs->sk, hr, 1, &err);
++		skb = sock_alloc_send_skb(&xs->sk, hr + addr_arr_sz, 1, &err);
+ 		if (unlikely(!skb))
+ 			return ERR_PTR(err);
+ 
+-		skb_reserve(skb, hr);
++		skb_reserve(skb, hr + addr_arr_sz);
  	}
  
- 	add_v4_addrs(idev);
--
--	if (dev->flags & IFF_POINTOPOINT)
--		addrconf_add_mroute(dev);
- }
- #endif
+ 	addr = desc->addr;
+@@ -648,6 +667,9 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+ 	skb->data_len += len;
+ 	skb->truesize += ts;
  
++	memcpy(skb->head + (addr_sz * xsk_get_num_desc(skb)),
++	       &desc->addr, addr_sz);
++
+ 	refcount_add(ts, &xs->sk.sk_wmem_alloc);
+ 
+ 	return skb;
+@@ -656,10 +678,13 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 				     struct xdp_desc *desc)
+ {
++	size_t addr_arr_sz = sizeof(desc->addr) * (MAX_SKB_FRAGS + 1);
++	size_t addr_sz = sizeof(desc->addr);
+ 	struct xsk_tx_metadata *meta = NULL;
+ 	struct net_device *dev = xs->dev;
+ 	struct sk_buff *skb = xs->skb;
+ 	bool first_frag = false;
++	u8 *addr_arr;
+ 	int err;
+ 
+ 	if (dev->priv_flags & IFF_TX_SKB_NO_LINEAR) {
+@@ -680,16 +705,21 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 
+ 			hr = max(NET_SKB_PAD, L1_CACHE_ALIGN(dev->needed_headroom));
+ 			tr = dev->needed_tailroom;
+-			skb = sock_alloc_send_skb(&xs->sk, hr + len + tr, 1, &err);
++			skb = sock_alloc_send_skb(&xs->sk,
++						  hr + addr_arr_sz + len + tr,
++						  1, &err);
+ 			if (unlikely(!skb))
+ 				goto free_err;
+ 
+-			skb_reserve(skb, hr);
++			skb_reserve(skb, hr + addr_arr_sz);
+ 			skb_put(skb, len);
+ 
+ 			err = skb_store_bits(skb, 0, buffer, len);
+ 			if (unlikely(err))
+ 				goto free_err;
++			addr_arr = skb->head;
++			memcpy(addr_arr, &desc->addr, addr_sz);
++
+ 		} else {
+ 			int nr_frags = skb_shinfo(skb)->nr_frags;
+ 			struct page *page;
+@@ -712,6 +742,10 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 
+ 			skb_add_rx_frag(skb, nr_frags, page, 0, len, PAGE_SIZE);
+ 			refcount_add(PAGE_SIZE, &xs->sk.sk_wmem_alloc);
++
++			addr_arr = skb->head;
++			memcpy(addr_arr + (addr_sz * skb_shinfo(skb)->nr_frags),
++			       &desc->addr, addr_sz);
+ 		}
+ 
+ 		if (first_frag && desc->options & XDP_TX_METADATA) {
+@@ -807,7 +841,7 @@ static int __xsk_generic_xmit(struct sock *sk)
+ 		 * if there is space in it. This avoids having to implement
+ 		 * any buffering in the Tx path.
+ 		 */
+-		err = xsk_cq_reserve_addr_locked(xs->pool, desc.addr);
++		err = xsk_cq_reserve_locked(xs->pool);
+ 		if (err) {
+ 			err = -EAGAIN;
+ 			goto out;
+diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
+index 46d87e961ad6..f16f390370dc 100644
+--- a/net/xdp/xsk_queue.h
++++ b/net/xdp/xsk_queue.h
+@@ -344,6 +344,11 @@ static inline u32 xskq_cons_present_entries(struct xsk_queue *q)
+ 
+ /* Functions for producers */
+ 
++static inline u32 xskq_get_prod(struct xsk_queue *q)
++{
++	return READ_ONCE(q->ring->producer);
++}
++
+ static inline u32 xskq_prod_nb_free(struct xsk_queue *q, u32 max)
+ {
+ 	u32 free_entries = q->nentries - (q->cached_prod - q->cached_cons);
+@@ -390,6 +395,13 @@ static inline int xskq_prod_reserve_addr(struct xsk_queue *q, u64 addr)
+ 	return 0;
+ }
+ 
++static inline void xskq_prod_write_addr(struct xsk_queue *q, u32 idx, u64 addr)
++{
++	struct xdp_umem_ring *ring = (struct xdp_umem_ring *)q->ring;
++
++	ring->desc[idx & q->ring_mask] = addr;
++}
++
+ static inline void xskq_prod_write_addr_batch(struct xsk_queue *q, struct xdp_desc *descs,
+ 					      u32 nb_entries)
+ {
+-- 
+2.34.1
 
 
