@@ -1,226 +1,159 @@
-Return-Path: <netdev+bounces-203265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18DD8AF1121
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:06:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 661E4AF1128
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:07:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04DEE484188
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:05:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C203D3ACEDE
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:06:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7417224DCF6;
-	Wed,  2 Jul 2025 10:05:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="BGxsK39q"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB80624A064;
+	Wed,  2 Jul 2025 10:06:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04181246BD9
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 10:05:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 278992376E0;
+	Wed,  2 Jul 2025 10:06:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751450736; cv=none; b=LOqPbRMK3tO4kmSJtekHo/CQjLhTMvcE7i/JMvS2t21Jt/mT53y/YfcGBpU4X9hPeTcMA42R5QJ7VGo0t7UE0iyqnW7y3JTNZci3o0xv3IRYeqAmTCTP95xN8EOypRQRRwl7DVTBRHRTukBvnrI/kqfCf05np68P8pf81gZh2FU=
+	t=1751450807; cv=none; b=iQPVW17NFUXUgCnDH7gxLxmrSvsqw5ohRjHP1/7dDTDfoeRZnPUyBbasajj8jEO1qdj3qEQ1zDIXh0p0epbxCcZsSIh4MJ2hZ0JjvFPZ4PW4OpGE/x1UT0MReEsb3Rf9m+cSM7RpVJjqJ/fR467U/Cm7+wDLqXa9LzGPf1BS1YU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751450736; c=relaxed/simple;
-	bh=/odDKUbMEXHb8YPMgH2eLGCrRUFAWoeTkGz9mBkC5Z8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tP3H30LsTZmSEUkHE2rxPJ0gIT/DjxY8vBXGhDbsseyLC0a3tvtPZm3f9Zr5zn/yI0I4xx0tBqAsUpG50zQvrmwpIh+7Bqdjk1vcoxgBBmx0qyurkcNUszV3DOs8LO3ZU/v3uwR9rI4KPyXXMqfe3etlYcEgz+Qn8CDHl/IS0Fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=BGxsK39q; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-453079c1e2eso7463645e9.3
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 03:05:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1751450732; x=1752055532; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jge/315nZmEr34QaqRg13k9ENVxZ/tBr+eglZFNGido=;
-        b=BGxsK39q6HlSq5lD/xVCPlwrLgbplvcfaNL9uBz6yF8r8zbqGQhlfUA5DXLXtL0Snx
-         046iUZncJRrVFYyBZYucf5Fx4cFJh1m2ZhMqYVpZQCHX2PImREFO312YUFMy8pMnkg5u
-         +qw02de1oQGX/Od2FJOuTb9148j2awPyxgSsB9encjnwLpqRydIRUvP6wBcgZ9ZQex3Z
-         zGDoa4tvj1NRdBWCtae9+I4JDlPRriN56OimNMgXAwrgLGwPLHs8DDQ0MHXr+tNqT/sd
-         wE5Wd4MeoWNJaXtQy85ltwnQfFbiK70ynox3wh4MjvzJs7MZ6hMzMnqQ6aa3T5Dcp8nV
-         UlVQ==
+	s=arc-20240116; t=1751450807; c=relaxed/simple;
+	bh=gBXapBjhsGncsCHz7HHng97WylcbP7vOg7ZSWGnLGTs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=AX4jdspQc1wxBwSlxtfR2tOY7C3uKxofmgf/HXZXs9+py41Mpa6TraFiKDctv12aGHcf9Rd11L2KHTzkSuDdzyx/DYypc5HdMayfpMzMTcJzJ4+WvOLTCBB06085p7o/8Z6N0y/MEhH/WGshROQtCZeG+nC9/RIM1FdWryMIFjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ae0e0271d82so1176489266b.3;
+        Wed, 02 Jul 2025 03:06:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751450732; x=1752055532;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1751450804; x=1752055604;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Jge/315nZmEr34QaqRg13k9ENVxZ/tBr+eglZFNGido=;
-        b=LwUCN/xdkowVl8/xKL+Gyf7e2VTzq/lW8yCqh8ruFhTLkzqt4XdyOEZSJi6okPpxrU
-         brEV721QAEFKjrpjknR7fLIUdZjGwSYaJVC14uYyZXHa/i/8p9qGEJgn+mAhH8Qy1cW6
-         rNQ/x8xf5iLDb7y6q40778FZn7XHLk33GlJRvhhYKcheoMyHFKH9C0OnjORmWtm4djkj
-         aKLxvGqfYwH0N3D32FGUp96QS7Cgc1dKvJGBJr8SxRNn3/QFVi9WjwQ57CjipX0QiXfF
-         wPF4owOrIRE21eKNPXxAAeNB7CpGKlPd3AJ8slB30ZB3bbnGN8+dxGQaUnb/7djJHwSK
-         Povw==
-X-Gm-Message-State: AOJu0YxxhNpCagJfEwDaQouDK1nQuiWpxBsTmA7BVnfVw6ItK1wJBAdw
-	//60maoLfY0qjD3G/tuvyBm3w96FpnMflgVh4MfYZvpNSYqv/NGdkfOtYp4jfvcy2Sw=
-X-Gm-Gg: ASbGncufRPaiGSPaNffW/IKHKqXfpkVLeJVMc+ibWRUqhrWQWFN49T1r73QYC57SFZv
-	efgOcMedg4tb6xsyD3xm/ZaObxLRLsmmWtvJ1tLn+06S3NsVrLSwsWfKZPDdlPyL2JDwn9IE9lh
-	vJjOLtO6/9MN7Nyf8m44UQvvev7hp5bV8Sbv4vvPDyoKiPDTiga3p9BBPrH/L4Ql8Boc4+jubij
-	ZDHJZaqCjBlVvxktCEfMYYvSSR6ys5fAI5OtHi0VeYZDzTrLyLwEsvufXX4UwdK1z1H45VvWAnP
-	a0GyMbxhEpp/q0HVlxAYEOgxyNR8WbxTYihi0egY5/pQEdtV9IFqieP8QLXlP6sHiHDnPU8LqQZ
-	QKh2If/+rzbBu220hucTQ1l/JaD5mx2I/ezqa+4U=
-X-Google-Smtp-Source: AGHT+IHl6GEGttPh0i4rVP4SmhL82lbxdawS1oN4zDLT3XLS5VSAgR8qS48eCoKhOKWSCmnAPDEk0g==
-X-Received: by 2002:a05:600c:46d1:b0:439:88bb:d00b with SMTP id 5b1f17b1804b1-454a3706e3amr8521565e9.5.1751450732227;
-        Wed, 02 Jul 2025 03:05:32 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:5568:c43d:79bc:c2ec? ([2a01:e0a:b41:c160:5568:c43d:79bc:c2ec])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4538a3a72dasm192919735e9.16.2025.07.02.03.05.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Jul 2025 03:05:31 -0700 (PDT)
-Message-ID: <c39c99a7-73c2-4fc6-a1f2-bc18c0b6301f@6wind.com>
-Date: Wed, 2 Jul 2025 12:05:31 +0200
+        bh=6QCuCBmF8QaYqs1/drTKdD/gVfMwicF+7VehnV1Bdt4=;
+        b=O73DkOCeI1QMKwn1qWc+Ss5DOHvnR6BlaXCY52tNNN9/3tDIySaa0ZqYu+Bs8Uqmaz
+         LwtGuHaWanNTc/SCk3p2GB4HlbPY/iWXPHdE+QIwN9vVbMDwLGcrjn8o84Cy+g3Rgf0P
+         WamnV0L2FLV76C1eu8f9D/60Fx5MYaUbq04lfxzpYvCoU57KzPXk3NGXF8Nblgf2VQJD
+         HoSgt2Or06KcvKstIHteYrzd3eVHkwEyOq4+dvU29d/FsYzTJLCS/9d5PcodAwWJ4/uw
+         rGd+VdBTYF21+yy2WMX0KsIeKHytnOueLyhH7x1H3OlRqGubVX9Nf/3sV2eM8BLnIogq
+         u7VQ==
+X-Forwarded-Encrypted: i=1; AJvYcCULjBJyae6QLV/0d5IdPVqc6LRi9gBNkgnO4etbON1jNozAFYlESV12pnClankXkDqwQiDK7GuxFyqgGv+7gPQm@vger.kernel.org, AJvYcCVqTkn4hSlQN26D0O9OwWC6kPauDCwGgXNgREzhG4RstN93MpORHDLew4L0F/3MwcduY5OBhkIjcWWSHrw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlnhOIKOEH7JJZVLQ1mLY4vrJPL/ZNFKC6rNGy3WsTSIKZm0SX
+	F0tGpTZrvlAKi4nUPUaiOLG7xU+e7IyHPUq79+XiIOE4NP8eWFupbaUb
+X-Gm-Gg: ASbGnctNntSR9nASnelhpQdhdXaCHX1oYB9XGjc7uenkBbfekSZ1NxKLA7m8uR+W2fn
+	R+rEruI7tHh9I9Uhcd1HnCnqBEudsZwNnS0Ocn7qX/RSTGtvAsM8iW3F3AQWIdGQl7yHh0fkcid
+	rLLKtOKHbnqmZHmx0qjH/miFKJWq8hRTAh/+JboB6BYcsVOwwRF+1+oWcaR3XYOp10uuvDO0oQI
+	KtyPdaUywliiBKy3tY53ffnqc0N1cPqQU9g1ZCc3uJYOe1UBXcXwCXTuMVGhkq9Xy7ZEK7A4iPL
+	ir2WEGSFauij97AuCJkhi+y9M6hfa8TRhNNW/GHV1FHBSCdJhNGl
+X-Google-Smtp-Source: AGHT+IExqwyCDaBJV4RZ1jK7MygEWEjWI6DB7TG9XSz13u+qvUKnpwC7oX2pie9l0LwSlJH5bngU1g==
+X-Received: by 2002:a17:907:86a2:b0:ade:bf32:b05a with SMTP id a640c23a62f3a-ae3c28ad072mr232725466b.0.1751450804088;
+        Wed, 02 Jul 2025 03:06:44 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:3::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae35365a732sm1060424966b.65.2025.07.02.03.06.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jul 2025 03:06:43 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next v2 0/7] netpoll: Factor out functions from
+ netpoll_send_udp() and add ipv6 selftest
+Date: Wed, 02 Jul 2025 03:06:32 -0700
+Message-Id: <20250702-netpoll_untagle_ip-v2-0-13cf3db24e2b@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH v3] ipv6: add `force_forwarding` sysctl to enable
- per-interface forwarding
-To: Gabriel Goller <g.goller@proxmox.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250702074619.139031-1-g.goller@proxmox.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <20250702074619.139031-1-g.goller@proxmox.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKgEZWgC/23NQQqDMBBA0auEWZuSpDU2rnqPIpLqqAMykSQVi
+ 3j3gnTZ9Yf3d0gYCRPUYoeIKyUKDLUwhYBu8jyipB5qAUaZUlmjJGNewjy3b85+nLGlReK16ir
+ nvHWmhELAEnGg7USfwJgl45ahKQRMlHKIn/O26rP/4OofvGqppNXeaOvMcL/5R48v8nwJcYTmO
+ I4v1xj3ZL8AAAA=
+X-Change-ID: 20250620-netpoll_untagle_ip-e37c799a6925
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
+ kernel-team@meta.com
+X-Mailer: b4 0.15-dev-dd21f
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2418; i=leitao@debian.org;
+ h=from:subject:message-id; bh=gBXapBjhsGncsCHz7HHng97WylcbP7vOg7ZSWGnLGTs=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoZQSyseK8z8mbKZFES5J7zFgJr7Xt3FnWXHCOV
+ Xw9i4oJMICJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaGUEsgAKCRA1o5Of/Hh3
+ beEfD/9pdL8uKcywWdJ9wi5DSie5fd+KC6VvWG0jN/9Fo2vM2G+Bm/2vLvUEOwudkk5waUwP6HN
+ +udzC8KY1+rySQ3QknYc4vr6vT+sDgb+Q7g+r0Hmau3GoOyb4Y7J0rJa3PV4DnzeXiDxLbSL1QR
+ h63OfBQFVOoXtkYCGnhkWGjBDlQLoJm+29ALJtJVDFTvdPtb3CBWwi7Fhk/jQMVB36Rgf2ZC+Ge
+ /Fu1eg1pe6m9dRzdnk4E+4/r011FbryvhbCDN89tBA7fDLQhb2ouLSW4J0I6wB4Rcw1Rc+T6EvR
+ Vvvd075E5mNpVxnTKBj7Qco8mxwXfL/pBgnbRLqNFSK+kigtNDK+2jLjJA4R1TGv//St9HwC5L9
+ p0fi0NMWh5IqSNCKCtszXCz3OBxVzkZP2kuZCPrk3HHpfuzlu9YhOqwQ4OquDXH6u/k6u+xclIc
+ 3h9896h3+o3rk4tqxSRP4ViwGCDiio2OD7Fxu1iH6h3BkpazKNsevAZ1FEykWXrnMvgXba3cw/f
+ kmIvFskq3ae1pRcMzFpRU7NwA5Da4IS2on9dWTn+ORaNWH/budSpUXC0aVwbE8VsZbkXEpksUje
+ CSYDQF9u+AvMuKfWpfLsJp2F68vOGOe3N0XyMEYO28nSocpuN8J4X57YMIdCB0ZnxPUCaFLLD8a
+ 3cVof6Ntc3uIQug==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Le 02/07/2025 à 09:46, Gabriel Goller a écrit :
-> It is currently impossible to enable ipv6 forwarding on a per-interface
-> basis like in ipv4. To enable forwarding on an ipv6 interface we need to
-> enable it on all interfaces and disable it on the other interfaces using
-> a netfilter rule. This is especially cumbersome if you have lots of
-> interface and only want to enable forwarding on a few. According to the
-> sysctl docs [0] the `net.ipv6.conf.all.forwarding` enables forwarding
-> for all interfaces, while the interface-specific
-> `net.ipv6.conf.<interface>.forwarding` configures the interface
-> Host/Router configuration.
-> 
-> Introduce a new sysctl flag `force_forwarding`, which can be set on every
-> interface. The ip6_forwarding function will then check if the global
-> forwarding flag OR the force_forwarding flag is active and forward the
-> packet.
-> 
-> To preserver backwards-compatibility reset the flag (on all interfaces)
-> to 0 if the net.ipv6.conf.all.forwarding flag is set to 0.
-> 
-> [0]: https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt
-> 
-> Signed-off-by: Gabriel Goller <g.goller@proxmox.com>
-> ---
-> 
-Please, wait 24 hours before reposting.
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/maintainer-netdev.rst#n419
+Refactors the netpoll UDP transmit path to improve code clarity,
+maintainability, and protocol-layer encapsulation.
 
+Function netpoll_send_udp() has more than 100 LoC, which is hard to
+understand and review. After this patchset, it has only 32 LoC, which is
+more manageable.
 
-[snip]
+The series systematically moves the construction of protocol headers
+(UDP, IPv4, IPv6, Ethernet) out of the core `netpoll_send_udp()`
+function into dedicated static helpers:
 
-> @@ -6747,6 +6759,77 @@ static int addrconf_sysctl_disable_policy(const struct ctl_table *ctl, int write
->  	return ret;
->  }
->  
-> +/* called with RTNL locked */
-Instead of a comment ...
+  - `push_udp()` for UDP header setup
+  - `push_ipv4()` and `push_ipv6()` for IP header setup
+  - `push_eth()` for Ethernet header setup
 
-> +static void addrconf_force_forward_change(struct net *net, __s32 newf)
-> +{
-> +	struct net_device *dev;
-> +	struct inet6_dev *idev;
-> +
-... put
+This results in a clean, layered abstraction that mirrors the protocol
+stack, reduces code duplication, and improves readability.
 
-	ASSERT_RTNL();
+Also, to make sure this is not breaking anything, add IPv6 selftest to
+netconsole tests, which will exercise this code. This test would also pick
+problems similiar to the one fixed by f599020702698  ("net: netpoll:
+Initialize UDP checksum field before checksumming"), which was
+embarrassin we didn't have a selftest catch it.
 
-> +	for_each_netdev(net, dev) {
-> +		idev = __in6_dev_get_rtnl_net(dev);
-> +		if (idev) {
-> +			int changed = (!idev->cnf.force_forwarding) ^ (!newf);
-> +
-> +			WRITE_ONCE(idev->cnf.force_forwarding, newf);
-> +			if (changed) {
-> +				inet6_netconf_notify_devconf(dev_net(dev), RTM_NEWNETCONF,
-> +							     NETCONFA_FORCE_FORWARDING,
-> +							     dev->ifindex, &idev->cnf);
-> +			}
-> +		}
-> +	}
-> +}
-> +
-> +static int addrconf_sysctl_force_forwarding(const struct ctl_table *ctl, int write,
-> +					    void *buffer, size_t *lenp, loff_t *ppos)
-> +{
-> +	int *valp = ctl->data;
-> +	int ret;
-> +	int old, new;
-> +
-> +	// get extra params from table
-/* */ for comment
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/coding-style.rst#n598
+Anyway, there are **no functional changes** intended in this patchset.
 
-> +	struct inet6_dev *idev = ctl->extra1;
-> +	struct net *net = ctl->extra2;
-Reverse x-mas tree for the variables declaration
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/maintainer-netdev.rst#n368
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Changes in v2:
+- Move ethernet data from push_ipv{4,6} into push_eth() function, making
+  the slice up even more clearer (Jakub).
+- Fixed some long lines to get checkpatch happier.
+- Link to v1: https://lore.kernel.org/r/20250627-netpoll_untagle_ip-v1-0-61a21692f84a@debian.org
 
-> +
-> +	// copy table and change extra params to min/max so we can use proc_douintvec_minmax
-> +	struct ctl_table lctl;
-> +
-> +	lctl = *ctl;
-> +	lctl.extra1 = SYSCTL_ZERO;
-> +	lctl.extra2 = SYSCTL_ONE;
-> +
-> +	old = *valp;
-> +	ret = proc_douintvec_minmax(&lctl, write, buffer, lenp, ppos);
-> +	new = *valp;
-I probably missed something. The new value is written in lctl. When is it
-written in ctl?
+---
+Breno Leitao (7):
+      netpoll: Improve code clarity with explicit struct size calculations
+      netpoll: factor out UDP checksum calculation into helper
+      netpoll: factor out IPv6 header setup into push_ipv6() helper
+      netpoll: factor out IPv4 header setup into push_ipv4() helper
+      netpoll: factor out UDP header setup into push_udp() helper
+      netpoll: move Ethernet setup to push_eth() helper
+      selftests: net: Add IPv6 support to netconsole basic tests
 
-> +
-> +	if (write && old != new) {
-> +		if (!rtnl_net_trylock(net))
-> +			return restart_syscall();
-> +
-> +		if (valp == &net->ipv6.devconf_dflt->force_forwarding) {
-> +			inet6_netconf_notify_devconf(net, RTM_NEWNETCONF,
-> +						     NETCONFA_FORCE_FORWARDING,
-> +						     NETCONFA_IFINDEX_DEFAULT,
-> +						     net->ipv6.devconf_dflt);
-> +		} else if (valp == &net->ipv6.devconf_all->force_forwarding) {
-> +			inet6_netconf_notify_devconf(net, RTM_NEWNETCONF,
-> +						     NETCONFA_FORCE_FORWARDING,
-> +						     NETCONFA_IFINDEX_ALL,
-> +						     net->ipv6.devconf_all);
-> +
-> +			addrconf_force_forward_change(net, new);
-> +		} else {
-> +			inet6_netconf_notify_devconf(net, RTM_NEWNETCONF,
-> +						     NETCONFA_FORCE_FORWARDING,
-> +						     idev->dev->ifindex,
-> +						     &idev->cnf);
-> +		}
-> +		rtnl_net_unlock(net);
-> +	}
-> +
-> +	return ret;
-> +}
-> +
->  static int minus_one = -1;
->  static const int two_five_five = 255;
->  static u32 ioam6_if_id_max = U16_MAX;
+ net/core/netpoll.c                                 | 192 +++++++++++++--------
+ .../selftests/drivers/net/lib/sh/lib_netcons.sh    |  76 +++++++-
+ .../testing/selftests/drivers/net/netcons_basic.sh |  53 +++---
+ 3 files changed, 215 insertions(+), 106 deletions(-)
+---
+base-commit: 8efa26fcbf8a7f783fd1ce7dd2a409e9b7758df0
+change-id: 20250620-netpoll_untagle_ip-e37c799a6925
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
+
 
