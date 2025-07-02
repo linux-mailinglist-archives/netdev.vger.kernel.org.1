@@ -1,88 +1,89 @@
-Return-Path: <netdev+bounces-203242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82A08AF0E85
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:56:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF169AF0E87
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:56:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB4241793CA
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:56:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63F763A6D73
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:56:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF5623C511;
-	Wed,  2 Jul 2025 08:56:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 798A723D284;
+	Wed,  2 Jul 2025 08:56:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qhtu8P+K"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dyNm9STq"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF14D1EDA12
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 08:56:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DBB5238D32
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 08:56:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751446589; cv=none; b=N+0pDP+1Gy27LbU4PDV8mkUtcTdsxSQFD/J7ZpE4+pE2E7mAxgWzZ1hA/dAfZyiz6/8HcPMDYpWqLaNbAw+EBolOxujgxbIBLPWueWH96/VHttq37y0q4/fNCOizMub3Y38j88ugJ19Wszv6P9SHv+jcUPv6yc1A6UAB5WCgg/0=
+	t=1751446590; cv=none; b=clQ0nL7LHUp56+ar1GEYQkXkyzR8RVP9540ETk/OAzujGe3UVOQBvjv7i1IezqB4/mn/o0JlgUuZeI3HysYWucN4Pq8Bm9SrJ5WmbMW8ZyQBKhQigE+3gO17/03Kp4QJ5RuasJQisH8hyzEweJMIpzYFZQsIcycqqkAxdXZMFgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751446589; c=relaxed/simple;
-	bh=ZGqbWJb6Ef6qwVsnW4m+O5Zl2ysSK9pTSNpwgAMK8C0=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=gYe5T2lanGyLzPxF1b5jOV3IZ5fV5BWAQk6l+lEvw5q9OJIc4vpX5i2Fo7NiunwON4+Fm4GrMdyrTuBoj335dnDxU/QU5Hc9YO4M7YUxYR8GQLpBvsCZx9h0ePtOmVYpsQBHbMKRQ6lMIGNDXMcOkUStPtFG9FMQ7SntylJvc68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qhtu8P+K; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1751446590; c=relaxed/simple;
+	bh=qS9faP9kZQFAWHiAA+TgHbu1PnNiZZIItnQH+/KIz9U=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=jBtFlWMIZtBLRqS4jzpU+2er1MWhYYXMtE1iT6tin/YOD7kDAPjXH0hJDry3yW/SULI6FZBxEJhcXoW5qTWI4kOspQEKEjsRlZ6Qp8BLolLEZP1tIMk0pEjH3sTo9cKNFj42lfiNl45mtzRl4T4BzZVOkwLD84EJukEtp73w+cE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dyNm9STq; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751446586;
+	s=mimecast20190719; t=1751446587;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Hd9V4j3xvd+KXkH5BH+0b/cE/jDyVGMILUqMFuZ2a9k=;
-	b=Qhtu8P+KWA91FOVH2TLxJoMaRFf5Cgv2TtVNBriGKUKWx9fZnrYNCzWSY6NF2K8fF6t3fb
-	S43vrzr8PMHvA/RsTOyfux5GGluyhVXvYcYh1ocvafa1b1f9bHWLsz/Vz3Igei0AXsLW+J
-	3qZ/BNm3NXSIDoAD6gPRLpDfvwVtaQU=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ou5038YfCMSsezsc+TuKk3LIuL7hz0k+oG8D9Fl1kDU=;
+	b=dyNm9STq12W0cUx9+lvpZlv0JVu9B8RSVQ8C2lRtr1Rt5gxpDaw6ZlWkyZ/3LwuC2PIJxq
+	e8rdoVO0SX2gLdIt9o0bB6Fixm6vNuvVLSvdgTz7kQkFLFQUVdTIVF1LL2l/Lglo1xyTcZ
+	PuhNqUMJKpXiGpExhffJrNHQsvTUmfM=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-591-Ig9iqzAENNadvtlnMHUQfA-1; Wed, 02 Jul 2025 04:56:25 -0400
-X-MC-Unique: Ig9iqzAENNadvtlnMHUQfA-1
-X-Mimecast-MFC-AGG-ID: Ig9iqzAENNadvtlnMHUQfA_1751446584
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ae354979e7aso292014766b.0
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 01:56:24 -0700 (PDT)
+ us-mta-601-6r5P6C7ePe-6IrXwb9YvDg-1; Wed, 02 Jul 2025 04:56:26 -0400
+X-MC-Unique: 6r5P6C7ePe-6IrXwb9YvDg-1
+X-Mimecast-MFC-AGG-ID: 6r5P6C7ePe-6IrXwb9YvDg_1751446585
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ade6db50bb4so319903866b.2
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 01:56:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1751446584; x=1752051384;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Hd9V4j3xvd+KXkH5BH+0b/cE/jDyVGMILUqMFuZ2a9k=;
-        b=RBdoEccpWI0rfoP/ok/zhG7m7xcn8+6Vs5cbxD8lWaLa22TbJK9vGl8iUvmtXK+TN1
-         4xh3HyCzPhpViRNIMT5rQfGE2Bg3XyWOwkziAZR0ob9y60ddWw+p0XLhQor1F+kNlKlT
-         y6IkkDnNREXSDn2mKrGypemLJABRSkWHK556fZzqW/GcFHBpKtVsLllR6DtAJNLKNSAU
-         oK1Wxhooc7xbz7/QyE+X9gxF2wIJnl7CecFw6YiWAap4E2CVawRvNN/UOAC0wiR5hjqv
-         PSYILguQ8sAl2xDJlucUxZcYhgkvz5ninz+MU8TaVYc5o5qYoOPDnuBLstEfiVA74UAn
-         KKGA==
-X-Gm-Message-State: AOJu0YzH6+b1QAIMudJ5VDxU60vCGBgTB0oOwsaS7vRLLo/4QdrHvpbu
-	rU7c5wCOAOddD/Snyr5v2uDcGC+FNiWglkJ75CdLscD6jvpR4x9Kn3OFhUfAtU1OakgUHlU1rVm
-	/ZAg9BmQuXyNBoo3aHbDlPsqzVKE7T9XuqGBowmsVTyHUu1RYeraSGHJ93g==
-X-Gm-Gg: ASbGnctpDW8LEEMEqj7WiklHGn7Ov33ePO3IWPQQhSKLT1jiYCIFaAkGyHy3jHXYbUA
-	fP+Fwzae/hFZHX2gkztifpEtFKao2baAqRxrZAqhmAAGT7lsSUBJe4Leufv5DNuSuPxxcHfhNpV
-	xTX7XnhwIKIgS3Gtb4HPDj1dnubFwPEBpx7KzVQFbrtj0ZICsJXDZ8lv2t5Tgww99EEi/Nh/5aP
-	Xv0dgnKZDpXTCvKM5BARxEzR4m8p2R6hOkl4ymT3vutuso4AUWI0NylrPstuy11oD63L/fxmSHz
-	UHCaw9VxQyDWHEdc6WA=
-X-Received: by 2002:a17:907:d846:b0:ada:abf7:d0e1 with SMTP id a640c23a62f3a-ae3c2d5639fmr167606766b.37.1751446583919;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ou5038YfCMSsezsc+TuKk3LIuL7hz0k+oG8D9Fl1kDU=;
+        b=Gy96zyT43MtVg8hAmHgAWgt6BKXcQ7mVFcRIYQ3AVJPaDYQZAeWdXIBFGktQR80UMW
+         jynvSh/F5L8eegSsFRqxpoWf3KIMZT1ThbZJL9zOJchqZlJosDx74x5D13j018ZS+ImS
+         ik27XN2pbL9Aa6C1JXLmykxz9zXoewzAwQonT6zaNX1YR9LTIkjfntcFnY/zfNNAygtx
+         LieUijjQUlwOTuxG9CRZa908/4oDaCKdVbwAP4702jFabsjzPkQcWNCCyjwEtGsgw+XQ
+         3oG9b2ECcjbyknYDTZsiVJil4wiXVJ+izcjKBhXI46P1RvYABiSpXSZH+FQLs6ZqHi9U
+         Kksg==
+X-Gm-Message-State: AOJu0YyboHGcP8+J3zpjM0l/zM7VVnVvXRiRnoEAn15LjsuETDuoBq7s
+	GcPeM6IJ+3Dc9lHrJMqP+PljelH0UXp5zzGX+GFQRtvuVw4opD2ieshqpOG5i++O8le6phZIi4j
+	yvUiXgshJkJxZtTYL1JD2zD+zXAfS+MAQe2zHKrm5mp4qLMh9s5+HooeqSigOZCnE4w==
+X-Gm-Gg: ASbGncvm9nOW25wprKoRVfNzXjnyn9JWL73Kxs+6hj6E7oS+hVsdJJXtAefyDxz+OlZ
+	MVHKB/HTimeWPpGVg4oOppLCh0IFOPbgI4XowFAhe7XU0Y4t0E/PxWqp/EJa0RdEHbJo/1Jp7zZ
+	fVsGEAvoyjBtWBlRbGIH+P2QMxHUEAm4NXZ6sTf3tvZmGSzX2cPlaV4mvE3UQHMDArSEtuESI2b
+	woU4ya+QbvftI1hQUdxNyKDj7qCu3lO8WEXgP2s3OtNMgsYEZx6HLyp8rCA+Vqk2RAFZfiKeH6C
+	z/dzSaZYJ3EhESMDllsBReYKlB4LBEytzexXQojjFfht850=
+X-Received: by 2002:a17:907:94cc:b0:ae3:6f0e:4741 with SMTP id a640c23a62f3a-ae3c2d2e914mr207724466b.33.1751446584312;
+        Wed, 02 Jul 2025 01:56:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF8sL2q5Kd2yoHDhMduHYdh46Uk0H1dY2JLseKFE/LONUPPIbDxFqR1MYvhezcbAnJ9sZCDPg==
+X-Received: by 2002:a17:907:94cc:b0:ae3:6f0e:4741 with SMTP id a640c23a62f3a-ae3c2d2e914mr207720166b.33.1751446583753;
         Wed, 02 Jul 2025 01:56:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IETz2cUbjohiDgMCeB5AGjP6DLRA0j8ue6TXaco20VrP3jVIARjRWImi3fvYB/VhYDunEYdrw==
-X-Received: by 2002:a17:907:d846:b0:ada:abf7:d0e1 with SMTP id a640c23a62f3a-ae3c2d5639fmr167604466b.37.1751446583485;
-        Wed, 02 Jul 2025 01:56:23 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae353c01506sm1049603266b.109.2025.07.02.01.56.22
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae35365a00bsm1020098966b.43.2025.07.02.01.56.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 02 Jul 2025 01:56:22 -0700 (PDT)
 Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id A73441B3802E; Wed, 02 Jul 2025 10:56:19 +0200 (CEST)
+	id AA1391B38030; Wed, 02 Jul 2025 10:56:19 +0200 (CEST)
 From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Subject: [PATCH net-next v2 0/2] netdevsim: support setting a permanent
- address
-Date: Wed, 02 Jul 2025 10:55:55 +0200
-Message-Id: <20250702-netdevsim-perm_addr-v2-0-66359a6288f0@redhat.com>
+Date: Wed, 02 Jul 2025 10:55:56 +0200
+Subject: [PATCH net-next v2 1/2] net: netdevsim: Support setting
+ dev->perm_addr on port creation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,11 +92,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-B4-Tracking: v=1; b=H4sIABv0ZGgC/22NzQrDIBCEXyXsuRY1hqQ99T1KKFY3zR7yg4qkB
- N+9i+cyp2H4vjkhYiCMcG9OCJgp0rZy0ZcG3GzXDwry3EFL3UmlB7Fi8pgjLWLHsLys90F0k7O
- mt3JQXQ9M7gEnOqr1CQwwdCQYeZkppi18611Wda9mLdu/5qwER8rBvN2tlcY8AvrZpqvbFhhLK
- T8SQztBwQAAAA==
-X-Change-ID: 20250128-netdevsim-perm_addr-5fca47a08157
+Message-Id: <20250702-netdevsim-perm_addr-v2-1-66359a6288f0@redhat.com>
+References: <20250702-netdevsim-perm_addr-v2-0-66359a6288f0@redhat.com>
+In-Reply-To: <20250702-netdevsim-perm_addr-v2-0-66359a6288f0@redhat.com>
 To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Paolo Abeni <pabeni@redhat.com>
@@ -109,32 +108,187 @@ NetworkManager, in particular, has carried an out of tree patch to set
 the permanent address on netdevsim devices to use in its CI for this
 purpose.
 
-This series adds support to netdevsim to set a permanent address on port
-creation, and adds a test script to test setting and getting of the
-different L2 address types.
+To support this use case, support setting netdev->perm_addr when
+creating a netdevsim port.
 
 Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
 ---
-Changes in v2:
-- Set the permanent address on port creation instead of through debugfs
-- Add test script for testing L2 address setting and getting
-- Link to v1: https://lore.kernel.org/r/20250203-netdevsim-perm_addr-v1-1-10084bc93044@redhat.com
+ drivers/net/netdevsim/bus.c       | 22 ++++++++++++++++++----
+ drivers/net/netdevsim/dev.c       | 14 +++++++-------
+ drivers/net/netdevsim/netdev.c    |  9 ++++++---
+ drivers/net/netdevsim/netdevsim.h |  9 +++++----
+ 4 files changed, 36 insertions(+), 18 deletions(-)
 
----
-Toke Høiland-Jørgensen (2):
-      net: netdevsim: Support setting dev->perm_addr on port creation
-      selftests: net: add netdev-l2addr.sh for testing L2 address functionality
+diff --git a/drivers/net/netdevsim/bus.c b/drivers/net/netdevsim/bus.c
+index 64c0cdd31bf85468ce4fa2b2af5c8aff4cfba897..422b3683afe154d9055878a601f95d7b39b30aaf 100644
+--- a/drivers/net/netdevsim/bus.c
++++ b/drivers/net/netdevsim/bus.c
+@@ -66,17 +66,31 @@ new_port_store(struct device *dev, struct device_attribute *attr,
+ 	       const char *buf, size_t count)
+ {
+ 	struct nsim_bus_dev *nsim_bus_dev = to_nsim_bus_dev(dev);
++	u8 eth_addr[ETH_ALEN] = {};
+ 	unsigned int port_index;
++	bool addr_set = false;
+ 	int ret;
+ 
+ 	/* Prevent to use nsim_bus_dev before initialization. */
+ 	if (!smp_load_acquire(&nsim_bus_dev->init))
+ 		return -EBUSY;
+-	ret = kstrtouint(buf, 0, &port_index);
+-	if (ret)
+-		return ret;
+ 
+-	ret = nsim_drv_port_add(nsim_bus_dev, NSIM_DEV_PORT_TYPE_PF, port_index);
++	ret = sscanf(buf, "%u %hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &port_index,
++		     &eth_addr[0], &eth_addr[1], &eth_addr[2], &eth_addr[3],
++		     &eth_addr[4], &eth_addr[5]);
++	switch (ret) {
++	case 7:
++		addr_set = true;
++		fallthrough;
++	case 1:
++		break;
++	default:
++		pr_err("Format for adding new port is \"id [perm_addr]\" (uint MAC).\n");
++		return -EINVAL;
++	}
++
++	ret = nsim_drv_port_add(nsim_bus_dev, NSIM_DEV_PORT_TYPE_PF, port_index,
++				addr_set ? eth_addr : NULL);
+ 	return ret ? ret : count;
+ }
+ 
+diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
+index 3e0b61202f0c9824952040c8d4c79eb8775954c6..107b106be516bbc97735e93643a7f7cf3bfc0a73 100644
+--- a/drivers/net/netdevsim/dev.c
++++ b/drivers/net/netdevsim/dev.c
+@@ -576,7 +576,7 @@ static void nsim_dev_dummy_region_exit(struct nsim_dev *nsim_dev)
+ 
+ static int
+ __nsim_dev_port_add(struct nsim_dev *nsim_dev, enum nsim_dev_port_type type,
+-		    unsigned int port_index);
++		    unsigned int port_index, u8 perm_addr[ETH_ALEN]);
+ static void __nsim_dev_port_del(struct nsim_dev_port *nsim_dev_port);
+ 
+ static int nsim_esw_legacy_enable(struct nsim_dev *nsim_dev,
+@@ -600,7 +600,7 @@ static int nsim_esw_switchdev_enable(struct nsim_dev *nsim_dev,
+ 	int i, err;
+ 
+ 	for (i = 0; i < nsim_dev_get_vfs(nsim_dev); i++) {
+-		err = __nsim_dev_port_add(nsim_dev, NSIM_DEV_PORT_TYPE_VF, i);
++		err = __nsim_dev_port_add(nsim_dev, NSIM_DEV_PORT_TYPE_VF, i, NULL);
+ 		if (err) {
+ 			NL_SET_ERR_MSG_MOD(extack, "Failed to initialize VFs' netdevsim ports");
+ 			pr_err("Failed to initialize VF id=%d. %d.\n", i, err);
+@@ -1353,7 +1353,7 @@ static const struct devlink_ops nsim_dev_devlink_ops = {
+ #define NSIM_DEV_TEST1_DEFAULT true
+ 
+ static int __nsim_dev_port_add(struct nsim_dev *nsim_dev, enum nsim_dev_port_type type,
+-			       unsigned int port_index)
++			       unsigned int port_index, u8 perm_addr[ETH_ALEN])
+ {
+ 	struct devlink_port_attrs attrs = {};
+ 	struct nsim_dev_port *nsim_dev_port;
+@@ -1390,7 +1390,7 @@ static int __nsim_dev_port_add(struct nsim_dev *nsim_dev, enum nsim_dev_port_typ
+ 	if (err)
+ 		goto err_dl_port_unregister;
+ 
+-	nsim_dev_port->ns = nsim_create(nsim_dev, nsim_dev_port);
++	nsim_dev_port->ns = nsim_create(nsim_dev, nsim_dev_port, perm_addr);
+ 	if (IS_ERR(nsim_dev_port->ns)) {
+ 		err = PTR_ERR(nsim_dev_port->ns);
+ 		goto err_port_debugfs_exit;
+@@ -1446,7 +1446,7 @@ static int nsim_dev_port_add_all(struct nsim_dev *nsim_dev,
+ 	int i, err;
+ 
+ 	for (i = 0; i < port_count; i++) {
+-		err = __nsim_dev_port_add(nsim_dev, NSIM_DEV_PORT_TYPE_PF, i);
++		err = __nsim_dev_port_add(nsim_dev, NSIM_DEV_PORT_TYPE_PF, i, NULL);
+ 		if (err)
+ 			goto err_port_del_all;
+ 	}
+@@ -1702,7 +1702,7 @@ __nsim_dev_port_lookup(struct nsim_dev *nsim_dev, enum nsim_dev_port_type type,
+ }
+ 
+ int nsim_drv_port_add(struct nsim_bus_dev *nsim_bus_dev, enum nsim_dev_port_type type,
+-		      unsigned int port_index)
++		      unsigned int port_index, u8 perm_addr[ETH_ALEN])
+ {
+ 	struct nsim_dev *nsim_dev = dev_get_drvdata(&nsim_bus_dev->dev);
+ 	int err;
+@@ -1711,7 +1711,7 @@ int nsim_drv_port_add(struct nsim_bus_dev *nsim_bus_dev, enum nsim_dev_port_type
+ 	if (__nsim_dev_port_lookup(nsim_dev, type, port_index))
+ 		err = -EEXIST;
+ 	else
+-		err = __nsim_dev_port_add(nsim_dev, type, port_index);
++		err = __nsim_dev_port_add(nsim_dev, type, port_index, perm_addr);
+ 	devl_unlock(priv_to_devlink(nsim_dev));
+ 	return err;
+ }
+diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+index e36d3e846c2dc314182efd1af03b59270397b007..f316e44130f722759f0ac4e5baac6a2f6956dc7d 100644
+--- a/drivers/net/netdevsim/netdev.c
++++ b/drivers/net/netdevsim/netdev.c
+@@ -998,8 +998,9 @@ static void nsim_exit_netdevsim(struct netdevsim *ns)
+ 	mock_phc_destroy(ns->phc);
+ }
+ 
+-struct netdevsim *
+-nsim_create(struct nsim_dev *nsim_dev, struct nsim_dev_port *nsim_dev_port)
++struct netdevsim *nsim_create(struct nsim_dev *nsim_dev,
++			      struct nsim_dev_port *nsim_dev_port,
++			      u8 perm_addr[ETH_ALEN])
+ {
+ 	struct net_device *dev;
+ 	struct netdevsim *ns;
+@@ -1010,6 +1011,9 @@ nsim_create(struct nsim_dev *nsim_dev, struct nsim_dev_port *nsim_dev_port)
+ 	if (!dev)
+ 		return ERR_PTR(-ENOMEM);
+ 
++	if (perm_addr)
++		memcpy(dev->perm_addr, perm_addr, ETH_ALEN);
++
+ 	dev_net_set(dev, nsim_dev_net(nsim_dev));
+ 	ns = netdev_priv(dev);
+ 	ns->netdev = dev;
+@@ -1031,7 +1035,6 @@ nsim_create(struct nsim_dev *nsim_dev, struct nsim_dev_port *nsim_dev_port)
+ 	ns->qr_dfs = debugfs_create_file("queue_reset", 0200,
+ 					 nsim_dev_port->ddir, ns,
+ 					 &nsim_qreset_fops);
+-
+ 	return ns;
+ 
+ err_free_netdev:
+diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+index 4a0c48c7a384e2036883c84dc847b82f992f1481..3a8b5510ec2914204beb15247ab60a5d9933f48d 100644
+--- a/drivers/net/netdevsim/netdevsim.h
++++ b/drivers/net/netdevsim/netdevsim.h
+@@ -143,8 +143,9 @@ struct netdevsim {
+ 	struct netdev_net_notifier nn;
+ };
+ 
+-struct netdevsim *
+-nsim_create(struct nsim_dev *nsim_dev, struct nsim_dev_port *nsim_dev_port);
++struct netdevsim *nsim_create(struct nsim_dev *nsim_dev,
++			      struct nsim_dev_port *nsim_dev_port,
++			      u8 perm_addr[ETH_ALEN]);
+ void nsim_destroy(struct netdevsim *ns);
+ bool netdev_is_nsim(struct net_device *dev);
+ 
+@@ -361,8 +362,8 @@ void nsim_dev_exit(void);
+ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev);
+ void nsim_drv_remove(struct nsim_bus_dev *nsim_bus_dev);
+ int nsim_drv_port_add(struct nsim_bus_dev *nsim_bus_dev,
+-		      enum nsim_dev_port_type type,
+-		      unsigned int port_index);
++		      enum nsim_dev_port_type type, unsigned int port_index,
++		      u8 perm_addr[ETH_ALEN]);
+ int nsim_drv_port_del(struct nsim_bus_dev *nsim_bus_dev,
+ 		      enum nsim_dev_port_type type,
+ 		      unsigned int port_index);
 
- drivers/net/netdevsim/bus.c                  | 22 +++++++--
- drivers/net/netdevsim/dev.c                  | 14 +++---
- drivers/net/netdevsim/netdev.c               |  9 ++--
- drivers/net/netdevsim/netdevsim.h            |  9 ++--
- tools/testing/selftests/net/Makefile         |  1 +
- tools/testing/selftests/net/lib.sh           | 17 +++++++
- tools/testing/selftests/net/netdev-l2addr.sh | 68 ++++++++++++++++++++++++++++
- 7 files changed, 122 insertions(+), 18 deletions(-)
----
-base-commit: e96ee511c906c59b7c4e6efd9d9b33917730e000
-change-id: 20250128-netdevsim-perm_addr-5fca47a08157
+-- 
+2.50.0
 
 
