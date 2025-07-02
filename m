@@ -1,149 +1,306 @@
-Return-Path: <netdev+bounces-203507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46490AF6375
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 22:40:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D75CAF6386
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 22:46:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DB1C1C26053
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 20:40:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 486BA1C27E3F
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 20:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9FE2BCF51;
-	Wed,  2 Jul 2025 20:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4082A2BCF51;
+	Wed,  2 Jul 2025 20:46:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="N0+M9a5K"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GQRkF2qT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4317.protonmail.ch (mail-4317.protonmail.ch [185.70.43.17])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0EDA2D63E2
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 20:39:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.17
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751488802; cv=none; b=BRqKQbGflcAKHAQEsiBzbFyiLxw/kRWXqrWZoRlLScGUHaNtiL/uKr1FLSx5C0rQlxEms0NxhvyYuVc8waOpVPLI8vaEBpmG7RgVyVp+q1MMj6UluZfSbCpyr7OYDNMGpZ6z9kqH9x4eC3ceADlU6RwkDdSepyPg9cJz7JS0O4Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751488802; c=relaxed/simple;
-	bh=uaiHubqpFRR4F4vaOrI/6747rZfgxE1BrVEsRjq8fUs=;
-	h=Date:To:From:Subject:Message-ID:MIME-Version:Content-Type; b=XumKEdzSBa7i3nuOClLx+494qKfS3+1VVRt0JeoPWTXXXEeZOjB55YJu3LU3fD6CfrJj4h3qGntAyztBQfLa1SurkAQko+Md8QH14Sg8dRNsRnXFEyvIb3gCfTgyJHn+xnU5G6dnDuqmkaXqx3AIXQiXoO7mi/+8Edgz6qx5R3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=N0+M9a5K; arc=none smtp.client-ip=185.70.43.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
-	s=protonmail; t=1751488790; x=1751747990;
-	bh=a/hdannPY9BCy1X1wMpHfEy0TMKP+MEPbU305iK4TVU=;
-	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=N0+M9a5K/LVjZp7gcnaOi0TgkG1co6fjJEZflmTI8tBrqFwX/2hTsDEoAtU0dUKE/
-	 uQyaGy55MC5o/VGCUtQazOhq+jRCfHE91h6jlens1kJ/GPFGKLDvv8ZokwzuJvQ9R2
-	 pnyRR1afrqDMkNLj5pu2wtrWsI1F9ISaEaERLy8kLgwmdP0pvJh9erM6nlnqTPyP5o
-	 hiVW2R2f89nTiYkcG5I1GtZzMcvHLYdzoDN4c90AchNjCPlLyo/AMUkTELt2w064aC
-	 IJBQklCWA+/xZ+2LYOXpxeP8Dyw2b74rmparr9dft4mnJm0N+a7wAy7AOuZjSW8Aet
-	 R6Yjx+AF6CaFg==
-Date: Wed, 02 Jul 2025 20:39:45 +0000
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Jamal Hadi Salim <jhs@mojatatu.com>, Savy <savy@syst3mfailure.io>, Paolo Abeni <pabeni@redhat.com>
-From: William Liu <will@willsroot.io>
-Subject: [BUG]  Inconsistency between qlen and backlog in hhf, fq, fq_codel, and fq_pie causing WARNING in qdisc_tree_reduce_backlog
-Message-ID: <2UMzQV_2SQetYadgDKNRO76CgTlKBSMAHmsHeosdnhCPcOEwBB-6mSKXghTNSLudarAX4llpw70UI7Zqg2dyE06JGSHm04ZqNDDC5PUH1uo=@willsroot.io>
-Feedback-ID: 42723359:user:proton
-X-Pm-Message-ID: 93ac2c8c761f39ddae57dbcff67cd7d6a8552fc3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844C32DE713;
+	Wed,  2 Jul 2025 20:46:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751489196; cv=fail; b=EdxCCPKu9GrdStnVPzJf1k8TvJcRYQYLixkXY2qij4C8lfj6D853kmzaHO06dMv7xMx1aXLCCfHJcc0R/Jl0Zh5/Di0Xg+6QhO06I46OX+0xA2Cex29w383QerOGaCgp7CCsIWcpqGmv+ZGbiFbN/aRjVlzrb/2EWfUjrAZkyBw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751489196; c=relaxed/simple;
+	bh=wTmFLSPh853ivH3+rYPuDFPKSyLsihgBaB5d7nyEEuU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=mkRFpMuP5zVDIUvQncofk0dsf44pcnM6+hFyLy32Dauhy+ltsRkqEw8ZlEfLCFxMnoJP+jblLwlHv77In7I4EU3P19wdtlp3EdTb3aG3RFhlhX7oE4gzi+X1h4ygY7/37nxVmfkg7RK74bb20w8bEEHLk3FGvQgSfWWZ0gJVLFI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GQRkF2qT; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751489194; x=1783025194;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:mime-version;
+  bh=wTmFLSPh853ivH3+rYPuDFPKSyLsihgBaB5d7nyEEuU=;
+  b=GQRkF2qTnsx4D3NsMKHeUzyt9m9ggF2T+95m+my6KkbB1MVDiQ/2P0kV
+   eGIHudctOAIkynkLOh2Sb1rArUWa4CAsxT0JY9yNBEb7G0WVLAj5dXC1+
+   cPMIbw5Jjqyyl3IsKPXpmSX8XzIBY/a6oajHPc2Jcx6z6WjBYAp3PdpGv
+   pwfUrXNcbhu5LCbEt/JQlFhMSnJzSMuL9VvtDxNRiX/F/LxeDs9KzdvNs
+   8uuUqI5Qz3zCMBFwHXpEKBExSrw450BMhlwTJ2p19BYv7Suftz6sFazL6
+   0dMnyJidZK0aQIsPMizV0HJHVnRubsf1bt45K5khYoZ9/XebEJwgwmD3s
+   g==;
+X-CSE-ConnectionGUID: hvE8+w3fQEC4EW3cEzu5XQ==
+X-CSE-MsgGUID: PSE7tdPoREm1Z9Y6L/Yjqw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11482"; a="41430795"
+X-IronPort-AV: E=Sophos;i="6.16,282,1744095600"; 
+   d="asc'?scan'208";a="41430795"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2025 13:46:33 -0700
+X-CSE-ConnectionGUID: LW/jhvZrQomkprsLV4dKUw==
+X-CSE-MsgGUID: Yvy9mPRwRUeRu5NKQBN45g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,282,1744095600"; 
+   d="asc'?scan'208";a="153628951"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2025 13:46:34 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 2 Jul 2025 13:46:33 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Wed, 2 Jul 2025 13:46:32 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (40.107.243.77)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Wed, 2 Jul 2025 13:46:32 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dFN7PKPoMq5Zek5UjvzmVf+C7IExEyA2zWSE3RSHtY4QSENhArkgjlOd3gzfuB8aXAObmktvMqrTYTJZF7l6G8Ex762lJ8MnBEaBHBxbcX2g0TgxL2UgFEU9jlURqKjelgVwZ5gVbSEM5t6FMpprvSLZq2jN5lLVaCqwCxGwXCi8V8JwXJkuIeweyan3Nn4TWfq0RX+HBYtW2WM5Ybt23hrDhSlGdIFRfS0eJCDMCSHJLvR/TG6q7ybcfaqgp+AVtwkNkrorzFXkA24F1l3PqUxtHzUUMfQqTWMz/dG10ifukeOd484Ej0Ze1VF/Ilv3VENLvwhDgRnirJSfpYAOKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WallE53qglJ+l1AlGXw7HnIuLSGF4eyzVr7vuScK9mw=;
+ b=xB7UoLhd11BehiGvgI9byP45IWw7/gVjsPBo3LMe7cmh5aowy+mQ6E2flpRRJ19xQHIcBuup8xCFt6Ed6/bjh0Kqp+SRc1v3seEbp6N+ZgVNnTxAldVMTfA63aeCgVMwfQrVBGFOHcj7m43BABGI8FLsiVESqpYT/9RUsebg1ejhmf4M28CxQwnR2fSmbsk2PNcP9R8l5T0C5pshlcCiulBB3uwMApw2A/CuRvxX1Jb/1zKeTi1A45IneuWsa/Ds6A/lqkp8EkbBBhSyhg3nfYucwCPVoI8UsNQY3RNYaidiJYwCcnIpnzwZ5Z60liAn3kV1KvwvzVPFBG9/GVh+Jw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by PH7PR11MB7429.namprd11.prod.outlook.com (2603:10b6:510:270::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.30; Wed, 2 Jul
+ 2025 20:46:01 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3%4]) with mapi id 15.20.8901.018; Wed, 2 Jul 2025
+ 20:46:01 +0000
+Message-ID: <44ca3f26-fe6d-4758-ae4f-a22be7599b25@intel.com>
+Date: Wed, 2 Jul 2025 13:45:59 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/6] eth: fbnic: Add firmware logging support
+To: Lee Trager <lee@trager.us>, Alexander Duyck <alexanderduyck@fb.com>,
+	"Jakub Kicinski" <kuba@kernel.org>, <kernel-team@meta.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Kees Cook
+	<kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, "Sanman
+ Pradhan" <sanman.p211993@gmail.com>, Mohsin Bashir <mohsin.bashr@gmail.com>,
+	Su Hui <suhui@nfschina.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Simon Horman <horms@kernel.org>, Kalesh AP
+	<kalesh-anakkur.purayil@broadcom.com>
+CC: Andrew Lunn <andrew@lunn.ch>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-hardening@vger.kernel.org>
+References: <20250702192207.697368-1-lee@trager.us>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <20250702192207.697368-1-lee@trager.us>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="------------lJrkmzQ4HSP9MyQ80c0rtXZw"
+X-ClientProxiedBy: MW4PR04CA0388.namprd04.prod.outlook.com
+ (2603:10b6:303:81::33) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH7PR11MB7429:EE_
+X-MS-Office365-Filtering-Correlation-Id: bf28b3bd-b9f4-4424-f067-08ddb9a974ae
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|921020;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?bmQ2S25jSC8yLysrLytGUDJvRVc1K05RbjRtSEIzdnBoRTVhaEQ1c09KRUJM?=
+ =?utf-8?B?YVFBMVlGSkQwQkptaGhKMUVabWhZaVhBNTJzc1VTQktWOFQzSHQ2bUNzVHN3?=
+ =?utf-8?B?WGpEbXJueXJoVDcxTytWMkNGaS8zN3liTWVLQjFoR1lJakhoTXFLajNYUmlO?=
+ =?utf-8?B?UGc5Qi82T2VhV2N4L0lBeXgwRHVhQ3NEMDZqek4zRGp2Z0x0a2UwMGMxRFN2?=
+ =?utf-8?B?K0FhaTFUaStpTXI2SE9mV3hTNFUrSUdqM2ppWjNQSUI4YmRWck1KK2RENUta?=
+ =?utf-8?B?dGVEWDR4L2FHcGtwWHJaS2VlSHVPbHBHMktWWG9YTG91ekFzbS9KaVFSYkk2?=
+ =?utf-8?B?clJIOUZVTCt1S2VNK1F0QXhtTEJmaWRnOWFRNTEyelBCNlJPQ1NiY2hFbEVq?=
+ =?utf-8?B?UldUbFR5ODREL2dTTllpZWhrbS9xUjNYcXJzVFIwSm4xR2xCMFVBK1dWMHBY?=
+ =?utf-8?B?YitJUmZoNnpKRm10aXlvZTBmbFQ0TGt5VE1JMzZiU21BWEhRUUlzTWF5VmFs?=
+ =?utf-8?B?S29QRTEvdHJwQzE0ZXVpSlVoR3VRRXE4MUw3M2lLUStwR1JRWGJTVHVnZ2JT?=
+ =?utf-8?B?dk5zN2JZSTA3Y09VTGxjQUNjTGZ6dmJWbVNuZWJpekppUkZRenJtSyt0K3pM?=
+ =?utf-8?B?QU5BeHhZbHd6aTZtMmxJeTd4ZVM5V2l0eTBEUCtHNStlTHFrN2RQTGRIZjd6?=
+ =?utf-8?B?R2RXSkF4YnRvdnFXOXFhaUE5NDhjNUNTTzgzSmlBYUlOcTdiczJsYS9MRXRT?=
+ =?utf-8?B?aE1sVzZVQWM3ZDJoMDRWNHB6b0FHNlhiK05rL1hMdHdJV2UrUm44Z3l0WUNE?=
+ =?utf-8?B?RmtxemhCN3lpTVBLVHhwbEdEVWR0SlVuRFMxWjF4ZXQ2UytSL2g2K3dTYThi?=
+ =?utf-8?B?OGJWRmZaUlZ2dk1iMHJUb3JvaDRYZDhCNWJwSXpuNlpaWUZyTEh0ODFKSGlV?=
+ =?utf-8?B?U2d2WXZraG16VytsKzUwL2oyRWtYMXp5dGFoTldmWFAwRHVhTmxQVFZ3QzZm?=
+ =?utf-8?B?dnNjZXh3MCtucm8vOUp2dytrZ251bWdNRDlFY0VBRHF6SXVCd2JmTmJEeXo5?=
+ =?utf-8?B?L1I0dyt3RVJ3dmFjYi8ySHN0b29DSncrMHh5YUNYTmc4RVVSY1FnWjBZV0o0?=
+ =?utf-8?B?SXBXUHJBdDdKVnVGdFNYRGYvNS9BSGVYVWIwT2NNYTF3T2xMRWZWYzFHZFZE?=
+ =?utf-8?B?YlBpZy9BSFVjRDJnSER1NU5FYWlsTVNTcFlxNlplMjBRZTUxZGpvYlpTUnA1?=
+ =?utf-8?B?RjJ2dU9CK2VNSlVJVkVuNENzZFJ0MkV6ay8zb2JpWjZnL1FlL0RIWmZtMWta?=
+ =?utf-8?B?bk5zZXdraE1KZGRTNGZkdUxzSWlZZC8xZ2xWTWt4MDkrdkdTRUY1djVlbmts?=
+ =?utf-8?B?M2F1QjJBQk5wdmpETklmczFEQzBqNlUvUmVUbnd1R2RqUjlyOFlMQWE5RDU1?=
+ =?utf-8?B?OXZkMjdqMjFRdDhiWXk4L0t6UFZORU1DeERML3p1bXBpMmhEVXZteGM2WnRW?=
+ =?utf-8?B?V1kwQTlyeXlvK0xUVUpCWXV1L3V2cmtNb1FuRFFUWGlubzAveUZva0tyWHd3?=
+ =?utf-8?B?akowOG9zMzNnMXYvQ2Mrc1FqblpzL0lYeWV5cncwRkIrTnRtZmhOeUxEcWc0?=
+ =?utf-8?B?czl2VlcxV1ZJNFQxeFd2VXZqdTlzMHhFcGlWeGdONXJ2UXlJNXhlRDNhR2R4?=
+ =?utf-8?B?RDh4dVNQSkY1UG93clRXVTFJaThJRzlnMUY4VXNiTVpHcDdidG9JL3p0Y3Bv?=
+ =?utf-8?B?a0lSWGNKUUFUb1J0cDBVekQ2WnpSZzA5cjlRTHZVdkUzaTlwR01lRDlSaTVL?=
+ =?utf-8?B?aTZnbEFBbUl3cGE3QlVZcmdBdGtQOUZrbGpFZWZtUHlBYmN3MWRWVDdJT1dm?=
+ =?utf-8?B?OUtaK0xYYWFZc01LZXY4UUhEMmo3Q3pmMmdjZk5Sc3FYaWRzNmpUeGVYOHM2?=
+ =?utf-8?B?UkkvK2dEaHllcGxaMlBoMGVIZ1VEOUFSVU1UNURhMTZvait1TmgyNWg4VE9U?=
+ =?utf-8?B?QmdUbHNPbk1nPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VjdpMnkweTVxdzdJS1M0WXRSakRiN1k4aEIxRmxtZVpzVXBoZXk4Zm9KZnpu?=
+ =?utf-8?B?UEFKWHBBS1lvQVZNbU5ONTFxMmFNeXZEdWMxem5nWjZyMnNaTGIveXRONVVJ?=
+ =?utf-8?B?dWx4aUpTM0xOR0h3UWFia29FZmdEVDU5TWpGUzU1bmRnZEExeTd6UEdCUWpj?=
+ =?utf-8?B?b1BSdWpvV3ZRSDNkYzQwQlRtQ0hxV0JneHZSa3MwbE5uZ0pneDBZOE9VRUV6?=
+ =?utf-8?B?VzJQWTZaaHU3R2ZKN0I2VVp4RWQ5MnRpQTkzYUVtaWhNTlM5ZUpFbE9UekJ6?=
+ =?utf-8?B?MDdtVGtvaGZvbmhXYTZ4b3JRQVE5dHdzYTA3aHhzQ2k3VDcvZEpYNzZCQXVI?=
+ =?utf-8?B?b3ZyUGR0RW1DVmRMME5FaWtsWmhxcFgxUUN5VC9ieVY1cjZSTlA2dm9jYmlK?=
+ =?utf-8?B?aXBXMHpVZnJtWWR1ZjRBcUMrb045WHpYcFZzWHpoWVBGZ1h2aVc1NzhTZ2F1?=
+ =?utf-8?B?QkFLTXZ2Q2p6dkdxZENVdXJndFE4U2p1bnZ3VDhuNjFMWGNhRk9vNUJkdWc1?=
+ =?utf-8?B?Tmp1djJLTkhZNFVoWHhRZHVXdDlsY2FqekU5bTZiaDFQcWF6cEFDS2Z4Q0hs?=
+ =?utf-8?B?ZVpDNFI2RW1uT3Q2L0Y5VzUvMUpNV3owVGdmMGIzQWVrVzQwdEJJZDk3OGU1?=
+ =?utf-8?B?czdHMWpaaUVsa1RoQmQ4T3ZhSjV6K1NmUlBXUVY4NDFaR3Y1MW41OVc1eVR4?=
+ =?utf-8?B?MkUvTGZkNVdlck1obUhDdmdrMjlqT0NoVEh3M1F1dUtyNnhPYW4xWk00dC9t?=
+ =?utf-8?B?SWtBZlY3OFpBYW5iNFRMcmNnQWNzaVh2aFp3aFVZL1Z2RTV4NUE2U25WKytV?=
+ =?utf-8?B?cjIrem90Mmg4ajF6aWZ3WDZCWUx1QVh0WXJjczRBTHZ3bzdpb2hOMFhucFJh?=
+ =?utf-8?B?ci80T3pVZGRMU2N5WitGMXJxQUN2SlUzTTdhSE9ncFR5ODg0OW4zaTQ2a1Bn?=
+ =?utf-8?B?RjRQYlM5eFFrSmN4QWlMTjFqTTVUTUgzRUp4QXk4NTR5N2ZZeXBMZmYwandT?=
+ =?utf-8?B?TTRnbXpYbGtTS0ovYzZDZUlTZGtnZjZXa2VzendQT3duTTJoYytsYmdlMUVG?=
+ =?utf-8?B?a0o5c2RtNjd4aHc3NFAzSm1EQzdkMkxYNmI3UHBRWEZxQkpDeTJxWEZaOHVt?=
+ =?utf-8?B?SUV4bVlQTm1TNWxZQ3c3TWhpWHJoR3ArbmdROHI1RGNvUklxM3NnL210SWp3?=
+ =?utf-8?B?VVprTklCMm9hQTZYanFLZEtmdnlSNkI5NDJJajE0a1BmUGY1VG1QOVpRUkMw?=
+ =?utf-8?B?Q2VSNnRTNWd0ekM0NEIwMERDTWFzeXpvMi85bzhJdEpUckg3VGRjUzU2S2ls?=
+ =?utf-8?B?cU8zVnB4K0o4eW5iVkVNYjcwT2VUU2F4V2kzKzlib0VwaVUxeFYzQ1BWZktw?=
+ =?utf-8?B?T3pWdG5xK1o2eHhPRkdneFZrSmZYU3RlNnhaWEV1cGRzRVkxYWNSUHZjcW9S?=
+ =?utf-8?B?NGVaTmtxNTduSXZJZUFqTExiMlk4K3V5Z0h5OElYREhtS21TR25ibitOMEdv?=
+ =?utf-8?B?WlVHTWR0cW56YlJwYjJZNFJHRGRPM0RaT3N6WlFYNHFDc2p1bTJxTGtBSmFn?=
+ =?utf-8?B?bUFGT2JxYktpZE5JaG1oNlkydXV0SkRodHoyYUUvNHR6VXY2YktxdmRIOUh3?=
+ =?utf-8?B?V0N2N0l0QnlaaFVoVnRib3IwcU1tU2cvWml3M2xpSVRwUjR5U2hyOUNIV2Fh?=
+ =?utf-8?B?WEd2emx3UVdOelU0TmFSVThsZmVBSW1HQjYrRk1rWWNlb0tKN3BKN1h2bW9a?=
+ =?utf-8?B?ZG1wNUVHOHB0aWhucXV3d1pieFZuRlBnWHRhSk1xamtKa3NQSU50VW5vSXBj?=
+ =?utf-8?B?UDZRa0YreDkvMWtDczJVekFvSnBpa0UyOUpOZGxCTHBMY3dYMVBSMXpYcXFY?=
+ =?utf-8?B?cXVMeHE2M1dZcnJNVWljVHhyL29UOFZYdWI3d3VUaDNrQWZWVkZrdFJOU3dt?=
+ =?utf-8?B?L0RZNjdnc1JyTk5SRkp6QjhYSjJ5UlVrenk1SGE3bTdTZDdpa205Y3NTU2VU?=
+ =?utf-8?B?ZFpqL2Q1NVNzNnQzaGRvVU80T29wTjdqbzIwckR0cHpmNTFiL09GWDQ0WjlU?=
+ =?utf-8?B?WFdyUVN1MG5ubmtIc3pMVUpJaXNqbWtyS3JJb1dxOWpoUFFDKytHc0FBWGk1?=
+ =?utf-8?B?dllQR210T1RhYXpoaFByOTUvSnd0ellaYVJzWnAxblJoODIrTWl4aDBUTWZS?=
+ =?utf-8?B?V0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: bf28b3bd-b9f4-4424-f067-08ddb9a974ae
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2025 20:46:01.5926
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: b+ozgHfo5TYixPm+QVvAZYv8/o0vaOHXouB0FbAjUpD+rVkwLl2XGdWaMsZ9YWiEfZ7MrqCSuPCZoVn7025lPq+ya/TD3U3pXcTxm6ohkQg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7429
+X-OriginatorOrg: intel.com
+
+--------------lJrkmzQ4HSP9MyQ80c0rtXZw
+Content-Type: multipart/mixed; boundary="------------1W5caA9uKyCT6OK2Uf21fftQ";
+ protected-headers="v1"
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: Lee Trager <lee@trager.us>, Alexander Duyck <alexanderduyck@fb.com>,
+ Jakub Kicinski <kuba@kernel.org>, kernel-team@meta.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Kees Cook <kees@kernel.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Sanman Pradhan <sanman.p211993@gmail.com>,
+ Mohsin Bashir <mohsin.bashr@gmail.com>, Su Hui <suhui@nfschina.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, Simon Horman
+ <horms@kernel.org>, Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-hardening@vger.kernel.org
+Message-ID: <44ca3f26-fe6d-4758-ae4f-a22be7599b25@intel.com>
+Subject: Re: [PATCH net-next 0/6] eth: fbnic: Add firmware logging support
+References: <20250702192207.697368-1-lee@trager.us>
+In-Reply-To: <20250702192207.697368-1-lee@trager.us>
+
+--------------1W5caA9uKyCT6OK2Uf21fftQ
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
 
-We write to report a bug in qlen and backlog consistency affecting hhf, fq,=
- fq_codel, and fq_pie when acting as a child of tbf. The cause of this bug =
-was introduced by the following fix last month designed to address a null d=
-ereference bug caused by gso segmentation and a temporary inconsistency in =
-queue state when tbf peeks at its child while running out of tokens during =
-tbf_dequeue [1]. We actually reported that bug but did not realize the subt=
-le problem in the fix until now. We are aware of bugs with similar symptoms=
- reported by Mingi [3] and Lion [4], but those are of a different root caus=
-e (at least what we can see of Mingi's report).
 
-This works on the upstream kernel, and we have the following reproducer.
+On 7/2/2025 12:12 PM, Lee Trager wrote:
+> Firmware running on fbnic generates device logs. These logs contain use=
+ful
+> information about the device which may or may not be related to the hos=
+t.
+> Logs are stored in a ring buffer and accessible through DebugFS.
+>=20
+> Lee Trager (6):
+>   eth: fbnic: Fix incorrect minimum firmware version
+>   eth: fbnic: Use FIELD_PREP to generate minimum firmware version
+>   eth: fbnic: Create ring buffer for firmware logs
+>   eth: fbnic: Add mailbox support for firmware logs
+>   eth: fbnic: Enable firmware logging
+>   eth: fbnic: Create fw_log file in DebugFS
+>=20
 
-./tc qdisc del dev lo root
-./tc qdisc add dev lo root handle 1: tbf rate 8bit burst 100b latency 1ms |=
-| echo TBF
-./tc qdisc add dev lo handle 3: parent 1:1 hhf limit 1000 || echo HH
-ping -I lo -f -c1 -s32 -W0.001 127.0.0.1 2>&1 >/dev/null
-./tc qdisc change dev lo handle 3: parent 1:1 hhf limit 0 || echo HH
-./tc qdisc replace dev lo handle 2: parent 1:1 sfq || echo SFQ=20
+Everything looked straight forward to me.
 
-Note that a patched version of tc that supports 0 limits must be built. The=
- symptom of the bug arises in the WARN_ON_ONCE check in qdisc_tree_reduce_b=
-acklog [2], where n is 0.  You can replace hhf with fq, fq_codel, and fq_pi=
-e to trigger warnings as well, though the success rate may vary.
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
-The root cause comes from the newly introduced function qdisc_dequeue_inter=
-nal, which the change handler will trigger in the affected qdiscs [5]. When=
- dequeuing from a non empty gso in this peek function, only qlen is decreme=
-nted, and backlog is not considered. The gso insertion is triggered by qdis=
-c_peek_dequeued, which tbf calls for these qdiscs when they are its child.
+>  drivers/net/ethernet/meta/fbnic/Makefile      |   1 +
+>  drivers/net/ethernet/meta/fbnic/fbnic.h       |   3 +
+>  drivers/net/ethernet/meta/fbnic/fbnic_csr.h   |  27 ++-
+>  .../net/ethernet/meta/fbnic/fbnic_debugfs.c   |  29 +++
+>  drivers/net/ethernet/meta/fbnic/fbnic_fw.c    | 179 +++++++++++++++++-=
 
-When replacing the qdisc, tbf_graft triggers, and qdisc_purge_queue trigger=
-s qdisc_tree_reduce_backlog with the inconsistent values, which one can obs=
-erve by adding printk to the passed qlen backlog values.
+>  drivers/net/ethernet/meta/fbnic/fbnic_fw.h    |  36 ++++
+>  .../net/ethernet/meta/fbnic/fbnic_fw_log.c    | 123 ++++++++++++
+>  .../net/ethernet/meta/fbnic/fbnic_fw_log.h    |  45 +++++
+>  drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |  21 ++
+>  9 files changed, 451 insertions(+), 13 deletions(-)
+>  create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_fw_log.c
+>  create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_fw_log.h
+>=20
+> --
+> 2.47.1
 
-While historically triggering this warning often results in a UAF, it seems=
- safe in this case to our knowledge. This warning will only trigger in tbf_=
-graft, and this corrupted class will be removed and made inaccessible regar=
-dless. Lion's patch also looks like qlen_notify will always trigger, which =
-is good.
 
-However, the whole operation of qdisc_dequeue_internal in conjunction with =
-its usage is strange. Posting the function here for reference:
+--------------1W5caA9uKyCT6OK2Uf21fftQ--
 
-static inline struct sk_buff *qdisc_dequeue_internal(struct Qdisc *sch, boo=
-l direct)
-{
-    struct sk_buff *skb;
+--------------lJrkmzQ4HSP9MyQ80c0rtXZw
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-    skb =3D __skb_dequeue(&sch->gso_skb);
-    if (skb) {
-        sch->q.qlen--;
-        return skb;
-    }
-    if (direct)
-        return __qdisc_dequeue_head(&sch->q);
-    else
-        return sch->dequeue(sch);
-}
+-----BEGIN PGP SIGNATURE-----
 
-The qdiscs pie, codel, fq, fq_pie, and fq_codel all adjust qlen and backlog=
- in the same loop where they call qdisc_dequeue_internal to bring the queue=
- back to the newly requested limit. In the gso case, this always seems inco=
-rrect as the number of dropped packets would be double counted for. In the =
-non gso case, this looks to be fine for when direct is true, as in the case=
- of codel and pie, but can be an issue otherwise when the dequeue handler a=
-djusts the qlen and backlog values. In the hhf case, no action for qlen and=
- backlog accounting is taken at all after qdisc_dequeue_internal in the loo=
-p (they just track a before and after value).
+wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaGWaiAUDAAAAAAAKCRBqll0+bw8o6Ek8
+AQCOKkdFPoxlTF57qHQcD8GZ6xUPa7afsxNVI/CblFategEAyh4RRiIuGigk9+k1ULxgeI2o+w4G
+XqJNCIyq3ntd2g8=
+=/tII
+-----END PGP SIGNATURE-----
 
-Cong, I see you posted an RFC for cleaning up GSO segmentation. Will these =
-address this inconsistency issue?
-
-Best,
-Will
-Savy
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit=
-/?id=3D2d3cbfd6d54a2c39ce3244f33f85c595844bd7b8
-[2] https://elixir.bootlin.com/linux/v6.16-rc4/source/net/sched/sch_api.c#L=
-809
-[3] https://lore.kernel.org/netdev/CAM0EoMnv6YAUJVEFx2mGrP75G8wzRiN+Z=3DhSf=
-RAz8ia0Fe4vBw@mail.gmail.com/
-[4] https://lore.kernel.org/netdev/CAM0EoMngoh9hMr363XNiVxpKCu3Y+C4QkBmu0br=
-Yncx3YgPF=3DQ@mail.gmail.com/
-[5] https://elixir.bootlin.com/linux/v6.16-rc4/source/include/net/sch_gener=
-ic.h#L1034
+--------------lJrkmzQ4HSP9MyQ80c0rtXZw--
 
