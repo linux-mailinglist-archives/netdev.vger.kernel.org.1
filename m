@@ -1,122 +1,133 @@
-Return-Path: <netdev+bounces-203107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CE7FAF0856
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 04:12:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89B2AAF085F
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 04:15:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 216247ABC27
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:11:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBBA11C05C9B
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:15:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77D6E19ABC3;
-	Wed,  2 Jul 2025 02:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F4872604;
+	Wed,  2 Jul 2025 02:15:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Su8ZC6sb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JYeoi0lR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C731553AA;
-	Wed,  2 Jul 2025 02:12:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01F0219FC;
+	Wed,  2 Jul 2025 02:15:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751422349; cv=none; b=aEbvuKpu8BV5j7tozie75Cf/uKgWfO/kRIoaJp3bJL/W1Mftp9SUh55zNGy3xfl8+RpKVazCH+UHQ5Jw+2wHBEkFRZHoRVl4jVQnaO5ES9xRxkstmayL4MeG7A6Gq+yfOiOjlEgSw3Tignk/puDoC5Nwl9JwrrCNMb49oHjuWVA=
+	t=1751422533; cv=none; b=q6T5peGw8HaLyzN89eBWpqm1konsd7oRO2uO1uKT5kSdGaw8bOpUgRg13HbL0UC/6yt4iB0s3g7P2wkHmeCJsApZSHuHDuHSb/luWfO791UvAzZFqSpdwaT3mG9lVgg1MjuzpD+jOHjN7wl6aF2t0o2OveNM13KF164MGJLp54Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751422349; c=relaxed/simple;
-	bh=QExLhnSbB/x30DEL+T86K50SaBnWTT5K33Tm+6SgIlQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=M5zbNaX5ZBt6elrIjg5UnhEpxGnJV26hUVORTPZvUwTX9/7yDw8OMrJuq8oDGehxOZsNGJqsV+tQPdOYxRsF9Q4eqxgLjo39a+2j3yc+wVo7svt8MX4rGKBfcjkd4YiLGdZxLcBmYR4mlMPjKxyC2WpjaK6xsejxgUCYmUOXut8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=Su8ZC6sb; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1751422331;
-	bh=wmUGv3+hSVocR0bGCaUm3npQbhvP5RBTITs1xd40P0A=;
-	h=Date:From:To:Cc:Subject:From;
-	b=Su8ZC6sbG5UFFpB7Q+XdS9fEHjJZPvOwQ8XssiKydV/ihnEFBi8LZyasg50pvYYXx
-	 wbUT1QOaVgDJEX74Ubdf2rrvd4l81Iy+Gp4vYzkMx7P/DdMlluFRajJhDbwaCcwWt7
-	 ptjiCCGFrYc1q39RiFMpWjcpImoA1aU79y+e71yxMYc8L4QhPXvRtjneEC3wvz7eNg
-	 RXbMVGpodpl9HOfiYjS1iSBnBpUIrvBnfiCcCe0QOksSQmvuAoAyrWoQj7LEbWXtxT
-	 F4yTGdAEFs3uNFuIIqAA8qkdgX47uhB1fRPLxIdNZY3t+3VAjylZ2aZJ4pOUw0BvTj
-	 6h9lzvhpPPdQA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bX3Ld5Lsvz4x21;
-	Wed,  2 Jul 2025 12:12:09 +1000 (AEST)
-Date: Wed, 2 Jul 2025 12:12:22 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
- <johan.hedberg@gmail.com>, David Miller <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: duplicate patches in the bluetooth tree
-Message-ID: <20250702121222.6882dd74@canb.auug.org.au>
+	s=arc-20240116; t=1751422533; c=relaxed/simple;
+	bh=mf227kKncoURIdLp1KReMZcMntXVrdskgCzq2WR7B3Q=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=LgslTRGhABJBIKRFyTcjMdI5Ive2XZwg81oYeeKwXNO8MT8zE4gjshlYaQOl/W1p+OkZGm/F6aYFJVyyssUx7icWrIeZ9UM5GtjTp5P+eSUFYrDZT34wjGqPcnTa6OjSsMmEkPXr0fWpIOyypayX1iOPGr4vofzRQfMjKHEHyr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JYeoi0lR; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-236470b2dceso33197565ad.0;
+        Tue, 01 Jul 2025 19:15:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751422531; x=1752027331; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g31GsV5you24XaAPrCY89ZjlDVNyI0JUrwAbjHIC07c=;
+        b=JYeoi0lR79XNfDsYssMZML3oXb6B1V0mZ7fFS2c7xA0zmc8tgT/gFh3esfHofje5n7
+         /roWrvJKx0hbGOYn6E/KjwcVbTmaH47mg4E+J/eyrxb4DpCaaZjnRHP4QvhZ+gJ5ImCU
+         EHp6ct8oj0xmlAIcvY98FCYmvuaiCka0upNMtxB5Ei8Esjw2XMqnbx9k9EKstztIP1G+
+         sXyW42RmgclA+FwY15CauK4+BnPyGIWmlIxqtizv66H/ogbouYZgA+/pFfI+zUuVZzFJ
+         b5DLk9i6mpuHmSEXNLb+ui4hNMkvNA+OyEXLZNbEh5QOLU51pP0PHm+C4Y3UyZkME4lc
+         RHeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751422531; x=1752027331;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g31GsV5you24XaAPrCY89ZjlDVNyI0JUrwAbjHIC07c=;
+        b=qDJCrsfucVukS09uVeYi5Kpf/xdeC7hc877BZWmfGJ6SEkbfRm7/+40q4FPSkU/HvJ
+         9c/ZLx/vCwMUKOvNBCKQ+pRMmbiKpCciUxo0hvJ0knyvc3sSOkY1sEZBf+gyKcg1zWNM
+         8iu4G1hQ/RYXOblQcq7f7rd5CTmsrWiE9E2I3PC81rG5STCDgqJFeZ28QvVPGQYq/AeO
+         Ch1WgpspO77J2Lwx+OJiqg+oxlRk3dhSq5Gmv73+fvVQCti6LEbm7ia7WiGEJr3ZlbKB
+         P2TNLWyjPVQLMzNjtbPqFZhBOSAzTtZh1TwSqniLsh6TW7ZrvGKZDMCblcWfZVMNIW5k
+         wI7w==
+X-Forwarded-Encrypted: i=1; AJvYcCUCkPRJ6XmUPUjehd+dP9cDFVTXzQWbHmz0OA3daC4nAPa0i4qEPU8GsTsOFCk4hpWdSRhT8b3g@vger.kernel.org, AJvYcCURzDy9ubZevjKscK7kt2Sn89SEnIhfobryVrqXbhxbrDj56IHKqi/INZxY0Hal9K07EBHjh5FzdC338dKQ@vger.kernel.org, AJvYcCWX5MAhEGT+ifP57iy+A37ME28OYxrG3DHhLIZ/HZvGs2wTqAM6gpsSR3H+5GJN7pgZPjA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yywqq0UXW1zHJ495scJGi04pVMlI73O+hwthWtlr5D3pnNGIE3N
+	ChcP9I4iG+VH3rjS196YPgUa+QiWYUVT6oVxjv0lvL1qJn+7sLMjI7ovl24jUHm0ONHo/XRc
+X-Gm-Gg: ASbGnctB2L0MxRCdqZjHYxdLj6VHsTeJao9WeS2PuLdqep6UkpvSyUvbK6x0daTn21v
+	uqz6IbDHuNiFFssrlYumk6fGtxk7zZWS1pHrhNMdKgk5m1Nzjww6o8Fpa1PSL+Q+i9beZBfKLT4
+	TLnHlBOEdkRe8cgwK/fZG+3Ne0rv3aUVzXb0yo8OkvCaFcTp4/CzXnmYUtzy4o8Yyx8AOuRjeyY
+	s2C7G9ePHVJQ+6820i4h8WloZvQCe31cmKzUeSgcmB3s5oDDKPM/+k4bGuPE6o/XpmytlVLZl7v
+	pSKN8C2f8wfuVfczXb5dyh8aCmgQkWIDcqvEAWO42SwsDcGJEaiz/ZMMG0fyzS5OKevpETk=
+X-Google-Smtp-Source: AGHT+IFU7cSFIO4KkQO2gT16lJGhF5dZmQEW6QhVLm1Oe+2lHVb75yDHEuhj6lpjbfnNle+xNLPuDA==
+X-Received: by 2002:a17:903:2341:b0:234:9375:e081 with SMTP id d9443c01a7336-23c6e5c8868mr13451135ad.42.1751422530838;
+        Tue, 01 Jul 2025 19:15:30 -0700 (PDT)
+Received: from smtpclient.apple ([23.132.124.130])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b34e31da818sm10336762a12.61.2025.07.01.19.15.26
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 01 Jul 2025 19:15:30 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/O8qkvtmYyEDNcGjKDJptJmk";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
+Subject: Re: [RESEND PATCH net-next v4 0/4] vsock: Introduce SIOCINQ ioctl
+ support
+From: Xuewei Niu <niuxuewei97@gmail.com>
+In-Reply-To: <20250701180927.2cafbb5c@kernel.org>
+Date: Wed, 2 Jul 2025 10:15:14 +0800
+Cc: sgarzare@redhat.com,
+ mst@redhat.com,
+ pabeni@redhat.com,
+ jasowang@redhat.com,
+ xuanzhuo@linux.alibaba.com,
+ davem@davemloft.net,
+ netdev@vger.kernel.org,
+ stefanha@redhat.com,
+ leonardi@redhat.com,
+ decui@microsoft.com,
+ virtualization@lists.linux.dev,
+ kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ fupan.lfp@antgroup.com,
+ Xuewei Niu <niuxuewei.nxw@antgroup.com>
+Content-Transfer-Encoding: 7bit
+Message-Id: <E6A8AF53-7AB0-46C1-AE41-FAB5F443911C@gmail.com>
+References: <20250630075727.210462-1-niuxuewei.nxw@antgroup.com>
+ <20250701180927.2cafbb5c@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+X-Mailer: Apple Mail (2.3826.600.51.1.1)
 
---Sig_/O8qkvtmYyEDNcGjKDJptJmk
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+> On Jul 2, 2025, at 09:09, Jakub Kicinski <kuba@kernel.org> wrote:
+> 
+> On Mon, 30 Jun 2025 15:57:23 +0800 Xuewei Niu wrote:
+>> Introduce SIOCINQ ioctl support for vsock, indicating the length of unread
+>> bytes.
+>> 
+>> Similar with SIOCOUTQ ioctl, the information is transport-dependent.
+> 
+> This series does not apply cleanly on current net-next.
+> Please rebase & repost.
+> Please note that we request that repost do not happen more often than
+> 24 hours apart:
+> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
 
-The following commits are also in the net tree as different commits
-(but the same patches):
+I'll rebase, and send out v5 in a few days, in order to have more comments.
 
-  9b36e38d0fb5 ("Bluetooth: HCI: Set extended advertising data synchronousl=
-y")
-  8dcd9b294572 ("Bluetooth: MGMT: mesh_send: check instances prior disablin=
-g advertising")
-  41d630621be1 ("Bluetooth: MGMT: set_mesh: update LE scan interval and win=
-dow")
-  1984453983fd ("Bluetooth: hci_sync: revert some mesh modifications")
-  8466ce07cb6a ("Bluetooth: Prevent unintended pause by checking if adverti=
-sing is active")
+Thanks,
+Xuewei
 
-These are commits
+> -- 
+> pw-bot: cr
 
-  89fb8acc3885 ("Bluetooth: HCI: Set extended advertising data synchronousl=
-y")
-  f3cb5676e5c1 ("Bluetooth: MGMT: mesh_send: check instances prior disablin=
-g advertising")
-  e5af67a870f7 ("Bluetooth: MGMT: set_mesh: update LE scan interval and win=
-dow")
-  46c0d947b64a ("Bluetooth: hci_sync: revert some mesh modifications")
-  1f029b4e30a6 ("Bluetooth: Prevent unintended pause by checking if adverti=
-sing is active")
-
-in the net tree.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/O8qkvtmYyEDNcGjKDJptJmk
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmhklYYACgkQAVBC80lX
-0Gx+iwf/RguU165QmqYoZiIK1kA1f76Rh+3FkqLc8wZKxj7yomIx78m+rFQZdw0l
-h7Ga+8R9XN5+v5+c5qEK2Ez82nVX03osLt+xhij3YlJytAp3xh31KzWo0kwSzX4n
-5lJO0/DLoYYnL7J+VLK1N4UXiNp4m0MJHk+0z1jrhQKZ2/fN1R38hTbQA0TUjhIx
-adGtPkvmfBk/YyT/AUbqNUifDJP5oPI/wwweasO2ID5AKnrZhM6HR248G0hPzJex
-EHTd346KKbYeH7BpU0r7zKLMnP+aSHfLgxfVjMHzhWKVsjppAlHfun05FpBFPoWk
-S8x/4CvLXhIFomocIK8vKwUNXF50sw==
-=AneY
------END PGP SIGNATURE-----
-
---Sig_/O8qkvtmYyEDNcGjKDJptJmk--
 
