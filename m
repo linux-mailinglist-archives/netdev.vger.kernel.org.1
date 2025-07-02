@@ -1,118 +1,134 @@
-Return-Path: <netdev+bounces-203245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7AFEAF0EAE
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:01:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C8F5AF0EB3
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:02:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C94503A6F09
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:01:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29ADF178B31
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:02:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C7A52405FD;
-	Wed,  2 Jul 2025 09:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9839123D2B5;
+	Wed,  2 Jul 2025 09:01:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b6fk/H7g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F87022F757;
-	Wed,  2 Jul 2025 09:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0D123ED56
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 09:01:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751446867; cv=none; b=nMpdOBCftjrscxBE87m/IKqbOo9vIyldK+r0JoAVl8/M8Ad+GPHzqXnpTWq87DZ5zdQne8UhB3mheUDJG0PWzFX0XNK1Z/E3HdVzBiBcS16jg+mNvdcu+Rfu3wnhke8tc7LGxvSWGHk81TO0p9S+VYN2cY/wlH7J7iV2kXW2XTA=
+	t=1751446910; cv=none; b=PvhxMP9OkmBZ7xMZQw5U7d5RmiEyzW4xCl152S0LImSJovjZIlzLL0XzI2qMOyjIXIw5YcRoaIxsKufDQ2z346E+yGJgHsP7zja0XIK9TDoetsz8jtIVNoDaGeqppDDg/qfleH0rpR9QIbOn7qbm3BOiB1dwPYT7vusKro4tsDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751446867; c=relaxed/simple;
-	bh=fZJzccDw6bL7Ls2PWdWua6e8l4VI/x3Ji22ej+rNsn0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P9IJEZk2YQqpVpopN29VFqWBrqtY94Wu5NYyWHdUx3J5UupK6MogepCSVjmmBnX9BBm5mAMwJjPfXBVqf+TUbaJrBt0sUBcholD+sZaoPw86DOGgFfa2nu7OA4cubVmRY5OvINJu48nyYJjWGJf+te4tWSypMRM/REs7epUqM/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-88131f0badcso2516816241.2;
-        Wed, 02 Jul 2025 02:01:05 -0700 (PDT)
+	s=arc-20240116; t=1751446910; c=relaxed/simple;
+	bh=rT/1yTCUYgsKJSyTh5ACsF+g/jBCPapT4DPjXtyBeC8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=P5pC7GviE2qFpJ+b5pomq8HjBTudSQ6rtkzSETxWHoHHo0e/YgTxQVxnNaVPIiUGB70Ki0vAKCZ1WsaXqfQqDElCUEwW54cV4PJ9JQQqpMFvaulhLrmWasbf8rwY0fqAdqtC8wcGUwhVbhS7JInVONyNo4/JUf8Tqwl/nkucB7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b6fk/H7g; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751446903;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rT/1yTCUYgsKJSyTh5ACsF+g/jBCPapT4DPjXtyBeC8=;
+	b=b6fk/H7gtm8IyYp9H6svKea+cpFQ1Sk7G44ya6qv1MaM6TQLOp/DJec4d+yCZMKftAl6Lk
+	XX/ZKvvRQtJYdNpH4EUokdx0YNNNTsqf/LRyPhSjs7F6WCDcBZww7IlKUBXlSSy5l2G+QQ
+	Vgxbivo6EVdM5U0qzzzRuTtkIPmqR+E=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-128-bsadKT4YOPKgaph3G6vc1Q-1; Wed, 02 Jul 2025 05:01:42 -0400
+X-MC-Unique: bsadKT4YOPKgaph3G6vc1Q-1
+X-Mimecast-MFC-AGG-ID: bsadKT4YOPKgaph3G6vc1Q_1751446901
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5551093dd58so2544569e87.3
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 02:01:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751446863; x=1752051663;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=p4ZaC8SZJJEqARXDIgMWg4EN0MjgSfBPCqeNJPMbVto=;
-        b=TQsShQ8Sn8syJahugGrGr2eLeVNXR1I0EU0XdNuQvtN2LwNzBNNeGFv/xx7QDUUMGF
-         eERgxEQMgEqtxVuJoOw2siMUDXLkTWv9iJpFCG3qzUHxWjGXDY82TaP2b3Q7nKU6eC6E
-         LmmeTTIGX9/zKl3ELHH6vNuwl2QpY37fnhD3ZcLMrGAcyPZwKJmOhlANu3g4Xm2Ih4/a
-         QVQM0ZuCfGvRp6F4ERHSNaikXe3gcGBy0X2Br5QIH2eGQKpbBsQsyei054U39U/oSnv2
-         EL/Vqg40ygSa7Q0qpNMjKoykWUQyDR+Jp2Xibd8d3y+BLfWlhy98bZbfxx6HVFVosCqw
-         uuog==
-X-Forwarded-Encrypted: i=1; AJvYcCVdNHh5WNQsXgNVG82ThtjsvoI7WoMe9p6FD+Bokn7Rsc+LTg4FXPJyD3HH1Gt4dfcB/KNrUU1Bcj2uLq/Hk1eRh5g=@vger.kernel.org, AJvYcCVwBjHDxQ0UoD2tbMIAWf4zNbgGxKfKIZxZ8avFeVJoBFrhJrdjSrYcfW/40gIWWrAaOPPMxo7q@vger.kernel.org, AJvYcCWZPybX0iZGinZsIHqJI6SmaJnYeGh8uqQoKD5rlVfHZ905YuFuocYva7fij2r5jeKjjiPb7a6A6pt7@vger.kernel.org, AJvYcCXbVBq+CVKbhchxYrJvzVhsfT38xndE3sU6Jyyb56bCmnlQUK8xusg8sh6U3HV7pom7RpWq2XQQt+5U@vger.kernel.org, AJvYcCXebHz5UMKPjQoN7dcgvt5YsCK9GUjiaFsSpzl6oMaU+hjOoIQJNl06psYooZuBxMQCouQ0mkLiFMhVV7z7@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7vt55ZKJsCn/Qt2Re6jM2kPk/6GPqOqa/HHDqeMCcrFGiB1zr
-	xYRLWGuD6nslI8hq4ICXBCtCaBcm7dWcJbsrwS0CczaPEIxn0duZ/3n2nqrGviIY
-X-Gm-Gg: ASbGncvWIM30SMiDi7XrKtYtRxqPkCQMVQRLiGe9/BAbsBRECeEycBqiuODyNcbt2CR
-	Xish0WKpk67GBu+xNx23+YZJnNBvGwsqwbvxpF8GcmSGwO5d0xvt0vvZTWbTmkJI3e8CEVCVMFV
-	q8dCaA6MWS5Pe1aMSIAcmMDX5ZrtPXSCcdERuS+pFLDTMbZaU/YNU5bUKM2/SvXHUYoxUvj14CK
-	yKcLOK6sn1dU5mfBojTsfZd5j5TPpcSzudY3CjHHJrxlyil2Tc6A5rDYMoSVwyUbBI8BaOtZ03z
-	Y9fYAwwHrwYW1uFGyRcuZNiFK6fbkIxv87afzodAVLoIAmpDb26X40D1u28UuTiFoWMHEgiq1s5
-	tAwL12gx7FGY4wFgBb364kaaKZauZ
-X-Google-Smtp-Source: AGHT+IGb/rdNczI7QkiwvzRrWHUozdrj2zm43+tzc1dsU7VwW1ZJW013I7vK9mQManbUXzrSz0VO+g==
-X-Received: by 2002:a05:6102:2d04:b0:4f1:37f4:8c32 with SMTP id ada2fe7eead31-4f1611617bbmr757041137.11.1751446862899;
-        Wed, 02 Jul 2025 02:01:02 -0700 (PDT)
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com. [209.85.221.180])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-884f3b2430fsm1444383241.9.2025.07.02.02.01.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Jul 2025 02:01:02 -0700 (PDT)
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-532dbe71e4eso2826478e0c.2;
-        Wed, 02 Jul 2025 02:01:01 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVFlDm2PqSkM1+MG5Ce0omji3QHarmDRFB+Qyb/J8Kp/nquTw7VdrGd4aRgYvPVkCaEskQDnr8rH+RdluWa@vger.kernel.org, AJvYcCVY+7Se18RfXi9VdEOC8y0esOHagnZid3JRBIyCVPXgePTOsakwZdSjCHkT/ZxKkvv+2dTNFF5R@vger.kernel.org, AJvYcCWcCrj906ieO0MTk1RQG4RCv9hulfgcTe9JISFaWMa4OI0luijzvWoDbdvYd7jmdv4B0T9jWhbGXJ5bM9tUnMHIqwI=@vger.kernel.org, AJvYcCWdtqqYUkvhIDd9cM1iAW/xgwHMzgAOKFjxEru+IMfzom+9B6Js7ke+eXPKVYm2aNr4ZwOPA/S5i5qA@vger.kernel.org, AJvYcCWfCeiTQI7eA1o13+qWjTb7x2lg73tCeBcxN1CAkUJZ8aC+8hhI49Y3vY/USuIVQSAJq+NsmTnRzUkL@vger.kernel.org
-X-Received: by 2002:a05:6122:8c8f:b0:52f:4776:f6a7 with SMTP id
- 71dfb90a1353d-53457c1c1afmr1365164e0c.0.1751446861289; Wed, 02 Jul 2025
- 02:01:01 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751446901; x=1752051701;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rT/1yTCUYgsKJSyTh5ACsF+g/jBCPapT4DPjXtyBeC8=;
+        b=C9igaTWY5PxwxA7bZ4uiyw3oj/LA+oRmiFumcpHIzquoeKkPNs6ooyYX4P9LIdZdjg
+         SqQCsJN0L4mLrfXLjdyadmjtko9NlObGwUFcjRbkBBwkwNNCRPokxqp1VStSqCLYzJDH
+         Usyh6t9ZNTXwwjqsX1enpQ11QyEk8SbmgT3xgeDMl5itGMHlnf5krYDIvs5jGbmJxbpd
+         L27Rt9vE0FfmSe864+Cp9c+UvyMblbfk5nHFGfsoLGI9N0dLxgKhkMzM70Fo8emkcXEI
+         HbzEd+9k/Hqa7m0lcWSYmGyfOHRqEDEwCwmVR4oHJM2UiwopZIJZMlts0BFPPhd6ecba
+         R6HA==
+X-Forwarded-Encrypted: i=1; AJvYcCXEbxVacg+5HKZ2b+qTFnt2hy/OO/51RircfSZkNNPL0HY1BFBbbBEOu0UL5LBDrJvkkdL4lGk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNQw+fQ+z07o6ii5Z/ZFQM9/LNVVgYySB0O8L2ZxYC8jlkCSZI
+	jvCmvOf2caKOzWmrUaSFrvlW7v2s1oUlM27aE0JEHwC8XwAQqcKWFFBOiltrnL8/uKMJSYScP9J
+	NKn5J0tTTLmErdVwAXzLWXG6c+u29z318s4NXhXowAWgT934Zg+jMNikBNA==
+X-Gm-Gg: ASbGncvjNfMJv3h8znqPnFbsH8Ed8rC/JLEfBk1Jz691Xv5Paq+5cq80mDVmxLeyxox
+	4o0899IwW0SJ+O4WRFh5OWrRUKMCVnCRuutnCVTQ/Wt1E0hwXU6vjCc6xsS18YQK7c+WZJaHQzW
+	QxxpZu/WLY5RVBmJ8CJstzUNHvGseFoa6E/SsbV6vsJLV2djmiTR4hEjFeJXNmtkMzzg39kg1Ba
+	tQzONQIKb5fYKCFzzoQEZQGwymPmE4xnlJDlKFkxa+d2aaK+aINtrAhPN0ALauTQh/HGLWWO/n2
+	4SFt+WWhGFnvI/8C7qs=
+X-Received: by 2002:a05:6512:2245:b0:553:addb:ef5c with SMTP id 2adb3069b0e04-55628372cfamr635089e87.54.1751446901062;
+        Wed, 02 Jul 2025 02:01:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG4L3Lr7zlS5Q7UNzNUPT3l26X2dNCoG8GtYzZzEmFsARCZIaKREcNHDzAIVt/eK0EazCxBZw==
+X-Received: by 2002:a05:6512:2245:b0:553:addb:ef5c with SMTP id 2adb3069b0e04-55628372cfamr635048e87.54.1751446900110;
+        Wed, 02 Jul 2025 02:01:40 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5550b24046csm2071324e87.20.2025.07.02.02.01.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jul 2025 02:01:39 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id C45C61B3803C; Wed, 02 Jul 2025 11:01:37 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org,
+ magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ joe@dama.to, willemdebruijn.kernel@gmail.com
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, Jason Xing
+ <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v2] Documentation: xsk: correct the obsolete
+ references and examples
+In-Reply-To: <20250702075811.15048-1-kerneljasonxing@gmail.com>
+References: <20250702075811.15048-1-kerneljasonxing@gmail.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 02 Jul 2025 11:01:37 +0200
+Message-ID: <87plejezke.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250702005706.1200059-1-john.madieu.xa@bp.renesas.com> <20250702005706.1200059-2-john.madieu.xa@bp.renesas.com>
-In-Reply-To: <20250702005706.1200059-2-john.madieu.xa@bp.renesas.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 2 Jul 2025 11:00:49 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdWN7K===8+a_xjbROXXwt31y=D9EhhtW0dcWhOW-xi3Fw@mail.gmail.com>
-X-Gm-Features: Ac12FXy3qvRlCCOU1J9rVOyXjvrgTG4HaTQsme_N6hvHGBENHVYbBkeMw8lB4F0
-Message-ID: <CAMuHMdWN7K===8+a_xjbROXXwt31y=D9EhhtW0dcWhOW-xi3Fw@mail.gmail.com>
-Subject: Re: [PATCH v4 1/4] clk: renesas: r9a09g047: Add clock and reset
- signals for the GBETH IPs
-To: John Madieu <john.madieu.xa@bp.renesas.com>
-Cc: magnus.damm@gmail.com, robh@kernel.org, krzk+dt@kernel.org, 
-	conor+dt@kernel.org, mturquette@baylibre.com, sboyd@kernel.org, 
-	richardcochran@gmail.com, prabhakar.mahadev-lad.rj@bp.renesas.com, 
-	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org, 
-	netdev@vger.kernel.org, biju.das.jz@bp.renesas.com, john.madieu@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2 Jul 2025 at 02:57, John Madieu <john.madieu.xa@bp.renesas.com> wrote:
-> Add clock and reset entries for the Gigabit Ethernet Interfaces (GBETH 0-1)
-> IPs found on the RZ/G3E SoC. This includes various PLLs, dividers, and mux
-> clocks needed by these two GBETH IPs.
+Jason Xing <kerneljasonxing@gmail.com> writes:
+
+> From: Jason Xing <kernelxing@tencent.com>
 >
-> Reviewed-by: Biju Das <biju.das.jz@bp.renesas.com>
-> Signed-off-by: John Madieu <john.madieu.xa@bp.renesas.com>
+> The modified lines are mainly related to the following commits[1][2]
+> which remove those tests and examples. Since samples/bpf has been
+> deprecated, we can refer to more examples that are easily searched
+> in the various xdp-projects, like the following link:
+> https://github.com/xdp-project/bpf-examples/tree/main/AF_XDP-example
+>
+> [1]
+> commit f36600634282 ("libbpf: move xsk.{c,h} into selftests/bpf")
+> [2]
+> commit cfb5a2dbf141 ("bpf, samples: Remove AF_XDP samples")
+>
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
 
-> v4:
->  - Renames clock names to match V2Hs
->  - Uses DEF_MOD_MUX_EXTERNAL instead of DEF_MOD for Tx and Rx clks
->  - Drops Tested-by tag from Biju
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
-i.e. will queue in renesas-clk for v6.17.
 
-Gr{oetje,eeting}s,
+I'll make sure to update the document should we ever decide to move the
+example code :)
 
-                        Geert
+-Toke
 
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
 
