@@ -1,98 +1,83 @@
-Return-Path: <netdev+bounces-203122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89800AF0899
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 04:40:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15947AF08A3
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 04:43:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD8AD1C20B1A
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:41:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AD4D7A4B28
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:41:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81E5C1E3DCD;
-	Wed,  2 Jul 2025 02:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08FFA1B0439;
+	Wed,  2 Jul 2025 02:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hd6g0ZP2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eICL/c+k"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58FC61A073F;
-	Wed,  2 Jul 2025 02:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9041149C64
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 02:43:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751424007; cv=none; b=MQ9xI2QGFwOSmg/Xr4l+Bw3cmS3nIV6fQwn8MrZt9KBkQn/t4SAR5JEmS4LzMZxnbKE0bYur+4nJEUYQ5btiyyOrEhcxV6GxFST7Ud/WjHm6OW49uCKMWOT4H5jWU0+EzTCEI6lGRdvhDP24PiL5RNofV+nr49jo9nCYf6JSbbo=
+	t=1751424190; cv=none; b=HdzdjFNTcG6Ml8kluu9YS/Xq29EnAqCMG3l8dnyr+YMy3vXQmOYDnAi6b9NMmy6MY384H1aPqDJQocOAQxGhJ9jURzf+PYT1w9mStKOtgc3A3vULUZGc3nmYKIqEO8jJHd5vDysJMTqGuvK22Jy1WYUWqCtKyb/uBdtpxjo2dgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751424007; c=relaxed/simple;
-	bh=ROltbsMKiJ+DHPDuXyJyxXrxE9iVmGwQvi4xmN8uk58=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gacU9PNrq+w4mPqPbjIVciE8H6cJSBAa8JBnIBRIgWaghcFsgg+cTRG70dd2jMykuz+7y6qVa34yx6FYB22jYsL+cyBYQyPTeWeHpy1ydkBMVnZUVenS09m4jwZC8fdr6bcd8bB9ubEkRKX+bXxh5oVat2enVSnufOow5KCLtns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hd6g0ZP2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F11DEC4CEEB;
-	Wed,  2 Jul 2025 02:40:06 +0000 (UTC)
+	s=arc-20240116; t=1751424190; c=relaxed/simple;
+	bh=IzAdJAiN7T3Zipdm0YPllcTD7NazI5EY7ANdPTXCdwY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eZ/xLbhMEtPWN6/0sL1uDOsxoB43a5+7hQ8dpF/E93QY1q9ZRjXEJ9uy+3kxZw7d20gy85oxJvTLVTMq+8XF9AKAMzpu7l430FYqgHpy0H3VkfD8wCQeqK0E3BRAk3oAp30nqkG/A+6NFKW0OFb05qSf0egW0BXDYQCXUv62b+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eICL/c+k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D598AC4CEEB;
+	Wed,  2 Jul 2025 02:43:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751424007;
-	bh=ROltbsMKiJ+DHPDuXyJyxXrxE9iVmGwQvi4xmN8uk58=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Hd6g0ZP2cQlmn95MhthViR/t1dg9p9zjN2Pozlh474VgjY8J3jy/gbXcG/SIwlwCe
-	 7GxCEgZNm29DW3HPAds+JQUJD0jaDi8KqYgO4jr5FgVd/uOXRQtl8k39ITqKLSSpZ3
-	 g0hBePm7Vr+xPKw8bl1wiAU6YNJDT/KabUjb57Pqh/WdB3AtOB3gw5oed/7hcgzLYh
-	 35PCPrsDDadbEr4yJqML/grMhUYw8akSCA3rXKHIl0SF7ipgI+ZIs5mKg+0KdVy43l
-	 exO+RmbdYsBxZiZRk/BO56HKrXhld5s4dg8lAGuXAMhspU9IgdE0ycu6V+jDYIIQhe
-	 PJGsa9fsxGk/g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE0E383BA06;
-	Wed,  2 Jul 2025 02:40:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1751424190;
+	bh=IzAdJAiN7T3Zipdm0YPllcTD7NazI5EY7ANdPTXCdwY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eICL/c+kBcJHHA+plrQUBkoID+nCxReg/yRdLqPNazhk0DhJW6VT6SdnQkMXFPW7J
+	 Zvo0KXrGP5d77sRLhk2vwkozPJP7B2jzezc0BpSHu82Sa5JxjhZ+iCpFv9izR20XMU
+	 whOFhf/5x0BkDeYRAUK02yGVlk/WQUXEhE/LeTJsXvoXBIIfPe4pQzcJ7YngU7HVSf
+	 uMOjj/ddHupcS1wUA0ev6QjPXhfHkbOQrqn8pixGZ+5pHwHFATMm41ao2HX5mnAyS0
+	 tLUheNTUsMcb5Ah7I2IBV5lUBNR/AJcdxRZc+PtgmpiUF9stQvkpmm5PysSarkDlLj
+	 SVtFR0Kue7j1A==
+Date: Tue, 1 Jul 2025 19:43:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gal Pressman <gal@nvidia.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, andrew@lunn.ch,
+ przemyslaw.kitszel@intel.com, anthony.l.nguyen@intel.com,
+ sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+ bbhushan2@marvell.com, tariqt@nvidia.com, mbloch@nvidia.com,
+ leon@kernel.org, ecree.xilinx@gmail.com
+Subject: Re: [PATCH net-next 3/5] eth: mlx5: migrate to the *_rxfh_context
+ ops
+Message-ID: <20250701194309.1dcb7467@kernel.org>
+In-Reply-To: <14654215-aa09-48c5-a12d-9fa99bb9e2cc@nvidia.com>
+References: <20250630160953.1093267-1-kuba@kernel.org>
+	<20250630160953.1093267-4-kuba@kernel.org>
+	<14654215-aa09-48c5-a12d-9fa99bb9e2cc@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/2] net: dsa: mv88e6xxx: Constify struct
- devlink_region_ops and struct mv88e6xxx_region
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175142403149.183540.1885720242599940117.git-patchwork-notify@kernel.org>
-Date: Wed, 02 Jul 2025 02:40:31 +0000
-References: 
- <46040062161dda211580002f950a6d60433243dc.1751200453.git.christophe.jaillet@wanadoo.fr>
-In-Reply-To: 
- <46040062161dda211580002f950a6d60433243dc.1751200453.git.christophe.jaillet@wanadoo.fr>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sun, 29 Jun 2025 14:35:49 +0200 you wrote:
-> 'struct devlink_region_ops' and 'struct mv88e6xxx_region' are not modified
-> in this driver.
+On Tue, 1 Jul 2025 09:25:41 +0300 Gal Pressman wrote:
+> > +	mlx5e_rx_res_rss_get_rxfh(priv->rx_res, rxfh->rss_context,
+> > +				  ethtool_rxfh_context_indir(ctx),
+> > +				  ethtool_rxfh_context_key(ctx),
+> > +				  &ctx->hfunc, &symmetric);  
 > 
-> Constifying these structures moves some data to a read-only section, so
-> increases overall security, especially when the structure holds some
-> function pointers.
-> 
-> [...]
+> We don't expect it to fail so no return value check here, but maybe a
+> WARN_ON_ONCE() should be added?
 
-Here is the summary with links:
-  - [net-next,1/2] net: dsa: mv88e6xxx: Constify struct devlink_region_ops and struct mv88e6xxx_region
-    https://git.kernel.org/netdev/net-next/c/ff2d4cfdaf91
-  - [net-next,2/2] net: dsa: mv88e6xxx: Use kcalloc()
-    https://git.kernel.org/netdev/net-next/c/a63b5a0bb740
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Hm.. you know what, I think I'll pop that WARN_ON_ONCE() inside
+mlx5e_rx_res_rss_get_rxfh() and make it return void. Core doesn't
+call get_rxfh for custom contexts any more, the only calls to
+mlx5e_rx_res_rss_get_rxfh() are this one right after creation
+and the one that asks for context 0, which I suppose must always exist.
 
