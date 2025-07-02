@@ -1,98 +1,90 @@
-Return-Path: <netdev+bounces-203517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49C23AF6406
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 23:30:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFD93AF640B
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 23:31:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 356904E32D9
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 21:29:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D4783BA622
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 21:31:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E2E72D46C4;
-	Wed,  2 Jul 2025 21:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4496423817F;
+	Wed,  2 Jul 2025 21:31:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NfS18JJA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HZRHlHoT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E88F82BE656;
-	Wed,  2 Jul 2025 21:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBA22C9A;
+	Wed,  2 Jul 2025 21:31:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751491786; cv=none; b=o6AroeKAoMT3QjBQlWdrmOnpmjpwPikqodq24CyTkr1EZk7Ju7xTc5GR+omfh4mbuMcMofG5bnr440APl5g8ScejOIgOsh1Jh3uixG04kkHrypVH01suiiIMjMgZ7V6kPxouf61ohdxgLLtB0m+L3Erj+hrORmXUbo00QamKOX4=
+	t=1751491914; cv=none; b=h8Rkr5N5bR4EDBmQobIlI9PqD0Doglcjyvu9JAYSY6XWo0jFd77DFV6dhkGHM6Fh9NNCQijxgbbgE8cck44qS5F73tTBNJFi++Dl2MUrDTHGAburDBO4R6XBtZVqrpq3PY1Z2WDpqGbkAX0TuVN6w9CSc/qE/QinogSFpn2JjIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751491786; c=relaxed/simple;
-	bh=0WNEst3sBeqmgcUmIKzjp8s/Qwi8FrrcsJxDKg7Ym1w=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GfXdxSJDjj859tdGLKAVNFrA+rG/LVcjkHn20KArPzYbHMjgfw7rWxBRBdC3q/EpLS2kGu+k9VxgF9rqO6PtZpe1I9k9sky0wM56EATetHfbXx2g8zON+nIAqXzbhr50QYB7DjJDK9wH4FclFAkat89BN7tE3XJZUVMUf7oSqvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NfS18JJA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81169C4CEF2;
-	Wed,  2 Jul 2025 21:29:45 +0000 (UTC)
+	s=arc-20240116; t=1751491914; c=relaxed/simple;
+	bh=jzuLxHC9Uv+OUUWTt79avAJ566i/3yVd42ByhldChw4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Q8/6LsS40tCNkbKIvuIm/6vu9SrrWvTuxGGVIER1XfMS0p5qcqEdgHJtTAFAnkIaqee31edwTFETaAoFPH1Z+/ARd7xTF4qb3YdIO7RntMHNHTHbEHIQHereU6vPpdcpkPRFvlPyy7K4bPQ/ErKqpaBkvpVFCcitT7ErLfJhjAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HZRHlHoT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44C72C4CEE7;
+	Wed,  2 Jul 2025 21:31:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751491785;
-	bh=0WNEst3sBeqmgcUmIKzjp8s/Qwi8FrrcsJxDKg7Ym1w=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NfS18JJANYUxJH9ISefFms7MtV7+AXIV0SzQUkrIm0wBiqDKXAQ9lJmvODN+ZDtoJ
-	 edX4Fod5+FSR1dZqv0Dgo3pjOc3SyjyupnkGWVDu43LE3zm3DPH/E1NCji36YwqBE9
-	 zKZ3rZ6da3Krvj0bSG2niC9/+ydgexba3TwxuROLFGa7VGUZ1mkmZwhThrp5jMKMJ+
-	 Oicoj4MsXhXOx4phQONxtDlsDpKdGEr1rzLbv2YgjgTdoewqVazQgsFyK76SRBeN4O
-	 h6yAiedu5e5LYwmVtSLTcwMu+G15EmIh00lOyjHI+AXGkPSzWiz1q1jaziuryGVfTm
-	 heDcexoDeuE2g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D68383B273;
-	Wed,  2 Jul 2025 21:30:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1751491913;
+	bh=jzuLxHC9Uv+OUUWTt79avAJ566i/3yVd42ByhldChw4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HZRHlHoTGy+g/1aNgLxhPgFbZnq278AxETgu0ki8GNKptTrMw/M3OBClefV5ZPTNr
+	 PxJ+bN2jAHJwQs6Gm+YQoAj1QKURdqSLRZI+DIwJWCPaRMtTeZNkNGYvxt4LHPK2yX
+	 8X6XgDLxOnVWZXqUhoYsnRI/QchZPD0Y8OZ9I9JcqyNj9elCFW7jCHnnzw9RmdSbe7
+	 G1EOOOYD5ZjWokBX/wumv6JEQ03EzG1MG1lBpMt+lfJihd9Z69IDCDA/VPd0UL23Xq
+	 jfZ3D1AbL+1HMnszBgr7jOS2ZOMr8sHHKr8XBzvKzaKYDxQrhor9CmtvwCRNQLSPdw
+	 TYJPugFhM4T6A==
+Date: Wed, 2 Jul 2025 14:31:52 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ mengyuanlou@net-swift.com, duanqiangwen@net-swift.com,
+ stable@vger.kernel.org
+Subject: Re: [PATCH net] net: libwx: fix double put of page to page_pool
+Message-ID: <20250702143152.6046ab7c@kernel.org>
+In-Reply-To: <C8A23A11DB646E60+20250630094102.22265-1-jiawenwu@trustnetic.com>
+References: <C8A23A11DB646E60+20250630094102.22265-1-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] net: thunderbolt: Enable end-to-end flow control also
- in
- transmit
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175149180975.869841.11361314397733527763.git-patchwork-notify@kernel.org>
-Date: Wed, 02 Jul 2025 21:30:09 +0000
-References: <20250628093813.647005-1-zhangjianrong5@huawei.com>
-In-Reply-To: <20250628093813.647005-1-zhangjianrong5@huawei.com>
-To: zhangjianrong <zhangjianrong5@huawei.com>
-Cc: michael.jamet@intel.com, mika.westerberg@linux.intel.com,
- YehezkelShB@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- guhengsheng@hisilicon.com, caiyadong@huawei.com, xuetao09@huawei.com,
- lixinghang1@huawei.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 30 Jun 2025 17:41:02 +0800 Jiawen Wu wrote:
+> wx_dma_sync_frag() incorrectly attempted to return the page to
+> page_pool, which is already handled via buffer reuse or wx_build_skb()
+> paths.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+The conditions is:
 
-On Sat, 28 Jun 2025 17:38:13 +0800 you wrote:
-> According to USB4 specification, if E2E flow control is disabled for
-> the Transmit Descriptor Ring, the Host Interface Adapter Layer shall
-> not require any credits to be available before transmitting a Tunneled
-> Packet from this Transmit Descriptor Ring, so e2e flow control should
-> be enabled in both directions.
+	if (unlikely(WX_CB(skb)->page_released))
+
+And only wx_put_rx_buffer() sets that to true.  And it sets page to
+NULL, so I don't understand how this is supposed to work.
+
+Please improve the commit message, if not the code..
+
+> Under high MTU and high throughput, this causes list corruption
+> inside page_pool due to double free.
 > 
-> Signed-off-by: zhangjianrong <zhangjianrong5@huawei.com>
-> 
-> [...]
+> [  876.949950] Call Trace:
+> [  876.949951]  <IRQ>
+> [  876.949952]  __rmqueue_pcplist+0x53/0x2c0
+> [  876.949955]  alloc_pages_bulk_noprof+0x2e0/0
 
-Here is the summary with links:
-  - [v2] net: thunderbolt: Enable end-to-end flow control also in transmit
-    https://git.kernel.org/netdev/net-next/c/a8065af3346e
-
-You are awesome, thank you!
+This is just the stack trace you're missing the earlier lines which
+tell us what problem happened and where.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
