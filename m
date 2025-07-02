@@ -1,184 +1,99 @@
-Return-Path: <netdev+bounces-203442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E3AAAF5F4E
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 18:59:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90636AF5F53
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 19:01:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 793544E3114
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 16:59:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 360BA189A958
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 17:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C732F530F;
-	Wed,  2 Jul 2025 16:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE122FC3C3;
+	Wed,  2 Jul 2025 17:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Va46DDik"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DIdrkV9V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3486B2F3C36;
-	Wed,  2 Jul 2025 16:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B2D22F85EF
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 17:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751475535; cv=none; b=b39cmHt72u4N/Eqyg6305RYC0Qpy2qASnegX3mHyLV+JeojC2WFMsAGZcUEEU4wLO2HmqE3071fxuF/fvaqx+SbXXPPav/CkhzajFMq68HTSk9CuZK/ZgTddPn5K8ottYHrwhyphhIfGNve1J3CvKckw8gi4oY1hVi4CtKHBCio=
+	t=1751475609; cv=none; b=YzQ4EXmorszJKByfhVsSyBqXjLeeAsN8QHSsdVgtBYE4ZklmNYnsYUn9WvUUvX2AuK0aXUvcl2vatpYlGjCgauu5aGQCe3UkGS8dG/KHinl7Fpa47cxO/Hj5cxByMDw2d0P28O7Fvvna3kBWBIQmWIDX3snNiST4rOWRJLNzhf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751475535; c=relaxed/simple;
-	bh=NRCwcBa+605nVVuq9je4xdUTbE9ogB25Tw0Q/57qzjo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fS/5xfHmCtBq2huTmZyUS9rfudB5MBVXXFZYHBgktV41BaQwpeJl/K8OMpqeG+UyzO+8Qefh6N1pLQz06DDDN5FKU52RTqU/uuJ4OP/ldLnIfmU5eGUr58AidIfP8fIsrzK56FXw+LDmNCbg0TvyZLOxOhsxU2vFq1PrI5lGru0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Va46DDik; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751475534; x=1783011534;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=NRCwcBa+605nVVuq9je4xdUTbE9ogB25Tw0Q/57qzjo=;
-  b=Va46DDikOrXIvfSbOucqM1atsEf6wuQZFPMhiuFjsRBgPxieIWJEuhq2
-   K5MKInUEWn3IXCwkCKmr5mYJsoJ07xB3pLVzxnNkhWhfajsSUwCy3CBzn
-   MYktuT7gUC/mb5bMkva+LGmvo7ZSEoXSaFfmAYdjYg506HMUaLFnNhWRI
-   9oEsKozvvr+ZWiSCe2W2wW0Ny2ie9oXPnl9i+rYz4+FfiPO0K71MMohRh
-   8SlaEtcOSxGzgFWBZ7itxzgLPcyHdKmZIt+PJpTqIKkxvtz6b9Xfmw4ID
-   IbDBUoMKlPEMnjY+u29znO3SkEZafnlSHiQD2rkviifZJiC16Mw6HNv74
-   g==;
-X-CSE-ConnectionGUID: 12lNxwf/S0OsXOrdB8qR6A==
-X-CSE-MsgGUID: QC5ondRCQEm5NZ4A3IbjCQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11482"; a="65132676"
-X-IronPort-AV: E=Sophos;i="6.16,281,1744095600"; 
-   d="scan'208";a="65132676"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2025 09:58:54 -0700
-X-CSE-ConnectionGUID: 1sbzCVlVTSCIMJVzDvo/3g==
-X-CSE-MsgGUID: 5LYgvkbZQkqdQZuay9eh1A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,281,1744095600"; 
-   d="scan'208";a="153538594"
-Received: from p12ill20yoongsia.png.intel.com ([10.88.227.38])
-  by orviesa010.jf.intel.com with ESMTP; 02 Jul 2025 09:58:47 -0700
-From: Song Yoong Siang <yoong.siang.song@intel.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH bpf-next,v3 2/2] selftests/bpf: Enhance XDP Rx metadata handling
-Date: Thu,  3 Jul 2025 00:57:57 +0800
-Message-Id: <20250702165757.3278625-3-yoong.siang.song@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250702165757.3278625-1-yoong.siang.song@intel.com>
-References: <20250702165757.3278625-1-yoong.siang.song@intel.com>
+	s=arc-20240116; t=1751475609; c=relaxed/simple;
+	bh=lD8+0GgmxZvEYmknjFXzg4FO5vQ3ovohbubFZd9SlUw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VWL56BwiF3yvQs2RPJJxWa240/AmplqudzZ4ZY4ArD6TxNlsyYlhM+qN12BJ6dOiMIpHYygQ0XYbHqFtUl20kVSntDgEwz5gmptbAKivAcUNSIDBQFZOSVIi8wiATC4yfpQN4cnnqORomHj7WOWCPwAgFR+g+FOBgQC4bagRtHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DIdrkV9V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D20FC4CEE7;
+	Wed,  2 Jul 2025 17:00:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751475609;
+	bh=lD8+0GgmxZvEYmknjFXzg4FO5vQ3ovohbubFZd9SlUw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DIdrkV9VG4AcTzWFspRGMet55CVIJNNAgAb7OiY+1514JyL4qL++8+RnnBcQ8wNJE
+	 CbK6ZFkCdRgkZJo0685o/zZytA5JWpjXNm/j35yvObk7Vk24Uf6wOggxyX3cg60Qa+
+	 tHC10uFRAgfMek8a+KejrP9ZyUG7aBLN0Bq2rFnUGbFKqIztWw1PhmLgTNOZMeioFl
+	 PwZq7njPf9hgn/UHEg+1/ebxKjfl92Pv3gj1bEmmuxg5kXOf84tOsE/0Y3ezt8mEUY
+	 BhRHUAZbFrf6m+LLmN+cj5fcJVn+jRRDYbv5vp4GoO7DcVNkO8W0sHo99kK6Q7UdxO
+	 qjF1S9F/iwH1A==
+Date: Wed, 2 Jul 2025 18:00:05 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, michael.chan@broadcom.com, andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com, netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>,
+	kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH net v2] bnxt_en: eliminate the compile warning in
+ bnxt_request_irq due to CONFIG_RFS_ACCEL
+Message-ID: <20250702170005.GH41770@horms.kernel.org>
+References: <20250702064822.3443-1-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250702064822.3443-1-kerneljasonxing@gmail.com>
 
-Introduce the XDP_METADATA_SIZE macro as a conservative measure to
-accommodate any metadata areas reserved by Ethernet devices.
+On Wed, Jul 02, 2025 at 02:48:22PM +0800, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> I received a kernel-test-bot report[1] that shows the
+> [-Wunused-but-set-variable] warning. Since the previous commit I made, as
+> the 'Fixes' tag shows, gives users an option to turn on and off the
+> CONFIG_RFS_ACCEL, the issue then can be discovered and reproduced with
+> GCC specifically.
+> 
+> Like Simon and Jakub suggested, use fewer #ifdefs which leads to fewer
+> bugs.
+> 
+> [1]
+> All warnings (new ones prefixed by >>):
+> 
+>    drivers/net/ethernet/broadcom/bnxt/bnxt.c: In function 'bnxt_request_irq':
+> >> drivers/net/ethernet/broadcom/bnxt/bnxt.c:10703:9: warning: variable 'j' set but not used [-Wunused-but-set-variable]
+>    10703 |  int i, j, rc = 0;
+>          |         ^
+> 
+> Fixes: 9b6a30febddf ("net: allow rps/rfs related configs to be switched")
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202506282102.x1tXt0qz-lkp@intel.com/
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+> v2
+> Link: https://lore.kernel.org/all/20250629003616.23688-1-kerneljasonxing@gmail.com/
+> 1. use a better approach with fewer #ifdefs (Simon, Jakub)
 
-Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
----
- tools/testing/selftests/bpf/prog_tests/xdp_metadata.c | 2 +-
- tools/testing/selftests/bpf/progs/xdp_hw_metadata.c   | 2 +-
- tools/testing/selftests/bpf/progs/xdp_metadata.c      | 2 +-
- tools/testing/selftests/bpf/xdp_hw_metadata.c         | 2 +-
- tools/testing/selftests/bpf/xdp_metadata.h            | 7 +++++++
- 5 files changed, 11 insertions(+), 4 deletions(-)
+Thanks for the update.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-index 19f92affc2da..8d6c2633698b 100644
---- a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-+++ b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-@@ -302,7 +302,7 @@ static int verify_xsk_metadata(struct xsk *xsk, bool sent_from_af_xdp)
- 
- 	/* custom metadata */
- 
--	meta = data - sizeof(struct xdp_meta);
-+	meta = data - XDP_METADATA_SIZE;
- 
- 	if (!ASSERT_NEQ(meta->rx_timestamp, 0, "rx_timestamp"))
- 		return -1;
-diff --git a/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c b/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-index 330ece2eabdb..3766f58d3486 100644
---- a/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-+++ b/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-@@ -72,7 +72,7 @@ int rx(struct xdp_md *ctx)
- 		return XDP_PASS;
- 	}
- 
--	err = bpf_xdp_adjust_meta(ctx, -(int)sizeof(struct xdp_meta));
-+	err = bpf_xdp_adjust_meta(ctx, -(int)XDP_METADATA_SIZE);
- 	if (err) {
- 		__sync_add_and_fetch(&pkts_fail, 1);
- 		return XDP_PASS;
-diff --git a/tools/testing/selftests/bpf/progs/xdp_metadata.c b/tools/testing/selftests/bpf/progs/xdp_metadata.c
-index 09bb8a038d52..5cada85fe0f4 100644
---- a/tools/testing/selftests/bpf/progs/xdp_metadata.c
-+++ b/tools/testing/selftests/bpf/progs/xdp_metadata.c
-@@ -73,7 +73,7 @@ int rx(struct xdp_md *ctx)
- 
- 	/* Reserve enough for all custom metadata. */
- 
--	ret = bpf_xdp_adjust_meta(ctx, -(int)sizeof(struct xdp_meta));
-+	ret = bpf_xdp_adjust_meta(ctx, -(int)XDP_METADATA_SIZE);
- 	if (ret != 0)
- 		return XDP_DROP;
- 
-diff --git a/tools/testing/selftests/bpf/xdp_hw_metadata.c b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-index 3d8de0d4c96a..a529d55d4ff4 100644
---- a/tools/testing/selftests/bpf/xdp_hw_metadata.c
-+++ b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-@@ -223,7 +223,7 @@ static void verify_xdp_metadata(void *data, clockid_t clock_id)
- {
- 	struct xdp_meta *meta;
- 
--	meta = data - sizeof(*meta);
-+	meta = data - XDP_METADATA_SIZE;
- 
- 	if (meta->hint_valid & XDP_META_FIELD_RSS)
- 		printf("rx_hash: 0x%X with RSS type:0x%X\n",
-diff --git a/tools/testing/selftests/bpf/xdp_metadata.h b/tools/testing/selftests/bpf/xdp_metadata.h
-index 87318ad1117a..2dfd3bf5e7bb 100644
---- a/tools/testing/selftests/bpf/xdp_metadata.h
-+++ b/tools/testing/selftests/bpf/xdp_metadata.h
-@@ -50,3 +50,10 @@ struct xdp_meta {
- 	};
- 	enum xdp_meta_field hint_valid;
- };
-+
-+/* XDP_METADATA_SIZE must be at least the size of struct xdp_meta. An additional
-+ * 32 bytes of padding is included as a conservative measure to accommodate any
-+ * metadata areas reserved by Ethernet devices. If the device-reserved metadata
-+ * exceeds 32 bytes, this value will need adjustment.
-+ */
-+#define XDP_METADATA_SIZE	(sizeof(struct xdp_meta) + 32)
--- 
-2.34.1
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
