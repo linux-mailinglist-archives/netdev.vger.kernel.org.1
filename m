@@ -1,137 +1,158 @@
-Return-Path: <netdev+bounces-203289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E94FEAF12AB
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:55:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05440AF12D5
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:59:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D8A1188AB18
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:54:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E35784A1741
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:59:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47AE5245038;
-	Wed,  2 Jul 2025 10:54:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E23A264A9E;
+	Wed,  2 Jul 2025 10:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="N2+PRhfs"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Lxqm/R71"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B26253F15
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 10:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA4826057C
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 10:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751453668; cv=none; b=A2H4MmfMA/MiPh+AhO8mhzg74YHroS3msS6Z0XZv5TQdl5g3qPJkaHdpz8FFM7UxanjgVFspfYEswIlpwGZPBRDJv4yXCmBRhg0cttbYEmLZd1kQZaZZDYbCWxjDCTYyJbAg7wpFihgAcsP0ZPjAXpjt53PF/5KEfW6p9nI/JEA=
+	t=1751453856; cv=none; b=JhYiovAVqPEgMi3yMXLuESZeA90ze5AMAndi8ufbae5tTfSSdAnvX2KmLHU2A8HYwfTX5Swd/2AdfE6x4PkI2NAv+dfK9WVVeLUfLnXgafXYmXIAupoQqyZgb1kauNsDu8aDznN/5g8LevtrP1aIKuOSQnNko0muKajdCmaj5GY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751453668; c=relaxed/simple;
-	bh=DWeR+/uQQSYMmH/LvahmZ0RIw9E1q0WXOgj4Vn2Kq3c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bMiQFT6FOQZsy5IrHbRGk+MfrzotSpSdnXMXeR2aXcDdgr9rWkQ8NREGvb4ra3gH2AwYIuOJw2uuLupYTma6ihDI/AjHCd3JUrGSZrALNMFQsNJD5D43OyaFi+WEh6ih9EZLBT6yZu+SIVAJvbQb3p3K+g447t86YuGRsnZ+1sA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=N2+PRhfs; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4538bc1cffdso40906175e9.0
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 03:54:25 -0700 (PDT)
+	s=arc-20240116; t=1751453856; c=relaxed/simple;
+	bh=IWxUbh4BDZ7bPd8L/dwwB+q8iBVYy1u5irOTFUt+L8o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FCzXILn2KkgOC+ckZJ+K2Lo+u3IvJPozkw6oFQu1fijG6Cpi7WX628avrkIjuJZJnwucWmvLo950LtWLS2z5esluNJf8zljVVFLT6a+Qh374cOjMSigPf1pbyEu6sEyyG/6BcM30ZelEUZc22/b4hc1CgoOLyGrkTX1faLpalR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Lxqm/R71; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a548a73ff2so6010855f8f.0
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 03:57:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1751453664; x=1752058464; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2Jg9h1VCLy4qgpopj8IiT7Jm8iMsC+mvB1PgrDfbBVE=;
-        b=N2+PRhfscD0orJLHMjTS5mMyjsrnqnShvdO0j55Hvw2Ix+mMm0+yiKGtnMsidce9db
-         k5X2PZWu2GEwuOmHVf+M8Zn8T8rGQ8xtZvVC/33j7mYNgtrMSYZcovZNTjxjloWqgMpp
-         CqAlGhXVDA9VauMbUq7fTMSkExaFaIHd+RhUTnoSfUyNHM9NSzMA2tlWYkC/MpztWfvc
-         5jh2DVm03v9WzJZlRCJmqS+p3z1ZQEV3cyEaI6wdsaA+uk3nybOKub/z0nIYtjabUKh0
-         OFf5ZW77JrBjQl5m6WEf5jPO4+qsPYt73E00g9QT7sLO0k4YenAekQZYVVmru6sHYidR
-         muWw==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1751453853; x=1752058653; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=G1Fm2q1qB6Y+ckuWV69fHpAi4zNbor+5BGrf65Mmqog=;
+        b=Lxqm/R71/qlMDJ0eVPjPMCiMWcyRwVJq+DsfxJBR3A/Zyq9stlGs2NCPVV66goGmZ+
+         mGxDjmYDSO8FXJI3ByzarZvm5+3H+pO/eDuaThx9UWH5zGErhl4ZvBTwf4fbm21RtSZJ
+         pkGIizRtBhsrvw0SuS9fE3oGn2a1m83Nyl6Bqrtgf+s7dPg+NaexUVjV0tyQkTVY45PT
+         szz0fZOxvhNwSVTGvog8IY7uyRe3gZIWjpFthWx+XFeEa/EKlra6sLMbSgIVpxDiXxB5
+         eVgyYe+Hs0Rrl+mF2uZfiS4PFTSFYPqTlNRwYQ/nmPDkAvlw3XnyrSzjHcOutUyEVbpC
+         CKyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751453664; x=1752058464;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2Jg9h1VCLy4qgpopj8IiT7Jm8iMsC+mvB1PgrDfbBVE=;
-        b=X9R454ddHImT/hiYtY/ZHFgvlLRZLej1VlSfF9mqvqJwR97U0cagjRWHaJWyTf3lUO
-         I+XPxo+wYUZSXJ/LxpS0qtjLEP7aAqQ8PIZlNp2zAIdk++dRHHcSBysbIR3Tjx9iuXNm
-         T6mE6jaoae8IwyhUMKm6Ngc/KumfgzRJ1PD4onAsWER0p9SjQ3oLzs5+o7Ckv/U7oxhv
-         4F/w/hQPyep6Cz/NaO1ohnEiwLVssDcAdqZAYwklAHLBgWal7QoFbvKS5Ra9g4AP0qr9
-         ULP2I2rjXgqheqykbm4hllD4fMiuyJ3Q0ACkvrsCQhRsplWb/yRWXfc5lLQtv4lPhm9h
-         EU6w==
-X-Forwarded-Encrypted: i=1; AJvYcCWEzGgbBuk11r2mOacP2BzoLDCuBs6Jr88c5JShy7yrNBlyZbVi55GS5QDeRKRNLdr+5VN8pF4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxH4X7nlySeU5Ru00OT89Won5yFj2Y+NppmiLgfASk6SaXV1o6
-	t0Jd17IZ7k1u5PDTga2CnDV368E5nEeazihUGqPnYyKnVhGvU1oHufAViAQf3bnuSXA=
-X-Gm-Gg: ASbGncuUdY3CBYgAkax9zL4VAMe+r4mrZLTF5VdA5Gw3hi/uP8WK1R3Qx41iEFb+BCP
-	c+XNlAq5J3WAk5FLzpmHzdUbS59277l6NpegSfGpTgEQ3srIjZVqIY9mEk3jBU5SloYXLCntDhM
-	J/bwlBg7wGAjvl+fgLjSl1ihBfXtkSYZdEMl6ZeTuZpRBVInbYQHSPB9FKr+OBJX/ohlxc6kIJF
-	CDAuGyvV4h7A+I0Hw21gA/qIUzQvLFFGj1tu54grGXXFBWDy3l2QKl2eZGqglcYHWATrKTf0Dkh
-	zhd7XJ+YYLFrBgwxh6lSpBDdpGLkZAe7i6LFQ65YMXUsaI/6XN5dYNam6NtabJgSWTdGg146SNv
-	m6YuAqQQjvRUJhD6E/AJ2lB9pnrzD
-X-Google-Smtp-Source: AGHT+IGAIK/G/I8tdPVOI217bep69ojNDn163oQvep1EwZXnaYnHz492awG91UUkdfrnfI0nWERljQ==
-X-Received: by 2002:a05:600c:3b24:b0:442:f12f:bd9f with SMTP id 5b1f17b1804b1-454a371d3eemr24456755e9.27.1751453664299;
-        Wed, 02 Jul 2025 03:54:24 -0700 (PDT)
-Received: from ?IPV6:2001:a61:13c3:8601:acfb:599e:12fa:d72a? ([2001:a61:13c3:8601:acfb:599e:12fa:d72a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a88c7e6f74sm15728135f8f.3.2025.07.02.03.54.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Jul 2025 03:54:24 -0700 (PDT)
-Message-ID: <560fa48a-7e0b-4b50-bebb-b3600efaadd3@suse.com>
-Date: Wed, 2 Jul 2025 12:54:23 +0200
+        d=1e100.net; s=20230601; t=1751453853; x=1752058653;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G1Fm2q1qB6Y+ckuWV69fHpAi4zNbor+5BGrf65Mmqog=;
+        b=NGrJsAoN946UOnE4zBGf/MxrKvr9DGzJT8GZmHwdXb9TSWv27TC9jWcDpdwq9rScaB
+         kWED3oSMEHfO1nKxwPEemDSrVjoSJVbOZmRCk1s2UIqncvoqoGvGHXM/EDfSWzb59Kd9
+         bGJCoeQ5hmvSwcDOcpU3+BdEoizLXqSDPzcXhQdwOkvQey/eWBQcXZVGUrKTk5zcri1l
+         HDFjNJDETiPOlVAhFzDEbwgHkqFcikayYKPnkBZmnQy80dO/GeacE723KumQXNCJIo01
+         QhMWnSJJCGpTtorHRT3zbiJadWyG/Nl2UJ5CtXhDIDBv+qrE9qXjcA2WLUlod4fRdk8f
+         u6ZA==
+X-Gm-Message-State: AOJu0YyUrt6y7IMjvdzCS1Xv6cnNLUfm0FAl1KLrgWZ2jz1WugbVEOzj
+	TSlvKRVej3doGE6rcCEzcwLBgaXHiXKDDOAe580v5K7AZzKSHIgxQ+7WCx/IT0lmeeM=
+X-Gm-Gg: ASbGncsqIla91XfEmPBIGGmtLTCGgDyfb0LXVbf9qKYRU8iul95RITxO8tQ9MXCWE89
+	d0b1RovwsD2AKiC+ukTXuIXWdoZsQycSEyXl9/iM9DnKkJBAySxta0jjdstV7EMmLycAJ2VOb2y
+	aJPsfLRJeivRl6VE5HzCuvr3/wlgQJ3cAg1yZK5KnT/YdqVqnoX0b9QvjOI+Itjsn4/Xfhr+qXH
+	VIAxOX3MdoAmOF1CRBV79Ywp2CFOXGJilJKfCCLz7LSTYyMlHI2n58Eg9cmt68ZEP2ttLpfBbgi
+	JepDaBOT+QCooE6Fkwq8iT0BLycncEsNS/ESJVt58Fa1eqQs1VRfGJRGl5qK/UFGk2xRXg==
+X-Google-Smtp-Source: AGHT+IEDVTtMFy2hu992Zcq7801L2H6bIzfHs2qeo81vyzxGHZtPy+ypN/+AhlS2RlBfT5PUx2bs3Q==
+X-Received: by 2002:a05:6000:21c4:b0:3a5:8abe:a264 with SMTP id ffacd0b85a97d-3b2001ac737mr1267473f8f.37.1751453852634;
+        Wed, 02 Jul 2025 03:57:32 -0700 (PDT)
+Received: from jiri-mlt ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4538f2fec5fsm173817385e9.40.2025.07.02.03.57.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jul 2025 03:57:32 -0700 (PDT)
+Date: Wed, 2 Jul 2025 12:57:22 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, 
+	Prathosh Satish <Prathosh.Satish@microchip.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Shannon Nelson <shannon.nelson@amd.com>, Dave Jiang <dave.jiang@intel.com>, 
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>, 
+	Petr Oros <poros@redhat.com>
+Subject: Re: [PATCH net-next v12 09/14] dpll: zl3073x: Register DPLL devices
+ and pins
+Message-ID: <ne36b7ky5cg2g3juejcah7bnvsajihncmpzag3vpjnb3gabz2m@xtxhpfhvfmwl>
+References: <20250629191049.64398-1-ivecera@redhat.com>
+ <20250629191049.64398-10-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: usb: usbnet: fix use-after-free in race on workqueue
-To: Jakub Kicinski <kuba@kernel.org>, Oliver Neukum <oneukum@suse.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, "Peter GJ. Park"
- <gyujoon.park@samsung.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org, Ming Lei <ming.lei@canonical.com>
-References: <CGME20250625093354epcas1p1c9817df6e1d1599e8b4eb16c5715a6fd@epcas1p1.samsung.com>
- <20250625-usbnet-uaf-fix-v1-1-421eb05ae6ea@samsung.com>
- <87a7f8a6-71b1-4b90-abc7-0a680f2a99cf@redhat.com>
- <ebd0bb9b-8e66-4119-b011-c1a737749fb2@suse.com>
- <20250701182617.07d6e437@kernel.org>
-Content-Language: en-US
-From: Oliver Neukum <oneukum@suse.com>
-In-Reply-To: <20250701182617.07d6e437@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250629191049.64398-10-ivecera@redhat.com>
 
-On 02.07.25 03:26, Jakub Kicinski wrote:
-> On Tue, 1 Jul 2025 15:22:54 +0200 Oliver Neukum wrote:
+Sun, Jun 29, 2025 at 09:10:44PM +0200, ivecera@redhat.com wrote:
 
->> That is indeed a core question, which we really need an answer to.
->> Do I interpret dev_close_many() correctly, if I state that the
->> ndo_stop() method will _not_ be called if the device has never been
->> opened?
-> 
-> Correct, open and close are paired. Most drivers would crash if we
-> tried to close them before they ever got opened.
+[...]
 
-Thank you for clarifying that.
+>+/**
+>+ * zl3073x_dpll_device_register - register DPLL device
+>+ * @zldpll: pointer to zl3073x_dpll structure
+>+ *
+>+ * Registers given DPLL device into DPLL sub-system.
+>+ *
+>+ * Return: 0 on success, <0 on error
+>+ */
+>+static int
+>+zl3073x_dpll_device_register(struct zl3073x_dpll *zldpll)
+>+{
+>+	struct zl3073x_dev *zldev = zldpll->dev;
+>+	u8 dpll_mode_refsel;
+>+	int rc;
+>+
+>+	/* Read DPLL mode and forcibly selected reference */
+>+	rc = zl3073x_read_u8(zldev, ZL_REG_DPLL_MODE_REFSEL(zldpll->id),
+>+			     &dpll_mode_refsel);
+>+	if (rc)
+>+		return rc;
+>+
+>+	/* Extract mode and selected input reference */
+>+	zldpll->refsel_mode = FIELD_GET(ZL_DPLL_MODE_REFSEL_MODE,
+>+					dpll_mode_refsel);
 
->> I am sorry to be a stickler here, but if that turns out to be true,
->> usbnet is not the only driver that has this bug.
-> 
-> Shooting from the hip slightly, but its unusual for a driver to start
-> link monitoring before open. After all there can be no packets on a
-> device that's closed. Why not something like:
+Who sets this?
 
-It turns out that user space wants to know whether there is carrier
-even before it uses an interface because it uses that information
-to decide whether to use the link.
 
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=444043
+>+	zldpll->forced_ref = FIELD_GET(ZL_DPLL_MODE_REFSEL_REF,
+>+				       dpll_mode_refsel);
+>+
+>+	zldpll->dpll_dev = dpll_device_get(zldev->clock_id, zldpll->id,
+>+					   THIS_MODULE);
+>+	if (IS_ERR(zldpll->dpll_dev)) {
+>+		rc = PTR_ERR(zldpll->dpll_dev);
+>+		zldpll->dpll_dev = NULL;
+>+
+>+		return rc;
+>+	}
+>+
+>+	rc = dpll_device_register(zldpll->dpll_dev,
+>+				  zl3073x_prop_dpll_type_get(zldev, zldpll->id),
+>+				  &zl3073x_dpll_device_ops, zldpll);
+>+	if (rc) {
+>+		dpll_device_put(zldpll->dpll_dev);
+>+		zldpll->dpll_dev = NULL;
+>+	}
+>+
+>+	return rc;
+>+}
 
-However, it looks to me like the issue is specifically
-queuing work for kevent. That would call for reverting
-0162c55463057 ("usbnet: apply usbnet_link_change")
-[taking author into CC]
-
-	Regards
-		Oliver
-
+[...]
 
