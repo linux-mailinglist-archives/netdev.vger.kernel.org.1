@@ -1,95 +1,127 @@
-Return-Path: <netdev+bounces-203080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D522AF0787
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:56:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4937FAF078B
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:57:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3BFBB7ACC39
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 00:54:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75E531BC7F66
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 00:57:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90CACFBF6;
-	Wed,  2 Jul 2025 00:56:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qm7wauHs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F3946447;
+	Wed,  2 Jul 2025 00:57:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CAAA1CD0C
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 00:56:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9596A1CD0C;
+	Wed,  2 Jul 2025 00:57:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751417769; cv=none; b=Wp2kiGO9gTJ9M0iKfDRIsZ2Hk1m3AOcHdrNhvjM/V+tQIm/bUmZbsowuiRtx+dRt5qoW42fXKZICfADDmMlTMxZnBAfAxtlzAFHK1TPVPWxi+DGrmLcNvj1WdR0veusqBELwyA/oKFEpeERHouSdR4c/8v3zuww12yjVNKO4tlE=
+	t=1751417839; cv=none; b=dQpPTl+DYbwjyUmmt33tAiDNaF6YW9ZfwzqyAPZAh8NyedHBQUh2CuN1ASBi2QFcYH962gXpwmIDLy8GsvXzF9/FXSGGzcOgt2YLt+yENVoX4WHErUdcQQldwsSiRHMnlqUVBD6dX5F+Qx561pwDpYQqIXbLs6GpCl1RFzM9f5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751417769; c=relaxed/simple;
-	bh=emjcxixWfsRyjbmBVGLczz5HMw/hsdMLQYXnR3V9LrY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CuNq5lbAREZfOBVA6KoLGRx82dHZjUKN4ttbWC+Ivc5/cxmLqckQuL8arlDZFUQJb1g9Pcanqj48VfDDHHE21xHpIAhC85vg1Tfv23fIQQCd675AyLE/K6u190zQPLtEveHnu/i2USweyVA+1uwA2/7fr4FhC+9rvl8v5EHu7Ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qm7wauHs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 851F7C4CEEB;
-	Wed,  2 Jul 2025 00:56:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751417768;
-	bh=emjcxixWfsRyjbmBVGLczz5HMw/hsdMLQYXnR3V9LrY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Qm7wauHs+ylhmhfvj6F0PEnkXO0nCPy/xGwHUHSlXbTZ1ghqJfSTACakfRWOjtlAH
-	 zWG7MZNv76S04qvD42z2krLydAHA/YbZanmdcgof+4AkrWj5JXXqBHnH+85Je0CfIJ
-	 R3VJfdYEMz+oMKE2LdcdtfEHpgzL0GhCbBhYBtEkPufQ6tGKqIFTmyDcemzrdMamhK
-	 O+GRYSN1UlNrfhDzRlsYf0xsTmuaITQWA2BqeeDsREg+r/ZbkL4i/4J5LqmSbiUOYc
-	 72plvA0GuezPrkmbdUMhLP99+nYS5F9YWL8MsNnaquQ9M8fIZYRPJX/irDz20GCNQz
-	 dfZHdNW2430Ug==
-Date: Tue, 1 Jul 2025 17:56:07 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Simon Horman <horms@kernel.org>, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
- michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
- netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>, kernel test
- robot <lkp@intel.com>
-Subject: Re: [PATCH net] bnxt_en: eliminate the compile warning in
- bnxt_request_irq due to CONFIG_RFS_ACCEL
-Message-ID: <20250701175607.35f2a544@kernel.org>
-In-Reply-To: <CAL+tcoAfV+P3579_uM4mikMkNK4L2dMx0EuXNnTeLwZ3-7Po2Q@mail.gmail.com>
-References: <20250629003616.23688-1-kerneljasonxing@gmail.com>
-	<20250630110953.GD41770@horms.kernel.org>
-	<CAL+tcoDUoPe05ZGhsoZX24MkaRZx=bRws+kY=MuEVQdy=3mM1A@mail.gmail.com>
-	<20250701171501.32e77315@kernel.org>
-	<CAL+tcoAfV+P3579_uM4mikMkNK4L2dMx0EuXNnTeLwZ3-7Po2Q@mail.gmail.com>
+	s=arc-20240116; t=1751417839; c=relaxed/simple;
+	bh=TcUWqObj9A2aDg0Iet8eLoGrQoTTe4lzZr/+guMfsng=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EXuWg4puZVMPBybabXPlRQu40OTGgr192h34wHAGXSAPDqfuk6NOUZPqpw1/IHDHsY/HVeMXaYN9nHBJnZL12P/6Cx2j/gI8n8Aw+T5W2TF1MTk63GqYQ11oFbgFdL4BUNdZ0aOTP0akMge5loUkymih99u+CPGfXRoxvAR6Kd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-CSE-ConnectionGUID: uvhiCRcwQK60zp4VXXpTtA==
+X-CSE-MsgGUID: O1EJtcI7TJuedVH7xS+dgg==
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie5.idc.renesas.com with ESMTP; 02 Jul 2025 09:57:15 +0900
+Received: from ubuntu.adwin.renesas.com (unknown [10.226.92.9])
+	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 95BF640E7741;
+	Wed,  2 Jul 2025 09:57:09 +0900 (JST)
+From: John Madieu <john.madieu.xa@bp.renesas.com>
+To: geert+renesas@glider.be,
+	magnus.damm@gmail.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	mturquette@baylibre.com,
+	sboyd@kernel.org,
+	richardcochran@gmail.com,
+	prabhakar.mahadev-lad.rj@bp.renesas.com
+Cc: linux-renesas-soc@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-clk@vger.kernel.org,
+	netdev@vger.kernel.org,
+	biju.das.jz@bp.renesas.com,
+	john.madieu@gmail.com,
+	John Madieu <john.madieu.xa@bp.renesas.com>
+Subject: [PATCH v4 0/4] Add support for GBETH IPs found on RZ/G3E SoCs
+Date: Wed,  2 Jul 2025 02:57:02 +0200
+Message-ID: <20250702005706.1200059-1-john.madieu.xa@bp.renesas.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 2 Jul 2025 08:47:08 +0800 Jason Xing wrote:
-> >  static int bnxt_request_irq(struct bnxt *bp)
-> >  {
-> > +       struct cpu_rmap *rmap = NULL;
-> >         int i, j, rc = 0;
-> >         unsigned long flags = 0;
-> > -#ifdef CONFIG_RFS_ACCEL
-> > -       struct cpu_rmap *rmap;
-> > -#endif  
-> 
-> Sorry, Jakub. I failed to see the positive point of this kind of
-> change comparatively.
+Hi all,
 
-Like Simon said -- fewer #ifdefs leads to fewer bugs of this nature.
-Or do you mean that you don't understand how my fix works?
+This series adds support for the two Gigabit Ethernet (GBETH) interfaces on the
+Renesas RZ/G3E (R9A09G047) SoCs and their enablement on the SMARC-II EVK. This
+is achieved by integrating the necessary clock/reset signals prior to defining
+common DTS nodes, and enabling both GBETH ports at the board level.
 
-> >         rc = bnxt_setup_int_mode(bp);
-> >         if (rc) {  
-> 
-> Probably in this position, you expect 'rmap = bp->dev->rx_cpu_rmap;'
-> to stay there even when CONFIG_RFS_ACCEL is off?
+Some of the patches from the initial series have already been queued. As the
+node enablement required OEN support, this fourth series includes two patches
+that add support for OEN on RZ/G3E SoCs.
 
-no, dev->rx_cpu_rmap doesn't exist if RDS_ACCEL=n
+Changes in v2:
+ - Appart from resending the patches and some collected tags, there is no
+ changes in V2.
+ - Separated binding patch sent as standalone patch can be found here [4]
 
-> The report says it's 'j' that causes the complaint.
+Changes in v3:
+ - Fixed consistency with clock names, replacing dashes with underscores
+ - Labeled mdio nodes and used phandle-based override instead of node
+ redefinition
+ - Minor typo fixes
+
+Changes in v4:
+ - Added two patches to add OEN support on G3E for a better description of the hardware
+ - Enforced consistency in clock patch to match v2h definitions
+
+OEN pin configuration check logs:
+
+```
+root@smarc-rzg3e:/sys/kernel/debug/pinctrl/10410000.pinctrl-pinctrl-rzg2l# cat pinconf-pins | grep PB1  
+pin 89 (PB1): input bias disabled, output drive push pull, output enabled, slew rate (0x0), output-impedance (1 x)
+root@smarc-rzg3e:/sys/kernel/debug/pinctrl/10410000.pinctrl-pinctrl-rzg2l# cat pinconf-pins | grep PE1
+pin 113 (PE1): input bias disabled, output drive push pull, output enabled, slew rate (0x0), output-impedance (1 x)
+root@smarc-rzg3e:/sys/kernel/debug/pinctrl/10410000.pinctrl-pinctrl-rzg2l#
+```
+
+[1] - https://lore.kernel.org/all/20250604065200.163778-1-john.madieu.xa@bp.renesas.com/
+[2] - https://lore.kernel.org/all/20250609083008.0157fe47@kernel.org/
+[3] - https://lore.kernel.org/all/20250611061609.15527-1-john.madieu.xa@bp.renesas.com/
+[4] - https://lore.kernel.org/all/20250611061204.15393-1-john.madieu.xa@bp.renesas.com/
+
+Regards,
+John Madieu
+
+John Madieu (2):
+  clk: renesas: r9a09g047: Add clock and reset signals for the GBETH IPs
+  arm64: dts: renesas: rzg3e-smarc-som: Enable eth{0-1} (GBETH)
+    interfaces
+
+Lad Prabhakar (2):
+  pinctrl: renesas: rzg2l: Pass OEN pin names
+  pinctrl: renesas: rzg2l: Add PFC_OEN support for RZ/G3E SoC
+
+ .../boot/dts/renesas/rzg3e-smarc-som.dtsi     | 111 ++++++++++++++++++
+ drivers/clk/renesas/r9a09g047-cpg.c           |  64 ++++++++++
+ drivers/pinctrl/renesas/pinctrl-rzg2l.c       |  63 ++++++++--
+ 3 files changed, 229 insertions(+), 9 deletions(-)
+
+-- 
+2.25.1
+
 
