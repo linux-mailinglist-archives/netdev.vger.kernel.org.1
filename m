@@ -1,95 +1,73 @@
-Return-Path: <netdev+bounces-203353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A66FAF586C
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 15:20:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7708AF597D
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 15:39:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E690D7BAFF3
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 13:17:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 064E016C3E9
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 13:38:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872FF277CBE;
-	Wed,  2 Jul 2025 13:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52ACF277035;
+	Wed,  2 Jul 2025 13:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="OrKKARZv"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="di6iKVFj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F356515624B
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 13:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64319272E7F
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 13:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751462287; cv=none; b=ZxjaSQKRhktnYSRHya0nS4Zllg0LoFaO1ranHcNekynV0veyG3NVxa11MmpEIhT8HD2HlCXz+WesQLM/E+Oqd18uSVJV7XVFGcO48viCgq1xIhC5Xcpt7SctUzukNqLPOu6gfBt2rQm4EJqnaLVcB/uzTwAEGLhDzaxaEOsJoAU=
+	t=1751463449; cv=none; b=K3Gjf7kFfKGTluQ216NxbEewV4l33WhRVqjxbHsoOKo1M403F9HJMSei1FIRpg1jZb4tipBymoXUFlPcdbm8OVNPOMDCw7LpJsRklYSFbfzuoWu/bel8cZ0Z72Sik+iXj4xzPkX6BWs1URsJg6EygsuBTR/5GDfr3Tr1ZPlShnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751462287; c=relaxed/simple;
-	bh=5kZlihYIZFmatXI4cBGB+TFOdpXZ12A7UPeui5kT3wc=;
+	s=arc-20240116; t=1751463449; c=relaxed/simple;
+	bh=owZJos2mwV7e+UnLZ4FZ+V0LgpU047OWxYg21pCI1C0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ev6ZN/2sHfPCSmkQwV1XAlQwEgWFdqtRn1cHicgJZmMgdcXIHi+ffkBa9GVj1uebstiCGLrQQ2hXylcXo20+HlM/klCDZDvOVPZHFQ973G3Q86OBdhCOZeEbsx9C4/O+FneJGuPg0YcJLEhxrBCCKcNkPpteeQFb7Mu/dxPhuMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=OrKKARZv; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-74b52bf417cso423444b3a.0
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 06:18:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1751462285; x=1752067085; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lz23Tyg/+cYmV17yzTrHH8B+H8AlynLVnYk/5oZAsnA=;
-        b=OrKKARZv8psod2z7g4d9SL5QvcXG/puN9MiuhOZ2cR0S7A+s2F+V2qP0eZaFxV2PuQ
-         FMb+s28Yy8kYEsxsmG1ZMb458A+GPuDibC6YXlmnSTJJyWnh0WLUGtsCWrFBffK9/kU/
-         PYgBhFfCHzvNtH5UjNVjfPibwvbqY/b3sGibgVqKGmdR9F8WxaGulbmvnAbkvTGk0qJC
-         z1xkS2TrCOAxGEhdiBK8E7dIKRVN1DV86sozCOXoJ3ZF9h20WNYKL8yreSDnOjbCKQgs
-         ZW1wpRLlBkSt8jwK6NxfsV/SESGY1HUo0XRgg8Arj6amgRKnDLE3wPMjeheWwsjgd2rx
-         JjWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751462285; x=1752067085;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Lz23Tyg/+cYmV17yzTrHH8B+H8AlynLVnYk/5oZAsnA=;
-        b=GBJ3tLtMc6X4kn7rJMIwSBzuIKRc2rjBQogJHmMH1MGMtXk6sRfR5cWd/nk2Nxg58h
-         ejZsUFlN3F3/kZS5aADbk6+nTWrltePA++dzVfthhv3P51REBtgCpwPHND7oUyeNNGPK
-         mLaX2OQlV4wA5A1PtN+1rUOePpC++2T3srQlgxIsEb1qeBDi8nMDCnK+O+9LR7ge+OsL
-         lKrXPj4ogeNbbrxLhb05z+80ExntDsezZSoNJNQ0hB8SJ99/cjS6XL+AONmqlICNW5IY
-         UM8lmwlZdUjsgZhk2NzTDuxj5MNKSG58L1+9Yz4TW5oPNYYgCjh65n+fZpigo/YVv0kH
-         pTbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUbyaoGn9NrIjz1WAb94rzSh9P4VLCMcLYdfh2yHKANkWSWbgWYk9bNVi32I0IZYsNIYcWe1nA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxe4qWb9Vieolr0CfJMAVmMdX8Z1NYlZp9nYk2LHUgzeR1DHccv
-	sGaLnwvaEiSwQWzx6iP51EvKoyRuel9xy8OKYI2E4/gZto1CxDNfykTUBZcwp3ZGwkI=
-X-Gm-Gg: ASbGncuqFtcLy+QOIt2oG1UIYRRryGqmBfeTe7QFPx7U1ZfUKAwts6e9qfzGIz5yqrK
-	CNfstX5cjoteAX2G8tOpOU7w0oYHtg5CqDWR6mBcHGvF5vBScWI7+oMUZFw0M0AGbyqLmCudGUl
-	3qyGPI87hnl/YZImbf+paG5OUMkFFt+zrjyq6tzhKZCU3Jyoo8vtpNCQXMIkmLscyMMrejCHcNc
-	EIacIkPF91cKcYx4abG2n2pY5/f8TmCQwtcAfS83II0M2X5YmycNanMlVBmDyajZ7tm57W5C8Y6
-	PlN+IFMg9CtZZMENTuGfKZ7havFYBmNx1PJXkdQAVvhMEYk=
-X-Google-Smtp-Source: AGHT+IEGc1zq93nkJMavPRth5ri3c2hUYnAePkxmcp9zyThS7yDUwDvLudNNxEfu++eq0S0smDF4tg==
-X-Received: by 2002:a05:6300:6199:b0:21f:a883:d1dd with SMTP id adf61e73a8af0-222d7defa65mr6135557637.14.1751462285065;
-        Wed, 02 Jul 2025 06:18:05 -0700 (PDT)
-Received: from ziepe.ca ([130.41.10.202])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b34e300d02bsm12981443a12.6.2025.07.02.06.18.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 06:18:04 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1uWxLf-00000004c0r-0w5g;
-	Wed, 02 Jul 2025 10:18:03 -0300
-Date: Wed, 2 Jul 2025 10:18:03 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Abhijit Gangurde <abhijit.gangurde@amd.com>, shannon.nelson@amd.com,
-	brett.creeley@amd.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
-	andrew+netdev@lunn.ch, allen.hubbe@amd.com, nikhil.agarwal@amd.com,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Andrew Boyer <andrew.boyer@amd.com>
-Subject: Re: [PATCH v3 10/14] RDMA/ionic: Register device ops for control path
-Message-ID: <20250702131803.GB904431@ziepe.ca>
-References: <20250624121315.739049-1-abhijit.gangurde@amd.com>
- <20250624121315.739049-11-abhijit.gangurde@amd.com>
- <20250701103844.GB118736@unreal>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FO/hqlp0LZzjRWCU0Z90AsIIZn7oIEJ082EL3nwq3XQHnBzXV5CxH6fQh/3+4F0lw7tfyz5JpJE+jBqGJ4MpmWadkW37sZmSMooydLo1WwE2h1b6ohA+KL3a8mD7ZpTXc/+I9jphjtPhpYJpw6rWVq7HbdgrAVz9BG5DqtMKWBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=di6iKVFj; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=1MdNvFa3e3MRKhSXN0JKs1vG8PKNJE2NVVy7wxWrKJc=; b=di6iKVFj3d19R1lIL6rEmPKzGi
+	YL07OGMeWemsRValmsR4/JV9jfh+0sfF0hgwlMW2NE1NP7cBILZwRVGNQth+IrEm+9i4bjeO4xIE9
+	F2aF6Wf1np8i9sQjGKTSJbSjZto3em+rljZL2aMb3rkn2OME++ZrkdESiEZ1itvad7N/K4ba9BtcL
+	+o7MWwtDWFd+6L0pmLTrclX6AQiOBMGVvE1qg4CWHY9ap9eqSOC3pAXqYxg+EsMfslLowU5aIy30Z
+	4P6lWrdibiVt27GepsQSg8RM7ueeIY01vtNUf6sXVNvlOgC4I/R3IcVuVbK/HvN1jRboy3bOuGKC0
+	EjnFO4UA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53314)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uWxeJ-0007ih-24;
+	Wed, 02 Jul 2025 14:37:19 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uWxeG-00047n-0A;
+	Wed, 02 Jul 2025 14:37:16 +0100
+Date: Wed, 2 Jul 2025 14:37:15 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexander Duyck <alexander.duyck@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 3/3] net: phylink: add
+ phylink_sfp_select_interface_speed()
+Message-ID: <aGU2C3ipj8UmKHq_@shell.armlinux.org.uk>
+References: <aGT_hoBELDysGbrp@shell.armlinux.org.uk>
+ <E1uWu14-005KXo-IO@rmk-PC.armlinux.org.uk>
+ <20250702151426.0d25a4ac@fedora.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,30 +76,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250701103844.GB118736@unreal>
+In-Reply-To: <20250702151426.0d25a4ac@fedora.home>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Jul 01, 2025 at 01:38:44PM +0300, Leon Romanovsky wrote:
-> > +static void ionic_flush_qs(struct ionic_ibdev *dev)
-> > +{
-> > +	struct ionic_qp *qp, *qp_tmp;
-> > +	struct ionic_cq *cq, *cq_tmp;
-> > +	LIST_HEAD(flush_list);
-> > +	unsigned long index;
-> > +
-> > +	/* Flush qp send and recv */
-> > +	rcu_read_lock();
-> > +	xa_for_each(&dev->qp_tbl, index, qp) {
-> > +		kref_get(&qp->qp_kref);
-> > +		list_add_tail(&qp->ibkill_flush_ent, &flush_list);
-> > +	}
-> > +	rcu_read_unlock();
+On Wed, Jul 02, 2025 at 03:14:26PM +0200, Maxime Chevallier wrote:
+> On Wed, 02 Jul 2025 10:44:34 +0100
+> "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
 > 
-> Same question as for CQ. What does RCU lock protect here?
+> > Add phylink_sfp_select_interface_speed() which attempts to select the
+> > SFP interface based on the ethtool speed when autoneg is turned off.
+> > This allows users to turn off autoneg for SFPs that support multiple
+> > interface modes, and have an appropriate interface mode selected.
+> > 
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> 
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> 
+> I don't have any hardware to perform relevant tests on this :(
 
-It should protect the kref_get against free of qp. The qp memory must
-be RCU freed.
+Me neither, I should've said. I'd like to see a t-b from
+Alexander Duyck who originally had the problem before this is
+merged.
 
-But this pattern requires kref_get_unless_zero()
-
-Jason
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
