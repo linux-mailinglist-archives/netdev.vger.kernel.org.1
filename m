@@ -1,190 +1,137 @@
-Return-Path: <netdev+bounces-203409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31031AF5D48
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 17:38:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 397F9AF5CEB
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 17:27:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4A114E1E4D
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 15:35:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8301916BB87
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 15:27:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58C102E7BBA;
-	Wed,  2 Jul 2025 15:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC372F198D;
+	Wed,  2 Jul 2025 15:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="qwCmYvbl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qO0k6M2w"
 X-Original-To: netdev@vger.kernel.org
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E0D2DCF54;
-	Wed,  2 Jul 2025 15:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751470273; cv=pass; b=kzoKNnkit66spH9W6TShud5VH11k4KwQyHEXr91YAgrF5I+LKWFWeFsSGFX6aKZpd2XRAB22JPsPQCQJbVSZpIngqw77iOV0Sb2+dTquoviEEKD+75ZhbeUzCRN+rG48HivVvWIFoCqnnTgPVaFqq2TMOniWMmYyg5Y/olhupy4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751470273; c=relaxed/simple;
-	bh=MPn4dwWS4SsgFUv2ktEgYlMmldSTWVa0DGbq8Yo9njs=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=U/Hu5pdoRc9WXhYJgWrhEJuA7MF7OA1D//qGG/5G69JC7bIzB4btGbCNmoCO9vM7bwgeu8WN0HRmwWjyVyVjhxa3dcViWHNyicrYwAde5qaQg5bJniLYLCyeFJ/2OvnQdl6lpUy+4h39kj3xfz9DTIXdEKzoWWQlj8T/CC41cTc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=qwCmYvbl; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
-Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a03d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4bXNv66SDgz49Q1w;
-	Wed,  2 Jul 2025 18:22:58 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1751469781;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=74URfcO5JqEqPB6bVC6qfZC838MIsWWJe/PpASUbCcg=;
-	b=qwCmYvblW1ha/yOsewISSpkENjgZG6kjiLfwgD0E+sVtnNzh7Zr2APWtQjd75KzRr4ENID
-	bREMQTMzIGyQq7GVpw0pWWqcKKMdAgslFC2A6NPz2cYwlBY6lQ+Z6XSyoG2bebOhh3hGbR
-	yzxJghasL1SVrZw0yElS2xcort6THfuzb0NWrF95KsPt01HEXhdNSluFnPci+PsrcU3jeg
-	CkTQKPb/sDydrKGVVGDFVxEvtxnYpTRD5pyrBHOLLY1c0Jv8IWsr/Oi1JFoSFuJRk64k6d
-	nxI5+9DuJrSsWWuw2EqbJ/GqWCZxaVeikWDhLI++PbAGa10N5/mIvIThj5dZqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1751469781;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=74URfcO5JqEqPB6bVC6qfZC838MIsWWJe/PpASUbCcg=;
-	b=Bv+zQLY/uODqENaM6A+8FpHCZeTVMohTR+6yB6cacaQUKKREpAdN4s86urYViTDo+sYBgi
-	P1tFQrjn7ks7/8ZtC6i9GYh5r+X/CCUVubuWHEBi6zLdSYK2OLSWuIrue5GZ/iYgeQ+asE
-	/e5p9W6wrQbFlBd5RWDivSqEZCYpI2qpUyN7b36rcgnUWKa6V3GIcknISLH+iU9N4g5s3/
-	8mJRLrtS0Yhec1VZUbXs7U5WeZJwHVf6303Sj6Ifoa/qdBNg9CUTtCTRPq/O6qiBQqpgrA
-	RVr/N+EyUAdyEoUMX3hmWRD4JNUaWTs0ruomOJ/FwsrSI8S+T/o/u+ZhsiiTyQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1751469781; a=rsa-sha256;
-	cv=none;
-	b=Un44gB7xX3oHblb63J1ZUJcaxwh9h1IM/GXh/z3WacNRJoluk3xC/FZdg8sMXiWE3fKARu
-	rwMhFyPesxQWyabrE/grEPy3rW7F556dvD487yqFxyUN8AKFHOZQgoIjHgeWeNlxMFq1HP
-	IIQB+tI+B1ApF8GG+3L0yLiCl/Nel4TRfvLezNuMwf2Ea6QiMrMEHcuRn6k39rWnIbqql1
-	+ffCgM61X2xXFvdjV3GTZiDvx7s40ovSl4QX21Hz4fueFT36s4pWFJCxifa4SUbaR4mjbQ
-	0kfuv4T60XWlFAN45QjQ1MnOrOz6NtNiFzU40/C45S5XYpQSr6nkdrNfwxDoBg==
-Message-ID: <d6906cfb7fae090b9fe0c1c5b8708182eb939b42.camel@iki.fi>
-Subject: Re: [PATCH v2] Bluetooth: ISO: Support SOCK_RCVTSTAMP via CMSG for
- ISO sockets
-From: Pauli Virtanen <pav@iki.fi>
-To: yang.li@amlogic.com, Marcel Holtmann <marcel@holtmann.org>, Johan
- Hedberg	 <johan.hedberg@gmail.com>, Luiz Augusto von Dentz
- <luiz.dentz@gmail.com>,  "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Date: Wed, 02 Jul 2025 18:22:56 +0300
-In-Reply-To: <20250702-iso_ts-v2-1-723d199c8068@amlogic.com>
-References: <20250702-iso_ts-v2-1-723d199c8068@amlogic.com>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7C3288C97
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 15:26:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751470003; cv=none; b=fyWpqBEOS67p3HnoA76QFb0DP0s6YC9huK608omqzaD6cnYxu/7dgXqgcZNRatAl+lycJ15T8k7LG28YCDubYwsLBmaYpG9X0RyZgk5yRBnCTRSDbOU7dGNwYyTrmtBXuOW0O6O0tP4FnQ3wGZ2XrvRfEQdLkZgQmaOo1/GbXBI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751470003; c=relaxed/simple;
+	bh=yTwTjAEsqE8rj045/ciU4b52UtCHhuYIPzLwtPO2e/I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z/S98RwJrg3kPSkoU3tqh5OdnidGu2duxjlXUH4dSUx6LyfMXhzT1ThfRyH2b18o5tz/btpv8OFPgThY6Ykzpbw0tZ79OqP1PhNxIvDllbq/4cck+IQXFOjXdsjmMo8QfoEIJux+SH9GuojWgSXjUi9igwFj35ajjv/Q35Fzr1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qO0k6M2w; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4a98208fa69so202361cf.1
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 08:26:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751470000; x=1752074800; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TCPXcNK+DUyogAPJxVpc3HAuduDHqfqUzIGLlK3xdwQ=;
+        b=qO0k6M2wEE0hfRDZm10j2qfUrNqLLa+SjG6m2Cz1GqSMLtbQXkt93fygg4dow70V6K
+         ZzXcE4rdHZtrNC6jAd3QbkNjJSjSEEo9AhTKvA6DXDKaI2wdRtKVIXno1OYyV7lSitkF
+         djWXeGXfPy6TydK2v3q5rHtm1njjalTzl1EW+9QoOzDwNtDjwf/T2Qtj2E2rIvtv1Sty
+         g+vmh9Sp4lRwQEiVNvJGDxngVAt6SbxzkKisNL0WjNL5aXdildWszBBnhlEVimvMJ+gw
+         SUgcSNTslYTo0mlmzi8oZfMiCqpSWSK3x1Ii2ajqXIKQmNBjQbxvmlWmmk43PCDWHfqK
+         iQQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751470000; x=1752074800;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TCPXcNK+DUyogAPJxVpc3HAuduDHqfqUzIGLlK3xdwQ=;
+        b=K36ozvbkwkVyt1q31CND2xIXmFqPeujpRuwjtDj4dqu29RrNj2utwtWMfT7MwBmhJz
+         3VzCR1qJJpaMe0N21NS+EX4q0vve9okdgy4etrEj5bDM+MArXmZMuSN1mWBfk+hilO8D
+         80r0tF0c6zOqiVr9SWUZs0U9MbjgWaX8CtVpKYRzjF9nGgIypBXdq03H7cyIu2Ds5Euw
+         0+pudI9GxhtMNxY/iW/xBwn/IRConbvP3nJk/EgPd1AdKGjuAOm+A7EVM0uzk9XV8qB6
+         ip3q5qGzpOxtzkau3zBiC/aY6usEZSAmtyUBSuZmJmHKmq09M/ceR9N0uP9nEU0VhP/a
+         Yk0Q==
+X-Gm-Message-State: AOJu0YyhjklHdQRjTIwxv7wyh7UJaU0nPAtXlEqBTQsDxD1yQOVCFCSZ
+	khJuzGi8505oOXe2hTYfaswbo92ZC9P2HvLgdJYrGl7y7bzduJ42Ty/AkC1JjGcOIYdt7H6SJlP
+	fihMNJx8vibXQhGg0a1bnyUSqnZ/qsX66kF9ij0fM
+X-Gm-Gg: ASbGnct6TU1FQ0uFj25SykodcNH5fjrH+on+/05Mt3l8zKhkulc/cUXsBOSXRyjoIzB
+	l7jPyca+umQ0DJqsI1Se5kszLvfcc0oUqtW9LOzKMN2DVEywEmd8Di/+bXy477SoxVQSm63S6uV
+	Mq3HpxsAnEK7vmhRDHGXiW4YpDhaWfIH0OibnqyJRr8Q==
+X-Google-Smtp-Source: AGHT+IH6CmHt8lPy9XENkmI+GA/Cv+r7CIhuq+Az9ScfxiFnyCFfXb99vMuNSbCmH6thvLn8wp9cASXm/JqpECT2UKc=
+X-Received: by 2002:a05:622a:4a0b:b0:4a8:191f:1893 with SMTP id
+ d75a77b69052e-4a9781a6c80mr46335991cf.26.1751469999922; Wed, 02 Jul 2025
+ 08:26:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250702141515.9414-1-oscmaes92@gmail.com>
+In-Reply-To: <20250702141515.9414-1-oscmaes92@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 2 Jul 2025 08:26:28 -0700
+X-Gm-Features: Ac12FXzRVX_eX2sqMm4YSTrDpzTWZI16IKpRrmn5eNbVSJYT11OpAEK61oHliW8
+Message-ID: <CANn89iK0Hu6CZQ=76+z6p-TPY4bTmEQh9SAgLu-==zNB9RrWMQ@mail.gmail.com>
+Subject: Re: [PATCH net] net: ipv4: fix incorrect MTU in broadcast routes
+To: Oscar Maes <oscmaes92@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, stable@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Wed, Jul 2, 2025 at 7:15=E2=80=AFAM Oscar Maes <oscmaes92@gmail.com> wro=
+te:
+>
+> Currently, __mkroute_output overrules the MTU value configured for
+> broadcast routes.
+>
+> This buggy behaviour can be reproduced with:
+>
+> ip link set dev eth1 mtu 9000
+> ip route del broadcast 192.168.0.255 dev eth1 proto kernel scope link src=
+ 192.168.0.2
+> ip route add broadcast 192.168.0.255 dev eth1 proto kernel scope link src=
+ 192.168.0.2 mtu 1500
+>
+> The maximum packet size should be 1500, but it is actually 8000:
+>
+> ping -b 192.168.0.255 -s 8000
 
-ke, 2025-07-02 kello 19:35 +0800, Yang Li via B4 Relay kirjoitti:
-> From: Yang Li <yang.li@amlogic.com>
->=20
-> User-space applications (e.g., PipeWire) depend on
-> ISO-formatted timestamps for precise audio sync.
->=20
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
+Looks sane to me, but could you add a test in tools/testing/selftests/net ?
+
+
+
+>
+> Fix __mkroute_output to allow MTU values to be configured for
+> for broadcast routes (to support a mixed-MTU local-area-network).
+>
+> Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
 > ---
-> Changes in v2:
-> - Support SOCK_RCVTSTAMPNS via CMSG for ISO sockets
-> - Link to v1: https://lore.kernel.org/r/20250429-iso_ts-v1-1-e586f30de6cb=
-@amlogic.com
-> ---
->  net/bluetooth/iso.c | 3 +++
->  1 file changed, 3 insertions(+)
->=20
-> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> index fc22782cbeeb..6927c593a1d6 100644
-> --- a/net/bluetooth/iso.c
-> +++ b/net/bluetooth/iso.c
-> @@ -2308,6 +2308,9 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff=
- *skb, u16 flags)
->  				goto drop;
->  			}
-> =20
-> +			/* Record the timestamp to skb*/
-> +			skb->skb_mstamp_ns =3D le32_to_cpu(hdr->ts);
-
-Hardware timestamps are supposed to go in
-
-	skb_hwtstamps(skb)->hwtstamp
-
-See Documentation/networking/timestamping.rst
-"3.1 Hardware Timestamping Implementation: Device Drivers" and how it
-is done in drivers/net/
-
-This documentation also explains how user applications can obtain the
-hardware timestamps.
-
-AFAIK, skb->tstamp (skb->skb_mstamp_ns is union for it) must be in
-system clock. The hdr->ts is in some unsynchronized controller clock,
-so they should go to HW timestamps.
-
-> +
->  			len =3D __le16_to_cpu(hdr->slen);
->  		} else {
->  			struct hci_iso_data_hdr *hdr;
->=20
-> ---
-> base-commit: 3bc46213b81278f3a9df0324768e152de71eb9fe
-> change-id: 20250421-iso_ts-c82a300ae784
->=20
-> Best regards,
-
---=20
-Pauli Virtanen
+>  net/ipv4/route.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+> index fccb05fb3..a2a3b6482 100644
+> --- a/net/ipv4/route.c
+> +++ b/net/ipv4/route.c
+> @@ -2585,7 +2585,6 @@ static struct rtable *__mkroute_output(const struct=
+ fib_result *res,
+>         do_cache =3D true;
+>         if (type =3D=3D RTN_BROADCAST) {
+>                 flags |=3D RTCF_BROADCAST | RTCF_LOCAL;
+> -               fi =3D NULL;
+>         } else if (type =3D=3D RTN_MULTICAST) {
+>                 flags |=3D RTCF_MULTICAST | RTCF_LOCAL;
+>                 if (!ip_check_mc_rcu(in_dev, fl4->daddr, fl4->saddr,
+> --
+> 2.39.5
+>
 
