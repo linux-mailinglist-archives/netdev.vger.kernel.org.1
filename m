@@ -1,120 +1,106 @@
-Return-Path: <netdev+bounces-203494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC5E4AF6283
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 21:18:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96AD4AF628E
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 21:25:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 927867AA318
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 19:16:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7F464A808B
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 19:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D36422F7CFD;
-	Wed,  2 Jul 2025 19:18:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0E002BE656;
+	Wed,  2 Jul 2025 19:25:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="U27uauSu"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="ByItZai0"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401F62F7D1F
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 19:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FC412F7CFD
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 19:24:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751483890; cv=none; b=Bmno2edVe8rbESZFr3UC4IEbcglsFBApFTT7xlhaHumgpKJQhVDMrG5vDh+HkESsqA50H38ZsqeOIoW0edYiz0UJPjo92XQbzI8LMP+f6D868LKzSqcGGThFGLNSGZQBXEbkDQHeqES3uxQTun9aWUs/f8e8+kmScZH1iRNvMWQ=
+	t=1751484301; cv=none; b=N/X2fsZu4Xr+UvDqoTjwKbza2dVuWAB2AruOwuxCtFKu7JxgKrUNPQ2oFXjl7Slci3TI07+rMAmAHWtMI0bnazSg+ZRT49zKYeL9y86lQQUFX0ygK86skMMAbP/iRPj/4kkhshsH5ISe94wzqJ3DVnyxRyI4YzhEYWfr+0Gm4jY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751483890; c=relaxed/simple;
-	bh=I6ujcxcF/NbT6fX1yq4Bb5wFObPVExVItAn9msWNl/8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=txM3ItDGhUiyAhiuWB6Ei0U3veYgWOvGEQSz0N7lrhtpzJ3/NMxIHgL/a15HoFXMmmjAXbKn/YpZ8WgNPPLtDxXT1PaNzTfP/ZHDgYw34+9BR4Cr5hKK6wmoO1Es5xosf/1haXTy5lDdZz+F3PtK/a3rwnTuGORH1R97qvdVnLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=U27uauSu; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=cROEizyYEhT1ZzF4lcKLDdkzX7FxmK9SvKDTB3Kex44=; b=U27uauSusKqT9GBDL2QT3mM+Dn
-	CWnNRJMtoNEY3zAT7rWw1xCROd2IAj3Tx4lG3kjhKhjbN8nWGwXTd4jLzBkvCffNExZGeq6V7tk3D
-	rOL+sjZo5Qvja7S7C/8fzXqt16i4LQ1cXTF7vrPgPE5RjprtwXud5x5WmKkOQKBMc/AUIShuHcyVG
-	Dxy08XZm0LW1hlkWB8uhfxTJb/QgSgqT9/U1eww1tEfAL67qX2O+FA3+C4UfUblLFc7dBjR29fDsg
-	/HLTjZjHOWrL7aGlBnKhgxBj0C9EkQ8dg6OJPCpVP+zVZdWE8WrBz5toRVs7F1UQR3JecykRqC+Jl
-	JK/xbQSw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47714)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uX2y1-000888-0o;
-	Wed, 02 Jul 2025 20:18:01 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uX2xx-0004Jx-26;
-	Wed, 02 Jul 2025 20:17:57 +0100
-Date: Wed, 2 Jul 2025 20:17:57 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 3/3] net: phylink: add
- phylink_sfp_select_interface_speed()
-Message-ID: <aGWF5Wee3vfoFtMj@shell.armlinux.org.uk>
-References: <aGT_hoBELDysGbrp@shell.armlinux.org.uk>
- <E1uWu14-005KXo-IO@rmk-PC.armlinux.org.uk>
- <20250702151426.0d25a4ac@fedora.home>
- <aGU2C3ipj8UmKHq_@shell.armlinux.org.uk>
- <CAKgT0UcWGH14B0zZnpHeJKw+5VU96LHFR1vR4CXVjqM10iBJSg@mail.gmail.com>
+	s=arc-20240116; t=1751484301; c=relaxed/simple;
+	bh=KK4ynMiBHY0thbjaKNOn/kUYd4MYbYdKNVAr0/lf4n4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M0yb8llQ252ra9L0kuv+1vz5x+6CEpXxJ0GGhAMy1ROfY0WiiuytnqK1ooVriK/F+wxtV4K7dNEwRC8Z9vSSTfp9u4C05wnOlZIDx3BtSWnmIjUdcUg1vKlncYZQUAPAao2zJZc+XBx5IUGLExp8nVkcU5SyL4BNB+PWhe2mDyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=ByItZai0; arc=none smtp.client-ip=209.85.219.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-e8187601f85so6494251276.2
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 12:24:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1751484297; x=1752089097; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RisGUs6Qykk07nJw80m0Ftg7mf8erIx6Cg/HctC8ynk=;
+        b=ByItZai0w8MGT3rkQg9Fse6epWc0z7aza9psyjNIslDY02rb45inRL5w27IE/oJ11f
+         toscM2B9hzhUCDHK15bMnsPE/Di2s1Fnzup6bh7976ZiwfV/heNX4UwBgb9ogSoco/OL
+         k8ON+PSZdN4V8YpzO6Y9Ggr/S6rKfC40f5GbvphbrqMm9Xzo20823UAr62YyCVa6TdV6
+         5kiXFi6zt5BX5S4WFny3X9Qf+qxgCUBdRgJ/F/hF0BTnYamqKTtPEijdzi4/9ClftHUD
+         oAJ5qjAaRWbqoSuQSZK8e4mnB9jHFs9k/8Ko8BjapzrR+Z4FqGj85d7nSwCD1SUGYz/q
+         GIxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751484297; x=1752089097;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RisGUs6Qykk07nJw80m0Ftg7mf8erIx6Cg/HctC8ynk=;
+        b=CxaMr5tSi5f8D88wWiGDJSj63xTv+mhYZOjoglV82pDayr/++fwqCuOlNNcYTOIs7R
+         L0Q20eUUv1S+hJ81h6Myzww9mdRmgl/dCk4L0SOkT7qJ+sAcYR7ljRv3ciGdkUhC+tXo
+         8yzsfw+Qmg/0ys5K6lpjQXGRREhVo5ivb3nRjIKlkoR4f6D8EnC/E1v3/6oQjaEmGAIZ
+         i+c6U8jPjab+LtcRaeSg+93ni+Miblx5LxOoxD5AKWxh7BumxiW7t15GVEnJCeJAC3rx
+         gJGfBBGKUuKJCoBydyAWxg9gQx6aNJt0FkC3h0Q+Cve7ywuY1C9FzJ/TVUthNUzJS74Z
+         Akww==
+X-Forwarded-Encrypted: i=1; AJvYcCXThO1LJcPg+y03Lh7V1Mqr5tVNR1iOBMzELihMtxNFLQBzYaZvc1XgXJ62iNWXgggZAOWc29w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5apNs8BT1jSMOZpN9gHFnLRwEJiZnftAHjkx+jiTTUx0YlXJg
+	uYlU5dE5KJHNCsC8nTku6u/xv+Rmxr6XwGSnfkjSYfA5RpW3eZLTh1PHV2mtqoWmJlJCob+gZ4O
+	ct6d/6onCVJijeIKMlAX5i72MnMSrY1TXcoTXh5iA
+X-Gm-Gg: ASbGncu0RL7TKdKYzqkS/Nv4s3ZYfNXSPFAOZjPpdNh1U8FAJiC32iRFsMY1pGXwCZ1
+	NP2zhBYtE0bgFJZLUe/Ow4Z/QcsDVp6tbI9Tt1j7csKTK8XwEyDFBy9VzrZf00XBrLjsfKfILmp
+	jNXKV2n+oumVGGQy3NSTVS5L0gqtlCxYL09rJSUmaFmQo=
+X-Google-Smtp-Source: AGHT+IHvhasAtxRO9RpFu2NYbRrcynF3zeEZltmoq9Luzh1btO4Igu87XYFa3nEiA/TfmY8TNO2agVgG/zRUYfJtTIM=
+X-Received: by 2002:a05:690c:6486:b0:70e:185b:356d with SMTP id
+ 00721157ae682-7164d398834mr54967477b3.14.1751484297140; Wed, 02 Jul 2025
+ 12:24:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKgT0UcWGH14B0zZnpHeJKw+5VU96LHFR1vR4CXVjqM10iBJSg@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20250702055820.112190-1-zhaochenguang@kylinos.cn>
+In-Reply-To: <20250702055820.112190-1-zhaochenguang@kylinos.cn>
+From: Paul Moore <paul@paul-moore.com>
+Date: Wed, 2 Jul 2025 15:24:46 -0400
+X-Gm-Features: Ac12FXyjMghT7240fFXsw7E25qCJfe8hMIplSYH8wjk3i5VEZLbQ2yBp0Z1HQmU
+Message-ID: <CAHC9VhTg7cwXu17tHMgSJF3ZRWjA_ozZg3TK3aLJOs2X4QBJ=w@mail.gmail.com>
+Subject: Re: [PATCH] net: ipv6: Fix spelling mistake
+To: Chenguang Zhao <zhaochenguang@kylinos.cn>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 02, 2025 at 11:07:52AM -0700, Alexander Duyck wrote:
-> On Wed, Jul 2, 2025 at 6:37 AM Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> >
-> > On Wed, Jul 02, 2025 at 03:14:26PM +0200, Maxime Chevallier wrote:
-> > > On Wed, 02 Jul 2025 10:44:34 +0100
-> > > "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
-> > >
-> > > > Add phylink_sfp_select_interface_speed() which attempts to select the
-> > > > SFP interface based on the ethtool speed when autoneg is turned off.
-> > > > This allows users to turn off autoneg for SFPs that support multiple
-> > > > interface modes, and have an appropriate interface mode selected.
-> > > >
-> > > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > >
-> > > Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > >
-> > > I don't have any hardware to perform relevant tests on this :(
-> >
-> > Me neither, I should've said. I'd like to see a t-b from
-> > Alexander Duyck who originally had the problem before this is
-> > merged.
-> 
-> It will probably be several days before I can get around to testing it
-> since I am slammed with meetings most of the next two days, then have
-> a holiday weekend coming up.
+On Wed, Jul 2, 2025 at 1:59=E2=80=AFAM Chenguang Zhao <zhaochenguang@kylino=
+s.cn> wrote:
+>
+> change 'Maximium' to 'Maximum'
+>
+> Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
+> ---
+>  net/ipv6/calipso.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
-I, too, have a vacation - from tomorrow for three weeks. I may dip in
-and out of kernel emails during that period, but it depends what
-happens each day.
+Acked-by: Paul Moore <paul@paul-moore.com>
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+--=20
+paul-moore.com
 
