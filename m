@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-203539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D4A3AF6559
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 00:37:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C78C1AF655A
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 00:37:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAA2652330A
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 22:37:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDAAC524541
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 22:37:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C03248F5F;
-	Wed,  2 Jul 2025 22:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B702F6F8B;
+	Wed,  2 Jul 2025 22:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MEQwxRGD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r1soa/87"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B322F5C2F
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 22:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700B624469B
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 22:36:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751495772; cv=none; b=AHus+nzLTzsPCBJPsHZvI3dwLISL6gogvi866zZu3t9mtPCfT5CSZ7yYoJkad4W6uXh4OXLiw/eXefvLDWpWVQ65tZWPJYaXzufH2vYnk/eTgL2qv+rb7+yXPt0i8RtVRFNBNRED9RLEj/3wxvmcd+aAOxt1BLycuMi8E+nyuqM=
+	t=1751495773; cv=none; b=cLlxsCOb9yQmdU8vfIeaprImfsWbSnY9umjfXQo+ZbJxgHgYz8IIYKCPDKb/lvuPy0ESDEdTuR5oI+JCQQMwpon4fapAfIBEpIcmjuELJHh3OYarai4tbjxdzwcsY1LpLcxOwqYRQrtQBzCVVnD/LbusQXLmjWMrOWR85WyU6T0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751495772; c=relaxed/simple;
-	bh=UW+SQEj8aN0Ft10n8URP7n2D3XO+nurfejv8kglxm5U=;
+	s=arc-20240116; t=1751495773; c=relaxed/simple;
+	bh=Ec2zhBNEqZVBAaUtoh+dwcbSM9J0PPgGYAYbMYhg9A8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eKSImdlwlm3aeL3hJlNSO4c3FpNci7U6r2Ty+7LPaOt1IGEUrn+SyJsrdIYj/MbSInnwNQpqrthx5uLCJwnGhETQYZXHzFyDhTMTEPkoKtEIrKI4Cz6zapTYczLNFquyFw6vpKrDb5bMfx42k2MLkrRTGo1SUBp8tzr8gmYtD4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MEQwxRGD; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=DrVb5vg3rLqLY51rAgP9COxXcs/wPbGybRJMoFKLiLibvaBaA4ZZXkr9T30yuyKMiy+d2zjBQ6uDMD5M0+PrtzKovdx58hl95JOoj8PXc7ZEdEawrKEGy2qaNlpqlm3ET9TGEcu8oyScRCDh6J3Vy4Al8HotzTJnI3ji6/i3uJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r1soa/87; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-311d670ad35so4401178a91.3
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 15:36:10 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3139c0001b5so4604680a91.2
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 15:36:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751495770; x=1752100570; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1751495772; x=1752100572; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uy4qEEDdx3wsd0+Zkpw4ox1GIS+aP/bDinXUKsJxlf0=;
-        b=MEQwxRGDb9XD6MmxWwueYTHUfnz7ZpkYyESmNDSywrKS820kfGcvq3w4h3Y6C5/XEN
-         tEVq43nZijpovEi9vC7jOHpKeanvIXIvJ9ESEDV42m9y2UP6YVm236PXp9aS53Pxlv5+
-         8ctqI/Iuuao9VKoU8WO+t2PsaEo0uIF6KFvx/EQL/GZNKiiAm6iwvAj0ackKVTph7W0i
-         ELt5MyDR1LO2O8pfBtQoHyEfLgSM0YOpqEtRqHlDlnOFuxbGT2XmG5Ozy25W1NTGAmOJ
-         /DlyTa58wjf7lo3f4iQ1oXMbrIKIy1jHLCueu4ORfsV8nGl3fWWHo9iVdjF8MXnOsPZ5
-         YS3g==
+        bh=IJUjH6DsAuK/KBRAZqWRqQKo31xReWxNFO3fvTzLCKU=;
+        b=r1soa/87+yJAc4T3KM+aoQMcS8NKfznIeiFhDOfOhlnS+38cff53xNNO+kp5bLNJgu
+         A3HARSfMr3Cr4K8CiykWhBPcV34CP2CWQNcRtaxxiE2K68N7nZ5CKDs3oA74/6iLgFP5
+         a4rgmW2JKlDOKpgbeHCGarcyUHTkI4KN4SU29iR8FaLzJPIp5EXTyAgBZjezY6qi04Kw
+         C8TvDpm6i1hoSruO0iRpN5TZ6VudkZl7xwvioUq+HuXFCH3D9JZdMujrQ0RCQ4yX4Sk/
+         zt2+UiXbORmNKCDk320Q12aZvs13jgT1edmxcUQxTn+FY2u/jHCb2rJsGz2yC6amEvlQ
+         Atdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751495770; x=1752100570;
+        d=1e100.net; s=20230601; t=1751495772; x=1752100572;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uy4qEEDdx3wsd0+Zkpw4ox1GIS+aP/bDinXUKsJxlf0=;
-        b=VfYOsO/aGFUe6xUjLK2wPLb+6ejGOm+oA391rQKhySKZ2BLhyxL+FGOoYlzY8t5h1T
-         MfV17zsTq9F5dgiHYvhjXlwZUVQTbr6K6vq4wM2QbRsWWlRkaZ9Fijk0WNJOGntiCyTx
-         RNIk4BkEJPg//e89guZ0RniYZnfz89lzvEDDMugkXgDXK7MRcofFxrqNvNNtkAK/+iss
-         zFV9G7YoRnoCp+LCzGdqJwAYdb0RTfhI9DN8cYi0DHnkWjzr8o+NWRkbexIF3Nr88Y4+
-         bb1lDt6YSKnyysIQDtkz3b9qge1gDs8i7CzAYqpPoFPHsGOY9H6cksQ8brUwdradW4cA
-         s2kA==
-X-Forwarded-Encrypted: i=1; AJvYcCVVu8Bml/+1tvyMsSxzvpskMu8Rf4C/nvYYObH6Tqq6o+QOyIGyuyDm+IrBUMOgQmW8t699X4o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOPkvoFX5KO9scJS2+i41wyFpTBsTsSTAoBEmYnaVkGvq5wSie
-	/7JS1VsdBZeboq0VFvkxRZ9/WsxFMrs/4EXKI+Z3GIsjg/xnH98FpGG9Htp04vocF+IZ6A0v73l
-	MxOqahg==
-X-Google-Smtp-Source: AGHT+IFZL7OfWcZxMF8jTIerCJ/5+HTstJCL8edR5B6lnSZevD47cNWlEc5DERAvpg8OQLiVQ8tjahab5sQ=
-X-Received: from pjbkl12.prod.google.com ([2002:a17:90b:498c:b0:311:c5d3:c7d0])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:58c7:b0:311:af8c:51cd
- with SMTP id 98e67ed59e1d1-31a90bd4921mr7870476a91.18.1751495770236; Wed, 02
- Jul 2025 15:36:10 -0700 (PDT)
-Date: Wed,  2 Jul 2025 22:35:13 +0000
+        bh=IJUjH6DsAuK/KBRAZqWRqQKo31xReWxNFO3fvTzLCKU=;
+        b=oti6L4xUWtyqE/rQLZ9pY6dGD/AIemg8KRiGDKyf/hpYfmK6KGZezg2pshQ0XXfYbm
+         eDKo9xabi1TeGM2nUefqB/XhD7WFmRnarqzKsmXK1lVmoxyd67tr8M2jYNJIatov8byX
+         27RmzCN04lcN37qb7ZMi5w3G4TcqAGMajkgIm6pZx1oY/pbCJcaCoPqqpqqTREuGYtvl
+         zIqdhED7prgpm+0Woj2MK++PVYWoX+ZpIYKDeSaRrjAYOhQ0k7rMpy61Z5HeoD53oUQr
+         EY0zNwJJqc6SKGxlZr62V0jxcNEZvAuD8TL0670B7vWPGt5eEYBNBC69MUxRhoOoBN8x
+         bMmA==
+X-Forwarded-Encrypted: i=1; AJvYcCXfEt5XYm88S1Z/8OVQcCkJlvl0getR9/iFgRPs2MVO9hIoOq5iZlX/rc4MUIFjp0hYxpMi/Bg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNhkLtTcOl9LrhbNMnH1jkKFckT/eMud9Lkk+EoxyiOIZtSCa9
+	fiDQtSonLAy+s0qtHrixpVWuGuSZcJhNVcHKLqZD2wp1OQ/hkfNCYPsnsQ24tIzPr6GSs3X4JED
+	TWe9PyQ==
+X-Google-Smtp-Source: AGHT+IHFN8rvx7qYc5hxNHiTBvFPeaHzgs4NkhysLVkIyQRVeKxtptUfKkK/NdhB5XlGIFmBQKjPX2OMHA4=
+X-Received: from pjbst8.prod.google.com ([2002:a17:90b:1fc8:b0:315:b7f8:7ff])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:1dd2:b0:312:26d9:d5b2
+ with SMTP id 98e67ed59e1d1-31a9d426d45mr1755636a91.0.1751495771730; Wed, 02
+ Jul 2025 15:36:11 -0700 (PDT)
+Date: Wed,  2 Jul 2025 22:35:14 +0000
 In-Reply-To: <20250702223606.1054680-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250702223606.1054680-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250702223606.1054680-2-kuniyu@google.com>
-Subject: [PATCH v1 net-next 1/7] af_unix: Don't hold unix_state_lock() in __unix_dgram_recvmsg().
+Message-ID: <20250702223606.1054680-3-kuniyu@google.com>
+Subject: [PATCH v1 net-next 2/7] af_unix: Don't check SOCK_DEAD in unix_stream_read_skb().
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -83,40 +83,55 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-When __skb_try_recv_datagram() returns NULL in __unix_dgram_recvmsg(),
-we hold unix_state_lock() unconditionally.
+unix_stream_read_skb() checks SOCK_DEAD only when the dequeued skb is
+OOB skb.
 
-This is because SOCK_SEQPACKET sk needs to return EOF in case its peer
-has been close()d concurrently.
+unix_stream_read_skb() is called for a SOCK_STREAM socket in SOCKMAP
+when data is sent to it.
 
-This behaviour totally depends on the timing of the peer's close() and
-reading sk->sk_shutdown, and taking the lock does not play a role.
+The function is invoked via sk_psock_verdict_data_ready(), which is
+set to sk->sk_data_ready().
 
-Let's drop the lock from __unix_dgram_recvmsg() and use READ_ONCE().
+During sendmsg(), we check if the receiver has SOCK_DEAD, so there
+is no point in checking it again later in ->read_skb().
+
+Also, unix_read_skb() for SOCK_DGRAM does not have the test either.
+
+Let's remove the SOCK_DEAD test in unix_stream_read_skb().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/unix/af_unix.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ net/unix/af_unix.c | 10 ----------
+ 1 file changed, 10 deletions(-)
 
 diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 564c970d97ff..1fa232ff4a2e 100644
+index 1fa232ff4a2e..be4c68876740 100644
 --- a/net/unix/af_unix.c
 +++ b/net/unix/af_unix.c
-@@ -2528,12 +2528,10 @@ int __unix_dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t size,
- 					      &err, &timeo, last));
+@@ -2804,14 +2804,6 @@ static int unix_stream_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
+ 	if (unlikely(skb == READ_ONCE(u->oob_skb))) {
+ 		bool drop = false;
  
- 	if (!skb) { /* implies iolock unlocked */
 -		unix_state_lock(sk);
- 		/* Signal EOF on disconnected non-blocking SEQPACKET socket. */
- 		if (sk->sk_type == SOCK_SEQPACKET && err == -EAGAIN &&
--		    (sk->sk_shutdown & RCV_SHUTDOWN))
-+		    (READ_ONCE(sk->sk_shutdown) & RCV_SHUTDOWN))
- 			err = 0;
--		unix_state_unlock(sk);
- 		goto out;
- 	}
+-
+-		if (sock_flag(sk, SOCK_DEAD)) {
+-			unix_state_unlock(sk);
+-			kfree_skb_reason(skb, SKB_DROP_REASON_SOCKET_CLOSE);
+-			return -ECONNRESET;
+-		}
+-
+ 		spin_lock(&sk->sk_receive_queue.lock);
+ 		if (likely(skb == u->oob_skb)) {
+ 			WRITE_ONCE(u->oob_skb, NULL);
+@@ -2819,8 +2811,6 @@ static int unix_stream_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
+ 		}
+ 		spin_unlock(&sk->sk_receive_queue.lock);
  
+-		unix_state_unlock(sk);
+-
+ 		if (drop) {
+ 			kfree_skb_reason(skb, SKB_DROP_REASON_UNIX_SKIP_OOB);
+ 			return -EAGAIN;
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
