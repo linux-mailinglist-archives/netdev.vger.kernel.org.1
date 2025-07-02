@@ -1,186 +1,290 @@
-Return-Path: <netdev+bounces-203211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE84BAF0C44
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:12:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C187AF0C53
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:17:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B3093B7BD3
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 07:12:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD3EC7AF309
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 07:16:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4168223DEA;
-	Wed,  2 Jul 2025 07:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D7FA223DF0;
+	Wed,  2 Jul 2025 07:17:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cAwe4z0Q"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hPoPhMew"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CD52236F3
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 07:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EFF7201261;
+	Wed,  2 Jul 2025 07:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751440357; cv=none; b=kb6UwozK8qwFgSKMh4B3/+aWOc5SHSmJQcYwCa+uzFTJf44WVoq0RbLBahTXiFCjpQ33yj6r6sba7yRa35kv9G7b2K56bcmPtWVP80mAHjxE18J3noym8HGEWU7SSyXzJYZ62uI5oj+3jdwh2FW+CBXhnT5yIrjSWPgv5ZYrj2Q=
+	t=1751440643; cv=none; b=C/KvEqxpiowv/l6N+KLEy/xziDK95KKsn3DChtyPl2BXNMTnbcqUHwAyux/g2gcoFJGH3ggTH1PVL4RbAe5U9cVXuAdsuBaW1TAY+9PhZi2ujYmx3KW/89gB/cO4tYWkqq4zJZp53SCoQiyHeYmDwU+sWnFNM0qPHUsfs/Pru+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751440357; c=relaxed/simple;
-	bh=L8gzyqSyVOMAec0ZT8t+tRHJlDwwhKa+i1P6GdG7vgQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=h+jVdL7+toRq7EBPyJLgKoNnCJ4UIEHJyqwxKHko/Jcbd1IvA7ftus9/z/ANKH/Tihy/f3TIEyudbflGQutg5cQFVSzlOla3txyAhIaXYHNOSLHvID8TI7ovhx6SHvi+WUQSZ1TzC2xhUk8HzFVMnPdKp0Awi5eWDgcYq03jjBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cAwe4z0Q; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7d413a10b4cso1106463085a.1
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 00:12:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751440354; x=1752045154; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/dxI8+CD4/R5XYiIR8lsirbp/clezH5qoh5q5NVx22U=;
-        b=cAwe4z0QpyB8gwMYgDM5yHhVyGXyyz6yZu2aMXko35fGLHICyt7OtRzERrD/U1r68c
-         DZZmbyU9Sb6CAFw3325QNe0TtMezR/88d6w0WpcOZMRASv8pzzaTc0sgGGEJlo4hBuSc
-         0swZABy4uxBAmNl6bSy5qMf3H7kObep50doNCqp2SCqDN928JxKEi1ZgO7gW6dL0KVS2
-         ZVF8mpGj8lBrO5FlcfU9V+juAtY+tNbuFUIA7cfupTLjbMUpx3Mridd5LVpeJAbUL1ZF
-         ZNE6GQ3jHZxrQkJ0bfMdy7ke4CayEg4rjR1r7ZzxhHNxB98BOXAsr1nscXB+r8dVCN3d
-         mWGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751440354; x=1752045154;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/dxI8+CD4/R5XYiIR8lsirbp/clezH5qoh5q5NVx22U=;
-        b=qwlUfah/DzJTBvss9TeV6z1bk0Sf6zKDUiSN5wlhcZs6JyNOdtT1dRhHLwZ++h94/r
-         xUric1Ua/eLLm5LrIFjGpyFujMd8UNDa741bJzqJVvNINjtJ3goWGIGE+nBNGeYOKnc2
-         CeJrKFuo+l8Ht8mdfB1Z3gv7DUSnw3BVwK9ipeSY8JCYCEtdbV2aleBxcnzyHAzZvtfI
-         fJ23zwDntunf/g0LcZgxYxs76E6s3LPj8y+Fkks3gWN46ad/dX4GD9v7Q9QHyzzFfx5/
-         2PWlJQP6DTEiJv6oeUrhSVJHpV5P/2DpOwcEuHNeq0r4WaLTIJDPAeWmGfXPoaDwLNMf
-         P2Hw==
-X-Forwarded-Encrypted: i=1; AJvYcCXg8CTbzB5/iA4Z2WexSLljOoJGSQZASOEn9pl7YTpI1VmiCGv1ivwTymvjvodVaWyEQZiGHOA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxITh+QzH3fd7a1e3JF3xA9A1DNIT1keY68f78KqH5jD3TpOb0o
-	Pv46FrvVm6Od+7dAcECrrIPNG2cCM8s6RxIgryQk04Ubkzp2OsLs46TeFnw1vKa2H93ComGLWxt
-	kT81bwH0zEmXLFg==
-X-Google-Smtp-Source: AGHT+IHl/h5HpQ94wR5tWMLOLZBDqviKVtaqC0Qsnw5QelK+AOF7injqtioDPlYZLVN6Ig4eRvtIhBFsy+E/IQ==
-X-Received: from qtbgd25.prod.google.com ([2002:a05:622a:5c19:b0:48a:4c42:bc53])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:8018:b0:7c7:b4aa:85bc with SMTP id af79cd13be357-7d5c472ec2bmr222674685a.17.1751440353736;
- Wed, 02 Jul 2025 00:12:33 -0700 (PDT)
-Date: Wed,  2 Jul 2025 07:12:30 +0000
+	s=arc-20240116; t=1751440643; c=relaxed/simple;
+	bh=LSExucKZe0mtwwHTf3y56VWlUEakHL74/OJzWDFLcJU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Di9+sxzxpuFHd6eNlK/eSR5VKI8Byj3cKyPWEszu2XXkKHIEzZs3tp4JcalCcO4ST5YK701zasRON/ZknOQEVjOX0ofsSPqEoGcZ8WoqGG5lac9SHlGyi9ocEHj3J9Kc7T7PtHAQ70AbmavgZuygKsrCVLoBkCDNUvQSSnVw/4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hPoPhMew; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A85F841DF1;
+	Wed,  2 Jul 2025 07:17:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1751440633;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7SFgR9s1yj+x64xIhs3vXUk9wLToSRANqG6/nyrw1DA=;
+	b=hPoPhMewJQweoHwYO4sqNASE9CzWou7I3Wgj6uAz6MZuXpv/hlIppiL7o4PqMX936lWsgX
+	5QO2qBBwFrLWUnIgrk5xvC9XzoI7xYf8SCWrz+3OngrB9NDfmvTC+Z8hyaMTSkY9LxkFOe
+	HMSRWCKAlbKrGIHaF1JC5VYaLe6Ik2CyTK2ujSpunLoGZPtytBJE1ws/ISdh7efmKEwhRA
+	zMxDYBhuGg70deDJmG+fSC8aV4oRU00idfkloFns4XOqP53SKJAEnX8LZvBd55cAaaN1j4
+	V+9sQkl2g5hJX6QU9ysJ8rX/rugg04aR64O18mJLe7girCTTDnpXq98WKJ5Z5g==
+Date: Wed, 2 Jul 2025 09:17:08 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Vivian Wang <wangruikang@iscas.ac.cn>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>, Philipp Zabel
+ <p.zabel@pengutronix.de>, Paul Walmsley <paul.walmsley@sifive.com>, Palmer
+ Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Alexandre
+ Ghiti <alex@ghiti.fr>, Vivian Wang <uwu@dram.page>, Lukas Bulwahn
+ <lukas.bulwahn@redhat.com>, Geert Uytterhoeven <geert+renesas@glider.be>,
+ Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/5] net: spacemit: Add K1 Ethernet MAC
+Message-ID: <20250702091708.7d459213@fedora.home>
+In-Reply-To: <20250702-net-k1-emac-v3-2-882dc55404f3@iscas.ac.cn>
+References: <20250702-net-k1-emac-v3-0-882dc55404f3@iscas.ac.cn>
+	<20250702-net-k1-emac-v3-2-882dc55404f3@iscas.ac.cn>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250702071230.1892674-1-edumazet@google.com>
-Subject: [PATCH v2 net-next] net/sched: acp_api: no longer acquire RTNL in tc_action_net_exit()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Vlad Buslov <vladbu@nvidia.com>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduieejkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeffgfejgeegheeitefgleehgeejiedvheefudelhfeijedutdeihfeijeetgfegfeenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdegpdhrtghpthhtohepfigrnhhgrhhuihhkrghnghesihhstggrshdrrggtrdgtnhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpt
+ hhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkrhiikhdoughtsehkvghrnhgvlhdrohhrgh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-tc_action_net_exit() got an rtnl exclusion in commit
-a159d3c4b829 ("net_sched: acquire RTNL in tc_action_net_exit()")
+Hello Vivian,
 
-Since then, commit 16af6067392c ("net: sched: implement reference
-counted action release") made this RTNL exclusion obsolete for
-most cases.
+On Wed, 02 Jul 2025 14:01:41 +0800
+Vivian Wang <wangruikang@iscas.ac.cn> wrote:
 
-Only tcf_action_offload_del() might still require it.
+> The Ethernet MACs found on SpacemiT K1 appears to be a custom design
+> that only superficially resembles some other embedded MACs. SpacemiT
+> refers to them as "EMAC", so let's just call the driver "k1_emac".
+> 
+> This driver is based on "k1x-emac" in the same directory in the vendor's
+> tree [1]. Some debugging tunables have been fixed to vendor-recommended
+> defaults, and PTP support is not included yet.
+> 
+> [1]: https://github.com/spacemit-com/linux-k1x
+> 
+> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
 
-Move the rtnl locking into tcf_idrinfo_destroy() when
-an offload action is found.
+I have a handful of tiny comments, the rest looks fine by me !
 
-Most netns do not have actions, yet deleting them is adding a lot
-of pressure on RTNL, which is for many the most contended mutex
-in the kernel.
+> +static int emac_phy_connect(struct net_device *ndev)
+> +{
+> +	struct emac_priv *priv = netdev_priv(ndev);
+> +	struct device *dev = &priv->pdev->dev;
+> +	struct phy_device *phydev;
+> +	struct device_node *np;
+> +	int ret;
+> +
+> +	ret = of_get_phy_mode(dev->of_node, &priv->phy_interface);
+> +	if (ret) {
+> +		dev_err(dev, "No phy-mode found");
+> +		return ret;
+> +	}
+> +
+> +	np = of_parse_phandle(dev->of_node, "phy-handle", 0);
+> +	if (!np && of_phy_is_fixed_link(dev->of_node))
+> +		np = of_node_get(dev->of_node);
+> +
+> +	if (!np) {
+> +		dev_err(dev, "No PHY specified");
+> +		return -ENODEV;
+> +	}
+> +
+> +	ret = emac_phy_interface_config(priv);
+> +	if (ret)
+> +		goto err_node_put;
+> +
+> +	phydev = of_phy_connect(ndev, np, &emac_adjust_link, 0,
+> +				priv->phy_interface);
+> +	if (!phydev) {
+> +		dev_err(dev, "Could not attach to PHY\n");
+> +		ret = -ENODEV;
+> +		goto err_node_put;
+> +	}
+> +
+> +	phydev->mac_managed_pm = true;
+> +
+> +	ndev->phydev = phydev;
 
-We are moving to a per-netns 'rtnl', so tc_action_net_exit()
-will not be able to grab 'rtnl' a single time for a batch of netns.
+of_phy_connect() eventually calls phy_attach_direct(), which sets
+ndev->phydev, so you don't need to do it here :)
 
-Before the patch:
+> +
+> +	emac_update_delay_line(priv);
+> +
+> +err_node_put:
+> +	of_node_put(np);
+> +	return ret;
+> +}
 
-perf probe -a rtnl_lock
+[ ... ]
 
-perf record -e probe:rtnl_lock -a /bin/bash -c 'unshare -n "/bin/true"; sleep 1'
-[ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.305 MB perf.data (25 samples) ]
+> +static int emac_down(struct emac_priv *priv)
+> +{
+> +	struct platform_device *pdev = priv->pdev;
+> +	struct net_device *ndev = priv->ndev;
+> +
+> +	netif_stop_queue(ndev);
+> +
+> +	phy_stop(ndev->phydev);
 
-After the patch:
+phy_disconnect() will call phy_stop() for you, you can remove it.
 
-perf record -e probe:rtnl_lock -a /bin/bash -c 'unshare -n "/bin/true"; sleep 1'
-[ perf record: Woken up 1 times to write data ]
-[ perf record: Captured and wrote 0.304 MB perf.data (9 samples) ]
+> +	phy_disconnect(ndev->phydev);
+> +
+> +	emac_wr(priv, MAC_INTERRUPT_ENABLE, 0x0);
+> +	emac_wr(priv, DMA_INTERRUPT_ENABLE, 0x0);
+> +
+> +	free_irq(priv->irq, ndev);
+> +
+> +	napi_disable(&priv->napi);
+> +
+> +	emac_reset_hw(priv);
+> +
+> +	pm_runtime_put_sync(&pdev->dev);
+> +	return 0;
+> +}
+> +
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Vlad Buslov <vladbu@nvidia.com>
-Cc: Jiri Pirko <jiri@resnulli.us>
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
----
-v2: Added conditional rtnl acquisition in tcf_idrinfo_destroy()
-    after Cong feedback about tcf_action_offload_del() safety.
-    Added some performance numbers before/after the patch.
-v1: https://lore.kernel.org/netdev/20250701133006.812702-1-edumazet@google.com/
+[ ... ]
 
- include/net/act_api.h | 2 --
- net/sched/act_api.c   | 9 ++++++++-
- 2 files changed, 8 insertions(+), 3 deletions(-)
+> +static int emac_probe(struct platform_device *pdev)
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	struct reset_control *reset;
+> +	struct net_device *ndev;
+> +	struct emac_priv *priv;
+> +	int ret;
+> +
+> +	ndev = devm_alloc_etherdev(dev, sizeof(struct emac_priv));
+> +	if (!ndev)
+> +		return -ENOMEM;
+> +
+> +	ndev->hw_features = NETIF_F_SG;
+> +	ndev->features |= ndev->hw_features;
+> +
+> +	ndev->min_mtu = ETH_MIN_MTU;
 
-diff --git a/include/net/act_api.h b/include/net/act_api.h
-index 404df8557f6a13420b18d9c52b9710fe86d084aa..04781c92b43d6ab9cc6c81a88d5c6fe8c282c590 100644
---- a/include/net/act_api.h
-+++ b/include/net/act_api.h
-@@ -170,14 +170,12 @@ static inline void tc_action_net_exit(struct list_head *net_list,
- {
- 	struct net *net;
- 
--	rtnl_lock();
- 	list_for_each_entry(net, net_list, exit_list) {
- 		struct tc_action_net *tn = net_generic(net, id);
- 
- 		tcf_idrinfo_destroy(tn->ops, tn->idrinfo);
- 		kfree(tn->idrinfo);
- 	}
--	rtnl_unlock();
- }
- 
- int tcf_generic_walker(struct tc_action_net *tn, struct sk_buff *skb,
-diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-index 057e20cef3754f33357c4c1e30034f6b9b872d91..9e468e46346710c85c3a85b905d27dfe3972916a 100644
---- a/net/sched/act_api.c
-+++ b/net/sched/act_api.c
-@@ -933,18 +933,25 @@ void tcf_idrinfo_destroy(const struct tc_action_ops *ops,
- 			 struct tcf_idrinfo *idrinfo)
- {
- 	struct idr *idr = &idrinfo->action_idr;
-+	bool mutex_taken = false;
- 	struct tc_action *p;
--	int ret;
- 	unsigned long id = 1;
- 	unsigned long tmp;
-+	int ret;
- 
- 	idr_for_each_entry_ul(idr, p, tmp, id) {
-+		if (tc_act_in_hw(p) && !mutex_taken) {
-+			rtnl_lock();
-+			mutex_taken = true;
-+		}
- 		ret = __tcf_idr_release(p, false, true);
- 		if (ret == ACT_P_DELETED)
- 			module_put(ops->owner);
- 		else if (ret < 0)
- 			return;
- 	}
-+	if (mutex_taken)
-+		rtnl_unlock();
- 	idr_destroy(&idrinfo->action_idr);
- }
- EXPORT_SYMBOL(tcf_idrinfo_destroy);
--- 
-2.50.0.727.gbf7dc18ff4-goog
+This should already be the default value when using
+devm_alloc_etherdev()
 
+> +	ndev->max_mtu = EMAC_RX_BUF_4K - (ETH_HLEN + ETH_FCS_LEN);
+> +
+> +	priv = netdev_priv(ndev);
+> +	priv->ndev = ndev;
+> +	priv->pdev = pdev;
+> +	platform_set_drvdata(pdev, priv);
+> +	priv->hw_stats = devm_kzalloc(dev, sizeof(*priv->hw_stats), GFP_KERNEL);
+> +	if (!priv->hw_stats) {
+> +		dev_err(dev, "Failed to allocate memory for stats\n");
+> +		ret = -ENOMEM;
+> +		goto err;
+> +	}
+> +
+> +	ret = emac_config_dt(pdev, priv);
+> +	if (ret < 0) {
+> +		dev_err(dev, "Configuration failed\n");
+> +		goto err;
+> +	}
+> +
+> +	ndev->watchdog_timeo = 5 * HZ;
+> +	ndev->base_addr = (unsigned long)priv->iobase;
+> +	ndev->irq = priv->irq;
+> +
+> +	ndev->ethtool_ops = &emac_ethtool_ops;
+> +	ndev->netdev_ops = &emac_netdev_ops;
+> +
+> +	devm_pm_runtime_enable(&pdev->dev);
+> +
+> +	priv->bus_clk = devm_clk_get_enabled(&pdev->dev, NULL);
+> +	if (IS_ERR(priv->bus_clk)) {
+> +		ret = dev_err_probe(dev, PTR_ERR(priv->bus_clk),
+> +				    "Failed to get clock\n");
+> +		goto err;
+> +	}
+> +
+> +	reset = devm_reset_control_get_optional_exclusive_deasserted(&pdev->dev,
+> +								     NULL);
+> +	if (IS_ERR(reset)) {
+> +		ret = dev_err_probe(dev, PTR_ERR(reset),
+> +				    "Failed to get reset\n");
+> +		goto err;
+> +	}
+> +
+> +	emac_sw_init(priv);
+> +
+> +	if (of_phy_is_fixed_link(dev->of_node)) {
+> +		ret = of_phy_register_fixed_link(dev->of_node);
+> +		if (ret) {
+> +			dev_err_probe(dev, ret,
+> +				      "Failed to register fixed-link");
+> +			goto err_timer_delete;
+> +		}
+
+It looks like you're missing the calls to:
+
+  of_phy_deregister_fixed_link()
+
+in the error path here as well as in the .remove() function.
+
+> +	}
+> +
+> +	ret = emac_mdio_init(priv);
+> +	if (ret)
+> +		goto err_timer_delete;
+> +
+> +	SET_NETDEV_DEV(ndev, &pdev->dev);
+> +
+> +	ret = devm_register_netdev(dev, ndev);
+> +	if (ret) {
+> +		dev_err(dev, "devm_register_netdev failed\n");
+> +		goto err_timer_delete;
+> +	}
+> +
+> +	netif_napi_add(ndev, &priv->napi, emac_rx_poll);
+> +	netif_carrier_off(ndev);
+> +
+> +	return 0;
+> +
+> +err_timer_delete:
+> +	timer_delete_sync(&priv->txtimer);
+> +err:
+> +	return ret;
+> +}
+
+Maxime
 
