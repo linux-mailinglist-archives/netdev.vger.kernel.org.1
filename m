@@ -1,288 +1,535 @@
-Return-Path: <netdev+bounces-203372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49C5BAF5A6B
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 16:03:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 310CBAF5A4E
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 15:59:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EFEF1C237AE
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:03:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 519523AB10A
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 13:59:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062D227EFEC;
-	Wed,  2 Jul 2025 14:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 842392820A9;
+	Wed,  2 Jul 2025 13:59:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sysclose.org header.i=@sysclose.org header.b="iQuYNVMu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oQcxq0lU"
 X-Original-To: netdev@vger.kernel.org
-Received: from sysclose.org (smtp.sysclose.org [69.164.214.230])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CD3270ED7;
-	Wed,  2 Jul 2025 14:02:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=69.164.214.230
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C3A1275846;
+	Wed,  2 Jul 2025 13:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751464969; cv=none; b=F72z066ZWIdewWdKh9GTBz4+EY+zj3daVQR47H4GqwQYjasHpMqN4mnhZrMm5zDiooCn4bI/DCWZLu3tXmjKBNviJ102MRMQJlzMCpHKyfzaOo2hMTN7e0bh/JMxcqTtltRWo2Y1ETtWKcRgbSXzYRr+9E4IDPGBPaPKqJ3uZ0o=
+	t=1751464764; cv=none; b=LvXrZ1Xt9VqMpijLTjzsznUhcuZpeXegREiwJit1NW3v3Zv0gczQfjLC07HYcRfs2q3Ri3asUG38FrewgKrD5KUq5uE2+5/2Iw8jlrJq6In0ouw+Dla2A+TF7NT/0kvh8XzjHRIyH2WEWSLYGhIzG4Q1Lk518qqIVxyMZgzyZbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751464969; c=relaxed/simple;
-	bh=ljfa/P03WreNjE/dmoPXa7QWaelY6lDcWmaTaw/kRes=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fv8gO6/gGqkduk8xdmbMG2w7OHD6HMhqDOrh7MUjmiTYpfUrm/319x5C9Esid6IP59qHFo3F3otBwV3H/HQjt0LeKxGgbrVzGROjYivHwZU9CLggSf7nG0AObiHbLFb1JZQ9uJkn7bPu7Yg66X2r6eW0ZJXBCYPRsiJmquEwrpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sysclose.org; spf=pass smtp.mailfrom=sysclose.org; dkim=pass (2048-bit key) header.d=sysclose.org header.i=@sysclose.org header.b=iQuYNVMu; arc=none smtp.client-ip=69.164.214.230
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sysclose.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sysclose.org
-Received: from uranium (unknown [131.100.62.92])
-	by sysclose.org (Postfix) with ESMTPSA id 4F1F0395ED;
-	Wed,  2 Jul 2025 13:53:19 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 sysclose.org 4F1F0395ED
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sysclose.org;
-	s=201903; t=1751464400;
-	bh=tziLTDpyItWKxbKGaI6qyfMyhaTQ8w2YyNAMXsvando=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iQuYNVMuU9HVYot4e7/voMi0OWfFzqh+FpDCyyBrrSWC09uLdGFwdZzVg9TmPc+tH
-	 rqe3eIIuxyZzl/fGVz1vZ5ZELG7zEOkhNIYKcVEN+e3XbENTLUT7ZSUhZOUvz9+/9c
-	 SxPg3Q4fx+CyxJ0J8+DhtYSHOSdNNJJqRC3HJ0HnbvjVf1OC5IY913Hr0IE3S6Qj/s
-	 VI+/AVBcE80D/WyvjhY45Ey3vqTZ3XyfH552cHXpDeMt+gj9Bzd2kzORrwxoHx/u/9
-	 137PfVkD+wwA2OSjxSydxM9Tz2NWg5Vk03kdTk3o4jWYRA//OYguSs/7ed6GXpnBkF
-	 swG5TI+BNwHYg==
-Date: Wed, 2 Jul 2025 10:53:16 -0300
-From: Flavio Leitner <fbl@sysclose.org>
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: netdev@vger.kernel.org, dev@openvswitch.org,
- linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Simon
- Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-Subject: Re: [ovs-dev] [PATCH net-next] net: openvswitch: allow providing
- upcall pid for the 'execute' command
-Message-ID: <20250702105316.43017482@uranium>
-In-Reply-To: <20250627220219.1504221-1-i.maximets@ovn.org>
-References: <20250627220219.1504221-1-i.maximets@ovn.org>
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1751464764; c=relaxed/simple;
+	bh=t34MpVPzW7NXrbOIu1xDGoQdQeOEH8/yMk9JpRN3A5M=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=eH8ZV/B+RQFZt+AgWUHbErDLMGq8BHEmMIOODG8GeuJbfENlsCF5+1osLPkjKCHFKL9bMnBP1E5BygK0oAxcmixjOXUGSQ9bgJn/St+iksMOe39kBuKaNuTraoxmyzpjy/+8Rh1/LqaWPJ3nlVng1C8eLRV1jOebfMpTgYWM0+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oQcxq0lU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE90EC4CEED;
+	Wed,  2 Jul 2025 13:59:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751464763;
+	bh=t34MpVPzW7NXrbOIu1xDGoQdQeOEH8/yMk9JpRN3A5M=;
+	h=Subject:From:To:Cc:Date:From;
+	b=oQcxq0lUvGZEbPhsEA98VQG1Xi/frLn+cJv2PCCf/6eGnwPvGv6p9+mCGDSYTHicJ
+	 pzHIusmfUr9+XKbP91rPJ5Ur3VVXIxQ0/JFR/+N84b1dXqqNnDjMraawpUpapuL4al
+	 9qqGG9P983LXnwgS4xzVjJ01kIqBo1PH1VkYLkpdKzTPHOJQZQ7ILosJN52g8+CI5m
+	 e2jiqoiIduQY06YtKXug4WqjohiDysp8eLqYY6EkIjEWjsZV/zteD5ZN5IrLwbQXRx
+	 CW6jFR+dvCDD9Qkb0JPRK9ur5Iwbgf7s2VwMS4AuVUYd0x0LzZqTSu0RO7pJYugb7u
+	 vH9meYaDjOa2w==
+Subject: [PATCH net-next V4] net: track pfmemalloc drops via
+ SKB_DROP_REASON_PFMEMALLOC
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
+ Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ kernel-team@cloudflare.com, mfleming@cloudflare.com
+Date: Wed, 02 Jul 2025 15:59:19 +0200
+Message-ID: <175146472829.1363787.9293177520571232738.stgit@firesoul>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
-On Sat, 28 Jun 2025 00:01:33 +0200
-Ilya Maximets <i.maximets@ovn.org> wrote:
+Add a new SKB drop reason (SKB_DROP_REASON_PFMEMALLOC) to track packets
+dropped due to memory pressure. In production environments, we've observed
+memory exhaustion reported by memory layer stack traces, but these drops
+were not properly tracked in the SKB drop reason infrastructure.
 
-> When a packet enters OVS datapath and there is no flow to handle it,
-> packet goes to userspace through a MISS upcall.  With per-CPU upcall
-> dispatch mechanism, we're using the current CPU id to select the
-> Netlink PID on which to send this packet.  This allows us to send
-> packets from the same traffic flow through the same handler.
-> 
-> The handler will process the packet, install required flow into the
-> kernel and re-inject the original packet via OVS_PACKET_CMD_EXECUTE.
-> 
-> While handling OVS_PACKET_CMD_EXECUTE, however, we may hit a
-> recirculation action that will pass the (likely modified) packet
-> through the flow lookup again.  And if the flow is not found, the
-> packet will be sent to userspace again through another MISS upcall.
-> 
-> However, the handler thread in userspace is likely running on a
-> different CPU core, and the OVS_PACKET_CMD_EXECUTE request is handled
-> in the syscall context of that thread.  So, when the time comes to
-> send the packet through another upcall, the per-CPU dispatch will
-> choose a different Netlink PID, and this packet will end up processed
-> by a different handler thread on a different CPU.
+While most network code paths now properly report pfmemalloc drops, some
+protocol-specific socket implementations still use sk_filter() without
+drop reason tracking:
+- Bluetooth L2CAP sockets
+- CAIF sockets
+- IUCV sockets
+- Netlink sockets
+- SCTP sockets
+- Unix domain sockets
 
+These remaining cases represent less common paths and could be converted
+in a follow-up patch if needed. The current implementation provides
+significantly improved observability into memory pressure events in the
+network stack, especially for key protocols like TCP and UDP, helping to
+diagnose problems in production environments.
 
-The per-CPU dispatch mode is supposed to rely on the CPU context, 
-which according with what you said above, it is working okay on 
-the first MISS. However, when we hit a recirculation action and 
-there is another MISS, another thread from another CPU context 
-is selected, why?
+Reported-by: Matt Fleming <mfleming@cloudflare.com>
+Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+---
+V4:
+ - Rebase and resend
+V3:
+ - Add some whilespace lines to please checkpatch
+ - Don't correct skb_drop_reason type in __udp4_lib_rcv
+ - drop_reason variable in RX-handler (__netif_receive_skb_core)
+ - link: https://lore.kernel.org/all/174861348802.1621620.12023807708034587582.stgit@firesoul
+V2:
+ - link: https://lore.kernel.org/all/174680137188.1282310.4154030185267079690.stgit@firesoul/
+V1:
+ - link: https://lore.kernel.org/all/174619899817.1075985.12078484570755125058.stgit@firesoul/
 
-Thanks,
-Flavio
+ drivers/net/tun.c             |    6 ++----
+ include/linux/filter.h        |   14 ++++++++++++--
+ include/net/dropreason-core.h |    5 +++++
+ include/net/tcp.h             |    2 +-
+ net/core/dev.c                |   12 +++++++++---
+ net/core/filter.c             |   15 ++++++++++++---
+ net/core/sock.c               |   20 +++++++++++++-------
+ net/ipv4/tcp_ipv4.c           |   25 ++++++++++++++-----------
+ net/ipv4/udp.c                |    6 ++----
+ net/ipv6/tcp_ipv6.c           |    9 +++------
+ net/ipv6/udp.c                |    4 +---
+ net/rose/rose_in.c            |    3 ++-
+ 12 files changed, 76 insertions(+), 45 deletions(-)
 
-> 
-> The process continues as long as there are new recirculations, each
-> time the packet goes to a different handler thread before it is sent
-> out of the OVS datapath to the destination port.  In real setups the
-> number of recirculations can go up to 4 or 5, sometimes more.
-> 
-> There is always a chance to re-order packets while processing upcalls,
-> because userspace will first install the flow and then re-inject the
-> original packet.  So, there is a race window when the flow is already
-> installed and the second packet can match it and be forwarded to the
-> destination before the first packet is re-injected.  But the fact that
-> packets are going through multiple upcalls handled by different
-> userspace threads makes the reordering noticeably more likely, because
-> we not only have a race between the kernel and a userspace handler
-> (which is hard to avoid), but also between multiple userspace
-> handlers.
-> 
-> For example, let's assume that 10 packets got enqueued through a MISS
-> upcall for handler-1, it will start processing them, will install the
-> flow into the kernel and start re-injecting packets back, from where
-> they will go through another MISS to handler-2.  Handler-2 will
-> install the flow into the kernel and start re-injecting the packets,
-> while handler-1 continues to re-inject the last of the 10 packets,
-> they will hit the flow installed by handler-2 and be forwarded
-> without going to the handler-2, while handler-2 still re-injects the
-> first of these 10 packets.  Given multiple recirculations and misses,
-> these 10 packets may end up completely mixed up on the output from
-> the datapath.
-> 
-> Let's allow userspace to specify on which Netlink PID the packets
-> should be upcalled while processing OVS_PACKET_CMD_EXECUTE.
-> This makes it possible to ensure that all the packets are processed
-> by the same handler thread in the userspace even with them being
-> upcalled multiple times in the process.  Packets will remain in order
-> since they will be enqueued to the same socket and re-injected in the
-> same order.  This doesn't eliminate re-ordering as stated above, since
-> we still have a race between kernel and the userspace thread, but it
-> allows to eliminate races between multiple userspace threads.
-> 
-> Userspace knows the PID of the socket on which the original upcall is
-> received, so there is no need to send it up from the kernel.
-> 
-> Solution requires storing the value somewhere for the duration of the
-> packet processing.  There are two potential places for this: our skb
-> extension or the per-CPU storage.  It's not clear which is better,
-> so just following currently used scheme of storing this kind of things
-> along the skb.
-> 
-> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
-> ---
->  include/uapi/linux/openvswitch.h |  6 ++++++
->  net/openvswitch/actions.c        |  6 ++++--
->  net/openvswitch/datapath.c       | 10 +++++++++-
->  net/openvswitch/datapath.h       |  3 +++
->  net/openvswitch/vport.c          |  1 +
->  5 files changed, 23 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/uapi/linux/openvswitch.h
-> b/include/uapi/linux/openvswitch.h index 3a701bd1f31b..3092c2c6f1d2
-> 100644 --- a/include/uapi/linux/openvswitch.h
-> +++ b/include/uapi/linux/openvswitch.h
-> @@ -186,6 +186,11 @@ enum ovs_packet_cmd {
->   * %OVS_PACKET_ATTR_USERSPACE action specify the Maximum received
-> fragment
->   * size.
->   * @OVS_PACKET_ATTR_HASH: Packet hash info (e.g. hash, sw_hash and
-> l4_hash in skb).
-> + * @OVS_PACKET_ATTR_UPCALL_PID: Netlink PID to use for upcalls while
-> + * processing %OVS_PACKET_CMD_EXECUTE.  Takes precedence over all
-> other ways
-> + * to determine the Netlink PID including %OVS_USERSPACE_ATTR_PID,
-> + * %OVS_DP_ATTR_UPCALL_PID, %OVS_DP_ATTR_PER_CPU_PIDS and the
-> + * %OVS_VPORT_ATTR_UPCALL_PID.
->   *
->   * These attributes follow the &struct ovs_header within the Generic
-> Netlink
->   * payload for %OVS_PACKET_* commands.
-> @@ -205,6 +210,7 @@ enum ovs_packet_attr {
->  	OVS_PACKET_ATTR_MRU,	    /* Maximum received IP
-> fragment size. */ OVS_PACKET_ATTR_LEN,	    /* Packet size
-> before truncation. */ OVS_PACKET_ATTR_HASH,	    /* Packet
-> hash. */
-> +	OVS_PACKET_ATTR_UPCALL_PID, /* u32 Netlink PID. */
->  	__OVS_PACKET_ATTR_MAX
->  };
->  
-> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-> index 3add108340bf..2832e0794197 100644
-> --- a/net/openvswitch/actions.c
-> +++ b/net/openvswitch/actions.c
-> @@ -941,8 +941,10 @@ static int output_userspace(struct datapath *dp,
-> struct sk_buff *skb, break;
->  
->  		case OVS_USERSPACE_ATTR_PID:
-> -			if (dp->user_features &
-> -			    OVS_DP_F_DISPATCH_UPCALL_PER_CPU)
-> +			if (OVS_CB(skb)->upcall_pid)
-> +				upcall.portid =
-> OVS_CB(skb)->upcall_pid;
-> +			else if (dp->user_features &
-> +				 OVS_DP_F_DISPATCH_UPCALL_PER_CPU)
->  				upcall.portid =
->  				  ovs_dp_get_upcall_portid(dp,
->  							   smp_processor_id());
-> diff --git a/net/openvswitch/datapath.c b/net/openvswitch/datapath.c
-> index b990dc83504f..ec08ce72f439 100644
-> --- a/net/openvswitch/datapath.c
-> +++ b/net/openvswitch/datapath.c
-> @@ -267,7 +267,9 @@ void ovs_dp_process_packet(struct sk_buff *skb,
-> struct sw_flow_key *key) memset(&upcall, 0, sizeof(upcall));
->  		upcall.cmd = OVS_PACKET_CMD_MISS;
->  
-> -		if (dp->user_features &
-> OVS_DP_F_DISPATCH_UPCALL_PER_CPU)
-> +		if (OVS_CB(skb)->upcall_pid)
-> +			upcall.portid = OVS_CB(skb)->upcall_pid;
-> +		else if (dp->user_features &
-> OVS_DP_F_DISPATCH_UPCALL_PER_CPU) upcall.portid =
->  			    ovs_dp_get_upcall_portid(dp,
-> smp_processor_id()); else
-> @@ -616,6 +618,7 @@ static int ovs_packet_cmd_execute(struct sk_buff
-> *skb, struct genl_info *info) struct sw_flow_actions *sf_acts;
->  	struct datapath *dp;
->  	struct vport *input_vport;
-> +	u32 upcall_pid = 0;
->  	u16 mru = 0;
->  	u64 hash;
->  	int len;
-> @@ -651,6 +654,10 @@ static int ovs_packet_cmd_execute(struct sk_buff
-> *skb, struct genl_info *info) !!(hash & OVS_PACKET_HASH_L4_BIT));
->  	}
->  
-> +	if (a[OVS_PACKET_ATTR_UPCALL_PID])
-> +		upcall_pid =
-> nla_get_u32(a[OVS_PACKET_ATTR_UPCALL_PID]);
-> +	OVS_CB(packet)->upcall_pid = upcall_pid;
-> +
->  	/* Build an sw_flow for sending this packet. */
->  	flow = ovs_flow_alloc();
->  	err = PTR_ERR(flow);
-> @@ -719,6 +726,7 @@ static const struct nla_policy
-> packet_policy[OVS_PACKET_ATTR_MAX + 1] = { [OVS_PACKET_ATTR_PROBE] =
-> { .type = NLA_FLAG }, [OVS_PACKET_ATTR_MRU] = { .type = NLA_U16 },
->  	[OVS_PACKET_ATTR_HASH] = { .type = NLA_U64 },
-> +	[OVS_PACKET_ATTR_UPCALL_PID] = { .type = NLA_U32 },
->  };
->  
->  static const struct genl_small_ops dp_packet_genl_ops[] = {
-> diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapath.h
-> index cfeb817a1889..db0c3e69d66c 100644
-> --- a/net/openvswitch/datapath.h
-> +++ b/net/openvswitch/datapath.h
-> @@ -121,6 +121,8 @@ struct datapath {
->   * @cutlen: The number of bytes from the packet end to be removed.
->   * @probability: The sampling probability that was applied to this
-> skb; 0 means
->   * no sampling has occurred; U32_MAX means 100% probability.
-> + * @upcall_pid: Netlink socket PID to use for sending this packet to
-> userspace;
-> + * 0 means "not set" and default per-CPU or per-vport dispatch
-> should be used. */
->  struct ovs_skb_cb {
->  	struct vport		*input_vport;
-> @@ -128,6 +130,7 @@ struct ovs_skb_cb {
->  	u16			acts_origlen;
->  	u32			cutlen;
->  	u32			probability;
-> +	u32			upcall_pid;
->  };
->  #define OVS_CB(skb) ((struct ovs_skb_cb *)(skb)->cb)
->  
-> diff --git a/net/openvswitch/vport.c b/net/openvswitch/vport.c
-> index 8732f6e51ae5..6bbbc16ab778 100644
-> --- a/net/openvswitch/vport.c
-> +++ b/net/openvswitch/vport.c
-> @@ -501,6 +501,7 @@ int ovs_vport_receive(struct vport *vport, struct
-> sk_buff *skb, OVS_CB(skb)->mru = 0;
->  	OVS_CB(skb)->cutlen = 0;
->  	OVS_CB(skb)->probability = 0;
-> +	OVS_CB(skb)->upcall_pid = 0;
->  	if (unlikely(dev_net(skb->dev) !=
-> ovs_dp_get_net(vport->dp))) { u32 mark;
->  
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index f8c5e2fd04df..a9ea8cdb332b 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -1000,8 +1000,8 @@ static unsigned int run_ebpf_filter(struct tun_struct *tun,
+ /* Net device start xmit */
+ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+ {
++	enum skb_drop_reason drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
+ 	struct tun_struct *tun = netdev_priv(dev);
+-	enum skb_drop_reason drop_reason;
+ 	int txq = skb->queue_mapping;
+ 	struct netdev_queue *queue;
+ 	struct tun_file *tfile;
+@@ -1030,10 +1030,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	}
+ 
+ 	if (tfile->socket.sk->sk_filter &&
+-	    sk_filter(tfile->socket.sk, skb)) {
+-		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
++	    (sk_filter_reason(tfile->socket.sk, skb, &drop_reason)))
+ 		goto drop;
+-	}
+ 
+ 	len = run_ebpf_filter(tun, skb, len);
+ 	if (len == 0) {
+diff --git a/include/linux/filter.h b/include/linux/filter.h
+index f5cf4d35d83e..4e82332afe03 100644
+--- a/include/linux/filter.h
++++ b/include/linux/filter.h
+@@ -1073,10 +1073,20 @@ bpf_jit_binary_lock_ro(struct bpf_binary_header *hdr)
+ 	return set_memory_rox((unsigned long)hdr, hdr->size >> PAGE_SHIFT);
+ }
+ 
+-int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap);
++int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap,
++		       enum skb_drop_reason *reason);
++
+ static inline int sk_filter(struct sock *sk, struct sk_buff *skb)
+ {
+-	return sk_filter_trim_cap(sk, skb, 1);
++	enum skb_drop_reason ignore_reason;
++
++	return sk_filter_trim_cap(sk, skb, 1, &ignore_reason);
++}
++
++static inline int sk_filter_reason(struct sock *sk, struct sk_buff *skb,
++				   enum skb_drop_reason *reason)
++{
++	return sk_filter_trim_cap(sk, skb, 1, reason);
+ }
+ 
+ struct bpf_prog *bpf_prog_select_runtime(struct bpf_prog *fp, int *err);
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index b9e78290269e..f83bf5918bad 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -124,6 +124,7 @@
+ 	FN(CAN_RX_INVALID_FRAME)	\
+ 	FN(CANFD_RX_INVALID_FRAME)	\
+ 	FN(CANXL_RX_INVALID_FRAME)	\
++	FN(PFMEMALLOC)	\
+ 	FNe(MAX)
+ 
+ /**
+@@ -591,6 +592,10 @@ enum skb_drop_reason {
+ 	 * non conform CAN-XL frame (or device is unable to receive CAN frames)
+ 	 */
+ 	SKB_DROP_REASON_CANXL_RX_INVALID_FRAME,
++	/**
++	 * @SKB_DROP_REASON_PFMEMALLOC: dropped when under memory pressure
++	 */
++	SKB_DROP_REASON_PFMEMALLOC,
+ 	/**
+ 	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
+ 	 * shouldn't be used as a real 'reason' - only for tracing code gen
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 761c4a0ad386..06e6106ec243 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -1560,7 +1560,7 @@ bool tcp_add_backlog(struct sock *sk, struct sk_buff *skb,
+ 		     enum skb_drop_reason *reason);
+ 
+ 
+-int tcp_filter(struct sock *sk, struct sk_buff *skb);
++int tcp_filter(struct sock *sk, struct sk_buff *skb, enum skb_drop_reason *reason);
+ void tcp_set_state(struct sock *sk, int state);
+ void tcp_done(struct sock *sk);
+ int tcp_abort(struct sock *sk, int err);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 7ee808eb068e..8a5867d890ab 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -5747,6 +5747,7 @@ static inline int nf_ingress(struct sk_buff *skb, struct packet_type **pt_prev,
+ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
+ 				    struct packet_type **ppt_prev)
+ {
++	enum skb_drop_reason drop_reason = SKB_DROP_REASON_UNHANDLED_PROTO;
+ 	struct packet_type *ptype, *pt_prev;
+ 	rx_handler_func_t *rx_handler;
+ 	struct sk_buff *skb = *pskb;
+@@ -5838,8 +5839,10 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
+ #endif
+ 	skb_reset_redirect(skb);
+ skip_classify:
+-	if (pfmemalloc && !skb_pfmemalloc_protocol(skb))
++	if (pfmemalloc && !skb_pfmemalloc_protocol(skb)) {
++		drop_reason = SKB_DROP_REASON_PFMEMALLOC;
+ 		goto drop;
++	}
+ 
+ 	if (skb_vlan_tag_present(skb)) {
+ 		if (pt_prev) {
+@@ -5937,8 +5940,10 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
+ 	}
+ 
+ 	if (pt_prev) {
+-		if (unlikely(skb_orphan_frags_rx(skb, GFP_ATOMIC)))
++		if (unlikely(skb_orphan_frags_rx(skb, GFP_ATOMIC))) {
++			drop_reason = SKB_DROP_REASON_SKB_UCOPY_FAULT;
+ 			goto drop;
++		}
+ 		*ppt_prev = pt_prev;
+ 	} else {
+ drop:
+@@ -5946,7 +5951,8 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
+ 			dev_core_stats_rx_dropped_inc(skb->dev);
+ 		else
+ 			dev_core_stats_rx_nohandler_inc(skb->dev);
+-		kfree_skb_reason(skb, SKB_DROP_REASON_UNHANDLED_PROTO);
++
++		kfree_skb_reason(skb, drop_reason);
+ 		/* Jamal, now you will not able to escape explaining
+ 		 * me how you were going to use this. :-)
+ 		 */
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 7a72f766aacf..2eb8947d8097 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -122,6 +122,7 @@ EXPORT_SYMBOL_GPL(copy_bpf_fprog_from_user);
+  *	@sk: sock associated with &sk_buff
+  *	@skb: buffer to filter
+  *	@cap: limit on how short the eBPF program may trim the packet
++ *	@reason: record drop reason on errors (negative return value)
+  *
+  * Run the eBPF program and then cut skb->data to correct size returned by
+  * the program. If pkt_len is 0 we toss packet. If skb->len is smaller
+@@ -130,7 +131,8 @@ EXPORT_SYMBOL_GPL(copy_bpf_fprog_from_user);
+  * be accepted or -EPERM if the packet should be tossed.
+  *
+  */
+-int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap)
++int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb,
++		       unsigned int cap, enum skb_drop_reason *reason)
+ {
+ 	int err;
+ 	struct sk_filter *filter;
+@@ -142,15 +144,20 @@ int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap)
+ 	 */
+ 	if (skb_pfmemalloc(skb) && !sock_flag(sk, SOCK_MEMALLOC)) {
+ 		NET_INC_STATS(sock_net(sk), LINUX_MIB_PFMEMALLOCDROP);
++		*reason = SKB_DROP_REASON_PFMEMALLOC;
+ 		return -ENOMEM;
+ 	}
+ 	err = BPF_CGROUP_RUN_PROG_INET_INGRESS(sk, skb);
+-	if (err)
++	if (err) {
++		*reason = SKB_DROP_REASON_SOCKET_FILTER;
+ 		return err;
++	}
+ 
+ 	err = security_sock_rcv_skb(sk, skb);
+-	if (err)
++	if (err) {
++		*reason = SKB_DROP_REASON_SECURITY_HOOK;
+ 		return err;
++	}
+ 
+ 	rcu_read_lock();
+ 	filter = rcu_dereference(sk->sk_filter);
+@@ -162,6 +169,8 @@ int sk_filter_trim_cap(struct sock *sk, struct sk_buff *skb, unsigned int cap)
+ 		pkt_len = bpf_prog_run_save_cb(filter->prog, skb);
+ 		skb->sk = save_sk;
+ 		err = pkt_len ? pskb_trim(skb, max(cap, pkt_len)) : -EPERM;
++		if (err)
++			*reason = SKB_DROP_REASON_SOCKET_FILTER;
+ 	}
+ 	rcu_read_unlock();
+ 
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 3a71d6c4ccf0..efb0b6b6af87 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -526,11 +526,10 @@ int sock_queue_rcv_skb_reason(struct sock *sk, struct sk_buff *skb,
+ 	enum skb_drop_reason drop_reason;
+ 	int err;
+ 
+-	err = sk_filter(sk, skb);
+-	if (err) {
+-		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
++	err = sk_filter_reason(sk, skb, &drop_reason);
++	if (err)
+ 		goto out;
+-	}
++
+ 	err = __sock_queue_rcv_skb(sk, skb);
+ 	switch (err) {
+ 	case -ENOMEM:
+@@ -553,15 +552,18 @@ EXPORT_SYMBOL(sock_queue_rcv_skb_reason);
+ int __sk_receive_skb(struct sock *sk, struct sk_buff *skb,
+ 		     const int nested, unsigned int trim_cap, bool refcounted)
+ {
++	enum skb_drop_reason reason = SKB_DROP_REASON_NOT_SPECIFIED;
+ 	int rc = NET_RX_SUCCESS;
++	int err;
+ 
+-	if (sk_filter_trim_cap(sk, skb, trim_cap))
++	if (sk_filter_trim_cap(sk, skb, trim_cap, &reason))
+ 		goto discard_and_relse;
+ 
+ 	skb->dev = NULL;
+ 
+ 	if (sk_rcvqueues_full(sk, READ_ONCE(sk->sk_rcvbuf))) {
+ 		atomic_inc(&sk->sk_drops);
++		reason = SKB_DROP_REASON_SOCKET_RCVBUFF;
+ 		goto discard_and_relse;
+ 	}
+ 	if (nested)
+@@ -577,8 +579,12 @@ int __sk_receive_skb(struct sock *sk, struct sk_buff *skb,
+ 		rc = sk_backlog_rcv(sk, skb);
+ 
+ 		mutex_release(&sk->sk_lock.dep_map, _RET_IP_);
+-	} else if (sk_add_backlog(sk, skb, READ_ONCE(sk->sk_rcvbuf))) {
++	} else if ((err = sk_add_backlog(sk, skb, READ_ONCE(sk->sk_rcvbuf)))) {
+ 		bh_unlock_sock(sk);
++		if (err == -ENOMEM)
++			reason = SKB_DROP_REASON_PFMEMALLOC;
++		if (err == -ENOBUFS)
++			reason = SKB_DROP_REASON_SOCKET_BACKLOG;
+ 		atomic_inc(&sk->sk_drops);
+ 		goto discard_and_relse;
+ 	}
+@@ -589,7 +595,7 @@ int __sk_receive_skb(struct sock *sk, struct sk_buff *skb,
+ 		sock_put(sk);
+ 	return rc;
+ discard_and_relse:
+-	kfree_skb(skb);
++	sk_skb_reason_drop(sk, skb, reason);
+ 	goto out;
+ }
+ EXPORT_SYMBOL(__sk_receive_skb);
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index 56223338bc0f..9f4cb862991c 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -2024,6 +2024,7 @@ bool tcp_add_backlog(struct sock *sk, struct sk_buff *skb,
+ 	u32 gso_size;
+ 	u64 limit;
+ 	int delta;
++	int err;
+ 
+ 	/* In case all data was pulled from skb frags (in __pskb_pull_tail()),
+ 	 * we can fix skb->truesize to its real value to avoid future drops.
+@@ -2134,21 +2135,26 @@ bool tcp_add_backlog(struct sock *sk, struct sk_buff *skb,
+ 
+ 	limit = min_t(u64, limit, UINT_MAX);
+ 
+-	if (unlikely(sk_add_backlog(sk, skb, limit))) {
++	if (unlikely((err = sk_add_backlog(sk, skb, limit)))) {
+ 		bh_unlock_sock(sk);
+-		*reason = SKB_DROP_REASON_SOCKET_BACKLOG;
+-		__NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPBACKLOGDROP);
++		if (err == -ENOMEM) {
++			*reason = SKB_DROP_REASON_PFMEMALLOC;
++			__NET_INC_STATS(sock_net(sk), LINUX_MIB_PFMEMALLOCDROP);
++		} else {
++			*reason = SKB_DROP_REASON_SOCKET_BACKLOG;
++			__NET_INC_STATS(sock_net(sk), LINUX_MIB_TCPBACKLOGDROP);
++		}
+ 		return true;
+ 	}
+ 	return false;
+ }
+ EXPORT_IPV6_MOD(tcp_add_backlog);
+ 
+-int tcp_filter(struct sock *sk, struct sk_buff *skb)
++int tcp_filter(struct sock *sk, struct sk_buff *skb, enum skb_drop_reason *reason)
+ {
+ 	struct tcphdr *th = (struct tcphdr *)skb->data;
+ 
+-	return sk_filter_trim_cap(sk, skb, th->doff * 4);
++	return sk_filter_trim_cap(sk, skb, th->doff * 4, reason);
+ }
+ EXPORT_IPV6_MOD(tcp_filter);
+ 
+@@ -2275,14 +2281,12 @@ int tcp_v4_rcv(struct sk_buff *skb)
+ 		}
+ 		refcounted = true;
+ 		nsk = NULL;
+-		if (!tcp_filter(sk, skb)) {
++		if (!tcp_filter(sk, skb, &drop_reason)) {
+ 			th = (const struct tcphdr *)skb->data;
+ 			iph = ip_hdr(skb);
+ 			tcp_v4_fill_cb(skb, iph, th);
+ 			nsk = tcp_check_req(sk, skb, req, false, &req_stolen,
+ 					    &drop_reason);
+-		} else {
+-			drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
+ 		}
+ 		if (!nsk) {
+ 			reqsk_put(req);
+@@ -2338,10 +2342,9 @@ int tcp_v4_rcv(struct sk_buff *skb)
+ 
+ 	nf_reset_ct(skb);
+ 
+-	if (tcp_filter(sk, skb)) {
+-		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
++	if (tcp_filter(sk, skb, &drop_reason))
+ 		goto discard_and_relse;
+-	}
++
+ 	th = (const struct tcphdr *)skb->data;
+ 	iph = ip_hdr(skb);
+ 	tcp_v4_fill_cb(skb, iph, th);
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 19573ee64a0f..ea5d8aa48355 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -2349,7 +2349,7 @@ static int __udp_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
+  */
+ static int udp_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
+ {
+-	int drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
++	enum skb_drop_reason drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
+ 	struct udp_sock *up = udp_sk(sk);
+ 	int is_udplite = IS_UDPLITE(sk);
+ 
+@@ -2438,10 +2438,8 @@ static int udp_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
+ 	    udp_lib_checksum_complete(skb))
+ 			goto csum_error;
+ 
+-	if (sk_filter_trim_cap(sk, skb, sizeof(struct udphdr))) {
+-		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
++	if (sk_filter_trim_cap(sk, skb, sizeof(struct udphdr), &drop_reason))
+ 		goto drop;
+-	}
+ 
+ 	udp_csum_pull_header(skb);
+ 
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 9fb614e17bde..846f871a8a32 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -1833,14 +1833,12 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
+ 		}
+ 		refcounted = true;
+ 		nsk = NULL;
+-		if (!tcp_filter(sk, skb)) {
++		if (!tcp_filter(sk, skb, &drop_reason)) {
+ 			th = (const struct tcphdr *)skb->data;
+ 			hdr = ipv6_hdr(skb);
+ 			tcp_v6_fill_cb(skb, hdr, th);
+ 			nsk = tcp_check_req(sk, skb, req, false, &req_stolen,
+ 					    &drop_reason);
+-		} else {
+-			drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
+ 		}
+ 		if (!nsk) {
+ 			reqsk_put(req);
+@@ -1896,10 +1894,9 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
+ 
+ 	nf_reset_ct(skb);
+ 
+-	if (tcp_filter(sk, skb)) {
+-		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
++	if (tcp_filter(sk, skb, &drop_reason))
+ 		goto discard_and_relse;
+-	}
++
+ 	th = (const struct tcphdr *)skb->data;
+ 	hdr = ipv6_hdr(skb);
+ 	tcp_v6_fill_cb(skb, hdr, th);
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index ebb95d8bc681..52af7eceed3b 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -894,10 +894,8 @@ static int udpv6_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
+ 	    udp_lib_checksum_complete(skb))
+ 		goto csum_error;
+ 
+-	if (sk_filter_trim_cap(sk, skb, sizeof(struct udphdr))) {
+-		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
++	if (sk_filter_trim_cap(sk, skb, sizeof(struct udphdr), &drop_reason))
+ 		goto drop;
+-	}
+ 
+ 	udp_csum_pull_header(skb);
+ 
+diff --git a/net/rose/rose_in.c b/net/rose/rose_in.c
+index 4d67f36dce1b..4603a9385a61 100644
+--- a/net/rose/rose_in.c
++++ b/net/rose/rose_in.c
+@@ -101,6 +101,7 @@ static int rose_state2_machine(struct sock *sk, struct sk_buff *skb, int framety
+  */
+ static int rose_state3_machine(struct sock *sk, struct sk_buff *skb, int frametype, int ns, int nr, int q, int d, int m)
+ {
++	enum skb_drop_reason dr; /* ignored */
+ 	struct rose_sock *rose = rose_sk(sk);
+ 	int queued = 0;
+ 
+@@ -162,7 +163,7 @@ static int rose_state3_machine(struct sock *sk, struct sk_buff *skb, int framety
+ 		rose_frames_acked(sk, nr);
+ 		if (ns == rose->vr) {
+ 			rose_start_idletimer(sk);
+-			if (sk_filter_trim_cap(sk, skb, ROSE_MIN_LEN) == 0 &&
++			if (sk_filter_trim_cap(sk, skb, ROSE_MIN_LEN, &dr) == 0 &&
+ 			    __sock_queue_rcv_skb(sk, skb) == 0) {
+ 				rose->vr = (rose->vr + 1) % ROSE_MODULUS;
+ 				queued = 1;
+
 
 
