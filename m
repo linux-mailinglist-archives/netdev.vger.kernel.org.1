@@ -1,116 +1,139 @@
-Return-Path: <netdev+bounces-203237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B86DEAF0E03
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:29:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC1F8AF0E3C
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:42:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0B0B1C25A02
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:29:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B84473BD9DA
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:42:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0591D238171;
-	Wed,  2 Jul 2025 08:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QYLmw7dE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7276238C33;
+	Wed,  2 Jul 2025 08:42:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8FF01EDA12;
-	Wed,  2 Jul 2025 08:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745F922DA1B;
+	Wed,  2 Jul 2025 08:42:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751444933; cv=none; b=jhobTm1oMoGQaP+RNEnqNaZf8sw5pnoPrY1vvpspM7v/jUDOfS0luHr5a32JeuLGBUNFmpRpIDNzCHOiJOvSA9XHWpr11iBcZpPiav7gkmmhLZ5tzlXTmdKce9tOTGWOEk+Usi7hB38S2p8KeG5y7gMyAKDTmqQVR8nZJ6NC1eI=
+	t=1751445773; cv=none; b=k7lHisfOH6PsNiBsmuBQ2xZoWuqkL/RwdY39REVWMgINurnQv6Pb3bsGCGMzew+8ScDH00lFNctaftpZYJi6uGID5vwmi4Xo87VWgB68FZKl9fQXFCp+vIZ2OA/iKi0+QK7vqYLjzG8IRC2yLZmXHg2U9GXn8Ww8zuvTJRSlM+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751444933; c=relaxed/simple;
-	bh=HMhGhl+nGkttwlmKfCx46IPS/kNi+zmx1F2ZQiHf9Zk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m2O7atUdTY3RzciZURQ3QZDdOroicJNRDb0/+Q4bM2aL8W/RukWUsLH/CN1GcgXNU2/oFH6hb3BFPT/32I910ytceSXr3blGFi6mOkoUNGvxfAQC9ufghawkE9WZaqPZb5jxM2izioDoCoXmsMfIQci4sLZhl7lFe3h8PFuTvGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QYLmw7dE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42C57C4CEEE;
-	Wed,  2 Jul 2025 08:28:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751444933;
-	bh=HMhGhl+nGkttwlmKfCx46IPS/kNi+zmx1F2ZQiHf9Zk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QYLmw7dEmPsd6RF01Odg6OhL8C5zww8nQEXsxMjQbj9dWVzEcfSKNY22SDl4f/iGB
-	 NBXf4bO3vGiwxCpLL5vB0E0UiTzCz/WS2k2ixoSoPDh1tFMQ1s9HnX2K0MRyQReNzm
-	 Q8IxVG1oxMhoYst9Jq8Kpz9K/D4wY2eWNCNlZKbJ6Ike6iaU43rewyK+0vOkF2ktTI
-	 Uomv+dqLF0K4ipfwh/TfUYZfThQnhE3olG7YyD4Mo6uthJpNLGxI54KgTc1nurCBL6
-	 v46SF7ofRJ92PF5DexJ3hsEuvretl7/w8TLC3cWmVNb771QKYhHHi6OqzNx0oSCONz
-	 aon1AfQTIeI3A==
-Date: Wed, 2 Jul 2025 11:28:47 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Stav Aviram <saviram@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, linux-rdma@vger.kernel.org,
-	Mark Bloch <markb@mellanox.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: Re: [PATCH mlx5-next v1] net/mlx5: Check device memory pointer
- before usage
-Message-ID: <20250702082847.GH6278@unreal>
-References: <c88711327f4d74d5cebc730dc629607e989ca187.1751370035.git.leon@kernel.org>
- <20250701193858.GA41770@horms.kernel.org>
+	s=arc-20240116; t=1751445773; c=relaxed/simple;
+	bh=ZWncWZqL3YVF7XFQNnWoJCmyi0/LyOh5Xf815k+EKh0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=l9IKspGw6K80TZ8I/4+TeAmNFq9AvdPCSynUcdsZdQfYbfZD6PleZnRWA0Eqlvski7os5H1yinFLl0wWwVVHQjQ0Q2tUQs6iUPulrHqTFBXvYLNja6/MNpCawgLyvjHue9T8yEsm5ikPQl57VT4vSfFJp0eM3QVW6rqVBQLxVjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bXCzJ696Qz2BdTy;
+	Wed,  2 Jul 2025 16:41:00 +0800 (CST)
+Received: from kwepemo200008.china.huawei.com (unknown [7.202.195.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9F8ED140278;
+	Wed,  2 Jul 2025 16:42:46 +0800 (CST)
+Received: from huawei.com (10.67.175.28) by kwepemo200008.china.huawei.com
+ (7.202.195.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 2 Jul
+ 2025 16:42:45 +0800
+From: Xinyu Zheng <zhengxinyu6@huawei.com>
+To: <mst@redhat.com>, <jasowang@redhat.com>, <pbonzini@redhat.com>,
+	<stefanha@redhat.com>, <virtualization@lists.linux-foundation.org>,
+	<kvm@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <gregkh@linuxfoundation.org>,
+	<stable@vger.kernel.org>
+CC: <zhengxinyu6@huawei.com>
+Subject: [PATCH v5.10] vhost-scsi: protect vq->log_used with vq->mutex
+Date: Wed, 2 Jul 2025 08:29:45 +0000
+Message-ID: <20250702082945.4164475-1-zhengxinyu6@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250701193858.GA41770@horms.kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemo200008.china.huawei.com (7.202.195.61)
 
-On Tue, Jul 01, 2025 at 08:38:58PM +0100, Simon Horman wrote:
-> On Tue, Jul 01, 2025 at 03:08:12PM +0300, Leon Romanovsky wrote:
-> > From: Stav Aviram <saviram@nvidia.com>
-> > 
-> > Add a NULL check before accessing device memory to prevent a crash if
-> > dev->dm allocation in mlx5_init_once() fails.
-> > 
-> > Fixes: c9b9dcb430b3 ("net/mlx5: Move device memory management to mlx5_core")
-> > Signed-off-by: Stav Aviram <saviram@nvidia.com>
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > ---
-> > Changelog:
-> > v1:
-> >  * Removed extra IS_ERR(dm) check.
-> > v0:
-> > https://lore.kernel.org/all/e389fa6ef075af1049cd7026b912d736ebe3ad23.1751279408.git.leonro@nvidia.com
-> > ---
-> >  drivers/infiniband/hw/mlx5/dm.c                  | 2 +-
-> >  drivers/net/ethernet/mellanox/mlx5/core/lib/dm.c | 4 ++--
-> >  drivers/net/ethernet/mellanox/mlx5/core/main.c   | 2 +-
-> >  3 files changed, 4 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/drivers/infiniband/hw/mlx5/dm.c b/drivers/infiniband/hw/mlx5/dm.c
-> > index b4c97fb62abf..9ded2b7c1e31 100644
-> > --- a/drivers/infiniband/hw/mlx5/dm.c
-> > +++ b/drivers/infiniband/hw/mlx5/dm.c
-> > @@ -282,7 +282,7 @@ static struct ib_dm *handle_alloc_dm_memic(struct ib_ucontext *ctx,
-> >  	int err;
-> >  	u64 address;
-> >  
-> > -	if (!MLX5_CAP_DEV_MEM(dm_db->dev, memic))
-> > +	if (!dm_db || !MLX5_CAP_DEV_MEM(dm_db->dev, memic))
-> >  		return ERR_PTR(-EOPNOTSUPP);
-> 
-> nit: -EOPNOTSUPP doesn't feel like the right error code
->      in the !dm_db case.
+From: Dongli Zhang <dongli.zhang@oracle.com>
 
-Why? This error is returned to the user through mlx5_ib_alloc_dm().
+[ Upstream commit f591cf9fce724e5075cc67488c43c6e39e8cbe27 ]
 
-Thanks
+The vhost-scsi completion path may access vq->log_base when vq->log_used is
+already set to false.
 
-> 
-> >  
-> >  	dm = kzalloc(sizeof(*dm), GFP_KERNEL);
-> 
-> ...
+    vhost-thread                       QEMU-thread
+
+vhost_scsi_complete_cmd_work()
+-> vhost_add_used()
+   -> vhost_add_used_n()
+      if (unlikely(vq->log_used))
+                                      QEMU disables vq->log_used
+                                      via VHOST_SET_VRING_ADDR.
+                                      mutex_lock(&vq->mutex);
+                                      vq->log_used = false now!
+                                      mutex_unlock(&vq->mutex);
+
+				      QEMU gfree(vq->log_base)
+        log_used()
+        -> log_write(vq->log_base)
+
+Assuming the VMM is QEMU. The vq->log_base is from QEMU userpace and can be
+reclaimed via gfree(). As a result, this causes invalid memory writes to
+QEMU userspace.
+
+The control queue path has the same issue.
+
+CVE-2025-38074
+Cc: stable@vger.kernel.org#5.10.x
+Cc: gregkh@linuxfoundation.org
+Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+Reviewed-by: Mike Christie <michael.christie@oracle.com>
+Message-Id: <20250403063028.16045-2-dongli.zhang@oracle.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+[ Conflicts in drivers/vhost/scsi.c
+  bacause vhost_scsi_complete_cmd_work() has been refactored. ]
+Signed-off-by: Xinyu Zheng <zhengxinyu6@huawei.com>
+---
+ drivers/vhost/scsi.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+index a23a65e7d828..fcde3752b4f1 100644
+--- a/drivers/vhost/scsi.c
++++ b/drivers/vhost/scsi.c
+@@ -579,8 +579,10 @@ static void vhost_scsi_complete_cmd_work(struct vhost_work *work)
+ 		ret = copy_to_iter(&v_rsp, sizeof(v_rsp), &iov_iter);
+ 		if (likely(ret == sizeof(v_rsp))) {
+ 			struct vhost_scsi_virtqueue *q;
+-			vhost_add_used(cmd->tvc_vq, cmd->tvc_vq_desc, 0);
+ 			q = container_of(cmd->tvc_vq, struct vhost_scsi_virtqueue, vq);
++			mutex_lock(&q->vq.mutex);
++			vhost_add_used(cmd->tvc_vq, cmd->tvc_vq_desc, 0);
++			mutex_unlock(&q->vq.mutex);
+ 			vq = q - vs->vqs;
+ 			__set_bit(vq, signal);
+ 		} else
+@@ -1193,8 +1195,11 @@ static void vhost_scsi_tmf_resp_work(struct vhost_work *work)
+ 	else
+ 		resp_code = VIRTIO_SCSI_S_FUNCTION_REJECTED;
+ 
++	mutex_lock(&tmf->svq->vq.mutex);
+ 	vhost_scsi_send_tmf_resp(tmf->vhost, &tmf->svq->vq, tmf->in_iovs,
+ 				 tmf->vq_desc, &tmf->resp_iov, resp_code);
++	mutex_unlock(&tmf->svq->vq.mutex);
++
+ 	vhost_scsi_release_tmf_res(tmf);
+ }
+ 
+-- 
+2.34.1
+
 
