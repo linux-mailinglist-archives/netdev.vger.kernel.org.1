@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-203112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D754DAF0883
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 04:38:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8C0FAF0885
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 04:38:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51859164B37
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:38:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 384094208EA
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:37:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21EE1A072C;
-	Wed,  2 Jul 2025 02:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41A071C5D61;
+	Wed,  2 Jul 2025 02:38:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DCEB16E863;
-	Wed,  2 Jul 2025 02:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8324818BC3B;
+	Wed,  2 Jul 2025 02:38:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751423884; cv=none; b=ZUKrvy+ajQKrK/AakNi5n8qwI9u0tqj2gyD/drLZ7IdX3GOvSudVsEDb4447Q5bIbmXAp6acSJ2aM/alAZKRucXlppRkzK8y0pibwKlwin+AZggpPyB/iqI8/OLhY01pv11maESyOoGoZlF2igEax2hCd3BwYCzLkB3h+DkrN50=
+	t=1751423886; cv=none; b=k0q5yKUi2HhiEkqTeUkCs7+HrMNbWpRfnawLSlL/mFVffDRYt8h/VLtcuRP6/CGYOiWitK9IQZJdYedItaox9GiMmDbqg7ttmfTpVn9KGcgeYsBQdFEnk1fD125RXc5//N2mzEEHsmQ1FOkhjzclfND5JPPvuboSRFdIW/GBjQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751423884; c=relaxed/simple;
-	bh=pQET3LimeNTjhg0Ps/AYZMyJeXizcXhkG/Op6lf6ZVA=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=LPUDMadM8qB5qB9hgrCdc2kmCEHLZ7tiDcA/GwWWUbxkotpFOBgpBJCa71uFXHMfxhyNC56XOKkpHki6din/Ar+KSto4tD2La2K6coDvJ0ePrzW1ieK2paNp1Epceec9wl3R+5SD/+QH63Sp/+kpwfSpngqrMTAKSW2b7weK87g=
+	s=arc-20240116; t=1751423886; c=relaxed/simple;
+	bh=OGabr0my+JeImAbeYx3UeMMb3/osl2h1XS7BApWu55o=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UucP+DKKAxK+5tZuSBGXlBhrKl6lZX3AMu/eeV/NAexbHKNrZBzFavHWpe5Bjh6qpZD6SC4bAomkKjRMpervPvcLYYZTKQZhKd1TNMU9kE265YYnTI4zF8hHdr6mSbA06ZEpEFh1b5TKrFOihi8aIGg2Si61wpZA2WSTfVgI2y8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1uWnM0-000000005DE-34JB;
-	Wed, 02 Jul 2025 02:37:44 +0000
-Date: Wed, 2 Jul 2025 03:37:40 +0100
+	id 1uWnMF-000000005DT-05g0;
+	Wed, 02 Jul 2025 02:37:59 +0000
+Date: Wed, 2 Jul 2025 03:37:55 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Felix Fietkau <nbd@nbd.name>,
 	Frank Wunderlich <frank-w@public-files.de>,
@@ -53,9 +53,10 @@ To: Felix Fietkau <nbd@nbd.name>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next v4 0/3] net: ethernet: mtk_eth_soc: improve device
- tree handling
-Message-ID: <cover.1751421358.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v4 1/3] net: ethernet: mtk_eth_soc: improve support
+ for named interrupts
+Message-ID: <aeccd00eccb7186d39d2c16292019b3b22ec53b8.1751421358.git.daniel@makrotopia.org>
+References: <cover.1751421358.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,41 +65,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <cover.1751421358.git.daniel@makrotopia.org>
 
-This series further improves the mtk_eth_soc driver in preparation to
-complete upstream support for the MediaTek MT7988 SoC family.
+Use platform_get_irq_byname_optional() to avoid outputting error
+messages when using legacy device trees which rely identifying
+interrupts only by index. Instead, output a warning notifying the user
+to update their device tree.
 
-Frank Wunderlich's previous attempt to have the ethernet node included
-in mt7988a.dtsi and cover support for MT7988 in the device tree bindings
-was criticized for the way mtk_eth_soc references SRAM in device tree[1].
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+---
+v4: unchanged
+v3: unchanged
+v2: unchanged
 
-Having a 2nd 'reg' property, like introduced by commit ebb1e4f9cf38
-("net: ethernet: mtk_eth_soc: add support for in-SoC SRAM") isn't
-acceptable and a dedicated "mmio-sram" node should be used instead.
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-In order to make the code more clean and readable, the existing
-hardcoded offsets for the scratch ring, RX and TX rings are dropped in
-favor of using the generic allocator. In this way support for the
-hard-coded offset and including the SRAM region as part of the
-Ethernet's "reg" MMIO space is kept as it will still be required in
-order to support existing legacy device trees of the MT7986 SoC family.
-
-While at it also replace confusing error messages when using legacy
-device trees without "interrupt-names" with a warning informing users
-that they are using a legacy device tree.
-
-[1]: https://patchwork.ozlabs.org/comment/3533543/
-
-Daniel Golle (3):
-  net: ethernet: mtk_eth_soc: improve support for named interrupts
-  net: ethernet: mtk_eth_soc: fix kernel-doc comment
-  net: ethernet: mtk_eth_soc: use generic allocator for SRAM
-
- drivers/net/ethernet/mediatek/Kconfig       |   1 +
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 155 +++++++++++---------
- drivers/net/ethernet/mediatek/mtk_eth_soc.h |  11 +-
- 3 files changed, 95 insertions(+), 72 deletions(-)
-
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+index f8a907747db4..8f55069441f4 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+@@ -3341,17 +3341,22 @@ static int mtk_get_irqs(struct platform_device *pdev, struct mtk_eth *eth)
+ 	int i;
+ 
+ 	/* future SoCs beginning with MT7988 should use named IRQs in dts */
+-	eth->irq[MTK_FE_IRQ_TX] = platform_get_irq_byname(pdev, "fe1");
+-	eth->irq[MTK_FE_IRQ_RX] = platform_get_irq_byname(pdev, "fe2");
++	eth->irq[MTK_FE_IRQ_TX] = platform_get_irq_byname_optional(pdev, "fe1");
++	eth->irq[MTK_FE_IRQ_RX] = platform_get_irq_byname_optional(pdev, "fe2");
+ 	if (eth->irq[MTK_FE_IRQ_TX] >= 0 && eth->irq[MTK_FE_IRQ_RX] >= 0)
+ 		return 0;
+ 
+-	/* only use legacy mode if platform_get_irq_byname returned -ENXIO */
++	/* only use legacy mode if platform_get_irq_byname_optional returned -ENXIO */
+ 	if (eth->irq[MTK_FE_IRQ_TX] != -ENXIO)
+-		return eth->irq[MTK_FE_IRQ_TX];
++		return dev_err_probe(&pdev->dev, eth->irq[MTK_FE_IRQ_TX],
++				     "Error requesting FE TX IRQ\n");
+ 
+ 	if (eth->irq[MTK_FE_IRQ_RX] != -ENXIO)
+-		return eth->irq[MTK_FE_IRQ_RX];
++		return dev_err_probe(&pdev->dev, eth->irq[MTK_FE_IRQ_RX],
++				     "Error requesting FE RX IRQ\n");
++
++	if (!MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_INT))
++		dev_warn(&pdev->dev, "legacy DT: missing interrupt-names.");
+ 
+ 	/* legacy way:
+ 	 * On MTK_SHARED_INT SoCs (MT7621 + MT7628) the first IRQ is taken
 -- 
 2.50.0
 
