@@ -1,122 +1,128 @@
-Return-Path: <netdev+bounces-203090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA404AF07D4
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 03:18:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35E8EAF07E9
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 03:26:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE1E7424C8F
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 01:18:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2B021C07027
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 01:26:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB58E39FCE;
-	Wed,  2 Jul 2025 01:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D646145FE8;
+	Wed,  2 Jul 2025 01:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IvoeSzGM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JAFl5gD1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF7B3C30;
-	Wed,  2 Jul 2025 01:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D32F82F5E;
+	Wed,  2 Jul 2025 01:26:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751419124; cv=none; b=PAJjm1cBr5hoa61/DeMzmmGy8rmOMV1PZuVUMjBNx9UiTpEHTB6BZ41JuRNAUNPvfxbF9/ekNFfxvT1dPD1jgninnLWFN2Eq8kJ8V7Z+fx4mZU5YFWRzF2SLve+38fld9NOprMMkrB9P4KbotoDpB4h4u7kiAM9cXWQzYRszEDM=
+	t=1751419580; cv=none; b=FUeUTOv3PHN+hLghSktKMhgVTUQ31XimouaVo6mg4dYz3ehQYLkYptMa15KHm8vc/nJO4zC3X657NoDAIgZxHSr6TkWXIlbpIqblO01QDZhs6UTcl0WNe1obEMl4hVrZ9YTKFOPeshbVptuvSz5bSQKjPyNI/6s16aXlxdoVbUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751419124; c=relaxed/simple;
-	bh=Q3ZlQcXLusGO7or5b6gbAN76N6KRrX9bFVhn/AXPoDQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tQk+3EIcjh8guQEXY+i6QVOtF+HZfDM0MpADhhXc23fN1LLu+nIhhUXMgZTsuiHk1+PlkxwhYsJ+ZYQWvfoPDuzP27SjFpd0jy3zWE2jkkzVgmo2xGIlRKR2sg8C5hUhJg/219R0dpwWJxW/lerGw1zhaXIq5GGD8KwqvKYD/GU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IvoeSzGM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1C881C4CEEB;
-	Wed,  2 Jul 2025 01:18:44 +0000 (UTC)
+	s=arc-20240116; t=1751419580; c=relaxed/simple;
+	bh=kpNeMrG3Dt4hd8A0for0V8nnG/pC3jvPKfmzTIld6sQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UunxqCgobFGG7gavkiltuLXJ/XgbGeXluLVCGftdZCDiBv6slrow1SGkiZLVKAcYVAVcz/vu+I1Woxb/pX/xviTcRzvZeFghngRt4yK5qbtISLwdMmag5/8cDAvZBZ7KkSqtkrPOWu05wgBvq8KY9NRRwmhzHkp756P3EWXCbto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JAFl5gD1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20D41C4CEEB;
+	Wed,  2 Jul 2025 01:26:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751419124;
-	bh=Q3ZlQcXLusGO7or5b6gbAN76N6KRrX9bFVhn/AXPoDQ=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=IvoeSzGMjkbTzs0OeT9pXsMaTabkeloJwgX2wcUdGzxUBxcm35JbpaDV/P7Aev0Ko
-	 clmqIktb3nuNauaNRqv4wjxWTyPiUGyH0UQ3a3NwFI5Z5323Xx3wwDjVjKmKvae+DU
-	 ErraIGxYRnfNTaNjwApvEqdpODrO+2IEH0OD/zLCReh7RJmqOKo9MjX8++ByP7I1M8
-	 oTCqT1L6O5DDK1U2z2vRfWts3nuXSTKZ1XnoxULF5pwSX+5agAXcJNST2hb37u/vs/
-	 v1TiDnffzf23FO9VTF4eGb7x/vunKnnEAJI8Wz9vkJ6x661or9hAzGr7sJDmlyuh+v
-	 T+C4KwqvBy3+A==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08F31C7EE30;
-	Wed,  2 Jul 2025 01:18:44 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Wed, 02 Jul 2025 09:18:42 +0800
-Subject: [PATCH] Bluetooth: hci_core: lookup pa sync need check BIG sync
- state
+	s=k20201202; t=1751419578;
+	bh=kpNeMrG3Dt4hd8A0for0V8nnG/pC3jvPKfmzTIld6sQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JAFl5gD1wB3U8t6EiLCi29YJ/X5QLu0Z63y6SqPAmuc/N2fMiP16+u7BL47rUV4Rp
+	 vAlrSI6DVvVoOCceeh1E4Be/ZN5Br36iRp+779w22nlcJglSBB7RDOxPZ1fwGsv/iN
+	 Vkoo7bjUwPWrxSmym682JDot3LKIiYXIYzXNgtq++Mq1EtGC7uQgSgIsiJB8mUa+Og
+	 LLXcj2Xn8YETjw6lJN035doe3udvvTukOV12jWnyOvj00q73roMS0NSv2lgYoAVR5y
+	 t2ov+K555lNCDDStMC5g6BO/C8ke7Lm5Vqc0YjCvUUDIFldczSu2Bb1oScjO7DamBv
+	 WkFe5wl7tiNXw==
+Date: Tue, 1 Jul 2025 18:26:17 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Oliver Neukum <oneukum@suse.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, "Peter GJ. Park"
+ <gyujoon.park@samsung.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: usb: usbnet: fix use-after-free in race on
+ workqueue
+Message-ID: <20250701182617.07d6e437@kernel.org>
+In-Reply-To: <ebd0bb9b-8e66-4119-b011-c1a737749fb2@suse.com>
+References: <CGME20250625093354epcas1p1c9817df6e1d1599e8b4eb16c5715a6fd@epcas1p1.samsung.com>
+	<20250625-usbnet-uaf-fix-v1-1-421eb05ae6ea@samsung.com>
+	<87a7f8a6-71b1-4b90-abc7-0a680f2a99cf@redhat.com>
+	<ebd0bb9b-8e66-4119-b011-c1a737749fb2@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250702-pa_sync-v1-1-7a96f5c2d012@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAPGIZGgC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI1MDcwND3YLE+OLKvGRdo7Rk87RkyzRTS6NkJaDqgqLUtMwKsEnRsbW1AGv
- pFS1ZAAAA
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Johan Hedberg <johan.hedberg@gmail.com>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1751419122; l=1160;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=GHF9U6GehkWVyzq0OzaU+JceT54aR44ovVM4Bx+2rpk=;
- b=eXovFOziL0YnMbRRQ5YVkV12C93VSCnu6TecapyGQ2OjfXYA8mgRc/OPiy0TVXdTOs0FztD/E
- qjG/4wvabekCKCj+qnJaf73QtkMQbVoB6oNjkiZn2XkfU256Ep1Eq37
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
 
-From: Yang Li <yang.li@amlogic.com>
+On Tue, 1 Jul 2025 15:22:54 +0200 Oliver Neukum wrote:
+> On 26.06.25 11:21, Paolo Abeni wrote:
+> >>   drivers/net/usb/usbnet.c | 3 +++
+> >>   1 file changed, 3 insertions(+)
+> >>
+> >> diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+> >> index c04e715a4c2ade3bc5587b0df71643a25cf88c55..3c5d9ba7fa6660273137c80106746103f84f5a37 100644
+> >> --- a/drivers/net/usb/usbnet.c
+> >> +++ b/drivers/net/usb/usbnet.c
+> >> @@ -1660,6 +1660,9 @@ void usbnet_disconnect (struct usb_interface *intf)
+> >>   	usb_free_urb(dev->interrupt);
+> >>   	kfree(dev->padding_pkt);
+> >>   
+> >> +	timer_delete_sync(&dev->delay);
+> >> +	tasklet_kill(&dev->bh);
+> >> +	cancel_work_sync(&dev->kevent);
+> >>   	free_netdev(net);  
+> > This happens after unregister_netdev(), which calls usbnet_stop() that
+> > already performs the above cleanup. How the race is supposed to take place?  
+> 
+> That is indeed a core question, which we really need an answer to.
+> Do I interpret dev_close_many() correctly, if I state that the
+> ndo_stop() method will _not_ be called if the device has never been
+> opened?
 
-Ignore the big sync connections, we are looking for the PA
-sync connection that was created as a result of the PA sync
-established event.
+Correct, open and close are paired. Most drivers would crash if we
+tried to close them before they ever got opened. 
 
-Signed-off-by: Yang Li <yang.li@amlogic.com>
----
- include/net/bluetooth/hci_core.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+> I am sorry to be a stickler here, but if that turns out to be true,
+> usbnet is not the only driver that has this bug.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 3ce1fb6f5822..646b0c5fd7a5 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1400,6 +1400,13 @@ hci_conn_hash_lookup_pa_sync_handle(struct hci_dev *hdev, __u16 sync_handle)
- 		if (c->type != BIS_LINK)
- 			continue;
+Shooting from the hip slightly, but its unusual for a driver to start
+link monitoring before open. After all there can be no packets on a
+device that's closed. Why not something like:
+
+diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+index 9564478a79cc..b75b0b5c3abc 100644
+--- a/drivers/net/usb/usbnet.c
++++ b/drivers/net/usb/usbnet.c
+@@ -896,6 +896,9 @@ int usbnet_open (struct net_device *net)
+        int                     retval;
+        const struct driver_info *info = dev->driver_info;
  
-+		/* Ignore the big sync connections, we are looking
-+		 * for the PA sync connection that was created as
-+		 * a result of the PA sync established event.
-+		 */
-+		if (test_bit(HCI_CONN_BIG_SYNC, &c->flags))
-+			continue;
++       if (dev->driver_info->flags & FLAG_LINK_INTR)
++               usbnet_link_change(dev, 0, 0);
 +
- 		/* Ignore the listen hcon, we are looking
- 		 * for the child hcon that was created as
- 		 * a result of the PA sync established event.
-
----
-base-commit: 3bc46213b81278f3a9df0324768e152de71eb9fe
-change-id: 20250701-pa_sync-2fc7fc9f592c
-
-Best regards,
--- 
-Yang Li <yang.li@amlogic.com>
-
-
+        if ((retval = usb_autopm_get_interface(dev->intf)) < 0) {
+                netif_info(dev, ifup, dev->net,
+                           "resumption fail (%d) usbnet usb-%s-%s, %s\n",
+@@ -1862,8 +1865,7 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
+ 
+        netif_device_attach (net);
+ 
+-       if (dev->driver_info->flags & FLAG_LINK_INTR)
+-               usbnet_link_change(dev, 0, 0);
++       netif_carrier_off(net);
+ 
+        return 0;
+ 
 
