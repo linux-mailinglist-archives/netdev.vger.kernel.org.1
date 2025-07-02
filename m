@@ -1,209 +1,201 @@
-Return-Path: <netdev+bounces-203408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F4B4AF5D4D
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 17:38:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC48DAF5D57
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 17:40:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CBF41883F57
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 15:35:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2035A3B9E65
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 15:37:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD4C33196C5;
-	Wed,  2 Jul 2025 15:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC76303DDF;
+	Wed,  2 Jul 2025 15:33:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kC4dKTZw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZSPoU5uz"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B7D3196B0
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 15:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F7A2FF483
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 15:33:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751470092; cv=none; b=Fu34Gbbws/JmzEy46fW1ms73Oej0y5HoF2EU588ofoj6Rr25x3i5hQIQbg8EEiIZeITvOQux6aK34T8BS4cbTpNxnSFYXHhQ+3q7z0vvwr1tVXbKsIJOTL1pfQIeuG4Wgc2ekF7FBPRY/bKAxZDvWHHmesBXP/gsJd7PHKzalhM=
+	t=1751470420; cv=none; b=DM3lLFRO6Qx0qLrJR2/yd2z5+vfxlADEjQoi2QQ35/h+HHLErDvzmu1maavTJs7s1D+fZTPv1Y/dL270nBsunpsoEi76TokaSwGUJkz7et3IgIR32HYd6bzSbgLcnu/mZpjgsjNDNl9LqKdehJclYvxRJxHT2OhIYBUPf4Arm9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751470092; c=relaxed/simple;
-	bh=toA1Z/HEzEC87vvHzwP53jgQyCAQTPKIkkCux8WahSA=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=Z9r26EzZD92Bq/VxKfFe6uPBVu+QcfnJ2iOy8CHhtlwIbFQIUvmGnwAcdzskKPQQPOWubDeP4bJXrsIEN3ZsHe8NzmtD14l6lfhxanfjqNZAGSwXCaWtArbb3I8or6fMXRhaA8EGelG8R5Tq0MEenciwe1py7s0Ki2yAqtueS1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kC4dKTZw; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1751470420; c=relaxed/simple;
+	bh=obDyf6FXbOYTWIuD3KSMiI8nmtrN1gR3/HHyGMdPab0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UX7W/8UVC/grJDtHBpYKsvI4CtIWSge2XqL9OTcUyX/ovVm40RvRYv7LPS6hjcnEg8Yp3DGDaSHgD4bpdpXLYJL856H50N87vp0ASNKdnrTUcapFANt3vnbEY2M18L6HBNxEqWgJgaNvs5W73Z12vRZWcXnXbIzop+zI7j9SSWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZSPoU5uz; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7490cb9a892so4968786b3a.0
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 08:33:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751470418; x=1752075218; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XokiYEzaoR1B14/T6j1v6mfh/QyFdt9cJod/XCOiF/Q=;
+        b=ZSPoU5uzCwNDNbkjBuWhZaJxDWC6Y7k716STWCYIpF61RBtZleSfVnKazgonDQqveX
+         fme4Kgl19Rc7z5Luwduh1/0NqV0xNIMVSUvEY/Jr0Q+HH1Zu3+8PdjxP4or1oNKfS2Rh
+         5X6np41J905l7QYdDN4727W6MuHXHikpdHwKyYu09fod4pFQME4VI9hXRjCnYWS0Uwok
+         flxedua/rp6RZz2vf3sujEO2wXMIz6/FWX4H9sqUmzDQWeTbi3QsRFVL6zuFSWhqftOe
+         AHqh4ILFOpHTzzcIGuS21nLMBpXZO5cSiz0ISDdfeGBEmVzhgEvy/wrQbMusJcSNRcUI
+         ZepA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751470418; x=1752075218;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XokiYEzaoR1B14/T6j1v6mfh/QyFdt9cJod/XCOiF/Q=;
+        b=HHXIP4DH9SxWVfV3UbEwYfs7quQCZ3DvhOTWsbrqlOZzbwwa6jQ0DuDzPPHlUZ5xym
+         j3JR2sEcNJK2WfI37cP3p0C2mI6KsTqIx9WMIuxTldUBlHOV4ulW+0cPxDNwc03fXl1I
+         O5g5Z3YxrTsiN9jQmIoZXfJADtCowQEQqTpL+UMbpEG+N2YuM2dN9JYaQUcgmE3fWYOn
+         QdJ4/qQpjbsOzG/D8RkcnMurUwT70MGq7Jude9fqFKacEpymv4WcxPZzNik+VtdZm562
+         WCTtLzch57DxS5HDloWNqeSbPovifdKavoW3LCvREqQRoG7txMiOWmHh/v7dPXtojwGV
+         YXyQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXsa/HdxSAfCQ2zhGqmb6C2IZ2GUhWsQX+V/XC994YD4SPS0MbdvAnwE44uI4jmTTeqmLmIxAY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2Wh105EVo6uvPBsj0jKr+hyFDbDAkSYlf74ZZo0CkzEInkm7b
+	iloQY/2RbbcpXw5M7h3oDxlBrbwey4i54TYIp85jv1NLmDhmTroXER8=
+X-Gm-Gg: ASbGncviyQ3UQsYScW504bXjmWaMGcL8JzVtqBSyRfwcgyrw76IiNRh2F1R4GedRr/t
+	2+6SEOq7sTAKh+qDGDa47l12YLHf6B5+314n8nbT55aYQctsVObXW+W61/WKvZs7LXztdnnK/iK
+	QragY9KuEbOpW0QIn3aBg3attLoCm9IbCXFJBH73vEONpJyHiuSCq8Ni8qTZlF5SCpB1FrShMsj
+	l6vObWyZat7GgHwmCW16nOcai0Qxb9vTP5LN4w3TAHUfU6EatDd+/zD8+j8nZQF5OwwC+MIHdaQ
+	JjZAZB97gL16hiiWM+ZqGpxQpAhPcI0p2J6kq70ogA364eDXI1amR8Xmdn/ixo/iBk/QL5M9vMD
+	MStlezt2jGSEFj+SMAKdr8w0=
+X-Google-Smtp-Source: AGHT+IGK4tHNVwEemyWXzdZf+tbHSzBbkjEWlOeifCheAQoxdwi0i+7rhIoh5aYtR5BFwTpZ9dV60g==
+X-Received: by 2002:a05:6a00:4fc1:b0:748:e4af:9c54 with SMTP id d2e1a72fcca58-74b50e84130mr4786184b3a.6.1751470417717;
+        Wed, 02 Jul 2025 08:33:37 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-74af557b27dsm14722787b3a.84.2025.07.02.08.33.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jul 2025 08:33:37 -0700 (PDT)
+Date: Wed, 2 Jul 2025 08:33:36 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next v2 3/8] net:
+ s/dev_get_mac_address/netif_get_mac_address/
+Message-ID: <aGVRUCTYNt_aMkQz@mini-arch>
+References: <20250630164222.712558-1-sdf@fomichev.me>
+ <20250630164222.712558-4-sdf@fomichev.me>
+ <6862fb095090_183f832945b@willemb.c.googlers.com.notmuch>
+ <aGMbe0hxH78xQvD8@mini-arch>
+ <686430091cc2_20bfeb294fc@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751470078;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=j37gTI83G/0npP0vUifckHIJRdF1qjNhI6E7oZQqNe0=;
-	b=kC4dKTZwI8kVcBTPiULB/3Z1bTjznXesHizU2OBZDrOWKE+8E0ZCWvdtSkmYGE+WsQTBFo
-	ROoEoxz3FgmIkC711b2kv6tqHY7tExrnI2gvGqPhkvZ78pyYIB9sK+6qLW5oEsSARImbzk
-	6ETnWVuy1ZP6hN7cALaosa06Nnvb22Q=
-Date: Wed, 02 Jul 2025 15:27:56 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <c910cfc4b58e9e2e1ceaca9d4dc7d68b679caa48@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net-next v1] tcp: Correct signedness in skb remaining
- space calculation
-To: "Eric Dumazet" <edumazet@google.com>
-Cc: netdev@vger.kernel.org, mrpre@163.com, "Neal Cardwell"
- <ncardwell@google.com>, "Kuniyuki Iwashima" <kuniyu@google.com>, "David
- S. Miller" <davem@davemloft.net>, "David Ahern" <dsahern@kernel.org>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Simon Horman" <horms@kernel.org>, "David Howells" <dhowells@redhat.com>,
- linux-kernel@vger.kernel.org
-In-Reply-To: <CANn89iJD6ZYCBBT_qsgm_HJ5Xrups1evzp9ej=UYGP5sv6oG_A@mail.gmail.com>
-References: <20250702110039.15038-1-jiayuan.chen@linux.dev>
- <c9c5d36bc516e70171d1bb1974806e16020fbff1@linux.dev>
- <CANn89iJdGZq0HW3+uGLCMtekC7G5cPnHChCJFCUhvzuzPuhsrA@mail.gmail.com>
- <CANn89iJD6ZYCBBT_qsgm_HJ5Xrups1evzp9ej=UYGP5sv6oG_A@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <686430091cc2_20bfeb294fc@willemb.c.googlers.com.notmuch>
 
-July 2, 2025 at 22:02, "Eric Dumazet" <edumazet@google.com> wrote:
+On 07/01, Willem de Bruijn wrote:
+> Stanislav Fomichev wrote:
+> > On 06/30, Willem de Bruijn wrote:
+> > > Stanislav Fomichev wrote:
+> > > > Commit cc34acd577f1 ("docs: net: document new locking reality")
+> > > > introduced netif_ vs dev_ function semantics: the former expects locked
+> > > > netdev, the latter takes care of the locking. We don't strictly
+> > > > follow this semantics on either side, but there are more dev_xxx handlers
+> > > > now that don't fit. Rename them to netif_xxx where appropriate.
+> > > > 
+> > > > netif_get_mac_address is used only by tun/tap, so move it into
+> > > > NETDEV_INTERNAL namespace.
+> > > > 
+> > > > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> > > > ---
+> > > >  drivers/net/tap.c         | 6 ++++--
+> > > >  drivers/net/tun.c         | 4 +++-
+> > > >  include/linux/netdevice.h | 2 +-
+> > > >  net/core/dev.c            | 4 ++--
+> > > >  net/core/dev_ioctl.c      | 3 ++-
+> > > >  net/core/net-sysfs.c      | 2 +-
+> > > >  6 files changed, 13 insertions(+), 8 deletions(-)
+> > > > 
+> > > > diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+> > > > index bdf0788d8e66..4c85770c809b 100644
+> > > > --- a/drivers/net/tap.c
+> > > > +++ b/drivers/net/tap.c
+> > > > @@ -28,6 +28,8 @@
+> > > >  
+> > > >  #include "tun_vnet.h"
+> > > >  
+> > > > +MODULE_IMPORT_NS("NETDEV_INTERNAL");
+> > > > +
+> > > >  #define TAP_IFFEATURES (IFF_VNET_HDR | IFF_MULTI_QUEUE)
+> > > >  
+> > > >  static struct proto tap_proto = {
+> > > > @@ -1000,8 +1002,8 @@ static long tap_ioctl(struct file *file, unsigned int cmd,
+> > > >  			return -ENOLINK;
+> > > >  		}
+> > > >  		ret = 0;
+> > > > -		dev_get_mac_address((struct sockaddr *)&ss, dev_net(tap->dev),
+> > > > -				    tap->dev->name);
+> > > > +		netif_get_mac_address((struct sockaddr *)&ss, dev_net(tap->dev),
+> > > > +				      tap->dev->name);
+> > > >  		if (copy_to_user(&ifr->ifr_name, tap->dev->name, IFNAMSIZ) ||
+> > > >  		    copy_to_user(&ifr->ifr_hwaddr, &ss, sizeof(ifr->ifr_hwaddr)))
+> > > >  			ret = -EFAULT;
+> > > > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> > > > index f8c5e2fd04df..4509ae68decf 100644
+> > > > --- a/drivers/net/tun.c
+> > > > +++ b/drivers/net/tun.c
+> > > > @@ -85,6 +85,8 @@
+> > > >  
+> > > >  #include "tun_vnet.h"
+> > > >  
+> > > > +MODULE_IMPORT_NS("NETDEV_INTERNAL");
+> > > > +
+> > > 
+> > > Thanks for giving this a go. Now that you've implemented it, does the
+> > > risk (of overlooking callers, mainly) indeed seem acceptable?
+> > > 
+> > > Documentation/core-api/symbol-namespaces.rst says
+> > > 
+> > >   It is advisable to add the MODULE_IMPORT_NS() statement close to other module
+> > >   metadata definitions like MODULE_AUTHOR() or MODULE_LICENSE().
+> > > 
+> > > No need to respin just for this from me. Something to consider,
+> > > especially if anything else comes up.
+> > 
+> > I put it at the top because it was at the top in bnxt. But it is
+> > at the top in bnxt is because the MODULE_LICENSE is there :-(
+> > Thanks for pointing it out, I'll definitely address that to be
+> > consistent.
+> >
+> > > Just curious, did you use the modpost and make nsdeps, or was it
+> > > sufficient to find the callers with tools like cscope and grep?
+> > 
+> > Only grep. I'm hoping the build bots will tell me if missed something.
+> 
+> SG.
+> 
+> One tradeoff with this series is that renaming and refactoring always
+> adds code churn that makes backports (e.g., to stable) more complex.
+> I trust that you weighted the pros and cons. We just need to be
+> careful to not encourage renaming series in general. Hence calling
+> that out right here :)
 
+Yeah, agreed, that why I'm only targeting the core<>driver api boundary.
+Which still might be, arguably, too much :-)
 
+> And, it's not trivial to review that the now netif_.. callees indeed
+> are holding the netdev locked (or RTNL). Does it make sense to add
+> lockdep_rtnl_is_held (or equivalent netdev lock) checks as part of
+> this series or follow-up? And the inverse for the dev_.. variants.
 
->=20
->=20On Wed, Jul 2, 2025 at 6:59 AM Eric Dumazet <edumazet@google.com> wro=
-te:
->=20
->=20>=20
->=20> On Wed, Jul 2, 2025 at 6:42 AM Jiayuan Chen <jiayuan.chen@linux.dev=
-> wrote:
-> >=20
->=20>  July 2, 2025 at 19:00, "Jiayuan Chen" <jiayuan.chen@linux.dev> wro=
-te:
-> >=20
->=20>  >
-> >=20
->=20>  > The calculation for the remaining space, 'copy =3D size_goal - s=
-kb->len',
-> >=20
->=20>  >
-> >=20
->=20>  > was prone to an integer promotion bug that prevented copy from e=
-ver being
-> >=20
->=20>  >
-> >=20
->=20>  > negative.
-> >=20
->=20>  >
-> >=20
->=20>  > The variable types involved are:
-> >=20
->=20>  >
-> >=20
->=20>  > copy: ssize_t (long)
-> >=20
->=20>  >
-> >=20
->=20>  > size_goal: int
-> >=20
->=20>  >
-> >=20
->=20>  > skb->len: unsigned int
-> >=20
->=20>  >
-> >=20
->=20>  > Due to C's type promotion rules, the signed size_goal is convert=
-ed to an
-> >=20
->=20>  >
-> >=20
->=20>  > unsigned int to match skb->len before the subtraction. The resul=
-t is an
-> >=20
->=20>  >
-> >=20
->=20>  > unsigned int.
-> >=20
->=20>  >
-> >=20
->=20>  > When this unsigned int result is then assigned to the s64 copy v=
-ariable,
-> >=20
->=20>  >
-> >=20
->=20>  > it is zero-extended, preserving its non-negative value. Conseque=
-ntly,
-> >=20
->=20>  >
-> >=20
->=20>  > copy is always >=3D 0.
-> >=20
->=20>  >
-> >=20
->=20>  To better explain this problem, consider the following example:
-> >=20
->=20>  '''
-> >=20
->=20>  #include <sys/types.h>
-> >=20
->=20>  #include <stdio.h>
-> >=20
->=20>  int size_goal =3D 536;
-> >=20
->=20>  unsigned int skblen =3D 1131;
-> >=20
->=20>  void main() {
-> >=20
->=20>  ssize_t copy =3D 0;
-> >=20
->=20>  copy =3D size_goal - skblen;
-> >=20
->=20>  printf("wrong: %zd\n", copy);
-> >=20
->=20>  copy =3D size_goal - (ssize_t)skblen;
-> >=20
->=20>  printf("correct: %zd\n", copy);
-> >=20
->=20>  return;
-> >=20
->=20>  }
-> >=20
->=20>  '''
-> >=20
->=20>  Output:
-> >=20
->=20>  '''
-> >=20
->=20>  wrong: 4294966701
-> >=20
->=20>  correct: -595
-> >=20
->=20>  '''
-> >=20
->=20>  Can you explain how one skb could have more bytes (skb->len) than =
-size_goal ?
-> >=20
->=20>  If we are under this condition, we already have a prior bug ?
-> >=20
->=20>  Please describe how you caught this issue.
-> >=20
->=20
-> Also, not sure why copy variable had to be changed from "int" to "ssize=
-_t"
->=20
->=20A nicer patch (without a cast) would be to make it an "int" again/
->
+Ack, let me double check whether adding more lockdep calls makes sense.
+We already have a bunch of them deep down in the call stack,
+that might be enough, not sure.
 
-I encountered this issue because I had tcp_repair enabled, which uses
-tcp_init_tso_segs to reset the MSS.
-However, it seems that tcp_bound_to_half_wnd also dynamically adjusts
-the value to be smaller than the current size_goal.
+> Aside from this high level points, overall series LGTM, thanks.
 
-Looking at the commit history, it's indeed unnecessary to define the
-copy variable as type ssize_t.
+Thank you for the review and feedback!
 
