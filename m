@@ -1,91 +1,52 @@
-Return-Path: <netdev+bounces-203288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7A2DAF122A
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:43:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D2CC5AF11D2
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:27:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D84841897038
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:43:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 481811C27025
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 222902580E4;
-	Wed,  2 Jul 2025 10:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q8oFkd6g"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54BB2242D9D;
+	Wed,  2 Jul 2025 10:27:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACCCF4C6E;
-	Wed,  2 Jul 2025 10:43:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9DBF17A2E6;
+	Wed,  2 Jul 2025 10:27:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751452999; cv=none; b=bx8Ip8R8BFxriCByQB+jS+p7MoNVuqWrmNW4RV5QecYLgwOsZXc2Vb0wa0HSSDaEV0YC4+hrEBPzvrk4U8sX6UK/pn30RngkkU2GSlRMUKDi6ZfuO8tR8w3NNBbhypitludwNBc0NkSre+1BXD6rf9/wamFs8YX+wdPIyIwKsGE=
+	t=1751452038; cv=none; b=fkKgu4suyJxdyEQRk50dTqLJtKRmK23DuiEpsJcZUYP4FIaoNrVSsYcGoEcOG2WAnwufxgccETzfvyGfiogCAFvY5Fz75XUa9TYiVpAe3wi/qCDAV01Q5WJlxSLAfslHo4D8wKlUFG3R/H1qXMGXcQ25HUzzWUNt+mQzZCn6St8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751452999; c=relaxed/simple;
-	bh=RHLJ9D48DllsGUWCN1uoEd21Mm8wSzcmeliizhoLpy4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bhncK0RyPPm74ClZgX75qC1rAF0Euqt67pcKvppeoihQe4T/J0quGgHMPvcG6PyBjD4+CoDrp+uixOobVQgzNpfMhBpR8zhnjLcO83AYKJUVhXSFQP6wp1olStjRYGVouNl/xiJjpjTstHhCdlIczB9IGlRVYPEwqnhvOPHafcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q8oFkd6g; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-747fc77bb2aso4044144b3a.3;
-        Wed, 02 Jul 2025 03:43:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751452997; x=1752057797; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zdPAwwrb4QJU2IWSSlyaWAnqCnTmtH2bZk+NO2oHIiA=;
-        b=Q8oFkd6g03X6+RJo05Oae/BwHM4IqRUWtDU9EXA4UEK/Txbv73ZOpzOTf/jH9yLQ29
-         QYVgY3VRNI+8QWPbRmE2drNQV9QJhhGwtbDmPrjiUl7yHpTp5JimZEV7nIAsR4t+WHq7
-         UAupONbSUc/ErwBawa6cMS3RztwM+ZO53E/S2k0l62JyTOJpatvDIK066VbAhkrS2Y0A
-         REmaIQHJmGpddE+JUP1g8WXEE50Z0Yu213Ml1jQiwog3QrpNTiKo3Ci14B/LdjPfWuZ2
-         UCoYe+3KuUipUd/RF+wr14K3VeK7OdA+FZ3yKoUypxgF/n7ehuLCgVAgs+gttSSGpWzG
-         StxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751452997; x=1752057797;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zdPAwwrb4QJU2IWSSlyaWAnqCnTmtH2bZk+NO2oHIiA=;
-        b=OF4/7pT4M1MR6iAboIK58hceMYFV+Ok82G46FVFoTE+hDhyFiOziJUSk9MhXBcPIiW
-         wCi7WKJz9z/tAPDMigDz0rqTh/L+NNeYc0hWcZtS/e5DtxOxJIKlGUnq+dxYrtkGuqSP
-         Y6o/at6g58zCiC4zmRm5h3GuH6JY8/LxlmGhrHxt1JBkLXjdjdffm0nrDPhxF9p9tgX+
-         vLSziH207QD0UN4vi5+xehGb19kGEM1wPey2fg941LS/YX8xRD2kZFJcQY6N5rfQJ2sz
-         s1NYGesNSB0upnDhC2XV6ooFAPN5nM63MlH11ZbHAdhlCzgDde5KYdSvLZPxAPlPwRZK
-         I+lA==
-X-Forwarded-Encrypted: i=1; AJvYcCUKpUShm5E8lgmIIMPNn/tUG6aWvqK2UbugzdPuWppZR3f9rfYyuwIXYtuomichmWNW15M3GvwAxNsN5QCdTQM=@vger.kernel.org, AJvYcCUcSddts3HLE/BDmDXYwnBVbmhVDglQlB61G6RlUoYM5JJjvjSH27HGnWLZ7NXHnpJX0EVYAxHY@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5AGIyvPXm2fsK2yNIHI+x/XdzQO2491m/QZcOz7oWMGe7h91l
-	U7E+pAPJZVYMHWKw8OX+p/+4okXSGeGtxUkU4Fz1vly6CuHTU8kXbrez
-X-Gm-Gg: ASbGncvu04x1jra8JC9al47BsCTelL6b35sxwPreuGx/OFdk1fbbtJ2vdrGPBTRBO01
-	h547Y+m+CyHdt83lkORZtXYcZXNVELCt0hm8p5+qFTyEcMDzc7I4fLajUZoTm8Sq6OV3WsNU4r4
-	m5S0h2kU6abnlHaZHETXNNsXgeQSRf/Il/TzNY73V4ZL/29SvSA31teiO8hy4aagg5jhzbrc63s
-	ftaJaMDHxcZO2Fl5KVgzN0BdM2oF0KrlReA48x4ao8ma7gOcDTq5V0wBJOfz1P2SQkR5XkRUFc0
-	d1NHFSShNjd9UDQ6/TYKMrEJMH2/JRudzYQ+LXhkihBUNFZv29g=
-X-Google-Smtp-Source: AGHT+IEeiHFvgdgKJjn0wBnclG5KXDNWT8Pp2yzRR3R/ETtmSUop97FYezDUkFO3sL3XSJBZmVb8HA==
-X-Received: by 2002:a05:6a20:3ca3:b0:222:1802:2ddb with SMTP id adf61e73a8af0-222d7dc4e64mr5025821637.8.1751452996777;
-        Wed, 02 Jul 2025 03:43:16 -0700 (PDT)
-Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74af54099besm14064227b3a.9.2025.07.02.03.43.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 03:43:16 -0700 (PDT)
-From: Taehee Yoo <ap420073@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	shuah@kernel.org,
-	almasrymina@google.com,
-	sdf@fomichev.me,
-	jdamato@fastly.com,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: ap420073@gmail.com
-Subject: [PATCH v2 net-next] selftests: devmem: configure HDS threshold
-Date: Wed,  2 Jul 2025 10:42:49 +0000
-Message-Id: <20250702104249.1665034-1-ap420073@gmail.com>
+	s=arc-20240116; t=1751452038; c=relaxed/simple;
+	bh=VwCvQamL3OLboOtaKpp5/6Nma/BoEDweaCfWoWZixfc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rRlbgpcOBZdavtmlREtiunbg6SObVUwnUK6FkDErNInBYBI/exjQ0ZUmlrfX+Kg/issklUMu0T4LtZoM/WTGEfJWVk5y/3evaWM4HbIrXyUBnOXE2YN7vUkDJ0UUz/sJECanM3343325aDg7LOkvz89U8JEPanX8JxSiL69yrqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bXGHp59Cxz2BdVx;
+	Wed,  2 Jul 2025 18:25:26 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id 99D4C180042;
+	Wed,  2 Jul 2025 18:27:12 +0800 (CST)
+Received: from huawei.com (10.175.124.27) by dggpemf500016.china.huawei.com
+ (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 2 Jul
+ 2025 18:27:11 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
+CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<wangliang74@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next] net: replace ADDRLABEL with dynamic debug
+Date: Wed, 2 Jul 2025 18:44:17 +0800
+Message-ID: <20250702104417.1526138-1-wangliang74@huawei.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -94,51 +55,109 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-The devmem TCP requires the hds-thresh value to be 0, but it doesn't
-change it automatically.
-Therefore, make configure_headersplit() sets hds-thresh value to 0.
+ADDRLABEL only works when it was set in compilation phase. Replace it with
+net_dbg_ratelimited().
 
-Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
 ---
+ net/ipv6/addrlabel.c | 32 +++++++++++---------------------
+ 1 file changed, 11 insertions(+), 21 deletions(-)
 
-v2:
- - Do not implement configure_hds_thresh().
- - Make configure_headersplit() sets hds-thresh to 0.
-
- tools/testing/selftests/drivers/net/hw/ncdevmem.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-index cc9b40d9c5d5..52b72de11e3b 100644
---- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-+++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-@@ -331,6 +331,12 @@ static int configure_headersplit(bool on)
- 	ret = ethtool_rings_set(ys, req);
- 	if (ret < 0)
- 		fprintf(stderr, "YNL failed: %s\n", ys->err.msg);
-+	if (on) {
-+		ethtool_rings_set_req_set_hds_thresh(req, 0);
-+		ret = ethtool_rings_set(ys, req);
-+		if (ret < 0)
-+			fprintf(stderr, "YNL failed: %s\n", ys->err.msg);
-+	}
- 	ethtool_rings_set_req_free(req);
+diff --git a/net/ipv6/addrlabel.c b/net/ipv6/addrlabel.c
+index fb63ffbcfc64..567efd626ab4 100644
+--- a/net/ipv6/addrlabel.c
++++ b/net/ipv6/addrlabel.c
+@@ -20,12 +20,6 @@
+ #include <linux/netlink.h>
+ #include <linux/rtnetlink.h>
  
- 	if (ret == 0) {
-@@ -338,9 +344,12 @@ static int configure_headersplit(bool on)
- 		ethtool_rings_get_req_set_header_dev_index(get_req, ifindex);
- 		get_rsp = ethtool_rings_get(ys, get_req);
- 		ethtool_rings_get_req_free(get_req);
--		if (get_rsp)
-+		if (get_rsp) {
- 			fprintf(stderr, "TCP header split: %s\n",
- 				tcp_data_split_str(get_rsp->tcp_data_split));
-+			fprintf(stderr, "HDS threshold: %u\n",
-+				get_rsp->hds_thresh);
-+		}
- 		ethtool_rings_get_rsp_free(get_rsp);
- 	}
+-#if 0
+-#define ADDRLABEL(x...) printk(x)
+-#else
+-#define ADDRLABEL(x...) do { ; } while (0)
+-#endif
+-
+ /*
+  * Policy Table
+  */
+@@ -150,8 +144,8 @@ u32 ipv6_addr_label(struct net *net,
+ 	label = p ? p->label : IPV6_ADDR_LABEL_DEFAULT;
+ 	rcu_read_unlock();
+ 
+-	ADDRLABEL(KERN_DEBUG "%s(addr=%pI6, type=%d, ifindex=%d) => %08x\n",
+-		  __func__, addr, type, ifindex, label);
++	net_dbg_ratelimited("%s(addr=%pI6, type=%d, ifindex=%d) => %08x\n", __func__, addr, type,
++			    ifindex, label);
+ 
+ 	return label;
+ }
+@@ -164,8 +158,8 @@ static struct ip6addrlbl_entry *ip6addrlbl_alloc(const struct in6_addr *prefix,
+ 	struct ip6addrlbl_entry *newp;
+ 	int addrtype;
+ 
+-	ADDRLABEL(KERN_DEBUG "%s(prefix=%pI6, prefixlen=%d, ifindex=%d, label=%u)\n",
+-		  __func__, prefix, prefixlen, ifindex, (unsigned int)label);
++	net_dbg_ratelimited("%s(prefix=%pI6, prefixlen=%d, ifindex=%d, label=%u)\n", __func__,
++			    prefix, prefixlen, ifindex, (unsigned int)label);
+ 
+ 	addrtype = ipv6_addr_type(prefix) & (IPV6_ADDR_MAPPED | IPV6_ADDR_COMPATv4 | IPV6_ADDR_LOOPBACK);
+ 
+@@ -207,8 +201,7 @@ static int __ip6addrlbl_add(struct net *net, struct ip6addrlbl_entry *newp,
+ 	struct hlist_node *n;
+ 	int ret = 0;
+ 
+-	ADDRLABEL(KERN_DEBUG "%s(newp=%p, replace=%d)\n", __func__, newp,
+-		  replace);
++	net_dbg_ratelimited("%s(newp=%p, replace=%d)\n", __func__, newp, replace);
+ 
+ 	hlist_for_each_entry_safe(p, n,	&net->ipv6.ip6addrlbl_table.head, list) {
+ 		if (p->prefixlen == newp->prefixlen &&
+@@ -247,9 +240,8 @@ static int ip6addrlbl_add(struct net *net,
+ 	struct ip6addrlbl_entry *newp;
+ 	int ret = 0;
+ 
+-	ADDRLABEL(KERN_DEBUG "%s(prefix=%pI6, prefixlen=%d, ifindex=%d, label=%u, replace=%d)\n",
+-		  __func__, prefix, prefixlen, ifindex, (unsigned int)label,
+-		  replace);
++	net_dbg_ratelimited("%s(prefix=%pI6, prefixlen=%d, ifindex=%d, label=%u, replace=%d)\n",
++			    __func__, prefix, prefixlen, ifindex, (unsigned int)label, replace);
+ 
+ 	newp = ip6addrlbl_alloc(prefix, prefixlen, ifindex, label);
+ 	if (IS_ERR(newp))
+@@ -271,8 +263,8 @@ static int __ip6addrlbl_del(struct net *net,
+ 	struct hlist_node *n;
+ 	int ret = -ESRCH;
+ 
+-	ADDRLABEL(KERN_DEBUG "%s(prefix=%pI6, prefixlen=%d, ifindex=%d)\n",
+-		  __func__, prefix, prefixlen, ifindex);
++	net_dbg_ratelimited("%s(prefix=%pI6, prefixlen=%d, ifindex=%d)\n", __func__, prefix,
++			    prefixlen, ifindex);
+ 
+ 	hlist_for_each_entry_safe(p, n, &net->ipv6.ip6addrlbl_table.head, list) {
+ 		if (p->prefixlen == prefixlen &&
+@@ -294,8 +286,8 @@ static int ip6addrlbl_del(struct net *net,
+ 	struct in6_addr prefix_buf;
+ 	int ret;
+ 
+-	ADDRLABEL(KERN_DEBUG "%s(prefix=%pI6, prefixlen=%d, ifindex=%d)\n",
+-		  __func__, prefix, prefixlen, ifindex);
++	net_dbg_ratelimited("%s(prefix=%pI6, prefixlen=%d, ifindex=%d)\n", __func__, prefix,
++			    prefixlen, ifindex);
+ 
+ 	ipv6_addr_prefix(&prefix_buf, prefix, prefixlen);
+ 	spin_lock(&net->ipv6.ip6addrlbl_table.lock);
+@@ -312,8 +304,6 @@ static int __net_init ip6addrlbl_net_init(struct net *net)
+ 	int err;
+ 	int i;
+ 
+-	ADDRLABEL(KERN_DEBUG "%s\n", __func__);
+-
+ 	spin_lock_init(&net->ipv6.ip6addrlbl_table.lock);
+ 	INIT_HLIST_HEAD(&net->ipv6.ip6addrlbl_table.head);
  
 -- 
 2.34.1
