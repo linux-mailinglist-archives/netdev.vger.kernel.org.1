@@ -1,124 +1,130 @@
-Return-Path: <netdev+bounces-203439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DA6FAF5F33
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 18:55:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ED72AF5F46
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 18:58:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B4194A718B
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 16:53:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2498E3BD2DA
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 16:58:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113292EF65A;
-	Wed,  2 Jul 2025 16:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D58CC2ED870;
+	Wed,  2 Jul 2025 16:58:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mKlMaTth"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RSHOxZEC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5533289E30;
-	Wed,  2 Jul 2025 16:53:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376831DACB1;
+	Wed,  2 Jul 2025 16:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751475237; cv=none; b=skSJO3bENTs8mBBJZn7c19QGmLCJg5r6GYqjzfdtB3/e9tbjJB3K7kLpZWrO6GLx3lUHGd+Zxa747LnA65nvbUiz7jbqq4y7FRkbTApp/KFiAXrhYhXD8dfEl7k2HlXr0KvKaYW1NVj2F098wThQ/v1vzqChJmh1uEdacibtT9g=
+	t=1751475523; cv=none; b=VeLAEoVIPmjVocnKBzgeqw4C27CKF2U7n0td0kFpWchCMNq3QvwEo3WJLWmg82IjIWTk5mpODMRmnVbtp6h3r6aR1LAbKKlpUljreKdzrf80DvDqgw3ODnFj8P6TcspzQOkQ4UecD4IgJjMJ3iAoSSEAFTooU6aor0aYkce1fcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751475237; c=relaxed/simple;
-	bh=SPe4Uai1bMQkO9HlAyYOM9wfRpZK1LE+tL6F2AD8u1I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YU50kBNlwviTyW/2W+0qHAkTaE+NhsPR8SBFVB6Onv5WNfNENyseoV0rWhedxojf50kJcvjN1jD4b53uF3aOhxb8MJhZm38tqQitUDZnhcH3c8yUBfijNDyQWC0pkpttfFzFF9gjiFrA18Yk8VfFiq69WNvfWpewV76iRnOt8Bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mKlMaTth; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DE08C4CEE7;
-	Wed,  2 Jul 2025 16:53:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751475236;
-	bh=SPe4Uai1bMQkO9HlAyYOM9wfRpZK1LE+tL6F2AD8u1I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mKlMaTth9qVjFXD1OrmZjGPDo89B+QjHzvGZv11qCVAmnmt/fVk1mV1FCiB8JKdNf
-	 D6Vro1jZ4YN3ADYJXKWzZZ0cMndBt84UGCpSFWW6ygeTgBzpcY3zazVZgGcp/pOmZn
-	 ogalxEGv0qRjivDYljIcQikdjDt35QapyEsoKDEDNgjC1H5OZtoSx8r+0M/n89FHhv
-	 0FYBMICOQWnsCj5jPKwA8Rc/Eab0BMqBGNMlX10Iu1ef++FnlKUjF7Yzo+gSzkKtv1
-	 iie6R/1OsgeHiMDbSfpx/RKVgdJAKwTyD8furAM25FZyQPwLA+Gzt81wBv3ZltyBeM
-	 R/NPEBCybHM9g==
-Date: Wed, 2 Jul 2025 11:53:55 -0500
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Matthew Gerlach <matthew.gerlach@altera.com>
-Cc: netdev@vger.kernel.org, maxime.chevallier@bootlin.com,
-	Mun Yew Tham <mun.yew.tham@altera.com>, davem@davemloft.net,
-	richardcochran@gmail.com, linux-arm-kernel@lists.infradead.org,
-	pabeni@redhat.com, krzk+dt@kernel.org, devicetree@vger.kernel.org,
-	kuba@kernel.org, linux-kernel@vger.kernel.org,
-	alexandre.torgue@foss.st.com, andrew+netdev@lunn.ch,
-	conor+dt@kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	dinguyen@kernel.org, edumazet@google.com, mcoquelin.stm32@gmail.com
-Subject: Re: [PATCH v7] dt-bindings: net: Convert socfpga-dwmac bindings to
- yaml
-Message-ID: <175147523465.1908626.13539013933475728908.robh@kernel.org>
-References: <20250630213748.71919-1-matthew.gerlach@altera.com>
+	s=arc-20240116; t=1751475523; c=relaxed/simple;
+	bh=/ef4CrFmebCh1AqCX+/iSl6DfpNGDmZ7ZDGmWGiqK8E=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=g6UMd/sigIs/vdgQBAp3j95EUyNe5TRv6wbGdfMecyVgpDzqoPArQiQfnrQ2P2EP1dLQCcqF/+c1WbsdjWUDQjHY6EvVQntDpyCbAygYQ9z8pEqMr7vFJU3a3mSXLm/Il04O37vc8pcybbiCzzqIEcZmwSMFfI0HJjZEtCkChLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RSHOxZEC; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751475523; x=1783011523;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=/ef4CrFmebCh1AqCX+/iSl6DfpNGDmZ7ZDGmWGiqK8E=;
+  b=RSHOxZECzkePmjIkf3SuP9X5TEBl+oECLEC79f5PVMK1N5WIb6anjXO9
+   QgR/UWIoUKXan33D/1ES2AR1dzyAh8qfcIBOTpbO1oRDOete+fUY1Z0tf
+   SRORQKrZIy6cIy35AxgI+mWlsYxBlEt2RPZ3im6MJbkEuLTZEAmfHVaLv
+   ReNKIdjXkq2LnzySjZLjIRC0JYOc0c+iJXQbRNqOLcnlDida/4Grgf+CC
+   JnKGyis3p9OBRAuR9+7y6sLErUY3+hftwg/04jiby+yUGdKiYXIZgVyJC
+   +CF9uVpmFjg1RkIaszybWy8msNgImev0uGG5/DGpqTYbjRbZY2tQpUE9v
+   Q==;
+X-CSE-ConnectionGUID: VLW5SnE8SsCw5SwEiV+5xg==
+X-CSE-MsgGUID: 3vB3Ur6QTcKnb3LBM+utVw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11482"; a="65132604"
+X-IronPort-AV: E=Sophos;i="6.16,281,1744095600"; 
+   d="scan'208";a="65132604"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2025 09:58:42 -0700
+X-CSE-ConnectionGUID: AZcKulOWRi+cKuI+6SBM1A==
+X-CSE-MsgGUID: aYFH497xR6ehS/lwI7YwMQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,281,1744095600"; 
+   d="scan'208";a="153538515"
+Received: from p12ill20yoongsia.png.intel.com ([10.88.227.38])
+  by orviesa010.jf.intel.com with ESMTP; 02 Jul 2025 09:58:35 -0700
+From: Song Yoong Siang <yoong.siang.song@intel.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>,
+	Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH bpf-next,v3 0/2] Clarify and Enhance XDP Rx Metadata Handling
+Date: Thu,  3 Jul 2025 00:57:55 +0800
+Message-Id: <20250702165757.3278625-1-yoong.siang.song@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250630213748.71919-1-matthew.gerlach@altera.com>
+Content-Transfer-Encoding: 8bit
 
+This patch set improves the documentation and selftests for XDP Rx metadata
+handling. The first patch clarifies the documentation around XDP metadata
+layout and METADATA_SIZE. The second patch enhances the BPF selftests to
+make XDP metadata handling more robust across different NICs.
 
-On Mon, 30 Jun 2025 14:37:48 -0700, Matthew Gerlach wrote:
-> Convert the bindings for socfpga-dwmac to yaml. Since the original
-> text contained descriptions for two separate nodes, two separate
-> yaml files were created.
-> 
-> Signed-off-by: Mun Yew Tham <mun.yew.tham@altera.com>
-> Signed-off-by: Matthew Gerlach <matthew.gerlach@altera.com>
-> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> ---
-> v7:
->  - Add compatible definition for Arria10.
->  - Update iommus to maxItems: 2.
-> 
-> v6:
->  - Fix reference to altr,gmii-to-sgmii-2.0.yaml in MAINTAINERS.
->  - Add Reviewed-by:
-> 
-> v5:
->  - Fix dt_binding_check error: comptabile.
->  - Rename altr,gmii-to-sgmii.yaml to altr,gmii-to-sgmii-2.0.yaml
-> 
-> v4:
->  - Change filename from socfpga,dwmac.yaml to altr,socfpga-stmmac.yaml.
->  - Updated compatible in select properties and main properties.
->  - Fixed clocks so stmmaceth clock is required.
->  - Added binding for altr,gmii-to-sgmii.
->  - Update MAINTAINERS.
-> 
-> v3:
->  - Add missing supported phy-modes.
-> 
-> v2:
->  - Add compatible to required.
->  - Add descriptions for clocks.
->  - Add clock-names.
->  - Clean up items: in altr,sysmgr-syscon.
->  - Change "additionalProperties: true" to "unevaluatedProperties: false".
->  - Add properties needed for "unevaluatedProperties: false".
->  - Fix indentation in examples.
->  - Drop gmac0: label in examples.
->  - Exclude support for Arria10 that is not validating.
-> ---
->  .../bindings/net/altr,gmii-to-sgmii-2.0.yaml  |  49 ++++++
->  .../bindings/net/altr,socfpga-stmmac.yaml     | 166 ++++++++++++++++++
->  .../devicetree/bindings/net/socfpga-dwmac.txt |  57 ------
->  MAINTAINERS                                   |   7 +-
->  4 files changed, 221 insertions(+), 58 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/net/altr,gmii-to-sgmii-2.0.yaml
->  create mode 100644 Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml
->  delete mode 100644 Documentation/devicetree/bindings/net/socfpga-dwmac.txt
-> 
+Prior to this patch set, the XDP program might accidentally overwrite the
+device-reserved metadata.
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+V3:
+  - update doc and commit msg accordingly.
+
+V2: https://lore.kernel.org/netdev/20250702030349.3275368-1-yoong.siang.song@intel.com/
+  - unconditionally do bpf_xdp_adjust_meta with -XDP_METADATA_SIZE (Stanislav)
+
+V1: https://lore.kernel.org/netdev/20250701042940.3272325-1-yoong.siang.song@intel.com/
+
+Song Yoong Siang (2):
+  doc: enhance explanation of XDP Rx metadata layout and METADATA_SIZE
+  selftests/bpf: Enhance XDP Rx metadata handling
+
+ Documentation/networking/xdp-rx-metadata.rst  | 36 +++++++++++++++----
+ .../selftests/bpf/prog_tests/xdp_metadata.c   |  2 +-
+ .../selftests/bpf/progs/xdp_hw_metadata.c     |  2 +-
+ .../selftests/bpf/progs/xdp_metadata.c        |  2 +-
+ tools/testing/selftests/bpf/xdp_hw_metadata.c |  2 +-
+ tools/testing/selftests/bpf/xdp_metadata.h    |  7 ++++
+ 6 files changed, 41 insertions(+), 10 deletions(-)
+
+-- 
+2.34.1
 
 
