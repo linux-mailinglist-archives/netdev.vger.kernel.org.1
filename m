@@ -1,131 +1,120 @@
-Return-Path: <netdev+bounces-203502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CC32AF62B3
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 21:33:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC5E4AF6283
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 21:18:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65B2A161016
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 19:33:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 927867AA318
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 19:16:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 839652E03F8;
-	Wed,  2 Jul 2025 19:32:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D36422F7CFD;
+	Wed,  2 Jul 2025 19:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="U27uauSu"
 X-Original-To: netdev@vger.kernel.org
-Received: from trager.us (trager.us [52.5.81.116])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009A71C07C3;
-	Wed,  2 Jul 2025 19:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.5.81.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401F62F7D1F
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 19:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751484777; cv=none; b=WwtsHkhfct1AhpOSgHCff1l/8UKT+CMz9iXt7VaEZlAT9+GYQ6TYCFDagCXqDiMM08jX3Uo864YSymfZsYTaHL15xXsYEAKeR1YMVT3xh3zitoiy0P2RlqRP9371vxKc9MCrpPPHWbgKGk9G+0NkZZw0tK4aTj+OfiSKUetsfIs=
+	t=1751483890; cv=none; b=Bmno2edVe8rbESZFr3UC4IEbcglsFBApFTT7xlhaHumgpKJQhVDMrG5vDh+HkESsqA50H38ZsqeOIoW0edYiz0UJPjo92XQbzI8LMP+f6D868LKzSqcGGThFGLNSGZQBXEbkDQHeqES3uxQTun9aWUs/f8e8+kmScZH1iRNvMWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751484777; c=relaxed/simple;
-	bh=OTJq42Qkwhx1ePJXn5n7/Ct+lnb367awCNBOaQN5OIE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mr7+Fj8twjZOUkEPRFxRR3q3gG5/4jQZ5WTJpK+Q/ux1ummPHOj5g3yCsniYbxt6BLGZaOlUFa2S3q5DCL0DY9E4Et3wOBKPRzjfajG59XTwSbgc/D04/yzCgGr9stpmvP93SNanouYZxRXRp2oht4X6nnZdnb98/211llsY9ZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=trager.us; spf=pass smtp.mailfrom=trager.us; arc=none smtp.client-ip=52.5.81.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=trager.us
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trager.us
-Received: from c-76-104-255-50.hsd1.wa.comcast.net ([76.104.255.50] helo=localhost)
-	by trager.us with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92.3)
-	(envelope-from <lee@trager.us>)
-	id 1uX3CK-00082Y-2T; Wed, 02 Jul 2025 19:32:48 +0000
-From: Lee Trager <lee@trager.us>
-To: Alexander Duyck <alexanderduyck@fb.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	kernel-team@meta.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1751483890; c=relaxed/simple;
+	bh=I6ujcxcF/NbT6fX1yq4Bb5wFObPVExVItAn9msWNl/8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=txM3ItDGhUiyAhiuWB6Ei0U3veYgWOvGEQSz0N7lrhtpzJ3/NMxIHgL/a15HoFXMmmjAXbKn/YpZ8WgNPPLtDxXT1PaNzTfP/ZHDgYw34+9BR4Cr5hKK6wmoO1Es5xosf/1haXTy5lDdZz+F3PtK/a3rwnTuGORH1R97qvdVnLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=U27uauSu; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=cROEizyYEhT1ZzF4lcKLDdkzX7FxmK9SvKDTB3Kex44=; b=U27uauSusKqT9GBDL2QT3mM+Dn
+	CWnNRJMtoNEY3zAT7rWw1xCROd2IAj3Tx4lG3kjhKhjbN8nWGwXTd4jLzBkvCffNExZGeq6V7tk3D
+	rOL+sjZo5Qvja7S7C/8fzXqt16i4LQ1cXTF7vrPgPE5RjprtwXud5x5WmKkOQKBMc/AUIShuHcyVG
+	Dxy08XZm0LW1hlkWB8uhfxTJb/QgSgqT9/U1eww1tEfAL67qX2O+FA3+C4UfUblLFc7dBjR29fDsg
+	/HLTjZjHOWrL7aGlBnKhgxBj0C9EkQ8dg6OJPCpVP+zVZdWE8WrBz5toRVs7F1UQR3JecykRqC+Jl
+	JK/xbQSw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47714)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uX2y1-000888-0o;
+	Wed, 02 Jul 2025 20:18:01 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uX2xx-0004Jx-26;
+	Wed, 02 Jul 2025 20:17:57 +0100
+Date: Wed, 2 Jul 2025 20:17:57 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Sanman Pradhan <sanman.p211993@gmail.com>,
-	Mohsin Bashir <mohsin.bashr@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Su Hui <suhui@nfschina.com>,
-	Simon Horman <horms@kernel.org>,
-	Lee Trager <lee@trager.us>,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH net-next 6/6] eth: fbnic: Create fw_log file in DebugFS
-Date: Wed,  2 Jul 2025 12:12:12 -0700
-Message-ID: <20250702192207.697368-7-lee@trager.us>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250702192207.697368-1-lee@trager.us>
-References: <20250702192207.697368-1-lee@trager.us>
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 3/3] net: phylink: add
+ phylink_sfp_select_interface_speed()
+Message-ID: <aGWF5Wee3vfoFtMj@shell.armlinux.org.uk>
+References: <aGT_hoBELDysGbrp@shell.armlinux.org.uk>
+ <E1uWu14-005KXo-IO@rmk-PC.armlinux.org.uk>
+ <20250702151426.0d25a4ac@fedora.home>
+ <aGU2C3ipj8UmKHq_@shell.armlinux.org.uk>
+ <CAKgT0UcWGH14B0zZnpHeJKw+5VU96LHFR1vR4CXVjqM10iBJSg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKgT0UcWGH14B0zZnpHeJKw+5VU96LHFR1vR4CXVjqM10iBJSg@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Allow reading the firmware log in DebugFS by accessing the fw_log file.
-Buffer is read while a spinlock is acquired.
+On Wed, Jul 02, 2025 at 11:07:52AM -0700, Alexander Duyck wrote:
+> On Wed, Jul 2, 2025 at 6:37 AM Russell King (Oracle)
+> <linux@armlinux.org.uk> wrote:
+> >
+> > On Wed, Jul 02, 2025 at 03:14:26PM +0200, Maxime Chevallier wrote:
+> > > On Wed, 02 Jul 2025 10:44:34 +0100
+> > > "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
+> > >
+> > > > Add phylink_sfp_select_interface_speed() which attempts to select the
+> > > > SFP interface based on the ethtool speed when autoneg is turned off.
+> > > > This allows users to turn off autoneg for SFPs that support multiple
+> > > > interface modes, and have an appropriate interface mode selected.
+> > > >
+> > > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > >
+> > > Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > >
+> > > I don't have any hardware to perform relevant tests on this :(
+> >
+> > Me neither, I should've said. I'd like to see a t-b from
+> > Alexander Duyck who originally had the problem before this is
+> > merged.
+> 
+> It will probably be several days before I can get around to testing it
+> since I am slammed with meetings most of the next two days, then have
+> a holiday weekend coming up.
 
-Signed-off-by: Lee Trager <lee@trager.us>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- .../net/ethernet/meta/fbnic/fbnic_debugfs.c   | 29 +++++++++++++++++++
- 1 file changed, 29 insertions(+)
+I, too, have a vacation - from tomorrow for three weeks. I may dip in
+and out of kernel emails during that period, but it depends what
+happens each day.
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_debugfs.c b/drivers/net/ethernet/meta/fbnic/fbnic_debugfs.c
-index e8f2d7f2d962..b7238dd967fe 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_debugfs.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_debugfs.c
-@@ -170,6 +170,33 @@ static int fbnic_dbg_ipo_dst_show(struct seq_file *s, void *v)
- }
- DEFINE_SHOW_ATTRIBUTE(fbnic_dbg_ipo_dst);
-
-+static int fbnic_dbg_fw_log_show(struct seq_file *s, void *v)
-+{
-+	struct fbnic_dev *fbd = s->private;
-+	struct fbnic_fw_log_entry *entry;
-+	unsigned long flags;
-+
-+	if (!fbnic_fw_log_ready(fbd))
-+		return -ENXIO;
-+
-+	spin_lock_irqsave(&fbd->fw_log.lock, flags);
-+
-+	list_for_each_entry_reverse(entry, &fbd->fw_log.entries, list) {
-+		seq_printf(s, FBNIC_FW_LOG_FMT, entry->index,
-+			   (entry->timestamp / (MSEC_PER_SEC * 60 * 60 * 24)),
-+			   (entry->timestamp / (MSEC_PER_SEC * 60 * 60)) % 24,
-+			   ((entry->timestamp / (MSEC_PER_SEC * 60) % 60)),
-+			   ((entry->timestamp / MSEC_PER_SEC) % 60),
-+			   (entry->timestamp % MSEC_PER_SEC),
-+			   entry->msg);
-+	}
-+
-+	spin_unlock_irqrestore(&fbd->fw_log.lock, flags);
-+
-+	return 0;
-+}
-+DEFINE_SHOW_ATTRIBUTE(fbnic_dbg_fw_log);
-+
- static int fbnic_dbg_pcie_stats_show(struct seq_file *s, void *v)
- {
- 	struct fbnic_dev *fbd = s->private;
-@@ -222,6 +249,8 @@ void fbnic_dbg_fbd_init(struct fbnic_dev *fbd)
- 			    &fbnic_dbg_ipo_src_fops);
- 	debugfs_create_file("ipo_dst", 0400, fbd->dbg_fbd, fbd,
- 			    &fbnic_dbg_ipo_dst_fops);
-+	debugfs_create_file("fw_log", 0400, fbd->dbg_fbd, fbd,
-+			    &fbnic_dbg_fw_log_fops);
- }
-
- void fbnic_dbg_fbd_exit(struct fbnic_dev *fbd)
---
-2.47.1
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
