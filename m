@@ -1,290 +1,223 @@
-Return-Path: <netdev+bounces-203212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C187AF0C53
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:17:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE770AF0C5A
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:18:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD3EC7AF309
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 07:16:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 572ED442086
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 07:18:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D7FA223DF0;
-	Wed,  2 Jul 2025 07:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BE4C223DCD;
+	Wed,  2 Jul 2025 07:18:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hPoPhMew"
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="dDhi9dkv"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EFF7201261;
-	Wed,  2 Jul 2025 07:17:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C00232C85
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 07:18:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751440643; cv=none; b=C/KvEqxpiowv/l6N+KLEy/xziDK95KKsn3DChtyPl2BXNMTnbcqUHwAyux/g2gcoFJGH3ggTH1PVL4RbAe5U9cVXuAdsuBaW1TAY+9PhZi2ujYmx3KW/89gB/cO4tYWkqq4zJZp53SCoQiyHeYmDwU+sWnFNM0qPHUsfs/Pru+s=
+	t=1751440705; cv=none; b=mmwA9TmpvaW6m+E5MYJJGLMJ+1CZ7dv5EQH8KrjsXklZw0g/5ezvKNf78Plbl8bpQU+EQImxNRDycDeYuhdfMiF9r0zevY1BuHEKJJaBtDaOOSopSfgFogfpVBOou6mSlZDPqUpqi9y7WRXUf+UOXI7PtCM1gLAjL77q2hpi65k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751440643; c=relaxed/simple;
-	bh=LSExucKZe0mtwwHTf3y56VWlUEakHL74/OJzWDFLcJU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Di9+sxzxpuFHd6eNlK/eSR5VKI8Byj3cKyPWEszu2XXkKHIEzZs3tp4JcalCcO4ST5YK701zasRON/ZknOQEVjOX0ofsSPqEoGcZ8WoqGG5lac9SHlGyi9ocEHj3J9Kc7T7PtHAQ70AbmavgZuygKsrCVLoBkCDNUvQSSnVw/4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hPoPhMew; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A85F841DF1;
-	Wed,  2 Jul 2025 07:17:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1751440633;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7SFgR9s1yj+x64xIhs3vXUk9wLToSRANqG6/nyrw1DA=;
-	b=hPoPhMewJQweoHwYO4sqNASE9CzWou7I3Wgj6uAz6MZuXpv/hlIppiL7o4PqMX936lWsgX
-	5QO2qBBwFrLWUnIgrk5xvC9XzoI7xYf8SCWrz+3OngrB9NDfmvTC+Z8hyaMTSkY9LxkFOe
-	HMSRWCKAlbKrGIHaF1JC5VYaLe6Ik2CyTK2ujSpunLoGZPtytBJE1ws/ISdh7efmKEwhRA
-	zMxDYBhuGg70deDJmG+fSC8aV4oRU00idfkloFns4XOqP53SKJAEnX8LZvBd55cAaaN1j4
-	V+9sQkl2g5hJX6QU9ysJ8rX/rugg04aR64O18mJLe7girCTTDnpXq98WKJ5Z5g==
-Date: Wed, 2 Jul 2025 09:17:08 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Vivian Wang <wangruikang@iscas.ac.cn>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>, Philipp Zabel
- <p.zabel@pengutronix.de>, Paul Walmsley <paul.walmsley@sifive.com>, Palmer
- Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, Alexandre
- Ghiti <alex@ghiti.fr>, Vivian Wang <uwu@dram.page>, Lukas Bulwahn
- <lukas.bulwahn@redhat.com>, Geert Uytterhoeven <geert+renesas@glider.be>,
- Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 2/5] net: spacemit: Add K1 Ethernet MAC
-Message-ID: <20250702091708.7d459213@fedora.home>
-In-Reply-To: <20250702-net-k1-emac-v3-2-882dc55404f3@iscas.ac.cn>
-References: <20250702-net-k1-emac-v3-0-882dc55404f3@iscas.ac.cn>
-	<20250702-net-k1-emac-v3-2-882dc55404f3@iscas.ac.cn>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1751440705; c=relaxed/simple;
+	bh=JxKrKEmLuA06NTeYWvo0wUyOPesaHES8pzAXeO2ZKPM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=peSj8d9lthWra3DMnK6jJ44d0lotRPg2ucTUUOixKpwnslz2ghDKbd+GCtTtKGlIFv3CCXjj+hsIjl0D7QvgwNYEDXN2U4XD8b82FjVSvGbOk5HC13CH0l0CNQREc2lA1eyzzMqv9V9gRwoqXWL0D0U4D/OPRsPPSCGlsaCO870=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=dDhi9dkv; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-234b440afa7so65835565ad.0
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 00:18:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1751440703; x=1752045503; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Iy7H0ZYdtRQl4Da1EmIyCQoTQO+pkft5mRGtpqqpozY=;
+        b=dDhi9dkvCRuOV/+Cgb2OFu/ksVDib65S22idI6z4ObwmKaxr2zEGpmdR/Uqa+v2STY
+         zR6VqPqUbNFqdpiAMQW12IDQSiSTmYX0zBj6Im8zux5sU0gjOpK9w3sk9O8wfU2OuKk0
+         FgLDJnTyGEBjHk7B02bst1k5TgMi57J+hV1L6ycGCsKse83zpGSfZqFkRWzfzQAw+1q9
+         BmeFrGSsx56qhJ4PnZ1AVALWA7wZbQ0vBunnOW4j6sE8Sqox6efUPIZG9woP9OBD3ajB
+         9pxnMd3m8Q2kJDKq0kkIrvIzyVtkmVSOxZfPLo+uXwnUfeUl/D++SvVDLGn4uo725ldm
+         lwtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751440703; x=1752045503;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Iy7H0ZYdtRQl4Da1EmIyCQoTQO+pkft5mRGtpqqpozY=;
+        b=KuuiEMkKhY1Gtnli+2TOrhSjB4KRTaM5EgRR/s7kXKvxB1fa/W0ijWQOLBFvQNhdFp
+         SQ1LAlAJrC9NuY+ugYHJr5t6aHbDetq5P51mru3a05rQ1MtYWKbt8QSVnD1BGd68A3EF
+         zpnMm6ACBTsVoH//8QlMohQssyO6DKZD158QwATg3eKV7pJKr0KEXR+AgZhnHkoyXn+W
+         gQBG24Qhf7lFN/69Bidn3gKBzFt9mtK/xbKQNrPyYAJtkj1lw4a6qkheeml2pAUVqYLI
+         HVwT/RYsv0Bab/aGSSqQUDhtcki/FmaSUb5cqaaN73iQ0Wyj2vgNKgD+UVh8BkicdH4I
+         1anQ==
+X-Gm-Message-State: AOJu0Yx2gjvqkKYN2Y6tLBZpjcryV+kb8/fHbtlqt1KJ+OLUuSjDrb8m
+	augPWE5eHyk5birD0maafqyAIwZbvEfCxWt2/OnHEdayLPp3m1kGND4awt7pHHIiZQ==
+X-Gm-Gg: ASbGncuHPKvOofvZwPep63PQ5k/Z4Q7zN1ScPQvvq+V/elCIuDa50sv23R3yGwzTnQn
+	XHinlWguhFXnThALdEc0klwo0ufgoW4Gv+P0mw+5h9LkcpAt9/Kf1aqYOlGR+I3v/xvabm5udnP
+	Qz0Pd4dVOam8X25hFfKCBGMW7NXjc7H1VFdmAhuLUSQTu0xuZzsAPZK/TLh9EIvNUFVswNVgC9h
+	JwZRGMt025+rD9OMFheqe9FgsRaTrbuh9jU2Jy5LPj+xWIeVVTtS+m9gJ+mv4TijGtDkpV08iie
+	CunWnWheb2EQRASr/7/7p+/ka18JR/cXGWJFscwxqIP6wMnIomZa0T0oO1egf54dNYsHbLYfjmN
+	J0qiyeKSqy47AYw==
+X-Google-Smtp-Source: AGHT+IE5DDFwnOS+TS6nh6JDekWlDH5rRkElgvGq44BHTX8yC75m31ZsyttD3EQg+A7nEynyZrTyHA==
+X-Received: by 2002:a17:902:ea0e:b0:236:363e:55d with SMTP id d9443c01a7336-23c6e591826mr29083665ad.28.1751440702829;
+        Wed, 02 Jul 2025 00:18:22 -0700 (PDT)
+Received: from xps.dhcp.asu.edu (209-147-138-224.nat.asu.edu. [209.147.138.224])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb2f0babsm129995935ad.58.2025.07.02.00.18.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jul 2025 00:18:22 -0700 (PDT)
+From: Xiang Mei <xmei5@asu.edu>
+To: gregkh@linuxfoundation.org
+Cc: netdev@vger.kernel.org,
+	xiyou.wangcong@gmail.com,
+	jhs@mojatatu.com,
+	jiri@resnulli.us,
+	security@kernel.org,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH] net/sched: sch_qfq: Fix null-deref in agg_dequeue
+Date: Wed,  2 Jul 2025 00:18:18 -0700
+Message-ID: <20250702071818.10161-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <2025070231-unrented-sulfate-8b6f@gregkh>
+References: <2025070231-unrented-sulfate-8b6f@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdduieejkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeffgfejgeegheeitefgleehgeejiedvheefudelhfeijedutdeihfeijeetgfegfeenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdegpdhrtghpthhtohepfigrnhhgrhhuihhkrghnghesihhstggrshdrrggtrdgtnhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpt
- hhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkrhiikhdoughtsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-Hello Vivian,
+To prevent a potential crash in agg_dequeue (net/sched/sch_qfq.c)
+when cl->qdisc->ops->peek(cl->qdisc) returns NULL, we check the return
+value before using it, similar to the existing approach in sch_hfsc.c.
 
-On Wed, 02 Jul 2025 14:01:41 +0800
-Vivian Wang <wangruikang@iscas.ac.cn> wrote:
+To avoid code duplication, the following changes are made:
 
-> The Ethernet MACs found on SpacemiT K1 appears to be a custom design
-> that only superficially resembles some other embedded MACs. SpacemiT
-> refers to them as "EMAC", so let's just call the driver "k1_emac".
-> 
-> This driver is based on "k1x-emac" in the same directory in the vendor's
-> tree [1]. Some debugging tunables have been fixed to vendor-recommended
-> defaults, and PTP support is not included yet.
-> 
-> [1]: https://github.com/spacemit-com/linux-k1x
-> 
-> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+1. Moved qdisc_warn_nonwc to include/net/sch_generic.h and removed
+its EXPORT_SYMBOL declaration, since all users include the header.
 
-I have a handful of tiny comments, the rest looks fine by me !
+2. Moved qdisc_peek_len from net/sched/sch_hfsc.c to
+include/net/sch_generic.h so that sch_qfq can reuse it.
 
-> +static int emac_phy_connect(struct net_device *ndev)
-> +{
-> +	struct emac_priv *priv = netdev_priv(ndev);
-> +	struct device *dev = &priv->pdev->dev;
-> +	struct phy_device *phydev;
-> +	struct device_node *np;
-> +	int ret;
-> +
-> +	ret = of_get_phy_mode(dev->of_node, &priv->phy_interface);
-> +	if (ret) {
-> +		dev_err(dev, "No phy-mode found");
-> +		return ret;
-> +	}
-> +
-> +	np = of_parse_phandle(dev->of_node, "phy-handle", 0);
-> +	if (!np && of_phy_is_fixed_link(dev->of_node))
-> +		np = of_node_get(dev->of_node);
-> +
-> +	if (!np) {
-> +		dev_err(dev, "No PHY specified");
-> +		return -ENODEV;
-> +	}
-> +
-> +	ret = emac_phy_interface_config(priv);
-> +	if (ret)
-> +		goto err_node_put;
-> +
-> +	phydev = of_phy_connect(ndev, np, &emac_adjust_link, 0,
-> +				priv->phy_interface);
-> +	if (!phydev) {
-> +		dev_err(dev, "Could not attach to PHY\n");
-> +		ret = -ENODEV;
-> +		goto err_node_put;
-> +	}
-> +
-> +	phydev->mac_managed_pm = true;
-> +
-> +	ndev->phydev = phydev;
+3. Applied qdisc_peek_len in agg_dequeue to avoid crashing.
 
-of_phy_connect() eventually calls phy_attach_direct(), which sets
-ndev->phydev, so you don't need to do it here :)
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
+---
+ include/net/sch_generic.h | 24 ++++++++++++++++++++++++
+ net/sched/sch_api.c       | 10 ----------
+ net/sched/sch_hfsc.c      | 16 ----------------
+ net/sched/sch_qfq.c       |  2 +-
+ 4 files changed, 25 insertions(+), 27 deletions(-)
 
-> +
-> +	emac_update_delay_line(priv);
-> +
-> +err_node_put:
-> +	of_node_put(np);
-> +	return ret;
-> +}
+diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+index 3287988a6a98..d090aaa59ef2 100644
+--- a/include/net/sch_generic.h
++++ b/include/net/sch_generic.h
+@@ -814,11 +814,35 @@ static inline bool qdisc_tx_is_noop(const struct net_device *dev)
+ 	return true;
+ }
+ 
++static inline void qdisc_warn_nonwc(const char *txt, struct Qdisc *qdisc)
++{
++	if (!(qdisc->flags & TCQ_F_WARN_NONWC)) {
++		pr_warn("%s: %s qdisc %X: is non-work-conserving?\n",
++			txt, qdisc->ops->id, qdisc->handle >> 16);
++		qdisc->flags |= TCQ_F_WARN_NONWC;
++	}
++}
++
+ static inline unsigned int qdisc_pkt_len(const struct sk_buff *skb)
+ {
+ 	return qdisc_skb_cb(skb)->pkt_len;
+ }
+ 
++static inline unsigned int qdisc_peek_len(struct Qdisc *sch)
++{
++	struct sk_buff *skb;
++	unsigned int len;
++
++	skb = sch->ops->peek(sch);
++	if (unlikely(skb == NULL)) {
++		qdisc_warn_nonwc("qdisc_peek_len", sch);
++		return 0;
++	}
++	len = qdisc_pkt_len(skb);
++
++	return len;
++}
++
+ /* additional qdisc xmit flags (NET_XMIT_MASK in linux/netdevice.h) */
+ enum net_xmit_qdisc_t {
+ 	__NET_XMIT_STOLEN = 0x00010000,
+diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+index df89790c459a..6518fdc63dc2 100644
+--- a/net/sched/sch_api.c
++++ b/net/sched/sch_api.c
+@@ -594,16 +594,6 @@ void __qdisc_calculate_pkt_len(struct sk_buff *skb,
+ 	qdisc_skb_cb(skb)->pkt_len = pkt_len;
+ }
+ 
+-void qdisc_warn_nonwc(const char *txt, struct Qdisc *qdisc)
+-{
+-	if (!(qdisc->flags & TCQ_F_WARN_NONWC)) {
+-		pr_warn("%s: %s qdisc %X: is non-work-conserving?\n",
+-			txt, qdisc->ops->id, qdisc->handle >> 16);
+-		qdisc->flags |= TCQ_F_WARN_NONWC;
+-	}
+-}
+-EXPORT_SYMBOL(qdisc_warn_nonwc);
+-
+ static enum hrtimer_restart qdisc_watchdog(struct hrtimer *timer)
+ {
+ 	struct qdisc_watchdog *wd = container_of(timer, struct qdisc_watchdog,
+diff --git a/net/sched/sch_hfsc.c b/net/sched/sch_hfsc.c
+index afcb83d469ff..751b1e2c35b3 100644
+--- a/net/sched/sch_hfsc.c
++++ b/net/sched/sch_hfsc.c
+@@ -835,22 +835,6 @@ update_vf(struct hfsc_class *cl, unsigned int len, u64 cur_time)
+ 	}
+ }
+ 
+-static unsigned int
+-qdisc_peek_len(struct Qdisc *sch)
+-{
+-	struct sk_buff *skb;
+-	unsigned int len;
+-
+-	skb = sch->ops->peek(sch);
+-	if (unlikely(skb == NULL)) {
+-		qdisc_warn_nonwc("qdisc_peek_len", sch);
+-		return 0;
+-	}
+-	len = qdisc_pkt_len(skb);
+-
+-	return len;
+-}
+-
+ static void
+ hfsc_adjust_levels(struct hfsc_class *cl)
+ {
+diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
+index 5e557b960bde..e0cefa21ce21 100644
+--- a/net/sched/sch_qfq.c
++++ b/net/sched/sch_qfq.c
+@@ -992,7 +992,7 @@ static struct sk_buff *agg_dequeue(struct qfq_aggregate *agg,
+ 
+ 	if (cl->qdisc->q.qlen == 0) /* no more packets, remove from list */
+ 		list_del_init(&cl->alist);
+-	else if (cl->deficit < qdisc_pkt_len(cl->qdisc->ops->peek(cl->qdisc))) {
++	else if (cl->deficit < qdisc_peek_len(cl->qdisc)) {
+ 		cl->deficit += agg->lmax;
+ 		list_move_tail(&cl->alist, &agg->active);
+ 	}
+-- 
+2.43.0
 
-[ ... ]
-
-> +static int emac_down(struct emac_priv *priv)
-> +{
-> +	struct platform_device *pdev = priv->pdev;
-> +	struct net_device *ndev = priv->ndev;
-> +
-> +	netif_stop_queue(ndev);
-> +
-> +	phy_stop(ndev->phydev);
-
-phy_disconnect() will call phy_stop() for you, you can remove it.
-
-> +	phy_disconnect(ndev->phydev);
-> +
-> +	emac_wr(priv, MAC_INTERRUPT_ENABLE, 0x0);
-> +	emac_wr(priv, DMA_INTERRUPT_ENABLE, 0x0);
-> +
-> +	free_irq(priv->irq, ndev);
-> +
-> +	napi_disable(&priv->napi);
-> +
-> +	emac_reset_hw(priv);
-> +
-> +	pm_runtime_put_sync(&pdev->dev);
-> +	return 0;
-> +}
-> +
-
-[ ... ]
-
-> +static int emac_probe(struct platform_device *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct reset_control *reset;
-> +	struct net_device *ndev;
-> +	struct emac_priv *priv;
-> +	int ret;
-> +
-> +	ndev = devm_alloc_etherdev(dev, sizeof(struct emac_priv));
-> +	if (!ndev)
-> +		return -ENOMEM;
-> +
-> +	ndev->hw_features = NETIF_F_SG;
-> +	ndev->features |= ndev->hw_features;
-> +
-> +	ndev->min_mtu = ETH_MIN_MTU;
-
-This should already be the default value when using
-devm_alloc_etherdev()
-
-> +	ndev->max_mtu = EMAC_RX_BUF_4K - (ETH_HLEN + ETH_FCS_LEN);
-> +
-> +	priv = netdev_priv(ndev);
-> +	priv->ndev = ndev;
-> +	priv->pdev = pdev;
-> +	platform_set_drvdata(pdev, priv);
-> +	priv->hw_stats = devm_kzalloc(dev, sizeof(*priv->hw_stats), GFP_KERNEL);
-> +	if (!priv->hw_stats) {
-> +		dev_err(dev, "Failed to allocate memory for stats\n");
-> +		ret = -ENOMEM;
-> +		goto err;
-> +	}
-> +
-> +	ret = emac_config_dt(pdev, priv);
-> +	if (ret < 0) {
-> +		dev_err(dev, "Configuration failed\n");
-> +		goto err;
-> +	}
-> +
-> +	ndev->watchdog_timeo = 5 * HZ;
-> +	ndev->base_addr = (unsigned long)priv->iobase;
-> +	ndev->irq = priv->irq;
-> +
-> +	ndev->ethtool_ops = &emac_ethtool_ops;
-> +	ndev->netdev_ops = &emac_netdev_ops;
-> +
-> +	devm_pm_runtime_enable(&pdev->dev);
-> +
-> +	priv->bus_clk = devm_clk_get_enabled(&pdev->dev, NULL);
-> +	if (IS_ERR(priv->bus_clk)) {
-> +		ret = dev_err_probe(dev, PTR_ERR(priv->bus_clk),
-> +				    "Failed to get clock\n");
-> +		goto err;
-> +	}
-> +
-> +	reset = devm_reset_control_get_optional_exclusive_deasserted(&pdev->dev,
-> +								     NULL);
-> +	if (IS_ERR(reset)) {
-> +		ret = dev_err_probe(dev, PTR_ERR(reset),
-> +				    "Failed to get reset\n");
-> +		goto err;
-> +	}
-> +
-> +	emac_sw_init(priv);
-> +
-> +	if (of_phy_is_fixed_link(dev->of_node)) {
-> +		ret = of_phy_register_fixed_link(dev->of_node);
-> +		if (ret) {
-> +			dev_err_probe(dev, ret,
-> +				      "Failed to register fixed-link");
-> +			goto err_timer_delete;
-> +		}
-
-It looks like you're missing the calls to:
-
-  of_phy_deregister_fixed_link()
-
-in the error path here as well as in the .remove() function.
-
-> +	}
-> +
-> +	ret = emac_mdio_init(priv);
-> +	if (ret)
-> +		goto err_timer_delete;
-> +
-> +	SET_NETDEV_DEV(ndev, &pdev->dev);
-> +
-> +	ret = devm_register_netdev(dev, ndev);
-> +	if (ret) {
-> +		dev_err(dev, "devm_register_netdev failed\n");
-> +		goto err_timer_delete;
-> +	}
-> +
-> +	netif_napi_add(ndev, &priv->napi, emac_rx_poll);
-> +	netif_carrier_off(ndev);
-> +
-> +	return 0;
-> +
-> +err_timer_delete:
-> +	timer_delete_sync(&priv->txtimer);
-> +err:
-> +	return ret;
-> +}
-
-Maxime
 
