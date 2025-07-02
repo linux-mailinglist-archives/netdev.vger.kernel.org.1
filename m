@@ -1,72 +1,50 @@
-Return-Path: <netdev+bounces-203133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F5E5AF08FA
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 05:07:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A2EFAF0903
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 05:09:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AA5C4E3695
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 03:07:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88E383B5407
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 03:09:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ACD91DEFDB;
-	Wed,  2 Jul 2025 03:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92B3919E7F9;
+	Wed,  2 Jul 2025 03:09:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L50Xe4+M"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OIM+BWYT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473471DED42
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 03:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5242F42
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 03:09:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751425613; cv=none; b=NLRH4LaNyB1kLW0Lm+mJAma5FyWPQpq0PRlE7lgFtQgcgBRQsA8yovHETMk9iFJRlfhSEEI2WSBcYQn8gKpwJEgznEPSMpQbhqd4ygm7X1GmRJPM5eo/NUGzxUGQsgv8Z99YY94zMd+O7im0OF26MW5M9OK6hSlq8s3vakFuv08=
+	t=1751425784; cv=none; b=OSkXlGhsp7unT9D7b4AM2l9XZwHL43nzLMBz0C1oeCMAnvQRj1Qs81SDG+oJyuVBfEVJ5xiq3N12757fF6WV4DuXCqaa+XRbVCPbEqXNH4NazPjrPo4K2Ouc0/2Yu5h6ci554U3FtwFNTlLbYyhGg4r63qiXFn4SwiIe6TtgxN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751425613; c=relaxed/simple;
-	bh=nUzDqed4EgDbLiB0xx+JLNmAhTy6L194y8iKhE3MiN8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sgsDaCJW79x8nZkLtbQHFXNUNlgSBU4bSP0ORxQF7S3L9pJDJ2YwkRSQ8nTw2Le7l+81YcIAtRlIf8aUyS400Y2PQYG4v0pBMz+3MKZgFs+0lga04qPTgtPsuy39k7ETLwLCaRi44z+eKRQRVrgj3BcrjIJ0LtzZygxpgYdylOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L50Xe4+M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB505C4CEEB;
-	Wed,  2 Jul 2025 03:06:52 +0000 (UTC)
+	s=arc-20240116; t=1751425784; c=relaxed/simple;
+	bh=5gHBQlRdpMAMx9P8m3MwOb7vD+p6NNVH/NHVmgydy7s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=H7dKP+UWKeNP5UMjzULAOFuDp/ntKkKj3W33X1gnJ+PEMcaz+Otu0cy8jpyiE9QlMMVKi277WAGz2K40ABwGV5WolYpuFeQn/WotRKLDb2LibJF1KxLYzJ8x2FoIi8313ySaZKwT55Mp5gCuweVksziwlL69+Y/fX3tBfHnb3I0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OIM+BWYT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39B55C4CEEB;
+	Wed,  2 Jul 2025 03:09:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751425613;
-	bh=nUzDqed4EgDbLiB0xx+JLNmAhTy6L194y8iKhE3MiN8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=L50Xe4+MendN+VUnqUlqC36xUQj1GljRaR8qcyrej1Wglmx8UC+URlVgDzSV1nxgO
-	 tGxCWlW66SvO15kfBWvc+F7mlmifO+DEELBrgfAdPbn1gWuPk180/ixnhgSzkIUUeU
-	 /dEyhgxAVphOzmYB7nC+IEDNvMntn9RM/kvj0DyzU3sCVimtPK7og4i1qkJ1PlvWPN
-	 WERGu0pgKheabl55ZS+QoaA6hd1sHTPGcr0se0+m2cVheN23p6nkJ0hF9Mtc4UZ46O
-	 ryBbqp68Kf25SjSU5Ft7gwK4W92k4Db39KRBlDuh2QMBqvjCkyuPFEaDXcE0EogAQm
-	 ZRdtR8rBnOASg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	andrew@lunn.ch,
-	przemyslaw.kitszel@intel.com,
-	anthony.l.nguyen@intel.com,
-	sgoutham@marvell.com,
-	gakula@marvell.com,
-	sbhatta@marvell.com,
-	bbhushan2@marvell.com,
-	tariqt@nvidia.com,
-	mbloch@nvidia.com,
-	leon@kernel.org,
-	gal@nvidia.com,
-	ecree.xilinx@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 5/5] net: ethtool: reduce indent for _rxfh_context ops
-Date: Tue,  1 Jul 2025 20:06:06 -0700
-Message-ID: <20250702030606.1776293-6-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250702030606.1776293-1-kuba@kernel.org>
-References: <20250702030606.1776293-1-kuba@kernel.org>
+	s=k20201202; t=1751425784;
+	bh=5gHBQlRdpMAMx9P8m3MwOb7vD+p6NNVH/NHVmgydy7s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OIM+BWYT3wblthFbjPNSn38s2wSXTTjzlvKMIUFaw7s3/yhfMzmiBt3p39kdH3bER
+	 WjSHimyYGpbpkGfi+IL98eVNG6NhaaiPtxoKe1WWVBycxqble8oY9aLfY3Kg03M8Z+
+	 ah3BRzy8B0N9v2EQ0f5AnCFxIOFE3Dme5ovAyIGE1CU6/uL6IdUEDicS90hRvQvUO2
+	 /qJ5jcgcmgAFEO1DfhYmvKG98i6k99E9qXzhzj4fP1Li34e5CnoEc1fuhR9TBZoC4a
+	 bN3tXDoRjwH1o0WP+5lOlgYlE5cKGs6NXHDY+Z4yG8RmnDGDCwsvHrmoW8gOldvmNr
+	 ar8IlUJkx7o9g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D98383BA06;
+	Wed,  2 Jul 2025 03:10:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,60 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net-next] net: atlantic: Rename PCI driver struct to
+ end in
+ _driver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175142580901.190284.10844841336207050615.git-patchwork-notify@kernel.org>
+Date: Wed, 02 Jul 2025 03:10:09 +0000
+References: <20250630164406.57589-2-u.kleine-koenig@baylibre.com>
+In-Reply-To: <20250630164406.57589-2-u.kleine-koenig@baylibre.com>
+To: =?utf-8?q?Uwe_Kleine-K=C3=B6nig_=3Cu=2Ekleine-koenig=40baylibre=2Ecom=3E?=@codeaurora.org
+Cc: irusskikh@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ Alexander.Loktionov@aquantia.com, vomlehn@texas.net,
+ Dmitry.Bezrukov@aquantia.com, Pavel.Belous@aquantia.com, horms@kernel.org,
+ netdev@vger.kernel.org
 
-Now that we don't have the compat code we can reduce the indent
-a little. No functional changes.
+Hello:
 
-Reviewed-by: Gal Pressman <gal@nvidia.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- net/ethtool/ioctl.c | 31 +++++++++++++------------------
- 1 file changed, 13 insertions(+), 18 deletions(-)
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 17dbda6afd96..fcd2a9a20527 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -1668,25 +1668,20 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
- 	rxfh_dev.rss_context = rxfh.rss_context;
- 	rxfh_dev.input_xfrm = rxfh.input_xfrm;
- 
--	if (rxfh.rss_context) {
--		if (create) {
--			ret = ops->create_rxfh_context(dev, ctx, &rxfh_dev,
--						       extack);
--			/* Make sure driver populates defaults */
--			WARN_ON_ONCE(!ret && !rxfh_dev.key &&
--				     ops->rxfh_per_ctx_key &&
--				     !memchr_inv(ethtool_rxfh_context_key(ctx),
--						 0, ctx->key_size));
--		} else if (rxfh_dev.rss_delete) {
--			ret = ops->remove_rxfh_context(dev, ctx,
--						       rxfh.rss_context,
--						       extack);
--		} else {
--			ret = ops->modify_rxfh_context(dev, ctx, &rxfh_dev,
--						       extack);
--		}
--	} else {
-+	if (!rxfh.rss_context) {
- 		ret = ops->set_rxfh(dev, &rxfh_dev, extack);
-+	} else if (create) {
-+		ret = ops->create_rxfh_context(dev, ctx, &rxfh_dev, extack);
-+		/* Make sure driver populates defaults */
-+		WARN_ON_ONCE(!ret && !rxfh_dev.key &&
-+			     ops->rxfh_per_ctx_key &&
-+			     !memchr_inv(ethtool_rxfh_context_key(ctx),
-+					 0, ctx->key_size));
-+	} else if (rxfh_dev.rss_delete) {
-+		ret = ops->remove_rxfh_context(dev, ctx,
-+					       rxfh.rss_context, extack);
-+	} else {
-+		ret = ops->modify_rxfh_context(dev, ctx, &rxfh_dev, extack);
- 	}
- 	if (ret) {
- 		if (create) {
+On Mon, 30 Jun 2025 18:44:07 +0200 you wrote:
+> This is not only a cosmetic change because the section mismatch checks
+> (implemented in scripts/mod/modpost.c) also depend on the object's name
+> and for drivers the checks are stricter than for ops.
+> 
+> However aq_pci_driver also passes the stricter checks just fine, so no
+> further changes needed.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,net-next] net: atlantic: Rename PCI driver struct to end in _driver
+    https://git.kernel.org/netdev/net-next/c/b9ac2ae0008d
+
+You are awesome, thank you!
 -- 
-2.50.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
