@@ -1,395 +1,174 @@
-Return-Path: <netdev+bounces-203346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1B49AF584B
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 15:16:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54A63AF586A
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 15:19:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 006414A811D
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 13:15:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C5057BAAB0
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 13:17:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D667127A904;
-	Wed,  2 Jul 2025 13:15:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AB0027816D;
+	Wed,  2 Jul 2025 13:16:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OFpLAVJ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB5A5278E7B;
-	Wed,  2 Jul 2025 13:15:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D49D253F35
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 13:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751462106; cv=none; b=a2M8EQpVnuHwf9nPro+M2YrVjd22FMD3VvhNxSXFikjpWpazx4iyqjZj57kqDGeYeXFtJo4QumdQuEYv25YLo0pUT1hiC+Rs37k6Frq5X4kk59OSi5qaZHBCzmOWlXUhAod6ehSIeOKk7hUhiSUD+J1OCXRSD1OsML7iKtPu3I8=
+	t=1751462199; cv=none; b=JoFk4EHpucOJdAGXxsDpbV++l0MEKe4/r9q9Tx87H3bnvV7P688xiKr7nIKygJDHmOo3BTG2W99pdWCObH104EUIhk/6XrB20qe6NzmljIwCKIyiuxH+NFoUc0+oIikkhykbtAREIKY2p+AHU97uWLaoIINeBr5KIj22ZRyfTEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751462106; c=relaxed/simple;
-	bh=nTWVnvrDxjxy+y7ZCiNtFIeOBKge8ov7uEPL0sS4PUA=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YI+a0BToMMmquPvDPkUoFaw7JwfOC8WeGHfPpxVqbsV6k1HcrCXcTR4+VOKCMKWjVOAd/OBmZ4OlL/vOHy+bJ5PJpCgsWb/RmKlE21nMTxv1nxRSKtFp0LfsLZ6MPmS9z9esYOdAsAT1qeOtoLjBYTJh/R1NHOkPzVHRHllc9LM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1uWxIh-000000007tp-1UHn;
-	Wed, 02 Jul 2025 13:14:59 +0000
-Date: Wed, 2 Jul 2025 14:14:56 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Felix Fietkau <nbd@nbd.name>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Eric Woudstra <ericwouds@gmail.com>, Elad Yifee <eladwf@gmail.com>,
-	Bo-Cun Chen <bc-bocun.chen@mediatek.com>,
-	Sky Huang <skylake.huang@mediatek.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH net-next v5 3/3] net: ethernet: mtk_eth_soc: use generic
- allocator for SRAM
-Message-ID: <c2b9242229d06af4e468204bcf42daa1535c3a72.1751461762.git.daniel@makrotopia.org>
-References: <cover.1751461762.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1751462199; c=relaxed/simple;
+	bh=1j1LyNigN5AHD08zHiexmmDlfFxiEshK30KkAloLUzs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KV1Lg5GEloH0kqhL9D/esfF/akFSXyQe13wYK2Kq8dMde++Ky5ENd6MSUiTS8DfJmkWoSY5pL8yd2swjwIZGr99sHSsa4Wz/kR2z9NpFjgqKeEA1RXDkbKDWDR+1oaaKhCQOmKavaIMqtMMjqOejhcIqIegtVlD0rI+w8f9yl5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OFpLAVJ9; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751462196;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sy4nWTHPkpPaaqEvDu9i4dBMnt5aD41NB3JYr++qf2M=;
+	b=OFpLAVJ9oUFP22/fqBDFeDG2TxYkk269JUXoghx6Xy/AoVsGzPGiuJLpDgBLs/cM4TC+NQ
+	ODguOszPhSit7aUOrHml/aHiA6dH0DVBPgOsbrx1hhyerxpiAqwA2aAHHzUieOPi9R7bdH
+	LpLhE1tUfkJ45jNm1iag+zQ8Qtci26g=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-502-4B43POM5N1iQhlZla6rhdA-1; Wed, 02 Jul 2025 09:16:35 -0400
+X-MC-Unique: 4B43POM5N1iQhlZla6rhdA-1
+X-Mimecast-MFC-AGG-ID: 4B43POM5N1iQhlZla6rhdA_1751462194
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-451deff247cso37106535e9.1
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 06:16:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751462194; x=1752066994;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sy4nWTHPkpPaaqEvDu9i4dBMnt5aD41NB3JYr++qf2M=;
+        b=G+7hJ9VCzP74B1RgniJBGGfMN2P+pyo9T5dBEopi40Jz6MeNvvVN7/1be5Z9FPaQgR
+         l/Bgi2KPOdXzIM9ZRmMvhpw3imMWdQydGHsCXaY45nc0ZYrPbK89Iyq+h8VsbHFCwfgC
+         HlG1QHM5ShWpNlLPLedyiBBMNNQfooQkoA93b3lRpoXCtXmDqu70N+UWlbxp+EvhSENx
+         8JT/V4jGRwIkWyw56ET8rx3d0Ocr/DEj+vAaT3cBVMTg/X8W5Fm15hgHb+k13yeEkE/k
+         WAJHdPQna3WXhBJcaKOD/voLg35xQA77z32qTb8BS5LU7MpXTzw8TErdihFTCrwhEI6d
+         16Iw==
+X-Forwarded-Encrypted: i=1; AJvYcCUw/vDjKIbs8aItDFbkb2MpLKOQuYH4lhTrUkFFAhy2zcHxxa+ip/yKc3eh7SG56gc2zB53CqE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQYSGhyQO7C1JjdNtrMH1t+mVCAUlS3v6SgZR0iW1X2zUjGJqP
+	mkL7S6soAKCgtchcQHT/k12rGy8ufc4YskAoTcTxNThgqm20eGSsFR3l59ub4xYUbm464JVi1mN
+	2MjzguUo+FQOjvDHRRR1PI1Vduh6idhKxzEcayBDfsWzATi6+dWr5sfRiYA==
+X-Gm-Gg: ASbGncs9THpjwkopqD2z04CNtWbqaw7u78f8HpHEkkqNCscj/uALqOXX56VY8S6axNM
+	xEYWupl1F/EoFm0DGqUhRoZPzIS1Ju54rrBvhvD6GRQA060pZWImW6ND7aVDxNLQwO7u19HWedd
+	96Z+HVBKbYGaX23G/BQoI3xiGa3dyYcPJBNggSg0Nv/H3h2kaGK3SWn6U3Dj973TCUf6pjuk/1D
+	SXFjVSMos6hTR3ppg6OgAz6oMGPhzz+pq8/Rn1lWRCWi5rJMXfDHGtuYKHHT+smZTV0h2rh9tBF
+	vTEv434uoObH+c7cvnLY1HhW3zWd
+X-Received: by 2002:a05:600c:c0dc:b0:453:45f1:9c96 with SMTP id 5b1f17b1804b1-454a3c610camr23628635e9.14.1751462193946;
+        Wed, 02 Jul 2025 06:16:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEK+MShUn1qdie/bqB3hm1XM6IQ/XjWSETD0pYwme5TdPq6afvGUkaA/cLuoccNQG7Dhu4OBw==
+X-Received: by 2002:a05:600c:c0dc:b0:453:45f1:9c96 with SMTP id 5b1f17b1804b1-454a3c610camr23628285e9.14.1751462193306;
+        Wed, 02 Jul 2025 06:16:33 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.164.126])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a88c7e72c1sm15900209f8f.1.2025.07.02.06.16.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jul 2025 06:16:32 -0700 (PDT)
+Date: Wed, 2 Jul 2025 15:16:19 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org, 
+	Keir Fraser <keirf@google.com>, Steven Moreland <smoreland@google.com>, 
+	Frederick Mayle <fmayle@google.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, netdev@vger.kernel.org, virtualization@lists.linux.dev
+Subject: Re: [PATCH v2 4/8] vsock/virtio: Resize receive buffers so that each
+ SKB fits in a page
+Message-ID: <3s4lvbnzdj72dcvvh2nnx4s7skyco4pbpwuyycccqv3iudqhnn@5szfvvgxojkb>
+References: <20250701164507.14883-1-will@kernel.org>
+ <20250701164507.14883-5-will@kernel.org>
+ <20250701201400.52442b0e@pumpkin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <cover.1751461762.git.daniel@makrotopia.org>
+In-Reply-To: <20250701201400.52442b0e@pumpkin>
 
-Use a dedicated "mmio-sram" node and the generic allocator
-instead of open-coding SRAM allocation for DMA rings.
-Keep support for legacy device trees but notify the user via a
-warning to update, and let the ethernet driver create the
-gen_pool in this case.
+On Tue, Jul 01, 2025 at 08:14:00PM +0100, David Laight wrote:
+>On Tue,  1 Jul 2025 17:45:03 +0100
+>Will Deacon <will@kernel.org> wrote:
+>
+>> When allocating receive buffers for the vsock virtio RX virtqueue, an
+>> SKB is allocated with a 4140 data payload (the 44-byte packet header +
+>> VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE). Even when factoring in the SKB
+>> overhead, the resulting 8KiB allocation thanks to the rounding in
+>> kmalloc_reserve() is wasteful (~3700 unusable bytes) and results in a
+>> higher-order page allocation for the sake of a few hundred bytes of
+>> packet data.
+>>
+>> Limit the vsock virtio RX buffers to a page per SKB, resulting in much
+>> better memory utilisation and removing the need to allocate higher-order
+>> pages entirely.
+>>
+>> Signed-off-by: Will Deacon <will@kernel.org>
+>> ---
+>>  include/linux/virtio_vsock.h     | 1 -
+>>  net/vmw_vsock/virtio_transport.c | 7 ++++++-
+>>  2 files changed, 6 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>> index eb6980aa19fd..1b5731186095 100644
+>> --- a/include/linux/virtio_vsock.h
+>> +++ b/include/linux/virtio_vsock.h
+>> @@ -109,7 +109,6 @@ static inline size_t virtio_vsock_skb_len(struct sk_buff *skb)
+>>  	return (size_t)(skb_end_pointer(skb) - skb->head);
+>>  }
+>>
+>> -#define VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE	(1024 * 4)
+>>  #define VIRTIO_VSOCK_MAX_BUF_SIZE		0xFFFFFFFFUL
+>>  #define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE		(1024 * 64)
+>>
+>> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>> index 488e6ddc6ffa..3daba06ed499 100644
+>> --- a/net/vmw_vsock/virtio_transport.c
+>> +++ b/net/vmw_vsock/virtio_transport.c
+>> @@ -307,7 +307,12 @@ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
+>>
+>>  static void virtio_vsock_rx_fill(struct virtio_vsock *vsock)
+>>  {
+>> -	int total_len = VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE + VIRTIO_VSOCK_SKB_HEADROOM;
+>> +	/* Dimension the SKB so that the entire thing fits exactly into
+>> +	 * a single page. This avoids wasting memory due to alloc_skb()
+>> +	 * rounding up to the next page order and also means that we
+>> +	 * don't leave higher-order pages sitting around in the RX queue.
+>> +	 */
+>> +	int total_len = SKB_WITH_OVERHEAD(PAGE_SIZE);
+>
+>Should that be an explicit 4096?
+>Otherwise it is very wasteful of memory on systems with large pages.
 
-Co-developed-by: Frank Wunderlich <frank-w@public-files.de>
-Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
-v5: remove unused variable tx_ring_size in mtk_rx_alloc()
-    avoid long lines
-v4: always use gen_pool allocator completely replacing the
-    previous approach of hardcoded SRAM offsets
-    added missing Kconfig change
-v3: fix resource leak on error in mtk_probe()
-v2: fix return type of mtk_dma_ring_alloc() in case of error
+This is a good point!
 
- drivers/net/ethernet/mediatek/Kconfig       |   1 +
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 152 +++++++++++---------
- drivers/net/ethernet/mediatek/mtk_eth_soc.h |  10 +-
- 3 files changed, 90 insertions(+), 73 deletions(-)
+What about SKB_WITH_OVERHEAD(VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE) ?
 
-diff --git a/drivers/net/ethernet/mediatek/Kconfig b/drivers/net/ethernet/mediatek/Kconfig
-index 7bfd3f230ff5..2ba361f8ce7d 100644
---- a/drivers/net/ethernet/mediatek/Kconfig
-+++ b/drivers/net/ethernet/mediatek/Kconfig
-@@ -17,6 +17,7 @@ config NET_MEDIATEK_SOC
- 	select PINCTRL
- 	select PHYLINK
- 	select DIMLIB
-+	select GENERIC_ALLOCATOR
- 	select PAGE_POOL
- 	select PAGE_POOL_STATS
- 	select PCS_MTK_LYNXI
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 8f55069441f4..11ee7e1829bf 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -27,6 +27,7 @@
- #include <net/dsa.h>
- #include <net/dst_metadata.h>
- #include <net/page_pool/helpers.h>
-+#include <linux/genalloc.h>
- 
- #include "mtk_eth_soc.h"
- #include "mtk_wed.h"
-@@ -1267,6 +1268,34 @@ static void *mtk_max_lro_buf_alloc(gfp_t gfp_mask)
- 	return (void *)data;
- }
- 
-+static void *mtk_dma_ring_alloc(struct mtk_eth *eth, size_t size,
-+				dma_addr_t *dma_handle, bool use_sram)
-+{
-+	void *dma_ring;
-+
-+	if (use_sram && eth->sram_pool) {
-+		dma_ring = (void *)gen_pool_alloc(eth->sram_pool, size);
-+		if (!dma_ring)
-+			return dma_ring;
-+		*dma_handle = gen_pool_virt_to_phys(eth->sram_pool,
-+						    (unsigned long)dma_ring);
-+	} else {
-+		dma_ring = dma_alloc_coherent(eth->dma_dev, size, dma_handle,
-+					      GFP_KERNEL);
-+	}
-+
-+	return dma_ring;
-+}
-+
-+static void mtk_dma_ring_free(struct mtk_eth *eth, size_t size, void *dma_ring,
-+			      dma_addr_t dma_handle, bool in_sram)
-+{
-+	if (in_sram && eth->sram_pool)
-+		gen_pool_free(eth->sram_pool, (unsigned long)dma_ring, size);
-+	else
-+		dma_free_coherent(eth->dma_dev, size, dma_ring, dma_handle);
-+}
-+
- /* the qdma core needs scratch memory to be setup */
- static int mtk_init_fq_dma(struct mtk_eth *eth)
- {
-@@ -1276,13 +1305,8 @@ static int mtk_init_fq_dma(struct mtk_eth *eth)
- 	dma_addr_t dma_addr;
- 	int i, j, len;
- 
--	if (MTK_HAS_CAPS(eth->soc->caps, MTK_SRAM))
--		eth->scratch_ring = eth->sram_base;
--	else
--		eth->scratch_ring = dma_alloc_coherent(eth->dma_dev,
--						       cnt * soc->tx.desc_size,
--						       &eth->phy_scratch_ring,
--						       GFP_KERNEL);
-+	eth->scratch_ring = mtk_dma_ring_alloc(eth, cnt * soc->tx.desc_size,
-+					       &eth->phy_scratch_ring, true);
- 
- 	if (unlikely(!eth->scratch_ring))
- 		return -ENOMEM;
-@@ -2620,14 +2644,7 @@ static int mtk_tx_alloc(struct mtk_eth *eth)
- 	if (!ring->buf)
- 		goto no_tx_mem;
- 
--	if (MTK_HAS_CAPS(soc->caps, MTK_SRAM)) {
--		ring->dma = eth->sram_base + soc->tx.fq_dma_size * sz;
--		ring->phys = eth->phy_scratch_ring + soc->tx.fq_dma_size * (dma_addr_t)sz;
--	} else {
--		ring->dma = dma_alloc_coherent(eth->dma_dev, ring_size * sz,
--					       &ring->phys, GFP_KERNEL);
--	}
--
-+	ring->dma = mtk_dma_ring_alloc(eth, ring_size * sz, &ring->phys, true);
- 	if (!ring->dma)
- 		goto no_tx_mem;
- 
-@@ -2726,10 +2743,10 @@ static void mtk_tx_clean(struct mtk_eth *eth)
- 		kfree(ring->buf);
- 		ring->buf = NULL;
- 	}
--	if (!MTK_HAS_CAPS(soc->caps, MTK_SRAM) && ring->dma) {
--		dma_free_coherent(eth->dma_dev,
--				  ring->dma_size * soc->tx.desc_size,
--				  ring->dma, ring->phys);
-+
-+	if (ring->dma) {
-+		mtk_dma_ring_free(eth, ring->dma_size * soc->tx.desc_size,
-+				  ring->dma, ring->phys, true);
- 		ring->dma = NULL;
- 	}
- 
-@@ -2746,14 +2763,9 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
- 	const struct mtk_reg_map *reg_map = eth->soc->reg_map;
- 	const struct mtk_soc_data *soc = eth->soc;
- 	struct mtk_rx_ring *ring;
--	int rx_data_len, rx_dma_size, tx_ring_size;
-+	int rx_data_len, rx_dma_size;
- 	int i;
- 
--	if (MTK_HAS_CAPS(eth->soc->caps, MTK_QDMA))
--		tx_ring_size = MTK_QDMA_RING_SIZE;
--	else
--		tx_ring_size = soc->tx.dma_size;
--
- 	if (rx_flag == MTK_RX_FLAGS_QDMA) {
- 		if (ring_no)
- 			return -EINVAL;
-@@ -2788,20 +2800,10 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
- 		ring->page_pool = pp;
- 	}
- 
--	if (!MTK_HAS_CAPS(eth->soc->caps, MTK_SRAM) ||
--	    rx_flag != MTK_RX_FLAGS_NORMAL) {
--		ring->dma = dma_alloc_coherent(eth->dma_dev,
--				rx_dma_size * eth->soc->rx.desc_size,
--				&ring->phys, GFP_KERNEL);
--	} else {
--		struct mtk_tx_ring *tx_ring = &eth->tx_ring;
--
--		ring->dma = tx_ring->dma + tx_ring_size *
--			    eth->soc->tx.desc_size * (ring_no + 1);
--		ring->phys = tx_ring->phys + tx_ring_size *
--			     eth->soc->tx.desc_size * (ring_no + 1);
--	}
--
-+	ring->dma = mtk_dma_ring_alloc(eth,
-+				       rx_dma_size * eth->soc->rx.desc_size,
-+				       &ring->phys,
-+				       rx_flag == MTK_RX_FLAGS_NORMAL);
- 	if (!ring->dma)
- 		return -ENOMEM;
- 
-@@ -2916,10 +2918,9 @@ static void mtk_rx_clean(struct mtk_eth *eth, struct mtk_rx_ring *ring, bool in_
- 		ring->data = NULL;
- 	}
- 
--	if (!in_sram && ring->dma) {
--		dma_free_coherent(eth->dma_dev,
--				  ring->dma_size * eth->soc->rx.desc_size,
--				  ring->dma, ring->phys);
-+	if (ring->dma) {
-+		mtk_dma_ring_free(eth, ring->dma_size * eth->soc->rx.desc_size,
-+				  ring->dma, ring->phys, in_sram);
- 		ring->dma = NULL;
- 	}
- 
-@@ -3287,15 +3288,16 @@ static void mtk_dma_free(struct mtk_eth *eth)
- 			netdev_tx_reset_subqueue(eth->netdev[i], j);
- 	}
- 
--	if (!MTK_HAS_CAPS(soc->caps, MTK_SRAM) && eth->scratch_ring) {
--		dma_free_coherent(eth->dma_dev,
--				  MTK_QDMA_RING_SIZE * soc->tx.desc_size,
--				  eth->scratch_ring, eth->phy_scratch_ring);
-+	if (eth->scratch_ring) {
-+		mtk_dma_ring_free(eth, soc->tx.fq_dma_size * soc->tx.desc_size,
-+				  eth->scratch_ring, eth->phy_scratch_ring,
-+				  true);
- 		eth->scratch_ring = NULL;
- 		eth->phy_scratch_ring = 0;
- 	}
-+
- 	mtk_tx_clean(eth);
--	mtk_rx_clean(eth, &eth->rx_ring[0], MTK_HAS_CAPS(soc->caps, MTK_SRAM));
-+	mtk_rx_clean(eth, &eth->rx_ring[0], true);
- 	mtk_rx_clean(eth, &eth->rx_ring_qdma, false);
- 
- 	if (eth->hwlro) {
-@@ -5007,9 +5009,30 @@ static int mtk_sgmii_init(struct mtk_eth *eth)
- 	return 0;
- }
- 
-+static int mtk_setup_legacy_sram(struct mtk_eth *eth, struct resource *res)
-+{
-+	dev_warn(eth->dev, "legacy DT: using hard-coded SRAM offset.\n");
-+
-+	if (res->start + MTK_ETH_SRAM_OFFSET + MTK_ETH_NETSYS_V2_SRAM_SIZE - 1 >
-+	    res->end)
-+		return -EINVAL;
-+
-+	eth->sram_pool = devm_gen_pool_create(eth->dev,
-+					      const_ilog2(MTK_ETH_SRAM_GRANULARITY),
-+					      NUMA_NO_NODE, dev_name(eth->dev));
-+
-+	if (IS_ERR(eth->sram_pool))
-+		return PTR_ERR(eth->sram_pool);
-+
-+	return gen_pool_add_virt(eth->sram_pool,
-+				 (unsigned long)eth->base + MTK_ETH_SRAM_OFFSET,
-+				 res->start + MTK_ETH_SRAM_OFFSET,
-+				 MTK_ETH_NETSYS_V2_SRAM_SIZE, NUMA_NO_NODE);
-+}
-+
- static int mtk_probe(struct platform_device *pdev)
- {
--	struct resource *res = NULL, *res_sram;
-+	struct resource *res = NULL;
- 	struct device_node *mac_np;
- 	struct mtk_eth *eth;
- 	int err, i;
-@@ -5029,20 +5052,6 @@ static int mtk_probe(struct platform_device *pdev)
- 	if (MTK_HAS_CAPS(eth->soc->caps, MTK_SOC_MT7628))
- 		eth->ip_align = NET_IP_ALIGN;
- 
--	if (MTK_HAS_CAPS(eth->soc->caps, MTK_SRAM)) {
--		/* SRAM is actual memory and supports transparent access just like DRAM.
--		 * Hence we don't require __iomem being set and don't need to use accessor
--		 * functions to read from or write to SRAM.
--		 */
--		if (mtk_is_netsys_v3_or_greater(eth)) {
--			eth->sram_base = (void __force *)devm_platform_ioremap_resource(pdev, 1);
--			if (IS_ERR(eth->sram_base))
--				return PTR_ERR(eth->sram_base);
--		} else {
--			eth->sram_base = (void __force *)eth->base + MTK_ETH_SRAM_OFFSET;
--		}
--	}
--
- 	if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA)) {
- 		err = dma_set_mask(&pdev->dev, DMA_BIT_MASK(36));
- 		if (!err)
-@@ -5117,16 +5126,21 @@ static int mtk_probe(struct platform_device *pdev)
- 			err = -EINVAL;
- 			goto err_destroy_sgmii;
- 		}
-+
- 		if (MTK_HAS_CAPS(eth->soc->caps, MTK_SRAM)) {
--			if (mtk_is_netsys_v3_or_greater(eth)) {
--				res_sram = platform_get_resource(pdev, IORESOURCE_MEM, 1);
--				if (!res_sram) {
-+			eth->sram_pool = of_gen_pool_get(pdev->dev.of_node,
-+							 "sram", 0);
-+			if (!eth->sram_pool) {
-+				if (!mtk_is_netsys_v3_or_greater(eth)) {
-+					err = mtk_setup_legacy_sram(eth, res);
-+					if (err)
-+						goto err_destroy_sgmii;
-+				} else {
-+					dev_err(&pdev->dev,
-+						"Could not get SRAM pool\n");
- 					err = -EINVAL;
- 					goto err_destroy_sgmii;
- 				}
--				eth->phy_scratch_ring = res_sram->start;
--			} else {
--				eth->phy_scratch_ring = res->start + MTK_ETH_SRAM_OFFSET;
- 			}
- 		}
- 	}
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-index 1ad9075a9b69..0168e2fbc619 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-@@ -141,8 +141,10 @@
- #define MTK_GDMA_MAC_ADRH(x)	({ typeof(x) _x = (x); (_x == MTK_GMAC3_ID) ?	\
- 				   0x54C : 0x50C + (_x * 0x1000); })
- 
--/* Internal SRAM offset */
--#define MTK_ETH_SRAM_OFFSET	0x40000
-+/* legacy DT support for internal SRAM */
-+#define MTK_ETH_SRAM_OFFSET		0x40000
-+#define MTK_ETH_SRAM_GRANULARITY	32
-+#define MTK_ETH_NETSYS_V2_SRAM_SIZE	0x40000
- 
- /* FE global misc reg*/
- #define MTK_FE_GLO_MISC         0x124
-@@ -1245,7 +1247,7 @@ struct mtk_soc_data {
-  * @dev:		The device pointer
-  * @dma_dev:		The device pointer used for dma mapping/alloc
-  * @base:		The mapped register i/o base
-- * @sram_base:		The mapped SRAM base
-+ * @sram_pool:		Pointer to SRAM pool used for DMA descriptor rings
-  * @page_lock:		Make sure that register operations are atomic
-  * @tx_irq__lock:	Make sure that IRQ register operations are atomic
-  * @rx_irq__lock:	Make sure that IRQ register operations are atomic
-@@ -1291,7 +1293,7 @@ struct mtk_eth {
- 	struct device			*dev;
- 	struct device			*dma_dev;
- 	void __iomem			*base;
--	void				*sram_base;
-+	struct gen_pool			*sram_pool;
- 	spinlock_t			page_lock;
- 	spinlock_t			tx_irq_lock;
- 	spinlock_t			rx_irq_lock;
--- 
-2.50.0
+Thanks,
+Stefano
+
+>
+>	David
+>
+>>  	struct scatterlist pkt, *p;
+>>  	struct virtqueue *vq;
+>>  	struct sk_buff *skb;
+>
+>
+
 
