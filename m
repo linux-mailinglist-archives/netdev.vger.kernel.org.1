@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-203552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0288FAF65C1
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 01:02:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1654BAF65C2
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 01:02:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EA1F482FBA
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 23:02:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CE551C42B12
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 23:02:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 164762652B6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97E52882CB;
 	Wed,  2 Jul 2025 23:02:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BO/kWIKe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mw39WXlb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3923B247298
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 23:02:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD9A2571D7
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 23:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751497340; cv=none; b=IOvi4jvR7unWCwCGuLlcVcT9bScBOHJbg9WUkr+duSCMvFQvD5S+eEkBcsv9YlqsZYyDvDZx1gaQyEiIe+bHLF6AOXCplYWlGNHxcDwufVPZwd/MTmbjjYl6Rjmqg0wvqNNPVYyfkLPjXDRYOtC0hdoj8+z3PWOQzR5zCp7EZ7Q=
+	t=1751497340; cv=none; b=PULJpjPeivEtuzXvHLhIxTzGQbpvvS8uKX+BeY2Sp7OH0M7EUP/Si9I1pgSDKfKxiRrrQcibG7rbwfwrzXZMaEcAk6N4oX4OCOY1W6ravulCrLtBd7NLzWv58GMQB/mxDG7jBlphwG/J4NA0kp90wjOyvtjM0+9N40pcUidxDho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1751497340; c=relaxed/simple;
-	bh=HgCa4+Ufz6GWWH3Q0HrK31t6CggWnibOj3mfOWyE2LM=;
+	bh=Abth/biW28FWoMiVoW0dS3YfqLdrd6/rvoFsposiTu4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gwdXoWrqjLcB9YM8zdu/tjJGBHc8kuHXp1F4lZ5dY3p3bUzeCGnHgKfRPV21QjHI+9+07brTDKKxTpH7aylG4FMm1omXzSz+YmO5yIgUFB3mWmQoRSaClE0eSz2OcmvMA3hkSBG7UN/jmE+KRJihLVbBMwu3JpzNHd84Kgb9sus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BO/kWIKe; arc=none smtp.client-ip=209.85.216.42
+	 MIME-Version; b=Y7Quni+f6zZJJqxs+Wnhr7Us7gDmf6fhm0AOeK5SnfIcDFFuCt0ijtM8mxg/YFXq3W/g6hnQhic5027Q3LhadW81gplNRRjO3bZagSZiCHZnnvOQXHtsmOYFzgcKzkFm1d8SsQ8pw/6fmdtrFTu9ccG5lC9LVWYqwmQAPb38XN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mw39WXlb; arc=none smtp.client-ip=209.85.216.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-3141b84bf65so7146949a91.1
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 16:02:18 -0700 (PDT)
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-313eeb77b1fso3892131a91.1
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 16:02:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751497337; x=1752102137; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1751497339; x=1752102139; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=90c6e6gbua2OJyy0zMFwOjiCznFt+/dmu+zJS47O8VY=;
-        b=BO/kWIKeS6+QWTXXyWxmb1B6HYzal0YFzC99geLu2Fok/hJXqEMnJGAk6a+INUFSOi
-         lYdT2w0nq7nZL4Gc9EquFFkXREvY6FBwtO7S40ZL2XAwfpY2hJvYRlZk3nodWyJDOLgB
-         ULQec75L5xyxhJrYino59gU36fqL2BNDHN7y7bjpkP0Bqzy5l4IwrpiA6Xry0J0XnUPm
-         Hl01dxEF0F6gdMnCi3QPyyl9cWyi3IEFaWqfA4Hr0BnYwTGyeY++DU8uBng9zsTBPNQ8
-         5i6PA/CxFZTewu6Wu0GZXR75KzOb5/jRKNdkTtuNQYcJ1pIC5tV9e1dnPdxhxv8hXJ16
-         Ywiw==
+        bh=cJFbN7WIBxa/Oi0MFVBur9Xjy1zWj6zkfVWihlv4ZVc=;
+        b=mw39WXlbZPigt3RqAci2qupTgdzIAf+63u4hDqOZTfMhqVsvIKymR9TBn1+sH1uFMV
+         LoqyufoPrD77x1vUDJAJXOoepofB6kAGhQher1xLDvu+wdCUrLE5HRXNYLXPI9fNMMH5
+         kgt/MjckbGQm9/0tDhtdNxRptKdW0hjNiH0jMsiQFsJnWw0G+u3SG+GejCmog3TXVzgg
+         x16AZVrGUMuONJS/meOsjI1a8iQldxIcmUfkroXYpB2JGiAoIIehvvczk4gZGuUnNyQj
+         hY9+rJwcYehgPQIxWyd0OICMSWMMhA+9LTcSGUMxNvjGWbUU5w5MFMmVZaWBNnpSdP+D
+         GtYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751497337; x=1752102137;
+        d=1e100.net; s=20230601; t=1751497339; x=1752102139;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=90c6e6gbua2OJyy0zMFwOjiCznFt+/dmu+zJS47O8VY=;
-        b=trHWWIPX0zBN53OEh7WlWCOMjUSTSoy4E2qTc9/jKvU6RHzjgsI93HGBrYfQ1WFAcf
-         bx9E6LzWHPOOPobXGNtXqx8ai4UsdupFNXGNopt83a3A3T4dX2+RsC9xzXPRxikhZRwg
-         OjGiGiQx03I+6P1U4FtXCRJ/nEvEuUxf785sTqFj92oHmNSsjJDsgqQxML7LvPsmjVl1
-         0G3im3yoWZlDGKjiGXm3Y09y2kK2AFtYmkgZfa1AK9oTUSJGzMmb4UpkyqxE0kBcCrWI
-         sr6jtvnMrQL+/aP+HfTc9l/MpfBrWSV/dzksgyEwfQDmArZNB4ByMjwCgU22Pjsk/z9y
-         Ud6A==
-X-Forwarded-Encrypted: i=1; AJvYcCVwm2hGfaZhRAZa4y6oDS/HOaIlKBXaIHPAIk5H8En2jtH45PIzyWp+Qji4XCl21f8H/CXoxUo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwC1gPdHJMt1OGivvTWce0E7EyRD4FNpuhdfaweX3yyhQCqqCfu
-	sfcoNf8FL9as4eual+UH7xf078EVGXV7iF+Ql+5j7kOPPDaqV4JHln4=
-X-Gm-Gg: ASbGncvET8fAuFrkN4FGMaQdSbe2Tupdkp+/RaHEJTO1+QH5TIAzSf3bMeW69hmJf25
-	rwFxvlrGGtsDMa3X5NXbi8wtfZ7832KfqPYRX7N6nyhmpLby7RsHBfH/vznPKjd0NAIf2ohlhhQ
-	SZ5rPujoMN0qZulNaXNyUTtYClxitYgOeFVeNen4p1+mvnQ7TZ5pbvPWrF51WrmB/97b2Fj4wzb
-	RXgG74eRD4Qi3LznZTSyVA+lAFxltSxMLnqKx+b7tl0YHHs3RVMEbY6jmVtBACrcmGGT+Y5Q+U3
-	1HsHOdH71Tzw0eWI7BGm456JaRM14dz4bljVP7k=
-X-Google-Smtp-Source: AGHT+IFBejVHdOIA51KaXtBjFaju4Trk3VwJi4s3C4XY98Cm1AEBL4MnRe6c1qUggBHusjvK8roO/w==
-X-Received: by 2002:a17:90b:1b50:b0:312:db8f:9a09 with SMTP id 98e67ed59e1d1-31a90b483f8mr7473435a91.14.1751497337318;
-        Wed, 02 Jul 2025 16:02:17 -0700 (PDT)
+        bh=cJFbN7WIBxa/Oi0MFVBur9Xjy1zWj6zkfVWihlv4ZVc=;
+        b=hKy2NVqpeqrNNfTNPB5DvFT5hkrd1I+zpIHESrA+nJCitWhtBGsFhYFWU2jdQcPPXp
+         yysloJ0UZ42BDbj9zHlg5rP/LUhoMU/y7L/9BiEQUT6IULYSni0/mADCMDo25qhrtW0I
+         usedCGtaKP5Jm7p8KtA31rDhab+tidOrKY+r0M3bQQED2KpOuCico7OMd6vGj31Q2I7I
+         VJ/9SWttgyrZNbqbMhLjB46r9vpI8GqAzkE1lKNiYMEQXNEZq8bzha4y+3uUYNOHzhx5
+         NFY2b+I6bRr44V90ztEymy6vNjeSBbw2OM3WofjuWwoTLZiD+DlYe+K/i2mug3vIsCp2
+         7ABQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW/egDxiC8IkftCIrrynUnt5mRwf7wMj/R92PMV1H3IG83XDlQXTpKnK14HFvVbiT7deKFKLZE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyac6A0VhJd/ERwuOv+WlYFKm6/gRMjBM25k49sci6Y954YIawU
+	Jc9EeBK7fslgWQpdysb9mIvvOrGIDmt4Km7nM9gfOauxhBPOriRwiW4=
+X-Gm-Gg: ASbGncvkZtW+/JSbl4lmWGBWTYYmJhP8ceHA8C6FRI1q+IIaoSOWNHcY/dqOVLl6NM/
+	Jh+jY6LJZAA2O11AbQRIWlqKnu6BVAHP/5lfFCDLOXwayzIVqs6QS/x5cEttW8PkMSWbaeI4vZL
+	G0S2UHpE/CBu5KYwzfg0HXX0zbdySFZC4WIbyR7snu8LXYpn/d9JF8NZuIJyqIj37XMz6tN2wCm
+	zAzQmLdFA5GU4e3CmucDVrWi0YF8eAwdSh9oF82IBe7Joj9JtyeIxj3u9UB/DcW3SA8Ak7VoIj+
+	yJw5KLKxEB+1x8esFC6qJJCjtja85KbZtAyNjSo=
+X-Google-Smtp-Source: AGHT+IFhHhlbCr4rbJ7mAfRTZ1dEEAGr0pTOfxVi1BjEj7qeIfuRv+N/7w2IuMfl+H/HiuuLxDE6cQ==
+X-Received: by 2002:a17:90b:2f4c:b0:312:f0d0:bb0 with SMTP id 98e67ed59e1d1-31a90b39399mr8314483a91.12.1751497338468;
+        Wed, 02 Jul 2025 16:02:18 -0700 (PDT)
 Received: from fedora.. ([2601:647:6700:3390::a408])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31a9cc70a17sm727071a91.26.2025.07.02.16.02.16
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31a9cc70a17sm727071a91.26.2025.07.02.16.02.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 16:02:16 -0700 (PDT)
+        Wed, 02 Jul 2025 16:02:18 -0700 (PDT)
 From: Kuniyuki Iwashima <kuni1840@gmail.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	David Ahern <dsahern@kernel.org>,
@@ -82,9 +82,9 @@ Cc: Simon Horman <horms@kernel.org>,
 	Kuniyuki Iwashima <kuniyu@google.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH v3 net-next 02/15] ipv6: mcast: Replace locking comments with lockdep annotations.
-Date: Wed,  2 Jul 2025 16:01:19 -0700
-Message-ID: <20250702230210.3115355-3-kuni1840@gmail.com>
+Subject: [PATCH v3 net-next 03/15] ipv6: mcast: Check inet6_dev->dead under idev->mc_lock in __ipv6_dev_mc_inc().
+Date: Wed,  2 Jul 2025 16:01:20 -0700
+Message-ID: <20250702230210.3115355-4-kuni1840@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250702230210.3115355-1-kuni1840@gmail.com>
 References: <20250702230210.3115355-1-kuni1840@gmail.com>
@@ -98,484 +98,108 @@ Content-Transfer-Encoding: 8bit
 
 From: Kuniyuki Iwashima <kuniyu@google.com>
 
-Commit 63ed8de4be81 ("mld: add mc_lock for protecting per-interface
-mld data") added the same comments regarding locking to many functions.
+Since commit 63ed8de4be81 ("mld: add mc_lock for protecting
+per-interface mld data"), every multicast resource is protected
+by inet6_dev->mc_lock.
 
-Let's replace the comments with lockdep annotation, which is more helpful.
+RTNL is unnecessary in terms of protection but still needed for
+synchronisation between addrconf_ifdown() and __ipv6_dev_mc_inc().
 
-Note that we just remove the comment for mld_clear_zeros() and
-mld_send_cr(), where mc_dereference() is used in the entry of the
-function.
+Once we removed RTNL, there would be a race below, where we could
+add a multicast address to a dead inet6_dev.
 
-While at it, a comment for __ipv6_sock_mc_join() is moved back to the
-correct place.
+  CPU1                            CPU2
+  ====                            ====
+  addrconf_ifdown()               __ipv6_dev_mc_inc()
+                                    if (idev->dead) <-- false
+    dead = true                       return -ENODEV;
+    ipv6_mc_destroy_dev() / ipv6_mc_down()
+      mutex_lock(&idev->mc_lock)
+      ...
+      mutex_unlock(&idev->mc_lock)
+                                    mutex_lock(&idev->mc_lock)
+                                    ...
+                                    mutex_unlock(&idev->mc_lock)
+
+The race window can be easily closed by checking inet6_dev->dead
+under inet6_dev->mc_lock in __ipv6_dev_mc_inc() as addrconf_ifdown()
+will acquire it after marking inet6_dev dead.
+
+Let's check inet6_dev->dead under mc_lock in __ipv6_dev_mc_inc().
+
+Note that now __ipv6_dev_mc_inc() no longer depends on RTNL and
+we can remove ASSERT_RTNL() there and the RTNL comment above
+addrconf_join_solict().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv6/mcast.c | 125 +++++++++++++++++++++++++++--------------------
- 1 file changed, 71 insertions(+), 54 deletions(-)
+ net/ipv6/addrconf.c |  7 +++----
+ net/ipv6/mcast.c    | 11 +++++------
+ 2 files changed, 8 insertions(+), 10 deletions(-)
 
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 9c297974d3a6..dcc07767e51f 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -2229,13 +2229,12 @@ void addrconf_dad_failure(struct sk_buff *skb, struct inet6_ifaddr *ifp)
+ 	in6_ifa_put(ifp);
+ }
+ 
+-/* Join to solicited addr multicast group.
+- * caller must hold RTNL */
++/* Join to solicited addr multicast group. */
+ void addrconf_join_solict(struct net_device *dev, const struct in6_addr *addr)
+ {
+ 	struct in6_addr maddr;
+ 
+-	if (dev->flags&(IFF_LOOPBACK|IFF_NOARP))
++	if (READ_ONCE(dev->flags) & (IFF_LOOPBACK | IFF_NOARP))
+ 		return;
+ 
+ 	addrconf_addr_solict_mult(addr, &maddr);
+@@ -3865,7 +3864,7 @@ static int addrconf_ifdown(struct net_device *dev, bool unregister)
+ 	 *	   Do not dev_put!
+ 	 */
+ 	if (unregister) {
+-		idev->dead = 1;
++		WRITE_ONCE(idev->dead, 1);
+ 
+ 		/* protected by rtnl_lock */
+ 		RCU_INIT_POINTER(dev->ip6_ptr, NULL);
 diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
-index 65831b4fee1f..5cd94effbc92 100644
+index 5cd94effbc92..15a37352124d 100644
 --- a/net/ipv6/mcast.c
 +++ b/net/ipv6/mcast.c
-@@ -108,9 +108,9 @@ static int __ipv6_dev_mc_inc(struct net_device *dev,
- int sysctl_mld_max_msf __read_mostly = IPV6_MLD_MAX_MSF;
- int sysctl_mld_qrv __read_mostly = MLD_QRV_DEFAULT;
- 
--/*
-- *	socket join on multicast group
-- */
-+#define mc_assert_locked(idev)			\
-+	lockdep_assert_held(&(idev)->mc_lock)
-+
- #define mc_dereference(e, idev) \
- 	rcu_dereference_protected(e, lockdep_is_held(&(idev)->mc_lock))
- 
-@@ -169,6 +169,9 @@ static int unsolicited_report_interval(struct inet6_dev *idev)
- 	return iv > 0 ? iv : 1;
- }
- 
-+/*
-+ *	socket join on multicast group
-+ */
- static int __ipv6_sock_mc_join(struct sock *sk, int ifindex,
- 			       const struct in6_addr *addr, unsigned int mode)
+@@ -952,23 +952,22 @@ static void inet6_ifmcaddr_notify(struct net_device *dev,
+ static int __ipv6_dev_mc_inc(struct net_device *dev,
+ 			     const struct in6_addr *addr, unsigned int mode)
  {
-@@ -668,12 +671,13 @@ bool inet6_mc_check(const struct sock *sk, const struct in6_addr *mc_addr,
- 	return rv;
- }
+-	struct ifmcaddr6 *mc;
+ 	struct inet6_dev *idev;
+-
+-	ASSERT_RTNL();
++	struct ifmcaddr6 *mc;
  
--/* called with mc_lock */
- static void igmp6_group_added(struct ifmcaddr6 *mc)
- {
- 	struct net_device *dev = mc->idev->dev;
- 	char buf[MAX_ADDR_LEN];
- 
-+	mc_assert_locked(mc->idev);
-+
- 	if (IPV6_ADDR_MC_SCOPE(&mc->mca_addr) <
- 	    IPV6_ADDR_SCOPE_LINKLOCAL)
- 		return;
-@@ -703,12 +707,13 @@ static void igmp6_group_added(struct ifmcaddr6 *mc)
- 	mld_ifc_event(mc->idev);
- }
- 
--/* called with mc_lock */
- static void igmp6_group_dropped(struct ifmcaddr6 *mc)
- {
- 	struct net_device *dev = mc->idev->dev;
- 	char buf[MAX_ADDR_LEN];
- 
-+	mc_assert_locked(mc->idev);
-+
- 	if (IPV6_ADDR_MC_SCOPE(&mc->mca_addr) <
- 	    IPV6_ADDR_SCOPE_LINKLOCAL)
- 		return;
-@@ -729,14 +734,13 @@ static void igmp6_group_dropped(struct ifmcaddr6 *mc)
- 		refcount_dec(&mc->mca_refcnt);
- }
- 
--/*
-- * deleted ifmcaddr6 manipulation
-- * called with mc_lock
-- */
-+/* deleted ifmcaddr6 manipulation */
- static void mld_add_delrec(struct inet6_dev *idev, struct ifmcaddr6 *im)
- {
- 	struct ifmcaddr6 *pmc;
- 
-+	mc_assert_locked(idev);
-+
- 	/* this is an "ifmcaddr6" for convenience; only the fields below
- 	 * are actually used. In particular, the refcnt and users are not
- 	 * used for management of the delete list. Using the same structure
-@@ -770,13 +774,14 @@ static void mld_add_delrec(struct inet6_dev *idev, struct ifmcaddr6 *im)
- 	rcu_assign_pointer(idev->mc_tomb, pmc);
- }
- 
--/* called with mc_lock */
- static void mld_del_delrec(struct inet6_dev *idev, struct ifmcaddr6 *im)
- {
- 	struct ip6_sf_list *psf, *sources, *tomb;
- 	struct in6_addr *pmca = &im->mca_addr;
- 	struct ifmcaddr6 *pmc, *pmc_prev;
- 
-+	mc_assert_locked(idev);
-+
- 	pmc_prev = NULL;
- 	for_each_mc_tomb(idev, pmc) {
- 		if (ipv6_addr_equal(&pmc->mca_addr, pmca))
-@@ -813,11 +818,12 @@ static void mld_del_delrec(struct inet6_dev *idev, struct ifmcaddr6 *im)
- 	}
- }
- 
--/* called with mc_lock */
- static void mld_clear_delrec(struct inet6_dev *idev)
- {
- 	struct ifmcaddr6 *pmc, *nextpmc;
- 
-+	mc_assert_locked(idev);
-+
- 	pmc = mc_dereference(idev->mc_tomb, idev);
- 	RCU_INIT_POINTER(idev->mc_tomb, NULL);
- 
-@@ -874,13 +880,14 @@ static void ma_put(struct ifmcaddr6 *mc)
- 	}
- }
- 
--/* called with mc_lock */
- static struct ifmcaddr6 *mca_alloc(struct inet6_dev *idev,
- 				   const struct in6_addr *addr,
- 				   unsigned int mode)
- {
- 	struct ifmcaddr6 *mc;
- 
-+	mc_assert_locked(idev);
-+
- 	mc = kzalloc(sizeof(*mc), GFP_KERNEL);
- 	if (!mc)
- 		return NULL;
-@@ -1091,46 +1098,51 @@ bool ipv6_chk_mcast_addr(struct net_device *dev, const struct in6_addr *group,
- 	return rv;
- }
- 
--/* called with mc_lock */
- static void mld_gq_start_work(struct inet6_dev *idev)
- {
- 	unsigned long tv = get_random_u32_below(idev->mc_maxdelay);
- 
-+	mc_assert_locked(idev);
-+
- 	idev->mc_gq_running = 1;
- 	if (!mod_delayed_work(mld_wq, &idev->mc_gq_work, tv + 2))
- 		in6_dev_hold(idev);
- }
- 
--/* called with mc_lock */
- static void mld_gq_stop_work(struct inet6_dev *idev)
- {
-+	mc_assert_locked(idev);
-+
- 	idev->mc_gq_running = 0;
- 	if (cancel_delayed_work(&idev->mc_gq_work))
- 		__in6_dev_put(idev);
- }
- 
--/* called with mc_lock */
- static void mld_ifc_start_work(struct inet6_dev *idev, unsigned long delay)
- {
- 	unsigned long tv = get_random_u32_below(delay);
- 
-+	mc_assert_locked(idev);
-+
- 	if (!mod_delayed_work(mld_wq, &idev->mc_ifc_work, tv + 2))
- 		in6_dev_hold(idev);
- }
- 
--/* called with mc_lock */
- static void mld_ifc_stop_work(struct inet6_dev *idev)
- {
-+	mc_assert_locked(idev);
-+
- 	idev->mc_ifc_count = 0;
- 	if (cancel_delayed_work(&idev->mc_ifc_work))
- 		__in6_dev_put(idev);
- }
- 
--/* called with mc_lock */
- static void mld_dad_start_work(struct inet6_dev *idev, unsigned long delay)
- {
- 	unsigned long tv = get_random_u32_below(delay);
- 
-+	mc_assert_locked(idev);
-+
- 	if (!mod_delayed_work(mld_wq, &idev->mc_dad_work, tv + 2))
- 		in6_dev_hold(idev);
- }
-@@ -1155,14 +1167,13 @@ static void mld_report_stop_work(struct inet6_dev *idev)
- 		__in6_dev_put(idev);
- }
- 
--/*
-- * IGMP handling (alias multicast ICMPv6 messages)
-- * called with mc_lock
-- */
-+/* IGMP handling (alias multicast ICMPv6 messages) */
- static void igmp6_group_queried(struct ifmcaddr6 *ma, unsigned long resptime)
- {
- 	unsigned long delay = resptime;
- 
-+	mc_assert_locked(ma->idev);
-+
- 	/* Do not start work for these addresses */
- 	if (ipv6_addr_is_ll_all_nodes(&ma->mca_addr) ||
- 	    IPV6_ADDR_MC_SCOPE(&ma->mca_addr) < IPV6_ADDR_SCOPE_LINKLOCAL)
-@@ -1181,15 +1192,15 @@ static void igmp6_group_queried(struct ifmcaddr6 *ma, unsigned long resptime)
- 	ma->mca_flags |= MAF_TIMER_RUNNING;
- }
- 
--/* mark EXCLUDE-mode sources
-- * called with mc_lock
-- */
-+/* mark EXCLUDE-mode sources */
- static bool mld_xmarksources(struct ifmcaddr6 *pmc, int nsrcs,
- 			     const struct in6_addr *srcs)
- {
- 	struct ip6_sf_list *psf;
- 	int i, scount;
- 
-+	mc_assert_locked(pmc->idev);
-+
- 	scount = 0;
- 	for_each_psf_mclock(pmc, psf) {
- 		if (scount == nsrcs)
-@@ -1212,13 +1223,14 @@ static bool mld_xmarksources(struct ifmcaddr6 *pmc, int nsrcs,
- 	return true;
- }
- 
--/* called with mc_lock */
- static bool mld_marksources(struct ifmcaddr6 *pmc, int nsrcs,
- 			    const struct in6_addr *srcs)
- {
- 	struct ip6_sf_list *psf;
- 	int i, scount;
- 
-+	mc_assert_locked(pmc->idev);
-+
- 	if (pmc->mca_sfmode == MCAST_EXCLUDE)
- 		return mld_xmarksources(pmc, nsrcs, srcs);
- 
-@@ -1913,7 +1925,6 @@ static struct sk_buff *add_grhead(struct sk_buff *skb, struct ifmcaddr6 *pmc,
- 
- #define AVAILABLE(skb)	((skb) ? skb_availroom(skb) : 0)
- 
--/* called with mc_lock */
- static struct sk_buff *add_grec(struct sk_buff *skb, struct ifmcaddr6 *pmc,
- 				int type, int gdeleted, int sdeleted,
- 				int crsend)
-@@ -1927,6 +1938,8 @@ static struct sk_buff *add_grec(struct sk_buff *skb, struct ifmcaddr6 *pmc,
- 	struct mld2_report *pmr;
- 	unsigned int mtu;
- 
-+	mc_assert_locked(idev);
-+
- 	if (pmc->mca_flags & MAF_NOREPORT)
- 		return skb;
- 
-@@ -2045,12 +2058,13 @@ static struct sk_buff *add_grec(struct sk_buff *skb, struct ifmcaddr6 *pmc,
- 	return skb;
- }
- 
--/* called with mc_lock */
- static void mld_send_report(struct inet6_dev *idev, struct ifmcaddr6 *pmc)
- {
- 	struct sk_buff *skb = NULL;
- 	int type;
- 
-+	mc_assert_locked(idev);
-+
- 	if (!pmc) {
- 		for_each_mc_mclock(idev, pmc) {
- 			if (pmc->mca_flags & MAF_NOREPORT)
-@@ -2072,10 +2086,7 @@ static void mld_send_report(struct inet6_dev *idev, struct ifmcaddr6 *pmc)
- 		mld_sendpack(skb);
- }
- 
--/*
-- * remove zero-count source records from a source filter list
-- * called with mc_lock
-- */
-+/* remove zero-count source records from a source filter list */
- static void mld_clear_zeros(struct ip6_sf_list __rcu **ppsf, struct inet6_dev *idev)
- {
- 	struct ip6_sf_list *psf_prev, *psf_next, *psf;
-@@ -2099,7 +2110,6 @@ static void mld_clear_zeros(struct ip6_sf_list __rcu **ppsf, struct inet6_dev *i
- 	}
- }
- 
--/* called with mc_lock */
- static void mld_send_cr(struct inet6_dev *idev)
- {
- 	struct ifmcaddr6 *pmc, *pmc_prev, *pmc_next;
-@@ -2263,13 +2273,14 @@ static void igmp6_send(struct in6_addr *addr, struct net_device *dev, int type)
- 	goto out;
- }
- 
--/* called with mc_lock */
- static void mld_send_initial_cr(struct inet6_dev *idev)
- {
--	struct sk_buff *skb;
- 	struct ifmcaddr6 *pmc;
-+	struct sk_buff *skb;
- 	int type;
- 
-+	mc_assert_locked(idev);
-+
- 	if (mld_in_v1_mode(idev))
- 		return;
- 
-@@ -2316,13 +2327,14 @@ static void mld_dad_work(struct work_struct *work)
- 	in6_dev_put(idev);
- }
- 
--/* called with mc_lock */
- static int ip6_mc_del1_src(struct ifmcaddr6 *pmc, int sfmode,
--	const struct in6_addr *psfsrc)
-+			   const struct in6_addr *psfsrc)
- {
- 	struct ip6_sf_list *psf, *psf_prev;
- 	int rv = 0;
- 
-+	mc_assert_locked(pmc->idev);
-+
- 	psf_prev = NULL;
- 	for_each_psf_mclock(pmc, psf) {
- 		if (ipv6_addr_equal(&psf->sf_addr, psfsrc))
-@@ -2359,7 +2371,6 @@ static int ip6_mc_del1_src(struct ifmcaddr6 *pmc, int sfmode,
- 	return rv;
- }
- 
--/* called with mc_lock */
- static int ip6_mc_del_src(struct inet6_dev *idev, const struct in6_addr *pmca,
- 			  int sfmode, int sfcount, const struct in6_addr *psfsrc,
- 			  int delta)
-@@ -2371,6 +2382,8 @@ static int ip6_mc_del_src(struct inet6_dev *idev, const struct in6_addr *pmca,
+ 	/* we need to take a reference on idev */
+ 	idev = in6_dev_get(dev);
+-
  	if (!idev)
+ 		return -EINVAL;
+ 
+-	if (idev->dead) {
++	mutex_lock(&idev->mc_lock);
++
++	if (READ_ONCE(idev->dead)) {
++		mutex_unlock(&idev->mc_lock);
+ 		in6_dev_put(idev);
  		return -ENODEV;
- 
-+	mc_assert_locked(idev);
-+
- 	for_each_mc_mclock(idev, pmc) {
- 		if (ipv6_addr_equal(pmca, &pmc->mca_addr))
- 			break;
-@@ -2412,15 +2425,14 @@ static int ip6_mc_del_src(struct inet6_dev *idev, const struct in6_addr *pmca,
- 	return err;
- }
- 
--/*
-- * Add multicast single-source filter to the interface list
-- * called with mc_lock
-- */
-+/* Add multicast single-source filter to the interface list */
- static int ip6_mc_add1_src(struct ifmcaddr6 *pmc, int sfmode,
--	const struct in6_addr *psfsrc)
-+			   const struct in6_addr *psfsrc)
- {
- 	struct ip6_sf_list *psf, *psf_prev;
- 
-+	mc_assert_locked(pmc->idev);
-+
- 	psf_prev = NULL;
- 	for_each_psf_mclock(pmc, psf) {
- 		if (ipv6_addr_equal(&psf->sf_addr, psfsrc))
-@@ -2443,11 +2455,12 @@ static int ip6_mc_add1_src(struct ifmcaddr6 *pmc, int sfmode,
- 	return 0;
- }
- 
--/* called with mc_lock */
- static void sf_markstate(struct ifmcaddr6 *pmc)
- {
--	struct ip6_sf_list *psf;
- 	int mca_xcount = pmc->mca_sfcount[MCAST_EXCLUDE];
-+	struct ip6_sf_list *psf;
-+
-+	mc_assert_locked(pmc->idev);
- 
- 	for_each_psf_mclock(pmc, psf) {
- 		if (pmc->mca_sfcount[MCAST_EXCLUDE]) {
-@@ -2460,14 +2473,15 @@ static void sf_markstate(struct ifmcaddr6 *pmc)
  	}
- }
  
--/* called with mc_lock */
- static int sf_setstate(struct ifmcaddr6 *pmc)
- {
--	struct ip6_sf_list *psf, *dpsf;
- 	int mca_xcount = pmc->mca_sfcount[MCAST_EXCLUDE];
-+	struct ip6_sf_list *psf, *dpsf;
- 	int qrv = pmc->idev->mc_qrv;
- 	int new_in, rv;
- 
-+	mc_assert_locked(pmc->idev);
-+
- 	rv = 0;
- 	for_each_psf_mclock(pmc, psf) {
- 		if (pmc->mca_sfcount[MCAST_EXCLUDE]) {
-@@ -2526,10 +2540,7 @@ static int sf_setstate(struct ifmcaddr6 *pmc)
- 	return rv;
- }
- 
--/*
-- * Add multicast source filter list to the interface list
-- * called with mc_lock
-- */
-+/* Add multicast source filter list to the interface list */
- static int ip6_mc_add_src(struct inet6_dev *idev, const struct in6_addr *pmca,
- 			  int sfmode, int sfcount, const struct in6_addr *psfsrc,
- 			  int delta)
-@@ -2541,6 +2552,8 @@ static int ip6_mc_add_src(struct inet6_dev *idev, const struct in6_addr *pmca,
- 	if (!idev)
- 		return -ENODEV;
- 
-+	mc_assert_locked(idev);
-+
- 	for_each_mc_mclock(idev, pmc) {
- 		if (ipv6_addr_equal(pmca, &pmc->mca_addr))
- 			break;
-@@ -2588,11 +2601,12 @@ static int ip6_mc_add_src(struct inet6_dev *idev, const struct in6_addr *pmca,
- 	return err;
- }
- 
--/* called with mc_lock */
- static void ip6_mc_clear_src(struct ifmcaddr6 *pmc)
- {
- 	struct ip6_sf_list *psf, *nextpsf;
- 
-+	mc_assert_locked(pmc->idev);
-+
- 	for (psf = mc_dereference(pmc->mca_tomb, pmc->idev);
- 	     psf;
- 	     psf = nextpsf) {
-@@ -2613,11 +2627,12 @@ static void ip6_mc_clear_src(struct ifmcaddr6 *pmc)
- 	WRITE_ONCE(pmc->mca_sfcount[MCAST_EXCLUDE], 1);
- }
- 
--/* called with mc_lock */
- static void igmp6_join_group(struct ifmcaddr6 *ma)
- {
- 	unsigned long delay;
- 
-+	mc_assert_locked(ma->idev);
-+
- 	if (ma->mca_flags & MAF_NOREPORT)
- 		return;
- 
-@@ -2664,9 +2679,10 @@ static int ip6_mc_leave_src(struct sock *sk, struct ipv6_mc_socklist *iml,
- 	return err;
- }
- 
--/* called with mc_lock */
- static void igmp6_leave_group(struct ifmcaddr6 *ma)
- {
-+	mc_assert_locked(ma->idev);
-+
- 	if (mld_in_v1_mode(ma->idev)) {
- 		if (ma->mca_flags & MAF_LAST_REPORTER) {
- 			igmp6_send(&ma->mca_addr, ma->idev->dev,
-@@ -2711,9 +2727,10 @@ static void mld_ifc_work(struct work_struct *work)
- 	in6_dev_put(idev);
- }
- 
--/* called with mc_lock */
- static void mld_ifc_event(struct inet6_dev *idev)
- {
-+	mc_assert_locked(idev);
-+
- 	if (mld_in_v1_mode(idev))
- 		return;
- 
+-	mutex_lock(&idev->mc_lock);
+ 	for_each_mc_mclock(idev, mc) {
+ 		if (ipv6_addr_equal(&mc->mca_addr, addr)) {
+ 			mc->mca_users++;
 -- 
 2.49.0
 
