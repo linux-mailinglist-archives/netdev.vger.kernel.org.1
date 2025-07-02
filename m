@@ -1,234 +1,151 @@
-Return-Path: <netdev+bounces-203256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2153AF107D
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:49:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66672AF1072
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:48:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 634641898178
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:47:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 13CA27A63E8
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F18A23D285;
-	Wed,  2 Jul 2025 09:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B8824A047;
+	Wed,  2 Jul 2025 09:47:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D1824DD07
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 09:46:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9D5247297;
+	Wed,  2 Jul 2025 09:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751449597; cv=none; b=hPhE4Hje89C8rELD7j/hwYrJDTYVKoBr/ueJ8nmaM5KnFJ1dX3NNn9JFGuw32wx2Ak1HVTldhE7gwP4wZv313NqtIKgkC51woqXgebxeS2fpFNLaPCpp6a1X/NPSqChN3EKcFpqAya6SMqOoPQ2ShfdHYwbqq9fSo7huSjVpFzI=
+	t=1751449663; cv=none; b=ZJUu9gprHOKMS5k6jrMHxFiPI/rI8IEmrQXW3xOzE/WU9kU6ws+u3bc4VoO+ydq64TFMB5l0Tn6APzb+2owoN8SVE+bBynEru1a1Jsh63/TqlGbcl7jG2U3g1ABoQnyFtbnKPon7PHKIqOLaGKBRiAbAqQez5gBf8Cy5PNJt9y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751449597; c=relaxed/simple;
-	bh=fcqLwKrtBfo+Rc0zgHHKHepYzHt0trmddqrZRYjg/Xs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L6jgY0qr4erLkjpeQqSCYSz0L8SgqyvFy4oQFgEKg5lWGD5iZv0VmyzFjlkRs7b58xm1j3zwmeozw5geaTexn8C1J2GGHfY6rNwJWe1oVEtrIWS+Ao0pUthtZy+0sz9AKMcvWvrRQ7lGPxRoIpBQUu8tMg4pN1/+x51KFqY16rQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uWu2Z-0007ke-ED; Wed, 02 Jul 2025 11:46:07 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uWu2X-006PhV-26;
-	Wed, 02 Jul 2025 11:46:05 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uWu2X-00DaqA-1k;
-	Wed, 02 Jul 2025 11:46:05 +0200
-Date: Wed, 2 Jul 2025 11:46:05 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	Andre Edich <andre.edich@microchip.com>
-Subject: Re: [PATCH net v1 4/4] net: phy: smsc: Disable IRQ support to
- prevent link state corruption
-Message-ID: <aGT_3SpVVzJFzT6B@pengutronix.de>
-References: <20250701122146.35579-1-o.rempel@pengutronix.de>
- <20250701122146.35579-5-o.rempel@pengutronix.de>
- <aGPba6fX1bqgVfYC@wunner.de>
+	s=arc-20240116; t=1751449663; c=relaxed/simple;
+	bh=Ouh2tjXOCV5J1xbDYQClFn1faPkd4g72dS9hnpcKiwc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KFBeGQ2O87XNd1SVPY7iQ4lYlGTVKx4jaPiwz1eddJc3D8DC4GIAv7VcYQM+uFTWT4pkgMxJcfl+EkXLwtl+kBjYq+YrSETkL1/LPVIGm1xhsrWFu7fOQ/2omXcfXDlDf7Ny+sU05Kly68QoUXvNHvfrE/VBY7jLdnS/2wdeOsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-87f4c8e9cdcso1520255241.2;
+        Wed, 02 Jul 2025 02:47:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751449660; x=1752054460;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UJLSZzMoHvI3XA3eUYjDZLD323ifNHYwsv3Hd6lOZUk=;
+        b=K4tw+vOGERB5jPntnu3uo+har3n5vaHjHsUPSpL2Pfl9+WJZKsh5KWnclZAZnGhlZ4
+         18Ur3LTdSLko5EojrpqmH20lsYQ7FrAhz1BLGNECRdQZfk/o/A/wBLKdNj6M6Gqyp19e
+         GBZJC6zw4N5q55Ld6kfiOR0bc5R0EfUdBWOz/KxGY0YXmQB+Cf0Yi9EdhILS5u7OChIL
+         8a7m0TupWLGSZmFxE2gCb2RbwC4qJkFs4grrwc9Xr8hDg6/AS7G0cWVBRwrX9thTU0J2
+         NOTvxEpwL6SYDvuBSGPGz9jbZCOqd83ofV8VgrvHAaucpX/BEu2K0/9YaSejh21puuHI
+         cCQg==
+X-Forwarded-Encrypted: i=1; AJvYcCUa3eAOcq10WMeh5cSjK8KbluyKhOotrUdXNVtqwvZrfh2bVU//hOkC2kQt684Z/9el9v6ohdUj@vger.kernel.org, AJvYcCVhB7i9ygtG4Ops5OiKUZR8esu5wA2/CIkIQeAyuHB3WyZBtb7IJ25DktMipHyM/4wd+Umqekxhpxvm@vger.kernel.org, AJvYcCWiZ7REFq+yVIZFveWXdD5Z8DUbmOTtSS3qZ99oYrT8IqvdFCg1CyvSaMNnUTvmLKyCGnO42C6AU12f@vger.kernel.org, AJvYcCWz6sW6J/ANgmlI9yfOK85B1FWpX2+buXm0ZHiUfclLxeFxBGo/Dj5klPzKsMakpfrH+EtQdulLxFxZBgY+@vger.kernel.org, AJvYcCXU7OaFn459Ei3ytaRzbEM0iqwAq9tl/BeImMx6H+YqMZeYr5u6rSbWZ26kQe3WnLDdcelhiziDxdD+J/fMBfaVVQg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZxZ5jOGFWnTE2ifZZKCYIRyr/WcWFpHnh9acTHBs3Tw4zvrHA
+	n9b79hTXfb0izTvSRXGU6QAGLt+8eWTGEkxduIO+zQlssBrYfwjKH5+BJHfEKcHo
+X-Gm-Gg: ASbGncuTzah0PkjykJNIyHlQdkdryqQ+PVHUY98IQAPmzp/I5ftWX3wq+3d3xnp3hYa
+	qk56h3OOVHihMj8KC0Kjnkrzw+kiBM0ctgoTO1zhTrKpiw2JirFXi0qTscxBThelhgJ/ZzWSyzK
+	0HxTitq9CK4otFhpLWwShUqTlZz7ZZM1uZu+uPponj4e+0GwU936Vx2H2hCWuF7SC1yKCMGfR6+
+	0gszWG/jy9e1MDOWuDwPcOP04eDsR5At9otH0dohVKdnCV3Wtru76XcPf/JRqf73zf17ohsVnRm
+	3cRIHiWKR3eRPuWKEBu8j5ONf1dCYSQwnO7izF8TRBwvKJKz0FS4fO2Bv2vxO/joQw8K2M2ut5+
+	5ILcbl7AXZPGVj+hKx42E2dyP
+X-Google-Smtp-Source: AGHT+IFnbx4WhcjjRJhuYKew+vkIZVG5I7u/AhmG8xwPh273vO3UIHNcJCeZ+stYHAYQZdh042SYNg==
+X-Received: by 2002:a05:6102:41ab:b0:4ec:c50c:399f with SMTP id ada2fe7eead31-4f16117a294mr803148137.11.1751449660106;
+        Wed, 02 Jul 2025 02:47:40 -0700 (PDT)
+Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com. [209.85.217.50])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4ee4c7ec2cfsm1776243137.7.2025.07.02.02.47.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Jul 2025 02:47:39 -0700 (PDT)
+Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-4e7fc3309f2so1584627137.2;
+        Wed, 02 Jul 2025 02:47:39 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUG6VowTjowzfY9ejsqrzOa/fvya25urfdq4YVCXg4DAKVURqr5dgWpiErNyrVOBffHGD4e2La+HVcF@vger.kernel.org, AJvYcCUeJHyQAvITNXJKQw4rgKWsdymWqD12UJ+RANqxdVfC9vJMxR6Yw6cHw4EhhpjKCLJPmErJWBRk59V2YT7ua9DwETQ=@vger.kernel.org, AJvYcCVOy0C1N+x1kJ0UsV+eBK5eSDx4QjnolcPpdDKga6/dGOCPJ49aolt6TGQQJQ8+rXIonaMuOpH/@vger.kernel.org, AJvYcCWiCKqTrsptwVvSK7OHrHyD9siyIOiH2GlxaCXg5BGaWhXNgy3VkzkRqvcAt18AMBC1KEEy96ShQO/Lde8Q@vger.kernel.org, AJvYcCXeXhoJRMzpx2OoDbei+oMCH72QpaaJFo8+vjLC3E5f58jgOXf2ySroq5TzirO5yqmm+Ssp80PfYX9/@vger.kernel.org
+X-Received: by 2002:a05:6102:b0d:b0:4e7:efa3:6475 with SMTP id
+ ada2fe7eead31-4f1614301fdmr617117137.25.1751449659490; Wed, 02 Jul 2025
+ 02:47:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aGPba6fX1bqgVfYC@wunner.de>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20250702005706.1200059-1-john.madieu.xa@bp.renesas.com> <20250702005706.1200059-3-john.madieu.xa@bp.renesas.com>
+In-Reply-To: <20250702005706.1200059-3-john.madieu.xa@bp.renesas.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 2 Jul 2025 11:47:27 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdVsvWrTBXkZ4etWy-8sPH4TG7AEyD_Z27RBWutNvpmUHA@mail.gmail.com>
+X-Gm-Features: Ac12FXyvUOO4u1emMGsdqUSyi2v-LKjWFuqnGZiY-qtjH2LDcXJWx9ecan2toDc
+Message-ID: <CAMuHMdVsvWrTBXkZ4etWy-8sPH4TG7AEyD_Z27RBWutNvpmUHA@mail.gmail.com>
+Subject: Re: [PATCH v4 2/4] pinctrl: renesas: rzg2l: Pass OEN pin names
+To: John Madieu <john.madieu.xa@bp.renesas.com>, prabhakar.mahadev-lad.rj@bp.renesas.com
+Cc: magnus.damm@gmail.com, robh@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, mturquette@baylibre.com, sboyd@kernel.org, 
+	richardcochran@gmail.com, linux-renesas-soc@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-clk@vger.kernel.org, netdev@vger.kernel.org, biju.das.jz@bp.renesas.com, 
+	john.madieu@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Lukas,
+Hi John, Prabhakar,
 
-On Tue, Jul 01, 2025 at 02:58:19PM +0200, Lukas Wunner wrote:
-> On Tue, Jul 01, 2025 at 02:21:46PM +0200, Oleksij Rempel wrote:
-> > Disable interrupt handling for the LAN87xx PHY to prevent the network
-> > interface from entering a corrupted state after rapid configuration
-> > changes.
-> > 
-> > When the link configuration is changed quickly, the PHY can get stuck in
-> > a non-functional state. In this state, 'ethtool' reports that a link is
-> > present, but 'ip link' shows NO-CARRIER, and the interface is unable to
-> > transfer data.
-> [...]
-> > --- a/drivers/net/phy/smsc.c
-> > +++ b/drivers/net/phy/smsc.c
-> > @@ -746,10 +746,6 @@ static struct phy_driver smsc_phy_driver[] = {
-> >  	.soft_reset	= smsc_phy_reset,
-> >  	.config_aneg	= lan87xx_config_aneg,
-> >  
-> > -	/* IRQ related */
-> > -	.config_intr	= smsc_phy_config_intr,
-> > -	.handle_interrupt = smsc_phy_handle_interrupt,
-> > -
-> 
-> Well, that's not good.  I guess this means that the interrupt is
-> polled again, so we basically go back to the suboptimal behavior
-> prior to 1ce8b37241ed?
+On Wed, 2 Jul 2025 at 02:57, John Madieu <john.madieu.xa@bp.renesas.com> wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+>
+> Pass the OEN pin names via the SoC-specific hardware configuration
+> structure to allow reuse of rzv2h_oen_read() and rzv2h_oen_write()
+> on multiple SoCs.
+>
+> On the RZ/V2H(P) and RZ/G3E SoCs, the PFC_OEN register is located at the
+> same offset. However, the register controls different pins on each SoC.
+> Hardcoding the pin names in the common logic prevents reusability.
+>
+> Extend struct rzg2l_hwcfg to include an array of OEN pin names and its
+> length. Use these values in rzv2h_pin_to_oen_bit() to determine the bit
+> position dynamically based on the active SoC.
+>
+> This enables shared handling of OEN register access while accounting for
+> SoC-specific pin mappings.
+>
+> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-Not fully. It will disable interrupt support only for the embedded PHY,
-other types of interrupts should work as expected.
+Thanks for your patch!
 
-> Without support for interrupt handling, we can't take advantage
-> of the GPIOs on the chip for interrupt generation.  Nor can we
-> properly support runtime PM if no cable is attached.
+> --- a/drivers/pinctrl/renesas/pinctrl-rzg2l.c
+> +++ b/drivers/pinctrl/renesas/pinctrl-rzg2l.c
+> @@ -257,6 +257,8 @@ enum rzg2l_iolh_index {
+>   * @func_base: base number for port function (see register PFC)
+>   * @oen_max_pin: the maximum pin number supporting output enable
+>   * @oen_max_port: the maximum port number supporting output enable
+> + * @oen_pin_names: array of pin names for output enable
+> + * @oen_pin_names_len: length of the oen_pin_names array
+>   */
+>  struct rzg2l_hwcfg {
+>         const struct rzg2l_register_offsets regs;
+> @@ -269,6 +271,8 @@ struct rzg2l_hwcfg {
+>         u8 func_base;
+>         u8 oen_max_pin;
+>         u8 oen_max_port;
+> +       const char * const *oen_pin_names;
+> +       u8 oen_pin_names_len;
 
-Hm... the PHY smsc driver is not using EDPD mode by default if PHY
-interrupts are enabled. Or do you mean other kind of PM?
+Please exchange the order of the members, so the u8 fits in the
+existing hole.
 
-> What's the actual root cause?  Is it the issue described in this
-> paragraph of 1ce8b37241ed's commit message?
-> 
->     Normally the PHY interrupt should be masked until the PHY driver has
->     cleared it.  However masking requires a (sleeping) USB transaction and
->     interrupts are received in (non-sleepable) softirq context.  I decided
->     not to mask the interrupt at all (by using the dummy_irq_chip's noop
->     ->irq_mask() callback):  The USB interrupt endpoint is polled in 1 msec
->     intervals and normally that's sufficient to wake the PHY driver's IRQ
->     thread and have it clear the interrupt.  If it does take longer, worst
->     thing that can happen is the IRQ thread is woken again.  No big deal.
+However, I think you better drop this patch, and use the existing
+rzg2l_pinctrl_data.oen_{read,write]() abstraction instead.
 
-I'm not sure. It seems to be not the problem.
+>  };
 
-> There must be better options than going back to polling.
-> E.g. inserting delays to avoid the PHY getting wedged.
-> 
-> TBH I did test this thoroughly back in the day and never
-> witnessed the issue.
+Gr{oetje,eeting}s,
 
-I did some testing back in time too. It worked and still works normally
-in the autoneg mode.
-
-What is not working as expected is the fixed mode, especially 10 mbit
-fixed mode.
-
-Here are my current testing results:
-
-# configure 10 mbit forced mode:
-ethtool -s eth0 autoneg off speed 10 duplex half
-# attach cable (can be done wothout reataching cable)
-[10174.585150] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[10174.586760] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[10174.594636] lan87xx_read_status: link: no, speed: 10, duplex: half, autoneg: off
-[10174.602777] lan87xx_read_status: link: no, speed: 10, duplex: half, autoneg: off
-[10174.841458] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[10174.843017] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[10174.850619] lan87xx_read_status: link: no, speed: 10, duplex: half, autoneg: off
-[10174.857026] lan87xx_read_status: link: no, speed: 10, duplex: half, autoneg: off
-[10175.425513] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[10175.427046] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[10175.434871] lan87xx_read_status: link: no, speed: 10, duplex: half, autoneg: off
-[10175.441332] lan87xx_read_status: link: no, speed: 10, duplex: half, autoneg: off
-
-At this point no more interrupts will come and link up state will not be
-detected. Replugging cable will have same result.
-
-The worst part - unplugging the cable may trigger an endless interrupt storm
-(which is some times reproducible in the 10Mbit forced mode):
-[ 1584.132799] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 1584.134220] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 1584.389134] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 1584.390591] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 1584.644757] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 1584.646177] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 1584.900781] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 1584.902305] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 1585.158416] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-
-With latest kernel we can use adaptive polling, wich I added now for
-testing. Here are the results:
-
-[ 2200.702427] lan87xx_read_status: link: no, speed: 10, duplex: half, autoneg: off
-[ 2200.948552] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2200.949640] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2200.950182] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2200.951374] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 2200.953186] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 2200.959234] lan87xx_read_status: link: no, speed: 10, duplex: half, autoneg: off
-[ 2201.204270] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2201.205284] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2201.207139] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 2201.208825] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 2201.216406] lan87xx_read_status: link: no, speed: 10, duplex: half, autoneg: off
-[ 2201.460548] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2201.461618] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2201.462181] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2201.463273] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 2201.464764] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 2201.471066] lan87xx_read_status: link: no, speed: 10, duplex: half, autoneg: off
-[ 2201.716547] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2201.717607] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2201.718235] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2201.719267] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 2201.721035] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 2201.727488] lan87xx_read_status: link: no, speed: 10, duplex: half, autoneg: off
-[ 2201.972542] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2201.973614] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2201.974176] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2201.975321] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 2201.977078] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 2201.983500] lan87xx_read_status: link: no, speed: 10, duplex: half, autoneg: off
-[ 2202.228538] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2202.229615] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2202.230174] smsc95xx 1-1.1:1.0 enu1u1: intdata: 0x00008000
-[ 2202.231292] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 2202.233038] smsc_phy_handle_interrupt: MII_LAN83C185_ISF = 0x0098
-[ 2202.238972] lan87xx_read_status: link: no, speed: 10, duplex: half, autoneg: off
-[ 2202.239018] smsc_phy_get_next_update: next update in 250 jiffies
-[ 2203.258566] lan87xx_read_status: link: yes, speed: 10, duplex: half, autoneg: off
-[ 2203.258756] smsc95xx 1-1.1:1.0 enu1u1: Link is Up - 10Mbps/Half - flow control off
-
-With adaptive polling we can use both. Since IRQ down interrupt works as
-expected, we can use low frequency polling (one per 30 seconds) in link up
-state. On link down state, after last interrupt poll one time per second
-for 30 seconds, then switch to low frequency polling (one per 30
-seconds).
-
-I need to figure out haw to handle an interrupt storm.
+                        Geert
 
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
