@@ -1,209 +1,158 @@
-Return-Path: <netdev+bounces-203226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF0F4AF0D56
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:58:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EB3BAF0D6D
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:03:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C69B64A3B5E
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 07:58:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E15B1C24001
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:03:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A198823182D;
-	Wed,  2 Jul 2025 07:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5315B2356DB;
+	Wed,  2 Jul 2025 08:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bL9LGCpl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1Tw4tUHH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F514C62;
-	Wed,  2 Jul 2025 07:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B101E2343AF
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 08:03:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751443101; cv=none; b=GyG25JM2kGApfnE0io5x3Peq4gQB9Ns9uPIDgw7FjvHnriQ7py3LcvC0YO4vQVzkd5thY1sH3pkLxuSRgSIIaXaZEaUqjT0XAm9Aah3YBuRcR+acqbKrOuvV8O67j5Td12j9VEbWCIcwTSu5z2RIr8kRXoN+Haei3Bxl8xy1Tnk=
+	t=1751443386; cv=none; b=pCFIz0KY0WMJSct9QjkDRtaxT4pwNEnRzppUWH1bTf0BFC+wS+NvzGz9tdyaN4o5BJYnbBZyyyP7Do5Ft0ndqb48GVtc/Q1yxP6grPEgtVjuUBRqr+Opmcwnj46HrSRf0Rkt71lPBdaK2qOWu40PQ6CWm7NthnSZZSH03wK88oE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751443101; c=relaxed/simple;
-	bh=1LJqahTJT53+fLu9xji5BGVOylitLicsEW0XIPFnVOo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GIyzDW+uAKlY0fxeqLlY6C4Hg7zkaHFp0nwKGVjf1RCf6RC7NzpK4YldbdOezmtsioSha9vMya259iEmuJjhNxlEQ7qYjFp4QTd2lG9IFKswXA3/hcMW/tiGTBGIVPXjyL+Mnm/4HcdvBBlbHwrowcKZVrXI0K/NlhO0CAPLnxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bL9LGCpl; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-235ea292956so38538705ad.1;
-        Wed, 02 Jul 2025 00:58:19 -0700 (PDT)
+	s=arc-20240116; t=1751443386; c=relaxed/simple;
+	bh=k5rRe3xa5VlcBs3acQkW7OBTqBGq71i2uzhF8vuv0ao=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DHiZICxOETL4J3CGdgIVPAUZL3tKpJFszuOagMzifC5f6emAT0fBq8kZuqvH6VVuzbH6r9EyUstswq/8fsci5WlvVfgbbXyVKp4xwlPJvnOG/1JHVWmM36htP5dZhPGleABPU6vRIpGIms0C+YFQ/u1SrmIT9IaXQksFvjFN+KI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1Tw4tUHH; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4a8244e897fso29291171cf.1
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 01:03:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751443099; x=1752047899; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rMrPa+nCyVOrTi/KimE81WsU7dXcbbOJzv0t/rpE1q0=;
-        b=bL9LGCplNPgeSBEPAUnvEzXdCW6jaKUQKKaI5KePUzNf7Hseaopu+P5Q47N7FagGwb
-         AVQ/yqmFa6eYJXSftwxbCoTMFo83CmERdeFpxNH/bqjZFry+Bs0yO6MfSwRF4wz/KNsl
-         LtwFLkWvrQKPichJO28R2jvTbzor67r+TzZAsBA4yq0voI2+Ck7lKO1goQ7cHAd6BKlD
-         D8ItzpwScnO59vZXALV909b8V+/VCiDtrdMrC+Jn6uqN2pURyY5Wdn7wt9QkmMHZFTMN
-         H4QEw3SIHDOcNRXuHJO4llyvPf+DM28E73CuHWk9OP1/lnmFPZWLRj5jV1ib1kz5+5ok
-         GiTw==
+        d=google.com; s=20230601; t=1751443383; x=1752048183; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qBZuk3H+46fxs/MVm+reaCZ2EIrEk1+0jJRknjvGIxs=;
+        b=1Tw4tUHHlmyn9nBgfvABW/B2HXHpVP1/UC84idzP+0uDc3LlsBmqRu6jVycDjPR95s
+         FrAY/iXCfJ7zzdawLEiUmMhKiZpci/AoIAe2BQGaOLGHTVeexdGB896HJlmS6hB9JO2t
+         lAYFbAeV0B0fm1JCHm+3lLE9owByQZ5ttzgni9f/weDNeqlBxxGi7mkkNMEn+229sO6Q
+         fF2nEh9GR13uhGcxzsN8oFlc2S6/20+xU5BXQqmaTZDATqfL1AdSsu3+ZKDRGVed2/mO
+         +D9Y6JdqW13VVRKyCZLZH90ZSdQGfsmCHRq9OCAbt0xCpaY19q4OKlUkr3SJcwYwNafe
+         +Bhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751443099; x=1752047899;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rMrPa+nCyVOrTi/KimE81WsU7dXcbbOJzv0t/rpE1q0=;
-        b=xFniAHo8+MtzG3jXb/M61hx33TU0Lc8DW73M02EWkQc9Mn7uVTfGRCslcJoAXpSNRH
-         GJ/mHzJ7BXb9KFUClIGL37iYoRsG/8FEB+5ktyvhTd9UISIfLDAGrkIbvADUPC92Ac5+
-         xthYYbM39W9b3G9ktVNgMUlOdFfhJLtvn/irYnj3zBb6B1Itukm9x2ujYSDb2cmxHG9B
-         4+LQohJiDeVbEspa++hwgKCqnMH/Wyg9U5Mz9Ps5JyVh31wFIKOGOVNt72U7jgEW+bIL
-         UL3SK2HuOYvj5Gjex14YWL09HcnqD1JPvlku6nb1B/KkjVoi3uAZmK8km+tkzJllDr9l
-         S4sw==
-X-Forwarded-Encrypted: i=1; AJvYcCV7h3Tk4YCG9/O9efkUIliXfd2Yq5QivEoYVpMjLyIlTvGrfyt++4tWL6ZgR+6BhqpIHo715/Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzN0V5UWjtxYLjkIBPh2GpJGMzcXAYTTcSuxqTtPrL5ZGLVgb7/
-	fJ6oiuddtFg+OGyqQ/xkoE+wEoxr5UalzP1iNHoBdG3WRMeP18ts99FJ
-X-Gm-Gg: ASbGncs1mC419xb1cbL+kubiHOplR+ERbjrtXjOKtvMjj5fbZKXmzfb9TN28DHvQbrL
-	25s4SCgD7Pd3RCM4DEJ80h1YmhzUcd9sATzpJ02kzpexDL6dxWzVhO1BxUIHe0juF1jJExaNaEM
-	c9uAwJeJHarrwRzAayrETUSyLXUtuKjUf9F4VXJV2HPaaiS3LcymU5Qt+ykESzbFXUtSL/bZ5K1
-	2fLSwUpTvOKMR1UBwJGksuk2jEJoWQrMASwiS/FSd+mCbI6tGG7MiPWl5uPnwzgU7L7Lu+KCGZc
-	ZVBnozthG76aIpv4xCqo/57ge13lIiJApq2KpjXe9ig6USKrm5pJcSCI7iRJ9kSjGYywSb2n/3h
-	EJV7YePHnF0slO2HU/Lq3zHyyMu7bsvLvDA==
-X-Google-Smtp-Source: AGHT+IHLDutWch0IE2Bvaph3sB0QawPJ6Z0hKCLgrQShX7CnSrpXHC5UwFey5MHn8lcu2vldiVGXsQ==
-X-Received: by 2002:a17:903:4b4c:b0:234:f182:a734 with SMTP id d9443c01a7336-23c6e54ff8fmr30013685ad.31.1751443099079;
-        Wed, 02 Jul 2025 00:58:19 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb2e2493sm131262725ad.48.2025.07.02.00.58.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 00:58:18 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	sdf@fomichev.me,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	joe@dama.to,
-	willemdebruijn.kernel@gmail.com
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v2] Documentation: xsk: correct the obsolete references and examples
-Date: Wed,  2 Jul 2025 15:58:11 +0800
-Message-Id: <20250702075811.15048-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+        d=1e100.net; s=20230601; t=1751443383; x=1752048183;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qBZuk3H+46fxs/MVm+reaCZ2EIrEk1+0jJRknjvGIxs=;
+        b=I2+I+9EY0VLtdhWDZn1Ys1/cBAg81SCRnUj2JhzH4tgErQJ4oOAJvqAvO9W8xH2SBv
+         45HsYBYdNk8bLiUxlyvanIBOHrF+l3gip1apvVGECr9hrVL/tYqWwvDFmSVClfk+zvN4
+         3K8R2VZylSnzYbhOu0OWW9aGfgQRcOMmIxao0+GFBOZkevCjByNXVM3ebo8qiK8CyWAj
+         amFHDvJX+E80ULh9Dku3crx5SDwkPm7T7nCtSZaUjUBi1ex66Enlgo4XtLYvYE+zjuNm
+         ZcjzsMTlbac4DVuq7A0NoH1tl67Et5LFJioBwyKK/XJaGCPwk6UAMZ2EndXTlXsUlKdO
+         xSlA==
+X-Forwarded-Encrypted: i=1; AJvYcCWyi5qv4IBqNvrxRco2B6JMmOrsfmbGAaVTVwHbg/83PbitML94nqlPba9ln8Nt64nnfuw+apY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcjUa5gpcPtVmV/EM4zjGFcVIbj7uhv1VncnQHN7UXNoTSnmgT
+	wIVWBmSC0b4OYkzDSOdBibCvTlmyLTAk969jWWCJDDzR6cGcrHo3GJ/tc5OUVllHBGCw5Bkl68g
+	QE+aJJUyRqzqGMPCiD09WXvW3YeUr9IdefvtRl27c
+X-Gm-Gg: ASbGnctHnmUgb1nTi6V4d6LsXHteSKXXc5SSfNOGQHDb0XCgcibUCvsECsL99a/Eo/J
+	YmABEulx15/+3VHidBcN4a7H0X+KX10SL/TfiKuubveD83ILEdltx75KVbOTHbvMTolgrclYW8c
+	s1vJYLe18UGafOk3OTMostH86pQGU0FshcjvmvvdZWMSg=
+X-Google-Smtp-Source: AGHT+IEWbarWvhofM/Pc12nISnSJw5RsRYduWp+QpexvsV9hogHcgiiuS7H42Qn0RZOWso9jMo9yKjhsiKGhVcygTSE=
+X-Received: by 2002:a05:622a:28c:b0:494:75f7:b0fa with SMTP id
+ d75a77b69052e-4a976a6ef2dmr36464411cf.41.1751443383082; Wed, 02 Jul 2025
+ 01:03:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250702020437.703698-1-kuniyu@google.com> <20250702020437.703698-2-kuniyu@google.com>
+In-Reply-To: <20250702020437.703698-2-kuniyu@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 2 Jul 2025 01:02:51 -0700
+X-Gm-Features: Ac12FXzPFJ3gtxBFYVfZfFoTLtrIri7P5W-UntjWVFvR3CMrQaKtvPUYFwIjZ6I
+Message-ID: <CANn89iKmA41ERK2VFScyrJ7PNNwqH4VBK9kpzNgxO3oFTRq=mQ@mail.gmail.com>
+Subject: Re: [PATCH v1 net 1/2] atm: clip: Fix infinite recursive call of clip_push().
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	syzbot+0c77cccd6b7cd917b35a@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jason Xing <kernelxing@tencent.com>
+On Tue, Jul 1, 2025 at 7:04=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.com=
+> wrote:
+>
+> syzbot reported the splat below. [0]
+>
+> This happens if we call ioctl(ATMARP_MKIP) more than once.
+>
+> During the first call, clip_mkip() sets clip_push() to vcc->push(),
+> and the second call copies it to clip_vcc->old_push().
+>
+> Later, when a NULL skb is passed to clip_push(), it calls
+> clip_vcc->old_push(), triggering the infinite recursion.
+>
+> Let's prevent the second ioctl(ATMARP_MKIP) by checking
+> vcc->user_back, which is allocated by the first call as clip_vcc.
+>
+> Note also that we use lock_sock() to prevent racy calls.
+>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-by: syzbot+0c77cccd6b7cd917b35a@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D2371d94d248d126c1eb1
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+> ---
+>  net/atm/clip.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/net/atm/clip.c b/net/atm/clip.c
+> index b234dc3bcb0d..250b3c7f4305 100644
+> --- a/net/atm/clip.c
+> +++ b/net/atm/clip.c
+> @@ -417,6 +417,8 @@ static int clip_mkip(struct atm_vcc *vcc, int timeout=
+)
+>
+>         if (!vcc->push)
+>                 return -EBADFD;
+> +       if (vcc->user_back)
+> +               return -EINVAL;
+>         clip_vcc =3D kmalloc(sizeof(struct clip_vcc), GFP_KERNEL);
+>         if (!clip_vcc)
+>                 return -ENOMEM;
+> @@ -655,6 +657,7 @@ static int atm_init_atmarp(struct atm_vcc *vcc)
+>  static int clip_ioctl(struct socket *sock, unsigned int cmd, unsigned lo=
+ng arg)
+>  {
+>         struct atm_vcc *vcc =3D ATM_SD(sock);
+> +       struct sock *sk =3D sock->sk;
+>         int err =3D 0;
+>
+>         switch (cmd) {
+> @@ -682,7 +685,9 @@ static int clip_ioctl(struct socket *sock, unsigned i=
+nt cmd, unsigned long arg)
+>                 }
+>                 break;
+>         case ATMARP_MKIP:
+> +               lock_sock(sk);
+>                 err =3D clip_mkip(vcc, arg);
+> +               release_sock(sk);
 
-The modified lines are mainly related to the following commits[1][2]
-which remove those tests and examples. Since samples/bpf has been
-deprecated, we can refer to more examples that are easily searched
-in the various xdp-projects, like the following link:
-https://github.com/xdp-project/bpf-examples/tree/main/AF_XDP-example
+This will still race with atm_init_atmarp(), which (ab)uses RTNL ?
 
-[1]
-commit f36600634282 ("libbpf: move xsk.{c,h} into selftests/bpf")
-[2]
-commit cfb5a2dbf141 ("bpf, samples: Remove AF_XDP samples")
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
-V2
-Link: https://lore.kernel.org/all/20250628120841.12421-1-kerneljasonxing@gmail.com/
-1. restore one part of doc and keep modifying a bit.
----
- Documentation/networking/af_xdp.rst | 39 +++++++++++++----------------
- 1 file changed, 18 insertions(+), 21 deletions(-)
-
-diff --git a/Documentation/networking/af_xdp.rst b/Documentation/networking/af_xdp.rst
-index dceeb0d763aa..a206c3636468 100644
---- a/Documentation/networking/af_xdp.rst
-+++ b/Documentation/networking/af_xdp.rst
-@@ -209,13 +209,10 @@ Libbpf
- 
- Libbpf is a helper library for eBPF and XDP that makes using these
- technologies a lot simpler. It also contains specific helper functions
--in tools/lib/bpf/xsk.h for facilitating the use of AF_XDP. It
--contains two types of functions: those that can be used to make the
--setup of AF_XDP socket easier and ones that can be used in the data
--plane to access the rings safely and quickly. To see an example on how
--to use this API, please take a look at the sample application in
--samples/bpf/xdpsock_usr.c which uses libbpf for both setup and data
--plane operations.
-+in ./tools/testing/selftests/bpf/xsk.h for facilitating the use of
-+AF_XDP. It contains two types of functions: those that can be used to
-+make the setup of AF_XDP socket easier and ones that can be used in the
-+data plane to access the rings safely and quickly.
- 
- We recommend that you use this library unless you have become a power
- user. It will make your program a lot simpler.
-@@ -372,9 +369,8 @@ needs to explicitly notify the kernel to send any packets put on the
- TX ring. This can be accomplished either by a poll() call, as in the
- RX path, or by calling sendto().
- 
--An example of how to use this flag can be found in
--samples/bpf/xdpsock_user.c. An example with the use of libbpf helpers
--would look like this for the TX path:
-+An example with the use of libbpf helpers would look like this for the
-+TX path:
- 
- .. code-block:: c
- 
-@@ -549,12 +545,12 @@ later in this document.
- Usage
- -----
- 
--In order to use AF_XDP sockets two parts are needed. The
--user-space application and the XDP program. For a complete setup and
--usage example, please refer to the sample application. The user-space
--side is xdpsock_user.c and the XDP side is part of libbpf.
-+In order to use AF_XDP sockets two parts are needed. The user-space
-+application and the XDP program. For a complete setup and usage example,
-+please refer to the xdp-project at
-+https://github.com/xdp-project/bpf-examples/tree/main/AF_XDP-example.
- 
--The XDP code sample included in tools/lib/bpf/xsk.c is the following:
-+The XDP code sample is the following:
- 
- .. code-block:: c
- 
-@@ -752,11 +748,12 @@ to facilitate extending a zero-copy driver with multi-buffer support.
- 
- Sample application
- ==================
--
--There is a xdpsock benchmarking/test application included that
--demonstrates how to use AF_XDP sockets with private UMEMs. Say that
--you would like your UDP traffic from port 4242 to end up in queue 16,
--that we will enable AF_XDP on. Here, we use ethtool for this::
-+There is a xdpsock benchmarking/test application that can be found at
-+https://github.com/xdp-project/bpf-examples/tree/main/AF_XDP-example
-+that demonstrates how to use AF_XDP sockets with private
-+UMEMs. Say that you would like your UDP traffic from port 4242 to end
-+up in queue 16, that we will enable AF_XDP on. Here, we use ethtool
-+for this::
- 
-       ethtool -N p3p2 rx-flow-hash udp4 fn
-       ethtool -N p3p2 flow-type udp4 src-port 4242 dst-port 4242 \
-@@ -773,7 +770,7 @@ can be displayed with "-h", as usual.
- This sample application uses libbpf to make the setup and usage of
- AF_XDP simpler. If you want to know how the raw uapi of AF_XDP is
- really used to make something more advanced, take a look at the libbpf
--code in tools/lib/bpf/xsk.[ch].
-+code in tools/testing/selftests/bpf/xsk.[ch].
- 
- FAQ
- =======
--- 
-2.41.3
-
+>                 break;
+>         case ATMARP_SETENTRY:
+>                 err =3D clip_setentry(vcc, (__force __be32)arg);
+> --
+> 2.50.0.727.gbf7dc18ff4-goog
+>
 
