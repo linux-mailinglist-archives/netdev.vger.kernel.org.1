@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-203077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B3D1AF077A
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:50:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B5AAAF077B
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:50:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D148C7A85DD
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 00:49:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D25484A5594
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 00:50:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3ABE146A66;
-	Wed,  2 Jul 2025 00:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4227F1553AA;
+	Wed,  2 Jul 2025 00:49:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="es7dEfCB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JifGZeb8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0339145B3E
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 00:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4D6154457;
+	Wed,  2 Jul 2025 00:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751417394; cv=none; b=IxZeshGy2bJXHyTi3SP+aWjfd+b72NQWcCxw6OcYMPnoYDbbWaDqix3MqxabP8um/QREDFPxfRmrf0MQhOIGDwoFNpeUZrAH7jR98dIRsc6j/IBMYgtUsaBXZ77P//ERtXVR/HR92Jv5eKOslUkoaFv2I/buRnkTBspfSb8QTG4=
+	t=1751417396; cv=none; b=E8B39sCRF5DbZBqCqPkt9PUpIR4fHAamcH1oBQjvwsvzV+rD6Os9B5Qwf6GKcfCSlnss0JuilbM86+t7nt7G45WeKdG4AbgXN+p5nVqvFcMmJYuHphJuKiM4dMU1JIDeumClGSUbXQCASpti/BR03zfYSnnGwfYTzzNFOzaQWN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751417394; c=relaxed/simple;
-	bh=nsZsB4Bag43e7mCaDzK1MbMF31AbLzH8N2KlkOTWggc=;
+	s=arc-20240116; t=1751417396; c=relaxed/simple;
+	bh=i4IHwHq/3wg1ZQvXxvqKvRzM0pghjy7/syd4suAgdMA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=S318NZDSTJX4NcdR6RV1NjBHGKNoVE923W+1EXPY8fhZyjV69akRU3KMF3LKgZ7Ck2y+mCMe2aMoEKFXf81gOPW7c/Ag/W4HqVer304q1eSJ/mbC/S0tkYq7C8nDAU3bgUV2VzLXV2DyWI1y1tE+gW8vy0moAtqduplc0AMbI6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=es7dEfCB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A6A9C4CEEB;
-	Wed,  2 Jul 2025 00:49:54 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=rpw9X4NkezHVGTVKEVM+todxtpHbP/7SrDTm7jx1XQ/nEWdsdstcgLfQmPv1dg7pkPY4PbobwnsdfBOIWphW+BWKbx+t1D2W+wcWXf9Kgj5JYBNxE7nVdrbyDbUrcK73ipxoKYBxr8vCGy2olkdB+oSpv336JdKe18RZpN1AeJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JifGZeb8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8E54C4CEEB;
+	Wed,  2 Jul 2025 00:49:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751417394;
-	bh=nsZsB4Bag43e7mCaDzK1MbMF31AbLzH8N2KlkOTWggc=;
+	s=k20201202; t=1751417395;
+	bh=i4IHwHq/3wg1ZQvXxvqKvRzM0pghjy7/syd4suAgdMA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=es7dEfCB32QDJur3P6xa4h1YbeYyKzd8ygQc6Q7k7ZzjlmH468DUsK5kWBgx/vxPW
-	 IScUhrRk5sm6/SO4sM9IgYNSc9Ryc13yDB7U4uJ50am0WOqAPblPTpWcsnCV4OF9+K
-	 Zyuqm/mRSJ3A1hwfILp50abyVuuOjYcCDFZVCu8izgGdwkWKIyZWj1T+UG2wdYJr4Y
-	 +G9A8rDbNGimd+iG3nboAQBs4R9WsYi6g44ezLqaQtR0PdLQxowIQKiinGiJnI6h1F
-	 rg6orGpfDlw1shFKud5q8HsKyL0b4+VDllqji3RVc+lJZrShtCknwhSGx9gi+S3e2o
-	 TbScty6yMSMCg==
+	b=JifGZeb8rkNeonxKtfMFX+ae0AG4e3qlXRu+ioIcfUbAK7pVP2kKyuWyiTlYG5EPB
+	 TOPqL33RT2jiPLSRANAA3UnD/lOLGoxk5/IJVt5sjeLabNOTAd5LmxELoLdxmgdi+a
+	 7SL8jYp/2Aw0p+Rh7Ar+x8pHTDZWZ3/w2yba6MwiyBDADDffY6tehfO+liZHH3PnGz
+	 p7qjoxphXNARRSAq8MIQ1xcQ6E4u13ZM6SoFN9z+SJMuKRIIF1xef2DmlDOgP/TKc4
+	 t7k+Qcj44K4ziBNiL99QJPeR0GqS/Z05Vp7xszCVaPA15z1sg2wvxd5tqOyuhQvZoI
+	 EO8Yo1rPc4/Eg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B00383BA06;
-	Wed,  2 Jul 2025 00:50:20 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE77383BA06;
+	Wed,  2 Jul 2025 00:50:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: ethtool: fix leaking netdev ref if
- ethnl_default_parse() failed
+Subject: Re: [PATCH net-next] selftests/tc-testing: Enable CONFIG_IP_SET
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175141741881.160580.14789268644696405027.git-patchwork-notify@kernel.org>
-Date: Wed, 02 Jul 2025 00:50:18 +0000
-References: <20250630154053.1074664-1-kuba@kernel.org>
-In-Reply-To: <20250630154053.1074664-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, idosch@idosch.org, netdev@vger.kernel.org,
- edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
- horms@kernel.org
+ <175141742024.160580.1452957244773705615.git-patchwork-notify@kernel.org>
+Date: Wed, 02 Jul 2025 00:50:20 +0000
+References: <20250630153341.Wgh3SzGi@linutronix.de>
+In-Reply-To: <20250630153341.Wgh3SzGi@linutronix.de>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, jhs@mojatatu.com,
+ xiyou.wangcong@gmail.com, jiri@resnulli.us, shuah@kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 30 Jun 2025 08:40:53 -0700 you wrote:
-> Ido spotted that I made a mistake in commit under Fixes,
-> ethnl_default_parse() may acquire a dev reference even when it returns
-> an error. This may have been driven by the code structure in dumps
-> (which unconditionally release dev before handling errors), but it's
-> too much of a trap. Functions should undo what they did before returning
-> an error, rather than expecting caller to clean up.
+On Mon, 30 Jun 2025 17:33:41 +0200 you wrote:
+> The config snippet specifies CONFIG_NET_EMATCH_IPSET. This option
+> depends on CONFIG_IP_SET.
+> 
+> Set CONFIG_IP_SET to be enabled at part for tc-testing.
+> 
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: ethtool: fix leaking netdev ref if ethnl_default_parse() failed
-    https://git.kernel.org/netdev/net-next/c/3249eae7e445
+  - [net-next] selftests/tc-testing: Enable CONFIG_IP_SET
+    https://git.kernel.org/netdev/net-next/c/131e0a1123e7
 
 You are awesome, thank you!
 -- 
