@@ -1,230 +1,244 @@
-Return-Path: <netdev+bounces-203325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E862AF15A2
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:28:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3482AF15D4
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:37:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D184189D91F
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:28:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CB9F4E27A3
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579C126FD9D;
-	Wed,  2 Jul 2025 12:28:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b="lnWreAxZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B85C26A0EB;
+	Wed,  2 Jul 2025 12:37:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from OS0P286CU011.outbound.protection.outlook.com (mail-japanwestazon11010038.outbound.protection.outlook.com [52.101.228.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f65.google.com (mail-ej1-f65.google.com [209.85.218.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02F926E707;
-	Wed,  2 Jul 2025 12:28:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.228.38
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751459292; cv=fail; b=jnQN1Kpv5xcq+jAikKUIGrtiR/EBS6UV6r+8IVjDtNcRFJqU5qiMChDCtWNzBLt2AXYf/uxAViZhdz9626GYfK7U+mNhNT4EMHiEcDIa0JgSRxJGiFwAVrsMECA9F19cQnaAZNCMD4wAlxdKRLnK6O/zHg99AL/Gk5jRTXYDY2k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751459292; c=relaxed/simple;
-	bh=xZe2hcu2PPw/FIVzYbHDXbLK4ItbZFIUGl/bONptORU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=pIKB7tqsH73NrMksyos5SKH4yudXkZuWHfvSgZjOTh1ndqhxBtbSxHxnWQKORYmTTlx7mkR1x0hZtKNXvaWF08a8rhpClWxes/htfszQWP9eNYEjPYlzzHpT+viOGe21enwgffGTSzwGjUxJos6DICVNWxIb/phMXZLMnRALYWg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b=lnWreAxZ; arc=fail smtp.client-ip=52.101.228.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xExg3rwMCmKImP12ipUeF6Fcvxqw9FIuu7VbwtOpuh1Kw8RN4q9phjhFkp2BLLVqfaL7NGksaA3G2KjAkSmUVEXq4kTLouHcuGWUiHf3pQ4MpYq2HCz5N3BupXzc82wuI3oHLMZ6Iur/hw46fK3oMW1vWc91JE60VwGv+D5V57uEA7mmXsFhJPh/WIUgS8A32iMGt4CVISllEjlD0/a9aahEmPVTacW4gI+0YZ8JHsbmKWCsG7wZ1gP5B2ro8glDX6wBoPxxFTIY/sw1mmrRsYAU1KgD4hmYuNlh//RWCZ7CLcjspx1BJ0uXlj1TIJ39pZwbSQ+/+DeF5Dq2vTJcYA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xZe2hcu2PPw/FIVzYbHDXbLK4ItbZFIUGl/bONptORU=;
- b=afxecn8Qr0l46tLJBJXHHC6jElNE//18hjcCfVuI1hYP08eYg8ME3KtS2gw5Zzp0Pjbo3RizlI270vnWKk757fONkgBaYXcXyhjatcGHFjFd/cwKhamE5cNHD4CZGUyHfWOFLVLR0yJ+vCXqBTdJiCqFGKc7rEw8SNZeqrJvtoyLxqrFbCxGEYB4jQBeXv9MnrspNoPX8cTusSMmRFde19jmDOgW9cTw9By5juib+4rt9vZnrWlMpA0B0wjpMbsnY1YQBoBS4UaZ9Ol/1RYFguaKJVOl9n8WIN39fQXq2WdDlRFE4kWRhzy2Ro86EpxG/Rft3vnIs1o6krXhTtkMsg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bp.renesas.com; dmarc=pass action=none
- header.from=bp.renesas.com; dkim=pass header.d=bp.renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bp.renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xZe2hcu2PPw/FIVzYbHDXbLK4ItbZFIUGl/bONptORU=;
- b=lnWreAxZ+dq7NqMwpzLK67s4IGST0GRNMsbW2JkHLjBgA7pH6ABV/shyA8dlSHmCPcvMR8XEf2lTHgooAa2BPCA2VT3qYcKec1QpKsfgaK4yCv0hnT/q7GhQmJmFIftEypSHxLpAR1GgJS9uEk6NN5MDQjCCYTXWCw0IHu3sID4=
-Received: from OSCPR01MB14647.jpnprd01.prod.outlook.com (2603:1096:604:3a0::6)
- by OSCPR01MB13329.jpnprd01.prod.outlook.com (2603:1096:604:352::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.20; Wed, 2 Jul
- 2025 12:28:05 +0000
-Received: from OSCPR01MB14647.jpnprd01.prod.outlook.com
- ([fe80::40e:e798:1aea:ca82]) by OSCPR01MB14647.jpnprd01.prod.outlook.com
- ([fe80::40e:e798:1aea:ca82%3]) with mapi id 15.20.8880.030; Wed, 2 Jul 2025
- 12:28:05 +0000
-From: John Madieu <john.madieu.xa@bp.renesas.com>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-CC: "magnus.damm@gmail.com" <magnus.damm@gmail.com>, "robh@kernel.org"
-	<robh@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>, "mturquette@baylibre.com"
-	<mturquette@baylibre.com>, "sboyd@kernel.org" <sboyd@kernel.org>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>, Prabhakar Mahadev Lad
-	<prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Biju Das
-	<biju.das.jz@bp.renesas.com>, "john.madieu@gmail.com" <john.madieu@gmail.com>
-Subject: RE: [PATCH v4 4/4] arm64: dts: renesas: rzg3e-smarc-som: Enable
- eth{0-1} (GBETH) interfaces
-Thread-Topic: [PATCH v4 4/4] arm64: dts: renesas: rzg3e-smarc-som: Enable
- eth{0-1} (GBETH) interfaces
-Thread-Index: AQHb6uxPdpC1mbmW10ejOY4vmVdOG7Qeil8AgAA4dMA=
-Date: Wed, 2 Jul 2025 12:28:05 +0000
-Message-ID:
- <OSCPR01MB14647F33648B9BD6CC70AF9FEFF40A@OSCPR01MB14647.jpnprd01.prod.outlook.com>
-References: <20250702005706.1200059-1-john.madieu.xa@bp.renesas.com>
- <20250702005706.1200059-5-john.madieu.xa@bp.renesas.com>
- <CAMuHMdWzGLQwmGep9L0A9bzp5mYybA00W=S2cZnGH0tbMJvzEw@mail.gmail.com>
-In-Reply-To:
- <CAMuHMdWzGLQwmGep9L0A9bzp5mYybA00W=S2cZnGH0tbMJvzEw@mail.gmail.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=bp.renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: OSCPR01MB14647:EE_|OSCPR01MB13329:EE_
-x-ms-office365-filtering-correlation-id: 253fd7a9-94b5-41ed-e6a1-08ddb963e534
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?SG1WT3Q4M1RyM1p2aUIzU3pER0g2UnhmeDlEM3drczJjeEdUUmQxWTk1cWlM?=
- =?utf-8?B?MFFKeXl5aUhFSHQrbDJHNjhuVmZrVGRvSWZ5YkpxVGFpcUJoMGxya3JQUE5o?=
- =?utf-8?B?ZHQ2dlZ4RmhBelhaYmtYVGM2cXZNcUcrUGZRcjRFKzEwV3dKVDhGck1sT1l3?=
- =?utf-8?B?KzZZVCtvSzZuaE9mcnFBMVZNdUtSVGt3YW5nVE5uTVowcUZKMG52dlpwN1Rz?=
- =?utf-8?B?UXArZmdLSWZ6V3BRNVB2c29PMDhrNGhJNFJzamphUnpMMm42d0Y4K01yNVFT?=
- =?utf-8?B?ZWpleFFxMThqUmFSWUNDL3E5eW1TS2hxTFRBaHpJVmh4ME1EWW10ZVoza29G?=
- =?utf-8?B?aHZUdUpiWmYrd0l3RC9WaEJnZWNVQzFrc2V2eXAza1Q0blk2R1RlMDZiclE0?=
- =?utf-8?B?cHRVeFBWRG1YYlZQS1IzbGJSTEpwQWptb0JnWFJ0VE5NdU53bDBKaXNIbnFr?=
- =?utf-8?B?NmFKZTd4ZjJMUHdDMW0zanRNMEVCckdQemtVci9OQitMcHc2Zis2Y3pKRDcw?=
- =?utf-8?B?RmVlNWpoV1FzWERpZkg0OW9rdXVNbk4wRkpmOU5Qa2lzMGhMRzF1R3FCSURL?=
- =?utf-8?B?a05KTS9kcTNFc0s3WUsxTktmbHk0bzdhTWFaOVpmN1J5UGE3ZS9nbXBOZzNU?=
- =?utf-8?B?MmFRVTgvK21wOEU2MlRPTUtPTWFoc3RueXJIQWhaRUJuYy9CRjU0UzZxYVp1?=
- =?utf-8?B?OXYxcVhoOHdZWHgrTjZySUVSc0x2ODNxNzZMbzlZQWxPeVZQY3pyMGY3OThG?=
- =?utf-8?B?aHgrNmZOYVBLUndVdnliNExkMXJxcTVPNC9RcjVzWlZpcXZlaXdwSlZGUndw?=
- =?utf-8?B?RDRFRXBFRlNrbXFuNkZTUEJqTWNsN0xJd2xleVlxZGhZOU9KSGwrVVR0VFVE?=
- =?utf-8?B?WVhHUzBnYzlNeTk4d1Vkc1FyUlVyYStPVkRmVUtVUkVubldXVDBycUFaQlFX?=
- =?utf-8?B?dkNXdnVQajZCc3dEQSs0a0hUa212MWVpWElFaHdJWmhTaGthWDZxUVhuWlRT?=
- =?utf-8?B?dGg4QTdiOFlpcjZTRm1lNGdWRU5nRVVEdnd6QTNuR3BIbys3c3UvVmU0Rmg2?=
- =?utf-8?B?MFErdXBiTEtJMVRFRjRMbjU5cEY3ZmRRTVhodkxIaXBUUzZSZWx4ODV6K0hD?=
- =?utf-8?B?Tm5rSjNybk9aejBEQ1VYazRiOWxQQ042c3Z3NEQ5U05ENHZVZko2MVhKTWJN?=
- =?utf-8?B?WGdlU0lzVzdaRFEyRC83QW5QZ29xdDY3VFFVYVYxNldXeWR0Smk1eWVQUXBH?=
- =?utf-8?B?UzM3bHNudGpLZG5wVklzWFBMNm5VQk1JdGRIUmdEcTdlcFVzdjdyblJIWGM0?=
- =?utf-8?B?NEx2MmpPdUtjUEhXeFJSMytqVHNZK0o3TUc4Q1h2bnhRTjc3VDQ2bUU4UjlF?=
- =?utf-8?B?TERaRDBUYWJpd2JmWmdOUzlSME5Pdm10Rk5DZG5nUzBFS2gxcXNLVVRNSmJv?=
- =?utf-8?B?N1U1V1VZSWdmYU9HVnZ4bDhvYmtmSmYvbDdkTi9wZVU3OTVZVjhEbWhiVFVD?=
- =?utf-8?B?V2M4ZW5PUFdLeDlwbm5tSXhOKzNqQ3FYM1d6dWx6ZWRsclR4UVI3aEd4Ly9P?=
- =?utf-8?B?MGJMVWlvUWxFbUtYWTIzMU52clcrTFhhL0pJcWlnTlE3akVwWUZpQlYwTkpz?=
- =?utf-8?B?N3UrcEtueUtRRkNGdnovd29ZUEZiM0d3ZjE2VktNVThqTlVjLzg0N0VFRkl0?=
- =?utf-8?B?SFRiYUJNNTZDTmxQUGY3L28yYWhQemFTaTlwOExqZlEzTnoyNDVLZlVYcVE0?=
- =?utf-8?B?ajB0V0hLWWRzNnhON3ZzTW5yaHVuK2tXMjdJM3oraHFwdFZVd1hRU1c1NXZv?=
- =?utf-8?B?bE85eG9rQWIzTnZjYitlVDk4QTdYV0F5TGRFWEtSYmVaVzRNQ09aVWJjTlNQ?=
- =?utf-8?B?NnVWYXZWRkhTQWJaZHR1ZytiZmxESXArT21CT3hjc1UyLzFIZTZMaFNwRGJG?=
- =?utf-8?B?YUZvQlNudGRCNFg1KzJIL3BmRWdWNDVoRENpRlNZN3NOSTBlMkhtM016SjEr?=
- =?utf-8?B?RWpuY1ZvTlZRPT0=?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:OSCPR01MB14647.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?NHhhYTlZaWlXQmtEL2lzdGVCTzZWNlRXc08rcC9iWnZEYzk4dEFQWlFxK0pS?=
- =?utf-8?B?LzM0MU4zbEIrZGE0QVNwLzczc3lBcjdXSlA0dWJHQmQxMTd5V2ltaTVHblRF?=
- =?utf-8?B?SlNLL1g1S2JjSFUvZ3REZDYyMmo3QUFHblppQWhPV0NpV2JScHZmbDFZa2hD?=
- =?utf-8?B?STJlbG0xTnVQdVZ2UnN5R2hIaGRpV3JUK1pQZlNZTWQ1RkN1TTB4ZFhGOHJH?=
- =?utf-8?B?WXBpTGNSekJHdy9DcDNrSnlGQnl2cFU4b0xKQmFHTkRCeFoxc081TXkvL1FG?=
- =?utf-8?B?Q1hOak9VZDErVUZuRlhZVUJtaWtZekNTYWxDeTIzSmVrS2lvWEZTZkVlWFdz?=
- =?utf-8?B?R1hZcVdFRmlkRy9uTWNOWXZzanFLeUZiaW9PTWFhRm4yc01INUV3c3l2T2Qr?=
- =?utf-8?B?WE9pa01BeHh2QmxyYzltYVhZaHk0d2pmd1U0KzJ4ZC9rNVRibU0zU0czbkQ5?=
- =?utf-8?B?bEVDb1ZIOVZDdHJISmpTcUwxdXBjS0FLb04rbGhYeE1OVEhnVXQ5d2UzNytC?=
- =?utf-8?B?ZjNHV211ODQ1WFE3cklHZGRiYzF3RW1XUHlSOHZpK29YendUNHZBcERCbERH?=
- =?utf-8?B?dkVxUGQwM1VCQUJaT2ZXczhDaWdVZXU0YzlrL1Z6amxqWnRNM2VNWUx4UWdv?=
- =?utf-8?B?bm8xanpQS3ViU1VadDM1YytvdjV4NWFHU3dhK2RZYjhPREZZdFRjZllTakVV?=
- =?utf-8?B?eWl4VjZORmQ0K1ZLb3MvMEpiRmRDamc5SFhGbFBHYmVETEo4STROeGU2d3J6?=
- =?utf-8?B?N2pmTU15UEcwVFhaZkRWcTVaU0x4RnZsdzV4RzJkVlJ3bW9HNlFWcFJGUG5Z?=
- =?utf-8?B?Q1lGMzhvR05UdXd4N1lBaDR1cjZkSUVlRFZwdDVhZnBJZ1NQZGlKN3FUWHRj?=
- =?utf-8?B?UkpCL1hhTjNiZEw4YTRXT29lMjJmUTFJT2ZRN3o3aXVUaU1ncDFVRnVYVnNh?=
- =?utf-8?B?WmdxbHk1eTZWQTI2dHNLcmdqKzNXSC9DR1dMK1huaXBjdDhZWjFSeVBvaElk?=
- =?utf-8?B?WktldW4zNjJ3R0ZNQzl0TWFOSmZFOWNLS3ZqR2s2ZjJtYTJtd083TkZRSFRy?=
- =?utf-8?B?aEM3RHJKOXVodVBrRTZOQi96QiszNUZNZnk2b2RXUks0ckt5Q2dPaE9rV2tS?=
- =?utf-8?B?SGY2eXJuOGJuNGdkZlJ2TnNYbzUzWVRMUERRcktMMStVZjdZTzluSUVJVWxv?=
- =?utf-8?B?UmpxQ3dDUXp6RHJ3TldvM1RiYXQrWkNoRjVQV3EzSExpRmprTVJGSjc0dXVD?=
- =?utf-8?B?UkttWHk1eWIwM0FFbHgrblZqZ2Y5U2ZYbldQcTRNRXVWck9rZUZ5ZGhabHRO?=
- =?utf-8?B?anBmYlErcFJXSEtXaGxSVS8zNDBQVEpkMTlUVldCSG90Ulh1aHhCWEZBMEFh?=
- =?utf-8?B?MW44dEhWL0hkZVRYbUM2WTY2aUZ1cFhlVHZ3cUVTZ1ZpZFNucWFyUnhRb0ZG?=
- =?utf-8?B?VmVYZ3QwQUQrbFdKak1nL2s3YzhiR1dBcHdPRVZwakZTM0RUYXl6Y290OTFm?=
- =?utf-8?B?SXp1NUo2eU1HbWI5QWg3bVBLSGJtNmZLeUlvNmhNNFRsMzdQMk1oVlkwbkJZ?=
- =?utf-8?B?MzFaTmp6SmpnUFlUMm1rNCtUTys4OHJOcktIY3lkQTMwTHdrc2lscTFrZVJ4?=
- =?utf-8?B?WDlHNDJmMXVoWlpDc25sa2J6TUw4TzhPQUlxNUJJcG5idVhhMkNNZ0ZzeVpM?=
- =?utf-8?B?T0pyTVpaa0pzbVZHL1FzcFF1VjB0cjg0N1IyUUVSckU0UXc5eG1ScmNEd1hT?=
- =?utf-8?B?TU5JY0swbVFHMU1MNlg2VmFldHN6QmZna082aG8xVW1pS1gzKzdTUUlObWNp?=
- =?utf-8?B?WE1saFhCV3k4ekg2OVRqZ0Fha2xLemg4dGdYZ0ZneDh6UzFvdkxNN01oYjU1?=
- =?utf-8?B?OG5uSWZ3dHFOcWREOFZKOXFvcnhCcjF3MWNCeHNSNmt6TktOaHZLSTJjTkU3?=
- =?utf-8?B?N3Y4NWpPc01aYTR4Tm1FQ2M5a0ZaMUZvVlFCL0oyWDdSa2VhQnhRRHlYWHJV?=
- =?utf-8?B?bHdLeFZHODhzOTJreERIeGFTUzh1NGovejNpVkl4ZjJrajkrVlZlRFIweG9S?=
- =?utf-8?B?KzVuZ1p1U3BFZGxkZGg4OER0U1ZCa3pZdnY3T3pHRklNR3hMTmpKYUZpSm9j?=
- =?utf-8?B?YWs2S0hVK2VkUStiUXFnNkt3eGkxTzUrci81dHNVT24zbEtSbEQ3cytwUE9K?=
- =?utf-8?B?Zmc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A541E485;
+	Wed,  2 Jul 2025 12:37:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.65
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751459832; cv=none; b=XrqpIXoEEc3zeWniERg9KUxwsZebZdz5KnJY3L+tyW4sddc/hXog12xj1y/IhIuZ1RTpa2luvnldF/2yNEMj7BbdTd+UXSdGekv0p5rSr89LtyQ+BFIBWgOkDOFPwJJjCb6sikfny8vIPBoo3oa7blSlPxRmQwVnTPn7y7LBZes=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751459832; c=relaxed/simple;
+	bh=lWLI6HXV2cYpLzKNcWtqiZCS7ZO47V+kUQ/8IC54N0U=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=StBS+vkmaX3ZhaDQ0oavzRvqVfzGpDlOxFDuogMAwvz1TVvZZoq1pYen+qxC8sZnAqL6WMhT6xvtZP8ZYlWMwM3MniuSyqJkZyVdFjCqIOA7zMCTa4VGCGH0W8iaAFDi6c7dcYnmJEZcLBF80/NauUS42OrT+o88BIQuhExIJv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f65.google.com with SMTP id a640c23a62f3a-ae35f36da9dso882965266b.0;
+        Wed, 02 Jul 2025 05:37:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751459829; x=1752064629;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:cc:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ct5tfT8kQ+dHa7pStRVD22g5lfyZcmkc2Q9T100R85M=;
+        b=THE4evdb3ot1J3udc0UegJMIovEj1fDkFWrzxNw6tbyCHKoyHYrkzUY4YUw4f2+5GI
+         DO0zuNSTz74Qh80S8NvEGd15Hb3/w6w0a1j1ExTlGLLoGP16YRlh+/XZXzRBoglJNWl+
+         w4MSUEk0vaNrwz+xnmMz9WuMnghn1/cJWAAmmkg6XmKauSbbn6BfM/6yrN3ihhGoSDDJ
+         bH3tDkI8HhWOqeIlXttvc1yLQz8z5YAYUL2edO9YmPKm9PCrxeCw7JFOnu0SsGDU42zY
+         8kGmx6cjx0+8XQiEYwKozz1HLHwxje4KLXAE6sJfmh6LeuZWpYLUBVGnRQDGpSHkgFTf
+         fABg==
+X-Forwarded-Encrypted: i=1; AJvYcCVLkxFLisHtOtMVwY8p++37nevzl4gQF3nAh3ngXclDoMyeP15c8tNGYRVYeGIj+++rVBviAB7t1qgAKcs=@vger.kernel.org, AJvYcCXJh/Gz/z+R0xRpszAK459SSDnnXTX+W+6K6cYGvUk8qnoIdRkGu8jb+uZ79IW8DQNPt+iAco+h@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzx60QlBo5p4EqVd2jAQ93QLDscO6lAAVM3LpXx8shYAHsaWhOK
+	LEf4xB651VMbS9J5qgzCHfuOCfK5tu4hGtGmLgOKlwmKOuCOprq8dcox
+X-Gm-Gg: ASbGncu19tJ9tWErv6wkSmx2QYZ5pylGA77XjsKlh9elsmMEu6QnQrxVJYLM2dBifMc
+	SXYtVbP/mbuXouBg+Cj3fmqNxy72KQbhHI6PTTChtokz5S3nJ+RDu8OGws46NtrGfY47huCpRSK
+	eCha28KMxB5iqv3W1dEXd6ABmKUZszHZ5vDCaj6ZMjzvAmytxn5fyZ+iwl7VgsAjmiS52yJNuyt
+	2TCyjK8OPxcY/nLghXM4D7fa1GKmhivU/N0UF8I8dz28R8ystU7z9+8lBB/rONCfGk0Shotr6BP
+	2Vayvr5JATwAp8tPmu2rebYgfjQvubyOVByOIiYv39rU40WG71SHjBqg+LAFk+JEdmcXmFQTtwJ
+	Dz5cXkz8TEKWUbruHsV9A
+X-Google-Smtp-Source: AGHT+IFIDGNG/HnK3F3+zA+aGTdRZ0u8nShGdLhDUxXu8s/pDp1pJndJnFGHRZrIrTVIeyJ4YuKnCg==
+X-Received: by 2002:a17:907:1ca7:b0:ae3:63b2:dfb4 with SMTP id a640c23a62f3a-ae3c2ca212emr278451266b.27.1751459828340;
+        Wed, 02 Jul 2025 05:37:08 -0700 (PDT)
+Received: from [192.168.88.252] (78-80-97-102.customers.tmcz.cz. [78.80.97.102])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae3a36c4940sm452734166b.79.2025.07.02.05.37.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Jul 2025 05:37:07 -0700 (PDT)
+Message-ID: <b450a7f2-cab4-4b71-aec8-ef867403663a@ovn.org>
+Date: Wed, 2 Jul 2025 14:37:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: bp.renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: OSCPR01MB14647.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 253fd7a9-94b5-41ed-e6a1-08ddb963e534
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Jul 2025 12:28:05.4452
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vFSbyzcKNcSIfpo03yQ9lEZXtwizMGaRDOnuJRId6AL3jL3jXfA0zErn3sa1YunsSvbAJ6Iiauvl73tc0eFJweo7DW4tbhQVkSbouAznB0I=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSCPR01MB13329
+User-Agent: Mozilla Thunderbird
+Cc: i.maximets@ovn.org, netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, dev@openvswitch.org,
+ linux-kernel@vger.kernel.org, Eelco Chaudron <echaudro@redhat.com>
+Subject: Re: [PATCH net-next] net: openvswitch: allow providing upcall pid for
+ the 'execute' command
+To: Aaron Conole <aconole@redhat.com>
+References: <20250627220219.1504221-1-i.maximets@ovn.org>
+ <f7tms9mssb0.fsf@redhat.com>
+Content-Language: en-US
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <f7tms9mssb0.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-SGkgR2VlcnQsDQoNClRoYW5rcyBmb3IgeW91ciByZXZpZXcuDQoNCj4gLS0tLS1PcmlnaW5hbCBN
-ZXNzYWdlLS0tLS0NCj4gRnJvbTogR2VlcnQgVXl0dGVyaG9ldmVuIDxnZWVydEBsaW51eC1tNjhr
-Lm9yZz4NCj4gU2VudDogV2VkbmVzZGF5LCBKdWx5IDIsIDIwMjUgMTE6MDMgQU0NCj4gVG86IEpv
-aG4gTWFkaWV1IDxqb2huLm1hZGlldS54YUBicC5yZW5lc2FzLmNvbT4NCj4gU3ViamVjdDogUmU6
-IFtQQVRDSCB2NCA0LzRdIGFybTY0OiBkdHM6IHJlbmVzYXM6IHJ6ZzNlLXNtYXJjLXNvbTogRW5h
-YmxlDQo+IGV0aHswLTF9IChHQkVUSCkgaW50ZXJmYWNlcw0KPiANCj4gSGkgSm9obiwNCj4gDQo+
-IE9uIFdlZCwgMiBKdWwgMjAyNSBhdCAwMjo1NywgSm9obiBNYWRpZXUgPGpvaG4ubWFkaWV1Lnhh
-QGJwLnJlbmVzYXMuY29tPg0KPiB3cm90ZToNCj4gPiBFbmFibGUgdGhlIEdpZ2FiaXQgRXRoZXJu
-ZXQgSW50ZXJmYWNlcyAoR0JFVEgpIHBvcHVsYXRlZCBvbiB0aGUgUlovRzNFDQo+ID4gU01BUkMg
-RVZLDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBKb2huIE1hZGlldSA8am9obi5tYWRpZXUueGFA
-YnAucmVuZXNhcy5jb20+DQo+IA0KPiA+IHY0Og0KPiA+ICAtIFVwZGF0ZSBwaW5tdXggdG8gYWRk
-IE9FTiBzdXBwb3J0DQo+ID4gIC0gRHJvcHMgVGIgYW5kIFJiIHRhZ3MgaW5pdGlhbGx5IGNvbGxl
-Y3RlZA0KPiANCj4gVGhhbmtzIGZvciB0aGUgdXBkYXRlIQ0KPiANCj4gPiAtLS0gYS9hcmNoL2Fy
-bTY0L2Jvb3QvZHRzL3JlbmVzYXMvcnpnM2Utc21hcmMtc29tLmR0c2kNCj4gPiArKysgYi9hcmNo
-L2FybTY0L2Jvb3QvZHRzL3JlbmVzYXMvcnpnM2Utc21hcmMtc29tLmR0c2kNCj4gPiAgJnBpbmN0
-cmwgew0KPiA+ICsgICAgICAgZXRoMF9waW5zOiBldGgwIHsNCj4gPiArICAgICAgICAgICAgICAg
-Y2xrMCB7DQo+IA0KPiBObyBuZWVkIGZvciB0aGUgMCAuLi4NCj4gDQo+ID4gKyAgICAgICAgICAg
-ICAgICAgICAgICAgcGlubXV4ID0gPFJaRzNFX1BPUlRfUElOTVVYKEIsIDEsIDEpPjsgLyogVFhD
-ICovDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgb3V0cHV0LWVuYWJsZTsNCj4gPiArICAg
-ICAgICAgICAgICAgfTsNCj4gPiArDQo+ID4gKyAgICAgICAgICAgICAgIGN0cmwwIHsNCj4gDQo+
-IC4uLiBzdWZmaXhlcy4uLg0KPiANCj4gPiArICAgICAgIGV0aDFfcGluczogZXRoMSB7DQo+ID4g
-KyAgICAgICAgICAgICAgIGNsazEgew0KPiANCj4gLi4uIG9yIHRoZSAxLi4uDQo+IA0KPiA+ICsg
-ICAgICAgICAgICAgICAgICAgICAgIHBpbm11eCA9IDxSWkczRV9QT1JUX1BJTk1VWChFLCAxLCAx
-KT47IC8qIFRYQyAqLw0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgIG91dHB1dC1lbmFibGU7
-DQo+ID4gKyAgICAgICAgICAgICAgIH07DQo+ID4gKw0KPiA+ICsgICAgICAgICAgICAgICBjdHJs
-MSB7DQo+IA0KPiAuLi4gc3VmZml4ZXMuDQo+IA0KPiANCj4gUmV2aWV3ZWQtYnk6IEdlZXJ0IFV5
-dHRlcmhvZXZlbiA8Z2VlcnQrcmVuZXNhc0BnbGlkZXIuYmU+IGkuZS4gd2lsbCBxdWV1ZSBpbg0K
-PiByZW5lc2FzLWRldmVsIGZvciB2Ni4xNyB3aXRoIHRoZSBhYm92ZSBmaXhlZC4NCg0KVGhhbmtz
-IGZvciB0YWtpbmcgY2FyZSBvZiB0aGF0Lg0KDQo+IA0KPiBHcntvZXRqZSxlZXRpbmd9cywNCj4g
-DQo+ICAgICAgICAgICAgICAgICAgICAgICAgIEdlZXJ0DQo+IA0KDQpSZWdhcmRzLA0KSm9obg0K
-DQo+IC0tDQo+IEdlZXJ0IFV5dHRlcmhvZXZlbiAtLSBUaGVyZSdzIGxvdHMgb2YgTGludXggYmV5
-b25kIGlhMzIgLS0gZ2VlcnRAbGludXgtDQo+IG02OGsub3JnDQo+IA0KPiBJbiBwZXJzb25hbCBj
-b252ZXJzYXRpb25zIHdpdGggdGVjaG5pY2FsIHBlb3BsZSwgSSBjYWxsIG15c2VsZiBhIGhhY2tl
-ci4gQnV0DQo+IHdoZW4gSSdtIHRhbGtpbmcgdG8gam91cm5hbGlzdHMgSSBqdXN0IHNheSAicHJv
-Z3JhbW1lciIgb3Igc29tZXRoaW5nIGxpa2UNCj4gdGhhdC4NCj4gICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAtLSBMaW51cyBUb3J2YWxkcw0K
+On 7/2/25 2:14 PM, Aaron Conole wrote:
+> Ilya Maximets <i.maximets@ovn.org> writes:
+> 
+>> When a packet enters OVS datapath and there is no flow to handle it,
+>> packet goes to userspace through a MISS upcall.  With per-CPU upcall
+>> dispatch mechanism, we're using the current CPU id to select the
+>> Netlink PID on which to send this packet.  This allows us to send
+>> packets from the same traffic flow through the same handler.
+>>
+>> The handler will process the packet, install required flow into the
+>> kernel and re-inject the original packet via OVS_PACKET_CMD_EXECUTE.
+>>
+>> While handling OVS_PACKET_CMD_EXECUTE, however, we may hit a
+>> recirculation action that will pass the (likely modified) packet
+>> through the flow lookup again.  And if the flow is not found, the
+>> packet will be sent to userspace again through another MISS upcall.
+>>
+>> However, the handler thread in userspace is likely running on a
+>> different CPU core, and the OVS_PACKET_CMD_EXECUTE request is handled
+>> in the syscall context of that thread.  So, when the time comes to
+>> send the packet through another upcall, the per-CPU dispatch will
+>> choose a different Netlink PID, and this packet will end up processed
+>> by a different handler thread on a different CPU.
+> 
+> Just wondering but why can't we choose the existing core handler when
+> running the packet_cmd_execute?  For example, when looking into the
+> per-cpu table we know what the current core is, can we just queue to
+> that one?  I actually thought that's what the PER_CPU dispatch mode was
+> supposed to do.
+
+This is exactly how it works today and it is the problem, because our
+userspace handler is running on a different CPU and so the 'current CPU'
+during the packet_cmd_execute is different from the one where kernel
+was processing the original upcall.
+
+> Or is it that we want to make sure we keep the
+> association between the skbuff for re-injection always?
+
+We want the same packet to be enqueued to the same upcall socket after
+each recirculation, so it gets handled by the same userspace thread.
+
+> 
+>> The process continues as long as there are new recirculations, each
+>> time the packet goes to a different handler thread before it is sent
+>> out of the OVS datapath to the destination port.  In real setups the
+>> number of recirculations can go up to 4 or 5, sometimes more.
+> 
+> Is it because the userspace handler threads are being rescheduled across
+> CPUs?
+
+Yes.  Userspace handlers are not pinned to a specific core in most cases,
+so they will be running on different CPUs and will float around.
+
+> Do we still see this behavior if we pinned each handler thread to
+> a specific CPU rather than letting the scheduler make the decision?
+
+If you pin each userspace thread to a core that is specified in the
+PCPU_UPCALL_PIDS for the socket that it is listening on, then the
+problem will go away, as the packet_cmd_execute syscall will be executed
+on the same core where the kernel received the original packet.
+However, that's not possible in many cases (reserved CPUs, different
+CPU affinity for IRQs and userspace applications, etc.) and not desired
+as may impact performance of the system, because the kernel and userspace
+will compete for the same core.
+
+> 
+>> There is always a chance to re-order packets while processing upcalls,
+>> because userspace will first install the flow and then re-inject the
+>> original packet.  So, there is a race window when the flow is already
+>> installed and the second packet can match it and be forwarded to the
+>> destination before the first packet is re-injected.  But the fact that
+>> packets are going through multiple upcalls handled by different
+>> userspace threads makes the reordering noticeably more likely, because
+>> we not only have a race between the kernel and a userspace handler
+>> (which is hard to avoid), but also between multiple userspace handlers.
+>>
+>> For example, let's assume that 10 packets got enqueued through a MISS
+>> upcall for handler-1, it will start processing them, will install the
+>> flow into the kernel and start re-injecting packets back, from where
+>> they will go through another MISS to handler-2.  Handler-2 will install
+>> the flow into the kernel and start re-injecting the packets, while
+>> handler-1 continues to re-inject the last of the 10 packets, they will
+>> hit the flow installed by handler-2 and be forwarded without going to
+>> the handler-2, while handler-2 still re-injects the first of these 10
+>> packets.  Given multiple recirculations and misses, these 10 packets
+>> may end up completely mixed up on the output from the datapath.
+>>
+>> Let's allow userspace to specify on which Netlink PID the packets
+>> should be upcalled while processing OVS_PACKET_CMD_EXECUTE.
+>> This makes it possible to ensure that all the packets are processed
+>> by the same handler thread in the userspace even with them being
+>> upcalled multiple times in the process.  Packets will remain in order
+>> since they will be enqueued to the same socket and re-injected in the
+>> same order.  This doesn't eliminate re-ordering as stated above, since
+>> we still have a race between kernel and the userspace thread, but it
+>> allows to eliminate races between multiple userspace threads.
+>>
+>> Userspace knows the PID of the socket on which the original upcall is
+>> received, so there is no need to send it up from the kernel.
+>>
+>> Solution requires storing the value somewhere for the duration of the
+>> packet processing.  There are two potential places for this: our skb
+>> extension or the per-CPU storage.  It's not clear which is better,
+>> so just following currently used scheme of storing this kind of things
+>> along the skb.
+> 
+> With this change we're almost full on the OVS sk_buff control block.
+> Might be good to mention it in the commit message if you're respinning.
+
+Are we full?  The skb->cb size is 48 bytes and we're only using 24
+with this change, unless I'm missing something.
+
+Best regards, Ilya Maximets.
 
