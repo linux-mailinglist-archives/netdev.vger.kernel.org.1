@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-203499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBC80AF62A8
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 21:29:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C9E4AF62AF
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 21:31:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0314B16A331
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 19:29:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C601174363
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 19:31:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD4C52D540B;
-	Wed,  2 Jul 2025 19:29:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87F001D5CC6;
+	Wed,  2 Jul 2025 19:31:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from trager.us (trager.us [52.5.81.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13732BE656;
-	Wed,  2 Jul 2025 19:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98892F7D18;
+	Wed,  2 Jul 2025 19:31:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.5.81.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751484565; cv=none; b=HFkSfxWMrFmFTj8Rc2wDudSOYyIWv6xO4Xg7CsBnGO4PEV3JZ9kYFX0eX1uWPqCT1zqSnDyInkfXHt0dmU22kWeQg0VTK+ZzZSUWAsh9MjLUzAxD2Ay8py/KipCkHc3Vz0a3HqjrXCqqWsZsTVU4jMJN8HHQU7AqLUdd2ovP89M=
+	t=1751484695; cv=none; b=gTk7E6ZEDlEHZo05s5Ja+U/cQQwrVrWgHcP7PNtsRiFvb0CBR5iwPBvTxsA4g01+5Z2Ffki6WQxdfx/0x2F7L/EMN/v6THJshxr4BHjL9NfK3/waPMuRj2Z6jEGAok0Au5uKGuwUiqM4EasqIdtiBguUKLiw8zBKl0MoeFFM6bE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751484565; c=relaxed/simple;
-	bh=rtPutSKWhgqsRdvkma+dOgbJpiK129bmyj9iZSvxP7A=;
+	s=arc-20240116; t=1751484695; c=relaxed/simple;
+	bh=XpjxKMXhHrJbAkM86bUV3jYSI9PntAn8jRn+vHWr8/s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HV3SBlFuVIpzh+Fx1Y270ey2ypQ27AiYEgiUF0MkzUtY748rEoPwJHtfMHbsPh+B/aKej1H+w5G1GOXpFSkEWhoson32LYgFXzV7UIG3Wf4CmXxFkIopfdteVbiIhlOc6B2p9Jo0n37eD5V2MfT7t5D51q8XR0h246iaxYBnRWU=
+	 MIME-Version; b=JqfpiMBhYykYKLni84Zj2CP6IuwdZq8nJM5a+iDMNiTC8dXnMf34nmMr/hX+okmXyuNDN26O6Ypezn6NaKP99DONqCLkoBUXJ4CQk2hjdi+eV1ybWlm1TnOBaDJlUDJ2zM4ERoRQuBEkSkhhEQZDfeu5gYRbUSenTgUewxcXkjE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=trager.us; spf=pass smtp.mailfrom=trager.us; arc=none smtp.client-ip=52.5.81.116
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=trager.us
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trager.us
@@ -33,7 +33,7 @@ Received: from c-76-104-255-50.hsd1.wa.comcast.net ([76.104.255.50] helo=localho
 	by trager.us with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
 	(Exim 4.92.3)
 	(envelope-from <lee@trager.us>)
-	id 1uX38t-00081r-M4; Wed, 02 Jul 2025 19:29:15 +0000
+	id 1uX3Ad-00082C-SN; Wed, 02 Jul 2025 19:31:04 +0000
 From: Lee Trager <lee@trager.us>
 To: Alexander Duyck <alexanderduyck@fb.com>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -44,10 +44,10 @@ To: Alexander Duyck <alexanderduyck@fb.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Kees Cook <kees@kernel.org>,
 	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Mohsin Bashir <mohsin.bashr@gmail.com>,
 	Sanman Pradhan <sanman.p211993@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Mohsin Bashir <mohsin.bashr@gmail.com>,
 	Su Hui <suhui@nfschina.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	Simon Horman <horms@kernel.org>,
 	Lee Trager <lee@trager.us>,
 	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
@@ -56,9 +56,9 @@ Cc: Andrew Lunn <andrew@lunn.ch>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-hardening@vger.kernel.org
-Subject: [PATCH net-next 4/6] eth: fbnic: Add mailbox support for firmware logs
-Date: Wed,  2 Jul 2025 12:12:10 -0700
-Message-ID: <20250702192207.697368-5-lee@trager.us>
+Subject: [PATCH net-next 5/6] eth: fbnic: Enable firmware logging
+Date: Wed,  2 Jul 2025 12:12:11 -0700
+Message-ID: <20250702192207.697368-6-lee@trager.us>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250702192207.697368-1-lee@trager.us>
 References: <20250702192207.697368-1-lee@trager.us>
@@ -70,329 +70,145 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-By default firmware will not send logs to the host. This must be explicitly
-enabled by the driver. The mailbox has the concept of a flag which is a u32
-used as a boolean. Lack of flag defaults to a value of false. When enabling
-logging historical logs may be optionally requested. These are log messages
-generated by the NIC before the driver was loaded. The driver also sends a
-log version to support changing the logging format in the future.
-
-[SEND_LOGS_REQ] = {
-    [SEND_LOGS]          /* flag to request log reporting */
-    [SEND_LOGS_HISTORY]  /* flag to request historical logs */
-    [SEND_LOGS_VERSION]  /* u32 indicating the log format version */
-}
-
-Logs may be sent to the user either one at a time, or when historical logs
-are requested in bulk. Firmware may not send more than 14 messages in bulk
-to prevent flooding the mailbox.
-
-[LOG_MSG] = {
-    [LOG_INDEX]     /* entry 0 - u64 index of log */
-    [LOG_MSEC]      /* entry 0 - u32 timestamp of log */
-    [LOG_MSG]       /* entry 0 - char log message up to 256 */
-    [LOG_LENGTH]    /* u32 of remaining log items in arrays */
-    [LOG_INDEX_ARRAY] = {
-        [LOG_INDEX] /* entry 1 - u64 index of log */
-	[LOG_INDEX] /* entry 2 - u64 index of log */
-	...
-    }
-    [LOG_MSEC_ARRAY] = {
-        [LOG_MSEC]  /* entry 1 - u32 timestamp of log */
-	[LOG_MSEC]  /* entry 2 - u32 timestamp of log */
-	...
-    }
-    [LOG_MSG_ARRAY] = {
-        [LOG_MSG]   /* entry 1 - char log message up to 256 */
-	[LOG_MSG]   /* entry 2 - char log message up to 256 */
-	...
-    }
-}
+The firmware log buffer is enabled during probe and freed during remove.
+Early versions of firmware do not support sending logs. Once the mailbox is
+up driver will enable logging when supported firmware versions are detected.
+Logging is disabled before the mailbox is freed.
 
 Signed-off-by: Lee Trager <lee@trager.us>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic_csr.h |  14 ++
- drivers/net/ethernet/meta/fbnic/fbnic_fw.c  | 166 ++++++++++++++++++++
- drivers/net/ethernet/meta/fbnic/fbnic_fw.h  |  36 +++++
- 3 files changed, 216 insertions(+)
+ .../net/ethernet/meta/fbnic/fbnic_fw_log.c    | 28 +++++++++++++++++++
+ .../net/ethernet/meta/fbnic/fbnic_fw_log.h    |  2 ++
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c   | 21 ++++++++++++++
+ 3 files changed, 51 insertions(+)
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-index 06b9c49e51a2..a81db842aa53 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-@@ -21,6 +21,20 @@
- /* Defines the minimum firmware version required by the driver */
- #define MIN_FW_VER_CODE				FW_VER_CODE(0, 10, 6, 0)
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw_log.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw_log.c
+index caedbe7844f7..38749d47cee6 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_fw_log.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw_log.c
+@@ -8,6 +8,31 @@
+ #include "fbnic_fw.h"
+ #include "fbnic_fw_log.h"
 
-+/* Defines the minimum firmware version required for firmware logs */
-+#define MIN_FW_VER_CODE_LOG			FW_VER_CODE(0, 12, 9, 0)
++void fbnic_fw_log_enable(struct fbnic_dev *fbd, bool send_hist)
++{
++	int err;
 +
-+/* Driver can request that firmware sends all cached logs in bulk. This
-+ * feature was enabled on older firmware however firmware has a bug
-+ * which attempted to send 30 messages per mbx message which caused an
-+ * overflow flooding the mailbox. This results in a kernel warning
-+ * related to corrupt mailbox messages.
-+ *
-+ * If firmware is new enough only request sending historical logs when
-+ * the log buffer is empty to prevent duplicate logs.
-+ */
-+#define MIN_FW_VER_CODE_HIST			FW_VER_CODE(25, 5, 7, 0)
++	if (!fbnic_fw_log_ready(fbd))
++		return;
 +
- #define PCI_DEVICE_ID_META_FBNIC_ASIC		0x0013
++	if (fbd->fw_cap.running.mgmt.version < MIN_FW_VER_CODE_HIST)
++		send_hist = false;
++
++	err = fbnic_fw_xmit_send_logs(fbd, true, send_hist);
++	if (err && err != -EOPNOTSUPP)
++		dev_warn(fbd->dev, "Unable to enable firmware logs: %d\n", err);
++}
++
++void fbnic_fw_log_disable(struct fbnic_dev *fbd)
++{
++	int err;
++
++	err = fbnic_fw_xmit_send_logs(fbd, false, false);
++	if (err && err != -EOPNOTSUPP)
++		dev_warn(fbd->dev, "Unable to disable firmware logs: %d\n",
++			 err);
++}
++
+ int fbnic_fw_log_init(struct fbnic_dev *fbd)
+ {
+ 	struct fbnic_fw_log *log = &fbd->fw_log;
+@@ -26,6 +51,8 @@ int fbnic_fw_log_init(struct fbnic_dev *fbd)
+ 	log->data_start = data;
+ 	log->data_end = data + FBNIC_FW_LOG_SIZE;
 
- #define FBNIC_CLOCK_FREQ	(600 * (1000 * 1000))
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-index ac7804a8a22c..0c55be7d2547 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-@@ -1034,6 +1034,169 @@ static int fbnic_fw_parse_tsene_read_resp(void *opaque,
- 	return err;
++	fbnic_fw_log_enable(fbd, true);
++
+ 	return 0;
  }
 
-+static const struct fbnic_tlv_index fbnic_fw_log_req_index[] = {
-+	FBNIC_TLV_ATTR_U32(FBNIC_FW_LOG_MSEC),
-+	FBNIC_TLV_ATTR_U64(FBNIC_FW_LOG_INDEX),
-+	FBNIC_TLV_ATTR_STRING(FBNIC_FW_LOG_MSG, FBNIC_FW_LOG_MAX_SIZE),
-+	FBNIC_TLV_ATTR_U32(FBNIC_FW_LOG_LENGTH),
-+	FBNIC_TLV_ATTR_ARRAY(FBNIC_FW_LOG_MSEC_ARRAY),
-+	FBNIC_TLV_ATTR_ARRAY(FBNIC_FW_LOG_INDEX_ARRAY),
-+	FBNIC_TLV_ATTR_ARRAY(FBNIC_FW_LOG_MSG_ARRAY),
-+	FBNIC_TLV_ATTR_LAST
-+};
-+
-+static int fbnic_fw_process_log_array(struct fbnic_tlv_msg **results,
-+				      u16 length, u16 arr_type_idx,
-+				      u16 attr_type_idx,
-+				      struct fbnic_tlv_msg **tlv_array_out)
-+{
-+	struct fbnic_tlv_msg *attr;
-+	int attr_len;
-+	int err;
-+
-+	if (!results[attr_type_idx])
-+		return -EINVAL;
-+
-+	tlv_array_out[0] = results[attr_type_idx];
-+
-+	if (!length)
-+		return 0;
-+
-+	if (!results[arr_type_idx])
-+		return -EINVAL;
-+
-+	attr = results[arr_type_idx];
-+	attr_len = le16_to_cpu(attr->hdr.len) / sizeof(u32) - 1;
-+	err = fbnic_tlv_attr_parse_array(&attr[1], attr_len, &tlv_array_out[1],
-+					 fbnic_fw_log_req_index,
-+					 attr_type_idx,
-+					 length);
-+	if (err)
-+		return err;
-+
-+	return 0;
-+}
-+
-+static int fbnic_fw_parse_logs(struct fbnic_dev *fbd,
-+			       struct fbnic_tlv_msg **msec_tlv,
-+			       struct fbnic_tlv_msg **index_tlv,
-+			       struct fbnic_tlv_msg **log_tlv,
-+			       int count)
-+{
-+	int i;
-+
-+	for (i = 0; i < count; i++) {
-+		char log[FBNIC_FW_LOG_MAX_SIZE];
-+		ssize_t len;
-+		u64 index;
-+		u32 msec;
-+		int err;
-+
-+		if (!msec_tlv[i] || !index_tlv[i] || !log_tlv[i]) {
-+			dev_warn(fbd->dev, "Received log message with missing attributes!\n");
-+			return -EINVAL;
-+		}
-+
-+		index = fbnic_tlv_attr_get_signed(index_tlv[i], 0);
-+		msec = fbnic_tlv_attr_get_signed(msec_tlv[i], 0);
-+		len = fbnic_tlv_attr_get_string(log_tlv[i], log,
-+						FBNIC_FW_LOG_MAX_SIZE);
-+		if (len < 0)
-+			return len;
-+
-+		err = fbnic_fw_log_write(fbd, index, msec, log);
-+		if (err)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static int fbnic_fw_parse_log_req(void *opaque,
-+				  struct fbnic_tlv_msg **results)
-+{
-+	struct fbnic_tlv_msg *index_tlv[FBNIC_FW_MAX_LOG_HISTORY];
-+	struct fbnic_tlv_msg *msec_tlv[FBNIC_FW_MAX_LOG_HISTORY];
-+	struct fbnic_tlv_msg *log_tlv[FBNIC_FW_MAX_LOG_HISTORY];
-+	struct fbnic_dev *fbd = opaque;
-+	u16 length;
-+	int err;
-+
-+	length = fta_get_uint(results, FBNIC_FW_LOG_LENGTH);
-+	if (length >= FBNIC_FW_MAX_LOG_HISTORY)
-+		return -E2BIG;
-+
-+	err = fbnic_fw_process_log_array(results, length,
-+					 FBNIC_FW_LOG_MSEC_ARRAY,
-+					 FBNIC_FW_LOG_MSEC, msec_tlv);
-+	if (err)
-+		return err;
-+
-+	err = fbnic_fw_process_log_array(results, length,
-+					 FBNIC_FW_LOG_INDEX_ARRAY,
-+					 FBNIC_FW_LOG_INDEX, index_tlv);
-+	if (err)
-+		return err;
-+
-+	err = fbnic_fw_process_log_array(results, length,
-+					 FBNIC_FW_LOG_MSG_ARRAY,
-+					 FBNIC_FW_LOG_MSG, log_tlv);
-+	if (err)
-+		return err;
-+
-+	err = fbnic_fw_parse_logs(fbd, msec_tlv, index_tlv, log_tlv,
-+				  length + 1);
-+	if (err)
-+		return err;
-+
-+	return 0;
-+}
-+
-+int fbnic_fw_xmit_send_logs(struct fbnic_dev *fbd, bool enable,
-+			    bool send_log_history)
-+{
-+	struct fbnic_tlv_msg *msg;
-+	int err;
-+
-+	if (fbd->fw_cap.running.mgmt.version < MIN_FW_VER_CODE_LOG) {
-+		dev_warn(fbd->dev, "Firmware version is too old to support firmware logs!\n");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	msg = fbnic_tlv_msg_alloc(FBNIC_TLV_MSG_ID_LOG_SEND_LOGS_REQ);
-+	if (!msg)
-+		return -ENOMEM;
-+
-+	if (enable) {
-+		err = fbnic_tlv_attr_put_flag(msg, FBNIC_SEND_LOGS);
-+		if (err)
-+			goto free_message;
-+
-+		/* Report request for version 1 of logs */
-+		err = fbnic_tlv_attr_put_int(msg, FBNIC_SEND_LOGS_VERSION,
-+					     FBNIC_FW_LOG_VERSION);
-+		if (err)
-+			goto free_message;
-+
-+		if (send_log_history) {
-+			err = fbnic_tlv_attr_put_flag(msg,
-+						      FBNIC_SEND_LOGS_HISTORY);
-+			if (err)
-+				goto free_message;
-+		}
-+	}
-+
-+	err = fbnic_mbx_map_tlv_msg(fbd, msg);
-+	if (err)
-+		goto free_message;
-+
-+	return 0;
-+
-+free_message:
-+	free_page((unsigned long)msg);
-+	return err;
-+}
-+
- static const struct fbnic_tlv_parser fbnic_fw_tlv_parser[] = {
- 	FBNIC_TLV_PARSER(FW_CAP_RESP, fbnic_fw_cap_resp_index,
- 			 fbnic_fw_parse_cap_resp),
-@@ -1053,6 +1216,9 @@ static const struct fbnic_tlv_parser fbnic_fw_tlv_parser[] = {
- 	FBNIC_TLV_PARSER(TSENE_READ_RESP,
- 			 fbnic_tsene_read_resp_index,
- 			 fbnic_fw_parse_tsene_read_resp),
-+	FBNIC_TLV_PARSER(LOG_MSG_REQ,
-+			 fbnic_fw_log_req_index,
-+			 fbnic_fw_parse_log_req),
- 	FBNIC_TLV_MSG_ERROR
- };
+@@ -36,6 +63,7 @@ void fbnic_fw_log_free(struct fbnic_dev *fbd)
+ 	if (!fbnic_fw_log_ready(fbd))
+ 		return;
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-index 555b231b38c1..fde331696fdd 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
-@@ -22,7 +22,20 @@ struct fbnic_fw_mbx {
- #define FBNIC_FW_VER_MAX_SIZE			32
- // Formatted version is in the format XX.YY.ZZ_RRR_COMMIT
- #define FBNIC_FW_CAP_RESP_COMMIT_MAX_SIZE	(FBNIC_FW_VER_MAX_SIZE - 13)
-+#define FBNIC_FW_LOG_VERSION			1
- #define FBNIC_FW_LOG_MAX_SIZE			256
-+/*
-+ * The max amount of logs which can fit in a single mailbox message. Firmware
-+ * assumes each mailbox message is 4096B. The amount of messages supported is
-+ * calculated as 4096 minus headers for message, arrays, and length minus the
-+ * size of length divided by headers for each array plus the maximum LOG size,
-+ * and the size of MSEC and INDEX. Put another way:
-+ *
-+ * MAX_LOG_HISTORY = ((4096 - TLV_HDR_SZ * 5 - LENGTH_SZ)
-+ *                    / (FBNIC_FW_LOG_MAX_SIZE + TLV_HDR_SZ * 3 + MSEC_SZ
-+ *                       + INDEX_SZ))
-+ */
-+#define FBNIC_FW_MAX_LOG_HISTORY		14
++	fbnic_fw_log_disable(fbd);
+ 	INIT_LIST_HEAD(&log->entries);
+ 	log->size = 0;
+ 	vfree(log->data_start);
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw_log.h b/drivers/net/ethernet/meta/fbnic/fbnic_fw_log.h
+index 881ee298ede7..cb6555f40a24 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_fw_log.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw_log.h
+@@ -36,6 +36,8 @@ struct fbnic_fw_log {
 
- struct fbnic_fw_ver {
- 	u32 version;
-@@ -82,6 +95,8 @@ int fbnic_fw_xmit_fw_write_chunk(struct fbnic_dev *fbd,
- 				 int cancel_error);
- int fbnic_fw_xmit_tsene_read_msg(struct fbnic_dev *fbd,
- 				 struct fbnic_fw_completion *cmpl_data);
-+int fbnic_fw_xmit_send_logs(struct fbnic_dev *fbd, bool enable,
-+			    bool send_log_history);
- struct fbnic_fw_completion *fbnic_fw_alloc_cmpl(u32 msg_type);
- void fbnic_fw_put_cmpl(struct fbnic_fw_completion *cmpl_data);
+ #define fbnic_fw_log_ready(_fbd)	(!!(_fbd)->fw_log.data_start)
 
-@@ -125,6 +140,9 @@ enum {
- 	FBNIC_TLV_MSG_ID_FW_FINISH_UPGRADE_RESP		= 0x29,
- 	FBNIC_TLV_MSG_ID_TSENE_READ_REQ			= 0x3C,
- 	FBNIC_TLV_MSG_ID_TSENE_READ_RESP		= 0x3D,
-+	FBNIC_TLV_MSG_ID_LOG_SEND_LOGS_REQ		= 0x43,
-+	FBNIC_TLV_MSG_ID_LOG_MSG_REQ			= 0x44,
-+	FBNIC_TLV_MSG_ID_LOG_MSG_RESP			= 0x45,
- };
++void fbnic_fw_log_enable(struct fbnic_dev *fbd, bool send_hist);
++void fbnic_fw_log_disable(struct fbnic_dev *fbd);
+ int fbnic_fw_log_init(struct fbnic_dev *fbd);
+ void fbnic_fw_log_free(struct fbnic_dev *fbd);
+ int fbnic_fw_log_write(struct fbnic_dev *fbd, u64 index, u32 timestamp,
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+index 249d3ef862d5..b70e4cadb37b 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+@@ -291,6 +291,17 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 		goto free_irqs;
+ 	}
 
- #define FBNIC_FW_CAP_RESP_VERSION_MAJOR		CSR_GENMASK(31, 24)
-@@ -199,4 +217,22 @@ enum {
- 	FBNIC_FW_FINISH_UPGRADE_MSG_MAX
- };
-
-+enum {
-+	FBNIC_SEND_LOGS				= 0x0,
-+	FBNIC_SEND_LOGS_VERSION			= 0x1,
-+	FBNIC_SEND_LOGS_HISTORY			= 0x2,
-+	FBNIC_SEND_LOGS_MSG_MAX
-+};
++	/* Send the request to enable the FW logging to host. Note if this
++	 * fails we ignore the error and just display a message as it is
++	 * possible the FW is just too old to support the logging and needs
++	 * to be updated.
++	 */
++	err = fbnic_fw_log_init(fbd);
++	if (err)
++		dev_warn(fbd->dev,
++			 "Unable to initialize firmware log buffer: %d\n",
++			 err);
 +
-+enum {
-+	FBNIC_FW_LOG_MSEC			= 0x0,
-+	FBNIC_FW_LOG_INDEX			= 0x1,
-+	FBNIC_FW_LOG_MSG			= 0x2,
-+	FBNIC_FW_LOG_LENGTH			= 0x3,
-+	FBNIC_FW_LOG_MSEC_ARRAY			= 0x4,
-+	FBNIC_FW_LOG_INDEX_ARRAY		= 0x5,
-+	FBNIC_FW_LOG_MSG_ARRAY			= 0x6,
-+	FBNIC_FW_LOG_MSG_MAX
-+};
+ 	fbnic_devlink_register(fbd);
+ 	fbnic_dbg_fbd_init(fbd);
+ 	spin_lock_init(&fbd->hw_stats_lock);
+@@ -365,6 +376,7 @@ static void fbnic_remove(struct pci_dev *pdev)
+ 	fbnic_hwmon_unregister(fbd);
+ 	fbnic_dbg_fbd_exit(fbd);
+ 	fbnic_devlink_unregister(fbd);
++	fbnic_fw_log_free(fbd);
+ 	fbnic_fw_free_mbx(fbd);
+ 	fbnic_free_irqs(fbd);
+
+@@ -389,6 +401,8 @@ static int fbnic_pm_suspend(struct device *dev)
+ 	rtnl_unlock();
+
+ null_uc_addr:
++	fbnic_fw_log_disable(fbd);
 +
- #endif /* _FBNIC_FW_H_ */
+ 	devl_lock(priv_to_devlink(fbd));
+
+ 	fbnic_fw_free_mbx(fbd);
+@@ -434,6 +448,11 @@ static int __fbnic_pm_resume(struct device *dev)
+
+ 	devl_unlock(priv_to_devlink(fbd));
+
++	/* Only send log history if log buffer is empty to prevent duplicate
++	 * log entries.
++	 */
++	fbnic_fw_log_enable(fbd, list_empty(&fbd->fw_log.entries));
++
+ 	/* No netdev means there isn't a network interface to bring up */
+ 	if (fbnic_init_failure(fbd))
+ 		return 0;
+@@ -455,6 +474,8 @@ static int __fbnic_pm_resume(struct device *dev)
+
+ 	return 0;
+ err_free_mbx:
++	fbnic_fw_log_disable(fbd);
++
+ 	rtnl_unlock();
+ 	fbnic_fw_free_mbx(fbd);
+ err_free_irqs:
 --
 2.47.1
 
