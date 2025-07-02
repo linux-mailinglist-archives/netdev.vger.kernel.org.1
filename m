@@ -1,236 +1,100 @@
-Return-Path: <netdev+bounces-203102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57D7DAF0837
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 04:00:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A8A4AF083F
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 04:04:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52D2F441E5D
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 01:59:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45D8A422DE4
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADD77101DE;
-	Wed,  2 Jul 2025 02:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7057F54723;
+	Wed,  2 Jul 2025 02:04:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RiE2Gdx1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yQLgq8wO"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFE0151991
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 02:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D8428691
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 02:04:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751421616; cv=none; b=Jj0eKykznZY6+Wr/51XYyXiqI2yCZwBo0jjFeyy2fhXWaC83ASmh8myuiiFvA3SIHF/n7BsRqXOkSzUiuGB7mexbJtX2rgmTHROxeKG67HR2YZiwkqzjsKF/xGv8hLFakrZJNjoSxChbySCeSJxIW7h7JlS1gEMi3Y+UlBopU4Y=
+	t=1751421883; cv=none; b=pZln2TXYJCTE+fXPWMWPs/IrDmG4tr/Zyr4Iw7Dr78AXwzkemHATU7gRj1itmKIe/5f4yWUThImEYslzn3BDpQQ1fhOx4pHAxKpzWfYem0zEklX3ca2P9d+TJF/Qz60waVpR7JEWM7w9VPRTPz1nPtmfXNmpf9vxityotunC/Po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751421616; c=relaxed/simple;
-	bh=mNL+vL+xN7bDVuRbaJlPg1tSMlXvcNCBR6ykGypA0R4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n4k/B5fP+IHg0BCHeU0kKr9Gt8LMKC418Fbxuz6va6UkKq/wNX4Eu2gNYBehOxO/y7qur+HdPQ8gDVYQ1Z1rQntfLsHXdib3OeVfAfLAyWKCUB53iBlJNPVRyRMJaCtQGIHBz6fqn+XJdaqrozUn5U7bKYeVIwFQflScl357IKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RiE2Gdx1; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <15ba0933-b0c1-40eb-9d3c-d8837d6ee12a@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751421601;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aKL1FF4hap74WWQz6H6EMD4nNxNTcrjgixOQ6nf32eM=;
-	b=RiE2Gdx1GgXM790DtELGwOhTrItveIzucm7gfHPjoIySLpLc8uXMdXgMbBgMGVFdR2oiPa
-	ZE/7qEHeI0xkLU5TEopXi/q4uCnVDLWJtMiXIoPqwdBooQY0oQ0+BgREr1zLdI0YFaEH6o
-	d8d2D072jp8C+wwdjrBY/r0AvtCnuzk=
-Date: Wed, 2 Jul 2025 09:59:52 +0800
+	s=arc-20240116; t=1751421883; c=relaxed/simple;
+	bh=qSLrIV/x/CJfpHqvH/bTNdL3EGVaF8vMLrnct3B6C0Q=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=iTGwIjFw9DEXSgoncDYYSB31y9v61IPDbdJqkMHxuQnUM9O2K+InvY4AhO+CX8f+uXuVTb4M3CK29Uy00wZV3AZHwr57biUyi04uqNMt6Kx2nMz8/109D79hj2yFMHMPkau+libJHeJNWRF29Bgq5RKAW8Sy/m+hKx2vaAruihw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yQLgq8wO; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-313c3915345so9473217a91.3
+        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 19:04:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751421881; x=1752026681; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=oIz9aa/LpkCyZsppk4TGcXPWyyj3Le1v4sCmUbqy+rE=;
+        b=yQLgq8wO0kk41RhnTa4NLtaHLG0LR8M8QmVJcAi2MAgx/enqTd3+gHjK/tWsjLFUAh
+         253MsTpq7RvILGjWTZlRorOETzcWGSZpyrTa2ptmCZ4J+1TmCb5h6mo5AfHvQv/MMH/7
+         323VkzK6jDr5R3IAQixBuymnLkltPZJdiFc9s6kCnK/jh1e3kqmIGc8AQvshe/wSEGWw
+         P68qGCP5o3kfYXAupXjSoZGxBp+0e6HF7kLEh3CPIh/XOFSlSUvrQZ7JLLJdJ9RDDqdJ
+         mxwPh6V+WbxM3N/c3sUWXJsDz3CF/yxcXSCeDi+kxmOm4V0uL0hA9F54v0k3OBmn9ZMB
+         fXmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751421881; x=1752026681;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oIz9aa/LpkCyZsppk4TGcXPWyyj3Le1v4sCmUbqy+rE=;
+        b=a+oU20o0FXy3Q0BzKUMj6icwqlD2Ack7wyLdm83Ul94kT7FgrEG3hV6JeT5FAZ6xs3
+         p4Xj2bDU+WmCDDegpBq5vkAvG1HhZncB6+qdxTdnSy2MD1tQPGTy+OWtweMjXMYJDG9K
+         mzBLSwDnUx+nmtL8e7awpYUHEwhXA7tVUKXhE+3onVRlAJ9e1Dv3Asjbzwzke6Sh/ico
+         KIA4twxGkPQgzTX+6s6lQLIqSTNRy3CpO6ABwNB4L+J8J7fKgyUuTJwhVeOgImgNaCnX
+         aRFq5gS+lhkabIyVVp4A8pL2RyzldzKv+IMxTvWJwnF04AjgUtD92/DQxnGkYezDA7pm
+         VWHw==
+X-Forwarded-Encrypted: i=1; AJvYcCVg409FmAl1kaP4Et7KIk1OOMbQP8lX6HQVm1fw2vXxXvtlH2/gRfYKM7n72qw9B9S08E9t3Lc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLs03cyr+NKabNDShozZUXNJvN9l33cRY9y535JMmhuwfXUU3t
+	BeiKzfW0TTsOKxNJPWQipSs0P7+OG/jMRz3jUJRJKktvHE+qitCR2s/Sb3ZaQGiThDCX5Yy5IPs
+	byRpoZA==
+X-Google-Smtp-Source: AGHT+IFjCXMeI+QGbNJIoNcR+WQFLolgghbVEs7WKZfmhr2QiviL7SUYFhBZzSbN+4VzreDjYwIdneytUUo=
+X-Received: from pjbpd4.prod.google.com ([2002:a17:90b:1dc4:b0:314:d44:4108])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:530c:b0:30e:8c5d:8ed
+ with SMTP id 98e67ed59e1d1-31a90bcad26mr1436665a91.19.1751421881298; Tue, 01
+ Jul 2025 19:04:41 -0700 (PDT)
+Date: Wed,  2 Jul 2025 02:04:06 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH RFT net-next 02/10] net: stmmac: Add support for Allwinner
- A523 GMAC200
-To: Chen-Yu Tsai <wens@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
- Jernej Skrabec <jernej@kernel.org>, Samuel Holland <samuel@sholland.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
- linux-kernel@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>
-References: <20250701165756.258356-1-wens@kernel.org>
- <20250701165756.258356-3-wens@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yanteng Si <si.yanteng@linux.dev>
-In-Reply-To: <20250701165756.258356-3-wens@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250702020437.703698-1-kuniyu@google.com>
+Subject: [PATCH v1 net 0/2] atm: clip: Fix infinite recursion and potential null-ptr-deref.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-在 7/2/25 12:57 AM, Chen-Yu Tsai 写道:
-> From: Chen-Yu Tsai <wens@csie.org>
-> 
-> The Allwinner A523 SoC family has a second Ethernet controller, called
-> the GMAC200 in the BSP and T527 datasheet, and referred to as GMAC1 for
-> numbering. This controller, according to BSP sources, is fully
-> compatible with a slightly newer version of the Synopsys DWMAC core.
-> The glue layer around the controller is the same as found around older
-> DWMAC cores on Allwinner SoCs. The only slight difference is that since
-> this is the second controller on the SoC, the register for the clock
-> delay controls is at a different offset. Last, the integration includes
-> a dedicated clock gate for the memory bus and the whole thing is put in
-> a separately controllable power domain.
-> 
-> Add a new driver for this hardware supporting the integration layer.
-> 
-> Signed-off-by: Chen-Yu Tsai <wens@csie.org>
-> ---
->   drivers/net/ethernet/stmicro/stmmac/Kconfig   |  12 ++
->   drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
->   .../ethernet/stmicro/stmmac/dwmac-sun55i.c    | 161 ++++++++++++++++++
->   3 files changed, 174 insertions(+)
->   create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> index 67fa879b1e52..38ce9a0cfb5b 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> @@ -263,6 +263,18 @@ config DWMAC_SUN8I
->   	  stmmac device driver. This driver is used for H3/A83T/A64
->   	  EMAC ethernet controller.
->   
-> +config DWMAC_SUN55I
-> +	tristate "Allwinner sun55i GMAC200 support"
-> +	default ARCH_SUNXI
-> +	depends on OF && (ARCH_SUNXI || COMPILE_TEST)
-> +	select MDIO_BUS_MUX
-> +	help
-> +	  Support for Allwinner A523/T527 GMAC200 ethernet controllers.
-> +
-> +	  This selects Allwinner SoC glue layer support for the
-> +	  stmmac device driver. This driver is used for A523/T527
-> +	  GMAC200 ethernet controller.
-> +
->   config DWMAC_THEAD
->   	tristate "T-HEAD dwmac support"
->   	depends on OF && (ARCH_THEAD || COMPILE_TEST)
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
-> index b591d93f8503..51e068e26ce4 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-> +++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-> @@ -31,6 +31,7 @@ obj-$(CONFIG_DWMAC_STI)		+= dwmac-sti.o
->   obj-$(CONFIG_DWMAC_STM32)	+= dwmac-stm32.o
->   obj-$(CONFIG_DWMAC_SUNXI)	+= dwmac-sunxi.o
->   obj-$(CONFIG_DWMAC_SUN8I)	+= dwmac-sun8i.o
-> +obj-$(CONFIG_DWMAC_SUN55I)	+= dwmac-sun55i.o
->   obj-$(CONFIG_DWMAC_THEAD)	+= dwmac-thead.o
->   obj-$(CONFIG_DWMAC_DWC_QOS_ETH)	+= dwmac-dwc-qos-eth.o
->   obj-$(CONFIG_DWMAC_INTEL_PLAT)	+= dwmac-intel-plat.o
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c
-> new file mode 100644
-> index 000000000000..7fadb90e3098
-> --- /dev/null
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c
-> @@ -0,0 +1,161 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * dwmac-sun55i.c - Allwinner sun55i GMAC200 specific glue layer
-> + *
-> + * Copyright (C) 2025 Chen-Yu Tsai <wens@csie.org>
-> + *
-> + * syscon parts taken from dwmac-sun8i.c, which is
-> + *
-> + * Copyright (C) 2017 Corentin Labbe <clabbe.montjoie@gmail.com>
-> + */
-> +
-> +#include <linux/bitfield.h>
-> +#include <linux/bits.h>
-> +#include <linux/mfd/syscon.h>
-> +#include <linux/module.h>
-> +#include <linux/of.h>
-> +#include <linux/phy.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/regmap.h>
-> +#include <linux/regulator/consumer.h>
-> +#include <linux/stmmac.h>
-> +
-> +#include "stmmac.h"
-> +#include "stmmac_platform.h"
-> +
-> +#define SYSCON_REG		0x34
-> +
-> +/* RMII specific bits */
-> +#define SYSCON_RMII_EN		BIT(13) /* 1: enable RMII (overrides EPIT) */
-insert a blankline.
-> +/* Generic system control EMAC_CLK bits */
-> +#define SYSCON_ETXDC_MASK		GENMASK(12, 10)
-> +#define SYSCON_ERXDC_MASK		GENMASK(9, 5)
-ditto.
-> +/* EMAC PHY Interface Type */
-> +#define SYSCON_EPIT			BIT(2) /* 1: RGMII, 0: MII */
-> +#define SYSCON_ETCS_MASK		GENMASK(1, 0)
-> +#define SYSCON_ETCS_MII		0x0
-> +#define SYSCON_ETCS_EXT_GMII	0x1
-> +#define SYSCON_ETCS_INT_GMII	0x2
-> +
-> +#define MASK_TO_VAL(mask)   ((mask) >> (__builtin_ffsll(mask) - 1))
-> +
-> +static int sun55i_gmac200_set_syscon(struct device *dev,
-> +				     struct plat_stmmacenet_data *plat)
-> +{
-> +	struct device_node *node = dev->of_node;
-> +	struct regmap *regmap;
-> +	u32 val, reg = 0;
-> +
-> +	regmap = syscon_regmap_lookup_by_phandle(node, "syscon");
-> +	if (IS_ERR(regmap))
-> +		return dev_err_probe(dev, PTR_ERR(regmap), "Unable to map syscon\n");
-> +
------------
-> +	if (!of_property_read_u32(node, "allwinner,tx-delay-ps", &val)) {
-> +		if (val % 100) {
-> +			dev_err(dev, "tx-delay must be a multiple of 100\n");
-> +			return -EINVAL;
-> +		}
-> +		val /= 100;
-> +		dev_dbg(dev, "set tx-delay to %x\n", val);
-> +		if (val > MASK_TO_VAL(SYSCON_ETXDC_MASK))
-> +			return dev_err_probe(dev, -EINVAL,
-> +					     "Invalid TX clock delay: %d\n",
-> +					     val);
-> +
-> +		reg |= FIELD_PREP(SYSCON_ETXDC_MASK, val);
-> +	}
-> +
-> +	if (!of_property_read_u32(node, "allwinner,rx-delay-ps", &val)) {
-> +		if (val % 100) {
-> +			dev_err(dev, "rx-delay must be a multiple of 100\n");
-> +			return -EINVAL;
-> +		}
-> +		val /= 100;
-> +		dev_dbg(dev, "set rx-delay to %x\n", val);
-> +		if (val > MASK_TO_VAL(SYSCON_ERXDC_MASK))
-> +			return dev_err_probe(dev, -EINVAL,
-> +					     "Invalid RX clock delay: %d\n",
-> +					     val);
-> +
-> +		reg |= FIELD_PREP(SYSCON_ERXDC_MASK, val);
-> +	}
-------------
-These two parts of the code are highly similar.
-Can you construct a separate function?
-> +
-> +	switch (plat->mac_interface) {
+Patch 1 fixes infinite recursive call of clip_vcc->old_push(), which
+was reported by syzbot.
 
-> +	case PHY_INTERFACE_MODE_MII:
-> +		/* default */
-> +		break;
-This line of comment seems a bit abrupt here.
+Patch 2 fixes racy access to atmarpd found while checking RTNL usage
+in clip.c.
 
 
-Thanks,
-Yanteng
+Kuniyuki Iwashima (2):
+  atm: clip: Fix infinite recursive call of clip_push().
+  atm: clip: Fix potential null-ptr-deref in to_atmarpd().
+
+ net/atm/clip.c | 47 +++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 33 insertions(+), 14 deletions(-)
+
+-- 
+2.50.0.727.gbf7dc18ff4-goog
+
 
