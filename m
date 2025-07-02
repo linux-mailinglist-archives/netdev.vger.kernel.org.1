@@ -1,41 +1,41 @@
-Return-Path: <netdev+bounces-203183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25D96AF0B27
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:03:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 350D9AF0B38
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:05:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E52A51C20F49
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 06:03:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8776C174624
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 06:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 140D9221FDD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E8D8223DCC;
 	Wed,  2 Jul 2025 06:02:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E19F2153CB;
-	Wed,  2 Jul 2025 06:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11501F4E34;
+	Wed,  2 Jul 2025 06:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751436174; cv=none; b=VcZiI0qPtBm33KfKBAIe432tcXN18VMQzO2LrEIBN2lalf9yidwTcLfYoJ2GQzNHVEbeOm8ZnD05pNdQGkUgYvPMaqI+UyXn1VA9S8PqscxMbviKlCgKttPX7f0wqtwS0MsDv8qgGuD7HUiYDFwH7mhDs0ucfSAC1LhLnFTkePY=
+	t=1751436174; cv=none; b=jkGhpaHzI5VTawHObqHTZ79KM2x/lTq7adJgN9pa0vzN3sHqFQhxGB6Q2vf0vg7sWTt3XV3jGe6YSal9fEQ5vou7kaBgKlI9qDg83Fq0YMg2qX8PWSzaNQSQMU7SUvcgYDdwMnat5oT/td41uNAI0IIqHoX0ecDCViIx7D0r3DQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1751436174; c=relaxed/simple;
-	bh=zOy0j5gOjuQT2uCiT1Uy8NiDyCMjkgCaKJu/RQgIvkw=;
+	bh=qn/Uvt2pbzXT7gbAmEV9GvDBEkRjha9r+LsFDfuwWfo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=e7j8Bmre6lI4Ro4j8Yzj8+EoOiR4HnGaYu7F+cRt6dN1M4pxv1kWkLG4/CvGmy70b/zeuz/vtIZ0dpIMt204AKOwMSh2NtyjVsuhI8vPngR++TBdedqwvKCLAY+akxu9AVDr3LqwMgMaJh+7On53Z/O0EJRKarxLHat6igDeKjA=
+	 In-Reply-To:To:Cc; b=mTwnvrccjr9f6E6E5d+hRN+Qb97hMGg6U3TADt+7eAo6nZUjaN06QgokA3CJe47++5Pv/rauXdJazx7tVWLWODhSnro3hxjbJtFKINe3vHhFPBQ2zCVFBqle9ofsYNkfG8lqiwAK5nDrdeoue4bWMM0XLLlX6wnNRhxMO1zdMqs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
 Received: from [127.0.0.2] (unknown [210.73.43.2])
-	by APP-01 (Coremail) with SMTP id qwCowAC3pqpny2RomPduAA--.1282S6;
+	by APP-01 (Coremail) with SMTP id qwCowAC3pqpny2RomPduAA--.1282S7;
 	Wed, 02 Jul 2025 14:02:17 +0800 (CST)
 From: Vivian Wang <wangruikang@iscas.ac.cn>
-Date: Wed, 02 Jul 2025 14:01:43 +0800
-Subject: [PATCH net-next v3 4/5] riscv: dts: spacemit: Add Ethernet support
- for BPI-F3
+Date: Wed, 02 Jul 2025 14:01:44 +0800
+Subject: [PATCH net-next v3 5/5] riscv: dts: spacemit: Add Ethernet support
+ for Jupiter
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -44,7 +44,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250702-net-k1-emac-v3-4-882dc55404f3@iscas.ac.cn>
+Message-Id: <20250702-net-k1-emac-v3-5-882dc55404f3@iscas.ac.cn>
 References: <20250702-net-k1-emac-v3-0-882dc55404f3@iscas.ac.cn>
 In-Reply-To: <20250702-net-k1-emac-v3-0-882dc55404f3@iscas.ac.cn>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -64,10 +64,10 @@ Cc: Vivian Wang <uwu@dram.page>, Lukas Bulwahn <lukas.bulwahn@redhat.com>,
  linux-riscv@lists.infradead.org, spacemit@lists.linux.dev, 
  linux-kernel@vger.kernel.org
 X-Mailer: b4 0.14.2
-X-CM-TRANSID:qwCowAC3pqpny2RomPduAA--.1282S6
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ary5JF45JFW8Xr1kAw4fZrb_yoW8WrWDp3
-	yakFs3urWDGr4Skw43Zr9F9r4fGa95XrWkC343uF1rJrWvvas0vw15Kwn7tr1DWrW5X345
-	Xr4xtFWj9r1qkw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+X-CM-TRANSID:qwCowAC3pqpny2RomPduAA--.1282S7
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kw43Gw1ftrWfAF43Cr45Jrb_yoW8WrW7pa
+	y3CFsaqFZ7Cr1fKw43Zr9F9r13Ga95GrWkC3y3uF1rJ3yIvFZ0vw1ftw17tr1DGrW5X34Y
+	vr10yFyxurnFkw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
 	9KBjDU0xBIdaVrnRJUUUQI14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
 	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_JF0E3s1l82xGYI
 	kIc2x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2
@@ -79,25 +79,25 @@ X-Coremail-Antispam: 1UD129KBjvJXoW7Ary5JF45JFW8Xr1kAw4fZrb_yoW8WrWDp3
 	ka0xkIwI1lc7CjxVAaw2AFwI0_GFv_Wrylc2xSY4AK67AK6r47MxAIw28IcxkI7VAKI48J
 	MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
 	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UMIIF0xvE42xK8V
+	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UMIIF0xvE42xK8V
 	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
 	14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7sRiEoXUUUUUU==
 X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-Banana Pi BPI-F3 uses an RGMII PHY for each port and uses GPIO for PHY
+Milk-V Jupiter uses an RGMII PHY for each port and uses GPIO for PHY
 reset.
 
 Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
 ---
- arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts | 46 +++++++++++++++++++++++++
+ arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts | 46 +++++++++++++++++++++++
  1 file changed, 46 insertions(+)
 
-diff --git a/arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts b/arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts
-index fe22c747c5012fe56d42ac8a7efdbbdb694f31b6..15fa4a5ebd043f3fbb115d37e5a980c9b773a228 100644
---- a/arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts
-+++ b/arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts
-@@ -40,6 +40,52 @@ &emmc {
- 	status = "okay";
+diff --git a/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts b/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts
+index 4483192141049caa201c093fb206b6134a064f42..c5933555c06b66f40e61fe2b9c159ba0770c2fa1 100644
+--- a/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts
++++ b/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts
+@@ -20,6 +20,52 @@ chosen {
+ 	};
  };
  
 +&eth0 {
