@@ -1,152 +1,121 @@
-Return-Path: <netdev+bounces-203307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1DA7AF13F6
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 13:34:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83C68AF13F8
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 13:35:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C0711C25E03
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:34:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1C431678EA
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:35:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39777264A9D;
-	Wed,  2 Jul 2025 11:34:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611902652A2;
+	Wed,  2 Jul 2025 11:35:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HHAi5kVB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VEOZQmII"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBC423371F;
-	Wed,  2 Jul 2025 11:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 322211D516A;
+	Wed,  2 Jul 2025 11:35:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751456057; cv=none; b=HvLONWrQMdHRSLtjBP/jDQ/Bx/QKhHmN23OaGIZ2ToNFPcA5ebqeNysEUT/dRCcA0QXR9Nm93e7FAdV2ajHNAAvSoQhSWM2f6PenY3Kw4PpKRD+riYtOtzggSMQj+7pSOrcbMhGLh/aH4e7C6ClnGfHi00Fw2cBIg7glP6bxp+U=
+	t=1751456152; cv=none; b=GSPJeqYQNmhWup7nD1ECp9CFqiX2QoNe1Vu5g7onrI4eTWXB+TsHENxeWN8aeBbI19hL2subtl6ds94+AkPwB4duaeQAs3CcskUTiPIj/59F49z7//dKIw7Nr1NlsIHHMsDJWDsjd/vfhMRE4DM7QFg5lwgwMLE473c1EmVsKc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751456057; c=relaxed/simple;
-	bh=Nq3rXKAUHavmOWHdiAxOlIxS5cCFcHFUGxZmUDclhSM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y0A7yikLIJEWOkZL3PZsOIWArn3xk9pXYwjDHXxEmsjLzAsOfEmjAxqOf5caPDzr1jj9gzFP0NPffvEdQAMzTIebLMTEDBK0E/ZeKi8bilCkRucqb1cU+ZXj5uMew/AkqyQuHDCMZRPSFtiL0jdOfiY5RcMqrMK4uJ/rCEMoY/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HHAi5kVB; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-8723a232750so379843439f.1;
-        Wed, 02 Jul 2025 04:34:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751456054; x=1752060854; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Tj/QHuZV4QOpSEKs+oYRbdM+glo559vKGz/A6OFJUSU=;
-        b=HHAi5kVBj5UyOSN4LEfY+SGrKNk0hZ7xfVKbi6Tk0ao6rh1efO3Mmrs3UJvTNzIiio
-         yhLtA3CvQA69KvIq707I2YBiLy+qXG2yYb/Lu1+hZkq2rIBepeY7pKpEwsJTore/b6Jq
-         LldgcyXNfeXM5dCzUaYDeLFQxPZxGwKblmOJddiqe6vdBjEPkwA9X3LexE4fn2uZ/fcV
-         ueOOnRo0y/+pLJlkExJqSeuBKWeOON85SK0UEktvF481ThF4QOY30/L2gFmUli9yZd7r
-         ja7DVc8HyDtMDcFfQ/NYnGy0RSeLLxgm5FHKgUw9Si99GNahJc+5BGjlthSpPlAbh6Ib
-         JdTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751456054; x=1752060854;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Tj/QHuZV4QOpSEKs+oYRbdM+glo559vKGz/A6OFJUSU=;
-        b=qCAs3h3vMZvJJPgHZ6laurBDaQR4LfksqNLctRmml/cjdJiyI6GI4sXTPW7XUpAbEg
-         WYw/fCy83S4oh1M30A5Fm4fKeK/3XhIT0Ikail/hnTdsXaxp1Po+ASl81td4XeknHw6Z
-         o/tOmhkqc18fObGU7hhhJ0ww/YAejqlkxYRJ9FcIwnpA3Rq5IM9cC27bWhzYs7ihKRwS
-         QQBapc9RbDLf18K6PYhlfv5wxJXEn7oLaL0ouz1TCjPrlWH/9x1eyDIAGF04vwo5YWlc
-         c0OCTBJDoocYP1McK+DTzX5arasVWGXeAYvpaky3VeOnJAj1jsYr3tCaD/9pSmZ9Ubk+
-         DlJA==
-X-Forwarded-Encrypted: i=1; AJvYcCULgUjbTXqnSuvvhLgOzseskKygDtycCUjkwQq9p0v+r4a5qF9/2fYFRP9cmMWF9P/DxrkGJSE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCzrNqfnybqPE5ZD3r78FHcYgqF+Hjeh0uUGv+ISZdPytcq3Nx
-	tcQBAG2Cg2q8KWNwalzgYtiq3NJDE3aI1qe+GqyU3hEGJ7EWHJf5x3UOyZ/zniwHS/yDbhK0znD
-	S54jRVI52VqzXW68q4B4EqoldeK3zVbw=
-X-Gm-Gg: ASbGnctHp7bfu59MHQIiMMhbK/mV/wGcFlgWNy+1pVt4FK+rAqBiipOa7DrYfVolAtr
-	Zf2bmcn445PQ0IHetUrRCY4doNsiEVUTGIb8qYCdTpTQyslPWhQ14d6NLaWNR7Y/OvPMOJn1FO1
-	dtqqrPsWbWKcYgeQfGynRYE2RUWWv6l2DFRJTICJG0QA==
-X-Google-Smtp-Source: AGHT+IEof+wvSreCEhz+hqGy3sJk0udMWHJqJUpmffqFzM1zUhy/ADa6+A9Lkbk5BSnxWb2BsPwcv70cf+Cx7qZyJ4I=
-X-Received: by 2002:a05:6e02:1988:b0:3df:1505:1d43 with SMTP id
- e9e14a558f8ab-3e054adbb28mr23658665ab.13.1751456054544; Wed, 02 Jul 2025
- 04:34:14 -0700 (PDT)
+	s=arc-20240116; t=1751456152; c=relaxed/simple;
+	bh=75tX/3HUrOf8+9xyDRzjBq3cba5xi1dbfPz2qmejVzQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=cHWccnyiVz+KIaTSUZV0SYI+qlkhnvik1OcP3QrJ0Mr2T3DS8WEmSWo6V4i2PA+VurlrSlggoFeyuq48XX1iveCUnFtHy9+KKrfVoFoliPdl/PfblWJ0XSHXw3GBnP5Rpnh6+kdjz531OXp0VRhK1UUeVQFJIcWkFgLTx21MsLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VEOZQmII; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8FD69C4CEF2;
+	Wed,  2 Jul 2025 11:35:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751456151;
+	bh=75tX/3HUrOf8+9xyDRzjBq3cba5xi1dbfPz2qmejVzQ=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=VEOZQmIIaiaKvRQd40Um4F8toPmxvD0ygHZOzMNUcGANXbNTX4Nx9IaPpgJtfMClD
+	 YDUwmoc+sPhKhgPpDtPk+g//uySdT8I5o83FbnsJvg8Eavmm6O6C+S8NDrtrUEU/0c
+	 BTKWFA71Dwodr8Xj0UKgnowse7P2j3A3uWL2UKu7tc8jzOOvNNYTVpRO1QKbLp2k2I
+	 TfAYBUo5UqMa4NBYrNhgJ4F+ArrTTIRJv6jcbTFweIQdl+RWEAngSZl2aVxJNV+uwn
+	 MzwiBfAq/SIhE4xYih5aswvAn4YL7bCdt6OFz6slHHirZ1Apd1VE6SnmU0dGRWaX5t
+	 Z20RDr7KUQ3XA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D04FC83013;
+	Wed,  2 Jul 2025 11:35:51 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Date: Wed, 02 Jul 2025 19:35:48 +0800
+Subject: [PATCH v2] Bluetooth: ISO: Support SOCK_RCVTSTAMP via CMSG for ISO
+ sockets
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250627110121.73228-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20250627110121.73228-1-kerneljasonxing@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 2 Jul 2025 19:33:36 +0800
-X-Gm-Features: Ac12FXzJvIQM7r7aIFq1ouNa3mwmFUqZNAjO2JDb1aDRaAESKrZwpEGXUSS05fY
-Message-ID: <CAL+tcoA=-igx3KPG4dY=9a6Ahd6kSSLsHz-AicTzShuDosa-1w@mail.gmail.com>
-Subject: Re: [PATCH net-next v6] net: xsk: introduce XDP_MAX_TX_BUDGET set/getsockopt
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250702-iso_ts-v2-1-723d199c8068@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAJMZZWgC/zXMywrCMBCF4VcpszaSpBdjV76HFInptB2wjWRKU
+ Ere3Vjo8j8cvg0YAyFDW2wQMBKTX3LoUwFussuIgvrcoKWuZaWVIPaPlYUz2pZSWryYCvL5HXC
+ gzw7du9wT8erDd3ej+q8HcT2IqIQSWJtmKGWPjXve7PzyI7mz8zN0KaUfJqRCPZ4AAAA=
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1751456149; l=982;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=KHMGQKsMq1ealL3OXyoBth/L4LOJjuWSriffKLAfOLM=;
+ b=/XSCa4bHVCWY+eq/QxDxP2198DpIAxIIYl+i0/OLzyiR//vXWJO4ymOsMxYq+VWerTZC7XiS5
+ fr079bqjNMVCLDw9rVIMzKlGfuxrsKYSwq4LMm4pJjo7jybc0sEvAE+
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-On Fri, Jun 27, 2025 at 7:01=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> This patch provides a setsockopt method to let applications leverage to
-> adjust how many descs to be handled at most in one send syscall. It
-> mitigates the situation where the default value (32) that is too small
-> leads to higher frequency of triggering send syscall.
->
-> Considering the prosperity/complexity the applications have, there is no
-> absolutely ideal suggestion fitting all cases. So keep 32 as its default
-> value like before.
->
-> The patch does the following things:
-> - Add XDP_MAX_TX_BUDGET socket option.
-> - Convert TX_BATCH_SIZE to tx_budget_spent.
-> - Set tx_budget_spent to 32 by default in the initialization phase as a
->   per-socket granular control. 32 is also the min value for
->   tx_budget_spent.
-> - Set the range of tx_budget_spent as [32, xs->tx->nentries].
->
-> The idea behind this comes out of real workloads in production. We use a
-> user-level stack with xsk support to accelerate sending packets and
-> minimize triggering syscalls. When the packets are aggregated, it's not
-> hard to hit the upper bound (namely, 32). The moment user-space stack
-> fetches the -EAGAIN error number passed from sendto(), it will loop to tr=
-y
-> again until all the expected descs from tx ring are sent out to the drive=
-r.
-> Enlarging the XDP_MAX_TX_BUDGET value contributes to less frequency of
-> sendto() and higher throughput/PPS.
->
-> Here is what I did in production, along with some numbers as follows:
-> For one application I saw lately, I suggested using 128 as max_tx_budget
-> because I saw two limitations without changing any default configuration:
-> 1) XDP_MAX_TX_BUDGET, 2) socket sndbuf which is 212992 decided by
-> net.core.wmem_default. As to XDP_MAX_TX_BUDGET, the scenario behind
-> this was I counted how many descs are transmitted to the driver at one
-> time of sendto() based on [1] patch and then I calculated the
-> possibility of hitting the upper bound. Finally I chose 128 as a
-> suitable value because 1) it covers most of the cases, 2) a higher
-> number would not bring evident results. After twisting the parameters,
-> a stable improvement of around 4% for both PPS and throughput and less
-> resources consumption were found to be observed by strace -c -p xxx:
-> 1) %time was decreased by 7.8%
-> 2) error counter was decreased from 18367 to 572
->
-> [1]: https://lore.kernel.org/all/20250619093641.70700-1-kerneljasonxing@g=
-mail.com/
->
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+From: Yang Li <yang.li@amlogic.com>
 
-Hi Maciej, Stan, Willem, and other maintainers,
+User-space applications (e.g., PipeWire) depend on
+ISO-formatted timestamps for precise audio sync.
 
-I wonder if you have further suggestions on the current patch?
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+---
+Changes in v2:
+- Support SOCK_RCVTSTAMPNS via CMSG for ISO sockets
+- Link to v1: https://lore.kernel.org/r/20250429-iso_ts-v1-1-e586f30de6cb@amlogic.com
+---
+ net/bluetooth/iso.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Thanks in advance!
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index fc22782cbeeb..6927c593a1d6 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -2308,6 +2308,9 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 				goto drop;
+ 			}
+ 
++			/* Record the timestamp to skb*/
++			skb->skb_mstamp_ns = le32_to_cpu(hdr->ts);
++
+ 			len = __le16_to_cpu(hdr->slen);
+ 		} else {
+ 			struct hci_iso_data_hdr *hdr;
+
+---
+base-commit: 3bc46213b81278f3a9df0324768e152de71eb9fe
+change-id: 20250421-iso_ts-c82a300ae784
+
+Best regards,
+-- 
+Yang Li <yang.li@amlogic.com>
+
+
 
