@@ -1,96 +1,79 @@
-Return-Path: <netdev+bounces-203067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8156AF0738
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:19:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B229AAF0743
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:24:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5EBE7A4B49
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 00:18:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C24A4A87FF
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 00:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 073B78F5C;
-	Wed,  2 Jul 2025 00:19:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BFB58F5C;
+	Wed,  2 Jul 2025 00:23:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dol2VaEa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TKxTe2fV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C9C611E;
-	Wed,  2 Jul 2025 00:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537468F5A;
+	Wed,  2 Jul 2025 00:23:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751415583; cv=none; b=Mt8DKA4QkNNlUf2L0Ptm5QUc7qDTT9lQDLx7FD2M2zW6xyMl8fST5R/LMF9ZMbMxzCejM0gdyQC1M1gD0BFy8qX+q2NfCm6jSwhV1dRTxOoNbOdzOxhCHPEzXyUd3Aegbv/mW6ROQhiKPANR3UVLckSmdzy2v8+DORTaWYDuyVg=
+	t=1751415834; cv=none; b=Zjvqwtvw7h/0X4Thh9fIkLFq3nlWv24nsA0X92NZqqVf7vxgAKN0Et/O9Tn6JQn+jXsLgRK029nIQmV69DPpSCDvrGMQi1/k3TzApcg4sB54zqKmbejX5U6QWASqtOefaCrc7SGORtkioe/YTN/Q/1zNFC3ZzUkH1zktg2Vduxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751415583; c=relaxed/simple;
-	bh=4DaWXPHuR88RaLcmPll2/wduEqRs83p/WfrwXFl1YNg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aTYsidNCOg8kG0oSekrkV5Ltcz3ut4h/v553QKF3ZbN9qIsB9pCx6FTVqYgl05EFZ8KEzFTtr38XORLeUmiK+UbG7qnwmv9XGi7C+fborrlCkNaws6qcYYYtHApw68RZV97nsqauJxWeasRiW5Lom6hppQH+cAikjkwaCB2V3no=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dol2VaEa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B207DC4CEEB;
-	Wed,  2 Jul 2025 00:19:43 +0000 (UTC)
+	s=arc-20240116; t=1751415834; c=relaxed/simple;
+	bh=yvX7x3EJvRcGIvHF2lTm5r0SKmIF/1zQI08kg/i9BEs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=e8F1IlgHbKIi6L3L1xjmQQZoKDQ4dYURoQn2ADLtb2Zcv4dovr0SgBlJMlMmL+CasR7duWPez+PD+n1jqq4j9IN4YxSA7Le+yjqfTsIg7Qyy8LGnfWr5aMWBS/MkoJUAJLZB2GSakKgVHkcU51NUZvZfu+qjbRuMGIJiG7aV8tI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TKxTe2fV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3074C4CEEB;
+	Wed,  2 Jul 2025 00:23:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751415583;
-	bh=4DaWXPHuR88RaLcmPll2/wduEqRs83p/WfrwXFl1YNg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Dol2VaEa9NrRUPqszDVzPaQCEXXbzfMIz6L6cVL458UL/YaEu9NiRSvCSqNi8ocyy
-	 TBJ57U6HvVDSJZUgEbSoWGK9kf/rMzlQb1w/pG1v8sRmiUHVFsN8AbzA+/FHv2rRos
-	 kZlZry+J18C+fUDCW17t3SM6jeD/Qb1mhIr9WJHXbSqeQ9i1ukhsTgyOO/YbY9LSn9
-	 S5/7ffwDA2KZCyvAD8XEw4MXQnBtRVG2QgE8Vj93jESMGssthk7iK6BQOg7N799/ru
-	 xqi0YAc9fSXHw+aDePnhOhbi5Q16ODA2qiLcpXFUKHN1FCxsRnYS7HnZRVMgEzoLfh
-	 t6wx3UIB1EfmA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE4A383BA06;
-	Wed,  2 Jul 2025 00:20:09 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1751415834;
+	bh=yvX7x3EJvRcGIvHF2lTm5r0SKmIF/1zQI08kg/i9BEs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TKxTe2fVWTN2DPnJasnSLLbfq5ZbBCXh3/wCel95rTMT45UBw7AVLFdA8Uy5kvYjd
+	 GREKE4zPFnRUquCpUPOYoCc54161ly7nF/GPgpbnb27/vtNWB9lP1LsZ4YD+FCViAy
+	 jjOfpyxA0WypFEBMYPBtpE6q4NBgGRuFOKPAENvmpC+d9JhJj379SoClLR6dVNupSX
+	 hv72nz6lC15wN6F5qXIJ/2vPYejjCrha6/Jt0XBe45gg4s66AcO0p8MzNZOV7A8YBE
+	 tkQQYrRcr+Sy7Vq0gym45bKZnqDd6lUcuqLODnau23vOhbXn4xcgelYdCDD1X0TZpa
+	 DxoP6kdGr6XJQ==
+Date: Tue, 1 Jul 2025 17:23:52 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Nimrod Oren <noren@nvidia.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Willem de Bruijn
+ <willemb@google.com>, <netdev@vger.kernel.org>,
+ <linux-kselftest@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, "Carolina
+ Jubran" <cjubran@nvidia.com>
+Subject: Re: [PATCH net] selftests: drv-net: rss_ctx: Add short delay
+ between per-context traffic checks
+Message-ID: <20250701172352.5dd42418@kernel.org>
+In-Reply-To: <20250629111812.644282-1-noren@nvidia.com>
+References: <20250629111812.644282-1-noren@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] sfc: siena: eliminate xdp_rxq_info_valid
- using
- XDP base API
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175141560850.155437.10463020454884868658.git-patchwork-notify@kernel.org>
-Date: Wed, 02 Jul 2025 00:20:08 +0000
-References: <20250628051033.51133-1-wangfushuai@baidu.com>
-In-Reply-To: <20250628051033.51133-1-wangfushuai@baidu.com>
-To: Fushuai Wang <wangfushuai@baidu.com>
-Cc: ecree.xilinx@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-net-drivers@amd.com,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 28 Jun 2025 13:10:33 +0800 you wrote:
-> Commit d48523cb88e0 ("sfc: Copy shared files needed for Siena (part 2)")
-> use xdp_rxq_info_valid to track failures of xdp_rxq_info_reg().
-> However, this driver-maintained state becomes redundant since the XDP
-> framework already provides xdp_rxq_info_is_reg() for checking registration
-> status.
+On Sun, 29 Jun 2025 14:18:12 +0300 Nimrod Oren wrote:
+> A few packets may still be sent and received during the termination of
+> the iperf processes. These late packets cause failures when they arrive
+> on queues expected to be empty.
 > 
-> Signed-off-by: Fushuai Wang <wangfushuai@baidu.com>
-> 
-> [...]
+> Add a one second delay between repeated _send_traffic_check() calls in
+> rss_ctx tests to ensure such packets are processed before the next
+> traffic checks are performed.
 
-Here is the summary with links:
-  - [net-next,v2] sfc: siena: eliminate xdp_rxq_info_valid using XDP base API
-    https://git.kernel.org/netdev/net-next/c/ca899622c528
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Sprinklings sleeps should be last resort. Is there a way to wait for
+iperf to shut down cleanly, or wait for the socket to be closed fully?
+Like wait_port_listen() ?
 
