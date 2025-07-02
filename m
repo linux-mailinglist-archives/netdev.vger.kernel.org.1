@@ -1,93 +1,154 @@
-Return-Path: <netdev+bounces-203223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 572A9AF0D32
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:53:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C75C3AF0D39
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:54:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C60221C23272
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 07:53:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00C6216C960
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 07:54:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D87322DFAA;
-	Wed,  2 Jul 2025 07:53:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 708A523184F;
+	Wed,  2 Jul 2025 07:54:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OxzHjiAl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WFmlGPHc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96C7225A47
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 07:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFF1200BA1;
+	Wed,  2 Jul 2025 07:54:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751442810; cv=none; b=GGfGKPl5SZTcmcKAh9A8/EHqP4UZIBTo8Av9fHuWpHMyBI6hAhkIbv8xG/S0scrJeb20lvzBPhoh58dvINtxbf4dLCkRWVPefhP5OyEXVG8MDt/jypg0sI+SSI3p0eKqC8jJfR9tZKRpDdT3v6RtumQZXooeAAK7Pc2jVZq9Ptg=
+	t=1751442862; cv=none; b=dB1c7XXXCXgl0UerEa1O3+p3bKMCDMvJNXZRSYqH/Ct4sAz1jYnPW2YdC01FYVxtJI3/1tfYRLqweQQl+vIM1nvK44xG9Hhi2s7Z7rtScjOQRVMj/gH4pA3aC1+1Ak/f4Z78EvUZE6O/kVxvZ32bS+pgga/rW9vFyWb0DAMh4+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751442810; c=relaxed/simple;
-	bh=zHhssj1BscwSCnFo8k5K8w92P0g4snuNMGaUFcK6yiQ=;
+	s=arc-20240116; t=1751442862; c=relaxed/simple;
+	bh=rUwUc12CwDq37/2slGik7dRlGZeOaTXSpDsb9W6K1i0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cKkO8j8IjsXBGxdmDP5V6xGWmlwTIwLTGv1hNEYofaJN77j2aUnKm6sdrRJdb6Sd1MenP5HRmXV3yV8k8mJIy58XCQd3r47z3+flp+ZK63XhKgkjPNx+W0nfCq8BgcPl/9leKFwPEsmkmPtcx/T2NYmuL+0RiJ+jetvcfseAfxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OxzHjiAl; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-234fcadde3eso54139035ad.0
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 00:53:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751442808; x=1752047608; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=AX4HjizhyCl6AUaOnZaLwNRLSmCn9508YystEK6mmK4=;
-        b=OxzHjiAljGOrOStItt3vHQKjYBJcKfa6sFepRS57wf15kGcHtt5G0tY90gQ4vhGgU4
-         Mp785fktoUbtzZM1hur0drcFv2VZHLPnjF86FD57LWaZD8CBi+dGpdJRY0uvPGOqWmoz
-         F7uKoswrWB9lvVF9N/inow7ymhx524AAsQnksfKcl3ZzqNOM47YNbMoZPNU4Kd5taTX/
-         NYzuWMshp3MOUzUPn86fJebRAzm31VbW1aeKxMmTSbN7S8WrjXY6hOd9JWGzqNR0SVLc
-         Zaw+VfAw8VUFR/dt/p+DFGEqDEj9zF9ZuOen/S9rllZsEDVjD6bK4sDmDRycHlFVF6/I
-         sStw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751442808; x=1752047608;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AX4HjizhyCl6AUaOnZaLwNRLSmCn9508YystEK6mmK4=;
-        b=Pj8MOiVdMWFucK+PtFGjz6BdL72MsDUANdOE0WXbY8/Pya0c/fdxJV1C8bNrvaHEIj
-         19GODsqMBn8WYTx656o8lc0uWe7R/qX0IdSLQVW1mnz5baGcpDJI0lj/DQI73XITTv8P
-         g+CVGfWuQsL2Vw4xya2UnOO3dJLB3JxbMCIbUSAuFqBVFXzaK4sJPL0eh2i0hq0w/aZE
-         fnMFrggdAtwJkMO92RS/OhAfaNK8YNMSoUuBQxxAvS9TrTq2tdE6CBRcmuV4LbAdV+Gz
-         z/Kh18U60ZXNsjtf4XwzWXjcTpLn8fu5OJ1gP78zxG/iGQl77+JoykVDc5QOQ83swFST
-         FKRA==
-X-Forwarded-Encrypted: i=1; AJvYcCWwil0fltvQGkPo6CRjzcEeTn7rdUyMyc5xgdNqrc1UBNozRv/vmWuIJS910qQ/IhWqVK+f6ws=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw258+s/Da1TPLsEq4l1TXaCo3A/mwZcLQDYRKeYADfIon68LTY
-	FI73HHw5OF0HEwwdSxKzYVIZW0aNBGkqCCc2YQw2+O3RsEjl72+gy7Vf
-X-Gm-Gg: ASbGncvZyRmrC9QZKlK4+kzm20Imm5zviIcoyJvGAkzzPxruVt/aeMaoLFffshrBMvL
-	hYO7ZIBWCT4YRr/Cz9BbeRvSoJ1tIhgXb00YybD3IMqC9vwrAaEdYi6l4wM6VAlt/Kmz6EWwNQv
-	ePrQm/FSp0MzoE9826IAK3wXIkScn0vDb0ZWMe0u2HY+0fLlmYyOFapXi6hiLyFUnjnkf+6qxpZ
-	I5ZSg3Ueg2/E3YU1Vh++qa+IM6TUdyau8Ko1wTjNCuil+XLoLkzoeMf+L4kZ5gqD4c9geoh0Y/n
-	RMfRHjPaUkvQucbDvM+Q7q0XFvGNunw26NIvec6we36qNSXs50NsIB5obYeCBlubpbWyjSMgiyV
-	+HA==
-X-Google-Smtp-Source: AGHT+IHAgA48M+8PH74Rm3Kz2xORYKVs0osmoGBeg+PaiJHh+3Q1nvmyof668u//iarnTCn0u7v3dg==
-X-Received: by 2002:a17:903:1c5:b0:234:bca7:2921 with SMTP id d9443c01a7336-23c6e589771mr26784485ad.33.1751442807793;
-        Wed, 02 Jul 2025 00:53:27 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb3d7406sm132042965ad.259.2025.07.02.00.53.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 00:53:27 -0700 (PDT)
-Date: Wed, 2 Jul 2025 07:53:20 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Erwan Dufour <erwan.dufour@withings.com>
-Cc: Erwan Dufour <mrarmonius@gmail.com>, netdev@vger.kernel.org,
-	steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, jv@jvosburgh.net, saeedm@nvidia.com,
-	tariqt@nvidia.com, Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH] [PATH xfrm offload] xfrm: bonding: Add xfrm packet
- offload for active-backup mode
-Message-ID: <aGTlcAOa6_ItYemu@fedora>
-References: <20250629210623.43497-1-mramonius@gmail.com>
- <aGJiZrvRKXm74wd2@fedora>
- <CAJ1gy2gjapE2a28MVFmrqBxct4xeCDpH1JPLBceWZ9WZAnmokg@mail.gmail.com>
- <aGN_q_aYSlHf_QRD@fedora>
- <CAJ1gy2ghhzU0+_QizeFq1JTm12YPtV+24MyJC_Apw11Z4Gnb4g@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=seWro7qJbYup7GFHmBryUyfZyi21bjRG0TQ+CZ8891D2I9JMrh4nutDvxHDeSGNPrMSsQ+CmWda+BZKloUyPnBbpVUY8UdreAnrSj0KlCxoUkF7kJAqGUyO4dxrMY1LcI5h8kwPyXtaNGAJqyDGt8Uci5l6yvS078UflmaX12Ik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WFmlGPHc; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751442861; x=1782978861;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=rUwUc12CwDq37/2slGik7dRlGZeOaTXSpDsb9W6K1i0=;
+  b=WFmlGPHcxwX2SUVmyW4anhqDN0rNuxfRwK7E9iwtDHAcNG7n7mt90SIG
+   mK78cNLxHgzP3jnCF5zBRVkB5QsRJEhrlhQmctWpLYDy9hcKUJP6osqIO
+   ITXwPhqMBGIlBPD2tkZ/cmVS0tyfS6Wjljwn5b5AqfAW4+OULwBzvS6Ia
+   VNXeQvB+I9uTDKycbHdAlqDbmLW72LHH0o8b0E1KLE3EpPwUTagjbcNkJ
+   sD5Z8b8zH7l+nmdMuJGYuhw04CIvNLIjNCFTwTpaY5NQuObmC41d0/3rr
+   aJEMHOiMdpkSl/NH+LB91PDo5gtbLJgp6Ar6+xQVimIwHzbUkEPsv6fmh
+   w==;
+X-CSE-ConnectionGUID: erfliI1MQcScn6KMnows+g==
+X-CSE-MsgGUID: 824dVOprSDmNoKTkDgl55Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11481"; a="64326060"
+X-IronPort-AV: E=Sophos;i="6.16,281,1744095600"; 
+   d="scan'208";a="64326060"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2025 00:54:18 -0700
+X-CSE-ConnectionGUID: 98SccRJrQ5yvJqszW1ShBA==
+X-CSE-MsgGUID: 52dATgF7Sy6tK3S06PLKug==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,281,1744095600"; 
+   d="scan'208";a="153636445"
+Received: from smile.fi.intel.com ([10.237.72.52])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2025 00:53:58 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
+	(envelope-from <andriy.shevchenko@intel.com>)
+	id 1uWsHv-0000000BrCM-1jUQ;
+	Wed, 02 Jul 2025 10:53:51 +0300
+Date: Wed, 2 Jul 2025 10:53:50 +0300
+From: Andy Shevchenko <andriy.shevchenko@intel.com>
+To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@kernel.org>
+Cc: Andy Shevchenko <andy.shevchenko@gmail.com>,
+	Waqar Hameed <waqar.hameed@axis.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Julien Panis <jpanis@baylibre.com>,
+	William Breathitt Gray <wbg@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>, Peter Rosin <peda@axentia.se>,
+	Jonathan Cameron <jic23@kernel.org>,
+	David Lechner <dlechner@baylibre.com>,
+	Nuno =?iso-8859-1?Q?S=E1?= <nuno.sa@analog.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Cosmin Tanislav <cosmin.tanislav@analog.com>,
+	Lars-Peter Clausen <lars@metafoo.de>,
+	Michael Hennerich <Michael.Hennerich@analog.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Matteo Martelli <matteomartelli3@gmail.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Francesco Dolcini <francesco@dolcini.it>,
+	=?iso-8859-1?Q?Jo=E3o_Paulo_Gon=E7alves?= <jpaulo.silvagoncalves@gmail.com>,
+	Hugo Villeneuve <hvilleneuve@dimonoff.com>,
+	Subhajit Ghosh <subhajit.ghosh@tweaklogic.com>,
+	Mudit Sharma <muditsharma.info@gmail.com>,
+	Gerald Loacker <gerald.loacker@wolfvision.net>,
+	Song Qiang <songqiang1304521@gmail.com>, Crt Mori <cmo@melexis.com>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Karol Gugala <kgugala@antmicro.com>,
+	Mateusz Holenko <mholenko@antmicro.com>,
+	Gabriel Somlo <gsomlo@gmail.com>, Joel Stanley <joel@jms.id.au>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Wei Fang <wei.fang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Alim Akhtar <alim.akhtar@samsung.com>,
+	Sebastian Reichel <sre@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Han Xu <han.xu@nxp.com>, Haibo Chen <haibo.chen@nxp.com>,
+	Yogesh Gaur <yogeshgaur.83@gmail.com>,
+	Mark Brown <broonie@kernel.org>, Avri Altman <avri.altman@wdc.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Souradeep Chowdhury <quic_schowdhu@quicinc.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
+	Bard Liao <yung-chuan.liao@linux.intel.com>,
+	Ranjani Sridharan <ranjani.sridharan@linux.intel.com>,
+	Daniel Baluta <daniel.baluta@nxp.com>,
+	Kai Vehmanen <kai.vehmanen@linux.intel.com>,
+	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>, kernel@axis.com,
+	linux-iio@vger.kernel.org, linux-omap@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-i2c@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	linux-rockchip@lists.infradead.org, linux-input@vger.kernel.org,
+	linux-mmc@vger.kernel.org, imx@lists.linux.dev,
+	netdev@vger.kernel.org, linux-phy@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org, linux-pm@vger.kernel.org,
+	linux-pwm@vger.kernel.org, linux-amlogic@lists.infradead.org,
+	linux-spi@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-usb@vger.kernel.org,
+	sound-open-firmware@alsa-project.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH] Remove error prints for devm_add_action_or_reset()
+Message-ID: <aGTljgePpiPJq2xj@smile.fi.intel.com>
+References: <pnd7c0s6ji2.fsf@axis.com>
+ <ylr7cuxldwb24ccenen4khtyddzq3owgzzfblbohkdxb7p7eeo@qpuddn6wrz3x>
+ <CAHp75Ve=Zas8=6YKoPeTRrvjCaTyyRAyJG1gBLripqZgQpfg7g@mail.gmail.com>
+ <zxtyk4vly2salnoy3lng2ni7pzu3wg6qnmucadnclfigrd2m2m@i6xcrmvh34r5>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,53 +158,78 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJ1gy2ghhzU0+_QizeFq1JTm12YPtV+24MyJC_Apw11Z4Gnb4g@mail.gmail.com>
+In-Reply-To: <zxtyk4vly2salnoy3lng2ni7pzu3wg6qnmucadnclfigrd2m2m@i6xcrmvh34r5>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-Hi Erwan,
+On Wed, Jul 02, 2025 at 08:10:28AM +0200, Uwe Kleine-König wrote:
+> On Tue, Jul 01, 2025 at 08:57:02PM +0300, Andy Shevchenko wrote:
+> > On Tue, Jul 1, 2025 at 8:44 PM Uwe Kleine-König <ukleinek@kernel.org> wrote:
+> > > On Tue, Jul 01, 2025 at 05:03:33PM +0200, Waqar Hameed wrote:
 
-On Tue, Jul 01, 2025 at 07:29:48PM +0200, Erwan Dufour wrote:
-> Hi Liu,
-> Thank you for the link.
-> The new patch with the good tab size can be found at the end of this email.
+...
+
+> > > With that
+> > >
+> > >         ret = devm_add_action_or_reset(dev, meson_pwm_s4_put_clk,
+> > >                                        meson->channels[i].clk);
+> > >         if (ret)
+> > >                 return dev_err_probe(dev, ret,
+> > >                                      "Failed to add clk_put action\n");
+> > >
+> > > from drivers/pwm/pwm-meson.c is optimized to
+> > >
+> > >         ret = devm_add_action_or_reset(dev, meson_pwm_s4_put_clk,
+> > >                                        meson->channels[i].clk);
+> > >         if (ret)
+> > >                 return ret;
+> > >
+> > > .
+> > >
+> > > I would prefer this approach, because a) there is no need to drop all
+> > > dev_err_probe()s after devm_add_action_or_reset() and b) the
+> > > dev_err_probe()s could stay for consistency in the error paths of a
+> > > driver.
+> > 
+> > Why do we need a dev_err_probe() after devm_add_action*()? I would
+> > expect that the original call (if needed) can spit out a message.
 > 
-> Hmm, I'm not very familiar with IPsec. I thought we can config xfrm state
-> > and
-> > policy on the interface at same time. Need others review this part.
-> 
-> The ip XFRM state and ip XFRM policy that you see when you use iproute with
-> 'ip xfrm state' or 'ip xfrm policy' command in cli may be on the same
-> interface.
-> But in the code here, the struct bond_ipsec is just an element of a list
-> used to store all the SAs and SPs linked to this device bond.
-> So this structure allows us to remove the SA and SP offloads from the old
-> primary slave and add them to the new one during primary current slave
-> exchanges. (function bond_change_active_slave() )
-> The bond_ipsec struct is an element of a list which stores all the SAs and
-> SPs of the device bond.
-> So every time we add an SA or SP to our bond, we create a new bond_ipsec
-> object and add it to our list. This is why, in our structure, we cannot
-> have an SA and an SP in the same bond_ipsec object.
+> I'm not a big fan of API functions that emit an error message.
 
-Thanks for your explanation. Unfortunately，the alignment still not works.
+We do have that in devm_ioremap*() family. Just saying...
 
-e.g.
+> In general the caller knows better what went wrong (here:
+> devm_add_action_or_reset() doesn't know this to be about the clk_put
+> action), so the error message can be more expressive.
 
-> 
-> -		if (real_dev->xfrmdev_ops->xdo_dev_state_add(real_dev,
-> -							     ipsec->xs, NULL)) {
+I'm not sure I was clear about my suggestion. What I argued is something like
+this
 
-Here the ipsec->xs is aligned with real_dev.
+devm_foo_alloc()
+{
+	ret = foo_alloc();
+	if (ret)
+		return dev_err_probe();
 
-> -			slave_warn(bond_dev, real_dev, "%s: failed to add SA\n", __func__);
-> -			continue;
-> -		}
-> +			if (real_dev->xfrmdev_ops->xdo_dev_state_add(real_dev,
-> +									ipsec->xs, NULL)) {
+	return devm_add_action_or_reset();
+}
 
-But here, ipsec->xs is not aligned with real_dev.
-If the code cannot be aligned properly using tabs alone, you can use spaces
-to complete the alignment.
+foo_alloc() in my example is left untouched.
 
-Thanks
-Hangbin
+> Also in general an API function doesn't know if a failure is fatal or if
+> the consumer handles the failure just well and if the call is part of a
+> driver's .probe() so it's unclear if dev_err_probe() can/should be used.
+> (I admit that the last two probably don't apply to
+> devm_add_action_or_reset() but that's not a good enough reason to
+> make this function special. Every special case is a maintanance burden.)
+
+devm_*() are only supposed to be called in the probe phase. So using
+dev_err_probe() there (implementations) is natural thing to do, if required.
+And see above, we have such cases already.
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
