@@ -1,158 +1,134 @@
-Return-Path: <netdev+bounces-203260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D2D9AF10BB
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:56:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 912A9AF10C3
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:57:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DD30163B2C
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:56:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE8D0164A2B
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:57:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EF8224BC07;
-	Wed,  2 Jul 2025 09:56:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GXwtQR05"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE28621B9D6;
+	Wed,  2 Jul 2025 09:57:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F99246760
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 09:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D6324466C;
+	Wed,  2 Jul 2025 09:57:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751450191; cv=none; b=udczJnzx8xc1ZvQlv//FvMT9n+1oSu7ped8Jj40bVyfhjFmjBbM2OwkIHw961X7wTFqwCKTsp63RqDE12T5+/9m/186Q+wp/abkZ5cUduWlUFCDmfAs6lFp2SEFY3ckV4JnXfZVn4pwY4oIxAefXu5HnEt3G5LBFadMnctOiD9k=
+	t=1751450252; cv=none; b=hKZejwkZCQfBW1Kpo9sGrU36uUTMVbz+EvI8n28cBEAMNMgovmX9I0DPbz9xVsr1341BUkNmfio8MAGecHPo/Kc8o2r7BqOvTxUPTU/uwNErWeG/wM/qscPqY3BbdxXnok//j53Cy6IGx8Wic0D9FAEZH4P8eOghYuKTHAcLhzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751450191; c=relaxed/simple;
-	bh=R/vqF8mtqR3Q5cYK/qFuLfD77vbI1Wt5cmIml3gcsWs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oflpV+y58oA9jbiTEbWaNX5WZA04As+Mea3aI2GqmsIYwRX92FVupUewsHcHkLRIc+7f9uPViyCszm6xbRt5lOTaGIn5fkH2RCNwWFlwIjbLQ6gJqVDz4A4JPq6SUSBRsyJwHDhjatUEFMS88cu2LHrCvPHGlWwDDvqi28Qe+9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GXwtQR05; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751450188;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vNl7Ngt3KhiRiuYDlu3AWhmnMill6bJNFUWa6YlfZWo=;
-	b=GXwtQR05pERJ4pTj5yZLrDcWZiavDIor+yGTECTxi3pCuLteBxgKk21Xhb8/peb6aVDoon
-	RHZRTfGVvkCmusc6d7DtYH+mDEUIallmWbzaTU3bFREldZJuPkuhbX3ZOCcSCniFCxM9NE
-	03MXgvGq/2xxpw3YVC4CnqywTsAqCPQ=
-Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com
- [209.85.160.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-549-teqU8japPCOdSYqtP71aLQ-1; Wed, 02 Jul 2025 05:56:27 -0400
-X-MC-Unique: teqU8japPCOdSYqtP71aLQ-1
-X-Mimecast-MFC-AGG-ID: teqU8japPCOdSYqtP71aLQ_1751450186
-Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-2e8f1365181so3625017fac.2
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 02:56:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751450186; x=1752054986;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vNl7Ngt3KhiRiuYDlu3AWhmnMill6bJNFUWa6YlfZWo=;
-        b=SxA3IdawGLPz+2wJ2kA9wm3T3sfSVnkr4sZL83YTXiOPgXSVSkEqvPYQLd9wLW0rgQ
-         yXrBH0xpsq0O0Alr8H906hMeCqgopW/KDdtLGfR2Sbyf4pBUcA4+sLfgsYtxQjNnMRCY
-         V55m9icLu6yCWGoiasAcEonMEgtTmSh0ynAh2rrQOYcd9bT5PFoPO+0io6lVOfu2Sdub
-         fqbfZvjadgh33twAQ0beJTzWUvMJon+Qzwrk92GiEF7QpaqjYRUwxlu7Z6Py6F4CMU5Z
-         iOykyhClg0WWy8rcM32lxCAEWbbZWtW1ebZKip8bMathzsx/um8To8K7StEvGQUdkVq6
-         TpBg==
-X-Forwarded-Encrypted: i=1; AJvYcCWsPElTkxsqy9Z4WQop6GDt6ToHxaA10BHbp/Uco744kpu3IrGCL7lSd3e7TiHwITPgPVsGrjQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzP//shP6eLu/tefRsjBdmac6w9cwteVN0sMS1SQawrSrLtLOUy
-	CEYmxghmd4IDi7Ig0Vns4ynUJjEQcc1h4TYIkEkJakPhHy2KFg6qnUvPF1b07avHwZ9bP6nOqyt
-	hGyTAjsYlBTAfRgMqMWDYWxRz0k1VoIMkwa8czL9hs4VB1MaUr2eHktJAvA==
-X-Gm-Gg: ASbGncvPBdqDgyzhl2PlTe0WsKHG8+lLAiGZaJuulG+I4UT69kjxfdtKzRvCVb4p0+j
-	Ar9pzSXv1eizx7imNUtyh4G1fv2ca0uyAGaBvKJ+Y4/bH+rnKq7bS7AO2UGRb2BHOCtwLrsjp3a
-	qg9egDLoZjSjZByTAlCXe4imi9XXyDps3ClfBNgLsYVR+76/kJAzlUlpeMwd01Q4+CUf8oolb8w
-	WjZwvGX6FQeTqdScJ+HtiyscFGsAuJD4LGSf6oFI9z/3JgOiExtPnAlijy4ZfFmqvaOm88MMvGC
-	0+aucjZHTZnnrf9C/yXT6hMlqAQB
-X-Received: by 2002:a05:6870:ac20:b0:2e9:735:91ba with SMTP id 586e51a60fabf-2f5c7c334d1mr1422474fac.25.1751450186326;
-        Wed, 02 Jul 2025 02:56:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEpqQrlTLKRF3KccZ2PdIYCRT6eIHGjwWaj9AB/7CS8NfzugBebe1UFmRYpDGfYy6NDhWabBg==
-X-Received: by 2002:a05:6870:ac20:b0:2e9:735:91ba with SMTP id 586e51a60fabf-2f5c7c334d1mr1422456fac.25.1751450185945;
-        Wed, 02 Jul 2025 02:56:25 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.164.126])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-73b29fd918fsm1247562a34.36.2025.07.02.02.56.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 02:56:25 -0700 (PDT)
-Date: Wed, 2 Jul 2025 11:56:06 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Xuewei Niu <niuxuewei97@gmail.com>
-Cc: mst@redhat.com, pabeni@redhat.com, jasowang@redhat.com, 
-	xuanzhuo@linux.alibaba.com, davem@davemloft.net, netdev@vger.kernel.org, stefanha@redhat.com, 
-	leonardi@redhat.com, decui@microsoft.com, virtualization@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, fupan.lfp@antgroup.com, 
-	Xuewei Niu <niuxuewei.nxw@antgroup.com>
-Subject: Re: [RESEND PATCH net-next v4 1/4] vsock: Add support for SIOCINQ
- ioctl
-Message-ID: <gqjvhl6rftfygatheyto27kpbqsfc4hixcv7g52nle6grjkrkq@f5ey4iyu7swl>
-References: <20250630075727.210462-1-niuxuewei.nxw@antgroup.com>
- <20250630075727.210462-2-niuxuewei.nxw@antgroup.com>
+	s=arc-20240116; t=1751450252; c=relaxed/simple;
+	bh=AYu3qAfoNpzcmgSd6XbKH0XaD3n4hTXoApoy6XD9nPw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CPSrPJr40DZtrCHHAOTL+amo7OVYitPm7Lb96W1WiCifMhChRHshDDsWdWhFW8Gz908j/3BTt04H55AxN3PYUDEjy2FVkr65iu1MA7kmNhag4gpJfGYolkZeQ56q7UkWwsRbfs1sW9QYBiPwxO/UFuKZAO29rokJu31L0KZSiSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=green-communications.fr; spf=pass smtp.mailfrom=green-communications.fr; arc=none smtp.client-ip=212.227.126.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=green-communications.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=green-communications.fr
+Received: from [192.168.0.90] ([151.127.53.97]) by mrelayeu.kundenserver.de
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1Mt8cD-1uqe5e3f57-00wWLW; Wed, 02 Jul 2025 11:57:11 +0200
+Message-ID: <4f5398e8-302f-40e7-b718-decade935f4d@green-communications.fr>
+Date: Wed, 2 Jul 2025 11:57:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250630075727.210462-2-niuxuewei.nxw@antgroup.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [DESIGN RFC] wifi: Robust AV streaming Design Proposal for AP
+To: Ben Greear <greearb@candelatech.com>,
+ Ramanathan Choodamani <quic_rchoodam@quicinc.com>,
+ linux-wireless@vger.kernel.org
+Cc: netdev@vger.kernel.org, ath12k@lists.infradead.org
+References: <20250624205716.1052329-1-quic_rchoodam@quicinc.com>
+ <0bc6c957-a0c4-c0f7-ed37-c8b44852c26c@candelatech.com>
+Content-Language: fr
+From: Nicolas Cavallari <nicolas.cavallari@green-communications.fr>
+In-Reply-To: <0bc6c957-a0c4-c0f7-ed37-c8b44852c26c@candelatech.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:6IHwV7SRzJBiUh+SWGjJWfFnUR8uLXYkC/aqpmQnrRtEfSIY+Jj
+ rj7t4wBGn35SDeQXJmet+kLnqsGGq+II4OlGsOe9kHIuAxuqGuXMxhekhVKxrTux+Fa7vA8
+ V4mEYPUC9p1gf/TIIVcmGoIYr33jp/gMivJyLx/e2Twjw2nsje7PawzlslyXoZQJQHfHrGD
+ AoY0K3eGJNFIps3sKhLbQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:XK2IEaG7KDs=;JfT7yIc+QjNNcDvbAsoW48thPwu
+ QDsE0StAhiwY+z9/qJB5LTl9tmjveeWWM+gFjc0UQdv30kDLBcmj9R6ZjqEnl75+8GgQNCBEC
+ s/LeAI7AJTCPJrdlB4r+X7ixXcBLYMAGwqhP3PwLBAkM6f21Jym09V9+LOw583NczLY891Enu
+ Ca/u3hx+YfLseSAmwtpB3jEq/4vYC2bS4DhdVXTKl6l0IoAcukbyl6BTTSlpCURPwNChS2XTh
+ S0qickInqm0UClondGo/Xb2JH8CdG0IYCKgU0BvjVv3T6M6jC1RjRhKnsuqW8OD0OHct+LK+M
+ eBzROeigv+kjmKKfGPLSvwbCaSqLH1VDnuD+JZYfMUGxc+7O1mjpHRfihIXmg8uGC3Kz0Mu7G
+ TfP00VzsbQ5ymVu4uq/6yr1MOx34sdu4i1TcmDcD426eOeejZH3eQ0XjFqLDqUnsdaWYDfsDo
+ qogC7ynCJecdPNr4/W09hH5zYinMbDz8w+vTJUsrO6/TtSEcgwp1YhGeIXnsLxsrRX3mqbKTW
+ eCA+AOQb7X/a8OrdI2V5DV0nHg+8+yvR/Kl2EuiWvAbGbkvlKnyVEKODYPc2N8Ux6CIIi5UB5
+ TKNTYesRh3MV36QMpDn5qD+PFytO5sVtQuSnYgTSrt7JG3U33X6B8Ee0vmnBEiYVlRz4ALohE
+ VGpdenzzNhziT6f10HBhIM2g19EzWO6jC+TCDaOAbkt6YiJ2wMZTrJEexrU4lTa2OkqFCeujB
+ TOhQDZUmYSNElE0ZZ0+eCpkxj5KsNbRGBfuFfPhhZlY4NTQMJW8fx+McJOhYRykvx8AR+PTta
+ 1T4tZwi/CuzbCfsifPU9mNw54DyG8GJ4JV1WbwYCH0mosCIZ/re5z+nlf/HUh7rOB3gxGKeu8
+ QCRyHdUlupiSS1b2buqYiNgfRAPJrpyt+0VZRpx6zCSv8m0q538sDcSwevHDrU+dBJSdzTmHM
+ 1xjrgutDUB39F+L+ycSevtVen9OOttHw+aeb6S0wBSnpTaaVu2U7Qh+h3SCqejuDcXB99LUY8
+ CadS2kXi+kl6lfgyvIAYrk3MFBRuFYBosQFlgog6DTscznEF+em22SyaT8xzWB2kRvnHaip1z
+ kptJ8bBdqeWWhQVd4duweU/2UKHK2872pObnOzu6b0GPVuJmqme7asW6Iv3Ivkmgo9DZR7F+l
+ Z9vfkmmMCv99LO4X4JGlkmZC1HFDuozhaOh/cbyApShO3nwE9Ix2m6fQLNW26b8JPQeGims2K
+ wxBLujwW9KhS6SayLpQgYgOcrmeeuBdkelBuex7Ibivfiv16STcoDTdSwc74yM32hCB2sx0+n
+ Kh3nR0aNNnTLOoU0AyTlb0IZtm0hWQCFq1RxBR0roUdShqkjwaKSs3a8Q9VOmomeDS7pFVvFQ
+ izgaocwWmI99ZKuFKp+X6usLUqJITCiJ6uGCoziCI6y5TWr8K0yVGKlWGHlm9X0eaEY3WzZ8B
+ LlcPUiBUGjC12XrFnESS0eW7z3ORoI63lUXpf8Ik/5Z+DQtDy0QVoc5kEGD+EFepbUmgo6DLn
+ ELpoqoyMHrXcXzopQUBJCLtpykzHX9eFTP61xIrlixLA4V5CoZ6jU6IDxWyw1rJr3HzDJMiAd
+ g1aJ063iTIeVxLLpCBCP5LzZUfgdX4E
 
-On Mon, Jun 30, 2025 at 03:57:24PM +0800, Xuewei Niu wrote:
->Add support for SIOCINQ ioctl, indicating the length of bytes unread in the
->socket. The value is obtained from `vsock_stream_has_data()`.
->
->Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
->---
-> net/vmw_vsock/af_vsock.c | 22 ++++++++++++++++++++++
-> 1 file changed, 22 insertions(+)
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 2e7a3034e965..bae6b89bb5fb 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1389,6 +1389,28 @@ static int vsock_do_ioctl(struct socket *sock, unsigned int cmd,
-> 	vsk = vsock_sk(sk);
->
-> 	switch (cmd) {
->+	case SIOCINQ: {
->+		ssize_t n_bytes;
->+
->+		if (!vsk->transport) {
->+			ret = -EOPNOTSUPP;
->+			break;
->+		}
->+
->+		if (sock_type_connectible(sk->sk_type) &&
->+		    sk->sk_state == TCP_LISTEN) {
->+			ret = -EINVAL;
->+			break;
->+		}
->+
->+		n_bytes = vsock_stream_has_data(vsk);
+On 25/06/2025 00:31, Ben Greear wrote:
+> On 6/24/25 13:57, Ramanathan Choodamani wrote:
+>> ===================================
+>> Robust AV streaming protocols - QoS
+>> ===================================
+>>
+>> The Robust AV stream protocols are mobile centric protocols - meaning 
+>> they
+>> are initiated by a non-AP STA to the AP. These protocols are implemented
+>> at the Access Point (AP) to classify packets sent to the non-AP STA 
+>> which requests
+>> classification using action frames. The non-AP STA initiates Robust AV 
+>> streaming
+>> action frames requesting for specific classification for the IP packets
+>> destined to the non-AP STA from the AP. These parameters can be 
+>> negotiated by both
+>> AP and non-AP STA.
+>>
+>> Upon successful handshake, The AP classifies incoming individually 
+>> addressed MSDUs
+>> (Mac Service Data Unit) based upon parameters provided by the non-AP 
+>> STA or
+>> notifies the non-AP STA to transmit MSDUs with preferred parameters 
+>> based upon
+>> what was exchanged.
+>>
+>> Robust AV streaming improves AV (Audio and Video) streaming 
+>> performance when
+>> using IEEE Std 802.11 for consumer and enterprise applications.
+>>
+>> Let's look at the Robust AV streaming protocols which are implemented 
+>> as a
+>> part of this design.
+> 
+> Thank you for posting this and for the beautiful ascii diagrams!
+> 
+> Since this will be poking netfilter rules into the kernel,
+> is there a good way to clean up all rules created by a previous
+> hostapd process in case hostapd crashes or is killed hard and
+> cannot do its own cleanup?  Maybe the rules could have some
+> special marking that is configurable per hostapd (or per AP or BSS or 
+> something)
 
-This patch should go after we fixed vsock_stream_has_data() for hyper-v.
+nftables has an optional "table owner" mechanism that destroys a table 
+if the netlink socket that created it is closed. Just like nl80211 
+connection owner for vifs.
 
-The rest LGTM!
-
-Thanks,
-Stefano
-
->+		if (n_bytes < 0) {
->+			ret = n_bytes;
->+			break;
->+		}
->+		ret = put_user(n_bytes, arg);
->+		break;
->+	}
-> 	case SIOCOUTQ: {
-> 		ssize_t n_bytes;
->
->-- 
->2.34.1
->
-
+keyword: NFT_TABLE_F_OWNER
 
