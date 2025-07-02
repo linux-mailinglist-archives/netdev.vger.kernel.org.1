@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-203195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CA22AF0B82
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:21:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E438AAF0B85
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:21:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D650F4A3EA8
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 06:21:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D4744A41E8
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 06:21:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3FFB2253A9;
-	Wed,  2 Jul 2025 06:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A1EB22D4F6;
+	Wed,  2 Jul 2025 06:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="csCDtZ0E"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="K9dM3l8m"
 X-Original-To: netdev@vger.kernel.org
 Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9B2223714
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66002248A4
 	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 06:20:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751437222; cv=none; b=pFt0fW5ep0SvFmYKXr8cBc6Lf6cDmC4S3Z7gW+1wQLUp4R1Hsw2H8cPh0VXH2ueeVzGcGyuHTeqGrh5LNfDD8Cp40LJhUU04XbT1Ypf8am69WQl+t1h2l/DywP3qv51PI/Y8Zvg+gymeyvoI78v71pT/p87CWa8Rw6iVvMzVJs0=
+	t=1751437224; cv=none; b=o/NSut7H8dr71OWImaNUEiai0aST2YjUu2MfMjN8+fJJUrCtjDM+GXRlev92YMdqf4TRaI2iVconTCsaEySCU2SzeA7c+eth5saoiRXjlzGa0+brMSyJCrqBspHQ/VjMG5ppkQisyunSbzYxvf+rNEQw0NbrqY7QSsyLQ2EFVkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751437222; c=relaxed/simple;
-	bh=Amw0PqR5Isd4b113XfXtqV7pEB/MPGGEeSph9UKgcOM=;
+	s=arc-20240116; t=1751437224; c=relaxed/simple;
+	bh=97l9YhFjs/43lTLg87kuxP8tJWwfPufhAG3OITg7yT8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=QlCA2nbl1faARthFgxJxjlSvKoDEqr7xi5i3+1OS6aT2huZwym/NX0jKDgg5coYlxFdHqaXYHw9oaiMquuQOV3JKkyAruo3AFFfO06KIyEoRrg9Z/BnpCq+5VPr2G8AhLqsty+rEBgwpiOOoOZm3qY+NFlUXjRlIB7lVKfssdFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=csCDtZ0E; arc=none smtp.client-ip=203.29.241.158
+	 In-Reply-To:To:Cc; b=m3HfyHSoNf+m9PCuqG3y2/TqY8kfEoN9rg16Fvchhpq/KSY7/FEWEO3Y8nA4UrDIWPNj8/mQy7+3zBcysc+ChbRs3MFjlbkdiBkbnBFzVPCU1cEZgi4OukDoyZ6Q1whiYAV57N3uY7L1SiUoiyKKWid+xXF7x3BYJh3xjbVBFwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=K9dM3l8m; arc=none smtp.client-ip=203.29.241.158
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=codeconstruct.com.au; s=2022a; t=1751437217;
-	bh=Qy3ifS83h7dXY25PPKU7pao4sLv1rSgHCtBSfhmTeNY=;
+	bh=avcr2hbEWgg9BQA1OxqdKMw5wuLkoWXKtg8WKkmfafA=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=csCDtZ0Ev7KeTq0rlDwRhuJWazaT/bQCWJhQzfytzhEf0fOmogqOJT2IGFNwFR7Ku
-	 LOGhil+eMC8qmz/ppEIxkAGJ+biMwZb8nEigJgJ4OID02mrs9KggtvLorEZGPW7B+m
-	 2P+crM89db4SoIZXtMXA9hkbMx6lDdnF3JjZ1/wXTcvIDdLkaQ7tNy+Fitk4DSqHm4
-	 aPC2ps0kXJs6VuVhCrSAH7SSOMX4IHhPkUQm5vV4V8kRJWRrhUFIDUyLWhOQ3dNlcc
-	 aeC0jP0bFLOIsfqdYVZgUstUq1YCHMYOuR5MxXhOy5ZPwVbOMvTNUzEGPJzYh5NyDz
-	 2FsKVryq4R0WQ==
+	b=K9dM3l8mQ0HifefrTKXcgCcpVSpjbtoMsRmpERibcKSMmrfZIv85G1cfX/srDZ7qj
+	 JtsVnVBjqVKgdYoJmE7sMrL9rwUz1t0fMdoTFSGEWu3h/ETeVHFg3ikujqEChAoAfR
+	 IXkPoKTO/IoeOROnVdBHzZnXWhepd5hCNwal45tJ5Ck4+YrtszIkcAKAYNj+dU7yiw
+	 25IRcRBKqoDFWB4/q2As2Vpqa0GMMyxMOHZ9nr08KDJoIHhBksg1UBne+APAliNTCt
+	 aCd4/BtKOT2/dzc2/05IJd94cr6DuH0Zd5N44LG1q5QP/B+1xiJnwazmwSa4FT/7ky
+	 usYc50+VUUmMQ==
 Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id 641A66A70F; Wed,  2 Jul 2025 14:20:17 +0800 (AWST)
+	id ABDE56A713; Wed,  2 Jul 2025 14:20:17 +0800 (AWST)
 From: Jeremy Kerr <jk@codeconstruct.com.au>
-Date: Wed, 02 Jul 2025 14:20:08 +0800
-Subject: [PATCH net-next v5 08/14] net: mctp: test: add sock test
- infrastructure
+Date: Wed, 02 Jul 2025 14:20:09 +0800
+Subject: [PATCH net-next v5 09/14] net: mctp: test: Add initial socket
+ tests
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,7 +55,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250702-dev-forwarding-v5-8-1468191da8a4@codeconstruct.com.au>
+Message-Id: <20250702-dev-forwarding-v5-9-1468191da8a4@codeconstruct.com.au>
 References: <20250702-dev-forwarding-v5-0-1468191da8a4@codeconstruct.com.au>
 In-Reply-To: <20250702-dev-forwarding-v5-0-1468191da8a4@codeconstruct.com.au>
 To: Matt Johnston <matt@codeconstruct.com.au>, 
@@ -65,64 +65,267 @@ To: Matt Johnston <matt@codeconstruct.com.au>,
 Cc: netdev@vger.kernel.org
 X-Mailer: b4 0.14.2
 
-Add a new test object, for use with the af_mctp socket code. This is
-intially empty, but we'll start populating actual tests in an upcoming
-change.
+Recent changes have modified the extaddr path a little, so add a couple
+of kunit tests to af-mctp.c. These check that we're correctly passing
+lladdr data between sendmsg/recvmsg and the routing layer.
 
 Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
 ---
- net/mctp/af_mctp.c         |  4 ++++
- net/mctp/test/route-test.c |  2 +-
- net/mctp/test/sock-test.c  | 16 ++++++++++++++++
- 3 files changed, 21 insertions(+), 1 deletion(-)
+ net/mctp/route.c          |   5 ++
+ net/mctp/test/sock-test.c | 213 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 218 insertions(+)
 
-diff --git a/net/mctp/af_mctp.c b/net/mctp/af_mctp.c
-index e2570d9755eac75c1384a4d576f1c7c3cc5d5b31..aef74308c18e3273008cb84aabe23ff700d0f842 100644
---- a/net/mctp/af_mctp.c
-+++ b/net/mctp/af_mctp.c
-@@ -775,3 +775,7 @@ MODULE_DESCRIPTION("MCTP core");
- MODULE_AUTHOR("Jeremy Kerr <jk@codeconstruct.com.au>");
+diff --git a/net/mctp/route.c b/net/mctp/route.c
+index 23f339b4364316817b90b4fb2952c9eac445dd24..c49c35c989d89e1c199c8f60ace4d6584ea0d8c8 100644
+--- a/net/mctp/route.c
++++ b/net/mctp/route.c
+@@ -17,6 +17,8 @@
+ #include <linux/rtnetlink.h>
+ #include <linux/skbuff.h>
  
- MODULE_ALIAS_NETPROTO(PF_MCTP);
++#include <kunit/static_stub.h>
 +
-+#if IS_ENABLED(CONFIG_MCTP_TEST)
-+#include "test/sock-test.c"
-+#endif
-diff --git a/net/mctp/test/route-test.c b/net/mctp/test/route-test.c
-index bbee22d33d6d3bb89cc61a0e010b8c4f07c68eae..36dd5e9ba27a0cfc6247ff321e884a9e128ee535 100644
---- a/net/mctp/test/route-test.c
-+++ b/net/mctp/test/route-test.c
-@@ -1204,7 +1204,7 @@ static struct kunit_case mctp_test_cases[] = {
- };
+ #include <uapi/linux/if_arp.h>
  
- static struct kunit_suite mctp_test_suite = {
--	.name = "mctp",
-+	.name = "mctp-route",
- 	.test_cases = mctp_test_cases,
- };
+ #include <net/mctp.h>
+@@ -1011,6 +1013,9 @@ int mctp_local_output(struct sock *sk, struct mctp_dst *dst,
+ 	int rc;
+ 	u8 tag;
  
++	KUNIT_STATIC_STUB_REDIRECT(mctp_local_output, sk, dst, skb, daddr,
++				   req_tag);
++
+ 	rc = -ENODEV;
+ 
+ 	spin_lock_irqsave(&dst->dev->addrs_lock, flags);
 diff --git a/net/mctp/test/sock-test.c b/net/mctp/test/sock-test.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..abaad82b4e256bead6c0a6ab0698bfa4f75f8473
---- /dev/null
+index abaad82b4e256bead6c0a6ab0698bfa4f75f8473..5501f7794a8f96f1dcf26e93542bec04ddcfc769 100644
+--- a/net/mctp/test/sock-test.c
 +++ b/net/mctp/test/sock-test.c
-@@ -0,0 +1,16 @@
-+// SPDX-License-Identifier: GPL-2.0
+@@ -1,10 +1,223 @@
+ // SPDX-License-Identifier: GPL-2.0
+ 
++#include <kunit/static_stub.h>
+ #include <kunit/test.h>
+ 
++#include <linux/socket.h>
++#include <linux/spinlock.h>
 +
-+#include <kunit/test.h>
+ #include "utils.h"
+ 
++static const u8 dev_default_lladdr[] = { 0x01, 0x02 };
 +
-+#include "utils.h"
++/* helper for simple sock setup: single device, with dev_default_lladdr as its
++ * hardware address, assigned with a local EID 8, and a route to EID 9
++ */
++static void __mctp_sock_test_init(struct kunit *test,
++				  struct mctp_test_dev **devp,
++				  struct mctp_test_route **rtp,
++				  struct socket **sockp)
++{
++	struct mctp_test_route *rt;
++	struct mctp_test_dev *dev;
++	struct socket *sock;
++	unsigned long flags;
++	u8 *addrs;
++	int rc;
 +
-+static struct kunit_case mctp_test_cases[] = {
-+	{}
++	dev = mctp_test_create_dev_lladdr(sizeof(dev_default_lladdr),
++					  dev_default_lladdr);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, dev);
++
++	addrs = kmalloc(1, GFP_KERNEL);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, addrs);
++	addrs[0] = 8;
++
++	spin_lock_irqsave(&dev->mdev->addrs_lock, flags);
++	dev->mdev->num_addrs = 1;
++	swap(addrs, dev->mdev->addrs);
++	spin_unlock_irqrestore(&dev->mdev->addrs_lock, flags);
++
++	kfree(addrs);
++
++	rt = mctp_test_create_route(dev_net(dev->ndev), dev->mdev, 9, 0);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, rt);
++
++	rc = sock_create_kern(&init_net, AF_MCTP, SOCK_DGRAM, 0, &sock);
++	KUNIT_ASSERT_EQ(test, rc, 0);
++
++	*devp = dev;
++	*rtp = rt;
++	*sockp = sock;
++}
++
++static void __mctp_sock_test_fini(struct kunit *test,
++				  struct mctp_test_dev *dev,
++				  struct mctp_test_route *rt,
++				  struct socket *sock)
++{
++	sock_release(sock);
++	mctp_test_route_destroy(test, rt);
++	mctp_test_destroy_dev(dev);
++}
++
++struct mctp_test_sock_local_output_config {
++	struct mctp_test_dev *dev;
++	size_t halen;
++	u8 haddr[MAX_ADDR_LEN];
++	bool invoked;
++	int rc;
 +};
 +
-+static struct kunit_suite mctp_test_suite = {
-+	.name = "mctp-sock",
-+	.test_cases = mctp_test_cases,
-+};
++static int mctp_test_sock_local_output(struct sock *sk,
++				       struct mctp_dst *dst,
++				       struct sk_buff *skb,
++				       mctp_eid_t daddr, u8 req_tag)
++{
++	struct kunit *test = kunit_get_current_test();
++	struct mctp_test_sock_local_output_config *cfg = test->priv;
 +
-+kunit_test_suite(mctp_test_suite);
++	KUNIT_EXPECT_PTR_EQ(test, dst->dev, cfg->dev->mdev);
++	KUNIT_EXPECT_EQ(test, dst->halen, cfg->halen);
++	KUNIT_EXPECT_MEMEQ(test, dst->haddr, cfg->haddr, dst->halen);
++
++	cfg->invoked = true;
++
++	kfree_skb(skb);
++
++	return cfg->rc;
++}
++
++static void mctp_test_sock_sendmsg_extaddr(struct kunit *test)
++{
++	struct sockaddr_mctp_ext addr = {
++		.smctp_base = {
++			.smctp_family = AF_MCTP,
++			.smctp_tag = MCTP_TAG_OWNER,
++			.smctp_network = MCTP_NET_ANY,
++		},
++	};
++	struct mctp_test_sock_local_output_config cfg = { 0 };
++	u8 haddr[] = { 0xaa, 0x01 };
++	u8 buf[4] = { 0, 1, 2, 3 };
++	struct mctp_test_route *rt;
++	struct msghdr msg = { 0 };
++	struct mctp_test_dev *dev;
++	struct mctp_sock *msk;
++	struct socket *sock;
++	ssize_t send_len;
++	struct kvec vec = {
++		.iov_base = buf,
++		.iov_len = sizeof(buf),
++	};
++
++	__mctp_sock_test_init(test, &dev, &rt, &sock);
++
++	/* Expect to see the dst configured up with the addressing data we
++	 * provide in the struct sockaddr_mctp_ext
++	 */
++	cfg.dev = dev;
++	cfg.halen = sizeof(haddr);
++	memcpy(cfg.haddr, haddr, sizeof(haddr));
++
++	test->priv = &cfg;
++
++	kunit_activate_static_stub(test, mctp_local_output,
++				   mctp_test_sock_local_output);
++
++	/* enable and configure direct addressing */
++	msk = container_of(sock->sk, struct mctp_sock, sk);
++	msk->addr_ext = true;
++
++	addr.smctp_ifindex = dev->ndev->ifindex;
++	addr.smctp_halen = sizeof(haddr);
++	memcpy(addr.smctp_haddr, haddr, sizeof(haddr));
++
++	msg.msg_name = &addr;
++	msg.msg_namelen = sizeof(addr);
++
++	iov_iter_kvec(&msg.msg_iter, ITER_SOURCE, &vec, 1, sizeof(buf));
++	send_len = mctp_sendmsg(sock, &msg, sizeof(buf));
++	KUNIT_EXPECT_EQ(test, send_len, sizeof(buf));
++	KUNIT_EXPECT_TRUE(test, cfg.invoked);
++
++	__mctp_sock_test_fini(test, dev, rt, sock);
++}
++
++static void mctp_test_sock_recvmsg_extaddr(struct kunit *test)
++{
++	struct sockaddr_mctp_ext recv_addr = { 0 };
++	u8 rcv_buf[1], rcv_data[] = { 0, 1 };
++	u8 haddr[] = { 0xaa, 0x02 };
++	struct mctp_test_route *rt;
++	struct mctp_test_dev *dev;
++	struct mctp_skb_cb *cb;
++	struct mctp_sock *msk;
++	struct sk_buff *skb;
++	struct mctp_hdr hdr;
++	struct socket *sock;
++	struct msghdr msg;
++	ssize_t recv_len;
++	int rc;
++	struct kvec vec = {
++		.iov_base = rcv_buf,
++		.iov_len = sizeof(rcv_buf),
++	};
++
++	__mctp_sock_test_init(test, &dev, &rt, &sock);
++
++	/* enable extended addressing on recv */
++	msk = container_of(sock->sk, struct mctp_sock, sk);
++	msk->addr_ext = true;
++
++	/* base incoming header, using a nul-EID dest */
++	hdr.ver = 1;
++	hdr.dest = 0;
++	hdr.src = 9;
++	hdr.flags_seq_tag = MCTP_HDR_FLAG_SOM | MCTP_HDR_FLAG_EOM |
++			    MCTP_HDR_FLAG_TO;
++
++	skb = mctp_test_create_skb_data(&hdr, &rcv_data);
++	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, skb);
++
++	mctp_test_skb_set_dev(skb, dev);
++
++	/* set incoming extended address data */
++	cb = mctp_cb(skb);
++	cb->halen = sizeof(haddr);
++	cb->ifindex = dev->ndev->ifindex;
++	memcpy(cb->haddr, haddr, sizeof(haddr));
++
++	/* Deliver to socket. The route input path pulls the network header,
++	 * leaving skb data at type byte onwards. recvmsg will consume the
++	 * type for addr.smctp_type
++	 */
++	skb_pull(skb, sizeof(hdr));
++	rc = sock_queue_rcv_skb(sock->sk, skb);
++	KUNIT_ASSERT_EQ(test, rc, 0);
++
++	msg.msg_name = &recv_addr;
++	msg.msg_namelen = sizeof(recv_addr);
++	iov_iter_kvec(&msg.msg_iter, ITER_DEST, &vec, 1, sizeof(rcv_buf));
++
++	recv_len = mctp_recvmsg(sock, &msg, sizeof(rcv_buf),
++				MSG_DONTWAIT | MSG_TRUNC);
++
++	KUNIT_EXPECT_EQ(test, recv_len, sizeof(rcv_buf));
++
++	/* expect our extended address to be populated from hdr and cb */
++	KUNIT_EXPECT_EQ(test, msg.msg_namelen, sizeof(recv_addr));
++	KUNIT_EXPECT_EQ(test, recv_addr.smctp_base.smctp_family, AF_MCTP);
++	KUNIT_EXPECT_EQ(test, recv_addr.smctp_ifindex, dev->ndev->ifindex);
++	KUNIT_EXPECT_EQ(test, recv_addr.smctp_halen, sizeof(haddr));
++	KUNIT_EXPECT_MEMEQ(test, recv_addr.smctp_haddr, haddr, sizeof(haddr));
++
++	__mctp_sock_test_fini(test, dev, rt, sock);
++}
++
+ static struct kunit_case mctp_test_cases[] = {
++	KUNIT_CASE(mctp_test_sock_sendmsg_extaddr),
++	KUNIT_CASE(mctp_test_sock_recvmsg_extaddr),
+ 	{}
+ };
+ 
 
 -- 
 2.39.5
