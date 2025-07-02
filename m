@@ -1,61 +1,60 @@
-Return-Path: <netdev+bounces-203381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77F43AF5B01
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 16:23:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 87D65AF5B39
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 16:35:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B50531C40332
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:23:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 272741C26F6F
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:35:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 637D82F5308;
-	Wed,  2 Jul 2025 14:23:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7C073093A4;
+	Wed,  2 Jul 2025 14:35:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rl+gbvA6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r78VRl5I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C38E1F5820;
-	Wed,  2 Jul 2025 14:23:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A03307ADF;
+	Wed,  2 Jul 2025 14:35:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751466183; cv=none; b=gEVzZM9P/LKPgXGiBat9R9ItkdaAj5/PtAGIBq+nob7eJQnxuTiJVcWD61RyARlpjH/d4SF+ZDBKMD7Ry8BeAJB8jVK2m+naXtEKsrYQ1zqHfuO5xqfTk5btF7AABX7FBA/xQBYz0g3zAJaEWLQZzFYfQzgCsx+8npbbXitMNvs=
+	t=1751466900; cv=none; b=hkl+07I9F+1q80ywazNzQhW7YBB25TtNyaCs6nwcla5ny/bmw7AddoSRxKkzbyDEOi8xJTIkcn+w/v5jia2uQwFWswQGcdcXPhOp7lq1bdmlvtmOHw96wqnhRigi2KDUdpqvhVbpTWc7kGnK2VzWalbs+cOByyvZMNFu8BV6zoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751466183; c=relaxed/simple;
-	bh=MpfCbVO4W0VVtHSdd8YbHgo+NQbHc9Of4ZYZeV2J2zw=;
+	s=arc-20240116; t=1751466900; c=relaxed/simple;
+	bh=kYG7Gws/V5xCeQe918f67t+EtnM9+dC9skPifSL5mEU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p0p6p4/IyIku2at93kJduzj0T7Pc1r6IdaaG+/2N387KLRoexDPquYVolnYygs6416jiWQMVmetx6IWjYGMCwtubCgkgHPy+ScioJXVyt6MZfkUd1cZcoq95jcHw10c1F6FtZS8i5sBtweiH2WgfAk71reh8VGw+FXBofVmcaZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rl+gbvA6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34ED4C4CEE7;
-	Wed,  2 Jul 2025 14:23:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=CYxU/wTj0CgK/I2yyNGNwhqDOOwShhQMSshzlDo3La9UXQOPIWy9VQOZ6zgdn2WCQJHtzmsAWfQHoRtjZMZJ5NbcF3aIG7oh4HU+PAD15Kkd4/5Szqib5NY7N4nFNJs45MIOkYO5xgCMhUAS6W2wA00EQoOGHVaoeByndEnlwPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r78VRl5I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 947FAC4CEE7;
+	Wed,  2 Jul 2025 14:34:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751466182;
-	bh=MpfCbVO4W0VVtHSdd8YbHgo+NQbHc9Of4ZYZeV2J2zw=;
+	s=k20201202; t=1751466900;
+	bh=kYG7Gws/V5xCeQe918f67t+EtnM9+dC9skPifSL5mEU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rl+gbvA6CfCQSBwjQ16wrT3SLKHGUqVW0d+NkC78yLIZaEmYRZFl0FUjjASWzSyzw
-	 LCUAwUb6rbNuVWpzV9miT+MQxYG4/IVFIboB0JbuREEWayEZ7gkundKQKdFkM1oCYb
-	 ro5hH2/7R2fAREHlaSlqb2aDAeh/S0kmPVLUnIocKrx7A8cCwnfWCxeEvr7oY3jEMn
-	 q4apu2IO/DoJVuQA+VRH/hVuPaPPFQKVHiHQwFonUXID27H73SPgMgIRcC1DcRnQ2y
-	 Nol38j+1hmM2j4MUbWwLqIDdtYq+3TYAogjLj3795PwE8N25cieGKpsrGwk9MeoqT4
-	 39xe36hW6EytQ==
-Date: Wed, 2 Jul 2025 07:23:01 -0700
+	b=r78VRl5I/3sZGIc4Z4XSnZZ9nI0/VFYS5QZJPImjo4moC0CXyco4x9TCM5999WMS2
+	 SXYSBaO+sxAgcRH7yNHZ1W+WGH0XxKL+auKJmN7/6ONgyozd3akL+V8Qb2xc+d24xJ
+	 4f8Rfu6RxsjjtycjFVE+VYPFrhlHzwmetUUzIZ8jrBQ/pmxs+mIv8yZf6WBEVatlul
+	 AFXB5yYWH5TPn/HMk+Z6zOIa2JInaLCwFRxez9k7elGf6GUy0Je9Prsbrav7oMd4Xr
+	 cy8FN4m3gSh9J4UBfIVSQ6Me5ZTe61QRI4OkqrOiY+pY4POSYPnJgQy/fUCnQkacq2
+	 dWoFesrrt+42Q==
+Date: Wed, 2 Jul 2025 07:34:58 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <andrew+netdev@lunn.ch>, <horms@kernel.org>, <shenjian15@huawei.com>,
- <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
- <jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
- <salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 0/4] There are some bugfix for the HNS3
- ethernet driver
-Message-ID: <20250702072301.51deaf72@kernel.org>
-In-Reply-To: <f3994ddd-9b9b-4bbb-bba4-89f7b4ae07f7@huawei.com>
-References: <20250702125731.2875331-1-shaojijie@huawei.com>
-	<f3994ddd-9b9b-4bbb-bba4-89f7b4ae07f7@huawei.com>
+To: Gabriel Goller <g.goller@proxmox.com>, Nicolas Dichtel
+ <nicolas.dichtel@6wind.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, David Ahern
+ <dsahern@kernel.org>, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] ipv6: add `force_forwarding` sysctl to enable
+ per-interface forwarding
+Message-ID: <20250702073458.3294b431@kernel.org>
+In-Reply-To: <20250702074619.139031-1-g.goller@proxmox.com>
+References: <20250702074619.139031-1-g.goller@proxmox.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,14 +64,27 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 2 Jul 2025 21:07:19 +0800 Jijie Shao wrote:
-> on 2025/7/2 20:57, Jijie Shao wrote:
-> > There are some bugfix for the HNS3 ethernet driver  
+On Wed,  2 Jul 2025 09:46:18 +0200 Gabriel Goller wrote:
+> It is currently impossible to enable ipv6 forwarding on a per-interface
+> basis like in ipv4. To enable forwarding on an ipv6 interface we need to
+> enable it on all interfaces and disable it on the other interfaces using
+> a netfilter rule. This is especially cumbersome if you have lots of
+> interface and only want to enable forwarding on a few. According to the
+> sysctl docs [0] the `net.ipv6.conf.all.forwarding` enables forwarding
+> for all interfaces, while the interface-specific
+> `net.ipv6.conf.<interface>.forwarding` configures the interface
+> Host/Router configuration.
 > 
-> Sorry, ignore this patch set, they should be sent to net not net-next ...
+> Introduce a new sysctl flag `force_forwarding`, which can be set on every
+> interface. The ip6_forwarding function will then check if the global
+> forwarding flag OR the force_forwarding flag is active and forward the
+> packet.
 
-You still should have waited 24h per:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
--- 
-pv-bot: 24h
+Should we invert the polarity? It appears that the condition below only
+let's this setting _disable_ forwarding. IMO calling it "force" suggests
+to the user that it will force it to be enabled.
+
+Nicolas, how do you feel about asking for a selftest here? 
+The functionality is fairly trivial from datapath PoV, but feels odd 
+to merge uAPI these days without a selftest..
 
