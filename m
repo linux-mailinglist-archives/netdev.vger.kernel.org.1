@@ -1,137 +1,172 @@
-Return-Path: <netdev+bounces-203390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B379BAF5BED
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 16:59:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82A27AF5BF4
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 16:59:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E0564A67FD
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:58:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F7094A042B
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:59:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC6130AADD;
-	Wed,  2 Jul 2025 14:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E3BF30B990;
+	Wed,  2 Jul 2025 14:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vfx/KsYX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GGzPPwzg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f193.google.com (mail-yb1-f193.google.com [209.85.219.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF0230AAD1;
-	Wed,  2 Jul 2025 14:58:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570CF307AFC;
+	Wed,  2 Jul 2025 14:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751468318; cv=none; b=aRDBVVNDjg8QaRjbhUKnJ4luSiCnw4eztnA0Hww6TRPfvGm1aRwNNFXssQGnKLaesaGk2u2L+RA8/+WPdghwqt2DdHyS65GLgDC97UHjTs9OO+SFPiWxoWoEhSQCCylvZaS0DF8K+asEcQUp/79jmnnr5zp+Pu87hSmDTgdLWSs=
+	t=1751468325; cv=none; b=MRNIwS/0KtfXuYJBS/5eMvqNfFXsY3ydfsFfccMphkxC3WWf26KNJMkmM8eNWfXxgfHRiU7oMXADyozoVMuXeA6fkoLMUxtF6CBtNBr2LxhwuRU+Bdw812I7eVR9zHTxeL/WKf+T9jMM1MUxv6d6kzUhB2uh/PQAr5SIHe9zsj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751468318; c=relaxed/simple;
-	bh=oX/ZAtWzwJdsQhtNvalvhpcwa8JeOFlisMtV8cvuNIk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J3KSujmNWkbU6uUda6vCdZ2ewoeYTwNTbXuXGLAH5CoGHo1CnEV9OLBltL7jLx7xl4QaurjwWZ5e/UwLIX6omEJhZe80WB8PWyCI2/plU9pNZzHk4J2QvlOmi7uYoqKciHfaeygHwHT/FeJkEgXMDXuufJDbHldr/ydsdSzPDMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vfx/KsYX; arc=none smtp.client-ip=209.85.219.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f193.google.com with SMTP id 3f1490d57ef6-e897c8ca777so1195032276.2;
-        Wed, 02 Jul 2025 07:58:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751468314; x=1752073114; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=T1WkFzcqoZ9zfZk6rKFoEV4a3LB4LFCO7cfh2fSf18M=;
-        b=Vfx/KsYXuvVLuESzF8oqtv5MeUX9ouWcH2RsUgPsN//qn6aWgIhjf1oJdicaOPMwKl
-         +gu9rIbKTP7tgvj9ymrWc/ZGgRHhZEDM6fK0DB9za6EYWmHnppZIBuKaBaEWsBu+twXA
-         +rW2z/++D57u/HZVgC5/ztmxeDfYy6at6SanHtmTyuJuibNkYOEorrIGsSyA+DqVmrJG
-         DYTZU4JhX6eofDm4MqLeiuSI3/Pj9fOWA2rEufcqDfLbHCBK6YUfQ/JC0reiUyBYcyCb
-         8eHqtQCWKJqqPeoPKFIfF4bMqrOQw9hSnOnWci/dggeGHb0r/7jGNptFTsYwkbM9gyl3
-         I7dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751468314; x=1752073114;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T1WkFzcqoZ9zfZk6rKFoEV4a3LB4LFCO7cfh2fSf18M=;
-        b=P3x502jqfgVMs+s9EqURKCHmuFD3TW4T4V3vytCA/lDS53m/WUsOc8zsgyyNJ7ySTI
-         OpblIvp8Zc8dieEzR/1eMQ8Oo+8NPEAaL8k6H9vfjm0vjyhm5/TGmBKQ/hJkilX/JPLN
-         KfoXB0AY0WgDiPTh7ZJFvXwmb1I4XuA+dKlxWSrcbOh3nKLzv5V5w3QZSmroQ/9ik6+s
-         0dQI3SROKgdRuhtfhlNgb2dq1prckmOS9TxLMPiFZB6oeUZc+xqopPQm7f+9wuj71FPw
-         XeS2fF4gpn00DJTbI0/s8N9ZuPyrDcD3RJXgjMqvOH+0thmHX3FAzVPhJL0hT53oar9P
-         LvUg==
-X-Forwarded-Encrypted: i=1; AJvYcCUv/fv8vftjzD24Ac4X+8b3V1yYPz2iy6JOoMgFEe4D+L793Z3AC2RVVGF644PVORzQRc8PEE6C@vger.kernel.org, AJvYcCXcJ/EWnO3z35VvWWysY7RXfQme80/+xIYUY7xhTfRvd/4WJv/edYEoIIHMfihXK8glLfJbDyJD1JcVn1g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8YkgM7LbFH45/HZnE7Nz8D/I+FWPINQnSAe5VTwjLZZ+Ssd0Q
-	LbTZkwBagU8LmefrX4/ibg30X29R5VU9slWlVAbIvt6dadPREFnnk9QS
-X-Gm-Gg: ASbGncsxcUjvzjLNNVgq17e/jp2/ua4BJxBiB7BUXbD22YAGtTKl8XpcXwTUxRlTlW5
-	VaFSpVQRluNIi+/FBGodwHN06QTVhVN7SUiQ1OCW0gvl1seLLrAqgiSG2XerUYHXPIgYEvLNhie
-	g1rKiGrsKr5+nJ/Z+RD/2uCQn5lHTijS9Bjk0nB/1cVMi4rWhtx3UUUgxKS1s96mXIbS1jQtKSq
-	MOreXsp+YGqi3+zTweXSE6XK4juK8QiYOwofb4Fr6u8aRnxhU6TuPKmTSZAA1MQEWmrBeGogtUS
-	5Xe/WYhGG1XtfDfQ+t4I2vaC/WDzXX6seg7JeHO0H1AZW10r3tR/uN12xldrEmvAT4LLQR9OL8L
-	t0YaAHurg
-X-Google-Smtp-Source: AGHT+IGlSboF2WeQ17XUS4xFc2PW/wJIU1k/DVuD4yqPbLcGVoiUFPieioZSCcoMk0Qg2yQY9vZcjg==
-X-Received: by 2002:a05:6902:728:b0:e89:8cc2:8082 with SMTP id 3f1490d57ef6-e898cc2856cmr885356276.41.1751468314365;
-        Wed, 02 Jul 2025 07:58:34 -0700 (PDT)
-Received: from [10.102.6.66] ([208.97.243.82])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e8980a99c80sm480883276.56.2025.07.02.07.58.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Jul 2025 07:58:34 -0700 (PDT)
-Message-ID: <9c43747a-f73d-476d-a1dc-1646fcfb771f@gmail.com>
-Date: Wed, 2 Jul 2025 10:58:33 -0400
+	s=arc-20240116; t=1751468325; c=relaxed/simple;
+	bh=iLNUwhn8Ec+aD/8O82h19EWGbHgFsaXzvcUBb0HirCw=;
+	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Mdcf8D5hS/3Io2yZpY0t6gzrIlhN1ZY5fWT21SmztruN13EVCbwwgzbAuyInzKvxWNwpDkHX260LrsXNlpBPSjNUnaSywbk2Vl2SXnHA288sAaEgcET/v8mOwefi9w/b23QpNK22oayaMn9f3rjY+9PqXhGKbubfY5TLgjujo1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GGzPPwzg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 697DDC4CEED;
+	Wed,  2 Jul 2025 14:58:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751468324;
+	bh=iLNUwhn8Ec+aD/8O82h19EWGbHgFsaXzvcUBb0HirCw=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=GGzPPwzgR9ZtaBxQFIAlwL5NvsA15pkkKhNnPNhUr1AOuGRfc2Dpo8xxvgBn+9AcP
+	 iTeFk9ifyY9ipoe+pt/k4CCmZQQ1RuU2xik1/rpFmr8U/Gz1RbGGYV+iQ0Neyb2MQ2
+	 GNQpfgEJmWx7wkYS32b5v2uybdTyqGDIvzRcG8psh8v7MvWLIJswBWaGKsQ0uhC9qM
+	 7EAsC+LyGXqkulx9gdsyO+YyHN5e01utWogvxbpAQRhKkQLzreZeZBzK1GMMaSE1s8
+	 ZRYnNfiAB/2rGIq0FlrNByJw1D5kViYYDfdiumCRSTb2OxAya46NEWv4EuEngAjpjA
+	 XnkoJgkknLu+Q==
+Subject: [PATCH bpf-next V2 4/7] net: xdp: Set skb hw metadata from xdp_frame
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>, lorenzo@kernel.org
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <borkmann@iogearbox.net>,
+ Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ sdf@fomichev.me, kernel-team@cloudflare.com, arthur@arthurfabre.com,
+ jakub@cloudflare.com
+Date: Wed, 02 Jul 2025 16:58:39 +0200
+Message-ID: <175146831960.1421237.9105904582430357235.stgit@firesoul>
+In-Reply-To: <175146824674.1421237.18351246421763677468.stgit@firesoul>
+References: <175146824674.1421237.18351246421763677468.stgit@firesoul>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: bridge: Do not offload IGMP/MLD messages
-To: Tobias Waldekranz <tobias@waldekranz.com>,
- Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org
-Cc: Nikolay Aleksandrov <razor@blackwall.org>,
- Ido Schimmel <idosch@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, bridge@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20250701193639.836027-1-Joseph.Huang@garmin.com>
- <87a55nyofq.fsf@waldekranz.com>
-Content-Language: en-US
-From: Joseph Huang <joseph.huang.2024@gmail.com>
-In-Reply-To: <87a55nyofq.fsf@waldekranz.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
-On 7/2/2025 4:41 AM, Tobias Waldekranz wrote:
-> On tis, jul 01, 2025 at 15:36, Joseph Huang <Joseph.Huang@garmin.com> wrote:
->> Do not offload IGMP/MLD messages as it could lead to IGMP/MLD Reports
->> being unintentionally flooded to Hosts. Instead, let the bridge decide
->> where to send these IGMP/MLD messages.
-> 
-> Hi Joseph,
-> 
-> Do I understand the situation correctly that this is the case where the
-> local host is sending out reports in response to a remote querier?
-> 
->          mcast-listener-process (IP_ADD_MEMBERSHIP)
->             \
->             br0
->            /   \
->         swp1   swp2
->           |     |
->     QUERIER     SOME-OTHER-HOST
-> 
-> So in the above setup, br0 will want to br_forward() reports for
-> mcast-listener-process's group(s) via swp1 to QUERIER; but since the
-> source hwdom is 0, the report is eligible for tx offloading, and is
-> flooded by hardware to both swp1 and swp2, reaching SOME-OTHER-HOST as
-> well?
+From: Lorenzo Bianconi <lorenzo@kernel.org>
 
-That's exactly what's happening with my setup.
+Update the following hw metadata provided by the NIC building the skb
+from a xdp_frame.
+- rx hash
+- rx vlan
+- rx hw-ts
 
-Also, IIRC, the querier port (a.k.a. mrouter port) is not offloaded to 
-the switch (at least not for DSA switches). So depending on the 
-multicast_flood setting on the (querier) port, the Reports may not even 
-reach the querier if they are tx offloaded.
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ include/net/xdp.h |   15 +++++++++++++++
+ net/core/xdp.c    |   29 ++++++++++++++++++++++++++++-
+ 2 files changed, 43 insertions(+), 1 deletion(-)
 
-Thanks,
-Joseph
+diff --git a/include/net/xdp.h b/include/net/xdp.h
+index 8c7d47e3609b..3d1a9711fe82 100644
+--- a/include/net/xdp.h
++++ b/include/net/xdp.h
+@@ -310,6 +310,21 @@ xdp_frame_is_frag_pfmemalloc(const struct xdp_frame *frame)
+ 	return !!(frame->flags & XDP_FLAGS_FRAGS_PF_MEMALLOC);
+ }
+ 
++static __always_inline bool xdp_frame_has_rx_meta_hash(struct xdp_frame *frame)
++{
++	return !!(frame->flags & XDP_FLAGS_META_RX_HASH);
++}
++
++static __always_inline bool xdp_frame_has_rx_meta_vlan(struct xdp_frame *frame)
++{
++	return !!(frame->flags & XDP_FLAGS_META_RX_VLAN);
++}
++
++static __always_inline bool xdp_frame_has_rx_meta_ts(struct xdp_frame *frame)
++{
++	return !!(frame->flags & XDP_FLAGS_META_RX_TS);
++}
++
+ #define XDP_BULK_QUEUE_SIZE	16
+ struct xdp_frame_bulk {
+ 	int count;
+diff --git a/net/core/xdp.c b/net/core/xdp.c
+index 1ffba57714ea..f1b2a3b4ba95 100644
+--- a/net/core/xdp.c
++++ b/net/core/xdp.c
+@@ -792,6 +792,23 @@ struct sk_buff *xdp_build_skb_from_zc(struct xdp_buff *xdp)
+ }
+ EXPORT_SYMBOL_GPL(xdp_build_skb_from_zc);
+ 
++static void xdp_set_skb_rx_hash_from_meta(struct xdp_frame *frame,
++					  struct sk_buff *skb)
++{
++	enum pkt_hash_types hash_type = PKT_HASH_TYPE_NONE;
++
++	if (!xdp_frame_has_rx_meta_hash(frame))
++		return;
++
++	if (frame->rx_meta.hash.type & XDP_RSS_TYPE_L4_ANY)
++		hash_type = PKT_HASH_TYPE_L4;
++	else if (frame->rx_meta.hash.type & (XDP_RSS_TYPE_L3_IPV4 |
++					     XDP_RSS_TYPE_L3_IPV6))
++		hash_type = PKT_HASH_TYPE_L3;
++
++	skb_set_hash(skb, frame->rx_meta.hash.val, hash_type);
++}
++
+ struct sk_buff *__xdp_build_skb_from_frame(struct xdp_frame *xdpf,
+ 					   struct sk_buff *skb,
+ 					   struct net_device *dev)
+@@ -800,11 +817,15 @@ struct sk_buff *__xdp_build_skb_from_frame(struct xdp_frame *xdpf,
+ 	unsigned int headroom, frame_size;
+ 	void *hard_start;
+ 	u8 nr_frags;
++	u64 ts;
+ 
+ 	/* xdp frags frame */
+ 	if (unlikely(xdp_frame_has_frags(xdpf)))
+ 		nr_frags = sinfo->nr_frags;
+ 
++	if (unlikely(xdp_frame_has_rx_meta_ts(xdpf)))
++		ts = sinfo->hwtstamps.hwtstamp;
++
+ 	/* Part of headroom was reserved to xdpf */
+ 	headroom = sizeof(*xdpf) + xdpf->headroom;
+ 
+@@ -832,9 +853,15 @@ struct sk_buff *__xdp_build_skb_from_frame(struct xdp_frame *xdpf,
+ 	/* Essential SKB info: protocol and skb->dev */
+ 	skb->protocol = eth_type_trans(skb, dev);
+ 
++	xdp_set_skb_rx_hash_from_meta(xdpf, skb);
++	if (xdp_frame_has_rx_meta_vlan(xdpf))
++		__vlan_hwaccel_put_tag(skb, xdpf->rx_meta.vlan.proto,
++				       xdpf->rx_meta.vlan.tci);
++	if (unlikely(xdp_frame_has_rx_meta_ts(xdpf)))
++		skb_hwtstamps(skb)->hwtstamp = ts;
++
+ 	/* Optional SKB info, currently missing:
+ 	 * - HW checksum info		(skb->ip_summed)
+-	 * - HW RX hash			(skb_set_hash)
+ 	 * - RX ring dev queue index	(skb_record_rx_queue)
+ 	 */
+ 
+
+
 
