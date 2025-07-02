@@ -1,90 +1,61 @@
-Return-Path: <netdev+bounces-203111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B72BAF087F
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 04:35:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D754DAF0883
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 04:38:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64DDD3BED33
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:34:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51859164B37
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:38:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BE0816E863;
-	Wed,  2 Jul 2025 02:35:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j51Lgk2l"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21EE1A072C;
+	Wed,  2 Jul 2025 02:38:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD453C26
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 02:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DCEB16E863;
+	Wed,  2 Jul 2025 02:38:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751423713; cv=none; b=h2ixwRajFP6Avkc4fM6RfCmW0/poCrlWXDTPejDgQsA0x/7L/5UwGEoXL2gnYqCiUseAOkODSOz1AIjIoo0eEWjr554WPgaJATvI2Vb8Zb28r8mJprTMfJPzRVHrN00dQJA5cRO0qB5w8EjDJmwb9DuYT/OuCaxCI3PDrJuZZl8=
+	t=1751423884; cv=none; b=ZUKrvy+ajQKrK/AakNi5n8qwI9u0tqj2gyD/drLZ7IdX3GOvSudVsEDb4447Q5bIbmXAp6acSJ2aM/alAZKRucXlppRkzK8y0pibwKlwin+AZggpPyB/iqI8/OLhY01pv11maESyOoGoZlF2igEax2hCd3BwYCzLkB3h+DkrN50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751423713; c=relaxed/simple;
-	bh=kqsH713MLO0auQQbcr+Z+gi8ARWLYQBfU32WG0W1vHY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=igIaL3kBHBkHJbafyVxJ7Q8vyPpyPQDjAct6eGKvBZrLcapvdoHEb9My8/xIouAKSW30Q3PPkOZVrUq8XK0/xRNXy/K8uB0Ur8QdRjel2rQfgPQJWPgtEsOZvkuPGFb9zYICn20RVZyfTugOp0gk7i1Gl9P6jbgJIw38T9WkmhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j51Lgk2l; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-749248d06faso6510964b3a.2
-        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 19:35:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751423711; x=1752028511; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kI3Fqs0qbOqnvteqQOBduVlneIj7Pqi9Z4xlMPSfBAY=;
-        b=j51Lgk2lcaqpmOJVG+tsUE8/TH6WZlqM6pphv4HlgLoGri6CPAP3vr7FkPMpk1OV/3
-         0oRp/b6QWK+HGMOAT/GMRQqm1JqZlbpj8cuoobmkFxfBJcKqZxOGJNbG4PsRihfIbkes
-         beqw8OoZxJk1AUzVKSobaCIFF8zKXN6m7GR1O8aSs2JatZBNIYkK+SWjcnGhp3BT/Kdg
-         x+2vd/e0MFsFhDXJ3OB7E6rGEWvceMlQeiowH+yyiXX5o6DDs/ZVOPkAGe5AKXGAoivd
-         prbYNM0Kk9fDZI80N6N0YBe7zfm7p2PhJR+A9uvPhsVIrabFXoTJAA6W2/sehxk/bbHX
-         jLVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751423711; x=1752028511;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kI3Fqs0qbOqnvteqQOBduVlneIj7Pqi9Z4xlMPSfBAY=;
-        b=ntbTHvQtDfydhJAowU625hAg6vNxb2zKGtubtn5t+ouCRhLseyJKvJOFvdPZxhXk+Y
-         Cq55reoclywY51h68syXeU8+KL+nfi8a7phuAXxeYmBU4PaGU8hbJP1galEv8EcWP71B
-         0q+a6PW08fHssqcDkZaGz+mv7v+ORmlDwrCKAK8+QwBZG8Zc+P80Cl0HdXTnf+jTfBiU
-         QvvOybEu9fWEtim9Fb9HDvAFcmLOdLYMpszvk/IQMj2NgvMd5t6Skqd060TijknGSjau
-         j4aKjMCus2sg+/8JccytxH6ULHYbk8J31GnhJvquWSCUEd/ST5UKhG+Pklyy23GWdUU0
-         ZtUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUk8pt60YagnmddlZWG7O9cFVD0KWdvhyEFapfiZUsyfvbUSL2GNF01IFjfRHOlPBrnlNqbGqY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMcrZ2L3xSj4vgWNcJHu+2/azR0v1tKt4dpaRIM2Uu7m0BnG0N
-	L78xiGHpDGZ2caJNUAxP5uIO7lcNWIO45MmTaFytDdho7bvog2zJFD58
-X-Gm-Gg: ASbGncs0PpZHsn8gKridrXWEjDyUuX6es/Dhz7cDxr4PcSVUkWi9H5vc7pUlBJbyj0N
-	RTTYmnH+93nA8cDCV27tyPDa6z9WI4b7F56CXG5ld7W+fPGvHqMKzFzHxMGWu/Cd1yIK+acLEo1
-	e3TlkAaxcR0Lfob822LXEOX7oQ5yQ207BkE3zm1BlmTPp659unYBHEWNaWsxwXx6s6jo4ZMCj0K
-	ydmPuFJ23yZPT7UuIKyF4Z+jLJtEwxtyxl/MAaocxGcRkuRDmCJPF7OPPYvvRPC8yNX8flXaAnw
-	giWT5Q6fozMJiNRpmEDXefonASJuBi0YX5kwYKhHd4sB+xS1G8hBhJx5BizEpxI9DkhL
-X-Google-Smtp-Source: AGHT+IGaMkwL58zv5Ty2D4dm5+wFK8TRcBxFvrIwkOdTgEgzt/08E/ITat5t824Fwwr8NgGwO8Zodg==
-X-Received: by 2002:a05:6a00:2312:b0:736:43d6:f008 with SMTP id d2e1a72fcca58-74b5104ce4bmr1557497b3a.12.1751423711259;
-        Tue, 01 Jul 2025 19:35:11 -0700 (PDT)
-Received: from localhost ([2601:647:6881:9060:9468:b035:3d01:25e5])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74af541bd1fsm12419447b3a.47.2025.07.01.19.35.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jul 2025 19:35:10 -0700 (PDT)
-Date: Tue, 1 Jul 2025 19:35:09 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1751423884; c=relaxed/simple;
+	bh=pQET3LimeNTjhg0Ps/AYZMyJeXizcXhkG/Op6lf6ZVA=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=LPUDMadM8qB5qB9hgrCdc2kmCEHLZ7tiDcA/GwWWUbxkotpFOBgpBJCa71uFXHMfxhyNC56XOKkpHki6din/Ar+KSto4tD2La2K6coDvJ0ePrzW1ieK2paNp1Epceec9wl3R+5SD/+QH63Sp/+kpwfSpngqrMTAKSW2b7weK87g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1uWnM0-000000005DE-34JB;
+	Wed, 02 Jul 2025 02:37:44 +0000
+Date: Wed, 2 Jul 2025 03:37:40 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Felix Fietkau <nbd@nbd.name>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Eric Woudstra <ericwouds@gmail.com>, Elad Yifee <eladwf@gmail.com>,
+	Bo-Cun Chen <bc-bocun.chen@mediatek.com>,
+	Sky Huang <skylake.huang@mediatek.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com, Vlad Buslov <vladbu@nvidia.com>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Subject: Re: [PATCH net-next] net/sched: acp_api: no longer acquire RTNL in
- tc_action_net_exit()
-Message-ID: <aGSa3bgijdi+KqcK@pop-os.localdomain>
-References: <20250701133006.812702-1-edumazet@google.com>
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH net-next v4 0/3] net: ethernet: mtk_eth_soc: improve device
+ tree handling
+Message-ID: <cover.1751421358.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,21 +64,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250701133006.812702-1-edumazet@google.com>
 
-On Tue, Jul 01, 2025 at 01:30:06PM +0000, Eric Dumazet wrote:
-> tc_action_net_exit() got an rtnl exclusion in commit
-> a159d3c4b829 ("net_sched: acquire RTNL in tc_action_net_exit()")
-> 
-> Since then, commit 16af6067392c ("net: sched: implement reference
-> counted action release") made this RTNL exclusion obsolete.
+This series further improves the mtk_eth_soc driver in preparation to
+complete upstream support for the MediaTek MT7988 SoC family.
 
-I am not sure removing RTNL is safe even we have action refcnt.
+Frank Wunderlich's previous attempt to have the ethernet node included
+in mt7988a.dtsi and cover support for MT7988 in the device tree bindings
+was criticized for the way mtk_eth_soc references SRAM in device tree[1].
 
-For example, are you sure tcf_action_offload_del() is safe to call
-without RTNL?
+Having a 2nd 'reg' property, like introduced by commit ebb1e4f9cf38
+("net: ethernet: mtk_eth_soc: add support for in-SoC SRAM") isn't
+acceptable and a dedicated "mmio-sram" node should be used instead.
 
-What are you trying to improve here?
+In order to make the code more clean and readable, the existing
+hardcoded offsets for the scratch ring, RX and TX rings are dropped in
+favor of using the generic allocator. In this way support for the
+hard-coded offset and including the SRAM region as part of the
+Ethernet's "reg" MMIO space is kept as it will still be required in
+order to support existing legacy device trees of the MT7986 SoC family.
 
-Thanks.
+While at it also replace confusing error messages when using legacy
+device trees without "interrupt-names" with a warning informing users
+that they are using a legacy device tree.
+
+[1]: https://patchwork.ozlabs.org/comment/3533543/
+
+Daniel Golle (3):
+  net: ethernet: mtk_eth_soc: improve support for named interrupts
+  net: ethernet: mtk_eth_soc: fix kernel-doc comment
+  net: ethernet: mtk_eth_soc: use generic allocator for SRAM
+
+ drivers/net/ethernet/mediatek/Kconfig       |   1 +
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c | 155 +++++++++++---------
+ drivers/net/ethernet/mediatek/mtk_eth_soc.h |  11 +-
+ 3 files changed, 95 insertions(+), 72 deletions(-)
+
+-- 
+2.50.0
 
