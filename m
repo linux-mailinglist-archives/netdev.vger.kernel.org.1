@@ -1,146 +1,146 @@
-Return-Path: <netdev+bounces-203287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B46AAF1226
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:42:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7A2DAF122A
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:43:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C15E87AA111
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:40:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D84841897038
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:43:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C78992571B9;
-	Wed,  2 Jul 2025 10:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 222902580E4;
+	Wed,  2 Jul 2025 10:43:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="PZIKXDfH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q8oFkd6g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E7F255F26
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 10:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACCCF4C6E;
+	Wed,  2 Jul 2025 10:43:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751452913; cv=none; b=j5+xDmXlmEXm43+R+FddLOoidQmHDkp2pEr9hcOGPjKtcKtG7a3kDPbFUbpeFhcgSxQ1/7YoPAA7THpl5dG8s7CbDsvpn1qDlq7FxtMFiwnXkxCz+i+CCxXSu/XGp/ENadXjcM/uh70iJ2z5Tax7IvcPXuh2IuwyTT3cveSxrSg=
+	t=1751452999; cv=none; b=bx8Ip8R8BFxriCByQB+jS+p7MoNVuqWrmNW4RV5QecYLgwOsZXc2Vb0wa0HSSDaEV0YC4+hrEBPzvrk4U8sX6UK/pn30RngkkU2GSlRMUKDi6ZfuO8tR8w3NNBbhypitludwNBc0NkSre+1BXD6rf9/wamFs8YX+wdPIyIwKsGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751452913; c=relaxed/simple;
-	bh=opI8kZ94jXxc3W+bhK8KIvd92l7nPa8l691dPsRb30U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iihmRsqKYE+8ZZsyDdVFNlq/7k1WvPOSvDKrENZTfe0ceo6J3qC4ntus/M1UIrfpzWaU204ao/66IkyY/ylWcIHWSTh5P+YnODlS07Fbse2eXOnv0T4hIL1Z6MXDtqD5VIH2dA5k0v2iEVzn1keR+tOpr+E6ou95Wg8c9ax0UY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=PZIKXDfH; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4530921461aso44080445e9.0
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 03:41:51 -0700 (PDT)
+	s=arc-20240116; t=1751452999; c=relaxed/simple;
+	bh=RHLJ9D48DllsGUWCN1uoEd21Mm8wSzcmeliizhoLpy4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bhncK0RyPPm74ClZgX75qC1rAF0Euqt67pcKvppeoihQe4T/J0quGgHMPvcG6PyBjD4+CoDrp+uixOobVQgzNpfMhBpR8zhnjLcO83AYKJUVhXSFQP6wp1olStjRYGVouNl/xiJjpjTstHhCdlIczB9IGlRVYPEwqnhvOPHafcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q8oFkd6g; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-747fc77bb2aso4044144b3a.3;
+        Wed, 02 Jul 2025 03:43:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1751452910; x=1752057710; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vKybssvnFprModTIZAiiqhMc9ohtbZTXrEhnTtnvSDI=;
-        b=PZIKXDfHzzrMWMb8wWmm9ujwZ6GGJl5NC9cuOftFYEVlr1vNngMTVjw3ej7F+Fk8dx
-         TjCGtHInRC2muFv9YuywxxvhjzO5GLv0h/yc7mA3gOUO93vT7ZtyKvIoBPF2jYQaX4JN
-         9n78uqtXP2gQAVaYlX8v9GOjbHH3AzUdyj14Ad+O1YKEbPRX9cX4kb9TGCCuIeQ0OL/5
-         XY/lOhBhTNf8kPWTL5HdXMu/YWyazpAcnqTQGZkvBT1E0WqJOIN/xOI95VpOgiWM8DFm
-         KguCe0C02dOXPoxsweSjAqvybOeiFUeHtqp8yfnV6TLSQYERoUWSpiq5TVq3pOs+dtM/
-         qZtQ==
+        d=gmail.com; s=20230601; t=1751452997; x=1752057797; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zdPAwwrb4QJU2IWSSlyaWAnqCnTmtH2bZk+NO2oHIiA=;
+        b=Q8oFkd6g03X6+RJo05Oae/BwHM4IqRUWtDU9EXA4UEK/Txbv73ZOpzOTf/jH9yLQ29
+         QYVgY3VRNI+8QWPbRmE2drNQV9QJhhGwtbDmPrjiUl7yHpTp5JimZEV7nIAsR4t+WHq7
+         UAupONbSUc/ErwBawa6cMS3RztwM+ZO53E/S2k0l62JyTOJpatvDIK066VbAhkrS2Y0A
+         REmaIQHJmGpddE+JUP1g8WXEE50Z0Yu213Ml1jQiwog3QrpNTiKo3Ci14B/LdjPfWuZ2
+         UCoYe+3KuUipUd/RF+wr14K3VeK7OdA+FZ3yKoUypxgF/n7ehuLCgVAgs+gttSSGpWzG
+         StxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751452910; x=1752057710;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vKybssvnFprModTIZAiiqhMc9ohtbZTXrEhnTtnvSDI=;
-        b=TYWKldze0BYoAqpqyIAgk9oGAridsf7lur5v0Y6Wggrl9EJuk4A6Ig7a3IdIOF22TB
-         KDBvcsXlWPgere7YCX6DgDl1Rml0R9zXjtDU09ijYFEC1CHceV83Flk4QtwZsLFbm1vN
-         atZJQZ5bexiFJNWz8H2YBvhVsSTEOcOfs1f1BxcKCoXb0IlmfcHmrCh7MH2UkGmezfjE
-         l/CbT5wwHS7qnI410jP5pdrAAJ9qCbQZjbb/C4MVPUNLAqmH+z8Pj7qH4GcZyo7P2cBR
-         Rjf/GpqRAhR0Q8UCRiHhj5/QtlI7ez2fJmMi5FZb2VjVx79LTYG+y0z9cgpmj3umhatG
-         ounQ==
-X-Gm-Message-State: AOJu0YzZF1XrzyVu+ATy0cZqIayplQlGCArY2wKshN31BAqDnWn87KW5
-	1BtEdlaDsZPioIowENpB4dyZ3NaK1Y81N99hQzs8gYHNqb6+sGYN3te0O+shcx4Pooc=
-X-Gm-Gg: ASbGncs4hKcOjv/VB7SNFn550HY1vAMP55LXdso0qNRSIgX0WJUieFeZvGwJ5Aq/dh9
-	qnFGK+A2hU0GATSI3fg44PYGMsdsqCTUE1JwMnRgUfZw61tejgdWTSRbLDJ8L797uzQbjROdEMl
-	c/zVZxC7R7c4EDjIm/N2mNkb24KZwiVFtoieJSd+GTlXqo+B4+o5iP7V/U2Ol9ESpQOyqhh3ncE
-	0W8QmdttsV7LxCa1G2805mvp3zGYaOrEX3bNbpjCziixeSDFhjh8VE4LgCULBcHesWeaXNd8KYH
-	uuUqPaGOQqFcWZofiyynBVYH644xEV0nplzlTrRXZaaecZb8WBEAZYwKQCpn1pq23wj0sA==
-X-Google-Smtp-Source: AGHT+IHp+NonL/psql4ZWWlHXVavL55jVvlBbLDx9BjCEnFRZEGhViNaWfW5qLGhu87010kP2/wTbw==
-X-Received: by 2002:a05:600c:538e:b0:453:697:6f08 with SMTP id 5b1f17b1804b1-454a3728b85mr23020135e9.26.1751452910342;
-        Wed, 02 Jul 2025 03:41:50 -0700 (PDT)
-Received: from jiri-mlt ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-453a85b3d44sm33167695e9.0.2025.07.02.03.41.43
+        d=1e100.net; s=20230601; t=1751452997; x=1752057797;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zdPAwwrb4QJU2IWSSlyaWAnqCnTmtH2bZk+NO2oHIiA=;
+        b=OF4/7pT4M1MR6iAboIK58hceMYFV+Ok82G46FVFoTE+hDhyFiOziJUSk9MhXBcPIiW
+         wCi7WKJz9z/tAPDMigDz0rqTh/L+NNeYc0hWcZtS/e5DtxOxJIKlGUnq+dxYrtkGuqSP
+         Y6o/at6g58zCiC4zmRm5h3GuH6JY8/LxlmGhrHxt1JBkLXjdjdffm0nrDPhxF9p9tgX+
+         vLSziH207QD0UN4vi5+xehGb19kGEM1wPey2fg941LS/YX8xRD2kZFJcQY6N5rfQJ2sz
+         s1NYGesNSB0upnDhC2XV6ooFAPN5nM63MlH11ZbHAdhlCzgDde5KYdSvLZPxAPlPwRZK
+         I+lA==
+X-Forwarded-Encrypted: i=1; AJvYcCUKpUShm5E8lgmIIMPNn/tUG6aWvqK2UbugzdPuWppZR3f9rfYyuwIXYtuomichmWNW15M3GvwAxNsN5QCdTQM=@vger.kernel.org, AJvYcCUcSddts3HLE/BDmDXYwnBVbmhVDglQlB61G6RlUoYM5JJjvjSH27HGnWLZ7NXHnpJX0EVYAxHY@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5AGIyvPXm2fsK2yNIHI+x/XdzQO2491m/QZcOz7oWMGe7h91l
+	U7E+pAPJZVYMHWKw8OX+p/+4okXSGeGtxUkU4Fz1vly6CuHTU8kXbrez
+X-Gm-Gg: ASbGncvu04x1jra8JC9al47BsCTelL6b35sxwPreuGx/OFdk1fbbtJ2vdrGPBTRBO01
+	h547Y+m+CyHdt83lkORZtXYcZXNVELCt0hm8p5+qFTyEcMDzc7I4fLajUZoTm8Sq6OV3WsNU4r4
+	m5S0h2kU6abnlHaZHETXNNsXgeQSRf/Il/TzNY73V4ZL/29SvSA31teiO8hy4aagg5jhzbrc63s
+	ftaJaMDHxcZO2Fl5KVgzN0BdM2oF0KrlReA48x4ao8ma7gOcDTq5V0wBJOfz1P2SQkR5XkRUFc0
+	d1NHFSShNjd9UDQ6/TYKMrEJMH2/JRudzYQ+LXhkihBUNFZv29g=
+X-Google-Smtp-Source: AGHT+IEeiHFvgdgKJjn0wBnclG5KXDNWT8Pp2yzRR3R/ETtmSUop97FYezDUkFO3sL3XSJBZmVb8HA==
+X-Received: by 2002:a05:6a20:3ca3:b0:222:1802:2ddb with SMTP id adf61e73a8af0-222d7dc4e64mr5025821637.8.1751452996777;
+        Wed, 02 Jul 2025 03:43:16 -0700 (PDT)
+Received: from ap.. ([182.213.254.91])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74af54099besm14064227b3a.9.2025.07.02.03.43.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 03:41:49 -0700 (PDT)
-Date: Wed, 2 Jul 2025 12:41:40 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Prathosh Satish <Prathosh.Satish@microchip.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Shannon Nelson <shannon.nelson@amd.com>, Dave Jiang <dave.jiang@intel.com>, 
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>, 
-	Petr Oros <poros@redhat.com>
-Subject: Re: [PATCH net-next v12 08/14] dpll: zl3073x: Read DPLL types and
- pin properties from system firmware
-Message-ID: <vpzjeh5kc6s4cpah5wagdy6sm3rzt6vlfyfcdbenppwnzftzow@u4xu7mhzg77u>
-References: <20250629191049.64398-1-ivecera@redhat.com>
- <20250629191049.64398-9-ivecera@redhat.com>
+        Wed, 02 Jul 2025 03:43:16 -0700 (PDT)
+From: Taehee Yoo <ap420073@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	shuah@kernel.org,
+	almasrymina@google.com,
+	sdf@fomichev.me,
+	jdamato@fastly.com,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: ap420073@gmail.com
+Subject: [PATCH v2 net-next] selftests: devmem: configure HDS threshold
+Date: Wed,  2 Jul 2025 10:42:49 +0000
+Message-Id: <20250702104249.1665034-1-ap420073@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250629191049.64398-9-ivecera@redhat.com>
+Content-Transfer-Encoding: 8bit
 
-Sun, Jun 29, 2025 at 09:10:43PM +0200, ivecera@redhat.com wrote:
+The devmem TCP requires the hds-thresh value to be 0, but it doesn't
+change it automatically.
+Therefore, make configure_headersplit() sets hds-thresh value to 0.
 
-[...]
+Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+---
 
+v2:
+ - Do not implement configure_hds_thresh().
+ - Make configure_headersplit() sets hds-thresh to 0.
 
->+/**
->+ * zl3073x_prop_dpll_type_get - get DPLL channel type
->+ * @zldev: pointer to zl3073x device
->+ * @index: DPLL channel index
->+ *
->+ * Return: DPLL type for given DPLL channel
->+ */
->+enum dpll_type
->+zl3073x_prop_dpll_type_get(struct zl3073x_dev *zldev, u8 index)
->+{
->+	const char *types[ZL3073X_MAX_CHANNELS];
->+	int count;
->+
->+	/* Read dpll types property from firmware */
->+	count = device_property_read_string_array(zldev->dev, "dpll-types",
->+						  types, ARRAY_SIZE(types));
->+
->+	/* Return default if property or entry for given channel is missing */
->+	if (index >= count)
->+		return DPLL_TYPE_PPS;
+ tools/testing/selftests/drivers/net/hw/ncdevmem.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-Not sure how this embedded stuff works, but isn't better to just bail
-out in case this is not present/unknown_value? Why assuming PPS is
-correct?
+diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
+index cc9b40d9c5d5..52b72de11e3b 100644
+--- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
++++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
+@@ -331,6 +331,12 @@ static int configure_headersplit(bool on)
+ 	ret = ethtool_rings_set(ys, req);
+ 	if (ret < 0)
+ 		fprintf(stderr, "YNL failed: %s\n", ys->err.msg);
++	if (on) {
++		ethtool_rings_set_req_set_hds_thresh(req, 0);
++		ret = ethtool_rings_set(ys, req);
++		if (ret < 0)
++			fprintf(stderr, "YNL failed: %s\n", ys->err.msg);
++	}
+ 	ethtool_rings_set_req_free(req);
+ 
+ 	if (ret == 0) {
+@@ -338,9 +344,12 @@ static int configure_headersplit(bool on)
+ 		ethtool_rings_get_req_set_header_dev_index(get_req, ifindex);
+ 		get_rsp = ethtool_rings_get(ys, get_req);
+ 		ethtool_rings_get_req_free(get_req);
+-		if (get_rsp)
++		if (get_rsp) {
+ 			fprintf(stderr, "TCP header split: %s\n",
+ 				tcp_data_split_str(get_rsp->tcp_data_split));
++			fprintf(stderr, "HDS threshold: %u\n",
++				get_rsp->hds_thresh);
++		}
+ 		ethtool_rings_get_rsp_free(get_rsp);
+ 	}
+ 
+-- 
+2.34.1
 
-
->+
->+	if (!strcmp(types[index], "pps"))
->+		return DPLL_TYPE_PPS;
->+	else if (!strcmp(types[index], "eec"))
->+		return DPLL_TYPE_EEC;
->+
->+	dev_info(zldev->dev, "Unknown DPLL type '%s', using default\n",
->+		 types[index]);
->+
->+	return DPLL_TYPE_PPS; /* Default */
->+}
-
-[...]
 
