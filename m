@@ -1,97 +1,96 @@
-Return-Path: <netdev+bounces-203515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C10E1AF63F2
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 23:27:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A9DFEAF6405
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 23:29:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F14E01C4487E
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 21:27:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8274D1C45609
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 21:30:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB3223C51A;
-	Wed,  2 Jul 2025 21:26:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1083278768;
+	Wed,  2 Jul 2025 21:29:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4bL5LqjS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e+TuWppp"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A111E5B72;
-	Wed,  2 Jul 2025 21:26:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F381F03D9;
+	Wed,  2 Jul 2025 21:29:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751491618; cv=none; b=Wjrg7pTtkLy5myGbQhzDHi0UuFr1HDsDLj9yBkmcCh6N+sv7smVnLQwQ5+Gj73RxEzypKTl6eozP6dGsFuY+a7jxLsAJYjeOirYsoRfSsr8L7wn30BlCo2ASDBrOeSyhdxNHV4ncurCBkfK0nQ1kKviXDcik3oRlHtALgvTU6EQ=
+	t=1751491784; cv=none; b=XI+hIiwTxII4xuQEUmQConSwOC0I864mgNHw1fXmJDHvAPU0HCZvhnhm0Fur1WBsEp8vSqkrzNe35Puh3jKAUeJTc6HFUvcIdrl2NVnW6S03cqm26djm4Qdzvjs8EZI7qlWdwQdHk3i5xjFVjOiIuf9/Jd2eynse0soW4MVAYig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751491618; c=relaxed/simple;
-	bh=ubcv531A0W3+7BMeK8QdrJzgPyyaklfbDSiVf1ogieE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jep5OKJxAk63q6ott4yQU1h19XutfdyjsLHJu1DWrVj1rb9bupM0++o/HJ46+f2+gnGq/+StrXN3PwucygL/r71gGfIrOInm3Z24Reg1SKOs4csFTO6ls9t+eUx6Hr4flL6osTqT+FoGVBdHF2cUGgn3agdwRDm2qOPgRlWt7n8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4bL5LqjS; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=EK6pIKbSgIOibKMxhtf9EOr2/NgmGGS9epSF1C9VniQ=; b=4bL5LqjSsgWMCbBqSjnGEGV7iY
-	j3L6/kjnWRfCLzShW/KjAmhrMoyp0Ob4TpTZx5HnK5We9FgcjmLWEqOBFraZZ980EqpmfQDRhB6cT
-	7IT6PGXWPRFDBcjg5hjX8uBDJ/WGl9qQtYGxzKeBqNf/xS7Z+5utX4Gz4uHfuqTRVOws=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uX4yY-0001kh-LA; Wed, 02 Jul 2025 23:26:42 +0200
-Date: Wed, 2 Jul 2025 23:26:42 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Asmaa Mnebhi <asmaa@nvidia.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	David Thompson <davthompson@nvidia.com>
-Subject: Re: [PATCH net v1] mlxbf-gige: Support workaround for MDIO GPIO
- degradation bug
-Message-ID: <c6f5da79-df83-4fad-9bfc-6fd45940d10f@lunn.ch>
-References: <20241122224829.457786-1-asmaa@nvidia.com>
- <7c7e94dc-a87f-425b-b833-32e618497cf8@lunn.ch>
- <CH3PR12MB7738C758D2A87A9263414AFBD78BA@CH3PR12MB7738.namprd12.prod.outlook.com>
- <6e3435a0-b04e-44cc-9e9d-981a8e9c3165@lunn.ch>
- <CH3PR12MB7738C25C6403C3C29538DA4BD78BA@CH3PR12MB7738.namprd12.prod.outlook.com>
- <CH3PR12MB773870BA2AA47223FF9A72D7D745A@CH3PR12MB7738.namprd12.prod.outlook.com>
- <668cd20c-3863-4d16-ab05-30399e4449f6@lunn.ch>
- <CH3PR12MB7738E1776CD326A2566254D5D740A@CH3PR12MB7738.namprd12.prod.outlook.com>
+	s=arc-20240116; t=1751491784; c=relaxed/simple;
+	bh=fE62hdLk6to/S3vrqlzE6dTuyTkFSPn3RG8SWSrYAG8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=JcDhfN9s2b9XI2MbJ66EaHZsWLHn6SXq5MQh7fV/NvXhMr/4JnmrfpAUpMkMblZJXXXi9/dfJYbIX3mJeXGpWmUMq7sfJM14QMqWCiWiKlW7j1udAzTuqJ5WhWQvTr8SrjBB9pQWVjwtsslXssSuZD1YmhqdAS05Ebnq2RZz/3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e+TuWppp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F017EC4CEE7;
+	Wed,  2 Jul 2025 21:29:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751491784;
+	bh=fE62hdLk6to/S3vrqlzE6dTuyTkFSPn3RG8SWSrYAG8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=e+TuWpppAqOInfDEJdwi2gUsj/uG/5bnzmNFEZvmsa8h0ix4gc+K+FrEhktLNoRfL
+	 Fo5lEaliGlPt+OfUOQKVNGDAiF4SlIh16N9LCN4FpeJ3iQTy/vmMabWvOzg5CM8n/i
+	 /706Z21I0uqLmjfZzdK+N2HLSEOKx0T0TsAx1tyf6xar/nzuM+jQiYWIodfonlna80
+	 MdAqn1EtqKGvSgr0YunR2EuEOCdraKuaPri5rpYtahfMIJQX8rnXiscgEMU6jBVs94
+	 W07n5Lso7IHs8BuXpTW57qV5/nZzOstuKUJVCq4umbNzPkgwM6cja7Sa799ZMFgy0s
+	 MlnaTA+F81M5A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE4A1383B273;
+	Wed,  2 Jul 2025 21:30:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CH3PR12MB7738E1776CD326A2566254D5D740A@CH3PR12MB7738.namprd12.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] net: thunderbolt: Fix the parameter passing of
+ tb_xdomain_enable_paths()/tb_xdomain_disable_paths()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175149180851.869841.2113483295411512857.git-patchwork-notify@kernel.org>
+Date: Wed, 02 Jul 2025 21:30:08 +0000
+References: <20250628094920.656658-1-zhangjianrong5@huawei.com>
+In-Reply-To: <20250628094920.656658-1-zhangjianrong5@huawei.com>
+To: zhangjianrong <zhangjianrong5@huawei.com>
+Cc: michael.jamet@intel.com, mika.westerberg@linux.intel.com,
+ YehezkelShB@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ guhengsheng@hisilicon.com, caiyadong@huawei.com, xuetao09@huawei.com,
+ lixinghang1@huawei.com
 
-> > You need to put the MDIO bus device into its own pm_domain. Try
-> > calling dev_pm_domain_set() to separate the MDIO bus from the MAC
-> > driver in terms of power domains. ethtool will then power on/off the
-> > MAC but leave the MDIO bus alone.
-> > 
+Hello:
 
-> Using dev_pm_domain_set() has the same effect as SET_RUNTIME_PM_OPS. The dev struct is shared so ethtool is still calling the suspend/resume.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sat, 28 Jun 2025 17:49:20 +0800 you wrote:
+> According to the description of tb_xdomain_enable_paths(), the third
+> parameter represents the transmit ring and the fifth parameter represents
+> the receive ring. tb_xdomain_disable_paths() is the same case.
 > 
-> int mlxbf_gige_mdio_probe(struct platform_device *pdev, struct mlxbf_gige *priv)
->  {
->         struct device *dev = &pdev->dev;
-> @@ -390,14 +418,27 @@ int mlxbf_gige_mdio_probe(struct platform_device *pdev, struct mlxbf_gige *priv)
->         snprintf(priv->mdiobus->id, MII_BUS_ID_SIZE, "%s",
->                  dev_name(dev));
+> Fixes: ff7cd07f3064 ("net: thunderbolt: Enable DMA paths only after rings are enabled")
+> Signed-off-by: zhangjianrong <zhangjianrong5@huawei.com>
 > 
-> +       pm_runtime_set_autosuspend_delay(priv->mdiobus->parent, 100);
-> +       pm_runtime_use_autosuspend(priv->mdiobus->parent);
+> [...]
 
-Why parent?
+Here is the summary with links:
+  - [v2] net: thunderbolt: Fix the parameter passing of tb_xdomain_enable_paths()/tb_xdomain_disable_paths()
+    https://git.kernel.org/netdev/net-next/c/8ec31cb17cd3
 
-	Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
