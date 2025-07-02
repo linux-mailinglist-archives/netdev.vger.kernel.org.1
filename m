@@ -1,111 +1,236 @@
-Return-Path: <netdev+bounces-203101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9C1BAF0831
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 03:57:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57D7DAF0837
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 04:00:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DB841C0453B
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 01:58:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52D2F441E5D
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 01:59:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A991F6F2F2;
-	Wed,  2 Jul 2025 01:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADD77101DE;
+	Wed,  2 Jul 2025 02:00:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AF3dY6Es"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RiE2Gdx1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8D93C26
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 01:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFE0151991
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 02:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751421467; cv=none; b=jUaWmOiA9ml1w8/NaGfsf4jzjK00/hDVvDy/owou5QPlTN6w43412hC4jR2R+BVsfUcMIF3C+OIb81fX6GSQgxRyE8rv/dPtHU6vsSwmWrJGeMF917HoNuXEUiPh5siTC6KvjOJLTlDJ1rUuk0GsPUUMPC1NKZsAgtUrx0O2KL4=
+	t=1751421616; cv=none; b=Jj0eKykznZY6+Wr/51XYyXiqI2yCZwBo0jjFeyy2fhXWaC83ASmh8myuiiFvA3SIHF/n7BsRqXOkSzUiuGB7mexbJtX2rgmTHROxeKG67HR2YZiwkqzjsKF/xGv8hLFakrZJNjoSxChbySCeSJxIW7h7JlS1gEMi3Y+UlBopU4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751421467; c=relaxed/simple;
-	bh=cFFcBlQNl5BO18LLVynByenciNWzHkVZIR8XGk05ijo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=paSxbodsFCMev6v3kqAUEoYtO8XOKU2vNb89IgFnkuGMFSdOKGruAQyzgeM0ktBNokhsyIGeqmKzORcCV1TTltQNSsR4dzKdZBbAlfirVFW1wVei7dXl/vx7xE6l9sDvF/l8dNE/2tOdbfTBj+Cw0+dCAcVkgsenVbdsylvsfT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AF3dY6Es; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-234f17910d8so61227395ad.3
-        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 18:57:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751421465; x=1752026265; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ePiW7aqYD0qALSKskjMbzEKCrjQTfN8/Jlp9bJXKkFg=;
-        b=AF3dY6EsAngyRYjbXFbRMlbjNe76A1GlEZcwsLa7ElHB0Y47sEI28/e1NtZB9s/H/2
-         Tz1WvLfwa3QPyKHPh/8rFR/yXbnc/cXU7LDyMurvIvH8DxcLGvScqIbc4Cv+eiEYcohd
-         cq3EN05OjA03FCoVx9Vl07NIP37r4OAxkcC0YgyMmvhBIPKxjd5nNXD+X+zDeWVzYbBX
-         RMcpY2lP/ZeF81B8sCH1tsEWLlufmBYl021e8nRhdHCK4eOMhaQ0WvwfqkFf3csYK//Y
-         HR6hxKQn6mtKX9HDXtv6dLvYQP7joDpgz/6KEpkBrxMIXgeHfKn2/mRdcxGf4v5ronX7
-         SMMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751421465; x=1752026265;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ePiW7aqYD0qALSKskjMbzEKCrjQTfN8/Jlp9bJXKkFg=;
-        b=fMu1zoO8h9Fje1RrKl5yC5njmzD+4xkNAA45X1e4OYlBOWT4v7zeLiTZadyZCdBmNZ
-         GXlIa/xNCVP8cYj0I/nc+CUl8XZeTVo0KEzcF8Up4NQat3JINmxvh3aiIDkS/l2fgPp5
-         oLO9hb6/PXdN2muumTvOERKcdvy868Fw/W1RAl0pZ13sCClrVgIX0Iu15hCqSZhb0NxW
-         zQJtZpA12Tm0l2TEtprnT1nt+W0Ch+monevvVIEFPU/QKx4M3N2j1YCypcvdTESiTIYt
-         p8jxKLK3U7vG/SJwIVM7tYrdOuAmbDfliqsr7H/1YxXgQsV+2fDACRaKXKSZxnp+yY/N
-         Abwg==
-X-Gm-Message-State: AOJu0Yyh+g3cmGKE5VZxGglK8NxCjyL+oICgAEQzi++0Hh78PxLuRWSd
-	kTrJtH/RSMqpsxpHQsQ9ukE+22piU1gWHkUgHqGTTe/uC09nb2vO7DvFFcy5zg==
-X-Gm-Gg: ASbGncuwPI8tE6qS639jEDy1cISoEL9AltwrcPrQuGWb2eYUx/lPyvjRgTgAdDRrZ+C
-	Sa6BsaJapMDGqZ/ntYbp1G4h/1Ojx1J2GJjUKSsfn0DUMHCcZ82L6i0/Fzb6r4/U+0KOgQ33sY/
-	NEcwv2QSGBRn/EFP9pZNhcTcdF01bWyhrC0KlNlDVpXDLXXT+/3zAMCSO5YRSIxW5SL16oTd8pz
-	L1/DUM0IIZ/de0jD5jqQGfDQjDpY2UHIh1F/baqvvC1saJ/e1UttjRFRJFNRlMYlQO8OXvXocjW
-	sJ1WH9+tnEs/aqA63hpA+2uqPB6tj8ZEocDJhpIdzVl3WJAh0MuvC8H7E+S0FhRiwtc0
-X-Google-Smtp-Source: AGHT+IERmsDWxCjPaUAp1AZ6+tQ5smCfiuNr1HoxJGLkMM7NcMDn1/4rY/lZpgdyKctUzC1u9/L9iA==
-X-Received: by 2002:a17:902:ce05:b0:235:f3df:bc26 with SMTP id d9443c01a7336-23c6e56165cmr10625535ad.3.1751421464972;
-        Tue, 01 Jul 2025 18:57:44 -0700 (PDT)
-Received: from localhost ([2601:647:6881:9060:9468:b035:3d01:25e5])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb3acc62sm124267655ad.143.2025.07.01.18.57.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jul 2025 18:57:44 -0700 (PDT)
-Date: Tue, 1 Jul 2025 18:57:43 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com, will@willsroot.io, stephen@networkplumber.org,
-	Savino Dicanosa <savy@syst3mfailure.io>
-Subject: Re: [Patch net 1/2] netem: Fix skb duplication logic to prevent
- infinite loops
-Message-ID: <aGSSF7K/M81Pjbyz@pop-os.localdomain>
-References: <20250701231306.376762-1-xiyou.wangcong@gmail.com>
- <20250701231306.376762-2-xiyou.wangcong@gmail.com>
+	s=arc-20240116; t=1751421616; c=relaxed/simple;
+	bh=mNL+vL+xN7bDVuRbaJlPg1tSMlXvcNCBR6ykGypA0R4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n4k/B5fP+IHg0BCHeU0kKr9Gt8LMKC418Fbxuz6va6UkKq/wNX4Eu2gNYBehOxO/y7qur+HdPQ8gDVYQ1Z1rQntfLsHXdib3OeVfAfLAyWKCUB53iBlJNPVRyRMJaCtQGIHBz6fqn+XJdaqrozUn5U7bKYeVIwFQflScl357IKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RiE2Gdx1; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <15ba0933-b0c1-40eb-9d3c-d8837d6ee12a@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751421601;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aKL1FF4hap74WWQz6H6EMD4nNxNTcrjgixOQ6nf32eM=;
+	b=RiE2Gdx1GgXM790DtELGwOhTrItveIzucm7gfHPjoIySLpLc8uXMdXgMbBgMGVFdR2oiPa
+	ZE/7qEHeI0xkLU5TEopXi/q4uCnVDLWJtMiXIoPqwdBooQY0oQ0+BgREr1zLdI0YFaEH6o
+	d8d2D072jp8C+wwdjrBY/r0AvtCnuzk=
+Date: Wed, 2 Jul 2025 09:59:52 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250701231306.376762-2-xiyou.wangcong@gmail.com>
+Subject: Re: [PATCH RFT net-next 02/10] net: stmmac: Add support for Allwinner
+ A523 GMAC200
+To: Chen-Yu Tsai <wens@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+ Jernej Skrabec <jernej@kernel.org>, Samuel Holland <samuel@sholland.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>
+References: <20250701165756.258356-1-wens@kernel.org>
+ <20250701165756.258356-3-wens@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yanteng Si <si.yanteng@linux.dev>
+In-Reply-To: <20250701165756.258356-3-wens@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jul 01, 2025 at 04:13:05PM -0700, Cong Wang wrote:
-> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> index fdd79d3ccd8c..33de9c3e4d1b 100644
-> --- a/net/sched/sch_netem.c
-> +++ b/net/sched/sch_netem.c
-> @@ -460,7 +460,8 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
->  	skb->prev = NULL;
->  
->  	/* Random duplication */
-> -	if (q->duplicate && q->duplicate >= get_crandom(&q->dup_cor, &q->prng))
-> +	if (tc_skb_cb(skb)->duplicate &&
+在 7/2/25 12:57 AM, Chen-Yu Tsai 写道:
+> From: Chen-Yu Tsai <wens@csie.org>
+> 
+> The Allwinner A523 SoC family has a second Ethernet controller, called
+> the GMAC200 in the BSP and T527 datasheet, and referred to as GMAC1 for
+> numbering. This controller, according to BSP sources, is fully
+> compatible with a slightly newer version of the Synopsys DWMAC core.
+> The glue layer around the controller is the same as found around older
+> DWMAC cores on Allwinner SoCs. The only slight difference is that since
+> this is the second controller on the SoC, the register for the clock
+> delay controls is at a different offset. Last, the integration includes
+> a dedicated clock gate for the memory bus and the whole thing is put in
+> a separately controllable power domain.
+> 
+> Add a new driver for this hardware supporting the integration layer.
+> 
+> Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+> ---
+>   drivers/net/ethernet/stmicro/stmmac/Kconfig   |  12 ++
+>   drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+>   .../ethernet/stmicro/stmmac/dwmac-sun55i.c    | 161 ++++++++++++++++++
+>   3 files changed, 174 insertions(+)
+>   create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> index 67fa879b1e52..38ce9a0cfb5b 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> @@ -263,6 +263,18 @@ config DWMAC_SUN8I
+>   	  stmmac device driver. This driver is used for H3/A83T/A64
+>   	  EMAC ethernet controller.
+>   
+> +config DWMAC_SUN55I
+> +	tristate "Allwinner sun55i GMAC200 support"
+> +	default ARCH_SUNXI
+> +	depends on OF && (ARCH_SUNXI || COMPILE_TEST)
+> +	select MDIO_BUS_MUX
+> +	help
+> +	  Support for Allwinner A523/T527 GMAC200 ethernet controllers.
+> +
+> +	  This selects Allwinner SoC glue layer support for the
+> +	  stmmac device driver. This driver is used for A523/T527
+> +	  GMAC200 ethernet controller.
+> +
+>   config DWMAC_THEAD
+>   	tristate "T-HEAD dwmac support"
+>   	depends on OF && (ARCH_THEAD || COMPILE_TEST)
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
+> index b591d93f8503..51e068e26ce4 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/Makefile
+> +++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
+> @@ -31,6 +31,7 @@ obj-$(CONFIG_DWMAC_STI)		+= dwmac-sti.o
+>   obj-$(CONFIG_DWMAC_STM32)	+= dwmac-stm32.o
+>   obj-$(CONFIG_DWMAC_SUNXI)	+= dwmac-sunxi.o
+>   obj-$(CONFIG_DWMAC_SUN8I)	+= dwmac-sun8i.o
+> +obj-$(CONFIG_DWMAC_SUN55I)	+= dwmac-sun55i.o
+>   obj-$(CONFIG_DWMAC_THEAD)	+= dwmac-thead.o
+>   obj-$(CONFIG_DWMAC_DWC_QOS_ETH)	+= dwmac-dwc-qos-eth.o
+>   obj-$(CONFIG_DWMAC_INTEL_PLAT)	+= dwmac-intel-plat.o
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c
+> new file mode 100644
+> index 000000000000..7fadb90e3098
+> --- /dev/null
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun55i.c
+> @@ -0,0 +1,161 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * dwmac-sun55i.c - Allwinner sun55i GMAC200 specific glue layer
+> + *
+> + * Copyright (C) 2025 Chen-Yu Tsai <wens@csie.org>
+> + *
+> + * syscon parts taken from dwmac-sun8i.c, which is
+> + *
+> + * Copyright (C) 2017 Corentin Labbe <clabbe.montjoie@gmail.com>
+> + */
+> +
+> +#include <linux/bitfield.h>
+> +#include <linux/bits.h>
+> +#include <linux/mfd/syscon.h>
+> +#include <linux/module.h>
+> +#include <linux/of.h>
+> +#include <linux/phy.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/regmap.h>
+> +#include <linux/regulator/consumer.h>
+> +#include <linux/stmmac.h>
+> +
+> +#include "stmmac.h"
+> +#include "stmmac_platform.h"
+> +
+> +#define SYSCON_REG		0x34
+> +
+> +/* RMII specific bits */
+> +#define SYSCON_RMII_EN		BIT(13) /* 1: enable RMII (overrides EPIT) */
+insert a blankline.
+> +/* Generic system control EMAC_CLK bits */
+> +#define SYSCON_ETXDC_MASK		GENMASK(12, 10)
+> +#define SYSCON_ERXDC_MASK		GENMASK(9, 5)
+ditto.
+> +/* EMAC PHY Interface Type */
+> +#define SYSCON_EPIT			BIT(2) /* 1: RGMII, 0: MII */
+> +#define SYSCON_ETCS_MASK		GENMASK(1, 0)
+> +#define SYSCON_ETCS_MII		0x0
+> +#define SYSCON_ETCS_EXT_GMII	0x1
+> +#define SYSCON_ETCS_INT_GMII	0x2
+> +
+> +#define MASK_TO_VAL(mask)   ((mask) >> (__builtin_ffsll(mask) - 1))
+> +
+> +static int sun55i_gmac200_set_syscon(struct device *dev,
+> +				     struct plat_stmmacenet_data *plat)
+> +{
+> +	struct device_node *node = dev->of_node;
+> +	struct regmap *regmap;
+> +	u32 val, reg = 0;
+> +
+> +	regmap = syscon_regmap_lookup_by_phandle(node, "syscon");
+> +	if (IS_ERR(regmap))
+> +		return dev_err_probe(dev, PTR_ERR(regmap), "Unable to map syscon\n");
+> +
+-----------
+> +	if (!of_property_read_u32(node, "allwinner,tx-delay-ps", &val)) {
+> +		if (val % 100) {
+> +			dev_err(dev, "tx-delay must be a multiple of 100\n");
+> +			return -EINVAL;
+> +		}
+> +		val /= 100;
+> +		dev_dbg(dev, "set tx-delay to %x\n", val);
+> +		if (val > MASK_TO_VAL(SYSCON_ETXDC_MASK))
+> +			return dev_err_probe(dev, -EINVAL,
+> +					     "Invalid TX clock delay: %d\n",
+> +					     val);
+> +
+> +		reg |= FIELD_PREP(SYSCON_ETXDC_MASK, val);
+> +	}
+> +
+> +	if (!of_property_read_u32(node, "allwinner,rx-delay-ps", &val)) {
+> +		if (val % 100) {
+> +			dev_err(dev, "rx-delay must be a multiple of 100\n");
+> +			return -EINVAL;
+> +		}
+> +		val /= 100;
+> +		dev_dbg(dev, "set rx-delay to %x\n", val);
+> +		if (val > MASK_TO_VAL(SYSCON_ERXDC_MASK))
+> +			return dev_err_probe(dev, -EINVAL,
+> +					     "Invalid RX clock delay: %d\n",
+> +					     val);
+> +
+> +		reg |= FIELD_PREP(SYSCON_ERXDC_MASK, val);
+> +	}
+------------
+These two parts of the code are highly similar.
+Can you construct a separate function?
+> +
+> +	switch (plat->mac_interface) {
 
-Oops, this is clearly should be !duplicate... It was lost during my
-stupid copy-n-paste... Sorry for this mistake.
+> +	case PHY_INTERFACE_MODE_MII:
+> +		/* default */
+> +		break;
+This line of comment seems a bit abrupt here.
 
-I will send v2 after waiting for other feedback.
 
-Thanks.
+Thanks,
+Yanteng
 
