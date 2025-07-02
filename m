@@ -1,137 +1,209 @@
-Return-Path: <netdev+bounces-203407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 397F9AF5CEB
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 17:27:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F4B4AF5D4D
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 17:38:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8301916BB87
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 15:27:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CBF41883F57
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 15:35:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC372F198D;
-	Wed,  2 Jul 2025 15:26:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD4C33196C5;
+	Wed,  2 Jul 2025 15:28:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qO0k6M2w"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kC4dKTZw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7C3288C97
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 15:26:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B7D3196B0
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 15:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751470003; cv=none; b=fyWpqBEOS67p3HnoA76QFb0DP0s6YC9huK608omqzaD6cnYxu/7dgXqgcZNRatAl+lycJ15T8k7LG28YCDubYwsLBmaYpG9X0RyZgk5yRBnCTRSDbOU7dGNwYyTrmtBXuOW0O6O0tP4FnQ3wGZ2XrvRfEQdLkZgQmaOo1/GbXBI=
+	t=1751470092; cv=none; b=Fu34Gbbws/JmzEy46fW1ms73Oej0y5HoF2EU588ofoj6Rr25x3i5hQIQbg8EEiIZeITvOQux6aK34T8BS4cbTpNxnSFYXHhQ+3q7z0vvwr1tVXbKsIJOTL1pfQIeuG4Wgc2ekF7FBPRY/bKAxZDvWHHmesBXP/gsJd7PHKzalhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751470003; c=relaxed/simple;
-	bh=yTwTjAEsqE8rj045/ciU4b52UtCHhuYIPzLwtPO2e/I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Z/S98RwJrg3kPSkoU3tqh5OdnidGu2duxjlXUH4dSUx6LyfMXhzT1ThfRyH2b18o5tz/btpv8OFPgThY6Ykzpbw0tZ79OqP1PhNxIvDllbq/4cck+IQXFOjXdsjmMo8QfoEIJux+SH9GuojWgSXjUi9igwFj35ajjv/Q35Fzr1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qO0k6M2w; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4a98208fa69so202361cf.1
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 08:26:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751470000; x=1752074800; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TCPXcNK+DUyogAPJxVpc3HAuduDHqfqUzIGLlK3xdwQ=;
-        b=qO0k6M2wEE0hfRDZm10j2qfUrNqLLa+SjG6m2Cz1GqSMLtbQXkt93fygg4dow70V6K
-         ZzXcE4rdHZtrNC6jAd3QbkNjJSjSEEo9AhTKvA6DXDKaI2wdRtKVIXno1OYyV7lSitkF
-         djWXeGXfPy6TydK2v3q5rHtm1njjalTzl1EW+9QoOzDwNtDjwf/T2Qtj2E2rIvtv1Sty
-         g+vmh9Sp4lRwQEiVNvJGDxngVAt6SbxzkKisNL0WjNL5aXdildWszBBnhlEVimvMJ+gw
-         SUgcSNTslYTo0mlmzi8oZfMiCqpSWSK3x1Ii2ajqXIKQmNBjQbxvmlWmmk43PCDWHfqK
-         iQQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751470000; x=1752074800;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TCPXcNK+DUyogAPJxVpc3HAuduDHqfqUzIGLlK3xdwQ=;
-        b=K36ozvbkwkVyt1q31CND2xIXmFqPeujpRuwjtDj4dqu29RrNj2utwtWMfT7MwBmhJz
-         3VzCR1qJJpaMe0N21NS+EX4q0vve9okdgy4etrEj5bDM+MArXmZMuSN1mWBfk+hilO8D
-         80r0tF0c6zOqiVr9SWUZs0U9MbjgWaX8CtVpKYRzjF9nGgIypBXdq03H7cyIu2Ds5Euw
-         0+pudI9GxhtMNxY/iW/xBwn/IRConbvP3nJk/EgPd1AdKGjuAOm+A7EVM0uzk9XV8qB6
-         ip3q5qGzpOxtzkau3zBiC/aY6usEZSAmtyUBSuZmJmHKmq09M/ceR9N0uP9nEU0VhP/a
-         Yk0Q==
-X-Gm-Message-State: AOJu0YyhjklHdQRjTIwxv7wyh7UJaU0nPAtXlEqBTQsDxD1yQOVCFCSZ
-	khJuzGi8505oOXe2hTYfaswbo92ZC9P2HvLgdJYrGl7y7bzduJ42Ty/AkC1JjGcOIYdt7H6SJlP
-	fihMNJx8vibXQhGg0a1bnyUSqnZ/qsX66kF9ij0fM
-X-Gm-Gg: ASbGnct6TU1FQ0uFj25SykodcNH5fjrH+on+/05Mt3l8zKhkulc/cUXsBOSXRyjoIzB
-	l7jPyca+umQ0DJqsI1Se5kszLvfcc0oUqtW9LOzKMN2DVEywEmd8Di/+bXy477SoxVQSm63S6uV
-	Mq3HpxsAnEK7vmhRDHGXiW4YpDhaWfIH0OibnqyJRr8Q==
-X-Google-Smtp-Source: AGHT+IH6CmHt8lPy9XENkmI+GA/Cv+r7CIhuq+Az9ScfxiFnyCFfXb99vMuNSbCmH6thvLn8wp9cASXm/JqpECT2UKc=
-X-Received: by 2002:a05:622a:4a0b:b0:4a8:191f:1893 with SMTP id
- d75a77b69052e-4a9781a6c80mr46335991cf.26.1751469999922; Wed, 02 Jul 2025
- 08:26:39 -0700 (PDT)
+	s=arc-20240116; t=1751470092; c=relaxed/simple;
+	bh=toA1Z/HEzEC87vvHzwP53jgQyCAQTPKIkkCux8WahSA=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=Z9r26EzZD92Bq/VxKfFe6uPBVu+QcfnJ2iOy8CHhtlwIbFQIUvmGnwAcdzskKPQQPOWubDeP4bJXrsIEN3ZsHe8NzmtD14l6lfhxanfjqNZAGSwXCaWtArbb3I8or6fMXRhaA8EGelG8R5Tq0MEenciwe1py7s0Ki2yAqtueS1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kC4dKTZw; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250702141515.9414-1-oscmaes92@gmail.com>
-In-Reply-To: <20250702141515.9414-1-oscmaes92@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 2 Jul 2025 08:26:28 -0700
-X-Gm-Features: Ac12FXzRVX_eX2sqMm4YSTrDpzTWZI16IKpRrmn5eNbVSJYT11OpAEK61oHliW8
-Message-ID: <CANn89iK0Hu6CZQ=76+z6p-TPY4bTmEQh9SAgLu-==zNB9RrWMQ@mail.gmail.com>
-Subject: Re: [PATCH net] net: ipv4: fix incorrect MTU in broadcast routes
-To: Oscar Maes <oscmaes92@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, stable@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751470078;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j37gTI83G/0npP0vUifckHIJRdF1qjNhI6E7oZQqNe0=;
+	b=kC4dKTZwI8kVcBTPiULB/3Z1bTjznXesHizU2OBZDrOWKE+8E0ZCWvdtSkmYGE+WsQTBFo
+	ROoEoxz3FgmIkC711b2kv6tqHY7tExrnI2gvGqPhkvZ78pyYIB9sK+6qLW5oEsSARImbzk
+	6ETnWVuy1ZP6hN7cALaosa06Nnvb22Q=
+Date: Wed, 02 Jul 2025 15:27:56 +0000
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <c910cfc4b58e9e2e1ceaca9d4dc7d68b679caa48@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH net-next v1] tcp: Correct signedness in skb remaining
+ space calculation
+To: "Eric Dumazet" <edumazet@google.com>
+Cc: netdev@vger.kernel.org, mrpre@163.com, "Neal Cardwell"
+ <ncardwell@google.com>, "Kuniyuki Iwashima" <kuniyu@google.com>, "David
+ S. Miller" <davem@davemloft.net>, "David Ahern" <dsahern@kernel.org>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Simon Horman" <horms@kernel.org>, "David Howells" <dhowells@redhat.com>,
+ linux-kernel@vger.kernel.org
+In-Reply-To: <CANn89iJD6ZYCBBT_qsgm_HJ5Xrups1evzp9ej=UYGP5sv6oG_A@mail.gmail.com>
+References: <20250702110039.15038-1-jiayuan.chen@linux.dev>
+ <c9c5d36bc516e70171d1bb1974806e16020fbff1@linux.dev>
+ <CANn89iJdGZq0HW3+uGLCMtekC7G5cPnHChCJFCUhvzuzPuhsrA@mail.gmail.com>
+ <CANn89iJD6ZYCBBT_qsgm_HJ5Xrups1evzp9ej=UYGP5sv6oG_A@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jul 2, 2025 at 7:15=E2=80=AFAM Oscar Maes <oscmaes92@gmail.com> wro=
+July 2, 2025 at 22:02, "Eric Dumazet" <edumazet@google.com> wrote:
+
+
+
+>=20
+>=20On Wed, Jul 2, 2025 at 6:59 AM Eric Dumazet <edumazet@google.com> wro=
 te:
+>=20
+>=20>=20
+>=20> On Wed, Jul 2, 2025 at 6:42 AM Jiayuan Chen <jiayuan.chen@linux.dev=
+> wrote:
+> >=20
+>=20>  July 2, 2025 at 19:00, "Jiayuan Chen" <jiayuan.chen@linux.dev> wro=
+te:
+> >=20
+>=20>  >
+> >=20
+>=20>  > The calculation for the remaining space, 'copy =3D size_goal - s=
+kb->len',
+> >=20
+>=20>  >
+> >=20
+>=20>  > was prone to an integer promotion bug that prevented copy from e=
+ver being
+> >=20
+>=20>  >
+> >=20
+>=20>  > negative.
+> >=20
+>=20>  >
+> >=20
+>=20>  > The variable types involved are:
+> >=20
+>=20>  >
+> >=20
+>=20>  > copy: ssize_t (long)
+> >=20
+>=20>  >
+> >=20
+>=20>  > size_goal: int
+> >=20
+>=20>  >
+> >=20
+>=20>  > skb->len: unsigned int
+> >=20
+>=20>  >
+> >=20
+>=20>  > Due to C's type promotion rules, the signed size_goal is convert=
+ed to an
+> >=20
+>=20>  >
+> >=20
+>=20>  > unsigned int to match skb->len before the subtraction. The resul=
+t is an
+> >=20
+>=20>  >
+> >=20
+>=20>  > unsigned int.
+> >=20
+>=20>  >
+> >=20
+>=20>  > When this unsigned int result is then assigned to the s64 copy v=
+ariable,
+> >=20
+>=20>  >
+> >=20
+>=20>  > it is zero-extended, preserving its non-negative value. Conseque=
+ntly,
+> >=20
+>=20>  >
+> >=20
+>=20>  > copy is always >=3D 0.
+> >=20
+>=20>  >
+> >=20
+>=20>  To better explain this problem, consider the following example:
+> >=20
+>=20>  '''
+> >=20
+>=20>  #include <sys/types.h>
+> >=20
+>=20>  #include <stdio.h>
+> >=20
+>=20>  int size_goal =3D 536;
+> >=20
+>=20>  unsigned int skblen =3D 1131;
+> >=20
+>=20>  void main() {
+> >=20
+>=20>  ssize_t copy =3D 0;
+> >=20
+>=20>  copy =3D size_goal - skblen;
+> >=20
+>=20>  printf("wrong: %zd\n", copy);
+> >=20
+>=20>  copy =3D size_goal - (ssize_t)skblen;
+> >=20
+>=20>  printf("correct: %zd\n", copy);
+> >=20
+>=20>  return;
+> >=20
+>=20>  }
+> >=20
+>=20>  '''
+> >=20
+>=20>  Output:
+> >=20
+>=20>  '''
+> >=20
+>=20>  wrong: 4294966701
+> >=20
+>=20>  correct: -595
+> >=20
+>=20>  '''
+> >=20
+>=20>  Can you explain how one skb could have more bytes (skb->len) than =
+size_goal ?
+> >=20
+>=20>  If we are under this condition, we already have a prior bug ?
+> >=20
+>=20>  Please describe how you caught this issue.
+> >=20
+>=20
+> Also, not sure why copy variable had to be changed from "int" to "ssize=
+_t"
+>=20
+>=20A nicer patch (without a cast) would be to make it an "int" again/
 >
-> Currently, __mkroute_output overrules the MTU value configured for
-> broadcast routes.
->
-> This buggy behaviour can be reproduced with:
->
-> ip link set dev eth1 mtu 9000
-> ip route del broadcast 192.168.0.255 dev eth1 proto kernel scope link src=
- 192.168.0.2
-> ip route add broadcast 192.168.0.255 dev eth1 proto kernel scope link src=
- 192.168.0.2 mtu 1500
->
-> The maximum packet size should be 1500, but it is actually 8000:
->
-> ping -b 192.168.0.255 -s 8000
 
-Looks sane to me, but could you add a test in tools/testing/selftests/net ?
+I encountered this issue because I had tcp_repair enabled, which uses
+tcp_init_tso_segs to reset the MSS.
+However, it seems that tcp_bound_to_half_wnd also dynamically adjusts
+the value to be smaller than the current size_goal.
 
-
-
->
-> Fix __mkroute_output to allow MTU values to be configured for
-> for broadcast routes (to support a mixed-MTU local-area-network).
->
-> Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
-> ---
->  net/ipv4/route.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-> index fccb05fb3..a2a3b6482 100644
-> --- a/net/ipv4/route.c
-> +++ b/net/ipv4/route.c
-> @@ -2585,7 +2585,6 @@ static struct rtable *__mkroute_output(const struct=
- fib_result *res,
->         do_cache =3D true;
->         if (type =3D=3D RTN_BROADCAST) {
->                 flags |=3D RTCF_BROADCAST | RTCF_LOCAL;
-> -               fi =3D NULL;
->         } else if (type =3D=3D RTN_MULTICAST) {
->                 flags |=3D RTCF_MULTICAST | RTCF_LOCAL;
->                 if (!ip_check_mc_rcu(in_dev, fl4->daddr, fl4->saddr,
-> --
-> 2.39.5
->
+Looking at the commit history, it's indeed unnecessary to define the
+copy variable as type ssize_t.
 
