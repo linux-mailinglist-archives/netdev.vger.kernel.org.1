@@ -1,134 +1,78 @@
-Return-Path: <netdev+bounces-203380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 018BEAF5AE1
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 16:16:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77F43AF5B01
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 16:23:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 151934A451F
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:15:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B50531C40332
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:23:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABC62EA494;
-	Wed,  2 Jul 2025 14:15:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 637D82F5308;
+	Wed,  2 Jul 2025 14:23:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NqnGC/ha"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rl+gbvA6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7E12E92A9;
-	Wed,  2 Jul 2025 14:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C38E1F5820;
+	Wed,  2 Jul 2025 14:23:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751465746; cv=none; b=CvDRCf1EMG8YjVR/Yw2MIP1TmFs8XTGDc+a1gh9tnaSKf5Ey2PEhUCXORB72t5l7eMS8Dw0Cds3p3r7VjlMPO+IYcxK1r1osVTMcwIuRXd1F5udRFcJf02p6Z2rs6F2ykn2+ywFP9tHPo9Glh37K8ZX8oe9+g8P4NDRsJAyQvNU=
+	t=1751466183; cv=none; b=gEVzZM9P/LKPgXGiBat9R9ItkdaAj5/PtAGIBq+nob7eJQnxuTiJVcWD61RyARlpjH/d4SF+ZDBKMD7Ry8BeAJB8jVK2m+naXtEKsrYQ1zqHfuO5xqfTk5btF7AABX7FBA/xQBYz0g3zAJaEWLQZzFYfQzgCsx+8npbbXitMNvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751465746; c=relaxed/simple;
-	bh=hgVRR0PR/ckdvyIGS+3hX9AlKTj2YA2xeoGPQSp3j2U=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=IZ5A8/3qs9brtsmC6g6kt4o9tfvXmYt/bcIrvXEzVFKxzqQzC8q1wC5ZZTXspLj0ZX1ErQdSnuRe532enqpRawJ/MjZ+drMPbKXiPAOYP7+Hqc2ZSWxYDxKy4JrWU0DyyhOis92L9mSVqaoC1+VrdFpup+oCb/fwHO9RmyGLzxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NqnGC/ha; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-450cf0120cdso45878185e9.2;
-        Wed, 02 Jul 2025 07:15:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751465743; x=1752070543; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=aRZoP19mVo+xouu+rD216ylrbdoQ3y6C2mRJgbjte3E=;
-        b=NqnGC/hafxF8eNkpoGDhrJ4+tPwPj1Ax+5kt4hyHS/rGmNZfEGnZiXEFU+nJYEpFoL
-         P4vg6JVSxCSyV9N8ig/F9jr/iQmyWktCL7IOuEkP6xm69MBVCQTtxMMIZ1GCoFnYhnTQ
-         tctfcmFueMaIlqTFo6a8ROghh/PFm5BYMFxIBUjySRhIycJHYxtcdgLO0leRnKz8kjYQ
-         eTGrVkXFu/6gjptbooXGrwomIs3c7+NVBQn/ncpNvImTLDRcfhb9rqOtR3yOiUfUQmzE
-         hzj6tL9IP+ihXXH5ThxQyHq8fi8aUacUbIE2gA7jMP8wGoEN2L2oTAOstOx7YpAbQ1CN
-         Jerg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751465743; x=1752070543;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aRZoP19mVo+xouu+rD216ylrbdoQ3y6C2mRJgbjte3E=;
-        b=S0Txyx9lOmWoQdmV3rK3PK24puvX+feGNsp8gyhwfNwYIM7VFMbSbZv7RezyKWusYc
-         dmxF4YowsRERHHtP5TIQnke7IWzgjTfqpg/IY0U10ag4p+TO0YGstovEQEeh5nMyftZM
-         PoL0FTNOxINZ2smEa3QKrjRotPZLhcQ24e/CPv88a4WMlxc9ceJoqR2VXFSsZ8P1Hlrd
-         rSyRbRMjVpom9XkHTsq+RGhaE+kDa37BGUNuJFJ/2wXNmFMshVuf5Kv9Fsrc9AB4sptM
-         lne4gUWoD+ysESc0BH27+q98x1XMXJIBJyOdoy932a9Q1+AyeJ4eaL/XpUGz19S09uP0
-         5PqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUlWgGEIzUEtyJqYJRwM+7fnTu3fyNApoef/hP2SZbiM0ddjc6KzUvOwOTPiCE9ciWy+G53/jVRCP2Eltk=@vger.kernel.org, AJvYcCVreNWHzA0TxrZt1ucIRUNu4MofXIGNMT6vEKginxHz36kQ5sTnrvVvyXI9DdGIv2Bnhu2Uomcc@vger.kernel.org
-X-Gm-Message-State: AOJu0YwA/50wZGmT9hCwqziMS1MQUnSQzb3qPTGLyu7bbA8+/kZUvtJa
-	paQWzdBnM7PylpepalbAo5Qz3cjPR0F0bdtesB6qmemlTGUCAVVo5iEluVgzW5GI
-X-Gm-Gg: ASbGncvHrBdeTUDdQ7zTklvwu4F+dWeFKWLriNxmd0DEm+LcOPzyrpzynv/7hWeD6w8
-	OTfjmyJ1bkpgFqS/5pw5y+NzVznHs4/ayr6uxzPEy9URQIwgETDC7HYpDKqRpeljFa4u3BTuJZ6
-	VHfpciuv3uL4MgcJyvYIpLWroMrOgfw/eTmOoxq9Fa+aRos1s2td2UlZorgHM7MAy+z5nUHIPXf
-	eV4SuzY7hf7BXsq+Ie3HUrOkk30EIu/hz3THaX8bYpdSiCBj23X+mZPahLtSvqXlinxFBTyIiCE
-	znLwnoUB6L0dXSM0gxlmGxaXozGecNTh0AIwM3+IJmslM0nckfoFHfFuvboAXqdqK9nKv3tEBt4
-	=
-X-Google-Smtp-Source: AGHT+IGKvUHBAcdt7Y5rZZoCKXs2ZNpvgRwAwjxch2Y9eD+LU5/6F49qKav6+2grsiDSPNdbmoOjmQ==
-X-Received: by 2002:a05:600c:638e:b0:453:59c2:e4f8 with SMTP id 5b1f17b1804b1-454a36d80d6mr29507715e9.1.1751465742339;
-        Wed, 02 Jul 2025 07:15:42 -0700 (PDT)
-Received: from localhost.localdomain ([45.128.133.218])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4538a4215dbsm198343375e9.35.2025.07.02.07.15.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 07:15:41 -0700 (PDT)
-From: Oscar Maes <oscmaes92@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	stable@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Oscar Maes <oscmaes92@gmail.com>
-Subject: [PATCH net] net: ipv4: fix incorrect MTU in broadcast routes
-Date: Wed,  2 Jul 2025 16:15:15 +0200
-Message-Id: <20250702141515.9414-1-oscmaes92@gmail.com>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1751466183; c=relaxed/simple;
+	bh=MpfCbVO4W0VVtHSdd8YbHgo+NQbHc9Of4ZYZeV2J2zw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p0p6p4/IyIku2at93kJduzj0T7Pc1r6IdaaG+/2N387KLRoexDPquYVolnYygs6416jiWQMVmetx6IWjYGMCwtubCgkgHPy+ScioJXVyt6MZfkUd1cZcoq95jcHw10c1F6FtZS8i5sBtweiH2WgfAk71reh8VGw+FXBofVmcaZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rl+gbvA6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34ED4C4CEE7;
+	Wed,  2 Jul 2025 14:23:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751466182;
+	bh=MpfCbVO4W0VVtHSdd8YbHgo+NQbHc9Of4ZYZeV2J2zw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rl+gbvA6CfCQSBwjQ16wrT3SLKHGUqVW0d+NkC78yLIZaEmYRZFl0FUjjASWzSyzw
+	 LCUAwUb6rbNuVWpzV9miT+MQxYG4/IVFIboB0JbuREEWayEZ7gkundKQKdFkM1oCYb
+	 ro5hH2/7R2fAREHlaSlqb2aDAeh/S0kmPVLUnIocKrx7A8cCwnfWCxeEvr7oY3jEMn
+	 q4apu2IO/DoJVuQA+VRH/hVuPaPPFQKVHiHQwFonUXID27H73SPgMgIRcC1DcRnQ2y
+	 Nol38j+1hmM2j4MUbWwLqIDdtYq+3TYAogjLj3795PwE8N25cieGKpsrGwk9MeoqT4
+	 39xe36hW6EytQ==
+Date: Wed, 2 Jul 2025 07:23:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <andrew+netdev@lunn.ch>, <horms@kernel.org>, <shenjian15@huawei.com>,
+ <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
+ <jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+ <salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 0/4] There are some bugfix for the HNS3
+ ethernet driver
+Message-ID: <20250702072301.51deaf72@kernel.org>
+In-Reply-To: <f3994ddd-9b9b-4bbb-bba4-89f7b4ae07f7@huawei.com>
+References: <20250702125731.2875331-1-shaojijie@huawei.com>
+	<f3994ddd-9b9b-4bbb-bba4-89f7b4ae07f7@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Currently, __mkroute_output overrules the MTU value configured for
-broadcast routes.
+On Wed, 2 Jul 2025 21:07:19 +0800 Jijie Shao wrote:
+> on 2025/7/2 20:57, Jijie Shao wrote:
+> > There are some bugfix for the HNS3 ethernet driver  
+> 
+> Sorry, ignore this patch set, they should be sent to net not net-next ...
 
-This buggy behaviour can be reproduced with:
-
-ip link set dev eth1 mtu 9000
-ip route del broadcast 192.168.0.255 dev eth1 proto kernel scope link src 192.168.0.2
-ip route add broadcast 192.168.0.255 dev eth1 proto kernel scope link src 192.168.0.2 mtu 1500
-
-The maximum packet size should be 1500, but it is actually 8000:
-
-ping -b 192.168.0.255 -s 8000
-
-Fix __mkroute_output to allow MTU values to be configured for
-for broadcast routes (to support a mixed-MTU local-area-network).
-
-Signed-off-by: Oscar Maes <oscmaes92@gmail.com>
----
- net/ipv4/route.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index fccb05fb3..a2a3b6482 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -2585,7 +2585,6 @@ static struct rtable *__mkroute_output(const struct fib_result *res,
- 	do_cache = true;
- 	if (type == RTN_BROADCAST) {
- 		flags |= RTCF_BROADCAST | RTCF_LOCAL;
--		fi = NULL;
- 	} else if (type == RTN_MULTICAST) {
- 		flags |= RTCF_MULTICAST | RTCF_LOCAL;
- 		if (!ip_check_mc_rcu(in_dev, fl4->daddr, fl4->saddr,
+You still should have waited 24h per:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
 -- 
-2.39.5
-
+pv-bot: 24h
 
