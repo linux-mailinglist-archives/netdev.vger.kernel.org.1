@@ -1,321 +1,93 @@
-Return-Path: <netdev+bounces-203220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F9C4AF0CDD
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:46:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D0E6AF0CE0
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:46:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75D11189AA82
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 07:46:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFDF33B3FDB
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 07:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89BB61F0991;
-	Wed,  2 Jul 2025 07:46:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5E99225A47;
+	Wed,  2 Jul 2025 07:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TY+5wL4g"
 X-Original-To: netdev@vger.kernel.org
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D796F34CF9;
-	Wed,  2 Jul 2025 07:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6321F0991;
+	Wed,  2 Jul 2025 07:46:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751442393; cv=none; b=Z+UtL+3jBxBwCIAA00eSN1QSniUdG/6vL/PIzfOZwC9oyzuUfhMiN8dxmXx0azr9DSqdTL0CbFG7x7L3hImz9+YoShVJJiZuY2tc43/p4UmnH2IHrOq768htH8BTYDUrT/EZxNEdphZlJt+K6YSdBMijQsg22LF+bzfOJUeDv4w=
+	t=1751442407; cv=none; b=Ql8SS5iQ+3U7gJJ6xo0/X6+EAKRGx1imLUOUrlmEXrO6+QbptoPhmJ7oCGQrhpa4vV9eLug6KMbQsnndg2MC8RsAFCHq0rHSQpwFiBV6sXCgJ+qn+klzlfLL4gbCTpn4LPqyf9heDh+9pP27ZtQ7AJMKwfDW41ge0OAwmB58j7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751442393; c=relaxed/simple;
-	bh=vyMrSzpX58YcmpU9y90H2CF2nt/hC1swmt3WMJETvqY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jaRFHRBcBBj0/P40XgC1C5wEXS93R8/Hco9mG3JlGiZ97MsuPdcFiJtVmt5+y2K+TVNf3EFmxDckLi1Wr7kv7Jf++GluXjBkSqVb9dCtV0Hr11OzVFTk4EOx45irDv82fqjVeW8dsWTdjSychY5mBVf4bdIUT1MpJuWdF4gRSx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id E9F3D471C8;
-	Wed,  2 Jul 2025 09:46:28 +0200 (CEST)
-From: Gabriel Goller <g.goller@proxmox.com>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+	s=arc-20240116; t=1751442407; c=relaxed/simple;
+	bh=T1dfQtN0fOnpT3jRKO9/i37AUF1Fx6meJL5vsJcl4c8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cZXNkHcO7jSVVhi2kdUn91hbdZmrhfvLmO3f4qYTEuQ8Qon8s9xjjc/E+oqVjelPu8prGD8VLY9/rf9o1942isN4tcKJQf756IKmaXTfLo1yG9p5kFN7pgPSwBgNktklDE5GXdrH4Cv7cS8R7nfJOSdQSCZHeK0EdaHIVn3kNUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TY+5wL4g; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=OFEn8Mwx7iZb4bcLt1+4BA8J7VwQHTbrRClWAd6OzhU=; b=TY+5wL4gDFSoFVqQeDom46pQ3Z
+	DslEO6a82orDnsC9xr7tvmwE9LkDnW1GS1RQeYPD4PSM3xE0VsV6qjCsxtVrRIs7Dt8+xW9DKeK/g
+	jEkUCwbXdJFtMPrHOp4p8hlz5likS8jO47le2YGqEcIhCcgzZhZ+Wze7mORKVH0L7ijQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uWsAk-00HYRS-Hx; Wed, 02 Jul 2025 09:46:26 +0200
+Date: Wed, 2 Jul 2025 09:46:26 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Felix Fietkau <nbd@nbd.name>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Eric Woudstra <ericwouds@gmail.com>, Elad Yifee <eladwf@gmail.com>,
+	Bo-Cun Chen <bc-bocun.chen@mediatek.com>,
+	Sky Huang <skylake.huang@mediatek.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3] ipv6: add `force_forwarding` sysctl to enable per-interface forwarding
-Date: Wed,  2 Jul 2025 09:46:18 +0200
-Message-Id: <20250702074619.139031-1-g.goller@proxmox.com>
-X-Mailer: git-send-email 2.39.5
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v4 3/3] net: ethernet: mtk_eth_soc: use generic
+ allocator for SRAM
+Message-ID: <e5d6ac18-4d38-4a01-abd5-8bd4d6c3b05b@lunn.ch>
+References: <cover.1751421358.git.daniel@makrotopia.org>
+ <88ae2a765ef809d36e153430bf60aac6ce81d6f1.1751421358.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <88ae2a765ef809d36e153430bf60aac6ce81d6f1.1751421358.git.daniel@makrotopia.org>
 
-It is currently impossible to enable ipv6 forwarding on a per-interface
-basis like in ipv4. To enable forwarding on an ipv6 interface we need to
-enable it on all interfaces and disable it on the other interfaces using
-a netfilter rule. This is especially cumbersome if you have lots of
-interface and only want to enable forwarding on a few. According to the
-sysctl docs [0] the `net.ipv6.conf.all.forwarding` enables forwarding
-for all interfaces, while the interface-specific
-`net.ipv6.conf.<interface>.forwarding` configures the interface
-Host/Router configuration.
+On Wed, Jul 02, 2025 at 03:38:15AM +0100, Daniel Golle wrote:
+> Use a dedicated "mmio-sram" node and the generic allocator
+> instead of open-coding SRAM allocation for DMA rings.
+> Keep support for legacy device trees but notify the user via a
+> warning to update, and let the ethernet driver create the
+> gen_pool in this case.
+> 
+> Co-developed-by: Frank Wunderlich <frank-w@public-files.de>
+> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
-Introduce a new sysctl flag `force_forwarding`, which can be set on every
-interface. The ip6_forwarding function will then check if the global
-forwarding flag OR the force_forwarding flag is active and forward the
-packet.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-To preserver backwards-compatibility reset the flag (on all interfaces)
-to 0 if the net.ipv6.conf.all.forwarding flag is set to 0.
-
-[0]: https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt
-
-Signed-off-by: Gabriel Goller <g.goller@proxmox.com>
----
-
-Changelog:
-v2 -> v3:
-    * remove forwarding=0 setting force_forwarding=0 globally.
-    * add min and max (0 and 1) value to sysctl.
-v1 -> v2:
-    * rename from `do_forwarding` to `force_forwarding`.
-    * add global `force_forwarding` flag which will enable
-      `force_forwarding` on every interface like the
-      `ipv4.all.forwarding` flag.
-    * `forwarding`=0 will disable global and per-interface
-      `force_forwarding`.
-    * export option as NETCONFA_FORCE_FORWARDING.
-
- Documentation/networking/ip-sysctl.rst |  5 ++
- include/linux/ipv6.h                   |  1 +
- include/uapi/linux/ipv6.h              |  1 +
- include/uapi/linux/netconf.h           |  1 +
- include/uapi/linux/sysctl.h            |  1 +
- net/ipv6/addrconf.c                    | 90 ++++++++++++++++++++++++++
- net/ipv6/ip6_output.c                  |  3 +-
- 7 files changed, 101 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index 0f1251cce314..f709aed44cde 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -2292,6 +2292,11 @@ conf/all/forwarding - BOOLEAN
- proxy_ndp - BOOLEAN
- 	Do proxy ndp.
- 
-+force_forwarding - BOOLEAN
-+	Enable forwarding on this interface only -- regardless of the setting on
-+	``conf/all/forwarding``. When setting ``conf.all.forwarding`` to 0,
-+	the `force_forwarding` flag will be reset on all interfaces.
-+
- fwmark_reflect - BOOLEAN
- 	Controls the fwmark of kernel-generated IPv6 reply packets that are not
- 	associated with a socket for example, TCP RSTs or ICMPv6 echo replies).
-diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
-index 5aeeed22f35b..5380107e466c 100644
---- a/include/linux/ipv6.h
-+++ b/include/linux/ipv6.h
-@@ -19,6 +19,7 @@ struct ipv6_devconf {
- 	__s32		forwarding;
- 	__s32		disable_policy;
- 	__s32		proxy_ndp;
-+	__s32		force_forwarding;
- 	__cacheline_group_end(ipv6_devconf_read_txrx);
- 
- 	__s32		accept_ra;
-diff --git a/include/uapi/linux/ipv6.h b/include/uapi/linux/ipv6.h
-index cf592d7b630f..d4d3ae774b26 100644
---- a/include/uapi/linux/ipv6.h
-+++ b/include/uapi/linux/ipv6.h
-@@ -199,6 +199,7 @@ enum {
- 	DEVCONF_NDISC_EVICT_NOCARRIER,
- 	DEVCONF_ACCEPT_UNTRACKED_NA,
- 	DEVCONF_ACCEPT_RA_MIN_LFT,
-+	DEVCONF_FORCE_FORWARDING,
- 	DEVCONF_MAX
- };
- 
-diff --git a/include/uapi/linux/netconf.h b/include/uapi/linux/netconf.h
-index fac4edd55379..1c8c84d65ae3 100644
---- a/include/uapi/linux/netconf.h
-+++ b/include/uapi/linux/netconf.h
-@@ -19,6 +19,7 @@ enum {
- 	NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
- 	NETCONFA_INPUT,
- 	NETCONFA_BC_FORWARDING,
-+	NETCONFA_FORCE_FORWARDING,
- 	__NETCONFA_MAX
- };
- #define NETCONFA_MAX	(__NETCONFA_MAX - 1)
-diff --git a/include/uapi/linux/sysctl.h b/include/uapi/linux/sysctl.h
-index 8981f00204db..63d1464cb71c 100644
---- a/include/uapi/linux/sysctl.h
-+++ b/include/uapi/linux/sysctl.h
-@@ -573,6 +573,7 @@ enum {
- 	NET_IPV6_ACCEPT_RA_FROM_LOCAL=26,
- 	NET_IPV6_ACCEPT_RA_RT_INFO_MIN_PLEN=27,
- 	NET_IPV6_RA_DEFRTR_METRIC=28,
-+	NET_IPV6_FORCE_FORWARDING=29,
- 	__NET_IPV6_MAX
- };
- 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index ba2ec7c870cc..cca78f75cf0c 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -239,6 +239,7 @@ static struct ipv6_devconf ipv6_devconf __read_mostly = {
- 	.ndisc_evict_nocarrier	= 1,
- 	.ra_honor_pio_life	= 0,
- 	.ra_honor_pio_pflag	= 0,
-+	.force_forwarding	= 0,
- };
- 
- static struct ipv6_devconf ipv6_devconf_dflt __read_mostly = {
-@@ -303,6 +304,7 @@ static struct ipv6_devconf ipv6_devconf_dflt __read_mostly = {
- 	.ndisc_evict_nocarrier	= 1,
- 	.ra_honor_pio_life	= 0,
- 	.ra_honor_pio_pflag	= 0,
-+	.force_forwarding	= 0,
- };
- 
- /* Check if link is ready: is it up and is a valid qdisc available */
-@@ -857,6 +859,15 @@ static void addrconf_forward_change(struct net *net, __s32 newf)
- 		idev = __in6_dev_get_rtnl_net(dev);
- 		if (idev) {
- 			int changed = (!idev->cnf.forwarding) ^ (!newf);
-+			/*
-+			 * With the introduction of force_forwarding, we need to be backwards
-+			 * compatible, so that means we need to set the force_forwarding flag
-+			 * on every interface to 0 if net.ipv6.conf.all.forwarding is set to 0.
-+			 * This allows the global forwarding flag to disable forwarding for
-+			 * all interfaces.
-+			 */
-+			if (newf == 0)
-+				WRITE_ONCE(idev->cnf.force_forwarding, newf);
- 
- 			WRITE_ONCE(idev->cnf.forwarding, newf);
- 			if (changed)
-@@ -5719,6 +5730,7 @@ static void ipv6_store_devconf(const struct ipv6_devconf *cnf,
- 	array[DEVCONF_ACCEPT_UNTRACKED_NA] =
- 		READ_ONCE(cnf->accept_untracked_na);
- 	array[DEVCONF_ACCEPT_RA_MIN_LFT] = READ_ONCE(cnf->accept_ra_min_lft);
-+	array[DEVCONF_FORCE_FORWARDING] = READ_ONCE(cnf->force_forwarding);
- }
- 
- static inline size_t inet6_ifla6_size(void)
-@@ -6747,6 +6759,77 @@ static int addrconf_sysctl_disable_policy(const struct ctl_table *ctl, int write
- 	return ret;
- }
- 
-+/* called with RTNL locked */
-+static void addrconf_force_forward_change(struct net *net, __s32 newf)
-+{
-+	struct net_device *dev;
-+	struct inet6_dev *idev;
-+
-+	for_each_netdev(net, dev) {
-+		idev = __in6_dev_get_rtnl_net(dev);
-+		if (idev) {
-+			int changed = (!idev->cnf.force_forwarding) ^ (!newf);
-+
-+			WRITE_ONCE(idev->cnf.force_forwarding, newf);
-+			if (changed) {
-+				inet6_netconf_notify_devconf(dev_net(dev), RTM_NEWNETCONF,
-+							     NETCONFA_FORCE_FORWARDING,
-+							     dev->ifindex, &idev->cnf);
-+			}
-+		}
-+	}
-+}
-+
-+static int addrconf_sysctl_force_forwarding(const struct ctl_table *ctl, int write,
-+					    void *buffer, size_t *lenp, loff_t *ppos)
-+{
-+	int *valp = ctl->data;
-+	int ret;
-+	int old, new;
-+
-+	// get extra params from table
-+	struct inet6_dev *idev = ctl->extra1;
-+	struct net *net = ctl->extra2;
-+
-+	// copy table and change extra params to min/max so we can use proc_douintvec_minmax
-+	struct ctl_table lctl;
-+
-+	lctl = *ctl;
-+	lctl.extra1 = SYSCTL_ZERO;
-+	lctl.extra2 = SYSCTL_ONE;
-+
-+	old = *valp;
-+	ret = proc_douintvec_minmax(&lctl, write, buffer, lenp, ppos);
-+	new = *valp;
-+
-+	if (write && old != new) {
-+		if (!rtnl_net_trylock(net))
-+			return restart_syscall();
-+
-+		if (valp == &net->ipv6.devconf_dflt->force_forwarding) {
-+			inet6_netconf_notify_devconf(net, RTM_NEWNETCONF,
-+						     NETCONFA_FORCE_FORWARDING,
-+						     NETCONFA_IFINDEX_DEFAULT,
-+						     net->ipv6.devconf_dflt);
-+		} else if (valp == &net->ipv6.devconf_all->force_forwarding) {
-+			inet6_netconf_notify_devconf(net, RTM_NEWNETCONF,
-+						     NETCONFA_FORCE_FORWARDING,
-+						     NETCONFA_IFINDEX_ALL,
-+						     net->ipv6.devconf_all);
-+
-+			addrconf_force_forward_change(net, new);
-+		} else {
-+			inet6_netconf_notify_devconf(net, RTM_NEWNETCONF,
-+						     NETCONFA_FORCE_FORWARDING,
-+						     idev->dev->ifindex,
-+						     &idev->cnf);
-+		}
-+		rtnl_net_unlock(net);
-+	}
-+
-+	return ret;
-+}
-+
- static int minus_one = -1;
- static const int two_five_five = 255;
- static u32 ioam6_if_id_max = U16_MAX;
-@@ -7217,6 +7300,13 @@ static const struct ctl_table addrconf_sysctl[] = {
- 		.extra1		= SYSCTL_ZERO,
- 		.extra2		= SYSCTL_TWO,
- 	},
-+	{
-+		.procname	= "force_forwarding",
-+		.data		= &ipv6_devconf.force_forwarding,
-+		.maxlen		= sizeof(int),
-+		.mode		= 0644,
-+		.proc_handler	= addrconf_sysctl_force_forwarding,
-+	},
- };
- 
- static int __addrconf_sysctl_register(struct net *net, char *dev_name,
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index 7bd29a9ff0db..c15ed4197416 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -509,7 +509,8 @@ int ip6_forward(struct sk_buff *skb)
- 	u32 mtu;
- 
- 	idev = __in6_dev_get_safely(dev_get_by_index_rcu(net, IP6CB(skb)->iif));
--	if (READ_ONCE(net->ipv6.devconf_all->forwarding) == 0)
-+	if ((idev && READ_ONCE(idev->cnf.force_forwarding) == 0) &&
-+	    READ_ONCE(net->ipv6.devconf_all->forwarding) == 0)
- 		goto error;
- 
- 	if (skb->pkt_type != PACKET_HOST)
--- 
-2.39.5
-
-
+    Andrew
 
