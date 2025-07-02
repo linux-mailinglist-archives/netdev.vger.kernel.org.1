@@ -1,229 +1,92 @@
-Return-Path: <netdev+bounces-203085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94116AF079E
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:58:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3549AF07B0
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 03:04:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55D1C42397C
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 00:58:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 041B817A8DE
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 01:04:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 101D586353;
-	Wed,  2 Jul 2025 00:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91062A1AA;
+	Wed,  2 Jul 2025 01:04:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9724CE08;
-	Wed,  2 Jul 2025 00:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B8A20311;
+	Wed,  2 Jul 2025 01:04:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751417861; cv=none; b=osmHEaGPht3LDZDCqzFuJPecXbqEvpJgqrzFOv8UdqLNoV3SOHNvHOrmLJDzx8cGeQrpqMtja6rrHeeHtXn9+GN0cgw1wsY+eOLj2zh5wlK70j7rPQH/I53XO7MYuUxOH1BV0InIwVj3pIqzBoeFfQC0CG/xwtMIl2OSwYiWVZI=
+	t=1751418282; cv=none; b=D/hH4jGCGW5cWdHZJgDunFPzlPlNiffLxYnYUwW5gIJLQWEUxUkcjvobtQzSNlKX/raCk/pB0opb83VwgxYvVK5n0f1CY3GFdXjVJhXidUgJ6Stn2urLM/dunMarudzOzfrlSl1HIlqkvvGuPQqDy8prA+GZQXl+crJYZRVlrmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751417861; c=relaxed/simple;
-	bh=fQBAnkI5rjMDZQo6P8/3QVUINwHo/QDB3Xt13H5B0vc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pTvwpMm7T6b6yTEzD1y/o6zhm7/sb5rfdig/b0rTzepNulfbkjfiyqVZ7YGVT7JdIz2jNcwfw4TyG44pYwRG+80yMJxDfbODzWUdvXNaN7KyJNmMMF/RYYnPlrZhNWbKTVhxqUwSQ0vEXlFN5GLIldt4/NL206UWeZjX87N+PFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-X-CSE-ConnectionGUID: J5+YdmRNSKOnN3uomudF6w==
-X-CSE-MsgGUID: oWfC5T+vSCu7irK4krP6oA==
-Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
-  by relmlie6.idc.renesas.com with ESMTP; 02 Jul 2025 09:57:38 +0900
-Received: from ubuntu.adwin.renesas.com (unknown [10.226.92.9])
-	by relmlir6.idc.renesas.com (Postfix) with ESMTP id C1FA740E798E;
-	Wed,  2 Jul 2025 09:57:32 +0900 (JST)
-From: John Madieu <john.madieu.xa@bp.renesas.com>
-To: geert+renesas@glider.be,
-	magnus.damm@gmail.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	mturquette@baylibre.com,
-	sboyd@kernel.org,
-	richardcochran@gmail.com,
-	prabhakar.mahadev-lad.rj@bp.renesas.com
-Cc: linux-renesas-soc@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-clk@vger.kernel.org,
-	netdev@vger.kernel.org,
-	biju.das.jz@bp.renesas.com,
-	john.madieu@gmail.com,
-	John Madieu <john.madieu.xa@bp.renesas.com>
-Subject: [PATCH v4 4/4] arm64: dts: renesas: rzg3e-smarc-som: Enable eth{0-1} (GBETH) interfaces
-Date: Wed,  2 Jul 2025 02:57:06 +0200
-Message-ID: <20250702005706.1200059-5-john.madieu.xa@bp.renesas.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250702005706.1200059-1-john.madieu.xa@bp.renesas.com>
-References: <20250702005706.1200059-1-john.madieu.xa@bp.renesas.com>
+	s=arc-20240116; t=1751418282; c=relaxed/simple;
+	bh=XAafEd/BG8qoJXRKDepV1XfLCyhQ+O787ct9l00N54o=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=aj4vkkxeKgHMinbIhnLm4z8EyMAG2Jlkgu8wqSAE6dfnEda1jOi3/AO9SfN+fMPqPISqkY9NVb/xB2JNkSqDF7eKnFkza/731IyXANWjpQDSRJAeWe0sBR3LSH5R08a/qwtsESMY66oBck2ji1jQINhgA/poLeKLNtc4kcxwn5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4bX1m40KKgzmZB9;
+	Wed,  2 Jul 2025 09:00:36 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id C6F2D140277;
+	Wed,  2 Jul 2025 09:04:36 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 2 Jul 2025 09:04:36 +0800
+Message-ID: <0c0d95ce-7c38-42d7-b45e-e7d388b57ede@huawei.com>
+Date: Wed, 2 Jul 2025 09:04:35 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
+	<horms@kernel.org>, <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4 net-next 1/3] net: hibmcge: support scenario without
+ PHY
+To: Andrew Lunn <andrew@lunn.ch>
+References: <20250701125446.720176-1-shaojijie@huawei.com>
+ <20250701125446.720176-2-shaojijie@huawei.com>
+ <9b45bab6-dc6e-40b5-b37c-2b296213e8ed@lunn.ch>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <9b45bab6-dc6e-40b5-b37c-2b296213e8ed@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-Enable the Gigabit Ethernet Interfaces (GBETH) populated on the RZ/G3E SMARC EVK
 
-Signed-off-by: John Madieu <john.madieu.xa@bp.renesas.com>
----
+on 2025/7/2 6:07, Andrew Lunn wrote:
+>> +	phydev = fixed_phy_register(&hbg_fixed_phy_status, NULL);
+>> +	if (IS_ERR(phydev)) {
+>> +		dev_err_probe(dev, IS_ERR(phydev),
+> IS_ERR() returns a bool, where as dev_err_probe() expects an int.
 
-Changes:
+Yeah,
+PTR_ERR(phydev) should be used in there
 
-v2:
-No changes but resending without dt-bindings patch
+Thanks,
+Jijie Shao
 
-v3:
-Updates mdio separately, based on phandles instead of node redefinition
-
-v4:
- - Update pinmux to add OEN support
- - Drops Tb and Rb tags initially collected
-
- .../boot/dts/renesas/rzg3e-smarc-som.dtsi     | 111 ++++++++++++++++++
- 1 file changed, 111 insertions(+)
-
-diff --git a/arch/arm64/boot/dts/renesas/rzg3e-smarc-som.dtsi b/arch/arm64/boot/dts/renesas/rzg3e-smarc-som.dtsi
-index f99a09d04ddd..f930e98a7ea9 100644
---- a/arch/arm64/boot/dts/renesas/rzg3e-smarc-som.dtsi
-+++ b/arch/arm64/boot/dts/renesas/rzg3e-smarc-som.dtsi
-@@ -26,6 +26,8 @@ / {
- 	compatible = "renesas,rzg3e-smarcm", "renesas,r9a09g047e57", "renesas,r9a09g047";
- 
- 	aliases {
-+		ethernet0 = &eth0;
-+		ethernet1 = &eth1;
- 		i2c2 = &i2c2;
- 		mmc0 = &sdhi0;
- 		mmc2 = &sdhi2;
-@@ -77,6 +79,24 @@ &audio_extal_clk {
- 	clock-frequency = <48000000>;
- };
- 
-+&eth0 {
-+	phy-handle = <&phy0>;
-+	phy-mode = "rgmii-id";
-+
-+	pinctrl-0 = <&eth0_pins>;
-+	pinctrl-names = "default";
-+	status = "okay";
-+};
-+
-+&eth1 {
-+	phy-handle = <&phy1>;
-+	phy-mode = "rgmii-id";
-+
-+	pinctrl-0 = <&eth1_pins>;
-+	pinctrl-names = "default";
-+	status = "okay";
-+};
-+
- &gpu {
- 	status = "okay";
- 	mali-supply = <&reg_vdd0p8v_others>;
-@@ -102,7 +122,98 @@ raa215300: pmic@12 {
- 	};
- };
- 
-+&mdio0 {
-+	phy0: ethernet-phy@7 {
-+		compatible = "ethernet-phy-id0022.1640",
-+			     "ethernet-phy-ieee802.3-c22";
-+		reg = <7>;
-+		interrupts-extended = <&icu 3 IRQ_TYPE_LEVEL_LOW>;
-+		rxc-skew-psec = <1400>;
-+		txc-skew-psec = <1400>;
-+		rxdv-skew-psec = <0>;
-+		txdv-skew-psec = <0>;
-+		rxd0-skew-psec = <0>;
-+		rxd1-skew-psec = <0>;
-+		rxd2-skew-psec = <0>;
-+		rxd3-skew-psec = <0>;
-+		txd0-skew-psec = <0>;
-+		txd1-skew-psec = <0>;
-+		txd2-skew-psec = <0>;
-+		txd3-skew-psec = <0>;
-+	};
-+};
-+
-+&mdio1 {
-+	phy1: ethernet-phy@7 {
-+		compatible = "ethernet-phy-id0022.1640",
-+			     "ethernet-phy-ieee802.3-c22";
-+		reg = <7>;
-+		interrupts-extended = <&icu 16 IRQ_TYPE_LEVEL_LOW>;
-+		rxc-skew-psec = <1400>;
-+		txc-skew-psec = <1400>;
-+		rxdv-skew-psec = <0>;
-+		txdv-skew-psec = <0>;
-+		rxd0-skew-psec = <0>;
-+		rxd1-skew-psec = <0>;
-+		rxd2-skew-psec = <0>;
-+		rxd3-skew-psec = <0>;
-+		txd0-skew-psec = <0>;
-+		txd1-skew-psec = <0>;
-+		txd2-skew-psec = <0>;
-+		txd3-skew-psec = <0>;
-+	};
-+};
-+
- &pinctrl {
-+	eth0_pins: eth0 {
-+		clk0 {
-+			pinmux = <RZG3E_PORT_PINMUX(B, 1, 1)>; /* TXC */
-+			output-enable;
-+		};
-+
-+		ctrl0 {
-+			pinmux = <RZG3E_PORT_PINMUX(A, 1, 1)>, /* MDC */
-+				 <RZG3E_PORT_PINMUX(A, 0, 1)>, /* MDIO */
-+				 <RZG3E_PORT_PINMUX(C, 2, 15)>, /* PHY_INTR (IRQ2) */
-+				 <RZG3E_PORT_PINMUX(C, 1, 1)>, /* RXD3 */
-+				 <RZG3E_PORT_PINMUX(C, 0, 1)>, /* RXD2 */
-+				 <RZG3E_PORT_PINMUX(B, 7, 1)>, /* RXD1 */
-+				 <RZG3E_PORT_PINMUX(B, 6, 1)>, /* RXD0 */
-+				 <RZG3E_PORT_PINMUX(B, 0, 1)>, /* RXC */
-+				 <RZG3E_PORT_PINMUX(A, 2, 1)>, /* RX_CTL */
-+				 <RZG3E_PORT_PINMUX(B, 5, 1)>, /* TXD3 */
-+				 <RZG3E_PORT_PINMUX(B, 4, 1)>, /* TXD2 */
-+				 <RZG3E_PORT_PINMUX(B, 3, 1)>, /* TXD1 */
-+				 <RZG3E_PORT_PINMUX(B, 2, 1)>, /* TXD0 */
-+				 <RZG3E_PORT_PINMUX(A, 3, 1)>; /* TX_CTL */
-+		};
-+	};
-+
-+	eth1_pins: eth1 {
-+		clk1 {
-+			pinmux = <RZG3E_PORT_PINMUX(E, 1, 1)>; /* TXC */
-+			output-enable;
-+		};
-+
-+		ctrl1 {
-+
-+			pinmux = <RZG3E_PORT_PINMUX(D, 1, 1)>, /* MDC */
-+				 <RZG3E_PORT_PINMUX(D, 0, 1)>, /* MDIO */
-+				 <RZG3E_PORT_PINMUX(F, 2, 15)>, /* PHY_INTR (IRQ15) */
-+				 <RZG3E_PORT_PINMUX(F, 1, 1)>, /* RXD3 */
-+				 <RZG3E_PORT_PINMUX(F, 0, 1)>, /* RXD2 */
-+				 <RZG3E_PORT_PINMUX(E, 7, 1)>, /* RXD1 */
-+				 <RZG3E_PORT_PINMUX(E, 6, 1)>, /* RXD0 */
-+				 <RZG3E_PORT_PINMUX(E, 0, 1)>, /* RXC */
-+				 <RZG3E_PORT_PINMUX(D, 2, 1)>, /* RX_CTL */
-+				 <RZG3E_PORT_PINMUX(E, 5, 1)>, /* TXD3 */
-+				 <RZG3E_PORT_PINMUX(E, 4, 1)>, /* TXD2 */
-+				 <RZG3E_PORT_PINMUX(E, 3, 1)>, /* TXD1 */
-+				 <RZG3E_PORT_PINMUX(E, 2, 1)>, /* TXD0 */
-+				 <RZG3E_PORT_PINMUX(D, 3, 1)>; /* TX_CTL */
-+		};
-+	};
-+
- 	i2c2_pins: i2c {
- 		pinmux = <RZG3E_PORT_PINMUX(3, 4, 1)>, /* SCL2 */
- 			 <RZG3E_PORT_PINMUX(3, 5, 1)>; /* SDA2 */
--- 
-2.25.1
-
+>
+>> +			      "failed to register fixed PHY device\n");
+>> +		return IS_ERR(phydev);
+> This also looks wrong.
+>
+>      Andrew
+>
+> ---
+> pw-bot: cr
 
