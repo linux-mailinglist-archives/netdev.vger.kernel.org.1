@@ -1,303 +1,144 @@
-Return-Path: <netdev+bounces-203216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E33DAF0CCE
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:42:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A003BAF0CD2
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:42:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A1A71C21C54
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 07:42:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EC7B1C21EE3
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 07:43:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6EA822DF9E;
-	Wed,  2 Jul 2025 07:42:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 528D222D795;
+	Wed,  2 Jul 2025 07:42:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEA201DF977;
-	Wed,  2 Jul 2025 07:42:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFDFB1DF977;
+	Wed,  2 Jul 2025 07:42:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751442126; cv=none; b=Jr4reNUNYXtb3TWgM2/ePcOq4q4gzJc0X/MAfesNnbXrDnZtEfP1uonNcazW24GIlSfPAZmBJ38+BtQ3Cl7vi8h9oxQUxFXLjdjXiIlOAh9HQLyg7R8aHlh85MRCiZSmDocuGvuiGR4Wv44fnbp/Ca5q/bylNqwzRg7jDJ4hVMk=
+	t=1751442167; cv=none; b=fb3Px1raxTPX2fXTL1ry3cCaV1N+nvzOCJZyum6JhqFLf7z8YTrLvLb1fVr5IaxzsuwyAHBtQUQNfkYsRW2CxevBR4/lQTX3Rdfd9Oi+8nm/oHZkprxEmEllIlBuNRfqnVvEBYUSmefn6usB7NhrREpu89b2Qwh5DahIdhQJGSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751442126; c=relaxed/simple;
-	bh=h5XObXmGPhWIsFNdl0j4c/OXIDA4oaPIHx3BFw437GQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ypz0bYUTW4oQrQDYOkICni46UDK3/jsCnkbB0lPMWpOgFumrxXVGZa8jRsNJihaxLcQt/hFkJapp43sJ64E8dfCMrkzN11XHtQnsnimBuYmZKbn6PgMKF9BbZha3yiUgbNRW0xJ+QYJFjiQUBSYRbyctV/AOKrtleZg/SuP5+gE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [192.168.33.13] (unknown [210.73.43.2])
-	by APP-03 (Coremail) with SMTP id rQCowAAXrn+f4mRooUF4AA--.33051S2;
-	Wed, 02 Jul 2025 15:41:20 +0800 (CST)
-Message-ID: <5f02539a-2541-4705-b1a3-c1095416463e@iscas.ac.cn>
-Date: Wed, 2 Jul 2025 15:41:18 +0800
+	s=arc-20240116; t=1751442167; c=relaxed/simple;
+	bh=5RD/hCbCr/sGytpploZW8IMrkvaWuftQdGAfxgLWjuE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YyXpJa/uf6GXOB4PzJ47zB2GNqfe4+0fGOZiJ4VkViGwOJxgS2AaeO8FvlY3OjSeTYm+Ov9pIR/ENULwxtbTbPJ4ZXNEp+jh0sLAIoAXB1wk3Z/mDW5eluPoGaSq98mRMOSA0Jkt+Lm6tqXGwyfnlTlTuQGyPsgDz35OUEV3Cq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id B25CB47204;
+	Wed,  2 Jul 2025 09:42:41 +0200 (CEST)
+Date: Wed, 2 Jul 2025 09:42:40 +0200
+From: Gabriel Goller <g.goller@proxmox.com>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] ipv6: add `force_forwarding` sysctl to enable
+ per-interface forwarding
+Message-ID: <vtgdrglnu52yech4p244ttzaqetooxphultqigf6dmytnfu6ky@rpx5cl3qmzec>
+Mail-Followup-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250701140423.487411-1-g.goller@proxmox.com>
+ <40dffba2-6dbd-442d-ba02-3803f305acb3@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/5] net: spacemit: Add K1 Ethernet MAC
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Ghiti <alex@ghiti.fr>, Vivian Wang <uwu@dram.page>,
- Lukas Bulwahn <lukas.bulwahn@redhat.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20250702-net-k1-emac-v3-0-882dc55404f3@iscas.ac.cn>
- <20250702-net-k1-emac-v3-2-882dc55404f3@iscas.ac.cn>
- <20250702091708.7d459213@fedora.home>
-Content-Language: en-US
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-In-Reply-To: <20250702091708.7d459213@fedora.home>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:rQCowAAXrn+f4mRooUF4AA--.33051S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxtw18ZF47GFWUAFy8KF13twb_yoW7Cw13pa
-	95GFWftF18Zr1xWr42vr4DJr92vw1ktF10kryYyay8u3sIyr1fJFy8KrWUCas5AFyqvrW5
-	Zw4UXFnrua1kWrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvCb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwV
-	C2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Gr1j6F
-	4UJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkI
-	wI1lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr
-	0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
-	17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
-	C0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY
-	6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2Kf
-	nxnUUI43ZEXa7IUY4pBDUUUUU==
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <40dffba2-6dbd-442d-ba02-3803f305acb3@6wind.com>
+User-Agent: NeoMutt/20241002-35-39f9a6
 
-Hi Maxime,
+On 01.07.2025 17:58, Nicolas Dichtel wrote:
+>Le 01/07/2025 à 16:04, Gabriel Goller a écrit :
+>> It is currently impossible to enable ipv6 forwarding on a per-interface
+>> basis like in ipv4. To enable forwarding on an ipv6 interface we need to
+>> enable it on all interfaces and disable it on the other interfaces using
+>> a netfilter rule. This is especially cumbersome if you have lots of
+>> interface and only want to enable forwarding on a few. According to the
+>> sysctl docs [0] the `net.ipv6.conf.all.forwarding` enables forwarding
+>> for all interfaces, while the interface-specific
+>> `net.ipv6.conf.<interface>.forwarding` configures the interface
+>> Host/Router configuration.
+>>
+>> Introduce a new sysctl flag `force_forwarding`, which can be set on every
+>> interface. The ip6_forwarding function will then check if the global
+>> forwarding flag OR the force_forwarding flag is active and forward the
+>> packet.
+>>
+>> To preserver backwards-compatibility reset the flag (global and on all
+>> interfaces) to 0 if the net.ipv6.conf.all.forwarding flag is set to 0.
+>>
+>> [0]: https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt
+>>
+>> Signed-off-by: Gabriel Goller <g.goller@proxmox.com>
+>> ---
+>
+>[snip]
+>
+>> @@ -896,6 +907,16 @@ static int addrconf_fixup_forwarding(const struct ctl_table *table, int *p, int
+>>  						     NETCONFA_IFINDEX_DEFAULT,
+>>  						     net->ipv6.devconf_dflt);
+>>
+>> +		/*
+>> +		 * With the introduction of force_forwarding, we need to be backwards
+>> +		 * compatible, so that means we need to set the force_forwarding global
+>> +		 * flag to 0 if the global forwarding flag is set to 0. Below in
+>> +		 * addrconf_forward_change(), we also set the force_forwarding flag on every
+>> +		 * interface to 0 if the global forwarding flag is set to 0.
+>> +		 */
+>> +		if (newf == 0)
+>> +			WRITE_ONCE(net->ipv6.devconf_all->force_forwarding, newf);
+>Hmm, is this true? Configuring the default value only impacts new interfaces.
+>And before your patch, only the 'all' entry is took into account. In other
+>words, configuring the default entry today doesn't change the current behavior,
+>so I don't see the backward compat point.
 
-Thanks for your suggestions.
+Yes, you're right I didn't think this through.
+This only affects new interfaces.
+I'll remove it.
 
-On 7/2/25 15:17, Maxime Chevallier wrote:
-> Hello Vivian,
+>> +
+>>  		addrconf_forward_change(net, newf);
+>>  		if ((!newf) ^ (!old))
+>>  			inet6_netconf_notify_devconf(net, RTM_NEWNETCONF,
 >
-> On Wed, 02 Jul 2025 14:01:41 +0800
-> Vivian Wang <wangruikang@iscas.ac.cn> wrote:
+>[snip]
 >
->> The Ethernet MACs found on SpacemiT K1 appears to be a custom design
->> that only superficially resembles some other embedded MACs. SpacemiT
->> refers to them as "EMAC", so let's just call the driver "k1_emac".
->>
->> This driver is based on "k1x-emac" in the same directory in the vendor's
->> tree [1]. Some debugging tunables have been fixed to vendor-recommended
->> defaults, and PTP support is not included yet.
->>
->> [1]: https://github.com/spacemit-com/linux-k1x
->>
->> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
-> I have a handful of tiny comments, the rest looks fine by me !
->
->> +static int emac_phy_connect(struct net_device *ndev)
+>> +static int addrconf_sysctl_force_forwarding(const struct ctl_table *ctl, int write,
+>> +					    void *buffer, size_t *lenp, loff_t *ppos)
 >> +{
->> +	struct emac_priv *priv = netdev_priv(ndev);
->> +	struct device *dev = &priv->pdev->dev;
->> +	struct phy_device *phydev;
->> +	struct device_node *np;
+>> +	int *valp = ctl->data;
 >> +	int ret;
+>> +	int old, new;
 >> +
->> +	ret = of_get_phy_mode(dev->of_node, &priv->phy_interface);
->> +	if (ret) {
->> +		dev_err(dev, "No phy-mode found");
->> +		return ret;
->> +	}
->> +
->> +	np = of_parse_phandle(dev->of_node, "phy-handle", 0);
->> +	if (!np && of_phy_is_fixed_link(dev->of_node))
->> +		np = of_node_get(dev->of_node);
->> +
->> +	if (!np) {
->> +		dev_err(dev, "No PHY specified");
->> +		return -ENODEV;
->> +	}
->> +
->> +	ret = emac_phy_interface_config(priv);
->> +	if (ret)
->> +		goto err_node_put;
->> +
->> +	phydev = of_phy_connect(ndev, np, &emac_adjust_link, 0,
->> +				priv->phy_interface);
->> +	if (!phydev) {
->> +		dev_err(dev, "Could not attach to PHY\n");
->> +		ret = -ENODEV;
->> +		goto err_node_put;
->> +	}
->> +
->> +	phydev->mac_managed_pm = true;
->> +
->> +	ndev->phydev = phydev;
-> of_phy_connect() eventually calls phy_attach_direct(), which sets
-> ndev->phydev, so you don't need to do it here :)
+>> +	old = *valp;
+>> +	ret = proc_douintvec(ctl, write, buffer, lenp, ppos);
+>> +	new = *valp;
+>Maybe you can limit values to 0 and 1, like it was done in the v1.
 
-I will remove it next version.
+We use the extra1 and extra2 params for the interfaces when setting
+interface-specific options, but I can just copy them out and then add
+the min/max options to the table like in `addrconf_sysctl_mtu`.
 
->> +
->> +	emac_update_delay_line(priv);
->> +
->> +err_node_put:
->> +	of_node_put(np);
->> +	return ret;
->> +}
-> [ ... ]
->
->> +static int emac_down(struct emac_priv *priv)
->> +{
->> +	struct platform_device *pdev = priv->pdev;
->> +	struct net_device *ndev = priv->ndev;
->> +
->> +	netif_stop_queue(ndev);
->> +
->> +	phy_stop(ndev->phydev);
-> phy_disconnect() will call phy_stop() for you, you can remove it.
+I'll send a patch soon!
 
-Thanks, I will simplify handling of this.
+>Regards,
+>Nicolas
 
->> +	phy_disconnect(ndev->phydev);
->> +
->> +	emac_wr(priv, MAC_INTERRUPT_ENABLE, 0x0);
->> +	emac_wr(priv, DMA_INTERRUPT_ENABLE, 0x0);
->> +
->> +	free_irq(priv->irq, ndev);
->> +
->> +	napi_disable(&priv->napi);
->> +
->> +	emac_reset_hw(priv);
->> +
->> +	pm_runtime_put_sync(&pdev->dev);
->> +	return 0;
->> +}
->> +
-> [ ... ]
->
->> +static int emac_probe(struct platform_device *pdev)
->> +{
->> +	struct device *dev = &pdev->dev;
->> +	struct reset_control *reset;
->> +	struct net_device *ndev;
->> +	struct emac_priv *priv;
->> +	int ret;
->> +
->> +	ndev = devm_alloc_etherdev(dev, sizeof(struct emac_priv));
->> +	if (!ndev)
->> +		return -ENOMEM;
->> +
->> +	ndev->hw_features = NETIF_F_SG;
->> +	ndev->features |= ndev->hw_features;
->> +
->> +	ndev->min_mtu = ETH_MIN_MTU;
-> This should already be the default value when using
-> devm_alloc_etherdev()
-
-I will remove next version.
-
->> +	ndev->max_mtu = EMAC_RX_BUF_4K - (ETH_HLEN + ETH_FCS_LEN);
->> +
->> +	priv = netdev_priv(ndev);
->> +	priv->ndev = ndev;
->> +	priv->pdev = pdev;
->> +	platform_set_drvdata(pdev, priv);
->> +	priv->hw_stats = devm_kzalloc(dev, sizeof(*priv->hw_stats), GFP_KERNEL);
->> +	if (!priv->hw_stats) {
->> +		dev_err(dev, "Failed to allocate memory for stats\n");
->> +		ret = -ENOMEM;
->> +		goto err;
->> +	}
->> +
->> +	ret = emac_config_dt(pdev, priv);
->> +	if (ret < 0) {
->> +		dev_err(dev, "Configuration failed\n");
->> +		goto err;
->> +	}
->> +
->> +	ndev->watchdog_timeo = 5 * HZ;
->> +	ndev->base_addr = (unsigned long)priv->iobase;
->> +	ndev->irq = priv->irq;
->> +
->> +	ndev->ethtool_ops = &emac_ethtool_ops;
->> +	ndev->netdev_ops = &emac_netdev_ops;
->> +
->> +	devm_pm_runtime_enable(&pdev->dev);
->> +
->> +	priv->bus_clk = devm_clk_get_enabled(&pdev->dev, NULL);
->> +	if (IS_ERR(priv->bus_clk)) {
->> +		ret = dev_err_probe(dev, PTR_ERR(priv->bus_clk),
->> +				    "Failed to get clock\n");
->> +		goto err;
->> +	}
->> +
->> +	reset = devm_reset_control_get_optional_exclusive_deasserted(&pdev->dev,
->> +								     NULL);
->> +	if (IS_ERR(reset)) {
->> +		ret = dev_err_probe(dev, PTR_ERR(reset),
->> +				    "Failed to get reset\n");
->> +		goto err;
->> +	}
->> +
->> +	emac_sw_init(priv);
->> +
->> +	if (of_phy_is_fixed_link(dev->of_node)) {
->> +		ret = of_phy_register_fixed_link(dev->of_node);
->> +		if (ret) {
->> +			dev_err_probe(dev, ret,
->> +				      "Failed to register fixed-link");
->> +			goto err_timer_delete;
->> +		}
-> It looks like you're missing the calls to:
->
->   of_phy_deregister_fixed_link()
->
-> in the error path here as well as in the .remove() function.
-
-It seems I had misunderstood the use of of_phy_register_fixed_link, I
-will fix this next version.
-
-Thanks,
-Vivian "dramforever" Wang
-
->> +	}
->> +
->> +	ret = emac_mdio_init(priv);
->> +	if (ret)
->> +		goto err_timer_delete;
->> +
->> +	SET_NETDEV_DEV(ndev, &pdev->dev);
->> +
->> +	ret = devm_register_netdev(dev, ndev);
->> +	if (ret) {
->> +		dev_err(dev, "devm_register_netdev failed\n");
->> +		goto err_timer_delete;
->> +	}
->> +
->> +	netif_napi_add(ndev, &priv->napi, emac_rx_poll);
->> +	netif_carrier_off(ndev);
->> +
->> +	return 0;
->> +
->> +err_timer_delete:
->> +	timer_delete_sync(&priv->txtimer);
->> +err:
->> +	return ret;
->> +}
-> Maxime
+Thanks for the review!
 
 
