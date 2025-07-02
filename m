@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-203254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19F33AF106C
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:48:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCE3BAF107B
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:49:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FD634A55CF
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:46:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 063FF520F40
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:47:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B068725BEE6;
-	Wed,  2 Jul 2025 09:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78EDB248893;
+	Wed,  2 Jul 2025 09:45:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="StgesMK0"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Q3GJtkiT"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ADFB2580F1
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 09:45:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF60248886
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 09:45:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751449517; cv=none; b=pth07E4y9jrb7QMkpwx0+q8fRklqM5wG1awuHMBQXiH8Cca3cOQiVrhilbQ6M70UWA0WVds9xjzrhrPiGM/zcsrlYTRC1Dx368Kwst7q7/yUzkGNURb5wxJc4/t2FgWAahG57/1ygAZGbdPIJ5gisYP74Hj9uNmNT24xcJ5mgO8=
+	t=1751449522; cv=none; b=odWsRa53awpMzp2+zcHLe3IoMLTp6KVDQRuAPgdXbQ/rlP/OPcAFqenGqkMrs4JWqnzn/SNCI8ap+gnS69R+58GKmMkN2fBWFWWWAsJ7vpLzTWd5B+KdzHdQSoxOTITh+caiq9+L54tLEel1q0/xRY3ZJlVvO3h/2j1GhZlVqQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751449517; c=relaxed/simple;
-	bh=HwO90/2G7hf1LBjtiLTrhBg1aS8dSR142vRMwHqvC+c=;
+	s=arc-20240116; t=1751449522; c=relaxed/simple;
+	bh=2O+MhMKdnbIbEJONlQxrJ5VAqwuESrIqBoVbNioUGQ8=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=DDd6m5ldvxzKyQX5BF7d0qiG4X97x+X6aQBVPAkZw+NWoRgIrgwXuVRVELQnrBkUYTkQ5m8GNhiWVYkC3+PV2Cg0wnQL7H5440MaSwvv+mV9YhqBp/uD0hXKhBEKZ38QXqFmIBRblyhsamtjLvo5E9PvrO1rcmU4saFhrFE44ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=StgesMK0; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=i9aue02E9ELuGZs7NgS9qTU6FYhIrlZ1xj2NxT5f0pUmKctBx7taDL89vZWUmDdbN6TNfZ2OVpGxOSL/dDghamLknPvOOkkVsQRQEyAmm5cAIJWL6hFOtybRBz6x4+YESxADqroKPVGeA7ANJC6j6MYpYavbblA0T2A3ya5x5CQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Q3GJtkiT; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=wtqxJxg8h5eXR2GcgUSD1Ag3pB7dBgrx3s1AVMQ98gM=; b=StgesMK0JzWOzbcEXU1+DkFHUu
-	rkMArHRKxea8epYOCxW1vJlCmZ5UO/s+1JwsbnOReq05FxX/IqfnRaN3gIDzByy91Dk9CdeKVP95e
-	3d4oYbllBkDXHsUJVaouCvi0ZB7yDh0AIyn0gJkJnB2qLzaIGVKyo89279cYuIRyqXl8wh63h02wJ
-	zl2Yg+97sgyzoRcVdNd0faOOvod6nyNFTn2RU3T7ynB6111Yqcodd54W8CSlKSETOIakQZoauV4KF
-	ISKyHfsp+D9jHmjeuFtFFJVnPY0QYIvHm+eHBz4t/rVCsf6JaAE5AJyUoEAralZHnUWQ5f0Qjx215
-	uAJiSvGA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:52898 helo=rmk-PC.armlinux.org.uk)
+	bh=21FXeyp5fcxCa1dzbyfJfckjUlTEeCyNDaa79Lfp0NA=; b=Q3GJtkiTjxVTVNT+t56sqJmcru
+	luDgFxZUgDknRtZU7IrBzFLToN/hC+UCGd/GVWYQeqmz5r4lLoFjlP0tdCOptTDw1+/9knWnyTg+f
+	iE27MUZ//+1DMXoNf4F6nDW2/a8HLeauNp7tIA0+3eL/ri8dXNkvQKsqxwm3336hmfXY20YnrjuIB
+	bOhshDTtL05y0GbVRUf26BA9RH5KPhsA04iM0BrgW00Esu+yCYY6QVmEquKVoTEO+tAK3re6xHUiu
+	SzRmh9WclP0wKMWuvH5SeSNBPay0VS3fbax25R0xsmsCD/q+/d5hVdJ1dxH5+K5ZLx9jtQuuQ/3++
+	NNginPig==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:37232 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1uWu1f-0007OQ-0K;
-	Wed, 02 Jul 2025 10:45:11 +0100
+	id 1uWu1k-0007Oc-13;
+	Wed, 02 Jul 2025 10:45:16 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1uWu0z-005KXi-EM; Wed, 02 Jul 2025 10:44:29 +0100
+	id 1uWu14-005KXo-IO; Wed, 02 Jul 2025 10:44:34 +0100
 In-Reply-To: <aGT_hoBELDysGbrp@shell.armlinux.org.uk>
 References: <aGT_hoBELDysGbrp@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -63,8 +63,8 @@ Cc: Alexander Duyck <alexander.duyck@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 2/3] net: phylink: clear SFP interfaces when not in
- use
+Subject: [PATCH net-next 3/3] net: phylink: add
+ phylink_sfp_select_interface_speed()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,54 +74,80 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1uWu0z-005KXi-EM@rmk-PC.armlinux.org.uk>
+Message-Id: <E1uWu14-005KXo-IO@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 02 Jul 2025 10:44:29 +0100
+Date: Wed, 02 Jul 2025 10:44:34 +0100
 
-Clear the SFP interfaces bitmap when we're not using it - in other
-words, when a module is unplugged, or we're using a PHY on the
-module.
+Add phylink_sfp_select_interface_speed() which attempts to select the
+SFP interface based on the ethtool speed when autoneg is turned off.
+This allows users to turn off autoneg for SFPs that support multiple
+interface modes, and have an appropriate interface mode selected.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/phy/phylink.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ drivers/net/phy/phylink.c | 41 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 40 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 6420e76f8ab1..c92a878ab717 100644
+index c92a878ab717..f5473510b762 100644
 --- a/drivers/net/phy/phylink.c
 +++ b/drivers/net/phy/phylink.c
-@@ -3536,6 +3536,8 @@ static int phylink_sfp_config_phy(struct phylink *pl, struct phy_device *phy)
- 	struct phylink_link_state config;
- 	int ret;
- 
-+	/* We're not using pl->sfp_interfaces, so clear it. */
-+	phy_interface_zero(pl->sfp_interfaces);
- 	linkmode_copy(support, phy->supported);
- 
- 	memset(&config, 0, sizeof(config));
-@@ -3673,6 +3675,13 @@ static int phylink_sfp_module_insert(void *upstream,
- 	return phylink_sfp_config_optical(pl);
+@@ -2709,6 +2709,39 @@ static phy_interface_t phylink_sfp_select_interface(struct phylink *pl,
+ 	return interface;
  }
  
-+static void phylink_sfp_module_remove(void *upstream)
++static phy_interface_t phylink_sfp_select_interface_speed(struct phylink *pl,
++							  u32 speed)
 +{
-+	struct phylink *pl = upstream;
++	phy_interface_t best_interface = PHY_INTERFACE_MODE_NA;
++	phy_interface_t interface;
++	u32 max_speed;
++	int i;
 +
-+	phy_interface_zero(pl->sfp_interfaces);
++	for (i = 0; i < ARRAY_SIZE(phylink_sfp_interface_preference); i++) {
++		interface = phylink_sfp_interface_preference[i];
++		if (!test_bit(interface, pl->sfp_interfaces))
++			continue;
++
++		max_speed = phylink_interface_max_speed(interface);
++
++		/* The logic here is: if speed == max_speed, then we've found
++		 * the best interface. Otherwise we find the interface that
++		 * can just support the requested speed.
++		 */
++		if (max_speed >= speed)
++			best_interface = interface;
++
++		if (max_speed <= speed)
++			break;
++	}
++
++	if (best_interface == PHY_INTERFACE_MODE_NA)
++		phylink_err(pl, "selection of interface failed, speed %u\n",
++			    speed);
++
++	return best_interface;
 +}
 +
- static int phylink_sfp_module_start(void *upstream)
+ static void phylink_merge_link_mode(unsigned long *dst, const unsigned long *b)
  {
- 	struct phylink *pl = upstream;
-@@ -3757,6 +3766,7 @@ static const struct sfp_upstream_ops sfp_phylink_ops = {
- 	.attach = phylink_sfp_attach,
- 	.detach = phylink_sfp_detach,
- 	.module_insert = phylink_sfp_module_insert,
-+	.module_remove = phylink_sfp_module_remove,
- 	.module_start = phylink_sfp_module_start,
- 	.module_stop = phylink_sfp_module_stop,
- 	.link_up = phylink_sfp_link_up,
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(mask);
+@@ -2911,8 +2944,14 @@ int phylink_ethtool_ksettings_set(struct phylink *pl,
+ 	 * link can be configured correctly.
+ 	 */
+ 	if (pl->sfp_bus) {
+-		config.interface = phylink_sfp_select_interface(pl,
++		if (kset->base.autoneg == AUTONEG_ENABLE)
++			config.interface =
++				phylink_sfp_select_interface(pl,
+ 							config.advertising);
++		else
++			config.interface =
++				phylink_sfp_select_interface_speed(pl,
++							config.speed);
+ 		if (config.interface == PHY_INTERFACE_MODE_NA)
+ 			return -EINVAL;
+ 
 -- 
 2.30.2
 
