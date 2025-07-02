@@ -1,134 +1,148 @@
-Return-Path: <netdev+bounces-203246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C8F5AF0EB3
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:02:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E81BAF0EC2
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:03:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29ADF178B31
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:02:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7803C1C25F5D
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:03:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9839123D2B5;
-	Wed,  2 Jul 2025 09:01:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b6fk/H7g"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD70523C51B;
+	Wed,  2 Jul 2025 09:03:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0D123ED56
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 09:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6161C5D62;
+	Wed,  2 Jul 2025 09:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751446910; cv=none; b=PvhxMP9OkmBZ7xMZQw5U7d5RmiEyzW4xCl152S0LImSJovjZIlzLL0XzI2qMOyjIXIw5YcRoaIxsKufDQ2z346E+yGJgHsP7zja0XIK9TDoetsz8jtIVNoDaGeqppDDg/qfleH0rpR9QIbOn7qbm3BOiB1dwPYT7vusKro4tsDY=
+	t=1751446999; cv=none; b=WQnqpdy4GKMibBoqhAC93EPFn0M7UNpzjQguxeoc2YwYzpvmANwKzzPluTUq628ZVIFp0Lb/t6vpNs870t4yf8yPzDsMVAdUX9mEYMegHsekNWgUuY4nrFeTN065x185k/1kicGgqgo8fgD4DjF8xVnlw70/9+zPubeF3cw7Noc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751446910; c=relaxed/simple;
-	bh=rT/1yTCUYgsKJSyTh5ACsF+g/jBCPapT4DPjXtyBeC8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=P5pC7GviE2qFpJ+b5pomq8HjBTudSQ6rtkzSETxWHoHHo0e/YgTxQVxnNaVPIiUGB70Ki0vAKCZ1WsaXqfQqDElCUEwW54cV4PJ9JQQqpMFvaulhLrmWasbf8rwY0fqAdqtC8wcGUwhVbhS7JInVONyNo4/JUf8Tqwl/nkucB7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b6fk/H7g; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751446903;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rT/1yTCUYgsKJSyTh5ACsF+g/jBCPapT4DPjXtyBeC8=;
-	b=b6fk/H7gtm8IyYp9H6svKea+cpFQ1Sk7G44ya6qv1MaM6TQLOp/DJec4d+yCZMKftAl6Lk
-	XX/ZKvvRQtJYdNpH4EUokdx0YNNNTsqf/LRyPhSjs7F6WCDcBZww7IlKUBXlSSy5l2G+QQ
-	Vgxbivo6EVdM5U0qzzzRuTtkIPmqR+E=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-128-bsadKT4YOPKgaph3G6vc1Q-1; Wed, 02 Jul 2025 05:01:42 -0400
-X-MC-Unique: bsadKT4YOPKgaph3G6vc1Q-1
-X-Mimecast-MFC-AGG-ID: bsadKT4YOPKgaph3G6vc1Q_1751446901
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5551093dd58so2544569e87.3
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 02:01:42 -0700 (PDT)
+	s=arc-20240116; t=1751446999; c=relaxed/simple;
+	bh=WvCSPAdXA7YMAOl08dmb3AIBfa+EJ3tyacOjS7cxvrQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nL5r69JMFNTiF4trykeZdu4FIE4q05W4j0hqCMTzQHqH2oKTAY88mcHnYfgHaIkuAD5NdNfl5S3mZSXZrCc5EoiZgmWxzWwoD53BWWcBIR5yGulq6wdXuyFnFLmsPJlvjGS7U2nj/kKEb/IJ+Q31GDabQRAmS11a5Ypoqy9fdaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-53145c74e15so1925900e0c.0;
+        Wed, 02 Jul 2025 02:03:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751446901; x=1752051701;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rT/1yTCUYgsKJSyTh5ACsF+g/jBCPapT4DPjXtyBeC8=;
-        b=C9igaTWY5PxwxA7bZ4uiyw3oj/LA+oRmiFumcpHIzquoeKkPNs6ooyYX4P9LIdZdjg
-         SqQCsJN0L4mLrfXLjdyadmjtko9NlObGwUFcjRbkBBwkwNNCRPokxqp1VStSqCLYzJDH
-         Usyh6t9ZNTXwwjqsX1enpQ11QyEk8SbmgT3xgeDMl5itGMHlnf5krYDIvs5jGbmJxbpd
-         L27Rt9vE0FfmSe864+Cp9c+UvyMblbfk5nHFGfsoLGI9N0dLxgKhkMzM70Fo8emkcXEI
-         HbzEd+9k/Hqa7m0lcWSYmGyfOHRqEDEwCwmVR4oHJM2UiwopZIJZMlts0BFPPhd6ecba
-         R6HA==
-X-Forwarded-Encrypted: i=1; AJvYcCXEbxVacg+5HKZ2b+qTFnt2hy/OO/51RircfSZkNNPL0HY1BFBbbBEOu0UL5LBDrJvkkdL4lGk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNQw+fQ+z07o6ii5Z/ZFQM9/LNVVgYySB0O8L2ZxYC8jlkCSZI
-	jvCmvOf2caKOzWmrUaSFrvlW7v2s1oUlM27aE0JEHwC8XwAQqcKWFFBOiltrnL8/uKMJSYScP9J
-	NKn5J0tTTLmErdVwAXzLWXG6c+u29z318s4NXhXowAWgT934Zg+jMNikBNA==
-X-Gm-Gg: ASbGncvjNfMJv3h8znqPnFbsH8Ed8rC/JLEfBk1Jz691Xv5Paq+5cq80mDVmxLeyxox
-	4o0899IwW0SJ+O4WRFh5OWrRUKMCVnCRuutnCVTQ/Wt1E0hwXU6vjCc6xsS18YQK7c+WZJaHQzW
-	QxxpZu/WLY5RVBmJ8CJstzUNHvGseFoa6E/SsbV6vsJLV2djmiTR4hEjFeJXNmtkMzzg39kg1Ba
-	tQzONQIKb5fYKCFzzoQEZQGwymPmE4xnlJDlKFkxa+d2aaK+aINtrAhPN0ALauTQh/HGLWWO/n2
-	4SFt+WWhGFnvI/8C7qs=
-X-Received: by 2002:a05:6512:2245:b0:553:addb:ef5c with SMTP id 2adb3069b0e04-55628372cfamr635089e87.54.1751446901062;
-        Wed, 02 Jul 2025 02:01:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG4L3Lr7zlS5Q7UNzNUPT3l26X2dNCoG8GtYzZzEmFsARCZIaKREcNHDzAIVt/eK0EazCxBZw==
-X-Received: by 2002:a05:6512:2245:b0:553:addb:ef5c with SMTP id 2adb3069b0e04-55628372cfamr635048e87.54.1751446900110;
-        Wed, 02 Jul 2025 02:01:40 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5550b24046csm2071324e87.20.2025.07.02.02.01.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 02:01:39 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id C45C61B3803C; Wed, 02 Jul 2025 11:01:37 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org,
- magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
- jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- joe@dama.to, willemdebruijn.kernel@gmail.com
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, Jason Xing
- <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v2] Documentation: xsk: correct the obsolete
- references and examples
-In-Reply-To: <20250702075811.15048-1-kerneljasonxing@gmail.com>
-References: <20250702075811.15048-1-kerneljasonxing@gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 02 Jul 2025 11:01:37 +0200
-Message-ID: <87plejezke.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1751446994; x=1752051794;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pWkqrPH+Peqo0aIdz6HAaPwffu/WSJWGQUNNsg59/84=;
+        b=XGecPL6Z+oTE0KbsCpPiCiuuEW8cEz9yW1hcohj4YOP0lwFG1VGeDRf39Un5uuBQO3
+         zDdScwU4c+kT0DO0BPnbeQ7Yyl/9vynCVfi4HZZHkspkxIpHJc8j3Xt0MSIocyvCB6iH
+         UzWWjpRH6toTzCE8Z3esifQKlrx3DZowErG4YDvhMual+3enkTj5LihfYcP/dJYEQJkL
+         qcozGjNJzZUianajPU1c9F4WALlnwoGs2PN5Qlmuu4txjoXPe1jiVpb+az9VtnOatI2h
+         Zu/AWppN+y+HrdzuNkbmrz86hUgJJL0aYgZmXK9HLmXEaXEtE8+qeGwJAnJjmQwSl1WS
+         7HFg==
+X-Forwarded-Encrypted: i=1; AJvYcCUPWnF82jbtjpqFCPZW81Qgd1lg2OLOS1lBe5a02MOsLIQliQV54D1JeBVP/zA0A+UHGwUXAse36+9z@vger.kernel.org, AJvYcCVf2bMVgsNLMFBmdP3TXBJnRkLEdhFKb4NyJd6DlHKPI4IEe+Gc1pdlRBcHm+Ley6W/Hy/iEZu0u8ZA@vger.kernel.org, AJvYcCW4wfVGFvmXgxRR4i+mcwPo706pDdoJiu+XEISUpkQiuEoAwNx2TpafRReJsBelVHoK/zZ8BC6zWWcDmHzR@vger.kernel.org, AJvYcCWR6iHUXX4GnwIf0VChUu1jBnbQpiPR0vkcRUoSst132HDmXsp7P2qUInYR+/ZzEzgqSTdsaR/2@vger.kernel.org, AJvYcCXxVOEARwUAgnlCLK5n8sltqCK8CxdgbU+e8aSowblPvTLS8z817927FUnnVKxekpf7eUimXFvZ2DgsZs8hsZ5Y5xU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBQ2fBHmPCAlGauA7x+SZKnqFBz3Ui0ypi3TpzZOBnMZpy3mlM
+	K5SEndVnE26tNENQygj5dRQm7Gyr2ZUBYwLAp0LmLDnG0/EBddCesdJnZiRK3g2x
+X-Gm-Gg: ASbGncsKvYxn5Kr8QbJNx19B9FEwOuz2SwBIbR63nUMenM+aqidlWI4wpLdHbcJ7teV
+	LKb80paDRV95JWZwiGSZL8V95kB9SDEUUfujDERx57iBQgvgdVvyKuyAHVM0IhsCT66VnwSPEX2
+	JEoKQsSDy/dovL9lkcgnV3ClFxYPzwLuHGqKzirImi60yjjJCAqD5JrJcS/tFECQtnx4M7n2D5A
+	J7RmSktAU2G9jfP5mjq81DFPSonaCK0XTeGBiiQYgVFa5l37wHyrwnf58elQY8yQSs7YemdBa/D
+	5mOVvjTnP8cGO8TAUcXWJrMFQrdZwCXfdKRRPDavsbZI804a+D7+2BxHATFBwm0W31agJBskLXZ
+	3FApooyLg85ewh0mRK6nFF5gb
+X-Google-Smtp-Source: AGHT+IGCHzlWZAjVbeSdUuhmcP0DTrGFm7as/qlrZIjC+w1VciHkZP9Xg119GdeyNys0FAwG97jScw==
+X-Received: by 2002:a05:6122:80b2:b0:531:4041:c4c7 with SMTP id 71dfb90a1353d-53458353a95mr1339612e0c.7.1751446993964;
+        Wed, 02 Jul 2025 02:03:13 -0700 (PDT)
+Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com. [209.85.217.48])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-533090c46b5sm2042205e0c.20.2025.07.02.02.03.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Jul 2025 02:03:13 -0700 (PDT)
+Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-4e8110ac0f5so1744649137.0;
+        Wed, 02 Jul 2025 02:03:13 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU0ksvN7lKj5idj7MfkhNPD/VnUOZOvatBgvhMgGyASMeH1ubvub5ms7aoU7ihzQTD6Ph47mM/DIDogKhRbou9Mebg=@vger.kernel.org, AJvYcCVT+j2FT7z1WN63LzBeMApsOpYiVAuQFdnW4USDIruNgJd1uvo24T+JytkkzjoYWL+UIzMbgFog68Pq@vger.kernel.org, AJvYcCVa8z/9OGBMQhZAjR34wSmVEzPBNAL9bOKzxD0dfuqRMhsMMIU06nqFlHMzYpIMhIpWVJ9dVFZFgKf6@vger.kernel.org, AJvYcCWQt91Y0PuKsNESdV0rkDaUWHvPTdOJKBK4dWYTfTjOGbf9KikP2P3fcT+HyUfJqMhjHHEp84g9C85OLkek@vger.kernel.org, AJvYcCXK3MeguY+2q6W0GURYo/d9jHy0y4VUPhPhNHPoa7b6bnLX34Vxu51bRQrAXB2/C+0g6vvG/mMf@vger.kernel.org
+X-Received: by 2002:a05:6102:32c4:b0:4e2:a235:2483 with SMTP id
+ ada2fe7eead31-4f1612aa178mr748536137.19.1751446993429; Wed, 02 Jul 2025
+ 02:03:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20250702005706.1200059-1-john.madieu.xa@bp.renesas.com> <20250702005706.1200059-5-john.madieu.xa@bp.renesas.com>
+In-Reply-To: <20250702005706.1200059-5-john.madieu.xa@bp.renesas.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 2 Jul 2025 11:03:00 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdWzGLQwmGep9L0A9bzp5mYybA00W=S2cZnGH0tbMJvzEw@mail.gmail.com>
+X-Gm-Features: Ac12FXwiA2_DO3vhH2MiiQxz-3dxHaqMTUJ7xX0QMzU3J14CqHlagpboID9b-mo
+Message-ID: <CAMuHMdWzGLQwmGep9L0A9bzp5mYybA00W=S2cZnGH0tbMJvzEw@mail.gmail.com>
+Subject: Re: [PATCH v4 4/4] arm64: dts: renesas: rzg3e-smarc-som: Enable
+ eth{0-1} (GBETH) interfaces
+To: John Madieu <john.madieu.xa@bp.renesas.com>
+Cc: magnus.damm@gmail.com, robh@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, mturquette@baylibre.com, sboyd@kernel.org, 
+	richardcochran@gmail.com, prabhakar.mahadev-lad.rj@bp.renesas.com, 
+	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org, 
+	netdev@vger.kernel.org, biju.das.jz@bp.renesas.com, john.madieu@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-Jason Xing <kerneljasonxing@gmail.com> writes:
+Hi John,
 
-> From: Jason Xing <kernelxing@tencent.com>
+On Wed, 2 Jul 2025 at 02:57, John Madieu <john.madieu.xa@bp.renesas.com> wrote:
+> Enable the Gigabit Ethernet Interfaces (GBETH) populated on the RZ/G3E SMARC EVK
 >
-> The modified lines are mainly related to the following commits[1][2]
-> which remove those tests and examples. Since samples/bpf has been
-> deprecated, we can refer to more examples that are easily searched
-> in the various xdp-projects, like the following link:
-> https://github.com/xdp-project/bpf-examples/tree/main/AF_XDP-example
->
-> [1]
-> commit f36600634282 ("libbpf: move xsk.{c,h} into selftests/bpf")
-> [2]
-> commit cfb5a2dbf141 ("bpf, samples: Remove AF_XDP samples")
->
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> Signed-off-by: John Madieu <john.madieu.xa@bp.renesas.com>
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> v4:
+>  - Update pinmux to add OEN support
+>  - Drops Tb and Rb tags initially collected
+
+Thanks for the update!
+
+> --- a/arch/arm64/boot/dts/renesas/rzg3e-smarc-som.dtsi
+> +++ b/arch/arm64/boot/dts/renesas/rzg3e-smarc-som.dtsi
+>  &pinctrl {
+> +       eth0_pins: eth0 {
+> +               clk0 {
+
+No need for the 0 ...
+
+> +                       pinmux = <RZG3E_PORT_PINMUX(B, 1, 1)>; /* TXC */
+> +                       output-enable;
+> +               };
+> +
+> +               ctrl0 {
+
+... suffixes...
+
+> +       eth1_pins: eth1 {
+> +               clk1 {
+
+... or the 1...
+
+> +                       pinmux = <RZG3E_PORT_PINMUX(E, 1, 1)>; /* TXC */
+> +                       output-enable;
+> +               };
+> +
+> +               ctrl1 {
+
+... suffixes.
 
 
-I'll make sure to update the document should we ever decide to move the
-example code :)
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+i.e. will queue in renesas-devel for v6.17 with the above fixed.
 
--Toke
+Gr{oetje,eeting}s,
 
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
