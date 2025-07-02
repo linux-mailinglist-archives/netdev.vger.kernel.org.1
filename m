@@ -1,282 +1,152 @@
-Return-Path: <netdev+bounces-203164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94BF7AF09F2
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 06:39:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EED7AF0A14
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 07:01:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A364C480C04
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 04:39:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3500F3A1F28
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 05:01:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E37F2221577;
-	Wed,  2 Jul 2025 04:37:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="gAk+rBe4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B39A1A4F0A;
+	Wed,  2 Jul 2025 05:01:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013031.outbound.protection.outlook.com [40.107.162.31])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF6321883C;
-	Wed,  2 Jul 2025 04:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.31
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751431076; cv=fail; b=tJg++VNmPm4oWQPUN92ZKsLYqeNDGknUfTJL8EEhYpm6FSfxvVYrlcbgSOZyb7cU27l0HsxUscPx17Ff2iZAhtwuOu3TrddCiicS/PPmgPZk8WTrpwHkpNcgjaQ1HciuK7pcNxHAMf6ajUJN14R2fUOiIJLr3z7/gn5nRaj1+iE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751431076; c=relaxed/simple;
-	bh=J30iOy+Lh8VCKUCbCfAEnUqRWAu53dq8wPfwoVdNSMA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W64jdn1WcC4WRDJJTPHu7fsseRXtw/yzD1thCCzxMWrEPv1ghqnmaAuz2SuZwk8rF2MoxuCsx07UzyLZQEC5Xq+xSrnkWG3G9KTQuWPhVzNL90Y7foOyc/v5NP2MRtn50G9f696nnljpKgVL7NHouksK5nA4IXcdmCeC9b8GHvY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=gAk+rBe4; arc=fail smtp.client-ip=40.107.162.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=P+O6fb9ZtUZ8rcqcbByKUCWH+1jCJ8e6Mw8exQghBZK2Mo+GhBSUgBmuv09rIV6EGCgdmqTHjs4og7EBYrhPv2jYC7f0ez+hfIbxFWrOsOrzixabw27HohiIypeJGjJt8i+V8kR2vXkY7Css2sSW25n5NmKGbLNdLQt20DVbVxgdp+3LRKrVIGrLyOEYTgONT22/wLXHeGrAbjYHzpbiMZ3iOsPN4he5cbM+Vr28BZX+ZoMLoFkWARPtdaDElol2ZWTjJ2XAY4PkC/8SRo9+xJgwPv2JtjueajlH9WSs4gL+GDqgixfxajtt+O3DfQBtRcem8BHyYgjY+T2L7TjGJA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=k6fjybJ/1YtQztmB+/QhyRQqFiK3FOO4hsPtLxSluOA=;
- b=DNrTQMvjrupspyxeT3VZpkbI4cxFHW+2rEHrnjZJLED1FtpP3wxpKfBh69fzKzpYoIZIAMbs5skvJ7WEF4wr7UvnYxGMw+sKYjLwo4L4EqRG60snx+7g8XRgSI9eGjCgix65Vx+AieR2S2o7fE1v3j9y6y05OlKilttsYeYbCHnU4JEQG9bTaiAD690eeTsP0xVTIOWYmUuTaw0MUIv0jh9JRHmpSkhOuIzC+n73ocrj9cOfQrc7Uc0Vyt1IMjXKVFKM5cvro1W8yeEELRPPWkriqo5gmRRyGhi+ykSDg8/1sxp+dyz4xcVCrJYIZzSrisbZOAwf5mrCqgpSbATLuQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 131.228.6.101) smtp.rcpttodomain=amazon.com
- smtp.mailfrom=nokia-bell-labs.com; dmarc=pass (p=reject sp=reject pct=100)
- action=none header.from=nokia-bell-labs.com; dkim=none (message not signed);
- arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=k6fjybJ/1YtQztmB+/QhyRQqFiK3FOO4hsPtLxSluOA=;
- b=gAk+rBe4npQWhLk99nNBcNrXjdasMdrMfYXq2BW+0iDnsxps+FgyEweK6VldA6nxBPCcb7QNDzbFI5kmxAtTfpp85y69NvsgYNc2rMbKqYRzAMgoiLo6OAhHjQwODNV116Y9Ac/O6eAsy4vjcLmrjypUzqPJ+lRnpWz8V4UipqhEgxU2ANALlmvR2Dw7HT6JQjiwnytQ20gsODQAUD/338AUWM+ewf8XEMAaLd6RpENGu45zaRzZ151eTCo/eIlEhp3q3hWgkf0DWfTodTzYboIse8sECvDRLVY1vPS2O/07qNUNerFhhMdu6x9i4RXr2aBjHZ4Gsxmx5druGAewjA==
-Received: from DU7P191CA0021.EURP191.PROD.OUTLOOK.COM (2603:10a6:10:54e::21)
- by PA4PR07MB8461.eurprd07.prod.outlook.com (2603:10a6:102:2a4::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.31; Wed, 2 Jul
- 2025 04:37:50 +0000
-Received: from DB1PEPF00039231.eurprd03.prod.outlook.com
- (2603:10a6:10:54e:cafe::36) by DU7P191CA0021.outlook.office365.com
- (2603:10a6:10:54e::21) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8901.20 via Frontend Transport; Wed,
- 2 Jul 2025 04:37:50 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 131.228.6.101)
- smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nokia-bell-labs.com;
-Received-SPF: Pass (protection.outlook.com: domain of nokia-bell-labs.com
- designates 131.228.6.101 as permitted sender)
- receiver=protection.outlook.com; client-ip=131.228.6.101;
- helo=fr712usmtp1.zeu.alcatel-lucent.com; pr=C
-Received: from fr712usmtp1.zeu.alcatel-lucent.com (131.228.6.101) by
- DB1PEPF00039231.mail.protection.outlook.com (10.167.8.104) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8901.15
- via Frontend Transport; Wed, 2 Jul 2025 04:37:50 +0000
-Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
-	by fr712usmtp1.zeu.alcatel-lucent.com (Postfix) with ESMTP id 0681D1C003B;
-	Wed,  2 Jul 2025 07:37:48 +0300 (EEST)
-From: chia-yu.chang@nokia-bell-labs.com
-To: pabeni@redhat.com,
-	edumazet@google.com,
-	linux-doc@vger.kernel.org,
-	corbet@lwn.net,
-	horms@kernel.org,
-	dsahern@kernel.org,
-	kuniyu@amazon.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	dave.taht@gmail.com,
-	jhs@mojatatu.com,
-	kuba@kernel.org,
-	stephen@networkplumber.org,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	donald.hunter@gmail.com,
-	ast@fiberby.net,
-	liuhangbin@gmail.com,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	ij@kernel.org,
-	ncardwell@google.com,
-	koen.de_schepper@nokia-bell-labs.com,
-	g.white@cablelabs.com,
-	ingemar.s.johansson@ericsson.com,
-	mirja.kuehlewind@ericsson.com,
-	cheshire@apple.com,
-	rs.ietf@gmx.at,
-	Jason_Livingood@comcast.com,
-	vidhi_goel@apple.com
-Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-Subject: [PATCH v10 net-next 15/15] tcp: accecn: try to fit AccECN option with SACK
-Date: Wed,  2 Jul 2025 06:37:19 +0200
-Message-Id: <20250702043719.15130-16-chia-yu.chang@nokia-bell-labs.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250702043719.15130-1-chia-yu.chang@nokia-bell-labs.com>
-References: <20250702043719.15130-1-chia-yu.chang@nokia-bell-labs.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C96082FB2;
+	Wed,  2 Jul 2025 05:01:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751432484; cv=none; b=HG8D9F8rViK8h2NdX5/jn4F9bS7U+ZIVrnoza5Reb4lF+Vt2ykv9Ma7zMIX7qUrPeADeKTExc7SpIEANNbBK3iLs+qBbL4Xsjbpez7KlsUFAKexpnpfdWDcpKyxqmUfL2vONoZCd15PHQvmieXTpGL8KuHH7iZUOyHx6MFXLbPo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751432484; c=relaxed/simple;
+	bh=aM2O311AG0MI5x8qPgoLBcOvvK+KMw4egyrI2NlTIh4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cB4ZD7XoE4P5hIzp1fu9he0z2WA1GjYabUs3j2RR5fHFb1jioCkYF6TZUmU2EjuS1k/Z47iaIQ0mtVQz7VKVLf5tV3QFdznozrEWjXYeOUzQ2JK4FAMIlrtpziDsKkOQcD//gRoem2FVWhkif4svbaC79HOInknmqSSIhgB2mXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-555024588a8so4186059e87.0;
+        Tue, 01 Jul 2025 22:01:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751432479; x=1752037279;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :reply-to:in-reply-to:references:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=V0rt2nH/TWlCePhqIMfxbMwVAseEB+3Yn8nvDGBHf0Y=;
+        b=lCCQbWbJiQt1NsmLzRWqp7kobxDfeXW766hwaaFAHgHwbOfjRY8dSA9necnUkkO5gm
+         KxNUrdmShXF3KFOaBaTn1BPMnMV4PKcRlm/r+L+brpFi+uNIZdLSxcgWiFHHyzdUnKx5
+         iZ5uLFCP5/WXRIbrkjuuSYfw1zpU14/DJUlN+QOzpF+1DbzTltV/XsRd2h1H5J2gL452
+         IFlmtZ6q/XWfBe2v69UvbG4wacAcm+xp+PD8LzECuWq5IXrrUh+e1GR0911C8uZjwf7e
+         6jFxX+b+FjKMhEPg4+OO41p2wrecOpa3Nth7Ps/zQ2/TIYSHRG3D8thwdhwyjGFqQTYX
+         HnEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUtpOIm/sIvMEStX6GABc+E7wbxGSABEjIX2J9YSicPVW73CCdylILWX+J3Ip3UCtsyn39WFYWveAD6lvKb@vger.kernel.org, AJvYcCWHcvdeSEeNiCsP6sjCNC5UfJGhe7Z0Ua9WhFRIhzrbj06rUZ3jFD3hlPR5XPnMvWoXp7xmXPsN0qmv@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVGsFJLfSanOhYLT9pgqUeXxtCLPyDxH3WEMBMTuT1j1Y8SLSX
+	JnuIAps4iSTQfV9omZbisgdJeoIohmuN3hw5WOrcVNSXwEUKMybwvcCiOl6YbkaO
+X-Gm-Gg: ASbGncso/lvvbgOW2st4Shr2Tv06LpD9csVeSaUzUEsXzr10oSF/DsE0z0WijCQYcKe
+	2nI1+x7RRB93a/JHPUu57Gw/ipWmrYHaxKDqdF3dNwAcvtIY7GliOqljkiIwMr44kVmVRbJD8Ir
+	UeKKwd6+z8Hp8EYHPBE+eoco6FA6lgfGoNypLmN4YqN3NShvdj+e3kbR4Dn+7ECK+6MjAaa1GO3
+	+mMwdQfpDMljP7K2Zlzamvx/TQLfsN575dHshyV2EWpb+A2Z2ZDfDzIw30nDwXfE9MGqFOMzqIt
+	8kvFakcu5l+c9Zsc6yw5DIlQWQaE9xzK47z+GzQpv7haXgRqbWJ6D+J/RRLdIUglmVT+8q5zWab
+	VSnMINBh08vk/HyMG/48=
+X-Google-Smtp-Source: AGHT+IFG9dXhqHdaZHV6aRjDiPPbxhVNAwyQpeQVP0kYHFcxWO4/K/yqM63WaXOZhLNe2KUBF9u9kQ==
+X-Received: by 2002:a05:6512:3ca4:b0:553:2645:4e90 with SMTP id 2adb3069b0e04-55628389775mr434988e87.52.1751432478833;
+        Tue, 01 Jul 2025 22:01:18 -0700 (PDT)
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com. [209.85.208.171])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5550b2ddc50sm1993541e87.231.2025.07.01.22.01.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Jul 2025 22:01:17 -0700 (PDT)
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-32cd0dfbd66so31294641fa.3;
+        Tue, 01 Jul 2025 22:01:17 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVfl159z/5RVQTsckcOvGW6WXb875jnd53t/621vGuq9cI2JinO3HbfaT6OE292k90lQ+m+qlZK7yVvy++H@vger.kernel.org, AJvYcCXXym3H69YibdS2FX0IiOWWLKTPNMFsZBe+e/o66NnPW/eAMCvStSUdOSmZVc7J1GcW8SChTEgL0ZWD@vger.kernel.org
+X-Received: by 2002:a05:651c:e1b:b0:32a:6c63:92a with SMTP id
+ 38308e7fff4ca-32e0004b940mr3217911fa.22.1751432477399; Tue, 01 Jul 2025
+ 22:01:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB1PEPF00039231:EE_|PA4PR07MB8461:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0f6e48ae-6a33-4372-ce24-08ddb92233d7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|82310400026|36860700013|1800799024|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?aU02cTF6U0FqcGFQZG9yUWtVUThIbWhuNkFZOVlYRUZlMFVoNXNuY2FLZEFt?=
- =?utf-8?B?cnQyanFCWU1uZ1NqTFRscUlWV0xVanREOEFnZ0d2dlV2bGJBU05EVnN2d044?=
- =?utf-8?B?Y3Fjekh0T3laWTJqYnltaFErbC9nMjhQVE1oWXNSNElYRFRuUC96U2gvbjQx?=
- =?utf-8?B?OHR1VkxWSWFtSTNxeCs0c1dRNGVLYmh3YnU5MGJ2L1JteHlTZVhLS091b01a?=
- =?utf-8?B?VzdDeWg2WUpXSVdpc1ZucWdtSlBOcDIzcjhJZmRacThpUVZwRkhUMC91aENB?=
- =?utf-8?B?NGZLa1AwWTJnTVMydUpIYlN1Y244bG9KTWI3a3Uva3ZjQy83QU1OcWNQaFgz?=
- =?utf-8?B?M1F4NWsvMzZxeVUzYlhjU3Q3ODVza2Z4NzRqS2hkYjZsdmtRaldZRVkwbENw?=
- =?utf-8?B?V3pjL1RjT2F5ZW1ja1F4Tm5yNENzeklISWJ1cE43cWJMYUc1WW5aNEQ5Y1hh?=
- =?utf-8?B?aGpzZC9aSGR4NHdRd1FBMEhHb0hGaXJTc1VFSlRNcnFTQm90Y0wrNnViUThZ?=
- =?utf-8?B?aWR6VWtCNkh6K2diZHl0OStOeUxpM2N1TzdVQkFGbFZmQWJycmd5RkZBb2lM?=
- =?utf-8?B?MTdDTFl5QnBJSDNUWnhDczZjRk5ZMmg2U0dxYSs0WW1HdEVQOE5PanNhOVdD?=
- =?utf-8?B?NHc5cko4cWw3Z21VY1grclo3NGwxZWxSL3ZVcU5qeVd6eTB2QVI5NytHNkRN?=
- =?utf-8?B?MEtmVFJwdU5jemg0MXhreTJvRU1yUmJqa0NadTdGU1kvUWR3R3U0bHBPSlNY?=
- =?utf-8?B?WXVSRDlpU3NSWmJtTkg4Y0kyRVZvYWhRODk0eTZvcVNxUk9VTkRyWUtLNVd2?=
- =?utf-8?B?dkpUNWxaUFdSQ3VKbmdMRTZNbGVtblcrbkRYalFEZnpZR0ZTVG83OHpIcE1D?=
- =?utf-8?B?QzF0ZDJVSHFsam1HNGw1RnNySWNMN0RMWnVGRkwyc1JoRU1DMjRrbHNlWWx6?=
- =?utf-8?B?SmJjOEhGQ3IvVG13VmhsZEx3MzJJTk1ESWp5ZElWU2ppSzVNSEF1aFJsNUl2?=
- =?utf-8?B?c1J0ZWNCVjZWSWN3RWgvSWYwZm1NWjRoUGpLUzVuZ2djU2ZBZ2NobEJPZ21V?=
- =?utf-8?B?ZjZUV2VGL3JxaG4raVdsZ0FpQ1VEeUxtaVUzVjQrVHJZMGR1S21LRG5FQ3ZQ?=
- =?utf-8?B?dEEyYTU5ODZOZ3p2cmdjZElFQjZtVys4WlJRRDZ6REo2Wm5OQk84OUJiU0tz?=
- =?utf-8?B?WTRNa1hNclJ1cC8vbk5Hd1JQalZYU3VkeXdhaExmNjlFVVo3RGRRM2JsMXlx?=
- =?utf-8?B?NUlXaHRlYUl2TzAxQVF6M2l2bWh2RUs5bXJ5ZWlBUk9TVDdjN1kvM3QwUWYz?=
- =?utf-8?B?ajVCT2srbzdITlZycU1oZ1k0TXRlbmp4K04zOVFsZHJMdDlDWDF5a1N2NXg1?=
- =?utf-8?B?ZE8wVjM0bUxmTi91OTVNWGplaWpzUUFDbiszSHlBcnlTMUlTV3Fzd3QrQ0E3?=
- =?utf-8?B?V1dLYkdyV21EdVB2Qk85MkloRS9RT2RXbEd5RXdkdjNxZUp5Rlh5cWZXQXNW?=
- =?utf-8?B?ZE1VY3VzMnB0ZHBEUDB2MGdLSmJ2UkY5cVIxTUkvcDkwblVSUVBveGxmeTk2?=
- =?utf-8?B?b040SmNNeVgyUHRoWDJIY2ZOVk1wMFVTQ2hMTHp1aUd0U0g0ajRyVzBCYUFo?=
- =?utf-8?B?K2xwcUZJVEcwNXNqb1RaenRYYTZ5U1VnSGlzeGFuZnhvaVlRK09LcncvYmhy?=
- =?utf-8?B?aDhmRk5ZYWJBdmo1eUFuanp5NVNBQTRhdkNGZCtpLzdJYWZsb0wvVGY1US9L?=
- =?utf-8?B?c2ZlT0xYSkIyTFc0ZXJuV0lMRVNSR0huY2JTT1NNZlpyMEFzbWV6TzBjMTF3?=
- =?utf-8?B?NGpnN3p0L1dYNkVIM05KUWduNmRzOXVrdVMwSkdCdzQ5aDRneUYyWUgwa0RN?=
- =?utf-8?B?eFJ1M0wvdUUxdStQbE9ScnExRFF5T1JNU2g3YzJhLzJ5eVlXSDRsTzhzV2lk?=
- =?utf-8?B?OVZ4WUtIby9XWXl0Q2N6ZUVuTE5xWkh6aTUzNlJGeEY2OEx4K1lRbGIrTGxF?=
- =?utf-8?B?RnV4ZzJNNFo2M2lJK2drbW5KOUZCNWMxV09SbkEwa0FsaG9NSlA4ZnpCTmFC?=
- =?utf-8?B?ZUFQeEZ4U3ZVTFRPem14Ti8rVWx2KzdJRDJ3QT09?=
-X-Forefront-Antispam-Report:
-	CIP:131.228.6.101;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fr712usmtp1.zeu.alcatel-lucent.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(36860700013)(1800799024)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: nokia-bell-labs.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jul 2025 04:37:50.5484
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0f6e48ae-6a33-4372-ce24-08ddb92233d7
-X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.6.101];Helo=[fr712usmtp1.zeu.alcatel-lucent.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF00039231.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR07MB8461
+References: <20250701165756.258356-1-wens@kernel.org> <20250701165756.258356-5-wens@kernel.org>
+In-Reply-To: <20250701165756.258356-5-wens@kernel.org>
+Reply-To: wens@csie.org
+From: Chen-Yu Tsai <wens@csie.org>
+Date: Wed, 2 Jul 2025 13:01:04 +0800
+X-Gmail-Original-Message-ID: <CAGb2v646HvqipGd_C=WJ4LGsumFfF5P9a7XQ7UGO6t1901DDiw@mail.gmail.com>
+X-Gm-Features: Ac12FXxOhT5Y9cipxD-0Dp_WlsoVmLL1HMEja_1PgcoQyh6p3ZogoQeQ7CimJkk
+Message-ID: <CAGb2v646HvqipGd_C=WJ4LGsumFfF5P9a7XQ7UGO6t1901DDiw@mail.gmail.com>
+Subject: Re: [PATCH RFT net-next 04/10] soc: sunxi: sram: register regmap as syscon
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej@kernel.org>, Samuel Holland <samuel@sholland.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+On Wed, Jul 2, 2025 at 12:58=E2=80=AFAM Chen-Yu Tsai <wens@kernel.org> wrot=
+e:
+>
+> From: Chen-Yu Tsai <wens@csie.org>
+>
+> Until now, if the system controller had a ethernet controller glue layer
+> control register, a limited access regmap would be registered and tied
+> to the system controller struct device for the ethernet driver to use.
+>
+> Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+> ---
+>  drivers/soc/sunxi/sunxi_sram.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/drivers/soc/sunxi/sunxi_sram.c b/drivers/soc/sunxi/sunxi_sra=
+m.c
+> index 4f8d510b7e1e..63c23bdffa78 100644
+> --- a/drivers/soc/sunxi/sunxi_sram.c
+> +++ b/drivers/soc/sunxi/sunxi_sram.c
+> @@ -12,6 +12,7 @@
+>
+>  #include <linux/debugfs.h>
+>  #include <linux/io.h>
+> +#include <linux/mfd/syscon.h>
+>  #include <linux/module.h>
+>  #include <linux/of.h>
+>  #include <linux/of_address.h>
+> @@ -377,6 +378,7 @@ static int __init sunxi_sram_probe(struct platform_de=
+vice *pdev)
+>         const struct sunxi_sramc_variant *variant;
+>         struct device *dev =3D &pdev->dev;
+>         struct regmap *regmap;
+> +       int ret;
+>
+>         sram_dev =3D &pdev->dev;
+>
+> @@ -394,6 +396,10 @@ static int __init sunxi_sram_probe(struct platform_d=
+evice *pdev)
+>                 regmap =3D devm_regmap_init_mmio(dev, base, &sunxi_sram_r=
+egmap_config);
+>                 if (IS_ERR(regmap))
+>                         return PTR_ERR(regmap);
+> +
+> +               ret =3D of_syscon_register_regmap(dev->of_node, regmap);
+> +               if (IS_ERR(ret))
 
-As SACK blocks tend to eat all option space when there are
-many holes, it is useful to compromise on sending many SACK
-blocks in every ACK and attempt to fit the AccECN option
-there by reducing the number of SACK blocks. However, it will
-never go below two SACK blocks because of the AccECN option.
+BroderTuck on IRC pointed out that this gives a compiler warning.
+Indeed it is incorrect. It should test `ret` directly.
 
-As the AccECN option is often not put to every ACK, the space
-hijack is usually only temporary. Depending on the reuqired
-AccECN fields (can be either 3, 2, 1, or 0, cf. Table 5 in
-AccECN spec) and the NOPs used for alignment of other
-TCP options, up to two SACK blocks will be reduced. Please
-find below tables for more details:
+ChenYu
 
-+====================+=========================================+
-| Number of | Required | Remaining |  Number of  |    Final    |
-|   SACK    |  AccECN  |  option   |  reduced    |  number of  |
-|  blocks   |  fields  |  spaces   | SACK blocks | SACK blocks |
-+===========+==========+===========+=============+=============+
-|  x (<=2)  |  0 to 3  |    any    |      0      |      x      |
-+-----------+----------+-----------+-------------+-------------+
-|     3     |    0     |    any    |      0      |      3      |
-|     3     |    1     |    <4     |      1      |      2      |
-|     3     |    1     |    >=4    |      0      |      3      |
-|     3     |    2     |    <8     |      1      |      2      |
-|     3     |    2     |    >=8    |      0      |      3      |
-|     3     |    3     |    <12    |      1      |      2      |
-|     3     |    3     |    >=12   |      0      |      3      |
-+-----------+----------+-----------+-------------+-------------+
-|  y (>=4)  |    0     |    any    |      0      |      y      |
-|  y (>=4)  |    1     |    <4     |      1      |     y-1     |
-|  y (>=4)  |    1     |    >=4    |      0      |      y      |
-|  y (>=4)  |    2     |    <8     |      1      |     y-1     |
-|  y (>=4)  |    2     |    >=8    |      0      |      y      |
-|  y (>=4)  |    3     |    <4     |      2      |     y-2     |
-|  y (>=4)  |    3     |    <12    |      1      |     y-1     |
-|  y (>=4)  |    3     |    >=12   |      0      |      y      |
-+===========+==========+===========+=============+=============+
-
-Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-Co-developed-by: Ilpo Järvinen <ij@kernel.org>
-Signed-off-by: Ilpo Järvinen <ij@kernel.org>
-
----
-v8:
-- Update tcp_options_fit_accecn() to avoid using recursion
----
- net/ipv4/tcp_output.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 560b0ca54bb8..cf1d40e9c0ed 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -876,7 +876,9 @@ static int tcp_options_fit_accecn(struct tcp_out_options *opts, int required,
- 				  int remaining)
- {
- 	int size = TCP_ACCECN_MAXSIZE;
-+	int sack_blocks_reduce = 0;
- 	int max_combine_saving;
-+	int rem = remaining;
- 
- 	if (opts->use_synack_ecn_bytes)
- 		max_combine_saving = tcp_synack_options_combine_saving(opts);
-@@ -889,14 +891,31 @@ static int tcp_options_fit_accecn(struct tcp_out_options *opts, int required,
- 		if (leftover_size > max_combine_saving)
- 			leftover_size = -((4 - leftover_size) & 0x3);
- 
--		if (remaining >= size - leftover_size) {
-+		if (rem >= size - leftover_size) {
- 			size -= leftover_size;
- 			break;
-+		} else if (opts->num_accecn_fields == required &&
-+			   opts->num_sack_blocks > 2 &&
-+			   required > 0) {
-+			/* Try to fit the option by removing one SACK block */
-+			opts->num_sack_blocks--;
-+			sack_blocks_reduce++;
-+			rem = rem + TCPOLEN_SACK_PERBLOCK;
-+
-+			opts->num_accecn_fields = TCP_ACCECN_NUMFIELDS;
-+			size = TCP_ACCECN_MAXSIZE;
-+			continue;
- 		}
- 
- 		opts->num_accecn_fields--;
- 		size -= TCPOLEN_ACCECN_PERFIELD;
- 	}
-+	if (sack_blocks_reduce > 0) {
-+		if (opts->num_accecn_fields >= required)
-+			size -= sack_blocks_reduce * TCPOLEN_SACK_PERBLOCK;
-+		else
-+			opts->num_sack_blocks += sack_blocks_reduce;
-+	}
- 	if (opts->num_accecn_fields < required)
- 		return 0;
- 
--- 
-2.34.1
-
+> +                       return ret;
+>         }
+>
+>         of_platform_populate(dev->of_node, NULL, NULL, dev);
+> --
+> 2.39.5
+>
+>
 
