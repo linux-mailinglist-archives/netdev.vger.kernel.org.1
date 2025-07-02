@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-203129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C5E8AF08F6
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 05:06:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B247AF08F7
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 05:07:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98DB74E262D
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 03:06:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 102247B10CF
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 03:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6277E1D07BA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 937481D54E9;
 	Wed,  2 Jul 2025 03:06:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bylQX3Kw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Seu4xuNp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E88F1CAA7D
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 03:06:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FAC01D514E
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 03:06:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751425611; cv=none; b=qpUVJIo4ykm/GvpLN54LfiyzOODdf31YJLpNn3Fbuwe7E3NY09I2ojJz9UqbIyFGGylU/vBdGY03ky+utX2R7ZaFsF3Hh5FQ6W3Mmm06HSvejbkHH30gtGL3I9ooBg+PrZutVbngk6uww/1rxUu3uhlBmIN+Cyb/NBDv0XDrSVM=
+	t=1751425611; cv=none; b=IfnLESJZlR5h5rEoZXm7Qam+0PQqFB6KSkugNw6e4YxbpffHnG/8yr8/q5a4ViNQDiwT3xclgbfcLJrR5tHGHc4qecF02h7jopJZkqFgSXPGWB6dzJ5XC8VgXI8eNO+t36gWADdfCIkjn4+h3I2Us/GtGVDd+qiU1/MO9Qi28Pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1751425611; c=relaxed/simple;
-	bh=yO5WaZne+s6pgpapAaqg++swEQawGa3U3Q1QyZdaM7U=;
+	bh=05Nm7NHxjsU6ZlJm8PjItJhWe7hkvN/OEfeZpOSWfbw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rsjTRguQfMiKHToFQJfmDdHgbVVpxWgDO7A0ShsUCqKLvJdSVZlL/QXkGOh7mDqryukth9Rc923G9TSydAmrUlk6Xwst1WhIw281JFft5Qt0+PbCYBEsE0qQsbCxBzoL+HxqIsLVDPpgO9WzTDWZkHyIRgncRaGaww+oTqERhZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bylQX3Kw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C362C4CEF2;
+	 MIME-Version; b=GEmmRoNTUE2Mfo4Cv3G5xWwd0pZ2VKf5wrDis/5dhiHjWYdlbMLOXihEkqoB6lcWXD0EAty5woa1kKuEDN+TOQ9M9mH7YHzpP04vXvrYviWdmqLH5jdGamQj34S5Y/Ulj+OE23bklbhTtdXgZBwm8pzelrabbC1eX786rNXpZPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Seu4xuNp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1FEBC4CEF4;
 	Wed,  2 Jul 2025 03:06:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751425610;
-	bh=yO5WaZne+s6pgpapAaqg++swEQawGa3U3Q1QyZdaM7U=;
+	s=k20201202; t=1751425611;
+	bh=05Nm7NHxjsU6ZlJm8PjItJhWe7hkvN/OEfeZpOSWfbw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bylQX3KwWZwxfzqGN93mKtzbmUN+ow58dAnvEjn1tz5YsHB0y2dTfcmGYa4YjqAtP
-	 264+2P9nam8VsWqiN3A1lR3G5LjVSkPNHha8g5OVclnOQaMmRsy+IeYYc8kIwmgXB5
-	 FnUimx1Z+vjT+/jep27MN+DGnyebNiApn3mwpCchOn/cSRelMyyw7m3DUji3U2XRLB
-	 Dt/xvjbCGVy4pSvlecDk6pu/Z2yRqHt0AZATCOSd3TJYI8Qm/aog49u0tH0EEXzOcH
-	 FFgkmgd068wTo0WYULiGeLhunBHaZWgEfZzLy/CSBLdgc/u3jDeUMQKbfk5riFtEIj
-	 jyDwb/tasMsyQ==
+	b=Seu4xuNp1501huH6GfUwFx147xIjHsDIpyGttolatNPkYuuX8pbs8XomDt99cqDfq
+	 cIK5k70xjWB75RE12fxvug2hiyDtoRzJ0tzDIi4Il+N0sisettn0TFeBsX4S8B0tzf
+	 6VgJXYttCy28EvxP4ewLNLc2dW0Q9GIQgZo2+P4rDXveAuU/fVLxn3F+NAOnaFP//c
+	 5DDUAN0hDRCg934utP360A7KQJwvGcXCE/A/oiI0N2TXY5VN9xik4cTYXEUfQYAW2Q
+	 EEgxpZKKRZLlMXwWtQyC+Rh9sqB0/atlhbilX3niwyrU0E1PBc+1DK/dzjp0AVssia
+	 HBWvZ7IycfK0A==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -61,9 +61,9 @@ Cc: netdev@vger.kernel.org,
 	gal@nvidia.com,
 	ecree.xilinx@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 1/5] eth: otx2: migrate to the *_rxfh_context ops
-Date: Tue,  1 Jul 2025 20:06:02 -0700
-Message-ID: <20250702030606.1776293-2-kuba@kernel.org>
+Subject: [PATCH net-next v2 2/5] eth: ice: drop the dead code related to rss_contexts
+Date: Tue,  1 Jul 2025 20:06:03 -0700
+Message-ID: <20250702030606.1776293-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250702030606.1776293-1-kuba@kernel.org>
 References: <20250702030606.1776293-1-kuba@kernel.org>
@@ -75,429 +75,88 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-otx2 only supports additional indirection tables (no separate keys
-etc.) so the conversion to dedicated callbacks and core-allocated
-context is mostly removing the code which stores the extra tables
-in the driver. Core already stores the indirection tables for
-additional contexts, and doesn't call .get for them.
+ICE appears to have some odd form of rss_context use plumbed
+in for .get_rxfh. The .set_rxfh side does not support creating
+contexts, however, so this must be dead code. For at least a year
+now (since commit 7964e7884643 ("net: ethtool: use the tracking
+array for get_rxfh on custom RSS contexts")) we have not been
+calling .get_rxfh with a non-zero rss_context. We just get
+the info from the RSS XArray under dev->ethtool.
 
-One subtle change here is that we'll now start with the table
-covering all queues, not directing all traffic to queue 0.
-This is what core expects if the user doesn't pass the initial
-indir table explicitly (there's a WARN_ON() in the core trying
-to make sure driver authors don't forget to populate ctx to
-defaults).
-
-Drivers implementing .create_rxfh_context don't have to set
-cap_rss_ctx_supported, so remove it.
+Remove what must be dead code in the driver, clear the support flags.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- .../marvell/octeontx2/nic/otx2_common.h       |   8 +-
- .../marvell/octeontx2/nic/otx2_common.c       |  27 ++--
- .../marvell/octeontx2/nic/otx2_ethtool.c      | 137 ++++++++++--------
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   6 +-
- .../ethernet/marvell/octeontx2/nic/otx2_xsk.c |   4 +-
- 5 files changed, 90 insertions(+), 92 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_ethtool.c | 28 +++-----------------
+ 1 file changed, 3 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index 6b59881f78e0..e3765b73c434 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -93,10 +93,6 @@ struct otx2_lmt_info {
- 	u64 lmt_addr;
- 	u16 lmt_id;
- };
--/* RSS configuration */
--struct otx2_rss_ctx {
--	u8  ind_tbl[MAX_RSS_INDIR_TBL_SIZE];
--};
- 
- struct otx2_rss_info {
- 	u8 enable;
-@@ -104,7 +100,7 @@ struct otx2_rss_info {
- 	u16 rss_size;
- #define RSS_HASH_KEY_SIZE	44   /* 352 bit key */
- 	u8  key[RSS_HASH_KEY_SIZE];
--	struct otx2_rss_ctx	*rss_ctx[MAX_RSS_GROUPS];
-+	u32 ind_tbl[MAX_RSS_INDIR_TBL_SIZE];
- };
- 
- /* NIX (or NPC) RX errors */
-@@ -1067,7 +1063,7 @@ int otx2_set_hw_capabilities(struct otx2_nic *pfvf);
- int otx2_rss_init(struct otx2_nic *pfvf);
- int otx2_set_flowkey_cfg(struct otx2_nic *pfvf);
- void otx2_set_rss_key(struct otx2_nic *pfvf);
--int otx2_set_rss_table(struct otx2_nic *pfvf, int ctx_id);
-+int otx2_set_rss_table(struct otx2_nic *pfvf, int ctx_id, const u32 *ind_tbl);
- 
- /* Mbox handlers */
- void mbox_handler_msix_offset(struct otx2_nic *pfvf,
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 9a10396e7504..f674729124e6 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -318,21 +318,20 @@ int otx2_set_flowkey_cfg(struct otx2_nic *pfvf)
- 	return err;
- }
- 
--int otx2_set_rss_table(struct otx2_nic *pfvf, int ctx_id)
-+int otx2_set_rss_table(struct otx2_nic *pfvf, int ctx_id, const u32 *ind_tbl)
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index ea7e8b879b48..e54221fba849 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -3591,11 +3591,10 @@ static int
+ ice_get_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh)
  {
- 	struct otx2_rss_info *rss = &pfvf->hw.rss_info;
- 	const int index = rss->rss_size * ctx_id;
- 	struct mbox *mbox = &pfvf->mbox;
--	struct otx2_rss_ctx *rss_ctx;
- 	struct nix_aq_enq_req *aq;
- 	int idx, err;
+ 	struct ice_netdev_priv *np = netdev_priv(netdev);
+-	u32 rss_context = rxfh->rss_context;
+ 	struct ice_vsi *vsi = np->vsi;
+ 	struct ice_pf *pf = vsi->back;
+ 	u16 qcount, offset;
+-	int err, num_tc, i;
++	int err, i;
+ 	u8 *lut;
  
- 	mutex_lock(&mbox->lock);
--	rss_ctx = rss->rss_ctx[ctx_id];
-+	ind_tbl = ind_tbl ?: rss->ind_tbl;
- 	/* Get memory to put this msg */
- 	for (idx = 0; idx < rss->rss_size; idx++) {
- 		/* Ignore the queue if AF_XDP zero copy is enabled */
--		if (test_bit(rss_ctx->ind_tbl[idx], pfvf->af_xdp_zc_qidx))
-+		if (test_bit(ind_tbl[idx], pfvf->af_xdp_zc_qidx))
- 			continue;
- 
- 		aq = otx2_mbox_alloc_msg_nix_aq_enq(mbox);
-@@ -352,7 +351,7 @@ int otx2_set_rss_table(struct otx2_nic *pfvf, int ctx_id)
- 			}
- 		}
- 
--		aq->rss.rq = rss_ctx->ind_tbl[idx];
-+		aq->rss.rq = ind_tbl[idx];
- 
- 		/* Fill AQ info */
- 		aq->qidx = index + idx;
-@@ -390,30 +389,22 @@ void otx2_set_rss_key(struct otx2_nic *pfvf)
- int otx2_rss_init(struct otx2_nic *pfvf)
- {
- 	struct otx2_rss_info *rss = &pfvf->hw.rss_info;
--	struct otx2_rss_ctx *rss_ctx;
- 	int idx, ret = 0;
- 
--	rss->rss_size = sizeof(*rss->rss_ctx[DEFAULT_RSS_CONTEXT_GROUP]);
-+	rss->rss_size = sizeof(*rss->ind_tbl);
- 
- 	/* Init RSS key if it is not setup already */
- 	if (!rss->enable)
- 		netdev_rss_key_fill(rss->key, sizeof(rss->key));
- 	otx2_set_rss_key(pfvf);
- 
--	if (!netif_is_rxfh_configured(pfvf->netdev)) {
--		/* Set RSS group 0 as default indirection table */
--		rss->rss_ctx[DEFAULT_RSS_CONTEXT_GROUP] = kzalloc(rss->rss_size,
--								  GFP_KERNEL);
--		if (!rss->rss_ctx[DEFAULT_RSS_CONTEXT_GROUP])
--			return -ENOMEM;
--
--		rss_ctx = rss->rss_ctx[DEFAULT_RSS_CONTEXT_GROUP];
-+	if (!netif_is_rxfh_configured(pfvf->netdev))
- 		for (idx = 0; idx < rss->rss_size; idx++)
--			rss_ctx->ind_tbl[idx] =
-+			rss->ind_tbl[idx] =
- 				ethtool_rxfh_indir_default(idx,
- 							   pfvf->hw.rx_queues);
--	}
--	ret = otx2_set_rss_table(pfvf, DEFAULT_RSS_CONTEXT_GROUP);
-+
-+	ret = otx2_set_rss_table(pfvf, DEFAULT_RSS_CONTEXT_GROUP, NULL);
- 	if (ret)
- 		return ret;
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-index 20de517dfb09..998c734ff839 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-@@ -796,35 +796,75 @@ static u32 otx2_get_rxfh_indir_size(struct net_device *dev)
- 	return  MAX_RSS_INDIR_TBL_SIZE;
- }
- 
--static int otx2_rss_ctx_delete(struct otx2_nic *pfvf, int ctx_id)
-+static int otx2_create_rxfh(struct net_device *dev,
-+			    struct ethtool_rxfh_context *ctx,
-+			    const struct ethtool_rxfh_param *rxfh,
-+			    struct netlink_ext_ack *extack)
- {
--	struct otx2_rss_info *rss = &pfvf->hw.rss_info;
-+	struct otx2_nic *pfvf = netdev_priv(dev);
-+	struct otx2_rss_info *rss;
-+	unsigned int queues;
-+	u32 *ind_tbl;
-+	int idx;
- 
--	otx2_rss_ctx_flow_del(pfvf, ctx_id);
--	kfree(rss->rss_ctx[ctx_id]);
--	rss->rss_ctx[ctx_id] = NULL;
-+	rss = &pfvf->hw.rss_info;
-+	queues = pfvf->hw.rx_queues;
-+
-+	if (rxfh->hfunc && rxfh->hfunc != ETH_RSS_HASH_TOP)
-+		return -EOPNOTSUPP;
-+	ctx->hfunc = ETH_RSS_HASH_TOP;
-+
-+	if (!rss->enable) {
-+		netdev_err(dev, "RSS is disabled, cannot change settings\n");
-+		return -EIO;
-+	}
-+
-+	ind_tbl = rxfh->indir;
-+	if (!ind_tbl) {
-+		ind_tbl = ethtool_rxfh_context_indir(ctx);
-+		for (idx = 0; idx < rss->rss_size; idx++)
-+			ind_tbl[idx] = ethtool_rxfh_indir_default(idx, queues);
-+	}
-+
-+	otx2_set_rss_table(pfvf, rxfh->rss_context, ind_tbl);
-+	return 0;
-+}
-+
-+static int otx2_modify_rxfh(struct net_device *dev,
-+			    struct ethtool_rxfh_context *ctx,
-+			    const struct ethtool_rxfh_param *rxfh,
-+			    struct netlink_ext_ack *extack)
-+{
-+	struct otx2_nic *pfvf = netdev_priv(dev);
-+
-+	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
-+	    rxfh->hfunc != ETH_RSS_HASH_TOP)
-+		return -EOPNOTSUPP;
-+
-+	if (!pfvf->hw.rss_info.enable) {
-+		netdev_err(dev, "RSS is disabled, cannot change settings\n");
-+		return -EIO;
-+	}
-+
-+	if (rxfh->indir)
-+		otx2_set_rss_table(pfvf, rxfh->rss_context, rxfh->indir);
- 
- 	return 0;
- }
- 
--static int otx2_rss_ctx_create(struct otx2_nic *pfvf,
--			       u32 *rss_context)
-+static int otx2_remove_rxfh(struct net_device *dev,
-+			    struct ethtool_rxfh_context *ctx,
-+			    u32 rss_context,
-+			    struct netlink_ext_ack *extack)
- {
--	struct otx2_rss_info *rss = &pfvf->hw.rss_info;
--	u8 ctx;
-+	struct otx2_nic *pfvf = netdev_priv(dev);
- 
--	for (ctx = 0; ctx < MAX_RSS_GROUPS; ctx++) {
--		if (!rss->rss_ctx[ctx])
--			break;
-+	if (!pfvf->hw.rss_info.enable) {
-+		netdev_err(dev, "RSS is disabled, cannot change settings\n");
-+		return -EIO;
+ 	if (!test_bit(ICE_FLAG_RSS_ENA, pf->flags)) {
+@@ -3603,24 +3602,8 @@ ice_get_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh)
+ 		return -EOPNOTSUPP;
  	}
--	if (ctx == MAX_RSS_GROUPS)
+ 
+-	if (rss_context && !ice_is_adq_active(pf)) {
+-		netdev_err(netdev, "RSS context cannot be non-zero when ADQ is not configured.\n");
 -		return -EINVAL;
+-	}
 -
--	rss->rss_ctx[ctx] = kzalloc(sizeof(*rss->rss_ctx[ctx]), GFP_KERNEL);
--	if (!rss->rss_ctx[ctx])
--		return -ENOMEM;
--	*rss_context = ctx;
+-	qcount = vsi->mqprio_qopt.qopt.count[rss_context];
+-	offset = vsi->mqprio_qopt.qopt.offset[rss_context];
+-
+-	if (rss_context && ice_is_adq_active(pf)) {
+-		num_tc = vsi->mqprio_qopt.qopt.num_tc;
+-		if (rss_context >= num_tc) {
+-			netdev_err(netdev, "RSS context:%d  > num_tc:%d\n",
+-				   rss_context, num_tc);
+-			return -EINVAL;
+-		}
+-		/* Use channel VSI of given TC */
+-		vsi = vsi->tc_map_vsi[rss_context];
+-	}
++	qcount = vsi->mqprio_qopt.qopt.count[0];
++	offset = vsi->mqprio_qopt.qopt.offset[0];
  
-+	otx2_rss_ctx_flow_del(pfvf, rss_context);
- 	return 0;
- }
- 
-@@ -833,23 +873,14 @@ static int otx2_set_rxfh(struct net_device *dev,
- 			 struct ethtool_rxfh_param *rxfh,
- 			 struct netlink_ext_ack *extack)
- {
--	u32 rss_context = DEFAULT_RSS_CONTEXT_GROUP;
- 	struct otx2_nic *pfvf = netdev_priv(dev);
--	struct otx2_rss_ctx *rss_ctx;
- 	struct otx2_rss_info *rss;
--	int ret, idx;
-+	int idx;
- 
- 	if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
+ 	rxfh->hfunc = ETH_RSS_HASH_TOP;
+ 	if (vsi->rss_hfunc == ICE_AQ_VSI_Q_OPT_RSS_HASH_SYM_TPLZ)
+@@ -3680,9 +3663,6 @@ ice_set_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh,
  	    rxfh->hfunc != ETH_RSS_HASH_TOP)
  		return -EOPNOTSUPP;
  
 -	if (rxfh->rss_context)
--		rss_context = rxfh->rss_context;
+-		return -EOPNOTSUPP;
 -
--	if (rss_context != ETH_RXFH_CONTEXT_ALLOC &&
--	    rss_context >= MAX_RSS_GROUPS)
--		return -EINVAL;
--
- 	rss = &pfvf->hw.rss_info;
- 
- 	if (!rss->enable) {
-@@ -861,21 +892,12 @@ static int otx2_set_rxfh(struct net_device *dev,
- 		memcpy(rss->key, rxfh->key, sizeof(rss->key));
- 		otx2_set_rss_key(pfvf);
- 	}
--	if (rxfh->rss_delete)
--		return otx2_rss_ctx_delete(pfvf, rss_context);
- 
--	if (rss_context == ETH_RXFH_CONTEXT_ALLOC) {
--		ret = otx2_rss_ctx_create(pfvf, &rss_context);
--		rxfh->rss_context = rss_context;
--		if (ret)
--			return ret;
--	}
- 	if (rxfh->indir) {
--		rss_ctx = rss->rss_ctx[rss_context];
- 		for (idx = 0; idx < rss->rss_size; idx++)
--			rss_ctx->ind_tbl[idx] = rxfh->indir[idx];
-+			rss->ind_tbl[idx] = rxfh->indir[idx];
- 	}
--	otx2_set_rss_table(pfvf, rss_context);
-+	otx2_set_rss_table(pfvf, DEFAULT_RSS_CONTEXT_GROUP, NULL);
- 
- 	return 0;
- }
-@@ -884,9 +906,7 @@ static int otx2_set_rxfh(struct net_device *dev,
- static int otx2_get_rxfh(struct net_device *dev,
- 			 struct ethtool_rxfh_param *rxfh)
- {
--	u32 rss_context = DEFAULT_RSS_CONTEXT_GROUP;
- 	struct otx2_nic *pfvf = netdev_priv(dev);
--	struct otx2_rss_ctx *rss_ctx;
- 	struct otx2_rss_info *rss;
- 	u32 *indir = rxfh->indir;
- 	int idx, rx_queues;
-@@ -894,32 +914,21 @@ static int otx2_get_rxfh(struct net_device *dev,
- 	rss = &pfvf->hw.rss_info;
- 
- 	rxfh->hfunc = ETH_RSS_HASH_TOP;
--	if (rxfh->rss_context)
--		rss_context = rxfh->rss_context;
--
- 	if (!indir)
- 		return 0;
- 
--	if (!rss->enable && rss_context == DEFAULT_RSS_CONTEXT_GROUP) {
-+	if (!rss->enable) {
- 		rx_queues = pfvf->hw.rx_queues;
- 		for (idx = 0; idx < MAX_RSS_INDIR_TBL_SIZE; idx++)
- 			indir[idx] = ethtool_rxfh_indir_default(idx, rx_queues);
- 		return 0;
- 	}
--	if (rss_context >= MAX_RSS_GROUPS)
--		return -ENOENT;
- 
--	rss_ctx = rss->rss_ctx[rss_context];
--	if (!rss_ctx)
--		return -ENOENT;
--
--	if (indir) {
--		for (idx = 0; idx < rss->rss_size; idx++) {
--			/* Ignore if the rx queue is AF_XDP zero copy enabled */
--			if (test_bit(rss_ctx->ind_tbl[idx], pfvf->af_xdp_zc_qidx))
--				continue;
--			indir[idx] = rss_ctx->ind_tbl[idx];
--		}
-+	for (idx = 0; idx < rss->rss_size; idx++) {
-+		/* Ignore if the rx queue is AF_XDP zero copy enabled */
-+		if (test_bit(rss->ind_tbl[idx], pfvf->af_xdp_zc_qidx))
-+			continue;
-+		indir[idx] = rss->ind_tbl[idx];
- 	}
- 	if (rxfh->key)
- 		memcpy(rxfh->key, rss->key, sizeof(rss->key));
-@@ -1307,12 +1316,12 @@ static void otx2_get_fec_stats(struct net_device *netdev,
+ 	if (!test_bit(ICE_FLAG_RSS_ENA, pf->flags)) {
+ 		/* RSS not supported return error here */
+ 		netdev_warn(netdev, "RSS is not configured on this VSI!\n");
+@@ -4750,12 +4730,10 @@ static int ice_repr_ethtool_reset(struct net_device *dev, u32 *flags)
  }
  
- static const struct ethtool_ops otx2_ethtool_ops = {
--	.cap_rss_ctx_supported	= true,
+ static const struct ethtool_ops ice_ethtool_ops = {
+-	.cap_rss_ctx_supported  = true,
  	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
- 				     ETHTOOL_COALESCE_MAX_FRAMES |
- 				     ETHTOOL_COALESCE_USE_ADAPTIVE,
- 	.supported_ring_params  = ETHTOOL_RING_USE_RX_BUF_LEN |
- 				  ETHTOOL_RING_USE_CQE_SIZE,
-+	.rxfh_max_num_contexts	= MAX_RSS_GROUPS,
- 	.get_link		= otx2_get_link,
- 	.get_drvinfo		= otx2_get_drvinfo,
- 	.get_strings		= otx2_get_strings,
-@@ -1332,6 +1341,9 @@ static const struct ethtool_ops otx2_ethtool_ops = {
- 	.set_rxfh		= otx2_set_rxfh,
- 	.get_rxfh_fields	= otx2_get_rss_hash_opts,
- 	.set_rxfh_fields	= otx2_set_rss_hash_opts,
-+	.create_rxfh_context	= otx2_create_rxfh,
-+	.modify_rxfh_context	= otx2_modify_rxfh,
-+	.remove_rxfh_context	= otx2_remove_rxfh,
- 	.get_msglevel		= otx2_get_msglevel,
- 	.set_msglevel		= otx2_set_msglevel,
- 	.get_pauseparam		= otx2_get_pauseparam,
-@@ -1426,12 +1438,12 @@ static int otx2vf_get_link_ksettings(struct net_device *netdev,
- }
- 
- static const struct ethtool_ops otx2vf_ethtool_ops = {
--	.cap_rss_ctx_supported	= true,
- 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
- 				     ETHTOOL_COALESCE_MAX_FRAMES |
- 				     ETHTOOL_COALESCE_USE_ADAPTIVE,
- 	.supported_ring_params  = ETHTOOL_RING_USE_RX_BUF_LEN |
- 				  ETHTOOL_RING_USE_CQE_SIZE,
-+	.rxfh_max_num_contexts	= MAX_RSS_GROUPS,
- 	.get_link		= otx2_get_link,
- 	.get_drvinfo		= otx2vf_get_drvinfo,
- 	.get_strings		= otx2vf_get_strings,
-@@ -1447,6 +1459,9 @@ static const struct ethtool_ops otx2vf_ethtool_ops = {
- 	.set_rxfh		= otx2_set_rxfh,
- 	.get_rxfh_fields	= otx2_get_rss_hash_opts,
- 	.set_rxfh_fields	= otx2_set_rss_hash_opts,
-+	.create_rxfh_context	= otx2_create_rxfh,
-+	.modify_rxfh_context	= otx2_modify_rxfh,
-+	.remove_rxfh_context	= otx2_remove_rxfh,
- 	.get_ringparam		= otx2_get_ringparam,
- 	.set_ringparam		= otx2_set_ringparam,
- 	.get_coalesce		= otx2_get_coalesce,
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index 4e2d1206e1b0..b23585c5e5c2 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -2158,7 +2158,6 @@ int otx2_stop(struct net_device *netdev)
- 	struct otx2_nic *pf = netdev_priv(netdev);
- 	struct otx2_cq_poll *cq_poll = NULL;
- 	struct otx2_qset *qset = &pf->qset;
--	struct otx2_rss_info *rss;
- 	int qidx, vec, wrk;
- 
- 	/* If the DOWN flag is set resources are already freed */
-@@ -2176,10 +2175,7 @@ int otx2_stop(struct net_device *netdev)
- 	otx2_rxtx_enable(pf, false);
- 
- 	/* Clear RSS enable flag */
--	rss = &pf->hw.rss_info;
--	rss->enable = false;
--	if (!netif_is_rxfh_configured(netdev))
--		kfree(rss->rss_ctx[DEFAULT_RSS_CONTEXT_GROUP]);
-+	pf->hw.rss_info.enable = false;
- 
- 	/* Cleanup Queue IRQ */
- 	vec = pci_irq_vector(pf->pdev,
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.c
-index b328aae23d73..7d67b4cbaf71 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.c
-@@ -132,7 +132,7 @@ int otx2_xsk_pool_enable(struct otx2_nic *pf, struct xsk_buff_pool *pool, u16 qi
- 	set_bit(qidx, pf->af_xdp_zc_qidx);
- 	otx2_clean_up_rq(pf, qidx);
- 	/* Reconfigure RSS table as 'qidx' cannot be part of RSS now */
--	otx2_set_rss_table(pf, DEFAULT_RSS_CONTEXT_GROUP);
-+	otx2_set_rss_table(pf, DEFAULT_RSS_CONTEXT_GROUP, NULL);
- 	/* Kick start the NAPI context so that receiving will start */
- 	return otx2_xsk_wakeup(pf->netdev, qidx, XDP_WAKEUP_RX);
- }
-@@ -153,7 +153,7 @@ int otx2_xsk_pool_disable(struct otx2_nic *pf, u16 qidx)
- 	clear_bit(qidx, pf->af_xdp_zc_qidx);
- 	xsk_pool_dma_unmap(pool, DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING);
- 	/* Reconfigure RSS table as 'qidx' now need to be part of RSS now */
--	otx2_set_rss_table(pf, DEFAULT_RSS_CONTEXT_GROUP);
-+	otx2_set_rss_table(pf, DEFAULT_RSS_CONTEXT_GROUP, NULL);
- 
- 	return 0;
- }
+ 				     ETHTOOL_COALESCE_USE_ADAPTIVE |
+ 				     ETHTOOL_COALESCE_RX_USECS_HIGH,
+ 	.supported_input_xfrm	= RXH_XFRM_SYM_XOR,
+-	.rxfh_per_ctx_key	= true,
+ 	.get_link_ksettings	= ice_get_link_ksettings,
+ 	.set_link_ksettings	= ice_set_link_ksettings,
+ 	.get_fec_stats		= ice_get_fec_stats,
 -- 
 2.50.0
 
