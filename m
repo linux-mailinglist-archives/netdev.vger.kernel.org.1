@@ -1,79 +1,93 @@
-Return-Path: <netdev+bounces-203068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B229AAF0743
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:24:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAF75AF0754
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 02:39:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C24A4A87FF
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 00:24:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AB9A1C04457
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 00:40:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BFB58F5C;
-	Wed,  2 Jul 2025 00:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2623912B73;
+	Wed,  2 Jul 2025 00:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TKxTe2fV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LYkIOP/M"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537468F5A;
-	Wed,  2 Jul 2025 00:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0128A611E
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 00:39:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751415834; cv=none; b=Zjvqwtvw7h/0X4Thh9fIkLFq3nlWv24nsA0X92NZqqVf7vxgAKN0Et/O9Tn6JQn+jXsLgRK029nIQmV69DPpSCDvrGMQi1/k3TzApcg4sB54zqKmbejX5U6QWASqtOefaCrc7SGORtkioe/YTN/Q/1zNFC3ZzUkH1zktg2Vduxs=
+	t=1751416783; cv=none; b=Ojg/RNQ8rddYdHILecO+qxvy6Omlfuom9J9NIEgPIjjKXNmKcWG4N3mVeCrETgk5XdGs7DjBRddCmNXF4hvAsKIfMmLDCG4bpKqoe0U9LhO2nzyInF5nA0gwMLW3BauKghosRBnmOj636tNKsIHXs5/JOLuTmJ4ipFxp+fxb+7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751415834; c=relaxed/simple;
-	bh=yvX7x3EJvRcGIvHF2lTm5r0SKmIF/1zQI08kg/i9BEs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e8F1IlgHbKIi6L3L1xjmQQZoKDQ4dYURoQn2ADLtb2Zcv4dovr0SgBlJMlMmL+CasR7duWPez+PD+n1jqq4j9IN4YxSA7Le+yjqfTsIg7Qyy8LGnfWr5aMWBS/MkoJUAJLZB2GSakKgVHkcU51NUZvZfu+qjbRuMGIJiG7aV8tI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TKxTe2fV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3074C4CEEB;
-	Wed,  2 Jul 2025 00:23:53 +0000 (UTC)
+	s=arc-20240116; t=1751416783; c=relaxed/simple;
+	bh=cE47cBwrfVLSArekjj3Ol1Sf2NbfQSKQ3A/x6Ev8aoQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=VLP7ZU+2GA5HUQZYknxJODO3NFPpmO7diMRPaK7JaLFN7xBCe/o50fh1KCzhr9J2UA5TtmqFF345oSij4Z7mrtZ0fGI9yQHAbEUGuEBZzu2ZIOJu0DV5GU3Dcwp/AqwPqGYgYwRolBWzjy1ipjMsJAQuoc/GtTiXyQVUCBpGoaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LYkIOP/M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 708D3C4CEEB;
+	Wed,  2 Jul 2025 00:39:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751415834;
-	bh=yvX7x3EJvRcGIvHF2lTm5r0SKmIF/1zQI08kg/i9BEs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TKxTe2fVWTN2DPnJasnSLLbfq5ZbBCXh3/wCel95rTMT45UBw7AVLFdA8Uy5kvYjd
-	 GREKE4zPFnRUquCpUPOYoCc54161ly7nF/GPgpbnb27/vtNWB9lP1LsZ4YD+FCViAy
-	 jjOfpyxA0WypFEBMYPBtpE6q4NBgGRuFOKPAENvmpC+d9JhJj379SoClLR6dVNupSX
-	 hv72nz6lC15wN6F5qXIJ/2vPYejjCrha6/Jt0XBe45gg4s66AcO0p8MzNZOV7A8YBE
-	 tkQQYrRcr+Sy7Vq0gym45bKZnqDd6lUcuqLODnau23vOhbXn4xcgelYdCDD1X0TZpa
-	 DxoP6kdGr6XJQ==
-Date: Tue, 1 Jul 2025 17:23:52 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Nimrod Oren <noren@nvidia.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Willem de Bruijn
- <willemb@google.com>, <netdev@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, "Carolina
- Jubran" <cjubran@nvidia.com>
-Subject: Re: [PATCH net] selftests: drv-net: rss_ctx: Add short delay
- between per-context traffic checks
-Message-ID: <20250701172352.5dd42418@kernel.org>
-In-Reply-To: <20250629111812.644282-1-noren@nvidia.com>
-References: <20250629111812.644282-1-noren@nvidia.com>
+	s=k20201202; t=1751416782;
+	bh=cE47cBwrfVLSArekjj3Ol1Sf2NbfQSKQ3A/x6Ev8aoQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LYkIOP/Mow3kQdCC/HhLxMJtxX8mTV1lf2g0C2MaM1D9fqgyHaHm7Y65/0W50QfYI
+	 6zKafBshEZz96jd1o7CJMaFJBpEQo/kwha/GNSr893uXm8QoFRUWaLmKTpok+R3Tt+
+	 hz3X6eVM9pslkO3RbausdD6zNCmsnz44e3ePyyEgiQ4yPLfrUoi3aFLwZmXS5gKB7u
+	 ibCZAh8RgkLrUrk5Vt4P5lbJiaKo891QL/uoGtUWZQ4B4Pw6c7BoaM41mo7XFLOJuL
+	 tAX+ncfz3MU/F+cPJSAsSoAu9GRKVrzRrrFeYyn6jorVvwkcMRooTUVbmJb1ZUGTm9
+	 4jioAau9mEKTQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BDC383BA06;
+	Wed,  2 Jul 2025 00:40:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net] amd-xgbe: align CL37 AN sequence as per databook
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175141680726.158782.16938610145522088734.git-patchwork-notify@kernel.org>
+Date: Wed, 02 Jul 2025 00:40:07 +0000
+References: <20250630192636.3838291-1-Raju.Rangoju@amd.com>
+In-Reply-To: <20250630192636.3838291-1-Raju.Rangoju@amd.com>
+To: Raju Rangoju <Raju.Rangoju@amd.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ thomas.lendacky@amd.com, Shyam-sundar.S-k@amd.com
 
-On Sun, 29 Jun 2025 14:18:12 +0300 Nimrod Oren wrote:
-> A few packets may still be sent and received during the termination of
-> the iperf processes. These late packets cause failures when they arrive
-> on queues expected to be empty.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 1 Jul 2025 00:56:36 +0530 you wrote:
+> Update the Clause 37 Auto-Negotiation implementation to properly align
+> with the PCS hardware specifications:
+> - Fix incorrect bit settings in Link Status and Link Duplex fields
+> - Implement missing sequence steps 2 and 7
 > 
-> Add a one second delay between repeated _send_traffic_check() calls in
-> rss_ctx tests to ensure such packets are processed before the next
-> traffic checks are performed.
+> These changes ensure CL37 auto-negotiation protocol follows the exact
+> sequence patterns as specified in the hardware databook.
+> 
+> [...]
 
-Sprinklings sleeps should be last resort. Is there a way to wait for
-iperf to shut down cleanly, or wait for the socket to be closed fully?
-Like wait_port_listen() ?
+Here is the summary with links:
+  - [net] amd-xgbe: align CL37 AN sequence as per databook
+    https://git.kernel.org/netdev/net/c/42fd432fe6d3
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
