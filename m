@@ -1,174 +1,138 @@
-Return-Path: <netdev+bounces-203322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76F96AF1563
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:20:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8E3DAF1560
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:19:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D42F6189336F
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:19:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 257A817DC06
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:19:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A1C272804;
-	Wed,  2 Jul 2025 12:17:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74D1826E707;
+	Wed,  2 Jul 2025 12:17:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="doB3EVWh"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="P4epZKvA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E78F12571D4
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 12:17:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780C726E17A
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 12:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751458629; cv=none; b=rncbU4M8l3pTF09idpLgLLKjALZeU2AEHkOtxMP/4yBtiA/kStD8iSSPHrT8jFLcN9R3UnumUbarSoT+vVpCJipHmJHchAQ8y5aRCighzHYjDM3fxUZ8a2Jk2CS181JbZniedD/6N165FUxwl97qqtNK6NsHWy9uth11nPQTrGc=
+	t=1751458639; cv=none; b=AGTJzmtf1oPRU2TAKpabz4ysqMgcS81+PJZzvExBiJzYvtPgzW6YZsQ7pRuq8D4gBKid+DQJm1vK73oscYmQe99LGFMd2+TJQEBWB0YBjTt9Y4Oy/hDcNRZh9XKT3xdveq0cLHUOx83my/UGhKV4EBOMkVFFf4JBixqQ8ddf7RU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751458629; c=relaxed/simple;
-	bh=arrFBjkFe46MqYLWVBWkj7DSOrnRYSGqfpNIx8b+8OQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fQ0yXmxTHRtMxSqrFytbUoHtz+kh97+pnjoXo7JmVbgMEhyO0r9FGqzubs0aAVMl9k5pbqc7sZ3/hqp5ND+qXyZKRdc946H6fbnQkhf0KZP0TY6AnQ+GEnH+qL9TyPDCcag0DouLefsA+lNi7ab7W8EspKvdjIr5YBpg+c0DtP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=doB3EVWh; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751458626;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CXv4HPGX8MKUJrgwv//0ODreoCsIVgbAC0DLr2hgEhY=;
-	b=doB3EVWhfiO/dlH5zPFPm3T5Q2tpG0HpOPNQxGSEe9mqmULn73186ixODTilNLcGeSIcJF
-	8ZMesGs/TfHW8Lp82dirqwBbGVQzn+6HHhBLHEumLJw86IObh2VLWtETgQHToryjnxfqbU
-	xLFpRiW6AywKzLBNNNJJtuSW93LGz5s=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-551-9oQVOhhVOhK-fBfnP8c5Yw-1; Wed,
- 02 Jul 2025 08:17:04 -0400
-X-MC-Unique: 9oQVOhhVOhK-fBfnP8c5Yw-1
-X-Mimecast-MFC-AGG-ID: 9oQVOhhVOhK-fBfnP8c5Yw_1751458622
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9F3BE1808985;
-	Wed,  2 Jul 2025 12:17:01 +0000 (UTC)
-Received: from [10.45.226.95] (unknown [10.45.226.95])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1086C18003FC;
-	Wed,  2 Jul 2025 12:16:54 +0000 (UTC)
-Message-ID: <e55caefa-2ea9-4d31-be76-48cdfd481b5c@redhat.com>
-Date: Wed, 2 Jul 2025 14:16:53 +0200
+	s=arc-20240116; t=1751458639; c=relaxed/simple;
+	bh=uzbmKudiCVqbCWHjsvWpIONLcOqXoBM4sksfA7jU3N4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=jknOJVqRPg/PiZ1Hzy/3zh0CbEN4xXp2ZuB61/pt26MsQGBsPxhMEkqseoRt6H79BdClaNiyPvRGJ3NJna9Ph50cZr01ko7hrgfmDSAFq+fGcl2ib48j2B5npnpFjiF7y0Tpx11M5ESOYjWwq4ToycGWpdqrb6am8/TwYGboX4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=P4epZKvA; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-ae360b6249fso877806866b.1
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 05:17:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1751458636; x=1752063436; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uzbmKudiCVqbCWHjsvWpIONLcOqXoBM4sksfA7jU3N4=;
+        b=P4epZKvA0luTXkjDRr1G4JmggNRPZfOa+42wwyhAgrTIxm2CBjn+vQPOxjT2uFTn7e
+         1HoSwvatZQaWHvH2NrAg9GbeX1fjPqQdTTqrAYDDJlx/p3hAjT3VBsRBxb0rST0yet5t
+         /XOBZGoGtwgOT3Ox6ikhNvVzHGh4y6n7Z77Bu5AO1JgHX5yqWji4qOi6DXv8YQJHZDPm
+         4M/OgvAIzaXX2LwMydQSu9qeZbDWiXg9vaH8yLh4ty1fy/opeTm/+lIyghNi4qU/w+LZ
+         lBhjFQRwVtKhFZa9jqIUEGf9dLMPzBgUGU9Erffhculxj/I04RROb61NSd7I6hNRHsge
+         +kkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751458636; x=1752063436;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uzbmKudiCVqbCWHjsvWpIONLcOqXoBM4sksfA7jU3N4=;
+        b=vq2tttHw6u2pNhCYDbv09m2CKpUG1K3R0FxwliFSp+J/fJ7wvPjvlmi7DdUNeYcJTY
+         3VeRbH21GS4lXOsW7immbUPHR4Dwn92KLI3QNIcywv7ifwQYlfH3KLialjs4GhZIreOQ
+         3TlxVQOEhKJRra2izkIjLbPCbUcsvUngkWXs1gsXKJfIFizK67fPAwm8MVmUQ67m/Kov
+         6Binup26yetxGIyDRsDXMpw6kcfQyjPkCu6wM3SpRUAdDWaQCBsp2ASHdInq6XsJZJbC
+         zkd/43PxlAHaXMzpdFNKMp0l56+Ir+nFQPxELStH07vJ3t8e2O57xPjNHnrh3Xhefnoc
+         nL5Q==
+X-Gm-Message-State: AOJu0Yym56KcLKsTDHqunV5yRsymxcAgVJAECREi1BdTwCqLGNiIn7hI
+	SsNbIaMEGMGZTqAnvqWJ2G9rRFpLmSUoKrCEI7G9aDg33qwdp1qFcFfo9PFnIy9pGkN82QSW3VZ
+	3RQcE
+X-Gm-Gg: ASbGnctcHol/P/Nx5m42h8Eqj8liFsRFXRbogWcCcUxvvN4xMIQ7ImoOHge2dnCHEm/
+	WDwBTK2SnkHdtLuLRqEiqi5VSdB1nBVp4frT9sEgETD3SkzthC1jYj7w3j2Osir/RLs25nnYoI7
+	pVywn45ctcoduXqKpMEFHxpO6WYGBaQONe0H9VVzlDgvZykyH6WS7RMU6ncgkbgcBV7hYz6ri12
+	bUdrbb/1JYmIdlpzyu0o6sl0zL1G+GIftifCf/ExhKqjpVE4KoxcERpefaaqr2Qgn1yeRAcpnvh
+	nDUiaPhpMB2cRll28Y9YvvMLsvafrX7moCXp9xxLS2lWaTwEGYWHzBg=
+X-Google-Smtp-Source: AGHT+IE1QJ3AjK7fa64xTgB3aheM3DjGwzgHhV3/DYIftQwwZX3WczE3Ty9UlDMRgc+foEdD2NDunw==
+X-Received: by 2002:a17:907:7fa8:b0:ae3:5e27:8e66 with SMTP id a640c23a62f3a-ae3c2bdcc36mr284553666b.27.1751458635631;
+        Wed, 02 Jul 2025 05:17:15 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:e7])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae35365a090sm1075241466b.56.2025.07.02.05.17.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jul 2025 05:17:14 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>, zijianzhang@bytedance.com
+Cc: netdev@vger.kernel.org,  bpf@vger.kernel.org,  john.fastabend@gmail.com,
+  zhoufeng.zf@bytedance.com,  Amery Hung <amery.hung@bytedance.com>,  Cong
+ Wang <cong.wang@bytedance.com>
+Subject: Re: [Patch bpf-next v4 4/4] tcp_bpf: improve ingress redirection
+ performance with message corking
+In-Reply-To: <20250701011201.235392-5-xiyou.wangcong@gmail.com> (Cong Wang's
+	message of "Mon, 30 Jun 2025 18:12:01 -0700")
+References: <20250701011201.235392-1-xiyou.wangcong@gmail.com>
+	<20250701011201.235392-5-xiyou.wangcong@gmail.com>
+Date: Wed, 02 Jul 2025 14:17:13 +0200
+Message-ID: <87ecuyn5x2.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v12 09/14] dpll: zl3073x: Register DPLL devices
- and pins
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, Prathosh Satish <Prathosh.Satish@microchip.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
- Shannon Nelson <shannon.nelson@amd.com>, Dave Jiang <dave.jiang@intel.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
-References: <20250629191049.64398-1-ivecera@redhat.com>
- <20250629191049.64398-10-ivecera@redhat.com>
- <ne36b7ky5cg2g3juejcah7bnvsajihncmpzag3vpjnb3gabz2m@xtxhpfhvfmwl>
- <1848e2f6-a0bb-48e6-9bfc-5ea6cbea2e5c@redhat.com>
- <k2osi2mzfmudh7q3av5raxj33smbdjgnrmaqjx2evjaaloddb3@vublvfldqlnm>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <k2osi2mzfmudh7q3av5raxj33smbdjgnrmaqjx2evjaaloddb3@vublvfldqlnm>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain
 
+On Mon, Jun 30, 2025 at 06:12 PM -07, Cong Wang wrote:
+> From: Zijian Zhang <zijianzhang@bytedance.com>
+>
+> The TCP_BPF ingress redirection path currently lacks the message corking
+> mechanism found in standard TCP. This causes the sender to wake up the
+> receiver for every message, even when messages are small, resulting in
+> reduced throughput compared to regular TCP in certain scenarios.
 
+I'm curious what scenarios are you referring to? Is it send-to-local or
+ingress-to-local? [1]
 
-On 02. 07. 25 2:02 odp., Jiri Pirko wrote:
-> Wed, Jul 02, 2025 at 01:49:22PM +0200, ivecera@redhat.com wrote:
->>
->>
->> On 02. 07. 25 12:57 odp., Jiri Pirko wrote:
->>> Sun, Jun 29, 2025 at 09:10:44PM +0200, ivecera@redhat.com wrote:
->>>
->>> [...]
->>>
->>>> +/**
->>>> + * zl3073x_dpll_device_register - register DPLL device
->>>> + * @zldpll: pointer to zl3073x_dpll structure
->>>> + *
->>>> + * Registers given DPLL device into DPLL sub-system.
->>>> + *
->>>> + * Return: 0 on success, <0 on error
->>>> + */
->>>> +static int
->>>> +zl3073x_dpll_device_register(struct zl3073x_dpll *zldpll)
->>>> +{
->>>> +	struct zl3073x_dev *zldev = zldpll->dev;
->>>> +	u8 dpll_mode_refsel;
->>>> +	int rc;
->>>> +
->>>> +	/* Read DPLL mode and forcibly selected reference */
->>>> +	rc = zl3073x_read_u8(zldev, ZL_REG_DPLL_MODE_REFSEL(zldpll->id),
->>>> +			     &dpll_mode_refsel);
->>>> +	if (rc)
->>>> +		return rc;
->>>> +
->>>> +	/* Extract mode and selected input reference */
->>>> +	zldpll->refsel_mode = FIELD_GET(ZL_DPLL_MODE_REFSEL_MODE,
->>>> +					dpll_mode_refsel);
->>>
->>> Who sets this?
->>
->> WDYM? refsel_mode register? If so this register is populated from
->> configuration stored in flash inside the chip. And the configuration
->> is prepared by vendor/OEM.
-> 
-> Okay. Any plan to implement on-fly change of this?
+If the sender is emitting small messages, that's probably intended -
+that is they likely want to get the message across as soon as possible,
+because They must have disabled the Nagle algo (set TCP_NODELAY) to do
+that.
 
-Do you mean switching between automatic and manual mode?
-If so? Yes, later, need to extend DPLL API to allow this.
+Otherwise, you get small segment merging on the sender side by default.
+And if MTU is a limiting factor, you should also be getting batching
+from GRO.
 
-Ivan
+What I'm getting at is that I don't quite follow why you don't see
+sufficient batching before the sockmap redirect today?
 
->>
->>>> +	zldpll->forced_ref = FIELD_GET(ZL_DPLL_MODE_REFSEL_REF,
->>>> +				       dpll_mode_refsel);
->>>> +
->>>> +	zldpll->dpll_dev = dpll_device_get(zldev->clock_id, zldpll->id,
->>>> +					   THIS_MODULE);
->>>> +	if (IS_ERR(zldpll->dpll_dev)) {
->>>> +		rc = PTR_ERR(zldpll->dpll_dev);
->>>> +		zldpll->dpll_dev = NULL;
->>>> +
->>>> +		return rc;
->>>> +	}
->>>> +
->>>> +	rc = dpll_device_register(zldpll->dpll_dev,
->>>> +				  zl3073x_prop_dpll_type_get(zldev, zldpll->id),
->>>> +				  &zl3073x_dpll_device_ops, zldpll);
->>>> +	if (rc) {
->>>> +		dpll_device_put(zldpll->dpll_dev);
->>>> +		zldpll->dpll_dev = NULL;
->>>> +	}
->>>> +
->>>> +	return rc;
->>>> +}
->>>
->>> [...]
->>>
->>
-> 
+> This change introduces a kernel worker-based intermediate layer to provide
+> automatic message corking for TCP_BPF. While this adds a slight latency
+> overhead, it significantly improves overall throughput by reducing
+> unnecessary wake-ups and reducing the sock lock contention.
 
+"Slight" for a +5% increase in latency is an understatement :-)
+
+IDK about this being always on for every socket. For send-to-local
+[1], sk_msg redirs can be viewed as a form of IPC, where latency
+matters.
+
+I do understand that you're trying to optimize for bulk-transfer
+workloads, but please consider also request-response workloads.
+
+[1] https://github.com/jsitnicki/kubecon-2024-sockmap/blob/main/cheatsheet-sockmap-redirect.png
+
+> Reviewed-by: Amery Hung <amery.hung@bytedance.com>
+> Co-developed-by: Cong Wang <cong.wang@bytedance.com>
+> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
+> ---
 
