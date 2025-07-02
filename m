@@ -1,166 +1,137 @@
-Return-Path: <netdev+bounces-203391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E378AF5BEF
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 16:59:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B379BAF5BED
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 16:59:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7507522E21
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:58:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E0564A67FD
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 14:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC09F30B9A9;
-	Wed,  2 Jul 2025 14:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g/Jl9jhT"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B4F30B9A6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC6130AADD;
 	Wed,  2 Jul 2025 14:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vfx/KsYX"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-yb1-f193.google.com (mail-yb1-f193.google.com [209.85.219.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF0230AAD1;
+	Wed,  2 Jul 2025 14:58:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751468319; cv=none; b=WMJzfjddg+yFVvb2LW2W811BX8IUMXHHjjK9BbwZ+sHcTG4zQJZmWu7cJMJsmv6i7OKemNITVEOH44o4XeCoHUlQ6zbl7JyvgOx86mQj9bgo67rbeYzpOFziHbhiV6mXJJRlMS046P0FygQE2XHLUYEZLBx42x9AnFs4td9f6X4=
+	t=1751468318; cv=none; b=aRDBVVNDjg8QaRjbhUKnJ4luSiCnw4eztnA0Hww6TRPfvGm1aRwNNFXssQGnKLaesaGk2u2L+RA8/+WPdghwqt2DdHyS65GLgDC97UHjTs9OO+SFPiWxoWoEhSQCCylvZaS0DF8K+asEcQUp/79jmnnr5zp+Pu87hSmDTgdLWSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751468319; c=relaxed/simple;
-	bh=SA9wfILOg4J9V+vuzNFLZxhr/uT3BR9G8K+trCq0n/w=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EiEFB1Ys7/+TLZM0dBAM9p0dzPqyvFSo2Jnr3m2+qtTOREgMGkKpboic/hgFoFrYBqQornW5y45E71S0HdcnTbSm95XB+rDiRTu84LOm6mdIAQTJWoGlI44ho/kyM6ZaXJgbBdFZulu8uyXDjeDjph0miWMhgah+ZB6KhlTHBB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g/Jl9jhT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C254FC4CEE7;
-	Wed,  2 Jul 2025 14:58:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751468318;
-	bh=SA9wfILOg4J9V+vuzNFLZxhr/uT3BR9G8K+trCq0n/w=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=g/Jl9jhTGOEyN0fmp9pk6wE9ndXDC4Oo9AAWjyCI4kUTdaM2qMwpFKQVHStPYF9n9
-	 IXrejOErjlUvsrFvGm4fB2uytmE2tifslwAGh/bdMLwNK2fDszrvU/ByyvMK69Vkzw
-	 X2r+MWTL0QBhe3BQUoffXAlHFDqXiwksuV9oYva9JdBnu3WHN69VKdOmSB92+DjRFa
-	 Iua4ImAIRgr39Z3eIw2qSLFh1dT7dvR1jod+W+Veo3TUYXBUqSA/i5OSiu9M4Qhxab
-	 L6o8mQ7c0cAJIkUFEwBOnesEw5dP2roMrZPyuWYYzOT/fD1ZNSNZLr4w4M6H5xxo8W
-	 3DqeIW3XZ+Tow==
-Subject: [PATCH bpf-next V2 3/7] net: xdp: Add kfuncs to store hw metadata in
- xdp_buff
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-To: bpf@vger.kernel.org, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, lorenzo@kernel.org
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <borkmann@iogearbox.net>,
- Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- sdf@fomichev.me, kernel-team@cloudflare.com, arthur@arthurfabre.com,
- jakub@cloudflare.com
-Date: Wed, 02 Jul 2025 16:58:32 +0200
-Message-ID: <175146831297.1421237.17665319427079757435.stgit@firesoul>
-In-Reply-To: <175146824674.1421237.18351246421763677468.stgit@firesoul>
-References: <175146824674.1421237.18351246421763677468.stgit@firesoul>
-User-Agent: StGit/1.5
+	s=arc-20240116; t=1751468318; c=relaxed/simple;
+	bh=oX/ZAtWzwJdsQhtNvalvhpcwa8JeOFlisMtV8cvuNIk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=J3KSujmNWkbU6uUda6vCdZ2ewoeYTwNTbXuXGLAH5CoGHo1CnEV9OLBltL7jLx7xl4QaurjwWZ5e/UwLIX6omEJhZe80WB8PWyCI2/plU9pNZzHk4J2QvlOmi7uYoqKciHfaeygHwHT/FeJkEgXMDXuufJDbHldr/ydsdSzPDMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vfx/KsYX; arc=none smtp.client-ip=209.85.219.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f193.google.com with SMTP id 3f1490d57ef6-e897c8ca777so1195032276.2;
+        Wed, 02 Jul 2025 07:58:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751468314; x=1752073114; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=T1WkFzcqoZ9zfZk6rKFoEV4a3LB4LFCO7cfh2fSf18M=;
+        b=Vfx/KsYXuvVLuESzF8oqtv5MeUX9ouWcH2RsUgPsN//qn6aWgIhjf1oJdicaOPMwKl
+         +gu9rIbKTP7tgvj9ymrWc/ZGgRHhZEDM6fK0DB9za6EYWmHnppZIBuKaBaEWsBu+twXA
+         +rW2z/++D57u/HZVgC5/ztmxeDfYy6at6SanHtmTyuJuibNkYOEorrIGsSyA+DqVmrJG
+         DYTZU4JhX6eofDm4MqLeiuSI3/Pj9fOWA2rEufcqDfLbHCBK6YUfQ/JC0reiUyBYcyCb
+         8eHqtQCWKJqqPeoPKFIfF4bMqrOQw9hSnOnWci/dggeGHb0r/7jGNptFTsYwkbM9gyl3
+         I7dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751468314; x=1752073114;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T1WkFzcqoZ9zfZk6rKFoEV4a3LB4LFCO7cfh2fSf18M=;
+        b=P3x502jqfgVMs+s9EqURKCHmuFD3TW4T4V3vytCA/lDS53m/WUsOc8zsgyyNJ7ySTI
+         OpblIvp8Zc8dieEzR/1eMQ8Oo+8NPEAaL8k6H9vfjm0vjyhm5/TGmBKQ/hJkilX/JPLN
+         KfoXB0AY0WgDiPTh7ZJFvXwmb1I4XuA+dKlxWSrcbOh3nKLzv5V5w3QZSmroQ/9ik6+s
+         0dQI3SROKgdRuhtfhlNgb2dq1prckmOS9TxLMPiFZB6oeUZc+xqopPQm7f+9wuj71FPw
+         XeS2fF4gpn00DJTbI0/s8N9ZuPyrDcD3RJXgjMqvOH+0thmHX3FAzVPhJL0hT53oar9P
+         LvUg==
+X-Forwarded-Encrypted: i=1; AJvYcCUv/fv8vftjzD24Ac4X+8b3V1yYPz2iy6JOoMgFEe4D+L793Z3AC2RVVGF644PVORzQRc8PEE6C@vger.kernel.org, AJvYcCXcJ/EWnO3z35VvWWysY7RXfQme80/+xIYUY7xhTfRvd/4WJv/edYEoIIHMfihXK8glLfJbDyJD1JcVn1g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8YkgM7LbFH45/HZnE7Nz8D/I+FWPINQnSAe5VTwjLZZ+Ssd0Q
+	LbTZkwBagU8LmefrX4/ibg30X29R5VU9slWlVAbIvt6dadPREFnnk9QS
+X-Gm-Gg: ASbGncsxcUjvzjLNNVgq17e/jp2/ua4BJxBiB7BUXbD22YAGtTKl8XpcXwTUxRlTlW5
+	VaFSpVQRluNIi+/FBGodwHN06QTVhVN7SUiQ1OCW0gvl1seLLrAqgiSG2XerUYHXPIgYEvLNhie
+	g1rKiGrsKr5+nJ/Z+RD/2uCQn5lHTijS9Bjk0nB/1cVMi4rWhtx3UUUgxKS1s96mXIbS1jQtKSq
+	MOreXsp+YGqi3+zTweXSE6XK4juK8QiYOwofb4Fr6u8aRnxhU6TuPKmTSZAA1MQEWmrBeGogtUS
+	5Xe/WYhGG1XtfDfQ+t4I2vaC/WDzXX6seg7JeHO0H1AZW10r3tR/uN12xldrEmvAT4LLQR9OL8L
+	t0YaAHurg
+X-Google-Smtp-Source: AGHT+IGlSboF2WeQ17XUS4xFc2PW/wJIU1k/DVuD4yqPbLcGVoiUFPieioZSCcoMk0Qg2yQY9vZcjg==
+X-Received: by 2002:a05:6902:728:b0:e89:8cc2:8082 with SMTP id 3f1490d57ef6-e898cc2856cmr885356276.41.1751468314365;
+        Wed, 02 Jul 2025 07:58:34 -0700 (PDT)
+Received: from [10.102.6.66] ([208.97.243.82])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e8980a99c80sm480883276.56.2025.07.02.07.58.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Jul 2025 07:58:34 -0700 (PDT)
+Message-ID: <9c43747a-f73d-476d-a1dc-1646fcfb771f@gmail.com>
+Date: Wed, 2 Jul 2025 10:58:33 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: bridge: Do not offload IGMP/MLD messages
+To: Tobias Waldekranz <tobias@waldekranz.com>,
+ Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org
+Cc: Nikolay Aleksandrov <razor@blackwall.org>,
+ Ido Schimmel <idosch@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, bridge@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+References: <20250701193639.836027-1-Joseph.Huang@garmin.com>
+ <87a55nyofq.fsf@waldekranz.com>
+Content-Language: en-US
+From: Joseph Huang <joseph.huang.2024@gmail.com>
+In-Reply-To: <87a55nyofq.fsf@waldekranz.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-From: Lorenzo Bianconi <lorenzo@kernel.org>
+On 7/2/2025 4:41 AM, Tobias Waldekranz wrote:
+> On tis, jul 01, 2025 at 15:36, Joseph Huang <Joseph.Huang@garmin.com> wrote:
+>> Do not offload IGMP/MLD messages as it could lead to IGMP/MLD Reports
+>> being unintentionally flooded to Hosts. Instead, let the bridge decide
+>> where to send these IGMP/MLD messages.
+> 
+> Hi Joseph,
+> 
+> Do I understand the situation correctly that this is the case where the
+> local host is sending out reports in response to a remote querier?
+> 
+>          mcast-listener-process (IP_ADD_MEMBERSHIP)
+>             \
+>             br0
+>            /   \
+>         swp1   swp2
+>           |     |
+>     QUERIER     SOME-OTHER-HOST
+> 
+> So in the above setup, br0 will want to br_forward() reports for
+> mcast-listener-process's group(s) via swp1 to QUERIER; but since the
+> source hwdom is 0, the report is eligible for tx offloading, and is
+> flooded by hardware to both swp1 and swp2, reaching SOME-OTHER-HOST as
+> well?
 
-Introduce the following kfuncs to store hw metadata provided by the NIC
-into the xdp_buff struct:
+That's exactly what's happening with my setup.
 
-- rx-hash: bpf_xdp_store_rx_hash
-- rx-vlan: bpf_xdp_store_rx_vlan
-- rx-hw-ts: bpf_xdp_store_rx_ts
+Also, IIRC, the querier port (a.k.a. mrouter port) is not offloaded to 
+the switch (at least not for DSA switches). So depending on the 
+multicast_flood setting on the (querier) port, the Reports may not even 
+reach the querier if they are tx offloaded.
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
----
- include/net/xdp.h |    5 +++++
- net/core/xdp.c    |   45 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 50 insertions(+)
-
-diff --git a/include/net/xdp.h b/include/net/xdp.h
-index f52742a25212..8c7d47e3609b 100644
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@ -153,6 +153,11 @@ static __always_inline void xdp_buff_set_frag_pfmemalloc(struct xdp_buff *xdp)
- 	xdp->flags |= XDP_FLAGS_FRAGS_PF_MEMALLOC;
- }
- 
-+static __always_inline bool xdp_buff_has_valid_meta_area(struct xdp_buff *xdp)
-+{
-+	return !!(xdp->flags & XDP_FLAGS_META_AREA);
-+}
-+
- static __always_inline void
- xdp_init_buff(struct xdp_buff *xdp, u32 frame_sz, struct xdp_rxq_info *rxq)
- {
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index bd3110fc7ef8..1ffba57714ea 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -963,12 +963,57 @@ __bpf_kfunc int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx,
- 	return -EOPNOTSUPP;
- }
- 
-+__bpf_kfunc int bpf_xdp_store_rx_hash(struct xdp_md *ctx, u32 hash,
-+				      enum xdp_rss_hash_type rss_type)
-+{
-+	struct xdp_buff *xdp = (struct xdp_buff *)ctx;
-+
-+	if (!xdp_buff_has_valid_meta_area(xdp))
-+		return -ENOSPC;
-+
-+	xdp->rx_meta->hash.val = hash;
-+	xdp->rx_meta->hash.type = rss_type;
-+	xdp->flags |= XDP_FLAGS_META_RX_HASH;
-+
-+	return 0;
-+}
-+
-+__bpf_kfunc int bpf_xdp_store_rx_vlan(struct xdp_md *ctx, __be16 vlan_proto,
-+				      u16 vlan_tci)
-+{
-+	struct xdp_buff *xdp = (struct xdp_buff *)ctx;
-+
-+	if (!xdp_buff_has_valid_meta_area(xdp))
-+		return -ENOSPC;
-+
-+	xdp->rx_meta->vlan.proto = vlan_proto;
-+	xdp->rx_meta->vlan.tci = vlan_tci;
-+	xdp->flags |= XDP_FLAGS_META_RX_VLAN;
-+
-+	return 0;
-+}
-+
-+__bpf_kfunc int bpf_xdp_store_rx_ts(struct xdp_md *ctx, u64 ts)
-+{
-+	struct xdp_buff *xdp = (struct xdp_buff *)ctx;
-+	struct skb_shared_info *sinfo = xdp_get_shared_info_from_buff(xdp);
-+	struct skb_shared_hwtstamps *shwt = &sinfo->hwtstamps;
-+
-+	shwt->hwtstamp = ts;
-+	xdp->flags |= XDP_FLAGS_META_RX_TS;
-+
-+	return 0;
-+}
-+
- __bpf_kfunc_end_defs();
- 
- BTF_KFUNCS_START(xdp_metadata_kfunc_ids)
- #define XDP_METADATA_KFUNC(_, __, name, ___) BTF_ID_FLAGS(func, name, KF_TRUSTED_ARGS)
- XDP_METADATA_KFUNC_xxx
- #undef XDP_METADATA_KFUNC
-+BTF_ID_FLAGS(func, bpf_xdp_store_rx_hash)
-+BTF_ID_FLAGS(func, bpf_xdp_store_rx_vlan)
-+BTF_ID_FLAGS(func, bpf_xdp_store_rx_ts)
- BTF_KFUNCS_END(xdp_metadata_kfunc_ids)
- 
- static const struct btf_kfunc_id_set xdp_metadata_kfunc_set = {
-
-
+Thanks,
+Joseph
 
