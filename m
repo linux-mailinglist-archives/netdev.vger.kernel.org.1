@@ -1,220 +1,235 @@
-Return-Path: <netdev+bounces-203284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51060AF11ED
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:32:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32E0BAF11F7
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:34:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53F4C175F0C
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:32:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B2721C2669C
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:34:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12621253F38;
-	Wed,  2 Jul 2025 10:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A098254873;
+	Wed,  2 Jul 2025 10:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="J3d/vSYk"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="RQ0+mZIp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB0A244EA0
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 10:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4E5246781;
+	Wed,  2 Jul 2025 10:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751452326; cv=none; b=pGx1vIY5iaRevB2fme57yaMgRagaRt88e7CGvQ+Qj7pFW8lZ7VCui6/1sH+U4EN1Jmo5azSlD7GxhLlBn+/6P+4c+YZQFS9xx8PRN6uIJmYp5Jsqnm9/d2XqOGD6DLO6V0KY12DEoPUqO0p+ZlvW2FnSR1d8z38ZNWku1D3YND4=
+	t=1751452434; cv=none; b=Z8jVb0fj6ByY97qZd1EMMKmUhxXDNd8ty7y//qvOnTAEuUrGSzksocJaImkx97YJjSIY96Sjz7T0PtOM0u+f40p+z/c08epzoNCHDTRGQKLKJhAGQ+bfYZWGS2zMdgx6SZvtcYZnn8Ch4W9WSYksJMMCJ+PrJG+a2zW2kBGGYg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751452326; c=relaxed/simple;
-	bh=ZIPepwL1zAjT3/W18tkz2vKEYlRwn57a6PC+KSBfoZo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ahtoM5t1edtbyFbB386M1sGfH7xxPEiW7H4FAKz1drsS+PC2OED73wa1Rdk2jcY/OUmmMJ5Px6MAoaLk/5Z+jDRVYWVazNLTxJggN4FRlOD23HpYSKYyYbB8MNBEIKO80GmP4EYXoc95ZggSuv/3ccBy4OW+82MQkwOK09Sk2xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=J3d/vSYk; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3a6e8b1fa37so3682793f8f.2
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 03:32:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1751452322; x=1752057122; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zXDzDU4TR6t6LCGPz2CtkRVWsYIWYd3/8o1AXqP8JIQ=;
-        b=J3d/vSYk8opocU0piDvqaKzjBrnanMQ1d0D5zxbXmNs04jPctePD1aatvNvRd6O4zI
-         VoZWvUe2VeYJ3UtEyo99293Di9gZX16zX3VZRD6FVxPCA2nzl2MU4K8vU4GdbdiLbPXi
-         wTG165FZqZkQhkZhuPMKoGbYrmwmFcujddWf0maC00rn6B3npN/9VT+xU0icuZbFm74w
-         1SS2cfvo0h6sSqyJJgENf8ORLRL1HK8MWdri5Tza1zUjF5UyaO/WEKys+Zq89GFu0iWT
-         Mvrtr3/QdBb1YA4x2pLZURJuvIMeKDH+h7rd++X6Da7FANh5KxhvNvP5B7L97eNfnAoP
-         53Hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751452322; x=1752057122;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zXDzDU4TR6t6LCGPz2CtkRVWsYIWYd3/8o1AXqP8JIQ=;
-        b=bHIKtlt81AzPeyulXoLj2NxNIETqobM01+j6/1zXj+6zJx/vkaHSt8qEBJkJEI8ICZ
-         6POBw6IWo4vv0zIgkOf52hGioj2mV896k1cXqMVglTRa1BZ/zRsuMEbewxBPKy0msIJL
-         QR8MdYaaDU/7GHKGwVVfCWfGn/eSvHATx15TiWMTegMZtpu7ZTY6Me7x+u9VJXOunMQ9
-         o/79MRKPlZqy1BV8jQqJQfztU8fTI/ZrbF2NO0Mk7AVJ2Tc1Mi5KO9G+BZpHFtPXH0HG
-         0bYUdLlyye7jVL83YK8Ki2eNh92fvFIhgWIaCo+9yaBooMcniL9gWMgDOpPTSEA/+kt+
-         nRGw==
-X-Gm-Message-State: AOJu0YxcdHZ8UUmZ7jQ8UPr5gMnr+Dd6OC7dLFDTdEm/ez9dKZ3Ig1t7
-	LCz6FuzTDG45NL4V0FTB7nCNQKTbtCf3EcBV4WOBaq2YRjg7m1X1eUn4tj8UXWAwdV0=
-X-Gm-Gg: ASbGnctXq7m/lSWoC/3lPNMzgI66qrXXvn2CpIjuMCjOYesIeD2W+W6Db22uUyw2zsB
-	E01CDsxC4sGWvcOn1GxfMdiIT2zwC9CBFB09QBoHypJlhEtbbf5mwSkNxexai6+5ZwxmkWCyS0J
-	ZkwUnM0jSWPL4quoY++G01yisUiH6eH4H+/hu6FroA43fGjOVFiUTxnCxtwjfw92KcKk7tWxAl4
-	E+JF9bxXhQPrsU4+xofMseIbJU/Etn9BREy+clJr0Q9EtLXdvDm6Ixt+7s/Rodv/BUxIYiWbINk
-	v+Ix4x3sn8nOxq3PIiIw6Iukfir/WWFbIZGvVZLM19MsI3K1+0gv1LgqqwpFE6GO3DTBJyCw8iu
-	FLX5R
-X-Google-Smtp-Source: AGHT+IGsTcnn79M2AkJYx6VwIu5Aao26W0bXZaJfZo1nGUhdH+xTH9BKoW+BRHywWzGq0ruyEcPoQw==
-X-Received: by 2002:adf:e196:0:b0:3a8:38b3:6e32 with SMTP id ffacd0b85a97d-3b1fdf02726mr1536066f8f.8.1751452322382;
-        Wed, 02 Jul 2025 03:32:02 -0700 (PDT)
-Received: from jiri-mlt ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4538a3fe28dsm195088325e9.20.2025.07.02.03.31.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 03:32:02 -0700 (PDT)
-Date: Wed, 2 Jul 2025 12:31:52 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Prathosh Satish <Prathosh.Satish@microchip.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Shannon Nelson <shannon.nelson@amd.com>, Dave Jiang <dave.jiang@intel.com>, 
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>, 
-	Petr Oros <poros@redhat.com>
-Subject: Re: [PATCH net-next v12 07/14] dpll: zl3073x: Add clock_id field
-Message-ID: <amsh2xeltgadepx22kvcq4cfyhb3psnxafqhr33ra6nznswsaq@hfq6yrb4zvo7>
-References: <20250629191049.64398-1-ivecera@redhat.com>
- <20250629191049.64398-8-ivecera@redhat.com>
+	s=arc-20240116; t=1751452434; c=relaxed/simple;
+	bh=Zr4lURcAt0rx9IueClgNCAvtqGi3g4wuS+sj1uYDWIE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=oOtuKmLK6v2j04LjssOSkpdkQ0YZS1cRe5FF0b5yoigfnJ4kb1sMzDQ+EHIpGjRpaZQc+8F4WSY4YR0oRU4OwiKzOpLRHwzCGZvyu4le8iB6bI0ECz3nYYwz+rrisTovlCD524m/q15CGl2aVcxeY5A50E6rkcuw1wc7IMga14M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=RQ0+mZIp; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56235evB020939;
+	Wed, 2 Jul 2025 10:33:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	tyuuEW55huNUHGYc+9oBljKgGuuKmVR8um5xHUVVKiE=; b=RQ0+mZIpNSh3Iz8A
+	RhHHe/+V1EIUnRYRbCEqxvllc8tpS6BrYL8QMLhA00tqScPxK2S61Ajr5QW7IyHn
+	69UqGMyj1bg7FxZXrArNwefXmRzc/8eEhUkmA6Yo5ibCoi4ScJ0tUqm97HP3yvkX
+	sKP6xOJASdNFBdRp+pUSu9YELcP0ceE/Mpup9XSxnNB4QNvCnfjce4P8Lz6K8dX6
+	LNVMWDwmrOLcztG1rROXp3+9ncHuXE+94fWNOCJyExgWIG3g/sZq8FKGoO09Y984
+	1fJgj7HbYAxmP3doQUwjBWCjneo+ENIponHFK9sT3jLUYl4iMX8AGUwZLfyim+F4
+	EE3Mmg==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47mhxn2xt9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 02 Jul 2025 10:33:40 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 562AXdZl022880
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 2 Jul 2025 10:33:39 GMT
+Received: from [10.253.36.62] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Wed, 2 Jul
+ 2025 03:33:33 -0700
+Message-ID: <ade0437b-3c23-4174-b4c5-6c90037abf14@quicinc.com>
+Date: Wed, 2 Jul 2025 18:33:31 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250629191049.64398-8-ivecera@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 5/8] dt-bindings: clock: qcom: Add NSS clock controller
+ for IPQ5424 SoC
+To: Krzysztof Kozlowski <krzk@kernel.org>
+CC: Bjorn Andersson <andersson@kernel.org>,
+        Michael Turquette
+	<mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>, Georgi Djakov <djakov@kernel.org>,
+        Philipp Zabel
+	<p.zabel@pengutronix.de>,
+        Richard Cochran <richardcochran@gmail.com>,
+        "Konrad
+ Dybcio" <konradybcio@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Anusha Rao <quic_anusha@quicinc.com>,
+        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-pm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <quic_kkumarcs@quicinc.com>,
+        <quic_linchen@quicinc.com>, <quic_leiwei@quicinc.com>,
+        <quic_suruchia@quicinc.com>, <quic_pavir@quicinc.com>
+References: <20250627-qcom_ipq5424_nsscc-v2-0-8d392f65102a@quicinc.com>
+ <20250627-qcom_ipq5424_nsscc-v2-5-8d392f65102a@quicinc.com>
+ <20250701-optimistic-esoteric-swallow-d93fc6@krzk-bin>
+Content-Language: en-US
+From: Luo Jie <quic_luoj@quicinc.com>
+In-Reply-To: <20250701-optimistic-esoteric-swallow-d93fc6@krzk-bin>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzAyMDA4NSBTYWx0ZWRfX8ic95YwncjRA
+ R4a/ZplQ4CcTmnpeSbBXjN38NorRfGm7Ty1Ot++Z+mRMrbEH9rm4bVxtycdNHSp9qs2NibUFiba
+ kjc7NUW4FXBBu43LDB5pY51vR2GQA/dKl1FJsaseUplIdTgdZyMO3i7dTNjVgVkzjbfCIjE7Rl/
+ 3Ix9k4evJes1nmfqFZNw0lcj84C4dO0tuPZtHAFUUDLTXcJLlNRPYb7WGY+ysmlTfLV0c+sdl8v
+ 4YuekVKu7AqhaSS/CRFirak/41IDSoojDw/IqV/BmHWeTxChg4hDHYl/pW4QSyKyskU5l1B/EB3
+ PF/ecM+oIhCfBcFQ7C35HXitpcR1HEUniMkTIPhtm+jEGrtmOWnBbEqGp9WeFC19yOHfYVQkzxc
+ aUItSPNWmB+JABtSCmH/8jMDuGsSFA+COQfNGsMpKt2sxLzyGvq+yv1AF81Y2K2MGL2nXb7Z
+X-Authority-Analysis: v=2.4 cv=EbvIQOmC c=1 sm=1 tr=0 ts=68650b04 cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=gEfo2CItAAAA:8
+ a=COk6AnOGAAAA:8 a=VwQbUJbxAAAA:8 a=l8XhYvs3ogmA2MLIGYEA:9 a=QEXdDO2ut3YA:10
+ a=sptkURWiP4Gy88Gu7hUp:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-ORIG-GUID: ZJFKHmu4BoQDsqmwOJcsqj0rTrgYuXIn
+X-Proofpoint-GUID: ZJFKHmu4BoQDsqmwOJcsqj0rTrgYuXIn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-02_01,2025-06-27_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 mlxscore=0 priorityscore=1501 mlxlogscore=999 lowpriorityscore=0
+ malwarescore=0 adultscore=0 clxscore=1015 bulkscore=0 impostorscore=0
+ spamscore=0 suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507020085
 
-Sun, Jun 29, 2025 at 09:10:42PM +0200, ivecera@redhat.com wrote:
->Add .clock_id to zl3073x_dev structure that will be used by later
->commits introducing DPLL feature. The clock ID is required for DPLL
->device registration.
->
->To generate this ID, use chip ID read during device initialization.
->In case where multiple zl3073x based chips are present, the chip ID
->is shifted and lower bits are filled by an unique value - using
->the I2C device address for I2C connections and the chip-select value
->for SPI connections.
-
-You say that multiple chips may have the same chip ID? How is that
-possible? Isn't it supposed to be unique?
-I understand clock ID to be invariant regardless where you plug your
-device. When you construct it from i2c address, sounds wrong.
 
 
->
->Signed-off-by: Ivan Vecera <ivecera@redhat.com>
->---
-> drivers/dpll/zl3073x/core.c | 6 +++++-
-> drivers/dpll/zl3073x/core.h | 4 +++-
-> drivers/dpll/zl3073x/i2c.c  | 4 +++-
-> drivers/dpll/zl3073x/spi.c  | 4 +++-
-> 4 files changed, 14 insertions(+), 4 deletions(-)
->
->diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
->index b99dd81077d56..94c78a36d9158 100644
->--- a/drivers/dpll/zl3073x/core.c
->+++ b/drivers/dpll/zl3073x/core.c
->@@ -743,13 +743,14 @@ static void zl3073x_devlink_unregister(void *ptr)
->  * zl3073x_dev_probe - initialize zl3073x device
->  * @zldev: pointer to zl3073x device
->  * @chip_info: chip info based on compatible
->+ * @dev_id: device ID to be used as part of clock ID
->  *
->  * Common initialization of zl3073x device structure.
->  *
->  * Returns: 0 on success, <0 on error
->  */
-> int zl3073x_dev_probe(struct zl3073x_dev *zldev,
->-		      const struct zl3073x_chip_info *chip_info)
->+		      const struct zl3073x_chip_info *chip_info, u8 dev_id)
-> {
-> 	u16 id, revision, fw_ver;
-> 	struct devlink *devlink;
->@@ -793,6 +794,9 @@ int zl3073x_dev_probe(struct zl3073x_dev *zldev,
-> 		FIELD_GET(GENMASK(15, 8), cfg_ver),
-> 		FIELD_GET(GENMASK(7, 0), cfg_ver));
+On 7/1/2025 4:22 PM, Krzysztof Kozlowski wrote:
+> On Fri, Jun 27, 2025 at 08:09:21PM +0800, Luo Jie wrote:
+>> NSS clock controller provides the clocks and resets to the networking
+>> blocks such as PPE (Packet Process Engine) and UNIPHY (PCS) on IPQ5424
+>> devices.
+>>
+>> Add the compatible "qcom,ipq5424-nsscc" support based on the current
+>> IPQ9574 NSS clock controller DT binding file. ICC clocks are always
+>> provided by the NSS clock controller of IPQ9574 and IPQ5424, so add
+>> interconnect-cells as required DT property.
+>>
+>> Also add master/slave ids for IPQ5424 networking interfaces, which is
+>> used by nss-ipq5424 driver for providing interconnect services using
+>> icc-clk framework.
+>>
+>> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+>> ---
+>>   .../bindings/clock/qcom,ipq9574-nsscc.yaml         | 70 +++++++++++++++++++---
+>>   include/dt-bindings/clock/qcom,ipq5424-nsscc.h     | 65 ++++++++++++++++++++
+>>   include/dt-bindings/interconnect/qcom,ipq5424.h    | 13 ++++
+>>   include/dt-bindings/reset/qcom,ipq5424-nsscc.h     | 46 ++++++++++++++
+>>   4 files changed, 186 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml b/Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
+>> index 17252b6ea3be..0029a148a397 100644
+>> --- a/Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
+>> +++ b/Documentation/devicetree/bindings/clock/qcom,ipq9574-nsscc.yaml
+>> @@ -4,7 +4,7 @@
+>>   $id: http://devicetree.org/schemas/clock/qcom,ipq9574-nsscc.yaml#
+>>   $schema: http://devicetree.org/meta-schemas/core.yaml#
+>>   
+>> -title: Qualcomm Networking Sub System Clock & Reset Controller on IPQ9574
+>> +title: Qualcomm Networking Sub System Clock & Reset Controller on IPQ9574 and IPQ5424
+>>   
+>>   maintainers:
+>>     - Bjorn Andersson <andersson@kernel.org>
+>> @@ -12,21 +12,29 @@ maintainers:
+>>   
+>>   description: |
+>>     Qualcomm networking sub system clock control module provides the clocks,
+>> -  resets on IPQ9574
+>> +  resets on IPQ9574 and IPQ5424
+>>   
+>> -  See also::
+>> +  See also:
+>> +    include/dt-bindings/clock/qcom,ipq5424-nsscc.h
+>>       include/dt-bindings/clock/qcom,ipq9574-nsscc.h
+>> +    include/dt-bindings/reset/qcom,ipq5424-nsscc.h
+>>       include/dt-bindings/reset/qcom,ipq9574-nsscc.h
+>>   
+>>   properties:
+>>     compatible:
+>> -    const: qcom,ipq9574-nsscc
+>> +    enum:
+>> +      - qcom,ipq5424-nsscc
+>> +      - qcom,ipq9574-nsscc
+>>   
+>>     clocks:
+>>       items:
+>>         - description: Board XO source
+>> -      - description: CMN_PLL NSS 1200MHz (Bias PLL cc) clock source
+>> -      - description: CMN_PLL PPE 353MHz (Bias PLL ubi nc) clock source
+>> +      - description: CMN_PLL NSS (Bias PLL cc) clock source. This clock rate
+>> +          can vary for different IPQ SoCs. For example, it is 1200 MHz on the
+>> +          IPQ9574 and 300 MHz on the IPQ5424.
+>> +      - description: CMN_PLL PPE (Bias PLL ubi nc) clock source. The clock
+>> +          rate can vary for different IPQ SoCs. For example, it is 353 MHz
+>> +          on the IPQ9574 and 375 MHz on the IPQ5424
+>>         - description: GCC GPLL0 OUT AUX clock source
+>>         - description: Uniphy0 NSS Rx clock source
+>>         - description: Uniphy0 NSS Tx clock source
+>> @@ -42,8 +50,12 @@ properties:
+>>     clock-names:
+>>       items:
+>>         - const: xo
+>> -      - const: nss_1200
+>> -      - const: ppe_353
+>> +      - enum:
+>> +          - nss_1200
+>> +          - nss
 > 
->+	/* Use chip ID and given dev ID as clock ID */
->+	zldev->clock_id = ((u64)id << 8) | dev_id;
->+
-> 	/* Initialize mutex for operations where multiple reads, writes
-> 	 * and/or polls are required to be done atomically.
-> 	 */
->diff --git a/drivers/dpll/zl3073x/core.h b/drivers/dpll/zl3073x/core.h
->index 2c831f1a4a5d1..1df2dc194980d 100644
->--- a/drivers/dpll/zl3073x/core.h
->+++ b/drivers/dpll/zl3073x/core.h
->@@ -57,6 +57,7 @@ struct zl3073x_synth {
->  * @dev: pointer to device
->  * @regmap: regmap to access device registers
->  * @multiop_lock: to serialize multiple register operations
->+ * @clock_id: clock id of the device
->  * @ref: array of input references' invariants
->  * @out: array of outs' invariants
->  * @synth: array of synths' invariants
->@@ -65,6 +66,7 @@ struct zl3073x_dev {
-> 	struct device		*dev;
-> 	struct regmap		*regmap;
-> 	struct mutex		multiop_lock;
->+	u64			clock_id;
+> No, that's the same clock.
+
+OK.
+
 > 
-> 	/* Invariants */
-> 	struct zl3073x_ref	ref[ZL3073X_NUM_REFS];
->@@ -87,7 +89,7 @@ extern const struct regmap_config zl3073x_regmap_config;
 > 
-> struct zl3073x_dev *zl3073x_devm_alloc(struct device *dev);
-> int zl3073x_dev_probe(struct zl3073x_dev *zldev,
->-		      const struct zl3073x_chip_info *chip_info);
->+		      const struct zl3073x_chip_info *chip_info, u8 dev_id);
+>> +      - enum:
+>> +          - ppe_353
+>> +          - ppe
 > 
-> /**********************
->  * Registers operations
->diff --git a/drivers/dpll/zl3073x/i2c.c b/drivers/dpll/zl3073x/i2c.c
->index 7bbfdd4ed8671..13942ee43b9e5 100644
->--- a/drivers/dpll/zl3073x/i2c.c
->+++ b/drivers/dpll/zl3073x/i2c.c
->@@ -22,7 +22,9 @@ static int zl3073x_i2c_probe(struct i2c_client *client)
-> 		return dev_err_probe(dev, PTR_ERR(zldev->regmap),
-> 				     "Failed to initialize regmap\n");
+> No, that's the same clock!
 > 
->-	return zl3073x_dev_probe(zldev, i2c_get_match_data(client));
->+	/* Initialize device and use I2C address as dev ID */
->+	return zl3073x_dev_probe(zldev, i2c_get_match_data(client),
->+				 client->addr);
-> }
+> The frequencies are not part of input pin. Input pin tells you this is
+> clock for PPE, not this is clock for PPE 353 and another for PPE xxx.
 > 
-> static const struct i2c_device_id zl3073x_i2c_id[] = {
->diff --git a/drivers/dpll/zl3073x/spi.c b/drivers/dpll/zl3073x/spi.c
->index af901b4d6dda0..670b44a7b270f 100644
->--- a/drivers/dpll/zl3073x/spi.c
->+++ b/drivers/dpll/zl3073x/spi.c
->@@ -22,7 +22,9 @@ static int zl3073x_spi_probe(struct spi_device *spi)
-> 		return dev_err_probe(dev, PTR_ERR(zldev->regmap),
-> 				     "Failed to initialize regmap\n");
+> Best regards,
+> Krzysztof
 > 
->-	return zl3073x_dev_probe(zldev, spi_get_device_match_data(spi));
->+	/* Initialize device and use SPI chip select value as dev ID */
->+	return zl3073x_dev_probe(zldev, spi_get_device_match_data(spi),
->+				 spi_get_chipselect(spi, 0));
-> }
-> 
-> static const struct spi_device_id zl3073x_spi_id[] = {
->-- 
->2.49.0
->
+
+Ok. Our only concern with dropping the suffix and using a common name
+was renaming the existing property (initially added for IPQ9574 SoC)
+from 'ppe_353' to 'ppe'. However I do agree that dropping suffix is the
+better approach. Thanks for the suggestion.
+
 
