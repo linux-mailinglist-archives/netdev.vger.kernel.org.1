@@ -1,187 +1,124 @@
-Return-Path: <netdev+bounces-203476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9C0DAF6040
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 19:41:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 164A0AF605E
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 19:50:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAEC71C449C7
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 17:41:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCA501C204EB
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 17:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E45301129;
-	Wed,  2 Jul 2025 17:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C38309A63;
+	Wed,  2 Jul 2025 17:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PW/Ochd1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4121BEF8C
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 17:41:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918E4E555;
+	Wed,  2 Jul 2025 17:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751478096; cv=none; b=jcCkPO6aUqDjLIVdKDL9HMVBlpZwaalCWM5LcW2YT4oKoCTbK9S2CQelOqJKD7NlC+BD3YQpsCAkTX6V36hagdhYPC2yZMu04QNWfzmpRoVEH+Ro2SJUrUc20qBiQ+urGPgNeq9uuWlzBgpFcJctTOlM2fp03CtRieeTMIR5It0=
+	t=1751478598; cv=none; b=dA3zZlbO5w8KpENi6uUFXLcp9arPaNa9DY9NQm2KrpYSLr0S955YhiZ+8LU6k8NU1mxcRLhtjaxV8qjY8mMhYMaxQ6Sq7lvmDkWz4Yyz5U2zBmzu5X/bvRiHM7wQMGdnX88C3VsNL4KVR5aYCpW0moDgxMDBfgfRAvDVfd/QSdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751478096; c=relaxed/simple;
-	bh=k2hXWWBUInE/X3KUM9hCnoEYw20iSW7B44f1ZY4i5/E=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=GsgDOg4VdRN1KSEJ9payV0DwwawkSpEi0zpu7xeCVYQdodLQZUTjv4Vd1e6JpYwoTkZ2rJqbMZ5w1M2EvtNwn8WT+76ffDdHhOSoF50YndvBj4V0aV9A7/aLubrGRvdafpHNOj8ewQFgAHwTO7e/KMv10wO/pBM/jSX2jWHIh/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3ddd5cd020dso89630675ab.0
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 10:41:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751478093; x=1752082893;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yBSPzhdH3wEfOn7N4dpzQCCYfN1eHNCMULLRrjRIgjg=;
-        b=LWm7ZsX/UT+PWRWvKRI5a7tY/eafIvfxSCSktmFN1yASKTe6U7NTx+XqjQNcpVoRrX
-         9gOnDtCQ69LoyI8E+vjwxZ6mEuyG9KMfrOEUBkSt5SOVqynIRjS+MiMlUnZZRNpc7lY6
-         nKhwcgj+IV0COvubJTBJkmuYDUhZ00OsnhZ2+iB6A+3rh8xjHIsKfYWJKspxwnFUWXJ/
-         JAtnJJXzbh2hQeKmrAIkIl6jC1don6l1Uyl+9ELAgBET2tfcicTrIkYT2v0k1HYlIXj4
-         9RR88BRPbYlSyzSaTa77oZFgmOIS0tMN25ABwQVPqPIVT69rWDG2KhXC1Bc0ggVav58K
-         6GCg==
-X-Forwarded-Encrypted: i=1; AJvYcCU8iIwUm+2Lq1As2b5KlFRlgcHU2knuCC41Glji/ZLlmaQJMzoGxHsI3RYDb48WTSzhg9drvPw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRH51Kag413VLf+tWlMKRDnUaANOaAf4H6lFvm0jFtUA79aLwu
-	C1+39I297xZ89DKZFzSgEQunV+ezNVF7MwVlbKhUfp5Yx98DxDjkFKc1rBjM+WbByBFPwdr3YJK
-	v4sjk6QWHHTE0GR3WvICeIUJJYDDDGUUuei0aX2lRUTzkC8PPkjvCqHF/KIg=
-X-Google-Smtp-Source: AGHT+IG9qfWx+mO2skrdHILIdxNHe2YmS67iX533ok1MrJTgeiu9knx1RbwQcsUIO5BQIb1S0J6cP6Ue0Z1Ecg0rza905tzPaLWR
+	s=arc-20240116; t=1751478598; c=relaxed/simple;
+	bh=ZoUzvinUgprRSAAxILgkzOBOTFZlJi46Lij9F8TRREw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gn4TkC5IYWSXOqf0SMNeaOREr4UdiXg6WmeqjscITpX9Cbvb9zp6JO88h65QkUPGMJfG+lzc2A06+CpwtBKuO8w+Zq/zq16g1D3uNn6E5qB/Ie707ZKFOULDP9WLchRU/6vs78CuG128/cVr2eWD4F5MmnfBm2CIfVsJpRS4aMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PW/Ochd1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC95CC4CEE7;
+	Wed,  2 Jul 2025 17:49:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751478598;
+	bh=ZoUzvinUgprRSAAxILgkzOBOTFZlJi46Lij9F8TRREw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PW/Ochd1SyaoYTkCZjtJD6Txr4Wufc7fzjRjC4h4uerizIlcPXrr5PVu/r2mZiCNl
+	 2ciDwWbXAUOA1MGVYbe3aZfEhOyiQTenb3A/W+QSWM17+U6EW+hOdXO4s2NfKN8sSd
+	 HDB138s8cV/TOHBd5gnCU1mGo5wOzzShQdT4/uMs/YT0vJLr1WSEtvmWMFGAFRW4Tm
+	 WOi22oWv97g6+LoqNdA162Day5ihiMf2Da+xhyxr7/sIQeFdycYn2/SsaEMYbDTRCR
+	 TqoY3dGZFEG5MVxQ9gvPaDxq54f14Kb4HtoXiYlwqQEW9dw2fhcWoKNSdaZL54/ZSX
+	 eqLijJhxtvweQ==
+Date: Wed, 2 Jul 2025 20:49:53 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Stav Aviram <saviram@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, linux-rdma@vger.kernel.org,
+	Mark Bloch <markb@mellanox.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: Re: [PATCH mlx5-next v1] net/mlx5: Check device memory pointer
+ before usage
+Message-ID: <20250702174953.GJ6278@unreal>
+References: <c88711327f4d74d5cebc730dc629607e989ca187.1751370035.git.leon@kernel.org>
+ <20250701193858.GA41770@horms.kernel.org>
+ <20250702082847.GH6278@unreal>
+ <20250702140735.GE41770@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1606:b0:3dc:8b2c:4bc7 with SMTP id
- e9e14a558f8ab-3e05c2ad437mr7169745ab.1.1751478093001; Wed, 02 Jul 2025
- 10:41:33 -0700 (PDT)
-Date: Wed, 02 Jul 2025 10:41:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68656f4c.a70a0220.2b31f5.0000.GAE@google.com>
-Subject: [syzbot] [nfs?] [net?] possible deadlock in rpc_close_pipes
-From: syzbot <syzbot+169de184e9defe7fe709@syzkaller.appspotmail.com>
-To: Dai.Ngo@oracle.com, anna@kernel.org, chuck.lever@oracle.com, 
-	davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	jlayton@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, neil@brown.name, netdev@vger.kernel.org, 
-	okorniev@redhat.com, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	tom@talpey.com, trondmy@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250702140735.GE41770@horms.kernel.org>
 
-Hello,
+On Wed, Jul 02, 2025 at 03:07:35PM +0100, Simon Horman wrote:
+> On Wed, Jul 02, 2025 at 11:28:47AM +0300, Leon Romanovsky wrote:
+> > On Tue, Jul 01, 2025 at 08:38:58PM +0100, Simon Horman wrote:
+> > > On Tue, Jul 01, 2025 at 03:08:12PM +0300, Leon Romanovsky wrote:
+> > > > From: Stav Aviram <saviram@nvidia.com>
+> > > > 
+> > > > Add a NULL check before accessing device memory to prevent a crash if
+> > > > dev->dm allocation in mlx5_init_once() fails.
+> > > > 
+> > > > Fixes: c9b9dcb430b3 ("net/mlx5: Move device memory management to mlx5_core")
+> > > > Signed-off-by: Stav Aviram <saviram@nvidia.com>
+> > > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > > > ---
+> > > > Changelog:
+> > > > v1:
+> > > >  * Removed extra IS_ERR(dm) check.
+> > > > v0:
+> > > > https://lore.kernel.org/all/e389fa6ef075af1049cd7026b912d736ebe3ad23.1751279408.git.leonro@nvidia.com
+> > > > ---
+> > > >  drivers/infiniband/hw/mlx5/dm.c                  | 2 +-
+> > > >  drivers/net/ethernet/mellanox/mlx5/core/lib/dm.c | 4 ++--
+> > > >  drivers/net/ethernet/mellanox/mlx5/core/main.c   | 2 +-
+> > > >  3 files changed, 4 insertions(+), 4 deletions(-)
+> > > > 
+> > > > diff --git a/drivers/infiniband/hw/mlx5/dm.c b/drivers/infiniband/hw/mlx5/dm.c
+> > > > index b4c97fb62abf..9ded2b7c1e31 100644
+> > > > --- a/drivers/infiniband/hw/mlx5/dm.c
+> > > > +++ b/drivers/infiniband/hw/mlx5/dm.c
+> > > > @@ -282,7 +282,7 @@ static struct ib_dm *handle_alloc_dm_memic(struct ib_ucontext *ctx,
+> > > >  	int err;
+> > > >  	u64 address;
+> > > >  
+> > > > -	if (!MLX5_CAP_DEV_MEM(dm_db->dev, memic))
+> > > > +	if (!dm_db || !MLX5_CAP_DEV_MEM(dm_db->dev, memic))
+> > > >  		return ERR_PTR(-EOPNOTSUPP);
+> > > 
+> > > nit: -EOPNOTSUPP doesn't feel like the right error code
+> > >      in the !dm_db case.
+> > 
+> > Why? This error is returned to the user through mlx5_ib_alloc_dm().
+> 
+> Because, as I understand things, such a case would be due to a memory
+> allocation failure, not by the device not supporting a feature.
+> 
+> handle_alloc_dm_memic() already returns ERR_PTR(-ENOMEM) if kzalloc() fails.
+> I'd suggest doing so for the !dm_db case too.
 
-syzbot found the following issue on:
+!dm_db case can be because of missing capabilities and EOPNOTSUPP is a
+way to inform users about it.
 
-HEAD commit:    50c8770a42fa Add linux-next specific files for 20250702
-git tree:       linux-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=162e7982580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=70c16e4e191115d4
-dashboard link: https://syzkaller.appspot.com/bug?extid=169de184e9defe7fe709
-compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1247d770580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17ffe48c580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3d4ef6bedc5b/disk-50c8770a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/15b7565dc0ef/vmlinux-50c8770a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/3b397342a62b/bzImage-50c8770a.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+169de184e9defe7fe709@syzkaller.appspotmail.com
-
-============================================
-WARNING: possible recursive locking detected
-6.16.0-rc4-next-20250702-syzkaller #0 Not tainted
---------------------------------------------
-syz-executor309/5837 is trying to acquire lock:
-ffff88807f5bc8c8 (&sb->s_type->i_mutex_key#15){+.+.}-{4:4}, at: inode_lock include/linux/fs.h:869 [inline]
-ffff88807f5bc8c8 (&sb->s_type->i_mutex_key#15){+.+.}-{4:4}, at: rpc_close_pipes+0x10a/0x730 net/sunrpc/rpc_pipe.c:178
-
-but task is already holding lock:
-ffff88807f5b91c8 (&sb->s_type->i_mutex_key#15){+.+.}-{4:4}, at: inode_lock include/linux/fs.h:869 [inline]
-ffff88807f5b91c8 (&sb->s_type->i_mutex_key#15){+.+.}-{4:4}, at: __simple_recursive_removal+0x190/0x510 fs/libfs.c:627
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&sb->s_type->i_mutex_key#15);
-  lock(&sb->s_type->i_mutex_key#15);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-4 locks held by syz-executor309/5837:
- #0: ffff888033ee40e0 (&type->s_umount_key#42){+.+.}-{4:4}, at: __super_lock fs/super.c:57 [inline]
- #0: ffff888033ee40e0 (&type->s_umount_key#42){+.+.}-{4:4}, at: __super_lock_excl fs/super.c:72 [inline]
- #0: ffff888033ee40e0 (&type->s_umount_key#42){+.+.}-{4:4}, at: deactivate_super+0xa9/0xe0 fs/super.c:506
- #1: ffff8881446f60a0 (&sn->pipefs_sb_lock){+.+.}-{4:4}, at: rpc_kill_sb+0x77/0x190 net/sunrpc/rpc_pipe.c:1196
- #2: ffffffff8f8e2df0 ((rpc_pipefs_notifier_list).rwsem){++++}-{4:4}, at: blocking_notifier_call_chain+0x54/0x90 kernel/notifier.c:379
- #3: ffff88807f5b91c8 (&sb->s_type->i_mutex_key#15){+.+.}-{4:4}, at: inode_lock include/linux/fs.h:869 [inline]
- #3: ffff88807f5b91c8 (&sb->s_type->i_mutex_key#15){+.+.}-{4:4}, at: __simple_recursive_removal+0x190/0x510 fs/libfs.c:627
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 5837 Comm: syz-executor309 Not tainted 6.16.0-rc4-next-20250702-syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_deadlock_bug+0x28b/0x2a0 kernel/locking/lockdep.c:3044
- check_deadlock kernel/locking/lockdep.c:3096 [inline]
- validate_chain+0x1a3f/0x2140 kernel/locking/lockdep.c:3898
- __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5240
- lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5871
- down_write+0x96/0x1f0 kernel/locking/rwsem.c:1577
- inode_lock include/linux/fs.h:869 [inline]
- rpc_close_pipes+0x10a/0x730 net/sunrpc/rpc_pipe.c:178
- __simple_recursive_removal+0x208/0x510 fs/libfs.c:631
- rpc_unlink+0x56/0x80 net/sunrpc/rpc_pipe.c:696
- rpc_pipefs_event+0xc0/0x170 fs/nfs/blocklayout/rpc_pipefs.c:179
- notifier_call_chain+0x1b3/0x3e0 kernel/notifier.c:85
- blocking_notifier_call_chain+0x6a/0x90 kernel/notifier.c:380
- rpc_kill_sb+0xd0/0x190 net/sunrpc/rpc_pipe.c:1204
- deactivate_locked_super+0xb9/0x130 fs/super.c:474
- cleanup_mnt+0x425/0x4c0 fs/namespace.c:1417
- task_work_run+0x1d1/0x260 kernel/task_work.c:227
- ptrace_notify+0x281/0x2c0 kernel/signal.c:2520
- ptrace_report_syscall include/linux/ptrace.h:415 [inline]
- ptrace_report_syscall_exit include/linux/ptrace.h:477 [inline]
- syscall_exit_work+0xc6/0x1d0 kernel/entry/syscall-common.c:111
- syscall_exit_to_user_mode_work include/linux/entry-common.h:173 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
- do_syscall_64+0x2ad/0x3b0 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f8f7dbc82e9
-Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffe287838a8 EFLAGS: 00000246 ORIG_RAX: 00000000000000a5
-RAX: ffffffffffffffec RBX: 0000200000000000 RCX: 00007f8f7dbc82e9
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> 
+> But I don't feel particularly strongly about this.
 
