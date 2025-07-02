@@ -1,78 +1,81 @@
-Return-Path: <netdev+bounces-203538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8D48AF6556
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 00:37:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D4A3AF6559
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 00:37:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E01C1C43AF7
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 22:37:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAA2652330A
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 22:37:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F2BA2F5C3B;
-	Wed,  2 Jul 2025 22:36:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C03248F5F;
+	Wed,  2 Jul 2025 22:36:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cPceMjAG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MEQwxRGD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 755D828FAA5
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 22:36:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B322F5C2F
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 22:36:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751495770; cv=none; b=gIipwcLOpT11vzbVEFBhdfqau3/VsYbAT/SFK1RksvKffIHqbNZ7JY0QSacquCyUj3ohNdtau1vYUdz3viUT5NRcYB15iKgoDk9LIN3KYicvXwLAfK7l/2GvD901PLTWWKg0t85nXoh+xMXuBScBmEkM5HIf42nu+ZUX/8+Yqcc=
+	t=1751495772; cv=none; b=AHus+nzLTzsPCBJPsHZvI3dwLISL6gogvi866zZu3t9mtPCfT5CSZ7yYoJkad4W6uXh4OXLiw/eXefvLDWpWVQ65tZWPJYaXzufH2vYnk/eTgL2qv+rb7+yXPt0i8RtVRFNBNRED9RLEj/3wxvmcd+aAOxt1BLycuMi8E+nyuqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751495770; c=relaxed/simple;
-	bh=UuGCJtoWtvRkjfOL0i3eMt88ioxIQr7lDItP3Fcqrrw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kwp5OuiObRjNLsIYAOIsTKrO1ShzuX6l/MjanIulO+Jb2XNH9HGrv1PLdsDCzbyadxv5H+w3GS83JgixHd/JE7qFD4WOwGgY4p8ElSBaJoC+laAT6uiMwuF20+z0gjlfZEe/Ob+r1+x7LTyvQXHrcN50pAKQXMckstW/hAEWPVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cPceMjAG; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1751495772; c=relaxed/simple;
+	bh=UW+SQEj8aN0Ft10n8URP7n2D3XO+nurfejv8kglxm5U=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=eKSImdlwlm3aeL3hJlNSO4c3FpNci7U6r2Ty+7LPaOt1IGEUrn+SyJsrdIYj/MbSInnwNQpqrthx5uLCJwnGhETQYZXHzFyDhTMTEPkoKtEIrKI4Cz6zapTYczLNFquyFw6vpKrDb5bMfx42k2MLkrRTGo1SUBp8tzr8gmYtD4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MEQwxRGD; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-313fab41f4bso10211047a91.0
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 15:36:09 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-311d670ad35so4401178a91.3
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 15:36:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751495769; x=1752100569; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Db75e96LplUcDlQItcgQ6vAr3c7eoV187JQSAseinaw=;
-        b=cPceMjAGgDPV+Hos41EG83lWztO0+R+ocS8yWdBjVuFjjZYFhMzdVxN7AD/OykC/H5
-         sXRSlaZ032EGTSwwYSlM0PEqW8uLhnwctVRrgE44W7egMXsxMBSJT2o5KnqUzabg+sIX
-         FCTaHSB5nDybiyg3csEeWNTwrfbxc8lGxbh/2XJRrh8ZgbYD1gyB9F/S7ktramVZwJsX
-         iKdufC7jM/26xUSAXKW3LR7YmSmlv7gUkV71yxZqMtHrZuxAjTLRIQU/k5MEXD9K+phW
-         z3cDLERaOHa5a9vETwR5jIEuRl8bi3DtH/qE1XsA7UaI6x0i7wuckUbMSyQI8CqBFKzL
-         fuyw==
+        d=google.com; s=20230601; t=1751495770; x=1752100570; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uy4qEEDdx3wsd0+Zkpw4ox1GIS+aP/bDinXUKsJxlf0=;
+        b=MEQwxRGDb9XD6MmxWwueYTHUfnz7ZpkYyESmNDSywrKS820kfGcvq3w4h3Y6C5/XEN
+         tEVq43nZijpovEi9vC7jOHpKeanvIXIvJ9ESEDV42m9y2UP6YVm236PXp9aS53Pxlv5+
+         8ctqI/Iuuao9VKoU8WO+t2PsaEo0uIF6KFvx/EQL/GZNKiiAm6iwvAj0ackKVTph7W0i
+         ELt5MyDR1LO2O8pfBtQoHyEfLgSM0YOpqEtRqHlDlnOFuxbGT2XmG5Ozy25W1NTGAmOJ
+         /DlyTa58wjf7lo3f4iQ1oXMbrIKIy1jHLCueu4ORfsV8nGl3fWWHo9iVdjF8MXnOsPZ5
+         YS3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751495769; x=1752100569;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Db75e96LplUcDlQItcgQ6vAr3c7eoV187JQSAseinaw=;
-        b=v+s3w1EScsxLENf9nz5yGuqA2iR6OZhysV+FAf7S7W1EtlujPCUW/U1DM6Q8wwFV6S
-         PnSsSpKOc2cyHFlSmm1MIRJ2LsnlkX2CFs/lRDJQzN5BSv/j8bSChMInS1FRAXPGvUVI
-         D+HC+E1WwHFAGfyyuzuBfLpfg+6QL4Gy5T8m3KrnqmKQ47ijSSoLLEap5kCNTYZ2F0lQ
-         hdHAxCFd7d2bAILKJekLrlQOjFXWmkqhS0EEdzPPigBxmgL6gksrxMYm2mc9Z1bq3t6X
-         hg1sIpCUJFKls8KqYVAI3qqe/EuMHOyWFSjweSsq3MbtoY/ErSeSHKKXVj/CJExYIxeT
-         7U0A==
-X-Forwarded-Encrypted: i=1; AJvYcCU4hxh7lAxQ1CGeKKL2ACYP08cPoF0yFaWV59H9Xwf1eVtpJFVNDO7LWYCAgdFkv/ipBa3WYSw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDGsW+bbSSO4gOP1wWVBWdrIJEbLqWfjd+FSmUYaMh1lK53TPM
-	XJOpp7xI0n9+QI1EprgcZcpK5E33nsvZEpjmq4CEw+bel8gSyswpqAYZIqhCbNCLSQyVz0GLL99
-	Qo5OdfQ==
-X-Google-Smtp-Source: AGHT+IHm9uXieWaJfcTxpXx1OfqgG356EVxJIlvQMBSsORXa5Kr8VLMbi+jQtVZScWPt0TPeDGzxlo7QwmA=
-X-Received: from pjbkl12.prod.google.com ([2002:a17:90b:498c:b0:312:14e5:174b])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:28c7:b0:313:176b:3d4b
- with SMTP id 98e67ed59e1d1-31a90bcad1bmr5504740a91.22.1751495768732; Wed, 02
- Jul 2025 15:36:08 -0700 (PDT)
-Date: Wed,  2 Jul 2025 22:35:12 +0000
+        d=1e100.net; s=20230601; t=1751495770; x=1752100570;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uy4qEEDdx3wsd0+Zkpw4ox1GIS+aP/bDinXUKsJxlf0=;
+        b=VfYOsO/aGFUe6xUjLK2wPLb+6ejGOm+oA391rQKhySKZ2BLhyxL+FGOoYlzY8t5h1T
+         MfV17zsTq9F5dgiHYvhjXlwZUVQTbr6K6vq4wM2QbRsWWlRkaZ9Fijk0WNJOGntiCyTx
+         RNIk4BkEJPg//e89guZ0RniYZnfz89lzvEDDMugkXgDXK7MRcofFxrqNvNNtkAK/+iss
+         zFV9G7YoRnoCp+LCzGdqJwAYdb0RTfhI9DN8cYi0DHnkWjzr8o+NWRkbexIF3Nr88Y4+
+         bb1lDt6YSKnyysIQDtkz3b9qge1gDs8i7CzAYqpPoFPHsGOY9H6cksQ8brUwdradW4cA
+         s2kA==
+X-Forwarded-Encrypted: i=1; AJvYcCVVu8Bml/+1tvyMsSxzvpskMu8Rf4C/nvYYObH6Tqq6o+QOyIGyuyDm+IrBUMOgQmW8t699X4o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOPkvoFX5KO9scJS2+i41wyFpTBsTsSTAoBEmYnaVkGvq5wSie
+	/7JS1VsdBZeboq0VFvkxRZ9/WsxFMrs/4EXKI+Z3GIsjg/xnH98FpGG9Htp04vocF+IZ6A0v73l
+	MxOqahg==
+X-Google-Smtp-Source: AGHT+IFZL7OfWcZxMF8jTIerCJ/5+HTstJCL8edR5B6lnSZevD47cNWlEc5DERAvpg8OQLiVQ8tjahab5sQ=
+X-Received: from pjbkl12.prod.google.com ([2002:a17:90b:498c:b0:311:c5d3:c7d0])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:58c7:b0:311:af8c:51cd
+ with SMTP id 98e67ed59e1d1-31a90bd4921mr7870476a91.18.1751495770236; Wed, 02
+ Jul 2025 15:36:10 -0700 (PDT)
+Date: Wed,  2 Jul 2025 22:35:13 +0000
+In-Reply-To: <20250702223606.1054680-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250702223606.1054680-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250702223606.1054680-1-kuniyu@google.com>
-Subject: [PATCH v1 net-next 0/7] af_unix: Introduce SO_INQ & SCM_INQ.
+Message-ID: <20250702223606.1054680-2-kuniyu@google.com>
+Subject: [PATCH v1 net-next 1/7] af_unix: Don't hold unix_state_lock() in __unix_dgram_recvmsg().
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -80,43 +83,40 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-We have an application that uses almost the same code for TCP and
-AF_UNIX (SOCK_STREAM).
+When __skb_try_recv_datagram() returns NULL in __unix_dgram_recvmsg(),
+we hold unix_state_lock() unconditionally.
 
-The application uses TCP_INQ for TCP, but AF_UNIX doesn't have it
-and requires an extra syscall, ioctl(SIOCINQ) or getsockopt(SO_MEMINFO)
-as an alternative.
+This is because SOCK_SEQPACKET sk needs to return EOF in case its peer
+has been close()d concurrently.
 
-Also, ioctl(SIOCINQ) for AF_UNIX SOCK_STREAM is more expensive because
-it needs to iterate all skb in the receive queue.
+This behaviour totally depends on the timing of the peer's close() and
+reading sk->sk_shutdown, and taking the lock does not play a role.
 
-This series adds a cached field for SIOCINQ to speed it up and introduce
-SO_INQ, the generic version of TCP_INQ to get the queue length as cmsg in
-each recvmsg().
+Let's drop the lock from __unix_dgram_recvmsg() and use READ_ONCE().
 
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ net/unix/af_unix.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-Kuniyuki Iwashima (7):
-  af_unix: Don't hold unix_state_lock() in __unix_dgram_recvmsg().
-  af_unix: Don't check SOCK_DEAD in unix_stream_read_skb().
-  af_unix: Don't use skb_recv_datagram() in unix_stream_read_skb().
-  af_unix: Use cached value for SOCK_STREAM in unix_inq_len().
-  af_unix: Cache state->msg in unix_stream_read_generic().
-  af_unix: Introduce SO_INQ.
-  selftest: af_unix: Add test for SO_INQ.
-
- arch/alpha/include/uapi/asm/socket.h          |   3 +
- arch/mips/include/uapi/asm/socket.h           |   3 +
- arch/parisc/include/uapi/asm/socket.h         |   3 +
- arch/sparc/include/uapi/asm/socket.h          |   3 +
- include/net/af_unix.h                         |   2 +
- include/uapi/asm-generic/socket.h             |   3 +
- net/unix/af_unix.c                            | 180 ++++++++++++------
- tools/testing/selftests/net/.gitignore        |   1 +
- tools/testing/selftests/net/af_unix/Makefile  |   2 +-
- tools/testing/selftests/net/af_unix/scm_inq.c | 125 ++++++++++++
- 10 files changed, 269 insertions(+), 56 deletions(-)
- create mode 100644 tools/testing/selftests/net/af_unix/scm_inq.c
-
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 564c970d97ff..1fa232ff4a2e 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -2528,12 +2528,10 @@ int __unix_dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t size,
+ 					      &err, &timeo, last));
+ 
+ 	if (!skb) { /* implies iolock unlocked */
+-		unix_state_lock(sk);
+ 		/* Signal EOF on disconnected non-blocking SEQPACKET socket. */
+ 		if (sk->sk_type == SOCK_SEQPACKET && err == -EAGAIN &&
+-		    (sk->sk_shutdown & RCV_SHUTDOWN))
++		    (READ_ONCE(sk->sk_shutdown) & RCV_SHUTDOWN))
+ 			err = 0;
+-		unix_state_unlock(sk);
+ 		goto out;
+ 	}
+ 
 -- 
 2.50.0.727.gbf7dc18ff4-goog
 
