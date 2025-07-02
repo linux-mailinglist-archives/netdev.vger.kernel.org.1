@@ -1,110 +1,198 @@
-Return-Path: <netdev+bounces-203209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73E40AF0C0C
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:55:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27370AF0C03
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:55:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65AFC7A6C32
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 06:54:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 307161C038B0
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 06:55:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95272223DDF;
-	Wed,  2 Jul 2025 06:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4ED7225A47;
+	Wed,  2 Jul 2025 06:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KdzdUKG4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HgEzaVEs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED69A221F37
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 06:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4E21D7E41;
+	Wed,  2 Jul 2025 06:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751439301; cv=none; b=shufSZWJBEUH1PvXdCH2eMLB2tAIBdO0YFNkwfofsax/+dq4vkkRlaIVqz3lkUHaI3vPndkmYXqio0V94GtMHOkEzYbQBJOZI+rvOF761MN6ad3o/oIhqjnzcV6iHeM2I1XHbNMiE71qFL6V95bjHkBjAs3fjl+EVQF1qS/yaLg=
+	t=1751439291; cv=none; b=BjfMjfHkxNG/5DvAGvzbZLvTEKzn+u8ddSmrXTImXjzHopwtvDy6llJmAGdu4eIH0dxlIcqNsl95Hp+PRawPWXTt1DpfcdYajuXsdD3ghRf84pAbjE2Pff8auxKLO4l0zbLwvMpOAJt7U7yU0/RQuojBpyseFN3KVKl2WHyjAe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751439301; c=relaxed/simple;
-	bh=LDGNXuYwT8Fh4cOCf0zdW7ATVlSQNuYGPOhRopSIAJI=;
+	s=arc-20240116; t=1751439291; c=relaxed/simple;
+	bh=OygOYEPels4czGsYfayew2rB/2MBUfzsc+sH9m4SBq0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z93Uy0wi8P++LsyKZYYUZgvMYNV7GK0wqAZVhUfx1Y9KK0xA3R0dQjND72eR9myE1OOMQKk5F/oKhiIiOQW/GX+PxcVjas/Kon61EE6FhrkUfEdxpUmvc+DzQ/GObyYZinXqQUKCloXMuMhnd7HvxMCLm1e1yLajgHKKkeBGSe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KdzdUKG4; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751439300; x=1782975300;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=LDGNXuYwT8Fh4cOCf0zdW7ATVlSQNuYGPOhRopSIAJI=;
-  b=KdzdUKG4n3DivRe7hz1JoA8dx96pfqwtxKX8YPt8UokdiRSlM/V2ir/f
-   Guyob4lHenKeQW7d8c71D2pStdengJjVQnMqNZ0LKjw4LjDbvgGpn6Wm7
-   W7CBVubTa4RE+saljhw3lW53OI4poXWOABhuV4SzTl4I6nFjkR9Uq9x4g
-   ih7VVlpWMqpF6qXFi7lcXsQ/qnJqRXzV/3kNlwKWW9+Gum/z0+Lxomj+/
-   jqrc+NP/xJ0vWJQpO4RPDv/of7/4SUUbScjuAuHsL6nEo9rVEDFS/WQuo
-   zSwA1N5BITacUSr0b4zS6uIXO9DgU3t/KAwXpKoS9Gd/7LlzmJZUxEJHP
-   w==;
-X-CSE-ConnectionGUID: p7XU+x9rS7CEymlx6Rg9VQ==
-X-CSE-MsgGUID: YCPE46kLT4yx2SlRQWXVaQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11481"; a="52954051"
-X-IronPort-AV: E=Sophos;i="6.16,281,1744095600"; 
-   d="scan'208";a="52954051"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2025 23:54:59 -0700
-X-CSE-ConnectionGUID: LbfLQ7TmT1a3aV60NwjuCw==
-X-CSE-MsgGUID: t+o73O4DT0mXjj2YU9rRTg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,281,1744095600"; 
-   d="scan'208";a="158547907"
-Received: from lkp-server01.sh.intel.com (HELO 0b2900756c14) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 01 Jul 2025 23:54:58 -0700
-Received: from kbuild by 0b2900756c14 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uWrMt-0000Hb-06;
-	Wed, 02 Jul 2025 06:54:55 +0000
-Date: Wed, 2 Jul 2025 14:54:22 +0800
-From: kernel test robot <lkp@intel.com>
-To: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net-next v2 4/8] net:
- s/dev_pre_changeaddr_notify/netif_pre_changeaddr_notify/
-Message-ID: <202507021431.lqWTrQAr-lkp@intel.com>
-References: <20250630164222.712558-5-sdf@fomichev.me>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KBBfrUnx9JuUhGVeZWDW8VRQY/VuyV4KM9C+G391oK4/4pwqIrx2j17CoRcnQJYc08TNW90QrZBH4tqaQBI++It2Z9EJTitBWsUQ4tyicMLDtWpnF5+OsFd52mAjMDBcD7SfqGX+famczpUpXpY8NOsxKq2m2qGgos+KJ4lyheQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HgEzaVEs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DADDC4CEEE;
+	Wed,  2 Jul 2025 06:54:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751439290;
+	bh=OygOYEPels4czGsYfayew2rB/2MBUfzsc+sH9m4SBq0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HgEzaVEsk//JdYC+Qyn/5EKrQUtKGk9503aAH2+MGID4BNeVQ532beH+YUPat8bTE
+	 ksassL7x58UVM8H2z1YiCwar+F03MKvsVVnuzRRKynO2HQG/FWdGtT9efkSLGsT2I7
+	 Ms+P4pZHTOL3Vi5wMI5yX6frOXuS33VSRWuaxiWcuK7ssHBQAM1VMY79ox/M3t/Kkg
+	 MpzSll7uEgbWqbwWs12mIdTWwhhed0E7KABMg9q7RSCMgBIviaW2okigJHox485Vzp
+	 +NGA4KhTUCCW4PB5nkG0t/tcwwrvz8+nBPF7c5fUeC9tKEKmXUIejMhEFiSWJ7w1Sq
+	 ROwcsDKchkEaA==
+Date: Wed, 2 Jul 2025 08:54:48 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@kernel.org>
+To: Jonathan Cameron <jic23@kernel.org>
+Cc: Waqar Hameed <waqar.hameed@axis.com>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, Julien Panis <jpanis@baylibre.com>, 
+	William Breathitt Gray <wbg@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Peter Rosin <peda@axentia.se>, 
+	David Lechner <dlechner@baylibre.com>, Nuno =?utf-8?B?U8Oh?= <nuno.sa@analog.com>, 
+	Andy Shevchenko <andy@kernel.org>, Cosmin Tanislav <cosmin.tanislav@analog.com>, 
+	Lars-Peter Clausen <lars@metafoo.de>, Michael Hennerich <Michael.Hennerich@analog.com>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Matteo Martelli <matteomartelli3@gmail.com>, 
+	Heiko Stuebner <heiko@sntech.de>, Francesco Dolcini <francesco@dolcini.it>, 
+	=?utf-8?Q?Jo=C3=A3o_Paulo_Gon=C3=A7alves?= <jpaulo.silvagoncalves@gmail.com>, Hugo Villeneuve <hvilleneuve@dimonoff.com>, 
+	Subhajit Ghosh <subhajit.ghosh@tweaklogic.com>, Mudit Sharma <muditsharma.info@gmail.com>, 
+	Gerald Loacker <gerald.loacker@wolfvision.net>, Song Qiang <songqiang1304521@gmail.com>, 
+	Crt Mori <cmo@melexis.com>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
+	Ulf Hansson <ulf.hansson@linaro.org>, Karol Gugala <kgugala@antmicro.com>, 
+	Mateusz Holenko <mholenko@antmicro.com>, Gabriel Somlo <gsomlo@gmail.com>, Joel Stanley <joel@jms.id.au>, 
+	Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
+	Wei Fang <wei.fang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
+	Kishon Vijay Abraham I <kishon@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, 
+	Alim Akhtar <alim.akhtar@samsung.com>, Sebastian Reichel <sre@kernel.org>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Kevin Hilman <khilman@baylibre.com>, 
+	Jerome Brunet <jbrunet@baylibre.com>, Martin Blumenstingl <martin.blumenstingl@googlemail.com>, 
+	Han Xu <han.xu@nxp.com>, Haibo Chen <haibo.chen@nxp.com>, 
+	Yogesh Gaur <yogeshgaur.83@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	Avri Altman <avri.altman@wdc.com>, Bart Van Assche <bvanassche@acm.org>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
+	Souradeep Chowdhury <quic_schowdhu@quicinc.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Liam Girdwood <lgirdwood@gmail.com>, Peter Ujfalusi <peter.ujfalusi@linux.intel.com>, 
+	Bard Liao <yung-chuan.liao@linux.intel.com>, Ranjani Sridharan <ranjani.sridharan@linux.intel.com>, 
+	Daniel Baluta <daniel.baluta@nxp.com>, Kai Vehmanen <kai.vehmanen@linux.intel.com>, 
+	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
+	Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, kernel@axis.com, 
+	linux-iio@vger.kernel.org, linux-omap@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org, linux-rockchip@lists.infradead.org, linux-input@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, imx@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-phy@lists.infradead.org, linux-samsung-soc@vger.kernel.org, linux-pm@vger.kernel.org, 
+	linux-pwm@vger.kernel.org, linux-amlogic@lists.infradead.org, linux-spi@vger.kernel.org, 
+	linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-usb@vger.kernel.org, 
+	sound-open-firmware@alsa-project.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH] Remove error prints for devm_add_action_or_reset()
+Message-ID: <jeajjewfbg5qo736imozpghnpxln2pux74aegtqsi57qsbpug2@opndel6zc3m3>
+References: <pnd7c0s6ji2.fsf@axis.com>
+ <ylr7cuxldwb24ccenen4khtyddzq3owgzzfblbohkdxb7p7eeo@qpuddn6wrz3x>
+ <20250701185519.1410e831@jic23-huawei>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="yoqxembgtzssn7jy"
 Content-Disposition: inline
-In-Reply-To: <20250630164222.712558-5-sdf@fomichev.me>
+In-Reply-To: <20250701185519.1410e831@jic23-huawei>
 
-Hi Stanislav,
 
-kernel test robot noticed the following build errors:
+--yoqxembgtzssn7jy
+Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH] Remove error prints for devm_add_action_or_reset()
+MIME-Version: 1.0
 
-[auto build test ERROR on net-next/main]
+Hello Jonathan,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Stanislav-Fomichev/net-s-dev_get_stats-netif_get_stats/20250701-004408
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250630164222.712558-5-sdf%40fomichev.me
-patch subject: [PATCH net-next v2 4/8] net: s/dev_pre_changeaddr_notify/netif_pre_changeaddr_notify/
-config: microblaze-defconfig (https://download.01.org/0day-ci/archive/20250702/202507021431.lqWTrQAr-lkp@intel.com/config)
-compiler: microblaze-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250702/202507021431.lqWTrQAr-lkp@intel.com/reproduce)
+On Tue, Jul 01, 2025 at 06:55:19PM +0100, Jonathan Cameron wrote:
+> On Tue, 1 Jul 2025 19:44:17 +0200
+> Uwe Kleine-K=F6nig <ukleinek@kernel.org> wrote:
+>=20
+> > On Tue, Jul 01, 2025 at 05:03:33PM +0200, Waqar Hameed wrote:
+> > >  drivers/pwm/pwm-meson.c                          | 3 +-- =20
+> >=20
+> > Looking at this driver I tried the following:
+>=20
+> I'm not sure what we actually want here.
+>=20
+> My thought when suggesting removing instances of this
+> particular combination wasn't saving on code size, but rather just
+> general removal of pointless code that was getting cut and
+> paste into new drivers and wasting a tiny bit of review bandwidth.
+> I'd consider it bad practice to have patterns like
+>=20
+> void *something =3D kmalloc();
+> if  (!something)
+> 	return dev_err_probe(dev, -ENOMEM, ..);
+>=20
+> and my assumption was people would take a similar view with
+> devm_add_action_or_reset().
+>
+> It is a bit nuanced to have some cases where we think prints
+> are reasonable and others where they aren't so I get your
+> point about consistency.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507021431.lqWTrQAr-lkp@intel.com/
+The problem I see is that there are two classes of functions: a) Those
+that require an error message and b) those that don't. Class b) consists
+of the functions that can only return success or -ENOMEM and the
+functions that emit an error message themselves. (And another problem I
+see is that for the latter the error message is usually non-optimal
+because the function doesn't know the all details of the request. See my
+reply to Andy for more details about that rant.)
 
-All errors (new ones prefixed by >>, old ones prefixed by <<):
+IMHO what takes away the review bandwidth is that the reviewer has to
+check which class the failing function is part of. If this effort
+results in more driver authors not adding an error message after
+devm_add_action_or_reset() that's nice, but in two months I have
+forgotten the details of this discussion and I have to recheck if
+devm_add_action_or_reset() is part of a) or b) and so the burden is
+still on me.
 
->> ERROR: modpost: module bridge uses symbol netif_pre_changeaddr_notify from namespace NETDEV_INTERNAL, but does not import it.
+So to give my answer on your question "What do we actually want here?":
+Please let us get rid of the need to care for a) or b).
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> The code size reduction is nice so I'd not be against it as an extra
+> if the reduction across a kernel builds is significant and enough
+> people want to keep these non printing prints.
+
+To complete implementing my wish all API functions would need to stop to
+emit an error message. Unfortunately that isn't without downsides
+because the result is that there are more error strings and so the
+kernel size is increased. So you have to weight if you prefer individual
+error messages and easier review/maintenance at the cost of a bigger
+binary size and more dev_err_probe() calls in drivers eating vertical
+space in your editor.
+
+I know on which side I am, but I bet we won't find agreement about that
+in the kernel community ...
+
+Best regards
+Uwe
+
+--yoqxembgtzssn7jy
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmhk17UACgkQj4D7WH0S
+/k4YcQgAlm1BDi3/P3JcN5b6Y1UamZV/S9cGOikezq/kf1GhqDBu8DxrVjTBFjOf
+OJoBgw/566zxq5agBq8EUgc7GrJBwe7BhieAXUGmYQI0pBg1Zdhgyj42kXhx7B9R
+u2j6XXXrEWa1Sw58sbK3g8bLeDEo9/kIem6g0Yk6NZX2WibbNU6Bw6UuV3yVwVaX
+TH4uFzMJ5wVvnwJDz2HCuxCLQ9NO25UL0U3DdZWIPI9oeuodG3U3MVNJWMJ5OuXc
+e+Yo5MhzsrnrMpj4nWPaicdD25qLOdVCySFDim72U4oI24wsmtlQBiJmDuNoldf/
+kbQM9dmwp48V3mVs7SFSmrt/TD4bFw==
+=6zPO
+-----END PGP SIGNATURE-----
+
+--yoqxembgtzssn7jy--
 
