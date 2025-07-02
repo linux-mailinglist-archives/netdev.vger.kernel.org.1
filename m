@@ -1,40 +1,41 @@
-Return-Path: <netdev+bounces-203180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CABB2AF0B2E
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:04:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4205AF0B31
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:04:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 873911634E3
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 06:03:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBDEC164A52
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 06:03:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D6B202F9C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A9F21ABBB;
 	Wed,  2 Jul 2025 06:02:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1387C1FDA89;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8321F5619;
 	Wed,  2 Jul 2025 06:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751436173; cv=none; b=cduT0ZiXoXKAV5Eqz7YzOqH/4HI5Eh8gnvLNOqcXi2dBD/PahWLVFhJ7rXoIkcLxs5kSc2AROhFC5B62o5SMJdYpHRzdEc8kwUdd3Jn1uyxJhC1UIpNggNla1F9AXPs3Jl2RzRGVHeQls/+u0b+F9Mx08hKe0SAvg4Wy32Y9DKw=
+	t=1751436173; cv=none; b=F3qxwkbxpEoY0HwVARPmyD4xs65ct3mE+AD8tSHH3QyCdwJNqaciwhXEqXwZkudB18v6iTX1QAjcQZDB2MZNPFs/8UlByzwt2J6cerTvdnsZ13iFZjMu3nhi32X61cRIVYhhHentNmZT4d4DoC16MRfu+wsJgkuDhSSjY4fkI2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1751436173; c=relaxed/simple;
-	bh=ou/wPExACHBZHOwewEIgbrMSFrrYFf9rkftnRUvoLAg=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Tn2mkE3OVe/kXu7UxxFOBqpdLbDAfor0XW1eC8dr+zkzLngcFAqbe3o+jm+3+WU/hNpFcy3De5EdwnwZYi9ttFupbcvI4qwCmj65bkmyZ3d3+DCOyAAWSCTEQWHqQF5ZA5Qoo+Pf50C/6TPTV+oYRWM7EJD/K/s43hdAkjrQqKQ=
+	bh=jh5EvUFWkXb95Vb+1mgggdXNgxLNFWJZEz/iNgD5W7U=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=dH29Z6sCnmBUZgyj0QHDtlZ+4egYkbpZoNjQHySaxXss5zmGJSCh64qsVEuk7qM0WfA8YzIO3OUe5rXPO9uPJV2DRsqIdq2aqNwb3QKXT7z2Jhw76QIahDJ2LC6MaSKM4so6HiVphLpq8oQjwtDnztW+sdtl0W26FVArNxYw3V4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
 Received: from [127.0.0.2] (unknown [210.73.43.2])
-	by APP-01 (Coremail) with SMTP id qwCowAC3pqpny2RomPduAA--.1282S2;
-	Wed, 02 Jul 2025 14:02:15 +0800 (CST)
+	by APP-01 (Coremail) with SMTP id qwCowAC3pqpny2RomPduAA--.1282S3;
+	Wed, 02 Jul 2025 14:02:16 +0800 (CST)
 From: Vivian Wang <wangruikang@iscas.ac.cn>
-Subject: [PATCH net-next v3 0/5] Add Ethernet MAC support for SpacemiT K1
-Date: Wed, 02 Jul 2025 14:01:39 +0800
-Message-Id: <20250702-net-k1-emac-v3-0-882dc55404f3@iscas.ac.cn>
+Date: Wed, 02 Jul 2025 14:01:40 +0800
+Subject: [PATCH net-next v3 1/5] dt-bindings: net: Add support for SpacemiT
+ K1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,13 +44,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAEPLZGgC/3WQ3U7DMAxGX6XKNa7itE1/hKa+B+IiS5wtgrYjy
- crQ1Hcn7UDaJLi07HP82VcWyDsKrMuuzNPsgpvGVBRPGdNHNR4InEk1E1xUXHIJI0V4Q6BBaSg
- IG6x4Q0qWLBEnT9ZdNtsLWwdHukT2eut4+jgnffxp71Ug0NMwuNhls8xRgte4WgYKQW2Lu+z5t
- hcLjohFm6PgWHMBKcC7Id97F3SIyufJtPsbrkQBQqyZgzlqBzMmWhJXxhhbl23ZH2iM05RP/vC
- PQiZF4s2gYH8OFMBbDZ/utLo4aI5lyRuRYto+5VEhVzrX4267/OhCnPzX9uAZt9N/b3r45U2lp
- W2pQi5lfa/aTLO4p5tHWiS6LW1leS1ErZpHelmWb6vpXgbqAQAA
-X-Change-ID: 20250606-net-k1-emac-3e181508ea64
+Message-Id: <20250702-net-k1-emac-v3-1-882dc55404f3@iscas.ac.cn>
+References: <20250702-net-k1-emac-v3-0-882dc55404f3@iscas.ac.cn>
+In-Reply-To: <20250702-net-k1-emac-v3-0-882dc55404f3@iscas.ac.cn>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -67,104 +64,124 @@ Cc: Vivian Wang <uwu@dram.page>, Lukas Bulwahn <lukas.bulwahn@redhat.com>,
  linux-riscv@lists.infradead.org, spacemit@lists.linux.dev, 
  linux-kernel@vger.kernel.org, Conor Dooley <conor.dooley@microchip.com>
 X-Mailer: b4 0.14.2
-X-CM-TRANSID:qwCowAC3pqpny2RomPduAA--.1282S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxur1fCw4fKFyxZr4rWryfWFg_yoWrJFW7pF
-	WxurZxuws5Jr4xKws7uw4xuayFganYyw13WFyUKryrXw1q9FWUJrsakr45AF1UZrW5Jw1f
-	tr4kZr1xuFsrAr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBj14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26F4j6r4UJwAm72CE4IkC6x0Yz7v_Jr
-	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E
-	8cxan2IY04v7MxkF7I0En4kS14v26r4a6rW5MxkIecxEwVAFwVW8AwCF04k20xvY0x0EwI
-	xGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480
-	Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7
-	IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k2
-	6cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxV
-	AFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRpyIUUUUUU=
+X-CM-TRANSID:qwCowAC3pqpny2RomPduAA--.1282S3
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cry3WF45trW5KrW5Zr4rGrg_yoW5Jr1xpF
+	4fCrs3Gr48KF13Jw4fXFykuF1fGw4kAF1DJrZFvw13tas5KF90qr4akryfXa4UurW8Ja43
+	XF1DAryDKr1DAaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUmE14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2048vs2IY020E87I2jVAFwI0_Jr4l82xGYIkIc2
+	x26xkF7I0E14v26ryj6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8wA2z4x0
+	Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr1j6F4UJw
+	A2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oVCq3wAS
+	0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2
+	IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Cr0_Gr1UMcvjeVCFs4IE7xkEbVWUJVW8JwAC
+	jcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0x
+	kIwI1lc7CjxVAaw2AFwI0_GFv_Wrylc2xSY4AK67AK6r47MxAIw28IcxkI7VAKI48JMxC2
+	0s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI
+	0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE
+	14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20x
+	vaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8
+	JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7sRRYFCUUUUUU==
 X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-SpacemiT K1 has two gigabit Ethernet MACs with RGMII and RMII support.
-Add a driver for them, as well as the supporting devicetree and bindings
-updates.
+The Ethernet MACs on SpacemiT K1 appears to be a custom design. SpacemiT
+refers to them as "EMAC", so let's just call them "spacemit,k1-emac".
 
-Tested on BananaPi BPI-F3 and Milk-V Jupiter.
-
-I would like to note that even though some bit field names superficially
-resemble that of DesignWare MAC, all other differences point to it in
-fact being a custom design.
-
-Based on SpacemiT drivers [1].
-
-This series depends on reset controller support [2] and DMA buses [3]
-for K1. There are some minor conflicts resulting from both touching
-k1.dtsi, but it should just both be adding nodes.
-
-These patches can also be pulled from:
-
-https://github.com/dramforever/linux/tree/k1/ethernet/v3
-
-[1]: https://github.com/spacemit-com/linux-k1x
-[2]: https://lore.kernel.org/all/20250613011139.1201702-1-elder@riscstar.com
-[3]: https://lore.kernel.org/all/20250623-k1-dma-buses-rfc-wip-v1-0-c0144082061f@iscas.ac.cn
-
+Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 ---
-Changes in v3:
-- Refactored and simplified emac_tx_mem_map
-- Addressed other minor v2 review comments
-- Removed what was patch 3 in v2, depend on DMA buses instead
-- DT nodes in alphabetical order where appropriate
-- Link to v2: https://lore.kernel.org/r/20250618-net-k1-emac-v2-0-94f5f07227a8@iscas.ac.cn
+ .../devicetree/bindings/net/spacemit,k1-emac.yaml  | 81 ++++++++++++++++++++++
+ 1 file changed, 81 insertions(+)
 
-Changes in v2:
-- dts: Put eth0 and eth1 nodes under a bus with dma-ranges
-- dts: Added Milk-V Jupiter
-- Fix typo in emac_init_hw() that broke the driver (Oops!)
-- Reformatted line lengths to under 80
-- Addressed other v1 review comments
-- Link to v1: https://lore.kernel.org/r/20250613-net-k1-emac-v1-0-cc6f9e510667@iscas.ac.cn
+diff --git a/Documentation/devicetree/bindings/net/spacemit,k1-emac.yaml b/Documentation/devicetree/bindings/net/spacemit,k1-emac.yaml
+new file mode 100644
+index 0000000000000000000000000000000000000000..500a3e1daa230ea3a1fad30d8ea56a7822fccb3d
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/spacemit,k1-emac.yaml
+@@ -0,0 +1,81 @@
++# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/spacemit,k1-emac.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: SpacemiT K1 Ethernet MAC
++
++allOf:
++  - $ref: ethernet-controller.yaml#
++
++maintainers:
++  - Vivian Wang <wangruikang@iscas.ac.cn>
++
++properties:
++  compatible:
++    const: spacemit,k1-emac
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  mdio-bus:
++    $ref: mdio.yaml#
++    unevaluatedProperties: false
++
++  resets:
++    maxItems: 1
++
++  spacemit,apmu:
++    $ref: /schemas/types.yaml#/definitions/phandle-array
++    items:
++      - items:
++          - description: phandle to syscon that controls this MAC
++          - description: offset of control registers
++    description:
++      A phandle to syscon with byte offset to control registers for this MAC
++
++required:
++  - compatible
++  - reg
++  - clocks
++  - interrupts
++  - resets
++  - spacemit,apmu
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/clock/spacemit,k1-syscon.h>
++
++    ethernet@cac80000 {
++        compatible = "spacemit,k1-emac";
++        reg = <0xcac80000 0x00000420>;
++        clocks = <&syscon_apmu CLK_EMAC0_BUS>;
++        interrupts = <131>;
++        mac-address = [ 00 00 00 00 00 00 ];
++        phy-handle = <&rgmii0>;
++        phy-mode = "rgmii-id";
++        pinctrl-names = "default";
++        pinctrl-0 = <&gmac0_cfg>;
++        resets = <&syscon_apmu RESET_EMAC0>;
++        rx-internal-delay-ps = <0>;
++        tx-internal-delay-ps = <0>;
++        spacemit,apmu = <&syscon_apmu 0x3e4>;
++
++        mdio-bus {
++            #address-cells = <0x1>;
++            #size-cells = <0x0>;
++
++            rgmii0: phy@1 {
++                reg = <0x1>;
++            };
++        };
++    };
 
----
-Vivian Wang (5):
-      dt-bindings: net: Add support for SpacemiT K1
-      net: spacemit: Add K1 Ethernet MAC
-      riscv: dts: spacemit: Add Ethernet support for K1
-      riscv: dts: spacemit: Add Ethernet support for BPI-F3
-      riscv: dts: spacemit: Add Ethernet support for Jupiter
-
- .../devicetree/bindings/net/spacemit,k1-emac.yaml  |   81 +
- arch/riscv/boot/dts/spacemit/k1-bananapi-f3.dts    |   46 +
- arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts  |   46 +
- arch/riscv/boot/dts/spacemit/k1-pinctrl.dtsi       |   48 +
- arch/riscv/boot/dts/spacemit/k1.dtsi               |   22 +
- drivers/net/ethernet/Kconfig                       |    1 +
- drivers/net/ethernet/Makefile                      |    1 +
- drivers/net/ethernet/spacemit/Kconfig              |   29 +
- drivers/net/ethernet/spacemit/Makefile             |    6 +
- drivers/net/ethernet/spacemit/k1_emac.c            | 1884 ++++++++++++++++++++
- drivers/net/ethernet/spacemit/k1_emac.h            |  420 +++++
- 11 files changed, 2584 insertions(+)
----
-base-commit: d9946fe286439c2aeaa7953b8c316efe5b83d515
-change-id: 20250606-net-k1-emac-3e181508ea64
-prerequisite-message-id: <20250613011139.1201702-1-elder@riscstar.com>
-prerequisite-patch-id: 2c73c63bef3640e63243ddcf3c07b108d45f6816
-prerequisite-patch-id: 0faba75db33c96a588e722c4f2b3862c4cbdaeae
-prerequisite-patch-id: 5db8688ef86188ec091145fae9e14b2211cd2b8c
-prerequisite-patch-id: e0fe84381637dc888d996a79ea717ff0e3441bd1
-prerequisite-patch-id: 2fc0ef1c2fcda92ad83400da5aadaf194fe78627
-prerequisite-patch-id: bfa54447803e5642059c386e2bd96297e691d0bf
-prerequisite-message-id: <20250523-22-k1-sdhci-v1-1-6e0adddf7494@gentoo.org>
-prerequisite-patch-id: 53fc23b06e26ab0ebb2c52ee09f4b2cffab889e2
-prerequisite-message-id: <20250623-k1-dma-buses-rfc-wip-v1-0-c0144082061f@iscas.ac.cn>
-prerequisite-patch-id: 7f04dcf6f82a9a9fa3a8a78ae4992571f85eb6ca
-prerequisite-patch-id: 291c9bcd2ce688e08a8ab57c6d274a57cac6b33c
-prerequisite-patch-id: 957d7285e8d2a7698beb0c25cb0f6ea733246af0
-
-Best regards,
 -- 
-Vivian "dramforever" Wang
+2.49.0
 
 
