@@ -1,367 +1,184 @@
-Return-Path: <netdev+bounces-203299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97E70AF1382
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 13:18:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA70AAF1397
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 13:21:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82560164A63
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:18:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D26AD1C24DF6
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:21:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661D0264606;
-	Wed,  2 Jul 2025 11:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E5/icBea"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E397E266B50;
+	Wed,  2 Jul 2025 11:21:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D04E255F26
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 11:17:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C935E265CB6;
+	Wed,  2 Jul 2025 11:21:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751455074; cv=none; b=pFZpPIC5LRQbcNYCp1GKE1y24nJYmW0tUOcmRlgVafIzKCnedbJN22kM6ytE8wNgz1OlNKhIr2ROq2mEhJTgr/YDWeQB4dznfogSDOKT2u3jsiBUWhxYfocQl6+XFJINI4fDl+U33wCfBo/7dIptP7rqT+UwGgVQjFrNEVFhjFg=
+	t=1751455271; cv=none; b=Qzkia5Cl+lKMYMtoDK5oM4rHmkgUjgmkcdUi2tjqLTofw/Jb5zXQve3jvc5OzWbAJMsxAwTeFthZ9XUz1Ve7sz/2zKhnzncOx7VNxayXOz1FL8BW9AApBg6pe3uXXrhOwxzX3ItdLGpN80KSFNGQPIM0PrOB+jfopZwYnfWKVNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751455074; c=relaxed/simple;
-	bh=sx6ZXPAv0DNYijJIpFX2qRRFSX+O86QuQitiC9rw1ZI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NIZduvP7PwMI0K7MdH6l/KpDSiT3uP/G+MgJ8nlxs1zBfKpsKSQPBm/zZablZSV2b0Y1dI9gyaRdL6gtDXEJLOlWl0e3J2/bXhiJIPzmFu8BT3O5f25lCd6St4Qy3Rd9EetrjX/0vEQqJv3X+I0uRJAQOkRIV0OhtXu/lkzX184=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E5/icBea; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751455071;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P+6hlIeCKXcjgCGE6QPvE3NZnk0CNW/XPA78sK/38pY=;
-	b=E5/icBea5K9d1Q1cRwzMRL9KcI4Fblw+pVnXVKvQffMN/eb6nnXWBLJ4xxt+hB+rGVfNwQ
-	gbykiGPggRC+4Sx5j+XVN4DanCfKmutCT7o22D/9bc2+pFyd2s8DfGLgS8j8mDujIDNmy3
-	maFxwDNBa6ajemKmq3Z1NkoFLUVGW/c=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-647-vs7MiqYAMrai4NBzc4YhzA-1; Wed, 02 Jul 2025 07:17:50 -0400
-X-MC-Unique: vs7MiqYAMrai4NBzc4YhzA-1
-X-Mimecast-MFC-AGG-ID: vs7MiqYAMrai4NBzc4YhzA_1751455070
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4a43c1e1e6bso141303521cf.3
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 04:17:50 -0700 (PDT)
+	s=arc-20240116; t=1751455271; c=relaxed/simple;
+	bh=Oa6I4J+3EiaoitoMqlxxWZcodweGnrQkOFGVcWo9wc4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=fToS4eztKgFi34u3jI8X3WlYi95BhmkRZEcUXlovbl2zk0XAyGoBpQEvv4sYF58s/HXJmLzlptps0Hgs0U/uYeOeKI1VwZQzRU8x3pMLd0z5pS7BKZjuTaUCCrpV+qYMPgI2laRWSbLQf8MHxMa+b+2MOfkPQe170edKG9ODh+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-60bf5a08729so8851259a12.0;
+        Wed, 02 Jul 2025 04:21:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751455070; x=1752059870;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P+6hlIeCKXcjgCGE6QPvE3NZnk0CNW/XPA78sK/38pY=;
-        b=arJjXYK8+5yf/NhOl8NLyG8UjjW8Foq3IKC7mTdExBid2dEIoDBsVwLZV5sYGM/gNo
-         3sYN4fDenTiVzLMatyFaEVcs5OkPWDUXRpElrBkVTrmTwzam5gceGfdMjGETiQRmpE2z
-         x9ggh5RyOyPFZwbUMBRG1BIq9lXuJoUL7zgMuOK4QSGJV3+8rVSSmiqnLe92v3KgvFEP
-         KSfwK0ErM3KWCS6gyV4a9FWpE/awN9ojINGxZb7Ob8IwmkvkXReeKI6zAF1VrU69I6xr
-         Fd8S126HDjoKv1TOu2nYxOMe0E82RHtUNrOsccgUugyjCoNSAuR7Nv/6AH2Kc/XPxu9X
-         bsDg==
-X-Forwarded-Encrypted: i=1; AJvYcCW35wzmb0NKCSj7GlVallkaBDuYLUrE+f4s5LTbE55POeZbUhrlYGVj1u4HMdqdwJrstr3CMLU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvRfFJEdfDpfq27QBR/RLyCR4zkaVxwGp6QoI+j+af3Ca3GSGr
-	M8ATeB4xjKUVvDJ9FrcMMVjMofopdPY4kl4eeT+62us0GrtYiz9NKBbJlU46H4VBQlHDxJenrrC
-	n4YD+UlLjXVy9gu0S14UaQaqLYObdTMnFbFCi/nkLuJ6RYK4eB0h1t7dhSA==
-X-Gm-Gg: ASbGncvHkcXlqZ2pCBMHxYQuy4U2+DEQaJAQ4FK7W+AiKmkfkuxdKzdVzQg1VeRRzeV
-	NSuNB4/EAGM7oqJ8dmAgI19ovLQT5iMdl6chqkJJz+ID3FImndVsnN8SLTh5xRITRpqNGAARVGH
-	1z0WWr3dUbIQzotMIc1ClH++DQsEASx+jTNsObBw6Zoz+B7N3mNSuia+wJ7gGpqIDHFWuOtfsh7
-	b1Lfd2x05Q2M5mOUD7aSm5JUd2lV5PZSLuLmCIxYWEfnbWVX1VGn5ZLb8M8GzTyO33QVwHSxC8W
-	YbiJBtxiCFZyb8ZZx2gDriTmy5Y9
-X-Received: by 2002:ac8:7f0f:0:b0:4a4:3fb2:113c with SMTP id d75a77b69052e-4a976a28ce1mr33172951cf.45.1751455069569;
-        Wed, 02 Jul 2025 04:17:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE5cBcz69WvcBm+o8cUuKL9tkLTgDyjUl7ykW1r2X7ywl3Jjzt418LNl2PWk5uGV4HOxkqbIg==
-X-Received: by 2002:ac8:7f0f:0:b0:4a4:3fb2:113c with SMTP id d75a77b69052e-4a976a28ce1mr33172511cf.45.1751455068861;
-        Wed, 02 Jul 2025 04:17:48 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.164.126])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a97c5826b7sm5693821cf.81.2025.07.02.04.17.46
+        d=1e100.net; s=20230601; t=1751455268; x=1752060068;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FwOadImlG8DTWZnqLfHAUYeQtgglNV2hsUFUVDivTSA=;
+        b=NIgs67d3N16U1C1rXBouemb4jVh5nGGKi9fEPif8Llcgh5N+tnfgvFiPFIFRwOWeeG
+         p9Tw468AKzFvzWTFt3snKKXCXNTEAM2HdGQIRdpFo6FJSEBr4eZE6kWSJg793jJzl8cL
+         L12rasS0OYg23IHQ57HSofIptOSH2X2DKMnZLjQHStCXIvTyH2tSu+XgZqmYy94QB7tx
+         N12mhyp5mNL54IkCxPL1vZzaOhj8/DohM9KaA/A41OkzXcMC5y/7EDeDoJxA5Hdf+Ove
+         IvbIGO2g/BBTiKy8v6uz/9fMa0JmTH/S14SfetsfTwa2Q31k9aGSSzqqqTA4um0kNEmC
+         K8XQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUFHevD70wEh+FnNoGcMm3jzTVJA2v3U07t5s2E7JaiItBWrvfmWwDO84wwtTtiKnKTsh0//lbGMix52gOGUhdL@vger.kernel.org, AJvYcCVTWYfBFD2XLWVYVAdHulIdSOjE79gOTOm7fQvaDhtoXWHRORUGbio7jNWPwRXUB/Tv0ew=@vger.kernel.org, AJvYcCWKdlPjYPdkpMqJwToogfJrVlo4+kDnw5K1qjrs67YbGf50uXn65CCtAMqeVwlULfc1/XLa84uo@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzUF6trvOgZ6D/AZ53MDccW0aQ5t4BfqbGfTp5czD+MSZDdABL
+	6MgO95KLK/G/eCPZzG/0ZIhjRMAl02aGLU0m7XIQOLZF2hi7Et8ElC4D
+X-Gm-Gg: ASbGncuc+txEzgN8V5RzwmgqUKOn+2GG3dQYKsEdn1yXRWBMFziPG9o6ituHLppHQeL
+	NHf/XVPxSVvLGH01kWL0xe6wiw1uYKC0VCDyhdmLTtmeJctKFur9B9VH7ckew1s6Hy2LSqcRJas
+	oNbk7Wt+4vWF/bqQzhUO7h9wY1pkfVZZmTAPk4+DKL0LWCyQZOz1rcETWZGhMVZLjhKVZPsBGdP
+	XQjJP+8Zqnn1Ov+El7jKjVYKt9MOFxgrD2XVsrDYrX5oxVF+767aqfRF3JA/orZbtLOIKPZ/z4g
+	gNdb+kBGOtDrCWcbp0Nc5UyhgA29Rbe6Y+Bd46N9UxkvrFwOb0CL
+X-Google-Smtp-Source: AGHT+IFvAijHC5To3z3TZw8XM7+z0rJfgERCs2qkqWCxTbZD6N1lkZgCDi9PpgZtH0wfmFxOoiXqxg==
+X-Received: by 2002:a05:6402:3550:b0:609:aa85:8d78 with SMTP id 4fb4d7f45d1cf-60e52cc4800mr2040323a12.8.1751455267772;
+        Wed, 02 Jul 2025 04:21:07 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:5::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60c831aa9d0sm9333912a12.46.2025.07.02.04.21.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 04:17:48 -0700 (PDT)
-Date: Wed, 2 Jul 2025 13:17:44 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Luigi Leonardi <leonardi@redhat.com>
-Cc: Michal Luczaj <mhal@rbox.co>, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Hyunwoo Kim <v4bel@theori.io>
-Subject: Re: [PATCH net-next v5 2/2] vsock/test: Add test for null ptr deref
- when transport changes
-Message-ID: <bmldzyieflxolpa3gttr6txbolva5wqgkqshar2t2l34i2e6it@hspfuah5b6vl>
-References: <20250630-test_vsock-v5-0-2492e141e80b@redhat.com>
- <20250630-test_vsock-v5-2-2492e141e80b@redhat.com>
+        Wed, 02 Jul 2025 04:21:07 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next v4 0/3] selftest: net: Add selftest for netpoll
+Date: Wed, 02 Jul 2025 04:20:59 -0700
+Message-Id: <20250702-netpoll_test-v4-0-cec227e85639@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250630-test_vsock-v5-2-2492e141e80b@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABsWZWgC/23NQWrDMBCF4auIWXuKPJIytle9RynFsUaJIMhBE
+ iYl+O4l7sZNs358779DkRylwKDukGWJJc4JBmUbBdN5TCfB6GFQQJqcPrSESep1vly+qpSKY2v
+ IetKOpw4aBdcsId62uw9IUjHJrcJno+AcS53z99ZZ2m1/fbm02KJltsH3rjcmvHs5xjG9zfn0S
+ Pwq0i+U04euMxSYwrRXj/5Cuya5J02o0bInZnZE9F+bveYnbVCjY3f0pPXUjf0fva7rD6DotUt
+ lAQAA
+X-Change-ID: 20250612-netpoll_test-a1324d2057c8
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, bpf@vger.kernel.org, 
+ kernel-team@meta.com, Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.15-dev-dd21f
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3228; i=leitao@debian.org;
+ h=from:subject:message-id; bh=Oa6I4J+3EiaoitoMqlxxWZcodweGnrQkOFGVcWo9wc4=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoZRYiCCzdTww05PHSPGEQ3RsBQGB1aNhF4dwTQ
+ O8dDRUldtaJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaGUWIgAKCRA1o5Of/Hh3
+ bVNKEACIjYWP/95e6ctiGaabivMqrcbUw4TRMCHeKwFUpED6VJRSaldn/4Ie6mkfq9UUuasCmk3
+ kkX8ETD9PqYdHVWa5nb5bSPhc7yDc3VQolvRu5hu97HDadZWRqVxdOjIAB3xYavnmQ2GXG4XDms
+ rX5+ABYkWJ8dXzXdoatuKngk3g38FAMk4In9erUNCAL9UMmpSmhQ0lpFISBmhJFB/tweXfVkhZG
+ 4a5nZ+KpGnS3s996/tJKdJlMiVARwXrRr7CYH2pdlfawa5zlAMFz4k8C0Sxj0M2c7kf+d5/iWKg
+ qCYAvxMA4RsXf9vJFm/96ued6abvQMxoY2qhWvxz6pPoOv8JjWl3bxUJ71at69kvt2pGcYYo3zQ
+ 0KSyP68Sqz6fmGfqkXCElOTt7XZ5NUV/DHICNxUpQnoGVS15ON+C2u283YnEbXhQd+WGwQLGHkT
+ a58sBHC9aL8TLmgngE14foDYbu9E13d/VA+AAwH5Sq+1DvK5apBFU+L+ohPozT65PB1uqsOX7pR
+ olI6ucsXl4ERZyAMcfy0UMw0DAs6vgrT8msv8thKy3F39WcY8yfrx8C8Nzn4zzoWFcOplrz5Bjb
+ GBLdbuHCU2W1B942cmH9DeNMMwnPOFy5acVPJ8Q6IooT1oQ5ZiVuXZzRCxS32DqXqOJVzhWyCBx
+ jSMjIlowG+1Oo2w==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-On Mon, Jun 30, 2025 at 06:33:04PM +0200, Luigi Leonardi wrote:
->Add a new test to ensure that when the transport changes a null pointer
->dereference does not occur. The bug was reported upstream [1] and fixed
->with commit 2cb7c756f605 ("vsock/virtio: discard packets if the
->transport changes").
->
->KASAN: null-ptr-deref in range [0x0000000000000060-0x0000000000000067]
->CPU: 2 UID: 0 PID: 463 Comm: kworker/2:3 Not tainted
->Workqueue: vsock-loopback vsock_loopback_work
->RIP: 0010:vsock_stream_has_data+0x44/0x70
->Call Trace:
-> virtio_transport_do_close+0x68/0x1a0
-> virtio_transport_recv_pkt+0x1045/0x2ae4
-> vsock_loopback_work+0x27d/0x3f0
-> process_one_work+0x846/0x1420
-> worker_thread+0x5b3/0xf80
-> kthread+0x35a/0x700
-> ret_from_fork+0x2d/0x70
-> ret_from_fork_asm+0x1a/0x30
->
->Note that this test may not fail in a kernel without the fix, but it may
->hang on the client side if it triggers a kernel oops.
->
->This works by creating a socket, trying to connect to a server, and then
->executing a second connect operation on the same socket but to a
->different CID (0). This triggers a transport change. If the connect
->operation is interrupted by a signal, this could cause a null-ptr-deref.
->
->Since this bug is non-deterministic, we need to try several times. It
->is reasonable to assume that the bug will show up within the timeout
->period.
->
->If there is a G2H transport loaded in the system, the bug is not
->triggered and this test will always pass. This is because
->`vsock_assign_transport`, when using CID 0, like in this case, sets
->vsk->transport to `transport_g2h` that is not NULL if a G2H transport is
->available.
->
->[1]https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/
->
->Suggested-by: Hyunwoo Kim <v4bel@theori.io>
->Suggested-by: Michal Luczaj <mhal@rbox.co>
->Signed-off-by: Luigi Leonardi <leonardi@redhat.com>
->---
-> tools/testing/vsock/Makefile     |   1 +
-> tools/testing/vsock/vsock_test.c | 170 +++++++++++++++++++++++++++++++++++++++
-> 2 files changed, 171 insertions(+)
+I am submitting a new selftest for the netpoll subsystem specifically
+targeting the case where the RX is polling in the TX path, which is
+a case that we don't have any test in the tree today. This is done when
+netpoll_poll_dev() called, and this test creates a scenario when that is
+probably.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+The test does the following:
 
-Thanks,
-Stefano
+ 1) Configuring a single RX/TX queue to increase contention on the
+    interface.
+ 2) Generating background traffic to saturate the network, mimicking
+    real-world congestion.
+ 3) Sending netconsole messages to trigger netpoll polling and monitor
+    its behavior.
+ 4) Using dynamic netconsole targets via configfs, with the ability to
+    delete and recreate targets during the test.
+ 5) Running bpftrace in parallel to verify that netpoll_poll_dev() is
+    called when expected. If it is called, then the test passes,
+    otherwise the test is marked as skipped.
 
->
->diff --git a/tools/testing/vsock/Makefile b/tools/testing/vsock/Makefile
->index 6e0b4e95e230500f99bb9c74350701a037ecd198..88211fd132d23ecdfd56ab0815580a237889e7f2 100644
->--- a/tools/testing/vsock/Makefile
->+++ b/tools/testing/vsock/Makefile
->@@ -5,6 +5,7 @@ vsock_test: vsock_test.o vsock_test_zerocopy.o timeout.o control.o util.o msg_ze
-> vsock_diag_test: vsock_diag_test.o timeout.o control.o util.o
-> vsock_perf: vsock_perf.o msg_zerocopy_common.o
->
->+vsock_test: LDLIBS = -lpthread
-> vsock_uring_test: LDLIBS = -luring
-> vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o msg_zerocopy_common.o
->
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index eb6f54378667ac7ed324f4823e988ec9846e41a3..be6ce764f69480c0f9c3e2288fc19cd2e74be148 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -22,6 +22,8 @@
-> #include <signal.h>
-> #include <sys/ioctl.h>
-> #include <linux/time64.h>
->+#include <pthread.h>
->+#include <fcntl.h>
->
-> #include "vsock_test_zerocopy.h"
-> #include "timeout.h"
->@@ -1867,6 +1869,169 @@ static void test_stream_connect_retry_server(const struct test_opts *opts)
-> 	close(fd);
-> }
->
->+#define TRANSPORT_CHANGE_TIMEOUT 2 /* seconds */
->+
->+static void *test_stream_transport_change_thread(void *vargp)
->+{
->+	pid_t *pid = (pid_t *)vargp;
->+	int ret;
->+
->+	ret = pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
->+	if (ret) {
->+		fprintf(stderr, "pthread_setcanceltype: %d\n", ret);
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	while (true) {
->+		if (kill(*pid, SIGUSR1) < 0) {
->+			perror("kill");
->+			exit(EXIT_FAILURE);
->+		}
->+	}
->+	return NULL;
->+}
->+
->+static void test_transport_change_signal_handler(int signal)
->+{
->+	/* We need a custom handler for SIGUSR1 as the default one terminates the process. */
->+}
->+
->+static void test_stream_transport_change_client(const struct test_opts *opts)
->+{
->+	__sighandler_t old_handler;
->+	pid_t pid = getpid();
->+	pthread_t thread_id;
->+	time_t tout;
->+	int ret, tr;
->+
->+	tr = get_transports();
->+
->+	/* Print a warning if there is a G2H transport loaded.
->+	 * This is on a best effort basis because VMCI can be either G2H and H2G, and there is
->+	 * no easy way to understand it.
->+	 * The bug we are testing only appears when G2H transports are not loaded.
->+	 * This is because `vsock_assign_transport`, when using CID 0, assigns a G2H transport
->+	 * to vsk->transport. If none is available it is set to NULL, causing the null-ptr-deref.
->+	 */
->+	if (tr & TRANSPORTS_G2H)
->+		fprintf(stderr, "G2H Transport detected. This test will not fail.\n");
->+
->+	old_handler = signal(SIGUSR1, test_transport_change_signal_handler);
->+	if (old_handler == SIG_ERR) {
->+		perror("signal");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	ret = pthread_create(&thread_id, NULL, test_stream_transport_change_thread, &pid);
->+	if (ret) {
->+		fprintf(stderr, "pthread_create: %d\n", ret);
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	control_expectln("LISTENING");
->+
->+	tout = current_nsec() + TRANSPORT_CHANGE_TIMEOUT * NSEC_PER_SEC;
->+	do {
->+		struct sockaddr_vm sa = {
->+			.svm_family = AF_VSOCK,
->+			.svm_cid = opts->peer_cid,
->+			.svm_port = opts->peer_port,
->+		};
->+		int s;
->+
->+		s = socket(AF_VSOCK, SOCK_STREAM, 0);
->+		if (s < 0) {
->+			perror("socket");
->+			exit(EXIT_FAILURE);
->+		}
->+
->+		ret = connect(s, (struct sockaddr *)&sa, sizeof(sa));
->+		/* The connect can fail due to signals coming from the thread,
->+		 * or because the receiver connection queue is full.
->+		 * Ignoring also the latter case because there is no way
->+		 * of synchronizing client's connect and server's accept when
->+		 * connect(s) are constantly being interrupted by signals.
->+		 */
->+		if (ret == -1 && (errno != EINTR && errno != ECONNRESET)) {
->+			perror("connect");
->+			exit(EXIT_FAILURE);
->+		}
->+
->+		/* Set CID to 0 cause a transport change. */
->+		sa.svm_cid = 0;
->+
->+		/* Ignore return value since it can fail or not.
->+		 * If the previous connect is interrupted while the
->+		 * connection request is already sent, the second
->+		 * connect() will wait for the response.
->+		 */
->+		connect(s, (struct sockaddr *)&sa, sizeof(sa));
->+
->+		close(s);
->+
->+		control_writeulong(CONTROL_CONTINUE);
->+
->+	} while (current_nsec() < tout);
->+
->+	control_writeulong(CONTROL_DONE);
->+
->+	ret = pthread_cancel(thread_id);
->+	if (ret) {
->+		fprintf(stderr, "pthread_cancel: %d\n", ret);
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	ret = pthread_join(thread_id, NULL);
->+	if (ret) {
->+		fprintf(stderr, "pthread_join: %d\n", ret);
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	if (signal(SIGUSR1, old_handler) == SIG_ERR) {
->+		perror("signal");
->+		exit(EXIT_FAILURE);
->+	}
->+}
->+
->+static void test_stream_transport_change_server(const struct test_opts *opts)
->+{
->+	int s = vsock_stream_listen(VMADDR_CID_ANY, opts->peer_port);
->+
->+	/* Set the socket to be nonblocking because connects that have been interrupted
->+	 * (EINTR) can fill the receiver's accept queue anyway, leading to connect failure.
->+	 * As of today (6.15) in such situation there is no way to understand, from the
->+	 * client side, if the connection has been queued in the server or not.
->+	 */
->+	if (fcntl(s, F_SETFL, fcntl(s, F_GETFL, 0) | O_NONBLOCK) < 0) {
->+		perror("fcntl");
->+		exit(EXIT_FAILURE);
->+	}
->+	control_writeln("LISTENING");
->+
->+	while (control_readulong() == CONTROL_CONTINUE) {
->+		/* Must accept the connection, otherwise the `listen`
->+		 * queue will fill up and new connections will fail.
->+		 * There can be more than one queued connection,
->+		 * clear them all.
->+		 */
->+		while (true) {
->+			int client = accept(s, NULL, NULL);
->+
->+			if (client < 0) {
->+				if (errno == EAGAIN)
->+					break;
->+
->+				perror("accept");
->+				exit(EXIT_FAILURE);
->+			}
->+
->+			close(client);
->+		}
->+	}
->+
->+	close(s);
->+}
->+
-> static void test_stream_linger_client(const struct test_opts *opts)
-> {
-> 	int fd;
->@@ -2106,6 +2271,11 @@ static struct test_case test_cases[] = {
-> 		.run_client = test_stream_nolinger_client,
-> 		.run_server = test_stream_nolinger_server,
-> 	},
->+	{
->+		.name = "SOCK_STREAM transport change null-ptr-deref",
->+		.run_client = test_stream_transport_change_client,
->+		.run_server = test_stream_transport_change_server,
->+	},
-> 	{},
-> };
->
->
->-- 
->2.50.0
->
+In order to achieve it, I stole Jakub's bpftrace helper from [1], and
+did some small changes that I found useful to use the helper.
+
+So, this patchset basically contains:
+
+ 1) The code stolen from Jakub
+ 2) Improvements on bpftrace() helper 
+ 3) The selftest itself
+
+Link: https://lore.kernel.org/all/20250421222827.283737-22-kuba@kernel.org/ [1]
+
+---
+Changes in v4:
+- Make the test XFail if it doesn't hit the function we are looking for
+- Toggle the interface while the traffic is flowing.
+- Bumped the number of messages from 10 to 40 per iterations.
+   * This is hitting ~15 times per run on my vng test.
+- Decreased the time from 15 seconds to 10 seconds, given that if
+  it didn't hit the function in 10 seconds, 5 seconds extra will not
+  help.
+- Link to v3: https://lore.kernel.org/r/20250627-netpoll_test-v3-0-575bd200c8a9@debian.org
+
+Changes in v3:
+- Make pylint happy (Simon)
+- Remove the unnecessary patch in bpftrace to raise an exception when it
+  fails. (Jakub)
+- Improved the bpftrace code (Willem)
+- Stop sending messages if bpftrace is not alive anymore.
+- Link to v2: https://lore.kernel.org/r/20250625-netpoll_test-v2-0-47d27775222c@debian.org
+
+Changes in v2:
+- Stole Jakub's helper to run bpftrace
+- Removed the DEBUG option and moved logs to logging
+- Change the code to have a higher chance of calling netpoll_poll_dev().
+  In my current configuration, it is hitting multiple times during the
+  test.
+- Save and restore TX/RX queue size (Jakub)
+- Link to v1: https://lore.kernel.org/r/20250620-netpoll_test-v1-1-5068832f72fc@debian.org
+
+---
+Breno Leitao (2):
+      selftests: drv-net: Strip '@' prefix from bpftrace map keys
+      selftests: net: add netpoll basic functionality test
+
+Jakub Kicinski (1):
+      selftests: drv-net: add helper/wrapper for bpftrace
+
+ tools/testing/selftests/drivers/net/Makefile       |   1 +
+ .../selftests/drivers/net/lib/py/__init__.py       |   3 +-
+ .../testing/selftests/drivers/net/netpoll_basic.py | 365 +++++++++++++++++++++
+ tools/testing/selftests/net/lib/py/utils.py        |  35 ++
+ 4 files changed, 403 insertions(+), 1 deletion(-)
+---
+base-commit: 22e1cfda0f612556f116560d2b7e9c3315636bfb
+change-id: 20250612-netpoll_test-a1324d2057c8
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
