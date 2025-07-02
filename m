@@ -1,198 +1,182 @@
-Return-Path: <netdev+bounces-203208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27370AF0C03
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 08:55:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A6BDAF0C37
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 09:08:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 307161C038B0
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 06:55:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B318A1C01FC8
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 07:08:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4ED7225A47;
-	Wed,  2 Jul 2025 06:54:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF10223337;
+	Wed,  2 Jul 2025 07:08:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HgEzaVEs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wUT2rnxW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4E21D7E41;
-	Wed,  2 Jul 2025 06:54:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE001DFDAB
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 07:08:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751439291; cv=none; b=BjfMjfHkxNG/5DvAGvzbZLvTEKzn+u8ddSmrXTImXjzHopwtvDy6llJmAGdu4eIH0dxlIcqNsl95Hp+PRawPWXTt1DpfcdYajuXsdD3ghRf84pAbjE2Pff8auxKLO4l0zbLwvMpOAJt7U7yU0/RQuojBpyseFN3KVKl2WHyjAe4=
+	t=1751440095; cv=none; b=JbiSmLNym+DQlbnwef07xewUQ62sEm3vedm67VvPHm8FemP3d/IUATn3Li+scxFlkgGbwyEobNc4CKwhyEAPbxM9HtABUoFPivqL1SQtnSg9mhj8Niq83PtdcKSOHest4SoMpPZvYXX6/uz2otZvoZobgskbwNKrNq/eWEe8ZkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751439291; c=relaxed/simple;
-	bh=OygOYEPels4czGsYfayew2rB/2MBUfzsc+sH9m4SBq0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KBBfrUnx9JuUhGVeZWDW8VRQY/VuyV4KM9C+G391oK4/4pwqIrx2j17CoRcnQJYc08TNW90QrZBH4tqaQBI++It2Z9EJTitBWsUQ4tyicMLDtWpnF5+OsFd52mAjMDBcD7SfqGX+famczpUpXpY8NOsxKq2m2qGgos+KJ4lyheQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HgEzaVEs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DADDC4CEEE;
-	Wed,  2 Jul 2025 06:54:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751439290;
-	bh=OygOYEPels4czGsYfayew2rB/2MBUfzsc+sH9m4SBq0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HgEzaVEsk//JdYC+Qyn/5EKrQUtKGk9503aAH2+MGID4BNeVQ532beH+YUPat8bTE
-	 ksassL7x58UVM8H2z1YiCwar+F03MKvsVVnuzRRKynO2HQG/FWdGtT9efkSLGsT2I7
-	 Ms+P4pZHTOL3Vi5wMI5yX6frOXuS33VSRWuaxiWcuK7ssHBQAM1VMY79ox/M3t/Kkg
-	 MpzSll7uEgbWqbwWs12mIdTWwhhed0E7KABMg9q7RSCMgBIviaW2okigJHox485Vzp
-	 +NGA4KhTUCCW4PB5nkG0t/tcwwrvz8+nBPF7c5fUeC9tKEKmXUIejMhEFiSWJ7w1Sq
-	 ROwcsDKchkEaA==
-Date: Wed, 2 Jul 2025 08:54:48 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@kernel.org>
-To: Jonathan Cameron <jic23@kernel.org>
-Cc: Waqar Hameed <waqar.hameed@axis.com>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, Julien Panis <jpanis@baylibre.com>, 
-	William Breathitt Gray <wbg@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Peter Rosin <peda@axentia.se>, 
-	David Lechner <dlechner@baylibre.com>, Nuno =?utf-8?B?U8Oh?= <nuno.sa@analog.com>, 
-	Andy Shevchenko <andy@kernel.org>, Cosmin Tanislav <cosmin.tanislav@analog.com>, 
-	Lars-Peter Clausen <lars@metafoo.de>, Michael Hennerich <Michael.Hennerich@analog.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Matteo Martelli <matteomartelli3@gmail.com>, 
-	Heiko Stuebner <heiko@sntech.de>, Francesco Dolcini <francesco@dolcini.it>, 
-	=?utf-8?Q?Jo=C3=A3o_Paulo_Gon=C3=A7alves?= <jpaulo.silvagoncalves@gmail.com>, Hugo Villeneuve <hvilleneuve@dimonoff.com>, 
-	Subhajit Ghosh <subhajit.ghosh@tweaklogic.com>, Mudit Sharma <muditsharma.info@gmail.com>, 
-	Gerald Loacker <gerald.loacker@wolfvision.net>, Song Qiang <songqiang1304521@gmail.com>, 
-	Crt Mori <cmo@melexis.com>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
-	Ulf Hansson <ulf.hansson@linaro.org>, Karol Gugala <kgugala@antmicro.com>, 
-	Mateusz Holenko <mholenko@antmicro.com>, Gabriel Somlo <gsomlo@gmail.com>, Joel Stanley <joel@jms.id.au>, 
-	Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
-	Wei Fang <wei.fang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
-	Kishon Vijay Abraham I <kishon@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, 
-	Alim Akhtar <alim.akhtar@samsung.com>, Sebastian Reichel <sre@kernel.org>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, Kevin Hilman <khilman@baylibre.com>, 
-	Jerome Brunet <jbrunet@baylibre.com>, Martin Blumenstingl <martin.blumenstingl@googlemail.com>, 
-	Han Xu <han.xu@nxp.com>, Haibo Chen <haibo.chen@nxp.com>, 
-	Yogesh Gaur <yogeshgaur.83@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Avri Altman <avri.altman@wdc.com>, Bart Van Assche <bvanassche@acm.org>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Souradeep Chowdhury <quic_schowdhu@quicinc.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Peter Ujfalusi <peter.ujfalusi@linux.intel.com>, 
-	Bard Liao <yung-chuan.liao@linux.intel.com>, Ranjani Sridharan <ranjani.sridharan@linux.intel.com>, 
-	Daniel Baluta <daniel.baluta@nxp.com>, Kai Vehmanen <kai.vehmanen@linux.intel.com>, 
-	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
-	Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, kernel@axis.com, 
-	linux-iio@vger.kernel.org, linux-omap@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, linux-rockchip@lists.infradead.org, linux-input@vger.kernel.org, 
-	linux-mmc@vger.kernel.org, imx@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-phy@lists.infradead.org, linux-samsung-soc@vger.kernel.org, linux-pm@vger.kernel.org, 
-	linux-pwm@vger.kernel.org, linux-amlogic@lists.infradead.org, linux-spi@vger.kernel.org, 
-	linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-usb@vger.kernel.org, 
-	sound-open-firmware@alsa-project.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH] Remove error prints for devm_add_action_or_reset()
-Message-ID: <jeajjewfbg5qo736imozpghnpxln2pux74aegtqsi57qsbpug2@opndel6zc3m3>
-References: <pnd7c0s6ji2.fsf@axis.com>
- <ylr7cuxldwb24ccenen4khtyddzq3owgzzfblbohkdxb7p7eeo@qpuddn6wrz3x>
- <20250701185519.1410e831@jic23-huawei>
+	s=arc-20240116; t=1751440095; c=relaxed/simple;
+	bh=vEfc23gWxmgkLBOZDVzmENwTJDV/WQatXo81v97y4Rg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c0rGvwULm/CBlGsRP+zs8Ty5GhruKIdZNkkR3o9H962ThguglPqTooVai/Z/KJF9VNhbL2OXu0OJopUANsOWG8XCj+uJomonxPn+fNeXrATF75/OCffEbg+ZEG/+/Q9VFYXOOKC58tgtfo9hkAVEOfrMo+xinn+VlHOT52TCr8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wUT2rnxW; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4a52d82adcaso54834181cf.0
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 00:08:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751440093; x=1752044893; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BOYXIgIBjv6MB4UJEdcjwBwxB8dHNloBIY8hBNzIzP4=;
+        b=wUT2rnxWo0RU4HNaE80Cssu3Q5WFPD53IItNE9SI4L58pWfTKBYLtFd5SiLwonfI3b
+         tQ92YdQk52rI7gCq35t8RD0Q3C/oZauxwe77IQAPy86ml3eW+ur8nbEiWIB7HiL4cYPe
+         WrawB0SM/IXUKIwI1PFwwJsNjbDrhd+1jYDYVRBznsVA82Fj3Py4+4ENa0BoNrrSvs8l
+         Be3y9zBCPNqKKo9Kk7V1QGeAu4xFNzP2FklrRF7c9w6Ksf8hN52CsizQwLPkvDbaiyiv
+         7TdSLrlDrh/rvAbEine8b0Yg9vx1BBdmBKSWlJtPithgaIvq/MQ9w80bcPJMuFQDxZv9
+         3PYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751440093; x=1752044893;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BOYXIgIBjv6MB4UJEdcjwBwxB8dHNloBIY8hBNzIzP4=;
+        b=bWj700623gPhLNdwXfkDHugvgRJJysNJZBEble1pyrzgtte60F9tQYIBIp6x9nkKYS
+         qeJvhcechvJq3/tzX5BxGL9/6zD0Fme4Mz2lnjS+uSxeJwAqIq618D9cZ2RlX8Z59+xd
+         S7fY6DrN9791BJxiYQI75UIlvzQaMCCx1tLf3Smf7V90hDIMF+QoPnKhvHTCbTrzepcC
+         iM4RuLB+xlN0fgD/oxsncMiPrvgYWvz+27WxPE76bMNDNArawClMkYJBfZQmai/nXIRK
+         lekUrZ+HkQmbnhRv2z1WzieGUexu/vAukalMef6B4IMUMWwBv9CmjkhqClOH7ymMx5Jp
+         yHWg==
+X-Forwarded-Encrypted: i=1; AJvYcCUJw419ME7tROyWw0IQnF6kKSAlCektol5ztTHYgtLh7nVFp064zrWWXVYm+FdpRRrhkjra5Ps=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWxA3iG17CLbfRPlBJkJcwL9NDZoiB9saOFtWW0vIoSJ9u83Qf
+	bH/5ZqUzdcDvDFXmppApuiCXWTQR/MzJTDTdmnd9uFTQnZyXeY2VfQ/eIguhbqiog0Yc+XSsVKq
+	elz7tCmL+XxSGLFCdThq2tqhPo5egXRRFAWV+Miq2
+X-Gm-Gg: ASbGncuSrkrDfOwAqAjU6Fp5sYm/kvuE6YXVPtf92bNgvVqJNqxiKibLOCq365pqeaL
+	CkRyvtwwXPWoZVcne0Jz55tYsqD9v9W9O8ADDeSNMzeHMKCQf44W0VMppHrbimXpOmT0yzJoWIc
+	2hkH+T0Ux3kqnnj/+sSvkkm+k1+mbYgvFoUU3HDXCkhsk=
+X-Google-Smtp-Source: AGHT+IGoTZjXu7qWcsI/t98GobF0wGfWody9rNcAnaBEU7lY1rhebw/zVTd37AvnAsXCcglTAT1qXqXGBKuQgsuTl0g=
+X-Received: by 2002:ac8:57d3:0:b0:4a8:225c:99b0 with SMTP id
+ d75a77b69052e-4a97689ed35mr31074771cf.3.1751440092564; Wed, 02 Jul 2025
+ 00:08:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="yoqxembgtzssn7jy"
-Content-Disposition: inline
-In-Reply-To: <20250701185519.1410e831@jic23-huawei>
-
-
---yoqxembgtzssn7jy
-Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
-Content-Disposition: inline
+References: <20250701133006.812702-1-edumazet@google.com> <aGSa3bgijdi+KqcK@pop-os.localdomain>
+In-Reply-To: <aGSa3bgijdi+KqcK@pop-os.localdomain>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 2 Jul 2025 00:08:01 -0700
+X-Gm-Features: Ac12FXx2mGccVr9O7uJ3QJJjWiOjNYEYgvytuRA8uiC5FdV0HF_AljoNrgPaqmg
+Message-ID: <CANn89iKA23zDtt3+3K46QrFx-3iUP-Ef4+n87xWdQJhTWA_zcA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net/sched: acp_api: no longer acquire RTNL in tc_action_net_exit()
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Vlad Buslov <vladbu@nvidia.com>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH] Remove error prints for devm_add_action_or_reset()
-MIME-Version: 1.0
 
-Hello Jonathan,
-
-On Tue, Jul 01, 2025 at 06:55:19PM +0100, Jonathan Cameron wrote:
-> On Tue, 1 Jul 2025 19:44:17 +0200
-> Uwe Kleine-K=F6nig <ukleinek@kernel.org> wrote:
->=20
-> > On Tue, Jul 01, 2025 at 05:03:33PM +0200, Waqar Hameed wrote:
-> > >  drivers/pwm/pwm-meson.c                          | 3 +-- =20
-> >=20
-> > Looking at this driver I tried the following:
->=20
-> I'm not sure what we actually want here.
->=20
-> My thought when suggesting removing instances of this
-> particular combination wasn't saving on code size, but rather just
-> general removal of pointless code that was getting cut and
-> paste into new drivers and wasting a tiny bit of review bandwidth.
-> I'd consider it bad practice to have patterns like
->=20
-> void *something =3D kmalloc();
-> if  (!something)
-> 	return dev_err_probe(dev, -ENOMEM, ..);
->=20
-> and my assumption was people would take a similar view with
-> devm_add_action_or_reset().
+On Tue, Jul 1, 2025 at 7:35=E2=80=AFPM Cong Wang <xiyou.wangcong@gmail.com>=
+ wrote:
 >
-> It is a bit nuanced to have some cases where we think prints
-> are reasonable and others where they aren't so I get your
-> point about consistency.
+> On Tue, Jul 01, 2025 at 01:30:06PM +0000, Eric Dumazet wrote:
+> > tc_action_net_exit() got an rtnl exclusion in commit
+> > a159d3c4b829 ("net_sched: acquire RTNL in tc_action_net_exit()")
+> >
+> > Since then, commit 16af6067392c ("net: sched: implement reference
+> > counted action release") made this RTNL exclusion obsolete.
+>
+> I am not sure removing RTNL is safe even we have action refcnt.
+>
+> For example, are you sure tcf_action_offload_del() is safe to call
+> without RTNL?
 
-The problem I see is that there are two classes of functions: a) Those
-that require an error message and b) those that don't. Class b) consists
-of the functions that can only return success or -ENOMEM and the
-functions that emit an error message themselves. (And another problem I
-see is that for the latter the error message is usually non-optimal
-because the function doesn't know the all details of the request. See my
-reply to Andy for more details about that rant.)
+My thinking was that at the time of these calls, devices were already
+gone from the dismantling netns, but this might be wrong.
 
-IMHO what takes away the review bandwidth is that the reviewer has to
-check which class the failing function is part of. If this effort
-results in more driver authors not adding an error message after
-devm_add_action_or_reset() that's nice, but in two months I have
-forgotten the details of this discussion and I have to recheck if
-devm_add_action_or_reset() is part of a) or b) and so the burden is
-still on me.
+We can conditionally acquire rtnl from tcf_idrinfo_destroy() when
+there is at least one offloaded action in the idr.
 
-So to give my answer on your question "What do we actually want here?":
-Please let us get rid of the need to care for a) or b).
+diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+index 057e20cef3754f33357c4c1e30034f6b9b872d91..9e468e46346710c85c3a85b905d=
+27dfe3972916a
+100644
+--- a/net/sched/act_api.c
++++ b/net/sched/act_api.c
+@@ -933,18 +933,25 @@ void tcf_idrinfo_destroy(const struct tc_action_ops *=
+ops,
+                         struct tcf_idrinfo *idrinfo)
+ {
+        struct idr *idr =3D &idrinfo->action_idr;
++       bool mutex_taken =3D false;
+        struct tc_action *p;
+-       int ret;
+        unsigned long id =3D 1;
+        unsigned long tmp;
++       int ret;
 
-> The code size reduction is nice so I'd not be against it as an extra
-> if the reduction across a kernel builds is significant and enough
-> people want to keep these non printing prints.
+        idr_for_each_entry_ul(idr, p, tmp, id) {
++               if (tc_act_in_hw(p) && !mutex_taken) {
++                       rtnl_lock();
++                       mutex_taken =3D true;
++               }
+                ret =3D __tcf_idr_release(p, false, true);
+                if (ret =3D=3D ACT_P_DELETED)
+                        module_put(ops->owner);
+                else if (ret < 0)
+                        return;
+        }
++       if (mutex_taken)
++               rtnl_unlock();
+        idr_destroy(&idrinfo->action_idr);
+ }
+ EXPORT_SYMBOL(tcf_idrinfo_destroy);
 
-To complete implementing my wish all API functions would need to stop to
-emit an error message. Unfortunately that isn't without downsides
-because the result is that there are more error strings and so the
-kernel size is increased. So you have to weight if you prefer individual
-error messages and easier review/maintenance at the cost of a bigger
-binary size and more dev_err_probe() calls in drivers eating vertical
-space in your editor.
 
-I know on which side I am, but I bet we won't find agreement about that
-in the kernel community ...
+>
+> What are you trying to improve here?
 
-Best regards
-Uwe
+Yeah, some of us are spending months of work to improve the RTNL
+situation, and we do not copy/paste why on every single patch :)
 
---yoqxembgtzssn7jy
-Content-Type: application/pgp-signature; name="signature.asc"
+I will capture the following in V2, thanks !
 
------BEGIN PGP SIGNATURE-----
+Most netns do not have actions, yet deleting them is adding a lot of
+pressure on RTNL, which is for us the most contended mutex in the
+kernel.
 
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmhk17UACgkQj4D7WH0S
-/k4YcQgAlm1BDi3/P3JcN5b6Y1UamZV/S9cGOikezq/kf1GhqDBu8DxrVjTBFjOf
-OJoBgw/566zxq5agBq8EUgc7GrJBwe7BhieAXUGmYQI0pBg1Zdhgyj42kXhx7B9R
-u2j6XXXrEWa1Sw58sbK3g8bLeDEo9/kIem6g0Yk6NZX2WibbNU6Bw6UuV3yVwVaX
-TH4uFzMJ5wVvnwJDz2HCuxCLQ9NO25UL0U3DdZWIPI9oeuodG3U3MVNJWMJ5OuXc
-e+Yo5MhzsrnrMpj4nWPaicdD25qLOdVCySFDim72U4oI24wsmtlQBiJmDuNoldf/
-kbQM9dmwp48V3mVs7SFSmrt/TD4bFw==
-=6zPO
------END PGP SIGNATURE-----
+We are moving to a per-netns 'rtnl', so tc_action_net_exit() will not
+be able to grab 'rtnl' a single time for a batch of netns.
 
---yoqxembgtzssn7jy--
+
+Before the patch:
+
+perf probe -a rtnl_lock  # Note: This does not capture all calls, some
+of them might be inlined in net/core/rtnetlink.c
+
+perf record -e probe:rtnl_lock -a /bin/bash -c 'unshare -n "/bin/true"; sle=
+ep 1'
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.305 MB perf.data (25 samples) ]
+
+After the patch:
+
+perf record -e probe:rtnl_lock -a /bin/bash -c 'unshare -n "/bin/true"; sle=
+ep 1'
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.304 MB perf.data (9 samples) ]
 
