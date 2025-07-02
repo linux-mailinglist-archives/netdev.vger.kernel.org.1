@@ -1,158 +1,113 @@
-Return-Path: <netdev+bounces-203290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05440AF12D5
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 12:59:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DA64AF1306
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 13:02:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E35784A1741
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 10:59:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF2543A827C
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 11:01:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E23A264A9E;
-	Wed,  2 Jul 2025 10:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7F5B25F98B;
+	Wed,  2 Jul 2025 11:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Lxqm/R71"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ACYiH2LO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA4826057C
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 10:57:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537C219995E
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 11:00:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751453856; cv=none; b=JhYiovAVqPEgMi3yMXLuESZeA90ze5AMAndi8ufbae5tTfSSdAnvX2KmLHU2A8HYwfTX5Swd/2AdfE6x4PkI2NAv+dfK9WVVeLUfLnXgafXYmXIAupoQqyZgb1kauNsDu8aDznN/5g8LevtrP1aIKuOSQnNko0muKajdCmaj5GY=
+	t=1751454059; cv=none; b=Sa3jUzCXtmoT5aiBt2qI8FwfNcn3Qt0B+Kup9vKMD2BTL+rgFf/jmk5Lw3ePF/oTF3xhBKjyDN8xJZjInuTgRWQ1ZopsSa6YAyp5jsBrqCxT7otBiVJp+OZfbzbnySjUo4ccQHkG/nky7KGJa7zbji3OwMtXUSjw312opaWNPms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751453856; c=relaxed/simple;
-	bh=IWxUbh4BDZ7bPd8L/dwwB+q8iBVYy1u5irOTFUt+L8o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FCzXILn2KkgOC+ckZJ+K2Lo+u3IvJPozkw6oFQu1fijG6Cpi7WX628avrkIjuJZJnwucWmvLo950LtWLS2z5esluNJf8zljVVFLT6a+Qh374cOjMSigPf1pbyEu6sEyyG/6BcM30ZelEUZc22/b4hc1CgoOLyGrkTX1faLpalR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Lxqm/R71; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3a548a73ff2so6010855f8f.0
-        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 03:57:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1751453853; x=1752058653; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=G1Fm2q1qB6Y+ckuWV69fHpAi4zNbor+5BGrf65Mmqog=;
-        b=Lxqm/R71/qlMDJ0eVPjPMCiMWcyRwVJq+DsfxJBR3A/Zyq9stlGs2NCPVV66goGmZ+
-         mGxDjmYDSO8FXJI3ByzarZvm5+3H+pO/eDuaThx9UWH5zGErhl4ZvBTwf4fbm21RtSZJ
-         pkGIizRtBhsrvw0SuS9fE3oGn2a1m83Nyl6Bqrtgf+s7dPg+NaexUVjV0tyQkTVY45PT
-         szz0fZOxvhNwSVTGvog8IY7uyRe3gZIWjpFthWx+XFeEa/EKlra6sLMbSgIVpxDiXxB5
-         eVgyYe+Hs0Rrl+mF2uZfiS4PFTSFYPqTlNRwYQ/nmPDkAvlw3XnyrSzjHcOutUyEVbpC
-         CKyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751453853; x=1752058653;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G1Fm2q1qB6Y+ckuWV69fHpAi4zNbor+5BGrf65Mmqog=;
-        b=NGrJsAoN946UOnE4zBGf/MxrKvr9DGzJT8GZmHwdXb9TSWv27TC9jWcDpdwq9rScaB
-         kWED3oSMEHfO1nKxwPEemDSrVjoSJVbOZmRCk1s2UIqncvoqoGvGHXM/EDfSWzb59Kd9
-         bGJCoeQ5hmvSwcDOcpU3+BdEoizLXqSDPzcXhQdwOkvQey/eWBQcXZVGUrKTk5zcri1l
-         HDFjNJDETiPOlVAhFzDEbwgHkqFcikayYKPnkBZmnQy80dO/GeacE723KumQXNCJIo01
-         QhMWnSJJCGpTtorHRT3zbiJadWyG/Nl2UJ5CtXhDIDBv+qrE9qXjcA2WLUlod4fRdk8f
-         u6ZA==
-X-Gm-Message-State: AOJu0YyUrt6y7IMjvdzCS1Xv6cnNLUfm0FAl1KLrgWZ2jz1WugbVEOzj
-	TSlvKRVej3doGE6rcCEzcwLBgaXHiXKDDOAe580v5K7AZzKSHIgxQ+7WCx/IT0lmeeM=
-X-Gm-Gg: ASbGncsqIla91XfEmPBIGGmtLTCGgDyfb0LXVbf9qKYRU8iul95RITxO8tQ9MXCWE89
-	d0b1RovwsD2AKiC+ukTXuIXWdoZsQycSEyXl9/iM9DnKkJBAySxta0jjdstV7EMmLycAJ2VOb2y
-	aJPsfLRJeivRl6VE5HzCuvr3/wlgQJ3cAg1yZK5KnT/YdqVqnoX0b9QvjOI+Itjsn4/Xfhr+qXH
-	VIAxOX3MdoAmOF1CRBV79Ywp2CFOXGJilJKfCCLz7LSTYyMlHI2n58Eg9cmt68ZEP2ttLpfBbgi
-	JepDaBOT+QCooE6Fkwq8iT0BLycncEsNS/ESJVt58Fa1eqQs1VRfGJRGl5qK/UFGk2xRXg==
-X-Google-Smtp-Source: AGHT+IEDVTtMFy2hu992Zcq7801L2H6bIzfHs2qeo81vyzxGHZtPy+ypN/+AhlS2RlBfT5PUx2bs3Q==
-X-Received: by 2002:a05:6000:21c4:b0:3a5:8abe:a264 with SMTP id ffacd0b85a97d-3b2001ac737mr1267473f8f.37.1751453852634;
-        Wed, 02 Jul 2025 03:57:32 -0700 (PDT)
-Received: from jiri-mlt ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4538f2fec5fsm173817385e9.40.2025.07.02.03.57.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 03:57:32 -0700 (PDT)
-Date: Wed, 2 Jul 2025 12:57:22 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, 
-	Prathosh Satish <Prathosh.Satish@microchip.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Shannon Nelson <shannon.nelson@amd.com>, Dave Jiang <dave.jiang@intel.com>, 
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>, 
-	Petr Oros <poros@redhat.com>
-Subject: Re: [PATCH net-next v12 09/14] dpll: zl3073x: Register DPLL devices
- and pins
-Message-ID: <ne36b7ky5cg2g3juejcah7bnvsajihncmpzag3vpjnb3gabz2m@xtxhpfhvfmwl>
-References: <20250629191049.64398-1-ivecera@redhat.com>
- <20250629191049.64398-10-ivecera@redhat.com>
+	s=arc-20240116; t=1751454059; c=relaxed/simple;
+	bh=DQjJaWggkDldRXpnrzmlwAeI4HspU8YUVeQ5IGyGpXs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YN0qmN+vLskiujflcD9ylHBYgzxzD8Bbc+1+JtnvzmozCjjtBFQYl5/kGl4FgnWZsxW0OCGbIuVN4AVGULyKyN0/+jn801Imal9+x/ph6T/YHgfOrjthKqN7BSz3ZQE/SbtQmhlnAZ56t17F3oVufwl6eCPN/alhyoUkjEWlNkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ACYiH2LO; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751454055;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Em9twcR+6cbawRA6c6xlT0XjWyczg2tC6QjmlON7lJ0=;
+	b=ACYiH2LOHWTn6ClU+LKjJ9r3mVs/uw/aRlI7QRFNpBnTz7BDA0RX5tJA2Niz2FN1I+Jgj6
+	+i7Kgo8M1AvztvD55mPnc7dEQXNb2jZ5lez8jDvKZhquI6QcwPgOiKhYSoC9hiMn66a1qF
+	OORbLU0Pal1JG6Ve8ZMIvnpMzw4Wuf4=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org
+Cc: mrpre@163.com,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Eric Dumazet <edumazet@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v1] tcp: Correct signedness in skb remaining space calculation
+Date: Wed,  2 Jul 2025 19:00:38 +0800
+Message-ID: <20250702110039.15038-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250629191049.64398-10-ivecera@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Sun, Jun 29, 2025 at 09:10:44PM +0200, ivecera@redhat.com wrote:
+The calculation for the remaining space, 'copy = size_goal - skb->len',
+was prone to an integer promotion bug that prevented copy from ever being
+negative.
 
-[...]
+The variable types involved are:
+copy: ssize_t (long)
+size_goal: int
+skb->len: unsigned int
 
->+/**
->+ * zl3073x_dpll_device_register - register DPLL device
->+ * @zldpll: pointer to zl3073x_dpll structure
->+ *
->+ * Registers given DPLL device into DPLL sub-system.
->+ *
->+ * Return: 0 on success, <0 on error
->+ */
->+static int
->+zl3073x_dpll_device_register(struct zl3073x_dpll *zldpll)
->+{
->+	struct zl3073x_dev *zldev = zldpll->dev;
->+	u8 dpll_mode_refsel;
->+	int rc;
->+
->+	/* Read DPLL mode and forcibly selected reference */
->+	rc = zl3073x_read_u8(zldev, ZL_REG_DPLL_MODE_REFSEL(zldpll->id),
->+			     &dpll_mode_refsel);
->+	if (rc)
->+		return rc;
->+
->+	/* Extract mode and selected input reference */
->+	zldpll->refsel_mode = FIELD_GET(ZL_DPLL_MODE_REFSEL_MODE,
->+					dpll_mode_refsel);
+Due to C's type promotion rules, the signed size_goal is converted to an
+unsigned int to match skb->len before the subtraction. The result is an
+unsigned int.
 
-Who sets this?
+When this unsigned int result is then assigned to the s64 copy variable,
+it is zero-extended, preserving its non-negative value. Consequently,
+copy is always >= 0.
 
+The intended logic is that a negative copy value indicates that the tail
+skb lacks sufficient space for appending new data, which should trigger
+the allocation of a new skb. Because of this bug, the condition copy <= 0
+was never met, causing the code to always append to the tail skb.
 
->+	zldpll->forced_ref = FIELD_GET(ZL_DPLL_MODE_REFSEL_REF,
->+				       dpll_mode_refsel);
->+
->+	zldpll->dpll_dev = dpll_device_get(zldev->clock_id, zldpll->id,
->+					   THIS_MODULE);
->+	if (IS_ERR(zldpll->dpll_dev)) {
->+		rc = PTR_ERR(zldpll->dpll_dev);
->+		zldpll->dpll_dev = NULL;
->+
->+		return rc;
->+	}
->+
->+	rc = dpll_device_register(zldpll->dpll_dev,
->+				  zl3073x_prop_dpll_type_get(zldev, zldpll->id),
->+				  &zl3073x_dpll_device_ops, zldpll);
->+	if (rc) {
->+		dpll_device_put(zldpll->dpll_dev);
->+		zldpll->dpll_dev = NULL;
->+	}
->+
->+	return rc;
->+}
+Fixes: 270a1c3de47e ("tcp: Support MSG_SPLICE_PAGES")
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+---
+ net/ipv4/tcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-[...]
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 8a3c99246d2e..ed942cd17351 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -1180,7 +1180,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
+ 
+ 		skb = tcp_write_queue_tail(sk);
+ 		if (skb)
+-			copy = size_goal - skb->len;
++			copy = size_goal - (ssize_t)skb->len;
+ 
+ 		trace_tcp_sendmsg_locked(sk, msg, skb, size_goal);
+ 
+-- 
+2.47.1
+
 
