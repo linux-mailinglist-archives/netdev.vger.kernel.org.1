@@ -1,97 +1,88 @@
-Return-Path: <netdev+bounces-203522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04BA1AF6463
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 23:50:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A63FAF646C
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 23:55:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3DEE523AE1
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 21:50:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A9FD170A1D
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 21:55:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D55324418D;
-	Wed,  2 Jul 2025 21:49:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC32241122;
+	Wed,  2 Jul 2025 21:55:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SzUkN8LU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aKYC5LkU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67EDB242D84
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 21:49:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 168CE23D2B4;
+	Wed,  2 Jul 2025 21:55:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751492990; cv=none; b=NZtVQFI+xaWJNCt8sjTW748waYQ2jrELMTUnQfww5xLAfmTsHHLlzHgXOODY21+QUSzGad0xZHH5Sde3f62HeKh22Y1UOXm6VtykDIPilblVeSpCtFJl+9Kj+mwen/hl/6TFiBmAfkkfkTDQ8EI13wwSirfNnJH6nvGpDoEYc9g=
+	t=1751493338; cv=none; b=CkI+k05WzKhoYb+sk2b/yD4wstKWaCsWwpTXRfXEkhI7fm6Bzj2mxWuuc4RH3hRFiX3WAnKlDQys3HyslbAFxyqhuA2DerK1cWR/KJQ9ysLzTGX8HtibNXfj1BUWjTNshtQbxJ+atUnpdoZ7x6Yp5PzSEb6ondE5sm4XJCnsHXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751492990; c=relaxed/simple;
-	bh=OCa2o+c8VjyxJ2s+GyfQFsyRKEx209cXGEDt7nnFU+A=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=utdugmdX25kPYoONK+D5/9ymDtxZDY2HAZ4XqUlg1LHBJ8AgIT9ATxm2tTkCDdaEhWcm6EJQV2AawfthsF7zk4k3p3ZWBFUMLHYH9AryCj1cmqfQvijA9dX3wHTAPbrylF8OiiVgwPV+srOEgqZFtR69jn2jBb0BYyiOueijdUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SzUkN8LU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB570C4CEEE;
-	Wed,  2 Jul 2025 21:49:49 +0000 (UTC)
+	s=arc-20240116; t=1751493338; c=relaxed/simple;
+	bh=TapG3+JaLlTv1hF0CipdWOSnkgSHAbCyu7aPQb1n74A=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Gu3Dj6Ipr3A4G1ncd06N5sBWO+EYj2QJ82SlildvWQKuHbamiRAXVi5dbVBtMjRx7kt0uIWgTTGy09oMAU5DFR9vURG6GuFA0cI8wjRUnimA0ELrTB8qbO1LM/YY+5r/dWMePaSVu47PUazxjzhGTNFSGnuRW4V9JKxsfZn31Cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aKYC5LkU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38196C4CEE7;
+	Wed,  2 Jul 2025 21:55:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751492990;
-	bh=OCa2o+c8VjyxJ2s+GyfQFsyRKEx209cXGEDt7nnFU+A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SzUkN8LUloYEzeWqfS22/JAcJFmoqtCKLHgKdweBWIjD9kTUhgcHK+eVbQlygi+9Q
-	 yJYXpf46H7Sv/2uW1bugZ9I/PUsIF2RMY9aMcrz7dsxzGBnZJFJDIcnRuvVY6A6INk
-	 Em0ZrxnK8kJI+6LZ37Gkv5SVlIEe4mnV8d5Z+G3NOE4QJvI4QE07/pQv3V361LHmb1
-	 DeLztSWwscwMRYgUswAl5oRAHP3bZN1vRcCJpGiSuFaGoQRGEdMQbvA6XlfUmFgIT5
-	 Se+z8ADaqLyUYBTeV2i3aQ6W77RjxoSx4pbOEu5nZHK6T7WLdcfeuwVq9wBwGxejoG
-	 X1an6BuGsmz0g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDF1383B273;
-	Wed,  2 Jul 2025 21:50:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1751493337;
+	bh=TapG3+JaLlTv1hF0CipdWOSnkgSHAbCyu7aPQb1n74A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aKYC5LkUwDX0ykRw+wH6my9oyimuCO1OZjbJt0g8xasmWSinrremCDfRc2DC+KQnc
+	 ZqXa2IwgSqZUIU54nNFmTdIapgPZhD9uJxZ4xPC+r7daG7LYS4xuenzz/sW2GSc325
+	 alyftUM37JYPz4yikS6b4mjQLui/IbNF7scw/0uNAnlk388mAGj4cHjvaG+wFcggOy
+	 WpNqE9PHCzX8xZNBhcnUZYWuVfWGwl3efgYL5mHblAf9PPt9RGRW27E2RKqhun6hBL
+	 m0Y7gMibVBcxTaWk51ndRl4JQswWfXTZhhqDMEYyn1tBq8b/txyBTRxaNwbvgdtDuy
+	 aCXL1GaiZZ0Cg==
+Date: Wed, 2 Jul 2025 14:55:36 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jeongjun Park <aha310510@gmail.com>
+Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] ptp: remove unnecessary mutex lock in
+ ptp_clock_unregister()
+Message-ID: <20250702145536.08a6aa7a@kernel.org>
+In-Reply-To: <20250701170353.7255-1-aha310510@gmail.com>
+References: <20250701170353.7255-1-aha310510@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net/sched: Always pass notifications when child class
- becomes
- empty
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175149301450.875317.4500699769123962307.git-patchwork-notify@kernel.org>
-Date: Wed, 02 Jul 2025 21:50:14 +0000
-References: <d912cbd7-193b-4269-9857-525bee8bbb6a@gmail.com>
-In-Reply-To: <d912cbd7-193b-4269-9857-525bee8bbb6a@gmail.com>
-To: Lion Ackermann <nnamrec@gmail.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com,
- jhs@mojatatu.com, victor@mojatatu.com, mincho@theori.io
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 30 Jun 2025 15:27:30 +0200 you wrote:
-> Certain classful qdiscs may invoke their classes' dequeue handler on an
-> enqueue operation. This may unexpectedly empty the child qdisc and thus
-> make an in-flight class passive via qlen_notify(). Most qdiscs do not
-> expect such behaviour at this point in time and may re-activate the
-> class eventually anyways which will lead to a use-after-free.
+On Wed,  2 Jul 2025 02:03:53 +0900 Jeongjun Park wrote:
+> ptp_clock_unregister() is called by ptp core and several drivers that
+> require ptp clock feature. And in this function, ptp_vclock_in_use()
+> is called to check if ptp virtual clock is in use, and
+> ptp->is_virtual_clock, ptp->n_vclocks are checked.
 > 
-> The referenced fix commit attempted to fix this behavior for the HFSC
-> case by moving the backlog accounting around, though this turned out to
-> be incomplete since the parent's parent may run into the issue too.
-> The following reproducer demonstrates this use-after-free:
+> It is true that you should always check ptp->is_virtual_clock to see if
+> you are using ptp virtual clock, but you do not necessarily need to
+> check ptp->n_vclocks.
 > 
-> [...]
+> ptp->n_vclocks is a feature need by ptp sysfs or some ptp cores, so in
+> most cases, except for these callers, it is not necessary to check.
+> 
+> The problem is that ptp_clock_unregister() checks ptp->n_vclocks even
+> when called by a driver other than the ptp core, and acquires
+> ptp->n_vclocks_mux to avoid concurrency issues when checking.
+> 
+> I think this logic is inefficient, so I think it would be appropriate to
+> modify the caller function that must check ptp->n_vclocks to check
+> ptp->n_vclocks in advance before calling ptp_clock_unregister().
 
-Here is the summary with links:
-  - net/sched: Always pass notifications when child class becomes empty
-    https://git.kernel.org/netdev/net/c/103406b38c60
-
-You are awesome, thank you!
+Please repost this and CC Vladimir.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
