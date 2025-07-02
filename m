@@ -1,195 +1,164 @@
-Return-Path: <netdev+bounces-203097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3FB7AF081F
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 03:44:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68F0EAF0827
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 03:55:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15182188398B
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 01:44:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C2511C04047
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 01:55:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E7254758;
-	Wed,  2 Jul 2025 01:43:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4qjUMay8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5268815747D;
+	Wed,  2 Jul 2025 01:55:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FCDE134CB
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 01:43:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A190F3C26
+	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 01:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751420638; cv=none; b=YQsPDLJ0vFLo9g/41t5/uCfiKXjV3+LhBhmLCd0I0sHRYn/COprFerYwwd4oY/Qg5i6crPxWAliMEY9tWbMa2wkkKRAuH01WZ2leSvK7D9uEPfqHyXCAmOrb5rI8XvboJTupOBqU0c30ICCzWuF0ffwkJOZf+R+tR7bz00LF2qg=
+	t=1751421331; cv=none; b=b1wVyKZ7CEHE611tRa1I0g36Uq8jkRe9DdPpF9vplOyC/80X2S8WHEW3Azol1X+hf3TrryM7WA4t5Arc4Ro7pnBFO4RPPFGolZHLqxYmRoKg+GTVAmbBlzAEZCXZWzcNyj7bzse4U0T2L2iDAS4GcNx993dHJjquok3/EfJub08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751420638; c=relaxed/simple;
-	bh=aXMltUif3/Tt0bzSuk/GyhAmdMlJxITxE0Hg378kuYI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=byGj08vPwguwhPcQ/cn2QGWwef1NokswlvAKytQ3jOJTjDtgW5tTC3vH+f3sAXI2lhWieQwvsD3/oa1Km2gKcKMPtcM1q8jUKoqyfbmdLwQbSxnkirzwwzMWpRUxjOZeQrUPre2PaJRPiUNRmAtpON/QVPSatvJHq7GvxWaKsX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4qjUMay8; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-74b537e8d05so76882b3a.3
-        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 18:43:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751420636; x=1752025436; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QNW4tMnWCcpcJB/iAL3iBGg/d0YW5C8bj3zT9ZX4CLc=;
-        b=4qjUMay8gMhM5rJP+yvyEbs3DfloNJr1AedKKMJ0e2NKqwOMEONn8xsfrs2/PAb0Zr
-         llqZkW0OUNUvpbtQm0BPRktsny9IxtQAGnk3xJf752cHO7sQR1C2r5A6zppJk5wroZbd
-         a80t5/bG9vEDpFA+8TO1vAspgGHxLGn3tvu42fxLyTOZCsVKAOeOZS1dCfqPY4iawjg7
-         Q/4lvId19MLTumgdRLF2cki4jkZmyqR2CXsFqnLdnLBuGtkZ73Dfwtd+BVkrsodD2Bwq
-         ACenLnNu9rNvccc5DG0nHXDda1H5Zj+kRyPAwFg+yS0Wc1v1p9uBYjaV05ZC4UBM+OqN
-         YI5w==
+	s=arc-20240116; t=1751421331; c=relaxed/simple;
+	bh=wU0uAqSERWaULjgXjCPjSAo+g9aZqdrRoNycpKfVcFg=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ikYxre9iFspVMDhnJSrOmJrrLj2RPKvptlb5t2K+wm+WirWytyD3bmMXWJjZmabY/OEuDCqD3qcHswwE7671WO5zJxz3Oo+7MOK4pThOUnqFn6qCY+jAQW3v3OxerDF+HtwJiuA0IAPNQtEdTqQohNfwFAuTFVS7xKrZXQaF2ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3df6030ea24so32132245ab.3
+        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 18:55:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751420636; x=1752025436;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=1e100.net; s=20230601; t=1751421329; x=1752026129;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=QNW4tMnWCcpcJB/iAL3iBGg/d0YW5C8bj3zT9ZX4CLc=;
-        b=CUEi4NL0LhkyHm7P64kgpWsc5pqG6UBvShagCKzggUQ1tnkUgA4uhy2oEqoFyou9Ku
-         NnX7AyCMmAcKpigX8vnqr4CYJI/fbiywVaRkkeTSrKYkUW09x7caCuWA3Y/NI0Fs+ncT
-         dGBFZiI5uQ2POR0tKloWkC4BC4gs9AL/f3L4S7Xdozll2dh1plCGWrdno37o/W8cfrrp
-         ToReMTP+tjOD5n5e0eaM8LfJqJfiTMzpxty92mLh9BkQnLzWI+a91rv7FknZ9CNRj0VR
-         AJzyZ8HR+ZGNNnO9jmUJU+7ZJbp/TvknfBdbxjsUbNaXoBIGoOWqBd+JKhlcgp5R+uSk
-         eDhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVjVpu0hAmk70uxRJe1Id++rkmPHm/9PVbXHzD0/HJ7X/0xmdgOpoWEd8gUx7i+jW4BffuvrDk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx73n09+j1gZ3mGy+EeEXtw3z2bQOH2CGAJpSk0aP9OzSu6VDsy
-	/rbSyL+cr9/pRDvCsEdqZzxbi3joNAu3q1nEiPwgaTsY39NkUzDTYy23TyjmIlw+kDxZPFnG3jH
-	qH2r0ZQ==
-X-Google-Smtp-Source: AGHT+IEMHVUL5aM4Xq8RS+pZ7XWnytgDkzFbRxqgLgnA/m9aLixIyklKd1j8FCUSszzE2yUOGAWznMOSs5Y=
-X-Received: from pgac24.prod.google.com ([2002:a05:6a02:2958:b0:b2c:4fb0:bc64])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:748f:b0:1f5:619a:7f4c
- with SMTP id adf61e73a8af0-222d7f06890mr2089192637.29.1751420635804; Tue, 01
- Jul 2025 18:43:55 -0700 (PDT)
-Date: Wed,  2 Jul 2025 01:43:40 +0000
+        bh=Onkd7o2/cbYDMjrYISpEERTdApVmoTNyGmJeUEY8dmQ=;
+        b=Wq4ItFL5WTWLHJKDBcKtE4v7akmlU05er3HJ+Xjo4kdEitKOAnYcus7HrpsQ1KkOIz
+         ye9C86ObzjbBZlg7T4P0gTKDoWduzT/XhPU/fts3SKbvTpLG7ObsRbQs5gWZO5TVbeIj
+         q0hxi4vn4EKxxZNlkv/jX9bhGLDpqnDwgFikynDCGhbzXqHEQSuHmdjyA67n1ulVls2n
+         +2XLTh0bTRforUi24fziThurUeUsN8HbIPSLXoKlLcZloOFOLJDgL09RKmL7j5jr6mKz
+         jihP08jSGpnLRFS9M0L6xtYnuv5TR/8osdxZNMoYNq62TIMymqq4X7WhHQshO+tLR1vw
+         W2EQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUV1Z0paYf8DimpwBQe8YmTIto6uxhNur6gIxig0IAW2vszGM/XG1eCKkOrzGE5I3qEhX1e0aQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkITUBK7tyXwAM0IfN0lXOQ5Mma5YCL7KlJiAFysoG5c5gNyrm
+	b03U121gkt8MkZ7ov8NwGu0WE3Aypv6Mvw4E06dpB+f74KrDpLix/OAKPh8BVOlokdSscekh+OK
+	ZhDDOdQxrDST+lPCKFocRgvydOJScfGk6IRyQadKYQe6Aunpc04oIW6Yudzo=
+X-Google-Smtp-Source: AGHT+IFa3zsLyTqW3kgAZxNJiDIQLEEbhCgdLAPhixNbMJut/f3gvntmA0vV6ufE60CJpZSMtIh/M46gkrgUX93m6f/fgdjUqFtT
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250702014350.692213-1-kuniyu@google.com>
-Subject: [PATCH v1 net] tipc: Fix use-after-free in tipc_conn_close().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Jon Maloy <jmaloy@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Ying Xue <ying.xue@windriver.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	tipc-discussion@lists.sourceforge.net, 
-	syzbot+d333febcf8f4bc5f6110@syzkaller.appspotmail.com
+MIME-Version: 1.0
+X-Received: by 2002:a92:cd84:0:b0:3df:3ad6:bfb2 with SMTP id
+ e9e14a558f8ab-3e0549c756amr14437125ab.17.1751421328864; Tue, 01 Jul 2025
+ 18:55:28 -0700 (PDT)
+Date: Tue, 01 Jul 2025 18:55:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68649190.a70a0220.3b7e22.20e8.GAE@google.com>
+Subject: [syzbot] [bpf?] WARNING in reg_bounds_sanity_check
+From: syzbot <syzbot+c711ce17dd78e5d4fdcf@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yonghong.song@linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-syzbot reported a null-ptr-deref in tipc_conn_close() during netns
-dismantle. [0]
+Hello,
 
-tipc_topsrv_stop() iterates tipc_net(net)->topsrv->conn_idr and calls
-tipc_conn_close() for each tipc_conn.
+syzbot found the following issue on:
 
-The problem is that tipc_conn_close() is called after releasing the
-IDR lock.
+HEAD commit:    cce3fee729ee selftests/bpf: Enable dynptr/test_probe_read_..
+git tree:       bpf-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=147793d4580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=79da270cec5ffd65
+dashboard link: https://syzkaller.appspot.com/bug?extid=c711ce17dd78e5d4fdcf
+compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1594e48c580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1159388c580000
 
-At the same time, there might be tipc_conn_recv_work() running and it
-could call tipc_conn_close() for the same tipc_conn and release its
-last ->kref.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/f286a7ef4940/disk-cce3fee7.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e2f2ebe1fdc3/vmlinux-cce3fee7.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/6e3070663778/bzImage-cce3fee7.xz
 
-Once we release the IDR lock in tipc_topsrv_stop(), there is no
-guarantee that the tipc_conn is alive.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c711ce17dd78e5d4fdcf@syzkaller.appspotmail.com
 
-Let's hold the ref before releasing the lock and put the ref after
-tipc_conn_close() in tipc_topsrv_stop().
-
-[0]:
-BUG: KASAN: use-after-free in tipc_conn_close+0x122/0x140 net/tipc/topsrv.c:165
-Read of size 8 at addr ffff888099305a08 by task kworker/u4:3/435
-
-CPU: 0 PID: 435 Comm: kworker/u4:3 Not tainted 4.19.204-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: netns cleanup_net
+------------[ cut here ]------------
+verifier bug: REG INVARIANTS VIOLATION (false_reg1): range bounds violation u64=[0x0, 0x0] s64=[0x0, 0x0] u32=[0x1, 0x0] s32=[0x0, 0x0] var_off=(0x0, 0x0)(1)
+WARNING: CPU: 1 PID: 5833 at kernel/bpf/verifier.c:2688 reg_bounds_sanity_check+0x6e6/0xc20 kernel/bpf/verifier.c:2682
+Modules linked in:
+CPU: 1 UID: 0 PID: 5833 Comm: syz-executor346 Not tainted 6.16.0-rc3-syzkaller-gcce3fee729ee #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
+RIP: 0010:reg_bounds_sanity_check+0x6e6/0xc20 kernel/bpf/verifier.c:2682
+Code: 24 20 4c 8b 44 24 60 4c 8b 4c 24 58 41 ff 75 00 53 41 57 55 ff 74 24 38 ff 74 24 70 ff 74 24 40 e8 8f 86 aa ff 48 83 c4 38 90 <0f> 0b 90 90 48 bb 00 00 00 00 00 fc ff df 4d 89 f7 4c 8b 74 24 08
+RSP: 0018:ffffc90003f6ec08 EFLAGS: 00010282
+RAX: 2c2acf8a45b1bf00 RBX: 0000000000000000 RCX: ffff888029235a00
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000002
+RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000004
+R10: dffffc0000000000 R11: fffffbfff1bfaa04 R12: ffff888025056000
+R13: ffff888025056020 R14: ffff888025056038 R15: 0000000000000000
+FS:  00005555860e1380(0000) GS:ffff888125d4d000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00002000002a1000 CR3: 00000000749a0000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x1fc/0x2ef lib/dump_stack.c:118
- print_address_description.cold+0x54/0x219 mm/kasan/report.c:256
- kasan_report_error.cold+0x8a/0x1b9 mm/kasan/report.c:354
- kasan_report mm/kasan/report.c:412 [inline]
- __asan_report_load8_noabort+0x88/0x90 mm/kasan/report.c:433
- tipc_conn_close+0x122/0x140 net/tipc/topsrv.c:165
- tipc_topsrv_stop net/tipc/topsrv.c:701 [inline]
- tipc_topsrv_exit_net+0x27b/0x5c0 net/tipc/topsrv.c:722
- ops_exit_list+0xa5/0x150 net/core/net_namespace.c:153
- cleanup_net+0x3b4/0x8b0 net/core/net_namespace.c:553
- process_one_work+0x864/0x1570 kernel/workqueue.c:2153
- worker_thread+0x64c/0x1130 kernel/workqueue.c:2296
- kthread+0x33f/0x460 kernel/kthread.c:259
- ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:415
+ <TASK>
+ reg_set_min_max+0x264/0x300 kernel/bpf/verifier.c:16262
+ check_cond_jmp_op+0x159b/0x2910 kernel/bpf/verifier.c:16705
+ do_check_insn kernel/bpf/verifier.c:19882 [inline]
+ do_check+0x665b/0xe080 kernel/bpf/verifier.c:20017
+ do_check_common+0x188f/0x23f0 kernel/bpf/verifier.c:23180
+ do_check_main kernel/bpf/verifier.c:23263 [inline]
+ bpf_check+0x10252/0x1a5d0 kernel/bpf/verifier.c:24619
+ bpf_prog_load+0x1318/0x1930 kernel/bpf/syscall.c:2972
+ __sys_bpf+0x5f1/0x860 kernel/bpf/syscall.c:5978
+ __do_sys_bpf kernel/bpf/syscall.c:6085 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:6083 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6083
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f37dffe23a9
+Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff6bb80468 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007fff6bb80648 RCX: 00007f37dffe23a9
+RDX: 0000000000000045 RSI: 00002000002a0fb8 RDI: 0000000000000005
+RBP: 00007f37e0055610 R08: 0000000000000000 R09: 0000000000000000
+R10: ffffffffffffffff R11: 0000000000000246 R12: 0000000000000001
+R13: 00007fff6bb80638 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
 
-Allocated by task 23:
- kmem_cache_alloc_trace+0x12f/0x380 mm/slab.c:3625
- kmalloc include/linux/slab.h:515 [inline]
- kzalloc include/linux/slab.h:709 [inline]
- tipc_conn_alloc+0x43/0x4f0 net/tipc/topsrv.c:192
- tipc_topsrv_accept+0x1b5/0x280 net/tipc/topsrv.c:470
- process_one_work+0x864/0x1570 kernel/workqueue.c:2153
- worker_thread+0x64c/0x1130 kernel/workqueue.c:2296
- kthread+0x33f/0x460 kernel/kthread.c:259
- ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:415
 
-Freed by task 23:
- __cache_free mm/slab.c:3503 [inline]
- kfree+0xcc/0x210 mm/slab.c:3822
- tipc_conn_kref_release net/tipc/topsrv.c:150 [inline]
- kref_put include/linux/kref.h:70 [inline]
- conn_put+0x2cd/0x3a0 net/tipc/topsrv.c:155
- process_one_work+0x864/0x1570 kernel/workqueue.c:2153
- worker_thread+0x64c/0x1130 kernel/workqueue.c:2296
- kthread+0x33f/0x460 kernel/kthread.c:259
- ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:415
-
-The buggy address belongs to the object at ffff888099305a00
- which belongs to the cache kmalloc-512 of size 512
-The buggy address is located 8 bytes inside of
- 512-byte region [ffff888099305a00, ffff888099305c00)
-The buggy address belongs to the page:
-page:ffffea000264c140 count:1 mapcount:0 mapping:ffff88813bff0940 index:0x0
-flags: 0xfff00000000100(slab)
-raw: 00fff00000000100 ffffea00028b6b88 ffffea0002cd2b08 ffff88813bff0940
-raw: 0000000000000000 ffff888099305000 0000000100000006 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff888099305900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888099305980: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff888099305a00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                      ^
- ffff888099305a80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888099305b00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-
-Fixes: c5fa7b3cf3cb ("tipc: introduce new TIPC server infrastructure")
-Reported-by: syzbot+d333febcf8f4bc5f6110@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=27169a847a70550d17be
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/tipc/topsrv.c | 2 ++
- 1 file changed, 2 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/tipc/topsrv.c b/net/tipc/topsrv.c
-index 8ee0c07d00e9..ffe577bf6b51 100644
---- a/net/tipc/topsrv.c
-+++ b/net/tipc/topsrv.c
-@@ -704,8 +704,10 @@ static void tipc_topsrv_stop(struct net *net)
- 	for (id = 0; srv->idr_in_use; id++) {
- 		con = idr_find(&srv->conn_idr, id);
- 		if (con) {
-+			conn_get(con);
- 			spin_unlock_bh(&srv->idr_lock);
- 			tipc_conn_close(con);
-+			conn_put(con);
- 			spin_lock_bh(&srv->idr_lock);
- 		}
- 	}
--- 
-2.50.0.727.gbf7dc18ff4-goog
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
