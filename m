@@ -1,123 +1,122 @@
-Return-Path: <netdev+bounces-203089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E85A9AF07CD
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 03:12:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CA404AF07D4
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 03:18:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D13754252F1
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 01:11:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE1E7424C8F
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 01:18:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA0B13B298;
-	Wed,  2 Jul 2025 01:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB58E39FCE;
+	Wed,  2 Jul 2025 01:18:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lgcS+X/F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IvoeSzGM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E2E1C6B4
-	for <netdev@vger.kernel.org>; Wed,  2 Jul 2025 01:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF7B3C30;
+	Wed,  2 Jul 2025 01:18:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751418733; cv=none; b=k7T9Tiqr5hc1bZ94xMwvyhC5cshS4nRKOfBhbL1UJrYY7vXmIRGEMHD8z0gWxwzp37fGApqV7hUDoJuEbyn8hfbsU/hDcMaiNwuCUFS/zqvqZwuUR+eA2aOHTdzs+eacpOY3BuEtMEaiyPHE14lftX5wlp2qSJ4p5EAOGtzvtMQ=
+	t=1751419124; cv=none; b=PAJjm1cBr5hoa61/DeMzmmGy8rmOMV1PZuVUMjBNx9UiTpEHTB6BZ41JuRNAUNPvfxbF9/ekNFfxvT1dPD1jgninnLWFN2Eq8kJ8V7Z+fx4mZU5YFWRzF2SLve+38fld9NOprMMkrB9P4KbotoDpB4h4u7kiAM9cXWQzYRszEDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751418733; c=relaxed/simple;
-	bh=tIHpRxPr6KrTjv+tRpSrdHkAL1h2W7zDf93K8Y5Jf4M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eU5Hk5O5+5znti5i5IWkSTEMWG+SL0H0AkX4EFDTeUzEm26QPXxvfnx+YLC1UCvHp7TixbkB+fSb+9XNmrgpCKPbFvSuu4+5ZDiIYa559+2cm7gzu69YUaHPPDEJTjnNjTzuMePxWclt5cQ+t7WjOtnqpkT7+8n7Sn2L1cm+DW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lgcS+X/F; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3dc9e7d10bdso12546245ab.2
-        for <netdev@vger.kernel.org>; Tue, 01 Jul 2025 18:12:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751418731; x=1752023531; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=40Ol6OgS1IWwtBlLR+q+C5SHoZRjfsmd6m18u528RnI=;
-        b=lgcS+X/FaEHPV9Iq9oQfUJxTuj4Tc3V0tPsubw3nY8z7Dhpdh062IsdokfheRJUaXG
-         0iaDYxyX0ghp2PJUdbmSaHveFiqo+tNBVd/jJLbWO7bTAO9Fe3spm2tiAICS59UWkBKY
-         q6cJF5zYOPpM7Y8CqiU3Z7Pd/L/UqHRv8pc2jGP37DSCSNaw8YizWk+aA2en5ERjwSqY
-         26ycX0lsP1vu9NbZvTY9xbY/KDTbNDCa/wZGcXWGWwnZxdjoYI5dVrECW6w77FETog4V
-         iPOKsa5kuLadhiRAW1G9fo8FmcMPMa4CfgE3lIsTNT1WQZ7s0YTyNpu0lUzQSt3L+5s2
-         8m8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751418731; x=1752023531;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=40Ol6OgS1IWwtBlLR+q+C5SHoZRjfsmd6m18u528RnI=;
-        b=xE+b4o1mDQziVXy933MXS0FIn4eF4yuNJcJOo9GkDpYMC8013IsGRZqjfctJIiN7y4
-         eqTcIgi8QbNqZ06ip+TQjtY9lOxCm/NASx7dW959Axnhl2FEJIESypQaqL14wDAAdheV
-         P0fWKV8TvgDBfOnxHPUVD5k0ijPJGpMwbbVaCfue4iIHz9jKroV2Nfco9GWiqv4mNGot
-         NP58SqQXGsJNb9nj8fJblS/wftNUOctEjpGT59k7xcnlbf8J0cNlxaV8q6W3eMEuelOs
-         zl2rmYpr9HYBjUNw5qBJxwb74U+ZY4SCRN+eUefj4kjJOZR2ePHeaFxAtlpPPCa0zUHg
-         0F3A==
-X-Forwarded-Encrypted: i=1; AJvYcCVd0lvOdQ3S9trwbTuHqP6ozmMYdFz3vb92Mai1RbSlkgk1c5FTlaJuLJky1b13YW9rmCkQSss=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/w2f5pCEbG07M0hXRZUa5JA5MajfoFg65Dw/NybwOLyo65E95
-	AXTFl6CMLW+6TydLWQdqhHLwRJQJbZT5ilUAXE0womIavJtL25HW9F8lQxOz2ABQJX9Z4io/ZL8
-	6I57THwg9x3cq7tugF1IL3NOQLELEhns=
-X-Gm-Gg: ASbGnctl90suBN994XXyWrpFbUdRWfJD792a+PGF2TWpDwFGJMzGzDT1od72V18PPR/
-	lQSki/uqajOt/L7qfAKEDJTYnkIcHNFGYJzFo/AjLf6Nqmn8McNX/bQkpJubOwPsPncT8v74KKl
-	+JykCdY1RiYskWIfZB3YFAAg8Ztoz4AO2ycSVIbd03uQ==
-X-Google-Smtp-Source: AGHT+IE2FWTAiyARTy92ULI6zk0pZxhNprq3g7ffe/o5i20QBzgD3keulA5+g65TXtPpJyhMwcVtp4vBRS1NRQOnWlI=
-X-Received: by 2002:a05:6e02:1c08:b0:3e0:546c:bdc3 with SMTP id
- e9e14a558f8ab-3e054ac7ddcmr10519975ab.11.1751418731035; Tue, 01 Jul 2025
- 18:12:11 -0700 (PDT)
+	s=arc-20240116; t=1751419124; c=relaxed/simple;
+	bh=Q3ZlQcXLusGO7or5b6gbAN76N6KRrX9bFVhn/AXPoDQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=tQk+3EIcjh8guQEXY+i6QVOtF+HZfDM0MpADhhXc23fN1LLu+nIhhUXMgZTsuiHk1+PlkxwhYsJ+ZYQWvfoPDuzP27SjFpd0jy3zWE2jkkzVgmo2xGIlRKR2sg8C5hUhJg/219R0dpwWJxW/lerGw1zhaXIq5GGD8KwqvKYD/GU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IvoeSzGM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1C881C4CEEB;
+	Wed,  2 Jul 2025 01:18:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751419124;
+	bh=Q3ZlQcXLusGO7or5b6gbAN76N6KRrX9bFVhn/AXPoDQ=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=IvoeSzGMjkbTzs0OeT9pXsMaTabkeloJwgX2wcUdGzxUBxcm35JbpaDV/P7Aev0Ko
+	 clmqIktb3nuNauaNRqv4wjxWTyPiUGyH0UQ3a3NwFI5Z5323Xx3wwDjVjKmKvae+DU
+	 ErraIGxYRnfNTaNjwApvEqdpODrO+2IEH0OD/zLCReh7RJmqOKo9MjX8++ByP7I1M8
+	 oTCqT1L6O5DDK1U2z2vRfWts3nuXSTKZ1XnoxULF5pwSX+5agAXcJNST2hb37u/vs/
+	 v1TiDnffzf23FO9VTF4eGb7x/vunKnnEAJI8Wz9vkJ6x661or9hAzGr7sJDmlyuh+v
+	 T+C4KwqvBy3+A==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08F31C7EE30;
+	Wed,  2 Jul 2025 01:18:44 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Date: Wed, 02 Jul 2025 09:18:42 +0800
+Subject: [PATCH] Bluetooth: hci_core: lookup pa sync need check BIG sync
+ state
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250629003616.23688-1-kerneljasonxing@gmail.com>
- <20250630110953.GD41770@horms.kernel.org> <CAL+tcoDUoPe05ZGhsoZX24MkaRZx=bRws+kY=MuEVQdy=3mM1A@mail.gmail.com>
- <20250701171501.32e77315@kernel.org> <CAL+tcoAfV+P3579_uM4mikMkNK4L2dMx0EuXNnTeLwZ3-7Po2Q@mail.gmail.com>
- <20250701175607.35f2a544@kernel.org> <CAL+tcoBu_jo5Nhv-4gRomwfOpN+Y_Ny+QJ6p1dk87gQ==YX-Mg@mail.gmail.com>
-In-Reply-To: <CAL+tcoBu_jo5Nhv-4gRomwfOpN+Y_Ny+QJ6p1dk87gQ==YX-Mg@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 2 Jul 2025 09:11:35 +0800
-X-Gm-Features: Ac12FXyU9J9F62qi7RmBzbm2j_CWwKOftedo0lVsOznd7zYkuj4WnV9DbHOClQQ
-Message-ID: <CAL+tcoA8+gGaOhAC4p743Ah9fVbmVwk8AT8zHH7SpFr2-pmm=A@mail.gmail.com>
-Subject: Re: [PATCH net] bnxt_en: eliminate the compile warning in
- bnxt_request_irq due to CONFIG_RFS_ACCEL
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, michael.chan@broadcom.com, 
-	pavan.chebbi@broadcom.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>, kernel test robot <lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250702-pa_sync-v1-1-7a96f5c2d012@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAPGIZGgC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDcwND3YLE+OLKvGRdo7Rk87RkyzRTS6NkJaDqgqLUtMwKsEnRsbW1AGv
+ pFS1ZAAAA
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Yang Li <yang.li@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1751419122; l=1160;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=GHF9U6GehkWVyzq0OzaU+JceT54aR44ovVM4Bx+2rpk=;
+ b=eXovFOziL0YnMbRRQ5YVkV12C93VSCnu6TecapyGQ2OjfXYA8mgRc/OPiy0TVXdTOs0FztD/E
+ qjG/4wvabekCKCj+qnJaf73QtkMQbVoB6oNjkiZn2XkfU256Ep1Eq37
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-On Wed, Jul 2, 2025 at 9:07=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.co=
-m> wrote:
->
-> On Wed, Jul 2, 2025 at 8:56=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
-> >
-> > On Wed, 2 Jul 2025 08:47:08 +0800 Jason Xing wrote:
-> > > >  static int bnxt_request_irq(struct bnxt *bp)
-> > > >  {
-> > > > +       struct cpu_rmap *rmap =3D NULL;
-> > > >         int i, j, rc =3D 0;
-> > > >         unsigned long flags =3D 0;
-> > > > -#ifdef CONFIG_RFS_ACCEL
-> > > > -       struct cpu_rmap *rmap;
-> > > > -#endif
-> > >
-> > > Sorry, Jakub. I failed to see the positive point of this kind of
-> > > change comparatively.
-> >
-> > Like Simon said -- fewer #ifdefs leads to fewer bugs of this nature.
->
-> Agree on this point.
->
-> > Or do you mean that you don't understand how my fix works?
+From: Yang Li <yang.li@amlogic.com>
 
-Oh, thanks to the word 'fix' you mentioned. It seems that I'm supposed
-to add Fixes: tag...
+Ignore the big sync connections, we are looking for the PA
+sync connection that was created as a result of the PA sync
+established event.
+
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+---
+ include/net/bluetooth/hci_core.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 3ce1fb6f5822..646b0c5fd7a5 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1400,6 +1400,13 @@ hci_conn_hash_lookup_pa_sync_handle(struct hci_dev *hdev, __u16 sync_handle)
+ 		if (c->type != BIS_LINK)
+ 			continue;
+ 
++		/* Ignore the big sync connections, we are looking
++		 * for the PA sync connection that was created as
++		 * a result of the PA sync established event.
++		 */
++		if (test_bit(HCI_CONN_BIG_SYNC, &c->flags))
++			continue;
++
+ 		/* Ignore the listen hcon, we are looking
+ 		 * for the child hcon that was created as
+ 		 * a result of the PA sync established event.
+
+---
+base-commit: 3bc46213b81278f3a9df0324768e152de71eb9fe
+change-id: 20250701-pa_sync-2fc7fc9f592c
+
+Best regards,
+-- 
+Yang Li <yang.li@amlogic.com>
+
+
 
