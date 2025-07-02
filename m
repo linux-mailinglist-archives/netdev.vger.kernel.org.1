@@ -1,219 +1,135 @@
-Return-Path: <netdev+bounces-203567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1FBAAF6610
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 01:11:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A9CE5AF665C
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 01:41:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45CAC1C465F9
-	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 23:11:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2596A1C42496
+	for <lists+netdev@lfdr.de>; Wed,  2 Jul 2025 23:41:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CC492D6409;
-	Wed,  2 Jul 2025 23:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05DCA24DCF7;
+	Wed,  2 Jul 2025 23:41:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D93QC3r5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i7mk1R2Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F16923A99D;
-	Wed,  2 Jul 2025 23:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 661E22248A4;
+	Wed,  2 Jul 2025 23:41:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751497788; cv=none; b=tDc4+yaL/FAxLWoTQmXfsT7UJ/OgYkPRTtPx/iDDDtmrngeZxJZXLJZfVEyC1jekbYF1xGgciQv4s5hGfVwE2IbrD73YQ1TmM4IxbcLImcpZJWmogIVN7xiqjqWONQSUVX7x466blmh4VrDuN8AQAjq+XnX3tGJ8KQ8QGgxhknI=
+	t=1751499678; cv=none; b=CLEriEb0S+zEDzVmrFtDl40NqUarD4jAi655ZhFkJ8LZrSkQYX9c5YBpsb7o3ToiMXMomj+MBjop84MJLuOclm6z028B5PnQyp5X6UTGvRu00nghcWymLQnkkf9uZvqt64Ipj5WQORKkK0r6WYItDwMbA5is7m+kMemAHdTXsx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751497788; c=relaxed/simple;
-	bh=uV4TkIxeORJ/qxzbkqXuZTta57Z8XxAbEdAXYELhZEk=;
+	s=arc-20240116; t=1751499678; c=relaxed/simple;
+	bh=Mn7wUCsYDxdQWE8WI7pFn3DTP7xJ6Za7yAZ8h7veegw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M1Q4UUXDJnfgZo7/jzjhFdw7hQirSbKd0sHGN0CXX/tTEBYXTeQ6IYZLCN/zQAyVZfWM1OD4bvPhBTxbhUT7iJpv0QsE5hbkzLSdTtWvE69S59HS3grW/lNC6l+rHjk5nhgkNVDPFltGPszHYcIfB5Kmi3i7CGZ2LadQ91ul04M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D93QC3r5; arc=none smtp.client-ip=209.85.166.182
+	 To:Cc:Content-Type; b=UaGtbD+oHNWb3OZhoz6XRu2ObRdMmoGvr5xwE801Cdw9I5K/GyIrTn72TeeSBfYFhKnlUy7eyFlH1UedCe+N1aeFNZTezKrz7q45aa6rIfeSbQTOHBNgl4NaqjJfhX2uwzM/5i6EKB8jBV0pM9gMJCtOD4L98DYVCdrruX1J8II=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i7mk1R2Y; arc=none smtp.client-ip=209.85.166.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3df2d111fefso39946465ab.1;
-        Wed, 02 Jul 2025 16:09:46 -0700 (PDT)
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3dda399db09so57118265ab.3;
+        Wed, 02 Jul 2025 16:41:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751497786; x=1752102586; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1751499676; x=1752104476; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=i3V/myxnyhBIMC4Q6lSBl6y0IMakKN7MT0xQVmCqag0=;
-        b=D93QC3r5bscmQ9e7AbpnLuiPCPPOe5bGwpjMY7bo35Y8j06bfHDRuh0gmcDy5BcnMo
-         lIu0qwbtw+XIIEuO765/DmFaVT6x3vDCVKLTSWPQfgPtdD4ZqW13E7pxMpAXJ2odj0jB
-         qp7mnCMB3yy7fvQFdVI7mG/IjsObQjqunBRdIrL0ScypngW9eZDTqzoIXC7aItfewymV
-         4yJlZ6hwCVi332W5ADnRVIlqxUJwdw2xvd0StcJud/qLa0ZoKLWeR4DZLq0twgPSZ59n
-         pPGfwZDN0ZnH+SARdRLLR2g6kiK/ZPfVFv4/aqUMlxnzH9GJW/wlC2xP8kYgAPeu4Kv2
-         aS9g==
+        bh=t+Al7nLB/wYBRu7qjBW6LVu1tp5R3H9FLxsXRPdr4hc=;
+        b=i7mk1R2Yc037J/SKzHfDlSWRpGwsowomv1oy4SwPk7KvvxZMoE75GwzuZz8wGq8WPc
+         q6/f6ztZQ+uLTwEpy21GD9LLGe0N+l6oO/wWkDFwyXdWBAuSUSi77ZgLOzbpwB9G6u27
+         kPYJMTf1Krep70QUXJxEIciRWiI0PTssNcidUbJaUzt0mId5asCJELm3QZRVml6LfV94
+         ikU8E3h+yebEwqDoeFi8a3fWu0I4K6svs1v4x1FZCQSUg908dSKFmL/2I/UzyPgqWGXW
+         dTRXsHrUkWRJLxHA8F/A14uAxHh3SEBFBbQgZMw9mEWPNUVv6S788zVFu/14jwvtAwrB
+         wQ+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751497786; x=1752102586;
+        d=1e100.net; s=20230601; t=1751499676; x=1752104476;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=i3V/myxnyhBIMC4Q6lSBl6y0IMakKN7MT0xQVmCqag0=;
-        b=qfKYFVYJSBsxHAOw/Wp6T25zCphUBIvC8bCjucICcXrnM0tLo9huigWo54aUSrxI3E
-         QR34dRM8m62EpWYiqHo3/6qUNjjvBXpCPOTo3mjxYtirCBR9dGyRhSh3hhcBNyE1LnLM
-         M7b127dzfFrDnxlKcU2qJVKZY64YW+2xOh6n1cSvDanL0ySfen2k6ysh3Xobvr70nj5H
-         19LB0ZeX4I9PyDV2Fk59ttCjke8OHSe6aRlJRho237arUbZUlFAmxlzzc22ATFZ6pSVR
-         /40DIRlq9unSruvTBHHEqLu/PJTF6Y2rx3LKxkCoKCw+BBZqY7xGO+Xvi+4fuBt/j/3f
-         r3PQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUL5tHOd/PVHBCrakUcchBWTQN9m6TDOscFUkaiMib36k8DtAAN24fNLn5zguxf7NIL06o=@vger.kernel.org, AJvYcCW7uCea5BC9gBHHzhlscj8IGkUB6zav7Ei2roAAOJEiKUNp+MWbUYXWEQoIeQO9eGjOGpqXB9jV@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrzrjLpqduRaZsTdGUAyBk9VKfqZHTd2F5kQcj1yDNUP9B0NbM
-	XgeSrcnS8pwfF4IMrWTfaMR1NE9UzqeAOMSPZhoc9LLN4L6FJwtoke21Sfx2Zu3JTHvbGWYFrAp
-	Kf3mzL0Xl6XviGLNvj7QK6Xr3q/K+uDE=
-X-Gm-Gg: ASbGncuwDc6QB7/Bv/hOOEoizsSBVOw0hi5ZPHVUjsuaA9j6iEEf9QiCYIVswm7Cvmk
-	VgyBprSTJqTXO+NUAUD3j+MddpMZLPg8UgQwGyUg0E7JN8bi1EAi/GliSyVK8Nj79RVwl3uNkjB
-	wXingxJ5/EESZGsbxsn8OTDWtvJVJldlWkxZ/QW4+DvMpwTTF7OFIN
-X-Google-Smtp-Source: AGHT+IFkvbaStjGGGI2HKxZVMVKV5CbKnEr7Zc62b3ighPgrOj72EIBtD/5b+d1D12SnxC/TN8hbhTifhllpqiCkgMM=
-X-Received: by 2002:a05:6e02:b42:b0:3e0:4f66:310a with SMTP id
- e9e14a558f8ab-3e05c323ff8mr20922075ab.16.1751497785720; Wed, 02 Jul 2025
- 16:09:45 -0700 (PDT)
+        bh=t+Al7nLB/wYBRu7qjBW6LVu1tp5R3H9FLxsXRPdr4hc=;
+        b=GJ58EoNh31AwKao5W324JUQqJllKVlUYzwfW6r7i4k6jcHxmU77nb/1aqxmH1UrqNA
+         sSRXFPVszwUMocR3pFNlgqIUOIbyjShy37HWCBc5hP7vNgTWyjjf6KIlpyi7jHrdiR9f
+         +ScQId/jfnJE19quy2DJbzLy0lvmw6L8ArBmflnzGs1u4HMpo6MSLuF4nlmnFTWbSmNS
+         xJ3fpGHj9PRt3teN3f/qCp3aFArcYh09iFvtAuNCaO2/wXcZ7s6NhC8c0MMsW7IF03Jx
+         k2AarIOywLLEbxGd4wbYVVqt1Pmzn9EoVKNgU3Hp5Twl+t9zYn4ANKihTu+/qxE+2BeE
+         eeLg==
+X-Forwarded-Encrypted: i=1; AJvYcCV1akRjbHXV4YTOW6tKjS5rR9XYTVB/cI/LrdCgqO+wUvFASniCbNrhGEHiZVPNXdiDG/Dv0xZ7Ud/NPgWY29C6SMmgH/qcOw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQSqZ4zRT3hZtaQ5/qoC9nlhzScU+KAeT1DPApawPpDOMkSxiq
+	lDL/IBy/NZ5Tiq2rGJCsPxxaP6rgxlWatcHC9YGB7u6EHI0OSQuCU08n6MJNTn2Pc5E6SU0bDI7
+	hvjjAHiogE1jUK7R31bkdjrnhwPNIvvQ=
+X-Gm-Gg: ASbGncsfOJv9Zb0/SvlXYTa29nNvV6hMZBLuOosXwXHpKaH7PvwUQo13FNQ91cT50oR
+	S5pWjAX2aAYzQJDeA+ubhzaL9taYy2ag3YSJdWPX9b0ENlC08L2+Dnmr9mTl3Uepo7vMjo6iiCc
+	bNZRRX46HpU3XqxZU4ptUs9q6OlOduijoc2WyLnnkIWg==
+X-Google-Smtp-Source: AGHT+IE9ZTlwXOZ+cxxoWqcvsD+iliLX5D39RnLAm2ADipy7j3828GqvLH0zdFwvWwmRhgXVsXLqa4A3QKP4T3VLTXo=
+X-Received: by 2002:a05:6e02:1c2b:b0:3df:3a4f:c884 with SMTP id
+ e9e14a558f8ab-3e05496bd83mr66987465ab.8.1751499676429; Wed, 02 Jul 2025
+ 16:41:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250702112815.50746-1-kerneljasonxing@gmail.com>
- <20250702112815.50746-3-kerneljasonxing@gmail.com> <aGVYNMZEZQV1SetF@mini-arch>
-In-Reply-To: <aGVYNMZEZQV1SetF@mini-arch>
+References: <20250701103149.4fe7aff3@kernel.org> <20250702080732.23442b9e@kernel.org>
+In-Reply-To: <20250702080732.23442b9e@kernel.org>
 From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 3 Jul 2025 07:09:09 +0800
-X-Gm-Features: Ac12FXxGYI4c5qaS-XudzBLVLvLszNKYomzklNbPRmW-W3YC7WTpytTAUoeXCCw
-Message-ID: <CAL+tcoA8Yhk85mkOBE9jEx7fd1s5rAW+Y8Uf2DAaNR3-9DW0Vg@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 2/2] selftests/bpf: add a new test to check
- the consumer update case
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
+Date: Thu, 3 Jul 2025 07:40:35 +0800
+X-Gm-Features: Ac12FXx2jNepn1PpDqvDgEJBSmtL17CYcOO5U5GhUvrot8X4D0l1TGf7Rbwo0lM
+Message-ID: <CAL+tcoBJmxE5+f8vZ=DbPRO=Bi84kEU=yrmqnuri30duva=HYg@mail.gmail.com>
+Subject: Re: [ANN] netdev foundation
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org, 
+	andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	horms@kernel.org, johannes@sipsolutions.net, kuni1840@gmail.com, 
+	willemb@google.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 3, 2025 at 12:03=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
->
-> On 07/02, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > The subtest sends 33 packets at one time on purpose to see if xsk
-> > exitting __xsk_generic_xmit() updates the global consumer of tx queue
-> > when reaching the max loop (max_tx_budget, 32 by default). The number 3=
-3
-> > can avoid xskq_cons_peek_desc() updates the consumer when it's about to
-> > quit sending, to accurately check if the issue that the first patch
-> > resolves remains. The new case will not check this issue in zero copy
-> > mode.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> > v5
-> > Link: https://lore.kernel.org/all/20250627085745.53173-1-kerneljasonxin=
-g@gmail.com/
-> > 1. use the initial approach to add a new testcase
-> > 2. add a new flag 'check_consumer' to see if the check is needed
-> > ---
-> >  tools/testing/selftests/bpf/xskxceiver.c | 51 +++++++++++++++++++++++-
-> >  tools/testing/selftests/bpf/xskxceiver.h |  1 +
-> >  2 files changed, 51 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/s=
-elftests/bpf/xskxceiver.c
-> > index 0ced4026ee44..ed12a55ecf2a 100644
-> > --- a/tools/testing/selftests/bpf/xskxceiver.c
-> > +++ b/tools/testing/selftests/bpf/xskxceiver.c
-> > @@ -109,6 +109,8 @@
-> >
-> >  #include <network_helpers.h>
-> >
-> > +#define MAX_TX_BUDGET_DEFAULT 32
-> > +
-> >  static bool opt_verbose;
-> >  static bool opt_print_tests;
-> >  static enum test_mode opt_mode =3D TEST_MODE_ALL;
-> > @@ -1091,11 +1093,45 @@ static bool is_pkt_valid(struct pkt *pkt, void =
-*buffer, u64 addr, u32 len)
-> >       return true;
-> >  }
-> >
-> > +static u32 load_value(u32 *counter)
-> > +{
-> > +     return __atomic_load_n(counter, __ATOMIC_ACQUIRE);
-> > +}
-> > +
-> > +static bool kick_tx_with_check(struct xsk_socket_info *xsk, int *ret)
-> > +{
-> > +     u32 max_budget =3D MAX_TX_BUDGET_DEFAULT;
-> > +     u32 cons, ready_to_send;
-> > +     int delta;
-> > +
-> > +     cons =3D load_value(xsk->tx.consumer);
-> > +     ready_to_send =3D load_value(xsk->tx.producer) - cons;
-> > +     *ret =3D sendto(xsk_socket__fd(xsk->xsk), NULL, 0, MSG_DONTWAIT, =
-NULL, 0);
-> > +
-> > +     delta =3D load_value(xsk->tx.consumer) - cons;
-> > +     /* By default, xsk should consume exact @max_budget descs at one
-> > +      * send in this case where hitting the max budget limit in while
-> > +      * loop is triggered in __xsk_generic_xmit(). Please make sure th=
-at
-> > +      * the number of descs to be sent is larger than @max_budget, or
-> > +      * else the tx.consumer will be updated in xskq_cons_peek_desc()
-> > +      * in time which hides the issue we try to verify.
-> > +      */
-> > +     if (ready_to_send > max_budget && delta !=3D max_budget)
-> > +             return false;
-> > +
-> > +     return true;
-> > +}
-> > +
-> >  static int kick_tx(struct xsk_socket_info *xsk)
-> >  {
-> >       int ret;
-> >
-> > -     ret =3D sendto(xsk_socket__fd(xsk->xsk), NULL, 0, MSG_DONTWAIT, N=
-ULL, 0);
-> > +     if (xsk->check_consumer) {
-> > +             if (!kick_tx_with_check(xsk, &ret))
-> > +                     return TEST_FAILURE;
-> > +     } else {
-> > +             ret =3D sendto(xsk_socket__fd(xsk->xsk), NULL, 0, MSG_DON=
-TWAIT, NULL, 0);
-> > +     }
-> >       if (ret >=3D 0)
-> >               return TEST_PASS;
-> >       if (errno =3D=3D ENOBUFS || errno =3D=3D EAGAIN || errno =3D=3D E=
-BUSY || errno =3D=3D ENETDOWN) {
-> > @@ -2613,6 +2649,18 @@ static int testapp_adjust_tail_grow_mb(struct te=
-st_spec *test)
-> >                                  XSK_UMEM__LARGE_FRAME_SIZE * 2);
-> >  }
-> >
-> > +static int testapp_tx_queue_consumer(struct test_spec *test)
-> > +{
-> > +     int nr_packets =3D MAX_TX_BUDGET_DEFAULT + 1;
-> > +
-> > +     pkt_stream_replace(test, nr_packets, MIN_PKT_SIZE);
-> > +     test->ifobj_tx->xsk->batch_size =3D nr_packets;
-> > +     if (!(test->mode & TEST_MODE_ZC))
-> > +             test->ifobj_tx->xsk->check_consumer =3D true;
->
-> The test looks good to me, thank you!
+Hello Jakub,
 
-Thanks.
-
+On Wed, Jul 2, 2025 at 11:08=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> One question here: why not exit/return for TEST_MODE_ZC instead
-> of conditionally setting check_consumer?
+> On Tue, 1 Jul 2025 10:31:49 -0700 Jakub Kicinski wrote:
+> >  https://github.com/linux-netdev/foundation
+> >
+> > The README page provides more information about the scope, and
+> > the process. We don't want to repeat all that information - please
+> > refer to the README and feel free to comment or ask any questions here.
+> >
+> > And please feel free to suggest projects!
+>
+> I see a number of people opened the link (or maybe like most Internet
+> traffic these days it's just AI scraping bots? :D) but no project
+> proposals were added, yet.
 
-As you said, yes, we could skip the zc test for this
-testapp_tx_queue_consumer(). It doesn't affect the goal or result of
-the subtest. So do you expect me to respin this patch or just leave it
-as is?
+I hope I didn't misunderstand what you said here. I keep thinking if
+there are other projects related to kernel development. IIUC, yes,
+there are some projects, something like xdp-project which heavily
+relies on the kernel but is equipped with its own standalone
+tests/benchmarks/documentations?
+
+If you're referring to that kind of project, it would be easy to list
+a few potential directions for people on the mailing list to take:
+1. RDMA impl/test.
+2. Various upper layer stacks with the help of AF_XDP, which I am
+currently working on.
+3. Useful debug tools/trace tools that are good to the real debug
+process (like writing bpftrace)
+    // a few side notes here, let me put BPF timestamping as an
+example. For now the selftests only show how it works overall, but not
+manifest how to write it is the best fit for the production load. I
+have a local one and hope more people can use it and polish it but I
+don't know where to put it except my personal github...
+4. some other interesting kernel modules that are apparently not
+suitable for landing on the kernel.
+...
+
+I wonder if I'm digressing a bit...
 
 Thanks,
 Jason
