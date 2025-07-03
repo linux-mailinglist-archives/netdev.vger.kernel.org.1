@@ -1,166 +1,136 @@
-Return-Path: <netdev+bounces-203705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F20CAAF6CB8
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 10:23:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D697AF6CBE
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 10:24:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C15531C4123A
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 08:23:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BB8016894D
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 08:24:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33CFD2D0C6F;
-	Thu,  3 Jul 2025 08:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264122D027E;
+	Thu,  3 Jul 2025 08:24:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NWkZMlUi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UjV1FxQY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D4B295523;
-	Thu,  3 Jul 2025 08:22:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDB3295523
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 08:23:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751530981; cv=none; b=UIjm1x1ENuzFkYcgunEu1fsHeLEzXw3TcRE/AqyrplIVM8Zgszoo9QafEbrHjqGJFDnEzcQg9wVgDg7ANm2/evpd7zpD/sIpLTk7+Wsn5Ni/e9UqwFOZJGtmkZXAJmk50JC3MwzTYxoRcldkhwoDjD5RtlaePIY3zPNetYPzCgY=
+	t=1751531041; cv=none; b=ObujlhCBwdF5NwVHV0Xtt/Ik43+gyPouJz1/JFAx0+nSzgroWPgDgsTGpscfuZXJlSErpqu4mHGUkhUDa/7oNZ/wcy6FvHx5VND/KkLu4J59aS1kzfI7LtSrrAyTiEVEFE877V8XIHVVtDk8QUdyRzbblDb8/J+TpGKyrClpfeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751530981; c=relaxed/simple;
-	bh=R1aiK5wt4ta91z40pzcnnqgIJtOlvHV1qIe3gS/lu6s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fCtqSpPQ2XRSEOqSkMAyfP8+/M6O3dD8D9r9KPk8yqq0QdCTUw+dqiB70dgjZuZbnoo2umFZS08aLzT5CxiO0+mXVB7kKteibPNQgZSolJ1q/ibng2ALsuTnI/Bqvwu7p0pWCZe4TBKyG8fUOTLuQ+Q1/+TliLc9z+q3tosMVs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NWkZMlUi; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3e05bb6efe0so9124625ab.3;
-        Thu, 03 Jul 2025 01:22:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751530978; x=1752135778; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z257Yice6IBNDbRebdWjE/izGZAoWE1CWTqPNOrEQJ4=;
-        b=NWkZMlUiZJZ/qtpelsrftWtVzAdssC5pq8ggYONPfEXH8dxsJdOpuaUVjC+9Q9U2b9
-         G8NpGhgbu420pXVNwmzVQAtr3xC+iHGcxQ+YYjYtd9wpsuleLJSKTqBDlH9MOcBu1cuL
-         Vm7s8EbkZ/PAZ5DJxTneemyG6SLP2IOtBcu5o6m1Uy+os3jKOZE6xYnb8p3LHxvDsBYb
-         lmvy3QKzKI5tBRz+s0yr2dyW2LgZ3WnZSMKbReXFUKIZcjAEXVm3FucYtzUiFp9CP3ks
-         yObFINjRWV5fGr2EvQLOSnYoqmjdTFnFcmVPq4v3nqrApO0aLOI3smsvM0yYvcdoZrr9
-         fKFg==
+	s=arc-20240116; t=1751531041; c=relaxed/simple;
+	bh=o+NkW4UjRCYC3Ox02bP9Grs2dJLcAnd5IKgqdCW1eLE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SHI9QuVBqtXDInKqAg3HiLVjEJXbTlyP4O1O9ENX5yZBe2/coHm6Ax74Ge681pk2lA4VSsGtebu8FfSKR1YTNOc5oaVy+MxCvVESEDMypc6BY3tH2FMcniyemru6v7rC7phzqL+gHCtjthzYAIGZCMowtcNGo2+yYjiJyvo7TVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UjV1FxQY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751531038;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ke2YfmZqQvuyIhOn4BkIuW587OZjecPx0SDiI46FKLs=;
+	b=UjV1FxQYOzeF7AaP7vOQxhOdSUUWce/+WMEvzwcmzefzINybr07xZQJwH/cVFANv1AnOcr
+	CT0xHJ2sW64nBBwc1uUWHjLqb9YANr9kNXaqr0aUOwKMLnG1MhpDZbOej+vGO8wdn+e39b
+	xEeLx1aR6M1Y1/1GO/BXmg/evhUXJLk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-212-GEV2yYpwP6u5TyY__p4qlg-1; Thu, 03 Jul 2025 04:23:56 -0400
+X-MC-Unique: GEV2yYpwP6u5TyY__p4qlg-1
+X-Mimecast-MFC-AGG-ID: GEV2yYpwP6u5TyY__p4qlg_1751531035
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a5281ba3a4so3573846f8f.0
+        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 01:23:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751530978; x=1752135778;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z257Yice6IBNDbRebdWjE/izGZAoWE1CWTqPNOrEQJ4=;
-        b=iQ3DjCjtTdXuogViNmZu7NSdcVcETfcqp73QlcbM9AmkNoTIsIZ0Guez7Vh1nr264N
-         CkWKc6PNHBvt/n3O1PeLPMahgPGfpf1cyN/oDO1SnmqXvGxj9IhxoNlSc2zeHPk+4cWE
-         XAavAQbB61B+Om+iU3zR+gbrbovLWwM9/WCNkjFLpda/JFVcEk2xKB5tCcXToHlHBy2x
-         a50J9n/lvl4nno6pMRBANMGvEtH5tclhrI1SRTXu2HGemChswk14U3Ry9MeeV3nvWIfQ
-         08AJxmaPiuF9MFTMcToVhBx6Hint3cxay1bnLoeGiCbiel8p/4cxhehhdwidccGNdgGx
-         KRlA==
-X-Forwarded-Encrypted: i=1; AJvYcCWZm/A/1OahpZef3kzS1VE559eEkSciEZ34M6ogMpjoD6nwtz7U6S0JeG2Sl2Fpm/mI0tU=@vger.kernel.org, AJvYcCXLLZ6CjuxHNXGq/0h7MrqxSuQQIpP7XaylPrEYGEZeGL9IPTXrZzjd1n3I1l08OBjlSpX99Ojj@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE9JTMA83vG3nT5Uh47q6u297EoXEgIIzO9VIc6pB57AjHyEpw
-	aPji82iaRk7JRjuW7l9OcXITzOW4CRCrmvxrEp3xIu3jtv9zPJDMux/dvmvx6Kj5hdL+pwL7hLl
-	ZOOcQi0eOqsUz6oM6n1TTfkUGr7yQmM0=
-X-Gm-Gg: ASbGncvqvH1Ws5LI0/dZD0c6elnUVYddn1Xz+JVNaDR+OgSDz/mUUdpk0yi+sFH8wH/
-	InRDfHy9vpwnzEGdDUdjWRVkzYLrlRQZse6LdUV11eTNOIGsFdLqU1alSf7qhVlHA5iiX4/1Dem
-	m6F6QMoa49rJ/4MivmWIbPcn3j3jRK+BdT+cv6ZJ8IR9bg6tEVR0QFXA==
-X-Google-Smtp-Source: AGHT+IFOX9nUaEucogkv2J60E9CkJRnX32TsnlPTkSh72ZrnbZscB8Gscg+pr8hkzpmF3XxzjNTf6VzLZQinxC9y0dQ=
-X-Received: by 2002:a05:6e02:1d9a:b0:3df:3208:968e with SMTP id
- e9e14a558f8ab-3e05c9a1bf5mr21243585ab.14.1751530978447; Thu, 03 Jul 2025
- 01:22:58 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751531035; x=1752135835;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ke2YfmZqQvuyIhOn4BkIuW587OZjecPx0SDiI46FKLs=;
+        b=s6il8cLZmiTFDJ9jTPuuD/1kJSz30DpeMsou5KaftZhxcJLVIIH7tWnvQPusX8SeUn
+         sn9zcRR1mGZ63XIRxju9F/PJ31kebmCNXpjsLGvMTjiCo8SpubbvwVVWpZR5pf3T7726
+         Vbna47nIts3Ltf1Vi/IIOa52hp3gxMzhfyArEiUjPze3UD5bwvy+zgFNwsNuHzB2CrDu
+         WPT99M71qRMc9xWaiiRuOH4W6MKSiFOTilWk8Vh9QDAjF15rzi4QhxNtp9vo4PKyCq/2
+         qLdcKp/t3aPXUIOyeaSjZpYZsWnrtAhLzCRTqJJhN5548rq0HhSDXYdtF0bpjr66gw0J
+         2iGA==
+X-Forwarded-Encrypted: i=1; AJvYcCXcqZhXPVq1xTVCXlkC4MOX1ms5rzyQjBHWN8f3B9lC1pvg2QYuxgi5n5TMGFzkd6nLWfJXfko=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgX/SlPq/6fc8TXDmjK8f1YPxCVopzcf7Vvru2WXhk5VEnlZox
+	mBCV+VtISi02ToKpV/CtcTHKE169BP6WcwhMf5KRbwfcUdr+E9qihJbU2vosTKnEbEGILhCzjbu
+	mHX5neg0fP5t4HJde6CYmb9wdESzu8DmYfd9ga5uOb0Nyi4gWjtyPpSifsw==
+X-Gm-Gg: ASbGncsAStk2Z/Ha8yk4aGVEBNauLfMEvNe8t8gqf5asJj6rzwkMrd3wzB3dkEb/EbJ
+	PXrnYJu9EN41GhOOIj1HW/wYXHxOIwMxUrLEVIfah1jQRHAvXrVAVFkRN7IUbXHh+wBAKxYfGyx
+	6W8j/23R/HIE68YYhyGomSJVTfmHETbkxvPZ3IEnG3Vt7QGBk/gPZLfslb0A4rkxcxBIId3ryrx
+	cxk0Z4UlMfYlFD8Uyyfr2hRcZpGT1kAgjaO0RtFd5Nlq2e7EMKABRr5ezBIBwpwSRhLQRan1NK7
+	4TddJuCBsU9XyqmcIqhGYqyjvDI=
+X-Received: by 2002:a05:6000:18ae:b0:3b3:9c75:c4cf with SMTP id ffacd0b85a97d-3b39c75c60dmr972426f8f.51.1751531034880;
+        Thu, 03 Jul 2025 01:23:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHCYV82hCMNv406EdS8av4JOq7IBDVQLti9dcL/h1KSI+kswFV5uEQ+Wn0KudAapNB0JCaiDw==
+X-Received: by 2002:a05:6000:18ae:b0:3b3:9c75:c4cf with SMTP id ffacd0b85a97d-3b39c75c60dmr972392f8f.51.1751531034265;
+        Thu, 03 Jul 2025 01:23:54 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.200.84])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a892e5f92esm18167611f8f.90.2025.07.03.01.23.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jul 2025 01:23:53 -0700 (PDT)
+Date: Thu, 3 Jul 2025 10:23:49 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v3 3/3] vsock: Fix IOCTL_VM_SOCKETS_GET_LOCAL_CID to
+ check also `transport_local`
+Message-ID: <34n3no6ip55yftyqtdpww6jzsse4mhnk3pjmd5sfqhpp5nt3my@wiql5wlf3zzp>
+References: <20250702-vsock-transports-toctou-v3-0-0a7e2e692987@rbox.co>
+ <20250702-vsock-transports-toctou-v3-3-0a7e2e692987@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250627110121.73228-1-kerneljasonxing@gmail.com> <af16a28a-18b9-4d45-9ab9-1b150988b7d5@redhat.com>
-In-Reply-To: <af16a28a-18b9-4d45-9ab9-1b150988b7d5@redhat.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 3 Jul 2025 16:22:21 +0800
-X-Gm-Features: Ac12FXx8fJa7A23R4bCrfAzQ98cFKSZOKsCciT-4f3Mxyv3nTDRt8MKJMIm6Hb4
-Message-ID: <CAL+tcoDa13Gzdzv7NOSVwWDZV86w7NgJniT1jMqe2FCw1psHFg@mail.gmail.com>
-Subject: Re: [PATCH net-next v6] net: xsk: introduce XDP_MAX_TX_BUDGET set/getsockopt
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, joe@dama.to, 
-	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250702-vsock-transports-toctou-v3-3-0a7e2e692987@rbox.co>
 
-On Thu, Jul 3, 2025 at 4:15=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
+On Wed, Jul 02, 2025 at 03:38:45PM +0200, Michal Luczaj wrote:
+>Support returning VMADDR_CID_LOCAL in case no other vsock transport is
+>available.
 >
-> On 6/27/25 1:01 PM, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > This patch provides a setsockopt method to let applications leverage to
-> > adjust how many descs to be handled at most in one send syscall. It
-> > mitigates the situation where the default value (32) that is too small
-> > leads to higher frequency of triggering send syscall.
-> >
-> > Considering the prosperity/complexity the applications have, there is n=
-o
-> > absolutely ideal suggestion fitting all cases. So keep 32 as its defaul=
-t
-> > value like before.
-> >
-> > The patch does the following things:
-> > - Add XDP_MAX_TX_BUDGET socket option.
-> > - Convert TX_BATCH_SIZE to tx_budget_spent.
-> > - Set tx_budget_spent to 32 by default in the initialization phase as a
-> >   per-socket granular control. 32 is also the min value for
-> >   tx_budget_spent.
-> > - Set the range of tx_budget_spent as [32, xs->tx->nentries].
-> >
-> > The idea behind this comes out of real workloads in production. We use =
-a
-> > user-level stack with xsk support to accelerate sending packets and
-> > minimize triggering syscalls. When the packets are aggregated, it's not
-> > hard to hit the upper bound (namely, 32). The moment user-space stack
-> > fetches the -EAGAIN error number passed from sendto(), it will loop to =
-try
-> > again until all the expected descs from tx ring are sent out to the dri=
-ver.
-> > Enlarging the XDP_MAX_TX_BUDGET value contributes to less frequency of
-> > sendto() and higher throughput/PPS.
-> >
-> > Here is what I did in production, along with some numbers as follows:
-> > For one application I saw lately, I suggested using 128 as max_tx_budge=
-t
-> > because I saw two limitations without changing any default configuratio=
-n:
-> > 1) XDP_MAX_TX_BUDGET, 2) socket sndbuf which is 212992 decided by
-> > net.core.wmem_default. As to XDP_MAX_TX_BUDGET, the scenario behind
-> > this was I counted how many descs are transmitted to the driver at one
-> > time of sendto() based on [1] patch and then I calculated the
-> > possibility of hitting the upper bound. Finally I chose 128 as a
-> > suitable value because 1) it covers most of the cases, 2) a higher
-> > number would not bring evident results. After twisting the parameters,
-> > a stable improvement of around 4% for both PPS and throughput and less
-> > resources consumption were found to be observed by strace -c -p xxx:
-> > 1) %time was decreased by 7.8%
-> > 2) error counter was decreased from 18367 to 572
-> >
-> > [1]: https://lore.kernel.org/all/20250619093641.70700-1-kerneljasonxing=
-@gmail.com/
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
->
-> LGTM, waiting a little more for an explicit an ack from XDP maintainers.
+>Fixes: 0e12190578d0 ("vsock: add local transport support in the vsock core")
+>Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> net/vmw_vsock/af_vsock.c | 2 ++
+> 1 file changed, 2 insertions(+)
 
-Thanks. No problem.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
 >
-> Side note: it could be useful to extend the xdp selftest to trigger the
-> new code path.
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 9b2af5c63f7c2ae575c160415bd77208a3980835..c8398f9cec5296e07395df8e7ad0f52b8ceb65d5 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -2581,6 +2581,8 @@ static long vsock_dev_do_ioctl(struct file *filp,
+> 		cid = vsock_registered_transport_cid(&transport_g2h);
+> 		if (cid == VMADDR_CID_ANY)
+> 			cid = vsock_registered_transport_cid(&transport_h2g);
+>+		if (cid == VMADDR_CID_ANY)
+>+			cid = vsock_registered_transport_cid(&transport_local);
+>
+> 		if (put_user(cid, p) != 0)
+> 			retval = -EFAULT;
+>
+>-- 
+>2.49.0
+>
 
-Roger that, sir. I will do it after this gets merged, maybe later this
-month, still studying for various tests in recent days :)
-
-Thanks,
-Jason
 
