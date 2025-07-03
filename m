@@ -1,124 +1,144 @@
-Return-Path: <netdev+bounces-203836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D360AF76A3
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 16:06:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E2D2AF7643
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 15:55:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB5F554506C
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 14:04:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A05FD542A6B
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:54:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E2D2E7185;
-	Thu,  3 Jul 2025 14:04:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8AE32E7647;
+	Thu,  3 Jul 2025 13:55:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="TtSV7JHA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YZRXmPws"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36581A83F5
-	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 14:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34FD92E7635
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 13:55:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751551461; cv=none; b=qKNwzoDd1YLdg5e0hYjosmjigCcKKh+Y0ZUObPZf4y1hHeJz2KdzMtSNAApqOA5rsrUvc4FElz+YfpQa7YZ9iBxnp72XKy7E8JNt76DaYyQYmRtj5cnfYh9apWEDR84WqVD1a7htvdxmxWLu7i9JDquFILTTc1JUclCvwE6BltY=
+	t=1751550907; cv=none; b=RwcHqCU/xw0oyzu2+ryahUQXk+mbB5kLCdpM/kb2JTPdapqKXxgnK06EZD8bR50QjoRjY6EprxgrLe26+5G3NF/X+YmNXbGrMiy+SNWxa4VOxSCxk7QTqG3mFJeR2+iZ5Vzm4wHCfzEYvH41zH0XcEmmSovcd5iN7ar11haEgR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751551461; c=relaxed/simple;
-	bh=2Ja0DRql3lathYbsnh14IuivZQ4FJiihEMyCBFg1y6E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=LG5MDj34zdM2y18shSc3alM1e+2HR6OG4stv1Y8a/jqtxLJDC5Dj5yDCp0dWrqkkx3MSntNpA0a7JLwPb8u6lpECG2jJzmdTMRQJtYFE3t0dx2nEULsqTukSgTgOM2oRMLRF3WZBC0oe+5lF4kFiAyRC5b41mqhZg7rrx+Ekoxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=TtSV7JHA; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3a524caf77eso1216321f8f.3
-        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 07:04:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1751551457; x=1752156257; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=dDrJgI2UVALwAFMMfVSy2p69AmBm6S+zzAfjuuFd4NM=;
-        b=TtSV7JHA98z6F4GHH35zpp4gDOAvs7W87NmDHqfSW96LSgYzE2ROJfELFFr+YWQLwZ
-         t+ApmACziJ8WHArk3KjRI7peWUyiXamCAm0KTW0Rxngxz02dBm8L+euTcdeugX8tIyMC
-         2dxFv3s9SJ+czqY1sFB42Ciyw2JENoadUcJlZZkAJTjk5w0cFesvYGin7PQVZWIvlDU6
-         swCyJ27phZ0eGOUZt7nVNq3bXV4Bw1gyD872B886oIkPmtnK7xVi8gIU7D8GwicNJ7/U
-         +/SANI61epMP3IuIEFIS3QISo4DwPMZxImRtfN6NiVFSNkC80xHGjDuiCc08mHxVaOBw
-         H7LA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751551457; x=1752156257;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dDrJgI2UVALwAFMMfVSy2p69AmBm6S+zzAfjuuFd4NM=;
-        b=PQxJrB5VKgYcgHk8zwEyqtULOB0M5nSReFRbDM0+k+KkPctX4RHuoB6Cq025TMuqGe
-         Y3DaI7632VeNp/SMSLiGXLRrTMWkduqVC4XUZ4HNj6cZ7Xe3r6Bs0VFdndv6caPz6YBy
-         2IaMvPqGVv3ald8JIVYGAG8bFtP0AiB/DJjq3c9FhAyApfwH4OaBL6XcAZf2tRYhAdPa
-         mqeLe7SPiiUDmAmP3hnmS/5pytfigOIRK815qBVnb/CjwGFOgMDjXlkzB2nwKx66YjzD
-         6aBFgFL43Cw/LOWdKRXJ11W/ZkCByp2PLVQ/A0lF6V+IVirthSqFjRRw6wYvkt+PvQ7r
-         Jg9A==
-X-Forwarded-Encrypted: i=1; AJvYcCVfVqryvPH3WymhOtLyXzEviV96gHBsQgp2OVaUKPcLxIgEX23hMjirLiBhNbebV5MSUF0qn3Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/mE1+y4kwPxg2DuZbtQ0vg0U3GxjV1U4KaH1M36skOcpjH6eL
-	tgE0xaMDDkK2IloAgJYdV+qdWvSjXswJqBg1avyN8hlCPTl3kOlXIkDSAiaOjqWgAZM=
-X-Gm-Gg: ASbGncuQzs41stNMQ+L3ZhvovqzLgVysKoG6a+aZtd2CoFs4hpwQW8JJDdoCQ1j0S0Q
-	pgTpq5yeyRB3r+PZJojG6SaD31Hrss2VXb3rl5u5OiNx7+FlY8NEMbaNz3jR5OCIfbETvQr3NLV
-	pRcStGXLW/yqq1OY7Injveol+Pl0jTSbGQt6ZPMQtiPy0S95Om8BVYBk2PwdXLSs+OhuzGp2F/J
-	BEotMG/PltjRUAkzGJfMZSYpb6oRSX9hjf6SFWye9bS+xL7rTbi1S35xhaftiBb6dEloVUpc6tR
-	8QLFLZqlav9RZ0hsjNL7gi0YPfnPZvmrDxe8LzuLWHB4j+mCyStdwsnTQYbtSGeexf4tQuCsRVI
-	yTXQ35dDohq/xS20jEuGkApRklrZuCSQzWnDWjMQ=
-X-Google-Smtp-Source: AGHT+IF5rCFDzUmRIqGfxH4DlbOtx7wQkmAk4Z9+J1BmQz88TZ603h5r95CnF2l2Jg+U+vKV4H4iEg==
-X-Received: by 2002:a5d:64c8:0:b0:3a4:e740:cd6e with SMTP id ffacd0b85a97d-3b37b7687c6mr698382f8f.8.1751551457041;
-        Thu, 03 Jul 2025 07:04:17 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:61e4:bb55:bb2c:ae50? ([2a01:e0a:b41:c160:61e4:bb55:bb2c:ae50])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454a99c07fcsm27185885e9.35.2025.07.03.07.04.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Jul 2025 07:04:14 -0700 (PDT)
-Message-ID: <1e896215-5f3a-40f9-9ab5-121109c48b3c@6wind.com>
-Date: Thu, 3 Jul 2025 16:04:14 +0200
+	s=arc-20240116; t=1751550907; c=relaxed/simple;
+	bh=+54lP9mDg81fXI9UcMd+4iV2j0kH4ZJuSiWgoz5VMp4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LGzYwy6u5puWS8vx8yhraPzZY+C2L9U+p1rWhf7zlx7nER5gbWyUTKa9K+4TXyVHbK3pGyLAhdXLLNkgYL+qNbKhXEuavWwEyeBTQhI88vO4JpBmxaZyo3tetgbWgLLTAGE2zEuu/rVFIkxxQqI719BFre8GHz5LwIh9Uc6x/TY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YZRXmPws; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751550906; x=1783086906;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=+54lP9mDg81fXI9UcMd+4iV2j0kH4ZJuSiWgoz5VMp4=;
+  b=YZRXmPws6sSFOtGXI4fz08oUDju9i4cgoDS4//YgubPvpv0lVcOfIKMH
+   u+9GcqfTIPXnb7VTVb60yIhx6U1e2cGBNA4DTD62hhZHURxXk6QhURHEf
+   ODeugxI4Iok999QzEL2DNq6PEHpDeVuvz861CvDZUc+tCONumnjhR7SFc
+   OGvEd4dOhzM6iocGWzzleGmUel/xcnelbHQiHGYodZQCWbsXTgilOJvXG
+   hFY6dvC1S0h70Pw60ZX05GyL4pCVkNzdgc0K2uItfj8y/nR0Hx9ke542q
+   c/o1eZmwrD0Y5XgVGdYs3WHSSvcmpyv5TTyfq/xxdTA9nCOT4cqo1YQgF
+   w==;
+X-CSE-ConnectionGUID: XGPnf5YcTKqIkBfWnmtwQg==
+X-CSE-MsgGUID: RZQ5bKL5QZqWE5ym+1g/eg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="57686473"
+X-IronPort-AV: E=Sophos;i="6.16,284,1744095600"; 
+   d="scan'208";a="57686473"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 06:55:05 -0700
+X-CSE-ConnectionGUID: qk/NDg/CQqGXpK88qOdaeQ==
+X-CSE-MsgGUID: Tcy81jYfStyVG4fhdZsddQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,284,1744095600"; 
+   d="scan'208";a="153790451"
+Received: from amlin-018-252.igk.intel.com ([10.102.18.252])
+  by orviesa010.jf.intel.com with ESMTP; 03 Jul 2025 06:55:04 -0700
+From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	andrew@lunn.ch,
+	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [iwl-next] ixgbe: add the 2.5G and 5G speed in auto-negotiation for E610
+Date: Thu,  3 Jul 2025 16:09:18 +0200
+Message-ID: <20250703140918.287365-1-piotr.kwapulinski@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH v3] ipv6: add `force_forwarding` sysctl to enable
- per-interface forwarding
-To: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, David Ahern <dsahern@kernel.org>,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250702074619.139031-1-g.goller@proxmox.com>
- <c39c99a7-73c2-4fc6-a1f2-bc18c0b6301f@6wind.com>
- <jsfa7qvqpspyau47xrqz5gxpzdxfyeyszbhcyuwx7ermzjahaf@jrznbsy3f722>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <jsfa7qvqpspyau47xrqz5gxpzdxfyeyszbhcyuwx7ermzjahaf@jrznbsy3f722>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Le 03/07/2025 à 13:04, Gabriel Goller a écrit :
-[snip]
->>> +    // get extra params from table
->> /* */ for comment
->> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/
->> Documentation/process/coding-style.rst#n598
-> 
-> NAK
-> (https://lore.kernel.org/lkml/
-> CA+55aFyQYJerovMsSoSKS7PessZBr4vNp-3QUUwhqk4A4_jcbg@mail.gmail.com/#r)
+Enable the 2.5G and 5G speed in auto-negotiation for E610 at driver load.
 
-I will follow the netdev maintainers' guidelines.
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 35 +++++++------------
+ 1 file changed, 12 insertions(+), 23 deletions(-)
 
-If the doc I pointed to is wrong, please update it. It will be easier to find
-than a 9-year-old email.
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+index d741164..b202639 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+@@ -1953,6 +1953,16 @@ int ixgbe_identify_phy_e610(struct ixgbe_hw *hw)
+ 	    phy_type_low  & IXGBE_PHY_TYPE_LOW_1G_SGMII    ||
+ 	    phy_type_high & IXGBE_PHY_TYPE_HIGH_1G_USXGMII)
+ 		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_1GB_FULL;
++	if (phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_T   ||
++	    phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_X   ||
++	    phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_KX  ||
++	    phy_type_high & IXGBE_PHY_TYPE_HIGH_2500M_SGMII ||
++	    phy_type_high & IXGBE_PHY_TYPE_HIGH_2500M_USXGMII)
++		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_2_5GB_FULL;
++	if (phy_type_low  & IXGBE_PHY_TYPE_LOW_5GBASE_T  ||
++	    phy_type_low  & IXGBE_PHY_TYPE_LOW_5GBASE_KR ||
++	    phy_type_high & IXGBE_PHY_TYPE_HIGH_5G_USXGMII)
++		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_5GB_FULL;
+ 	if (phy_type_low  & IXGBE_PHY_TYPE_LOW_10GBASE_T       ||
+ 	    phy_type_low  & IXGBE_PHY_TYPE_LOW_10G_SFI_DA      ||
+ 	    phy_type_low  & IXGBE_PHY_TYPE_LOW_10GBASE_SR      ||
+@@ -1963,31 +1973,10 @@ int ixgbe_identify_phy_e610(struct ixgbe_hw *hw)
+ 	    phy_type_high & IXGBE_PHY_TYPE_HIGH_10G_USXGMII)
+ 		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_10GB_FULL;
+ 
+-	/* 2.5 and 5 Gbps link speeds must be excluded from the
+-	 * auto-negotiation set used during driver initialization due to
+-	 * compatibility issues with certain switches. Those issues do not
+-	 * exist in case of E610 2.5G SKU device (0x57b1).
+-	 */
+-	if (!hw->phy.autoneg_advertised &&
+-	    hw->device_id != IXGBE_DEV_ID_E610_2_5G_T)
++	/* Initialize autoneg speeds */
++	if (!hw->phy.autoneg_advertised)
+ 		hw->phy.autoneg_advertised = hw->phy.speeds_supported;
+ 
+-	if (phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_T   ||
+-	    phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_X   ||
+-	    phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_KX  ||
+-	    phy_type_high & IXGBE_PHY_TYPE_HIGH_2500M_SGMII ||
+-	    phy_type_high & IXGBE_PHY_TYPE_HIGH_2500M_USXGMII)
+-		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_2_5GB_FULL;
+-
+-	if (!hw->phy.autoneg_advertised &&
+-	    hw->device_id == IXGBE_DEV_ID_E610_2_5G_T)
+-		hw->phy.autoneg_advertised = hw->phy.speeds_supported;
+-
+-	if (phy_type_low  & IXGBE_PHY_TYPE_LOW_5GBASE_T  ||
+-	    phy_type_low  & IXGBE_PHY_TYPE_LOW_5GBASE_KR ||
+-	    phy_type_high & IXGBE_PHY_TYPE_HIGH_5G_USXGMII)
+-		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_5GB_FULL;
+-
+ 	/* Set PHY ID */
+ 	memcpy(&hw->phy.id, pcaps.phy_id_oui, sizeof(u32));
+ 
+-- 
+2.47.1
 
-
-Regards,
-Nicolas
 
