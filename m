@@ -1,243 +1,206 @@
-Return-Path: <netdev+bounces-203813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EA62AF7513
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 15:09:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2E37AF752A
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 15:12:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B0E9541666
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:09:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1B3A3BD474
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:12:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E70DC2E62AE;
-	Thu,  3 Jul 2025 13:09:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A68F2E6D32;
+	Thu,  3 Jul 2025 13:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O3mcL7U9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 064E92E267E;
-	Thu,  3 Jul 2025 13:09:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7482523AB86;
+	Thu,  3 Jul 2025 13:12:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751548182; cv=none; b=mQABWyGA/cQtTQZJeuwFqOM4HpcwqwtadgXDtSXsD0IkocjNnzs/+rytxqWxGlwK6FQO/oTrSU8oIGHcDKz3zzm8m6mWRSzQgCJy6Hfw9fqbDS38vURgwTcOatst8REWJEIy5rW2fJ61xM6FMT+O4iVk0myMn3yX0R8GTQrj/cg=
+	t=1751548358; cv=none; b=FemwWXobkt3wH3PKRrSF1IENIg/1Fj9DazMXsMbreEMCupQKDAHz0rpOODUNqiFrSKPrWmvoZfB1a+E7la1qolFo2IVwdiS8NbIh2VuAeSfqcAfEOIA50iMv7PeUsd/ZCxG4OyK5E9yQ2W62lW8kC7BtYIRuupAv0bVbZlca0qU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751548182; c=relaxed/simple;
-	bh=kgui7inL/vqDsBTMEH69lNiIWQHRQWTR+OPqeHY6vs0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=htTk3xkMs+EWIia+8HkcNosg86Txm4InmJrzEC3niEK8/ICirdfZlxXxAIbw7KstKY3/4dwKSc225EDS/jhZkc0I+jmdF5HX+6jUDk/pCv8NygL5nYSGYS8zieMZQ3HsivXdHhzLbX+XXf6/daxdHkEVnUmzW73TBevP8MeupBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1751548358; c=relaxed/simple;
+	bh=LG9XBSu0ciGJZgz7vLJ4OrBf9LsapUiqVdmBedNFvKE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FezCfIJFyhFAsQgvK2j8sFDVKVBkFHoJslowY4/Xm2r9XHBSoBdJO32XIDvxzXZHt1O6JgiVP4TPLD1zjqGSkHfQtonWpzF7Vbp6rnxg2GLX7TWgl1fdJ9LuwtDoPVZSFR6lVseDCk8/fpbxSAefBo6tuS91GfyyJPVz5GhUhj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O3mcL7U9; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-60bfcada295so9682423a12.1;
-        Thu, 03 Jul 2025 06:09:40 -0700 (PDT)
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3df210930f7so3613895ab.1;
+        Thu, 03 Jul 2025 06:12:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751548355; x=1752153155; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RuoUj+0h6/tTrKengxDfGebjlK0PMrwSeN40sTMEen8=;
+        b=O3mcL7U9qtVOeCuMB4stsZJI9gHiwjuL3010JfLk9pAXNKSlWGZVcB3ABzzpb8nlhr
+         p+JBc/lbuseYMuBCuEOFPG4TZt9FaBhgmvS7dJu88ckTCKqNYyNrbZa+ALlcZFqJHama
+         M8sCKYhdvWJnNNnXGRCcLFwctsaPWKnb/Vc0S/+UESQQFsCQ24ZT2kvmzhJVoHEm+XLu
+         gTbunFAXZ6PPV+dBVEV7d2SPN3HE/sLVnWun3PHeeQTmUsyIKGvqvw5fAYVhUAwiEaaL
+         ZsKgECDBUrJ2OLkNsLcpF6utf/amZ8hrP0LkJPhsdQlNV2ZbDdvfEzCBG5vwikovkspZ
+         /caA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751548179; x=1752152979;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JbShCvDOHKErkMP/Gg1T/sR3JkdeJYzMVJhkxwSXBGw=;
-        b=miD0VAe/4DAcEuqUZalWA0vsczvmi2J3OqiHBiQh5y2pnPzSpWlMB3hhrgBCLoLE5R
-         o2BecKWNGVDlha1opmmqZNhJeDPaPqP1bOa+boFOCAGDDZDG5ajWyRTTxEZYrRtdqoqP
-         /OUt6/yjHF9Ogf5Wsj9MQ6fFDyJHIjaNj/ucylrYWaxvQNJ6TTedPH8P70LwH4dC4YeE
-         ij433+iOcPIlgZgGRfewWzTivMh6b/vsX1Oi6XX83t2a6nVFNyIrQKvpivQ5KA/kdK56
-         CwrXJ6/82eMJ1Rt5HmyotAbp8GqqJLah2LP71AKprzVY83qHCrLbrxJvOfPOMCOcKbfq
-         5LPw==
-X-Forwarded-Encrypted: i=1; AJvYcCULE6RRBngmA5C432Z6CDfq7f95eT3bnzkXhH/8spZxusC5IVJJLWUxfSUb8IY3n8PLyCQB4bg2en1bmLY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCa3NcmF33JmKs8mC2fJNegV3ms92ipKyEaw9ct+qEamat14S7
-	9qebl5HFYaMu88RaW/fJcvIwkfcTndrEBW70D2/NaI0jMqZcA8OcmZp/
-X-Gm-Gg: ASbGnct0TXuIavVuqzXTG1bfv0kNC/CR3ps2wbJS5GwT1SnqiuquNzT2PYKrLma/6ln
-	vxXJt92aGWkZdcvX1kMkUooUuyGq2NqMwGckYlux/C/2XZaJkU+MITja9BfWhTWLYgpyvy8gJXI
-	SvWLCXeowD2h4qZZV3eT+eA5sVy/9YyWSzTpnNBvCQc/FFdudOBXJ8xp8fyyGFO1tFx4wUjwD5F
-	k9FD78PSLOAImghpLjqsjT/9rlpb29wkXY38NSpWHS57dupjNyZGRlMq3GW4eX6AgJr4RMOwLkn
-	SXgvxrPCnmOIoC0NjeQdBCfMSpiaUzgdS/IAxBWOpc1CSr7+GqfRHw==
-X-Google-Smtp-Source: AGHT+IH7hCjykRgI9mpodZMOhaf85NYz4FocHyyQgjmldVU3vGkcWKPV4AoKvcwsfoHIqsVpJ5ac/Q==
-X-Received: by 2002:a05:6402:2113:b0:602:1b8b:2925 with SMTP id 4fb4d7f45d1cf-60e52e3ba2amr5561204a12.29.1751548178913;
-        Thu, 03 Jul 2025 06:09:38 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:70::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae3c55ed0d8sm300195766b.184.2025.07.03.06.09.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jul 2025 06:09:38 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-Date: Thu, 03 Jul 2025 06:09:31 -0700
-Subject: [PATCH net-next v2] netdevsim: implement peer queue flow control
+        d=1e100.net; s=20230601; t=1751548355; x=1752153155;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RuoUj+0h6/tTrKengxDfGebjlK0PMrwSeN40sTMEen8=;
+        b=GxEfxVlI2k0aLeS7VhIsgNobh7RQRT7OHRbNcXVEG9Pi5ls72KAXgwDenD6ehPpoNt
+         /GYY2MNG9yMjT527k1flEPRhsbj8LQdKRHExKvi70OItGbNyjv56cUnBpw4fDwhtU2kW
+         FIOmyOt0jSd1Gxb4Gl1w8g152aRxH7KU6D+LEE4KnyLg8INteiNRIsIwZdEfeXu1OAIu
+         uixo/XlX1pLnFC7rSTvy0jDq98KacvQoAXJGa3MBvA7r+xOlOrxjbH4b/28sNSpYdihr
+         kuZuAMrqup6rV2Ul5uWDWUQGjDxJTMBAky/prp16AXyOEG1OrM1RmZd4d52oMxi2bG33
+         5TSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVPQccfh98KDwe2PQnSZBa3HP526rdB+jLD0OCqC6tfCc4pxGznqmZ4uOK318wOlZ7zgJ3Zr5Du@vger.kernel.org, AJvYcCWMTXLVf0/fJiKqGyA2Z0SqY2/F6wu2dPL91dgFFciF/t9AqsboN6xvS1098sLTrDCQ+b0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGv0oSrbMTfcylh5rAFLg7ecZgJfqiR/dKrNHk/kRHK7EYIpNA
+	1cWkX0D7N3P7Rf1D+VEQ02DyRuLzWdSCi7mTiatDt0ETRxEC4SY+3Bv4lkQEnNbQ1A2cA7QR5GX
+	5zlM9d2Cc1/+3Dx1lcXhFL/1Y+waTx0Q=
+X-Gm-Gg: ASbGncsIQBOos18wuKnQMN/2gbYsaAsmHfbtVil93Va816nTQ392a/DTkvynpUlM5TT
+	ayxzr66obkKUZBc8u+mhuRxxrbk1gx1blNkojrZtUUmRChZTgHg8/5aPuP18Ps6bXf+TDhgixDT
+	b9g9lsdTdsLXto6gEiXCz71EaH2wdR5A94kXQ8wShQ8A==
+X-Google-Smtp-Source: AGHT+IFOI6FpNIzalOqbXgrhAJIcObLcLVwZs+q5IvM5m2F+tRfHbtjuSWZc/xXYaWyTJOwesyvxzTR6QtHkmJMk28g=
+X-Received: by 2002:a05:6e02:d54:b0:3e0:536d:2b72 with SMTP id
+ e9e14a558f8ab-3e05dc866b0mr14080785ab.8.1751548355476; Thu, 03 Jul 2025
+ 06:12:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250703-netdev_flow_control-v2-1-ab00341c9cc1@debian.org>
-X-B4-Tracking: v=1; b=H4sIAAqBZmgC/23N0QqDIBSA4VeRc51Djyupq73HiKg8lRAaKq4Rv
- fvA613/8P0XRAqWInTsgkDZRusddAwrBvM2upW4NdAxQIG1aJTgjpKhPCy7/wyzdyn4neOERum
- 2qZXWUDE4Ai32LOobHCXu6EzQVww2G5MP37LLsvQiayH/yllyyfEpFLbL3MpJvgxNdnQPH1bo7
- /v+AVBVVdLBAAAA
-X-Change-ID: 20250630-netdev_flow_control-2b2d37965377
-To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kernel-team@meta.com, dw@davidwei.uk, Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-dd21f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4672; i=leitao@debian.org;
- h=from:subject:message-id; bh=kgui7inL/vqDsBTMEH69lNiIWQHRQWTR+OPqeHY6vs0=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBoZoERcft8bK3dMVKQb6yXmuyia5dVmmZX1fuCW
- OdEkvDfGveJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaGaBEQAKCRA1o5Of/Hh3
- beP7D/0RIGkLt+gYe9hGiFpgO5Vbjel27Tcg8bhVWGFHBrhltBotjNvwizDW8kHBktKc9Lbm7Ef
- y4asKd46RjeOczmGeWWpJUKy1LAzmnASk3bCdLP9eKzV9hyad28xX8aGBRTKMJ1caM63nQQPx/C
- uNyy8Bht3yHmbpgOC5w+MQeLeZifPYdR6yBptJ/grZ72CUe8hEsNRcoijhB4ZtnAenwv6mTSE5E
- nL5hh5KiOgDBEo/r6Pgkrk8T0ID9JK6M0tLb7uzolNcGm1sHIVhzzvSFG93Cs/8KGd0o+PHddoi
- r8mwu0yxZa7NQmb9ndBszgS5eGtwOBj0rLHNxmt3imw9tSA9wPmba6+fD0s/+NUdH/H0Z+nSoQM
- oPehLXmtN0qbVU1KZ9oA7Rlen9XHqjxiGqN7Bsb5brSRXsg8gWViReUt23PnjYl/BmT23dw7ajx
- bpe0EPf+HzeCjGsjv3sOnczi1+2M39GP+x7qX2ABWLG8surlZ5Twi3BVPG7K3hjlZh360bPnM0L
- is/DHNpDL+Kb7HBaWR4jCYRGkNWlkiXnSpVqbdtsAsZC26V7QwHgbpsjKJEGxP83gyYoL5Mcl85
- yrdFE20Clu64UDZtrWpq5RabfErPdmZwPLM9zVfdsn5GaaG9edhLTvHKsnFyXmNw4ohEuGiMa3d
- 8mRGkISuF1Uh9bw==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+References: <20250627110121.73228-1-kerneljasonxing@gmail.com>
+ <af16a28a-18b9-4d45-9ab9-1b150988b7d5@redhat.com> <CAL+tcoDa13Gzdzv7NOSVwWDZV86w7NgJniT1jMqe2FCw1psHFg@mail.gmail.com>
+ <aGZ3mJnFSsAxv7z6@boxer>
+In-Reply-To: <aGZ3mJnFSsAxv7z6@boxer>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 3 Jul 2025 21:11:59 +0800
+X-Gm-Features: Ac12FXz3W63k1fTo7bN8uwnlrl2zEdGUbU37o6c7gkRkUAmwEuB-Ue1tdQqQhCI
+Message-ID: <CAL+tcoDuBkd=pMR+mrUJgLpCRdh1cQcPBEH9rvnMJtXU242MHQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v6] net: xsk: introduce XDP_MAX_TX_BUDGET set/getsockopt
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, joe@dama.to, 
+	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add flow control mechanism between paired netdevsim devices to stop the
-TX queue during high traffic scenarios. When a receive queue becomes
-congested (approaching NSIM_RING_SIZE limit), the corresponding transmit
-queue on the peer device is stopped using netif_subqueue_try_stop().
+On Thu, Jul 3, 2025 at 8:29=E2=80=AFPM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> On Thu, Jul 03, 2025 at 04:22:21PM +0800, Jason Xing wrote:
+> > On Thu, Jul 3, 2025 at 4:15=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> =
+wrote:
+> > >
+> > > On 6/27/25 1:01 PM, Jason Xing wrote:
+> > > > From: Jason Xing <kernelxing@tencent.com>
+> > > >
+> > > > This patch provides a setsockopt method to let applications leverag=
+e to
+> > > > adjust how many descs to be handled at most in one send syscall. It
+> > > > mitigates the situation where the default value (32) that is too sm=
+all
+> > > > leads to higher frequency of triggering send syscall.
+> > > >
+> > > > Considering the prosperity/complexity the applications have, there =
+is no
+> > > > absolutely ideal suggestion fitting all cases. So keep 32 as its de=
+fault
+> > > > value like before.
+> > > >
+> > > > The patch does the following things:
+> > > > - Add XDP_MAX_TX_BUDGET socket option.
+> > > > - Convert TX_BATCH_SIZE to tx_budget_spent.
+> > > > - Set tx_budget_spent to 32 by default in the initialization phase =
+as a
+> > > >   per-socket granular control. 32 is also the min value for
+> > > >   tx_budget_spent.
+> > > > - Set the range of tx_budget_spent as [32, xs->tx->nentries].
+> > > >
+> > > > The idea behind this comes out of real workloads in production. We =
+use a
+> > > > user-level stack with xsk support to accelerate sending packets and
+> > > > minimize triggering syscalls. When the packets are aggregated, it's=
+ not
+> > > > hard to hit the upper bound (namely, 32). The moment user-space sta=
+ck
+> > > > fetches the -EAGAIN error number passed from sendto(), it will loop=
+ to try
+> > > > again until all the expected descs from tx ring are sent out to the=
+ driver.
+> > > > Enlarging the XDP_MAX_TX_BUDGET value contributes to less frequency=
+ of
+> > > > sendto() and higher throughput/PPS.
+> > > >
+> > > > Here is what I did in production, along with some numbers as follow=
+s:
+> > > > For one application I saw lately, I suggested using 128 as max_tx_b=
+udget
+> > > > because I saw two limitations without changing any default configur=
+ation:
+> > > > 1) XDP_MAX_TX_BUDGET, 2) socket sndbuf which is 212992 decided by
+> > > > net.core.wmem_default. As to XDP_MAX_TX_BUDGET, the scenario behind
+> > > > this was I counted how many descs are transmitted to the driver at =
+one
+> > > > time of sendto() based on [1] patch and then I calculated the
+> > > > possibility of hitting the upper bound. Finally I chose 128 as a
+> > > > suitable value because 1) it covers most of the cases, 2) a higher
+> > > > number would not bring evident results. After twisting the paramete=
+rs,
+> > > > a stable improvement of around 4% for both PPS and throughput and l=
+ess
+> > > > resources consumption were found to be observed by strace -c -p xxx=
+:
+> > > > 1) %time was decreased by 7.8%
+> > > > 2) error counter was decreased from 18367 to 572
+> > > >
+> > > > [1]: https://lore.kernel.org/all/20250619093641.70700-1-kerneljason=
+xing@gmail.com/
+> > > >
+> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > >
+> > > LGTM, waiting a little more for an explicit an ack from XDP maintaine=
+rs.
+> >
+> > Thanks. No problem.
+>
+> Hey! i did review. Jason sorry but I got confused that you need to sort
+> out the performance results on your side, hence the silence.
 
-Once the receive queue has sufficient capacity again, the peer's
-transmit queue is resumed with netif_tx_wake_queue().
+Thanks for the review. My environment doesn't allow me to continue the
+xdpsock experiment because of many limitations from the host side.
+>
+> >
+> > >
+> > > Side note: it could be useful to extend the xdp selftest to trigger t=
+he
+> > > new code path.
+> >
+> > Roger that, sir. I will do it after this gets merged, maybe later this
+> > month, still studying for various tests in recent days :)
+>
+> IMHO nothing worth testing with this patch per-se, it's rather the matter
+> of performance.
+>
+> I would like however to ask you for follow-up with patch against xdpsock
+> that adds support for using this new setsockopt (once we accept this onto
+> kernel).
 
-Key changes:
-  * Add nsim_stop_peer_tx_queue() to pause peer TX when RX queue is full
-  * Add nsim_start_peer_tx_queue() to resume peer TX when RX queue drains
-  * Implement queue mapping validation to ensure TX/RX queue count match
-  * Wake all queues during device unlinking to prevent stuck queues
-  * Use RCU protection when accessing peer device references
+That xdp-project in the github. I will finish it after it's done.
 
-The flow control only activates when devices have matching TX/RX queue
-counts to ensure proper queue mapping.
+Thanks,
+Jason
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
-Changes in v2:
-- Move the RCU locks inside the function (David)
-- Use better helpers for waking up all the queues (Jakub)
-- Link to v1: https://lore.kernel.org/r/20250701-netdev_flow_control-v1-1-240329fc91b1@debian.org
----
- drivers/net/netdevsim/bus.c    |  3 ++
- drivers/net/netdevsim/netdev.c | 63 ++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 64 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/netdevsim/bus.c b/drivers/net/netdevsim/bus.c
-index 64c0cdd31bf85..1ba52471f3fbc 100644
---- a/drivers/net/netdevsim/bus.c
-+++ b/drivers/net/netdevsim/bus.c
-@@ -366,6 +366,9 @@ static ssize_t unlink_device_store(const struct bus_type *bus, const char *buf,
- 	err = 0;
- 	RCU_INIT_POINTER(nsim->peer, NULL);
- 	RCU_INIT_POINTER(peer->peer, NULL);
-+	synchronize_net();
-+	netif_tx_wake_all_queues(dev);
-+	netif_tx_wake_all_queues(peer->netdev);
- 
- out_put_netns:
- 	put_net(ns);
-diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index e36d3e846c2dc..b5b13fba6450d 100644
---- a/drivers/net/netdevsim/netdev.c
-+++ b/drivers/net/netdevsim/netdev.c
-@@ -37,9 +37,67 @@ MODULE_IMPORT_NS("NETDEV_INTERNAL");
- 
- #define NSIM_RING_SIZE		256
- 
--static int nsim_napi_rx(struct nsim_rq *rq, struct sk_buff *skb)
-+static void nsim_start_peer_tx_queue(struct net_device *dev, struct nsim_rq *rq)
-+{
-+	struct netdevsim *ns = netdev_priv(dev);
-+	struct net_device *peer_dev;
-+	struct netdevsim *peer_ns;
-+	struct netdev_queue *txq;
-+	u16 idx;
-+
-+	idx = rq->napi.index;
-+	rcu_read_lock();
-+	peer_ns = rcu_dereference(ns->peer);
-+	if (!peer_ns)
-+		goto out;
-+
-+	/* TX device */
-+	peer_dev = peer_ns->netdev;
-+	if (dev->real_num_tx_queues != peer_dev->num_rx_queues)
-+		goto out;
-+
-+	txq = netdev_get_tx_queue(peer_dev, idx);
-+	if (!(netif_tx_queue_stopped(txq)))
-+		goto out;
-+
-+	netif_tx_wake_queue(txq);
-+out:
-+	rcu_read_unlock();
-+}
-+
-+static void nsim_stop_peer_tx_queue(struct net_device *dev, struct nsim_rq *rq,
-+				    u16 idx)
-+{
-+	struct netdevsim *ns = netdev_priv(dev);
-+	struct net_device *peer_dev;
-+	struct netdevsim *peer_ns;
-+
-+	rcu_read_lock();
-+	peer_ns = rcu_dereference(ns->peer);
-+	if (!peer_ns)
-+		goto out;
-+
-+	/* TX device */
-+	peer_dev = peer_ns->netdev;
-+
-+	/* If different queues size, do not stop, since it is not
-+	 * easy to find which TX queue is mapped here
-+	 */
-+	if (dev->real_num_tx_queues != peer_dev->num_rx_queues)
-+		goto out;
-+
-+	netif_subqueue_try_stop(peer_dev, idx,
-+				NSIM_RING_SIZE - skb_queue_len(&rq->skb_queue),
-+				NSIM_RING_SIZE / 2);
-+out:
-+	rcu_read_unlock();
-+}
-+
-+static int nsim_napi_rx(struct net_device *dev, struct nsim_rq *rq,
-+			struct sk_buff *skb)
- {
- 	if (skb_queue_len(&rq->skb_queue) > NSIM_RING_SIZE) {
-+		nsim_stop_peer_tx_queue(dev, rq, skb_get_queue_mapping(skb));
- 		dev_kfree_skb_any(skb);
- 		return NET_RX_DROP;
- 	}
-@@ -51,7 +109,7 @@ static int nsim_napi_rx(struct nsim_rq *rq, struct sk_buff *skb)
- static int nsim_forward_skb(struct net_device *dev, struct sk_buff *skb,
- 			    struct nsim_rq *rq)
- {
--	return __dev_forward_skb(dev, skb) ?: nsim_napi_rx(rq, skb);
-+	return __dev_forward_skb(dev, skb) ?: nsim_napi_rx(dev, rq, skb);
- }
- 
- static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
-@@ -351,6 +409,7 @@ static int nsim_rcv(struct nsim_rq *rq, int budget)
- 			dev_dstats_rx_dropped(dev);
- 	}
- 
-+	nsim_start_peer_tx_queue(dev, rq);
- 	return i;
- }
- 
-
----
-base-commit: be4ea6c336b9a4fc1cc4be1c0549b24d0e687488
-change-id: 20250630-netdev_flow_control-2b2d37965377
-
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
-
+>
+> >
+> > Thanks,
+> > Jason
 
