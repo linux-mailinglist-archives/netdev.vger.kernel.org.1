@@ -1,227 +1,533 @@
-Return-Path: <netdev+bounces-203674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3249BAF6C0F
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 09:53:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA748AF6C1C
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 09:55:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8D233A6E26
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 07:53:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2B687B70EA
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 07:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FAEC29AAF0;
-	Thu,  3 Jul 2025 07:53:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70F7829CB2A;
+	Thu,  3 Jul 2025 07:54:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mf01XLBc"
+	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="dwc06PbT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from va-1-19.ptr.blmpb.com (va-1-19.ptr.blmpb.com [209.127.230.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF08299A85;
-	Thu,  3 Jul 2025 07:53:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4271129CB39
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 07:54:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.230.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751529227; cv=none; b=Ugu0o4NUfb47HGFjjjcu3J8inUmTTVlDX1kdnjWBH2DM9ulluXqyMAo5P7nGLAfGW4HomixGrZR4f3ax1bUUxFUh8f7OKrtvSwg5vR9GepBa7qmiaXu+MuKC49IEFGJaCNuPB2r83UNfwhG4+YKe1XjUCcFkiPMCkrTKlxhocX4=
+	t=1751529277; cv=none; b=c2n8RlOoQ8GBELZmXDcGFcG5qDsBsRcK60xGaebnSC+32dImLjAwviAcr7GHdWAPlsxXScJoxk2kkOaNDaTqLHpX8Nv9Pi1PWGNpKrZseHWILQ5Mit/w2APiS5zU9wIZ/dMbFAFp7lsgxIZZku4ZLaHQMBq8PtvXiGGclibzatw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751529227; c=relaxed/simple;
-	bh=EAO/alnjYPf1u5+DtQLR/0pbf21VfVmpJZWS6+1VGvA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=knaBHDuAbduU4efoUZFWGKTQ65IciP+xyPYvsO9OD60XBPqHwhgmOc/QVla6KfIwGPcbBhnhl1RQnhK26pC7lG+LZ5q1dytb8aoxD4UVV03GCNV5sTyDzOWE37iZphRXL2f8cnGwrZ48urTZC1ZHJ7A0DXnfM2ZF9Y89ZOXhF2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mf01XLBc; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-31223a4cddeso3445235a91.1;
-        Thu, 03 Jul 2025 00:53:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751529225; x=1752134025; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o5Z3Ibg5dI0YI2U0Q0aEUI660v44K9U+DyvKSIB5G4w=;
-        b=mf01XLBc5PMojHYNULfLOA2L6G9YKwG7pzSZDrTKOBhGSkg1fUb8E7j8MyqCrYXodL
-         ZIAWCn+/Teqt8qs6lA9UDsV1GfdWIotqzOUnp9hZ0HKyJ94x1rSy+DKzT0qNYOdX3IBZ
-         W/Wv2WjyGmDhWqw+ln3UvUDbM+L3Z9Z1E9U3eXRPKsGDCSYmM4FV0jG4xfs5M5sfFPdJ
-         WUoX8g8VeZ4rtcrRZAbS0Dt61DjjTvYOUZmkkTsJA0N8+XKZ7WtUj6jQia8njlmSMCSQ
-         YyRRUk1TvGXOqVvOBR5v5N+/nhejnk9hBLwfwK1WNWuChSg37Yb/Xc1hApVc1hSu8Qnf
-         nFxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751529225; x=1752134025;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o5Z3Ibg5dI0YI2U0Q0aEUI660v44K9U+DyvKSIB5G4w=;
-        b=FkjugsMktYQw+K9qB6iYYxQ9esj7HxK9BU2zg+rkb71J8R8PTXDhr/Ovkdnh4v9MLT
-         /Rker0hAGuP/DGNMpLAu81Wy7592fxgEF5Fy9asV65kNgSN+ZV4HHfD6+USkRtRQa88d
-         vh8SmnDDhB1a5cDN2z43+/4mZMs9B7WVB/CgOpPscHCRhSzUsp99nApbBziiPG+FbLcz
-         ++ZH2Byvk6Dtj8qqGOXhjWNA+UpC08KBavZ/GtCzhOzqKRi9a3geKCFq05GyVl6mJnTr
-         +F8y4A+Np4vrc9GXlch3eeHtrXPn7w2tAumsXeRHUkXuT6upapiqbpy1d2bAqh3ocYo7
-         DX6w==
-X-Forwarded-Encrypted: i=1; AJvYcCUOt41p7ig/CboFg58xTapoafQ0lYVCmrmhHj8tWLEIfwwdB2DuPVZAR9vLG/8DqElwl8G51nDsBtqLdCy8@vger.kernel.org, AJvYcCUWrVp3EnwMgd9Nkf8ne38UUXPVUAn9wHFJCvNfh/gGCPnpA5Rmdg14c2bhlxbesa3+x30nmiil@vger.kernel.org, AJvYcCVLhhTMD5cj1EzMY38LO3tUR6OsRv7en2gIsVPcutk/9DLDqv9SeaZUonbepGLvxNU/C+s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjvdCBKUNV5029yTi0z6dZ3cGHlsi68PNpDnBXIKcu8dDmFGvg
-	U6Toq/ZfB1gWsX6ChTlGLNJDdfC67zThonEYtbt8Q2K9dqBNLwfZqTOeJhsXwdxgDulHGH6W
-X-Gm-Gg: ASbGncuRCQgb2q8h5X8Xy4yHRDrUD99JAbNIWsnBpB89womxCaddg5jwdEI35vsdi4q
-	aPBvjYDWIQWj/TEwEwRcb/o/QP76Zlx0kq4AwQQT9yiSNShTd7cA3KcR2iv1cIx+gpU/QZYW2l7
-	QSbM1LsqnPV2+G564BzLPYQxoMnc+W7XX2IzofIzrcwnjcvmVlBLL/zHlIXaI6mODQ27GbFxzNV
-	L3/5zyby95kIoUfuO5x6YcWikAu+13D7BM9yeJLyMmBXSvcQ2n2Het1ecZlTYgoh6QSMkviHKW4
-	zEdoV0xeO2xigqaz9YRsi+Yt9I/pQjulfH7FtQcix5JSi5uNXDfnk6vIzKW4jK28vxMKC9+/CSe
-	C0sbvHRmJV/u/Qd+v+Ws=
-X-Google-Smtp-Source: AGHT+IG5wCaASyniAIni8ifVqNeDb2b7kJdZU/BUNxpaGI75twsZCp3n4qDX+fcy/2jRkP4DZDxYgw==
-X-Received: by 2002:a17:90b:4c84:b0:312:1ae9:153a with SMTP id 98e67ed59e1d1-31a90bef1a8mr8956064a91.25.1751529224280;
-        Thu, 03 Jul 2025 00:53:44 -0700 (PDT)
-Received: from devant.antgroup-inc.local ([47.89.83.0])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31a9cc5a266sm1788596a91.12.2025.07.03.00.53.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jul 2025 00:53:43 -0700 (PDT)
-From: Xuewei Niu <niuxuewei97@gmail.com>
-X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
-To: sgarzare@redhat.com
-Cc: davem@davemloft.net,
-	decui@microsoft.com,
-	fupan.lfp@antgroup.com,
-	jasowang@redhat.com,
-	kvm@vger.kernel.org,
-	leonardi@redhat.com,
-	linux-kernel@vger.kernel.org,
-	mst@redhat.com,
-	netdev@vger.kernel.org,
-	niuxuewei.nxw@antgroup.com,
-	niuxuewei97@gmail.com,
-	pabeni@redhat.com,
-	stefanha@redhat.com,
-	virtualization@lists.linux.dev,
-	xuanzhuo@linux.alibaba.com
-Subject: Re: [RESEND PATCH net-next v4 3/4] test/vsock: Add retry mechanism to ioctl wrapper
-Date: Thu,  3 Jul 2025 15:53:28 +0800
-Message-Id: <20250703075328.1004942-1-niuxuewei.nxw@antgroup.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <ceulzs7srd77t57ozaauveim4dlp6stqmbvvjh5dketapmjzhv@nu6gruoyidze>
-References: <ceulzs7srd77t57ozaauveim4dlp6stqmbvvjh5dketapmjzhv@nu6gruoyidze>
+	s=arc-20240116; t=1751529277; c=relaxed/simple;
+	bh=ogPhZUCPa4EJT+q4aaNWhiAMIBNclHTziTYIhkGoAHc=;
+	h=Cc:Subject:Mime-Version:Content-Type:References:To:Message-Id:
+	 In-Reply-To:From:Date; b=AFFsJmhoQ/mTlvQE4124wPvGzBiJQYYGQ3cO7VoLIFoW4dVIZcmv9paOwM1od6rgyTmlYkWJjfBNepGk78RACBFNkXJB8amMVmdiz9hxbJtRfgcbfxHbuvmUsceKjjtVFimrQLbbQ87XBjaF+QDMtU/0GWVJKbE4S/ZPOGuXsRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=dwc06PbT; arc=none smtp.client-ip=209.127.230.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=feishu2403070942; d=yunsilicon.com; t=1751529225; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=fMNSgHmSqMpcu/yQNzvf3mxbUV86fL0McWYpNtS9/3k=;
+ b=dwc06PbTbUVfZFfenbL97+uKxCSIwAvZL6iycFnv3ksTBIMnCzddT73QJoYrOh8wIbxHb3
+ 6ly/dKfp7FMjFh+cQzMbAjjQw8+Ffl/cbC0uaMIYtqCa03+C1g/Ww+WDJl3H/3DgqRaNPX
+ +typbaGvFjH/fk8DYd0Qx7+ny7FpvWxCVxTMCIqtw96orjN2FTWHFz1MmbS+5tJsaOfMKt
+ EJY+3q77kr9bzloCzMl+UbuLV7abcE3ZRfwaYKojorJQQBElLURfkSJ02MOCEhL+OAy60P
+ fE9I7gpAzNhTUKrn5PCku5d97L59kZqyRBN4y884SnO1qhW4mqjshKCYXHGT8g==
+Cc: <leon@kernel.org>, <andrew+netdev@lunn.ch>, <kuba@kernel.org>, 
+	<pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>, 
+	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
+	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <jacky@yunsilicon.com>, 
+	<horms@kernel.org>, <parthiban.veerasooran@microchip.com>, 
+	<masahiroy@kernel.org>, <kalesh-anakkur.purayil@broadcom.com>, 
+	<geert+renesas@glider.be>, <pabeni@redhat.com>, <geert@linux-m68k.org>
+Subject: [PATCH net-next v12 01/14] xsc: Add xsc driver basic framework
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+References: <20250703075341.3488773-1-tianx@yunsilicon.com>
+Received: from ubuntu-liun.yunsilicon.com ([58.34.192.114]) by smtp.feishu.cn with ESMTPS; Thu, 03 Jul 2025 15:53:42 +0800
+To: <netdev@vger.kernel.org>
+Message-Id: <20250703075341.3488773-2-tianx@yunsilicon.com>
+X-Mailer: git-send-email 2.25.1
+X-Lms-Return-Path: <lba+268663707+759f1f+vger.kernel.org+tianx@yunsilicon.com>
+Content-Transfer-Encoding: 7bit
+In-Reply-To: <20250703075341.3488773-1-tianx@yunsilicon.com>
+X-Original-From: Xin Tian <tianx@yunsilicon.com>
+From: "Xin Tian" <tianx@yunsilicon.com>
+Date: Thu, 03 Jul 2025 15:53:42 +0800
 
-> On Thu, Jul 03, 2025 at 11:05:14AM +0800, Xuewei Niu wrote:
-> >Resend: the previous message was rejected due to HTML
-> >Resend: forgot to reply all...
-> >
-> >> On Mon, Jun 30, 2025 at 03:57:26PM +0800, Xuewei Niu wrote:
-> >> >Wrap the ioctl in `ioctl_int()`, which takes a pointer to the actual
-> >> >int value and an expected int value. The function will not return until
-> >> >either the ioctl returns the expected value or a timeout occurs, thus
-> >> >avoiding immediate failure.
-> >> >
-> >> >Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
-> >> >---
-> >> > tools/testing/vsock/util.c | 32 +++++++++++++++++++++++---------
-> >> > tools/testing/vsock/util.h |  1 +
-> >> > 2 files changed, 24 insertions(+), 9 deletions(-)
-> >> >
-> >> >diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
-> >> >index 0c7e9cbcbc85..481c395227e4 100644
-> >> >--- a/tools/testing/vsock/util.c
-> >> >+++ b/tools/testing/vsock/util.c
-> >> >@@ -16,6 +16,7 @@
-> >> > #include <unistd.h>
-> >> > #include <assert.h>
-> >> > #include <sys/epoll.h>
-> >> >+#include <sys/ioctl.h>
-> >> > #include <sys/mman.h>
-> >> > #include <linux/sockios.h>
-> >> >
-> >> >@@ -97,28 +98,41 @@ void vsock_wait_remote_close(int fd)
-> >> > 	close(epollfd);
-> >> > }
-> >> >
-> >> >-/* Wait until transport reports no data left to be sent.
-> >> >- * Return false if transport does not implement the unsent_bytes()
-> >> >callback.
-> >> >+/* Wait until ioctl gives an expected int value.
-> >> >+ * Return false if the op is not supported.
-> >> >  */
-> >> >-bool vsock_wait_sent(int fd)
-> >> >+bool vsock_ioctl_int(int fd, unsigned long op, int *actual, int expected)
-> >>
-> >> Why we need the `actual` parameter?
-> >
-> >We can exit early `if (*actual == expected)`, and the `expected` can be any integer.
-> >I also make it to be a pointer, because the caller might need to have the actual value.
-> 
-> IIUC this function return true if `*actual == expected` or false if 
-> there was an error, so I don't see the point of aving `actual`, since it 
-> can only be equal to `expected` if it returns true, or invalid if it 
-> returs false.
+1. Add yunsilicon xsc driver basic compile framework, including
+xsc_pci driver and xsc_eth driver
+2. Implemented PCI device initialization.
 
-Nice catch! I'll remove it in v5.
+Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
+Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+Co-developed-by: Lei Yan <jacky@yunsilicon.com>
+Signed-off-by: Lei Yan <jacky@yunsilicon.com>
+Signed-off-by: Xin Tian <tianx@yunsilicon.com>
+---
+ MAINTAINERS                                   |   7 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/yunsilicon/Kconfig       |  26 +++
+ drivers/net/ethernet/yunsilicon/Makefile      |   7 +
+ .../ethernet/yunsilicon/xsc/common/xsc_core.h |  43 ++++
+ .../net/ethernet/yunsilicon/xsc/net/Kconfig   |  17 ++
+ .../net/ethernet/yunsilicon/xsc/net/Makefile  |   9 +
+ .../net/ethernet/yunsilicon/xsc/pci/Kconfig   |  14 ++
+ .../net/ethernet/yunsilicon/xsc/pci/Makefile  |   9 +
+ .../net/ethernet/yunsilicon/xsc/pci/main.c    | 214 ++++++++++++++++++
+ 11 files changed, 348 insertions(+)
+ create mode 100644 drivers/net/ethernet/yunsilicon/Kconfig
+ create mode 100644 drivers/net/ethernet/yunsilicon/Makefile
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/Makefile
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/main.c
 
-Thanks,
-Xuewei
-
-> Thanks,
-> Stefano
-> 
-> >
-> >Thanks,
-> >Xuewei
-> >
-> >> > {
-> >> >-	int ret, sock_bytes_unsent;
-> >> >+	int ret;
-> >> >+	char name[32];
-> >> >+
-> >> >+	snprintf(name, sizeof(name), "ioctl(%lu)", op);
-> >> >
-> >> > 	timeout_begin(TIMEOUT);
-> >> > 	do {
-> >> >-		ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
-> >> >+		ret = ioctl(fd, op, actual);
-> >> > 		if (ret < 0) {
-> >> > 			if (errno == EOPNOTSUPP)
-> >> > 				break;
-> >> >
-> >> >-			perror("ioctl(SIOCOUTQ)");
-> >> >+			perror(name);
-> >> > 			exit(EXIT_FAILURE);
-> >> > 		}
-> >> >-		timeout_check("SIOCOUTQ");
-> >> >-	} while (sock_bytes_unsent != 0);
-> >> >+		timeout_check(name);
-> >> >+	} while (*actual != expected);
-> >> > 	timeout_end();
-> >> >
-> >> >-	return !ret;
-> >> >+	return ret >= 0;
-> >> >+}
-> >> >+
-> >> >+/* Wait until transport reports no data left to be sent.
-> >> >+ * Return false if transport does not implement the unsent_bytes() callback.
-> >> >+ */
-> >> >+bool vsock_wait_sent(int fd)
-> >> >+{
-> >> >+	int sock_bytes_unsent;
-> >> >+
-> >> >+	return vsock_ioctl_int(fd, SIOCOUTQ, &sock_bytes_unsent, 0);
-> >> > }
-> >> >
-> >> > /* Create socket <type>, bind to <cid, port> and return the file descriptor. */
-> >> >diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
-> >> >index 5e2db67072d5..d59581f68d61 100644
-> >> >--- a/tools/testing/vsock/util.h
-> >> >+++ b/tools/testing/vsock/util.h
-> >> >@@ -54,6 +54,7 @@ int vsock_stream_listen(unsigned int cid, unsigned int port);
-> >> > int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
-> >> > 			   struct sockaddr_vm *clientaddrp);
-> >> > void vsock_wait_remote_close(int fd);
-> >> >+bool vsock_ioctl_int(int fd, unsigned long op, int *actual, int expected);
-> >> > bool vsock_wait_sent(int fd);
-> >> > void send_buf(int fd, const void *buf, size_t len, int flags,
-> >> > 	      ssize_t expected_ret);
-> >> >--
-> >> >2.34.1
-> >> >
-> >
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 96b827049..19664829b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -26630,6 +26630,13 @@ S:	Maintained
+ F:	Documentation/input/devices/yealink.rst
+ F:	drivers/input/misc/yealink.*
+ 
++YUNSILICON XSC DRIVERS
++M:	Honggang Wei <weihg@yunsilicon.com>
++M:	Xin Tian <tianx@yunsilicon.com>
++L:	netdev@vger.kernel.org
++S:	Maintained
++F:	drivers/net/ethernet/yunsilicon/xsc
++
+ Z8530 DRIVER FOR AX.25
+ M:	Joerg Reuter <jreuter@yaina.de>
+ L:	linux-hams@vger.kernel.org
+diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
+index 0baac25db..aa6016597 100644
+--- a/drivers/net/ethernet/Kconfig
++++ b/drivers/net/ethernet/Kconfig
+@@ -82,6 +82,7 @@ source "drivers/net/ethernet/i825xx/Kconfig"
+ source "drivers/net/ethernet/ibm/Kconfig"
+ source "drivers/net/ethernet/intel/Kconfig"
+ source "drivers/net/ethernet/xscale/Kconfig"
++source "drivers/net/ethernet/yunsilicon/Kconfig"
+ 
+ config JME
+ 	tristate "JMicron(R) PCI-Express Gigabit Ethernet support"
+diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
+index c03203439..c16c34d4b 100644
+--- a/drivers/net/ethernet/Makefile
++++ b/drivers/net/ethernet/Makefile
+@@ -51,6 +51,7 @@ obj-$(CONFIG_NET_VENDOR_INTEL) += intel/
+ obj-$(CONFIG_NET_VENDOR_I825XX) += i825xx/
+ obj-$(CONFIG_NET_VENDOR_MICROSOFT) += microsoft/
+ obj-$(CONFIG_NET_VENDOR_XSCALE) += xscale/
++obj-$(CONFIG_NET_VENDOR_YUNSILICON) += yunsilicon/
+ obj-$(CONFIG_JME) += jme.o
+ obj-$(CONFIG_KORINA) += korina.o
+ obj-$(CONFIG_LANTIQ_ETOP) += lantiq_etop.o
+diff --git a/drivers/net/ethernet/yunsilicon/Kconfig b/drivers/net/ethernet/yunsilicon/Kconfig
+new file mode 100644
+index 000000000..e66ab4376
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/Kconfig
+@@ -0,0 +1,26 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++# Yunsilicon driver configuration
++#
++
++config NET_VENDOR_YUNSILICON
++	bool "Yunsilicon devices"
++	default y
++	depends on PCI
++	depends on 64BIT || COMPILE_TEST
++	help
++	  If you have a network (Ethernet) device belonging to this class,
++	  say Y.
++
++	  Note that the answer to this question doesn't directly affect the
++	  kernel: saying N will just cause the configurator to skip all
++	  the questions about Yunsilicon cards. If you say Y, you will be asked
++	  for your specific card in the following questions.
++
++if NET_VENDOR_YUNSILICON
++
++source "drivers/net/ethernet/yunsilicon/xsc/net/Kconfig"
++source "drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig"
++
++endif # NET_VENDOR_YUNSILICON
+diff --git a/drivers/net/ethernet/yunsilicon/Makefile b/drivers/net/ethernet/yunsilicon/Makefile
+new file mode 100644
+index 000000000..05aa35c3c
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/Makefile
+@@ -0,0 +1,7 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++# Makefile for the Yunsilicon device drivers.
++#
++
++obj-$(CONFIG_YUNSILICON_XSC_PCI) += xsc/pci/
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+new file mode 100644
+index 000000000..0673e34fe
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+@@ -0,0 +1,43 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++ * All rights reserved.
++ */
++
++#ifndef __XSC_CORE_H
++#define __XSC_CORE_H
++
++#include <linux/pci.h>
++
++#define XSC_PCI_VENDOR_ID		0x1f67
++
++#define XSC_MC_PF_DEV_ID		0x1011
++#define XSC_MC_VF_DEV_ID		0x1012
++#define XSC_MC_PF_DEV_ID_DIAMOND	0x1021
++
++#define XSC_MF_HOST_PF_DEV_ID		0x1051
++#define XSC_MF_HOST_VF_DEV_ID		0x1052
++#define XSC_MF_SOC_PF_DEV_ID		0x1053
++
++#define XSC_MS_PF_DEV_ID		0x1111
++#define XSC_MS_VF_DEV_ID		0x1112
++
++#define XSC_MV_HOST_PF_DEV_ID		0x1151
++#define XSC_MV_HOST_VF_DEV_ID		0x1152
++#define XSC_MV_SOC_PF_DEV_ID		0x1153
++
++struct xsc_dev_resource {
++	/* protect buffer allocation according to numa node */
++	struct mutex		alloc_mutex;
++};
++
++struct xsc_core_device {
++	struct pci_dev		*pdev;
++	struct device		*device;
++	struct xsc_dev_resource	*dev_res;
++	int			numa_node;
++
++	void __iomem		*bar;
++	int			bar_num;
++};
++
++#endif
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/Kconfig b/drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
+new file mode 100644
+index 000000000..b2f95370f
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
+@@ -0,0 +1,17 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++# Yunsilicon driver configuration
++#
++
++config YUNSILICON_XSC_ETH
++	tristate "Yunsilicon XSC ethernet driver"
++	depends on YUNSILICON_XSC_PCI
++	depends on NET
++	select PAGE_POOL
++	help
++	  This driver provides ethernet support for
++	  Yunsilicon XSC devices.
++
++	  To compile this driver as a module, choose M here. The module
++	  will be called xsc_eth.
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/Makefile b/drivers/net/ethernet/yunsilicon/xsc/net/Makefile
+new file mode 100644
+index 000000000..53300be3c
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/net/Makefile
+@@ -0,0 +1,9 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++
++ccflags-y += -I$(srctree)/drivers/net/ethernet/yunsilicon/xsc
++
++obj-$(CONFIG_YUNSILICON_XSC_ETH) += xsc_eth.o
++
++xsc_eth-y := main.o
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig b/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
+new file mode 100644
+index 000000000..b707da28b
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
+@@ -0,0 +1,14 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++# Yunsilicon PCI configuration
++#
++
++config YUNSILICON_XSC_PCI
++	tristate "Yunsilicon XSC PCI driver"
++	help
++	  This driver is common for Yunsilicon XSC
++	  ethernet and RDMA drivers.
++
++	  To compile this driver as a module, choose M here. The module
++	  will be called xsc_pci.
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile b/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+new file mode 100644
+index 000000000..709270df8
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+@@ -0,0 +1,9 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++
++ccflags-y += -I$(srctree)/drivers/net/ethernet/yunsilicon/xsc
++
++obj-$(CONFIG_YUNSILICON_XSC_PCI) += xsc_pci.o
++
++xsc_pci-y := main.o
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/main.c b/drivers/net/ethernet/yunsilicon/xsc/pci/main.c
+new file mode 100644
+index 000000000..b8fc25679
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/pci/main.c
+@@ -0,0 +1,214 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++ * All rights reserved.
++ */
++
++#include "common/xsc_core.h"
++
++static const struct pci_device_id xsc_pci_id_table[] = {
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MC_PF_DEV_ID) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MC_PF_DEV_ID_DIAMOND) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MF_HOST_PF_DEV_ID) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MF_SOC_PF_DEV_ID) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MS_PF_DEV_ID) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MV_HOST_PF_DEV_ID) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MV_SOC_PF_DEV_ID) },
++	{ 0 }
++};
++
++static int xsc_set_dma_caps(struct pci_dev *pdev)
++{
++	int err;
++
++	err = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(64));
++	if (!err)
++		dma_set_max_seg_size(&pdev->dev, SZ_2G);
++
++	return err;
++}
++
++static int xsc_pci_init(struct xsc_core_device *xdev,
++			const struct pci_device_id *id)
++{
++	struct pci_dev *pdev = xdev->pdev;
++	void __iomem *bar_base;
++	int bar_num = 0;
++	int err;
++
++	xdev->numa_node = dev_to_node(&pdev->dev);
++
++	err = pci_enable_device(pdev);
++	if (err) {
++		pci_err(pdev, "failed to enable PCI device: err=%d\n", err);
++		goto err_out;
++	}
++
++	err = pci_request_region(pdev, bar_num, KBUILD_MODNAME);
++	if (err) {
++		pci_err(pdev, "failed to request %s pci_region=%d: err=%d\n",
++			KBUILD_MODNAME, bar_num, err);
++		goto err_disable;
++	}
++
++	pci_set_master(pdev);
++
++	err = xsc_set_dma_caps(pdev);
++	if (err) {
++		pci_err(pdev, "failed to set DMA capabilities mask: err=%d\n",
++			err);
++		goto err_clr_master;
++	}
++
++	bar_base = pci_ioremap_bar(pdev, bar_num);
++	if (!bar_base) {
++		pci_err(pdev, "failed to ioremap %s bar%d\n", KBUILD_MODNAME,
++			bar_num);
++		err = -ENOMEM;
++		goto err_clr_master;
++	}
++
++	err = pci_save_state(pdev);
++	if (err) {
++		pci_err(pdev, "pci_save_state failed: err=%d\n", err);
++		goto err_io_unmap;
++	}
++
++	xdev->bar_num = bar_num;
++	xdev->bar = bar_base;
++
++	return 0;
++
++err_io_unmap:
++	pci_iounmap(pdev, bar_base);
++err_clr_master:
++	pci_clear_master(pdev);
++	pci_release_region(pdev, bar_num);
++err_disable:
++	pci_disable_device(pdev);
++err_out:
++	return err;
++}
++
++static void xsc_pci_fini(struct xsc_core_device *xdev)
++{
++	struct pci_dev *pdev = xdev->pdev;
++
++	pci_iounmap(pdev, xdev->bar);
++	pci_clear_master(pdev);
++	pci_release_region(pdev, xdev->bar_num);
++	pci_disable_device(pdev);
++}
++
++static int xsc_dev_res_init(struct xsc_core_device *xdev)
++{
++	struct xsc_dev_resource *dev_res;
++
++	dev_res = kvzalloc(sizeof(*dev_res), GFP_KERNEL);
++	if (!dev_res)
++		return -ENOMEM;
++
++	xdev->dev_res = dev_res;
++	mutex_init(&dev_res->alloc_mutex);
++
++	return 0;
++}
++
++static void xsc_dev_res_cleanup(struct xsc_core_device *xdev)
++{
++	kfree(xdev->dev_res);
++}
++
++static int xsc_core_dev_init(struct xsc_core_device *xdev)
++{
++	int err;
++
++	err = xsc_dev_res_init(xdev);
++	if (err) {
++		pci_err(xdev->pdev, "xsc dev res init failed %d\n", err);
++		return err;
++	}
++
++	return 0;
++}
++
++static void xsc_core_dev_cleanup(struct xsc_core_device *xdev)
++{
++	xsc_dev_res_cleanup(xdev);
++}
++
++static int xsc_pci_probe(struct pci_dev *pci_dev,
++			 const struct pci_device_id *id)
++{
++	struct xsc_core_device *xdev;
++	int err;
++
++	xdev = kzalloc(sizeof(*xdev), GFP_KERNEL);
++	if (!xdev)
++		return -ENOMEM;
++
++	xdev->pdev = pci_dev;
++	xdev->device = &pci_dev->dev;
++
++	pci_set_drvdata(pci_dev, xdev);
++	err = xsc_pci_init(xdev, id);
++	if (err) {
++		pci_err(pci_dev, "xsc_pci_init failed %d\n", err);
++		goto err_unset_pci_drvdata;
++	}
++
++	err = xsc_core_dev_init(xdev);
++	if (err) {
++		pci_err(pci_dev, "xsc_core_dev_init failed %d\n", err);
++		goto err_pci_fini;
++	}
++
++	return 0;
++err_pci_fini:
++	xsc_pci_fini(xdev);
++err_unset_pci_drvdata:
++	pci_set_drvdata(pci_dev, NULL);
++	kfree(xdev);
++
++	return err;
++}
++
++static void xsc_pci_remove(struct pci_dev *pci_dev)
++{
++	struct xsc_core_device *xdev = pci_get_drvdata(pci_dev);
++
++	xsc_core_dev_cleanup(xdev);
++	xsc_pci_fini(xdev);
++	pci_set_drvdata(pci_dev, NULL);
++	kfree(xdev);
++}
++
++static struct pci_driver xsc_pci_driver = {
++	.name		= "xsc-pci",
++	.id_table	= xsc_pci_id_table,
++	.probe		= xsc_pci_probe,
++	.remove		= xsc_pci_remove,
++};
++
++static int __init xsc_init(void)
++{
++	int err;
++
++	err = pci_register_driver(&xsc_pci_driver);
++	if (err) {
++		pr_err("failed to register pci driver\n");
++		return err;
++	}
++
++	return 0;
++}
++
++static void __exit xsc_fini(void)
++{
++	pci_unregister_driver(&xsc_pci_driver);
++}
++
++module_init(xsc_init);
++module_exit(xsc_fini);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Yunsilicon XSC PCI driver");
+-- 
+2.43.0
 
