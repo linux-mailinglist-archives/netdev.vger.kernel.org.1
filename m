@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-203891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24FD9AF7F43
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2D47AF7F44
 	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 19:43:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86DCA3BF231
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 17:42:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78F26584017
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 17:43:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C105A2F235B;
-	Thu,  3 Jul 2025 17:42:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 518122F2364;
+	Thu,  3 Jul 2025 17:42:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eviPn3MB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q57apsvP"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D001F279DB9
-	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 17:42:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A4AF2BEC5C
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 17:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751564570; cv=none; b=tI6nLYTOC73ZdxHjI9uoZ7atfx21uoialv9G5Da06jMNv+DvAHQZ7ix64F+BgVFC3bstH5y9PGEp0N/Ix620/+eTo9GsbJWurl5vwiXJwGtH9cCohp+IixLErGcXPDW8H+7PIdcBymL23Yi9V7v286uCt+QhzSWKZiYj25J0D8M=
+	t=1751564571; cv=none; b=Bv6sQkqtcVtU/92ps7TSSXWF3RwEOnxYRxkQkMntjI4GDZBUfoZEVDPJPAXWFCymk9AaUoiTpXgzxWjrKJgDm5yA4K4LW6qsD5S5aZpkvyaCiCp/j0PKvVvyFEmos7WU3r22Eq867a8enoGrbszwD3ZbT14veY6wdKdKNJw48gM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751564570; c=relaxed/simple;
-	bh=f600Ayz0XtATDfqDeVlM/cfFqa4kWg+Jfzh65HfCvdA=;
+	s=arc-20240116; t=1751564571; c=relaxed/simple;
+	bh=j2D9tHaqinp9UrU9W4KBfh+QPZ4vsD9GkMRBGop7als=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KjHacddUyJXA/Vro8vJ+vfK+j3qkpWLrGkJvXZybr2IRfgicyOQiHCUBn6P9EdsGzcn4MLSxDhdYYmD9gQYWa+1dZfAZqU6jumBqpWyXweH0sax0NtJm2t/g3W/46avx9r3Ck1hEF0uNQakQKbwSb/y9VuxLOi8eTj/rQVWkBcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eviPn3MB; arc=none smtp.client-ip=198.175.65.19
+	 MIME-Version; b=cyWPd15zw3t503yrhC/eqIUvGedE1jmOkIWfQHk/h/13CLZpXwzEWXJrfnDeidXwEl+Xk7OogCiXZ3mljqyC+MfijZqt2WMe/aqCLp4kO0IS/fPc13XKYwJtoZUjt7XnZ86CBXpIXvYkDS+4zYiazvcI1ScuSvIZnkZ2b6L64Bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q57apsvP; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751564569; x=1783100569;
+  t=1751564570; x=1783100570;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=f600Ayz0XtATDfqDeVlM/cfFqa4kWg+Jfzh65HfCvdA=;
-  b=eviPn3MBGHfKb3MBcdh+nBUu+gnAMhrtrDKXi1vrLXK9OCliMn+zXr8N
-   0nYYQ2/8pBcd0T0kqWWKf+kaczdgYs4nztF6WCaDkPQ33yLMxTAnIlTaB
-   2RTEaNmDdLNshCIzA0Onvd6IXW8CdWQygsTlTAbmSLWaNyUKRYalEdZGv
-   Mj94bQr4IG0Wq8IZvMvsUxRjXdbwyYLlNX1ZZL09HS0ahV2vzCbMxjqRD
-   L+OAdTe82fa8a6NatSdhLcNXAscT4oOEFSdkpdjErGWxJNDPd+eISx+rZ
-   WZ5c0nYg9ZDsXQB/+SpEXL/0Nz0JitXtMssGctpUQagHuuR3147Hm4CNU
+  bh=j2D9tHaqinp9UrU9W4KBfh+QPZ4vsD9GkMRBGop7als=;
+  b=Q57apsvPm1Z2ftJsxkdilBo834LSto6e5HZ7NgpFNFxaogegDtrucv7K
+   Zsvq3fNkuom5w6CZducYeZwkG7XHSdkgJ0WABRwKtBvxoX6GkaEk2v0l1
+   Gl6h0I07bxWCUELk2ouVPjjypP85/OfwN+OsKU0wT9IWd84mZbNwdYpuW
+   2BSOKwIoESnR3HkrKHuUjIpkSIjmPfDA1bN82Aj0YWHuHuO9v8OnV2Hir
+   mu7VujOEQEluz6aOlcXpbFsjAQIZTVLULYyoFF6bar4ciyTQO5/K4+a3i
+   JfovCjlpA61f4b9NDDw/SPJo1rG8o4FPZSVJhEVNH3rufcsDO3c4TdD/y
    w==;
-X-CSE-ConnectionGUID: IKzoBN/9TJCbQJSdg4ppzA==
-X-CSE-MsgGUID: V8+YArehQyeb70FrX2G1+Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="53767883"
+X-CSE-ConnectionGUID: DTpY4BzhTyuMb2iqm25qwg==
+X-CSE-MsgGUID: 6PSE/PwMTsqKz5vxTmxdIA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="53767896"
 X-IronPort-AV: E=Sophos;i="6.16,285,1744095600"; 
-   d="scan'208";a="53767883"
+   d="scan'208";a="53767896"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
   by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 10:42:48 -0700
-X-CSE-ConnectionGUID: WrVyS3vNQQqLHIeKr/yylw==
-X-CSE-MsgGUID: NlhBpVUPQruHYcf3HpGUaQ==
+X-CSE-ConnectionGUID: VV+FzxBVToyhkBTKhRPfRg==
+X-CSE-MsgGUID: w+nCwDHVRPahtrCbn29EPg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,285,1744095600"; 
-   d="scan'208";a="154997873"
+   d="scan'208";a="154997882"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa008.fm.intel.com with ESMTP; 03 Jul 2025 10:42:47 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -67,15 +67,16 @@ To: davem@davemloft.net,
 	netdev@vger.kernel.org
 Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
 	anthony.l.nguyen@intel.com,
+	vitaly.lifshits@intel.com,
+	dima.ruinskiy@intel.com,
 	richardcochran@gmail.com,
-	Jacob Keller <jacob.e.keller@intel.com>,
 	Simon Horman <horms@kernel.org>,
 	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	Milena Olech <milena.olech@intel.com>,
-	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net-next 01/12] ice: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
-Date: Thu,  3 Jul 2025 10:42:28 -0700
-Message-ID: <20250703174242.3829277-2-anthony.l.nguyen@intel.com>
+	Mor Bar-Gabay <morx.bar.gabay@intel.com>
+Subject: [PATCH net-next 02/12] igc: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
+Date: Thu,  3 Jul 2025 10:42:29 -0700
+Message-ID: <20250703174242.3829277-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250703174242.3829277-1-anthony.l.nguyen@intel.com>
 References: <20250703174242.3829277-1-anthony.l.nguyen@intel.com>
@@ -92,156 +93,140 @@ From: Vladimir Oltean <vladimir.oltean@nxp.com>
 New timestamping API was introduced in commit 66f7223039c0 ("net: add
 NDOs for configuring hardware timestamping") from kernel v6.6.
 
-It is time to convert the Intel ice driver to the new API, so that
+It is time to convert the Intel igc driver to the new API, so that
 timestamping configuration can be removed from the ndo_eth_ioctl() path
 completely.
 
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Acked-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
 Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 Reviewed-by: Milena Olech <milena.olech@intel.com>
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_main.c | 24 +-----------
- drivers/net/ethernet/intel/ice/ice_ptp.c  | 45 ++++++++++++-----------
- drivers/net/ethernet/intel/ice/ice_ptp.h  | 17 ++++++---
- 3 files changed, 37 insertions(+), 49 deletions(-)
+ drivers/net/ethernet/intel/igc/igc.h      |  9 ++++--
+ drivers/net/ethernet/intel/igc/igc_main.c | 21 ++-----------
+ drivers/net/ethernet/intel/igc/igc_ptp.c  | 36 +++++++++++------------
+ 3 files changed, 25 insertions(+), 41 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index f8ef80069e3d..af68869693ed 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -7901,27 +7901,6 @@ int ice_change_mtu(struct net_device *netdev, int new_mtu)
- 	return err;
+diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
+index 1525ae25fd3e..97b1a2c820ee 100644
+--- a/drivers/net/ethernet/intel/igc/igc.h
++++ b/drivers/net/ethernet/intel/igc/igc.h
+@@ -315,7 +315,7 @@ struct igc_adapter {
+ 	 */
+ 	spinlock_t ptp_tx_lock;
+ 	struct igc_tx_timestamp_request tx_tstamp[IGC_MAX_TX_TSTAMP_REGS];
+-	struct hwtstamp_config tstamp_config;
++	struct kernel_hwtstamp_config tstamp_config;
+ 	unsigned int ptp_flags;
+ 	/* System time value lock */
+ 	spinlock_t tmreg_lock;
+@@ -773,8 +773,11 @@ void igc_ptp_reset(struct igc_adapter *adapter);
+ void igc_ptp_suspend(struct igc_adapter *adapter);
+ void igc_ptp_stop(struct igc_adapter *adapter);
+ ktime_t igc_ptp_rx_pktstamp(struct igc_adapter *adapter, __le32 *buf);
+-int igc_ptp_set_ts_config(struct net_device *netdev, struct ifreq *ifr);
+-int igc_ptp_get_ts_config(struct net_device *netdev, struct ifreq *ifr);
++int igc_ptp_hwtstamp_get(struct net_device *netdev,
++			 struct kernel_hwtstamp_config *config);
++int igc_ptp_hwtstamp_set(struct net_device *netdev,
++			 struct kernel_hwtstamp_config *config,
++			 struct netlink_ext_ack *extack);
+ void igc_ptp_tx_hang(struct igc_adapter *adapter);
+ void igc_ptp_read(struct igc_adapter *adapter, struct timespec64 *ts);
+ void igc_ptp_tx_tstamp_event(struct igc_adapter *adapter);
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 2e12915b42a9..3d6de62b78a2 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -6303,24 +6303,6 @@ int igc_close(struct net_device *netdev)
+ 	return 0;
  }
  
 -/**
-- * ice_eth_ioctl - Access the hwtstamp interface
+- * igc_ioctl - Access the hwtstamp interface
 - * @netdev: network interface device structure
 - * @ifr: interface request data
 - * @cmd: ioctl command
-- */
--static int ice_eth_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
+- **/
+-static int igc_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
 -{
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_pf *pf = np->vsi->back;
--
 -	switch (cmd) {
 -	case SIOCGHWTSTAMP:
--		return ice_ptp_get_ts_config(pf, ifr);
+-		return igc_ptp_get_ts_config(netdev, ifr);
 -	case SIOCSHWTSTAMP:
--		return ice_ptp_set_ts_config(pf, ifr);
+-		return igc_ptp_set_ts_config(netdev, ifr);
 -	default:
 -		return -EOPNOTSUPP;
 -	}
 -}
 -
- /**
-  * ice_aq_str - convert AQ err code to a string
-  * @aq_err: the AQ error code to convert
-@@ -9761,7 +9740,6 @@ static const struct net_device_ops ice_netdev_ops = {
- 	.ndo_change_mtu = ice_change_mtu,
- 	.ndo_get_stats64 = ice_get_stats64,
- 	.ndo_set_tx_maxrate = ice_set_tx_maxrate,
--	.ndo_eth_ioctl = ice_eth_ioctl,
- 	.ndo_set_vf_spoofchk = ice_set_vf_spoofchk,
- 	.ndo_set_vf_mac = ice_set_vf_mac,
- 	.ndo_get_vf_config = ice_get_vf_cfg,
-@@ -9785,4 +9763,6 @@ static const struct net_device_ops ice_netdev_ops = {
- 	.ndo_bpf = ice_xdp,
- 	.ndo_xdp_xmit = ice_xdp_xmit,
- 	.ndo_xsk_wakeup = ice_xsk_wakeup,
-+	.ndo_hwtstamp_get = ice_ptp_hwtstamp_get,
-+	.ndo_hwtstamp_set = ice_ptp_hwtstamp_set,
- };
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index e7005d757477..e358eb1d719f 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -2197,23 +2197,24 @@ static int ice_ptp_getcrosststamp(struct ptp_clock_info *info,
- }
- 
- /**
-- * ice_ptp_get_ts_config - ioctl interface to read the timestamping config
-- * @pf: Board private structure
-- * @ifr: ioctl data
-+ * ice_ptp_hwtstamp_get - interface to read the timestamping config
-+ * @netdev: Pointer to network interface device structure
-+ * @config: Timestamping configuration structure
-  *
-  * Copy the timestamping config to user buffer
-  */
--int ice_ptp_get_ts_config(struct ice_pf *pf, struct ifreq *ifr)
-+int ice_ptp_hwtstamp_get(struct net_device *netdev,
-+			 struct kernel_hwtstamp_config *config)
+ static int igc_save_launchtime_params(struct igc_adapter *adapter, int queue,
+ 				      bool enable)
  {
--	struct hwtstamp_config *config;
-+	struct ice_netdev_priv *np = netdev_priv(netdev);
-+	struct ice_pf *pf = np->vsi->back;
+@@ -6971,12 +6953,13 @@ static const struct net_device_ops igc_netdev_ops = {
+ 	.ndo_fix_features	= igc_fix_features,
+ 	.ndo_set_features	= igc_set_features,
+ 	.ndo_features_check	= igc_features_check,
+-	.ndo_eth_ioctl		= igc_ioctl,
+ 	.ndo_setup_tc		= igc_setup_tc,
+ 	.ndo_bpf		= igc_bpf,
+ 	.ndo_xdp_xmit		= igc_xdp_xmit,
+ 	.ndo_xsk_wakeup		= igc_xsk_wakeup,
+ 	.ndo_get_tstamp		= igc_get_tstamp,
++	.ndo_hwtstamp_get	= igc_ptp_hwtstamp_get,
++	.ndo_hwtstamp_set	= igc_ptp_hwtstamp_set,
+ };
  
- 	if (pf->ptp.state != ICE_PTP_READY)
- 		return -EIO;
- 
--	config = &pf->ptp.tstamp_config;
-+	*config = pf->ptp.tstamp_config;
- 
--	return copy_to_user(ifr->ifr_data, config, sizeof(*config)) ?
--		-EFAULT : 0;
-+	return 0;
- }
- 
- /**
-@@ -2221,8 +2222,8 @@ int ice_ptp_get_ts_config(struct ice_pf *pf, struct ifreq *ifr)
-  * @pf: Board private structure
-  * @config: hwtstamp settings requested or saved
+ u32 igc_rd32(struct igc_hw *hw, u32 reg)
+diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c b/drivers/net/ethernet/intel/igc/igc_ptp.c
+index f4f5c28615d3..b7b46d863bee 100644
+--- a/drivers/net/ethernet/intel/igc/igc_ptp.c
++++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
+@@ -626,7 +626,7 @@ static void igc_ptp_enable_tx_timestamp(struct igc_adapter *adapter)
+  * Return: 0 in case of success, negative errno code otherwise.
   */
--static int
--ice_ptp_set_timestamp_mode(struct ice_pf *pf, struct hwtstamp_config *config)
-+static int ice_ptp_set_timestamp_mode(struct ice_pf *pf,
+ static int igc_ptp_set_timestamp_mode(struct igc_adapter *adapter,
+-				      struct hwtstamp_config *config)
 +				      struct kernel_hwtstamp_config *config)
  {
  	switch (config->tx_type) {
  	case HWTSTAMP_TX_OFF:
-@@ -2266,32 +2267,32 @@ ice_ptp_set_timestamp_mode(struct ice_pf *pf, struct hwtstamp_config *config)
+@@ -853,48 +853,46 @@ void igc_ptp_tx_tstamp_event(struct igc_adapter *adapter)
  }
  
  /**
-- * ice_ptp_set_ts_config - ioctl interface to control the timestamping
-- * @pf: Board private structure
-- * @ifr: ioctl data
-+ * ice_ptp_hwtstamp_set - interface to control the timestamping
-+ * @netdev: Pointer to network interface device structure
-+ * @config: Timestamping configuration structure
-+ * @extack: Netlink extended ack structure for error reporting
+- * igc_ptp_set_ts_config - set hardware time stamping config
++ * igc_ptp_hwtstamp_set - set hardware time stamping config
+  * @netdev: network interface device structure
+- * @ifr: interface request data
++ * @config: timestamping configuration structure
++ * @extack: netlink extended ack structure for error reporting
   *
-  * Get the user config and store it
-  */
--int ice_ptp_set_ts_config(struct ice_pf *pf, struct ifreq *ifr)
-+int ice_ptp_hwtstamp_set(struct net_device *netdev,
+  **/
+-int igc_ptp_set_ts_config(struct net_device *netdev, struct ifreq *ifr)
++int igc_ptp_hwtstamp_set(struct net_device *netdev,
 +			 struct kernel_hwtstamp_config *config,
 +			 struct netlink_ext_ack *extack)
  {
+ 	struct igc_adapter *adapter = netdev_priv(netdev);
 -	struct hwtstamp_config config;
-+	struct ice_netdev_priv *np = netdev_priv(netdev);
-+	struct ice_pf *pf = np->vsi->back;
  	int err;
- 
- 	if (pf->ptp.state != ICE_PTP_READY)
- 		return -EAGAIN;
  
 -	if (copy_from_user(&config, ifr->ifr_data, sizeof(config)))
 -		return -EFAULT;
 -
--	err = ice_ptp_set_timestamp_mode(pf, &config);
-+	err = ice_ptp_set_timestamp_mode(pf, config);
+-	err = igc_ptp_set_timestamp_mode(adapter, &config);
++	err = igc_ptp_set_timestamp_mode(adapter, config);
  	if (err)
  		return err;
  
- 	/* Return the actual configuration set */
--	config = pf->ptp.tstamp_config;
-+	*config = pf->ptp.tstamp_config;
+ 	/* save these settings for future reference */
+-	memcpy(&adapter->tstamp_config, &config,
+-	       sizeof(adapter->tstamp_config));
++	adapter->tstamp_config = *config;
  
 -	return copy_to_user(ifr->ifr_data, &config, sizeof(config)) ?
 -		-EFAULT : 0;
@@ -249,52 +234,31 @@ index e7005d757477..e358eb1d719f 100644
  }
  
  /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
-index c8dac5a5bcd9..137f2070a2d9 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
-@@ -259,7 +259,7 @@ struct ice_ptp {
- 	struct ptp_extts_request extts_rqs[GLTSYN_EVNT_H_IDX_MAX];
- 	struct ptp_clock_info info;
- 	struct ptp_clock *clock;
--	struct hwtstamp_config tstamp_config;
-+	struct kernel_hwtstamp_config tstamp_config;
- 	u64 reset_time;
- 	u32 tx_hwtstamp_skipped;
- 	u32 tx_hwtstamp_timeouts;
-@@ -291,8 +291,11 @@ struct ice_ptp {
- #if IS_ENABLED(CONFIG_PTP_1588_CLOCK)
- int ice_ptp_clock_index(struct ice_pf *pf);
- struct ice_pf;
--int ice_ptp_set_ts_config(struct ice_pf *pf, struct ifreq *ifr);
--int ice_ptp_get_ts_config(struct ice_pf *pf, struct ifreq *ifr);
-+int ice_ptp_hwtstamp_get(struct net_device *netdev,
-+			 struct kernel_hwtstamp_config *config);
-+int ice_ptp_hwtstamp_set(struct net_device *netdev,
-+			 struct kernel_hwtstamp_config *config,
-+			 struct netlink_ext_ack *extack);
- void ice_ptp_restore_timestamp_mode(struct ice_pf *pf);
+- * igc_ptp_get_ts_config - get hardware time stamping config
++ * igc_ptp_hwtstamp_get - get hardware time stamping config
+  * @netdev: network interface device structure
+- * @ifr: interface request data
++ * @config: timestamping configuration structure
+  *
+  * Get the hwtstamp_config settings to return to the user. Rather than attempt
+  * to deconstruct the settings from the registers, just return a shadow copy
+  * of the last known settings.
+  **/
+-int igc_ptp_get_ts_config(struct net_device *netdev, struct ifreq *ifr)
++int igc_ptp_hwtstamp_get(struct net_device *netdev,
++			 struct kernel_hwtstamp_config *config)
+ {
+ 	struct igc_adapter *adapter = netdev_priv(netdev);
+-	struct hwtstamp_config *config = &adapter->tstamp_config;
  
- void ice_ptp_extts_event(struct ice_pf *pf);
-@@ -313,12 +316,16 @@ void ice_ptp_init(struct ice_pf *pf);
- void ice_ptp_release(struct ice_pf *pf);
- void ice_ptp_link_change(struct ice_pf *pf, bool linkup);
- #else /* IS_ENABLED(CONFIG_PTP_1588_CLOCK) */
--static inline int ice_ptp_set_ts_config(struct ice_pf *pf, struct ifreq *ifr)
+-	return copy_to_user(ifr->ifr_data, config, sizeof(*config)) ?
+-		-EFAULT : 0;
++	*config = adapter->tstamp_config;
 +
-+static inline int ice_ptp_hwtstamp_get(struct net_device *netdev,
-+				       struct kernel_hwtstamp_config *config)
- {
- 	return -EOPNOTSUPP;
++	return 0;
  }
  
--static inline int ice_ptp_get_ts_config(struct ice_pf *pf, struct ifreq *ifr)
-+static inline int ice_ptp_hwtstamp_set(struct net_device *netdev,
-+				       struct kernel_hwtstamp_config *config,
-+				       struct netlink_ext_ack *extack)
- {
- 	return -EOPNOTSUPP;
- }
+ /* The two conditions below must be met for cross timestamping via
 -- 
 2.47.1
 
