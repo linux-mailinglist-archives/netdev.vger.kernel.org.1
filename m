@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-203941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51AF9AF834F
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 00:24:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85F65AF8358
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 00:25:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6770583827
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 22:24:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB97F6E609B
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 22:24:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30D7A2BEC3A;
-	Thu,  3 Jul 2025 22:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8F329C339;
+	Thu,  3 Jul 2025 22:24:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="bGYhb8mr"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="nYdxqGH1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A042BEC21
-	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 22:23:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3752AF19
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 22:23:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751581432; cv=none; b=q+fIRzsdvDkr+uZc3cTvstF+auC1eL9s115BCpci9EH39Mb7Ah4SiMX2xDFM48C3RBw29nN68HSKmv+QDR7NCGsAWVrORJK7OkWLqWSZYqbQW/p9JWnpe+yzmIypDpOLec7ZGiD8LN79GT4UyqGwczu9/ByKuXHjrbAUxxNngHc=
+	t=1751581440; cv=none; b=K4Ix+co2BJa6NAuHHNNXUbL9tDY1RqFwQ9W78jvQZWsbprrISVuyT0NIH5vb2oK0iPbSu+nIiX9g4bgg8zGeQ3bHs/QO+05T3R+hMP/3TDslYQ7/EVKTSvuYassGNogRmCWLXdTW57Z+1fKdC6EBDY5gP7Os1C4oiqd9tajG5E4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751581432; c=relaxed/simple;
-	bh=Gn7W5P0APLN41EFikXwUV5T0T3M9B52pVgzplH3HA2w=;
+	s=arc-20240116; t=1751581440; c=relaxed/simple;
+	bh=76jAgqwnRdt0PkgsmBh+2CH7T1W71cnmvzvOLXA8MWA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tYc2ITtlMCkm8c9uZ9pOxDWi/kx79do5p4Dsalh6EWDZ959D3K5aD0Uv6mtWqv5pJOdvlGIvsd+kgIQeDeO2avwKmGHHeRWWJBJBdjTs7G1MmGlCGHd4jXcBi0lxTZrUJ5n287l5cvuNZuu/0n7rFga+AgUb+YTVtyo9tYcWroE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=bGYhb8mr; arc=none smtp.client-ip=185.125.188.123
+	 MIME-Version; b=t8xEz9/Jr/u6PBso9BYb9yEOy1Dn4J1r4KE2cDSooPmqJEGhiBUGkv4CRQh1ftAodCJ7PERIhdF9tO82BPXDC10X6D37dIdaMaGFEtNlkGhwt0LZIcRFGTCfwl4CYVakGl6xVq3nC3kmTpHdaHTogTWGou+y9LkruRiY6IxZeiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=nYdxqGH1; arc=none smtp.client-ip=185.125.188.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com [209.85.208.71])
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com [209.85.208.72])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 5776F3F920
-	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 22:23:47 +0000 (UTC)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id AD5353F919
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 22:23:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1751581427;
-	bh=RPCya3yNT0z68V2C/y3Kyp31HeP4GdNlj4LTMqhXVPM=;
+	s=20210705; t=1751581432;
+	bh=VswAsDFL0zNUvK6Slvz23luzH3RQ+gAmm3nQvl/AzzM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version;
-	b=bGYhb8mrW1Sg00YZPVp8k3nu/Js0zpIJcMDUmxk/f348HutISeMyREPDWE5PB+56s
-	 4fBzNyHa/M/ewwb4mOOqNiclLv2VRwBFrge8a/C+vBdtb7u20+GrfImab0fjQg/b8w
-	 CvELnOb+3d3HWCQlOQKoStI+wYZvZIMRWzLdrGgdmI/JCVe+9jHIJWSPOafrM1xN4p
-	 umnzKdoBiMtJ6BoRXH2beSjLUUTXpIuQogZUeTNpgnW99IfnYRipbMSdZ80C0ewgTl
-	 fwPVSH9XltwwPpt3fUfa5U0mP90vMBQVmzKOogCDcfBGi8CQKXkgp1DQCN9BTOv1Ba
-	 uErYDmUSdnFSw==
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-60835716983so297360a12.1
-        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 15:23:47 -0700 (PDT)
+	b=nYdxqGH1tYW8sWcgeMk8GB3iiKqgE3C6czSap5o6asqQHjHb/PKN969iNPrC97Cht
+	 rL7e1jXSPD4L2tUJ6NT041ihUHr/wo/2Gsb7KI5/i6AG/PvEkc67Y7Om49WVJN1rWY
+	 dog3R2iAKDgkOqmX+gIRthrJEvO6R/AGRIyy2mvndcTWoWhrkcmo+fP9aiMtWPgDog
+	 UDYwDUWNz13EyGi6CGTExO+BUQMenlVTFDlDbmxhq+nwZszwG1SOBKVBXacRuFUASC
+	 hTRcGgAosZjDTdtJGc+RqGh/RP2LR1WViZF1ZgyN40I+U9Ic6ewCmrArcG3/F3C7VR
+	 sV5j9w7zzT+wA==
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-60724177a1fso256823a12.3
+        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 15:23:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751581426; x=1752186226;
+        d=1e100.net; s=20230601; t=1751581431; x=1752186231;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RPCya3yNT0z68V2C/y3Kyp31HeP4GdNlj4LTMqhXVPM=;
-        b=Wec5I8nBYcYd1skkq6WBJahUChBUi/0wnbzGJta+mKTugNrhcAD8Au57IjBvv9AD98
-         8U2GazmCyRg9r/leZuyMaHUs6vp2UlUjycoopnRPNxhfpgiUvZaoMt9v5GBdGcviy40D
-         vWL67XDk546jp3VbCyAQVWWOT8GsDveJiStNNwZZKOdXOuGVK7mT3ifCnXS0aiNdxsfV
-         HDixxrvA4bd7rZl05dkD5xZxPbwFN/C3hMP4V/qH7cvb2pzG6EE4rMRX/DpfIn89c1iV
-         3m6P2WLkJvamUR5mYwfOIhtxcFDgQzoFVH2bZkVItV9H7x06cS8snMnvJX0bMjgYwmTI
-         NJzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVz6YMbL3u85Apjgm30payMQ+qMi8u2mFGrAOvTA7xFTSRyEHyHvm8HFRtkq0Vjjnezgw/QdX0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYNUKRj0fbC36k6B+LpUeV0PcdiKVzmWoFInMDsKuBMo8Al6sp
-	dUn+hgUEOjMuFX8WQ8/E67selaDgBWPhdxstxkcFhDv6sqBXp5SS6NRRJ9YRZQSnf52TG9M2CeS
-	eDvI6r+uW3Hm5njs9yASagxoYjpFPrhiNygSKIBq9PZu+KE0xqqEz2dt9LDqehrvNmLMM6juNcQ
+        bh=VswAsDFL0zNUvK6Slvz23luzH3RQ+gAmm3nQvl/AzzM=;
+        b=Tf9nKACgHgjG1t2+a3ZMaiqWBC7W0DA8Y6FEh5Ng2ncGYLGqfHpqEQPMFZL/U9mfFz
+         +c4B8EoqDGj0y78kngP+pBU6hcfOoLLrH4Xv5c8kXdOCxhieFqdCMOb8p08AgcoxBXi7
+         Nl3fF86RKtfD72l/o+AkTRewdHUVrhjR8hxUpEf5drUnqY7v9ZX3PRXuG7IlYosTKVtk
+         MpspzBRCjUkAWStE+V8QGxD/wtvs0epXpxOqnq5x39C9C8vGmr8FGx8LDokNvWe8qZ72
+         biR7xYn5n3NgHdeLHSW2MuGaOqYU+yTfUfnA9TaH2fxEV4PPLQW0Agg+N9QFjwPXRTiD
+         4gkw==
+X-Forwarded-Encrypted: i=1; AJvYcCU3LnAYZV/0+5/CefcmflgXzqiqhjuJliBKxs8sPcSj2NT0++pMiuQ7r8n8u19n1PaL8aZ0/K4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/rGcoIJ+zkeD7cn6orVRqmaPMot/cxb3TTrKMrYW9mv/ZmttI
+	ZDkkms2iYOrVMfZLc9AUFOaTQeOKptsBS7nXXDDKNIeS1UeFIGdcqbl2OK9SnXzVb0vVkPngyEm
+	9E/41t4LfGnxcF53mFQay/kbuhcagTtgr2KvwLOjLtsgsqn6bhHigscBHDdEbv0Vw+Lh/vmgVhQ
 	==
-X-Gm-Gg: ASbGnct8jj9njVldi8Z+xt3dZkIfflEhNFK3wUkHOU3qx0gVs1DW3Tq+JB2VDJarVOW
-	W9ZRYxOGZK64aGM1etvnmLy0kkxZ8QJG9ERh8G9DqUC5jANXeWEkm2q+tvnzdUYcFp+29fk+4ue
-	xFI1YuJF9P1HQllztRweJEBUSflq3KupSnb6Iacx1K0LxZOBzTebgoILOPA0Xf78/Zu9sGljSv0
-	mAZUBmJ3Ax2HpWUYZM1rFJ1ciWketvCavItRFtC7upsIcuegCikmf6YwbEoKpXw/3SG0msl90qp
-	ocr+VQyhWCz3zgl1uwI0ml972TtXPN9ITQ12k4VIhPt6fNVZdg==
-X-Received: by 2002:a05:6402:4606:b0:60c:461e:7199 with SMTP id 4fb4d7f45d1cf-60fd2fb475bmr206997a12.9.1751581426542;
-        Thu, 03 Jul 2025 15:23:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEhYrS4/6WMb2G+ZUHQLTdnePYa7hC/QbuhLVyf8RVZHrcRhQsytyx8CWJVQ2cOge1XHrBWFg==
-X-Received: by 2002:a05:6402:4606:b0:60c:461e:7199 with SMTP id 4fb4d7f45d1cf-60fd2fb475bmr206975a12.9.1751581426110;
-        Thu, 03 Jul 2025 15:23:46 -0700 (PDT)
+X-Gm-Gg: ASbGncsnyLvCA5u4VJtV2wPjRv7fGgYp/KJY1rU3OWcpKENLRQrzSV8bCLHL1idiHhS
+	4AHeU5Mgn+gWFr3lAaT7dklnaiVqi6kxAT9Wl6nMxTKLWe9+SejrZaUzx9+iT+M9cpfZ0ZV3PTe
+	oiyw2CWrFYVFuC2pog5KB47/RCbLJtlB0llPlZTfn5p1dC1VlmJLoGRKVjDqF02Nnl/YUYeT/th
+	qFd4KUKNDwLrJH84iRvC1GCQAvh2VS2cwZvcu3CZdklGzZfhIogpXQQefMn192Znybfusb1HaPL
+	23kIHlnellTYIgpZJqcCXqtZhRAVKgaJbrW1IRjJWhJQ7KIYFg==
+X-Received: by 2002:a05:6402:3588:b0:60c:6a48:8047 with SMTP id 4fb4d7f45d1cf-60fd322483dmr239240a12.11.1751581431513;
+        Thu, 03 Jul 2025 15:23:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHFPhWZ0KYGjmFv+0GQApSZDavL8SiqBWwO+aZo2jCUxgX0FmWRVcBX+bYx4jduoymluOqpJA==
+X-Received: by 2002:a05:6402:3588:b0:60c:6a48:8047 with SMTP id 4fb4d7f45d1cf-60fd322483dmr239220a12.11.1751581431164;
+        Thu, 03 Jul 2025 15:23:51 -0700 (PDT)
 Received: from amikhalitsyn.lan ([178.24.219.243])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60fcb1fb083sm355164a12.62.2025.07.03.15.23.45
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60fcb1fb083sm355164a12.62.2025.07.03.15.23.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jul 2025 15:23:45 -0700 (PDT)
+        Thu, 03 Jul 2025 15:23:50 -0700 (PDT)
 From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
 To: kuniyu@google.com
 Cc: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
@@ -91,16 +91,16 @@ Cc: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
 	Leon Romanovsky <leon@kernel.org>,
 	Arnd Bergmann <arnd@arndb.de>,
 	Christian Brauner <brauner@kernel.org>,
 	Lennart Poettering <mzxreary@0pointer.de>,
 	Luca Boccassi <bluca@debian.org>,
-	David Rheinsberg <david@readahead.eu>,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next v3 5/7] af_unix: stash pidfs dentry when needed
-Date: Fri,  4 Jul 2025 00:23:09 +0200
-Message-ID: <20250703222314.309967-6-aleksandr.mikhalitsyn@canonical.com>
+	David Rheinsberg <david@readahead.eu>
+Subject: [PATCH net-next v3 6/7] af_unix: enable handing out pidfds for reaped tasks in SCM_PIDFD
+Date: Fri,  4 Jul 2025 00:23:10 +0200
+Message-ID: <20250703222314.309967-7-aleksandr.mikhalitsyn@canonical.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250703222314.309967-1-aleksandr.mikhalitsyn@canonical.com>
 References: <20250703222314.309967-1-aleksandr.mikhalitsyn@canonical.com>
@@ -112,20 +112,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We need to ensure that pidfs dentry is allocated when we meet any
-struct pid for the first time. This will allows us to open pidfd
-even after the task it corresponds to is reaped.
-
-Basically, we need to identify all places where we fill skb/scm_cookie
-with struct pid reference for the first time and call pidfs_register_pid().
-
-Tricky thing here is that we have a few places where this happends
-depending on what userspace is doing:
-- [__scm_replace_pid()] explicitly sending an SCM_CREDENTIALS message
-                        and specified pid in a numeric format
-- [unix_maybe_add_creds()] enabled SO_PASSCRED/SO_PASSPIDFD but
-                           didn't send SCM_CREDENTIALS explicitly
-- [scm_send()] force_creds is true. Netlink case, we don't need to touch it.
+Now everything is ready to pass PIDFD_STALE to pidfd_prepare().
+This will allow opening pidfd for reaped tasks.
 
 Cc: linux-kernel@vger.kernel.org
 Cc: netdev@vger.kernel.org
@@ -134,6 +122,7 @@ Cc: Eric Dumazet <edumazet@google.com>
 Cc: Jakub Kicinski <kuba@kernel.org>
 Cc: Paolo Abeni <pabeni@redhat.com>
 Cc: Simon Horman <horms@kernel.org>
+Cc: Willem de Bruijn <willemb@google.com>
 Cc: Leon Romanovsky <leon@kernel.org>
 Cc: Arnd Bergmann <arnd@arndb.de>
 Cc: Christian Brauner <brauner@kernel.org>
@@ -142,79 +131,32 @@ Cc: Lennart Poettering <mzxreary@0pointer.de>
 Cc: Luca Boccassi <bluca@debian.org>
 Cc: David Rheinsberg <david@readahead.eu>
 Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Reviewed-by: Christian Brauner <brauner@kernel.org>
 ---
-v2:
-	- renamed __skb_set_pid() -> unix_set_pid_to_skb() [ as Kuniyuki suggested ]
-	- get rid of extra helper (__scm_set_cred()) I've introduced before [ as Kuniyuki suggested ]
-	- s/__inline__/inline/ for functions I touched [ as Kuniyuki suggested ]
-	- get rid of chunk in unix_destruct_scm() with NULLifying UNIXCB(skb).pid [ as Kuniyuki suggested ]
-	- added proper error handling in scm_send() for scm_set_cred() return value [ found by me during rework ]
-v3:
-	- don't stash pidfs dentry for netlink case
-	- splited whitespace changes
-	- removed unix_set_pid_to_skb() to simplify changes
----
- net/core/scm.c     |  7 +++++++
- net/unix/af_unix.c | 11 ++++++++++-
- 2 files changed, 17 insertions(+), 1 deletion(-)
+ net/core/scm.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/net/core/scm.c b/net/core/scm.c
-index 045ab5bdac7d..358a4e04d46c 100644
+index 358a4e04d46c..072d5742440a 100644
 --- a/net/core/scm.c
 +++ b/net/core/scm.c
 @@ -23,6 +23,7 @@
  #include <linux/security.h>
  #include <linux/pid_namespace.h>
  #include <linux/pid.h>
-+#include <linux/pidfs.h>
++#include <uapi/linux/pidfd.h>
+ #include <linux/pidfs.h>
  #include <linux/nsproxy.h>
  #include <linux/slab.h>
- #include <linux/errqueue.h>
-@@ -147,9 +148,15 @@ EXPORT_SYMBOL(__scm_destroy);
+@@ -482,7 +483,7 @@ static void scm_pidfd_recv(struct msghdr *msg, struct scm_cookie *scm)
+ 	if (!scm->pid)
+ 		return;
  
- static inline int scm_replace_pid(struct scm_cookie *scm, struct pid *pid)
- {
-+	int err;
-+
- 	/* drop all previous references */
- 	scm_destroy_cred(scm);
+-	pidfd = pidfd_prepare(scm->pid, 0, &pidfd_file);
++	pidfd = pidfd_prepare(scm->pid, PIDFD_STALE, &pidfd_file);
  
-+	err = pidfs_register_pid(pid);
-+	if (unlikely(err))
-+		return err;
-+
- 	scm->pid = pid;
- 	scm->creds.pid = pid_vnr(pid);
- 	return 0;
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 323e4fc85d4b..d52811321fce 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -1971,6 +1971,7 @@ static void unix_skb_to_scm(struct sk_buff *skb, struct scm_cookie *scm)
-  * We include credentials if source or destination socket
-  * asserted SOCK_PASSCRED.
-  *
-+ * Context: May sleep.
-  * Return: On success zero, on error a negative error code is returned.
-  */
- static int unix_maybe_add_creds(struct sk_buff *skb, const struct sock *sk,
-@@ -1980,7 +1981,15 @@ static int unix_maybe_add_creds(struct sk_buff *skb, const struct sock *sk,
- 		return 0;
- 
- 	if (unix_may_passcred(sk) || unix_may_passcred(other)) {
--		UNIXCB(skb).pid = get_pid(task_tgid(current));
-+		struct pid *pid;
-+		int err;
-+
-+		pid = task_tgid(current);
-+		err = pidfs_register_pid(pid);
-+		if (unlikely(err))
-+			return err;
-+
-+		UNIXCB(skb).pid = get_pid(pid);
- 		current_uid_gid(&UNIXCB(skb).uid, &UNIXCB(skb).gid);
- 	}
- 
+ 	if (put_cmsg(msg, SOL_SOCKET, SCM_PIDFD, sizeof(int), &pidfd)) {
+ 		if (pidfd_file) {
 -- 
 2.43.0
 
