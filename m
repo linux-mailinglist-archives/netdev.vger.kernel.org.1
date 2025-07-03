@@ -1,112 +1,116 @@
-Return-Path: <netdev+bounces-203606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07C1BAF682C
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 04:44:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C981EAF684B
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 04:51:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44681521D1F
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 02:44:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BC503ABC73
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 02:51:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C814C1F5838;
-	Thu,  3 Jul 2025 02:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE3F15D5B6;
+	Thu,  3 Jul 2025 02:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="iXQRXRKL"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="YF4iyGWh"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-70.smtpout.orange.fr [193.252.22.70])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB891E51EB;
-	Thu,  3 Jul 2025 02:44:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52CF3EEBA;
+	Thu,  3 Jul 2025 02:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751510686; cv=none; b=LbetmefWeHabBSnu7g7UeQqflV8/7qQqb4dCu7gPOEv1/Sa97dYYunZ/j4er1gSXgeZADqcqdG6w2czWftT9izP10cwqdIvmIQdqRML0pW+rsrTPfTdK9G2HvFyvmoYbCDJf4lnb0XfzlJ6bcPGmM5ETttgBi1L8VjJcQXHhsB8=
+	t=1751511091; cv=none; b=XlCICLlCrskJt6yedpPMFjKgHxQzG1QOotZBlZ785p2sX6zZ/ps5tJJ0oHLuHo+BGf+9LQCwhfsbNm8KWJdMxGTWgknUJZmJ/ypMpcCB8j8hLbFmYAswnwl8ggoGUI+IG/3ENzTVkFzlCwAP/zmb+C6ZAb1IzceOMmh/3O58Y3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751510686; c=relaxed/simple;
-	bh=WgbSXIsjCcwNK+L/EUnxevkdq+CUcqhuSViQKFcXTjw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XBbY5gRh31/SRBM6h5z2jB79SVosGiF0+g7lzFNQkum0S/SzYbECPwhBD5jMBmUGglXYP0/rRWbYxHl/4l6pVQTHs5qMnEhMZSp5ZCtCFMedd+MG570PdY7fUUHk42Zq7PrZEpOJloEe96KSdHO6DZfhzlTl7+VfPdflDCyUX9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=iXQRXRKL; arc=none smtp.client-ip=193.252.22.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id X9w4uFmBje9b2X9w5ufiLf; Thu, 03 Jul 2025 04:44:39 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1751510679;
-	bh=6u4dQwo3U5CVNhb6hsocU5gXqojJ+ccC7r8jooA/t4w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=iXQRXRKLyqFhiDoWzZ4/cZ3rhPOqFo2X1WYTGinZ4rICj+IyL+vqDaXboDyyr0Z//
-	 LwRAGJ5KcZInhwjhI4s7dqP4FkeYA5CSovuyJ5djeYoZlSYfbdEMIPEudIjYHj48KL
-	 UA4WbyPAI70FpPFXeSvl43wLPyiyrF9aX9b22E/3cQNHhswOGXQPJ/ZV7YoqdQeeZf
-	 NuB9yP+fEgfrJNzo9m3ndWoGP+SG3Xcs1Bphx9MSjb3n7EyilA14PUh2I+pbhLR1Fs
-	 HnLB+ueM9kGix6pOSNobbxBmv7APRg/dMAu2VEc5wr6jUEqc3nhIwg7kKv53PPDEs/
-	 32YSrY7dwvHcw==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Thu, 03 Jul 2025 04:44:39 +0200
-X-ME-IP: 124.33.176.97
-Message-ID: <0360d2e0-e071-4259-a7c7-23c31e52e563@wanadoo.fr>
-Date: Thu, 3 Jul 2025 11:44:27 +0900
+	s=arc-20240116; t=1751511091; c=relaxed/simple;
+	bh=8W7KpWdMaIiQg2iObW8SfTHbpPj7vW5/o4e77fqeV6I=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=t+U8jSWegdIcfaDGLS4zOy/P3Zogn4ChUJdlUi1Du8udDD2N2BKa+EIwrL0w6zizk7leecCADdYog4PsQIBOrYo+J6nFSGKLN9nnRXvVNeXBRGgJeqZQSGkjqpU/SmrEdO4LcRmMjy+ZQeni+D1oUW1A3tNE4zmKYj4Cl9LR4F8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=YF4iyGWh; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1751511063;
+	bh=HwgCr4UaBtbJSmmcK7ifa1Jw1DlFKiK/NCJFmbPjCPU=;
+	h=Date:From:To:Cc:Subject:From;
+	b=YF4iyGWh3HVZO6ky/qw4pthQjLSd4ClgDYlvFTUl6KsmboIKov3T5D58MN3An546M
+	 7c+pEiZFAW1Gy4LigY1P9gWnSztowRrbYxZJno2gBpJ2xw0IJFP5Gan4HJgqfbbKb+
+	 suLsFZXFccHHL3WyQNw7fdkjE23GxyhTrwJMbyBqZsQGm3DWce/ZBLWA2Z9zzTDqb5
+	 tVTkM158RVAihwFX3va6nOwUodEt8UEsd12U9xZdMSn0fyMW7ra+lRCjbQ1NN6hEk6
+	 8ezs7+w3cA1pA+ZT+D80feOKLkp0mjD8CVvCB+P050Pvi5lYglKFGqNVvExE/bxhXt
+	 XmZMKsXkUCL0g==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bXh9300pVz4wxJ;
+	Thu,  3 Jul 2025 12:51:01 +1000 (AEST)
+Date: Thu, 3 Jul 2025 12:51:21 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Christian Brauner
+ <brauner@kernel.org>
+Cc: bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Linux
+ Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: duplicate patches in the bpf-next tree
+Message-ID: <20250703125121.2f34c015@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 1/7] mfd: Add core driver for Nuvoton NCT6694
-To: Ming Yu <a0282524688@gmail.com>, Lee Jones <lee@kernel.org>
-Cc: tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl,
- andi.shyti@kernel.org, mkl@pengutronix.de, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
- jdelvare@suse.com, alexandre.belloni@bootlin.com,
- linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
- netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
- linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
- linux-usb@vger.kernel.org
-References: <20250627102730.71222-1-a0282524688@gmail.com>
- <20250627102730.71222-2-a0282524688@gmail.com>
- <20250702161513.GX10134@google.com>
- <CAOoeyxXWbjWvOgsSvXb9u2y6yFExq347ceZe96bm9w+GQAp2Rg@mail.gmail.com>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
- GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
- bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
- BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
- 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
- yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
- CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
- ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <CAOoeyxXWbjWvOgsSvXb9u2y6yFExq347ceZe96bm9w+GQAp2Rg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/tmOAMKdyi2i3/ON3pYRcFO.";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On 03/07/2025 à 11:39, Ming Yu wrote:
-> Dear Lee,
-> 
-> Thanks for your feedback and review.
-> Currently, the status of the sub-device drivers is as follows (A/R/T):
->     [v13,1/7] mfd: Add core driver for Nuvoton NCT6694 (- - -)
->     [v13,2/7] gpio: Add Nuvoton NCT6694 GPIO support (1 1 -)
->     [v13,3/7] i2c: Add Nuvoton NCT6694 I2C support (1 - -)
->     [v13,4/7] can: Add Nuvoton NCT6694 CANFD support (- 2 -)
+--Sig_/tmOAMKdyi2i3/ON3pYRcFO.
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-For the CAN driver, my Reviewed-by can be interpreted as an Acked-by :)
+Hi all,
 
->     [v13,5/7] watchdog: Add Nuvoton NCT6694 WDT support (1 - -)
->     [v13,6/7] hwmon: Add Nuvoton NCT6694 HWMON support (- 1 -)
->     [v13,7/7] rtc: Add Nuvoton NCT6694 RTC support (1 - -)
+The following commits are also in the vfs-brauner tree as different
+commits (but the same patches):
 
+  f4fba2d6d282 ("selftests/bpf: Add tests for bpf_cgroup_read_xattr")
+  1504d8c7c702 ("bpf: Mark cgroup_subsys_state->cgroup RCU safe")
+  535b070f4a80 ("bpf: Introduce bpf_cgroup_read_xattr to read xattr of cgro=
+up's node")
 
-Yours sincerely,
-Vincent Mailhol
+These are commits
 
+  21eebc655b0f ("selftests/bpf: Add tests for bpf_cgroup_read_xattr")
+  5bc9557c9f17 ("bpf: Mark cgroup_subsys_state->cgroup RCU safe")
+  b95ee9049c93 ("bpf: Introduce bpf_cgroup_read_xattr to read xattr of cgro=
+up's node")
+
+in the vfs-brauner tree.
+
+These duplicates are causing unnecessary conflicts.
+
+The previous commit in both trees is not quite identical.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/tmOAMKdyi2i3/ON3pYRcFO.
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmhl8CkACgkQAVBC80lX
+0GzFxAf9HegHwqGUyAvK6g01Csp7ye/ewIkp51mjuySHB2rn54HcggUA9V11PpwE
+0TufMupaVfTKNVRo8cq6+GAX2bW7pQj2yTuWdVnd4xu4Di213AprYmLeYvLCjQku
+Y4h53F1jEDeKH3VFiCkgNmxl3e0njGwjpT8uEPLVhUaG9cH/BJUiTJ1cUXmNvaps
+2IqJjtVMaX5o02jE5StHTg5SVinY7qbBd7huK8bpkRdcvT7TGJHaYDuvWuLBVl4K
+tNLMhgnlLB26cAnFLtsLwyfLaqzVX6R3Tc/9iQC0dr06dKB7sHxnrBTyIbBkWvEy
+hkvlg6moBs3qUrxo9DhnGcLQ8Gpkjw==
+=S9FW
+-----END PGP SIGNATURE-----
+
+--Sig_/tmOAMKdyi2i3/ON3pYRcFO.--
 
