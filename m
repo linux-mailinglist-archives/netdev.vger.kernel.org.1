@@ -1,254 +1,262 @@
-Return-Path: <netdev+bounces-203817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0176AF753C
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 15:17:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F129AF755F
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 15:22:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A66F81C83DB3
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:17:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21E0C7AAB47
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:20:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64CC2335BA;
-	Thu,  3 Jul 2025 13:17:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50041139CE3;
+	Thu,  3 Jul 2025 13:22:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UvZ5+Q5C"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nv9W47ra"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2021DDD1;
-	Thu,  3 Jul 2025 13:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4BD1DDD1
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 13:22:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751548636; cv=none; b=PHTtavwZmBS4jXXvfp4LaDEOLUPhK6sknhV8hfWVlMnEFOgGeQfgbA2nGRUy/yOmAzv3oaxpoSfPhI7mVdUCxVq596kCiFE2PXTu8EFW5S63Qg4mmo9audNurQEi4xOnj0GSC7eUqmkt20+1O1zTNMs5K76DmlXBym3hq70AkuU=
+	t=1751548934; cv=none; b=Oa+hNo6D+WP3jc2c6tZniHxQ8DfE8Ecy2Ss1zWiFGfNEWdkrswceTgyMHxQjfRrck2S0yWRSLblW3rOfj6kNyJwczknWTh6uPygeznp+gaTRJ4oWMyKFG3TCUmTaFEQ65zsbwKjthetgUtP0qqnCYt+nb6zXgbQ5K91z3XboFIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751548636; c=relaxed/simple;
-	bh=N9vx4nN/TtiQ7kDCz3sMGAFcDb/bYgvtZpWErpPG28s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jDmRkswuJLjDKZD/FgWjlya2yHO8ZS8aAKnpeLw8QNX90A8yYC393NsSH+F3JbeUI35JAEWQEYhD0Dt+bBM47JRnnsXGQ0b8s1QKzYbWHkflDg7i9t7WOYcvxnA53gWwypKxmwQ2Bcmulqc4LwX5Osx9rqFTeQ74RFhM5ayuOKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UvZ5+Q5C; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3d948ce7d9dso31691325ab.2;
-        Thu, 03 Jul 2025 06:17:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751548634; x=1752153434; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0YTKQYtfASLZ4WUpXznMDU4LflCg1MNaJpuSyTx8YzU=;
-        b=UvZ5+Q5Cn7L6qPOcIDagKnHnfBUw6yNHhyHsm9hBmGZxWGGKTwjUT4bgf1yk6++VCD
-         ZjYdrlk8RDtPjD+leRwzTjMEM7c9y91bhIJ6BQRbd1YWsWLxQ6X+/nG9PGv7PLE2JM5E
-         mVr0egBy6Gd9QwyoDQTsSMxKBHs9uDZ46OwbYwMemi5OEQ5POY5Yz5I0q/HSzlCyUl4y
-         jZorJ3i6Y+mpbd1SH04AmVIjlYzXud2tvhswHyfdwnxBLl4O+Czd72YcSX8u4dfFXGKg
-         s39RM5aRe7nuatvrYD054p2rWbs9qqqQt1rGSGAynrv+darZESdR3S0gw4aCw5d4SJWi
-         XeAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751548634; x=1752153434;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0YTKQYtfASLZ4WUpXznMDU4LflCg1MNaJpuSyTx8YzU=;
-        b=Ldg8kcWXj8kxoj/fCZMOYFCRS0CWf7vR3GGfXYhEuVbgWWuU5/XwS4YRCtxD0YC32J
-         /u5GeLCzOdfWYerGdbASjbzjMEXHdB62r5Swim/Oczb1/groVsJGpXCM+IHvQa6bStP1
-         UEFmV5vdVy5k/uCp3iKpeEPMnFtM4sQVQoPxLqAROxT2CNX//CVrapPLrz5yPXrQCKhQ
-         ZDxtb8BoE8MS0yjNm3b6j/OZoBt7k+N/1qDlqJUU9A2stiaHjNmwHy1wHtM8FmlTI8PT
-         qijY2nA5uD6HkggdGR58P6kIiWq7D2Dfz+Dw0DJ4OYtqMrpLnNsxVTfHpIGsZkveXsO6
-         C2BQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWIVXXmQMs3x7QdHjaRK9TkguTMi02ZikIBu/dgpwZ1CZYZRwNzdsngIssNOSbpwRaNnj6y8f5k@vger.kernel.org, AJvYcCXE8KQ0IvA+Guwz3l6H6/eQT3/KgwT7lxwVVLATKer0PxRboixTG+PfF0gOvNSG53zuITs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOsUPT6Rl0eS0fgJauFhwf2kvAnAfam1enDEVeMBigpj/ZvyiT
-	0kRVR1Rm1XAXNRpfaeozBL/LhC6jmJgMOcl2hkYQ2Oe8DYtsFQxZm83nvXKUttd/0QLZNtKdCb/
-	BEElhvkzEVXd7neA4EWKJsoonzTHG2g0=
-X-Gm-Gg: ASbGncvwixOK73c96jtmgjDqQ/McYp/Loj366SagwFsj3oo6cl8oYp6zzV1fE2/opiU
-	A1p/0v3AxrVDaZbnWq7Bt56PF/xevPmP7RfssCYUookuvuta+903PvqpztMOw7pzs9K6kPyV5ku
-	Ho9ie6RHvLcFa+Rxfj+Lh+YDeRmOzdolkbkJixJ47nbw==
-X-Google-Smtp-Source: AGHT+IHpZju9DDW3thyUnIqv/xSVWfyOkcFJ+jcMFY3JRyCJOE3oyLV/2Ns2ixq64cxok3+TlxmpwRsmiQAUNILWDKo=
-X-Received: by 2002:a92:c269:0:b0:3df:45bb:28fe with SMTP id
- e9e14a558f8ab-3e054934d51mr77786645ab.1.1751548633602; Thu, 03 Jul 2025
- 06:17:13 -0700 (PDT)
+	s=arc-20240116; t=1751548934; c=relaxed/simple;
+	bh=WatsLhEqxxRQO2BKB/QaLjbLLm8Bmi7hxVyA8S1HxSc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q6zX8anAF67ZdBiq3+WKXP+5dFwvbMY8RU1dOz9e2UAT8c8GimDROJq4zXHX2eaqABMBxqE0Z2Fnl49EI6NMbiI9mHi6eASjgak+GJfyBhSXERMzZFVVR7cT8efYO6tYzTm3vesRReT7wXNKK+8rLWR30R3+0USu1TFOuAfqOdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nv9W47ra; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751548931;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=dMZQdR9FvwcYqCFm9P+KhO+sujNaYy5P5Nd+l/eOb9g=;
+	b=Nv9W47rakTd71/fRGFqwIpRq+A7mZWFNy4jz6+bngQAf5bBewIlY54Se0N06HOU1BXF55k
+	wCcuC8qhlQKgogFjk/bogKTrOoIHZvmvlYo1l6bkKgAFSVXUVajbpjqscq53UGWrfjyo2Z
+	hRQrnRYDrOOm/23W9T28NKGHOuKolmA=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-613-AhybN3tsMp6_hfxw-mtIhQ-1; Thu,
+ 03 Jul 2025 09:22:07 -0400
+X-MC-Unique: AhybN3tsMp6_hfxw-mtIhQ-1
+X-Mimecast-MFC-AGG-ID: AhybN3tsMp6_hfxw-mtIhQ_1751548926
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 901D7180034E;
+	Thu,  3 Jul 2025 13:22:06 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.33.20])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7B543195608F;
+	Thu,  3 Jul 2025 13:22:04 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.16-rc5
+Date: Thu,  3 Jul 2025 15:21:58 +0200
+Message-ID: <20250703132158.33888-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250702112815.50746-1-kerneljasonxing@gmail.com>
- <20250702112815.50746-3-kerneljasonxing@gmail.com> <aGVYNMZEZQV1SetF@mini-arch>
- <CAL+tcoA8Yhk85mkOBE9jEx7fd1s5rAW+Y8Uf2DAaNR3-9DW0Vg@mail.gmail.com> <aGZ5dq5P0G8e8A/J@boxer>
-In-Reply-To: <aGZ5dq5P0G8e8A/J@boxer>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 3 Jul 2025 21:16:36 +0800
-X-Gm-Features: Ac12FXwc8V4qfJJdWFJ9Ko5PqZxJI_ZHNvnMbieyJC1gDAgvtlEKHdimQfLCK4k
-Message-ID: <CAL+tcoCkZSOHy4zteK-pw8JgRNDr6oz2aSMmZEsmrP4onXWsDg@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 2/2] selftests/bpf: add a new test to check
- the consumer update case
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Stanislav Fomichev <stfomichev@gmail.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org, 
-	magnus.karlsson@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Thu, Jul 3, 2025 at 8:37=E2=80=AFPM Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> On Thu, Jul 03, 2025 at 07:09:09AM +0800, Jason Xing wrote:
-> > On Thu, Jul 3, 2025 at 12:03=E2=80=AFAM Stanislav Fomichev <stfomichev@=
-gmail.com> wrote:
-> > >
-> > > On 07/02, Jason Xing wrote:
-> > > > From: Jason Xing <kernelxing@tencent.com>
-> > > >
-> > > > The subtest sends 33 packets at one time on purpose to see if xsk
-> > > > exitting __xsk_generic_xmit() updates the global consumer of tx que=
-ue
-> > > > when reaching the max loop (max_tx_budget, 32 by default). The numb=
-er 33
-> > > > can avoid xskq_cons_peek_desc() updates the consumer when it's abou=
-t to
-> > > > quit sending, to accurately check if the issue that the first patch
-> > > > resolves remains. The new case will not check this issue in zero co=
-py
-> > > > mode.
-> > > >
-> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > > ---
-> > > > v5
-> > > > Link: https://lore.kernel.org/all/20250627085745.53173-1-kerneljaso=
-nxing@gmail.com/
-> > > > 1. use the initial approach to add a new testcase
-> > > > 2. add a new flag 'check_consumer' to see if the check is needed
-> > > > ---
-> > > >  tools/testing/selftests/bpf/xskxceiver.c | 51 ++++++++++++++++++++=
-+++-
-> > > >  tools/testing/selftests/bpf/xskxceiver.h |  1 +
-> > > >  2 files changed, 51 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testi=
-ng/selftests/bpf/xskxceiver.c
-> > > > index 0ced4026ee44..ed12a55ecf2a 100644
-> > > > --- a/tools/testing/selftests/bpf/xskxceiver.c
-> > > > +++ b/tools/testing/selftests/bpf/xskxceiver.c
-> > > > @@ -109,6 +109,8 @@
-> > > >
-> > > >  #include <network_helpers.h>
-> > > >
-> > > > +#define MAX_TX_BUDGET_DEFAULT 32
-> > > > +
-> > > >  static bool opt_verbose;
-> > > >  static bool opt_print_tests;
-> > > >  static enum test_mode opt_mode =3D TEST_MODE_ALL;
-> > > > @@ -1091,11 +1093,45 @@ static bool is_pkt_valid(struct pkt *pkt, v=
-oid *buffer, u64 addr, u32 len)
-> > > >       return true;
-> > > >  }
-> > > >
-> > > > +static u32 load_value(u32 *counter)
-> > > > +{
-> > > > +     return __atomic_load_n(counter, __ATOMIC_ACQUIRE);
-> > > > +}
-> > > > +
-> > > > +static bool kick_tx_with_check(struct xsk_socket_info *xsk, int *r=
-et)
-> > > > +{
-> > > > +     u32 max_budget =3D MAX_TX_BUDGET_DEFAULT;
-> > > > +     u32 cons, ready_to_send;
-> > > > +     int delta;
-> > > > +
-> > > > +     cons =3D load_value(xsk->tx.consumer);
-> > > > +     ready_to_send =3D load_value(xsk->tx.producer) - cons;
-> > > > +     *ret =3D sendto(xsk_socket__fd(xsk->xsk), NULL, 0, MSG_DONTWA=
-IT, NULL, 0);
-> > > > +
-> > > > +     delta =3D load_value(xsk->tx.consumer) - cons;
-> > > > +     /* By default, xsk should consume exact @max_budget descs at =
-one
-> > > > +      * send in this case where hitting the max budget limit in wh=
-ile
-> > > > +      * loop is triggered in __xsk_generic_xmit(). Please make sur=
-e that
-> > > > +      * the number of descs to be sent is larger than @max_budget,=
- or
-> > > > +      * else the tx.consumer will be updated in xskq_cons_peek_des=
-c()
-> > > > +      * in time which hides the issue we try to verify.
-> > > > +      */
-> > > > +     if (ready_to_send > max_budget && delta !=3D max_budget)
-> > > > +             return false;
-> > > > +
-> > > > +     return true;
-> > > > +}
-> > > > +
-> > > >  static int kick_tx(struct xsk_socket_info *xsk)
-> > > >  {
-> > > >       int ret;
-> > > >
-> > > > -     ret =3D sendto(xsk_socket__fd(xsk->xsk), NULL, 0, MSG_DONTWAI=
-T, NULL, 0);
-> > > > +     if (xsk->check_consumer) {
-> > > > +             if (!kick_tx_with_check(xsk, &ret))
-> > > > +                     return TEST_FAILURE;
-> > > > +     } else {
-> > > > +             ret =3D sendto(xsk_socket__fd(xsk->xsk), NULL, 0, MSG=
-_DONTWAIT, NULL, 0);
-> > > > +     }
-> > > >       if (ret >=3D 0)
-> > > >               return TEST_PASS;
-> > > >       if (errno =3D=3D ENOBUFS || errno =3D=3D EAGAIN || errno =3D=
-=3D EBUSY || errno =3D=3D ENETDOWN) {
-> > > > @@ -2613,6 +2649,18 @@ static int testapp_adjust_tail_grow_mb(struc=
-t test_spec *test)
-> > > >                                  XSK_UMEM__LARGE_FRAME_SIZE * 2);
-> > > >  }
-> > > >
-> > > > +static int testapp_tx_queue_consumer(struct test_spec *test)
-> > > > +{
-> > > > +     int nr_packets =3D MAX_TX_BUDGET_DEFAULT + 1;
-> > > > +
-> > > > +     pkt_stream_replace(test, nr_packets, MIN_PKT_SIZE);
-> > > > +     test->ifobj_tx->xsk->batch_size =3D nr_packets;
-> > > > +     if (!(test->mode & TEST_MODE_ZC))
-> > > > +             test->ifobj_tx->xsk->check_consumer =3D true;
-> > >
-> > > The test looks good to me, thank you!
-> >
-> > Thanks.
-> >
-> > >
-> > > One question here: why not exit/return for TEST_MODE_ZC instead
-> > > of conditionally setting check_consumer?
-> >
-> > As you said, yes, we could skip the zc test for this
-> > testapp_tx_queue_consumer(). It doesn't affect the goal or result of
-> > the subtest. So do you expect me to respin this patch or just leave it
-> > as is?
->
-> Yes I think it would be worth respinning and skipping it for zc. see how
-> testapp_stats_rx_dropped() does it.
+Hi Linus!
 
-Got it. I see:
-        if (test->mode =3D=3D TEST_MODE_ZC) {
-                ksft_test_result_skip("Can not run RX_DROPPED test for
-ZC mode\n");
-                return TEST_SKIP;
-        }
+The following changes since commit e34a79b96ab9d49ed8b605fee11099cf3efbb428:
 
->
-> Otherwise we would probably never change it and just keep on running this
-> test case for zc which is not beneficial at this point.
->
-> Besides LGTM!
+  Merge tag 'net-6.16-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-06-26 09:13:27 -0700)
 
-Thanks. Will repost it soon :)
+are available in the Git repository at:
 
->
-> >
-> > Thanks,
-> > Jason
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.16-rc5
+
+for you to fetch changes up to 223e2288f4b8c262a864e2c03964ffac91744cd5:
+
+  vsock/vmci: Clear the vmci transport packet properly when initializing it (2025-07-03 12:52:52 +0200)
+
+----------------------------------------------------------------
+Including fixes from Bluetooth.
+
+Current release - new code bugs:
+
+  - eth: txgbe: fix the issue of TX failure
+
+  - eth: ngbe: specify IRQ vector when the number of VFs is 7
+
+Previous releases - regressions:
+
+  - sched: always pass notifications when child class becomes empty
+
+  - ipv4: fix stat increase when udp early demux drops the packet
+
+  - bluetooth: prevent unintended pause by checking if advertising is active
+
+  - virtio: fix error reporting in virtqueue_resize
+
+  - eth: virtio-net:
+    - ensure the received length does not exceed allocated size
+    - fix the xsk frame's length check
+
+  - eth: lan78xx: fix WARN in __netif_napi_del_locked on disconnect
+
+Previous releases - always broken:
+
+  - bluetooth: mesh: check instances prior disabling advertising
+
+  - eth: idpf: convert control queue mutex to a spinlock
+
+  - eth: dpaa2: fix xdp_rxq_info leak
+
+  - eth: amd-xgbe: align CL37 AN sequence as per databook
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+----------------------------------------------------------------
+Ahmed Zaki (1):
+      idpf: convert control queue mutex to a spinlock
+
+Alok Tiwari (1):
+      enic: fix incorrect MTU comparison in enic_change_mtu()
+
+Antoine Tenart (1):
+      net: ipv4: fix stat increase when udp early demux drops the packet
+
+Bui Quang Minh (4):
+      virtio-net: ensure the received length does not exceed allocated size
+      virtio-net: remove redundant truesize check with PAGE_SIZE
+      virtio-net: use the check_mergeable_len helper
+      virtio-net: xsk: rx: fix the frame's length check
+
+Christian Eggers (4):
+      Bluetooth: hci_sync: revert some mesh modifications
+      Bluetooth: MGMT: set_mesh: update LE scan interval and window
+      Bluetooth: MGMT: mesh_send: check instances prior disabling advertising
+      Bluetooth: HCI: Set extended advertising data synchronously
+
+Dan Carpenter (1):
+      lib: test_objagg: Set error message in check_expect_hints_stats()
+
+Fushuai Wang (1):
+      dpaa2-eth: fix xdp_rxq_info leak
+
+HarshaVardhana S A (1):
+      vsock/vmci: Clear the vmci transport packet properly when initializing it
+
+Jakub Kicinski (3):
+      docs: netdev: correct the heading level for co-posting selftests
+      Merge tag 'for-net-2025-06-27' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
+      Merge branch '200GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+
+Jan Karcher (1):
+      MAINTAINERS: update smc section
+
+Jiawen Wu (5):
+      net: txgbe: fix the issue of TX failure
+      net: libwx: fix the incorrect display of the queue number
+      net: txgbe: request MISC IRQ in ndo_open
+      net: wangxun: revert the adjustment of the IRQ vector sequence
+      net: ngbe: specify IRQ vector when the number of VFs is 7
+
+Kohei Enju (1):
+      rose: fix dangling neighbour pointers in rose_rt_device_down()
+
+Krzysztof Kozlowski (1):
+      dt-bindings: net: sophgo,sg2044-dwmac: Drop status from the example
+
+Laurent Vivier (3):
+      virtio_ring: Fix error reporting in virtqueue_resize
+      virtio_net: Cleanup '2+MAX_SKB_FRAGS'
+      virtio_net: Enforce minimum TX ring size for reliability
+
+Lion Ackermann (1):
+      net/sched: Always pass notifications when child class becomes empty
+
+Lukas Bulwahn (1):
+      MAINTAINERS: adjust file entry after renaming rzv2h-gbeth dtb
+
+Mark Bloch (1):
+      MAINTAINERS: Add myself as mlx5 core and mlx5e co-maintainer
+
+Michal Swiatkowski (1):
+      idpf: return 0 size for RSS key if not supported
+
+Oleksij Rempel (1):
+      net: usb: lan78xx: fix WARN in __netif_napi_del_locked on disconnect
+
+Paolo Abeni (3):
+      Merge branch 'virtio-net-fixes-for-mergeable-xdp-receive-path'
+      Merge branch 'virtio-fixes-for-tx-ring-sizing-and-resize-error-reporting'
+      Merge branch 'fix-irq-vectors'
+
+Raju Rangoju (2):
+      amd-xgbe: align CL37 AN sequence as per databook
+      amd-xgbe: do not double read link status
+
+Thomas Fourier (2):
+      ethernet: atl1: Add missing DMA mapping error checks and count errors
+      nui: Fix dma_mapping_error() check
+
+Ulrich Weber (1):
+      doc: tls: socket needs to be established to enable ulp
+
+Vitaly Lifshits (1):
+      igc: disable L1.2 PCI-E link substate to avoid performance issue
+
+Yang Li (1):
+      Bluetooth: Prevent unintended pause by checking if advertising is active
+
+ .../bindings/net/sophgo,sg2044-dwmac.yaml          |   3 +-
+ Documentation/networking/tls.rst                   |   4 +-
+ Documentation/process/maintainer-netdev.rst        |   2 +-
+ MAINTAINERS                                        |  10 +-
+ drivers/net/ethernet/amd/xgbe/xgbe-common.h        |   2 +
+ drivers/net/ethernet/amd/xgbe/xgbe-mdio.c          |  13 ++
+ drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c        |  24 ++-
+ drivers/net/ethernet/amd/xgbe/xgbe.h               |   4 +-
+ drivers/net/ethernet/atheros/atlx/atl1.c           |  79 +++++--
+ drivers/net/ethernet/cisco/enic/enic_main.c        |   4 +-
+ drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c   |  26 ++-
+ drivers/net/ethernet/intel/idpf/idpf_controlq.c    |  23 +--
+ .../net/ethernet/intel/idpf/idpf_controlq_api.h    |   2 +-
+ drivers/net/ethernet/intel/idpf/idpf_ethtool.c     |   4 +-
+ drivers/net/ethernet/intel/idpf/idpf_lib.c         |  12 +-
+ drivers/net/ethernet/intel/igc/igc_main.c          |  10 +
+ drivers/net/ethernet/sun/niu.c                     |  31 ++-
+ drivers/net/ethernet/sun/niu.h                     |   4 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c        |  27 ++-
+ drivers/net/ethernet/wangxun/libwx/wx_sriov.c      |   4 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h       |   3 +-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c      |   4 +-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_type.h      |   2 +-
+ drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c     |   1 +
+ drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c     |   8 +-
+ drivers/net/ethernet/wangxun/txgbe/txgbe_main.c    |  22 +-
+ drivers/net/ethernet/wangxun/txgbe/txgbe_type.h    |   4 +-
+ drivers/net/usb/lan78xx.c                          |   2 -
+ drivers/net/virtio_net.c                           | 111 ++++++----
+ drivers/virtio/virtio_ring.c                       |   8 +-
+ lib/test_objagg.c                                  |   4 +-
+ net/bluetooth/hci_event.c                          |  36 ----
+ net/bluetooth/hci_sync.c                           | 227 +++++++++++++--------
+ net/bluetooth/mgmt.c                               |  25 ++-
+ net/ipv4/ip_input.c                                |   7 +-
+ net/rose/rose_route.c                              |  15 +-
+ net/sched/sch_api.c                                |  19 +-
+ net/vmw_vsock/vmci_transport.c                     |   4 +-
+ 38 files changed, 494 insertions(+), 296 deletions(-)
+
 
