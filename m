@@ -1,166 +1,83 @@
-Return-Path: <netdev+bounces-203625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 608ADAF6894
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 05:17:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A762AF68BD
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 05:36:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DF691C46B29
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 03:17:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64CEB3A90D4
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 03:36:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 771E0230BC2;
-	Thu,  3 Jul 2025 03:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="ZG/xrzLd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE5C9238150;
+	Thu,  3 Jul 2025 03:36:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB08C1F5437
-	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 03:17:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AB022376E1;
+	Thu,  3 Jul 2025 03:36:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751512624; cv=none; b=uhXcr5eJigJSeEf8LyQqRckvTZ1xSskso1nFyMygngfeVxo9JqSCAVw3tXTyeoxK+qlAoBv/5v0CxIl9ylogqAcxKInSOjLlVa22/LnwqoyBgO0xCWrJvHBziiCw6+NA1zdj8ekby4+9oq7KVidVlX5iDp+Pk8XwpgpER/FFV38=
+	t=1751513805; cv=none; b=tYk2T79/yH4xj/XauMzq2bp0e7sp4LwWe/IZULAbn/vkFTH+Dhl5gN6jUuIw1N6KR3502V9VxAasoAFKBVYQ6FM1X06ihvurLQLdW3r1E1gNXubPliiWLQw+XVVyQ7JgLMi6lHBprVqR30ZWigUkpTfCc/DmeTskgDVpmHZe7SE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751512624; c=relaxed/simple;
-	bh=WfQo6VWW97Dd9tbJRF8NIjPGOh4v/l76zixni158weE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YvCMXc6TC8fNhqAcJCJNyiomG9jMPAQWpGKeK/r7qIwCAek5Rg3h6FZ/6DFakS3ikUfiqyzr6sLfGH+2ev//J5qw0hOcdzT8q5FJDjI2CgpbV4YYWnbvpP9rZNT1PM0U3G8LDE1ESGjDsU3emrNCw2bWm5MNKi4z7vXWOZEwZHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=ZG/xrzLd; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=hIxLajEFFO+kE/xI6d38sn/tW/Rlk/k00h8fWzbhVBA=; t=1751512622; x=1752376622; 
-	b=ZG/xrzLd182chouzSL5p24WGVlY7x/QJ8UOIbD10teRHUeDG1xZsJa5r1Wg2jKo9MzRLILnYwTp
-	tWD8m0d9EJWHLBEA4YzGEntpg/FeEvkmcbsFVWp0y+B3susK2T6ctUjABqT8EtzvwrRCN1soE2nJ8
-	PKS6KMLx6t31J+uBRyT0o7BwDvRcULzWALN9qDF0jQfEl3yG+CLXzaLZrmyP1IqMe+hlt/L9qmV1k
-	23qtv7stpVTt/Ag46xTFyO7BSrJ1vR5O9FH/k3ys0zVyH0yFD5SdaiQhoce37FhDGGwCmWXO+8XDp
-	Yt+BRE3y6sK9/Syj7yr5RC4AFyB9F18fkcmg==;
-Received: from 70-228-78-207.lightspeed.sntcca.sbcglobal.net ([70.228.78.207]:54972 helo=localhost.localdomain)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1uXARZ-0006te-TM; Wed, 02 Jul 2025 20:17:02 -0700
-From: John Ousterhout <ouster@cs.stanford.edu>
-To: netdev@vger.kernel.org
-Cc: pabeni@redhat.com,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	John Ousterhout <ouster@cs.stanford.edu>
-Subject: [PATCH net-next v10 15/15] net: homa: create Makefile and Kconfig
-Date: Wed,  2 Jul 2025 20:13:23 -0700
-Message-ID: <20250703031445.569-16-ouster@cs.stanford.edu>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20250703031445.569-1-ouster@cs.stanford.edu>
-References: <20250703031445.569-1-ouster@cs.stanford.edu>
+	s=arc-20240116; t=1751513805; c=relaxed/simple;
+	bh=qufCM+a9ttb0lswuL1Vr+9sSMDwIKtcoIE0s5xR/GiE=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=XDi9MCqy+Rw45aHQSqu2dk6/Pn97+jdgqEzT0Q44sHVOO4GoooZNTVNA3ml72Cjn8EbV/QX7wY2Dq3Ljc+Q41lIIirrjsgPtKEh6v//yxszQArHPFeyTWIoYSprKl3/qz82inoc7S6OCD/8meZTJBnsABkU07AmFNoDlnV+ajA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bXj7c4WKJz2BdV7;
+	Thu,  3 Jul 2025 11:34:52 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6AFF21A016C;
+	Thu,  3 Jul 2025 11:36:39 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 3 Jul 2025 11:36:38 +0800
+Message-ID: <cb9826e0-8366-4b34-abce-fedd5882ba00@huawei.com>
+Date: Thu, 3 Jul 2025 11:36:37 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -1.0
-X-Scan-Signature: 50c535147b6e7155177bcd7d65214eb3
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+	<shenjian15@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 0/4] There are some bugfix for the HNS3 ethernet
+ driver
+To: Jakub Kicinski <kuba@kernel.org>
+References: <20250702125731.2875331-1-shaojijie@huawei.com>
+ <f3994ddd-9b9b-4bbb-bba4-89f7b4ae07f7@huawei.com>
+ <20250702072301.51deaf72@kernel.org>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20250702072301.51deaf72@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-Before this commit the Homa code is "inert": it won't be compiled
-in kernel builds. This commit adds Homa's Makefile and Kconfig, and
-also links Homa into net/Makefile and net/Kconfig, so that Homa
-will be built during kernel builds if enabled (it is disabled by
-default).
 
-Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
----
- net/Kconfig       |  1 +
- net/Makefile      |  1 +
- net/homa/Kconfig  | 21 +++++++++++++++++++++
- net/homa/Makefile | 16 ++++++++++++++++
- 4 files changed, 39 insertions(+)
- create mode 100644 net/homa/Kconfig
- create mode 100644 net/homa/Makefile
+on 2025/7/2 22:23, Jakub Kicinski wrote:
+> On Wed, 2 Jul 2025 21:07:19 +0800 Jijie Shao wrote:
+>> on 2025/7/2 20:57, Jijie Shao wrote:
+>>> There are some bugfix for the HNS3 ethernet driver
+>> Sorry, ignore this patch set, they should be sent to net not net-next ...
+> You still should have waited 24h per:
+> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
 
-diff --git a/net/Kconfig b/net/Kconfig
-index ebc80a98fc91..cb89196c63ff 100644
---- a/net/Kconfig
-+++ b/net/Kconfig
-@@ -250,6 +250,7 @@ source "net/bridge/netfilter/Kconfig"
- endif
- 
- source "net/sctp/Kconfig"
-+source "net/homa/Kconfig"
- source "net/rds/Kconfig"
- source "net/tipc/Kconfig"
- source "net/atm/Kconfig"
-diff --git a/net/Makefile b/net/Makefile
-index aac960c41db6..71f740e0dc34 100644
---- a/net/Makefile
-+++ b/net/Makefile
-@@ -43,6 +43,7 @@ ifneq ($(CONFIG_VLAN_8021Q),)
- obj-y				+= 8021q/
- endif
- obj-$(CONFIG_IP_SCTP)		+= sctp/
-+obj-$(CONFIG_HOMA)		+= homa/
- obj-$(CONFIG_RDS)		+= rds/
- obj-$(CONFIG_WIRELESS)		+= wireless/
- obj-$(CONFIG_MAC80211)		+= mac80211/
-diff --git a/net/homa/Kconfig b/net/homa/Kconfig
-new file mode 100644
-index 000000000000..8ce5fbf08258
---- /dev/null
-+++ b/net/homa/Kconfig
-@@ -0,0 +1,21 @@
-+# SPDX-License-Identifier: BSD-2-Clause
-+#
-+# Homa transport protocol
-+#
-+
-+menuconfig HOMA
-+	tristate "The Homa transport protocol"
-+	depends on INET
-+	depends on IPV6
-+
-+	help
-+	  Homa is a network transport protocol for communication within
-+	  a datacenter. It provides significantly lower latency than TCP,
-+	  particularly for workloads containing a mixture of large and small
-+	  messages operating at high network utilization. At present, Homa
-+	  has been only partially upstreamed; this version provides bare-bones
-+	  functionality but is not performant. For more information see the
-+	  homa(7) man page or checkout the Homa Wiki at
-+	  https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview.
-+
-+	  If unsure, say N.
-diff --git a/net/homa/Makefile b/net/homa/Makefile
-new file mode 100644
-index 000000000000..ed894ebab176
---- /dev/null
-+++ b/net/homa/Makefile
-@@ -0,0 +1,16 @@
-+# SPDX-License-Identifier: BSD-2-Clause
-+#
-+# Makefile for the Linux implementation of the Homa transport protocol.
-+
-+obj-$(CONFIG_HOMA) := homa.o
-+homa-y:=        homa_incoming.o \
-+		homa_interest.o \
-+		homa_outgoing.o \
-+		homa_pacer.o \
-+		homa_peer.o \
-+		homa_plumbing.o \
-+		homa_pool.o \
-+		homa_rpc.o \
-+		homa_sock.o \
-+		homa_timer.o \
-+		homa_utils.o
--- 
-2.43.0
+
+Okay, I'll take note of that. Thank you.
+
 
 
