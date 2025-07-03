@@ -1,147 +1,116 @@
-Return-Path: <netdev+bounces-203570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C297AF66E0
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 02:44:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B9ABAF6715
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 03:16:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 560D87A8378
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 00:43:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7E3E4A0907
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 01:15:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC1642CCC1;
-	Thu,  3 Jul 2025 00:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D908D4414;
+	Thu,  3 Jul 2025 01:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xp8OEYOY"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B19972F29;
-	Thu,  3 Jul 2025 00:44:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E41715C0
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 01:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751503488; cv=none; b=SIhS0VYuIxWeMb0QNfqJ5ofMKaNtttB5V+jAtfhuqtxnvsh/Z3TtvoIcN5qfj8tD2X9oGOpgL6C+Zv36Rc8oCGLf1VRNpReoLBb3VeZrpbQLC7TV3IsuvphZwfjxqeornSZjY58B70gjJn+cK3t6z/G4xEpo/2XczvWFW+e6EyI=
+	t=1751505363; cv=none; b=VelRmDvoSzb1ASi8Ubyn+CQslEbo4sA8tFPZPrjrK2647r+CbBSFEMsJfT09GZj1X/gRibzlBr/N8Nna+iKgJW22/cxEf7nQeYQW5z7RZNKGarl78MDafTlEu+oooW/B7j0FBZHlI6FYlHC+98hhhs840HMGrYcu9xfZpUeBfJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751503488; c=relaxed/simple;
-	bh=9t98IKG3iIzsvVxpLKy1yWHEyggTRxAlznMox1HXnHQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kGQ07Q7nEeHI9we6KOPgYoyIO25lg8kX8fiWSF2yY2AaYE6GOpJ5nBTvN85CMTYmZxjeP+irMxVwXnrAi1DHSK3QcNOnNM5RGNqZcAYYMokhYKPUqeKHZ1l7EZk+h67/jbwli6wlis4TfND5pCcS7SnTwn0yKzXNo+o1mVaBEr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bXdJL212yz1R7Xh;
-	Thu,  3 Jul 2025 08:42:10 +0800 (CST)
-Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9073014022E;
-	Thu,  3 Jul 2025 08:44:41 +0800 (CST)
-Received: from DESKTOP-F6Q6J7K.china.huawei.com (10.174.175.220) by
- kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 3 Jul 2025 08:44:39 +0800
-From: Fan Gong <gongfan1@huawei.com>
-To: <pabeni@redhat.com>
-CC: <andrew+netdev@lunn.ch>, <christophe.jaillet@wanadoo.fr>,
-	<corbet@lwn.net>, <davem@davemloft.net>, <edumazet@google.com>,
-	<gongfan1@huawei.com>, <guoxin09@huawei.com>, <gur.stavi@huawei.com>,
-	<helgaas@kernel.org>, <horms@kernel.org>, <jdamato@fastly.com>,
-	<kuba@kernel.org>, <lee@trager.us>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <luosifu@huawei.com>,
-	<meny.yossefi@huawei.com>, <mpe@ellerman.id.au>, <netdev@vger.kernel.org>,
-	<przemyslaw.kitszel@intel.com>, <shenchenyang1@hisilicon.com>,
-	<shijing34@huawei.com>, <sumang@marvell.com>, <vadim.fedorenko@linux.dev>,
-	<wulike1@huawei.com>, <zhoushuai28@huawei.com>, <zhuyikai1@h-partners.com>
-Subject: Re: [PATCH net-next v06 4/8] hinic3: Command Queue interfaces
-Date: Thu, 3 Jul 2025 08:44:33 +0800
-Message-ID: <20250703004433.11160-1-gongfan1@huawei.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <f875faa2-718d-4244-bb86-2178fed55922@redhat.com>
-References: <f875faa2-718d-4244-bb86-2178fed55922@redhat.com>
+	s=arc-20240116; t=1751505363; c=relaxed/simple;
+	bh=VuQUjz/cGviES32kMdzC/Jy2KFJ3fEM5cdUhhdRfutk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mb1W8bG8Ctzv+x4JN1e/hciSpMlL+807g9ZeCu7HOAn6SalzjIext/9qZWBybyf/svBmOaNJDrfSmpGn5IO9pUbGIcR5ZleMLFjunl7WEDlk3HFqARcRuy5ZZfcovCfi8IR1flsavyUl7or3bLtBeWvMbM8w1it4KW1tDAnqLAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xp8OEYOY; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-237e6963f63so33124565ad.2
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 18:16:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751505362; x=1752110162; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=e2rKVkepBlRpmG6kqLBNvSNUuv0Xmr+/D1oBfdtHKj0=;
+        b=Xp8OEYOYXo7nP5pOMBOcI3HmqXmQd38ls/srppMoZayZsW+fGpFJgokHako3OJz2bw
+         2KnNdvNV88zM6eNjOOSkjh/sMvX0sg4z4J6m6NWVg27KIRo6Y5U7qjZXyTgY2UgDYphe
+         93ucm9/VWAZ5sXCex+WGZMSHtYwMsArZNvNelDQ5YuclsjxdAw9gl7VWO72nEYn3KoKl
+         UtCzEPfGwQuUMWKICSucPtQwjb1Meq2gZ2KgAg2E0mntxQpEHhuuuAPrH9W6HMmLpDbF
+         Ymv6IBqOJxAj5+GHn6XDvTZtvX7iRWgMDaGl/yHzHR++EE7Y65vu0VD+aNn6rJnblPjh
+         Zw2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751505362; x=1752110162;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e2rKVkepBlRpmG6kqLBNvSNUuv0Xmr+/D1oBfdtHKj0=;
+        b=GGOh3RdqpJdJoCs1N6xAzU6ozNyVLWjk6rIi5TgqJc+9QFeRMQuVV6LLBa3EsfFYgZ
+         SgCp8xpanJgrQUMdnByzgHer5r+21TFAUIpaWr/zb4PWf1xtuQV8UFQ4RbN9P+vnnRBv
+         dR1T3SVYfehtX//qdS7xOvkD5aaikKTmxtSCgKgpjnn2v65wSz33yTN9OhlbSinvHR0O
+         chvNKP+VMnZLN/3U7IokwPVw8+qFWMh0UbmROzHKbR4ckSGXjUkojc0Uy3thFiRjX8Yt
+         mUBPl8YRtyu812XGp5PenGzdTrsUsPk2kc+nx5rwjaZI9Ip4vmTKiNyivV/yxBcMYBpI
+         jINw==
+X-Forwarded-Encrypted: i=1; AJvYcCW72iIoxwD6c6nyX68spT5INsKfbS5TqS2elxy+O7p4gTfwkM0fW/tVLYitsvX22PSNWVfyhK8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsamZIbGR3fAwrsp4Azcs5QrF9Tp1+y7lr+TZkyQinoVf1DFAd
+	BQ5fuQCdoxNJj0h1E74T5zLSq2x6LyLY+troZCdljNO33jTylxSQyA8r2eRxi+UJFOQ=
+X-Gm-Gg: ASbGncuvqVDPoh4xe0GobtNLF6HbBhwTQUZrdRMJPBL0Z952sKlZoP8VSlVRS6V2nF1
+	RvCmeOV9ows8a3VDayz366+rYrlk1oAWXERgaImZlK3HLPrnqCqmpGIQXPwRKKgwLZLlx7XR79s
+	FSOfZy8/2qKX+J/64bkKdOK6pockVIFNosEWhPoPzyuwmnx1v8qqngMdFB9pkYmXLd2XU9NQM/8
+	UC51Ei4M6Zwsn+qws5pbYU6UWZ9OEqknZUDyG8UCUHxIM8lbMOB8whCRBrCSn/3ZVlQTdg6pMOm
+	vKaNmAYxb8akwq2IDf7uRcZG7QXmW8lIMbKv25Wy/GQX8nO1roedHXqVx6w6l7nXRnA=
+X-Google-Smtp-Source: AGHT+IElpn3LtHKgd/pQGODxGX39ip8rsNsfbKE8qL6xAZZw41rxJZhqoC95nSKb0ABBl7JSHCppNw==
+X-Received: by 2002:a17:902:e891:b0:235:779:edfa with SMTP id d9443c01a7336-23c6e5505camr59486385ad.32.1751505361603;
+        Wed, 02 Jul 2025 18:16:01 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23acb2f39bdsm148185245ad.80.2025.07.02.18.15.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jul 2025 18:16:01 -0700 (PDT)
+Date: Thu, 3 Jul 2025 01:15:54 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Erwan Dufour <erwan.dufour@withings.com>
+Cc: Erwan Dufour <mrarmonius@gmail.com>, netdev@vger.kernel.org,
+	steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, jv@jvosburgh.net, saeedm@nvidia.com,
+	tariqt@nvidia.com, Cosmin Ratiu <cratiu@nvidia.com>
+Subject: Re: [PATCH] [PATH xfrm offload] xfrm: bonding: Add xfrm packet
+ offload for active-backup mode
+Message-ID: <aGXZyuyiAQP2EVHi@fedora>
+References: <20250629210623.43497-1-mramonius@gmail.com>
+ <aGJiZrvRKXm74wd2@fedora>
+ <CAJ1gy2gjapE2a28MVFmrqBxct4xeCDpH1JPLBceWZ9WZAnmokg@mail.gmail.com>
+ <aGN_q_aYSlHf_QRD@fedora>
+ <CAJ1gy2ghhzU0+_QizeFq1JTm12YPtV+24MyJC_Apw11Z4Gnb4g@mail.gmail.com>
+ <aGTlcAOa6_ItYemu@fedora>
+ <CAJ1gy2h+BtDPZ2y4umhjVMrD74Nd5dZezdZOOy-YqLvyFGKKQA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- kwepemf100013.china.huawei.com (7.202.181.12)
+In-Reply-To: <CAJ1gy2h+BtDPZ2y4umhjVMrD74Nd5dZezdZOOy-YqLvyFGKKQA@mail.gmail.com>
 
-> > +static void cmdq_sync_cmd_handler(struct hinic3_cmdq *cmdq,
-> > +				  struct cmdq_wqe *wqe, u16 ci)
-> > +{
-> > +	spin_lock(&cmdq->cmdq_lock);
-> > +	cmdq_update_cmd_status(cmdq, ci, wqe);
-> > +	if (cmdq->cmd_infos[ci].cmpt_code) {
-> > +		*cmdq->cmd_infos[ci].cmpt_code = CMDQ_DIRECT_SYNC_CMPT_CODE;
-> > +		cmdq->cmd_infos[ci].cmpt_code = NULL;
-> > +	}
-> > +
-> > +	/* Ensure that completion code has been updated before updating done */
-> > +	smp_rmb();
->
-> There is something off with the above barrier. It's not clear where is
-> the paired wmb() and the comment looks misleading as this barrier order
-> reads operation and not writes (as implied by 'updating').
+On Thu, Jul 03, 2025 at 01:58:36AM +0200, Erwan Dufour wrote:
+> Hi Liu,
+> 
+> Thanks for your explanation. Unfortunately，the alignment still not works.
+> 
+> With pleasure. Thank you very much for providing an example with an
+> explanation.
+> Hopefully, there were no mistakes and I managed to correct all the errors
+> in the new patch.
 
-Thanks for your reviewing. The comment is right and using read barrier here
-is wrong. I will correct smp_rmb to smp_wmb in next version.
+Yes, the patch looks good to me now.
 
-> > +	spin_lock_bh(&cmdq->cmdq_lock);
-> > +	curr_wqe = cmdq_get_wqe(wq, &curr_prod_idx);
-> > +	if (!curr_wqe) {
-> > +		spin_unlock_bh(&cmdq->cmdq_lock);
-> > +		return -EBUSY;
-> > +	}
-> > +
-> > +	wrapped = cmdq->wrapped;
-> > +	next_prod_idx = curr_prod_idx + CMDQ_WQE_NUM_WQEBBS;
-> > +	if (next_prod_idx >= wq->q_depth) {
-> > +		cmdq->wrapped ^= 1;
-> > +		next_prod_idx -= wq->q_depth;
-> > +	}
-> > +
-> > +	cmd_info = &cmdq->cmd_infos[curr_prod_idx];
-> > +	init_completion(&done);
-> > +	refcount_inc(&buf_in->ref_cnt);
-> > +	cmd_info->cmd_type = HINIC3_CMD_TYPE_DIRECT_RESP;
-> > +	cmd_info->done = &done;
-> > +	cmd_info->errcode = &errcode;
-> > +	cmd_info->direct_resp = out_param;
-> > +	cmd_info->cmpt_code = &cmpt_code;
-> > +	cmd_info->buf_in = buf_in;
-> > +	saved_cmd_info = *cmd_info;
-> > +	cmdq_set_lcmd_wqe(&wqe, CMDQ_CMD_DIRECT_RESP, buf_in, NULL,
-> > +			  wrapped, mod, cmd, curr_prod_idx);
-> > +
-> > +	cmdq_wqe_fill(curr_wqe, &wqe);
-> > +	(cmd_info->cmdq_msg_id)++;
-> > +	curr_msg_id = cmd_info->cmdq_msg_id;
-> > +	cmdq_set_db(cmdq, HINIC3_CMDQ_SYNC, next_prod_idx);
-> > +	spin_unlock_bh(&cmdq->cmdq_lock);
-> > +
-> > +	err = wait_cmdq_sync_cmd_completion(cmdq, cmd_info, &saved_cmd_info,
-> > +					    curr_msg_id, curr_prod_idx,
-> > +					    curr_wqe, CMDQ_CMD_TIMEOUT);
-> > +	if (err) {
-> > +		dev_err(cmdq->hwdev->dev,
-> > +			"Cmdq sync command timeout, mod: %u, cmd: %u, prod idx: 0x%x\n",
-> > +			mod, cmd, curr_prod_idx);
-> > +		err = -ETIMEDOUT;
-> > +	}
-> > +
-> > +	if (cmpt_code == CMDQ_FORCE_STOP_CMPT_CODE) {
-> > +		dev_dbg(cmdq->hwdev->dev,
-> > +			"Force stop cmdq cmd, mod: %u, cmd: %u\n", mod, cmd);
-> > +		err = -EAGAIN;
-> > +	}
-> > +
-> > +	smp_rmb(); /* read error code after completion */
->
-> Isn't the errcode updated under the spinlock protection? Why is this
-> barrier neeed?
-
-"spin_unlock_bh(&cmdq->cmdq_lock)" is executed before the errcode assignment.
-So the errcode is updated out of the spinlock protection and we need this barrier. 
+Hangbin
 
