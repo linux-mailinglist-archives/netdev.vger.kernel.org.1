@@ -1,260 +1,118 @@
-Return-Path: <netdev+bounces-203608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37E3AAF6852
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 04:52:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AABD5AF6862
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 04:57:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AFB65223DB
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 02:52:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8FBB1C42601
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 02:57:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B2B61F5838;
-	Thu,  3 Jul 2025 02:52:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9EC1218584;
+	Thu,  3 Jul 2025 02:56:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZDfahOcW"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="MRttt+mN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F861C6FE9;
-	Thu,  3 Jul 2025 02:52:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C6A23BE;
+	Thu,  3 Jul 2025 02:56:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751511137; cv=none; b=LNCenoRXhjhCahd0xi+ci0IB+CpImT4sXEWoeur8xyiKr3QLqANyJFtNCK9ITITJ0rlKAjNBfQipNItIS4+BKWFmJ+Jwid03L8yCoAY1MdNSdMPmI3ai7rIm526c98FbSfOoZpUwx39jPG2P+MC801zts2GowoJqSNHDIeyLqJI=
+	t=1751511416; cv=none; b=BSgZvp01TvBTxB2iMzCZtXckB7xmBXk3iS+kuyGjD5gx8ooKZpMjOFNlZuNxeKqmAb99/mVUNsQ0jTifqPpxWVdjs8Jr2tnnP8VA7xqtdQ36NHzet0ultZ9c4wS0gqPHXp+8fqrZyKFSXKpJmuohn3eH9HDxBcg1CGW0mhoecC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751511137; c=relaxed/simple;
-	bh=tGikjumrTmudqXSLn2oIbcGO+dakZooSKitvvlYxbFE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=m7KB59EuVhq8dymFHW3EG5AqOSG/gRGJvmWNYEHE+cvXBwQD1olHRGleHVPtp55wfHJvOgv04hsstf5uT12sU0InwfnxjbhcV7bK3yb2kCEl7dgVCRr9NuVgIwRSGekx395OhsBN6jZmhu4HkarlQjsZgHPqoW8y/RK1FXcgHco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZDfahOcW; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-af6a315b491so4859376a12.1;
-        Wed, 02 Jul 2025 19:52:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751511135; x=1752115935; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lo9px2O8dxCxStsMAy6k8t9n1UAlivRa8eyuw8Vbn2g=;
-        b=ZDfahOcWijFbxN6BIH7ar9kviGwme1x6rKqwNa0fuScpGYtObCPPddP8GgfFveXMsJ
-         H6eUn9f9H37Wdc7SueoJSvsNQs3/r5sEWGXYr73/QXVjcrb+FfiW8WY31akeXW0NQKcX
-         JOZmpk48jku/z1RdWk32tLbpvJQVw1jKB8r/ABqcshlIMF3pFG9/bFwCof5lJ/4+TDOe
-         jOMbECz0710cpOxv6vP5gPAixpcD0Gm5jj/OpjX2nZd2Q3HgswDt+QYNwyBi5YNmmDHW
-         X4rT7zlhtEkG6EZWdSBbj6rdWFD2w/NJ6L5VrP6iS+ILuSYatMEKLtG3KqAkxLRWki6y
-         24PQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751511135; x=1752115935;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lo9px2O8dxCxStsMAy6k8t9n1UAlivRa8eyuw8Vbn2g=;
-        b=WeYCsf8u1u7i5TqLrbSgX3aw0QAF/IP50eNNBfa9qXf/CL3zGGq/9PiqVkbxgSc10v
-         x2mOjKFKXTA01CC4wWje5+1JNY4u854VYKNtIawszGxPI1ZAIvmpfm8G38vx7T2snvwZ
-         RhltdwKg3k4E2KQJhdYkrOa1YVpSh0mplUi5HUbbF72TkOjdqLORw4EVA7LBlt24x0gK
-         eOSnIquHnnB9cRNe/R3aBxPHzsqWPgi5mdPkCADohuwvV8WshaZP67sRe6x0DYzudbuY
-         icsM8Q+XYbpcpl4NHik2xLor84Ix5p1rrmPGgZojrovYOAcUD7Nc971/hiUl+o17vK1K
-         Ycvw==
-X-Forwarded-Encrypted: i=1; AJvYcCU7Jdcz/1blcCg2MpYDY9tbstI3VB6eLYot4nNQApvhubWlBcTIB1F1doWAiFd+wvkGZ4rDHgXqCHOe9ww4@vger.kernel.org, AJvYcCUc1iB2UqKHjLyYJXJGOj3FUd47vv4YGf7az8Jt98Sht/aoganB488xrbxMhal/TLckZTOCebkV@vger.kernel.org, AJvYcCXGAbiWj/vuYGmw/oN7lQr+yzESS3SdZD54NQVCXg3U674vAnDMiKJ0OBC2ZK41NXXIIgU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTqTvvMoAmaQMJ2E8v6satLoqiyGGyjQRA3WJP/D9l9Uw6jkTH
-	3ntVJVFn77cGwc8tvNjhtLGM5okhCQlvXsRNRdJcRHKKnGP+anwBF1PK
-X-Gm-Gg: ASbGnct5oE4/IHWqeYPs9G8YkdKZ5h50vHxrvihoREC0xlMZiNWZxbRFLm16CNNSkM+
-	X4fSeToOyOrOsWjP63rlF+n/0RwTMRKltJ41Upe1sNrsLp8sc2pmkWkvbKsD+81hg5ZBL4Dl55M
-	ujtIEWxArd0ZkkODbXBKMEvlDrBFeR4LK0jh5ux/qEy1pXbKC0KzcqiewsTZ7UGu5G4R5ng9KRS
-	ZK3+1cKYXYhR217Y+boAfig/eOJ6LEl1t3CM+etcFOpU/CG65AT7Wklv6XooLenacvdaYwZqbss
-	orRbgQT2+yiNnFfoI0zTHkz6o8Tem54p5yAFcw96Nv5h/HpsehfyqxkvTaxWzTE5nX/ae4+P2Lf
-	YgoXSRzMt
-X-Google-Smtp-Source: AGHT+IGzteSmePiYOjnty3CvF79a8fsJyFKLo1CJyDiGjPDyKnKRc/syqMP+iX0JDQKDqfuzEdxWrA==
-X-Received: by 2002:a17:90b:28cb:b0:313:f83a:e473 with SMTP id 98e67ed59e1d1-31a9d5ebad2mr2484943a91.15.1751511134907;
-        Wed, 02 Jul 2025 19:52:14 -0700 (PDT)
-Received: from devant.antgroup-inc.local ([47.89.83.0])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31a9cc8ffb5sm949110a91.46.2025.07.02.19.52.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 19:52:14 -0700 (PDT)
-From: Xuewei Niu <niuxuewei97@gmail.com>
-X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
-To: sgarzare@redhat.com
-Cc: davem@davemloft.net,
-	decui@microsoft.com,
-	fupan.lfp@antgroup.com,
-	jasowang@redhat.com,
-	kvm@vger.kernel.org,
-	leonardi@redhat.com,
-	linux-kernel@vger.kernel.org,
-	mst@redhat.com,
-	netdev@vger.kernel.org,
-	niuxuewei.nxw@antgroup.com,
-	niuxuewei97@gmail.com,
-	pabeni@redhat.com,
-	stefanha@redhat.com,
-	virtualization@lists.linux.dev,
-	xuanzhuo@linux.alibaba.com
-Subject: Re: [RESEND PATCH net-next v4 4/4] test/vsock: Add ioctl SIOCINQ tests
-Date: Thu,  3 Jul 2025 10:51:56 +0800
-Message-Id: <20250703025156.844532-1-niuxuewei.nxw@antgroup.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <qe45fgoj32f4lyfpqvor2iyse6rdzhhkji7g5snnyqw4wuxa7s@mu4eghcet6sn>
-References: <qe45fgoj32f4lyfpqvor2iyse6rdzhhkji7g5snnyqw4wuxa7s@mu4eghcet6sn>
+	s=arc-20240116; t=1751511416; c=relaxed/simple;
+	bh=fvTb1Naz4/aQKS4k1Ie7/8XwGaOR0S230HZwGnJ8TeA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=uAL3XY/QzqR9X70ttPundDKt+3Tt0knjQS0bufVcc7G4MjSfQujA+QJnVlwVLJNvbWb9su1eA7h7hEksmAId9wY20RcyskLSfHTnlESWFH1CZ8jTLCrlKUsn+xCi+CSINdMuPmX6MQA+2pzaZGeIweUbjnvAWBixGHN+Uv4dSOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=MRttt+mN; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1751511391;
+	bh=Ilt3fsEFxzUtz6gFNrQnqtGKY+gocpI7l2q5RJz1u/k=;
+	h=Date:From:To:Cc:Subject:From;
+	b=MRttt+mNMSVSA1G0W211fef5mPdmAEm3kN2aw8B2dOheZSYTOv8zRzXv32Jo+PDXC
+	 mIaAZfhGJJzpP5Ye6hIGEdQg91pbiIhhch0xY8C7WAFmRji04IVvKEIJhJq6Cpnq9h
+	 qsDTzBOi/jWLfBGIaDTiQISSM6WvN/EPFLw5p7kN3fB456q+imqRKeMiOMxQIOpVES
+	 Pjfz8nxTRHEyzGQbaOXV2Ua5ljxZtMki3vlJG7AmjWqr+7Gb5EG9VyS32WJcUQzasm
+	 N1Gn5FBEeM3E0LztEIYUJTsVEiHWC72cK0zkZ/PfNNGU46n9+SR/yK5ax7f7mg+J3Z
+	 McA8lCrGTZkKQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bXhHK4F5Yz4wbb;
+	Thu,  3 Jul 2025 12:56:29 +1000 (AEST)
+Date: Thu, 3 Jul 2025 12:56:49 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Miriam Rachel Korenblit <miriam.rachel.korenblit@intel.com>, Johannes
+ Berg <johannes@sipsolutions.net>, David Miller <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Jiasheng Jiang <jiasheng@iscas.ac.cn>, Networking
+ <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the iwlwifi-next tree with the net-next
+ tree
+Message-ID: <20250703125649.07adf3b2@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/K+BUbNwg2+DN7tLYQ2baJFL";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Resend: forgot to reply all...
+--Sig_/K+BUbNwg2+DN7tLYQ2baJFL
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> On Mon, Jun 30, 2025 at 03:57:27PM +0800, Xuewei Niu wrote:
-> >Add SIOCINQ ioctl tests for both SOCK_STREAM and SOCK_SEQPACKET.
-> >
-> >The client waits for the server to send data, and checks if the SIOCINQ
-> >ioctl value matches the data size. After consuming the data, the client
-> >checks if the SIOCINQ value is 0.
-> >
-> >Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
-> >---
-> > tools/testing/vsock/vsock_test.c | 80 ++++++++++++++++++++++++++++++++
-> > 1 file changed, 80 insertions(+)
-> >
-> >diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-> >index f669baaa0dca..1f525a7e0098 100644
-> >--- a/tools/testing/vsock/vsock_test.c
-> >+++ b/tools/testing/vsock/vsock_test.c
-> >@@ -1305,6 +1305,56 @@ static void test_unsent_bytes_client(const struct test_opts *opts, int type)
-> > 	close(fd);
-> > }
-> >
-> >+static void test_unread_bytes_server(const struct test_opts *opts, int type)
-> >+{
-> >+	unsigned char buf[MSG_BUF_IOCTL_LEN];
-> >+	int client_fd;
-> >+
-> >+	client_fd = vsock_accept(VMADDR_CID_ANY, opts->peer_port, NULL, type);
-> >+	if (client_fd < 0) {
-> >+		perror("accept");
-> >+		exit(EXIT_FAILURE);
-> >+	}
-> >+
-> >+	for (int i = 0; i < sizeof(buf); i++)
-> >+		buf[i] = rand() & 0xFF;
-> >+
-> >+	send_buf(client_fd, buf, sizeof(buf), 0, sizeof(buf));
-> >+	control_writeln("SENT");
-> >+
-> >+	close(client_fd);
-> >+}
-> >+
-> >+static void test_unread_bytes_client(const struct test_opts *opts, int type)
-> >+{
-> >+	unsigned char buf[MSG_BUF_IOCTL_LEN];
-> >+	int fd;
-> >+	int sock_bytes_unread;
-> >+
-> >+	fd = vsock_connect(opts->peer_cid, opts->peer_port, type);
-> >+	if (fd < 0) {
-> >+		perror("connect");
-> >+		exit(EXIT_FAILURE);
-> >+	}
-> >+
-> >+	control_expectln("SENT");
-> >+	/* The data has arrived but has not been read. The expected is
-> >+	 * MSG_BUF_IOCTL_LEN.
-> >+	 */
-> >+	if (!vsock_ioctl_int(fd, TIOCINQ, &sock_bytes_unread,
-> 
-> I know that TIOCINQ is the same of SIOCINQ, but IMO is confusing, why 
-> not using SIOCINQ ?
+Hi all,
 
-I tried to use `SIOCINQ` but got:
+Today's linux-next merge of the iwlwifi-next tree got a conflict in:
 
-```
-vsock_test.c: In function 'test_unread_bytes_client':
-vsock_test.c:1344:34: error: 'SIOCINQ' undeclared (first use in this function); did you mean 'TIOCINQ'?
- 1344 |         if (!vsock_ioctl_int(fd, SIOCINQ, &sock_bytes_unread,
-      |                                  ^~~~~~~
-      |                                  TIOCINQ
-vsock_test.c:1344:34: note: each undeclared identifier is reported only once for each function it appears in
-```
+  drivers/net/wireless/intel/iwlwifi/dvm/main.c
 
-I just followed the compiler suggestion, and replaced it with `TIOCINQ`.
-Following your comments, I found that `SIOCINQ` is defined in `linux/sockios.h`, as documented in [1].
-The documentation suggests that we can use `FIONREAD` alternatively.
-In order to avoid confusion, I'd like to choose `SIOCINQ`.
+between commit:
 
-1: https://man7.org/linux/man-pages/man7/unix.7.html
+  90a0d9f33996 ("iwlwifi: Add missing check for alloc_ordered_workqueue")
 
-Thanks,
-Xuewei
- 
-> The rest LGTM.
-> 
-> Thanks,
-> Stefano
-> 
-> >+			     MSG_BUF_IOCTL_LEN)) {
-> >+		fprintf(stderr, "Test skipped, TIOCINQ not supported.\n");
-> >+		goto out;
-> >+	}
-> >+
-> >+	recv_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
-> >+	/* All data has been consumed, so the expected is 0. */
-> >+	vsock_ioctl_int(fd, TIOCINQ, &sock_bytes_unread, 0);
-> >+
-> >+out:
-> >+	close(fd);
-> >+}
-> >+
-> > static void test_stream_unsent_bytes_client(const struct test_opts *opts)
-> > {
-> > 	test_unsent_bytes_client(opts, SOCK_STREAM);
-> >@@ -1325,6 +1375,26 @@ static void test_seqpacket_unsent_bytes_server(const struct test_opts *opts)
-> > 	test_unsent_bytes_server(opts, SOCK_SEQPACKET);
-> > }
-> >
-> >+static void test_stream_unread_bytes_client(const struct test_opts *opts)
-> >+{
-> >+	test_unread_bytes_client(opts, SOCK_STREAM);
-> >+}
-> >+
-> >+static void test_stream_unread_bytes_server(const struct test_opts *opts)
-> >+{
-> >+	test_unread_bytes_server(opts, SOCK_STREAM);
-> >+}
-> >+
-> >+static void test_seqpacket_unread_bytes_client(const struct test_opts *opts)
-> >+{
-> >+	test_unread_bytes_client(opts, SOCK_SEQPACKET);
-> >+}
-> >+
-> >+static void test_seqpacket_unread_bytes_server(const struct test_opts *opts)
-> >+{
-> >+	test_unread_bytes_server(opts, SOCK_SEQPACKET);
-> >+}
-> >+
-> > #define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
-> > /* This define is the same as in 'include/linux/virtio_vsock.h':
-> >  * it is used to decide when to send credit update message during
-> >@@ -2051,6 +2121,16 @@ static struct test_case test_cases[] = {
-> > 		.run_client = test_stream_nolinger_client,
-> > 		.run_server = test_stream_nolinger_server,
-> > 	},
-> >+	{
-> >+		.name = "SOCK_STREAM ioctl(SIOCINQ) functionality",
-> >+		.run_client = test_stream_unread_bytes_client,
-> >+		.run_server = test_stream_unread_bytes_server,
-> >+	},
-> >+	{
-> >+		.name = "SOCK_SEQPACKET ioctl(SIOCINQ) functionality",
-> >+		.run_client = test_seqpacket_unread_bytes_client,
-> >+		.run_server = test_seqpacket_unread_bytes_server,
-> >+	},
-> > 	{},
-> > };
-> >
-> >-- 
-> >2.34.1
-> >
+from the net-next tree and commit:
+
+  511b136d072c ("iwlwifi: Add missing check for alloc_ordered_workqueue")
+
+from the iwlwifi-next tree.
+
+I fixed it up (I just used the latter version) and can carry the fix as
+necessary. This is now fixed as far as linux-next is concerned, but any
+non trivial conflicts should be mentioned to your upstream maintainer
+when your tree is submitted for merging.  You may also want to consider
+cooperating with the maintainer of the conflicting tree to minimise any
+particularly complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/K+BUbNwg2+DN7tLYQ2baJFL
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmhl8XEACgkQAVBC80lX
+0GzpWwf/Xd1+jEm0jqV4dMp8rKHGR2NAhDCAgj27335Qr0DC/7ovZNHHF06cotCS
+gifGojmTqj84LFmx4rgWCsafjjOVr+kUvjBbusTmZkoHApJP4g3Ldy8mxLXYYsA7
+WxAR8LC/9ZE+YDBAz/Nb0WkJOrkg/0nJm/GlHU4cdJpLeMdGz0sA8RIm0ZUStrKX
+D/KHXLFwIzWWmvLVFxNOm/bwvXH1PHJs3S9du9mWey79MEJnxa4dLvkHugU46ofd
+TjHYbXs5AYflFF/GincXmEuHtyYb62U7lwWVB/EKRYtnomWhwU76F7h+HghX3Izy
+AjzgrrO+S+lwJQH+sRq3KCcWExoNCA==
+=WGpZ
+-----END PGP SIGNATURE-----
+
+--Sig_/K+BUbNwg2+DN7tLYQ2baJFL--
 
