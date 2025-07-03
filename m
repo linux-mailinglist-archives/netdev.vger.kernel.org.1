@@ -1,219 +1,134 @@
-Return-Path: <netdev+bounces-203806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A00AFAF7425
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 14:30:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4768CAF7435
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 14:32:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78F5D1C22A5F
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 12:30:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38EF31C20DDD
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 12:32:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E1E2E7BB7;
-	Thu,  3 Jul 2025 12:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jPw1Tqy6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD852E62DF;
+	Thu,  3 Jul 2025 12:32:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA97239086;
-	Thu,  3 Jul 2025 12:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0AE721D3F8;
+	Thu,  3 Jul 2025 12:32:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751545808; cv=none; b=c13gg5vQqu9Pp3M4xbIaq4HAsm5LzpbD6HX1jmjqcWT6nhIXVu0Sm0gIB7RhofvxVwM8fTXonq2Evk7D1wAWAFIDZ+9sALyLkG9WE0dOSvOSkpbS0sn2xedHxGJMCNqy2IIhsSMSZ571L/MgoMRD8R4xZ7PzzCgjtb0E+1NUbqw=
+	t=1751545929; cv=none; b=SuSjA64oJxqRq+VaZsN40UtS8M0CpjbJJ7CMWW1e3yJ6zdmJjmqbVJPxuBBFgGW9lZ2aTH3T4UIvdZSuE6vNOBzYOtCLbBF6DnQ7nia1XTEI7qLZ8ZE0Y60Zj/hi4PSmh/+V05jI8xa89Zug80rimjFFp2YHSwFnXnez/qlIBNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751545808; c=relaxed/simple;
-	bh=sncJuZPOjb+xUXw7bfjPXRm0fnaDZzKts8QIyan7TEQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B5YcBboE5i3um3hhHUg3h+Z3+l3ph4gH5UyLAayS8/I6ruzXudQNjkJ7NASoxQY1ZWPVyak6myT1C32UgK+FKe69Mwaqn6P2z57bfhcGYECUNqXnA9o5aKu8WltdNzFU6eQ56gyLeDGYG5hEmsMRTBCeAu1M7fcyyVu4PbH6G68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jPw1Tqy6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9257C4CEF0;
-	Thu,  3 Jul 2025 12:30:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751545808;
-	bh=sncJuZPOjb+xUXw7bfjPXRm0fnaDZzKts8QIyan7TEQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jPw1Tqy6pYpht+FSkHMWBDFfLWIYycidBhU2FbQXnwetC/SUYX+ig8oDaK3oEukdW
-	 WBlReZUuM8N+HCumo+KG0sYUnJq7zkrdY7PVF0vKApASRjMrH2mXxS2SgNhuTALRUd
-	 031uR9mYeAPrwODlxGI2QLHGiMghxfzCSyUykVYfUtXZytWFtUZDcJdwqZyav7u2Sa
-	 HKhCrVxco7Q+S8dr/3CGw6RaVdKDQjkev42zfa+zmnwRDLyUzJqJW0K86BwuR8iwUS
-	 oVse+FLaJpLcS5SSMmBQsseRLBOxLFW+l11LG3XAUTocNBIfbKsY8K/MwiTZ9w1IBV
-	 +6yHtZ+Hj9sng==
-Date: Thu, 3 Jul 2025 14:30:06 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/2] net: netfilter: Add IPIP flowtable SW
- acceleration
-Message-ID: <aGZ3zkDAvT3JV3QR@lore-desk>
-References: <20250627-nf-flowtable-ipip-v2-0-c713003ce75b@kernel.org>
- <20250627-nf-flowtable-ipip-v2-1-c713003ce75b@kernel.org>
- <aF6ygRse7xSy949F@calendula>
- <aF-6M-4SjQgRQw1j@lore-desk>
- <807503bf-4213-4423-b38b-ffdc11aaaeee@redhat.com>
+	s=arc-20240116; t=1751545929; c=relaxed/simple;
+	bh=oAFqXq1QyFv35ms999RYltPlUo10N7M57paHMCPoPSc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mFHA4o6msEi59LLkayTEaeQf4h8IoLJLZuwAsOkgA4eibZjUhfNdMliViRPaDuFzkLxPq7AvHUSEoLRFD5Az/h6HW/mTmBDOiSF/A80eg9LGXWrxZZL1XAJc0z0NzzaK4zQ0tS52JbhX4s2vdEyqlVxGd2byglLWMm12k2PCDCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [192.168.0.105] (unknown [114.241.87.235])
+	by APP-05 (Coremail) with SMTP id zQCowAC3Dl8YeGZoHT+zAA--.45946S2;
+	Thu, 03 Jul 2025 20:31:20 +0800 (CST)
+Message-ID: <17733827-8038-4c85-9bb1-0148a50ca10f@iscas.ac.cn>
+Date: Thu, 3 Jul 2025 20:31:20 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="RDeHOGiG1l5V487k"
-Content-Disposition: inline
-In-Reply-To: <807503bf-4213-4423-b38b-ffdc11aaaeee@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 1/2] dt-bindings: net: Add support for
+ SpacemiT K1
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Junhui Liu <junhui.liu@pigmoral.tech>,
+ Conor Dooley <conor.dooley@microchip.com>, netdev@vger.kernel.org,
+ Philipp Zabel <p.zabel@pengutronix.de>, Jakub Kicinski <kuba@kernel.org>,
+ linux-riscv@lists.infradead.org, Simon Horman <horms@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
+ Vivian Wang <uwu@dram.page>, Yixun Lan <dlan@gentoo.org>,
+ spacemit@lists.linux.dev, Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Paolo Abeni <pabeni@redhat.com>, Conor Dooley <conor+dt@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>
+References: <20250703-net-k1-emac-v4-0-686d09c4cfa8@iscas.ac.cn>
+ <20250703-net-k1-emac-v4-1-686d09c4cfa8@iscas.ac.cn>
+ <175153978342.612698.13197728053938266111.robh@kernel.org>
+Content-Language: en-US
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+In-Reply-To: <175153978342.612698.13197728053938266111.robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:zQCowAC3Dl8YeGZoHT+zAA--.45946S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cry3WF48Kr4UWryfuF13CFg_yoW8uF43pa
+	ySkwnIkrWjvFy7Jw43tr92v3WFgr4ftFyaqFy2gr17t3Z8XF4ftrWS9r48uF18CrWrJa4f
+	Zw17u3WxGry5AFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvvb7Iv0xC_KF4lb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4
+	A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IE
+	w4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMc
+	vjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY
+	1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8Jw
+	C20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAF
+	wI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjx
+	v20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2
+	jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73Uj
+	IFyTuYvjxU3wIDUUUUU
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
 
---RDeHOGiG1l5V487k
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 7/3/25 18:49, Rob Herring (Arm) wrote:
+> On Thu, 03 Jul 2025 17:42:02 +0800, Vivian Wang wrote:
+>> The Ethernet MACs on SpacemiT K1 appears to be a custom design. SpacemiT
+>> refers to them as "EMAC", so let's just call them "spacemit,k1-emac".
+>>
+>> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+>> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+>> ---
+>>   .../devicetree/bindings/net/spacemit,k1-emac.yaml  | 81 ++++++++++++++++++++++
+>>   1 file changed, 81 insertions(+)
+>>
+> My bot found errors running 'make dt_binding_check' on your patch:
+>
+> yamllint warnings/errors:
+>
+> dtschema/dtc warnings/errors:
+> Error: Documentation/devicetree/bindings/net/spacemit,k1-emac.example.dts:36.36-37 syntax error
+> FATAL ERROR: Unable to parse input tree
 
-> On 6/28/25 11:47 AM, Lorenzo Bianconi wrote:
-> >> On Fri, Jun 27, 2025 at 02:45:28PM +0200, Lorenzo Bianconi wrote:
-> >>> Introduce SW acceleration for IPIP tunnels in the netfilter flowtable
-> >>> infrastructure.
-> >>> IPIP SW acceleration can be tested running the following scenario whe=
-re
-> >>> the traffic is forwarded between two NICs (eth0 and eth1) and an IPIP
-> >>> tunnel is used to access a remote site (using eth1 as the underlay de=
-vice):
-> >>>
-> >>> ETH0 -- TUN0 <=3D=3D> ETH1 -- [IP network] -- TUN1 (192.168.100.2)
-> >>>
-> >>> $ip addr show
-> >>> 6: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue sta=
-te UP group default qlen 1000
-> >>>     link/ether 00:00:22:33:11:55 brd ff:ff:ff:ff:ff:ff
-> >>>     inet 192.168.0.2/24 scope global eth0
-> >>>        valid_lft forever preferred_lft forever
-> >>> 7: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue sta=
-te UP group default qlen 1000
-> >>>     link/ether 00:11:22:33:11:55 brd ff:ff:ff:ff:ff:ff
-> >>>     inet 192.168.1.1/24 scope global eth1
-> >>>        valid_lft forever preferred_lft forever
-> >>> 8: tun0@NONE: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1480 qdisc noqueue =
-state UNKNOWN group default qlen 1000
-> >>>     link/ipip 192.168.1.1 peer 192.168.1.2
-> >>>     inet 192.168.100.1/24 scope global tun0
-> >>>        valid_lft forever preferred_lft forever
-> >>>
-> >>> $ip route show
-> >>> default via 192.168.100.2 dev tun0
-> >>> 192.168.0.0/24 dev eth0 proto kernel scope link src 192.168.0.2
-> >>> 192.168.1.0/24 dev eth1 proto kernel scope link src 192.168.1.1
-> >>> 192.168.100.0/24 dev tun0 proto kernel scope link src 192.168.100.1
-> >>>
-> >>> $nft list ruleset
-> >>> table inet filter {
-> >>>         flowtable ft {
-> >>>                 hook ingress priority filter
-> >>>                 devices =3D { eth0, eth1 }
-> >>>         }
-> >>>
-> >>>         chain forward {
-> >>>                 type filter hook forward priority filter; policy acce=
-pt;
-> >>>                 meta l4proto { tcp, udp } flow add @ft
-> >>>         }
-> >>> }
-> >>
-> >> Is there a proof that this accelerates forwarding?
-> >=20
-> > I reproduced the scenario described above using veths (something simila=
-r to
-> > what is done in nft_flowtable.sh) and I got the following results:
-> >=20
-> > - flowtable configured as above between the two router interfaces
-> > - TCP stream between client and server going via the IPIP tunnel
-> > - TCP stream transmitted into the IPIP tunnel:
-> >   - net-next:				~41Gbps
-> >   - net-next + IPIP flowtbale support:	~40Gbps
-> > - TCP stream received from the IPIP tunnel:
-> >   - net-next:				~35Gbps
-> >   - net-next + IPIP flowtbale support:	~49Gbps
-> >=20
-> >>
-> >>> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> >>> ---
-> >>>  net/ipv4/ipip.c                  | 21 +++++++++++++++++++++
-> >>>  net/netfilter/nf_flow_table_ip.c | 28 ++++++++++++++++++++++++++--
-> >>>  2 files changed, 47 insertions(+), 2 deletions(-)
-> >>>
-> >=20
-> > [...]
-> >=20
-> >>>  static bool nf_flow_skb_encap_protocol(struct sk_buff *skb, __be16 p=
-roto,
-> >>>  				       u32 *offset)
-> >>>  {
-> >>>  	struct vlan_ethhdr *veth;
-> >>>  	__be16 inner_proto;
-> >>> +	u16 size;
-> >>> =20
-> >>>  	switch (skb->protocol) {
-> >>> +	case htons(ETH_P_IP):
-> >>> +		if (nf_flow_ip4_encap_proto(skb, &size))
-> >>> +			*offset +=3D size;
-> >>
-> >> This is blindly skipping the outer IP header.
-> >=20
-> > Do you mean we are supposed to validate the outer IP header performing =
-the
-> > sanity checks done in nf_flow_tuple_ip()?
->=20
-> Yes.
+My bad. The example still depends on the reset bindings for the constant 
+RESET_EMAC0. I just tried with reset v12 [1] and that fixes it.
 
-ack
+[1]: https://lore.kernel.org/spacemit/20250702113709.291748-2-elder@riscstar.com/
 
->=20
-> Note that we could always obtain a possibly considerably tput
-> improvement stripping required validation ;)
+Vivian "dramforever" Wang
 
-I have been proactive and I added the sanity checks done in nf_flow_tuple_i=
-p()
-and I got ~ the same results.
+> make[2]: *** [scripts/Makefile.dtbs:131: Documentation/devicetree/bindings/net/spacemit,k1-emac.example.dtb] Error 1
+> make[2]: *** Waiting for unfinished jobs....
+> make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1519: dt_binding_check] Error 2
+> make: *** [Makefile:248: __sub-make] Error 2
+>
+> doc reference errors (make refcheckdocs):
+>
+> See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250703-net-k1-emac-v4-1-686d09c4cfa8@iscas.ac.cn
+>
+> The base for the series is generally the latest rc1. A different dependency
+> should be noted in *this* patch.
+>
+> If you already ran 'make dt_binding_check' and didn't see the above
+> error(s), then make sure 'yamllint' is installed and dt-schema is up to
+> date:
+>
+> pip3 install dtschema --upgrade
+>
+> Please check and re-submit after running the above command yourself. Note
+> that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+> your schema. However, it must be unset to test all examples with your schema.
 
->=20
-> I guess this should go via the netfilter tree, please adjust the patch
-> prefix accordingly.
-
-ack
-
->=20
-> Also why IP over IP specifically? I guess other kind of encapsulations
-> may benefit from similar path and are more ubiquitous.
-
-this is just the first step, I want to add IPv6 counterpart too.
-
-Regards,
-Lorenzo
-
->=20
->=20
-> /P
->=20
-
---RDeHOGiG1l5V487k
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaGZ3zQAKCRA6cBh0uS2t
-rMV8AQD4VNErJEc0BSKlUXUwaXX4vTun3p2otUcxRbwhmexCmQEA7JILzmhD/dC/
-DQ02baajIoSe6cQLMYZ2zEOQWffIEw0=
-=gsb1
------END PGP SIGNATURE-----
-
---RDeHOGiG1l5V487k--
 
