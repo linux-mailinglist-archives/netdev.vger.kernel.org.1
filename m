@@ -1,108 +1,211 @@
-Return-Path: <netdev+bounces-203611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92F15AF686D
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 05:01:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE012AF6879
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 05:06:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B0703B42F0
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 03:00:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23E041BC85D3
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 03:07:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F0E18DB02;
-	Thu,  3 Jul 2025 03:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A7B227EA4;
+	Thu,  3 Jul 2025 03:06:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="KEj8cY9H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="futhr3sV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F1517D7;
-	Thu,  3 Jul 2025 03:01:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8472D1F9F70;
+	Thu,  3 Jul 2025 03:06:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751511669; cv=none; b=I6iPRoTAqnGQQr1YjgNV+9Op8KFLCz8kzCiKWvq1O+J6qj1CTtClKlWSqCTAjeUuoAOG+9geqPMacZFie6iv+mwi1dhZ2Y8KVg+M+GRW+sp2xHNuKlwdTb9hntFsC18DMLbvkO9N0CzU2Gi7jZdXyS13frZ6fntE+UnItFomIqU=
+	t=1751512005; cv=none; b=BZdLhM6S5MKz2miPC+51+Q9GgiuGFunFz/rSrt4K4Tf+cqghFWvpAWk/lY0nHTwe6YrUUuH0zV4yTZzPNkxWanaSOG4UJpZnXH7xt2p96Fmw8c2z16SxvassjqOxExCxMqgTtJ53zjZcjjcZjfSTdhM0LuRqg5yOy5fZ7hEP3QQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751511669; c=relaxed/simple;
-	bh=vUY7f0Djx0zEZn+AW+YZahB84Jscggn6xd3e4dSocY4=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=rGUMneWcyaiCzGFQsz6OsvluqpmPy8mWVy/QaUbK3wt44Vv4QAZrTHviMOCJqQ+vlDQDjS0qeDfyIn1Xor06X9WuG/7wDUsSJIJJ9vRxn2Xl1xjZsTquDslSdOP1Yzp9Y1RHSpZ49GG2Bah0rlE6uhZIYEsovBpV9ewDZKkXFes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=KEj8cY9H; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1751511644;
-	bh=s+yk+uAqFV3gUgjqjAi/UjTCw86A3rGnDWfIHLwuDr4=;
-	h=Date:From:To:Cc:Subject:From;
-	b=KEj8cY9HQ9gu91hmJMqS7aCogt6uGlKtT9DNlBNAmu2dFoEF1NR8nR+He49Epv6Gp
-	 T/nV4XzyvyokxPuVQwnYe0slCMZkYvUam8Hld1BXJcgZLJiCn+MHirPUd/k01y/oGA
-	 /hn77fT41nwU+3lqb7ksMaSKkT2pnsgZhAVkwAI1BqsU69BDcDf4qxovfJHy9qZQ5B
-	 pc0M7W8HHPngVUa76eIVNbT0aN9btrCLjX5RuS5lfJR11sAai8ZIlVD92bnvUjaZGq
-	 Ny4H9uOeZEiN2Yv0C1tLTmAjAo/T8gMWqFvH9KuKvdq1qMqlSDcWS6TYlBxnEHud1w
-	 l8UYy6Sq04Xxg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bXhND0LV7z4xQP;
-	Thu,  3 Jul 2025 13:00:44 +1000 (AEST)
-Date: Thu, 3 Jul 2025 13:01:04 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Miriam Rachel Korenblit <miriam.rachel.korenblit@intel.com>, Johannes
- Berg <johannes@sipsolutions.net>, David Miller <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: duplicate patch in the iwlwifi-next tree
-Message-ID: <20250703130104.4b187e13@canb.auug.org.au>
+	s=arc-20240116; t=1751512005; c=relaxed/simple;
+	bh=g0goUqpz0H5nqzeA/3fuXMeQmy/4V6hWpW6/CbP1VvE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=l5TFl84bpBDACE9sqF1cQ1Wl2i28AEFzKb+Gunskc/SxFXtvSGyIPJQapND/CSyzVifl0Fl1kg8H+2VNYzafeAAXybcHOuXuv2dBMCtpwVH08o5dJmXJUkuPGDyJw3CBDCypn7+2zf3UkssiPCoDPR7lK/zllqCrwHli4DEjjEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=futhr3sV; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-74801bc6dc5so435571b3a.1;
+        Wed, 02 Jul 2025 20:06:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751512003; x=1752116803; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NUDKiPyVRQeazWkY4m2jYwgTMEJufvXw/+pCwXThNj0=;
+        b=futhr3sVqvVbv5PeFK1/8Ra+MBVeYj2V8zlzgc04nQ8endPFnj7RW4svet9lZJAbKT
+         cEV31cLqDBFLmLsQm8Jf2skGo0hnsMqRKGabEQ0+URkjaSgtorhH/wAkLPhJtkaLxbHu
+         xRawBoNzzdEBBjOvcBAFqdIhYdzewB/jVEe+/9/bhTVpMcSfm0UCFAzY//iLgxD8b4qJ
+         kLEmggdEfn7meLgubbgeUxiA/2KSQf+ja531OjxqS93vfSikUQVAoeSS/fKcwyeU0rbd
+         XJ6Q05pJiPJGMYXwoUxonU9Y3JT/E/6ofoy1Dvff6NyQYk+NCkO4IWcq/M74ortV5BOJ
+         kbYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751512003; x=1752116803;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NUDKiPyVRQeazWkY4m2jYwgTMEJufvXw/+pCwXThNj0=;
+        b=s//J6L/Vqfb67EakcIr8mJTjchfNGz8YC0O6EZqIFanGX/JFQEYyyyTbwne7xqEjmR
+         FkpREPXIZcVOxyS0D1SDlhFx3YJXe0AxQ1G28EDDjblLynQg9s9pPi0n/7L/50ROkYno
+         yCTMwHS8rHEi03qUWb9Gb52SZerZyPvhCGb/P/DsxOM1jVwcq7Wolw9lXdLc9NbOswVZ
+         vWokrceVcdBHfCOjy6VghkZUsbfGN4COqjMT4p+FBTMgn2qFwfjLRWMQEXdzAB8+A1/J
+         Any/GvpWIG3/ghpx1XCI46Lykhi4yIfUgAgCp2uAScRT5FKINYhEMQ3cZ53vAKbdtjrk
+         McWg==
+X-Forwarded-Encrypted: i=1; AJvYcCVeWs739Os2K1UWjy0HwGDr+LHiy6FI/NfWysizNPhri8m3QRzlyZ+nhHSmq1Uz3Sdxxo0=@vger.kernel.org, AJvYcCWRiudUrqgxVZ+gickPFuFMQVD2ieUJox5uPsfQdS2z4mIdhAgQ4KXWwQwYnf8XFDq684SUUNn5d1VcxROS@vger.kernel.org, AJvYcCWoTqS8OahUvQLE/zhC2jTqr1P5A1DpF/lwfTbuKzZiJaOt3hGR+tV9mPlMKQkl58470PpgqVrf@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzt32Kx+S4dc+vKhofa7FdVj+vQ15w0Adx+yqCIwt3NRbuDs1O+
+	iZTSzficQ/svkybPbjP45vACNXlU22RyrR4iQ+G72E+dKndgOIJlvJPg
+X-Gm-Gg: ASbGnctMiu5CgI+KFQjPoCxvbPcJZS04RdoISpqM/XuHiOwPgaVe6XZOxVYTWo1+UTZ
+	nPC8VqIi8J7mrghw8L1S6hWvAI92zBHblXuKicf4GdO7irjbfp8OhV4tPtvZ/2dqK+ERjPbSG15
+	mX7ssyAPilzZui/zK45j1S0IAmZ8cBn55RwBwszT5FEVAuyTl/rKxaN8epkQ7Fv5JHUV420JuO/
+	5IpmT4y2SGurcNGS2+llaJKJGyatMAnbCapxG6Rwo+PIRIVZX1UQaX9/Oilh/ofu7ZqLiOJEGti
+	FfoUO3ry+X451X05mrmfb/PiqOwyueXfQkfKx+NdMpEj8zOmRaS5o8deYj7CJ9l3qWCKU5xblUI
+	qQ64F3rdd
+X-Google-Smtp-Source: AGHT+IFz7kt0Nb7vZz+tzUh5I+gOTwteT4lcjZk9zNPo6PfyuL6H+Px1Zb73lqI3Wo071I67AWpnGQ==
+X-Received: by 2002:a05:6a00:2d94:b0:736:9f2e:1357 with SMTP id d2e1a72fcca58-74cd5b575bdmr707117b3a.12.1751512002612;
+        Wed, 02 Jul 2025 20:06:42 -0700 (PDT)
+Received: from devant.antgroup-inc.local ([47.89.83.0])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74af541d9a5sm16108617b3a.62.2025.07.02.20.06.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jul 2025 20:06:42 -0700 (PDT)
+From: Xuewei Niu <niuxuewei97@gmail.com>
+X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+To: sgarzare@redhat.com
+Cc: davem@davemloft.net,
+	decui@microsoft.com,
+	fupan.lfp@antgroup.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	leonardi@redhat.com,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	netdev@vger.kernel.org,
+	niuxuewei.nxw@antgroup.com,
+	niuxuewei97@gmail.com,
+	pabeni@redhat.com,
+	stefanha@redhat.com,
+	virtualization@lists.linux.dev,
+	xuanzhuo@linux.alibaba.com
+Subject: Re: [RESEND PATCH net-next v4 3/4] test/vsock: Add retry mechanism to ioctl wrapper
+Date: Thu,  3 Jul 2025 11:05:14 +0800
+Message-Id: <20250703030514.845623-1-niuxuewei.nxw@antgroup.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <2cpqw23kr4qiatpzcty6wve4qdyut5su7g7fr4kg52dx33ikdu@ljicf6mktu5z>
+References: <2cpqw23kr4qiatpzcty6wve4qdyut5su7g7fr4kg52dx33ikdu@ljicf6mktu5z>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/CA+r1kYDXcYp56kIqnF5DPs";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
 
---Sig_/CA+r1kYDXcYp56kIqnF5DPs
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Resend: the previous message was rejected due to HTML
+Resend: forgot to reply all...
 
-Hi all,
+> On Mon, Jun 30, 2025 at 03:57:26PM +0800, Xuewei Niu wrote:
+> >Wrap the ioctl in `ioctl_int()`, which takes a pointer to the actual
+> >int value and an expected int value. The function will not return until
+> >either the ioctl returns the expected value or a timeout occurs, thus
+> >avoiding immediate failure.
+> >
+> >Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+> >---
+> > tools/testing/vsock/util.c | 32 +++++++++++++++++++++++---------
+> > tools/testing/vsock/util.h |  1 +
+> > 2 files changed, 24 insertions(+), 9 deletions(-)
+> >
+> >diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+> >index 0c7e9cbcbc85..481c395227e4 100644
+> >--- a/tools/testing/vsock/util.c
+> >+++ b/tools/testing/vsock/util.c
+> >@@ -16,6 +16,7 @@
+> > #include <unistd.h>
+> > #include <assert.h>
+> > #include <sys/epoll.h>
+> >+#include <sys/ioctl.h>
+> > #include <sys/mman.h>
+> > #include <linux/sockios.h>
+> >
+> >@@ -97,28 +98,41 @@ void vsock_wait_remote_close(int fd)
+> > 	close(epollfd);
+> > }
+> >
+> >-/* Wait until transport reports no data left to be sent.
+> >- * Return false if transport does not implement the unsent_bytes() 
+> >callback.
+> >+/* Wait until ioctl gives an expected int value.
+> >+ * Return false if the op is not supported.
+> >  */
+> >-bool vsock_wait_sent(int fd)
+> >+bool vsock_ioctl_int(int fd, unsigned long op, int *actual, int expected)
+> 
+> Why we need the `actual` parameter?
 
-The following commit is also in the net-next tree as a different commit
-(but the same patch):
+We can exit early `if (*actual == expected)`, and the `expected` can be any integer.
+I also make it to be a pointer, because the caller might need to have the actual value.
 
-  fc80ea519981 ("wifi: iwlwifi: dvm: fix potential overflow in rs_fill_link=
-_cmd()")
-
-This is commit
-
-  e3ad987e9dc7 ("wifi: iwlwifi: dvm: fix potential overflow in rs_fill_link=
-_cmd()")
-
-in the net-next tree.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/CA+r1kYDXcYp56kIqnF5DPs
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmhl8nAACgkQAVBC80lX
-0Gy3+wf+NlLpJCrUkb5ydwDtthwHZZcdFrYJml4Kv8FG2GWXeVDNf+bYHB7HepaW
-Sl3PCy+3D7SMN1IB5R8T56klfOibVXQt3wGbh8gCje43a87spbr9hfbKUnbVzgBo
-NjGkPAz3BMLd0DF4qzz4qr+M9SMzpffUlA7PiYTawga7ZoLPevdDPHZmhwdlzi+1
-KSU3fKouAGgwLiMiablQTTZsOVNyrt2Qb+Sjt8TQnUpwfJf0dYvKdXaEzROOqMYF
-CpY8Yzr1mVuCfisexGlOj/apZGu05kbuJrEkKmKzOiyAL2xrxGsPwrO5SqyOzFAA
-BKt514FH02sTBBYoTdB34PSWsbJBSA==
-=HII7
------END PGP SIGNATURE-----
-
---Sig_/CA+r1kYDXcYp56kIqnF5DPs--
+Thanks,
+Xuewei
+ 
+> > {
+> >-	int ret, sock_bytes_unsent;
+> >+	int ret;
+> >+	char name[32];
+> >+
+> >+	snprintf(name, sizeof(name), "ioctl(%lu)", op);
+> >
+> > 	timeout_begin(TIMEOUT);
+> > 	do {
+> >-		ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
+> >+		ret = ioctl(fd, op, actual);
+> > 		if (ret < 0) {
+> > 			if (errno == EOPNOTSUPP)
+> > 				break;
+> >
+> >-			perror("ioctl(SIOCOUTQ)");
+> >+			perror(name);
+> > 			exit(EXIT_FAILURE);
+> > 		}
+> >-		timeout_check("SIOCOUTQ");
+> >-	} while (sock_bytes_unsent != 0);
+> >+		timeout_check(name);
+> >+	} while (*actual != expected);
+> > 	timeout_end();
+> >
+> >-	return !ret;
+> >+	return ret >= 0;
+> >+}
+> >+
+> >+/* Wait until transport reports no data left to be sent.
+> >+ * Return false if transport does not implement the unsent_bytes() callback.
+> >+ */
+> >+bool vsock_wait_sent(int fd)
+> >+{
+> >+	int sock_bytes_unsent;
+> >+
+> >+	return vsock_ioctl_int(fd, SIOCOUTQ, &sock_bytes_unsent, 0);
+> > }
+> >
+> > /* Create socket <type>, bind to <cid, port> and return the file descriptor. */
+> >diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+> >index 5e2db67072d5..d59581f68d61 100644
+> >--- a/tools/testing/vsock/util.h
+> >+++ b/tools/testing/vsock/util.h
+> >@@ -54,6 +54,7 @@ int vsock_stream_listen(unsigned int cid, unsigned int port);
+> > int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
+> > 			   struct sockaddr_vm *clientaddrp);
+> > void vsock_wait_remote_close(int fd);
+> >+bool vsock_ioctl_int(int fd, unsigned long op, int *actual, int expected);
+> > bool vsock_wait_sent(int fd);
+> > void send_buf(int fd, const void *buf, size_t len, int flags,
+> > 	      ssize_t expected_ret);
+> >-- 
+> >2.34.1
+> >
 
