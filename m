@@ -1,213 +1,227 @@
-Return-Path: <netdev+bounces-203673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1636EAF6C0A
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 09:52:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3249BAF6C0F
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 09:53:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 246341C46700
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 07:52:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8D233A6E26
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 07:53:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1D77299A85;
-	Thu,  3 Jul 2025 07:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FAEC29AAF0;
+	Thu,  3 Jul 2025 07:53:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b="JzhbKh2S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mf01XLBc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15086298CB7;
-	Thu,  3 Jul 2025 07:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF08299A85;
+	Thu,  3 Jul 2025 07:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751529125; cv=none; b=i7fiHj1lSfbBv/9Bw2a2BUMqBxF84reZ64ARq5M5qTDZ8xXUWJCMvoqOyYXviEtA+n0pvYGS5lW4mw7wLs0Xt1yYPzd8GonS+dKRr6WXUNPOoRjcbgXQA+Ne+Ru/yr9r8+PyMrA9yaZ9PsqxTBUS9Y/70ikGRe0lrzOXuxF7YYg=
+	t=1751529227; cv=none; b=Ugu0o4NUfb47HGFjjjcu3J8inUmTTVlDX1kdnjWBH2DM9ulluXqyMAo5P7nGLAfGW4HomixGrZR4f3ax1bUUxFUh8f7OKrtvSwg5vR9GepBa7qmiaXu+MuKC49IEFGJaCNuPB2r83UNfwhG4+YKe1XjUCcFkiPMCkrTKlxhocX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751529125; c=relaxed/simple;
-	bh=TIb8Vu1zmttjZ1M0dwM7ar8hOBslW93Xl1m9iCYHcQs=;
-	h=MIME-Version:Message-ID:From:To:Cc:Subject:Content-Type:Date:
-	 In-Reply-To:References; b=GIXcxRWvqNmii5c+KNkcXVdI8dbun5jRCQWhMdR54uB/q+11w9eNOZxJOcqn1jBm5oDalgjYit67TaLIn74FOFR3buSakexgB8kFamJunLgXObVeCGy1blsa1xRpvKG3m+C9JcRzx/n8qtmIYJge4AP+q2uye3twzUzKRh0PRro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de; spf=pass smtp.mailfrom=public-files.de; dkim=pass (2048-bit key) header.d=public-files.de header.i=frank-w@public-files.de header.b=JzhbKh2S; arc=none smtp.client-ip=212.227.15.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=public-files.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=public-files.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=public-files.de;
-	s=s31663417; t=1751529104; x=1752133904; i=frank-w@public-files.de;
-	bh=TIb8Vu1zmttjZ1M0dwM7ar8hOBslW93Xl1m9iCYHcQs=;
-	h=X-UI-Sender-Class:MIME-Version:Message-ID:From:To:Cc:Subject:
-	 Content-Type:Date:In-Reply-To:References:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=JzhbKh2SwdXzZM9Ks4J8reStpKuZOQyBvGxhiTwZ+W3Aa9k5MrNrl715l3LP1jjW
-	 jfUV9h2zU860mQOZb3G5mX45+EL/53v4p3Gh0ubCwIuBvpz1S/xtOBTU3FYNJGlLq
-	 FFUF0RNHktl39DIfrn0V5MY9TuGH+T0GAIdT5dCU9d/pd3zsKHPHjBEP2GGUAm+HB
-	 ZghZmcrKZYwhV3wKwcyIYnGdglBdTL8TlUoe9/wqfbIIf+D4dCic3vs2cSYeRDcWo
-	 AE+QUIe8FuVAgkvI9HHCsOrK5jLturcTrmgFfpa29bkNOq8dEybT40sJbnfb+ALAI
-	 g6T8CbzZNNczXvk28w==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [100.71.3.167] ([100.71.3.167]) by
- trinity-msg-rest-gmx-gmx-live-847b5f5c86-wpb8f (via HTTP); Thu, 3 Jul 2025
- 07:51:44 +0000
+	s=arc-20240116; t=1751529227; c=relaxed/simple;
+	bh=EAO/alnjYPf1u5+DtQLR/0pbf21VfVmpJZWS6+1VGvA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=knaBHDuAbduU4efoUZFWGKTQ65IciP+xyPYvsO9OD60XBPqHwhgmOc/QVla6KfIwGPcbBhnhl1RQnhK26pC7lG+LZ5q1dytb8aoxD4UVV03GCNV5sTyDzOWE37iZphRXL2f8cnGwrZ48urTZC1ZHJ7A0DXnfM2ZF9Y89ZOXhF2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mf01XLBc; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-31223a4cddeso3445235a91.1;
+        Thu, 03 Jul 2025 00:53:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751529225; x=1752134025; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o5Z3Ibg5dI0YI2U0Q0aEUI660v44K9U+DyvKSIB5G4w=;
+        b=mf01XLBc5PMojHYNULfLOA2L6G9YKwG7pzSZDrTKOBhGSkg1fUb8E7j8MyqCrYXodL
+         ZIAWCn+/Teqt8qs6lA9UDsV1GfdWIotqzOUnp9hZ0HKyJ94x1rSy+DKzT0qNYOdX3IBZ
+         W/Wv2WjyGmDhWqw+ln3UvUDbM+L3Z9Z1E9U3eXRPKsGDCSYmM4FV0jG4xfs5M5sfFPdJ
+         WUoX8g8VeZ4rtcrRZAbS0Dt61DjjTvYOUZmkkTsJA0N8+XKZ7WtUj6jQia8njlmSMCSQ
+         YyRRUk1TvGXOqVvOBR5v5N+/nhejnk9hBLwfwK1WNWuChSg37Yb/Xc1hApVc1hSu8Qnf
+         nFxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751529225; x=1752134025;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=o5Z3Ibg5dI0YI2U0Q0aEUI660v44K9U+DyvKSIB5G4w=;
+        b=FkjugsMktYQw+K9qB6iYYxQ9esj7HxK9BU2zg+rkb71J8R8PTXDhr/Ovkdnh4v9MLT
+         /Rker0hAGuP/DGNMpLAu81Wy7592fxgEF5Fy9asV65kNgSN+ZV4HHfD6+USkRtRQa88d
+         vh8SmnDDhB1a5cDN2z43+/4mZMs9B7WVB/CgOpPscHCRhSzUsp99nApbBziiPG+FbLcz
+         ++ZH2Byvk6Dtj8qqGOXhjWNA+UpC08KBavZ/GtCzhOzqKRi9a3geKCFq05GyVl6mJnTr
+         +F8y4A+Np4vrc9GXlch3eeHtrXPn7w2tAumsXeRHUkXuT6upapiqbpy1d2bAqh3ocYo7
+         DX6w==
+X-Forwarded-Encrypted: i=1; AJvYcCUOt41p7ig/CboFg58xTapoafQ0lYVCmrmhHj8tWLEIfwwdB2DuPVZAR9vLG/8DqElwl8G51nDsBtqLdCy8@vger.kernel.org, AJvYcCUWrVp3EnwMgd9Nkf8ne38UUXPVUAn9wHFJCvNfh/gGCPnpA5Rmdg14c2bhlxbesa3+x30nmiil@vger.kernel.org, AJvYcCVLhhTMD5cj1EzMY38LO3tUR6OsRv7en2gIsVPcutk/9DLDqv9SeaZUonbepGLvxNU/C+s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjvdCBKUNV5029yTi0z6dZ3cGHlsi68PNpDnBXIKcu8dDmFGvg
+	U6Toq/ZfB1gWsX6ChTlGLNJDdfC67zThonEYtbt8Q2K9dqBNLwfZqTOeJhsXwdxgDulHGH6W
+X-Gm-Gg: ASbGncuRCQgb2q8h5X8Xy4yHRDrUD99JAbNIWsnBpB89womxCaddg5jwdEI35vsdi4q
+	aPBvjYDWIQWj/TEwEwRcb/o/QP76Zlx0kq4AwQQT9yiSNShTd7cA3KcR2iv1cIx+gpU/QZYW2l7
+	QSbM1LsqnPV2+G564BzLPYQxoMnc+W7XX2IzofIzrcwnjcvmVlBLL/zHlIXaI6mODQ27GbFxzNV
+	L3/5zyby95kIoUfuO5x6YcWikAu+13D7BM9yeJLyMmBXSvcQ2n2Het1ecZlTYgoh6QSMkviHKW4
+	zEdoV0xeO2xigqaz9YRsi+Yt9I/pQjulfH7FtQcix5JSi5uNXDfnk6vIzKW4jK28vxMKC9+/CSe
+	C0sbvHRmJV/u/Qd+v+Ws=
+X-Google-Smtp-Source: AGHT+IG5wCaASyniAIni8ifVqNeDb2b7kJdZU/BUNxpaGI75twsZCp3n4qDX+fcy/2jRkP4DZDxYgw==
+X-Received: by 2002:a17:90b:4c84:b0:312:1ae9:153a with SMTP id 98e67ed59e1d1-31a90bef1a8mr8956064a91.25.1751529224280;
+        Thu, 03 Jul 2025 00:53:44 -0700 (PDT)
+Received: from devant.antgroup-inc.local ([47.89.83.0])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31a9cc5a266sm1788596a91.12.2025.07.03.00.53.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jul 2025 00:53:43 -0700 (PDT)
+From: Xuewei Niu <niuxuewei97@gmail.com>
+X-Google-Original-From: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+To: sgarzare@redhat.com
+Cc: davem@davemloft.net,
+	decui@microsoft.com,
+	fupan.lfp@antgroup.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	leonardi@redhat.com,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	netdev@vger.kernel.org,
+	niuxuewei.nxw@antgroup.com,
+	niuxuewei97@gmail.com,
+	pabeni@redhat.com,
+	stefanha@redhat.com,
+	virtualization@lists.linux.dev,
+	xuanzhuo@linux.alibaba.com
+Subject: Re: [RESEND PATCH net-next v4 3/4] test/vsock: Add retry mechanism to ioctl wrapper
+Date: Thu,  3 Jul 2025 15:53:28 +0800
+Message-Id: <20250703075328.1004942-1-niuxuewei.nxw@antgroup.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <ceulzs7srd77t57ozaauveim4dlp6stqmbvvjh5dketapmjzhv@nu6gruoyidze>
+References: <ceulzs7srd77t57ozaauveim4dlp6stqmbvvjh5dketapmjzhv@nu6gruoyidze>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <trinity-112cc1ce-74d3-4fd8-a800-e302916dde33-1751529104009@trinity-msg-rest-gmx-gmx-live-847b5f5c86-wpb8f>
-From: frank-w@public-files.de
-To: krzk@kernel.org, linux@fw-web.de
-Cc: myungjoo.ham@samsung.com, kyungmin.park@samsung.com,
- cw00.choi@samsung.com, djakov@kernel.org, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, andrew@lunn.ch, olteanv@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, johnson.wang@mediatek.com,
- arinc.unal@arinc9.com, Landen.Chao@mediatek.com, dqfext@gmail.com,
- sean.wang@mediatek.com, daniel@makrotopia.org, lorenzo@kernel.org,
- nbd@nbd.name, linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Subject: Aw: Re: [PATCH v7 02/14] dt-bindings: net: mediatek,net: update for
- mt7988
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 3 Jul 2025 07:51:44 +0000
-In-Reply-To: <24081402-4690-4a1b-a6d0-adab803d0049@kernel.org>
-References: <20250628165451.85884-1-linux@fw-web.de>
- <20250628165451.85884-3-linux@fw-web.de>
- <20250701-rebel-mellow-parrot-fda216@krzk-bin>
- <8C311FDD-094A-4F1C-AE26-7E3ABB337C14@public-files.de>
- <24081402-4690-4a1b-a6d0-adab803d0049@kernel.org>
-X-UI-CLIENT-META-MAIL-DROP: W10=
-X-Provags-ID: V03:K1:Y5ZQ8Y1C/j8ZgyHcUkGFJFXJlcCBeb2rydmw7I1JcmLTb5aoJmKZa/IEDJj1c37Qi5y5f
- CdmV/21E99vlXJVPNGgppFsjOEBqrmZnjdXOeecSli/Ktb2cb0So+H9d2MG/b6mJlEi/VCo0w3hC
- 5h7V5tCJzvWG+0fGtsqlHu/sRR0kKL90/VbvCmL5p20oS6GCjb93AHx4kPPUBy9MqaRhKASxrj2y
- +tBrYRB3BjvCGL4VbSyPitzOO6WyqHBei0SfyKkLh4vZkPpZSm+udN+KyvVsuMsjDdSaKpuv8UXt
- YU2mZydqBntLo1TNjKeKPesXQ4rzsPf2PtPRUaHPS44Ws3ExTuaiAX+fr3+Cg9Du3w=
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:5IGurp4wuy4=;61DYLIahmylHpOzMtce5fa0vxtC
- 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
- 3meBAARWEA==
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-> Gesendet: Mittwoch, 2. Juli 2025 um 08:29
-> Von: "Krzysztof Kozlowski" <krzk@kernel.org>
-> Betreff: Re: [PATCH v7 02/14] dt-bindings: net: mediatek,net: update for=
- mt7988
->
-> On 01/07/2025 12:33, Frank Wunderlich wrote:
-> > Am 1. Juli 2025 08:41:42 MESZ schrieb Krzysztof Kozlowski <krzk@kernel=
-.org>:
-> >> On Sat, Jun 28, 2025 at 06:54:37PM +0200, Frank Wunderlich wrote:
-> >>> From: Frank Wunderlich <frank-w@public-files.de>
-> >>>
-> >>> Update binding for mt7988 which has 3 gmac and a sram for dma
-> >>> operations.
+> On Thu, Jul 03, 2025 at 11:05:14AM +0800, Xuewei Niu wrote:
+> >Resend: the previous message was rejected due to HTML
+> >Resend: forgot to reply all...
+> >
+> >> On Mon, Jun 30, 2025 at 03:57:26PM +0800, Xuewei Niu wrote:
+> >> >Wrap the ioctl in `ioctl_int()`, which takes a pointer to the actual
+> >> >int value and an expected int value. The function will not return until
+> >> >either the ioctl returns the expected value or a timeout occurs, thus
+> >> >avoiding immediate failure.
+> >> >
+> >> >Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+> >> >---
+> >> > tools/testing/vsock/util.c | 32 +++++++++++++++++++++++---------
+> >> > tools/testing/vsock/util.h |  1 +
+> >> > 2 files changed, 24 insertions(+), 9 deletions(-)
+> >> >
+> >> >diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+> >> >index 0c7e9cbcbc85..481c395227e4 100644
+> >> >--- a/tools/testing/vsock/util.c
+> >> >+++ b/tools/testing/vsock/util.c
+> >> >@@ -16,6 +16,7 @@
+> >> > #include <unistd.h>
+> >> > #include <assert.h>
+> >> > #include <sys/epoll.h>
+> >> >+#include <sys/ioctl.h>
+> >> > #include <sys/mman.h>
+> >> > #include <linux/sockios.h>
+> >> >
+> >> >@@ -97,28 +98,41 @@ void vsock_wait_remote_close(int fd)
+> >> > 	close(epollfd);
+> >> > }
+> >> >
+> >> >-/* Wait until transport reports no data left to be sent.
+> >> >- * Return false if transport does not implement the unsent_bytes()
+> >> >callback.
+> >> >+/* Wait until ioctl gives an expected int value.
+> >> >+ * Return false if the op is not supported.
+> >> >  */
+> >> >-bool vsock_wait_sent(int fd)
+> >> >+bool vsock_ioctl_int(int fd, unsigned long op, int *actual, int expected)
 > >>
-> >> I asked why you are updating. You claim you update because it has 3
-> >> GMAC... but that's irrelevant, because it is easy to answer with: it =
-did
-> >> not have 3 GMAC before?
-> >>
-> >> So same question: Provide real reason why you are making updates. Tha=
-t's
-> >> why you have commit msg.
-> >=20
-> > MT7988 had always 3 gmac,but no dts with ethernet
-> > node till now.
-> > As i try to upstream the dts,i fell over this.
->=20
-> What does it mean? Are you adding new device or not? Nothing explains
-> that something was missing.
+> >> Why we need the `actual` parameter?
+> >
+> >We can exit early `if (*actual == expected)`, and the `expected` can be any integer.
+> >I also make it to be a pointer, because the caller might need to have the actual value.
+> 
+> IIUC this function return true if `*actual == expected` or false if 
+> there was an error, so I don't see the point of aving `actual`, since it 
+> can only be equal to `expected` if it returns true, or invalid if it 
+> returs false.
 
-The binding already exists, but was incomplete. It was added while changin=
-g ethernet driver but was not used
-because i'm the first person adding mt7988 Ethernet node to devicetree in =
-this series.
+Nice catch! I'll remove it in v5.
 
-> >=20
-> > Imho changing the regex for the mac subnodes was
-> > simply forgotten to be updated on initial mt7988
-> > support patch.
->=20
-> Fix
-> your
-> wrapping because
-> it is
-> difficult
-> to follow
-> such
-> style.
+Thanks,
+Xuewei
 
-i understand that it is not the best, but i have to manually wrap lines be=
-cause neither my webmail nor
-my Android Mail-App (K9Mail) supports automatic wrapping (created a featur=
-e-request some years ago which
-got rejected). I try to wrap it as good as possible, but still manually (o=
-n phone it is not that easy).
-
-> >=20
-> > I try to rephrase it like this:
-> >=20
-> > Binding was not aware for 3 MAC subnodes because
-> > previous mediatek SoC had only 2. Change this to allow
-> > 3 GMAC in mt7988 devicetree.
->=20
-> So a fix for existing? Than add Fixes tag, describe the issue and fix
-> ONLY that issue.
-
-Yes, binding for mt7988 already exists withing the mediatek,net binding, b=
-ut the pattern for mac subnodes
-was not updated while adding. So i had to do it before adding the ethernet=
- node to dts in same series.
-
-But yes, i can separate this change again and add Fixes Tag. So just the s=
-ram-Property is added in this patch
-and i repharse it like this.
-
-> Best regards,
-> Krzysztof
-
-regards Frank
+> Thanks,
+> Stefano
+> 
+> >
+> >Thanks,
+> >Xuewei
+> >
+> >> > {
+> >> >-	int ret, sock_bytes_unsent;
+> >> >+	int ret;
+> >> >+	char name[32];
+> >> >+
+> >> >+	snprintf(name, sizeof(name), "ioctl(%lu)", op);
+> >> >
+> >> > 	timeout_begin(TIMEOUT);
+> >> > 	do {
+> >> >-		ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
+> >> >+		ret = ioctl(fd, op, actual);
+> >> > 		if (ret < 0) {
+> >> > 			if (errno == EOPNOTSUPP)
+> >> > 				break;
+> >> >
+> >> >-			perror("ioctl(SIOCOUTQ)");
+> >> >+			perror(name);
+> >> > 			exit(EXIT_FAILURE);
+> >> > 		}
+> >> >-		timeout_check("SIOCOUTQ");
+> >> >-	} while (sock_bytes_unsent != 0);
+> >> >+		timeout_check(name);
+> >> >+	} while (*actual != expected);
+> >> > 	timeout_end();
+> >> >
+> >> >-	return !ret;
+> >> >+	return ret >= 0;
+> >> >+}
+> >> >+
+> >> >+/* Wait until transport reports no data left to be sent.
+> >> >+ * Return false if transport does not implement the unsent_bytes() callback.
+> >> >+ */
+> >> >+bool vsock_wait_sent(int fd)
+> >> >+{
+> >> >+	int sock_bytes_unsent;
+> >> >+
+> >> >+	return vsock_ioctl_int(fd, SIOCOUTQ, &sock_bytes_unsent, 0);
+> >> > }
+> >> >
+> >> > /* Create socket <type>, bind to <cid, port> and return the file descriptor. */
+> >> >diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+> >> >index 5e2db67072d5..d59581f68d61 100644
+> >> >--- a/tools/testing/vsock/util.h
+> >> >+++ b/tools/testing/vsock/util.h
+> >> >@@ -54,6 +54,7 @@ int vsock_stream_listen(unsigned int cid, unsigned int port);
+> >> > int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
+> >> > 			   struct sockaddr_vm *clientaddrp);
+> >> > void vsock_wait_remote_close(int fd);
+> >> >+bool vsock_ioctl_int(int fd, unsigned long op, int *actual, int expected);
+> >> > bool vsock_wait_sent(int fd);
+> >> > void send_buf(int fd, const void *buf, size_t len, int flags,
+> >> > 	      ssize_t expected_ret);
+> >> >--
+> >> >2.34.1
+> >> >
+> >
 
