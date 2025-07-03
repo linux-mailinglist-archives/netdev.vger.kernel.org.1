@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-203620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0E3BAF6892
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 05:17:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98CF8AF6890
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 05:17:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 107993BCD1A
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 03:16:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FE3552428A
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 03:17:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C690822D78A;
-	Thu,  3 Jul 2025 03:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070182288C6;
+	Thu,  3 Jul 2025 03:16:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="dLeso113"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="rgxUpi7+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912DC22157F
-	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 03:16:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6230E22157F
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 03:16:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751512605; cv=none; b=kGNqT/imAU1f3cvaeR6vX0z0w9fXoyvycIB/B0LgP+L5rU4pgrS1daOoLWmfxD9gRmip3ywQuxErOxuu9TshPACCFgeD/eHF2Ax7sEiRzix0Yb+v1QjYzR4cS+n9IqDQmqw1rhYnF8nmT+LN9SZVNAizQ6i2z0es2LQLFfNTtbY=
+	t=1751512608; cv=none; b=qWYzjg2IxOPyhgecDw7Z5drXXl99tKGdjYmJfcnUamZKuRkkUVox0NOI8GoslWBKpnc4FmtKp9SaBMpl+JrKtoXXY2V0ncFeSyCb0qNjIw/+a0Objew8uFo3MS2itPcxh/tcumFxwIyyCk3eOVPcKjR2gJXRqSUCwoDN6NDn8PQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751512605; c=relaxed/simple;
-	bh=+p3q9DyOYfQabzSMgqBYoX68N1e6oFhCzvLKxDOEBvs=;
+	s=arc-20240116; t=1751512608; c=relaxed/simple;
+	bh=k86am7rgDkwOLVRBPPnQBUXTL7K7NwHKDg1cVNeZoXQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KuvNuAqQ9TcoqjfhSGVkyuFXqCXeyZ+N8jepsc/rNG488zltAqSbj2P+yQc81axNT7hZpYuY+GSrpqw/hUS1NeVhaFceprz7uaSD3ggEX3tClMvCeCsyLbOonFbpNqrDE93MoCykFXDSP2as4pgOTSydYrUIs+3BUqdUhYfQMPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=dLeso113; arc=none smtp.client-ip=171.64.64.25
+	 MIME-Version; b=WyYC51xjFsMUIvJ8rzY/DjdFEdy+TP3H3or6fK5qbPt4DOEincBal49VEuurrCM2yLT75MQhIx8r7OXHnKWCMoGY92tQSZhDyyvHzHeEsF1SJuYcZHSd+CiBkjoyy032LkHDRGE+RVyW56+ylGJqIDdCztPvDoyl0l7R1ZmBlho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=rgxUpi7+; arc=none smtp.client-ip=171.64.64.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,17 +37,17 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=u5b0NitjbeIBZJ+ZBlGdGw3YBNEvCklXIDsbepgu8p4=; t=1751512603; x=1752376603; 
-	b=dLeso113dQp8YCgLyhmWB7hhjwA370L8ZfP1LQkkpib1XEJYr+AOsyXDubJECY5lATo4tE4MQmr
-	UGRisDXobcfHa1LHwyiN11edY88FAsZz87h1f8tVftumCn7jzJ7EOqgdatBS946f2o86JrSzLa7+y
-	39hhlRLfbfrzqYGOB3D6eN61PcO3U4uqOYAhq7LFbNxKvlyCpE06WipRnZQ/7lhizG7JpT4+VJXqv
-	Sy2vOIpvHDfLvtFoUdnfW9+WVFAtK5Stlgyo1EbamLtwpiodnF/ghtQ2HP7mJkJMLeSuBucV+bS9S
-	CmMhzbwfZcx2v66zV7Of6o6fzUgHoirYKeCQ==;
+	bh=OxmvVUNVGszbF2C9j1Ik3UBFZO1LBUlkqtb5IbCW6cw=; t=1751512607; x=1752376607; 
+	b=rgxUpi7+TwHi1wCw9BHH1ZyhJIaRqEawrdgPILqC7QAkTtSWfaSgM6ra1eQndIvUYLyYmOIV+L5
+	ay4P3Vs2P+XnVCe5eKCPRCheZhanpBtmGF2TzIJf6tqm+xHZPXYzk2ZFmXEhAAdSmE0BktxR/2Amk
+	Z6pqsp5FlsZkS/r0XG5rtZuTKcIfvVR++GLNnMaSTbGCaSXpOiV6JDQUDpVAXSmo+2eITbxBbJuqv
+	90NltBurlFLVHy+1BOTSt1jzWX5txR0+LWGCuiKY7IIuXghxgkFscA+R6yGGYYnY9zmrbqjLpK68A
+	/h8yXB7CXt1qtpkr5jbs1i/uoTa4792hKMEQ==;
 Received: from 70-228-78-207.lightspeed.sntcca.sbcglobal.net ([70.228.78.207]:54972 helo=localhost.localdomain)
 	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ouster@cs.stanford.edu>)
-	id 1uXARE-0006te-A1; Wed, 02 Jul 2025 20:16:43 -0700
+	id 1uXARJ-0006te-28; Wed, 02 Jul 2025 20:16:45 -0700
 From: John Ousterhout <ouster@cs.stanford.edu>
 To: netdev@vger.kernel.org
 Cc: pabeni@redhat.com,
@@ -55,9 +55,9 @@ Cc: pabeni@redhat.com,
 	horms@kernel.org,
 	kuba@kernel.org,
 	John Ousterhout <ouster@cs.stanford.edu>
-Subject: [PATCH net-next v10 10/15] net: homa: create homa_outgoing.c
-Date: Wed,  2 Jul 2025 20:13:18 -0700
-Message-ID: <20250703031445.569-11-ouster@cs.stanford.edu>
+Subject: [PATCH net-next v10 11/15] net: homa: create homa_utils.c
+Date: Wed,  2 Jul 2025 20:13:19 -0700
+Message-ID: <20250703031445.569-12-ouster@cs.stanford.edu>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20250703031445.569-1-ouster@cs.stanford.edu>
 References: <20250703031445.569-1-ouster@cs.stanford.edu>
@@ -69,642 +69,187 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Score: -1.0
-X-Scan-Signature: a5be76b49fb75bdab7bf34c58a1babd6
+X-Scan-Signature: d35fb6c06066e474e02df1cf6298274e
 
-This file does most of the work of transmitting outgoing messages.
-It is also responsible for copying data from user space into skbs.
+This file contains functions for constructing and destructing
+homa structs.
 
 Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
 
 ---
 Changes for v10:
-* Revise sparse annotations to eliminate __context__ definition
 * Remove log messages after alloc errors
 
 Changes for v9:
+* Add support for homa_net objects
 * Use new homa_clock abstraction layer
 * Various name improvements (e.g. use "alloc" instead of "new" for functions
   that allocate memory)
-* Eliminate sizeof32 define: use sizeof instead
+
+Changes for v8:
+* Accommodate homa_pacer refactoring
 
 Changes for v7:
-* Implement accounting for bytes in tx skbs
-* Rename UNKNOWN packet type to RPC_UNKNOWN
-* Use new RPC reference counts; eliminates need for RCU
-* Remove locker argument from locking functions
+* Make Homa a pernet subsystem
+* Add support for tx memory accounting
+* Remove "lock_slow" functions, which don't add functionality in this
+  patch series
 * Use u64 and __u64 properly
-* Fix incorrect skb check in homa_message_out_fill
 ---
- net/homa/homa_impl.h     |  13 +
- net/homa/homa_outgoing.c | 570 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 583 insertions(+)
- create mode 100644 net/homa/homa_outgoing.c
+ net/homa/homa_impl.h  |   6 +++
+ net/homa/homa_utils.c | 121 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 127 insertions(+)
+ create mode 100644 net/homa/homa_utils.c
 
 diff --git a/net/homa/homa_impl.h b/net/homa/homa_impl.h
-index 6dd24383efa2..a03ee6ca3403 100644
+index a03ee6ca3403..72d646f70381 100644
 --- a/net/homa/homa_impl.h
 +++ b/net/homa/homa_impl.h
-@@ -379,12 +379,25 @@ static inline bool homa_make_header_avl(struct sk_buff *skb)
+@@ -379,12 +379,18 @@ static inline bool homa_make_header_avl(struct sk_buff *skb)
  
  extern unsigned int homa_net_id;
  
-+int      homa_fill_data_interleaved(struct homa_rpc *rpc,
-+				    struct sk_buff *skb, struct iov_iter *iter);
-+int      homa_message_out_fill(struct homa_rpc *rpc,
-+			       struct iov_iter *iter, int xmit);
-+void     homa_message_out_init(struct homa_rpc *rpc, int length);
++void     homa_destroy(struct homa *homa);
+ int      homa_fill_data_interleaved(struct homa_rpc *rpc,
+ 				    struct sk_buff *skb, struct iov_iter *iter);
++int      homa_init(struct homa *homa);
+ int      homa_message_out_fill(struct homa_rpc *rpc,
+ 			       struct iov_iter *iter, int xmit);
+ void     homa_message_out_init(struct homa_rpc *rpc, int length);
++void     homa_net_destroy(struct homa_net *hnet);
++int      homa_net_init(struct homa_net *hnet, struct net *net,
++		       struct homa *homa);
  void     homa_rpc_handoff(struct homa_rpc *rpc);
-+struct sk_buff *homa_tx_data_pkt_alloc(struct homa_rpc *rpc,
-+				       struct iov_iter *iter, int offset,
-+				       int length, int max_seg_data);
- int      homa_xmit_control(enum homa_packet_type type, void *contents,
- 			   size_t length, struct homa_rpc *rpc);
-+int      __homa_xmit_control(void *contents, size_t length,
-+			     struct homa_peer *peer, struct homa_sock *hsk);
- void     homa_xmit_data(struct homa_rpc *rpc, bool force);
-+void     homa_xmit_unknown(struct sk_buff *skb, struct homa_sock *hsk);
- 
- int      homa_message_in_init(struct homa_rpc *rpc, int unsched);
-+void     homa_resend_data(struct homa_rpc *rpc, int start, int end);
-+void     __homa_xmit_data(struct sk_buff *skb, struct homa_rpc *rpc);
- 
- /**
-  * homa_net_from_net() - Return the struct homa_net associated with a particular
-diff --git a/net/homa/homa_outgoing.c b/net/homa/homa_outgoing.c
++void     homa_spin(int ns);
+ struct sk_buff *homa_tx_data_pkt_alloc(struct homa_rpc *rpc,
+ 				       struct iov_iter *iter, int offset,
+ 				       int length, int max_seg_data);
+diff --git a/net/homa/homa_utils.c b/net/homa/homa_utils.c
 new file mode 100644
-index 000000000000..b56872608aa2
+index 000000000000..75cedb55cad0
 --- /dev/null
-+++ b/net/homa/homa_outgoing.c
-@@ -0,0 +1,570 @@
++++ b/net/homa/homa_utils.c
+@@ -0,0 +1,121 @@
 +// SPDX-License-Identifier: BSD-2-Clause
 +
-+/* This file contains functions related to the sender side of message
-+ * transmission. It also contains utility functions for sending packets.
++/* This file contains miscellaneous utility functions for Homa, such
++ * as initializing and destroying homa structs.
 + */
 +
 +#include "homa_impl.h"
 +#include "homa_pacer.h"
 +#include "homa_peer.h"
 +#include "homa_rpc.h"
-+#include "homa_wire.h"
 +#include "homa_stub.h"
 +
 +/**
-+ * homa_message_out_init() - Initialize rpc->msgout.
-+ * @rpc:       RPC whose output message should be initialized. Must be
-+ *             locked by caller.
-+ * @length:    Number of bytes that will eventually be in rpc->msgout.
++ * homa_init() - Constructor for homa objects.
++ * @homa:   Object to initialize.
++ *
++ * Return:  0 on success, or a negative errno if there was an error. Even
++ *          if an error occurs, it is safe (and necessary) to call
++ *          homa_destroy at some point.
 + */
-+void homa_message_out_init(struct homa_rpc *rpc, int length)
-+	__must_hold(rpc->bucket->lock)
++int homa_init(struct homa *homa)
 +{
-+	memset(&rpc->msgout, 0, sizeof(rpc->msgout));
-+	rpc->msgout.length = length;
-+	rpc->msgout.next_xmit = &rpc->msgout.packets;
-+	rpc->msgout.init_time = homa_clock();
-+}
-+
-+/**
-+ * homa_fill_data_interleaved() - This function is invoked to fill in the
-+ * part of a data packet after the initial header, when GSO is being used.
-+ * homa_seg_hdrs must be interleaved with the data to provide the correct
-+ * offset for each segment.
-+ * @rpc:            RPC whose output message is being created. Must be
-+ *                  locked by caller.
-+ * @skb:            The packet being filled. The initial homa_data_hdr was
-+ *                  created and initialized by the caller and the
-+ *                  homa_skb_info has been filled in with the packet geometry.
-+ * @iter:           Describes location(s) of (remaining) message data in user
-+ *                  space.
-+ * Return:          Either a negative errno or 0 (for success).
-+ */
-+int homa_fill_data_interleaved(struct homa_rpc *rpc, struct sk_buff *skb,
-+			       struct iov_iter *iter)
-+	__must_hold(rpc->bucket->lock)
-+{
-+	struct homa_skb_info *homa_info = homa_get_skb_info(skb);
-+	int seg_length = homa_info->seg_length;
-+	int bytes_left = homa_info->data_bytes;
-+	int offset = homa_info->offset;
 +	int err;
 +
-+	/* Each iteration of the following loop adds info for one packet,
-+	 * which includes a homa_seg_hdr followed by the data for that
-+	 * segment. The first homa_seg_hdr was already added by the caller.
-+	 */
-+	while (1) {
-+		struct homa_seg_hdr seg;
++	memset(homa, 0, sizeof(*homa));
 +
-+		if (bytes_left < seg_length)
-+			seg_length = bytes_left;
-+		err = homa_skb_append_from_iter(rpc->hsk->homa, skb, iter,
-+						seg_length);
-+		if (err != 0)
-+			return err;
-+		bytes_left -= seg_length;
-+		offset += seg_length;
-+
-+		if (bytes_left == 0)
-+			break;
-+
-+		seg.offset = htonl(offset);
-+		err = homa_skb_append_to_frag(rpc->hsk->homa, skb, &seg,
-+					      sizeof(seg));
-+		if (err != 0)
-+			return err;
++	atomic64_set(&homa->next_outgoing_id, 2);
++	homa->pacer = homa_pacer_alloc(homa);
++	if (IS_ERR(homa->pacer)) {
++		err = PTR_ERR(homa->pacer);
++		homa->pacer = NULL;
++		return err;
 +	}
++	homa->peertab = homa_peer_alloc_peertab();
++	if (IS_ERR(homa->peertab)) {
++		err = PTR_ERR(homa->peertab);
++		homa->peertab = NULL;
++		return err;
++	}
++	homa->socktab = kmalloc(sizeof(*homa->socktab), GFP_KERNEL);
++	if (!homa->socktab)
++		return -ENOMEM;
++	homa_socktab_init(homa->socktab);
++
++	/* Wild guesses to initialize configuration values... */
++	homa->resend_ticks = 5;
++	homa->resend_interval = 5;
++	homa->timeout_ticks = 100;
++	homa->timeout_resends = 5;
++	homa->request_ack_ticks = 2;
++	homa->reap_limit = 10;
++	homa->dead_buffs_limit = 5000;
++	homa->max_gso_size = 10000;
++	homa->wmem_max = 100000000;
++	homa->bpage_lease_usecs = 10000;
 +	return 0;
 +}
 +
 +/**
-+ * homa_tx_data_pkt_alloc() - Allocate a new sk_buff and fill it with an
-+ * outgoing Homa data packet. The resulting packet will be a GSO packet
-+ * that will eventually be segmented by the NIC.
-+ * @rpc:          RPC that packet will belong to (msgout must have been
-+ *                initialized). Must be locked by caller.
-+ * @iter:         Describes location(s) of (remaining) message data in user
-+ *                space.
-+ * @offset:       Offset in the message of the first byte of data in this
-+ *                packet.
-+ * @length:       How many bytes of data to include in the skb. Caller must
-+ *                ensure that this amount of data isn't too much for a
-+ *                well-formed GSO packet, and that iter has at least this
-+ *                much data.
-+ * @max_seg_data: Maximum number of bytes of message data that can go in
-+ *                a single segment of the GSO packet.
-+ * Return: A pointer to the new packet, or a negative errno.
++ * homa_destroy() -  Destructor for homa objects.
++ * @homa:      Object to destroy. It is safe if this object has already
++ *             been previously destroyed.
 + */
-+struct sk_buff *homa_tx_data_pkt_alloc(struct homa_rpc *rpc,
-+				       struct iov_iter *iter, int offset,
-+				       int length, int max_seg_data)
-+	__must_hold(rpc->bucket->lock)
++void homa_destroy(struct homa *homa)
 +{
-+	struct homa_skb_info *homa_info;
-+	struct homa_data_hdr *h;
-+	struct sk_buff *skb;
-+	int err, gso_size;
-+	u64 segs;
-+
-+	segs = length + max_seg_data - 1;
-+	do_div(segs, max_seg_data);
-+
-+	/* Initialize the overall skb. */
-+	skb = homa_skb_alloc_tx(sizeof(struct homa_data_hdr) + length +
-+			      (segs - 1) * sizeof(struct homa_seg_hdr));
-+	if (!skb)
-+		return ERR_PTR(-ENOMEM);
-+
-+	/* Fill in the Homa header (which will be replicated in every
-+	 * network packet by GSO).
-+	 */
-+	h = (struct homa_data_hdr *)skb_put(skb, sizeof(struct homa_data_hdr));
-+	h->common.sport = htons(rpc->hsk->port);
-+	h->common.dport = htons(rpc->dport);
-+	h->common.sequence = htonl(offset);
-+	h->common.type = DATA;
-+	homa_set_doff(h, sizeof(struct homa_data_hdr));
-+	h->common.checksum = 0;
-+	h->common.sender_id = cpu_to_be64(rpc->id);
-+	h->message_length = htonl(rpc->msgout.length);
-+	h->ack.client_id = 0;
-+	homa_peer_get_acks(rpc->peer, 1, &h->ack);
-+	h->retransmit = 0;
-+	h->seg.offset = htonl(offset);
-+
-+	homa_info = homa_get_skb_info(skb);
-+	homa_info->next_skb = NULL;
-+	homa_info->wire_bytes = length + segs * (sizeof(struct homa_data_hdr)
-+			+  rpc->hsk->ip_header_length + HOMA_ETH_OVERHEAD);
-+	homa_info->data_bytes = length;
-+	homa_info->seg_length = max_seg_data;
-+	homa_info->offset = offset;
-+
-+	if (segs > 1) {
-+		homa_set_doff(h, sizeof(struct homa_data_hdr)  -
-+				sizeof(struct homa_seg_hdr));
-+		gso_size = max_seg_data + sizeof(struct homa_seg_hdr);
-+		err = homa_fill_data_interleaved(rpc, skb, iter);
-+	} else {
-+		gso_size = max_seg_data;
-+		err = homa_skb_append_from_iter(rpc->hsk->homa, skb, iter,
-+						length);
++	/* The order of the following cleanups matters! */
++	if (homa->socktab) {
++		homa_socktab_destroy(homa->socktab, NULL);
++		kfree(homa->socktab);
++		homa->socktab = NULL;
 +	}
-+	if (err)
-+		goto error;
-+
-+	if (segs > 1) {
-+		skb_shinfo(skb)->gso_segs = segs;
-+		skb_shinfo(skb)->gso_size = gso_size;
-+
-+		/* It's unclear what gso_type should be used to force software
-+		 * GSO; the value below seems to work...
-+		 */
-+		skb_shinfo(skb)->gso_type =
-+		    rpc->hsk->homa->gso_force_software ? 0xd : SKB_GSO_TCPV6;
++	if (homa->pacer) {
++		homa_pacer_free(homa->pacer);
++		homa->pacer = NULL;
 +	}
-+	return skb;
-+
-+error:
-+	homa_skb_free_tx(rpc->hsk->homa, skb);
-+	return ERR_PTR(err);
++	if (homa->peertab) {
++		homa_peer_free_peertab(homa->peertab);
++		homa->peertab = NULL;
++	}
 +}
 +
 +/**
-+ * homa_message_out_fill() - Initializes information for sending a message
-+ * for an RPC (either request or response); copies the message data from
-+ * user space and (possibly) begins transmitting the message.
-+ * @rpc:     RPC for which to send message; this function must not
-+ *           previously have been called for the RPC. Must be locked. The RPC
-+ *           will be unlocked while copying data, but will be locked again
-+ *           before returning.
-+ * @iter:    Describes location(s) of message data in user space.
-+ * @xmit:    Nonzero means this method should start transmitting packets;
-+ *           transmission will be overlapped with copying from user space.
-+ *           Zero means the caller will initiate transmission after this
-+ *           function returns.
-+ *
-+ * Return:   0 for success, or a negative errno for failure. It is possible
-+ *           for the RPC to be freed while this function is active. If that
-+ *           happens, copying will cease, -EINVAL will be returned, and
-+ *           rpc->state will be RPC_DEAD.
++ * homa_net_init() - Initialize a new struct homa_net as a per-net subsystem.
++ * @hnet:    Struct to initialzie.
++ * @net:     The network namespace the struct will be associated with.
++ * @homa:    The main Homa data structure to use for the net.
++ * Return:  0 on success, otherwise a negative errno.
 + */
-+int homa_message_out_fill(struct homa_rpc *rpc, struct iov_iter *iter, int xmit)
-+	__must_hold(rpc->bucket->lock)
++int homa_net_init(struct homa_net *hnet, struct net *net, struct homa *homa)
 +{
-+	/* Geometry information for packets:
-+	 * mtu:              largest size for an on-the-wire packet (including
-+	 *                   all headers through IP header, but not Ethernet
-+	 *                   header).
-+	 * max_seg_data:     largest amount of Homa message data that fits
-+	 *                   in an on-the-wire packet (after segmentation).
-+	 * max_gso_data:     largest amount of Homa message data that fits
-+	 *                   in a GSO packet (before segmentation).
-+	 */
-+	int mtu, max_seg_data, max_gso_data;
-+
-+	struct sk_buff **last_link;
-+	struct dst_entry *dst;
-+	u64 segs_per_gso;
-+	int overlap_xmit;
-+
-+	/* Bytes of the message that haven't yet been copied into skbs. */
-+	int bytes_left;
-+
-+	int gso_size;
-+	int err;
-+
-+	homa_rpc_hold(rpc);
-+	if (unlikely(iter->count > HOMA_MAX_MESSAGE_LENGTH ||
-+		     iter->count == 0)) {
-+		err = -EINVAL;
-+		goto error;
-+	}
-+	homa_message_out_init(rpc, iter->count);
-+
-+	/* Compute the geometry of packets. */
-+	dst = homa_get_dst(rpc->peer, rpc->hsk);
-+	mtu = dst_mtu(dst);
-+	max_seg_data = mtu - rpc->hsk->ip_header_length
-+			- sizeof(struct homa_data_hdr);
-+	gso_size = dst->dev->gso_max_size;
-+	if (gso_size > rpc->hsk->homa->max_gso_size)
-+		gso_size = rpc->hsk->homa->max_gso_size;
-+	dst_release(dst);
-+
-+	/* Round gso_size down to an even # of mtus. */
-+	segs_per_gso = gso_size - rpc->hsk->ip_header_length -
-+			sizeof(struct homa_data_hdr) +
-+			sizeof(struct homa_seg_hdr);
-+	do_div(segs_per_gso, max_seg_data +
-+			sizeof(struct homa_seg_hdr));
-+	if (segs_per_gso == 0)
-+		segs_per_gso = 1;
-+	max_gso_data = segs_per_gso * max_seg_data;
-+
-+	overlap_xmit = rpc->msgout.length > 2 * max_gso_data;
-+	homa_skb_stash_pages(rpc->hsk->homa, rpc->msgout.length);
-+
-+	/* Each iteration of the loop below creates one GSO packet. */
-+	last_link = &rpc->msgout.packets;
-+	for (bytes_left = rpc->msgout.length; bytes_left > 0; ) {
-+		int skb_data_bytes, offset;
-+		struct sk_buff *skb;
-+
-+		homa_rpc_unlock(rpc);
-+		skb_data_bytes = max_gso_data;
-+		offset = rpc->msgout.length - bytes_left;
-+		if (skb_data_bytes > bytes_left)
-+			skb_data_bytes = bytes_left;
-+		skb = homa_tx_data_pkt_alloc(rpc, iter, offset, skb_data_bytes,
-+					     max_seg_data);
-+		if (IS_ERR(skb)) {
-+			err = PTR_ERR(skb);
-+			homa_rpc_lock(rpc);
-+			goto error;
-+		}
-+		bytes_left -= skb_data_bytes;
-+
-+		homa_rpc_lock(rpc);
-+		if (rpc->state == RPC_DEAD) {
-+			/* RPC was freed while we were copying. */
-+			err = -EINVAL;
-+			homa_skb_free_tx(rpc->hsk->homa, skb);
-+			goto error;
-+		}
-+		*last_link = skb;
-+		last_link = &(homa_get_skb_info(skb)->next_skb);
-+		*last_link = NULL;
-+		rpc->msgout.num_skbs++;
-+		rpc->msgout.skb_memory += skb->truesize;
-+		rpc->msgout.copied_from_user = rpc->msgout.length - bytes_left;
-+		if (overlap_xmit && list_empty(&rpc->throttled_links) &&
-+		    xmit)
-+			homa_pacer_manage_rpc(rpc);
-+	}
-+	refcount_add(rpc->msgout.skb_memory, &rpc->hsk->sock.sk_wmem_alloc);
-+	homa_rpc_put(rpc);
-+	if (!overlap_xmit && xmit)
-+		homa_xmit_data(rpc, false);
++	memset(hnet, 0, sizeof(*hnet));
++	hnet->net = net;
++	hnet->homa = homa;
++	hnet->prev_default_port = HOMA_MIN_DEFAULT_PORT - 1;
 +	return 0;
-+
-+error:
-+	refcount_add(rpc->msgout.skb_memory, &rpc->hsk->sock.sk_wmem_alloc);
-+	homa_rpc_put(rpc);
-+	return err;
 +}
 +
 +/**
-+ * homa_xmit_control() - Send a control packet to the other end of an RPC.
-+ * @type:      Packet type, such as DATA.
-+ * @contents:  Address of buffer containing the contents of the packet.
-+ *             Only information after the common header must be valid;
-+ *             the common header will be filled in by this function.
-+ * @length:    Length of @contents (including the common header).
-+ * @rpc:       The packet will go to the socket that handles the other end
-+ *             of this RPC. Addressing info for the packet, including all of
-+ *             the fields of homa_common_hdr except type, will be set from this.
-+ *             Caller must hold either the lock or a reference.
-+ *
-+ * Return:     Either zero (for success), or a negative errno value if there
-+ *             was a problem.
++ * homa_net_destroy() - Release any resources associated with a homa_net.
++ * @hnet:    Object to destroy; must not be used again after this function
++ *           returns.
 + */
-+int homa_xmit_control(enum homa_packet_type type, void *contents,
-+		      size_t length, struct homa_rpc *rpc)
++void homa_net_destroy(struct homa_net *hnet)
 +{
-+	struct homa_common_hdr *h = contents;
-+
-+	h->type = type;
-+	h->sport = htons(rpc->hsk->port);
-+	h->dport = htons(rpc->dport);
-+	h->sender_id = cpu_to_be64(rpc->id);
-+	return __homa_xmit_control(contents, length, rpc->peer, rpc->hsk);
++	homa_socktab_destroy(hnet->homa->socktab, hnet);
++	homa_peer_free_net(hnet);
 +}
 +
 +/**
-+ * __homa_xmit_control() - Lower-level version of homa_xmit_control: sends
-+ * a control packet.
-+ * @contents:  Address of buffer containing the contents of the packet.
-+ *             The caller must have filled in all of the information,
-+ *             including the common header.
-+ * @length:    Length of @contents.
-+ * @peer:      Destination to which the packet will be sent.
-+ * @hsk:       Socket via which the packet will be sent.
-+ *
-+ * Return:     Either zero (for success), or a negative errno value if there
-+ *             was a problem.
++ * homa_spin() - Delay (without sleeping) for a given time interval.
++ * @ns:   How long to delay (in nanoseconds)
 + */
-+int __homa_xmit_control(void *contents, size_t length, struct homa_peer *peer,
-+			struct homa_sock *hsk)
++void homa_spin(int ns)
 +{
-+	struct homa_common_hdr *h;
-+	struct sk_buff *skb;
-+	int extra_bytes;
-+	int result;
++	u64 end;
 +
-+	skb = homa_skb_alloc_tx(HOMA_MAX_HEADER);
-+	if (unlikely(!skb))
-+		return -ENOBUFS;
-+	skb_dst_set(skb, homa_get_dst(peer, hsk));
-+
-+	h = skb_put(skb, length);
-+	memcpy(h, contents, length);
-+	extra_bytes = HOMA_MIN_PKT_LENGTH - length;
-+	if (extra_bytes > 0)
-+		memset(skb_put(skb, extra_bytes), 0, extra_bytes);
-+	skb->ooo_okay = 1;
-+	skb_get(skb);
-+	if (hsk->inet.sk.sk_family == AF_INET6)
-+		result = ip6_xmit(&hsk->inet.sk, skb, &peer->flow.u.ip6, 0,
-+				  NULL, 0, 0);
-+	else
-+		result = ip_queue_xmit(&hsk->inet.sk, skb, &peer->flow);
-+	if (unlikely(result != 0)) {
-+		/* It appears that ip*_xmit frees skbuffs after
-+		 * errors; the following code is to raise an alert if
-+		 * this isn't actually the case. The extra skb_get above
-+		 * and kfree_skb call below are needed to do the check
-+		 * accurately (otherwise the buffer could be freed and
-+		 * its memory used for some other purpose, resulting in
-+		 * a bogus "reference count").
-+		 */
-+		if (refcount_read(&skb->users) > 1) {
-+			if (hsk->inet.sk.sk_family == AF_INET6)
-+				pr_notice("ip6_xmit didn't free Homa control packet (type %d) after error %d\n",
-+					  h->type, result);
-+			else
-+				pr_notice("ip_queue_xmit didn't free Homa control packet (type %d) after error %d\n",
-+					  h->type, result);
-+		}
-+	}
-+	kfree_skb(skb);
-+	return result;
-+}
-+
-+/**
-+ * homa_xmit_unknown() - Send an RPC_UNKNOWN packet to a peer.
-+ * @skb:         Buffer containing an incoming packet; identifies the peer to
-+ *               which the RPC_UNKNOWN packet should be sent.
-+ * @hsk:         Socket that should be used to send the RPC_UNKNOWN packet.
-+ */
-+void homa_xmit_unknown(struct sk_buff *skb, struct homa_sock *hsk)
-+{
-+	struct homa_common_hdr *h = (struct homa_common_hdr *)skb->data;
-+	struct in6_addr saddr = skb_canonical_ipv6_saddr(skb);
-+	struct homa_rpc_unknown_hdr unknown;
-+	struct homa_peer *peer;
-+
-+	unknown.common.sport = h->dport;
-+	unknown.common.dport = h->sport;
-+	unknown.common.type = RPC_UNKNOWN;
-+	unknown.common.sender_id = cpu_to_be64(homa_local_id(h->sender_id));
-+	peer = homa_peer_get(hsk, &saddr);
-+	if (!IS_ERR(peer))
-+		__homa_xmit_control(&unknown, sizeof(unknown), peer, hsk);
-+	homa_peer_release(peer);
-+}
-+
-+/**
-+ * homa_xmit_data() - If an RPC has outbound data packets that are permitted
-+ * to be transmitted according to the scheduling mechanism, arrange for
-+ * them to be sent (some may be sent immediately; others may be sent
-+ * later by the pacer thread).
-+ * @rpc:       RPC to check for transmittable packets. Must be locked by
-+ *             caller. Note: this function will release the RPC lock while
-+ *             passing packets through the RPC stack, then reacquire it
-+ *             before returning. It is possible that the RPC gets freed
-+ *             when the lock isn't held, in which case the state will
-+ *             be RPC_DEAD on return.
-+ * @force:     True means send at least one packet, even if the NIC queue
-+ *             is too long. False means that zero packets may be sent, if
-+ *             the NIC queue is sufficiently long.
-+ */
-+void homa_xmit_data(struct homa_rpc *rpc, bool force)
-+	__must_hold(rpc->bucket->lock)
-+{
-+	struct homa *homa = rpc->hsk->homa;
-+
-+	homa_rpc_hold(rpc);
-+	while (*rpc->msgout.next_xmit) {
-+		struct sk_buff *skb = *rpc->msgout.next_xmit;
-+
-+		if ((rpc->msgout.length - rpc->msgout.next_xmit_offset)
-+				>= homa->pacer->throttle_min_bytes) {
-+			if (!homa_pacer_check_nic_q(homa->pacer, skb, force)) {
-+				homa_pacer_manage_rpc(rpc);
-+				break;
-+			}
-+		}
-+
-+		rpc->msgout.next_xmit = &(homa_get_skb_info(skb)->next_skb);
-+		rpc->msgout.next_xmit_offset +=
-+				homa_get_skb_info(skb)->data_bytes;
-+
-+		homa_rpc_hold(rpc);
-+		homa_rpc_unlock(rpc);
-+		skb_get(skb);
-+		__homa_xmit_data(skb, rpc);
-+		force = false;
-+		homa_rpc_lock(rpc);
-+		homa_rpc_put(rpc);
-+		if (rpc->state == RPC_DEAD)
-+			break;
-+	}
-+	homa_rpc_put(rpc);
-+}
-+
-+/**
-+ * __homa_xmit_data() - Handles packet transmission stuff that is common
-+ * to homa_xmit_data and homa_resend_data.
-+ * @skb:      Packet to be sent. The packet will be freed after transmission
-+ *            (and also if errors prevented transmission).
-+ * @rpc:      Information about the RPC that the packet belongs to.
-+ */
-+void __homa_xmit_data(struct sk_buff *skb, struct homa_rpc *rpc)
-+{
-+	skb_dst_set(skb, homa_get_dst(rpc->peer, rpc->hsk));
-+
-+	skb->ooo_okay = 1;
-+	skb->ip_summed = CHECKSUM_PARTIAL;
-+	skb->csum_start = skb_transport_header(skb) - skb->head;
-+	skb->csum_offset = offsetof(struct homa_common_hdr, checksum);
-+	if (rpc->hsk->inet.sk.sk_family == AF_INET6)
-+		ip6_xmit(&rpc->hsk->inet.sk, skb, &rpc->peer->flow.u.ip6,
-+			 0, NULL, 0, 0);
-+	else
-+		ip_queue_xmit(&rpc->hsk->inet.sk, skb, &rpc->peer->flow);
-+}
-+
-+/**
-+ * homa_resend_data() - This function is invoked as part of handling RESEND
-+ * requests. It retransmits the packet(s) containing a given range of bytes
-+ * from a message.
-+ * @rpc:      RPC for which data should be resent.
-+ * @start:    Offset within @rpc->msgout of the first byte to retransmit.
-+ * @end:      Offset within @rpc->msgout of the byte just after the last one
-+ *            to retransmit.
-+ */
-+void homa_resend_data(struct homa_rpc *rpc, int start, int end)
-+	__must_hold(rpc->bucket->lock)
-+{
-+	struct homa_skb_info *homa_info;
-+	struct sk_buff *skb;
-+
-+	if (end <= start)
-+		return;
-+
-+	/* Each iteration of this loop checks one packet in the message
-+	 * to see if it contains segments that need to be retransmitted.
-+	 */
-+	for (skb = rpc->msgout.packets; skb; skb = homa_info->next_skb) {
-+		int seg_offset, offset, seg_length, data_left;
-+		struct homa_data_hdr *h;
-+
-+		homa_info = homa_get_skb_info(skb);
-+		offset = homa_info->offset;
-+		if (offset >= end)
-+			break;
-+		if (start >= (offset + homa_info->data_bytes))
-+			continue;
-+
-+		offset = homa_info->offset;
-+		seg_offset = sizeof(struct homa_data_hdr);
-+		data_left = homa_info->data_bytes;
-+		if (skb_shinfo(skb)->gso_segs <= 1) {
-+			seg_length = data_left;
-+		} else {
-+			seg_length = homa_info->seg_length;
-+			h = (struct homa_data_hdr *)skb_transport_header(skb);
-+		}
-+		for ( ; data_left > 0; data_left -= seg_length,
-+		     offset += seg_length,
-+		     seg_offset += skb_shinfo(skb)->gso_size) {
-+			struct homa_skb_info *new_homa_info;
-+			struct sk_buff *new_skb;
-+			int err;
-+
-+			if (seg_length > data_left)
-+				seg_length = data_left;
-+
-+			if (end <= offset)
-+				goto resend_done;
-+			if ((offset + seg_length) <= start)
-+				continue;
-+
-+			/* This segment must be retransmitted. */
-+			new_skb = homa_skb_alloc_tx(sizeof(struct homa_data_hdr)
-+					+ seg_length);
-+			if (unlikely(!new_skb))
-+				goto resend_done;
-+			h = __skb_put_data(new_skb, skb_transport_header(skb),
-+					   sizeof(struct homa_data_hdr));
-+			h->common.sequence = htonl(offset);
-+			h->seg.offset = htonl(offset);
-+			h->retransmit = 1;
-+			err = homa_skb_append_from_skb(rpc->hsk->homa, new_skb,
-+						       skb, seg_offset,
-+						       seg_length);
-+			if (err != 0) {
-+				pr_err("%s got error %d from homa_skb_append_from_skb\n",
-+				       __func__, err);
-+				kfree_skb(new_skb);
-+				goto resend_done;
-+			}
-+
-+			new_homa_info = homa_get_skb_info(new_skb);
-+			new_homa_info->wire_bytes = rpc->hsk->ip_header_length
-+					+ sizeof(struct homa_data_hdr)
-+					+ seg_length + HOMA_ETH_OVERHEAD;
-+			new_homa_info->data_bytes = seg_length;
-+			new_homa_info->seg_length = seg_length;
-+			new_homa_info->offset = offset;
-+			homa_pacer_check_nic_q(rpc->hsk->homa->pacer, new_skb,
-+					       true);
-+			__homa_xmit_data(new_skb, rpc);
-+		}
-+	}
-+
-+resend_done:
-+	return;
++	end = homa_clock() + homa_ns_to_cycles(ns);
++	while (homa_clock() < end)
++		/* Empty loop body.*/
++		;
 +}
 -- 
 2.43.0
