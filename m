@@ -1,184 +1,252 @@
-Return-Path: <netdev+bounces-203928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC8E7AF81EC
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 22:27:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 891D6AF8201
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 22:36:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E56FB17F519
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 20:27:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58B953B17E7
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 20:36:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A30E2BCF73;
-	Thu,  3 Jul 2025 20:27:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3B1F2BD593;
+	Thu,  3 Jul 2025 20:36:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dGa5c45G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aUnuMd3l"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2042.outbound.protection.outlook.com [40.107.243.42])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01BA3225A59;
-	Thu,  3 Jul 2025 20:27:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751574436; cv=fail; b=p04at6OLwznhYV85ou+sV9W6TGEhyHA3CD2ImUkZmhMGMzpEC/J720G0ORaw2+ezn59SxL1iGMyv82DLbecfuBJyI/9PZetHW/jFo2CI4XwQq1nkdfo4uwPgWmzS50+PM0q8dPMUsy6zXLAF2LYBIqaOFdvTGI5ODn81sKN2Qhc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751574436; c=relaxed/simple;
-	bh=rJq4WpJ12U+C4JjF8argAg+kph2ZFxiEobIFmmWx7Rs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VF9/S392s6rnce5hZ2t/PcXcNU2mWUneemwt9noHI1P1gMfXS8qP7Mmhn9bThuibUHHZQgf6NgrJQifUFRr6gBrlkyptAeYKQZjHZPl1OWRtZWp+WBlA7BMtF0AVph5zuzD/CbTS25ax8HoPaBtJgnreuoXlcvGsbeBCRaH8Ws0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dGa5c45G; arc=fail smtp.client-ip=40.107.243.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jl7L7r7gFf9l6l4ZEHIGsmSywsEFlTnagwjvIIs5+a5jtPYNOkqKIIMFjvfGMPo8DN2RSQOK9z6s7abEhhZeUqhm8+nYhxSQFz9606xg24g4f4X0z2tT6nkv2bNTxRD2sNCW79DCZR0t5NnMNi0gLBajfku4poIP0RwwhQzPqxFnR06ZOEljLvp2ayH2G6GLWVaA2PZl4L9IlHd34tBuZt4V+V58N7zaY5p0aKlg52T4bESIQTDG7f9+YUOtrpvXqOy28h0lOBkCZOaGC0GzQOyLNvJSI5OqAxlrRWvQSD4xn9hUa0fVfmRae0inZEKOWuBk6h6OEV1UEBXQodQBGQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Cb9ZdrCCS/wDONGcd4lwL74BGmx54U4Uw/NAMEFWZto=;
- b=NRMl8WEpnr7dJefo00chrKWrgn2RSGIBQam4q8k6m+nI4TfIRLtUQqY365S+JJFxmTKx0SbVVTfM3zb91tIa5XtbGWcPyQ2rCLjQvB79ELmyu9Lp1f8XcCT+tuF3jA+To029bJ5Hxi9syB6FVaPQpM0Q1QGliyHvHny0S/XoiHgv3hcgiYudVpSC4cvGWKpo1rYoNNiIeLXyH4D4ygr6y/26dHzaniZ86uWC0RhIKdNhb/kco48LKbB1maAWp5iqP0OHQkowczCVSriCKK464vGDOIRxzvHeaNFXuv9yoXNMloaW0t4wqwE9d2dbuZnkdJqTmDNuNKUAOr53Xb93vg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Cb9ZdrCCS/wDONGcd4lwL74BGmx54U4Uw/NAMEFWZto=;
- b=dGa5c45Gdl+s1oHzkE+yrrG3ZRUbz11bJyQKm3Aq+vt2Laq5pONw+WTIx/ZyOi9z/mnM6EPd4VDk3g8gbTb38Rqp0tNhzgFBdLDhVPYXU54Dr2tQ/I3vs7o6xRdxdFoCFYUCKeNuEV4tZIu3qIxQlFX0MlBTk4PrzADpg46T0yOCY9fw5HgUQEQVb6FGX0+1QiLes+gQ4dwsGWFO+bpmweFPGc0H+ID4Hj/zo53f+DxohYhVdDoQILtsF3insuWpy/ITqBx++rRhJHHp1QnIH5yjXj9w1YDyEAFknaDFF9aw2h6gUEkJfA9cfd6UomixoYA423Ia+tAF71SttoKYUQ==
-Received: from BY1P220CA0013.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:59d::17)
- by DM6PR12MB4172.namprd12.prod.outlook.com (2603:10b6:5:212::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.25; Thu, 3 Jul
- 2025 20:27:11 +0000
-Received: from CO1PEPF000044F2.namprd05.prod.outlook.com
- (2603:10b6:a03:59d:cafe::34) by BY1P220CA0013.outlook.office365.com
- (2603:10b6:a03:59d::17) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8901.22 via Frontend Transport; Thu,
- 3 Jul 2025 20:27:11 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CO1PEPF000044F2.mail.protection.outlook.com (10.167.241.72) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8901.15 via Frontend Transport; Thu, 3 Jul 2025 20:27:10 +0000
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 3 Jul 2025
- 13:26:54 -0700
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by rnnvmail203.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 3 Jul
- 2025 13:26:54 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Thu, 3 Jul
- 2025 13:26:51 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>
-CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, <netdev@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [pull-request] mlx5-next updates 2025-07-03
-Date: Thu, 3 Jul 2025 23:26:25 +0300
-Message-ID: <1751574385-24672-1-git-send-email-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.8.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB2325A333;
+	Thu,  3 Jul 2025 20:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751574999; cv=none; b=nh7JWb7F08oAm0z+fR2U+L2ON9DV3v/EVpKZ9iTe2kocaklpJ0ZxBwkLTkpIOdEPXU97krjvveGvnEtRasu1rkqbSfs8QQstg3rgvGXH8as+FhmhJyKeVEf3L4qX3uswW85/ze+pLPT8P0b0ckfseX/HrsOkfGmB1Ef3EV3F1aw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751574999; c=relaxed/simple;
+	bh=2saPPEn9425FFhvGNMi4caxWoimFmbNxhrNrgWcW1xo=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=Ss+AVcWIbD8qRQ98ZUqYkZytm1EQL5vL5u9B0h0/sy88zX6MElKoraWLhMk9bb7/7qCiCCDev6PqCupntVMBotT7NwugcSrVgn43HoBGJ7TwIbYzH5JGHjFv096UcNlOxfVvy4hFrTx1SSltKDbwmW2B+UUaNz/QfFNVGqGWYEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aUnuMd3l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 148E8C4CEE3;
+	Thu,  3 Jul 2025 20:36:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751574999;
+	bh=2saPPEn9425FFhvGNMi4caxWoimFmbNxhrNrgWcW1xo=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=aUnuMd3lAzNVdHKmsSOkvyHqWUVDyN6+5VbON6S2ighNhr4Tqjp9O3PhBDDj2sMad
+	 nqxCBeHK5NzhhRVBPjYzNndcgZ/kccpdZAdcJWBV0o9saMIsKJAWtx1ZkxONmMjsdr
+	 Udb4YVLk7WBZhm6YqdnYo3NrMhiTwycvAl2TEYwhBHH1wcp24c1oCYgr5FJhsvYWLt
+	 1A7y65+nZaib48GBOEWOV35upeNutd7vyU0IEd94P3uJ8clcVdtjcPpjKfd75HpyQw
+	 ZTiOSvUP4VLDscuViykR0Ij4TSTNCChDAd0OR28SQwH0lJd3J8F6FFoacf3Y1B8Imb
+	 NEJPgnffMTCAQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044F2:EE_|DM6PR12MB4172:EE_
-X-MS-Office365-Filtering-Correlation-Id: cc12e4db-7c47-40ec-5b15-08ddba6ffd51
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|82310400026|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ph6Q1STFXJF1Bk90DlbVh6v9Qb6t6gb4IXwc+lc+TeoRP5j+1xA9gTDQ069i?=
- =?us-ascii?Q?rjR5UTeg7UlffknhuyZ/PPgsSKh0h9lF3cFVXfWivAr/Yuzooo05yHQQGzmX?=
- =?us-ascii?Q?kQ9YXNxgKwY+Klqad97Mwaua1xyiijDq/g3t5/W8yIAVI2hiz2q17j73owV3?=
- =?us-ascii?Q?SSa7j3J0Hvz3Cv9FALn+jSCAPwX2z7DAfD6eJMEDEAXJC81tveJ+cEIimWbe?=
- =?us-ascii?Q?LKQsaDDqEwhNVFpVNBr3ue6kH8YLxcpmQTkUM2CoqzPPZqtsOszA0qMhH35v?=
- =?us-ascii?Q?YKDcl+hOIY+rBsgkSrRc8Aob8+uxRJHAZJL3/i7YNgAPkgG7s+M4smGistGa?=
- =?us-ascii?Q?GI1C7UaBwChOFtsPLOptAkoGascHpZW/kdeI21VzHClprvTo/fsIzOmoQ7H/?=
- =?us-ascii?Q?fMcjwmljpP8fdoEy+LD5AhQIhtc+hc1arOvfaQeL9E6GN9kjdd2A0CjQZqnT?=
- =?us-ascii?Q?+A9x0MDYxsrJBU8kuJOn7HPdondqFHO2RDdz33HdIwuY3OP00nHHIlK3soFP?=
- =?us-ascii?Q?r4F9/g+2vLPTW0VjWKkTowqY/iYLzChsz8vwqKvtpglBHXBmmnNG4SQrlU5B?=
- =?us-ascii?Q?YyQyz8J6YHiR6VQQwoTg2ySqWP7wyyyIiHybrnGpLMnbUK4wuq5PptaNmC9p?=
- =?us-ascii?Q?GXBpixWMNOULCWQLfbWMpdZiismn+PoGPl5kyV4AGCtLEbei1LGC3S3Z7dCd?=
- =?us-ascii?Q?5nvXo5PIhy94g/zfMTV7d9p+faRrBG2fnxQFjTU/oPI86ooU7+vksNdq19UH?=
- =?us-ascii?Q?DSkhhkXVKInTKuExYfhQwkCGoqRBcVZH5U2xOeEXQY9EJFJotIQ8A6Z5bY+7?=
- =?us-ascii?Q?MPlFgixzemEgExs8PV9ZAuNRYg7m3vh3nOe6uCWCT69WBNbmFfDgFerdrV6m?=
- =?us-ascii?Q?nP7xFyQRm6DSmuLCFVGSBwNremYBu0CC1Ms3mArpTcFGuvCIJTvl29EeJOwM?=
- =?us-ascii?Q?mCmTLzi8Kl8GkGHFKaVjXWIMDWKVGAF3la2Dh+0WThzPUgPcr8tjnl6svd19?=
- =?us-ascii?Q?4sxCnKdrnaJR5guCs0fpC6d/Db24XlPjZAG47hHWQTTJsL4Puqrofkv5Kbra?=
- =?us-ascii?Q?R1MJKJBfFJ5rvpMkBKV3Df+kCltd24Ie4pIl8YmDe4yPlQU1rAeyRDtXI7kN?=
- =?us-ascii?Q?gkRFJaMh+vlKjQgwXfIrzUn545eeZYBDvErFrqQFd2icgP7YWRfAaNr4B1gi?=
- =?us-ascii?Q?SjA9kDAIOt9wzC077rTe7GPOdx54YCbeaDZfuQsmfxHwHiG1qdQlRdSMNlj5?=
- =?us-ascii?Q?drICs4yA4E96jvQ7IkpVE0ozbEbmL3zhz19MmIT1KtJAUAD2m+r+RfubrzX0?=
- =?us-ascii?Q?h5TKeBqf425UIF8qS2W82g364KHIv+gRQbpuhHmR7evEPIpgI22DIFUXXHkd?=
- =?us-ascii?Q?w0hhalzGE9C/4W4qbyB2F5LN7SO0pOjenH4j4I4n/kMbpsfEwjNexgaW4npJ?=
- =?us-ascii?Q?c/ibhKwl+exjyit/TzXqbCk8WpcIvBKI0WAVDKqExsUNyrOyTzkE+gr/Eivu?=
- =?us-ascii?Q?lyqXoR6+09Wu68d3JACSzaRajVFx+gvad/92?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(82310400026)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2025 20:27:10.9632
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: cc12e4db-7c47-40ec-5b15-08ddba6ffd51
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044F2.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4172
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 03 Jul 2025 22:36:26 +0200
+Message-Id: <DB2PIGAQHCJR.3BF8ZHECYH3KB@kernel.org>
+Cc: "Michal Rostecki" <vadorovsky@protonmail.com>, "Miguel Ojeda"
+ <ojeda@kernel.org>, "Alex Gaynor" <alex.gaynor@gmail.com>, "Boqun Feng"
+ <boqun.feng@gmail.com>, "Gary Guo" <gary@garyguo.net>,
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Andreas
+ Hindborg" <a.hindborg@kernel.org>, "Alice Ryhl" <aliceryhl@google.com>,
+ "Trevor Gross" <tmgross@umich.edu>, "Brendan Higgins"
+ <brendan.higgins@linux.dev>, "David Gow" <davidgow@google.com>, "Rae Moar"
+ <rmoar@google.com>, "Danilo Krummrich" <dakr@kernel.org>, "Maarten
+ Lankhorst" <maarten.lankhorst@linux.intel.com>, "Maxime Ripard"
+ <mripard@kernel.org>, "Thomas Zimmermann" <tzimmermann@suse.de>, "David
+ Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "Greg
+ Kroah-Hartman" <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, "Luis Chamberlain" <mcgrof@kernel.org>, "Russ Weight"
+ <russ.weight@linux.dev>, "FUJITA Tomonori" <fujita.tomonori@gmail.com>,
+ "Rob Herring" <robh@kernel.org>, "Saravana Kannan" <saravanak@google.com>,
+ "Peter Zijlstra" <peterz@infradead.org>, "Ingo Molnar" <mingo@redhat.com>,
+ "Will Deacon" <will@kernel.org>, "Waiman Long" <longman@redhat.com>,
+ "Nathan Chancellor" <nathan@kernel.org>, "Nick Desaulniers"
+ <nick.desaulniers+lkml@gmail.com>, "Bill Wendling" <morbo@google.com>,
+ "Justin Stitt" <justinstitt@google.com>, "Andrew Lunn" <andrew@lunn.ch>,
+ "Heiner Kallweit" <hkallweit1@gmail.com>, "Russell King"
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Bjorn Helgaas" <bhelgaas@google.com>, "Arnd
+ Bergmann" <arnd@arndb.de>, "Jens Axboe" <axboe@kernel.dk>,
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, "Dave
+ Ertman" <david.m.ertman@intel.com>, "Ira Weiny" <ira.weiny@intel.com>,
+ "Leon Romanovsky" <leon@kernel.org>, "Breno Leitao" <leitao@debian.org>,
+ "Viresh Kumar" <viresh.kumar@linaro.org>, "Michael Turquette"
+ <mturquette@baylibre.com>, "Stephen Boyd" <sboyd@kernel.org>,
+ <rust-for-linux@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-kselftest@vger.kernel.org>, <kunit-dev@googlegroups.com>,
+ <dri-devel@lists.freedesktop.org>, <netdev@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <llvm@lists.linux.dev>,
+ <linux-pci@vger.kernel.org>, <nouveau@lists.freedesktop.org>,
+ <linux-block@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+ <linux-clk@vger.kernel.org>
+Subject: Re: [PATCH v13 2/5] rust: support formatting of foreign types
+From: "Benno Lossin" <lossin@kernel.org>
+To: "Tamir Duberstein" <tamird@gmail.com>
+X-Mailer: aerc 0.20.1
+References: <20250701-cstr-core-v13-0-29f7d3eb97a6@gmail.com>
+ <20250701-cstr-core-v13-2-29f7d3eb97a6@gmail.com>
+ <DB2BDSN1JH51.14ZZPETJORBC6@kernel.org>
+ <CAJ-ks9nC=AyBPXRY3nJ0NuZvjFskzMcOkVNrBEfXD2hZ5uRntQ@mail.gmail.com>
+ <DB2IJ9HBIM0W.3N0JVGKX558QI@kernel.org>
+ <CAJ-ks9nF5+m+_bn0Pzi9yU0pw0TyN7Fs4x--mQ4ygyHz4A6hzg@mail.gmail.com>
+In-Reply-To: <CAJ-ks9nF5+m+_bn0Pzi9yU0pw0TyN7Fs4x--mQ4ygyHz4A6hzg@mail.gmail.com>
 
-Hi,
+On Thu Jul 3, 2025 at 8:55 PM CEST, Tamir Duberstein wrote:
+> On Thu, Jul 3, 2025 at 11:08=E2=80=AFAM Benno Lossin <lossin@kernel.org> =
+wrote:
+>> On Thu Jul 3, 2025 at 3:55 PM CEST, Tamir Duberstein wrote:
+>> > On Thu, Jul 3, 2025 at 5:32=E2=80=AFAM Benno Lossin <lossin@kernel.org=
+> wrote:
+>> >> On Tue Jul 1, 2025 at 6:49 PM CEST, Tamir Duberstein wrote:
+>> >> > Introduce a `fmt!` macro which wraps all arguments in
+>> >> > `kernel::fmt::Adapter` and a `kernel::fmt::Display` trait. This ena=
+bles
+>> >> > formatting of foreign types (like `core::ffi::CStr`) that do not
+>> >> > implement `core::fmt::Display` due to concerns around lossy convers=
+ions which
+>> >> > do not apply in the kernel.
+>> >> >
+>> >> > Replace all direct calls to `format_args!` with `fmt!`.
+>> >> >
+>> >> > Replace all implementations of `core::fmt::Display` with implementa=
+tions
+>> >> > of `kernel::fmt::Display`.
+>> >> >
+>> >> > Suggested-by: Alice Ryhl <aliceryhl@google.com>
+>> >> > Link: https://rust-for-linux.zulipchat.com/#narrow/channel/288089-G=
+eneral/topic/Custom.20formatting/with/516476467
+>> >> > Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+>> >> > Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+>> >> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+>> >> > ---
+>> >> >  drivers/block/rnull.rs       |  2 +-
+>> >> >  drivers/gpu/nova-core/gpu.rs |  4 +-
+>> >> >  rust/kernel/block/mq.rs      |  2 +-
+>> >> >  rust/kernel/device.rs        |  2 +-
+>> >> >  rust/kernel/fmt.rs           | 89 ++++++++++++++++++++++++++++++++=
++++++++
+>> >> >  rust/kernel/kunit.rs         |  6 +--
+>> >> >  rust/kernel/lib.rs           |  1 +
+>> >> >  rust/kernel/prelude.rs       |  3 +-
+>> >> >  rust/kernel/print.rs         |  4 +-
+>> >> >  rust/kernel/seq_file.rs      |  2 +-
+>> >> >  rust/kernel/str.rs           | 22 ++++------
+>> >> >  rust/macros/fmt.rs           | 99 ++++++++++++++++++++++++++++++++=
+++++++++++++
+>> >> >  rust/macros/lib.rs           | 19 +++++++++
+>> >> >  rust/macros/quote.rs         |  7 ++++
+>> >> >  scripts/rustdoc_test_gen.rs  |  2 +-
+>> >> >  15 files changed, 236 insertions(+), 28 deletions(-)
+>> >>
+>> >> This would be a lot easier to review if he proc-macro and the call
+>> >> replacement were different patches.
+>> >>
+>> >> Also the `kernel/fmt.rs` file should be a different commit.
+>> >
+>> > Can you help me understand why? The changes you ask to be separated
+>> > would all be in different files, so why would separate commits make it
+>> > easier to review?
+>>
+>> It takes less time to go through the entire patch and give a RB. I can
+>> take smaller time chunks and don't have to get back into the entire
+>> context of the patch when I don't have 30-60min available.
+>
+> Ah, I see what you mean. Yeah, the requirement to RB the entire patch
+> does mean there's a benefit to smaller patches.
+>
+>> In this patch the biggest problem is the rename & addition of new
+>> things, maybe just adding 200 lines in those files could be okay to go
+>> together, see below for more.
+>
+> After implementing your suggestion of re-exporting things from
+> `kernel::fmt` the diffstat is
+>
+> 26 files changed, 253 insertions(+), 51 deletions(-)
+>
+> so I guess I could do all the additions in one patch, but then
+> *everything* else has to go in a single patch together because the
+> formatting macros either want core::fmt::Display or
+> kernel::fmt::Display; they can't work in a halfway state.
 
-The following pull-request contains common mlx5 updates
-for your *net-next* tree.
-Please pull and let me know of any problem.
+I don't understand, can't you just do:
 
-Regards,
-Tariq
+* add `rust/kernel/fmt.rs`,
+* add `rust/macros/fmt.rs`,
+* change all occurrences of `core::fmt` to `kernel::fmt` and
+  `format_args!` to `fmt!`.
 
-----------------------------------------------------------------
+The last one could be split by subsystem, no? Some subsystems might
+interact and thus need simultaneous splitting, but there should be some
+independent ones.
 
-The following changes since commit e04c78d86a9699d136910cfc0bdcf01087e3267e:
+>> > I prefer to keep things in one commit because the changes are highly
+>> > interdependent. The proc macro doesn't make sense without
+>> > kernel/fmt.rs and kernel/fmt.rs is useless without the proc macro.
+>>
+>> I think that `Adapter`, the custom `Display` and their impl blocks
+>> don't need to be in the same commit as the proc-macro. They are related,
+>> but maybe someone is not well-versed in proc-macros and thus doesn't
+>> want to review that part.
+>
+> Sure, I guess I will split them. But as noted above: changing the
+> formatting macros and all the types' trait implementations has to be a
+> "flag day" change.
 
-  Linux 6.16-rc2 (2025-06-15 13:49:41 -0700)
+See above.
 
-are available in the Git repository at:
+>> >> > +impl_fmt_adapter_forward!(Debug, LowerHex, UpperHex, Octal, Binary=
+, Pointer, LowerExp, UpperExp);
+>> >> > +
+>> >> > +/// A copy of [`fmt::Display`] that allows us to implement it for =
+foreign types.
+>> >> > +///
+>> >> > +/// Types should implement this trait rather than [`fmt::Display`]=
+. Together with the [`Adapter`]
+>> >> > +/// type and [`fmt!`] macro, it allows for formatting foreign type=
+s (e.g. types from core) which do
+>> >> > +/// not implement [`fmt::Display`] directly.
+>> >> > +///
+>> >> > +/// [`fmt!`]: crate::prelude::fmt!
+>> >> > +pub trait Display {
+>> >> > +    /// Same as [`fmt::Display::fmt`].
+>> >> > +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result;
+>> >> > +}
+>> >> > +
+>> >> > +impl<T: ?Sized + Display> Display for &T {
+>> >> > +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+>> >> > +        Display::fmt(*self, f)
+>> >> > +    }
+>> >> > +}
+>> >> > +
+>> >> > +impl<T: ?Sized + Display> fmt::Display for Adapter<&T> {
+>> >> > +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+>> >> > +        let Self(t) =3D self;
+>> >> > +        Display::fmt(t, f)
+>> >>
+>> >> Why not `Display::fmt(&self.0, f)`?
+>> >
+>> > I like destructuring because it shows me that there's only one field.
+>> > With `self.0` I don't see that.
+>>
+>> And what is the benefit here?
+>
+> In general the benefit is that the method does not ignore some portion
+> of `Self`. A method that uses `self.0` would not provoke a compiler
+> error in case another field is added, while this form would.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git 02943ac2f6fb
+Yeah, but why would that change happen here? And even if it got another
+field, why would that invalidate the impl of `fn fmt`?
 
-for you to fetch changes up to 02943ac2f6fbba8fc5e57c57e7cbc2d7c67ebf0d:
-
-  net/mlx5: fs, fix RDMA TRANSPORT init cleanup flow (2025-07-02 14:08:18 -0400)
-
-----------------------------------------------------------------
-Dragos Tatulea (2):
-      net/mlx5: Small refactor for general object capabilities
-      net/mlx5: Add IFC bits for PCIe Congestion Event object
-
-Patrisious Haddad (2):
-      net/mlx5: fs, add multiple prios to RDMA TRANSPORT steering domain
-      net/mlx5: fs, fix RDMA TRANSPORT init cleanup flow
-
- drivers/net/ethernet/mellanox/mlx5/core/fs_core.c | 44 ++++++++++++---
- include/linux/mlx5/fs.h                           |  2 +-
- include/linux/mlx5/mlx5_ifc.h                     | 67 +++++++++++++++++++----
- 3 files changed, 93 insertions(+), 20 deletions(-)
+---
+Cheers,
+Benno
 
