@@ -1,305 +1,181 @@
-Return-Path: <netdev+bounces-203670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D99CDAF6BCD
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 09:42:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7914EAF6BD4
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 09:43:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0785F1C4650D
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 07:43:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F64748207C
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 07:43:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B16742980AF;
-	Thu,  3 Jul 2025 07:42:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17E79298994;
+	Thu,  3 Jul 2025 07:43:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="czuYXEUL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CIbbGulE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89F16224AF3;
-	Thu,  3 Jul 2025 07:42:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F26922D78F
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 07:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751528559; cv=none; b=n3ojLzMAlVzJkShS5ZhBIT0JU1fNrEKtMniQogOuzKi8jsiP8d9BGy9Eo3pb1J/K6E/2Nqm6gI16qKoHmwL9al5z2prt/NkEWPh9gk1q99sW9/mzmpaM5+ZsXlOKlGImhtPgHpktCqC9OkNjwMrRV0uOAonHIE6hSRffesA7r4E=
+	t=1751528634; cv=none; b=RgR5/im4IE149qktbR6RKztbqnbaPABDs8klySXlQ46jbl0danDs9C49Ez+2j4OiReCiw5CiKel8kM06TiK34ofQS1Mo8+xiG/WntlQW6w9i45Yu+J3V2b9sQYPn8JZMKaXWjXTAaLU7ck/decl8KdRH/TVjQMxkFnhSPZdm6r4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751528559; c=relaxed/simple;
-	bh=7JguKXSUW49wIt9EBmEjrE1JrwCA0VvHpJRgj+Q4Nc8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I70DbNUaCBxQaCT4ezEzQSQVZLsi4NG2X8EK2BroQelJ8kWsXfh2Jzv8iGJPsDoPAs/OHZrOs5M2rs+m9Cb8VsyOiXsAhXP/LZoc2fLP31TeD1OcaP875PGMiTXOPymtFrggBpOisAMGbDxzJB0xPGlw+0sB0PNh/MBs50/sobY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=czuYXEUL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D75E3C4CEE3;
-	Thu,  3 Jul 2025 07:42:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751528559;
-	bh=7JguKXSUW49wIt9EBmEjrE1JrwCA0VvHpJRgj+Q4Nc8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=czuYXEULKfuh7qBbX2vkVwxQoxFyB8BcEscwi6nvFfCF1HlptgB/3MXusedQNZJz5
-	 Ok2qqUPhYjgS5QhdjyzILt7nZ+RBcv/z5pU5+vADvjo8ZVYdfwROpzBZ+IIrleuNl7
-	 qkNzo73h94wCAvdjWzfx8JFnuaBdMp9ibCOGR3i9vNfLGjiPmJzqoKlvd7QwyswfrS
-	 oB17ek1Y7cizwy/pK+ddZHzWECgZ403XrmUNQHzBQvL/RAa5IjP8cXvV1jDi3tzr2I
-	 /TjdZn1vGmj/ko4YUEpmgHDPczvllohIpA345JZKkPPaKHojureGabC9cP9RnQtB+r
-	 Utn85+3Rjkbdg==
-Date: Thu, 3 Jul 2025 09:42:33 +0200
-From: Christian Brauner <brauner@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Leon Romanovsky <leon@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Lennart Poettering <mzxreary@0pointer.de>, Luca Boccassi <bluca@debian.org>, 
-	David Rheinsberg <david@readahead.eu>, Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH net-next v2 4/6] af_unix: stash pidfs dentry when needed
-Message-ID: <20250703-brenzlig-bibliothek-b65bf4b52609@brauner>
-References: <20250701083922.97928-1-aleksandr.mikhalitsyn@canonical.com>
- <20250701083922.97928-9-aleksandr.mikhalitsyn@canonical.com>
- <CAAVpQUDFzPBJmCeawhaHL5Twjxk8obLZW9UPH0HfD_5BYpjh_w@mail.gmail.com>
+	s=arc-20240116; t=1751528634; c=relaxed/simple;
+	bh=R12TjoQqtaP+OHOg5vELHjQDxeyg7kZReIjNyGXwKnE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=daVtk/KIELqTzXk9I/j5DEREDJqgUR8301WPkI4jGCc8rXI2xrzSy1QGq6cmFZ5PxCrYxCrzqZjv08onkliHOwuWhdMNX/8w8qbABMxCnyT9xXl8l2ioTe3XIKCRfjY2yutvlwe7GxefDGpXX6b1FWQSD++rtk/+w82OuePRuJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CIbbGulE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751528631;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=6EpDYxyy2mrZVYzfWYPjxHIrTItJ7JlFF1ncAGLURGQ=;
+	b=CIbbGulEb0MmFEiSIud+Cp5U3zz3Lj3poqEtPi12v8aAk+vKMoZPXcyE4AOX2xmNZhzS/P
+	1ZBYRhWgvV4fovwnWZTVuH8LL8BxbgHKVz06RqRsCPdoO18SFy2bfu+k2V3I9tIvQ+v2r3
+	KzyEcsKxidq3K7C3e5v5gH6XSUPElSg=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-14-aPIeHyRdPAacQ2UpjGgvAQ-1; Thu, 03 Jul 2025 03:43:49 -0400
+X-MC-Unique: aPIeHyRdPAacQ2UpjGgvAQ-1
+X-Mimecast-MFC-AGG-ID: aPIeHyRdPAacQ2UpjGgvAQ_1751528628
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a5281ba3a4so3552510f8f.0
+        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 00:43:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751528628; x=1752133428;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6EpDYxyy2mrZVYzfWYPjxHIrTItJ7JlFF1ncAGLURGQ=;
+        b=PBfDkitSlB28hkDCUZt4NDuARlCvzQvRxzh2Bbo4uKXf7XxwvxS57dITmKd9z4y6aK
+         d0oByR1/M3GfFjo/TXCSbxu/uEnJLpCVVSHXfhn/8dhU1HjFpgiD72ONmkEf5WiUFPrN
+         bT+HfKGSQ9J+xIgWKZ0lgJCSz5PwtSmiZAxQt7J07O5aUDEkdysbkNh73UBbmcxjMapr
+         GMVj1OBpL2038xHE8gNmCPX/nU5mwLrtMupv3fGCxkzZMWdkBYKFcE30zHecCMQ/sEsM
+         ei6DZVqkfQjIEpSVbe9uHf+faf32EsGcZlRXa/oyh8VaAtVUnXOEW4M1Sgqko1ZYiyI5
+         Ttng==
+X-Gm-Message-State: AOJu0YzMcfhCN3IlA62axA5kCGutOxw6vliZ3h8d8Dr5toztcnJAnBGP
+	obdvYToNy4yINkuuwZ+3If3/5YyUBaGkRVnC++Hf8GkIHkjjEULCEDzxvzVY2HWFjKdw0q96dZM
+	tshO/Au1yXo/K1bPqbUO6pGg3k0L+TeslBunjl/0GfzldiytInkS4HaOA7w==
+X-Gm-Gg: ASbGnctQgaNI5LZVzgk5+y0psGh/mG4OquT0l61hNKt7ALES2xWX3Fs1hvFehP41x9W
+	uLPgwTe3J0IQ9tHl4Y5WR9/K8Tok3FzqrXLX/Ec/xsldYLUEDENP+AOnk7vmq0gicYoc5gOKTLf
+	AYqy7P+FmeSiZEkWgHgCk7Ke+dEuA9+ZKyUMc1Yuj1BkPvxtS+OAmbdunQFomVvZ55sTaGx0W//
+	Sq8p6OXI7mvYJzWODhS81bQrJjhDPKO+ZaEMxPMNQHdtv/wyJN5nRDGDYPkwO9WZDGh/R2uCKyq
+	W7mq7xjqpoh2d/Ok8fuwzgfW0NJ187CoG8NUKSxocTHdagNOilHI5HUL8l6zLg==
+X-Received: by 2002:a05:6000:1a88:b0:3a5:8905:2df9 with SMTP id ffacd0b85a97d-3b32ebd79f0mr1569341f8f.37.1751528628425;
+        Thu, 03 Jul 2025 00:43:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFvFrMwfp7e/fgq6XK2cDp/19q243cAhOekmS354fLqpt9h5aal0IYzzF1RmWfR/wO3yuF5tw==
+X-Received: by 2002:a05:6000:1a88:b0:3a5:8905:2df9 with SMTP id ffacd0b85a97d-3b32ebd79f0mr1569317f8f.37.1751528628045;
+        Thu, 03 Jul 2025 00:43:48 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:e10:ef90:343a:68f:2e91:95c? ([2a01:e0a:e10:ef90:343a:68f:2e91:95c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a892e5f918sm17831437f8f.100.2025.07.03.00.43.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Jul 2025 00:43:47 -0700 (PDT)
+Message-ID: <770fc206-70e4-4c63-b438-153b57144f23@redhat.com>
+Date: Thu, 3 Jul 2025 09:43:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAVpQUDFzPBJmCeawhaHL5Twjxk8obLZW9UPH0HfD_5BYpjh_w@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/3] virtio: Fixes for TX ring sizing and resize error
+ reporting
+To: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, linux-kernel@vger.kernel.org
+References: <20250521092236.661410-1-lvivier@redhat.com>
+ <7974cae6-d4d9-41cc-bc71-ffbc9ce6e593@redhat.com>
+ <20250528031540-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; keydata=
+ xsFNBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
+ WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
+ SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
+ UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
+ Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
+ JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
+ q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
+ RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
+ 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
+ LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABzSNMYXVyZW50IFZp
+ dmllciA8bHZpdmllckByZWRoYXQuY29tPsLBeAQTAQIAIgUCVgVQgAIbAwYLCQgHAwIGFQgC
+ CQoLBBYCAwECHgECF4AACgkQ8ww4vT8vvjwpgg//fSGy0Rs/t8cPFuzoY1cex4limJQfReLr
+ SJXCANg9NOWy/bFK5wunj+h/RCFxIFhZcyXveurkBwYikDPUrBoBRoOJY/BHK0iZo7/WQkur
+ 6H5losVZtrotmKOGnP/lJYZ3H6OWvXzdz8LL5hb3TvGOP68K8Bn8UsIaZJoeiKhaNR0sOJyI
+ YYbgFQPWMHfVwHD/U+/gqRhD7apVysxv5by/pKDln1I5v0cRRH6hd8M8oXgKhF2+rAOL7gvh
+ jEHSSWKUlMjC7YwwjSZmUkL+TQyE18e2XBk85X8Da3FznrLiHZFHQ/NzETYxRjnOzD7/kOVy
+ gKD/o7asyWQVU65mh/ECrtjfhtCBSYmIIVkopoLaVJ/kEbVJQegT2P6NgERC/31kmTF69vn8
+ uQyW11Hk8tyubicByL3/XVBrq4jZdJW3cePNJbTNaT0d/bjMg5zCWHbMErUib2Nellnbg6bc
+ 2HLDe0NLVPuRZhHUHM9hO/JNnHfvgiRQDh6loNOUnm9Iw2YiVgZNnT4soUehMZ7au8PwSl4I
+ KYE4ulJ8RRiydN7fES3IZWmOPlyskp1QMQBD/w16o+lEtY6HSFEzsK3o0vuBRBVp2WKnssVH
+ qeeV01ZHw0bvWKjxVNOksP98eJfWLfV9l9e7s6TaAeySKRRubtJ+21PRuYAxKsaueBfUE7ZT
+ 7zfOwU0EVgUmGQEQALxSQRbl/QOnmssVDxWhHM5TGxl7oLNJms2zmBpcmlrIsn8nNz0rRyxT
+ 460k2niaTwowSRK8KWVDeAW6ZAaWiYjLlTunoKwvF8vP3JyWpBz0diTxL5o+xpvy/Q6YU3BN
+ efdq8Vy3rFsxgW7mMSrI/CxJ667y8ot5DVugeS2NyHfmZlPGE0Nsy7hlebS4liisXOrN3jFz
+ asKyUws3VXek4V65lHwB23BVzsnFMn/bw/rPliqXGcwl8CoJu8dSyrCcd1Ibs0/Inq9S9+t0
+ VmWiQWfQkz4rvEeTQkp/VfgZ6z98JRW7S6l6eophoWs0/ZyRfOm+QVSqRfFZdxdP2PlGeIFM
+ C3fXJgygXJkFPyWkVElr76JTbtSHsGWbt6xUlYHKXWo+xf9WgtLeby3cfSkEchACrxDrQpj+
+ Jt/JFP+q997dybkyZ5IoHWuPkn7uZGBrKIHmBunTco1+cKSuRiSCYpBIXZMHCzPgVDjk4viP
+ brV9NwRkmaOxVvye0vctJeWvJ6KA7NoAURplIGCqkCRwg0MmLrfoZnK/gRqVJ/f6adhU1oo6
+ z4p2/z3PemA0C0ANatgHgBb90cd16AUxpdEQmOCmdNnNJF/3Zt3inzF+NFzHoM5Vwq6rc1JP
+ jfC3oqRLJzqAEHBDjQFlqNR3IFCIAo4SYQRBdAHBCzkM4rWyRhuVABEBAAHCwV8EGAECAAkF
+ AlYFJhkCGwwACgkQ8ww4vT8vvjwg9w//VQrcnVg3TsjEybxDEUBm8dBmnKqcnTBFmxN5FFtI
+ WlEuY8+YMiWRykd8Ln9RJ/98/ghABHz9TN8TRo2b6WimV64FmlVn17Ri6FgFU3xNt9TTEChq
+ AcNg88eYryKsYpFwegGpwUlaUaaGh1m9OrTzcQy+klVfZWaVJ9Nw0keoGRGb8j4XjVpL8+2x
+ OhXKrM1fzzb8JtAuSbuzZSQPDwQEI5CKKxp7zf76J21YeRrEW4WDznPyVcDTa+tz++q2S/Bp
+ P4W98bXCBIuQgs2m+OflERv5c3Ojldp04/S4NEjXEYRWdiCxN7ca5iPml5gLtuvhJMSy36gl
+ U6IW9kn30IWuSoBpTkgV7rLUEhh9Ms82VWW/h2TxL8enfx40PrfbDtWwqRID3WY8jLrjKfTd
+ R3LW8BnUDNkG+c4FzvvGUs8AvuqxxyHbXAfDx9o/jXfPHVRmJVhSmd+hC3mcQ+4iX5bBPBPM
+ oDqSoLt5w9GoQQ6gDVP2ZjTWqwSRMLzNr37rJjZ1pt0DCMMTbiYIUcrhX8eveCJtY7NGWNyx
+ FCRkhxRuGcpwPmRVDwOl39MB3iTsRighiMnijkbLXiKoJ5CDVvX5yicNqYJPKh5MFXN1bvsB
+ kmYiStMRbrD0HoY1kx5/VozBtc70OU0EB8Wrv9hZD+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+In-Reply-To: <20250528031540-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 02, 2025 at 06:53:21PM -0700, Kuniyuki Iwashima wrote:
-> On Tue, Jul 1, 2025 at 1:41 AM Alexander Mikhalitsyn
-> <aleksandr.mikhalitsyn@canonical.com> wrote:
-> >
-> > We need to ensure that pidfs dentry is allocated when we meet any
-> > struct pid for the first time. This will allows us to open pidfd
-> > even after the task it corresponds to is reaped.
-> >
-> > Basically, we need to identify all places where we fill skb/scm_cookie
-> > with struct pid reference for the first time and call pidfs_register_pid().
-> >
-> > Tricky thing here is that we have a few places where this happends
-> > depending on what userspace is doing:
-> > - [__scm_replace_pid()] explicitly sending an SCM_CREDENTIALS message
-> >                         and specified pid in a numeric format
-> > - [unix_maybe_add_creds()] enabled SO_PASSCRED/SO_PASSPIDFD but
-> >                            didn't send SCM_CREDENTIALS explicitly
-> > - [scm_send()] force_creds is true. Netlink case.
-> >
-> > Cc: linux-kernel@vger.kernel.org
-> > Cc: netdev@vger.kernel.org
-> > Cc: "David S. Miller" <davem@davemloft.net>
-> > Cc: Eric Dumazet <edumazet@google.com>
-> > Cc: Jakub Kicinski <kuba@kernel.org>
-> > Cc: Paolo Abeni <pabeni@redhat.com>
-> > Cc: Simon Horman <horms@kernel.org>
-> > Cc: Leon Romanovsky <leon@kernel.org>
-> > Cc: Arnd Bergmann <arnd@arndb.de>
-> > Cc: Christian Brauner <brauner@kernel.org>
-> > Cc: Kuniyuki Iwashima <kuniyu@google.com>
-> > Cc: Lennart Poettering <mzxreary@0pointer.de>
-> > Cc: Luca Boccassi <bluca@debian.org>
-> > Cc: David Rheinsberg <david@readahead.eu>
-> > Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-> > ---
-> > v2:
-> >         - renamed __skb_set_pid() -> unix_set_pid_to_skb() [ as Kuniyuki suggested ]
-> >         - get rid of extra helper (__scm_set_cred()) I've introduced before [ as Kuniyuki suggested ]
-> >         - s/__inline__/inline/ for functions I touched [ as Kuniyuki suggested ]
-> >         - get rid of chunk in unix_destruct_scm() with NULLifying UNIXCB(skb).pid [ as Kuniyuki suggested ]
-> >         - added proper error handling in scm_send() for scm_set_cred() return value [ found by me during rework ]
-> > ---
-> >  include/net/scm.h  | 32 ++++++++++++++++++++++++--------
-> >  net/core/scm.c     |  6 ++++++
-> >  net/unix/af_unix.c | 33 +++++++++++++++++++++++++++++----
-> >  3 files changed, 59 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/include/net/scm.h b/include/net/scm.h
-> > index 84c4707e78a5..597a40779269 100644
-> > --- a/include/net/scm.h
-> > +++ b/include/net/scm.h
-> > @@ -8,6 +8,7 @@
-> >  #include <linux/file.h>
-> >  #include <linux/security.h>
-> >  #include <linux/pid.h>
-> > +#include <linux/pidfs.h>
-> >  #include <linux/nsproxy.h>
-> >  #include <linux/sched/signal.h>
-> >  #include <net/compat.h>
-> > @@ -66,19 +67,28 @@ static __inline__ void unix_get_peersec_dgram(struct socket *sock, struct scm_co
-> >  { }
-> >  #endif /* CONFIG_SECURITY_NETWORK */
-> >
-> > -static __inline__ void scm_set_cred(struct scm_cookie *scm,
-> > -                                   struct pid *pid, kuid_t uid, kgid_t gid)
-> > +static inline int scm_set_cred(struct scm_cookie *scm,
-> > +                              struct pid *pid, bool pidfs_register,
-> > +                              kuid_t uid, kgid_t gid)
-> >  {
-> > -       scm->pid  = get_pid(pid);
-> > +       if (pidfs_register) {
-> > +               int err = pidfs_register_pid(pid);
-> > +               if (err)
-> > +                       return err;
-> > +       }
-> > +
-> > +       scm->pid = get_pid(pid);
-> > +
-> >         scm->creds.pid = pid_vnr(pid);
-> >         scm->creds.uid = uid;
-> >         scm->creds.gid = gid;
-> > +       return 0;
-> >  }
-> >
-> >  static __inline__ void scm_destroy_cred(struct scm_cookie *scm)
-> >  {
-> >         put_pid(scm->pid);
-> > -       scm->pid  = NULL;
-> > +       scm->pid = NULL;
+On 28/05/2025 09:20, Michael S. Tsirkin wrote:
+> On Wed, May 28, 2025 at 08:24:32AM +0200, Paolo Abeni wrote:
+>> On 5/21/25 11:22 AM, Laurent Vivier wrote:
+>>> This patch series contains two fixes and a cleanup for the virtio subsystem.
+>>>
+>>> The first patch fixes an error reporting bug in virtio_ring's
+>>> virtqueue_resize() function. Previously, errors from internal resize
+>>> helpers could be masked if the subsequent re-enabling of the virtqueue
+>>> succeeded. This patch restores the correct error propagation, ensuring that
+>>> callers of virtqueue_resize() are properly informed of underlying resize
+>>> failures.
+>>>
+>>> The second patch does a cleanup of the use of '2+MAX_SKB_FRAGS'
+>>>
+>>> The third patch addresses a reliability issue in virtio_net where the TX
+>>> ring size could be configured too small, potentially leading to
+>>> persistently stopped queues and degraded performance. It enforces a
+>>> minimum TX ring size to ensure there's always enough space for at least one
+>>> maximally-fragmented packet plus an additional slot.
+>>
+>> @Michael: it's not clear to me if you prefer take this series via your
+>> tree or if it should go via net. Please LMK, thanks!
+>>
+>> Paolo
 > 
-> Could you split these double-space changes to another
-> patch to make review easier ?
+> Given 1/3 is in virtio I was going to take it. Just after rc1,
+> though.
 > 
-> 
-> >  }
-> >
-> >  static __inline__ void scm_destroy(struct scm_cookie *scm)
-> > @@ -88,14 +98,20 @@ static __inline__ void scm_destroy(struct scm_cookie *scm)
-> >                 __scm_destroy(scm);
-> >  }
-> >
-> > -static __inline__ int scm_send(struct socket *sock, struct msghdr *msg,
-> > -                              struct scm_cookie *scm, bool forcecreds)
-> > +static inline int scm_send(struct socket *sock, struct msghdr *msg,
-> > +                          struct scm_cookie *scm, bool forcecreds)
-> >  {
-> >         memset(scm, 0, sizeof(*scm));
-> >         scm->creds.uid = INVALID_UID;
-> >         scm->creds.gid = INVALID_GID;
-> > -       if (forcecreds)
-> > -               scm_set_cred(scm, task_tgid(current), current_uid(), current_gid());
-> > +
-> > +       if (forcecreds) {
-> > +               int err = scm_set_cred(scm, task_tgid(current), true,
-> > +                                      current_uid(), current_gid());
-> 
-> Do we need to pass true here ?
-> 
-> Given this series affects scm_pidfd_recv(), we don't need to
-> touch netlink path that is not allowed to call scm_recv_unix() ?
-> 
-> Then, all callers pass false to scm_set_cred() and
-> pidfs_register_pid() there will be unnecessary.
-> 
-> 
-> > +               if (err)
-> > +                       return err;
-> > +       }
-> > +
-> >         unix_get_peersec_dgram(sock, scm);
-> >         if (msg->msg_controllen <= 0)
-> >                 return 0;
-> > diff --git a/net/core/scm.c b/net/core/scm.c
-> > index 68441c024dd8..50dfec6f8a2b 100644
-> > --- a/net/core/scm.c
-> > +++ b/net/core/scm.c
-> > @@ -147,9 +147,15 @@ EXPORT_SYMBOL(__scm_destroy);
-> >
-> >  static inline int __scm_replace_pid(struct scm_cookie *scm, struct pid *pid)
-> >  {
-> > +       int err;
-> > +
-> >         /* drop all previous references */
-> >         scm_destroy_cred(scm);
-> >
-> > +       err = pidfs_register_pid(pid);
-> > +       if (err)
-> > +               return err;
-> > +
-> >         scm->pid = pid;
-> >         scm->creds.pid = pid_vnr(pid);
-> >         return 0;
-> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> > index df2174d9904d..18c677683ddc 100644
-> > --- a/net/unix/af_unix.c
-> > +++ b/net/unix/af_unix.c
-> > @@ -1924,12 +1924,27 @@ static void unix_peek_fds(struct scm_cookie *scm, struct sk_buff *skb)
-> >         scm->fp = scm_fp_dup(UNIXCB(skb).fp);
-> >  }
-> >
-> > +static int unix_set_pid_to_skb(struct sk_buff *skb, struct pid *pid, bool pidfs_register)
-> > +{
-> > +       if (pidfs_register) {
-> > +               int err;
-> > +
-> > +               err = pidfs_register_pid(pid);
-> > +               if (err)
-> > +                       return err;
-> > +       }
-> > +
-> > +       UNIXCB(skb).pid = get_pid(pid);
-> > +       return 0;
-> > +}
-> > +
-> >  static void unix_destruct_scm(struct sk_buff *skb)
-> >  {
-> >         struct scm_cookie scm;
-> >
-> >         memset(&scm, 0, sizeof(scm));
-> > -       scm.pid  = UNIXCB(skb).pid;
-> > +       scm.pid = UNIXCB(skb).pid;
-> > +
-> >         if (UNIXCB(skb).fp)
-> >                 unix_detach_fds(&scm, skb);
-> >
-> > @@ -1943,7 +1958,10 @@ static int unix_scm_to_skb(struct scm_cookie *scm, struct sk_buff *skb, bool sen
-> >  {
-> >         int err = 0;
-> >
-> > -       UNIXCB(skb).pid = get_pid(scm->pid);
-> > +       err = unix_set_pid_to_skb(skb, scm->pid, false);
-> > +       if (unlikely(err))
-> 
-> This does not fail too.
-> 
-> Perhaps keep get_pid() here and move pidfs_register_pid()
-> to unix_maybe_add_creds(), that will look simpler.
-> 
-> 
-> > +               return err;
-> > +
-> >         UNIXCB(skb).uid = scm->creds.uid;
-> >         UNIXCB(skb).gid = scm->creds.gid;
-> >         UNIXCB(skb).fp = NULL;
-> > @@ -1957,7 +1975,8 @@ static int unix_scm_to_skb(struct scm_cookie *scm, struct sk_buff *skb, bool sen
-> >
-> >  static void unix_skb_to_scm(struct sk_buff *skb, struct scm_cookie *scm)
-> >  {
-> > -       scm_set_cred(scm, UNIXCB(skb).pid, UNIXCB(skb).uid, UNIXCB(skb).gid);
-> > +       /* scm_set_cred() can't fail when pidfs_register == false */
-> > +       scm_set_cred(scm, UNIXCB(skb).pid, false, UNIXCB(skb).uid, UNIXCB(skb).gid);
-> >         unix_set_secdata(scm, skb);
-> >  }
-> >
-> > @@ -1971,6 +1990,7 @@ static void unix_skb_to_scm(struct sk_buff *skb, struct scm_cookie *scm)
-> >   * We include credentials if source or destination socket
-> >   * asserted SOCK_PASSCRED.
-> >   *
-> > + * Context: May sleep.
-> >   * Return: On success zero, on error a negative error code is returned.
-> >   */
-> >  static int unix_maybe_add_creds(struct sk_buff *skb, const struct sock *sk,
-> > @@ -1980,7 +2000,12 @@ static int unix_maybe_add_creds(struct sk_buff *skb, const struct sock *sk,
-> >                 return 0;
-> >
-> >         if (unix_may_passcred(sk) || unix_may_passcred(other)) {
-> 
-> I forgot to mention that this part will conflict with net-next.
-> 
-> I guess Christian will take this series via vfs tree ?
 
-I'll just grab it and take care of the merge conflict.
-Thanks for all the reviews. This will be a really helpful extension.
-I really really like that we're pushing the envelope on secure client
-authentication quite a bit with the recent work in this area!
+Michael, if you don't have time to merge this series, perhaps Paolo can?
+
+Thanks,
+Laurent
+
 
