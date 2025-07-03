@@ -1,137 +1,206 @@
-Return-Path: <netdev+bounces-203715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 161ACAF6DEE
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 10:58:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ED65AF6E11
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 11:03:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51B4D1C80847
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 08:58:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FCE11C282F8
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 09:03:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9597E2D3A74;
-	Thu,  3 Jul 2025 08:58:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB662D4B65;
+	Thu,  3 Jul 2025 09:02:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=pigmoral.tech header.i=junhui.liu@pigmoral.tech header.b="qXVoJZH4"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DDDD2D3A63;
-	Thu,  3 Jul 2025 08:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.75.44.102
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751533085; cv=none; b=PZpejuTxz6DIyJ5cH09340DUA2UygrFAVxjIIBdYMZ7xNT2g7It5YuEhQgSHqwxMWqDESMfl7ZJqG4AchATTz5jTymofSTABaB79Gt3l1WgHYLyanfZ9BfKrNSgfmNhcSdh9G1UPZeGRpaCaCIYagRHrEIER2zcpHsvHTTdOF24=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751533085; c=relaxed/simple;
-	bh=bQyWiZYdYm5aXqkw3t73tYwoLPNz7/6/IJf5Lxr78zA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ob6ltXcH/4JazrCfPK6+w/FQxxqJC6Q6v3IZOhR9jNcP23+5BEnFtSIMdfEOsl/avxV+3B2faPQEqxBPVko/gc2lQc5ipZB4j1R2XIJm6El3Iho0DneAYu2x8lSXCh/oJltfwvck8U+rcL6sTakRU7R5rb8FR0GchhEQd3towQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=13.75.44.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from E0005182LT.eswin.cn (unknown [10.12.96.155])
-	by app2 (Coremail) with SMTP id TQJkCgBX9pT1RWZoWl2oAA--.28545S2;
-	Thu, 03 Jul 2025 16:57:28 +0800 (CST)
-From: weishangjuan@eswincomputing.com
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	rmk+kernel@armlinux.org.uk,
-	yong.liang.choong@linux.intel.com,
-	vladimir.oltean@nxp.com,
-	jszhang@kernel.org,
-	jan.petrous@oss.nxp.com,
-	prabhakar.mahadev-lad.rj@bp.renesas.com,
-	inochiama@gmail.com,
-	boon.khai.ng@altera.com,
-	dfustini@tenstorrent.com,
-	0x1207@gmail.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Cc: ningyu@eswincomputing.com,
-	linmin@eswincomputing.com,
-	lizhi2@eswincomputing.com,
-	Shangjuan Wei <weishangjuan@eswincomputing.com>
-Subject: [PATCH v3 0/2]  Add driver support for Eswin eic7700 SoC ethernet controller
-Date: Thu,  3 Jul 2025 16:57:24 +0800
-Message-Id: <20250703085724.1960-1-weishangjuan@eswincomputing.com>
-X-Mailer: git-send-email 2.31.1.windows.1
+Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5436A2D46D8;
+	Thu,  3 Jul 2025 09:02:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751533355; cv=pass; b=I66GwIrWSxpMW6EXDIZsd9OOQSYL+fREVNiGix/H6l7fxvmm+71SrRWR5lL6SRYM736w8vzYxvp74fAmeJDEM3cRsO4ctGphNLX8KW+F63KQVtcU0yqiiV7mQWgemMWMFW2iYGHm1Ky78PzfiFds578gOOvzLaIPoM5CpSb5Xt8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751533355; c=relaxed/simple;
+	bh=1x9noGp/YyjeYTaho9SwTajjJAkTELQbXuhXq6ypjTQ=;
+	h=MIME-Version:From:To:In-Reply-To:Cc:Subject:Message-ID:Date:
+	 Content-Type; b=CgauUw8aqm3WjwYDN7paiAPwiMLd2ewvJA3nF5FcyzXlmgU1yLFgHAIc69bz9gT44gNvGIQGX78V60dlgosvk/ZZoRCJNgyM/dwFTMYfcjuDmfCPb53yRNJKJukjGrQI0h/l6jP9Hoo46CIkb65oQI1+xGStwfN9Z8NEWLJPs4g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pigmoral.tech; spf=pass smtp.mailfrom=pigmoral.tech; dkim=pass (1024-bit key) header.d=pigmoral.tech header.i=junhui.liu@pigmoral.tech header.b=qXVoJZH4; arc=pass smtp.client-ip=136.143.188.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pigmoral.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pigmoral.tech
+ARC-Seal: i=1; a=rsa-sha256; t=1751533249; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=KKVvBkeo3qxgezrXeVABLPlIw6eJ6RvPjxqCLLPR4Wnc8F2rJVoSc/AEIptXtdu4xG8yAAuWEOf9cdgo/kBECOzxLRuHqdPPDDAw/HmE/CuvN4cezsUdL0OCJ0GWzVrpS1LI2/Ciu1SQcN+OkAXEc0lqPwn2fEYKP8P9g+y1ACg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1751533249; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=1x9noGp/YyjeYTaho9SwTajjJAkTELQbXuhXq6ypjTQ=; 
+	b=TRDiAOb2YJWhEJMbR3dNNALR4dGoxA+pcqocs96/m/wERWsEejxGwuKEswbte2hd4eCHqJ37IJcmfQpdtcXRghKbNQxmFwIBZEz0JQqpF5QPbA5aIHFiSRdlqguMcVL2q8hyAMcP+FHQDlYCVZSao3IGgWy6LHN9cWiT2WoY9Kg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=pigmoral.tech;
+	spf=pass  smtp.mailfrom=junhui.liu@pigmoral.tech;
+	dmarc=pass header.from=<junhui.liu@pigmoral.tech>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1751533249;
+	s=zmail; d=pigmoral.tech; i=junhui.liu@pigmoral.tech;
+	h=MIME-Version:From:From:To:To:In-Reply-To:Cc:Cc:Subject:Subject:Message-ID:Date:Date:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=1x9noGp/YyjeYTaho9SwTajjJAkTELQbXuhXq6ypjTQ=;
+	b=qXVoJZH4IPSkxKuRWuy6EJrTq8XQNfEpvvT6bKfDt6znEZxc8MF2TGctYNIe6epI
+	Q7bHijO9JmxE/LeFbyiARWeQSK/7g+i/aq/na+ZyVvlj+wBYaPLB93n3J6D4yIr5+r1
+	l5cmMXZN430EDk9vglEow6IExvLngACe4mS9YahQ=
+Received: by mx.zohomail.com with SMTPS id 175153324571033.72754487040095;
+	Thu, 3 Jul 2025 02:00:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:TQJkCgBX9pT1RWZoWl2oAA--.28545S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Aw1rGr1fKFy3tw4fZFW3trb_yoW8Cr18pa
-	yDCFy5Gw1ktryxJan3Jw10kFySqan7tr1a9r1Iq3WfXayqya90vw4avF4FkF9rArWDXF1a
-	qFW3urn8CFn8A3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBv14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
-	Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxkF7I0En4kS14v26r4a6rW5MxkIecxEwVCm-wCF04
-	k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18
-	MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr4
-	1lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1l
-	IxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4
-	A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRBOJnUUUUU=
-X-CM-SenderInfo: pzhl2xxdqjy31dq6v25zlqu0xpsx3x1qjou0bp/
+From: "Junhui Liu" <junhui.liu@pigmoral.tech>
+To: "Vivian Wang" <wangruikang@iscas.ac.cn>, 
+	"Andrew Lunn" <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, 
+	"Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, 
+	"Paolo Abeni" <pabeni@redhat.com>, "Rob Herring" <robh@kernel.org>, 
+	"Krzysztof Kozlowski" <krzk+dt@kernel.org>, 
+	"Conor Dooley" <conor+dt@kernel.org>, "Yixun Lan" <dlan@gentoo.org>, 
+	"Philipp Zabel" <p.zabel@pengutronix.de>, 
+	"Paul Walmsley" <paul.walmsley@sifive.com>, 
+	"Palmer Dabbelt" <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>, 
+	"Alexandre Ghiti" <alex@ghiti.fr>
+In-Reply-To: <ce2881b9-38ed-42b6-824d-72948389e8fa@iscas.ac.cn>
+Cc: "Vivian Wang" <uwu@dram.page>, 
+	"Lukas Bulwahn" <lukas.bulwahn@redhat.com>, 
+	"Geert Uytterhoeven" <geert+renesas@glider.be>, 
+	"Parthiban Veerasooran" <Parthiban.Veerasooran@microchip.com>, 
+	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>, 
+	<linux-riscv@lists.infradead.org>, <spacemit@lists.linux.dev>, 
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 5/5] riscv: dts: spacemit: Add Ethernet support
+	 for Jupiter
+Message-ID: <184eb232eceb01f8.c7773f00732f7e87.4136a253a628cb2b@Jude-Air.local>
+Date: Thu, 3 Jul 2025 09:00:36 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-ZohoMailClient: External
 
-From: Shangjuan Wei <weishangjuan@eswincomputing.com>
+Hi Vivian,
 
-This patch depends on the vendor prefix patch:
-https://lore.kernel.org/all/20250616112316.3833343-4-pinkesh.vaghela@einfochips.com/
+On 03/07/2025 15:46, Vivian Wang wrote:
+> Hi Junhui,
+>=20
+> On 7/3/25 14:48, Junhui Liu wrote:
+>> Hi Vivian,
+>> Thanks for you work!
+>>
+>> On 2025/7/2 14:01, Vivian Wang wrote:
+>>> Milk-V Jupiter uses an RGMII PHY for each port and uses GPIO for PHY
+>>> reset.
+>>>
+>>> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+>>
+>> Successfully tested with iperf3 on Milk-V Jupiter.
+>>
+>> TCP Rx: 941 Mbits/sec
+>> TCP Tx: 943 Mbits/sec
+>> UDP Rx: 956 Mbits/sec
+>> UDP Tx: 956 Mbits/sec
+>>
+>> Tested-by: Junhui Liu <junhui.liu@pigmoral.tech>=C2=A0
+>>
+> Thanks for the testing! I do not have a Milk-V Jupiter handy, so that
+> was very helpful.
+>=20
+> As discussed [1], I will post a v4 soon with minor fixes and also sans
+> the DTS changes. I will put your Tested-by on the driver patch instead
+> of this DTS patch, so it will show up in v4.
+>=20
+> Are you okay with this? If you don't like it feel free to tell me.
 
-Updates:
+It's okay to me. Thanks!
 
-  Changes in v3:
-  - Updated eswin,eic7700-eth.yaml
-    - Add descriptions of snps,write-questions, snps,read-questions,
-      snps,burst-map attributes
-    - Remove the description of reg
-    - Delete snps,axi-config
-  - Updated dwmac-eic7700.c
-    - Simplify drivers and remove unnecessary API and DTS attribute configurations
-    - Increase the mapping from tx/rx_delay_ps to private dly
-  - Link to v2: https://lore.kernel.org/all/aDad+8YHEFdOIs38@mev-dev.igk.intel.com/
+>=20
+> Regards,
+> Vivian "dramforever" Wang
+>=20
+> [1]: https://lore.kernel.org/spacemit/a9cad07c-0973-43c3-89f3-95b856b575df=
+@iscas.ac.cn/
+>=20
+>>> ---
+>>> =C2=A0 arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts | 46
+>>> +++++++++++++++++++++++
+>>> =C2=A0 1 file changed, 46 insertions(+)
+>>>
+>>> diff --git a/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts
+>>> b/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts
+>>> index
+>>> 4483192141049caa201c093fb206b6134a064f42..c5933555c06b66f40e61fe2b9c159b=
+a0770c2fa1
+>>> 100644
+>>> --- a/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts
+>>> +++ b/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts
+>>> @@ -20,6 +20,52 @@ chosen {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 };
+>>> =C2=A0 };
+>>> =C2=A0 +&eth0 {
+>>> +=C2=A0=C2=A0=C2=A0 phy-handle =3D <&rgmii0>;
+>>> +=C2=A0=C2=A0=C2=A0 phy-mode =3D "rgmii-id";
+>>> +=C2=A0=C2=A0=C2=A0 pinctrl-names =3D "default";
+>>> +=C2=A0=C2=A0=C2=A0 pinctrl-0 =3D <&gmac0_cfg>;
+>>> +=C2=A0=C2=A0=C2=A0 rx-internal-delay-ps =3D <0>;
+>>> +=C2=A0=C2=A0=C2=A0 tx-internal-delay-ps =3D <0>;
+>>> +=C2=A0=C2=A0=C2=A0 status =3D "okay";
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 mdio-bus {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 #address-cells =3D <0x1>;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 #size-cells =3D <0x0>;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reset-gpios =3D <&gpio K1_GP=
+IO(110) GPIO_ACTIVE_LOW>;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reset-delay-us =3D <10000>;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reset-post-delay-us =3D <100=
+000>;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rgmii0: phy@1 {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reg =
+=3D <0x1>;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 };
+>>> +=C2=A0=C2=A0=C2=A0 };
+>>> +};
+>>> +
+>>> +&eth1 {
+>>> +=C2=A0=C2=A0=C2=A0 phy-handle =3D <&rgmii1>;
+>>> +=C2=A0=C2=A0=C2=A0 phy-mode =3D "rgmii-id";
+>>> +=C2=A0=C2=A0=C2=A0 pinctrl-names =3D "default";
+>>> +=C2=A0=C2=A0=C2=A0 pinctrl-0 =3D <&gmac1_cfg>;
+>>> +=C2=A0=C2=A0=C2=A0 rx-internal-delay-ps =3D <0>;
+>>> +=C2=A0=C2=A0=C2=A0 tx-internal-delay-ps =3D <250>;
+>>> +=C2=A0=C2=A0=C2=A0 status =3D "okay";
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 mdio-bus {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 #address-cells =3D <0x1>;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 #size-cells =3D <0x0>;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reset-gpios =3D <&gpio K1_GP=
+IO(115) GPIO_ACTIVE_LOW>;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reset-delay-us =3D <10000>;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reset-post-delay-us =3D <100=
+000>;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 rgmii1: phy@1 {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reg =
+=3D <0x1>;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 };
+>>> +=C2=A0=C2=A0=C2=A0 };
+>>> +};
+>>> +
+>>> =C2=A0 &uart0 {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pinctrl-names =3D "default";
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 pinctrl-0 =3D <&uart0_2_cfg>;
+>>>
 
-  Changes in v2:
-  - Updated eswin,eic7700-eth.yaml
-    - Add snps,dwmac in binding file
-    - Chang the names of reset-names and phy-mode
-  - Updated dwmac-eic7700.c
-    - Remove the code related to PHY LED configuration from the MAC driver
-    - Adjust the code format and driver interfaces, such as replacing kzalloc
-      with devm_kzalloc, etc.
-    - Use phylib instead of the GPIO API in the driver to implement the PHY
-      reset function
-  - Link to v1: https://lore.kernel.org/all/20250516010849.784-1-weishangjuan@eswincomputing.com/
-
-Shangjuan Wei (2):
-  dt-bindings: ethernet: eswin: Document for EIC7700 SoC
-  ethernet: eswin: Add eic7700 ethernet driver
-
- .../bindings/net/eswin,eic7700-eth.yaml       | 175 ++++++++++++
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
- drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
- .../ethernet/stmicro/stmmac/dwmac-eic7700.c   | 257 ++++++++++++++++++
- 4 files changed, 444 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
- create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
-
--- 
-2.17.1
-
+--=20
+Best regards,
+Junhui Liu
 
