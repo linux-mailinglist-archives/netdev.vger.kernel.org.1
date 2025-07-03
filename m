@@ -1,117 +1,130 @@
-Return-Path: <netdev+bounces-203777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C136EAF72AA
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:41:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 229C8AF72B8
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:45:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A28741C273A8
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 11:41:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5145E17E0FB
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 11:45:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E3D2E4986;
-	Thu,  3 Jul 2025 11:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4F1224BBF0;
+	Thu,  3 Jul 2025 11:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zfwugwhy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="epVRt9UH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9222E4279;
-	Thu,  3 Jul 2025 11:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0888CB676;
+	Thu,  3 Jul 2025 11:44:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751542868; cv=none; b=R8vG3bADVGHDqWWv2wNIBtsQwdaiAe+AKF+ahtaXLjUJ7eDf5zF8Dc0GiRB3jTxHYD4HqggAb95W0K42NOaLxdox2F/Ma4gT2iCuDe6oZ00r/u2+0lZ4bJyXsC3rxP7PdciXqrQo2QZVYHhso9kHJRYMMJGhQBVYx/sDdmSLHJo=
+	t=1751543099; cv=none; b=Qj0axi/xCRw5ZPoEqTScGOrNDxyN2qkO9n3FJOjgRxgyRL8d//treonjdH/BaSxO5k760p/PAT+N5XHz2T3riCKuUGS428zYJtAHwp9lW7tKV+kee00Q7jWrbKxiYE/5ZLB09YykZ6WzOnRC552dTAkbegZojKWwlHjVryy3TXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751542868; c=relaxed/simple;
-	bh=FzrFno3HDT5rbQBIfWlmtU7HWlWzFpzClCAfuDmDn8M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Uu4nxDWHaoLPOpwDqgFTbNdVD/Y9/eNhywXJItWv0TP8A/JT/TrUjFik/tFhI08dPwkUqNCS8coL+FDerlejqCDSO/6t7S/55Nwfb9qFzSP/6A1L9qRxole3EFr+r2XV6Pol9Wl3XCUoBsI8duMx5AAizTFr4BepsGR2Y1Yhk70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zfwugwhy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94D6EC4CEED;
-	Thu,  3 Jul 2025 11:41:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751542867;
-	bh=FzrFno3HDT5rbQBIfWlmtU7HWlWzFpzClCAfuDmDn8M=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Zfwugwhy+wdUYhl0Hn1UAGuI5Yv+lNiEl2TS7y44hhXj1CvHNeHJDsrom/w45CPZf
-	 zICPUqWdSDWo7J2Z/KICMUtcD7Uf1uPCgCUY4Nx6M+9D2APF0P5IcgJ0PDwSjnqBsC
-	 5obInYBk+bi7bgMzwOtNfg/28fezmznd14w7eO98xZnuzk1SKwXx8es0cG8Lo7iU8q
-	 JgH3KNwgKyP7WCPMtC81pHdRduJWmEO4Luhb/TUdHbxg5gunj/RmMlIDeXkTmKLFmr
-	 F8G9R8I/1I41JwGAfgwT0W5aDDkYUL8zMfW6lTStsrgJ+FMiG/x06FOvfZEWFTMBQE
-	 4jqLTesGt2ckw==
-Message-ID: <85eee028-2784-4bcd-b9a9-9e1bdf0799f3@kernel.org>
-Date: Thu, 3 Jul 2025 13:41:02 +0200
+	s=arc-20240116; t=1751543099; c=relaxed/simple;
+	bh=uBUjONmwbn8v/AAfxz8Lbc8VDb7rf37tWkb0CBGxo4I=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V7mN4PPPmz3li8sFnGLYNMXzlDnU590I7aA8ZnYXoc1puvBi2iIpxHtiH8kbZEybqvEp3l8cFSB//b/7TmTN44pQ+Fxlk56dyuky4JVLAMEc+1tLvZC/X6ETAUeopSpDMJduVxoelFmNlVqluJD151fF81VHAwDkiK3GpmA82NI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=epVRt9UH; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-450ce3a2dd5so43816035e9.3;
+        Thu, 03 Jul 2025 04:44:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751543096; x=1752147896; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6k9QClSQ8ICwQ6dLl8pnu9ysAhTMsX6Xb60vNSqN+9o=;
+        b=epVRt9UHnJFcdLWfGDNisyMS/FMdPQVu5GXr7oeq9ysTP/0ZwgcwF2CUq9p2ECQGoQ
+         yw7jB3DdDH1Rsr6pZcOc8aTdj9pdl6ooU78qM3fNy85bwTIWXvvfHAuOVzUssFaq7uZa
+         GVZAdCgziV7YmqYtQ3rFTmyWPu8LZ2a/FECQDJaLE+Xboz46tq7DFJkpNOzNFpy35oRT
+         QywbWBpk/bmFFmMf/imFyKyFSlR0wleDpBvWNmmyb0NPltBo2rkbOKLx05sQ7MakBFXJ
+         v6HvR9y5PkmHNzg3cxUGT92O+gzask0Ej0OeMDq2Ak2Hr20I9lteBfp+P6EF1ZWIxC56
+         5U8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751543096; x=1752147896;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6k9QClSQ8ICwQ6dLl8pnu9ysAhTMsX6Xb60vNSqN+9o=;
+        b=sylmlIPuLFL4tvRZGw//XKX+/WQ4nGmMq0Kmc6m3ijXMuoc0VBozPVtx2jbmcW1tcJ
+         NL4Ivp86wilgN1bsq8c9Dn/vTNj6EW4Uc/bs6HjVyGpkWdS6lNQ0j2AB5CU8ZtIy8Ycf
+         JupUGuIQFJShW8yHfYDHz9cVbyMyLS1HQYDHbnpM541lrdAXYoHvGKCEABpJ8lmI8bUb
+         pobufrtOWU1CCfxBWTV4TRJbUBVLg+hjZXYWZKltpp+T9MJAr/wMsgEz+MkMRx2LXYxL
+         vAB7xpifltlBnsGTHapf6wFIR8bipLIHSVDTxf+olitB4kUbN0rjG1biQVSyPNeX+wFx
+         b20g==
+X-Forwarded-Encrypted: i=1; AJvYcCVv/YUD3wFXeluGIp1XgBjZ2A9t2ZWLF8DVo9RxQZIdEFXMZ5aYXxholPKaMhM6nULmVNcfHavAwJhevUM=@vger.kernel.org, AJvYcCXtM4x+asMKhI2XYVpbzA+S+tak2V0K3Pz6dKq7b9XbwwTBC/cQZgJ0dL4e4XQH22uN/1oVwxld@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZi6QJ1ruWem4O79Z+wrPBkBpjuURKmK56S5M/6jJsSwKjF1vd
+	Q6fd4BrdfPop6+vDkjV57xStlfK4l3rEXdQxfZMd2y9rNVljbiiut5Sn
+X-Gm-Gg: ASbGncvZaturL3TP5OC30tS+EJ4UExfodaposoq8HqXhwWAwn0aZG6WK2c8PgofpLls
+	v48/P3CaQ7IQVoOuFruCMktFWcOGnNzZJPODV3UpfS+RN68ddJ0spqnZpy6GQMZYFTnW1qbLJJV
+	UXw5W5WRm2jfiynHb0Kv+OYyXIl/7WieIdtn28y1uBy5qdMJYJA3I4Ovqv4gIZDaWHCY7JzTELB
+	ImQ03fXUu2iryAJs9tQ/pERJmGKesdtTheFvLx501svMHFEE178GPmf9iEcXSFJt0yySWhGGOps
+	OkF+c9CEsJKLvXxCg6erQaBStJh+ChQZRX31MqQ9VnNdfaBelwBc4jTVY54qRzchu2nTtVJUg4G
+	A45pr0V1BLH5LYChoGw==
+X-Google-Smtp-Source: AGHT+IGf43gfMfzl0TZZrRJIvNkgxoDqDSXV/tGVc7FGBGnLX0cjt4oLacTns9SQIRGExEHDCvPVEQ==
+X-Received: by 2002:a05:6000:26cb:b0:3a5:1471:d89b with SMTP id ffacd0b85a97d-3b2019b6a21mr4968036f8f.53.1751543095974;
+        Thu, 03 Jul 2025 04:44:55 -0700 (PDT)
+Received: from pumpkin (host-92-21-58-28.as13285.net. [92.21.58.28])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a892e6214fsm18647264f8f.98.2025.07.03.04.44.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jul 2025 04:44:55 -0700 (PDT)
+Date: Thu, 3 Jul 2025 12:44:53 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Feng Yang <yangfeng59949@163.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, horms@kernel.org, willemb@google.com,
+ almasrymina@google.com, kerneljasonxing@gmail.com, ebiggers@google.com,
+ asml.silence@gmail.com, aleksander.lobakin@intel.com, stfomichev@gmail.com,
+ yangfeng@kylinos.cn, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] skbuff: Add MSG_MORE flag to optimize large packet
+ transmission
+Message-ID: <20250703124453.390f5908@pumpkin>
+In-Reply-To: <e7275f92-5107-48d2-9a47-435b73c62ef4@redhat.com>
+References: <20250630071029.76482-1-yangfeng59949@163.com>
+	<e7275f92-5107-48d2-9a47-435b73c62ef4@redhat.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next V2 3/7] net: xdp: Add kfuncs to store hw metadata
- in xdp_buff
-To: bpf@vger.kernel.org, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, lorenzo@kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <borkmann@iogearbox.net>,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, sdf@fomichev.me,
- kernel-team@cloudflare.com, arthur@arthurfabre.com, jakub@cloudflare.com
-References: <175146824674.1421237.18351246421763677468.stgit@firesoul>
- <175146831297.1421237.17665319427079757435.stgit@firesoul>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <175146831297.1421237.17665319427079757435.stgit@firesoul>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
+On Thu, 3 Jul 2025 10:48:40 +0200
+Paolo Abeni <pabeni@redhat.com> wrote:
 
-On 02/07/2025 16.58, Jesper Dangaard Brouer wrote:
-> From: Lorenzo Bianconi<lorenzo@kernel.org>
+> On 6/30/25 9:10 AM, Feng Yang wrote:
+> > From: Feng Yang <yangfeng@kylinos.cn>
+> > 
+> > The "MSG_MORE" flag is added to improve the transmission performance of large packets.
+> > The improvement is more significant for TCP, while there is a slight enhancement for UDP.  
 > 
-> Introduce the following kfuncs to store hw metadata provided by the NIC
-> into the xdp_buff struct:
-> 
-> - rx-hash: bpf_xdp_store_rx_hash
-> - rx-vlan: bpf_xdp_store_rx_vlan
-> - rx-hw-ts: bpf_xdp_store_rx_ts
-> 
-> Signed-off-by: Lorenzo Bianconi<lorenzo@kernel.org>
-> Signed-off-by: Jesper Dangaard Brouer<hawk@kernel.org>
-> ---
->   include/net/xdp.h |    5 +++++
->   net/core/xdp.c    |   45 +++++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 50 insertions(+)
-> 
-> diff --git a/net/core/xdp.c b/net/core/xdp.c
-> index bd3110fc7ef8..1ffba57714ea 100644
-> --- a/net/core/xdp.c
-> +++ b/net/core/xdp.c
-> @@ -963,12 +963,57 @@ __bpf_kfunc int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx,
-[...]
-> +__bpf_kfunc int bpf_xdp_store_rx_ts(struct xdp_md *ctx, u64 ts)
-> +{
-> +	struct xdp_buff *xdp = (struct xdp_buff *)ctx;
-> +	struct skb_shared_info *sinfo = xdp_get_shared_info_from_buff(xdp);
-> +	struct skb_shared_hwtstamps *shwt = &sinfo->hwtstamps;
-> +
-> +	shwt->hwtstamp = ts;
+> I'm sorry for the conflicting input, but i fear we can't do this for
+> UDP: unconditionally changing the wire packet layout may break the
+> application, and or at very least incur in unexpected fragmentation issues.
 
-Here we are storing into the SKB shared_info struct.  This is located at
-the SKB data tail.  Thus, this will very likely cause a cache-miss.
+Does the code currently work for UDP?
 
-What about storing it into xdp->rx_meta and then starting a prefetch for
-shared_info?  (and updating patch-4 that moved it into SKB)
+I'd have thought the skb being sent was an entire datagram.
+But each semdmsg() is going to send a separate datagram.
+IIRC for UDP MSG_MORE indicates that the next send() will be
+part of the same datagram - so the actual send can't be done
+until the final fragment (without MSG_MORE) is sent.
 
-(Reviewers should be aware that writing into the xdp_frame headroom
-(xdp->rx_meta) likely isn't a cache-miss, because all drivers does a
-prefetchw for this memory prior to running BPF-prog).
+None of the versions is right for SCTP.
+The skb being sent needs to be processed as a single entity.
+Here MSG_MORE tells the stack that more messages follow and can be put
+into a single ethernet frame - but they are separate protocol messages.
 
+OTOH I've not looked at where this code is called from.
+In particular, when it would be called with non-linear skb.
 
-> +	xdp->flags |= XDP_FLAGS_META_RX_TS;
-> +
-> +	return 0;
-> +}
+	David
 
