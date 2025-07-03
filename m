@@ -1,121 +1,175 @@
-Return-Path: <netdev+bounces-203827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBCA4AF75D4
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 15:35:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF87CAF75FB
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 15:42:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57CBD5675EE
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:35:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C49F3BD777
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:42:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7425E29C33E;
-	Thu,  3 Jul 2025 13:35:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691682D5418;
+	Thu,  3 Jul 2025 13:42:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GhGe50BY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A6lmP4xQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA7F513DB9F
-	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 13:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0A92222B4;
+	Thu,  3 Jul 2025 13:42:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751549744; cv=none; b=Vj+caujrJt8Q3WMmwRGSxG2UhTt7RUD8vM8yMOnodZoLzkzAoz99TAsM43CZtLBE/vFH6KZuJxMeEjMbu/EmHqJ08zcD+o8lcYRpDu5rb2yX9mGZkQvgGcx1wMle3SbfAj++PcKZquW1b46ugaUN2YmmrNybEEW6lSBVxBwvKFA=
+	t=1751550161; cv=none; b=d0dTJzINGbEl6or8AbmRs3wN3TgjscAad10wW/XWyNlERB83ocPrTogx+yNqBv3TFN0mtmPqS9QFuPz1f1/YIOAiWacx+mHey06TaaY2xGnoq0IdjtR/CwAfqd912lDMDTiWyr9EukTBBDk8XZ16G0XVlMMdEAivGfgKNRkUWiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751549744; c=relaxed/simple;
-	bh=a+w31SBzpx20AQVT5u5Pj5TY/qHbG3BfdlMP+1tjTIk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=BWpjY5pS1rOjY2YSSYGAAD6NuwNhtUE/b6AmAwKw6z0b5iFyNILU9YIfJ7I2ge2G/nsvfZZTE4SkTmWeGMh2XNR5latObSzJq2Crg5JBEhaLJwhYmdDysVYQJWZIUntTRrMjnD1v/E+nimAFzuk1jcuM1/c/4340dicFrdeE76E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GhGe50BY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751549741;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a+w31SBzpx20AQVT5u5Pj5TY/qHbG3BfdlMP+1tjTIk=;
-	b=GhGe50BYCvVlcDaVtr8EGY/r7NE/chU6iWxhE12eDO1MQJoeNGR+3FEfnks66ppmFQW6Og
-	yIEk44cgk4QSWwAoVrxVtAv8Xe+nQzmm7qwlMGhDTJreEC9x6QfODFoDZwTAY4A7RfW6hf
-	uLZ5fbhvdVaiC5LjcolozPPyMV0dsaM=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-511-0PFNBEcsMuOE72wfF4N1Tw-1; Thu, 03 Jul 2025 09:35:40 -0400
-X-MC-Unique: 0PFNBEcsMuOE72wfF4N1Tw-1
-X-Mimecast-MFC-AGG-ID: 0PFNBEcsMuOE72wfF4N1Tw_1751549739
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-32b574cd23dso49428541fa.2
-        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 06:35:40 -0700 (PDT)
+	s=arc-20240116; t=1751550161; c=relaxed/simple;
+	bh=tavQcEGaObxidlIkQzXjJ++BUyUCiEeX6N3ES4TeMI4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OFchWEMClkTVod/TmGQbYfAg3UDQlpRxLndw5G00XY1vaJDMCxY/bHrfUBUktAj/4sVW2ty/xgtTZqhtRm0BX4FX1Jj7lmTAOXb6rgF+UF7TBNroQvTLzoYyVI50afGoyO/0TAe6vpwtNLyAFxkZ07CrmRNoCu6M5LP2okSueyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A6lmP4xQ; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-32b553e33e6so48826361fa.2;
+        Thu, 03 Jul 2025 06:42:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751550158; x=1752154958; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jFNqw5vvbvpKQuxgS3RLj0oHSG6zw8ZBvyqT3A0POSI=;
+        b=A6lmP4xQ/aTs5EFT/hOOPjMgwYh2GZmdDeL/3YfgTyTY+Vvw1CV/jgoWF8aWdZAgvW
+         BroDq21ROcZw6uHxrjyTnmIff/u1sURMI4QzS1u71CcdSgKsyYyykpvPBEh2AYVKonWX
+         vxVBYNLWi028IEefl/OcoM1W3viF9Xo19um8eUS5W38W9Rt9RLPwRJz8WFNgNVMGftmx
+         rxSbBO7HWMWrKhE2tWKvm4h4S74ZHNCSgeoKwx6EAuBxA7B3Oo54yyXodmZaCANxfHV1
+         FBuR67O4bcdDopXAYn67yz7UeVhHUi2DXl9PX24Vi2fT3J6tjjQ64DOUEBb/thlbbkIU
+         /GBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751549739; x=1752154539;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1751550158; x=1752154958;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=a+w31SBzpx20AQVT5u5Pj5TY/qHbG3BfdlMP+1tjTIk=;
-        b=t0WV9MF+xS8ejKLMo8Dtt3RCRZQi3ElH/1fofUpg6dOjMHdmDqh9gbzqTqjrejqzLh
-         scdjxxc2h1Dvm9UVJn1vA1l/V0aEvQoyR7XfEPAAKtNFp4iUenQk1MtQpV5EuqPDXG00
-         0EapDNJiAmHZxgpja9KZH5mXIjKQlrCuiF33W/F0Ce71Pkxtfb7Au3+BUjxVJoqjSoKE
-         qTtJsX9XHsgBD8z4lsiIl3wIafWX+8eG4wz3uYMLEdRkoe+3cPp+Wt+L3rO0aS1YUwHl
-         /7+0hJieX9PYn2MhKDcaMf97ZuIqX3CS6o5pIrQFHQcbD7cQq7DlCj3i6DtVSqnyMP4c
-         AnRA==
-X-Forwarded-Encrypted: i=1; AJvYcCUVcToQT+hgNLyWVzY4iSAdOU8hDsX9MAkdyMzKcFB6kiBws/6DI871jxuM585YT6sfb9Ww5wA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZO9+HOmo3vit/JjhLrLFWowGdAwzKRxLvptk4kpO8IZRPjqtz
-	LzhRNn6LWGBOiHg9X/lxvmDzusjfQKxo+SRULkHUqSXOugu8RDoRrGr6wJ7rFqIy7yngv5uaFAs
-	p3KLMYjYKPcTuQkDdJz2zWeHQXgdoWLSYAgHaESltQm4Nzrptjrkmfg740g==
-X-Gm-Gg: ASbGnctUD2VZir5ki3uI4QiMQH+8Ow5JZXlaEVmk4k95yBiwxdOOzJJyu3ffqJhxGDk
-	IQq4A8DU6I8HmtoCAme4/j645xlEzQdkCHF8oxJQ1YeOFDww8ErYIoudcXlcMJ0Yw/hGs+MQbfZ
-	cLa468iKKXOozBi8+GYIeGmbKgdoAaOKOEoxAKG68rI/ImvuOcp2LrGH2G0IyzHC4vmWhajKar0
-	hysZjyAHVzJpwM+D1MKId7y/kkNZfYdUvZGlp71zVv+bIAQI2dNfIRcxKIB7mzT65pezHeYXGX2
-	kmmAbhpuZgc6GbCsqmkDf4gysiPRXB2qpKJqdBIMzbVqDpc=
-X-Received: by 2002:a2e:be89:0:b0:32b:7149:9396 with SMTP id 38308e7fff4ca-32e0fd18fe6mr8228081fa.41.1751549738988;
-        Thu, 03 Jul 2025 06:35:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHQaqzYM0ICxZ0BcYvjzIBIgaPPoPD7CoeNzD4IOdnJqDmOWKXFznuKZROMVSn5ZIRHwy1dDw==
-X-Received: by 2002:a2e:be89:0:b0:32b:7149:9396 with SMTP id 38308e7fff4ca-32e0fd18fe6mr8227821fa.41.1751549738530;
-        Thu, 03 Jul 2025 06:35:38 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-32cd2ec6592sm21550691fa.57.2025.07.03.06.35.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jul 2025 06:35:38 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 3747B1B383C6; Thu, 03 Jul 2025 15:35:36 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Fengyuan Gong <gfengyuan@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- edumazet@google.com, "David S . Miller" <davem@davemloft.net>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Stanislav
- Fomichev <sdf@fomichev.me>, Kuniyuki Iwashima <kuniyu@google.com>, Ahmed
- Zaki <ahmed.zaki@intel.com>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, cake@lists.bufferbloat.net,
- willemb@google.com, Fengyuan Gong <gfengyuan@google.com>
-Subject: Re: [PATCH net-next] net: account for encap headers in qdisc pkt len
-In-Reply-To: <20250702160741.1204919-1-gfengyuan@google.com>
-References: <20250702160741.1204919-1-gfengyuan@google.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 03 Jul 2025 15:35:36 +0200
-Message-ID: <87zfdl8kif.fsf@toke.dk>
+        bh=jFNqw5vvbvpKQuxgS3RLj0oHSG6zw8ZBvyqT3A0POSI=;
+        b=RQ1OuBgDMas5dOXHBkINo9ndUqZKOI1nSdFzquYFZ6XFGfd6JpZhJqY/XmIJ7Vgxpe
+         X32x6b5A5KaOfBE3ogSh4DCvqvwORZAAAA6DmM/a1H4bEKKXeDMYg+LfLFLIfh01LMoP
+         7VAzOrCnRjLeNtge6IwmThYw9kgi0Cnvy9SXyn+CroPYfHLBYvG+ywSKG+yI2M7LEV6q
+         FiNhwa3oxjM5cRCNpteIIcySDKuWpaCqhByYcnckAtNz8Rw79W/zFX5Fk7QM0nMH4Hpn
+         2wsSOYlywUnx36Xzv2DUc4YlugnDlMUANMeYgDhVyz/sRu8LNizJeMrJtmSBnHm5q5nt
+         xZvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVP57BGMN5QJ9jNn0RIvSjZkZf1H16Q1CWCRQHHQpMNcy12DA574dh15F746tpu2tDqCaD5ll13RDtYQWNMjNI=@vger.kernel.org, AJvYcCWRuiEjvI73Jog1/dia8Ah+z+ayuElq1antPI75LG9SRUnlkQMymzycrjeooPSLbHky9ZtsmB08@vger.kernel.org, AJvYcCWf658de3A2si8z75716UjCpV+0X+M9Qq78wxjjbH+7cT62uebf4kFt8FuEhfGVCOtQemYq41pKQZDTZy0q@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOaZJD04efkxK0/7oDUD3eegFaTHmAz7vxKsLkMC2clNfevLQp
+	v2Zdj8zj/CrWd5WTNgrdzM1Jiq8u44KEmipuFK7faFDnT43/tstyjd82UBA7tbJ5blnOQJL+SkG
+	ruHeJvcVvuM4ITfDGHd/bLanEZ3eUK+A=
+X-Gm-Gg: ASbGncvGdzHmXpqJHkaGHlrhtL+R3XhceSq0zEVdEtt/a7lNc3/IXHyGwrgYxy/FO57
+	ibWWCzLMQiFQK9uMnmwjupQ+Hg1frk0RRBZzVFP39o3mgOpGeTWzf7hnPwL2DDckFbRjQQA5yZx
+	KQYh0JohGGvU3m4KG4lxqVyDDPewTBySZqNt1brzVDHQ==
+X-Google-Smtp-Source: AGHT+IEJwE1g4YnSLqje9oO3w/5JCMMzalfAYURIzR+idPnMXcOc8GmRto0P9wd9n73uBaY7LwalrXFGw49te1yx/Y4=
+X-Received: by 2002:a05:651c:4001:b0:32a:651c:9aea with SMTP id
+ 38308e7fff4ca-32e0009ad64mr19007641fa.34.1751550157391; Thu, 03 Jul 2025
+ 06:42:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20250703125941.1659700-1-neeraj.sanjaykale@nxp.com>
+In-Reply-To: <20250703125941.1659700-1-neeraj.sanjaykale@nxp.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 3 Jul 2025 09:42:24 -0400
+X-Gm-Features: Ac12FXxaJZkUcMMuvEfhaCIQVNH4xMzK0iXdJhhq4GoOYF0l2cqU-Les31hBC0w
+Message-ID: <CABBYNZKN+mHcvJkMB=1vvOyExF8_Tg2BnD-CemX3b14PoA1vkg@mail.gmail.com>
+Subject: Re: [PATCH v1 1/2] Bluetooth: coredump: Add hci_devcd_unregister()
+ for cleanup
+To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, amitkumar.karwar@nxp.com, sherry.sun@nxp.com, 
+	manjeet.gupta@nxp.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Fengyuan Gong <gfengyuan@google.com> writes:
+Hi Neeraj,
 
-> Refine qdisc_pkt_len_init to include headers up through
-> the inner transport header when computing header size
-> for encapsulations. Also refine net/sched/sch_cake.c
-> borrowed from qdisc_pkt_len_init().
+On Thu, Jul 3, 2025 at 9:17=E2=80=AFAM Neeraj Sanjay Kale
+<neeraj.sanjaykale@nxp.com> wrote:
 >
-> Signed-off-by: Fengyuan Gong <gfengyuan@google.com>
+> This adds hci_devcd_unregister() which can be called when driver is
+> removed, which will cleanup the devcoredump data and cancel delayed
+> dump_timeout work.
+>
+> With BTNXPUART driver, it is observed that after FW dump, if driver is
+> removed and re-loaded, it creates hci1 interface instead of hci0
+> interface.
+>
+> But after DEVCD_TIMEOUT (5 minutes) if driver is re-loaded, hci0 is
+> created. This is because after FW dump, hci0 is not unregistered
+> properly for DEVCD_TIMEOUT.
+>
+> With this patch, BTNXPUART is able to create hci0 after every FW dump
+> and driver reload.
+>
+> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> ---
+>  include/net/bluetooth/coredump.h | 3 +++
+>  net/bluetooth/coredump.c         | 8 ++++++++
+>  2 files changed, 11 insertions(+)
+>
+> diff --git a/include/net/bluetooth/coredump.h b/include/net/bluetooth/cor=
+edump.h
+> index 72f51b587a04..bc8856e4bfe7 100644
+> --- a/include/net/bluetooth/coredump.h
+> +++ b/include/net/bluetooth/coredump.h
+> @@ -66,6 +66,7 @@ void hci_devcd_timeout(struct work_struct *work);
+>
+>  int hci_devcd_register(struct hci_dev *hdev, coredump_t coredump,
+>                        dmp_hdr_t dmp_hdr, notify_change_t notify_change);
+> +void hci_devcd_unregister(struct hci_dev *hdev);
+>  int hci_devcd_init(struct hci_dev *hdev, u32 dump_size);
+>  int hci_devcd_append(struct hci_dev *hdev, struct sk_buff *skb);
+>  int hci_devcd_append_pattern(struct hci_dev *hdev, u8 pattern, u32 len);
+> @@ -85,6 +86,8 @@ static inline int hci_devcd_register(struct hci_dev *hd=
+ev, coredump_t coredump,
+>         return -EOPNOTSUPP;
+>  }
+>
+> +static inline void hci_devcd_unregister(struct hci_dev *hdev) {}
+> +
+>  static inline int hci_devcd_init(struct hci_dev *hdev, u32 dump_size)
+>  {
+>         return -EOPNOTSUPP;
+> diff --git a/net/bluetooth/coredump.c b/net/bluetooth/coredump.c
+> index 819eacb38762..dd7bd40e3eba 100644
+> --- a/net/bluetooth/coredump.c
+> +++ b/net/bluetooth/coredump.c
+> @@ -442,6 +442,14 @@ int hci_devcd_register(struct hci_dev *hdev, coredum=
+p_t coredump,
+>  }
+>  EXPORT_SYMBOL(hci_devcd_register);
+>
+> +void hci_devcd_unregister(struct hci_dev *hdev)
+> +{
+> +       cancel_delayed_work(&hdev->dump.dump_timeout);
+> +       skb_queue_purge(&hdev->dump.dump_q);
+> +       dev_coredump_put(&hdev->dev);
+> +}
+> +EXPORT_SYMBOL_GPL(hci_devcd_unregister);
 
-Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+The fact that the dump lives inside hdev is sort of the source of
+these problems, specially if the dumps are not HCI traffic it might be
+better off having the driver control its lifetime and not use
+hdev->workqueue to schedule it.
 
+>  static inline bool hci_devcd_enabled(struct hci_dev *hdev)
+>  {
+>         return hdev->dump.supported;
+> --
+> 2.34.1
+>
+
+
+--=20
+Luiz Augusto von Dentz
 
