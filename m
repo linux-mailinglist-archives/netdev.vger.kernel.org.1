@@ -1,118 +1,137 @@
-Return-Path: <netdev+bounces-203714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1641DAF6D95
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 10:49:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 161ACAF6DEE
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 10:58:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 273CB1895F6E
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 08:49:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51B4D1C80847
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 08:58:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6D7528D8F4;
-	Thu,  3 Jul 2025 08:48:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eu54ptmv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9597E2D3A74;
+	Thu,  3 Jul 2025 08:58:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2326A2D3727
-	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 08:48:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.75.44.102])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DDDD2D3A63;
+	Thu,  3 Jul 2025 08:58:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.75.44.102
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751532528; cv=none; b=DRIcS6mmHVGgZCIA4SnflZJCBa4INI5vpMpB9X0pCDINpW0wJKKvVh69JxZqeGrwHHtzr1UkB4ibSmT6bwVbfbuZ7XC2mo/pHLcgRHGIKW8Y4RJnT9UdOZh9IleoTxwl7d9nMSnQ2RfaqahL9n2K3odrKGEG48eoUdi0ITp72aY=
+	t=1751533085; cv=none; b=PZpejuTxz6DIyJ5cH09340DUA2UygrFAVxjIIBdYMZ7xNT2g7It5YuEhQgSHqwxMWqDESMfl7ZJqG4AchATTz5jTymofSTABaB79Gt3l1WgHYLyanfZ9BfKrNSgfmNhcSdh9G1UPZeGRpaCaCIYagRHrEIER2zcpHsvHTTdOF24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751532528; c=relaxed/simple;
-	bh=/RTepCs0dztAoAhV3cYzw3AFqbONWKbO7CPOvH6DzM0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cCQKsfnFJj9YdUGDs1C5nFfkPs1n9QALD3Ar+jen3eyslX5Ddk4eMPH5WCH1WJtET2vOlJM8yeLsWFwl5sacfUupl2kepfsrOO0DpXHmVuwdXyyFafJcgTu4ZIOdZC8I6h5TjXMVVL/yH/mvkQ+mxOMrhgMWSOJdkAmpP+HP5EM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eu54ptmv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751532525;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m5A+/MxsYcbYH1goxrESZ9WwNmbDxLlkxrFPCFIvbec=;
-	b=eu54ptmv0VqWxIsGYKI9bryHz0HC7RYSsVssPF4LxfgIitkUvjmvMfAHWi1jzWO5U2Ny29
-	GTvPSs3yE3C+GfprR+6nlUjerUBsVTYkzyR4sTMQ1x0uFRhHQ0iGL0+eC75vI03aqOOFMQ
-	qMgVqRY3oGxnuBSC3vYL0XR8kk0KGUg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-449-jRBswKCyN8KDzoe-KDHVSQ-1; Thu, 03 Jul 2025 04:48:44 -0400
-X-MC-Unique: jRBswKCyN8KDzoe-KDHVSQ-1
-X-Mimecast-MFC-AGG-ID: jRBswKCyN8KDzoe-KDHVSQ_1751532523
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3a4f7ebfd00so3835092f8f.2
-        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 01:48:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751532523; x=1752137323;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m5A+/MxsYcbYH1goxrESZ9WwNmbDxLlkxrFPCFIvbec=;
-        b=r0k04yPzNz/7O45BiJrJImqgB8B9jx4ZvsSzUc9t7OGxdS2KwbWJMaqU/s15c8+46N
-         RZlIGAKBa+qhN1rTQcwE8CmpJYx735JtascT5xstYBtPPgPZ/r96gKXHxX5axMi/CfBc
-         KIRnVoJbC8dB88ZPPITx9rGY9O7TQ3VPFMNUMB06j3teCCC4pSyVWjtp6MS8v0rBbhYc
-         clB7UXv36Rvmxs3sECLEl2EKUButXbf1ujYhxplmmkQQxMDBxAiyVJufGkHjtbPxBOp5
-         3ekRfGxG06wNq8bTSWhYVtKy9luR6B5wVBHsyngFdxREPLccTiGKDtJRQQnqhEs5YiLy
-         Xwxg==
-X-Forwarded-Encrypted: i=1; AJvYcCVIXbYU+Z3c9WaXq7a9yX5H9I3cNQxx/9b1D0Czh/tupjIsyTLdjhRijLU1MHEJNjuaRnaOqG8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7tnASFwHAzgcSMRvY+o94TnlXNo17nhO2tgZXbPSEAm4Mk9u0
-	bK/VpPzJIBHE7SLC1G4V15x1qaW6nw4p1uo5MSzoxx0PxxlVJbtE3ZpJlA7wYkPy8qYYmYDQazc
-	A/vTYWbcaq3OPG2oNG3+zRsPHgzk2uiEYS3l16ikEzPKvTsc8iEqY6rdqKw==
-X-Gm-Gg: ASbGncvToD910+hXB/4EFAJ0HDOKxnk0IbfXU8Msf6EOGlhx3aAn/FvknU3nQQnDtGd
-	TBt5oMkBSaAP/jjKONDgvLyWjfaWf36uQ+iO/2YWIRXDwoWWFr1Rtq4oD1XjUQcZK0sONlom7q0
-	ROEWwMyIc0L+puIswK8ePMyyU1ab+sYNN7TfcbE6SvEhpEl5u0yS4jGRBE1uzMDkyIDQ9kDaA0q
-	9t97Oj7X321krYwFldaCbDizfRRJASqTIS8YyCXpAHjWHfm0qWQ4bkIJkjjmZXYjy5obEYrsj1v
-	UTH9B4ZO4Uf2xIXjMU9dt5R1/7NEI7d4sVJoLjZDOltlbf/vSFiD5bB6ViCP+iLDeZA=
-X-Received: by 2002:a05:6000:1ac9:b0:3a1:f5c4:b81b with SMTP id ffacd0b85a97d-3b1fe1e69b5mr5343063f8f.23.1751532523287;
-        Thu, 03 Jul 2025 01:48:43 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEwJWsJ9Bcq221tnNZUrZgPxYaGKS2ioIMyKtLjbCKUp7n/zy8XxkU4Y6rahZ2XUyogggC6pg==
-X-Received: by 2002:a05:6000:1ac9:b0:3a1:f5c4:b81b with SMTP id ffacd0b85a97d-3b1fe1e69b5mr5343032f8f.23.1751532522882;
-        Thu, 03 Jul 2025 01:48:42 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:270a:b10:5fbf:faa5:ef2b:6314? ([2a0d:3344:270a:b10:5fbf:faa5:ef2b:6314])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454a999c632sm20422205e9.23.2025.07.03.01.48.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Jul 2025 01:48:42 -0700 (PDT)
-Message-ID: <e7275f92-5107-48d2-9a47-435b73c62ef4@redhat.com>
-Date: Thu, 3 Jul 2025 10:48:40 +0200
+	s=arc-20240116; t=1751533085; c=relaxed/simple;
+	bh=bQyWiZYdYm5aXqkw3t73tYwoLPNz7/6/IJf5Lxr78zA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ob6ltXcH/4JazrCfPK6+w/FQxxqJC6Q6v3IZOhR9jNcP23+5BEnFtSIMdfEOsl/avxV+3B2faPQEqxBPVko/gc2lQc5ipZB4j1R2XIJm6El3Iho0DneAYu2x8lSXCh/oJltfwvck8U+rcL6sTakRU7R5rb8FR0GchhEQd3towQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=13.75.44.102
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
+Received: from E0005182LT.eswin.cn (unknown [10.12.96.155])
+	by app2 (Coremail) with SMTP id TQJkCgBX9pT1RWZoWl2oAA--.28545S2;
+	Thu, 03 Jul 2025 16:57:28 +0800 (CST)
+From: weishangjuan@eswincomputing.com
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	rmk+kernel@armlinux.org.uk,
+	yong.liang.choong@linux.intel.com,
+	vladimir.oltean@nxp.com,
+	jszhang@kernel.org,
+	jan.petrous@oss.nxp.com,
+	prabhakar.mahadev-lad.rj@bp.renesas.com,
+	inochiama@gmail.com,
+	boon.khai.ng@altera.com,
+	dfustini@tenstorrent.com,
+	0x1207@gmail.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Cc: ningyu@eswincomputing.com,
+	linmin@eswincomputing.com,
+	lizhi2@eswincomputing.com,
+	Shangjuan Wei <weishangjuan@eswincomputing.com>
+Subject: [PATCH v3 0/2]  Add driver support for Eswin eic7700 SoC ethernet controller
+Date: Thu,  3 Jul 2025 16:57:24 +0800
+Message-Id: <20250703085724.1960-1-weishangjuan@eswincomputing.com>
+X-Mailer: git-send-email 2.31.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] skbuff: Add MSG_MORE flag to optimize large packet
- transmission
-To: Feng Yang <yangfeng59949@163.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, horms@kernel.org, willemb@google.com,
- almasrymina@google.com, kerneljasonxing@gmail.com, ebiggers@google.com,
- asml.silence@gmail.com, aleksander.lobakin@intel.com, stfomichev@gmail.com,
- david.laight.linux@gmail.com
-Cc: yangfeng@kylinos.cn, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250630071029.76482-1-yangfeng59949@163.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250630071029.76482-1-yangfeng59949@163.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:TQJkCgBX9pT1RWZoWl2oAA--.28545S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Aw1rGr1fKFy3tw4fZFW3trb_yoW8Cr18pa
+	yDCFy5Gw1ktryxJan3Jw10kFySqan7tr1a9r1Iq3WfXayqya90vw4avF4FkF9rArWDXF1a
+	qFW3urn8CFn8A3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBv14x267AKxVWrJVCq3wAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lw4CEc2x0rVAKj4xxMxkF7I0En4kS14v26r4a6rW5MxkIecxEwVCm-wCF04
+	k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18
+	MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr4
+	1lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1l
+	IxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4
+	A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRBOJnUUUUU=
+X-CM-SenderInfo: pzhl2xxdqjy31dq6v25zlqu0xpsx3x1qjou0bp/
 
-On 6/30/25 9:10 AM, Feng Yang wrote:
-> From: Feng Yang <yangfeng@kylinos.cn>
-> 
-> The "MSG_MORE" flag is added to improve the transmission performance of large packets.
-> The improvement is more significant for TCP, while there is a slight enhancement for UDP.
+From: Shangjuan Wei <weishangjuan@eswincomputing.com>
 
-I'm sorry for the conflicting input, but i fear we can't do this for
-UDP: unconditionally changing the wire packet layout may break the
-application, and or at very least incur in unexpected fragmentation issues.
+This patch depends on the vendor prefix patch:
+https://lore.kernel.org/all/20250616112316.3833343-4-pinkesh.vaghela@einfochips.com/
 
-/P
+Updates:
+
+  Changes in v3:
+  - Updated eswin,eic7700-eth.yaml
+    - Add descriptions of snps,write-questions, snps,read-questions,
+      snps,burst-map attributes
+    - Remove the description of reg
+    - Delete snps,axi-config
+  - Updated dwmac-eic7700.c
+    - Simplify drivers and remove unnecessary API and DTS attribute configurations
+    - Increase the mapping from tx/rx_delay_ps to private dly
+  - Link to v2: https://lore.kernel.org/all/aDad+8YHEFdOIs38@mev-dev.igk.intel.com/
+
+  Changes in v2:
+  - Updated eswin,eic7700-eth.yaml
+    - Add snps,dwmac in binding file
+    - Chang the names of reset-names and phy-mode
+  - Updated dwmac-eic7700.c
+    - Remove the code related to PHY LED configuration from the MAC driver
+    - Adjust the code format and driver interfaces, such as replacing kzalloc
+      with devm_kzalloc, etc.
+    - Use phylib instead of the GPIO API in the driver to implement the PHY
+      reset function
+  - Link to v1: https://lore.kernel.org/all/20250516010849.784-1-weishangjuan@eswincomputing.com/
+
+Shangjuan Wei (2):
+  dt-bindings: ethernet: eswin: Document for EIC7700 SoC
+  ethernet: eswin: Add eic7700 ethernet driver
+
+ .../bindings/net/eswin,eic7700-eth.yaml       | 175 ++++++++++++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-eic7700.c   | 257 ++++++++++++++++++
+ 4 files changed, 444 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-eic7700.c
+
+-- 
+2.17.1
 
 
