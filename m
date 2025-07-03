@@ -1,226 +1,104 @@
-Return-Path: <netdev+bounces-203746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2101AF6F3C
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 11:52:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E1B0AF6F57
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 11:54:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA74C165B85
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 09:52:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD5DB16F938
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 09:54:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86FCF2DFF17;
-	Thu,  3 Jul 2025 09:51:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB3A2DFA2B;
+	Thu,  3 Jul 2025 09:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="elZhqrVw"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="bAHTcEfK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE4428E579;
-	Thu,  3 Jul 2025 09:51:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D40E2D6632;
+	Thu,  3 Jul 2025 09:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751536317; cv=none; b=Gg78Twp+71QKi7k8gp9qS+NQxOjI5W1owrlgUGg08rSqMsbz+Fm++E4bGNcbbGXBfyNi12YIoKXlC7XNj6yAD7SZaFEl/oXVEJ+Kv9Pfv2DH43Hm9ex+rGfDLEeX0twTpoIHGAPE2mSD9YUtpxplsiUXVAQZhr7QiZM+q5mxe2k=
+	t=1751536474; cv=none; b=t2ihWeVzc9Zwo8fGz5x9ASi1AS9RGHUmb3LpwjwrAWGI0Tf6c1/DmTRTZM2oVooKitvpBvajfgFFBtUnm788fvNkOU2BXnkEGiSJUnJ5x62XocX1WbLJwj0CS5rQKbKVOTraApxctvzXhUBPcYxdWbiBdTPTTz01Gq4Q5UstPU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751536317; c=relaxed/simple;
-	bh=2ntYrlK1cqffKZY1IjFAi1d0w6hK+W+A95jFi0JZ1sM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RiwRwe/5YT/V7YjsNnYx3f4QD4JDWjWkgXDOCXm3lv81Fo7vQ+IvfOZIoILX8aAtJeThDEQz3FFFZdpPn6uQxxvaHsz+Cu7AxeyO50g1KCuRlEA33Vt/Fpjphl/MBXAXTnUkByvYtrexz3/KPcAG16vceD+POW4sNik/MdzoIeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=elZhqrVw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D2B0C4CEE3;
-	Thu,  3 Jul 2025 09:51:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751536316;
-	bh=2ntYrlK1cqffKZY1IjFAi1d0w6hK+W+A95jFi0JZ1sM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=elZhqrVwFWec9SPbr8X4Ggmzt+owTzcEiF8B2LpTjJGI/2DwjK/pH8WqCcI8vqytD
-	 n/Wz5F5a4piDtE/bAF14ppZV0MnsXLmouknbPvR83puKGR5aRGZhDi8CZfIqv+Q4PD
-	 B46c7Q+mZ0RY7j4hTOFSzYly44gi08CaZM+tpzbwpiBtbKy5KHr0pOfx18m8qEMzFZ
-	 TUm2lkq2cVDpJTlHbHzevOWz+AQs6xydYAmkEABNzUWhO2vBSmoDS9Fp0ZmYe/SwYh
-	 meR5vsuiEee3rHuwPb634sL2FH/9m0NdkL2C3W2O8AP9wPegnUp5a7BtYNJ1fLuw6l
-	 02UbmdXUENMQg==
-Message-ID: <9316adcb-4626-4ff8-a308-725c6ab34eba@kernel.org>
-Date: Thu, 3 Jul 2025 11:51:47 +0200
+	s=arc-20240116; t=1751536474; c=relaxed/simple;
+	bh=M30E5phtsRgNt9bWOudN+Wz7g5IN3dIUI9pAYWfH0GI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rEJfRb5NErvfibJsvYOT94IdwOMmRGBj0S50rM0V6PaVRiETpkAfy5bTvzG7UWO6TV9aTE0C0ZIsT+PVDPY8lUZ+gd1RNqL5xxlErlim3+/IG/WtB8hYIfnO26gH5n65JQ8+3dwcECVh86PItpm/hlwPZsIIfL832LBoZ3YQ3FM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=bAHTcEfK; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=zq
+	yqcmzFSBUDYjqKQmxZony3sGHurYaKa67pNQBSGA4=; b=bAHTcEfKSMHDjwiSZg
+	hJQ1k1nBR2UbZQb12xuRQuvCRQ9Xd9enEtlTpuU7z7n35kSLjZdBvnz2rD+e/ads
+	0g3RaJ0Ewzwe+dgE76P5mbh4YmVGgUTsIGrL4i6Co093ISlPjAWJJE1/9RuZ7pss
+	5zW9hO6D75dXQQmvKzQxzCc3U=
+Received: from icess-ProLiant-DL380-Gen10.. (unknown [])
+	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wDXz5_hUmZo74LVCA--.57467S4;
+	Thu, 03 Jul 2025 17:52:34 +0800 (CST)
+From: Haoxiang Li <haoxiang_li2024@163.com>
+To: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haoxiang Li <haoxiang_li2024@163.com>,
+	stable@vger.kernel.org,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [PATCH v2] ice: Fix a null pointer dereference in ice_copy_and_init_pkg()
+Date: Thu,  3 Jul 2025 17:52:32 +0800
+Message-Id: <20250703095232.2539006-1-haoxiang_li2024@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/2] dt-bindings: ethernet: eswin: Document for EIC7700
- SoC
-To: weishangjuan@eswincomputing.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- rmk+kernel@armlinux.org.uk, yong.liang.choong@linux.intel.com,
- vladimir.oltean@nxp.com, jszhang@kernel.org, jan.petrous@oss.nxp.com,
- prabhakar.mahadev-lad.rj@bp.renesas.com, inochiama@gmail.com,
- boon.khai.ng@altera.com, dfustini@tenstorrent.com, 0x1207@gmail.com,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-Cc: ningyu@eswincomputing.com, linmin@eswincomputing.com,
- lizhi2@eswincomputing.com
-References: <20250703091808.1092-1-weishangjuan@eswincomputing.com>
- <20250703091947.1148-1-weishangjuan@eswincomputing.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20250703091947.1148-1-weishangjuan@eswincomputing.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDXz5_hUmZo74LVCA--.57467S4
+X-Coremail-Antispam: 1Uf129KBjvdXoWruF1fXw1Duw47JFyDWr1xKrg_yoWkKFg_uw
+	4FvFyfArWUKr1F9w4YkF47Z34FyF1kXFykua12k39Y9w15GryDXa4DZr9xXr4qgF1DuFnx
+	Ars3JasFyFy2qjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRKiiSDUUUUU==
+X-CM-SenderInfo: xkdr5xpdqjszblsqjki6rwjhhfrp/xtbBEgB-bmhmSx75sAAAsR
 
-On 03/07/2025 11:19, weishangjuan@eswincomputing.com wrote:
-> From: Shangjuan Wei <weishangjuan@eswincomputing.com>
-> 
-> Add ESWIN EIC7700 Ethernet controller, supporting clock
-> configuration, delay adjustment and speed adaptive functions.
-> 
-> Signed-off-by: Zhi Li <lizhi2@eswincomputing.com>
-> Signed-off-by: Shangjuan Wei <weishangjuan@eswincomputing.com>
-> ---
->  .../bindings/net/eswin,eic7700-eth.yaml       | 175 ++++++++++++++++++
->  1 file changed, 175 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml b/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
-> new file mode 100644
-> index 000000000000..04b4c7bfbb5b
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/eswin,eic7700-eth.yaml
-> @@ -0,0 +1,175 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/eswin,eic7700-eth.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Eswin EIC7700 SOC Eth Controller
-> +
-> +maintainers:
-> +  - Shuang Liang <liangshuang@eswincomputing.com>
-> +  - Zhi Li <lizhi2@eswincomputing.com>
-> +  - Shangjuan Wei <weishangjuan@eswincomputing.com>
-> +
-> +description:
-> +  The eth controller registers are part of the syscrg block on
-> +  the EIC7700 SoC.
-> +
-> +select:
-> +  properties:
-> +    compatible:
-> +      contains:
-> +        enum:
-> +          - eswin,eic7700-qos-eth
-> +  required:
-> +    - compatible
-> +
-> +allOf:
-> +  - $ref: snps,dwmac.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    items:
-> +      - const: eswin,eic7700-qos-eth
-> +      - const: snps,dwmac-5.20
-> +
-> +  reg:
-> +    minItems: 1
+Add check for the return value of devm_kmemdup()
+to prevent potential null pointer dereference.
 
-Nope. Changelog does not explain that, it is not correct and no one ever
-requested something like that. See also writing bindings about constraints.
+Fixes: c76488109616 ("ice: Implement Dynamic Device Personalization (DDP) download")
+Cc: stable@vger.kernel.org
+Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+---
+Changes in v2:
+- modify the Fixes commit number. Thanks, Michal!
+---
+ drivers/net/ethernet/intel/ice/ice_ddp.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> +
-> +  interrupt-names:
-> +    const: macirq
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +  phy-mode:
-> +    $ref: /schemas/types.yaml#/definitions/string
-> +    enum:
-> +      - rgmii
-> +      - rgmii-rxid
-> +      - rgmii-txid
-> +      - rgmii-id
-> +
-> +  phy-handle:
-> +    $ref: /schemas/types.yaml#/definitions/phandle
-> +    description: Reference to the PHY device
-> +
-> +  clocks:
-> +    minItems: 2
-> +    maxItems: 2
-> +
-> +  clock-names:
-> +    minItems: 2
-> +    maxItems: 2
-> +    contains:
-> +      enum:
-> +        - stmmaceth
-> +        - tx
+diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
+index 59323c019544..351824dc3c62 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ddp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
+@@ -2301,6 +2301,8 @@ enum ice_ddp_state ice_copy_and_init_pkg(struct ice_hw *hw, const u8 *buf,
+ 		return ICE_DDP_PKG_ERR;
+ 
+ 	buf_copy = devm_kmemdup(ice_hw_to_dev(hw), buf, len, GFP_KERNEL);
++	if (!buf_copy)
++		return ICE_DDP_PKG_ERR;
+ 
+ 	state = ice_init_pkg(hw, buf_copy, len);
+ 	if (!ice_is_init_pkg_successful(state)) {
+-- 
+2.25.1
 
-Not much changed, nothing explained in the changelog in cover letter.
-
-You got already feedback that you keep pushing same code without fixing
-anything. You don't respond to feedback. You don't address it.
-
-What is left for me? Start treating us seriously. I am not going to
-review the rest.
-
-Respond to previous feedback with acknowledging that you understood it
-or further questions if you did not understand it, but you made thorough
-research on other bindings and example schema how to do it.
-
-NAK
-
-Best regards,
-Krzysztof
 
