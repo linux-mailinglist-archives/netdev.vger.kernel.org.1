@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-203897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 951B6AF7F48
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 19:43:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B63AAAF7F50
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 19:43:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82E671CA2113
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 17:43:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C59C7B6276
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 17:42:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C074A2F2C42;
-	Thu,  3 Jul 2025 17:42:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82692F2C56;
+	Thu,  3 Jul 2025 17:42:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BEDIOTUy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hlx+mGhj"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB592F2714
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F252F272D
 	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 17:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751564574; cv=none; b=aF7JVcH3hJrokuum6df7xhG1EG+6B6PG31TstAP7EtUxbItk2cqziD6Q9iQTHqH1uTMqgOKcgIoE6umTPv8ewjKwP/VPrqUR+hqNSbDE58M1luraN5Vld6riU4mFKP2nCpU88PU3Nwg3KCbwNdH5KIZeV+w/gPceZD6vjC8TJu0=
+	t=1751564575; cv=none; b=jn60O0/DZ2kuIKxEwFRzFgh6III9Hdr0e0qasyM1ZDOPROtj7hPwUHyMci+Q+ohsVjycEqJR0eZKda+TJZfADZxlnJOtbOZxOe1b79VlJ69/wi+Z/dT/WX9oifSbwW4kqKFDMee5ZgnipEVLzor8NCAiNNv+cWx1CrvpHxLKQf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751564574; c=relaxed/simple;
-	bh=E9Ak6jttg05x6DXCtWvsSAfBWoMK7+awR0LxYUN3QIU=;
+	s=arc-20240116; t=1751564575; c=relaxed/simple;
+	bh=MFbpMpf9F9xLjtlQMlOF6Id3YSZB0BoXzJ9lVI7v/Jk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mVzB3wVzDrb2W7UPFlpdgD5/sz9Cu4Fv7DFgXIzO1mH7l8GZEj4YVBl7rwWiNeOU5IDXFLBBzfcQ1WjNdTypYPLqL/9d4OyBoZBkxczifFaU7dnETHfcs7lu3afIoBNKZN7cqK182lrgnLBeJGo4BLwLfno3NzA0+DNu6gPmNaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BEDIOTUy; arc=none smtp.client-ip=198.175.65.19
+	 MIME-Version; b=txYXkkg5AxsoGWxPHPaqrmlu68lrmprzBhX48kVKZiBfPUIyVPIactqafiz49G2ILm9OMc3AnrSaCSWdFMq3E0oPDXNWW8GWEJHJjrrLNDVqhhUx5OyaatScdx44Vyw/h3cCJvL49eqgEHI95pxl/JkDJVY8rl4Nz4FIvJrFBlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hlx+mGhj; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,28 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1751564574; x=1783100574;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=E9Ak6jttg05x6DXCtWvsSAfBWoMK7+awR0LxYUN3QIU=;
-  b=BEDIOTUyr3nHM9VGXQsRV9buyI4JmVIzpbQ39BhQDfYknzl1o3jR7Mcj
-   JwzdDudDG6TAgebvFczZMn/1xR016xXniwFdqjVY1q+mTdeT+Cv9+BGQz
-   uXsufbF4thW3CThhv5QmA9Jac0UvjBHAHCQYRGZaC8IbhNv89Bjh7seWh
-   b4t3gvirjT7m9a/tPD5NNtK3ksg1/+g/msfasCGUB8XJji8dUdsCWZ5Cg
-   edAw6FBlPZHkOGka6C9EFDF7uCf51fKbVyF/yDnvs+iGgW51MFmrnTcYg
-   IizSwJcJZxEyP6gFBjCwfayacNIBi2C5Cs/TIluhBRJ++BmTFtinEC/HS
-   w==;
-X-CSE-ConnectionGUID: raZckS+PQ0+Qa4ln9Cr1Nw==
-X-CSE-MsgGUID: GNdmGHLKS+upwUv33njd4Q==
-X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="53767943"
+  bh=MFbpMpf9F9xLjtlQMlOF6Id3YSZB0BoXzJ9lVI7v/Jk=;
+  b=hlx+mGhjJlwMTWcQC9t+nrZ8fo7Ze8pRXoDpu9QMo2l6irBtV0/HGmFS
+   97PehXYG14zO4Wl2YkxHRCin01ks8dNnK3NDhC+yWJx9dy+RHMP8c3laz
+   hNSZjWc6KGEYsFhRzl+U0iym/eLP/xcn/e8L1V4wj2//ALVBwhT95xTQO
+   cxHzykTPhdV6zc7w+DjqASKzqpwBQ8FQnm22gZcYabWnFhT34TxOchoVS
+   B32CB0RDJFOLiM+lUBqksGRzf2YNihlNdcXYYaPYzPPg2TyPHYY5SIl+o
+   KFDp7t2Q8Uou+A+Nbf3zLptjX21WWysgUCDdrsITNWI5Ev5VWJ0MdI749
+   A==;
+X-CSE-ConnectionGUID: 4EaxQ3mpTx2V6iaEGS5MCw==
+X-CSE-MsgGUID: MHmdVnzeSE6RGyKtTHKwnA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="53767951"
 X-IronPort-AV: E=Sophos;i="6.16,285,1744095600"; 
-   d="scan'208";a="53767943"
+   d="scan'208";a="53767951"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
   by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 10:42:51 -0700
-X-CSE-ConnectionGUID: YjegntrNRAuK8YTsCpMjvA==
-X-CSE-MsgGUID: HrQ5fO/vQI28F8DPRkuQeQ==
+X-CSE-ConnectionGUID: oU0DAyEuRFCTGTvt8rseaA==
+X-CSE-MsgGUID: jz7zlpsWTli6aCAJjZzPvw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,285,1744095600"; 
-   d="scan'208";a="154997909"
+   d="scan'208";a="154997916"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa008.fm.intel.com with ESMTP; 03 Jul 2025 10:42:49 -0700
+  by fmviesa008.fm.intel.com with ESMTP; 03 Jul 2025 10:42:50 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -65,7 +65,8 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+Cc: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>,
+	anthony.l.nguyen@intel.com,
 	jedrzej.jagielski@intel.com,
 	przemyslaw.kitszel@intel.com,
 	dawid.osuchowski@intel.com,
@@ -74,9 +75,9 @@ Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
 	horms@kernel.org,
 	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
 	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net-next 07/12] ixgbe: check for MDD events
-Date: Thu,  3 Jul 2025 10:42:34 -0700
-Message-ID: <20250703174242.3829277-8-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 08/12] ixgbe: add Tx hang detection unhandled MDD
+Date: Thu,  3 Jul 2025 10:42:35 -0700
+Message-ID: <20250703174242.3829277-9-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250703174242.3829277-1-anthony.l.nguyen@intel.com>
 References: <20250703174242.3829277-1-anthony.l.nguyen@intel.com>
@@ -88,148 +89,362 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Don Skidmore <donald.c.skidmore@intel.com>
+From: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
 
-When an event is detected it is logged and, for the time being, the
-queue is immediately re-enabled.  This is due to the lack of an API
-to the hypervisor so it could deal with it as it chooses.
+Add Tx Hang detection due to an unhandled MDD Event.
+
+Previously, a malicious VF could disable the entire port causing
+TX to hang on the E610 card.
+Those events that caused PF to freeze were not detected
+as an MDD event and usually required a Tx Hang watchdog timer
+to catch the suspension, and perform a physical function reset.
+
+Implement flows in the affected PF driver in such a way to check
+the cause of the hang, detect it as an MDD event and log an
+entry of the malicious VF that caused the Hang.
+
+The PF blocks the malicious VF, if it continues to be the source
+of several MDD events.
 
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
 Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-Signed-off-by: Don Skidmore <donald.c.skidmore@intel.com>
+Signed-off-by: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
+Co-developed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  3 ++
- .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    | 51 +++++++++++++++++++
- .../net/ethernet/intel/ixgbe/ixgbe_sriov.h    |  1 +
- drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |  2 +
- 4 files changed, 57 insertions(+)
+ drivers/net/ethernet/intel/ixgbe/ixgbe.h      |   5 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c  |   3 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 211 ++++++++++++++++--
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |  12 +-
+ 4 files changed, 209 insertions(+), 22 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+index 39ae17d4a727..05b36ac3ac29 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
+@@ -429,6 +429,10 @@ enum ixgbe_ring_f_enum {
+ #define IXGBE_BAD_L2A_QUEUE		3
+ #define IXGBE_MAX_MACVLANS		63
+ 
++#define IXGBE_MAX_TX_QUEUES		128
++#define IXGBE_MAX_TX_DESCRIPTORS	40
++#define IXGBE_MAX_TX_VF_HANGS		4
++
+ DECLARE_STATIC_KEY_FALSE(ixgbe_xdp_locking_key);
+ 
+ struct ixgbe_ring_feature {
+@@ -810,6 +814,7 @@ struct ixgbe_adapter {
+ 	u32 timer_event_accumulator;
+ 	u32 vferr_refcount;
+ 	struct ixgbe_mac_addr *mac_table;
++	u8 tx_hang_count[IXGBE_MAX_TX_QUEUES];
+ 	struct kobject *info_kobj;
+ 	u16 lse_mask;
+ #ifdef CONFIG_IXGBE_HWMON
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c
+index 336d47ffb95a..54d75cf94cc1 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c
+@@ -1293,7 +1293,8 @@ void ixgbe_tx_ctxtdesc(struct ixgbe_ring *tx_ring, u32 vlan_macip_lens,
+ 	tx_ring->next_to_use = (i < tx_ring->count) ? i : 0;
+ 
+ 	/* set bits to identify this as an advanced context descriptor */
+-	type_tucmd |= IXGBE_TXD_CMD_DEXT | IXGBE_ADVTXD_DTYP_CTXT;
++	type_tucmd |= IXGBE_TXD_CMD_DEXT |
++		FIELD_PREP(IXGBE_ADVTXD_DTYP_MASK, IXGBE_ADVTXD_DTYP_CTXT);
+ 
+ 	context_desc->vlan_macip_lens	= cpu_to_le32(vlan_macip_lens);
+ 	context_desc->fceof_saidx	= cpu_to_le32(fceof_saidx);
 diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 991cf24f3b9b..4db8e7136571 100644
+index 4db8e7136571..f1c51ddbaf9e 100644
 --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
 +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -7964,6 +7964,9 @@ static void ixgbe_watchdog_link_is_up(struct ixgbe_adapter *adapter)
- 	netif_carrier_on(netdev);
- 	ixgbe_check_vf_rate_limit(adapter);
- 
-+	if (adapter->num_vfs && hw->mac.ops.enable_mdd)
-+		hw->mac.ops.enable_mdd(hw);
-+
- 	/* enable transmits */
- 	netif_tx_wake_all_queues(adapter->netdev);
- 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-index 0dbbd2befd4d..bd9a054d7d94 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-@@ -207,6 +207,7 @@ void ixgbe_enable_sriov(struct ixgbe_adapter *adapter, unsigned int max_vfs)
- int ixgbe_disable_sriov(struct ixgbe_adapter *adapter)
- {
- 	unsigned int num_vfs = adapter->num_vfs, vf;
-+	struct ixgbe_hw *hw = &adapter->hw;
- 	unsigned long flags;
- 	int rss;
- 
-@@ -237,6 +238,9 @@ int ixgbe_disable_sriov(struct ixgbe_adapter *adapter)
- 	if (!(adapter->flags & IXGBE_FLAG_SRIOV_ENABLED))
- 		return 0;
- 
-+	if (hw->mac.ops.disable_mdd)
-+		hw->mac.ops.disable_mdd(hw);
-+
- #ifdef CONFIG_PCI_IOV
- 	/*
- 	 * If our VFs are assigned we cannot shut down SR-IOV
-@@ -1353,12 +1357,59 @@ static void ixgbe_rcv_ack_from_vf(struct ixgbe_adapter *adapter, u32 vf)
- 		ixgbe_write_mbx(hw, &msg, 1, vf);
+@@ -9,6 +9,7 @@
+ #include <linux/string.h>
+ #include <linux/in.h>
+ #include <linux/interrupt.h>
++#include <linux/iopoll.h>
+ #include <linux/ip.h>
+ #include <linux/tcp.h>
+ #include <linux/sctp.h>
+@@ -1040,6 +1041,48 @@ static u64 ixgbe_get_tx_pending(struct ixgbe_ring *ring)
+ 	return ((head <= tail) ? tail : tail + ring->count) - head;
  }
  
 +/**
-+ * ixgbe_check_mdd_event - check for MDD event on all VFs
-+ * @adapter: pointer to ixgbe adapter
++ * ixgbe_get_vf_idx - provide VF index number based on queue index
++ * @adapter: pointer to the adapter struct
++ * @queue: Tx queue identifier
++ * @vf: output VF index
 + *
-+ * Return: true if there is a VF on which MDD event occurred, false otherwise.
++ * Provide VF index number associated to the input queue.
++ *
++ * Returns: 0 if VF provided or error number.
 + */
-+bool ixgbe_check_mdd_event(struct ixgbe_adapter *adapter)
++static int ixgbe_get_vf_idx(struct ixgbe_adapter *adapter, u16 queue, u16 *vf)
 +{
 +	struct ixgbe_hw *hw = &adapter->hw;
-+	DECLARE_BITMAP(vf_bitmap, 64);
-+	bool ret = false;
-+	int i;
++	u8 queue_count;
++	u32 reg;
 +
-+	if (!hw->mac.ops.handle_mdd)
-+		return false;
++	if (queue >= adapter->num_tx_queues)
++		return -EINVAL;
 +
-+	/* Did we have a malicious event */
-+	bitmap_zero(vf_bitmap, 64);
-+	hw->mac.ops.handle_mdd(hw, vf_bitmap);
-+
-+	/* Log any blocked queues and release lock */
-+	for_each_set_bit(i, vf_bitmap, 64) {
-+		dev_warn(&adapter->pdev->dev,
-+			 "Malicious event on VF %d tx:%x rx:%x\n", i,
-+			 IXGBE_READ_REG(hw, IXGBE_LVMMC_TX),
-+			 IXGBE_READ_REG(hw, IXGBE_LVMMC_RX));
-+
-+		if (hw->mac.ops.restore_mdd_vf) {
-+			u32 ping;
-+
-+			hw->mac.ops.restore_mdd_vf(hw, i);
-+
-+			/* get the VF to rebuild its queues */
-+			adapter->vfinfo[i].clear_to_send = 0;
-+			ping = IXGBE_PF_CONTROL_MSG |
-+			       IXGBE_VT_MSGTYPE_CTS;
-+			ixgbe_write_mbx(hw, &ping, 1, i);
-+		}
-+
-+		ret = true;
++	/* Determine number of queues by checking
++	 * number of virtual functions
++	 */
++	reg = IXGBE_READ_REG(hw, IXGBE_GCR_EXT);
++	switch (reg & IXGBE_GCR_EXT_VT_MODE_MASK) {
++	case IXGBE_GCR_EXT_VT_MODE_64:
++		queue_count = IXGBE_64VFS_QUEUES;
++		break;
++	case IXGBE_GCR_EXT_VT_MODE_32:
++		queue_count = IXGBE_32VFS_QUEUES;
++		break;
++	case IXGBE_GCR_EXT_VT_MODE_16:
++		queue_count = IXGBE_16VFS_QUEUES;
++		break;
++	default:
++		return -EINVAL;
 +	}
 +
-+	return ret;
++	*vf = queue / queue_count;
++
++	return 0;
 +}
 +
- void ixgbe_msg_task(struct ixgbe_adapter *adapter)
+ static bool ixgbe_check_tx_hang(struct ixgbe_ring *tx_ring)
  {
- 	struct ixgbe_hw *hw = &adapter->hw;
- 	unsigned long flags;
- 	u32 vf;
+ 	u32 tx_done = ixgbe_get_tx_completed(tx_ring);
+@@ -1158,6 +1201,150 @@ void ixgbe_update_rx_ring_stats(struct ixgbe_ring *rx_ring,
+ 	q_vector->rx.total_packets += pkts;
+ }
  
-+	ixgbe_check_mdd_event(adapter);
++/**
++ * ixgbe_pf_handle_tx_hang - handle Tx hang on PF
++ * @tx_ring: tx ring number
++ * @next: next ring
++ *
++ * Prints a message containing details about the tx hang.
++ */
++static void ixgbe_pf_handle_tx_hang(struct ixgbe_ring *tx_ring,
++				    unsigned int next)
++{
++	struct ixgbe_adapter *adapter = netdev_priv(tx_ring->netdev);
++	struct ixgbe_hw *hw = &adapter->hw;
 +
- 	spin_lock_irqsave(&adapter->vfs_lock, flags);
- 	for (vf = 0; vf < adapter->num_vfs; vf++) {
- 		/* process any reset requests */
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.h
-index 0690ecb8dfa3..bc4cab976bf9 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.h
-@@ -15,6 +15,7 @@
- #ifdef CONFIG_PCI_IOV
- void ixgbe_restore_vf_multicasts(struct ixgbe_adapter *adapter);
- #endif
-+bool ixgbe_check_mdd_event(struct ixgbe_adapter *adapter);
- void ixgbe_msg_task(struct ixgbe_adapter *adapter);
- int ixgbe_vf_configuration(struct pci_dev *pdev, unsigned int event_mask);
- void ixgbe_ping_all_vfs(struct ixgbe_adapter *adapter);
++	e_err(drv, "Detected Tx Unit Hang%s\n"
++		   "  Tx Queue             <%d>\n"
++		   "  TDH, TDT             <%x>, <%x>\n"
++		   "  next_to_use          <%x>\n"
++		   "  next_to_clean        <%x>\n"
++		   "tx_buffer_info[next_to_clean]\n"
++		   "  time_stamp           <%lx>\n"
++		   "  jiffies              <%lx>\n",
++	      ring_is_xdp(tx_ring) ? " (XDP)" : "",
++	      tx_ring->queue_index,
++	      IXGBE_READ_REG(hw, IXGBE_TDH(tx_ring->reg_idx)),
++	      IXGBE_READ_REG(hw, IXGBE_TDT(tx_ring->reg_idx)),
++	      tx_ring->next_to_use, next,
++	      tx_ring->tx_buffer_info[next].time_stamp, jiffies);
++
++	if (!ring_is_xdp(tx_ring))
++		netif_stop_subqueue(tx_ring->netdev,
++				    tx_ring->queue_index);
++}
++
++/**
++ * ixgbe_vf_handle_tx_hang - handle Tx hang on VF
++ * @adapter: structure containing ring specific data
++ * @vf: VF index
++ *
++ * Print a message containing details about malicious driver detection.
++ * Set malicious VF link down if the detection happened several times.
++ */
++static void ixgbe_vf_handle_tx_hang(struct ixgbe_adapter *adapter, u16 vf)
++{
++	struct ixgbe_hw *hw = &adapter->hw;
++
++	if (adapter->hw.mac.type != ixgbe_mac_e610)
++		return;
++
++	e_warn(drv,
++	       "Malicious Driver Detection tx hang detected on PF %d VF %d MAC: %pM",
++	       hw->bus.func, vf, adapter->vfinfo[vf].vf_mac_addresses);
++
++	adapter->tx_hang_count[vf]++;
++	if (adapter->tx_hang_count[vf] == IXGBE_MAX_TX_VF_HANGS) {
++		ixgbe_set_vf_link_state(adapter, vf,
++					IFLA_VF_LINK_STATE_DISABLE);
++		adapter->tx_hang_count[vf] = 0;
++	}
++}
++
++static u32 ixgbe_poll_tx_icache(struct ixgbe_hw *hw, u16 queue, u16 idx)
++{
++	IXGBE_WRITE_REG(hw, IXGBE_TXDESCIC, queue * idx);
++	return IXGBE_READ_REG(hw, IXGBE_TXDESCIC);
++}
++
++/**
++ * ixgbe_check_illegal_queue - search for queue with illegal packet
++ * @adapter: structure containing ring specific data
++ * @queue: queue index
++ *
++ * Check if tx descriptor connected with input queue
++ * contains illegal packet.
++ *
++ * Returns: true if queue contain illegal packet.
++ */
++static bool ixgbe_check_illegal_queue(struct ixgbe_adapter *adapter,
++				      u16 queue)
++{
++	u32 hdr_len_reg, mss_len_reg, type_reg;
++	struct ixgbe_hw *hw = &adapter->hw;
++	u32 mss_len, header_len, reg;
++
++	for (u16 i = 0; i < IXGBE_MAX_TX_DESCRIPTORS; i++) {
++		/* HW will clear bit IXGBE_TXDESCIC_READY when address
++		 * is written to address field. HW will set this bit
++		 * when iCache read is done, and data is ready at TIC_DWx.
++		 * Set descriptor address.
++		 */
++		read_poll_timeout(ixgbe_poll_tx_icache, reg,
++				  !(reg & IXGBE_TXDESCIC_READY), 0, 0, false,
++				  hw, queue, i);
++
++		/* read tx descriptor access registers */
++		hdr_len_reg = IXGBE_READ_REG(hw, IXGBE_TIC_DW2(IXGBE_VLAN_MACIP_LENS_REG));
++		type_reg = IXGBE_READ_REG(hw, IXGBE_TIC_DW2(IXGBE_TYPE_TUCMD_MLHL));
++		mss_len_reg = IXGBE_READ_REG(hw, IXGBE_TIC_DW2(IXGBE_MSS_L4LEN_IDX));
++
++		/* check if Advanced Context Descriptor */
++		if (FIELD_GET(IXGBE_ADVTXD_DTYP_MASK, type_reg) !=
++		    IXGBE_ADVTXD_DTYP_CTXT)
++			continue;
++
++		/* check for illegal MSS and Header length */
++		mss_len = FIELD_GET(IXGBE_ADVTXD_MSS_MASK, mss_len_reg);
++		header_len = FIELD_GET(IXGBE_ADVTXD_HEADER_LEN_MASK,
++				       hdr_len_reg);
++		if ((mss_len + header_len) > SZ_16K) {
++			e_warn(probe, "mss len + header len too long\n");
++			return true;
++		}
++	}
++
++	return false;
++}
++
++/**
++ * ixgbe_handle_mdd_event - handle mdd event
++ * @adapter: structure containing ring specific data
++ * @tx_ring: tx descriptor ring to handle
++ *
++ * Reset VF driver if malicious vf detected or
++ * illegal packet in an any queue detected.
++ */
++static void ixgbe_handle_mdd_event(struct ixgbe_adapter *adapter,
++				   struct ixgbe_ring *tx_ring)
++{
++	u16 vf, q;
++
++	if (adapter->vfinfo && ixgbe_check_mdd_event(adapter)) {
++		/* vf mdd info and malicious vf detected */
++		if (!ixgbe_get_vf_idx(adapter, tx_ring->queue_index, &vf))
++			ixgbe_vf_handle_tx_hang(adapter, vf);
++	} else {
++		/* malicious vf not detected */
++		for (q = 0; q < IXGBE_MAX_TX_QUEUES; q++) {
++			if (ixgbe_check_illegal_queue(adapter, q) &&
++			    !ixgbe_get_vf_idx(adapter, q, &vf))
++				/* illegal queue detected */
++				ixgbe_vf_handle_tx_hang(adapter, vf);
++		}
++	}
++}
++
+ /**
+  * ixgbe_clean_tx_irq - Reclaim resources after transmit completes
+  * @q_vector: structure containing interrupt and ring information
+@@ -1265,26 +1452,10 @@ static bool ixgbe_clean_tx_irq(struct ixgbe_q_vector *q_vector,
+ 	adapter->tx_ipsec += total_ipsec;
+ 
+ 	if (check_for_tx_hang(tx_ring) && ixgbe_check_tx_hang(tx_ring)) {
+-		/* schedule immediate reset if we believe we hung */
+-		struct ixgbe_hw *hw = &adapter->hw;
+-		e_err(drv, "Detected Tx Unit Hang %s\n"
+-			"  Tx Queue             <%d>\n"
+-			"  TDH, TDT             <%x>, <%x>\n"
+-			"  next_to_use          <%x>\n"
+-			"  next_to_clean        <%x>\n"
+-			"tx_buffer_info[next_to_clean]\n"
+-			"  time_stamp           <%lx>\n"
+-			"  jiffies              <%lx>\n",
+-			ring_is_xdp(tx_ring) ? "(XDP)" : "",
+-			tx_ring->queue_index,
+-			IXGBE_READ_REG(hw, IXGBE_TDH(tx_ring->reg_idx)),
+-			IXGBE_READ_REG(hw, IXGBE_TDT(tx_ring->reg_idx)),
+-			tx_ring->next_to_use, i,
+-			tx_ring->tx_buffer_info[i].time_stamp, jiffies);
+-
+-		if (!ring_is_xdp(tx_ring))
+-			netif_stop_subqueue(tx_ring->netdev,
+-					    tx_ring->queue_index);
++		if (adapter->hw.mac.type == ixgbe_mac_e610)
++			ixgbe_handle_mdd_event(adapter, tx_ring);
++
++		ixgbe_pf_handle_tx_hang(tx_ring, i);
+ 
+ 		e_info(probe,
+ 		       "tx hang %d detected on queue %d, resetting adapter\n",
 diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-index 2a25abc0b17a..89df6f462302 100644
+index 89df6f462302..80dfc94c89f7 100644
 --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
 +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-@@ -402,6 +402,8 @@ struct ixgbe_nvm_version {
- #define IXGBE_MRCTL(_i)      (0x0F600 + ((_i) * 4))
- #define IXGBE_VMRVLAN(_i)    (0x0F610 + ((_i) * 4))
- #define IXGBE_VMRVM(_i)      (0x0F630 + ((_i) * 4))
-+#define IXGBE_LVMMC_RX	     0x2FA8
-+#define IXGBE_LVMMC_TX	     0x8108
- #define IXGBE_WQBR_RX(_i)    (0x2FB0 + ((_i) * 4)) /* 4 total */
- #define IXGBE_WQBR_TX(_i)    (0x8130 + ((_i) * 4)) /* 4 total */
- #define IXGBE_L34T_IMIR(_i)  (0x0E800 + ((_i) * 4)) /*128 of these (0-127)*/
+@@ -1044,6 +1044,7 @@ struct ixgbe_nvm_version {
+ #define IXGBE_GCR_EXT_VT_MODE_16        0x00000001
+ #define IXGBE_GCR_EXT_VT_MODE_32        0x00000002
+ #define IXGBE_GCR_EXT_VT_MODE_64        0x00000003
++#define IXGBE_GCR_EXT_VT_MODE_MASK      0x00000003
+ #define IXGBE_GCR_EXT_SRIOV             (IXGBE_GCR_EXT_MSIX_EN | \
+ 					 IXGBE_GCR_EXT_VT_MODE_64)
+ 
+@@ -2935,6 +2936,13 @@ struct ixgbe_adv_tx_context_desc {
+ 	__le32 mss_l4len_idx;
+ };
+ 
++enum {
++	IXGBE_VLAN_MACIP_LENS_REG	= 0,
++	IXGBE_FCEOF_SAIDX_REG		= 1,
++	IXGBE_TYPE_TUCMD_MLHL		= 2,
++	IXGBE_MSS_L4LEN_IDX		= 3,
++};
++
+ /* Adv Transmit Descriptor Config Masks */
+ #define IXGBE_ADVTXD_DTALEN_MASK      0x0000FFFF /* Data buf length(bytes) */
+ #define IXGBE_ADVTXD_MAC_LINKSEC      0x00040000 /* Insert LinkSec */
+@@ -2942,7 +2950,7 @@ struct ixgbe_adv_tx_context_desc {
+ #define IXGBE_ADVTXD_IPSEC_SA_INDEX_MASK   0x000003FF /* IPSec SA index */
+ #define IXGBE_ADVTXD_IPSEC_ESP_LEN_MASK    0x000001FF /* IPSec ESP length */
+ #define IXGBE_ADVTXD_DTYP_MASK  0x00F00000 /* DTYP mask */
+-#define IXGBE_ADVTXD_DTYP_CTXT  0x00200000 /* Advanced Context Desc */
++#define IXGBE_ADVTXD_DTYP_CTXT	0x2 /* Advanced Context Desc */
+ #define IXGBE_ADVTXD_DTYP_DATA  0x00300000 /* Advanced Data Descriptor */
+ #define IXGBE_ADVTXD_DCMD_EOP   IXGBE_TXD_CMD_EOP  /* End of Packet */
+ #define IXGBE_ADVTXD_DCMD_IFCS  IXGBE_TXD_CMD_IFCS /* Insert FCS */
+@@ -2991,6 +2999,8 @@ struct ixgbe_adv_tx_context_desc {
+ #define IXGBE_ADVTXD_FCOEF_EOF_MASK  (3u << 10)  /* FC EOF index */
+ #define IXGBE_ADVTXD_L4LEN_SHIFT     8  /* Adv ctxt L4LEN shift */
+ #define IXGBE_ADVTXD_MSS_SHIFT       16  /* Adv ctxt MSS shift */
++#define IXGBE_ADVTXD_MSS_MASK		GENMASK(31, IXGBE_ADVTXD_MSS_SHIFT)
++#define IXGBE_ADVTXD_HEADER_LEN_MASK	GENMASK(8, 0)
+ 
+ /* Autonegotiation advertised speeds */
+ typedef u32 ixgbe_autoneg_advertised;
 -- 
 2.47.1
 
