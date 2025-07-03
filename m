@@ -1,252 +1,187 @@
-Return-Path: <netdev+bounces-203596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6600EAF67C8
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 04:12:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 981CCAF67CA
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 04:13:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F6694A7430
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 02:12:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 741B73A7523
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 02:12:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A3D1B0F17;
-	Thu,  3 Jul 2025 02:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC3F1E9B3D;
+	Thu,  3 Jul 2025 02:12:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KCmPu2DF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DPv/EHZ6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170DC78F3B;
-	Thu,  3 Jul 2025 02:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680141D5CE5
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 02:12:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751508763; cv=none; b=LlTfC2ZGl4sDyLXXUAneHho41e85ZcKjLO66jchnZV/YyO8wywkkz1bR4XatBEc2BYcUh/iBWO8/P8f/FzOSAp6nM+GrsEgSBcRLPuUDwmqLJalZnlGhIQRMnSpLSnZxurhAoZh/OcV5EkfKdYDARhmlcwINzi+uzXZEhClPLKU=
+	t=1751508765; cv=none; b=dhf0t3P7fcMN0tcLeYob9KQWWGuvfYrKmAfsN9fxEXnl/Hbqoyb79SY55e6ZMfuiN4vnKLPREWbnJgquw50pYYJqFrAp5CHS5gGDQ/VIfJSo/hWXeLygdCLF+wXL40sri4Ua0s2YKhpiK5OyeJQ0wxQEr7oDtpkBWiazzwXgI6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751508763; c=relaxed/simple;
-	bh=sMqFnXsB9KHf9HSqojnNLZvxtE3M1hEaE1+cY5TdKiY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hUR/I8N1Zxeb8fdXfSzejrfjpJyvHY3PQ8MbT/8PACfHbucbSCenlCqry524sWzqTIlb+KVv/j1A5buaotnlkn/V0i6glHlfcil5jwLmh9Pyonuf7nbwyjz5qKcy4jyRwm8mxjbNZ1cRvX1Y6g514NDTM2d1Bw5hWz3nLhcPOC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KCmPu2DF; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-235ef62066eso96182965ad.3;
-        Wed, 02 Jul 2025 19:12:41 -0700 (PDT)
+	s=arc-20240116; t=1751508765; c=relaxed/simple;
+	bh=lBg+2rfNaGnjS0hbzaYfp1CeUFtw5//muHuGCu2lNkk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WIVRpWCVuz/D7dn4o+sVS+J5KLklpFRYGywp88FNVMcTEDft4nHNtGesWe/f9hVVYUVY54hpgTWrAxnlUPd1/lBQKSF16B303ADj9IFBe7yMQiSVOJ1V2+mo8CHCifvYOMMldGWg+KtdJ2uIsA+Ys5MVLuqfprqsmPTF0jLH5Lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DPv/EHZ6; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-311e46d38ddso6395884a91.0
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 19:12:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751508761; x=1752113561; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=S16+Wo1JY0zCcQqq1dcPzIA9NOiw0i4loy9qh5wd/pc=;
-        b=KCmPu2DFpT+ia3G8ZJ0BwfYp+d7q91+IS6f8IPkwJvA6u4X8UP8uVoQHJhJw67h1ur
-         sIHtA/rdGgCBIA7CJIfbR2FZeqLTEYPxnmJhXr6HQWWWkNnWZOtV/oSPhGIq+HIMX0Bo
-         h3qie4UEKeItaKBcwaucMjL60ArPOPBcRM1QXHZX3GTj/fpIMfP6CzU8kUcs3XaVqvB6
-         XcR1Hwq9Sp1k2tw4zTir7kcxAmiQgYNld87s3QIqgqke5Lt1QGDRf/bMKiVGG4pVEEqV
-         SHoOTDhUIhxVkV7oGGsBlfO3uyDlsEBVv8MNYwbHr2dbTRdqk3ArKD3Hav1I1EieKY5o
-         3skg==
+        d=google.com; s=20230601; t=1751508764; x=1752113564; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6NO73RfR6Y3gr9CLEXQ/SnY7i03Uc20liAAl3u3Q+Dk=;
+        b=DPv/EHZ656vNnmW1Bkn/Ws5mrldtenzkVYMOUvdDCDORnuZ/+tip6rJGDvLfgQ0A72
+         8YRh51X+q9dPjOzWf1QDH2CmPEEnEtNOTntdYfhAacoCjYuN9s3/62iXKq32Jp6gPRiB
+         hN781T7XX+7YOKsVj8pSPBQaUv4Qalsmh+mRbixMiYq9hubT0zKExpTlTb8pGOadVhDJ
+         GFJfvu6uM+/CJUNYHkTt1k10IElrLsQFQi8TwKG2+mwupemHr4sD+rTW2Uz3eqxxbdJ+
+         JItysBqbZ1Z1W6fEYwnErQmsnLYF1z/KWSZdnmBh4+rystKqd7fOykGL2ouV1XEDQ1WJ
+         PsKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751508761; x=1752113561;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=S16+Wo1JY0zCcQqq1dcPzIA9NOiw0i4loy9qh5wd/pc=;
-        b=Dzgvg27YNFoEp6z06hHc2NZwF0f3eHQ8rxDBZF/V3gh5T3myN3IcMz7EIODXnexi8w
-         CpccjJgtbkRPq2i3jp4nxsZrIgpRBkKP3Ac8Qr0u6Z847gqd5u0CueRJ9RMfIyH+XqqY
-         d6kcCdxlNR5uF+o+SfAu5Q1WEKQDBvyEI+rD0aGfEwcdJx4LqCrmdtVqDxU5lPlzS3IM
-         +AIc2OwK0PafSh2L8Gd6Zg7QsoA2ucOfLq6vHZCBhdMfe3b+J2oV3s1ILaeJxaS3xYwn
-         K4ZA8nwntdM3np+A1hYgmF0C7JUe9FYWrCP7qjLo9e/yMZj8xlVbvbhqd7CIJ1WoetG2
-         PC7g==
-X-Forwarded-Encrypted: i=1; AJvYcCV6ED4GK0TOfEyzpX3pmZPp7yt9sYYhuMeb29Sda3iseNpTt+0LAVXrEdPe9KUWAATmG2OTQ7EpVgPo@vger.kernel.org, AJvYcCWmG/2JawE9gIHhNXIl8PjXhuQqtOVmzpAfNLDB3B2tb1U45VolkoDJA/mbjNNdmOmMh2+ggkWRm1RsuIUD@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPbJWwhhQWgdM/x/pAaI8xPzrwzpyzcPRMWd2zy6Ql/Kj26R2K
-	qpcVEy0Do3ODSlDi98dJ2gIWZ+E4LI7wGxohb14/Id9IKt8X7RRX71jd
-X-Gm-Gg: ASbGncst0kN9kgZme7EjdCjpQxTW9qyuc3rWTCieUdRtHaOlKq97YJ3nlLx3qbg+1HZ
-	Ph7EoNH5VGRN3F/FYLOf7MRbgxYgCZGFe1AndDZGuuY1D8eH1btC3ajpI3z7mNmvUucSbJcaA2/
-	F2HZSWOdJ/IKxyNoqUdSpPDog623tQIvEvpbn5nDHcjd9Pgma1bUvjRg8tN1T9l5azkqf7Szbkt
-	GzRYAz8rXl8P76KTbQW7JX2afhkZTrlJH2Hqi6Xz/801j7iSb0TfRbwKwsNiQbyDAIS/Jv79wv2
-	lICe/lxOkWQw/HtFnNw8gruMX1Y5p5UtqwLrikD9wm84gf66lkM1tdGwn2zTwA==
-X-Google-Smtp-Source: AGHT+IFnmlwLaBLaGwc+N19c2w52c0k4AcjFAlDtZ/2XEfLCT2lg1jaNUPZxftwxJdpBB1iqrVZDJA==
-X-Received: by 2002:a17:902:d492:b0:236:8df9:ab38 with SMTP id d9443c01a7336-23c6e591cd5mr88563685ad.34.1751508761218;
-        Wed, 02 Jul 2025 19:12:41 -0700 (PDT)
-Received: from localhost ([2001:19f0:ac00:4eb8:5400:5ff:fe30:7df3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-23acb2f1b31sm140649065ad.69.2025.07.02.19.12.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 19:12:40 -0700 (PDT)
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chen Wang <unicorn_wang@outlook.com>,
-	Inochi Amaoto <inochiama@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexandre Ghiti <alex@ghiti.fr>
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	sophgo@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	Yixun Lan <dlan@gentoo.org>,
-	Longbin Li <looong.bin@gmail.com>,
-	Conor Dooley <conor.dooley@microchip.com>
-Subject: [PATCH net-next] dt-bindings: net: Add support for Sophgo CV1800 dwmac
-Date: Thu,  3 Jul 2025 10:12:19 +0800
-Message-ID: <20250703021220.124195-1-inochiama@gmail.com>
-X-Mailer: git-send-email 2.50.0
+        d=1e100.net; s=20230601; t=1751508764; x=1752113564;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6NO73RfR6Y3gr9CLEXQ/SnY7i03Uc20liAAl3u3Q+Dk=;
+        b=W6gIoFx7DpK/0EUVBZkz4YA/CmEXx5A845t2LbGVuVHqCe50cN1UhZDt6hSAQQJzKS
+         4jnFikjxFvn7HaClOCqy+RyByOiwtQs5/pp7dhaQoh9e0JvgaQN5CoSf0I85vpU+Iu+9
+         vRdUsGX557n2fuUSeNKtOaGvL9D6k6+NwtVqAk+e/849xS9aMkuWCsPX0JztFvBOJ+oF
+         3gIn6O/eZyMR9ou7fsflRB8XFzhH/Vs4z4hF0YnC+ExoHDzDz0YKls5jkgyp/fNEikPc
+         jM5qUNYirZuFUZ74wYClMWLDE6npaFOwBJeNDRh2QoTvNeYYyVna31dwPPeJJGQSrfje
+         dx4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV53WNtvui8BvrRT5QnST7qItTRiNQMsKaZfLBvf55nrrsIpIno6rrYFiiS8+xdVR+wctnFoFg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHIHSSeJVBAu/m9vmAACtOT4TAI7o7M3gO2aY77NNFW66zEMdQ
+	W3WHL7in+AhpPZZ6H4toGbZK2FzN+eFa4MqsLYqrKuLrEPUbqaIGFYwO0FtCf+jLqNamd78IPg0
+	QdMUsHz7xf2UeewKw1adZmiLZjBsWielKJXaGyJ4C
+X-Gm-Gg: ASbGncu0tgUe5kKlTGbH5vWKAwGz7WsNfuVlCouQXNvQMSF4wJ6WGhyG6MpaQtCuljH
+	tlqBSjGkrUAyfa5ZdD8IvvfadSKsgQXUujMmk6MZ44lVhUlfktolZrq+G/vuv8oBe8ta9IPR/bs
+	J8I92O8YD2y/ILMRg2aGLwfJEpIoLf1bFgMYNjitSNXO1/lQup8TYTzin514VGlYNn578fgdinm
+	G8lRb6yeTV2OcQ=
+X-Google-Smtp-Source: AGHT+IEfk5Evrrn1hWvkFobuV0tS0uqK20Nkb4L5h50gd31HYQ14M5AinIcG/AgD9Ggo+cNn9dNRqqkwceDxacax1UY=
+X-Received: by 2002:a17:90b:53ce:b0:311:c5d9:2c7c with SMTP id
+ 98e67ed59e1d1-31a9df94759mr1241067a91.23.1751508763578; Wed, 02 Jul 2025
+ 19:12:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250701083922.97928-1-aleksandr.mikhalitsyn@canonical.com> <20250701083922.97928-7-aleksandr.mikhalitsyn@canonical.com>
+In-Reply-To: <20250701083922.97928-7-aleksandr.mikhalitsyn@canonical.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Wed, 2 Jul 2025 19:12:31 -0700
+X-Gm-Features: Ac12FXxZ3hrF9DXpmcOwKNJ_VHMmv3IGoCk3Oxc0vEHSANkYmmlrMbUy8AXWM1A
+Message-ID: <CAAVpQUAXwWE6ssHYwaA4Wi4U0j_VOQ0vPD6oTAEhEV3q92fPnQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/6] af_unix: introduce and use
+ __scm_replace_pid() helper
+To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, Leon Romanovsky <leon@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Christian Brauner <brauner@kernel.org>, Lennart Poettering <mzxreary@0pointer.de>, 
+	Luca Boccassi <bluca@debian.org>, David Rheinsberg <david@readahead.eu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The GMAC IP on CV1800 series SoC is a standard Synopsys
-DesignWare MAC (version 3.70a).
+On Tue, Jul 1, 2025 at 1:41=E2=80=AFAM Alexander Mikhalitsyn
+<aleksandr.mikhalitsyn@canonical.com> wrote:
+>
+> Existing logic in __scm_send() related to filling an struct scm_cookie
+> with a proper struct pid reference is already pretty tricky. Let's
+> simplify it a bit by introducing a new helper. This helper will be
+> extended in one of the next patches.
+>
+> Cc: linux-kernel@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: Willem de Bruijn <willemb@google.com>
+> Cc: Leon Romanovsky <leon@kernel.org>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Christian Brauner <brauner@kernel.org>
+> Cc: Kuniyuki Iwashima <kuniyu@google.com>
+> Cc: Lennart Poettering <mzxreary@0pointer.de>
+> Cc: Luca Boccassi <bluca@debian.org>
+> Cc: David Rheinsberg <david@readahead.eu>
+> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com=
+>
+> ---
+> v2:
+>         - don't do get_pid() in __scm_replace_pid() [ as Kuniyuki suggest=
+ed ]
+>         - move __scm_replace_pid() from scm.h to scm.c [ as Kuniyuki sugg=
+ested ]
+> ---
+>  net/core/scm.c | 22 +++++++++++++++++++---
+>  1 file changed, 19 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/core/scm.c b/net/core/scm.c
+> index 0225bd94170f..68441c024dd8 100644
+> --- a/net/core/scm.c
+> +++ b/net/core/scm.c
+> @@ -145,6 +145,16 @@ void __scm_destroy(struct scm_cookie *scm)
+>  }
+>  EXPORT_SYMBOL(__scm_destroy);
+>
+> +static inline int __scm_replace_pid(struct scm_cookie *scm, struct pid *=
+pid)
 
-Add necessary compatible string for this device.
+As you will need v3, I'd remove "__" because there's no-prefix-version.
 
-Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
----
-The binding patch is split from the origianl series
-"[PATCH net-next RFC v4 0/4] riscv: dts: sophgo: Add ethernet support
-for cv18xx".
 
-Change from origianl RFC v4:
-- https://lore.kernel.org/all/20250701011730.136002-1-inochiama@gmail.com
-2. remove status, add "phy-handle" and "phy-mode" for binding test.
----
- .../bindings/net/sophgo,cv1800b-dwmac.yaml    | 114 ++++++++++++++++++
- 1 file changed, 114 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/sophgo,cv1800b-dwmac.yaml
-
-diff --git a/Documentation/devicetree/bindings/net/sophgo,cv1800b-dwmac.yaml b/Documentation/devicetree/bindings/net/sophgo,cv1800b-dwmac.yaml
-new file mode 100644
-index 000000000000..b89456f0ef83
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/sophgo,cv1800b-dwmac.yaml
-@@ -0,0 +1,114 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/sophgo,cv1800b-dwmac.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Sophgo CV1800B DWMAC glue layer
-+
-+maintainers:
-+  - Inochi Amaoto <inochiama@gmail.com>
-+
-+select:
-+  properties:
-+    compatible:
-+      contains:
-+        enum:
-+          - sophgo,cv1800b-dwmac
-+  required:
-+    - compatible
-+
-+properties:
-+  compatible:
-+    items:
-+      - const: sophgo,cv1800b-dwmac
-+      - const: snps,dwmac-3.70a
-+
-+  reg:
-+    maxItems: 1
-+
-+  clocks:
-+    items:
-+      - description: GMAC main clock
-+      - description: PTP clock
-+
-+  clock-names:
-+    items:
-+      - const: stmmaceth
-+      - const: ptp_ref
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  interrupt-names:
-+    maxItems: 1
-+
-+  resets:
-+    maxItems: 1
-+
-+  reset-names:
-+    const: stmmaceth
-+
-+required:
-+  - compatible
-+  - reg
-+  - clocks
-+  - clock-names
-+  - interrupts
-+  - interrupt-names
-+  - resets
-+  - reset-names
-+
-+allOf:
-+  - $ref: snps,dwmac.yaml#
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+
-+    ethernet@4070000 {
-+      compatible = "sophgo,cv1800b-dwmac", "snps,dwmac-3.70a";
-+      reg = <0x04070000 0x10000>;
-+      clocks = <&clk 35>, <&clk 36>;
-+      clock-names = "stmmaceth", "ptp_ref";
-+      interrupts = <31 IRQ_TYPE_LEVEL_HIGH>;
-+      interrupt-names = "macirq";
-+      phy-handle = <&internal_ephy>;
-+      phy-mode = "internal";
-+      resets = <&rst 12>;
-+      reset-names = "stmmaceth";
-+      rx-fifo-depth = <8192>;
-+      tx-fifo-depth = <8192>;
-+      snps,multicast-filter-bins = <0>;
-+      snps,perfect-filter-entries = <1>;
-+      snps,aal;
-+      snps,txpbl = <8>;
-+      snps,rxpbl = <8>;
-+      snps,mtl-rx-config = <&gmac0_mtl_rx_setup>;
-+      snps,mtl-tx-config = <&gmac0_mtl_tx_setup>;
-+      snps,axi-config = <&gmac0_stmmac_axi_setup>;
-+
-+      mdio {
-+        compatible = "snps,dwmac-mdio";
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+      };
-+
-+      gmac0_mtl_rx_setup: rx-queues-config {
-+        snps,rx-queues-to-use = <1>;
-+        queue0 {};
-+      };
-+
-+      gmac0_mtl_tx_setup: tx-queues-config {
-+        snps,tx-queues-to-use = <1>;
-+        queue0 {};
-+      };
-+
-+      gmac0_stmmac_axi_setup: stmmac-axi-config {
-+        snps,blen = <16 8 4 0 0 0 0>;
-+        snps,rd_osr_lmt = <2>;
-+        snps,wr_osr_lmt = <1>;
-+      };
-+    };
---
-2.50.0
-
+> +{
+> +       /* drop all previous references */
+> +       scm_destroy_cred(scm);
+> +
+> +       scm->pid =3D pid;
+> +       scm->creds.pid =3D pid_vnr(pid);
+> +       return 0;
+> +}
+> +
+>  int __scm_send(struct socket *sock, struct msghdr *msg, struct scm_cooki=
+e *p)
+>  {
+>         const struct proto_ops *ops =3D READ_ONCE(sock->ops);
+> @@ -189,15 +199,21 @@ int __scm_send(struct socket *sock, struct msghdr *=
+msg, struct scm_cookie *p)
+>                         if (err)
+>                                 goto error;
+>
+> -                       p->creds.pid =3D creds.pid;
+>                         if (!p->pid || pid_vnr(p->pid) !=3D creds.pid) {
+>                                 struct pid *pid;
+>                                 err =3D -ESRCH;
+>                                 pid =3D find_get_pid(creds.pid);
+>                                 if (!pid)
+>                                         goto error;
+> -                               put_pid(p->pid);
+> -                               p->pid =3D pid;
+> +
+> +                               /* pass a struct pid reference from
+> +                                * find_get_pid() to __scm_replace_pid().
+> +                                */
+> +                               err =3D __scm_replace_pid(p, pid);
+> +                               if (err) {
+> +                                       put_pid(pid);
+> +                                       goto error;
+> +                               }
+>                         }
+>
+>                         err =3D -EINVAL;
+> --
+> 2.43.0
+>
 
