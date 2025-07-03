@@ -1,118 +1,104 @@
-Return-Path: <netdev+bounces-203630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8A69AF68DB
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 05:52:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C81F8AF68FF
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 06:06:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05A6A1C40939
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 03:52:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 491401C249BF
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 04:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF9522A7EF;
-	Thu,  3 Jul 2025 03:52:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k3pV2vBS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 185B7289375;
+	Thu,  3 Jul 2025 04:06:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCE9225D6;
-	Thu,  3 Jul 2025 03:52:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+Received: from azure-sdnproxy.icoremail.net (l-sdnproxy.icoremail.net [20.188.111.126])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00760272E4A;
+	Thu,  3 Jul 2025 04:06:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=20.188.111.126
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751514728; cv=none; b=uMNroSrTcExQ/HhdgE6Sstu8P3rc5HuDpz222+Tj15tLQjm4YpsQoPigkUqGP3wrvdMVHfNDA5VSoHxqGVPNC4aJ9xuPdgpIOz2SlM1B4pfB7IFOeHSrbVrvO3zRvEosEeqJTrcE8dFO5+kBtCKzYxwp6Qhug5v+hCNDeRsxD3E=
+	t=1751515585; cv=none; b=m3iPI8O7CNVPIItG7cjx4+lFjfDjLjXJcNyJP8IsXJVcGJJyWYTufqY/rVqe10/qPNgfw/D5Xcnww8HXddwrIdmc1TJb0rJ+l9CUOLj215RINwpcG8xeVF2u7DZ+X4DWNfCqmav6yobTNXUs1ktqoNiLFlm6N4duwaUW2BdyvpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751514728; c=relaxed/simple;
-	bh=9L3OxoFJhj2X6mmDuLUW7hIWdOK8GGMg/eog1zKbTbY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jsTgZwoyRs7sSqf2NxAr1CU+5f+/+74geMDIKs8nqhxZ90WKEQaEAtMqt9v+ltB8pgG6Le4dxlx04iYWxbWiQyKvUSjShXkVQUL3PvjZfNrPVHPCAcURgSyy+NxLRhfrQdq/T2IOlNXXL647lYFv8fl2D0l0d2XTIwsg/i4KmvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k3pV2vBS; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-608acb0a27fso8116006a12.0;
-        Wed, 02 Jul 2025 20:52:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751514725; x=1752119525; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b02Al31mOHYf9mmDMFXOknGM6+JzXhM/g5/Uo2Yhy4E=;
-        b=k3pV2vBSsWIi4cvg8yJzauDmU97vbaCDNJthNGmynjsHbKPvzRgmKsWQIik126BnpX
-         fy5ax1NUgeHhJVcVlNDhsq7b/cY++lh6bExLDV9q2bVAoSLXw9XYRdihM5ILNRFLyTPb
-         j9Wz01xbcmZqJj3TeY4YulnbCqe5Ac5v3mgme1lRG0Tz3wlafWvps3T1ANl5aM5rCL98
-         QFMMoDwaQCswWShGNXK9ZQlWsK01O3nCdDYa0SrL46sKmP3zuyDMmK+AK/fl6RTN7Xau
-         6PXvX5XF4leXDKCGPynZPTP0JdZTmlHeVbhh6lE5DInFzHrAAATP0XdOLUcMJLQV3iE8
-         XKVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751514725; x=1752119525;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b02Al31mOHYf9mmDMFXOknGM6+JzXhM/g5/Uo2Yhy4E=;
-        b=VESjkQlue0gCMX1QMA0RmtVslf3rIxO4ZoEeaGpLaR4+Sp79an1yUxOA3LKZ4Aht4j
-         9HdMhO8WixA/57/bpXljzH6PT5jey/meebWAJw8Yf2JfcsQHmrJXqEVoBshO+v70egws
-         SJrU83J4V+9QlhHBUfZLgqz4JT1Oyf1JykEnPultG8/R10ekLdstYgpN5Mgi+VDyLr+p
-         /jaM6RO5RwLY5X90ACaxoWofmqo2/iSgbNzUTjoKT/y6fyIr1EXqJt1OG07RaQxlyCiS
-         SaEDhrNMARuTLenbfPz4cD2ljdEjZI+nRT7/x/EE9oFuYwAdjQMFMueiMrrH+4t7KANI
-         0D4g==
-X-Forwarded-Encrypted: i=1; AJvYcCWJqI63n0OG00/RLlVRItGDAqqc3DyC7tguzbNF8Eo4bWBWMQp6e6PG+sWJ+he/y+TMq3qOG6LkOFqMXjhlcks=@vger.kernel.org, AJvYcCWpNALlALUn6fMMip4G9hy6nbpI9K+gqXt2By5O9QTf0WyT8caCxcCqaOnBL048nFpYmlGh0IW6@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGbYomwSviLx1jfTG1qO01HSD8+QzJ2IDZmyt98WZ6mZCGysUn
-	WG1UB1q+ItFAOrCqpAP/iz2Y6kwUDGO4M4fEKPE+QlNcZ8RBotFJkhWbrv3Me2UVIG9OMmCJ9ww
-	O+eNTDTrLT66rW9i7IHtukO0jOU/UG2s=
-X-Gm-Gg: ASbGnctzxUJI8g0H2JOQxHNWMUNqCl9KLYiSZpm3j6NGajTtrwsZ5TSpAnId7HplGO2
-	Ye8xcNBmB66DtuB+Z0VBir2esyfONHs0/BEF4EplDCqv36Z2GZwJImW79lH8jTQIw6OmC/zyjzu
-	3oKmzjZrcrHM+92vRdboXpiD0sdS07HHM2NmWUqqdwVCtWYA==
-X-Google-Smtp-Source: AGHT+IEW1jWDQ7cVWvWC+xl6RFuTx5QAXvi9aUUrYkVftaVUM78GsPULsQVqhnNZ0iUGuPRWaPs2zIbQsJRCAYxiySo=
-X-Received: by 2002:a17:906:c14e:b0:ae0:ab3f:36b5 with SMTP id
- a640c23a62f3a-ae3c2a6c748mr583244966b.4.1751514724973; Wed, 02 Jul 2025
- 20:52:04 -0700 (PDT)
+	s=arc-20240116; t=1751515585; c=relaxed/simple;
+	bh=70sgCDrpf2Ch+2jl83A2ilMe10M/C7Wera8/aLEjkgI=;
+	h=Date:From:To:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=HjxYDO0pcBkhRt0N4Tc4tUxMgkBamzo1RGwiu4KWGFSiDU8vx/x5/xbDzQt1iStwlJpRMA2zPH9YT6xe4NTwAp4O/0MvBn0glyEkGdwMqfPylOtcvdWa5R9z+qwZK3tNxt3u3HZruz0wa7aer65z6I/bQSj6wT334/IPL/5bJKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=20.188.111.126
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from zju.edu.cn (unknown [115.197.243.13])
+	by mtasvr (Coremail) with SMTP id _____wDXN3ygAWZoLLDZAw--.7864S3;
+	Thu, 03 Jul 2025 12:05:53 +0800 (CST)
+Received: from linma$zju.edu.cn ( [115.197.243.13] ) by
+ ajax-webmail-mail-app2 (Coremail) ; Thu, 3 Jul 2025 12:05:52 +0800
+ (GMT+08:00)
+Date: Thu, 3 Jul 2025 12:05:52 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: "Lin Ma" <linma@zju.edu.cn>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, mingo@kernel.org,
+	tglx@linutronix.de, pwn9uin@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net: atm: Fix incorrect net_device lec check
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2024.3-cmXT6 build
+ 20250620(94335109) Copyright (c) 2002-2025 www.mailtech.cn zju.edu.cn
+In-Reply-To: <20250703023416.97641-1-linma@zju.edu.cn>
+References: <20250703023416.97641-1-linma@zju.edu.cn>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250702104249.1665034-1-ap420073@gmail.com> <20250702113930.79a9f060@kernel.org>
-In-Reply-To: <20250702113930.79a9f060@kernel.org>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Thu, 3 Jul 2025 12:51:53 +0900
-X-Gm-Features: Ac12FXzO98GaAsaJAVUoLTm5FA7ipupBexnpOgJODdq4yTy4ZCtkvHc8QYIFgrw
-Message-ID: <CAMArcTVqsD_sbXTM9JLDWgALNpYdj=V_Xyp6Lr3dpWqc93P+iQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] selftests: devmem: configure HDS threshold
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
-	andrew+netdev@lunn.ch, shuah@kernel.org, almasrymina@google.com, 
-	sdf@fomichev.me, jdamato@fastly.com, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Message-ID: <34a6dc2e.8f73.197ce7659b8.Coremail.linma@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:zC_KCgBXSYGgAWZo41lZAA--.8181W
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwAPEmhjuY4KnQAKs-
+X-CM-DELIVERINFO: =?B?oiOYlgXKKxbFmtjJiESix3B1w3tPqcowV1L23Bze5QtIr9Db75bEBiiEybVhThS0pI
+	APHjeUlN/wNeQBhT9FIlu3pf6oyLjuoTf6z+lqvBIvQfa8ZpR3plsqbCx0C0tkvZqU375E
+	shS97zN+qEokR/CgHUgVZHv87wqNY3HgyweVm/d1xFp5o+myX+BbxuL5WJl3TA==
+X-Coremail-Antispam: 1Uk129KBj9xXoWrur1UKw1rKryfAr15Wr45urX_yoWkXrXE9w
+	1Iv3s7Gr43ZFW0yanxuryfXFyjqw4DX348XFnrGrW3X34kJFy5WrZ5WFyqyrWagrW7AFW3
+	GFs8uF9Ik3W5ZosvyTuYvTs0mTUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbPkYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	W8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
+	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AK
+	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7xvr2IYc2Ij64
+	vIr40E4x8a64kEw24lFcxC0VAYjxAxZF0Ew4CEw7xC0wACY4xI67k04243AVC20s07M4II
+	rI8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
+	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
+	67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
+	x0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
+	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8Jr1l6VACY4xI67k042
+	43AbIYCTnIWIevJa73UjIFyTuYvjxU7GYpUUUUU
 
-On Thu, Jul 3, 2025 at 3:39=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
+SGkgdGhlcmUsCgpTb3JyeSBhZ2FpbiBmb3IgdGhlIGNhcmVsZXNzIG1pc3Rha2VzLi4uIHRoZSBg
+bGVjX25ldGRldl9vcHNgIGlzIGEgc3RhdGljIG9wcyB2YXJpYWJsZSBkZWZpbmVkCmVsc2V3aGVy
+ZSwgaGVuY2UgdGhlIHBhdGNoIGNhbm5vdCBjb21waWxlIGNvcnJlY3RseS4KClByZXBhcmluZyB0
+aGUgdjMgcGF0Y2guCgpSZWdhcmRzCkxpbgoKPiBWMSAtPiBWMjogYWRkIG51bGwgY2hlY2sgc3Vn
+Z2VzdGVkIGJ5IEVyaWMgRHVtYXpldCA8ZWR1bWF6ZXRAZ29vZ2xlLmNvbT4sCj4gICAgICAgICAg
+IG90aGVyd2lzZSB3aWxsIGNyYXNoCj4gCj4gIG5ldC9hdG0vbXBjLmMgfCA1ICsrKystCj4gIDEg
+ZmlsZSBjaGFuZ2VkLCA0IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKPiAKPiBkaWZmIC0t
+Z2l0IGEvbmV0L2F0bS9tcGMuYyBiL25ldC9hdG0vbXBjLmMKPiBpbmRleCBmNmI0NDdiYmEzMjku
+LmFmNDA5ZDZmYTJkZCAxMDA2NDQKPiAtLS0gYS9uZXQvYXRtL21wYy5jCj4gKysrIGIvbmV0L2F0
+bS9tcGMuYwo+IEBAIC0yNzUsNiArMjc1LDkgQEAgc3RhdGljIHN0cnVjdCBuZXRfZGV2aWNlICpm
+aW5kX2xlY19ieV9pdGZudW0oaW50IGl0ZikKPiAgCXNwcmludGYobmFtZSwgImxlYyVkIiwgaXRm
+KTsKPiAgCWRldiA9IGRldl9nZXRfYnlfbmFtZSgmaW5pdF9uZXQsIG5hbWUpOwo+ICAKPiArCWlm
+ICghZGV2IHx8IGRldi0+bmV0ZGV2X29wcyAhPSBsZWNfbmV0ZGV2X29wcykKPiArCQlyZXR1cm4g
+TlVMTDsKPiArCj4gIAlyZXR1cm4gZGV2Owo+ICB9Cj4gIAo+IEBAIC0xMDA2LDcgKzEwMDksNyBA
+QCBzdGF0aWMgaW50IG1wb2FfZXZlbnRfbGlzdGVuZXIoc3RydWN0IG5vdGlmaWVyX2Jsb2NrICpt
+cG9hX25vdGlmaWVyLAo+ICAJaWYgKCFuZXRfZXEoZGV2X25ldChkZXYpLCAmaW5pdF9uZXQpKQo+
+ICAJCXJldHVybiBOT1RJRllfRE9ORTsKPiAgCj4gLQlpZiAoc3RybmNtcChkZXYtPm5hbWUsICJs
+ZWMiLCAzKSkKPiArCWlmIChkZXYtPm5ldGRldl9vcHMgIT0gbGVjX25ldGRldl9vcHMpCj4gIAkJ
+cmV0dXJuIE5PVElGWV9ET05FOyAvKiB3ZSBhcmUgb25seSBpbnRlcmVzdGVkIGluIGxlYzpzICov
+Cj4gIAo+ICAJc3dpdGNoIChldmVudCkgewo+IC0tIAo+IDIuMTcuMQo=
 
-Hi Jakub,
-Thanks a lot for your review!
-
-> On Wed,  2 Jul 2025 10:42:49 +0000 Taehee Yoo wrote:
-> > The devmem TCP requires the hds-thresh value to be 0, but it doesn't
-> > change it automatically.
-> > Therefore, make configure_headersplit() sets hds-thresh value to 0.
->
-> I don't see any undoing of the configuration :(
-> The selftest should leave the system in the state that it started.
-> We should either add some code to undo at shutdown or (preferably)
-> move the logic to the Python script where we can handle this more
-> cleanly with defer().
-
-Okay, I understand it.
-I will fix this in the next version.
-
-Thanks a lot!
-Taehee Yoo
-
-> --
-> pw-bot: cr
 
