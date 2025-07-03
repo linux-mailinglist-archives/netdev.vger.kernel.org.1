@@ -1,109 +1,139 @@
-Return-Path: <netdev+bounces-203833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A1B8AF7664
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 15:59:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AD57AF7690
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 16:04:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 448177A8794
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:58:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FFBD4E7AAC
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 14:03:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9DEC2E7641;
-	Thu,  3 Jul 2025 13:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uGhDUrqn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA1582E7BD6;
+	Thu,  3 Jul 2025 14:01:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2C623C512;
-	Thu,  3 Jul 2025 13:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C622DE6E2
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 14:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751551191; cv=none; b=SCLZGN1CNko1UW0E3yQ0NcUyQwMBVaFvBDbW3zKAovMSRNJd4zf7PJtyD/LwBNz4nx/iN9NYL+leV+t6aaD5oxduVEuQnY9YFp7mIVc/a3lkkbjxABP6Y1Pk2a4H1Jrmeap5QB3CW1Kfq+ObPv/gbANqhEs0JoAj5TyHJ3wAnG0=
+	t=1751551263; cv=none; b=WcjaOsjEBiZFGULYDJtFNfpg3Y2VeFOViKwkcyEvF45rR6/tvZCclOQsee+tCidFPFO4KaV7EGBg5QsPOmwYu6rQfpgZSLiVvv4avQ1xRoKV2zvzj+UbdOcv+2daxyg4Aqw7DywqWoBaPGUQEPvCJAHTYY7z7R4pMxfzHM/jrmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751551191; c=relaxed/simple;
-	bh=edtgpnX53JCZZy1iES92p0EiTMae8N4vIOkkyGwRFr0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aQhvtnvD2+AP8FjxNFe2sXGgTwp+sGOZKlu/GTf8jA3gj1LYs4gNpeXtLrlG74ScFbJqrqu51MV+5RjiH0kXtUO+X7EnOLr+UwfAO8Tb/6bD23si+Kn08yRMsuj+dp5IfpycCyJEcJgzksG/Yq5k7UmfxwSZSbzYVuD/gIg/nMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uGhDUrqn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CA3DC4CEE3;
-	Thu,  3 Jul 2025 13:59:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751551191;
-	bh=edtgpnX53JCZZy1iES92p0EiTMae8N4vIOkkyGwRFr0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uGhDUrqnpmrhR/fqztSaP6QC+8KglYz7xjKBrgA5DJDDHfodTX5qLJuI3gtCX0SfZ
-	 EUJ6rUyolfX+yKN0nwWgFh0X9aT9QEnSZkszIli5JLovHd2n3Ht4tKp65iyF3HN1/J
-	 kVI1rH2+zdGRwNF/+jDc+1skKTHEoOZx6dnN4fGGDksXnNpfo5qmLuhhy7h/Qknm2/
-	 n2y2gzvlpljWccv6l2Zb6J40n7idc1oTLd0c2dhDLweLok5EAkgVDfaAaamyl0qQv9
-	 v3dTHWnJvpGZuqPO0NRam4eI33v7oHg2UNfW8x9eY+qcruXiKSMR1aRleQbQL2Hjaa
-	 xlguuJ1+19K0A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF48383B274;
-	Thu,  3 Jul 2025 14:00:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1751551263; c=relaxed/simple;
+	bh=ANJTRIqlr6OWG/iKdPB4n+XAWhmqAVcl4wQBz814+Y8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hYfcjw3whPnRrzZgcOMlsqRM4i9Q7z/b4ffgfNnNnrJjE3bs0/qnetwzYoRjeMzUZN+ZG3t0mtLAm9O+EQA7StqQ4MxQ9ONYR2/3jz3UASe35OG1F0JXgfVJ22bKStYImuVmcp/xSf2itAf1IbszKjB5HNKSJTM9HKPIFviKpbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.36] (g36.guest.molgen.mpg.de [141.14.220.36])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id F230E601F9C7D;
+	Thu, 03 Jul 2025 16:00:34 +0200 (CEST)
+Message-ID: <4290ec59-645d-4675-9c98-f59246796f3c@molgen.mpg.de>
+Date: Thu, 3 Jul 2025 16:00:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [iwl-next] ixgbe: add the 2.5G and 5G speed in
+ auto-negotiation for E610
+To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, andrew@lunn.ch,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>
+References: <20250703140918.287365-1-piotr.kwapulinski@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250703140918.287365-1-piotr.kwapulinski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/5] Another ip-sysctl docs cleanup
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175155121526.1491725.12686388638876887833.git-patchwork-notify@kernel.org>
-Date: Thu, 03 Jul 2025 14:00:15 +0000
-References: <20250701031300.19088-1-bagasdotme@gmail.com>
-In-Reply-To: <20250701031300.19088-1-bagasdotme@gmail.com>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
- abdelrahmanfekry375@gmail.com
 
-Hello:
+Dear Piotr,
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
 
-On Tue,  1 Jul 2025 10:12:55 +0700 you wrote:
-> Inspired by Abdelrahman's cleanup [1]. This time, mostly formatting
-> conversion to bullet lists.
+Thank you for your patch.
+
+Am 03.07.25 um 16:09 schrieb Piotr Kwapulinski:
+> Enable the 2.5G and 5G speed in auto-negotiation for E610 at driver load.
+
+The removed comment says there were incompatibilities with “certain 
+switches“. What changed? Please elaborate in the commit message.
+
+
+Kind regards,
+
+Paul
+
+
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+> ---
+>   drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 35 +++++++------------
+>   1 file changed, 12 insertions(+), 23 deletions(-)
 > 
-> [1]: https://lore.kernel.org/linux-doc/20250624150923.40590-1-abdelrahmanfekry375@gmail.com/
-> 
-> Bagas Sanjaya (5):
->   net: ip-sysctl: Format Private VLAN proxy arp aliases as bullet list
->   net: ip-sysctl: Format possible value range of ioam6_id{,_wide} as
->     bullet list
->   net: ip-sysctl: Format pf_{enable,expose} boolean lists as bullet
->     lists
->   net: ip-sysctl: Format SCTP-related memory parameters description as
->     bullet list
->   net: ip-sysctl: Add link to SCTP IPv4 scoping draft
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,1/5] net: ip-sysctl: Format Private VLAN proxy arp aliases as bullet list
-    https://git.kernel.org/netdev/net-next/c/501aeb1ef463
-  - [net-next,2/5] net: ip-sysctl: Format possible value range of ioam6_id{,_wide} as bullet list
-    https://git.kernel.org/netdev/net-next/c/2040058db302
-  - [net-next,3/5] net: ip-sysctl: Format pf_{enable,expose} boolean lists as bullet lists
-    https://git.kernel.org/netdev/net-next/c/98bc1d41f2c5
-  - [net-next,4/5] net: ip-sysctl: Format SCTP-related memory parameters description as bullet list
-    https://git.kernel.org/netdev/net-next/c/82b056600059
-  - [net-next,5/5] net: ip-sysctl: Add link to SCTP IPv4 scoping draft
-    https://git.kernel.org/netdev/net-next/c/2f1fa26eef65
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> index d741164..b202639 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> @@ -1953,6 +1953,16 @@ int ixgbe_identify_phy_e610(struct ixgbe_hw *hw)
+>   	    phy_type_low  & IXGBE_PHY_TYPE_LOW_1G_SGMII    ||
+>   	    phy_type_high & IXGBE_PHY_TYPE_HIGH_1G_USXGMII)
+>   		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_1GB_FULL;
+> +	if (phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_T   ||
+> +	    phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_X   ||
+> +	    phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_KX  ||
+> +	    phy_type_high & IXGBE_PHY_TYPE_HIGH_2500M_SGMII ||
+> +	    phy_type_high & IXGBE_PHY_TYPE_HIGH_2500M_USXGMII)
+> +		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_2_5GB_FULL;
+> +	if (phy_type_low  & IXGBE_PHY_TYPE_LOW_5GBASE_T  ||
+> +	    phy_type_low  & IXGBE_PHY_TYPE_LOW_5GBASE_KR ||
+> +	    phy_type_high & IXGBE_PHY_TYPE_HIGH_5G_USXGMII)
+> +		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_5GB_FULL;
+>   	if (phy_type_low  & IXGBE_PHY_TYPE_LOW_10GBASE_T       ||
+>   	    phy_type_low  & IXGBE_PHY_TYPE_LOW_10G_SFI_DA      ||
+>   	    phy_type_low  & IXGBE_PHY_TYPE_LOW_10GBASE_SR      ||
+> @@ -1963,31 +1973,10 @@ int ixgbe_identify_phy_e610(struct ixgbe_hw *hw)
+>   	    phy_type_high & IXGBE_PHY_TYPE_HIGH_10G_USXGMII)
+>   		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_10GB_FULL;
+>   
+> -	/* 2.5 and 5 Gbps link speeds must be excluded from the
+> -	 * auto-negotiation set used during driver initialization due to
+> -	 * compatibility issues with certain switches. Those issues do not
+> -	 * exist in case of E610 2.5G SKU device (0x57b1).
+> -	 */
+> -	if (!hw->phy.autoneg_advertised &&
+> -	    hw->device_id != IXGBE_DEV_ID_E610_2_5G_T)
+> +	/* Initialize autoneg speeds */
+> +	if (!hw->phy.autoneg_advertised)
+>   		hw->phy.autoneg_advertised = hw->phy.speeds_supported;
+>   
+> -	if (phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_T   ||
+> -	    phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_X   ||
+> -	    phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_KX  ||
+> -	    phy_type_high & IXGBE_PHY_TYPE_HIGH_2500M_SGMII ||
+> -	    phy_type_high & IXGBE_PHY_TYPE_HIGH_2500M_USXGMII)
+> -		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_2_5GB_FULL;
+> -
+> -	if (!hw->phy.autoneg_advertised &&
+> -	    hw->device_id == IXGBE_DEV_ID_E610_2_5G_T)
+> -		hw->phy.autoneg_advertised = hw->phy.speeds_supported;
+> -
+> -	if (phy_type_low  & IXGBE_PHY_TYPE_LOW_5GBASE_T  ||
+> -	    phy_type_low  & IXGBE_PHY_TYPE_LOW_5GBASE_KR ||
+> -	    phy_type_high & IXGBE_PHY_TYPE_HIGH_5G_USXGMII)
+> -		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_5GB_FULL;
+> -
+>   	/* Set PHY ID */
+>   	memcpy(&hw->phy.id, pcaps.phy_id_oui, sizeof(u32));
+>   
 
 
