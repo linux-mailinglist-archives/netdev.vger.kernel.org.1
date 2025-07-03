@@ -1,188 +1,405 @@
-Return-Path: <netdev+bounces-203932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0401DAF82AC
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 23:29:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C16EAF82B3
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 23:36:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C95D57A2323
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 21:27:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 548F83B1CDD
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 21:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 526792BEC2A;
-	Thu,  3 Jul 2025 21:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B3E12BE7A2;
+	Thu,  3 Jul 2025 21:36:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Nas0qbwd"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="oa/idDJA"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F1B2AF19;
-	Thu,  3 Jul 2025 21:28:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9BF7190679
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 21:36:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751578131; cv=none; b=oJNUjWpHI5H3OsUODtQ4BZjorF0w4Dw2SfGwtD4B+TOVp+7QnMSkujFF3r3oWsv0ctLIuqMP9YwBiO/OTfyZxT05kXbEAUwj+4frTLBLg/kkvPP/wgSZpnWLZmLOR/6kdci7QQ20QQwuhbsL8DI3Ll3sbrY252BpcFROAzzlA8g=
+	t=1751578569; cv=none; b=sYOXzPdXOkZ9RFl7qTZ28BJ39zxQIRnOeBDGeI1J8H72dtd1ZjD3elghjxl1pc8f8lGrOxbDs0XUFkr06WMa5lx4x/4yapmKMSABDZ1FBRgUgREqwO/GjCwJ2Rhem/xC0l1IRtxdeNy+Y+pJzMfwm/fb3IUMnQZ2K9x2UKfjxk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751578131; c=relaxed/simple;
-	bh=7s1vdVb4Jp0AKYi0fqgt4BTeqCIZhFaWic60VjgU5TU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GHB5t5XzldEmrSlyUzdCzN5OmzCJIS5T3FdIn0uTbHwi+calt1iaanfpHJVlhnmTyTUkSMxGXU2iMgy/Qy5MbLWP6SXR3RluJU2NlnbQdYsJ81Qk20k0HiPd7wRKxVfTqhD6oWX3YyniAANFhC7+0y3+JtkJO7Nat1kcEUsXAYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Nas0qbwd; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=A83NKRGoevWzL/NcvqijuYTaZ0xDTVIZ9pvu0pc07Jk=; b=Na
-	s0qbwdL6B67K0wS+f7tbNlfneHHctNev/cTniYFhLMkwezOAunGEDatFtpLb4g+PG761JVmPtbDzC
-	rfpydruVCCrDayQ33cjSGl/o6BiA+VGkuX6ILQmO0/nR1G4/Ap/W5RcWrBNuhbzqrUhTrrpdbnIlt
-	YvmVDe7keP8zJfo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uXRTN-0008hX-2p; Thu, 03 Jul 2025 23:28:01 +0200
-Date: Thu, 3 Jul 2025 23:28:01 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tamir Duberstein <tamird@gmail.com>
-Cc: Benno Lossin <lossin@kernel.org>,
-	Michal Rostecki <vadorovsky@protonmail.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Saravana Kannan <saravanak@google.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-	Waiman Long <longman@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, Arnd Bergmann <arnd@arndb.de>,
-	Jens Axboe <axboe@kernel.dk>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Dave Ertman <david.m.ertman@intel.com>,
-	Ira Weiny <ira.weiny@intel.com>, Leon Romanovsky <leon@kernel.org>,
-	Breno Leitao <leitao@debian.org>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, rust-for-linux@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com, dri-devel@lists.freedesktop.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	llvm@lists.linux.dev, linux-pci@vger.kernel.org,
-	nouveau@lists.freedesktop.org, linux-block@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-clk@vger.kernel.org
-Subject: Re: [PATCH v13 2/5] rust: support formatting of foreign types
-Message-ID: <34c00dfa-8302-45ee-8d80-58b97a08e52e@lunn.ch>
-References: <20250701-cstr-core-v13-0-29f7d3eb97a6@gmail.com>
- <20250701-cstr-core-v13-2-29f7d3eb97a6@gmail.com>
- <DB2BDSN1JH51.14ZZPETJORBC6@kernel.org>
- <CAJ-ks9nC=AyBPXRY3nJ0NuZvjFskzMcOkVNrBEfXD2hZ5uRntQ@mail.gmail.com>
- <DB2IJ9HBIM0W.3N0JVGKX558QI@kernel.org>
- <CAJ-ks9nF5+m+_bn0Pzi9yU0pw0TyN7Fs4x--mQ4ygyHz4A6hzg@mail.gmail.com>
+	s=arc-20240116; t=1751578569; c=relaxed/simple;
+	bh=lMjmIbbrKCapHNvacndT3CYesc+OgdSuDb/BnQRGjRI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=amuXJrYhJl9G0PmpWSRJgteX5zwHG9DeAoq9vAtYr8uYFoM4KhJ5LQ3vPC9/3XsYOh5TcsKOxypga9yWsxcYrWTv9Z2U4FwTTIpvoZYuPmdLLvpaR5lY+h8QVsxzZbwu/rzpFM/8YB+wsSo5t5WFxPaE79/xKwiNeYWjpJbXafY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=oa/idDJA; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com [209.85.217.69])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 4283D3F84A
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 21:35:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1751578558;
+	bh=bWTBBR3tcfcCVwCDO6Z84tS0/UdOmqTNNcVmWEaK54c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=oa/idDJAap/AXBGXzn51KUAiKdU4FQ4oy4CVpcnO6zr/gbwxfdTE2ArsOOfGU8sWg
+	 +z2F+Kqh501YFEAjG2Rxe0FxFS0aBQ+vuM5QvKuB48rZtWjm2IXYlB+deHP/YvjcJL
+	 V8kPkCEnJjGu+rAt9/MY7OC5KmeRpoH/avFs/snjFM4FlxT5ool+ARD3ZbbMFfZ4Ye
+	 zRRxc1hMLz54dMuUsqrDvQH4fZPh6BI0uuMErOm+FVbnd/luVfLcytJDTtqbwlOTKH
+	 aLaj5Fzfi0q1N8glXQAc3xWTB0sBkAKxYPoDvOFKdSwa+O7CgsLie7Bn4e8JsQo7Jv
+	 7moVbdu3SKT6w==
+Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-4f1dbe8f605so54631137.2
+        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 14:35:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751578557; x=1752183357;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bWTBBR3tcfcCVwCDO6Z84tS0/UdOmqTNNcVmWEaK54c=;
+        b=DGfFKFpjG4Skfb8oK5uxW/A6ylkBF6P+EXtN+2B40LsG8ngI47PwO4vEN6ANbFt+Ah
+         1hbCLjPTEGhuJNvC0VGJY1wwdRAZZQoBccyvNKQ2mClMFWgljNDhE2cI+6hf1ANlNeNT
+         gzdG2lOc6pwspM0YhSYQoLu+GihDBiMzPAchtFEXtTXtoZ71nLnFy3dLK3ToeqnsVHro
+         C3DweCpOZ2zXoacx1rOehtmThCQVk0io/nuFhvHXSL9ChU1FWqdIlZVoGm6tOydRUJfN
+         c4+b1o94M2Y+Ku3yD4z/z4AVdafIXmSzedJy2hGuJS45xdfNMRLA/30iFwXOBG6OQAOd
+         kFdw==
+X-Forwarded-Encrypted: i=1; AJvYcCXgbIUde2gUFLDdF+NZXxrEV43eM9V1MUeB+HxfQneXWKgpFCul3ErvrWa6hRyfKOgkYR1i6nc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXBhoi92p8saTw2MJdwJmnEWiYWiu5tmEckS3ej6DkgxFv3ZFo
+	X1NU1TyMT6P3eQktaf5f0RqxJTPQzTeWy4XbiAMcNZvotn/S7Caweo7whSodE4ioDLTtuivIDxb
+	BNgeVwwQOXRRyjv6i7BdMmP3+zKSBS6bbjwnoKNj2UDU3wmfY9qqaBW185Y/Fa5hoC8017/TeO4
+	vyQNkhJqZVF3cu0anKj/VhgzdjFzoss3IQg14C3FjeU49BM7Pl
+X-Gm-Gg: ASbGncvtuOSm5TLuEmIVCLPyfaTk5pfUvb+fLYFNJd3XkJsPraxLvNaala9e3DIX6zp
+	I/rOZpHupjaS0xh+7Dn+WfNgTtMp5MTSuNn69p+xQOJPGZ5f5hdvIT2IH1wu29vVRMFf/JQa3a5
+	GZvG8E
+X-Received: by 2002:a05:6102:8016:b0:4e6:d995:94f9 with SMTP id ada2fe7eead31-4f2ee1ab3a4mr527034137.12.1751578557042;
+        Thu, 03 Jul 2025 14:35:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEs8JP0V1kADGywsst8bal2/wb6N1RrkMLmV2Gjw43MXO4S6TS4rzjt/nP4+sUjYqQWdRkeW6U5Q5+FItLuA88=
+X-Received: by 2002:a05:6102:8016:b0:4e6:d995:94f9 with SMTP id
+ ada2fe7eead31-4f2ee1ab3a4mr527022137.12.1751578556645; Thu, 03 Jul 2025
+ 14:35:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJ-ks9nF5+m+_bn0Pzi9yU0pw0TyN7Fs4x--mQ4ygyHz4A6hzg@mail.gmail.com>
+References: <20250701083922.97928-1-aleksandr.mikhalitsyn@canonical.com>
+ <20250701083922.97928-9-aleksandr.mikhalitsyn@canonical.com> <CAAVpQUDFzPBJmCeawhaHL5Twjxk8obLZW9UPH0HfD_5BYpjh_w@mail.gmail.com>
+In-Reply-To: <CAAVpQUDFzPBJmCeawhaHL5Twjxk8obLZW9UPH0HfD_5BYpjh_w@mail.gmail.com>
+From: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Date: Thu, 3 Jul 2025 23:35:45 +0200
+X-Gm-Features: Ac12FXyeeJVA73E3LrFMGuvn0EDeHuAYD44eCvPPXqmKAveYKS08quI8ryvRj9s
+Message-ID: <CAEivzxc_CxQ5AS8KaFS9LEsHhzzyLyuEgqcp--JQJ6X6Rj-s+A@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 4/6] af_unix: stash pidfs dentry when needed
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Leon Romanovsky <leon@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Christian Brauner <brauner@kernel.org>, 
+	Lennart Poettering <mzxreary@0pointer.de>, Luca Boccassi <bluca@debian.org>, 
+	David Rheinsberg <david@readahead.eu>, Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 03, 2025 at 02:55:30PM -0400, Tamir Duberstein wrote:
-> On Thu, Jul 3, 2025 at 11:08 AM Benno Lossin <lossin@kernel.org> wrote:
+On Thu, Jul 3, 2025 at 3:53=E2=80=AFAM Kuniyuki Iwashima <kuniyu@google.com=
+> wrote:
+>
+> On Tue, Jul 1, 2025 at 1:41=E2=80=AFAM Alexander Mikhalitsyn
+> <aleksandr.mikhalitsyn@canonical.com> wrote:
 > >
-> > On Thu Jul 3, 2025 at 3:55 PM CEST, Tamir Duberstein wrote:
-> > > On Thu, Jul 3, 2025 at 5:32 AM Benno Lossin <lossin@kernel.org> wrote:
-> > >> On Tue Jul 1, 2025 at 6:49 PM CEST, Tamir Duberstein wrote:
-> > >> > Introduce a `fmt!` macro which wraps all arguments in
-> > >> > `kernel::fmt::Adapter` and a `kernel::fmt::Display` trait. This enables
-> > >> > formatting of foreign types (like `core::ffi::CStr`) that do not
-> > >> > implement `core::fmt::Display` due to concerns around lossy conversions which
-> > >> > do not apply in the kernel.
-> > >> >
-> > >> > Replace all direct calls to `format_args!` with `fmt!`.
-> > >> >
-> > >> > Replace all implementations of `core::fmt::Display` with implementations
-> > >> > of `kernel::fmt::Display`.
-> > >> >
-> > >> > Suggested-by: Alice Ryhl <aliceryhl@google.com>
-> > >> > Link: https://rust-for-linux.zulipchat.com/#narrow/channel/288089-General/topic/Custom.20formatting/with/516476467
-> > >> > Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > >> > Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> > >> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> > >> > ---
-> > >> >  drivers/block/rnull.rs       |  2 +-
-> > >> >  drivers/gpu/nova-core/gpu.rs |  4 +-
-> > >> >  rust/kernel/block/mq.rs      |  2 +-
-> > >> >  rust/kernel/device.rs        |  2 +-
-> > >> >  rust/kernel/fmt.rs           | 89 +++++++++++++++++++++++++++++++++++++++
-> > >> >  rust/kernel/kunit.rs         |  6 +--
-> > >> >  rust/kernel/lib.rs           |  1 +
-> > >> >  rust/kernel/prelude.rs       |  3 +-
-> > >> >  rust/kernel/print.rs         |  4 +-
-> > >> >  rust/kernel/seq_file.rs      |  2 +-
-> > >> >  rust/kernel/str.rs           | 22 ++++------
-> > >> >  rust/macros/fmt.rs           | 99 ++++++++++++++++++++++++++++++++++++++++++++
-> > >> >  rust/macros/lib.rs           | 19 +++++++++
-> > >> >  rust/macros/quote.rs         |  7 ++++
-> > >> >  scripts/rustdoc_test_gen.rs  |  2 +-
-> > >> >  15 files changed, 236 insertions(+), 28 deletions(-)
-> > >>
-> > >> This would be a lot easier to review if he proc-macro and the call
-> > >> replacement were different patches.
-> > >>
-> > >> Also the `kernel/fmt.rs` file should be a different commit.
-> > >
-> > > Can you help me understand why? The changes you ask to be separated
-> > > would all be in different files, so why would separate commits make it
-> > > easier to review?
+> > We need to ensure that pidfs dentry is allocated when we meet any
+> > struct pid for the first time. This will allows us to open pidfd
+> > even after the task it corresponds to is reaped.
 > >
-> > It takes less time to go through the entire patch and give a RB. I can
-> > take smaller time chunks and don't have to get back into the entire
-> > context of the patch when I don't have 30-60min available.
-> 
-> Ah, I see what you mean. Yeah, the requirement to RB the entire patch
-> does mean there's a benefit to smaller patches.
+> > Basically, we need to identify all places where we fill skb/scm_cookie
+> > with struct pid reference for the first time and call pidfs_register_pi=
+d().
+> >
+> > Tricky thing here is that we have a few places where this happends
+> > depending on what userspace is doing:
+> > - [__scm_replace_pid()] explicitly sending an SCM_CREDENTIALS message
+> >                         and specified pid in a numeric format
+> > - [unix_maybe_add_creds()] enabled SO_PASSCRED/SO_PASSPIDFD but
+> >                            didn't send SCM_CREDENTIALS explicitly
+> > - [scm_send()] force_creds is true. Netlink case.
+> >
+> > Cc: linux-kernel@vger.kernel.org
+> > Cc: netdev@vger.kernel.org
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> > Cc: Eric Dumazet <edumazet@google.com>
+> > Cc: Jakub Kicinski <kuba@kernel.org>
+> > Cc: Paolo Abeni <pabeni@redhat.com>
+> > Cc: Simon Horman <horms@kernel.org>
+> > Cc: Leon Romanovsky <leon@kernel.org>
+> > Cc: Arnd Bergmann <arnd@arndb.de>
+> > Cc: Christian Brauner <brauner@kernel.org>
+> > Cc: Kuniyuki Iwashima <kuniyu@google.com>
+> > Cc: Lennart Poettering <mzxreary@0pointer.de>
+> > Cc: Luca Boccassi <bluca@debian.org>
+> > Cc: David Rheinsberg <david@readahead.eu>
+> > Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.c=
+om>
+> > ---
+> > v2:
+> >         - renamed __skb_set_pid() -> unix_set_pid_to_skb() [ as Kuniyuk=
+i suggested ]
+> >         - get rid of extra helper (__scm_set_cred()) I've introduced be=
+fore [ as Kuniyuki suggested ]
+> >         - s/__inline__/inline/ for functions I touched [ as Kuniyuki su=
+ggested ]
+> >         - get rid of chunk in unix_destruct_scm() with NULLifying UNIXC=
+B(skb).pid [ as Kuniyuki suggested ]
+> >         - added proper error handling in scm_send() for scm_set_cred() =
+return value [ found by me during rework ]
+> > ---
+> >  include/net/scm.h  | 32 ++++++++++++++++++++++++--------
+> >  net/core/scm.c     |  6 ++++++
+> >  net/unix/af_unix.c | 33 +++++++++++++++++++++++++++++----
+> >  3 files changed, 59 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/include/net/scm.h b/include/net/scm.h
+> > index 84c4707e78a5..597a40779269 100644
+> > --- a/include/net/scm.h
+> > +++ b/include/net/scm.h
+> > @@ -8,6 +8,7 @@
+> >  #include <linux/file.h>
+> >  #include <linux/security.h>
+> >  #include <linux/pid.h>
+> > +#include <linux/pidfs.h>
+> >  #include <linux/nsproxy.h>
+> >  #include <linux/sched/signal.h>
+> >  #include <net/compat.h>
+> > @@ -66,19 +67,28 @@ static __inline__ void unix_get_peersec_dgram(struc=
+t socket *sock, struct scm_co
+> >  { }
+> >  #endif /* CONFIG_SECURITY_NETWORK */
+> >
+> > -static __inline__ void scm_set_cred(struct scm_cookie *scm,
+> > -                                   struct pid *pid, kuid_t uid, kgid_t=
+ gid)
+> > +static inline int scm_set_cred(struct scm_cookie *scm,
+> > +                              struct pid *pid, bool pidfs_register,
+> > +                              kuid_t uid, kgid_t gid)
+> >  {
+> > -       scm->pid  =3D get_pid(pid);
+> > +       if (pidfs_register) {
+> > +               int err =3D pidfs_register_pid(pid);
+> > +               if (err)
+> > +                       return err;
+> > +       }
+> > +
+> > +       scm->pid =3D get_pid(pid);
+> > +
+> >         scm->creds.pid =3D pid_vnr(pid);
+> >         scm->creds.uid =3D uid;
+> >         scm->creds.gid =3D gid;
+> > +       return 0;
+> >  }
+> >
+> >  static __inline__ void scm_destroy_cred(struct scm_cookie *scm)
+> >  {
+> >         put_pid(scm->pid);
+> > -       scm->pid  =3D NULL;
+> > +       scm->pid =3D NULL;
+>
+> Could you split these double-space changes to another
+> patch to make review easier ?
 
-I often tell kernel newbies:
+Hi Kuniyuki,
 
-Lots of small patches which are obviously correct.
+Sure, will do!
 
-A small patch tends to be more obviously correct than a big patch. The
-commit message is more focused and helpful because it refers to a
-small chunk of code. Because the commit message is more focused, it
-can answer questions reviewers might ask, before they ask them. If i
-can spend 60 seconds looking at a patch and decide it looks correct,
-i'm more likely to actually look at it and give a reviewed by. If i
-need to find 10 minutes, it is going to get put off for a later
-time. Many reviewers just have a few minutes here, a few there,
-slotted into time between other tasks, while drinking coffee, etc.
+>
+>
+> >  }
+> >
+> >  static __inline__ void scm_destroy(struct scm_cookie *scm)
+> > @@ -88,14 +98,20 @@ static __inline__ void scm_destroy(struct scm_cooki=
+e *scm)
+> >                 __scm_destroy(scm);
+> >  }
+> >
+> > -static __inline__ int scm_send(struct socket *sock, struct msghdr *msg=
+,
+> > -                              struct scm_cookie *scm, bool forcecreds)
+> > +static inline int scm_send(struct socket *sock, struct msghdr *msg,
+> > +                          struct scm_cookie *scm, bool forcecreds)
+> >  {
+> >         memset(scm, 0, sizeof(*scm));
+> >         scm->creds.uid =3D INVALID_UID;
+> >         scm->creds.gid =3D INVALID_GID;
+> > -       if (forcecreds)
+> > -               scm_set_cred(scm, task_tgid(current), current_uid(), cu=
+rrent_gid());
+> > +
+> > +       if (forcecreds) {
+> > +               int err =3D scm_set_cred(scm, task_tgid(current), true,
+> > +                                      current_uid(), current_gid());
+>
+> Do we need to pass true here ?
+>
+> Given this series affects scm_pidfd_recv(), we don't need to
+> touch netlink path that is not allowed to call scm_recv_unix() ?
+>
+> Then, all callers pass false to scm_set_cred() and
+> pidfs_register_pid() there will be unnecessary.
 
-	Andrew
+I agree. While it is safe to call pidfd_register_pid() for the netlink
+case too (and get pidfs dentry allocated),
+it is not really useful. Thanks for noticing this!
+
+>
+>
+> > +               if (err)
+> > +                       return err;
+> > +       }
+> > +
+> >         unix_get_peersec_dgram(sock, scm);
+> >         if (msg->msg_controllen <=3D 0)
+> >                 return 0;
+> > diff --git a/net/core/scm.c b/net/core/scm.c
+> > index 68441c024dd8..50dfec6f8a2b 100644
+> > --- a/net/core/scm.c
+> > +++ b/net/core/scm.c
+> > @@ -147,9 +147,15 @@ EXPORT_SYMBOL(__scm_destroy);
+> >
+> >  static inline int __scm_replace_pid(struct scm_cookie *scm, struct pid=
+ *pid)
+> >  {
+> > +       int err;
+> > +
+> >         /* drop all previous references */
+> >         scm_destroy_cred(scm);
+> >
+> > +       err =3D pidfs_register_pid(pid);
+> > +       if (err)
+> > +               return err;
+> > +
+> >         scm->pid =3D pid;
+> >         scm->creds.pid =3D pid_vnr(pid);
+> >         return 0;
+> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> > index df2174d9904d..18c677683ddc 100644
+> > --- a/net/unix/af_unix.c
+> > +++ b/net/unix/af_unix.c
+> > @@ -1924,12 +1924,27 @@ static void unix_peek_fds(struct scm_cookie *sc=
+m, struct sk_buff *skb)
+> >         scm->fp =3D scm_fp_dup(UNIXCB(skb).fp);
+> >  }
+> >
+> > +static int unix_set_pid_to_skb(struct sk_buff *skb, struct pid *pid, b=
+ool pidfs_register)
+> > +{
+> > +       if (pidfs_register) {
+> > +               int err;
+> > +
+> > +               err =3D pidfs_register_pid(pid);
+> > +               if (err)
+> > +                       return err;
+> > +       }
+> > +
+> > +       UNIXCB(skb).pid =3D get_pid(pid);
+> > +       return 0;
+> > +}
+> > +
+> >  static void unix_destruct_scm(struct sk_buff *skb)
+> >  {
+> >         struct scm_cookie scm;
+> >
+> >         memset(&scm, 0, sizeof(scm));
+> > -       scm.pid  =3D UNIXCB(skb).pid;
+> > +       scm.pid =3D UNIXCB(skb).pid;
+> > +
+> >         if (UNIXCB(skb).fp)
+> >                 unix_detach_fds(&scm, skb);
+> >
+> > @@ -1943,7 +1958,10 @@ static int unix_scm_to_skb(struct scm_cookie *sc=
+m, struct sk_buff *skb, bool sen
+> >  {
+> >         int err =3D 0;
+> >
+> > -       UNIXCB(skb).pid =3D get_pid(scm->pid);
+> > +       err =3D unix_set_pid_to_skb(skb, scm->pid, false);
+> > +       if (unlikely(err))
+>
+> This does not fail too.
+>
+> Perhaps keep get_pid() here and move pidfs_register_pid()
+> to unix_maybe_add_creds(), that will look simpler.
+
+You are absolutely right. Thanks for pointing this out!
+Actually, this was really useful when pidfs_get_pid()/pidfs_put_pid()
+API was a thing [1],
+because in unix_set_pid_to_skb() we would call pidfs_get_pid() *or*
+pidfs_register_pid().
+
+But now, when lifetime rules for pidfs dentries are changed we don't
+have pidfs_get_pid()/pidfs_put_pid() API
+and we don't need this unix_set_pid_to_skb() helper anymore. So,
+basically it's post-vfs-rebase leftovers.
+
+[1] https://github.com/mihalicyn/linux/commit/6a80e241feeea40e9068922eac045=
+2566deccc61#diff-0553d076c243e06ae312480cb8cb52f1cebe1d80fc099d3842593e12c9=
+e0d4f3R1920-R1930
+
+Kind regards,
+Alex
+
+>
+>
+> > +               return err;
+> > +
+> >         UNIXCB(skb).uid =3D scm->creds.uid;
+> >         UNIXCB(skb).gid =3D scm->creds.gid;
+> >         UNIXCB(skb).fp =3D NULL;
+> > @@ -1957,7 +1975,8 @@ static int unix_scm_to_skb(struct scm_cookie *scm=
+, struct sk_buff *skb, bool sen
+> >
+> >  static void unix_skb_to_scm(struct sk_buff *skb, struct scm_cookie *sc=
+m)
+> >  {
+> > -       scm_set_cred(scm, UNIXCB(skb).pid, UNIXCB(skb).uid, UNIXCB(skb)=
+.gid);
+> > +       /* scm_set_cred() can't fail when pidfs_register =3D=3D false *=
+/
+> > +       scm_set_cred(scm, UNIXCB(skb).pid, false, UNIXCB(skb).uid, UNIX=
+CB(skb).gid);
+> >         unix_set_secdata(scm, skb);
+> >  }
+> >
+> > @@ -1971,6 +1990,7 @@ static void unix_skb_to_scm(struct sk_buff *skb, =
+struct scm_cookie *scm)
+> >   * We include credentials if source or destination socket
+> >   * asserted SOCK_PASSCRED.
+> >   *
+> > + * Context: May sleep.
+> >   * Return: On success zero, on error a negative error code is returned=
+.
+> >   */
+> >  static int unix_maybe_add_creds(struct sk_buff *skb, const struct sock=
+ *sk,
+> > @@ -1980,7 +2000,12 @@ static int unix_maybe_add_creds(struct sk_buff *=
+skb, const struct sock *sk,
+> >                 return 0;
+> >
+> >         if (unix_may_passcred(sk) || unix_may_passcred(other)) {
+>
+> I forgot to mention that this part will conflict with net-next.
+>
+> I guess Christian will take this series via vfs tree ?
+>
+>
+> > -               UNIXCB(skb).pid =3D get_pid(task_tgid(current));
+> > +               int err;
+> > +
+> > +               err =3D unix_set_pid_to_skb(skb, task_tgid(current), tr=
+ue);
+> > +               if (unlikely(err))
+> > +                       return err;
+> > +
+> >                 current_uid_gid(&UNIXCB(skb).uid, &UNIXCB(skb).gid);
+> >         }
+> >
+> > --
+> > 2.43.0
+> >
 
