@@ -1,275 +1,246 @@
-Return-Path: <netdev+bounces-203656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9726AF6A3E
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 08:26:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 25F1EAF6AB3
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 08:47:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE7201C45186
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 06:26:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 537C9188C4DF
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 06:47:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB77428FFFB;
-	Thu,  3 Jul 2025 06:26:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BDFE157A72;
+	Thu,  3 Jul 2025 06:47:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KNgsLbX/"
+	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="L7cGDZmJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F296B28DF12;
-	Thu,  3 Jul 2025 06:26:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26699291C20
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 06:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751523989; cv=none; b=TmzLAWE4Fm3UydRjU2traEFkEbcQ267Z3TZ9ff1O6HgjYx1Kf3mqBZu6SZZVatYWDiHPQxw7LETU/skUsmJH7P2gYjWWEEMYCtrlewxLh4joCMnQuSk0b7VWP/z8RXbgUiD4Y7FPN3kQbm5pvr2InR9RwPBkp/veXvldHxGbXAw=
+	t=1751525229; cv=none; b=h3fW9dQdxe694phbysT5j7+jfN8AYHI4cFw5Cfe8PxQavvN6SgmYAtzS/pJt9bfK3i4MNKQ/vLAQyDAae05jJhEbfcUJ8+UKjNSXbiC65HNgVEaE+5GvGMuh7r/ebPWDzpy/3cIUWZeJB3hnA+qyqPcJ73nlUT8SCBBOiU92EbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751523989; c=relaxed/simple;
-	bh=O7FtMN/oZvbdEPRzE2eGJw2a74XUhi2ghAeHVB3nVk4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t0stRlwU68LV7SJhlL5sOCd75huXqRf9jKzMNHeS3e1zaGsDqVf1DoaCQOmDJQbhz8QbTacjCCvL72g6bB68JYdfA+HktQD+9mEWde3FjJgw6xZUHIaZxVo5hiw3vZCHdPucSDtDp6lFv8tNKieAwWAF4MmZ67wM/IDpQ23pthI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KNgsLbX/; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-3141b84bf65so7402066a91.1;
-        Wed, 02 Jul 2025 23:26:27 -0700 (PDT)
+	s=arc-20240116; t=1751525229; c=relaxed/simple;
+	bh=KKAzeqsPZBn+zW8nScCvN9YtYxrO9ie+kNFaSzOUMu4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ns0reJii3RHsiROUNiHtmhGVPNtCw7OKueQMwdS5tPyOM9891gSIpUtx2SG/7onWAphQuPKytn2LJRBdmlfojcduomdVh54iCwk2d2VzOOzHeTzMewH6S6AHLEs+V5knctarj/t/X5cTqkpNAKeCBc6ldR2rAm1W7x1EZPLS9FM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=L7cGDZmJ; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-60c3aafae23so1414884a12.1
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 23:47:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751523987; x=1752128787; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QuIAHAlsiFGvJaXEewMBhiZ5Eab4fEfhk+tp+Ptj1aE=;
-        b=KNgsLbX/9ox6XzgZPkDhmrvOY5XxE47+bhd7b+nEeVdfrKmH1OCFvZYRnkZaEb9VaT
-         XBwzIUIMJRT+bR/llzAOJjvLdZpBEw9Zt59ZeSosGpUi7FKvmtAvOxjWn6NprkN8jF1x
-         lM2tF3Ratq4IFucMdz1fXACq6HA8nEZQk/WW4f1XXXNExJpafLjDY03+KiTri/bQcYyl
-         HGFCg4qPo45De5Ry8E/NAGkR1CgVBecaZJPCs9HhS2x8YX/xPBPQhZoUBUVRUofBsT10
-         Na5Gzs3l6pXJalDgJzRlwwHSjl3DxROduV9ES5Yz9LDdzjrV0Ke1EhZLg3vxGdzG3o8+
-         +Yrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751523987; x=1752128787;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gooddata.com; s=google; t=1751525225; x=1752130025; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QuIAHAlsiFGvJaXEewMBhiZ5Eab4fEfhk+tp+Ptj1aE=;
-        b=r1+WIxhD+6VUdM7xfAQ1Vj5ZBGYkAebEtLVrG/3G9/906XCZRLlUgGltJnFoWuOItB
-         9CFD7miYyTcqVWRkDsu+0qzIXveIWX3d1SAvYGMv7UVsWe8j4P+nBiZ4HN4aIJAoR1Wc
-         d/1bz4tyWwTs6VmZgxjzIfas9iw36CnthecsOqKZTjgMaDEOebHb7MIjTQoUbptgdu/S
-         pz6+Yf9C4aKW/s72FkS4e5gZhUxJeIt3dsVnAyvZn8+WLTuMfOA+mCICcZbzmVymDYG9
-         POHAogpqlVK9bXuGZwivefQAHwvfdRMzRd37uYFr6V34x9kg+ak2QFlkK8PNDD4h+z1P
-         y0Vw==
-X-Forwarded-Encrypted: i=1; AJvYcCU1yjb4v5AXeY1q7HV9IdOyuTO4rG2PEWmqUAXw3DN2etvFoR6fYTGjQlw2nWF8PP6AIU5BlxIZ/lPFfX8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yywzwn7X4s+826WkCvPbwkBEoJyhmNLq+3AofIu2zbelbI9HMmm
-	9317YUhLt8kJjlh5ufCl+wXxihfIWrIXDYiq+XRn8MR87rdzCCqOf8OS
-X-Gm-Gg: ASbGncsz1XFWz7GeXY2zzxqVSUW8LoJPwXkv+xHsSGuJv41WrrYlvgaTKDzeJGgpsNl
-	dCjfULqGILz/r/RB33U9bGyVMKv4gSm0x6rUmoRpzwjvqOZvdZ46El+o3TSImcuLI/mTXE4GD8P
-	bSObt1hR3iC9so5rKzHM91sh6IqhastEhOM0B2RLfW2Xnk/LhMoheOYrli+UTYBs3npEuaV6+AR
-	0nQsxOyBXMNLR76yOcz+twPUGgybRoyqbGuKzLlpSHHHifE4gGaTcie9VBflkkUFL7soc7PpMR+
-	Jw7zN3IP7o4ZZX7H5NVWgCngp+xovQJFFK0CFWuze3OH9taj5iunnXs7G+jX55g1dUk=
-X-Google-Smtp-Source: AGHT+IF5quh2GmPJA9pctNyeWe7UNYZqkXGkms/Kv9FuB0DogmCg3pIalj/wfNhCusfEInF4jgQmJw==
-X-Received: by 2002:a17:90b:5345:b0:311:abba:53d2 with SMTP id 98e67ed59e1d1-31a90bcae27mr8856716a91.17.1751523987040;
-        Wed, 02 Jul 2025 23:26:27 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31a9cc6ec94sm1382212a91.23.2025.07.02.23.26.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 23:26:26 -0700 (PDT)
-Date: Thu, 3 Jul 2025 06:26:19 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jay Vosburgh <jv@jvosburgh.net>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	Liang Li <liali@redhat.com>
-Subject: Re: [PATCH net] bonding: fix multicast MAC address synchronization
-Message-ID: <aGYiiw5oVEc2cyXu@fedora>
-References: <20250523022313.906-1-liuhangbin@gmail.com>
- <302767.1748034227@famine>
- <aDQrn8EslaWx_jEA@fedora>
+        bh=PDqOAfgT3Oy9KpWbVwjw3Lb+O0iMjFXu+dOXEH7JNSc=;
+        b=L7cGDZmJVPaUrQ91bcnovVSJVGTQ4fCNavhQQuADjxsgqjWPc8vYUVS+nv12dbIOtc
+         3EH5PHz5pq9RDE2kPvg4pi3bwRuOFx8zaSH9HsGppZc6jc4DssGv8qriBv4TT2hAdK9E
+         QKzcsL1QappFMAacOOhlYK5GUO20QywuMbvhs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751525225; x=1752130025;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PDqOAfgT3Oy9KpWbVwjw3Lb+O0iMjFXu+dOXEH7JNSc=;
+        b=Ggb2kqM9mVb6YF4JZOEglKtUoO2hTLou2Zq59MmPiRPFHz+R60t+N1uw6ETbbdcXcD
+         LmBmaWLuEMd1gzsx07Oyb6cPA/VVBAkx+njDa6LQW6NvU6//ZL/DQ4JolTnLDsjoG1FN
+         U/Sd1+mNP0CogCPPfQlB/7Wpv2V6nbYSN8LXTqLnIKGsbsnDusK6dIvg1M4L64K912Xn
+         GQ930YVX58JEbvypsscTXkQXby9FVWGkb1R66TD8K4/e1pE++QKQWqTMoIDPX6xtuTe4
+         //TYPLotnRpS77mt3ktLSwJHr5CLl+oEBfTqZmHLmF1BwOfp1KXfZZrhOxRUljGD5wty
+         4iag==
+X-Forwarded-Encrypted: i=1; AJvYcCV7eDems0Uu9fWNHi7x+QskYMsY8G6tZvwyUy0qKpYdciwTeSVy/LxYZKIshPY8fMvgy7+Olzc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmQBF7LOZG6IfbJnJbvnkJyMHR+Ga1SySMS2cvNxzFGHyvSbr9
+	lkMsg8hfEC0r6ZieKgffCmFoKHagelCbB9f5pnSGRJi/iLYM5xQO8GTz1vEIP/9TbHHTKvcESn+
+	SZhzBOOZVW6nSsA79i+ErRwf8Pbmoj+TaoQs6PWto
+X-Gm-Gg: ASbGncu7jeQtXo4Tp+cJ/CnZv/xcrQIug452x87Z0WsVjUU4AsVXd+HmPyLSDLvOWiK
+	LKNRyKJK4IyCBHzwb6ZzKAhEybk+6dgzIXfH5xTIODNoI/Pdnsi31VLoI84WHgH9Y9SotnEDvYS
+	Tx4hab7aRNFwtIgjBk1YdDoCPtUJrZWY/7+GK5iPjZoyMA
+X-Google-Smtp-Source: AGHT+IGBZUT7WCdiwrLSQBtH7lC8SQvHRPw9yd56kqSKdGJOCBS49gi/T/sZg6mX9fJkz6q4OJHjjJib4f41n/vvE3Y=
+X-Received: by 2002:a17:907:84a:b0:ae0:e1ed:d1a0 with SMTP id
+ a640c23a62f3a-ae3dcabcb04mr185354766b.8.1751525225322; Wed, 02 Jul 2025
+ 23:47:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aDQrn8EslaWx_jEA@fedora>
+References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
+ <CAK8fFZ5XTO9dGADuMSV0hJws-6cZE9equa3X6dfTBgDyzE1pEQ@mail.gmail.com>
+ <b3eb99da-9293-43e8-a24d-f4082f747d6c@intel.com> <CAK8fFZ7LREBEdhXjBAKuaqktOz1VwsBTxcCpLBsa+dkMj4Pyyw@mail.gmail.com>
+ <20250625132545.1772c6ab@kernel.org> <CAK8fFZ7KDaPk_FVDbTdFt8soEWrpJ_g0_fiKEg1WzjRp1BC0Qg@mail.gmail.com>
+ <CAK8fFZ5rS8Xg11LvyQHzFh3aVHbKdRHpuhrpV_Wc7oYRcMZFRA@mail.gmail.com>
+ <c764ad97-9c6a-46f5-a03b-cfa812cdb8e1@intel.com> <CAK8fFZ4bRJz2WnhoYdG8PVYi6=EKYTXBE5tu8pR4=CQoifqUuA@mail.gmail.com>
+ <f2e43212-dc49-4f87-9bbc-53a77f3523e5@intel.com> <CAK8fFZ6FU1+1__FndEoFQgHqSXN+330qvNTWMvMfiXc2DpN8NQ@mail.gmail.com>
+ <08fae312-2e3e-4622-94ab-7960accc8008@intel.com> <366dbe9f-af4d-48ec-879e-1ac54cd5f3b6@intel.com>
+ <CAK8fFZ6PPw1nshtSp+QZ_2VVWVrsCKZDdsxdPF9Tjc0=_gi=Wg@mail.gmail.com>
+ <bdab5970-0701-4ba7-abd2-2009a92c130a@intel.com> <CAK8fFZ5XPQ-mW5z9qJNJhqFukdtYGJawYTYuhHYDTCvcD37oFw@mail.gmail.com>
+ <d3c4f2f0-4c22-449b-9f8d-677c4671ee17@intel.com>
+In-Reply-To: <d3c4f2f0-4c22-449b-9f8d-677c4671ee17@intel.com>
+From: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Date: Thu, 3 Jul 2025 08:46:38 +0200
+X-Gm-Features: Ac12FXz0G_nxXDbxTR_lWeIinm5sVKDrIbLME8sCXpuZH0NLRJmD7kJagG_iKoU
+Message-ID: <CAK8fFZ4L=bJtkDcj3Vi2G0Y4jpki3qtEf8F0bxgG3x9ZHWrOUA@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
+ driver after upgrade to 6.13.y (regression in commit 492a044508ad)
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, "Damato, Joe" <jdamato@fastly.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, 
+	"Czapnik, Lukasz" <lukasz.czapnik@intel.com>, "Dumazet, Eric" <edumazet@google.com>, 
+	"Zaki, Ahmed" <ahmed.zaki@intel.com>, Martin Karsten <mkarsten@uwaterloo.ca>, 
+	Igor Raits <igor@gooddata.com>, Daniel Secik <daniel.secik@gooddata.com>, 
+	Zdenek Pesek <zdenek.pesek@gooddata.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jay,
+>
+> On 7/2/2025 2:48 AM, Jaroslav Pulchart wrote:
+> >>
+> >> On 6/30/2025 11:48 PM, Jaroslav Pulchart wrote:
+> >>>> On 6/30/2025 2:56 PM, Jacob Keller wrote:
+> >>>>> Unfortunately it looks like the fix I mentioned has landed in 6.14,=
+ so
+> >>>>> its not a fix for your issue (since you mentioned 6.14 has failed
+> >>>>> testing in your system)
+> >>>>>
+> >>>>> $ git describe --first-parent --contains --match=3Dv* --exclude=3D*=
+rc*
+> >>>>> 743bbd93cf29f653fae0e1416a31f03231689911
+> >>>>> v6.14~251^2~15^2~2
+> >>>>>
+> >>>>> I don't see any other relevant changes since v6.14. I can try to se=
+e if
+> >>>>> I see similar issues with CONFIG_MEM_ALLOC_PROFILING on some test
+> >>>>> systems here.
+> >>>>
+> >>>> On my system I see this at boot after loading the ice module from
+> >>>>
+> >>>> $ grep -F "/ice/" /proc/allocinfo | sort -g | tail | numfmt --to=3Di=
+ec>
+> >>>>       26K      230 drivers/net/ethernet/intel/ice/ice_irq.c:84 [ice]
+> >>>> func:ice_get_irq_res
+> >>>>>          48K        2 drivers/net/ethernet/intel/ice/ice_arfs.c:565=
+ [ice] func:ice_init_arfs
+> >>>>>          57K      226 drivers/net/ethernet/intel/ice/ice_lib.c:397 =
+[ice] func:ice_vsi_alloc_ring_stats
+> >>>>>          57K      226 drivers/net/ethernet/intel/ice/ice_lib.c:416 =
+[ice] func:ice_vsi_alloc_ring_stats
+> >>>>>          85K      226 drivers/net/ethernet/intel/ice/ice_lib.c:1398=
+ [ice] func:ice_vsi_alloc_rings
+> >>>>>         339K      226 drivers/net/ethernet/intel/ice/ice_lib.c:1422=
+ [ice] func:ice_vsi_alloc_rings
+> >>>>>         678K      226 drivers/net/ethernet/intel/ice/ice_base.c:109=
+ [ice] func:ice_vsi_alloc_q_vector
+> >>>>>         1.1M      257 drivers/net/ethernet/intel/ice/ice_fwlog.c:40=
+ [ice] func:ice_fwlog_alloc_ring_buffs
+> >>>>>         7.2M      114 drivers/net/ethernet/intel/ice/ice_txrx.c:493=
+ [ice] func:ice_setup_rx_ring
+> >>>>>         896M   229264 drivers/net/ethernet/intel/ice/ice_txrx.c:680=
+ [ice] func:ice_alloc_mapped_page
+> >>>>
+> >>>> Its about 1GB for the mapped pages. I don't see any increase moment =
+to
+> >>>> moment. I've started an iperf session to simulate some traffic, and =
+I'll
+> >>>> leave this running to see if anything changes overnight.
+> >>>>
+> >>>> Is there anything else that you can share about the traffic setup or
+> >>>> otherwise that I could look into?  Your system seems to use ~2.5 x t=
+he
+> >>>> buffer size as mine, but that might just be a smaller number of CPUs=
+.
+> >>>>
+> >>>> Hopefully I'll get some more results overnight.
+> >>>
+> >>> The traffic is random production workloads from VMs, using standard
+> >>> Linux or OVS bridges. There is no specific pattern to it. I haven=E2=
+=80=99t
+> >>> had any luck reproducing (or was not patient enough) this with iperf3
+> >>> myself. The two active (UP) interfaces are in an LACP bonding setup.
+> >>> Here are our ethtool settings for the two member ports (em1 and p3p1)
+> >>>
+> >>
+> >> I had iperf3 running overnight and the memory usage for
+> >> ice_alloc_mapped_pages is constant here. Mine was direct connections
+> >> without bridge or bonding. From your description I assume there's no X=
+DP
+> >> happening either.
+> >
+> > Yes, no XDP in use.
+> >
+> > BTW the allocinfo after 6days uptime:
+> > # uptime ; sort -g /proc/allocinfo| tail -n 15
+> >  11:46:44 up 6 days,  2:18,  1 user,  load average: 9.24, 11.33, 15.07
+> >    102489024   533797 fs/dcache.c:1681 func:__d_alloc
+> >    106229760    25935 mm/shmem.c:1854 func:shmem_alloc_folio
+> >    117118192   103097 fs/ext4/super.c:1388 [ext4] func:ext4_alloc_inode
+> >    134479872    32832 kernel/events/ring_buffer.c:811 func:perf_mmap_al=
+loc_page
+> >    162783232     7656 mm/slub.c:2452 func:alloc_slab_page
+> >    189906944    46364 mm/memory.c:1056 func:folio_prealloc
+> >    499384320   121920 mm/percpu-vm.c:95 func:pcpu_alloc_pages
+> >    530579456   129536 mm/page_ext.c:271 func:alloc_page_ext
+> >    625876992    54186 mm/slub.c:2450 func:alloc_slab_page
+> >    838860800      400 mm/huge_memory.c:1165 func:vma_alloc_anon_folio_p=
+md
+> >   1014710272   247732 mm/filemap.c:1978 func:__filemap_get_folio
+> >   1056710656   257986 mm/memory.c:1054 func:folio_prealloc
+> >   1279262720      610 mm/khugepaged.c:1084 func:alloc_charge_folio
+> >   1334530048   325763 mm/readahead.c:186 func:ractl_alloc_folio
+> >   3341238272   412215 drivers/net/ethernet/intel/ice/ice_txrx.c:681
+> > [ice] func:ice_alloc_mapped_page
+> >
+> I have a suspicion that the issue is related to the updating of
+> page_count in ice_get_rx_pgcnt(). The i40e driver has a very similar
+> logic for page reuse but doesn't do this. It also has a counter to track
+> failure to re-use the Rx pages.
+>
+> Commit 11c4aa074d54 ("ice: gather page_count()'s of each frag right
+> before XDP prog call") changed the logic to update page_count of the Rx
+> page just prior to the XDP call instead of at the point where we get the
+> page from ice_get_rx_buf(). I think this change was originally
+> introduced while we were trying out an experimental refactor of the
+> hotpath to handle fragments differently, which no longer happens since
+> 743bbd93cf29 ("ice: put Rx buffers after being done with current
+> frame"), which ironically was part of this very same series..
+>
+> I think this updating of page count is accidentally causing us to
+> miscount when we could perform page-reuse, and ultimately causes us to
+> leak the page somehow. I'm still investigating, but I think this might
+> trigger if somehow the page pgcnt - pagecnt_bias becomes >1, we don't
+> reuse the page.
+>
+> The i40e driver stores the page count in i40e_get_rx_buffer, and I think
+> our updating it later can somehow get things out-of-sync.
+>
+> Do you know if your traffic pattern happens to send fragmented frames? I
 
-Any comments?
+Hmm, I check the
+* node_netstat_Ip_Frag* metrics and they are empty(do-not-exists),
+* shortly run "tcpdump -n -i any 'ip[6:2] & 0x3fff !=3D 0'" and nothing was=
+ found
+looks to me like there is no fragmentation.
 
-Thanks
-Hangbin
-On Mon, May 26, 2025 at 08:51:52AM +0000, Hangbin Liu wrote:
-> On Fri, May 23, 2025 at 02:03:47PM -0700, Jay Vosburgh wrote:
-> > Hangbin Liu <liuhangbin@gmail.com> wrote:
-> > 
-> > >There is a corner case where the NS (Neighbor Solicitation) target is set to
-> > >an invalid or unreachable address. In such cases, all the slave links are
-> > >marked as down and set to backup. This causes the bond to add multicast MAC
-> > >addresses to all slaves.
-> > >
-> > >However, bond_ab_arp_probe() later tries to activate a carrier on slave and
-> > >sets it as active. If we subsequently change or clear the NS targets, the
-> > >call to bond_slave_ns_maddrs_del() on this interface will fail because it
-> > >is still marked active, and the multicast MAC address will remain.
-> > 
-> > 	This seems complicated, so, just to make sure I'm clear, the bug
-> > being fixed here happens when:
-> > 
-> > (a) ARP monitor is running with NS target(s), all of which do not
-> > solicit a reply (invalid address or unreachable), resulting in all
-> > interfaces in the bond being marked down
-> > 
-> > (b) while in the above state, the ARP monitor will cycle through each
-> > interface, making them "active" (active-ish, really, just enough for the
-> > ARP mon stuff to work) in turn to check for a response to a probe
-> 
-> Yes
-> 
-> > 
-> > (c) while the cycling from (b) is occurring, attempts to change a NS
-> > target will fail on the interface that happens to be quasi-"active" at
-> > the moment.
-> 
-> Yes, this is because bond_slave_ns_maddrs_del() must ensure the deletion
-> happens on a backup slave only. However, during ARP monitor, it set one of
-> the slaves to active, this causes the deletion of multicast MAC addresses to
-> be skipped on that interface.
-> 
-> > 	Is my summary correct?
-> > 
-> > 	Doesn't the failure scenario also require that arp_validate be
-> > enabled?  Looking at bond_slave_ns_maddrs_{add,del}, they do nothing if
-> > arp_validate is off.
-> 
-> Yes, it need.
-> 
-> > 
-> > >To fix this issue, move the NS multicast address add/remove logic into
-> > >bond_set_slave_state() to ensure multicast MAC addresses are updated
-> > >synchronously whenever the slave state changes.
-> > 
-> > 	Ok, but state change calls happen in a lot more places than the
-> > existing bond_hw_addr_swap(), which is only called during change of
-> > active for active-backup, balance-alb, and balance-tlb.  Are you sure
-> > that something goofy like setting arp_validate and an NS target with the
-> > ARP monitor disabled (or in a mode that disallows it) will behave
-> > rationally?
-> 
-> The slave_can_set_ns_maddr() in slave_set_ns_maddrs could check the bond mode
-> and if the slave is active. But no arp_interval checking. I can add it in the
-> checking to avoid the miss-config. e.g.
-> 
-> diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
-> index 91893c29b899..21116362cc24 100644
-> --- a/drivers/net/bonding/bond_options.c
-> +++ b/drivers/net/bonding/bond_options.c
-> @@ -1241,6 +1241,7 @@ static int bond_option_arp_ip_targets_set(struct bonding *bond,
->  static bool slave_can_set_ns_maddr(const struct bonding *bond, struct slave *slave)
->  {
->         return BOND_MODE(bond) == BOND_MODE_ACTIVEBACKUP &&
-> +              bond->params.arp_interval &&
->                !bond_is_active_slave(slave) &&
->                slave->dev->flags & IFF_MULTICAST;
->  }
-> 
-> > 
-> > >Note: The call to bond_slave_ns_maddrs_del() in __bond_release_one() is
-> > >kept, as it is still required to clean up multicast MAC addresses when
-> > >a slave is removed.
-> > >
-> > >Fixes: 8eb36164d1a6 ("bonding: add ns target multicast address to slave device")
-> > >Reported-by: Liang Li <liali@redhat.com>
-> > >Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> > >---
-> > > drivers/net/bonding/bond_main.c | 9 ---------
-> > > include/net/bonding.h           | 7 +++++++
-> > > 2 files changed, 7 insertions(+), 9 deletions(-)
-> > >
-> > >diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> > >index 8ea183da8d53..6dde6f870ee2 100644
-> > >--- a/drivers/net/bonding/bond_main.c
-> > >+++ b/drivers/net/bonding/bond_main.c
-> > >@@ -1004,8 +1004,6 @@ static void bond_hw_addr_swap(struct bonding *bond, struct slave *new_active,
-> > > 
-> > > 		if (bond->dev->flags & IFF_UP)
-> > > 			bond_hw_addr_flush(bond->dev, old_active->dev);
-> > >-
-> > >-		bond_slave_ns_maddrs_add(bond, old_active);
-> > > 	}
-> > > 
-> > > 	if (new_active) {
-> > >@@ -1022,8 +1020,6 @@ static void bond_hw_addr_swap(struct bonding *bond, struct slave *new_active,
-> > > 			dev_mc_sync(new_active->dev, bond->dev);
-> > > 			netif_addr_unlock_bh(bond->dev);
-> > > 		}
-> > >-
-> > >-		bond_slave_ns_maddrs_del(bond, new_active);
-> > > 	}
-> > > }
-> > > 
-> > >@@ -2350,11 +2346,6 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
-> > > 	bond_compute_features(bond);
-> > > 	bond_set_carrier(bond);
-> > > 
-> > >-	/* Needs to be called before bond_select_active_slave(), which will
-> > >-	 * remove the maddrs if the slave is selected as active slave.
-> > >-	 */
-> > >-	bond_slave_ns_maddrs_add(bond, new_slave);
-> > >-
-> > > 	if (bond_uses_primary(bond)) {
-> > > 		block_netpoll_tx();
-> > > 		bond_select_active_slave(bond);
-> > >diff --git a/include/net/bonding.h b/include/net/bonding.h
-> > >index 95f67b308c19..0041f7a2bd18 100644
-> > >--- a/include/net/bonding.h
-> > >+++ b/include/net/bonding.h
-> > >@@ -385,7 +385,14 @@ static inline void bond_set_slave_state(struct slave *slave,
-> > > 	if (slave->backup == slave_state)
-> > > 		return;
-> > > 
-> > >+	if (slave_state == BOND_STATE_ACTIVE)
-> > >+		bond_slave_ns_maddrs_del(slave->bond, slave);
-> > >+
-> > > 	slave->backup = slave_state;
-> > >+
-> > >+	if (slave_state == BOND_STATE_BACKUP)
-> > >+		bond_slave_ns_maddrs_add(slave->bond, slave);
-> > 
-> > 	This code pattern kind of makes it look like the slave->backup
-> > assignment must happen between the two new if blocks.  I don't think
-> > that's true, and things would work correctly if the slave->backup
-> > assignment happened first (or last).
-> 
-> The slave->backup assignment must happen between the two if blocks, because
-> 
-> bond_slave_ns_maddrs_add/del only do the operation on backup slave.
-> So if a interface become active, we need to call maddrs_del before it set
-> backup state to active. If a interface become backup. We need to call
-> maddrs_add after the backup state set to backup.
-> 
-> I will add a comment in the code.
-> 
-> Thanks
-> Hangbin
-> > 
-> > 	Assuming I'm correct, could you move the assignment so it's not
-> > in the middle?  If, however, it does need to be in the middle, that
-> > deserves a comment explaining why.
-> > 
-> > 	-J
-> > 
-> > >+
-> > > 	if (notify) {
-> > > 		bond_lower_state_changed(slave);
-> > > 		bond_queue_slave_event(slave);
-> > >-- 
-> > >2.46.0
-> > >
-> > 
-> > ---
-> > 	-Jay Vosburgh, jv@jvosburgh.net
+> think iperf doesn't do that, which might be part of whats causing this
+> issue. I'm going to try to see if I can generate such fragmentation to
+> confirm. Is your MTU kept at the default ethernet size?
+
+Our MTU size is set to 9000 everywhere.
+
+>
+> At the very least I'm going to propose a patch for ice similar to the
+> one from Joe Damato to track the rx busy page count. That might at least
+> help track something..
+>
+> Thanks,
+> Jake
 
