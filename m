@@ -1,245 +1,278 @@
-Return-Path: <netdev+bounces-203855-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C3C6AF7A1C
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 17:09:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C7B6AF7A79
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 17:13:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6B6F177A76
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 15:06:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33C861BC5C97
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 15:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19CD92E7649;
-	Thu,  3 Jul 2025 15:06:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 690542EF64D;
+	Thu,  3 Jul 2025 15:08:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="eWsA89Dg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sqiylDDl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5000B2D6622
-	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 15:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1439915442C;
+	Thu,  3 Jul 2025 15:08:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751555171; cv=none; b=LTX7vk2qTfMZ6l+Pv/pOaxDyorrU3eNba4vcRZox4G14rzE1Xkv/NSYDizi+dix1W/2waEcRhONSJKjYrYH25u5cGX33ndzL/P4HBczMYJsUfryFps9wnP90ZC0liY/OX7zHqxydEscx4EDhbW/QqbDnjEv2MzolkvuOS2QWjEs=
+	t=1751555316; cv=none; b=XzJnIY2NPr2wHXqiVaAsV4Fk8JURykD9k9T/GKZydB/5g5yMpuKpZH8VJQnOdl8uQXSfdxpTBV4KNstEAICXvcD1qyHiccZPTL9JZoBmbSvjx0juVL9vk8s0XMJe11s9q13hattYb+0mAf5It4tdRSSInsjqDTv0gYhuRLlhMk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751555171; c=relaxed/simple;
-	bh=DYvCAhzLM8fdwVq7aCiUxFHRsCqPkI8aNLS/wCBGn0w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Eea8outcke/nH8a37EMF7bbI+b/kPycoJHWhLjtx8uWKJei51SIxxhAXIrNU3AlW5fm4hmpncOP7KNFzDjmbE9s4xeG3SOGMxwFQkHChA0247CpoGfEAkzc4GYs4KcVKtYKClBOa+gdxuRBy6cgunzw9ZGBxn2Kp0s/EaL6Nxy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=eWsA89Dg; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-74b52bf417cso81250b3a.0
-        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 08:06:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1751555168; x=1752159968; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zr5/PSMlHaNo3rCbCbRSTlWCczbh6mWql7osZOxjq28=;
-        b=eWsA89Dg+kPt9tt7Sju2dkIp0p5CVbhXBvJ4psc1hkL8M3nIp4wvvWRxDuQCoud4uV
-         o1JqXXyS1gPnVrZbiGzjQzmjy+gVRn5zMM42zCMFdSMpYAlOPRbnQo4P6gdC3d2AHiyc
-         b4ZEnTL2+xOce2HVSESI2X0n7kH6As66FFuWM9nW0WBwTMD7Xk0AJSqW5KgHl6GzBUFg
-         hFVX0DdCYI2/f/Y2h4J+SNZ0gr4nKeMY4dYg8sEVeIklkkJ8sW0ZA8wzBn4fwzM0boJe
-         /x6opTSQIM2v/cT/zVbkbU3Q0H5TgiME9ERc8BUP4PRqLHUIoWGi4pfL8hF9tVYCt/8d
-         Xj0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751555168; x=1752159968;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zr5/PSMlHaNo3rCbCbRSTlWCczbh6mWql7osZOxjq28=;
-        b=uQEhLas5d29KlPf7eWYTBUlEm7TqM/Rph20od0ws8YYX+k/4vQepc5dJUH45Qc06ZK
-         yKD4LOZ0TRA7YncioX5j7Tk0AHGnnc7xjeOHRg8wAiUuu05kwIcEisJl1ot5GK3doJ0m
-         Dh+UiHQz1OazNld8iCekLhMk36ZrJcEh+fODeUFB02J0dlx66r5oEcOQErEenPxBBDE0
-         BjUk/2nffUjaYC6egR4zrkq32t+MPA/Yqi9yrYvvadEmdSx4vuAE077aWChOmbtsvik8
-         OFTshZZ2iK6ZjXbMSzFqoTdI5mo+K1o0e48qR8rs1ZLg77mA+xagPdMcOZVcAKZVT9Gx
-         gQTg==
-X-Forwarded-Encrypted: i=1; AJvYcCX4TAIpzjP56hdbNFIk2q8Uiv/X0QmrXRP839Hr14zo6u+EDoYLaRnMAusdE1MWYD6x57OlQ80=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywx1mbQD3h+CnsJ28Fx7B8MgY7B5slnlgn5xleJ12a8fKFWxm9a
-	HstT7cIkQZUMuqJ6Hu8n1Zo56i+v1JN9ILdeWle8OSp9U3gMdW8WYZ4BpHPrXFd862sFf+9tHN1
-	zG6jwnD+a7WjlTG/xr3Eic++tF+p+o37xh2oEfnU6
-X-Gm-Gg: ASbGncsxm/diB4HWx1Y9oZPw/FICWHvUF7jD6nPHSMKk6FHxBSUuDNgBoHzhkBXqk5m
-	OjrvldAjKKEODg7BWAAaDDJYcy1tM/tfYqzEGjV/MncieSIwBS6gAsBFYBekUkhG/zWOlHK3EzG
-	1WOoOZAjApTli/pkF67+MSN8ArToVF2GwwKc9PCpj23g==
-X-Google-Smtp-Source: AGHT+IE7LWxQoj/NE9eb8qrgB6bmZeglyHBFQW8RyGDs4pupg6OxAxtcd4yot8ghXLbwdJjmPIUO2sQUkC+1dLEudyM=
-X-Received: by 2002:a05:6a00:a95:b0:73e:1e24:5a4e with SMTP id
- d2e1a72fcca58-74cb6a2684fmr4721831b3a.24.1751555168577; Thu, 03 Jul 2025
- 08:06:08 -0700 (PDT)
+	s=arc-20240116; t=1751555316; c=relaxed/simple;
+	bh=8GljKLrHpe9kEXKa3hqzrNoCIsl56DSFqDvkVIih/VM=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=Sc6/BQoNQNdwu8w7Zaiq/Wgo6+QgxsmVrSHskkbAz8z/XeRykUsLOjFL/eCeLlCNyfUsnGlFS/lXU/E3dm5ZQ8qNJyI/7MhxATTCWnBpfsQQFcbNnRh5QJ6ZXJp9lArg5E5Uwk/jKxYHEHw/ryPDgcv/c1oA1ERgLMM+lS5aRDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sqiylDDl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D734DC4CEED;
+	Thu,  3 Jul 2025 15:08:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751555315;
+	bh=8GljKLrHpe9kEXKa3hqzrNoCIsl56DSFqDvkVIih/VM=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=sqiylDDl2AA2H7oObOdp9HnXMvLCM5hmnb6+/+MaxrqmX3gDy8ZShwCyGlfIyap/G
+	 +7azaRN8FrYZT4oKRXiUCRfO+CqSSXm5T9GXI84E6Pa2TuJkvuZQwAROBV5FE5VJ8h
+	 g9dT/h6I7czTQp/Rlz02Tp07mpnCYSt4Eoe/Po/8s6XjPEA6/2nULo6w+IShgITWpv
+	 9t/P2XvQXr9RVsxQdIg4h7R0n2vQk0Uai3C/J2zSGKxlJvqemQBwkQmFj6KwoFCxVz
+	 CBILc4T0vMxDj5eEIfvb3CzXrE1KOadGjHOtdX4cfhY9147utvIV7umZv8Jf5AgeeF
+	 vnxs7Lkq8KyeQ==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <68663c93.a70a0220.5d25f.0857.GAE@google.com> <68666a48.a00a0220.c7b3.0003.GAE@google.com>
-In-Reply-To: <68666a48.a00a0220.c7b3.0003.GAE@google.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 3 Jul 2025 11:05:57 -0400
-X-Gm-Features: Ac12FXz0U46QJZd0mMRlLQj1vbF2-eA_JKElS5gSdKa2WfGkzHIdN1l5OlAIswM
-Message-ID: <CAM0EoM=JWBb-Ap8Wutic8-7k7_+5rrt-t65h5Bv-iyiJ+JtOCA@mail.gmail.com>
-Subject: Lion, can you take a look at his? WAS(Re: [syzbot] [net?] general
- protection fault in htb_qlen_notify
-To: syzbot <syzbot+d8b58d7b0ad89a678a16@syzkaller.appspotmail.com>, 
-	Lion <nnamrec@gmail.com>
-Cc: David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Simon Horman <horms@kernel.org>, Jiri Pirko <jiri@resnulli.us>, Jakub Kicinski <kuba@kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	syzkaller-bugs <syzkaller-bugs@googlegroups.com>, Cong Wang <xiyou.wangcong@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 03 Jul 2025 17:08:22 +0200
+Message-Id: <DB2IJ9HBIM0W.3N0JVGKX558QI@kernel.org>
+Cc: "Michal Rostecki" <vadorovsky@protonmail.com>, "Miguel Ojeda"
+ <ojeda@kernel.org>, "Alex Gaynor" <alex.gaynor@gmail.com>, "Boqun Feng"
+ <boqun.feng@gmail.com>, "Gary Guo" <gary@garyguo.net>,
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Andreas
+ Hindborg" <a.hindborg@kernel.org>, "Alice Ryhl" <aliceryhl@google.com>,
+ "Trevor Gross" <tmgross@umich.edu>, "Brendan Higgins"
+ <brendan.higgins@linux.dev>, "David Gow" <davidgow@google.com>, "Rae Moar"
+ <rmoar@google.com>, "Danilo Krummrich" <dakr@kernel.org>, "Maarten
+ Lankhorst" <maarten.lankhorst@linux.intel.com>, "Maxime Ripard"
+ <mripard@kernel.org>, "Thomas Zimmermann" <tzimmermann@suse.de>, "David
+ Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>, "Greg
+ Kroah-Hartman" <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, "Luis Chamberlain" <mcgrof@kernel.org>, "Russ Weight"
+ <russ.weight@linux.dev>, "FUJITA Tomonori" <fujita.tomonori@gmail.com>,
+ "Rob Herring" <robh@kernel.org>, "Saravana Kannan" <saravanak@google.com>,
+ "Peter Zijlstra" <peterz@infradead.org>, "Ingo Molnar" <mingo@redhat.com>,
+ "Will Deacon" <will@kernel.org>, "Waiman Long" <longman@redhat.com>,
+ "Nathan Chancellor" <nathan@kernel.org>, "Nick Desaulniers"
+ <nick.desaulniers+lkml@gmail.com>, "Bill Wendling" <morbo@google.com>,
+ "Justin Stitt" <justinstitt@google.com>, "Andrew Lunn" <andrew@lunn.ch>,
+ "Heiner Kallweit" <hkallweit1@gmail.com>, "Russell King"
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "Bjorn Helgaas" <bhelgaas@google.com>, "Arnd
+ Bergmann" <arnd@arndb.de>, "Jens Axboe" <axboe@kernel.dk>,
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, "Dave
+ Ertman" <david.m.ertman@intel.com>, "Ira Weiny" <ira.weiny@intel.com>,
+ "Leon Romanovsky" <leon@kernel.org>, "Breno Leitao" <leitao@debian.org>,
+ "Viresh Kumar" <viresh.kumar@linaro.org>, "Michael Turquette"
+ <mturquette@baylibre.com>, "Stephen Boyd" <sboyd@kernel.org>,
+ <rust-for-linux@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-kselftest@vger.kernel.org>, <kunit-dev@googlegroups.com>,
+ <dri-devel@lists.freedesktop.org>, <netdev@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <llvm@lists.linux.dev>,
+ <linux-pci@vger.kernel.org>, <nouveau@lists.freedesktop.org>,
+ <linux-block@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+ <linux-clk@vger.kernel.org>
+Subject: Re: [PATCH v13 2/5] rust: support formatting of foreign types
+From: "Benno Lossin" <lossin@kernel.org>
+To: "Tamir Duberstein" <tamird@gmail.com>
+X-Mailer: aerc 0.20.1
+References: <20250701-cstr-core-v13-0-29f7d3eb97a6@gmail.com>
+ <20250701-cstr-core-v13-2-29f7d3eb97a6@gmail.com>
+ <DB2BDSN1JH51.14ZZPETJORBC6@kernel.org>
+ <CAJ-ks9nC=AyBPXRY3nJ0NuZvjFskzMcOkVNrBEfXD2hZ5uRntQ@mail.gmail.com>
+In-Reply-To: <CAJ-ks9nC=AyBPXRY3nJ0NuZvjFskzMcOkVNrBEfXD2hZ5uRntQ@mail.gmail.com>
 
-On Thu, Jul 3, 2025 at 7:32=E2=80=AFAM syzbot
-<syzbot+d8b58d7b0ad89a678a16@syzkaller.appspotmail.com> wrote:
+On Thu Jul 3, 2025 at 3:55 PM CEST, Tamir Duberstein wrote:
+> On Thu, Jul 3, 2025 at 5:32=E2=80=AFAM Benno Lossin <lossin@kernel.org> w=
+rote:
+>> On Tue Jul 1, 2025 at 6:49 PM CEST, Tamir Duberstein wrote:
+>> > Introduce a `fmt!` macro which wraps all arguments in
+>> > `kernel::fmt::Adapter` and a `kernel::fmt::Display` trait. This enable=
+s
+>> > formatting of foreign types (like `core::ffi::CStr`) that do not
+>> > implement `core::fmt::Display` due to concerns around lossy conversion=
+s which
+>> > do not apply in the kernel.
+>> >
+>> > Replace all direct calls to `format_args!` with `fmt!`.
+>> >
+>> > Replace all implementations of `core::fmt::Display` with implementatio=
+ns
+>> > of `kernel::fmt::Display`.
+>> >
+>> > Suggested-by: Alice Ryhl <aliceryhl@google.com>
+>> > Link: https://rust-for-linux.zulipchat.com/#narrow/channel/288089-Gene=
+ral/topic/Custom.20formatting/with/516476467
+>> > Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+>> > Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+>> > Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+>> > ---
+>> >  drivers/block/rnull.rs       |  2 +-
+>> >  drivers/gpu/nova-core/gpu.rs |  4 +-
+>> >  rust/kernel/block/mq.rs      |  2 +-
+>> >  rust/kernel/device.rs        |  2 +-
+>> >  rust/kernel/fmt.rs           | 89 +++++++++++++++++++++++++++++++++++=
+++++
+>> >  rust/kernel/kunit.rs         |  6 +--
+>> >  rust/kernel/lib.rs           |  1 +
+>> >  rust/kernel/prelude.rs       |  3 +-
+>> >  rust/kernel/print.rs         |  4 +-
+>> >  rust/kernel/seq_file.rs      |  2 +-
+>> >  rust/kernel/str.rs           | 22 ++++------
+>> >  rust/macros/fmt.rs           | 99 +++++++++++++++++++++++++++++++++++=
++++++++++
+>> >  rust/macros/lib.rs           | 19 +++++++++
+>> >  rust/macros/quote.rs         |  7 ++++
+>> >  scripts/rustdoc_test_gen.rs  |  2 +-
+>> >  15 files changed, 236 insertions(+), 28 deletions(-)
+>>
+>> This would be a lot easier to review if he proc-macro and the call
+>> replacement were different patches.
+>>
+>> Also the `kernel/fmt.rs` file should be a different commit.
 >
-> syzbot has found a reproducer for the following issue on:
->
-> HEAD commit:    bd475eeaaf3c Merge branch '200GbE' of git://git.kernel.or=
-g..
-> git tree:       net
-> console output: https://syzkaller.appspot.com/x/log.txt?x=3D15cc058258000=
-0
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D36b0e72cad529=
-8f8
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3Dd8b58d7b0ad89a6=
-78a16
-> compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f604=
-9-1~exp1~20250616065826.132), Debian LLD 20.1.7
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D1113748c580=
-000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D10909ebc58000=
-0
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/d59bc82a55e0/dis=
-k-bd475eea.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/2a83759fceb6/vmlinu=
-x-bd475eea.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/07576fd8e432/b=
-zImage-bd475eea.xz
->
-> IMPORTANT: if you fix the issue, please add the following tag to the comm=
-it:
-> Reported-by: syzbot+d8b58d7b0ad89a678a16@syzkaller.appspotmail.com
->
-> Oops: general protection fault, probably for non-canonical address 0xdfff=
-fc0000000035: 0000 [#1] SMP KASAN PTI
-> KASAN: null-ptr-deref in range [0x00000000000001a8-0x00000000000001af]
-> CPU: 1 UID: 0 PID: 6017 Comm: syz.0.16 Not tainted 6.16.0-rc3-syzkaller-0=
-0144-gbd475eeaaf3c #0 PREEMPT(full)
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 05/07/2025
-> RIP: 0010:htb_deactivate net/sched/sch_htb.c:613 [inline]
-> RIP: 0010:htb_qlen_notify+0x31/0xc0 net/sched/sch_htb.c:1489
-> Code: 41 56 41 55 41 54 53 49 89 f6 49 89 ff 49 bc 00 00 00 00 00 fc ff d=
-f e8 3d c6 46 f8 49 8d 9e a8 01 00 00 49 89 dd 49 c1 ed 03 <43> 0f b6 44 25=
- 00 84 c0 75 4d 8b 2b 31 ff 89 ee e8 5a ca 46 f8 85
-> RSP: 0018:ffffc900034f6fb0 EFLAGS: 00010206
-> RAX: ffffffff89798833 RBX: 00000000000001a8 RCX: ffff88802714bc00
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88807a6ac000
-> RBP: dffffc0000000000 R08: ffff88802714bc00 R09: 0000000000000002
-> R10: 00000000ffffffff R11: ffffffff89798810 R12: dffffc0000000000
-> R13: 0000000000000035 R14: 0000000000000000 R15: ffff88807a6ac000
-> FS:  00007fa0c3df16c0(0000) GS:ffff888125d50000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007fa0c3dd0d58 CR3: 00000000743e8000 CR4: 00000000003526f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  qdisc_tree_reduce_backlog+0x29c/0x480 net/sched/sch_api.c:811
->  fq_change+0x1519/0x1f50 net/sched/sch_fq.c:1147
->  fq_init+0x699/0x960 net/sched/sch_fq.c:1201
->  qdisc_create+0x7ac/0xea0 net/sched/sch_api.c:1324
->  __tc_modify_qdisc net/sched/sch_api.c:1749 [inline]
->  tc_modify_qdisc+0x1426/0x2010 net/sched/sch_api.c:1813
->  rtnetlink_rcv_msg+0x779/0xb70 net/core/rtnetlink.c:6953
->  netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2534
->  netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
->  netlink_unicast+0x75b/0x8d0 net/netlink/af_netlink.c:1339
->  netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
->  sock_sendmsg_nosec net/socket.c:712 [inline]
->  __sock_sendmsg+0x21c/0x270 net/socket.c:727
->  ____sys_sendmsg+0x505/0x830 net/socket.c:2566
->  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
->  __sys_sendmsg net/socket.c:2652 [inline]
->  __do_sys_sendmsg net/socket.c:2657 [inline]
->  __se_sys_sendmsg net/socket.c:2655 [inline]
->  __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fa0c2f8e929
-> Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f=
-7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff=
- ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007fa0c3df1038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 00007fa0c31b5fa0 RCX: 00007fa0c2f8e929
-> RDX: 0000000000044080 RSI: 0000200000000040 RDI: 0000000000000006
-> RBP: 00007fa0c3010b39 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 0000000000000000 R14: 00007fa0c31b5fa0 R15: 00007ffd14aa8178
->  </TASK>
-> Modules linked in:
-> ---[ end trace 0000000000000000 ]---
-> RIP: 0010:htb_deactivate net/sched/sch_htb.c:613 [inline]
-> RIP: 0010:htb_qlen_notify+0x31/0xc0 net/sched/sch_htb.c:1489
-> Code: 41 56 41 55 41 54 53 49 89 f6 49 89 ff 49 bc 00 00 00 00 00 fc ff d=
-f e8 3d c6 46 f8 49 8d 9e a8 01 00 00 49 89 dd 49 c1 ed 03 <43> 0f b6 44 25=
- 00 84 c0 75 4d 8b 2b 31 ff 89 ee e8 5a ca 46 f8 85
-> RSP: 0018:ffffc900034f6fb0 EFLAGS: 00010206
-> RAX: ffffffff89798833 RBX: 00000000000001a8 RCX: ffff88802714bc00
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88807a6ac000
-> RBP: dffffc0000000000 R08: ffff88802714bc00 R09: 0000000000000002
-> R10: 00000000ffffffff R11: ffffffff89798810 R12: dffffc0000000000
-> R13: 0000000000000035 R14: 0000000000000000 R15: ffff88807a6ac000
-> FS:  00007fa0c3df16c0(0000) GS:ffff888125d50000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007fa0c3dd0d58 CR3: 00000000743e8000 CR4: 00000000003526f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> ----------------
-> Code disassembly (best guess):
->    0:   41 56                   push   %r14
->    2:   41 55                   push   %r13
->    4:   41 54                   push   %r12
->    6:   53                      push   %rbx
->    7:   49 89 f6                mov    %rsi,%r14
->    a:   49 89 ff                mov    %rdi,%r15
->    d:   49 bc 00 00 00 00 00    movabs $0xdffffc0000000000,%r12
->   14:   fc ff df
->   17:   e8 3d c6 46 f8          call   0xf846c659
->   1c:   49 8d 9e a8 01 00 00    lea    0x1a8(%r14),%rbx
->   23:   49 89 dd                mov    %rbx,%r13
->   26:   49 c1 ed 03             shr    $0x3,%r13
-> * 2a:   43 0f b6 44 25 00       movzbl 0x0(%r13,%r12,1),%eax <-- trapping=
- instruction
->   30:   84 c0                   test   %al,%al
->   32:   75 4d                   jne    0x81
->   34:   8b 2b                   mov    (%rbx),%ebp
->   36:   31 ff                   xor    %edi,%edi
->   38:   89 ee                   mov    %ebp,%esi
->   3a:   e8 5a ca 46 f8          call   0xf846ca99
->   3f:   85                      .byte 0x85
->
->
-> ---
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
+> Can you help me understand why? The changes you ask to be separated
+> would all be in different files, so why would separate commits make it
+> easier to review?
 
-It is triggered by your patch. On the first try, removing your patch
-seems to fix it.
-It may have nothing to do with your patch i.e your patch may have
-opened it up to trigger an existing bug.
-You removed that if n=3D0, len=3D0 check which earlier code was using to
-terminate the processing.
+It takes less time to go through the entire patch and give a RB. I can
+take smaller time chunks and don't have to get back into the entire
+context of the patch when I don't have 30-60min available.
 
-cheers,
-jamal
+In this patch the biggest problem is the rename & addition of new
+things, maybe just adding 200 lines in those files could be okay to go
+together, see below for more.
+
+> I prefer to keep things in one commit because the changes are highly
+> interdependent. The proc macro doesn't make sense without
+> kernel/fmt.rs and kernel/fmt.rs is useless without the proc macro.
+
+I think that `Adapter`, the custom `Display` and their impl blocks
+don't need to be in the same commit as the proc-macro. They are related,
+but maybe someone is not well-versed in proc-macros and thus doesn't
+want to review that part.
+
+>> > diff --git a/rust/kernel/fmt.rs b/rust/kernel/fmt.rs
+>> > new file mode 100644
+>> > index 000000000000..348d16987de6
+>> > --- /dev/null
+>> > +++ b/rust/kernel/fmt.rs
+>> > @@ -0,0 +1,89 @@
+>> > +// SPDX-License-Identifier: GPL-2.0
+>> > +
+>> > +//! Formatting utilities.
+>> > +
+>> > +use core::fmt;
+>>
+>> I think we should pub export all types that we are still using from
+>> `core::fmt`. For example `Result`, `Formatter`, `Debug` etc.
+>>
+>> That way I can still use the same pattern of importing `fmt` and then
+>> writing
+>>
+>>     impl fmt::Display for MyType {
+>>         fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {}
+>>     }
+>
+> Great idea, done for the next spin. It would be nice to be able to
+> lint against references to `core::fmt` outside of kernel/fmt.rs.
+
+I think there was something in clippy that can do that globally and we
+could allow that in this file?
+
+>> > +
+>> > +/// Internal adapter used to route allow implementations of formattin=
+g traits for foreign types.
+>> > +///
+>> > +/// It is inserted automatically by the [`fmt!`] macro and is not mea=
+nt to be used directly.
+>> > +///
+>> > +/// [`fmt!`]: crate::prelude::fmt!
+>> > +#[doc(hidden)]
+>> > +pub struct Adapter<T>(pub T);
+>> > +
+>> > +macro_rules! impl_fmt_adapter_forward {
+>> > +    ($($trait:ident),* $(,)?) =3D> {
+>> > +        $(
+>> > +            impl<T: fmt::$trait> fmt::$trait for Adapter<T> {
+>> > +                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Res=
+ult {
+>> > +                    let Self(t) =3D self;
+>> > +                    fmt::$trait::fmt(t, f)
+>> > +                }
+>> > +            }
+>> > +        )*
+>> > +    };
+>> > +}
+>> > +
+>> > +impl_fmt_adapter_forward!(Debug, LowerHex, UpperHex, Octal, Binary, P=
+ointer, LowerExp, UpperExp);
+>> > +
+>> > +/// A copy of [`fmt::Display`] that allows us to implement it for for=
+eign types.
+>> > +///
+>> > +/// Types should implement this trait rather than [`fmt::Display`]. T=
+ogether with the [`Adapter`]
+>> > +/// type and [`fmt!`] macro, it allows for formatting foreign types (=
+e.g. types from core) which do
+>> > +/// not implement [`fmt::Display`] directly.
+>> > +///
+>> > +/// [`fmt!`]: crate::prelude::fmt!
+>> > +pub trait Display {
+>> > +    /// Same as [`fmt::Display::fmt`].
+>> > +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result;
+>> > +}
+>> > +
+>> > +impl<T: ?Sized + Display> Display for &T {
+>> > +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+>> > +        Display::fmt(*self, f)
+>> > +    }
+>> > +}
+>> > +
+>> > +impl<T: ?Sized + Display> fmt::Display for Adapter<&T> {
+>> > +    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+>> > +        let Self(t) =3D self;
+>> > +        Display::fmt(t, f)
+>>
+>> Why not `Display::fmt(&self.0, f)`?
+>
+> I like destructuring because it shows me that there's only one field.
+> With `self.0` I don't see that.
+
+And what is the benefit here?
+
+>> > +
+>> > +    let mut args =3D TokenStream::from_iter(first_opt);
+>> > +    {
+>> > +        let mut flush =3D |args: &mut TokenStream, current: &mut Toke=
+nStream| {
+>>
+>> You don't need to pass `args` as a closure argument, since you always
+>> call it with `&mut args`.
+>
+> This doesn't work because of the borrow checker. If I wrote what you
+> suggest, then `args` is mutably borrowed by the closure, which
+> prohibits the mutable borrow needed for the .extend() call here:
+
+Ahh right... Well then it's fine.
+
+---
+Cheers,
+Benno
 
