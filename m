@@ -1,86 +1,63 @@
-Return-Path: <netdev+bounces-203738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFDD4AF6EDA
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 11:35:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E45EAF6EE9
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 11:37:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BE5D163E83
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 09:35:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C06F3A6C7A
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 09:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C7A02D7810;
-	Thu,  3 Jul 2025 09:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E7ED2D77FB;
+	Thu,  3 Jul 2025 09:37:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EsNz4cM6"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="d/2U4O7M"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933A92D77E3
-	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 09:35:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3048323BCF1;
+	Thu,  3 Jul 2025 09:36:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751535303; cv=none; b=ehcxA4NhJYeemY6bkADi9vOYUmkatpaaZkVNei27DJaR7XSQRVagUjh+N1MSqIOFBkDVID1sWjnJWjnNRzItwfWm+RTSjWsvtfQwhWjlKrzMxQDM7cuD0vPL0QOBKyKY4YWT3Jdwe9oawKn2U3PR2DMEvvNNIGKyzip8CD09DfY=
+	t=1751535420; cv=none; b=hXilwU4yzWVQhc6GXho8yX10zOQr5jvV8++ibLwZ8G4ZJJH+BTLgkRGxvIXEJZlrPY21lJhVVzrQf++/OKvQqZZYPu6/tFLQ2rArJafthc924NMGLhK1Z5hwrnjFh6OiLvSp7UVfQBtLsl4iEJudPieUeHAPujpnWUTjKwgJv4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751535303; c=relaxed/simple;
-	bh=VR6ewPlkDFxYVcgxyd675Ed+HjCla7X/pFXJY9SXONM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GeT5SGI33bj1HanqzjJmD8ZeaGIcim6HCF7zFPr3CznCLe1MF7unJ6rc+vBJvAWNzD67I7KaT/lhARzb9tP7EDOq2gzLqMjsW9RJED8ja3kMd6/z82J+Y1pCQIXCDxr6fW21XySlE7eh5NLGy9pt7vKrU1otsMYFI4EwRqA6KQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EsNz4cM6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751535300;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7/ecjRiZ4n4Bi63qDTEf/0ZSKiFCmEcZDCqQjBwaZSE=;
-	b=EsNz4cM6h4/ptiaMsKO7dKr56tplXuMS2RlGXegtBd1SswWumsaFaXCLAj5CD3PexRb2cj
-	OPmQoNIKdhTbzEW8cLvtB3ZOf9UqImnCylVTerswFDTBv5tNsnI+HIfcBTcQiy9xbPt4XS
-	xfL8zuWU1Lfo4YhjoH0b85a/aKtJc2M=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-573-ymZI5M67NW6i3NqKzdB6iA-1; Thu, 03 Jul 2025 05:34:59 -0400
-X-MC-Unique: ymZI5M67NW6i3NqKzdB6iA-1
-X-Mimecast-MFC-AGG-ID: ymZI5M67NW6i3NqKzdB6iA_1751535298
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-450d64026baso42306825e9.1
-        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 02:34:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751535298; x=1752140098;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7/ecjRiZ4n4Bi63qDTEf/0ZSKiFCmEcZDCqQjBwaZSE=;
-        b=DQ/zFHFSFYh9z6RfHfjA0Z0eehg6KXa3vz+YxBhftvNnnzvZGCPM4obKyQWnbscvmY
-         Wd92tXnXNbhpHjKUgEj+zEMvXATNBajDFwOiLcufucRVNYnzTRpfHq+RnTkQTpYIvnvA
-         aEmSS/T3P4g9MIyOCOH/Zocqads+AwDGzDarCPrOIhU+oKLi267RSvNJyUB/ENFyPYAY
-         iZXOJN/5o3LxBn6cyAKZyHmc/zpZxWMZoVQsG7xQldXrKE12qIc4XagA+fgFpgJUeClc
-         FKkEkcKsCLSYaThddyqEONxnMzfap2qtbwBgJkZeoAmNxgtHobH4dLYURKPXGWK4kfrW
-         UPuA==
-X-Forwarded-Encrypted: i=1; AJvYcCWRzh7c2S2iIcEjCBo3EjK0npxCJE1BSggAbbUY5IrByesulxW7Rpi1e3CMPHBFNlL2KshtTzU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxG6wYxJ1NfTaaoZIPOou8qHl50hxwnQY+VCXNE5BdUN+VBj70r
-	vtKTBVx66ri57FpDPQzaXpUl6I7NFQddh64ZVT+5LKggB/ui8RrGaWiF4ii0vGlZ6PEvpJMpXUY
-	904XugwcV1VW1wLc+zevR5DG6LH8e/ubCrMUgBclHO/rrGWwJbatuRfL4Mw==
-X-Gm-Gg: ASbGncslAkFIJSxidEtjd1HJOOpZuYgCDm3+pY35I5urApuw0KDj1z+QrA2mS/zDUxb
-	GOq9SqJj+59FvF7d7zX3jeD0LB80UrAFkMDOPT/Vkm64PRYIU6X7QV3X2K/ET8DzyTJCxTP/h9s
-	Rr4JGqYAjx8HY3UBLxR6uWLRk26ILSNhgswNXmhEbGg46wnUmR88M6sHLRs1rU3J2VM03OOeb30
-	Fe88jqfPs8hGdBUUoolkPezC9RGd8/eQkzdodRFYCfS9rY6vS0qjaRcBUjpqNX/NobZMiIKKNt9
-	MliSIiB9uUdXkzUhgzYSGxjYX43184RKXEtNip22QEdFFQVMwmeV64N+C9jx1TQK8k8=
-X-Received: by 2002:a05:6000:25c7:b0:3a5:58a5:6a83 with SMTP id ffacd0b85a97d-3b1fdc22221mr5018372f8f.13.1751535297786;
-        Thu, 03 Jul 2025 02:34:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE7Sup7XyxN+vlAC3A6KR6EYEEhcRygZVV8MNmYtKBfNlpT2OJsvFJElmDrry1SsdzOsPGkZg==
-X-Received: by 2002:a05:6000:25c7:b0:3a5:58a5:6a83 with SMTP id ffacd0b85a97d-3b1fdc22221mr5018346f8f.13.1751535297350;
-        Thu, 03 Jul 2025 02:34:57 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:270a:b10:5fbf:faa5:ef2b:6314? ([2a0d:3344:270a:b10:5fbf:faa5:ef2b:6314])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a88c7e7098sm17827679f8f.4.2025.07.03.02.34.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Jul 2025 02:34:56 -0700 (PDT)
-Message-ID: <c7eb3517-2fc3-4d91-8fa3-e5c870acece1@redhat.com>
-Date: Thu, 3 Jul 2025 11:34:55 +0200
+	s=arc-20240116; t=1751535420; c=relaxed/simple;
+	bh=hQIHEuqeokZqHMrXMdMOy10SxuZNFEjF/nKwhEfgynE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=bC7MbdOlnEalcNOCfWDw6/fB3CsD1Xh2UWRCRTLHdkNeYoSYpQgNiocaREnZtrmCjDqQNCh/pWQzz0QelhSyTHg2xWdyrVpiVJiHW92Sex8azemjhUXu5yVeMI8xnX5bfPT33D1eXt/B+FZXcFfgolIhi8bhRNZIjnZ8y38YDVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=d/2U4O7M; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56314BTM025364;
+	Thu, 3 Jul 2025 09:36:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	3Bx/D3f8npc4SVgVlVyBMLFb5KwIBdvI3Ykpbm7JiFg=; b=d/2U4O7MmgI2E25/
+	XyI77OUZU2WdhYAdQLuIqyTA8j5kPLGbz2tR3FyoZ8U8U3/gKrvFnUpc70DqkRTH
+	oN9OnZC/U+1paA5j1skHfguT/BaU8DxeLfvYZpL6bp44uGsR/H1uLKXV5cjjhx81
+	REC+oV2WZHHUiXkQQZ4CnxRcGpfasz3TRQ9cLAaRE6kGXwGx3LInOIW063RX/p79
+	nfOXRP7H1tlR6moY9id3ZdCPlpLjNOdRSUy26J1wSbvjYfWKhZke2ySSvdndSaZw
+	Q6SlML1wqvwgzB8CsxSt0E9aVfbDjHW3qlri4rN1ZfcFI7gv5WclW/kZGrVKxqGp
+	FEdgwg==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47kd64vyyx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 03 Jul 2025 09:36:44 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 5639agrH028261
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 3 Jul 2025 09:36:42 GMT
+Received: from [10.253.36.62] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Thu, 3 Jul
+ 2025 02:36:36 -0700
+Message-ID: <e6185a22-8e32-417e-a2d5-a7526ff91bc6@quicinc.com>
+Date: Thu, 3 Jul 2025 17:36:33 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,56 +65,424 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/3] virtio: Fixes for TX ring sizing and resize error
- reporting
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, netdev@vger.kernel.org,
- Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- linux-kernel@vger.kernel.org
-References: <20250521092236.661410-1-lvivier@redhat.com>
- <7974cae6-d4d9-41cc-bc71-ffbc9ce6e593@redhat.com>
- <20250703053042-mutt-send-email-mst@kernel.org>
+Subject: Re: [PATCH net-next v5 01/14] dt-bindings: net: Add PPE for Qualcomm
+ IPQ9574 SoC
+To: Krzysztof Kozlowski <krzk@kernel.org>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>, Lei Wei <quic_leiwei@quicinc.com>,
+        Suruchi Agarwal
+	<quic_suruchia@quicinc.com>,
+        Pavithra R <quic_pavir@quicinc.com>,
+        "Simon
+ Horman" <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+        Kees Cook
+	<kees@kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        "Philipp
+ Zabel" <p.zabel@pengutronix.de>,
+        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>
+References: <20250626-qcom_ipq_ppe-v5-0-95bdc6b8f6ff@quicinc.com>
+ <20250626-qcom_ipq_ppe-v5-1-95bdc6b8f6ff@quicinc.com>
+ <20250701-mottled-clever-walrus-f7dcd3@krzk-bin>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250703053042-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Luo Jie <quic_luoj@quicinc.com>
+In-Reply-To: <20250701-mottled-clever-walrus-f7dcd3@krzk-bin>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Authority-Analysis: v=2.4 cv=Z+PsHGRA c=1 sm=1 tr=0 ts=68664f2c cx=c_pps
+ a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10
+ a=z97pFrWBJukyg1BkY94A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzAzMDA3OCBTYWx0ZWRfX8UQw/MA7PL37
+ gbOYW7JuoqHEOBxy8x0mHsSZtGIBk+voLShXu6J6WGNO0FUX2h9TGs1AKWl57erHEaMLe9ZQgnm
+ R+Zd5ReqTfa6Hl6nKR2Dznc3opNkUYn2E5sRhX0L/cLkYLkK7Fj6G5Y4OFkr6upvQPuAe3VBou/
+ 9ftvi33yD6AdQRatBDEh5aW5hyNehqkiiIeF8lKXb7cSrfgaaeiawTEO2DEFIXPskXGuwqGcYvy
+ U7oX2JNuWV3TA5NdIodajiLNh9vZ5SfjMWdpE2krEze95WPeV2GB+YRPfKuklCwuBqSkbKu3sQ1
+ whyAG3m09I9ItYVMPkrLTO8nYv2+NIKMlzLfrfaATDT0GilE+ynfoL06eQlrRyCnzB24D3M55dL
+ 7g6e9AOQZh45iS777CVKEQYOdI8RjNcLGe9VX+KQ4nUAkdQA1j/KfVc4SaDUDGMJSqbCywla
+X-Proofpoint-GUID: Ipww-gDeKaUXzGkcJvTRDz5XUSrPL6D8
+X-Proofpoint-ORIG-GUID: Ipww-gDeKaUXzGkcJvTRDz5XUSrPL6D8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-03_03,2025-07-02_04,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 lowpriorityscore=0 clxscore=1015 malwarescore=0 mlxlogscore=999
+ spamscore=0 adultscore=0 mlxscore=0 priorityscore=1501 bulkscore=0
+ impostorscore=0 suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507030078
 
-On 7/3/25 11:31 AM, Michael S. Tsirkin wrote:
-> On Wed, May 28, 2025 at 08:24:32AM +0200, Paolo Abeni wrote:
->> On 5/21/25 11:22 AM, Laurent Vivier wrote:
->>> This patch series contains two fixes and a cleanup for the virtio subsystem.
->>>
->>> The first patch fixes an error reporting bug in virtio_ring's
->>> virtqueue_resize() function. Previously, errors from internal resize
->>> helpers could be masked if the subsequent re-enabling of the virtqueue
->>> succeeded. This patch restores the correct error propagation, ensuring that
->>> callers of virtqueue_resize() are properly informed of underlying resize
->>> failures.
->>>
->>> The second patch does a cleanup of the use of '2+MAX_SKB_FRAGS'
->>>
->>> The third patch addresses a reliability issue in virtio_net where the TX
->>> ring size could be configured too small, potentially leading to
->>> persistently stopped queues and degraded performance. It enforces a
->>> minimum TX ring size to ensure there's always enough space for at least one
->>> maximally-fragmented packet plus an additional slot.
->>
->> @Michael: it's not clear to me if you prefer take this series via your
->> tree or if it should go via net. Please LMK, thanks!
->>
->> Paolo
+
+
+On 7/1/2025 3:11 PM, Krzysztof Kozlowski wrote:
+> On Thu, Jun 26, 2025 at 10:31:00PM +0800, Luo Jie wrote:
+>> +      resets:
+>> +        maxItems: 1
+>> +        description: EDMA reset from NSS clock controller
+>> +
+>> +      interrupts:
+>> +        minItems: 65
+>> +        maxItems: 65
+>> +
+>> +      interrupt-names:
+>> +        minItems: 65
+>> +        maxItems: 65
+>> +        description:
+>> +          Interrupts "txcmpl_[0-31]" are the Ethernet DMA TX completion ring interrupts.
+>> +          Interrupts "rxfill_[0-7]" are the Ethernet DMA RX fill ring interrupts.
+>> +          Interrupts "rxdesc_[0-23]" are the Ethernet DMA RX Descriptor ring interrupts.
+>> +          Interrupt "misc" is the Ethernet DMA miscellaneous error interrupt.
+>> +
+>> +    required:
+>> +      - clocks
+>> +      - clock-names
+>> +      - resets
+>> +      - interrupts
+>> +      - interrupt-names
+>> +
+>> +patternProperties:
+>> +  "^(ethernet-)?port@[0-9a-f]+$":
 > 
-> I take it back: given I am still not fully operational, I'd like it
-> to be merged through net please. Does it have to be resubmitted for
-> this?
+> Only one port? What are you switching here?
+
+Sorry that this was missed in the update. We wanted to
+add the ethernet-port' property to ensure we document
+the per-port clocks/resets for completeness, but missed
+adding the 'ethernet-ports' property. I will add the
+'ethernet-ports' node in the updated version of the patch
+to accurately reflect the schema and hardware hierarchy.
+
+There are six physical ports in the PPE that can be part of
+the switch function.
+
 > 
-> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> Anyway, ^ethernet-port..... is preferred over port.
 
-I just resurrected the series in PW, so no need to repost it.
+OK, I will update to use '^ethernet-port' instead.
 
-Thanks,
+> 
+> But other problem is that it does not match referenced schema at all and
+> nothing in commit msg explains why this appered. 1.5 years of
+> development of this and some significant, unexpected and not correct
+> changes.
+> 
 
-Paolo
+I understand your concern. This change was described briefly in the V5
+cover letter, but I will improve this description in cover letter and
+update the commit message as well, to explicitly document this change.
+The motivation for adding the ethernet-port node in bindings was to
+document the required per-port clocks and resets as well, as these
+are essential for enabling Ethernet functionality on this hardware.
+
+Could you please review the following proposed changes and let me know
+if this approach is acceptable?
+
+patternProperties:
+   "^(ethernet-)?ports$":
+     additionalProperties: true
+     patternProperties:
+       "^ethernet-port@[1-6]+$":
+         type: object
+         unevaluatedProperties: false
+         $ref: ethernet-controller.yaml#
+		
+         properties:
+           reg:
+             minimum: 1
+             maximum: 6
+             description: PPE Ethernet port ID
+			
+           clocks:
+             items:
+               - description: Port MAC clock from NSS clock controller
+               - description: Port RX clock from NSS clock controller
+               - description: Port TX clock from NSS clock controller
+			
+           clock-names:
+             items:
+               - const: mac
+               - const: rx
+               - const: tx
+			
+           resets:
+             items:
+               - description: Port MAC reset from NSS clock controller
+               - description: Port RX reset from NSS clock controller
+               - description: Port TX reset from NSS clock controller
+			
+           reset-names:
+             items:
+               - const: mac
+               - const: rx
+               - const: tx
+			
+         required:
+           - reg
+           - clocks
+           - clock-names
+           - resets
+           - reset-names
+		
+...
+
+allOf:
+   - $ref: ethernet-switch.yaml
+...
+
+>> +    unevaluatedProperties: false
+>> +    $ref: ethernet-switch-port.yaml#
+>> +
+>> +    properties:
+>> +      clocks:
+>> +        items:
+>> +          - description: Port MAC clock from NSS clock controller
+>> +          - description: Port RX clock from NSS clock controller
+>> +          - description: Port TX clock from NSS clock controller
+>> +
+>> +      clock-names:
+>> +        items:
+>> +          - const: mac
+>> +          - const: rx
+>> +          - const: tx
+>> +
+>> +      resets:
+>> +        items:
+>> +          - description: Port MAC reset from NSS clock controller
+>> +          - description: Port RX reset from NSS clock controller
+>> +          - description: Port TX reset from NSS clock controller
+>> +
+>> +      reset-names:
+>> +        items:
+>> +          - const: mac
+>> +          - const: rx
+>> +          - const: tx
+>> +
+>> +    required:
+>> +      - reg
+>> +      - clocks
+>> +      - clock-names
+>> +      - resets
+>> +      - reset-names
+>> +
+>> +required:
+>> +  - compatible
+>> +  - reg
+>> +  - clocks
+>> +  - clock-names
+>> +  - resets
+>> +  - interconnects
+>> +  - interconnect-names
+>> +  - ethernet-dma
+>> +
+>> +allOf:
+>> +  - $ref: ethernet-switch.yaml
+>> +
+>> +unevaluatedProperties: false
+>> +
+>> +examples:
+>> +  - |
+>> +    #include <dt-bindings/clock/qcom,ipq9574-gcc.h>
+>> +    #include <dt-bindings/clock/qcom,ipq9574-nsscc.h>
+>> +    #include <dt-bindings/interconnect/qcom,ipq9574.h>
+>> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+>> +    #include <dt-bindings/reset/qcom,ipq9574-nsscc.h>
+>> +
+>> +    ethernet-switch@3a000000 {
+>> +        compatible = "qcom,ipq9574-ppe";
+>> +        reg = <0x3a000000 0xbef800>;
+>> +        clocks = <&nsscc NSS_CC_PPE_SWITCH_CLK>,
+>> +                 <&nsscc NSS_CC_PPE_SWITCH_CFG_CLK>,
+>> +                 <&nsscc NSS_CC_PPE_SWITCH_IPE_CLK>,
+>> +                 <&nsscc NSS_CC_PPE_SWITCH_BTQ_CLK>;
+>> +        clock-names = "ppe",
+>> +                      "apb",
+>> +                      "ipe",
+>> +                      "btq";
+>> +        resets = <&nsscc PPE_FULL_RESET>;
+>> +        interrupts = <GIC_SPI 498 IRQ_TYPE_LEVEL_HIGH>;
+>> +        interconnects = <&nsscc MASTER_NSSNOC_PPE &nsscc SLAVE_NSSNOC_PPE>,
+>> +                        <&nsscc MASTER_NSSNOC_PPE_CFG &nsscc SLAVE_NSSNOC_PPE_CFG>,
+>> +                        <&gcc MASTER_NSSNOC_QOSGEN_REF &gcc SLAVE_NSSNOC_QOSGEN_REF>,
+>> +                        <&gcc MASTER_NSSNOC_TIMEOUT_REF &gcc SLAVE_NSSNOC_TIMEOUT_REF>,
+>> +                        <&gcc MASTER_MEM_NOC_NSSNOC &gcc SLAVE_MEM_NOC_NSSNOC>,
+>> +                        <&gcc MASTER_NSSNOC_MEMNOC &gcc SLAVE_NSSNOC_MEMNOC>,
+>> +                        <&gcc MASTER_NSSNOC_MEM_NOC_1 &gcc SLAVE_NSSNOC_MEM_NOC_1>;
+>> +        interconnect-names = "ppe",
+>> +                             "ppe_cfg",
+>> +                             "qos_gen",
+>> +                             "timeout_ref",
+>> +                             "nssnoc_memnoc",
+>> +                             "memnoc_nssnoc",
+>> +                             "memnoc_nssnoc_1";
+>> +
+>> +        ethernet-dma {
+>> +            clocks = <&nsscc NSS_CC_PPE_EDMA_CLK>,
+>> +                     <&nsscc NSS_CC_PPE_EDMA_CFG_CLK>;
+>> +            clock-names = "sys",
+>> +                          "apb";
+>> +            resets = <&nsscc EDMA_HW_RESET>;
+>> +            interrupts = <GIC_SPI 363 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 364 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 365 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 366 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 367 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 368 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 369 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 370 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 371 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 372 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 373 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 374 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 375 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 376 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 377 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 378 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 379 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 380 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 381 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 382 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 383 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 384 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 509 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 508 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 507 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 506 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 505 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 504 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 503 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 502 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 501 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 500 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 355 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 356 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 357 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 358 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 359 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 360 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 361 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 362 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 331 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 332 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 333 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 334 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 335 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 336 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 337 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 338 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 339 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 340 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 341 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 342 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 343 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 344 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 345 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 346 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 347 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 348 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 349 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 350 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 351 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 352 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 353 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 354 IRQ_TYPE_LEVEL_HIGH>,
+>> +                         <GIC_SPI 499 IRQ_TYPE_LEVEL_HIGH>;
+>> +            interrupt-names = "txcmpl_0",
+>> +                              "txcmpl_1",
+>> +                              "txcmpl_2",
+>> +                              "txcmpl_3",
+>> +                              "txcmpl_4",
+>> +                              "txcmpl_5",
+>> +                              "txcmpl_6",
+>> +                              "txcmpl_7",
+>> +                              "txcmpl_8",
+>> +                              "txcmpl_9",
+>> +                              "txcmpl_10",
+>> +                              "txcmpl_11",
+>> +                              "txcmpl_12",
+>> +                              "txcmpl_13",
+>> +                              "txcmpl_14",
+>> +                              "txcmpl_15",
+>> +                              "txcmpl_16",
+>> +                              "txcmpl_17",
+>> +                              "txcmpl_18",
+>> +                              "txcmpl_19",
+>> +                              "txcmpl_20",
+>> +                              "txcmpl_21",
+>> +                              "txcmpl_22",
+>> +                              "txcmpl_23",
+>> +                              "txcmpl_24",
+>> +                              "txcmpl_25",
+>> +                              "txcmpl_26",
+>> +                              "txcmpl_27",
+>> +                              "txcmpl_28",
+>> +                              "txcmpl_29",
+>> +                              "txcmpl_30",
+>> +                              "txcmpl_31",
+>> +                              "rxfill_0",
+>> +                              "rxfill_1",
+>> +                              "rxfill_2",
+>> +                              "rxfill_3",
+>> +                              "rxfill_4",
+>> +                              "rxfill_5",
+>> +                              "rxfill_6",
+>> +                              "rxfill_7",
+>> +                              "rxdesc_0",
+>> +                              "rxdesc_1",
+>> +                              "rxdesc_2",
+>> +                              "rxdesc_3",
+>> +                              "rxdesc_4",
+>> +                              "rxdesc_5",
+>> +                              "rxdesc_6",
+>> +                              "rxdesc_7",
+>> +                              "rxdesc_8",
+>> +                              "rxdesc_9",
+>> +                              "rxdesc_10",
+>> +                              "rxdesc_11",
+>> +                              "rxdesc_12",
+>> +                              "rxdesc_13",
+>> +                              "rxdesc_14",
+>> +                              "rxdesc_15",
+>> +                              "rxdesc_16",
+>> +                              "rxdesc_17",
+>> +                              "rxdesc_18",
+>> +                              "rxdesc_19",
+>> +                              "rxdesc_20",
+>> +                              "rxdesc_21",
+>> +                              "rxdesc_22",
+>> +                              "rxdesc_23",
+>> +                              "misc";
+>> +        };
+>> +
+>> +        ethernet-ports {
+> 
+> Look at your binding, not what it said...
+
+I will fix this to add the ethernet-ports node in the next version.
+
+> 
+>> +            #address-cells = <1>;
+>> +            #size-cells = <0>;
+>> +
+>> +            port@1 {
+> 
+> Best regards,
+> Krzysztof
+> 
+> 
 
 
