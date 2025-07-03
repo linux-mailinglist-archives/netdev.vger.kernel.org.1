@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-203895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93194AF7F47
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 19:43:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26E45AF7F49
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 19:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23B1E4E0D53
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 17:42:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05B1F584712
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 17:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39CAC2F271B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7B962F235C;
 	Thu,  3 Jul 2025 17:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l90zSMYZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bnElgf2W"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E882F2365
-	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 17:42:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10E352F237A
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 17:42:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751564573; cv=none; b=WOSdAgE5FIUksKXbPsw4+o8XKsQmwZgpSg6S1nj6fK0mRXkd0xjr0BweMkUZz8tULtG8d1OeOhqY6F2YEv/7uriM/Yb5/pF8QbKDH3Jtd8b5kjcsKqN1+4tvCzX3RjzF4IdtC00yvBvm/wHU/XAKMZRsicPBIIE0HW7SOcakONk=
+	t=1751564573; cv=none; b=rxtr08JSudjpR6cnpH/VTQnS+iWPh4zmRUy5pd7p4NZWjvvpbHPlvY3Alh7YbbZEjdzUbd+7/JgPcV+9upiSMZ0Bj2DTiZHPYpfjWviGDnr90J7G21B+H2RVzzwuvv10gnyCKLrSq05nZWwbzu+K6Mk1dAVn7ZudBVvNE9uDc3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1751564573; c=relaxed/simple;
-	bh=H5A/0kxSP2qktbFGr9VdOyDLH8QuajdQdwxhJydDRWE=;
+	bh=csO0ykXEBWopPfPKvT8Yh6AI+JBISxQAkO+lDUMbwPc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WT3g6TUL+i7fJ+bbftMQlSIxUEOMoWAiBzyrQBLsbY4AKTBKT0KoRYPym16lTSvPtBaA6D4M3ZMx2ni0WJiWXqNqq+81OnT9fZj2g6Zu+Weehs4f4/IY670IhGwrTIV9/h5jKzshcxfYtwaGQnz5E978wJ+leeVSXIZG+sHwD1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l90zSMYZ; arc=none smtp.client-ip=198.175.65.19
+	 MIME-Version; b=OMAe6y5SI7gE8PWdwenUr1+Y5zBLt0bn/mtOaInlh8SYpF1+CEXXQ5kCuOR6N8cFc9zslzruYnrWiDXo4tZs7iPm9mMN9w9IuMjXmx1s3bC3jvlbs6jrPbrFRbDJg6rncJQbDVY8tTB6JQcxOSyhp9vhg2qNtuHLUo2vvJNrFos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bnElgf2W; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,28 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1751564572; x=1783100572;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=H5A/0kxSP2qktbFGr9VdOyDLH8QuajdQdwxhJydDRWE=;
-  b=l90zSMYZWdfes/SLwkx4u52395nWnsoqTnQgluiMAd57qsby+YVGDVZ/
-   XzINncP6GABfxcFYUwaNfK2DQUoGVTXEm+oTQ7oIyDoOVU4CGy0jmZSqZ
-   Kw7tuUTPcZWDM6X8dMDoG3wR+Ijd4NvefCpUZlLfx7K7LE0bk+p720Yx2
-   g6GXS3lZkzRbq7zEDPbRfbcQpZ/QL3T32NR8iNFqnz2h9Yp0ogGj87F3t
-   rkHx/Ueshiahz/FWkr4udivkH8qVPoD+MPfbAOLqpzNQDqojNXL6FPZKY
-   37kG157Qnmw9spGF1tGqOMiKu8Cz3XHtQBTwopZ2n1Uj6cxfmIIfW1ZfW
-   Q==;
-X-CSE-ConnectionGUID: CJpc5OgHSz2JsMeVfxInNQ==
-X-CSE-MsgGUID: /ikvZyNMTymUnYoOX0S7Rg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="53767928"
+  bh=csO0ykXEBWopPfPKvT8Yh6AI+JBISxQAkO+lDUMbwPc=;
+  b=bnElgf2W78szEV4aPmohoco7Whn3FdDG73X6vVBXaoi0ivCiVPs221Ke
+   EHdug16wzdTcHrFDxiQtrozKAnHrtzMbDAZat8snLOAb0kq+QJv6Ub4/4
+   sKT22WlN5hXZoH7twR4YstXHUZ0+z2vdo/DYK2Ej3Mm9xvUfnEfZfvuVa
+   aM9iyR8Zz/86IsQ7z/iPrifmZzLVLE6/FSSeB+QZgDA2UJGSBujUQq92v
+   cSolZ4kKddcQLZbLvW+hGIAU9t9+moPYw/i8tWVxSUSWCpHvoFTDv6J8c
+   UyZvJJOR2IsDj/QJv6ciilPIy4zRWGZu1uyV4yk/1j3Xkgod+IChXWW0M
+   A==;
+X-CSE-ConnectionGUID: wQmN7VKCTimsfkBOP4yiHg==
+X-CSE-MsgGUID: Hgi5uap4SV+6t96GEpJf1Q==
+X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="53767937"
 X-IronPort-AV: E=Sophos;i="6.16,285,1744095600"; 
-   d="scan'208";a="53767928"
+   d="scan'208";a="53767937"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 10:42:49 -0700
-X-CSE-ConnectionGUID: 3YMRbZAMQguMWTG5SYlLpg==
-X-CSE-MsgGUID: mKNv0WyCQcy75zx/KJm3KQ==
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 10:42:50 -0700
+X-CSE-ConnectionGUID: HTrMhSBLQcKWJSSRjzZKgA==
+X-CSE-MsgGUID: U0+jXUbfThaJ+NMSwfkHBQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.16,285,1744095600"; 
-   d="scan'208";a="154997896"
+   d="scan'208";a="154997903"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa008.fm.intel.com with ESMTP; 03 Jul 2025 10:42:48 -0700
+  by fmviesa008.fm.intel.com with ESMTP; 03 Jul 2025 10:42:49 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -65,16 +65,19 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
+Cc: Paul Greenwalt <paul.greenwalt@intel.com>,
 	anthony.l.nguyen@intel.com,
-	richardcochran@gmail.com,
-	Simon Horman <horms@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Milena Olech <milena.olech@intel.com>,
-	Rinitha S <sx.rinitha@intel.com>
-Subject: [PATCH net-next 05/12] i40e: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
-Date: Thu,  3 Jul 2025 10:42:32 -0700
-Message-ID: <20250703174242.3829277-6-anthony.l.nguyen@intel.com>
+	jedrzej.jagielski@intel.com,
+	przemyslaw.kitszel@intel.com,
+	dawid.osuchowski@intel.com,
+	piotr.kwapulinski@intel.com,
+	marcin.szycik@linux.intel.com,
+	horms@kernel.org,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Rafal Romanowski <rafal.romanowski@intel.com>
+Subject: [PATCH net-next 06/12] ixgbe: add MDD support
+Date: Thu,  3 Jul 2025 10:42:33 -0700
+Message-ID: <20250703174242.3829277-7-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250703174242.3829277-1-anthony.l.nguyen@intel.com>
 References: <20250703174242.3829277-1-anthony.l.nguyen@intel.com>
@@ -86,199 +89,251 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
+From: Paul Greenwalt <paul.greenwalt@intel.com>
 
-New timestamping API was introduced in commit 66f7223039c0 ("net: add
-NDOs for configuring hardware timestamping") from kernel v6.6.
+Add malicious driver detection to ixgbe driver. The supported devices
+are E610 and X550.
 
-It is time to convert the Intel i40e driver to the new API, so that
-timestamping configuration can be removed from the ndo_eth_ioctl() path
-completely.
+Handling MDD events is enabled while VFs are created and turned off
+when they are disabled. There is no runtime command to enable or
+disable MDD independently.
 
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+MDD event is logged when malicious VF driver is detected. For example VF
+can try to send incorrect Tx descriptor (TSO on, but length field not
+correct). It can be reproduced by manipulating the driver, or using
+driver with incorrect descriptor values.
+
+Example log:
+"Malicious event on VF 0 tx:128 rx:128"
+
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Reviewed-by: Milena Olech <milena.olech@intel.com>
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e.h      |  9 +++--
- drivers/net/ethernet/intel/i40e/i40e_main.c | 24 +-----------
- drivers/net/ethernet/intel/i40e/i40e_ptp.c  | 43 +++++++++++----------
- 3 files changed, 31 insertions(+), 45 deletions(-)
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c |   4 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |  28 ++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c | 120 ++++++++++++++++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h |   5 +
+ 4 files changed, 157 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index 54d5fdc303ca..eea845b22089 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -661,7 +661,7 @@ struct i40e_pf {
- 	struct ptp_clock_info ptp_caps;
- 	struct sk_buff *ptp_tx_skb;
- 	unsigned long ptp_tx_start;
--	struct hwtstamp_config tstamp_config;
-+	struct kernel_hwtstamp_config tstamp_config;
- 	struct timespec64 ptp_prev_hw_time;
- 	struct work_struct ptp_extts0_work;
- 	ktime_t ptp_reset_start;
-@@ -1303,8 +1303,11 @@ void i40e_ptp_tx_hang(struct i40e_pf *pf);
- void i40e_ptp_tx_hwtstamp(struct i40e_pf *pf);
- void i40e_ptp_rx_hwtstamp(struct i40e_pf *pf, struct sk_buff *skb, u8 index);
- void i40e_ptp_set_increment(struct i40e_pf *pf);
--int i40e_ptp_set_ts_config(struct i40e_pf *pf, struct ifreq *ifr);
--int i40e_ptp_get_ts_config(struct i40e_pf *pf, struct ifreq *ifr);
-+int i40e_ptp_hwtstamp_get(struct net_device *netdev,
-+			  struct kernel_hwtstamp_config *config);
-+int i40e_ptp_hwtstamp_set(struct net_device *netdev,
-+			  struct kernel_hwtstamp_config *config,
-+			  struct netlink_ext_ack *extack);
- void i40e_ptp_save_hw_time(struct i40e_pf *pf);
- void i40e_ptp_restore_hw_time(struct i40e_pf *pf);
- void i40e_ptp_init(struct i40e_pf *pf);
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 3b4f59d978a5..949b74fbb127 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -2954,27 +2954,6 @@ static int i40e_change_mtu(struct net_device *netdev, int new_mtu)
- 	return 0;
- }
- 
--/**
-- * i40e_ioctl - Access the hwtstamp interface
-- * @netdev: network interface device structure
-- * @ifr: interface request data
-- * @cmd: ioctl command
-- **/
--int i40e_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
--{
--	struct i40e_netdev_priv *np = netdev_priv(netdev);
--	struct i40e_pf *pf = np->vsi->back;
--
--	switch (cmd) {
--	case SIOCGHWTSTAMP:
--		return i40e_ptp_get_ts_config(pf, ifr);
--	case SIOCSHWTSTAMP:
--		return i40e_ptp_set_ts_config(pf, ifr);
--	default:
--		return -EOPNOTSUPP;
--	}
--}
--
- /**
-  * i40e_vlan_stripping_enable - Turn on vlan stripping for the VSI
-  * @vsi: the vsi being adjusted
-@@ -13626,7 +13605,6 @@ static const struct net_device_ops i40e_netdev_ops = {
- 	.ndo_validate_addr	= eth_validate_addr,
- 	.ndo_set_mac_address	= i40e_set_mac,
- 	.ndo_change_mtu		= i40e_change_mtu,
--	.ndo_eth_ioctl		= i40e_ioctl,
- 	.ndo_tx_timeout		= i40e_tx_timeout,
- 	.ndo_vlan_rx_add_vid	= i40e_vlan_rx_add_vid,
- 	.ndo_vlan_rx_kill_vid	= i40e_vlan_rx_kill_vid,
-@@ -13654,6 +13632,8 @@ static const struct net_device_ops i40e_netdev_ops = {
- 	.ndo_xsk_wakeup	        = i40e_xsk_wakeup,
- 	.ndo_dfwd_add_station	= i40e_fwd_add,
- 	.ndo_dfwd_del_station	= i40e_fwd_del,
-+	.ndo_hwtstamp_get	= i40e_ptp_hwtstamp_get,
-+	.ndo_hwtstamp_set	= i40e_ptp_hwtstamp_set,
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+index 71ea25de1bac..87b03c1992a8 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+@@ -3965,6 +3965,10 @@ static const struct ixgbe_mac_operations mac_ops_e610 = {
+ 	.prot_autoc_write		= prot_autoc_write_generic,
+ 	.setup_fc			= ixgbe_setup_fc_e610,
+ 	.fc_autoneg			= ixgbe_fc_autoneg_e610,
++	.enable_mdd			= ixgbe_enable_mdd_x550,
++	.disable_mdd			= ixgbe_disable_mdd_x550,
++	.restore_mdd_vf			= ixgbe_restore_mdd_vf_x550,
++	.handle_mdd			= ixgbe_handle_mdd_x550,
  };
  
- /**
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-index b72a4b5d76b9..1d04ea7df552 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-@@ -912,23 +912,26 @@ void i40e_ptp_set_increment(struct i40e_pf *pf)
- }
+ static const struct ixgbe_phy_operations phy_ops_e610 = {
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+index 892fa6c1f879..2a25abc0b17a 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+@@ -2746,6 +2746,28 @@ enum ixgbe_fdir_pballoc_type {
+ #define FW_PHY_INFO_ID_HI_MASK		0xFFFF0000u
+ #define FW_PHY_INFO_ID_LO_MASK		0x0000FFFFu
  
- /**
-- * i40e_ptp_get_ts_config - ioctl interface to read the HW timestamping
-- * @pf: Board private structure
-- * @ifr: ioctl data
-+ * i40e_ptp_hwtstamp_get - interface to read the HW timestamping
-+ * @netdev: Network device structure
-+ * @config: Timestamping configuration structure
-  *
-  * Obtain the current hardware timestamping settigs as requested. To do this,
-  * keep a shadow copy of the timestamp settings rather than attempting to
-  * deconstruct it from the registers.
-  **/
--int i40e_ptp_get_ts_config(struct i40e_pf *pf, struct ifreq *ifr)
-+int i40e_ptp_hwtstamp_get(struct net_device *netdev,
-+			  struct kernel_hwtstamp_config *config)
- {
--	struct hwtstamp_config *config = &pf->tstamp_config;
-+	struct i40e_netdev_priv *np = netdev_priv(netdev);
-+	struct i40e_pf *pf = np->vsi->back;
- 
- 	if (!test_bit(I40E_FLAG_PTP_ENA, pf->flags))
- 		return -EOPNOTSUPP;
- 
--	return copy_to_user(ifr->ifr_data, config, sizeof(*config)) ?
--		-EFAULT : 0;
-+	*config = pf->tstamp_config;
++/* There are only 3 options for VFs creation on this device:
++ * 16 VFs pool with 8 queues each
++ * 32 VFs pool with 4 queues each
++ * 64 VFs pool with 2 queues each
++ *
++ * That means reading some VF registers that map VF to queue depending on
++ * chosen option. Define values that help dealing with each scenario.
++ */
++/* Number of queues based on VFs pool */
++#define IXGBE_16VFS_QUEUES		8
++#define IXGBE_32VFS_QUEUES		4
++#define IXGBE_64VFS_QUEUES		2
++/* Mask for getting queues bits based on VFs pool */
++#define IXGBE_16VFS_BITMASK		GENMASK(IXGBE_16VFS_QUEUES - 1, 0)
++#define IXGBE_32VFS_BITMASK		GENMASK(IXGBE_32VFS_QUEUES - 1, 0)
++#define IXGBE_64VFS_BITMASK		GENMASK(IXGBE_64VFS_QUEUES - 1, 0)
++/* Convert queue index to register number.
++ * We have 4 registers with 32 queues in each.
++ */
++#define IXGBE_QUEUES_PER_REG		32
++#define IXGBE_QUEUES_REG_AMOUNT		4
 +
-+	return 0;
+ /* Host Interface Command Structures */
+ struct ixgbe_hic_hdr {
+ 	u8 cmd;
+@@ -3539,6 +3561,12 @@ struct ixgbe_mac_operations {
+ 	int (*dmac_config_tcs)(struct ixgbe_hw *hw);
+ 	int (*read_iosf_sb_reg)(struct ixgbe_hw *, u32, u32, u32 *);
+ 	int (*write_iosf_sb_reg)(struct ixgbe_hw *, u32, u32, u32);
++
++	/* MDD events */
++	void (*enable_mdd)(struct ixgbe_hw *hw);
++	void (*disable_mdd)(struct ixgbe_hw *hw);
++	void (*restore_mdd_vf)(struct ixgbe_hw *hw, u32 vf);
++	void (*handle_mdd)(struct ixgbe_hw *hw, unsigned long *vf_bitmap);
+ };
+ 
+ struct ixgbe_phy_operations {
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
+index 7461367a1868..a8263f59ebba 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
+@@ -3800,6 +3800,122 @@ static int ixgbe_write_phy_reg_x550a(struct ixgbe_hw *hw, u32 reg_addr,
+ 	return status;
  }
  
- /**
-@@ -1167,7 +1170,7 @@ int i40e_ptp_alloc_pins(struct i40e_pf *pf)
-  * more broad if the specific filter is not directly supported.
-  **/
- static int i40e_ptp_set_timestamp_mode(struct i40e_pf *pf,
--				       struct hwtstamp_config *config)
-+				       struct kernel_hwtstamp_config *config)
- {
- 	struct i40e_hw *hw = &pf->hw;
- 	u32 tsyntype, regval;
-@@ -1290,9 +1293,10 @@ static int i40e_ptp_set_timestamp_mode(struct i40e_pf *pf,
- }
++static void ixgbe_set_mdd_x550(struct ixgbe_hw *hw, bool ena)
++{
++	u32 reg_dma, reg_rdr;
++
++	reg_dma = IXGBE_READ_REG(hw, IXGBE_DMATXCTL);
++	reg_rdr = IXGBE_READ_REG(hw, IXGBE_RDRXCTL);
++
++	if (ena) {
++		reg_dma |= (IXGBE_DMATXCTL_MDP_EN | IXGBE_DMATXCTL_MBINTEN);
++		reg_rdr |= (IXGBE_RDRXCTL_MDP_EN | IXGBE_RDRXCTL_MBINTEN);
++	} else {
++		reg_dma &= ~(IXGBE_DMATXCTL_MDP_EN | IXGBE_DMATXCTL_MBINTEN);
++		reg_rdr &= ~(IXGBE_RDRXCTL_MDP_EN | IXGBE_RDRXCTL_MBINTEN);
++	}
++
++	IXGBE_WRITE_REG(hw, IXGBE_DMATXCTL, reg_dma);
++	IXGBE_WRITE_REG(hw, IXGBE_RDRXCTL, reg_rdr);
++}
++
++/**
++ * ixgbe_enable_mdd_x550 - enable malicious driver detection
++ * @hw: pointer to hardware structure
++ */
++void ixgbe_enable_mdd_x550(struct ixgbe_hw *hw)
++{
++	ixgbe_set_mdd_x550(hw, true);
++}
++
++/**
++ * ixgbe_disable_mdd_x550 - disable malicious driver detection
++ * @hw: pointer to hardware structure
++ */
++void ixgbe_disable_mdd_x550(struct ixgbe_hw *hw)
++{
++	ixgbe_set_mdd_x550(hw, false);
++}
++
++/**
++ * ixgbe_restore_mdd_vf_x550 - restore VF that was disabled during MDD event
++ * @hw: pointer to hardware structure
++ * @vf: vf index
++ */
++void ixgbe_restore_mdd_vf_x550(struct ixgbe_hw *hw, u32 vf)
++{
++	u32 idx, reg, val, num_qs, start_q, bitmask;
++
++	/* Map VF to queues */
++	reg = IXGBE_READ_REG(hw, IXGBE_MRQC);
++	switch (reg & IXGBE_MRQC_MRQE_MASK) {
++	case IXGBE_MRQC_VMDQRT8TCEN:
++		num_qs = IXGBE_16VFS_QUEUES;
++		bitmask = IXGBE_16VFS_BITMASK;
++		break;
++	case IXGBE_MRQC_VMDQRSS32EN:
++	case IXGBE_MRQC_VMDQRT4TCEN:
++		num_qs = IXGBE_32VFS_QUEUES;
++		bitmask = IXGBE_32VFS_BITMASK;
++		break;
++	default:
++		num_qs = IXGBE_64VFS_QUEUES;
++		bitmask = IXGBE_64VFS_BITMASK;
++		break;
++	}
++	start_q = vf * num_qs;
++
++	/* Release vf's queues by clearing WQBR_TX and WQBR_RX (RW1C) */
++	idx = start_q / IXGBE_QUEUES_PER_REG;
++	val = bitmask << (start_q % IXGBE_QUEUES_PER_REG);
++	IXGBE_WRITE_REG(hw, IXGBE_WQBR_TX(idx), val);
++	IXGBE_WRITE_REG(hw, IXGBE_WQBR_RX(idx), val);
++}
++
++/**
++ * ixgbe_handle_mdd_x550 - handle malicious driver detection event
++ * @hw: pointer to hardware structure
++ * @vf_bitmap: output vf bitmap of malicious vfs
++ */
++void ixgbe_handle_mdd_x550(struct ixgbe_hw *hw, unsigned long *vf_bitmap)
++{
++	u32 i, j, reg, q, div, vf;
++	unsigned long wqbr;
++
++	/* figure out pool size for mapping to vf's */
++	reg = IXGBE_READ_REG(hw, IXGBE_MRQC);
++	switch (reg & IXGBE_MRQC_MRQE_MASK) {
++	case IXGBE_MRQC_VMDQRT8TCEN:
++		div = IXGBE_16VFS_QUEUES;
++		break;
++	case IXGBE_MRQC_VMDQRSS32EN:
++	case IXGBE_MRQC_VMDQRT4TCEN:
++		div = IXGBE_32VFS_QUEUES;
++		break;
++	default:
++		div = IXGBE_64VFS_QUEUES;
++		break;
++	}
++
++	/* Read WQBR_TX and WQBR_RX and check for malicious queues */
++	for (i = 0; i < IXGBE_QUEUES_REG_AMOUNT; i++) {
++		wqbr = IXGBE_READ_REG(hw, IXGBE_WQBR_TX(i)) |
++		       IXGBE_READ_REG(hw, IXGBE_WQBR_RX(i));
++		if (!wqbr)
++			continue;
++
++		/* Get malicious queue */
++		for_each_set_bit(j, (unsigned long *)&wqbr,
++				 IXGBE_QUEUES_PER_REG) {
++			/* Get queue from bitmask */
++			q = j + (i * IXGBE_QUEUES_PER_REG);
++			/* Map queue to vf */
++			vf = q / div;
++			set_bit(vf, vf_bitmap);
++		}
++	}
++}
++
+ #define X550_COMMON_MAC \
+ 	.init_hw			= &ixgbe_init_hw_generic, \
+ 	.start_hw			= &ixgbe_start_hw_X540, \
+@@ -3863,6 +3979,10 @@ static const struct ixgbe_mac_operations mac_ops_X550 = {
+ 	.prot_autoc_write	= prot_autoc_write_generic,
+ 	.setup_fc		= ixgbe_setup_fc_generic,
+ 	.fc_autoneg		= ixgbe_fc_autoneg,
++	.enable_mdd		= ixgbe_enable_mdd_x550,
++	.disable_mdd		= ixgbe_disable_mdd_x550,
++	.restore_mdd_vf		= ixgbe_restore_mdd_vf_x550,
++	.handle_mdd		= ixgbe_handle_mdd_x550,
+ };
  
- /**
-- * i40e_ptp_set_ts_config - ioctl interface to control the HW timestamping
-- * @pf: Board private structure
-- * @ifr: ioctl data
-+ * i40e_ptp_hwtstamp_set - interface to control the HW timestamping
-+ * @netdev: Network device structure
-+ * @config: Timestamping configuration structure
-+ * @extack: Netlink extended ack structure for error reporting
-  *
-  * Respond to the user filter requests and make the appropriate hardware
-  * changes here. The XL710 cannot support splitting of the Tx/Rx timestamping
-@@ -1303,26 +1307,25 @@ static int i40e_ptp_set_timestamp_mode(struct i40e_pf *pf,
-  * as the user receives the timestamps they care about and the user is notified
-  * the filter has been broadened.
-  **/
--int i40e_ptp_set_ts_config(struct i40e_pf *pf, struct ifreq *ifr)
-+int i40e_ptp_hwtstamp_set(struct net_device *netdev,
-+			  struct kernel_hwtstamp_config *config,
-+			  struct netlink_ext_ack *extack)
- {
--	struct hwtstamp_config config;
-+	struct i40e_netdev_priv *np = netdev_priv(netdev);
-+	struct i40e_pf *pf = np->vsi->back;
- 	int err;
+ static const struct ixgbe_mac_operations mac_ops_X550EM_x = {
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h
+index 3e4092f8da3e..2a11147fb1bc 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h
+@@ -17,4 +17,9 @@ void ixgbe_set_source_address_pruning_x550(struct ixgbe_hw *hw,
+ void ixgbe_set_ethertype_anti_spoofing_x550(struct ixgbe_hw *hw,
+ 					    bool enable, int vf);
  
- 	if (!test_bit(I40E_FLAG_PTP_ENA, pf->flags))
- 		return -EOPNOTSUPP;
- 
--	if (copy_from_user(&config, ifr->ifr_data, sizeof(config)))
--		return -EFAULT;
--
--	err = i40e_ptp_set_timestamp_mode(pf, &config);
-+	err = i40e_ptp_set_timestamp_mode(pf, config);
- 	if (err)
- 		return err;
- 
- 	/* save these settings for future reference */
--	pf->tstamp_config = config;
-+	pf->tstamp_config = *config;
- 
--	return copy_to_user(ifr->ifr_data, &config, sizeof(config)) ?
--		-EFAULT : 0;
-+	return 0;
- }
- 
- /**
++void ixgbe_enable_mdd_x550(struct ixgbe_hw *hw);
++void ixgbe_disable_mdd_x550(struct ixgbe_hw *hw);
++void ixgbe_restore_mdd_vf_x550(struct ixgbe_hw *hw, u32 vf);
++void ixgbe_handle_mdd_x550(struct ixgbe_hw *hw, unsigned long *vf_bitmap);
++
+ #endif /* _IXGBE_X550_H_ */
 -- 
 2.47.1
 
