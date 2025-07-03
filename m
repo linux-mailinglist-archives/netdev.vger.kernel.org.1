@@ -1,145 +1,120 @@
-Return-Path: <netdev+bounces-203771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A5C3AF7208
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:25:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD0E8AF7214
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:27:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A68E57A1EA2
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 11:23:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3629E3B98CD
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 11:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBBB92E2EF3;
-	Thu,  3 Jul 2025 11:24:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10ACF2E2EE9;
+	Thu,  3 Jul 2025 11:26:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UKWn5ARH"
+	dkim=pass (2048-bit key) header.d=sysclose.org header.i=@sysclose.org header.b="wYWJlGcV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from sysclose.org (smtp.sysclose.org [69.164.214.230])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D70C2DE6E2
-	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 11:24:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778462DE6E2;
+	Thu,  3 Jul 2025 11:26:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=69.164.214.230
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751541897; cv=none; b=uWT8iir9VTafEnDLT54NpqlRh/imCYuETGx2/W5h4Ke3a0qJfh/bqBqaIbdgmF/Rg3xsTfWD0DPHGV2ZUOk7y9ANt7B+v+mNtWPoFaFqRWfTjUnZm3BpJI6/oauBpFk0Oo4yEV9ZZ+sKkg2LhTq5jLrDb9o6moo7gnCVMsRlCRE=
+	t=1751542019; cv=none; b=KCkIidX0288sPVdRlQGVr+VLLnmpapIMLvMqQkBuHJMbBi3Y4HphxLR1+zlOXT89qzpz5oo60XdPAeUqevG50a2SquDHjXxTvPmHsP2aowKWDiha5iEOriuXVBoPpec35Gux8cgYrx2lvQhj6hk2TIBauOw/Zzt1dVkDOmlngug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751541897; c=relaxed/simple;
-	bh=BsV0eSUAnrB3wda6T9wzig3D/sNdr+8qBzppAP467XI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wc29bi+b7HzKKkYaI0CeWkkfT6Uh47OH7vFbf9OR+Rp+3ipaTMgHdiUYYfZEqrpkG6ZxweEQ/IewMJ3OuZW/67vJ7aT5zWJn/dC85KHz3CAFbtvH2kyt0mYAB+JhyUIB8YDPyi4+s7d79hqmJgSfZcCJvBQ5POyd4FP7sMhFLjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UKWn5ARH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751541895;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=W9Ys+B0kKW0I1OmxDH3RChxDm9/AfOdFHpxEknTEX7s=;
-	b=UKWn5ARHmQ9AO9G3hZRhtpm5gPe4z0r9vdj/UXxBusXHHd1vvjMrSlYhG+rO50pEzXhxPY
-	drD2zf5lOcjmtwtzDvYPOOH05UODaKQs6XWf+rOauqNVcMxWbs/CvhZL17jCXHg3EooMPF
-	f3B/QAye2EvYzPwFVVhqppGxYUHD/Q8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-611-4UzqYhzCP4e2PRRreCx1GA-1; Thu, 03 Jul 2025 07:24:53 -0400
-X-MC-Unique: 4UzqYhzCP4e2PRRreCx1GA-1
-X-Mimecast-MFC-AGG-ID: 4UzqYhzCP4e2PRRreCx1GA_1751541893
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-453a5d50b81so27878455e9.1
-        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 04:24:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751541893; x=1752146693;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W9Ys+B0kKW0I1OmxDH3RChxDm9/AfOdFHpxEknTEX7s=;
-        b=W8ytrPXPBM16Us4K6vxSnaG6b6n+MYpp6RL+2E01zTrXvcMM/ibwiRBWjajdlYXye4
-         92Z4WQgYd8UVisu4OGYMZWmZGsVxWIykd+/l47U3of3xI8vq2iXXsfm/nrIIxf80mS1/
-         AvP4amGWOkBi48dp2ixVZqB1L9mb/ls2eFJq4KPWzEBBPWgxirnHzZaCV3gkBbuH1Mis
-         qcXTV7YqA6pMZEqziMLHTEejTAREUcGaMzvfLDvHdXOhgMULo6hSvxJJ04YJYEatvaKq
-         ThcqvVgrqmDQTYpibHkh71oIljSB/uWooDFfF8KvsGBYuulabCBbWSH9JhILeKEmUNJj
-         oLPw==
-X-Gm-Message-State: AOJu0YyHEWOVXAXTUDjD2IfysPtqCH5nFSZfERTIgLr5qD4iSw2Qyutl
-	CsV5DUFk0YbCJtmXRZ9HtvaLA+cy31HHuvho/nVjM2jlipXhcQIiw87SPhlfxedpQN9YXQEtwd6
-	Gi9Y9RGTyRcFuTYb96I9aJM7yCQDtg4GBQ61VxERILYnSeohHG6fIXY7QkQ==
-X-Gm-Gg: ASbGncvJeLF5/E3Z1TSrZvDEquBh04fW43gaR6Fw6lpuj50I1uxMApMeilADIKwO0wZ
-	Fc4sG9hsuBjbUOIsOTbPrkZhFEfVX1vxsqt9BCCz3mljj2C1+XPEyI22xlLjpOA5iSjQNO7DsiG
-	uPzO89b/RPp7S7nm+UC3ooprig2JKswDAatk2+1ngLgz/bFpPSwXcV6MC4N+tDwQfei+fnIamfj
-	c4rRCL+pNdPPt5YhJTitQeZ1lihPQSmsAlSRUkiTt7++IKbQkn0TSV23Ny7L6NQf9p0NzUVQ4+v
-	l7EbIDh6JgDqYcso
-X-Received: by 2002:a05:600c:3b9f:b0:453:6b3a:6c06 with SMTP id 5b1f17b1804b1-454a4311ca9mr61059065e9.29.1751541892607;
-        Thu, 03 Jul 2025 04:24:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGQ4owisLty2PWAU9CFlsOOvJcG4PRg4iHjZY5ASRNKjngFo9l8E2RNGlgQIxnBwYpnCVU+kw==
-X-Received: by 2002:a05:600c:3b9f:b0:453:6b3a:6c06 with SMTP id 5b1f17b1804b1-454a4311ca9mr61058815e9.29.1751541892171;
-        Thu, 03 Jul 2025 04:24:52 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:152e:1400:856d:9957:3ec3:1ddc])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454a9978c83sm24183675e9.13.2025.07.03.04.24.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jul 2025 04:24:51 -0700 (PDT)
-Date: Thu, 3 Jul 2025 07:24:49 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Bobby Eshleman <bobby.eshleman@bytedance.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, virtualization@lists.linux.dev,
-	bpf@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net] vsock: fix `vsock_proto` declaration
-Message-ID: <20250703072443-mutt-send-email-mst@kernel.org>
-References: <20250703112329.28365-1-sgarzare@redhat.com>
+	s=arc-20240116; t=1751542019; c=relaxed/simple;
+	bh=TOKohPTb4tBgw655yIcU3rQarBR23hyIWvaTujm58uI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=P2pjF5pKjFx1ga8B7pL1gIt0LH+VzH8Nif6AsEEPdkMNLf/ioAxMNjWmh9lKpWqx4naN+lY4igAdh1q64513w0080m+HN/5TQalazZMKJR5WQ6aEud5lz071nMZhRtDCQuxhWI1L8KDUCPjan78LAQ5BJCpXgWPESAPLUfHGYyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sysclose.org; spf=pass smtp.mailfrom=sysclose.org; dkim=pass (2048-bit key) header.d=sysclose.org header.i=@sysclose.org header.b=wYWJlGcV; arc=none smtp.client-ip=69.164.214.230
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sysclose.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sysclose.org
+Received: from uranium (unknown [131.100.62.92])
+	by sysclose.org (Postfix) with ESMTPSA id D6A56396A5;
+	Thu,  3 Jul 2025 11:26:54 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 sysclose.org D6A56396A5
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sysclose.org;
+	s=201903; t=1751542016;
+	bh=mXYVu7Hi/bd/OSmZ10ajRbQ29ztcfjFGLXOdStiCgV4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=wYWJlGcVO6c+b3LEnfm74rOtDnuYmKjPDDlNH2VLdC7IrHYrhPuC6C/arIO3vEiqO
+	 hE41Vl7ffjP7PcDOtUM/R8cCx3KK78hPqH2QUzVxQEQXO7RGFCY2ubUVS49uGY9ocE
+	 hXWzbFQvib+ucXQr4djcWn2CZL4W9wtMaipOfHI837Yf1NHsGuYXZUQ+7PzSlsR9N6
+	 jDu8d5U30Or0wTsS/wIBKuJ+nGsYSqa8vOID5KJe2UFc1UT/WreYT3zqF09zWUqfaq
+	 mTFpE2uyUN+kd07cB1r4jtlsKl8t/XPgOV3KAVtM1JLqMIDuaXLdCdxNEte2m+KiwC
+	 DcqCnhoNANZYQ==
+Date: Thu, 3 Jul 2025 08:26:53 -0300
+From: Flavio Leitner <fbl@sysclose.org>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org, dev@openvswitch.org,
+ linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Simon
+ Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
+Subject: Re: [ovs-dev] [PATCH net-next] net: openvswitch: allow providing
+ upcall pid for the 'execute' command
+Message-ID: <20250703082653.2e102d68@uranium>
+In-Reply-To: <1039a336-5f4e-4197-a27d-f91c58aa5104@ovn.org>
+References: <20250627220219.1504221-1-i.maximets@ovn.org>
+	<20250702105316.43017482@uranium>
+	<00067667-0329-4d8c-9c9a-a6660806b137@ovn.org>
+	<20250702200821.3119cb6c@uranium>
+	<5c0e9359-6bdd-4d49-b427-8fd1e8802b7c@ovn.org>
+	<20250703080411.21c45920@uranium>
+	<1039a336-5f4e-4197-a27d-f91c58aa5104@ovn.org>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250703112329.28365-1-sgarzare@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 03, 2025 at 01:23:29PM +0200, Stefano Garzarella wrote:
-> From: Stefano Garzarella <sgarzare@redhat.com>
-> 
-> >From commit 634f1a7110b4 ("vsock: support sockmap"), `struct proto
-> vsock_proto`, defined in af_vsock.c, is not static anymore, since it's
-> used by vsock_bpf.c.
-> 
-> If CONFIG_BPF_SYSCALL is not defined, `make C=2` will print a warning:
->     $ make O=build C=2 W=1 net/vmw_vsock/
->       ...
->       CC [M]  net/vmw_vsock/af_vsock.o
->       CHECK   ../net/vmw_vsock/af_vsock.c
->     ../net/vmw_vsock/af_vsock.c:123:14: warning: symbol 'vsock_proto' was not declared. Should it be static?
-> 
-> Declare `vsock_proto` regardless of CONFIG_BPF_SYSCALL, since it's defined
-> in af_vsock.c, which is built regardless of CONFIG_BPF_SYSCALL.
-> 
-> Fixes: 634f1a7110b4 ("vsock: support sockmap")
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+On Thu, 3 Jul 2025 13:15:17 +0200
+Ilya Maximets <i.maximets@ovn.org> wrote:
 
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-> ---
->  include/net/af_vsock.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> On 7/3/25 1:04 PM, Flavio Leitner wrote:
+> > On Thu, 3 Jul 2025 10:38:49 +0200
+> > Ilya Maximets <i.maximets@ovn.org> wrote:
+> >   
+> >> On 7/3/25 1:08 AM, Flavio Leitner wrote:  
+> >>>>>> @@ -651,6 +654,10 @@ static int ovs_packet_cmd_execute(struct sk_buff
+> >>>>>> *skb, struct genl_info *info) !!(hash & OVS_PACKET_HASH_L4_BIT));
+> >>>>>>  	}
+> >>>>>>  
+> >>>>>> +	if (a[OVS_PACKET_ATTR_UPCALL_PID])
+> >>>>>> +		upcall_pid =
+> >>>>>> nla_get_u32(a[OVS_PACKET_ATTR_UPCALL_PID]);
+> >>>>>> +	OVS_CB(packet)->upcall_pid = upcall_pid;    
+> >>>
+> >>> Since this is coming from userspace, does it make sense to check if the
+> >>> upcall_pid is one of the pids in the dp->upcall_portids array?    
+> >>
+> >> Not really.  IMO, this would be an unnecessary artificial restriction.
+> >> We're not concerned about security here since OVS_PACKET_CMD_EXECUTE
+> >> requires the same privileges as the OVS_DP_CMD_NEW or the
+> >> OVS_DP_CMD_SET.  
+> > 
+> > What if the userspace is buggy or compromised?
+> > It seems netlink API will return -ECONNREFUSED and the upcall is dropped.
+> > Therefore, we would be okay either way, correct?  
 > 
-> diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
-> index d56e6e135158..d40e978126e3 100644
-> --- a/include/net/af_vsock.h
-> +++ b/include/net/af_vsock.h
-> @@ -243,8 +243,8 @@ int __vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
->  int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
->  			size_t len, int flags);
->  
-> -#ifdef CONFIG_BPF_SYSCALL
->  extern struct proto vsock_proto;
-> +#ifdef CONFIG_BPF_SYSCALL
->  int vsock_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore);
->  void __init vsock_bpf_build_proto(void);
->  #else
-> -- 
-> 2.50.0
+> If the userspace is compromised, it can overwrite the upcall_portids
+> and do many other things, since the userspace application here has a
+> CAP_NET_ADMIN.  And if it's buggy, then the packet will be just dropped
+> on validation or on the upcall, there isn't much difference.
+> 
+> It's a responsibility of the userspace application to make sure these
+> sockets exist before passing PIDs into the kernel.  From the kernel's
+> perspective dropping the upcall is completely fine.  So, yes, we should
+> be OK.
+
+ack, thanks!
+--
+Flavio Leitner
+
 
 
