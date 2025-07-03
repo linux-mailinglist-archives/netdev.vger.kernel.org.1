@@ -1,274 +1,366 @@
-Return-Path: <netdev+bounces-203790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DB53AF732B
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 14:03:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DB89AF7330
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 14:04:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 138431887898
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 12:03:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 408A6562E99
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 12:04:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63DF9298CBC;
-	Thu,  3 Jul 2025 12:03:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97E912E2F12;
+	Thu,  3 Jul 2025 12:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ayEG+PtL"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dco+cCvD"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DA8EEA9;
-	Thu,  3 Jul 2025 12:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58896EEA9
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 12:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751544206; cv=none; b=bjteR2WjY6oSR7NcqeR209RPpOOUJwPLzu0n6x2roJFLiqtJmOJhWYmRK0AZvonvpgafHjWcfhg8usr0FbSdtTmN4SgwT1PPB3Eo8JddCKlFKxldDYXNZTNRGpr9l8HIG0T68i98mZOPd8JdW9pt3GcjLDDmM+TqdQIJFV9qhRw=
+	t=1751544221; cv=none; b=qEsx+431PdWp+v+NGo/7+/7x1eAr+R2VI2WrpaH1rZEfrjRPXncJl6uuadKipMqL2QOqM141wAO5Q/byUZvEAv4nwPf9ni2r6nDggCGfld8z9MmMFUzlJszRVDXPo1jrh4c2vJozFFxgczt7XwvKV/A1Mh1gDkQdpaiTpDwujms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751544206; c=relaxed/simple;
-	bh=13Mtr8tfOpo/bjU47Z0Ixv/RqoqZx+pkZNbvLw+MH6E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r+K554ORNE55rd86EsHyHfgxEPY5qvlt8lOVgh3swoi8byA345KlyMVSOpkAOTEItzWyOLaFk0xrIuAwKsi9M0eqKyANYl91ST3ePa0nppS4MYSM+oQEJQszyNCJFaN+QnM3NZQrDJqV2ADj0UqR7ny6Nyk82k9ia+8zngI/0ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ayEG+PtL; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=0bLFCgSGsGWYqU1VUzp/98s4ncOYCMUP6PUrfSKkQ9I=; b=ayEG+PtL2NdfYFXcLmfnMMc+/o
-	REzK/c2hbPC5peR8ZFgtSTCGIwfArWZLcKgJZYlfV4CQSgckIAtgEpCBuc0U9ApE8zxEcdu84+/Vp
-	/8m8ibuEVYYA0mOJUFD3FeLs4FzBiiugflhOFF//Qlplz/DBrvsIu8Li98qAgzaldWJ08LShkNJMw
-	k678K+PC1fbvUgCwdIlPjRJGFyYe7M8RBdMckjrhpz9jEDTLsc53yiMyEQNgrFIdUmsxPZON/xTch
-	KRAGlD50wX7grhb9R40HOToRDopp9oo4HXTCggU+zZHztGDRVUjubbE2dbpddRVH+1FXWgZvCetN0
-	M2/p8Rbw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43908)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uXIeh-0000gv-0k;
-	Thu, 03 Jul 2025 13:03:07 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uXIeZ-00054e-1E;
-	Thu, 03 Jul 2025 13:02:59 +0100
-Date: Thu, 3 Jul 2025 13:02:59 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: weishangjuan@eswincomputing.com
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	yong.liang.choong@linux.intel.com, vladimir.oltean@nxp.com,
-	jszhang@kernel.org, jan.petrous@oss.nxp.com,
-	prabhakar.mahadev-lad.rj@bp.renesas.com, inochiama@gmail.com,
-	boon.khai.ng@altera.com, dfustini@tenstorrent.com, 0x1207@gmail.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
-	linmin@eswincomputing.com, lizhi2@eswincomputing.com
-Subject: Re: [PATCH v3 2/2] ethernet: eswin: Add eic7700 ethernet driver
-Message-ID: <aGZxc-9C0rPVMsGH@shell.armlinux.org.uk>
-References: <20250703091808.1092-1-weishangjuan@eswincomputing.com>
- <20250703092015.1200-1-weishangjuan@eswincomputing.com>
+	s=arc-20240116; t=1751544221; c=relaxed/simple;
+	bh=jerXSrRoqA1qUbkI8oky8jp1ImqFUxyU/bN43PKvfSM=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=sgxpZ27rctAROUpGKC4eNq1SovDnAeVq9HBngpBbP2v8Bow6G3rJHrr5kN1h8kwGn7H1Gqu1d2L9qn+vIiwq5VWw4LL3F4T2zCeK/Tx/ErpXDgMf891NmlXm9jpY+TlGL+bGRTf0R7ft+AxifIP/ENUpU17Wl8H+pcBWhgJduLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dco+cCvD; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250703092015.1200-1-weishangjuan@eswincomputing.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751544214;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e/8w/xeDaBVWRw9XzILJTV9gwuQG1T26Mai5piqvf6w=;
+	b=dco+cCvDXtd07E6MtJaUfPxKAou+XRstlbU4pNHpBHSOjS1EfCn/aTXbQ/AlYwzmwrbq8w
+	DbEawoGxejy3A5BRZzMeCXV8UrnPuayAvfIxanMZ+BHtqE0OYKNLwvmcH3MUTFhwVmPB0r
+	fNvqLGQJQ6dxDoAImE6C2OYiahyERFU=
+Date: Thu, 03 Jul 2025 12:03:33 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <6724e69057445ab66d70f0b28c115e2d8fb5543b@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH net-next v1] tcp: Correct signedness in skb remaining
+ space calculation
+To: "Eric Dumazet" <edumazet@google.com>
+Cc: netdev@vger.kernel.org, mrpre@163.com, "Neal Cardwell"
+ <ncardwell@google.com>, "Kuniyuki Iwashima" <kuniyu@google.com>, "David
+ S. Miller" <davem@davemloft.net>, "David Ahern" <dsahern@kernel.org>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Simon Horman" <horms@kernel.org>, "David Howells" <dhowells@redhat.com>,
+ linux-kernel@vger.kernel.org
+In-Reply-To: <CANn89iL=GR5iHXUQ6Jor_rjkn91vuL5w8DCrxwJRQGSO7zmQ-w@mail.gmail.com>
+References: <20250702110039.15038-1-jiayuan.chen@linux.dev>
+ <c9c5d36bc516e70171d1bb1974806e16020fbff1@linux.dev>
+ <CANn89iJdGZq0HW3+uGLCMtekC7G5cPnHChCJFCUhvzuzPuhsrA@mail.gmail.com>
+ <CANn89iJD6ZYCBBT_qsgm_HJ5Xrups1evzp9ej=UYGP5sv6oG_A@mail.gmail.com>
+ <c910cfc4b58e9e2e1ceaca9d4dc7d68b679caa48@linux.dev>
+ <CANn89iL=GR5iHXUQ6Jor_rjkn91vuL5w8DCrxwJRQGSO7zmQ-w@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jul 03, 2025 at 05:20:15PM +0800, weishangjuan@eswincomputing.com wrote:
-> +static void eic7700_qos_fix_speed(void *priv, int speed, u32 mode)
-> +{
-> +	struct eic7700_qos_priv *dwc_priv = priv;
-> +	int i;
-> +
-> +	switch (speed) {
-> +	case SPEED_1000:
-> +		for (i = 0; i < 3; i++)
-> +			regmap_write(dwc_priv->hsp_regmap,
-> +				     dwc_priv->dly_hsp_reg[i],
-> +				     dwc_priv->dly_param_1000m[i]);
-> +		break;
-> +	case SPEED_100:
-> +		for (i = 0; i < 3; i++) {
-> +			regmap_write(dwc_priv->hsp_regmap,
-> +				     dwc_priv->dly_hsp_reg[i],
-> +				     dwc_priv->dly_param_100m[i]);
-> +		}
+2025/7/2 23:34, "Eric Dumazet" <edumazet@google.com> =E5=86=99=E5=88=B0:
 
-The other two instances don't have the curley braces, why does this need
-it?
 
-> +		break;
-> +	case SPEED_10:
-> +		for (i = 0; i < 3; i++) {
-> +			regmap_write(dwc_priv->hsp_regmap,
-> +				     dwc_priv->dly_hsp_reg[i],
-> +				     dwc_priv->dly_param_10m[i]);
-> +		}
-> +		break;
-> +	default:
-> +		dev_err(dwc_priv->dev, "invalid speed %u\n", speed);
-> +		break;
-> +	}
 
-Overall, wouldn't:
+>=20
+>=20On Wed, Jul 2, 2025 at 8:28 AM Jiayuan Chen <jiayuan.chen@linux.dev> =
+wrote:
+>=20
+>=20>=20
+>=20> July 2, 2025 at 22:02, "Eric Dumazet" <edumazet@google.com> wrote:
+> >=20
+>=20>  On Wed, Jul 2, 2025 at 6:59 AM Eric Dumazet <edumazet@google.com> =
+wrote:
+> >=20
+>=20>  >
+> >=20
+>=20>  > On Wed, Jul 2, 2025 at 6:42 AM Jiayuan Chen <jiayuan.chen@linux.=
+dev> wrote:
+> >=20
+>=20>  >
+> >=20
+>=20>  > July 2, 2025 at 19:00, "Jiayuan Chen" <jiayuan.chen@linux.dev> w=
+rote:
+> >=20
+>=20>  >
+> >=20
+>=20>  > >
+> >=20
+>=20>  >
+> >=20
+>=20>  > > The calculation for the remaining space, 'copy =3D size_goal -=
+ skb->len',
+> >=20
+>=20>  >
+> >=20
+>=20>  > >
+> >=20
+>=20>  >
+> >=20
+>=20>  > > was prone to an integer promotion bug that prevented copy from=
+ ever being
+> >=20
+>=20>  >
+> >=20
+>=20>  > >
+> >=20
+>=20>  >
+> >=20
+>=20>  > > negative.
+> >=20
+>=20>  >
+> >=20
+>=20>  > >
+> >=20
+>=20>  >
+> >=20
+>=20>  > > The variable types involved are:
+> >=20
+>=20>  >
+> >=20
+>=20>  > >
+> >=20
+>=20>  >
+> >=20
+>=20>  > > copy: ssize_t (long)
+> >=20
+>=20>  >
+> >=20
+>=20>  > >
+> >=20
+>=20>  >
+> >=20
+>=20>  > > size_goal: int
+> >=20
+>=20>  >
+> >=20
+>=20>  > >
+> >=20
+>=20>  >
+> >=20
+>=20>  > > skb->len: unsigned int
+> >=20
+>=20>  >
+> >=20
+>=20>  > >
+> >=20
+>=20>  >
+> >=20
+>=20>  > > Due to C's type promotion rules, the signed size_goal is conve=
+rted to an
+> >=20
+>=20>  >
+> >=20
+>=20>  > >
+> >=20
+>=20>  >
+> >=20
+>=20>  > > unsigned int to match skb->len before the subtraction. The res=
+ult is an
+> >=20
+>=20>  >
+> >=20
+>=20>  > >
+> >=20
+>=20>  >
+> >=20
+>=20>  > > unsigned int.
+> >=20
+>=20>  >
+> >=20
+>=20>  > >
+> >=20
+>=20>  >
+> >=20
+>=20>  > > When this unsigned int result is then assigned to the s64 copy=
+ variable,
+> >=20
+>=20>  >
+> >=20
+>=20>  > >
+> >=20
+>=20>  >
+> >=20
+>=20>  > > it is zero-extended, preserving its non-negative value. Conseq=
+uently,
+> >=20
+>=20>  >
+> >=20
+>=20>  > >
+> >=20
+>=20>  >
+> >=20
+>=20>  > > copy is always >=3D 0.
+> >=20
+>=20>  >
+> >=20
+>=20>  > >
+> >=20
+>=20>  >
+> >=20
+>=20>  > To better explain this problem, consider the following example:
+> >=20
+>=20>  >
+> >=20
+>=20>  > '''
+> >=20
+>=20>  >
+> >=20
+>=20>  > #include <sys/types.h>
+> >=20
+>=20>  >
+> >=20
+>=20>  > #include <stdio.h>
+> >=20
+>=20>  >
+> >=20
+>=20>  > int size_goal =3D 536;
+> >=20
+>=20>  >
+> >=20
+>=20>  > unsigned int skblen =3D 1131;
+> >=20
+>=20>  >
+> >=20
+>=20>  > void main() {
+> >=20
+>=20>  >
+> >=20
+>=20>  > ssize_t copy =3D 0;
+> >=20
+>=20>  >
+> >=20
+>=20>  > copy =3D size_goal - skblen;
+> >=20
+>=20>  >
+> >=20
+>=20>  > printf("wrong: %zd\n", copy);
+> >=20
+>=20>  >
+> >=20
+>=20>  > copy =3D size_goal - (ssize_t)skblen;
+> >=20
+>=20>  >
+> >=20
+>=20>  > printf("correct: %zd\n", copy);
+> >=20
+>=20>  >
+> >=20
+>=20>  > return;
+> >=20
+>=20>  >
+> >=20
+>=20>  > }
+> >=20
+>=20>  >
+> >=20
+>=20>  > '''
+> >=20
+>=20>  >
+> >=20
+>=20>  > Output:
+> >=20
+>=20>  >
+> >=20
+>=20>  > '''
+> >=20
+>=20>  >
+> >=20
+>=20>  > wrong: 4294966701
+> >=20
+>=20>  >
+> >=20
+>=20>  > correct: -595
+> >=20
+>=20>  >
+> >=20
+>=20>  > '''
+> >=20
+>=20>  >
+> >=20
+>=20>  > Can you explain how one skb could have more bytes (skb->len) tha=
+n size_goal ?
+> >=20
+>=20>  >
+> >=20
+>=20>  > If we are under this condition, we already have a prior bug ?
+> >=20
+>=20>  >
+> >=20
+>=20>  > Please describe how you caught this issue.
+> >=20
+>=20>  >
+> >=20
+>=20>  Also, not sure why copy variable had to be changed from "int" to "=
+ssize_t"
+> >=20
+>=20>  A nicer patch (without a cast) would be to make it an "int" again/
+> >=20
+>=20>  I encountered this issue because I had tcp_repair enabled, which u=
+ses
+> >=20
+>=20>  tcp_init_tso_segs to reset the MSS.
+> >=20
+>=20>  However, it seems that tcp_bound_to_half_wnd also dynamically adju=
+sts
+> >=20
+>=20>  the value to be smaller than the current size_goal.
+> >=20
+>=20
+> Okay, and what was the end result ?
+>=20
+>=20An skb has a limited amount of bytes that can be put into it
+>=20
+>=20(MAX_SKB_FRAGS * 32K) , and I can't see what are the effects of havin=
+g
+>=20
 
-	const u32 *dly_param;
+Hi=20Eric,
 
-	switch (speed) {
-	case SPEED_1000:
-		dly_param = dwc_priv->dly_param_1000m;
-		break;
-	... etc ...
-	default:
-		dly_param = NULL;
-		dev_err(dwc_priv->dev, "invalid speed %u\n", speed);
-		break;
-	}
+I'm working with a reproducer generated by syzkaller [1], and its core
+logic is roughly as follows:
 
-	if (dly_param)
-		for (i = 0; i < 3; i++)
-			regmap_write(dwc_priv->hsp_regmap,
-				     dwc_priv->dly_hsp_reg[i],
-				     dly_param[i]);
+'''
+setsockopt(fd, TCP_REPAIR, 1)
+connect(fd);
+setsockopt(fd, TCP_REPAIR, -1)
 
-be more concise and easier to read?
+send(fd, small);
+sendmmsg(fd, buffer_2G);
+'''
 
-> +}
-> +
-> +static int eic7700_dwmac_probe(struct platform_device *pdev)
-> +{
-> +	struct plat_stmmacenet_data *plat_dat;
-> +	struct stmmac_resources stmmac_res;
-> +	struct eic7700_qos_priv *dwc_priv;
-> +	u32 hsp_aclk_ctrl_offset;
-> +	u32 hsp_aclk_ctrl_regset;
-> +	u32 hsp_cfg_ctrl_offset;
-> +	u32 eth_axi_lp_ctrl_offset;
-> +	u32 eth_phy_ctrl_offset;
-> +	u32 eth_phy_ctrl_regset;
-> +	bool has_rx_dly = false;
-> +	bool has_tx_dly = false;
-> +	int ret;
-> +
-> +	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
-> +	if (ret)
-> +		return dev_err_probe(&pdev->dev, ret,
-> +				"failed to get resources\n");
-> +
-> +	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
-> +	if (IS_ERR(plat_dat))
-> +		return dev_err_probe(&pdev->dev, PTR_ERR(plat_dat),
-> +				"dt configuration failed\n");
-> +
-> +	dwc_priv = devm_kzalloc(&pdev->dev, sizeof(*dwc_priv), GFP_KERNEL);
-> +	if (!dwc_priv)
-> +		return -ENOMEM;
-> +
-> +	dwc_priv->dev = &pdev->dev;
-> +	dwc_priv->dly_param_1000m[0] = EIC7700_DELAY_VALUE0;
-> +	dwc_priv->dly_param_1000m[1] = EIC7700_DELAY_VALUE1;
-> +	dwc_priv->dly_param_1000m[2] = EIC7700_DELAY_VALUE0;
-> +	dwc_priv->dly_param_100m[0] = EIC7700_DELAY_VALUE0;
-> +	dwc_priv->dly_param_100m[1] = EIC7700_DELAY_VALUE1;
-> +	dwc_priv->dly_param_100m[2] = EIC7700_DELAY_VALUE0;
-> +	dwc_priv->dly_param_10m[0] = 0x0;
-> +	dwc_priv->dly_param_10m[1] = 0x0;
-> +	dwc_priv->dly_param_10m[2] = 0x0;
-> +
-> +	ret = of_property_read_u32(pdev->dev.of_node, "rx-internal-delay-ps",
-> +				   &dwc_priv->rx_delay_ps);
-> +	if (ret)
-> +		dev_dbg(&pdev->dev, "can't get rx-internal-delay-ps, ret(%d).", ret);
+First, because TCP_REPAIR is enabled, the send() operation leaves the skb
+at the tail of the write_queue. Subsequently, sendmmsg is called to send
+2GB of data.
 
-Consider using %pe and ERR_PTR(ret) so that error codes can be
-translated to human readable strings. Ditto elsewhere.
+Due to TCP_REPAIR, the size_goal is reduced, which can cause the copy
+variable to become negative. However, because of integer promotion bug
+mentioned in the previous email, this negative value is misinterpreted as
+a large positive number. Ultimately, copy becomes a huge value, approachi=
+ng
+the int32 limit. This, in turn, causes sk->sk_forward_alloc to overflow,
+which is the exact issue reported by syzkaller.
 
-> +	else
-> +		has_rx_dly = true;
-> +
-> +	ret = of_property_read_u32(pdev->dev.of_node, "tx-internal-delay-ps",
-> +				   &dwc_priv->tx_delay_ps);
-> +	if (ret)
-> +		dev_dbg(&pdev->dev, "can't get tx-internal-delay-ps, ret(%d).", ret);
-> +	else
-> +		has_tx_dly = true;
-> +	if (has_rx_dly && has_tx_dly) {
-> +		eic7700_set_delay(dwc_priv->rx_delay_ps, dwc_priv->tx_delay_ps,
-> +				  &dwc_priv->dly_param_1000m[1]);
-> +		eic7700_set_delay(dwc_priv->rx_delay_ps, dwc_priv->tx_delay_ps,
-> +				  &dwc_priv->dly_param_100m[1]);
-> +		eic7700_set_delay(dwc_priv->rx_delay_ps, dwc_priv->tx_delay_ps,
-> +				  &dwc_priv->dly_param_10m[1]);
-> +	} else {
-> +		dev_dbg(&pdev->dev, " use default dly\n");
-> +	}
-> +
-> +	ret = of_property_read_variable_u32_array(pdev->dev.of_node, "eswin,dly_hsp_reg",
-> +						  &dwc_priv->dly_hsp_reg[0], 3, 0);
-> +	if (ret != 3) {
-> +		dev_err(&pdev->dev, "can't get delay hsp reg.ret(%d)\n", ret);
-> +		return ret;
-> +	}
-> +
-> +	dwc_priv->crg_regmap = syscon_regmap_lookup_by_phandle(pdev->dev.of_node,
-> +							       "eswin,syscrg_csr");
-> +	if (IS_ERR(dwc_priv->crg_regmap))
-> +		return dev_err_probe(&pdev->dev, PTR_ERR(dwc_priv->crg_regmap),
-> +				"Failed to get syscrg_csr regmap\n");
-> +
-> +	ret = of_property_read_u32_index(pdev->dev.of_node, "eswin,syscrg_csr", 1,
-> +					 &hsp_aclk_ctrl_offset);
-> +	if (ret)
-> +		return dev_err_probe(&pdev->dev, ret, "can't get hsp_aclk_ctrl_offset\n");
-> +
-> +	regmap_read(dwc_priv->crg_regmap, hsp_aclk_ctrl_offset, &hsp_aclk_ctrl_regset);
-> +	hsp_aclk_ctrl_regset |= (EIC7700_HSP_ACLK_CLKEN | EIC7700_HSP_ACLK_DIVSOR);
-> +	regmap_write(dwc_priv->crg_regmap, hsp_aclk_ctrl_offset, hsp_aclk_ctrl_regset);
-> +
-> +	ret = of_property_read_u32_index(pdev->dev.of_node, "eswin,syscrg_csr", 2,
-> +					 &hsp_cfg_ctrl_offset);
-> +	if (ret)
-> +		return dev_err_probe(&pdev->dev, ret, "can't get hsp_cfg_ctrl_offset\n");
-> +
-> +	regmap_write(dwc_priv->crg_regmap, hsp_cfg_ctrl_offset, EIC7700_HSP_CFG_CTRL_REGSET);
-> +
-> +	dwc_priv->hsp_regmap = syscon_regmap_lookup_by_phandle(pdev->dev.of_node,
-> +							       "eswin,hsp_sp_csr");
-> +	if (IS_ERR(dwc_priv->hsp_regmap))
-> +		return dev_err_probe(&pdev->dev, PTR_ERR(dwc_priv->hsp_regmap),
-> +				"Failed to get hsp_sp_csr regmap\n");
-> +
-> +	ret = of_property_read_u32_index(pdev->dev.of_node, "eswin,hsp_sp_csr", 2,
-> +					 &eth_phy_ctrl_offset);
-> +	if (ret)
-> +		return dev_err_probe(&pdev->dev, ret, "can't get eth_phy_ctrl_offset\n");
-> +
-> +	regmap_read(dwc_priv->hsp_regmap, eth_phy_ctrl_offset, &eth_phy_ctrl_regset);
-> +	eth_phy_ctrl_regset |= (EIC7700_ETH_TX_CLK_SEL | EIC7700_ETH_PHY_INTF_SELI);
-> +	regmap_write(dwc_priv->hsp_regmap, eth_phy_ctrl_offset, eth_phy_ctrl_regset);
-> +
-> +	ret = of_property_read_u32_index(pdev->dev.of_node, "eswin,hsp_sp_csr", 3,
-> +					 &eth_axi_lp_ctrl_offset);
-> +	if (ret)
-> +		return dev_err_probe(&pdev->dev, ret, "can't get eth_axi_lp_ctrl_offset\n");
-> +
-> +	regmap_write(dwc_priv->hsp_regmap, eth_axi_lp_ctrl_offset, EIC7700_ETH_CSYSREQ_VAL);
-> +
+On a related note, even without using TCP_REPAIR, the tcp_bound_to_half_w=
+nd()
+function can also reduce size_goal on its own. Therefore, my understandin=
+g is
+that under extreme conditions, we might still encounter an overflow in
+sk->sk_forward_alloc.
 
-Consider more sensible wrapping of this (netdev frowns at >80
-characters per line, except for message strings that should remain
-greppable.)
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+So, I think we have good reason to change copy to an int.
 
