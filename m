@@ -1,58 +1,81 @@
-Return-Path: <netdev+bounces-203658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16585AF6AC0
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 08:50:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 314BAAF6ADD
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 08:58:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE8961C2715E
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 06:50:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15C9A4A486D
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 06:58:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B78F29293D;
-	Thu,  3 Jul 2025 06:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 643D6295D92;
+	Thu,  3 Jul 2025 06:58:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=pigmoral.tech header.i=junhui.liu@pigmoral.tech header.b="SB08K3Up"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="dh1tWdqt"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFF5157A72;
-	Thu,  3 Jul 2025 06:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751525398; cv=pass; b=r4lmWI4wVdtx57mLZ74DI0bSS2yc7A1mWlP8srFYl2lOhe0iT0psFJ+OwYHHNAbUx7ZqpCpfjOVGYKZceMzjHR8Uaf03ldkKf9LJN9YsCVh5u9gn9IlXnEuzOhNNjNW7TNRjML1OTFk0La4pB7PKjaQF4tMDsPRlT/GuiiP7E1w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751525398; c=relaxed/simple;
-	bh=CZQd9iOOxuAR4GYOSoR4dRo+S6LB4QgGgQrm5oC59Cg=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81924293C53
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 06:58:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751525902; cv=none; b=hPipmp4f/VYirfvEF7FNTlwlsOGVDtnrokUlGyuFXzpcmEPefsL8UhtXC6p4Jpohhqsnnt3RBe8/WKH93WtxqXZhrtECvS6f+bwsprITmARGlcSkA2tlVJmoB90xBSdG9qBj09ea6NVPpc2LGYYzOLlabqYr5nNhtPZuESWHGDA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751525902; c=relaxed/simple;
+	bh=bickAPlR7/NP79mWKt8/KneNlEYimMJnZ+NoqIvI854=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aP/g81qMKdYkiWgO29nG6PWEaoGnjxVdMWrFSqOGPQzUiO/ju8JfowlBt0wC2MP+1VeurpgQs/E1LddmFEnsF8TV94yENbmoYTvN5yhjg7j3IRN/4ax1uy4qSzRdK20I5gsF0U1BN0ixfVNdQHLkjhI8pwXsojrFXj/q/hysIWs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pigmoral.tech; spf=pass smtp.mailfrom=pigmoral.tech; dkim=pass (1024-bit key) header.d=pigmoral.tech header.i=junhui.liu@pigmoral.tech header.b=SB08K3Up; arc=pass smtp.client-ip=136.143.188.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pigmoral.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pigmoral.tech
-ARC-Seal: i=1; a=rsa-sha256; t=1751525332; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=mD8uUny1XYdpWeQP6SVaqolbEt3RDJk6TvOGlAxAVadzbU58ua9UfPewBALDrj9LYp7jYGK1+PDyQTEt18mkEMKhNXJKrTSXJHsjdFe0gSdCH563YyLSeocKbSHgcSdg+PB38ZTlCGQat5ox6UxRlDvsGNKq9840PPfmH+k3cQY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1751525332; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=JHSQpMjUPCAOTe05SvkTtkx5uWkYFZS0xHWecOXz3R4=; 
-	b=iXQOgr+YJdkGpSD4cOaIkMRqrM7MVn7EjI+s8IgbNXDk3oc3E2jImPpM7zP66LansiUnvJ22x+0pQBhf7+rRMoA0NTKtaut2QVNS8hk2e4L1VvFa3C2NcJE7AtwmPy1JEb/PaYd1iDT+kp3y59MhwTWihrr45fqVq4/hXiZedLw=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=pigmoral.tech;
-	spf=pass  smtp.mailfrom=junhui.liu@pigmoral.tech;
-	dmarc=pass header.from=<junhui.liu@pigmoral.tech>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1751525332;
-	s=zmail; d=pigmoral.tech; i=junhui.liu@pigmoral.tech;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=JHSQpMjUPCAOTe05SvkTtkx5uWkYFZS0xHWecOXz3R4=;
-	b=SB08K3UpsvQeF1hLVykmZ5rpp7nw7Io/5oOUFGLAyhb5sqp5oIF8BpXHxGS42wWf
-	pTZS5fB+YK0aauSLEzaKS8xYdDrcU9wqgZESra8Y7iUPB1E5OrWxjE2YxTbKjtIA/Gy
-	UJND0pWB0MXSctpwf236kTpk5St/yU7YfyTI80KM=
-Received: by mx.zohomail.com with SMTPS id 1751525328226725.9805381687908;
-	Wed, 2 Jul 2025 23:48:48 -0700 (PDT)
-Message-ID: <a2284afb-ee61-457e-aaa8-49a9ce3838f9@pigmoral.tech>
-Date: Thu, 3 Jul 2025 14:48:27 +0800
+	 In-Reply-To:Content-Type; b=j3UUefx1mJ/QwyVWihNGFOtaseIv4ygXpb+6eZF8NZSdDpQIl5XrlPp420aXwsvU8wuf9a5Bt+7S55R7rTZq7dDGcjYAduihfrzhB1//lkqSDdZfcDpxAjWZSOsH1MXdYccy9lU2rTJy2Z0eUguUhDzrKwAjThP3QIfPsuN+MYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=dh1tWdqt; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3a577f164c8so1044617f8f.2
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 23:58:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1751525898; x=1752130698; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=uGKG5g4X2FtIIBBBni+nAn11AVuFyvfdg7Z2wu+7sP4=;
+        b=dh1tWdqtB6NPRpo0/mK42wwS3VGH8FsFkNqIPeIBLmg2QY0JnNQYPvTHM1jVhMFlgE
+         GzB2f+xQMNHHNfYWjtScja1t9a+QNdGQG9TMZc7eHL2qzKu9XgbFFPhZNdKL8tey+GWy
+         WTT7UUPUJegTvHMkoI7HuC8xzcHny0hH36hPfjMFDEaYMl3u1VgaBKM4PKs7G6FNW8O7
+         EBLSHSWkFMAF1Zu3cRCQWTCWrkNxVtt3C7zgBVG0oCLLoUR73tHtNWhM/32/XDzs+OdY
+         +EmF4HdNtwnp0btOurmMHkZ+r5HQEJOVf/KpGbiwfxCz+jUYTG1l+PzElCNtxElkYd3N
+         wpCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751525898; x=1752130698;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uGKG5g4X2FtIIBBBni+nAn11AVuFyvfdg7Z2wu+7sP4=;
+        b=gsuoytZDjWWYmQIhPRKArldaqSxdheKyo1rHLPoNZzgKX6YoYkSbNmioJnMAy/joT5
+         BEGDdIMhom/PCGp6lbwXg3+6kdvVO2WsEC7Xh/Wa7NRkEK0PugvyhVqXTFqZMCv+a77C
+         8w2dymL+v87bVLU0PByR2BJvUsaL+273H4cVhicS2sgMGeuAUuG6JppL1454kaLNn83A
+         Gb1yWKKzho9ZnsM1K5WMzBOulaE2z3L7cGM+z8NTarOdXwdNUVPf9FGGlQnkN/QkBviM
+         CRN9azMfBdT16uAHy3je4I3hqlEEkNPPs65rLMorv++vWDq1PFpoImk1MYfa5FuCOwBI
+         yRDg==
+X-Gm-Message-State: AOJu0YwH0QI9UJ1rZLlgzekOBEFCdpjTvn9fC3rGqR67Ay0BgxjtQwcg
+	FFA43cVywz/crl6ZEJsN8chZcHQ0C45hwCAukB4yNOfuiRn3LtaFldRS6TnawN1ESqYo6pEDvob
+	uO2GnpKQ=
+X-Gm-Gg: ASbGncuXe2GI37tH0He5a/hl4E9QGQGWcD8IZMdqkZ0S2wpXEEyy8k6zYgWGuKqeXz2
+	R8mDu4TrZ4DavFP52Bbw6UWYiQZJV6fw+zlwVhahQKBmAwF0uas0wejRITnkmtke7+YyJ1XF2q0
+	KTPS0XQMOzaQeSr+43vu76+MZHK2KAQ3G5iclelUD1AjM54ckKEzz79TrGcr/ssn09BpftLQoUl
+	BFW9M1lPUu9JtG90qTnnr852phkQaQ4udcyN1U+Fv12pWqOwZqhrm7jYPoqfYAKsaVToz+6uOSe
+	uQ5BgNN81yDo+lG8qmrSFB1rWA8HDxzCTfTheSfmNLfOR0/Vqx62jb3aNy76pB812A7K4135zJP
+	Pf9xtZhGHHVDdUAOnDAOwahEz7LOB44RJn/OGmVs=
+X-Google-Smtp-Source: AGHT+IFFoiiowVu/8wR0tlX292EVRJFeXC5GLN8cUKtKtyQtGsaIToPUA9LCF0OxS2wvlY0ljK8jzQ==
+X-Received: by 2002:a05:6000:24c7:b0:3a4:dbdf:7152 with SMTP id ffacd0b85a97d-3b20110b371mr1611335f8f.14.1751525897572;
+        Wed, 02 Jul 2025 23:58:17 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:5568:c43d:79bc:c2ec? ([2a01:e0a:b41:c160:5568:c43d:79bc:c2ec])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a892e5966csm17977144f8f.72.2025.07.02.23.58.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Jul 2025 23:58:16 -0700 (PDT)
+Message-ID: <869cd247-2cde-46bd-9100-0011d8dbd47c@6wind.com>
+Date: Thu, 3 Jul 2025 08:58:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,113 +83,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 5/5] riscv: dts: spacemit: Add Ethernet
- support for Jupiter
-To: Vivian Wang <wangruikang@iscas.ac.cn>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Ghiti <alex@ghiti.fr>
-Cc: Vivian Wang <uwu@dram.page>, Lukas Bulwahn <lukas.bulwahn@redhat.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH v3] ipv6: add `force_forwarding` sysctl to enable
+ per-interface forwarding
+To: Randy Dunlap <rdunlap@infradead.org>,
+ Gabriel Goller <g.goller@proxmox.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
  linux-kernel@vger.kernel.org
-References: <20250702-net-k1-emac-v3-0-882dc55404f3@iscas.ac.cn>
- <20250702-net-k1-emac-v3-5-882dc55404f3@iscas.ac.cn>
-From: Junhui Liu <junhui.liu@pigmoral.tech>
-In-Reply-To: <20250702-net-k1-emac-v3-5-882dc55404f3@iscas.ac.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+References: <20250702074619.139031-1-g.goller@proxmox.com>
+ <c39c99a7-73c2-4fc6-a1f2-bc18c0b6301f@6wind.com>
+ <53d8eaa7-6684-4596-ae98-69688068b84c@infradead.org>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+Organization: 6WIND
+In-Reply-To: <53d8eaa7-6684-4596-ae98-69688068b84c@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Vivian,
-Thanks for you work!
+Le 03/07/2025 à 00:26, Randy Dunlap a écrit :
 
-On 2025/7/2 14:01, Vivian Wang wrote:
-> Milk-V Jupiter uses an RGMII PHY for each port and uses GPIO for PHY
-> reset.
->
-> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+[snip]
 
-Successfully tested with iperf3 on Milk-V Jupiter.
+>>> +static int addrconf_sysctl_force_forwarding(const struct ctl_table *ctl, int write,
+>>> +					    void *buffer, size_t *lenp, loff_t *ppos)
+>>> +{
+>>> +	int *valp = ctl->data;
+>>> +	int ret;
+>>> +	int old, new;
+>>> +
+>>> +	// get extra params from table
+>> /* */ for comment
+>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/coding-style.rst#n598
+> 
+> Hm, lots there from the BK to git transfer in 2005, with a few updates by Mauro, Jakub, and myself.
+> 
+> 
+> More recently (2016!), Linus said this:
+>   https://lore.kernel.org/lkml/CA+55aFyQYJerovMsSoSKS7PessZBr4vNp-3QUUwhqk4A4_jcbg@mail.gmail.com/
+> 
+> which seems to allow for "//" style commenting. But yeah, it hasn't been added to
+> coding-style.rst.
+I wasn't aware. I always seen '//' rejected.
 
-TCP Rx: 941 Mbits/sec
-TCP Tx: 943 Mbits/sec
-UDP Rx: 956 Mbits/sec
-UDP Tx: 956 Mbits/sec
-
-Tested-by: Junhui Liu <junhui.liu@pigmoral.tech>
-
-> ---
->   arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts | 46 +++++++++++++++++++++++
->   1 file changed, 46 insertions(+)
->
-> diff --git a/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts b/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts
-> index 4483192141049caa201c093fb206b6134a064f42..c5933555c06b66f40e61fe2b9c159ba0770c2fa1 100644
-> --- a/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts
-> +++ b/arch/riscv/boot/dts/spacemit/k1-milkv-jupiter.dts
-> @@ -20,6 +20,52 @@ chosen {
->   	};
->   };
->   
-> +&eth0 {
-> +	phy-handle = <&rgmii0>;
-> +	phy-mode = "rgmii-id";
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&gmac0_cfg>;
-> +	rx-internal-delay-ps = <0>;
-> +	tx-internal-delay-ps = <0>;
-> +	status = "okay";
-> +
-> +	mdio-bus {
-> +		#address-cells = <0x1>;
-> +		#size-cells = <0x0>;
-> +
-> +		reset-gpios = <&gpio K1_GPIO(110) GPIO_ACTIVE_LOW>;
-> +		reset-delay-us = <10000>;
-> +		reset-post-delay-us = <100000>;
-> +
-> +		rgmii0: phy@1 {
-> +			reg = <0x1>;
-> +		};
-> +	};
-> +};
-> +
-> +&eth1 {
-> +	phy-handle = <&rgmii1>;
-> +	phy-mode = "rgmii-id";
-> +	pinctrl-names = "default";
-> +	pinctrl-0 = <&gmac1_cfg>;
-> +	rx-internal-delay-ps = <0>;
-> +	tx-internal-delay-ps = <250>;
-> +	status = "okay";
-> +
-> +	mdio-bus {
-> +		#address-cells = <0x1>;
-> +		#size-cells = <0x0>;
-> +
-> +		reset-gpios = <&gpio K1_GPIO(115) GPIO_ACTIVE_LOW>;
-> +		reset-delay-us = <10000>;
-> +		reset-post-delay-us = <100000>;
-> +
-> +		rgmii1: phy@1 {
-> +			reg = <0x1>;
-> +		};
-> +	};
-> +};
-> +
->   &uart0 {
->   	pinctrl-names = "default";
->   	pinctrl-0 = <&uart0_2_cfg>;
->
--- 
-Best regards,
-Junhui Liu
+> 
+>>> +	struct inet6_dev *idev = ctl->extra1;
+>>> +	struct net *net = ctl->extra2;
+>> Reverse x-mas tree for the variables declaration
+>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/maintainer-netdev.rst#n368
+> 
+> Shouldn't maintainer-netdev.rst contain something about netdev-style comment blocks?
+> (not that I'm offering since I think it's ugly)
+> 
+It has been removed:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=82b8000c28b5
 
