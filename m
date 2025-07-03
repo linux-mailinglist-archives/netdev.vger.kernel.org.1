@@ -1,175 +1,152 @@
-Return-Path: <netdev+bounces-203828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF87CAF75FB
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 15:42:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E83BAF7619
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 15:48:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C49F3BD777
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:42:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E71F4A0463
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:48:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691682D5418;
-	Thu,  3 Jul 2025 13:42:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3FF12E6D2A;
+	Thu,  3 Jul 2025 13:48:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A6lmP4xQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OqJ4aGtr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0A92222B4;
-	Thu,  3 Jul 2025 13:42:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C412E339E
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 13:48:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751550161; cv=none; b=d0dTJzINGbEl6or8AbmRs3wN3TgjscAad10wW/XWyNlERB83ocPrTogx+yNqBv3TFN0mtmPqS9QFuPz1f1/YIOAiWacx+mHey06TaaY2xGnoq0IdjtR/CwAfqd912lDMDTiWyr9EukTBBDk8XZ16G0XVlMMdEAivGfgKNRkUWiM=
+	t=1751550498; cv=none; b=V9iKRWO2eF8hEE7jk2zTmMKzz6EccpLFIBiz8KGYvfnab0NdNha5tAHKYNaB+bG87d3QxrWzP5W5eqiPunnR7d8G1sFImqeBBXmIsnS/cLMJTTVqwRu2Mwn/5xPkoFhqZMEnBbGha382X5XFaSp7ORwbCXFej/IAX90maV2zu8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751550161; c=relaxed/simple;
-	bh=tavQcEGaObxidlIkQzXjJ++BUyUCiEeX6N3ES4TeMI4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OFchWEMClkTVod/TmGQbYfAg3UDQlpRxLndw5G00XY1vaJDMCxY/bHrfUBUktAj/4sVW2ty/xgtTZqhtRm0BX4FX1Jj7lmTAOXb6rgF+UF7TBNroQvTLzoYyVI50afGoyO/0TAe6vpwtNLyAFxkZ07CrmRNoCu6M5LP2okSueyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A6lmP4xQ; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-32b553e33e6so48826361fa.2;
-        Thu, 03 Jul 2025 06:42:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751550158; x=1752154958; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jFNqw5vvbvpKQuxgS3RLj0oHSG6zw8ZBvyqT3A0POSI=;
-        b=A6lmP4xQ/aTs5EFT/hOOPjMgwYh2GZmdDeL/3YfgTyTY+Vvw1CV/jgoWF8aWdZAgvW
-         BroDq21ROcZw6uHxrjyTnmIff/u1sURMI4QzS1u71CcdSgKsyYyykpvPBEh2AYVKonWX
-         vxVBYNLWi028IEefl/OcoM1W3viF9Xo19um8eUS5W38W9Rt9RLPwRJz8WFNgNVMGftmx
-         rxSbBO7HWMWrKhE2tWKvm4h4S74ZHNCSgeoKwx6EAuBxA7B3Oo54yyXodmZaCANxfHV1
-         FBuR67O4bcdDopXAYn67yz7UeVhHUi2DXl9PX24Vi2fT3J6tjjQ64DOUEBb/thlbbkIU
-         /GBA==
+	s=arc-20240116; t=1751550498; c=relaxed/simple;
+	bh=EfnLWETl1J5M1bL6Y29tMN98S/aXdjr4ysoydW1po4A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P8ZhcDQb/rTEig1vJSpCdCxVMf05MindYSqT3YHhN+P2lLE5S/ywNJsfr+OThhopvNVD3D6viz340bXpJWr/rWL7VIbhga6CM8xsMDc/wkRtQEPDBSUHqosI1WYt6VZEOPnrfOVp6pQo/z3FzhMGfnRwDiGoFmIDQKm3RfIAjfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OqJ4aGtr; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751550495;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XJrMtFaBP2BGL6npOuum/zHAyGQyeC3LXV3nbl5mRq8=;
+	b=OqJ4aGtrJpU+r3avD6ExMNRT1cMO0/T+YtkeXn8j1T+O8/0H4txcrOmrpWc7c9t7lPGuBF
+	I6iVfbngRYwH4BRFQWMv9sNAd3C3SEditp0DBIT0JXe0MCnnw4io/zMlwCZ0X3Z64gtBHE
+	NCa/PhnfA9GuDsLXuB185IvpWFU9KZM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-584-EZco4YH-ME24K41430f5Dg-1; Thu, 03 Jul 2025 09:48:14 -0400
+X-MC-Unique: EZco4YH-ME24K41430f5Dg-1
+X-Mimecast-MFC-AGG-ID: EZco4YH-ME24K41430f5Dg_1751550493
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a6df0c67a6so3708193f8f.3
+        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 06:48:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751550158; x=1752154958;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jFNqw5vvbvpKQuxgS3RLj0oHSG6zw8ZBvyqT3A0POSI=;
-        b=RQ1OuBgDMas5dOXHBkINo9ndUqZKOI1nSdFzquYFZ6XFGfd6JpZhJqY/XmIJ7Vgxpe
-         X32x6b5A5KaOfBE3ogSh4DCvqvwORZAAAA6DmM/a1H4bEKKXeDMYg+LfLFLIfh01LMoP
-         7VAzOrCnRjLeNtge6IwmThYw9kgi0Cnvy9SXyn+CroPYfHLBYvG+ywSKG+yI2M7LEV6q
-         FiNhwa3oxjM5cRCNpteIIcySDKuWpaCqhByYcnckAtNz8Rw79W/zFX5Fk7QM0nMH4Hpn
-         2wsSOYlywUnx36Xzv2DUc4YlugnDlMUANMeYgDhVyz/sRu8LNizJeMrJtmSBnHm5q5nt
-         xZvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVP57BGMN5QJ9jNn0RIvSjZkZf1H16Q1CWCRQHHQpMNcy12DA574dh15F746tpu2tDqCaD5ll13RDtYQWNMjNI=@vger.kernel.org, AJvYcCWRuiEjvI73Jog1/dia8Ah+z+ayuElq1antPI75LG9SRUnlkQMymzycrjeooPSLbHky9ZtsmB08@vger.kernel.org, AJvYcCWf658de3A2si8z75716UjCpV+0X+M9Qq78wxjjbH+7cT62uebf4kFt8FuEhfGVCOtQemYq41pKQZDTZy0q@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOaZJD04efkxK0/7oDUD3eegFaTHmAz7vxKsLkMC2clNfevLQp
-	v2Zdj8zj/CrWd5WTNgrdzM1Jiq8u44KEmipuFK7faFDnT43/tstyjd82UBA7tbJ5blnOQJL+SkG
-	ruHeJvcVvuM4ITfDGHd/bLanEZ3eUK+A=
-X-Gm-Gg: ASbGncvGdzHmXpqJHkaGHlrhtL+R3XhceSq0zEVdEtt/a7lNc3/IXHyGwrgYxy/FO57
-	ibWWCzLMQiFQK9uMnmwjupQ+Hg1frk0RRBZzVFP39o3mgOpGeTWzf7hnPwL2DDckFbRjQQA5yZx
-	KQYh0JohGGvU3m4KG4lxqVyDDPewTBySZqNt1brzVDHQ==
-X-Google-Smtp-Source: AGHT+IEJwE1g4YnSLqje9oO3w/5JCMMzalfAYURIzR+idPnMXcOc8GmRto0P9wd9n73uBaY7LwalrXFGw49te1yx/Y4=
-X-Received: by 2002:a05:651c:4001:b0:32a:651c:9aea with SMTP id
- 38308e7fff4ca-32e0009ad64mr19007641fa.34.1751550157391; Thu, 03 Jul 2025
- 06:42:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751550493; x=1752155293;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XJrMtFaBP2BGL6npOuum/zHAyGQyeC3LXV3nbl5mRq8=;
+        b=XnNnmFGRiQ2sIRxDcWZuL5YfiWp/jMslW9uyRRmTKU3gzZI1fMvAAd78ywr4YZIveD
+         t2DXq6Xh3bSsCUGgwK9grMMboKrfyZZf3OaXgBsZOr/yd6k0tlqAeiqV5XrmxFoWArPB
+         pgliqWXTA7wcIA3cliTwGX0F0VacUe/tjFM6uyTnxTHgN7+OMby/uzSyFCJBzjs3Cdg0
+         vlKpwPZgwMveP9ZG3aW2cgWYXkOBZ28X2/WneORILDepaAbqVyCbkvP5Yu8S66bHwh8a
+         2EGypgdx0xsgfi2iqUnjupgvRBinR4qdMTV+niAJOFInbXQrqDFCqLZMwqbszBpl20UD
+         s0NQ==
+X-Gm-Message-State: AOJu0YyxCXkyEiZQ68acB7WPABRKpTv61B8lxmzlVCLPXZN0m8amUWGg
+	nPRucLegczYyaH385Dw6QBrmjDti5+FHNKEWK5zB9qduyqydURkAZ62rRgeC4tusW2r4fLp1uJ7
+	DXPJxHJDPJVMUZuP/O4ggVp9IyraHiQ+AGEXSaXWrG0TStWINtxZs4ZQzMw==
+X-Gm-Gg: ASbGncsLjTLBYYbhmsEBFlhWD6dctmtC9sP0n4EKNUo1d4qhKSe8vVFzKPlu8y9kJSO
+	0Pj/1fB8+ZGmvo90fLjWS77vUU8T3nq+V75y678aGmWjrKx+DlhKqyFhoXQLpHuqVynabMtqIMt
+	CJu+gVamLd+cMCOn9kQGBXmuXR+1VHW0P8Qa5tZq4reAenOcNmwOvwbz2ykz9i4Z4NBeEyug/rH
+	I9EGLSL+90UlUMlSejvx1DdeB0zRXjYYKepQmjFMx5VnC1kjnPbOj5WrFr9qFO77UohN+A2hLtY
+	rIdEKdWumjBvRKZAdT2sZ9SRk4a220Qyy1ubaktgHK7rXXLLCvidLvDkVXpyY972bsY=
+X-Received: by 2002:a05:6000:290d:b0:3a5:2848:2445 with SMTP id ffacd0b85a97d-3b1fe6b5ae9mr6007915f8f.16.1751550493338;
+        Thu, 03 Jul 2025 06:48:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFd2kcIWtwK91F48hm7gSXrDxg3r7yvE33vIqHRfIQfbCwGMDKd3QlGq6N3EMfPF5sDl04JmA==
+X-Received: by 2002:a05:6000:290d:b0:3a5:2848:2445 with SMTP id ffacd0b85a97d-3b1fe6b5ae9mr6007887f8f.16.1751550492828;
+        Thu, 03 Jul 2025 06:48:12 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:270a:b10:5fbf:faa5:ef2b:6314? ([2a0d:3344:270a:b10:5fbf:faa5:ef2b:6314])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a88c7e7098sm18357751f8f.4.2025.07.03.06.48.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Jul 2025 06:48:12 -0700 (PDT)
+Message-ID: <4cab9be0-3516-454f-883b-7a999994c447@redhat.com>
+Date: Thu, 3 Jul 2025 15:48:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250703125941.1659700-1-neeraj.sanjaykale@nxp.com>
-In-Reply-To: <20250703125941.1659700-1-neeraj.sanjaykale@nxp.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 3 Jul 2025 09:42:24 -0400
-X-Gm-Features: Ac12FXxaJZkUcMMuvEfhaCIQVNH4xMzK0iXdJhhq4GoOYF0l2cqU-Les31hBC0w
-Message-ID: <CABBYNZKN+mHcvJkMB=1vvOyExF8_Tg2BnD-CemX3b14PoA1vkg@mail.gmail.com>
-Subject: Re: [PATCH v1 1/2] Bluetooth: coredump: Add hci_devcd_unregister()
- for cleanup
-To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, amitkumar.karwar@nxp.com, sherry.sun@nxp.com, 
-	manjeet.gupta@nxp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [patch V2 0/3] ptp: Provide support for auxiliary clocks for
+ PTP_SYS_OFFSET_EXTENDED
+To: Thomas Gleixner <tglx@linutronix.de>, LKML <linux-kernel@vger.kernel.org>
+Cc: netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>,
+ Christopher Hall <christopher.s.hall@intel.com>,
+ John Stultz <jstultz@google.com>, Frederic Weisbecker <frederic@kernel.org>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Miroslav Lichvar <mlichvar@redhat.com>,
+ Werner Abt <werner.abt@meinberg-usa.com>,
+ David Woodhouse <dwmw2@infradead.org>, Stephen Boyd <sboyd@kernel.org>,
+ =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>,
+ Kurt Kanzenbach <kurt@linutronix.de>, Nam Cao <namcao@linutronix.de>,
+ Antoine Tenart <atenart@kernel.org>
+References: <20250701130923.579834908@linutronix.de>
+ <faca1b8e-bd39-4501-a380-24246a8234d6@redhat.com> <87ecuxwic0.ffs@tglx>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <87ecuxwic0.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Neeraj,
+On 7/3/25 2:48 PM, Thomas Gleixner wrote:
+> On Thu, Jul 03 2025 at 12:27, Paolo Abeni wrote:
+>> On 7/1/25 3:26 PM, Thomas Gleixner wrote:
+>>> Merge logistics if agreed on:
+>>>
+>>>     1) Patch #1 is applied to the tip tree on top of plain v6.16-rc1 and
+>>>        tagged
+>>>
+>>>     2) That tag is merged into tip:timers/ptp and the temporary CLOCK_AUX
+>>>        define is removed in a subsequent commit
+>>>
+>>>     3) Network folks merge the tag and apply patches #2 + #3
+>>>
+>>> So the only fallout from this are the extra merges in both trees and the
+>>> cleanup commit in the tip tree. But that way there are no dependencies and
+>>> no duplicate commits with different SHAs.
+>>>
+>>> Thoughts?
+>>
+>> I'm sorry for the latency here; the plan works for me! I'll wait for the
+>> tag reference.
+> 
+> No problem. Rome wasn't built in a day either :)
+> 
+>> Could you please drop a notice here when such tag will be available?
+> 
+> Here you go:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git ktime-get-clock-ts64-for-ptp
+> 
+> I merged it locally into net-next, applied the PTP patches on top and
+> verified that the combination with the tip timers/ptp branch, which has
+> the tag integrated and the workaround removed, creates the expected
+> working result.
 
-On Thu, Jul 3, 2025 at 9:17=E2=80=AFAM Neeraj Sanjay Kale
-<neeraj.sanjaykale@nxp.com> wrote:
->
-> This adds hci_devcd_unregister() which can be called when driver is
-> removed, which will cleanup the devcoredump data and cancel delayed
-> dump_timeout work.
->
-> With BTNXPUART driver, it is observed that after FW dump, if driver is
-> removed and re-loaded, it creates hci1 interface instead of hci0
-> interface.
->
-> But after DEVCD_TIMEOUT (5 minutes) if driver is re-loaded, hci0 is
-> created. This is because after FW dump, hci0 is not unregistered
-> properly for DEVCD_TIMEOUT.
->
-> With this patch, BTNXPUART is able to create hci0 after every FW dump
-> and driver reload.
->
-> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> ---
->  include/net/bluetooth/coredump.h | 3 +++
->  net/bluetooth/coredump.c         | 8 ++++++++
->  2 files changed, 11 insertions(+)
->
-> diff --git a/include/net/bluetooth/coredump.h b/include/net/bluetooth/cor=
-edump.h
-> index 72f51b587a04..bc8856e4bfe7 100644
-> --- a/include/net/bluetooth/coredump.h
-> +++ b/include/net/bluetooth/coredump.h
-> @@ -66,6 +66,7 @@ void hci_devcd_timeout(struct work_struct *work);
->
->  int hci_devcd_register(struct hci_dev *hdev, coredump_t coredump,
->                        dmp_hdr_t dmp_hdr, notify_change_t notify_change);
-> +void hci_devcd_unregister(struct hci_dev *hdev);
->  int hci_devcd_init(struct hci_dev *hdev, u32 dump_size);
->  int hci_devcd_append(struct hci_dev *hdev, struct sk_buff *skb);
->  int hci_devcd_append_pattern(struct hci_dev *hdev, u8 pattern, u32 len);
-> @@ -85,6 +86,8 @@ static inline int hci_devcd_register(struct hci_dev *hd=
-ev, coredump_t coredump,
->         return -EOPNOTSUPP;
->  }
->
-> +static inline void hci_devcd_unregister(struct hci_dev *hdev) {}
-> +
->  static inline int hci_devcd_init(struct hci_dev *hdev, u32 dump_size)
->  {
->         return -EOPNOTSUPP;
-> diff --git a/net/bluetooth/coredump.c b/net/bluetooth/coredump.c
-> index 819eacb38762..dd7bd40e3eba 100644
-> --- a/net/bluetooth/coredump.c
-> +++ b/net/bluetooth/coredump.c
-> @@ -442,6 +442,14 @@ int hci_devcd_register(struct hci_dev *hdev, coredum=
-p_t coredump,
->  }
->  EXPORT_SYMBOL(hci_devcd_register);
->
-> +void hci_devcd_unregister(struct hci_dev *hdev)
-> +{
-> +       cancel_delayed_work(&hdev->dump.dump_timeout);
-> +       skb_queue_purge(&hdev->dump.dump_q);
-> +       dev_coredump_put(&hdev->dev);
-> +}
-> +EXPORT_SYMBOL_GPL(hci_devcd_unregister);
+I had to wrestle a bit with the script I use - since the whole thing was
+a little different from my usual workflow - but it's in now, hoping I
+did not mess badly with something.
 
-The fact that the dump lives inside hdev is sort of the source of
-these problems, specially if the dumps are not HCI traffic it might be
-better off having the driver control its lifetime and not use
-hdev->workqueue to schedule it.
+/P
 
->  static inline bool hci_devcd_enabled(struct hci_dev *hdev)
->  {
->         return hdev->dump.supported;
-> --
-> 2.34.1
->
-
-
---=20
-Luiz Augusto von Dentz
 
