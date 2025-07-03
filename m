@@ -1,90 +1,90 @@
-Return-Path: <netdev+bounces-203780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D985CAF72C4
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:46:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 856F5AF72CA
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:47:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECE0D1C82F02
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 11:47:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C3F77A1D1F
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 11:45:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956E62E6125;
-	Thu,  3 Jul 2025 11:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08E732E62BE;
+	Thu,  3 Jul 2025 11:46:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="GOPSKkuw"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="UFCUI8M4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DB82E5435
-	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 11:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 566672E54C6
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 11:46:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751543162; cv=none; b=Brqll4Id5XOHTCG9SxUjwRABVf5DZn/PsVCqBhFPqShriXFYLSNtZnLHXXCCdqTmj+RnDhX/bQGmX6uJH4WWjF5SxLzXJZ9/x4pzUkFjxUwshnCaE/wCRn9Ann6I587ulC2r3XJjyGY5XTMfGvkH8ML4kRVQNuCx/cUrMU9SPHs=
+	t=1751543163; cv=none; b=E2EXqrD6i5Xh8oKSd9QX2NSCBPDW15AheexCN0X0e4tevfyOzszJVmG40LCHhqZk+dYYyPTNFbAoxsa7cyHAS7K6/zLaW1TeuLT5eNZBHiBoAfH77ZwfgxdaoIwsTGtZl2q7HxSEz+uoVH81H5wPlblOlVzTYxPwtAwGzhy0DJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751543162; c=relaxed/simple;
-	bh=+MygOH5s03WBamEE1JsTEBSyXCbxQSo1/+p7URAI3ks=;
+	s=arc-20240116; t=1751543163; c=relaxed/simple;
+	bh=a8zTMySE1h/78M/VhrdoqH5/54hihYiyowo7NEwB01Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dAIWjAJP6IYBECJix+AJczCRy2ouf8WfWvznwaQdEYTjSSF+UXJOrYFuNtsgsPqLT+/GajoDK1qPyvKi9psS9dxWzenE496jZhNQg9FsdPI50za7WES4SfR6CBYEaKc+ny+GB9BfuvhSj/151ysd/8P9bi4jw7eu8yBWtX0k8u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=GOPSKkuw; arc=none smtp.client-ip=209.85.128.42
+	 MIME-Version; b=rVnFZ05mPn6ESo/Pk6cNFtJEIO9EK9VZAofMWLD2xpbB19lC9mQSm0OuPUSOBIPYvXfwj04rpm8eOpUIkbH4GMZrXPFkYk3AV+ixu96c4HLnu4cPvhTnc9tskJZF1Zp7DjVrK5026i+IzA18klnlpyLeVXMo49roQ97ogCZ8jtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=UFCUI8M4; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-451e2f0d9c2so5757215e9.1
-        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 04:46:00 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-454aaade1fbso9053635e9.3
+        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 04:46:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1751543158; x=1752147958; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1751543159; x=1752147959; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SWHkdbNA6gsGW3IvCwvedCkXrN6MyTNxVpT937ld2BE=;
-        b=GOPSKkuwpN0p2lOMEoaMxzG0n8XemXHy0Kt51e9ig0bxPVvADhEJ1c7LxOFhr55oD5
-         20OwnUggkNCc4wli4tJG2tcFEGX7NT5oodGxHgojFbzEwgF6cnFa6ukfCr52GzUoWT53
-         os7a59t2g3dSxeK/zGL/I2SS/WNxuuooglCfMFE5B+MKs1kTN/Oo5MZM4W7Xam+qnvsk
-         fi/n+uZZ7zS8C7GIvHVQNLTjgcoPHOQirz9KpMfyquO86ISULqqDqmYi1f5S2z+LxnhA
-         Pu32bUhjRn6jamd3StGk106uUdF6dNCdyeUb4stZvAnp30CryOqBzz32c497MFCn6XdG
-         GraQ==
+        bh=OjSo51JI2lr/aKAlTJVMCKSHhVGiQ7Yt0BxxyNJbxMo=;
+        b=UFCUI8M4lUC/WtAMu8evArTh7+usR3ar1DyRpcICWwAUf8UTdLq0PEBmVzZDk9CZTk
+         vqt8uIsa1r9MbmsTD7bf1jtMCO75n2B8Q2Mt87texigvwGPTT/SkJnePwTXqnAPcyOjy
+         y79/gIs4rxPMjEk1JatDLcifKaTEKEK4IhGrfARlIbHPrGITxAQiB0uPvgwX8OyGpKg7
+         nCCn/4MIHgpT7rUIKGO6Qr8zZ0AoSKMFeTyZ3gPzNWqV7Tq5lguzzvDrxU/+I3Vh/XCU
+         NN6jLgcUn7stW4TH9Una8FT/8AXUbPH0v9bGMPhkhVXwvnNAL6rK0XlmW9Xe6/xONCIG
+         NuLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751543158; x=1752147958;
+        d=1e100.net; s=20230601; t=1751543159; x=1752147959;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SWHkdbNA6gsGW3IvCwvedCkXrN6MyTNxVpT937ld2BE=;
-        b=wgujTZN2GkB/oSwlcPxJ7OO0/NMqvO3Zuqhl8v9cmAc4bNUTQiKXfMCh8oL4DmEVuh
-         iEBtnLxbXhbBlFxt0zcoB5boqHtouXSut8ZSlSgRztIJkBqZ8vPDjTbB3qPfw4TiybcF
-         E1uNTv+MbE8D1onssLfOO+Wqd6lKz+pG2g9n1WmhsQng9Jj3+JoPbP3oDgkOaqVZ+ADj
-         kJmBfgpCmKzaxxtS92NoOE9DVQYVEb3RfNNeduMBFEXSVxBJsoFdmQNu8LuiqrCCQxJn
-         h+NnescLH9wP6/rLToMO1pFnJahv5ymdlMmsArWOv0piEiXxtw9/IeFNcR+mfDPn24Vn
-         2Yxw==
-X-Gm-Message-State: AOJu0YzfHjhM9zBquHZEo2dD0i6ojQTwOoJ5Zrmgak9vZ56cWZO3bCyp
-	2sMPyeT7YZGQFVHMUy1pZ/jZFIe4rHq1KbCw4t+vVbFxwqZbQWfYJ8P2x/qIyA6UPoS9sovXRSY
-	wYtz6hkL0hg9WrxRvfieRL5SzOZeooFDSKAB7blyJQoEXSUvHZNkXXZZRjN5YoFdk
-X-Gm-Gg: ASbGnctctftiy+8134d2DPamgoiDnBbaszwyegPKkxqGy2tMCHTOS8KwpsHujmjhqBU
-	JpuJFDVA3obe69+SMVmau7tMZ5+kdvIZ8CmZerMm8hRKmFberbDkebxEY+LED91CUWwMxZTqVkV
-	iXiewwXK0Q9xLcBUYTKC7KmNaHnVaoWc2Br6mnh9Xyan756mFxn11v9/iyjp7pR41vtTfBDJ0bO
-	EgMRGxAxMmpD4YvNo9Y6XeowlFj8U5EIP0lQ9o4CJkrPidGwjSkdjZzOxsap8/kEzd1sF5mCU3f
-	DAnYGHPTiwQYHg/Sr7tKz2gsNIV4s7B3i6UCJ2W9mEG2s4CMRScDoXyu21s56jV4REavE0YQIbl
-	m61/2AsCB
-X-Google-Smtp-Source: AGHT+IHq66TQeySgzUv365AkEmx6Knd+D1brvVjILr7pwpKpG54IB+vqf0wAWj2A1UkZDFJUTbs6nw==
-X-Received: by 2002:a05:600c:8b0e:b0:439:4b23:9e8e with SMTP id 5b1f17b1804b1-454ae8893camr15442475e9.3.1751543158196;
-        Thu, 03 Jul 2025 04:45:58 -0700 (PDT)
+        bh=OjSo51JI2lr/aKAlTJVMCKSHhVGiQ7Yt0BxxyNJbxMo=;
+        b=LfrSFIV9fF+IciLiPyfUV1/OpiIu+HfA0UE7k18buq92KpCm4vVJL/uy//PaLSWGSi
+         Ux9S7PtCNWvrYtsKHoB1Ayp3ewlFY4hKXdPcM0Q/k+J8cfI8yLmNYUfDy0BW8+GpCWlS
+         aYSwPUifaoO9umY7iS5elEYYCzoJdwFVKivDi4HEL80wXWuKwZ/XcA9yTcyVCYL9wWKO
+         yVOHSmamwW0FEuK78UfplCSl1AWH3xRqFs5NLvyno//Ch47AggDIP/58V0edehn5POFA
+         yzkmVb7MXR6IlNW6SW7lZW1INrw8j3z4wxFF197qACcI/V/vUfls6i8ekKEcUS14EDLZ
+         wx/g==
+X-Gm-Message-State: AOJu0YwGvOEV8g7VxPO1wMiX0foXYyWvWJLR3QvSaYM5NfihZKcCJrs2
+	q/f4rwWIB1JZ9UXqMPFHKYlaap6FjGHKHrcBResN23vQfH7PY735xgSQIFupXEMUlQ4NR7Eim06
+	ceRgaMGpoVNFF9ASfgGzs8XMwhHwsW2PMhYU3IufNLyaEBJTY1fcdZaJ3HDySV0/b
+X-Gm-Gg: ASbGncvlIXSQ8MfncMO3BjywpZcQwPmPJMI7cI5nCrCK38N4UgTE0TznwbYdJqi6g2n
+	Xm8wLQ/O4/5WAmFw9fsIL8Ws61J5QDw0uJP5A80Y69MxaoN8ASvy9nJN41cngo2WNZtRNO3bjCu
+	f7AO5I59NlmIVY5qmNKAZuSh0OGNm7k+bGO/REA90Y3Ijk0dQZ1NYQ0xmiOAO0z7YIcw57k0iB3
+	IuKlv7RL+5ELG6lTa62azmt3xIQk8itKomcmPgq/HfY9t05s49hwKce4aLjplQ8n6jRG59rLQsd
+	l526L8v2/hcsYDdOdDvWlKiTwFVva+K6kIIBJIQK+MkTF+0x4ux15HtgukQ9W5OhRoyKHjia7+V
+	CwvqvVkUU
+X-Google-Smtp-Source: AGHT+IFKgq0KhkHwjzn8EibxekRSW3VrMB8Zzttwyzhfpg3mCp6W2NQkurukjDd2VBDAxi9T/icbsQ==
+X-Received: by 2002:a05:600c:8b22:b0:453:1e14:6387 with SMTP id 5b1f17b1804b1-454a4e1c2d0mr46486165e9.32.1751543159214;
+        Thu, 03 Jul 2025 04:45:59 -0700 (PDT)
 Received: from inifinity.homelan.mandelbit.com ([2001:67c:2fbc:1:aeb1:428:2d89:85bc])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454a9be5bbfsm24174145e9.34.2025.07.03.04.45.57
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454a9be5bbfsm24174145e9.34.2025.07.03.04.45.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jul 2025 04:45:57 -0700 (PDT)
+        Thu, 03 Jul 2025 04:45:58 -0700 (PDT)
 From: Antonio Quartulli <antonio@openvpn.net>
 To: netdev@vger.kernel.org
-Cc: Ralf Lici <ralf@mandelbit.com>,
+Cc: Antonio Quartulli <antonio@openvpn.net>,
 	Sabrina Dubroca <sd@queasysnail.net>,
 	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Antonio Quartulli <antonio@openvpn.net>
-Subject: [PATCH net 1/3] ovpn: propagate socket mark to skb in UDP
-Date: Thu,  3 Jul 2025 13:45:10 +0200
-Message-ID: <20250703114513.18071-2-antonio@openvpn.net>
+	Ralf Lici <ralf@mandelbit.com>
+Subject: [PATCH net 2/3] ovpn: explicitly reject netlink attr PEER_LOCAL_PORT in CMD_PEER_NEW/SET
+Date: Thu,  3 Jul 2025 13:45:11 +0200
+Message-ID: <20250703114513.18071-3-antonio@openvpn.net>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250703114513.18071-1-antonio@openvpn.net>
 References: <20250703114513.18071-1-antonio@openvpn.net>
@@ -96,38 +96,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Ralf Lici <ralf@mandelbit.com>
+The OVPN_A_PEER_LOCAL_PORT is designed to be a read-only attribute
+that ovpn sends back to userspace to show the local port being used
+to talk to that specific peer.
 
-OpenVPN allows users to configure a FW mark on sockets used to
-communicate with other peers. The mark is set by means of the
-`SO_MARK` Linux socket option.
+However, we forgot to reject it when parsing CMD_PEER_NEW/SET messages.
+This is not a critical issue because the incoming value is just
+ignored, but it may fool userspace which expects some change in
+behaviour.
 
-However, in the ovpn UDP code path, the socket's `sk_mark` value is
-currently ignored and it is not propagated to outgoing `skbs`.
+Explicitly error out and send back a message if OVPN_A_PEER_LOCAL_PORT
+is specified in a CMD_PEER_NEW/SET message.
 
-This commit ensures proper inheritance of the field by setting
-`skb->mark` to `sk->sk_mark` before handing the `skb` to the network
-stack for transmission.
-
-Signed-off-by: Ralf Lici <ralf@mandelbit.com>
-Link: https://www.mail-archive.com/openvpn-devel@lists.sourceforge.net/msg31877.html
+Reported-by: Ralf Lici <ralf@mandelbit.com>
+Closes: https://github.com/OpenVPN/ovpn-net-next/issues/19
 Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
 ---
- drivers/net/ovpn/udp.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ovpn/netlink.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/drivers/net/ovpn/udp.c b/drivers/net/ovpn/udp.c
-index bff00946eae2..60435a21f29c 100644
---- a/drivers/net/ovpn/udp.c
-+++ b/drivers/net/ovpn/udp.c
-@@ -344,6 +344,7 @@ void ovpn_udp_send_skb(struct ovpn_peer *peer, struct sock *sk,
- 	int ret;
+diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
+index a4ec53def46e..17d23d01c6d8 100644
+--- a/drivers/net/ovpn/netlink.c
++++ b/drivers/net/ovpn/netlink.c
+@@ -224,6 +224,17 @@ static int ovpn_nl_peer_precheck(struct ovpn_priv *ovpn,
+ 		return -EINVAL;
+ 	}
  
- 	skb->dev = peer->ovpn->dev;
-+	skb->mark = READ_ONCE(sk->sk_mark);
- 	/* no checksum performed at this layer */
- 	skb->ip_summed = CHECKSUM_NONE;
- 
++	/* the local port cannot be set by userspace because the socket
++	 * being passed is already bound to one.
++	 * OVPN_A_PEER_LOCAL_PORT is for sending peer status only (check
++	 * ovpn_nl_send_peer())
++	 */
++	if (attrs[OVPN_A_PEER_LOCAL_PORT]) {
++		NL_SET_ERR_MSG_MOD(info->extack,
++				   "cannot specify local port (socket is bound already)");
++		return -EINVAL;
++	}
++
+ 	/* check that local and remote address families are the same even
+ 	 * after parsing v4mapped IPv6 addresses.
+ 	 * (if addresses are not provided, family will be AF_UNSPEC and
 -- 
 2.49.0
 
