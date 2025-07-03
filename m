@@ -1,201 +1,199 @@
-Return-Path: <netdev+bounces-203699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E2BEAF6C9B
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 10:17:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9724FAF6CA5
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 10:18:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A9AF4A494A
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 08:17:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F29064A0E98
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 08:18:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B94922C3262;
-	Thu,  3 Jul 2025 08:17:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A59A2C327C;
+	Thu,  3 Jul 2025 08:18:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GhJD91vs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F397F29A9D3
-	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 08:17:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8217C295523
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 08:18:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751530646; cv=none; b=UPfFk/5R4MfLY5+qTm47nVUIQuOF4uGTkV2NBuwSVTqz8LYzAS5VvawJbvz+LZ/iy458LM68hSKUQj/JQKiM95WIWR3ahQlCkNmcfBSqNEE829AyE6ZJoKdxQS7s3kQtgk8RlPwHUSJynsZAZSxwPxCbPOx0Z4THs5PBl9x1Zf0=
+	t=1751530731; cv=none; b=IremWtSpo3kXpDoepLYK/gSoEiybIC555bNDQ3LxE3p0kilTF60HWrzmNID3SGyV6SR33aDTBkKa0MzkXPYDaPyZc2gMx0ZoBiw0lELCrDwG3l70CKRf+oqs8sqCF1rk9fnDBHiLsp//lgC4+4XUC+aenQ7VdMNA1py0aX+CPXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751530646; c=relaxed/simple;
-	bh=0tqfQcdcQKvuybNYYmd7zqhw/ToCZ5BO8caAXPV5fps=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=RAaMp2q0w8yHIjHbNHqv42BZNYF9n0JB08+Xx2ja9XfYoBXsXEdsm4SI1P8ITxD4so1s0koSwD/wC0MpWjVYz77nv0xKZxKgLWcneI9Ts/3aKLC2MIbojbp6CzlF3OC3DwHX0cj/Q2AtJkvuOA2VlOh26kTD3D/0EyV45tNg2sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-86d07944f29so1040785339f.0
-        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 01:17:24 -0700 (PDT)
+	s=arc-20240116; t=1751530731; c=relaxed/simple;
+	bh=hk+vmY3dwf/9cfvNIfPCcCovO3SGaMSrfEj5J+75b3I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FtDOAGuzq5DHL9I4Dib7hv/5vxx0XPxbX2M6E5Ri1YWcJZfU6mgH+j1eKSaErHqQA252Vwp97fAfcjKl2MVbEXry2+VlVGRgr93XJF0ScAoQixDAqM6/14x2ePlJQgr1LLzL6fPV5RpE4GmKLY7Mrl7GTceveYqpSCGI80zZhi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GhJD91vs; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751530728;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=g+LEYHxbEIy/Tv/yJgYAu7UXqbf4GKrC7aHzLDp5r0E=;
+	b=GhJD91vsMAhaXZHOG/oYaOwBXwF/9zIN8nTtuvmplPeaYxdbnY1WU0hXlTp9aFrWYrFxSC
+	x1mhp24VPVEfeNVeqrvSIPVvrOFF2KfOLl7gsblQktXVb4SrZYsmoaD/v3xhecbcN9MT6p
+	zlNGZuZLUHwf9Yvg5A85gylm1QZEJzo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-486-mRGvkjDUMJipt8cZ3M7FaA-1; Thu, 03 Jul 2025 04:18:46 -0400
+X-MC-Unique: mRGvkjDUMJipt8cZ3M7FaA-1
+X-Mimecast-MFC-AGG-ID: mRGvkjDUMJipt8cZ3M7FaA_1751530726
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a4f6ff23ccso5273131f8f.2
+        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 01:18:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751530644; x=1752135444;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tP8fSrrWw+c6oVlbKpv1/K9lt7NV7UPwWnh/sxdbK/k=;
-        b=WgEKl3H1LRDQQi9hbUUTJbZg7xobA8dnU5Vtx+aSLRXkRyXdhcS9UKcs0+YKMEVZSk
-         HksvA9YFdjVs5rVnR27ACRcjsMmoo76+o8IBobvdIcc2iF7fyi2O4FTGCjg3AeQQXyY6
-         mrg0t6/RO2/V/Ipm8Hn790XFxNnZ31oqje5DfScD5PMLZjApceuLTjkhYbafyEbkjZ4p
-         d8W9SPa8NqrA/3OQbuAOWfi7XMzZQvT0H5JxgT/xZg2fSUsDdKfvlxHOD1j8Dcmo7s58
-         9Pf1tZNxnNxARarMs9U8b1fEMb1sKtiJCI9wi6cdn8BI2JDyzk81+BuKaH/JAHA5epi5
-         4OIA==
-X-Forwarded-Encrypted: i=1; AJvYcCXH6DVqYggp8PTDZQAvOOJB9ZSgJrWfLSpjNWyIHL3S3Aa3eHwo+gX5x2pEMdMqiMPD7GXyc+E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8YyBoIkQdfdH/2N9TEYzgRU+M9CE1dq5ovYubzQeW1V4Y1yPH
-	0GnOzC3MCsHo7fTcqxUSOoJOUaOM6TM6k+dUmpJPKOPG8GIzSqrKxC1dXf9TjBUX768ElxbhYVQ
-	rbYpey/ywIqti9p/fFe2masXEnns+r5+bTqaH2jR/fmeKwSACpvjmlF4xPJI=
-X-Google-Smtp-Source: AGHT+IFOZtOW8lab3M0KveD6JB+xB55jCeWVZWok95T1ybd9U5+90wzOI5xdlMgBLaLI8WNjjxGiRaN/pL4TlllEyOLbZEnV1N7G
+        d=1e100.net; s=20230601; t=1751530725; x=1752135525;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g+LEYHxbEIy/Tv/yJgYAu7UXqbf4GKrC7aHzLDp5r0E=;
+        b=Mt5dKXYl/Ymw7VF1V+lQkn7OoTBA4neHPeZ7kW0bb5d6nWWUg+6JeL6sYo4d5a70Qi
+         su0booxxh095l+lIadNBrgucm1oLr6ISXyTscKO44QuD9v9V4oXAsSXZ4yKO2lroaSr3
+         0sG968SwdhQ2W2Vy3Up/9WYAoAYFWetatdCwAUPVwVaR2Ja9GJucT6Ch07c/UXMHD3/l
+         CyUQ0VDux9HNRAQJQkygpjyrH7V3gp2yATH3T3vzKtVkPQ6kYB7r9vi1VSwVdxXf//ND
+         EphqGH6iclZlb10P40iX1zGgkG/w5uHFjACVWPV8duTps+nLWgsF4GBahPfOiQT7jKfL
+         2wig==
+X-Forwarded-Encrypted: i=1; AJvYcCUtQ3F2jQ5QtK5oX0XklphWsC4fz9kfJStXGQha7yXy/NqJE+/rY9ud8laZkgG/xzdqLtyNlT0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaACVzWNMp5PnzKex63+qDbUR3YE2Ihf4V6CK9tGrETcB0KL2I
+	9GUtL8+UFTu5vkMhaQoRB+W4MlU+Rvj0GEiMi+Mbhy5h8v8AGPkAqdchXBUlPO1TcFfLlduKUaJ
+	waNgOqXFtW1qYCFUFnSweSIiyYIKKdzaE1YJYf9C8kx6P01o3Q8VLcMFS1A==
+X-Gm-Gg: ASbGncuGjsBK6b+nDHO+Ea/wnUNL4mZsZRqPaXMf1u8a5befnaNl2XAcZ4rUcXR76Id
+	IPf30jxmrfajzWRBowCsWwzig2FImuhHjuLXM3pWImJjRfeT2eraoDAlSsBwiD3L4MHS5jLX1WG
+	NBVcbF1koN/RzR9oFewFH/e9B1DdaVYsmB6BkAkqUsf2cC2ml5JWYjoZm4yGLNG4vWfyjbt7i34
+	D7zWq2cWBtU02ghX1lzT8/YNUzmTYTUi1MkwhyzbnV9w9R/A2YezqPfAVT3iASPKsqbiP3sJ7wf
+	hXFx7glYs34wkFsbA97eJdRlfgw=
+X-Received: by 2002:a05:6000:4406:b0:3a5:300d:5e17 with SMTP id ffacd0b85a97d-3b2001ac272mr2916163f8f.29.1751530725433;
+        Thu, 03 Jul 2025 01:18:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHW0kGfmmDWUEurUd2wl4ocsEjWEOjLs4QoNc2p+iimi1Wz7I4Ohva/pHwVEIrj+lRpCHqhCA==
+X-Received: by 2002:a05:6000:4406:b0:3a5:300d:5e17 with SMTP id ffacd0b85a97d-3b2001ac272mr2916144f8f.29.1751530724857;
+        Thu, 03 Jul 2025 01:18:44 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.200.84])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a88c80b516sm17574612f8f.41.2025.07.03.01.18.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jul 2025 01:18:44 -0700 (PDT)
+Date: Thu, 3 Jul 2025 10:18:39 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v3 1/3] vsock: Fix transport_{g2h,h2g} TOCTOU
+Message-ID: <ed4jqbmfre4ggtza76lpzq77szhgxdfy5fgokqgfzdy3bdop42@wnp2s6mxejvj>
+References: <20250702-vsock-transports-toctou-v3-0-0a7e2e692987@rbox.co>
+ <20250702-vsock-transports-toctou-v3-1-0a7e2e692987@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a6b:fc03:0:b0:876:b8a0:6a16 with SMTP id
- ca18e2360f4ac-876c6a8a90cmr653146239f.13.1751530644171; Thu, 03 Jul 2025
- 01:17:24 -0700 (PDT)
-Date: Thu, 03 Jul 2025 01:17:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <68663c94.a70a0220.5d25f.0858.GAE@google.com>
-Subject: [syzbot] [net?] general protection fault in hfsc_qlen_notify
-From: syzbot <syzbot+5eccb463fa89309d8bdc@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250702-vsock-transports-toctou-v3-1-0a7e2e692987@rbox.co>
 
-Hello,
+On Wed, Jul 02, 2025 at 03:38:43PM +0200, Michal Luczaj wrote:
+>vsock_find_cid() and vsock_dev_do_ioctl() may race with module unload.
+>transport_{g2h,h2g} may become NULL after the NULL check.
+>
+>Introduce vsock_transport_local_cid() to protect from a potential
+>null-ptr-deref.
+>
+>KASAN: null-ptr-deref in range [0x0000000000000118-0x000000000000011f]
+>RIP: 0010:vsock_find_cid+0x47/0x90
+>Call Trace:
+> __vsock_bind+0x4b2/0x720
+> vsock_bind+0x90/0xe0
+> __sys_bind+0x14d/0x1e0
+> __x64_sys_bind+0x6e/0xc0
+> do_syscall_64+0x92/0x1c0
+> entry_SYSCALL_64_after_hwframe+0x4b/0x53
+>
+>KASAN: null-ptr-deref in range [0x0000000000000118-0x000000000000011f]
+>RIP: 0010:vsock_dev_do_ioctl.isra.0+0x58/0xf0
+>Call Trace:
+> __x64_sys_ioctl+0x12d/0x190
+> do_syscall_64+0x92/0x1c0
+> entry_SYSCALL_64_after_hwframe+0x4b/0x53
+>
+>Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
+>Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> net/vmw_vsock/af_vsock.c | 27 +++++++++++++++++++++------
+> 1 file changed, 21 insertions(+), 6 deletions(-)
 
-syzbot found the following issue on:
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-HEAD commit:    bd475eeaaf3c Merge branch '200GbE' of git://git.kernel.org..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=16510c8c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=36b0e72cad5298f8
-dashboard link: https://syzkaller.appspot.com/bug?extid=5eccb463fa89309d8bdc
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+Thanks!
+Stefano
 
-Unfortunately, I don't have any reproducer for this issue yet.
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 2e7a3034e965db30b6ee295370d866e6d8b1c341..39473b9e0829f240045262aef00cbae82a425dcc 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -531,9 +531,25 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+> }
+> EXPORT_SYMBOL_GPL(vsock_assign_transport);
+>
+>+/*
+>+ * Provide safe access to static transport_{h2g,g2h,dgram,local} callbacks.
+>+ * Otherwise we may race with module removal. Do not use on `vsk->transport`.
+>+ */
+>+static u32 vsock_registered_transport_cid(const struct vsock_transport **transport)
+>+{
+>+	u32 cid = VMADDR_CID_ANY;
+>+
+>+	mutex_lock(&vsock_register_mutex);
+>+	if (*transport)
+>+		cid = (*transport)->get_local_cid();
+>+	mutex_unlock(&vsock_register_mutex);
+>+
+>+	return cid;
+>+}
+>+
+> bool vsock_find_cid(unsigned int cid)
+> {
+>-	if (transport_g2h && cid == transport_g2h->get_local_cid())
+>+	if (cid == vsock_registered_transport_cid(&transport_g2h))
+> 		return true;
+>
+> 	if (transport_h2g && cid == VMADDR_CID_HOST)
+>@@ -2536,18 +2552,17 @@ static long vsock_dev_do_ioctl(struct file *filp,
+> 			       unsigned int cmd, void __user *ptr)
+> {
+> 	u32 __user *p = ptr;
+>-	u32 cid = VMADDR_CID_ANY;
+> 	int retval = 0;
+>+	u32 cid;
+>
+> 	switch (cmd) {
+> 	case IOCTL_VM_SOCKETS_GET_LOCAL_CID:
+> 		/* To be compatible with the VMCI behavior, we prioritize the
+> 		 * guest CID instead of well-know host CID (VMADDR_CID_HOST).
+> 		 */
+>-		if (transport_g2h)
+>-			cid = transport_g2h->get_local_cid();
+>-		else if (transport_h2g)
+>-			cid = transport_h2g->get_local_cid();
+>+		cid = vsock_registered_transport_cid(&transport_g2h);
+>+		if (cid == VMADDR_CID_ANY)
+>+			cid = vsock_registered_transport_cid(&transport_h2g);
+>
+> 		if (put_user(cid, p) != 0)
+> 			retval = -EFAULT;
+>
+>-- 
+>2.49.0
+>
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/d59bc82a55e0/disk-bd475eea.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2a83759fceb6/vmlinux-bd475eea.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/07576fd8e432/bzImage-bd475eea.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5eccb463fa89309d8bdc@syzkaller.appspotmail.com
-
-Oops: general protection fault, probably for non-canonical address 0xdffffc000000005d: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x00000000000002e8-0x00000000000002ef]
-CPU: 0 UID: 0 PID: 13767 Comm: syz.0.2184 Not tainted 6.16.0-rc3-syzkaller-00144-gbd475eeaaf3c #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-RIP: 0010:hfsc_qlen_notify+0x2e/0x160 net/sched/sch_hfsc.c:1238
-Code: 55 41 57 41 56 41 55 41 54 53 48 89 f3 49 bc 00 00 00 00 00 fc ff df e8 d0 ef 45 f8 4c 8d b3 ec 02 00 00 4c 89 f0 48 c1 e8 03 <42> 0f b6 04 20 84 c0 0f 85 e8 00 00 00 41 8b 2e 31 ff 89 ee e8 e9
-RSP: 0018:ffffc90003d2f070 EFLAGS: 00010203
-RAX: 000000000000005d RBX: 0000000000000000 RCX: 0000000000080000
-RDX: ffffc9000c0e9000 RSI: 0000000000000323 RDI: 0000000000000324
-RBP: dffffc0000000000 R08: ffff88802c831e00 R09: 0000000000000002
-R10: 00000000ffffffff R11: ffffffff897a5e80 R12: dffffc0000000000
-R13: ffff888053eaa000 R14: 00000000000002ec R15: ffff888053eaa000
-FS:  00007f783fff36c0(0000) GS:ffff888125c50000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f8d435e1e9c CR3: 000000005e97a000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- qdisc_tree_reduce_backlog+0x29c/0x480 net/sched/sch_api.c:811
- fq_codel_change+0xa96/0xef0 net/sched/sch_fq_codel.c:450
- fq_codel_init+0x355/0x960 net/sched/sch_fq_codel.c:487
- qdisc_create+0x7ac/0xea0 net/sched/sch_api.c:1324
- __tc_modify_qdisc net/sched/sch_api.c:1749 [inline]
- tc_modify_qdisc+0x1426/0x2010 net/sched/sch_api.c:1813
- rtnetlink_rcv_msg+0x779/0xb70 net/core/rtnetlink.c:6953
- netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2534
- netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
- netlink_unicast+0x75b/0x8d0 net/netlink/af_netlink.c:1339
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1883
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:727
- ____sys_sendmsg+0x505/0x830 net/socket.c:2566
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
- __sys_sendmsg net/socket.c:2652 [inline]
- __do_sys_sendmsg net/socket.c:2657 [inline]
- __se_sys_sendmsg net/socket.c:2655 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2655
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0x3b0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f783f18e929
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f783fff3038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f783f3b5fa0 RCX: 00007f783f18e929
-RDX: 0000000000000800 RSI: 0000200000000100 RDI: 0000000000000005
-RBP: 00007f783f210b39 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f783f3b5fa0 R15: 00007ffd53451d68
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:hfsc_qlen_notify+0x2e/0x160 net/sched/sch_hfsc.c:1238
-Code: 55 41 57 41 56 41 55 41 54 53 48 89 f3 49 bc 00 00 00 00 00 fc ff df e8 d0 ef 45 f8 4c 8d b3 ec 02 00 00 4c 89 f0 48 c1 e8 03 <42> 0f b6 04 20 84 c0 0f 85 e8 00 00 00 41 8b 2e 31 ff 89 ee e8 e9
-RSP: 0018:ffffc90003d2f070 EFLAGS: 00010203
-RAX: 000000000000005d RBX: 0000000000000000 RCX: 0000000000080000
-RDX: ffffc9000c0e9000 RSI: 0000000000000323 RDI: 0000000000000324
-RBP: dffffc0000000000 R08: ffff88802c831e00 R09: 0000000000000002
-R10: 00000000ffffffff R11: ffffffff897a5e80 R12: dffffc0000000000
-R13: ffff888053eaa000 R14: 00000000000002ec R15: ffff888053eaa000
-FS:  00007f783fff36c0(0000) GS:ffff888125c50000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f8d435e1e9c CR3: 000000005e97a000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	55                   	push   %rbp
-   1:	41 57                	push   %r15
-   3:	41 56                	push   %r14
-   5:	41 55                	push   %r13
-   7:	41 54                	push   %r12
-   9:	53                   	push   %rbx
-   a:	48 89 f3             	mov    %rsi,%rbx
-   d:	49 bc 00 00 00 00 00 	movabs $0xdffffc0000000000,%r12
-  14:	fc ff df
-  17:	e8 d0 ef 45 f8       	call   0xf845efec
-  1c:	4c 8d b3 ec 02 00 00 	lea    0x2ec(%rbx),%r14
-  23:	4c 89 f0             	mov    %r14,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 0f b6 04 20       	movzbl (%rax,%r12,1),%eax <-- trapping instruction
-  2f:	84 c0                	test   %al,%al
-  31:	0f 85 e8 00 00 00    	jne    0x11f
-  37:	41 8b 2e             	mov    (%r14),%ebp
-  3a:	31 ff                	xor    %edi,%edi
-  3c:	89 ee                	mov    %ebp,%esi
-  3e:	e8                   	.byte 0xe8
-  3f:	e9                   	.byte 0xe9
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
