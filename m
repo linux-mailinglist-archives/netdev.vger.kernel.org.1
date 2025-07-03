@@ -1,262 +1,125 @@
-Return-Path: <netdev+bounces-203820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F129AF755F
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 15:22:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34D24AF758F
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 15:27:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21E0C7AAB47
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:20:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70D09563FC0
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:27:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50041139CE3;
-	Thu,  3 Jul 2025 13:22:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 359DB2D4B75;
+	Thu,  3 Jul 2025 13:27:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nv9W47ra"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cCmmqMiS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4BD1DDD1
-	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 13:22:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0286FC148;
+	Thu,  3 Jul 2025 13:27:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751548934; cv=none; b=Oa+hNo6D+WP3jc2c6tZniHxQ8DfE8Ecy2Ss1zWiFGfNEWdkrswceTgyMHxQjfRrck2S0yWRSLblW3rOfj6kNyJwczknWTh6uPygeznp+gaTRJ4oWMyKFG3TCUmTaFEQ65zsbwKjthetgUtP0qqnCYt+nb6zXgbQ5K91z3XboFIc=
+	t=1751549247; cv=none; b=UwD+4dz+hnFQkVz/1qG+dtDy/Li4FiZztbzDLrMAXOtIsb72JoxgIM9evl2VN9g+pLcdZix/8GCwN09EwTvQLhSKiy849sLZB1tn6q0Se2mVdXGlEhUk3ATZxDTK2LN6pI8ECQqerGQ2ZN9Zg41Q8IZrWXXArt+2869vTiF4Rqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751548934; c=relaxed/simple;
-	bh=WatsLhEqxxRQO2BKB/QaLjbLLm8Bmi7hxVyA8S1HxSc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q6zX8anAF67ZdBiq3+WKXP+5dFwvbMY8RU1dOz9e2UAT8c8GimDROJq4zXHX2eaqABMBxqE0Z2Fnl49EI6NMbiI9mHi6eASjgak+GJfyBhSXERMzZFVVR7cT8efYO6tYzTm3vesRReT7wXNKK+8rLWR30R3+0USu1TFOuAfqOdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nv9W47ra; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751548931;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=dMZQdR9FvwcYqCFm9P+KhO+sujNaYy5P5Nd+l/eOb9g=;
-	b=Nv9W47rakTd71/fRGFqwIpRq+A7mZWFNy4jz6+bngQAf5bBewIlY54Se0N06HOU1BXF55k
-	wCcuC8qhlQKgogFjk/bogKTrOoIHZvmvlYo1l6bkKgAFSVXUVajbpjqscq53UGWrfjyo2Z
-	hRQrnRYDrOOm/23W9T28NKGHOuKolmA=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-613-AhybN3tsMp6_hfxw-mtIhQ-1; Thu,
- 03 Jul 2025 09:22:07 -0400
-X-MC-Unique: AhybN3tsMp6_hfxw-mtIhQ-1
-X-Mimecast-MFC-AGG-ID: AhybN3tsMp6_hfxw-mtIhQ_1751548926
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 901D7180034E;
-	Thu,  3 Jul 2025 13:22:06 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.33.20])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7B543195608F;
-	Thu,  3 Jul 2025 13:22:04 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL] Networking for v6.16-rc5
-Date: Thu,  3 Jul 2025 15:21:58 +0200
-Message-ID: <20250703132158.33888-1-pabeni@redhat.com>
+	s=arc-20240116; t=1751549247; c=relaxed/simple;
+	bh=02Jt1Cymbs57OvvyqASB9yCoi82LcJgdykJmqeCnv8Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mMkGZ4bLIybJdAc/rE7cFAOt1+viRYOvjhsZHVerbkf+0kBR4epz2h2HHE1i4xdb7LsWN9PJKBP3jioP9NXyByroOREV8SW1YLPqcI1PTrJjwcGbUEX5czJNGkNplOO1+SXsHc3bYYczv0SZ3GW3jZM3qiCalPD9ZlTFxmal0hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cCmmqMiS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D7ECC4CEE3;
+	Thu,  3 Jul 2025 13:27:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751549246;
+	bh=02Jt1Cymbs57OvvyqASB9yCoi82LcJgdykJmqeCnv8Y=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cCmmqMiSMdW95nEPe1HJViQllZgFpmCY4isMnJBc6miFP3aSlDhfQg5wjWCPHBjUO
+	 jHIeWhmx8m/x5oTMYwK0pov1zIDGKIMVDEnEtNxEXKtts1KZ2e+bU816zmaE07OmaY
+	 vsGJqNigVBrmny+x/6apIvX4eGvR6RjhALEZ6hvMDFB4gVoeUWGD3HDIDGVEkoDAC0
+	 Fg1ZBJkg7bp+v9NK8JyV2aTfdU6REn1Ex58+/5nr3A6gL2RPe1L6saJxdppQTUV8LE
+	 qk0RP9lsJzodZ4eLLvskzTzyRiXaqlBfL/8EMYRLQDZ2cgzGfZLwYoSk4cD4S5ia8M
+	 dKDsCjqTRS9qQ==
+Message-ID: <720df841-8300-490a-af77-8d20f833c042@kernel.org>
+Date: Thu, 3 Jul 2025 15:27:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 5/5] page_pool: make page_pool_get_dma_addr()
+ just wrap page_pool_get_dma_addr_netmem()
+To: Byungchul Park <byungchul@sk.com>, willy@infradead.org,
+ netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ kernel_team@skhynix.com, kuba@kernel.org, almasrymina@google.com,
+ ilias.apalodimas@linaro.org, harry.yoo@oracle.com,
+ akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com,
+ andrew+netdev@lunn.ch, asml.silence@gmail.com, toke@redhat.com,
+ tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com,
+ saeedm@nvidia.com, leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
+ vbabka@suse.cz, rppt@kernel.org, surenb@google.com, mhocko@suse.com,
+ horms@kernel.org, linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+ vishal.moola@gmail.com, hannes@cmpxchg.org, ziy@nvidia.com,
+ jackmanb@google.com
+References: <20250702053256.4594-1-byungchul@sk.com>
+ <20250702053256.4594-6-byungchul@sk.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20250702053256.4594-6-byungchul@sk.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Hi Linus!
 
-The following changes since commit e34a79b96ab9d49ed8b605fee11099cf3efbb428:
 
-  Merge tag 'net-6.16-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-06-26 09:13:27 -0700)
+On 02/07/2025 07.32, Byungchul Park wrote:
+> The page pool members in struct page cannot be removed unless it's not
+> allowed to access any of them via struct page.
+> 
+> Do not access 'page->dma_addr' directly in page_pool_get_dma_addr() but
+> just wrap page_pool_get_dma_addr_netmem() safely.
+> 
+> Signed-off-by: Byungchul Park <byungchul@sk.com>
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
+> Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
+> Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+> ---
+>   include/net/page_pool/helpers.h | 7 +------
+>   1 file changed, 1 insertion(+), 6 deletions(-)
+> 
+> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+> index 773fc65780b5..db180626be06 100644
+> --- a/include/net/page_pool/helpers.h
+> +++ b/include/net/page_pool/helpers.h
+> @@ -444,12 +444,7 @@ static inline dma_addr_t page_pool_get_dma_addr_netmem(netmem_ref netmem)
+>    */
+>   static inline dma_addr_t page_pool_get_dma_addr(const struct page *page)
+>   {
+> -	dma_addr_t ret = page->dma_addr;
+> -
+> -	if (PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA)
+> -		ret <<= PAGE_SHIFT;
+> -
+> -	return ret;
+> +	return page_pool_get_dma_addr_netmem(page_to_netmem(page));
 
-are available in the Git repository at:
+Wow - the amount of type casting shenanigans going on here make the code
+hard to follow.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.16-rc5
+This code changes adds an extra "AND" operation, but we don't have a
+micro-benchmark that tests the performance of a DMA enabled page_pool,
+so I cannot tell if this add any overhead.  My experience tells me that
+this extra AND-operation will not be measurable.
 
-for you to fetch changes up to 223e2288f4b8c262a864e2c03964ffac91744cd5:
+I see a lot of reviewed-by from people I trust, so you also get my 
+page_pool maintainer ack.
 
-  vsock/vmci: Clear the vmci transport packet properly when initializing it (2025-07-03 12:52:52 +0200)
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
-----------------------------------------------------------------
-Including fixes from Bluetooth.
-
-Current release - new code bugs:
-
-  - eth: txgbe: fix the issue of TX failure
-
-  - eth: ngbe: specify IRQ vector when the number of VFs is 7
-
-Previous releases - regressions:
-
-  - sched: always pass notifications when child class becomes empty
-
-  - ipv4: fix stat increase when udp early demux drops the packet
-
-  - bluetooth: prevent unintended pause by checking if advertising is active
-
-  - virtio: fix error reporting in virtqueue_resize
-
-  - eth: virtio-net:
-    - ensure the received length does not exceed allocated size
-    - fix the xsk frame's length check
-
-  - eth: lan78xx: fix WARN in __netif_napi_del_locked on disconnect
-
-Previous releases - always broken:
-
-  - bluetooth: mesh: check instances prior disabling advertising
-
-  - eth: idpf: convert control queue mutex to a spinlock
-
-  - eth: dpaa2: fix xdp_rxq_info leak
-
-  - eth: amd-xgbe: align CL37 AN sequence as per databook
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Ahmed Zaki (1):
-      idpf: convert control queue mutex to a spinlock
-
-Alok Tiwari (1):
-      enic: fix incorrect MTU comparison in enic_change_mtu()
-
-Antoine Tenart (1):
-      net: ipv4: fix stat increase when udp early demux drops the packet
-
-Bui Quang Minh (4):
-      virtio-net: ensure the received length does not exceed allocated size
-      virtio-net: remove redundant truesize check with PAGE_SIZE
-      virtio-net: use the check_mergeable_len helper
-      virtio-net: xsk: rx: fix the frame's length check
-
-Christian Eggers (4):
-      Bluetooth: hci_sync: revert some mesh modifications
-      Bluetooth: MGMT: set_mesh: update LE scan interval and window
-      Bluetooth: MGMT: mesh_send: check instances prior disabling advertising
-      Bluetooth: HCI: Set extended advertising data synchronously
-
-Dan Carpenter (1):
-      lib: test_objagg: Set error message in check_expect_hints_stats()
-
-Fushuai Wang (1):
-      dpaa2-eth: fix xdp_rxq_info leak
-
-HarshaVardhana S A (1):
-      vsock/vmci: Clear the vmci transport packet properly when initializing it
-
-Jakub Kicinski (3):
-      docs: netdev: correct the heading level for co-posting selftests
-      Merge tag 'for-net-2025-06-27' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
-      Merge branch '200GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-
-Jan Karcher (1):
-      MAINTAINERS: update smc section
-
-Jiawen Wu (5):
-      net: txgbe: fix the issue of TX failure
-      net: libwx: fix the incorrect display of the queue number
-      net: txgbe: request MISC IRQ in ndo_open
-      net: wangxun: revert the adjustment of the IRQ vector sequence
-      net: ngbe: specify IRQ vector when the number of VFs is 7
-
-Kohei Enju (1):
-      rose: fix dangling neighbour pointers in rose_rt_device_down()
-
-Krzysztof Kozlowski (1):
-      dt-bindings: net: sophgo,sg2044-dwmac: Drop status from the example
-
-Laurent Vivier (3):
-      virtio_ring: Fix error reporting in virtqueue_resize
-      virtio_net: Cleanup '2+MAX_SKB_FRAGS'
-      virtio_net: Enforce minimum TX ring size for reliability
-
-Lion Ackermann (1):
-      net/sched: Always pass notifications when child class becomes empty
-
-Lukas Bulwahn (1):
-      MAINTAINERS: adjust file entry after renaming rzv2h-gbeth dtb
-
-Mark Bloch (1):
-      MAINTAINERS: Add myself as mlx5 core and mlx5e co-maintainer
-
-Michal Swiatkowski (1):
-      idpf: return 0 size for RSS key if not supported
-
-Oleksij Rempel (1):
-      net: usb: lan78xx: fix WARN in __netif_napi_del_locked on disconnect
-
-Paolo Abeni (3):
-      Merge branch 'virtio-net-fixes-for-mergeable-xdp-receive-path'
-      Merge branch 'virtio-fixes-for-tx-ring-sizing-and-resize-error-reporting'
-      Merge branch 'fix-irq-vectors'
-
-Raju Rangoju (2):
-      amd-xgbe: align CL37 AN sequence as per databook
-      amd-xgbe: do not double read link status
-
-Thomas Fourier (2):
-      ethernet: atl1: Add missing DMA mapping error checks and count errors
-      nui: Fix dma_mapping_error() check
-
-Ulrich Weber (1):
-      doc: tls: socket needs to be established to enable ulp
-
-Vitaly Lifshits (1):
-      igc: disable L1.2 PCI-E link substate to avoid performance issue
-
-Yang Li (1):
-      Bluetooth: Prevent unintended pause by checking if advertising is active
-
- .../bindings/net/sophgo,sg2044-dwmac.yaml          |   3 +-
- Documentation/networking/tls.rst                   |   4 +-
- Documentation/process/maintainer-netdev.rst        |   2 +-
- MAINTAINERS                                        |  10 +-
- drivers/net/ethernet/amd/xgbe/xgbe-common.h        |   2 +
- drivers/net/ethernet/amd/xgbe/xgbe-mdio.c          |  13 ++
- drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c        |  24 ++-
- drivers/net/ethernet/amd/xgbe/xgbe.h               |   4 +-
- drivers/net/ethernet/atheros/atlx/atl1.c           |  79 +++++--
- drivers/net/ethernet/cisco/enic/enic_main.c        |   4 +-
- drivers/net/ethernet/freescale/dpaa2/dpaa2-eth.c   |  26 ++-
- drivers/net/ethernet/intel/idpf/idpf_controlq.c    |  23 +--
- .../net/ethernet/intel/idpf/idpf_controlq_api.h    |   2 +-
- drivers/net/ethernet/intel/idpf/idpf_ethtool.c     |   4 +-
- drivers/net/ethernet/intel/idpf/idpf_lib.c         |  12 +-
- drivers/net/ethernet/intel/igc/igc_main.c          |  10 +
- drivers/net/ethernet/sun/niu.c                     |  31 ++-
- drivers/net/ethernet/sun/niu.h                     |   4 +
- drivers/net/ethernet/wangxun/libwx/wx_lib.c        |  27 ++-
- drivers/net/ethernet/wangxun/libwx/wx_sriov.c      |   4 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h       |   3 +-
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c      |   4 +-
- drivers/net/ethernet/wangxun/ngbe/ngbe_type.h      |   2 +-
- drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c     |   1 +
- drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c     |   8 +-
- drivers/net/ethernet/wangxun/txgbe/txgbe_main.c    |  22 +-
- drivers/net/ethernet/wangxun/txgbe/txgbe_type.h    |   4 +-
- drivers/net/usb/lan78xx.c                          |   2 -
- drivers/net/virtio_net.c                           | 111 ++++++----
- drivers/virtio/virtio_ring.c                       |   8 +-
- lib/test_objagg.c                                  |   4 +-
- net/bluetooth/hci_event.c                          |  36 ----
- net/bluetooth/hci_sync.c                           | 227 +++++++++++++--------
- net/bluetooth/mgmt.c                               |  25 ++-
- net/ipv4/ip_input.c                                |   7 +-
- net/rose/rose_route.c                              |  15 +-
- net/sched/sch_api.c                                |  19 +-
- net/vmw_vsock/vmci_transport.c                     |   4 +-
- 38 files changed, 494 insertions(+), 296 deletions(-)
-
+--Jesper
 
