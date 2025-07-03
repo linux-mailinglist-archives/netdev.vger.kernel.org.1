@@ -1,699 +1,463 @@
-Return-Path: <netdev+bounces-203874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8500AF7D16
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 18:01:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30D01AF7D5D
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 18:09:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E8164E7732
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 16:00:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 925FD1C856CB
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 16:03:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB60423BCFF;
-	Thu,  3 Jul 2025 15:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="GJ2e0pB6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24F1F23BCF0;
+	Thu,  3 Jul 2025 16:02:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55AF12F002D
-	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 15:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069A71369B4;
+	Thu,  3 Jul 2025 16:02:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751558387; cv=none; b=t+eoo+qmC4NqIPlREd1iDn860QChe6fkJihYwZuHxaTizxhKAFH6rpyP6bFajbTNXmA+kJHtpn2LHmX3ZOtEccGASZlewP+nFElM21HZA/l8BV3tgrUJDAWR2xRlv2HcCqulRqgPgeWmGYV9t4nxSn2ZC8aWnUDDL1z6x6fSrqE=
+	t=1751558531; cv=none; b=bgF7hRQIx9wsn1lXVnGkCx6cFMVR/f+2D7SHqW7yEsp4KKDfNpXlVTCrnD+nCBK/517ddycaAvZC5HsRWMxlItr10hH13fP72E4UwdgsOU0+VnA+skbQtTMQ/rWNk7RzwWsdW12jkr0hoSJmo7qNss+mrI/CNeGcz3/8Vsb4DPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751558387; c=relaxed/simple;
-	bh=U2+amGx3sCguwAh7IndQ65ofujYhNkNl9b/ttqK/5ec=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DAjVllbrCY0QiB+BM+elUP12flQ7R1ZpYPoB8ZioeCmbej2FjyljNqkyhrNzAkezeQs7ij4xH6+O0GeYyICskv2Rdd3mcUjM0urc+G2VptP384CqMg9LWhQpNi/lL9kCnaYZuSalDge2AhRrgYy6+jKQubd6gjEb02aqxGo1HFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=GJ2e0pB6; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-607cc1a2bd8so13922a12.2
-        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 08:59:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1751558382; x=1752163182; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mEDKDHPRddWVdNOZNFpFOkWBp4im61e/BUKjEk6P/ek=;
-        b=GJ2e0pB6nw49zNhOK/Eqc4zOqtTc0ZX0Q4FthMtRYAEgliHqsWIzNHuAHZCP533m04
-         yz1tOqOBe4G97RziK7KN5gWBcvF+CrZfCEF4ku+LX7gFQ907zYY8PgTM9CTM4X2KjFXE
-         Mjg+7gQjuT9xG/FLRMkZtVI8isTb8xFgR/k/PBReWA+cYKaT5TL2iUzoVUmMrphirVru
-         PpLHdhFcDq/UjGrQqOaF05s2Ef6Cv/VZp4jlYbFp1H9JVN+78sr2C/AntLfdtA10y6H+
-         eSEcWLHeZPi4UfMkkdxUXBRMWHUrMYJ/Mbl/j+vtBIykdXDrHyNwRufpu4HgBsLWKENx
-         3WGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751558382; x=1752163182;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mEDKDHPRddWVdNOZNFpFOkWBp4im61e/BUKjEk6P/ek=;
-        b=dwPMCCOnKchUipI8Banu6dHlS2pffRr03UVchNOHlFjXsVPvwkRehM6eI92/wWq3dg
-         9aJptdYNajsVJkk1k6lSclfOzaLJMhS/9XDwOt4ex1+U/A2CsMewui8xc1ZRXNP+ylfz
-         j61kQ/RET9QVLjU2rQxDrW9EfBS+ozEwbZ2ZGCHvKq50RDGzWuyGUDc94X6Aug5HgqiD
-         pejSmokS4Pjl1TQoAw35dyyOJ6oVclbwEpoblaTrAcqiIY++Vq0yk2Ft+4hAcLixpglb
-         MH017z+2+8OWPiMZ9P6T4uvzRWAt6hbZTmXKK7eZfj1WC93srToDrXZfFhmoRyz9GEyh
-         rLQA==
-X-Gm-Message-State: AOJu0Yw9q7iUkEE09r2s3+BCxvQN0yTYnhUUiaANh1p6NgfobyAwtHAD
-	ocHyNBbj+xhNwm4hPbjHYNtAAWOJSxaW4qqhXozeNVhL1hPTM8WiHtht6x7+Q4RZ378oqCiI5wo
-	KHc80
-X-Gm-Gg: ASbGncvqYw70G6ILWB6xEDZakBqJHa8ZnjFBpxVXSJ2oKL5d/trhL7q1RbXsywRZAZ8
-	31NMxnD04EBkhKpcaPvcrgcDMlMOe8xmXnpcQ+RdFBMz40DCZBLj1nBvT30Q5uUedj3RvZXL34P
-	jznHBKKa0FR4JtYroV+0h32SIow9bNxWfDpKQwcPpsXkZ+EtR9RKeZjYwn2TlWDXOfU3KhgQqkJ
-	7y5YySsB/LOtCv+ES+wlf5mAF2RzDDLuAqdm8SLqhFgTLjF8saKnMZz1RudKu1s+gYopoWdwixZ
-	GCHOfCOO7lhyvocQX6by7+iViwuJR1SBAV8AsPttTzutEk2iYdrrqBM=
-X-Google-Smtp-Source: AGHT+IHt+1f1GvRP13vz/cTnQfh2vKvPRP5SvGV43xWzVqyXCpwLYdERMv2gKrfK6hDiij8lgeYEaQ==
-X-Received: by 2002:a50:8a98:0:b0:5f7:f55a:e5e1 with SMTP id 4fb4d7f45d1cf-60e5350159cmr5332167a12.24.1751558382010;
-        Thu, 03 Jul 2025 08:59:42 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:c2])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60c828bbea9sm10851963a12.1.2025.07.03.08.59.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jul 2025 08:59:41 -0700 (PDT)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1751558531; c=relaxed/simple;
+	bh=PzORzLa49BK+ydb4P1wH335Sc7lAmwdxStus3uR9xsE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=m/LarXGF0b8ksFwOSIII6zVZ3ilrnAi/fDXvJ/qcgTVldp7bQJ8A44n/MBoHDn3nJ94/7674m8hF5zuce374fjIr2AZK2b17zNmdWgLd85HuBenkdKEe0qqJifYwwfUMVEWylvzTtpm57FKFDwFz+nJV/u3bxn8NGYhu6pAixpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id CEE6A41988;
+	Thu,  3 Jul 2025 18:02:04 +0200 (CEST)
+From: Gabriel Goller <g.goller@proxmox.com>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>,
 	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>
-Cc: kernel-team@cloudflare.com
-Subject: [PATCH net-next v2 2/2] selftests/net: Cover port sharing scenarios with IP_LOCAL_PORT_RANGE
-Date: Thu,  3 Jul 2025 17:59:37 +0200
-Message-ID: <20250703-connect-port-search-harder-v2-2-d51bce6bd0a6@cloudflare.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250703-connect-port-search-harder-v2-1-d51bce6bd0a6@cloudflare.com>
-References: <20250703-connect-port-search-harder-v2-1-d51bce6bd0a6@cloudflare.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	David Ahern <dsahern@kernel.org>,
+	Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next v4] ipv6: add `force_forwarding` sysctl to enable per-interface forwarding
+Date: Thu,  3 Jul 2025 18:01:53 +0200
+Message-Id: <20250703160154.560239-1-g.goller@proxmox.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Mailer: b4 0.15-dev-07fe9
 Content-Transfer-Encoding: 8bit
 
-Expand the ip_local_port_range tests to check that when using
-IP_LOCAL_PORT_RANGE socket option:
+It is currently impossible to enable ipv6 forwarding on a per-interface
+basis like in ipv4. To enable forwarding on an ipv6 interface we need to
+enable it on all interfaces and disable it on the other interfaces using
+a netfilter rule. This is especially cumbersome if you have lots of
+interface and only want to enable forwarding on a few. According to the
+sysctl docs [0] the `net.ipv6.conf.all.forwarding` enables forwarding
+for all interfaces, while the interface-specific
+`net.ipv6.conf.<interface>.forwarding` configures the interface
+Host/Router configuration.
 
-1) We can share the local port as long as there is no IP address conflict
-   with any other socket. Covered by tcp_port_reuse__no_ip_conflict* tests.
+Introduce a new sysctl flag `force_forwarding`, which can be set on every
+interface. The ip6_forwarding function will then check if the global
+forwarding flag OR the force_forwarding flag is active and forward the
+packet.
 
-2) We cannot share the local port with wildcard sockets or when there is a
-   local IP conflict. Covered by tcp_port_reuse__ip_conflict* tests.
+To preserver backwards-compatibility reset the flag (on all interfaces)
+to 0 if the net.ipv6.conf.all.forwarding flag is set to 0.
 
-3) We cannot share the local IP and port to connect to different remote IPs
-   if the port bucket is in non-reuseable state, Corner case covered by
-   tcp_port_reuse__ip_port_conflict_with_unique_dst_after_bind test.
+Add a short selftest that checks if a packet gets forwarded with and
+without `force_forwarding`.
 
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
+[0]: https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt
+
+Signed-off-by: Gabriel Goller <g.goller@proxmox.com>
 ---
- tools/testing/selftests/net/ip_local_port_range.c  | 525 +++++++++++++++++++++
- tools/testing/selftests/net/ip_local_port_range.sh |  14 +-
- 2 files changed, 534 insertions(+), 5 deletions(-)
 
-diff --git a/tools/testing/selftests/net/ip_local_port_range.c b/tools/testing/selftests/net/ip_local_port_range.c
-index 29451d2244b7..33288732dc1b 100644
---- a/tools/testing/selftests/net/ip_local_port_range.c
-+++ b/tools/testing/selftests/net/ip_local_port_range.c
-@@ -9,6 +9,7 @@
+First time writing a selftest, so LMK if I did something wrong or if
+there is something I can improve. Thanks!
+
+v4:
+    * actually write the sysctl value to the table
+    * use ASSERT_RTNL() when forwarding the sysctl change
+    * remove useless comments in function body
+    * simplify forwarding and force_forwarding check in ip6_output.c
+    * fix code backticks in Documentation (double instead of single)
+    * add selftests
+v3: https://lore.kernel.org/netdev/20250702074619.139031-1-g.goller@proxmox.com/
+    * remove forwarding=0 setting force_forwarding=0 globally.
+    * add min and max (0 and 1) value to sysctl.
+v2: https://lore.kernel.org/netdev/20250701140423.487411-1-g.goller@proxmox.com/
+    * rename from `do_forwarding` to `force_forwarding`.
+    * add global `force_forwarding` flag which will enable
+      `force_forwarding` on every interface like the
+      `ipv4.all.forwarding` flag.
+    * `forwarding`=0 will disable global and per-interface
+      `force_forwarding`.
+    * export option as NETCONFA_FORCE_FORWARDING.
+v1: https://lore.kernel.org/netdev/20250702074619.139031-1-g.goller@proxmox.com/
+
+ Documentation/networking/ip-sysctl.rst        |   5 +
+ include/linux/ipv6.h                          |   1 +
+ include/uapi/linux/ipv6.h                     |   1 +
+ include/uapi/linux/netconf.h                  |   1 +
+ include/uapi/linux/sysctl.h                   |   1 +
+ net/ipv6/addrconf.c                           |  91 +++++++++++++++
+ net/ipv6/ip6_output.c                         |   3 +-
+ tools/testing/selftests/net/Makefile          |   1 +
+ .../selftests/net/ipv6_force_forwarding.sh    | 105 ++++++++++++++++++
+ 9 files changed, 208 insertions(+), 1 deletion(-)
+ create mode 100644 tools/testing/selftests/net/ipv6_force_forwarding.sh
+
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index 0f1251cce314..ec7fa1e890f1 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -2292,6 +2292,11 @@ conf/all/forwarding - BOOLEAN
+ proxy_ndp - BOOLEAN
+ 	Do proxy ndp.
  
- #include <fcntl.h>
- #include <netinet/ip.h>
-+#include <arpa/inet.h>
- 
- #include "../kselftest_harness.h"
- 
-@@ -20,6 +21,15 @@
- #define IPPROTO_MPTCP 262
- #endif
- 
-+static const int ONE = 1;
++force_forwarding - BOOLEAN
++	Enable forwarding on this interface only -- regardless of the setting on
++	``conf/all/forwarding``. When setting ``conf.all.forwarding`` to 0,
++	the ``force_forwarding`` flag will be reset on all interfaces.
 +
-+__attribute__((nonnull)) static inline void close_fd(int *fd)
-+{
-+	close(*fd);
-+}
-+
-+#define __close_fd __attribute__((cleanup(close_fd)))
-+
- static __u32 pack_port_range(__u16 lo, __u16 hi)
- {
- 	return (hi << 16) | (lo << 0);
-@@ -116,6 +126,81 @@ static int get_ip_local_port_range(int fd, __u32 *range)
- 	return 0;
+ fwmark_reflect - BOOLEAN
+ 	Controls the fwmark of kernel-generated IPv6 reply packets that are not
+ 	associated with a socket for example, TCP RSTs or ICMPv6 echo replies).
+diff --git a/include/linux/ipv6.h b/include/linux/ipv6.h
+index 5aeeed22f35b..5380107e466c 100644
+--- a/include/linux/ipv6.h
++++ b/include/linux/ipv6.h
+@@ -19,6 +19,7 @@ struct ipv6_devconf {
+ 	__s32		forwarding;
+ 	__s32		disable_policy;
+ 	__s32		proxy_ndp;
++	__s32		force_forwarding;
+ 	__cacheline_group_end(ipv6_devconf_read_txrx);
+ 
+ 	__s32		accept_ra;
+diff --git a/include/uapi/linux/ipv6.h b/include/uapi/linux/ipv6.h
+index cf592d7b630f..d4d3ae774b26 100644
+--- a/include/uapi/linux/ipv6.h
++++ b/include/uapi/linux/ipv6.h
+@@ -199,6 +199,7 @@ enum {
+ 	DEVCONF_NDISC_EVICT_NOCARRIER,
+ 	DEVCONF_ACCEPT_UNTRACKED_NA,
+ 	DEVCONF_ACCEPT_RA_MIN_LFT,
++	DEVCONF_FORCE_FORWARDING,
+ 	DEVCONF_MAX
+ };
+ 
+diff --git a/include/uapi/linux/netconf.h b/include/uapi/linux/netconf.h
+index fac4edd55379..1c8c84d65ae3 100644
+--- a/include/uapi/linux/netconf.h
++++ b/include/uapi/linux/netconf.h
+@@ -19,6 +19,7 @@ enum {
+ 	NETCONFA_IGNORE_ROUTES_WITH_LINKDOWN,
+ 	NETCONFA_INPUT,
+ 	NETCONFA_BC_FORWARDING,
++	NETCONFA_FORCE_FORWARDING,
+ 	__NETCONFA_MAX
+ };
+ #define NETCONFA_MAX	(__NETCONFA_MAX - 1)
+diff --git a/include/uapi/linux/sysctl.h b/include/uapi/linux/sysctl.h
+index 8981f00204db..63d1464cb71c 100644
+--- a/include/uapi/linux/sysctl.h
++++ b/include/uapi/linux/sysctl.h
+@@ -573,6 +573,7 @@ enum {
+ 	NET_IPV6_ACCEPT_RA_FROM_LOCAL=26,
+ 	NET_IPV6_ACCEPT_RA_RT_INFO_MIN_PLEN=27,
+ 	NET_IPV6_RA_DEFRTR_METRIC=28,
++	NET_IPV6_FORCE_FORWARDING=29,
+ 	__NET_IPV6_MAX
+ };
+ 
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index ba2ec7c870cc..dcf4e8bf8cf8 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -239,6 +239,7 @@ static struct ipv6_devconf ipv6_devconf __read_mostly = {
+ 	.ndisc_evict_nocarrier	= 1,
+ 	.ra_honor_pio_life	= 0,
+ 	.ra_honor_pio_pflag	= 0,
++	.force_forwarding	= 0,
+ };
+ 
+ static struct ipv6_devconf ipv6_devconf_dflt __read_mostly = {
+@@ -303,6 +304,7 @@ static struct ipv6_devconf ipv6_devconf_dflt __read_mostly = {
+ 	.ndisc_evict_nocarrier	= 1,
+ 	.ra_honor_pio_life	= 0,
+ 	.ra_honor_pio_pflag	= 0,
++	.force_forwarding	= 0,
+ };
+ 
+ /* Check if link is ready: is it up and is a valid qdisc available */
+@@ -857,6 +859,15 @@ static void addrconf_forward_change(struct net *net, __s32 newf)
+ 		idev = __in6_dev_get_rtnl_net(dev);
+ 		if (idev) {
+ 			int changed = (!idev->cnf.forwarding) ^ (!newf);
++			/*
++			 * With the introduction of force_forwarding, we need to be backwards
++			 * compatible, so that means we need to set the force_forwarding flag
++			 * on every interface to 0 if net.ipv6.conf.all.forwarding is set to 0.
++			 * This allows the global forwarding flag to disable forwarding for
++			 * all interfaces.
++			 */
++			if (newf == 0)
++				WRITE_ONCE(idev->cnf.force_forwarding, newf);
+ 
+ 			WRITE_ONCE(idev->cnf.forwarding, newf);
+ 			if (changed)
+@@ -5719,6 +5730,7 @@ static void ipv6_store_devconf(const struct ipv6_devconf *cnf,
+ 	array[DEVCONF_ACCEPT_UNTRACKED_NA] =
+ 		READ_ONCE(cnf->accept_untracked_na);
+ 	array[DEVCONF_ACCEPT_RA_MIN_LFT] = READ_ONCE(cnf->accept_ra_min_lft);
++	array[DEVCONF_FORCE_FORWARDING] = READ_ONCE(cnf->force_forwarding);
  }
  
-+struct sockaddr_inet {
-+	union {
-+		struct sockaddr_storage ss;
-+		struct sockaddr_in6 v6;
-+		struct sockaddr_in v4;
-+		struct sockaddr sa;
-+	};
-+	socklen_t len;
-+};
-+
-+static void make_inet_addr(int af, const char *ip, __u16 port,
-+			   struct sockaddr_inet *addr)
+ static inline size_t inet6_ifla6_size(void)
+@@ -6747,6 +6759,78 @@ static int addrconf_sysctl_disable_policy(const struct ctl_table *ctl, int write
+ 	return ret;
+ }
+ 
++static void addrconf_force_forward_change(struct net *net, __s32 newf)
 +{
-+	memset(addr, 0, sizeof(*addr));
++	ASSERT_RTNL();
++	struct net_device *dev;
++	struct inet6_dev *idev;
 +
-+	switch (af) {
-+	case AF_INET:
-+		addr->len = sizeof(addr->v4);
-+		addr->v4.sin_family = af;
-+		addr->v4.sin_port = htons(port);
-+		inet_pton(af, ip, &addr->v4.sin_addr);
-+		break;
-+	case AF_INET6:
-+		addr->len = sizeof(addr->v6);
-+		addr->v6.sin6_family = af;
-+		addr->v6.sin6_port = htons(port);
-+		inet_pton(af, ip, &addr->v6.sin6_addr);
-+		break;
++	for_each_netdev(net, dev) {
++		idev = __in6_dev_get_rtnl_net(dev);
++		if (idev) {
++			int changed = (!idev->cnf.force_forwarding) ^ (!newf);
++
++			WRITE_ONCE(idev->cnf.force_forwarding, newf);
++			if (changed) {
++				inet6_netconf_notify_devconf(dev_net(dev), RTM_NEWNETCONF,
++							     NETCONFA_FORCE_FORWARDING,
++							     dev->ifindex, &idev->cnf);
++			}
++		}
 +	}
 +}
 +
-+static bool is_v4mapped(const struct sockaddr_inet *a)
++static int addrconf_sysctl_force_forwarding(const struct ctl_table *ctl, int write,
++					    void *buffer, size_t *lenp, loff_t *ppos)
 +{
-+	return (a->sa.sa_family == AF_INET6 &&
-+		IN6_IS_ADDR_V4MAPPED(&a->v6.sin6_addr));
-+}
++	struct inet6_dev *idev = ctl->extra1;
++	struct net *net = ctl->extra2;
++	int *valp = ctl->data;
++	loff_t pos = *ppos;
++	int new_val = *valp;
++	int old_val = *valp;
++	int ret;
 +
-+static void v4mapped_to_ipv4(struct sockaddr_inet *a)
-+{
-+	in_port_t port = a->v6.sin6_port;
-+	in_addr_t ip4 = *(in_addr_t *)&a->v6.sin6_addr.s6_addr[12];
++	struct ctl_table tmp_ctl = *ctl;
 +
-+	memset(a, 0, sizeof(*a));
-+	a->len = sizeof(a->v4);
-+	a->v4.sin_family = AF_INET;
-+	a->v4.sin_port = port;
-+	a->v4.sin_addr.s_addr = ip4;
-+}
++	tmp_ctl.extra1 = SYSCTL_ZERO;
++	tmp_ctl.extra2 = SYSCTL_ONE;
++	tmp_ctl.data = &new_val;
 +
-+static void ipv4_to_v4mapped(struct sockaddr_inet *a)
-+{
-+	in_port_t port = a->v4.sin_port;
-+	in_addr_t ip4 = a->v4.sin_addr.s_addr;
++	ret = proc_douintvec_minmax(&tmp_ctl, write, buffer, lenp, ppos);
 +
-+	memset(a, 0, sizeof(*a));
-+	a->len = sizeof(a->v6);
-+	a->v6.sin6_family = AF_INET6;
-+	a->v6.sin6_port = port;
-+	a->v6.sin6_addr.s6_addr[10] = 0xff;
-+	a->v6.sin6_addr.s6_addr[11] = 0xff;
-+	memcpy(&a->v6.sin6_addr.s6_addr[12], &ip4, sizeof(ip4));
-+}
++	if (write && old_val != new_val) {
++		if (!rtnl_net_trylock(net))
++			return restart_syscall();
 +
-+static __u16 inet_port(const struct sockaddr_inet *a)
-+{
-+	switch (a->sa.sa_family) {
-+	case AF_INET:
-+		return ntohs(a->v4.sin_port);
-+	case AF_INET6:
-+		return ntohs(a->v6.sin6_port);
-+	default:
-+		return 0;
++		if (valp == &net->ipv6.devconf_dflt->force_forwarding) {
++			inet6_netconf_notify_devconf(net, RTM_NEWNETCONF,
++						     NETCONFA_FORCE_FORWARDING,
++						     NETCONFA_IFINDEX_DEFAULT,
++						     net->ipv6.devconf_dflt);
++		} else if (valp == &net->ipv6.devconf_all->force_forwarding) {
++			inet6_netconf_notify_devconf(net, RTM_NEWNETCONF,
++						     NETCONFA_FORCE_FORWARDING,
++						     NETCONFA_IFINDEX_ALL,
++						     net->ipv6.devconf_all);
++
++			addrconf_force_forward_change(net, new_val);
++		} else {
++			inet6_netconf_notify_devconf(net, RTM_NEWNETCONF,
++						     NETCONFA_FORCE_FORWARDING,
++						     idev->dev->ifindex,
++						     &idev->cnf);
++		}
++		rtnl_net_unlock(net);
 +	}
++
++	if (write)
++		WRITE_ONCE(*valp, new_val);
++	if (ret)
++		*ppos = pos;
++	return ret;
 +}
 +
- FIXTURE(ip_local_port_range) {};
+ static int minus_one = -1;
+ static const int two_five_five = 255;
+ static u32 ioam6_if_id_max = U16_MAX;
+@@ -7217,6 +7301,13 @@ static const struct ctl_table addrconf_sysctl[] = {
+ 		.extra1		= SYSCTL_ZERO,
+ 		.extra2		= SYSCTL_TWO,
+ 	},
++	{
++		.procname	= "force_forwarding",
++		.data		= &ipv6_devconf.force_forwarding,
++		.maxlen		= sizeof(int),
++		.mode		= 0644,
++		.proc_handler	= addrconf_sysctl_force_forwarding,
++	},
+ };
  
- FIXTURE_SETUP(ip_local_port_range)
-@@ -460,4 +545,444 @@ TEST_F(ip_local_port_range, get_port_range)
- 	ASSERT_TRUE(!err) TH_LOG("close failed");
- }
+ static int __addrconf_sysctl_register(struct net *net, char *dev_name,
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index 7bd29a9ff0db..440b9efced72 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -509,7 +509,8 @@ int ip6_forward(struct sk_buff *skb)
+ 	u32 mtu;
  
-+FIXTURE(tcp_port_reuse__no_ip_conflict) {};
-+FIXTURE_SETUP(tcp_port_reuse__no_ip_conflict) {}
-+FIXTURE_TEARDOWN(tcp_port_reuse__no_ip_conflict) {}
-+
-+FIXTURE_VARIANT(tcp_port_reuse__no_ip_conflict) {
-+	int af_one;
-+	const char *ip_one;
-+	int af_two;
-+	const char *ip_two;
-+};
-+
-+FIXTURE_VARIANT_ADD(tcp_port_reuse__no_ip_conflict, ipv4) {
-+	.af_one = AF_INET,
-+	.ip_one = "127.0.0.1",
-+	.af_two = AF_INET,
-+	.ip_two = "127.0.0.2",
-+};
-+
-+FIXTURE_VARIANT_ADD(tcp_port_reuse__no_ip_conflict, ipv6_v4mapped) {
-+	.af_one = AF_INET6,
-+	.ip_one = "::ffff:127.0.0.1",
-+	.af_two = AF_INET,
-+	.ip_two = "127.0.0.2",
-+};
-+
-+FIXTURE_VARIANT_ADD(tcp_port_reuse__no_ip_conflict, ipv6) {
-+	.af_one = AF_INET6,
-+	.ip_one = "2001:db8::1",
-+	.af_two = AF_INET6,
-+	.ip_two = "2001:db8::2",
-+};
-+
-+/* Check that a connected socket, which is using IP_LOCAL_PORT_RANGE to relax
-+ * port search restrictions at connect() time, can share a local port with a
-+ * listening socket bound to a different IP.
-+ */
-+TEST_F(tcp_port_reuse__no_ip_conflict, share_port_with_listening_socket)
-+{
-+	const typeof(variant) v = variant;
-+	struct sockaddr_inet addr;
-+	__close_fd int ln = -1;
-+	__close_fd int c = -1;
-+	__close_fd int p = -1;
-+	__u32 range;
-+	int r;
-+
-+	/* Listen on <ip one>:40000 */
-+	ln = socket(v->af_one, SOCK_STREAM, 0);
-+	ASSERT_GE(ln, 0) TH_LOG("socket");
-+
-+	r = setsockopt(ln, SOL_SOCKET, SO_REUSEADDR, &ONE, sizeof(ONE));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(SO_REUSEADDR)");
-+
-+	make_inet_addr(v->af_one, v->ip_one, 40000, &addr);
-+	r = bind(ln, &addr.sa, addr.len);
-+	ASSERT_EQ(r, 0) TH_LOG("bind(<ip_one>:40000)");
-+
-+	r = listen(ln, 1);
-+	ASSERT_EQ(r, 0) TH_LOG("listen");
-+
-+	/* Connect from <ip two>:40000 to <ip one>:40000 */
-+	c = socket(v->af_two, SOCK_STREAM, 0);
-+	ASSERT_GE(c, 0) TH_LOG("socket");
-+
-+	r = setsockopt(c, SOL_IP, IP_BIND_ADDRESS_NO_PORT, &ONE, sizeof(ONE));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_BIND_ADDRESS_NO_PORT)");
-+
-+	range = pack_port_range(40000, 40000);
-+	r = setsockopt(c, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE)");
-+
-+	make_inet_addr(v->af_two, v->ip_two, 0, &addr);
-+	r = bind(c, &addr.sa, addr.len);
-+	ASSERT_EQ(r, 0) TH_LOG("bind(<ip_two>:0)");
-+
-+	make_inet_addr(v->af_one, v->ip_one, 40000, &addr);
-+	if (is_v4mapped(&addr))
-+		v4mapped_to_ipv4(&addr);
-+	r = connect(c, &addr.sa, addr.len);
-+	EXPECT_EQ(r, 0) TH_LOG("connect(<ip_one>:40000)");
-+	EXPECT_EQ(get_sock_port(c), 40000);
-+}
-+
-+/* Check that a connected socket, which is using IP_LOCAL_PORT_RANGE to relax
-+ * port search restrictions at connect() time, can share a local port with
-+ * another connected socket bound to a different IP without
-+ * IP_BIND_ADDRESS_NO_PORT enabled.
-+ */
-+TEST_F(tcp_port_reuse__no_ip_conflict, share_port_with_connected_socket)
-+{
-+	const typeof(variant) v = variant;
-+	struct sockaddr_inet dst = {};
-+	struct sockaddr_inet src = {};
-+	__close_fd int ln = -1;
-+	__close_fd int c1 = -1;
-+	__close_fd int c2 = -1;
-+	__u32 range;
-+	__u16 port;
-+	int r;
-+
-+	/* Listen on wildcard. Same family as <ip_two>. */
-+	ln = socket(v->af_two, SOCK_STREAM, 0);
-+	ASSERT_GE(ln, 0) TH_LOG("socket");
-+
-+	r = setsockopt(ln, SOL_SOCKET, SO_REUSEADDR, &ONE, sizeof(ONE));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(SO_REUSEADDR");
-+
-+	r = listen(ln, 2);
-+	ASSERT_EQ(r, 0) TH_LOG("listen");
-+
-+	dst.len = sizeof(dst.ss);
-+	r = getsockname(ln, &dst.sa, &dst.len);
-+	ASSERT_EQ(r, 0) TH_LOG("getsockname");
-+
-+	/* Connect from <ip one> but without IP_BIND_ADDRESS_NO_PORT */
-+	c1 = socket(v->af_one, SOCK_STREAM, 0);
-+	ASSERT_GE(c1, 0) TH_LOG("socket");
-+
-+	make_inet_addr(v->af_one, v->ip_one, 0, &src);
-+	r = bind(c1, &src.sa, src.len);
-+	ASSERT_EQ(r, 0) TH_LOG("bind");
-+
-+	if (src.sa.sa_family == AF_INET6 && dst.sa.sa_family == AF_INET)
-+		ipv4_to_v4mapped(&dst);
-+	r = connect(c1, &dst.sa, dst.len);
-+	ASSERT_EQ(r, 0) TH_LOG("connect");
-+
-+	src.len = sizeof(src.ss);
-+	r = getsockname(c1, &src.sa, &src.len);
-+	ASSERT_EQ(r, 0) TH_LOG("getsockname");
-+
-+	/* Connect from <ip two>:<c1 port> with IP_BIND_ADDRESS_NO_PORT */
-+	c2 = socket(v->af_two, SOCK_STREAM, 0);
-+	ASSERT_GE(c2, 0) TH_LOG("socket");
-+
-+	r = setsockopt(c2, SOL_IP, IP_BIND_ADDRESS_NO_PORT, &ONE, sizeof(ONE));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_BIND_ADDRESS_NO_PORT)");
-+
-+	port = inet_port(&src);
-+	range = pack_port_range(port, port);
-+	r = setsockopt(c2, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE)");
-+
-+	make_inet_addr(v->af_two, v->ip_two, 0, &src);
-+	r = bind(c2, &src.sa, src.len);
-+	ASSERT_EQ(r, 0) TH_LOG("bind");
-+
-+	if (is_v4mapped(&dst))
-+		v4mapped_to_ipv4(&dst);
-+	r = connect(c2, &dst.sa, dst.len);
-+	EXPECT_EQ(r, 0) TH_LOG("connect");
-+	EXPECT_EQ(get_sock_port(c2), port);
-+}
-+
-+/* Check that a connected socket, which is using IP_LOCAL_PORT_RANGE to relax
-+ * port search restrictions at connect() time, can share a local port with an
-+ * IPv6 wildcard socket which is not dualstack (v6-only).
-+ */
-+TEST(tcp_port_reuse__no_ip_conflict_wildcard_v6only)
-+{
-+	struct sockaddr_inet addr;
-+	__close_fd int ln4 = -1;
-+	__close_fd int ln6 = -1;
-+	__close_fd int c = -1;
-+	__u32 range;
-+	int r;
-+
-+	/* Listen on [::]:40000 (v6only) */
-+	ln6 = socket(AF_INET6, SOCK_STREAM, 0);
-+	ASSERT_GE(ln6, 0) TH_LOG("socket");
-+
-+	r = setsockopt(ln6, SOL_SOCKET, SO_REUSEADDR, &ONE, sizeof(ONE));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(SO_REUSEADDR)");
-+
-+	r = setsockopt(ln6, IPPROTO_IPV6, IPV6_V6ONLY, &ONE, sizeof(ONE));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IPV6_V6ONLY)");
-+
-+	make_inet_addr(AF_INET6, "::", 40000, &addr);
-+	r = bind(ln6, &addr.sa, addr.len);
-+	ASSERT_EQ(r, 0) TH_LOG("bind([::]:40000)");
-+
-+	r = listen(ln6, 1);
-+	ASSERT_EQ(r, 0) TH_LOG("listen");
-+
-+	/* Listen on 127.0.0.1:30000 */
-+	ln4 = socket(AF_INET, SOCK_STREAM, 0);
-+	ASSERT_GE(ln4, 0) TH_LOG("socket");
-+
-+	r = setsockopt(ln4, SOL_SOCKET, SO_REUSEADDR, &ONE, sizeof(ONE));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(SO_REUSEADDR)");
-+
-+	make_inet_addr(AF_INET, "127.0.0.1", 30000, &addr);
-+	r = bind(ln4, &addr.sa, addr.len);
-+	ASSERT_EQ(r, 0) TH_LOG("bind(127.0.0.1:30000)");
-+
-+	r = listen(ln4, 1);
-+	ASSERT_EQ(r, 0) TH_LOG("listen");
-+
-+	/* Connect from 127.0.0.1:40000 to 127.0.0.1:30000*/
-+	c = socket(AF_INET, SOCK_STREAM, 0);
-+	ASSERT_GE(c, 0) TH_LOG("socket");
-+
-+	range = pack_port_range(40000, 40000);
-+	r = setsockopt(c, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE)");
-+
-+	r = connect(c, &addr.sa, addr.len);
-+	EXPECT_EQ(r, 0) TH_LOG("connect(127.0.0.1:30000)");
-+	EXPECT_EQ(get_sock_port(c), 40000);
-+}
-+
-+/* Check that two sockets can share the local IP and the ephemeral port when the
-+ * destination address differs.
-+ */
-+TEST(tcp_port_reuse__no_ip_conflict_with_unique_dst)
-+{
-+	struct sockaddr_inet addr;
-+	__close_fd int ln = -1;
-+	__close_fd int c1 = -1;
-+	__close_fd int c2 = -1;
-+	__u32 range;
-+	int r;
-+
-+	/* Listen on 0.0.0.0:30000 */
-+	ln = socket(AF_INET, SOCK_STREAM, 0);
-+	ASSERT_GE(ln, 0) TH_LOG("socket");
-+
-+	r = setsockopt(ln, SOL_SOCKET, SO_REUSEADDR, &ONE, sizeof(ONE));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(SO_REUSEADDR)");
-+
-+	make_inet_addr(AF_INET, "0.0.0.0", 30000, &addr);
-+	r = bind(ln, &addr.sa, addr.len);
-+	ASSERT_EQ(r, 0) TH_LOG("bind");
-+
-+	r = listen(ln, 2);
-+	ASSERT_EQ(r, 0) TH_LOG("listen");
-+
-+	/* Connect from 127.0.0.1:40000 to 127.1.1.1:30000 */
-+	c1 = socket(AF_INET, SOCK_STREAM, 0);
-+	ASSERT_GE(c1, 0) TH_LOG("socket");
-+
-+	range = pack_port_range(40000, 40000);
-+	r = setsockopt(c1, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE)");
-+
-+	make_inet_addr(AF_INET, "127.1.1.1", 30000, &addr);
-+	r = connect(c1, &addr.sa, addr.len);
-+	ASSERT_EQ(r, 0) TH_LOG("connect(127.1.1.1:30000)");
-+	ASSERT_EQ(get_sock_port(c1), 40000);
-+
-+	/* Connect from 127.0.0.1:40000 to 127.2.2.2:30000 */
-+	c2 = socket(AF_INET, SOCK_STREAM, 0);
-+	ASSERT_GE(c2, 0) TH_LOG("socket");
-+
-+	range = pack_port_range(40000, 40000);
-+	r = setsockopt(c2, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE)");
-+
-+	make_inet_addr(AF_INET, "127.2.2.2", 30000, &addr);
-+	r = connect(c2, &addr.sa, addr.len);
-+	EXPECT_EQ(r, 0) TH_LOG("connect(127.1.1.1:30000)");
-+	EXPECT_EQ(get_sock_port(c2), 40000);
-+}
-+
-+FIXTURE(tcp_port_reuse__ip_conflict) {};
-+FIXTURE_SETUP(tcp_port_reuse__ip_conflict) {}
-+FIXTURE_TEARDOWN(tcp_port_reuse__ip_conflict) {}
-+
-+FIXTURE_VARIANT(tcp_port_reuse__ip_conflict) {
-+	int af_one;
-+	const char *ip_one;
-+	int af_two;
-+	const char *ip_two;
-+};
-+
-+FIXTURE_VARIANT_ADD(tcp_port_reuse__ip_conflict, ipv4) {
-+	.af_one = AF_INET,
-+	.ip_one = "127.0.0.1",
-+	.af_two = AF_INET,
-+	.ip_two = "127.0.0.1",
-+};
-+
-+FIXTURE_VARIANT_ADD(tcp_port_reuse__ip_conflict, ipv6_v4mapped) {
-+	.af_one = AF_INET6,
-+	.ip_one = "::ffff:127.0.0.1",
-+	.af_two = AF_INET,
-+	.ip_two = "127.0.0.1",
-+};
-+
-+FIXTURE_VARIANT_ADD(tcp_port_reuse__ip_conflict, ipv6) {
-+	.af_one = AF_INET6,
-+	.ip_one = "2001:db8::1",
-+	.af_two = AF_INET6,
-+	.ip_two = "2001:db8::1",
-+};
-+
-+FIXTURE_VARIANT_ADD(tcp_port_reuse__ip_conflict, ipv4_wildcard) {
-+	.af_one = AF_INET,
-+	.ip_one = "0.0.0.0",
-+	.af_two = AF_INET,
-+	.ip_two = "127.0.0.1",
-+};
-+
-+FIXTURE_VARIANT_ADD(tcp_port_reuse__ip_conflict, ipv6_v4mapped_wildcard) {
-+	.af_one = AF_INET6,
-+	.ip_one = "::ffff:0.0.0.0",
-+	.af_two = AF_INET,
-+	.ip_two = "127.0.0.1",
-+};
-+
-+FIXTURE_VARIANT_ADD(tcp_port_reuse__ip_conflict, ipv6_wildcard) {
-+	.af_one = AF_INET6,
-+	.ip_one = "::",
-+	.af_two = AF_INET6,
-+	.ip_two = "2001:db8::1",
-+};
-+
-+FIXTURE_VARIANT_ADD(tcp_port_reuse__ip_conflict, dualstack_wildcard) {
-+	.af_one = AF_INET6,
-+	.ip_one = "::",
-+	.af_two = AF_INET6,
-+	.ip_two = "127.0.0.1",
-+};
-+
-+/* Check that a socket, which using IP_LOCAL_PORT_RANGE to relax local port
-+ * search restrictions at connect() time, can't share a local port with a
-+ * listening socket when there is IP address conflict.
-+ */
-+TEST_F(tcp_port_reuse__ip_conflict, cannot_share_port)
-+{
-+	const typeof(variant) v = variant;
-+	struct sockaddr_inet dst, src;
-+	__close_fd int ln = -1;
-+	__close_fd int c = -1;
-+	__u32 range;
-+	int r;
-+
-+	/* Listen on <ip_one>:40000 */
-+	ln = socket(v->af_one, SOCK_STREAM, 0);
-+	ASSERT_GE(ln, 0) TH_LOG("socket");
-+
-+	r = setsockopt(ln, SOL_SOCKET, SO_REUSEADDR, &ONE, sizeof(ONE));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(SO_REUSEADDR)");
-+
-+	make_inet_addr(v->af_one, v->ip_one, 40000, &dst);
-+	r = bind(ln, &dst.sa, dst.len);
-+	ASSERT_EQ(r, 0) TH_LOG("bind(<ip_one>:40000)");
-+
-+	r = listen(ln, 1);
-+	ASSERT_EQ(r, 0) TH_LOG("listen");
-+
-+	/* Attempt to connect from <ip two>:40000 */
-+	c = socket(v->af_two, SOCK_STREAM, 0);
-+	ASSERT_GE(c, 0) TH_LOG("socket");
-+
-+	r = setsockopt(c, SOL_IP, IP_BIND_ADDRESS_NO_PORT, &ONE, sizeof(ONE));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_BIND_ADDRESS_NO_PORT)");
-+
-+	range = pack_port_range(40000, 40000);
-+	r = setsockopt(c, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE)");
-+
-+	make_inet_addr(v->af_two, v->ip_two, 0, &src);
-+	r = bind(c, &src.sa, src.len);
-+	ASSERT_EQ(r, 0) TH_LOG("bind(<ip_two>:40000)");
-+
-+	if (is_v4mapped(&dst))
-+		v4mapped_to_ipv4(&dst);
-+	r = connect(c, &dst.sa, dst.len);
-+	EXPECT_EQ(r, -1) TH_LOG("connect(*:40000)");
-+	EXPECT_EQ(errno, EADDRNOTAVAIL);
-+}
-+
-+/* Demonstrate that a local IP and port can't be shared any more, even when the
-+ * remote address is unique, after explicitly binding to that port.
-+ */
-+TEST(tcp_port_reuse__ip_port_conflict_with_unique_dst_after_bind)
-+{
-+	struct sockaddr_inet addr;
-+	__close_fd int ln = -1;
-+	__close_fd int c1 = -1;
-+	__close_fd int c2 = -1;
-+	__u32 range;
-+	int s, r;
-+
-+	/* Listen on 0.0.0.0:30000 */
-+	ln = socket(AF_INET, SOCK_STREAM, 0);
-+	ASSERT_GE(ln, 0) TH_LOG("socket");
-+
-+	r = setsockopt(ln, SOL_SOCKET, SO_REUSEADDR, &ONE, sizeof(ONE));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(SO_REUSEADDR)");
-+
-+	make_inet_addr(AF_INET, "0.0.0.0", 30000, &addr);
-+	r = bind(ln, &addr.sa, addr.len);
-+	ASSERT_EQ(r, 0) TH_LOG("bind(0.0.0.0:30000)");
-+
-+	r = listen(ln, 2);
-+	ASSERT_EQ(r, 0) TH_LOG("listen");
-+
-+	/* Connect from 127.0.0.1:40000 to 127.1.1.1:30000 */
-+	c1 = socket(AF_INET, SOCK_STREAM, 0);
-+	ASSERT_GE(c1, 0) TH_LOG("socket");
-+
-+	range = pack_port_range(40000, 40000);
-+	r = setsockopt(c1, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE)");
-+
-+	make_inet_addr(AF_INET, "127.1.1.1", 30000, &addr);
-+	r = connect(c1, &addr.sa, addr.len);
-+	ASSERT_EQ(r, 0) TH_LOG("connect(127.1.1.1:30000)");
-+	ASSERT_EQ(get_sock_port(c1), 40000);
-+
-+	/* Block the port. Bind to 127.9.9.9:40000 and unbind immediately */
-+	s = socket(AF_INET, SOCK_STREAM, 0);
-+	ASSERT_GE(s, 0) TH_LOG("socket");
-+
-+	r = setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &ONE, sizeof(ONE));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(SO_REUSEADDR)");
-+
-+	make_inet_addr(AF_INET, "127.9.9.9", 40000, &addr);
-+	r = bind(s, &addr.sa, addr.len);
-+	ASSERT_EQ(r, 0) TH_LOG("bind(127.9.9.9:40000)");
-+
-+	r = close(s);
-+	ASSERT_EQ(r, 0) TH_LOG("close");
-+
-+	/* Connect from 127.0.0.1:40000 to 127.2.2.2:30000 */
-+	c2 = socket(AF_INET, SOCK_STREAM, 0);
-+	ASSERT_GE(c2, 0) TH_LOG("socket");
-+
-+	range = pack_port_range(40000, 40000);
-+	r = setsockopt(c2, SOL_IP, IP_LOCAL_PORT_RANGE, &range, sizeof(range));
-+	ASSERT_EQ(r, 0) TH_LOG("setsockopt(IP_LOCAL_PORT_RANGE)");
-+
-+	make_inet_addr(AF_INET, "127.2.2.2", 30000, &addr);
-+	r = connect(c2, &addr.sa, addr.len);
-+	EXPECT_EQ(r, -1) TH_LOG("connect(127.1.1.1:30000)");
-+	EXPECT_EQ(errno, EADDRNOTAVAIL);
-+}
-+
- TEST_HARNESS_MAIN
-diff --git a/tools/testing/selftests/net/ip_local_port_range.sh b/tools/testing/selftests/net/ip_local_port_range.sh
-index 4ff746db1256..3fc151545b2d 100755
---- a/tools/testing/selftests/net/ip_local_port_range.sh
-+++ b/tools/testing/selftests/net/ip_local_port_range.sh
-@@ -1,7 +1,11 @@
--#!/bin/sh
+ 	idev = __in6_dev_get_safely(dev_get_by_index_rcu(net, IP6CB(skb)->iif));
+-	if (READ_ONCE(net->ipv6.devconf_all->forwarding) == 0)
++	if (idev && !READ_ONCE(idev->cnf.force_forwarding) &&
++	    !READ_ONCE(net->ipv6.devconf_all->forwarding))
+ 		goto error;
+ 
+ 	if (skb->pkt_type != PACKET_HOST)
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index 332f387615d7..f64ec8a15a77 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -112,6 +112,7 @@ TEST_PROGS += skf_net_off.sh
+ TEST_GEN_FILES += skf_net_off
+ TEST_GEN_FILES += tfo
+ TEST_PROGS += tfo_passive.sh
++TEST_PROGS += ipv6_force_forwarding.sh
+ 
+ # YNL files, must be before "include ..lib.mk"
+ YNL_GEN_FILES := busy_poller netlink-dumps
+diff --git a/tools/testing/selftests/net/ipv6_force_forwarding.sh b/tools/testing/selftests/net/ipv6_force_forwarding.sh
+new file mode 100644
+index 000000000000..62adc9d4afc9
+--- /dev/null
++++ b/tools/testing/selftests/net/ipv6_force_forwarding.sh
+@@ -0,0 +1,105 @@
 +#!/bin/bash
- # SPDX-License-Identifier: GPL-2.0
- 
--./in_netns.sh \
--  sh -c 'sysctl -q -w net.mptcp.enabled=1 && \
--         sysctl -q -w net.ipv4.ip_local_port_range="40000 49999" && \
--         ./ip_local_port_range'
-+./in_netns.sh sh <(cat <<-EOF
-+        sysctl -q -w net.mptcp.enabled=1
-+        sysctl -q -w net.ipv4.ip_local_port_range="40000 49999"
-+        ip -6 addr add dev lo 2001:db8::1/32 nodad
-+        ip -6 addr add dev lo 2001:db8::2/32 nodad
-+        exec ./ip_local_port_range
-+EOF
-+)
-
++# SPDX-License-Identifier: GPL-2.0
++#
++# Test IPv6 force_forwarding interface property
++#
++# This test verifies that the force_forwarding property works correctly:
++# - When global forwarding is disabled, packets are not forwarded normally
++# - When force_forwarding is enabled on an interface, packets are forwarded
++#   regardless of the global forwarding setting
++
++source lib.sh
++
++cleanup() {
++    cleanup_ns $ns1 $ns2 $ns3
++}
++
++trap cleanup EXIT
++
++setup_test() {
++    # Create three namespaces: sender, router, receiver
++    setup_ns ns1 ns2 ns3
++
++    # Create veth pairs: ns1 <-> ns2 <-> ns3
++    ip link add name veth12 type veth peer name veth21
++    ip link add name veth23 type veth peer name veth32
++
++    # Move interfaces to namespaces
++    ip link set veth12 netns $ns1
++    ip link set veth21 netns $ns2
++    ip link set veth23 netns $ns2
++    ip link set veth32 netns $ns3
++
++    # Configure interfaces
++    ip -n $ns1 addr add 2001:db8:1::1/64 dev veth12
++    ip -n $ns2 addr add 2001:db8:1::2/64 dev veth21
++    ip -n $ns2 addr add 2001:db8:2::1/64 dev veth23
++    ip -n $ns3 addr add 2001:db8:2::2/64 dev veth32
++
++    # Bring up interfaces
++    ip -n $ns1 link set veth12 up
++    ip -n $ns2 link set veth21 up
++    ip -n $ns2 link set veth23 up
++    ip -n $ns3 link set veth32 up
++
++    # Add routes
++    ip -n $ns1 route add 2001:db8:2::/64 via 2001:db8:1::2
++    ip -n $ns3 route add 2001:db8:1::/64 via 2001:db8:2::1
++
++    # Disable global forwarding
++    ip netns exec $ns2 sysctl -qw net.ipv6.conf.all.forwarding=0
++}
++
++test_force_forwarding() {
++    local ret=0
++
++    echo "TEST: force_forwarding functionality"
++
++    # Check if force_forwarding sysctl exists
++    if ! ip netns exec $ns2 test -f /proc/sys/net/ipv6/conf/veth21/force_forwarding; then
++        echo "SKIP: force_forwarding not available"
++        return $ksft_skip
++    fi
++
++    # Test 1: Without force_forwarding, ping should fail
++    ip netns exec $ns2 sysctl -qw net.ipv6.conf.veth21.force_forwarding=0
++    ip netns exec $ns2 sysctl -qw net.ipv6.conf.veth23.force_forwarding=0
++
++    if ip netns exec $ns1 ping -6 -c 1 -W 2 2001:db8:2::2 &>/dev/null; then
++        echo "FAIL: ping succeeded when forwarding disabled"
++        ret=1
++    else
++        echo "PASS: forwarding disabled correctly"
++    fi
++
++    # Test 2: With force_forwarding enabled, ping should succeed
++    ip netns exec $ns2 sysctl -qw net.ipv6.conf.veth21.force_forwarding=1
++    ip netns exec $ns2 sysctl -qw net.ipv6.conf.veth23.force_forwarding=1
++
++    if ip netns exec $ns1 ping -6 -c 1 -W 2 2001:db8:2::2 &>/dev/null; then
++        echo "PASS: force_forwarding enabled forwarding"
++    else
++        echo "FAIL: ping failed with force_forwarding enabled"
++        ret=1
++    fi
++
++    return $ret
++}
++
++echo "IPv6 force_forwarding test"
++echo "=========================="
++
++setup_test
++test_force_forwarding
++ret=$?
++
++if [ $ret -eq 0 ]; then
++    echo "OK"
++    exit 0
++elif [ $ret -eq $ksft_skip ]; then
++    echo "SKIP"
++    exit $ksft_skip
++else
++    echo "FAIL"
++    exit 1
++fi
 -- 
-2.43.0
+2.39.5
+
 
 
