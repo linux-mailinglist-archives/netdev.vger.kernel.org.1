@@ -1,218 +1,315 @@
-Return-Path: <netdev+bounces-203851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77EE9AF77A9
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 16:35:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E46DAF7885
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 16:51:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 429BE188A523
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 14:36:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D3FE7A23F0
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 14:50:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943E12EE272;
-	Thu,  3 Jul 2025 14:35:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0007B2EF9B0;
+	Thu,  3 Jul 2025 14:50:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="mm7u7nOB";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="tki+ADtY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QxwRstni"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2BDF2E7F17;
-	Thu,  3 Jul 2025 14:35:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A48D2EE276;
+	Thu,  3 Jul 2025 14:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751553331; cv=none; b=f1osKueSQmtpoomBsWD+AAuG2UwCHwZYHj+WdVFxdtqwaVgmqG6Q50tpptKWsMhShNk8Uicc4bBteGIBjzvKPIui70rUodEjY3dBrLqIaQ93hurIPN2QS8PGlZs1mfAicgaSMNg6ZeAMoNiQ+lTpOu8TPGeh3dcRYVHC9OLoAlo=
+	t=1751554255; cv=none; b=PL7nHdrEAxoEoUS4DIJwzwCQba/ajZDl1By5u/BC64xlQrDp0WdGmTAruoFN7sblC3DhoXK/cLOSS21bKj9dK+9HWWSUHwKDdhQxcmzxPCqncXAu+Sdxnm2/grt8FjFhF0GrsDMOLA1rWJpRuUGyy1lEyLuwrEl4ILjw4sAtAKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751553331; c=relaxed/simple;
-	bh=UYKs9e+7rT8OaW3Pom+V6nrry0GZ8fJqGxzsMTbQc0c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aT2pcdjyROh/pDXPA+sZCEhSAwWA/8SZOEWGokWHN+9nt7PoOXV7gp8dCQtTjHPWU01Kxw9QMhVnsmPiRDObiffm3MoMA9HbreDrYQ2Mv+i1vyXuKGtwiOEs4PjApZpOO8ZF2HIkUIYDaK0qNlSXaBzNvUkeM/E3clVkowJBxes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=mm7u7nOB; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=tki+ADtY; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 4A97560273; Thu,  3 Jul 2025 16:35:27 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1751553327;
-	bh=fML8uwElPkd6qxwr1E07cLSyoYRRPrLAYboPkelEe+I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mm7u7nOBPNBBYBiE6993cSUDbBTfeLmkvvAOj7FWNOzlZHYLz+7ksyB6Xxg6LdkAZ
-	 DYKhlobwicgYcBZYEu1LZykOo3CathRe1ORJE7oRz7RHS61bDJMrOpUn2F3wVQ9HBD
-	 G8sXjkpwZw4zXPk9DgalJdoNBwu1HKSjzbk+2yntZb9dasvM0EYqkU78ru+WWdQg4h
-	 xoPAO8yxvsXBNO96pfL0fowYbE4VofkpmbbcFTm2EBZfuvVrUWr3fwWR2JJoklVl3v
-	 ZS3DZlK0XGZk3CFYxPLn+jxnu1vIoWm6HNw3ve66ycK4KnVomCkH19LO58LEFbQM/d
-	 NEilgtH+uXbIA==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 4098360273;
-	Thu,  3 Jul 2025 16:35:24 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1751553324;
-	bh=fML8uwElPkd6qxwr1E07cLSyoYRRPrLAYboPkelEe+I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tki+ADtYcwDtsXH58SZ70wnGBCZ7PSJdLRaGzN/F54T2k/4XKoFPWQATln6Q+MCw0
-	 IYN+H9i+2zm0Dtj2iA0EWoMNABC3hJfR5PHDG0JWpO4yptou5SfbPvuBmqjVYuiYDS
-	 jxa/1OtlUGWPepr23jrOug7nfNQSSQclQLfZ7oeLoY4rigGS2rsvHz7f/YFI7eqTdO
-	 esXCVf8nzpGJsYdbJTjvrxOYB2eL4PqsvJhDtMvWCYLQCVUEmlEiqV683TnLetAYyu
-	 ezRG5B+ZJXJKmCYZ4nZRPxWOgqaOIJKRV6X5tKlTBz3bHD8WfujK+jMrUCaSXbSl/v
-	 xppGvxlHCGSOg==
-Date: Thu, 3 Jul 2025 16:35:21 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH nf-next v3 1/2] net: netfilter: Add IPIP flowtable SW
- acceleration
-Message-ID: <aGaVKWKOKj1a-eG1@calendula>
-References: <20250703-nf-flowtable-ipip-v3-0-880afd319b9f@kernel.org>
- <20250703-nf-flowtable-ipip-v3-1-880afd319b9f@kernel.org>
+	s=arc-20240116; t=1751554255; c=relaxed/simple;
+	bh=+aYImCSAbfTWXumNGDL/e1sBgqJjefwWyiKtXXrLJ30=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Z+dV8KDoF6zjdUm04M7yBCox9FEfS8286eGPM5eEaxNIQ4BuEkT7KWgMEy6cyts/chJGIWxW59BjVVixUp57s/3SmFngRb+FedQ66WRbuGC0MUQWI8YGzstnRYJt86FskkRxDjjpl0QAluTBpPFDAQUj7za06JHZRq7t9zFTm5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QxwRstni; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-313f68bc519so61803a91.0;
+        Thu, 03 Jul 2025 07:50:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751554253; x=1752159053; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ghEtv2XWUrpnnDEqCRu2DJ1E3mdFA7WnrvN95ViKIAA=;
+        b=QxwRstniPqQWCFI2F/SjaSwmUXDDtYRY2KszeEicWxRLtG9buK9ZMcXNNYfLklWX5P
+         o7ZYVsBWjbOrdEXCPEB5NdQTjARoJg1JwMxEI4DLgKIzbxqFo4vL8dbUfgWNeH7VrziJ
+         0vHXfE6Gzn6zOuoNbx0oSBVqIBOSrU+JxWsMPtgHticGFX4w7uyaLtutZRC9hHGYZrvQ
+         3C+8kLhNLwhaXnJX/JTBQpfHrHsGChK+jh6QfBwSM1vIb7vlHpWPeA+WKaj3KuYBEKd2
+         haamaT0xJPf70fxyFMkGnqYvSxYirkYq8aEFBY4g21gUcbrtoGbc32Y59csaaVeBayQ3
+         66mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751554253; x=1752159053;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ghEtv2XWUrpnnDEqCRu2DJ1E3mdFA7WnrvN95ViKIAA=;
+        b=MGOjlFUUvUNqgbp5pmYa7LlERZpSYJkkAfkO6A/oIUAAoYddW/eBNDCfzyNzgidl4G
+         Cbb08GdRPc9Yb+TPSe79rLUf73VkZUvX43k1h24U2iojiesQArIwSHFNBSHzdqpLEIBc
+         FNwu+QXFUimhoTn1mWpJnN8hKdXK2nzzo3A3t3l5ZBoocPEGA1UQcUaZtUlpaP6CmWCG
+         7RFDPpIHoTfVi0eqXcUyjtVlx970Mp1jKT37Laq0hvSmnTzBfHSwQdNPdcWER5tXk3bD
+         Fv0P8czU4j6D6Zw8a6eBER8QBoWe7/roRZU43oYDohNfig3U1nPIvHdqahqeIBr8BPJA
+         f0Rg==
+X-Forwarded-Encrypted: i=1; AJvYcCXrPjXLiVPcu52wvRUBLWPPkHg9G0WLej52MvH7HfoSwXyzPSyKAnrHLozi7ObgF2pAe6VU04U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBnzFKV052mv53yRi6R5SW3JYShursMJOxTLxIHoSMTXhLgur6
+	1M+jRlSq5g3GDhwhyDbHFLHBUpGjVn7289BfHqTiIJ8x69qxEWLJrgm7KCkEF/lvuQQ=
+X-Gm-Gg: ASbGncsd2ntwUndt4CYVF7R1i7SoJWDzCG5cKZdGFsNEQiM0SAvi2SzczDa4dM7O0kx
+	oWkWmfXDDmdgL+ArRvHYWQyKKI9efZeCf7xqDyoxGTVa1h7ymf9DGQ1jsw9bDiFYKj6doFSVc2/
+	43vjUus1RG7T6dZfrFlufOanRlryyRC6ua9mOEVCGDwkh7PYfSgnSO8nWqX8YDmJF7lBmr2x4M3
+	5H9K1x4hxgT33LzY/j9rcrmTjW2I9QXmpv1h3DcwD7PI2hiuxMg6KfsT9gOkqfQtWZFTwjnFScb
+	xK+5RzS0FarRO75lGro1VRJPNgZRfxNiJayaEuNwUFwhqz+08UhnEDp/WncZ/y57Zcy3bL8TPKM
+	WCnnMrUD0zSw5ma6nfjo1dQ==
+X-Google-Smtp-Source: AGHT+IGhJswT39ngCgnG/9BD0aLYPdBPbkL54kFaKYkRhq232pJllreyulhTAoJGGpb86oKgpVfTuQ==
+X-Received: by 2002:a17:90a:da8e:b0:311:ef19:824d with SMTP id 98e67ed59e1d1-31a90b1a29emr9816029a91.2.1751554253212;
+        Thu, 03 Jul 2025 07:50:53 -0700 (PDT)
+Received: from KERNELXING-MC1.tencent.com ([111.201.26.0])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31a9cd1acfcsm2633424a91.43.2025.07.03.07.50.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jul 2025 07:50:52 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	sdf@fomichev.me,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	joe@dama.to,
+	willemdebruijn.kernel@gmail.com
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next v7] net: xsk: introduce XDP_MAX_TX_SKB_BUDGET setsockopt
+Date: Thu,  3 Jul 2025 22:50:45 +0800
+Message-Id: <20250703145045.58271-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250703-nf-flowtable-ipip-v3-1-880afd319b9f@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jul 03, 2025 at 04:16:02PM +0200, Lorenzo Bianconi wrote:
-> Introduce SW acceleration for IPIP tunnels in the netfilter flowtable
-> infrastructure.
-> IPIP SW acceleration can be tested running the following scenario where
-> the traffic is forwarded between two NICs (eth0 and eth1) and an IPIP
-> tunnel is used to access a remote site (using eth1 as the underlay device):
+From: Jason Xing <kernelxing@tencent.com>
 
-Question below.
+This patch provides a setsockopt method to let applications leverage to
+adjust how many descs to be handled at most in one send syscall. It
+mitigates the situation where the default value (32) that is too small
+leads to higher frequency of triggering send syscall.
 
-> ETH0 -- TUN0 <==> ETH1 -- [IP network] -- TUN1 (192.168.100.2)
-> 
-> $ip addr show
-> 6: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
->     link/ether 00:00:22:33:11:55 brd ff:ff:ff:ff:ff:ff
->     inet 192.168.0.2/24 scope global eth0
->        valid_lft forever preferred_lft forever
-> 7: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
->     link/ether 00:11:22:33:11:55 brd ff:ff:ff:ff:ff:ff
->     inet 192.168.1.1/24 scope global eth1
->        valid_lft forever preferred_lft forever
-> 8: tun0@NONE: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1480 qdisc noqueue state UNKNOWN group default qlen 1000
->     link/ipip 192.168.1.1 peer 192.168.1.2
->     inet 192.168.100.1/24 scope global tun0
->        valid_lft forever preferred_lft forever
-> 
-> $ip route show
-> default via 192.168.100.2 dev tun0
-> 192.168.0.0/24 dev eth0 proto kernel scope link src 192.168.0.2
-> 192.168.1.0/24 dev eth1 proto kernel scope link src 192.168.1.1
-> 192.168.100.0/24 dev tun0 proto kernel scope link src 192.168.100.1
-> 
-> $nft list ruleset
-> table inet filter {
->         flowtable ft {
->                 hook ingress priority filter
->                 devices = { eth0, eth1 }
->         }
-> 
->         chain forward {
->                 type filter hook forward priority filter; policy accept;
->                 meta l4proto { tcp, udp } flow add @ft
->         }
-> }
-> 
-> Reproducing the scenario described above using veths I got the following
-> results:
-> - TCP stream transmitted into the IPIP tunnel:
->   - net-next:				~41Gbps
->   - net-next + IPIP flowtbale support:	~40Gbps
-                      ^^^^^^^^^
-no gain on tx side.
+Considering the prosperity/complexity the applications have, there is no
+absolutely ideal suggestion fitting all cases. So keep 32 as its default
+value like before.
 
-> - TCP stream received from the IPIP tunnel:
->   - net-next:				~35Gbps
->   - net-next + IPIP flowtbale support:	~49Gbps
-> 
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
->  net/ipv4/ipip.c                  | 21 +++++++++++++++++++++
->  net/netfilter/nf_flow_table_ip.c | 34 ++++++++++++++++++++++++++++++++--
->  2 files changed, 53 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/ipv4/ipip.c b/net/ipv4/ipip.c
-> index 3e03af073a1ccc3d7597a998a515b6cfdded40b5..05fb1c859170d74009d693bc8513183bdec3ff90 100644
-> --- a/net/ipv4/ipip.c
-> +++ b/net/ipv4/ipip.c
-> @@ -353,6 +353,26 @@ ipip_tunnel_ctl(struct net_device *dev, struct ip_tunnel_parm_kern *p, int cmd)
->  	return ip_tunnel_ctl(dev, p, cmd);
->  }
->  
-> +static int ipip_fill_forward_path(struct net_device_path_ctx *ctx,
-> +				  struct net_device_path *path)
-> +{
-> +	struct ip_tunnel *tunnel = netdev_priv(ctx->dev);
-> +	const struct iphdr *tiph = &tunnel->parms.iph;
-> +	struct rtable *rt;
-> +
-> +	rt = ip_route_output(dev_net(ctx->dev), tiph->daddr, 0, 0, 0,
-> +			     RT_SCOPE_UNIVERSE);
-> +	if (IS_ERR(rt))
-> +		return PTR_ERR(rt);
-> +
-> +	path->type = DEV_PATH_ETHERNET;
-> +	path->dev = ctx->dev;
-> +	ctx->dev = rt->dst.dev;
-> +	ip_rt_put(rt);
-> +
-> +	return 0;
-> +}
-> +
->  static const struct net_device_ops ipip_netdev_ops = {
->  	.ndo_init       = ipip_tunnel_init,
->  	.ndo_uninit     = ip_tunnel_uninit,
-> @@ -362,6 +382,7 @@ static const struct net_device_ops ipip_netdev_ops = {
->  	.ndo_get_stats64 = dev_get_tstats64,
->  	.ndo_get_iflink = ip_tunnel_get_iflink,
->  	.ndo_tunnel_ctl	= ipip_tunnel_ctl,
-> +	.ndo_fill_forward_path = ipip_fill_forward_path,
->  };
->  
->  #define IPIP_FEATURES (NETIF_F_SG |		\
-> diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
-> index 8cd4cf7ae21120f1057c4fce5aaca4e3152ae76d..6b55e00b1022f0a2b02d9bfd1bd34bb55c1b83f7 100644
-> --- a/net/netfilter/nf_flow_table_ip.c
-> +++ b/net/netfilter/nf_flow_table_ip.c
-> @@ -277,13 +277,37 @@ static unsigned int nf_flow_xmit_xfrm(struct sk_buff *skb,
->  	return NF_STOLEN;
->  }
->  
-> +static bool nf_flow_ip4_encap_proto(struct sk_buff *skb, u16 *size)
-> +{
-> +	struct iphdr *iph;
-> +
-> +	if (!pskb_may_pull(skb, sizeof(*iph)))
-> +		return false;
-> +
-> +	iph = (struct iphdr *)skb_network_header(skb);
-> +	*size = iph->ihl << 2;
-> +
-> +	if (ip_is_fragment(iph) || unlikely(ip_has_options(*size)))
-> +		return false;
-> +
-> +	if (iph->ttl <= 1)
-> +		return false;
-> +
-> +	return iph->protocol == IPPROTO_IPIP;
+The patch does the following things:
+- Add XDP_MAX_TX_SKB_BUDGET socket option.
+- Set max_tx_budget to 32 by default in the initialization phase as a
+  per-socket granular control.
+- Set the range of max_tx_budget as [32, xs->tx->nentries].
 
-Once the flow is in the flowtable, it is possible to inject traffic
-with forged outer IP header, this is only looking at the inner IP
-header.
+The idea behind this comes out of real workloads in production. We use a
+user-level stack with xsk support to accelerate sending packets and
+minimize triggering syscalls. When the packets are aggregated, it's not
+hard to hit the upper bound (namely, 32). The moment user-space stack
+fetches the -EAGAIN error number passed from sendto(), it will loop to try
+again until all the expected descs from tx ring are sent out to the driver.
+Enlarging the XDP_MAX_TX_SKB_BUDGET value contributes to less frequency of
+sendto() and higher throughput/PPS.
+
+Here is what I did in production, along with some numbers as follows:
+For one application I saw lately, I suggested using 128 as max_tx_budget
+because I saw two limitations without changing any default configuration:
+1) XDP_MAX_TX_SKB_BUDGET, 2) socket sndbuf which is 212992 decided by
+net.core.wmem_default. As to XDP_MAX_TX_SKB_BUDGET, the scenario behind
+this was I counted how many descs are transmitted to the driver at one
+time of sendto() based on [1] patch and then I calculated the
+possibility of hitting the upper bound. Finally I chose 128 as a
+suitable value because 1) it covers most of the cases, 2) a higher
+number would not bring evident results. After twisting the parameters,
+a stable improvement of around 4% for both PPS and throughput and less
+resources consumption were found to be observed by strace -c -p xxx:
+1) %time was decreased by 7.8%
+2) error counter was decreased from 18367 to 572
+
+[1]: https://lore.kernel.org/all/20250619093641.70700-1-kerneljasonxing@gmail.com/
+
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+v7
+Link: https://lore.kernel.org/all/20250627110121.73228-1-kerneljasonxing@gmail.com/
+1. use 'copy mode' in Doc
+2. move init of max_tx_budget to a proper position
+3. use the max value in the if condition in setsockopt
+4. change sockopt name to XDP_MAX_TX_SKB_BUDGET
+5. set MAX_PER_SOCKET_BUDGET to 32 instead of TX_BATCH_SIZE because they
+   have no correlation at all.
+
+v6
+Link: https://lore.kernel.org/all/20250625123527.98209-1-kerneljasonxing@gmail.com/
+1. use [32, xs->tx->nentries] range
+2. Since setsockopt may generate a different value, add getsockopt to help
+   application know what value takes effect finally.
+
+v5
+Link: https://lore.kernel.org/all/20250623021345.69211-1-kerneljasonxing@gmail.com/
+1. remove changes around zc mode
+
+v4
+Link: https://lore.kernel.org/all/20250619090440.65509-1-kerneljasonxing@gmail.com/
+1. remove getsockopt as it seems no real use case.
+2. adjust the position of max_tx_budget to make sure it stays with other
+read-most fields in one cacheline.
+3. set one as the lower bound of max_tx_budget
+4. add more descriptions/performance data in Doucmentation and commit message.
+
+V3
+Link: https://lore.kernel.org/all/20250618065553.96822-1-kerneljasonxing@gmail.com/
+1. use a per-socket control (suggested by Stanislav)
+2. unify both definitions into one
+3. support setsockopt and getsockopt
+4. add more description in commit message
+
+V2
+Link: https://lore.kernel.org/all/20250617002236.30557-1-kerneljasonxing@gmail.com/
+1. use a per-netns sysctl knob
+2. use sysctl_xsk_max_tx_budget to unify both definitions.
+---
+ Documentation/networking/af_xdp.rst |  9 +++++++++
+ include/net/xdp_sock.h              |  1 +
+ include/uapi/linux/if_xdp.h         |  1 +
+ net/xdp/xsk.c                       | 21 +++++++++++++++++++--
+ tools/include/uapi/linux/if_xdp.h   |  1 +
+ 5 files changed, 31 insertions(+), 2 deletions(-)
+
+diff --git a/Documentation/networking/af_xdp.rst b/Documentation/networking/af_xdp.rst
+index dceeb0d763aa..95ff1836e5c6 100644
+--- a/Documentation/networking/af_xdp.rst
++++ b/Documentation/networking/af_xdp.rst
+@@ -442,6 +442,15 @@ is created by a privileged process and passed to a non-privileged one.
+ Once the option is set, kernel will refuse attempts to bind that socket
+ to a different interface.  Updating the value requires CAP_NET_RAW.
+ 
++XDP_MAX_TX_SKB_BUDGET setsockopt
++----------------------------
++
++This setsockopt sets the maximum number of descriptors that can be handled
++and passed to the driver at one send syscall. It is applied in the copy
++mode to allow application to tune the per-socket maximum iteration for
++better throughput and less frequency of send syscall.
++Allowed range is [32, xs->tx->nentries].
++
+ XDP_STATISTICS getsockopt
+ -------------------------
+ 
+diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
+index e8bd6ddb7b12..ce587a225661 100644
+--- a/include/net/xdp_sock.h
++++ b/include/net/xdp_sock.h
+@@ -84,6 +84,7 @@ struct xdp_sock {
+ 	struct list_head map_list;
+ 	/* Protects map_list */
+ 	spinlock_t map_list_lock;
++	u32 max_tx_budget;
+ 	/* Protects multiple processes in the control path */
+ 	struct mutex mutex;
+ 	struct xsk_queue *fq_tmp; /* Only as tmp storage before bind */
+diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xdp.h
+index 44f2bb93e7e6..23a062781468 100644
+--- a/include/uapi/linux/if_xdp.h
++++ b/include/uapi/linux/if_xdp.h
+@@ -79,6 +79,7 @@ struct xdp_mmap_offsets {
+ #define XDP_UMEM_COMPLETION_RING	6
+ #define XDP_STATISTICS			7
+ #define XDP_OPTIONS			8
++#define XDP_MAX_TX_SKB_BUDGET		9
+ 
+ struct xdp_umem_reg {
+ 	__u64 addr; /* Start of packet data area */
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index 72c000c0ae5f..07ee585bec7a 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -34,7 +34,7 @@
+ #include "xsk.h"
+ 
+ #define TX_BATCH_SIZE 32
+-#define MAX_PER_SOCKET_BUDGET (TX_BATCH_SIZE)
++#define MAX_PER_SOCKET_BUDGET 32
+ 
+ void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool)
+ {
+@@ -779,7 +779,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ static int __xsk_generic_xmit(struct sock *sk)
+ {
+ 	struct xdp_sock *xs = xdp_sk(sk);
+-	u32 max_batch = TX_BATCH_SIZE;
++	u32 max_batch;
+ 	bool sent_frame = false;
+ 	struct xdp_desc desc;
+ 	struct sk_buff *skb;
+@@ -796,6 +796,7 @@ static int __xsk_generic_xmit(struct sock *sk)
+ 	if (xs->queue_id >= xs->dev->real_num_tx_queues)
+ 		goto out;
+ 
++	max_batch = READ_ONCE(xs->max_tx_budget);
+ 	while (xskq_cons_peek_desc(xs->tx, &desc, xs->pool)) {
+ 		if (max_batch-- == 0) {
+ 			err = -EAGAIN;
+@@ -1437,6 +1438,21 @@ static int xsk_setsockopt(struct socket *sock, int level, int optname,
+ 		mutex_unlock(&xs->mutex);
+ 		return err;
+ 	}
++	case XDP_MAX_TX_SKB_BUDGET:
++	{
++		unsigned int budget;
++
++		if (optlen != sizeof(budget))
++			return -EINVAL;
++		if (copy_from_sockptr(&budget, optval, sizeof(budget)))
++			return -EFAULT;
++		if (!xs->tx ||
++		    budget < TX_BATCH_SIZE || budget > xs->tx->nentries)
++			return -EACCES;
++
++		WRITE_ONCE(xs->max_tx_budget, budget);
++		return 0;
++	}
+ 	default:
+ 		break;
+ 	}
+@@ -1734,6 +1750,7 @@ static int xsk_create(struct net *net, struct socket *sock, int protocol,
+ 
+ 	xs = xdp_sk(sk);
+ 	xs->state = XSK_READY;
++	xs->max_tx_budget = TX_BATCH_SIZE;
+ 	mutex_init(&xs->mutex);
+ 
+ 	INIT_LIST_HEAD(&xs->map_list);
+diff --git a/tools/include/uapi/linux/if_xdp.h b/tools/include/uapi/linux/if_xdp.h
+index 44f2bb93e7e6..23a062781468 100644
+--- a/tools/include/uapi/linux/if_xdp.h
++++ b/tools/include/uapi/linux/if_xdp.h
+@@ -79,6 +79,7 @@ struct xdp_mmap_offsets {
+ #define XDP_UMEM_COMPLETION_RING	6
+ #define XDP_STATISTICS			7
+ #define XDP_OPTIONS			8
++#define XDP_MAX_TX_SKB_BUDGET		9
+ 
+ struct xdp_umem_reg {
+ 	__u64 addr; /* Start of packet data area */
+-- 
+2.41.3
+
 
