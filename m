@@ -1,139 +1,191 @@
-Return-Path: <netdev+bounces-203601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18227AF67DE
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 04:17:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3760CAF67DF
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 04:17:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FF1E1C44F7C
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 02:17:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8774B177BA9
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 02:17:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1998223DE1;
-	Thu,  3 Jul 2025 02:16:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF171D5CE5;
+	Thu,  3 Jul 2025 02:17:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HMRDxbW+"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Y15RNFeb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7408122259F;
-	Thu,  3 Jul 2025 02:16:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2247720EB
+	for <netdev@vger.kernel.org>; Thu,  3 Jul 2025 02:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751508991; cv=none; b=WEBg9VthpsnHdsTs2mxI8s4KtX2/FVqJ+AmMmglVVHs/l2sMBVW8mnahHGqxWp7t/y1Cmx10vvzacJGOUeiUlqtJ8a3U2cJwf1VktoUoJ3ZqAqNRLVTIwHU+c3hfjTQe5x6FT2KLE4NFb1ZAilp2YRvCmfHH3jPjj5kbqtuHT0A=
+	t=1751509036; cv=none; b=hm2pfF/ChFcXWescS0SYrfwC25ZxkVpI6xSyghR9/uEwgzX7eLSqWpoZcJcvfHg1Avve7PT1zHjbcEbNKjtNUPBWIoGQadUDtG1oIc+AKRKPeQkS/YZi2MCMo+iSYQAZFWrT8HxScqVFHs08O1N73W7VsZdM2uTlu9cQePfbBes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751508991; c=relaxed/simple;
-	bh=Hq80mkzOm4sDH1lo61LQlZ+WhvZpGs/2+0D69YVEncc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YlYIyvMr9B8W4u6okIW5mG/+AprTpqlH3lZTmcO3owvtCjd2Zzl9EEv9SLmIGuDrhPvtPJ77YXY04Yuoair8XOC0l6Ks2/C+9se2ofUpJvs1zslO3JOPbwfvR+0Lc7byWyEXDdMf/qC3LNxERqlq6f3tHbpwGPjSPOWV/fLauoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HMRDxbW+; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7424ccbef4eso4603942b3a.2;
-        Wed, 02 Jul 2025 19:16:30 -0700 (PDT)
+	s=arc-20240116; t=1751509036; c=relaxed/simple;
+	bh=OIdDBt4YHQH/Z8F8kDFEE5iY7tyr2nh1TwvItwfIcWE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jZ77pQFYCNxUFpwim/6w09WJ65jYE8z8e6n8Au2mwc5qqfUvqK/piGEhByiSW7kbHlk3fy/vQWeigOL6JwzCRLXvp3N4Ydz2DtZTkrgjUo7CHfT2tnpZi+02U4NiD/g7G3q+vM4Fvv8Y7rpO0/YhYkUsl7zeXdigimydDeL3KxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=Y15RNFeb; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-3138b2f0249so6068919a91.2
+        for <netdev@vger.kernel.org>; Wed, 02 Jul 2025 19:17:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751508990; x=1752113790; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RnJ5HyRFTLzSb90lPZ0kytxtuJ4Ps5kIpRokWvdn6qw=;
-        b=HMRDxbW+jRSK4Rc94HqLJ9B+Qc2uebm2XEMDqXJeeXzR29Br1Uw7Hs6mTBw6+IB423
-         GQstWm1//qNGxz+E317xo78ku5eAFOqk1JjtZnnp0OeKfl46lx/U0K/ceYHabxIaWNew
-         J6Mw/srTQFPdZZZdiOMriyTVHekipIh+tM0piXd45aJQgbJtmAmaDMKfGQM3wfm1tS69
-         maB7f/8RC7S78xi3qVyXgrtKqNRCW58BCRUQs1bEhli+7xi0ANHzeqRXwkMI7MtsQPY9
-         vE2og1nv/BNxrrU7UOB7+r1lr80gqfMYvV0WqZx97pU2zb7QWIXWfL8xTtPIuRI8HxZn
-         mfOw==
+        d=bytedance.com; s=google; t=1751509033; x=1752113833; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gW8ZgcyW/YE8BVQUnsKXenOjs+L4jlA4xpssC98G1Fs=;
+        b=Y15RNFebjSEP0iI1nA09hE250Ckgbl5rVw4jVZ2BGRi+GXc8Ri5NAja2gZwPl1TXlj
+         TkFrA22cvJz99pR84yCyePQ842EZJgNcPFeGVGBJYbxEHNhHxr2hKavA8cZpUCg/nTsc
+         YwZv1VU5YZQvLz85l1zYxAVbmQZ/5hbT6y/+O060xshU7OZyX8VBOHVrThg2nL7pyXbx
+         K/3gukrbB6kihleP4VSur/n2a/xOWgn3+/sQxR2aw6aai8h8oRJugK/uChB6GWECOl8d
+         lQ3lL71O9rhxsdY/iztA9Iq1edbDq8l397HTSMWXlXjnscwYtWJZRPyhpCkwRWn7HNb5
+         8IPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751508990; x=1752113790;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RnJ5HyRFTLzSb90lPZ0kytxtuJ4Ps5kIpRokWvdn6qw=;
-        b=hXQ2DziQekmDnHu5vGhAaLeiBYiWDrQMjgE6rOULAtg48ARfQilLnJ+8DnG2dmIHC+
-         BowIzXMANa44hhGe/BycBNW390UK/8v2U+CCA6jtHMZd388y1dEDWeefESt8GmBLV8cU
-         OuNP4GDgkNdmgMqjoR1fnwq8RpYWeUlbmZT3uJoR8JW78y3/2UdRKKJSotIfIY0ixgPn
-         3nR9KK41tpOGwuyO/IYbUCRnTBH9jC+qRikTS5b63cTIDtu6ZBL2g8sEwNYyLZseInlH
-         k/zBeCZ/bxbCaHUw0bKxmvVuxsXMxZoeLdwkHYEBel2t+n6DApv7WAw8hoDPCzc3nu25
-         hgyA==
-X-Forwarded-Encrypted: i=1; AJvYcCU0YvUBAvt4P8QKKlc+5Fjd932qsAku31Ht+ynBhR86fZ4/irVSrkPVIieETkjbvo9OLtJraEDtz+3vl4o=@vger.kernel.org, AJvYcCWRE0vagEKMhZFbDUsSdxkg1RwiA/c47uBa3TfdU/8+g+zmYUF2soHd2xR3rirYE0WXB3MPeF+N@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNRGYBaojdSr+9caOe+UPx6YU7beFAPfja7e3X+6VgB5l/AK3Q
-	2Lcs3h2bcXWcuAAzTfRp0In+gF96d/uPCcFpnVY9bPThhMzAlRpNv+hR
-X-Gm-Gg: ASbGncuQUPmkzV1tR/v6gmAClS4CnIY5lPrdz8KLieL5PjcIXimUD8uA9Kj8pdFbYdU
-	L+OqSPWwfMNZaOXqR7JjBIkS+oZdKXL05cUYPBW0u8teysKKxNU2scb2LgRwqJQ5M5TiGn/JT0O
-	gLGg+z95xRY38TtQtplFTka+GgBIvyZtUESaTm4crFgI0kJxIWUzmAM6VmEUos5k+CfVkSNreRq
-	bM4fT387eJ806NLLUZN8Uw5Fz4egvAa9USj5i+OqUvvCn6L/It1uMukXokqeLvLUeiSDwkq8uEu
-	DazFb8+HQJMlos4RrrUlw2LkW0IdO2ef+0gqB5M+NYddCG/IZJKcBg7ppnWbagZgpYiAnNAR
-X-Google-Smtp-Source: AGHT+IEpMsMQUhVEgvoZKgFsN3ulChI2nMRJELvAlPxYIYdKpwZvdxW8bpYzVJB4RTLdgFWxGCsHMQ==
-X-Received: by 2002:aa7:88cf:0:b0:749:1d18:2c74 with SMTP id d2e1a72fcca58-74b50dfa0c2mr6495116b3a.10.1751508989779;
-        Wed, 02 Jul 2025 19:16:29 -0700 (PDT)
-Received: from localhost ([2001:19f0:ac00:4eb8:5400:5ff:fe30:7df3])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-74af54099ecsm15228303b3a.11.2025.07.02.19.16.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jul 2025 19:16:29 -0700 (PDT)
-From: Inochi Amaoto <inochiama@gmail.com>
-To: Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexandre Ghiti <alex@ghiti.fr>,
-	Chen Wang <unicorn_wang@outlook.com>,
-	Inochi Amaoto <inochiama@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
-	Yixun Lan <dlan@gentoo.org>,
-	Ze Huang <huangze@whut.edu.cn>,
-	Thomas Bonnefille <thomas.bonnefille@bootlin.com>
-Cc: devicetree@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	sophgo@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Longbin Li <looong.bin@gmail.com>
-Subject: [PATCH 3/3] riscv: dts: sophgo: Enable ethernet device for Huashan Pi
-Date: Thu,  3 Jul 2025 10:15:58 +0800
-Message-ID: <20250703021600.125550-4-inochiama@gmail.com>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250703021600.125550-1-inochiama@gmail.com>
-References: <20250703021600.125550-1-inochiama@gmail.com>
+        d=1e100.net; s=20230601; t=1751509033; x=1752113833;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gW8ZgcyW/YE8BVQUnsKXenOjs+L4jlA4xpssC98G1Fs=;
+        b=LqM0HD11aDn4dwNh2zZhxsem/bdnzgpIcX3CEUTpdg3PGgZIjOw823EmBK3MF8g/G3
+         taQhovnxpmEU85HQBKQ1IgKXAK9EMzWe0fii2RpKCSURWt7YOuhmrYVceQMEWcJVIZ4+
+         aCQXttL3yJLf4QmsAH8KTv0/AmGtSyJLFCLq3pRAFjLlJyFssxh132ADbcaIyH4svZFb
+         qUCB+I4xw2362aO90arWmYGZaSp7UWfjYJJQF695hkc9Q8dZg5WezskHRLQIWrYfXj37
+         Xr+ShRiqS8v+nm3/Aw/1obqjPiiamYZPCvC3/pKHZp1aTjQP1G6dZ+1YExrc7P5QGS1R
+         XaWQ==
+X-Gm-Message-State: AOJu0YzLxAr2kxNbf7ZRCEPHBMFmj62rFFRkCFNfoS27B62mg1mDYKrT
+	kBI4xVA/smPUrOkypP+zUzexvWjfSIjFXTmL5Z8yVUGkDB+WJnDUg5A2csvgEB7zDko=
+X-Gm-Gg: ASbGncv9RC6Z0NvtCDxhY7Ms2zQ70Hr3akMYM47ItcqpsIHID188rwz44HQfB3g5n3O
+	mSLnKJVnA/NzB+sZyU1o9Xap0tumLPZeiwlddMLRvAga52n3KHcd3ELBEnKWO+8oR8mBQCVoKYC
+	8aeyBAmxW4pDOHnCSIKJ+rbPZUP0OG+l/Q/epNVXYoXxkxcVQ0OVItpLL0+qtLcwLS6rJrU7t3a
+	QXKj4wq+C9UHE9XpN0QpnQTTj0vyV8Fp9WnMH649PUiFehSq6U3EEEjrG6ZdY649V4ijthKhfWU
+	lefx2rW71WzE3LoRaYoW2sglET5PqVAUeKJbdoRKY90z9n6S9xEEjovUQXm/EFKihPx5YvabCfg
+	j5Fg57w==
+X-Google-Smtp-Source: AGHT+IEfpWDi9AI5G9opEJ999ceBrirGnidtW9pkIjH17KcFswz2qH/jhRgT+2hI/If6MfyQ++Bs2w==
+X-Received: by 2002:a17:90b:3807:b0:312:f88d:25f9 with SMTP id 98e67ed59e1d1-31a9de8b153mr1828746a91.7.1751509033126;
+        Wed, 02 Jul 2025 19:17:13 -0700 (PDT)
+Received: from [10.3.202.172] ([61.213.176.6])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31a9cd0ba3dsm901644a91.36.2025.07.02.19.17.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Jul 2025 19:17:12 -0700 (PDT)
+Message-ID: <509939c4-2e3e-41a6-888f-cbbf6d4c93cb@bytedance.com>
+Date: Thu, 3 Jul 2025 10:17:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Patch bpf-next v4 4/4] tcp_bpf: improve ingress redirection
+ performance with message corking
+To: Jakub Sitnicki <jakub@cloudflare.com>,
+ Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, john.fastabend@gmail.com,
+ zhoufeng.zf@bytedance.com, Amery Hung <amery.hung@bytedance.com>,
+ Cong Wang <cong.wang@bytedance.com>
+References: <20250701011201.235392-1-xiyou.wangcong@gmail.com>
+ <20250701011201.235392-5-xiyou.wangcong@gmail.com>
+ <87ecuyn5x2.fsf@cloudflare.com>
+Content-Language: en-US
+From: Zijian Zhang <zijianzhang@bytedance.com>
+In-Reply-To: <87ecuyn5x2.fsf@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Enable ethernet controller and mdio multiplexer device on Huashan Pi.
+On 7/2/25 8:17 PM, Jakub Sitnicki wrote:
+> On Mon, Jun 30, 2025 at 06:12 PM -07, Cong Wang wrote:
+>> From: Zijian Zhang <zijianzhang@bytedance.com>
+>>
+>> The TCP_BPF ingress redirection path currently lacks the message corking
+>> mechanism found in standard TCP. This causes the sender to wake up the
+>> receiver for every message, even when messages are small, resulting in
+>> reduced throughput compared to regular TCP in certain scenarios.
+> 
+> I'm curious what scenarios are you referring to? Is it send-to-local or
+> ingress-to-local? [1]
+> 
 
-Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
----
- arch/riscv/boot/dts/sophgo/cv1812h-huashan-pi.dts | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Thanks for your attention and detailed reviewing!
+We are referring to "send-to-local" here.
 
-diff --git a/arch/riscv/boot/dts/sophgo/cv1812h-huashan-pi.dts b/arch/riscv/boot/dts/sophgo/cv1812h-huashan-pi.dts
-index 26b57e15adc1..4a5835fa9e96 100644
---- a/arch/riscv/boot/dts/sophgo/cv1812h-huashan-pi.dts
-+++ b/arch/riscv/boot/dts/sophgo/cv1812h-huashan-pi.dts
-@@ -55,6 +55,14 @@ &emmc {
- 	non-removable;
- };
- 
-+&gmac0 {
-+	status = "okay";
-+};
-+
-+&mdio {
-+	status = "okay";
-+};
-+
- &sdhci0 {
- 	status = "okay";
- 	bus-width = <4>;
--- 
-2.50.0
+> If the sender is emitting small messages, that's probably intended -
+> that is they likely want to get the message across as soon as possible,
+> because They must have disabled the Nagle algo (set TCP_NODELAY) to do
+> that.
+> 
+> Otherwise, you get small segment merging on the sender side by default.
+> And if MTU is a limiting factor, you should also be getting batching
+> from GRO.
+> 
+> What I'm getting at is that I don't quite follow why you don't see
+> sufficient batching before the sockmap redirect today?
+> 
+
+IMHO,
+
+In “send-to-local” case, both sender and receiver sockets are added to
+the sockmap. Their protocol is modified from TCP to eBPF_TCP, so that
+sendmsg will invoke “tcp_bpf_sendmsg” instead of “tcp_sendmsg”. In this
+case, the whole process is building a skmsg and moving it to the
+receiver socket’s queue immediately. In this process, there is no
+sk_buff generated, and we cannot benefit from TCP stack optimizations.
+As a result, small segments will not be merged by default, that's the
+reason why I am implementing skmsg coalescing here.
+
+>> This change introduces a kernel worker-based intermediate layer to provide
+>> automatic message corking for TCP_BPF. While this adds a slight latency
+>> overhead, it significantly improves overall throughput by reducing
+>> unnecessary wake-ups and reducing the sock lock contention.
+> 
+> "Slight" for a +5% increase in latency is an understatement :-)
+> 
+> IDK about this being always on for every socket. For send-to-local
+> [1], sk_msg redirs can be viewed as a form of IPC, where latency
+> matters.
+> 
+> I do understand that you're trying to optimize for bulk-transfer
+> workloads, but please consider also request-response workloads.
+> 
+> [1] https://github.com/jsitnicki/kubecon-2024-sockmap/blob/main/cheatsheet-sockmap-redirect.png
+> 
+
+Totally understand that request-response workloads are also very
+important.
+
+Here are my thoughts:
+
+I had an idea before: when the user sets NO_DELAY, we could follow the
+original code path. However, I'm concerned about a specific scenario: if
+a user sends part of a message and then sets NO_DELAY to send another
+message, it's possible that messages sent via kworker haven't yet
+reached the ingress_msg (maybe due to delayed kworker scheduling), while
+the messages sent with NO_DELAY have already arrived. This could disrupt
+the order. Since there's no TCP packet formation or retransmission
+mechanism in this process, once the order is disrupted, it stays that
+way.
+
+As a result, I propose,
+
+- When the user sets NO_DELAY, introduce a wait (I haven't determined
+the exact location yet; maybe in tcp_bpf_sendmsg) to ensure all messages
+from kworker are sent before proceeding. Then follow the original path
+for packet transmission.
+
+- When the user switches back from NO_DELAY to DELAY, it's less of an 
+issue. We can simply follow our current code path.
+
+If 5% degradation is not a blocker for this patchset, and the solution
+looks good to you, we will do it in the next patchset.
+
+>> Reviewed-by: Amery Hung <amery.hung@bytedance.com>
+>> Co-developed-by: Cong Wang <cong.wang@bytedance.com>
+>> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+>> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
+>> ---
 
 
