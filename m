@@ -1,161 +1,254 @@
-Return-Path: <netdev+bounces-203816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 781C0AF7537
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 15:16:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0176AF753C
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 15:17:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCA4B1BC222D
-	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:16:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A66F81C83DB3
+	for <lists+netdev@lfdr.de>; Thu,  3 Jul 2025 13:17:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 763F9D53C;
-	Thu,  3 Jul 2025 13:16:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64CC2335BA;
+	Thu,  3 Jul 2025 13:17:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="SLmp6xJ/";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mAocVhQk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UvZ5+Q5C"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B085081E;
-	Thu,  3 Jul 2025 13:16:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2021DDD1;
+	Thu,  3 Jul 2025 13:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751548588; cv=none; b=UhKCLHta/OyKuZ7wJAQKCOknlyx/oX5BXlCweB6JBxd/23WytsQ3HLg9XorA3lmrc1lkfSz6HBsBlCvin8c8eYX5wjB6wVwz07cXV/lb5Lynv1+T10Cw0UJZB+rBtNc+u9zp5MtzkDvaAdvun9J8K4rWpcCoLxSOYKxTj36ky7Y=
+	t=1751548636; cv=none; b=PHTtavwZmBS4jXXvfp4LaDEOLUPhK6sknhV8hfWVlMnEFOgGeQfgbA2nGRUy/yOmAzv3oaxpoSfPhI7mVdUCxVq596kCiFE2PXTu8EFW5S63Qg4mmo9audNurQEi4xOnj0GSC7eUqmkt20+1O1zTNMs5K76DmlXBym3hq70AkuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751548588; c=relaxed/simple;
-	bh=XytcD+vaZ9RJo/DfZdRUZv3WXvu5odrf278v+i2KoHs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qGqGxj6FtiKmY+KvHelXHm56bI7SNcnhf78OerzFKk1s6tLuIQo/IJnsLeqgCYxEVKuYvgaWre6TxwgxIUGIuod1T/odM5uAdfrTsPOfwto47b5ambqhvgxY2VWtvkq562bEPwEU/s3GlUwy++em3YJKFAFOCtKZlGxFYKE2Rwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=SLmp6xJ/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mAocVhQk; arc=none smtp.client-ip=202.12.124.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 8AE197A0178;
-	Thu,  3 Jul 2025 09:16:24 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Thu, 03 Jul 2025 09:16:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1751548584;
-	 x=1751634984; bh=BOGBp2DJegAx2Lc/mJxCM1Eut5ojkmLVEQeycC/XxH8=; b=
-	SLmp6xJ/tPVDiaA5ooFReHwnYWyXCGOD4CZUs39MpuykhRPXb6lLCTjLst84fo3N
-	/SSInCJYaDIYO/RURtuLkeXgWLeSHO+dn2/ffU/Kw0FnAh3MSH5sD+y2lYkr/hMz
-	zoBUq4prc7TwrFLi+GNYevzXEOODe9E1rL0RqqJJxljAVb/35dH2/3l70tpYsbu7
-	RMpnKOJ6l6SPvA4GUtxTLA+1PNFUcKPzo7jejiXoh/JOjQRmrKbUVN5A44pvhAzu
-	E4Jsf2hDknzw+S2Jf6uj1TVGyKa4RvhPmlin0VfjwyhfajrHL/3EEdsvAhpShhnx
-	RvT24+LCYVvhzB0cmjekFw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1751548584; x=
-	1751634984; bh=BOGBp2DJegAx2Lc/mJxCM1Eut5ojkmLVEQeycC/XxH8=; b=m
-	AocVhQkiUtqa5yHFhPYWsVRPfvekoRGfnPsytzCArFklpslMni53h1K3wmbtiDjS
-	BL/eCFE3mrMSKjXGDXhCRbKY16Z0qHx79VfktuC78ThTnp4bVCLr+2JeTzYEdoAc
-	VQ9iVtQx0jK2LCVEhfvWoYRyvAZ8bwd5Ut1HmaXUBa32ABE6HRmwseF++LiwzYkP
-	0Z/WY1GDWhUOSlevdhgAtlm2AGN5UYZwZV9iqyrUN1YBEj+TasnuE5Gy++Amc7tp
-	D+E3wOzZiy43byEphB7nhidxgTIfK6g1jmjtcUOL/b+PYM63f671xYznlKlas6c2
-	QZL/V+k+YKgJnvVNelCow==
-X-ME-Sender: <xms:qIJmaDSSR9LmqGPrfgfcIgZcBZyxFfepZ-IzPs6NraVsd4o8I8SFew>
-    <xme:qIJmaEwUuv2le5Y5qsy2Gm3tY9qQ3ssZGHITqmaKuRZHfp_4OPNJlR6ulpguLCHyA
-    ng7nCFo5X9TzmBkY4M>
-X-ME-Received: <xmr:qIJmaI1E58ujjTX93pRqPB3OdeW4PqZJkIbb2uASVLxSsJ5BzgwYB4dYZRTMJKkUVC2HT9f9iVM0PrvoI3z68n5xEh85B1PJRQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddvtdefkecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomheppfhikhhlrghs
-    ucfunpguvghrlhhunhguuceonhhikhhlrghsrdhsohguvghrlhhunhgusehrrghgnhgrth
-    gvtghhrdhsvgeqnecuggftrfgrthhtvghrnhepveetgedtvddvhfdtkeeghfeffeehteeh
-    keekgeefjeduieduueelgedtheekkeetnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepnhhikhhlrghsrdhsohguvghrlhhunhgusehrrghgnhgr
-    thgvtghhrdhsvgdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprh
-    gtphhtthhopehhrghogihirghnghgplhhivddtvdegseduieefrdgtohhmpdhrtghpthht
-    oheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvg
-    hmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohho
-    ghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpth
-    htohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehrihgthhgrrhgu
-    tghotghhrhgrnhesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvg
-    hrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhrvghnvghsrghsqdhs
-    ohgtsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:qIJmaDBK7lUQ_By2uIWr5UtX3THEi_zbpdfh0jnjzMPqeeEcEYGdHA>
-    <xmx:qIJmaMh6oO0szYF9TLacp2BMO92KUT0ng5h6VGVfPbYDgLYxpp3GKw>
-    <xmx:qIJmaHqT6nzcM3yrTMSThzH2xayrXDB_iQCIg5xNGVtIRBV4fWJBsg>
-    <xmx:qIJmaHj4dSMI9mfPDKPd-6p3ceeUgTkvQqVjJLZ6750y6jQGO9yKeA>
-    <xmx:qIJmaFEGiyLTcw_JceSAG82Ik7gWYRB-XbAOxd5rALA0GyBPYHsmC1Vd>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 3 Jul 2025 09:16:23 -0400 (EDT)
-Date: Thu, 3 Jul 2025 15:16:21 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
-To: Haoxiang Li <haoxiang_li2024@163.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2] net: ethernet: rtsn: Fix a null pointer dereference
- in rtsn_probe()
-Message-ID: <20250703131621.GB3900914@ragnatech.se>
-References: <20250703100109.2541018-1-haoxiang_li2024@163.com>
+	s=arc-20240116; t=1751548636; c=relaxed/simple;
+	bh=N9vx4nN/TtiQ7kDCz3sMGAFcDb/bYgvtZpWErpPG28s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jDmRkswuJLjDKZD/FgWjlya2yHO8ZS8aAKnpeLw8QNX90A8yYC393NsSH+F3JbeUI35JAEWQEYhD0Dt+bBM47JRnnsXGQ0b8s1QKzYbWHkflDg7i9t7WOYcvxnA53gWwypKxmwQ2Bcmulqc4LwX5Osx9rqFTeQ74RFhM5ayuOKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UvZ5+Q5C; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3d948ce7d9dso31691325ab.2;
+        Thu, 03 Jul 2025 06:17:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751548634; x=1752153434; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0YTKQYtfASLZ4WUpXznMDU4LflCg1MNaJpuSyTx8YzU=;
+        b=UvZ5+Q5Cn7L6qPOcIDagKnHnfBUw6yNHhyHsm9hBmGZxWGGKTwjUT4bgf1yk6++VCD
+         ZjYdrlk8RDtPjD+leRwzTjMEM7c9y91bhIJ6BQRbd1YWsWLxQ6X+/nG9PGv7PLE2JM5E
+         mVr0egBy6Gd9QwyoDQTsSMxKBHs9uDZ46OwbYwMemi5OEQ5POY5Yz5I0q/HSzlCyUl4y
+         jZorJ3i6Y+mpbd1SH04AmVIjlYzXud2tvhswHyfdwnxBLl4O+Czd72YcSX8u4dfFXGKg
+         s39RM5aRe7nuatvrYD054p2rWbs9qqqQt1rGSGAynrv+darZESdR3S0gw4aCw5d4SJWi
+         XeAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751548634; x=1752153434;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0YTKQYtfASLZ4WUpXznMDU4LflCg1MNaJpuSyTx8YzU=;
+        b=Ldg8kcWXj8kxoj/fCZMOYFCRS0CWf7vR3GGfXYhEuVbgWWuU5/XwS4YRCtxD0YC32J
+         /u5GeLCzOdfWYerGdbASjbzjMEXHdB62r5Swim/Oczb1/groVsJGpXCM+IHvQa6bStP1
+         UEFmV5vdVy5k/uCp3iKpeEPMnFtM4sQVQoPxLqAROxT2CNX//CVrapPLrz5yPXrQCKhQ
+         ZDxtb8BoE8MS0yjNm3b6j/OZoBt7k+N/1qDlqJUU9A2stiaHjNmwHy1wHtM8FmlTI8PT
+         qijY2nA5uD6HkggdGR58P6kIiWq7D2Dfz+Dw0DJ4OYtqMrpLnNsxVTfHpIGsZkveXsO6
+         C2BQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWIVXXmQMs3x7QdHjaRK9TkguTMi02ZikIBu/dgpwZ1CZYZRwNzdsngIssNOSbpwRaNnj6y8f5k@vger.kernel.org, AJvYcCXE8KQ0IvA+Guwz3l6H6/eQT3/KgwT7lxwVVLATKer0PxRboixTG+PfF0gOvNSG53zuITs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOsUPT6Rl0eS0fgJauFhwf2kvAnAfam1enDEVeMBigpj/ZvyiT
+	0kRVR1Rm1XAXNRpfaeozBL/LhC6jmJgMOcl2hkYQ2Oe8DYtsFQxZm83nvXKUttd/0QLZNtKdCb/
+	BEElhvkzEVXd7neA4EWKJsoonzTHG2g0=
+X-Gm-Gg: ASbGncvwixOK73c96jtmgjDqQ/McYp/Loj366SagwFsj3oo6cl8oYp6zzV1fE2/opiU
+	A1p/0v3AxrVDaZbnWq7Bt56PF/xevPmP7RfssCYUookuvuta+903PvqpztMOw7pzs9K6kPyV5ku
+	Ho9ie6RHvLcFa+Rxfj+Lh+YDeRmOzdolkbkJixJ47nbw==
+X-Google-Smtp-Source: AGHT+IHpZju9DDW3thyUnIqv/xSVWfyOkcFJ+jcMFY3JRyCJOE3oyLV/2Ns2ixq64cxok3+TlxmpwRsmiQAUNILWDKo=
+X-Received: by 2002:a92:c269:0:b0:3df:45bb:28fe with SMTP id
+ e9e14a558f8ab-3e054934d51mr77786645ab.1.1751548633602; Thu, 03 Jul 2025
+ 06:17:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250703100109.2541018-1-haoxiang_li2024@163.com>
+References: <20250702112815.50746-1-kerneljasonxing@gmail.com>
+ <20250702112815.50746-3-kerneljasonxing@gmail.com> <aGVYNMZEZQV1SetF@mini-arch>
+ <CAL+tcoA8Yhk85mkOBE9jEx7fd1s5rAW+Y8Uf2DAaNR3-9DW0Vg@mail.gmail.com> <aGZ5dq5P0G8e8A/J@boxer>
+In-Reply-To: <aGZ5dq5P0G8e8A/J@boxer>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 3 Jul 2025 21:16:36 +0800
+X-Gm-Features: Ac12FXwc8V4qfJJdWFJ9Ko5PqZxJI_ZHNvnMbieyJC1gDAgvtlEKHdimQfLCK4k
+Message-ID: <CAL+tcoCkZSOHy4zteK-pw8JgRNDr6oz2aSMmZEsmrP4onXWsDg@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 2/2] selftests/bpf: add a new test to check
+ the consumer update case
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Stanislav Fomichev <stfomichev@gmail.com>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, bjorn@kernel.org, 
+	magnus.karlsson@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Haoxiang,
+On Thu, Jul 3, 2025 at 8:37=E2=80=AFPM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> On Thu, Jul 03, 2025 at 07:09:09AM +0800, Jason Xing wrote:
+> > On Thu, Jul 3, 2025 at 12:03=E2=80=AFAM Stanislav Fomichev <stfomichev@=
+gmail.com> wrote:
+> > >
+> > > On 07/02, Jason Xing wrote:
+> > > > From: Jason Xing <kernelxing@tencent.com>
+> > > >
+> > > > The subtest sends 33 packets at one time on purpose to see if xsk
+> > > > exitting __xsk_generic_xmit() updates the global consumer of tx que=
+ue
+> > > > when reaching the max loop (max_tx_budget, 32 by default). The numb=
+er 33
+> > > > can avoid xskq_cons_peek_desc() updates the consumer when it's abou=
+t to
+> > > > quit sending, to accurately check if the issue that the first patch
+> > > > resolves remains. The new case will not check this issue in zero co=
+py
+> > > > mode.
+> > > >
+> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > ---
+> > > > v5
+> > > > Link: https://lore.kernel.org/all/20250627085745.53173-1-kerneljaso=
+nxing@gmail.com/
+> > > > 1. use the initial approach to add a new testcase
+> > > > 2. add a new flag 'check_consumer' to see if the check is needed
+> > > > ---
+> > > >  tools/testing/selftests/bpf/xskxceiver.c | 51 ++++++++++++++++++++=
++++-
+> > > >  tools/testing/selftests/bpf/xskxceiver.h |  1 +
+> > > >  2 files changed, 51 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testi=
+ng/selftests/bpf/xskxceiver.c
+> > > > index 0ced4026ee44..ed12a55ecf2a 100644
+> > > > --- a/tools/testing/selftests/bpf/xskxceiver.c
+> > > > +++ b/tools/testing/selftests/bpf/xskxceiver.c
+> > > > @@ -109,6 +109,8 @@
+> > > >
+> > > >  #include <network_helpers.h>
+> > > >
+> > > > +#define MAX_TX_BUDGET_DEFAULT 32
+> > > > +
+> > > >  static bool opt_verbose;
+> > > >  static bool opt_print_tests;
+> > > >  static enum test_mode opt_mode =3D TEST_MODE_ALL;
+> > > > @@ -1091,11 +1093,45 @@ static bool is_pkt_valid(struct pkt *pkt, v=
+oid *buffer, u64 addr, u32 len)
+> > > >       return true;
+> > > >  }
+> > > >
+> > > > +static u32 load_value(u32 *counter)
+> > > > +{
+> > > > +     return __atomic_load_n(counter, __ATOMIC_ACQUIRE);
+> > > > +}
+> > > > +
+> > > > +static bool kick_tx_with_check(struct xsk_socket_info *xsk, int *r=
+et)
+> > > > +{
+> > > > +     u32 max_budget =3D MAX_TX_BUDGET_DEFAULT;
+> > > > +     u32 cons, ready_to_send;
+> > > > +     int delta;
+> > > > +
+> > > > +     cons =3D load_value(xsk->tx.consumer);
+> > > > +     ready_to_send =3D load_value(xsk->tx.producer) - cons;
+> > > > +     *ret =3D sendto(xsk_socket__fd(xsk->xsk), NULL, 0, MSG_DONTWA=
+IT, NULL, 0);
+> > > > +
+> > > > +     delta =3D load_value(xsk->tx.consumer) - cons;
+> > > > +     /* By default, xsk should consume exact @max_budget descs at =
+one
+> > > > +      * send in this case where hitting the max budget limit in wh=
+ile
+> > > > +      * loop is triggered in __xsk_generic_xmit(). Please make sur=
+e that
+> > > > +      * the number of descs to be sent is larger than @max_budget,=
+ or
+> > > > +      * else the tx.consumer will be updated in xskq_cons_peek_des=
+c()
+> > > > +      * in time which hides the issue we try to verify.
+> > > > +      */
+> > > > +     if (ready_to_send > max_budget && delta !=3D max_budget)
+> > > > +             return false;
+> > > > +
+> > > > +     return true;
+> > > > +}
+> > > > +
+> > > >  static int kick_tx(struct xsk_socket_info *xsk)
+> > > >  {
+> > > >       int ret;
+> > > >
+> > > > -     ret =3D sendto(xsk_socket__fd(xsk->xsk), NULL, 0, MSG_DONTWAI=
+T, NULL, 0);
+> > > > +     if (xsk->check_consumer) {
+> > > > +             if (!kick_tx_with_check(xsk, &ret))
+> > > > +                     return TEST_FAILURE;
+> > > > +     } else {
+> > > > +             ret =3D sendto(xsk_socket__fd(xsk->xsk), NULL, 0, MSG=
+_DONTWAIT, NULL, 0);
+> > > > +     }
+> > > >       if (ret >=3D 0)
+> > > >               return TEST_PASS;
+> > > >       if (errno =3D=3D ENOBUFS || errno =3D=3D EAGAIN || errno =3D=
+=3D EBUSY || errno =3D=3D ENETDOWN) {
+> > > > @@ -2613,6 +2649,18 @@ static int testapp_adjust_tail_grow_mb(struc=
+t test_spec *test)
+> > > >                                  XSK_UMEM__LARGE_FRAME_SIZE * 2);
+> > > >  }
+> > > >
+> > > > +static int testapp_tx_queue_consumer(struct test_spec *test)
+> > > > +{
+> > > > +     int nr_packets =3D MAX_TX_BUDGET_DEFAULT + 1;
+> > > > +
+> > > > +     pkt_stream_replace(test, nr_packets, MIN_PKT_SIZE);
+> > > > +     test->ifobj_tx->xsk->batch_size =3D nr_packets;
+> > > > +     if (!(test->mode & TEST_MODE_ZC))
+> > > > +             test->ifobj_tx->xsk->check_consumer =3D true;
+> > >
+> > > The test looks good to me, thank you!
+> >
+> > Thanks.
+> >
+> > >
+> > > One question here: why not exit/return for TEST_MODE_ZC instead
+> > > of conditionally setting check_consumer?
+> >
+> > As you said, yes, we could skip the zc test for this
+> > testapp_tx_queue_consumer(). It doesn't affect the goal or result of
+> > the subtest. So do you expect me to respin this patch or just leave it
+> > as is?
+>
+> Yes I think it would be worth respinning and skipping it for zc. see how
+> testapp_stats_rx_dropped() does it.
 
-Thanks for your work.
+Got it. I see:
+        if (test->mode =3D=3D TEST_MODE_ZC) {
+                ksft_test_result_skip("Can not run RX_DROPPED test for
+ZC mode\n");
+                return TEST_SKIP;
+        }
 
-On 2025-07-03 18:01:09 +0800, Haoxiang Li wrote:
-> Add check for the return value of rcar_gen4_ptp_alloc()
-> to prevent potential null pointer dereference.
-> 
-> Fixes: b0d3969d2b4d ("net: ethernet: rtsn: Add support for Renesas Ethernet-TSN")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
+>
+> Otherwise we would probably never change it and just keep on running this
+> test case for zc which is not beneficial at this point.
+>
+> Besides LGTM!
 
-Reviewed-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+Thanks. Will repost it soon :)
 
-> ---
-> Changes in v2:
-> - Add a blank line to make the grouping similar to the
-> style of other error checks in probe. Thanks, Niklas!
-> ---
->  drivers/net/ethernet/renesas/rtsn.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/renesas/rtsn.c b/drivers/net/ethernet/renesas/rtsn.c
-> index 6b3f7fca8d15..05c4b6c8c9c3 100644
-> --- a/drivers/net/ethernet/renesas/rtsn.c
-> +++ b/drivers/net/ethernet/renesas/rtsn.c
-> @@ -1259,7 +1259,12 @@ static int rtsn_probe(struct platform_device *pdev)
->  	priv = netdev_priv(ndev);
->  	priv->pdev = pdev;
->  	priv->ndev = ndev;
-> +
->  	priv->ptp_priv = rcar_gen4_ptp_alloc(pdev);
-> +	if (!priv->ptp_priv) {
-> +		ret = -ENOMEM;
-> +		goto error_free;
-> +	}
->  
->  	spin_lock_init(&priv->lock);
->  	platform_set_drvdata(pdev, priv);
-> -- 
-> 2.25.1
-> 
-
--- 
-Kind Regards,
-Niklas Söderlund
+>
+> >
+> > Thanks,
+> > Jason
 
