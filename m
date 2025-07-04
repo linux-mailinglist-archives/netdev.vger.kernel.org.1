@@ -1,129 +1,121 @@
-Return-Path: <netdev+bounces-203961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 089A5AF8591
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 04:26:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2E00AF85EB
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 05:11:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B276E3B60BB
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 02:26:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FD7F567551
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 03:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D8741D86DC;
-	Fri,  4 Jul 2025 02:26:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 301D71E32C6;
+	Fri,  4 Jul 2025 03:11:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Hc+GHlpy"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCCC8262A6;
-	Fri,  4 Jul 2025 02:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE9617CA1B;
+	Fri,  4 Jul 2025 03:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751596014; cv=none; b=VleraLPxHsE0BTAjzP1U/nuZ7LRorJvp5IVKLsB7HIPwJ9qC3cinFEq9y5FNFfdQ77ogAsRqosxKEZ9JwMQJrVLqQr1WOaXcEnkmZdzzXJtlfT7d9aC4aAu3kYDkh25ecKld5VbyeewKv8uMm5O3NcNkVERbm/fvcboWp+j0edw=
+	t=1751598704; cv=none; b=BYDt8ypdwycK8ODjv+VVIxBbGzBE7mDDEH1yVmkyUai+Ja51IlZJJQNBsxIFMWBYUc86m5ZsGB9l0MZfkxSZiPAewUiXQqs6LtK14L/9y7FM5RbZmqQo77tB1j0/v34WatDeeGKrJMRjmTfHMwO97S51l2iHqqttbk80VpSIzKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751596014; c=relaxed/simple;
-	bh=2Jvgtj5t3hZ5VQ36euT0z9PS2vO0mdNlfh7YaTvGcyc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ys5hxJeFTk4hdBQJneEAhKSMWvPJh8l4PWMRP3PqiMQjMA5TchLy1Rhc0noJSoZtrBJVFVhvodcxeIyYpwy+r9BESh/ju2Arx1UqN6a+yRO9ULAao4hHLLfxyj1kPA6AFp1iNFzN1iGKBOq8H5+DegcmT0Ta2XmkbsoauUH/+vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bYHYJ40KDzVmcW;
-	Fri,  4 Jul 2025 10:25:40 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id 17713180B2C;
-	Fri,  4 Jul 2025 10:26:48 +0800 (CST)
-Received: from huawei.com (10.175.124.27) by dggpemf500002.china.huawei.com
- (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 4 Jul
- 2025 10:26:47 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<yuehaibing@huawei.com>
-Subject: [PATCH] atm: clip: Fix NULL pointer dereference in vcc_sendmsg()
-Date: Fri, 4 Jul 2025 10:39:14 +0800
-Message-ID: <20250704023914.3876975-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1751598704; c=relaxed/simple;
+	bh=43Q7A3VRL4TnRonDlu6Q4IeSp7pTTqPtvV2liehgIyE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=BqEL17JSTyZ1lo8Qx5yPMKvp3n7iBYd8HAch7/yv1O+DT4tVzu85R8ljNcf9rE3gtdCzMazgwt+lMAwlxhsNh/2rqYO6HMJE9qHIdtGubwXWNAkNYgBDB3eTZ5yjM9zaU1tvlQjTkNGbmaZkRHMo/rL73rXZMZYAaJgQbnPVB4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=Hc+GHlpy; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1751598669;
+	bh=gDdy+536mUIxf1DeR863dGAOtY2TVORyc2BvNtT+JdY=;
+	h=Date:From:To:Cc:Subject:From;
+	b=Hc+GHlpye3EBxeVotIESMrfoXnJe0JGugBLNpJNvjjlvQarh9VwfwXY6Rr0McIvfu
+	 ZQfiZ9saOqE6Vw3x84I5vvsN5a/G4A9uSScaBhj21fNSXy7HmSw00Eu8eHAPLcJO+H
+	 +6TpTe+3C2m6WtnDL+ZZ4eNGk4E0NgE879nWGyYYE0g2TptsWr8vjKLOzQdZMBIArB
+	 cxN56uxPTCEQ0z4UKw4+TZnxoLIsvzhG1brrUWtIrqbCj/qN5+KvnlOENC/rHNBTD6
+	 eu/WAtJFq4dcXwVwIzNCVJTpeOmkyW+Dbh6GK3/VdFukvOUBBw3OeNRjQ/aGYrh14q
+	 IcNZTfYh2o9Yg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bYJYn0Wbvz4x11;
+	Fri,  4 Jul 2025 13:11:08 +1000 (AEST)
+Date: Fri, 4 Jul 2025 13:11:35 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Christian
+ Borntraeger <borntraeger@de.ibm.com>
+Cc: bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>,
+ Alexander Gordeev <agordeev@linux.ibm.com>, Ilya Leoshkevich
+ <iii@linux.ibm.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Thomas Huth <thuth@redhat.com>
+Subject: linux-next: manual merge of the bpf-next tree with the s390 tree
+Message-ID: <20250704131135.1da6c34d@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
- dggpemf500002.china.huawei.com (7.185.36.57)
+Content-Type: multipart/signed; boundary="Sig_/uJZDkAfq+ILtcqSLTUC/+ev";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-BUG: kernel NULL pointer dereference, address: 0000000000000000
-PGD 0 P4D 0
-Oops: Oops: 0010 [#1] SMP KASAN NOPTI
-CPU: 0 UID: 0 PID: 5324 Comm: syz.0.0 Not tainted 6.15.0-rc6-syzkaller-00346-g5723cc3450bc #0 PREEMPT(full)
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:0x0
-Code: Unable to access opcode bytes at 0xffffffffffffffd6.
-RSP: 0018:ffffc9000d3cf778 EFLAGS: 00010246
-RAX: 1ffffffff1910dd1 RBX: 00000000000000c0 RCX: dffffc0000000000
-RDX: ffffc9000dc82000 RSI: ffff88803e4c4640 RDI: ffff888052cd0000
-RBP: ffffc9000d3cf8d0 R08: ffff888052c9143f R09: 1ffff1100a592287
-R10: dffffc0000000000 R11: 0000000000000000 R12: 1ffff92001a79f00
-R13: ffff888052cd0000 R14: ffff88803e4c4640 R15: ffffffff8c886e88
-FS:  00007fbc762566c0(0000) GS:ffff88808d6c2000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffffffffffffd6 CR3: 0000000041f1b000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- vcc_sendmsg+0xa10/0xc50 net/atm/common.c:644
- sock_sendmsg_nosec net/socket.c:712 [inline]
- __sock_sendmsg+0x219/0x270 net/socket.c:727
- ____sys_sendmsg+0x52d/0x830 net/socket.c:2566
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
- __sys_sendmmsg+0x227/0x430 net/socket.c:2709
- __do_sys_sendmmsg net/socket.c:2736 [inline]
- __se_sys_sendmmsg net/socket.c:2733 [inline]
- __x64_sys_sendmmsg+0xa0/0xc0 net/socket.c:2733
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+--Sig_/uJZDkAfq+ILtcqSLTUC/+ev
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-atmarpd_dev_ops does not implement the send method, which may cause crash
-as above.
+Hi all,
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot+e34e5e6b5eddb0014def@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/682f82d5.a70a0220.1765ec.0143.GAE@google.com/T
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- net/atm/clip.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Today's linux-next merge of the bpf-next tree got a conflict in:
 
-diff --git a/net/atm/clip.c b/net/atm/clip.c
-index b234dc3bcb0d..c02ba9d64bc3 100644
---- a/net/atm/clip.c
-+++ b/net/atm/clip.c
-@@ -616,8 +616,15 @@ static void atmarpd_close(struct atm_vcc *vcc)
- 	module_put(THIS_MODULE);
- }
- 
-+static int atmarpd_send(struct atm_vcc *vcc, struct sk_buff *skb)
-+{
-+	dev_kfree_skb_any(skb);
-+	return 0;
-+}
-+
- static const struct atmdev_ops atmarpd_dev_ops = {
--	.close = atmarpd_close
-+	.close = atmarpd_close,
-+	.send = atmarpd_send
- };
- 
- 
--- 
-2.34.1
+  arch/s390/net/bpf_jit.h
 
+between commit:
+
+  42398caf16c9 ("s390: Replace __ASSEMBLY__ with __ASSEMBLER__ in non-uapi =
+headers")
+
+from the s390 tree and commit:
+
+  e26d523edf2a ("s390/bpf: Describe the frame using a struct instead of con=
+stants")
+
+from the bpf-next tree.
+
+I fixed it up (the latter deleted the file, so I did that) and can
+carry the fix as necessary. This is now fixed as far as linux-next is
+concerned, but any non trivial conflicts should be mentioned to your
+upstream maintainer when your tree is submitted for merging.  You may
+also want to consider cooperating with the maintainer of the conflicting
+tree to minimise any particularly complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/uJZDkAfq+ILtcqSLTUC/+ev
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmhnRmcACgkQAVBC80lX
+0Gx+1Af/cwbu4s3JWbpJGDK5eExNhF2ULcsDI3C6WJk/dVck6AnCaHLUiKlnoUcm
+WgVVzJ3f73OwyRwnrjk1INabmdmUtm1/6RaUZHeETqbz2pfTGrVlKPfCKuHMpc5i
+MkiuybVXMHuI0Pyk/79QoGDx8ckG5oubCefiDZPvwwa9JPstVkxnlu9WJOW97/4N
+LYO98igB6MecgAO2f6EEGqNjE2qkF8lJmCDpl3+YA6ExILoRoeS3iPGYGSW09U1a
+H3uVsrhuF96K04/o2CNJZ7ZQyOHbLeTja3lXf8ffC60V6AlApZLJCr/0sQEzmhT2
+CWY/yw7Dp6vrBOT31MXdOeUZFdKWdQ==
+=j7L0
+-----END PGP SIGNATURE-----
+
+--Sig_/uJZDkAfq+ILtcqSLTUC/+ev--
 
