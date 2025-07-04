@@ -1,188 +1,118 @@
-Return-Path: <netdev+bounces-204104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BA52AF8EE5
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:41:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD3C1AF8F27
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:52:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F46916EF8B
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:41:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45A27B4050A
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:47:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 320992EA14B;
-	Fri,  4 Jul 2025 09:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 103642EBBAE;
+	Fri,  4 Jul 2025 09:48:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lv9KvEEg"
 X-Original-To: netdev@vger.kernel.org
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A18902DAFA8;
-	Fri,  4 Jul 2025 09:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F40D29AAFD;
+	Fri,  4 Jul 2025 09:48:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751622082; cv=none; b=h/CQXorHW4c6hVG5KwTLIQ9ZVihAUyosBDA0SagG6sD221QnUvXffJuMwLSTf+iSNrkBPER+fJ09rBHOFRgDVyg9V8z50OEmiykzae1ZExMQ672xmFVomEUWXk9WRPdcoBF9kN2Ybg67NSKSWYxgIsGt4G9ds9u+QMz1k32scUk=
+	t=1751622519; cv=none; b=lD3l2a8i8GC8hkShio7ePYASZnf4Xv+I4My39k2z1+a8xa+Yb0weQothN86T4y4XDAY0qb99w60QRsUaY7yM+z9Dine012TghN5hUiP61IScPNM+mnrp0P5Mz8Bl1INDcYmEBd5qAqtnbp8I+tJCkvKOPgs9FW6xzhJDXRGywTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751622082; c=relaxed/simple;
-	bh=5kfD3eLWhydpapTP/xx9CKZcEgNscuE+DHWcliVdzt4=;
+	s=arc-20240116; t=1751622519; c=relaxed/simple;
+	bh=am0YjSLq6opId+8jb8XluWaS3QEulOIJcT1B2pYF464=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bbhNuFFdQuXEnQ4qV1svW8E0cHOTAZWiIe+4aY6zB5DJ8vSbaMqeS3Ks4KXN3KUPRUpoymAp5nBhP3DgAhhEOE/RK4Gj3DGDPDkcXJUqsms+Np+wtLhh0VjXk3dyysUahKhQiOn2cDXhEam+fi2/4n+KaGqmTEnTl7pzKR3EFZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id CE1D546D0D;
-	Fri,  4 Jul 2025 11:41:17 +0200 (CEST)
-Date: Fri, 4 Jul 2025 11:41:16 +0200
-From: Gabriel Goller <g.goller@proxmox.com>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v4] ipv6: add `force_forwarding` sysctl to
- enable per-interface forwarding
-Message-ID: <pwrkjcem57hgbg7ptfbqofr42kqgfyac5eprptn2uw3e5tdfge@4rip2rl2my6b>
-Mail-Followup-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-References: <20250703160154.560239-1-g.goller@proxmox.com>
- <d90c29af-d614-43ea-8bcd-f2c8ced779df@6wind.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YsIV7JHSmRkv4oZBVjSKAzUwNzR/25xzfsaj0WczmvhFsyw3l62JybKaL0Nh4xnNg7dOL56mnjmZVbrHJpozTEEuYq5Uyw0Lmet4e45sVbfWNn4pzAoNkNvyDWiNpU+UJYIUZ/+h0p7L7jqXzsZbAmbr9AEnTSfASGXm/8lAdyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lv9KvEEg; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751622519; x=1783158519;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=am0YjSLq6opId+8jb8XluWaS3QEulOIJcT1B2pYF464=;
+  b=Lv9KvEEgviuLQTffuh2sdu4r7G80QCJWf5ZavNjSg/IBBAGMedAHvfmQ
+   xUjmHryiHpyHQT5AgBCBThdNjW3WP5YrH9os2ctmmDOtjmSzYMHBxtLtr
+   0JLptc6a2YjDsp+/N+ccW5nsPVR4ZxbE0sUBrIQwqt55dsCjNZ+qSWG65
+   xRvenl1HKO3NJuz40n0r56Y1E7GYU7AjNLiX2sLALKpd9dSajs3hp2Vtm
+   9x7YPXOzWQ/z0QMM75L4j5J/IWw/bWIYi0cd+lDv6UHIwcp9JLUTk/exa
+   1DVjDIXOOy5dEmvsGuOjvVhKswd6ob7zihcV1NrIYpRgS8dNhcf+8agNR
+   Q==;
+X-CSE-ConnectionGUID: lrf5lB4FTcCmPRpyM3mMMg==
+X-CSE-MsgGUID: 30SNgoBNR1KOUkHAqeHKgw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="65408516"
+X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
+   d="scan'208";a="65408516"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 02:48:38 -0700
+X-CSE-ConnectionGUID: kSKs1kAUT6+aKYAMcPG3Kg==
+X-CSE-MsgGUID: qMilI+FFQwqrwSpxQFY3ug==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
+   d="scan'208";a="154016435"
+Received: from lkp-server01.sh.intel.com (HELO 0b2900756c14) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 04 Jul 2025 02:48:35 -0700
+Received: from kbuild by 0b2900756c14 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uXd20-0003ZL-1Q;
+	Fri, 04 Jul 2025 09:48:32 +0000
+Date: Fri, 4 Jul 2025 17:48:01 +0800
+From: kernel test robot <lkp@intel.com>
+To: Zijun Hu <zijun_hu@icloud.com>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andreas Larsson <andreas@gaisler.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Thadeu Lima de Souza Cascardo <cascardo@igalia.com>,
+	Zijun Hu <zijun_hu@icloud.com>, linux-kernel@vger.kernel.org,
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org
+Subject: Re: [PATCH v3 2/8] char: misc: Adapt and add test cases for simple
+ minor space division
+Message-ID: <202507041717.ZONOYCp2-lkp@intel.com>
+References: <20250702-rfc_miscdev-v3-2-d8925de7893d@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d90c29af-d614-43ea-8bcd-f2c8ced779df@6wind.com>
-User-Agent: NeoMutt/20241002-35-39f9a6
+In-Reply-To: <20250702-rfc_miscdev-v3-2-d8925de7893d@oss.qualcomm.com>
 
-On 04.07.2025 10:07, Nicolas Dichtel wrote:
->Le 03/07/2025 à 18:01, Gabriel Goller a écrit :
->> It is currently impossible to enable ipv6 forwarding on a per-interface
->> basis like in ipv4. To enable forwarding on an ipv6 interface we need to
->> enable it on all interfaces and disable it on the other interfaces using
->> a netfilter rule. This is especially cumbersome if you have lots of
->> interface and only want to enable forwarding on a few. According to the
->> sysctl docs [0] the `net.ipv6.conf.all.forwarding` enables forwarding
->> for all interfaces, while the interface-specific
->> `net.ipv6.conf.<interface>.forwarding` configures the interface
->> Host/Router configuration.
->>
->> Introduce a new sysctl flag `force_forwarding`, which can be set on every
->> interface. The ip6_forwarding function will then check if the global
->> forwarding flag OR the force_forwarding flag is active and forward the
->> packet.
->>
->> To preserver backwards-compatibility reset the flag (on all interfaces)
->> to 0 if the net.ipv6.conf.all.forwarding flag is set to 0.
->>
->> Add a short selftest that checks if a packet gets forwarded with and
->> without `force_forwarding`.
->>
->> [0]: https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt
->>
->> Signed-off-by: Gabriel Goller <g.goller@proxmox.com>
->> ---
->>
->
->[snip]
->
->> @@ -6747,6 +6759,78 @@ static int addrconf_sysctl_disable_policy(const struct ctl_table *ctl, int write
->>  	return ret;
->>  }
->>
->> +static void addrconf_force_forward_change(struct net *net, __s32 newf)
->> +{
->> +	ASSERT_RTNL();
->> +	struct net_device *dev;
->> +	struct inet6_dev *idev;
->> +
->
->ASSERT_RTNL() is always put after variables declaration.
+Hi Zijun,
 
-I removed ASSERT_RTNL completely, this is already checked by __in6_dev_get_rtnl_net.
+kernel test robot noticed the following build warnings:
 
->> +	for_each_netdev(net, dev) {
->> +		idev = __in6_dev_get_rtnl_net(dev);
->> +		if (idev) {
->> +			int changed = (!idev->cnf.force_forwarding) ^ (!newf);
->> +
->> +			WRITE_ONCE(idev->cnf.force_forwarding, newf);
->> +			if (changed) {
->> +				inet6_netconf_notify_devconf(dev_net(dev), RTM_NEWNETCONF,
->> +							     NETCONFA_FORCE_FORWARDING,
->> +							     dev->ifindex, &idev->cnf);
->> +			}
->> +		}
->> +	}
->> +}
->> +
->> +static int addrconf_sysctl_force_forwarding(const struct ctl_table *ctl, int write,
->> +					    void *buffer, size_t *lenp, loff_t *ppos)
->> +{
->> +	struct inet6_dev *idev = ctl->extra1;
->> +	struct net *net = ctl->extra2;
->> +	int *valp = ctl->data;
->> +	loff_t pos = *ppos;
->> +	int new_val = *valp;
->> +	int old_val = *valp;
->> +	int ret;
->> +
->> +	struct ctl_table tmp_ctl = *ctl;
->This declaration should be put with other declarations.
+[auto build test WARNING on 626e89412dfb88766d90d842af4d9ec432d8526f]
 
-Agree.
+url:    https://github.com/intel-lab-lkp/linux/commits/Zijun-Hu/char-misc-Move-drivers-misc-misc_minor_kunit-c-to-drivers-char/20250702-202131
+base:   626e89412dfb88766d90d842af4d9ec432d8526f
+patch link:    https://lore.kernel.org/r/20250702-rfc_miscdev-v3-2-d8925de7893d%40oss.qualcomm.com
+patch subject: [PATCH v3 2/8] char: misc: Adapt and add test cases for simple minor space division
+config: powerpc64-randconfig-002-20250704 (https://download.01.org/0day-ci/archive/20250704/202507041717.ZONOYCp2-lkp@intel.com/config)
+compiler: powerpc64-linux-gcc (GCC) 10.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250704/202507041717.ZONOYCp2-lkp@intel.com/reproduce)
 
->> +
->> +	tmp_ctl.extra1 = SYSCTL_ZERO;
->> +	tmp_ctl.extra2 = SYSCTL_ONE;
->> +	tmp_ctl.data = &new_val;
->> +
->> +	ret = proc_douintvec_minmax(&tmp_ctl, write, buffer, lenp, ppos);
->> +
->> +	if (write && old_val != new_val) {
->> +		if (!rtnl_net_trylock(net))
->> +			return restart_syscall();
->> +
->> +		if (valp == &net->ipv6.devconf_dflt->force_forwarding) {
->> +			inet6_netconf_notify_devconf(net, RTM_NEWNETCONF,
->> +						     NETCONFA_FORCE_FORWARDING,
->> +						     NETCONFA_IFINDEX_DEFAULT,
->> +						     net->ipv6.devconf_dflt);
->> +		} else if (valp == &net->ipv6.devconf_all->force_forwarding) {
->> +			inet6_netconf_notify_devconf(net, RTM_NEWNETCONF,
->> +						     NETCONFA_FORCE_FORWARDING,
->> +						     NETCONFA_IFINDEX_ALL,
->> +						     net->ipv6.devconf_all);
->> +
->> +			addrconf_force_forward_change(net, new_val);
->> +		} else {
->> +			inet6_netconf_notify_devconf(net, RTM_NEWNETCONF,
->> +						     NETCONFA_FORCE_FORWARDING,
->> +						     idev->dev->ifindex,
->> +						     &idev->cnf);
->> +		}
->> +		rtnl_net_unlock(net);
->> +	}
->> +
->> +	if (write)
->> +		WRITE_ONCE(*valp, new_val);
->Why not putting this in the above block?
->And maybe under the rtnl_lock to avoid race if two users change the value at the
->same time.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507041717.ZONOYCp2-lkp@intel.com/
 
-Yep, you're right.
+All warnings (new ones prefixed by >>, old ones prefixed by <<):
 
->Nicolas
+WARNING: modpost: vmlinux: section mismatch in reference: hash_debug_pagealloc_alloc_slots+0x98 (section: .text) -> memblock_alloc_try_nid (section: .init.text)
+>> WARNING: modpost: vmlinux: section mismatch in reference: test_cases+0x60 (section: .data) -> miscdev_test_invalid_input (section: .init.text)
 
-Thanks for the review!
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
