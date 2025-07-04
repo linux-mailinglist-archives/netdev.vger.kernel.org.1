@@ -1,147 +1,164 @@
-Return-Path: <netdev+bounces-204122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0882AF8F4E
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:58:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BAB6AF8F5F
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 12:04:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48D971CA2B2B
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:59:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A706158699F
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 10:04:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 785B82EE61E;
-	Fri,  4 Jul 2025 09:58:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 256612EE96F;
+	Fri,  4 Jul 2025 10:04:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vFRIQo4h"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UJnu80K5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B22A28D821;
-	Fri,  4 Jul 2025 09:58:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA6E2900AA
+	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 10:04:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751623126; cv=none; b=LtDznqagZlXo1O4TKLOcfCLBKU5fgnZgf7hv3dIRClVQKHAo8wSeSpitZ6JOmPu2loXAcBDf8+H747AvfgMBpLqTFS2/hbtRhB3cAXBYodTwGQpVW7Q6Cewhkgt3v/SDusn2M7OayfvSnEMO+BrYhGOCMAIt8ZiT8PYULerD/7A=
+	t=1751623445; cv=none; b=P+xJp8SsnBkqHY2lyfHoBjN94feb6U7hopTnDkKbidzr4HSxwcAVF1+Fw9yGYPN6YUPzXDPtXxprgWsXVaW8L8FWOmrzy4+pg3MPY4QYuHiiq6uzR+UNcaqWbqrcHlD7P1RMEiyHygblQV/3qXSuKEcnwkuC7+vCPuj9UCxCawQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751623126; c=relaxed/simple;
-	bh=6y/QrROAdpMG0KepOi2ABSvBSikwo1+w0ZScUptNNMA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XmCFw1IwAHV0AQySD5PpT0X8vDGZyV7tA/iZJ1RMVw5DtwyRunZV2hojTGIwU8xFoMSGJGVxWiEGu87g07kxMCls1UuGsXw+NxyILtITr9WSh47VP/RqcUuEVojP/AiMcQ5zvRcDLDdtHx9bgsZSX3PgSrwNDNhNksPFj0h1+aU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vFRIQo4h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45E78C4CEE3;
-	Fri,  4 Jul 2025 09:58:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751623125;
-	bh=6y/QrROAdpMG0KepOi2ABSvBSikwo1+w0ZScUptNNMA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=vFRIQo4haEeX4z5G3jGKdot+Ekt3XkyErGwHdiSf82A1pio97j4o+a5RUViuC0Rq4
-	 5J2iAyDuCnCcHJHG9aAHo22icN2sNwSBPXudpAOpPY4u0d+5MWluuZVUjaXso3iyMj
-	 EahQZNxNrzn+p8Yj3maagbM2KJADYIyh3mAQthEbWNC1hOpocQsHNnib2DRz/GOqzR
-	 /sqoSfdiSs13t6LPG7HxRvr/WGdSfVaQhsQgm8qM9unLa1ofbUCuxo/qzyyQTJVM7V
-	 lpaGIUtoJae4pJ9Xd5dHwaKmZ9ZEq8Z1Lo25wjRFfXp2XVD1aetV/OqzFYSpvhpbgO
-	 wdjOWFkU7/CHQ==
-Message-ID: <88a64a65-bd8c-4b73-af19-6764054d4572@kernel.org>
-Date: Fri, 4 Jul 2025 11:58:37 +0200
+	s=arc-20240116; t=1751623445; c=relaxed/simple;
+	bh=B7aUvk/jHjdAbP1Txi087l61k45RNX1ZWe+SIygilVA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n10zkM94HWN4NoSzCqBRDmL2sc1frIt3L5azcSgSPrn9X7L97YWRzH/hnL6CV50EmsZeXK4PVTK5UNtUoIcT2DUCgcatL17f/LyAAyMTAyNI1WdrtyvpVUU/S18Fquee0uepqN3J7C2ZiwZaH78Q0epwyIfxtwva0g4TNlTtAMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UJnu80K5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751623442;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rWi88a+JkVfvhFesKDsYwPcS3Up3wpcEEvDnhl9YEKo=;
+	b=UJnu80K5FfXIcTUpsh0CkcpNPZnGSZ0u2illoO2/caqzWH3NvBO7eprHjWYS7TWoKpQhvj
+	m15ViQNmfDSEUk/rHj48kJqOBaAFylOHi73lVP9X/z7JGCA91zlsgkJ4JJ8lt0gItZI3l6
+	s5Vc0r6TExzAwTFfSFn3PL6t598J8ns=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-108-zzS39xkCOY-UIyh8i2hMrg-1; Fri, 04 Jul 2025 06:04:01 -0400
+X-MC-Unique: zzS39xkCOY-UIyh8i2hMrg-1
+X-Mimecast-MFC-AGG-ID: zzS39xkCOY-UIyh8i2hMrg_1751623440
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ae371f9e3f5so185957966b.1
+        for <netdev@vger.kernel.org>; Fri, 04 Jul 2025 03:04:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751623440; x=1752228240;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rWi88a+JkVfvhFesKDsYwPcS3Up3wpcEEvDnhl9YEKo=;
+        b=wx2dQz2JkQ83FBfKtjnet2RMkAjmf4aFYd3oWT2ShZ7gO33h3OuePmYs8Hnx5evM4w
+         Sgrnjt5xNGU5z4BJDcvjRSigPMLYrKUW6X9njKfyNiUNY9qBKIugqvEWj3XfMbxm6kvd
+         igssVFaKQ42LKzdFvT4JNNkOrLAgVlHznQFfRkmwlW+fnOPlpviwegWtTb67QLPkX0xK
+         G2PXUwjSviashMGXzHnC1pM3ZtjYg8ziTNxaJW9B9ol0chimEbmOHbZ4dhRKtMOaELvw
+         qExvsfNOdd5BhYfRLjMLSryf0AgfCR8pvfwcInHf0StFhUN4ujIWSsoM4owVGyYk+j3a
+         frCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVVEUqZSCBcXASAcIa1yr+MADBDbVBr0MT7hNzcaBVR1H6iURxybl8n9gftH0b1aMoP2Pp6b44=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyQXL7mE2TCjR0NO5neTyIVBFq8LAC7ejpLTGVPRfwORpI9MbY
+	45OrhZlIc8p8j0ZpBF9tU+k/0ID6BNVdsK/oHjC9a/Mgd3Dp8y49aeMOlH0UK2PbS9D530hq2/1
+	VBO97W2Qe+oaKWJ4KwIQec3xG+lVHURUEnyv+g2MeZ79ZXBPcBKsvB1T4efWhElsmDK1z8g37K3
+	G0vi+uayOiWDGPWf/f992p20SURwj7mQLZ
+X-Gm-Gg: ASbGncuLC4hfcSmQP+W8hJG2hx0t6x2UsQARiVk/Q80NT38B0rjKv87+yK4HUd4xTqT
+	iUvVrcq3I18An/DxnecIQ/sZSJWGXhcVN58EmRUQ0izgsJcqoeANNSRPyZEaJBce9NmfSGfYkaR
+	MwWy9Q
+X-Received: by 2002:a17:907:1b28:b0:ae3:6038:ad6f with SMTP id a640c23a62f3a-ae3f801ffffmr257591966b.3.1751623439672;
+        Fri, 04 Jul 2025 03:03:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHS9N1eCIk/WZ0O55TJaTXfCqhycvxAdX3gpiv7v0S1xEAaaTDokoaZNHnw35/eNshgWtKvOMMHV8DKBFb9MEc=
+X-Received: by 2002:a17:907:1b28:b0:ae3:6038:ad6f with SMTP id
+ a640c23a62f3a-ae3f801ffffmr257584266b.3.1751623438615; Fri, 04 Jul 2025
+ 03:03:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next,v3 2/2] selftests/bpf: Enhance XDP Rx metadata
- handling
-To: "Song, Yoong Siang" <yoong.siang.song@intel.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
- Magnus Karlsson <magnus.karlsson@gmail.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-References: <20250702165757.3278625-1-yoong.siang.song@intel.com>
- <20250702165757.3278625-3-yoong.siang.song@intel.com>
- <77463344-1b1a-443a-97be-a7ef8a88b8af@kernel.org>
- <IA3PR11MB92546301B67FB3A9FDCD716DD842A@IA3PR11MB9254.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <IA3PR11MB92546301B67FB3A9FDCD716DD842A@IA3PR11MB9254.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250702014139.721-1-liming.wu@jaguarmicro.com>
+In-Reply-To: <20250702014139.721-1-liming.wu@jaguarmicro.com>
+From: Lei Yang <leiyang@redhat.com>
+Date: Fri, 4 Jul 2025 18:03:21 +0800
+X-Gm-Features: Ac12FXx2LPRflMaDOhrK2WN9s4Zkqha02pwAGwf7MkpIy2PH8obbz9l4skjV1c8
+Message-ID: <CAPpAL=wY_JU7r8oWgcF_keq+rbpGdkhS5KF0K67g=rbX7_nwng@mail.gmail.com>
+Subject: Re: [PATCH] virtio_net: simplify tx queue wake condition check
+To: liming.wu@jaguarmicro.com
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, angus.chen@jaguarmicro.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+I tested this patch with virito-net regression tests, everything works fine=
+.
 
+Tested-by: Lei Yang <leiyang@redhat.com>
 
-On 04/07/2025 03.17, Song, Yoong Siang wrote:
-> On Friday, July 4, 2025 1:05 AM, Jesper Dangaard Brouer <hawk@kernel.org> wrote:
->> On 02/07/2025 18.57, Song Yoong Siang wrote:
->>> Introduce the XDP_METADATA_SIZE macro as a conservative measure to
->>> accommodate any metadata areas reserved by Ethernet devices.
->>>
->>
->> This seems like a sloppy workaround :-(
->>
->> To me, the problem arise because AF_XDP is lacking the ability to
->> communicate the size of the data_meta area.  If we had this capability,
->> then we could allow the IGC driver to take some of the space, have the
->> BPF-prog expand it futher (bpf_xdp_adjust_meta) and then userspace
->> AF_XDP would simply be able to see the size of the data_meta area, and
->> apply the struct xdp_meta at right offset.
->>
-> Thanks for your input.
-> 
-> I agree with you that the implementation will be simple if user application
-> able to get the size of data_meta area. The intention of this patch set is to let
-> developer aware of such limitations before we have a perfect solution.
-> 
-> Btw, do you got any suggestion on how to expose the metadata length?
-> I not sure whether xdp_desc.options is a simple and good idea or not?
+On Wed, Jul 2, 2025 at 9:42=E2=80=AFAM <liming.wu@jaguarmicro.com> wrote:
+>
+> From: Liming Wu <liming.wu@jaguarmicro.com>
+>
+> Consolidate the two nested if conditions for checking tx queue wake
+> conditions into a single combined condition. This improves code
+> readability without changing functionality. And move netif_tx_wake_queue
+> into if condition to reduce unnecessary checks for queue stops.
+>
+> Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
+> ---
+>  drivers/net/virtio_net.c | 22 ++++++++++------------
+>  1 file changed, 10 insertions(+), 12 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index e53ba600605a..6f3d69feb427 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -2998,12 +2998,11 @@ static void virtnet_poll_cleantx(struct receive_q=
+ueue *rq, int budget)
+>                         free_old_xmit(sq, txq, !!budget);
+>                 } while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
+>
+> -               if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS) {
+> -                       if (netif_tx_queue_stopped(txq)) {
+> -                               u64_stats_update_begin(&sq->stats.syncp);
+> -                               u64_stats_inc(&sq->stats.wake);
+> -                               u64_stats_update_end(&sq->stats.syncp);
+> -                       }
+> +               if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS &&
+> +                   netif_tx_queue_stopped(txq)) {
+> +                       u64_stats_update_begin(&sq->stats.syncp);
+> +                       u64_stats_inc(&sq->stats.wake);
+> +                       u64_stats_update_end(&sq->stats.syncp);
+>                         netif_tx_wake_queue(txq);
+>                 }
+>
+> @@ -3195,12 +3194,11 @@ static int virtnet_poll_tx(struct napi_struct *na=
+pi, int budget)
+>         else
+>                 free_old_xmit(sq, txq, !!budget);
+>
+> -       if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS) {
+> -               if (netif_tx_queue_stopped(txq)) {
+> -                       u64_stats_update_begin(&sq->stats.syncp);
+> -                       u64_stats_inc(&sq->stats.wake);
+> -                       u64_stats_update_end(&sq->stats.syncp);
+> -               }
+> +       if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS &&
+> +           netif_tx_queue_stopped(txq)) {
+> +               u64_stats_update_begin(&sq->stats.syncp);
+> +               u64_stats_inc(&sq->stats.wake);
+> +               u64_stats_update_end(&sq->stats.syncp);
+>                 netif_tx_wake_queue(txq);
+>         }
+>
+> --
+> 2.34.1
+>
+>
 
-That is a question to the AF_XDP maintainers... added them to this email.
-
-/* Rx/Tx descriptor */
-struct xdp_desc {
-	__u64 addr;
-	__u32 len;
-	__u32 options;
-};
-
-As far as I know, the xdp_desc.options field isn't used, right?
-
-
-(Please AF_XDP experts, please verify below statements:)
-Something else we likely want to document: The available headroom in the
-AF_XDP frame.  When accessing the metadata in userspace AF_XDP we do a
-negative offset from the UMEM packet pointer.  IIRC on RX the available
-headroom will be either 255 or 192 bytes (depending on NIC drivers).
-
-Slightly confusing when AF_XDP transmitting from userspace the UMEM
-headroom is default zero (XSK_UMEM__DEFAULT_FRAME_HEADROOM is zero).
-This is configurable via xsk_umem_config.frame_headroom, like I did in
-this example[1].
-
-Maybe I did something wrong in[1], because I see that the new method is
-setting xsk_umem_config.tx_metadata_len + flag XDP_UMEM_TX_METADATA_LEN.
-This is nicely documented in [2]. How does this interact with setting
-xsk_umem_config.frame_headroom ?
-
-
-[1] 
-https://github.com/xdp-project/bpf-examples/blob/3f365af4be1fe6a0ef77e751ff9b12c912810453/AF_XDP-interaction/af_xdp_user.c#L423-L424
-[2] https://www.kernel.org/doc/html/v6.12/networking/xsk-tx-metadata.html
-
---Jesper
 
