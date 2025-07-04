@@ -1,160 +1,127 @@
-Return-Path: <netdev+bounces-203964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DEE2AF8603
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 05:24:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2DAEAF8635
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 06:09:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 116EE7A2873
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 03:22:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 857061C40194
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 04:10:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D771E25EB;
-	Fri,  4 Jul 2025 03:24:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BC21078F;
+	Fri,  4 Jul 2025 04:09:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e0GYfyIO"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gadcINUu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D953B1DF265
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 03:23:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B7A1C28E;
+	Fri,  4 Jul 2025 04:09:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751599441; cv=none; b=SP8CyF1WNXPYaNhWX7N3hOkWj64m0Vbn6whtR+AoF2ZOC8mAeDTi2Htl1iUcCSdrO8mYboplYh4N6uH9hQ+1KnxEEq/UXXVYDG8xFVDWmxuv4+AisHCTc6NcyCwI/sM9I1iU56QWG0l+rx7pR95NT58OEYGNDnO6BeShhOvPp4w=
+	t=1751602186; cv=none; b=jTxq2W+23xWfs6VATQuc4rSiAtEfmO58a9ng9B4f9PbIeG1irNR4Zo7j4NUewSORmP44HiOJ3nPW+up5Cmu1sknmWBmFhA1/Ev6ZIoXkE3dCIPqcylC9eNhXqB4Oxssa0BmIB/q0Upttx5FlfVZ6k1WFkw5OqtHjClrKNcg4Hh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751599441; c=relaxed/simple;
-	bh=4S8wpH5Pnq6+MDR8tFUxzEncIxuZveMK0y+6Kselt/s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H0fVe3qUOGLQxM1tQ3kWy5aVE0twv2MBjmhUn3FQtMg0MPvs8Oj6aF/a75VV2xe3XHHEEcRCnPSv6hrUWlKVOkm1QSEL3xr2INLuvrznJUztfaX7YtpbyiBu2IIjrTVcXGzZKHjqDLqIC2KiDyaRCXqcs6nqI1Pe4B6Qwm2H09E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e0GYfyIO; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751599440; x=1783135440;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=4S8wpH5Pnq6+MDR8tFUxzEncIxuZveMK0y+6Kselt/s=;
-  b=e0GYfyIOYyYfz2IMcOZDN44AU+IJtDjOqokPRVKNsTN9DRc90faVsjBk
-   McDvIJ9L5pwOvozPQEUD9eSu1LAXT6EAEGM3TdoVt0+Ii4oHv6j+w77EG
-   jotRheQhf2NABdOBo4wiX5oaMaSsO/43FSNJemOb2TaXc6c0dkmY3ynW5
-   PY/fEFe5dYCIl9VDVwMAQEDa/4fqwSEdq18HX3Gaxn369higKkT71k/Ho
-   son3bH1lLkKWwjToa0Y+P9Gqe64TE6/LfBMKyeBqKBVvhnSpai5ZhdmK2
-   habGt260gU1irLAWsgd2fYQozsaE00fFvszpTTyhrqEw2Jp2RpSvzcvc/
-   w==;
-X-CSE-ConnectionGUID: IOMalOCIRIuh0z47DnJiMQ==
-X-CSE-MsgGUID: 71TdpH9PTk6z6TQQoiPgPg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="53156686"
-X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
-   d="scan'208";a="53156686"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 20:23:59 -0700
-X-CSE-ConnectionGUID: qFWY1a8FRO2YmJC8FwbL4Q==
-X-CSE-MsgGUID: FPE2/dhAReqiHf7j0Vun/g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
-   d="scan'208";a="154617835"
-Received: from lkp-server01.sh.intel.com (HELO 0b2900756c14) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 03 Jul 2025 20:23:57 -0700
-Received: from kbuild by 0b2900756c14 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uXX1n-0003Gx-0N;
-	Fri, 04 Jul 2025 03:23:55 +0000
-Date: Fri, 4 Jul 2025 11:23:50 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>
-Subject: Re: [PATCH v1 net 2/2] atm: clip: Fix potential null-ptr-deref in
- to_atmarpd().
-Message-ID: <202507041113.tpHgxTvk-lkp@intel.com>
-References: <20250702020437.703698-3-kuniyu@google.com>
+	s=arc-20240116; t=1751602186; c=relaxed/simple;
+	bh=NuTXy5WMCH00kP5NE8jojIc7E0/NGT4JS+O7qSkAWvE=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=jtf7uQCkIorY4bI/waRrVxLro/eX10lhTYNNhGwt8003ZAsawWdcqkW7FfGjJZs5oLd/4Jd/59/eZMnXppScQOsawOVbMdLhKIwjU9CwSqBtdC+zkV3V0JX+lL1mXLvgKckrdNfCCiKAql+MzeKjgpMWqRSFk38aqMU4dmy/bxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gadcINUu; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=xVhyq3GAC3zK0skZbh1GvKpLi8ozrAxJQgU1jxCDsAw=; b=gadcINUuNR6ega90tbZtZW64df
+	RvtQ1sLPUdCqjCUAiqgrZ/czweLaj42cJxsCYVtjTRECbLWQldOdYusinQR7V+0UnvIfM/JBVHZal
+	4FghRFRu53FaOlDqpLFPlRjf97adW0mCDGLMU5snt/wKCiaulQtiJeK40Oz4XQ9hPNYkl1vlf42qU
+	abe59qlidfvie7/df4QXG8IBt04BV2LjMoLOarwm96/E7y6rZNnK2KFlMLIULXlS0vSLX/3n/prOn
+	Pf/D9Vz6hHdI7b3LZFFKHK4XWhfKulK5egK6i94aHGpUv2b9a9UDU4/MSSMNZaGWUPkriKYKAwnWg
+	4g6uqmlA==;
+Received: from [50.53.25.54] (helo=[127.0.0.1])
+	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1uXXjy-00000007maA-0sDv;
+	Fri, 04 Jul 2025 04:09:35 +0000
+Date: Thu, 03 Jul 2025 21:09:30 -0700
+From: Randy Dunlap <rdunlap@infradead.org>
+To: nicolas.dichtel@6wind.com, Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+ Gabriel Goller <g.goller@proxmox.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ David Ahern <dsahern@kernel.org>
+CC: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v3=5D_ipv6=3A_add_=60force=5Fforwarding?=
+ =?US-ASCII?Q?=60_sysctl_to_enable_per-interface_forwarding?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <869cd247-2cde-46bd-9100-0011d8dbd47c@6wind.com>
+References: <20250702074619.139031-1-g.goller@proxmox.com> <c39c99a7-73c2-4fc6-a1f2-bc18c0b6301f@6wind.com> <53d8eaa7-6684-4596-ae98-69688068b84c@infradead.org> <869cd247-2cde-46bd-9100-0011d8dbd47c@6wind.com>
+Message-ID: <D20FF7E9-0A12-40F9-B134-BD78A8C59745@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250702020437.703698-3-kuniyu@google.com>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Kuniyuki,
+On July 2, 2025 11:58:16 PM PDT, Nicolas Dichtel <nicolas=2Edichtel@6wind=
+=2Ecom> wrote:
+>Le 03/07/2025 =C3=A0 00:26, Randy Dunlap a =C3=A9crit=C2=A0:
+>
+>[snip]
+>
+>>>> +static int addrconf_sysctl_force_forwarding(const struct ctl_table *=
+ctl, int write,
+>>>> +					    void *buffer, size_t *lenp, loff_t *ppos)
+>>>> +{
+>>>> +	int *valp =3D ctl->data;
+>>>> +	int ret;
+>>>> +	int old, new;
+>>>> +
+>>>> +	// get extra params from table
+>>> /* */ for comment
+>>> https://git=2Ekernel=2Eorg/pub/scm/linux/kernel/git/torvalds/linux=2Eg=
+it/tree/Documentation/process/coding-style=2Erst#n598
+>>=20
+>> Hm, lots there from the BK to git transfer in 2005, with a few updates =
+by Mauro, Jakub, and myself=2E
+>>=20
+>>=20
+>> More recently (2016!), Linus said this:
+>>   https://lore=2Ekernel=2Eorg/lkml/CA+55aFyQYJerovMsSoSKS7PessZBr4vNp-3=
+QUUwhqk4A4_jcbg@mail=2Egmail=2Ecom/
+>>=20
+>> which seems to allow for "//" style commenting=2E But yeah, it hasn't b=
+een added to
+>> coding-style=2Erst=2E
+>I wasn't aware=2E I always seen '//' rejected=2E
+>
+>>=20
+>>>> +	struct inet6_dev *idev =3D ctl->extra1;
+>>>> +	struct net *net =3D ctl->extra2;
+>>> Reverse x-mas tree for the variables declaration
+>>> https://git=2Ekernel=2Eorg/pub/scm/linux/kernel/git/torvalds/linux=2Eg=
+it/tree/Documentation/process/maintainer-netdev=2Erst#n368
+>>=20
+>> Shouldn't maintainer-netdev=2Erst contain something about netdev-style =
+comment blocks?
+>> (not that I'm offering since I think it's ugly)
+>>=20
+>It has been removed:
+>https://git=2Ekernel=2Eorg/pub/scm/linux/kernel/git/torvalds/linux=2Egit/=
+commit/?id=3D82b8000c28b5
+>
 
-kernel test robot noticed the following build warnings:
+Oh, thanks=2E  Sorry I missed that patch=2E=20
 
-[auto build test WARNING on net/main]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/atm-clip-Fix-infinite-recursive-call-of-clip_push/20250702-100652
-base:   net/main
-patch link:    https://lore.kernel.org/r/20250702020437.703698-3-kuniyu%40google.com
-patch subject: [PATCH v1 net 2/2] atm: clip: Fix potential null-ptr-deref in to_atmarpd().
-config: i386-randconfig-063-20250704 (https://download.01.org/0day-ci/archive/20250704/202507041113.tpHgxTvk-lkp@intel.com/config)
-compiler: clang version 20.1.7 (https://github.com/llvm/llvm-project 6146a88f60492b520a36f8f8f3231e15f3cc6082)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250704/202507041113.tpHgxTvk-lkp@intel.com/reproduce)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507041113.tpHgxTvk-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> net/atm/clip.c:64:15: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   net/atm/clip.c:64:15: sparse:    struct atm_vcc [noderef] __rcu *
-   net/atm/clip.c:64:15: sparse:    struct atm_vcc *
-   net/atm/clip.c:625:9: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   net/atm/clip.c:625:9: sparse:    struct atm_vcc [noderef] __rcu *
-   net/atm/clip.c:625:9: sparse:    struct atm_vcc *
-   net/atm/clip.c:658:9: sparse: sparse: incompatible types in comparison expression (different address spaces):
-   net/atm/clip.c:658:9: sparse:    struct atm_vcc [noderef] __rcu *
-   net/atm/clip.c:658:9: sparse:    struct atm_vcc *
-
-vim +64 net/atm/clip.c
-
-    52	
-    53	static int to_atmarpd(enum atmarp_ctrl_type type, int itf, __be32 ip)
-    54	{
-    55		struct sock *sk;
-    56		struct atmarp_ctrl *ctrl;
-    57		struct atm_vcc *vcc;
-    58		struct sk_buff *skb;
-    59		int err = 0;
-    60	
-    61		pr_debug("(%d)\n", type);
-    62	
-    63		rcu_read_lock();
-  > 64		vcc = rcu_dereference(atmarpd);
-    65		if (!vcc) {
-    66			err = -EUNATCH;
-    67			goto unlock;
-    68		}
-    69		skb = alloc_skb(sizeof(struct atmarp_ctrl), GFP_ATOMIC);
-    70		if (!skb) {
-    71			err = -ENOMEM;
-    72			goto unlock;
-    73		}
-    74		ctrl = skb_put(skb, sizeof(struct atmarp_ctrl));
-    75		ctrl->type = type;
-    76		ctrl->itf_num = itf;
-    77		ctrl->ip = ip;
-    78		atm_force_charge(vcc, skb->truesize);
-    79	
-    80		sk = sk_atm(vcc);
-    81		skb_queue_tail(&sk->sk_receive_queue, skb);
-    82		sk->sk_data_ready(sk);
-    83	unlock:
-    84		rcu_read_unlock();
-    85		return err;
-    86	}
-    87	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+~Randy
 
