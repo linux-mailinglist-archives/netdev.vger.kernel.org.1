@@ -1,93 +1,138 @@
-Return-Path: <netdev+bounces-204096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BD4DAF8DF4
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:15:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7BDCAF8EBF
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:35:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B870189FE7C
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:14:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8D5BB65CE9
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:18:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9480D2F1FCC;
-	Fri,  4 Jul 2025 09:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 905252E9EC7;
+	Fri,  4 Jul 2025 09:18:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AUl0daSu"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="Pq2h8jR9"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from out162-62-57-87.mail.qq.com (out162-62-57-87.mail.qq.com [162.62.57.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3B32E8E03;
-	Fri,  4 Jul 2025 09:09:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B222EA494
+	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 09:18:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751620155; cv=none; b=S2lGR2+M4nCZn6T1NH5IOcmrcKTpJwATVi1tSWMRW3IkTFVBXLJHuM2FkNa49GVY0bPL+Yg3UMH7pTSbZrFno9Nw02+MJQmqaqGuoOJm0ZnEvKyPzEobSLB4hrG1FsMiVu+i27ZuKxA+WkbDQrkB5hxPqaBGfXhr7ngUWPHwst0=
+	t=1751620699; cv=none; b=RmMMcq1dU+KqtGIF4vwKg/l64WjR/ZEfq8mPTFf6Aush8QArOgMkqC+nxY+vrrhXWxg0f5w/PJLFwgrO8B5VxysFu+uBK6sewV4owU9Lf35HeK7BWNlwn39FciLesoID4Kcr5EX0tl475bgIlgc0rDMp0AmPCiq4neJY2y2M8KM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751620155; c=relaxed/simple;
-	bh=v9k5hOGsBzFXPC68vIzdXKUVHTyMCdZHS5bgukRHvDo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KzcyWK8PMgQW3fTInqiEStUTsvu8oIKLntjUKIOF8NwSiIc+1VTOEF4E47pOED2KlEc62hhh74jFciLSSx1X8oMo1v3vh5tqoy++fLUFGcFgk7haPY4S0R+BHdpwpS7Bdn/WeuCB/v05M5f8+m/UYFvslzkIcbnXXNit/xTos10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AUl0daSu; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id ED10A4333F;
-	Fri,  4 Jul 2025 09:09:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1751620145;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eyYT35dsDio4qjJzYgyZ6hDdsGQEMgy8YZyDCLNTbXI=;
-	b=AUl0daSuNSO1AriU1l6qpK47h2Gifi94b6WwPvM1CaNdkwczeQbdrxkm1F4tyMIcCX+3yL
-	DntDNV5KdLnmazt2rUnYZhsrkZ01yjdtBTfK1nWOlI5SWZRVyF4YvpCdAXhqtznFlQx3kC
-	rTuEjSPnJDaZv4Vdc9XdGz6hiROUlpHpWmBdRO3eVuwcaSUD8Fw9n4PtJ11UdkhXYSDk71
-	Og0oO9Rg3Q8MZGXyzWT7tQ1Y+Hocu/v7UQp3oBNiWivHPaqjG1Cufir4WUClATpSE1obtk
-	H8rVNVAjhs7WGfUFj09E60sj/DKkrzyo1ovWrNlo8JgcM41DfZdy3z0wIsRS7w==
-Date: Fri, 4 Jul 2025 11:09:02 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Viorel Suman
- <viorel.suman@nxp.com>, Li Yang <leoyang.li@nxp.com>, "Russell King
- (Oracle)" <rmk+kernel@armlinux.org.uk>, Wei Fang <wei.fang@nxp.com>,
- <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RESEND net 3/3] net: phy: qcom: qca807x: Enable WoL
- support using shared library
-Message-ID: <20250704110902.4fdef534@fedora.home>
-In-Reply-To: <20250704-qcom_phy_wol_support-v1-3-053342b1538d@quicinc.com>
-References: <20250704-qcom_phy_wol_support-v1-0-053342b1538d@quicinc.com>
-	<20250704-qcom_phy_wol_support-v1-3-053342b1538d@quicinc.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1751620699; c=relaxed/simple;
+	bh=0zuS3RWBtUBodtvkf/ojgcQxdAESeriLKOF0Zsh0LuY=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=d268uJEphWmCZJAPL6cwPCE8CSX/MNt15X09UBMINfc4Y5cA+HwyGin8u8vLGnDmhaIXi4t85n0j+CR60RpPYLDJvS6IH/ZgUZFxZRfWg4LA7hwrHmC3QYD5YkS/PkdNevSXY73QPYwEMvqN3ef9JS2HaB970K/ISBQl+TiXh8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=Pq2h8jR9; arc=none smtp.client-ip=162.62.57.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1751620690;
+	bh=TmZzzFDNWWd+HL9IKxavp2on0YiqSG6V5RQgmiQWl38=;
+	h=From:To:Cc:Subject:Date;
+	b=Pq2h8jR9FtAiClHIuBqLCbZp8HdH53ngCqY2l7c5QN3Zc/z0g6n9ts8NTMP5d1Wrs
+	 vE+5kYQ25s4RldjFQS3QXv60liRodgbXhsTeBQ8L+XXwexNr316YD0pNQzZ58p3xxJ
+	 Aqp3B5q3Ph+rwXTFKBaD5FLxhZS5XhWr+Kexdv2Q=
+Received: from leon-ssd.. ([2409:8762:315:25:f201:17a2:7f4f:c156])
+	by newxmesmtplogicsvrszc13-0.qq.com (NewEsmtp) with SMTP
+	id 2A736660; Fri, 04 Jul 2025 17:10:39 +0800
+X-QQ-mid: xmsmtpt1751620239tg1xl9jxa
+Message-ID: <tencent_87F4A935227D7FACE9A05E681FC13882F40A@qq.com>
+X-QQ-XMAILINFO: MRMtjO3A6C9XodI9PW+wxkOMr+IvwK49eI2hQONPfw0xcFsTGuhN1VbZLgSues
+	 P1AaFSrJ6yLtqeQz8WAdShrbfLpR/8zTKQ+13RzxpTcmjcZ+CRaF54jjuh2tuxkHjU2CqgWSUoDf
+	 X3+cckEKq8QfUukLt4a0tI02vP6EHwyymd2a+xQh8edjB/0HepEcwe8chn4Di9FYEm1fj04uCogT
+	 K0uE5Ql3EHPPzidjEtfAgkNXZKUNeeod7OEwa6TJ0RglWHcSBgEZ2ST32zTVTQGjFOrxrM+9P7iA
+	 PHsyM74qr4Iuj3cKcMzahIiXyyQUysmF45EeyIAVCT1e6vlPfv8OjpdWjAwli91ehLi0/UCHn6o6
+	 /Ed88H+nmSmx0o5P8FfzYeUoKD81Rz9e7AHvoJ/gEjrltFBSPYzl/VcrVE5YcD9Tu2p2YdGXqSdG
+	 XvqwSztJApVLWaoE8Obe7hl091BxoMsfYns5KFjG2HwJ//ysGm6OIDNu82vH+i5UCnsT1X1QGYvn
+	 5Z5jqJvsWYw57ogX7HDGBOO/STqOUr7sdHBjXmEduRkYNbXM5YPDP1pRtee+wBDIN0srmfpq9xD2
+	 3uh17AMifUq2WI7No9R5X3UrJQzixrvYLH+8OnUFWlXDH+ZiHqRXru9uMihLLhpVokulpuEqVPd2
+	 cwZ0JPePaL124wxE5yrNRDi+QWZ4S1GDPgpCuFw1yLHnRZZj89tII41ly/PV25kUIu/HyfQ0TvE2
+	 AWiTKzSxA7RxLPI9PqL8VCdlQyU3Q28oEy5xJJ9W4C89yJLRJagmkSDlRXfgtbywjLXMRJYNK61W
+	 0u7N+aT0x4/xvQbS7IehEsdK5Th83iuxt8KWajAnYoDv0ZqIfYHIOK+pToB7KkIu5kZyTwOc5hba
+	 KcXT67u10sL/KZDq8lkVERcZ5Mv/pfT1SDWw/fZm/V22YaOOt/AiiAKtbqsVjBQlDUPaq6uwX1kv
+	 3rxrqNfrF1HvCs1QypZ9cTHDd22k7xFpZjR2JcdUzU+jIXdyVsL9bdRpXpbTnaFxbFVA+40AAlzg
+	 XNZaX42AAkxs2Z2EE6YfhP6WTaosVXljxFd0iScNiEbpH5iyWd0O3t3VZso4Y3S6SU5zq6D6r8uo
+	 uTc9vcTcuEroY15J/MktDnUs12uw==
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+From: Liangming Liu <liangming.liu@foxmail.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	Liangming Liu <liangming.liu@foxmail.com>
+Subject: [PATCH] net: ipv4: fix mixed tab and space indentation in af_inet.c
+Date: Fri,  4 Jul 2025 17:10:11 +0800
+X-OQ-MSGID: <20250704091011.1342429-1-liangming.liu@foxmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddvvdejiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduhedprhgtphhtthhopehquhhitggplhhuohhjsehquhhitghinhgtrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpt
- hhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-On Fri, 4 Jul 2025 13:31:15 +0800
-Luo Jie <quic_luoj@quicinc.com> wrote:
+Fixes mixed use of tabs and spaces in af_inet.c to comply with
+Linux kernel coding style. This change does not affect logic
+or functionality.
 
-> The Wake-on-LAN (WoL) functionality for the QCA807x series is identical
-> to that of the AT8031. WoL support for QCA807x is enabled by utilizing
-> the at8031_set_wol() function provided in the shared library.
-> 
-> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+Signed-off-by: Liangming Liu <liangming.liu@foxmail.com>
+---
+ net/ipv4/af_inet.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index 76e38092cd8a..5a5aabb962d8 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -501,7 +501,7 @@ int __inet_bind(struct sock *sk, struct sockaddr *uaddr, int addr_len,
+ 	 */
+ 	err = -EADDRNOTAVAIL;
+ 	if (!inet_addr_valid_or_nonlocal(net, inet, addr->sin_addr.s_addr,
+-	                                 chk_addr_ret))
++					 chk_addr_ret))
+ 		goto out;
+ 
+ 	snum = ntohs(addr->sin_port);
+@@ -1167,23 +1167,23 @@ static struct inet_protosw inetsw_array[] =
+ 		.prot =       &udp_prot,
+ 		.ops =        &inet_dgram_ops,
+ 		.flags =      INET_PROTOSW_PERMANENT,
+-       },
++	},
+ 
+-       {
++	{
+ 		.type =       SOCK_DGRAM,
+ 		.protocol =   IPPROTO_ICMP,
+ 		.prot =       &ping_prot,
+ 		.ops =        &inet_sockraw_ops,
+ 		.flags =      INET_PROTOSW_REUSE,
+-       },
+-
+-       {
+-	       .type =       SOCK_RAW,
+-	       .protocol =   IPPROTO_IP,	/* wild card */
+-	       .prot =       &raw_prot,
+-	       .ops =        &inet_sockraw_ops,
+-	       .flags =      INET_PROTOSW_REUSE,
+-       }
++	},
++
++	{
++		.type =       SOCK_RAW,
++		.protocol =   IPPROTO_IP,	/* wild card */
++		.prot =       &raw_prot,
++		.ops =        &inet_sockraw_ops,
++		.flags =      INET_PROTOSW_REUSE,
++	}
+ };
+ 
+ #define INETSW_ARRAY_LEN ARRAY_SIZE(inetsw_array)
+-- 
+2.43.0
 
-Maxime
 
