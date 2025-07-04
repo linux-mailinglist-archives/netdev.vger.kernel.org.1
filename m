@@ -1,235 +1,188 @@
-Return-Path: <netdev+bounces-204129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A234AF9104
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 13:02:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DC07AF9143
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 13:16:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7DD916D0AC
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:02:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 862963AE08E
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:16:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817C9271444;
-	Fri,  4 Jul 2025 11:02:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B360721ADB5;
+	Fri,  4 Jul 2025 11:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ifZHHvcR"
+	dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b="SUOYCk86"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mail-gw02.astralinux.ru (mail-gw02.astralinux.ru [93.188.205.243])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8321239E76
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 11:02:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A905285C9F;
+	Fri,  4 Jul 2025 11:16:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.188.205.243
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751626967; cv=none; b=sxHm6KKAwH6MUYkfStPfPqK+sTlyZTuFkbzQk51+eX+2EJox6CxVHN1NhFsejsk3WrKPIy6cVwGSrxEiKinrVxwk8OO8ngAfZESkvP1UsMBWaT46qtjxGuFOdFTBOLdnaqdRUfO34JuiSNq+ot+lMlMjO/LdJ6QmZV/Id3CtIFs=
+	t=1751627787; cv=none; b=OyNnTNFmrW/F1Lly383DAcdWrEeDEXY0QjrpySFGNIx0eDDJISC4dz83cxzM19W0l5O4vLEDoLbaddJN2qb4GWY9bNjxa4S/cnXSshXl6lf7A0nu5V3Xka+wb0yRtH1NqOscCKVlIt2o6fgR9o/k7Dt57irqNtJlSjv/eqg6auY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751626967; c=relaxed/simple;
-	bh=RPGK3rzN/jti3M3Bwfulr/BzvLaYn9tJQuNbxRwcnb4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QNqvClzh1c9/59Dr+kZjqzCcPYa7lCRTXRrA5qT0EBzm1swFUEEGNTfMSXKmIXojtmnprziRgPY6URu0Yi9sF40hgbmg1ScHWK5TArKgLXpT+Z37LpYSsB//I2D35+w/g2DK4cr1ytuMoM1u8mbdiS02MHrYMkZ3dG0JKcF/UPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ifZHHvcR; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751626965; x=1783162965;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=RPGK3rzN/jti3M3Bwfulr/BzvLaYn9tJQuNbxRwcnb4=;
-  b=ifZHHvcRtrUSCDXEZtwb4VqkZDv3fA5/tMt44prWnZVUy34/HO9WB5aA
-   5uRVFrCsgQ5QF9EOoV6HxEMrtXy29tF6A4eFWWlb4vKVt2LiYGj/u9my7
-   /pY7pkn2j2ON3WBmzdFXcMVKvyqYUUnLPnuJjN7VRa2SoqWcOjhV8U9Ry
-   dwYiQl/FNhcXX5x/zePgMzLeodS3OqDV3VPaOiwFX+rOLT+VsmL/VNsH6
-   YMhntlL9z8ewmZFJXN/zbkkSp9W4WR/G7aYSStr597SpFMbzTAniB7w2i
-   jI5sQYKBY98WPm5jc+Y8zg7xghuQOskdGxdvl+QGMtCg65uWSc+eEMNEo
-   Q==;
-X-CSE-ConnectionGUID: 4xRRhCdyQxGnTuvj1tvijw==
-X-CSE-MsgGUID: etIMh8NaSmGx+5vtYhYp0g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="76508707"
-X-IronPort-AV: E=Sophos;i="6.16,287,1744095600"; 
-   d="scan'208";a="76508707"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 04:02:44 -0700
-X-CSE-ConnectionGUID: A8nMu1HmRX+OjxIzdAW2eA==
-X-CSE-MsgGUID: uFhlsTEiTb6D3ohepmnCJQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,287,1744095600"; 
-   d="scan'208";a="154260168"
-Received: from lkp-server01.sh.intel.com (HELO 0b2900756c14) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 04 Jul 2025 04:02:42 -0700
-Received: from kbuild by 0b2900756c14 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uXeBj-0003d1-2t;
-	Fri, 04 Jul 2025 11:02:39 +0000
-Date: Fri, 4 Jul 2025 19:01:46 +0800
-From: kernel test robot <lkp@intel.com>
-To: Matt Johnston <matt@codeconstruct.com.au>,
-	Jeremy Kerr <jk@codeconstruct.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Matt Johnston <matt@codeconstruct.com.au>
-Subject: Re: [PATCH net-next 6/7] net: mctp: Test conflicts of connect() with
- bind()
-Message-ID: <202507041803.6bndMcXn-lkp@intel.com>
-References: <20250703-mctp-bind-v1-6-bb7e97c24613@codeconstruct.com.au>
+	s=arc-20240116; t=1751627787; c=relaxed/simple;
+	bh=QkzF9v0JtK+J9zdf0mskE+qnDwEhUeZEuDR6yZ7/7bw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HbjgmgoDcWroETvxDEdS9L1xxElr+m4B0+Uvu2/V6h1rk1OqO0nlkQrulXGORSTXcF+enXGSZv+Y7wq9y8UkwBlIcsb3qvAFaTue14bI9rtCjsOjhuHg149wp1WaCbfBfPJXF51TzYTsxRKZI5Ill06jlp9bZxhfKLahmEFk9Cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b=SUOYCk86; arc=none smtp.client-ip=93.188.205.243
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=astralinux.ru;
+	s=mail; t=1751627778;
+	bh=QkzF9v0JtK+J9zdf0mskE+qnDwEhUeZEuDR6yZ7/7bw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=SUOYCk86TCIBqp9OXBNKVEMf08UiN7a2feyK37rbVIq3KuYP4/2Kj3If3+4oiLeLG
+	 Lv9HuWOrkSFFsViuQrJMtieb5SV2+Fv6hQNoz6JPnZzJV5kmulF9HfBQIAeskcBbbr
+	 QCG8sJW7M/RGRXkezuHGSPLBc7gmIpQ3bbW2lYzDOhhq5wnn5zk2DY4oY5kWbJRFk5
+	 wk3YQ3dMt9+jRjpLLMEEeMnpQ+xlyPz5YAiZbVY7zgHM/I4XPDY1F5l0tlVfAwcFJt
+	 /G0TcBCL4Rc78+cFUqk/ySOVhozlZR4SU8bPMUzUZmmGMOBLj8X5A5pzIk01Ad4AAW
+	 nB0bQF5Caqhvw==
+Received: from gca-msk-a-srv-ksmg01.astralinux.ru (localhost [127.0.0.1])
+	by mail-gw02.astralinux.ru (Postfix) with ESMTP id 169141F98F;
+	Fri,  4 Jul 2025 14:16:18 +0300 (MSK)
+Received: from new-mail.astralinux.ru (unknown [10.177.185.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail-gw02.astralinux.ru (Postfix) with ESMTPS;
+	Fri,  4 Jul 2025 14:16:16 +0300 (MSK)
+Received: from localhost.localdomain (unknown [10.198.20.23])
+	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4bYWJv6p1Vz16Hnq;
+	Fri,  4 Jul 2025 14:15:43 +0300 (MSK)
+From: Anastasia Belova <abelova@astralinux.ru>
+To: stable@vger.kernel.org,
+	"Greg Kroah-Hartman ." <gregkh@linuxfoundation.org>
+Cc: Anastasia Belova <abelova@astralinux.ru>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <kafai@fb.com>,
+	Song Liu <songliubraving@fb.com>,
+	Yonghong Song <yhs@fb.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Petar Penkov <ppenkov@google.com>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Hao Sun <sunhao.th@gmail.com>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.10] bpf: Reject variable offset alu on PTR_TO_FLOW_KEYS
+Date: Fri,  4 Jul 2025 14:15:33 +0300
+Message-ID: <20250704111535.34760-1-abelova@astralinux.ru>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250703-mctp-bind-v1-6-bb7e97c24613@codeconstruct.com.au>
+Content-Transfer-Encoding: 8bit
+X-KSMG-AntiPhishing: NotDetected, bases: 2025/07/04 10:48:00
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Envelope-From: abelova@astralinux.ru
+X-KSMG-AntiSpam-Info: LuaCore: 63 0.3.63 9cc2b4b18bf16653fda093d2c494e542ac094a39, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, lore.kernel.org:7.1.1;new-mail.astralinux.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;astralinux.ru:7.1.1, FromAlignment: s
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiSpam-Lua-Profiles: 194551 [Jul 03 2025]
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Version: 6.1.1.11
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.0.7854, bases: 2025/07/04 07:50:00 #27617035
+X-KSMG-AntiVirus-Status: NotDetected, skipped
+X-KSMG-LinksScanning: NotDetected, bases: 2025/07/04 10:48:00
+X-KSMG-Message-Action: skipped
+X-KSMG-Rule-ID: 1
 
-Hi Matt,
+From: Hao Sun <sunhao.th@gmail.com>
 
-kernel test robot noticed the following build warnings:
+[ Upstream commit 22c7fa171a02d310e3a3f6ed46a698ca8a0060ed ]
 
-[auto build test WARNING on 8b98f34ce1d8c520403362cb785231f9898eb3ff]
+For PTR_TO_FLOW_KEYS, check_flow_keys_access() only uses fixed off
+for validation. However, variable offset ptr alu is not prohibited
+for this ptr kind. So the variable offset is not checked.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Matt-Johnston/net-mctp-Prevent-duplicate-binds/20250703-171427
-base:   8b98f34ce1d8c520403362cb785231f9898eb3ff
-patch link:    https://lore.kernel.org/r/20250703-mctp-bind-v1-6-bb7e97c24613%40codeconstruct.com.au
-patch subject: [PATCH net-next 6/7] net: mctp: Test conflicts of connect() with bind()
-config: loongarch-randconfig-001-20250704 (https://download.01.org/0day-ci/archive/20250704/202507041803.6bndMcXn-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250704/202507041803.6bndMcXn-lkp@intel.com/reproduce)
+The following prog is accepted:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507041803.6bndMcXn-lkp@intel.com/
+  func#0 @0
+  0: R1=ctx() R10=fp0
+  0: (bf) r6 = r1                       ; R1=ctx() R6_w=ctx()
+  1: (79) r7 = *(u64 *)(r6 +144)        ; R6_w=ctx() R7_w=flow_keys()
+  2: (b7) r8 = 1024                     ; R8_w=1024
+  3: (37) r8 /= 1                       ; R8_w=scalar()
+  4: (57) r8 &= 1024                    ; R8_w=scalar(smin=smin32=0,
+  smax=umax=smax32=umax32=1024,var_off=(0x0; 0x400))
+  5: (0f) r7 += r8
+  mark_precise: frame0: last_idx 5 first_idx 0 subseq_idx -1
+  mark_precise: frame0: regs=r8 stack= before 4: (57) r8 &= 1024
+  mark_precise: frame0: regs=r8 stack= before 3: (37) r8 /= 1
+  mark_precise: frame0: regs=r8 stack= before 2: (b7) r8 = 1024
+  6: R7_w=flow_keys(smin=smin32=0,smax=umax=smax32=umax32=1024,var_off
+  =(0x0; 0x400)) R8_w=scalar(smin=smin32=0,smax=umax=smax32=umax32=1024,
+  var_off=(0x0; 0x400))
+  6: (79) r0 = *(u64 *)(r7 +0)          ; R0_w=scalar()
+  7: (95) exit
 
-All warnings (new ones prefixed by >>):
+This prog loads flow_keys to r7, and adds the variable offset r8
+to r7, and finally causes out-of-bounds access:
 
-   In file included from net/mctp/route.c:1584:
-   net/mctp/test/route-test.c:1258:65: warning: 'type1' defined but not used [-Wunused-const-variable=]
-    1258 | static const struct mctp_test_bind_setup bind_addr8_netdefault, type1 = {
-         |                                                                 ^~~~~
-   net/mctp/test/route-test.c:1258:42: warning: 'bind_addr8_netdefault' defined but not used [-Wunused-const-variable=]
-    1258 | static const struct mctp_test_bind_setup bind_addr8_netdefault, type1 = {
-         |                                          ^~~~~~~~~~~~~~~~~~~~~
-   net/mctp/test/route-test.c: In function 'mctp_bind_pair_desc':
->> net/mctp/test/route-test.c:1340:49: warning: '%s' directive output may be truncated writing up to 99 bytes into a region of size between 87 and 101 [-Wformat-truncation=]
-    1340 |                  "{bind(addr %d, type %d, net %d%s)} {bind(addr %d, type %d, net %d%s)} -> error %d",
-         |                                                 ^~
-    1341 |                  t->bind1->bind_addr, t->bind1->bind_type, t->bind1->bind_net, peer1,
-         |                                                                                ~~~~~
-   net/mctp/test/route-test.c:1340:18: note: directive argument in the range [0, 255]
-    1340 |                  "{bind(addr %d, type %d, net %d%s)} {bind(addr %d, type %d, net %d%s)} -> error %d",
-         |                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/mctp/test/route-test.c:1340:18: note: directive argument in the range [0, 255]
-   net/mctp/test/route-test.c:1339:9: note: 'snprintf' output between 71 and 307 bytes into a destination of size 128
-    1339 |         snprintf(desc, KUNIT_PARAM_DESC_SIZE,
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1340 |                  "{bind(addr %d, type %d, net %d%s)} {bind(addr %d, type %d, net %d%s)} -> error %d",
-         |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1341 |                  t->bind1->bind_addr, t->bind1->bind_type, t->bind1->bind_net, peer1,
-         |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1342 |                  t->bind2->bind_addr, t->bind2->bind_type, t->bind2->bind_net, peer2,
-         |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    1343 |                  t->error);
-         |                  ~~~~~~~~~
+  BUG: unable to handle page fault for address: ffffc90014c80038
+  [...]
+  Call Trace:
+   <TASK>
+   bpf_dispatcher_nop_func include/linux/bpf.h:1231 [inline]
+   __bpf_prog_run include/linux/filter.h:651 [inline]
+   bpf_prog_run include/linux/filter.h:658 [inline]
+   bpf_prog_run_pin_on_cpu include/linux/filter.h:675 [inline]
+   bpf_flow_dissect+0x15f/0x350 net/core/flow_dissector.c:991
+   bpf_prog_test_run_flow_dissector+0x39d/0x620 net/bpf/test_run.c:1359
+   bpf_prog_test_run kernel/bpf/syscall.c:4107 [inline]
+   __sys_bpf+0xf8f/0x4560 kernel/bpf/syscall.c:5475
+   __do_sys_bpf kernel/bpf/syscall.c:5561 [inline]
+   __se_sys_bpf kernel/bpf/syscall.c:5559 [inline]
+   __x64_sys_bpf+0x73/0xb0 kernel/bpf/syscall.c:5559
+   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+   do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:83
+   entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
+Fix this by rejecting ptr alu with variable offset on flow_keys.
+Applying the patch rejects the program with "R7 pointer arithmetic
+on flow_keys prohibited".
 
-vim +1340 net/mctp/test/route-test.c
+Fixes: d58e468b1112 ("flow_dissector: implements flow dissector BPF hook")
+Signed-off-by: Hao Sun <sunhao.th@gmail.com>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Acked-by: Yonghong Song <yonghong.song@linux.dev>
+Link: https://lore.kernel.org/bpf/20240115082028.9992-1-sunhao.th@gmail.com
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
+---
+Backport fix for CVE-2024-26589
+ kernel/bpf/verifier.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-  1257	
-> 1258	static const struct mctp_test_bind_setup bind_addr8_netdefault, type1 = {
-  1259		.bind_addr = 8, .bind_net = MCTP_NET_ANY, .bind_type = 1,
-  1260	};
-  1261	
-  1262	/* 1 is default net */
-  1263	static const struct mctp_test_bind_setup bind_addr8_net1_type1 = {
-  1264		.bind_addr = 8, .bind_net = 1, .bind_type = 1,
-  1265	};
-  1266	
-  1267	static const struct mctp_test_bind_setup bind_addrany_net1_type1 = {
-  1268		.bind_addr = MCTP_ADDR_ANY, .bind_net = 1, .bind_type = 1,
-  1269	};
-  1270	
-  1271	/* 2 is an arbitrary net */
-  1272	static const struct mctp_test_bind_setup bind_addr8_net2_type1 = {
-  1273		.bind_addr = 8, .bind_net = 2, .bind_type = 1,
-  1274	};
-  1275	
-  1276	static const struct mctp_test_bind_setup bind_addr8_netdefault_type1 = {
-  1277		.bind_addr = 8, .bind_net = MCTP_NET_ANY, .bind_type = 1,
-  1278	};
-  1279	
-  1280	static const struct mctp_test_bind_setup bind_addrany_net2_type2 = {
-  1281		.bind_addr = MCTP_ADDR_ANY, .bind_net = 2, .bind_type = 2,
-  1282	};
-  1283	
-  1284	static const struct mctp_test_bind_setup bind_addrany_net2_type1_peer9 = {
-  1285		.bind_addr = MCTP_ADDR_ANY, .bind_net = 2, .bind_type = 1,
-  1286		.have_peer = true, .peer_addr = 9, .peer_net = 2,
-  1287	};
-  1288	
-  1289	struct mctp_bind_pair_test {
-  1290		const struct mctp_test_bind_setup *bind1;
-  1291		const struct mctp_test_bind_setup *bind2;
-  1292		int error;
-  1293	};
-  1294	
-  1295	/* Pairs of binds and whether they will conflict */
-  1296	static const struct mctp_bind_pair_test mctp_bind_pair_tests[] = {
-  1297		/* Both ADDR_ANY, conflict */
-  1298		{ &bind_addrany_netdefault_type1, &bind_addrany_netdefault_type1, EADDRINUSE },
-  1299		/* Same specific EID, conflict */
-  1300		{ &bind_addr8_netdefault_type1, &bind_addr8_netdefault_type1, EADDRINUSE },
-  1301		/* ADDR_ANY vs specific EID, OK */
-  1302		{ &bind_addrany_netdefault_type1, &bind_addr8_netdefault_type1, 0 },
-  1303		/* ADDR_ANY different types, OK */
-  1304		{ &bind_addrany_net2_type2, &bind_addrany_net2_type1, 0 },
-  1305		/* ADDR_ANY different nets, OK */
-  1306		{ &bind_addrany_net2_type1, &bind_addrany_netdefault_type1, 0 },
-  1307	
-  1308		/* specific EID, NET_ANY (resolves to default)
-  1309		 *  vs specific EID, explicit default net 1, conflict
-  1310		 */
-  1311		{ &bind_addr8_netdefault_type1, &bind_addr8_net1_type1, EADDRINUSE },
-  1312	
-  1313		/* specific EID, net 1 vs specific EID, net 2, ok */
-  1314		{ &bind_addr8_net1_type1, &bind_addr8_net2_type1, 0 },
-  1315	
-  1316		/* ANY_ADDR, NET_ANY (doesn't resolve to default)
-  1317		 *  vs ADDR_ANY, explicit default net 1, OK
-  1318		 */
-  1319		{ &bind_addrany_netdefault_type1, &bind_addrany_net1_type1, 0 },
-  1320	
-  1321		/* specific remote peer doesn't conflict with any-peer bind */
-  1322		{ &bind_addrany_net2_type1_peer9, &bind_addrany_net2_type1, 0 },
-  1323	
-  1324		/* bind() NET_ANY is allowed with a connect() net */
-  1325		{ &bind_addrany_net2_type1_peer9, &bind_addrany_netdefault_type1, 0 },
-  1326	};
-  1327	
-  1328	static void mctp_bind_pair_desc(const struct mctp_bind_pair_test *t, char *desc)
-  1329	{
-  1330		char peer1[100] = {0}, peer2[100] = {0};
-  1331	
-  1332		if (t->bind1->have_peer)
-  1333			snprintf(peer1, sizeof(peer1), ", peer %d net %d",
-  1334				 t->bind1->peer_addr, t->bind1->peer_net);
-  1335		if (t->bind2->have_peer)
-  1336			snprintf(peer2, sizeof(peer2), ", peer %d net %d",
-  1337				 t->bind2->peer_addr, t->bind2->peer_net);
-  1338	
-  1339		snprintf(desc, KUNIT_PARAM_DESC_SIZE,
-> 1340			 "{bind(addr %d, type %d, net %d%s)} {bind(addr %d, type %d, net %d%s)} -> error %d",
-  1341			 t->bind1->bind_addr, t->bind1->bind_type, t->bind1->bind_net, peer1,
-  1342			 t->bind2->bind_addr, t->bind2->bind_type, t->bind2->bind_net, peer2,
-  1343			 t->error);
-  1344	}
-  1345	
-
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index 75251870430e..2a3b5e4276ba 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -6280,6 +6280,10 @@ static int adjust_ptr_min_max_vals(struct bpf_verifier_env *env,
+ 		verbose(env, "R%d pointer arithmetic on %s prohibited, null-check it first\n",
+ 			dst, reg_type_str[ptr_reg->type]);
+ 		return -EACCES;
++	case PTR_TO_FLOW_KEYS:
++		if (known)
++			break;
++		fallthrough;
+ 	case CONST_PTR_TO_MAP:
+ 		/* smin_val represents the known value */
+ 		if (known && smin_val == 0 && opcode == BPF_ADD)
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
+
 
