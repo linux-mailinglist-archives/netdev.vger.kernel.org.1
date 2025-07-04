@@ -1,152 +1,160 @@
-Return-Path: <netdev+bounces-203963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AE85AF85F8
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 05:13:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DEE2AF8603
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 05:24:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60C99162DD4
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 03:13:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 116EE7A2873
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 03:22:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8180D1EDA09;
-	Fri,  4 Jul 2025 03:12:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D771E25EB;
+	Fri,  4 Jul 2025 03:24:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AXZ2Rxug"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e0GYfyIO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B0E18A6CF;
-	Fri,  4 Jul 2025 03:12:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D953B1DF265
+	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 03:23:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751598747; cv=none; b=mmvjFNNkWuRChGacOl4hyLYEfrEtLkPAUl7A0hH5iQca5U+pk6p4eRt8W0isy6WW5rdwiV2Jmoog/iDA1k8d5dvXuZlNDgJsclk7EEQ6G+vCS5h5NM4t6LspaRUi24dGK4oJZTyPCv1xVUARy0jDdRHgRgQRN5pw/PhYxGF7dDE=
+	t=1751599441; cv=none; b=SP8CyF1WNXPYaNhWX7N3hOkWj64m0Vbn6whtR+AoF2ZOC8mAeDTi2Htl1iUcCSdrO8mYboplYh4N6uH9hQ+1KnxEEq/UXXVYDG8xFVDWmxuv4+AisHCTc6NcyCwI/sM9I1iU56QWG0l+rx7pR95NT58OEYGNDnO6BeShhOvPp4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751598747; c=relaxed/simple;
-	bh=Fs5SxE9OYDU9RRGx9YYCJ+8P6J1CW9T/pjsOKtv2W/c=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=WwgJFFeJFBBEChjQ56e1pyg1NEN10FTkL9jBCLik7RJdLuJp6pVbn4Sc/aE7cLpz+iBkMxkfdgq5H8nE+ZIDa2ZxO2jmN5jzB3CtIuIPMN06VCbsekjCB6eFkhbic4hRQdDj8ClVnFa7NV13GGnvbNMpC+ajBPw4KL0zujGE4fY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AXZ2Rxug; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7425bd5a83aso647783b3a.0;
-        Thu, 03 Jul 2025 20:12:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751598745; x=1752203545; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UDnxtWl5s/38sHw0j/zQjmRuBOsfROq4Q9JtcMPC9gI=;
-        b=AXZ2RxugIR6Qb2n/vWLP43ZVDCRpuw6TKWbot5Xk9oM6rRtIZKYq+jnNCql7iGNXf4
-         LEWiVnitHNk7HTD1s6c1aORcMgKa3Sl25u22nSBbWpX10iG3gEMAf9GFt+OXmZjh9xUA
-         +TxfZRls3OO3TaoMHl9K2P9bPIIf4hLPbGgfTswNVuTXJ52VHOeEcyyyd0pWMEtkj+t6
-         MRUbZWUJ0y8yfDikyrMMRluxVv2P+DEybJJtc9hCWurv8yzjjr8UoM/g5Y9QqhncGMYa
-         BPG0Orege4XnVTJ3R6WXsKAAAYJOPUVwC24Ji39eccFzRM5E1LUL/GOVl7jfdjZrEFSr
-         RiYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751598745; x=1752203545;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=UDnxtWl5s/38sHw0j/zQjmRuBOsfROq4Q9JtcMPC9gI=;
-        b=jX1VP56ROU2fwNIbdBc6X7pW9WL+ncWgoH6e2mdyO3md7a+MPHOuXvz5wvM3PQ0Go9
-         e+hhvSB0M0PMvpXlD+2Fpx/H+CXmO01C1AzAEkVAldFbj7gMEKbKOuvfZSEGFuyLiLRF
-         cHAxD7z1lAKjJ9kT5l5aF2XHkLYSCf3OzX0G3TDogH3sDHkA0HuyAG5l8FmM6w1LdCav
-         9zWeh/r4/fMIX79vxVcNrewEgzR+hzXgHwDYuujCIY+KfzQiT0edphXJZNVVgaTzGDir
-         5Lo1COmRZSJ4nq6ka6eoT2Rjo5yvS1+Md1jpuXxBmiUxA7c+SX559/THsW0O8dfU6WPP
-         Io0A==
-X-Forwarded-Encrypted: i=1; AJvYcCUi/EZ+vnnq9x4/3s2L4sS+x2wLtUTbQd60+61Y1lQAbd6BN6Hq2WWcBaT2mo6kGZ3yvRDZXpxMSpUT@vger.kernel.org, AJvYcCWGwuk12iA2mRF00hbjsqyoAB1CkEumz509eIfS2SjN6HSYrXTsWV+JtEirJxhBm1+69depvuVXHq8TIG6Eq4o=@vger.kernel.org, AJvYcCWHRms7T5rv4t9rYcKs1yhQotgOLnLl/OGS3YgLfjOuhGXqYSWlx0GPjUn5uSztqp4Z2ltaYniB5iUrzJGl@vger.kernel.org, AJvYcCWJyuvjC2KBG7KyrCThQSKaSylk27zUlJNrKKzFnWOC0a29Jmzl5aeGqP5JnV4eU4PD8tQFUQti@vger.kernel.org, AJvYcCWZ0OjewRwTtjDChJ2ubNtqRQNN7GJJPh6NV66QxXyoiWAwuFimGJQSRBaUVRhFBsk8WrrxFQ6BkkfF@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUNdOOf5kSuKeRTRUEg9xlQLkW2tXHWE68jQBDND3G62WuRQuM
-	VLhl+4mj2z7LHdrWJbXMrb2JVqRK3gOtG0vRVzhD7VuxyvB2itv1WZyB
-X-Gm-Gg: ASbGncsBZHu5a8ze6sNuvdw971xOgKff7XJlfVYpNUPGoF8A39aPGxxknzOWYklz2ew
-	1PYddKtYniG9ugej4+kFcCVG/tU3PDtZ8qzZErtfgnZxs2KvApGC9gIon70Adei3uMhCxtT9DK8
-	0jWqPQs7zCucbpro6sNm0imDPvbTV7Kv1Mt7Xp+I3v0qYck3hrRUYugIKS5SW/JDKx7sPMab783
-	i292eLsnuGsPtZZ+vVmGcEj4LwQS1dLvlmMsBiwr3eeRqqXKBsqDKDp2iOpdNojFoX+93T3N6Nq
-	aAWuzLsEbjdkg7RFyFbomq6MAD3UPgPdFyX/tZ1Vc0MO0h4H1jFx56uojoJdoL2NzW6Z86BgYuN
-	L+LViRKASHnVC6vRMNto9hdyQRGHiLUJ1R3sA/jtc
-X-Google-Smtp-Source: AGHT+IGsyFjekenVPYCtS93mzSmCbDC/+mZ2vHpqBkN8bjtYSY2xjBOBoLm6ohoEPg7/g649OEgPBw==
-X-Received: by 2002:a05:6a20:2583:b0:21f:54f0:3b84 with SMTP id adf61e73a8af0-2260b96873fmr609171637.35.1751598745078;
-        Thu, 03 Jul 2025 20:12:25 -0700 (PDT)
-Received: from localhost (p5332007-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.120.7])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce42a2c10sm863165b3a.136.2025.07.03.20.12.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Jul 2025 20:12:24 -0700 (PDT)
-Date: Fri, 04 Jul 2025 12:12:08 +0900 (JST)
-Message-Id: <20250704.121208.1554239479866226095.fujita.tomonori@gmail.com>
-To: dakr@kernel.org
-Cc: fujita.tomonori@gmail.com, alex.gaynor@gmail.com,
- gregkh@linuxfoundation.org, ojeda@kernel.org, rafael@kernel.org,
- robh@kernel.org, saravanak@google.com, a.hindborg@kernel.org,
- aliceryhl@google.com, bhelgaas@google.com, bjorn3_gh@protonmail.com,
- boqun.feng@gmail.com, david.m.ertman@intel.com,
- devicetree@vger.kernel.org, gary@garyguo.net, ira.weiny@intel.com,
- kwilczynski@kernel.org, leon@kernel.org, linux-kernel@vger.kernel.org,
- linux-pci@vger.kernel.org, lossin@kernel.org, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, tmgross@umich.edu
-Subject: Re: [PATCH v2 1/3] rust: device_id: split out index support into a
- separate trait
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <aGckCY3BiPRCPmS7@pollux>
-References: <20250701141252.600113-1-fujita.tomonori@gmail.com>
-	<20250701141252.600113-2-fujita.tomonori@gmail.com>
-	<aGckCY3BiPRCPmS7@pollux>
+	s=arc-20240116; t=1751599441; c=relaxed/simple;
+	bh=4S8wpH5Pnq6+MDR8tFUxzEncIxuZveMK0y+6Kselt/s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H0fVe3qUOGLQxM1tQ3kWy5aVE0twv2MBjmhUn3FQtMg0MPvs8Oj6aF/a75VV2xe3XHHEEcRCnPSv6hrUWlKVOkm1QSEL3xr2INLuvrznJUztfaX7YtpbyiBu2IIjrTVcXGzZKHjqDLqIC2KiDyaRCXqcs6nqI1Pe4B6Qwm2H09E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e0GYfyIO; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751599440; x=1783135440;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=4S8wpH5Pnq6+MDR8tFUxzEncIxuZveMK0y+6Kselt/s=;
+  b=e0GYfyIOYyYfz2IMcOZDN44AU+IJtDjOqokPRVKNsTN9DRc90faVsjBk
+   McDvIJ9L5pwOvozPQEUD9eSu1LAXT6EAEGM3TdoVt0+Ii4oHv6j+w77EG
+   jotRheQhf2NABdOBo4wiX5oaMaSsO/43FSNJemOb2TaXc6c0dkmY3ynW5
+   PY/fEFe5dYCIl9VDVwMAQEDa/4fqwSEdq18HX3Gaxn369higKkT71k/Ho
+   son3bH1lLkKWwjToa0Y+P9Gqe64TE6/LfBMKyeBqKBVvhnSpai5ZhdmK2
+   habGt260gU1irLAWsgd2fYQozsaE00fFvszpTTyhrqEw2Jp2RpSvzcvc/
+   w==;
+X-CSE-ConnectionGUID: IOMalOCIRIuh0z47DnJiMQ==
+X-CSE-MsgGUID: 71TdpH9PTk6z6TQQoiPgPg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="53156686"
+X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
+   d="scan'208";a="53156686"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2025 20:23:59 -0700
+X-CSE-ConnectionGUID: qFWY1a8FRO2YmJC8FwbL4Q==
+X-CSE-MsgGUID: FPE2/dhAReqiHf7j0Vun/g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
+   d="scan'208";a="154617835"
+Received: from lkp-server01.sh.intel.com (HELO 0b2900756c14) ([10.239.97.150])
+  by fmviesa006.fm.intel.com with ESMTP; 03 Jul 2025 20:23:57 -0700
+Received: from kbuild by 0b2900756c14 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uXX1n-0003Gx-0N;
+	Fri, 04 Jul 2025 03:23:55 +0000
+Date: Fri, 4 Jul 2025 11:23:50 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>
+Subject: Re: [PATCH v1 net 2/2] atm: clip: Fix potential null-ptr-deref in
+ to_atmarpd().
+Message-ID: <202507041113.tpHgxTvk-lkp@intel.com>
+References: <20250702020437.703698-3-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250702020437.703698-3-kuniyu@google.com>
 
-On Fri, 4 Jul 2025 02:44:57 +0200
-Danilo Krummrich <dakr@kernel.org> wrote:
+Hi Kuniyuki,
 
-> On Tue, Jul 01, 2025 at 11:12:50PM +0900, FUJITA Tomonori wrote:
->> +// SAFETY:
->> +// * `DRIVER_DATA_OFFSET` is the offset to the `driver_data` field.
-> 
-> Here and for a few other occurances, this doesn't need to be a list, since it's
-> just a single item.
+kernel test robot noticed the following build warnings:
 
-Indeed, fixed all the places.
+[auto build test WARNING on net/main]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/atm-clip-Fix-infinite-recursive-call-of-clip_push/20250702-100652
+base:   net/main
+patch link:    https://lore.kernel.org/r/20250702020437.703698-3-kuniyu%40google.com
+patch subject: [PATCH v1 net 2/2] atm: clip: Fix potential null-ptr-deref in to_atmarpd().
+config: i386-randconfig-063-20250704 (https://download.01.org/0day-ci/archive/20250704/202507041113.tpHgxTvk-lkp@intel.com/config)
+compiler: clang version 20.1.7 (https://github.com/llvm/llvm-project 6146a88f60492b520a36f8f8f3231e15f3cc6082)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250704/202507041113.tpHgxTvk-lkp@intel.com/reproduce)
 
->> +/// Extension trait for [`RawDeviceId`] for devices that embed an index or context value.
->> +///
->> +/// This is typically used when the device ID struct includes a field like `driver_data`
->> +/// that is used to store a pointer-sized value (e.g., an index or context pointer).
->> +///
->> +/// # Safety
->> +///
->> +/// Implementers must ensure that:
->> +///   - `DRIVER_DATA_OFFSET` is the correct offset (in bytes) to the context/data field (e.g., the
->> +///     `driver_data` field) within the raw device ID structure. This field must be correctly sized
->> +///     to hold a `usize`.
->> +///
->> +///     Ideally, the data should ideally be added during `Self` to `RawType` conversion,
-> 
-> Remove one of the duplicate "ideally".
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507041113.tpHgxTvk-lkp@intel.com/
 
-Oops, removed.
+sparse warnings: (new ones prefixed by >>)
+>> net/atm/clip.c:64:15: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   net/atm/clip.c:64:15: sparse:    struct atm_vcc [noderef] __rcu *
+   net/atm/clip.c:64:15: sparse:    struct atm_vcc *
+   net/atm/clip.c:625:9: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   net/atm/clip.c:625:9: sparse:    struct atm_vcc [noderef] __rcu *
+   net/atm/clip.c:625:9: sparse:    struct atm_vcc *
+   net/atm/clip.c:658:9: sparse: sparse: incompatible types in comparison expression (different address spaces):
+   net/atm/clip.c:658:9: sparse:    struct atm_vcc [noderef] __rcu *
+   net/atm/clip.c:658:9: sparse:    struct atm_vcc *
 
+vim +64 net/atm/clip.c
 
->> +///     but there's currently no way to do it when using traits in const.
->> +///
->> +///   - The `index` method must return the value stored at the location specified
->> +///     by `DRIVER_DATA_OFFSET`, assuming `self` is layout-compatible with `RawType`.
-> 
-> I think technically this safety requirement isn't needed.
+    52	
+    53	static int to_atmarpd(enum atmarp_ctrl_type type, int itf, __be32 ip)
+    54	{
+    55		struct sock *sk;
+    56		struct atmarp_ctrl *ctrl;
+    57		struct atm_vcc *vcc;
+    58		struct sk_buff *skb;
+    59		int err = 0;
+    60	
+    61		pr_debug("(%d)\n", type);
+    62	
+    63		rcu_read_lock();
+  > 64		vcc = rcu_dereference(atmarpd);
+    65		if (!vcc) {
+    66			err = -EUNATCH;
+    67			goto unlock;
+    68		}
+    69		skb = alloc_skb(sizeof(struct atmarp_ctrl), GFP_ATOMIC);
+    70		if (!skb) {
+    71			err = -ENOMEM;
+    72			goto unlock;
+    73		}
+    74		ctrl = skb_put(skb, sizeof(struct atmarp_ctrl));
+    75		ctrl->type = type;
+    76		ctrl->itf_num = itf;
+    77		ctrl->ip = ip;
+    78		atm_force_charge(vcc, skb->truesize);
+    79	
+    80		sk = sk_atm(vcc);
+    81		skb_queue_tail(&sk->sk_receive_queue, skb);
+    82		sk->sk_data_ready(sk);
+    83	unlock:
+    84		rcu_read_unlock();
+    85		return err;
+    86	}
+    87	
 
-Ah, you're right. I'll remove it.
-
-
-> With this:
-> 
-> 	Acked-by: Danilo Krummrich <dakr@kernel.org>
-
-Thanks a lot!
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
