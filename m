@@ -1,125 +1,105 @@
-Return-Path: <netdev+bounces-204135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0558BAF925E
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 14:18:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BC01AF9269
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 14:22:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B01A564EB9
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 12:18:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C59143AFE2B
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 12:21:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D18832D5C8E;
-	Fri,  4 Jul 2025 12:17:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E9E2D63EA;
+	Fri,  4 Jul 2025 12:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ODWJAbWo"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="J097Db1w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B129226CF8;
-	Fri,  4 Jul 2025 12:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634EA2D640C;
+	Fri,  4 Jul 2025 12:21:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751631475; cv=none; b=rDFJ6NDfOrbPOXBBRvhGjh32OlcHfuZmD/Wcyb9uo/BFvD6ac/zHCeFjvvVfCBmyQ2+/BuombI9L8lwWPvw9rj7geKBHLRqWFpszyfyOUqeFQi9Yb/sobWirFhY4sDB+JX7B4isteEp/azSJot9gzhGa7ThwZtn7C053rkEVIlA=
+	t=1751631706; cv=none; b=XnIbRiLQ0iGqKO+q/w7igjzxdLcy3U15F2GnWlcVlt27AaXbxEQkQ2JSWSqULeDFdE2B+DeKktakrx1R9bJYtPxhFD90GcNdvT3IA/QyzxR68O77bF0ZuthKJG9NHopv82OdlfY+5Xvfk0LkyXpP6Z90RZCuJvQGjGFc5dOdvdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751631475; c=relaxed/simple;
-	bh=v+85yg2C2UzcM3/q41A27+OqPOceyBE3B71jGq3SiMg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nBOL956ZjwEPPsbMDFChU9NyAn4/DuvOYWdC6/2DxjhpA6i2S0DyGZihXWQe56rODRtuGnPiwgXmNGOuGv4N8GQM4d0luavZKMHhjJRi7pyOzqAs3hBUNjG2wzpUY7DsBF0+OBrVhQsgP48LohJ8SUJdet3kQjpUC+hev1AzTlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ODWJAbWo; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751631474; x=1783167474;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=v+85yg2C2UzcM3/q41A27+OqPOceyBE3B71jGq3SiMg=;
-  b=ODWJAbWoUA322Qq+W8zz8fiYjBSAWbuA6odc0CjwTvvxOYBcsuezmaVr
-   V5gi6r/ZyNKWa0byUkZ99fAWFa6ldv1UDnnNNKkEBvfaWZtUW65YDTkaL
-   6D0El4jkng1ozgEjz3FMh/vekvgPbvRFXzIlZrq5g8T9CJJeDOVe/LmQS
-   SXqKBlO7fuJX0YPvLYxZXZdD4Vg3sfkoB1a+mBwC1RhkLmnS9MHzOX0BO
-   n6lS4Wr/NAQbk6/f/YewdQegoOypUURATgwah5AaMoPjyLs+gJnn0yOqX
-   /XDapFXHw8z4M+tV91WyCTSO3XJJ69YvaBPed1EcbyvbzWO4Uzjbpv5Sf
-   g==;
-X-CSE-ConnectionGUID: nCWz7/WwQgagrG+3hl1sfA==
-X-CSE-MsgGUID: ftscQASIRIuma2f8SBLo6w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="64566932"
-X-IronPort-AV: E=Sophos;i="6.16,287,1744095600"; 
-   d="scan'208";a="64566932"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 05:17:54 -0700
-X-CSE-ConnectionGUID: tzq80C+0S4elQw0iuct3zw==
-X-CSE-MsgGUID: rf1mevPzQ56YiCStLTdnKw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,287,1744095600"; 
-   d="scan'208";a="160305463"
-Received: from lkp-server01.sh.intel.com (HELO 0b2900756c14) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 04 Jul 2025 05:17:49 -0700
-Received: from kbuild by 0b2900756c14 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uXfMQ-0003gd-2m;
-	Fri, 04 Jul 2025 12:17:46 +0000
-Date: Fri, 4 Jul 2025 20:17:04 +0800
-From: kernel test robot <lkp@intel.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net
-Cc: oe-kbuild-all@lists.linux.dev,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] net: netdevsim: Add PHY support in netdevsim
-Message-ID: <202507041906.JXjAtVqe-lkp@intel.com>
-References: <20250702082806.706973-2-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1751631706; c=relaxed/simple;
+	bh=8a4JE7cC0D+vkHlLbZY2UU0DDIew3l1nNVFssbZ4h8A=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QpnhbrNwTrecvEaVMpeezHRbSYreKgetspFmN4LcxG54J7WFeQFlPfTDx+nA8lSCujBoa8o5JK0yx+J5d3EKraK9ywEtk1MkTmJ3lGrW7ChtB86pIKTXN3/V8Q3bUsgYUj8rd0UDpp45HQTzNtz9MSLNspF7mk9GuYxKZSb0Kzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=J097Db1w; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 283F2443D7;
+	Fri,  4 Jul 2025 12:21:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1751631702;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=14yiLbluiFffVexpfXmhgolj33cjrEQatU2sWBvTEdI=;
+	b=J097Db1wBFOvaRrjiF9azT0bdbkQY94mrPe7zYjitUqSWMfDesYbvsacSuyVVdFQBMdhwg
+	H5h3R65CFuckmQ/22cfTk8dwQIbbo4DefNPG5iBIiBtLUSW7Wwzr9OKqv4ljrAxqgIoiob
+	BXXAWBL0dotvhogtMiDID5oPru3xsZLM3wD6R26Fe6rNW6pMjPmn2exXLYpjORajw23luG
+	sy7osrRw0xoLiFKXrxLrw+Fc6PLu8m/oAhlOSifFzkHeKnmGXH7DTKbnpWEadmujxOF8Rf
+	OpIwn4FtYuUWSHHs7ibiBZ9lsqsLqA9X4pVUu4IL4n1kEEtLkIYOeyBtHoh+Zw==
+Date: Fri, 4 Jul 2025 14:21:38 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Sarosh Hasan <quic_sarohasa@quicinc.com>
+Cc: Wei Fang <wei.fang@nxp.com>, "andrew @ lunn . ch" <andrew@lunn.ch>,
+ Russell King <linux@armlinux.org.uk>, Florian Fainelli
+ <f.fainelli@gmail.com>, "hkallweit1 @ gmail . com" <hkallweit1@gmail.com>,
+ "davem @ davemloft . net" <davem@davemloft.net>, "edumazet @ google . com"
+ <edumazet@google.com>, "kuba @ kernel . org" <kuba@kernel.org>, "pabeni @
+ redhat . com" <pabeni@redhat.com>, "xiaolei . wang @ windriver . com"
+ <xiaolei.wang@windriver.com>, "linux-kernel @ vger . kernel . org"
+ <linux-kernel@vger.kernel.org>, "imx @ lists . linux . dev"
+ <imx@lists.linux.dev>, "netdev @ vger . kernel . org"
+ <netdev@vger.kernel.org>, Prasad Sodagudi <quic_psodagud@quicinc.com>,
+ Abhishek Chauhan <quic_abchauha@quicinc.com>, Sagar Cheluvegowda
+ <quic_scheluve@quicinc.com>, Girish Potnuru <quic_gpotnuru@quicinc.com>,
+ <kernel@oss.qualcomm.com>
+Subject: Re: [PATCH net v1] net: phy: Change flag to autoremove the consumer
+Message-ID: <20250704142138.3f1a4ec1@fedora.home>
+In-Reply-To: <20250703090041.23137-1-quic_sarohasa@quicinc.com>
+References: <20250703090041.23137-1-quic_sarohasa@quicinc.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250702082806.706973-2-maxime.chevallier@bootlin.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddvfeduhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduledprhgtphhtthhopehquhhitggpshgrrhhohhgrshgrsehquhhitghinhgtrdgtohhmpdhrtghpthhtohepfigvihdrfhgrnhhgsehngihprdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpt
+ hhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopehfrdhfrghinhgvlhhlihesghhmrghilhdrtghomhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hi Maxime,
+On Thu, 3 Jul 2025 14:30:41 +0530
+Sarosh Hasan <quic_sarohasa@quicinc.com> wrote:
 
-kernel test robot noticed the following build errors:
+> phy_detach() is not called when the MDIO controller driver is
+> removed. So phydev->devlink is not cleared, but actually the device
+> link has been removed by phy_device_remove()--> device_del().Therefore,
+> it will cause the crash when the MAC controller driver is removed.
+> In such case delete link between phy dev and mac dev. Change the 
+> DL_FLAG_STATELESS flag to DL_FLAG_AUTOREMOVE_SUPPLIER,so that the
+> consumer (MAC controller) driver will be automatically removed
+> when the link is removed.
 
-[auto build test ERROR on net-next/main]
+This doesn't work unfortunately, PHY devices can be hot-swappable, e.g.
+when the PHY is in an SFP module. In that case, we must not
+automatically remove the MAC controller driver when the PHY goes away.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Maxime-Chevallier/net-netdevsim-Add-PHY-support-in-netdevsim/20250702-163058
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250702082806.706973-2-maxime.chevallier%40bootlin.com
-patch subject: [PATCH net-next 1/3] net: netdevsim: Add PHY support in netdevsim
-config: microblaze-allmodconfig (https://download.01.org/0day-ci/archive/20250704/202507041906.JXjAtVqe-lkp@intel.com/config)
-compiler: microblaze-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250704/202507041906.JXjAtVqe-lkp@intel.com/reproduce)
+I gave this patch a quick test on a Macchiatobin, which has an SFP
+module, and indeed when you unplug the module while the link is up, the
+system hangs completely when running a command like "ip a" afterwards.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507041906.JXjAtVqe-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   microblaze-linux-ld: drivers/net/netdevsim/phy.o: in function `phy_module_exit':
->> phy.o:(.exit.text+0x0): multiple definition of `cleanup_module'; drivers/net/netdevsim/netdev.o:netdev.o:(.exit.text+0x0): first defined here
-   microblaze-linux-ld: drivers/net/netdevsim/phy.o: in function `phy_module_init':
->> phy.o:(.init.text+0x0): multiple definition of `init_module'; drivers/net/netdevsim/netdev.o:netdev.o:(.init.text+0x0): first defined here
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Maxime
 
