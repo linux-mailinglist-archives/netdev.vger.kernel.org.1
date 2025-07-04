@@ -1,56 +1,92 @@
-Return-Path: <netdev+bounces-204217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B08CAAF9983
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 19:14:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63142AF9988
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 19:14:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B84517D42F
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 17:14:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B957456345D
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 17:14:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E92E293B42;
-	Fri,  4 Jul 2025 17:14:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4A72D8362;
+	Fri,  4 Jul 2025 17:14:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hq5nQt/w"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JUC4rJYw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B481DD0C7
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 17:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE512D3EFC;
+	Fri,  4 Jul 2025 17:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751649245; cv=none; b=t2IrMaxuuKoQg6UKML97y1uoxTDJcaTr3k5VmCI+J9H9bZ0hRWX6AVVNi1CI2m0bGHZkbP9kboE7tzMVZTT0cVmfsTSW7FhWdkPUNmbw7LvCrDEJjSm9WsGBB3V5uryoJItr01Q8heeL5e9lnhHcX8eCezlfAlFaGoL6qMrJyUE=
+	t=1751649285; cv=none; b=R3DWrG/FIWozb2AaOk2fFoLyN5H/yojQkRu3VN7M+2+/kphgKLzTzjvsarWZ6FJl440uCNOkb0R/Ffw4zDBVROCgb2wzyo/btdmBldKjK0JTRw9RQh43oHnYzNmy+/w5RU7R/sZgty8CUlW6JtKaI52yInWNk1R2TwpgxgF3RtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751649245; c=relaxed/simple;
-	bh=UdE2wCHXWoXBCeTbv4BQLfwv23s57LU+ZR904hskDSA=;
+	s=arc-20240116; t=1751649285; c=relaxed/simple;
+	bh=34JBcfpqv/RuVeGVE1sgz4VnuW3G11ODRxomS8x+vyU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tvOY7N79CL6RVTPJSYdsaswB756BxkSEaYi7kv6XPMM+VABdNr8KnMLMJDprb5pkZBoKJk++QEvUKrQHPdrcOWUkEjDggXxmI4+iJ76EBQagKfCXxvsF/cMUE8eA8bisnzrSbaCmi6MZ9uxyXjHJ0OSpIi1GTj9XAWlPUY3XvVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hq5nQt/w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C5C0C4CEE3;
-	Fri,  4 Jul 2025 17:14:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751649244;
-	bh=UdE2wCHXWoXBCeTbv4BQLfwv23s57LU+ZR904hskDSA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hq5nQt/w0COcnj2QGzSWI6m7CZobPXbXF83SaX68mu1id63YZ0idO0Z3MV32MVSd1
-	 g8LjKI07ySTIykZ9bdxpsjnqgyH8Cni4hvijmk6unU7N8jfm4DutWfRaxB5qCvCtci
-	 TBMmvGtkZc70JMYH8buod6teh7n5IjJS0clfwyEoYplncbC4YbrAHFL895T9Ec/Ikn
-	 k0vjB+44kGIp8X1hkRieTx07AOWvl5Nm2Zq91/XSS67snkyitRxNn1ci3C7mxv/65+
-	 YVqZu/76K0evT0Rk+ijJDWAvddSXZu8o435xWRYyHW00NfKAKoVBV7HUAn2LntflZQ
-	 L9cruT+S1RpPw==
-Date: Fri, 4 Jul 2025 18:14:00 +0100
-From: Simon Horman <horms@kernel.org>
-To: Mingming Cao <mmc@linux.ibm.com>
-Cc: netdev@vger.kernel.org, bjking1@linux.ibm.com, haren@linux.ibm.com,
-	ricklind@linux.ibm.com, davemarq@linux.ibm.com
-Subject: Re: [PATCH v2 net-next 2/4] ibmvnic: Fix hardcoded
- NUM_RX_STATS/NUM_TX_STATS with dynamic sizeof
-Message-ID: <20250704171400.GN41770@horms.kernel.org>
-References: <20250702171804.86422-1-mmc@linux.ibm.com>
- <20250702171804.86422-3-mmc@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hy73QaOyyDq5czAa8h4NTsXhIUsvaUKu/tDQKzkoFZrmi/z1UPqRuzi2smoqeK573vH9AtZvV5DCpsGckyP4vsOAIbnnIzkn34naRBtMaXvFWNZaSGMv2KcMZODEJlaUerQXo8jnNmX5KNHKxb89J+W3eNJDd+N5eWn86g5RCf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JUC4rJYw; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-45348bff79fso11883415e9.2;
+        Fri, 04 Jul 2025 10:14:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751649282; x=1752254082; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tyC50wOyVRs8MKfadyZet0uzckUrFkE/ZuApW9xR9g0=;
+        b=JUC4rJYw6n32r6GpnLEO+V+CXLuWGvB5mu54yNuRGG2xZJIZN4jtg8TJwOyii10fm+
+         95/rbMeBg+qbBNl6E+9dy1IwzUo+5qF1NZeTLn+nzn3U7ctbAlapolYrhMbdq4x5kOu2
+         Jhp3bLDiVNxIwxUkzSg9FcaMBS+LjPApPfNPPR6zjdLlhJLj3R1oVsapbwCOsDbgkL5b
+         ozP59Qz9C7ayz8goEPbyOuAHGrMFa4Pq8qAiuuWRhZ69rOUZ8Qq0q4U3ykvQ4/Y+M7q6
+         mBhApX7wkYlYOYGJTqYffpmmX4JAfHL/UpXzkBIGGya4vbS6aSSIc3vrkhQ1Ag5DDN0e
+         +9oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751649282; x=1752254082;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tyC50wOyVRs8MKfadyZet0uzckUrFkE/ZuApW9xR9g0=;
+        b=eLAWVHc7zz9pnfzraYcLeA0HF82rarTEsQhEmuY7EVTdAo4r+Y6wnQLTaUducvjRo2
+         ye2rrupEYMEq3vfXp7/9d52bbS9Ryu5qCwUs9oi/e3jbIxzBu7iT6TrMrjayM6e+AaEs
+         Dc6PU0fwzdAMmbyYkpEiouA2+qUUy+Uk2sDaS2NWC4Y7X44R0dPTVuLfeNWeYfJ81i/c
+         fkZPDcJTxsI385CjX8oXoEu7i8ijh7r4mC+bH74f8daZJXVk2oTa8eqAHYDiRueMcvZD
+         8mA36zl2mfdee3p4p7lh8CnkFJFne/O6rP2ldtheCjYFBU4+mmQQLwm9DKYbUavQ8tnH
+         ymaA==
+X-Forwarded-Encrypted: i=1; AJvYcCVHESibUwliAqjD52iOvrLpSvwQnuAUbjI8PxdPwQ8CjlGuzymdkzOb+MYKxhBoDwdxZKYHOIIF+Xgog+3K@vger.kernel.org, AJvYcCX1kPmEykCO0lP12fwZru/zyrJsuAdEHS5tYwwYm/HQH9YyjPSiKucE1bZfWvAVGdT1U1Y=@vger.kernel.org, AJvYcCXlw0sxcpO/7RWXX/Z2+c/8qMQ1slOte/AUPwN9RtlOlys+HjwlJ2snHmxDhucsIZNHfV6uGqM8@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVbyhQLwB14XELGsq14LexcAnnMU5ATjpnglz3FSfvkfl1+xn8
+	3KR0sH9gwCv3MFzAcOGL9XtsT8b7EhWpiUWHBHbC62C/xG4aKyKrJ70k
+X-Gm-Gg: ASbGnctPfqAc4+kQNYCVFL9o/xGiwNvWejdG7+l9i0JL0O9nWW7Mzp8zjVot0wZd01W
+	O9b+kHCN9zy4rymnjzqSjr0U2mhHtOlaRdKELGIre8PpOgh8C7QxKJJTiv7ygfZOLHoQ/zIpPP0
+	WxoNClJXW4yyU/hKrWadGlH4JPWtxoabXEJFI6zp97Ofx0CXQOn8eBQI7d1Q/3xXmCz5ld2qDZN
+	NhFOrmrchDxbzJb0cIfDyZRgFJzMAEpWyJePYtVHYlxKyao7fs9ZoyR+CxhRWBtfn8dgfZhRHLP
+	gN6bsIozoLeiwHWDdQJcqGsSszhMd3sLOH2AVjHO1AjYn27cquSj3o8ITgbe3YAzExG90pfQKV2
+	V2o44wOGEsVEDigrEy/Fadbfv9qi92RoohP9etxvkNiaM0Qt8CeW2BKnjpfY=
+X-Google-Smtp-Source: AGHT+IEpBfkGUWzq1y9+h7zKwUeUeUOSaRanOJEnEFwDu+h0TVYl39D9u2QkWyRSq6xOmn06pQZyFA==
+X-Received: by 2002:a05:600c:3555:b0:453:8f6:6383 with SMTP id 5b1f17b1804b1-454b4e850ffmr36548925e9.15.1751649281599;
+        Fri, 04 Jul 2025 10:14:41 -0700 (PDT)
+Received: from mail.gmail.com (2a01cb0889497e00f4a70e6ef5563d6a.ipv6.abo.wanadoo.fr. [2a01:cb08:8949:7e00:f4a7:e6e:f556:3d6a])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b4708d0ed9sm2995844f8f.38.2025.07.04.10.14.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Jul 2025 10:14:40 -0700 (PDT)
+Date: Fri, 4 Jul 2025 19:14:38 +0200
+From: Paul Chaignon <paul.chaignon@gmail.com>
+To: Eduard Zingerman <eddyz87@gmail.com>
+Cc: syzbot <syzbot+c711ce17dd78e5d4fdcf@syzkaller.appspotmail.com>,
+	andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+	daniel@iogearbox.net, haoluo@google.com, john.fastabend@gmail.com,
+	jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org,
+	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@fomichev.me,
+	song@kernel.org, syzkaller-bugs@googlegroups.com,
+	yonghong.song@linux.dev
+Subject: Re: [syzbot] [bpf?] WARNING in reg_bounds_sanity_check
+Message-ID: <aGgL_g3wA2w3yRrG@mail.gmail.com>
+References: <68649190.a70a0220.3b7e22.20e8.GAE@google.com>
+ <aGa3iOI1IgGuPDYV@Tunnel>
+ <865f2345eaa61afbd26d9de0917e3b1d887c647d.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,78 +95,123 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250702171804.86422-3-mmc@linux.ibm.com>
+In-Reply-To: <865f2345eaa61afbd26d9de0917e3b1d887c647d.camel@gmail.com>
 
-On Wed, Jul 02, 2025 at 10:18:02AM -0700, Mingming Cao wrote:
-> The previous hardcoded definitions of NUM_RX_STATS and
-> NUM_TX_STATS were not updated when new fields were added
-> to the ibmvnic_{rx,tx}_queue_stats structures. Specifically,
-> commit 2ee73c54a615 ("ibmvnic: Add stat for tx direct vs tx
-> batched") added a fourth TX stat, but NUM_TX_STATS remained 3,
-> leading to a mismatch.
+On Thu, Jul 03, 2025 at 11:54:27AM -0700, Eduard Zingerman wrote:
+> On Thu, 2025-07-03 at 19:02 +0200, Paul Chaignon wrote:
+> > On Tue, Jul 01, 2025 at 06:55:28PM -0700, syzbot wrote:
+> > > Hello,
+> > >
+> > > syzbot found the following issue on:
+> > >
+> > > HEAD commit:    cce3fee729ee selftests/bpf: Enable dynptr/test_probe_read_..
+> > > git tree:       bpf-next
+> > > console+strace: https://syzkaller.appspot.com/x/log.txt?x=147793d4580000
+> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=79da270cec5ffd65
+> > > dashboard link: https://syzkaller.appspot.com/bug?extid=c711ce17dd78e5d4fdcf
+> > > compiler:       Debian clang version 20.1.6 (++20250514063057+1e4d39e07757-1~exp1~20250514183223.118), Debian LLD 20.1.6
+> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1594e48c580000
+> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1159388c580000
+> > >
+> > > Downloadable assets:
+> > > disk image: https://storage.googleapis.com/syzbot-assets/f286a7ef4940/disk-cce3fee7.raw.xz
+> > > vmlinux: https://storage.googleapis.com/syzbot-assets/e2f2ebe1fdc3/vmlinux-cce3fee7.xz
+> > > kernel image: https://storage.googleapis.com/syzbot-assets/6e3070663778/bzImage-cce3fee7.xz
+> > >
+> > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > > Reported-by: syzbot+c711ce17dd78e5d4fdcf@syzkaller.appspotmail.com
+> > >
+> > > ------------[ cut here ]------------
+> > > verifier bug: REG INVARIANTS VIOLATION (false_reg1): range bounds violation u64=[0x0, 0x0] s64=[0x0, 0x0] u32=[0x1, 0x0] s32=[0x0, 0x0] var_off=(0x0, 0x0)(1)
+> > > WARNING: CPU: 1 PID: 5833 at kernel/bpf/verifier.c:2688 reg_bounds_sanity_check+0x6e6/0xc20 kernel/bpf/verifier.c:2682
+> >
+> > I'm unsure how to handle this one.
+> >
+> > One example repro is as follows.
+> >
+> >   0: call bpf_get_netns_cookie
+> >   1: if r0 == 0 goto <exit>
+> >   2: if r0 & Oxffffffff goto <exit>
+> >
+> > The issue is on the path where we fall through both jumps.
+> >
+> > That path is unreachable at runtime: after insn 1, we know r0 != 0, but
+> > with the sign extension on the jset, we would only fallthrough insn 2
+> > if r0 == 0. Unfortunately, is_branch_taken() isn't currently able to
+> > figure this out, so the verifier walks all branches. As a result, we end
+> > up with inconsistent register ranges on this unreachable path:
+> >
+> >   0: if r0 == 0 goto <exit>
+> >     r0: u64=[0x1, 0xffffffffffffffff] var_off=(0, 0xffffffffffffffff)
+> >   1: if r0 & 0xffffffff goto <exit>
+> >     r0 before reg_bounds_sync: u64=[0x1, 0xffffffffffffffff] var_off=(0, 0)
+> >     r0 after reg_bounds_sync:  u64=[0x1, 0] var_off=(0, 0)
+> >
+> > I suspect there isn't anything specific to these two conditions, and
+> > anytime we start walking an unreachable path, we may end up with
+> > inconsistent register ranges. The number of times syzkaller is currently
+> > hitting this (180 in 1.5 days) suggests there are many different ways to
+> > reproduce.
+> >
+> > We could teach is_branch_taken() about this case, but we probably won't
+> > be able to cover all cases. We could stop warning on this, but then we
+> > may also miss legitimate cases (i.e., invariants violations on reachable
+> > paths). We could also teach reg_bounds_sync() to stop refining the
+> > bounds before it gets inconsistent, but I'm unsure how useful that'd be.
 > 
-> This patch replaces the static defines with dynamic sizeof-based
-> calculations to ensure the stat arrays are correctly sized.
-> This fixes incorrect indexing and prevents incomplete stat
-> reporting in tools like ethtool.
+> Hi Paul,
 > 
-> Fixes: 2ee73c54a615 ("ibmvnic: Add stat for tx direct vs tx batched")
+> In general, I think that reg_bounds_sync() can be used as a substitute
+> for is_branch_taken() -> whenever an impossible range is produced,
+> the branch should be deemed impossible at runtime and abandoned.
+> If I recall correctly Andrii considered this too risky some time ago,
+> so this warning is in place to catch bugs.
 
-nit: no blank line between Fixes and other tags please
+Hi Eduard,
 
-More importantly, the cited commit is present in net so this
-fix patch sould also be targeted at net. IOW, please break this
-patch out of this patchset and post it targeted at net, while
-the remaining patches should be posted as a v3 for net-next.
+Yeah, that feels risky enough that I didn't even dare mention it as a
+possibility :)
 
 > 
-> Signed-off-by: Mingming Cao <mmc@linux.ibm.com>
-> Reviewed-by: Dave Marquardt <davemarq@linux.ibm.com>
-> Reviewed by: Haren Myneni <haren@linux.ibm.com>
-> ---
->  drivers/net/ethernet/ibm/ibmvnic.h | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+> Which leaves only the option to refine is_branch_taken().
 > 
-> diff --git a/drivers/net/ethernet/ibm/ibmvnic.h b/drivers/net/ethernet/ibm/ibmvnic.h
-> index 9b1693d817..e574eed97c 100644
-> --- a/drivers/net/ethernet/ibm/ibmvnic.h
-> +++ b/drivers/net/ethernet/ibm/ibmvnic.h
-> @@ -211,7 +211,6 @@ struct ibmvnic_statistics {
->  	u8 reserved[72];
->  } __packed __aligned(8);
->  
-> -#define NUM_TX_STATS 3
->  struct ibmvnic_tx_queue_stats {
->  	atomic64_t batched_packets;
->  	atomic64_t direct_packets;
-> @@ -219,13 +218,18 @@ struct ibmvnic_tx_queue_stats {
->  	atomic64_t dropped_packets;
->  };
->  
-> -#define NUM_RX_STATS 3
-> +#define NUM_TX_STATS \
-> +	(sizeof(struct ibmvnic_tx_queue_stats) / sizeof(atomic64_t))
-> +
+> I think is_branch_taken() modification should not be too complicated.
+> For JSET it only checks tnum, but does not take ranges into account.
+> Reasoning about ranges is something along the lines:
+> - for unsigned range a = b & CONST -> a is in [b_min & CONST, b_max & CONST];
+> - for signed ranged same thing, but consider two unsigned sub-ranges;
+> - for non CONST cases, I think same reasoning can apply, but more
+>   min/max combinations need to be explored.
+> - then check if zero is a member or 'a' range.
+> 
+> Wdyt?
 
-I'd suggest changing this to use the old, u64, type instead of atomic64_t.
-Then, once this patch has hit net-next, via net, post the remaining patches
-of this patchset for net-next. And at that time, in what is currently the
-first patch of this series, which changes the type of the members of struct
-ibmvnic_tx_queue_stats, also update u64 to atomic64_t here.
+I might be missing something, but I'm not sure that works. For the
+unsigned range, if we have b & 0x2 with b in [2; 10], then we'd end up
+with a in [2; 2] and would conclude that the jump is never taken. But
+b=8 proves us wrong.
 
->  struct ibmvnic_rx_queue_stats {
->  	atomic64_t packets;
->  	atomic64_t bytes;
->  	atomic64_t interrupts;
->  };
->  
-> +#define NUM_RX_STATS \
-> +	(sizeof(struct ibmvnic_rx_queue_stats) / sizeof(atomic64_t))
-> +
+> 
+> > The number of times syzkaller is currently hitting this (180 in 1.5
+> > days) suggests there are many different ways to reproduce.
+> 
+> It is a bit inconvenient to read syzbot BPF reports at the moment,
+> because it us hard to figure out how the program looks like.
+> Do you happen to know how complicated would it be to modify syzbot
+> output to:
+> - produce a comment with BPF program
+> - generating reproducer with a flag, allowing to print level 2
+>   verifier log
+> ?
 
-Likewise here.
+I have the same thought sometimes. Right now, I add verifier logs to a
+syz or C reproducer to see the program. Producing the BPF program in a
+comment would likely be tricky as we'd need to maintain a disassembler
+in syzkaller. Adding verifier logs to reproducers that contain
+bpf(PROG_LOAD) calls seems easier. Then I guess we'd get that output in
+the strace or console logs of syzbot.
 
->  struct ibmvnic_acl_buffer {
->  	__be32 len;
->  	__be32 version;
+> 
+> Thanks,
+> Eduard
 
