@@ -1,191 +1,361 @@
-Return-Path: <netdev+bounces-204251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6D69AF9B0F
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 21:12:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAFCFAF9B23
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 21:30:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B6047B6317
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 19:11:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 263115A3832
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 19:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D87AF230BCC;
-	Fri,  4 Jul 2025 19:12:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C00E1D516C;
+	Fri,  4 Jul 2025 19:30:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H7DHunoC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WfAn8FT5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0929C22069F;
-	Fri,  4 Jul 2025 19:12:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751656334; cv=none; b=YDeP0cET7i6gi0k1tIziTquG19C58vgHx4JfnWjFozfHboyBU0iswAhOGxnANhJW6b53OSby3Ymp4W5JFSqNRgbem0QbZOPLtQPYf2KcPYH1N5g7TJeJFcHXxNnKxjQ5SiMFTv8s31ZOaMaWUi8IN9wTc4EjTfwb4m39Eb4/Yj4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751656334; c=relaxed/simple;
-	bh=Q/lrdq2Uikvlke/32oZHP0bIjd+ePE8bpseap/4Mp0c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qu+iZR2SX9NvraFMPrYBkWdmxdoxwUztNIAfw0zVK1ihtXMBOX8ofeIxwyWcF7cNxQq9AkyU1rkZlS3pGumwr632BWXnGOjCeM9OppibvH4fO8zurPl8R8UJp9onVe2nVhx6McVbml23GRaz4yCzgFM8uVhbq2QHQV7+JWvNyt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H7DHunoC; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-ae0ccfd5ca5so185549366b.3;
-        Fri, 04 Jul 2025 12:12:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751656331; x=1752261131; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OmZsUY7dpf8eao6+4v2lrJjyeF3MwXa41UKxk0tU7Co=;
-        b=H7DHunoCvkhMAGTJVSfvLGctbG1Cvi0ts8kagKcXjl1uzOfiBr779nZjmt1r1ANcmB
-         tOg4jwrI0Hgvum1EwfUDMcwX7fkqJU0YHBEevp01i0QGZsTnHu1W/dydEo/LJYgc7tBm
-         i8TyovPH7+9Wt9qzwWL/NkZm5azE6t0YQ0hympOjvO6RWcfOAlPZBTUjYDA+l7MtQ6K2
-         ciMrc37jE+4BZtESgU112PqKC/se9j5gqZhaHGTn+Ib/FKZCwCPXmJSC2W88gDpD+vle
-         kATJuhGnxr0SheKbBEQdOyqOgUH7aHxKoQtUBv7qy1ovay9dKkRKs9nHW+66AZgG1IZU
-         KxTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751656331; x=1752261131;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OmZsUY7dpf8eao6+4v2lrJjyeF3MwXa41UKxk0tU7Co=;
-        b=GjmgjeMEDT6d7rSrOob5w5Vw5CsefGKjNJT1uYcLEttA1QfX8GYBN2ynC40AGZ27qm
-         cfqP8PszvHm+0I94ylqoOTFgSw6d3R4OhVU4OlGQj6xxcoZXagEv0GijmHSAEq0USIii
-         T5Kaa1QauKHc4yFEkuJmxDJvlofT1XXKN228rsjJQdzU86wT3Zn+mmXcTM+DmcKzEYw0
-         Pn3VvLfdUih2bSFGyLpkmxx8zjSay5SffxU+KyolF4bP7OJw7L7MOJB+QkSIWOZZY4m3
-         3rdFSJmVCJQfxqRiVsjhLo/jPuS7cPWldlq1Q4pe6EOWLjCEsfQ74TYgg3koUFwZqbKj
-         De1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVkUQG/4mdg4g1m0bOVxTnL3tXYqkS6BY0hqh6ytFnpXi6076XAzaAzZezlE8AGk6SNlDYRdIg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxehTGofULdVv4fe7x1aPY9ciAHn81cQ2QxSmuZJ0+jXeI3Qsnb
-	lFptZh3Q67u4P1C0fuyC4HEBxrcbwCpsD7pxFLpPXeiqIWzjyH6bpkOz
-X-Gm-Gg: ASbGncue5dE8DNHMm+wBK3kkxchsdlu6gTjxp7D5IKTl8FEeLbCyrsb7lznfFEcD5MX
-	oKHmqrOpJSTpBtI3Q3GB2I9BmuKexJMh6P2KH1lSJY4dPcIl8Y7xeGErCRDQpuDuuExIUgpTaWK
-	my9tBQxe77JRJqBK2tlD1EFQ/IUXGWhT2z0O/gP8KB+ioSMao1pG6AMyQAbn/l2a3B3qlaPRUMY
-	TUdOmPJTW0mXErEZrvBReGks1PZ2OV6C/AaUDhibntinxaXPf5q9hrETdTgOLBnh3eAwwxHYo4v
-	9LshXzp9T3GOOPD57fIEkdOYMntNnYvxFAOYH13xh5KCseeV0OtL/aUR9z9Ij40r64ZtB9CW6eU
-	z3MYIvJTb3ROctXR3ZueBKnTpfgQT3QX5Wl7WwBouhax4D+pCQASsIYuv3NrEwOfW9PnWEjxTBp
-	ibGIWD
-X-Google-Smtp-Source: AGHT+IEeXAJoE2Ma43SXkCEuo3RyDIgqb9kmpp3aaYZZQ/WrcATyFVvyLOOnKU6Am6D5hgzbpWQ0+g==
-X-Received: by 2002:a17:907:9485:b0:ae0:ba0f:85af with SMTP id a640c23a62f3a-ae3fe800101mr359646266b.51.1751656331097;
-        Fri, 04 Jul 2025 12:12:11 -0700 (PDT)
-Received: from localhost.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae3f6ac5fd7sm219476366b.103.2025.07.04.12.12.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jul 2025 12:12:10 -0700 (PDT)
-From: Eric Woudstra <ericwouds@gmail.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netfilter-devel@vger.kernel.org,
-	bridge@lists.linux.dev,
-	netdev@vger.kernel.org,
-	Eric Woudstra <ericwouds@gmail.com>
-Subject: [PATCH v13 nf-next 3/3] netfilter: nft_chain_filter: Add bridge double vlan and pppoe
-Date: Fri,  4 Jul 2025 21:11:35 +0200
-Message-ID: <20250704191135.1815969-4-ericwouds@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250704191135.1815969-1-ericwouds@gmail.com>
-References: <20250704191135.1815969-1-ericwouds@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADBA572634
+	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 19:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751657444; cv=fail; b=Q5hO9MmLulQpMx8PwjfWo5o1uVSsjIOZHiYhBSZfnQyxm/GjABrsylV/xmz43TcVZuOdddXh79Om0JCts5oS7fAWpC/KADdSf7UL7LXjgiLlYh5CmpuFvpjPLmGnMKCnh04S6RPGDrBYdYPm2jUEE9Nq6CzYkk3ZaEXIlXP19h0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751657444; c=relaxed/simple;
+	bh=X+qAfAAu8WSSxBzWQZdgSovafNZD4CxNmht+DDxo2Xs=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=GlcoGFDzrkBK24TWoiIvVN2QhxMIglluTIbqCmxqgKBEsrDCFfJYA1ooK3xsO/1UTq+yeLXYlfXlSmW4A6QK2I2aTTKjUnRRJlo6FUhJLAmKkKOxp5jioI1TjbvIuGHDy6XB5aruJAtYXbFqtTDeP2ISn00mQu3+/dnrqFWNrTM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WfAn8FT5; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751657443; x=1783193443;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=X+qAfAAu8WSSxBzWQZdgSovafNZD4CxNmht+DDxo2Xs=;
+  b=WfAn8FT5/Pq4dpbQxI35UJtfWkhDzEI0ZxU5UW6TdaunFgeuxf4wFbgA
+   16qQPLM2tjwtGy3Umj2smgsxGGrW3xw2qwFFElrHPFFUnpum8NNy+uwfO
+   hz1dzo5djLZ6cLEgTdQz8KZpJ6vOHHlC+J40gOIcFy+k2vJvE+1WDFoy/
+   fMNXx2jAVXYAaPXqLpXImLu9KJ8Wl86BugzZxhtV0CqdvHBTUJkbxh8w1
+   ezzr5tbIDi0C24jIgk2ZKuaWKrM1xFL/VUml29n4/qyGRaT1IcNF9HnHg
+   1BhFcq0hI8dErO6oW0NOZMQjj7VyYBmmWXZ3XY5/gUnYfzWXgZm8/ipE3
+   A==;
+X-CSE-ConnectionGUID: Va+1AvKwQWigFq5JO6EBhw==
+X-CSE-MsgGUID: om/KJWizSHyMMdQ9lSK7qA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11484"; a="54108846"
+X-IronPort-AV: E=Sophos;i="6.16,288,1744095600"; 
+   d="scan'208";a="54108846"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 12:30:42 -0700
+X-CSE-ConnectionGUID: LOGc/iU+Tp+lvoq/QIJUXw==
+X-CSE-MsgGUID: kSXZ9KWrTLCl56FpAy8S3Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,288,1744095600"; 
+   d="scan'208";a="155458910"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 12:30:41 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 4 Jul 2025 12:30:40 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Fri, 4 Jul 2025 12:30:40 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (40.107.93.62) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 4 Jul 2025 12:30:40 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XVzcUcLfU6Mscsigwf2RgJhOSdOaok890LA+JEs2Txwpj3Gb/cXZDVF3gdpnodQfk4CJLEIdlmVN+FrSS+dZXrrdu2zN/uoHubXb45b6sD13VJ3gCZAR7ssi8rqL8/oeUJXesMOhpinXussos+O3Qx/O5/FXq4dIBtoHlW9yZ1Z04wVrGx8nvaLH+iEz+7bMJs6DuvWruGz6mKGmwyDfD9SQFXF73YW0RM1v5GHGgjnYPjlFiILxB6j7XWrH9wzqREHU0Ur8J+hn3N22pfSp4VAe3SmfEsXKH1CT/12vsFcK9s5Jtsm/o199ApZ6rOx8ZFRf4hpCbVjPhKAal+Seqw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=l0wQVHLWBjZFAnf6ZTDWgMwCKA1DW2KHJS58LH8kvwI=;
+ b=Lv2KNG+uX+GfYxC+CTZtrngszLLdB4bt26aQqk6XSrG4U3nWxvzon9K11Y/ZyrPpmEwpb2FYL/umg/JDX6NQWWR3I4FqV1I+VASiPJkDERvDTcfNpcdz//Ex0sC7NCgQMLjRqhoPAjwTpED28rmehhsUw9qpa5mEISofIQeVzV3y0F36fdvk/uByy+NwoTBjV52F9BfzFclA5motujHj5laYQES/Q/TCZNcAvk8+y1u/E/m52eg74OIpvoq1amFABnYq8vbH+4I+Zy2dool6jd29dSQbL4dBnEpFvIgvsbnadOV3c6ywW7XffBbyyCwcBvhlQAkWBMDnbMwV2D4hVw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ MW4PR11MB6570.namprd11.prod.outlook.com (2603:10b6:303:1e3::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8901.20; Fri, 4 Jul 2025 19:30:09 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%2]) with mapi id 15.20.8901.021; Fri, 4 Jul 2025
+ 19:30:08 +0000
+Date: Fri, 4 Jul 2025 21:30:02 +0200
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+CC: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>, Jakub Kicinski
+	<kuba@kernel.org>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Damato, Joe" <jdamato@fastly.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, "Czapnik, Lukasz"
+	<lukasz.czapnik@intel.com>, "Dumazet, Eric" <edumazet@google.com>, "Zaki,
+ Ahmed" <ahmed.zaki@intel.com>, Martin Karsten <mkarsten@uwaterloo.ca>, "Igor
+ Raits" <igor@gooddata.com>, Daniel Secik <daniel.secik@gooddata.com>, "Zdenek
+ Pesek" <zdenek.pesek@gooddata.com>
+Subject: Re: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
+ driver after upgrade to 6.13.y (regression in commit 492a044508ad)
+Message-ID: <aGgruu0EWqQnVRd8@boxer>
+References: <f2e43212-dc49-4f87-9bbc-53a77f3523e5@intel.com>
+ <CAK8fFZ6FU1+1__FndEoFQgHqSXN+330qvNTWMvMfiXc2DpN8NQ@mail.gmail.com>
+ <08fae312-2e3e-4622-94ab-7960accc8008@intel.com>
+ <366dbe9f-af4d-48ec-879e-1ac54cd5f3b6@intel.com>
+ <CAK8fFZ6PPw1nshtSp+QZ_2VVWVrsCKZDdsxdPF9Tjc0=_gi=Wg@mail.gmail.com>
+ <bdab5970-0701-4ba7-abd2-2009a92c130a@intel.com>
+ <CAK8fFZ5XPQ-mW5z9qJNJhqFukdtYGJawYTYuhHYDTCvcD37oFw@mail.gmail.com>
+ <d3c4f2f0-4c22-449b-9f8d-677c4671ee17@intel.com>
+ <CAK8fFZ4L=bJtkDcj3Vi2G0Y4jpki3qtEf8F0bxgG3x9ZHWrOUA@mail.gmail.com>
+ <aff93c23-4f46-4d52-bdaa-9ed365e87782@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aff93c23-4f46-4d52-bdaa-9ed365e87782@intel.com>
+X-ClientProxiedBy: DU6P191CA0054.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:10:53e::21) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|MW4PR11MB6570:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1c4e4fa3-0ec8-4075-1360-08ddbb312fd8
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?RWx1cXRHeXB3U3ZsRnBUajJhd1VheXJYZmdUdVludjVHRDU3U29uV295THZV?=
+ =?utf-8?B?MXc4TUErRU1uSFQrTTRBVnkvbmY1QmtWTURkSmxiNS9kZTAvQlNXaUJvQzVl?=
+ =?utf-8?B?bktOU28rMGhlbDBJbURFTGtJL3pzdWF0MUJIRHQxMVVldXJQekRodUlweTdL?=
+ =?utf-8?B?MkJUMmN2T0N1RTJMTjBLaEY3aUt0RS85Y2NqZjJ4U2J4UCtpckpsSTJVNkNn?=
+ =?utf-8?B?TjY1VlJnTUN0aEFhQS9YWDJmK2pwKy9tMjhLNk01c0ZJRTRYV0RiVU9VVnp4?=
+ =?utf-8?B?a3N0R0ZaN1JCWkpqcjhDb1JFWFhIVWRsRkJoTVplcmxpQjAyU0pLQzMxN1Fm?=
+ =?utf-8?B?MHBtVG9vVmFuTkhCTHJSU3ZsazY0bkVKNmEzZEtRVFJUV0l4YzI0bG9kVjVJ?=
+ =?utf-8?B?QkdwZTZtb3d6RjhwT1dHMXVWS1VTMWdGNmZDeXlmYmtjdlRLR2dQbFEzcjNV?=
+ =?utf-8?B?MDRicWRQM3pWY3luQTNmYUozRnE4WHFpRVEwN0pQVGwxSlBld2RJVTkwajRB?=
+ =?utf-8?B?Qk9rTEJkU3FlYk9SbkdmdGJFamJyZTgrWkwyQkpTZFJJMHJlcnhuazM0YzBH?=
+ =?utf-8?B?aFIyT3Q2SEFyZS8xN3RDVkY3a1pRQ1RBSTNmdTB1N3JXZEhLR0ZZcHRoV0NE?=
+ =?utf-8?B?ZDhhMi83M1hKRjZoSUJybGN2djhYbkRTTHVsajF4dFFOYU04OG8xQS81Tnpm?=
+ =?utf-8?B?NFRaeGYzUlFEUlRsT3lyaGFnSFNNa3RSaW1rUjAvQXQ3aThvZGZzbUFEVkV4?=
+ =?utf-8?B?b0NuclJKOHkxTDhCeUMwTyt2b005RXl3a3FqOUtNWWRaQjBWMzRLZE1rZm5z?=
+ =?utf-8?B?SmN2REtCcHM2cDNRQmc3dTBCbEt5aHhHYi8zbnVMSkp1dlRLNHphNU5JOXNq?=
+ =?utf-8?B?UVdnVmliNmNXQlVla1pIbEhRZWhhWURleDF1NVZjZGVyUWIza3VJVVE2bHFa?=
+ =?utf-8?B?MC9CeFlYVG5IWXBjVGtQL1M2aWVRcU10MkgvSTJEL1NaN2pQU3VJRVNIOW9v?=
+ =?utf-8?B?R1NZMEtHbmsxSXhwNWJWNGpCWngrdWlFZ0FaL1dLTXBDanI4Nk9HaEdvWFFD?=
+ =?utf-8?B?YjVzbWg3N3dRSDVJS3hSakRMejEvUngxeUpabGw1TzBnTHpBR3FnRkY2bWcw?=
+ =?utf-8?B?SDFsbi9aTE1CUFg0K2xaekMra0o3TWVoTHB2czRuSXNIc2VXNW1wcDIyV0xp?=
+ =?utf-8?B?WnFEb0NjRExoaGUxM1VBaXdrUXRYNzlqM3FsVmtMWTZvOGhnd3ZORWs3NFhV?=
+ =?utf-8?B?eHp2THpmQVJsMWowdHhPMnVTV0daRzBVVXNMZVJZaEZmeHdEbFhFQmcra25q?=
+ =?utf-8?B?b3FmeDc4WGRDMzdMZ3hSS0R6NWpsbHFpalRBNVNUandzMFVWdCtkQnlzRk9j?=
+ =?utf-8?B?REY2T1FSNi9oNUtSN0tHMzYwRnJYWXZ1a1JQeTRGVUo0eXZZUVRQZ3lpeWpL?=
+ =?utf-8?B?aEhGTGpPdVo5OCszV0l2SnpFZHF6QzZ4NTQ2SzRSMDU4L3BUWTFXcWM5RmRV?=
+ =?utf-8?B?OVQ0cy9jOTdhNnFOS2UrUTBBZ01qZUlQUTBjenJGWUtMb2s2WGtjUEo2cFYv?=
+ =?utf-8?B?QmE1Nmd2MSthNlRMeERER0xVUUM4OGlaaFY5UXBYMEdBS0YxYWt3ODFkQ3FM?=
+ =?utf-8?B?c0FTWDVtUU9scWJ2bGJ5dmIyVm9yM3ZtcFlmRW0yRnlpREk1aEhTNDR0a3dJ?=
+ =?utf-8?B?WnhOZFZZNGZQVC96RGhsYUNvcFdSSDFrbE05d2luYnlxMnFmV1NyVnAvSmZy?=
+ =?utf-8?B?NVN3Z2l0ZmswNyszNS9sM056UDQzZGlnZVNISlpHNXYwT0twRjlQdmVLUlBM?=
+ =?utf-8?B?YVRoa1NIUndHaGFDOVVtVVpnTXZIOW4yb0h2Z1JmTXpNU2Ribmp0MHZrKzlm?=
+ =?utf-8?B?SGVIdi9ySmJtaFdGWGJuaExCZVA2dFNQTlp3amUvNUJQb2NWbUhNUVZGREpH?=
+ =?utf-8?Q?Wmns7PfWcuM=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YVB0TDlSRXZOQS82WDFaRVNocFNJTlhyMWFvNjBxb2pJK0ovY0ZkQXNGWkVH?=
+ =?utf-8?B?ZG1qSVR6RmJJMkViOEJ3QUxrZW1UZ3FZTkFIQ05lQ0V1Y2h6eTg4TkVaQnF3?=
+ =?utf-8?B?SDE4VWlTOFlCZkNreEp5dTJmM3ZURENJdEVaTnpIQkVEdlJuZGxWZ3NUSEZh?=
+ =?utf-8?B?MTMzcFAwdXRUcFBISGRUYkJsUWptbkx2cUdSeXlFNHhNcUorL2wrUkNnOTAx?=
+ =?utf-8?B?RTJoR3I3U3Q1cFNZZkpVVGpkcUVuMFpJL3F2cnI5TlA0bkQ0N0UyZiszSjhJ?=
+ =?utf-8?B?R1VTTDE5QjhDbldWYnloRUdzUk5KdVd4S0JaSUM5ZHZJNnR2SklJRFBDRmVp?=
+ =?utf-8?B?a3l3YjBHVEM4ZGRMRExzMVRnMFM1b3VkT05TZG1zbERlTnJYVFNxc0hISDhz?=
+ =?utf-8?B?QXd5QjRzMjA4SEUyWWhFcVU3aUNIVVg0VjRIZkZlTC9ja05IdFhtSlR5NldT?=
+ =?utf-8?B?WjdJRnlYai9yNS9iMU5GbHhoUjBWT0FHMXJrY01JcXFJZDBDdTIzbTQzN2g5?=
+ =?utf-8?B?TmtuNThvaEJJSUx4ZTVmVDF5U0JPMVpsWUt5T212VEo3MzQxaHlVUXlBTm83?=
+ =?utf-8?B?VkJSLzlJcm5wTCtzU09BZEF3alhMUElwOVFMN0pKNjlIelhDWmtkSnRXdWk4?=
+ =?utf-8?B?V0Fxb1JCaVBhSVpySm9BbmNlRVE5QXo3Q2pCdHBIMUkzM1VHNDhPbGFxUkZM?=
+ =?utf-8?B?Q09wNGNVRHV6NWRNeWoyYzB6amNhOWhCYytqam4xMVcrREx5dTQ5K25KY3d2?=
+ =?utf-8?B?YXpITnhvSWZXSnNXOFhMQVNIOTdKR0M2STlHK1JuNEFKcWwyTmkvamUzYzJM?=
+ =?utf-8?B?VXR2YmovN3RaeVpkQWxNTG9VeG1RUXAvc0ZUTE1qcXFzR2pYUndQcjQwNytK?=
+ =?utf-8?B?eWJQRHFpWDd1bmoxOEUyWnE5WE9acC94QytHVFU1NGs2YW1ibS9MVHIra0gv?=
+ =?utf-8?B?UXp6bVhOU1pxK2laeE5hV081UEYwRUhLaU81Zlo2Z3I0dG5ST3ovSHhuM3RS?=
+ =?utf-8?B?cjhPeHUvNEdiQmN0YVZtTDNYa2Q2UjVMclVtSS84VDR0eitsL0RhWFFxOVl5?=
+ =?utf-8?B?bFR1UDV6VFRLeWxxZmJtVmRMcHNDYXV2UmdkSG1XVGpXMGJCbWZPU2ZzWWRl?=
+ =?utf-8?B?b2xzU3RFVDY2SkFwdW92UkUvRi8vdFRFOW8wN2R3bWF5Wi84VmZRVW0yMTRJ?=
+ =?utf-8?B?RWQ1QUtLUklMblJlVXVuZ2ZCOTBSL1BxSWN5cEtFNTA2WlVXUnB5aGxWU1ZO?=
+ =?utf-8?B?Z01UWlM2dlJyNHNtMUpwVEt6TFl1SElUKytIL2U5M2hrNE9rM3YvTEZRSEkx?=
+ =?utf-8?B?TzZoTUloUW1EQjR0VW5xNVIwV0k2dVhiLytWY2pLcllMNWZNOE9BQzNaVFlm?=
+ =?utf-8?B?eHBzS2RxM0g4eXRxTzJhZ1pvTERSQks4Sk42T2V3TXFwOHZzUE9Tb3FLemts?=
+ =?utf-8?B?UXFkM2VuNkZPcERpaWsvM2F4dDRicWtldG0wbFgxYnNkdmhyNndiU0kzR1Yr?=
+ =?utf-8?B?Njc4bmRGQmhscW1rS3Z5YU5STW9RclpWVURLdG1aaENKVjYwQXZQQzdvUXlS?=
+ =?utf-8?B?OFNmV0hqU0VTY05aeXZFeFY0RThTTSs3cmZkTEE0NXJGRWU4TnZ6U20wOHli?=
+ =?utf-8?B?WldsWjgzeE9jQjdMU0Flc01hMjZJMGZLckVFMmlXNEVzbDNTZklrV0VXbXF0?=
+ =?utf-8?B?ZW5zVklJSmY0RHNCdXlrS0dweTcxV2VjRFFtWER5R0ZqS3JCSlNsOC9xNTNn?=
+ =?utf-8?B?Q1Z2Vms5WWpvYTRIRTg0Qlp0VjYrSWRtTmhybnhuZUtnUi9rdzdGQjQ1SkVh?=
+ =?utf-8?B?emNaZjUxRlRBZlh5UjZtdDBLMk9FelRBMm03Wjl2dGxHbzlQNlFROWpyUmxP?=
+ =?utf-8?B?clBmcUZML2gvU212RTFGUU1GQmhXY3p6MTF6YWVuajY4bHozcEg2WG12ckNr?=
+ =?utf-8?B?K0J3V3QvZU96Z0htbVNFd3R4WmZzd2o5OEVra1R4VTYrRjdweGpJWE9nNk4y?=
+ =?utf-8?B?bEFSNmo3K1FJaG14RXE1bzBGeVYxVzd3MGtlc081THpPSG9GQm12NG83aW9K?=
+ =?utf-8?B?eDduaFRUNTF5QnplLzc0Wm9aZjJwK0lZcjBFemNHbW1xUnVpdTM0RjVtbUpV?=
+ =?utf-8?B?cm1WTmRnTUlGdDY5c2ROb3U1dVVoZmpOSHJNZTNKM3VWc1RCaEZaZGF6THp3?=
+ =?utf-8?B?Smc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c4e4fa3-0ec8-4075-1360-08ddbb312fd8
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2025 19:30:08.8328
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kg4Xniv9IU5oZenECdEGbJSggvd0yH6ebrM8MC76f8JdbA/90E8zgMrqgTR+nMn/ft35q9VgjkzwPEmTUyD+zvm/FI/RIiT3S5JN+PwtQu0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6570
+X-OriginatorOrg: intel.com
 
-This adds the capability to evaluate 802.1ad, QinQ, PPPoE and PPPoE-in-Q
-packets in the bridge filter chain.
+On Thu, Jul 03, 2025 at 09:16:35AM -0700, Jacob Keller wrote:
+> 
+> 
+> On 7/2/2025 11:46 PM, Jaroslav Pulchart wrote:
+> >>
+> >> On 7/2/2025 2:48 AM, Jaroslav Pulchart wrote:
+> >>>>
+> >>>> On 6/30/2025 11:48 PM, Jaroslav Pulchart wrote:
+> >>>>>> On 6/30/2025 2:56 PM, Jacob Keller wrote:
+> >>>>>>> Unfortunately it looks like the fix I mentioned has landed in 6.14, so
+> >>>>>>> its not a fix for your issue (since you mentioned 6.14 has failed
+> >>>>>>> testing in your system)
+> >>>>>>>
+> >>>>>>> $ git describe --first-parent --contains --match=v* --exclude=*rc*
+> >>>>>>> 743bbd93cf29f653fae0e1416a31f03231689911
+> >>>>>>> v6.14~251^2~15^2~2
+> >>>>>>>
+> >>>>>>> I don't see any other relevant changes since v6.14. I can try to see if
+> >>>>>>> I see similar issues with CONFIG_MEM_ALLOC_PROFILING on some test
+> >>>>>>> systems here.
+> >>>>>>
+> >>>>>> On my system I see this at boot after loading the ice module from
+> >>>>>>
+> >>>>>> $ grep -F "/ice/" /proc/allocinfo | sort -g | tail | numfmt --to=iec>
+> >>>>>>       26K      230 drivers/net/ethernet/intel/ice/ice_irq.c:84 [ice]
+> >>>>>> func:ice_get_irq_res
+> >>>>>>>          48K        2 drivers/net/ethernet/intel/ice/ice_arfs.c:565 [ice] func:ice_init_arfs
+> >>>>>>>          57K      226 drivers/net/ethernet/intel/ice/ice_lib.c:397 [ice] func:ice_vsi_alloc_ring_stats
+> >>>>>>>          57K      226 drivers/net/ethernet/intel/ice/ice_lib.c:416 [ice] func:ice_vsi_alloc_ring_stats
+> >>>>>>>          85K      226 drivers/net/ethernet/intel/ice/ice_lib.c:1398 [ice] func:ice_vsi_alloc_rings
+> >>>>>>>         339K      226 drivers/net/ethernet/intel/ice/ice_lib.c:1422 [ice] func:ice_vsi_alloc_rings
+> >>>>>>>         678K      226 drivers/net/ethernet/intel/ice/ice_base.c:109 [ice] func:ice_vsi_alloc_q_vector
+> >>>>>>>         1.1M      257 drivers/net/ethernet/intel/ice/ice_fwlog.c:40 [ice] func:ice_fwlog_alloc_ring_buffs
+> >>>>>>>         7.2M      114 drivers/net/ethernet/intel/ice/ice_txrx.c:493 [ice] func:ice_setup_rx_ring
+> >>>>>>>         896M   229264 drivers/net/ethernet/intel/ice/ice_txrx.c:680 [ice] func:ice_alloc_mapped_page
+> >>>>>>
+> >>>>>> Its about 1GB for the mapped pages. I don't see any increase moment to
+> >>>>>> moment. I've started an iperf session to simulate some traffic, and I'll
+> >>>>>> leave this running to see if anything changes overnight.
+> >>>>>>
+> >>>>>> Is there anything else that you can share about the traffic setup or
+> >>>>>> otherwise that I could look into?  Your system seems to use ~2.5 x the
+> >>>>>> buffer size as mine, but that might just be a smaller number of CPUs.
+> >>>>>>
+> >>>>>> Hopefully I'll get some more results overnight.
+> >>>>>
+> >>>>> The traffic is random production workloads from VMs, using standard
+> >>>>> Linux or OVS bridges. There is no specific pattern to it. I haven’t
+> >>>>> had any luck reproducing (or was not patient enough) this with iperf3
+> >>>>> myself. The two active (UP) interfaces are in an LACP bonding setup.
+> >>>>> Here are our ethtool settings for the two member ports (em1 and p3p1)
+> >>>>>
+> >>>>
+> >>>> I had iperf3 running overnight and the memory usage for
+> >>>> ice_alloc_mapped_pages is constant here. Mine was direct connections
+> >>>> without bridge or bonding. From your description I assume there's no XDP
+> >>>> happening either.
+> >>>
+> >>> Yes, no XDP in use.
+> >>>
+> >>> BTW the allocinfo after 6days uptime:
+> >>> # uptime ; sort -g /proc/allocinfo| tail -n 15
+> >>>  11:46:44 up 6 days,  2:18,  1 user,  load average: 9.24, 11.33, 15.07
+> >>>    102489024   533797 fs/dcache.c:1681 func:__d_alloc
+> >>>    106229760    25935 mm/shmem.c:1854 func:shmem_alloc_folio
+> >>>    117118192   103097 fs/ext4/super.c:1388 [ext4] func:ext4_alloc_inode
+> >>>    134479872    32832 kernel/events/ring_buffer.c:811 func:perf_mmap_alloc_page
+> >>>    162783232     7656 mm/slub.c:2452 func:alloc_slab_page
+> >>>    189906944    46364 mm/memory.c:1056 func:folio_prealloc
+> >>>    499384320   121920 mm/percpu-vm.c:95 func:pcpu_alloc_pages
+> >>>    530579456   129536 mm/page_ext.c:271 func:alloc_page_ext
+> >>>    625876992    54186 mm/slub.c:2450 func:alloc_slab_page
+> >>>    838860800      400 mm/huge_memory.c:1165 func:vma_alloc_anon_folio_pmd
+> >>>   1014710272   247732 mm/filemap.c:1978 func:__filemap_get_folio
+> >>>   1056710656   257986 mm/memory.c:1054 func:folio_prealloc
+> >>>   1279262720      610 mm/khugepaged.c:1084 func:alloc_charge_folio
+> >>>   1334530048   325763 mm/readahead.c:186 func:ractl_alloc_folio
+> >>>   3341238272   412215 drivers/net/ethernet/intel/ice/ice_txrx.c:681
+> >>> [ice] func:ice_alloc_mapped_page
+> >>>
+> >> I have a suspicion that the issue is related to the updating of
+> >> page_count in ice_get_rx_pgcnt(). The i40e driver has a very similar
+> >> logic for page reuse but doesn't do this. It also has a counter to track
+> >> failure to re-use the Rx pages.
+> >>
+> >> Commit 11c4aa074d54 ("ice: gather page_count()'s of each frag right
+> >> before XDP prog call") changed the logic to update page_count of the Rx
+> >> page just prior to the XDP call instead of at the point where we get the
+> >> page from ice_get_rx_buf(). I think this change was originally
+> >> introduced while we were trying out an experimental refactor of the
+> >> hotpath to handle fragments differently, which no longer happens since
+> >> 743bbd93cf29 ("ice: put Rx buffers after being done with current
+> >> frame"), which ironically was part of this very same series..
+> >>
+> >> I think this updating of page count is accidentally causing us to
+> >> miscount when we could perform page-reuse, and ultimately causes us to
+> >> leak the page somehow. I'm still investigating, but I think this might
+> >> trigger if somehow the page pgcnt - pagecnt_bias becomes >1, we don't
+> >> reuse the page.
+> >>
+> >> The i40e driver stores the page count in i40e_get_rx_buffer, and I think
+> >> our updating it later can somehow get things out-of-sync.
+> >>
+> >> Do you know if your traffic pattern happens to send fragmented frames? I
+> > 
+> > Hmm, I check the
+> > * node_netstat_Ip_Frag* metrics and they are empty(do-not-exists),
+> > * shortly run "tcpdump -n -i any 'ip[6:2] & 0x3fff != 0'" and nothing was found
+> > looks to me like there is no fragmentation.
+> > 
+> 
+> Good to rule it out at least.
+> 
+> >> think iperf doesn't do that, which might be part of whats causing this
+> >> issue. I'm going to try to see if I can generate such fragmentation to
+> >> confirm. Is your MTU kept at the default ethernet size?
+> > 
+> > Our MTU size is set to 9000 everywhere.
+> > 
+> 
+> Ok. I am re-trying with MTU 9000 and using some traffic generated by wrk
+> now. I do see much larger memory use (~2GB) when using MTU 9000, so that
+> tracks with what your system shows. Currently its fluctuating between
+> 1.9 and 2G. I'll leave this going for a couple of days while on vacation
+> and see if anything pops up.
 
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
----
- net/netfilter/nft_chain_filter.c | 52 +++++++++++++++++++++++++++++++-
- 1 file changed, 51 insertions(+), 1 deletion(-)
+I was thinking if order-1 pages might do the mess there for some reason
+since for 9k mtu we pull them and split into half.
 
-diff --git a/net/netfilter/nft_chain_filter.c b/net/netfilter/nft_chain_filter.c
-index 19a553550c76..8445ddfb9cea 100644
---- a/net/netfilter/nft_chain_filter.c
-+++ b/net/netfilter/nft_chain_filter.c
-@@ -232,11 +232,55 @@ nft_do_chain_bridge(void *priv,
- 		    struct sk_buff *skb,
- 		    const struct nf_hook_state *state)
- {
-+	__be16 outer_proto, proto = 0;
- 	struct nft_pktinfo pkt;
-+	int ret, offset = 0;
- 
- 	nft_set_pktinfo(&pkt, skb, state);
- 
- 	switch (eth_hdr(skb)->h_proto) {
-+	case htons(ETH_P_PPP_SES): {
-+		struct ppp_hdr {
-+			struct pppoe_hdr hdr;
-+			__be16 proto;
-+		} *ph;
-+
-+		if (!pskb_may_pull(skb, PPPOE_SES_HLEN))
-+			break;
-+		offset = PPPOE_SES_HLEN;
-+		outer_proto = skb->protocol;
-+		ph = (struct ppp_hdr *)(skb->data);
-+		switch (ph->proto) {
-+		case htons(PPP_IP):
-+			proto = htons(ETH_P_IP);
-+			break;
-+		case htons(PPP_IPV6):
-+			proto = htons(ETH_P_IPV6);
-+			break;
-+		}
-+		skb_set_network_header(skb, offset);
-+		skb->protocol = proto;
-+		break;
-+	}
-+	case htons(ETH_P_8021Q): {
-+		struct vlan_hdr *vhdr;
-+
-+		if (!pskb_may_pull(skb, VLAN_HLEN))
-+			break;
-+		offset = VLAN_HLEN;
-+		outer_proto = skb->protocol;
-+		vhdr = (struct vlan_hdr *)(skb->data);
-+		proto = vhdr->h_vlan_encapsulated_proto;
-+		skb_set_network_header(skb, offset);
-+		skb->protocol = proto;
-+		break;
-+	}
-+	default:
-+		proto = eth_hdr(skb)->h_proto;
-+		break;
-+	}
-+
-+	switch (proto) {
- 	case htons(ETH_P_IP):
- 		nft_set_pktinfo_ipv4_validate(&pkt);
- 		break;
-@@ -248,7 +292,13 @@ nft_do_chain_bridge(void *priv,
- 		break;
- 	}
- 
--	return nft_do_chain(&pkt, priv);
-+	ret = nft_do_chain(&pkt, priv);
-+
-+	if (offset) {
-+		skb_reset_network_header(skb);
-+		skb->protocol = outer_proto;
-+	}
-+	return ret;
- }
- 
- static const struct nft_chain_type nft_chain_filter_bridge = {
--- 
-2.47.1
+Maybe it would be worth trying out if legacy-rx (which will work on
+order-0 pages) doesn't have this issue? but that would require 8k mtu.
+
+> 
+> Thanks,
+> Jake
+
+
 
 
