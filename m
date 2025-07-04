@@ -1,126 +1,190 @@
-Return-Path: <netdev+bounces-204071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABB1EAF8C48
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 10:43:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49DB8AF8CFB
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 10:58:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 432A31C431E9
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 08:43:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55E10B42FDE
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 08:43:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D083285C99;
-	Fri,  4 Jul 2025 08:36:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5779528A3F7;
+	Fri,  4 Jul 2025 08:40:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="JPJ/sWpp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bzeq9P50"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99BD82857FA;
-	Fri,  4 Jul 2025 08:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BF422877F6;
+	Fri,  4 Jul 2025 08:40:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751618199; cv=none; b=BXY70Ky8UAlt/D0P16ikQ4fHqmp5bKc6+X3nB+MqMNsHaH+HzppTbwHW8gXZ8MbLJj6It6pgNh41OHFhG0VeNig4nGM/o2r/b2HT3I2xIjUnyUnmLbI/On6BZIokS/QwHvlhcvzD+02xjvtbXTOmV8ND6nbJNpykig3BhRstSPI=
+	t=1751618459; cv=none; b=RBAUJl3svz6cNDxWHQ1UnkyQelNSstprG61XKduS/L3pDD4qV73oQG9zRSiZWDKsOnVFtl2L+VRSAn9IyAA5OoEf9gYnGUjFzwMuY3Gu4ZkNnB07br3zGkrdrxXx+BlQi5DjNui0Jhh0wD254KCiAokiJIl7FRnbuclDsK94xjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751618199; c=relaxed/simple;
-	bh=w2oE4pOh1akyKzIgJzSCOJHT+T23QNxc7gNrBnaFFh0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hyOLvKNqEzpUhFxq0eY5aHSb7GqgW037Ioek3Yfja1ylqN4U1KYpaPOw+hMtfqGGEj1VwDRYiLAkSE/Zq21uttAQ6drH6R5AtcGEQEtopisEtxToakylThw0p+Inqd9HydU5vRXqPhNjiyYYdUb40bZTX3XlF2EjtDOrejFdj1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=JPJ/sWpp; arc=none smtp.client-ip=54.204.34.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1751618185;
-	bh=d95nx73kVtyU4RyV75KvYPcyXTaQmjFaV1z38NhfO0A=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=JPJ/sWppdQuAt42JSvwi5mAkDItJ0kzLh+ZmRDstLITBOIkEK/OrXLj0cxTLJOrdo
-	 a2X2Il2+kGvHWvU2kC3QUezQMskuXcDiSpYtNX5yKEb2fXgBd9wWvOcd49fmUD967C
-	 iZX0xCjrQAlmWiqH2JcR5CniELT1UfBdw0xzyFRU=
-X-QQ-mid: zesmtpip3t1751618170ta0779b56
-X-QQ-Originating-IP: GVTrYKP7FbgWTpX/QoheMwYVtVk1rEfX3Iwi04kHrNQ=
-Received: from avenger-e500 ( [localhost])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 04 Jul 2025 16:36:07 +0800 (CST)
-X-QQ-SSF: 0002000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 16565113001037801047
-EX-QQ-RecipientCnt: 18
-From: WangYuli <wangyuli@uniontech.com>
-To: horms@verge.net.au,
-	ja@ssi.bg,
-	pablo@netfilter.org,
-	kadlec@netfilter.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	lvs-devel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org,
-	zhanjun@uniontech.com,
-	niecheng1@uniontech.com,
-	guanwentao@uniontech.com,
-	wangyuli@deepin.org,
-	WangYuli <wangyuli@uniontech.com>
-Subject: [PATCH RESEND] ipvs: ip_vs_conn_expire_now: Rename del_timer in comment
-Date: Fri,  4 Jul 2025 16:35:53 +0800
-Message-ID: <E5403EE80920424D+20250704083553.313144-1-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.50.0
+	s=arc-20240116; t=1751618459; c=relaxed/simple;
+	bh=pMXtGRROxYPlLPH4DHRGNMDWd5KHAZVN6SCVZ3OapRA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZiPan4aDiXnC1JMj6vB8OFug2du3/P6h+eUpegUV2BJHkPd/qjQkhTgq8IGGNegnlsjjI87/ts5NjCHQPON1sBzL4nGfFC/QX9dsCSo9T0WIgOkBStKTDBf5s8Zr9wpYkllZd5X0wvL8Ij/SGfAwY9wybMr0B4aSDVtdOeAA89I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bzeq9P50; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-234ae2bf851so1167885ad.1;
+        Fri, 04 Jul 2025 01:40:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751618456; x=1752223256; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dHSEKYsU05H6zm689vQoHx3pYIDxa35XkhfzWTQQ1co=;
+        b=Bzeq9P50kol2ZeLr6FIr9eK3alv5iuod5raycUWSg6VlQHOpVZCnmt464cL5O0eUbM
+         aITpLB2HRDEPXf1BOg+lkdiegrSvvi1MH+OMrPgxF7yY8eayaXFa1FDeYxNlx9RldYYr
+         9qINIempwG+/I21P62sSi666k9u+j5jDR/K1jgbuHTJ8HpPYb41A6pAQRYMDmu2tL56q
+         H15VndfwCiyRwXld+HwPfgAcYxDCXO7K086+NDhQo98OUPoCXrGxK6g9wmgD3+iv47Hv
+         QfKJrsU2dHYdd0yr3azRH1OEdRisx69E8sAcXm4rbjVzBIzPAhUUymS+AKlESsty3aZs
+         qUOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751618456; x=1752223256;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dHSEKYsU05H6zm689vQoHx3pYIDxa35XkhfzWTQQ1co=;
+        b=m6SHLv2te55bJDD2svThCxYTAbiWwzXJpGLDXM30LYPtWDQHdWpJviArf8OgMOxM50
+         OX0uPS952mIoqwCOfUHdkD9wyXUEO1G6SArbi/ouxHsJ2NuKEmcUf0EZgcrj5eBLBher
+         H20B8u0eiNf0jMDR/CKw1mHE/M+d+Q3iyJpOY5WCVoofh2AqPfAesuK2ge5MccSgd45c
+         k7Ih9dqJAwLThpSEv9TW9iNJDBtIZc7NpBQX2kPQtBN9D9PaeST0+PLypGGLOljnminE
+         f1/y5cVQ3YZco7m9iqms/Wmhv66x7VCz/vFIxnvVjmX1Za7Zl6uUMwnGfs/qj/U5VqVq
+         X2Vw==
+X-Forwarded-Encrypted: i=1; AJvYcCU3cCOZmUVuhG1fyHAcyGmi73KgJTB3445+D2vobUrp0ycO/EEpAo6gxlaEC4ZpzN1zUkN0bGG/Gmjn@vger.kernel.org, AJvYcCUAMwb3VWMCUAiexM3KKUr9cGxigbyri7C9z3Xq/thq6WXhz9EHcp/gTFsYTZzYpN0DrInrU1U54He8YHs=@vger.kernel.org, AJvYcCUW//ZZEMYHK9OljczbHJ2dCrPpY8rch1f2aVsCHsuDg/RVYN6sTxMvAjPgQaaV8VtFuD2kFCm5BItD@vger.kernel.org, AJvYcCV4CIaFouKsa/iNSlBD+6dAXIoJIBghGYya71AJYtAxQWoS+0WdoeT3/totlWGcFAJICRIOWA7Y6FNeBzeceyI=@vger.kernel.org, AJvYcCVESNr/NymRCfNdEBfBcqc+6gWtjRvYc+w1+nBnqN2iNkvSZGoiaMRMKaFfO/NXIbBnOk2SlyuhMMA=@vger.kernel.org, AJvYcCWDzDmr0AJAWhfT2dt6DpqIaSvaNbpyFeWEzmrk4wqldFukrxB46lyCxWVcLzPlg33/dUW/AxvPVNEcpycp@vger.kernel.org, AJvYcCWRb6q1DCxqxueFaQXDGZt0BWP6bfgJn6zRSMSsIjzniGDyVcCmUQ/qOLCUkLph0mRXFKLocwZh6c5FsVDbNWv8@vger.kernel.org, AJvYcCX/9hq8OaS4xAlL8LDugjNIjVPWCDGIEjopWKLJhUFg8W8n9G3kEK6n7EU84k3FPHRJICYP1e93KUmr@vger.kernel.org, AJvYcCXB5DrWLhl/FGz56m6717kgCDzuVn0dhELU0zuXws1sMstJ6t17mgjjUhGAUkse13EUs++OY12W@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx796ck+apW87+Uji9q2JYCzen2qRUKajt/2JF4bV0fJfC8inU/
+	jvamyOYa3c3tMHBsGXDU9p4nqPEjPqEACuXlm59LzWNv54YgYM7EDMDFwfBs41zi0RPMX/bLPal
+	Rc+uLEJKm5Jl+jd0owBLLsEIMVALyeo0=
+X-Gm-Gg: ASbGncsbqEeJXO+BFa7iMzxLPc/K8fQH3yCZnpLBhz3YuOh9wkfcpT6mdLsbxfHrDp+
+	x9dPVlgqHee9pFeCQzYYts2mbw7e3gswfd9wnHJ4y45lH0aamnJYRR9aKnIdiliFgbIN+DPpq62
+	rM/Wiq1Aq/ShI6df2W5PgLutXL/j/W6koDc1Vda9TqVN4=
+X-Google-Smtp-Source: AGHT+IFMfEXuJ43kSXsdtdWY5bcekIDLYN3gAjscsQDNZrtLRLqrsSS7+psigrvCXRqkKZzl+hRlwyHYKmZ9GwWepBk=
+X-Received: by 2002:a17:90b:1dcc:b0:311:c1da:3858 with SMTP id
+ 98e67ed59e1d1-31aaca78c4dmr1037960a91.0.1751618456422; Fri, 04 Jul 2025
+ 01:40:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NFToOSOzJvJPUdRWuFYvA3xtNnngWCK/MdKYtqeU2XliL+CABkjlBu/r
-	NHDglCmfW02t2Pqw/zDzAoIOC0bZq2+793TnV4M5V26BfcRBbiIzBEVtvsmO5a/k74QM2ia
-	MfvOhQZZverk3WrGyS83rGmJ5rLsBd91QWB8NduumkJLxlmix6S7xwrhSjRPEfoaSnyPgus
-	1gdMQDY+jBSpAfFl6+tSW9gfX0Hjwxb5MjgkEFUFh8LPPOAhlg9p7+rSxTgeVSwYdUw58S3
-	fRbX3+5eQd5TAnf+X/PnYehg5BHwinNpenVg8WFvyQltZvNcfebTLCy/mD6udzh2fQM3/34
-	ZW9ONEaf+weLoHnmwR+E4uL0Bt9NRMlulZ4MiHoyUe9xQ22nSJZT5m34FBmeyRGP1uDqscw
-	vUO/Aa86dWyqAB/3m96X5HfRs8bgxbBXDO0E2ABViO3UvvPqFvkPjCJc4Rec7JJa4lyb8rQ
-	lGkkK5AUSWC6wcHh5oqQKvjjPaWkn8UO6R0rjFb+5ylQTFeZ/HA0jDr4gXqV6tjqk3WazpY
-	dYVEBrtpCToclT0TQdrw05bB0C947MsZOk6BeiGSX/Q9+GWQIbcYjWqe7/XXj/piLnn9Tvs
-	i0t86ikm1wjvh375bxgsvMCC/mtQJnsDxsAC9M2SwrKjbwE0C49AyhAT2T7dCMiL7s1RgPn
-	6TsfmOQ5JEPZc1gVQbkuYiovf5iLhhwQtBq4MkD4wNwocq62xozYh9M6yw+2/7AvNfVpWA5
-	BQzd8aPjPfq04hAlCxuEaQYcgBzZk16/w0O0br6qMDzJPLVya2451RGRwfHdFrY3R9gzoXL
-	cdU6pK3buqhHNfQIK67eHO68fbq9NUuepbTjMMXqsgk9HDsmVty654mW0cT6gg/FnMfNWBE
-	Dn9xZo0+2Ph1M+YhieHB40qm+3cPhtLvEM/9TAefmZapefea05W6Tjv2pZ/hehXjibfWv5T
-	SdH1QfSXm3uz8byrizR/7W9tA+s33Tg2wQpNL6i+mAC/nzLnBfBm9CbxEg4nAQwp7sc97nj
-	hyn2b8a1YuOVJvHC2fo+6hawEpZXrdiI6qzUA0KmI6OvaA7hNtto4xRNAPomOKRfOovJD2e
-	PquAjAN4QY7
-X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
-X-QQ-RECHKSPAM: 0
+References: <20250701-cstr-core-v13-0-29f7d3eb97a6@gmail.com>
+ <20250701-cstr-core-v13-2-29f7d3eb97a6@gmail.com> <DB2BDSN1JH51.14ZZPETJORBC6@kernel.org>
+ <CAJ-ks9nC=AyBPXRY3nJ0NuZvjFskzMcOkVNrBEfXD2hZ5uRntQ@mail.gmail.com>
+ <DB2IJ9HBIM0W.3N0JVGKX558QI@kernel.org> <CAJ-ks9nF5+m+_bn0Pzi9yU0pw0TyN7Fs4x--mQ4ygyHz4A6hzg@mail.gmail.com>
+ <34c00dfa-8302-45ee-8d80-58b97a08e52e@lunn.ch> <CANiq72ksOG10vc36UDdBytsM-LT7PdgjcZ9B0dkqSETH6a0ezA@mail.gmail.com>
+ <CAJ-ks9mkC3ncTeTiJo54p2nAgoBgTKdRsAwEEwZE2CtwbAS7BA@mail.gmail.com>
+In-Reply-To: <CAJ-ks9mkC3ncTeTiJo54p2nAgoBgTKdRsAwEEwZE2CtwbAS7BA@mail.gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Fri, 4 Jul 2025 10:40:43 +0200
+X-Gm-Features: Ac12FXwGbZyrddKNNViyoD8x6yBVbP3kVI8pI2AlPxz0BjAZk4Lec5cu34XzXTU
+Message-ID: <CANiq72kta=Wk=3764A5SzxB6Mq=sJfm9DyMZXFC91ojUSj1TeQ@mail.gmail.com>
+Subject: Re: [PATCH v13 2/5] rust: support formatting of foreign types
+To: Tamir Duberstein <tamird@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Benno Lossin <lossin@kernel.org>, 
+	Michal Rostecki <vadorovsky@protonmail.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Andreas Hindborg <a.hindborg@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
+	Trevor Gross <tmgross@umich.edu>, Brendan Higgins <brendan.higgins@linux.dev>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+	Danilo Krummrich <dakr@kernel.org>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, Peter Zijlstra <peterz@infradead.org>, 
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Jens Axboe <axboe@kernel.dk>, 
+	=?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+	Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+	Leon Romanovsky <leon@kernel.org>, Breno Leitao <leitao@debian.org>, 
+	Viresh Kumar <viresh.kumar@linaro.org>, Michael Turquette <mturquette@baylibre.com>, 
+	Stephen Boyd <sboyd@kernel.org>, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, dri-devel@lists.freedesktop.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, llvm@lists.linux.dev, 
+	linux-pci@vger.kernel.org, nouveau@lists.freedesktop.org, 
+	linux-block@vger.kernel.org, linux-pm@vger.kernel.org, 
+	linux-clk@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Commit 8fa7292fee5c ("treewide: Switch/rename to timer_delete[_sync]()")
-switched del_timer to timer_delete, but did not modify the comment for
-ip_vs_conn_expire_now(). Now fix it.
+On Fri, Jul 4, 2025 at 12:46=E2=80=AFAM Tamir Duberstein <tamird@gmail.com>=
+ wrote:
+>
+> There's also a tactical question about splitting by subsystem: are
+> there any tools that would assist in doing this, or is it a matter of
+> manually consulting MAINTAINERS to figure out file groupings?
 
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
----
- net/netfilter/ipvs/ip_vs_conn.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+As Andrew mentioned, you can use that script, though I recommend not
+fully/blindly trusting it.
 
-diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
-index 44b2ad695c15..965f3c8e5089 100644
---- a/net/netfilter/ipvs/ip_vs_conn.c
-+++ b/net/netfilter/ipvs/ip_vs_conn.c
-@@ -926,7 +926,7 @@ static void ip_vs_conn_expire(struct timer_list *t)
- void ip_vs_conn_expire_now(struct ip_vs_conn *cp)
- {
- 	/* Using mod_timer_pending will ensure the timer is not
--	 * modified after the final del_timer in ip_vs_conn_expire.
-+	 * modified after the final timer_delete in ip_vs_conn_expire.
- 	 */
- 	if (timer_pending(&cp->timer) &&
- 	    time_after(cp->timer.expires, jiffies))
--- 
-2.50.0
+Sometimes you will want to adjust things, e.g. sometimes things may be
+related even if in a couple different `MAINTAINERS` entries, or you
+may want to adjust the flags the script provides to filter, or you may
+want to check `git log --no-merges` to see who is recently applying
+patches related to that area, etc.
 
+It is essentially the same process as when you send patches.
+
+For instance, taking the diffstat above, and ignoring contents (i.e.
+assuming all lines could just be freely split and without considering
+other splits discussed to make the patches smaller first and reducing
+the flag day changes), I could have done something like this:
+
+    drivers/block/rnull.rs       |  2 +-
+    rust/kernel/block/mq.rs      |  2 +-
+
+    drivers/gpu/nova-core/gpu.rs |  4 +-
+
+    rust/kernel/device.rs        |  2 +-
+
+    rust/kernel/kunit.rs         |  6 +--
+
+    rust/kernel/seq_file.rs      |  2 +-
+
+    rust/kernel/fmt.rs           | 89 +++++++++++++++++++++++++++++++++++++=
+++
+    rust/kernel/lib.rs           |  1 +
+    rust/kernel/prelude.rs       |  3 +-
+    rust/kernel/print.rs         |  4 +-
+    rust/kernel/str.rs           | 22 ++++------
+    rust/macros/fmt.rs           | 99
+++++++++++++++++++++++++++++++++++++++++++++
+    rust/macros/lib.rs           | 19 +++++++++
+    rust/macros/quote.rs         |  7 ++++
+    scripts/rustdoc_test_gen.rs  |  2 +-
+
+And then those long lines may hint that it may make sense to split the
+smaller tweaks in the last group into their own patch, so that it
+mirrors what is done for the other smaller groups. Thus possibly
+leaving the feature being added into its own patch, which would be the
+biggest and the one that would take some discussion. And the others
+would be the small ones that are easy to Acked-by or Reviewed-by or
+simply take (if independently possible) by other maintainers.
+
+And so on -- again, this is speaking generally, and it is just a dummy
+example, not intended to say anything about the current patch. And
+sometimes things may not make sense to split too far, and it can be
+more annoying than it is worth for everyone involved, e.g. when we are
+talking about trivial conversions that could take 50+ patches that
+could be automated instead and then applied by a single maintainer.
+
+So it is a balance.
+
+Cheers,
+Miguel
 
