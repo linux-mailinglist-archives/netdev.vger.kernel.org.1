@@ -1,272 +1,123 @@
-Return-Path: <netdev+bounces-204008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14DF9AF8766
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 07:49:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75568AF8768
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 07:51:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67956586676
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 05:49:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D86993A5E4A
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 05:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19531F4C83;
-	Fri,  4 Jul 2025 05:49:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QBOZ1Nzm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491AC20DD4D;
+	Fri,  4 Jul 2025 05:51:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C2BCBE65
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 05:49:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE29A205E02;
+	Fri,  4 Jul 2025 05:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751608145; cv=none; b=a54fEYce4uOyUCOeMGqkCAC+DXhrJSEUcYniXpaXWYdf8TPSpEO0npQCbUX3XJnw/up9FOlYWmABsR+bppD67cJlBmucaa45Ufxa5BBbetWJsg7BWTeMqUhw/vUaMAyJitV7PjU7SHx8KQ7eGp9aQQohkTl72QQDql/8tldGGZg=
+	t=1751608296; cv=none; b=rp11rtQfYrwNbrIgDC56rl+6g8pFBdP9O4k/gfzVlD9qhtigyN2q++iVT47ojI8g4cNy8Cgc33o4+WdOcTVerNcUe2Px+eVUkJt8TlHdgRaYqyvd4hGeQToskweuP44ODVnHxPQkhLrlW21EUp5wDl/E4tc1WZOXnmmsJD7S/6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751608145; c=relaxed/simple;
-	bh=dLQ0I++oMsQfuP7cl0/y1n9onLevjwsYXCn4YZ0ygCc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZQu39F+FtUTz8N0/ICKqmoS7ejevAUoAsQt53gWsrF31wUuVgk63oGWDl72vfGDSVibBveM3HIEUYcIoDVlhpbiLRxBRqXPi0mAMDYDd6/ORQznxyuCTKy/ejEG0m0a7KCEg3KxZB3JxcQT5x/oJcJuHDwn2SX4HEG91oc24DZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QBOZ1Nzm; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b31f112c90aso423060a12.0
-        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 22:49:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751608143; x=1752212943; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=2LoRkUJFqHCmPcvNF0h7FQwolyfFv2zgcK878cX0WZ4=;
-        b=QBOZ1NzmuLmhcr4vUop0VCWwoVS7ystU4unof1RDqHzO6YRxoJmj0kmM7nugTmMK35
-         EaR+k3Erw+k9t1ndhCp1UsPB3ZEpFf9kQV5K+5RQOdoty0+Qq5hzsvZW/fvi6QgyY0qn
-         57B18d5HgVSCZVyw1f9k6S7fA7wjZyhfZf7k/+MhX63o5S2Hegqdck1tO9F56FsYpdzI
-         9Ww29hKY1WMRdJXCkmsvLjwagdLKXyK9iNco0Gw1koWziFz0OIkjrThWgaWlCqpLIiER
-         OeE2xnJBNNp1wAbVmkcH1/nhqc8EhkyqJyxTkOt+TSqNM/2VKjkmEcZKdOmax5+3aSAr
-         +tCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751608143; x=1752212943;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2LoRkUJFqHCmPcvNF0h7FQwolyfFv2zgcK878cX0WZ4=;
-        b=BrvDjMraopdcxYrJHBr99d+20HPOZ4ZlT7Hewri7QqjSBLbgDMOAirHdDxChBCeCNp
-         jqQnxB9DUU+3hsuHS4DyYt4wYFv0ap1hKrcbAzGFe3vzW1Yby0Pvn73b4dVicEWvrvqv
-         i8ssGhqmV5yIeEgA8Ile4UHUHfWkS4OU2G34YAG1U/iOSiyFHDSu20Rb1kiZXRHOrTgT
-         6f92sMHjd8yh36hi4UFBvUQ0/saGnHOeRC9uR/ZECkW2s0kCmr4MWg+B3dGDtUUImehA
-         Bru6pwtM9N9eegvzxLjb6UfxUH+yAIWFj3LJKMqp/DyflaxVh5wVLjj8oJGzVFyn/PL4
-         caLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXg29hBBtoE/Y6/YDR0G5DphXWldPntCjjqR/WeEWMWTC40Y4CCf8cSKWK8JSvB5lbr9Jh8JbY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzse4OG5kSNWtZrqYT4r4YJFZhQg4fFII3ChmeXdQAm7wcHxwTN
-	O3EowFHv0mMaWLj6dIPT+q3ft0tAzF0f0ufUp9doIL5/mEt+vBzgpslyz5LMIh1IxZN38BURjgv
-	VMlt6ww==
-X-Google-Smtp-Source: AGHT+IEQjv5xk3F1NNRPz8AkCb+qo/WZmwKrtXChCUZbzNSUDVF1vj8ee8w17r4+6J5tA4DWC+AObbbApAw=
-X-Received: from pgbda5.prod.google.com ([2002:a05:6a02:2385:b0:b2e:beba:356])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:439f:b0:21c:fa68:9da6
- with SMTP id adf61e73a8af0-225adc8f4eemr2744532637.8.1751608143521; Thu, 03
- Jul 2025 22:49:03 -0700 (PDT)
-Date: Fri,  4 Jul 2025 05:48:18 +0000
+	s=arc-20240116; t=1751608296; c=relaxed/simple;
+	bh=fB+FQaLeKQCqcyQ3cf1/iOclesosPJUHqJkKrxwT/tU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Scjiwt5TN2UZSmOk2wocdRpMWkwICNdNQYt5VVUo6EyvgMrfUiwQHsRixB81DtelTduJjbSr4PlNb+FXyG+6C/3T/3sVTnBgC9rAonLafLPM52uUCjCdOGeB7wqAgS3T8dO5OxKHhzOy35DOHQ9pDvF5yY87AyCD/b2WIWb7xcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; arc=none smtp.client-ip=210.160.252.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
+X-CSE-ConnectionGUID: g1AZybX6R5qI5qLyChaz/A==
+X-CSE-MsgGUID: H4CsqKgeTgOTKPKnnf1UCQ==
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie6.idc.renesas.com with ESMTP; 04 Jul 2025 14:51:32 +0900
+Received: from [127.0.1.1] (unknown [10.226.78.19])
+	by relmlir6.idc.renesas.com (Postfix) with ESMTP id D785941566DC;
+	Fri,  4 Jul 2025 14:51:28 +0900 (JST)
+From: Michael Dege <michael.dege@renesas.com>
+Subject: [PATCH 0/3] net: renesas: rswitch: R-Car S4 add HW offloading for
+ layer 2 switching
+Date: Fri, 04 Jul 2025 07:51:14 +0200
+Message-Id: <20250704-add_l2_switching-v1-0-ff882aacb258@renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250704054824.1580222-1-kuniyu@google.com>
-Subject: [PATCH v1 net] netlink: Fix wraparounds of sk->sk_rmem_alloc.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	Jason Baron <jbaron@akamai.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIANJrZ2gC/x3MQQqAIBBA0avErBMcS4OuEhHRTDkQFhoVRHdPW
+ r7F/w8kjsIJ2uKByKck2UIGlgVMfgwLK6FsMNpY7dCpkWhYzZAuOSYvYVFVbREb1JY0Qc72yLP
+ c/7Lr3/cDNTQpFGIAAAA=
+X-Change-ID: 20250616-add_l2_switching-345117105d0d
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
+ =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
+ Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Michael Dege <michael.dege@renesas.com>, 
+ Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1751608288; l=1696;
+ i=michael.dege@renesas.com; s=20250523; h=from:subject:message-id;
+ bh=fB+FQaLeKQCqcyQ3cf1/iOclesosPJUHqJkKrxwT/tU=;
+ b=9eG/9Tow82L7TUDK6gPh8F9s8z+spio+oYe9J32Vnm7cje21J80TmwW8oV86vTrIT0+pJrGes
+ Bs/pOO/Y/yeDYod713GMj9V6JGgJ7+ExKulhOD1YLkDblD/VT0lF13h
+X-Developer-Key: i=michael.dege@renesas.com; a=ed25519;
+ pk=+gYTlVQ3/MlOju88OuKnXA7MlapP4lYqJn1F81HZGSo=
 
-Netlink has this pattern in some places
+Hello!
 
-  if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
-  	atomic_add(skb->truesize, &sk->sk_rmem_alloc);
+The current R-Car S4 rswitch driver only supports port based fowarding.
+This patch set adds HW offloading for L2 switching/bridgeing. The driver
+hooks into switchdev.
 
-, which has the same problem fixed by commit 5a465a0da13e ("udp:
-Fix multiple wraparounds of sk->sk_rmem_alloc.").
+1. Rename the base driver file to keep the driver name (rswitch.ko)
 
-For example, if we set INT_MAX to SO_RCVBUFFORCE, the condition
-is always false as the two operands are of int.
+2. Add the L2 driver extension in a separate file. The HW offloading
+is automatically configured when a port is added to the bridge device.
 
-Then, a single socket can eat as many skb as possible until OOM
-happens, and we can see multiple wraparounds of sk->sk_rmem_alloc.
+Ussage example:
+ip link add name br type bridge
+ip link set dev tsn0 master br
+ip link set dev tsn1 master br
+ip link set dev br up
+ip link set dev tsn0 up
+ip link set dev tsn1 up
 
-Let's fix it by using atomic_add_return() and comparing the two
-variables as unsigned int.
+Layer 2 traffic is now fowarded by HW from port TSN0 to port TSN1.
 
-Before:
-  [root@fedora ~]# ss -f netlink
-  Recv-Q      Send-Q Local Address:Port                Peer Address:Port
-  -1668710080 0               rtnl:nl_wraparound/293               *
+3. Provides the functionality to set the MAC table ageing time in the
+Rswitch.
 
-After:
-  [root@fedora ~]# ss -f netlink
-  Recv-Q     Send-Q Local Address:Port                Peer Address:Port
-  2147483072 0               rtnl:nl_wraparound/290               *
-  ^
-  `--- INT_MAX - 576
+Usage example:
+brctl setageing br 300
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: Jason Baron <jbaron@akamai.com>
-Closes: https://lore.kernel.org/netdev/cover.1750285100.git.jbaron@akamai.com/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+Thanks,
+
+Michael
+
+Signed-off-by: Michael Dege <michael.dege@renesas.com>
+Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
 ---
- net/netlink/af_netlink.c | 81 ++++++++++++++++++++++++----------------
- 1 file changed, 49 insertions(+), 32 deletions(-)
+Michael Dege (3):
+      net: renesas: rswitch: rename rswitch.c to rswitch_main.c
+      net: renesas: rswitch: add offloading for L2 switching
+      net: renesas: rswitch: add modifiable ageing time
 
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index e8972a857e51..79fbaf7333ce 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -387,7 +387,6 @@ static void netlink_skb_set_owner_r(struct sk_buff *skb, struct sock *sk)
- 	WARN_ON(skb->sk != NULL);
- 	skb->sk = sk;
- 	skb->destructor = netlink_skb_destructor;
--	atomic_add(skb->truesize, &sk->sk_rmem_alloc);
- 	sk_mem_charge(sk, skb->truesize);
- }
- 
-@@ -1212,41 +1211,48 @@ struct sk_buff *netlink_alloc_large_skb(unsigned int size, int broadcast)
- int netlink_attachskb(struct sock *sk, struct sk_buff *skb,
- 		      long *timeo, struct sock *ssk)
- {
-+	DECLARE_WAITQUEUE(wait, current);
- 	struct netlink_sock *nlk;
-+	unsigned int rmem;
- 
- 	nlk = nlk_sk(sk);
-+	rmem = atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
- 
--	if ((atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf ||
--	     test_bit(NETLINK_S_CONGESTED, &nlk->state))) {
--		DECLARE_WAITQUEUE(wait, current);
--		if (!*timeo) {
--			if (!ssk || netlink_is_kernel(ssk))
--				netlink_overrun(sk);
--			sock_put(sk);
--			kfree_skb(skb);
--			return -EAGAIN;
--		}
--
--		__set_current_state(TASK_INTERRUPTIBLE);
--		add_wait_queue(&nlk->wait, &wait);
-+	if ((rmem == skb->truesize || rmem < READ_ONCE(sk->sk_rcvbuf)) &&
-+	    !test_bit(NETLINK_S_CONGESTED, &nlk->state)) {
-+		netlink_skb_set_owner_r(skb, sk);
-+		return 0;
-+	}
- 
--		if ((atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf ||
--		     test_bit(NETLINK_S_CONGESTED, &nlk->state)) &&
--		    !sock_flag(sk, SOCK_DEAD))
--			*timeo = schedule_timeout(*timeo);
-+	atomic_sub(skb->truesize, &sk->sk_rmem_alloc);
- 
--		__set_current_state(TASK_RUNNING);
--		remove_wait_queue(&nlk->wait, &wait);
-+	if (!*timeo) {
-+		if (!ssk || netlink_is_kernel(ssk))
-+			netlink_overrun(sk);
- 		sock_put(sk);
-+		kfree_skb(skb);
-+		return -EAGAIN;
-+	}
- 
--		if (signal_pending(current)) {
--			kfree_skb(skb);
--			return sock_intr_errno(*timeo);
--		}
--		return 1;
-+	__set_current_state(TASK_INTERRUPTIBLE);
-+	add_wait_queue(&nlk->wait, &wait);
-+	rmem = atomic_read(&sk->sk_rmem_alloc);
-+
-+	if (((rmem && rmem + skb->truesize > READ_ONCE(sk->sk_rcvbuf)) ||
-+	     test_bit(NETLINK_S_CONGESTED, &nlk->state)) &&
-+	    !sock_flag(sk, SOCK_DEAD))
-+		*timeo = schedule_timeout(*timeo);
-+
-+	__set_current_state(TASK_RUNNING);
-+	remove_wait_queue(&nlk->wait, &wait);
-+	sock_put(sk);
-+
-+	if (signal_pending(current)) {
-+		kfree_skb(skb);
-+		return sock_intr_errno(*timeo);
- 	}
--	netlink_skb_set_owner_r(skb, sk);
--	return 0;
-+
-+	return 1;
- }
- 
- static int __netlink_sendskb(struct sock *sk, struct sk_buff *skb)
-@@ -1307,6 +1313,7 @@ static int netlink_unicast_kernel(struct sock *sk, struct sk_buff *skb,
- 	ret = -ECONNREFUSED;
- 	if (nlk->netlink_rcv != NULL) {
- 		ret = skb->len;
-+		atomic_add(skb->truesize, &sk->sk_rmem_alloc);
- 		netlink_skb_set_owner_r(skb, sk);
- 		NETLINK_CB(skb).sk = ssk;
- 		netlink_deliver_tap_kernel(sk, ssk, skb);
-@@ -1383,13 +1390,19 @@ EXPORT_SYMBOL_GPL(netlink_strict_get_check);
- static int netlink_broadcast_deliver(struct sock *sk, struct sk_buff *skb)
- {
- 	struct netlink_sock *nlk = nlk_sk(sk);
-+	unsigned int rmem, rcvbuf;
- 
--	if (atomic_read(&sk->sk_rmem_alloc) <= sk->sk_rcvbuf &&
-+	rmem = atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
-+	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
-+
-+	if ((rmem != skb->truesize || rmem <= rcvbuf) &&
- 	    !test_bit(NETLINK_S_CONGESTED, &nlk->state)) {
- 		netlink_skb_set_owner_r(skb, sk);
- 		__netlink_sendskb(sk, skb);
--		return atomic_read(&sk->sk_rmem_alloc) > (sk->sk_rcvbuf >> 1);
-+		return rmem > (rcvbuf >> 1);
- 	}
-+
-+	atomic_sub(skb->truesize, &sk->sk_rmem_alloc);
- 	return -1;
- }
- 
-@@ -2249,6 +2262,7 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
- 	struct module *module;
- 	int err = -ENOBUFS;
- 	int alloc_min_size;
-+	unsigned int rmem;
- 	int alloc_size;
- 
- 	if (!lock_taken)
-@@ -2258,9 +2272,6 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
- 		goto errout_skb;
- 	}
- 
--	if (atomic_read(&sk->sk_rmem_alloc) >= sk->sk_rcvbuf)
--		goto errout_skb;
--
- 	/* NLMSG_GOODSIZE is small to avoid high order allocations being
- 	 * required, but it makes sense to _attempt_ a 32KiB allocation
- 	 * to reduce number of system calls on dump operations, if user
-@@ -2283,6 +2294,12 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
- 	if (!skb)
- 		goto errout_skb;
- 
-+	rmem = atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
-+	if (rmem >= READ_ONCE(sk->sk_rcvbuf)) {
-+		atomic_sub(skb->truesize, &sk->sk_rmem_alloc);
-+		goto errout_skb;
-+	}
-+
- 	/* Trim skb to allocated size. User is expected to provide buffer as
- 	 * large as max(min_dump_alloc, 32KiB (max_recvmsg_len capped at
- 	 * netlink_recvmsg())). dump will pack as many smaller messages as
+ drivers/net/ethernet/renesas/Makefile              |   1 +
+ drivers/net/ethernet/renesas/rswitch.h             |  43 ++-
+ drivers/net/ethernet/renesas/rswitch_l2.c          | 344 +++++++++++++++++++++
+ drivers/net/ethernet/renesas/rswitch_l2.h          |  15 +
+ .../ethernet/renesas/{rswitch.c => rswitch_main.c} |  88 +++++-
+ 5 files changed, 485 insertions(+), 6 deletions(-)
+---
+base-commit: 19272b37aa4f83ca52bdf9c16d5d81bdd1354494
+change-id: 20250616-add_l2_switching-345117105d0d
+
+Best regards,
 -- 
-2.50.0.727.gbf7dc18ff4-goog
+Michael Dege <michael.dege@renesas.com>
 
 
