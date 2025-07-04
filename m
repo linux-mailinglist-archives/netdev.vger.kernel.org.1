@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-204236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9879FAF9A8F
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 20:24:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3671EAF9A96
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 20:25:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EEE63BEC4D
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 18:24:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BF891887468
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 18:25:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BA1D2D8392;
-	Fri,  4 Jul 2025 18:23:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECFCD309A4D;
+	Fri,  4 Jul 2025 18:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qxd4rEk2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dz/F3O4H"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A212C327D
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 18:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26EFA307AFC
+	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 18:23:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751653384; cv=none; b=CkXEV71h9pt+YSXCkHMnKUkGXbaExYld3Yo8oo0vgaca7fjc8Uyg0J7eQk0AvPyHw7opz6yP6/LP8GnLERZyU/urc6j89P4iYasXySUdTlwzmKiiZsDcY78lOxxP/Rn7Wr5DAeU8HQysobLJQdGVBhDHJrhjTCB0EHVH17w3s8Q=
+	t=1751653391; cv=none; b=lYPu0u7wkcVfjlaNlIcjKduUrMAUfG7dwaTNpIhEkZaNOhYzwvTUXvS3DvaG84eIyDJglQzxZ0PZ2VBhxW5vXDeXmWQHDzxI32xiFUIKWOYcVvhIX0rs/wDfJ8pqXm3u3cxNQR22x/+BUsShKeDBhmiGsH8tI6UlUlw//VDVYts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751653384; c=relaxed/simple;
-	bh=z6qjjLz0SSTPEcIRaHp9RzcawPPXAZSXMKjZt7lcXVs=;
+	s=arc-20240116; t=1751653391; c=relaxed/simple;
+	bh=dd+kzRDAwdSjJNqBTN2Pu6b9mvqm7uas5inOVtTvK3g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Hsb+/kcdr5qpG1ZfLIjPjsQ27XQYshtcNdRqV8cszncpSFEMf7NUlZXEwrTQtKi/xCqexaMCsXp3REKldvLzrDE9uX+ydE2Qus9YgLvpI3Kdi7Xn1nXeCtX9gdqySIDv+0ERFTQ97wEvKXcjSRMZmTWGV4jc1TsHjm9wEmc+zWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qxd4rEk2; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=hz0tzFwgew6va2eZm/5xgTXeVAL7uvzRi4dPKm5RyFGtN/5wEtlqZoQkMl6bVEHM5AArIOg6uVt82oRrYQ/YSNByD+7Q0M65/6RO78XaFgwniDBnJUIQ45NharSTgPfIi4FytmzcfCainXKfYJfqunmKUzN225nSzqpoNoaccOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Dz/F3O4H; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751653380;
+	s=mimecast20190719; t=1751653387;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VGRpVq1PGAwypbE9oqGafHPbMiOetxAha/FlADn0WM4=;
-	b=Qxd4rEk2ggRCV+JyrSux/CvLm8BcZjG7flKbA7Bw643GsCu0ViEW9F2K/afObT70N/gG60
-	prvwOZ51wtV7ANp8kRFQn1IkfJoPT8xql2fd/lJTYlFNjFoseiHYdjejV4/m2SWenHrSvK
-	XqZPa0jD2C8Grvae8x0dZzuzOX9110o=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=ViNlIxpPN94JQM1fTBhS8Sk9ydM6R932fxwVRTOia0Q=;
+	b=Dz/F3O4HoPcVBFAOhAIS8aQ3UF9UDtvWt10uodYHXD8Ziw1JHuHhDqoFiN5F7yVzpFZ3qf
+	hbD8GXYvQkwpCLEz8Xm2E5QPcrCkpoNWXRCoyq5NNdMBemSJGe+7hm0e6RxX5E1ZJH3eId
+	fJ1weqWOl3DkRmS341CmVbaLyxiYd9U=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-369-nJyEo1T3Pz6bKfJZq0MTUw-1; Fri,
- 04 Jul 2025 14:22:57 -0400
-X-MC-Unique: nJyEo1T3Pz6bKfJZq0MTUw-1
-X-Mimecast-MFC-AGG-ID: nJyEo1T3Pz6bKfJZq0MTUw_1751653374
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-221-nBLjbE5qMlG2aJy6eMsMkA-1; Fri,
+ 04 Jul 2025 14:23:04 -0400
+X-MC-Unique: nBLjbE5qMlG2aJy6eMsMkA-1
+X-Mimecast-MFC-AGG-ID: nBLjbE5qMlG2aJy6eMsMkA_1751653381
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9C20C1800343;
-	Fri,  4 Jul 2025 18:22:54 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 85A981955F3E;
+	Fri,  4 Jul 2025 18:23:01 +0000 (UTC)
 Received: from p16v.redhat.com (unknown [10.45.226.37])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0052219560A7;
-	Fri,  4 Jul 2025 18:22:46 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1B25F19560A7;
+	Fri,  4 Jul 2025 18:22:54 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: Jiri Pirko <jiri@resnulli.us>,
 	netdev@vger.kernel.org
@@ -81,9 +81,9 @@ Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	linux-doc@vger.kernel.org,
 	Michal Schmidt <mschmidt@redhat.com>,
 	Petr Oros <poros@redhat.com>
-Subject: [PATCH net-next v13 05/12] dpll: Add basic Microchip ZL3073x support
-Date: Fri,  4 Jul 2025 20:21:55 +0200
-Message-ID: <20250704182202.1641943-6-ivecera@redhat.com>
+Subject: [PATCH net-next v13 06/12] dpll: zl3073x: Fetch invariants during probe
+Date: Fri,  4 Jul 2025 20:21:56 +0200
+Message-ID: <20250704182202.1641943-7-ivecera@redhat.com>
 In-Reply-To: <20250704182202.1641943-1-ivecera@redhat.com>
 References: <20250704182202.1641943-1-ivecera@redhat.com>
 Precedence: bulk
@@ -95,1304 +95,702 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Microchip Azurite ZL3073x represents chip family providing DPLL
-and optionally PHC (PTP) functionality. The chips can be connected
-be connected over I2C or SPI bus.
+Several configuration parameters will remain constant at runtime,
+so we can load them during probe to avoid excessive reads from
+the hardware.
 
-They have the following characteristics:
-* up to 5 separate DPLL units (channels)
-* 5 synthesizers
-* 10 input pins (references)
-* 10 outputs
-* 20 output pins (output pin pair shares one output)
-* Each reference and output can operate in either differential or
-  single-ended mode (differential mode uses 2 pins)
-* Each output is connected to one of the synthesizers
-* Each synthesizer is driven by one of the DPLL unit
+Read the following parameters from the device during probe and store
+them for later use:
 
-The device uses 7-bit addresses and 8-bits values. It exposes 8-, 16-,
-32- and 48-bits registers in address range <0x000,0x77F>. Due to 7bit
-addressing, the range is organized into pages of 128 bytes, with each
-page containing a page selector register at address 0x7F.
-For reading/writing multi-byte registers, the device supports bulk
-transfers.
-
-Add basic functionality to access device registers, probe functionality
-both I2C and SPI cases and add devlink support to provide info and
-to set clock ID parameter.
+* enablement status and frequencies of the synthesizers and their
+  associated DPLL channels
+* enablement status and type (single-ended or differential) of input pins
+* associated synthesizers, signal format, and enablement status of
+  outputs
 
 Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
-v13:
-* squashed patches 4, 5 & 7
-* extended Kconfig description
-* renamed "cfg.custom_ver" to "custom_cfg"
-* initial clock_id is generated randomly
-* added support for devlink clock_id parameter
----
- Documentation/networking/devlink/index.rst   |   1 +
- Documentation/networking/devlink/zl3073x.rst |  51 ++
- MAINTAINERS                                  |   8 +
- drivers/Kconfig                              |   4 +-
- drivers/dpll/Kconfig                         |   6 +
- drivers/dpll/Makefile                        |   2 +
- drivers/dpll/zl3073x/Kconfig                 |  38 ++
- drivers/dpll/zl3073x/Makefile                |  10 +
- drivers/dpll/zl3073x/core.c                  | 465 +++++++++++++++++++
- drivers/dpll/zl3073x/core.h                  |  57 +++
- drivers/dpll/zl3073x/devlink.c               | 242 ++++++++++
- drivers/dpll/zl3073x/devlink.h               |  12 +
- drivers/dpll/zl3073x/i2c.c                   |  76 +++
- drivers/dpll/zl3073x/regs.h                  |  75 +++
- drivers/dpll/zl3073x/spi.c                   |  76 +++
- 15 files changed, 1121 insertions(+), 2 deletions(-)
- create mode 100644 Documentation/networking/devlink/zl3073x.rst
- create mode 100644 drivers/dpll/zl3073x/Kconfig
- create mode 100644 drivers/dpll/zl3073x/Makefile
- create mode 100644 drivers/dpll/zl3073x/core.c
- create mode 100644 drivers/dpll/zl3073x/core.h
- create mode 100644 drivers/dpll/zl3073x/devlink.c
- create mode 100644 drivers/dpll/zl3073x/devlink.h
- create mode 100644 drivers/dpll/zl3073x/i2c.c
- create mode 100644 drivers/dpll/zl3073x/regs.h
- create mode 100644 drivers/dpll/zl3073x/spi.c
+ drivers/dpll/zl3073x/core.c | 249 +++++++++++++++++++++++++++++++
+ drivers/dpll/zl3073x/core.h | 286 ++++++++++++++++++++++++++++++++++++
+ drivers/dpll/zl3073x/regs.h |  65 ++++++++
+ 3 files changed, 600 insertions(+)
 
-diff --git a/Documentation/networking/devlink/index.rst b/Documentation/networking/devlink/index.rst
-index 8319f43b5933d..250ae71f40236 100644
---- a/Documentation/networking/devlink/index.rst
-+++ b/Documentation/networking/devlink/index.rst
-@@ -98,3 +98,4 @@ parameters, info versions, and other features it supports.
-    iosm
-    octeontx2
-    sfc
-+   zl3073x
-diff --git a/Documentation/networking/devlink/zl3073x.rst b/Documentation/networking/devlink/zl3073x.rst
-new file mode 100644
-index 0000000000000..4b6cfaf386433
---- /dev/null
-+++ b/Documentation/networking/devlink/zl3073x.rst
-@@ -0,0 +1,51 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=======================
-+zl3073x devlink support
-+=======================
-+
-+This document describes the devlink features implemented by the ``zl3073x``
-+device driver.
-+
-+Parameters
-+==========
-+
-+.. list-table:: Generic parameters implemented
-+   :widths: 5 5 90
-+
-+   * - Name
-+     - Mode
-+     - Notes
-+   * - ``clock_id``
-+     - driverinit
-+     - Set the clock ID that is used by the driver for registering DPLL devices
-+       and pins.
-+
-+Info versions
-+=============
-+
-+The ``zl3073x`` driver reports the following versions
-+
-+.. list-table:: devlink info versions implemented
-+    :widths: 5 5 5 90
-+
-+    * - Name
-+      - Type
-+      - Example
-+      - Description
-+    * - ``asic.id``
-+      - fixed
-+      - 1E94
-+      - Chip identification number
-+    * - ``asic.rev``
-+      - fixed
-+      - 300
-+      - Chip revision number
-+    * - ``fw``
-+      - running
-+      - 7006
-+      - Firmware version number
-+    * - ``custom_cfg``
-+      - running
-+      - 1.3.0.1
-+      - Device configuration version customized by OEM
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5488a6fd31f59..b841cdb568306 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16479,6 +16479,14 @@ L:	linux-wireless@vger.kernel.org
- S:	Supported
- F:	drivers/net/wireless/microchip/
- 
-+MICROCHIP ZL3073X DRIVER
-+M:	Ivan Vecera <ivecera@redhat.com>
-+M:	Prathosh Satish <Prathosh.Satish@microchip.com>
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+F:	Documentation/devicetree/bindings/dpll/microchip,zl30731.yaml
-+F:	drivers/dpll/zl3073x/
-+
- MICROSEMI MIPS SOCS
- M:	Alexandre Belloni <alexandre.belloni@bootlin.com>
- M:	UNGLinuxDriver@microchip.com
-diff --git a/drivers/Kconfig b/drivers/Kconfig
-index 7c556c5ac4fdd..3d8c902c25610 100644
---- a/drivers/Kconfig
-+++ b/drivers/Kconfig
-@@ -77,6 +77,8 @@ source "drivers/pps/Kconfig"
- 
- source "drivers/ptp/Kconfig"
- 
-+source "drivers/dpll/Kconfig"
-+
- source "drivers/pinctrl/Kconfig"
- 
- source "drivers/gpio/Kconfig"
-@@ -245,6 +247,4 @@ source "drivers/hte/Kconfig"
- 
- source "drivers/cdx/Kconfig"
- 
--source "drivers/dpll/Kconfig"
--
- endmenu
-diff --git a/drivers/dpll/Kconfig b/drivers/dpll/Kconfig
-index 20607ed542435..ade872c915ac6 100644
---- a/drivers/dpll/Kconfig
-+++ b/drivers/dpll/Kconfig
-@@ -3,5 +3,11 @@
- # Generic DPLL drivers configuration
- #
- 
-+menu "DPLL device support"
-+
- config DPLL
- 	bool
-+
-+source "drivers/dpll/zl3073x/Kconfig"
-+
-+endmenu
-diff --git a/drivers/dpll/Makefile b/drivers/dpll/Makefile
-index 2e5b278501105..9e7a3a3e592e8 100644
---- a/drivers/dpll/Makefile
-+++ b/drivers/dpll/Makefile
-@@ -7,3 +7,5 @@ obj-$(CONFIG_DPLL)      += dpll.o
- dpll-y                  += dpll_core.o
- dpll-y                  += dpll_netlink.o
- dpll-y                  += dpll_nl.o
-+
-+obj-$(CONFIG_ZL3073X)	+= zl3073x/
-diff --git a/drivers/dpll/zl3073x/Kconfig b/drivers/dpll/zl3073x/Kconfig
-new file mode 100644
-index 0000000000000..41fa6a8f96ab9
---- /dev/null
-+++ b/drivers/dpll/zl3073x/Kconfig
-@@ -0,0 +1,38 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+
-+config ZL3073X
-+	tristate "Microchip Azurite DPLL/PTP/SyncE devices"
-+	depends on NET
-+	select DPLL
-+	select NET_DEVLINK
-+	help
-+	  This driver supports Microchip Azurite family DPLL/PTP/SyncE
-+	  devices that support up to 5 independent DPLL channels,
-+	  10 input pins and up to 20 output pins.
-+
-+	  To compile this driver as a module, choose M here. The module
-+	  will be called zl3073x.
-+
-+config ZL3073X_I2C
-+	tristate "I2C bus implementation for Microchip Azurite devices"
-+	depends on I2C && ZL3073X
-+	select REGMAP_I2C
-+	default m
-+	help
-+	  This is I2C bus implementation for Microchip Azurite DPLL/PTP/SyncE
-+	  devices.
-+
-+	  To compile this driver as a module, choose M here: the module will
-+	  be called zl3073x_i2c.
-+
-+config ZL3073X_SPI
-+	tristate "SPI bus implementation for Microchip Azurite devices"
-+	depends on SPI && ZL3073X
-+	select REGMAP_SPI
-+	default m
-+	help
-+	  This is SPI bus implementation for Microchip Azurite DPLL/PTP/SyncE
-+	  devices.
-+
-+	  To compile this driver as a module, choose M here: the module will
-+	  be called zl3073x_spi.
-diff --git a/drivers/dpll/zl3073x/Makefile b/drivers/dpll/zl3073x/Makefile
-new file mode 100644
-index 0000000000000..ef2c575ce012c
---- /dev/null
-+++ b/drivers/dpll/zl3073x/Makefile
-@@ -0,0 +1,10 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+obj-$(CONFIG_ZL3073X)		+= zl3073x.o
-+zl3073x-objs			:= core.o devlink.o
-+
-+obj-$(CONFIG_ZL3073X_I2C)	+= zl3073x_i2c.o
-+zl3073x_i2c-objs		:= i2c.o
-+
-+obj-$(CONFIG_ZL3073X_SPI)	+= zl3073x_spi.o
-+zl3073x_spi-objs		:= spi.o
 diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
-new file mode 100644
-index 0000000000000..38019f878ff02
---- /dev/null
+index 38019f878ff02..37ec22c562248 100644
+--- a/drivers/dpll/zl3073x/core.c
 +++ b/drivers/dpll/zl3073x/core.c
-@@ -0,0 +1,465 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+#include <linux/array_size.h>
-+#include <linux/bitfield.h>
-+#include <linux/bits.h>
-+#include <linux/dev_printk.h>
-+#include <linux/device.h>
-+#include <linux/export.h>
-+#include <linux/module.h>
-+#include <linux/netlink.h>
-+#include <linux/regmap.h>
-+#include <linux/sprintf.h>
-+#include <linux/unaligned.h>
-+#include <net/devlink.h>
-+
-+#include "core.h"
-+#include "devlink.h"
-+#include "regs.h"
-+
-+/* Chip IDs for zl30731 */
-+static const u16 zl30731_ids[] = {
-+	0x0E93,
-+	0x1E93,
-+	0x2E93,
-+};
-+
-+const struct zl3073x_chip_info zl30731_chip_info = {
-+	.ids = zl30731_ids,
-+	.num_ids = ARRAY_SIZE(zl30731_ids),
-+	.num_channels = 1,
-+};
-+EXPORT_SYMBOL_NS_GPL(zl30731_chip_info, "ZL3073X");
-+
-+/* Chip IDs for zl30732 */
-+static const u16 zl30732_ids[] = {
-+	0x0E30,
-+	0x0E94,
-+	0x1E94,
-+	0x1F60,
-+	0x2E94,
-+	0x3FC4,
-+};
-+
-+const struct zl3073x_chip_info zl30732_chip_info = {
-+	.ids = zl30732_ids,
-+	.num_ids = ARRAY_SIZE(zl30732_ids),
-+	.num_channels = 2,
-+};
-+EXPORT_SYMBOL_NS_GPL(zl30732_chip_info, "ZL3073X");
-+
-+/* Chip IDs for zl30733 */
-+static const u16 zl30733_ids[] = {
-+	0x0E95,
-+	0x1E95,
-+	0x2E95,
-+};
-+
-+const struct zl3073x_chip_info zl30733_chip_info = {
-+	.ids = zl30733_ids,
-+	.num_ids = ARRAY_SIZE(zl30733_ids),
-+	.num_channels = 3,
-+};
-+EXPORT_SYMBOL_NS_GPL(zl30733_chip_info, "ZL3073X");
-+
-+/* Chip IDs for zl30734 */
-+static const u16 zl30734_ids[] = {
-+	0x0E96,
-+	0x1E96,
-+	0x2E96,
-+};
-+
-+const struct zl3073x_chip_info zl30734_chip_info = {
-+	.ids = zl30734_ids,
-+	.num_ids = ARRAY_SIZE(zl30734_ids),
-+	.num_channels = 4,
-+};
-+EXPORT_SYMBOL_NS_GPL(zl30734_chip_info, "ZL3073X");
-+
-+/* Chip IDs for zl30735 */
-+static const u16 zl30735_ids[] = {
-+	0x0E97,
-+	0x1E97,
-+	0x2E97,
-+};
-+
-+const struct zl3073x_chip_info zl30735_chip_info = {
-+	.ids = zl30735_ids,
-+	.num_ids = ARRAY_SIZE(zl30735_ids),
-+	.num_channels = 5,
-+};
-+EXPORT_SYMBOL_NS_GPL(zl30735_chip_info, "ZL3073X");
-+
-+#define ZL_RANGE_OFFSET		0x80
-+#define ZL_PAGE_SIZE		0x80
-+#define ZL_NUM_PAGES		15
-+#define ZL_PAGE_SEL		0x7F
-+#define ZL_PAGE_SEL_MASK	GENMASK(3, 0)
-+#define ZL_NUM_REGS		(ZL_NUM_PAGES * ZL_PAGE_SIZE)
-+
-+/* Regmap range configuration */
-+static const struct regmap_range_cfg zl3073x_regmap_range = {
-+	.range_min	= ZL_RANGE_OFFSET,
-+	.range_max	= ZL_RANGE_OFFSET + ZL_NUM_REGS - 1,
-+	.selector_reg	= ZL_PAGE_SEL,
-+	.selector_mask	= ZL_PAGE_SEL_MASK,
-+	.selector_shift	= 0,
-+	.window_start	= 0,
-+	.window_len	= ZL_PAGE_SIZE,
-+};
-+
-+static bool
-+zl3073x_is_volatile_reg(struct device *dev __maybe_unused, unsigned int reg)
+@@ -6,10 +6,12 @@
+ #include <linux/dev_printk.h>
+ #include <linux/device.h>
+ #include <linux/export.h>
++#include <linux/math64.h>
+ #include <linux/module.h>
+ #include <linux/netlink.h>
+ #include <linux/regmap.h>
+ #include <linux/sprintf.h>
++#include <linux/string_choices.h>
+ #include <linux/unaligned.h>
+ #include <net/devlink.h>
+ 
+@@ -383,6 +385,248 @@ int zl3073x_poll_zero_u8(struct zl3073x_dev *zldev, unsigned int reg, u8 mask)
+ 					ZL_POLL_SLEEP_US, ZL_POLL_TIMEOUT_US);
+ }
+ 
++int zl3073x_mb_op(struct zl3073x_dev *zldev, unsigned int op_reg, u8 op_val,
++		  unsigned int mask_reg, u16 mask_val)
 +{
-+	/* Only page selector is non-volatile */
-+	return reg != ZL_PAGE_SEL;
++	int rc;
++
++	/* Set mask for the operation */
++	rc = zl3073x_write_u16(zldev, mask_reg, mask_val);
++	if (rc)
++		return rc;
++
++	/* Trigger the operation */
++	rc = zl3073x_write_u8(zldev, op_reg, op_val);
++	if (rc)
++		return rc;
++
++	/* Wait for the operation to actually finish */
++	return zl3073x_poll_zero_u8(zldev, op_reg, op_val);
 +}
 +
-+const struct regmap_config zl3073x_regmap_config = {
-+	.reg_bits	= 8,
-+	.val_bits	= 8,
-+	.max_register	= ZL_RANGE_OFFSET + ZL_NUM_REGS - 1,
-+	.ranges		= &zl3073x_regmap_range,
-+	.num_ranges	= 1,
-+	.cache_type	= REGCACHE_MAPLE,
-+	.volatile_reg	= zl3073x_is_volatile_reg,
-+};
-+EXPORT_SYMBOL_NS_GPL(zl3073x_regmap_config, "ZL3073X");
-+
-+static bool
-+zl3073x_check_reg(struct zl3073x_dev *zldev, unsigned int reg, size_t size)
++/**
++ * zl3073x_ref_state_fetch - get input reference state
++ * @zldev: pointer to zl3073x_dev structure
++ * @index: input reference index to fetch state for
++ *
++ * Function fetches information for the given input reference that are
++ * invariant and stores them for later use.
++ *
++ * Return: 0 on success, <0 on error
++ */
++static int
++zl3073x_ref_state_fetch(struct zl3073x_dev *zldev, u8 index)
 +{
-+	/* Check that multiop lock is held when accessing registers
-+	 * from page 10 and above.
-+	 */
-+	if (ZL_REG_PAGE(reg) >= 10)
-+		lockdep_assert_held(&zldev->multiop_lock);
++	struct zl3073x_ref *input = &zldev->ref[index];
++	u8 ref_config;
++	int rc;
 +
-+	/* Check the index is in valid range for indexed register */
-+	if (ZL_REG_OFFSET(reg) > ZL_REG_MAX_OFFSET(reg)) {
-+		dev_err(zldev->dev, "Index out of range for reg 0x%04lx\n",
-+			ZL_REG_ADDR(reg));
-+		return false;
++	/* If the input is differential then the configuration for N-pin
++	 * reference is ignored and P-pin config is used for both.
++	 */
++	if (zl3073x_is_n_pin(index) &&
++	    zl3073x_ref_is_diff(zldev, index - 1)) {
++		input->enabled = zl3073x_ref_is_enabled(zldev, index - 1);
++		input->diff = true;
++
++		return 0;
 +	}
-+	/* Check the requested size corresponds to register size */
-+	if (ZL_REG_SIZE(reg) != size) {
-+		dev_err(zldev->dev, "Invalid size %zu for reg 0x%04lx\n",
-+			size, ZL_REG_ADDR(reg));
++
++	guard(mutex)(&zldev->multiop_lock);
++
++	/* Read reference configuration */
++	rc = zl3073x_mb_op(zldev, ZL_REG_REF_MB_SEM, ZL_REF_MB_SEM_RD,
++			   ZL_REG_REF_MB_MASK, BIT(index));
++	if (rc)
++		return rc;
++
++	/* Read ref_config register */
++	rc = zl3073x_read_u8(zldev, ZL_REG_REF_CONFIG, &ref_config);
++	if (rc)
++		return rc;
++
++	input->enabled = FIELD_GET(ZL_REF_CONFIG_ENABLE, ref_config);
++	input->diff = FIELD_GET(ZL_REF_CONFIG_DIFF_EN, ref_config);
++
++	dev_dbg(zldev->dev, "REF%u is %s and configured as %s\n", index,
++		str_enabled_disabled(input->enabled),
++		input->diff ? "differential" : "single-ended");
++
++	return rc;
++}
++
++/**
++ * zl3073x_out_state_fetch - get output state
++ * @zldev: pointer to zl3073x_dev structure
++ * @index: output index to fetch state for
++ *
++ * Function fetches information for the given output (not output pin)
++ * that are invariant and stores them for later use.
++ *
++ * Return: 0 on success, <0 on error
++ */
++static int
++zl3073x_out_state_fetch(struct zl3073x_dev *zldev, u8 index)
++{
++	struct zl3073x_out *out = &zldev->out[index];
++	u8 output_ctrl, output_mode;
++	int rc;
++
++	/* Read output configuration */
++	rc = zl3073x_read_u8(zldev, ZL_REG_OUTPUT_CTRL(index), &output_ctrl);
++	if (rc)
++		return rc;
++
++	/* Store info about output enablement and synthesizer the output
++	 * is connected to.
++	 */
++	out->enabled = FIELD_GET(ZL_OUTPUT_CTRL_EN, output_ctrl);
++	out->synth = FIELD_GET(ZL_OUTPUT_CTRL_SYNTH_SEL, output_ctrl);
++
++	dev_dbg(zldev->dev, "OUT%u is %s and connected to SYNTH%u\n", index,
++		str_enabled_disabled(out->enabled), out->synth);
++
++	guard(mutex)(&zldev->multiop_lock);
++
++	/* Read output configuration */
++	rc = zl3073x_mb_op(zldev, ZL_REG_OUTPUT_MB_SEM, ZL_OUTPUT_MB_SEM_RD,
++			   ZL_REG_OUTPUT_MB_MASK, BIT(index));
++	if (rc)
++		return rc;
++
++	/* Read output_mode */
++	rc = zl3073x_read_u8(zldev, ZL_REG_OUTPUT_MODE, &output_mode);
++	if (rc)
++		return rc;
++
++	/* Extract and store output signal format */
++	out->signal_format = FIELD_GET(ZL_OUTPUT_MODE_SIGNAL_FORMAT,
++				       output_mode);
++
++	dev_dbg(zldev->dev, "OUT%u has signal format 0x%02x\n", index,
++		out->signal_format);
++
++	return rc;
++}
++
++/**
++ * zl3073x_synth_state_fetch - get synth state
++ * @zldev: pointer to zl3073x_dev structure
++ * @index: synth index to fetch state for
++ *
++ * Function fetches information for the given synthesizer that are
++ * invariant and stores them for later use.
++ *
++ * Return: 0 on success, <0 on error
++ */
++static int
++zl3073x_synth_state_fetch(struct zl3073x_dev *zldev, u8 index)
++{
++	struct zl3073x_synth *synth = &zldev->synth[index];
++	u16 base, m, n;
++	u8 synth_ctrl;
++	u32 mult;
++	int rc;
++
++	/* Read synth control register */
++	rc = zl3073x_read_u8(zldev, ZL_REG_SYNTH_CTRL(index), &synth_ctrl);
++	if (rc)
++		return rc;
++
++	/* Store info about synth enablement and DPLL channel the synth is
++	 * driven by.
++	 */
++	synth->enabled = FIELD_GET(ZL_SYNTH_CTRL_EN, synth_ctrl);
++	synth->dpll = FIELD_GET(ZL_SYNTH_CTRL_DPLL_SEL, synth_ctrl);
++
++	dev_dbg(zldev->dev, "SYNTH%u is %s and driven by DPLL%u\n", index,
++		str_enabled_disabled(synth->enabled), synth->dpll);
++
++	guard(mutex)(&zldev->multiop_lock);
++
++	/* Read synth configuration */
++	rc = zl3073x_mb_op(zldev, ZL_REG_SYNTH_MB_SEM, ZL_SYNTH_MB_SEM_RD,
++			   ZL_REG_SYNTH_MB_MASK, BIT(index));
++	if (rc)
++		return rc;
++
++	/* The output frequency is determined by the following formula:
++	 * base * multiplier * numerator / denominator
++	 *
++	 * Read registers with these values
++	 */
++	rc = zl3073x_read_u16(zldev, ZL_REG_SYNTH_FREQ_BASE, &base);
++	if (rc)
++		return rc;
++
++	rc = zl3073x_read_u32(zldev, ZL_REG_SYNTH_FREQ_MULT, &mult);
++	if (rc)
++		return rc;
++
++	rc = zl3073x_read_u16(zldev, ZL_REG_SYNTH_FREQ_M, &m);
++	if (rc)
++		return rc;
++
++	rc = zl3073x_read_u16(zldev, ZL_REG_SYNTH_FREQ_N, &n);
++	if (rc)
++		return rc;
++
++	/* Check denominator for zero to avoid div by 0 */
++	if (!n) {
++		dev_err(zldev->dev,
++			"Zero divisor for SYNTH%u retrieved from device\n",
++			index);
++		return -EINVAL;
++	}
++
++	/* Compute and store synth frequency */
++	zldev->synth[index].freq = div_u64(mul_u32_u32(base * m, mult), n);
++
++	dev_dbg(zldev->dev, "SYNTH%u frequency: %u Hz\n", index,
++		zldev->synth[index].freq);
++
++	return rc;
++}
++
++static int
++zl3073x_dev_state_fetch(struct zl3073x_dev *zldev)
++{
++	int rc;
++	u8 i;
++
++	for (i = 0; i < ZL3073X_NUM_REFS; i++) {
++		rc = zl3073x_ref_state_fetch(zldev, i);
++		if (rc) {
++			dev_err(zldev->dev,
++				"Failed to fetch input state: %pe\n",
++				ERR_PTR(rc));
++			return rc;
++		}
++	}
++
++	for (i = 0; i < ZL3073X_NUM_SYNTHS; i++) {
++		rc = zl3073x_synth_state_fetch(zldev, i);
++		if (rc) {
++			dev_err(zldev->dev,
++				"Failed to fetch synth state: %pe\n",
++				ERR_PTR(rc));
++			return rc;
++		}
++	}
++
++	for (i = 0; i < ZL3073X_NUM_OUTS; i++) {
++		rc = zl3073x_out_state_fetch(zldev, i);
++		if (rc) {
++			dev_err(zldev->dev,
++				"Failed to fetch output state: %pe\n",
++				ERR_PTR(rc));
++			return rc;
++		}
++	}
++
++	return rc;
++}
++
+ /**
+  * zl3073x_dev_probe - initialize zl3073x device
+  * @zldev: pointer to zl3073x device
+@@ -450,6 +694,11 @@ int zl3073x_dev_probe(struct zl3073x_dev *zldev,
+ 		return dev_err_probe(zldev->dev, rc,
+ 				     "Failed to initialize mutex\n");
+ 
++	/* Fetch device state */
++	rc = zl3073x_dev_state_fetch(zldev);
++	if (rc)
++		return rc;
++
+ 	/* Register the devlink instance and parameters */
+ 	rc = zl3073x_devlink_register(zldev);
+ 	if (rc)
+diff --git a/drivers/dpll/zl3073x/core.h b/drivers/dpll/zl3073x/core.h
+index d5e7b1977b161..a23262bce307d 100644
+--- a/drivers/dpll/zl3073x/core.h
++++ b/drivers/dpll/zl3073x/core.h
+@@ -6,21 +6,72 @@
+ #include <linux/mutex.h>
+ #include <linux/types.h>
+ 
++#include "regs.h"
++
+ struct device;
+ struct regmap;
+ 
++/*
++ * Hardware limits for ZL3073x chip family
++ */
++#define ZL3073X_NUM_REFS	10
++#define ZL3073X_NUM_OUTS	10
++#define ZL3073X_NUM_SYNTHS	5
++
++/**
++ * struct zl3073x_ref - input reference invariant info
++ * @enabled: input reference is enabled or disabled
++ * @diff: true if input reference is differential
++ */
++struct zl3073x_ref {
++	bool	enabled;
++	bool	diff;
++};
++
++/**
++ * struct zl3073x_out - output invariant info
++ * @enabled: out is enabled or disabled
++ * @synth: synthesizer the out is connected to
++ * @signal_format: out signal format
++ */
++struct zl3073x_out {
++	bool	enabled;
++	u8	synth;
++	u8	signal_format;
++};
++
++/**
++ * struct zl3073x_synth - synthesizer invariant info
++ * @freq: synthesizer frequency
++ * @dpll: ID of DPLL the synthesizer is driven by
++ * @enabled: synth is enabled or disabled
++ */
++struct zl3073x_synth {
++	u32	freq;
++	u8	dpll;
++	bool	enabled;
++};
++
+ /**
+  * struct zl3073x_dev - zl3073x device
+  * @dev: pointer to device
+  * @regmap: regmap to access device registers
+  * @multiop_lock: to serialize multiple register operations
+  * @clock_id: clock id of the device
++ * @ref: array of input references' invariants
++ * @out: array of outs' invariants
++ * @synth: array of synths' invariants
+  */
+ struct zl3073x_dev {
+ 	struct device		*dev;
+ 	struct regmap		*regmap;
+ 	struct mutex		multiop_lock;
+ 	u64			clock_id;
++
++	/* Invariants */
++	struct zl3073x_ref	ref[ZL3073X_NUM_REFS];
++	struct zl3073x_out	out[ZL3073X_NUM_OUTS];
++	struct zl3073x_synth	synth[ZL3073X_NUM_SYNTHS];
+ };
+ 
+ struct zl3073x_chip_info {
+@@ -44,6 +95,8 @@ int zl3073x_dev_probe(struct zl3073x_dev *zldev,
+  * Registers operations
+  **********************/
+ 
++int zl3073x_mb_op(struct zl3073x_dev *zldev, unsigned int op_reg, u8 op_val,
++		  unsigned int mask_reg, u16 mask_val);
+ int zl3073x_poll_zero_u8(struct zl3073x_dev *zldev, unsigned int reg, u8 mask);
+ int zl3073x_read_u8(struct zl3073x_dev *zldev, unsigned int reg, u8 *val);
+ int zl3073x_read_u16(struct zl3073x_dev *zldev, unsigned int reg, u16 *val);
+@@ -54,4 +107,237 @@ int zl3073x_write_u16(struct zl3073x_dev *zldev, unsigned int reg, u16 val);
+ int zl3073x_write_u32(struct zl3073x_dev *zldev, unsigned int reg, u32 val);
+ int zl3073x_write_u48(struct zl3073x_dev *zldev, unsigned int reg, u64 val);
+ 
++static inline bool
++zl3073x_is_n_pin(u8 id)
++{
++	/* P-pins ids are even while N-pins are odd */
++	return id & 1;
++}
++
++static inline bool
++zl3073x_is_p_pin(u8 id)
++{
++	return !zl3073x_is_n_pin(id);
++}
++
++/**
++ * zl3073x_input_pin_ref_get - get reference for given input pin
++ * @id: input pin id
++ *
++ * Return: reference id for the given input pin
++ */
++static inline u8
++zl3073x_input_pin_ref_get(u8 id)
++{
++	return id;
++}
++
++/**
++ * zl3073x_output_pin_out_get - get output for the given output pin
++ * @id: output pin id
++ *
++ * Return: output id for the given output pin
++ */
++static inline u8
++zl3073x_output_pin_out_get(u8 id)
++{
++	/* Output pin pair shares the single output */
++	return id / 2;
++}
++
++/**
++ * zl3073x_ref_is_diff - check if the given input reference is differential
++ * @zldev: pointer to zl3073x device
++ * @index: input reference index
++ *
++ * Return: true if reference is differential, false if reference is single-ended
++ */
++static inline bool
++zl3073x_ref_is_diff(struct zl3073x_dev *zldev, u8 index)
++{
++	return zldev->ref[index].diff;
++}
++
++/**
++ * zl3073x_ref_is_enabled - check if the given input reference is enabled
++ * @zldev: pointer to zl3073x device
++ * @index: input reference index
++ *
++ * Return: true if input refernce is enabled, false otherwise
++ */
++static inline bool
++zl3073x_ref_is_enabled(struct zl3073x_dev *zldev, u8 index)
++{
++	return zldev->ref[index].enabled;
++}
++
++/**
++ * zl3073x_synth_dpll_get - get DPLL ID the synth is driven by
++ * @zldev: pointer to zl3073x device
++ * @index: synth index
++ *
++ * Return: ID of DPLL the given synthetizer is driven by
++ */
++static inline u8
++zl3073x_synth_dpll_get(struct zl3073x_dev *zldev, u8 index)
++{
++	return zldev->synth[index].dpll;
++}
++
++/**
++ * zl3073x_synth_freq_get - get synth current freq
++ * @zldev: pointer to zl3073x device
++ * @index: synth index
++ *
++ * Return: frequency of given synthetizer
++ */
++static inline u32
++zl3073x_synth_freq_get(struct zl3073x_dev *zldev, u8 index)
++{
++	return zldev->synth[index].freq;
++}
++
++/**
++ * zl3073x_synth_is_enabled - check if the given synth is enabled
++ * @zldev: pointer to zl3073x device
++ * @index: synth index
++ *
++ * Return: true if synth is enabled, false otherwise
++ */
++static inline bool
++zl3073x_synth_is_enabled(struct zl3073x_dev *zldev, u8 index)
++{
++	return zldev->synth[index].enabled;
++}
++
++/**
++ * zl3073x_out_synth_get - get synth connected to given output
++ * @zldev: pointer to zl3073x device
++ * @index: output index
++ *
++ * Return: index of synth connected to given output.
++ */
++static inline u8
++zl3073x_out_synth_get(struct zl3073x_dev *zldev, u8 index)
++{
++	return zldev->out[index].synth;
++}
++
++/**
++ * zl3073x_out_is_enabled - check if the given output is enabled
++ * @zldev: pointer to zl3073x device
++ * @index: output index
++ *
++ * Return: true if the output is enabled, false otherwise
++ */
++static inline bool
++zl3073x_out_is_enabled(struct zl3073x_dev *zldev, u8 index)
++{
++	u8 synth;
++
++	/* Output is enabled only if associated synth is enabled */
++	synth = zl3073x_out_synth_get(zldev, index);
++	if (zl3073x_synth_is_enabled(zldev, synth))
++		return zldev->out[index].enabled;
++
++	return false;
++}
++
++/**
++ * zl3073x_out_signal_format_get - get output signal format
++ * @zldev: pointer to zl3073x device
++ * @index: output index
++ *
++ * Return: signal format of given output
++ */
++static inline u8
++zl3073x_out_signal_format_get(struct zl3073x_dev *zldev, u8 index)
++{
++	return zldev->out[index].signal_format;
++}
++
++/**
++ * zl3073x_out_dpll_get - get DPLL ID the output is driven by
++ * @zldev: pointer to zl3073x device
++ * @index: output index
++ *
++ * Return: ID of DPLL the given output is driven by
++ */
++static inline
++u8 zl3073x_out_dpll_get(struct zl3073x_dev *zldev, u8 index)
++{
++	u8 synth;
++
++	/* Get synthesizer connected to given output */
++	synth = zl3073x_out_synth_get(zldev, index);
++
++	/* Return DPLL that drives the synth */
++	return zl3073x_synth_dpll_get(zldev, synth);
++}
++
++/**
++ * zl3073x_out_is_diff - check if the given output is differential
++ * @zldev: pointer to zl3073x device
++ * @index: output index
++ *
++ * Return: true if output is differential, false if output is single-ended
++ */
++static inline bool
++zl3073x_out_is_diff(struct zl3073x_dev *zldev, u8 index)
++{
++	switch (zl3073x_out_signal_format_get(zldev, index)) {
++	case ZL_OUTPUT_MODE_SIGNAL_FORMAT_LVDS:
++	case ZL_OUTPUT_MODE_SIGNAL_FORMAT_DIFF:
++	case ZL_OUTPUT_MODE_SIGNAL_FORMAT_LOWVCM:
++		return true;
++	default:
++		break;
++	}
++
++	return false;
++}
++
++/**
++ * zl3073x_output_pin_is_enabled - check if the given output pin is enabled
++ * @zldev: pointer to zl3073x device
++ * @id: output pin id
++ *
++ * Checks if the output of the given output pin is enabled and also that
++ * its signal format also enables the given pin.
++ *
++ * Return: true if output pin is enabled, false if output pin is disabled
++ */
++static inline bool
++zl3073x_output_pin_is_enabled(struct zl3073x_dev *zldev, u8 id)
++{
++	u8 output = zl3073x_output_pin_out_get(id);
++
++	/* Check if the whole output is enabled */
++	if (!zl3073x_out_is_enabled(zldev, output))
 +		return false;
++
++	/* Check signal format */
++	switch (zl3073x_out_signal_format_get(zldev, output)) {
++	case ZL_OUTPUT_MODE_SIGNAL_FORMAT_DISABLED:
++		/* Both output pins are disabled by signal format */
++		return false;
++
++	case ZL_OUTPUT_MODE_SIGNAL_FORMAT_1P:
++		/* Output is one single ended P-pin output */
++		if (zl3073x_is_n_pin(id))
++			return false;
++		break;
++	case ZL_OUTPUT_MODE_SIGNAL_FORMAT_1N:
++		/* Output is one single ended N-pin output */
++		if (zl3073x_is_p_pin(id))
++			return false;
++		break;
++	default:
++		/* For other format both pins are enabled */
++		break;
 +	}
 +
 +	return true;
 +}
 +
-+static int
-+zl3073x_read_reg(struct zl3073x_dev *zldev, unsigned int reg, void *val,
-+		 size_t size)
-+{
-+	int rc;
-+
-+	if (!zl3073x_check_reg(zldev, reg, size))
-+		return -EINVAL;
-+
-+	/* Map the register address to virtual range */
-+	reg = ZL_REG_ADDR(reg) + ZL_RANGE_OFFSET;
-+
-+	rc = regmap_bulk_read(zldev->regmap, reg, val, size);
-+	if (rc) {
-+		dev_err(zldev->dev, "Failed to read reg 0x%04x: %pe\n", reg,
-+			ERR_PTR(rc));
-+		return rc;
-+	}
-+
-+	return 0;
-+}
-+
-+static int
-+zl3073x_write_reg(struct zl3073x_dev *zldev, unsigned int reg, const void *val,
-+		  size_t size)
-+{
-+	int rc;
-+
-+	if (!zl3073x_check_reg(zldev, reg, size))
-+		return -EINVAL;
-+
-+	/* Map the register address to virtual range */
-+	reg = ZL_REG_ADDR(reg) + ZL_RANGE_OFFSET;
-+
-+	rc = regmap_bulk_write(zldev->regmap, reg, val, size);
-+	if (rc) {
-+		dev_err(zldev->dev, "Failed to write reg 0x%04x: %pe\n", reg,
-+			ERR_PTR(rc));
-+		return rc;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * zl3073x_read_u8 - read value from 8bit register
-+ * @zldev: zl3073x device pointer
-+ * @reg: register to write to
-+ * @val: value to write
-+ *
-+ * Reads value from given 8bit register.
-+ *
-+ * Returns: 0 on success, <0 on error
-+ */
-+int zl3073x_read_u8(struct zl3073x_dev *zldev, unsigned int reg, u8 *val)
-+{
-+	return zl3073x_read_reg(zldev, reg, val, sizeof(*val));
-+}
-+
-+/**
-+ * zl3073x_write_u8 - write value to 16bit register
-+ * @zldev: zl3073x device pointer
-+ * @reg: register to write to
-+ * @val: value to write
-+ *
-+ * Writes value into given 8bit register.
-+ *
-+ * Returns: 0 on success, <0 on error
-+ */
-+int zl3073x_write_u8(struct zl3073x_dev *zldev, unsigned int reg, u8 val)
-+{
-+	return zl3073x_write_reg(zldev, reg, &val, sizeof(val));
-+}
-+
-+/**
-+ * zl3073x_read_u16 - read value from 16bit register
-+ * @zldev: zl3073x device pointer
-+ * @reg: register to write to
-+ * @val: value to write
-+ *
-+ * Reads value from given 16bit register.
-+ *
-+ * Returns: 0 on success, <0 on error
-+ */
-+int zl3073x_read_u16(struct zl3073x_dev *zldev, unsigned int reg, u16 *val)
-+{
-+	int rc;
-+
-+	rc = zl3073x_read_reg(zldev, reg, val, sizeof(*val));
-+	if (!rc)
-+		be16_to_cpus(val);
-+
-+	return rc;
-+}
-+
-+/**
-+ * zl3073x_write_u16 - write value to 16bit register
-+ * @zldev: zl3073x device pointer
-+ * @reg: register to write to
-+ * @val: value to write
-+ *
-+ * Writes value into given 16bit register.
-+ *
-+ * Returns: 0 on success, <0 on error
-+ */
-+int zl3073x_write_u16(struct zl3073x_dev *zldev, unsigned int reg, u16 val)
-+{
-+	cpu_to_be16s(&val);
-+
-+	return zl3073x_write_reg(zldev, reg, &val, sizeof(val));
-+}
-+
-+/**
-+ * zl3073x_read_u32 - read value from 32bit register
-+ * @zldev: zl3073x device pointer
-+ * @reg: register to write to
-+ * @val: value to write
-+ *
-+ * Reads value from given 32bit register.
-+ *
-+ * Returns: 0 on success, <0 on error
-+ */
-+int zl3073x_read_u32(struct zl3073x_dev *zldev, unsigned int reg, u32 *val)
-+{
-+	int rc;
-+
-+	rc = zl3073x_read_reg(zldev, reg, val, sizeof(*val));
-+	if (!rc)
-+		be32_to_cpus(val);
-+
-+	return rc;
-+}
-+
-+/**
-+ * zl3073x_write_u32 - write value to 32bit register
-+ * @zldev: zl3073x device pointer
-+ * @reg: register to write to
-+ * @val: value to write
-+ *
-+ * Writes value into given 32bit register.
-+ *
-+ * Returns: 0 on success, <0 on error
-+ */
-+int zl3073x_write_u32(struct zl3073x_dev *zldev, unsigned int reg, u32 val)
-+{
-+	cpu_to_be32s(&val);
-+
-+	return zl3073x_write_reg(zldev, reg, &val, sizeof(val));
-+}
-+
-+/**
-+ * zl3073x_read_u48 - read value from 48bit register
-+ * @zldev: zl3073x device pointer
-+ * @reg: register to write to
-+ * @val: value to write
-+ *
-+ * Reads value from given 48bit register.
-+ *
-+ * Returns: 0 on success, <0 on error
-+ */
-+int zl3073x_read_u48(struct zl3073x_dev *zldev, unsigned int reg, u64 *val)
-+{
-+	u8 buf[6];
-+	int rc;
-+
-+	rc = zl3073x_read_reg(zldev, reg, buf, sizeof(buf));
-+	if (!rc)
-+		*val = get_unaligned_be48(buf);
-+
-+	return rc;
-+}
-+
-+/**
-+ * zl3073x_write_u48 - write value to 48bit register
-+ * @zldev: zl3073x device pointer
-+ * @reg: register to write to
-+ * @val: value to write
-+ *
-+ * Writes value into given 48bit register.
-+ * The value must be from the interval -S48_MIN to U48_MAX.
-+ *
-+ * Returns: 0 on success, <0 on error
-+ */
-+int zl3073x_write_u48(struct zl3073x_dev *zldev, unsigned int reg, u64 val)
-+{
-+	u8 buf[6];
-+
-+	/* Check the value belongs to <S48_MIN, U48_MAX>
-+	 * Any value >= S48_MIN has bits 47..63 set.
-+	 */
-+	if (val > GENMASK_ULL(47, 0) && val < GENMASK_ULL(63, 47)) {
-+		dev_err(zldev->dev, "Value 0x%0llx out of range\n", val);
-+		return -EINVAL;
-+	}
-+
-+	put_unaligned_be48(val, buf);
-+
-+	return zl3073x_write_reg(zldev, reg, buf, sizeof(buf));
-+}
-+
-+/**
-+ * zl3073x_poll_zero_u8 - wait for register to be cleared by device
-+ * @zldev: zl3073x device pointer
-+ * @reg: register to poll (has to be 8bit register)
-+ * @mask: bit mask for polling
-+ *
-+ * Waits for bits specified by @mask in register @reg value to be cleared
-+ * by the device.
-+ *
-+ * Returns: 0 on success, <0 on error
-+ */
-+int zl3073x_poll_zero_u8(struct zl3073x_dev *zldev, unsigned int reg, u8 mask)
-+{
-+	/* Register polling sleep & timeout */
-+#define ZL_POLL_SLEEP_US   10
-+#define ZL_POLL_TIMEOUT_US 2000000
-+	unsigned int val;
-+
-+	/* Check the register is 8bit */
-+	if (ZL_REG_SIZE(reg) != 1) {
-+		dev_err(zldev->dev, "Invalid reg 0x%04lx size for polling\n",
-+			ZL_REG_ADDR(reg));
-+		return -EINVAL;
-+	}
-+
-+	/* Map the register address to virtual range */
-+	reg = ZL_REG_ADDR(reg) + ZL_RANGE_OFFSET;
-+
-+	return regmap_read_poll_timeout(zldev->regmap, reg, val, !(val & mask),
-+					ZL_POLL_SLEEP_US, ZL_POLL_TIMEOUT_US);
-+}
-+
-+/**
-+ * zl3073x_dev_probe - initialize zl3073x device
-+ * @zldev: pointer to zl3073x device
-+ * @chip_info: chip info based on compatible
-+ *
-+ * Common initialization of zl3073x device structure.
-+ *
-+ * Returns: 0 on success, <0 on error
-+ */
-+int zl3073x_dev_probe(struct zl3073x_dev *zldev,
-+		      const struct zl3073x_chip_info *chip_info)
-+{
-+	u16 id, revision, fw_ver;
-+	unsigned int i;
-+	u32 cfg_ver;
-+	int rc;
-+
-+	/* Read chip ID */
-+	rc = zl3073x_read_u16(zldev, ZL_REG_ID, &id);
-+	if (rc)
-+		return rc;
-+
-+	/* Check it matches */
-+	for (i = 0; i < chip_info->num_ids; i++) {
-+		if (id == chip_info->ids[i])
-+			break;
-+	}
-+
-+	if (i == chip_info->num_ids) {
-+		return dev_err_probe(zldev->dev, -ENODEV,
-+				     "Unknown or non-match chip ID: 0x%0x\n",
-+				     id);
-+	}
-+
-+	/* Read revision, firmware version and custom config version */
-+	rc = zl3073x_read_u16(zldev, ZL_REG_REVISION, &revision);
-+	if (rc)
-+		return rc;
-+	rc = zl3073x_read_u16(zldev, ZL_REG_FW_VER, &fw_ver);
-+	if (rc)
-+		return rc;
-+	rc = zl3073x_read_u32(zldev, ZL_REG_CUSTOM_CONFIG_VER, &cfg_ver);
-+	if (rc)
-+		return rc;
-+
-+	dev_dbg(zldev->dev, "ChipID(%X), ChipRev(%X), FwVer(%u)\n", id,
-+		revision, fw_ver);
-+	dev_dbg(zldev->dev, "Custom config version: %lu.%lu.%lu.%lu\n",
-+		FIELD_GET(GENMASK(31, 24), cfg_ver),
-+		FIELD_GET(GENMASK(23, 16), cfg_ver),
-+		FIELD_GET(GENMASK(15, 8), cfg_ver),
-+		FIELD_GET(GENMASK(7, 0), cfg_ver));
-+
-+	/* Generate random clock ID as the device has not such property that
-+	 * could be used for this purpose. A user can later change this value
-+	 * using devlink.
-+	 */
-+	zldev->clock_id = get_random_u64();
-+
-+	/* Initialize mutex for operations where multiple reads, writes
-+	 * and/or polls are required to be done atomically.
-+	 */
-+	rc = devm_mutex_init(zldev->dev, &zldev->multiop_lock);
-+	if (rc)
-+		return dev_err_probe(zldev->dev, rc,
-+				     "Failed to initialize mutex\n");
-+
-+	/* Register the devlink instance and parameters */
-+	rc = zl3073x_devlink_register(zldev);
-+	if (rc)
-+		return dev_err_probe(zldev->dev, rc,
-+				     "Failed to register devlink instance\n");
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_NS_GPL(zl3073x_dev_probe, "ZL3073X");
-+
-+MODULE_AUTHOR("Ivan Vecera <ivecera@redhat.com>");
-+MODULE_DESCRIPTION("Microchip ZL3073x core driver");
-+MODULE_LICENSE("GPL");
-diff --git a/drivers/dpll/zl3073x/core.h b/drivers/dpll/zl3073x/core.h
-new file mode 100644
-index 0000000000000..d5e7b1977b161
---- /dev/null
-+++ b/drivers/dpll/zl3073x/core.h
-@@ -0,0 +1,57 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+
-+#ifndef _ZL3073X_CORE_H
-+#define _ZL3073X_CORE_H
-+
-+#include <linux/mutex.h>
-+#include <linux/types.h>
-+
-+struct device;
-+struct regmap;
-+
-+/**
-+ * struct zl3073x_dev - zl3073x device
-+ * @dev: pointer to device
-+ * @regmap: regmap to access device registers
-+ * @multiop_lock: to serialize multiple register operations
-+ * @clock_id: clock id of the device
-+ */
-+struct zl3073x_dev {
-+	struct device		*dev;
-+	struct regmap		*regmap;
-+	struct mutex		multiop_lock;
-+	u64			clock_id;
-+};
-+
-+struct zl3073x_chip_info {
-+	const u16	*ids;
-+	size_t		num_ids;
-+	int		num_channels;
-+};
-+
-+extern const struct zl3073x_chip_info zl30731_chip_info;
-+extern const struct zl3073x_chip_info zl30732_chip_info;
-+extern const struct zl3073x_chip_info zl30733_chip_info;
-+extern const struct zl3073x_chip_info zl30734_chip_info;
-+extern const struct zl3073x_chip_info zl30735_chip_info;
-+extern const struct regmap_config zl3073x_regmap_config;
-+
-+struct zl3073x_dev *zl3073x_devm_alloc(struct device *dev);
-+int zl3073x_dev_probe(struct zl3073x_dev *zldev,
-+		      const struct zl3073x_chip_info *chip_info);
-+
-+/**********************
-+ * Registers operations
-+ **********************/
-+
-+int zl3073x_poll_zero_u8(struct zl3073x_dev *zldev, unsigned int reg, u8 mask);
-+int zl3073x_read_u8(struct zl3073x_dev *zldev, unsigned int reg, u8 *val);
-+int zl3073x_read_u16(struct zl3073x_dev *zldev, unsigned int reg, u16 *val);
-+int zl3073x_read_u32(struct zl3073x_dev *zldev, unsigned int reg, u32 *val);
-+int zl3073x_read_u48(struct zl3073x_dev *zldev, unsigned int reg, u64 *val);
-+int zl3073x_write_u8(struct zl3073x_dev *zldev, unsigned int reg, u8 val);
-+int zl3073x_write_u16(struct zl3073x_dev *zldev, unsigned int reg, u16 val);
-+int zl3073x_write_u32(struct zl3073x_dev *zldev, unsigned int reg, u32 val);
-+int zl3073x_write_u48(struct zl3073x_dev *zldev, unsigned int reg, u64 val);
-+
-+#endif /* _ZL3073X_CORE_H */
-diff --git a/drivers/dpll/zl3073x/devlink.c b/drivers/dpll/zl3073x/devlink.c
-new file mode 100644
-index 0000000000000..8957ab8389c4e
---- /dev/null
-+++ b/drivers/dpll/zl3073x/devlink.c
-@@ -0,0 +1,242 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+#include <linux/device/devres.h>
-+#include <linux/netlink.h>
-+#include <linux/sprintf.h>
-+#include <linux/types.h>
-+#include <net/devlink.h>
-+
-+#include "core.h"
-+#include "devlink.h"
-+#include "regs.h"
-+
-+/**
-+ * zl3073x_devlink_info_get - Devlink device info callback
-+ * @devlink: devlink structure pointer
-+ * @req: devlink request pointer to store information
-+ * @extack: netlink extack pointer to report errors
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_devlink_info_get(struct devlink *devlink, struct devlink_info_req *req,
-+			 struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dev *zldev = devlink_priv(devlink);
-+	u16 id, revision, fw_ver;
-+	char buf[16];
-+	u32 cfg_ver;
-+	int rc;
-+
-+	rc = zl3073x_read_u16(zldev, ZL_REG_ID, &id);
-+	if (rc)
-+		return rc;
-+
-+	snprintf(buf, sizeof(buf), "%X", id);
-+	rc = devlink_info_version_fixed_put(req,
-+					    DEVLINK_INFO_VERSION_GENERIC_ASIC_ID,
-+					    buf);
-+	if (rc)
-+		return rc;
-+
-+	rc = zl3073x_read_u16(zldev, ZL_REG_REVISION, &revision);
-+	if (rc)
-+		return rc;
-+
-+	snprintf(buf, sizeof(buf), "%X", revision);
-+	rc = devlink_info_version_fixed_put(req,
-+					    DEVLINK_INFO_VERSION_GENERIC_ASIC_REV,
-+					    buf);
-+	if (rc)
-+		return rc;
-+
-+	rc = zl3073x_read_u16(zldev, ZL_REG_FW_VER, &fw_ver);
-+	if (rc)
-+		return rc;
-+
-+	snprintf(buf, sizeof(buf), "%u", fw_ver);
-+	rc = devlink_info_version_running_put(req,
-+					      DEVLINK_INFO_VERSION_GENERIC_FW,
-+					      buf);
-+	if (rc)
-+		return rc;
-+
-+	rc = zl3073x_read_u32(zldev, ZL_REG_CUSTOM_CONFIG_VER, &cfg_ver);
-+	if (rc)
-+		return rc;
-+
-+	/* No custom config version */
-+	if (cfg_ver == U32_MAX)
-+		return 0;
-+
-+	snprintf(buf, sizeof(buf), "%lu.%lu.%lu.%lu",
-+		 FIELD_GET(GENMASK(31, 24), cfg_ver),
-+		 FIELD_GET(GENMASK(23, 16), cfg_ver),
-+		 FIELD_GET(GENMASK(15, 8), cfg_ver),
-+		 FIELD_GET(GENMASK(7, 0), cfg_ver));
-+
-+	return devlink_info_version_running_put(req, "custom_cfg", buf);
-+}
-+
-+static int
-+zl3073x_devlink_reload_down(struct devlink *devlink, bool netns_change,
-+			    enum devlink_reload_action action,
-+			    enum devlink_reload_limit limit,
-+			    struct netlink_ext_ack *extack)
-+{
-+	if (action != DEVLINK_RELOAD_ACTION_DRIVER_REINIT)
-+		return -EOPNOTSUPP;
-+
-+	return 0;
-+}
-+
-+static int
-+zl3073x_devlink_reload_up(struct devlink *devlink,
-+			  enum devlink_reload_action action,
-+			  enum devlink_reload_limit limit,
-+			  u32 *actions_performed,
-+			  struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dev *zldev = devlink_priv(devlink);
-+	union devlink_param_value val;
-+	int rc;
-+
-+	if (action != DEVLINK_RELOAD_ACTION_DRIVER_REINIT)
-+		return -EOPNOTSUPP;
-+
-+	rc = devl_param_driverinit_value_get(devlink,
-+					     DEVLINK_PARAM_GENERIC_ID_CLOCK_ID,
-+					     &val);
-+	if (rc)
-+		return rc;
-+
-+	if (zldev->clock_id != val.vu64) {
-+		dev_dbg(zldev->dev,
-+			"'clock_id' changed to %016llx\n", val.vu64);
-+		zldev->clock_id = val.vu64;
-+	}
-+
-+	*actions_performed = BIT(DEVLINK_RELOAD_ACTION_DRIVER_REINIT);
-+
-+	return 0;
-+}
-+
-+static const struct devlink_ops zl3073x_devlink_ops = {
-+	.info_get = zl3073x_devlink_info_get,
-+	.reload_actions = BIT(DEVLINK_RELOAD_ACTION_DRIVER_REINIT),
-+	.reload_down = zl3073x_devlink_reload_down,
-+	.reload_up = zl3073x_devlink_reload_up,
-+};
-+
-+static void
-+zl3073x_devlink_free(void *ptr)
-+{
-+	devlink_free(ptr);
-+}
-+
-+/**
-+ * zl3073x_devm_alloc - allocates zl3073x device structure
-+ * @dev: pointer to device structure
-+ *
-+ * Allocates zl3073x device structure as device resource.
-+ *
-+ * Return: pointer to zl3073x device on success, error pointer on error
-+ */
-+struct zl3073x_dev *zl3073x_devm_alloc(struct device *dev)
-+{
-+	struct zl3073x_dev *zldev;
-+	struct devlink *devlink;
-+	int rc;
-+
-+	devlink = devlink_alloc(&zl3073x_devlink_ops, sizeof(*zldev), dev);
-+	if (!devlink)
-+		return ERR_PTR(-ENOMEM);
-+
-+	/* Add devres action to free devlink device */
-+	rc = devm_add_action_or_reset(dev, zl3073x_devlink_free, devlink);
-+	if (rc)
-+		return ERR_PTR(rc);
-+
-+	zldev = devlink_priv(devlink);
-+	zldev->dev = dev;
-+	dev_set_drvdata(zldev->dev, zldev);
-+
-+	return zldev;
-+}
-+EXPORT_SYMBOL_NS_GPL(zl3073x_devm_alloc, "ZL3073X");
-+
-+static int
-+zl3073x_devlink_param_clock_id_validate(struct devlink *devlink, u32 id,
-+					union devlink_param_value val,
-+					struct netlink_ext_ack *extack)
-+{
-+	if (!val.vu64) {
-+		NL_SET_ERR_MSG_MOD(extack, "'clock_id' must be non-zero");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static const struct devlink_param zl3073x_devlink_params[] = {
-+	DEVLINK_PARAM_GENERIC(CLOCK_ID, BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
-+			      NULL, NULL,
-+			      zl3073x_devlink_param_clock_id_validate),
-+};
-+
-+static void
-+zl3073x_devlink_unregister(void *ptr)
-+{
-+	struct devlink *devlink = priv_to_devlink(ptr);
-+
-+	devl_lock(devlink);
-+
-+	/* Unregister devlink params */
-+	devl_params_unregister(devlink, zl3073x_devlink_params,
-+			       ARRAY_SIZE(zl3073x_devlink_params));
-+
-+	/* Unregister devlink instance */
-+	devl_unregister(devlink);
-+
-+	devl_unlock(devlink);
-+}
-+
-+/**
-+ * zl3073x_devlink_register - register devlink instance and params
-+ * @zldev: zl3073x device to register the devlink for
-+ *
-+ * Register the devlink instance and parameters associated with the device.
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+int zl3073x_devlink_register(struct zl3073x_dev *zldev)
-+{
-+	struct devlink *devlink = priv_to_devlink(zldev);
-+	union devlink_param_value value;
-+	int rc;
-+
-+	devl_lock(devlink);
-+
-+	/* Register devlink params */
-+	rc = devl_params_register(devlink, zl3073x_devlink_params,
-+				  ARRAY_SIZE(zl3073x_devlink_params));
-+	if (rc) {
-+		devl_unlock(devlink);
-+
-+		return rc;
-+	}
-+
-+	value.vu64 = zldev->clock_id;
-+	devl_param_driverinit_value_set(devlink,
-+					DEVLINK_PARAM_GENERIC_ID_CLOCK_ID,
-+					value);
-+
-+	/* Register devlink instance */
-+	devl_register(devlink);
-+
-+	devl_unlock(devlink);
-+
-+	/* Add devres action to unregister devlink device */
-+	return devm_add_action_or_reset(zldev->dev, zl3073x_devlink_unregister,
-+					zldev);
-+}
-diff --git a/drivers/dpll/zl3073x/devlink.h b/drivers/dpll/zl3073x/devlink.h
-new file mode 100644
-index 0000000000000..037720db204fc
---- /dev/null
-+++ b/drivers/dpll/zl3073x/devlink.h
-@@ -0,0 +1,12 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+
-+#ifndef _ZL3073X_DEVLINK_H
-+#define _ZL3073X_DEVLINK_H
-+
-+struct zl3073x_dev;
-+
-+struct zl3073x_dev *zl3073x_devm_alloc(struct device *dev);
-+
-+int zl3073x_devlink_register(struct zl3073x_dev *zldev);
-+
-+#endif /* _ZL3073X_DEVLINK_H */
-diff --git a/drivers/dpll/zl3073x/i2c.c b/drivers/dpll/zl3073x/i2c.c
-new file mode 100644
-index 0000000000000..7bbfdd4ed8671
---- /dev/null
-+++ b/drivers/dpll/zl3073x/i2c.c
-@@ -0,0 +1,76 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+#include <linux/dev_printk.h>
-+#include <linux/err.h>
-+#include <linux/i2c.h>
-+#include <linux/module.h>
-+#include <linux/regmap.h>
-+
-+#include "core.h"
-+
-+static int zl3073x_i2c_probe(struct i2c_client *client)
-+{
-+	struct device *dev = &client->dev;
-+	struct zl3073x_dev *zldev;
-+
-+	zldev = zl3073x_devm_alloc(dev);
-+	if (IS_ERR(zldev))
-+		return PTR_ERR(zldev);
-+
-+	zldev->regmap = devm_regmap_init_i2c(client, &zl3073x_regmap_config);
-+	if (IS_ERR(zldev->regmap))
-+		return dev_err_probe(dev, PTR_ERR(zldev->regmap),
-+				     "Failed to initialize regmap\n");
-+
-+	return zl3073x_dev_probe(zldev, i2c_get_match_data(client));
-+}
-+
-+static const struct i2c_device_id zl3073x_i2c_id[] = {
-+	{
-+		.name = "zl30731",
-+		.driver_data = (kernel_ulong_t)&zl30731_chip_info,
-+	},
-+	{
-+		.name = "zl30732",
-+		.driver_data = (kernel_ulong_t)&zl30732_chip_info,
-+	},
-+	{
-+		.name = "zl30733",
-+		.driver_data = (kernel_ulong_t)&zl30733_chip_info,
-+	},
-+	{
-+		.name = "zl30734",
-+		.driver_data = (kernel_ulong_t)&zl30734_chip_info,
-+	},
-+	{
-+		.name = "zl30735",
-+		.driver_data = (kernel_ulong_t)&zl30735_chip_info,
-+	},
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(i2c, zl3073x_i2c_id);
-+
-+static const struct of_device_id zl3073x_i2c_of_match[] = {
-+	{ .compatible = "microchip,zl30731", .data = &zl30731_chip_info },
-+	{ .compatible = "microchip,zl30732", .data = &zl30732_chip_info },
-+	{ .compatible = "microchip,zl30733", .data = &zl30733_chip_info },
-+	{ .compatible = "microchip,zl30734", .data = &zl30734_chip_info },
-+	{ .compatible = "microchip,zl30735", .data = &zl30735_chip_info },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, zl3073x_i2c_of_match);
-+
-+static struct i2c_driver zl3073x_i2c_driver = {
-+	.driver = {
-+		.name = "zl3073x-i2c",
-+		.of_match_table = zl3073x_i2c_of_match,
-+	},
-+	.probe = zl3073x_i2c_probe,
-+	.id_table = zl3073x_i2c_id,
-+};
-+module_i2c_driver(zl3073x_i2c_driver);
-+
-+MODULE_AUTHOR("Ivan Vecera <ivecera@redhat.com>");
-+MODULE_DESCRIPTION("Microchip ZL3073x I2C driver");
-+MODULE_IMPORT_NS("ZL3073X");
-+MODULE_LICENSE("GPL");
+ #endif /* _ZL3073X_CORE_H */
 diff --git a/drivers/dpll/zl3073x/regs.h b/drivers/dpll/zl3073x/regs.h
-new file mode 100644
-index 0000000000000..08bf595935ea1
---- /dev/null
+index 08bf595935ea1..753b42d8b2093 100644
+--- a/drivers/dpll/zl3073x/regs.h
 +++ b/drivers/dpll/zl3073x/regs.h
-@@ -0,0 +1,75 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
+@@ -72,4 +72,69 @@
+ #define ZL_REG_FW_VER				ZL_REG(0, 0x05, 2)
+ #define ZL_REG_CUSTOM_CONFIG_VER		ZL_REG(0, 0x07, 4)
+ 
++/***********************************
++ * Register Page 9, Synth and Output
++ ***********************************/
 +
-+#ifndef _ZL3073X_REGS_H
-+#define _ZL3073X_REGS_H
++#define ZL_REG_SYNTH_CTRL(_idx)						\
++	ZL_REG_IDX(_idx, 9, 0x00, 1, ZL3073X_NUM_SYNTHS, 1)
++#define ZL_SYNTH_CTRL_EN			BIT(0)
++#define ZL_SYNTH_CTRL_DPLL_SEL			GENMASK(6, 4)
 +
-+#include <linux/bitfield.h>
-+#include <linux/bits.h>
++#define ZL_REG_OUTPUT_CTRL(_idx)					\
++	ZL_REG_IDX(_idx, 9, 0x28, 1, ZL3073X_NUM_OUTS, 1)
++#define ZL_OUTPUT_CTRL_EN			BIT(0)
++#define ZL_OUTPUT_CTRL_SYNTH_SEL		GENMASK(6, 4)
 +
-+/*
-+ * Register address structure:
-+ * ===========================
-+ *  25        19 18  16 15     7 6           0
-+ * +------------------------------------------+
-+ * | max_offset | size |  page  | page_offset |
-+ * +------------------------------------------+
-+ *
-+ * page_offset ... <0x00..0x7F>
-+ * page .......... HW page number
-+ * size .......... register byte size (1, 2, 4 or 6)
-+ * max_offset .... maximal offset for indexed registers
-+ *                 (for non-indexed regs max_offset == page_offset)
-+ */
++/*******************************
++ * Register Page 10, Ref Mailbox
++ *******************************/
 +
-+#define ZL_REG_OFFSET_MASK	GENMASK(6, 0)
-+#define ZL_REG_PAGE_MASK	GENMASK(15, 7)
-+#define ZL_REG_SIZE_MASK	GENMASK(18, 16)
-+#define ZL_REG_MAX_OFFSET_MASK	GENMASK(25, 19)
-+#define ZL_REG_ADDR_MASK	GENMASK(15, 0)
++#define ZL_REG_REF_MB_MASK			ZL_REG(10, 0x02, 2)
 +
-+#define ZL_REG_OFFSET(_reg)	FIELD_GET(ZL_REG_OFFSET_MASK, _reg)
-+#define ZL_REG_PAGE(_reg)	FIELD_GET(ZL_REG_PAGE_MASK, _reg)
-+#define ZL_REG_MAX_OFFSET(_reg)	FIELD_GET(ZL_REG_MAX_OFFSET_MASK, _reg)
-+#define ZL_REG_SIZE(_reg)	FIELD_GET(ZL_REG_SIZE_MASK, _reg)
-+#define ZL_REG_ADDR(_reg)	FIELD_GET(ZL_REG_ADDR_MASK, _reg)
++#define ZL_REG_REF_MB_SEM			ZL_REG(10, 0x04, 1)
++#define ZL_REF_MB_SEM_WR			BIT(0)
++#define ZL_REF_MB_SEM_RD			BIT(1)
 +
-+/**
-+ * ZL_REG_IDX - define indexed register
-+ * @_idx: index of register to access
-+ * @_page: register page
-+ * @_offset: register offset in page
-+ * @_size: register byte size (1, 2, 4 or 6)
-+ * @_items: number of register indices
-+ * @_stride: stride between items in bytes
-+ *
-+ * All parameters except @_idx should be constant.
-+ */
-+#define ZL_REG_IDX(_idx, _page, _offset, _size, _items, _stride)	\
-+	(FIELD_PREP(ZL_REG_OFFSET_MASK,					\
-+		    (_offset) + (_idx) * (_stride))		|	\
-+	 FIELD_PREP_CONST(ZL_REG_PAGE_MASK, _page)		|	\
-+	 FIELD_PREP_CONST(ZL_REG_SIZE_MASK, _size)		|	\
-+	 FIELD_PREP_CONST(ZL_REG_MAX_OFFSET_MASK,			\
-+			  (_offset) + ((_items) - 1) * (_stride)))
++#define ZL_REG_REF_CONFIG			ZL_REG(10, 0x0d, 1)
++#define ZL_REF_CONFIG_ENABLE			BIT(0)
++#define ZL_REF_CONFIG_DIFF_EN			BIT(2)
 +
-+/**
-+ * ZL_REG - define simple (non-indexed) register
-+ * @_page: register page
-+ * @_offset: register offset in page
-+ * @_size: register byte size (1, 2, 4 or 6)
-+ *
-+ * All parameters should be constant.
-+ */
-+#define ZL_REG(_page, _offset, _size)					\
-+	ZL_REG_IDX(0, _page, _offset, _size, 1, 0)
++/*********************************
++ * Register Page 13, Synth Mailbox
++ *********************************/
 +
-+/**************************
-+ * Register Page 0, General
-+ **************************/
++#define ZL_REG_SYNTH_MB_MASK			ZL_REG(13, 0x02, 2)
 +
-+#define ZL_REG_ID				ZL_REG(0, 0x01, 2)
-+#define ZL_REG_REVISION				ZL_REG(0, 0x03, 2)
-+#define ZL_REG_FW_VER				ZL_REG(0, 0x05, 2)
-+#define ZL_REG_CUSTOM_CONFIG_VER		ZL_REG(0, 0x07, 4)
++#define ZL_REG_SYNTH_MB_SEM			ZL_REG(13, 0x04, 1)
++#define ZL_SYNTH_MB_SEM_WR			BIT(0)
++#define ZL_SYNTH_MB_SEM_RD			BIT(1)
 +
-+#endif /* _ZL3073X_REGS_H */
-diff --git a/drivers/dpll/zl3073x/spi.c b/drivers/dpll/zl3073x/spi.c
-new file mode 100644
-index 0000000000000..af901b4d6dda0
---- /dev/null
-+++ b/drivers/dpll/zl3073x/spi.c
-@@ -0,0 +1,76 @@
-+// SPDX-License-Identifier: GPL-2.0-only
++#define ZL_REG_SYNTH_FREQ_BASE			ZL_REG(13, 0x06, 2)
++#define ZL_REG_SYNTH_FREQ_MULT			ZL_REG(13, 0x08, 4)
++#define ZL_REG_SYNTH_FREQ_M			ZL_REG(13, 0x0c, 2)
++#define ZL_REG_SYNTH_FREQ_N			ZL_REG(13, 0x0e, 2)
 +
-+#include <linux/dev_printk.h>
-+#include <linux/err.h>
-+#include <linux/module.h>
-+#include <linux/regmap.h>
-+#include <linux/spi/spi.h>
++/**********************************
++ * Register Page 14, Output Mailbox
++ **********************************/
++#define ZL_REG_OUTPUT_MB_MASK			ZL_REG(14, 0x02, 2)
 +
-+#include "core.h"
++#define ZL_REG_OUTPUT_MB_SEM			ZL_REG(14, 0x04, 1)
++#define ZL_OUTPUT_MB_SEM_WR			BIT(0)
++#define ZL_OUTPUT_MB_SEM_RD			BIT(1)
 +
-+static int zl3073x_spi_probe(struct spi_device *spi)
-+{
-+	struct device *dev = &spi->dev;
-+	struct zl3073x_dev *zldev;
++#define ZL_REG_OUTPUT_MODE			ZL_REG(14, 0x05, 1)
++#define ZL_OUTPUT_MODE_SIGNAL_FORMAT		GENMASK(7, 4)
++#define ZL_OUTPUT_MODE_SIGNAL_FORMAT_DISABLED	0
++#define ZL_OUTPUT_MODE_SIGNAL_FORMAT_LVDS	1
++#define ZL_OUTPUT_MODE_SIGNAL_FORMAT_DIFF	2
++#define ZL_OUTPUT_MODE_SIGNAL_FORMAT_LOWVCM	3
++#define ZL_OUTPUT_MODE_SIGNAL_FORMAT_2		4
++#define ZL_OUTPUT_MODE_SIGNAL_FORMAT_1P		5
++#define ZL_OUTPUT_MODE_SIGNAL_FORMAT_1N		6
++#define ZL_OUTPUT_MODE_SIGNAL_FORMAT_2_INV	7
++#define ZL_OUTPUT_MODE_SIGNAL_FORMAT_2_NDIV	12
++#define ZL_OUTPUT_MODE_SIGNAL_FORMAT_2_NDIV_INV	15
 +
-+	zldev = zl3073x_devm_alloc(dev);
-+	if (IS_ERR(zldev))
-+		return PTR_ERR(zldev);
-+
-+	zldev->regmap = devm_regmap_init_spi(spi, &zl3073x_regmap_config);
-+	if (IS_ERR(zldev->regmap))
-+		return dev_err_probe(dev, PTR_ERR(zldev->regmap),
-+				     "Failed to initialize regmap\n");
-+
-+	return zl3073x_dev_probe(zldev, spi_get_device_match_data(spi));
-+}
-+
-+static const struct spi_device_id zl3073x_spi_id[] = {
-+	{
-+		.name = "zl30731",
-+		.driver_data = (kernel_ulong_t)&zl30731_chip_info
-+	},
-+	{
-+		.name = "zl30732",
-+		.driver_data = (kernel_ulong_t)&zl30732_chip_info,
-+	},
-+	{
-+		.name = "zl30733",
-+		.driver_data = (kernel_ulong_t)&zl30733_chip_info,
-+	},
-+	{
-+		.name = "zl30734",
-+		.driver_data = (kernel_ulong_t)&zl30734_chip_info,
-+	},
-+	{
-+		.name = "zl30735",
-+		.driver_data = (kernel_ulong_t)&zl30735_chip_info,
-+	},
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(spi, zl3073x_spi_id);
-+
-+static const struct of_device_id zl3073x_spi_of_match[] = {
-+	{ .compatible = "microchip,zl30731", .data = &zl30731_chip_info },
-+	{ .compatible = "microchip,zl30732", .data = &zl30732_chip_info },
-+	{ .compatible = "microchip,zl30733", .data = &zl30733_chip_info },
-+	{ .compatible = "microchip,zl30734", .data = &zl30734_chip_info },
-+	{ .compatible = "microchip,zl30735", .data = &zl30735_chip_info },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, zl3073x_spi_of_match);
-+
-+static struct spi_driver zl3073x_spi_driver = {
-+	.driver = {
-+		.name = "zl3073x-spi",
-+		.of_match_table = zl3073x_spi_of_match,
-+	},
-+	.probe = zl3073x_spi_probe,
-+	.id_table = zl3073x_spi_id,
-+};
-+module_spi_driver(zl3073x_spi_driver);
-+
-+MODULE_AUTHOR("Ivan Vecera <ivecera@redhat.com>");
-+MODULE_DESCRIPTION("Microchip ZL3073x SPI driver");
-+MODULE_IMPORT_NS("ZL3073X");
-+MODULE_LICENSE("GPL");
+ #endif /* _ZL3073X_REGS_H */
 -- 
 2.49.0
 
