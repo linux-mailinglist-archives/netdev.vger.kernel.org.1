@@ -1,60 +1,50 @@
-Return-Path: <netdev+bounces-204120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ED03AF8F2E
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:53:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0454AF8F17
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:50:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 898195858D7
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:52:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06E1B483F0A
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:49:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 100A728D8F3;
-	Fri,  4 Jul 2025 09:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CDDF2ED149;
+	Fri,  4 Jul 2025 09:49:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="czXRBwSk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC982E974C
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 09:52:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38D3A2ED159
+	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 09:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751622736; cv=none; b=rtkN0Bl6BUrD0NslT9s+7tNVWxqq2gqC6JsICnEceF+8eim88HJNQrqRO8nxnVwBNgKwPIq/HxepYbAq+lluJ6XnmyRNnBDiVtx3B19EoNERYnnMtd3I6+hCH/FGvjFqyve0Ep0YalsvxDtCVLQnSJwd1+3TP1YpCShPOOzc1Hs=
+	t=1751622582; cv=none; b=Koua9oj/zX2lcSHfyaKKma+0ZiE9WdfQP3IjKoYx4fatj227+rvgsLLfO18R9sBme2x9pUQk6HzfPqvtRsgjTGZ6Ft3njRvsiyiZRICy/7YvdO/pGYz7Yn9WhEd2half898jahX35JkPhl/KoFn7sPYsDBQ6mDLqkzt1zzLeXS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751622736; c=relaxed/simple;
-	bh=bGBZRVNvn20ljGWqnan9JFfmDSpk7ft4e0v/0WFNrok=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Q9iT89zqR2K2Thl0PMzAgER+m6yAwyAHRNI349jw1UqACKKqe+i+7K8jtslRlhKQRBUHDNL9usEwLrwUFq/YmxFWN5godP/NjnaHOgZe0RJfxEC0WqP6wKgEtcbgnigP5CYiEbB1R9Hs6oR7n/bwk5T/1RyqMPq8aF0p/XXOskU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=18.194.254.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: zesmtpsz1t1751622667ta78f9de0
-X-QQ-Originating-IP: PCPB8T8SU6IxrzoIrXJXM7xHgW4m2RfgVC1tsQC4ZHo=
-Received: from localhost.localdomain ( [156.146.53.122])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 04 Jul 2025 17:51:00 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 11872626369487512020
-EX-QQ-RecipientCnt: 10
-From: Mengyuan Lou <mengyuanlou@net-swift.com>
-To: netdev@vger.kernel.org
-Cc: michal.swiatkowski@linux.intel.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	andrew+netdev@lunn.ch,
-	duanqiangwen@net-swift.com,
-	linglingzhang@trustnetic.com,
-	jiawenwu@trustnetic.com,
-	Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH net-next v3 12/12] net: ngbevf: add link update flow
-Date: Fri,  4 Jul 2025 17:49:23 +0800
-Message-Id: <20250704094923.652-13-mengyuanlou@net-swift.com>
-X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20250704094923.652-1-mengyuanlou@net-swift.com>
-References: <20250704094923.652-1-mengyuanlou@net-swift.com>
+	s=arc-20240116; t=1751622582; c=relaxed/simple;
+	bh=hjkzQGP69/TcghSKUvqwK1pJ9werthnhntu4aG51WMo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=RgdfY3Ggpa7zXvWB3bzJq9/sImu/YB3H3MCz9DAP9Gj19ry6q1qohgvxEFXq1EsWMRjIHDz2C6nP0TLroNKrJoRpZBKDsjHEChS+RnASUiwJdLGfT6hSb4TQ2GnygaHWEUsZF0D0hFBX3RvX22/ncz+/yqAiFlh0RxQ1AShlAMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=czXRBwSk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A61AAC4CEEF;
+	Fri,  4 Jul 2025 09:49:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751622581;
+	bh=hjkzQGP69/TcghSKUvqwK1pJ9werthnhntu4aG51WMo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=czXRBwSkjL9+i+bNJV9uHvpOYQLO++KSX4+OTUrPWL2fsrGAlw3h7WP7mRpAW8Na1
+	 a+vSUvsp0JMOoV/tBfkJpK/eJglIkBQV1WKHwCGC7xXr8lgCsoqLo7XjrXJKwjDdhb
+	 P6QsHJNaQRbwno1oqEiNhjEJ/YqBmyzX6RWufuV3dFNypkfSDuRogO8IB6TUNFPP6i
+	 LTZZ4VTv6K6309ICEzyaM06hiD6CtWBXd5ue01w1DKy8W4mPwPxHIJW7Ay9+vHbWVZ
+	 mLYUuv03TnWGJp5hWdXbuv2pAETkvCHwUU8khTvwLE7iZT5s9gt4VuS8qKzZh2EN0W
+	 b4jwra+1A7xMg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF25383BA01;
+	Fri,  4 Jul 2025 09:50:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,59 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: Nkc2PsekgugWrQu3DfjmZovQOkXKVxVjtMysyWhfHkSk5iHdoO14KFgz
-	56bs2zcoP4vPuI1BjhNIC3LipkhPDV5Dt9lQO+SYeVNEOApR7uoQUFntq9uPtwDNMaeyHQW
-	SLLqoHnBDCf6Mza+OwsCmbtr9F6I1AB7DvsDHkP3MfrAJcoyj69plvtau9PDP5b7uv44YdO
-	R+IBVH9bUphEeX9JGyadGeh6C+Tc9M7NTKNIEvoHHPoSzVo8ygaag6/ZDcSb0KOFlJZoLdr
-	1Vat3JldIY+iioMc96xatranSDoCuHL7iuC0CZTQS6dsGMtfGctBcgBCwSsfHf3MeAsu01z
-	SrNfHsd1fApihfhFd0AZHKvyGDfDp3yPR9h9L9ckTUp0UBB0qrQkc9nxJGdxTL9nUiWAU7u
-	ev3PAYWWjb9p+1XcpTpjlGDvPSP9RPmDsPmuRhbrsPda7nz0pYPHho1XUdfa2LUewXFDNEK
-	6jCv3tIExDyuR1AOcGYP+t7HxGtuUBM+SBpkoK2k+/IVqvaCRxGkT4puSv709m4KH4vK/48
-	NZANRvY5JBiS3PP3L2e2ZGqJm0YoOvEPwvxeMukKlgA8mm5Nh39szK3fPxKio3Io1TerRCh
-	3iS0Zc8D6RJv0jQVWe1GnJ/yx8IJwGlOM99Z+aXFahc7Ck7jK0Mu/gP6L21qLuuTqsuBZBq
-	KkwDuljvaagIL6Jp8mQL2rqzXidwFuKdu03c5VpJSkgX4ibQ8Zsp4OEVj6yPpgqLeR5P72l
-	qD2k/Ez+yKGg1jWWIRdY4a2U5eJhb5k94Oi/LCmhyVivjrObgnyVey5gyDRxzmbINHdlDHJ
-	dz6X+0/zn8VF9AQz07d6t39FA5AJyh3OyuZwCY3Q2mhzjBsfTVZhC+/cz47HykMM4uFnIMV
-	PqvWd/Whr+dATDjEjz6/4EidC2R+xKjdFw04VAA9/ROQnnIZpjwpLAWCdch4laAEol9M+LA
-	NjGzj3Qycq0x1JUvSiFxWGN8mbpPBk5aaj5jCtN8VimwrgZLvRtYHXiQM1GF3vsgIzUlIq9
-	QY6zNKAtQPVjZYdHhFZBZQpfs8caUiRZ5P4KMSq0HOmvCa8oylN4Tqqb7Vlskn8tUFfEdMG
-	QAflrVeJlEl9JiC9sl5WvOjWU5EXFc/JKDjC/bBkHKEbHmr1voH2ogOIZAjPN+8OA==
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
+Subject: Re: [PATCH net v2] bnxt_en: eliminate the compile warning in
+ bnxt_request_irq due to CONFIG_RFS_ACCEL
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175162260576.1797013.6792489669982214101.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Jul 2025 09:50:05 +0000
+References: <20250702064822.3443-1-kerneljasonxing@gmail.com>
+In-Reply-To: <20250702064822.3443-1-kerneljasonxing@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, michael.chan@broadcom.com,
+ andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com, netdev@vger.kernel.org,
+ kernelxing@tencent.com, lkp@intel.com
 
-Add link update flow to wangxun 1G virtual functions.
-Get link status from pf in mbox, and if it is failed then
-check the vx_status, because vx_status switching is too slow.
+Hello:
 
-Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
----
- drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c | 3 +++
- 1 file changed, 3 insertions(+)
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-diff --git a/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c b/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c
-index a629b645d3a1..c1246ab5239c 100644
---- a/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c
-@@ -197,6 +197,7 @@ static int ngbevf_probe(struct pci_dev *pdev,
- 	eth_hw_addr_set(netdev, wx->mac.perm_addr);
- 	ether_addr_copy(netdev->perm_addr, wx->mac.addr);
- 
-+	wxvf_init_service(wx);
- 	err = wx_init_interrupt_scheme(wx);
- 	if (err)
- 		goto err_free_sw_init;
-@@ -213,6 +214,8 @@ static int ngbevf_probe(struct pci_dev *pdev,
- err_register:
- 	wx_clear_interrupt_scheme(wx);
- err_free_sw_init:
-+	timer_delete_sync(&wx->service_timer);
-+	cancel_work_sync(&wx->service_task);
- 	kfree(wx->vfinfo);
- 	kfree(wx->rss_key);
- 	kfree(wx->mac_table);
+On Wed,  2 Jul 2025 14:48:22 +0800 you wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> I received a kernel-test-bot report[1] that shows the
+> [-Wunused-but-set-variable] warning. Since the previous commit I made, as
+> the 'Fixes' tag shows, gives users an option to turn on and off the
+> CONFIG_RFS_ACCEL, the issue then can be discovered and reproduced with
+> GCC specifically.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2] bnxt_en: eliminate the compile warning in bnxt_request_irq due to CONFIG_RFS_ACCEL
+    https://git.kernel.org/netdev/net/c/b9fd9888a565
+
+You are awesome, thank you!
 -- 
-2.30.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
