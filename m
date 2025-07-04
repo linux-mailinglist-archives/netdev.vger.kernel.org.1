@@ -1,65 +1,67 @@
-Return-Path: <netdev+bounces-204211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC8D6AF9949
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 18:50:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDB2EAF9952
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 18:50:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7136856094A
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 16:49:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B5A03A326B
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 16:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 042D82D838E;
-	Fri,  4 Jul 2025 16:48:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A64341E5201;
+	Fri,  4 Jul 2025 16:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rx4+MXeP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gRwFBx/f"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0292D8368;
-	Fri,  4 Jul 2025 16:48:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7926219BBA;
+	Fri,  4 Jul 2025 16:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751647690; cv=none; b=lq6PYEMoQa49AC3KIzwm5yyPlkrMv9vuA5f0lQCE4j7C9Vgrwe+gpMd3expd3NLhJ5PnmfUdvytKRlehvUXzgUP89z9qilWtmQ7vCotVryKYBk3MoQ2YSehSlFhgx8NFczmqWzK33P8b1pn09sVnj0I5hNwsQSbDF/Zd3uVY9cU=
+	t=1751647852; cv=none; b=IHq5eCqMYZFx9kopCEho0QqjTfBPCIDmwVSG1/73aRpHeqQx5x2Q5IP2NllX1FFiHocEtmY02Dhegdjlx59cmB3aTv71zhpLnzIwiqDuietzYq5N/hes+zBFHQgCmXC9b7k1Qkb94pj+c8sJKCPeL3htiO9J+G9Jz463d07N/xU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751647690; c=relaxed/simple;
-	bh=BMXgAQlDKN+mET+jMsDybdF+/EB3t5j/i7lP7yLuKdY=;
+	s=arc-20240116; t=1751647852; c=relaxed/simple;
+	bh=z4xIqrxnxJb/VU6+2ATYNGE+j9z5mnmSIDSJ+6cCgqk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cUTiO33A9xiH2aGhigpC7NcN8XvNgePZ9y/cO1ysZeFN/XZolHZcH1nBgJjXiEvZvn0/PuNGw+vcvmUkfgzjwzCaxd0TQFX9HtlOYiCcXfSTCGgj9lq4cPucQlFVMNJ6JESaRF9Sx3k4UYLRR7H+6faKoHI8SRzXQHzjylmO6ZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rx4+MXeP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44375C4CEE3;
-	Fri,  4 Jul 2025 16:48:07 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=F4imdZmg52FFhX0sj/F0/Y7SvOSBoEtQs0hZokt5eIhZ5g9Y/HVtoJ+UjZFdBWFRMqan2qwddYKsMiN3vJgnCuXpoYCCRPfiCRoPHTywptBcZhQinhjz7dnxfkncQe8Rb4Y7AeZDwVeRUYFCB8i5tcK9cjCTshVZlmDqAzJHAzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gRwFBx/f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D703C4CEEE;
+	Fri,  4 Jul 2025 16:50:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751647690;
-	bh=BMXgAQlDKN+mET+jMsDybdF+/EB3t5j/i7lP7yLuKdY=;
+	s=k20201202; t=1751647852;
+	bh=z4xIqrxnxJb/VU6+2ATYNGE+j9z5mnmSIDSJ+6cCgqk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rx4+MXeP/7v+RpQ4g0tuv5M13L0hFoFo8Jj0R9y1UD7zOMHZYpliSXMjFSPKFdy/J
-	 BAtxH+iDerzV+oBeewMDbWa3wsbD5H+8pI+UPRxYlly7eBJhaeabD10QH5PEPBqweg
-	 4+0PaGreGR0OzrkMZW5DWUhrFO2gL1h4n6MO6d5aK7TzG22INCHDUJdWSbLbWKNgP7
-	 722DVPdgkNHpA4t8VM7gVyjVxVEpUTm++T/AJDDDaky/A+EhcnSSfMTbtR+MzU77gv
-	 AmnC2yOFFRPsMmdOJQBpYG3yDDlgzjPAGtpHCJfd/7LheenciRa3oONLqnxmPxPCZa
-	 9F3owIl/Thh7Q==
-Date: Fri, 4 Jul 2025 17:48:04 +0100
+	b=gRwFBx/fCbHOJNhDgzF1CP7cSmMOD7AvI/ezevCzbNVkhRRjSPw8g7a7PRiip3Ws5
+	 xKmheH2WV6Gj+hWPcYucHPVvW5qL0i4ezRA+VvCvNWthfrhrK40QBq3YUkLF5lntFN
+	 Lg61CB0wkVLdJ769VegGGteZSVpU1Ab4VN1FYDu+OO4CmJRTVKPqT1L25L4ROYlFiJ
+	 DN5d5hWNZboc8wc22pc/3Zg5SAdg+NfXzBA17p6Sf8gKTHJwubaqY9IdfPlkfgKwzZ
+	 X9+YxcVXNLzIJ3K2wOFLTgL6ezZz/WvhJgz7UI3AjKqB9D94i4sfWFnVN700Fdl04Y
+	 CgDDxvg66qIPg==
+Date: Fri, 4 Jul 2025 17:50:45 +0100
 From: Simon Horman <horms@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Stav Aviram <saviram@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, linux-rdma@vger.kernel.org,
-	Mark Bloch <markb@mellanox.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: Re: [PATCH mlx5-next v1] net/mlx5: Check device memory pointer
- before usage
-Message-ID: <20250704164804.GK41770@horms.kernel.org>
-References: <c88711327f4d74d5cebc730dc629607e989ca187.1751370035.git.leon@kernel.org>
- <20250701193858.GA41770@horms.kernel.org>
- <20250702082847.GH6278@unreal>
- <20250702140735.GE41770@horms.kernel.org>
- <20250702174953.GJ6278@unreal>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 3/3] selftests: ethtool: Introduce ethernet PHY
+ selftests on netdevsim
+Message-ID: <20250704165045.GL41770@horms.kernel.org>
+References: <20250702082806.706973-1-maxime.chevallier@bootlin.com>
+ <20250702082806.706973-4-maxime.chevallier@bootlin.com>
+ <20250704132019.GM41770@horms.kernel.org>
+ <20250704153250.6ec18427@fedora.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,60 +70,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250702174953.GJ6278@unreal>
+In-Reply-To: <20250704153250.6ec18427@fedora.home>
 
-On Wed, Jul 02, 2025 at 08:49:53PM +0300, Leon Romanovsky wrote:
-> On Wed, Jul 02, 2025 at 03:07:35PM +0100, Simon Horman wrote:
-> > On Wed, Jul 02, 2025 at 11:28:47AM +0300, Leon Romanovsky wrote:
-> > > On Tue, Jul 01, 2025 at 08:38:58PM +0100, Simon Horman wrote:
-> > > > On Tue, Jul 01, 2025 at 03:08:12PM +0300, Leon Romanovsky wrote:
-> > > > > From: Stav Aviram <saviram@nvidia.com>
-> > > > > 
-> > > > > Add a NULL check before accessing device memory to prevent a crash if
-> > > > > dev->dm allocation in mlx5_init_once() fails.
-> > > > > 
-> > > > > Fixes: c9b9dcb430b3 ("net/mlx5: Move device memory management to mlx5_core")
-> > > > > Signed-off-by: Stav Aviram <saviram@nvidia.com>
-> > > > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > > > > ---
-> > > > > Changelog:
-> > > > > v1:
-> > > > >  * Removed extra IS_ERR(dm) check.
-> > > > > v0:
-> > > > > https://lore.kernel.org/all/e389fa6ef075af1049cd7026b912d736ebe3ad23.1751279408.git.leonro@nvidia.com
-> > > > > ---
-> > > > >  drivers/infiniband/hw/mlx5/dm.c                  | 2 +-
-> > > > >  drivers/net/ethernet/mellanox/mlx5/core/lib/dm.c | 4 ++--
-> > > > >  drivers/net/ethernet/mellanox/mlx5/core/main.c   | 2 +-
-> > > > >  3 files changed, 4 insertions(+), 4 deletions(-)
-> > > > > 
-> > > > > diff --git a/drivers/infiniband/hw/mlx5/dm.c b/drivers/infiniband/hw/mlx5/dm.c
-> > > > > index b4c97fb62abf..9ded2b7c1e31 100644
-> > > > > --- a/drivers/infiniband/hw/mlx5/dm.c
-> > > > > +++ b/drivers/infiniband/hw/mlx5/dm.c
-> > > > > @@ -282,7 +282,7 @@ static struct ib_dm *handle_alloc_dm_memic(struct ib_ucontext *ctx,
-> > > > >  	int err;
-> > > > >  	u64 address;
-> > > > >  
-> > > > > -	if (!MLX5_CAP_DEV_MEM(dm_db->dev, memic))
-> > > > > +	if (!dm_db || !MLX5_CAP_DEV_MEM(dm_db->dev, memic))
-> > > > >  		return ERR_PTR(-EOPNOTSUPP);
-> > > > 
-> > > > nit: -EOPNOTSUPP doesn't feel like the right error code
-> > > >      in the !dm_db case.
-> > > 
-> > > Why? This error is returned to the user through mlx5_ib_alloc_dm().
-> > 
-> > Because, as I understand things, such a case would be due to a memory
-> > allocation failure, not by the device not supporting a feature.
-> > 
-> > handle_alloc_dm_memic() already returns ERR_PTR(-ENOMEM) if kzalloc() fails.
-> > I'd suggest doing so for the !dm_db case too.
+On Fri, Jul 04, 2025 at 03:32:50PM +0200, Maxime Chevallier wrote:
+> On Fri, 4 Jul 2025 14:20:19 +0100
+> Simon Horman <horms@kernel.org> wrote:
 > 
-> !dm_db case can be because of missing capabilities and EOPNOTSUPP is a
-> way to inform users about it.
+> > On Wed, Jul 02, 2025 at 10:28:05AM +0200, Maxime Chevallier wrote:
+> > > Now that netdevsim supports PHY device simulation, we can start writing
+> > > some tests to cover a little bit all PHY-related ethtool commands.
+> > > 
+> > > So far we only test the basic use of "ethtool --show-phys", with :
+> > >  - A simple command to get a PHY we just added
+> > >  - A DUMP command listing PHYs on multiple netdevsim instances
+> > >  - A Filtered DUMP command listing all PHYs on a netdevsim
+> > > 
+> > > Introduce some helpers to create netdevsim PHYs, and a new test file.
+> > > 
+> > > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>  
+> > 
+> > Hi Maxime,
+> > 
+> > We have recently started running shellcheck as part of our CI (NIPA).
+> > Could you do so for the scripts added and modified by this patch?
+> 
+> Sure thing, I'll do that :)
 
-Understood. No further objections from my side.
+Thanks.
 
-...
+> > > ---
+> > >  .../selftests/drivers/net/netdevsim/config    |  1 +
+> > >  .../drivers/net/netdevsim/ethtool-common.sh   | 15 +++++
+> > >  .../drivers/net/netdevsim/ethtool-phy.sh      | 64 +++++++++++++++++++  
+> > 
+> > Should ethtool-phy.sh be added to TEST_PROGS the Makefile in
+> > the same directory?
+> 
+> Ah yes I forgot that. So any file in that TEST_PROGS list will end-up
+> being run in NAPI tests ?
+
+I assume so.
 
