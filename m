@@ -1,279 +1,253 @@
-Return-Path: <netdev+bounces-204040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 067E8AF88EF
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:15:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77199AF892D
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:23:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A953587E39
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 07:15:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FD8E7B9FC6
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 07:22:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F6E2797BF;
-	Fri,  4 Jul 2025 07:15:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 337B7277818;
+	Fri,  4 Jul 2025 07:23:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="k0d2Su75"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="UOGSQEIT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013004.outbound.protection.outlook.com [40.107.162.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55CBA27991C
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 07:15:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751613324; cv=none; b=aOXBOR9H7FdQtgTfMoaWdnNwmcmaZzpiy7DWEOolVVCYud1YzShfLsqrB9EcZOVJ4K7AlwG+fSMONZ2hUAlEM7ty9l61lPBrU5ij+jo0pn/H4RlyfdHXrziIms6umdwsBEh2KFoRaMyDFRgF/cO8KusfX0NIHxa3TuaAJJWPWCs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751613324; c=relaxed/simple;
-	bh=PJ17NYzwR8crZVZzpZEmSEDl3INy0gxmFE0naPX67hU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sBZfdOdGKt7vLwTQUBgiAZa3XbsvSxemcipNpC+RCq7kXDvSYzJvS1DKUal0z4bwcpzorOt5fGpyTmxp6OhmkRRmV3YVy6tXyd0F+7221i+gji7/Zf4qTe5OQk2Eoi0GVvr9PIRt/GDDDvd6mHLtfYjF+C35A2mln1p7psR6AyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=k0d2Su75; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 51ED63F921
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 07:15:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1751613317;
-	bh=eOHKenlUn0WrzTitWPsxik4RxUTJ+cwEPC53JoDl8e8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=k0d2Su756ZZWygzdi1eyrA6LEl9naSq5CpdW2S17BSiObLuq6X1LBNl8aBnTqF/Tk
-	 oumy/w4cW7hBbHbx0+biaOxdcnXrG8deUOlXEAPG7LoGLwVC7Y4BJ1qkW3cAwM1Anw
-	 y+Meh4XwAnJkWaqHl6zbYM6/admUeAkn4cQ1sz6UYWBrynk7P5AWrtc0LLOIGYbeOo
-	 OdmOpHbI8f9JVeMuvVbqRElDKTG0h4yTMmBmYjU4f/D1q0CMFqZLHsH0JAmX863F7z
-	 UIF4KV0Z9uPc8PxvKjAb4eHQgWAAZELUTC7MgD5wPNxz/JhzS7B8Brsd9ZzhSNfAZl
-	 mNHEuCbhgEDnQ==
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4f6ba526eso378417f8f.1
-        for <netdev@vger.kernel.org>; Fri, 04 Jul 2025 00:15:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751613315; x=1752218115;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eOHKenlUn0WrzTitWPsxik4RxUTJ+cwEPC53JoDl8e8=;
-        b=lgzD6T7SpS8jIELg+tZKQaNfv6+mxROyb6dVBPumkZC+hrFxNBW5pPj1htsxHRv3p5
-         VXRFxf7Hf+7Ow/dnJGRd0cjCsWonjqGmER7X+Juj+cOYr7defpUfCcr+9bLBUb7NWFaR
-         PyjtdfNJcGsPK1RGKfe/Cj9xvt3CAnzmS7BXp6+18okL1+uBSNy0QIBqdErZsVCHbBBo
-         Eny1gEHAAF48cYS7l5dQf5Mr6l663lOZTxQ1Zz0yqDbjQr1G0Sc9jK8hhp/dO0mUoScu
-         v6bG6vJIoHyjK8M8vRZsKRNY9bap6nYYfDixOVLH97kacIYXGXmxuZ3k7QV6t3UqJeH2
-         uleA==
-X-Forwarded-Encrypted: i=1; AJvYcCUxwCUsVNWbfThcmyXxiKHm+HBkm6y72it2fuRgG/dNZtdzw5yGCnXpHyvUYmInlqUwNbz433k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3dqhg3OeY46UBqR/tyxuM+kAQje2dTxy74h8WLaPmHWsLTuwr
-	oIIFSk1n6sP9KXKkBnRP+TeGCBedM8VOSLJTR6TgcMOEPgbB7p2TDuoc3aJINrO0UqpOSA75rDz
-	k0RivmUFcWnqBXblAW6PcsQh5BdUl6nJ49aB0Okj5wzZLrQdXlOemh+eJfHFT3Z8O3Cop7WysxL
-	7mkJCLWfCr3au5R8jE68oql7HY0VlOZ5YS7m6ynRzmh2eDFfBr
-X-Gm-Gg: ASbGncskbbi5lmLI5ULacJxa1fOfHI9YQPKWZt5DeYC7YwQK5oI5nu7fbtxlqOVZxTT
-	v8Ms3WS+agWYIpOmlmekvow+hr3EL1vbtdXvB05UEvBom/AX4gKyj18gqodHCTfBexLcL2q3si+
-	SIt9ey
-X-Received: by 2002:a05:6000:2c0e:b0:3b3:9cb4:a2fb with SMTP id ffacd0b85a97d-3b496607ba4mr1101145f8f.33.1751613314585;
-        Fri, 04 Jul 2025 00:15:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEs2loDZ8Ahhlwp61+khQUNQNmUajyh8hMqo5bymejd7TY7m60S3yJ4iCiWJA6UU/KjjSwjuFppfJUbhZc5mRE=
-X-Received: by 2002:a05:6000:2c0e:b0:3b3:9cb4:a2fb with SMTP id
- ffacd0b85a97d-3b496607ba4mr1101108f8f.33.1751613314079; Fri, 04 Jul 2025
- 00:15:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828BF2DE711;
+	Fri,  4 Jul 2025 07:23:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.4
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751613825; cv=fail; b=usrjsj+EOZ5EJU5uuWeenbdXO6By1JYT/GtGk6ptryWyBacs0I8ECmS62eck+M+MUVhx+81V6hTtdJpnBNIK29qDpEv35pykz/4EJIlj3iCcK9a5qry1CtOQd8V9zJGc8FunhBNfM3lnvigC9Cg9jMlio/k6WUyzBNBnWvTtMUU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751613825; c=relaxed/simple;
+	bh=KkKS4nqT4YnjVs3hJ0QGJty9tSxqj5yqGSrsU+V/eBg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=IlIUEaWwpDsOVRpfza6PaAorz+zaNovHEtyAiF8RS1rBPRucz/VJ4vSo36Q/BWFSBidcYMRAmoVbpXgq72N7nckak87cQj+Rczgt6JkyNrPj2H7kssIWgYZoAaso2n5/CwBBFu2cgr+bHBPu073oog3wtBZpYBTgP/IAXLmRq3A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=UOGSQEIT; arc=fail smtp.client-ip=40.107.162.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gpmq11W4ychBsgwLTUmGtInZzv7JhHj9Ltm6kK3xJZV0uvjQQKIaqncNuM3Ubf75Xu8K6ArcpBc8dA+/LOceBNS6y/AOPYcOD+DZAS5ojhseFmj1d9CJ5nrq+RHTxTZTP+YXbBSGEmuopy5R3zwF+a3QQFXa1CtxYvRz++Cjs7W1adJ8Zq/XxszAtMDUnX/QQEWVr3Qm3Q+SZ8v9jErHK/WG+TI5QqqHophFgYjohc+hjgTyg5RRkdw70X7LeKjzHM9ERUwAqNio4RiOhwmZTvxiO5cg4BBF1DoNKukET5xA/HXugst5vdaeuVthYt91f/3v/8TfandTFz+MLRhKhA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KkKS4nqT4YnjVs3hJ0QGJty9tSxqj5yqGSrsU+V/eBg=;
+ b=EGNgOjtewqu4Ot5lA+a7kZM8ISgZ82L281NUk2plA/tsgPtbbgwPl0eiPcmE4hH1Bt3xekhqWA0DHdQMUtWl2REw7nxphUW5JB3+UzYccYDrC6rT+tXqlyELVAIQ5YXxhuE/HLYZWuir3QMPTrGTg9khkixMhr/Y9hOJxj7wiWUrxOTEQ3PlK5Sx5z5P0eNgj2mLDb6A3MIj7E/6dRwfWzTZQG6MBxRaDv78VjCea/kdhtswweDWvlyAln8L/fzSoi2Jxaga/nHRYIkmLnP1gR3cKZHig0gMq1rI6y9HkjYLPrM3DAvH+IS61uHqcchXj72JMMat6/QWWktD4oh/lg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KkKS4nqT4YnjVs3hJ0QGJty9tSxqj5yqGSrsU+V/eBg=;
+ b=UOGSQEITVYOtB32F++54cfQNHwIHnFBVpx4T/SZECIcvxeK6bab15gFjqJyiRtuwiVxZMiUH3Z/EM/YHLzbHUaCZsR4/22Fy/y5VD+aRNlOCJBlLrshehtI2XVIAlMohPLhGT6kd9122hxQNiIr6DpAunViuJ7AAqdV3L5PBfzfwFg6i8hF1XKcnxXOKvz09qjABQaByPHsjg5l6vFjuhFasWZNi0R0kVNt+W/+eXlb29cJ4gASTDAhyvnepOLM/LnSp4+Fm3ZT2lWyM6Q0dxl0CS8xRH9qUOhr4HIXC+fZmhL//Z+915t90mWr99F8+ejIovLmaEBlpjRiY23VpOQ==
+Received: from AS4PR04MB9692.eurprd04.prod.outlook.com (2603:10a6:20b:4fe::20)
+ by DU4PR04MB10816.eurprd04.prod.outlook.com (2603:10a6:10:582::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.21; Fri, 4 Jul
+ 2025 07:23:39 +0000
+Received: from AS4PR04MB9692.eurprd04.prod.outlook.com
+ ([fe80::a2bf:4199:6415:f299]) by AS4PR04MB9692.eurprd04.prod.outlook.com
+ ([fe80::a2bf:4199:6415:f299%5]) with mapi id 15.20.8901.018; Fri, 4 Jul 2025
+ 07:23:39 +0000
+From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "marcel@holtmann.org" <marcel@holtmann.org>, "johan.hedberg@gmail.com"
+	<johan.hedberg@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, Amitkumar Karwar <amitkumar.karwar@nxp.com>, Sherry
+ Sun <sherry.sun@nxp.com>, Manjeet Gupta <manjeet.gupta@nxp.com>
+Subject: Re: [PATCH v1 1/2] Bluetooth: coredump: Add hci_devcd_unregister()
+ for cleanup
+Thread-Topic: [PATCH v1 1/2] Bluetooth: coredump: Add hci_devcd_unregister()
+ for cleanup
+Thread-Index: AQHb7LSQLA3TVvNOWUyfSGQrRm03Jw==
+Date: Fri, 4 Jul 2025 07:23:39 +0000
+Message-ID:
+ <AS4PR04MB969274E6E1CD42BC80C1BE61E742A@AS4PR04MB9692.eurprd04.prod.outlook.com>
+References: <20250703125941.1659700-1-neeraj.sanjaykale@nxp.com>
+ <CABBYNZKN+mHcvJkMB=1vvOyExF8_Tg2BnD-CemX3b14PoA1vkg@mail.gmail.com>
+In-Reply-To:
+ <CABBYNZKN+mHcvJkMB=1vvOyExF8_Tg2BnD-CemX3b14PoA1vkg@mail.gmail.com>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AS4PR04MB9692:EE_|DU4PR04MB10816:EE_
+x-ms-office365-filtering-correlation-id: e32da0fc-3ed1-495a-0ffa-08ddbacbb29f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|19092799006|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?U0VBaVdQUWszSjBGMWhhQ0p6WG5NZ1FRRmNVdmtpOHVSVURzUmJNdno4Wkpl?=
+ =?utf-8?B?MFZ0a01KdFZ3Zzc5eU9aQ09KSFdVZDdoWElaeWFPYTl2cW5VZEtseGl5MVNL?=
+ =?utf-8?B?NnBnU0VnbDdZWHp3TEJ2MCswZG1EVXU3RTBMeCtqZDVrWWxpc0ZpTWJmOFND?=
+ =?utf-8?B?bS9HZnVMYXNmWHJtaFMza0RzK0F2MTNnOWZTUitaWEtVN3NtUElsUVlxeGxD?=
+ =?utf-8?B?SDJPVlhTbGtiS09yZHVCcm5JOUdzNDNDYjFhK24vYTBLN0F6M25mY1lPOFdh?=
+ =?utf-8?B?RUFJcFFyV0h0Z0g3SndxRldmcUVLSEZzclRaNFdQaWtpZGMxajVLRy9MRU12?=
+ =?utf-8?B?N1BIbWZWd01zSGR0L000TW9xRkNZMDVpWG1kMWt4MjI2eUxVZHk4ZEdoeCs4?=
+ =?utf-8?B?cXpudHkvUEdHQThqY2J6bnNaNm11YUYzdjJJY3YyZ3ZoNXdOVStiNGlWQWds?=
+ =?utf-8?B?YzI1VCtKWFc5VkFyZWxFcnRaRVJNdWhpRnAwMWJndUVEUmkrdmc3Z3JvR1ZS?=
+ =?utf-8?B?cmhRaFNZOExqL0QyY05YYVNLZkhUbDRyb1dPNnVhVlVML0cvUUF0Zmc5N00v?=
+ =?utf-8?B?Q3F0VEdsSXo5NFduZUV2R0twNFg0aHFoMDdCTWk2YjB0U3pIOEdOMVE1UGJZ?=
+ =?utf-8?B?ZnFZaHYwTEJidWI0ZitzYng1SkZxZFR3YkF2dmtGbkpCbjJCYS9IN0g0TlVO?=
+ =?utf-8?B?dEdrTm9XaEtvSTRqRU82NFNvZk9jUDBBMVFqMmpCRVJuR2JaVVFtSEhZSERa?=
+ =?utf-8?B?Q3UyaXVlRlFFMzU2MUFTNS9oS29iVXZCL0JPbEpYcXRXS25xNWhVNFpqZlEz?=
+ =?utf-8?B?YmRuMVhicFFyTk5GQnJSMVg3aGp5VzZUcDBWVG5IdmNwamVta2NPZjBnbXVu?=
+ =?utf-8?B?K09xSWt1dFdWa0lJNnhMNE5uS0w3R3lmd2dlem5TdStsdFpDSnBRMFZMZGVJ?=
+ =?utf-8?B?UGE0WENxL243bmlQTm9MVDlBNWRPQlhHanBGUkpiRVFPMkxISG1kU2E4WTdN?=
+ =?utf-8?B?R2Z1UE43QUhQbklmZ3g0R3J6S2ptWWduTDIvNURvTHpMb1RnbXJCWFp0bFE1?=
+ =?utf-8?B?d2xleTh0QXJpa2YrRFgra1VSWkhvZ01uSHRhdFBVcGgvQVJ2TGFkMWVOMVhB?=
+ =?utf-8?B?YUdzZmJDWjRUT24xNW1EZ29ha2FqTnB0OHhZVXdwcXR2TG0yUzJWOEw1c3cy?=
+ =?utf-8?B?aGNGYlZDWFdKMlBVUjl5VWVPajlHcTcrSDZlNTFsK01WbUhwVUtoN2VBa0FC?=
+ =?utf-8?B?U294blZRdnJPQXhNdDVyK1RZeGVZL1FCZ1hxUEVuUnlIRHFjY0lvRVhnaFV1?=
+ =?utf-8?B?Z1F4NkRzaVV1b2N4RG9Ra1VBMTA5aGJmNy9WVUpES2hDdVcyelZZb1ROdnRl?=
+ =?utf-8?B?NmhyenduN1NIRWNZSzFoSytkeC9GR3p0SkRsK0l5amxSdHBNTnE2V3VBUkVM?=
+ =?utf-8?B?NFQ4dlIzOU1qTzlaZHpEcHRPTE1JYUgrVWN2VysyYkxHTUFKNHN5RFRWT1JD?=
+ =?utf-8?B?dkxSZGpwVmdPTEpyUUZKTFVtTEpMempsSkJEZ3dXR212ZU1ENXdxY3U2ZWg3?=
+ =?utf-8?B?ZEZoY2dzenhhWDN3UjdMeDA2NGNkQ3p1MngxM2xacHd6bXNOcmpOQ3doSW9M?=
+ =?utf-8?B?YTlSMlNJa2twRUI2K2NHcmo3dzZwdU4yU2tkMU9KdzFBQzNXUmtTVk1zcmNV?=
+ =?utf-8?B?TUI2bHE3RWMrRmJrcHhRTzVYbDhnRVpsejdWT2hTNTNxdWN4UWcvZ2lIY1BY?=
+ =?utf-8?B?QWx2MjgzSWU1aFFpQ2tBaGZRL2xzZzJ6alEyWXphNWtqL3JxS0hNSk0rNzhJ?=
+ =?utf-8?B?TWw1aEdoRGp0R0RCMWI0MmJoNVQyb09CNkNvMEdXZUpZMUNuV3kzdE5abERk?=
+ =?utf-8?B?UVl1UDZ3ekpucWtuS0QwNDF0V2FEbkVuekxvOVcwYllwWmx2bkVOZEMrbFVI?=
+ =?utf-8?B?b0p6MUF4SjlQeEREUHVpU1VlaXlWaG13cmNYL2dNWHpXMnRDeXE4S3oxM0cy?=
+ =?utf-8?Q?3qEM5VFkWlsP4JLthHPeGJMWfvdVAw=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR04MB9692.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(19092799006)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?dTV5QzhVbUpubE5YUnhTY0w2cFJJcUUwa0kzdklZZ21WVCsvWG42WXZvd25Z?=
+ =?utf-8?B?NTIrWS9jRTlSb3VOcVZnZGhNeExYVXhIVHRZaFk2TEk2Q2tWSlUreHpSV1My?=
+ =?utf-8?B?eGdOYUxXZGVxcG5pdDVVU01HczRtTGoyalcwc25MMzR4U04vdGxvTzBZUWhF?=
+ =?utf-8?B?VGFCb3BUSjJrVUk2cXpOeTJSSnFYdUFWcGExbFhzMmd0ckxRN3lydGFPNGgz?=
+ =?utf-8?B?M1JiWk1hUVNjaTB4YTJJWlUzSjdDVXJGUDdtSm82eW1JcVk3RXJoc2Q1dG5X?=
+ =?utf-8?B?all4U3o1TXJUT2pyeVJKSVRGMCtmaDgxU1p3N0JaUWlhV1hXSFRyb2txbkx5?=
+ =?utf-8?B?aEIwYktiemRKZmVqejZTRUFmdkpEeFp5RXJCYkJVeGFoWC9SZkZ5bTQwS2lz?=
+ =?utf-8?B?RDRyRHZ5R3kyNllRdVY0REdhOWE0VnFzTmlsZzlLWlR3WFVNV2J4MDhuWXdW?=
+ =?utf-8?B?RzMrYTcrMWZDM1VSYTlxWCtOS1MzWWNMR0RLdW85Z0RqRXZ5WkluSzFrWWNy?=
+ =?utf-8?B?OUxMcmtJL0J2M3dIOC80ZStlT2pqdHBiSzRSampTRlBhZTdqeWhyUlM5eUpz?=
+ =?utf-8?B?ak5oeVBINHpXRlNWMDdwRVJYRXdhNjNzbmNIazkrUkt2MHZCaEk3QXNCaFpP?=
+ =?utf-8?B?SnNsR2VYdWgrSnRrK0NjRVFKTUJCbXBBL1hWRUN3NDJSQ3ZEUTB4Ym92NFEw?=
+ =?utf-8?B?ZXZCN1lVR2NQODQxN2pWQzZkLzNHTlh2WDNkbFMxQ3dpK2J1WFFWclhxMmhG?=
+ =?utf-8?B?elhqSFhtYUlkdndVVWl3bkR2czFFdERiNFJKZnRDcVdkZWdoVTIvTjh6MEFV?=
+ =?utf-8?B?MERZUXU2c0MyM0JlOFVZeUdUT1U4TkxrVWVxSnpWVzBNRld4NzExeWpLYlNi?=
+ =?utf-8?B?aytWak1BVGUxOFhTcHkxT2J0RkpWTlR0M3RQRldHbWFJZmgvUEpnQThTWld0?=
+ =?utf-8?B?VTBPSDJOZVBEK0J1eGlXaXZyaStFTWhhTzZJZTA5MlhtQUZaOUlRZHllMlhk?=
+ =?utf-8?B?WExJMVFvcmY0eU1WSlVCTWFCNEdXVlhmOGkwTUVDUm8yOUVucWV6azQyUFBG?=
+ =?utf-8?B?Z0toUkQwZXVVY2xYNEFXK3VPeHhJK2xMeE5FNzJGUTU1ZWl0blY0UnlRSEh4?=
+ =?utf-8?B?cXNVQTJoWlJqOG5INytwU0c2enhzdVVuOUZoTVg4TVpwcGE1dzdLMmpRYmk1?=
+ =?utf-8?B?cGFPSjh2d2xDckNLZXZONnFNM0FSL0RZY2piQ0ppNGZ1ZGFCd3BtR2dOL3BB?=
+ =?utf-8?B?ZFJpVkU5TUkweEZUdXVLZXRXMGZMYzVlcVgzeFVTbHhzbVBnOWlYM0VNZ09V?=
+ =?utf-8?B?QjVEb04xS3hLZWF4VVFUWTJIZDVWclkxaXg1QnFGZlM5T3poVVN5UTE0bzc1?=
+ =?utf-8?B?S3E5elJmL0pVWHNQdjVSakhKV2IvMlhiZHp0VVNUSDF5THp3K3ZzdFlaWHRW?=
+ =?utf-8?B?dUcwTWxsd01UaFBPSHVhdmNzbWRDdys4NFBCM1EyU3E3SVdKSW5nQWNHeUEz?=
+ =?utf-8?B?TXVTSkJtRGlVaEV5M09xK2lHOE1mU2JaMytIWEhzR250YnVvYW0yMUVFMlg5?=
+ =?utf-8?B?T3c1YVJMbHVRS2ZBNXdRM2NBZk9lN3pZTTRFS3cvZVVXaUYydEpmR3BVR25B?=
+ =?utf-8?B?ZStMeTBFWEpzcXhOR3U5aUpsTkh1Um5yR2liTnlTakEvemNuaktIdVBGckFz?=
+ =?utf-8?B?cmZwcHVDYkJjeVhpckM0NGJqb3pOVFl1UGljSnJzMU5rUHRDcWYyOThodXZq?=
+ =?utf-8?B?dlJBTUFSa0dBamdFZXFyK1kzcThMZTRpRXFma00wbHYzVjZPUlkxamk2Nklj?=
+ =?utf-8?B?TlJ0TDJyZmdyTytIdjZLamVYSmlrVjhGaGlvSTQ5UVlFRVRhZFVOOTI3YTZw?=
+ =?utf-8?B?ZFZXeDZGZHdXYUNYenU3cmplYVJnM3NKY2liUkhtY25vRHB5SzhZUTVYRDh6?=
+ =?utf-8?B?cXZ1a2htL3VWRXlFU003ZmJFOENvbURLUDIyVEYyY3I5NUNRdFN2U1YvRFJz?=
+ =?utf-8?B?QllJVlhzejVuYlZhOFJ5eTFYanpOSmoyenExbUcyYUVzN1VlNGdod2hlbm9B?=
+ =?utf-8?B?SkZTdmxScVRKN2piVmVObjdwdG9PekpHQ2FJQjUxQTZXRjVmLzBiRzZadVBG?=
+ =?utf-8?Q?3aYnYhipyQ/3/TGIms6Mytf/4?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAMqyJG3LVqfgqMcTxeaPur_Jq0oQH7GgdxRuVtRX_6TTH2mX5Q@mail.gmail.com>
- <3023fe74-29c7-4a41-b805-c6b00fb0b3cc@intel.com> <20250701154423.1917c3de@onyx.my.domain>
-In-Reply-To: <20250701154423.1917c3de@onyx.my.domain>
-From: En-Wei WU <en-wei.wu@canonical.com>
-Date: Fri, 4 Jul 2025 15:15:02 +0800
-X-Gm-Features: Ac12FXyj1-ZyBE3D1qBUiJnE2eIIgUp4g0jGX8z1J7TRdyPJWcFakElyE77oy6Y
-Message-ID: <CAMqyJG1bt_p9trGrtk-_xqfEF954TrSKoV6QokuadJK8ga80xA@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] [REGRESSION] Packet loss after hot-plugging
- ethernet cable on HP Zbook (Arrow Lake)
-To: Timo Teras <timo.teras@iki.fi>
-Cc: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, netdev@vger.kernel.org, 
-	intel-wired-lan@lists.osuosl.org, regressions@lists.linux.dev, 
-	stable@vger.kernel.org, sashal@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AS4PR04MB9692.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e32da0fc-3ed1-495a-0ffa-08ddbacbb29f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jul 2025 07:23:39.4029
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zRCnok4e2smygFvvSXkc0UWBanov//+KeycPHCpMiS5vRC0g/bHteoZQ5ayVGHDUwYuJfeq9K9zs1ixcHc05y8jSHgEL7kLFPAVlTHL26oI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB10816
 
-Thank you all for your quick response. Sorry for the delay.
-
-I ran two independent tests:
-
-1. The same experiment as Timo said: When the packet-loss problem
-occurs (by hot-plugging the Ethernet cable), running the following
-command fixes the issue
-$ ethtool -r # trigger a re-negotiation
-
-2. As Vitaly suggests: By enabling flow control, we no longer observe
-any packet loss.
-e1000e 0000:00:1f.6 eno1: NIC Link is Up 1000 Mbps Full Duplex, Flow
-Control: Rx/Tx
-
-
-From the power management perspective, I can confirm that the Ethernet
-controller stays D0 at all times. But I=E2=80=99m not sure if it=E2=80=99s =
-the case
-for PHY, as I=E2=80=99m not familiar with how to check the power state of a
-PHY.
-
-Thanks,
-En-Wei.
-
-On Tue, 1 Jul 2025 at 20:44, Timo Teras <timo.teras@iki.fi> wrote:
->
-> On Tue, 1 Jul 2025 14:46:18 +0300
-> "Lifshits, Vitaly" <vitaly.lifshits@intel.com> wrote:
->
-> > On 7/1/2025 8:31 AM, En-Wei WU wrote:
-> > > Hi,
-> > >
-> > > I'm seeing a regression on an HP ZBook using the e1000e driver
-> > > (chipset PCI ID: [8086:57a0]) -- the system can't get an IP address
-> > > after hot-plugging an Ethernet cable. In this case, the Ethernet
-> > > cable was unplugged at boot. The network interface eno1 was present
-> > > but stuck in the DHCP process. Using tcpdump, only TX packets were
-> > > visible and never got any RX -- indicating a possible packet loss or
-> > > link-layer issue.
-> > >
-> > > This is on the vanilla Linux 6.16-rc4 (commit
-> > > 62f224733431dbd564c4fe800d4b67a0cf92ed10).
-> > >
-> > > Bisect says it's this commit:
-> > >
-> > > commit efaaf344bc2917cbfa5997633bc18a05d3aed27f
-> > > Author: Vitaly Lifshits <vitaly.lifshits@intel.com>
-> > > Date:   Thu Mar 13 16:05:56 2025 +0200
-> > >
-> > >      e1000e: change k1 configuration on MTP and later platforms
-> > >
-> > >      Starting from Meteor Lake, the Kumeran interface between the
-> > > integrated MAC and the I219 PHY works at a different frequency.
-> > > This causes sporadic MDI errors when accessing the PHY, and in rare
-> > > circumstances could lead to packet corruption.
-> > >
-> > >      To overcome this, introduce minor changes to the Kumeran idle
-> > >      state (K1) parameters during device initialization. Hardware
-> > > reset reverts this configuration, therefore it needs to be applied
-> > > in a few places.
-> > >
-> > >      Fixes: cc23f4f0b6b9 ("e1000e: Add support for Meteor Lake")
-> > >      Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-> > >      Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
-> > >      Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-> > >
-> > >   drivers/net/ethernet/intel/e1000e/defines.h |  3 +++
-> > >   drivers/net/ethernet/intel/e1000e/ich8lan.c | 80
-> > > +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=
------
-> > >   drivers/net/ethernet/intel/e1000e/ich8lan.h |  4 ++++
-> > >   3 files changed, 82 insertions(+), 5 deletions(-)
-> > >
-> > > Reverting this patch resolves the issue.
-> > >
-> > > Based on the symptoms and the bisect result, this issue might be
-> > > similar to
-> > > https://lore.kernel.org/intel-wired-lan/20250626153544.1853d106@onyx.=
-my.domain/
-> > >
-> > >
-> > > Affected machine is:
-> > > HP ZBook X G1i 16 inch Mobile Workstation PC, BIOS 01.02.03
-> > > 05/27/2025 (see end of message for dmesg from boot)
-> > >
-> > > CPU model name:
-> > > Intel(R) Core(TM) Ultra 7 265H (Arrow Lake)
-> > >
-> > > ethtool output:
-> > > driver: e1000e
-> > > version: 6.16.0-061600rc4-generic
-> > > firmware-version: 0.1-4
-> > > expansion-rom-version:
-> > > bus-info: 0000:00:1f.6
-> > > supports-statistics: yes
-> > > supports-test: yes
-> > > supports-eeprom-access: yes
-> > > supports-register-dump: yes
-> > > supports-priv-flags: yes
-> > >
-> > > lspci output:
-> > > 0:1f.6 Ethernet controller [0200]: Intel Corporation Device
-> > > [8086:57a0] DeviceName: Onboard Ethernet
-> > >          Subsystem: Hewlett-Packard Company Device [103c:8e1d]
-> > >          Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop-
-> > > ParErr- Stepping- SERR- FastB2B- DisINTx+
-> > >          Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=3Dfast
-> > > >TAbort- <TAbort- <MAbort- >SERR- <PERR- INTx-
-> > >          Latency: 0
-> > >          Interrupt: pin D routed to IRQ 162
-> > >          IOMMU group: 17
-> > >          Region 0: Memory at 92280000 (32-bit, non-prefetchable)
-> > > [size=3D128K] Capabilities: [c8] Power Management version 3
-> > >                  Flags: PMEClk- DSI+ D1- D2- AuxCurrent=3D0mA
-> > > PME(D0+,D1-,D2-,D3hot+,D3cold+)
-> > >                  Status: D0 NoSoftRst+ PME-Enable- DSel=3D0 DScale=3D=
-1
-> > > PME- Capabilities: [d0] MSI: Enable+ Count=3D1/1 Maskable- 64bit+
-> > >                  Address: 00000000fee00798  Data: 0000
-> > >          Kernel driver in use: e1000e
-> > >          Kernel modules: e1000e
-> > >
-> > > The relevant dmesg:
-> > > <<<cable disconnected>>>
-> > >
-> > > [    0.927394] e1000e: Intel(R) PRO/1000 Network Driver
-> > > [    0.927398] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
-> > > [    0.927933] e1000e 0000:00:1f.6: enabling device (0000 -> 0002)
-> > > [    0.928249] e1000e 0000:00:1f.6: Interrupt Throttling Rate
-> > > (ints/sec) set to dynamic conservative mode
-> > > [    1.155716] e1000e 0000:00:1f.6 0000:00:1f.6 (uninitialized):
-> > > registered PHC clock
-> > > [    1.220694] e1000e 0000:00:1f.6 eth0: (PCI Express:2.5GT/s:Width
-> > > x1) 24:fb:e3:bf:28:c6
-> > > [    1.220721] e1000e 0000:00:1f.6 eth0: Intel(R) PRO/1000 Network
-> > > Connection [    1.220903] e1000e 0000:00:1f.6 eth0: MAC: 16, PHY:
-> > > 12, PBA No: FFFFFF-0FF [    1.222632] e1000e 0000:00:1f.6 eno1:
-> > > renamed from eth0
-> > >
-> > > <<<cable connected>>>
-> > >
-> > > [  153.932626] e1000e 0000:00:1f.6 eno1: NIC Link is Up 1000 Mbps
-> > > Half Duplex, Flow Control: None
-> > > [  153.934527] e1000e 0000:00:1f.6 eno1: NIC Link is Down
-> > > [  157.622238] e1000e 0000:00:1f.6 eno1: NIC Link is Up 1000 Mbps
-> > > Full Duplex, Flow Control: None
-> > >
-> > > No error message seen after hot-plugging the Ethernet cable.
-> > >
-> >
-> > Thank your for the report.
-> >
-> > We did not encounter this issue during our patch testing. However, we
-> > will attempt to reproduce it in our lab.
-> >
-> > One detail that caught my attention is that flow control is disabled
-> > in both scenarios. Could you please check whether the issue persists
-> > when flow control is enabled? This might require connecting to a link
-> > partner that supports flow control.
->
-> I wrote the other similar report from Dell Pro referenced earlier.
-> Additional testing on the Dell provided the following insight:
->
-> - A fast cable out/in will work. The cable should be disconnected
->   for 10-15 seconds for the issue to trigger.
->
-> - Sometimes the first spurious link up is 1000 mbps/half and sometimes
->   10 mbps/half.
->
-> - Using ethtool -r to renegotiate the link will make things work in
->   the defunct state.
->
-> And yes, my issue seems to be exactly the same.
->
-> Thanks,
-> Timo
+SGkgTHVpeiwNCg0KVGhhbmsgeW91IGZvciByZXZpZXdpbmcgdGhpcyBwYXRjaC4NCg0KPiBPbiBU
+aHUsIEp1bCAzLCAyMDI1IGF0IDk6MTfigK9BTSBOZWVyYWogU2FuamF5IEthbGUNCj4gPG5lZXJh
+ai5zYW5qYXlrYWxlQG54cC5jb20+IHdyb3RlOg0KPiA+DQo+ID4gVGhpcyBhZGRzIGhjaV9kZXZj
+ZF91bnJlZ2lzdGVyKCkgd2hpY2ggY2FuIGJlIGNhbGxlZCB3aGVuIGRyaXZlciBpcw0KPiA+IHJl
+bW92ZWQsIHdoaWNoIHdpbGwgY2xlYW51cCB0aGUgZGV2Y29yZWR1bXAgZGF0YSBhbmQgY2FuY2Vs
+IGRlbGF5ZWQNCj4gPiBkdW1wX3RpbWVvdXQgd29yay4NCj4gPg0KPiA+IFdpdGggQlROWFBVQVJU
+IGRyaXZlciwgaXQgaXMgb2JzZXJ2ZWQgdGhhdCBhZnRlciBGVyBkdW1wLCBpZiBkcml2ZXIgaXMN
+Cj4gPiByZW1vdmVkIGFuZCByZS1sb2FkZWQsIGl0IGNyZWF0ZXMgaGNpMSBpbnRlcmZhY2UgaW5z
+dGVhZCBvZiBoY2kwDQo+ID4gaW50ZXJmYWNlLg0KPiA+DQo+ID4gQnV0IGFmdGVyIERFVkNEX1RJ
+TUVPVVQgKDUgbWludXRlcykgaWYgZHJpdmVyIGlzIHJlLWxvYWRlZCwgaGNpMCBpcw0KPiA+IGNy
+ZWF0ZWQuIFRoaXMgaXMgYmVjYXVzZSBhZnRlciBGVyBkdW1wLCBoY2kwIGlzIG5vdCB1bnJlZ2lz
+dGVyZWQNCj4gPiBwcm9wZXJseSBmb3IgREVWQ0RfVElNRU9VVC4NCj4gPg0KPiA+IFdpdGggdGhp
+cyBwYXRjaCwgQlROWFBVQVJUIGlzIGFibGUgdG8gY3JlYXRlIGhjaTAgYWZ0ZXIgZXZlcnkgRlcg
+ZHVtcA0KPiA+IGFuZCBkcml2ZXIgcmVsb2FkLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogTmVl
+cmFqIFNhbmpheSBLYWxlIDxuZWVyYWouc2FuamF5a2FsZUBueHAuY29tPg0KPiA+IC0tLQ0KPiA+
+ICBpbmNsdWRlL25ldC9ibHVldG9vdGgvY29yZWR1bXAuaCB8IDMgKysrDQo+ID4gIG5ldC9ibHVl
+dG9vdGgvY29yZWR1bXAuYyAgICAgICAgIHwgOCArKysrKysrKw0KPiA+ICAyIGZpbGVzIGNoYW5n
+ZWQsIDExIGluc2VydGlvbnMoKykNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9pbmNsdWRlL25ldC9i
+bHVldG9vdGgvY29yZWR1bXAuaA0KPiA+IGIvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2NvcmVkdW1w
+LmgNCj4gPiBpbmRleCA3MmY1MWI1ODdhMDQuLmJjODg1NmU0YmZlNyAxMDA2NDQNCj4gPiAtLS0g
+YS9pbmNsdWRlL25ldC9ibHVldG9vdGgvY29yZWR1bXAuaA0KPiA+ICsrKyBiL2luY2x1ZGUvbmV0
+L2JsdWV0b290aC9jb3JlZHVtcC5oDQo+ID4gQEAgLTY2LDYgKzY2LDcgQEAgdm9pZCBoY2lfZGV2
+Y2RfdGltZW91dChzdHJ1Y3Qgd29ya19zdHJ1Y3QgKndvcmspOw0KPiA+DQo+ID4gIGludCBoY2lf
+ZGV2Y2RfcmVnaXN0ZXIoc3RydWN0IGhjaV9kZXYgKmhkZXYsIGNvcmVkdW1wX3QgY29yZWR1bXAs
+DQo+ID4gICAgICAgICAgICAgICAgICAgICAgICBkbXBfaGRyX3QgZG1wX2hkciwgbm90aWZ5X2No
+YW5nZV90DQo+ID4gbm90aWZ5X2NoYW5nZSk7DQo+ID4gK3ZvaWQgaGNpX2RldmNkX3VucmVnaXN0
+ZXIoc3RydWN0IGhjaV9kZXYgKmhkZXYpOw0KPiA+ICBpbnQgaGNpX2RldmNkX2luaXQoc3RydWN0
+IGhjaV9kZXYgKmhkZXYsIHUzMiBkdW1wX3NpemUpOyAgaW50DQo+ID4gaGNpX2RldmNkX2FwcGVu
+ZChzdHJ1Y3QgaGNpX2RldiAqaGRldiwgc3RydWN0IHNrX2J1ZmYgKnNrYik7ICBpbnQNCj4gPiBo
+Y2lfZGV2Y2RfYXBwZW5kX3BhdHRlcm4oc3RydWN0IGhjaV9kZXYgKmhkZXYsIHU4IHBhdHRlcm4s
+IHUzMiBsZW4pOw0KPiA+IEBAIC04NSw2ICs4Niw4IEBAIHN0YXRpYyBpbmxpbmUgaW50IGhjaV9k
+ZXZjZF9yZWdpc3RlcihzdHJ1Y3QgaGNpX2Rldg0KPiAqaGRldiwgY29yZWR1bXBfdCBjb3JlZHVt
+cCwNCj4gPiAgICAgICAgIHJldHVybiAtRU9QTk9UU1VQUDsNCj4gPiAgfQ0KPiA+DQo+ID4gK3N0
+YXRpYyBpbmxpbmUgdm9pZCBoY2lfZGV2Y2RfdW5yZWdpc3RlcihzdHJ1Y3QgaGNpX2RldiAqaGRl
+dikge30NCj4gPiArDQo+ID4gIHN0YXRpYyBpbmxpbmUgaW50IGhjaV9kZXZjZF9pbml0KHN0cnVj
+dCBoY2lfZGV2ICpoZGV2LCB1MzIgZHVtcF9zaXplKQ0KPiA+IHsNCj4gPiAgICAgICAgIHJldHVy
+biAtRU9QTk9UU1VQUDsNCj4gPiBkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9jb3JlZHVtcC5j
+IGIvbmV0L2JsdWV0b290aC9jb3JlZHVtcC5jIGluZGV4DQo+ID4gODE5ZWFjYjM4NzYyLi5kZDdi
+ZDQwZTNlYmEgMTAwNjQ0DQo+ID4gLS0tIGEvbmV0L2JsdWV0b290aC9jb3JlZHVtcC5jDQo+ID4g
+KysrIGIvbmV0L2JsdWV0b290aC9jb3JlZHVtcC5jDQo+ID4gQEAgLTQ0Miw2ICs0NDIsMTQgQEAg
+aW50IGhjaV9kZXZjZF9yZWdpc3RlcihzdHJ1Y3QgaGNpX2RldiAqaGRldiwNCj4gPiBjb3JlZHVt
+cF90IGNvcmVkdW1wLCAgfSAgRVhQT1JUX1NZTUJPTChoY2lfZGV2Y2RfcmVnaXN0ZXIpOw0KPiA+
+DQo+ID4gK3ZvaWQgaGNpX2RldmNkX3VucmVnaXN0ZXIoc3RydWN0IGhjaV9kZXYgKmhkZXYpIHsN
+Cj4gPiArICAgICAgIGNhbmNlbF9kZWxheWVkX3dvcmsoJmhkZXYtPmR1bXAuZHVtcF90aW1lb3V0
+KTsNCj4gPiArICAgICAgIHNrYl9xdWV1ZV9wdXJnZSgmaGRldi0+ZHVtcC5kdW1wX3EpOw0KPiA+
+ICsgICAgICAgZGV2X2NvcmVkdW1wX3B1dCgmaGRldi0+ZGV2KTsNCj4gPiArfQ0KPiA+ICtFWFBP
+UlRfU1lNQk9MX0dQTChoY2lfZGV2Y2RfdW5yZWdpc3Rlcik7DQo+IA0KPiBUaGUgZmFjdCB0aGF0
+IHRoZSBkdW1wIGxpdmVzIGluc2lkZSBoZGV2IGlzIHNvcnQgb2YgdGhlIHNvdXJjZSBvZiB0aGVz
+ZQ0KPiBwcm9ibGVtcywgc3BlY2lhbGx5IGlmIHRoZSBkdW1wcyBhcmUgbm90IEhDSSB0cmFmZmlj
+IGl0IG1pZ2h0IGJlIGJldHRlciBvZmYNCj4gaGF2aW5nIHRoZSBkcml2ZXIgY29udHJvbCBpdHMg
+bGlmZXRpbWUgYW5kIG5vdCB1c2UNCj4gaGRldi0+d29ya3F1ZXVlIHRvIHNjaGVkdWxlIGl0Lg0K
+QXJlIHlvdSBhcmUgdGFsa2luZyBhYm91dCAiaGRldi0+ZHVtcC5kdW1wX3RpbWVvdXQiPyBpdCBk
+b2VzIG5vdCBjb250cm9sIHRoZSBkdW1wIGxpZmV0aW1lLg0KSXQgc2ltcGx5IG1ha2VzIHN1cmUg
+dGhhdCBvbmNlIEZXIGR1bXAgaXMgc3RhcnRlZCwgaXQgc2hvdWxkIGJlIGNvbXBsZXRlIHdpdGhp
+biAiZHVtcF90aW1lb3V0IiBzZWNvbmRzLg0KDQpUaGUgYWN0dWFsIGNsZWFuaW5nIHVwIG9mIGR1
+bXAgZGF0YSBpcyBkb25lIGJ5IHRoZSAiIGRldmNkLT5kZWxfd2siIHdoaWNoIGlzIGRlbGF5LXNj
+aGVkdWxlZCBieSA1IG1pbnV0ZXMgaW4gZGV2X2NvcmVkdW1wbV90aW1lb3V0KCksIHdoaWNoIGlz
+IHBhcnQgb2YgdGhlIGRldmNvcmVkdW1wIGJhc2UuDQoNClN1cmUsIHdpdGggc29tZSBtb2RpZmlj
+YXRpb24sIHRoZSBkcml2ZXIgY2FuIGNvbnRyb2wgdGhlIGR1bXAgbGlmZXRpbWUgaW5zdGVhZCBv
+ZiBoYXJkY29kZSBERVZDRF9USU1FT1VULCBidXQgZHVyaW5nIGRyaXZlciBleGl0LCB0aGVyZSBp
+cyBhIG5lZWQgZm9yICJkZXZfY29yZWR1bXBfcHV0KCkiIEFQSSB0byBiZSBjYWxsZWQgYW55d2F5
+Lg0KDQpQbGVhc2UgbGV0IG1lIGtub3cgeW91ciB0aG91Z2h0cyBvbiB0aGlzLg0KDQo+IA0KPiA+
+ICBzdGF0aWMgaW5saW5lIGJvb2wgaGNpX2RldmNkX2VuYWJsZWQoc3RydWN0IGhjaV9kZXYgKmhk
+ZXYpICB7DQo+ID4gICAgICAgICByZXR1cm4gaGRldi0+ZHVtcC5zdXBwb3J0ZWQ7DQo+ID4gLS0N
+Cg0KVGhhbmtzLA0KTmVlcmFqDQo=
 
