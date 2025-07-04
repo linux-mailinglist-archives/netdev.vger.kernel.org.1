@@ -1,315 +1,135 @@
-Return-Path: <netdev+bounces-204186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6528AF96A0
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 17:18:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73098AF96A1
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 17:19:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A54116A86B
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 15:18:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 108B454729A
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 15:18:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3542170826;
-	Fri,  4 Jul 2025 15:18:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 233311CCEE0;
+	Fri,  4 Jul 2025 15:19:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Jk5cnw+c"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nPbXMW68"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2056.outbound.protection.outlook.com [40.107.220.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3670914B08A;
-	Fri,  4 Jul 2025 15:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751642294; cv=fail; b=MqKd1ITKm8y4ak56pvx7ZIU7QTRlCUISVYllz1WtLy8PysCmbiF71gyvm+LN1ptbeBQ4gmzC8zyNjDNXaS1D/4xlMVWdRarmyHw1vXyhgVBvCtBnJPgpxdvF+ycIUmpXG94e8Pvm9CPKqHXaVvJ5fIc+YcIjSgjBbfUsA3BPicE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751642294; c=relaxed/simple;
-	bh=cQdYXFZ5VO+EpTo8Vj91CZS94L0bmjV6cEJ7bZq6UKI=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=XnZjHZOunLNE17nx6CpxjfG4XfA0wou3pTg29m6jRmN11kHw0xqZ4/Pf+ChnW/ahUnKf2v0YCmxT5zl8pKbFfI42RdoZJd7yMfCwVA30+3D4O6Trvmo+pUGPl/RnECwsJyyGLRsxSWi7PQ3mtQnKlMaGWRCiyB9HOIcnLQ9V4UU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Jk5cnw+c; arc=fail smtp.client-ip=40.107.220.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=a8ftyNv4Ta7fz9Sl7lJJwgq7VbzGSB1JYmJ1VnPYwcqdZqIIoVQT89RzHhP5agjw6KXqZlSdEXjnrqCcJJkJqZTFfSzvPX9JGzFpHx3xkwI75WQxHpvJOhOQ/r0dw76xSuxweS+C8dnQgpzgWXMO9O67qxwjgBQQNEMzAU9KTNmzFeqorz7sqEtIuILjYPwooIyps6AtB9YjugZV+yNZmi9xe5IpA/tRZT9U3bWlna48mshq2RXnLYJcf2Nwg3ZPXWW9qYiISKDNZKv2kzKM9jAKhJXyI8jj9KHS173kpAtPF1wrj7YAKKLg447RRwligXWagtC2bigZoVVkn0UuMg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5UfjPMqGNYfzKO4b1PgU3UWjULwRfN/1RubdZPRPSQw=;
- b=Vb/WrbhowjoN4J8i4jQ5phJUUrcodss1RB57Qa/SWjCMjWhQx/wo9btN0chph8vG+u53UmJlxUZAHSGeef9bO6qZcaRbezNN4DHNtU+tb2xm8yV+jJxAPHsDceTSgp61UWUmwABlfjqca5kcbn5AfYeUDkaowVoYh3dsYYJ/AzV7qW+QvC9k/sBzlzk1T/ZD+gFkavAf6aZr7iGMG74CqLBM+/vNMCo/PtOW6CObbAM/gvbOpPmtGQn/0Dd/rdKt4Pgx7eQUtDvdlZm+e5ZrBbz0w/dQpEk7dypt5DOF380dkvdFI/XJcPAMtfB8pP4hStIaGkFcPx2ScTIyH1EAJw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5UfjPMqGNYfzKO4b1PgU3UWjULwRfN/1RubdZPRPSQw=;
- b=Jk5cnw+crrN4JcS2H3o5xqhShtCl2i//H3uJMls+Z0lEDaQchjBHUzPHSsMoK4HyS1psNTj48EAKZYbRUuFoypzIk1Wqmfn+jMIIY9D4q6U+SDJCEGzD16cw5eZpgrn9e/qIwo5O4IJ7IChZboLBVkXvPRE9HK7HPErg88cOMzg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by DM3PR12MB9434.namprd12.prod.outlook.com (2603:10b6:0:4b::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.26; Fri, 4 Jul
- 2025 15:18:11 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%6]) with mapi id 15.20.8901.018; Fri, 4 Jul 2025
- 15:18:11 +0000
-Message-ID: <00624fd6-8b30-4f86-99b7-f7df2cedf401@amd.com>
-Date: Fri, 4 Jul 2025 16:18:07 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 13/22] cxl: Define a driver interface for DPA
- allocation
-Content-Language: en-US
-To: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
- dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
- dave.jiang@intel.com, Ben Cheatham <benjamin.cheatham@amd.com>
-References: <20250624141355.269056-1-alejandro.lucero-palau@amd.com>
- <20250624141355.269056-14-alejandro.lucero-palau@amd.com>
- <20250627100638.0000456f@huawei.com>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <20250627100638.0000456f@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DU7PR01CA0006.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:50f::6) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899A01991D2
+	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 15:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751642343; cv=none; b=tXJhieR2puds4iiePkDI5oUG64FaBIvZmBvsjmjCd951D6ibVzyDCoHrapACXeHAxsaho1VmgQE4vsWBwIet3CtoxVOFsmcgU1qIr430AVJ9FjyhUqoAA00pP06fdqb+gyb0ghZkiRQBHSvv2a/3w2XjV53n3yScpJww//7SFXU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751642343; c=relaxed/simple;
+	bh=Yqe/pwD7AyGVmoL5xzBOCtjhrEIVJhXck3ab/p8Jlsw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G+dIVwEu+4NjsefGE4d1Y0s8kaQ3JEBWqky5+iopkK0WQZ6Ek90F/HFqtySY3NyX/ryELBgKfRDvBAo5B1YdiUGHg7XyZRyh1TdHANdMPZD5aH58bZkEYm0lQBPP6DPW47LN0iKCjwiYp6fTsUro0tAL7SyK3hf7SstrBXqbEmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nPbXMW68; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4a5ac8fae12so980811cf.0
+        for <netdev@vger.kernel.org>; Fri, 04 Jul 2025 08:19:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751642340; x=1752247140; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X3GlbbaPlqRv+/DEEtqvv3IB346Z8IPmcH1mAgiGhrk=;
+        b=nPbXMW68C5ChNKqhptn1Lttpx41610qHYVhvLMiQGMO2elvvTULRD4Em/9hiI47hDb
+         C1JrGSYhHxAvdPCMXXLsGwR7CUx8iZV2UbqKFr7pXkEwfI/XBH9a+qRPt7tp/lNvQazt
+         oZYzirz3bzh7hBWUIpahgpqdB4ng0Ily6bYcMjRoYBkMLZ8FD0JNu2x7tIGi2Tpezz0c
+         TsS2dMZ50d1lCl7R0pperebQSxR2N1FuV0drUZR+2DkclJ2tt67COe/NRq9feiG0XQ1C
+         8CsDT2GbE7rjHBFbvWK91JaPxPZH1ZRbkyiXn4UXZsaR/lzS11QUdOTIaoT1TQHJ5hxR
+         CYlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751642340; x=1752247140;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X3GlbbaPlqRv+/DEEtqvv3IB346Z8IPmcH1mAgiGhrk=;
+        b=HYizI0TN0sr3atpQGKaKvadhFK8YHUxuCX5MxMYyW8GHNRXH5OEi3RpmpZDcZZY0cp
+         xtBdnq3qKJPqKoA/4UwzIShEk+vgt2tc+I/1YhUgQfyRgyQQ/YsuB81UwfANBB+Rp7me
+         XvNaijjzLih/hxejBPH/y1qCTnfbX9oOM7eqNtqnSXx+7lQcKdI652hMSzg2miNc8Qg0
+         +nSqBZ5JkxYXSj1nI4tduUPfK5ytTh2mmGhRIbpKqYZmQ+12YbRFdSkSj/DXwmazu1Ui
+         8u6Cuv+A6qKTjj5bcxT9Nro5QMJ3zqcLnJKWcMv+bjYybVCkEDJqXRlCslvLycCfEyoL
+         7Yog==
+X-Forwarded-Encrypted: i=1; AJvYcCWxnDeS6lx8nPr3tgpnlvxNDga8e0gSVvkKesRUWLPSu/gNcbkgHBSr4cPb1/Ga5UP5c3bF6LQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzvc9TrbAQGNYfY/uYnrkitcqBb2mdX0uyTST0nC4uiccfcTDWs
+	3kyAb6RO7zGfGp9Ww/X2jJJLbovg5XzSj+DWTWWXFEe+KOaXIr746/Ix7ai8p0s6iYNhDWGG6SS
+	V91iLw+PbWpKU7gT2sLKufbkRlXwS41bz++4KTJVq
+X-Gm-Gg: ASbGnctjkYA/LCnLoggR92rK5Qpa7HHyujm9etKlXYVkWkDIz7jGKczmu7H1cJCTCyD
+	pJHBKEjkcn9Bi8l5xL7DoF+CGuuxPszic1WKNcqGLmMGIeF0XJX2/ipl1bNx9xd17+t4pRwbSg4
+	WQ7xVgmLm0V+z9/jQkUfQVFWa7dbB4lOTdwerSSM80znkeQ6YIg0WiltMqIdvyPhUkCumq1pNu5
+	QcJ
+X-Google-Smtp-Source: AGHT+IGrbmoNwSV4gGCqgdNZ6JBB75TKk2uFeHNZGf7KdVjqOTMILaSAOxzfKQoFn3BwM3eFIdpel65r3G/gKlFf/+k=
+X-Received: by 2002:ac8:5794:0:b0:48a:ba32:370 with SMTP id
+ d75a77b69052e-4a987e934b9mr8885721cf.10.1751642340067; Fri, 04 Jul 2025
+ 08:19:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|DM3PR12MB9434:EE_
-X-MS-Office365-Filtering-Correlation-Id: df606995-11fa-4aab-3f96-08ddbb0dfcd3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?clcvbEN6NDQzVDFtb1cwNkFpbmh3eEEvRUZFVkM3WEVNcmYwQlR3djRsUVRs?=
- =?utf-8?B?eDl2K3dleW5vZU5HK2R1cFhHZUNvNXo2T1ZLa3lqT0lFeFVHZXFSVmx6TEJG?=
- =?utf-8?B?RDl2L2JYLzFyQmh0QW5HTDd1WUhZWVQ2Q2VJRDBNMU8xdkpJZmM4L3J1MFB1?=
- =?utf-8?B?Mld3MDFjR3RlL3ZjWHJqQVUzNlM0dnlkVUIvam1zSWNXS0FHQzVMZUlYTk9N?=
- =?utf-8?B?RmxiRmxYMVZMNElaS29GUnc3T0paNEMzVDg1ZE54Qi9Qa21jYXFFMEV3K2VX?=
- =?utf-8?B?OFRFZmxhNkNhYXhmRmFIUTlPQXZqdTJkTXg2NHNlMWdzeTZseElMSElZT3BQ?=
- =?utf-8?B?SFZTWTkxdnFWR1c2RGhRYVYrL09rb3hVc0lqOU81ZTk1ZnB1akQwb3VQN0d0?=
- =?utf-8?B?OXJyOTYxWHRGMllveEl3cU5nOVdEK1BUeUhGMkc3ZDk0M0VJZnNzNWdaamRv?=
- =?utf-8?B?YnpaQ016NWRNcGhTMVVtQ3R2aFJmWkhObUxrRWtTZ0ozOU94bUFqc1gzMUU5?=
- =?utf-8?B?NUs1TE9BTWpubUZJSjJuTlNYSURpcXJPU2hwU3JWMXprY0U4alJiWTlaR1Z3?=
- =?utf-8?B?L2FRNTBFM2Jsc2RJSnU2MUlhTU9DdXY0aHpDbUZ6RjlOWGQ1OXBSTUxhUG5I?=
- =?utf-8?B?WDllcTVPQkEvRlRMOTVYV2tWTTZ6MWR6YzRoUnlNWCs0OGQydWl5M1lSMkcz?=
- =?utf-8?B?WVF1QUdCZFJVTDdjMHl6bTlPMTF6UEJiall4c29qall4eEJPV0ZHWEZpazhm?=
- =?utf-8?B?YUtwUVZXdFBlZVJhZTA5cnNRUS9VWFY5UTAxU0hWZEhGcEM5NVNxWnYyemk5?=
- =?utf-8?B?WGpZcEd3bC9lR3JTY1NtSVNMUEgzMXNybmRyV0dEOCs1eUpMVkNhbDMwNzBh?=
- =?utf-8?B?akdpaTFZcERVa0hkdGdrMzdJVXZUaFo4Qkx0V2N5dVFDeWN1VlVGQkNBK0x3?=
- =?utf-8?B?eGNzVnM0bU5WT0xmSU5qV0FlMWtjaTZ3cTM3c2NtZ3RjYW1uQW9NVUwwSHN6?=
- =?utf-8?B?MUtPNW04dkFPeGNDN1p5WXpaU0ZyZVZzM0JyTGhQL2tBSGVJUCt6ZHdnb1JH?=
- =?utf-8?B?b1R3cW1aQ2ZMdSsvVDlZR0R5RUxpdW9zNXVPZHFDYVVYcDk5L05MS2M0STlQ?=
- =?utf-8?B?VlRDdG5tZ0hUY3NUQmNUZDJOT3VuNEdBblZQU2pFUm1KMlkwdEFhN25STklt?=
- =?utf-8?B?RzBNQlJaMllRQWlmT0toUmdFQzRwaDMrbnFiQmtzTk40NWFyaVlrS1VQZzhU?=
- =?utf-8?B?NERjN2VNR1pSR0xHZU90ZjlXZmloeXVlaDRWbXRSY05TUTUvSzJRSUdpZXp5?=
- =?utf-8?B?QW5QeGxsOGhrL2hBZ04yWmZmZU9GWGlsYlI4eWFpUFBGVGg3bmljOFl4U1NQ?=
- =?utf-8?B?aXlvcGFTcVhUcGd6Vll0bmFmU0phUlJ4Y0srZWd0QVNlWGNhU2NGYjh4SVU1?=
- =?utf-8?B?VEsyd3VuaEJhTmtaZ3dUeUwrRVB2RXllZSt3NmNpTVowbk1vOFAzLzc4MnR0?=
- =?utf-8?B?NmNESnhrMy9MM05Mc1AxUHNyYjRiZDNoY2RWRUYxWEdKR3ltZmJUa0RxT1lU?=
- =?utf-8?B?R0d3Si8wWmU1VGY3WW9ueUM1UXkyYjVsU2dLcEVFVm1FNEx4aHJZdnhnWmVM?=
- =?utf-8?B?bW5STWpPdWdTSkNjUjNjZi9uZytnaGliZ3NmZ0R2SFoxZW5vNVduL3hLak1Q?=
- =?utf-8?B?VUtqWFNhWHRFNFc3Uk9ZcjAwVHhuSFh2QmVoWCt5TFVDNDI3VzNkUVF1OWs5?=
- =?utf-8?B?eTBuWVBmSXVWa0d5NUxycGRUaG1CNGl4ZTJuUzRTdGZwMFphOS84ODhacmVq?=
- =?utf-8?B?K0EwQWpablh1WWRzMFpEcWRqRzkveElHVDQ0TzlKRHY1dm1HMkNBTmF4SG1V?=
- =?utf-8?B?Zis3RjF2aFY0b0FuWG9QR2lLVGFoQjhrQ0M5TmgvanVHbmludytwTVNIU0Fv?=
- =?utf-8?Q?snRB5oDJqTM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NnBMN1lHemtvZ1d3NC9pcnVNVXFhYTZiMmxKQXhWUzJGdTk2M3l6N2dZQ0tD?=
- =?utf-8?B?UmtDcVdmZ1k3SXcxRjErZE5PU3c3T3VlVWdMQWxyZm9kbVB4WlZBYTJyODFB?=
- =?utf-8?B?T0lQeFhsWUtMWUl5djBReXBnek9yL3V1ekRHc0lLcGtnVzNRRG00YXVLdnZr?=
- =?utf-8?B?NFZsWG8rRUp6a2RmR1ByTFFxV01MdmMwZ1JiWkN2QlRLelJxQ201ME5vMkVZ?=
- =?utf-8?B?UExqZHR0bU5qaStYSmd4NVN0cThtL21nckNRVi9RUEtJeHZNUW5hcW1jY1NT?=
- =?utf-8?B?UjIvb1BCdXZmZEFVeFVqZ3BRMG9rVGxmWkhpSktpUDVUUEJxTUNiM240UGRB?=
- =?utf-8?B?RXY4d3FYbnROVEN0TEVvbFkrUjlYLzFFTDVxQmJBaU00R0FjTER0VWg2OW1l?=
- =?utf-8?B?dFdmcEdIbGNROUlmZ09DNW40cVRLVEU0bVJvREFMaFR3d1JsaUYwdFdQTmhL?=
- =?utf-8?B?Mk1DTkxmcndhR3pDWGFQaDBvSUNlSWpMakNFUC9kb0UrTEtXWlhVSllZTytl?=
- =?utf-8?B?S2haWU9DbmRISGtsYi9qSkpUYWNKTFU3NTVWVVZyaHpjYlRIOUNKMFo4VUNT?=
- =?utf-8?B?b21YNC9IcUFBRFBpejh6VUVLdEswaWdEdHpGNytJMkM1QVV4M2NlSUQ4WlhD?=
- =?utf-8?B?MWF3ckNCTGRMbDlPaVlZc294QWJMVDdiWW9zK0ZCTDN2MjBmeStIQ3ZqS01S?=
- =?utf-8?B?cjFhZ1czZ2FldjVlVEJETlBIaVd1c1k4L0l1UWU0Z3p2ZlpFWW02eTYwNHFQ?=
- =?utf-8?B?SWFnRkZUNUlxSFhwUW5kM1BDQjh5ck9KYjM3N1BzYmZPeDRyVFZXZktVWlZJ?=
- =?utf-8?B?Q1QyUVhRVlRueXhHR0dpVWhITW5NMkZUR3pBdWFoY3FBSy9RUnI3UjdaR1Br?=
- =?utf-8?B?UTB0U0FORXdpZDJiWUtsUmxUeU9DMHFQT0tFV2xZSzJyRmJ6b2JaeFpSTnhN?=
- =?utf-8?B?ZFBvaVBLUmxEVG9paTZOV3Z3RzZqcjBOVnA4VGd3amN5dXJ6TEJhL1ZneDI5?=
- =?utf-8?B?ejJoU1dVRGR5bVFSMVh3dGV4NjkxV2Y4ZjhOQ2hRcjFsd3N0UjNmS2RlOE85?=
- =?utf-8?B?bFJFcWpRM2dUWlk2SDZoZHFURDRqMWRJWG5rN09WME1sMUpCRVFaWVBRVTIr?=
- =?utf-8?B?UjFMbmtxNGZSaThvNzBRWEova3dzS0Rpc3hRWXlHNnBlWFNjbGZ1bDM1R1ky?=
- =?utf-8?B?UDJxM0E4R0RHb3BxcnRsaGJQRkZKZXo3ZXFMeHlXTjFJZjdsMThocUtlSWJk?=
- =?utf-8?B?SkFnUWhSNHF0RFNSbXJEcjdTL1RLWFZxRmRVUlRzWlJvRzNPcjR2VXloNURT?=
- =?utf-8?B?QjlFaUZsRjFqSUZEM1dFSVpHMG9QK2Q1ZzdLVndJL04weUVRbllCVzF4NjFs?=
- =?utf-8?B?NDlWRDFMSENEdE5EWk5UYXE1N3dJek84NjVyeVJhWVZhL3VrTFNEMy9XWmFO?=
- =?utf-8?B?U0Vyd1Jubk92czFGWFhEbDEzUVhWeTJMOWduby80Tko2WnB6bEFmS1ZjWTlo?=
- =?utf-8?B?b3Z4NlNzV1FBZUhDN3Y4Vk5WYWpnZTFEelNqRXdPeUxQQXB3SGJVaEYrc21o?=
- =?utf-8?B?RHNlM09YSXFhbTlrWFd0S3l5TXpqbStxZjhUWFdUZXJNV1YvOWdqN1l3bGVW?=
- =?utf-8?B?TTRUVnNoV04rMjdNbzdjdmZOSWhvQ2g4ZXo1WG5TZUsrWUpMRU85L0xSR2o5?=
- =?utf-8?B?SEdOdGJPQUtDb1UveW1YNHVHZCtFSFhMTkFJb3hvQ3QweEdLU1BES01LOEhk?=
- =?utf-8?B?ZHlORkN6QmJJQjlHWmNrNWY0eWFvdHVpSERXOUYzdDlLZTEwUzZMaG80MkZx?=
- =?utf-8?B?TzEvaEJzQy8zWjJPMXNESGdMS3poSExxUHorQmk5WUlOTU0xSGhMcko3OVFC?=
- =?utf-8?B?UmlQQW5JS3hyM1Uxb1JZeHhsWkk4dUNzbVhXcU0vNnpuaUFUK09Ld200S0px?=
- =?utf-8?B?cGJ0NU9NV0t2OERDK1YwQjZSazI4Mmg4cWZlMFluNExpVUZNVnQyMHZhV0Rs?=
- =?utf-8?B?TWNqVDFoWnM0OUxSd0FDQ29VM1psL1I2RGdKbkoyUkhnOGV4TmFvMFpJZ2t4?=
- =?utf-8?B?ZzR6SzJ3R3pNcDZWbjhoWGx1REhxK1QxS3lLemZObkFwaTZtWDV5UWlMWkFq?=
- =?utf-8?Q?zji2QalxLx7QpGb3tdLsHBtoD?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: df606995-11fa-4aab-3f96-08ddbb0dfcd3
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2025 15:18:10.9428
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: S4OE5G2uRrytnjQgW5iJVJDPRJcpyxDnqUgiaJ9k0qYrRJ6U8Nph7mm+jGivI5qAmFN9jWxHRnt8kL969BJ5Rw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9434
+References: <20250704144830.246159-1-guoxin0309@gmail.com>
+In-Reply-To: <20250704144830.246159-1-guoxin0309@gmail.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Fri, 4 Jul 2025 11:18:43 -0400
+X-Gm-Features: Ac12FXxhRuexo6Ct0veI_79HKLqeASoJEsSPyX8PGv7oJY1ciCfP66dpPoAxAW0
+Message-ID: <CADVnQymBGf3OW8oh8PBKXtNpxF5C=FZJTvaQe5TGy3uObZuCOw@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: update the comment for tcp_process_tlp_ack()
+To: "xin.guo" <guoxin0309@gmail.com>
+Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-On 6/27/25 10:06, Jonathan Cameron wrote:
-> On Tue, 24 Jun 2025 15:13:46 +0100
-> <alejandro.lucero-palau@amd.com> wrote:
+On Fri, Jul 4, 2025 at 10:49=E2=80=AFAM xin.guo <guoxin0309@gmail.com> wrot=
+e:
 >
->> From: Alejandro Lucero <alucerop@amd.com>
->>
->> Region creation involves finding available DPA (device-physical-address)
->> capacity to map into HPA (host-physical-address) space.
->>
->> In order to support CXL Type2 devices, define an API, cxl_request_dpa(),
->> that tries to allocate the DPA memory the driver requires to operate.The
->> memory requested should not be bigger than the max available HPA obtained
->> previously with cxl_get_hpa_freespace.
->>
->> Based on https://lore.kernel.org/linux-cxl/168592158743.1948938.7622563891193802610.stgit@dwillia2-xfh.jf.intel.com/
->>
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
->> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Hmm. I wouldn't trust this last guy not to have missed a few things.
-> See below.
+> As ACK-TLP was published as a standards-track RFC8985,
+
+nit: typo: s/ACK-TLP/RACK-TLP/
+
+> so the comment for tcp_process_tlp_ack() is outdated.
 >
-
-My mistake. The patch changed after applying Dan's suggestions, so I 
-should have removed the tags.
-
-
->> +static struct cxl_endpoint_decoder *
->> +cxl_find_free_decoder(struct cxl_memdev *cxlmd)
->> +{
->> +	struct cxl_port *endpoint = cxlmd->endpoint;
->> +	struct device *dev;
->> +
->> +	scoped_guard(rwsem_read, &cxl_dpa_rwsem) {
->> +		dev = device_find_child(&endpoint->dev, NULL,
->> +					find_free_decoder);
->> +	}
->> +	if (dev)
->> +		return to_cxl_endpoint_decoder(dev);
->> +
->> +	return NULL;
-> If this code isn't going to get modified later, could be simpler as
+> Signed-off-by: xin.guo <guoxin0309@gmail.com>
+> ---
+>  net/ipv4/tcp_input.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> 	guard(rwsem_read)(&cxl_dpa_rwsem) {
-> 	dev = device_find_child(&endpoint->dev, NULL, find_free_decoder);
-> 	if (!dev)
-> 		return NULL
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index 79e3bfb0108f..e9e654f09180 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -3714,7 +3714,7 @@ static int tcp_replace_ts_recent(struct tcp_sock *t=
+p, u32 seq)
+>  }
 >
-> 	return to_cxl_endpoint_decoder(dev);
-> 		
+>  /* This routine deals with acks during a TLP episode and ends an episode=
+ by
+> - * resetting tlp_high_seq. Ref: TLP algorithm in draft-ietf-tcpm-rack
+> + * resetting tlp_high_seq. Ref: TLP algorithm in RFC8985
 
+Thanks for updating this! This looks good, but in net-next at
+6b9fd8857b9fc I see two other outdated references to
+draft-ietf-tcpm-rack. Can you please fix the other two as well:
 
-Yes, it makes sense.
+git grep -n draft-ietf-tcpm-rack 6b9fd8857b9fc
 
+6b9fd8857b9fc:Documentation/networking/ip-sysctl.rst:434:       losses
+into fast recovery (draft-ietf-tcpm-rack). Note that
 
->> +}
->> +
->> +/**
->> + * cxl_request_dpa - search and reserve DPA given input constraints
->> + * @cxlmd: memdev with an endpoint port with available decoders
->> + * @mode: DPA operation mode (ram vs pmem)
->> + * @alloc: dpa size required
->> + *
->> + * Returns a pointer to a cxl_endpoint_decoder struct or an error
->> + *
->> + * Given that a region needs to allocate from limited HPA capacity it
->> + * may be the case that a device has more mappable DPA capacity than
->> + * available HPA. The expectation is that @alloc is a driver known
->> + * value based on the device capacity but it could not be available
->> + * due to HPA constraints.
->> + *
->> + * Returns a pinned cxl_decoder with at least @alloc bytes of capacity
->> + * reserved, or an error pointer. The caller is also expected to own the
->> + * lifetime of the memdev registration associated with the endpoint to
->> + * pin the decoder registered as well.
->> + */
->> +struct cxl_endpoint_decoder *cxl_request_dpa(struct cxl_memdev *cxlmd,
->> +					     enum cxl_partition_mode mode,
->> +					     resource_size_t alloc)
->> +{
->> +	struct cxl_endpoint_decoder *cxled __free(put_cxled) =
->> +				cxl_find_free_decoder(cxlmd);
->> +	struct device *cxled_dev;
->> +	int rc;
->> +
->> +	if (!IS_ALIGNED(alloc, SZ_256M))
->> +		return ERR_PTR(-EINVAL);
->> +
->> +	if (!cxled) {
->> +		rc = -ENODEV;
->> +		goto err;
->> +	}
->> +
->> +	rc = cxl_dpa_set_part(cxled, mode);
->> +	if (rc)
->> +		goto err;
->> +
->> +	rc = cxl_dpa_alloc(cxled, alloc);
->> +	if (rc)
->> +		goto err;
->> +
->> +	return cxled;
-> I was kind of expecting us to disable the put above wuth a return_ptr()
-> here.  If there is a reason why not, add a comment as it is not obvious
-> to me anyway!
+6b9fd8857b9fc:net/ipv4/tcp_input.c:3717: * resetting tlp_high_seq.
+Ref: TLP algorithm in draft-ietf-tcpm-rack
 
+6b9fd8857b9fc:net/ipv4/tcp_recovery.c:38:/* RACK loss detection (IETF
+draft draft-ietf-tcpm-rack-01):
 
-It seems I did a mess applying Dan's suggestions. You are right here and 
-the put not invoked.
-
-
->
->> +err:
->> +	put_device(cxled_dev);
-> It's not been assigned.  I'm surprised if none of the standard tooling
-> (sparse, smatch etc screamed about this one).
-> For complex series like this it's worth running them on each patch just to
-> avoid possible bot warnings later!
-
-
-This is bad, of course. I did not see it, and I realize now Dan's 
-changes make this harder to handle.
-
-I'll fix it.
-
-Thanks!
-
-
-
->
->> +	return ERR_PTR(rc);
->> +}
->> +EXPORT_SYMBOL_NS_GPL(cxl_request_dpa, "CXL");
-> __CXL_CXL_H__ */
->
+thanks,
+neal
 
