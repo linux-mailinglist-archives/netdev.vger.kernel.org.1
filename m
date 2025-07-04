@@ -1,173 +1,123 @@
-Return-Path: <netdev+bounces-204107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97E4BAF8F1D
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:51:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68022AF8F57
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 12:01:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E74661764FE
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:51:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25BF27A4BE0
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4C072EE604;
-	Fri,  4 Jul 2025 09:51:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B2D52877C7;
+	Fri,  4 Jul 2025 10:01:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hpiG6HzS"
+	dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="hD5BeEK/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx.ssi.bg (mx.ssi.bg [193.238.174.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3AF2ED85E
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 09:50:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014EC262A6;
+	Fri,  4 Jul 2025 10:00:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751622660; cv=none; b=C6ocuOch/yp/+FWBNsHo0XdmgiNZfMDHd4KM6DUWSZU4CcRGh0pl4Rfut1wWL3NFP4Osa+NvV+E4/FHBZOK4ueBNMitIxCfSuCCDupY+o0/8YcInrQ2QXw6S9LIRdrGcUICReBIZqE/THGDJTCrSvJo/YVGSDAe4wgrwK0vPAEU=
+	t=1751623262; cv=none; b=TBVPwyVozIJrpMsAWF0yXv8uCSxIs3vFGu6z+oKMtbJ5XNuX2BZjzknyrT0Bn5x2HrwuNgoWG6ga/n8mcsj/re4T0DzBN7o3ucUw+cwZ8PFbQUgb5zlEEYU7+saaemV9kTkKW4KyqTQbJ/uP+wT/Sc1lWGy/JEYt74E5LSZ0sKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751622660; c=relaxed/simple;
-	bh=Zec5aAtgje1saqg3959mi64eaXHhk/cKgvNvFwImF30=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RS+pomXtEG0jwlfd2Rp6jZQleUDhEBvmVV9wC21dTuCSjrrmBimh2E/cEoB44Sw14+yCaUmQVcy6rhttiEAgbdSdI1+dHtyg1nHOeKHR5RD5tQOop2qT3NMQSLfo6ILw9mk3TMHP49319ZZgzZ45AEGiqch2IPPb8l6R29K0TQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hpiG6HzS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751622657;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tTdyBwlWGAyaHdEmFmxeJ+/oXgj79IJdQhxBgmlSUqU=;
-	b=hpiG6HzSAhQ2OfLL0nfyN9Pfq1y34L1y4zmMYa7VmCbWT8CCi2Z57nUUnDZIJo0aV37uCl
-	iCUbozZJFe6MV9tHCycbEwi4oUVAaKNgAAVERZnYTmBLBJOIYpXbuV3vjM0U+h0FUprkoD
-	7gmdxjOImS8AXAORQxvLmeN2liYoeDs=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-286--GIEnf0VNaOfDLnbQMOu0g-1; Fri, 04 Jul 2025 05:50:55 -0400
-X-MC-Unique: -GIEnf0VNaOfDLnbQMOu0g-1
-X-Mimecast-MFC-AGG-ID: -GIEnf0VNaOfDLnbQMOu0g_1751622655
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ae3b2630529so51530266b.1
-        for <netdev@vger.kernel.org>; Fri, 04 Jul 2025 02:50:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751622655; x=1752227455;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tTdyBwlWGAyaHdEmFmxeJ+/oXgj79IJdQhxBgmlSUqU=;
-        b=PJWAzPjlcrW7klv9/FJU8IB47ZnPDDcLvMkYCOY5mIPSVJXQ4dzyqgxZjWwWFBsSUR
-         WtOhapsWCEy42Ychpj16E9pnQSsSdvrBFZlzCwrH22Uhu3bBCwcnm1ZD+PNCFfRidaQV
-         b8MxGDuaP5LTRByXZ3iQ7HQW+tshMkjoCVJ2FChCo9edJB3YBbJmTV8V7w7+30/ptjNa
-         Mhq8Ow2TFeYbFxjs2mqG9DL9F2fhpV0aPTuY3ktHVEN8jsf/bgTZEtl1FMIRi+oe1CWX
-         /S1j7o654KD8UKNV690zcxMGOV6+ovKPd+ma840mQrxEiDwXknWAf3nlqBdcfs3ttXNw
-         uZhg==
-X-Forwarded-Encrypted: i=1; AJvYcCVZnC5GM8mhqEcC8DH4QbQAaM6Zk+qUp35WccishCz9PEtLw2hPrrrAkLR4PB+gDwOKOHHVOUs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5xntLiDM/zd6u62Bx4F4y7fIG2WejJ/QNU7ONwOmuHmdId9tF
-	e4FujCdvofkj73R63AME7pP5xFyzAsDiRWnWVTv6FibaJ3HCIOqBOaZQcuI8cYOyR2Mc/pNzaC8
-	2+Jt1oG0GK+/xhJm0VfejdAXkudfjDdxRuRXpcc3EIZUnDj/vZ5IGeQTkIzBtq9EaneaP8U3l4H
-	9U91PCVvmGfuuTFmKeymqvA6Sa0Fa1IY6E
-X-Gm-Gg: ASbGncskXeRlSwIaoMGZcXBeyt6eQqvV63pwEieW0xHMtsNtHdLHo1HJ2dmgw8xB1C7
-	57qtTHGk81ES2vZ+05644u2z42tIxcrm++AFvOmO1Ai6rrlfs1gPRKwL7fzOBdoyXBNt9do8Fly
-	kzP5sQ
-X-Received: by 2002:a17:907:d0b:b0:ade:9b52:4da0 with SMTP id a640c23a62f3a-ae3fe791341mr118180166b.60.1751622654593;
-        Fri, 04 Jul 2025 02:50:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEZ6rmo441u00rCw39ALIYLXhXjrSJGPTmWEcD7E0TeZdIInSkqrp6WRoYHqk0yeiuf4JW6qAtpz5TNgnRXERw=
-X-Received: by 2002:a17:907:d0b:b0:ade:9b52:4da0 with SMTP id
- a640c23a62f3a-ae3fe791341mr118177466b.60.1751622654163; Fri, 04 Jul 2025
- 02:50:54 -0700 (PDT)
+	s=arc-20240116; t=1751623262; c=relaxed/simple;
+	bh=UDwLdN9+Ws+1t2BdqtB8v0310FnUQKl1SthOpC5EQhs=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=BWT5I5vDQjJGFHzrHn+6U6PsZiQvAEtzs3Gh8HDWk+OEu0N0iroJ5DY53Fs4XyioA8AwKbTQf6S/qkPOwRr4IJ2VZro6Yhhj+gPKtA62NzERtuByxJFfcP2G/QSpO7/uj8+VeGR2IUVWhSJie2bB2tqxjIljb+VHDdqVLZS9Zuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (4096-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=hD5BeEK/; arc=none smtp.client-ip=193.238.174.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mx.ssi.bg (localhost [127.0.0.1])
+	by mx.ssi.bg (Potsfix) with ESMTP id D59B323554;
+	Fri,  4 Jul 2025 12:53:06 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ssi.bg; h=cc:cc
+	:content-type:content-type:date:from:from:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=ssi;
+	 bh=CI21Vkd6rz8iL5QUwk0CI7L4tOktsE0+upPgppWiPgc=; b=hD5BeEK/Rn3H
+	iWAQ38MngKYxsD96rpyvcK6MHUgbtbw1cp+80nwsjBGLhTZiKT5KVKbtXBdZg76Z
+	yAFmrsden6bCwbnNcMVRXZk9Vd8dXtuum73fdpq+/ayXuNuYW/eKKqiNPFpL2Fdc
+	2hLVXB+7nSGSnuXsIvDIRUa7Q1Sb65rgj/KvTv9YrGtjzw3MRJybKcZtvsYoSEM4
+	myc6ou7HFHI791DIjV0uPFHOBU2ekW6v8A3W2OCi4BUd+UMxT2XqNMV1zh9w5YeB
+	CYlZpUZ9KiCD+7XZtpie2PJCnrDHJNAEcEuKgYQ6KqXnkD5yY9BGMC69utZtycOq
+	Ph47x3qI2cIIUXcX7+hQK3zxJJGj3DcG8ZsKyErG7lvoybNF/hB6Z4N9dLh9kAQ2
+	PLuvBwC7p59bXeH+0SmvgeWtmbHpdoIPX0e9AX+fWGg6jvJ9mQ4xpkie0wPrrU5G
+	w7/vZwnxf/xVnKlZNTaP4O+enRcvzVftRYLT87BtzvU+KSy9zcEfaOoKuZ4D6Eb5
+	cRFUXLnfQLDzRpf8lVCEaNaOQSSHjwtnP+41fUxZaqrk5zplVK3uiG1XFEieVV7l
+	/WZxqyVeGsJ4EITuJ6/kjfUXBRosqtjymV6BeL0tsE40TZ3QYlaTYWs+aMb/G2oS
+	o2mQEwKpRrhm/jkw5p2MpBsutjM5JVI=
+Received: from box.ssi.bg (box.ssi.bg [193.238.174.46])
+	by mx.ssi.bg (Potsfix) with ESMTPS;
+	Fri,  4 Jul 2025 12:53:06 +0300 (EEST)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by box.ssi.bg (Potsfix) with ESMTPSA id 1F7A264A13;
+	Fri,  4 Jul 2025 12:53:05 +0300 (EEST)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.18.1/8.18.1) with ESMTP id 5649qvsn007449;
+	Fri, 4 Jul 2025 12:52:57 +0300
+Date: Fri, 4 Jul 2025 12:52:57 +0300 (EEST)
+From: Julian Anastasov <ja@ssi.bg>
+To: WangYuli <wangyuli@uniontech.com>
+cc: Simon Horman <horms@verge.net.au>, pablo@netfilter.org,
+        kadlec@netfilter.org, netdev@vger.kernel.org,
+        lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, linux-kernel <linux-kernel@vger.kernel.org>,
+        zhanjun@uniontech.com, niecheng1@uniontech.com,
+        guanwentao@uniontech.com, wangyuli@cloudflare.getdeepin.org
+Subject: Re: [PATCH RESEND] ipvs: ip_vs_conn_expire_now: Rename del_timer in
+ comment
+In-Reply-To: <E5403EE80920424D+20250704083553.313144-1-wangyuli@uniontech.com>
+Message-ID: <3dbee3f4-8670-b72c-e5b0-3a108b5ded04@ssi.bg>
+References: <E5403EE80920424D+20250704083553.313144-1-wangyuli@uniontech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250701164507.14883-1-will@kernel.org>
-In-Reply-To: <20250701164507.14883-1-will@kernel.org>
-From: Lei Yang <leiyang@redhat.com>
-Date: Fri, 4 Jul 2025 17:50:16 +0800
-X-Gm-Features: Ac12FXwqxd82V3LOjpodDJwMF_q2dHh_J7JtDHMWUmQsDfy8ZtrC-XST6Mt-11Y
-Message-ID: <CAPpAL=zBxWBTQ8s-DGG-NywoE2+rDJQ4=9XGGn-YZSFH3R_mZg@mail.gmail.com>
-Subject: Re: [PATCH v2 0/8] vsock/virtio: SKB allocation improvements
-To: Will Deacon <will@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Keir Fraser <keirf@google.com>, 
-	Steven Moreland <smoreland@google.com>, Frederick Mayle <fmayle@google.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, netdev@vger.kernel.org, 
-	virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 
-I tested this series of patches with virtio-net regression tests,
-everything works fine.
 
-Tested-by: Lei Yang <leiyang@redhat.com>
+	Hello,
 
-On Wed, Jul 2, 2025 at 12:48=E2=80=AFAM Will Deacon <will@kernel.org> wrote=
-:
->
-> Hello again,
->
-> Here is version two of the patches I previously posted here:
->
->   https://lore.kernel.org/r/20250625131543.5155-1-will@kernel.org
->
-> Changes since v1 include:
->
->   * Remove virtio_vsock_alloc_skb_with_frags() and instead push decision
->     to allocate nonlinear SKBs into virtio_vsock_alloc_skb()
->
->   * Remove VIRTIO_VSOCK_DEFAULT_RX_BUF_SIZE and inline its definition
->     along with a comment
->
->   * Validate the length advertised by the packet header on the guest
->     receive path
->
->   * Minor tweaks to the commit messages and addition of stable tags
->
-> Thanks to Stefano for all the review feedback so far.
->
-> Cheers,
->
-> Will
->
-> Cc: Keir Fraser <keirf@google.com>
-> Cc: Steven Moreland <smoreland@google.com>
-> Cc: Frederick Mayle <fmayle@google.com>
-> Cc: Stefan Hajnoczi <stefanha@redhat.com>
-> Cc: Stefano Garzarella <sgarzare@redhat.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: "Eugenio P=C3=A9rez" <eperezma@redhat.com>
-> Cc: linux-kernel@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: virtualization@lists.linux.dev
->
-> --->8
->
-> Will Deacon (8):
->   vhost/vsock: Avoid allocating arbitrarily-sized SKBs
->   vsock/virtio: Validate length in packet header before skb_put()
->   vsock/virtio: Move length check to callers of
->     virtio_vsock_skb_rx_put()
->   vsock/virtio: Resize receive buffers so that each SKB fits in a page
->   vsock/virtio: Add vsock helper for linear SKB allocation
->   vhost/vsock: Allocate nonlinear SKBs for handling large receive
->     buffers
->   vsock/virtio: Rename virtio_vsock_skb_rx_put() to
->     virtio_vsock_skb_put()
->   vsock/virtio: Allocate nonlinear SKBs for handling large transmit
->     buffers
->
->  drivers/vhost/vsock.c                   | 15 +++++-----
->  include/linux/virtio_vsock.h            | 37 +++++++++++++++++++------
->  net/vmw_vsock/virtio_transport.c        | 25 +++++++++++++----
->  net/vmw_vsock/virtio_transport_common.c |  3 +-
->  4 files changed, 59 insertions(+), 21 deletions(-)
->
-> --
-> 2.50.0.727.gbf7dc18ff4-goog
->
->
+On Fri, 4 Jul 2025, WangYuli wrote:
+
+> Commit 8fa7292fee5c ("treewide: Switch/rename to timer_delete[_sync]()")
+> switched del_timer to timer_delete, but did not modify the comment for
+> ip_vs_conn_expire_now(). Now fix it.
+> 
+> Signed-off-by: WangYuli <wangyuli@uniontech.com>
+
+	Looks good to me for nf-next, thanks!
+
+Acked-by: Julian Anastasov <ja@ssi.bg>
+
+> ---
+>  net/netfilter/ipvs/ip_vs_conn.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/netfilter/ipvs/ip_vs_conn.c b/net/netfilter/ipvs/ip_vs_conn.c
+> index 44b2ad695c15..965f3c8e5089 100644
+> --- a/net/netfilter/ipvs/ip_vs_conn.c
+> +++ b/net/netfilter/ipvs/ip_vs_conn.c
+> @@ -926,7 +926,7 @@ static void ip_vs_conn_expire(struct timer_list *t)
+>  void ip_vs_conn_expire_now(struct ip_vs_conn *cp)
+>  {
+>  	/* Using mod_timer_pending will ensure the timer is not
+> -	 * modified after the final del_timer in ip_vs_conn_expire.
+> +	 * modified after the final timer_delete in ip_vs_conn_expire.
+>  	 */
+>  	if (timer_pending(&cp->timer) &&
+>  	    time_after(cp->timer.expires, jiffies))
+> -- 
+> 2.50.0
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
 
 
