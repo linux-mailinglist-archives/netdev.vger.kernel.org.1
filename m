@@ -1,325 +1,185 @@
-Return-Path: <netdev+bounces-204198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C606AF9786
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 18:01:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF732AF978D
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 18:06:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E45BB188573B
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 16:02:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0B59482C2D
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 16:05:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C8830E840;
-	Fri,  4 Jul 2025 16:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C18F315505;
+	Fri,  4 Jul 2025 16:05:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B1Mq8o8v"
+	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="Ka2p1dWk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2127.outbound.protection.outlook.com [40.107.236.127])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E372F315500;
-	Fri,  4 Jul 2025 16:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751644910; cv=none; b=m1Gmp7OFPM3+gi/bkUXMFWeFAjo89bv9q4AuNC6K2+vxqIhukf4lt4pr9qAgTnZTCFi0uoqZM6R+EGYpZw4VtiBd7zZ84SvVWkKJ4xc+rhOFl/9lqFCcsBuFiUsVlOwjf/U/ox4ZO4tBFHeaCpxu3YLRoywD2P3oq2wePCYppTg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751644910; c=relaxed/simple;
-	bh=xFrNvEzSsfmR8ztPcT4lu3I+QGbTuI8ogQhfDZjslbE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JpddCQUe3eremwYHVA1yv9AH++nxS3Dt2ygSwZhOlivwVtTmZ2fxWSt8ZLtuc9VPRIl845f+yVRykkxWf00WrZ6a0mMpP5wDZIlDUZwtUkN/RmzU975gVENErdkAI97KCeTRIf5j28FgS4Npmv2gPx7cd25cJt2EO/YSQgcNVks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B1Mq8o8v; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7399a2dc13fso1397632b3a.2;
-        Fri, 04 Jul 2025 09:01:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B1330B9B8
+	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 16:05:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.127
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751645157; cv=fail; b=N7vc/1ApRx8LDYqj/lXnlk/MAeFWUWqQxZXroSnQIydsFoYLGV6+x0dkY/ZEpPpyNm4fCJXctbKjtH7riAc5oU91fszdrb+GkPjc1Na5uDW3RP1A3hhWMKimGJvLpTCVEydq7BZ786Wzt4rRlr+nAJFwUYn1oUlNlstntgfckfk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751645157; c=relaxed/simple;
+	bh=wSJR8F6e/KamF2eGHdigmk3RNp0TGXJMit6smdybxz4=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=kCLqa+qcKQv8wbJteumPQyj6iLr/6wFFUoFJccSdXfxPZLwurJe4LdW5xKxGvi9EI2rbMgaqexyn4WJIAv1fXFU9FGjZxx0uiQ5LKbJ4yBx+uaH49VCYxTgY2GGnWxUUC0CLEOCTwoZQ1Y4WRyCGgqluJo+3KQlj/JVsRaLsOBw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com; spf=pass smtp.mailfrom=corigine.com; dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b=Ka2p1dWk; arc=fail smtp.client-ip=40.107.236.127
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=corigine.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Kg2JlLY0DhDTxf5VvrSRrq6l5HzPBhrQbVtmR7NGJxvrbTNz0oBvhx4DOoTZcKV8Agdv1ips3mSAScWOTbTpcgy02MmkrGPXy4roI8PjNz8mjQ3ZaNhD+ml5J3MhcMKGffvuEZFu7m9rINCFZp80imr1hIs2LCS3s133ZED9g/RWxahv6cdQ3KOh+hsv+74oLk2fvWuRsRY26mADSf1s7jo9stm6KNJfI6N7SOTSTFQiuE5h/aajeoJ9j3YFGSq3DfTZ6s23XRS3IvCHPEHTSu3yFppgh4AiZoAib26CRRbmZgNhnYNJN4clggxlAVw4BMXUTWWKChZ2cjDaGA3bdg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2FTAgtJnGSC6syXL1WR4ut3NCeaXPWT/wReg1+d4lpE=;
+ b=v1MIPE5DD3X0NFpAxB6CbwuCP+KazHFdNzcM0siYTfhZnXFjzRh4woE7LI87t0dWZAjCKVfu7KmzgMEavKEhqKdRdfsQRQ7m7fIw46FwGUskaL3Oo08x9cHv4BFBoYeRmAbSv3xBZbdS/yEzdmqrXB2gGvLD1+eJ7PyrTLJm55pzo/EdrSuEFvtK8sIjrNd/IBUSQeeZcoK+IX7fErjeaUpwPKurWzAHx270Rgj6UWghRNdz7nupzuY205EVBEP2ATwzn+ObENlGyGYO3Snlm+QTggEwca7y9MIeEWs9AIiqCeJ+yT2z61l76Sxb54XLyVxaK05p8EJ3t9TgQxomAw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751644908; x=1752249708; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vkWtbW0Yi1BNHQlSBu7xW8+PyJEJCNaJApFwDfAEaq8=;
-        b=B1Mq8o8vyuxO7tL7fSae/OcSRl/csxjfS1l0pwN1pPZMw6twspc8YU64PBJivdFZvP
-         CK23sZe5GWhO4p8YLE0xIARZjt3vfV8nOJSBO4od5Y4l+q97sraEtRunY4iOdvwA50ES
-         fWzkSm7pPfAEc4QkwXzWEMYpYrZhIq2zvlncJtv6YhwamPIzqQAVCewTUFOHlKQPjsjY
-         8cJqDB937Ge7tPVJvL4a4yEDSAVzwpvez1zbw2P20fn1e6isYuhqvpA7hCO3ZKvxe6SV
-         KwWuBOtVUJY9qJ/dy4V5Fm1V6nJ0nt5WGmM4sTG7vhs1CDEa+BswwFSb2SjUKk2V69zo
-         HzFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751644908; x=1752249708;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vkWtbW0Yi1BNHQlSBu7xW8+PyJEJCNaJApFwDfAEaq8=;
-        b=MFg6rCUVDqjeORnEk+NcI5lqvSHqanogyzkZ6wrHj8pJOO1zo+b2WCqO46C2+YTlB6
-         OaBiygcUmzpIxyXedURsQLQ4+fkNpPdj8ttiV/3WkwzaEQMSufjsmqmisDmGri5+P8FV
-         crgvKH8sd+u162pLvF9193ehKfVbMHwYb6QcQPsyqM2BIGL67M0/5x8Sxgta/tTMLB+r
-         ycgJPCqdsU87ij7uulf36yyw4hYOtKFMUx0E2HlRIuTwBXrhJTMmmxyDZm2hL8P/uL8S
-         Hx4SDzZuBZ7OAvcWGEVVVTlScTN8A6mDoxlE4j/MgO15FbdwmEOtb5kzOVf6+n0UoHCg
-         eaLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUd37N9nKXqdWlmQl4rm2/vHU0+pgRqxkS6NpSwtrU65VqMSlKOG+P4atTdoLCY+ezJWTbxfw0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymLIX/GWP1wSj8dZLVcJjxLSDqkjMxkR1ERLqZSCD5GCCZo52k
-	b4oTI2rLyp0RAlI7QElCsXFsDBD0ZjcMIhRvv1Cmy98zzJyiSFe/0KVN
-X-Gm-Gg: ASbGncvZoryw5BZ3kWL887+flpAaEg5je90O/GhMiiLOtrkrRKAh+uk8STMnFAiGIJ1
-	UYHh6aJtwhb8sGHZ7EAzWGwwwQJgO7IwUZC2SzmLSHEHBligJu88ifgD15pX98lgvwqYy2oaXgy
-	rf42LJZx4PrLXPXHW68MsD7NKZlvy+gDGXnuvzWRdASqG7uCLY5GyoXM54PijWsC4Xb4rHXLfd3
-	016MogWKkQhbjbmvp7xpVykg6pir7NYLAfcD3ENES+EorgkTsjlvf0Qu9/6XcGXJgbTzajYXyuH
-	CgvreADg17eXIcxPENx/9CFtIV/plOH860boimsJ3C8a/3dJ1NRkwIpzF2uYECtYdxh5809X58x
-	0jZP2rZCahEYHCVS7RVPuhA==
-X-Google-Smtp-Source: AGHT+IGGOvhe3ZZoxXZbQS/mXIxZPF6K70FXNij0vBW95ftv6BX5rzZAzt/gWObiLl4Bha7HuhW/jA==
-X-Received: by 2002:a05:6a00:986:b0:748:3385:a4a with SMTP id d2e1a72fcca58-74ce66d56c3mr4312596b3a.23.1751644907544;
-        Fri, 04 Jul 2025 09:01:47 -0700 (PDT)
-Received: from KERNELXING-MC1.tencent.com ([111.201.26.0])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b38ee5f0eeasm2344816a12.46.2025.07.04.09.01.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jul 2025 09:01:47 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	sdf@fomichev.me,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	joe@dama.to,
-	willemdebruijn.kernel@gmail.com
-Cc: bpf@vger.kernel.org,
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2FTAgtJnGSC6syXL1WR4ut3NCeaXPWT/wReg1+d4lpE=;
+ b=Ka2p1dWkUU0nCcgGnp2vJfQkW8tLf+MwoWo6F3LEFxQMs+RuzLKn2vAiSQENGdKxBtA4xshZ6Def+01sbJMLCpkkpy1VwlagI4gxBTqjiRAroNPbEn4EGU1kS2kYm/p6XAuTsf5UZlj6KAcBzCi3528On/+VsFAf86kG9fQd3jA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
+ by BN0PR13MB4582.namprd13.prod.outlook.com (2603:10b6:408:117::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.20; Fri, 4 Jul
+ 2025 16:05:51 +0000
+Received: from BL0PR13MB4403.namprd13.prod.outlook.com
+ ([fe80::bbcb:1c13:7639:bdc0]) by BL0PR13MB4403.namprd13.prod.outlook.com
+ ([fe80::bbcb:1c13:7639:bdc0%5]) with mapi id 15.20.8857.026; Fri, 4 Jul 2025
+ 16:05:51 +0000
+From: Louis Peens <louis.peens@corigine.com>
+To: David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>,
 	netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v8] net: xsk: introduce XDP_MAX_TX_SKB_BUDGET setsockopt
-Date: Sat,  5 Jul 2025 00:01:38 +0800
-Message-Id: <20250704160138.48677-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+	oss-drivers@corigine.com
+Subject: [net-next] MAINTAINERS: remove myself as netronome maintainer
+Date: Fri,  4 Jul 2025 18:05:34 +0200
+Message-ID: <20250704160534.32217-1-louis.peens@corigine.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: JNAP275CA0034.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4d::11)
+ To BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL0PR13MB4403:EE_|BN0PR13MB4582:EE_
+X-MS-Office365-Filtering-Correlation-Id: a5954c5a-fd8c-42bd-6dd8-08ddbb14a57b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|52116014|366016|1800799024|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?JjUVYRJtTmx02YQ01M0fk0AJ7SJh9KL/eoOVNlsej0eL9pIggHDCKbIo/Oxw?=
+ =?us-ascii?Q?zyT4acGyZCUNKmVQte6Aowssf+xlialxYwAYAPGZ/emhadyWAzU7Nlsffa3m?=
+ =?us-ascii?Q?wWhC6bh9pzS2cLY/sPfaCNnT6oZMe6Fwp3V5ALiMImyyjgPk2t21PTgHNGbP?=
+ =?us-ascii?Q?G3l4bczAWZM10k+5RJ8sSTZQR0BbtVE/6iwfAIDycTCfwvjNA4K/oYHLP5XQ?=
+ =?us-ascii?Q?tclnIXbOH6ldjG85tjyVC2/SMdoOY3j0MoH1+bFpAmp8Zmww+gnqBlsFr3uM?=
+ =?us-ascii?Q?DiDhlPRRwA8OWkx2mZqZgVLrdd4mjBmHhTaFm4H08ES6NZJBEyuV2pk4UHLi?=
+ =?us-ascii?Q?7X8BRBfIfUwGVmSnS7BQX0cf7Rwf8zSuDhwJ2SfSnNDpK8Q+SD5IVn1Z/7+r?=
+ =?us-ascii?Q?6XHsNByO+vcAAhUco3D2/aw2VLZwPxdN+vxYeKX2YPuckOBJtDOjf2sAGOn7?=
+ =?us-ascii?Q?AjC9IQOti57iQVSr0QEjnSU1lGdWiNCkFemwHDFSPKaWU9E5ZkOeXivO72kq?=
+ =?us-ascii?Q?Yiza9EjHDMv0phwOXtQ3pidfCWMPCzzTykmyX0iCc8ZL4/9ktzb+T3LJADOv?=
+ =?us-ascii?Q?8/S7vW1rQc4rpZoV6I6Ymw2N7BXJMAhxGOumGy+WX5YnF+qF8FeLuAcE51sa?=
+ =?us-ascii?Q?c6p1AUqYO2DfuKhiuLWc11S/y5HIHsuJqFQOFa9Bth+h2e3kIJ18Zl9BQZzs?=
+ =?us-ascii?Q?KxhSeB04FIpJg+YOkarJ50907Ty8u7u8p7B2Doejwy/s5aobrRjSoN6Mo8R7?=
+ =?us-ascii?Q?DhBzmyb4aIPCrKfI7vpP6UssUFiXftWMTY7ZqLiNa0K0ybHoqaEO9RKfT7ky?=
+ =?us-ascii?Q?mGbMCxLb/z3BtbA6H2h8IdCwA082H5h4p/VNRmE2Nq5ZFRBuqNj5FjYROCfJ?=
+ =?us-ascii?Q?r9j63oKvhOSsnCJCB5X/IRNQInU5DQ7ALwU3nZckNKGbdq3PuluQF47loimC?=
+ =?us-ascii?Q?H8/eDk3AuTfMmUhnRH0GJd/qkz2/avfmaQjp04iT58az6qzWG2YqAmxEPoYC?=
+ =?us-ascii?Q?x2xqPaJrunkQ2z6duaHYf6rBf9HYqk50s/4UbdW5I6eXZSMsLkW0mNfhczZe?=
+ =?us-ascii?Q?g2RzaLiS9evhyrZmVld60SerXsJ6bcZNG5lMEAi28waDCxoTeZ66ucnfJpXO?=
+ =?us-ascii?Q?qSq5BEh6umfUJu6bLtBACufepFsO+0lrD3l1p5Ti9yKP9f4nkuWsxNPWg9TA?=
+ =?us-ascii?Q?COLzH0uSFuri21FzQQRD42Yntz70ZnfFZY0tu39P6HcVsheC9kqhubRqY8aO?=
+ =?us-ascii?Q?z/Ub/8cMhcdiPJgijQ/KiKg9dcfRHTpuILuHsUG/Mh6ubcCQH6/TXbI9fneE?=
+ =?us-ascii?Q?L3z+rMfeMWWhKw6GWxquwPDLVtUCrcVsQQ2IQpo3Ue6kbfCesSsDFfzBDwIu?=
+ =?us-ascii?Q?QqJAt750dykeyG+36BgmKTgiSckwo2GNKMbRLas/QMdRaCS5kDnQ7PXScmUd?=
+ =?us-ascii?Q?vifh3NsbrOOd7Q6DzEmMMvDs5RGTwFyYZ7LChF5ZoQTCMd4MdC61fw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR13MB4403.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(52116014)(366016)(1800799024)(38350700014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?6tA/OgjuK9yJUUcoEGu//FseIWL0cx3kruB+ozrqVpqTVKIs4+xwsL4HuEk8?=
+ =?us-ascii?Q?hYPeb5DMMay72iIC6ToRjozPv0/xulaTAOKYOpcCgQupPMK9HGUSX6E3fk+l?=
+ =?us-ascii?Q?C2+BlusxPR8zT+tWZ1cWg3aACbkB8ymDAw+2clkCpvI6E4Jg4Q/te9fv2LMT?=
+ =?us-ascii?Q?hOb8uXmFgM4vLxcv0tJFhnt+da0V6CDO8rq4Ls0/oP+oNcuA+JktswqlpdP9?=
+ =?us-ascii?Q?YA/859rELsJyERaTYrVPB9ZLw87n4Yol70QIp0eTTSu8Sx9AHUa10mjBJfuF?=
+ =?us-ascii?Q?H7Pt/n52ZuRCnKZmn4wVEgrsSOnVv9nvg60uNBPqvDFhHC9ZJbZ3ExHTQmQ5?=
+ =?us-ascii?Q?NIEWVgzKdn/UNoGUE8FjD3aUQOfSJqZOgKVM+uVZUk0Jq6cUShW23V0ULoOv?=
+ =?us-ascii?Q?uSThRvL27N+FuNZK7SpQo0yBw33f9PEz8WzsR7JektD0cUFoA618m6DRzCW6?=
+ =?us-ascii?Q?yAaTW0cXYKrT2H4qo4z+ubui0dxrwtRH4vWRcIoHjRx7aYbs/5UhziN9tZvV?=
+ =?us-ascii?Q?mZMLwzzO5fbAOWwrsBgPQmLfcQzl2nN3um7nZjXo6Ivg4dEf4QrE/tBC6fvh?=
+ =?us-ascii?Q?/LAci4fKCFrZ3O37eyCKCe/F3R37QC7Moc3QQwUmQMgN9dTe1ncVXPKtbVoT?=
+ =?us-ascii?Q?RHmD+8uHqifi3wkBn5+PDK04y3ORpWLdxSjHwk1prfQBreJCK8BUvXC9oeSh?=
+ =?us-ascii?Q?y2UBwqtjdTaaDDKqDfksEzFcaEXmEXe95lLwW9ez7crj/a/OGq4gFSI9sR2w?=
+ =?us-ascii?Q?ykTyvZPKJxhaehId65XkBO9I5VrTmfPQrIWDEjjyUemnW9a7Z56PeL9oZdbl?=
+ =?us-ascii?Q?0isn7uTsPH3moVbfJ32/7M+iFx+IfpNbczW/KJRRhymUe+WWlH8ULb1RXJYa?=
+ =?us-ascii?Q?hqw9RclF1Rq81wrvs+iXS7cDoxLuztwxwREhMlcL84Gapjmy8uBSp7el+Ylj?=
+ =?us-ascii?Q?QuDfUtkzy6pb/3vdoE9Vrrc3FyaNH3+yCwoU9sLyQ0B8vuWptHPVtEwYtcrX?=
+ =?us-ascii?Q?wDMjd9JzH22VdvF6YwVKBQLIH9f+DKwaaXc2BZqBjtGW6AiLhrp3TECt+vfZ?=
+ =?us-ascii?Q?Cnzow8iKvpqWDcJpB65DtHfL3aNpODhNmxuMVUg59dnNoYuafv53HoPohm0S?=
+ =?us-ascii?Q?TnKscij19ZwVPlMPEbN/tQCqQ5LsiYdLLWXfvRB0xGfcYlQbt6sUAtNbva0X?=
+ =?us-ascii?Q?31x5Rj23kHLbiu+KXhubT4KlE93OMDbSijKM2ZoOKIfm6sqL8sTwQ9ESQ9eZ?=
+ =?us-ascii?Q?SpjUwk1ptFdl9LgbjE6LIH+pfEDSHVUnEFyfuKhH6ce0RmGFK41608MuKuVC?=
+ =?us-ascii?Q?byA5I2Mu+8aY4UtBkrVP0tQUFIXQ8E63BnZr02chufETuXCWAf3CBhwCQ0Cx?=
+ =?us-ascii?Q?QpwJ7910dM9opiucOFmHDySC+xYv4P7pd3//3imj46HiebciQHtRl9Bm2H92?=
+ =?us-ascii?Q?ounof2Zh7x670pc+OF/jWOUOL6yXpyN0AUwe8wJWKUPVmib9lFQVfDt2/Q9U?=
+ =?us-ascii?Q?rsRK3yvnX6osNcuiQZpYm+Yqtie2kVltUN0I9EzFAOop/QjRNV2j8v+Nc8AG?=
+ =?us-ascii?Q?8cEWCgtMnX2FiiudWSdDmD7cfKxd9qcBpDFenJu6BZy4hTTT5xeRvR4CK0Wq?=
+ =?us-ascii?Q?wA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a5954c5a-fd8c-42bd-6dd8-08ddbb14a57b
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR13MB4403.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2025 16:05:51.0540
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OrDbhIIfSmrINvKhbca9A6gszAX37/3xewEVpAGhfgD1d6yaeKr734fetQr6RHIkxs2z4j/oIurMaPygMS5qQTr8oXQTWcyqfg58FIHQOSc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR13MB4582
 
-From: Jason Xing <kernelxing@tencent.com>
+I am moving on from Corigine to different things, for the moment
+slightly removed from kernel development. Right now there is nobody I
+can in good conscience recommend to take over the maintainer role, so
+also mark the netronome driver as orphaned.
 
-This patch provides a setsockopt method to let applications leverage to
-adjust how many descs to be handled at most in one send syscall. It
-mitigates the situation where the default value (32) that is too small
-leads to higher frequency of triggering send syscall.
-
-Considering the prosperity/complexity the applications have, there is no
-absolutely ideal suggestion fitting all cases. So keep 32 as its default
-value like before.
-
-The patch does the following things:
-- Add XDP_MAX_TX_SKB_BUDGET socket option.
-- Set max_tx_budget to 32 by default in the initialization phase as a
-  per-socket granular control.
-- Set the range of max_tx_budget as [32, xs->tx->nentries].
-
-The idea behind this comes out of real workloads in production. We use a
-user-level stack with xsk support to accelerate sending packets and
-minimize triggering syscalls. When the packets are aggregated, it's not
-hard to hit the upper bound (namely, 32). The moment user-space stack
-fetches the -EAGAIN error number passed from sendto(), it will loop to try
-again until all the expected descs from tx ring are sent out to the driver.
-Enlarging the XDP_MAX_TX_SKB_BUDGET value contributes to less frequency of
-sendto() and higher throughput/PPS.
-
-Here is what I did in production, along with some numbers as follows:
-For one application I saw lately, I suggested using 128 as max_tx_budget
-because I saw two limitations without changing any default configuration:
-1) XDP_MAX_TX_SKB_BUDGET, 2) socket sndbuf which is 212992 decided by
-net.core.wmem_default. As to XDP_MAX_TX_SKB_BUDGET, the scenario behind
-this was I counted how many descs are transmitted to the driver at one
-time of sendto() based on [1] patch and then I calculated the
-possibility of hitting the upper bound. Finally I chose 128 as a
-suitable value because 1) it covers most of the cases, 2) a higher
-number would not bring evident results. After twisting the parameters,
-a stable improvement of around 4% for both PPS and throughput and less
-resources consumption were found to be observed by strace -c -p xxx:
-1) %time was decreased by 7.8%
-2) error counter was decreased from 18367 to 572
-
-[1]: https://lore.kernel.org/all/20250619093641.70700-1-kerneljasonxing@gmail.com/
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
-Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Signed-off-by: Louis Peens <louis.peens@corigine.com>
 ---
-v8
-Link: https://lore.kernel.org/all/20250703145045.58271-1-kerneljasonxing@gmail.com/
-1. fix Kdoc issue
-2. avoid breaking RCT
-3. add acked-by tag
+ MAINTAINERS | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-v7
-Link: https://lore.kernel.org/all/20250627110121.73228-1-kerneljasonxing@gmail.com/
-1. use 'copy mode' in Doc
-2. move init of max_tx_budget to a proper position
-3. use the max value in the if condition in setsockopt
-4. change sockopt name to XDP_MAX_TX_SKB_BUDGET
-5. set MAX_PER_SOCKET_BUDGET to 32 instead of TX_BATCH_SIZE because they
-   have no correlation at all.
-
-v6
-Link: https://lore.kernel.org/all/20250625123527.98209-1-kerneljasonxing@gmail.com/
-1. use [32, xs->tx->nentries] range
-2. Since setsockopt may generate a different value, add getsockopt to help
-   application know what value takes effect finally.
-
-v5
-Link: https://lore.kernel.org/all/20250623021345.69211-1-kerneljasonxing@gmail.com/
-1. remove changes around zc mode
-
-v4
-Link: https://lore.kernel.org/all/20250619090440.65509-1-kerneljasonxing@gmail.com/
-1. remove getsockopt as it seems no real use case.
-2. adjust the position of max_tx_budget to make sure it stays with other
-read-most fields in one cacheline.
-3. set one as the lower bound of max_tx_budget
-4. add more descriptions/performance data in Doucmentation and commit message.
-
-V3
-Link: https://lore.kernel.org/all/20250618065553.96822-1-kerneljasonxing@gmail.com/
-1. use a per-socket control (suggested by Stanislav)
-2. unify both definitions into one
-3. support setsockopt and getsockopt
-4. add more description in commit message
-
-V2
-Link: https://lore.kernel.org/all/20250617002236.30557-1-kerneljasonxing@gmail.com/
-1. use a per-netns sysctl knob
-2. use sysctl_xsk_max_tx_budget to unify both definitions.
----
- Documentation/networking/af_xdp.rst |  9 +++++++++
- include/net/xdp_sock.h              |  1 +
- include/uapi/linux/if_xdp.h         |  1 +
- net/xdp/xsk.c                       | 21 +++++++++++++++++++--
- tools/include/uapi/linux/if_xdp.h   |  1 +
- 5 files changed, 31 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/networking/af_xdp.rst b/Documentation/networking/af_xdp.rst
-index dceeb0d763aa..64d8741717c0 100644
---- a/Documentation/networking/af_xdp.rst
-+++ b/Documentation/networking/af_xdp.rst
-@@ -442,6 +442,15 @@ is created by a privileged process and passed to a non-privileged one.
- Once the option is set, kernel will refuse attempts to bind that socket
- to a different interface.  Updating the value requires CAP_NET_RAW.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 14196433aa87..1b8a856536e7 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -17227,10 +17227,9 @@ F:	drivers/rtc/rtc-ntxec.c
+ F:	include/linux/mfd/ntxec.h
  
-+XDP_MAX_TX_SKB_BUDGET setsockopt
-+--------------------------------
-+
-+This setsockopt sets the maximum number of descriptors that can be handled
-+and passed to the driver at one send syscall. It is applied in the copy
-+mode to allow application to tune the per-socket maximum iteration for
-+better throughput and less frequency of send syscall.
-+Allowed range is [32, xs->tx->nentries].
-+
- XDP_STATISTICS getsockopt
- -------------------------
+ NETRONOME ETHERNET DRIVERS
+-M:	Louis Peens <louis.peens@corigine.com>
+ R:	Jakub Kicinski <kuba@kernel.org>
+ L:	oss-drivers@corigine.com
+-S:	Maintained
++S:	Orphan
+ F:	drivers/net/ethernet/netronome/
  
-diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-index e8bd6ddb7b12..ce587a225661 100644
---- a/include/net/xdp_sock.h
-+++ b/include/net/xdp_sock.h
-@@ -84,6 +84,7 @@ struct xdp_sock {
- 	struct list_head map_list;
- 	/* Protects map_list */
- 	spinlock_t map_list_lock;
-+	u32 max_tx_budget;
- 	/* Protects multiple processes in the control path */
- 	struct mutex mutex;
- 	struct xsk_queue *fq_tmp; /* Only as tmp storage before bind */
-diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xdp.h
-index 44f2bb93e7e6..23a062781468 100644
---- a/include/uapi/linux/if_xdp.h
-+++ b/include/uapi/linux/if_xdp.h
-@@ -79,6 +79,7 @@ struct xdp_mmap_offsets {
- #define XDP_UMEM_COMPLETION_RING	6
- #define XDP_STATISTICS			7
- #define XDP_OPTIONS			8
-+#define XDP_MAX_TX_SKB_BUDGET		9
- 
- struct xdp_umem_reg {
- 	__u64 addr; /* Start of packet data area */
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 72c000c0ae5f..5165dd2bb8e4 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -34,7 +34,7 @@
- #include "xsk.h"
- 
- #define TX_BATCH_SIZE 32
--#define MAX_PER_SOCKET_BUDGET (TX_BATCH_SIZE)
-+#define MAX_PER_SOCKET_BUDGET 32
- 
- void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool)
- {
-@@ -779,10 +779,10 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- static int __xsk_generic_xmit(struct sock *sk)
- {
- 	struct xdp_sock *xs = xdp_sk(sk);
--	u32 max_batch = TX_BATCH_SIZE;
- 	bool sent_frame = false;
- 	struct xdp_desc desc;
- 	struct sk_buff *skb;
-+	u32 max_batch;
- 	int err = 0;
- 
- 	mutex_lock(&xs->mutex);
-@@ -796,6 +796,7 @@ static int __xsk_generic_xmit(struct sock *sk)
- 	if (xs->queue_id >= xs->dev->real_num_tx_queues)
- 		goto out;
- 
-+	max_batch = READ_ONCE(xs->max_tx_budget);
- 	while (xskq_cons_peek_desc(xs->tx, &desc, xs->pool)) {
- 		if (max_batch-- == 0) {
- 			err = -EAGAIN;
-@@ -1437,6 +1438,21 @@ static int xsk_setsockopt(struct socket *sock, int level, int optname,
- 		mutex_unlock(&xs->mutex);
- 		return err;
- 	}
-+	case XDP_MAX_TX_SKB_BUDGET:
-+	{
-+		unsigned int budget;
-+
-+		if (optlen != sizeof(budget))
-+			return -EINVAL;
-+		if (copy_from_sockptr(&budget, optval, sizeof(budget)))
-+			return -EFAULT;
-+		if (!xs->tx ||
-+		    budget < TX_BATCH_SIZE || budget > xs->tx->nentries)
-+			return -EACCES;
-+
-+		WRITE_ONCE(xs->max_tx_budget, budget);
-+		return 0;
-+	}
- 	default:
- 		break;
- 	}
-@@ -1734,6 +1750,7 @@ static int xsk_create(struct net *net, struct socket *sock, int protocol,
- 
- 	xs = xdp_sk(sk);
- 	xs->state = XSK_READY;
-+	xs->max_tx_budget = TX_BATCH_SIZE;
- 	mutex_init(&xs->mutex);
- 
- 	INIT_LIST_HEAD(&xs->map_list);
-diff --git a/tools/include/uapi/linux/if_xdp.h b/tools/include/uapi/linux/if_xdp.h
-index 44f2bb93e7e6..23a062781468 100644
---- a/tools/include/uapi/linux/if_xdp.h
-+++ b/tools/include/uapi/linux/if_xdp.h
-@@ -79,6 +79,7 @@ struct xdp_mmap_offsets {
- #define XDP_UMEM_COMPLETION_RING	6
- #define XDP_STATISTICS			7
- #define XDP_OPTIONS			8
-+#define XDP_MAX_TX_SKB_BUDGET		9
- 
- struct xdp_umem_reg {
- 	__u64 addr; /* Start of packet data area */
+ NETWORK BLOCK DEVICE (NBD)
 -- 
-2.41.3
+2.43.0
 
 
