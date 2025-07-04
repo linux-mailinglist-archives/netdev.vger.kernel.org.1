@@ -1,118 +1,124 @@
-Return-Path: <netdev+bounces-204030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47E45AF8803
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 08:28:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D5F3AF880B
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 08:32:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E84406E47D8
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 06:28:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04C981C4745A
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 06:33:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 035DC256C84;
-	Fri,  4 Jul 2025 06:28:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB7325F989;
+	Fri,  4 Jul 2025 06:32:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="QecQ2JOR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Gwra00Ve"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E374C2561DD;
-	Fri,  4 Jul 2025 06:28:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613E925A2C8
+	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 06:32:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751610504; cv=none; b=qoXoGnxBxr2TZdE028yWHiPXf4dkZkYtpJYcFjjKy7iILYU+pNpYNz1Xh9ymKrEVW0WDVSc+i1sKh6rvk5+YT0u55JewehSq+Fpof5gDMs0WuagkkMo9yCUgnsVqbKJ2/gce+1g37us4HGXCtii6BcWzvPDkkP3IewIOovpI8sU=
+	t=1751610760; cv=none; b=FieDk5xELjMdOqlHm+mkph0EaqkHpQlXUyjaohPXixC3zRfWLGVvDB6wQV6qFb0ojbShRjxzuLmAp6ajfZQsvfXoxvCwkYA8UARicC/a2peHbFnO32qNPGBtpL5SGs8fPO1Q+7gp6fcosi8EWA9rG/vBahs2XsDgoc/RuCkvqD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751610504; c=relaxed/simple;
-	bh=Q9RYV6cUqTbv8CavUxMur1RSdGmZWCvmLmbWwv5pBfs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=tve5kMV1UeoLYDljbSqu8qIU7B/+LFU7Urce+b4w4Y7NiZ7M3NfdPSV97RlFerlVuS9KIDERFEm7IQ80CgMKaE/7UOvxXVNixoThxzltMX5dP6Hi44ZwpVJjs55z03ZKm0NsaSV6VkcMEclJtsDFZJ0buSg2bQmtJr5eJ2p0e8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=QecQ2JOR; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1751610470;
-	bh=2mhIUNlzWyrqyhDrKkHAaaSs0j4eeeqr+64tc/45pno=;
-	h=Date:From:To:Cc:Subject:From;
-	b=QecQ2JORotwtJZQ46D1I9hh1OvbUXTWllflzf5d3djnIcWSowLC35o5aO5yChMUQh
-	 KFzjEZGoQ0ev5tHXJAVu203oG+UYo2MjQt0jjROth6eH+1NOn5wShAaFUGcU3oV/cu
-	 YboiqE3Usogzuh/uNEbPNm+vXgDR+gdDYDRcgatLZA7hGlGUfNr9nKvyxRgH5nd2NG
-	 ECMVbwZizVid8bWduTye/ENCQz1ismzm/3bl6PWOZqH7i+hdb+9o7sf59FaJRvrRly
-	 I4ZdMPz5j9AfpuX3vRT3B9NjIhiz2Ds/xFzlv0RwdVpOChvYmi/+fqoSAz7uOCSksZ
-	 jTBmm0Xh7Aehw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bYNwj5VdXz4wcy;
-	Fri,  4 Jul 2025 16:27:49 +1000 (AEST)
-Date: Fri, 4 Jul 2025 16:28:17 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>,
- "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>
-Cc: Anna-Maria Behnsen <anna-maria@linutronix.de>, Networking
- <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the tip tree with the net-next tree
-Message-ID: <20250704162817.14314a06@canb.auug.org.au>
+	s=arc-20240116; t=1751610760; c=relaxed/simple;
+	bh=bW38HoOG8BJ8/lcEADwqe31KzLD4Xuz2XljmttWHZwY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nXqW+Wy+BPvd8HflSqKHHuIqvAcCKisLuKDHSEKb3ewtkU10UYAGFh01ma4YkgiGxhv1esSSxCz/248TYKZpxJ32OgDterEvmWKJfP3Ypu4CMs9mZNVDLA5XwqeOMZ5RmQVAUvoEDPfunZDMt1nQlwPdWNALTa+T/Jtng0tBX1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Gwra00Ve; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-23636167afeso6739345ad.3
+        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 23:32:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751610757; x=1752215557; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bW38HoOG8BJ8/lcEADwqe31KzLD4Xuz2XljmttWHZwY=;
+        b=Gwra00Ve2WpbFkfA3MHjfRAb+2hYV0wcKLZxGedQOLR0sInb7pKV2CAQ/e0zGJI9EF
+         swPykQfUKBsF2RO6c7aIzjQ6IlybgmBUik0U5KJxvkt1ivJnbdhi5Xzqie23H1gNupqW
+         Gnx+ciMvchigN5R2IFq35CsinRUVFV+Z8mFFlTdxXv7oRaY/xyf+nGEwyR9aHTBnjoOL
+         iRGl0IfimuHwft36xJqbrXzbrobgQsAvMSXKSpYywZ/uokE5jR443r47fD3g8JTNz9Dm
+         rRNUiiZ32ejfa5DEbDeRhi+pZyb5U7YjKItQ40gKC0t4cakA7Ec+1IYPd8vHXeB4EdQH
+         bH0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751610757; x=1752215557;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bW38HoOG8BJ8/lcEADwqe31KzLD4Xuz2XljmttWHZwY=;
+        b=NDCwxq8xUyyuIxyl3r3JX7xZ6FnsS/ErKIGPpkxrGtbNpBdsIALuI2QvySPbfvaKyj
+         crf3LVR2UGNaXT1H0pkE/gGDyrKlamS3ERwqOeG/4tY8JVEChjgmCDG/nCtYm61Qq3sQ
+         p/zG4234TgC1zVdyozPF4fPa2vDN4SRHsI0W86m+yRvHEfUjxLbm54srDDMD21gKW1Wl
+         EVrqF1vIB0YKx9pjZS6O04YbkY8BESRhGod2+Hl0NWHV1ilOmL4pnzycN3vwK50QoS5D
+         2amkcYsF1aVYOLdnY+xnk/kLztEQ0kJ46o14EdISfLgdgL8g5VYSH08b7774YMviNUAO
+         MbLw==
+X-Forwarded-Encrypted: i=1; AJvYcCU8Cpqeqmnuv9iPHyD6ERMxmDJ6cnCLGuD4H/wC0VLYV3gdXzlG3S5l+zAG0gPhsqjGZZh0pwo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUb56naaIIVqRav/FnslmGf0AwVDTb9tqRs2yOXvwjZUk4Rv+x
+	jqrRHO66jxnL1jTzk6pEpD3Co4JTSUzE5l3SiR7eRadh7S7Ym1X9iNQQz/yh6e2Vkm/87yDJaAM
+	VPcvDngpVR+1+Pscs1jROZ+vamT84BroYe3AjLJAi
+X-Gm-Gg: ASbGncvGpAUQ0M0fvI4YzN/+tWMFmH5owTceYgh7EBw7VpnU6JwkS0CS7rYxPrKikoU
+	iZ07MgFIVyQvSuK1tl9zGbrwhHNeOisxPNNngStBkj3I4fMCdeIxPTpyF5ncqaktwM+Tvaz9532
+	rOrvxgAxGjB2XC5JzSmuLYQ9bH8nUpxtLFNytkTeJEKFd00jzzbZRAl9tUCSQ5pmnE2hve8jJ8/
+	Q==
+X-Google-Smtp-Source: AGHT+IFlijuScf5GueouIoSdy88ZOExg3BGfGXdnU6iWiUuGJdQ2+xVWlfMMrPj+fBM2GhpLJI1c/WPx7/X7ynDsFLM=
+X-Received: by 2002:a17:90b:3c0c:b0:312:2bb:aa89 with SMTP id
+ 98e67ed59e1d1-31aadda369bmr1398712a91.20.1751610757304; Thu, 03 Jul 2025
+ 23:32:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/AhwB/cwOZfTpwguigflw+lM";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-
---Sig_/AhwB/cwOZfTpwguigflw+lM
-Content-Type: text/plain; charset=US-ASCII
+References: <20250703222314.309967-1-aleksandr.mikhalitsyn@canonical.com> <20250703222314.309967-2-aleksandr.mikhalitsyn@canonical.com>
+In-Reply-To: <20250703222314.309967-2-aleksandr.mikhalitsyn@canonical.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Thu, 3 Jul 2025 23:32:25 -0700
+X-Gm-Features: Ac12FXzzwNLoSRxnyRclSXtaCVD4LfgoskTv8fLUOj3llCpKrCJ4FQuvzqJiyKw
+Message-ID: <CAAVpQUB9UMXorFPUKV969NQHont6EM2RYz3xUmT-nNqVATmTFw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 1/7] af_unix: rework unix_maybe_add_creds() to
+ allow sleep
+To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Leon Romanovsky <leon@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Christian Brauner <brauner@kernel.org>, 
+	Lennart Poettering <mzxreary@0pointer.de>, Luca Boccassi <bluca@debian.org>, 
+	David Rheinsberg <david@readahead.eu>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On Thu, Jul 3, 2025 at 3:23=E2=80=AFPM Alexander Mikhalitsyn
+<aleksandr.mikhalitsyn@canonical.com> wrote:
+>
+> As a preparation for the next patches we need to allow sleeping
+> in unix_maybe_add_creds() and also return err. Currently, we can't do
+> that as unix_maybe_add_creds() is being called under unix_state_lock().
+> There is no need for this, really. So let's move call sites of
+> this helper a bit and do necessary function signature changes.
+>
+> Cc: linux-kernel@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Simon Horman <horms@kernel.org>
+> Cc: Leon Romanovsky <leon@kernel.org>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Christian Brauner <brauner@kernel.org>
+> Cc: Kuniyuki Iwashima <kuniyu@google.com>
+> Cc: Lennart Poettering <mzxreary@0pointer.de>
+> Cc: Luca Boccassi <bluca@debian.org>
+> Cc: David Rheinsberg <david@readahead.eu>
+> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com=
+>
+> Reviewed-by: Christian Brauner <brauner@kernel.org>
 
-Today's linux-next merge of the tip tree got a conflict in:
-
-  kernel/time/timekeeping.c
-
-between commit:
-
-  5b605dbee07d ("timekeeping: Provide ktime_get_clock_ts64()")
-
-from the net-next tree and commit:
-
-  22c62b9a84b8 ("timekeeping: Introduce auxiliary timekeepers")
-
-from the tip tree.
-
-I fixed it up (the latter just removed a blank line where the former added
-a new function :-( ) and can carry the fix as necessary. This is now fixed
-as far as linux-next is concerned, but any non trivial conflicts should
-be mentioned to your upstream maintainer when your tree is submitted for
-merging.  You may also want to consider cooperating with the maintainer
-of the conflicting tree to minimise any particularly complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/AhwB/cwOZfTpwguigflw+lM
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmhndIEACgkQAVBC80lX
-0GwNxAf/bDsnKwrgRIvS+TrCTxID+kgAT1Y6p1uVITgJZ7kji4IDnyj+5n7jhRaf
-L1G6YZ79Bz8u5YRGivsWDbrUOQEDLUWU/tyw1mrRtjmZlzt+DxSXLEY/RAr3/yng
-IYGulFLS5jIhe6u9X8qDR7SLfZVSLY9nlvoOieLHenGdITPDdXfa+LEZV6aC0Nm4
-9ObSLc76uzU0a4usnl+rX1FeA6/Sb9hi3tWQxjvC0merOLVGfbDwn4gf7ljkc6Qt
-EXQx3hLwUFtKTZIUh0dbIYY1loafjZ1HhnMP7/m/6iFa0PmK9Wk/1qnujTP1F3ia
-2MczY+WeO/Hm8r3fvwWywraNxGvYjw==
-=rJcS
------END PGP SIGNATURE-----
-
---Sig_/AhwB/cwOZfTpwguigflw+lM--
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
