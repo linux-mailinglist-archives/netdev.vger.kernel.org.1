@@ -1,281 +1,374 @@
-Return-Path: <netdev+bounces-204090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 530E7AF8D43
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:03:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43F49AF8D9D
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:08:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 597B11C86F04
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:03:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E47F8767348
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:04:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1038A2FA645;
-	Fri,  4 Jul 2025 08:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302DC2F5338;
+	Fri,  4 Jul 2025 08:57:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="Ss6hMBMg"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="Dr/1zclY";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IF4ZC77U"
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013055.outbound.protection.outlook.com [40.107.162.55])
+Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133172FA626;
-	Fri,  4 Jul 2025 08:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751619340; cv=fail; b=K3YfQuarUbFwBlbvnJhGcILYapCiaxi8xoFewtizT3dMfeL8BwEKQphn6IjEBtaNnUxGY7U8d9WAAWsVAPaLNnS74t4BxMvSgZpvcsjrlxGSXDsfXtpZnxmdBJ2vhG9NPytsVcG+mxUfjOuZsrU8xq49b7zEhDSJaPQYUrTjghw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751619340; c=relaxed/simple;
-	bh=J30iOy+Lh8VCKUCbCfAEnUqRWAu53dq8wPfwoVdNSMA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mTIGEu1RMZxGaByevFCEPGA89JAZXvPg4ZfCDHBLiaSroqlVWQtUTMiUxUV1QsyNb3uAJLHwwadSVYZLiAqf5O+H9aVyWpUzILScxLwcRCCWvbWH+fSjXi8bJ259rmONJNf4DGsN+TOw0ya1c1b/Et90huAPXnTnkzZBN40j+fA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=Ss6hMBMg; arc=fail smtp.client-ip=40.107.162.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CD54ZcJXjnT0IQYdn6d0x7LtqQUavVUsqCWzRp/X6LUpzPIKsQBebt6LFcodgRAYjIeVLP/k3EWube0Q1Tv9rrU7T002KRoV41fvuWqbi3+Ogx76hdMClNjtCXjxpFnR31hZQ10hWCjoRKHlgNelp919YRXHk4BewoTFvRPtbAVkQh5ZYdsi5xRnjXP1oHpBYz6RCwPpdEeUEct3P6nGRX29Wr9GnVPeg2B0IFHYXCIl9tuLpO8JeUzDcAqmwC+yEtD8MzjCxpUqfmRyXfxG7jRzWfQrIldJ41tn+2WIDH48/FrNo4JpVQlmf/nzbV1G8NdAGi9KWvMe8spaZ3LX3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=k6fjybJ/1YtQztmB+/QhyRQqFiK3FOO4hsPtLxSluOA=;
- b=vudu+0R2zmJvUN1Y5E/JOakhmoRXR9kTmCKSJaBe//NhlIkcekLc8CXokVMPonePxO08bMAtfKHcd3Y5qrAtbA9Lnnon5smTJExnNGop/tDXYxrI7m4FuMT8+Jc+TodoGjbQ/JHS5c2xmHPomPB0IXL5FRz0DmDQqan4wKUT+KzS7yEv4dVMPW70d6UT847G7QCzuS7kNeiFc/u5dh6RnIczbu16enVAmk2c2xSG1yqM2u6uCVEXcr0B+XK6xyuzXxJs4eHItBDyGKhEGhiAJvMFe2e0fKSZvgMqDYCwJ4yiSoim07p4AylfL/JuT9VtjRxEPvxk8LApuJqKtUcqqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 131.228.2.241) smtp.rcpttodomain=amazon.com
- smtp.mailfrom=nokia-bell-labs.com; dmarc=pass (p=reject sp=reject pct=100)
- action=none header.from=nokia-bell-labs.com; dkim=none (message not signed);
- arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=k6fjybJ/1YtQztmB+/QhyRQqFiK3FOO4hsPtLxSluOA=;
- b=Ss6hMBMgELcfBnE+apSkL8x11RBOEvMV1Fd0vWdslV73DT1BVzhA9KReB4r7u8zBtvnkbZgo6eFrU7lUfpQM6cdiby3TTKaELxLvyX0DMOVYJadoYqzvB5Q4iL4711Czx/evC6TZOFy5UMr3vxMaGSCqrCk7V1jUutCQ/7teHAz5YYEND6o+jYsqP3PxqcLrs9TtwFYZDvsB3PS9aURPunGtYyr11a0HQKrt99PGAADzb3zAMcA8fBb7lYq3VqEP03O+NV6z2BpGg5xgj8mbo9kvdHPz7aGVMsAUx2vJJyQdTGurAiUSN4Np/j6BG6zNkH7Y1gII+cM6ZspLHUEsqA==
-Received: from DUZP191CA0011.EURP191.PROD.OUTLOOK.COM (2603:10a6:10:4f9::9) by
- DB9PR07MB10100.eurprd07.prod.outlook.com (2603:10a6:10:4cd::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8901.20; Fri, 4 Jul 2025 08:55:35 +0000
-Received: from DB1PEPF000509EA.eurprd03.prod.outlook.com
- (2603:10a6:10:4f9:cafe::c3) by DUZP191CA0011.outlook.office365.com
- (2603:10a6:10:4f9::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8901.23 via Frontend Transport; Fri,
- 4 Jul 2025 08:55:35 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 131.228.2.241)
- smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nokia-bell-labs.com;
-Received-SPF: Pass (protection.outlook.com: domain of nokia-bell-labs.com
- designates 131.228.2.241 as permitted sender)
- receiver=protection.outlook.com; client-ip=131.228.2.241;
- helo=fihe3nok0734.emea.nsn-net.net; pr=C
-Received: from fihe3nok0734.emea.nsn-net.net (131.228.2.241) by
- DB1PEPF000509EA.mail.protection.outlook.com (10.167.242.68) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8901.15
- via Frontend Transport; Fri, 4 Jul 2025 08:55:35 +0000
-Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
-	by fihe3nok0734.emea.nsn-net.net (Postfix) with ESMTP id DC29F20153;
-	Fri,  4 Jul 2025 11:55:33 +0300 (EEST)
-From: chia-yu.chang@nokia-bell-labs.com
-To: pabeni@redhat.com,
-	edumazet@google.com,
-	linux-doc@vger.kernel.org,
-	corbet@lwn.net,
-	horms@kernel.org,
-	dsahern@kernel.org,
-	kuniyu@amazon.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	dave.taht@gmail.com,
-	jhs@mojatatu.com,
-	kuba@kernel.org,
-	stephen@networkplumber.org,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	donald.hunter@gmail.com,
-	ast@fiberby.net,
-	liuhangbin@gmail.com,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	ij@kernel.org,
-	ncardwell@google.com,
-	koen.de_schepper@nokia-bell-labs.com,
-	g.white@cablelabs.com,
-	ingemar.s.johansson@ericsson.com,
-	mirja.kuehlewind@ericsson.com,
-	cheshire@apple.com,
-	rs.ietf@gmx.at,
-	Jason_Livingood@comcast.com,
-	vidhi_goel@apple.com
-Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-Subject: [PATCH v12 net-next 15/15] tcp: accecn: try to fit AccECN option with SACK
-Date: Fri,  4 Jul 2025 10:53:45 +0200
-Message-Id: <20250704085345.46530-16-chia-yu.chang@nokia-bell-labs.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250704085345.46530-1-chia-yu.chang@nokia-bell-labs.com>
-References: <20250704085345.46530-1-chia-yu.chang@nokia-bell-labs.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF5E2F5326;
+	Fri,  4 Jul 2025 08:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751619469; cv=none; b=PhIZjVD4T9xyf0qyrIbfO1vKcBIXsT3e2X/hg6B0PzqmioQvVZxVggw4LXLk+pSjdIfAm0TIfOtsrrQH9UiCSXhaQbbysQMbqIu7q4ip/3cBxGz+kK6kO+1Jp+IcwX+lCEQChxSdhZqeNQLPnAHR3BIpGC6K9Zjzn2V0FQW86ss=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751619469; c=relaxed/simple;
+	bh=wuYMIxwGMEMR3DYWFdJ7l4qk19i6gD9BmnMrRAyqqfE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=itarA3q3sCT4UG2iqru6BSMTc1XSMzxvSjFNveonn+vNz3tVEHoRn7tbI0xYDEkrWEPiebieJ4HO5KsEkacq9JhZx2gU2GTYBo8lfgmrSbDz8I/x0RrbclfXlUUxAfa8T+j3GemeuY/0fFATy0UPQow7NtTo8NF4dL90qPM0yI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=Dr/1zclY; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=IF4ZC77U; arc=none smtp.client-ip=202.12.124.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 22FB87A00C0;
+	Fri,  4 Jul 2025 04:57:44 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Fri, 04 Jul 2025 04:57:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1751619463;
+	 x=1751705863; bh=USFQgATkh8/GL2dbFYao1i5xeRL2FTm2q9EcU0XzEoM=; b=
+	Dr/1zclY5VnCcX3Wrmn9rAI9DAJyukc2yq4xYBK/PD4syJlxiIfuGokDnlN6Vfni
+	ZKYyl/QJKrSdE+lYQecP3Hk2KUT7gjLvl5RFZAdwKzTHQ/jw+Oj7T51motWFJUYV
+	5arT/u39EB0E850TO4FoFlHBHzf4hzBhg74dGrJmDjxY3L7Z4Yudk/avRDzmqMDG
+	CeHdeZC1xos+ipHFbp/ZRwzU0NzJqWPhgTFW31GyCJHv+208woRbR74D/ZgLyKys
+	Z/yOdtfiob+h3WaiPkM4gTbWo1Ic80B9aPYzOotaQPP0MqnLiY7xF++DueSsef+o
+	SjUpvM3vFfMkQGY1lcFIBg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1751619463; x=
+	1751705863; bh=USFQgATkh8/GL2dbFYao1i5xeRL2FTm2q9EcU0XzEoM=; b=I
+	F4ZC77UMFJHiBktdjeuEGtkZOtl/rj/n+Sy7Z1NE3CCQhv8ucBLnuhQt087Kr93s
+	bMi7KUaNv2PVYXw7LMruqtaMks+QucHiMjkS0zrRF1Cy1e/Repb8566s1Xqn7ic1
+	wXtXUZa7dweW/g0HIkYky6wAX84/mwYpzSaiXc18uRzh69h29zSyYXRN4V5JJFhP
+	xYJnkjma8f6RI9eMUU02qyh8fpJ0XbcRnoe2oaGH8BAyq+Sa+rdTy1TBiwuL3t2B
+	2+SYAn3g7XzzxzV4yk4N/vXy9Mt0u82nlIkookGgo0vNW2NAsLz5V8wqgXY2MnIu
+	umHef8k16i7kg0I4/d/9g==
+X-ME-Sender: <xms:h5dnaIy3yDqp7ePuo4llfq5xTyaRcqoiP3ITpTwHBXaEo8PNj1meVA>
+    <xme:h5dnaMQKZEHmAmoRhGmixlOxweCv_u_Tk6TUxHm_E3gMavcpGDVRFQy0lX2JnhL4n
+    M2Vn0C9svZ3GpsAmdA>
+X-ME-Received: <xmr:h5dnaKUFVZUC2asEGUaw5XD5TtHlrSRjcs_tN2ozMJgGfGIECKYCrI11AV1mCk_WBIsMMNhX0hAMOOCVPLJPaOJyXdKZf2gTiA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddvvdejfecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtugfgjgesthekredttddtjeenucfhrhhomheppfhikhhlrghs
+    ucfunpguvghrlhhunhguuceonhhikhhlrghsrdhsohguvghrlhhunhgusehrrghgnhgrth
+    gvtghhrdhsvgeqnecuggftrfgrthhtvghrnhepffdtgeefveefgfeutdevveelgfelkeeu
+    vdefgefgfeehfeeijeehudelhfejkefgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrgh
+    enucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhk
+    lhgrshdrshhouggvrhhluhhnugesrhgrghhnrghtvggthhdrshgvpdhnsggprhgtphhtth
+    hopedvtddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepshgrkhgrrhhirdgrihhl
+    uhhssehlihhnuhigrdhinhhtvghlrdgtohhmpdhrtghpthhtohepnhhitgholhgrshdrfh
+    gvrhhrvgesmhhitghrohgthhhiphdrtghomhdprhgtphhtthhopegtlhgruhguihhurdgs
+    vgiinhgvrgesthhugihonhdruggvvhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvg
+    hvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgv
+    thdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoh
+    epkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughh
+    rghtrdgtohhmpdhrtghpthhtohepfigvihdrfhgrnhhgsehngihprdgtohhm
+X-ME-Proxy: <xmx:h5dnaGgRRYevqoMdxIkYsoMnzpEwu0pNJCRCJcTFsKIPW0BIsWGslg>
+    <xmx:h5dnaKCdLx4MYN94d2T3nOyWAl2RnY0frqlxLDSCkao496knxVBGfQ>
+    <xmx:h5dnaHJ5SjLMY_lvvU3DW_8SSWaLuJ8R2O18tI9Kg22woFPhxldnPg>
+    <xmx:h5dnaBCzh5ayu5tZKL1wEvnt50eePvTtZGLn_zj7dTA268hrm5Yrng>
+    <xmx:h5dnaDz-jPh8bR8XsNIlqxcl6GNFwgtvAaU1cczzuw2qtUirGWEk8I4B>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 4 Jul 2025 04:57:42 -0400 (EDT)
+Date: Fri, 4 Jul 2025 10:57:40 +0200
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
+To: Sakari Ailus <sakari.ailus@linux.intel.com>
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>, Paul Barker <paul@pbarker.dev>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, linux-renesas-soc@vger.kernel.org,
+	linux-omap@vger.kernel.org
+Subject: Re: [PATCH 46/80] net: ethernet: Remove redundant
+ pm_runtime_mark_last_busy() calls
+Message-ID: <20250704085740.GA137171@ragnatech.se>
+References: <20250704075225.3212486-1-sakari.ailus@linux.intel.com>
+ <20250704075435.3220683-1-sakari.ailus@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB1PEPF000509EA:EE_|DB9PR07MB10100:EE_
-X-MS-Office365-Filtering-Correlation-Id: 777ce9cf-44b2-4d19-9579-08ddbad88a74
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|7416014|376014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?QW9nMDYzWjk4V1pYOHJVbHU3N0E2ZXYxVjZQVWJhT0tMTVYrbVBkZTU5RWwv?=
- =?utf-8?B?WkxiZnFSWXZTck1abXR3YXpOWE56Wk5iVmNJVkcxSUVGa2hmcHVwczhISThx?=
- =?utf-8?B?V2FKWjF2ci96alNBNXNYalRUeUZ2b2wrSE44empHSDc2WFpjVGNieXpzWEN6?=
- =?utf-8?B?OUo5aDR6V24xL3FNRUpTQ1Rpb2hCaUx4RFBPNVRER1Y4M1dXQmR6UjZpQmJl?=
- =?utf-8?B?R0hKSXJoYnArWVo4VE1UWWYvdnBxT2F5U3hkbm5NRmsxQlVMdEJTTGM4N3pa?=
- =?utf-8?B?TWI4Q2JHMUxzTTExUkxIZTZ2bk1nVHRla2ZrOXNxb2l0NEordmxQcjQxSHRW?=
- =?utf-8?B?MnI2c3lKZWdYZUt3RWoxK01vcmxVZmk0V2h2T0FFMzRpZFNaRHRJNDdHdDdo?=
- =?utf-8?B?MEsyak1KQzVaa0NMWEtVRlV1M1ZrcjV2NnV1akpFU2F6RE1Ock9hTGpabVRp?=
- =?utf-8?B?aW81eXZOQmRjcCtZOXNBRWZkUzEvWGZRbXNFNDB6RUJlWDlZSWd2ek1sZWFZ?=
- =?utf-8?B?d0tDdEx4NklJSm9WUUFsSHF1RG0wYUxENEZXNTRGRXFPaXYwQTRWME8xZWoy?=
- =?utf-8?B?UjJpUkFyR1NoMDJkbWxWMDlFZGJtN0E2dDZlb0JiK1k3ZXpBclUyMzBRNUNw?=
- =?utf-8?B?bHJoR1hENWova3VnUTdTUFlvZS8xVFExeWJCNGl6aFlxbTlkbjlBdnkyWk52?=
- =?utf-8?B?c1BEOVJ0RnAramJRTkFxVTVOT1B2bzJhaFBWNC9zbDBZM2lLdS9ZaUg3aUkv?=
- =?utf-8?B?bllRc083T0ZXQTZUNFlDcUpUV3I1cTFubmVOSUNsaFkzWk5zREE5MG5lVWp5?=
- =?utf-8?B?V3N6ZVdTN2tlZnA3WkpCZ3pBQ080SWRlM2pLWWJuMU1sYUZkelgrNTVNK2VF?=
- =?utf-8?B?VHhnZGFWbUZveXp4SS9rMWJNbGQ0bmoyeS9FR3NuZEt0K3dEUTFVdUVGQklr?=
- =?utf-8?B?ZnlqV1hLR0REejh1bllURUF3WUw5SFA3WmlFNERGZU1iV2phMnkvYjMxTVQ1?=
- =?utf-8?B?Z3NVeFFRd25VYXV6WDZaai9PQnphWFBRaDBXWjNnSEU4MjNQYWljT3lMYUl4?=
- =?utf-8?B?ZHFSdUJMVnVkUUJTTG1SNWtqaGNYSkY5L2NuNy9qU2krNEs4NndjVFdBSmY2?=
- =?utf-8?B?RW5BL3pBWEdKVWM3TjhnVE9jSklCL0s1bStJdUQ3NDVHVHpzaUZROXdzZWtI?=
- =?utf-8?B?UC94WVhKczA4U3BuQlhXSE1pT2hOYkM0MzR5QmY3eW1QcCtEdmVqUFUzeXQ4?=
- =?utf-8?B?bWpuaXprMGtUTVo2ckNyNUU3eXptUTdEYWRqb2kzSUJHWDVvNFJrcW1Vd0Iw?=
- =?utf-8?B?WFpCTGhvTFE5T0ZyT0RZSlhRS2F1VXh2Ly9sZC9JSGZDYjZ4RXBSQis0Zk1Z?=
- =?utf-8?B?bVZCZVNnVldMdXNvSThWOGR6ZkhCbFo2dFozNkZ5UEUvQ3V1TXNTdzlDZnRa?=
- =?utf-8?B?RGRNN0psUDY2WVlwNmRmUnNNY21oOW1nRkR6R3N0OW5xSSs4UFpjSDdxMy8r?=
- =?utf-8?B?Ny9pbWlERnk0dVVsRVVsOXB6NldNSG5DQmdOVlU0Q3hwTDVjaTFidm9aTEtS?=
- =?utf-8?B?VENlNFdFNk1NS1VZUTlvT0lUdlp4YUMrc2FPTTVuWW45WTFXNG9kSDZmSWhY?=
- =?utf-8?B?M1M4V3NTY29MempiYmdEeXlvcTJoc0pRWGhhZWRwVmlWMDc5ekY2TENDZ1R4?=
- =?utf-8?B?eWg0VHVxQ2c1aGxIWE9KcGI2MGREZWdQUkt5eWZLMW5PMGJianZzdnBMaVFT?=
- =?utf-8?B?a0FERmN5ZFVUQjI3a2VQbi9GaS9YTnA5VHV6emh2OER2ZUlGUE5pTGNmNEtW?=
- =?utf-8?B?aTRLa0J5RXhPQ3pNejdzeWZkMXBsZjd2SGl4WlhGSkoxeVUyK0k3MFlITVN2?=
- =?utf-8?B?anFpVlFMVTNzTTdNd3pRNDFOZXBGOXNNRFNUZXJRb3Jza3NqK1BaOGJXeXg2?=
- =?utf-8?B?TkU5Q0RJUi9KNmRyVG1NRnJHZHcxaGNPVVlwUXYrZ0tVYUNiVmNGOERLcEpl?=
- =?utf-8?B?MjhMWTJzZW1sdzdudlAwd3BXQlk3NVJEai9mdnlvWE9XY05mSTYxUytJNW5H?=
- =?utf-8?B?bG01eWt5dlFEYkdOZytpaS9PekVzbDQrcUdxUT09?=
-X-Forefront-Antispam-Report:
-	CIP:131.228.2.241;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fihe3nok0734.emea.nsn-net.net;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: nokia-bell-labs.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2025 08:55:35.4285
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 777ce9cf-44b2-4d19-9579-08ddbad88a74
-X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.2.241];Helo=[fihe3nok0734.emea.nsn-net.net]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF000509EA.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR07MB10100
+In-Reply-To: <20250704075435.3220683-1-sakari.ailus@linux.intel.com>
 
-From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+Hej Sakari,
 
-As SACK blocks tend to eat all option space when there are
-many holes, it is useful to compromise on sending many SACK
-blocks in every ACK and attempt to fit the AccECN option
-there by reducing the number of SACK blocks. However, it will
-never go below two SACK blocks because of the AccECN option.
+Thanks for your work, this is a nice improvement!
 
-As the AccECN option is often not put to every ACK, the space
-hijack is usually only temporary. Depending on the reuqired
-AccECN fields (can be either 3, 2, 1, or 0, cf. Table 5 in
-AccECN spec) and the NOPs used for alignment of other
-TCP options, up to two SACK blocks will be reduced. Please
-find below tables for more details:
+On 2025-07-04 10:54:35 +0300, Sakari Ailus wrote:
+> pm_runtime_put_autosuspend(), pm_runtime_put_sync_autosuspend(),
+> pm_runtime_autosuspend() and pm_request_autosuspend() now include a call
+> to pm_runtime_mark_last_busy(). Remove the now-reduntant explicit call to
+> pm_runtime_mark_last_busy().
+> 
+> Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+> ---
+> The cover letter of the set can be found here
+> <URL:https://lore.kernel.org/linux-pm/20250704075225.3212486-1-sakari.ailus@linux.intel.com>.
+> 
+> In brief, this patch depends on PM runtime patches adding marking the last
+> busy timestamp in autosuspend related functions. The patches are here, on
+> rc2:
+> 
+>         git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm.git \
+>                 pm-runtime-6.17-rc1
+> 
+>  drivers/net/ethernet/cadence/macb_main.c  | 5 -----
+>  drivers/net/ethernet/freescale/fec_main.c | 8 --------
+>  drivers/net/ethernet/renesas/ravb_main.c  | 4 ----
 
-+====================+=========================================+
-| Number of | Required | Remaining |  Number of  |    Final    |
-|   SACK    |  AccECN  |  option   |  reduced    |  number of  |
-|  blocks   |  fields  |  spaces   | SACK blocks | SACK blocks |
-+===========+==========+===========+=============+=============+
-|  x (<=2)  |  0 to 3  |    any    |      0      |      x      |
-+-----------+----------+-----------+-------------+-------------+
-|     3     |    0     |    any    |      0      |      3      |
-|     3     |    1     |    <4     |      1      |      2      |
-|     3     |    1     |    >=4    |      0      |      3      |
-|     3     |    2     |    <8     |      1      |      2      |
-|     3     |    2     |    >=8    |      0      |      3      |
-|     3     |    3     |    <12    |      1      |      2      |
-|     3     |    3     |    >=12   |      0      |      3      |
-+-----------+----------+-----------+-------------+-------------+
-|  y (>=4)  |    0     |    any    |      0      |      y      |
-|  y (>=4)  |    1     |    <4     |      1      |     y-1     |
-|  y (>=4)  |    1     |    >=4    |      0      |      y      |
-|  y (>=4)  |    2     |    <8     |      1      |     y-1     |
-|  y (>=4)  |    2     |    >=8    |      0      |      y      |
-|  y (>=4)  |    3     |    <4     |      2      |     y-2     |
-|  y (>=4)  |    3     |    <12    |      1      |     y-1     |
-|  y (>=4)  |    3     |    >=12   |      0      |      y      |
-+===========+==========+===========+=============+=============+
+For RAVB,
 
-Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-Co-developed-by: Ilpo Järvinen <ij@kernel.org>
-Signed-off-by: Ilpo Järvinen <ij@kernel.org>
+Reviewed-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
 
----
-v8:
-- Update tcp_options_fit_accecn() to avoid using recursion
----
- net/ipv4/tcp_output.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+>  drivers/net/ethernet/ti/davinci_mdio.c    | 7 -------
+>  4 files changed, 24 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index 53aaf6b08e39..9b7cbb3e3108 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -360,7 +360,6 @@ static int macb_mdio_read_c22(struct mii_bus *bus, int mii_id, int regnum)
+>  	status = MACB_BFEXT(DATA, macb_readl(bp, MAN));
+>  
+>  mdio_read_exit:
+> -	pm_runtime_mark_last_busy(&bp->pdev->dev);
+>  	pm_runtime_put_autosuspend(&bp->pdev->dev);
+>  mdio_pm_exit:
+>  	return status;
+> @@ -406,7 +405,6 @@ static int macb_mdio_read_c45(struct mii_bus *bus, int mii_id, int devad,
+>  	status = MACB_BFEXT(DATA, macb_readl(bp, MAN));
+>  
+>  mdio_read_exit:
+> -	pm_runtime_mark_last_busy(&bp->pdev->dev);
+>  	pm_runtime_put_autosuspend(&bp->pdev->dev);
+>  mdio_pm_exit:
+>  	return status;
+> @@ -438,7 +436,6 @@ static int macb_mdio_write_c22(struct mii_bus *bus, int mii_id, int regnum,
+>  		goto mdio_write_exit;
+>  
+>  mdio_write_exit:
+> -	pm_runtime_mark_last_busy(&bp->pdev->dev);
+>  	pm_runtime_put_autosuspend(&bp->pdev->dev);
+>  mdio_pm_exit:
+>  	return status;
+> @@ -484,7 +481,6 @@ static int macb_mdio_write_c45(struct mii_bus *bus, int mii_id,
+>  		goto mdio_write_exit;
+>  
+>  mdio_write_exit:
+> -	pm_runtime_mark_last_busy(&bp->pdev->dev);
+>  	pm_runtime_put_autosuspend(&bp->pdev->dev);
+>  mdio_pm_exit:
+>  	return status;
+> @@ -5358,7 +5354,6 @@ static int macb_probe(struct platform_device *pdev)
+>  		    macb_is_gem(bp) ? "GEM" : "MACB", macb_readl(bp, MID),
+>  		    dev->base_addr, dev->irq, dev->dev_addr);
+>  
+> -	pm_runtime_mark_last_busy(&bp->pdev->dev);
+>  	pm_runtime_put_autosuspend(&bp->pdev->dev);
+>  
+>  	return 0;
+> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+> index d4eed252ad40..e6979599ae7e 100644
+> --- a/drivers/net/ethernet/freescale/fec_main.c
+> +++ b/drivers/net/ethernet/freescale/fec_main.c
+> @@ -2207,7 +2207,6 @@ static int fec_enet_mdio_read_c22(struct mii_bus *bus, int mii_id, int regnum)
+>  	ret = FEC_MMFR_DATA(readl(fep->hwp + FEC_MII_DATA));
+>  
+>  out:
+> -	pm_runtime_mark_last_busy(dev);
+>  	pm_runtime_put_autosuspend(dev);
+>  
+>  	return ret;
+> @@ -2256,7 +2255,6 @@ static int fec_enet_mdio_read_c45(struct mii_bus *bus, int mii_id,
+>  	ret = FEC_MMFR_DATA(readl(fep->hwp + FEC_MII_DATA));
+>  
+>  out:
+> -	pm_runtime_mark_last_busy(dev);
+>  	pm_runtime_put_autosuspend(dev);
+>  
+>  	return ret;
+> @@ -2288,7 +2286,6 @@ static int fec_enet_mdio_write_c22(struct mii_bus *bus, int mii_id, int regnum,
+>  	if (ret)
+>  		netdev_err(fep->netdev, "MDIO write timeout\n");
+>  
+> -	pm_runtime_mark_last_busy(dev);
+>  	pm_runtime_put_autosuspend(dev);
+>  
+>  	return ret;
+> @@ -2332,7 +2329,6 @@ static int fec_enet_mdio_write_c45(struct mii_bus *bus, int mii_id,
+>  		netdev_err(fep->netdev, "MDIO write timeout\n");
+>  
+>  out:
+> -	pm_runtime_mark_last_busy(dev);
+>  	pm_runtime_put_autosuspend(dev);
+>  
+>  	return ret;
+> @@ -2814,7 +2810,6 @@ static void fec_enet_get_regs(struct net_device *ndev,
+>  		buf[off] = readl(&theregs[off]);
+>  	}
+>  
+> -	pm_runtime_mark_last_busy(dev);
+>  	pm_runtime_put_autosuspend(dev);
+>  }
+>  
+> @@ -3590,7 +3585,6 @@ fec_enet_open(struct net_device *ndev)
+>  err_enet_alloc:
+>  	fec_enet_clk_enable(ndev, false);
+>  clk_enable:
+> -	pm_runtime_mark_last_busy(&fep->pdev->dev);
+>  	pm_runtime_put_autosuspend(&fep->pdev->dev);
+>  	pinctrl_pm_select_sleep_state(&fep->pdev->dev);
+>  	return ret;
+> @@ -3621,7 +3615,6 @@ fec_enet_close(struct net_device *ndev)
+>  		cpu_latency_qos_remove_request(&fep->pm_qos_req);
+>  
+>  	pinctrl_pm_select_sleep_state(&fep->pdev->dev);
+> -	pm_runtime_mark_last_busy(&fep->pdev->dev);
+>  	pm_runtime_put_autosuspend(&fep->pdev->dev);
+>  
+>  	fec_enet_free_buffers(ndev);
+> @@ -4568,7 +4561,6 @@ fec_probe(struct platform_device *pdev)
+>  
+>  	INIT_WORK(&fep->tx_timeout_work, fec_enet_timeout_work);
+>  
+> -	pm_runtime_mark_last_busy(&pdev->dev);
+>  	pm_runtime_put_autosuspend(&pdev->dev);
+>  
+>  	return 0;
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index c9f4976a3527..b8bfc3cdbb6b 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -1974,7 +1974,6 @@ static int ravb_open(struct net_device *ndev)
+>  out_set_reset:
+>  	ravb_set_opmode(ndev, CCC_OPC_RESET);
+>  out_rpm_put:
+> -	pm_runtime_mark_last_busy(dev);
+>  	pm_runtime_put_autosuspend(dev);
+>  out_napi_off:
+>  	if (info->nc_queues)
+> @@ -2383,7 +2382,6 @@ static int ravb_close(struct net_device *ndev)
+>  	if (error)
+>  		return error;
+>  
+> -	pm_runtime_mark_last_busy(dev);
+>  	pm_runtime_put_autosuspend(dev);
+>  
+>  	return 0;
+> @@ -3089,7 +3087,6 @@ static int ravb_probe(struct platform_device *pdev)
+>  	netdev_info(ndev, "Base address at %#x, %pM, IRQ %d.\n",
+>  		    (u32)ndev->base_addr, ndev->dev_addr, ndev->irq);
+>  
+> -	pm_runtime_mark_last_busy(&pdev->dev);
+>  	pm_runtime_put_autosuspend(&pdev->dev);
+>  
+>  	return 0;
+> @@ -3274,7 +3271,6 @@ static int ravb_resume(struct device *dev)
+>  
+>  out_rpm_put:
+>  	if (!priv->wol_enabled) {
+> -		pm_runtime_mark_last_busy(dev);
+>  		pm_runtime_put_autosuspend(dev);
+>  	}
+>  
+> diff --git a/drivers/net/ethernet/ti/davinci_mdio.c b/drivers/net/ethernet/ti/davinci_mdio.c
+> index 68507126be8e..9f049ebbf107 100644
+> --- a/drivers/net/ethernet/ti/davinci_mdio.c
+> +++ b/drivers/net/ethernet/ti/davinci_mdio.c
+> @@ -234,7 +234,6 @@ static int davinci_mdiobb_read_c22(struct mii_bus *bus, int phy, int reg)
+>  
+>  	ret = mdiobb_read_c22(bus, phy, reg);
+>  
+> -	pm_runtime_mark_last_busy(bus->parent);
+>  	pm_runtime_put_autosuspend(bus->parent);
+>  
+>  	return ret;
+> @@ -251,7 +250,6 @@ static int davinci_mdiobb_write_c22(struct mii_bus *bus, int phy, int reg,
+>  
+>  	ret = mdiobb_write_c22(bus, phy, reg, val);
+>  
+> -	pm_runtime_mark_last_busy(bus->parent);
+>  	pm_runtime_put_autosuspend(bus->parent);
+>  
+>  	return ret;
+> @@ -268,7 +266,6 @@ static int davinci_mdiobb_read_c45(struct mii_bus *bus, int phy, int devad,
+>  
+>  	ret = mdiobb_read_c45(bus, phy, devad, reg);
+>  
+> -	pm_runtime_mark_last_busy(bus->parent);
+>  	pm_runtime_put_autosuspend(bus->parent);
+>  
+>  	return ret;
+> @@ -285,7 +282,6 @@ static int davinci_mdiobb_write_c45(struct mii_bus *bus, int phy, int devad,
+>  
+>  	ret = mdiobb_write_c45(bus, phy, devad, reg, val);
+>  
+> -	pm_runtime_mark_last_busy(bus->parent);
+>  	pm_runtime_put_autosuspend(bus->parent);
+>  
+>  	return ret;
+> @@ -332,7 +328,6 @@ static int davinci_mdio_common_reset(struct davinci_mdio_data *data)
+>  	data->bus->phy_mask = phy_mask;
+>  
+>  done:
+> -	pm_runtime_mark_last_busy(data->dev);
+>  	pm_runtime_put_autosuspend(data->dev);
+>  
+>  	return 0;
+> @@ -441,7 +436,6 @@ static int davinci_mdio_read(struct mii_bus *bus, int phy_id, int phy_reg)
+>  		break;
+>  	}
+>  
+> -	pm_runtime_mark_last_busy(data->dev);
+>  	pm_runtime_put_autosuspend(data->dev);
+>  	return ret;
+>  }
+> @@ -478,7 +472,6 @@ static int davinci_mdio_write(struct mii_bus *bus, int phy_id,
+>  		break;
+>  	}
+>  
+> -	pm_runtime_mark_last_busy(data->dev);
+>  	pm_runtime_put_autosuspend(data->dev);
+>  
+>  	return ret;
+> -- 
+> 2.39.5
+> 
 
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 560b0ca54bb8..cf1d40e9c0ed 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -876,7 +876,9 @@ static int tcp_options_fit_accecn(struct tcp_out_options *opts, int required,
- 				  int remaining)
- {
- 	int size = TCP_ACCECN_MAXSIZE;
-+	int sack_blocks_reduce = 0;
- 	int max_combine_saving;
-+	int rem = remaining;
- 
- 	if (opts->use_synack_ecn_bytes)
- 		max_combine_saving = tcp_synack_options_combine_saving(opts);
-@@ -889,14 +891,31 @@ static int tcp_options_fit_accecn(struct tcp_out_options *opts, int required,
- 		if (leftover_size > max_combine_saving)
- 			leftover_size = -((4 - leftover_size) & 0x3);
- 
--		if (remaining >= size - leftover_size) {
-+		if (rem >= size - leftover_size) {
- 			size -= leftover_size;
- 			break;
-+		} else if (opts->num_accecn_fields == required &&
-+			   opts->num_sack_blocks > 2 &&
-+			   required > 0) {
-+			/* Try to fit the option by removing one SACK block */
-+			opts->num_sack_blocks--;
-+			sack_blocks_reduce++;
-+			rem = rem + TCPOLEN_SACK_PERBLOCK;
-+
-+			opts->num_accecn_fields = TCP_ACCECN_NUMFIELDS;
-+			size = TCP_ACCECN_MAXSIZE;
-+			continue;
- 		}
- 
- 		opts->num_accecn_fields--;
- 		size -= TCPOLEN_ACCECN_PERFIELD;
- 	}
-+	if (sack_blocks_reduce > 0) {
-+		if (opts->num_accecn_fields >= required)
-+			size -= sack_blocks_reduce * TCPOLEN_SACK_PERBLOCK;
-+		else
-+			opts->num_sack_blocks += sack_blocks_reduce;
-+	}
- 	if (opts->num_accecn_fields < required)
- 		return 0;
- 
 -- 
-2.34.1
-
+Kind Regards,
+Niklas Söderlund
 
