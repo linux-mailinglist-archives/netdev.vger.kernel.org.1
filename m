@@ -1,54 +1,57 @@
-Return-Path: <netdev+bounces-204172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29DEDAF9570
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 16:25:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 365D7AF958B
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 16:32:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 133A31CC190C
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 14:24:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C88171C86AA3
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 14:32:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A0251ADFFB;
-	Fri,  4 Jul 2025 14:23:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 217DA1B532F;
+	Fri,  4 Jul 2025 14:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e0vIdv1k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GQz+ZRWI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445081A83F9
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 14:23:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB1A3161302;
+	Fri,  4 Jul 2025 14:31:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751639039; cv=none; b=WkecR/evuKLLW165eO1uk2kOX8p31phzPdXStWnL8saG/BgSRm66pF2G0NBhoEZhcEPlraqaGGzu0gIficzSlyqWhAhINWXFGIP3DYe4fEfR9aOk7BOmsvhOrvJ4nhNjoi23JVZ7QhSMoi5E1Tw0o8JrYJv4Isshj7Gsft1KWOw=
+	t=1751639519; cv=none; b=ugfUuRQdjQi3bXrMYujykmbI5j1V/wHikBlc+CK2fQDfmxPhl/g2yFeAfE8nVVggD3zTwnyQsYTp7opEgbIoaxYnXMld8pSmA+m3Tl9JjykR7u/fIbCEeVeEGSqDkDnjnxLey8xj07wdcDJ6Wuo7jYZjbLhjNgBhmBojRoSrzfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751639039; c=relaxed/simple;
-	bh=7WxuQlZc8vD5Z2eIBi4LfKOgvwn7Ii6URZnvn7v0EZo=;
+	s=arc-20240116; t=1751639519; c=relaxed/simple;
+	bh=+5DmzQLPza93gOMD8f0BTpUxdlPMXYwaa3qhIYuLHYo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WNEgLSToXqVtNitGtssE3WJLMZ477QGMLs9XQ/zOFpjPafCEDvdb3GNAquQ1nbknJ8mtN0kMPOccAuHLrt0DY+n/8grroORY0xZ8Ru+POmRzT+h4WVPMpTF+kTTEzln9pVdlnEyR8NTe4msxnTS/KkhZpMNpw0WfIiHjLr5XU6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e0vIdv1k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1ECDC4CEE3;
-	Fri,  4 Jul 2025 14:23:57 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=LWKXmcKA3zhNqHPzgtLBpgEJ2ipxDgwEBn3G/EXaRPR55V9AcFqpa/wIGG1VObZjnoDqRbjLzkm2EYvlJy7++gAZ5vrM1OnwqWPRLLd/rm17lWUTTukW1R4XfuMpyVg4JebjMwwxwKEmeQNUaq4dWLyysefoNdgnKIAji2f+rxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GQz+ZRWI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B3E5C4CEE3;
+	Fri,  4 Jul 2025 14:31:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751639038;
-	bh=7WxuQlZc8vD5Z2eIBi4LfKOgvwn7Ii6URZnvn7v0EZo=;
+	s=k20201202; t=1751639518;
+	bh=+5DmzQLPza93gOMD8f0BTpUxdlPMXYwaa3qhIYuLHYo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=e0vIdv1kiJeyeJei5YeWNnELHvPB/rue8OHxIBjr1qkWnhfD7FnQpE8hqsr7KqPJW
-	 F+wc5CfEFGAjSvlacF873FFvBAu/PlBO0dQ/0JziQ5+4DmQd/G22cGHUIWPqSbETp8
-	 j7p5zXlQ2itNtAXyVtFAGgegRrD8reVVMk+GWIHvhQxi1gjhWr5L01ldn90IRJzbNl
-	 7JsEvpa7dH462+RJrUD712AJOVm+lLUrmoySFDEonaBk4JzwRzaKe6aYFZZ7U39H4N
-	 WndXVbF/xus83eGkkSCJSymZVJwrPBVeAwDYLGXi8tFA4zayyRbAuW0RyEoX8j/Bse
-	 xUTMOVDeu5r8A==
-Date: Fri, 4 Jul 2025 15:23:55 +0100
+	b=GQz+ZRWI7/hwV16HU05Q6HdQ8/j83VtY5qZBnkCtghe1J/maiZUQ9H71dOGjG0xe7
+	 pht4KQHCNQkaLAEsPBCMky3GEwyhDsgR03xBNA+PQkBh5Ab1sSO8RY3FjwJ4P54ntt
+	 EjM6TwpcSnIAcsNbflJWuetBqySHQitVEmxAwX7KmmSp4eSNlKuqvkEI1hvX5uCmcJ
+	 RM/o6HCY/Ka3c9VbB0EwRjkh58YvlRwUCqdLenzK20Hxkkh3EafFFl6F36/xFTBQUM
+	 iMP2Al27Hqy9HX05o/aNxVPFeevsI+2mDMSkjE25mblunx/LHs3pNAfIBc5wYnAWmo
+	 ftk49pulHJmGQ==
+Date: Fri, 4 Jul 2025 15:31:53 +0100
 From: Simon Horman <horms@kernel.org>
-To: Liangming Liu <liangming.liu@foxmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org
-Subject: Re: [PATCH] net: ipv4: fix mixed tab and space indentation in
- af_inet.c
-Message-ID: <20250704142355.GX41770@horms.kernel.org>
-References: <tencent_87F4A935227D7FACE9A05E681FC13882F40A@qq.com>
+To: David Thompson <davthompson@nvidia.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, asmaa@nvidia.com,
+	u.kleine-koenig@baylibre.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] mlxbf_gige: emit messages during open and
+ probe failures
+Message-ID: <20250704143153.GY41770@horms.kernel.org>
+References: <20250701180324.29683-1-davthompson@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,38 +60,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <tencent_87F4A935227D7FACE9A05E681FC13882F40A@qq.com>
+In-Reply-To: <20250701180324.29683-1-davthompson@nvidia.com>
 
-On Fri, Jul 04, 2025 at 05:10:11PM +0800, Liangming Liu wrote:
-> Fixes mixed use of tabs and spaces in af_inet.c to comply with
-> Linux kernel coding style. This change does not affect logic
-> or functionality.
+On Tue, Jul 01, 2025 at 02:03:24PM -0400, David Thompson wrote:
+> The open() and probe() functions of the mlxbf_gige driver
+> check for errors during initialization, but do not provide
+> details regarding the errors. The mlxbf_gige driver should
+> provide error details in the kernel log, noting what step
+> of initialization failed.
 > 
-> Signed-off-by: Liangming Liu <liangming.liu@foxmail.com>
+> Signed-off-by: David Thompson <davthompson@nvidia.com>
 
-Hi,
+Thanks for the follow-up on v1.
 
-Unfortunately we don't accept patches like this that
-aren't part of a larger body of work.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Quoting documentation:
-
-  Clean-up patches
-  ~~~~~~~~~~~~~~~~
-
-  Netdev discourages patches which perform simple clean-ups, which are not in
-  the context of other work. For example:
-
-  * Addressing ``checkpatch.pl`` warnings
-  * Addressing :ref:`Local variable ordering<rcs>` issues
-  * Conversions to device-managed APIs (``devm_`` helpers)
-
-  This is because it is felt that the churn that such changes produce comes
-  at a greater cost than the value of such clean-ups.
-
-  Conversely, spelling and grammar fixes are not discouraged.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#clean-up-patches
---
-pw-bot: cr
 
