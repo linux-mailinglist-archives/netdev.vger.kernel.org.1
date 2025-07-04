@@ -1,137 +1,91 @@
-Return-Path: <netdev+bounces-203956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30195AF8509
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 02:53:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CABE4AF8514
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 03:12:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FA551C86E30
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 00:53:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71E413B2C34
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 01:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 945FF27454;
-	Fri,  4 Jul 2025 00:53:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DLVJZSW/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13A5272612;
+	Fri,  4 Jul 2025 01:12:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6A71E89C
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 00:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8352D1EEE6
+	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 01:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751590410; cv=none; b=UTMu8CCeAdN+KvB+3FG9yzIIskPgN/Izy/IWbYDM2ofW9vcmDYKysgTnt8bKJiNG67HQ8ShAa3EjVKeMGXHzq4fSEhP0WWHbwOlIRxuWb2enJLF+tzdIngIaZM+2xKJQfiwYYgeeMIbTqPm/PycBjBaTY3bd99kG2X5lJGszePg=
+	t=1751591529; cv=none; b=Cow1AdxhK0yaJf8gmFtzq0TA7aLx0Z4yh4D7aPK05yP4g6U4hGQyWukwjtMMSupNcmMiUnxG4gLKeWwXGq/ePWJ79mU9iAiCzXI2Ezi+M3X76Q17CfUpq2gMNUbKUDzDvIthB7DgCyZ+uz9tV7BqXLa6FIoJPqmVgQ1Hbz9js4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751590410; c=relaxed/simple;
-	bh=/uh/kY9f63FFoWCRFO7wD3jUeZn7lzI7W8ly2efSafw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DRxdtY7UyaM7O44TIdDcnZhn0x20jmIUz7HQ6rX23RiBYtab6ydBWu+lJkB3WIRG2TGWVcjnWJYzYuznZ6Zxm7Mld3JAq3KYCiNEeUaHwrJ2NhFis9NlhDjvr4s2DIlqpxDdVZv6HuSxxvaxi4LG/E/V9opnLWx3S7OYY/d4zcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DLVJZSW/; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751590396;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=JSu8rsxK4BAk8jXC2ShdBMCyiCvqbyzaWdfyeOxP/PI=;
-	b=DLVJZSW/tNUGvpDdRHirTPp4JjnoQHm1KdSBttHwjJwLwiWZbh8LoqHUlDp/LidCyrrsbd
-	6AgHSibkSpKt2Hh73Q0uRA85JZyynAMBzbn89h6urOV0Cxaklrr8WUQUbc+uhWFEo1lWZg
-	cvESIbuoAVVHoCF1V6V6oqmMyrYLxUg=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: netdev@vger.kernel.org
-Cc: mrpre@163.com,
-	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	syzbot+de6565462ab540f50e47@syzkaller.appspotmail.com,
-	Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3] tcp: Correct signedness in skb remaining spac calculation
-Date: Fri,  4 Jul 2025 08:52:52 +0800
-Message-ID: <20250704005252.21744-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1751591529; c=relaxed/simple;
+	bh=v4ljxXh9jmLHKzoGwMvcVw2+anv/viIoaS532cR4bqI=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=nSMkB0TSgNxbflutDE3oaO6IyiMGggh7ubc5SH2ynir1PWjLtCaLWGa8DsdrfWIyUZ9E2lz1I5hyZTToLdHMwwy0Z91ZyPs6dsl8iE4FcLS6MqpsTVUg5k/ccBeqBDRz2hmsY+h4YqKlWdsmA6NuYR7rN71O1Ppw+A62SzilBmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3df33d97436so13703835ab.1
+        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 18:12:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751591525; x=1752196325;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MkuOwkFiGaiAuFJlUywvo+QnqLqF8JrCZ3yBHoZeImQ=;
+        b=A8YzKaE8PPz0AHAwDLE+EJHOLVuKCAsA/xZf57KDtsvAjBxN2kV/xIJonKBbQt2G9M
+         03EFnDUBrP9GZLlvGP7BEqMBjeo/PDvccTDaa3TIoMPPnPHeq5mAd91J8jlJIXbovf+H
+         XcRCef8WLDAFkcN3VUpJc2WlHNtosJRu0LjqD5rLLTGw9QIe8wn9QkWTaYBlUujDDhGd
+         SFvRmClM6IMpOwzzeM1ZIJkm58+GxCCkZexM2fcyKOyoXX8UlHY9Y175ja+JAKCYmgj8
+         7c4cwyuofG2voJygu2GrZrN9wwmSZUA2aM/n8tW1K3rA+5GEQe7LYL6CahnMWKPPsKlU
+         gc8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV7ww14zDKehZitwDraH5f8wTVmMZsowe4W976qYuYwRVgLrUMFRVIAV6t1ktwULtPuCZbF7Ls=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwwfSrkeT8MvR0wPPVwpZ6yDZswXAnjdS/OUCDAdy1J49GOPTx
+	fLWjahNNv2DjzX8YwRQIoiLD6ULmj6ob08LAsEe3Ywgy2KnzGYb6Zym/0sDwD/tHltp+VeFTvXy
+	ZmHE8OfRW5pOkClTfBaICGU7V3kfLFiQE0bD9N1pxzTt0lxn4ETg1VpdnkGg=
+X-Google-Smtp-Source: AGHT+IHwNUtJNYBWi9dh6hlhmUWt01g4j478p8KSAzt2iVqzGD7y+FBKavq1knyjjnEO5w2MgU6suKIGkQtwvL2xzu7Ovu7k6N+J
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a92:c52b:0:b0:3e1:3491:e873 with SMTP id
+ e9e14a558f8ab-3e13491e9d2mr8427755ab.10.1751591525652; Thu, 03 Jul 2025
+ 18:12:05 -0700 (PDT)
+Date: Thu, 03 Jul 2025 18:12:05 -0700
+In-Reply-To: <f14f4c0f-dc5d-454e-b5ef-1143b5a8f512@mojatatu.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <68672a65.a00a0220.c7b3.000c.GAE@google.com>
+Subject: Re: [syzbot] [net?] general protection fault in htb_qlen_notify
+From: syzbot <syzbot+d8b58d7b0ad89a678a16@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, victor@mojatatu.com, 
+	xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-Syzkaller reported a bug [1] where sk->sk_forward_alloc can overflow.
+Hello,
 
-When we send data, if an skb exists at the tail of the write queue, the
-kernel will attempt to append the new data to that skb. However, the code
-that checks for available space in the skb is flawed:
-'''
-copy = size_goal - skb->len
-'''
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-The types of the variables involved are:
-'''
-copy: ssize_t (s64 on 64-bit systems)
-size_goal: int
-skb->len: unsigned int
-'''
+Reported-by: syzbot+d8b58d7b0ad89a678a16@syzkaller.appspotmail.com
+Tested-by: syzbot+d8b58d7b0ad89a678a16@syzkaller.appspotmail.com
 
-Due to C's type promotion rules, the signed size_goal is converted to an
-unsigned int to match skb->len before the subtraction. The result is an
-unsigned int.
+Tested on:
 
-When this unsigned int result is then assigned to the s64 copy variable,
-it is zero-extended, preserving its non-negative value. Consequently, copy
-is always >= 0.
+commit:         223e2288 vsock/vmci: Clear the vmci transport packet p..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=16685ebc580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=36b0e72cad5298f8
+dashboard link: https://syzkaller.appspot.com/bug?extid=d8b58d7b0ad89a678a16
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=141d8c8c580000
 
-Assume we are sending 2GB of data and size_goal has been adjusted to a
-value smaller than skb->len. The subtraction will result in copy holding a
-very large positive integer. In the subsequent logic, this large value is
-used to update sk->sk_forward_alloc, which can easily cause it to overflow.
-
-The syzkaller reproducer uses TCP_REPAIR to reliably create this
-condition. However, this can also occur in real-world scenarios. The
-tcp_bound_to_half_wnd() function can also reduce size_goal to a small
-value. This would cause the subsequent tcp_wmem_schedule() to set
-sk->sk_forward_alloc to a value close to INT_MAX. Further memory
-allocation requests would then cause sk_forward_alloc to wrap around and
-become negative.
-
-[1]: https://syzkaller.appspot.com/bug?extid=de6565462ab540f50e47
-
-Reported-by: syzbot+de6565462ab540f50e47@syzkaller.appspotmail.com
-Fixes: 270a1c3de47e ("tcp: Support MSG_SPLICE_PAGES")
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-
----
-v2 -> v3: Use correct syzkaller link
-v1 -> v2: Added more commit message
-https://lore.kernel.org/netdev/20250702110039.15038-1-jiayuan.chen@linux.dev/
----
- net/ipv4/tcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 8a3c99246d2e..803a419f4ea0 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -1176,7 +1176,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
- 		goto do_error;
- 
- 	while (msg_data_left(msg)) {
--		ssize_t copy = 0;
-+		int copy = 0;
- 
- 		skb = tcp_write_queue_tail(sk);
- 		if (skb)
--- 
-2.47.1
-
+Note: testing is done by a robot and is best-effort only.
 
