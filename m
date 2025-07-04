@@ -1,146 +1,122 @@
-Return-Path: <netdev+bounces-204098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CB68AF8E46
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:21:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 655C8AF8E96
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:30:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFC3A1886591
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:20:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C1445602C8
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95A992E3360;
-	Fri,  4 Jul 2025 09:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32F5B28B419;
+	Fri,  4 Jul 2025 09:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="UA9K8fHW"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="mdiZoBaD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E312874EF
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 09:17:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6AE328935D;
+	Fri,  4 Jul 2025 09:27:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751620653; cv=none; b=eO/iD6fftBLXSuSNg6+lUJC+iqssg8qGbiub9nJauFnPcSZQPZhzNhpy/RMZyBPMhmohc5oWWpmVxX3hB4nzEEkxV1ZUXHCXt4ejloCGNiqdp/wEUmyUedXV99CpYc6Ug8MrGAoDSCcPhRfuFVJUNNcASqmDdicY6hEOsGkXxj4=
+	t=1751621230; cv=none; b=lH4h9XYBgnsr6pSXR1Zd24VwslbSMb7+vHdwGNYLW0+6ww+l0HJUeBU6Sw6SuRaLK3E7clVjjb22J92ILF7C0Sr4E0LXeRs5E8CP3qpLnoqjOwIryrtLYxSjAiGyZHthuXIxU4p1BXp2ur1klUMFkBqoI/UtKEELYPLsiaIBCMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751620653; c=relaxed/simple;
-	bh=nen0FQiNOdfZO4Q56xpz10TT78TaPWD+VpCvGeEfP+A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N9j8W+uEaGFvlJhPWEbxn5AHuQvQkOR7R8ZRswKbWFt0PIzxSPNxzQEb+JDWlFKV5BMp8w73quBMoIeIm4wReSgMd8XnbSSMTXF0F8LWn3WzX+Gx67Hl6HKx0CA5BRfYmPF2u5/YruRm+AM6AnfKiw6CMwWIs50sAK6974Q8z8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=UA9K8fHW; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-453749aef9eso2341395e9.3
-        for <netdev@vger.kernel.org>; Fri, 04 Jul 2025 02:17:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1751620648; x=1752225448; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vXvwDn7itTHGGZLWAaah4dYCYgTFq/tKhFwCa5qaWyo=;
-        b=UA9K8fHW/T6xt5r4Jv+OjNYodBPJ4e0KrAw4V+XrQlCvpdZG/AEbyr8rvXdQBHwwZ7
-         UP3aPuNXQSU6LX4IkLCAmkbdLkRW5Ei4PWLNelGMfCVnRpJA8wGH29HFyVzpEBKsCtBm
-         RmKChBIVmNYTNjS2UbBOrp0FsFkvy8j1wzKJZ29YCgf3m1G69/wCSlYJxfLkfBkLnwpZ
-         ZoyURvBStFdMAEUITtvqzBig1gXMjJgane3J3u1seV++41zx0HVSLdS3TjgR3m/zM28t
-         7LBIvrj4E2YqlejXmf4BTzcRpTRd6B27ZEukG0HNYoz22RLkEvuNI2/P1eXfV8kAEEqx
-         Ttsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751620648; x=1752225448;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vXvwDn7itTHGGZLWAaah4dYCYgTFq/tKhFwCa5qaWyo=;
-        b=umVRLYDRllziBEUvMJd5stJ7v0SGzOvCEbOJmFealT03OJBJGuZYSVkF+FStfYbkU0
-         yzPyb9R/0hKNmtk3OhDlzzieAyJ/ZYqJ1Unpjd30ZLXgoUfkhJ+vJPeYJADUc18sYMI/
-         h+AnN3iMiOzs2JEiQ4w4xg/1PYqC9anPwZfsEtBw0CzaFKAh4H98TCroNPi3BvdeB9Ge
-         qivW/vv2HBcSFDueFAK5nx5OVdcJWdsSV97g1jklmMTh5jTwZLgrzxHxD8IdhnGhAsRI
-         raMxknCbI/xj8EZlY5NxWpRbK1T5lh3961mMWVaA26vKU/TMqnQBK1mFRzNpu/OouBM2
-         azWw==
-X-Forwarded-Encrypted: i=1; AJvYcCW+QIbJ6rSoQivhV0pmKDQQGNE2niMdgQz2KHtfunprdR3YT6BcIGCeK8dzBgiPKO4ay9ZWRsc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWMIQTi5wCtOEgORWuSmqMq5a6p69cJEMJVen/w9GaYG55szbM
-	4eG4/dRBuaBfRPnhSrqtkKAb96J6yMFF9N71v5a3QRQujFqToG1XRhdOsBORYaYH7+c=
-X-Gm-Gg: ASbGncsmD4kcKm0JVqC/f7HnQfcpU6a8gAjGobmL8DhsP/zWDqY97F1ZWaF0L+zMwrh
-	DxRghfNwvTTGsp2gqO2cVsT034Um6htv6Cmd7QRAu6ITd8FYzSZpyiT47a1qL9sTZBmBQddvFVl
-	DggdsajBos7J3CDfJekm4smE3eeWp5zJ6ZZZivmiiWrQ18ec75KbgRdv1LD3NU3IKYABdGlYjUQ
-	/pVcw8iVB7aKbP6NTrYstvJgksSuwoB5KGDL1iP8rSFKccnp492CF1g4RKQO1WwFuYqpa5hmNtr
-	dt0k71GIAq/sWrK3vd0m1nSz/7pTasrHeE8W2/+tbJ5xd2HXLXRVVXMAWnmxh5GayC2Klw==
-X-Google-Smtp-Source: AGHT+IFD4sOgB0QaLEA+zQ5wvucnFk0w/y8zzg8ON1aekW0QpH8D16ZTT07LE/HlxqbKBTMJuFlcrQ==
-X-Received: by 2002:a5d:588e:0:b0:3a5:8cc2:a4a1 with SMTP id ffacd0b85a97d-3b4964e2afcmr1633764f8f.39.1751620648183;
-        Fri, 04 Jul 2025 02:17:28 -0700 (PDT)
-Received: from jiri-mlt ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b47030b9desm2014594f8f.19.2025.07.04.02.17.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jul 2025 02:17:27 -0700 (PDT)
-Date: Fri, 4 Jul 2025 11:17:23 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com, 
-	netdev@vger.kernel.org, david.kaplan@amd.com, dhowells@redhat.com, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH iwl-net v1 1/2] devlink: allow driver to freely name
- interfaces
-Message-ID: <my4wiyu5dqlalt45e5pz2dfhjm3ytbnshhhjqlcdetp357z7u6@zvnq7wfcunlv>
-References: <20250703113022.1451223-1-jedrzej.jagielski@intel.com>
+	s=arc-20240116; t=1751621230; c=relaxed/simple;
+	bh=5wbbXxgvDFyK+G+2mifhOPF7TDkBVwZWONUdtH31LPE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=jKdHgol/78GuewsXjiaGhyrEp5Rqw7FoQvp0H1J8SiGhdJc/9UHG97S2LHWrj3QHzlgMoU+wFEiM2SIpZAoaIbAddFiLrJhORHmqh5f7JX9NUWymGCZvJCUiK7+QTWHtYJMDYBSW3FVaGKQUUxx8BrPVLSmIkKnHqg9J1myIJ2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=mdiZoBaD; arc=none smtp.client-ip=220.197.31.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=f7
+	CFGDQq6f5U6xjFHBlUjqg91tFfHeHfYWC9ZkGkvEo=; b=mdiZoBaD3GX8nr36/8
+	1ux/cdjFvWgwWNccweBuly87T1hwHo7s/Meo4FMPqSQfBdYo8ObKxkS0Ha85Qof6
+	9q4CXlyB4DD/nrs+/C6py0E5iZQAKZJwUq2bUFTleS7ciGbg3X/W6+saF2ZQ2n9p
+	qjhH9UEW/Xmbk787KyJoS81ec=
+Received: from localhost.localdomain (unknown [])
+	by gzsmtp3 (Coremail) with SMTP id PigvCgA3y+NFnmdoo9YvAA--.6682S2;
+	Fri, 04 Jul 2025 17:26:29 +0800 (CST)
+From: Feng Yang <yangfeng59949@163.com>
+To: david.laight.linux@gmail.com
+Cc: aleksander.lobakin@intel.com,
+	almasrymina@google.com,
+	asml.silence@gmail.com,
+	davem@davemloft.net,
+	ebiggers@google.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	kerneljasonxing@gmail.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	stfomichev@gmail.com,
+	willemb@google.com,
+	yangfeng59949@163.com,
+	yangfeng@kylinos.cn
+Subject: Re: [PATCH v3] skbuff: Add MSG_MORE flag to optimize large packet transmission
+Date: Fri,  4 Jul 2025 17:26:28 +0800
+Message-Id: <20250704092628.80593-1-yangfeng59949@163.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20250703124453.390f5908@pumpkin>
+References: <20250703124453.390f5908@pumpkin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250703113022.1451223-1-jedrzej.jagielski@intel.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PigvCgA3y+NFnmdoo9YvAA--.6682S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7KFy8GF1ftFW7trW5Cr18uFg_yoW8Ar1UpF
+	W5J3srtrs5Ca1jyrn2qw4xWw45t3ySgr13Aas0v34Fk3909rykWFy2qF4xKF95JrnFkFyY
+	vw4qgasrCa4Yv37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRcTmhUUUUU=
+X-CM-SenderInfo: p1dqww5hqjkmqzuzqiywtou0bp/1tbiTgKAeGhnnH40IwAAsO
 
-Thu, Jul 03, 2025 at 01:30:21PM +0200, jedrzej.jagielski@intel.com wrote:
->Currently when adding devlink port it is prohibited to let
->a driver name an interface on its own. In some scenarios
->it would not be preferable to provide such limitation.
->
->Remove triggering the warning when ndo_get_phys_port_name() is
->implemented for driver which interface is about to get a devlink
->port on.
+Thu, 3 Jul 2025 12:44:53 +0100 david.laight.linux@gmail.com wrote:
 
-What's the reason for this? If you are missing some formatting, you
-should add it to devlink.
-
-Please don't to this.
-
->
->Suggested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
->---
-> net/devlink/port.c | 17 -----------------
-> 1 file changed, 17 deletions(-)
->
->diff --git a/net/devlink/port.c b/net/devlink/port.c
->index 939081a0e615..f885c8e73307 100644
->--- a/net/devlink/port.c
->+++ b/net/devlink/port.c
->@@ -1161,23 +1161,6 @@ static void devlink_port_type_netdev_checks(struct devlink_port *devlink_port,
-> {
-> 	const struct net_device_ops *ops = netdev->netdev_ops;
+> On Thu, 3 Jul 2025 10:48:40 +0200
+> Paolo Abeni <pabeni@redhat.com> wrote:
 > 
->-	/* If driver registers devlink port, it should set devlink port
->-	 * attributes accordingly so the compat functions are called
->-	 * and the original ops are not used.
->-	 */
->-	if (ops->ndo_get_phys_port_name) {
->-		/* Some drivers use the same set of ndos for netdevs
->-		 * that have devlink_port registered and also for
->-		 * those who don't. Make sure that ndo_get_phys_port_name
->-		 * returns -EOPNOTSUPP here in case it is defined.
->-		 * Warn if not.
->-		 */
->-		char name[IFNAMSIZ];
->-		int err;
->-
->-		err = ops->ndo_get_phys_port_name(netdev, name, sizeof(name));
->-		WARN_ON(err != -EOPNOTSUPP);
->-	}
-> 	if (ops->ndo_get_port_parent_id) {
-> 		/* Some drivers use the same set of ndos for netdevs
-> 		 * that have devlink_port registered and also for
->-- 
->2.31.1
->
+> > On 6/30/25 9:10 AM, Feng Yang wrote:
+> > > From: Feng Yang <yangfeng@kylinos.cn>
+> > > 
+> > > The "MSG_MORE" flag is added to improve the transmission performance of large packets.
+> > > The improvement is more significant for TCP, while there is a slight enhancement for UDP.  
+> > 
+> > I'm sorry for the conflicting input, but i fear we can't do this for
+> > UDP: unconditionally changing the wire packet layout may break the
+> > application, and or at very least incur in unexpected fragmentation issues.
+> 
+> Does the code currently work for UDP?
+> 
+> I'd have thought the skb being sent was an entire datagram.
+> But each semdmsg() is going to send a separate datagram.
+> IIRC for UDP MSG_MORE indicates that the next send() will be
+> part of the same datagram - so the actual send can't be done
+> until the final fragment (without MSG_MORE) is sent.
+
+If we add MSG_MORE, won't the entire skb be sent out all at once? Why doesn't this work for UDP?
+If that's not feasible, would the v2 version of the code work for UDP?
+Thanks.
+
+> None of the versions is right for SCTP.
+__skb_send_sock
+	......
+	INDIRECT_CALL_2(sendmsg, sendmsg_locked, sendmsg_unlocked, sk, &msg);
+	......
+This sending code doesn't seem to call sctp_sendmsg.
+
+> The skb being sent needs to be processed as a single entity.
+> Here MSG_MORE tells the stack that more messages follow and can be put
+> into a single ethernet frame - but they are separate protocol messages.
+> 
+> OTOH I've not looked at where this code is called from.
+> In particular, when it would be called with non-linear skb.
+> 
+> 	David
+
 
