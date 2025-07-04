@@ -1,148 +1,138 @@
-Return-Path: <netdev+bounces-204144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 628D5AF9306
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 14:47:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7733CAF932A
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 14:53:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B548480380
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 12:46:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B3997AB435
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 12:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3AEF2D63E5;
-	Fri,  4 Jul 2025 12:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 925392DFA24;
+	Fri,  4 Jul 2025 12:52:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MG0DJeXC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HNpak+Xv"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D738038FA3;
-	Fri,  4 Jul 2025 12:46:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05752D94A5;
+	Fri,  4 Jul 2025 12:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751633218; cv=none; b=oiODozOc/mgvGiMAqFl9q3Kpl22L6BAysok5L4lirBZrRxdhLzn1YR/J42K4V7LcI2vBL7Sj0jMAc6dCLHI5u+5ZpoXlXv50baXdgVlRdpKixEw5wAZSvPuRxhINgz0R3Nrk2C7j98UKNHIu4YhwIk92y6B2J/Umb0uZNgmoLzU=
+	t=1751633563; cv=none; b=UaJ09b7f+gdSVtx2aOXO8jiKUREQ01nQ3GDYWqeQwHmFbOAn2OHcE+Sbn/gorhCJkXeU0IgXtegOLa71dvXtwVXEXSXfyBgBgDyP4uOg6i9nEsbuOmGPvKUescPczrY+9Qu1QPHxb5CkQFcuXdLvVyInWSWvzUlqAhy7h34zwyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751633218; c=relaxed/simple;
-	bh=1rk86AvntVp/KK+qQBI5h2T2wnKgP6ZYTlqIVUIc8hY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=csJWBCVXjsSVxW7CPC1Lad7ipmobewzSvI4dKYO0M4+uflsqhduYSkmYD6BbomR53DZlCQH33e9Z0lwsXsmLMydoB13JA2t8Uoy5/v/BJtY7SL+wHi20o6PSm/CwQsNnfDhcHBdF2TF7K5ebE7imTInQrVZwqIirSF6Br6zdRaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MG0DJeXC; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 247C743277;
-	Fri,  4 Jul 2025 12:46:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1751633213;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Blod6Od3CkwpUAIdzJOd3oqDn6Iow/ARCeXK46AAgOA=;
-	b=MG0DJeXCi8aE5SYxQhke7ORPyHtu/OVya3p4KdhSUssSkrxEbj9bzoYQchj7ZYpDXsQ5Tg
-	AR6dExpLGnUAm8h/oNK4bMblTSIzDaRdRm1Yym94be0zLqTgtYoJoquvm3rfsHskdntbxk
-	lql01891TvwR8M2vUF2l265LsD+OSSa90KCT/PYQWLN+aJfcLfEE7QUk5oYruvpA2qihNU
-	YPkaO/2twXRxQnwyfqI1ZwP07qvp6HiZA0YA4w1SvJjwFOyxh82NCjCKC23yF5rH+SeIkT
-	BjMoSPymEgRV83TsK2Bg0sTmONPwA7z7NBsZDpiYdG5GIQKOQ0aHoPRw34+IrA==
-Date: Fri, 4 Jul 2025 14:46:51 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
- <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
- <linux@armlinux.org.uk>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
- Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Oleksij Rempel
- <o.rempel@pengutronix.de>, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] net: netdevsim: Add PHY support in
- netdevsim
-Message-ID: <20250704144651.064e3c28@fedora.home>
-In-Reply-To: <20250704124336.GL41770@horms.kernel.org>
-References: <20250702082806.706973-1-maxime.chevallier@bootlin.com>
-	<20250702082806.706973-2-maxime.chevallier@bootlin.com>
-	<20250704124336.GL41770@horms.kernel.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1751633563; c=relaxed/simple;
+	bh=Lv77ncIZaSXhxMERgrh5OeHFTO3hg5Vgpt53QyAMAhQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LbGm8cosS+hexlNuGdb6V4wvV68reZUQaJJH9VFuXSfySng1RF7HVAjCoprmtRw01NLZype/OT0NDbvOJgb5u5Np66moGg7VGJ5gqn3WxVjbPdV+/7XLO+63E3HkbF7ZiS0R4DGzzrDmSg7elaA+aw3TJzh0/njyaPNHZFgUnjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HNpak+Xv; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ae0a0cd709bso426174366b.0;
+        Fri, 04 Jul 2025 05:52:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751633558; x=1752238358; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=U6agZDXg3JLzaN2OCV+FcnM7kSozPXczImXEBeFbSpI=;
+        b=HNpak+XvYdw8A6qZi1PigFfjQ4GjEoB53RNBa3p+xTf9Wc3S3CEFfLQOBKaxqE0qOf
+         QX99Nu/f9i9ZFRLAaZFErNix2H2CbIqoZpqBRFT7DQrm/U0toah8I3Gjv1LUelxgAANK
+         fEG2gqCIh14faNTrqzh7wSRu9SpOEBChc2rMqDbP8MZrk6ke10T9m1w4qMZ8LrV/i+Js
+         XODsPfYVCsdmI464FyacBJSMIqKE+6h6JzNc1UUi/HLjqJTxpr/MhsP5UQUXiAuHJeTK
+         VaMJDGFcZ5U1WOk15ozITxEy6wM8287XDwkpLzmtU2WagMilDVbCkDJH01N+TkXrynC6
+         6fsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751633558; x=1752238358;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=U6agZDXg3JLzaN2OCV+FcnM7kSozPXczImXEBeFbSpI=;
+        b=OFuVhpWl5ziXWXAlDv0rZ0c59pjhRHKVPHBuDAFFGb0retjnEoddnBCXTO48D2lx+v
+         O7As3eohis5wXSxjX1el7JxV2ZL+qzJm0YsUkjIUpm2Xg3VPJJ6bGmIQ/IbdnvbSmt0S
+         G0f3PWEDA0i62/17O45+PoJW5QpQDN0CKRmIlW6BMwQMqbI2v32d0l9rWCcnlhSwmMTE
+         58tzYPzbFwfTL4BboGQjYqb5kjTjKIDQnJpSsJN3Q5X44d74uPnv+hyuQPwRZQUn0I7i
+         VLv4+qZpVDTRp2Ab6oFjQ9BUTQ4LcS9JzQ8FpngWPwZK8qLrjjiZdxKtgHzlQaVvkXq3
+         pz6g==
+X-Forwarded-Encrypted: i=1; AJvYcCWJHRe4x12pD6peQuIL4BGM/IRtxNFOY8EelPkykA+4jz8melzjxBSQGY/JLU5YBF5/HLImXdWxAtz/L/s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxw03jKllVwYsXtN5jDNh5N4Mf/voXI5dXDw9yAC9mFYOaZ5KbM
+	cApY8g3lt1Bu7zSyCLChCyj+NYrYjhmIhqzRjEHz4HipN42O2IJ6MiklMS2l+96hyHfVAw==
+X-Gm-Gg: ASbGncvX8tbYYzpGVxcky1jI/PSmMErM0XstVA0RTYW/2FnepUGgcLcHdw7iKxTYI7t
+	1k451PVPXifBYHScjxWfAD+bt8aaA4i55EdNSXFK4m9wVEJl+u3bTTiXAnF3k/ktg+o1K0cvos2
+	AesS1OAJ1CY6FDdCjKEwJ1qGPODk2gwg8pmsTI+udMjfqJhvofIBEaQixZDn4xHLjZnSUr4hLYT
+	JxFEcKAOGQemDHG8R4HGmTE+QxRGU2i/P6iGcPj8PmUuuxTgW0pVDWD8EwZqcAAgf5mfnZDeEkv
+	lDTbvQJKNOLgUzxeOCxQ01pvcLNwbsUMNFrPgk3ySOQnel3S6N24MFc2ILS81gMqBCdIYycAdTB
+	J0h9GLeSoBBqqL0BHBTKmqTRZ/bpV4y7wSs+87G2Q8M890FlGjvS3LuTeGQ+6ew==
+X-Google-Smtp-Source: AGHT+IFpCEztIGoFzfrmV+vqdIEGfp/nTh6AxOzZLT2hvsf0an1a/VUt6ax6LIeqDZwMXaAilODeiw==
+X-Received: by 2002:a17:907:9711:b0:ad8:adf3:7d6d with SMTP id a640c23a62f3a-ae3f9cecbadmr258052966b.21.1751633557801;
+        Fri, 04 Jul 2025 05:52:37 -0700 (PDT)
+Received: from legolas.fritz.box (p200300d0af416e00eb84418c678abf7e.dip0.t-ipconnect.de. [2003:d0:af41:6e00:eb84:418c:678a:bf7e])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae3f6b64f5asm166346066b.162.2025.07.04.05.52.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Jul 2025 05:52:37 -0700 (PDT)
+From: Markus Theil <theil.markus@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: davem@davemloft.net,
+	akpm@linux-foundation.org,
+	Jason@zx2c4.com,
+	Markus Theil <theil.markus@gmail.com>
+Subject: [PATCH v2 0/4] add usage hints to prandom and switch to Xoshiro
+Date: Fri,  4 Jul 2025 14:52:29 +0200
+Message-ID: <20250704125233.2653779-1-theil.markus@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddvfedulecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedujedprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrt
- ghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhm
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Simon,
+This series builds on top of the crng/master repository, as other
+prandom commits are already queued there.
 
-On Fri, 4 Jul 2025 13:43:36 +0100
-Simon Horman <horms@kernel.org> wrote:
+v2:
+  - fix indentation
+  - add better checks against invalid state
+  - rebase
 
-> On Wed, Jul 02, 2025 at 10:28:03AM +0200, Maxime Chevallier wrote:
-> > With the introduction of phy_link_topology, we have the ability to keep
-> > track of PHY devices that sit behind a net_device. While we still can
-> > only attach one single PHY to a netdev, we can look at all these PHYs
-> > through netlink, with the ETHTOOL_MSG_PHY_GET command.
-> > 
-> > Moreover, netlink commands that are targeting PHY devices also now
-> > allow specifying which PHY we want to address in a given netlink
-> > command.
-> > 
-> > That whole process comes with its own complexity, and a few bugs were
-> > dicovered over the months following the introduction of  
-> 
-> Hi Maxime,
-> 
-> As it seems like there will be a v2 anyway: discovered
+With the current cryptographically safe PRNG in drivers/char/random.c
+fast enough for most purposes, make annoyingly clear, that no one should
+use the prandom PRNG for cryptographic purposes without known about
+this.
 
-Thanks :)
+While looking at the prandom/random32 code, I informed myself about
+PRNGs and saw that currently fast PRNGs with better statistical
+properties than LFSR113, which is currently used, are available.
 
-> > phy_link_topology.  
-> 
-> ...
-> 
-> > +static struct phy_driver nsim_virtual_phy_drv[] = {
-> > +	{
-> > +		.name			= "Netdevsim virtual PHY driver",
-> > +		.get_features		= nsim_get_features,
-> > +		.match_phy_device	= nsim_match_phy_device,
-> > +		.config_aneg		= nsim_config_aneg,
-> > +		.read_status		= nsim_read_status,
-> > +	},
-> > +};
-> > +
-> > +module_phy_driver(nsim_virtual_phy_drv);  
-> 
-> I see that this has been flagged by Kernel Test Robot,
-> but as I had already written most of this it seems worth sending anyway.
-> 
-> I am somewhat guessing at the why here, but
-> I see build failures with this patch applied:
-> 
-> ld: drivers/net/netdevsim/phy.o: in function `phy_module_init':
-> phy.c:(.init.text+0x0): multiple definition of `init_module'; drivers/net/netdevsim/netdev.o:netdev.c:(.init.text+0x0): first defined here
-> ld: drivers/net/netdevsim/phy.o: in function `phy_module_exit':
-> phy.c:(.exit.text+0x0): multiple definition of `cleanup_module'; drivers/net/netdevsim/netdev.o:netdev.c:(.exit.text+0x0): first defined here
-> 
-> I am guessing that this is because above module_phy_driver() will define
-> init_module and phy_module_exit functions.  But the following lines near
-> the end of drivers/net/netdevsim/netdev.c also define functions with those
-> names.
-> 
-> module_init(nsim_module_init);
-> module_exit(nsim_module_exit);
-> 
-> ...
+Recent alternatives to consider are in my opinion:
+* PCG: https://www.pcg-random.org
+* Xoshiro: https://prng.di.unimi.it
 
-I just received the kernel test robot report indeed :( Thanks for the
-investigation ! I'll rework that part, sorry about that :/
+While both seem to have good statistical properties, I recommend
+to chose Xoshiro256++ here, because it seems to be even faster than
+RNGs from the PCG series.
 
-Maxime
+Furthermore, the authors of Xoshiro provide a small RNG named SplitMix64
+for generating high quality seeds for the Xoshiro RNG. By using this in
+the default way, no further seed checks or state warmup are necessary.
+This simplifies the PRNG code IMHO.
+
+Markus Theil (4):
+  prandom: add usage comments for cryptography
+  prandom/random32: switch to Xoshiro256++
+  prandom/random32: add checks against invalid state
+  test_hash.c: replace custom PRNG by prandom
+
+ include/linux/prandom.h |  30 +---
+ lib/random32.c          | 378 +++++++++++++++++++++-------------------
+ lib/tests/test_hash.c   |  40 ++---
+ 3 files changed, 220 insertions(+), 228 deletions(-)
+
+-- 
+2.49.0
+
 
