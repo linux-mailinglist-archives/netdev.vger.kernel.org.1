@@ -1,127 +1,147 @@
-Return-Path: <netdev+bounces-203965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2DAEAF8635
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 06:09:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA19CAF8639
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 06:10:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 857061C40194
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 04:10:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B09E566732
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 04:10:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BC21078F;
-	Fri,  4 Jul 2025 04:09:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577DF1A0BFD;
+	Fri,  4 Jul 2025 04:10:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gadcINUu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TTG3fRYU"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B7A1C28E;
-	Fri,  4 Jul 2025 04:09:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA40127735;
+	Fri,  4 Jul 2025 04:10:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751602186; cv=none; b=jTxq2W+23xWfs6VATQuc4rSiAtEfmO58a9ng9B4f9PbIeG1irNR4Zo7j4NUewSORmP44HiOJ3nPW+up5Cmu1sknmWBmFhA1/Ev6ZIoXkE3dCIPqcylC9eNhXqB4Oxssa0BmIB/q0Upttx5FlfVZ6k1WFkw5OqtHjClrKNcg4Hh8=
+	t=1751602241; cv=none; b=YQUN+gXjgvJialBo/Fxe/WgZjzNBw6lrdVqMuO0ymnKcOQzxHiBC8ifKVlbdwHmOzvN7ibiGmkBbgqd6g9XX94xCFBhgJ1LiueV2umFhsi/ItP4R+GYZuAql1mzby+GDie+Ihuwqve2VrxspfcEGA42IDp5FZ+U1dwF1yvxSPe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751602186; c=relaxed/simple;
-	bh=NuTXy5WMCH00kP5NE8jojIc7E0/NGT4JS+O7qSkAWvE=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=jtf7uQCkIorY4bI/waRrVxLro/eX10lhTYNNhGwt8003ZAsawWdcqkW7FfGjJZs5oLd/4Jd/59/eZMnXppScQOsawOVbMdLhKIwjU9CwSqBtdC+zkV3V0JX+lL1mXLvgKckrdNfCCiKAql+MzeKjgpMWqRSFk38aqMU4dmy/bxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gadcINUu; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=xVhyq3GAC3zK0skZbh1GvKpLi8ozrAxJQgU1jxCDsAw=; b=gadcINUuNR6ega90tbZtZW64df
-	RvtQ1sLPUdCqjCUAiqgrZ/czweLaj42cJxsCYVtjTRECbLWQldOdYusinQR7V+0UnvIfM/JBVHZal
-	4FghRFRu53FaOlDqpLFPlRjf97adW0mCDGLMU5snt/wKCiaulQtiJeK40Oz4XQ9hPNYkl1vlf42qU
-	abe59qlidfvie7/df4QXG8IBt04BV2LjMoLOarwm96/E7y6rZNnK2KFlMLIULXlS0vSLX/3n/prOn
-	Pf/D9Vz6hHdI7b3LZFFKHK4XWhfKulK5egK6i94aHGpUv2b9a9UDU4/MSSMNZaGWUPkriKYKAwnWg
-	4g6uqmlA==;
-Received: from [50.53.25.54] (helo=[127.0.0.1])
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1uXXjy-00000007maA-0sDv;
-	Fri, 04 Jul 2025 04:09:35 +0000
-Date: Thu, 03 Jul 2025 21:09:30 -0700
-From: Randy Dunlap <rdunlap@infradead.org>
-To: nicolas.dichtel@6wind.com, Nicolas Dichtel <nicolas.dichtel@6wind.com>,
- Gabriel Goller <g.goller@proxmox.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- David Ahern <dsahern@kernel.org>
-CC: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v3=5D_ipv6=3A_add_=60force=5Fforwarding?=
- =?US-ASCII?Q?=60_sysctl_to_enable_per-interface_forwarding?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <869cd247-2cde-46bd-9100-0011d8dbd47c@6wind.com>
-References: <20250702074619.139031-1-g.goller@proxmox.com> <c39c99a7-73c2-4fc6-a1f2-bc18c0b6301f@6wind.com> <53d8eaa7-6684-4596-ae98-69688068b84c@infradead.org> <869cd247-2cde-46bd-9100-0011d8dbd47c@6wind.com>
-Message-ID: <D20FF7E9-0A12-40F9-B134-BD78A8C59745@infradead.org>
+	s=arc-20240116; t=1751602241; c=relaxed/simple;
+	bh=UYnOJXNb5tVXYjvHRR3It8xW8zrJ9HPaV5rZRzi307A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GKcCED/gOdEnnBwCX6cPszZ/Bpqd9U/A/nM93UugL8lb7GB1pEnpXc1nsNHN+cRmEjdBixAaU6G+UWRlildnibkJHTKmFKN9vCPB1Vj7mHcql9IHq+pGYZkKGfEgHsiAnr008xfLJCnyOChKiR7LxkG45msjDy71HSalwx0wxHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TTG3fRYU; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-74931666cbcso537071b3a.0;
+        Thu, 03 Jul 2025 21:10:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751602239; x=1752207039; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rOsl7CR/Km27mQJQQ5nCcQyvHS1FKCs3qYBDakhTIoc=;
+        b=TTG3fRYUpJJjqBPYFEUEpVfcTuaclRdzBk1omrqn+9CaACEMKKFJKlKHOmkHSIerVu
+         I3jAxOUzQEfbmB/4hxFyolkef2JYCuFjsP7teHZSyUdWxR9byKKcmNPF78BGlh5B5G1s
+         HMEkzdETTznNm15PdA2EiZ4ROWWy1BsnhEvCLPnTpcKXxk5GndlzlHt48iQt5H8+0iqO
+         B6BxdSpjPgvhblhQWhAKye+OIBKaRwjiybmxDDC1ZJ0vrbfxKkhhpXv3/R5WYnxKiDCk
+         r9heg00Iaq5o49H80m4vJ2vPQADy+O/ZL11MdPk+AZ3f+bMPbhw7ijO1k5P0z78Lp4Wd
+         M6SQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751602239; x=1752207039;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rOsl7CR/Km27mQJQQ5nCcQyvHS1FKCs3qYBDakhTIoc=;
+        b=hkfqMUuR4mUaQUhk6eMzaXY0jEVXvvluam+5n2Z73KAFDdMTv/gnCjJNi+03lo8sbI
+         5gKoHDcXwW5Y62S6Bj7kH93rcr0YOD4YwZo7haBZRoAeZe7GbK10Nj7+51INCQ8kvQ6T
+         rVCxBXP51NZqBeoqrA48/pia9Q+Klv9VAux5HiJrUUzV2WYcPG8HNodByPnEKyMeVLsV
+         PS/Wujk5c/X8WjKDj5ie1BgeK5fch5xafTnHeBJc597tN4ehoFsYvKwyYoBPvNSJcppL
+         NIcYZ8RPePNh9iYxjD+phRhgM1KBSVSPoILJraON4b6UsYvLizHtDfaPu305CjIrzYhU
+         48BA==
+X-Forwarded-Encrypted: i=1; AJvYcCUqyVyhvcfEvxTPIitzjmVwT8y5FgR6KFJVKdG+HbXpulmjdJPET72fIIa4/7VUrtXnmb7C76Eb2Y475dYj@vger.kernel.org, AJvYcCUvyEKxLdG7OXDZfWhUEBs2XrmgAMB9EdQq28ZrRrl76d2dJAkXR5jUUCuvpF+da3N704UYASNKi3SK@vger.kernel.org, AJvYcCUx9jg2xNm1k1r1N1hy6yKvLZBx5kXoq0qJ4YWiI8HmUFdWtZzTR6Ya5YG37OzdP3QJpYJ4RPcmUeoy@vger.kernel.org, AJvYcCUzqjUf9G2eVDuBU1f2Aw04Yv/2Osk29GQ25Ohp8EuvZsQhnvpL6MFAyjKoMrrHJzCWSzyazzOuffs6xvZtAZg=@vger.kernel.org, AJvYcCVWWeCVcpPBeLCIrBjdeOC+OYleWzWGk240jhQIxdyZ23f/lUZ4VoudTMhAFnNSvXWzF1y+4twB@vger.kernel.org
+X-Gm-Message-State: AOJu0YwodPnLEA/cgw7FpS2vc3Sa5mIJAEQfe0Vlz9cCey1zdM2UPSPm
+	1zMXuBGZK9Kh1+Rli1UwCdv1SjpwGtfvdALpvMx6Q71YZDPlijtTjVn5WnNiZvT3
+X-Gm-Gg: ASbGncv93nkTN1BONm1Juzyuxi3uqHJ6lI28im6dEdeRsMLKaqU2dKrhTRn0oKRiQwS
+	Cp6KhZSkTSgD6u4Ul7nMLZeP2vv+hzdhm6Hy0Bg5FRKdg6H4AmKadDBEN8tO5SrxOsN5VICpVSW
+	51EhOj8HHPMAjf8PpbYz+s435oW6mKd0Ny+3EmnnobNObmZH9357G74mWtEJJRJk132fNPVrab7
+	t1uAez4/FmX2BAWec1e2PgwX5aHfck1n7L2GhZPM54qHOhH6JcYdf7K0BU/4HF2zdrgdMv8/u/G
+	CQ04guc56VeVW0HAcLhTyelNf+ZOu01nf+Pp2Z3ahlKAYiWHK4ndAJS4lyOdk0wQDVMhGi7++Lz
+	t2cb94RAraYSC7RbkZrJ9NePBHPl9pEaJs2FZ6ckV9xr5ow==
+X-Google-Smtp-Source: AGHT+IGijwZ/VaDDoU4q/O6ib72Y7x9Bzt5VkHerKX1ea/rm2xa62dpX8WJCTcQOWARzdJIAIhb63g==
+X-Received: by 2002:a05:6a00:b49:b0:736:4644:86ee with SMTP id d2e1a72fcca58-74ce69b2315mr1616237b3a.14.1751602238785;
+        Thu, 03 Jul 2025 21:10:38 -0700 (PDT)
+Received: from bee.. (p5332007-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.120.7])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce35ccb9esm1055290b3a.50.2025.07.03.21.10.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jul 2025 21:10:38 -0700 (PDT)
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+To: alex.gaynor@gmail.com,
+	dakr@kernel.org,
+	gregkh@linuxfoundation.org,
+	ojeda@kernel.org,
+	rafael@kernel.org,
+	robh@kernel.org,
+	saravanak@google.com
+Cc: a.hindborg@kernel.org,
+	aliceryhl@google.com,
+	bhelgaas@google.com,
+	bjorn3_gh@protonmail.com,
+	boqun.feng@gmail.com,
+	david.m.ertman@intel.com,
+	devicetree@vger.kernel.org,
+	gary@garyguo.net,
+	ira.weiny@intel.com,
+	kwilczynski@kernel.org,
+	leon@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	lossin@kernel.org,
+	netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org,
+	tmgross@umich.edu
+Subject: [PATCH v3 0/3] rust: Build PHY device tables by using module_device_table macro
+Date: Fri,  4 Jul 2025 13:10:00 +0900
+Message-ID: <20250704041003.734033-1-fujita.tomonori@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On July 2, 2025 11:58:16 PM PDT, Nicolas Dichtel <nicolas=2Edichtel@6wind=
-=2Ecom> wrote:
->Le 03/07/2025 =C3=A0 00:26, Randy Dunlap a =C3=A9crit=C2=A0:
->
->[snip]
->
->>>> +static int addrconf_sysctl_force_forwarding(const struct ctl_table *=
-ctl, int write,
->>>> +					    void *buffer, size_t *lenp, loff_t *ppos)
->>>> +{
->>>> +	int *valp =3D ctl->data;
->>>> +	int ret;
->>>> +	int old, new;
->>>> +
->>>> +	// get extra params from table
->>> /* */ for comment
->>> https://git=2Ekernel=2Eorg/pub/scm/linux/kernel/git/torvalds/linux=2Eg=
-it/tree/Documentation/process/coding-style=2Erst#n598
->>=20
->> Hm, lots there from the BK to git transfer in 2005, with a few updates =
-by Mauro, Jakub, and myself=2E
->>=20
->>=20
->> More recently (2016!), Linus said this:
->>   https://lore=2Ekernel=2Eorg/lkml/CA+55aFyQYJerovMsSoSKS7PessZBr4vNp-3=
-QUUwhqk4A4_jcbg@mail=2Egmail=2Ecom/
->>=20
->> which seems to allow for "//" style commenting=2E But yeah, it hasn't b=
-een added to
->> coding-style=2Erst=2E
->I wasn't aware=2E I always seen '//' rejected=2E
->
->>=20
->>>> +	struct inet6_dev *idev =3D ctl->extra1;
->>>> +	struct net *net =3D ctl->extra2;
->>> Reverse x-mas tree for the variables declaration
->>> https://git=2Ekernel=2Eorg/pub/scm/linux/kernel/git/torvalds/linux=2Eg=
-it/tree/Documentation/process/maintainer-netdev=2Erst#n368
->>=20
->> Shouldn't maintainer-netdev=2Erst contain something about netdev-style =
-comment blocks?
->> (not that I'm offering since I think it's ugly)
->>=20
->It has been removed:
->https://git=2Ekernel=2Eorg/pub/scm/linux/kernel/git/torvalds/linux=2Egit/=
-commit/?id=3D82b8000c28b5
->
+Build PHY device tables by using module_device_table macro.
 
-Oh, thanks=2E  Sorry I missed that patch=2E=20
+The PHY abstractions have been generating their own device tables
+manually instead of using the module_device_table macro provided by
+the device_id crate. However, the format of device tables occasionally
+changes [1] [2], requiring updates to both the device_id crate and the custom
+format used by the PHY abstractions, which is cumbersome to maintain.
+
+[1]: https://lore.kernel.org/lkml/20241119235705.1576946-14-masahiroy@kernel.org/
+[2]: https://lore.kernel.org/lkml/6e2f70b07a710e761eb68d089d96cee7b27bb2d5.1750511018.git.legion@kernel.org/
+
+v3:
+- Fix Safety comments and typo
+v2: https://lore.kernel.org/lkml/20250701141252.600113-1-fujita.tomonori@gmail.com/
+- Split off index-related parts of RawDeviceId into RawDeviceIdIndex
+v1: https://lore.kernel.org/lkml/20250623060951.118564-1-fujita.tomonori@gmail.com/
+
+FUJITA Tomonori (3):
+  rust: device_id: split out index support into a separate trait
+  rust: net::phy represent DeviceId as transparent wrapper over
+    mdio_device_id
+  rust: net::phy Change module_phy_driver macro to use
+    module_device_table macro
+
+ rust/kernel/auxiliary.rs |  11 +++--
+ rust/kernel/device_id.rs |  91 ++++++++++++++++++++++++----------
+ rust/kernel/net/phy.rs   | 104 +++++++++++++++++++--------------------
+ rust/kernel/of.rs        |  15 ++++--
+ rust/kernel/pci.rs       |  11 +++--
+ 5 files changed, 138 insertions(+), 94 deletions(-)
 
 
+base-commit: 2009a2d5696944d85c34d75e691a6f3884e787c0
+-- 
+2.43.0
 
-~Randy
 
