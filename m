@@ -1,146 +1,150 @@
-Return-Path: <netdev+bounces-204154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C0E2AF938D
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 15:05:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 73F72AF9327
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 14:52:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 443991679E3
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 13:03:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D39BE562FC0
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 12:52:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9EE02FC3AF;
-	Fri,  4 Jul 2025 13:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC1672D8DC8;
+	Fri,  4 Jul 2025 12:52:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VTZQCGwh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Tq+A+qyO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B3D2F50B0;
-	Fri,  4 Jul 2025 13:01:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83DC92D8DB1
+	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 12:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751634099; cv=none; b=eaIvkhRVA6PAJJOGJnZApRdCxDy1nTl90Kob8hxCXJBoFAG1jhXVh1sSu3mpwyC81r8exZyxEi1I2vUBoThqZIcfTI7e2Tvij1NnHWXs6JagY+NxCgweWH0hoIKidNsm0jy58fO1/uvszHTJAnWkDSdQEVnISAKbM9TDkvk7IUA=
+	t=1751633535; cv=none; b=X+a0UDU735J7SGxA5XkGAIGLfv7fGRUQGUT5xE9d1KFd0jEmw7a63XjgBXObNRgSLb9QF/ZNwOyJ8/fC+DwDTW8ahBFDG5+MYsZ2m0GhR/Y06OHJthPTqj8U7J6KsN99FRHPzBQ4umq0ZW1yicdtSXoNE9AHbZj8eMxy6U7hBVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751634099; c=relaxed/simple;
-	bh=1SFIg86ScSSNsm00r4z39bxOC+QdfD7ofZFsNo39Gyw=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=QuDmR68sXHJu1VdwvmOy/8TKkuR13xrJO6c5cZ2Dm/63RUAXWFJo+uSeEfuIuoyWIfr+OSEYH50qX3xum/A/sAZZ72tqBtllDepreXqcg7TkhEkoSAQX7YcMVMYNoQfVX3DGY/+ZHLIamqaMI/wFSizpV1u5LYGB1BhBXd1C95s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VTZQCGwh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CA72C4CEE3;
-	Fri,  4 Jul 2025 13:01:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751634099;
-	bh=1SFIg86ScSSNsm00r4z39bxOC+QdfD7ofZFsNo39Gyw=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=VTZQCGwhAN+TexmrabJGl6LSW4Xumo1b3iyodJcqKKb2S+NtuyH0wgV0XP9jPivaQ
-	 QuIqn8AtkfhK0+gKQ1ejE0AWPSMFd9C0sa8nLfuIly2BzdyUP8Px0ho4oMaC2LnN3l
-	 4lB1zV53g1wSLGMaKO1dWQLG5r1vqzj/k5z4JY4BdlXr5S/IsxRkvkdm+tgkf2VgOx
-	 fZqh+B/8T9b4HB0rnSrjSrFm90CAihtJ2cuZ6KUhRJXNxo5H/Hqv9zo/6d3q3R8XPw
-	 gK1OTk3fERiW0Prtx9CO8/vhuUS5bARcvhok3yE2TSbAXA89qvtD+iuArw73v2kZOz
-	 bKOGfZaX9sCWQ==
+	s=arc-20240116; t=1751633535; c=relaxed/simple;
+	bh=UpJO7tHztgaENI7GQIg23EKFxr+O+WGUa8QjAu6KUcw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dMiixYBXiy7IcahsVt33xUlecwO7rsIUQ9ZdsmaPKwu33vMecTdspEr+uzmyX1mwJnUIDijeMHjzoNDPxDtF+RoJ9AraQxAquIHKKuDX525ab2v045ajdKrEJsylr+S44VK+pBuLV1LobDeAnLPF4Zxko5v24Jplwd0zjmJ4zZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Tq+A+qyO; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751633534; x=1783169534;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=UpJO7tHztgaENI7GQIg23EKFxr+O+WGUa8QjAu6KUcw=;
+  b=Tq+A+qyO2+fmZsGqQCUAY80i+Om6a1szIsDk1Iy9KjodoRTbgh/9w5ZS
+   8/Y+ntgI4HeIknwTJKZKY+3ypKivroLDZ2+BwG9FunFje3x73KaHlNwL6
+   0ViFV8UUXnl+NR6tNQAH7ZeQPd9JzjIRgCkm8j0cQcwja2Su6ig0cEOQa
+   MIGoGetrsV3f0qaycOY85F4DJ8ZQfaQXZWz/lL4KA1F5izMYK9pMb6X83
+   SoXb2gXPhSXOdHTNvZA0U04U95wMNkCSXmqWHEXDCM/3WdG6nfxExHeH/
+   cQ0hD4tsCmJC+cnbtNcejqGpsjKCwrWwMKvBe97ttJxIsYltr5wjfFBzy
+   g==;
+X-CSE-ConnectionGUID: thcRETOgQgqS6ces+f5UZw==
+X-CSE-MsgGUID: nmCUqVj7RLqDQ2zDKnjQbg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="64660138"
+X-IronPort-AV: E=Sophos;i="6.16,287,1744095600"; 
+   d="scan'208";a="64660138"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 05:52:13 -0700
+X-CSE-ConnectionGUID: UvMSU6XUScas0Yn5Y0BKvQ==
+X-CSE-MsgGUID: ClfXJyNQStOm6u6sB87fig==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,287,1744095600"; 
+   d="scan'208";a="154764656"
+Received: from amlin-018-252.igk.intel.com ([10.102.18.252])
+  by orviesa007.jf.intel.com with ESMTP; 04 Jul 2025 05:52:11 -0700
+From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	andrew@lunn.ch,
+	pmenzel@molgen.mpg.de,
+	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [iwl-next v2] ixgbe: add the 2.5G and 5G speeds in auto-negotiation for E610
+Date: Fri,  4 Jul 2025 15:06:24 +0200
+Message-ID: <20250704130624.372651-1-piotr.kwapulinski@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 04 Jul 2025 15:01:23 +0200
-Message-Id: <DB3AGL1QO4M4.2HANWHX9TF9WN@kernel.org>
-Cc: <rust-for-linux@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-kselftest@vger.kernel.org>, <kunit-dev@googlegroups.com>,
- <dri-devel@lists.freedesktop.org>, <netdev@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <llvm@lists.linux.dev>,
- <linux-pci@vger.kernel.org>, <nouveau@lists.freedesktop.org>,
- <linux-block@vger.kernel.org>, <linux-pm@vger.kernel.org>,
- <linux-clk@vger.kernel.org>
-Subject: Re: [PATCH v13 4/5] rust: replace `kernel::c_str!` with C-Strings
-From: "Benno Lossin" <lossin@kernel.org>
-To: "Tamir Duberstein" <tamird@gmail.com>, "Michal Rostecki"
- <vadorovsky@protonmail.com>, "Miguel Ojeda" <ojeda@kernel.org>, "Alex
- Gaynor" <alex.gaynor@gmail.com>, "Boqun Feng" <boqun.feng@gmail.com>, "Gary
- Guo" <gary@garyguo.net>, =?utf-8?q?Bj=C3=B6rn_Roy_Baron?=
- <bjorn3_gh@protonmail.com>, "Andreas Hindborg" <a.hindborg@kernel.org>,
- "Alice Ryhl" <aliceryhl@google.com>, "Trevor Gross" <tmgross@umich.edu>,
- "Brendan Higgins" <brendan.higgins@linux.dev>, "David Gow"
- <davidgow@google.com>, "Rae Moar" <rmoar@google.com>, "Danilo Krummrich"
- <dakr@kernel.org>, "Maarten Lankhorst" <maarten.lankhorst@linux.intel.com>,
- "Maxime Ripard" <mripard@kernel.org>, "Thomas Zimmermann"
- <tzimmermann@suse.de>, "David Airlie" <airlied@gmail.com>, "Simona Vetter"
- <simona@ffwll.ch>, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, "Luis Chamberlain"
- <mcgrof@kernel.org>, "Russ Weight" <russ.weight@linux.dev>, "FUJITA
- Tomonori" <fujita.tomonori@gmail.com>, "Rob Herring" <robh@kernel.org>,
- "Saravana Kannan" <saravanak@google.com>, "Peter Zijlstra"
- <peterz@infradead.org>, "Ingo Molnar" <mingo@redhat.com>, "Will Deacon"
- <will@kernel.org>, "Waiman Long" <longman@redhat.com>, "Nathan Chancellor"
- <nathan@kernel.org>, "Nick Desaulniers" <nick.desaulniers+lkml@gmail.com>,
- "Bill Wendling" <morbo@google.com>, "Justin Stitt"
- <justinstitt@google.com>, "Andrew Lunn" <andrew@lunn.ch>, "Heiner Kallweit"
- <hkallweit1@gmail.com>, "Russell King" <linux@armlinux.org.uk>, "David S.
- Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Bjorn
- Helgaas" <bhelgaas@google.com>, "Arnd Bergmann" <arnd@arndb.de>, "Jens
- Axboe" <axboe@kernel.dk>, =?utf-8?q?Krzysztof_Wilczy=C5=84ski?=
- <kwilczynski@kernel.org>, "Dave Ertman" <david.m.ertman@intel.com>, "Ira
- Weiny" <ira.weiny@intel.com>, "Leon Romanovsky" <leon@kernel.org>, "Breno
- Leitao" <leitao@debian.org>, "Viresh Kumar" <viresh.kumar@linaro.org>,
- "Michael Turquette" <mturquette@baylibre.com>, "Stephen Boyd"
- <sboyd@kernel.org>
-X-Mailer: aerc 0.20.1
-References: <20250701-cstr-core-v13-0-29f7d3eb97a6@gmail.com>
- <20250701-cstr-core-v13-4-29f7d3eb97a6@gmail.com>
-In-Reply-To: <20250701-cstr-core-v13-4-29f7d3eb97a6@gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Tue Jul 1, 2025 at 6:49 PM CEST, Tamir Duberstein wrote:
-> C-String literals were added in Rust 1.77. Replace instances of
-> `kernel::c_str!` with C-String literals where possible and rename
-> `kernel::c_str!` to `str_to_cstr!` to clarify its intended use.
+The auto-negotiation limitation for 2.5G and 5G speeds is no longer true
+for X550 successors like E610 adapter. Enable the 2.5G and 5G speeds in
+auto-negotiation for E610 at driver load.
 
-These two things can also be split? And it should also be possible to do
-this by-subsystem, right?
-
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
 ---
-Cheers,
-Benno
+v1 -> v2
+  More details in commit message
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 35 +++++++------------
+ 1 file changed, 12 insertions(+), 23 deletions(-)
 
-> Closes: https://github.com/Rust-for-Linux/linux/issues/1075
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
-> ---
->  drivers/block/rnull.rs                |  2 +-
->  drivers/cpufreq/rcpufreq_dt.rs        |  5 ++---
->  drivers/gpu/drm/nova/driver.rs        | 10 +++++-----
->  drivers/gpu/nova-core/driver.rs       |  6 +++---
->  drivers/net/phy/ax88796b_rust.rs      |  7 +++----
->  drivers/net/phy/qt2025.rs             |  5 ++---
->  rust/kernel/clk.rs                    |  6 ++----
->  rust/kernel/configfs.rs               |  9 +++++----
->  rust/kernel/cpufreq.rs                |  3 +--
->  rust/kernel/devres.rs                 |  2 +-
->  rust/kernel/drm/ioctl.rs              |  2 +-
->  rust/kernel/firmware.rs               |  6 +++---
->  rust/kernel/kunit.rs                  | 14 ++++++--------
->  rust/kernel/net/phy.rs                |  6 ++----
->  rust/kernel/platform.rs               |  4 ++--
->  rust/kernel/str.rs                    | 24 ++++++++++++++++--------
->  rust/kernel/sync.rs                   |  7 +++----
->  rust/kernel/sync/completion.rs        |  2 +-
->  rust/kernel/sync/lock/global.rs       |  3 ++-
->  rust/kernel/workqueue.rs              |  8 ++++----
->  rust/macros/kunit.rs                  | 10 +++++-----
->  rust/macros/module.rs                 |  2 +-
->  samples/rust/rust_configfs.rs         |  5 ++---
->  samples/rust/rust_driver_auxiliary.rs |  4 ++--
->  samples/rust/rust_driver_faux.rs      |  4 ++--
->  samples/rust/rust_driver_pci.rs       |  4 ++--
->  samples/rust/rust_driver_platform.rs  |  4 ++--
->  samples/rust/rust_misc_device.rs      |  3 +--
->  scripts/rustdoc_test_gen.rs           |  4 ++--
->  29 files changed, 84 insertions(+), 87 deletions(-)
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+index d741164..b202639 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+@@ -1953,6 +1953,16 @@ int ixgbe_identify_phy_e610(struct ixgbe_hw *hw)
+ 	    phy_type_low  & IXGBE_PHY_TYPE_LOW_1G_SGMII    ||
+ 	    phy_type_high & IXGBE_PHY_TYPE_HIGH_1G_USXGMII)
+ 		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_1GB_FULL;
++	if (phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_T   ||
++	    phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_X   ||
++	    phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_KX  ||
++	    phy_type_high & IXGBE_PHY_TYPE_HIGH_2500M_SGMII ||
++	    phy_type_high & IXGBE_PHY_TYPE_HIGH_2500M_USXGMII)
++		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_2_5GB_FULL;
++	if (phy_type_low  & IXGBE_PHY_TYPE_LOW_5GBASE_T  ||
++	    phy_type_low  & IXGBE_PHY_TYPE_LOW_5GBASE_KR ||
++	    phy_type_high & IXGBE_PHY_TYPE_HIGH_5G_USXGMII)
++		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_5GB_FULL;
+ 	if (phy_type_low  & IXGBE_PHY_TYPE_LOW_10GBASE_T       ||
+ 	    phy_type_low  & IXGBE_PHY_TYPE_LOW_10G_SFI_DA      ||
+ 	    phy_type_low  & IXGBE_PHY_TYPE_LOW_10GBASE_SR      ||
+@@ -1963,31 +1973,10 @@ int ixgbe_identify_phy_e610(struct ixgbe_hw *hw)
+ 	    phy_type_high & IXGBE_PHY_TYPE_HIGH_10G_USXGMII)
+ 		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_10GB_FULL;
+ 
+-	/* 2.5 and 5 Gbps link speeds must be excluded from the
+-	 * auto-negotiation set used during driver initialization due to
+-	 * compatibility issues with certain switches. Those issues do not
+-	 * exist in case of E610 2.5G SKU device (0x57b1).
+-	 */
+-	if (!hw->phy.autoneg_advertised &&
+-	    hw->device_id != IXGBE_DEV_ID_E610_2_5G_T)
++	/* Initialize autoneg speeds */
++	if (!hw->phy.autoneg_advertised)
+ 		hw->phy.autoneg_advertised = hw->phy.speeds_supported;
+ 
+-	if (phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_T   ||
+-	    phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_X   ||
+-	    phy_type_low  & IXGBE_PHY_TYPE_LOW_2500BASE_KX  ||
+-	    phy_type_high & IXGBE_PHY_TYPE_HIGH_2500M_SGMII ||
+-	    phy_type_high & IXGBE_PHY_TYPE_HIGH_2500M_USXGMII)
+-		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_2_5GB_FULL;
+-
+-	if (!hw->phy.autoneg_advertised &&
+-	    hw->device_id == IXGBE_DEV_ID_E610_2_5G_T)
+-		hw->phy.autoneg_advertised = hw->phy.speeds_supported;
+-
+-	if (phy_type_low  & IXGBE_PHY_TYPE_LOW_5GBASE_T  ||
+-	    phy_type_low  & IXGBE_PHY_TYPE_LOW_5GBASE_KR ||
+-	    phy_type_high & IXGBE_PHY_TYPE_HIGH_5G_USXGMII)
+-		hw->phy.speeds_supported |= IXGBE_LINK_SPEED_5GB_FULL;
+-
+ 	/* Set PHY ID */
+ 	memcpy(&hw->phy.id, pcaps.phy_id_oui, sizeof(u32));
+ 
+-- 
+2.47.1
+
 
