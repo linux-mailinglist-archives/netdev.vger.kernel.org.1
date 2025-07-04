@@ -1,247 +1,193 @@
-Return-Path: <netdev+bounces-204258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65371AF9B87
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 22:14:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23BCEAF9BA1
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 22:18:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B63515A845E
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 20:14:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 403F63BC70E
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 20:17:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E37922FDFF;
-	Fri,  4 Jul 2025 20:14:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87FC61F429C;
+	Fri,  4 Jul 2025 20:17:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="H8sovjks"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bNqyguPl"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2046.outbound.protection.outlook.com [40.107.236.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB1522836C;
-	Fri,  4 Jul 2025 20:14:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751660092; cv=fail; b=qg077KyndvhAuVca6SCiLFtFLvFx57Vn3IuZ5bga0E0rtM9gvTygpVHCZolqxSlo9NeInEVG9chLwuFLmLgOFOT4WfQulZFLQy/AnBLS1I/G8TSyQGtdJQ+eqjYbxvB+B8Q5bb7Vwb+h13BtlvTez9g5gPko+mucYbIowggwxy0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751660092; c=relaxed/simple;
-	bh=eOakgkcnn+xG3VYCEY/1pbBUT9FbMEcTZi+nq8zipNM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=W6OSDPE87Nx5aGiG0tiTLiVjLPGV1yuV67AmdVZnUxaY7scSUzcahFv+IJkIoozSzD7WhYn9T5Eh5mh681S8kNC0eYVJ3eoV7jwlx4oRKWzx5+uWNr53V0T2YA0fbA8GCCLsFXVUOEON+jo/NjhwG9DwOR+Axc9YZA9+himFrP8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=H8sovjks; arc=fail smtp.client-ip=40.107.236.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MHVk9fjBHte2A+9xk2T62HyRpniEfdf+MGV+jUCoO43saFmw1h+4/4m0eQu/fN+ET72I/CmDglnOgay028naoeNd52oCkamCkM9usPZQW3oN5ZieM3GkIU6suF/spml/i1Ju/hrnfAadze0IT/7Ajq1X8GAkyGt0KP1bfkVdDx5RP7ev3hrkpaHipQ68CIhMy4o4rBDOoK/LpJcKC+WMOSZk7asunr6yYKfx0nKXVvXRGFqRlduLg3VocSsa9vaswD8woUpHliUMTBeIRGwKkbdn4tM2MDtKX4eHgWVXwBXDa9n3BRd78n1BQr3bTt9gKNV2WRk20BocdsHUr4K2rw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WzFddSS4S7sZw5U/6jQ+GfHdOVLP+tG4Wkuv5aF5fWg=;
- b=a4HWM1ZBhylPRfJhX6gUYkkzQVlkoMUDFhHoAwhpafhAaCHsCsuBMmcsf4RHLEgndhCnnfVvVA5rQdgxZhFleV8zeFj7Fdb5XcP0Z56HIe705F7LxRpqSQ3U5+V+rtWd+1AbSfG2lAIaJwCpHBDRB4uvvuncGiL8dnkXbDzpXSlVhiNuAie+Q5j/1YztKlL4PAu0YINyLRh494p/2eTIMBIEfMZ/ogvVuZyYhcCQN0D/pLZ9nrynWd89FphRXqz+oSwLAhMuAJjNeuEIUL1TmeytXCQeZW4FBRf/Yo+HFb32WchQh6xaFss4v0myZFSVekdpUDc9CiX5LIkJDvpa8A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WzFddSS4S7sZw5U/6jQ+GfHdOVLP+tG4Wkuv5aF5fWg=;
- b=H8sovjksh7opF4QjWcRN8FlkBe0l227/JNc0g/dKcvmbAhPMuMq8+QkXOoCopnbWnN9RE72gzMPlSJnmQyjOFdK/dhsimPVp7RIOmY1KNWIJsKqE6MJLHcCU7QVx52uKrnKDAljHyIcUGiabDTmSWnNjr8b8Aq/GHUCwY3kWXQ8UpE9ed3A3KGCJHgWUWRTIRAQBDfFejdgj5E103BZ4bvxQj5fIJn7Djl4KdUwQxq+QiUAi7y3V5RLEcgesvUjwf6T1f09SL9kiWSup0UcaheQ5BDfNrKvDkuxMGkyucyGnFKFI2CE+PXKvlhCOfr7x3VA8dCb5inf34LNSgCMZPg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from IA1PR12MB9031.namprd12.prod.outlook.com (2603:10b6:208:3f9::19)
- by CH2PR12MB4278.namprd12.prod.outlook.com (2603:10b6:610:ab::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.27; Fri, 4 Jul
- 2025 20:14:44 +0000
-Received: from IA1PR12MB9031.namprd12.prod.outlook.com
- ([fe80::1fb7:5076:77b5:559c]) by IA1PR12MB9031.namprd12.prod.outlook.com
- ([fe80::1fb7:5076:77b5:559c%5]) with mapi id 15.20.8901.021; Fri, 4 Jul 2025
- 20:14:44 +0000
-Date: Fri, 4 Jul 2025 20:14:20 +0000
-From: Dragos Tatulea <dtatulea@nvidia.com>
-To: Chris Arges <carges@cloudflare.com>, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org
-Cc: kernel-team <kernel-team@cloudflare.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, tariqt@nvidia.com, saeedm@nvidia.com, 
-	Leon Romanovsky <leon@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	John Fastabend <john.fastabend@gmail.com>, Simon Horman <horms@kernel.org>, 
-	Andrew Rzeznik <arzeznik@cloudflare.com>, Yan Zhai <yan@cloudflare.com>
-Subject: Re: [BUG] mlx5_core memory management issue
-Message-ID: <md46ky57c74xrw2l2y5biwnw4vzgn6juiovqkx7tzdwks6smab@vpfd5hmclioa>
-References: <CAFzkdvi4BTXb5zrjpwae2dF5--d2qwVDCKDCFnGyeV40S_6o3Q@mail.gmail.com>
- <dhqeshvesjhyxeimyh6nttlkrrhoxwpmjpn65tesani3tmne5v@msusvzdhuuin>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <dhqeshvesjhyxeimyh6nttlkrrhoxwpmjpn65tesani3tmne5v@msusvzdhuuin>
-X-ClientProxiedBy: TL2P290CA0004.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:2::13) To IA1PR12MB9031.namprd12.prod.outlook.com
- (2603:10b6:208:3f9::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D21BC145346;
+	Fri,  4 Jul 2025 20:17:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751660264; cv=none; b=OtaLG2OqPA8GLXWAghyHhdlB/a0qqN7A4NVXmlPz3YOlCjOiggk+LrlOZQmcu+xxCNqlmOLEGhPotkQE7AeV/4FJNhHKX+mExmwYlj+Jfc/CZO1OQVk3Xl/ek6piukiqi2ZXIf6slUxtrb7HMUTBBugkhUOCA7ZShBMPx/J1giQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751660264; c=relaxed/simple;
+	bh=ToSSYeda+QvMFhFJXYbRjh6o30tOZEKbemwVCqAxu2s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Nt/rH25hWz2TgPZVGrvLoslQ6tD5vLScMwpO1nhMvgyxvXIq3QoDQUCAzJtwqUo8bNUNHHbN1h3KuOwaVBLrI1CwAoPIEY/RHjVJq5TfkQterDZruDS4T+4OgUDrjnwfPx71vbDxNcVOgDIn2knI3NJ2ktEtfm/PwLuDAwcXSlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bNqyguPl; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-60c93c23b08so2342310a12.3;
+        Fri, 04 Jul 2025 13:17:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751660261; x=1752265061; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=NcNlVgWf+PG2kdLWT+gkGkxQYjH5Ivc/a0PUOrXHeO8=;
+        b=bNqyguPl0xrE1jzVA7rq5YcxgyWlEQf2RtB+mjVSLcuqZB8QVzbfpL/fFoM7moqWaX
+         mw8hDQj9LlJzu9RLWTH3gOnNUxfJyBqWqg+hOPeSK84+zIakS7+ZxUlwa36m/ZkrSItT
+         3tfa0ezzUdR0Ip3zHg/dGhvCBDcdP2YpSJ8yPx3npfRY4C00yMSaDb4rOStnuY0dqdwr
+         3tvOdJO6m1Dt5eqSnB033i+ZnqxK4ZV7v/vrHrb6Ub/wjwko4Nx0DWHzW56q46yGWBlo
+         jzEf1HMRUv9LOUhpOK9bbaMoIgx0AOF9/52DhuiXs59PXo2Su6A+U4NgagQYypKIKQ0E
+         N2/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751660261; x=1752265061;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NcNlVgWf+PG2kdLWT+gkGkxQYjH5Ivc/a0PUOrXHeO8=;
+        b=vXBCx69gNrQJx7wTWtG7Mb09BE5mjz97PTcHkIIcEa9E4I3gziVgr9XQcVrunvDbL2
+         e5bQCxxdMWoI8g90i6L5vNlC2BHemI254WLBg2qguHJs2nj0pF2KitTDcd4YOHHZW6av
+         4CGnq1l/n2X5Nvtzs/yZowFPWoSDq42ZVGo1CAkr3WltbbQyUqOs/onAoXTLkBr2uyLw
+         En7GBdxFdSP7JoQui5cg6fgoOc7s0Fjq/N40Ud3bQQ3QENjyacAPEvfULxsPrAYKVVBT
+         7t+xwYrsatZ7sC5LX3JQgD8KF4DJszIpStKgbQbc+BdDwH3rSOMm7/UYOQIlJBTEO5M0
+         D3tw==
+X-Forwarded-Encrypted: i=1; AJvYcCUKh+zR/XcwYYIb5Ju9tqD9hotTT9lYQEQJwTf7qs+EtEF1x4Q9HIbatF7eE4tessCZYl5E77hx@vger.kernel.org, AJvYcCUV4GME6p7yKyxLp0J9tIQtOotbrEJPKoxXdFQcP+L4eBP5bOJbUNSPpyIRGun4b1SzcoBHP+fQ+19vfxs=@vger.kernel.org, AJvYcCUmZ9d0SzoM8ytScq6zTsALBDmb/sStjB8kdFfcpbyhaTpjh8sIEveGgfp3EZ9ODx0wiogBOAV0@vger.kernel.org
+X-Gm-Message-State: AOJu0YznPwzc46byVTZBg+4Hj/NCpRMDXG7dYrIAgj7frzRe5ZEAuAeg
+	QqeJ7/9YVKPICGN9cpWMv11VY4O2qgT4tOK1cptEFM4CwPtdW4xu5kRo
+X-Gm-Gg: ASbGnctmQJGpDYQ9amilnkQH/DzSE8A5DDmo03bncRqyByvW1SHL3eRVH1Vu41/xo5m
+	hZAM5Ur0IgtOF0PQWcNdw658ReQFQuZHzF8FjYi2WDplaNSGqP7mYyaUc42j8K+9eFFYgQd+d9k
+	kdgrgEn6DVkYZavJEkroTqF9Il3l2nD9W2+fbf9bSOAeMJ68iXJcqoj8QUAguJ014Esa6JrU1b+
+	TvstyAeSvcgEpe/ewA6Z61jXbAHwStTLfTuSnIIMCxdPaV6zTIl98lGmDBqERs4x+/IRS5Vf+rH
+	/gxKx7FA+LGE9GQtHBp21inIUszMOpkpHP12BNVAiQIPge98Qp0OxIcws6hOQm2pmFBvKek3rNL
+	u+m460rpRSujlGrRyBee5CVclrCKFu+Vn7GjpsvC366vmQaZ+S+jlMhyWoMJaNpvjLdeiuYbmfc
+	L50Il8kDKY080fR/TDhrbiLccHsbYxQumWiJxf
+X-Google-Smtp-Source: AGHT+IFSIskvmIhHXw4zIijBIXv/T/NVh58YZFyd5CYdip6AxgaDFxcLpextRGQE/hA/eaElTXlVgQ==
+X-Received: by 2002:a05:6402:2354:b0:609:7e19:f10f with SMTP id 4fb4d7f45d1cf-60fd1f8af77mr3569937a12.0.1751660260953;
+        Fri, 04 Jul 2025 13:17:40 -0700 (PDT)
+Received: from ?IPV6:2003:ea:8f2f:7a00:656d:a8a8:c9d6:8d1d? (p200300ea8f2f7a00656da8a8c9d68d1d.dip0.t-ipconnect.de. [2003:ea:8f2f:7a00:656d:a8a8:c9d6:8d1d])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-60fcb0c791bsm1809126a12.42.2025.07.04.13.17.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Jul 2025 13:17:40 -0700 (PDT)
+Message-ID: <0310186d-dfc5-406f-8cd1-c393a7c620e8@gmail.com>
+Date: Fri, 4 Jul 2025 22:18:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB9031:EE_|CH2PR12MB4278:EE_
-X-MS-Office365-Filtering-Correlation-Id: c45cd071-5cac-47ad-eae8-08ddbb376a4f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?RVd6OCtYR2ZqQUFyaUN3ZENhZldSSlJ1cWE4andGZ0VZV0FOcEVGbWFsWGEw?=
- =?utf-8?B?b2QzN2M2VWZBdmlUUERFTEhZTHo5ZW14R3htRTF4QmRYb2lkUjdYQnJmRnhD?=
- =?utf-8?B?clJzT20xV1pDMzhUS0pKemlubWNZWVdFWGhuMkNoVEtFbGVvTktILzhvKzJ6?=
- =?utf-8?B?bjdwZW9kVWNJY3J1Q3RObE5BeGh2U3dnVXR0Yi9VWDdnWTY0b1BibzBaR0gr?=
- =?utf-8?B?Y1YxQitHM1ppcWtyeTFQNkc3eTZxbGZhMFFiOXFSQXpXVHdoYkxyOTZhSUNY?=
- =?utf-8?B?enE1RTBXWG8zeGFMNEpsY3VTaHhwQ1F5ZmVMUUNjZUM2cHg5ekE4MWU1eHdF?=
- =?utf-8?B?dFpOMkp3Vm4vOHdPbnN3VlhCUUgvVkI4cUxZSFFQaHN2ZXdXdEs0THVyWEdr?=
- =?utf-8?B?dUpPS05IWW1sV2FtWktpRWp4MHoxR1dxS0tidEdDR293azhkTXQrN2NSTVRw?=
- =?utf-8?B?TXI3ejUxZ1JYTjBoOUVldDZmcXBYSTRyUTFRTHFlWklXamNXeEVXVjhlUWRF?=
- =?utf-8?B?N1hzM0R3akRPck9sb2ZDaDJiRExiZHV3V1FteUFhN1BZdHVicVBHcDdVRW9y?=
- =?utf-8?B?N1FhcGtOOEErU1ZxZjY4VlJKdlZ3WnRicjdWRFZiNWVucTZ5TEl4OTBud0wz?=
- =?utf-8?B?cHk5YmFuNmhsVTIvYm42R1RTMEM4RlR4TVN0MU91Um9LT09MOXVQNWw2R2VX?=
- =?utf-8?B?aWhPWkpCb0FxVlZwdlM1bjNJOEwwTlJYdnBhTTlrR2ZNSkxlR3lpUU8xTklF?=
- =?utf-8?B?L0tobmFod29MZFN6aWk3N2EzQXVMWCtSY0hsQ3pvdFJ0amZpdG9RMjhoTVpr?=
- =?utf-8?B?eW9aUzUxRkttZTNiMnNKWStDdElSdXBPSm85eEhDWjROTzBVRGZGR2VuaVA3?=
- =?utf-8?B?Y3lNLzgzSThTR2hKRFVBZ0U2dUF2dGk5a1VFZkw2SXczZlhuc3FhTzdiSkVv?=
- =?utf-8?B?V09SR3d1TkNMTkdQVG15eWdNNWU2bFQ5bG9TZTdTek5EODRhcDRqUmJqNXBY?=
- =?utf-8?B?SUR4MjNadjArZnA0Z1lnUlAzd1lZcmpFRFQ3UGpCU1FvVzJweFRCMnZreU9u?=
- =?utf-8?B?MC9DclYvMmVscmFvWWRoY01laEZIbVh1U3VPMy8wK0pHdVVkekRqNFhaME1v?=
- =?utf-8?B?SnR5S0dFSjVkMTU1ZWpmRk85SFJQeWE3M2VoV2dtaEZ6eEpYZFY3VU56UUZq?=
- =?utf-8?B?UUc5UzNocndMWUVNcUdMd0lRbUcyblY4eUNUazdSWDEwWFg3Q3VHZTdhVHNh?=
- =?utf-8?B?bkRoVTdxbk8rd3pDbFJ1L1V1OElXcWdVOVRic2dtZXJRUUlvVVV4R2RJTDhB?=
- =?utf-8?B?OCtUd3JUWWRKQ3laWWlUMkM3Wll2dEFzUnVBZjNhMUY3dDdyVUh6WlFNZVR0?=
- =?utf-8?B?bENZUTc3VUJLaHE4SzQra2U3aGZVdVFRMXo1SVo3VGYzNGN5NFNTRTBDRkJh?=
- =?utf-8?B?LzI3VE4vbm9oQ1hoeGY2Tkd6SElldzI2TzlpMzg5ZHN1NE1JaFpkM01YYncz?=
- =?utf-8?B?UXA0VzJPWVNIcXVDc1B2Uk14Unp1eXhFaWl5NEFIMlI4WXQ0V2tjWkI0U2p5?=
- =?utf-8?B?UmJ6azBCZjREUW5hbjhSMlN5cUk4aHNCTlNHM21yaHl3eTlFVVRTL216Z0VC?=
- =?utf-8?B?d1lBYUJWUWhHdU0yV2xrSjdaZ2plRTlaN1FnSEdzWHIvNjFaMnJyVWxCd015?=
- =?utf-8?B?MEFRT3NuZDZkUURzT0QyelRMNGFzTnd3dnZuYTE0V0tnSDBvaVdic2Jxa1Rt?=
- =?utf-8?B?elpYV0E2aHhiQWhSSHFGUDI1c0sreG4vOGVlRHBuNmMweHhuZ2xoR0pEdkZ1?=
- =?utf-8?B?UEdIUlhTbjdGRmFXQ1dZQ0pUQnh2RjdwQ2luZko2by9LTGk3andBUEd4aUdC?=
- =?utf-8?B?alJTMnNONm12TEpHbjFaY1FnbmtnTWk2SHVPOTk2SXcxbkxJWVlwRVQzSWNW?=
- =?utf-8?Q?J2XLVirjes8=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB9031.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(13003099007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VWdoNWJZR2QzYXZCRmNXMnJYZE96aDcrbTlUd0JiTWpoNDNaKzZmNmJkanFh?=
- =?utf-8?B?MWIzUVBvc011KzR2cmYvQTdBZjhxaEJidGwwQXViM1QyekIvanZIU0VxbmNp?=
- =?utf-8?B?ZXdBanJSbjM0YXBRWEVhc0gralZ4cVNMTmNmRlRNYkd0Si9LUm12bzNQaUh5?=
- =?utf-8?B?WDREUjVYTUxtWWN1eUVCbzBnQ3hXWDhBcUZYOVM4RWNlRk9BQVozRGpZaldZ?=
- =?utf-8?B?akEzRmhVRU1lQ1FRcUFUSE5hWUllR096eFR2WTNTR0hUa1FuNTJKSmdjODlT?=
- =?utf-8?B?ZUxvN1BFLzY4TTZXckUyVzdlcjc2Z3prakJIdGdkdDJKa0k2YXlEV1drNnBY?=
- =?utf-8?B?S0F3UjIxalZiT2JrMjdxTlRUOXRpSEZqV1Z0WS9jWmpIK1NiRElwZ3RiakpJ?=
- =?utf-8?B?K1I3MUFNOTY5TjljZGNkRnJzQ0hsWFdWQ1QzR2VlQlNETTAzNHpXa3I0WHdM?=
- =?utf-8?B?YlpJTFpMT2tGeVREWlMxWllSWTk4WWR2VWY3dG42T0djQmh4dVhEc05xUWlQ?=
- =?utf-8?B?S1FoZk80RXpVTDhMVVNWS0lDVDJHMkJwK2JXaFhzMTNTM09oWXloNHVqM1p4?=
- =?utf-8?B?ZXdiK25Ea0d2WDJtNXdxeWN6dXhqTHRBNFU3TEZEb28rQ0lNSnlyVTNaM0lO?=
- =?utf-8?B?dTl6T0ErWkIrckVOWnFCUUkxMzJ1U3NqS0liUjV2Q2J6MElINlJrUlliSE42?=
- =?utf-8?B?RHcvQ3BWSXlJVm8rMjVCejI4R3h2eVV6NnEveDk4ZnYvdFpnSWdoR1NtNVgy?=
- =?utf-8?B?RlBvd3lIQnozZ2Fya1JreXQ3Yk5QVlE5MVE3T1lzQWxiamtvQ0tXNEhsazVs?=
- =?utf-8?B?aFZ3UnZEeUU3eDI2TnZJUG5DNWVkVVBYUVc2VElGMkFJVndHL1oxZW5UczlM?=
- =?utf-8?B?eTA2cyt1MURVY3QyL282NkNQM1NtWG1NVkhjVDNwZzdnNllJbkltbGo5QkUv?=
- =?utf-8?B?ZlVZTGl0dVI5UXhFRDFkSklPajF1RE9JOHVWZ1JyQm84ZFhTU3hta282djM0?=
- =?utf-8?B?Zy9CMU5kbGRWYVZaVDJBZ002VVhSVnE5anhiazg0eVp5RXZGUC9YMXJ2MUVQ?=
- =?utf-8?B?bkh6WWpPcWxPbkxVbklLUDF1STN0TGFGRGROcUZqbFQycnRrd3ZYbVJYRlUy?=
- =?utf-8?B?KysxR3l4SFBqd29qRkRhOW95d293SlNzYU9Dek5ZL0dialpSQ05vMi81SFBP?=
- =?utf-8?B?ZVdPNVZFbXFxZ1JjZnVjU1FuTGI4UnZRb0UvdFJsOGltakVoOXBLWDB1c2JK?=
- =?utf-8?B?RU9nSHE1ZlNIaGlQQlJTZWdTeXRjSU9Zd2pwcWlFSE5lLzJjZ0ZTSitCMlJ4?=
- =?utf-8?B?NHlpS3pLTm5PNWhsT0xrOFBnbEZtWVdualZSbUgxeDZockhNbFhhNWwzdUxW?=
- =?utf-8?B?Y2dEZlBSUmMrbFJUVVFmYTZQeDRyN05nNEp0clYxVE1lSlVGbnRnYnpzVkhB?=
- =?utf-8?B?V09pTkltUVNJdWRJQmdRQW9TSEdYVFhTMGVVVXQ3dG5yczY2ZXpwbGtTM0VK?=
- =?utf-8?B?R25tVjJzb20wVWFqZGpMTitneE1JT0E1ODQ0VGxWYmh2c2FMMHNvV1JRZnlG?=
- =?utf-8?B?aDJmaWVMMU1NbDU4anVWT2w1dnMxd3BXSzl2VC9uSHYvbHZuR2tYU1pnQVBS?=
- =?utf-8?B?TUhBMEdMMjdDR1ovdFF2U1VHb0xCMnl4L25jQjNCTmFFT0FPZS9tdUNVbWhD?=
- =?utf-8?B?cWJOanh2UTdDT0ZaTE5JaWErdGtRN1EvZWdWUVJvazMyRVZIZXNCSUVGZlk2?=
- =?utf-8?B?TW1tdVNyQTJZS09tNitNak1CNVVxQk9vaXlDLzVqTGdVeXJnOWxFOG1vVHpK?=
- =?utf-8?B?ZGxQRC9LZHBFTENvaFc5TkhJWktnekZGTWV3YVJpYWpFaVg3WVpva2RJcVIz?=
- =?utf-8?B?SWNIVkR6K2NqYmVqNTV6SUlZTXVVMFdVblB5bmg1ZUhKSTEyNVQ5Uyt1K1Ey?=
- =?utf-8?B?SDRJQytPS3VwNHBMR0hwSENjbGhUNVNzd3JuUGt4blhUbWhkYkJKNXlxM1dP?=
- =?utf-8?B?VVNwTEhFTlR6UG5namJtWFZIUmZEcEVwb1NjWjNOTDNXL1ZGQlVuSVRybjg0?=
- =?utf-8?B?MWRHQ21RYXNQS3Vxdjg3TlNrWFdFRnplcUtVTjhoVnAyMWkvTWdMaXFxZHho?=
- =?utf-8?Q?6cLgx37i4NMtEcgGh529hpEj8?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c45cd071-5cac-47ad-eae8-08ddbb376a4f
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB9031.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2025 20:14:43.9134
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: S9mHI4X/4oZPNaN4CHTnEEFJK29fumVEwLgnYyGccALBMbTtouP1O+kxUKlB00NHp87I5ta73/630oT8vYyjMA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4278
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: phy: realtek: Reset after clock enable
+To: Sebastian Reichel <sebastian.reichel@collabora.com>,
+ Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Detlev Casanova <detlev.casanova@collabora.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20250704-phy-realtek-clock-fix-v1-1-63b33d204537@kernel.org>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20250704-phy-realtek-clock-fix-v1-1-63b33d204537@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jul 04, 2025 at 12:37:36PM +0000, Dragos Tatulea wrote:
-> On Thu, Jul 03, 2025 at 10:49:20AM -0500, Chris Arges wrote:
-> > When running iperf through a set of XDP programs we were able to crash
-> > machines with NICs using the mlx5_core driver. We were able to confirm
-> > that other NICs/drivers did not exhibit the same problem, and suspect
-> > this could be a memory management issue in the driver code.
-> > Specifically we found a WARNING at include/net/page_pool/helpers.h:277
-> > mlx5e_page_release_fragmented.isra. We are able to demonstrate this
-> > issue in production using hardware, but cannot easily bisect because
-> > we don’t have a simple reproducer.
-> >
-> Thanks for the report! We will investigate.
+On 04.07.2025 19:48, Sebastian Reichel wrote:
+> On Radxa ROCK 4D boards we are seeing some issues with PHY detection and
+> stability (e.g. link loss, or not capable of transceiving packages)
+> after new board revisions switched from a dedicated crystal to providing
+> the 25 MHz PHY input clock from the SoC instead.
 > 
-> > I wanted to share stack traces in
-> > order to help us further debug and understand if anyone else has run
-> > into this issue. We are currently working on getting more crashdumps
-> > and doing further analysis.
-> > 
-> > 
-> > The test setup looks like the following:
-> >   ┌─────┐
-> >   │mlx5 │
-> >   │NIC  │
-> >   └──┬──┘
-> >      │xdp ebpf program (does encap and XDP_TX)
-> >      │
-> >      ▼
-> >   ┌──────────────────────┐
-> >   │xdp.frags             │
-> >   │                      │
-> >   └──┬───────────────────┘
-> >      │tailcall
-> >      │BPF_REDIRECT_MAP (using CPUMAP bpf type)
-> >      ▼
-> >   ┌──────────────────────┐
-> >   │xdp.frags/cpumap      │
-> >   │                      │
-> >   └──┬───────────────────┘
-> >      │BPF_REDIRECT to veth (*potential trigger for issue)
-> >      │
-> >      ▼
-> >   ┌──────┐
-> >   │veth  │
-> >   │      │
-> >   └──┬───┘
-> >      │
-> >      │
-> >      ▼
-> > 
-> > Here an mlx5 NIC has an xdp.frags program attached which tailcalls via
-> > BPF_REDIRECT_MAP into an xdp.frags/cpumap. For our reproducer we can
-> > choose a random valid CPU to reproduce the issue. Once that packet
-> > reaches the xdp.frags/cpumap program we then do another BPF_REDIRECT
-> > to a veth device which has an XDP program which redirects to an
-> > XSKMAP. It wasn’t until we added the additional BPF_REDIRECT to the
-> > veth device that we noticed this issue.
-> > 
-> Would it be possible to try to use a single program that redirects to
-> the XSKMAP and check that the issue reproduces?
->
-I forgot to ask: what is the MTU size?
-Also, are you setting any other special config on the device?
- 
-Thanks,
-Dragos
+> This board is using a RTL8211F PHY, which is connected to an always-on
+> regulator. Unfortunately the datasheet does not explicitly mention the
+> power-up sequence regarding the clock, but it seems to assume that the
+> clock is always-on (i.e. dedicated crystal).
+> 
+> By doing an explicit reset after enabling the clock, the issue on the
+> boards could no longer be observed.
+> 
+Is the SoC clock always on after boot? Or may it be disabled e.g.
+during system suspend? Then you would have to do the PHY reset also
+on resume from suspend.
+
+> Cc: stable@vger.kernel.org
+> Fixes: 7300c9b574cc ("net: phy: realtek: Add optional external PHY clock")
+> Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+> ---
+>  drivers/net/phy/realtek/realtek_main.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+> index c3dcb62574303374666b46a454cd4e10de455d24..3a783f0c3b4f2a4f6aa63a16ad309e3471b0932a 100644
+> --- a/drivers/net/phy/realtek/realtek_main.c
+> +++ b/drivers/net/phy/realtek/realtek_main.c
+> @@ -231,6 +231,10 @@ static int rtl821x_probe(struct phy_device *phydev)
+>  		return dev_err_probe(dev, PTR_ERR(priv->clk),
+>  				     "failed to get phy clock\n");
+>  
+> +	/* enabling the clock might produce glitches, so hard-reset the PHY */
+> +	phy_device_reset(phydev, 1);
+> +	phy_device_reset(phydev, 0);
+> +
+>  	ret = phy_read_paged(phydev, RTL8211F_PHYCR_PAGE, RTL8211F_PHYCR1);
+>  	if (ret < 0)
+>  		return ret;
+> 
+> ---
+> base-commit: 4c06e63b92038fadb566b652ec3ec04e228931e8
+> change-id: 20250704-phy-realtek-clock-fix-6cd393e8cb2a
+> 
+> Best regards,
+
 
