@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-204117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F447AF8F2D
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:52:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CCEB4AF8F24
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:52:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E72E64A06A9
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:52:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CA77485B63
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:51:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F0682F1FCC;
-	Fri,  4 Jul 2025 09:51:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92A7428689A;
+	Fri,  4 Jul 2025 09:51:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74DB72EF9DA
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 09:51:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD93B2C3264
+	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 09:51:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751622713; cv=none; b=BTqvQFQ6+X2TFCf70GhtgvKGBRfcW3gcYgLMiCt0/oav0OD+SvrFiO0D0vP95Z7ybcZOBMpdMfDZuKYQYcgymVL+rxsJDQoOoHixAXJUUcbXL4EFfFWU3XfyX7Eo5rI4keBAvvpqRb6D/DrYMLq40wd/uahCO4eD9u5vu5KJepw=
+	t=1751622699; cv=none; b=pHA19gwwy31VXGDS6PSYOnAVI4z6Izl8Dq0oTfB1QB2VbKQzMMYmGB0Qg06UL4w2uu64aeliFZwxNopTCXHArHwYotniSoOV+dUVkFTi1t9xJJA0PWGNx7jS8mzSuTKf02R1sNUPBmz3t8CI6yq4sAjqRNOK9NOO/Sw+BdKGOxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751622713; c=relaxed/simple;
-	bh=VH6LcZQ87oA13NTtcuK4mzyH2jos9CoDOOQZGpUnUiE=;
+	s=arc-20240116; t=1751622699; c=relaxed/simple;
+	bh=7hqcaz84SluVy67hFSf74JyGlTNdCH9W4vQKnsHS12s=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tqnBKbOYpsUzVlSuPQrJgutBLolPLtwJvHFMM4KBRY7TMZRBPh62uJPx4oQ+wygh1912rdJgA6ZqwDcbeYHT37CmPVl5+yKdz7z0NQvMyQfdZA/uzYQlKydxtlxIKCqAH9LkTZrxFd+7YxMh4QjhNhdpq84AS8b1gOEiirf4Wa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=18.169.211.239
+	 MIME-Version; b=aJGPa41lFe8fLfxRbxVb5ViHecCxPbjF23X+53Z0Dxe4R6hOub9zZDQ9f9q/pAU1ktMKK2mAagO3saMcReJBSGyN/h8vs68uO1aVIAGwqZQmJtX7orNvfelq1Kkc8Fh0gmsDCv4kLJqBUX4US+i4f9hxqMe6Gd/Qom8Szf+ElQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=15.184.224.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: zesmtpsz1t1751622648t9fd10a27
-X-QQ-Originating-IP: sWU/pnXycx1p18K/+nQ+VBTI/q42jGIXjqStUEtTDBw=
+X-QQ-mid: zesmtpsz1t1751622659t46204e9f
+X-QQ-Originating-IP: nY9RJdlXBqoanBpDxAiRKvYsHhzzWsIDy3No+H2qkY0=
 Received: from localhost.localdomain ( [156.146.53.122])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 04 Jul 2025 17:50:43 +0800 (CST)
+	id ; Fri, 04 Jul 2025 17:50:50 +0800 (CST)
 X-QQ-SSF: 0001000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 17738686573472729539
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 14614419719975722882
 EX-QQ-RecipientCnt: 10
 From: Mengyuan Lou <mengyuanlou@net-swift.com>
 To: netdev@vger.kernel.org
@@ -49,9 +49,9 @@ Cc: michal.swiatkowski@linux.intel.com,
 	linglingzhang@trustnetic.com,
 	jiawenwu@trustnetic.com,
 	Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH net-next v3 10/12] net: ngbevf: add sw init pci info and reset hardware
-Date: Fri,  4 Jul 2025 17:49:21 +0800
-Message-Id: <20250704094923.652-11-mengyuanlou@net-swift.com>
+Subject: [PATCH net-next v3 11/12] net: ngbevf: init interrupts and request irqs
+Date: Fri,  4 Jul 2025 17:49:22 +0800
+Message-Id: <20250704094923.652-12-mengyuanlou@net-swift.com>
 X-Mailer: git-send-email 2.30.1
 In-Reply-To: <20250704094923.652-1-mengyuanlou@net-swift.com>
 References: <20250704094923.652-1-mengyuanlou@net-swift.com>
@@ -64,170 +64,120 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: zesmtpsz:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: MRPscMwXVhqxDvnXp+TGEd8Qx92dcfkxyfAQVsc9GeMO9LklnCvjnSm0
-	GhhWbOLQWtrJaDdwY6tdVwuiiHWw8/Hr7qAxUejMk/Y+smimsdMjO4PB9z2afZS7h1fsPtC
-	MbYgYaCHBT6N2yNjpaz1jAiqtNe0SB2gz7AGsmh/IFR9pGhjxoPzH3P8MeeTt7eHtcpHV8Z
-	mJwUeRIeUZMELSTePKVelBbLAPtPFSEvhcsLFpoeQquAC9bH4TXyhifRRg2LWNzPgy4TIh5
-	kxHhmJlp6Kfss7RebQKdYyUYxFtsLUO0Agj7o5pS0FmFjGStfJ24Y25DdacNmPjtmFQpCbK
-	YqJ3v9kScQcif3GpM8iPxpRW8dJEMGfwyYVRmRHYmDEM7wEXfh8jE7yS9Fzt8SyOwbTyv2S
-	3Y5AriV8/bQzx7zHnYShjevA/8OaDt/p8jMhR6gQZ2D5EjGMUwIBW35MFfTjGO/KOihxBQf
-	bjogh7UPXczaj7Kfi6ByVxIP48lIm6HoaIyIeJCjKa7XsvE04FvEY/w2BsIKuWQVdjricnj
-	pVAOWjQVbjWEhjUkNPw+q+PghTYNCUiLra58Pnmkcs7YUGSVJrkE0NobJ2X5r16ZgHqBy28
-	EYI/pDHpyTSxQo/OqkSfP1TUT465yjZOd+2nchs80kng6Azem9eLlf9jL4TNlQd11m+e4hd
-	QNZfkd3Llub1Wutpbn5nrnrRk7DnQaM5a8b2oOCky6WRpRAmWNcqJ7bHMOOph7B8Zj0JjCk
-	/DlR34fDJ7A91iqYBgiN6z85LcC6QvcHhbsS2SoM4CLg5Cg7oIN6i1zWDIiGPVrJ3YwV4f8
-	l4vIHOLr57ZNhTycnUHB7LrqReqe+0SBy7M3vJtyzgUtMaiFHJ9PEsaQh0+i5g8xFT2wnDL
-	qp/fp09u+ldPdcYzMVNlf5taEt5HTPXhhNOXXxlihGedta8ambuISYAQ+wbhFdU+dfHV3G7
-	d0fsNZ7WZSMTWGQZO1VM/fgwoV7FfjRLjVUKDoptUgehF+RW3pYHQYYVT0vNhdvJxoYUJkj
-	iEkZok35T52aPKNvkLWFmX9iJZDZmormeXBCR5KAzaZK5s5EjJRohzOL6nBFy0EkKdyF4ZO
-	K/B0TIf2ZOfUyIaOh61A3f1LBqilJcAqEmZQgFfJS77nIiPboYPwFY=
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-XMAILINFO: Nw5WZPeltq7paQQoPCrcR0ae/s0MARjOeRiIhXl+TCjAMgApgIlDqHWB
+	e/WvG90eLbGauHsMxu4Pw8OsarKzkJtdiBV+RLBIWk5y8BuAgjAF6mldNGFnAIIT1m5lN9F
+	mZ6iSDA1Wy/0tiW9+JPE5iXyNA0emafVSmcqW6eo73MQoSfW3vtzCHWpVukDORKTN23QSRS
+	41jZOKQEBTXmlENcssEa0zdC8Sbl8Opl5NmQ546DQI/AsBDFpcpisTYVHRq950aK35tkfRy
+	5aL2VsqjQm2LxFCs8Hh1q+xflOXt6wK4npDbyXoKyd8n0VVtSKnmOULo6d2b0CYZJPYZqj6
+	KCpLCadqkO8R8SpQjehTC/UBKP+52QoKy56fHYVdTFhov6FSbuuCmruHjjnrUZMrXNm42Jb
+	bd5Y4MOCcI/c1j4InacRLwV/fpx1xH6KSiczwcsiwsrSlo3FyB3B7ta724n5+ALV9HKDiV6
+	2fh/vtU9as6cM07je5R096s1UWk4MRtWNnXz2bGMR/M2ell1Xhqw8tjr0BQlw9xOrSQdC9q
+	twnfAdGrVZT8wAcySLI/83hEsrkxloeTpAHofY6ZMm08+oob2t8c5K3MkrY+8mCUaBF7WCj
+	zmJ9KsaaRNF7ZNYQjN0JwC05yp+JL9pA2yvpvpGrcGLDSMWZ9p4DmWypQHMtNEaLlvAA+1r
+	U9FHmaFzWrDN1JD+yN1B1xO//dIi1v+25l/1zT/skXZW0B9lpCyE4L2ajGVwfteO7aw3sbB
+	O1w9KDRVOXE7AZpngUbjrDCakoZduzaJnJv5u5gYlCZ3rAos18MREzBRCdlsNj43QQXq4hA
+	M6u8IxhDow4xucSzXeaceYBnpmpsmmTVElVcZpLnOdzqBpZ2ITwAg6TNLUsSYA1ZmTkI5SR
+	6PbemoZto9b1JPEZioXYHRP1+oxLG37BmaRgVrUmmVsULg6FGyQkupZ7coS1TXtJMoO0E5y
+	zrrPSt+UbgpxDkdlUSnVv6GcBLuv84RYuovkR+rhqkzxfdC364VSvHzFXJLM6C6qAw/gC9f
+	9XYCTAJLFPyrT0BKCwpYy06xOaDeYT/aGPySrntA6j7X8X7S5Z9jnV7kAlAFQc0TFh0WyB+
+	XXosaBkIe1yjBGLzxBbfLzNRBJDF85Ta90RtNBGHBWN/6gggR++gq4CpvMTtK+zbcQ2HuZl
+	LmXEM5v5Za19pXtby+mTVVweyQ==
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
 X-QQ-RECHKSPAM: 0
 
-Do sw init and reset hw for ngbevf virtual functions, then
-register netdev.
+Add specific parameters for irq alloc, then use
+wx_init_interrupt_scheme to initialize interrupt
+allocation in probe.
+Add .ndo_start_xmit support and start all queues.
 
 Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
 ---
- .../net/ethernet/wangxun/ngbevf/ngbevf_main.c | 91 +++++++++++++++++++
- .../net/ethernet/wangxun/ngbevf/ngbevf_type.h |  4 +
- 2 files changed, 95 insertions(+)
+ .../net/ethernet/wangxun/ngbevf/ngbevf_main.c  | 18 ++++++++++++++++++
+ .../net/ethernet/wangxun/ngbevf/ngbevf_type.h  |  1 +
+ 2 files changed, 19 insertions(+)
 
 diff --git a/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c b/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c
-index 77025e7deeeb..4eea682f024b 100644
+index 4eea682f024b..a629b645d3a1 100644
 --- a/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c
 +++ b/drivers/net/ethernet/wangxun/ngbevf/ngbevf_main.c
-@@ -9,6 +9,9 @@
- #include <linux/etherdevice.h>
+@@ -10,6 +10,7 @@
  
  #include "../libwx/wx_type.h"
-+#include "../libwx/wx_hw.h"
-+#include "../libwx/wx_mbx.h"
-+#include "../libwx/wx_vf.h"
+ #include "../libwx/wx_hw.h"
++#include "../libwx/wx_lib.h"
+ #include "../libwx/wx_mbx.h"
+ #include "../libwx/wx_vf.h"
  #include "../libwx/wx_vf_common.h"
- #include "ngbevf_type.h"
- 
-@@ -37,6 +40,75 @@ static const struct pci_device_id ngbevf_pci_tbl[] = {
- 	{ .device = 0 }
+@@ -43,10 +44,18 @@ static const struct pci_device_id ngbevf_pci_tbl[] = {
+ static const struct net_device_ops ngbevf_netdev_ops = {
+ 	.ndo_open               = wxvf_open,
+ 	.ndo_stop               = wxvf_close,
++	.ndo_start_xmit         = wx_xmit_frame,
+ 	.ndo_validate_addr      = eth_validate_addr,
+ 	.ndo_set_mac_address    = wx_set_mac_vf,
  };
  
-+static const struct net_device_ops ngbevf_netdev_ops = {
-+	.ndo_open               = wxvf_open,
-+	.ndo_stop               = wxvf_close,
-+	.ndo_validate_addr      = eth_validate_addr,
-+	.ndo_set_mac_address    = wx_set_mac_vf,
-+};
-+
-+static int ngbevf_sw_init(struct wx *wx)
++static void ngbevf_set_num_queues(struct wx *wx)
 +{
-+	struct net_device *netdev = wx->netdev;
-+	struct pci_dev *pdev = wx->pdev;
-+	int err;
-+
-+	/* Initialize pcie info and common capability flags */
-+	err = wx_sw_init(wx);
-+	if (err < 0)
-+		goto err_wx_sw_init;
-+
-+	/* Initialize the mailbox */
-+	err = wx_init_mbx_params_vf(wx);
-+	if (err)
-+		goto err_init_mbx_params;
-+
-+	/* Initialize the device type */
-+	wx->mac.type = wx_mac_em;
-+	/* lock to protect mailbox accesses */
-+	spin_lock_init(&wx->mbx.mbx_lock);
-+
-+	err = wx_reset_hw_vf(wx);
-+	if (err) {
-+		wx_err(wx, "PF still in reset state. Is the PF interface up?\n");
-+		goto err_reset_hw;
-+	}
-+	wx_init_hw_vf(wx);
-+	wx_negotiate_api_vf(wx);
-+	if (is_zero_ether_addr(wx->mac.addr))
-+		dev_info(&pdev->dev,
-+			 "MAC address not assigned by administrator.\n");
-+	eth_hw_addr_set(netdev, wx->mac.addr);
-+
-+	if (!is_valid_ether_addr(netdev->dev_addr)) {
-+		dev_info(&pdev->dev, "Assigning random MAC address\n");
-+		eth_hw_addr_random(netdev);
-+		ether_addr_copy(wx->mac.addr, netdev->dev_addr);
-+		ether_addr_copy(wx->mac.perm_addr, netdev->dev_addr);
-+	}
-+
-+	wx->mac.max_tx_queues = NGBEVF_MAX_TX_QUEUES;
-+	wx->mac.max_rx_queues = NGBEVF_MAX_RX_QUEUES;
-+	/* Enable dynamic interrupt throttling rates */
-+	wx->rx_itr_setting = 1;
-+	wx->tx_itr_setting = 1;
-+	/* set default ring sizes */
-+	wx->tx_ring_count = NGBEVF_DEFAULT_TXD;
-+	wx->rx_ring_count = NGBEVF_DEFAULT_RXD;
-+	/* set default work limits */
-+	wx->tx_work_limit = NGBEVF_DEFAULT_TX_WORK;
-+	wx->rx_work_limit = NGBEVF_DEFAULT_RX_WORK;
-+
-+	return 0;
-+err_reset_hw:
-+	kfree(wx->vfinfo);
-+err_init_mbx_params:
-+	kfree(wx->rss_key);
-+	kfree(wx->mac_table);
-+err_wx_sw_init:
-+	return err;
++	/* Start with base case */
++	wx->num_rx_queues = 1;
++	wx->num_tx_queues = 1;
 +}
 +
- /**
-  * ngbevf_probe - Device Initialization Routine
-  * @pdev: PCI device information struct
-@@ -102,11 +174,30 @@ static int ngbevf_probe(struct pci_dev *pdev,
- 		goto err_pci_release_regions;
- 	}
+ static int ngbevf_sw_init(struct wx *wx)
+ {
+ 	struct net_device *netdev = wx->netdev;
+@@ -65,6 +74,7 @@ static int ngbevf_sw_init(struct wx *wx)
  
-+	netdev->netdev_ops = &ngbevf_netdev_ops;
-+
-+	/* setup the private structure */
-+	err = ngbevf_sw_init(wx);
+ 	/* Initialize the device type */
+ 	wx->mac.type = wx_mac_em;
++	wx->mac.max_msix_vectors = NGBEVF_MAX_MSIX_VECTORS;
+ 	/* lock to protect mailbox accesses */
+ 	spin_lock_init(&wx->mbx.mbx_lock);
+ 
+@@ -98,6 +108,7 @@ static int ngbevf_sw_init(struct wx *wx)
+ 	/* set default work limits */
+ 	wx->tx_work_limit = NGBEVF_DEFAULT_TX_WORK;
+ 	wx->rx_work_limit = NGBEVF_DEFAULT_RX_WORK;
++	wx->set_num_queues = ngbevf_set_num_queues;
+ 
+ 	return 0;
+ err_reset_hw:
+@@ -186,15 +197,22 @@ static int ngbevf_probe(struct pci_dev *pdev,
+ 	eth_hw_addr_set(netdev, wx->mac.perm_addr);
+ 	ether_addr_copy(netdev->perm_addr, wx->mac.addr);
+ 
++	err = wx_init_interrupt_scheme(wx);
 +	if (err)
-+		goto err_pci_release_regions;
++		goto err_free_sw_init;
 +
- 	netdev->features |= NETIF_F_HIGHDMA;
-+
-+	eth_hw_addr_set(netdev, wx->mac.perm_addr);
-+	ether_addr_copy(netdev->perm_addr, wx->mac.addr);
-+
-+	err = register_netdev(netdev);
-+	if (err)
-+		goto err_register;
-+
+ 	err = register_netdev(netdev);
+ 	if (err)
+ 		goto err_register;
+ 
  	pci_set_drvdata(pdev, wx);
++	netif_tx_stop_all_queues(netdev);
  
  	return 0;
  
-+err_register:
-+	kfree(wx->vfinfo);
-+	kfree(wx->rss_key);
-+	kfree(wx->mac_table);
- err_pci_release_regions:
- 	pci_release_selected_regions(pdev,
- 				     pci_select_bars(pdev, IORESOURCE_MEM));
+ err_register:
++	wx_clear_interrupt_scheme(wx);
++err_free_sw_init:
+ 	kfree(wx->vfinfo);
+ 	kfree(wx->rss_key);
+ 	kfree(wx->mac_table);
 diff --git a/drivers/net/ethernet/wangxun/ngbevf/ngbevf_type.h b/drivers/net/ethernet/wangxun/ngbevf/ngbevf_type.h
-index c71a244ec6b9..dc29349304f1 100644
+index dc29349304f1..67e761089e99 100644
 --- a/drivers/net/ethernet/wangxun/ngbevf/ngbevf_type.h
 +++ b/drivers/net/ethernet/wangxun/ngbevf/ngbevf_type.h
-@@ -20,5 +20,9 @@
+@@ -18,6 +18,7 @@
+ #define NGBEVF_DEV_ID_EM_WX1860A1               0x011a
+ #define NGBEVF_DEV_ID_EM_WX1860AL1              0x011b
  
++#define NGBEVF_MAX_MSIX_VECTORS               1
  #define NGBEVF_MAX_RX_QUEUES                  1
  #define NGBEVF_MAX_TX_QUEUES                  1
-+#define NGBEVF_DEFAULT_TXD                    128
-+#define NGBEVF_DEFAULT_RXD                    128
-+#define NGBEVF_DEFAULT_TX_WORK                256
-+#define NGBEVF_DEFAULT_RX_WORK                256
- 
- #endif /* _NGBEVF_TYPE_H_ */
+ #define NGBEVF_DEFAULT_TXD                    128
 -- 
 2.30.1
 
