@@ -1,128 +1,272 @@
-Return-Path: <netdev+bounces-204007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F9ADAF8765
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 07:48:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14DF9AF8766
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 07:49:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCD291C876D1
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 05:48:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67956586676
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 05:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28EB1DF247;
-	Fri,  4 Jul 2025 05:48:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19531F4C83;
+	Fri,  4 Jul 2025 05:49:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="s75o/XOI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QBOZ1Nzm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BB429A2
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 05:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C2BCBE65
+	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 05:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751608092; cv=none; b=AlqK4qmpj6gRBp8jBefOYmGH/fqK8rVE88t0plzkiSTzTNPwcOKiVMsltOIXX7iZKbvubUdmyaPdPBkLT9XbVl0CJJmFzRaI/nJchYpFXkvXNUoeXV1op6QadNtXA1BiVHjJUCOcyZVnUqk5xDkSzS+TKT3NsFd1umFetZ3Fheg=
+	t=1751608145; cv=none; b=a54fEYce4uOyUCOeMGqkCAC+DXhrJSEUcYniXpaXWYdf8TPSpEO0npQCbUX3XJnw/up9FOlYWmABsR+bppD67cJlBmucaa45Ufxa5BBbetWJsg7BWTeMqUhw/vUaMAyJitV7PjU7SHx8KQ7eGp9aQQohkTl72QQDql/8tldGGZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751608092; c=relaxed/simple;
-	bh=pCmpmqNU+lG2jDy/e0Ny+2PIPaedzqZYHrXL2NchU9E=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p7Q4QUxLiMSgRAvoenKhrLnIVbJ0O6kOPpqIB9Hl6YMRnTgm8gL22oR2j5HC60Cf+oJQLnWzUr9rFRFvgcwafOcg3aMXE8DeR0vQfBvM4beJUHoxzyO+qKMcyx/9Y4LWIJ46Q13xLqA+rE452NNwSA0mFogHPrD54WNIE/ndGl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=s75o/XOI; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id AACA220820;
-	Fri,  4 Jul 2025 07:48:04 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HmYhTKWB5lhb; Fri,  4 Jul 2025 07:48:03 +0200 (CEST)
-Received: from EXCH-03.secunet.de (unknown [10.32.0.243])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 99B2220872;
-	Fri,  4 Jul 2025 07:47:54 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 99B2220872
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1751608074;
-	bh=f+FFyoWhLRsx0avbs36s0XvQ1/oZSmS4tFdD95JV/Qc=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=s75o/XOIQtqRKGI0csmv/85nm2kgGnV/vD6rPBiw0YnfFZLAGFRU1/0AdTEUsMlhr
-	 1Vz6kNVUccrOmcjCSIGlZgIxEccMb3MFxMuIDiAM2aZOe6h0yjZWRtcO2qYN2nM1Ts
-	 bQ5Ac+subfyJW6LaErjFRArGguSalmKu0PCrHCSAkNCUrci8gaovKYHmR0/saV6AuU
-	 ynqAO1i2bUHXfzr/UGW1l4IX/kKxaBVAK6WkEJfG5g0f2qxCb7iX8RDzaoXGJyy2kR
-	 VQEGzOOAP8x94oqq8EZvhZgmj+xD8nUNRm7O7qdL6+K3uTreObHD+nJuFYxHBWA5nz
-	 OzUK779t4ZVnw==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by EXCH-03.secunet.de
- (10.32.0.183) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.10; Fri, 4 Jul
- 2025 07:47:54 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 4 Jul
- 2025 07:47:53 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 31248318017C; Fri,  4 Jul 2025 07:47:53 +0200 (CEST)
-Date: Fri, 4 Jul 2025 07:47:53 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Erwan Dufour <erwan.dufour@withings.com>
-CC: Hangbin Liu <liuhangbin@gmail.com>, Erwan Dufour <mrarmonius@gmail.com>,
-	<netdev@vger.kernel.org>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <jv@jvosburgh.net>, <saeedm@nvidia.com>,
-	<tariqt@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH] [PATH xfrm offload] xfrm: bonding: Add xfrm packet
- offload for active-backup mode
-Message-ID: <aGdrCYtJ5oe3NI7i@gauss3.secunet.de>
-References: <20250629210623.43497-1-mramonius@gmail.com>
- <aGJiZrvRKXm74wd2@fedora>
- <CAJ1gy2gjapE2a28MVFmrqBxct4xeCDpH1JPLBceWZ9WZAnmokg@mail.gmail.com>
- <aGN_q_aYSlHf_QRD@fedora>
- <CAJ1gy2ghhzU0+_QizeFq1JTm12YPtV+24MyJC_Apw11Z4Gnb4g@mail.gmail.com>
- <aGTlcAOa6_ItYemu@fedora>
- <CAJ1gy2h+BtDPZ2y4umhjVMrD74Nd5dZezdZOOy-YqLvyFGKKQA@mail.gmail.com>
+	s=arc-20240116; t=1751608145; c=relaxed/simple;
+	bh=dLQ0I++oMsQfuP7cl0/y1n9onLevjwsYXCn4YZ0ygCc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZQu39F+FtUTz8N0/ICKqmoS7ejevAUoAsQt53gWsrF31wUuVgk63oGWDl72vfGDSVibBveM3HIEUYcIoDVlhpbiLRxBRqXPi0mAMDYDd6/ORQznxyuCTKy/ejEG0m0a7KCEg3KxZB3JxcQT5x/oJcJuHDwn2SX4HEG91oc24DZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QBOZ1Nzm; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b31f112c90aso423060a12.0
+        for <netdev@vger.kernel.org>; Thu, 03 Jul 2025 22:49:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751608143; x=1752212943; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2LoRkUJFqHCmPcvNF0h7FQwolyfFv2zgcK878cX0WZ4=;
+        b=QBOZ1NzmuLmhcr4vUop0VCWwoVS7ystU4unof1RDqHzO6YRxoJmj0kmM7nugTmMK35
+         EaR+k3Erw+k9t1ndhCp1UsPB3ZEpFf9kQV5K+5RQOdoty0+Qq5hzsvZW/fvi6QgyY0qn
+         57B18d5HgVSCZVyw1f9k6S7fA7wjZyhfZf7k/+MhX63o5S2Hegqdck1tO9F56FsYpdzI
+         9Ww29hKY1WMRdJXCkmsvLjwagdLKXyK9iNco0Gw1koWziFz0OIkjrThWgaWlCqpLIiER
+         OeE2xnJBNNp1wAbVmkcH1/nhqc8EhkyqJyxTkOt+TSqNM/2VKjkmEcZKdOmax5+3aSAr
+         +tCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751608143; x=1752212943;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2LoRkUJFqHCmPcvNF0h7FQwolyfFv2zgcK878cX0WZ4=;
+        b=BrvDjMraopdcxYrJHBr99d+20HPOZ4ZlT7Hewri7QqjSBLbgDMOAirHdDxChBCeCNp
+         jqQnxB9DUU+3hsuHS4DyYt4wYFv0ap1hKrcbAzGFe3vzW1Yby0Pvn73b4dVicEWvrvqv
+         i8ssGhqmV5yIeEgA8Ile4UHUHfWkS4OU2G34YAG1U/iOSiyFHDSu20Rb1kiZXRHOrTgT
+         6f92sMHjd8yh36hi4UFBvUQ0/saGnHOeRC9uR/ZECkW2s0kCmr4MWg+B3dGDtUUImehA
+         Bru6pwtM9N9eegvzxLjb6UfxUH+yAIWFj3LJKMqp/DyflaxVh5wVLjj8oJGzVFyn/PL4
+         caLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXg29hBBtoE/Y6/YDR0G5DphXWldPntCjjqR/WeEWMWTC40Y4CCf8cSKWK8JSvB5lbr9Jh8JbY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzse4OG5kSNWtZrqYT4r4YJFZhQg4fFII3ChmeXdQAm7wcHxwTN
+	O3EowFHv0mMaWLj6dIPT+q3ft0tAzF0f0ufUp9doIL5/mEt+vBzgpslyz5LMIh1IxZN38BURjgv
+	VMlt6ww==
+X-Google-Smtp-Source: AGHT+IEQjv5xk3F1NNRPz8AkCb+qo/WZmwKrtXChCUZbzNSUDVF1vj8ee8w17r4+6J5tA4DWC+AObbbApAw=
+X-Received: from pgbda5.prod.google.com ([2002:a05:6a02:2385:b0:b2e:beba:356])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:439f:b0:21c:fa68:9da6
+ with SMTP id adf61e73a8af0-225adc8f4eemr2744532637.8.1751608143521; Thu, 03
+ Jul 2025 22:49:03 -0700 (PDT)
+Date: Fri,  4 Jul 2025 05:48:18 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJ1gy2h+BtDPZ2y4umhjVMrD74Nd5dZezdZOOy-YqLvyFGKKQA@mail.gmail.com>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250704054824.1580222-1-kuniyu@google.com>
+Subject: [PATCH v1 net] netlink: Fix wraparounds of sk->sk_rmem_alloc.
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	Jason Baron <jbaron@akamai.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jul 03, 2025 at 01:58:36AM +0200, Erwan Dufour wrote:
-> Hi Liu,
-> 
-> Thanks for your explanation. Unfortunately，the alignment still not works.
-> 
-> With pleasure. Thank you very much for providing an example with an
-> explanation.
-> Hopefully, there were no mistakes and I managed to correct all the errors
-> in the new patch.
-> 
-> New Patch:
-> 
-> >From 39639cf83712b13271fc3d8bbe3f4d9cd0b38db6 Mon Sep 17 00:00:00 2001
-> From: Erwan Dufour <erwan.dufour@withings.com>
-> Date: Wed, 2 Jul 2025 22:12:10 +0000
-> Subject: [PATCH net-next] xfrm: bonding: Add xfrm packet offload for
->  active-backup mode
-> 
-> Implement XFRM policy offload functions for bond device in active-backup mode.
->  - xdo_dev_policy_add = bond_ipsec_add_sp
->  - xdo_dev_policy_delete = bond_ipsec_del_sp
->  _ xdo_deb_policy_free = bond_ipsec_free_sp
+Netlink has this pattern in some places
 
-We should not add further xfrm offloads to bonding as long
-as the security issues are not solved. Moving an already
-used SA from one device to another can lead to IV reusage,
-as discussed here:
+  if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
+  	atomic_add(skb->truesize, &sk->sk_rmem_alloc);
 
-https://lore.kernel.org/all/ZsbkdzvjVf3GiYHa@gauss3.secunet.de/
+, which has the same problem fixed by commit 5a465a0da13e ("udp:
+Fix multiple wraparounds of sk->sk_rmem_alloc.").
 
-This should be fixed before we add another offload.
+For example, if we set INT_MAX to SO_RCVBUFFORCE, the condition
+is always false as the two operands are of int.
+
+Then, a single socket can eat as many skb as possible until OOM
+happens, and we can see multiple wraparounds of sk->sk_rmem_alloc.
+
+Let's fix it by using atomic_add_return() and comparing the two
+variables as unsigned int.
+
+Before:
+  [root@fedora ~]# ss -f netlink
+  Recv-Q      Send-Q Local Address:Port                Peer Address:Port
+  -1668710080 0               rtnl:nl_wraparound/293               *
+
+After:
+  [root@fedora ~]# ss -f netlink
+  Recv-Q     Send-Q Local Address:Port                Peer Address:Port
+  2147483072 0               rtnl:nl_wraparound/290               *
+  ^
+  `--- INT_MAX - 576
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: Jason Baron <jbaron@akamai.com>
+Closes: https://lore.kernel.org/netdev/cover.1750285100.git.jbaron@akamai.com/
+Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+---
+ net/netlink/af_netlink.c | 81 ++++++++++++++++++++++++----------------
+ 1 file changed, 49 insertions(+), 32 deletions(-)
+
+diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+index e8972a857e51..79fbaf7333ce 100644
+--- a/net/netlink/af_netlink.c
++++ b/net/netlink/af_netlink.c
+@@ -387,7 +387,6 @@ static void netlink_skb_set_owner_r(struct sk_buff *skb, struct sock *sk)
+ 	WARN_ON(skb->sk != NULL);
+ 	skb->sk = sk;
+ 	skb->destructor = netlink_skb_destructor;
+-	atomic_add(skb->truesize, &sk->sk_rmem_alloc);
+ 	sk_mem_charge(sk, skb->truesize);
+ }
+ 
+@@ -1212,41 +1211,48 @@ struct sk_buff *netlink_alloc_large_skb(unsigned int size, int broadcast)
+ int netlink_attachskb(struct sock *sk, struct sk_buff *skb,
+ 		      long *timeo, struct sock *ssk)
+ {
++	DECLARE_WAITQUEUE(wait, current);
+ 	struct netlink_sock *nlk;
++	unsigned int rmem;
+ 
+ 	nlk = nlk_sk(sk);
++	rmem = atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
+ 
+-	if ((atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf ||
+-	     test_bit(NETLINK_S_CONGESTED, &nlk->state))) {
+-		DECLARE_WAITQUEUE(wait, current);
+-		if (!*timeo) {
+-			if (!ssk || netlink_is_kernel(ssk))
+-				netlink_overrun(sk);
+-			sock_put(sk);
+-			kfree_skb(skb);
+-			return -EAGAIN;
+-		}
+-
+-		__set_current_state(TASK_INTERRUPTIBLE);
+-		add_wait_queue(&nlk->wait, &wait);
++	if ((rmem == skb->truesize || rmem < READ_ONCE(sk->sk_rcvbuf)) &&
++	    !test_bit(NETLINK_S_CONGESTED, &nlk->state)) {
++		netlink_skb_set_owner_r(skb, sk);
++		return 0;
++	}
+ 
+-		if ((atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf ||
+-		     test_bit(NETLINK_S_CONGESTED, &nlk->state)) &&
+-		    !sock_flag(sk, SOCK_DEAD))
+-			*timeo = schedule_timeout(*timeo);
++	atomic_sub(skb->truesize, &sk->sk_rmem_alloc);
+ 
+-		__set_current_state(TASK_RUNNING);
+-		remove_wait_queue(&nlk->wait, &wait);
++	if (!*timeo) {
++		if (!ssk || netlink_is_kernel(ssk))
++			netlink_overrun(sk);
+ 		sock_put(sk);
++		kfree_skb(skb);
++		return -EAGAIN;
++	}
+ 
+-		if (signal_pending(current)) {
+-			kfree_skb(skb);
+-			return sock_intr_errno(*timeo);
+-		}
+-		return 1;
++	__set_current_state(TASK_INTERRUPTIBLE);
++	add_wait_queue(&nlk->wait, &wait);
++	rmem = atomic_read(&sk->sk_rmem_alloc);
++
++	if (((rmem && rmem + skb->truesize > READ_ONCE(sk->sk_rcvbuf)) ||
++	     test_bit(NETLINK_S_CONGESTED, &nlk->state)) &&
++	    !sock_flag(sk, SOCK_DEAD))
++		*timeo = schedule_timeout(*timeo);
++
++	__set_current_state(TASK_RUNNING);
++	remove_wait_queue(&nlk->wait, &wait);
++	sock_put(sk);
++
++	if (signal_pending(current)) {
++		kfree_skb(skb);
++		return sock_intr_errno(*timeo);
+ 	}
+-	netlink_skb_set_owner_r(skb, sk);
+-	return 0;
++
++	return 1;
+ }
+ 
+ static int __netlink_sendskb(struct sock *sk, struct sk_buff *skb)
+@@ -1307,6 +1313,7 @@ static int netlink_unicast_kernel(struct sock *sk, struct sk_buff *skb,
+ 	ret = -ECONNREFUSED;
+ 	if (nlk->netlink_rcv != NULL) {
+ 		ret = skb->len;
++		atomic_add(skb->truesize, &sk->sk_rmem_alloc);
+ 		netlink_skb_set_owner_r(skb, sk);
+ 		NETLINK_CB(skb).sk = ssk;
+ 		netlink_deliver_tap_kernel(sk, ssk, skb);
+@@ -1383,13 +1390,19 @@ EXPORT_SYMBOL_GPL(netlink_strict_get_check);
+ static int netlink_broadcast_deliver(struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct netlink_sock *nlk = nlk_sk(sk);
++	unsigned int rmem, rcvbuf;
+ 
+-	if (atomic_read(&sk->sk_rmem_alloc) <= sk->sk_rcvbuf &&
++	rmem = atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
++	rcvbuf = READ_ONCE(sk->sk_rcvbuf);
++
++	if ((rmem != skb->truesize || rmem <= rcvbuf) &&
+ 	    !test_bit(NETLINK_S_CONGESTED, &nlk->state)) {
+ 		netlink_skb_set_owner_r(skb, sk);
+ 		__netlink_sendskb(sk, skb);
+-		return atomic_read(&sk->sk_rmem_alloc) > (sk->sk_rcvbuf >> 1);
++		return rmem > (rcvbuf >> 1);
+ 	}
++
++	atomic_sub(skb->truesize, &sk->sk_rmem_alloc);
+ 	return -1;
+ }
+ 
+@@ -2249,6 +2262,7 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
+ 	struct module *module;
+ 	int err = -ENOBUFS;
+ 	int alloc_min_size;
++	unsigned int rmem;
+ 	int alloc_size;
+ 
+ 	if (!lock_taken)
+@@ -2258,9 +2272,6 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
+ 		goto errout_skb;
+ 	}
+ 
+-	if (atomic_read(&sk->sk_rmem_alloc) >= sk->sk_rcvbuf)
+-		goto errout_skb;
+-
+ 	/* NLMSG_GOODSIZE is small to avoid high order allocations being
+ 	 * required, but it makes sense to _attempt_ a 32KiB allocation
+ 	 * to reduce number of system calls on dump operations, if user
+@@ -2283,6 +2294,12 @@ static int netlink_dump(struct sock *sk, bool lock_taken)
+ 	if (!skb)
+ 		goto errout_skb;
+ 
++	rmem = atomic_add_return(skb->truesize, &sk->sk_rmem_alloc);
++	if (rmem >= READ_ONCE(sk->sk_rcvbuf)) {
++		atomic_sub(skb->truesize, &sk->sk_rmem_alloc);
++		goto errout_skb;
++	}
++
+ 	/* Trim skb to allocated size. User is expected to provide buffer as
+ 	 * large as max(min_dump_alloc, 32KiB (max_recvmsg_len capped at
+ 	 * netlink_recvmsg())). dump will pack as many smaller messages as
+-- 
+2.50.0.727.gbf7dc18ff4-goog
+
 
