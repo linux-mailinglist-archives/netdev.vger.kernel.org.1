@@ -1,149 +1,132 @@
-Return-Path: <netdev+bounces-204222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07969AF99B1
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 19:31:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7110AAF99FA
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 19:44:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 712DD1CC02E9
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 17:31:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E046F1C82B04
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 17:45:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73E08F5B;
-	Fri,  4 Jul 2025 17:31:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JxO4fyXF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E16512DE704;
+	Fri,  4 Jul 2025 17:44:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F397C2E36FF
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 17:31:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4912D8384
+	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 17:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751650285; cv=none; b=fWGIr+H9cnRbqDmgScllR0kWLtOjupNuN47L142i5VAYaOfQYDABYsUvjQAdu8eyIvRbx+bgvEJ5VDEJVqHKq6ekUh7aQinRV8NkEXP5OE0yaIPLZ4pj/Sq0TRts/d9mrYEbYDqvQpB0i+Q+uBp7+B/snP6ceg3WMYeiOnDTD6M=
+	t=1751651071; cv=none; b=Eqi7tvn5GmKL6hJceafdBnE8Xbp34B/u8KOBobOqAm3iN7iAkCzhRuMcnj8Wl5b6uqNSvTMT3T3WlTjhF+ozqxV2ZiNDGIBBJiUK4r83oh/9efw72liqK2EVUKeNYpfvN4YdgLWclnEJoQybnvpVctofSp9ZBVX/VLUjR/GfnYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751650285; c=relaxed/simple;
-	bh=NKk6c78uRA66DoTs6cF0whB+T2dVkZSNDvCh77x5Nmc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hjR2d+tVxT7Lt9eJYj1aEby5l7WEf6q/CSO5ayb52tPwueobwPNGrhd3QVhEFkz/lXXAY61VINBG0mgX62C2PL14Q7KBLb+mL2daPuPtxp7JWKSReuK5rhU9HSFaqSkS7V7q1OXhq/Yw5dbnBZrjy5Knkdy81GxiwMiUsZOB3rA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JxO4fyXF; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751650285; x=1783186285;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=NKk6c78uRA66DoTs6cF0whB+T2dVkZSNDvCh77x5Nmc=;
-  b=JxO4fyXFb4iUk50+Um1HJ51ji/nvupUzFjK5whD4zBunDvJt1LhGtLDU
-   auBwgM4gJMw0SlEsJKds/uNVg0Jo52L28bXWCJlpKVwi0yDw5nUR9kI9e
-   u20MMHdXgugnpYcFpuJpLwQeoXi4DoSxzlZhtwFK64neQdLychK/l/J0I
-   RnDiDgxni6c1PyMDvmeB9839LgerDtjEVr0FRceVBj0N/omV3n3RE2c6L
-   RwJbqFlXrqVgtxcbdh1N1L6E4hNijM4WQwV6S7HQtrMy9vaPgN6j1rh98
-   MB+spY76A1Wve+lBBaNtAL3zAdh3UEkiGjmQhPCCOPx78oBn4IppQkKFu
-   A==;
-X-CSE-ConnectionGUID: fXYwiRHgSqG8s5Yaeba2Qg==
-X-CSE-MsgGUID: h82YCX/HQb+hqIMkiMVgzQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11484"; a="54105569"
-X-IronPort-AV: E=Sophos;i="6.16,287,1744095600"; 
-   d="scan'208";a="54105569"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 10:31:24 -0700
-X-CSE-ConnectionGUID: oBCictNeSAu6oJTnwKE4jg==
-X-CSE-MsgGUID: 9dA7UOUMTSacf8WZ2vnfWQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,287,1744095600"; 
-   d="scan'208";a="154327853"
-Received: from lkp-server01.sh.intel.com (HELO 0b2900756c14) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 04 Jul 2025 10:31:22 -0700
-Received: from kbuild by 0b2900756c14 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uXkFr-0003x1-1u;
-	Fri, 04 Jul 2025 17:31:19 +0000
-Date: Sat, 5 Jul 2025 01:30:24 +0800
-From: kernel test robot <lkp@intel.com>
-To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, pabeni@redhat.com, edumazet@google.com,
-	horms@kernel.org, kuba@kernel.org,
-	John Ousterhout <ouster@cs.stanford.edu>
-Subject: Re: [PATCH net-next v10 15/15] net: homa: create Makefile and Kconfig
-Message-ID: <202507050104.p9sjOlBX-lkp@intel.com>
-References: <20250703031445.569-16-ouster@cs.stanford.edu>
+	s=arc-20240116; t=1751651071; c=relaxed/simple;
+	bh=+XClgXfK5539UpfpVJ0FXUXY6s0Q6GsORz9dYVHVAt0=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=RpqISjN2Wdq4r2DaIV6gbLRRdF6NdO11MzdMHK/+zqISgOvLDRiDfvXqHZilR1uhcUX6fFaDcNRzUVm2idoJcRnPa/XqZOQbvZnKYxhMD2oLhub9/LUNKqTYG8Y1dzNGQS8kubMS7mbR4XmLwQWKJ19Qx8XdffLRlOaYkF6ZRUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-86cc7cdb86fso93802739f.1
+        for <netdev@vger.kernel.org>; Fri, 04 Jul 2025 10:44:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751651069; x=1752255869;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6reEAjZbC0EFOta4hsE/f6/3JFK1KtUWT6rEBCyeXtM=;
+        b=U2yKWQ41o4DLJDuDgAVTPZJiRdn+nh6J7i+dykzZC30LrGhYVJTJJPMOgY47LzVJoz
+         V7nGyY8tx9Yx8LQVEZJM0IJPSB1/Te84tc2E+t/32dArbDDgCjnAqX9eQ9WCX6Xfisvu
+         eVaGKbBzLF4CVsbKuBsDscGTfWDu4Z0gORKXM0TkcA1QnecDCCai24LXarSYWgsEVhrR
+         s3ZqaDSugKIH3g4Rv2gae9m4CESRiCVon0UUENxHQlV9gXZS5yw2HPkEvlC1+HrVazXI
+         pXzAyuj+5uqwXf1kGoFW5jcFOHz18ODXa25tCSYPe6dEOzYNFEQugX7BwZkrSM4cEcgJ
+         p6yA==
+X-Forwarded-Encrypted: i=1; AJvYcCV2x/1D9MyptKsaakTgzYW1Nj07Rt/zg3Ou3zOkgAmIJwlwbgI35jbVpaLS+1mu3WhAnH9WrXk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBxzXpTfWssLQwjPzeGTh/i8IkFyghgJB9OgKtuaal/9N2DBrn
+	RlMJF6+Hw+jWSfrqC4glmH6tbMMUM8/FO47cNJLH2UF9+4FH2ITWyjGFM3kLHHNw9/eEXylQOaS
+	yNpR2453rcZU4/ozbmNl1o5tGbZckaqA4hGUEay3Xs8OZX+tmUzXiEqpW0H0=
+X-Google-Smtp-Source: AGHT+IGxnkF+jK9kcfbeYVAYPmNFQGpp0HxbAR/UMkQSYP3VAXKmHVJI7VOExp4skgFZmmGT0iL2Btc8ZkLaAqmbYCZ6V27EfVd8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250703031445.569-16-ouster@cs.stanford.edu>
+X-Received: by 2002:a05:6e02:2591:b0:3df:3222:278e with SMTP id
+ e9e14a558f8ab-3e136ea4bf6mr30724205ab.1.1751651069283; Fri, 04 Jul 2025
+ 10:44:29 -0700 (PDT)
+Date: Fri, 04 Jul 2025 10:44:29 -0700
+In-Reply-To: <682602fd.a00a0220.a2f23.01d0.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <686812fd.a00a0220.c7b3.0020.GAE@google.com>
+Subject: Re: [syzbot] [wireless?] WARNING in mac80211_hwsim_sta_rc_update
+From: syzbot <syzbot+c0472dd80bb8f668625f@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi John,
+syzbot has found a reproducer for the following issue on:
 
-kernel test robot noticed the following build errors:
+HEAD commit:    4c06e63b9203 Merge tag 'for-6.16-rc4-tag' of git://git.ker..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16f94582580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b29b1a0d7330d4a8
+dashboard link: https://syzkaller.appspot.com/bug?extid=c0472dd80bb8f668625f
+compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13f66c8c580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12497ebc580000
 
-[auto build test ERROR on net-next/main]
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-4c06e63b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ff61efc838cb/vmlinux-4c06e63b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/dea44d0d14bb/bzImage-4c06e63b.xz
 
-url:    https://github.com/intel-lab-lkp/linux/commits/John-Ousterhout/net-homa-define-user-visible-API-for-Homa/20250703-113049
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250703031445.569-16-ouster%40cs.stanford.edu
-patch subject: [PATCH net-next v10 15/15] net: homa: create Makefile and Kconfig
-config: arc-allmodconfig (https://download.01.org/0day-ci/archive/20250705/202507050104.p9sjOlBX-lkp@intel.com/config)
-compiler: arc-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250705/202507050104.p9sjOlBX-lkp@intel.com/reproduce)
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c0472dd80bb8f668625f@syzkaller.appspotmail.com
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507050104.p9sjOlBX-lkp@intel.com/
+------------[ cut here ]------------
+intf 08:02:11:00:00:01 [link=0]: bad STA 00:00:00:ff:ff:ff bandwidth 20 MHz (0) > channel config 10 MHz (7)
+WARNING: CPU: 0 PID: 176 at drivers/net/wireless/virtual/mac80211_hwsim.c:2653 mac80211_hwsim_sta_rc_update+0x6f5/0x860 drivers/net/wireless/virtual/mac80211_hwsim.c:2650
+Modules linked in:
+CPU: 0 UID: 0 PID: 176 Comm: kworker/u4:4 Not tainted 6.16.0-rc4-syzkaller-00123-g4c06e63b9203 #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: events_unbound cfg80211_wiphy_work
+RIP: 0010:mac80211_hwsim_sta_rc_update+0x6f5/0x860 drivers/net/wireless/virtual/mac80211_hwsim.c:2650
+Code: 71 17 00 00 48 c7 c7 c0 ae 2d 8c 48 8b 74 24 28 89 ea 48 8b 4c 24 10 41 89 d8 45 89 f9 41 56 50 e8 d0 df 8f fa 48 83 c4 10 90 <0f> 0b 90 90 e9 0c ff ff ff e8 2d 37 cc fa 90 0f 0b 90 e9 fe fe ff
+RSP: 0018:ffffc90001a07768 EFLAGS: 00010282
+RAX: 2b7aa56dabf85f00 RBX: 0000000000000014 RCX: ffff888000b5a440
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000002
+RBP: 0000000000000000 R08: ffff88801fc24293 R09: 1ffff11003f84852
+R10: dffffc0000000000 R11: ffffed1003f84853 R12: 0000000000000000
+R13: dffffc0000000000 R14: 0000000000000007 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff88808d21c000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffec31d80b8 CR3: 000000001216d000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+ mac80211_hwsim_sta_add+0xa3/0x310 drivers/net/wireless/virtual/mac80211_hwsim.c:2670
+ drv_sta_add net/mac80211/driver-ops.h:466 [inline]
+ drv_sta_state+0x8be/0x1840 net/mac80211/driver-ops.c:155
+ sta_info_insert_drv_state net/mac80211/sta_info.c:775 [inline]
+ sta_info_insert_finish net/mac80211/sta_info.c:883 [inline]
+ sta_info_insert_rcu+0xd32/0x1940 net/mac80211/sta_info.c:960
+ ieee80211_ocb_finish_sta net/mac80211/ocb.c:102 [inline]
+ ieee80211_ocb_work+0x31f/0x580 net/mac80211/ocb.c:136
+ cfg80211_wiphy_work+0x2df/0x460 net/wireless/core.c:435
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xade/0x17b0 kernel/workqueue.c:3321
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3402
+ kthread+0x70e/0x8a0 kernel/kthread.c:464
+ ret_from_fork+0x3fc/0x770 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
-All errors (new ones prefixed by >>):
 
-   In file included from <command-line>:
-   net/homa/homa_plumbing.c: In function 'homa_load':
->> include/linux/compiler_types.h:568:45: error: call to '__compiletime_assert_981' declared with attribute error: BUILD_BUG_ON failed: sizeof(struct homa_recvmsg_args) != 88
-     568 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |                                             ^
-   include/linux/compiler_types.h:549:25: note: in definition of macro '__compiletime_assert'
-     549 |                         prefix ## suffix();                             \
-         |                         ^~~~~~
-   include/linux/compiler_types.h:568:9: note: in expansion of macro '_compiletime_assert'
-     568 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ^~~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_assert'
-      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-         |                                     ^~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_ON_MSG'
-      50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
-         |         ^~~~~~~~~~~~~~~~
-   net/homa/homa_plumbing.c:216:9: note: in expansion of macro 'BUILD_BUG_ON'
-     216 |         BUILD_BUG_ON(sizeof(struct homa_recvmsg_args) != 88);
-         |         ^~~~~~~~~~~~
-
-
-vim +/__compiletime_assert_981 +568 include/linux/compiler_types.h
-
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  554  
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  555  #define _compiletime_assert(condition, msg, prefix, suffix) \
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  556  	__compiletime_assert(condition, msg, prefix, suffix)
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  557  
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  558  /**
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  559   * compiletime_assert - break build and emit msg if condition is false
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  560   * @condition: a compile-time constant condition to check
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  561   * @msg:       a message to emit if condition is false
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  562   *
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  563   * In tradition of POSIX assert, this macro will break the build if the
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  564   * supplied condition is *false*, emitting the supplied error message if the
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  565   * compiler has support to do so.
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  566   */
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  567  #define compiletime_assert(condition, msg) \
-eb5c2d4b45e3d2 Will Deacon 2020-07-21 @568  	_compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-eb5c2d4b45e3d2 Will Deacon 2020-07-21  569  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
