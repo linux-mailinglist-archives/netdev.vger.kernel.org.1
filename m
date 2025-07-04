@@ -1,121 +1,152 @@
-Return-Path: <netdev+bounces-203962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-203963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2E00AF85EB
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 05:11:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AE85AF85F8
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 05:13:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FD7F567551
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 03:11:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60C99162DD4
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 03:13:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 301D71E32C6;
-	Fri,  4 Jul 2025 03:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8180D1EDA09;
+	Fri,  4 Jul 2025 03:12:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Hc+GHlpy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AXZ2Rxug"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE9617CA1B;
-	Fri,  4 Jul 2025 03:11:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B0E18A6CF;
+	Fri,  4 Jul 2025 03:12:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751598704; cv=none; b=BYDt8ypdwycK8ODjv+VVIxBbGzBE7mDDEH1yVmkyUai+Ja51IlZJJQNBsxIFMWBYUc86m5ZsGB9l0MZfkxSZiPAewUiXQqs6LtK14L/9y7FM5RbZmqQo77tB1j0/v34WatDeeGKrJMRjmTfHMwO97S51l2iHqqttbk80VpSIzKs=
+	t=1751598747; cv=none; b=mmvjFNNkWuRChGacOl4hyLYEfrEtLkPAUl7A0hH5iQca5U+pk6p4eRt8W0isy6WW5rdwiV2Jmoog/iDA1k8d5dvXuZlNDgJsclk7EEQ6G+vCS5h5NM4t6LspaRUi24dGK4oJZTyPCv1xVUARy0jDdRHgRgQRN5pw/PhYxGF7dDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751598704; c=relaxed/simple;
-	bh=43Q7A3VRL4TnRonDlu6Q4IeSp7pTTqPtvV2liehgIyE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=BqEL17JSTyZ1lo8Qx5yPMKvp3n7iBYd8HAch7/yv1O+DT4tVzu85R8ljNcf9rE3gtdCzMazgwt+lMAwlxhsNh/2rqYO6HMJE9qHIdtGubwXWNAkNYgBDB3eTZ5yjM9zaU1tvlQjTkNGbmaZkRHMo/rL73rXZMZYAaJgQbnPVB4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=Hc+GHlpy; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1751598669;
-	bh=gDdy+536mUIxf1DeR863dGAOtY2TVORyc2BvNtT+JdY=;
-	h=Date:From:To:Cc:Subject:From;
-	b=Hc+GHlpye3EBxeVotIESMrfoXnJe0JGugBLNpJNvjjlvQarh9VwfwXY6Rr0McIvfu
-	 ZQfiZ9saOqE6Vw3x84I5vvsN5a/G4A9uSScaBhj21fNSXy7HmSw00Eu8eHAPLcJO+H
-	 +6TpTe+3C2m6WtnDL+ZZ4eNGk4E0NgE879nWGyYYE0g2TptsWr8vjKLOzQdZMBIArB
-	 cxN56uxPTCEQ0z4UKw4+TZnxoLIsvzhG1brrUWtIrqbCj/qN5+KvnlOENC/rHNBTD6
-	 eu/WAtJFq4dcXwVwIzNCVJTpeOmkyW+Dbh6GK3/VdFukvOUBBw3OeNRjQ/aGYrh14q
-	 IcNZTfYh2o9Yg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4bYJYn0Wbvz4x11;
-	Fri,  4 Jul 2025 13:11:08 +1000 (AEST)
-Date: Fri, 4 Jul 2025 13:11:35 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
- <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Christian
- Borntraeger <borntraeger@de.ibm.com>
-Cc: bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>,
- Alexander Gordeev <agordeev@linux.ibm.com>, Ilya Leoshkevich
- <iii@linux.ibm.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Thomas Huth <thuth@redhat.com>
-Subject: linux-next: manual merge of the bpf-next tree with the s390 tree
-Message-ID: <20250704131135.1da6c34d@canb.auug.org.au>
+	s=arc-20240116; t=1751598747; c=relaxed/simple;
+	bh=Fs5SxE9OYDU9RRGx9YYCJ+8P6J1CW9T/pjsOKtv2W/c=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=WwgJFFeJFBBEChjQ56e1pyg1NEN10FTkL9jBCLik7RJdLuJp6pVbn4Sc/aE7cLpz+iBkMxkfdgq5H8nE+ZIDa2ZxO2jmN5jzB3CtIuIPMN06VCbsekjCB6eFkhbic4hRQdDj8ClVnFa7NV13GGnvbNMpC+ajBPw4KL0zujGE4fY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AXZ2Rxug; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7425bd5a83aso647783b3a.0;
+        Thu, 03 Jul 2025 20:12:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751598745; x=1752203545; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UDnxtWl5s/38sHw0j/zQjmRuBOsfROq4Q9JtcMPC9gI=;
+        b=AXZ2RxugIR6Qb2n/vWLP43ZVDCRpuw6TKWbot5Xk9oM6rRtIZKYq+jnNCql7iGNXf4
+         LEWiVnitHNk7HTD1s6c1aORcMgKa3Sl25u22nSBbWpX10iG3gEMAf9GFt+OXmZjh9xUA
+         +TxfZRls3OO3TaoMHl9K2P9bPIIf4hLPbGgfTswNVuTXJ52VHOeEcyyyd0pWMEtkj+t6
+         MRUbZWUJ0y8yfDikyrMMRluxVv2P+DEybJJtc9hCWurv8yzjjr8UoM/g5Y9QqhncGMYa
+         BPG0Orege4XnVTJ3R6WXsKAAAYJOPUVwC24Ji39eccFzRM5E1LUL/GOVl7jfdjZrEFSr
+         RiYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751598745; x=1752203545;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UDnxtWl5s/38sHw0j/zQjmRuBOsfROq4Q9JtcMPC9gI=;
+        b=jX1VP56ROU2fwNIbdBc6X7pW9WL+ncWgoH6e2mdyO3md7a+MPHOuXvz5wvM3PQ0Go9
+         e+hhvSB0M0PMvpXlD+2Fpx/H+CXmO01C1AzAEkVAldFbj7gMEKbKOuvfZSEGFuyLiLRF
+         cHAxD7z1lAKjJ9kT5l5aF2XHkLYSCf3OzX0G3TDogH3sDHkA0HuyAG5l8FmM6w1LdCav
+         9zWeh/r4/fMIX79vxVcNrewEgzR+hzXgHwDYuujCIY+KfzQiT0edphXJZNVVgaTzGDir
+         5Lo1COmRZSJ4nq6ka6eoT2Rjo5yvS1+Md1jpuXxBmiUxA7c+SX559/THsW0O8dfU6WPP
+         Io0A==
+X-Forwarded-Encrypted: i=1; AJvYcCUi/EZ+vnnq9x4/3s2L4sS+x2wLtUTbQd60+61Y1lQAbd6BN6Hq2WWcBaT2mo6kGZ3yvRDZXpxMSpUT@vger.kernel.org, AJvYcCWGwuk12iA2mRF00hbjsqyoAB1CkEumz509eIfS2SjN6HSYrXTsWV+JtEirJxhBm1+69depvuVXHq8TIG6Eq4o=@vger.kernel.org, AJvYcCWHRms7T5rv4t9rYcKs1yhQotgOLnLl/OGS3YgLfjOuhGXqYSWlx0GPjUn5uSztqp4Z2ltaYniB5iUrzJGl@vger.kernel.org, AJvYcCWJyuvjC2KBG7KyrCThQSKaSylk27zUlJNrKKzFnWOC0a29Jmzl5aeGqP5JnV4eU4PD8tQFUQti@vger.kernel.org, AJvYcCWZ0OjewRwTtjDChJ2ubNtqRQNN7GJJPh6NV66QxXyoiWAwuFimGJQSRBaUVRhFBsk8WrrxFQ6BkkfF@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUNdOOf5kSuKeRTRUEg9xlQLkW2tXHWE68jQBDND3G62WuRQuM
+	VLhl+4mj2z7LHdrWJbXMrb2JVqRK3gOtG0vRVzhD7VuxyvB2itv1WZyB
+X-Gm-Gg: ASbGncsBZHu5a8ze6sNuvdw971xOgKff7XJlfVYpNUPGoF8A39aPGxxknzOWYklz2ew
+	1PYddKtYniG9ugej4+kFcCVG/tU3PDtZ8qzZErtfgnZxs2KvApGC9gIon70Adei3uMhCxtT9DK8
+	0jWqPQs7zCucbpro6sNm0imDPvbTV7Kv1Mt7Xp+I3v0qYck3hrRUYugIKS5SW/JDKx7sPMab783
+	i292eLsnuGsPtZZ+vVmGcEj4LwQS1dLvlmMsBiwr3eeRqqXKBsqDKDp2iOpdNojFoX+93T3N6Nq
+	aAWuzLsEbjdkg7RFyFbomq6MAD3UPgPdFyX/tZ1Vc0MO0h4H1jFx56uojoJdoL2NzW6Z86BgYuN
+	L+LViRKASHnVC6vRMNto9hdyQRGHiLUJ1R3sA/jtc
+X-Google-Smtp-Source: AGHT+IGsyFjekenVPYCtS93mzSmCbDC/+mZ2vHpqBkN8bjtYSY2xjBOBoLm6ohoEPg7/g649OEgPBw==
+X-Received: by 2002:a05:6a20:2583:b0:21f:54f0:3b84 with SMTP id adf61e73a8af0-2260b96873fmr609171637.35.1751598745078;
+        Thu, 03 Jul 2025 20:12:25 -0700 (PDT)
+Received: from localhost (p5332007-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.120.7])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce42a2c10sm863165b3a.136.2025.07.03.20.12.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jul 2025 20:12:24 -0700 (PDT)
+Date: Fri, 04 Jul 2025 12:12:08 +0900 (JST)
+Message-Id: <20250704.121208.1554239479866226095.fujita.tomonori@gmail.com>
+To: dakr@kernel.org
+Cc: fujita.tomonori@gmail.com, alex.gaynor@gmail.com,
+ gregkh@linuxfoundation.org, ojeda@kernel.org, rafael@kernel.org,
+ robh@kernel.org, saravanak@google.com, a.hindborg@kernel.org,
+ aliceryhl@google.com, bhelgaas@google.com, bjorn3_gh@protonmail.com,
+ boqun.feng@gmail.com, david.m.ertman@intel.com,
+ devicetree@vger.kernel.org, gary@garyguo.net, ira.weiny@intel.com,
+ kwilczynski@kernel.org, leon@kernel.org, linux-kernel@vger.kernel.org,
+ linux-pci@vger.kernel.org, lossin@kernel.org, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, tmgross@umich.edu
+Subject: Re: [PATCH v2 1/3] rust: device_id: split out index support into a
+ separate trait
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <aGckCY3BiPRCPmS7@pollux>
+References: <20250701141252.600113-1-fujita.tomonori@gmail.com>
+	<20250701141252.600113-2-fujita.tomonori@gmail.com>
+	<aGckCY3BiPRCPmS7@pollux>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/uJZDkAfq+ILtcqSLTUC/+ev";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
---Sig_/uJZDkAfq+ILtcqSLTUC/+ev
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Fri, 4 Jul 2025 02:44:57 +0200
+Danilo Krummrich <dakr@kernel.org> wrote:
 
-Hi all,
+> On Tue, Jul 01, 2025 at 11:12:50PM +0900, FUJITA Tomonori wrote:
+>> +// SAFETY:
+>> +// * `DRIVER_DATA_OFFSET` is the offset to the `driver_data` field.
+> 
+> Here and for a few other occurances, this doesn't need to be a list, since it's
+> just a single item.
 
-Today's linux-next merge of the bpf-next tree got a conflict in:
+Indeed, fixed all the places.
 
-  arch/s390/net/bpf_jit.h
 
-between commit:
+>> +/// Extension trait for [`RawDeviceId`] for devices that embed an index or context value.
+>> +///
+>> +/// This is typically used when the device ID struct includes a field like `driver_data`
+>> +/// that is used to store a pointer-sized value (e.g., an index or context pointer).
+>> +///
+>> +/// # Safety
+>> +///
+>> +/// Implementers must ensure that:
+>> +///   - `DRIVER_DATA_OFFSET` is the correct offset (in bytes) to the context/data field (e.g., the
+>> +///     `driver_data` field) within the raw device ID structure. This field must be correctly sized
+>> +///     to hold a `usize`.
+>> +///
+>> +///     Ideally, the data should ideally be added during `Self` to `RawType` conversion,
+> 
+> Remove one of the duplicate "ideally".
 
-  42398caf16c9 ("s390: Replace __ASSEMBLY__ with __ASSEMBLER__ in non-uapi =
-headers")
+Oops, removed.
 
-from the s390 tree and commit:
 
-  e26d523edf2a ("s390/bpf: Describe the frame using a struct instead of con=
-stants")
+>> +///     but there's currently no way to do it when using traits in const.
+>> +///
+>> +///   - The `index` method must return the value stored at the location specified
+>> +///     by `DRIVER_DATA_OFFSET`, assuming `self` is layout-compatible with `RawType`.
+> 
+> I think technically this safety requirement isn't needed.
 
-from the bpf-next tree.
+Ah, you're right. I'll remove it.
 
-I fixed it up (the latter deleted the file, so I did that) and can
-carry the fix as necessary. This is now fixed as far as linux-next is
-concerned, but any non trivial conflicts should be mentioned to your
-upstream maintainer when your tree is submitted for merging.  You may
-also want to consider cooperating with the maintainer of the conflicting
-tree to minimise any particularly complex conflicts.
 
---=20
-Cheers,
-Stephen Rothwell
+> With this:
+> 
+> 	Acked-by: Danilo Krummrich <dakr@kernel.org>
 
---Sig_/uJZDkAfq+ILtcqSLTUC/+ev
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Thanks a lot!
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmhnRmcACgkQAVBC80lX
-0Gx+1Af/cwbu4s3JWbpJGDK5eExNhF2ULcsDI3C6WJk/dVck6AnCaHLUiKlnoUcm
-WgVVzJ3f73OwyRwnrjk1INabmdmUtm1/6RaUZHeETqbz2pfTGrVlKPfCKuHMpc5i
-MkiuybVXMHuI0Pyk/79QoGDx8ckG5oubCefiDZPvwwa9JPstVkxnlu9WJOW97/4N
-LYO98igB6MecgAO2f6EEGqNjE2qkF8lJmCDpl3+YA6ExILoRoeS3iPGYGSW09U1a
-H3uVsrhuF96K04/o2CNJZ7ZQyOHbLeTja3lXf8ffC60V6AlApZLJCr/0sQEzmhT2
-CWY/yw7Dp6vrBOT31MXdOeUZFdKWdQ==
-=j7L0
------END PGP SIGNATURE-----
-
---Sig_/uJZDkAfq+ILtcqSLTUC/+ev--
 
