@@ -1,115 +1,98 @@
-Return-Path: <netdev+bounces-204094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0F8DAF8DD4
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:12:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 070C7AF8E33
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 11:19:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 495321C815A3
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:12:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C628763D30
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 09:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CCEF2F548A;
-	Fri,  4 Jul 2025 09:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16625289372;
+	Fri,  4 Jul 2025 09:08:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="H3U2ymWm"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Gx5pkXyL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD1282F4A12
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 09:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E162DAFCB;
+	Fri,  4 Jul 2025 09:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751619921; cv=none; b=uez/eaixxjoE703chcoqDIBjZs8CXsLHtqGFJzpvMtkxOC8efG6cwvzwVPDju75FGZx8ILdEAHrbbJCA8A89HFsbGVjVg5omWVG4U4ds6rBl+2E/Hr/GCNQregGdB82qygTESzjooH6kk2zDZLWPhvSs1D3LyjtY7UhogmOQhw4=
+	t=1751620130; cv=none; b=lwmMyKf0JvfRdN6kQnvBZ6D0o7Am2PDznvhWQnBlp3yp9Zm+HjV06hGMC45V4pDLdVxXZ8vAG6lg+wVnupL08aCXt+Xm/W9WwrqCMqCvXUsWO0gE5r4ziWNAfR+dgpUgTQ3eYAFb2vS2mcXijVrnkS5/J9Z1KnTAMahIOTphsQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751619921; c=relaxed/simple;
-	bh=lRw7yJVneIfUXB5qnJ6oSwcGV4RKbOy3n7DSX0pBpsM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZUBr5O1O+REv2ikLRr4maIJHeWARNkME7i3x/Y367/cuVQUO82sKnJrBimvGmC2tp8E84hwKyleYnexa7FCLZIqGpJHvjx55yMsRJ67VwteF53h0c2Sh6m0RdpyR4yd8njekoUCn12pb7Jstcc8LxzCKE0zI/YJ0IVKBDRsJ9hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=H3U2ymWm; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ae0c571f137so143196166b.0
-        for <netdev@vger.kernel.org>; Fri, 04 Jul 2025 02:05:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1751619915; x=1752224715; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5lvqW25n8VSdsxeIbb6N6y1V/bckNRxGH4LVpn13n8M=;
-        b=H3U2ymWmKJvzY6LVPa7qpM4oO2dpgixhT8WECCxKAxFXOafT6qAvJGd4nfO8CjUfxK
-         aqXGukWxDg/2q/LUqBk7Btvs2Ml1HFqRo3+Kfo+p98HdrMzzvxAe1cy8/JZiSz0fnxuW
-         X5eTKMlP4Pfk6I8mkB47Ya9AUeTLbl6fmcaiKF/6Pk2UzdwU8TcyPWlmEpzkSaWa5Vie
-         BJHeDbf/9wk94WUn05wJ9zJOtbCOJ+NFQIlMQXATdR57st5dhs5l05A3zXn3jpj4DC5L
-         yqMxKLiwbH/2IWxa5oQSjBWSQsr2tx76v9qzFAgWb0oQRRHCus7RJvyNFye2zFZYDeFQ
-         iUfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751619915; x=1752224715;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5lvqW25n8VSdsxeIbb6N6y1V/bckNRxGH4LVpn13n8M=;
-        b=nmjKoIsLuOqDKOfEeH134fJOiYKrB49bLQjax8rrd7IRjsz2iN/1jgiX9C+2qNuKhH
-         G5LxMXgvhtCZ2cueEil6/PG8G8np/cfs3ibCiYQzsHDNiagJWOiFZGv7R+L3SKYJjk8p
-         U3wEK8ebLPgaBqrsEAls4Bk5FjAlLLdC4nOkUr7Ix27pmomVlaVmtSzQE43yOhh1pAL0
-         dbxyjoKOM6FzQdwLbFkoIKMG2htsmgWE9wsl/PvU/TizRZ8RZgZ9ISlPV5QZ1NoeYNFH
-         PxS+9N9rEgNBqcmt4IvO0P71qJpGwut8cg5BO0WhbiBL5/H+aM5OSWS8qEaiWrAgyHO8
-         USLw==
-X-Forwarded-Encrypted: i=1; AJvYcCXKtxlW8cfeTsSBeCGzJcG1UC/rkOvOtv9vegROng0xtIXraZKpsqiinxPBl6/R8QfmXv7Z21g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6fOuCtdK30KjsAxr1AxnR5HUWgLO/bKxzBS+3HktGFSObK345
-	8aVzN3x1YoW+MFYgtqFWzaO9i6qfsdva5d+InHMHEokbEUcQE/r0F2S+m/xVKBlStX8=
-X-Gm-Gg: ASbGncue2CjFd4rxSYbO0j3NFtE0XmIIoAYijfhQ5N7KimQFqsbrcaS8YDCeQTZxlUb
-	biB9VNvWU3DbhpdSpjDeQE+5nVK/OpLo8B/Wfkj6ZHGspz406NvmpRFRU860H0q+ClsMwewVHbb
-	fVDOnl13ytHgZFel3ADKfED5Y2e+y8HvTEfV81fS75KQ4/2RMaWSdSpJwLz8QD/GacbZwUUue3t
-	/jyyYmKlpfdWlTW6VycMPr/NqnHOILmXmsQ2I5ncvlF1aoVTABAsJ/pcrZtw3hJFDK7Ynb2Ftzz
-	+6stRNtOwadHlTZB6Dwk4a8o7tCymap1JGvKJK0ys0GfUCa02jYy1teL0ALZktXRhPP4NoN8h/W
-	Mp3G4cYyDQx8O
-X-Google-Smtp-Source: AGHT+IEZO1zxjcWXhdMMtE+CxCjQoXtX/7S5BwYI92EZAOfHlQnV8tIpwdxwwtnNSgAwSoG0neHl+w==
-X-Received: by 2002:a17:906:c102:b0:ad4:8ec1:8fcf with SMTP id a640c23a62f3a-ae3fbd6c7d4mr177062566b.46.1751619915226;
-        Fri, 04 Jul 2025 02:05:15 -0700 (PDT)
-Received: from ?IPV6:2a02:810a:b98:a000::f225? ([2a02:810a:b98:a000::f225])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae3f66d91cdsm137351766b.22.2025.07.04.02.05.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Jul 2025 02:05:14 -0700 (PDT)
-Message-ID: <79a57427-fd4a-4b9a-a081-cf09b649a20e@cogentembedded.com>
-Date: Fri, 4 Jul 2025 11:05:14 +0200
+	s=arc-20240116; t=1751620130; c=relaxed/simple;
+	bh=A/tOP4cJ2t1NZ8O1Dsh/+HuppAWTYNhyv8Wa6EMqDFw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k9Rzdxza/bb0enVkYgIthvQ21GHZvkv3DDschAcuzJZ+bUgTRYNfJjxehG9uLGlalS26d+B3cHRx0HV58edJOL2mKOQeh6rMQygClalUfvKdo66Q67fiyFW/V8NZ6sAhdl0bQ/OBnj/SSA1GLQ/iQQKWhjk/Y/hcqPeOz6HJ4NM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Gx5pkXyL; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 910304326B;
+	Fri,  4 Jul 2025 09:08:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1751620126;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tR1QnAR+tVQi5ONZkL2wcXGMP9Iltcj6/sbOx85efyQ=;
+	b=Gx5pkXyL5tYAW1yK2OCfVrehUO9xUuN3+LjltFzIZD6opOk1iWuECnHh8/HZd+ZEw4MNmT
+	jz4d/lngarwLDIxbFQKIjzVYtPOYI2HlPzrfBY5cSnadHEtYxymItYxVggkK6Fi7jvzM9X
+	TBi1tGMsavBRjx8JrP0+9hQvYvaXMkcRSMy4ZXGTypaGAK4ramvkLt/4zYjbJQzRdGndOx
+	PExNmWloL79Yvbj15ZvHBD+YY6tQrI3QDuLXp8KLi0BjSCeycC20E8pPRuQ12svhzLtdIn
+	rsMiKYLGtf2relLc8cJC88sKTcnnw/Jsn6HWFwaUcrQh4HvH78PUNTlrATzBkA==
+Date: Fri, 4 Jul 2025 11:08:42 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Viorel Suman
+ <viorel.suman@nxp.com>, Li Yang <leoyang.li@nxp.com>, "Russell King
+ (Oracle)" <rmk+kernel@armlinux.org.uk>, Wei Fang <wei.fang@nxp.com>,
+ <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH RESEND net 2/3] net: phy: qcom: qca808x: Fix WoL issue
+ by utilizing at8031_set_wol()
+Message-ID: <20250704110842.51616179@fedora.home>
+In-Reply-To: <20250704-qcom_phy_wol_support-v1-2-053342b1538d@quicinc.com>
+References: <20250704-qcom_phy_wol_support-v1-0-053342b1538d@quicinc.com>
+	<20250704-qcom_phy_wol_support-v1-2-053342b1538d@quicinc.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] net: renesas: rswitch: R-Car S4 add HW offloading for
- layer 2 switching
-To: Andrew Lunn <andrew@lunn.ch>, Michael Dege <michael.dege@renesas.com>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
- Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250704-add_l2_switching-v1-0-ff882aacb258@renesas.com>
- <4310ae08-983a-49bb-b9fe-4292ca1c6ace@lunn.ch>
-Content-Language: en-US, ru-RU
-From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-In-Reply-To: <4310ae08-983a-49bb-b9fe-4292ca1c6ace@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgddvvdejiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejfedtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeehteevfeeivdekjeefkeekffefgfdtudetjeehkeegieelheekgfefgfevveffhfenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduhedprhgtphhtthhopehquhhitggplhhuohhjsehquhhitghinhgtrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpt
+ hhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-> Looking at the code, it is not clear to me what would happen with:
+On Fri, 4 Jul 2025 13:31:14 +0800
+Luo Jie <quic_luoj@quicinc.com> wrote:
+
+> The previous commit unintentionally removed the code responsible for
+> enabling WoL via MMD3 register 0x8012 BIT5. As a result, Wake-on-LAN
+> (WoL) support for the QCA808X PHY is no longer functional.
 > 
-> ip link add name br0 type bridge
-> ip link set dev tsn0 master br0
-> ip link set dev br0 up
-> ip link set dev tsn0 up
-> ip link add name br1 type bridge
-> ip link set dev tsn1 master br1
-> ip link set dev br1 up
-> ip link set dev tsn1 up
+> The WoL (Wake-on-LAN) feature for the QCA808X PHY is enabled via MMD3
+> register 0x8012, BIT5. This implementation is aligned with the approach
+> used in at8031_set_wol().
+> 
+> Fixes: e58f30246c35 ("net: phy: at803x: fix the wol setting functions")
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
 
-Per design, it shall enable hardware forwarding when two ports are in the same brdev.
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Maxime
 
