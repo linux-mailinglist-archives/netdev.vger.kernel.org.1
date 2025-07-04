@@ -1,120 +1,125 @@
-Return-Path: <netdev+bounces-204047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 391E3AF8AAA
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 10:07:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE984AF8ACA
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 10:11:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5886B17243E
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 08:05:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 364151BC5AB9
+	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 08:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 955A42E9729;
-	Fri,  4 Jul 2025 07:54:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="et60A+wg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE952F530D;
+	Fri,  4 Jul 2025 07:55:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96C0F2D542C;
-	Fri,  4 Jul 2025 07:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9AF2F4315;
+	Fri,  4 Jul 2025 07:55:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751615685; cv=none; b=Q3VDSepiYJUJSIsvC6wGafHkeJTfSaZgezaw+8PA4jJLmlZeHl94yBarbrIF3F/8Y7t8Lozmt/u8QmQrM4UsxJXYJH6q7YWURkWXycqJ0ovamHDXn63diNIEJJdQSrui2ONzkIjFzRd1JXHsfqed2w8nR8pmvaZvdH3aiUxO6kI=
+	t=1751615706; cv=none; b=qulbYgToINrDMO9/64LnMI6mSXCiVBkqEsHymxWetF4lULwfdA1s7T0F39jXH53Ug0NZeMMIdBfxz3KyDJtWkJL3HgT2R2FZg3V0fcTWu1x9/KNvqUy9LgikegK+Jjwmf4xdyhfynhrSPNbi44iWSNuHlrhtq+O2/hDkzB48JNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751615685; c=relaxed/simple;
-	bh=logG108dBu9v+vZYmJaE48QCvdOD6icuV7EBnGifvsg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NiJsKcoAUaY4XtX/XqmO6Og9fuogxCUnE//068g6qbFClog7eoaBiFQNxoPMbeMkMxOs3FGA8wl0M3RHkRZ7Q9qowFwkyEw4g/mncnc2RKfLfTs2XtX8ysTKCniS/4y4Y/l4Bo+4K2T6vtP8798XDvy7xFdk6FEmzP4hs51Ul0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=et60A+wg; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751615684; x=1783151684;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=logG108dBu9v+vZYmJaE48QCvdOD6icuV7EBnGifvsg=;
-  b=et60A+wgq6ISM4GjspNUpyRrKOfpEW3a00WN/zWYCu679/xm7leuYdCz
-   ZaSNNbHzCcnBjoJJjl9VZhXdu6aI/nvcGzbqAqESqTejeYk+8E3YyLnK8
-   I6nPvLYt0QK1JHfJVjKCBeoXj5Crodrx/Kov0WZTRxrM0eFYW4ghQ5At0
-   g/YYBlvRs4mFgxIPnCETdAqK6urMIrbegiA8aweyQvkhx70zeFWP8fzKM
-   tXcZVbn7V6WVS4x195LNk97PpD5VRK0nuD0fuhnqWsqIv3C5+7lXcy+/3
-   jDxG/41DP2yWNka2ftv20XeHOHTK/H7JxmD4C5E//xkDGOW84P2xl6he5
-   A==;
-X-CSE-ConnectionGUID: xgPG8+RvQem4YvrodoyOqQ==
-X-CSE-MsgGUID: ijRRG5kjQ3aeulZVRGgqLA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11483"; a="64194126"
-X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
-   d="scan'208";a="64194126"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 00:54:44 -0700
-X-CSE-ConnectionGUID: rbi9tavUSMOh371v/XWsQA==
-X-CSE-MsgGUID: 6ST/TLHmQKiMFn0fLWSHsg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,286,1744095600"; 
-   d="scan'208";a="158616594"
-Received: from jkrzyszt-mobl2.ger.corp.intel.com (HELO svinhufvud.fi.intel.com) ([10.245.244.244])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 00:54:41 -0700
-Received: from svinhufvud.lan (localhost [IPv6:::1])
-	by svinhufvud.fi.intel.com (Postfix) with ESMTP id A488744424;
-	Fri,  4 Jul 2025 10:54:39 +0300 (EEST)
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6 krs, Bertel Jungin Aukio 5, 02600 Espoo
-From: Sakari Ailus <sakari.ailus@linux.intel.com>
-To: Mark Greer <mgreer@animalcreek.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>
-Cc: linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 50/80] nfc: trf7970a: Remove redundant pm_runtime_mark_last_busy() calls
-Date: Fri,  4 Jul 2025 10:54:39 +0300
-Message-Id: <20250704075439.3221036-1-sakari.ailus@linux.intel.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250704075225.3212486-1-sakari.ailus@linux.intel.com>
-References: <20250704075225.3212486-1-sakari.ailus@linux.intel.com>
+	s=arc-20240116; t=1751615706; c=relaxed/simple;
+	bh=x9A3hNhSIv1JfhUbvnxXKeblQ+dzPJLL+9vPRTOw4PY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=cpMiwwyCJGYU2WjxuWXAOHwlhA4Kuvs7vssCArtKmnUjfyNJ4RkuqNQwDmIeNx/oMKe4I9vwi5qpzQqnljMh1DN0Gbv31+iMvSiy3ipAjvmQ8mJp9PfoPnLPRkqPerfZ+EV8VYZemxTil69cqWTZfTfPAwe3GBLldVkUER73n1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4bYQqD0Hdfz2BdWG;
+	Fri,  4 Jul 2025 15:53:12 +0800 (CST)
+Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5B79B1402CB;
+	Fri,  4 Jul 2025 15:55:00 +0800 (CST)
+Received: from [10.174.179.113] (10.174.179.113) by
+ dggpemf500002.china.huawei.com (7.185.36.57) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 4 Jul 2025 15:54:59 +0800
+Message-ID: <d1bb9101-f826-4d79-a74d-dabcbcac351d@huawei.com>
+Date: Fri, 4 Jul 2025 15:54:58 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] atm: clip: Fix NULL pointer dereference in vcc_sendmsg()
+To: Kuniyuki Iwashima <kuniyu@google.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>
+References: <20250704023914.3876975-1-yuehaibing@huawei.com>
+ <20250704065353.1621693-1-kuniyu@google.com>
+Content-Language: en-US
+From: Yue Haibing <yuehaibing@huawei.com>
+In-Reply-To: <20250704065353.1621693-1-kuniyu@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ dggpemf500002.china.huawei.com (7.185.36.57)
 
-pm_runtime_put_autosuspend(), pm_runtime_put_sync_autosuspend(),
-pm_runtime_autosuspend() and pm_request_autosuspend() now include a call
-to pm_runtime_mark_last_busy(). Remove the now-reduntant explicit call to
-pm_runtime_mark_last_busy().
+On 2025/7/4 14:53, Kuniyuki Iwashima wrote:
+> Please specify 'net' in subject:
+> 
+>   [PATCH net v2] atm: clip: ...
+> 
+> From: Yue Haibing <yuehaibing@huawei.com>
+> Date: Fri, 4 Jul 2025 10:39:14 +0800
+[...]
+>> as above.
+> 
+> Please move commit message before the splat.
 
-Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
----
-The cover letter of the set can be found here
-<URL:https://lore.kernel.org/linux-pm/20250704075225.3212486-1-sakari.ailus@linux.intel.com>.
+ok
+> 
+> 
+>>
+>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+>> Reported-by: syzbot+e34e5e6b5eddb0014def@syzkaller.appspotmail.com
+>> Closes: https://lore.kernel.org/all/682f82d5.a70a0220.1765ec.0143.GAE@google.com/T
+>> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+>> ---
+>>  net/atm/clip.c | 9 ++++++++-
+>>  1 file changed, 8 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/atm/clip.c b/net/atm/clip.c
+>> index b234dc3bcb0d..c02ba9d64bc3 100644
+>> --- a/net/atm/clip.c
+>> +++ b/net/atm/clip.c
+>> @@ -616,8 +616,15 @@ static void atmarpd_close(struct atm_vcc *vcc)
+>>  	module_put(THIS_MODULE);
+>>  }
+>>  
+>> +static int atmarpd_send(struct atm_vcc *vcc, struct sk_buff *skb)
+>> +{
+>> +	dev_kfree_skb_any(skb);
+> 
+> This is not enough, see:
 
-In brief, this patch depends on PM runtime patches adding marking the last
-busy timestamp in autosuspend related functions. The patches are here, on
-rc2:
+Thanks, will check this and rework.
 
-        git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm.git \
-                pm-runtime-6.17-rc1
-
- drivers/nfc/trf7970a.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/drivers/nfc/trf7970a.c b/drivers/nfc/trf7970a.c
-index d17c701c7888..2d0d348aa278 100644
---- a/drivers/nfc/trf7970a.c
-+++ b/drivers/nfc/trf7970a.c
-@@ -1139,7 +1139,6 @@ static void trf7970a_switch_rf_off(struct trf7970a *trf)
- 	trf->aborting = false;
- 	trf->state = TRF7970A_ST_RF_OFF;
- 
--	pm_runtime_mark_last_busy(trf->dev);
- 	pm_runtime_put_autosuspend(trf->dev);
- }
- 
--- 
-2.39.5
-
+> commit 7851263998d4269125fd6cb3fdbfc7c6db853859
+> Author: Kuniyuki Iwashima <kuniyu@google.com>
+> Date:   Mon Jun 16 18:21:15 2025
+> 
+>     atm: Revert atm_account_tx() if copy_from_iter_full() fails.
+> 
+> 
+>> +	return 0;
+>> +}
+>> +
+>>  static const struct atmdev_ops atmarpd_dev_ops = {
+>> -	.close = atmarpd_close
+>> +	.close = atmarpd_close,
+>> +	.send = atmarpd_send
+>>  };
+>>  
+>>  
+>> -- 
+>> 2.34.1
 
