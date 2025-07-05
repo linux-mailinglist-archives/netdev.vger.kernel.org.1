@@ -1,70 +1,52 @@
-Return-Path: <netdev+bounces-204297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 844F8AF9F2B
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 10:36:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AE24AF9F23
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 10:31:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13B2A3AD5D7
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 08:35:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D2A6581276
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 08:31:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E34E2286D5B;
-	Sat,  5 Jul 2025 08:36:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="cF0ow0Mk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9BBF276030;
+	Sat,  5 Jul 2025 08:31:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-73.smtpout.orange.fr [80.12.242.73])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7846123AD;
-	Sat,  5 Jul 2025 08:36:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60AD2E3702;
+	Sat,  5 Jul 2025 08:31:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751704565; cv=none; b=uD1w3XjAgqv5L4+P1SSsc/sysCcZN0T6bO2V2zTyS+bquUe7V50nQKQbQYQYR2BlJWbdQgyCmF6SEdTm1k317pR76do+uZ/YGbFYq8l/EMNFDFdgRtq8ThycQ43gYgrMTLXAy9HDs+Z02k6R1FzeGIpX6jmpZV9U9nx4l/f8Cko=
+	t=1751704296; cv=none; b=bJSiS0W8PXadDMXktpC925RkmDNAC7UpN8RYYC7VhGwvKAhlzTQ9YNe3a9Fgpg+h9oScxsOJH8xXOlM2NIJmwAeqldr0CE6WRRkCJv3ERLwcABe9CCV+t2shXgPUCGIaXN0FhuvB66Tia2LRREg9EKrexyVYIluwFMwEFLUjbn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751704565; c=relaxed/simple;
-	bh=Cn0VWrYKwf8V6uYejsIP+/3mvamaPCvfi5zjmIbd94g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=esEzW6NyU3Um94cHsetKnqx450NvlKIXaM6SV0MSE19+Nv9537vup9JJZ+AYNNJbon/hZY9CJ/+DRoJWeHKhume+vUSmqy6qNqSRHL/7BeyNgInUwRCl8qVE2e7GWCVJzBuTUaQ793bWF+E0wBb7N7hdA8ZuM79fPNkvkofg0So=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=cF0ow0Mk; arc=none smtp.client-ip=80.12.242.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from fedora.home ([IPv6:2a01:cb10:785:b00:8347:f260:7456:7662])
-	by smtp.orange.fr with ESMTPA
-	id XyMCunIdc3HAMXyMCux85J; Sat, 05 Jul 2025 10:34:50 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1751704491;
-	bh=bZ2e0OGLx3B1xnxgJsmUQMNOM9BBR0+6G+mi7LokNx8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=cF0ow0Mk+vKo0i7MXgUtpEOsNiSg/EqNpyVO5xtB2DGhRDbSJb+yPRjQoa3h+IbIo
-	 Q5f7G2PnB/Uqq8/s1VsxYbEcVImyFXJmcSEivXu/6IvwWRfh8613zFQOtWm87ZDplo
-	 sUzYPZMf5TXsaatv+ywMe26H0XR+DSrXCdGaEFvfmmJedqFosv3F5CeQQxAKAgVa6q
-	 7HN3dvmIIjrFEHqqMWjgVYBOHGYY/e28mf3Hs31hPhZtKM6FXIegxEQNkoEf7eWm5C
-	 yLGQ3RQyLknnkAxvmNLP/s7pJosT1WsjYaHlSz8GxbpNrqbpHGFj8pt980/R6/V5PE
-	 j0d4uq3fe1J2w==
-X-ME-Helo: fedora.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sat, 05 Jul 2025 10:34:51 +0200
-X-ME-IP: 2a01:cb10:785:b00:8347:f260:7456:7662
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Simon Horman <horms@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v4 net] net: airoha: Fix an error handling path in airoha_probe()
-Date: Sat,  5 Jul 2025 10:34:32 +0200
-Message-ID: <1c940851b4fa3c3ed2a142910c821493a136f121.1746715755.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.50.0
+	s=arc-20240116; t=1751704296; c=relaxed/simple;
+	bh=J0E8HN+m0lxf9U9PXWp7oYqn6/NzReP+6gkjAYV/Ycg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oEwQ62NfNpiM755fABOpZrTMmwxq/NuC32Noo4l8jU6VSmnXiYI62s35sEhK9nHTfilPAYh3SZu7BhRbW2+H0V+hLGfK2IN0PN0qGPylB9devwV8siMSa9ROmbIOlwFRXLBLLAz6VV7KoLx5VPtW4sKQwMVvlV0Bty5jNmsjZts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4bZ3f34HZxz2qFB7;
+	Sat,  5 Jul 2025 16:32:27 +0800 (CST)
+Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
+	by mail.maildlp.com (Postfix) with ESMTPS id A28861401F1;
+	Sat,  5 Jul 2025 16:31:30 +0800 (CST)
+Received: from huawei.com (10.175.124.27) by dggpemf500002.china.huawei.com
+ (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 5 Jul
+ 2025 16:31:29 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<yuehaibing@huawei.com>
+Subject: [PATCH v2 net] atm: clip: Fix NULL pointer dereference in vcc_sendmsg()
+Date: Sat, 5 Jul 2025 16:52:28 +0800
+Message-ID: <20250705085228.329202-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,54 +54,79 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ dggpemf500002.china.huawei.com (7.185.36.57)
 
-If an error occurs after a successful airoha_hw_init() call,
-airoha_ppe_deinit() needs to be called as already done in the remove
-function.
+atmarpd_dev_ops does not implement the send method, which may cause crash
+as bellow.
 
-Fixes: 00a7678310fe ("net: airoha: Introduce flowtable offload support")
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
+BUG: kernel NULL pointer dereference, address: 0000000000000000
+PGD 0 P4D 0
+Oops: Oops: 0010 [#1] SMP KASAN NOPTI
+CPU: 0 UID: 0 PID: 5324 Comm: syz.0.0 Not tainted 6.15.0-rc6-syzkaller-00346-g5723cc3450bc #0 PREEMPT(full)
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:0x0
+Code: Unable to access opcode bytes at 0xffffffffffffffd6.
+RSP: 0018:ffffc9000d3cf778 EFLAGS: 00010246
+RAX: 1ffffffff1910dd1 RBX: 00000000000000c0 RCX: dffffc0000000000
+RDX: ffffc9000dc82000 RSI: ffff88803e4c4640 RDI: ffff888052cd0000
+RBP: ffffc9000d3cf8d0 R08: ffff888052c9143f R09: 1ffff1100a592287
+R10: dffffc0000000000 R11: 0000000000000000 R12: 1ffff92001a79f00
+R13: ffff888052cd0000 R14: ffff88803e4c4640 R15: ffffffff8c886e88
+FS:  00007fbc762566c0(0000) GS:ffff88808d6c2000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffffffffffffd6 CR3: 0000000041f1b000 CR4: 0000000000352ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ vcc_sendmsg+0xa10/0xc50 net/atm/common.c:644
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg+0x219/0x270 net/socket.c:727
+ ____sys_sendmsg+0x52d/0x830 net/socket.c:2566
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
+ __sys_sendmmsg+0x227/0x430 net/socket.c:2709
+ __do_sys_sendmmsg net/socket.c:2736 [inline]
+ __se_sys_sendmmsg net/socket.c:2733 [inline]
+ __x64_sys_sendmmsg+0xa0/0xc0 net/socket.c:2733
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzbot+e34e5e6b5eddb0014def@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/682f82d5.a70a0220.1765ec.0143.GAE@google.com/T
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 ---
-Changes in v4:
-  - Add A-b and R-b tags
-  - Rebase against latest -next (because v3 now gets "Hunk #1 succeeded
-    at 2979 (offset -12 lines)")
-
-Changes in v3:
-  - call airoha_ppe_deinit() and not airoha_ppe_init()   [Lorenzo Bianconi]
-v3: https://lore.kernel.org/all/1b94b91345017429ed653e2f05d25620dc2823f9.1746715755.git.christophe.jaillet@wanadoo.fr/
-
-Changes in v2:
-  - Call airoha_ppe_init() at the right place in the error handling path
-    of the probe   [Lorenzo Bianconi]
-v2: https://lore.kernel.org/all/3791c95da3fa3c3bd2a942210e821d9301362128.1746715755.git.christophe.jaillet@wanadoo.fr/
-
-v1: https://lore.kernel.org/all/f4a420f3a8b4a6fe72798f9774ec9aff2291522d.1744977434.git.christophe.jaillet@wanadoo.fr/
-
-Compile tested only.
-
-In the previous iteration, this patch was part of a serie (was 2/4).
-But it should be related to 'net', while the rest of the serie was for
-'net-next'. So it is resent as a stand-alone patch, as a v4.
+v2: Add atm_return_tx() call
 ---
- drivers/net/ethernet/airoha/airoha_eth.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/atm/clip.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index af8c4015938c..d435179875df 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -2979,6 +2979,7 @@ static int airoha_probe(struct platform_device *pdev)
- error_napi_stop:
- 	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++)
- 		airoha_qdma_stop_napi(&eth->qdma[i]);
-+	airoha_ppe_deinit(eth);
- error_hw_cleanup:
- 	for (i = 0; i < ARRAY_SIZE(eth->qdma); i++)
- 		airoha_hw_cleanup(&eth->qdma[i]);
+diff --git a/net/atm/clip.c b/net/atm/clip.c
+index b234dc3bcb0d..170f9386d42d 100644
+--- a/net/atm/clip.c
++++ b/net/atm/clip.c
+@@ -616,8 +616,16 @@ static void atmarpd_close(struct atm_vcc *vcc)
+ 	module_put(THIS_MODULE);
+ }
+ 
++static int atmarpd_send(struct atm_vcc *vcc, struct sk_buff *skb)
++{
++	atm_return_tx(vcc, skb);
++	dev_kfree_skb_any(skb);
++	return 0;
++}
++
+ static const struct atmdev_ops atmarpd_dev_ops = {
+-	.close = atmarpd_close
++	.close = atmarpd_close,
++	.send = atmarpd_send
+ };
+ 
+ 
 -- 
-2.49.0
+2.34.1
 
 
