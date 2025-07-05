@@ -1,87 +1,58 @@
-Return-Path: <netdev+bounces-204315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5456CAFA0F6
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 18:37:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5176AFA0FC
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 19:03:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B69B4560064
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 16:37:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 378D74A1B1F
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 17:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676E2201032;
-	Sat,  5 Jul 2025 16:37:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="emnI5DV6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D101FC7CA;
+	Sat,  5 Jul 2025 17:03:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47C915A864
-	for <netdev@vger.kernel.org>; Sat,  5 Jul 2025 16:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2916672634;
+	Sat,  5 Jul 2025 17:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751733456; cv=none; b=ZK8rA1zmWHNdUCifbVQQAKdaN5wIJFzf6PcbFWrFsjynCUYDZFEIGE3wsW5lgcu5/T5rPXynShUabfKuF/W9Lxh6045QQUMkK2gL2Yn7SfPXTn02YQszpIFlSauFO68NpYrFH7akrZk0zsZAWNdF1w1LJS82lIRn6X/sEoMa94w=
+	t=1751735024; cv=none; b=pIyLRqNA0gQcbLnqXmr+v3l5qickLsWhWNpBiKJnA3uh4SgrPSmc5duIWxmSFZIvIMkbElKa9ODr3eZrhPGBe6iSqGJeGqpVGiR+TgwQvPpYmqzjcC2xwBmwdHaNPcjRHaJdOOBI5cCEvpA7lcWvHLpSbIYikhtr10Dfdnx2BNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751733456; c=relaxed/simple;
-	bh=bpEfMJs8e9ArpurmqPH1aMCwQmhMzG5uqy2rm0sq/DA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ay/nAKRdcKCMe2Ou1HWoWcvk/UF9PRjVVlXR2toG3kxsEd50t35vnWNwHCrFhc2RwSdQ4GR92z5b9lvac6Z36OORY/MrpfgC2gv1jLn8WyW4ymwtXQ0jQJx1ER0KokeruMtBsXF96HATTkSvYbjL+I65j7ats6+uRrleL46ZtSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=emnI5DV6; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-31384c8ba66so416956a91.1
-        for <netdev@vger.kernel.org>; Sat, 05 Jul 2025 09:37:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751733454; x=1752338254; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=15N/9RGbtN0ibAbyvgksx/lLbHh3evmAYS3TJQW3xZk=;
-        b=emnI5DV6MUe2Tgk4qiVgJT2QM7OaFT9JsoS5Gv74jKBtTGReMWnAbPze75iweUtAp8
-         aJXELjfD5y3DHqpMr1ZzxSzjDAk40VdPwzzAjKaXlGw20cwa2eKwDRKySKp2npoxL6de
-         u+VPwvyyCjidNDEmX3Uqcr5TVgRklF+H0AP3yrCKM8lGtkwE8ujnvd4c5ZQF8YBoESN+
-         nihKNJ9Ej+3gcqSsPY5uEKdgyMJ0GYIcHVAPjYVAg9iacSqLud7SiTd3HQ4Fg8ZUnViJ
-         T3hfp5GtdbJNSLmlEXd0G2SqG9dM9/dv2h5DVvhnCTBqxgGGpArANzmAd7NehOygks4i
-         zZ/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751733454; x=1752338254;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=15N/9RGbtN0ibAbyvgksx/lLbHh3evmAYS3TJQW3xZk=;
-        b=mblGYQe/GFBUHAH8naVVJp4BN0uFw4WvEVYj6dqt1zhoA1uTW4JK+fEnST15VZnTbd
-         AS+NauAMsXHyK7dmwuI7LyyxbUkeiERQR2RkLKPJMJI8tZGkxTwYgeDnE6uT9WjHoLWx
-         U6To5W6AK3CwstP22imQizH/1LwbjhbEsfvhLYfXAwiil+DVgv3KvFBf1ISO+ppBi/2F
-         2udUg9tj5/UuNTh9oszV4O42GHNznkpY4YFE07hCpau1TqI0iivZrzND7iOpbpiuzfyv
-         cnVq3aYh6yq8EobsLPszLVgAA7wvTiKtRbJbnpctCv6SDPM9N2Kjj+2NB4aUcZ5IMIEd
-         2iig==
-X-Gm-Message-State: AOJu0YyWJE2JXakijnq5IUNW/qvw3pQSS7NMReTiVRGFLUt8WAXZVT4f
-	qLDSjHqHddEUbd+fS6bQaDnQn3711k8U3WvOHpIlEnorPMVs+ZuDxro=
-X-Gm-Gg: ASbGncsGbu8vr7S2/SAg8RRaLwkb3SkU6mylqSk7RF4Ul+gNjr0OPA8IAI04HSU9IXB
-	7hgdCi5m9eLAno+can9XpbJR8HN6PYNXaemHadr+YH1PkJFtnAG97ib5dCXpPQAkt6WB4HX9oKV
-	FHBtrq9Gx6lRzKPMgRI3ZjNg6YTlSY77VsRbFZFDJRdiKb86HODJTdzyQ/8IHO8C9cdgHXlXn8S
-	pjuGXEGZQKvkWZV1fQtjBkH+QRyzpHR/XfudtDNXP64sEcaW7obXTC1bZ4zKxl/LKzjMGBgabWm
-	muqLAfFomibrz+G0G6hqCd+1Sbc9/eniQ45gZkZtwBwVy/eEJRnPmWRdu7LstrCpOG8IA/pAzkn
-	myw==
-X-Google-Smtp-Source: AGHT+IF+ZQlgJzx0h9TpvyKk2RN6ZlY1FCiRZNM1HublucYMI11IurJtMQPGso4JRIwyf8RO3dpp6w==
-X-Received: by 2002:a17:903:2406:b0:23c:8f18:7987 with SMTP id d9443c01a7336-23c8f187bb1mr17315025ad.9.1751733454146;
-        Sat, 05 Jul 2025 09:37:34 -0700 (PDT)
-Received: from jiaoziyan-Precision-5510.. ([23.163.8.30])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23c8431a373sm45460895ad.7.2025.07.05.09.37.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Jul 2025 09:37:33 -0700 (PDT)
-From: Xin Guo <guoxin0309@gmail.com>
-To: ncardwell@google.com,
-	edumazet@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	Xin Guo <guoxin0309@gmail.com>
-Subject: [PATCH net-next v1] tcp: update the outdated ref draft-ietf-tcpm-rack
-Date: Sun,  6 Jul 2025 00:36:47 +0800
-Message-ID: <20250705163647.301231-1-guoxin0309@gmail.com>
+	s=arc-20240116; t=1751735024; c=relaxed/simple;
+	bh=QjfCCAHuG5KSO6VVPMvYRGWXhmONEiIJ+1z/qE4+WX8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LDs8B8vjN35HqwTcYHwBieo1lu76QUt4egD+2+CW+zYAXNrnaS2yP4XCjnYh6gZKkhWCUXEQb5wA95OxcYT2rS6h3SNIvul49ovGC6PU32umWNWFmOwfS7N7O78XTwvCN6y5oW5dImHvVJgwaqXuyBH1EBPe7aOUMxkzTJtFkN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-CSE-ConnectionGUID: UIRvHSRsSVmKRx59j0yRyQ==
+X-CSE-MsgGUID: cnHpFD2WTtap0SSiNRFArw==
+Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
+  by relmlie5.idc.renesas.com with ESMTP; 06 Jul 2025 02:03:33 +0900
+Received: from localhost.localdomain (unknown [10.226.92.32])
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id 1D9304010E1B;
+	Sun,  6 Jul 2025 02:03:28 +0900 (JST)
+From: Biju Das <biju.das.jz@bp.renesas.com>
+To: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: Biju Das <biju.das.jz@bp.renesas.com>,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Biju Das <biju.das.au@gmail.com>
+Subject: [PATCH net-next] net: stmmac: dwmac-renesas-gbeth: Add PM suspend/resume callbacks
+Date: Sat,  5 Jul 2025 18:03:24 +0100
+Message-ID: <20250705170326.106073-1-biju.das.jz@bp.renesas.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -91,57 +62,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-As RACK-TLP was published as a standards-track RFC8985,
-so the outdated ref draft-ietf-tcpm-rack need to be updated.
+Add PM suspend/resume callbacks for RZ/G3E SMARC EVK.
 
-Signed-off-by: Xin Guo <guoxin0309@gmail.com>
----
-v1:including the other two ref draft-ietf-tcpm-rack
----
- Documentation/networking/ip-sysctl.rst | 2 +-
- net/ipv4/tcp_input.c                   | 2 +-
- net/ipv4/tcp_recovery.c                | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+The PM deep entry is executed by pressing the SLEEP button and exit from
+entry is by pressing the power button.
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index 2cad74e18f71..14700ea77e75 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -431,7 +431,7 @@ tcp_dsack - BOOLEAN
- 
- tcp_early_retrans - INTEGER
- 	Tail loss probe (TLP) converts RTOs occurring due to tail
--	losses into fast recovery (draft-ietf-tcpm-rack). Note that
-+	losses into fast recovery (RFC8985). Note that
- 	TLP requires RACK to function properly (see tcp_recovery below)
- 
- 	Possible values:
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 79e3bfb0108f..e9e654f09180 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -3714,7 +3714,7 @@ static int tcp_replace_ts_recent(struct tcp_sock *tp, u32 seq)
- }
- 
- /* This routine deals with acks during a TLP episode and ends an episode by
-- * resetting tlp_high_seq. Ref: TLP algorithm in draft-ietf-tcpm-rack
-+ * resetting tlp_high_seq. Ref: TLP algorithm in RFC8985
-  */
- static void tcp_process_tlp_ack(struct sock *sk, u32 ack, int flag)
- {
-diff --git a/net/ipv4/tcp_recovery.c b/net/ipv4/tcp_recovery.c
-index bba10110fbbc..c52fd3254b6e 100644
---- a/net/ipv4/tcp_recovery.c
-+++ b/net/ipv4/tcp_recovery.c
-@@ -35,7 +35,7 @@ s32 tcp_rack_skb_timeout(struct tcp_sock *tp, struct sk_buff *skb, u32 reo_wnd)
- 	       tcp_stamp_us_delta(tp->tcp_mstamp, tcp_skb_timestamp_us(skb));
- }
- 
--/* RACK loss detection (IETF draft draft-ietf-tcpm-rack-01):
-+/* RACK loss detection (IETF RFC8985):
-  *
-  * Marks a packet lost, if some packet sent later has been (s)acked.
-  * The underlying idea is similar to the traditional dupthresh and FACK
+Logs:
+root@smarc-rzg3e:~# PM: suspend entry (deep)
+Filesystems sync: 0.115 seconds
+Freezing user space processes
+Freezing user space processes completed (elapsed 0.002 seconds)
+OOM killer disabled.
+Freezing remaining freezable tasks
+Freezing remaining freezable tasks completed (elapsed 0.001 seconds)
+printk: Suspending console(s) (use no_console_suspend to debug)
+NOTICE:  BL2: v2.10.5(release):2.10.5/rz_soc_dev-162-g7148ba838
+NOTICE:  BL2: Built : 14:23:58, Jul  5 2025
+NOTICE:  BL2: SYS_LSI_MODE: 0x13e06
+NOTICE:  BL2: SYS_LSI_DEVID: 0x8679447
+NOTICE:  BL2: SYS_LSI_PRR: 0x0
+NOTICE:  BL2: Booting BL31
+renesas-gbeth 15c30000.ethernet end0: Link is Down
+Disabling non-boot CPUs ...
+psci: CPU3 killed (polled 0 ms)
+psci: CPU2 killed (polled 0 ms)
+psci: CPU1 killed (polled 0 ms)
+Enabling non-boot CPUs ...
+Detected VIPT I-cache on CPU1
+GICv3: CPU1: found redistributor 100 region 0:0x0000000014960000
+CPU1: Booted secondary processor 0x0000000100 [0x412fd050]
+CPU1 is up
+Detected VIPT I-cache on CPU2
+GICv3: CPU2: found redistributor 200 region 0:0x0000000014980000
+CPU2: Booted secondary processor 0x0000000200 [0x412fd050]
+CPU2 is up
+Detected VIPT I-cache on CPU3
+GICv3: CPU3: found redistributor 300 region 0:0x00000000149a0000
+CPU3: Booted secondary processor 0x0000000300 [0x412fd050]
+CPU3 is up
+dwmac4: Master AXI performs fixed burst length
+15c30000.ethernet end0: No Safety Features support found
+15c30000.ethernet end0: IEEE 1588-2008 Advanced Timestamp supported
+15c30000.ethernet end0: configuring for phy/rgmii-id link mode
+dwmac4: Master AXI performs fixed burst length
+15c40000.ethernet end1: No Safety Features support found
+15c40000.ethernet end1: IEEE 1588-2008 Advanced Timestamp supported
+15c40000.ethernet end1: configuring for phy/rgmii-id link mode
+OOM killer enabled.
+Restarting tasks: Starting
+Restarting tasks: Done
+random: crng reseeded on system resumption
+PM: suspend exit
+
+15c30000.ethernet end0: Link is Up - 1Gbps/Full - flow control rx/tx
+root@smarc-rzg3e:~# ifconfig end0 192.168.10.7 up
+root@smarc-rzg3e:~# ping 192.168.10.1
+PING 192.168.10.1 (192.168.10.1) 56(84) bytes of data.
+64 bytes from 192.168.10.1: icmp_seq=1 ttl=64 time=2.05 ms
+64 bytes from 192.168.10.1: icmp_seq=2 ttl=64 time=0.928 ms
+
+Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
+---
+This patch is tested with out-of tree patch for save/restore
+ethernet OEN registers in the pinctrl block.
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+index 9a774046455b..df4ca897a60c 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+@@ -136,6 +136,7 @@ static struct platform_driver renesas_gbeth_driver = {
+ 	.probe  = renesas_gbeth_probe,
+ 	.driver = {
+ 		.name		= "renesas-gbeth",
++		.pm		= &stmmac_pltfr_pm_ops,
+ 		.of_match_table	= renesas_gbeth_match,
+ 	},
+ };
 -- 
 2.43.0
 
