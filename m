@@ -1,186 +1,159 @@
-Return-Path: <netdev+bounces-204287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86687AF9E94
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 09:02:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D24E0AF9E9E
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 09:16:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08088189C5F7
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 07:02:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B0263AC9C6
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 07:16:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30DD81FA859;
-	Sat,  5 Jul 2025 07:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 381F21F91E3;
+	Sat,  5 Jul 2025 07:16:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="dwUbXZMv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iQ2g3aM0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3204320B1F5
-	for <netdev@vger.kernel.org>; Sat,  5 Jul 2025 07:01:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2464319DF4A;
+	Sat,  5 Jul 2025 07:16:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751698917; cv=none; b=Ylvq3RHqq5vFFlIWwd3phd9zfI+t17cIVf+URkwaTlACjpAQdkEmgl6/+lr0ZPU6iML/uXNKj6fi36/EvS5mZo0fd/3lA5GDp3yqZVGuTckKT4xIQdp89qTaGE82bX3xdK0eUCsWVQ21xWaj4Hh5DbvW7WxTJE3HMuTP19/i2w8=
+	t=1751699806; cv=none; b=hww+PTisFr7wMghX4Qsh1pHmJtFaBfKqS09tWGANZ3NhSfbX8delA/7JLDcdR2mEybcx8gq7f9YgN/Y2zo4/zWUXYXl5xZjrajKLXCXYqtd17VXkJIvjLBd5HxbXvSwNrT+ie6orysg7w39P3QH1Bf8Y4aUnxhatOnxkhgmRP7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751698917; c=relaxed/simple;
-	bh=QjEnynwiHDhQP5PZTUAgnZKYFJ/39FKKd2Q6H8WQyQo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lr+lbJs7Kl/mhmbb1BmUryeUDMW/1/JzG3dgxhaFEFdBer8NV4dUGXKgBG2xPDcvMMRREyquc9E+PgI6bjqXvisPWevJbfEe8dQF+yUDAMlFBgT83ZrB72Wvx0XgImtkJNPTyiAZ+GQ9jYBeqj2jP5+7bT8BkaVMHwob7D71+rM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=dwUbXZMv; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-ae361e8ec32so328384166b.3
-        for <netdev@vger.kernel.org>; Sat, 05 Jul 2025 00:01:54 -0700 (PDT)
+	s=arc-20240116; t=1751699806; c=relaxed/simple;
+	bh=tUhWmgK4dOMTc0iS2htVf8JYMWc1HQMBTCCneavHgjU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HWZcbkeKirdVJXO0meHNm5BbiXFTollkYRRJ85t5zePfeN7s7A0hEE0CW+p3i0XecvEgqBDGCqpyIeaNbE6tpE9J8MSLsUB5AKk9wvN1We1vHdA/VYFoLsjUOMeA/BOANm98WsJr+kt2IOKmqDYOhbZHEoMbJ8rvo+HU5smDVLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iQ2g3aM0; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4537fdec33bso9008665e9.1;
+        Sat, 05 Jul 2025 00:16:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gooddata.com; s=google; t=1751698913; x=1752303713; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1751699802; x=1752304602; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4+B/RDwnbgv2srEjK10waQf0Cyf424fDE1uZHA2I9lg=;
-        b=dwUbXZMvTSiJnQsF/1TGcNUlU7cUjKGgsQSsbuzlJlLLHmA5Hp0pwI0tqOZxGgME8J
-         Yivt/H61uGcVHYvzmj2CV5pj2EaxmMpfqTBw/hJcMVeWHoQkV5e3SNLYSCribWOEVV0q
-         iAn116IezoKguk0c9CuETLNVIDv+GxPMryfVc=
+        bh=8R5oTgaAPwIE+ySog9Pi/wJSy7DIcCAi0+86Q6mHWKY=;
+        b=iQ2g3aM0O+1MIrbxY2HjshMIKaIbeKaBxPnQRcZ69/gQjdWptmpArdTLnvjOp6jZIY
+         VHHE7+pZhUEpwB9l6iqyqxIcTWY7Mzzf86pTvPPXfgZ7DiUTzFGSWS+5+v34jmDbrwqW
+         TTRb8ZSnEr0yNX7nJxFPOaomJS2MDucRQBaI9r0ioaCbhgaFdH7zLG4VgfSlIyVIHYr1
+         yeCTQ+tR3kHuwGLXBgFbUWdrRTJ3fCEvgBHoR4o/JN9s79XQqwzKAt7Y9Wg38XGmhSvI
+         aoyWqCNcmj9Ofuge6ELxHnrZJMkijrwvB9IcHvipAaqg1WTMUMppEiF3z+DAw9gmispF
+         O+xQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751698913; x=1752303713;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1751699802; x=1752304602;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4+B/RDwnbgv2srEjK10waQf0Cyf424fDE1uZHA2I9lg=;
-        b=TJ7Ug6ivE1O9T94eb8Clnt7o9G29riBD7WPVGq1k4HJykO7GBhzKhcxXRZKXFujoWq
-         cAQpKNuuf4uP8k//rWqZyqIbaYI/1M35JrmZQdAzIUDKhZ8lk4yhyAL66g8OCkv37vq9
-         KOG17gaPx9q49igQMcMVx99cfUyrHdMft0Cak9HHoMk3EVJpd6Pkm6pIfdvfx5bXxHdu
-         Hx0P8mXkXEoO0oEropVxcm0dC4oX4u2MIAgTOjcPmuv2po6WxQ/1lMEViu37LGY0Q2zc
-         Ewx9KG+9Hu+Lt/k1ljiHYa2Xh66S16y/iUUEhKQ/HoJi6OXs4pWtDeW6L+GNPuTKZq5x
-         YnFw==
-X-Forwarded-Encrypted: i=1; AJvYcCW5kSQ+fU9BX1vU/8aSMK2mPQ192ui/MTDVZq13bSdx8Par9MmviTNPOD+qPvsxMfpYQYxJWr4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwK2MfKfC6zWay16evwMn9EEBOz+dQdE2cCOPXy0k1gMMBB2PbC
-	5ARtIHF/Q1GuDwgI6k0yMHJ2h9pRV75w2+rdtx8bxHR5kufS2kUWuEv9K26eBtOY3I2JDu6TbT5
-	Ybvsr+dQ6Ozr/tIN7eD6BWdBCIeNZJm0OJaAE3NYJ
-X-Gm-Gg: ASbGncuBNLdy9/VWwebyBdihA29LnGLzZ/OZHIAZRLiitOITMRaIDscrzD2ALr98CJM
-	p7qUVpKxk/2yxb/kN3kVffDPCZjBOZyMt6BpaBS4sW8zObF9FRlTCxymzQh3XmmeHcrXIOpBnXa
-	Xq5qxJ5+uUN1E1DxNPwf1/DpSoNAkduLkKueToE6CZVaN9
-X-Google-Smtp-Source: AGHT+IFZNGe5yhhDERjrdCMDkrJYVHRb+epjwumv6RBELYxXQX1wAeeejnpm1EGNA6u6CvCTxThS06tD3fpmLZpVlIM=
-X-Received: by 2002:a17:907:d23:b0:ad8:9257:573a with SMTP id
- a640c23a62f3a-ae4107862a5mr122681966b.5.1751698913266; Sat, 05 Jul 2025
- 00:01:53 -0700 (PDT)
+        bh=8R5oTgaAPwIE+ySog9Pi/wJSy7DIcCAi0+86Q6mHWKY=;
+        b=m8a1NOrwWdcaFvk3aHKxUFbsF7uJmrEcZ8pxosyfI7bx8RXALNcpxB9X9Yc0Zl/tsm
+         UOJYHBtZKH6QqlHp8R2RamgHvLZkDf8kKF56c9WOhemlNTjLCGk6oaKseKFR+SE7KPuj
+         lDXfSDjMD2PHAWbPXgKDpAQqFjdBASf/Ybf4LRGzVukqpYg/YAd2V1l0lWZZ2pIkcPiJ
+         MXgyDdgQKDW3tCKpu+ZOp9A+2UNxc0Gr3gFRZMlLCjDv0s4g8jCmgxJcMEw7+hDhQL5y
+         XcJgkbl8l/+A6smc7BAS3ZIJxFVNFNZ4UR6W8xWlqwGTeJPMEnFl6ehet88sEZmgtYmw
+         oswQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX6t501G9jqXUv6VRYN4+3fCfc3gtIQlE36WFnl2BXrZqiOig7/RNP4H6ZCzUIjm2mf9x35VtQa+HbynfE=@vger.kernel.org, AJvYcCXE01j4xT74EqwRbiNNELHcY5W06qNA9FB76YWXtI/NV7SOGgWVKo1eDWniljHZCxe7NSmmzEbn@vger.kernel.org
+X-Gm-Message-State: AOJu0YzB3ydBa6r0sslBLip6mLgobAEAbHRxDZRaLGqh6HNJt7WMNpaP
+	cdq1HI1/6/O4RiGkZn02dRFOgth9sIBHNTaqRkIXwqHWphj1cPGzqA3Q
+X-Gm-Gg: ASbGncuzxrRoZcj9V2hN2hpBgmtZo9PFyzshSDx/QYNc0IJdbL8ViIsqhP2T13NpFkV
+	pHCj3rUt2d7t0MBF/d2G0+PPoMNkuBUfN1SFaJ9e8Mlv8SiqOft+RBZCLTwDMxUo3//UtwMJVC2
+	NTD7KQF7adkUaOqPyiVvNEal7B4QyZ+eSLHCCZ+XNxWOeUkzELQorDcO2Tfwslwil3/BISLZnQ+
+	YJtob+jV4sEzM+NwXaTlClGjU78xoUHyM9LiW9fo+4r2l38lJkS5OTCA5cX4jpB5rX0HDvVhCGb
+	zqFQQobuIr/lvX7gRv5xY0B7FTckW54z+KKvqP84yff6/0t0ONDeZrS/ojtHzSxsY644IcS0LmR
+	qKFMwfl49tleurYE2Mg==
+X-Google-Smtp-Source: AGHT+IHXEwjcjQ9NX0f8W1fKeEpMnHB2PDebEu/auXAypGG0r6Beul+slgLTogHrnsvnqSeFZur0dw==
+X-Received: by 2002:a05:600c:1c21:b0:453:7b2b:ed2e with SMTP id 5b1f17b1804b1-454b4eb7e77mr42866925e9.24.1751699802184;
+        Sat, 05 Jul 2025 00:16:42 -0700 (PDT)
+Received: from pumpkin (host-92-21-58-28.as13285.net. [92.21.58.28])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454a9bdf038sm76279665e9.27.2025.07.05.00.16.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Jul 2025 00:16:41 -0700 (PDT)
+Date: Sat, 5 Jul 2025 08:16:40 +0100
+From: David Laight <david.laight.linux@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Feng Yang <yangfeng59949@163.com>, aleksander.lobakin@intel.com,
+ almasrymina@google.com, asml.silence@gmail.com, davem@davemloft.net,
+ ebiggers@google.com, edumazet@google.com, horms@kernel.org,
+ kerneljasonxing@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, stfomichev@gmail.com, willemb@google.com,
+ yangfeng@kylinos.cn
+Subject: Re: [PATCH v3] skbuff: Add MSG_MORE flag to optimize large packet
+ transmission
+Message-ID: <20250705081640.232efec3@pumpkin>
+In-Reply-To: <1a24a603-b49f-4692-a116-f25605301af6@redhat.com>
+References: <20250703124453.390f5908@pumpkin>
+	<20250704092628.80593-1-yangfeng59949@163.com>
+	<1a24a603-b49f-4692-a116-f25605301af6@redhat.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
- <aGgHka8Nm8S3fKQK@localhost.localdomain>
-In-Reply-To: <aGgHka8Nm8S3fKQK@localhost.localdomain>
-From: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Date: Sat, 5 Jul 2025 09:01:27 +0200
-X-Gm-Features: Ac12FXz0iPXl1W6a_JIMngDrS-AC2eXoaB-V4pPDY0n9tMd_rdWNz2tfHyTkcSo
-Message-ID: <CAK8fFZ6KzyfswFE=qj6pz-18QZ16swdwyFfTf=4e_0+sPLyUcg@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
- driver after upgrade to 6.13.y (regression in commit 492a044508ad)
-To: Michal Kubiak <michal.kubiak@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, jdamato@fastly.com, 
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	Igor Raits <igor@gooddata.com>, Daniel Secik <daniel.secik@gooddata.com>, 
-	Zdenek Pesek <zdenek.pesek@gooddata.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> On Mon, Apr 14, 2025 at 06:29:01PM +0200, Jaroslav Pulchart wrote:
-> > Hello,
-> >
-> > While investigating increased memory usage after upgrading our
-> > host/hypervisor servers from Linux kernel 6.12.y to 6.13.y, I observed
-> > a regression in available memory per NUMA node. Our servers allocate
-> > 60GB of each NUMA node=E2=80=99s 64GB of RAM to HugePages for VMs, leav=
-ing 4GB
-> > for the host OS.
-> >
-> > After the upgrade, we noticed approximately 500MB less free RAM on
-> > NUMA nodes 0 and 2 compared to 6.12.y, even with no VMs running (just
-> > the host OS after reboot). These nodes host Intel 810-XXV NICs. Here's
-> > a snapshot of the NUMA stats on vanilla 6.13.y:
-> >
-> >      NUMA nodes:  0     1     2     3     4     5     6     7     8
-> >  9    10    11    12    13    14    15
-> >      HPFreeGiB:   60    60    60    60    60    60    60    60    60
-> >  60   60    60    60    60    60    60
-> >      MemTotal:    64989 65470 65470 65470 65470 65470 65470 65453
-> > 65470 65470 65470 65470 65470 65470 65470 65462
-> >      MemFree:     2793  3559  3150  3438  3616  3722  3520  3547  3547
-> >  3536  3506  3452  3440  3489  3607  3729
-> >
-> > We traced the issue to commit 492a044508ad13a490a24c66f311339bf891cb5f
-> > "ice: Add support for persistent NAPI config".
-> >
-> > We limit the number of channels on the NICs to match local NUMA cores
-> > or less if unused interface (from ridiculous 96 default), for example:
-> >    ethtool -L em1 combined 6       # active port; from 96
-> >    ethtool -L p3p2 combined 2      # unused port; from 96
-> >
-> > This typically aligns memory use with local CPUs and keeps NUMA-local
-> > memory usage within expected limits. However, starting with kernel
-> > 6.13.y and this commit, the high memory usage by the ICE driver
-> > persists regardless of reduced channel configuration.
-> >
-> > Reverting the commit restores expected memory availability on nodes 0
-> > and 2. Below are stats from 6.13.y with the commit reverted:
-> >     NUMA nodes:  0     1     2     3     4     5     6     7     8
-> > 9    10    11    12    13    14    15
-> >     HPFreeGiB:   60    60    60    60    60    60    60    60    60
-> > 60   60    60    60    60    60    60
-> >     MemTotal:    64989 65470 65470 65470 65470 65470 65470 65453 65470
-> > 65470 65470 65470 65470 65470 65470 65462
-> >     MemFree:     3208  3765  3668  3507  3811  3727  3812  3546  3676  =
-3596 ...
-> >
-> > This brings nodes 0 and 2 back to ~3.5GB free RAM, similar to kernel
-> > 6.12.y, and avoids swap pressure and memory exhaustion when running
-> > services and VMs.
-> >
-> > I also do not see any practical benefit in persisting the channel
-> > memory allocation. After a fresh server reboot, channels are not
-> > explicitly configured, and the system will not automatically resize
-> > them back to a higher count unless manually set again. Therefore,
-> > retaining the previous memory footprint appears unnecessary and
-> > potentially harmful in memory-constrained environments
-> >
-> > Best regards,
-> > Jaroslav Pulchart
-> >
->
->
-> Hello Jaroslav,
->
-> I have just sent a series for converting the Rx path of the ice driver
-> to use the Page Pool.
-> We suspect it may help for the memory consumption issue since it removes
-> the problematic code and delegates some memory management to the generic
-> code.
->
-> Could you please give it a try and check if it helps for your issue.
-> The link to the series: https://lore.kernel.org/intel-wired-lan/202507041=
-61859.871152-1-michal.kubiak@intel.com/
+On Fri, 4 Jul 2025 17:50:42 +0200
+Paolo Abeni <pabeni@redhat.com> wrote:
 
-I can try it, however I cannot apply the patch as-is @ 6.15.y:
-$ git am ~/ice-convert-Rx-path-to-Page-Pool.patch
-Applying: ice: remove legacy Rx and construct SKB
-Applying: ice: drop page splitting and recycling
-error: patch failed: drivers/net/ethernet/intel/ice/ice_txrx.h:480
-error: drivers/net/ethernet/intel/ice/ice_txrx.h: patch does not apply
-Patch failed at 0002 ice: drop page splitting and recycling
-hint: Use 'git am --show-current-patch=3Ddiff' to see the failed patch
-hint: When you have resolved this problem, run "git am --continue".
-hint: If you prefer to skip this patch, run "git am --skip" instead.
-hint: To restore the original branch and stop patching, run "git am --abort=
-".
-hint: Disable this message with "git config set advice.mergeConflict false"
+> On 7/4/25 11:26 AM, Feng Yang wrote:
+> > Thu, 3 Jul 2025 12:44:53 +0100 david.laight.linux@gmail.com wrote:
+> >   
+> >> On Thu, 3 Jul 2025 10:48:40 +0200
+> >> Paolo Abeni <pabeni@redhat.com> wrote:
+> >>  
+> >>> On 6/30/25 9:10 AM, Feng Yang wrote:  
+> >>>> From: Feng Yang <yangfeng@kylinos.cn>
+> >>>>
+> >>>> The "MSG_MORE" flag is added to improve the transmission performance of large packets.
+> >>>> The improvement is more significant for TCP, while there is a slight enhancement for UDP.    
+> >>>
+> >>> I'm sorry for the conflicting input, but i fear we can't do this for
+> >>> UDP: unconditionally changing the wire packet layout may break the
+> >>> application, and or at very least incur in unexpected fragmentation issues.  
+> >>
+> >> Does the code currently work for UDP?
+> >>
+> >> I'd have thought the skb being sent was an entire datagram.
+> >> But each semdmsg() is going to send a separate datagram.
+> >> IIRC for UDP MSG_MORE indicates that the next send() will be
+> >> part of the same datagram - so the actual send can't be done
+> >> until the final fragment (without MSG_MORE) is sent.  
+> > 
+> > If we add MSG_MORE, won't the entire skb be sent out all at once? Why doesn't this work for UDP?  
+> 
+> Without MSG_MORE N sendmsg() calls will emit on the wire N (small) packets.
+> 
+> With MSG_MORE on the first N-1 calls, the stack will emit a single
+> packet with larger size.
+> 
+> UDP application may relay on packet size for protocol semantic. i.e. the
+> application level message size could be expected to be equal to the
+> (wire) packet size itself.
 
->
-> Thanks,
-> Michal
->
+Correct, but the function is __skb_send_sock() - so you'd expect it to
+send the 'message' held in the skb to the socket.
+I don't think that the fact that the skb has fragments should make any
+difference to what is sent.
+In other words it ought to be valid for any code to 'linearize' the skb.
+
+	David
+
+> 
+> Unexpectedly aggregating the packets may break the application. Also it
+> can lead to IP fragmentation, which in turn could kill performances.
+> 
+> > If that's not feasible, would the v2 version of the code work for UDP?  
+> 
+> My ask is to explicitly avoid MSG_MORE when the transport is UDP.
+> 
+> /P
+> 
+
 
