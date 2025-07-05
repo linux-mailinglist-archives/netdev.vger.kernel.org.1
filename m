@@ -1,122 +1,111 @@
-Return-Path: <netdev+bounces-204271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BBA7AF9D95
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 03:22:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB2F4AF9D96
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 03:22:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED25E6E1C9F
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 01:20:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B41EB6E14B3
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 01:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2C0191F7E;
-	Sat,  5 Jul 2025 01:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E88FD1ACEDA;
+	Sat,  5 Jul 2025 01:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lE4Z47CJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0E113AF2;
-	Sat,  5 Jul 2025 01:19:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1864B13AF2;
+	Sat,  5 Jul 2025 01:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751678383; cv=none; b=O9W6au46SSSwmsHP2a+pSPcnx9UZGbO3KiHvmN3Bh/MafkgDyB9UbavvN/XidBVVxPUtvJDAEee01yo2ise4okSCuntFf+mg83jiCMys1GlMT2q9I9rjoS7NUGgfHTYnglULvOu+VyQgP/HCb8Eb5BPlGG0GFj5DnW7e9vMR9+4=
+	t=1751678406; cv=none; b=ogac5M04E1nwXjFPlK8wgbxwu/MFyyEYD8kR4FnsI6jyCELgAZkI4eQtEd5ZRbJ+r1WFQvVsgXba7wydd1r1piDMJekbf/McwNn/nNlRkym8wuJEYKwBLmdDF+n6mTR6GWY6+64L6H0R2fwuUSMjhc4AbCu67pkqhx5y2liJv/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751678383; c=relaxed/simple;
-	bh=GUGEXd4EgBCmDuiJWPwUA7rug1859Bt3B+RyGDN28UQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YDPcV6r5ktrRor/6hObQm/hkZQo4TTNtDqSpEx4Go9JeD+XEYorvV3kr6986nPEs5GrHGa1aUAkHVdkJOilkKMMIgKXs3d8dM/nDx7DW3wtNkZLLZXL6jLqLfRdaKjASxpI1DVZOflbJ0pDMvmXy+guUqWYVKGifgDxzArKfuBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250810.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5651A3PZ011649;
-	Fri, 4 Jul 2025 18:19:24 -0700
-Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 47jbp4f8pj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Fri, 04 Jul 2025 18:19:24 -0700 (PDT)
-Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.57; Fri, 4 Jul 2025 18:18:26 -0700
-Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
- 15.1.2507.57 via Frontend Transport; Fri, 4 Jul 2025 18:18:23 -0700
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <xiyou.wangcong@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-        <jhs@mojatatu.com>, <jiri@resnulli.us>, <kuba@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <pabeni@redhat.com>, <syzkaller-bugs@googlegroups.com>
-Subject: [PATCH V2] net/sched: Prevent notify to parent who unsupport class ops
-Date: Sat, 5 Jul 2025 09:18:22 +0800
-Message-ID: <20250705011823.1443446-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <aGhr2R3vkwBT/uiv@pop-os.localdomain>
-References: <aGhr2R3vkwBT/uiv@pop-os.localdomain>
+	s=arc-20240116; t=1751678406; c=relaxed/simple;
+	bh=8Y8n8B3BoqNB1B8GJbvTAFfoTSxMib31OsR6t2OeupI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MvYSvXf09Ji7fYOnrrVAank14Qe4r2wWSCjfUr4NiASw2umEqfbhYKwhOSFXUJmGBA7cVx07CVy7bEA2vtuPO9dlx/1K/hPLnH951I0/NbQ+GAZfQV2nTVdxN/WsgzYotILKhYWPyZDPK8NQ6XQkQ5r5yd93CNEr4tWov2EXm7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lE4Z47CJ; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751678405; x=1783214405;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8Y8n8B3BoqNB1B8GJbvTAFfoTSxMib31OsR6t2OeupI=;
+  b=lE4Z47CJQe4s3HHyCJm72xzk9k1KqGvIBOBsbv8Lo+fy+9oPfAsb/f4M
+   HGj346/B55kHNnqk7kxhREoKlg+PuTOBDfi856R3DOCqhXAR26QLHTzzv
+   r6fAjMS4ii8EgIt+RL1sbk5DuOp8Mkna7CfZaPMf/l3konCpRqhFkQ1Dy
+   +u+S0ojxKoXPSfpByvuH8ghewiBKWqx0GrD4vgzTsXZgJblCKQf62YSvV
+   W1CM9ns6b0UyVrsAfvy3mxV5YDRlJ13EKeTVSKlbijuOIfwvAxFNQoBRB
+   XMZ51q2bvjW+E5BHk9EOXC5jVm8M844vVjM3S79TLz4b3EB7oYSyVENvZ
+   Q==;
+X-CSE-ConnectionGUID: JORpcVKcSmSOVOIG3KWzNA==
+X-CSE-MsgGUID: RQjpQ4TbQni9nuipYUPytQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11484"; a="79438591"
+X-IronPort-AV: E=Sophos;i="6.16,288,1744095600"; 
+   d="scan'208";a="79438591"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 18:20:05 -0700
+X-CSE-ConnectionGUID: v5StXrznTzyJgs3Br5MgRQ==
+X-CSE-MsgGUID: 9ffFj94CQOy4esuKkDDozA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,288,1744095600"; 
+   d="scan'208";a="159089068"
+Received: from lkp-server01.sh.intel.com (HELO 0b2900756c14) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 04 Jul 2025 18:20:01 -0700
+Received: from kbuild by 0b2900756c14 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uXrZP-0004BX-11;
+	Sat, 05 Jul 2025 01:19:59 +0000
+Date: Sat, 5 Jul 2025 09:19:17 +0800
+From: kernel test robot <lkp@intel.com>
+To: Lin Ma <linma@zju.edu.cn>, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	mingo@kernel.org, tglx@linutronix.de, pwn9uin@gmail.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH net v3] net: atm: Fix incorrect net_device lec check
+Message-ID: <202507050831.2GTrUnFN-lkp@intel.com>
+References: <20250703052427.12626-1-linma@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: pDMKJWOA6mPpijoe-kZUiBr4rL_mYAv9
-X-Proofpoint-ORIG-GUID: pDMKJWOA6mPpijoe-kZUiBr4rL_mYAv9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA1MDAwNiBTYWx0ZWRfXw3C9AdZnA4NH s750zaccsW/pnjcsNzN1RwVbzmMgE1fihikw2n5EV5L/9cHddEfLa2q1lqUPz/QOZWTjr0ejOXX rJh1Gwmsh4koM9FKaNc2I8Q+5+pH2yrM2yUdounedoExKMBgUhbKb6l+wTQtCNBK3x3mtxxo0iZ
- bTSwcu34As4YDecjKNX7N6sVUDerR+1MPamdXzzS9qQGbn2AmXh2M5IBBZHWe2xRBjI50XHwvcU XVqKANfDZT5u5pFD2u6UsthdNNewbensoTP0NOED2ffK8I2Sfm4BULdQLUyAvFfbqFztP0IFu+2 vcB+GuXt8AFrGDW7J6v5uAJ2a9N0NumXvtZ0e0rAUhL7TumCgn0oOp84oG1f8GK5D66jhIXYb96
- DMrsc8mD7ktyYznQBxum7rQuQQ3hUUxB7opAVJoq+7AgoPrnrBbh13xX1OBwyMEJIsE8tKoa
-X-Authority-Analysis: v=2.4 cv=JMg7s9Kb c=1 sm=1 tr=0 ts=68687d9c cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=Wb1JkmetP80A:10 a=edf1wS77AAAA:8 a=hSkVLCK3AAAA:8 a=t7CeM3EgAAAA:8 a=ia4idYVxgj-SMl71MLAA:9 a=DcSpbTIhAlouE1Uv7lRv:22
- a=cQPPKAXgyycSBL8etih5:22 a=FdTzh2GWekK77mhwV6Dw:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-04_07,2025-07-04_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=676 suspectscore=0 adultscore=0 phishscore=0 spamscore=0
- priorityscore=1501 lowpriorityscore=0 clxscore=1015 mlxscore=0
- impostorscore=0 bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.21.0-2505280000
- definitions=main-2507050006
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250703052427.12626-1-linma@zju.edu.cn>
 
-If the parent qdisc does not support class operations then exit notify.
+Hi Lin,
 
-In addition, the validity of the cl value is judged before executing the
-notify. Similarly, the notify is exited when the address represented by
-its value is invalid.
+kernel test robot noticed the following build errors:
 
-Reported-by: syzbot+1261670bbdefc5485a06@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=1261670bbdefc5485a06
-Tested-by: syzbot+1261670bbdefc5485a06@syzkaller.appspotmail.com
-Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
----
-V1 -> V2: movie notify check first and check cl NULL
+[auto build test ERROR on net/main]
 
- net/sched/sch_api.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Lin-Ma/net-atm-Fix-incorrect-net_device-lec-check/20250703-132727
+base:   net/main
+patch link:    https://lore.kernel.org/r/20250703052427.12626-1-linma%40zju.edu.cn
+patch subject: [PATCH net v3] net: atm: Fix incorrect net_device lec check
+config: x86_64-randconfig-078-20250705 (https://download.01.org/0day-ci/archive/20250705/202507050831.2GTrUnFN-lkp@intel.com/config)
+compiler: clang version 20.1.7 (https://github.com/llvm/llvm-project 6146a88f60492b520a36f8f8f3231e15f3cc6082)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250705/202507050831.2GTrUnFN-lkp@intel.com/reproduce)
 
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index d8a33486c51..53fd63af14d 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -803,12 +803,13 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, int n, int len)
- 			break;
- 		}
- 		cops = sch->ops->cl_ops;
--		if (notify && cops->qlen_notify) {
-+		if (notify && cops && cops->qlen_notify) {
- 			/* Note that qlen_notify must be idempotent as it may get called
- 			 * multiple times.
- 			 */
- 			cl = cops->find(sch, parentid);
--			cops->qlen_notify(sch, cl);
-+			if (cl)
-+				cops->qlen_notify(sch, cl);
- 		}
- 		sch->q.qlen -= n;
- 		sch->qstats.backlog -= len;
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507050831.2GTrUnFN-lkp@intel.com/
+
+All errors (new ones prefixed by >>, old ones prefixed by <<):
+
+>> ERROR: modpost: "is_netdev_lec" [net/atm/mpoa.ko] undefined!
+
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
