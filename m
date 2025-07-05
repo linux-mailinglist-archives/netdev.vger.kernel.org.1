@@ -1,147 +1,156 @@
-Return-Path: <netdev+bounces-204316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5176AFA0FC
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 19:03:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07BBDAFA109
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 19:34:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 378D74A1B1F
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 17:03:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 372E87A6991
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 17:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D101FC7CA;
-	Sat,  5 Jul 2025 17:03:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C416211A31;
+	Sat,  5 Jul 2025 17:34:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M2whp148"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2916672634;
-	Sat,  5 Jul 2025 17:03:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94FB6211A11;
+	Sat,  5 Jul 2025 17:34:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751735024; cv=none; b=pIyLRqNA0gQcbLnqXmr+v3l5qickLsWhWNpBiKJnA3uh4SgrPSmc5duIWxmSFZIvIMkbElKa9ODr3eZrhPGBe6iSqGJeGqpVGiR+TgwQvPpYmqzjcC2xwBmwdHaNPcjRHaJdOOBI5cCEvpA7lcWvHLpSbIYikhtr10Dfdnx2BNc=
+	t=1751736867; cv=none; b=jWZ16/QACqACY6iDINIP7YWO2Sig/7rzFVxBPRszPEtR2wpPAtiiAM9RJzjtxc0td5Qw70yEY1GLOu1uGoOMOwfujjrj+WkhrClyOxcEbdss075FqK/z7UfJ784e1ddIrUYfMHQ6rWXYnWUJbO5C+9+eTSZMAu+2+NTru/tWncg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751735024; c=relaxed/simple;
-	bh=QjfCCAHuG5KSO6VVPMvYRGWXhmONEiIJ+1z/qE4+WX8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LDs8B8vjN35HqwTcYHwBieo1lu76QUt4egD+2+CW+zYAXNrnaS2yP4XCjnYh6gZKkhWCUXEQb5wA95OxcYT2rS6h3SNIvul49ovGC6PU32umWNWFmOwfS7N7O78XTwvCN6y5oW5dImHvVJgwaqXuyBH1EBPe7aOUMxkzTJtFkN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-X-CSE-ConnectionGUID: UIRvHSRsSVmKRx59j0yRyQ==
-X-CSE-MsgGUID: cnHpFD2WTtap0SSiNRFArw==
-Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
-  by relmlie5.idc.renesas.com with ESMTP; 06 Jul 2025 02:03:33 +0900
-Received: from localhost.localdomain (unknown [10.226.92.32])
-	by relmlir5.idc.renesas.com (Postfix) with ESMTP id 1D9304010E1B;
-	Sun,  6 Jul 2025 02:03:28 +0900 (JST)
-From: Biju Das <biju.das.jz@bp.renesas.com>
-To: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1751736867; c=relaxed/simple;
+	bh=jwjO89dAruZlxXW25Yo8Gimm/KsplfgPKs8KiTMRLJE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F6d/WcHweaH1ntRcLbqr7kEEp0smKMzXPwEeB8wzJUTrWkliNFnD4EPDnVzXlMwFiHqvbHNEcM7BT/1sj0m1gc0fi2reh2/ZbEY9UmE2ULAowjdwM+63s1TVwVfdaAVyzuqZLIPIo3LtqdN1OudXr18g4rxle1U+uaP6HWcMARg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M2whp148; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751736865; x=1783272865;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jwjO89dAruZlxXW25Yo8Gimm/KsplfgPKs8KiTMRLJE=;
+  b=M2whp148BT5+IzXAvu8sRCsJtENR53e+ztomc6V8mGhAxrAGkMQJWhXC
+   UjeYT2h43kfVTgbrNhz5lnmSQezhLM1PffT1TBqszY4UkfjixDDpjZKco
+   yI9N1KZ5Pa36r/vGGy2SMEEC2Tq1odYQ3Vx8E+tVaDAAFPSVXZBrcOH7X
+   rIYyMQAQX06R95aB9+CPUawr2+vSxzCNvBtuw0hlpyofejjwxs+A7Pot2
+   FgjWAY8nWXOBTD1fNCB85vhbLslN+Cia/zlPJsm0rmyRTFEllkqCUHWUR
+   IgumbMHyzseey8n5htqmonZQIhZ9qs9kfitiBjHE45YVYjZb6L/uKfgBu
+   w==;
+X-CSE-ConnectionGUID: Q5JnjcN3QAGLQZAG0Qanzw==
+X-CSE-MsgGUID: OvzkN3D+SZ++SDkYJzxmqQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11485"; a="57790097"
+X-IronPort-AV: E=Sophos;i="6.16,290,1744095600"; 
+   d="scan'208";a="57790097"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2025 10:34:25 -0700
+X-CSE-ConnectionGUID: UjlxWgo5RW6vclon7VAVJQ==
+X-CSE-MsgGUID: whd9aa+uQ8m2unXGIE7e1g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,290,1744095600"; 
+   d="scan'208";a="159203564"
+Received: from lkp-server01.sh.intel.com (HELO 0b2900756c14) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 05 Jul 2025 10:34:22 -0700
+Received: from kbuild by 0b2900756c14 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1uY6mJ-0004dz-2F;
+	Sat, 05 Jul 2025 17:34:19 +0000
+Date: Sun, 6 Jul 2025 01:33:21 +0800
+From: kernel test robot <lkp@intel.com>
+To: Eric Woudstra <ericwouds@gmail.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: Biju Das <biju.das.jz@bp.renesas.com>,
-	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Biju Das <biju.das.au@gmail.com>
-Subject: [PATCH net-next] net: stmmac: dwmac-renesas-gbeth: Add PM suspend/resume callbacks
-Date: Sat,  5 Jul 2025 18:03:24 +0100
-Message-ID: <20250705170326.106073-1-biju.das.jz@bp.renesas.com>
-X-Mailer: git-send-email 2.43.0
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, bridge@lists.linux.dev,
+	Eric Woudstra <ericwouds@gmail.com>
+Subject: Re: [PATCH v13 nf-next 1/3] netfilter: utils: nf_checksum(_partial)
+ correct data!=networkheader
+Message-ID: <202507060106.A5xgr1Rs-lkp@intel.com>
+References: <20250704191135.1815969-2-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250704191135.1815969-2-ericwouds@gmail.com>
 
-Add PM suspend/resume callbacks for RZ/G3E SMARC EVK.
+Hi Eric,
 
-The PM deep entry is executed by pressing the SLEEP button and exit from
-entry is by pressing the power button.
+kernel test robot noticed the following build warnings:
 
-Logs:
-root@smarc-rzg3e:~# PM: suspend entry (deep)
-Filesystems sync: 0.115 seconds
-Freezing user space processes
-Freezing user space processes completed (elapsed 0.002 seconds)
-OOM killer disabled.
-Freezing remaining freezable tasks
-Freezing remaining freezable tasks completed (elapsed 0.001 seconds)
-printk: Suspending console(s) (use no_console_suspend to debug)
-NOTICE:  BL2: v2.10.5(release):2.10.5/rz_soc_dev-162-g7148ba838
-NOTICE:  BL2: Built : 14:23:58, Jul  5 2025
-NOTICE:  BL2: SYS_LSI_MODE: 0x13e06
-NOTICE:  BL2: SYS_LSI_DEVID: 0x8679447
-NOTICE:  BL2: SYS_LSI_PRR: 0x0
-NOTICE:  BL2: Booting BL31
-renesas-gbeth 15c30000.ethernet end0: Link is Down
-Disabling non-boot CPUs ...
-psci: CPU3 killed (polled 0 ms)
-psci: CPU2 killed (polled 0 ms)
-psci: CPU1 killed (polled 0 ms)
-Enabling non-boot CPUs ...
-Detected VIPT I-cache on CPU1
-GICv3: CPU1: found redistributor 100 region 0:0x0000000014960000
-CPU1: Booted secondary processor 0x0000000100 [0x412fd050]
-CPU1 is up
-Detected VIPT I-cache on CPU2
-GICv3: CPU2: found redistributor 200 region 0:0x0000000014980000
-CPU2: Booted secondary processor 0x0000000200 [0x412fd050]
-CPU2 is up
-Detected VIPT I-cache on CPU3
-GICv3: CPU3: found redistributor 300 region 0:0x00000000149a0000
-CPU3: Booted secondary processor 0x0000000300 [0x412fd050]
-CPU3 is up
-dwmac4: Master AXI performs fixed burst length
-15c30000.ethernet end0: No Safety Features support found
-15c30000.ethernet end0: IEEE 1588-2008 Advanced Timestamp supported
-15c30000.ethernet end0: configuring for phy/rgmii-id link mode
-dwmac4: Master AXI performs fixed burst length
-15c40000.ethernet end1: No Safety Features support found
-15c40000.ethernet end1: IEEE 1588-2008 Advanced Timestamp supported
-15c40000.ethernet end1: configuring for phy/rgmii-id link mode
-OOM killer enabled.
-Restarting tasks: Starting
-Restarting tasks: Done
-random: crng reseeded on system resumption
-PM: suspend exit
+[auto build test WARNING on netfilter-nf/main]
+[also build test WARNING on horms-ipvs/master linus/master v6.16-rc4 next-20250704]
+[cannot apply to nf-next/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-15c30000.ethernet end0: Link is Up - 1Gbps/Full - flow control rx/tx
-root@smarc-rzg3e:~# ifconfig end0 192.168.10.7 up
-root@smarc-rzg3e:~# ping 192.168.10.1
-PING 192.168.10.1 (192.168.10.1) 56(84) bytes of data.
-64 bytes from 192.168.10.1: icmp_seq=1 ttl=64 time=2.05 ms
-64 bytes from 192.168.10.1: icmp_seq=2 ttl=64 time=0.928 ms
+url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Woudstra/netfilter-utils-nf_checksum-_partial-correct-data-networkheader/20250705-031418
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git main
+patch link:    https://lore.kernel.org/r/20250704191135.1815969-2-ericwouds%40gmail.com
+patch subject: [PATCH v13 nf-next 1/3] netfilter: utils: nf_checksum(_partial) correct data!=networkheader
+config: x86_64-randconfig-121-20250705 (https://download.01.org/0day-ci/archive/20250706/202507060106.A5xgr1Rs-lkp@intel.com/config)
+compiler: clang version 20.1.7 (https://github.com/llvm/llvm-project 6146a88f60492b520a36f8f8f3231e15f3cc6082)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250706/202507060106.A5xgr1Rs-lkp@intel.com/reproduce)
 
-Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
----
-This patch is tested with out-of tree patch for save/restore
-ethernet OEN registers in the pinctrl block.
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c | 1 +
- 1 file changed, 1 insertion(+)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202507060106.A5xgr1Rs-lkp@intel.com/
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-index 9a774046455b..df4ca897a60c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-@@ -136,6 +136,7 @@ static struct platform_driver renesas_gbeth_driver = {
- 	.probe  = renesas_gbeth_probe,
- 	.driver = {
- 		.name		= "renesas-gbeth",
-+		.pm		= &stmmac_pltfr_pm_ops,
- 		.of_match_table	= renesas_gbeth_match,
- 	},
- };
+sparse warnings: (new ones prefixed by >>)
+>> net/netfilter/utils.c:131:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected restricted __sum16 @@     got int @@
+   net/netfilter/utils.c:131:24: sparse:     expected restricted __sum16
+   net/netfilter/utils.c:131:24: sparse:     got int
+   net/netfilter/utils.c:155:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected restricted __sum16 @@     got int @@
+   net/netfilter/utils.c:155:24: sparse:     expected restricted __sum16
+   net/netfilter/utils.c:155:24: sparse:     got int
+
+vim +131 net/netfilter/utils.c
+
+   122	
+   123	__sum16 nf_checksum(struct sk_buff *skb, unsigned int hook,
+   124			    unsigned int dataoff, u8 protocol,
+   125			    unsigned short family)
+   126	{
+   127		unsigned int nhpull = skb_network_header(skb) - skb->data;
+   128		__sum16 csum = 0;
+   129	
+   130		if (!pskb_may_pull(skb, nhpull))
+ > 131			return -ENOMEM;
+   132		__skb_pull(skb, nhpull);
+   133		switch (family) {
+   134		case AF_INET:
+   135			csum = nf_ip_checksum(skb, hook, dataoff - nhpull, protocol);
+   136			break;
+   137		case AF_INET6:
+   138			csum = nf_ip6_checksum(skb, hook, dataoff - nhpull, protocol);
+   139			break;
+   140		}
+   141		__skb_push(skb, nhpull);
+   142	
+   143		return csum;
+   144	}
+   145	EXPORT_SYMBOL_GPL(nf_checksum);
+   146	
+
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
