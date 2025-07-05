@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-204347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8263AAFA1F6
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 23:10:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38648AFA1F8
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 23:10:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DECB94A3A05
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 21:10:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38EED4A3873
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 21:10:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6EDB23C4E6;
-	Sat,  5 Jul 2025 21:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC3F023E32B;
+	Sat,  5 Jul 2025 21:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R9JnOIqS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KNLLA8C7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD3EB136349;
-	Sat,  5 Jul 2025 21:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38B223D28F;
+	Sat,  5 Jul 2025 21:10:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751749815; cv=none; b=uaOHlwTIVvV3OEhSMkkqDg/Rlp6ikVi5YUwaV7YlWfX40ZkEi3GdNJhspV8txAB0F9dDgsiptEuI5OzoesiH8Z6rnYKy6TwMDttJNlfLxn2geq1bJUT74ELLNmzACgxsm6YpDKmyHp4uNgZpsWTVvwelcjUXCo2pigPiebCttAU=
+	t=1751749819; cv=none; b=NiZFBieQU4HUVsDTX0Aw0vOoWI1T4GBrnZ5m5YQbuHVG98B9yESj+tluZnk8j/6ToxLAEgU0sFaY8OBifU1wFs/vGw8ikXSnAHYWqYJqKzo3NaFL/NKrCPispH5Re7NFX7MAitiXydpnkwqnHG+ibHAr4Y3IOXSYe2foTYUMt6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751749815; c=relaxed/simple;
-	bh=PE8CYF+KPPeWMtClRPVBKcyxMNaNMuI0KMUEfk9n6U4=;
+	s=arc-20240116; t=1751749819; c=relaxed/simple;
+	bh=nJ18tbaHJlhnqSKWjhX0WmYwbJQL+A5jO3NbanY07hU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=sjBdGfzFj0kja6pD571k73zyD9USu3W1gbZmBC3Rl3s0iWRipxT2M9GpUyw9T7mcY11WBLW5F7IPDcF8rhFn3xkv5shiL5a4HOajcn/eJ8KZhtH7SAivvA3UyuRH+QNPyEU4CGU5lgtFXIgEkG5Uc0OoJMZi6sH456by3eBJbDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R9JnOIqS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EC27C4CEE7;
-	Sat,  5 Jul 2025 21:10:15 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=EzEbVBEgBGrDCzzBaeYkrJGX54D0WgjUDRaM1107djBSe7ngshtprcRhRrg3bD/755waWKu9OYfizygTMgyGEaIOWGTO5kFMtfqOT0StWbF2ixQUK7PtKOg41vbcgC9zSAtRYttQR6zbhizB3E+nMitaSYMwbBVh4PhBBiNCafA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KNLLA8C7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00422C4CEE7;
+	Sat,  5 Jul 2025 21:10:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751749815;
-	bh=PE8CYF+KPPeWMtClRPVBKcyxMNaNMuI0KMUEfk9n6U4=;
+	s=k20201202; t=1751749818;
+	bh=nJ18tbaHJlhnqSKWjhX0WmYwbJQL+A5jO3NbanY07hU=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=R9JnOIqSx+ZMIQQEF7n3Z5EScObwnlwqpeJyqn+z3eqJ15yfngVOtzYf0qbWpJdPZ
-	 g7JsEGWbwBmyLAFSL8o20ou3qRTG1zDFZKVpXBfqhGc1GLnhjCKrQom3s8CSjPm95m
-	 6S/BgCF+cy6dA8z6e8Xuyv2A4BwoQoduylnqRsMtancH+pYQkwDG8Zm6MmwDgVAL8p
-	 ZdZ7ApsVCXbYMmGTdhDRWcNcYWtyS2ltQEaviG3wv0l+KtPajFBxJkrfmXkV+k5T8b
-	 hNOU57DEDsDOm/NuKKjXAbmCEVN2yVsvXTUO94pZ/5UIQUoihec8avRb0MZV61P4ZB
-	 vU+AP5HhgZ2pw==
+	b=KNLLA8C7Pq3UaF11V/WADMte1jasiqjR3PurD64SmWLQqWwfNd9G0Qb5bATB0nBIn
+	 JCe38KGEOr5CZAK9lCWL+zvEWaL3Yb7ewGbEhzCmB6vIiyKbGP/MQ27XMhge8pja5A
+	 KCmAcCG2xWhIeHX7rGCSQx9MN+1+E7MxVq7cnooTErD8irbQYlKP9n8Fd9i3XgjZlT
+	 8lk6yE6g+mTWF+anKB5UyHSuqpkcP/ROdsy82k2NdreaJxpTRPw7auDr1pOxqbUXgz
+	 E9Ajo+cagWRi8dItx/bto35UwbIxS2uSMuq5WjfCQfJ7eMpk9/gOPHSVNQ36SGDK/k
+	 SDefOTht8RSxA==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Sat, 05 Jul 2025 23:09:48 +0200
-Subject: [PATCH net-next v2 4/7] net: airoha: npu: Add wlan irq management
- callbacks
+Date: Sat, 05 Jul 2025 23:09:49 +0200
+Subject: [PATCH net-next v2 5/7] net: airoha: npu: Read NPU wlan interrupt
+ lines from the DTS
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250705-airoha-en7581-wlan-offlaod-v2-4-3cf32785e381@kernel.org>
+Message-Id: <20250705-airoha-en7581-wlan-offlaod-v2-5-3cf32785e381@kernel.org>
 References: <20250705-airoha-en7581-wlan-offlaod-v2-0-3cf32785e381@kernel.org>
 In-Reply-To: <20250705-airoha-en7581-wlan-offlaod-v2-0-3cf32785e381@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -63,80 +63,63 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
  Conor Dooley <conor+dt@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
 Cc: linux-arm-kernel@lists.infradead.org, 
  linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, Simon Horman <horms@kernel.org>
+ devicetree@vger.kernel.org
 X-Mailer: b4 0.14.2
 
-Introduce callbacks used by the MT76 driver to configure NPU SoC
-interrupts. This is a preliminary patch to enable wlan flowtable
-offload for EN7581 SoC with MT76 driver.
+Read all NPU wlan IRQ lines from the NPU device-tree node.
+NPU module fires wlan irq lines when the traffic to/from the WiFi NIC is
+not hw accelerated (these interrupts will be consumed by the MT76 driver
+in subsequent patches).
+This is a preliminary patch to enable wlan flowtable offload for EN7581
+SoC.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/airoha/airoha_npu.c | 27 +++++++++++++++++++++++++++
- drivers/net/ethernet/airoha/airoha_npu.h |  4 ++++
- 2 files changed, 31 insertions(+)
+ drivers/net/ethernet/airoha/airoha_npu.c | 9 +++++++++
+ drivers/net/ethernet/airoha/airoha_npu.h | 3 +++
+ 2 files changed, 12 insertions(+)
 
 diff --git a/drivers/net/ethernet/airoha/airoha_npu.c b/drivers/net/ethernet/airoha/airoha_npu.c
-index a1568233edcb180c7d19245051f0c409664b5242..aa7edb60e5d1d19fbfc0675bae623cab346bf211 100644
+index aa7edb60e5d1d19fbfc0675bae623cab346bf211..8c31df5b760730814ccfaa9fffff6c6aa8742f01 100644
 --- a/drivers/net/ethernet/airoha/airoha_npu.c
 +++ b/drivers/net/ethernet/airoha/airoha_npu.c
-@@ -525,6 +525,29 @@ static u32 airoha_npu_wlan_queue_addr_get(struct airoha_npu *npu, int qid,
- 	return REG_RX_BASE(qid);
- }
+@@ -701,6 +701,15 @@ static int airoha_npu_probe(struct platform_device *pdev)
+ 		INIT_WORK(&core->wdt_work, airoha_npu_wdt_work);
+ 	}
  
-+static void airoha_npu_wlan_irq_status_set(struct airoha_npu *npu, u32 val)
-+{
-+	regmap_write(npu->regmap, REG_IRQ_STATUS, val);
-+}
++	/* wlan IRQ lines */
++	for (i = 0; i < ARRAY_SIZE(npu->irqs); i++) {
++		irq = platform_get_irq(pdev, i + ARRAY_SIZE(npu->cores) + 1);
++		if (irq < 0)
++			return irq;
 +
-+static u32 airoha_npu_wlan_irq_status_get(struct airoha_npu *npu, int q)
-+{
-+	u32 val;
++		npu->irqs[i] = irq;
++	}
 +
-+	regmap_read(npu->regmap, REG_IRQ_STATUS, &val);
-+	return val;
-+}
-+
-+static void airoha_npu_wlan_irq_enable(struct airoha_npu *npu, int q)
-+{
-+	regmap_set_bits(npu->regmap, REG_IRQ_RXDONE(q), NPU_IRQ_RX_MASK(q));
-+}
-+
-+static void airoha_npu_wlan_irq_disable(struct airoha_npu *npu, int q)
-+{
-+	regmap_clear_bits(npu->regmap, REG_IRQ_RXDONE(q), NPU_IRQ_RX_MASK(q));
-+}
-+
- struct airoha_npu *airoha_npu_get(struct device *dev, dma_addr_t *stats_addr)
- {
- 	struct platform_device *pdev;
-@@ -632,6 +655,10 @@ static int airoha_npu_probe(struct platform_device *pdev)
- 	npu->ops.wlan_send_msg = airoha_npu_wlan_msg_send;
- 	npu->ops.wlan_get_msg = airoha_npu_wlan_msg_get;
- 	npu->ops.wlan_get_queue_addr = airoha_npu_wlan_queue_addr_get;
-+	npu->ops.wlan_set_irq_status = airoha_npu_wlan_irq_status_set;
-+	npu->ops.wlan_get_irq_status = airoha_npu_wlan_irq_status_get;
-+	npu->ops.wlan_enable_irq = airoha_npu_wlan_irq_enable;
-+	npu->ops.wlan_disable_irq = airoha_npu_wlan_irq_disable;
- 
- 	npu->regmap = devm_regmap_init_mmio(dev, base, &regmap_config);
- 	if (IS_ERR(npu->regmap))
+ 	err = dma_set_coherent_mask(dev, DMA_BIT_MASK(32));
+ 	if (err)
+ 		return err;
 diff --git a/drivers/net/ethernet/airoha/airoha_npu.h b/drivers/net/ethernet/airoha/airoha_npu.h
-index 6a9cb1425f48ad8b01daf191ace4e443d22949dc..9e225df8b6c94b40386cc015cc086e9de7489a53 100644
+index 9e225df8b6c94b40386cc015cc086e9de7489a53..72b1d41d99e798ed32e8abdaa443e4775c6defd1 100644
 --- a/drivers/net/ethernet/airoha/airoha_npu.h
 +++ b/drivers/net/ethernet/airoha/airoha_npu.h
-@@ -88,6 +88,10 @@ struct airoha_npu {
- 				    u32 *data);
- 		u32 (*wlan_get_queue_addr)(struct airoha_npu *npu, int qid,
- 					   bool xmit);
-+		void (*wlan_set_irq_status)(struct airoha_npu *npu, u32 val);
-+		u32 (*wlan_get_irq_status)(struct airoha_npu *npu, int q);
-+		void (*wlan_enable_irq)(struct airoha_npu *npu, int q);
-+		void (*wlan_disable_irq)(struct airoha_npu *npu, int q);
- 	} ops;
- };
+@@ -5,6 +5,7 @@
+  */
  
+ #define NPU_NUM_CORES		8
++#define NPU_NUM_IRQ		6
+ 
+ enum airoha_npu_wlan_set_cmd {
+ 	WLAN_FUNC_SET_WAIT_PCIE_ADDR,
+@@ -67,6 +68,8 @@ struct airoha_npu {
+ 		struct work_struct wdt_work;
+ 	} cores[NPU_NUM_CORES];
+ 
++	int irqs[NPU_NUM_IRQ];
++
+ 	struct airoha_foe_stats __iomem *stats;
+ 
+ 	struct {
 
 -- 
 2.50.0
