@@ -1,213 +1,148 @@
-Return-Path: <netdev+bounces-204314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DD41AFA0F3
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 18:28:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5456CAFA0F6
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 18:37:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7D684A6796
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 16:28:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B69B4560064
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 16:37:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 711B51F4623;
-	Sat,  5 Jul 2025 16:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676E2201032;
+	Sat,  5 Jul 2025 16:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="emnI5DV6"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.interlinx.bc.ca (mail.interlinx.bc.ca [69.165.217.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30FD20EB
-	for <netdev@vger.kernel.org>; Sat,  5 Jul 2025 16:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=69.165.217.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47C915A864
+	for <netdev@vger.kernel.org>; Sat,  5 Jul 2025 16:37:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751732935; cv=none; b=rlskqBp2DGm3QV2xJl+iIEhbKuENjDHewCva36l66HEBFxp0TRwAL6Et5u5hmPqKYhxGGZwFbtva+Zf/iesKa507yZwIdPLWkb3FgmQCXv/8fK3hpZ2sMYrBBZAWxg+FEs8vB7MGUZtCPQG3eYKCQshtzzgQx6atdzzQcddV9Vk=
+	t=1751733456; cv=none; b=ZK8rA1zmWHNdUCifbVQQAKdaN5wIJFzf6PcbFWrFsjynCUYDZFEIGE3wsW5lgcu5/T5rPXynShUabfKuF/W9Lxh6045QQUMkK2gL2Yn7SfPXTn02YQszpIFlSauFO68NpYrFH7akrZk0zsZAWNdF1w1LJS82lIRn6X/sEoMa94w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751732935; c=relaxed/simple;
-	bh=w8S0U3gO2CjV6SmjS1BDyQEVmElP2W6z7wNnD6OnbsU=;
-	h=Message-ID:Subject:From:To:Date:Content-Type:MIME-Version; b=iOszqdWZOvXa88dSQ7vHGprtPzVIyb9j7UFD19BiAA0Kpg+EKKq3C5m0dcQf3Qx4rVVxo0upBq8DL1klV/iVzD98yd4nZeqc6IRO1khxF4YTmY8yYwGFBa1DdpDX0lTgW7P7g1Cc23zHmwj0zIfe0EtNwaOFnRQR6vG1fOCyjyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=interlinx.bc.ca; spf=fail smtp.mailfrom=interlinx.bc.ca; arc=none smtp.client-ip=69.165.217.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=interlinx.bc.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=interlinx.bc.ca
-Received: from brian-laptop.interlinx.bc.ca (brian-laptop.interlinx.bc.ca [IPv6:fd31:aeb1:48df:0:2374:a2d1:e1b7:89a3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by server.interlinx.bc.ca (Postfix) with ESMTPSA id 2BAC630267
-	for <netdev@vger.kernel.org>; Sat,  5 Jul 2025 12:20:44 -0400 (EDT)
-Message-ID: <388009b205bbb4046cdad4124e7e447d8f16d6dc.camel@interlinx.bc.ca>
-Subject: nftables, prerouting and rate limiting
-From: "Brian J. Murrell" <brian@interlinx.bc.ca>
-To: netdev@vger.kernel.org
-Date: Sat, 05 Jul 2025 12:20:43 -0400
-Autocrypt: addr=brian@interlinx.bc.ca; prefer-encrypt=mutual;
- keydata=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
- Dc1uQeNIcmTaawmvwmnhoNZYwBfdrEi8mWJtwQ9rxRpbkrz8OFCbNGc1AGeRx464OkJ3EHy+/x0Xn
- 9qDxL7OLAZ6tChCcmlhbiBKLiBNdXJyZWxsIDxicmlhbkBpbnRlcmxpbnguYmMuY2E+iHYEMBECAD
- YFAkFRkTovHQBUaGlzIGlzIGFuIG9sZCBrZXkuICBQbGVhc2UgdXNlIDYyRjJCOTcwIG5vdy4ACgk
- QWkUtrHIQJiJp2wCeMuwXHszwNxBY8nR9o9Rv9mrrWjoAn14m48ueXrhGJsJOwj12CqynCKwdmI4E
- U55NCQEEAOhiOhVQNRL+2mctVQUjsOFHftZvNXeNM6w7UC7+zoWFhpuQomK5Wy8E1s1qt68amxbvG
- fJe7BRln3aDaErtxzv1RIJbtxOpcmyk5pg8ofdza9/kBX1PtwhR0RpeFHJ+uE15CcAvzNkOM4snWl
- keneYNASKQ76ih2Q/pep/kdF1BACDCJ25riQE3BCABAgChBQJXsqABmh0CVGhpcyBrZXkgd2FzIGd
- lbmVyYXRlZCBhcyBwYXJ0IG9mIHRoZSBFdmlsMzIgcHJvamVjdC4KSXQgaXMgbm90IG93bmVkIGJ5
- IHRoZSB1c2VyIGRlc2NyaWJlZCBpbiB0aGUgVUlELgpTZWUgaHR0cHM6Ly9ldmlsMzIuY29tL3Jld
- m9rZWQgZm9yIG1vcmUgZGV0YWlscy4ACgkQDpHnaGLyuXADagP+O8Xu3d/cauZx84xmjGxTL7OBMi
- x/4Lr6cUeh5ahcptaJEQHMgYxWg+SbNLq5iXyyUL7zn+FlVT804PHpOvpdd2zETqow4yteuz1Olyv
- 04dJWCGaqUY1XpSEyaeFhPZPWQ7libV+vDtb75VNPm88JhsBZXoZ8kSUactp+RqjZDye0KEJyaWFu
- IEouIE11cnJlbGwgPGJyaWFuQGludGVybGlueC5iYy5jYT6IuAQTAQIAIgUCU+BJ4AIbLwYLCQgHA
- wIGFQgCCQoLBBYCAwECHgECF4AACgkQDpHnaGLyuXDzRQQAhiAYEko0qilFSVu9TKEHzUGdSw9jFW
- O4rAlocPSXf0j0e2Uw1z1v4hvqtW3tMRNK7f+eifvvxfRM9SrM0+DuSQA60/kwP6X6NuJ1SQQ//ck
- klmTr1/rJPC+ZnuIbtE01augCZYLw2TQIU4U2cakLUGJqV8SZsNkmNG+c04lLCsCZAaIENOfAUxEE
- AMbyzutLDHcwOMVUvS6GFjPZ2KfgU/I9n1OzT3/O3UX7b6CU4PZ2xo/1C0dVsL2pGZx8Apm+bEMoA
- /eGRWdkC2G26R7rAXnXLPsTaddrAc1j17NVbIWZe1dUP5ju/3coYrrkBgIYRhGom4jxVqiwnEchGp
- GLQWuY3BP1juen3+eTAKD/2AdHKjAWRlOj8fyCow2cHgbe4wP/Q/nnagGdqyMIWIjkAR4/zvWJ28S
- 6ERnx4hdvlzvLMeryaSNzEi8/MUfWI+r20G0SSYP6BpOeguneDHHle9v+PPBooE6FcwmMEVBf7wVz
- WUFhAeUYGwbXJw+M7wpWP1v6IPK8JexMnip7Ke6gMO5Xy9ad9kmYN3VrYytG3UHaPyYD/R26wKk+Z
- M2abDpIuqvJR2Blc5QvnM0iCnmZVHonm9Y9AEehZsON2hAt02+y/yzZ98yhCN9AbLFE2Gm/N9Q0M0
- b7FVm7yCpIeTxtn2zrflfof7ln3GaGtbiEASoQpsevlcTppt8NSp49ZRtCKBturoXLXuXn59aNAx3
- 1XWCgMHybtChCcmlhbiBKLiBNdXJyZWxsIDxicmlhbkBpbnRlcmxpbnguYmMuY2E+iFMEEBECAAsF
- AjTnwFMECwMBAgASCRCXcRCUYvK5cAdlR1BHAAEBRe8AoMrjwQhhp40fTxJ4jq7usVx6eXjIAKD6s
- xVTia/AeRc6ukrODwvqng9hJLQgQnJpYW4gSi4gTXVycmVsbCA8YnJpYW5Ac3VuLmNvbT6ISQQwEQ
- IACQUCUoKgWQIdIAAKCRCXcRCUYvK5cOwGAKDJO2OHMNaFyC5WbVwpvKp6EkaYEwCg9ETMisiO9K5
- KevxXj1exCPMvylm0I0JyaWFuIEouIE11cnJlbGwgPGJyaWFuQGJlb25peC5jb20+iEkEMBECAAkF
- AlKCoFkCHSAACgkQl3EQlGLyuXBgpwCfRHsJWNscLl9DaVKVI83VN0hUvXYAoLzLmbZ4IPIcKGtQX
- ipcK+XgYQfctChCcmlhbiBKLiBNdXJyZWxsIDxCcmlhbi5NdXJyZWxsQFN1bi5DT00+iEkEMBECAA
- kFAlKCoFkCHSAACgkQl3EQlGLyuXCxygCg10BJ1RJ0B8MLJqaEPwjImxO6Xj0AoMQsthNoXCwy7XO
- hUiUt+XjGDKKGtClCcmlhbiBKLiBNdXJyZWxsIDxicmlhbkBicmlhbi5tdXJyZWxsLmNhPohfBBMR
- AgAXBQI8t9eKBQsHCgMEAxUDAgMWAgECF4AAEgkQl3EQlGLyuXAHZUdQRwABAQbaAKCwKGGFFlRor
- ED/FnKXTHtor2eWtACeN2TsVMsCPshjtaVuLs+fH5LO6P20KUJyaWFuIEouIE11cnJlbGwgPGNvb2
- tlckBpbnRlcmxpbnguYmMuY2E+iGQEExECABwFAj5dJ68CGwMECwcDAgMVAgMDFgIBAh4BAheAABI
- JEJdxEJRi8rlwB2VHUEcAAQFC6gCg1K4t13XDc52IO3uIR1aVM8MqPgcAoIIIILSGhMFEaLY34bSo
- cNNYtJ79tCxCcmlhbiBKLiBNdXJyZWxsIDxuZXRmaWx0ZXJAaW50ZXJsaW54LmJjLmNhPohkBBMRA
- gAcBQI9yTdUAhsDBAsHAwIDFQIDAxYCAQIeAQIXgAASCRCXcRCUYvK5cAdlR1BHAAEB1zwAn0iSmK
- YuPu2zv6B2hiJtKnGJsVLeAJ96FtWl9Uo92jc1RMRHFxFLvTdI4LQyQnJpYW4gSi4gTXVycmVsbCA
- oS0xVRyBhY2NvdW50KSA8YnJpYW5Aa2x1Zy5vbi5jYT6IZAQTEQIAHAUCPcUi2gIbAwQLBwMCAxUC
- AwMWAgECHgECF4AAEgkQl3EQlGLyuXAHZUdQRwABARkxAJ4+2OV7b7jfDAbQ8L4bhIPJVREXhACg1
- QL4VtqlUUwJ7PLEVZ6V7wll2am0NUJyaWFuIEouIE11cnJlbGwgKD5jbGlja2V0eSBjbGljazwpID
- xib2ZoQGtsdWcub24uY2E+iGQEExECABwFAj3FIwoCGwMECwcDAgMVAgMDFgIBAh4BAheAABIJEJd
- xEJRi8rlwB2VHUEcAAQFrGgCfdZWKmCszRrsU+8mBYDli97WVYecAoLegVz3WuxWsxBVpnWUN+vPQ
- Cs24tDdCcmlhbiBKLiBNdXJyZWxsICg+Y2xpY2tldHkgY2xpY2s8KSA8Ym9maEBraW5nc3Rvbi5uZ
- XQ+iF8EExECABcFAjy1qR4FCwcKAwQDFQMCAxYCAQIXgAASCRCXcRCUYvK5cAdlR1BHAAEBLyUAn1
- E7eftZqeduGBJ33sfO6hW8Xc48AKDHF83gZHpjZoUb/E9Imh4NPkXvx7Q4QnJpYW4gSi4gTXVycmV
- sbCAoV2hhbWNsb3VkLCBJbmMuKSA8YnJpYW5Ad2hhbWNsb3VkLmNvbT6IYgQTEQIAIgUCTWP03AIb
- AwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQl3EQlGLyuXDOMwCfVNMqn4k02agHN6W/ZclR+
- e8S9FkAmwZLhPqFa/X2M7xmW5R/bTMznMmltEJCcmlhbiBKLiBNdXJyZWxsIChDbHVzdGVyIEZpbG
- VzeXN0ZW1zLCBJbmMuKSA8YnJpYW5AY2x1c3RlcmZzLmNvbT6ISQQwEQIACQUCUoKgWAIdIAAKCRC
- XcRCUYvK5cFJJAJ9otGn0eLsltoMCBKFlyK6v4pJDXQCg1cFhVOBfAxeLNHdcZdkdQe+xKxy0TkJy
- aWFuIEouIE11cnJlbGwgKEkgZG9uJ3QgdXN1YWxseSByZWFkIHRoaXMgYWNjb3VudCkgPGJyaWFua
- m11cnJlbGxAZ21haWwuY29tPohgBBMRAgAgBQJLzKsDAhsDBgsJCAcDAgQVAggDBBYCAwECHgECF4
- AACgkQl3EQlGLyuXCP+QCfbEHvWzrLhaJ8noFNlPJi9F3o9S0AoPn+fZ/a/qkAoPt+Rfm7sTUWu/R
- jtE5CcmlhbiBKLiBNdXJyZWxsIChKYWJiZXIgYWNjb3VudCBvbiB0aGUgS0xVRyBzZXJ2ZXIpIDxi
- cmlhbkBqYWJiZXIua2x1Zy5vbi5jYT6IZgQTEQIAHgUCPvoDQQIbAwYLCQgHAwIDFQIDAxYCAQIeA
- QIXgAASCRCXcRCUYvK5cAdlR1BHAAEBVjEAn3Rcfi8zD+Lyad+pLPZ1O+WW0vvGAKDe6fDd4LxROz
- yTgyr7+EcxAU/z8bRRQnJpYW4gSi4gTXVycmVsbCAoTXkgU291cmNlRm9yZ2UgYWNjb3VudCkgPGJ
- yaWFuX2pfbXVycmVsbEB1c2Vycy5zb3VyY2Vmb3JnZS5uZXQ+iF8EExECABcFAjys16sFCwcKAwQD
- FQMCAxYCAQIXgAASCRCXcRCUYvK5cAdlR1BHAAEBD3oAoMJDSIFPzWsRv3W2RNdxBqfbMxHaAJ45G
- MtFqAjf4R0lVueUBW1OrUPz2LRbQnJpYW4gSi4gTXVycmVsbCAoVmlhIFlhaG9vISwgdXNlIGFzIG
- EgbGFzdCByZXNvcnQgdG8gcmVhY2ggbWUpIDxicmlhbl9qX211cnJlbGxAeWFob28uY29tPohfBBM
- RAgAXBQI8jisYBQsHCgMEAxUDAgMWAgECF4AAEgkQl3EQlGLyuXAHZUdQRwABASQYAKCC0c9ICbiw
- NqDcob3h63nyueajbgCfdwBSiG5eeRAx9UBgPvPtwOhppCq0LEJyaWFuIEouIE11cnJlbGwgPGJya
- WFuX2pfbXVycmVsbEBjb2dlY28uY2E+iGEEExECACEFAleaVzcCGwMFCwkIBwIGFQgJCgsCBBYCAw
- ECHgECF4AACgkQl3EQlGLyuXCtdwCdG850C123WLJQvNaq+kJbgXebm6gAnAqjBxoorSW5fssdU36
- ALpu5mnmE
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+	s=arc-20240116; t=1751733456; c=relaxed/simple;
+	bh=bpEfMJs8e9ArpurmqPH1aMCwQmhMzG5uqy2rm0sq/DA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ay/nAKRdcKCMe2Ou1HWoWcvk/UF9PRjVVlXR2toG3kxsEd50t35vnWNwHCrFhc2RwSdQ4GR92z5b9lvac6Z36OORY/MrpfgC2gv1jLn8WyW4ymwtXQ0jQJx1ER0KokeruMtBsXF96HATTkSvYbjL+I65j7ats6+uRrleL46ZtSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=emnI5DV6; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-31384c8ba66so416956a91.1
+        for <netdev@vger.kernel.org>; Sat, 05 Jul 2025 09:37:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751733454; x=1752338254; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=15N/9RGbtN0ibAbyvgksx/lLbHh3evmAYS3TJQW3xZk=;
+        b=emnI5DV6MUe2Tgk4qiVgJT2QM7OaFT9JsoS5Gv74jKBtTGReMWnAbPze75iweUtAp8
+         aJXELjfD5y3DHqpMr1ZzxSzjDAk40VdPwzzAjKaXlGw20cwa2eKwDRKySKp2npoxL6de
+         u+VPwvyyCjidNDEmX3Uqcr5TVgRklF+H0AP3yrCKM8lGtkwE8ujnvd4c5ZQF8YBoESN+
+         nihKNJ9Ej+3gcqSsPY5uEKdgyMJ0GYIcHVAPjYVAg9iacSqLud7SiTd3HQ4Fg8ZUnViJ
+         T3hfp5GtdbJNSLmlEXd0G2SqG9dM9/dv2h5DVvhnCTBqxgGGpArANzmAd7NehOygks4i
+         zZ/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751733454; x=1752338254;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=15N/9RGbtN0ibAbyvgksx/lLbHh3evmAYS3TJQW3xZk=;
+        b=mblGYQe/GFBUHAH8naVVJp4BN0uFw4WvEVYj6dqt1zhoA1uTW4JK+fEnST15VZnTbd
+         AS+NauAMsXHyK7dmwuI7LyyxbUkeiERQR2RkLKPJMJI8tZGkxTwYgeDnE6uT9WjHoLWx
+         U6To5W6AK3CwstP22imQizH/1LwbjhbEsfvhLYfXAwiil+DVgv3KvFBf1ISO+ppBi/2F
+         2udUg9tj5/UuNTh9oszV4O42GHNznkpY4YFE07hCpau1TqI0iivZrzND7iOpbpiuzfyv
+         cnVq3aYh6yq8EobsLPszLVgAA7wvTiKtRbJbnpctCv6SDPM9N2Kjj+2NB4aUcZ5IMIEd
+         2iig==
+X-Gm-Message-State: AOJu0YyWJE2JXakijnq5IUNW/qvw3pQSS7NMReTiVRGFLUt8WAXZVT4f
+	qLDSjHqHddEUbd+fS6bQaDnQn3711k8U3WvOHpIlEnorPMVs+ZuDxro=
+X-Gm-Gg: ASbGncsGbu8vr7S2/SAg8RRaLwkb3SkU6mylqSk7RF4Ul+gNjr0OPA8IAI04HSU9IXB
+	7hgdCi5m9eLAno+can9XpbJR8HN6PYNXaemHadr+YH1PkJFtnAG97ib5dCXpPQAkt6WB4HX9oKV
+	FHBtrq9Gx6lRzKPMgRI3ZjNg6YTlSY77VsRbFZFDJRdiKb86HODJTdzyQ/8IHO8C9cdgHXlXn8S
+	pjuGXEGZQKvkWZV1fQtjBkH+QRyzpHR/XfudtDNXP64sEcaW7obXTC1bZ4zKxl/LKzjMGBgabWm
+	muqLAfFomibrz+G0G6hqCd+1Sbc9/eniQ45gZkZtwBwVy/eEJRnPmWRdu7LstrCpOG8IA/pAzkn
+	myw==
+X-Google-Smtp-Source: AGHT+IF+ZQlgJzx0h9TpvyKk2RN6ZlY1FCiRZNM1HublucYMI11IurJtMQPGso4JRIwyf8RO3dpp6w==
+X-Received: by 2002:a17:903:2406:b0:23c:8f18:7987 with SMTP id d9443c01a7336-23c8f187bb1mr17315025ad.9.1751733454146;
+        Sat, 05 Jul 2025 09:37:34 -0700 (PDT)
+Received: from jiaoziyan-Precision-5510.. ([23.163.8.30])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23c8431a373sm45460895ad.7.2025.07.05.09.37.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Jul 2025 09:37:33 -0700 (PDT)
+From: Xin Guo <guoxin0309@gmail.com>
+To: ncardwell@google.com,
+	edumazet@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	Xin Guo <guoxin0309@gmail.com>
+Subject: [PATCH net-next v1] tcp: update the outdated ref draft-ietf-tcpm-rack
+Date: Sun,  6 Jul 2025 00:36:47 +0800
+Message-ID: <20250705163647.301231-1-guoxin0309@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hello.
+As RACK-TLP was published as a standards-track RFC8985,
+so the outdated ref draft-ietf-tcpm-rack need to be updated.
 
-I'm hoping somebody can clarify something for me.
+Signed-off-by: Xin Guo <guoxin0309@gmail.com>
+---
+v1:including the other two ref draft-ietf-tcpm-rack
+---
+ Documentation/networking/ip-sysctl.rst | 2 +-
+ net/ipv4/tcp_input.c                   | 2 +-
+ net/ipv4/tcp_recovery.c                | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-I understand that I can create filter rules that can rate limit
-connections by creating first, an un-rate-limited rule that allows
-"established" packets and then after that rule, create rules that allow
-whatever various connections I want to allow and apply the rate
-limiting on those rules.  Effectively the rate limiting is only be
-applied to the initial packets that are establishing a connection since
-all other packets in a connection will be processed by the first,
-"established connections" rule (without a rate-limit on it).  Very
-straightforward.
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index 2cad74e18f71..14700ea77e75 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -431,7 +431,7 @@ tcp_dsack - BOOLEAN
+ 
+ tcp_early_retrans - INTEGER
+ 	Tail loss probe (TLP) converts RTOs occurring due to tail
+-	losses into fast recovery (draft-ietf-tcpm-rack). Note that
++	losses into fast recovery (RFC8985). Note that
+ 	TLP requires RACK to function properly (see tcp_recovery below)
+ 
+ 	Possible values:
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 79e3bfb0108f..e9e654f09180 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -3714,7 +3714,7 @@ static int tcp_replace_ts_recent(struct tcp_sock *tp, u32 seq)
+ }
+ 
+ /* This routine deals with acks during a TLP episode and ends an episode by
+- * resetting tlp_high_seq. Ref: TLP algorithm in draft-ietf-tcpm-rack
++ * resetting tlp_high_seq. Ref: TLP algorithm in RFC8985
+  */
+ static void tcp_process_tlp_ack(struct sock *sk, u32 ack, int flag)
+ {
+diff --git a/net/ipv4/tcp_recovery.c b/net/ipv4/tcp_recovery.c
+index bba10110fbbc..c52fd3254b6e 100644
+--- a/net/ipv4/tcp_recovery.c
++++ b/net/ipv4/tcp_recovery.c
+@@ -35,7 +35,7 @@ s32 tcp_rack_skb_timeout(struct tcp_sock *tp, struct sk_buff *skb, u32 reo_wnd)
+ 	       tcp_stamp_us_delta(tp->tcp_mstamp, tcp_skb_timestamp_us(skb));
+ }
+ 
+-/* RACK loss detection (IETF draft draft-ietf-tcpm-rack-01):
++/* RACK loss detection (IETF RFC8985):
+  *
+  * Marks a packet lost, if some packet sent later has been (s)acked.
+  * The underlying idea is similar to the traditional dupthresh and FACK
+-- 
+2.43.0
 
-Where it gets fuzzy for me is with "type nat hook postrouting priority
-srcnat" chains.  If I have a chain:
-
-        chain dstnat {
-                type nat hook prerouting priority dstnat; policy accept;
-                iifname { "eth0.2", "pppoe-wan1" } jump dstnat_wan comment =
-"!fw4: Handle wan IPv4/IPv6 dstnat traffic"
-        }
-
-along with:
-
-        chain dstnat_wan {
-                meta nfproto ipv4 tcp dport 25 limit rate 10/minute burst 5=
- packets counter packets 301 bytes 17120 dnat ip to 10.75.22.9:25 comment "=
-SMTP"
-        }
-
-In that case, is the rate limiting being applied to only connection
-establishing packets (i.e. SYN, SYN/ACK three-way handshake packets in
-the case of TCP as similar to the above description for the filter
-case) or is it applying to every packet in the connection/stream?
-
-Ultimately I am trying to figure out if I need to be using a different
-accounting scale on rate limiting for dnat rules than I use for filter
-rules because for the former do I need to account for every packet in a
-connection/stream being counted vs. the latter where I only need to
-account for the initial connection establishing packets being counted?
-
-Cheers,
-b.
 
