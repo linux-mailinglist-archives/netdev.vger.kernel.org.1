@@ -1,116 +1,147 @@
-Return-Path: <netdev+bounces-204291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C716AF9ED2
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 09:40:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E5EBAF9EE4
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 09:56:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD3C41BC40D8
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 07:40:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A97F37A7142
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 07:54:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0554326B746;
-	Sat,  5 Jul 2025 07:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112E0275AE6;
+	Sat,  5 Jul 2025 07:56:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="spfl7yhj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UWmDf4CA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C6E20B1F5
-	for <netdev@vger.kernel.org>; Sat,  5 Jul 2025 07:39:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC65200B99;
+	Sat,  5 Jul 2025 07:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751701196; cv=none; b=S5rtOqgSa4zRSny7knuVFK6fAxzAqUhuaN6kPLPb8aQJvKuHjMv3N4FcpINCf70KB0SbEzfNon4qlngMn4sATRQasm4D3RmHv8gjaDQNtjJ4OXyZrfhIUARKYYfptP3HPvVLP5vK4G147xE5/RNfisoh6WSlluwo5qzK6lupSmA=
+	t=1751702172; cv=none; b=VCUC6PUDKuiVUZhiK6XheWHHGRM3fOzoD+MSoM2pmFboFRwy87xmYgBD8nI8JNbyy/fMyraTu0xoWlMmS0Bp7bEv0nUcYxqGVejXumlHpCePyHTzG41yuypYAZgPyzSFek13lDDwqBk0Gn+ny+/DTQng3lEpXfaRayqjnP0XI2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751701196; c=relaxed/simple;
-	bh=4+smnfJ0bY+IFawuGcGZ/H4RoAnFNYqIwx8+xfv8nVE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T6UN+4dCXF/i0jqAQX3KFr4hCrBUqpC3lxQai+amol3hNwL0z2TTCr8NB2EyjqIV0uJhG9NEgeIYj9X5ujWr38R7SugGq98Whjw7rgFDji2sGfLg01iMjaF1quDLpf+7I+Uw7BYXf9CESIygsK3TvUctI5tDDy+M+IV7p1idgcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=spfl7yhj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEA7CC4CEE7;
-	Sat,  5 Jul 2025 07:39:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751701196;
-	bh=4+smnfJ0bY+IFawuGcGZ/H4RoAnFNYqIwx8+xfv8nVE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=spfl7yhjw229noSAYcjPw2hNzzUOhogF/lLOZxen7eRbmvKUCPRZNDN0tHFNQztgV
-	 vYIS3RH+1xiGAiDy1XQzXBF3ZrRF26ZQyDWb7LRFP30cQ7uV9TqZr5VoqzS7J5U+DS
-	 srgEkfZhP8/vAtGvtXcbWA/gyGzBC54xzdVfrp+O9tcPWzVeWAV7c30qDWz5f8KCra
-	 +bGme6OaEeT+KlAyM80rE+CChREQbYqD6g1dOocfwWJ8CRt1u9vIV+pnKK1nEKpbt+
-	 rGJ9yHrY/BaOMyiZOM0Sy2LWgTaoqFAN0LZzO7lZaQXJjOJgmSBv/nVicriWOxCdFL
-	 pksO9saAXJeMA==
-Date: Sat, 5 Jul 2025 09:39:53 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1751702172; c=relaxed/simple;
+	bh=1P2U2dshSLhnnrRgjC9ySFPrNtAdxhRNQ9ZjqtLrhc0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tmXB8BskQeyqFrFqPi2BAoDw6TJ8tzXY69Z+oeX3g9lSINSuqGEha4VXmcnhBoHjzpPaIfaMS4XfLIbkk/ePMldg5Yx8ZhoB+OsbuksrrHrWHbjp85GZ13lw54OZeS9D/tRluftjGL4nZHjxyMsN5gPwaHdk3J+rBcKQERpqeZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UWmDf4CA; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-b34a71d9208so971945a12.3;
+        Sat, 05 Jul 2025 00:56:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751702169; x=1752306969; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=h/IUKcxSD2e2ah4kSG9Q2b9GaMgau4YL3nl4/Ou8ZYo=;
+        b=UWmDf4CA7dn1jyHjN5Hlu603FKL0a7Y1WQR7hlBC7SdhiQc62xH01cbmQ4RkkJv2v+
+         7INsN2EcVh9ksjfKm4d3Zr6fnrWVPFCHFuHFmJReNqQ1o05R4THE+mCnjoqoHbbwLnad
+         flEVJOT/5bHM6e5+NVseVfi7bHzKKkVwHPbwIcXuamrdRN7PpSvpTcyKJo0j4lS3CUA2
+         nti1cuUpEUK6xayV1+By4McD6WzjLi+On07bN9gaHWUIuabhyA0sJA/wFC5w7TJJnCpL
+         L5kgoErlLMsneSqNEdhF/llSyIOJScjoPjHHCeXrlZN70tRsdbP9u80HXyAajYCiMk5u
+         A0zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751702169; x=1752306969;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=h/IUKcxSD2e2ah4kSG9Q2b9GaMgau4YL3nl4/Ou8ZYo=;
+        b=jIgWQsic4g8vRRIdnkwJts3cVroDJmQRwsh0HMIs54AxOmULzGxXSDeaozmHki+Qzk
+         5sxvNcvk5zC31XO0wRpt2pEjwuuQf6TPcU6MyVotWMPzy+Dh/kstzEvhKQq0UIMMSsuw
+         p6Q1HM2yb1WYF5hc0XruqMc9HP5QCN6AMTJ1vv5pCue8bKPIj/2TwKWfK3vsZ0b6Ywx7
+         ZOsCoRWDlRVCPwSSbsd4PoBih/xAXoSWevs4TagoLLOGcLRcAzhwJoUz/o0fCOtsme+e
+         iGilOwylwPzL112Knt/mncFshD5VF7hk2fKuLQWwAIDs0h/wdhr4bY4eeitX7Eftk71G
+         wyxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVTVVmmL+RyJAwQ39O/VYQqvFZglFSBZDteES3wog7ANyoQWhI0s+9C8Fm1rynyr2R8FTM=@vger.kernel.org, AJvYcCXDdbVZUYjBCldekkrk2wUFCe5h3gn3dFPdjjdeLTboCs7HOWxPqfh5VJRnrpcU8Ffqb+tEu85CWvldTpTE@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNWhg8Hfu8x87oafSjEvAINUC221B6NEi/hVUk5QpNYMkO++wj
+	E8HYnTEZKBH9XNW5kIY6+fI/BRR9xhiEv1ja04L+BJ8/8jYcLKbHNOKcaWpg5A==
+X-Gm-Gg: ASbGncvEX5cfYVSoy5tSn7taNKEIVP7UXqckQTbkPjAOK7gv1AfC5fLHsINIVnF6Zth
+	mdMtBbNxwUfSoAkfkPS99B7qHy/mblPP7ZdsaNi+2cVKWnMomWjqTYEjydh3fbXDAvOJt8YO47Q
+	OB4hSxlYXQXuWPvDySLHb/6EVneifH0Dxkr17eTcFtaojwSwHlByZAXP2lxSPoyywbKkpxH83HC
+	uqk4nXFGQoxIB4cSnLQklSmHa+RUZosvFuEJvhA9mM8sLEeCsGQZ4CHegCFbFPZVIeMvaZWLB2c
+	0r465fwrXPK3oF0+OfOOJXW681zzPTLowbnqhWXbxL2qbXWXs5mMyML0AFjRLYqlkW9fqBJuV7X
+	84A==
+X-Google-Smtp-Source: AGHT+IELb59jy1yq/0ZLxHvUZqGi8xjJJOOy8kXY/fGS5HJJFKa5k9aihU11XHC1d9gpDvqKsoQ2NA==
+X-Received: by 2002:a05:6a21:33a5:b0:220:658:860 with SMTP id adf61e73a8af0-2260989672amr6461002637.12.1751702169435;
+        Sat, 05 Jul 2025 00:56:09 -0700 (PDT)
+Received: from minh.192.168.1.1 ([2001:ee0:4f0e:fb30:8079:3d14:21d6:b779])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-74ce359e9c7sm4092388b3a.15.2025.07.05.00.56.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Jul 2025 00:56:09 -0700 (PDT)
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 4/6] net: airoha: npu: Read NPU interrupt lines
- from the DTS
-Message-ID: <aGjWySVX1VosLjyd@lore-desk>
-References: <20250702-airoha-en7581-wlan-offlaod-v1-0-803009700b38@kernel.org>
- <20250702-airoha-en7581-wlan-offlaod-v1-4-803009700b38@kernel.org>
- <20250704145604.GD41770@horms.kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Bui Quang Minh <minhquangbui99@gmail.com>
+Subject: [PATCH net-next] virtio-net: xsk: rx: move the xdp->data adjustment to buf_to_xdp()
+Date: Sat,  5 Jul 2025 14:55:14 +0700
+Message-ID: <20250705075515.34260-1-minhquangbui99@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="lvihB4WnHkB75gUf"
-Content-Disposition: inline
-In-Reply-To: <20250704145604.GD41770@horms.kernel.org>
+Content-Transfer-Encoding: 8bit
 
+This commit does not do any functional changes. It moves xdp->data
+adjustment for buffer other than first buffer to buf_to_xdp() helper so
+that the xdp_buff adjustment does not scatter over different functions.
 
---lvihB4WnHkB75gUf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+---
+ drivers/net/virtio_net.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-> On Wed, Jul 02, 2025 at 12:23:33AM +0200, Lorenzo Bianconi wrote:
-> > Read all NPU supported IRQ lines from NPU device-tree node.
-> > This is a preliminary patch to enable wlan flowtable offload for EN7581
-> > SoC.
-> >=20
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
->=20
-> Hi Lorenzo,
->=20
-> I think a bit more information is needed on how you plan to use this.
-> Ideally in the form of a patch that does so.
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 9f6e0153ed2d..4d995a47a116 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -1179,7 +1179,14 @@ static struct xdp_buff *buf_to_xdp(struct virtnet_info *vi,
+ 		return NULL;
+ 	}
+ 
+-	xsk_buff_set_size(xdp, len);
++	if (first_buf) {
++		xsk_buff_set_size(xdp, len);
++	} else {
++		xdp_prepare_buff(xdp, xdp->data_hard_start,
++				 XDP_PACKET_HEADROOM - vi->hdr_len, len, 1);
++		xdp->flags = 0;
++	}
++
+ 	xsk_buff_dma_sync_for_cpu(xdp);
+ 
+ 	return xdp;
+@@ -1304,7 +1311,7 @@ static int xsk_append_merge_buffer(struct virtnet_info *vi,
+ 			goto err;
+ 		}
+ 
+-		memcpy(buf, xdp->data - vi->hdr_len, len);
++		memcpy(buf, xdp->data, len);
+ 
+ 		xsk_buff_free(xdp);
+ 
+-- 
+2.43.0
 
-Hi Simon,
-
-These irqs are described in [0] (wlan irq line*). They are the irq lines fi=
-red
-by the NPU when the wlan traffic is not hw accelerated. These interrupts wi=
-ll
-be consumed by the MT76 driver (I will post the MT76 patches in the near fu=
-ture).
-I will improve the commit message in v2.
-
-Regards,
-Lorenzo
-
-[0] https://github.com/torvalds/linux/blob/master/Documentation/devicetree/=
-bindings/net/airoha%2Cen7581-npu.yaml
-
---lvihB4WnHkB75gUf
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaGjWyQAKCRA6cBh0uS2t
-rFk8AP96S3uwwMjqG+gxNeu0vYtPO8k0wpSE8h8jcVdsA9LSxwD/TgAgGrhtQ0MH
-X/X+uJ3xtH8+ZjGezUAS+b0IkEiR+Ag=
-=z6Q3
------END PGP SIGNATURE-----
-
---lvihB4WnHkB75gUf--
 
