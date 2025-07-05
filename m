@@ -1,143 +1,134 @@
-Return-Path: <netdev+bounces-204300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39969AF9F76
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 11:58:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B338DAF9F6F
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 11:51:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7D0C1BC71D1
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 09:58:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 098927ADF4D
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 09:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81AD9275853;
-	Sat,  5 Jul 2025 09:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B4EB1F0E58;
+	Sat,  5 Jul 2025 09:51:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=palvencia.se header.i=@palvencia.se header.b="bXkF61hd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KtGvnq0i"
 X-Original-To: netdev@vger.kernel.org
-Received: from m101-out-mua-6.websupport.se (m101-out-mua-6.websupport.se [109.235.175.106])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43DDC239E87;
-	Sat,  5 Jul 2025 09:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.235.175.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4567E107;
+	Sat,  5 Jul 2025 09:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751709488; cv=none; b=SY4FvOeAkSvDB8Hahq1LIX9MmFIF1sZ2ifT0uozmErDypPGTWd6hYpl7+Pja0OZp6FhphLSxqzfupbnRJsZU8KZCXhjj83Ka4ygjOVvtIAbWhHY/7AQx/XG6GJotMDwptm9f0uCOpPB7ia+6Xw8VY0rzNxtyAufuxkoLB3mHq8M=
+	t=1751709089; cv=none; b=actPaQ6BTjNkJmP7+s77crnemFX2GLJlecVgEL/3d9DfHwgzIyjPgZFMf3Ao/lb1iknPOx8gle+17A0TDmExlPcAcOVPE8C9rd8eAT8pMmc0LeqceInVwayA7KJfVIoi+QO/FBGgBowrMjsiemCMmBn4ykHr3iX/kZy3zvy9WR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751709488; c=relaxed/simple;
-	bh=WJ4HbOQu78BdDONBa51774fnFcMtDdfI8U3P82ZRyVw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QAhE2IjD2ShR4xOoFXdpwjKLZt3UvY+UqcXAZrxX59g9liAM5DqaO/Sz9jAcjkX306na3h88ET5SuhtfS9EoQJjcAcRRGtb4XGkcpyX0YUKCIuh69tNq+p+3DF3LicJ6IMBTFc0kDftBYnT+vV5Gu0b35rIaNBMhCjD2u4o63EE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=palvencia.se; spf=pass smtp.mailfrom=palvencia.se; dkim=pass (2048-bit key) header.d=palvencia.se header.i=@palvencia.se header.b=bXkF61hd; arc=none smtp.client-ip=109.235.175.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=palvencia.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=palvencia.se
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=palvencia.se;
-	s=mail; t=1751708736;
-	bh=uhXa9esT/5VXql/uG7nuK4DRUevXL199pPe0ERZ9KrM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bXkF61hdjGYlYWI7fRAibPkbjV8n1SIWfk5H2xp0LjiOTtSSyNipITFlEldslm6XR
-	 NL9lHwpvEoxFWIdhZMsO8dsRo4R9FjCvrnauBbnR2fUof4OA7Qf+md1EqsFnbDIlWP
-	 lA3FCvK9wy8+qCNgs3Z6zWTCA2jEpaed+IdMyl5xMXlLNwgp02mtFYEuMAW73A4yX+
-	 diuvVGI66XejLonv7oR06HTMMEVVgv03mDqGuBVDNeNEjDuWg1YHXkz+tscKC867ei
-	 OVgWPnFf7abysW0LLxDFe1Xf+TjfzHFOu71XfAB4SBnHFHNdgPyzgi5x1v7/3dS+yq
-	 HDTjRn5tptW3Q==
-Received: from m101-u6-ing.websupport.se (unknown [10.30.6.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	by m101-out-mua-6.websupport.se (Postfix) with ESMTPS id 4bZ5GS2fDHz1Ym9;
-	Sat,  5 Jul 2025 11:45:36 +0200 (CEST)
-X-Authenticated-Sender: per@palvencia.se
-Authentication-Results: m101-u6-ing.websupport.se;
-	auth=pass smtp.auth=per@palvencia.se smtp.mailfrom=per@palvencia.se
-Received: from rpi (unknown [213.204.219.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: per@palvencia.se)
-	by m101-u6-ing.websupport.se (Postfix) with ESMTPSA id 4bZ5GN71HQz17mm;
-	Sat,  5 Jul 2025 11:45:32 +0200 (CEST)
-Date: Sat, 5 Jul 2025 11:45:27 +0200
-From: Per Larsson <per@palvencia.se>
-To: Chen-Yu Tsai <wens@csie.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Jernej Skrabec <jernej@kernel.org>, Samuel Holland
- <samuel@sholland.org>, netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
- linux-kernel@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH RFT net-next 04/10] soc: sunxi: sram: register regmap as
- syscon
-Message-ID: <20250705114527.73b15356@rpi>
-In-Reply-To: <CAGb2v646HvqipGd_C=WJ4LGsumFfF5P9a7XQ7UGO6t1901DDiw@mail.gmail.com>
-References: <20250701165756.258356-1-wens@kernel.org>
-	<20250701165756.258356-5-wens@kernel.org>
-	<CAGb2v646HvqipGd_C=WJ4LGsumFfF5P9a7XQ7UGO6t1901DDiw@mail.gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1751709089; c=relaxed/simple;
+	bh=3bynmHtozjFAKsrJYZmSEGrQWHqK+GJEPB3QJy++yc4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Xvumb7u9B9jduGB/MvUfEfz7ncEVRDntpxDiim1LxMPmawmo1RYZ4BvB2a8mdR/sjohnkhPNlNDA6mpC7KPmOAcgZbM2pFnXhFHe8jLp3nwQaItyFYXdqyQqzLqoFYvfxo7UvtYL6bbeDk3e1e2PNaywk0GjLK8dweaQSOPKVtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KtGvnq0i; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3ab112dea41so807400f8f.1;
+        Sat, 05 Jul 2025 02:51:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751709086; x=1752313886; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CwilIVNfuxa3IIndCAzsGcrIR2J+YGRrDjOtdSWoirg=;
+        b=KtGvnq0irZH2hY5XwqWGQkKQVxHqU/sn5nFxjiMwRwtV5K9FLLAC5Nel6chp+2WqqL
+         b8sD47jrSTQ4eSuv1QlIcWny1KJZ23xbKguKTWtlQUzyIY3WQsqwRNjT1k2lTvrLZGxS
+         0RKSAh7lmE6Y/5nJ21JmBs3ZDw6jYrLvTgcac52Fw7eSfudb4uqgvhdImqxzn1RGvITU
+         lIdKFd/fksLa0pmaP70zDJ8AzT+1edh983hypywcSIYJ7l+tw3rINJjp3499pOcrP45M
+         Sh/lqpMTOGZ7u8BZZaJtpG3dD+xtWyZ0YunOrsBaNMsaCAjyCLT9+I1sNn8PwnWet0MQ
+         4Ksg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751709086; x=1752313886;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CwilIVNfuxa3IIndCAzsGcrIR2J+YGRrDjOtdSWoirg=;
+        b=lXebEz80wwmTbsIN/npIqzgTZvPD4Lm+Ie8rLqKTLD/S7BBqItYtkjp4892p2y68yE
+         GwNAXzMrv6CHvl3MG6tgPhq1FlIAY96XYv0Z2QT99GbP4jUbBHQNc9yu/Ly/qrzGNdxY
+         5AruEr26XSYUR8GI4X5na5hLnfXy74e+rTm60HcPFV5p88LoDkpT3bk/h5IRZsQw7zAM
+         sCav/Po9Xu61qdsWeA4OEex3u353oxLcRe4nS/Vj2j8wyl9wIbtsRAoeAQbkSV3qiEZT
+         uBPC03wWg2mSGQG3WxzYn5adhq3wew1wFyAkxDDsSx3nFWcb1SltltxCgP58PiagEpZW
+         tUkw==
+X-Forwarded-Encrypted: i=1; AJvYcCUDl9La3QC4Jcr1lHrheWPFStDLdWHax9Ln+ROAWm7F9l7k2pSU3FjU6/dp/afHW3DtMfWUqUC5FxyZTfBU@vger.kernel.org, AJvYcCXTIbtfZKVLrx6yFT/2n4R7FI111PnB2CeTcvyJS9fup9+ZaMkw11wzY2M4qDvgHXmnyy/yoLLs9RLJP/0Y@vger.kernel.org
+X-Gm-Message-State: AOJu0YxACd9NJphwkBbhrfBpGL1z00gwb3/22LqsHfD52HNWwfDCH1xa
+	50LVRPfnFwJgdsIb0243YINUeYSeu3Ax31j/k8DMkRzfKebjhQhH4wg2
+X-Gm-Gg: ASbGnct6fjXzIvZWt/OcgZ8axmBQyx3aNFl9nNDsNxn3Bj+n+V4jgfka2L49vtVf+5m
+	cIdtUGFwucW+WtytIOtoe0b06I2spWJukFVSZ9eAIQbpXv1GqxAzRfcu4piOvKcjGo23PQ7wd/+
+	tlF6KkylAsAyZvH2WmDT+Yf4u23qjPFW6xbKJ4KTYlFPYVQxKC199hpwXPVDqmvPzCOzyU0J6wV
+	fkjRtxU875kgFZgqfvInK4bGo4d285rgR5tZ0C0z2D8s8aOg5zzYh2AvHOTpR4RlYh6CZzFbhfw
+	T8gO905Lzd2/ScTIEujOoFpVtaX/w4YzdI3z+t9zw3gFB96niWcaoe5AmLnC4JTt+PTXBMgm796
+	4
+X-Google-Smtp-Source: AGHT+IGcaIsL2pfhpJrl9NqtL7ggGiN1AraC3c74I7g09DJNfdA2gFRuPNOw/igevGsR7d/Uv8HwOw==
+X-Received: by 2002:a05:6000:430a:b0:3a4:edf5:b942 with SMTP id ffacd0b85a97d-3b49aa8d85bmr1170854f8f.57.1751709085924;
+        Sat, 05 Jul 2025 02:51:25 -0700 (PDT)
+Received: from [192.168.0.2] ([212.50.121.5])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454b161e8dbsm50246005e9.5.2025.07.05.02.51.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 05 Jul 2025 02:51:25 -0700 (PDT)
+Message-ID: <4afe6178-7ff7-4a08-ac24-babff55ad5f0@gmail.com>
+Date: Sat, 5 Jul 2025 12:51:29 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Out-Spamd-Result: default: False [1.90 / 1000.00];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.10)[text/plain];
-	FROM_HAS_DN(0.00)[];
-	ASN(0.00)[asn:35790, ipnet:213.204.219.0/24, country:SE];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,dt];
-	HAS_X_AS(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	RCVD_COUNT_ZERO(0.00)[0];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+]
-X-Out-Rspamd-Queue-Id: 4bZ5GN71HQz17mm
-X-Rspamd-Action: no action
-X-Out-Rspamd-Server: m101-rspamd-out-4
-X-purgate-type: clean
-X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
-X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
-X-purgate: clean
-X-purgate-size: 928
-X-purgate-ID: 155908::1751708736-048FF069-EA712F3F/0/0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 49/80] net: wwan: Remove redundant
+ pm_runtime_mark_last_busy() calls
+To: Sakari Ailus <sakari.ailus@linux.intel.com>,
+ Stephan Gerhold <stephan@gerhold.net>,
+ Loic Poulain <loic.poulain@oss.qualcomm.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+ Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
+ Liu Haijun <haijun.liu@mediatek.com>,
+ M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
+ Ricardo Martinez <ricardo.martinez@linux.intel.com>
+Cc: netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250704075225.3212486-1-sakari.ailus@linux.intel.com>
+ <20250704075438.3220967-1-sakari.ailus@linux.intel.com>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <20250704075438.3220967-1-sakari.ailus@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 2 Jul 2025 13:01:04 +0800
-Chen-Yu Tsai <wens@csie.org> wrote:
+On 7/4/25 10:54, Sakari Ailus wrote:
+> pm_runtime_put_autosuspend(), pm_runtime_put_sync_autosuspend(),
+> pm_runtime_autosuspend() and pm_request_autosuspend() now include a call
+> to pm_runtime_mark_last_busy(). Remove the now-reduntant explicit call to
+> pm_runtime_mark_last_busy().
+> 
+> Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+> ---
+> The cover letter of the set can be found here
+> <URL:https://lore.kernel.org/linux-pm/20250704075225.3212486-1-sakari.ailus@linux.intel.com>.
+> 
+> In brief, this patch depends on PM runtime patches adding marking the last
+> busy timestamp in autosuspend related functions. The patches are here, on
+> rc2:
+> 
+>          git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm.git \
+>                  pm-runtime-6.17-rc1
+> 
+>   drivers/net/wwan/qcom_bam_dmux.c           | 2 --
+>   drivers/net/wwan/t7xx/t7xx_hif_cldma.c     | 3 ---
+>   drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c | 2 --
+>   drivers/net/wwan/t7xx/t7xx_hif_dpmaif_tx.c | 2 --
+>   4 files changed, 9 deletions(-)
 
-> On Wed, Jul 2, 2025 at 12:58=E2=80=AFAM Chen-Yu Tsai <wens@kernel.org> wr=
-ote:
-> >
-> > From: Chen-Yu Tsai <wens@csie.org>
-> >
-> > Until now, if the system controller had a ethernet controller glue
-> > layer control register, a limited access regmap would be registered
-> > and tied to the system controller struct device for the ethernet
-> > driver to use.
-
-"Until now"?=20
-Does that description (i.e. something that used to happen, but not
-after the patch) really match the change?
-
-- snip -
-
-> > +               ret =3D of_syscon_register_regmap(dev->of_node,
-> > regmap);
-> > +               if (IS_ERR(ret)) =20
->=20
-> BroderTuck on IRC pointed out that this gives a compiler warning.
-> Indeed it is incorrect. It should test `ret` directly.
->=20
-> ChenYu
->=20
-
-Regards
-Per Larsson, known as BroderTuck on #linux-sunxi
+Reviewed-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 
