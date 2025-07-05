@@ -1,134 +1,175 @@
-Return-Path: <netdev+bounces-204299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B338DAF9F6F
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 11:51:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3DD9AFA00C
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 14:20:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 098927ADF4D
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 09:50:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7425D1BC6F34
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 12:21:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B4EB1F0E58;
-	Sat,  5 Jul 2025 09:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6858C2550C2;
+	Sat,  5 Jul 2025 12:20:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KtGvnq0i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NO97l4Uh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4567E107;
-	Sat,  5 Jul 2025 09:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B98252287;
+	Sat,  5 Jul 2025 12:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751709089; cv=none; b=actPaQ6BTjNkJmP7+s77crnemFX2GLJlecVgEL/3d9DfHwgzIyjPgZFMf3Ao/lb1iknPOx8gle+17A0TDmExlPcAcOVPE8C9rd8eAT8pMmc0LeqceInVwayA7KJfVIoi+QO/FBGgBowrMjsiemCMmBn4ykHr3iX/kZy3zvy9WR0=
+	t=1751718044; cv=none; b=fhFZNxG74E6CgoHZHyjOntMStOjEkb35Ohli/xah5g14WALJU6XnFizxJOM1QhfcFotKt137bqFrG0YnYduxnkHCtqHu38B18B0pEwX+gJJWvlnLDEbd55h/tHeiUhqj0iuOV9u5mK7Hsq/bIfHAEP2ld2yOk63WQhgK/G7+tKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751709089; c=relaxed/simple;
-	bh=3bynmHtozjFAKsrJYZmSEGrQWHqK+GJEPB3QJy++yc4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xvumb7u9B9jduGB/MvUfEfz7ncEVRDntpxDiim1LxMPmawmo1RYZ4BvB2a8mdR/sjohnkhPNlNDA6mpC7KPmOAcgZbM2pFnXhFHe8jLp3nwQaItyFYXdqyQqzLqoFYvfxo7UvtYL6bbeDk3e1e2PNaywk0GjLK8dweaQSOPKVtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KtGvnq0i; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3ab112dea41so807400f8f.1;
-        Sat, 05 Jul 2025 02:51:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751709086; x=1752313886; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CwilIVNfuxa3IIndCAzsGcrIR2J+YGRrDjOtdSWoirg=;
-        b=KtGvnq0irZH2hY5XwqWGQkKQVxHqU/sn5nFxjiMwRwtV5K9FLLAC5Nel6chp+2WqqL
-         b8sD47jrSTQ4eSuv1QlIcWny1KJZ23xbKguKTWtlQUzyIY3WQsqwRNjT1k2lTvrLZGxS
-         0RKSAh7lmE6Y/5nJ21JmBs3ZDw6jYrLvTgcac52Fw7eSfudb4uqgvhdImqxzn1RGvITU
-         lIdKFd/fksLa0pmaP70zDJ8AzT+1edh983hypywcSIYJ7l+tw3rINJjp3499pOcrP45M
-         Sh/lqpMTOGZ7u8BZZaJtpG3dD+xtWyZ0YunOrsBaNMsaCAjyCLT9+I1sNn8PwnWet0MQ
-         4Ksg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751709086; x=1752313886;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CwilIVNfuxa3IIndCAzsGcrIR2J+YGRrDjOtdSWoirg=;
-        b=lXebEz80wwmTbsIN/npIqzgTZvPD4Lm+Ie8rLqKTLD/S7BBqItYtkjp4892p2y68yE
-         GwNAXzMrv6CHvl3MG6tgPhq1FlIAY96XYv0Z2QT99GbP4jUbBHQNc9yu/Ly/qrzGNdxY
-         5AruEr26XSYUR8GI4X5na5hLnfXy74e+rTm60HcPFV5p88LoDkpT3bk/h5IRZsQw7zAM
-         sCav/Po9Xu61qdsWeA4OEex3u353oxLcRe4nS/Vj2j8wyl9wIbtsRAoeAQbkSV3qiEZT
-         uBPC03wWg2mSGQG3WxzYn5adhq3wew1wFyAkxDDsSx3nFWcb1SltltxCgP58PiagEpZW
-         tUkw==
-X-Forwarded-Encrypted: i=1; AJvYcCUDl9La3QC4Jcr1lHrheWPFStDLdWHax9Ln+ROAWm7F9l7k2pSU3FjU6/dp/afHW3DtMfWUqUC5FxyZTfBU@vger.kernel.org, AJvYcCXTIbtfZKVLrx6yFT/2n4R7FI111PnB2CeTcvyJS9fup9+ZaMkw11wzY2M4qDvgHXmnyy/yoLLs9RLJP/0Y@vger.kernel.org
-X-Gm-Message-State: AOJu0YxACd9NJphwkBbhrfBpGL1z00gwb3/22LqsHfD52HNWwfDCH1xa
-	50LVRPfnFwJgdsIb0243YINUeYSeu3Ax31j/k8DMkRzfKebjhQhH4wg2
-X-Gm-Gg: ASbGnct6fjXzIvZWt/OcgZ8axmBQyx3aNFl9nNDsNxn3Bj+n+V4jgfka2L49vtVf+5m
-	cIdtUGFwucW+WtytIOtoe0b06I2spWJukFVSZ9eAIQbpXv1GqxAzRfcu4piOvKcjGo23PQ7wd/+
-	tlF6KkylAsAyZvH2WmDT+Yf4u23qjPFW6xbKJ4KTYlFPYVQxKC199hpwXPVDqmvPzCOzyU0J6wV
-	fkjRtxU875kgFZgqfvInK4bGo4d285rgR5tZ0C0z2D8s8aOg5zzYh2AvHOTpR4RlYh6CZzFbhfw
-	T8gO905Lzd2/ScTIEujOoFpVtaX/w4YzdI3z+t9zw3gFB96niWcaoe5AmLnC4JTt+PTXBMgm796
-	4
-X-Google-Smtp-Source: AGHT+IGcaIsL2pfhpJrl9NqtL7ggGiN1AraC3c74I7g09DJNfdA2gFRuPNOw/igevGsR7d/Uv8HwOw==
-X-Received: by 2002:a05:6000:430a:b0:3a4:edf5:b942 with SMTP id ffacd0b85a97d-3b49aa8d85bmr1170854f8f.57.1751709085924;
-        Sat, 05 Jul 2025 02:51:25 -0700 (PDT)
-Received: from [192.168.0.2] ([212.50.121.5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454b161e8dbsm50246005e9.5.2025.07.05.02.51.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 05 Jul 2025 02:51:25 -0700 (PDT)
-Message-ID: <4afe6178-7ff7-4a08-ac24-babff55ad5f0@gmail.com>
-Date: Sat, 5 Jul 2025 12:51:29 +0300
+	s=arc-20240116; t=1751718044; c=relaxed/simple;
+	bh=w6JVrjNC7s+w46VT5qoV9Am1SjT66OpW5xDi+rFdRiw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n8uEW/Pq64xHI2Finazd41njOmJrDvrlQzqvtoO6Evp7s7npXYVgisDct7wvW2/XukGgO2GpYX4J6sXuecbPaHKVYZdlEhlVSRjqLJhGhw/xNS2mUt70f+ibbZh2t6GHc0Ocb/hhqgGt7NwZY8fwAgOlrTJBLzSRmh5qGwzbXz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NO97l4Uh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B691DC4AF09;
+	Sat,  5 Jul 2025 12:20:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751718043;
+	bh=w6JVrjNC7s+w46VT5qoV9Am1SjT66OpW5xDi+rFdRiw=;
+	h=References:In-Reply-To:Reply-To:From:Date:Subject:To:Cc:From;
+	b=NO97l4Uh1TnQv0IgibQlK8jSxdy5+saaJFnqpoZJ32HXznZja1vuRpy6IEPbvBFjn
+	 U9ZDGiwSWzANC3fWbivFHWhkM9K2BrjwbNV6Lf+0PmbSRMSrPyZ8ZNdRL6pCWZnvJ6
+	 3I6skH+H3KsDvrEFB1VYPUU5v8nQDvn1vTUsZ/96mjDKVuanBfyzoU2bB3XD6felBG
+	 ksweZSvZdDnorhAx4dzGBd6rWikZ07JTWcl4q0ueZeSjKIGqgppB6oMFevOQeU2CbZ
+	 YCYMZpVTcqVfDCZQQQ9JlQs4R4kkCWpKuI634EhdyLXGu83HPKjWbs4gCXuNyC1bMj
+	 5Dz37HNSncqpA==
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-32b595891d2so13263011fa.2;
+        Sat, 05 Jul 2025 05:20:43 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUeEeP32SsDiw/D2SS6KMqXdQEc812V/f/93NV8o5QQmYEEG67VOFOZ7qHyNB0nrezjy6i5qGiArlpv@vger.kernel.org, AJvYcCXReICa/2hLimgtimablo1Vm8Lk5Sai1PML7g6GfiR+Znwszx9/S7cXa76LPSIrC2iHgvhv0Hrb@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzif8sjxx/37mrWjc3is2ew1ZAYwOpod9r338kNLWEzN6atSGyV
+	LlwGnX+yyugd2PG1VLKenjjQw2ka2Q9f1+Ycff6sfVI3+i3kzhAGHOajRtXdYFVtHqIS4eq6q1v
+	JwQiAf6YVkL5GfWn3UeaVd4117GGnMGE=
+X-Google-Smtp-Source: AGHT+IE2FeBYZ8ZmnNW0SV5XaswcVwlOSGE5JRdJuwk2CAsSkNvjgDvq3feTe9kdVd6rU22ciEC8vE3JOGVj9L4sHqY=
+X-Received: by 2002:a2e:ae1c:0:b0:32a:74db:f3c1 with SMTP id
+ 38308e7fff4ca-32f19ad68d4mr4847691fa.24.1751718042043; Sat, 05 Jul 2025
+ 05:20:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 49/80] net: wwan: Remove redundant
- pm_runtime_mark_last_busy() calls
-To: Sakari Ailus <sakari.ailus@linux.intel.com>,
- Stephan Gerhold <stephan@gerhold.net>,
- Loic Poulain <loic.poulain@oss.qualcomm.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
- Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
- Liu Haijun <haijun.liu@mediatek.com>,
- M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
- Ricardo Martinez <ricardo.martinez@linux.intel.com>
-Cc: netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250704075225.3212486-1-sakari.ailus@linux.intel.com>
- <20250704075438.3220967-1-sakari.ailus@linux.intel.com>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <20250704075438.3220967-1-sakari.ailus@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250628054438.2864220-1-wens@kernel.org> <20250705083600.2916bf0c@minigeek.lan>
+In-Reply-To: <20250705083600.2916bf0c@minigeek.lan>
+Reply-To: wens@kernel.org
+From: Chen-Yu Tsai <wens@kernel.org>
+Date: Sat, 5 Jul 2025 21:20:29 +0900
+X-Gmail-Original-Message-ID: <CAGb2v64My=A_Jw+CBCsqno3SsSSTtBFKXOrgLv+Nyq_z5oeYBg@mail.gmail.com>
+X-Gm-Features: Ac12FXyj5gh1iUI7aiMezVsM5cn9-cQcjwImIe4vvpZrS6Hd_ny1T0St79tYcpI
+Message-ID: <CAGb2v64My=A_Jw+CBCsqno3SsSSTtBFKXOrgLv+Nyq_z5oeYBg@mail.gmail.com>
+Subject: Re: [PATCH net 0/2] allwinner: a523: Rename emac0 to gmac0
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Jernej Skrabec <jernej@kernel.org>, Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-sunxi@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/4/25 10:54, Sakari Ailus wrote:
-> pm_runtime_put_autosuspend(), pm_runtime_put_sync_autosuspend(),
-> pm_runtime_autosuspend() and pm_request_autosuspend() now include a call
-> to pm_runtime_mark_last_busy(). Remove the now-reduntant explicit call to
-> pm_runtime_mark_last_busy().
-> 
-> Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
-> ---
-> The cover letter of the set can be found here
-> <URL:https://lore.kernel.org/linux-pm/20250704075225.3212486-1-sakari.ailus@linux.intel.com>.
-> 
-> In brief, this patch depends on PM runtime patches adding marking the last
-> busy timestamp in autosuspend related functions. The patches are here, on
-> rc2:
-> 
->          git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm.git \
->                  pm-runtime-6.17-rc1
-> 
->   drivers/net/wwan/qcom_bam_dmux.c           | 2 --
->   drivers/net/wwan/t7xx/t7xx_hif_cldma.c     | 3 ---
->   drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c | 2 --
->   drivers/net/wwan/t7xx/t7xx_hif_dpmaif_tx.c | 2 --
->   4 files changed, 9 deletions(-)
+On Sat, Jul 5, 2025 at 4:37=E2=80=AFPM Andre Przywara <andre.przywara@arm.c=
+om> wrote:
+>
+> On Sat, 28 Jun 2025 13:44:36 +0800
+> Chen-Yu Tsai <wens@kernel.org> wrote:
+>
+> Hi,
+>
+> > From: Chen-Yu Tsai <wens@csie.org>
+> >
+> > Hi folks,
+> >
+> > This small series aims to align the name of the first ethernet
+> > controller found on the Allwinner A523 SoC family with the name
+> > found in the datasheets. It renames the compatible string and
+> > any other references from "emac0" to "gmac0".
+>
+> To be honest I am not a big fan of those cosmetic renames when it
+> touches DT files. It seems to not break compatibility in this case,
+> since we don't use the specific compatible string, but leaves a bitter
+> taste anyway. Also I pick DT patches out of -rc releases for U-Boot,
+> and did so internally already, so it's not without churns.
 
-Reviewed-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+I'd say that new stuff shouldn't really be considered stable until
+it is actually released, hence why I wanted to get this series merged
+now. Picking from an -rc release is a tradeoff of getting new stuff
+faster vs having something changed or reverted during the -rc process.
+I'm sorry that it went the other way this time.
+
+> So is this really necessary, and what is the purpose of this patch?
+
+It's really about aligning the names used throughout the kernel with
+the ones seen in the datasheet.
+
+> I am fine with using GMAC for the GMAC200 part in the SoC, but the A64,
+> H6, H616, A133 all use the same IP - as the fallback compatible proves -
+> and they call it all EMAC.
+
+There's also an EMAC in the A10 and A20 that only does up to 100 Mbps,
+and there's no lineage there. Also, not all datasheets for SoCs with
+this gigabit-capable EMAC call it the EMAC. Off the top of my head, I
+believe the R40 calls it the GMAC. And the R40's compatible string
+in this binding even uses the string "gmac".
+
+So it's really whatever Allwinner wants to call it. I would rather have
+the names follow the datasheet than us making some scheme up. We just
+have to remember that this funky gigabit-capable Ethernet controller
+is this piece of hardware.
+
+Hope that explains things.
+
+Thanks
+ChenYu
+
+> That's not a NAK, but just wanted to bring this up.
+>
+> Cheers,
+> Andre.
+>
+> > When support of the hardware was introduced, the name chosen was
+> > "EMAC", which followed previous generations. However the datasheets
+> > use the name "GMAC" instead, likely because there is another "GMAC"
+> > based on a newer DWMAC IP.
+> >
+> > The first patch fixes the compatible string entry in the device tree
+> > binding.
+> >
+> > The second patch fixes all references in the existing device trees.
+> >
+> > Since this was introduced in v6.16-rc1, I hope to land this for v6.16
+> > as well.
+> >
+> > There's a small conflict in patch one around the patch context with
+> >
+> >     dt-bindings: net: sun8i-emac: Add A100 EMAC compatible
+> >
+> > that just landed in net-next today. I will leave this patch to the net
+> > mainainers to merge to avoid making a bigger mess. Once that is landed
+> > I will merge the second patch through the sunxi tree.
+> >
+> >
+> > Thanks
+> > ChenYu
+> >
+> >
+> > Chen-Yu Tsai (2):
+> >   dt-bindings: net: sun8i-emac: Rename A523 EMAC0 to GMAC0
+> >   arm64: dts: allwinner: a523: Rename emac0 to gmac0
+> >
+> >  .../devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml  | 2 +-
+> >  arch/arm64/boot/dts/allwinner/sun55i-a523.dtsi              | 6 +++---
+> >  arch/arm64/boot/dts/allwinner/sun55i-a527-cubie-a5e.dts     | 4 ++--
+> >  arch/arm64/boot/dts/allwinner/sun55i-t527-avaota-a1.dts     | 4 ++--
+> >  4 files changed, 8 insertions(+), 8 deletions(-)
+> >
+>
 
