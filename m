@@ -1,529 +1,186 @@
-Return-Path: <netdev+bounces-204286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B874DAF9E81
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 08:41:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 86687AF9E94
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 09:02:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 791F31C277F6
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 06:42:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08088189C5F7
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 07:02:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA1D820298E;
-	Sat,  5 Jul 2025 06:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30DD81FA859;
+	Sat,  5 Jul 2025 07:01:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="EFISkFEX"
+	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="dwUbXZMv"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A90220B7F9
-	for <netdev@vger.kernel.org>; Sat,  5 Jul 2025 06:41:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3204320B1F5
+	for <netdev@vger.kernel.org>; Sat,  5 Jul 2025 07:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751697697; cv=none; b=iK50PpD659LY7zJyYZ0GrslALkcP1HkkehNznNNcU9K3Ev4ZiTnW5eD+1qynZaeDlbu2pcBhLcNrv1Q1qKyJ8+PiovwI3rhGRAfZ53SKVnKVtndvbjmC71NK1MUWPVlvIsTkpEc252HMpH66m5fXFBs8zg+l8wdrEoMuFlaiOkA=
+	t=1751698917; cv=none; b=Ylvq3RHqq5vFFlIWwd3phd9zfI+t17cIVf+URkwaTlACjpAQdkEmgl6/+lr0ZPU6iML/uXNKj6fi36/EvS5mZo0fd/3lA5GDp3yqZVGuTckKT4xIQdp89qTaGE82bX3xdK0eUCsWVQ21xWaj4Hh5DbvW7WxTJE3HMuTP19/i2w8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751697697; c=relaxed/simple;
-	bh=igXQzalukED0rJo7dDmagEt8kcnSLiMwRAMwgkp+BtU=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=PQ0kgJve/0u8RLiF8qxcCYvFTIp0QCfKTKHAxHwsc2N40F+bCmpg9JSP9MHx/oW5OtMKJF6NVuk5lGfHv6FknAgYtVF9RuH/lTi3jbpoMUP5Yp+yz0LCFPC+0+5/aib7eFgVhCFdi0lNeRwM+055JEodBYP/xJa+uasPTXnQgA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=EFISkFEX; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1751698917; c=relaxed/simple;
+	bh=QjEnynwiHDhQP5PZTUAgnZKYFJ/39FKKd2Q6H8WQyQo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lr+lbJs7Kl/mhmbb1BmUryeUDMW/1/JzG3dgxhaFEFdBer8NV4dUGXKgBG2xPDcvMMRREyquc9E+PgI6bjqXvisPWevJbfEe8dQF+yUDAMlFBgT83ZrB72Wvx0XgImtkJNPTyiAZ+GQ9jYBeqj2jP5+7bT8BkaVMHwob7D71+rM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=dwUbXZMv; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-ae361e8ec32so328384166b.3
+        for <netdev@vger.kernel.org>; Sat, 05 Jul 2025 00:01:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gooddata.com; s=google; t=1751698913; x=1752303713; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4+B/RDwnbgv2srEjK10waQf0Cyf424fDE1uZHA2I9lg=;
+        b=dwUbXZMvTSiJnQsF/1TGcNUlU7cUjKGgsQSsbuzlJlLLHmA5Hp0pwI0tqOZxGgME8J
+         Yivt/H61uGcVHYvzmj2CV5pj2EaxmMpfqTBw/hJcMVeWHoQkV5e3SNLYSCribWOEVV0q
+         iAn116IezoKguk0c9CuETLNVIDv+GxPMryfVc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751698913; x=1752303713;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4+B/RDwnbgv2srEjK10waQf0Cyf424fDE1uZHA2I9lg=;
+        b=TJ7Ug6ivE1O9T94eb8Clnt7o9G29riBD7WPVGq1k4HJykO7GBhzKhcxXRZKXFujoWq
+         cAQpKNuuf4uP8k//rWqZyqIbaYI/1M35JrmZQdAzIUDKhZ8lk4yhyAL66g8OCkv37vq9
+         KOG17gaPx9q49igQMcMVx99cfUyrHdMft0Cak9HHoMk3EVJpd6Pkm6pIfdvfx5bXxHdu
+         Hx0P8mXkXEoO0oEropVxcm0dC4oX4u2MIAgTOjcPmuv2po6WxQ/1lMEViu37LGY0Q2zc
+         Ewx9KG+9Hu+Lt/k1ljiHYa2Xh66S16y/iUUEhKQ/HoJi6OXs4pWtDeW6L+GNPuTKZq5x
+         YnFw==
+X-Forwarded-Encrypted: i=1; AJvYcCW5kSQ+fU9BX1vU/8aSMK2mPQ192ui/MTDVZq13bSdx8Par9MmviTNPOD+qPvsxMfpYQYxJWr4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwK2MfKfC6zWay16evwMn9EEBOz+dQdE2cCOPXy0k1gMMBB2PbC
+	5ARtIHF/Q1GuDwgI6k0yMHJ2h9pRV75w2+rdtx8bxHR5kufS2kUWuEv9K26eBtOY3I2JDu6TbT5
+	Ybvsr+dQ6Ozr/tIN7eD6BWdBCIeNZJm0OJaAE3NYJ
+X-Gm-Gg: ASbGncuBNLdy9/VWwebyBdihA29LnGLzZ/OZHIAZRLiitOITMRaIDscrzD2ALr98CJM
+	p7qUVpKxk/2yxb/kN3kVffDPCZjBOZyMt6BpaBS4sW8zObF9FRlTCxymzQh3XmmeHcrXIOpBnXa
+	Xq5qxJ5+uUN1E1DxNPwf1/DpSoNAkduLkKueToE6CZVaN9
+X-Google-Smtp-Source: AGHT+IFZNGe5yhhDERjrdCMDkrJYVHRb+epjwumv6RBELYxXQX1wAeeejnpm1EGNA6u6CvCTxThS06tD3fpmLZpVlIM=
+X-Received: by 2002:a17:907:d23:b0:ad8:9257:573a with SMTP id
+ a640c23a62f3a-ae4107862a5mr122681966b.5.1751698913266; Sat, 05 Jul 2025
+ 00:01:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751697682;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RjP7CZmYG3XniR4jO2Z9JhFJtKlfBbTqa8Xif+9DeVQ=;
-	b=EFISkFEX9T0D8IgGCBAV46kQlVXt/QoefNxv5ZAuaMbhlO+ZfQMFAxzz1N9qlNrF5qO27A
-	3zupVa6oRYGSQLjUMDDujasx6wexMrhh35noZ25lNO7SUEm9W4zCac9qJ9lExxegDoER5m
-	5rEO1VoUbtWRvo3M6yo0F0Lgg0sEuRo=
-Date: Sat, 05 Jul 2025 06:41:20 +0000
-Content-Type: text/plain; charset="utf-8"
+References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
+ <aGgHka8Nm8S3fKQK@localhost.localdomain>
+In-Reply-To: <aGgHka8Nm8S3fKQK@localhost.localdomain>
+From: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Date: Sat, 5 Jul 2025 09:01:27 +0200
+X-Gm-Features: Ac12FXz0iPXl1W6a_JIMngDrS-AC2eXoaB-V4pPDY0n9tMd_rdWNz2tfHyTkcSo
+Message-ID: <CAK8fFZ6KzyfswFE=qj6pz-18QZ16swdwyFfTf=4e_0+sPLyUcg@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
+ driver after upgrade to 6.13.y (regression in commit 492a044508ad)
+To: Michal Kubiak <michal.kubiak@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, jdamato@fastly.com, 
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	Igor Raits <igor@gooddata.com>, Daniel Secik <daniel.secik@gooddata.com>, 
+	Zdenek Pesek <zdenek.pesek@gooddata.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: qiang.zhang@linux.dev
-Message-ID: <c2e597d2101b588d19a5028b8ae73a33c5240e32@linux.dev>
-TLS-Required: No
-Subject: Re: [bug report] [PATCH v6] net: usb: Convert tasklet API to new
- bottom half workqueue mechanism
-To: "Oleksij Rempel" <o.rempel@pengutronix.de>, "Jun Miao"
- <jun.miao@intel.com>
-Cc: sbhatta@marvell.com, kuba@kernel.org, oneukum@suse.com,
- netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org
-In-Reply-To: <74395e33b2175fdb2745211c4ca41e5b2358d80d@linux.dev>
-References: <20250618173923.950510-1-jun.miao@intel.com>
- <aGgD_Lp0i-ZU2xkt@pengutronix.de>
- <74395e33b2175fdb2745211c4ca41e5b2358d80d@linux.dev>
-X-Migadu-Flow: FLOW_OUT
 
->=20
->=20>=20
->=20> Hi Jun,
-> >=20
->=20>=20=20
->=20>=20
->=20>  On Wed, Jun 18, 2025 at 01:39:23PM -0400, Jun Miao wrote:
-> >=20
->=20>=20=20
->=20>=20
->=20>=20=20
->=20>=20
->=20>  Migrate tasklet APIs to the new bottom half workqueue mechanism. I=
-t
-> >=20
->=20>=20=20
->=20>=20
->=20>  replaces all occurrences of tasklet usage with the appropriate wor=
-kqueue
-> >=20
->=20>=20=20
->=20>=20
->=20>  APIs throughout the usbnet driver. This transition ensures compati=
-bility
-> >=20
->=20>=20=20
->=20>=20
->=20>  with the latest design and enhances performance.
-> >=20
->=20>=20=20
->=20>=20
->=20>=20=20
->=20>=20
->=20>  After applying this patch, the smsc95xx driver fails after one dow=
-n/up
-> >=20
->=20>=20=20
->=20>=20
->=20>  cycle.
-> >=20
->=20
-> Hello, Oleksij
->=20
->=20Please try follow patch base on Jun Miao's patchs:
->=20
-
-Sorry,=20please ignore previous, try it:
-
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index 9564478a79cc..6a3cca104af9 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -861,14 +861,14 @@ int usbnet_stop (struct net_device *net)
-        /* deferred work (timer, softirq, task) must also stop */
-        dev->flags =3D 0;
-        timer_delete_sync(&dev->delay);
--       disable_work_sync(&dev->bh_work);
-+       cancel_work_sync(&dev->bh_work);
-        cancel_work_sync(&dev->kevent);
-=20
-=20       /* We have cyclic dependencies. Those calls are needed
-         * to break a cycle. We cannot fall into the gaps because
-         * we have a flag
-         */
--       disable_work_sync(&dev->bh_work);
-+       cancel_work_sync(&dev->bh_work);
-        timer_delete_sync(&dev->delay);
-        cancel_work_sync(&dev->kevent);
-
-
-> diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
->=20
->=20index 9564478a79cc..554f1a1cf247 100644
->=20
->=20--- a/drivers/net/usb/usbnet.c
->=20
->=20+++ b/drivers/net/usb/usbnet.c
->=20
->=20@@ -953,6 +953,7 @@ int usbnet_open (struct net_device *net)
->=20
->=20 dev->pkt_cnt =3D 0;
->=20
->=20 dev->pkt_err =3D 0;
->=20
->=20 clear_bit(EVENT_RX_KILL, &dev->flags);
->=20
->=20+ enable_work(&dev->bh_work);
->=20
->=20=20
->=20
->  // delay posting reads until we're fully open
->=20
->=20 queue_work(system_bh_wq, &dev->bh_work);
->=20
->=20Thanks
->=20
->=20Zqiang
->=20
->=20>=20
->=20> Here is how I can reproduce the issue:
-> >=20
->=20>=20=20
->=20>=20
->=20>  nmcli device set enu1u1 managed no
-> >=20
->=20>=20=20
->=20>=20
->=20>  ip a a 10.10.10.1/24 dev enu1u1
-> >=20
->=20>=20=20
->=20>=20
->=20>  ping -c 4 10.10.10.3
-> >=20
->=20>=20=20
->=20>=20
->=20>  ip l s dev enu1u1 down
-> >=20
->=20>=20=20
->=20>=20
->=20>  ip l s dev enu1u1 up
-> >=20
->=20>=20=20
->=20>=20
->=20>  ping -c 4 10.10.10.3
-> >=20
->=20>=20=20
->=20>=20
->=20>  The second ping does not reach the host. Networking also fails on =
-other
-> >=20
->=20>=20=20
->=20>=20
->=20>  interfaces.
-> >=20
->=20>=20=20
->=20>=20
->=20>  After some delay, the following trace appears:
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.838527] INFO: task kworker/u16:1:308 blocked for more than 1=
-20 seconds.
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.838596] Not tainted 6.16.0-rc3-00963-g4fcedea9cdf2-dirty #32
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.838666] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" d=
-isables this message.
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.838697] task:kworker/u16:1 state:D stack:0 pid:308 tgid:308 =
-ppid:2
-> >=20
->=20>=20=20
->=20>=20
->=20>  task_flags:0x4208060 flags:0x00000010
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.838776] Workqueue: events_unbound linkwatch_event
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.838851] Call trace:
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.838880] __switch_to+0x1d0/0x330 (T)
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.838933] __schedule+0xa88/0x2a90
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.838980] schedule+0x114/0x428
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839010] schedule_preempt_disabled+0x80/0x118
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839036] __mutex_lock+0x764/0xba8
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839060] mutex_lock_nested+0x28/0x38
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839084] rtnl_lock+0x20/0x30
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839115] linkwatch_event+0x18/0x70
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839141] process_one_work+0x760/0x17b0
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839175] worker_thread+0x768/0xce8
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839208] kthread+0x3bc/0x690
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839237] ret_from_fork+0x10/0x20
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839359] INFO: task kworker/u16:1:308 is blocked on a mutex l=
-ikely
-> >=20
->=20>=20=20
->=20>=20
->=20>  owned by task ip:899.
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839381] task:ip state:D stack:0 pid:899
-> >=20
->=20>=20=20
->=20>=20
->=20>  tgid:899 ppid:1 task_flags:0x400100 flags:0x00000019
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839419] Call trace:
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839432] __switch_to+0x1d0/0x330 (T)
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839466] __schedule+0xa88/0x2a90
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839495] schedule+0x114/0x428
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839524] schedule_timeout+0xec/0x220
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839551] wait_skb_queue_empty+0xa0/0x168
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839581] usbnet_terminate_urbs+0x150/0x2c8
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839609] usbnet_stop+0x41c/0x608
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839636] __dev_close_many+0x1fc/0x4b8
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839668] __dev_change_flags+0x33c/0x500
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839694] netif_change_flags+0x7c/0x158
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839718] do_setlink.isra.0+0x2040/0x2eb8
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839745] rtnl_newlink+0xd88/0x16c8
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839770] rtnetlink_rcv_msg+0x654/0x8c8
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839795] netlink_rcv_skb+0x19c/0x350
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839823] rtnetlink_rcv+0x1c/0x30
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839848] netlink_unicast+0x3c4/0x668
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839873] netlink_sendmsg+0x620/0xa10
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839899] ____sys_sendmsg+0x2f8/0x788
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839924] ___sys_sendmsg+0xf0/0x178
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839950] __sys_sendmsg+0x104/0x198
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.839975] __arm64_sys_sendmsg+0x74/0xa8
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840000] el0_svc_common.constprop.0+0xe4/0x338
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840033] do_el0_svc+0x44/0x60
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840061] el0_svc+0x3c/0xb0
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840089] el0t_64_sync_handler+0x104/0x130
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840117] el0t_64_sync+0x154/0x158
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840164]
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840164] Showing all locks held in the system:
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840199] 1 lock held by khungtaskd/41:
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840216] #0: ffffffc08424ede0 (rcu_read_lock){....}-{1:3}, at=
-: debug_show_all_locks+0x14/0x1b0
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840309] 3 locks held by kworker/u16:2/47:
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840325] #0: ffffff800926a148 ((wq_completion)ipv6_addrconf){=
-+.+.}-{0:0}, at: process_one_work+0x698/0x17b0
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840406] #1: ffffffc0860f7c00 ((work_completion)(&(&net->ipv6=
-.addr_chk_work)->work)){+.+.}-{0:0}, at: process_one_work+0x6bc/0x17b0
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840484] #2: ffffffc084924408 (rtnl_mutex){+.+.}-{4:4}, at: r=
-tnl_lock+0x20/0x30
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840568] 2 locks held by pr/ttymxc1/60:
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840595] 5 locks held by sugov:0/84:
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840618] 2 locks held by systemd-journal/124:
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840639] 3 locks held by kworker/u16:1/308:
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840655] #0: ffffff8005d00148 ((wq_completion)events_unbound)=
-{+.+.}-{0:0}, at: process_one_work+0x698/0x17b0
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840733] #1: ffffffc087307c00 ((linkwatch_work).work){+.+.}-{=
-0:0}, at: process_one_work+0x6bc/0x17b0
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840810] #2: ffffffc084924408 (rtnl_mutex){+.+.}-{4:4}, at: r=
-tnl_lock+0x20/0x30
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840894] 1 lock held by ip/899:
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840910] #0: ffffffc084924408 (rtnl_mutex){+.+.}-{4:4}, at: r=
-tnl_newlink+0x5e8/0x16c8
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840982] 2 locks held by sshd/901:
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.840998] #0: ffffff800aee06b0 (nlk_cb_mutex-ROUTE){+.+.}-{4:4=
-}, at: __netlink_dump_start+0x100/0x800
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.841073] #1: ffffffc084924408 (rtnl_mutex){+.+.}-{4:4}, at: r=
-tnl_dumpit+0x128/0x1a8
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.841149] 2 locks held by sshd/903:
-> >=20
->=20>=20=20
->=20>=20
->=20>  [=20846.841165] #0: ffffff800b1c76b0 (nlk_cb_mutex-ROUTE){+.+.}-{4=
-:4}, at: __netlink_dump_start+0x100/0x800
-> >=20
->=20>=20=20
->=20>=20
->=20>  [ 846.841237] #1: ffffffc084924408 (rtnl_mutex){+.+.}-{4:4}, at: r=
-tnl_dumpit+0x128/0x1a8
-> >=20
->=20>=20=20
->=20>=20
->=20>  Reverting this patch recovers smsc95xx functionality.
-> >=20
->=20>=20=20
->=20>=20
->=20>  Best Regards,
-> >=20
->=20>=20=20
->=20>=20
->=20>  Oleksij
+> On Mon, Apr 14, 2025 at 06:29:01PM +0200, Jaroslav Pulchart wrote:
+> > Hello,
 > >
+> > While investigating increased memory usage after upgrading our
+> > host/hypervisor servers from Linux kernel 6.12.y to 6.13.y, I observed
+> > a regression in available memory per NUMA node. Our servers allocate
+> > 60GB of each NUMA node=E2=80=99s 64GB of RAM to HugePages for VMs, leav=
+ing 4GB
+> > for the host OS.
+> >
+> > After the upgrade, we noticed approximately 500MB less free RAM on
+> > NUMA nodes 0 and 2 compared to 6.12.y, even with no VMs running (just
+> > the host OS after reboot). These nodes host Intel 810-XXV NICs. Here's
+> > a snapshot of the NUMA stats on vanilla 6.13.y:
+> >
+> >      NUMA nodes:  0     1     2     3     4     5     6     7     8
+> >  9    10    11    12    13    14    15
+> >      HPFreeGiB:   60    60    60    60    60    60    60    60    60
+> >  60   60    60    60    60    60    60
+> >      MemTotal:    64989 65470 65470 65470 65470 65470 65470 65453
+> > 65470 65470 65470 65470 65470 65470 65470 65462
+> >      MemFree:     2793  3559  3150  3438  3616  3722  3520  3547  3547
+> >  3536  3506  3452  3440  3489  3607  3729
+> >
+> > We traced the issue to commit 492a044508ad13a490a24c66f311339bf891cb5f
+> > "ice: Add support for persistent NAPI config".
+> >
+> > We limit the number of channels on the NICs to match local NUMA cores
+> > or less if unused interface (from ridiculous 96 default), for example:
+> >    ethtool -L em1 combined 6       # active port; from 96
+> >    ethtool -L p3p2 combined 2      # unused port; from 96
+> >
+> > This typically aligns memory use with local CPUs and keeps NUMA-local
+> > memory usage within expected limits. However, starting with kernel
+> > 6.13.y and this commit, the high memory usage by the ICE driver
+> > persists regardless of reduced channel configuration.
+> >
+> > Reverting the commit restores expected memory availability on nodes 0
+> > and 2. Below are stats from 6.13.y with the commit reverted:
+> >     NUMA nodes:  0     1     2     3     4     5     6     7     8
+> > 9    10    11    12    13    14    15
+> >     HPFreeGiB:   60    60    60    60    60    60    60    60    60
+> > 60   60    60    60    60    60    60
+> >     MemTotal:    64989 65470 65470 65470 65470 65470 65470 65453 65470
+> > 65470 65470 65470 65470 65470 65470 65462
+> >     MemFree:     3208  3765  3668  3507  3811  3727  3812  3546  3676  =
+3596 ...
+> >
+> > This brings nodes 0 and 2 back to ~3.5GB free RAM, similar to kernel
+> > 6.12.y, and avoids swap pressure and memory exhaustion when running
+> > services and VMs.
+> >
+> > I also do not see any practical benefit in persisting the channel
+> > memory allocation. After a fresh server reboot, channels are not
+> > explicitly configured, and the system will not automatically resize
+> > them back to a higher count unless manually set again. Therefore,
+> > retaining the previous memory footprint appears unnecessary and
+> > potentially harmful in memory-constrained environments
+> >
+> > Best regards,
+> > Jaroslav Pulchart
+> >
+>
+>
+> Hello Jaroslav,
+>
+> I have just sent a series for converting the Rx path of the ice driver
+> to use the Page Pool.
+> We suspect it may help for the memory consumption issue since it removes
+> the problematic code and delegates some memory management to the generic
+> code.
+>
+> Could you please give it a try and check if it helps for your issue.
+> The link to the series: https://lore.kernel.org/intel-wired-lan/202507041=
+61859.871152-1-michal.kubiak@intel.com/
+
+I can try it, however I cannot apply the patch as-is @ 6.15.y:
+$ git am ~/ice-convert-Rx-path-to-Page-Pool.patch
+Applying: ice: remove legacy Rx and construct SKB
+Applying: ice: drop page splitting and recycling
+error: patch failed: drivers/net/ethernet/intel/ice/ice_txrx.h:480
+error: drivers/net/ethernet/intel/ice/ice_txrx.h: patch does not apply
+Patch failed at 0002 ice: drop page splitting and recycling
+hint: Use 'git am --show-current-patch=3Ddiff' to see the failed patch
+hint: When you have resolved this problem, run "git am --continue".
+hint: If you prefer to skip this patch, run "git am --skip" instead.
+hint: To restore the original branch and stop patching, run "git am --abort=
+".
+hint: Disable this message with "git config set advice.mergeConflict false"
+
+>
+> Thanks,
+> Michal
 >
 
