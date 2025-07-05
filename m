@@ -1,82 +1,88 @@
-Return-Path: <netdev+bounces-204279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3E59AF9E20
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 05:25:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78F44AF9E57
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 07:07:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 476981BC774B
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 03:25:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FD511C27BA2
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 05:08:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4383C26F449;
-	Sat,  5 Jul 2025 03:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73AC51946DF;
+	Sat,  5 Jul 2025 05:07:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Arq08kRI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K/7MlPnF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D1D26E700
-	for <netdev@vger.kernel.org>; Sat,  5 Jul 2025 03:25:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 083B520330;
+	Sat,  5 Jul 2025 05:07:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751685920; cv=none; b=e7s1CQFlATlgB5r4mm9H6vqdV9zMh7tANjJldFVNtRPo0f6o0WEKVtjUCmr8GQ05SWV3CO1U/fENSHV16ldk1T61+RycEQww4I9/a44KlDPEd7wxazzi+cnFs6UWkAMaFyJscZQBkSkkHQphklaLMopHwtJNYV97Rdg8U6Jh1Go=
+	t=1751692058; cv=none; b=p2TfUDTDqclv/IltBICk5pbtYohfVhY2gyXVVq3/dSIba9n3y9SDsAJdI25aCIi9938RKaAzERHHpdXNqRZUnq+CqK8vDt8aCTxGb5+/ntX/+79MH8qAEYC6Rvu3/paZuldKW5ElvPP6M7PIhxWzE0YWzxyD9bHGoVE7RupXvYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751685920; c=relaxed/simple;
-	bh=/XTL8dsaj/HAboMmNbxl/kqYz2wYXtuIkGO3JWQj7wo=;
+	s=arc-20240116; t=1751692058; c=relaxed/simple;
+	bh=ZCh1Z/9IBsRPKRwZSKQnkU4l/vD//9dhXGv2tucMw+8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k5exh3Qu3iM/ysIjjyFxdlClqLGAwccuOyKk+hUCLDWvuwsj3ypj+6VGzEBvjRO2ECAI3fiwMtrbwEsBw7n7TA9Y1NJAgCEmiQWnpqfkxyX1odEsedkq79LX/OtdUCBQeq5SvRYcNm3B03Qs7zHuw6jEBdRs8SnyqDxdN/Kg8Y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Arq08kRI; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751685917; x=1783221917;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/XTL8dsaj/HAboMmNbxl/kqYz2wYXtuIkGO3JWQj7wo=;
-  b=Arq08kRIV46U4/jBK7WSE24pOf+GB1f1+wgpRWmAtYMz4OQlXpvX2cuJ
-   ocKcsWCtX0oJeLV3A+VBTbydg6wPihvtmpue0ymDqg081Jy5g62FudwOC
-   y2pFu7edfQmf55PNxC82bOhLZcylywPlnGHK9RkgwCqZUTVSFefWwpFg0
-   w+F/y05YY4dIPvu8WSg+KY6dEpSqyQqmF7WwdMYFeZxUHT1KG45MIpRRF
-   casaIO5Zd1Te04QnTwIuMzERX+EP1Dp6/smFjUqjw4AiETEpp9myG9gJ0
-   ov9ziu1Z6DZViX+J5vfAt9DHA2toEzCTlWjRGosQFvqg/8ZpGNkL9Bf4C
-   g==;
-X-CSE-ConnectionGUID: lkX15247RIqJMFx6OuJrBQ==
-X-CSE-MsgGUID: 14Wkv9B/QICVkT8/nOTS0g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11484"; a="64601691"
-X-IronPort-AV: E=Sophos;i="6.16,289,1744095600"; 
-   d="scan'208";a="64601691"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2025 20:25:16 -0700
-X-CSE-ConnectionGUID: N6OH5bwoQNGjFiCKktdKUA==
-X-CSE-MsgGUID: NBn3KLVgQ7SF8rygsStobg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,289,1744095600"; 
-   d="scan'208";a="159306903"
-Received: from lkp-server01.sh.intel.com (HELO 0b2900756c14) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 04 Jul 2025 20:25:12 -0700
-Received: from kbuild by 0b2900756c14 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uXtWX-0004FT-2g;
-	Sat, 05 Jul 2025 03:25:09 +0000
-Date: Sat, 5 Jul 2025 11:24:12 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	horms@kernel.org, andrew@lunn.ch, przemyslaw.kitszel@intel.com,
-	anthony.l.nguyen@intel.com, sgoutham@marvell.com,
-	gakula@marvell.com, sbhatta@marvell.com, bbhushan2@marvell.com,
-	tariqt@nvidia.com, mbloch@nvidia.com, leon@kernel.org,
-	gal@nvidia.com, ecree.xilinx@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH net-next v2 3/5] eth: mlx5: migrate to the *_rxfh_context
- ops
-Message-ID: <202507051125.6hx5EsC9-lkp@intel.com>
-References: <20250702030606.1776293-4-kuba@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ha3j080bdgRbbYI4zcOS6G1DK0Zf4kiSw/pnAHjzhDN5TOa1ce4zw/iXaoSr6Qvx9m8pBob8gI0fbT7DzIqnEVBNxvFBduFsSq2aFAcTlxEc+FiInFEz0wvjqtoej7gEKbi4yg1VNjot0garrP+TMr83egpUq+jtFkzmnfSoA7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K/7MlPnF; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-b26f7d2c1f1so1911288a12.0;
+        Fri, 04 Jul 2025 22:07:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751692056; x=1752296856; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zJof5mhNhWys0vTPjrJo1lwyk2akFY2XmfI5Oa0Y5QM=;
+        b=K/7MlPnFjnOsadG7N75pW783RPUkeRSB5THMzbBNZVAleTkMUG+5HF2jBlkGwH+lW+
+         NQguItQ6mref0XbFzsJQ3kBV4Z0NDbRGjV3e8nyrvflCGAtVUmp3QkI1mZAM0NCnuzxv
+         Nf+U0cKdc+Xk4Fc1IuMUCWl3GyfPNtC5D9aDm2lHRSFo06eXFO+swMGOC+WQWPPxeNtI
+         tSlhyUjpFPB35j/ec7KfJHhbXmUKc6Uu9SZS7S+belIQlBAAQL0CbwelG1dpTxdFpZwN
+         Ds3xOI6VDY+XM8qJWfA43tjCm8Tz4OZ1Weity/3cJuScNhK63Gai3xe6yj1GGb1zGg41
+         WdRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751692056; x=1752296856;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zJof5mhNhWys0vTPjrJo1lwyk2akFY2XmfI5Oa0Y5QM=;
+        b=dpRz+2atOBck1FZbNjw6dHVgxECESRKs3zmEXKvQHwCMs0Q5d6BvKWsElE54jru01r
+         X+5OiUGC0azo6pBeFRvGY4OVOBXNWt1Pj72zEjqa3qnFBwVWhmGNLsxVetvtJ+M9+SK9
+         Dap72+7tffiZY+kyoUpcHuiwMKLpGGTHONF2tBtvx0K93whWzKimFIrF+eV8bwJsRb0m
+         uQPuBA+PdQdMnGSudBy0tT5lT+BzrWXpQFGnfYNgMxDboPOjh5/jmGyUeRGnlnFC1FO0
+         Vk00IOx23SLzwSX335a07YfhkZcn6l8pt0bHFFhDzaPYR38bHW62u6ULez/q2a3u4E6S
+         DpEA==
+X-Forwarded-Encrypted: i=1; AJvYcCUI21mflvKGK8pDcE2lKfqLTrSaiNPVx7aZjO4mCLYdoT7ZU/xYQxU4vH/ynVDslQrHyAgNMvIE@vger.kernel.org, AJvYcCWvUBOUCuqas5iFGfJyaaBLkv1Wqk7hG7IaYGZFoIprrYUKeoyLBBDGb4K2PSq05iPMLEhkChtjlN2XOmw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNTkWIc6+nN2tNPegcLpjfQ1njrPdQt4C52USY/NVUZ37d8RrS
+	uQPivkcP1Q2oWfXK4ffTW9y9/+o1ixW61ac8ubSkz0a+6BvUOiNle5Oy
+X-Gm-Gg: ASbGncv0RA0sCVJuHX2PY9ENJaeX1BJ81LpWWnuMifRq2wk/uWPsWXuu8G4r6adwUgs
+	Pz/N3lP0Y0BCgZMt91w20qPxtlsFx8TAIhUR85Nk+c5owN5j9Pa26Y/XZxC2vegloglG5bNv5gk
+	loOklHyQdXSVnRvZjrpTXlLDDqfFPyIk+puAMger56n1myTRQHtv1v++GcyYiSuseFsfky6Wj+N
+	YFeV9MJTtoJRRSP0ad6w4abhbCd7lPEedTCwwGfyzHyOrYapvknUYJONqniTAPApgBPoD+ivEfx
+	NJgas+opCux5cbgK2EezJvz17PuXHQaKbOqPRYmo60TJBp1UH36g3HGMYgvbSavIT3Me
+X-Google-Smtp-Source: AGHT+IHzFj2sNLlVlawNH0SaI7hYGGQLuLt+m1fm+NAe+jaUcrflvlbZrbgolrD42aIK+Km2IwtwyQ==
+X-Received: by 2002:a17:90b:578f:b0:310:cea4:e3b9 with SMTP id 98e67ed59e1d1-31aac5511a1mr5791725a91.34.1751692056136;
+        Fri, 04 Jul 2025 22:07:36 -0700 (PDT)
+Received: from localhost ([2601:647:6881:9060:af97:2acd:2917:c229])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31aaae60f2fsm3558844a91.16.2025.07.04.22.07.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Jul 2025 22:07:35 -0700 (PDT)
+Date: Fri, 4 Jul 2025 22:07:34 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Lizhi Xu <lizhi.xu@windriver.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH V2] net/sched: Prevent notify to parent who unsupport
+ class ops
+Message-ID: <aGizFhZwnPo98Bj/@pop-os.localdomain>
+References: <aGhr2R3vkwBT/uiv@pop-os.localdomain>
+ <20250705011823.1443446-1-lizhi.xu@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,63 +91,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250702030606.1776293-4-kuba@kernel.org>
+In-Reply-To: <20250705011823.1443446-1-lizhi.xu@windriver.com>
 
-Hi Jakub,
+Hi Lizhi,
 
-kernel test robot noticed the following build errors:
+On Sat, Jul 05, 2025 at 09:18:22AM +0800, Lizhi Xu wrote:
+> If the parent qdisc does not support class operations then exit notify.
+> 
+> In addition, the validity of the cl value is judged before executing the
+> notify. Similarly, the notify is exited when the address represented by
+> its value is invalid.
+> 
+> Reported-by: syzbot+1261670bbdefc5485a06@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=1261670bbdefc5485a06
 
-[auto build test ERROR on net-next/main]
+Maybe I didn't make it clear, I think Victor's patch also fixes this
+bug.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jakub-Kicinski/eth-otx2-migrate-to-the-_rxfh_context-ops/20250702-110737
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250702030606.1776293-4-kuba%40kernel.org
-patch subject: [PATCH net-next v2 3/5] eth: mlx5: migrate to the *_rxfh_context ops
-config: arc-allmodconfig (https://download.01.org/0day-ci/archive/20250705/202507051125.6hx5EsC9-lkp@intel.com/config)
-compiler: arc-linux-gcc (GCC) 15.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250705/202507051125.6hx5EsC9-lkp@intel.com/reproduce)
+https://lore.kernel.org/netdev/20250704163422.160424-1-victor@mojatatu.com/
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507051125.6hx5EsC9-lkp@intel.com/
+Can you check if you still see the crash with his fix?
 
-All errors (new ones prefixed by >>):
+The reason why I am asking is because his fix addresses a problem
+earlier on the code path, which possibly makes your fix unnecessary.
+Hence, his fix is closer to the root cause.
 
-   drivers/net/ethernet/mellanox/mlx5/core/en/rss.c: In function 'mlx5e_rss_get_rxfh':
->> drivers/net/ethernet/mellanox/mlx5/core/en/rss.c:587:16: error: 'return' with a value, in function returning void [-Wreturn-mismatch]
-     587 |         return 0;
-         |                ^
-   drivers/net/ethernet/mellanox/mlx5/core/en/rss.c:570:6: note: declared here
-     570 | void mlx5e_rss_get_rxfh(struct mlx5e_rss *rss, u32 *indir, u8 *key, u8 *hfunc,
-         |      ^~~~~~~~~~~~~~~~~~
+Please test and confirm.
 
-
-vim +/return +587 drivers/net/ethernet/mellanox/mlx5/core/en/rss.c
-
-25307a91cb50a0 Tariq Toukan   2021-08-16  569  
-540d484b812cad Jakub Kicinski 2025-07-01  570  void mlx5e_rss_get_rxfh(struct mlx5e_rss *rss, u32 *indir, u8 *key, u8 *hfunc,
-540d484b812cad Jakub Kicinski 2025-07-01  571  			bool *symmetric)
-25307a91cb50a0 Tariq Toukan   2021-08-16  572  {
-25307a91cb50a0 Tariq Toukan   2021-08-16  573  	if (indir)
-cae8e6dea27923 Adham Faris    2023-10-12  574  		memcpy(indir, rss->indir.table,
-74a8dadac17e2b Adham Faris    2023-10-12  575  		       rss->indir.actual_table_size * sizeof(*rss->indir.table));
-25307a91cb50a0 Tariq Toukan   2021-08-16  576  
-25307a91cb50a0 Tariq Toukan   2021-08-16  577  	if (key)
-25307a91cb50a0 Tariq Toukan   2021-08-16  578  		memcpy(key, rss->hash.toeplitz_hash_key,
-25307a91cb50a0 Tariq Toukan   2021-08-16  579  		       sizeof(rss->hash.toeplitz_hash_key));
-25307a91cb50a0 Tariq Toukan   2021-08-16  580  
-25307a91cb50a0 Tariq Toukan   2021-08-16  581  	if (hfunc)
-25307a91cb50a0 Tariq Toukan   2021-08-16  582  		*hfunc = rss->hash.hfunc;
-25307a91cb50a0 Tariq Toukan   2021-08-16  583  
-4d20c9f2db83a0 Gal Pressman   2025-02-24  584  	if (symmetric)
-4d20c9f2db83a0 Gal Pressman   2025-02-24  585  		*symmetric = rss->hash.symmetric;
-4d20c9f2db83a0 Gal Pressman   2025-02-24  586  
-25307a91cb50a0 Tariq Toukan   2021-08-16 @587  	return 0;
-25307a91cb50a0 Tariq Toukan   2021-08-16  588  }
-25307a91cb50a0 Tariq Toukan   2021-08-16  589  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks!
 
