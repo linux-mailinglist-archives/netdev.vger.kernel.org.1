@@ -1,163 +1,122 @@
-Return-Path: <netdev+bounces-204306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DDEDAFA060
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 16:03:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61A5CAFA073
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 16:22:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 599193B33B3
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 14:02:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 498ED1C2693F
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 14:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4C79192D97;
-	Sat,  5 Jul 2025 14:03:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A20781CAA65;
+	Sat,  5 Jul 2025 14:22:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Z5JYXROO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NSmLw/Lh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E60A17BA1
-	for <netdev@vger.kernel.org>; Sat,  5 Jul 2025 14:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86CA19B5A7;
+	Sat,  5 Jul 2025 14:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751724193; cv=none; b=t7KXb+D7S2ly994t+6IOgUuNFOjCMh8zOcCjaOTGdYfPkdfybjxQJ5xsPmaQdTDfzIUzFGVSLlTXD10INjVQ1GCejnlxE3icSostujFEq/qLnwJ1ZES7E7yN8V6IVNz9RNIehOYh12M3CJsywSg3yKAwOi3oBcqma9ScmwJjjOo=
+	t=1751725363; cv=none; b=VcLy57NZCwskeuVk6GlDD5lkoRRWs+R5Cz7nx3cclC7tXQo54eJOVk34mkyTH266jzCYuKtoWmTgZWlyd4c347d7jR/aLdXi7jRx9htJs5WdbC24udO/Lzr4uYdndzpfBfFa8GcjNBmjdjD1q+zF+vw9VWdXFyxn/MFoz44Onxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751724193; c=relaxed/simple;
-	bh=QDoSXmn++2DYZA+XXDJ8e7cbvdCPxr22UuJ2fFIIp64=;
+	s=arc-20240116; t=1751725363; c=relaxed/simple;
+	bh=EKnvJSsHM8ulrLq2cUyRJJRTRCaqjDuz6/x0xf/Ok1o=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jLqj+S0t90nZsw3l4ZIAzdCYsXbe4KcDRgX/irC6ccO7z5FVkZ6K9+xdIwSSH3OdBBpMSv0aePVEyY5fcTCw3oT3M+lp+aMO/wJQs/7GjFGzkmb7rj0Ztf93zoAtGBRNiKAMXT2pT2Rv/7/sAPNYQpOl1e43ftCIjN58Ni3J4qs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=Z5JYXROO; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-749068b9b63so977167b3a.0
-        for <netdev@vger.kernel.org>; Sat, 05 Jul 2025 07:03:12 -0700 (PDT)
+	 To:Cc:Content-Type; b=nCCgJVW2bvdOwIU9HxAcmKGQjjts7IHpDVTy3QhmaGZFS4M6aEPoAjVFpZclcQZXviCBPIb/6nTgB8Cm7BdUB0ZXB1nquMy839G9W1uatHKE9pgCOr8pvfN11B4HxuCRDWGsvBDRjzKzkBYIm4tQsd4DlzSOeMJ2s6pHdmsuBK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NSmLw/Lh; arc=none smtp.client-ip=209.85.208.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-32b3c292bb4so15112831fa.1;
+        Sat, 05 Jul 2025 07:22:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1751724191; x=1752328991; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1751725360; x=1752330160; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=L+BExu2AJZhCqWTRL678knREcLDHHxulZ1eN9KwYoZs=;
-        b=Z5JYXROOLdcpYRshi9d2ILhNBfBkd4u/jBptJRcESZclwIkmdhID+tLl7D1ZXObZ7p
-         hQjEDtn+PIn+qJHZL2mwFIzrPbP8Emm7RbEyZFV5STnyKJE2z5y9prLaNgI2eCoEx1Hq
-         ndV+61E06iYjyWIc82wxp9K3+1ohQ5gccfaGAsV5O8hJQfiR3KNxOgo7lqPzNHIwr6/a
-         MrLXfPinRAffdGZgzAko/6g7+dbm3zP2e1gJ4KolYHRxyLxtxb7LcjJqZbjMagCP7rOz
-         HRr9bZM+dWrycRaQnjpNoycX9VqXBq8Hvtug6MSRJTN/Q+1ZO4hiZbxFo/BwSS6G9BjU
-         GT0Q==
+        bh=EKnvJSsHM8ulrLq2cUyRJJRTRCaqjDuz6/x0xf/Ok1o=;
+        b=NSmLw/Lh3f60MDGShQYUtxyOWFovFtSkDvQjX8roPslfPRLJZwSiTrHoDYLorLrG/J
+         hwluXnqjb2fOUbPQCD4InHZ5LYpYfQavtmAqQl5kg/8PalqomplDjJdt3R7MXljuI/vL
+         Tj9Z2EpN8yBs3oJjpJxRvA8i+lB/Hq3k/d/uAlVX0JjQ61sC0NDIOcAEi7YrYanAUI8k
+         +5vq+uTsFyfiNHJr+cF+OmFIXfITu65e3JW/6dKWqJiFC4PTg+CbNSFowVV61qkKbsab
+         lD585FjqovDgtDhXcFy+54WnsVmsGQTw9ctSgJKke/DNXg3YCIkbu3LYK4YLBiydaDwH
+         IA7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751724191; x=1752328991;
+        d=1e100.net; s=20230601; t=1751725360; x=1752330160;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=L+BExu2AJZhCqWTRL678knREcLDHHxulZ1eN9KwYoZs=;
-        b=Aas3OM85GwvdyFlEMmkirx6c/Rmph203piK6FNxCcHadne3Do6PLTPEq7K5fn3LNCC
-         7c9wKyC6kDvUYXFSGVU8lxrddATiFKEouB0BZ1C/v6t1fMmovq8RfI/pDfgYYbsaWe/B
-         Z6/QvHuv1IGqAHURVq5PLMyPtK4/NnlHFJDW5LvPg4NWXLyEeCclahOiY1TUg2MMBPv7
-         cMDaGv1JlSXiTy+ZElpyv7oqqD4B0X/FSqeuXhSKYt48MNiiXwDnvchx6zrvlcgfErVn
-         lwcky4dV88yrnE+2pYdl2ftyVFPZSsaXtaIz8/AF7A4UFhFLs/7uq3U6aVSanMIrjzZl
-         h1rQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWpgVmzxdOj9Y1EXEuc86XKVNKvKR3lBl0vrzNe6aJKPljrEU1B3BcS6aEkApab+m2tHc9Xrxo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4LS8k/qT1EW2WTBe2lTZyqM7kwp6iV/rn/l85Tc9y23anlbYJ
-	CyKUIjN2jL5SqiW6ITnXS22UYDo20cAOzCkLUdvMXLASIlXB16yhfLjYaUBnMzWfdjhe1PTtW+p
-	G+zUBHnMOIs/BJTBdUr6F+Piaje62Bl+SHvh9sD6z
-X-Gm-Gg: ASbGncuAZboNlkIEd9CJyPdfW1n27d4gVMcRvH9wpFhPxy70sTVFP3ze7oER1NeLl3N
-	bhxt0f/Ei15D7ecti4vvEnHISm87rh0x6i8gevIKu7ft2f+lMMP7sCbG8LCLGFo5suSt2NVHFlH
-	K8E3PC7kQ/gTY1xMpsWOwIWmEXaCYDchD6O0gUx5y3CqEr1jdUFrou
-X-Google-Smtp-Source: AGHT+IFbEFi7wKOyacHXcK5qJ340hGGYhfuVJE486BCEI2CXeLafwnsrvYKTLLl4Df+a1PTHSPucNuc6yE1eIV5mLSc=
-X-Received: by 2002:a05:6a00:2d96:b0:748:e149:fa89 with SMTP id
- d2e1a72fcca58-74cf6f2fcbcmr3720070b3a.8.1751724191447; Sat, 05 Jul 2025
- 07:03:11 -0700 (PDT)
+        bh=EKnvJSsHM8ulrLq2cUyRJJRTRCaqjDuz6/x0xf/Ok1o=;
+        b=YxRnS6NR+SF/DrCHIgNBFpw/IFSRY6ioTpVUSwRG7HkJLZqd+Kug8JyYcStF3/ndSh
+         5GgWvYRU8l2fong+6hDYvt/SmuJL6vS2BMZ1/WoDtNSN2IkNSJ0hWK7hYAXpq1RUtwHd
+         ZXggXix93Hz6bUrTZxpPZv2kt6J5hMQBg5ghR+Ignbeu1g9zwCTsxtGGiBrzmSf/qX8O
+         taS7PSSkIqsfPb5EKsTEj7MqMIxepH96+kOW85umBj68rn3f4uG1xN5xl8JuP+Y3ZoKC
+         PhKYZ/VGFdvd7rGMGtU3RKd4TZG03U4QS0prsayVK6micDyTt53TNBBl6Pd/horlH64E
+         79kw==
+X-Forwarded-Encrypted: i=1; AJvYcCUEtE5mmYRUHhAovZVdXnbjkR7OZ1GklhPzi2Jc882J+b0xiMIW6sdSw2Gkw9fk7aFTFHCDNSM7@vger.kernel.org, AJvYcCVFAVocGMeEm38Es0WEg4XMcQNtw5lT2XeMoNfBVhyDPIGsb/xn0zEJKy2tSVNROOtJZvSZFpaRyHjQ0bg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhpzTrEsPEIVZegXoWH9Mv/Bjt7TqWg27mjoEvs1kE3Zc8K/UP
+	jqB/1k/tgCAmiQYwFuSGv9f7otEdB6gG/AkkwiUFQ2p/l+NP7oCWIK7r0w0E5+n5yb/D58shXkw
+	Lo+TrrtcI8uQUuMGHHfKvEAkzHHlRS4Z8QV48lXM=
+X-Gm-Gg: ASbGncsXIVq8RJXNqCgbbfqJLOx9K0tLLRt5A2YX7+Ex00dkVY4Mf12B7wlKE06F/Pp
+	6oX0TuQ8gvRdwC6O/jjk+HqyfxlLkZb5/8KPIfqXv9oxUH9yhlNNUGktqejfF8FAMxg5DOJEgGJ
+	KzVF8xMHuqHWenR01mH9M9fGOQU9awGh3KoEPi+JU2GO5dFLTXuiQwo2iJgrGvevdMuOHc4bNu8
+	bAX
+X-Google-Smtp-Source: AGHT+IGuIQlSO3797vvLGrll9LAZKYQKZplapMq9u69AfgtSc7RATXdK57f65U7ENb+iG1b1TyqYhaomusbYbquohcc=
+X-Received: by 2002:a05:651c:889:b0:32b:3ca0:dbe3 with SMTP id
+ 38308e7fff4ca-32f199c75f9mr4452501fa.15.1751725359675; Sat, 05 Jul 2025
+ 07:22:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250704163422.160424-1-victor@mojatatu.com> <aGhpq58BI8mFpCEs@pop-os.localdomain>
-In-Reply-To: <aGhpq58BI8mFpCEs@pop-os.localdomain>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sat, 5 Jul 2025 10:03:00 -0400
-X-Gm-Features: Ac12FXxiK7JYPJuw8_FABXtMPU7Bkc4OfN6EHnMFbFmoYbWnHt8Xvf1tT2qtoB4
-Message-ID: <CAM0EoMkkQc+ZwEyY19oZMo_zuhTR-w2gCYdjhrvReNzcuQs9CQ@mail.gmail.com>
-Subject: Re: [PATCH net] net/sched: Abort __tc_modify_qdisc if parent class
- does not exist
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: Victor Nogueira <victor@mojatatu.com>, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, edumazet@google.com, jiri@resnulli.us, 
-	netdev@vger.kernel.org, pctammela@mojatatu.com, 
-	syzbot+d8b58d7b0ad89a678a16@syzkaller.appspotmail.com, 
-	syzbot+5eccb463fa89309d8bdc@syzkaller.appspotmail.com, 
-	syzbot+1261670bbdefc5485a06@syzkaller.appspotmail.com, 
-	syzbot+4dadc5aecf80324d5a51@syzkaller.appspotmail.com, 
-	syzbot+15b96fc3aac35468fe77@syzkaller.appspotmail.com
+References: <20250612114859.2163-1-pranav.tyagi03@gmail.com> <20250613181624.5684fc0b@kernel.org>
+In-Reply-To: <20250613181624.5684fc0b@kernel.org>
+From: Pranav Tyagi <pranav.tyagi03@gmail.com>
+Date: Sat, 5 Jul 2025 19:52:28 +0530
+X-Gm-Features: Ac12FXym_sLRKnvpL4ehI5Xa8tsBnF156fVik9VwPt420tw7zcBjXtJXW6zf9Q8
+Message-ID: <CAH4c4jJHiacPDWSS_S17WpAqkRNKBi7P=9f_QJdc8Cs=A4Zhhw@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] net: ipconfig: replace strncpy with strscpy
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, horms@kernel.org, skhan@linuxfoundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kernel-mentees@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 4, 2025 at 7:54=E2=80=AFPM Cong Wang <xiyou.wangcong@gmail.com>=
- wrote:
+On Sat, Jun 14, 2025 at 6:46=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> On Fri, Jul 04, 2025 at 01:34:22PM -0300, Victor Nogueira wrote:
-> > Lion's patch [1] revealed an ancient bug in the qdisc API.
-> > Whenever a user creates/modifies a qdisc specifying as a parent another
-> > qdisc, the qdisc API will, during grafting, detect that the user is
-> > not trying to attach to a class and reject. However grafting is
-> > performed after qdisc_create (and thus the qdiscs' init callback) is
-> > executed. In qdiscs that eventually call qdisc_tree_reduce_backlog
-> > during init or change (such as fq, hhf, choke, etc), an issue
-> > arises. For example, executing the following commands:
-> >
-> > sudo tc qdisc add dev lo root handle a: htb default 2
-> > sudo tc qdisc add dev lo parent a: handle beef fq
-> >
-> > Qdiscs such as fq, hhf, choke, etc unconditionally invoke
-> > qdisc_tree_reduce_backlog() in their control path init() or change() wh=
-ich
-> > then causes a failure to find the child class; however, that does not s=
-top
-> > the unconditional invocation of the assumed child qdisc's qlen_notify w=
-ith
-> > a null class. All these qdiscs make the assumption that class is non-nu=
-ll.
-> >
-> > The solution is ensure that qdisc_leaf() which looks up the parent
-> > class, and is invoked prior to qdisc_create(), should return failure on
-> > not finding the class.
-> > In this patch, we leverage qdisc_leaf to return ERR_PTRs whenever the
-> > parentid doesn't correspond to a class, so that we can detect it
-> > earlier on and abort before qdisc_create is called.
-> >
+> On Thu, 12 Jun 2025 17:18:59 +0530 Pranav Tyagi wrote:
+> > Replace the deprecated strncpy() with strscpy() as the destination
+> > buffer is NUL-terminated and does not require any
+> > trailing NUL-padding. Also increase the length to 252
+> > as NUL-termination is guaranteed.
 >
-> Thanks for your quick and excellent catch!
->
-> Reviewed-by: Cong Wang <xiyou.wangcong@gmail.com>
->
-> Just one additional question, do we still need to safe-guard
-> qdisc_tree_reduce_backlog()? Below is actually what pops on my mind
-> immediately after reading your above description (before reading your
-> code):
->
->
-> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-> index c5e3673aadbe..5a32af623aa4 100644
-> --- a/net/sched/sch_api.c
-> +++ b/net/sched/sch_api.c
-> @@ -817,6 +817,8 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, int=
- n, int len)
->                 cops =3D sch->ops->cl_ops;
->                 if (notify && cops->qlen_notify) {
->                         cl =3D cops->find(sch, parentid);
-> +                       if (!cl)
-> +                               break;
->                         cops->qlen_notify(sch, cl);
->                 }
->                 sch->q.qlen -=3D n;
->
+> Petr is making functional changes to this code:
+> https://lore.kernel.org/all/20250610143504.731114-1-petr.zejdl@cern.ch/
+> Please repost once his work is merged to avoid unnecessary conflicts
+> --
+> pw-bot: defer
 
-Sorry, meant to respond to this in last email: there's no need for
-this extra piece because with the patch posted by Victor this code
-will not be hit anymore.
+Hi,
 
-cheers,
-jamal
+I hope you're doing well.
+
+I noticed that Petr=E2=80=99s patch has not seen any updates for some time =
+now.
+I wanted to kindly ask if it would be appropriate to repost my patch
+at this point
+or if I should continue to wait until his changes are merged.
+
+Thank you for your time and guidance.
+
+Regards
+Pranav Tyagi
 
