@@ -1,91 +1,90 @@
-Return-Path: <netdev+bounces-204267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBEF3AF9CD5
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 01:54:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1789AF9CD9
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 02:03:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 480601C2795F
-	for <lists+netdev@lfdr.de>; Fri,  4 Jul 2025 23:54:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6668A1C4773E
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 00:04:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09383271444;
-	Fri,  4 Jul 2025 23:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D246A33F9;
+	Sat,  5 Jul 2025 00:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vw4C1srG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q9rajuje"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 854CB156237
-	for <netdev@vger.kernel.org>; Fri,  4 Jul 2025 23:54:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9A010E0;
+	Sat,  5 Jul 2025 00:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751673262; cv=none; b=Lx/rlKerU0A1ioyCFfA5N6mhrnIcaA+kf3myXDBUK5LiLcOI0iGrGYlDr2mjQT3AEFaEVaABBAIEVWjxfSZj3n90SSzHn3SXZSRPlITAhWJTmJH0F8FtUjfYBmQhCNxG3NFXCFLyr9W9Axd6vmam5/lKX+m5CvcgacN2RZOphoE=
+	t=1751673821; cv=none; b=Pp3tdXpnwbe+iO4zc6dBZkm7o64wJ/8qX5fIwIJc2yGjnogE7YeU3D+eQDn+fFAUufIeGaUp3GQ/Q26ix/HmTcqcIN5lDoddQG9Cp6uIR/U4eNXkK36xoRcun2O+FRJUXeGQrweHuJFctaDno8B/nzsiCJGzIxFtRE0mdvoPt7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751673262; c=relaxed/simple;
-	bh=V0xTBU47Qgx0GOfLF9JSCgbYSugS2nWrhW7eyP3cRK4=;
+	s=arc-20240116; t=1751673821; c=relaxed/simple;
+	bh=fc2HeCj8S7/bC0C27mDYSzPdHbvGJD07pU7oIodB5m8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H7RaY0NMt3JLZLpkfwRDUiGUV9r2Nzhha0OoJBfQCRcZM9qRtChS4moObN5u6MORHxx5OOIN47Zd/AXykK1JSOljh7+IRjeDrpJmW2MJI0n1TNADfvIXylL08R7D5s4L89a7oaVfsKgZXdLoUlqXUU19bxZm/I6q9+9ILqN/kT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vw4C1srG; arc=none smtp.client-ip=209.85.214.180
+	 Content-Type:Content-Disposition:In-Reply-To; b=NW0Iequ8WDJr3aBtSoD0rs09t4BpYZFLC11sEaezcAFoA8zxH06x2OtsVP83+0cx6BKGwGQwA4rU+GFeZVABiSOPTJ6hcphruTHUo0DMaese7JjTJoxIn/4khQQrK6JU3WCcrEviTqQ8LROYB/g3uUwIOfOSujO3paPh/Jy7T8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q9rajuje; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-23526264386so13422815ad.2
-        for <netdev@vger.kernel.org>; Fri, 04 Jul 2025 16:54:21 -0700 (PDT)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-73c17c770a7so1802646b3a.2;
+        Fri, 04 Jul 2025 17:03:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751673261; x=1752278061; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1751673819; x=1752278619; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2L9kJem12eSgr6YZ4XMgbcF7suPbHcisGaW5itGFjBo=;
-        b=Vw4C1srGAbUnbWS+TwZKLI9Wva2S7t++0P2kJ7Pimnnw3SSGaSOFU+FHlKUMfeMcKJ
-         X8fD5/vHv/9rIMb+I64f9LzAAX2qjx2zhJz0EcN4T8LHig8ADP1RGBwuXNsfdEFl5x6w
-         rPtqyiqsxWqnNWGIYP97+2xDQoOfYowUonY2Al9dWzdD3gYjv5EOO4Wpk4oYUIs94+PX
-         /wGhk8M81zObh9cMYO1ykbxG5q2wU3zT8UrSJxIzg+W9Tq+yQudl6RIoLtZLe3EqkBE/
-         ptjs8IpcAQKBgNBpRZRE+iUp5ucYmV6EvY5KkftFnSnLcHC6lkBF2G/ayQ0RTDSEzcSE
-         F0Mg==
+        bh=W2zJe7UIc4K7hUHwuWT+OfAK+G8q7OIxAC0g78/mEX4=;
+        b=Q9rajujeuUQ0j9vCztpzLSi3d6uAArc2phrJflpgJ81trc+0WNOWgfpxlAn+OirTMs
+         8n1IH7I8bBwa8Dq2h+ViLZ61PE54M5Pqh2nM5m1Y2h5ybv/Om9flEYKK5LJhryk3/+hw
+         uRB2je/oYf7UWrx4c33e4aLdOWwnVPi5rbLk9ZQy8ly2zQT11u8bKWGUjJA6RtuPlZox
+         0DcCIA2EVuMAO5HNcNLOLfhvlmvz3osnSG0falu7PtriKmCmgpFBDxgfG5K+q/P+EQ3b
+         Kbwt8KzLnVYW5+HQb07ehlUtMUBovqSusJnc0DFFoNp6wvjTP6/lRIT3ncG3BQUFf766
+         nXNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751673261; x=1752278061;
+        d=1e100.net; s=20230601; t=1751673820; x=1752278620;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2L9kJem12eSgr6YZ4XMgbcF7suPbHcisGaW5itGFjBo=;
-        b=dRY4VgCNNl63VvzXF96qEAXb3kx+QEju8xHEyrjf7xpwOeZ2eDdgjido6/m2DRZh83
-         tjUBKiRS7SE+Gt/KY3dchDbtGfbpNHMYDiZ3E53aRv6LX05mbH4fsKRkZ1nqRr48iMFL
-         S8l+yZPx+MAvWLg3HBAcIHADR+j9OqzhaF9JBuOpBxd4nesyRkDjYBxqGepU+dGefm5Q
-         Pv0bjXjGLVazvi2eWz25WEQUoT50c6ia+zWnkyj1ZLNXD5VSde6v8FmYUrbAHGpzdYAc
-         1HCCLAcUbRAz/X4EURXbe0YYO8l0zqxG4O6zFYj5LmYvgKzASVpvCz6Xp8thXKc3e5b0
-         vXVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX8+4V/LLV2jm9s2KSG00yqVM+Cbxjq/Gom18Uc38xpyOGmRitDa/jalzSa9N8YyqJzbcPpP1w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsaToKrY4TdDs1Dik5adZ5Vv7ROW2y8/fwRn58mpTmcBe41DwB
-	f/vB89vTzOVJJYtSPvleumK/dzAx5wrv9e/oqC8h0xH8h4BU054GMNUl
-X-Gm-Gg: ASbGncsePkpAmfBtXb0FTtcNCWGzPzRWRrZ11Ka0Ak+oVVinFoa5bl+ldurz00dfdr2
-	RN9OgVm6wyExn+ntH7v3TlzagFeLFWBLsYnNIZ/V58gy/fm6oeHMEVtJgFY7w4ONmCY1h72qm1s
-	4WA+XJilk9EtpnbxrI9UL0Oc+NGdwapuNx2xTawc9xGaJD1VNY1yMwHnJELDZA1C0NZMHJVYne4
-	b18c7e/huHiIHtEn2+R5FZsiWnkotXkuOs3WmMRRU+tQ7Rm9r1DhycSSsJdP0Q2cx3KwVQOQvjk
-	U4WhUt5bei8OoaGqZ+88m9Za1yiQFw5FvMnJXFCEOVIhrqv8hrhqKsipuMfof4klTxqh
-X-Google-Smtp-Source: AGHT+IFwGakgYPzhEli9n98Rh+goCnmHPuXp6IsKxbcj93P6yZ4n7xesrbOSU/7HCGsJhGGoVcm+eA==
-X-Received: by 2002:a17:902:ccc4:b0:235:e942:cb9d with SMTP id d9443c01a7336-23c8747dfafmr49291605ad.17.1751673260732;
-        Fri, 04 Jul 2025 16:54:20 -0700 (PDT)
+        bh=W2zJe7UIc4K7hUHwuWT+OfAK+G8q7OIxAC0g78/mEX4=;
+        b=BR+Bl5NK1Xblx4m6uCfzm+nDyS31m5Qsdm+Gnbr96lbbxm6kWXp8F0nXbj/hi42XyN
+         7utyA4Up/ECn21yUYt7+MrfbDTQ5UjcVlJ7S+mqAhu1LWMMlU95vKBEsX455GAu4yE5/
+         DBVdiHJUNbt54V9yDIKdbmQAObidTEtS+hFxvHwLI5zyHZt+9h60IZretYE6rzisHr++
+         aPxch9EQWPH31BFe2egbh6e3oUtdXhEU2+apESb16lQcFfOmG3D2sYTi43f7a10M21UJ
+         9eJCamqGSpQkhbFWb1oSfRTDXvP5NbZ/7+0sUM0TgDy/KSnAKA+ldC0M1YhBb5pw7P8a
+         6NNA==
+X-Forwarded-Encrypted: i=1; AJvYcCVI4AO8exFQJTwl4eKK+/0e7I3U43gYz6IJQDy1aDrwmS9wIP5+0lUCFJxqnCGt3BuRvGcj2anu@vger.kernel.org, AJvYcCWwZdPVSIvTE5CIAKqK3Gv6lC6OtJaihiEPQ9kavTIJNrkHbUNcz3B7psXOXcXDlKHNoI3ba1n6BLvoaBw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9i2X3yXFA/PI74wZEA5CL5QlXtoj6ffFOlR8gdXmuTsUgkGgn
+	P5YO1doa3soC6/9CK0urbN4SWLYkcS3iaXTeSVc5gzQ1VAI3lLIAZc9YzxAGGA==
+X-Gm-Gg: ASbGncuuGRUNuW3ajlFhBmPgUeMplEBUous2obG9qYGzvZTA7xdbpC0EH4L/rPzyIIJ
+	O/8RV3KtxPRakLV01B6ECBm30TFGU990OK3n9qFGuaYS92jQfxMgnsThejwqtlUxWZi4n17yx3y
+	BHunEoJQFX5E1vdn2r6rpTC6YxWfxLjINqGBrXJqcrYTwCgJW0Ld9kmA3qsm6X5Y+d75WovNoOH
+	UNTVCuGrw1Q4Z7RLaFYFvavn2TiCTYIYG1UBhmKnGSQCuKa/Yb0JWWn7CYOehFrBug2rXINKZ8X
+	XBM9hVgjlKtjuq+KewhyYzjJXgCiNh79ouuObuor93wpYlERtVEEvv7+bJndCOjsEFSq
+X-Google-Smtp-Source: AGHT+IEcbea5ZBSpxUSiZjb3AiPzERqxr4jb3dBYe9axwVAfIlOYvEulZyGw5jRZDcdF2I6M9WhhFQ==
+X-Received: by 2002:a05:6a00:6f11:b0:74c:efae:ff6b with SMTP id d2e1a72fcca58-74cefaeffc7mr3211137b3a.7.1751673819578;
+        Fri, 04 Jul 2025 17:03:39 -0700 (PDT)
 Received: from localhost ([2601:647:6881:9060:4a21:dfa9:264b:9578])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23c8455ba80sm28730215ad.114.2025.07.04.16.54.20
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce42b8044sm3075291b3a.143.2025.07.04.17.03.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jul 2025 16:54:20 -0700 (PDT)
-Date: Fri, 4 Jul 2025 16:54:19 -0700
+        Fri, 04 Jul 2025 17:03:38 -0700 (PDT)
+Date: Fri, 4 Jul 2025 17:03:37 -0700
 From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, jhs@mojatatu.com, jiri@resnulli.us,
-	netdev@vger.kernel.org, pctammela@mojatatu.com,
-	syzbot+d8b58d7b0ad89a678a16@syzkaller.appspotmail.com,
-	syzbot+5eccb463fa89309d8bdc@syzkaller.appspotmail.com,
-	syzbot+1261670bbdefc5485a06@syzkaller.appspotmail.com,
-	syzbot+4dadc5aecf80324d5a51@syzkaller.appspotmail.com,
-	syzbot+15b96fc3aac35468fe77@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] net/sched: Abort __tc_modify_qdisc if parent class
- does not exist
-Message-ID: <aGhpq58BI8mFpCEs@pop-os.localdomain>
-References: <20250704163422.160424-1-victor@mojatatu.com>
+To: Lizhi Xu <lizhi.xu@windriver.com>
+Cc: syzbot+1261670bbdefc5485a06@syzkaller.appspotmail.com,
+	davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com,
+	Victor Nogueira <victor@mojatatu.com>
+Subject: Re: [PATCH] net/sched: Prevent notify to parent who unsupport class
+ ops
+Message-ID: <aGhr2R3vkwBT/uiv@pop-os.localdomain>
+References: <686764a5.a00a0220.c7b3.0013.GAE@google.com>
+ <20250704080421.4046239-1-lizhi.xu@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,57 +93,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250704163422.160424-1-victor@mojatatu.com>
+In-Reply-To: <20250704080421.4046239-1-lizhi.xu@windriver.com>
 
-On Fri, Jul 04, 2025 at 01:34:22PM -0300, Victor Nogueira wrote:
-> Lion's patch [1] revealed an ancient bug in the qdisc API.
-> Whenever a user creates/modifies a qdisc specifying as a parent another
-> qdisc, the qdisc API will, during grafting, detect that the user is
-> not trying to attach to a class and reject. However grafting is
-> performed after qdisc_create (and thus the qdiscs' init callback) is
-> executed. In qdiscs that eventually call qdisc_tree_reduce_backlog
-> during init or change (such as fq, hhf, choke, etc), an issue
-> arises. For example, executing the following commands:
+(Cc Victor)
+
+On Fri, Jul 04, 2025 at 04:04:21PM +0800, Lizhi Xu wrote:
+> If the parent qdisc does not support class operations then exit notify.
 > 
-> sudo tc qdisc add dev lo root handle a: htb default 2
-> sudo tc qdisc add dev lo parent a: handle beef fq
+> In addition, the validity of the cl value is judged before executing the
+> notify. Similarly, the notify is exited when the address represented by
+> its value is invalid.
 > 
-> Qdiscs such as fq, hhf, choke, etc unconditionally invoke
-> qdisc_tree_reduce_backlog() in their control path init() or change() which
-> then causes a failure to find the child class; however, that does not stop
-> the unconditional invocation of the assumed child qdisc's qlen_notify with
-> a null class. All these qdiscs make the assumption that class is non-null.
+> Reported-by: syzbot+1261670bbdefc5485a06@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=1261670bbdefc5485a06
+> Tested-by: syzbot+1261670bbdefc5485a06@syzkaller.appspotmail.com
+> Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+
+Victor also posted a fix here:
+https://lore.kernel.org/netdev/20250704163422.160424-1-victor@mojatatu.com/
+
+I asked Victor there if we still need to patch
+qdisc_tree_reduce_backlog().
+
+> ---
+>  net/sched/sch_api.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> The solution is ensure that qdisc_leaf() which looks up the parent
-> class, and is invoked prior to qdisc_create(), should return failure on
-> not finding the class.
-> In this patch, we leverage qdisc_leaf to return ERR_PTRs whenever the
-> parentid doesn't correspond to a class, so that we can detect it
-> earlier on and abort before qdisc_create is called.
-> 
+> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+> index d8a33486c51..53fd63af14d 100644
+> --- a/net/sched/sch_api.c
+> +++ b/net/sched/sch_api.c
+> @@ -803,12 +803,13 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, int n, int len)
+>  			break;
+>  		}
+>  		cops = sch->ops->cl_ops;
+> -		if (notify && cops->qlen_notify) {
+> +		if (cops && notify && cops->qlen_notify) {
 
-Thanks for your quick and excellent catch!
+I think 'notify' should be tested first, as it was.
 
-Reviewed-by: Cong Wang <xiyou.wangcong@gmail.com>
+>  			/* Note that qlen_notify must be idempotent as it may get called
+>  			 * multiple times.
+>  			 */
+>  			cl = cops->find(sch, parentid);
+> -			cops->qlen_notify(sch, cl);
+> +			if (virt_addr_valid(cl))
 
-Just one additional question, do we still need to safe-guard
-qdisc_tree_reduce_backlog()? Below is actually what pops on my mind
-immediately after reading your above description (before reading your
-code):
+This is not how we test NULL or error pointers. Just "if (cl)" should
+be sufficient for NULL case.
 
-
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index c5e3673aadbe..5a32af623aa4 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -817,6 +817,8 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, int n, int len)
-                cops = sch->ops->cl_ops;
-                if (notify && cops->qlen_notify) {
-                        cl = cops->find(sch, parentid);
-+                       if (!cl)
-+                               break;
-                        cops->qlen_notify(sch, cl);
-                }
-                sch->q.qlen -= n;
-
+Thanks.
 
