@@ -1,166 +1,159 @@
-Return-Path: <netdev+bounces-204269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3A02AF9D00
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 02:48:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C581AF9D0E
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 03:04:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F3145422A3
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 00:47:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE53F1C27192
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 01:04:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C25621348;
-	Sat,  5 Jul 2025 00:48:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C493F50F;
+	Sat,  5 Jul 2025 01:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BJUZtmO1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YWvSppT1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7242EED8
-	for <netdev@vger.kernel.org>; Sat,  5 Jul 2025 00:48:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF481C2D1
+	for <netdev@vger.kernel.org>; Sat,  5 Jul 2025 01:04:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751676496; cv=none; b=Qfqwqj6zcYNIgJ9DP2O28EQkENX/2oukHjAi937F8VQkWwOVImdbAzcpKRCB99OMX07JDYaZ4IwbS4TKFaNMmu++1yXbrnaIw3ZcqMEqDOKXtXdpqGoJVUlCkU9VocFI8kOp6xgixIZzNqE//zeX8MKCfjh9XvkbANhZJUvq3a0=
+	t=1751677474; cv=none; b=gekN781QCCgAAq4fBJO99cjAQyXmnybR1GstrbPjEPYP5KUohbTqEocpf9PIqu9nqEVvrON+mq2OSL7yeD/5Y7VCDYxly0uztw4YJZU3zfipdoavJtsFIYlSii7gWh+fEQ29pls4ihQRYfpNzwHWNowEPJgtcqWoJCRiIdN7YMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751676496; c=relaxed/simple;
-	bh=CdvPjZAjx/92Jfy4Yqqcxcpnrd3RXwYZsPlPzXC0/PY=;
+	s=arc-20240116; t=1751677474; c=relaxed/simple;
+	bh=1oi4cqeRhaYHPseZ0E63JOKlByBvQKqBM80wpoAO/HU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G47C0vA4bIaKRZcjVXFbzDpwMzZkCQFXH43XEPKPF1UwEe6M+1Ts4V8nmmwihiTrLDu+T5595V/94mdWZaFQbr6+19JOr3QjzmpEDbLTguUApVh8jJTdoay6SdycgFHON44n8Q5SO+9uHc7QrZY0yRqUcsV0zW/DByS/YDosktM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BJUZtmO1; arc=none smtp.client-ip=209.85.214.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=UmjNeAYgSq0MNin3JnBbiEw9GSUMHO+g1isFcnuACzPjnlVO9AtIM7nxpr/LGGTxxIEaQ2gt01JP2i6WvMfWyDysDYsqD2Es5dCzmF4zMtSCyyF06TGD+YLEmKQ6AYnSIwYuP1Cf5TVU70IX/y8w2IaXck2U0O6uqtcid570Xzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YWvSppT1; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-23636167b30so13501855ad.1
-        for <netdev@vger.kernel.org>; Fri, 04 Jul 2025 17:48:14 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7490acf57b9so1082363b3a.2
+        for <netdev@vger.kernel.org>; Fri, 04 Jul 2025 18:04:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751676494; x=1752281294; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=kh/R74pyHyhrcRODL8p10TZyV918DFQKuUqR0nCt+4Y=;
-        b=BJUZtmO16OVCMqz3jEFphplB3AXhb3XTPrCPVbG0asolPnAsZ2Axsq8K9bXHV1uQJZ
-         3aSUvHyQITtLHHt/P2r80jmI88WaUq61XwoB3PLZ60nIQZjE4T3YHePMQuRH3fia4YRy
-         Hq7MPrM9+Xt2zMdRhoU0FBi82ylQ/3jYvewIMIvKjqMMs7eTqte1ofqzJ+MGgykHkzWY
-         bV5BAyv7F1gNHAbrrNKcieXGQiZq9QO2xm3YRUNCBFoxPFKFI95ezn2oAyviDNQwfsgo
-         t2tt/BnB5KoZcYpNInKoZl7WQfLfTHM0mxx+/sKFMG/MNAV7dyCa0mPYXdyAkKQ7bx9E
-         O2xQ==
+        d=gmail.com; s=20230601; t=1751677472; x=1752282272; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/uWxiKuTZY1yONxfCOM4zzlaNArqxuhl+/jFKeZr03A=;
+        b=YWvSppT1mRrXyeocV2jSWWzIiR99FV9tk4Wxdktm9zOZQCjNLy+VRCGk7qJxAZTBQr
+         dH6OnHyCyD9atRLYTM+TzvWhPYs/2RQdUdw0eEjZ52khjB4DN4cboLuHS155abbC4dov
+         Dr5M/vqfuH500CztGKxBuJxsuaihUxg76OOFnB3+lNFEs8lWQkrQEZU3R+HGvWtvN5L3
+         NEWpMhfm2jmjF/+0aAOlLnUeQ8q06DprSbQhxb5x9BgR3KD/uQ05vV1UUP+55rwTA20s
+         rQwvqr27MOqQ8CnszB3DILMBIp2No2jOUwdMyZjjGTs/JJZ0JiViU7R4eOotBZ0yYest
+         RWbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751676494; x=1752281294;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kh/R74pyHyhrcRODL8p10TZyV918DFQKuUqR0nCt+4Y=;
-        b=Rr+7KZNB7zXtyAfW5q8TISpZH0aKHwNlHH1wdUTjpUpSXTjs60q1FxG6XP1+XQlumJ
-         B1VaRvhgcNcQ5H6FOpQ0H1oHmTtRR5vSvRmJDDHW6wzmt5T12LGov1L/W5Xk+ycW0uTf
-         jKHKIdj9MHsWrYo9Q1H2Xi0HWNAgNPPA5UaVwr8LjtHbOIM3bbgnNAiYc8wOoxomjfPD
-         vyQn/rp+kE7F1JmMxWa3x/TLxM1dJEzhOCE4DaQ0x3M5sXKWo2qoSKWRWFovSvpt+wmw
-         aARnJxZoMEuVykEnhqAhJJv8PZZxzXSuFTRPFZc60Z6/CeBiBO9YfMD5R1TTyXvWxQLf
-         nbGA==
-X-Gm-Message-State: AOJu0YwUGgmQaNUevcSoSW2o9wDQvqh0wUAdWvxFv+4DGtjlkPoZJtYb
-	5wteSGZLQI+GiYnT3hELGFnGWuaxpaxOs3tCemtuTBuEaRRSQ/MT7XVQ7xYivg==
-X-Gm-Gg: ASbGnctBuoWrpW0UDQ6fUCy99zPW75Io2HY14h2oKzIfQh4v+2yiqoPUDwyIrPMyMZx
-	F4jvlwv9SNy2FjRWNAL1uHas7zJUb5cUhVtDPjU0CyphURRsc+fCXRxXelQVi2XOmDIFviSxbTJ
-	9VGK+1ZlXCvzWePmvuDw6uT9/jVI5+mfhUPK+nrQazKDRsJItIEqS9VGOPzx3acEjmj1HXtk27X
-	znEwcEjvUgrqajAV5BO6cqQvD2OccMUP+NkNKTx4Mxf6XMrs6ihHrTqjxmO55ShWYZKNZAIlwv1
-	7vFuR+aJKD6fRwMNvbrfpcqF6e78X9fgjEP2xpiXxc9+hPxHZ/wGGOxL6G6J7cMHG1cv
-X-Google-Smtp-Source: AGHT+IFSlsi3zOCzRftnjWS08djVmNdpCtMxC6g0jFbFBR5S/Vgmq2P9+x8AZwRaoxmeRsexAen3UA==
-X-Received: by 2002:a17:903:1aed:b0:237:de7e:5bbc with SMTP id d9443c01a7336-23c85ec7ba8mr62576975ad.49.1751676493917;
-        Fri, 04 Jul 2025 17:48:13 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751677472; x=1752282272;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/uWxiKuTZY1yONxfCOM4zzlaNArqxuhl+/jFKeZr03A=;
+        b=YaKIeta8YGTqqEe9kAu+S+clYSJ7+1+Rep17kzZMf/yw3qTBLAANyL41FDrLRNex5x
+         4U6WIL9XcRE4XZxOG/nCCiylXght/gbKnt0JI6H2/a+c7UYcVgIoiE7GPQ0ammKMHuSL
+         gClOgquNRzPtLUqfw60vs50L+pz1j8vEhca+y94ZM02vaGqBHGrx7Hd4o7WAtUk30CIU
+         wWppTgTnQTrXXgD5vMYKANj+NOsT9yT/J32dvumujYC/77YLYP+RIeHSsgD5jmI54g4I
+         GrNLTf1h+63LGbDejuDcC4ZlH07KFy+V+jt+bnE0RNkyn8QpFqdaP/h/i52VCmnGthVc
+         mLoA==
+X-Gm-Message-State: AOJu0Yy9VHn3MILg5JufFFLwHKqA2A7dR2xu8QV8DkH6gMYhe9CCxs6u
+	SPNS/9l2Fa4BwKHslYgtWjN4qGXaNrKaupIAwKBGLuw/X1qCLB/rnis2ncO2tA==
+X-Gm-Gg: ASbGncvWvRsGC9O0PhqQ5iU2bgSr02MJW0Ty6BmLikcxj0B3COrjt0yugo4qr2AsfTB
+	AT6Oujs4iyPlj2x5sfOwQXGl78P6psAoiXhDjV7OE36Tf4wH5YYFMlfANZ64i6ALFxv274RNkD4
+	aHi+e8nuwVgEpj9hEcIqpR76I+iUoc+VkwZcSUU/dm6aaGefgnLADHNWbk/viUPRApIOGGSbGun
+	HZAYNxD5GLyWSrqzUraqexxU/AJ5DVyUqlXb7FCgEmQgu3kCLcNlbPkr9UxDJ++kvxq+u5fYTpo
+	1ITD/FSnr52zy4zveZvAVQM0jPDJHPUj9KXsJB5palztYo4I+qu5/imxIWy95EJpZ9GR
+X-Google-Smtp-Source: AGHT+IGVzSPhaT2orYUcT0lqr8e2oQv9Vs3uMLICvB0rxGrn5YKeguKzy2bgm3/Q9Mv/BE1bnaXoPA==
+X-Received: by 2002:a05:6a20:a126:b0:21e:eb3a:dc04 with SMTP id adf61e73a8af0-225b754f893mr7104425637.3.1751677471904;
+        Fri, 04 Jul 2025 18:04:31 -0700 (PDT)
 Received: from localhost ([2601:647:6881:9060:4a21:dfa9:264b:9578])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23c84351a69sm29192925ad.63.2025.07.04.17.48.13
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b38ee5f32c1sm3008243a12.48.2025.07.04.18.04.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jul 2025 17:48:13 -0700 (PDT)
-Date: Fri, 4 Jul 2025 17:48:12 -0700
+        Fri, 04 Jul 2025 18:04:31 -0700 (PDT)
+Date: Fri, 4 Jul 2025 18:04:30 -0700
 From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, will@willsroot.io, stephen@networkplumber.org,
-	Savino Dicanosa <savy@syst3mfailure.io>
-Subject: Re: [Patch net 1/2] netem: Fix skb duplication logic to prevent
- infinite loops
-Message-ID: <aGh2TKCthenJ2xS2@pop-os.localdomain>
-References: <20250701231306.376762-1-xiyou.wangcong@gmail.com>
- <20250701231306.376762-2-xiyou.wangcong@gmail.com>
- <aGSSF7K/M81Pjbyz@pop-os.localdomain>
- <CAM0EoMmDj9TOafynkjVPaBw-9s7UDuS5DoQ_K3kAtioEdJa1-g@mail.gmail.com>
- <CAM0EoMmBdZBzfUAms5-0hH5qF5ODvxWfgqrbHaGT6p3-uOD6vg@mail.gmail.com>
+To: William Liu <will@willsroot.io>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>, Jamal Hadi Salim <jhs@mojatatu.com>,
+	Savy <savy@syst3mfailure.io>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [BUG]  Inconsistency between qlen and backlog in hhf, fq,
+ fq_codel, and fq_pie causing WARNING in qdisc_tree_reduce_backlog
+Message-ID: <aGh6HiQmcgsPug1u@pop-os.localdomain>
+References: <2UMzQV_2SQetYadgDKNRO76CgTlKBSMAHmsHeosdnhCPcOEwBB-6mSKXghTNSLudarAX4llpw70UI7Zqg2dyE06JGSHm04ZqNDDC5PUH1uo=@willsroot.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAM0EoMmBdZBzfUAms5-0hH5qF5ODvxWfgqrbHaGT6p3-uOD6vg@mail.gmail.com>
+In-Reply-To: <2UMzQV_2SQetYadgDKNRO76CgTlKBSMAHmsHeosdnhCPcOEwBB-6mSKXghTNSLudarAX4llpw70UI7Zqg2dyE06JGSHm04ZqNDDC5PUH1uo=@willsroot.io>
 
-On Wed, Jul 02, 2025 at 11:04:22AM -0400, Jamal Hadi Salim wrote:
-> On Wed, Jul 2, 2025 at 10:12 AM Jamal Hadi Salim <jhs@mojatatu.com> wrote:
-> >
-> > On Tue, Jul 1, 2025 at 9:57 PM Cong Wang <xiyou.wangcong@gmail.com> wrote:
-> > >
-> > > On Tue, Jul 01, 2025 at 04:13:05PM -0700, Cong Wang wrote:
-> > > > diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> > > > index fdd79d3ccd8c..33de9c3e4d1b 100644
-> > > > --- a/net/sched/sch_netem.c
-> > > > +++ b/net/sched/sch_netem.c
-> > > > @@ -460,7 +460,8 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
-> > > >       skb->prev = NULL;
-> > > >
-> > > >       /* Random duplication */
-> > > > -     if (q->duplicate && q->duplicate >= get_crandom(&q->dup_cor, &q->prng))
-> > > > +     if (tc_skb_cb(skb)->duplicate &&
-> > >
-> > > Oops, this is clearly should be !duplicate... It was lost during my
-> > > stupid copy-n-paste... Sorry for this mistake.
-> > >
-> >
-> > I understood you earlier, Cong. My view still stands:
-> > You are adding logic to a common data structure for a use case that
-
-You are exaggerating this. I only added 1 bit to the core data structure,
-the code logic remains in the netem, so it is contained within netem.
-
-> > really makes no sense. The ROI is not good.
-
-Speaking of ROI, I think you need to look at the patch stats:
-
-William/Your patch:
- 1 file changed, 40 insertions(+)
-
-My patch:
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-
-> > BTW: I am almost certain you will hit other issues when this goes out
-> > or when you actually start to test and then you will have to fix more
-> > spots.
-> >
-> Here's an example that breaks it:
+On Wed, Jul 02, 2025 at 08:39:45PM +0000, William Liu wrote:
+> Hi,
 > 
-> sudo tc qdisc add dev lo root handle 1: prio bands 3 priomap 0 0 0 0 0
-> 0 0 0 0 0 0 0 0 0 0 0
-> sudo tc filter add dev lo parent 1:0 protocol ip bpf obj
-> netem_bug_test.o sec classifier/pass classid 1:1
-> sudo tc qdisc add dev lo parent 1:1 handle 10: netem limit 4 duplicate 100%
-> sudo tc qdisc add dev lo parent 10: handle 30: netem gap 1 limit 4
-> duplicate 100% delay 1us reorder 100%
-> 
-> And the ping 127.0.0.1 -c 1
-> I had to fix your patch for correctness (attached)
-> 
-> 
-> the ebpf prog is trivial - make it just return the classid or even zero.
+> We write to report a bug in qlen and backlog consistency affecting hhf, fq, fq_codel, and fq_pie when acting as a child of tbf. The cause of this bug was introduced by the following fix last month designed to address a null dereference bug caused by gso segmentation and a temporary inconsistency in queue state when tbf peeks at its child while running out of tokens during tbf_dequeue [1]. We actually reported that bug but did not realize the subtle problem in the fix until now. We are aware of bugs with similar symptoms reported by Mingi [3] and Lion [4], but those are of a different root cause (at least what we can see of Mingi's report).
 
-Interesting, are you sure this works before my patch?
+Thanks for your report.
 
-I don't intend to change any logic except closing the infinite loop. IOW,
-if it didn't work before, I don't expect to make it work with this patch,
-this patch merely fixes the infinite loop, which is sufficient as a bug fix.
-Otherwise it would become a feature improvement. (Don't get me wrong, I
-think this feature should be improved rather than simply forbidden, it just
-belongs to a different patch.)
+> 
+> This works on the upstream kernel, and we have the following reproducer.
+> 
+> ./tc qdisc del dev lo root
+> ./tc qdisc add dev lo root handle 1: tbf rate 8bit burst 100b latency 1ms || echo TBF
+> ./tc qdisc add dev lo handle 3: parent 1:1 hhf limit 1000 || echo HH
+> ping -I lo -f -c1 -s32 -W0.001 127.0.0.1 2>&1 >/dev/null
+> ./tc qdisc change dev lo handle 3: parent 1:1 hhf limit 0 || echo HH
+> ./tc qdisc replace dev lo handle 2: parent 1:1 sfq || echo SFQ 
+> 
+> Note that a patched version of tc that supports 0 limits must be built. The symptom of the bug arises in the WARN_ON_ONCE check in qdisc_tree_reduce_backlog [2], where n is 0.  You can replace hhf with fq, fq_codel, and fq_pie to trigger warnings as well, though the success rate may vary.
+> 
+> The root cause comes from the newly introduced function qdisc_dequeue_internal, which the change handler will trigger in the affected qdiscs [5]. When dequeuing from a non empty gso in this peek function, only qlen is decremented, and backlog is not considered. The gso insertion is triggered by qdisc_peek_dequeued, which tbf calls for these qdiscs when they are its child.
+> 
+> When replacing the qdisc, tbf_graft triggers, and qdisc_purge_queue triggers qdisc_tree_reduce_backlog with the inconsistent values, which one can observe by adding printk to the passed qlen backlog values.
 
-Thanks.
+If I understand you correctly, the problem is the inconsistent behavior
+between qdisc_purge_queue() and qdisc_dequeue_internal()? And it is
+because the former does not take care of ->gso_skb?
+
+> 
+> While historically triggering this warning often results in a UAF, it seems safe in this case to our knowledge. This warning will only trigger in tbf_graft, and this corrupted class will be removed and made inaccessible regardless. Lion's patch also looks like qlen_notify will always trigger, which is good.
+> 
+> However, the whole operation of qdisc_dequeue_internal in conjunction with its usage is strange. Posting the function here for reference:
+> 
+> static inline struct sk_buff *qdisc_dequeue_internal(struct Qdisc *sch, bool direct)
+> {
+>     struct sk_buff *skb;
+> 
+>     skb = __skb_dequeue(&sch->gso_skb);
+>     if (skb) {
+>         sch->q.qlen--;
+>         return skb;
+>     }
+>     if (direct)
+>         return __qdisc_dequeue_head(&sch->q);
+>     else
+>         return sch->dequeue(sch);
+> }
+> 
+> The qdiscs pie, codel, fq, fq_pie, and fq_codel all adjust qlen and backlog in the same loop where they call qdisc_dequeue_internal to bring the queue back to the newly requested limit. In the gso case, this always seems incorrect as the number of dropped packets would be double counted for. In the non gso case, this looks to be fine for when direct is true, as in the case of codel and pie, but can be an issue otherwise when the dequeue handler adjusts the qlen and backlog values. In the hhf case, no action for qlen and backlog accounting is taken at all after qdisc_dequeue_internal in the loop (they just track a before and after value).
+
+I noticed the inconsistent definition of sch->limit too, some Qdisc's
+just shrink their backlog down to the limit (assuming it is smaller than
+the old one), some Qdisc's just flush everything.
+
+The reason why I didn't touch it is that it _may_ be too late to change,
+since it is exposed to users, so maybe there are users expecting the
+existing behaviors.
+
+> 
+> Cong, I see you posted an RFC for cleaning up GSO segmentation. Will these address this inconsistency issue?
+
+No, actually the ->gso_skb has nothing to do with GSO segmentation. It
+is a terribly misleading name, it should be named as "->peeked_skb". I
+wanted to rename it but was too lazy to do so. (You are welcome to work
+on this if you have time).
+
+Thanks!
 
