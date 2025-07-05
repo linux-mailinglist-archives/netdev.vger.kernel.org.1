@@ -1,156 +1,95 @@
-Return-Path: <netdev+bounces-204317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07BBDAFA109
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 19:34:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B385EAFA126
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 20:19:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 372E87A6991
-	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 17:33:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67F301BC41AD
+	for <lists+netdev@lfdr.de>; Sat,  5 Jul 2025 18:19:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C416211A31;
-	Sat,  5 Jul 2025 17:34:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D3B9212B31;
+	Sat,  5 Jul 2025 18:19:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M2whp148"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QCFrurRN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94FB6211A11;
-	Sat,  5 Jul 2025 17:34:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4448134A8
+	for <netdev@vger.kernel.org>; Sat,  5 Jul 2025 18:19:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751736867; cv=none; b=jWZ16/QACqACY6iDINIP7YWO2Sig/7rzFVxBPRszPEtR2wpPAtiiAM9RJzjtxc0td5Qw70yEY1GLOu1uGoOMOwfujjrj+WkhrClyOxcEbdss075FqK/z7UfJ784e1ddIrUYfMHQ6rWXYnWUJbO5C+9+eTSZMAu+2+NTru/tWncg=
+	t=1751739550; cv=none; b=cC9ESmiVe6TsI0agrMwzJTh7R+db8YDOfZELyLLlyTmfEcFhwySQqVzoD8PoZxTYY19tbagjUywwx/eF+/2IHkH+vshq7tXmldeaMg69HiifuLAwhPJhOgInATSjGwA6UDiyqsVu1gajo4o6LOoG2QvNFpcm0eRavQ6JhW+WHmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751736867; c=relaxed/simple;
-	bh=jwjO89dAruZlxXW25Yo8Gimm/KsplfgPKs8KiTMRLJE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F6d/WcHweaH1ntRcLbqr7kEEp0smKMzXPwEeB8wzJUTrWkliNFnD4EPDnVzXlMwFiHqvbHNEcM7BT/1sj0m1gc0fi2reh2/ZbEY9UmE2ULAowjdwM+63s1TVwVfdaAVyzuqZLIPIo3LtqdN1OudXr18g4rxle1U+uaP6HWcMARg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M2whp148; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751736865; x=1783272865;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=jwjO89dAruZlxXW25Yo8Gimm/KsplfgPKs8KiTMRLJE=;
-  b=M2whp148BT5+IzXAvu8sRCsJtENR53e+ztomc6V8mGhAxrAGkMQJWhXC
-   UjeYT2h43kfVTgbrNhz5lnmSQezhLM1PffT1TBqszY4UkfjixDDpjZKco
-   yI9N1KZ5Pa36r/vGGy2SMEEC2Tq1odYQ3Vx8E+tVaDAAFPSVXZBrcOH7X
-   rIYyMQAQX06R95aB9+CPUawr2+vSxzCNvBtuw0hlpyofejjwxs+A7Pot2
-   FgjWAY8nWXOBTD1fNCB85vhbLslN+Cia/zlPJsm0rmyRTFEllkqCUHWUR
-   IgumbMHyzseey8n5htqmonZQIhZ9qs9kfitiBjHE45YVYjZb6L/uKfgBu
-   w==;
-X-CSE-ConnectionGUID: Q5JnjcN3QAGLQZAG0Qanzw==
-X-CSE-MsgGUID: OvzkN3D+SZ++SDkYJzxmqQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11485"; a="57790097"
-X-IronPort-AV: E=Sophos;i="6.16,290,1744095600"; 
-   d="scan'208";a="57790097"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2025 10:34:25 -0700
-X-CSE-ConnectionGUID: UjlxWgo5RW6vclon7VAVJQ==
-X-CSE-MsgGUID: whd9aa+uQ8m2unXGIE7e1g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,290,1744095600"; 
-   d="scan'208";a="159203564"
-Received: from lkp-server01.sh.intel.com (HELO 0b2900756c14) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 05 Jul 2025 10:34:22 -0700
-Received: from kbuild by 0b2900756c14 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uY6mJ-0004dz-2F;
-	Sat, 05 Jul 2025 17:34:19 +0000
-Date: Sun, 6 Jul 2025 01:33:21 +0800
-From: kernel test robot <lkp@intel.com>
-To: Eric Woudstra <ericwouds@gmail.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, bridge@lists.linux.dev,
-	Eric Woudstra <ericwouds@gmail.com>
-Subject: Re: [PATCH v13 nf-next 1/3] netfilter: utils: nf_checksum(_partial)
- correct data!=networkheader
-Message-ID: <202507060106.A5xgr1Rs-lkp@intel.com>
-References: <20250704191135.1815969-2-ericwouds@gmail.com>
+	s=arc-20240116; t=1751739550; c=relaxed/simple;
+	bh=/SmLkSLLzKeVDP7Cvme86a74M//CZrJoxpLpziodCD0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Chmafj2Lm7zgmVVIgtlwTQt30yStobtEFE3G7jweUMP32oNgKxIb4f+XUxBg0KojjwOBvqNRTcv2StoHI/X4JniFsh01Wz12mc7b7BRopb0mnrF7oF0H6efqA0Br0PvDrF+p7sNPRImIUe7xQZwKIKpM5zpwBv7zt1BEnq2zwVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QCFrurRN; arc=none smtp.client-ip=209.85.222.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-884f2b3bc2eso281906241.2
+        for <netdev@vger.kernel.org>; Sat, 05 Jul 2025 11:19:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751739548; x=1752344348; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=/SmLkSLLzKeVDP7Cvme86a74M//CZrJoxpLpziodCD0=;
+        b=QCFrurRNR1wgg7g91twlRx0k3dOm9VfvcHzFITJqaRkzYKtGrzjOFXI72jpniDnlrU
+         vA4EqjNi2pMCMbcvC7/dOA12L64oIZc6nYEIcOfYCNi7rwiY2QV4vU7GZOmTDC9uJPcI
+         M4tEr2Ntvwp/z9h8mFVXRDh0JUgI+d3rJ0fwlEc0ueVJ4JE+2kMpwzZz3QEA/bWDQal9
+         9MGE2ofYp3CS4bMm6PjxLDI9KRf01D95qVkphTm/FuCSJCeyDCoNcqOTUZ/Hkj/so8fE
+         uYnd+8KKgqppnzVjuZL3mypft8QKNb3lbiRV+l6bs4AupEMkYhAXPyazfuIrwWP5+pNI
+         pVgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751739548; x=1752344348;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/SmLkSLLzKeVDP7Cvme86a74M//CZrJoxpLpziodCD0=;
+        b=dzeVlvcLDTRymScY40rT9InJpvvmR6yrkbbG/L+tcdUMV2RGza+cd7K72EOmIONHbH
+         SExNblWZ3IQRdojPHSdIK1Lf5mrRLQwxpn5VA9nWVe/0eY2vs0UBPnA756GvQn3OiUPK
+         /XLtgzYzGjeoQv+PoMdB6Oenh62gR+0sjqp4PgzAHYxL+dZwlaEpqasblzSd1DfX47jY
+         7GYM9VCZaMyiu+wgkfMVkeGBQPzywS6QyPNWqoCjjkd+vvJelj/CMtxdKOgH0fOFR2s5
+         IbFnmQCmnGUwZoix+I7Zwr+fNtlv7oJAYeBc2fGuyFQO4M2rz4bAmDLDEdazxR1mMPms
+         CakQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU9nqn0bCaBHNtr4dEa/jJHR9Lbv4bN0EtqO5Q8YXZBTv0D2eb/qzlOu4rYun/hWjDk51Kk8jg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxlp5X1QtXqzw6riPYH90HA8Yg3vM54giv+FguDYVELXdGieiu9
+	EOiVNYpwHHYb+Q/k4DFtedH89ouyDQp6yUpUWNZX+sL0dM5SJAgLQCsrAM67LQwwflJuUl5TbGL
+	Bf4sWxCO7Kk1J5U2CauXda9xXfUZOPZk=
+X-Gm-Gg: ASbGncu8RodX3hViahtkVhEbenwEIDs9JawjGyCrgzktDO4D8fMnKZgZ5vCelfVqyxb
+	hHayKSIcWSzFQbrne7Dvr36qd4C2wxiEwYRWgPIT9H3Baw/gsFXWe5gI65YhW36bIRiqNXFZhQQ
+	vqwwJBslCg2qFgSQoIYtAg6ilZ3Gjw7kuc/v2yFQ3eOPo4nJ4X2VrpwAb0yWiM/CIu/yKoLOHu+
+	vVA
+X-Google-Smtp-Source: AGHT+IGW/3mDaE2WnD/gk0j6hfYQAdnUFBVj+aVjmMm6t3a2YQlud9TM4v1IrqO7qUy/zqfSjEsnAimUUc4EGgwe9rM=
+X-Received: by 2002:a05:6102:2922:b0:4e7:f3d3:a283 with SMTP id
+ ada2fe7eead31-4f2ee2bc326mr4682201137.25.1751739547671; Sat, 05 Jul 2025
+ 11:19:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250704191135.1815969-2-ericwouds@gmail.com>
+References: <20250627042352.921-1-markovicbudimir@gmail.com> <CAM_iQpVm66ErGcm+WriMSoudh8-XYt+GiEH48b0un3G9vpA=oA@mail.gmail.com>
+In-Reply-To: <CAM_iQpVm66ErGcm+WriMSoudh8-XYt+GiEH48b0un3G9vpA=oA@mail.gmail.com>
+From: Cong Wang <xiyou.wangcong@gmail.com>
+Date: Sat, 5 Jul 2025 11:18:56 -0700
+X-Gm-Features: Ac12FXzgQplEvvoB9Jv3iqKiCoNidf_icgXFLHtp0A_PnYWoWLP-esWItuVQUs0
+Message-ID: <CAM_iQpXW2fSdQOjXDufv8DYxGA5fcPVEzB8qrphLHte9XeT8xA@mail.gmail.com>
+Subject: Re: Use-after-free in hfsc_enqueue()
+To: Budimir Markovic <markovicbudimir@gmail.com>
+Cc: security@kernel.org, jhs@mojatatu.com, Mingi Cho <mincho@theori.io>, 
+	Linux Kernel Network Developers <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Eric,
+Hi Budimir and Mingi,
 
-kernel test robot noticed the following build warnings:
+I just re-tested this. This bug has been gone after Lion's fix:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=103406b38c600fec1fe375a77b27d87e314aea09
 
-[auto build test WARNING on netfilter-nf/main]
-[also build test WARNING on horms-ipvs/master linus/master v6.16-rc4 next-20250704]
-[cannot apply to nf-next/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Woudstra/netfilter-utils-nf_checksum-_partial-correct-data-networkheader/20250705-031418
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git main
-patch link:    https://lore.kernel.org/r/20250704191135.1815969-2-ericwouds%40gmail.com
-patch subject: [PATCH v13 nf-next 1/3] netfilter: utils: nf_checksum(_partial) correct data!=networkheader
-config: x86_64-randconfig-121-20250705 (https://download.01.org/0day-ci/archive/20250706/202507060106.A5xgr1Rs-lkp@intel.com/config)
-compiler: clang version 20.1.7 (https://github.com/llvm/llvm-project 6146a88f60492b520a36f8f8f3231e15f3cc6082)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250706/202507060106.A5xgr1Rs-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507060106.A5xgr1Rs-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> net/netfilter/utils.c:131:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected restricted __sum16 @@     got int @@
-   net/netfilter/utils.c:131:24: sparse:     expected restricted __sum16
-   net/netfilter/utils.c:131:24: sparse:     got int
-   net/netfilter/utils.c:155:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected restricted __sum16 @@     got int @@
-   net/netfilter/utils.c:155:24: sparse:     expected restricted __sum16
-   net/netfilter/utils.c:155:24: sparse:     got int
-
-vim +131 net/netfilter/utils.c
-
-   122	
-   123	__sum16 nf_checksum(struct sk_buff *skb, unsigned int hook,
-   124			    unsigned int dataoff, u8 protocol,
-   125			    unsigned short family)
-   126	{
-   127		unsigned int nhpull = skb_network_header(skb) - skb->data;
-   128		__sum16 csum = 0;
-   129	
-   130		if (!pskb_may_pull(skb, nhpull))
- > 131			return -ENOMEM;
-   132		__skb_pull(skb, nhpull);
-   133		switch (family) {
-   134		case AF_INET:
-   135			csum = nf_ip_checksum(skb, hook, dataoff - nhpull, protocol);
-   136			break;
-   137		case AF_INET6:
-   138			csum = nf_ip6_checksum(skb, hook, dataoff - nhpull, protocol);
-   139			break;
-   140		}
-   141		__skb_push(skb, nhpull);
-   142	
-   143		return csum;
-   144	}
-   145	EXPORT_SYMBOL_GPL(nf_checksum);
-   146	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks!
 
