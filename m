@@ -1,152 +1,144 @@
-Return-Path: <netdev+bounces-204419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9374AFA5C9
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 16:30:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 431F8AFA5F9
+	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 16:46:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 594EE189305F
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 14:30:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE1783B43BC
+	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 14:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC5F2AD0B;
-	Sun,  6 Jul 2025 14:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C9D2882C6;
+	Sun,  6 Jul 2025 14:46:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qij0/zJo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JOHaNyse"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF06CA6F;
-	Sun,  6 Jul 2025 14:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20102135AD
+	for <netdev@vger.kernel.org>; Sun,  6 Jul 2025 14:46:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751812222; cv=none; b=VtrVfBV6Jvb+Bh0RVSlYbQHeSE3sdEKW9hrWlr/dPN9eRoeEtra15uzWPxHSW0FFcMHhfvIyExSNXiU+sUtce0Uq/3BxHv4lH/HnQlkJHQwz2nNeq+prdQpMQBk9SCwwZDizCz+X6o1i4xXTchml9JAPvKi/9qDgi3PFIq1Ysuc=
+	t=1751813163; cv=none; b=qgatxMykd5/RdDlFUwPY4gA47rlxYFupA8/daD4vERAPEw+NnybOYpCG3NPSY+jAS2hHUsEROcXlK+I6O6na6ih5peTMCUFZCoE70IUfd4UVo/GLM9wMZTFZU8drR6mpVVskzodrvHFXTAiCm4YFlbYpH6nRJvv7LEyAODzRHZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751812222; c=relaxed/simple;
-	bh=Os3p122TLkem1wFS19Yci4rOcV8RY/p5XKcAomC5zKk=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=S/z5H27Q2OrZCuiUnaimJArEN+zvZ9kkhiQyO2RouLsE8OCSbMghXvqOLEl5F1GKSRwuYMJGvPPl8/4UkjWe+pTguyzU3y0qYpeCP96EB0U0Xm0UE2Rc3tHbTxYBHvHnY83be9OLPjAG4cv0oq5Iq0APQ0kU63o5ASTfVBQDwhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qij0/zJo; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e8259b783f6so1757296276.3;
-        Sun, 06 Jul 2025 07:30:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751812219; x=1752417019; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ILk6V+IjCGdWOhQWfk6SrwBKe81/cN3kOICCBDFtPzw=;
-        b=Qij0/zJotKtNvL0NFyrVDuBOhanG5L655xQWOAEGGEOnMUxHhNOOxB/wHbkx1MJjyy
-         20zm+EN2Xo7KJ8n384QjGtKu77x5mPFg3VPh5pRiAH45heOBuCiRJ9Jqo0Nf93LAW5yu
-         r9zHt6gfA6Z3RKsCZ22EQ/DBXIaEkrxRa1ovqZ1MHTWUfkqSuSjqZqokpod1wrk+RtCD
-         yf/5fa1TGXbnooP6TvhJ22KbrGyOxU4JatR22PYUVMroS+c31NanUThBnru4FZLs+aqL
-         AEfX1DIKeGQ9nlSTPja0paBENwkKRSSeKhfVrZutCIVeYx2q791fxuC2jMrezmh8J5nJ
-         eD/w==
+	s=arc-20240116; t=1751813163; c=relaxed/simple;
+	bh=4DbTlb5Y+2nPoZPtuGoDMcpTgssTLkBbLMQtueNDNr4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=VZhuls0ibWhr4t7gnblrpGohmcUY/kQ3V4+mxQULJhTKJDVX54CeuS4MTN3h2VzKiRIx2Az/8ZhT4JKM0spxl7Szs3MStkphtNSJ4WQhDbHA95cfL6Gowi/wPWjC9yiYBTaG5hdEBdG3DFFwnTaZWrK/77kbnH/mRcoT36X6RQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JOHaNyse; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751813160;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=7yfm2/nR8Fm8CG3trRJnXBCO5odY4C5ewI1q0oEUm1A=;
+	b=JOHaNysejjI/2xha0L34/dxoxViMBCTiVHZQH0zLVZNR3k2eNgVwwG+YbdaYeAsSYoxrZm
+	YJxCJ+RqFVpsE8bIVFLsjuR5kjowVprbAKoxx3mO2TkCpFUhAE6/xfZ8Lxq39XS6r12+FQ
+	oL6B1wbDNDiLrWx4RHkT4diI5/DtdwU=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-212-U3k0YnS5M8ySBdV0JbEliA-1; Sun, 06 Jul 2025 10:45:59 -0400
+X-MC-Unique: U3k0YnS5M8ySBdV0JbEliA-1
+X-Mimecast-MFC-AGG-ID: U3k0YnS5M8ySBdV0JbEliA_1751813157
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-32b40be4525so16337961fa.2
+        for <netdev@vger.kernel.org>; Sun, 06 Jul 2025 07:45:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751812219; x=1752417019;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ILk6V+IjCGdWOhQWfk6SrwBKe81/cN3kOICCBDFtPzw=;
-        b=tdFq5A2LXRfSQKT11V/1ZjJSys3cer6pBnh/K0ZF0mRRgFgibFwaqhQLE/6WS/9fGc
-         lztNmH77Q72QmE/5lU+WBpxS6j6dU6Jk4EQDJAaie/gw4XJ2r7KkA0xIwBDfLN+Frh5O
-         JQkR2bKXLG8+f5nL+kHWh8btXE/7kl3oBK/L7d4lpPOYg7Yd3C+DrPGmd8fDb7haPuEX
-         /1R1k90XkPYbllyq6ONTlnJJQ5SAD5lqgiErgwErLkmfq7oWe/4gKNrjINAwveZRqe0v
-         gm8dDuaavsWm94V1B8PoDs2WoUJ6Ih1owJyEf35WJahKEnrJO0GiPkY0yrBJDOUoiX21
-         gEOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWCaQpRLqW9T7k2PuH3XZLmq3OxTW4n9Vl2yh4kSlXgBkKvBPoqfcemHMDK8L/W/xHtSoZflnIB@vger.kernel.org, AJvYcCWuqjA9TrQnZULVTSDXD4P+cVTTQHu7rKCN1inKbNpP3d51rdsEhLr4J23dvgaQp2Oh+mOO6PUE/0rIyTk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxV+IceVEMkv9/TwvpojLFtusEB2hCyG/7DWTPrkdFX0KMcI8/c
-	6Ae7hKauOJtT8KSHj7Z4Mo78VoDK2iFf1daYOQ2xvKbelQInT9o4UCGT
-X-Gm-Gg: ASbGncupq2WdgzJN3/2lf8a0o7RUsPtg4BfjKk5As/zpkN7prVV+20l+tYcFXYb+blt
-	FB6JlPeRYucLw8Zp/hwJOSp3KCD1hYD6BQQcRj/Hjn/qdk0Ar9PnAMGGs4GmSPKqYmUsOR9bHx8
-	RoWeq9Y4vzjGQw8tMxbb7UfpaM5Sg8M2csYZZFTGBOGUsvIUSadsumQb5vUfjduVhI9qOWARdfY
-	eOVKDqti9JyvFVLVU8X3ClOC5rYCadG45G9LYxJvDStsgjngYPYnW3sTFc4CbmBLCkQu+SAwEW4
-	VGydidDTERQOTMm1qWYsMMe0N8Qx7CxNzgigqBkaRsZRhLw0NEBMfdip7UZPKWeE/j1fqIf1Q7o
-	0mpx2eTC6yGMilx/A9RHtoq4PvKgo/FWaFDo05rA=
-X-Google-Smtp-Source: AGHT+IEBmKQ51ZAVM2knwYxTBZrzCKTaZIBinugB6wBxG5OAXF22jsYHYXdSZcwqnMwbxhIIzKhdhg==
-X-Received: by 2002:a05:690c:38a:b0:712:d946:788e with SMTP id 00721157ae682-7166b5f6d7emr106376527b3.14.1751812219293;
-        Sun, 06 Jul 2025 07:30:19 -0700 (PDT)
-Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e899c440e7bsm2016366276.37.2025.07.06.07.30.18
+        d=1e100.net; s=20230601; t=1751813157; x=1752417957;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7yfm2/nR8Fm8CG3trRJnXBCO5odY4C5ewI1q0oEUm1A=;
+        b=QcI+aCoRtkSA2INAJrDiU2SlRixE/281vujfbNmftOd59A21/O0QqFWJTksPVkj7iE
+         8numKU9PiIdbY2g4wqK8NdSTmhz0J1bjgOFB9zhWMTBKrIah98/jpoq60WyNwPDTDeyz
+         7SY0Az3FlceO8TmICemz//X3qe0LzA7IGFy4gVjhtxqSnqVeCPDY5QyzRkSVo43VzI9z
+         TFixzT12xxWYcpTAjbwAAbpGJvUK1L3o9w5tCsYmbpIy2qxhREO0s68Qj576rxOjLkZO
+         koKGQVndE31Out+7CK9c9v+01WARFgjAFdow4bUBJsCP02Edu738m7zUu4nOBkg5cxqa
+         mtCg==
+X-Gm-Message-State: AOJu0Yz1YHqKYQU6pxKfWfLGkuuZG5t9RV+A3b8GuKku/w7QEbLfbL2+
+	3Omcb+cenJsX8ZPhcezMkcUDUOrr61VXzfqc68jbRYTPGflgzfbwkfq97P9Z++hHPIY3aXPg8GZ
+	ge0ODkc4uiNsHocqO+e4XYVjfo7arAd53PJhwqKWQcKE4k5Q8K6rucHGNrW8c+4EqLA==
+X-Gm-Gg: ASbGnctuxloxgY2DTk6KMmtJZca8/+9wuK42CKQ4+m3bsiyHiexxEqOtk9LNA+5Bglo
+	mszcGYJxZHF2/11IfeXgdLHBZd7psXNZwiRNtVksHTCITjUIkXW030rvByj11pYdWfN4VLcerGj
+	z9Jpv936XxG2z1c0L99EhP4DqpsebI1rZYHeQcag4tun2ECBhGRJFWFlFikPUNQkrzo41rA1PwY
+	7rD+yk7G7y/GhpTDwv3LliOr9DEsnt68LeggLLuzlUF+boTvBrlPTHHCQRcqzshR6YTkxfbwUAY
+	gk5nPRJLb3JohEMUicYfhTZ+xAdwFDPalsiMVu3cNNNETqs=
+X-Received: by 2002:a05:651c:2115:b0:32b:7111:95a1 with SMTP id 38308e7fff4ca-32f19b53425mr11731781fa.41.1751813156655;
+        Sun, 06 Jul 2025 07:45:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHe+nMzSXNfhSd5KCwXb3/NhFkRgP8YzyViTAvLtl8abk+Gx2zjbo8KZNDtSv8g94K6//qw5w==
+X-Received: by 2002:a05:651c:2115:b0:32b:7111:95a1 with SMTP id 38308e7fff4ca-32f19b53425mr11731751fa.41.1751813156206;
+        Sun, 06 Jul 2025 07:45:56 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-32e1b17aa83sm9128731fa.98.2025.07.06.07.45.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Jul 2025 07:30:18 -0700 (PDT)
-Date: Sun, 06 Jul 2025 10:30:18 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Cong Wang <xiyou.wangcong@gmail.com>, 
- Fengyuan Gong <gfengyuan@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- toke@toke.dk, 
- edumazet@google.com, 
- "David S . Miller" <davem@davemloft.net>, 
- Jamal Hadi Salim <jhs@mojatatu.com>, 
- Jiri Pirko <jiri@resnulli.us>, 
- Stanislav Fomichev <sdf@fomichev.me>, 
- Kuniyuki Iwashima <kuniyu@google.com>, 
- Ahmed Zaki <ahmed.zaki@intel.com>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- cake@lists.bufferbloat.net, 
- willemb@google.com
-Message-ID: <686a887a34d5a_3ad0f3294c@willemb.c.googlers.com.notmuch>
-In-Reply-To: <aGdZFhGu40UD6UDU@pop-os.localdomain>
-References: <20250702160741.1204919-1-gfengyuan@google.com>
- <aGdZFhGu40UD6UDU@pop-os.localdomain>
-Subject: Re: [PATCH net-next] net: account for encap headers in qdisc pkt len
+        Sun, 06 Jul 2025 07:45:54 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id E735F1B89EAB; Sun, 06 Jul 2025 16:45:52 +0200 (CEST)
+From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Subject: [PATCH net-next v3 0/2] netdevsim: support setting a permanent
+ address
+Date: Sun, 06 Jul 2025 16:45:30 +0200
+Message-Id: <20250706-netdevsim-perm_addr-v3-0-88123e2b2027@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAAuMamgC/23NywrDIBAF0F8JrmsZX4ntqv9RSrE6aVzkgYqkh
+ Px7xU0phFldLvfMRiIGj5Fcm40EzD76eSpBnBpiBzO9kXpXMuHAFTCu6YTJYY5+pAuG8WmcC1T
+ 11sjOgGaqI2W5BOz9WtU7KYMyWhN5lGbwMc3hU99lVvsqcxCHcma0HICWL3sRIOUtoBtMOtt5r
+ GDmP6QDfoxwCrRthbqYlmvdwx+y7/sX0fShrwYBAAA=
+X-Change-ID: 20250128-netdevsim-perm_addr-5fca47a08157
+To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, 
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+X-Mailer: b4 0.14.2
 
-Cong Wang wrote:
-> On Wed, Jul 02, 2025 at 04:07:41PM +0000, Fengyuan Gong wrote:
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index 11da1e272ec20..dfec541f68e3a 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -3944,7 +3944,10 @@ static void qdisc_pkt_len_init(struct sk_buff *skb)
-> >  		unsigned int hdr_len;
-> >  
-> >  		/* mac layer + network layer */
-> > -		hdr_len = skb_transport_offset(skb);
-> > +		if (!skb->encapsulation)
-> > +			hdr_len = skb_transport_offset(skb);
-> > +		else
-> > +			hdr_len = skb_inner_transport_offset(skb);
-> 
-> This pattern seems repeated in a few places, other than the two you are
-> patching, I saw another one:
-> 
-> 2465 static netdev_features_t hns3_features_check(struct sk_buff *skb,
-> 2466                                              struct net_device *dev,
-> 2467                                              netdev_features_t features)
-> 2468 {
-> 2469 #define HNS3_MAX_HDR_LEN        480U
-> 2470 #define HNS3_MAX_L4_HDR_LEN     60U
-> 2471 
-> 2472         size_t len;
-> 2473 
-> 2474         if (skb->ip_summed != CHECKSUM_PARTIAL)
-> 2475                 return features;
-> 2476 
-> 2477         if (skb->encapsulation)
-> 2478                 len = skb_inner_transport_offset(skb);
-> 2479         else
-> 2480                 len = skb_transport_offset(skb);
+Network management daemons that match on the device permanent address
+currently have no virtual interface types to test against.
+NetworkManager, in particular, has carried an out of tree patch to set
+the permanent address on netdevsim devices to use in its CI for this
+purpose.
 
-From a quick grep, this is the only other case, right?
- 
-> Maybe worth a helper now?
+This series adds support to netdevsim to set a permanent address on port
+creation, and adds a test script to test setting and getting of the
+different L2 address types.
 
-If only one more, I wouldn't respin for that.
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+---
+Changes in v3:
+- Fix shellcheck warnings in test script
+- Link to v2: https://lore.kernel.org/r/20250702-netdevsim-perm_addr-v2-0-66359a6288f0@redhat.com
+
+Changes in v2:
+- Set the permanent address on port creation instead of through debugfs
+- Add test script for testing L2 address setting and getting
+- Link to v1: https://lore.kernel.org/r/20250203-netdevsim-perm_addr-v1-1-10084bc93044@redhat.com
+
+---
+Toke Høiland-Jørgensen (2):
+      net: netdevsim: Support setting dev->perm_addr on port creation
+      selftests: net: add netdev-l2addr.sh for testing L2 address functionality
+
+ drivers/net/netdevsim/bus.c                  | 22 +++++++--
+ drivers/net/netdevsim/dev.c                  | 14 +++---
+ drivers/net/netdevsim/netdev.c               |  9 ++--
+ drivers/net/netdevsim/netdevsim.h            |  9 ++--
+ tools/testing/selftests/net/Makefile         |  1 +
+ tools/testing/selftests/net/lib.sh           | 23 ++++++++++
+ tools/testing/selftests/net/netdev-l2addr.sh | 69 ++++++++++++++++++++++++++++
+ 7 files changed, 129 insertions(+), 18 deletions(-)
+---
+base-commit: e96ee511c906c59b7c4e6efd9d9b33917730e000
+change-id: 20250128-netdevsim-perm_addr-5fca47a08157
+
 
