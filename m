@@ -1,102 +1,172 @@
-Return-Path: <netdev+bounces-204440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 439AEAFA736
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 20:36:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0911AFA771
+	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 21:21:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A0FF3A6669
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 18:35:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53E3A1898A44
+	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 19:21:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302F52877E4;
-	Sun,  6 Jul 2025 18:36:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 927971F463F;
+	Sun,  6 Jul 2025 19:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="ZObrtIBH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JkK5jTfk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B355A1C5D77
-	for <netdev@vger.kernel.org>; Sun,  6 Jul 2025 18:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1236617A309
+	for <netdev@vger.kernel.org>; Sun,  6 Jul 2025 19:21:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751826975; cv=none; b=tfiXrJ2AFRT/txHhAgld+XmErLIc0KKFrlV/FWYa9jyG7HL2tF2CS5CpIb+7emMT4rfbxeewHuR3FPu4r4Tzwqzu64nMZmrlpLSgxIqudx6QPvPLfMiQqs9YIwHWaB3s7hOaVIc/vx0DPzivopjHQCPtwOo4OXtl40bs75byL38=
+	t=1751829679; cv=none; b=OmOVKYpSZ4lVYox3mEuFeSYNiLXDaBCS6ttbFAbogc9wPqoh7s8/t65zMmdsLtzYNXKMgW+tvZmm2Ug6EGXcbD3rf6yQlJc5lsfD2NiFbjSQCrciSAC7l+oOmsmAuk7/Vt3fAiGfTvG6AOXvEuxBguyNmHKf0acJ14ONeRpxjyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751826975; c=relaxed/simple;
-	bh=EaSyyumbPn/z7D+Peo+TAe7w8FD0BhRKW0vhSRvqVvI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i9/9N0p5BOrraflK8eEAfnqU1MSA7GTcpyaOqdXOL7jazveycPidMCpV1uyRIXUtaOIuZC0Bo7qUW7vxDeDz602ykmrmIehnX3iK5CQ/4+atuhI6Xl2pInHToaOPcj8Ed18yqr9g9XFw0UiHUMkuTA2KyPbyQ7tMC+Q0UDfWK7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=ZObrtIBH; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7426c4e3d57so399570b3a.2
-        for <netdev@vger.kernel.org>; Sun, 06 Jul 2025 11:36:13 -0700 (PDT)
+	s=arc-20240116; t=1751829679; c=relaxed/simple;
+	bh=0OKj2CuAxo5PE3lgiAI0emXC0RhoMOS67STyWIJ5Yu0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=apcHcATvN5Ize8cUrWbEDqorR0M7ujXJO+TmSz75wj/c1pLcfbOmILx30kibx8M2CPSb5eXglTMg/0jlxz/w7GLfSUD8SLncrGYDEbbnBcudz8zTOxQndgED+I8FUJWtn2Vc6hBExkaan6CB3hBaKXK1aKeR4RT6mk8aZCBTk+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JkK5jTfk; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-313a001d781so1850705a91.3
+        for <netdev@vger.kernel.org>; Sun, 06 Jul 2025 12:21:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1751826973; x=1752431773; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EaSyyumbPn/z7D+Peo+TAe7w8FD0BhRKW0vhSRvqVvI=;
-        b=ZObrtIBHEY6pPbYUQqBzAYsakvIjgeIsFRdEsBTqK7Xwgk1D4+5Q58wn/bGnj0oe5e
-         y93APPaN7TUAoa8lAmH0VIXCcE0OIgwF/7t189p0jEu/q9AR54OBBhoB+0jx3ePJHayO
-         0gMG4xBOxJeRecmmaZiS0ldW9sHJOKsk7jSweTaQUCr1+NLXbfMFbmqAFu6AOiRgaVPM
-         ukgSTsGEY5sH2MwY17cLSHZ5tii7a6xOya3jyuoUb6kXpKtSrPe1OaVCCF/zx01XJemr
-         uooeRI0UI8NLJXTHGw3y9ODEiZ1qW50ASqL58Rp9xJafMwfOO3K5JZMO8tG3V2npAIh2
-         QzMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751826973; x=1752431773;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1751829677; x=1752434477; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EaSyyumbPn/z7D+Peo+TAe7w8FD0BhRKW0vhSRvqVvI=;
-        b=QekUF5YBOwxbLws5XZUgHBef+meD3uBN0dg0JSS89VmLB7cYQuHkNbJXo1lU+ElZta
-         cPKd8A89hOs5DSNqpTmptiz4vzZTtiJa/H6awY+S+EgXtxKT5OuksvYvK1WQINCPHjJc
-         NMwn8Mo7wFQ7Ll38aZ6QmVzZU+VGWVoP5d4/nq69aIc6MFNJg+B1/nTJcFLxUwQOp8K8
-         XH2Eadi4tbPbyEKvG2bSH36h8Ii1xPYt1ngXaB/THphlxjfD2Z12R/fr5V+LcsaFz2ib
-         mtCwo9VGh38QmMWUE0nvAzW1iwS7NJG9XiDZQnoIotvW8ibUyvhfY3xItStiHKILo0DB
-         SoQA==
-X-Gm-Message-State: AOJu0YzzWEZN0uL1Rwgs4CAJGWIrDnOjnlwc/2jom3Y3WJ+IQiyYhTeS
-	yGYGKAyEs6OzW3ShVMBQf0lmF3anyDFPDxvboKgAZeQWMqzhCBCNAah+ilYi3f4c9+M=
-X-Gm-Gg: ASbGncteEERFQqveT4UpDodY9QvvKFq/paA/yuV9XY//5eWdEt2vML/WRwr8xLRBhbf
-	nxT69+du5/W/g0VP39I9lVK8HU9TA/hO7U7pBD866gHYEg885Iv2/C4jhud+uxucaC3VUk0sKBp
-	Gfdvy/P9uFEt+afR5H3Pid6ze+qeRO4b2iIpDZ8jCi4ug3F+Z+DMjHftEe7+QtiG0oUUA0METOh
-	J0Z3/0Xv99tf2Ccb3KD4hJdjjvoxoWc8oNKySS4I2ktr1M0SZOj7ufhkk5quiO6zEWkiJrc373B
-	pux9OhrExNS13whT+5xXpjb/5EcCDSOrmjyZ9aoVuCdjJ8B44QKqJC+NH0k=
-X-Google-Smtp-Source: AGHT+IG91q24WBqoOFy3IButW8Z/B4H/etgIOaxw4tS2rHdcvGhID6hawdPFnji8oLdkp4ZpY0LPqA==
-X-Received: by 2002:a17:902:dad1:b0:234:c549:da0c with SMTP id d9443c01a7336-23c87178d8bmr52961415ad.0.1751826972892;
-        Sun, 06 Jul 2025 11:36:12 -0700 (PDT)
-Received: from t14 ([2001:5a8:4528:b100:8dab:9982:878f:106d])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23c8431e15dsm66523425ad.36.2025.07.06.11.36.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Jul 2025 11:36:12 -0700 (PDT)
-Date: Sun, 6 Jul 2025 11:36:09 -0700
-From: Jordan Rife <jordan@jrife.io>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Subject: Re: [PATCH v3 bpf-next 05/12] bpf: tcp: Avoid socket skips and
- repeats during iteration
-Message-ID: <s55nxnbs4gq56ytq627n7wanqkcrbn5vmbht43tdrrbcbe5jl7@uufojhrm6qyh>
-References: <20250630171709.113813-1-jordan@jrife.io>
- <20250630171709.113813-6-jordan@jrife.io>
- <aGLYO7XRafb9ROQi@mini-arch>
+        bh=7VGRc7y2RCJf8zHE4Lxpl+ymRedBL4YGuUrOObcVcUY=;
+        b=JkK5jTfkYA8mpeaNB+eK6+mgf7TCOEYgr545imZs4gNUHsEAYCDBcN5fnYgMn35t6Y
+         x/OBIbiFfPvMUZ/O5ZVAAjlXVCkZC02II6FJShluDTQTICg66Xv0OzwmKUEtIiDscG4x
+         BmtpsKFXCZ5LzMjlJSGVZK2YC1ozX5549lb66JW8+q0DQIaREZPLA+EC7mpw+xR5DgFg
+         +M5qqYM8EJFLMuGHrnt71drqEl5sFYFcjRe07czCpKAntQzd6vMMl6FgwYgKD6Gln+1l
+         pmS12jRf8CpY3BsqbgwVHURMyfTFQMKzIYCN6sfQFa/eSBQ9+bhXjcDDd4lSU+gN/LaK
+         EIlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751829677; x=1752434477;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7VGRc7y2RCJf8zHE4Lxpl+ymRedBL4YGuUrOObcVcUY=;
+        b=TIcL2mEAFy6ULmK91TbpmXr/XBbZa737L9Ld8OBeIbYSW0COTRf6BmXHcLBNsqDFjT
+         CCGM7Zn5F1FtPs01NopKsD8VXU1Kn1kbmPa/qAKrU9VeftxmOS0jxfSBc1jtrfoi5IN3
+         VrPulW1pE5MrPlEWx3dl8EerSa+G3TfVkGwfsXqi6HSkdyWS9ZW46M75SHhwv/0+5kPq
+         vbH3xsjrz4DSklmLSkKooCqr0fDjz/8FF63cGVdnKMID/zaSpfCyeqq3XKMuV7UeIbVi
+         kMj0xLdMssS54rAxoSeiGITZFnN3/F7p7LpY7TSfXa6yjjN24gI8q2xhFYkb3s+EpvfY
+         6ywg==
+X-Forwarded-Encrypted: i=1; AJvYcCW7ndkO7tu0l6E30eZ34VhCDSTcyikLlFn+90R2C9i/JDt22bYvP+1RZcsBiCzwyqQsTaG6Is0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyG7grluXzyoLKsYYP2F6ztJmoTPMAtfLnzqEYqL7dKGZzySzIw
+	iRtZWoJDfuLcPSmGasFfJELdCXtCAXnTwDfxZ3X8f7CO1q3gk8e52zBF5vLp7xra+6ZYK0ScLL/
+	8jEWv6gpfh72PwpVGOL5ZnOAAyBxDtlGp8lo8UjWH
+X-Gm-Gg: ASbGnct3XqEFedndQTEKFhB2Xi00ZFq5Oud30XkoCPRki08dmcKdeNBX7Eo+Zf+ZUaS
+	22o6YG+HpMFdhJUzJeRzkBEcrdp3HbmXQgHb/aitCLoITA2+3CAhmwkAoVm6466pGUwvCbT//kl
+	IjIuH7JWdkmG7mp7HYMrzrBU6ohXAemhL+viNr20iUD6gYBusPzla71N9dImFjNG8Ve5qOjSgal
+	0VB
+X-Google-Smtp-Source: AGHT+IGLEi8Ql17Lm/5wwAMceK5HwCFYMkPYSR5SWZdp+dy3YWrrM4bgmWNMiMRZzMaCav1yyeQavdzIOlSrpN4wU+E=
+X-Received: by 2002:a17:90a:c2cb:b0:312:ec:412f with SMTP id
+ 98e67ed59e1d1-31aac44cc39mr16702693a91.14.1751829677204; Sun, 06 Jul 2025
+ 12:21:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aGLYO7XRafb9ROQi@mini-arch>
+References: <20250702223606.1054680-1-kuniyu@google.com> <20250702223606.1054680-7-kuniyu@google.com>
+ <686a81f1ec754_3aa65429440@willemb.c.googlers.com.notmuch>
+In-Reply-To: <686a81f1ec754_3aa65429440@willemb.c.googlers.com.notmuch>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Sun, 6 Jul 2025 12:21:05 -0700
+X-Gm-Features: Ac12FXzYg6AUW5KRd7_n0C_sTyOx5WPYNW9r59VWQkqtj4AqOrJ2jQCa7Q1eXcU
+Message-ID: <CAAVpQUD1Exoz6iY-Bzst5EWD6Oh0z_adQ_R4QdUjad+WykWfiA@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 6/7] af_unix: Introduce SO_INQ.
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> nit: let's drop {} around sk_nulls_for_each_from?
-> nit: add break here for consistency?
+On Sun, Jul 6, 2025 at 7:02=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Kuniyuki Iwashima wrote:
+> > We have an application that uses almost the same code for TCP and
+> > AF_UNIX (SOCK_STREAM).
+> >
+> > TCP can use TCP_INQ, but AF_UNIX doesn't have it and requires an
+> > extra syscall, ioctl(SIOCINQ) or getsockopt(SO_MEMINFO) as an
+> > alternative.
+> >
+> > Let's introduce the generic version of TCP_INQ.
+> >
+> > If SO_INQ is enabled, recvmsg() will put a cmsg of SCM_INQ that
+> > contains the exact value of ioctl(SIOCINQ).  The cmsg is also
+> > included when msg->msg_get_inq is non-zero to make sockets
+> > io_uring-friendly.
+> >
+> > Note that SOCK_CUSTOM_SOCKOPT is flagged only for SOCK_STREAM to
+> > override setsockopt() for SOL_SOCKET.
+> >
+> > By having the flag in struct unix_sock, instead of struct sock, we
+> > can later add SO_INQ support for TCP and reuse tcp_sk(sk)->recvmsg_inq.
+> >
+> > Note also that supporting custom getsockopt() for SOL_SOCKET will need
+> > preparation for other SOCK_CUSTOM_SOCKOPT users (UDP, vsock, MPTCP).
+> >
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+>
+> > +static int unix_setsockopt(struct socket *sock, int level, int optname=
+,
+> > +                        sockptr_t optval, unsigned int optlen)
+> > +{
+> > +     struct unix_sock *u =3D unix_sk(sock->sk);
+> > +     struct sock *sk =3D sock->sk;
+> > +     int val;
+> > +
+> > +     if (level !=3D SOL_SOCKET)
+> > +             return -EOPNOTSUPP;
+> > +
+> > +     if (!unix_custom_sockopt(optname))
+> > +             return sock_setsockopt(sock, level, optname, optval, optl=
+en);
+> > +
+> > +     if (optlen !=3D sizeof(int))
+> > +             return -EINVAL;
+> > +
+> > +     if (copy_from_sockptr(&val, optval, sizeof(val)))
+> > +             return -EFAULT;
+> > +
+> > +     switch (optname) {
+> > +     case SO_INQ:
+> > +             if (sk->sk_type !=3D SOCK_STREAM)
+> > +                     return -EINVAL;
+>
+> Sanity check, but technically not needed as SOCK_CUSTOM_SOCKOPT is
+> only set for SOCK_STREAM?
 
-Thanks for taking another look. Will address this and other nits in v4.
+Yes, I planned to move other AF_UNIX specific options and reuse
+unix_setsockopt() for DGRAM and SEQPACKET.
 
-Jordan
+
+>
+> > +
+> > +             if (val > 1 || val < 0)
+> > +                     return -EINVAL;
+> > +
+> > +             WRITE_ONCE(u->recvmsg_inq, val);
+> > +             break;
+> > +     default:
+> > +             return -ENOPROTOOPT;
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+> > +
+>
 
