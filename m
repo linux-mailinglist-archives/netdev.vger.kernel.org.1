@@ -1,172 +1,145 @@
-Return-Path: <netdev+bounces-204391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41B12AFA51D
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 14:57:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4512DAFA526
+	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 15:14:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93454179364
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 12:57:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 713227A855C
+	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 13:13:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3972820F098;
-	Sun,  6 Jul 2025 12:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE20214A8B;
+	Sun,  6 Jul 2025 13:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H74tGhnO"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [13.76.142.27])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 612A11D432D;
-	Sun,  6 Jul 2025 12:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.76.142.27
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01DAE2E3701;
+	Sun,  6 Jul 2025 13:14:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751806618; cv=none; b=OhqIrOI4OEa89lQmzFrMq8b7Ss852kPEjVPoUZK7G4w5QcNeT7InsudMYfC5L9hKZ8iB/pGonxK/rcQyB0L2R3sWiXp7I3P1pAcHVj0688iwrJ/eYYLSEntjWPC4bwQSu41ejLlh/FZe6zIuJIsU6g1qSeX8a5WTq+pIdjv/6nE=
+	t=1751807665; cv=none; b=oyxxmBPC/xFAoYIpB+46OaGFm/5Mwk01HuxQXwv0lbMqWAZppIab4QEeUfN5HNuKAWowtd+lurzUqqnbESjiZADRAmRLfPrzItvfWFWEy895P4LweAfz4oVt8TYhUv9LZq+aKhXQWtOE53GwRI8nIutwqAh0HwLUBWoeU1xGT6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751806618; c=relaxed/simple;
-	bh=yGyfR8pc5R6xxQY2Hclru8EO9YQuivrLTWTlrwbMtjY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=Y2BF8dsv8z6Sy3JOdsY5H05wEDjV6HcMroOv6exziKvalzd+21vP9Bmy9DrwVvYjQOC/vG47N1A8Slt6Xom1EKHiCxLRd5ijAcoEeh2gJh3fbhfxwCPwQuNOhVO7d1g2EUOlVsgAVwhms9w81IZPkc8/OseADbvjYi4/+cCvlBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=13.76.142.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
-Received: from weishangjuan$eswincomputing.com ( [10.100.72.77] ) by
- ajax-webmail-app2 (Coremail) ; Sun, 6 Jul 2025 20:56:09 +0800 (GMT+08:00)
-Date: Sun, 6 Jul 2025 20:56:09 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: =?UTF-8?B?6Z+m5bCa5aif?= <weishangjuan@eswincomputing.com>
-To: "Krzysztof Kozlowski" <krzk@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	rmk+kernel@armlinux.org.uk, yong.liang.choong@linux.intel.com,
-	vladimir.oltean@nxp.com, jszhang@kernel.org, jan.petrous@oss.nxp.com,
-	prabhakar.mahadev-lad.rj@bp.renesas.com, inochiama@gmail.com,
-	boon.khai.ng@altera.com, dfustini@tenstorrent.com, 0x1207@gmail.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
-	linmin@eswincomputing.com, lizhi2@eswincomputing.com
-Subject: Re: Re: [PATCH v3 1/2] dt-bindings: ethernet: eswin: Document for
- EIC7700 SoC
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2024.2-cmXT6 build
- 20241203(6b039d88) Copyright (c) 2002-2025 www.mailtech.cn
- mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
-In-Reply-To: <9316adcb-4626-4ff8-a308-725c6ab34eba@kernel.org>
-References: <20250703091808.1092-1-weishangjuan@eswincomputing.com>
- <20250703091947.1148-1-weishangjuan@eswincomputing.com>
- <9316adcb-4626-4ff8-a308-725c6ab34eba@kernel.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	s=arc-20240116; t=1751807665; c=relaxed/simple;
+	bh=u8xJci6BCA/NPXr2bGUVttu27gcVFr7isab2Lo+Nre0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o0VcCat9uPJeXhUBjbUOIEBOkG6zl1C9Bss5nlSrB90P/yb1ZW/4jQ8PnNMAlnPkp1AJEo3nF9DdgM2N+eFHvzl2GkObXAvW6jDpbB8O9VU8bfSN0nGO54ejnmNM4s51NHGE9BgtnVqQCWIc5c/7r3Ff0wR9UOtDV1DGzGeI/+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H74tGhnO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F04BC4CEF4;
+	Sun,  6 Jul 2025 13:14:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751807664;
+	bh=u8xJci6BCA/NPXr2bGUVttu27gcVFr7isab2Lo+Nre0=;
+	h=References:In-Reply-To:Reply-To:From:Date:Subject:To:Cc:From;
+	b=H74tGhnOnclNfDF4L3HiqPatu/Ckv4SZwOZieRM9X1HBvT72eGWkjGnmDrv7miyw9
+	 /md3SO6VV9wp5un7SLJY585Cu/xC634IOPRqKSenlFAWLasra7D84WocasA5yNAdlD
+	 truaLbkyAf1bmoInf5c1WugXZSj9/M49L3VtGnO0G/wlS3W6obpgMsPh1oh5ZBHhLa
+	 OVciZG90FoRDiu/0VBG5iGHISg1+KxXT01I0j1NFUAoFVv/Y/X1jlDlCm1VwhNH99F
+	 l5V7Z5whmNhUv3QtzTCBJdRKtGTxMvkg62s/rmxA1PI1IvYi/g1Oi0d8wu9E/jWLMx
+	 5blPMHji5owrA==
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-55628eaec6cso2112782e87.0;
+        Sun, 06 Jul 2025 06:14:24 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWesOGrBnNtEBaTu+Rgx9QLxBjgSkk6UzfJG6rN2hpqKBwniNO3Jeu39v48FExmG/MEdjpBYJTg@vger.kernel.org, AJvYcCXkrovdX4KjTXTX1cnRxPee/pR0AcEFfOBIEeSzjNDb6RjWw0AGLyctsZi5+NYD4pQ8SWHaJiTe9Ia+@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2Nwu2D3nRaBL8sVw9SAomqFQQg/n/QTJvHmByPn+/dElTosDY
+	uAaMh405X4q7S75TCUc5NS9D8HCFFBE8tkz1HXeJg9QB7EJGkzVETssk3dry6yj4PsZj/wJ82In
+	xDugZ+DAhychPosr1AuYrORydJLbKWsM=
+X-Google-Smtp-Source: AGHT+IEzN50658kYdEZu4z11IX1+qj76bRNUj9L9XsGay2m70Sqt76p+ZP6G4FZVEV9964rwYfujWQD+iVC6l49gAsw=
+X-Received: by 2002:a05:6512:4027:b0:553:ceed:c859 with SMTP id
+ 2adb3069b0e04-557e5537687mr1059540e87.21.1751807662868; Sun, 06 Jul 2025
+ 06:14:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <3223ba93.2c32.197dfceedc6.Coremail.weishangjuan@eswincomputing.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:TQJkCgAXt5Vpcmpov_apAA--.18621W
-X-CM-SenderInfo: pzhl2xxdqjy31dq6v25zlqu0xpsx3x1qjou0bp/1tbiAQEPEGhpU2
-	0HCwAAss
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
+References: <20250628054438.2864220-1-wens@kernel.org> <20250705083600.2916bf0c@minigeek.lan>
+ <CAGb2v64My=A_Jw+CBCsqno3SsSSTtBFKXOrgLv+Nyq_z5oeYBg@mail.gmail.com>
+ <e9c5949d-9ac5-4b33-810d-b716ccce5fe9@lunn.ch> <20250706002223.128ff760@minigeek.lan>
+In-Reply-To: <20250706002223.128ff760@minigeek.lan>
+Reply-To: wens@kernel.org
+From: Chen-Yu Tsai <wens@kernel.org>
+Date: Sun, 6 Jul 2025 21:14:09 +0800
+X-Gmail-Original-Message-ID: <CAGb2v64vxtAVi3QK3a=mvDz2u+gKQ6XPMN-JB46eEuwfusMG2w@mail.gmail.com>
+X-Gm-Features: Ac12FXwracJUFtxrR-geU8AnCt2mihSX7AlHGCMKyxbdZy4UN94qheE6j6Zh998
+Message-ID: <CAGb2v64vxtAVi3QK3a=mvDz2u+gKQ6XPMN-JB46eEuwfusMG2w@mail.gmail.com>
+Subject: Re: [PATCH net 0/2] allwinner: a523: Rename emac0 to gmac0
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Jernej Skrabec <jernej@kernel.org>, Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-sunxi@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-RGVhciBLcnp5c3p0b2YgS296bG93c2tpLAoKSSBhcG9sb2dpemUgZm9yIHRoZSBpbmNvbnZlbmll
-bmNlIGNhdXNlZCBieSBzZW5kaW5nIHBhdGNoZXMgbXVsdGlwbGUgdGltZXMgZHVlIHRvIG15IGlu
-Y29tcGxldGUgdW5kZXJzdGFuZGluZyBvZiB5b3VyIHByZXZpb3VzIHZlcnNpb24ncyByZXNwb25z
-ZS4gVGhhbmsgeW91IHZlcnkgbXVjaCBmb3IgcmV2aWV3aW5nIG91ciBwYXRjaGVzIG11bHRpcGxl
-IHRpbWVzLiBSZWdhcmRpbmcgeW91ciByZXNwb25zZSBvbiBWMywgSSBoYXZlIHR3byBxdWVzdGlv
-bnMgYWJvdXQgWUFNTCBmaWxlcyB0aGF0IEkgd291bGQgbGlrZSB0byBjb25maXJtIHdpdGggeW91
-LiBDYW4geW91IHRha2Ugc29tZSB0aW1lIG91dCBvZiB5b3VyIGJ1c3kgc2NoZWR1bGUgdG8gcmVw
-bHkgdG8gbWU/CgoxLiBSZWdhcmRpbmcgInJlZzogbWluSXRlbXM6IDEiCkkgaGF2ZSByZXZpZXdl
-ZCB0aGUgd3JpdGluZyBtZXRob2QgZnJvbSBvdGhlciBZQU1MIGZpbGVzIGluIHRoZSBzb3VyY2Ug
-Y29kZSwgYW5kIHRoZXkgYWxsIHVzZSDigJxyZWc6IG1heEl0ZW1zOiAxIOKAnSBpbnN0ZWFkIG9m
-CuKAnHJlZzogbWluSXRlbXM6IDHigJ0uIFNvIHdlIGFsc28gbmVlZCB0byB1c2Ug4oCccmVnOiBt
-YXhJdGVtczogMSDigJ0gaW4gb3VyIFlBTUwgZmlsZS4KSXMgdGhpcyB1bmRlcnN0YW5kaW5nIGNv
-cnJlY3Q/CgoyLiBSZWdhcmRpbmfCoGNsb2NrcyBhbmQgY2xvY2stbmFtZXMKRm9yIGNsb2NrcyBh
-bmQgY2xvY2stbmFtZXMsIGZyb20gb3RoZXIgWUFNTCBmaWxlcyB0aGVyZSBpcyBubyBtaW5JdGVt
-cyBhbmQgbWF4SXRlbXMgbWVudGlvbmVkLgpXZSB3aWxsIHJlbW92ZSBtaW5JdGVtcyBhbmQgbWF4
-SXRlbXMgZnJvbSBjbG9ja3MgYW5kIGNsb2NrLW5hbWVzIGFuZCBhcyB3ZSBoYXZlIGZpeCAyIGNs
-b2NrcywKd2Ugd2lsbCBhbHNvIGFkZCBkZXNjcmlwdGlvbiBpbiBjbG9ja3M6aXRlbXMuClJlZiB5
-YW1sOiBzb3BoZ28sc2cyMDQ0LWR3bWFjLnlhbWwsIHN0YXJmaXZlLGpoNzExMC1kd21hYy55YW1s
-CkxldCBtZSBrbm93IGlmIHRoaXMgaXMgY29ycmVjdD8gV2Ugd2lsbCB1cGRhdGUgaW4gbmV4dCB2
-ZXJzaW9uIGJhc2VkIG9uIHlvdXIgc3VnZ2VzdGlvbnMuCgozLiBEbyB3ZSBuZWVkIHRvIGluY2x1
-ZGUgYWxsIGNoYW5nZXMgYmFzZWQgb24gdGhlIHByZXZpb3VzIHZlcnNpb24gaW4gdGhlIGNvdmVy
-IGxldHRlciBwYXRjaCB3aGVuIHN1Ym1pdHRpbmcgdGhlIHBhdGNoZXM/CklmIHNvLCB3ZSB3aWxs
-IGNvdmVyIGFsbCB0aGUgY2hhbmdlcyBpbiBjb3ZlciBsZXR0ZXIgZnJvbSBuZXh0IHRpbWUuCgpM
-b29rIGZvcndhcmQgdG8geW91ciByZXBsee+8gQoKCgoKPiAtLS0tLeWOn+Wni+mCruS7ti0tLS0t
-Cj4g5Y+R5Lu25Lq6OiAiS3J6eXN6dG9mIEtvemxvd3NraSIgPGtyemtAa2VybmVsLm9yZz4KPiDl
-j5HpgIHml7bpl7Q6MjAyNS0wNy0wMyAxNzo1MTo0NyAo5pif5pyf5ZubKQo+IOaUtuS7tuS6ujog
-d2Vpc2hhbmdqdWFuQGVzd2luY29tcHV0aW5nLmNvbSwgYW5kcmV3K25ldGRldkBsdW5uLmNoLCBk
-YXZlbUBkYXZlbWxvZnQubmV0LCBlZHVtYXpldEBnb29nbGUuY29tLCBrdWJhQGtlcm5lbC5vcmcs
-IHJvYmhAa2VybmVsLm9yZywga3J6aytkdEBrZXJuZWwub3JnLCBjb25vcitkdEBrZXJuZWwub3Jn
-LCBuZXRkZXZAdmdlci5rZXJuZWwub3JnLCBkZXZpY2V0cmVlQHZnZXIua2VybmVsLm9yZywgbGlu
-dXgta2VybmVsQHZnZXIua2VybmVsLm9yZywgbWNvcXVlbGluLnN0bTMyQGdtYWlsLmNvbSwgYWxl
-eGFuZHJlLnRvcmd1ZUBmb3NzLnN0LmNvbSwgcm1rK2tlcm5lbEBhcm1saW51eC5vcmcudWssIHlv
-bmcubGlhbmcuY2hvb25nQGxpbnV4LmludGVsLmNvbSwgdmxhZGltaXIub2x0ZWFuQG54cC5jb20s
-IGpzemhhbmdAa2VybmVsLm9yZywgamFuLnBldHJvdXNAb3NzLm54cC5jb20sIHByYWJoYWthci5t
-YWhhZGV2LWxhZC5yakBicC5yZW5lc2FzLmNvbSwgaW5vY2hpYW1hQGdtYWlsLmNvbSwgYm9vbi5r
-aGFpLm5nQGFsdGVyYS5jb20sIGRmdXN0aW5pQHRlbnN0b3JyZW50LmNvbSwgMHgxMjA3QGdtYWls
-LmNvbSwgbGludXgtc3RtMzJAc3QtbWQtbWFpbG1hbi5zdG9ybXJlcGx5LmNvbSwgbGludXgtYXJt
-LWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnCj4g5oqE6YCBOiBuaW5neXVAZXN3aW5jb21wdXRp
-bmcuY29tLCBsaW5taW5AZXN3aW5jb21wdXRpbmcuY29tLCBsaXpoaTJAZXN3aW5jb21wdXRpbmcu
-Y29tCj4g5Li76aKYOiBSZTogW1BBVENIIHYzIDEvMl0gZHQtYmluZGluZ3M6IGV0aGVybmV0OiBl
-c3dpbjogRG9jdW1lbnQgZm9yIEVJQzc3MDAgU29DCj4gCj4gT24gMDMvMDcvMjAyNSAxMToxOSwg
-d2Vpc2hhbmdqdWFuQGVzd2luY29tcHV0aW5nLmNvbSB3cm90ZToKPiA+IEZyb206IFNoYW5nanVh
-biBXZWkgPHdlaXNoYW5nanVhbkBlc3dpbmNvbXB1dGluZy5jb20+Cj4gPiAKPiA+IEFkZCBFU1dJ
-TiBFSUM3NzAwIEV0aGVybmV0IGNvbnRyb2xsZXIsIHN1cHBvcnRpbmcgY2xvY2sKPiA+IGNvbmZp
-Z3VyYXRpb24sIGRlbGF5IGFkanVzdG1lbnQgYW5kIHNwZWVkIGFkYXB0aXZlIGZ1bmN0aW9ucy4K
-PiA+IAo+ID4gU2lnbmVkLW9mZi1ieTogWmhpIExpIDxsaXpoaTJAZXN3aW5jb21wdXRpbmcuY29t
-Pgo+ID4gU2lnbmVkLW9mZi1ieTogU2hhbmdqdWFuIFdlaSA8d2Vpc2hhbmdqdWFuQGVzd2luY29t
-cHV0aW5nLmNvbT4KPiA+IC0tLQo+ID4gIC4uLi9iaW5kaW5ncy9uZXQvZXN3aW4sZWljNzcwMC1l
-dGgueWFtbCAgICAgICB8IDE3NSArKysrKysrKysrKysrKysrKysKPiA+ICAxIGZpbGUgY2hhbmdl
-ZCwgMTc1IGluc2VydGlvbnMoKykKPiA+ICBjcmVhdGUgbW9kZSAxMDA2NDQgRG9jdW1lbnRhdGlv
-bi9kZXZpY2V0cmVlL2JpbmRpbmdzL25ldC9lc3dpbixlaWM3NzAwLWV0aC55YW1sCj4gPiAKPiA+
-IGRpZmYgLS1naXQgYS9Eb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3MvbmV0L2Vzd2lu
-LGVpYzc3MDAtZXRoLnlhbWwgYi9Eb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3MvbmV0
-L2Vzd2luLGVpYzc3MDAtZXRoLnlhbWwKPiA+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0Cj4gPiBpbmRl
-eCAwMDAwMDAwMDAwMDAuLjA0YjRjN2JmYmI1Ygo+ID4gLS0tIC9kZXYvbnVsbAo+ID4gKysrIGIv
-RG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL25ldC9lc3dpbixlaWM3NzAwLWV0aC55
-YW1sCj4gPiBAQCAtMCwwICsxLDE3NSBAQAo+ID4gKyMgU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6
-IChHUEwtMi4wLW9ubHkgT1IgQlNELTItQ2xhdXNlKQo+ID4gKyVZQU1MIDEuMgo+ID4gKy0tLQo+
-ID4gKyRpZDogaHR0cDovL2RldmljZXRyZWUub3JnL3NjaGVtYXMvbmV0L2Vzd2luLGVpYzc3MDAt
-ZXRoLnlhbWwjCj4gPiArJHNjaGVtYTogaHR0cDovL2RldmljZXRyZWUub3JnL21ldGEtc2NoZW1h
-cy9jb3JlLnlhbWwjCj4gPiArCj4gPiArdGl0bGU6IEVzd2luIEVJQzc3MDAgU09DIEV0aCBDb250
-cm9sbGVyCj4gPiArCj4gPiArbWFpbnRhaW5lcnM6Cj4gPiArICAtIFNodWFuZyBMaWFuZyA8bGlh
-bmdzaHVhbmdAZXN3aW5jb21wdXRpbmcuY29tPgo+ID4gKyAgLSBaaGkgTGkgPGxpemhpMkBlc3dp
-bmNvbXB1dGluZy5jb20+Cj4gPiArICAtIFNoYW5nanVhbiBXZWkgPHdlaXNoYW5nanVhbkBlc3dp
-bmNvbXB1dGluZy5jb20+Cj4gPiArCj4gPiArZGVzY3JpcHRpb246Cj4gPiArICBUaGUgZXRoIGNv
-bnRyb2xsZXIgcmVnaXN0ZXJzIGFyZSBwYXJ0IG9mIHRoZSBzeXNjcmcgYmxvY2sgb24KPiA+ICsg
-IHRoZSBFSUM3NzAwIFNvQy4KPiA+ICsKPiA+ICtzZWxlY3Q6Cj4gPiArICBwcm9wZXJ0aWVzOgo+
-ID4gKyAgICBjb21wYXRpYmxlOgo+ID4gKyAgICAgIGNvbnRhaW5zOgo+ID4gKyAgICAgICAgZW51
-bToKPiA+ICsgICAgICAgICAgLSBlc3dpbixlaWM3NzAwLXFvcy1ldGgKPiA+ICsgIHJlcXVpcmVk
-Ogo+ID4gKyAgICAtIGNvbXBhdGlibGUKPiA+ICsKPiA+ICthbGxPZjoKPiA+ICsgIC0gJHJlZjog
-c25wcyxkd21hYy55YW1sIwo+ID4gKwo+ID4gK3Byb3BlcnRpZXM6Cj4gPiArICBjb21wYXRpYmxl
-Ogo+ID4gKyAgICBpdGVtczoKPiA+ICsgICAgICAtIGNvbnN0OiBlc3dpbixlaWM3NzAwLXFvcy1l
-dGgKPiA+ICsgICAgICAtIGNvbnN0OiBzbnBzLGR3bWFjLTUuMjAKPiA+ICsKPiA+ICsgIHJlZzoK
-PiA+ICsgICAgbWluSXRlbXM6IDEKPiAKPiBOb3BlLiBDaGFuZ2Vsb2cgZG9lcyBub3QgZXhwbGFp
-biB0aGF0LCBpdCBpcyBub3QgY29ycmVjdCBhbmQgbm8gb25lIGV2ZXIKPiByZXF1ZXN0ZWQgc29t
-ZXRoaW5nIGxpa2UgdGhhdC4gU2VlIGFsc28gd3JpdGluZyBiaW5kaW5ncyBhYm91dCBjb25zdHJh
-aW50cy4KPiAKPiA+ICsKPiA+ICsgIGludGVycnVwdC1uYW1lczoKPiA+ICsgICAgY29uc3Q6IG1h
-Y2lycQo+ID4gKwo+ID4gKyAgaW50ZXJydXB0czoKPiA+ICsgICAgbWF4SXRlbXM6IDEKPiA+ICsK
-PiA+ICsgIHBoeS1tb2RlOgo+ID4gKyAgICAkcmVmOiAvc2NoZW1hcy90eXBlcy55YW1sIy9kZWZp
-bml0aW9ucy9zdHJpbmcKPiA+ICsgICAgZW51bToKPiA+ICsgICAgICAtIHJnbWlpCj4gPiArICAg
-ICAgLSByZ21paS1yeGlkCj4gPiArICAgICAgLSByZ21paS10eGlkCj4gPiArICAgICAgLSByZ21p
-aS1pZAo+ID4gKwo+ID4gKyAgcGh5LWhhbmRsZToKPiA+ICsgICAgJHJlZjogL3NjaGVtYXMvdHlw
-ZXMueWFtbCMvZGVmaW5pdGlvbnMvcGhhbmRsZQo+ID4gKyAgICBkZXNjcmlwdGlvbjogUmVmZXJl
-bmNlIHRvIHRoZSBQSFkgZGV2aWNlCj4gPiArCj4gPiArICBjbG9ja3M6Cj4gPiArICAgIG1pbkl0
-ZW1zOiAyCj4gPiArICAgIG1heEl0ZW1zOiAyCj4gPiArCj4gPiArICBjbG9jay1uYW1lczoKPiA+
-ICsgICAgbWluSXRlbXM6IDIKPiA+ICsgICAgbWF4SXRlbXM6IDIKPiA+ICsgICAgY29udGFpbnM6
-Cj4gPiArICAgICAgZW51bToKPiA+ICsgICAgICAgIC0gc3RtbWFjZXRoCj4gPiArICAgICAgICAt
-IHR4Cj4gCj4gTm90IG11Y2ggY2hhbmdlZCwgbm90aGluZyBleHBsYWluZWQgaW4gdGhlIGNoYW5n
-ZWxvZyBpbiBjb3ZlciBsZXR0ZXIuCj4gCj4gWW91IGdvdCBhbHJlYWR5IGZlZWRiYWNrIHRoYXQg
-eW91IGtlZXAgcHVzaGluZyBzYW1lIGNvZGUgd2l0aG91dCBmaXhpbmcKPiBhbnl0aGluZy4gWW91
-IGRvbid0IHJlc3BvbmQgdG8gZmVlZGJhY2suIFlvdSBkb24ndCBhZGRyZXNzIGl0Lgo+IAo+IFdo
-YXQgaXMgbGVmdCBmb3IgbWU/IFN0YXJ0IHRyZWF0aW5nIHVzIHNlcmlvdXNseS4gSSBhbSBub3Qg
-Z29pbmcgdG8KPiByZXZpZXcgdGhlIHJlc3QuCj4gCj4gUmVzcG9uZCB0byBwcmV2aW91cyBmZWVk
-YmFjayB3aXRoIGFja25vd2xlZGdpbmcgdGhhdCB5b3UgdW5kZXJzdG9vZCBpdAo+IG9yIGZ1cnRo
-ZXIgcXVlc3Rpb25zIGlmIHlvdSBkaWQgbm90IHVuZGVyc3RhbmQgaXQsIGJ1dCB5b3UgbWFkZSB0
-aG9yb3VnaAo+IHJlc2VhcmNoIG9uIG90aGVyIGJpbmRpbmdzIGFuZCBleGFtcGxlIHNjaGVtYSBo
-b3cgdG8gZG8gaXQuCj4gCj4gTkFLCj4gCj4gQmVzdCByZWdhcmRzLAo+IEtyenlzenRvZgo=
+On Sun, Jul 6, 2025 at 7:23=E2=80=AFAM Andre Przywara <andre.przywara@arm.c=
+om> wrote:
+>
+> On Sat, 5 Jul 2025 17:53:17 +0200
+> Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> Hi Andrew,
+>
+> > > So it's really whatever Allwinner wants to call it. I would rather ha=
+ve
+> > > the names follow the datasheet than us making some scheme up.
+> >
+> > Are the datasheets publicly available?
+>
+> We collect them in the sunxi wiki (see the links below), but just to
+> make sure:
+> I am not disputing that GMAC is the name mentioned in the A523 manual,
+> and would have probably been the right name to use originally - even
+> though it's not very consistent, as the same IP is called EMAC in the
+> older SoCs' manuals. I am also not against renaming identifiers or even
+> (internal) DT labels. But the problem here is that the renaming affects
+> the DT compatible string and the pinctrl function name, both of which
+> are used as an interface between the devicetree and its users, which is
+> not only the Linux kernel, but also U-Boot and other OSes like the BSDs.
+
+I reiterate my position: they are not stable until they actually hit a
+release. This provides some time to fix mistakes before they are set in
+stone.
+
+> In this particular case we would probably get away with it, because
+> it's indeed very early in the development cycle for this SoC, but for
+> instance the "emac0" function name is already used in some U-Boot
+> patch series on the list:
+> https://lore.kernel.org/linux-sunxi/20250323113544.7933-18-andre.przywara=
+@arm.com/
+>
+> If we REALLY need to rename this, it wouldn't be the end of the world,
+> but would create some churn on the U-Boot side.
+>
+> I just wanted to point out that any changes to the DT bindings have
+> some impact to other projects, even if they are proposed as a coherent
+> series on the Linux side. Hence my question if this is really necessary.
+
+For the compatible string, I can live with having a comment in the binding
+stating the name used in the datasheet for reference.
+
+For the pinctrl stuff, which is the contentious bit here, I thought the
+whole idea of the newer pinctrl bindings is that the driver uses
+"allwinner,pinmux" instead of "function". I think having both being valid
+is confusing, and likely to cause conflicts later on. If we're going to
+use the hardware register values in the device tree, I'd really like them
+to be the only source of truth. The commit message for the binding also
+sort of suggests that "allwinner,pinmux" is the part that matters.
+
+
+ChenYu
+
+> Cheers,
+> Andre
+>
+> https://linux-sunxi.org/A64#Documentation
+> https://linux-sunxi.org/H616#Documentation
+> https://linux-sunxi.org/A523#Documentation
 
