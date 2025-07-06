@@ -1,371 +1,239 @@
-Return-Path: <netdev+bounces-204388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D563AFA465
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 12:17:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7E2BAFA4AF
+	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 12:59:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC35B7A72A1
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 10:16:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B844188DB53
+	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 10:59:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40DD1F0995;
-	Sun,  6 Jul 2025 10:17:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64E921FFC74;
+	Sun,  6 Jul 2025 10:59:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b="qD0Vb+kY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mwsjwZyp"
 X-Original-To: netdev@vger.kernel.org
-Received: from TYVP286CU001.outbound.protection.outlook.com (mail-japaneastazon11011037.outbound.protection.outlook.com [52.101.125.37])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B27881E;
-	Sun,  6 Jul 2025 10:17:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.125.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9821BF58;
+	Sun,  6 Jul 2025 10:59:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751797048; cv=fail; b=CNlZl9nYcvxlhtcOJEgdglSj6ewMlBtehjP+2XPoJL0XiRUFuVwhY+8OV6QlkfdRfYgkGtrEawQl8U8NgghBceT2icoDNfSyAW+HeCF3LD/LEcXi6uYlCxgsYNQ7GEnYp+6lF5S51MtuMOiljJcYNTJE2U36qDUDxGpJmhjOTaM=
+	t=1751799547; cv=fail; b=KdJxdkOhn0tE/JwPX94IL7VKHR8bGFcJPjrrQIkJUbr9F25v0KUQVK1EWF6e/iV/kUhEEorNLZO1FPLSJyIDdjzhHyrumPi9w4y9Pp3+KEUf8MnXYsQi3COfHsFkoaDpkM7nOFR/oewmloAGioX/S3EW4ddDKliMe9Qm8bh/vPU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751797048; c=relaxed/simple;
-	bh=Yu9i2yZzG9WnwhJjrDWzZWIFl20us+xKeaiggh/OnIo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=n6VpM8g7ziB4cSutLxZ4hl7AziYNbSm03DFpBtr3Wb4jPytiM7pYQSi32IoBQEOgeD03jsAKPh/N9sPkzhGrWGRkjtufaIOyjdJo0F+ACEZbDvYklhpCDVnf46BwKqtosk4OkNqD9HXxnAbmGC3PQ6EwOtX6D03sX1qLFmUEZuY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b=qD0Vb+kY; arc=fail smtp.client-ip=52.101.125.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+	s=arc-20240116; t=1751799547; c=relaxed/simple;
+	bh=lulD8Nh3jYnVTtyHYBsvtnNN390c99oJcZNQlMlB7Vc=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=l5cxTMpROLYG9fEvKd3+df3Th62hcC6PKPWRygZM1JCsTTwyHOutvRfcxdAVmpudBjhybwIqpmA2IKxBQpp55mELfqr4bw8DYjDsiqM5U5BgwruxmJGhIdu9ikQkDah7tSIl2OpgktZ3mg4EuFJ08olGz4OCl4fFBAw3OyoYjSQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mwsjwZyp; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1751799546; x=1783335546;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=lulD8Nh3jYnVTtyHYBsvtnNN390c99oJcZNQlMlB7Vc=;
+  b=mwsjwZyp2WQtZd7UYQKH469+fOW+KszWt23FvTOEFhMnj/MSbR/mZTZ6
+   p9MmI97xKYUE5ZglhwrMpwKSJyLe3bSIxcf4PPbwZtBphTRGFQffxvUHM
+   O36gkpazICSF5+htSRXcNE33e+Ybby3/AtDOAvVdyeB2szoek3f7z+/J+
+   bLVWqpelDoM7m3o7/kfOlTSyFrUOnFoSUB2PrvIiSQxUTYASm0MXOdORY
+   dP599m3uOLi1z/0v6G+yp2ovhbL+4C3+GnRw144irzTAFjIq3cPuPfe6N
+   1X2Fom00rXG2nCHqtn1NTq26+peuRBDfWGO+ulphPnMZowYM6augEVCjv
+   g==;
+X-CSE-ConnectionGUID: IoiZaXVDRm+KMVpbNUKrYw==
+X-CSE-MsgGUID: eiDhWH/XRhWHzaKimkPG2A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11485"; a="65390620"
+X-IronPort-AV: E=Sophos;i="6.16,291,1744095600"; 
+   d="scan'208";a="65390620"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2025 03:59:05 -0700
+X-CSE-ConnectionGUID: jCw+o90eSMa2vNsHAsrpuw==
+X-CSE-MsgGUID: E3+mFHTkRjiX4FyZ8kL/Mg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,291,1744095600"; 
+   d="scan'208";a="154395334"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2025 03:59:04 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Sun, 6 Jul 2025 03:59:03 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Sun, 6 Jul 2025 03:59:03 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (40.107.94.44) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Sun, 6 Jul 2025 03:59:03 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ls+024YLgqbBF1ydDPFPjSAUj2Q7p80YzZxXNd3ntlKsk6GC1bqWpBFFoA4iZxPqEzlsuOc9wGn/P+HeLFu8XqJoVYcr5Qn9cG8ys+0ABftVGrHAh+3ahfY5t9IVhGqrwNZyk45xs+i9xrQ/zj9bSl092xJ8TLXllTNDHpCTD/eTc1cTW5Q+AU7egzVMRyzL3VbzxLItKYssbvPG+6bpoaWm4h5ekH3O7Hmfoumjj927YWYrzKuHF+Ff3UwrgBm3i/L7S7iIrXneZFAnVtE8T3ioJ0DdZZU4Vj6KZhEX3R58glEjOUps5g2WoIyNq0a78C0ejn49Xayi+9PjRhO1hA==
+ b=oQPHhuL07H+tbU8ry7qaQbXzaXgAimslLQvnxI8CjTSz4+wyoXcPEhhr8OyS8rUFTSxSKMLwzOg0CNKW8NOl/t3z8fJ/f4kKiBdD4OOZtM4wIr31TbU9JyjXxp+mfJl/CyjVj91p4jydK1uWSoi8+19ZVG5ug0s2CKOJvCB3leCYRVkuZfkgn+Hjos7GuRcj4qIXM/XeCxNscAvwFrK8gCSwQadII9KlpZ3qhzxYn3DkjbflnpguIFdlzHIa1xI2yRNwJxdZho9DWkc15+SUgw9striMmbku6kYQgJdYGQ/nOctzPqyiyUsRVj6YT6JXQRpoxzmhFsz1QHVeMPtQvw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tjSLHQZ7TWdyLitPaQQlf8pJhQyM0DXViZeRKNEUZao=;
- b=c9gIMzcEi6gi5H+mq3+u9J3zLclL32mVav5tKwPxZqgrg8iUZsRH4VDMWn4j1CFOH2g5TtdmcxS1WJbSNFJKOwvWAVLcF63LbZTqlTTW4zzmVEjwdrYOaZ6bHnIQdO1LCB4+sZtFRUZApF+/xdLaRX4bwn+1lB0bdKowQqZ46XdlZXyEEGYvCztihEY8IPKOApUAp6jW5z23fnvYgwuQFeM2/ecfO9vAZg+vY4gpUiH1ghQw96sP7hdMF+oDMQiGRCDFPkjSdNDKsoMDxXOlszmFuGoow3k182X9Agf39BU31/H15/uBLbXIRONrkp0UJ8sdnrQblq0ms10pSUkJdw==
+ bh=MNftCNBaEt5/t5mbED9hQsXbsAz2vJMT28hP6OXnHgE=;
+ b=Z/4KsF5VT7fZNRZEspdrUxwTnc1yQayidyQCjhSq9QhwqPWiVEDR436E6rTPCG92FhiOknxtixQH7V0E+7+leZPimQDopdsyUIEcvgu2ipl+4oSOoAyeL3dmFL9H7yfHSZQutRB3dUalhMMiampfEqLFe2Y1+s9RKotH0wKcC7OSq/L1AEKGB+tlww4VqEwzU8Jyw7U7Y8Gagcq+k4wklwPVxtvOetaWyBdLP2pAG3bP0BRWXZVab4flKBbrL2Of8qdsQH3zH6KXixAE6yit07dB9RKuZ6vR6rrghwoTJ0xded3rwfL8fLb9+MmQZJj70k5OeHvHKthoDYOaDODwEg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bp.renesas.com; dmarc=pass action=none
- header.from=bp.renesas.com; dkim=pass header.d=bp.renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bp.renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tjSLHQZ7TWdyLitPaQQlf8pJhQyM0DXViZeRKNEUZao=;
- b=qD0Vb+kYyxICOi58pKsk9Q1IR9H1eaQ9S4XSxT9zqk1NfRSnxscVGh1kRpYw2Kg5PRDM0BiXpEAilSfiCWQfjohEa2dnWNK068CwnYVwHR3yXqoM3enf1o4uCwOPE4Tf2wsEkeK9bU7ElGINWgJpKmEj92idbb+P3+Ya1ETHzMI=
-Received: from TY3PR01MB11346.jpnprd01.prod.outlook.com (2603:1096:400:3d0::7)
- by OS7PR01MB14808.jpnprd01.prod.outlook.com (2603:1096:604:398::11) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6307.namprd11.prod.outlook.com (2603:10b6:930:21::20)
+ by MW4PR11MB6787.namprd11.prod.outlook.com (2603:10b6:303:209::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.21; Sun, 6 Jul
- 2025 10:17:21 +0000
-Received: from TY3PR01MB11346.jpnprd01.prod.outlook.com
- ([fe80::86ef:ca98:234d:60e1]) by TY3PR01MB11346.jpnprd01.prod.outlook.com
- ([fe80::86ef:ca98:234d:60e1%3]) with mapi id 15.20.8901.024; Sun, 6 Jul 2025
- 10:17:21 +0000
-From: Biju Das <biju.das.jz@bp.renesas.com>
-To: Russell King <linux@armlinux.org.uk>
-CC: Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre
- Torgue <alexandre.torgue@foss.st.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-renesas-soc@vger.kernel.org"
-	<linux-renesas-soc@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Geert Uytterhoeven <geert+renesas@glider.be>,
-	biju.das.au <biju.das.au@gmail.com>
-Subject: RE: [PATCH net-next] net: stmmac: dwmac-renesas-gbeth: Add PM
- suspend/resume callbacks
-Thread-Topic: [PATCH net-next] net: stmmac: dwmac-renesas-gbeth: Add PM
- suspend/resume callbacks
-Thread-Index: AQHb7c6+F2cIzXpCE0eHQabSLpoq6LQj6xeAgAALbTCAANFSwIAAF8uAgAACdQA=
-Date: Sun, 6 Jul 2025 10:17:21 +0000
-Message-ID:
- <TY3PR01MB11346A275022D7B74E8FDDB27864CA@TY3PR01MB11346.jpnprd01.prod.outlook.com>
-References: <20250705170326.106073-1-biju.das.jz@bp.renesas.com>
- <aGl9e9Exvq1fVI0s@shell.armlinux.org.uk>
- <TYCPR01MB11332BCE03B3533784711A5BF864DA@TYCPR01MB11332.jpnprd01.prod.outlook.com>
- <TY3PR01MB113460004F6A57B3AAD77E86E864CA@TY3PR01MB11346.jpnprd01.prod.outlook.com>
- <aGpKncEeZTifSlA2@shell.armlinux.org.uk>
-In-Reply-To: <aGpKncEeZTifSlA2@shell.armlinux.org.uk>
-Accept-Language: en-GB, en-US
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.22; Sun, 6 Jul
+ 2025 10:59:01 +0000
+Received: from CY5PR11MB6307.namprd11.prod.outlook.com
+ ([fe80::1fa2:d2f9:5904:2a14]) by CY5PR11MB6307.namprd11.prod.outlook.com
+ ([fe80::1fa2:d2f9:5904:2a14%5]) with mapi id 15.20.8901.024; Sun, 6 Jul 2025
+ 10:59:01 +0000
+Message-ID: <f34de140-e01e-46a4-b3b8-4b6e7ba85b97@intel.com>
+Date: Sun, 6 Jul 2025 13:58:52 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next, v3 1/2] igc: Relocate RSS
+ field definitions to igc_defines.h
+To: Song Yoong Siang <yoong.siang.song@intel.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, "David S . Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	"Jesper Dangaard Brouer" <hawk@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, "Shinas Rasheed" <srasheed@marvell.com>,
+	Kevin Tian <kevin.tian@intel.com>, "Brett Creeley" <brett.creeley@amd.com>,
+	Blanco Alcaine Hector <hector.blanco.alcaine@intel.com>, Joshua Hay
+	<joshua.a.hay@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Jacob Keller
+	<jacob.e.keller@intel.com>, Kurt Kanzenbach <kurt@linutronix.de>, Marcin
+ Szycik <marcin.szycik@linux.intel.com>, Brett Creeley <bcreeley@amd.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20250620100251.2791202-1-yoong.siang.song@intel.com>
+ <20250620100251.2791202-2-yoong.siang.song@intel.com>
 Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=bp.renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TY3PR01MB11346:EE_|OS7PR01MB14808:EE_
-x-ms-office365-filtering-correlation-id: e1cbab3f-6caf-469a-71cc-08ddbc764b5e
-x-ld-processed: 53d82571-da19-47e4-9cb4-625a166a4a2a,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?geyNe9BJdA3RDsY5KdCh8H+GEaNzo4VIc0GWU4Jp0nImtuu4NeJdQA3BG0gi?=
- =?us-ascii?Q?hlgD/6NjgRbzc1oTbW1El1kx+VOH2WsLGASZdJgsIDac2XTwr1P+RWjF8jut?=
- =?us-ascii?Q?Zkuz7kokqPkT8ty8wvfKZ2mwLD+0PkyiAjZVEy/t/HVbS031jp+ua9dPMKmg?=
- =?us-ascii?Q?LpSCsHekmRC+OTBFaB68HAbwOUYSQyvZYlHidP/XyBLF3vt6MInMZFYBhyae?=
- =?us-ascii?Q?BDBszyoSsaJguNk+iG5vyyq/Btdu6pC42lpye7Y4iqiORY7ZYGe2uRJzmjNT?=
- =?us-ascii?Q?/88Pi5FavtnK/LJ20OEnU9WNPwHaMpMPC+0lj0w9MCye8fGGC5owpJvLHr54?=
- =?us-ascii?Q?XkXKfIn7onjvTwBUHKxIwDhTxODZV7fWNsSw+0EuXMhgx997v80bWJS029fr?=
- =?us-ascii?Q?qhydU5tJCoHEFQLz1akkwKLc46PufqD/2XXuVeQATBSZjtN1eDIeEIeWqObp?=
- =?us-ascii?Q?DOFEVEMeEVOKEXd/4NCG1CbErukBnCeGMQIbGvmg3hczW/6pQjRmvJWn6eRr?=
- =?us-ascii?Q?18ab18i+kcWsDUyjuW0VO+Ja3iLT293Ph5KAb7CKBJ2AteUBpVCx+YbPgBY6?=
- =?us-ascii?Q?py6lm1HFZf4mAuafHhMt4qqufe2tZm3ulj4qauXIojolErG355rGKanfu1ob?=
- =?us-ascii?Q?fiiu/gG46QFIeITGestbA5sXrrCiL1F1wUhiGawkHXBB92zquImB+Zze4P91?=
- =?us-ascii?Q?3TCcaZlJwXvta772UZwfmRedh04a8tsZ5SkVI7xorGDk4t8H7b0ph0NMk93+?=
- =?us-ascii?Q?4g0fVb6OpUtJNPUcGT8ikBVoMaLAaUrFgHeNbSBnbP0xUN3I4nkRvkPaw1ZW?=
- =?us-ascii?Q?1GaKiZ7GxebUisL6ZSP5QQQaPgp51Ql5b433NRpLpic+LeJZbX3O4POKT/hO?=
- =?us-ascii?Q?+cMZlVToL2dvBjTPRjY6144cy/mVaGxKMMa9GBEgwgIebAlZ7ZlzS8fPI+Gl?=
- =?us-ascii?Q?irQ64kGL37ZujqgdBuaozh+NtZAb5r2MO9rYUMtEAvAd9xK3k+gLAnd841Ke?=
- =?us-ascii?Q?8wO3OeuQhL9ACRU0V4FLRgfjFxcwg9TfhT0yECz6k1xU0OQP9Ofpk+kLE5tk?=
- =?us-ascii?Q?CQUelDYy0tPcYyxTaNB2SplFr7yH3Vl4OgIPFk8/UcawQiUVcqY4mxx/87gV?=
- =?us-ascii?Q?f3s0I0OknyWKYIKF8R3ucSQRp1RVDSYvBdWwNS+FxcSznSlyGUWOimRR8v6v?=
- =?us-ascii?Q?iMafCf7RzQPcXFowYWVWwdg5e5RryFwi3oS8SaYrJU9pQYpB6lm86N2kdrF0?=
- =?us-ascii?Q?5RF3hkqMWUUJfWCb+S1Af8ijEZa1GVBFEffexGXRrG5i4WS6RzwJcN2ssC9z?=
- =?us-ascii?Q?fL8HMLoCPG7gPqVaD0VuWNjacbK+PL5guz/5cbROlkFvbBnlGafobVh1hl0N?=
- =?us-ascii?Q?21LyY35kg/BiQXMuLynLYVIC/VBuVeSJMQffrbhTb+Rva7I+k1ECpDCi+U4c?=
- =?us-ascii?Q?Be3EPnVNjiVve6BP5DPZqJYa0Rpo6WiOP2ljtE5scu/AruP0+m5ofzR/WbKm?=
- =?us-ascii?Q?/3u4CuYJ7Y9YN9o=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY3PR01MB11346.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?xrq86Aw3adGxxVgTkZdcYVce6AYVuwdQFgA2e2OBKL47p6OOgfFRw0s4T2my?=
- =?us-ascii?Q?TPBU5btH2YmTvnv0plwaFrNDKb40K7YCwwM7OCvdXvpVhkDg6irnfMPHFce6?=
- =?us-ascii?Q?gcI77259+775qBOvc0j6Ib6KK+0miRqCbYRO9hl35IuLnlk7XEpPfKmW1PRu?=
- =?us-ascii?Q?3kfdRmkpZCBtiNkpTLOR/Y1z+rUVj1kG71vr5rNASfyd3jm4DzVSqo/tdVj2?=
- =?us-ascii?Q?SNR05gvD3J8CB1n3F5CEqhhQSI48OaFWX1+R7F7bCFfhwttqOvHsb0iBwVZP?=
- =?us-ascii?Q?0JsgtS4PLUPc2mzi+nY5JFhAhdf0nwOliiJMbHa6lGfWWaWCzsaDC0TCLFdR?=
- =?us-ascii?Q?ws8K9YyJ3RlRcJhiYuh+ZxXwrPiyyzKYfImF8eQWriVZ5qFO/Gox8oNafLLR?=
- =?us-ascii?Q?EhOK+EVkRd9FDrvwO7ninkq+b67YUd2TgIIKHSpReA4XK7rCVA9q+d/9QzKO?=
- =?us-ascii?Q?SFjxMlPZ1R4nSEAuKGGwX8Tg2/k5rWlN2A14VPpWJYZxtXDnGtv3I/n1QxT6?=
- =?us-ascii?Q?V6rdpTVbRqNg5Q+1ltfOr2CdHRod8aherpXoLkgABJ5gUNRogcymCZfios0e?=
- =?us-ascii?Q?zuX9KfAVYpzdrO/GLaws5k4rrG0GrdLpNRdPToQJLlX80LBcPs5iePvgt24M?=
- =?us-ascii?Q?rDGH95h/OLZEhwQOiTyETGKExhFQXjjIVl1HAF9xnKRGgjI+l2cJ4GBpd+zD?=
- =?us-ascii?Q?/nKV0VgtNEFVeQ3zZwC+vj/yGJGYt0nZPaXcyVkehzoB5ayemX895ZjBkBhu?=
- =?us-ascii?Q?b0jzQsnfGD7R50ErKPezWYOrSDhfwOArPgQ5kmCSvTJSu0delf0JAWeAAZzQ?=
- =?us-ascii?Q?s/tmIZZFadOWhdgC8cKs/Dv5/4FiN1/DrEjOvYOj1fumD1opOBuQV7VmRPg6?=
- =?us-ascii?Q?VVIDqHkmT7MyLp0xCFqifqGWM4axGho7FllgNQdkCfr7OVxYZAv+J+LF1h9L?=
- =?us-ascii?Q?rmLahmKNLqFS3waURnylheWxa7zmyPP1Mw03GBDwt77NFzsjpnaRA/RwlaKz?=
- =?us-ascii?Q?TKvXNaGeqUZqFCgL9N3QP00PETmkkGuitaZiv7vLGyXDMPtfF7BEbLJWOwGj?=
- =?us-ascii?Q?KGDXImHDvBwpoqxf7sTXzq+KZMlP5otJqICpzdQDZO7SuPf1Oh1BY7p/H8F7?=
- =?us-ascii?Q?7LOZjXFQVAzw9FosjI/zFu/Rnl7dNKy/LcBMa3hmT4dPBmS/lC3WfpfjTtLj?=
- =?us-ascii?Q?tJQqaMyu/XjyOKv94RJqIrfR7x2ebXwXCV5pWFG6NnQklbWn1dXJbfegyZaj?=
- =?us-ascii?Q?+RR7eris2yMlpLrFlr/YzjU4jHsWy2vmy9lD3vUD4Yo9NXYklLhp7CyojzLH?=
- =?us-ascii?Q?NuLj5jJumvdZEL2pE/sjDPyuUafMlW6DTjUqXnnnyVZjnPv9cCHRDbfJzbN2?=
- =?us-ascii?Q?b6jBCn2lDCKaqbLQZH3FVqJjbB1/gxU4raSEEIwJE/07aD7lnSiP5l2KH132?=
- =?us-ascii?Q?BCwuSFzm3gltimPUme3p5vo5CLpfXDQ+nG1ZS7F4QSjoNNjSNYS0hZifveZH?=
- =?us-ascii?Q?Pk7gGQ/SRc6BPcdks2SJTfOJvFC8myHdZq4KxC6Oyb/rT14P3oDkdXiXVMDJ?=
- =?us-ascii?Q?rMHE5Rn/3MuqFbdXEm88NNzgNYOobkx8jrINPGlNBFA5TStKr0mLQjULeKWn?=
- =?us-ascii?Q?nQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+From: Mor Bar-Gabay <morx.bar.gabay@intel.com>
+In-Reply-To: <20250620100251.2791202-2-yoong.siang.song@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TL2P290CA0022.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:3::6)
+ To CY5PR11MB6307.namprd11.prod.outlook.com (2603:10b6:930:21::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: bp.renesas.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6307:EE_|MW4PR11MB6787:EE_
+X-MS-Office365-Filtering-Correlation-Id: 734342b3-409e-4629-d978-08ddbc7c1d30
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|921020;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?V2x1MlZUbVM4QzdwbzRaTkEybkZtdnlabmdjbTBmRVM4RGI4d3VuUCt5Nmkw?=
+ =?utf-8?B?QlZXTDRXN1gxREYrWFVVTE9MWEtNdVp3VkJ6UGJMZ3ZzZWpNandNb2JwSVlC?=
+ =?utf-8?B?RHdwUUF3MURCeHRTRjJnVy9KTUVxTkFjNk56WGE1VGU1Mms0THZDdVEwMG1z?=
+ =?utf-8?B?emh0eTk1TjVDVG9NejlGQWxnSnM1eVFLUitPeXFPUHpXeUxMRTh2enYxdDFZ?=
+ =?utf-8?B?Tm93b1FLNVJGRFYzZ1VUUndQZkpxNnNNT0p1emFYWHpsL2RPaHhaN3ZSbjRl?=
+ =?utf-8?B?UHJ4dGhuZ1hKYXh3a0hRZTl5aTc4aE5IeFpxTVNpRi9RcFVTVGR1T3lSeXRi?=
+ =?utf-8?B?SUZGY0FVZFZMOGtma1FNZUF5QnRvRDNudzhsb0Fnc0dDMVlpU1lueUJPNk1V?=
+ =?utf-8?B?TE0wK2dlMlBzKzgyYUxhanJzS3dYaFI2eU5mVnE5TWJTeUJuSVlOaElMZDRP?=
+ =?utf-8?B?Skx0Z0xlaE5qb1BTWnRYRXpCYUJmd3BrbUVEemdhaVdZd3pmREp3c2VDWVBO?=
+ =?utf-8?B?QS9mckNSNlR5OGFRbTdtLzFKdmdjS2lSNEhhcnc0T1MzOTV6ZXY3VG1WQURv?=
+ =?utf-8?B?YmJGdlFhZXNnRzlzWEFGNlVKRnM0QkFRUUJOUVI3MUJleU5TRmpNMzl0dE1O?=
+ =?utf-8?B?SGpWZGt5VjhMYVZoaTN4SVQzZEVpTHNWQ0FWNnBKRUJ3THJ4c25Bd3JXa1Fz?=
+ =?utf-8?B?ejE4YWNxLzZLUThUcjFmbzJSbHZRSDl0ejBoeStheDZ0VDIvZWZMbkZvRy9p?=
+ =?utf-8?B?b25nSWw3YThrL2FPd2dNMEFkNlF1cUdQbEVpNVdaUGtYYmMyQ1ZKblZXOFJi?=
+ =?utf-8?B?elVDaC9kQjE2TkRGd00wZUZXTDdjN3BZZ2crTVJ3RCs2eGhsNkJETTRMZlc4?=
+ =?utf-8?B?NDN1T1ZkcmgzKzhITStTendPK0ZDY3Q0Q3loN3lpT01hM1JLQ1VLOU13a0w3?=
+ =?utf-8?B?a3d4bEgvNjI0OENsNG0zak81aUlEUlJXekM2bTRLN3dsZDRJekdobmltd1NH?=
+ =?utf-8?B?UHVQUUQrTlVSNmFaV2dXNmx1QldGOGh1Y3Bra3ZBQnEyNU8wVnBCSEZzOHZK?=
+ =?utf-8?B?WnJkaWtOZU9JT09NeFhCaUgvR3ErQXM1ZmMrdGlSbEJXVEtmemFKcGNJL2xm?=
+ =?utf-8?B?UDZxQ3d1RW9hOWVIRlNEZHpWeDRsWm12SWNkYUJ6NlErd2JRMzZJOHlaSi9x?=
+ =?utf-8?B?UzhIMWQrMXp4d1FWSEE4dE9XT0w5MitKcDZOOThWTlBnV1o2QkR0M0NyOVlL?=
+ =?utf-8?B?NTBPd2krSnl0eVFpNHFGNVNqYWZPNytHczZnbTN0ckFDRXBXUER3a2RrQjE0?=
+ =?utf-8?B?WVhJWmQ3a2hlRDdsNHpRbHlBWm9ncXlaNEU2RjM1NWFnUkZoaGwvOUUwNzZG?=
+ =?utf-8?B?RU04TU9kQVpmanBJMTFYcmI3azdnckZ2SGlpZ3hybEhkcUVuVlNoUEo4ekdY?=
+ =?utf-8?B?VG9Da0xvcUQ1bklPMUxiajFpQjhNQUpoNFFIMmthcjVxQVdoMENEUzF3UGFM?=
+ =?utf-8?B?cnY0azd6NnM0dFUwKzZHd1BhQStXc3hQYXpvL3FQblRDVXVZdDNaOURWWHVK?=
+ =?utf-8?B?T1BFL0VsYzlUYkdGQUp5UXY1WU83MkcwNGU3U1hHdSttbXJUbzZKZExidUFG?=
+ =?utf-8?B?c2NsNGVhM1h3VWpWR0F2WTloZGRhYk9pckpOR2g5ZjAxOFgrNkpDUndqY2x4?=
+ =?utf-8?B?MTJRakM2YzM1UFB2RVlDeWpkSU82QUVhRTFiMVBsQ0owS1FmL1BVRTFPWVlO?=
+ =?utf-8?B?TGZqN1FhQTl6TmtBbm9VWStydnVsbWIzVjNJcjI0T3Y3dkEyZDh0QXVEa0RJ?=
+ =?utf-8?B?cUhGVlBpMzNiQUVlRDlQT3RPU1hzVVRibXllU0J4a1h1My80TThINW8rc0NW?=
+ =?utf-8?B?N29DY3VSaWY1ejZnbCt1MzJnRWs3bTRpVnhWaFp2ZmNTazVaLy9pM1g3SHdx?=
+ =?utf-8?B?OXZZaUx6b1UrbVBTNmg4Qnh3TUZGRjlBMU9BRCtYTmpNQ09mMTh3YkVsZEx3?=
+ =?utf-8?B?VGhrYUpWZUt3PT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6307.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZlN0OFY3Z1JsUXZEMVBFb2s5UVgwdW9VUHp2Rnp1NTdlZzM3MVk3SG9lUzND?=
+ =?utf-8?B?eFlOczVDTmZ4ejhXY01BRHNzcVZyNUR4S1g2bmVXTmFJQlZjeCtydmNBREln?=
+ =?utf-8?B?QXNBUUJvbWJqeUV6UFd6RnlUeW5VR2tWWnFGdHhTWkUrZjBLaVowQ0lyT3pC?=
+ =?utf-8?B?ZVM2a29XZUN6U0JLTSsrQXQ2dGVTYnV5Wm4xaDBkTE5VUkY5bm55REgrN0tr?=
+ =?utf-8?B?KzRxN01YdXpwdXF2SFJoWDc1YnF0OFdISHh3OThrTU5BL1hVNkl6SVZiam9u?=
+ =?utf-8?B?dFNjd256Q2xxRnZld25la0M4TzhzZTRLR0dZb0wyVHQ4ZUdzenlJdEVmaHRp?=
+ =?utf-8?B?djN4TXF3S2o5WmRHRlkwc0xnbzZkVEpvZThHQUp2SHhTZDZGa1l3cXlwcUQz?=
+ =?utf-8?B?V041TFBSazBWa2U3QklrNUhtVWZCb29EYUh2aWxuTWZwUjJBWE93cXVFZjA3?=
+ =?utf-8?B?ejhKRzRGNXZRVHhvUHpnenRPZ0NtMmJtdzgxY0FTSktnc25ZaCtmNmo2bnk0?=
+ =?utf-8?B?TXZBV29GOW03eFRwYWxKVVVMS3dWd0tVcFVFd1hyRTQzRVBLcnhXVXl2NUp2?=
+ =?utf-8?B?cWc3aktKNG02cU51YVRkN0o2azJyUUVyOERlNURYWjRpS2wzbGh1YXI2SzFr?=
+ =?utf-8?B?MWV5eGVBVTZ3T1RoT1FGTjhwYkVzblc1QlV2aFdyTnVXaDJCT2pqUE9saWpo?=
+ =?utf-8?B?WkxYeHpVSzBvREdLbVNxZkhqZk5hNVNieFlaZWF6YjB0SlA5c1NYSXVHam9x?=
+ =?utf-8?B?RkpJU0JsVlU5TjU1SVF6YTl6c0FSUzB0eG91NkZyaCsybjhrck1oTzMvSHha?=
+ =?utf-8?B?Z1Z0QWtRVVpXTVBXMTM1dElDajZKSzgwVG1QRjQ3STlSU1QvZWd0Myt1VEJ1?=
+ =?utf-8?B?MTl4WnNib2JSb2c2cWpXVjFGdjJNdmJtYmJXTFNyTy8veFpOWE9zN3BnZEpI?=
+ =?utf-8?B?c0I3YjFLNUxhS3R6YkpMaHdBdlY3QkV3bktLclpuNmlBTFZEWE80NjZ3eXkw?=
+ =?utf-8?B?eHBHU2pYWHRTY1JSazRNaHdHeUhYQ1REcHNOTnNGb3kxeVJHRENFVXJHeXdT?=
+ =?utf-8?B?UWJwL1JDU3REelRRZXdnWTZGa2VsY0NMc2JYbHUybW1ySkhNRFFjMm1OM0xZ?=
+ =?utf-8?B?VUpEYzc3MzhyaVdEZm9yNFFKK2d3OERVYkRXL2dubFhheHNPVXloUk1HU2l5?=
+ =?utf-8?B?dDVWdkUvS05UcG1WenpQNHZjV1ljQkF0K0VuMENnV0k2Q1loelF0ZnpQVito?=
+ =?utf-8?B?N1FOZFY5WFZKaXBoUXQzUm90TUlZWUZjRlU1TDVyMk9hL251OXM3czhTWEIv?=
+ =?utf-8?B?SHZ6Nk9BZmNybVgzYjlRUXJBL3E4bXNTQXk2MG8yM1ZhR3d5WXNWcWZyZUVa?=
+ =?utf-8?B?eGhidTlFKzIxUTRsbkhMUmFSQkNCZUljQmY0a3FKblZucE5SV0crMjZyR2dL?=
+ =?utf-8?B?R1AvK0dxQ0dKOVVtQVhVNCsyRjJtUEpMcjQ2RDdDNi9TLy9Tbkp6QnQzTFJW?=
+ =?utf-8?B?REd3ZFJRQnlXMVk4dk1sUElJZGo5anYxcVcrTHlKeGcyVjQ4NXpkejZQQnd4?=
+ =?utf-8?B?NEtOWkIzR1BYVUZyN2NtcndmZFk1MVAvTjZnUXpJcGwvN2ZyM2s5djRzM0Jk?=
+ =?utf-8?B?cHA3aGRsUzF1WjFkSGwrdkl4U0lxc05xZ0dhaGlKcEQxNEw2bC96cklXeEQv?=
+ =?utf-8?B?TzZ3b0Q3RE1RQ044Zkp6WmZSRVQ5RHU1YXc4eTFTaitrV2xKeFJWektPMkdn?=
+ =?utf-8?B?ZHFjMGs3Vm4yYVdpTTU3NlZETUJqb2Fka1Z2SkRNRDZRbG5RSEZnSVorTHRh?=
+ =?utf-8?B?cVhkRSt0cEw1dlhKWVZRTm1TTXE3OXFMeHBLK1ZCVld4WVFwRG9IMGk0aXk5?=
+ =?utf-8?B?MEJzSk91dlpKbU9RQkpYQkZpMkM1cnFhYjc3bkJpRFNVNWp3eHFPUHlNbUFO?=
+ =?utf-8?B?NFNFSG4xbi9sQnVhakg4N2x1K0x1bFg3SmtqclBSYklNa0J2cEFVdDhybnhY?=
+ =?utf-8?B?cVpsZGFpN1BrWjRVbVJQM3NyVVR2cjlTclJReEF5cExnUktpVm1Fd243dHk0?=
+ =?utf-8?B?ekZZMlN1UjFvQjBSbXFyRzVQSzN4Yk5NWWxFSmkrNzVmNHdlekRlTklRSXpp?=
+ =?utf-8?B?TFduTDFIZmk2MTFYTE8yVS8xWldmUTZQVENXUU9mQ0c0QzUrOW1PcjlNajRj?=
+ =?utf-8?B?THc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 734342b3-409e-4629-d978-08ddbc7c1d30
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6307.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TY3PR01MB11346.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1cbab3f-6caf-469a-71cc-08ddbc764b5e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jul 2025 10:17:21.3031
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2025 10:59:01.2773
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: UDjlsKA/+UJEyMZr/kPJRI27zOzl9Soh+4mAW2BKqb+hsjeQcMTRMnLdi469fzkKP4gxP4UUgaxLcjhlZXmOF0ZAwRpnV/GgfmI0Lt7P1pw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OS7PR01MB14808
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8Ce6B+ayPVJ2JoAi5iGP82j5bcNj9mvVuO9UMi4cK51eMifBv4N40dBIXCQAoAgsyL1RSIymMwYUm35iQtfGde4LEvjD7WSbY6+gDaScv0E=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6787
+X-OriginatorOrg: intel.com
 
-Hi Russell King,
-
-> -----Original Message-----
-> From: Russell King <linux@armlinux.org.uk>
-> Sent: 06 July 2025 11:06
-> Subject: Re: [PATCH net-next] net: stmmac: dwmac-renesas-gbeth: Add PM su=
-spend/resume callbacks
->=20
-> On Sun, Jul 06, 2025 at 08:45:14AM +0000, Biju Das wrote:
-> > Hi Russell King,
-> >
-> > FYI, The above testing is done with rootFS mounted on SD card.
-> >
-> > But when I mount rootFS on NFS, after wakeup, I am not able to contact =
-the NFS server.
-> >
-> > The below patch makes it to work[1].
-> > Not sure, why the original code is failing if the rootFS is mounted on =
-NFS?
->=20
-> It would be good to understand exactly what is going on there.
->=20
-> As stmmac sets mac_managed_pm to true, which is propagated to phylib, thi=
-s means the mdiobus
-> suspend/resume will be no-ops, as the MAC driver needs to do everything n=
-ecessar to resume the PHY.
->=20
-> Is your PHY losing power over suspend/resume?
-
-Yes, it is losing power during suspend.
-
->=20
-> Maybe phylink_prepare_resume() needs to call phy_init_hw() as well, like =
-mdio_bus_phy_resume() does?
-
-The below patch fixes the issue.
-
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 67218d278ce6..511d87481631 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -2593,8 +2593,10 @@ void phylink_prepare_resume(struct phylink *pl)
-         * then resume the PHY. Note that 802.3 allows PHYs 500ms before
-         * the clock meets requirements. We do not implement this delay.
-         */
--       if (pl->config->mac_requires_rxc && phydev && phydev->suspended)
-+       if (pl->config->mac_requires_rxc && phydev && phydev->suspended) {
-+               phy_init_hw(phydev);
-                phy_resume(phydev);
-+       }
-
-
-root@smarc-rzg3e:~# [   21.382260] PM: suspend entry (deep)
-[   21.386144] Filesystems sync: 0.000 seconds
-[   21.394055] Freezing user space processes
-[   21.399743] Freezing user space processes completed (elapsed 0.001 secon=
-ds)
-[   21.406775] OOM killer disabled.
-[   21.410020] Freezing remaining freezable tasks
-[   21.415642] Freezing remaining freezable tasks completed (elapsed 0.001 =
-seconds)
-[   21.423051] printk: Suspending console(s) (use no_console_suspend to deb=
-ug)
-NOTICE:  BL2: v2.10.5(release):2.10.5/rz_soc_dev-162-g7148ba838
-NOTICE:  BL2: Built : 14:23:58, Jul  5 2025
-NOTICE:  BL2: SYS_LSI_MODE: 0x13e06
-NOTICE:  BL2: SYS_LSI_DEVID: 0x8679447
-NOTICE:  BL2: SYS_LSI_PRR: 0x0
-NOTICE:  BL2: Booting BL31
-[   21.469365] libphy: #######phy_suspend 1908
-[   21.469401] ########kszphy_suspend 2350
-[   21.469457] renesas-gbeth 15c30000.ethernet eth0: Link is Down
-[   21.470144] ########kszphy_suspend 2356
-[   21.470503] ########kszphy_generic_suspend 2343
-[   21.470535] libphy: #######phy_suspend 1925
-[   21.478742] Disabling non-boot CPUs ...
-[   21.483025] psci: CPU3 killed (polled 0 ms)
-[   21.490772] psci: CPU2 killed (polled 0 ms)
-[   21.497394] psci: CPU1 killed (polled 4 ms)
-[   21.500532] Enabling non-boot CPUs ...
-[   21.500742] Detected VIPT I-cache on CPU1
-[   21.500786] GICv3: CPU1: found redistributor 100 region 0:0x000000001496=
-0000
-[   21.500823] CPU1: Booted secondary processor 0x0000000100 [0x412fd050]
-[   21.501549] CPU1 is up
-[   21.501644] Detected VIPT I-cache on CPU2
-[   21.501665] GICv3: CPU2: found redistributor 200 region 0:0x000000001498=
-0000
-[   21.501686] CPU2: Booted secondary processor 0x0000000200 [0x412fd050]
-[   21.502106] CPU2 is up
-[   21.502200] Detected VIPT I-cache on CPU3
-[   21.502221] GICv3: CPU3: found redistributor 300 region 0:0x00000000149a=
-0000
-[   21.502242] CPU3: Booted secondary processor 0x0000000300 [0x412fd050]
-[   21.502755] CPU3 is up
-[   21.565815] ########kszphy_resume 2389
-[   21.565828] CPU: 3 UID: 0 PID: 283 Comm: systemd-sleep Not tainted 6.16.=
-0-rc4-next-20250703-gf2ebaf5365aa-dirty #65 PREEMPT
-[   21.565837] Hardware name: Renesas SMARC EVK version 2 based on r9a09g04=
-7e57 (DT)
-[   21.565841] Call trace:
-[   21.565844]  show_stack+0x18/0x24 (C)
-[   21.565859]  dump_stack_lvl+0x78/0x90
-[   21.565870]  dump_stack+0x18/0x24
-[   21.565876]  kszphy_resume+0x3c/0xf0
-[   21.565884]  phy_resume+0x3c/0x74
-[   21.565892]  phylink_prepare_resume+0x60/0xa8
-[   21.565901]  stmmac_resume+0x90/0x2a0
-[   21.565910]  stmmac_pltfr_resume+0x3c/0x4c
-[   21.565918]  device_resume+0x108/0x1ec
-[   21.565927]  dpm_resume+0x198/0x1b8
-[   21.565933]  dpm_resume_end+0x20/0x38
-[   21.565940]  suspend_devices_and_enter+0x4a8/0x58c
-[   21.565948]  pm_suspend+0x180/0x20c
-[   21.565954]  state_store+0x80/0xec
-[   21.565960]  kobj_attr_store+0x18/0x2c
-[   21.565967]  sysfs_kf_write+0x7c/0x94
-[   21.565974]  kernfs_fop_write_iter+0x120/0x1ec
-[   21.565980]  vfs_write+0x238/0x370
-[   21.565988]  ksys_write+0x6c/0x100
-[   21.565994]  __arm64_sys_write+0x1c/0x28
-[   21.566001]  invoke_syscall+0x48/0x110
-[   21.566009]  el0_svc_common.constprop.0+0xc0/0xe0
-[   21.566016]  do_el0_svc+0x1c/0x28
-[   21.566023]  el0_svc+0x34/0xf0
-[   21.566031]  el0t_64_sync_handler+0xa0/0xe4
-[   21.566037]  el0t_64_sync+0x198/0x19c
-[   21.566044] ########kszphy_generic_resume 2328
-[   21.568610] ########kszphy_resume 2413
-[   21.579522] dwmac4: Master AXI performs fixed burst length
-[   21.580438] renesas-gbeth 15c30000.ethernet eth0: No Safety Features sup=
-port found
-[   21.580457] renesas-gbeth 15c30000.ethernet eth0: IEEE 1588-2008 Advance=
-d Timestamp supported
-[   21.584111] renesas-gbeth 15c30000.ethernet eth0: configuring for phy/rg=
-mii-id link mode
-[   21.584126] ########kszphy_resume 2389
-[   21.584131] CPU: 3 UID: 0 PID: 283 Comm: systemd-sleep Not tainted 6.16.=
-0-rc4-next-20250703-gf2ebaf5365aa-dirty #65 PREEMPT
-[   21.584138] Hardware name: Renesas SMARC EVK version 2 based on r9a09g04=
-7e57 (DT)
-[   21.584141] Call trace:
-[   21.584143]  show_stack+0x18/0x24 (C)
-[   21.584150]  dump_stack_lvl+0x78/0x90
-[   21.584158]  dump_stack+0x18/0x24
-[   21.584163]  kszphy_resume+0x3c/0xf0
-[   21.584168]  __phy_resume+0x28/0x54
-[   21.584175]  phy_start+0x7c/0xb4
-[   21.584180]  phylink_start+0xb8/0x210
-[   21.584187]  phylink_resume+0x7c/0xc4
-[   21.584194]  stmmac_resume+0x1ec/0x2a0
-[   21.584200]  stmmac_pltfr_resume+0x3c/0x4c
-[   21.584207]  device_resume+0x108/0x1ec
-[   21.584214]  dpm_resume+0x198/0x1b8
-[   21.584220]  dpm_resume_end+0x20/0x38
-[   21.584226]  suspend_devices_and_enter+0x4a8/0x58c
-[   21.584233]  pm_suspend+0x180/0x20c
-[   21.584239]  state_store+0x80/0xec
-[   21.584245]  kobj_attr_store+0x18/0x2c
-[   21.584250]  sysfs_kf_write+0x7c/0x94
-[   21.584256]  kernfs_fop_write_iter+0x120/0x1ec
-[   21.584261]  vfs_write+0x238/0x370
-[   21.584267]  ksys_write+0x6c/0x100
-[   21.584273]  __arm64_sys_write+0x1c/0x28
-[   21.584279]  invoke_syscall+0x48/0x110
-[   21.584286]  el0_svc_common.constprop.0+0xc0/0xe0
-[   21.584293]  do_el0_svc+0x1c/0x28
-[   21.584299]  el0_svc+0x34/0xf0
-[   21.584306]  el0t_64_sync_handler+0xa0/0xe4
-[   21.584312]  el0t_64_sync+0x198/0x19c
-[   21.584318] ########kszphy_generic_resume 2328
-[   21.586896] ########kszphy_resume 2413
-[   23.029414] OOM killer enabled.
-[   23.036456] Restarting tasks: Starting
-
-[   23.041654] Restarting tasks: Done
-[   23.045259] random: crng reseeded on system resumption
-[   23.050644] PM: suspend exit
-root@smarc-rzg3e:~# p[   24.223019] renesas-gbeth 15c30000.ethernet eth0: L=
-ink is Up - 1Gbps/Full - flow control rx/tx
-ing 1[   25.410201] 8021q: 802.1Q VLAN Support v1.8
-[   25.414618] 8021q: adding VLAN 0 to HW filter on device eth0
-root@smarc-rzg3e:~# ping 192.168.10.1
-PING 192.168.10.1 (192.168.10.1) 56(84) bytes of data.
-64 bytes from 192.168.10.1: icmp_seq=3D1 ttl=3D64 time=3D0.516 ms
-64 bytes from 192.168.10.1: icmp_seq=3D2 ttl=3D64 time=3D0.838 ms
-64 bytes from 192.168.10.1: icmp_seq=3D3 ttl=3D64 time=3D1.03 ms
-64 bytes from 192.168.10.1: icmp_seq=3D4 ttl=3D64 time=3D0.985 ms
-
-Cheers,
-Biju
+On 20/06/2025 13:02, Song Yoong Siang wrote:
+> Move the RSS field definitions related to IPv4 and IPv6 UDP from igc.h to
+> igc_defines.h to consolidate the RSS field definitions in a single header
+> file, improving code organization and maintainability.
+> 
+> This refactoring does not alter the functionality of the driver but
+> enhances the logical grouping of related constants
+> 
+> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+> ---
+>   drivers/net/ethernet/intel/igc/igc.h         | 4 ----
+>   drivers/net/ethernet/intel/igc/igc_defines.h | 3 +++
+>   2 files changed, 3 insertions(+), 4 deletions(-)
+> 
+Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
 
