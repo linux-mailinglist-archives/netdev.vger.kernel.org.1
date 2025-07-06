@@ -1,193 +1,197 @@
-Return-Path: <netdev+bounces-204397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00C8BAFA544
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 15:23:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28CD7AFA592
+	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 15:43:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EEF0F7ADEB1
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 13:22:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BCE9189C98F
+	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 13:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D11C21930B;
-	Sun,  6 Jul 2025 13:22:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C33225390;
+	Sun,  6 Jul 2025 13:43:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="vY7oTaVd"
+	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="qJbYveqD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout4.routing.net (mxout4.routing.net [134.0.28.9])
+Received: from mail-10624.protonmail.ch (mail-10624.protonmail.ch [79.135.106.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09841E230E;
-	Sun,  6 Jul 2025 13:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB5A320487E
+	for <netdev@vger.kernel.org>; Sun,  6 Jul 2025 13:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751808160; cv=none; b=a0IrVANhdtTCPiILFDypAH5qRiPBuAfzzBwnFGsdynUqGGKU3j+8LeihjamkILkeaPGDT4xncrsj+h86xxpBQCs0xNeNTqHGZuv977UPPGtZvvD4HuLK+vdKydsVDGVN6HH+ztR4ZTxAjG8ew/nfGEttmyELTbIceQyB3mOiYHU=
+	t=1751809407; cv=none; b=meIcXnTJCTZSLp+ZpfjNpMoMBDohwHMeuVopwGCERfyueV415CCi9UbFrx1tkbY9qwP/V4+eFak4NoHu9HI4YBGG+ooclFU7fyiwGju7efe/w9El71cXN46Pmw+fjm9/nHsPVHB5oR1g+u2ortPAeiIND6mDVzOoLS0FfK+PsVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751808160; c=relaxed/simple;
-	bh=owery2Y9xho1bAvAYoxF0F6uDfB7KsKdTzyV/Nr07xM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Yu63dhJXPtcknY+Ktq++xqdhS5XYnG8Wycgy+AS0o+CH6dx85mbXFhNxu3TPgx8ptoBd1oaoSzQSwj4Ttqoh+D03Jwuu7rWaBkKA2e6643Mhd0qUEfm5BlywKvPXAMzhCpFfAAhdjhN4iCMfs0jzbynFx3S5F2pSGBTxkqTotG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=vY7oTaVd; arc=none smtp.client-ip=134.0.28.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
-	by mxout4.routing.net (Postfix) with ESMTP id 3DCC810087D;
-	Sun,  6 Jul 2025 13:22:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1751808153;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Mw75z6h4HeFha6AF7YI1R1VXg23z1dS7Y1C1o8vw7rQ=;
-	b=vY7oTaVdC6Qx/kFkod5Ac553htlOok+0+ENyqyosC/5ZA+lyV5PdYgql/HkQboHwC5O1Wo
-	K43SNzaMKChJ/Yx2siwfBBfIZ/76ymrIYAChsiAbYmXjZILkH75D1CDfs+sCxikl7dOnR9
-	AY8Q5AHqy156d1eYQZaDMcwAia88KrM=
-Received: from frank-u24.. (fttx-pool-194.15.86.111.bambit.de [194.15.86.111])
-	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id D79811226A5;
-	Sun,  6 Jul 2025 13:22:32 +0000 (UTC)
-From: Frank Wunderlich <linux@fw-web.de>
-To: MyungJoo Ham <myungjoo.ham@samsung.com>,
-	Kyungmin Park <kyungmin.park@samsung.com>,
-	Chanwoo Choi <cw00.choi@samsung.com>,
-	Georgi Djakov <djakov@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Johnson Wang <johnson.wang@mediatek.com>,
-	=?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
-	linux-pm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH v8 16/16] arm64: dts: mediatek: mt7988a-bpi-r4: configure switch phys and leds
-Date: Sun,  6 Jul 2025 15:22:11 +0200
-Message-ID: <20250706132213.20412-17-linux@fw-web.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250706132213.20412-1-linux@fw-web.de>
-References: <20250706132213.20412-1-linux@fw-web.de>
+	s=arc-20240116; t=1751809407; c=relaxed/simple;
+	bh=Iz05zg6KTG2h870K13pF4I99TkLs10BkZ2pBAub+Tno=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Az2UDNuYhc9Y335Jk+qjEuj73fmT+9djdITzm/Afq5WwVJ9ZFtDsxZ8B+vG88Lhoj1FQvyAbUyc34o/U9f9rYnK3pxsC+dX7lUDRvZ1KqfvtBOSkfFIq1+3HyH8810c6uVjt3OtnbEDt/+xjFo1UIdQVAy0wHZdp8mf63ZTUniQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=qJbYveqD; arc=none smtp.client-ip=79.135.106.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
+	s=protonmail; t=1751809395; x=1752068595;
+	bh=Iz05zg6KTG2h870K13pF4I99TkLs10BkZ2pBAub+Tno=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=qJbYveqDzu66TvK0Hvufs0qUSVKKiwXWvPZXpRGRoTmaPQiG5dle/DJBiH9sJ2/LY
+	 +wm8HfMOf4rLN2sjDUlw2SnxivOen/qk7rrG1yAsyjUQySHgcbK968NyeGBE6O5bja
+	 b1jYIXOHERHmfSDFHAOz/6P74a11rcMPoj9vYDPaDtluN0PS0KRbIGqoa2fi7b+Czu
+	 utAjoMoagnNFQe52o6Fi/8ZFP+w5uWhrsDQDmsC40YtR/IOL7l9cG/bs1iHYQtZvVk
+	 HLNvKf6EbHcdTY8rCmVo3klw+diQ01sgGREcUVEGRy/znt/0+M4Nnvk7poQO/vW4ba
+	 o+9rFzZ/GaLeg==
+Date: Sun, 06 Jul 2025 13:43:08 +0000
+To: Cong Wang <xiyou.wangcong@gmail.com>
+From: William Liu <will@willsroot.io>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jiri Pirko <jiri@resnulli.us>, Jamal Hadi Salim <jhs@mojatatu.com>, Savy <savy@syst3mfailure.io>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [BUG]  Inconsistency between qlen and backlog in hhf, fq, fq_codel, and fq_pie causing WARNING in qdisc_tree_reduce_backlog
+Message-ID: <X6Q8WFnkbyNTRaSQ07hgoBUIihJJdm7GIDvCCY0prplSeVDZPKXquiH2as4hPXAWn1J1a2tyP5RnBm8tjKWNM881yDlMlx0pMg9vioBRY1w=@willsroot.io>
+In-Reply-To: <aGh6HiQmcgsPug1u@pop-os.localdomain>
+References: <2UMzQV_2SQetYadgDKNRO76CgTlKBSMAHmsHeosdnhCPcOEwBB-6mSKXghTNSLudarAX4llpw70UI7Zqg2dyE06JGSHm04ZqNDDC5PUH1uo=@willsroot.io> <aGh6HiQmcgsPug1u@pop-os.localdomain>
+Feedback-ID: 42723359:user:proton
+X-Pm-Message-ID: 101863d14e42b2a8fa434b75af334c5c54e62f6e
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Frank Wunderlich <frank-w@public-files.de>
+On Saturday, July 5th, 2025 at 1:04 AM, Cong Wang <xiyou.wangcong@gmail.com=
+> wrote:
 
-Assign pinctrl to switch phys and leds.
+>=20
+>=20
+> On Wed, Jul 02, 2025 at 08:39:45PM +0000, William Liu wrote:
+>=20
+> > Hi,
+> >=20
+> > We write to report a bug in qlen and backlog consistency affecting hhf,=
+ fq, fq_codel, and fq_pie when acting as a child of tbf. The cause of this =
+bug was introduced by the following fix last month designed to address a nu=
+ll dereference bug caused by gso segmentation and a temporary inconsistency=
+ in queue state when tbf peeks at its child while running out of tokens dur=
+ing tbf_dequeue [1]. We actually reported that bug but did not realize the =
+subtle problem in the fix until now. We are aware of bugs with similar symp=
+toms reported by Mingi [3] and Lion [4], but those are of a different root =
+cause (at least what we can see of Mingi's report).
+>=20
+>=20
+> Thanks for your report.
+>=20
+> > This works on the upstream kernel, and we have the following reproducer=
+.
+> >=20
+> > ./tc qdisc del dev lo root
+> > ./tc qdisc add dev lo root handle 1: tbf rate 8bit burst 100b latency 1=
+ms || echo TBF
+> > ./tc qdisc add dev lo handle 3: parent 1:1 hhf limit 1000 || echo HH
+> > ping -I lo -f -c1 -s32 -W0.001 127.0.0.1 2>&1 >/dev/null
+> > ./tc qdisc change dev lo handle 3: parent 1:1 hhf limit 0 || echo HH
+> > ./tc qdisc replace dev lo handle 2: parent 1:1 sfq || echo SFQ
+> >=20
+> > Note that a patched version of tc that supports 0 limits must be built.=
+ The symptom of the bug arises in the WARN_ON_ONCE check in qdisc_tree_redu=
+ce_backlog [2], where n is 0. You can replace hhf with fq, fq_codel, and fq=
+_pie to trigger warnings as well, though the success rate may vary.
+> >=20
+> > The root cause comes from the newly introduced function qdisc_dequeue_i=
+nternal, which the change handler will trigger in the affected qdiscs [5]. =
+When dequeuing from a non empty gso in this peek function, only qlen is dec=
+remented, and backlog is not considered. The gso insertion is triggered by =
+qdisc_peek_dequeued, which tbf calls for these qdiscs when they are its chi=
+ld.
+> >=20
+> > When replacing the qdisc, tbf_graft triggers, and qdisc_purge_queue tri=
+ggers qdisc_tree_reduce_backlog with the inconsistent values, which one can=
+ observe by adding printk to the passed qlen backlog values.
+>=20
+>=20
+> If I understand you correctly, the problem is the inconsistent behavior
+> between qdisc_purge_queue() and qdisc_dequeue_internal()? And it is
+> because the former does not take care of ->gso_skb?
+>=20
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
----
-v4:
-- reorder switch phy(-led) properties
-v2:
-- add labels and led-function and include after dropping from soc dtsi
----
- .../dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi | 61 +++++++++++++++++++
- 1 file changed, 61 insertions(+)
+No, there are 2 points of inconsistent behavior.=20
 
-diff --git a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-index 4d709ee527df..7c9df606f60d 100644
---- a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-+++ b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-@@ -4,6 +4,7 @@
- 
- #include <dt-bindings/gpio/gpio.h>
- #include <dt-bindings/regulator/richtek,rt5190a-regulator.h>
-+#include <dt-bindings/leds/common.h>
- 
- #include "mt7988a.dtsi"
- 
-@@ -152,6 +153,66 @@ &gmac2 {
- 	sfp = <&sfp1>;
- };
- 
-+&gsw_phy0 {
-+	pinctrl-0 = <&gbe0_led0_pins>;
-+	pinctrl-names = "gbe-led";
-+};
-+
-+&gsw_phy0_led0 {
-+	function = LED_FUNCTION_WAN;
-+	color = <LED_COLOR_ID_GREEN>;
-+	status = "okay";
-+};
-+
-+&gsw_port0 {
-+	label = "wan";
-+};
-+
-+&gsw_phy1 {
-+	pinctrl-0 = <&gbe1_led0_pins>;
-+	pinctrl-names = "gbe-led";
-+};
-+
-+&gsw_phy1_led0 {
-+	function = LED_FUNCTION_LAN;
-+	color = <LED_COLOR_ID_GREEN>;
-+	status = "okay";
-+};
-+
-+&gsw_port1 {
-+	label = "lan1";
-+};
-+
-+&gsw_phy2 {
-+	pinctrl-0 = <&gbe2_led0_pins>;
-+	pinctrl-names = "gbe-led";
-+};
-+
-+&gsw_phy2_led0 {
-+	function = LED_FUNCTION_LAN;
-+	color = <LED_COLOR_ID_GREEN>;
-+	status = "okay";
-+};
-+
-+&gsw_port2 {
-+	label = "lan2";
-+};
-+
-+&gsw_phy3 {
-+	pinctrl-0 = <&gbe3_led0_pins>;
-+	pinctrl-names = "gbe-led";
-+};
-+
-+&gsw_phy3_led0 {
-+	function = LED_FUNCTION_LAN;
-+	color = <LED_COLOR_ID_GREEN>;
-+	status = "okay";
-+};
-+
-+&gsw_port3 {
-+	label = "lan3";
-+};
-+
- &i2c0 {
- 	pinctrl-names = "default";
- 	pinctrl-0 = <&i2c0_pins>;
--- 
-2.43.0
+1. qdisc_dequeue_internal and qdisc_peek_dequeued. In qdisc_peek_dequeued, =
+when a skb comes from the dequeue handler, it gets added to the gso_skb wit=
+h qlen and backlog increased. In qdisc_dequeue_internal, only qlen is decre=
+ased when removing from gso.
+
+2. The dequeue limit loop in change handlers and qdisc_dequeue_internal. Ev=
+ery time those loops call qdisc_dequeue_internal, the loops track their own=
+ version of dropped items and total dropped packet sizes, before using thos=
+e values for qdisc_tree_reduce_backlog. The hhf qdisc is an exception as it=
+ just uses a before and after loop in the limit change loop. Would this not=
+ lead to double counting in the gso_skb dequeue case for qdisc_dequeue_inte=
+rnal?=20
+
+Also, I took a look at some of the dequeue handlers (which qdisc_dequeue_in=
+ternal call when direct is false), and fq_codel_dequeue touches the drop_co=
+unt and drop_len statistics, which the limit adjustment loop also uses.=20
+
+> > While historically triggering this warning often results in a UAF, it s=
+eems safe in this case to our knowledge. This warning will only trigger in =
+tbf_graft, and this corrupted class will be removed and made inaccessible r=
+egardless. Lion's patch also looks like qlen_notify will always trigger, wh=
+ich is good.
+> >=20
+> > However, the whole operation of qdisc_dequeue_internal in conjunction w=
+ith its usage is strange. Posting the function here for reference:
+> >=20
+> > static inline struct sk_buff *qdisc_dequeue_internal(struct Qdisc *sch,=
+ bool direct)
+> > {
+> > struct sk_buff *skb;
+> >=20
+> > skb =3D __skb_dequeue(&sch->gso_skb);
+> > if (skb) {
+> > sch->q.qlen--;
+> > return skb;
+> > }
+> > if (direct)
+> > return __qdisc_dequeue_head(&sch->q);
+> > else
+> > return sch->dequeue(sch);
+> > }
+> >=20
+> > The qdiscs pie, codel, fq, fq_pie, and fq_codel all adjust qlen and bac=
+klog in the same loop where they call qdisc_dequeue_internal to bring the q=
+ueue back to the newly requested limit. In the gso case, this always seems =
+incorrect as the number of dropped packets would be double counted for. In =
+the non gso case, this looks to be fine for when direct is true, as in the =
+case of codel and pie, but can be an issue otherwise when the dequeue handl=
+er adjusts the qlen and backlog values. In the hhf case, no action for qlen=
+ and backlog accounting is taken at all after qdisc_dequeue_internal in the=
+ loop (they just track a before and after value).
+>=20
+>=20
+> I noticed the inconsistent definition of sch->limit too, some Qdisc's
+>=20
+> just shrink their backlog down to the limit (assuming it is smaller than
+> the old one), some Qdisc's just flush everything.
+>=20
+> The reason why I didn't touch it is that it may be too late to change,
+> since it is exposed to users, so maybe there are users expecting the
+> existing behaviors.
+>=20
+> > Cong, I see you posted an RFC for cleaning up GSO segmentation. Will th=
+ese address this inconsistency issue?
+>=20
+>=20
+> No, actually the ->gso_skb has nothing to do with GSO segmentation. It
+>=20
+> is a terribly misleading name, it should be named as "->peeked_skb". I
+>=20
+> wanted to rename it but was too lazy to do so. (You are welcome to work
+> on this if you have time).
+
+Ok, I might take a look at this when free.
 
 
