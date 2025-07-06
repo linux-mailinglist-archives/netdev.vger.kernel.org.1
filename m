@@ -1,458 +1,114 @@
-Return-Path: <netdev+bounces-204373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C15DAFA296
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 04:05:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35AC8AFA2D3
+	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 05:07:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D55017A89C6
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 02:03:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96D683B629A
+	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 03:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17C2C1714B7;
-	Sun,  6 Jul 2025 02:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC791547C0;
+	Sun,  6 Jul 2025 03:07:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ADkAR8+G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gm7ywA5o"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1B11A23AA
-	for <netdev@vger.kernel.org>; Sun,  6 Jul 2025 02:04:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9553B2E36F6
+	for <netdev@vger.kernel.org>; Sun,  6 Jul 2025 03:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751767445; cv=none; b=HX1yj2Y5fsq8jbFCVm3ao/QSWl1RXF8ikfy5B/XFPYgutPMxglYousjtVYudWjQYaTpkwqXE8XH3J5baAMkAdvJWTngBXbtCo+3QDOtbHmDfU8wLdZr20cnrIWhfvyPYuHWsTXv7iGxVLRGeOxXKERO15G/Mzc0ZelSdvVXA/U4=
+	t=1751771258; cv=none; b=B/+VMSiOm6vFipm5noScMI596w+MCy/CoycpaKOUS07f3uDBacCOT1Yamk+Iv2Ug70UWQAvIWrW0aM4HihaoMHhJ9TPt67Ysi1EJ0WKhcKt9I85eIQQzXesc629OKVPKvF4j1lq7PpBBpdVVEXOFk67wSb9yAboOo9xvINUiFfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751767445; c=relaxed/simple;
-	bh=HfKZSMoj9CMCA/upYsqZr3SQ6QB2y7U7v3Pn7CKI8rU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EXKLK10CosqzVMrarl8Cu/XkTOYe4d4Au+3/FfSleT46ryso+2LCBM/zcd+YfcE2cNPQ7e+sbeScfEddewRHb1q7wS+IZV2bHzicmZqI0E6dsFCkmAYQpyuZrzxNztzUAaWbf4jy0RnCNm7xOY4Ylaga29dMN2Iz33L32IgElPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ADkAR8+G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4902C4CEE7;
-	Sun,  6 Jul 2025 02:04:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751767444;
-	bh=HfKZSMoj9CMCA/upYsqZr3SQ6QB2y7U7v3Pn7CKI8rU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ADkAR8+GBTchTDhrcHJ8CXXshbH72AxBd1ZXiGw9g9lqZU6oj45retSsweYgSaqLi
-	 F8MZ/qnmnsR+3+hdmVXcrLgiANOwZThavCoz3LWB8YFVpyU/G4oMpeELr97SxWNDdg
-	 ZXv8PMjrF57ymf97Z/NDHM7NMoygmzgVzLxDku7QR35isuY7kx3qxwOM07dpnoe1gt
-	 pxGfnYVaO+yYkKU/0TSr1NO+eHnwWt4KpjhaYexTaX7QdCUPPvNaWIeH/bi1i/25yV
-	 cyMayrLWKniGFxHPrHKqIuRuyAZrr9iWY5BELPCbbzj6BzP9gSferdr4ELZHiYCd9T
-	 W14Coocyn+6Og==
-From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Jiri Pirko <jiri@nvidia.com>
-Subject: [PATCH net-next V5 13/13] net/mlx5: Implement eSwitch hairpin per prio buffers devlink params
-Date: Sat,  5 Jul 2025 19:03:33 -0700
-Message-ID: <20250706020333.658492-14-saeed@kernel.org>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250706020333.658492-1-saeed@kernel.org>
-References: <20250706020333.658492-1-saeed@kernel.org>
+	s=arc-20240116; t=1751771258; c=relaxed/simple;
+	bh=VuCjj2MQ8sgmbGuNT+dkYL0J5A5635INk2QkQBk3D2w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QOWP/PwT0r8aArqi3h9rsW7M5EvvhRr8za3IQgK3u20zI03u3bTsGVfGAK+TNGEIrkXGw+u2tKGnbJXGMx0GScoySgJClH1e3AWFlOvLh3/CTozgcP7c8zezaANGDNThJ4lF3+gujqQf825ZsxfpRfzs/QBu06juL/F8ztADdvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gm7ywA5o; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7424ccbef4eso1632481b3a.2
+        for <netdev@vger.kernel.org>; Sat, 05 Jul 2025 20:07:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751771254; x=1752376054; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qixshjKfFwR3v8v4HXHEgmY8rQMmYay7ALz0do5olqs=;
+        b=Gm7ywA5oF/mGE7H0AdhJg5hwy315Xu9wkJALEgQxBD2mSNurqj+5LJ9XCNa8Eo6nR0
+         tzqfHKG8NAl6NihZ3pJcNCgQvdOfYXdn4lB6OsU/0VIkrlh5VfyBtmVOmPz++Cs9JnPn
+         UpMoH6+KymOAAM+fWO1zmZrBgjz/cN1WC7qioSI4xWUqnP2fngRIVWBuWIXA6/+fUmCS
+         le9OIjomTCCGH/RMiKoYUHZxGsPzkRzr1+3LgHzvDAi/TL/xL/Ngl75KIgITZ7tAM5hG
+         Z7qCm9aDbwS+5gScgV5FYjhv6y9dL+UVa17GTjzfjDbQHUklexrECCYIeGdZ2XrqDmaM
+         WbAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751771254; x=1752376054;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qixshjKfFwR3v8v4HXHEgmY8rQMmYay7ALz0do5olqs=;
+        b=YfMkk8l/GjqKtmHzpNdqpLTADVqZYqlCEbOR7bBf5JVT73ByO4ZcQt1UcroSt+oQBO
+         pB7U1BtkrEATLdHPiQS2fcxWmBVoqSq0Ws2QID54k+ZhSF9+qjmmAo/0pauLl2BTeo1c
+         k86IWcMaXHcEFvoM7qBJ35m8yalkNSlLyNpsKH2HaK6qNOOB4EWuBOBQ2hc/qePzXqo9
+         HHiR0Q2BHWsL7BcuUK/PYJiiztZxA71l2cRj2TgbmNVIIINsBJ3H9nXrojrednU6OD8d
+         EMIWu2jmKMh5aZa0lEtnwam8EycQlce0tkUArL6CplYempZjrvXKZhY5TgBdJCZSXJeb
+         S5dg==
+X-Gm-Message-State: AOJu0YyXNMbQ2bSMYD/b1sgKuDNYrNPzBCqiK7uU8VVWaJrrCcfPigLm
+	Dpc+c3qBc1aFM3la715JwqSlwXKLCtLIG85xl2CoTz3mgfua+SRjmSYt
+X-Gm-Gg: ASbGncuGUb1RIAIT1ePrIN7EA4MDVEhug5Wwf30IaAc5IYo1g3mcCPc+8uprIUnEQhp
+	qQYO2JB90SRb3zMZOl5/LZ2iGnfuNwpfmyacfnTbFn+R11zMIDe7PCtytf9zWoFnCqFVxYypT9Q
+	VAN3sDj+C4Fg7faFy7UPp9tBOegxviSywwjXvSs6K2cpIONHW0JFuxIeeAk+i6mglDS/gjbPtdd
+	mLrEDo2pkcefEGcQ1cp35ROhY2dZzPbBsllYkxQYvbNdDF1F8nK5nY3SkHTUwnW17SzQ4W3P3FA
+	NNeNdZukBRy6pQtNN02yESmRWTKMSXVUcVA3ENsS/ZXuIbEyN4p6AgRyNrdzrIiKRlLsfICcRpM
+	5P9s=
+X-Google-Smtp-Source: AGHT+IHWz9EiQWYyvcieAMgw3vPvzYZ7Xo8CrNN19UVvREpHm4ggUMsntvB548/LvpCFNQCCcVJFhQ==
+X-Received: by 2002:aa7:88c7:0:b0:742:a91d:b2f6 with SMTP id d2e1a72fcca58-74ce8aa58bfmr9605193b3a.13.1751771253831;
+        Sat, 05 Jul 2025 20:07:33 -0700 (PDT)
+Received: from localhost ([2601:647:6881:9060:357d:7cd8:b68f:6a2a])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce35cba78sm5919529b3a.57.2025.07.05.20.07.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Jul 2025 20:07:33 -0700 (PDT)
+Date: Sat, 5 Jul 2025 20:07:32 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Xiang Mei <xmei5@asu.edu>
+Cc: netdev@vger.kernel.org, gregkh@linuxfoundation.org, jhs@mojatatu.com,
+	jiri@resnulli.us, security@kernel.org
+Subject: Re: [PATCH v3] net/sched: sch_qfq: Fix null-deref in agg_dequeue
+Message-ID: <aGnodC+JgY8wI9xc@pop-os.localdomain>
+References: <aGdceCwEZ/cwzKq9@pop-os.localdomain>
+ <20250705212143.3982664-1-xmei5@asu.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250705212143.3982664-1-xmei5@asu.edu>
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+On Sat, Jul 05, 2025 at 02:21:43PM -0700, Xiang Mei wrote:
+> To prevent a potential crash in agg_dequeue (net/sched/sch_qfq.c)
+> when cl->qdisc->ops->peek(cl->qdisc) returns NULL, we check the return
+> value before using it, similar to the existing approach in sch_hfsc.c.
+> 
+> To avoid code duplication, the following changes are made:
+> 
+> 1. Changed qdisc_warn_nonwc(include/net/pkt_sched.h) into a static
+> inline function.
+> 
+> 2. Moved qdisc_peek_len from net/sched/sch_hfsc.c to
+> include/net/pkt_sched.h so that sch_qfq can reuse it.
+> 
+> 3. Applied qdisc_peek_len in agg_dequeue to avoid crashing.
+> 
+> Signed-off-by: Xiang Mei <xmei5@asu.edu>
 
-E-Switch hairpin per prio buffers are controlled and configurable by the
-device, add two devlink params to control them.
+Fixes: 462dbc9101ac ("pkt_sched: QFQ Plus: fair-queueing service at DRR cost")
+Reviewed-by: Cong Wang <xiyou.wangcong@gmail.com>
 
-esw_haripin_per_prio_log_queue_size: p0,p1,....,p7
-  Log(base 2) of the number of packets descriptors allocated
-  internally for hairpin for IEEE802.1p priorities.
-  0 means that no descriptors are allocated for this priority
-  and traffic with this priority will be dropped.
-
-esw_hairpin_per_prio_log_buf_size: p0,p1,...,p7
-  Log(base 2) of the buffer size (in bytes) allocated internally
-  for hairpin for IEEE802.1p priorities.
-  0 means no buffer for this priority and traffic with this
-  priority will be dropped.
-
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
----
- Documentation/networking/devlink/mlx5.rst     |  15 +
- .../net/ethernet/mellanox/mlx5/core/devlink.h |   4 +-
- .../mellanox/mlx5/core/lib/nv_param.c         | 283 ++++++++++++++++++
- 3 files changed, 301 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
-index c9c064de4699..053060de6126 100644
---- a/Documentation/networking/devlink/mlx5.rst
-+++ b/Documentation/networking/devlink/mlx5.rst
-@@ -161,6 +161,21 @@ parameters.
-        * ``balanced`` : Merges fewer CQEs, resulting in a moderate compression ratio but maintaining a balance between bandwidth savings and performance
-        * ``aggressive`` : Merges more CQEs into a single entry, achieving a higher compression rate and maximizing performance, particularly under high traffic loads
- 
-+   * - ``esw_hairpin_per_prio_log_queue_size``
-+     - u32 array[8]
-+     - permanent
-+     - each item is log(base 2) of the number of packet descriptors allocated
-+       internally for hairpin for IEEE802.1p priorities.
-+       0 means that no descriptors are allocated for this priority
-+       and traffic with this priority will be dropped.
-+
-+   * - ``esw_hairpin_per_prio_log_buf_size``
-+     - u32 array[8]
-+     - permanent
-+     - each item is log(base 2) of the buffer size (in bytes) allocated internally
-+       for hairpin for IEEE802.1p priorities.
-+       0 means no buffer for this priority and traffic with this priority will be dropped.
-+
- The ``mlx5`` driver supports reloading via ``DEVLINK_CMD_RELOAD``
- 
- Info versions
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.h b/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
-index 74bcdfa70361..b2c10ce1eac5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
-@@ -22,7 +22,9 @@ enum mlx5_devlink_param_id {
- 	MLX5_DEVLINK_PARAM_ID_ESW_MULTIPORT,
- 	MLX5_DEVLINK_PARAM_ID_HAIRPIN_NUM_QUEUES,
- 	MLX5_DEVLINK_PARAM_ID_HAIRPIN_QUEUE_SIZE,
--	MLX5_DEVLINK_PARAM_ID_CQE_COMPRESSION_TYPE
-+	MLX5_DEVLINK_PARAM_ID_CQE_COMPRESSION_TYPE,
-+	MLX5_DEVLINK_PARAM_ID_ESW_HAIRPIN_DESCRIPTORS,
-+	MLX5_DEVLINK_PARAM_ID_ESW_HAIRPIN_DATA_SIZE,
- };
- 
- struct mlx5_trap_ctx {
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-index a7578eac2dd0..d1115767dea8 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-@@ -1,11 +1,15 @@
- // SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
- /* Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved. */
- 
-+#include <net/dcbnl.h>
-+
- #include "nv_param.h"
- #include "mlx5_core.h"
- #include "en.h"
- 
- enum {
-+	MLX5_CLASS_0_CTRL_ID_NV_INTERNAL_HAIRPIN_CONF         = 0x13,
-+	MLX5_CLASS_0_CTRL_ID_NV_INTERNAL_HAIRPIN_CAP          = 0x14,
- 	MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CONF               = 0x80,
- 	MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CAP                = 0x81,
- 	MLX5_CLASS_0_CTRL_ID_NV_SW_OFFLOAD_CONFIG             = 0x10a,
-@@ -145,6 +149,19 @@ struct mlx5_ifc_nv_keep_link_up_bits {
- 	u8    keep_eth_link_up[0x1];
- };
- 
-+struct mlx5_ifc_nv_internal_hairpin_cap_bits {
-+	u8    log_max_hpin_total_num_descriptors[0x8];
-+	u8    log_max_hpin_total_data_size[0x8];
-+	u8    log_max_hpin_num_descriptor_per_prio[0x8];
-+	u8    log_max_hpin_data_size_per_prio[0x8];
-+};
-+
-+struct mlx5_ifc_nv_internal_hairpin_conf_bits {
-+	u8    log_hpin_num_descriptor[8][0x8];
-+
-+	u8    log_hpin_data_size[8][0x8];
-+};
-+
- #define MNVDA_HDR_SZ \
- 	(MLX5_ST_SZ_BYTES(mnvda_reg) - \
- 	 MLX5_BYTE_OFF(mnvda_reg, configuration_item_data))
-@@ -562,6 +579,258 @@ static int mlx5_devlink_total_vfs_validate(struct devlink *devlink, u32 id,
- 	return 0;
- }
- 
-+static int
-+mlx5_nv_param_read_internal_hairpin_conf(struct mlx5_core_dev *dev,
-+					 void *mnvda, size_t len)
-+{
-+	MLX5_SET_CFG_ITEM_TYPE(global, mnvda, type_class, 0);
-+	MLX5_SET_CFG_ITEM_TYPE(global, mnvda, parameter_index,
-+			       MLX5_CLASS_0_CTRL_ID_NV_INTERNAL_HAIRPIN_CONF);
-+	MLX5_SET_CFG_HDR_LEN(mnvda, nv_internal_hairpin_conf);
-+
-+	return mlx5_nv_param_read(dev, mnvda, len);
-+}
-+
-+static int
-+mlx5_nv_param_read_internal_hairpin_cap(struct mlx5_core_dev *dev,
-+					void *mnvda, size_t len)
-+{
-+	MLX5_SET_CFG_ITEM_TYPE(global, mnvda, type_class, 0);
-+	MLX5_SET_CFG_ITEM_TYPE(global, mnvda, parameter_index,
-+			       MLX5_CLASS_0_CTRL_ID_NV_INTERNAL_HAIRPIN_CAP);
-+
-+	return mlx5_nv_param_read(dev, mnvda, len);
-+}
-+
-+static int
-+mlx5_nv_param_esw_hairpin_descriptors_get(struct devlink *devlink, u32 id,
-+					  struct devlink_param_gset_ctx *ctx)
-+
-+{
-+	struct mlx5_core_dev *dev = devlink_priv(devlink);
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	void *data;
-+	int err, i;
-+
-+	BUILD_BUG_ON(IEEE_8021QAZ_MAX_TCS > __DEVLINK_PARAM_MAX_ARRAY_SIZE);
-+
-+	err = mlx5_nv_param_read_internal_hairpin_conf(dev, mnvda,
-+						       sizeof(mnvda));
-+	if (err)
-+		return err;
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+
-+	ctx->val.arr.size = IEEE_8021QAZ_MAX_TCS;
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
-+		ctx->val.arr.vu32[i] = MLX5_GET(nv_internal_hairpin_conf, data,
-+						log_hpin_num_descriptor[i]);
-+	return 0;
-+}
-+
-+static int
-+mlx5_nv_param_esw_hairpin_descriptors_set(struct devlink *devlink, u32 id,
-+					  struct devlink_param_gset_ctx *ctx,
-+					  struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_core_dev *dev = devlink_priv(devlink);
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	void *data;
-+	int err, i;
-+
-+	err = mlx5_nv_param_read_internal_hairpin_conf(dev, mnvda,
-+						       sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Unable to query internal hairpin conf");
-+		return err;
-+	}
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
-+		MLX5_SET(nv_internal_hairpin_conf, data,
-+			 log_hpin_num_descriptor[i], ctx->val.arr.vu32[i]);
-+
-+	return mlx5_nv_param_write(dev, mnvda,  sizeof(mnvda));
-+}
-+
-+static int
-+mlx5_nv_param_esw_hairpin_descriptors_validate(struct devlink *devlink, u32 id,
-+					       union devlink_param_value val,
-+					       struct netlink_ext_ack *extack)
-+{
-+	u8 log_max_num_descriptors, log_max_total_descriptors;
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	u16 total = 0;
-+	void *data;
-+	int err, i;
-+
-+	if (val.arr.size != IEEE_8021QAZ_MAX_TCS) {
-+		NL_SET_ERR_MSG_FMT_MOD(extack, "Array size must be %d",
-+				       IEEE_8021QAZ_MAX_TCS);
-+		return -EINVAL;
-+	}
-+	err = mlx5_nv_param_read_internal_hairpin_cap(devlink_priv(devlink),
-+						      mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Unable to query internal hairpin cap");
-+		return err;
-+	}
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	log_max_total_descriptors =
-+		MLX5_GET(nv_internal_hairpin_cap, data,
-+			 log_max_hpin_total_num_descriptors);
-+	log_max_num_descriptors =
-+		MLX5_GET(nv_internal_hairpin_cap, data,
-+			 log_max_hpin_num_descriptor_per_prio);
-+
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++) {
-+		if (val.arr.vu32[i] <= log_max_num_descriptors)
-+			continue;
-+
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "Max allowed value per prio is %d",
-+				       log_max_num_descriptors);
-+		return -ERANGE;
-+	}
-+
-+	/* Validate total number of descriptors */
-+	memset(mnvda, 0, sizeof(mnvda));
-+	err = mlx5_nv_param_read_internal_hairpin_conf(devlink_priv(devlink),
-+						       mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Unable to query internal hairpin conf");
-+		return err;
-+	}
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
-+		total += 1 << val.arr.vu32[i];
-+
-+	if (total > (1 << log_max_total_descriptors)) {
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "Log max total value allowed is %d",
-+				       log_max_total_descriptors);
-+		return -ERANGE;
-+	}
-+
-+	return 0;
-+}
-+
-+static int
-+mlx5_nv_param_esw_hairpin_data_size_get(struct devlink *devlink, u32 id,
-+					struct devlink_param_gset_ctx *ctx)
-+{
-+	struct mlx5_core_dev *dev = devlink_priv(devlink);
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	void *data;
-+	int err, i;
-+
-+	err = mlx5_nv_param_read_internal_hairpin_conf(dev, mnvda,
-+						       sizeof(mnvda));
-+	if (err)
-+		return err;
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	ctx->val.arr.size = IEEE_8021QAZ_MAX_TCS;
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
-+		ctx->val.arr.vu32[i] = MLX5_GET(nv_internal_hairpin_conf, data,
-+						log_hpin_data_size[i]);
-+	return 0;
-+}
-+
-+static int
-+mlx5_nv_param_esw_hairpin_data_size_set(struct devlink *devlink, u32 id,
-+					struct devlink_param_gset_ctx *ctx,
-+					struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_core_dev *dev = devlink_priv(devlink);
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	int err, i;
-+	void *data;
-+
-+	err = mlx5_nv_param_read_internal_hairpin_conf(dev, mnvda,
-+						       sizeof(mnvda));
-+	if (err)
-+		return err;
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
-+		MLX5_SET(nv_internal_hairpin_conf, data, log_hpin_data_size[i],
-+			 ctx->val.arr.vu32[i]);
-+
-+	return mlx5_nv_param_write(dev, mnvda,  sizeof(mnvda));
-+}
-+
-+static int
-+mlx5_nv_param_esw_hairpin_data_size_validate(struct devlink *devlink, u32 id,
-+					     union devlink_param_value val,
-+					     struct netlink_ext_ack *extack)
-+{
-+	u8 log_max_data_size, log_max_total_data_size;
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	unsigned long total = 0;
-+	void *data;
-+	int err, i;
-+
-+	if (val.arr.size != IEEE_8021QAZ_MAX_TCS) {
-+		NL_SET_ERR_MSG_FMT_MOD(extack, "Array size must be %d",
-+				       IEEE_8021QAZ_MAX_TCS);
-+		return -EINVAL;
-+	}
-+
-+	err = mlx5_nv_param_read_internal_hairpin_cap(devlink_priv(devlink),
-+						      mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Unable to query internal hairpin cap");
-+		return err;
-+	}
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	log_max_data_size = MLX5_GET(nv_internal_hairpin_cap, data,
-+				     log_max_hpin_data_size_per_prio);
-+	log_max_total_data_size = MLX5_GET(nv_internal_hairpin_cap, data,
-+					   log_max_hpin_total_data_size);
-+
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++) {
-+		if (val.arr.vu32[i] <= log_max_data_size)
-+			continue;
-+
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "Max allowed value per prio is %d",
-+				       log_max_data_size);
-+		return -ERANGE;
-+	}
-+
-+	/* Validate total data size */
-+	memset(mnvda, 0, sizeof(mnvda));
-+	err = mlx5_nv_param_read_internal_hairpin_conf(devlink_priv(devlink),
-+						       mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Unable to query internal hairpin conf");
-+		return err;
-+	}
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
-+		total += 1 << val.arr.vu32[i];
-+
-+	if (total > (1 << log_max_total_data_size)) {
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "Log max total value allowed is %d",
-+				       log_max_total_data_size);
-+		return -ERANGE;
-+	}
-+
-+	return 0;
-+}
-+
- static const struct devlink_param mlx5_nv_param_devlink_params[] = {
- 	DEVLINK_PARAM_GENERIC(ENABLE_SRIOV, BIT(DEVLINK_PARAM_CMODE_PERMANENT),
- 			      mlx5_devlink_enable_sriov_get,
-@@ -576,6 +845,20 @@ static const struct devlink_param mlx5_nv_param_devlink_params[] = {
- 			     mlx5_nv_param_devlink_cqe_compress_get,
- 			     mlx5_nv_param_devlink_cqe_compress_set,
- 			     mlx5_nv_param_devlink_cqe_compress_validate),
-+	DEVLINK_PARAM_DRIVER(MLX5_DEVLINK_PARAM_ID_ESW_HAIRPIN_DESCRIPTORS,
-+			     "esw_hairpin_per_prio_log_queue_size",
-+			     DEVLINK_PARAM_TYPE_ARR_U32,
-+			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
-+			     mlx5_nv_param_esw_hairpin_descriptors_get,
-+			     mlx5_nv_param_esw_hairpin_descriptors_set,
-+			     mlx5_nv_param_esw_hairpin_descriptors_validate),
-+	DEVLINK_PARAM_DRIVER(MLX5_DEVLINK_PARAM_ID_ESW_HAIRPIN_DATA_SIZE,
-+			     "esw_hairpin_per_prio_log_buf_size",
-+			     DEVLINK_PARAM_TYPE_ARR_U32,
-+			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
-+			     mlx5_nv_param_esw_hairpin_data_size_get,
-+			     mlx5_nv_param_esw_hairpin_data_size_set,
-+			     mlx5_nv_param_esw_hairpin_data_size_validate),
- };
- 
- int mlx5_nv_param_register_dl_params(struct devlink *devlink)
--- 
-2.50.0
-
+Thanks!
 
