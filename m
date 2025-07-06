@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-204412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F134AAFA59D
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 15:53:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AFA9AFA5A8
+	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 16:02:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27DF57A12FF
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 13:52:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71D897AB891
+	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 14:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E04202998;
-	Sun,  6 Jul 2025 13:53:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46B0F4E2;
+	Sun,  6 Jul 2025 14:02:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mSY0W1R2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m26BqOPy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
+Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8937A1D432D
-	for <netdev@vger.kernel.org>; Sun,  6 Jul 2025 13:53:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2062E3700
+	for <netdev@vger.kernel.org>; Sun,  6 Jul 2025 14:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751810005; cv=none; b=M/RycBb49LoBGoXQIsJbt8xYpxkBWxw78yQEvYnLQu9bhdzPx1TUEw78FojtS5Qfp3miIieERYnjXZKFF7zW+5lmpGeGkTQarKxdSNGtPDVQJCRxuKSNdE7tO6SsJPmRyhfawAHpGV71UwXGPgdoKquTsKukiGiZmf+OVmbLcvc=
+	t=1751810549; cv=none; b=EVsgx0RC7g2S/XxLu8iikiX3gs+d+nFuQfKtjIGViogGkzgsa64YTie3024rxg19sxjrGaWWtv9cp7LqvBwja2y11RscntSgMDwczACoYXzCJjgYVzkzd8N/K/ZrylSWNRJpZe+TCjWWoyogrFjKn0tMeFZR9eWqS6j5rS2omV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751810005; c=relaxed/simple;
-	bh=YMKvrK25Vko8CdwpfCdeBs/6ioxCUNzDHOwrPgdh8eE=;
+	s=arc-20240116; t=1751810549; c=relaxed/simple;
+	bh=M13KugF1Ws0QBtUBcnC7d32T74BfCi8DqZTDRHjXYq0=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=NEI4fA2R3AokbI1m771VDEDHTC00F6SBxG8vU/r+Gc85E8MQhaxKJV0jwwsyOU1f9+FBE3rju/uutiKPQsRc38gp1Pf+BJBKXTYA5tnLDplYvJeGEaSYwSg+WLsguYj+cIKkQdwMd7cTytHwbozdK+y4bav83H71CdWdZltohJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mSY0W1R2; arc=none smtp.client-ip=209.85.219.173
+	 Mime-Version:Content-Type; b=kVMmoXdmmeDIc3+5knaiD309ptZZ2CB+71jpnIMVubnKN99JiyXrTfsz/oW/RJTryB1O2TALs2ABZz8hzqV2I9l+CS+Ee4p/ORTzVJ0BYuqWJhhAyC7KIHlqSpK/NS1VVVIZPxBlHWhVxnbOXaJs89VZASdbTYahdJUChp0dQUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m26BqOPy; arc=none smtp.client-ip=209.85.219.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e81826d5b72so1868476276.3
-        for <netdev@vger.kernel.org>; Sun, 06 Jul 2025 06:53:23 -0700 (PDT)
+Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e7387d4a336so1771377276.2
+        for <netdev@vger.kernel.org>; Sun, 06 Jul 2025 07:02:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751810002; x=1752414802; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1751810547; x=1752415347; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TbTSvpE3MV/NaFwPJygqzq4JzBK3Z/CAs5d9JpUff5o=;
-        b=mSY0W1R22ia4GtuCD5FGfOHUcfDEynltPkOYNELUlw318jYSn/YSg/HfWskJhqquz9
-         WVpiz4K5O0BJK9ZT2AiLxSJwNeLZ0nUuYNcGElxcbIGmNnOy4I4Ta+hGBhr7RfQaYtOh
-         itpuvvNBKk6z+YqeEXNW4+77oXNe1zWPX6iXSqTRfjLwp7uHxBiK8e80VN8voWUp+AtZ
-         cI1hYWdKozePK4hnIuoeyxSyJ9OR5kA4+0DJSMMscmXcazhAkf7UTCppG56ujZYHhZyO
-         4pKn/hNCP22y6ASfue9YMIfFRre7156alyWn3pPIhce9oqHygaUyvupINnEFGGiMvZ0b
-         ESlQ==
+        bh=6QZ6wmwyGXii0Wu+TrRn9Ig1CfOT0Nay8M5P76inQEg=;
+        b=m26BqOPyXBV/jpRO5PO66utNyR81K6PTp6tSeSu5meUqW8G2nJBRZq7/cAKznLFKzv
+         2eZoAHGAMtg9sly0o9W9a1h3thATuxic7B1IYjrVuBemr+2wPvpVtgFRiRSbRpdok0Yy
+         ypoU9IdM8diuO3VjznXahkl42dbmdG8AzbS+qrC+21LS55+g+b/C1hHeQ6xa0cB6ojep
+         JBvCAuDHoVuN06h1esoo4GtZc7+VLMfmn6HhWaKDYrXxivgza94jBOXwrtdEdb70sIlk
+         acWETzXrTfZiigyoZp0EzjaZSYY88hL83Be3Gncg+0M/FC/SrHhnS9i0Zpmm/2bJZUBA
+         jdpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751810002; x=1752414802;
+        d=1e100.net; s=20230601; t=1751810547; x=1752415347;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=TbTSvpE3MV/NaFwPJygqzq4JzBK3Z/CAs5d9JpUff5o=;
-        b=dsPioB1i8xZW8SnG38oU4KM9+ffxxS18QGkBZeWfcB+yCgCLtJdKKG1pjuDOcgr/Y1
-         TkJB1jHrew6TTMdv0XZTaHtTCENAL6I4TUoZp7ZkYdIcGgTJVGe0DoeOS7pUlIJvy/sC
-         CnUcLlhkKD/JUMjULeBChQj2RmTEDzpc+cALrqeoyFAt6k8m9qmXXSRjmyjJzET4Fcs1
-         ybE25WL9bMRaafLArwa9L1WEfd55SBdU2dzv7WyLkodlejCh3l/yoop16S3SDA2nHhTA
-         NMiJ9a3JXcL9SZbhc97ihDm0FvwHgqPQJmaZj7z8Myp++SJgQkdWwltCYrXaAnRElQ4G
-         ICdw==
-X-Forwarded-Encrypted: i=1; AJvYcCV78PzmQnFcw5bWdbJ0l3doPcqN/SgIv9Uu76x1bqWYmg4gv+OcBWnzj/mIu9lIolYR2wK1E3I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQy8CBMtxsTAZHGYqXth/5XlKZOGRiOHrmQOP73tosq+gBQP2i
-	M1qcChdxT/xlMYu8DPQGnKt2IJMpPyFHfM0ZX3wSEQpN73xxTezlMDaW
-X-Gm-Gg: ASbGncub+WVHcJRQDVkAA4J+Nqn706McNafqgFmJj/jTFIji+uSsD72bECYcZ0Q0BrQ
-	eqiUWgiJXq/ydsiPTzlyY+TsfIKEiDsJyphKjFOUvVTmvlmGn6gL9KUqSwKZUiSz1ATkaLuPoGf
-	WJ46TdP6BJxukz6QtlyY9g0v9BcyWO/X3Mio84ljFLf2+7tsVB0om7uUt1fJh9nAJ2p+tMTIiwC
-	GmlOMKP1ETNjB34SC9fcx2ixHv/5c/hOiVkQF4IDKls7bZpKsd4slecMalNqdKHY4Hgnf7/r1Vn
-	NYb7FZQFThdXQ38q7l/8GZD8D8jSOFthU1MGu4iKhGJScUs8Gcx4vwY0wOCkuAzIt4lPqlPrvji
-	EODCIirxPiuk90Qg7AtA/R2/o/ljoeYvG+44wzNc=
-X-Google-Smtp-Source: AGHT+IEEgiAtUMg6fd4XOR5bSfBhFD0BM9SnY+DEfBNz3zy8InFJ+HiXlD21vI3QMZdk345WRZyqAQ==
-X-Received: by 2002:a05:6902:18ce:b0:e81:9c45:a97e with SMTP id 3f1490d57ef6-e8b3cd912c8mr5782348276.38.1751810002480;
-        Sun, 06 Jul 2025 06:53:22 -0700 (PDT)
+        bh=6QZ6wmwyGXii0Wu+TrRn9Ig1CfOT0Nay8M5P76inQEg=;
+        b=V6BZWyTo3v5/A6NBUh2vEioaGI5zMvoAK/ZWxvgLCMgur3Gatq1kPyYlD0otZYBSEm
+         SpZuhcWKOLpIhWUe54nB6mAloVt0QSAw+a9iUfa/bMIduGtrE5wFL/8dqKLOTnOV+FJB
+         bx/EVYQgaDqet10HlzNVLCBXI3Rh+IdGY4TI248KjQaN+enJJUZs/BhSWb3YxIjxSNWW
+         uyosqY6P6ARL5dZOL83LTRMb3bvNiEBIXSza4aZpPE1E58JiLUaZyJHp7K7Y4ZykuUlg
+         kypL2klHw/xhLWU2JDDzZL82qRqZ5OIN1JwKQZatKCvGgT/AdX3kP1ef0KfQibWhPMaB
+         mDtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXxP1PTeQLDG+XtA8Npg1jWeQCcYKUvtFjy7XsUbTq+Cu8AW16MRypASBtdYmAkxqPfs7KU9Kk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMZ7y/AUsdNr4ggxc+633yc48LJM997Oq5rwKdLc5AfNLsNrhP
+	yugD+HDrp5a5tcrSWplVALtfw/Q/q6zwkrI5W8Je13AoT7xZJ8wzOhDO
+X-Gm-Gg: ASbGnctvtkhX6Fa+Qsd8KkticoAi5CpIaz58KVaELjdpfOYDHwaDcliWXwz+Lg8Eifo
+	26LpH8bVo0/LnR7p9TifSp8x9FJoQ5wR7dO95SBn0rcwQZeOr5ySD2maNTOgShKo0mDNLWTGhNA
+	AAfhD1tQz6Q3yCNTtfmlR0Ul75V/eaLwPadWwb5xgzkvdkW7hqbb7fOLIv1fW4JpEQe3kCaPUVI
+	SFy3f4jn3lqOI0+/9ceJH6khT1D/CQo6MsYy/RXed1M9n1eCY5tk903V56OaYAcXiWqEwSbdSts
+	bEId8/YUS51ze9NkBnErL/T6p6PG/BxBMqgGxH6Sk80YImPtPnTQ4l0q6URQziAJyBtDb+J2gmZ
+	uVniha2uTUO1C0InbPQGk9sAuHzgUKcB7+pbESKPs2fITYQ7haQ==
+X-Google-Smtp-Source: AGHT+IE0w14l3euFA51VKLaGtgpdpeYidtn0JopqpG9Oz/GuiHFLnI7VLxR9YN3Zq2ie1t6NzG3cmQ==
+X-Received: by 2002:a05:6902:4585:b0:e8b:3e1c:14db with SMTP id 3f1490d57ef6-e8b3e1c1619mr3868367276.34.1751810546997;
+        Sun, 06 Jul 2025 07:02:26 -0700 (PDT)
 Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-7166598b457sm12337247b3.22.2025.07.06.06.53.21
+        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e899c48f85asm2004240276.47.2025.07.06.07.02.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Jul 2025 06:53:21 -0700 (PDT)
-Date: Sun, 06 Jul 2025 09:53:21 -0400
+        Sun, 06 Jul 2025 07:02:26 -0700 (PDT)
+Date: Sun, 06 Jul 2025 10:02:25 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: Kuniyuki Iwashima <kuniyu@google.com>, 
  "David S. Miller" <davem@davemloft.net>, 
@@ -84,12 +84,11 @@ Cc: Simon Horman <horms@kernel.org>,
  Kuniyuki Iwashima <kuniyu@google.com>, 
  Kuniyuki Iwashima <kuni1840@gmail.com>, 
  netdev@vger.kernel.org
-Message-ID: <686a7fd16830f_3aa6542947b@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250702223606.1054680-5-kuniyu@google.com>
+Message-ID: <686a81f1ec754_3aa65429440@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250702223606.1054680-7-kuniyu@google.com>
 References: <20250702223606.1054680-1-kuniyu@google.com>
- <20250702223606.1054680-5-kuniyu@google.com>
-Subject: Re: [PATCH v1 net-next 4/7] af_unix: Use cached value for SOCK_STREAM
- in unix_inq_len().
+ <20250702223606.1054680-7-kuniyu@google.com>
+Subject: Re: [PATCH v1 net-next 6/7] af_unix: Introduce SO_INQ.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,28 +100,72 @@ Content-Type: text/plain;
 Content-Transfer-Encoding: 7bit
 
 Kuniyuki Iwashima wrote:
-> Compared to TCP, ioctl(SIOCINQ) for AF_UNIX SOCK_STREAM socket is more
-> expensive, as unix_inq_len() requires iterating through the receive queue
-> and accumulating skb->len.
+> We have an application that uses almost the same code for TCP and
+> AF_UNIX (SOCK_STREAM).
 > 
-> Let's cache the value for SOCK_STREAM to a new field during sendmsg()
-> and recvmsg().
+> TCP can use TCP_INQ, but AF_UNIX doesn't have it and requires an
+> extra syscall, ioctl(SIOCINQ) or getsockopt(SO_MEMINFO) as an
+> alternative.
 > 
-> The field is protected by the receive queue lock.
-
-nit: for updates, but the read is taken without the lock held, hence
-the WRITE_ONCE/READ_ONCE accessors.
-
+> Let's introduce the generic version of TCP_INQ.
 > 
-> Note that ioctl(SIOCINQ) for SOCK_DGRAM returns the length of the first
-> skb in the queue.
+> If SO_INQ is enabled, recvmsg() will put a cmsg of SCM_INQ that
+> contains the exact value of ioctl(SIOCINQ).  The cmsg is also
+> included when msg->msg_get_inq is non-zero to make sockets
+> io_uring-friendly.
 > 
-> SOCK_SEQPACKET still requires iterating through the queue because we do
-> not touch functions shared with unix_dgram_ops.  But, if really needed,
-> we can support it by switching __skb_try_recv_datagram() to a custom
-> version.
+> Note that SOCK_CUSTOM_SOCKOPT is flagged only for SOCK_STREAM to
+> override setsockopt() for SOL_SOCKET.
+> 
+> By having the flag in struct unix_sock, instead of struct sock, we
+> can later add SO_INQ support for TCP and reuse tcp_sk(sk)->recvmsg_inq.
+> 
+> Note also that supporting custom getsockopt() for SOL_SOCKET will need
+> preparation for other SOCK_CUSTOM_SOCKOPT users (UDP, vsock, MPTCP).
 > 
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 
 Reviewed-by: Willem de Bruijn <willemb@google.com>
+
+> +static int unix_setsockopt(struct socket *sock, int level, int optname,
+> +			   sockptr_t optval, unsigned int optlen)
+> +{
+> +	struct unix_sock *u = unix_sk(sock->sk);
+> +	struct sock *sk = sock->sk;
+> +	int val;
+> +
+> +	if (level != SOL_SOCKET)
+> +		return -EOPNOTSUPP;
+> +
+> +	if (!unix_custom_sockopt(optname))
+> +		return sock_setsockopt(sock, level, optname, optval, optlen);
+> +
+> +	if (optlen != sizeof(int))
+> +		return -EINVAL;
+> +
+> +	if (copy_from_sockptr(&val, optval, sizeof(val)))
+> +		return -EFAULT;
+> +
+> +	switch (optname) {
+> +	case SO_INQ:
+> +		if (sk->sk_type != SOCK_STREAM)
+> +			return -EINVAL;
+
+Sanity check, but technically not needed as SOCK_CUSTOM_SOCKOPT is
+only set for SOCK_STREAM?
+
+> +
+> +		if (val > 1 || val < 0)
+> +			return -EINVAL;
+> +
+> +		WRITE_ONCE(u->recvmsg_inq, val);
+> +		break;
+> +	default:
+> +		return -ENOPROTOOPT;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+
 
