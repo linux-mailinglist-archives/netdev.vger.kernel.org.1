@@ -1,172 +1,157 @@
-Return-Path: <netdev+bounces-204441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0911AFA771
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 21:21:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFDBDAFA781
+	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 21:44:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53E3A1898A44
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 19:21:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 035023B5A74
+	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 19:44:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 927971F463F;
-	Sun,  6 Jul 2025 19:21:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4DBD288537;
+	Sun,  6 Jul 2025 19:44:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JkK5jTfk"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="gIbM0PWf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1236617A309
-	for <netdev@vger.kernel.org>; Sun,  6 Jul 2025 19:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E687B3E1;
+	Sun,  6 Jul 2025 19:44:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751829679; cv=none; b=OmOVKYpSZ4lVYox3mEuFeSYNiLXDaBCS6ttbFAbogc9wPqoh7s8/t65zMmdsLtzYNXKMgW+tvZmm2Ug6EGXcbD3rf6yQlJc5lsfD2NiFbjSQCrciSAC7l+oOmsmAuk7/Vt3fAiGfTvG6AOXvEuxBguyNmHKf0acJ14ONeRpxjyc=
+	t=1751831063; cv=none; b=hmTZ1Hof0BHBZqD0XoIdWVJEnGtwGcfsmvM9qbSKTL2cbCuE1Za+QcQLzFMRnw3YtNjAvx9x7YnEwYSW456QfO1tC7fyBpfZp8Eytte8Ep85SDHiZ+CSERW0/spi+tp9aL9F/kEm3vlpydhCKI0rwFIUFlcj2FbbT698qN6TmX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751829679; c=relaxed/simple;
-	bh=0OKj2CuAxo5PE3lgiAI0emXC0RhoMOS67STyWIJ5Yu0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=apcHcATvN5Ize8cUrWbEDqorR0M7ujXJO+TmSz75wj/c1pLcfbOmILx30kibx8M2CPSb5eXglTMg/0jlxz/w7GLfSUD8SLncrGYDEbbnBcudz8zTOxQndgED+I8FUJWtn2Vc6hBExkaan6CB3hBaKXK1aKeR4RT6mk8aZCBTk+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JkK5jTfk; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-313a001d781so1850705a91.3
-        for <netdev@vger.kernel.org>; Sun, 06 Jul 2025 12:21:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751829677; x=1752434477; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7VGRc7y2RCJf8zHE4Lxpl+ymRedBL4YGuUrOObcVcUY=;
-        b=JkK5jTfkYA8mpeaNB+eK6+mgf7TCOEYgr545imZs4gNUHsEAYCDBcN5fnYgMn35t6Y
-         x/OBIbiFfPvMUZ/O5ZVAAjlXVCkZC02II6FJShluDTQTICg66Xv0OzwmKUEtIiDscG4x
-         BmtpsKFXCZ5LzMjlJSGVZK2YC1ozX5549lb66JW8+q0DQIaREZPLA+EC7mpw+xR5DgFg
-         +M5qqYM8EJFLMuGHrnt71drqEl5sFYFcjRe07czCpKAntQzd6vMMl6FgwYgKD6Gln+1l
-         pmS12jRf8CpY3BsqbgwVHURMyfTFQMKzIYCN6sfQFa/eSBQ9+bhXjcDDd4lSU+gN/LaK
-         EIlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751829677; x=1752434477;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7VGRc7y2RCJf8zHE4Lxpl+ymRedBL4YGuUrOObcVcUY=;
-        b=TIcL2mEAFy6ULmK91TbpmXr/XBbZa737L9Ld8OBeIbYSW0COTRf6BmXHcLBNsqDFjT
-         CCGM7Zn5F1FtPs01NopKsD8VXU1Kn1kbmPa/qAKrU9VeftxmOS0jxfSBc1jtrfoi5IN3
-         VrPulW1pE5MrPlEWx3dl8EerSa+G3TfVkGwfsXqi6HSkdyWS9ZW46M75SHhwv/0+5kPq
-         vbH3xsjrz4DSklmLSkKooCqr0fDjz/8FF63cGVdnKMID/zaSpfCyeqq3XKMuV7UeIbVi
-         kMj0xLdMssS54rAxoSeiGITZFnN3/F7p7LpY7TSfXa6yjjN24gI8q2xhFYkb3s+EpvfY
-         6ywg==
-X-Forwarded-Encrypted: i=1; AJvYcCW7ndkO7tu0l6E30eZ34VhCDSTcyikLlFn+90R2C9i/JDt22bYvP+1RZcsBiCzwyqQsTaG6Is0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyG7grluXzyoLKsYYP2F6ztJmoTPMAtfLnzqEYqL7dKGZzySzIw
-	iRtZWoJDfuLcPSmGasFfJELdCXtCAXnTwDfxZ3X8f7CO1q3gk8e52zBF5vLp7xra+6ZYK0ScLL/
-	8jEWv6gpfh72PwpVGOL5ZnOAAyBxDtlGp8lo8UjWH
-X-Gm-Gg: ASbGnct3XqEFedndQTEKFhB2Xi00ZFq5Oud30XkoCPRki08dmcKdeNBX7Eo+Zf+ZUaS
-	22o6YG+HpMFdhJUzJeRzkBEcrdp3HbmXQgHb/aitCLoITA2+3CAhmwkAoVm6466pGUwvCbT//kl
-	IjIuH7JWdkmG7mp7HYMrzrBU6ohXAemhL+viNr20iUD6gYBusPzla71N9dImFjNG8Ve5qOjSgal
-	0VB
-X-Google-Smtp-Source: AGHT+IGLEi8Ql17Lm/5wwAMceK5HwCFYMkPYSR5SWZdp+dy3YWrrM4bgmWNMiMRZzMaCav1yyeQavdzIOlSrpN4wU+E=
-X-Received: by 2002:a17:90a:c2cb:b0:312:ec:412f with SMTP id
- 98e67ed59e1d1-31aac44cc39mr16702693a91.14.1751829677204; Sun, 06 Jul 2025
- 12:21:17 -0700 (PDT)
+	s=arc-20240116; t=1751831063; c=relaxed/simple;
+	bh=TSgDwVxqyTCCtOVNGZAXW3H2A9hsP3zJNy5SDirqyg8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ir7umcfgL5ox1Mk0zFvtSV77Yd4k26mq5ZMrKGU6WhSNYnAkwZhYICFDcFXF7cbhZsZUr45T+oQ32G+aqSUo0mXVJAgZ7rC+kQ6sUNepSUfyMRv5omb8ky81rzap6sHqi9q8LGIHyFIFLc7nF+IlRuBaV0Fn5H7Wg45H6dK5yf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=gIbM0PWf; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 566702s7017602;
+	Sun, 6 Jul 2025 19:44:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=DyWUe8d1haw6m8Oy1cI30UgcAmbCj
+	yeCPJKwX4Tb+kM=; b=gIbM0PWfjM/yE0F3sOODWqKbRZ/XqzQBvHcJcuOrtTL37
+	1hj5WU5pikqp4Q26+zt/0+pTCHBgEr9xZF5C6DdrgwxfYaeSloQApuemVKqLFLo+
+	Eb+mAqEAkMeb0g90+HZThSECyBL+9nXaQpgv3ZZBNumy5PPoCd4rT8x8I8WB1Onh
+	Z0vwzShmmQ2MzX56GtnAp+xkndKkjoh62rqD1bOKyJzu6f2N3lKK/32a4ohUHnmE
+	nLcU1AfPyRsgbyBRKM6+wT6YAQ1JAwiK8K+xnK2EpENEN1lh2/Ossz3z7TKlOutv
+	Mif/W3lznQMx4Tz3diWt8GUTsA0B0Klm4SO/VpD1g==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47pvkxsfx0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 06 Jul 2025 19:44:00 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 566GBoh2014173;
+	Sun, 6 Jul 2025 19:43:58 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 47ptg7ggas-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 06 Jul 2025 19:43:58 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 566Jhwv8007692;
+	Sun, 6 Jul 2025 19:43:58 GMT
+Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 47ptg7ggah-1;
+	Sun, 06 Jul 2025 19:43:58 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: sgoutham@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        horms@kernel.org, netdev@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com, linux-arm-kernel@lists.infradead.org,
+        darren.kenny@oracle.com, linux-kernel@vger.kernel.org
+Subject: [PATCH net v3] net: thunderx: avoid direct MTU assignment after WRITE_ONCE()
+Date: Sun,  6 Jul 2025 12:43:21 -0700
+Message-ID: <20250706194327.1369390-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250702223606.1054680-1-kuniyu@google.com> <20250702223606.1054680-7-kuniyu@google.com>
- <686a81f1ec754_3aa65429440@willemb.c.googlers.com.notmuch>
-In-Reply-To: <686a81f1ec754_3aa65429440@willemb.c.googlers.com.notmuch>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Sun, 6 Jul 2025 12:21:05 -0700
-X-Gm-Features: Ac12FXzYg6AUW5KRd7_n0C_sTyOx5WPYNW9r59VWQkqtj4AqOrJ2jQCa7Q1eXcU
-Message-ID: <CAAVpQUD1Exoz6iY-Bzst5EWD6Oh0z_adQ_R4QdUjad+WykWfiA@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 6/7] af_unix: Introduce SO_INQ.
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-04_07,2025-07-04_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 adultscore=0
+ suspectscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2505160000 definitions=main-2507060126
+X-Proofpoint-GUID: vPShqCo2W3JHl8gIwplnonW7g9JumuOR
+X-Authority-Analysis: v=2.4 cv=a5Uw9VSF c=1 sm=1 tr=0 ts=686ad200 b=1 cx=c_pps a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=Heg8zcIur3sJgoQ754cA:9 cc=ntf awl=host:12058
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA2MDEyNiBTYWx0ZWRfX7762+z18io8I YHRqK58bq3ToBBffQqK0EroeY63XNgOsjdex53ntMFemr2FuNxoQIwnl3NmhO0VD9AhCrK5+m8y YOmYc+rMgUy1wgvAsF2Ou2af2PiDVx30rdnKm9Z8ICUyz8PwJUlUVqt2k7Hcpj12X12fReDj+oz
+ fXnHlXhp94bG94Sn3SEXKqsTeBAGBXUKQmC+R3rEosmlbEA08qMVyIATkeV3n7WH3mzKIAB7qL2 zf2TvuSVXdiJ5expgj0xgTGXFhFRI2Dv+1HWVH6VtUGcMT2qK/mw/s9G4pE+ck02lYgt52lROEV nxux0ZNxaahOd76o82muTa2DhKl05ONrKJDuSCw/HaEu7RUGEd7UBsUyAVdi7PIFpoe4SMoONaE
+ c7+1carHuUTcOjkNYn5OxF3LGVStgJVihm7z1pNvRNlYeTDGa2ZJmD3CMDRRK4dpHWWn5in3
+X-Proofpoint-ORIG-GUID: vPShqCo2W3JHl8gIwplnonW7g9JumuOR
 
-On Sun, Jul 6, 2025 at 7:02=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Kuniyuki Iwashima wrote:
-> > We have an application that uses almost the same code for TCP and
-> > AF_UNIX (SOCK_STREAM).
-> >
-> > TCP can use TCP_INQ, but AF_UNIX doesn't have it and requires an
-> > extra syscall, ioctl(SIOCINQ) or getsockopt(SO_MEMINFO) as an
-> > alternative.
-> >
-> > Let's introduce the generic version of TCP_INQ.
-> >
-> > If SO_INQ is enabled, recvmsg() will put a cmsg of SCM_INQ that
-> > contains the exact value of ioctl(SIOCINQ).  The cmsg is also
-> > included when msg->msg_get_inq is non-zero to make sockets
-> > io_uring-friendly.
-> >
-> > Note that SOCK_CUSTOM_SOCKOPT is flagged only for SOCK_STREAM to
-> > override setsockopt() for SOL_SOCKET.
-> >
-> > By having the flag in struct unix_sock, instead of struct sock, we
-> > can later add SO_INQ support for TCP and reuse tcp_sk(sk)->recvmsg_inq.
-> >
-> > Note also that supporting custom getsockopt() for SOL_SOCKET will need
-> > preparation for other SOCK_CUSTOM_SOCKOPT users (UDP, vsock, MPTCP).
-> >
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
->
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
->
-> > +static int unix_setsockopt(struct socket *sock, int level, int optname=
-,
-> > +                        sockptr_t optval, unsigned int optlen)
-> > +{
-> > +     struct unix_sock *u =3D unix_sk(sock->sk);
-> > +     struct sock *sk =3D sock->sk;
-> > +     int val;
-> > +
-> > +     if (level !=3D SOL_SOCKET)
-> > +             return -EOPNOTSUPP;
-> > +
-> > +     if (!unix_custom_sockopt(optname))
-> > +             return sock_setsockopt(sock, level, optname, optval, optl=
-en);
-> > +
-> > +     if (optlen !=3D sizeof(int))
-> > +             return -EINVAL;
-> > +
-> > +     if (copy_from_sockptr(&val, optval, sizeof(val)))
-> > +             return -EFAULT;
-> > +
-> > +     switch (optname) {
-> > +     case SO_INQ:
-> > +             if (sk->sk_type !=3D SOCK_STREAM)
-> > +                     return -EINVAL;
->
-> Sanity check, but technically not needed as SOCK_CUSTOM_SOCKOPT is
-> only set for SOCK_STREAM?
+The current logic in nicvf_change_mtu() writes the new MTU to
+netdev->mtu using WRITE_ONCE() before verifying if the hardware
+update succeeds. However on hardware update failure, it attempts
+to revert to the original MTU using a direct assignment
+(netdev->mtu = orig_mtu)
+which violates the intended of WRITE_ONCE protection introduced in
+commit 1eb2cded45b3 ("net: annotate writes on dev->mtu from
+ndo_change_mtu()")
 
-Yes, I planned to move other AF_UNIX specific options and reuse
-unix_setsockopt() for DGRAM and SEQPACKET.
+Additionally, WRITE_ONCE(netdev->mtu, new_mtu) is unnecessarily
+performed even when the device is not running.
 
+Fix this by:
+  Only writing netdev->mtu after successfully updating the hardware.
+  Skipping hardware update when the device is down, and setting MTU
+  directly. Remove unused variable orig_mtu.
 
->
-> > +
-> > +             if (val > 1 || val < 0)
-> > +                     return -EINVAL;
-> > +
-> > +             WRITE_ONCE(u->recvmsg_inq, val);
-> > +             break;
-> > +     default:
-> > +             return -ENOPROTOOPT;
-> > +     }
-> > +
-> > +     return 0;
-> > +}
-> > +
->
+This ensures that all writes to netdev->mtu are consistent with
+WRITE_ONCE expectations and avoids unintended state corruption
+on failure paths.
+
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+v2 -> v3
+https://lore.kernel.org/all/20250630111836.GE41770@horms.kernel.org/
+Simplify code as suggested by Simon
+---
+ drivers/net/ethernet/cavium/thunder/nicvf_main.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/net/ethernet/cavium/thunder/nicvf_main.c b/drivers/net/ethernet/cavium/thunder/nicvf_main.c
+index aebb9fef3f6eb..1be2dc40a1a63 100644
+--- a/drivers/net/ethernet/cavium/thunder/nicvf_main.c
++++ b/drivers/net/ethernet/cavium/thunder/nicvf_main.c
+@@ -1578,7 +1578,6 @@ int nicvf_open(struct net_device *netdev)
+ static int nicvf_change_mtu(struct net_device *netdev, int new_mtu)
+ {
+ 	struct nicvf *nic = netdev_priv(netdev);
+-	int orig_mtu = netdev->mtu;
+ 
+ 	/* For now just support only the usual MTU sized frames,
+ 	 * plus some headroom for VLAN, QinQ.
+@@ -1589,15 +1588,10 @@ static int nicvf_change_mtu(struct net_device *netdev, int new_mtu)
+ 		return -EINVAL;
+ 	}
+ 
+-	WRITE_ONCE(netdev->mtu, new_mtu);
+-
+-	if (!netif_running(netdev))
+-		return 0;
+-
+-	if (nicvf_update_hw_max_frs(nic, new_mtu)) {
+-		netdev->mtu = orig_mtu;
++	if (netif_running(netdev) && nicvf_update_hw_max_frs(nic, new_mtu))
+ 		return -EINVAL;
+-	}
++
++	WRITE_ONCE(netdev->mtu, new_mtu);
+ 
+ 	return 0;
+ }
+-- 
+2.46.0
+
 
