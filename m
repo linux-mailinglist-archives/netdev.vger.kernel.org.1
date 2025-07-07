@@ -1,231 +1,117 @@
-Return-Path: <netdev+bounces-204683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BBCCAFBBD1
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 21:40:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9EC8AFBBE6
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 21:50:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B791D16CA4E
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 19:40:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7E7D7AC333
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 19:49:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1598266EEA;
-	Mon,  7 Jul 2025 19:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05260262FF0;
+	Mon,  7 Jul 2025 19:50:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gLth78te"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g0OiCPXv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242A6266B65
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 19:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8AE233133
+	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 19:50:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751917244; cv=none; b=E3YmhTkE6maBX1dSaKx+aDwDO7FLTQ5lyYaQQO5Hjddg/H1pSe4cgMe0/DHVDgYl5zPjaVO3CeXNb8DAVoWyJRmqJwfqmb9pvCZdFmQ27IAuCAQgZ2u8CfgiRZfAc7bbQOuFvu5TDosFMavidu1hMxsoWtekswpBHDbxFqOGFEY=
+	t=1751917835; cv=none; b=L71dtzkK0vT+OzGhCb8s7oAtDs7+UdIKQzxsNEngkaXdP4a9oXyKxV9R2zhTAbsHMl8Yd4Lv3hsv72Jt/00AUW3i24ZQlskhknC36YVAeNRA53fDRm43xVIeGzYu50idyQ2jLZMDUSKTrP22lZd+iQB/b07EBvLUwYI8tkYd8RI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751917244; c=relaxed/simple;
-	bh=THWFh1m0HZ+K8ZcZT3BzRuteofGhTBbzq6cVM4wAcMw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=odXJ4R0/pttLAx8Kkkre2PNQ7AslVEkP+DUFbuT8P7D4rMEfJBSRdkZRA47jgrCYsp2sytj6xuBcIB8RaqlCQzVjcsvSP806U4ysrm7cvMykzg3CaxcNigtz5FNrP3+I30s4OsadBiIP2qXPWL7O6ceMEprIHsvt0/SApe/6pNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gLth78te; arc=none smtp.client-ip=209.85.210.169
+	s=arc-20240116; t=1751917835; c=relaxed/simple;
+	bh=2MeJh+FQ7ljUYPhCAGcCNuXVwXJ3AhQBo9cMoxBenQY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tODQ1DE0Cq+ydQ2TnS9uVs8377/V4XX+lKx2NEyohgiLGkc5Beyuy8U41cp3f8902hPupXjkrCpYvgWn9KmNvk25x0nq8CoJSq9pjeOlbIFlRmveTF00qYIyJL6aUqG9EtK5Ep3KWNBoJOzWGHbnMikt2mOmBlH6XSSKZhD/pZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g0OiCPXv; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-74af4af04fdso3517719b3a.1
-        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 12:40:42 -0700 (PDT)
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b1fd59851baso2505821a12.0
+        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 12:50:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751917242; x=1752522042; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ZNwAhDs0n7u3s+MHu2tzeKRRRuf2WyE5yN2L4FyRPIY=;
-        b=gLth78teZ9LO5UvQPtyraUvTagBUUn2Mrtg+K1+cGKY9vICS4LrQDpmC+Wp6V/h7EH
-         utfm4Wqq+WycmQ0WTM7fUa2jkQryF08HjkuNZcpgmIu+Aq/FlAZw/pUT8FPIG3AkAkUX
-         4fDIngT0gT3KLRj5y4GTr1+a9TW7amTBnmMJjxOgnsgJu9bZohyDsNkRq35UOERjXhTI
-         EFmG30rk5uCj2cobsQr3Z6O1r/tSiTiFGW/7BrjdgQKQDcSX+R+JkIaLbNpbpUdbfcrv
-         ZHYwaP1/2pJlmaVoJHa81wKSWcb34TyN7SGkfA5Z3X9VtLcORUso6B9d+ywqy2Dl4fHp
-         j76Q==
+        d=gmail.com; s=20230601; t=1751917833; x=1752522633; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gfqVmDb5KDAzOCFQrsPNKqXq8Z9ZbJBGBRlfzT284PM=;
+        b=g0OiCPXvB+M8PQt0PenZEHpB19yKJ37zrB8ef4q/sE2BHUP0vPDWoBprb2p17GE0uH
+         irGD3lvMApnadiMFUFso7dr9feS/LrCg2tKtbzda225CZpM84OMJexnb8UkgVtWtDjFS
+         QNbMwkcGRVXl2TKdsg852doAvjJ3MXgRRXIMaYEml1DxB/EWhc/f7GWm9BkyI4p5ndHZ
+         4izDZCvnUCEk1hzLltvGYoXcD8Zv9f10LhuM7rgXBp3k3ntjXtzDPzmSolrYZZuSezXh
+         Q9lYS2DckWNfq6spzxcLdGJ8jBI/oi3KSYhLa9vPqV1z1XAzarC09Qm6/VAIKaMBgqhM
+         3eyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751917242; x=1752522042;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZNwAhDs0n7u3s+MHu2tzeKRRRuf2WyE5yN2L4FyRPIY=;
-        b=G5556V3IQYzSrz0QeErIJyjNxhKEGhaqAyL1TiKxX2MkyXe54qQMC4TzoZ6u5uAiLZ
-         LR1WvWg7FO6HcsKUhGlyWbaGVKG21VPLpQT9AhCb7d3r1tcslGHA2fR4flfRZmo0kphR
-         5pfPoda6lckV/QizEj/qfi1Vjzpl6AM9ybQ39bMMieX770hcoTo7+6DDF0KpifVMbhqy
-         MpeNfu8xIKfjo2vVia80J6JIrP8HWiiC/FdX1CwcArREIihVt94+L/geGZvEitG5VALv
-         zl3dKz4YbQ36B0nKdkBM2BmOXmgar/xa0XmjKpfyBSinJxo9zbz3l4cNh8lWwBTtnIbW
-         Gx1Q==
-X-Gm-Message-State: AOJu0Yxmn5saTXH7TheAPtx7w8x5sWwtB4lpCbfUAaX9BMxYnBt5UMNG
-	R70gGJR8WlrAi00str4NMzpCvDzseWyfHe5YAV4kUKg2I9ArKWGHdBbp
-X-Gm-Gg: ASbGncsHRBYCUmH1uheGMq08jhXLk291RGMoak8k8OeVu3fhhJQC0uN2bhN6vbXZlnz
-	c8HB0qocc2dVR1RVlAtoa7hsGKJqag5L6o2ZbLPeBlyBeM2DhZ2eRNOKMTRKlzVKQ2f7gEA0nR4
-	03B8UJaXMvXp5jd/BvzDnOLN/4XDxe/kSpv0KlZeSQYCJguFQ4HpKefqFFXhgobfRuCcno/bFMe
-	ZJBd9AX7ThoGw3mcwDLw3kvYSbfAf2BSMvJLPn722DmDh1IIqKY63D84ByTkUXWtMZCbPoNMHsf
-	71SSnrZGpG7izTQCNhqOqLgnhNpCKRPEOyE20KhaXQmEiiMX20RVs6sQm4+WomVxrg==
-X-Google-Smtp-Source: AGHT+IEpsS0LgTH8Wcn4p/9VRHkD+xy3M9ocMrcOs7n9SU0yBqrkDgM+qZ/QuHDN2v9DdALkOKaigg==
-X-Received: by 2002:a05:6a21:6d84:b0:220:2fe9:f07a with SMTP id adf61e73a8af0-22b23d85f2cmr1279460637.6.1751917242288;
-        Mon, 07 Jul 2025 12:40:42 -0700 (PDT)
-Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b38ee4797dasm9569217a12.26.2025.07.07.12.40.41
+        d=1e100.net; s=20230601; t=1751917833; x=1752522633;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gfqVmDb5KDAzOCFQrsPNKqXq8Z9ZbJBGBRlfzT284PM=;
+        b=Pc3tQe2pFMY1b1B0UefCfDo1wK7pdfUDC7Cjbuu+YWLLLh2UP+VVgm5M4nEERgVtTn
+         /otcmuAXMJ1EwkFEQJFYE5dt/+72YorGQ0kQLlGVcQIrX2ejMZtCLJCvRjxguYuMs+xd
+         bZCKKl1u833hCDmMDETvs8NcRt3X7rPar2hqZ+Gr74HsNyi0j7UX78aX53ohGQwYd2Yt
+         1w1Zl+T7DHnN568ExEZemUMgGGqTgI/Bs64w6pUCEuz8tcEBlHl74LhubWR9ajUFgkCj
+         KTb2k2o6t9aWkxHfxKPdacJiQgOaJucYBp4IMlNUKE8Ys6wj89plh4YNznXQlRrD3Gji
+         OAdg==
+X-Gm-Message-State: AOJu0YxasnImSzAUEwRqiXWzIM0X5wYlS8EFIFp1iLJxJenAz3v+hP71
+	Ao/iX8D4461YlpRJ4t2gzMsfmU1bETgclJu6stte6bF9xuyKLISv8qgbCodheA==
+X-Gm-Gg: ASbGncvBgNn36aAosqndJuYSCs17C6ioxZNMCqEHjATHp+ei6GqB16upKjLWnYK0VqZ
+	1xICF4KBkTnQZK0PelnXXe3YYCZiduGeADEbaxF6nrtBufoUjPtnJtj6ejga28zv/kkI937rfUt
+	0FuHu8Bs92eJVSnqcthKEDhFeweKY614OY7rFHQbYwnBAm9Akd8rxNAsv9Sugk5D/6DaLUMM1aY
+	VmZZxbkmNHz3QLWGJl4TgUrASy2sdplO3M9gQjk7AEuQ4mugIqG6x7+ggIDSQHEwokWk5aTlBxu
+	Zrlm9BuIiDtFSuJo1Eku4nwhNlPt06qtGNMVCViRirV4d8y6vZ8sqn9wL+LRkwz8irQvo2TvAKe
+	v/hRcGeY=
+X-Google-Smtp-Source: AGHT+IHY+sR3hqvHzixueUV/xzvRoLNSdvOu4gH+4wPOyzOr3WI/+z5BqCSbhjpgmHsjUwLAoEuMMw==
+X-Received: by 2002:a05:6a21:6d88:b0:215:df90:b298 with SMTP id adf61e73a8af0-225b9484b16mr22295796637.26.1751917833383;
+        Mon, 07 Jul 2025 12:50:33 -0700 (PDT)
+Received: from pop-os.scu.edu ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce42a2c10sm9648931b3a.136.2025.07.07.12.50.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jul 2025 12:40:41 -0700 (PDT)
-Date: Mon, 7 Jul 2025 12:40:40 -0700
+        Mon, 07 Jul 2025 12:50:32 -0700 (PDT)
 From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, will@willsroot.io, stephen@networkplumber.org,
-	Savino Dicanosa <savy@syst3mfailure.io>
-Subject: Re: [Patch net 1/2] netem: Fix skb duplication logic to prevent
- infinite loops
-Message-ID: <aGwiuDju8TNvRdGe@pop-os.localdomain>
-References: <20250701231306.376762-1-xiyou.wangcong@gmail.com>
- <20250701231306.376762-2-xiyou.wangcong@gmail.com>
- <aGSSF7K/M81Pjbyz@pop-os.localdomain>
- <CAM0EoMmDj9TOafynkjVPaBw-9s7UDuS5DoQ_K3kAtioEdJa1-g@mail.gmail.com>
- <CAM0EoMmBdZBzfUAms5-0hH5qF5ODvxWfgqrbHaGT6p3-uOD6vg@mail.gmail.com>
- <aGh2TKCthenJ2xS2@pop-os.localdomain>
- <CAM0EoM=99ufQSzbYZU=wz8fbYOQ2v+cMa7BX1EM6OHk+dBrE0Q@mail.gmail.com>
+To: netdev@vger.kernel.org
+Cc: jhs@mojatatu.com,
+	will@willsroot.io,
+	stephen@networkplumber.org,
+	Cong Wang <xiyou.wangcong@gmail.com>
+Subject: [Patch v2 net 0/2] netem: Fix skb duplication logic to prevent infinite loops
+Date: Mon,  7 Jul 2025 12:50:13 -0700
+Message-Id: <20250707195015.823492-1-xiyou.wangcong@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAM0EoM=99ufQSzbYZU=wz8fbYOQ2v+cMa7BX1EM6OHk+dBrE0Q@mail.gmail.com>
 
-On Sat, Jul 05, 2025 at 09:52:05AM -0400, Jamal Hadi Salim wrote:
-> On Fri, Jul 4, 2025 at 8:48 PM Cong Wang <xiyou.wangcong@gmail.com> wrote:
-> >
-> > On Wed, Jul 02, 2025 at 11:04:22AM -0400, Jamal Hadi Salim wrote:
-> > > On Wed, Jul 2, 2025 at 10:12 AM Jamal Hadi Salim <jhs@mojatatu.com> wrote:
-> > > >
-> > > > On Tue, Jul 1, 2025 at 9:57 PM Cong Wang <xiyou.wangcong@gmail.com> wrote:
-> > > > >
-> > > > > On Tue, Jul 01, 2025 at 04:13:05PM -0700, Cong Wang wrote:
-> > > > > > diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> > > > > > index fdd79d3ccd8c..33de9c3e4d1b 100644
-> > > > > > --- a/net/sched/sch_netem.c
-> > > > > > +++ b/net/sched/sch_netem.c
-> > > > > > @@ -460,7 +460,8 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
-> > > > > >       skb->prev = NULL;
-> > > > > >
-> > > > > >       /* Random duplication */
-> > > > > > -     if (q->duplicate && q->duplicate >= get_crandom(&q->dup_cor, &q->prng))
-> > > > > > +     if (tc_skb_cb(skb)->duplicate &&
-> > > > >
-> > > > > Oops, this is clearly should be !duplicate... It was lost during my
-> > > > > stupid copy-n-paste... Sorry for this mistake.
-> > > > >
-> > > >
-> > > > I understood you earlier, Cong. My view still stands:
-> > > > You are adding logic to a common data structure for a use case that
-> >
-> > You are exaggerating this. I only added 1 bit to the core data structure,
-> > the code logic remains in the netem, so it is contained within netem.
-> 
-> Try it out ;->
-> Here's an even simpler setup:
-> 
-> sudo tc qdisc add dev lo root handle 1: prio bands 3 priomap 0 0 0 0 0
-> 0 0 0 0 0 0 0 0 0 0 0
-> sudo tc filter add dev lo parent 1:0 protocol ip bpf obj
-> netem_bug_test.o sec classifier/pass classid 1:1
-> sudo tc qdisc add dev lo parent 1:1 handle 10: netem limit 4 duplicate 100%
-> then:
-> ping -c 1 127.0.0.1
+This patchset fixes the infinite loops due to skb duplication in netem.
 
-Of course (I replaced your ebpf filter with matchall):
+This replaces the patches from William, with much less code and without
+any workaround. More importantly, this does not break any use case at
+all.
 
-[root@localhost ~]# cat netem_from_jamal.sh
-tc qdisc add dev lo root handle 1: prio bands 3 priomap 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-# tc filter add dev lo parent 1:0 protocol ip bpf obj netem_bug_test.o sec classifier/pass classid 1:1
-tc filter add dev lo parent 1:0 protocol ip matchall classid 1:1
-tc qdisc add dev lo parent 1:1 handle 10: netem limit 4 duplicate 100%
+Note: This patch only aims to fix the infinite loops, nothing else. If
+there is other issue with netem duplication, it needs to be addressed
+separately.
 
-[root@localhost ~]# bash -x netem_from_jamal.sh
-+ tc qdisc add dev lo root handle 1: prio bands 3 priomap 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-+ tc filter add dev lo parent 1:0 protocol ip matchall classid 1:1
-+ tc qdisc add dev lo parent 1:1 handle 10: netem limit 4 duplicate 100%
-[root@localhost ~]# ping -c 1 127.0.0.1
-PING 127.0.0.1 (127.0.0.1) 56(84) bytes of data.
-64 bytes from 127.0.0.1: icmp_seq=1 ttl=64 time=3.84 ms
+---
+v2: fixed a typo
+    improved tdc selftest to check sent bytes
 
---- 127.0.0.1 ping statistics ---
-1 packets transmitted, 1 received, 0% packet loss, time 0ms
-rtt min/avg/max/mdev = 3.836/3.836/3.836/0.000 ms
+Cong Wang (2):
+  netem: Fix skb duplication logic to prevent infinite loops
+  selftests/tc-testing: Add a nested netem duplicate test
 
-There is clearly no soft lockup. Hence the original issue has been successfully fixed.
+ include/net/sch_generic.h                     |  1 +
+ net/sched/sch_netem.c                         |  7 +++---
+ .../tc-testing/tc-tests/qdiscs/netem.json     | 25 +++++++++++++++++++
+ 3 files changed, 29 insertions(+), 4 deletions(-)
 
-> 
-> Note: there are other issues as well but i thought citing the ebpf one
-> was sufficient to get the point across.
+-- 
+2.34.1
 
-Please kindly define "issues" here. My definition for issue in this
-context is the soft lockup issue reported by William. Like I already
-explained, I have _no_ intention to solve any other issue than the one
-reported by William, simply because they probably can be deferred to
--net-next.
-
-> 
-> >
-> > > > really makes no sense. The ROI is not good.
-> >
-> > Speaking of ROI, I think you need to look at the patch stats:
-> >
-> > William/Your patch:
-> >  1 file changed, 40 insertions(+)
-> >
-> > My patch:
-> >  2 files changed, 4 insertions(+), 4 deletions(-)
-> >
-> 
-> ROI is not just about LOC. The consequences of a patch are also part
-> of that formula. And let's not forget the time spent so far debating
-> instead of plugging the hole.
-
-LOC matters a lot for code review and maintainance.
-
-> 
-> >
-> > > > BTW: I am almost certain you will hit other issues when this goes out
-> > > > or when you actually start to test and then you will have to fix more
-> > > > spots.
-> > > >
-> > > Here's an example that breaks it:
-> > >
-> > > sudo tc qdisc add dev lo root handle 1: prio bands 3 priomap 0 0 0 0 0
-> > > 0 0 0 0 0 0 0 0 0 0 0
-> > > sudo tc filter add dev lo parent 1:0 protocol ip bpf obj
-> > > netem_bug_test.o sec classifier/pass classid 1:1
-> > > sudo tc qdisc add dev lo parent 1:1 handle 10: netem limit 4 duplicate 100%
-> > > sudo tc qdisc add dev lo parent 10: handle 30: netem gap 1 limit 4
-> > > duplicate 100% delay 1us reorder 100%
-> > >
-> > > And the ping 127.0.0.1 -c 1
-> > > I had to fix your patch for correctness (attached)
-> > >
-> > >
-> > > the ebpf prog is trivial - make it just return the classid or even zero.
-> >
-> > Interesting, are you sure this works before my patch?
-> >
-> > I don't intend to change any logic except closing the infinite loop. IOW,
-> > if it didn't work before, I don't expect to make it work with this patch,
-> > this patch merely fixes the infinite loop, which is sufficient as a bug fix.
-> > Otherwise it would become a feature improvement. (Don't get me wrong, I
-> > think this feature should be improved rather than simply forbidden, it just
-> > belongs to a different patch.)
-> 
-> A quick solution is what William had. I asked him to use ext_cb not
-> because i think it is a better solution but just so we can move
-> forward.
-
-I already posted a patch, instead of just arguing. Now you are arguing
-about the patch I posted...
-
-Thanks.
 
