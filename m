@@ -1,180 +1,127 @@
-Return-Path: <netdev+bounces-204448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52001AFA8A6
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 02:40:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A9ECAFA943
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 03:42:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE75C18968BF
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 00:40:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5DF3188BD14
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 01:42:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5D3F1A0BD0;
-	Mon,  7 Jul 2025 00:39:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="By0lvB/I"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37E5A1A8F6D;
+	Mon,  7 Jul 2025 01:33:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54813192B7D;
-	Mon,  7 Jul 2025 00:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1318D1E379B;
+	Mon,  7 Jul 2025 01:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751848767; cv=none; b=cgdBliC07pKaCWoQ3Ai6lTPbHdGeDNDKkI2bLP1b4qxP6tmxXuQUU90wRuPMEQy9aPwdA9CjOIp4UKGCz5rlC9lFGHrZorH9IYNcDDV72bmLJ6vfa1XMUDLJO/xGdpkkWIMp5qJ/QcdGznUKfrndz7jaeRBKl4T9LmxBao0cQG8=
+	t=1751852032; cv=none; b=i2NFzkcZUwfwEtOFoVC+0eBTjoqvL526oc78yORTJqxgTy/H9iplFFwITyp9z7yg0ILiNxRKiTzi+ex2tUzb9ODhUZRlzcZqi/BKKlSTRpy4fEIOHsEcPXET/GSxUyEtpemJA0T046v/AenLOeG7acCfAdoqFTzdPjt9X6Be7K4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751848767; c=relaxed/simple;
-	bh=7Jp+7aoQlwHzBSLcGDasAf4OQ1Ko0V2RppLdpuU/eto=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BrowSbXtrPwZYfDsalQefBRa6tBytbMPzu1i9/33h4RExFuHpealsBu4uHJGafWtUZRcW3BHk8teixglRuydfzmcgwG8+xBIER3jSVZHL1U3GDbgfboLuS3GRtafBoOv/gp2ZpVmHxk9GbBxfmE1fefbkDdYViXu7VOo0oGOJZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=By0lvB/I; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2350fc2591dso22691335ad.1;
-        Sun, 06 Jul 2025 17:39:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751848765; x=1752453565; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QxrAKwHku8E+qt+4+5rp0WxwZwqsAY76OjW42aieBp4=;
-        b=By0lvB/IcWm1qqOfm12cnX4WC938AA6D4iehPGZJCVFXteRqFtPkSJlmvk2CzEf1o1
-         FVOl1BoSCAshhxOBhSkSM0yyw5tnTet10THYTw0Te2YfsDqbWlYqy6913TCOQpBU2zsO
-         RjNmp12Au7orMyWc0SIZpFe8Y9u/y2VHZIdobCXlRq7TNBtj6saia1eOYDvEDQt0C4iF
-         7MMuOannN5Ht/nuWNXchaJM5R80E0NHW/9+jXYTnraHe3BtG7jFWgDMig03o5Ph3/e55
-         /f3P/BYFJqm1Zq10eLATUp3UqEkbZHhYZBoaEJzi1LG/QKYwlxqFgbLGLhuPuSWhfuQ+
-         E5RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751848765; x=1752453565;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QxrAKwHku8E+qt+4+5rp0WxwZwqsAY76OjW42aieBp4=;
-        b=sY7ZNNleLVKtEskYOT1S2Yt3Ou5qIDuFvue2e3JSiGgkDhyMC4Pe5ec++5tCdWndij
-         yH1pyeuVOBNeIlgh9CRD5AvDTZOjNAt5oN1F5sctXhhti9jPePDW6FTviAMFHFo14GuA
-         LBK9EeiWFhj+DFO1zoafBfmDrQeIkoHxHguSwW7Ux4DSuubQXJg3NcmIKSC3+FvVJo5t
-         uOGHO281DyUVoEDWgIpi+cI7cOLAYrOQXxhYq9sFcJVh/XO3hBLKgFwqBPmzJ/x4Rd6f
-         vh4IEH9rz//MbmOAtTm5yPQnv0xGAJWc7I3SCdoRAxjgGXrhX9rL/SxQpDDdyAvp2ILO
-         NoRw==
-X-Forwarded-Encrypted: i=1; AJvYcCUWrW3AEu2DsQPzvSelnUcC5kyy9zjnIRGM8RfRjNrVOy4qc9tP5t/38One3a5VWcI1zcBl+zgEMkIBwO8=@vger.kernel.org, AJvYcCVh2uskXGv8PPiySwILF1pO/cvT4o/oy3rCBO0vmMGZf5gCdrdoMiBLgZGNwfj22Upd8cVz7ioRy16+LsO4kCFL4O4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRgR+MkqBjcDnhUnKFL8Kcie0Gbqof1I35gyYIpF1/bJKuqmws
-	i5bjIm8PKz0Xdlug8e2+sLSp4cQgyytdgTB4HLR1hL5NHTL/ftLcJ9tsHJSh0hkRtQA=
-X-Gm-Gg: ASbGncvivZnRNteOBccXBg26MwF8sQLII1fFlAOoS9toXeie4cLH7TF/YRfoOgw3N7k
-	LvDmW3r3rc3dsVTB2lWrIkDOaBHziEJf62qE/GamW9/6RLVsAZ4ZV/VkA+BpXpcnE2CJyKeoZDi
-	n5BCv7tmwxUePYLS9l7gQjGno4IXRONO8e2MnU5MOhdJAKN7vx93d8swK4HQI4+lRffzQDUEypv
-	EY447WxWBUohqK/CqzIqdnzVxIxdLiTDPkFzwClTk6u4245IqEgza7BZhWVLNhmla5wRzbF+Dvu
-	nUdsFLBkVIZAHlGJ57cAZE4I1MtBRTH1A2gDplyHMK8=
-X-Google-Smtp-Source: AGHT+IGty8Ntkt/MFR9OqCcqTDhoe8U+WLujB92TeHcy0aCVB9CmM2uhsEPhx5niuUJv9fVmm3G+eQ==
-X-Received: by 2002:a17:903:2a85:b0:234:8a4a:ad89 with SMTP id d9443c01a7336-23c85886944mr177284005ad.1.1751848765357;
-        Sun, 06 Jul 2025 17:39:25 -0700 (PDT)
-Received: from archlinux.lan ([2601:644:8200:dab8::1f6])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23c8431e2a4sm70308085ad.19.2025.07.06.17.39.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Jul 2025 17:39:24 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
-	linux-kernel@vger.kernel.org (open list),
-	linux-renesas-soc@vger.kernel.org (open list:RENESAS RZ/N1 A5PSW SWITCH DRIVER)
-Subject: [PATCH 2/2] net: dsa: rzn1_a5psw: use devm to enable clocks
-Date: Sun,  6 Jul 2025 17:39:18 -0700
-Message-ID: <20250707003918.21607-3-rosenp@gmail.com>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250707003918.21607-1-rosenp@gmail.com>
-References: <20250707003918.21607-1-rosenp@gmail.com>
+	s=arc-20240116; t=1751852032; c=relaxed/simple;
+	bh=MciWweHvQB2NtpzxZf2w/+oDgf2sdTGWiZTywc435t0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PEh/CfXnoRku4Xb6cNwn8nKazcQ/rtsWq1IDjTYFCO9Fah6IpIvQdeFQaxy8H23QMi4GI/wr6wY0PcRAZt5NpN3K3PqT5X+oDwHq6mjp+IbOVQCiWa6f2oZiwlGz1ZlJvuG+/srvla45C36Jd4RpAU46SQKmhWDmWgh7uEY3gpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.204.34.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: zesmtpgz3t1751851963t07aee121
+X-QQ-Originating-IP: qa6YJhuflzK+wHht4l6gRJZFvUQBoyK2hYypibZViIU=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 07 Jul 2025 09:32:41 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 10452172534868935923
+Date: Mon, 7 Jul 2025 09:32:36 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+	andrew+netdev@lunn.ch, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 02/15] net: rnpgbe: Add n500/n210 chip support
+Message-ID: <0412FE867055AD77+20250707013236.GA122831@nic-Precision-5820-Tower>
+References: <20250703014859.210110-1-dong100@mucse.com>
+ <20250703014859.210110-3-dong100@mucse.com>
+ <3d0a5666-c57a-4026-b6a1-284821f25943@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3d0a5666-c57a-4026-b6a1-284821f25943@lunn.ch>
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: OHTF91J1Rz8hoMMIA7Duh70bMvN4qNV/yNfMxMdX6l9I5zx5RegTJj9S
+	t0vp5cwkF9KuBpMn/ZSxzQXAfxdQwcqQvejWBmZjRjsJhaI+a0pNAL/QELutMSj/sDpykwl
+	BNwpbVgqyQG6fIEdhMFuuJPmU+CB6j/9Dmsx4FrQyw9S9P/BwXZ4o8E0o38klYErVKtbP/F
+	Ggja6hjdMCF6FKcI0PpTG3OZSQQe4s+SJFoSt7Bjz/02kjH7ZjpxdZigWMuVBZUlloNj8Y+
+	aOXoFI+7YQleoix3HLLyQhnFIHn4q5kJuBWFI3YR1MTaI/oyBAES3eTCJsTnVhTOUeVlpNq
+	SGhmLCodELvJ5WuGhrAie9ghl5K4GAq4wfcDH1uQgy9E07l536DttTaM3RmcA3FhKxCyMxg
+	qjnPHxPSjQezMiWToTse2hdo3J5gTfrfP9YyPPbwckpMYzLk8hvLmFxh1kf2E8YNlc/xUDP
+	/4wV9FAZ1ITH/E1UMA3lb24+/xt1TFz+hddgtQ2Ze2yIeCMO+4uqxJTCu/sDivroUfqOPFv
+	y7iD6hC0uIlH45YoKTUfqFqScvgnyQcHiFahRxWRwBbp1jeHybhvcHfkuvusJTIvpDSjfFS
+	Xg3aPBInFgzQRYd5tATbpbVKArlyjJglMOpoTbToWyzRFWV9rLoKYG2eXs28ZUJOmUf2LQl
+	ZXR0A2WxKtpkER02Yt92k3SJGuGxIklxhFfWPSgjOdZcibsWlSYC2xyfr7EcCPInXpza4sJ
+	Z/MxPbDs9xQpXVGuf+8j4agJzHoRelLvf1gwWbsuV+fPxHUI7wrR/BDgYETVKz0g4nHzfns
+	CqNsZgWK4E5yXqqb7IoOox0uJrlWiY2Uh2fSantZf1+w+db5x4nqqIPg8tghBwUZ4O/iDKQ
+	TA2VHVCG43j5xFKpAw/tqLU4/sZLmm3U0NQS5VPxl5jBgMc9bFqEMLSr/OvgSZEbReiy+FW
+	I5PFm5dyxvIMLZ38Di+5YJSYf
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
-The remove function has these in the wrong order. The switch should be
-unregistered last. Simpler to use devm so that the right thing is done.
-
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/dsa/rzn1_a5psw.c | 22 ++++------------------
- 1 file changed, 4 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/net/dsa/rzn1_a5psw.c b/drivers/net/dsa/rzn1_a5psw.c
-index df7466d4fe8f..1635255f58e4 100644
---- a/drivers/net/dsa/rzn1_a5psw.c
-+++ b/drivers/net/dsa/rzn1_a5psw.c
-@@ -1227,35 +1227,27 @@ static int a5psw_probe(struct platform_device *pdev)
- 	if (ret)
- 		return ret;
- 
--	a5psw->hclk = devm_clk_get(dev, "hclk");
-+	a5psw->hclk = devm_clk_get_enabled(dev, "hclk");
- 	if (IS_ERR(a5psw->hclk)) {
- 		dev_err(dev, "failed get hclk clock\n");
- 		ret = PTR_ERR(a5psw->hclk);
- 		goto free_pcs;
- 	}
- 
--	a5psw->clk = devm_clk_get(dev, "clk");
-+	a5psw->clk = devm_clk_get_enabled(dev, "clk");
- 	if (IS_ERR(a5psw->clk)) {
- 		dev_err(dev, "failed get clk_switch clock\n");
- 		ret = PTR_ERR(a5psw->clk);
- 		goto free_pcs;
- 	}
- 
--	ret = clk_prepare_enable(a5psw->clk);
--	if (ret)
--		goto free_pcs;
--
--	ret = clk_prepare_enable(a5psw->hclk);
--	if (ret)
--		goto clk_disable;
--
- 	mdio = of_get_available_child_by_name(dev->of_node, "mdio");
- 	if (mdio) {
- 		ret = a5psw_probe_mdio(a5psw, mdio);
- 		of_node_put(mdio);
- 		if (ret) {
- 			dev_err(dev, "Failed to register MDIO: %d\n", ret);
--			goto hclk_disable;
-+			goto free_pcs;
- 		}
- 	}
- 
-@@ -1269,15 +1261,11 @@ static int a5psw_probe(struct platform_device *pdev)
- 	ret = dsa_register_switch(ds);
- 	if (ret) {
- 		dev_err(dev, "Failed to register DSA switch: %d\n", ret);
--		goto hclk_disable;
-+		goto free_pcs;
- 	}
- 
- 	return 0;
- 
--hclk_disable:
--	clk_disable_unprepare(a5psw->hclk);
--clk_disable:
--	clk_disable_unprepare(a5psw->clk);
- free_pcs:
- 	a5psw_pcs_free(a5psw);
- 
-@@ -1293,8 +1281,6 @@ static void a5psw_remove(struct platform_device *pdev)
- 
- 	dsa_unregister_switch(&a5psw->ds);
- 	a5psw_pcs_free(a5psw);
--	clk_disable_unprepare(a5psw->hclk);
--	clk_disable_unprepare(a5psw->clk);
- }
- 
- static void a5psw_shutdown(struct platform_device *pdev)
--- 
-2.50.0
-
+On Fri, Jul 04, 2025 at 08:03:47PM +0200, Andrew Lunn wrote:
+> > +#define M_NET_FEATURE_SG ((u32)(1 << 0))
+> > +#define M_NET_FEATURE_TX_CHECKSUM ((u32)(1 << 1))
+> > +#define M_NET_FEATURE_RX_CHECKSUM ((u32)(1 << 2))
+> 
+> Please use the BIT() macro.
+> 
+Got it, I will fix this.
+> > +	u32 feature_flags;
+> > +	u16 usecstocount;
+> > +};
+> > +
+> 
+> > +#define rnpgbe_rd_reg(reg) readl((void *)(reg))
+> > +#define rnpgbe_wr_reg(reg, val) writel((val), (void *)(reg))
+> 
+> These casts look wrong. You should be getting your basic iomem pointer
+> from a function which returns an void __iomem* pointer, so the cast
+> should not be needed.
+> 
+Yes, I also get failed from 'patch status' website, I should remove
+'void *' here.
+> > -static int rnpgbe_add_adpater(struct pci_dev *pdev)
+> > +static int rnpgbe_add_adpater(struct pci_dev *pdev,
+> > +			      const struct rnpgbe_info *ii)
+> >  {
+> > +	int err = 0;
+> >  	struct mucse *mucse = NULL;
+> >  	struct net_device *netdev;
+> > +	struct mucse_hw *hw = NULL;
+> > +	u8 __iomem *hw_addr = NULL;
+> > +	u32 dma_version = 0;
+> >  	static int bd_number;
+> > +	u32 queues = ii->total_queue_pair_cnts;
+> 
+> You need to work on your reverse Christmas tree. Local variables
+> should be ordered longest to shortest.
+> 
+>        Andrew
+> 
+Got it, I will fix it, and try to check other patches.
+Thanks for your feedback.
 
