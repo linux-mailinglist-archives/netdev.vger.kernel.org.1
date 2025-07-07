@@ -1,159 +1,258 @@
-Return-Path: <netdev+bounces-204644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02A41AFB8FF
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 18:50:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC8D7AFB965
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 19:04:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D01537AF8BD
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 16:48:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 212F842387A
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 17:03:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D34B622A7FC;
-	Mon,  7 Jul 2025 16:49:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC0C23F26B;
+	Mon,  7 Jul 2025 17:04:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SxaJEAvc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SN0yqhSr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f195.google.com (mail-yb1-f195.google.com [209.85.219.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8DD224B0E;
-	Mon,  7 Jul 2025 16:49:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2127C22DF9E;
+	Mon,  7 Jul 2025 17:04:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751906982; cv=none; b=kxyVB9ZpPaXsewjIa+qbOP/1jPgBBtN8quix40p9OanKazqTa+KRHM2wtYnDClzR5n7LjcIas40pB/hS+Lu65i2SewU4CBKjjTiwHo70cy6tU/GxCGAdOVZr3V7ipRoBv77k5iQ7meO0LoAg8+5EKjj7t1Pd+jVmYDPUh8ZkQ0Y=
+	t=1751907845; cv=none; b=HMAHBR2LawWUW4LZYMz2hCwsOsbRPrIbxQStLk9YWWKUGMGU/litwKKUFV5NZg9UUoVHtej6vKy0VfANQ7B2S1chnxohnOS0Rdg7oqyfFYVZC2BIDTN3HgsIlAX6aXpTmCcToi/fBVeKi0gCBFNpw39+XGNINfawRkQu/a0NdlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751906982; c=relaxed/simple;
-	bh=2qpWdHuWmXVbwdu0z0dszit3gKd+4ot0FUdDS48fSgI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MppshHmWUOlCjZUM70nG6o0gkjk1oEEE1EAM/xkKEKL6Dmc+6iLYBaPx7NA3uwfMOvD4l76UBCMWJb1OluAPvywmj+gzTrs2k/Gz+dWGHV4p+HwxU6qt5zJOn3JmtY2VD1MhNKmuyUXY56sLhsVVIM11T5VBBO33AIlYkit1HaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SxaJEAvc; arc=none smtp.client-ip=209.85.219.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f195.google.com with SMTP id 3f1490d57ef6-e8b3cc05665so1468358276.2;
-        Mon, 07 Jul 2025 09:49:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751906980; x=1752511780; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=u1xOWZOyoPm540GobFdkxEMray8IVt4E7vfdVGtWbcI=;
-        b=SxaJEAvcODg8FPB0/uuvtexW/OFfPehlsOjPdiW19C41zKOnu+FNFEEbV6+W77rEqY
-         f3gk/RuPK8jmEyYg/ptLDfzxH9BaKBALv8aop4cgMoGuW3DV3rTCXDJfFIC2CkmkNSWL
-         L5TQwoDRPDEHpfkmWFNaNOEan08HAZo4eWU8ZSj+lSvAurmsMuFQPSAjK2FNCs09clvb
-         17t5LpA3HLMA1dqGo77fMkrAjNXG1B1B1GGz4QGWwH6AGHXq+cagJg2OxXOnT8ARHx73
-         SN2NMAtsBIZvc8JGTG7hkp1Mrh3mWSEquYie4cs0irbUgSeIn2T5HAgCvfFcQWdabEGx
-         xLVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751906980; x=1752511780;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u1xOWZOyoPm540GobFdkxEMray8IVt4E7vfdVGtWbcI=;
-        b=DKmR7Dd1+Jg6QusXu4SHqIxOE98JDVsT31OZO56PCNQ9cqQf0G1pOC0YsKrsOUfOFv
-         jMN/10+CFhSPArPj8P0K2FNKn8ggayAE2uu+XdKBPYTCPdvXQ0fzqlo7JjKOclcELXoO
-         K63uu+2QiO+WcOxTIHI4tiUe8TAFcurwguD5iR8dIowEMzvvY8RJPpn027D06nOZmmTM
-         GPrA9Pg7IYq3780/Wnvm/OgHjEgPHRxAexmm0elV9ZcThrpiR+arSTgVr/HpdHfgrJJC
-         N0lHW2biwWyWPyceeOyDC+aGZyRm7XWwlmse69w1jWtiWBB7lFoDWFZlWUb4z3IBfu14
-         NPtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX/iUJgghUHUvR/fsBYlnDkEk1cfAP31exKYjc5POj2CmM/a2WBXSnpMb4uOAaxjPQTQc+aHzf4ekVhpec=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9rt3qw1eeKcTc2Rs6pDPdsACZRPkOa0HgGMiS73vKOK7d0WHc
-	Jv04Z5wDcthVUTIXa4ygBGhGqr6GYS9RsoWbcewwCqARYMEvhEQHR+Q5
-X-Gm-Gg: ASbGncv3mOhEE+OFvvijW9wmpE0TGq9b3wqIVn58H8JZQXenxePqRdPpVR6NK0e3g4Y
-	AUa+W7bVcOSO6Hayto5N/LZjveLUHH3fSlmjqDzxOvrZn7rhXZ39Ni7C5oyHlWMUh9Ea/cf/EhE
-	dKYHVYMY6+BYuCA8dvN8xR+gOOtENRW+wjHqh/XfMGmK5SNRzl2uQj4it49nrc5L+C6djFJQzqJ
-	vVJY5pinZH0jwXahPyERuAY70o9YkgC/cPczMvZqaQaN2pBw2RWFieBTmZA9g0xWQ9lKXI5RroW
-	fIGw9pD7sIGQGJCzwuumV6hcDPuy7hkOn3YnAbY/f9MqZZmgaIdn9xdzsMkkcKxg7tL1EV2NSGy
-	iX5gPBg2O
-X-Google-Smtp-Source: AGHT+IEb39Z0BOySPnuTvXs3SmBQemC+SyqVyRj1OliqOspcPBmsWCNbNxGyQ9B5BaQfJESFgNSDTw==
-X-Received: by 2002:a05:690c:6082:b0:70e:2c7f:2ed4 with SMTP id 00721157ae682-71668b45afamr187921317b3.0.1751906979843;
-        Mon, 07 Jul 2025 09:49:39 -0700 (PDT)
-Received: from [10.102.6.66] ([208.97.243.82])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-71665b12c7dsm17204217b3.93.2025.07.07.09.49.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Jul 2025 09:49:39 -0700 (PDT)
-Message-ID: <4998a14e-f755-44a2-b5c3-f966056acb1d@gmail.com>
-Date: Mon, 7 Jul 2025 12:49:39 -0400
+	s=arc-20240116; t=1751907845; c=relaxed/simple;
+	bh=fXVvzF15bpWsezX3Z1LLweb0HAZMkiYNVmMTks27JOA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BFPsiMaON6H/uPkVBXMcwg2uwG/JcfthCout1+ZBekGlHozkU2WGd3wIUikv8qXh/JxALO99cqi4HqGvuV8+FoGs3IJe90PeKyRSjF0+pdEXEylNE6GPhRovEBtsmk0LrQKdLQ1DWAwV2T84NIAFDIuuHGiyIlX/pk94ykxN+XI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SN0yqhSr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0B4DC4CEF4;
+	Mon,  7 Jul 2025 17:04:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751907844;
+	bh=fXVvzF15bpWsezX3Z1LLweb0HAZMkiYNVmMTks27JOA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=SN0yqhSrz2l8O207ABkdKZPGwlSQ14EjGxfB2RhwB7V0asUw3kRPHe0tjKtdmtQIA
+	 T3TRdJ6L58m/3ld/A0Hn5bt/oOICnvalzoLbdzrS8anRnYG1uxhRtrsbam8XAecPSj
+	 4Xeru1/kl4xM9pEjjnvSs1PZVSeKvSVexHBPMFuGBGwUUiFPr+D6RQoHpXkpaJqKKR
+	 TeYu1WSTX+/tXdYvrI7JA0HlBHJn4Wfs6cq0+uj2EfokV+595mr8R9L03JoViqGgmY
+	 bLry+n5A+gdHRaTznSPSZop3ygbR7pfwcpgc3G/efE/PZFBp5v0Kk4lttHQWGql/8a
+	 7LV5s82MarlFQ==
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	Bernard Metzler <bmt@zurich.ibm.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Chengchang Tang <tangchengchang@huawei.com>,
+	Cheng Xu <chengyou@linux.alibaba.com>,
+	Christian Benvenuti <benve@cisco.com>,
+	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+	Edward Srouji <edwards@nvidia.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Junxian Huang <huangjunxian6@hisilicon.com>,
+	Kai Shen <kaishen@linux.alibaba.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	linux-pci@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	Long Li <longli@microsoft.com>,
+	Michael Margolin <mrgolin@amazon.com>,
+	Michal Kalderon <mkalderon@marvell.com>,
+	Moshe Shemesh <moshe@nvidia.com>,
+	Mustafa Ismail <mustafa.ismail@intel.com>,
+	Nelson Escobar <neescoba@cisco.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Potnuri Bharat Teja <bharat@chelsio.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Selvin Xavier <selvin.xavier@broadcom.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Tatyana Nikolova <tatyana.e.nikolova@intel.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: [PATCH rdma-next 0/8] RDMA support for DMA handle
+Date: Mon,  7 Jul 2025 20:03:00 +0300
+Message-ID: <cover.1751907231.git.leon@kernel.org>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: bridge: Do not offload IGMP/MLD messages
-To: Vladimir Oltean <vladimir.oltean@nxp.com>,
- Joseph Huang <Joseph.Huang@garmin.com>
-Cc: netdev@vger.kernel.org, Nikolay Aleksandrov <razor@blackwall.org>,
- Ido Schimmel <idosch@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Tobias Waldekranz <tobias@waldekranz.com>, bridge@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20250701193639.836027-1-Joseph.Huang@garmin.com>
- <20250707130052.wwd7e6fenp7imvy7@skbuf>
-Content-Language: en-US
-From: Joseph Huang <joseph.huang.2024@gmail.com>
-In-Reply-To: <20250707130052.wwd7e6fenp7imvy7@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 7/7/2025 9:00 AM, Vladimir Oltean wrote:
-> Hi Joseph,
-> 
-> On Tue, Jul 01, 2025 at 03:36:38PM -0400, Joseph Huang wrote:
->> Do not offload IGMP/MLD messages as it could lead to IGMP/MLD Reports
->> being unintentionally flooded to Hosts. Instead, let the bridge decide
->> where to send these IGMP/MLD messages.
->> 
->> Fixes: 472111920f1c ("net: bridge: switchdev: allow the TX data plane forwarding to be offloaded")
->> Signed-off-by: Joseph Huang <Joseph.Huang@garmin.com>
->> ---
->>  net/bridge/br_switchdev.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->> 
->> diff --git a/net/bridge/br_switchdev.c b/net/bridge/br_switchdev.c
->> index 95d7355a0407..757c34bf5931 100644
->> --- a/net/bridge/br_switchdev.c
->> +++ b/net/bridge/br_switchdev.c
->> @@ -18,7 +18,8 @@ static bool nbp_switchdev_can_offload_tx_fwd(const struct net_bridge_port *p,
->>                 return false;
->> 
->>         return (p->flags & BR_TX_FWD_OFFLOAD) &&
->> -              (p->hwdom != BR_INPUT_SKB_CB(skb)->src_hwdom);
->> +              (p->hwdom != BR_INPUT_SKB_CB(skb)->src_hwdom) &&
->> +              !br_multicast_igmp_type(skb);
->>  }
->> 
->>  bool br_switchdev_frame_uses_tx_fwd_offload(struct sk_buff *skb)
->> --
->> 2.49.0
->>
-> 
-> Can you please incorporate the extra clarifications made to Tobias in
-> the commit message? They provide valuable background.
+From Yishai,
 
-Will do.
+This patch series introduces a new DMA Handle (DMAH) object, along with
+corresponding APIs for its allocation and deallocation.
 
-> 
-> Also, keeping in mind I have no experience with IGMP/MLD snooping:
-> aren't there IGMP/MLD messages which should be delivered to all hosts?
-> Are you looking for BR_INPUT_SKB_CB_MROUTERS_ONLY(skb) as a substitute
-> to br_multicast_igmp_type() instead?
-> 
+The DMAH object encapsulates attributes relevant for DMA transactions.
 
-Yes, there are messages which should be delivered to all hosts, but if 
-we offload these messages, we're at the mercy of the multicast_flood 
-setting on each port and whether or not 224.0.0.1/ff02::1 are "known" 
-multicast groups. (There's a discrepancy between the bridge and DSA 
-subsystem on how 224.0.0.1/ff02::1 groups are handled.)
+While initially intended to support TLP Processing Hints (TPH) [1], the
+design is extensible to accommodate future features such as PCI
+multipath for DMA, PCI UIO configurations, traffic class selection, and
+more.
 
-Group Specific Queries might be the only ones which are safe to offload 
-regardless of what multicast_flood setting is, but I don't think the 
-bridge has a flag specifically for those.
+Additionally, we introduce a new ioctl method on the MR object:
+UVERBS_METHOD_REG_MR.
 
-Thanks,
-Joseph
+This method consolidates multiple reg_mr variants under a single
+user-space ioctl interface, supporting: ibv_reg_mr(), ibv_reg_mr_iova(),
+ibv_reg_mr_iova2() and ibv_reg_dmabuf_mr(). It also enables passing a
+DMA handle as part of the registration process.
+
+Throughout the patch series, the following DMAH-related stuff can also
+be observed in the IB layer:
+
+- Association with a CPU ID and its memory type, for use with Steering
+  Tags [2].
+
+- Inclusion of Processing Hints (PH) data for TPH functionality [3].
+
+- Enforces security by ensuring that only tasks allowed to run on a
+  given CPU may request a DMA handle for it.
+
+- Reference counting for DMAH life cycle management and safe usage
+  across memory regions.
+
+mlx5 driver implementation:
+--------------------------
+The series includes implementation of the above functionality in the
+mlx5 driver.
+
+In mlx5_core:
+- Enables TPH over PCIe when both firmware and OS support it.
+
+- Manages Steering Tags and corresponding indices by writing tag values
+  to the PCI configuration space.
+
+- Exposes APIs to upper layers (e.g., mlx5_ib) to enable the PCIe TPH
+  functionality.
+
+In mlx5_ib:
+- Adds full support for DMAH operations.
+
+- Utilizes mlx5_core's Steering Tag APIs to derive tag indices from input.
+
+- Stores the resulting index in a mlx5_dmah structure for use during
+  MKEY creation with a DMA handle.
+
+- Adds support for allowing MKEYs to be created in conjunction with DMA
+  handles.
+
+Additional details are provided in the commit messages.
+
+[1] Background, from PCIe specification 6.2.
+TLP Processing Hints (TPH)
+--------------------------
+TLP Processing Hints is an optional feature that provides hints in
+Request TLP headers to facilitate optimized processing of Requests that
+target Memory Space.  These Processing Hints enable the system hardware
+(e.g., the Root Complex and/ or Endpoints) to optimize platform
+resources such as system and memory interconnect on a per TLP basis.
+Steering Tags are system-specific values used to identify a processing
+resource that a Requester explicitly targets. System software discovers
+and identifies TPH capabilities to determine the Steering Tag allocation
+for each Function that supports TPH
+
+[2] Steering Tags
+Functions that intend to target a TLP towards a specific processing
+resource such as a host processor or system cache hierarchy require
+topological information of the target cache (e.g., which host cache).
+Steering Tags are system-specific values that provide information about
+the host or cache structure in the system cache hierarchy. These values
+are used to associate processing elements within the platform with the
+processing of Requests.
+
+[3] Processing Hints
+The Requester provides hints to the Root Complex or other targets about
+the intended use of data and data structures by the host and/or device.
+The hints are provided by the Requester, which has knowledge of upcoming
+Request patterns, and which the Completer would not be able to deduce
+autonomously (with good accuracy)
+
+Yishai
+    
+Yishai Hadas (8):
+  pci/tph: Expose pcie_tph_get_st_table_size()
+  net/mlx5: Expose IFC bits for TPH
+  net/mlx5: Add support for device steering tag
+  IB/core: Add UVERBS_METHOD_REG_MR on the MR object
+  RDMA/core: Introduce a DMAH object and its alloc/free APIs
+  RDMA/mlx5: Add DMAH object support
+  IB: Extend UVERBS_METHOD_REG_MR to get DMAH
+  RDMA/mlx5: Add DMAH support for reg_user_mr/reg_user_dmabuf_mr
+
+ drivers/infiniband/core/Makefile              |   1 +
+ drivers/infiniband/core/device.c              |   3 +
+ drivers/infiniband/core/rdma_core.h           |   1 +
+ drivers/infiniband/core/restrack.c            |   2 +
+ drivers/infiniband/core/uverbs_cmd.c          |   2 +-
+ .../infiniband/core/uverbs_std_types_dmah.c   | 151 ++++++++++++++++
+ drivers/infiniband/core/uverbs_std_types_mr.c | 170 +++++++++++++++++-
+ drivers/infiniband/core/uverbs_uapi.c         |   1 +
+ drivers/infiniband/core/verbs.c               |   5 +-
+ drivers/infiniband/hw/bnxt_re/ib_verbs.c      |   8 +
+ drivers/infiniband/hw/bnxt_re/ib_verbs.h      |   2 +
+ drivers/infiniband/hw/cxgb4/iw_cxgb4.h        |   1 +
+ drivers/infiniband/hw/cxgb4/mem.c             |   6 +-
+ drivers/infiniband/hw/efa/efa.h               |   2 +
+ drivers/infiniband/hw/efa/efa_verbs.c         |   8 +
+ drivers/infiniband/hw/erdma/erdma_verbs.c     |   6 +-
+ drivers/infiniband/hw/erdma/erdma_verbs.h     |   3 +-
+ drivers/infiniband/hw/hns/hns_roce_device.h   |   1 +
+ drivers/infiniband/hw/hns/hns_roce_mr.c       |   4 +
+ drivers/infiniband/hw/irdma/verbs.c           |   9 +
+ drivers/infiniband/hw/mana/mana_ib.h          |   2 +
+ drivers/infiniband/hw/mana/mr.c               |   8 +
+ drivers/infiniband/hw/mlx4/mlx4_ib.h          |   1 +
+ drivers/infiniband/hw/mlx4/mr.c               |   4 +
+ drivers/infiniband/hw/mlx5/Makefile           |   1 +
+ drivers/infiniband/hw/mlx5/devx.c             |   4 +
+ drivers/infiniband/hw/mlx5/dmah.c             |  54 ++++++
+ drivers/infiniband/hw/mlx5/dmah.h             |  23 +++
+ drivers/infiniband/hw/mlx5/main.c             |   5 +
+ drivers/infiniband/hw/mlx5/mlx5_ib.h          |   7 +
+ drivers/infiniband/hw/mlx5/mr.c               | 103 +++++++++--
+ drivers/infiniband/hw/mlx5/odp.c              |   1 +
+ drivers/infiniband/hw/mthca/mthca_provider.c  |   6 +-
+ drivers/infiniband/hw/ocrdma/ocrdma_verbs.c   |   6 +-
+ drivers/infiniband/hw/ocrdma/ocrdma_verbs.h   |   3 +-
+ drivers/infiniband/hw/qedr/verbs.c            |   6 +-
+ drivers/infiniband/hw/qedr/verbs.h            |   3 +-
+ drivers/infiniband/hw/usnic/usnic_ib_verbs.c  |   4 +
+ drivers/infiniband/hw/usnic/usnic_ib_verbs.h  |   1 +
+ drivers/infiniband/hw/vmw_pvrdma/pvrdma_mr.c  |   5 +
+ .../infiniband/hw/vmw_pvrdma/pvrdma_verbs.h   |   1 +
+ drivers/infiniband/sw/rdmavt/mr.c             |   5 +
+ drivers/infiniband/sw/rdmavt/mr.h             |   1 +
+ drivers/infiniband/sw/rxe/rxe_verbs.c         |   4 +
+ drivers/infiniband/sw/siw/siw_verbs.c         |   7 +-
+ drivers/infiniband/sw/siw/siw_verbs.h         |   3 +-
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |   5 +
+ .../net/ethernet/mellanox/mlx5/core/lib/st.c  | 162 +++++++++++++++++
+ .../net/ethernet/mellanox/mlx5/core/main.c    |   2 +
+ .../ethernet/mellanox/mlx5/core/mlx5_core.h   |   9 +
+ drivers/pci/tph.c                             |  11 +-
+ include/linux/mlx5/driver.h                   |  20 +++
+ include/linux/mlx5/mlx5_ifc.h                 |  14 +-
+ include/linux/pci-tph.h                       |   1 +
+ include/rdma/ib_verbs.h                       |  31 ++++
+ include/rdma/restrack.h                       |   4 +
+ include/uapi/rdma/ib_user_ioctl_cmds.h        |  32 ++++
+ 57 files changed, 905 insertions(+), 40 deletions(-)
+ create mode 100644 drivers/infiniband/core/uverbs_std_types_dmah.c
+ create mode 100644 drivers/infiniband/hw/mlx5/dmah.c
+ create mode 100644 drivers/infiniband/hw/mlx5/dmah.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/st.c
+
+-- 
+2.50.0
+
 
