@@ -1,169 +1,135 @@
-Return-Path: <netdev+bounces-204661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8F7AAFBA59
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 20:06:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1633BAFBA66
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 20:10:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86D03189C2F8
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 18:06:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEBC71899B21
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 18:11:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE0922577E;
-	Mon,  7 Jul 2025 18:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="T3kDLldL";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="lSaJvOni";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="T3kDLldL";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="lSaJvOni"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEDC0261586;
+	Mon,  7 Jul 2025 18:10:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 334251DE4CE
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 18:06:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CB43194C96;
+	Mon,  7 Jul 2025 18:10:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751911566; cv=none; b=c0ntV9Q5KDeVK2WS7cFpMXozvCMEQRZPbL/9uExDTTxWEjF/ce3tCZ5vvr6NCQwUbqQd/3Can06Wbt9h9uMpHFAoc7Mq2JazbGqEw11a9uCVbCYrogNJJ0AdX4xwSo4w/zvz2ZNnSHV7eFQfxiipZTJiHKqLew2Fk6sZoVfq7vY=
+	t=1751911841; cv=none; b=bjvACUascsgPFycqJ0AyE5WnMjoSY1K5xr3XviI4/Ug7fkDv8lgN+9h/JQQXKXi+GFj3UO/alaB7Ga+n/S4Olqb3l5nIYyfOwMwbvOkNn/x5YltHJa02o2peCrFyk72MLk6PS2prgjSRZNWDXUlJ/iScS7FOu6wN9FpYvNIG8Lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751911566; c=relaxed/simple;
-	bh=EUWWMbUY9ateg96QhXRNUNfq0grkZdzUiVEFChiED8o=;
+	s=arc-20240116; t=1751911841; c=relaxed/simple;
+	bh=wlHrCtGBl+DGqEhOWB+uOhhtbGi1szeAAR8W96IRhys=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U+8K+fxpBSJfe+u+oYLSmP2vSOE1wPfZh0nhPo9E7k9oP/28HD2TcjrbNg6en/msM4G7bmt91iVLYO/Z83vHqPKugu87fEGv+/XhDJbCUVjr1KrJTs9edxt6rSdsxVKqvZ7nGsPRl0s9/+zPHGxclgXU0QImtU4sHedHobVMy2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=T3kDLldL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=lSaJvOni; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=T3kDLldL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=lSaJvOni; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from lion.mk-sys.cz (unknown [10.100.225.114])
+	 Content-Type:Content-Disposition:In-Reply-To; b=TofEdPpDnBcBdMNZaPn0HLympt4McjJ4DabZxiOYFRCyBqmIuJlSN37jBiyregff13ezpbbCUYXRHWDnjBPt7XYjnFWCaIgTSErSFryD7s4wxeLq1pHsBeIWkdFGo+u7koiy8BSqXralQDM/V00XAWm9tajJLHSQ89gbvDf4KNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 0C6E62115E;
-	Mon,  7 Jul 2025 18:06:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1751911560; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EUWWMbUY9ateg96QhXRNUNfq0grkZdzUiVEFChiED8o=;
-	b=T3kDLldL4ZPx2Vj8uGglfJzRxj3/zeMMzNqF4Q+4IaB3Dm+gBW68783/Z/xdkx/lL3l45b
-	q+fL99V8TrxhdTktI9XzE0ByCDg4ibi0RXPnZKW3plhTvXdR+UEg/dNjXvJ533WVD7ffqR
-	sD8TwSKGk4jvtmzu9z22hMvTxBoZBiw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1751911560;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EUWWMbUY9ateg96QhXRNUNfq0grkZdzUiVEFChiED8o=;
-	b=lSaJvOniYX8Jbh2LYFyIo8KschfgpOym2z8YAx3yoDjXAQzp3Ly65v8GmaDsEv58OcL7em
-	hkPthbRqf77/wdCg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1751911560; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EUWWMbUY9ateg96QhXRNUNfq0grkZdzUiVEFChiED8o=;
-	b=T3kDLldL4ZPx2Vj8uGglfJzRxj3/zeMMzNqF4Q+4IaB3Dm+gBW68783/Z/xdkx/lL3l45b
-	q+fL99V8TrxhdTktI9XzE0ByCDg4ibi0RXPnZKW3plhTvXdR+UEg/dNjXvJ533WVD7ffqR
-	sD8TwSKGk4jvtmzu9z22hMvTxBoZBiw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1751911560;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EUWWMbUY9ateg96QhXRNUNfq0grkZdzUiVEFChiED8o=;
-	b=lSaJvOniYX8Jbh2LYFyIo8KschfgpOym2z8YAx3yoDjXAQzp3Ly65v8GmaDsEv58OcL7em
-	hkPthbRqf77/wdCg==
-Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-	id CD5AA20057; Mon, 07 Jul 2025 20:05:59 +0200 (CEST)
-Date: Mon, 7 Jul 2025 20:05:59 +0200
-From: Michal Kubecek <mkubecek@suse.cz>
-To: Chintan Vankar <c-vankar@ti.com>
-Cc: s-vadapalli@ti.com, danishanwar@ti.com, netdev@vger.kernel.org
-Subject: Re: [PATCH ethtool-next v3] pretty: Add support for TI K3 CPSW
- registers and ALE table dump
-Message-ID: <amrdqao56qoonqvxxtsdufzib3pctiqumbsz2io2cz3uktkk4h@wxaxo2ozjxcp>
-References: <20250705134807.3514891-1-c-vankar@ti.com>
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 7F0F92009184;
+	Mon,  7 Jul 2025 20:10:36 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 67F0D19DDB6; Mon,  7 Jul 2025 20:10:36 +0200 (CEST)
+Date: Mon, 7 Jul 2025 20:10:36 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	Andre Edich <andre.edich@microchip.com>
+Subject: Re: [PATCH net v1 2/2] net: phy: smsc: add adaptive polling to
+ recover missed link-up on LAN8700
+Message-ID: <aGwNnBJbM9LWnJ8f@wunner.de>
+References: <20250707153232.1082819-1-o.rempel@pengutronix.de>
+ <20250707153232.1082819-3-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="5prkyphzq5ter5ff"
-Content-Disposition: inline
-In-Reply-To: <20250705134807.3514891-1-c-vankar@ti.com>
-X-Spamd-Result: default: False [-5.90 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SIGNED_PGP(-2.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	NEURAL_HAM_SHORT(-0.20)[-0.990];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_COUNT_ONE(0.00)[1];
-	TO_DN_SOME(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Level: 
-X-Spam-Score: -5.90
-
-
---5prkyphzq5ter5ff
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250707153232.1082819-3-o.rempel@pengutronix.de>
 
-On Sat, Jul 05, 2025 at 07:18:07PM GMT, Chintan Vankar wrote:
-> Add support to dump CPSW registers and ALE table for the CPSW instances on
-> K3 SoCs that are configured using the am65-cpsw-nuss.c device-driver in
-> Linux.
->=20
-> Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
-> Signed-off-by: Chintan Vankar <c-vankar@ti.com>
+On Mon, Jul 07, 2025 at 05:32:32PM +0200, Oleksij Rempel wrote:
+> Fixe unreliable link detection on LAN8700 configured for 10 Mbit / half-
 
-The patch breaks compilation with gcc7 which doesn't like variable
-declarations at the beginning of a case block in switch statement
-(lines 423 and 432 in am65-cpsw-nuss.c). Newer versions (at least 11-15)
-do not have a problem with this so it seems to be rather a bug in gcc7.
-Thus I'm going to apply the patch anyway (unless I find a real issue
-with it which is not likely).
+s/Fixe/Fix/
 
-That being said, putting variable declarations there is a bad habit
-as such case block is not a scope in C (causing errors e.g. when you use
-the same variable name in two different case blocks of the same switch
-statement) even if it seems to be optically.
+> or full-duplex against an autonegotiating partner and similar scenarios.
+> 
+> The LAN8700 PHY (build in to LAN9512 and similar adapters) can fail to
 
-But that's rather a cosmetic issue which can be addressed later.
-Standard cleanup is either declaring the variables earlier or, if you
-really want the scope of such variable to be within one case block,
-closing it into a { ... } block.
+s/build/built/
 
-Michal
+> report a link-up event when it is forced to a fixed speed/duplex and the
+> link partner still advertises autonegotiation. During link establishment
+> the PHY raises several interrupts while the link is not yet up; once the
+> link finally comes up no further interrupt is generated, so phylib never
+> observes the transition and the kernel keeps the interface down even
+> though ethtool shows the link as up.
+> 
+> Mitigate this by combining interrupts with adaptive polling:
+> 
+> - When the driver is running in pure polling mode it continues to poll
+>   once per second (unchanged).
+> - With an IRQ present we now
+>   - poll every 30 s while the link is up (low overhead);
+>   - switch to a 1 s poll for up to 30 s after the last IRQ and while the
+>     link is down, ensuring we catch the final silent link-up.
 
---5prkyphzq5ter5ff
-Content-Type: application/pgp-signature; name="signature.asc"
+I think this begs the question, if we *know* that the link may come up
+belatedly without an interrupt, why poll?  Would it work to schedule a
+one-off link check after a reasonable delay to catch the link change?
 
------BEGIN PGP SIGNATURE-----
+I'm also wondering if enabling EDPD changes the behavior?
 
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmhsDIQACgkQ538sG/LR
-dpXxYggAjuX6SYg+XOakZBvXxzoo3BCjJHRKYrPZxx1Cy01I0sP7WXtwH80zo76k
-73sfNVZ+8LMQ3zo+z5UgC1U+NsHUlNVawwiQ8ddj0Vtg9cMDWVh/HruSwZgPZutp
-Twb4kgehGveEq0iLSwkbAWWfHZ76Jf65YDW3bEiefFF7oj10+afEBrLzk7jySnSM
-XV6Z1KJ0jDQYM/XlX4TI+SIb2kgTIKWiUmsbGR6fPAfNhj6jKV/ug+TmM1dQ2Qjx
-bFlIT9MK4QOpDQl1dHyaMMx0N3wEIlnOsdbM8kX9CAucH+DWRLnoKgACGqgMwYHz
-a16u6ZSAFp+ody6UVHVn7lCjVctxGg==
-=prDF
------END PGP SIGNATURE-----
+> +static unsigned int smsc_phy_get_next_update(struct phy_device *phydev)
+> +{
+> +	struct smsc_phy_priv *priv = phydev->priv;
+> +
+> +	/* If interrupts are disabled, fall back to default polling */
+> +	if (phydev->irq == PHY_POLL)
+> +		return SMSC_NOIRQ_POLLING_INTERVAL;
+> +
+> +	/* The PHY sometimes drops the *final* link-up IRQ when we run
+> +	 * with autoneg OFF (10 Mbps HD/FD) against an autonegotiating
+> +	 * partner: we see several "link down" IRQs, none for "link up".
 
---5prkyphzq5ter5ff--
+Hm, I'm not seeing a check for all those conditions (e.g. autoneg off) here?
+
+Also, you seem to be using UTF-8 characters instead of US-ASCII single or
+double quotes around "link down" and "link up".
+
+> +	 *
+> +	 * Work-around philosophy:
+> +	 *   - If the link is already up, the hazard is past, so we
+> +	 *     revert to a relaxed 30 s poll to save power.
+> +	 *   - Otherwise we stay in a tighter polling loop for up to one
+> +	 *     full interval after the last IRQ in case the crucial
+> +	 *     link-up IRQ was lost.  Empirically 5 s is enough but we
+> +	 *     keep 30 s to be extra conservative.
+> +	 */
+> +	if (!priv->last_irq || phydev->link ||
+> +	    time_is_before_jiffies(priv->last_irq + SMSC_IRQ_POLLING_INTERVAL))
+> +		return SMSC_IRQ_POLLING_INTERVAL;
+> +
+> +	return SMSC_NOIRQ_POLLING_INTERVAL;
+> +}
+
+Thanks,
+
+Lukas
 
