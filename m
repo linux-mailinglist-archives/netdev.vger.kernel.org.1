@@ -1,155 +1,154 @@
-Return-Path: <netdev+bounces-204602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2C6CAFB6D1
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 17:05:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B258AFB6DA
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 17:06:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64BA53A2798
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 15:04:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3169C1798A5
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 15:06:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8FE12E1749;
-	Mon,  7 Jul 2025 15:04:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 721072E1C63;
+	Mon,  7 Jul 2025 15:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hn188aKx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h1eKC47q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7E42E11D9;
-	Mon,  7 Jul 2025 15:04:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43DD24B26;
+	Mon,  7 Jul 2025 15:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751900687; cv=none; b=ePzS23Kg8mAF31Bja2AOQSRC78vIHzBomw0thHrG8BgaE80qT9yZxXJs1NrBbLTFRlESFh0QDYz6bX4HbucS28ngMJ/OWtYRJiD4DHOU7MtVMW/PMXdJaHTrkL5RZ28tDR+mcswMe/rReLywDukWKe5fXjJmXx7WdvZevyPdtD4=
+	t=1751900785; cv=none; b=gV60nd0OfegAw70oA1AcscYRuFqN7sFr1B77T5DG3perKOhwtQmM/S3UqBtJMUSBn2LT4WgPzZqRx9YZ6mu4BbT46Xh3ri4OWd+ytgr0jXe82xz3lmoE9PBbMiLMHNrU3r65/XWVpUWDNQ9R8g2Gaqo+c8P6Fgip1X9f9vBvkOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751900687; c=relaxed/simple;
-	bh=RhkJAKLlY4Yx5V4ar6nowx9DR12JvZ+qhTjq8dUu1S8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pTORrJ8M1KqNJsv/5DDH0DJK9YBTNGtFzPivfvY18mabSqOOtJrfbwfBrrciFfSHaKCgAkTVwjEgVL7XCFu52kYcEU/VhmCivQMBsP4vXXekEX7VAWZF0101O11mMJDcvf2EbjEhJTEC+XoGz8S0zsM1JOv2tyD0nLmCTHcBxLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hn188aKx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C94A4C4CEF1;
-	Mon,  7 Jul 2025 15:04:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751900687;
-	bh=RhkJAKLlY4Yx5V4ar6nowx9DR12JvZ+qhTjq8dUu1S8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hn188aKx/v6jVmCYoDu49FSfZzv8h1+ZBs0lktN1enyIT4JftJI3UknxmE6cVI57E
-	 7IYglXZuK0rUQFSgXzde7MpueugfJNmodR/rH1iAhxY/QqEVJaWCRhF+JeoNXXR2He
-	 S4AJqXrOZmt/IKXmLJHLgkLJIWFggVuSMavdu33fc/cBTsNMlMBEp01rgOMjDl02Y0
-	 auUfrhxr7sjnDNVa0cpSjlEHFnPPnkpPLnijbr4U9c+duGCe+rTUsN58oD6EgGRH9e
-	 Zee82vrDwb06dVOCZWZv0SwVqNrthmMr3AJI8hyN9CU7xkpHeodQ2CjK5GUb2v17MQ
-	 jpZcbt69m327Q==
-Message-ID: <679e6fd2-967f-4057-9ccd-92a37ecc4819@kernel.org>
-Date: Mon, 7 Jul 2025 17:04:41 +0200
+	s=arc-20240116; t=1751900785; c=relaxed/simple;
+	bh=OtZTlc41xEUSAFuDvcnp3QF+S8jjt8sKIbxXecNYARU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dk/+5n7wBk9ggK1ddL56iKPeCNSuyKGOfjYApqCzNSn9ubAYBgqy9eirED9c4lrGlYG/i7xN3p4h7c5dKUx6GnqT3ofnHCxb9aJAOtqpPnqTBacyrbgoWthE//iRq/fzrF/8lvT0kNitsu0AyY7xhpZ2XlDIR0C3+Tn3xrZgRLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h1eKC47q; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-747e41d5469so3622465b3a.3;
+        Mon, 07 Jul 2025 08:06:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751900783; x=1752505583; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vBwTkO1i6uyUmtXk9j5iWD5gRAXh5Ag4QOoLfLwpMgM=;
+        b=h1eKC47qTTq2HSCxMwJxjJb6V5JPzrgGUTxsFtZMVwCcMDD4/JFK3y27XslPGq8l1U
+         I5NQ7vZlWgrPSk9bZBIVuo66jQCbyftj9vPDkuq+7A+yHFctv8hMr/Gw3AzTSnhDVOXL
+         O5LUoJyxn3Nh7BDbfSqBsuO+VHm/D7NL7Ybu+FOKxgqfC+ZWzoeH9Ew5lk6CmTdFs9ts
+         iqgNgphYxzlDO1yuzonxIoeR49Pt0ZSWKeVki5ZWKg0NeRpIn25vsX6uA9t3m844zMXp
+         aiKyPJDmggc/gjQ5zHQFFyYD/EH/+O/zCBTBnH9k6iBDAatv0eoX220bHrtX4786ZF0Q
+         f56g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751900783; x=1752505583;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vBwTkO1i6uyUmtXk9j5iWD5gRAXh5Ag4QOoLfLwpMgM=;
+        b=TdqO+BxQwjJH54mu3467J2TSt2heLFIdquDVmiz4DOFHJ7NmZ7WiMHWVP4wVR4jzBp
+         KlNqxOkbf7vJIBr17hAkw7gyQdBQTjW+pifmXXtbcP7q0ggx3setil5Y8L0Ui/SEunCB
+         nFvVfoPa4Mu3+Q/2Bxd/6UQsl5QItqpHamJN7gOwxvINUfDm15jYnHSyDcd/MBdWeD9p
+         +RTeHGv6YI5eQZxONzCWF/FPz6BohJAw2woLXUE9T+ALQQ8hX6JVtQqS8Y599yqF614I
+         obH/bEo6J6r9B0We7Xy3XJzUR8AYJjjo/figngJtA1dCc9y6Q4QALzb37VZbTuEZso1W
+         Ly0w==
+X-Forwarded-Encrypted: i=1; AJvYcCUITl3elAFsEnJLZSJ2DtkhCjJK8+UYxjnh5qHEFeY8McLZMfAHzZ8/t34gp/1GxNgisXQ=@vger.kernel.org, AJvYcCX9gEMWMuleHlURsEwsC7b8ZFNj1+DvcxE/Q1a3nhGZNu8ILFKlDF/n9SRwOWA9htDSSTWLviHZ@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEjlnF1SRKIjRpOr+FDz1tzTJQrJgTnTl1T9+XtLmZV0q7sQrs
+	7+HSEPyfiby1EmSNj4AXb+4VwEVtG/USSzVaz2M19D+oetgFBs6t6dA=
+X-Gm-Gg: ASbGncsryxjWUZazwjzOabTXYfDKS9dv9SNnZx4IOUVGkQkNyLF2s5P/B6l5vF1m38h
+	JFYs5noHGem0+elnYKYL2Fo3JMCJQmf4OXG4Fn3BuElTotbIgl5xxoi04D44fGrAbfClbTkyhtn
+	nGCrOz5Z9Fvuykz2wsCFdMGdpeXdZzq1fz4Lom+h47Q6dlqpJ6zvQx+Fj/MzwEcO8UWF9P91pzA
+	MzDVCRGcSNLnCb/vMyL1JEKntyiwCxfI4wDlvzmd3lEUlf2XV0hEFFKj7UcVVKkP6rMTYPM3l6B
+	+Dy9GZzFIfMak/ebCMAIiwtnHf2JsDVVa/kGW6TcQQNuiyxyEoPcogr9O1Qq0rj3qBsckBlPOA+
+	i8oumCkrwJROIck9vasxiJbk=
+X-Google-Smtp-Source: AGHT+IHvJfhixLT7bcWwkcxX64R8rNpGvST8CW9NVhZs9Vy4EHGpO+QVgRb0plujhQ6UjhYUzyE4yw==
+X-Received: by 2002:a05:6a20:734a:b0:215:ee6e:ee3b with SMTP id adf61e73a8af0-2260a794581mr19874078637.15.1751900783014;
+        Mon, 07 Jul 2025 08:06:23 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-b38ee7410a0sm9098766a12.67.2025.07.07.08.06.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Jul 2025 08:06:22 -0700 (PDT)
+Date: Mon, 7 Jul 2025 08:06:21 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+	netdev@vger.kernel.org, magnus.karlsson@intel.com,
+	Eryk Kubanski <e.kubanski@partner.samsung.com>
+Subject: Re: [PATCH v2 bpf] xsk: fix immature cq descriptor production
+Message-ID: <aGvibV5TkUBEmdWV@mini-arch>
+References: <20250705135512.1963216-1-maciej.fijalkowski@intel.com>
+ <d0e7fe46-1b9d-4228-bb0f-358e8360ee7b@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 2/7] net: airoha: npu: Add NPU wlan memory
- initialization commands
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, Simon Horman <horms@kernel.org>,
- Felix Fietkau <nbd@nbd.name>
-References: <20250705-airoha-en7581-wlan-offlaod-v2-0-3cf32785e381@kernel.org>
- <20250705-airoha-en7581-wlan-offlaod-v2-2-3cf32785e381@kernel.org>
- <20250707-agile-aardwolf-of-politeness-29fead@krzk-bin>
- <aGt2L1e3xbWVoqOO@lore-desk>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <aGt2L1e3xbWVoqOO@lore-desk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d0e7fe46-1b9d-4228-bb0f-358e8360ee7b@intel.com>
 
-On 07/07/2025 09:24, Lorenzo Bianconi wrote:
->> On Sat, Jul 05, 2025 at 11:09:46PM +0200, Lorenzo Bianconi wrote:
->>> +
->>>  struct airoha_npu *airoha_npu_get(struct device *dev, dma_addr_t *stats_addr)
->>>  {
->>>  	struct platform_device *pdev;
->>> @@ -493,6 +573,7 @@ static int airoha_npu_probe(struct platform_device *pdev)
->>>  	npu->ops.ppe_deinit = airoha_npu_ppe_deinit;
->>>  	npu->ops.ppe_flush_sram_entries = airoha_npu_ppe_flush_sram_entries;
->>>  	npu->ops.ppe_foe_commit_entry = airoha_npu_foe_commit_entry;
->>> +	npu->ops.wlan_init_reserved_memory = airoha_npu_wlan_init_memory;
->>
->> I cannot find in your code single place calling this (later you add a
->> wrapper... which is not called either).
->>
->> All this looks like dead code...
+On 07/07, Alexander Lobakin wrote:
+> From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> Date: Sat,  5 Jul 2025 15:55:12 +0200
 > 
-> As pointed out in the commit log, these callbacks will be used by MT76 driver
-> to initialize the NPU reserved memory and registers during driver probe in
-> order to initialize the WiFi offloading. Since MT76 patches are going via
-> the wireless tree, I needed to add these callbacks first.
+> > Eryk reported an issue that I have put under Closes: tag, related to
+> > umem addrs being prematurely produced onto pool's completion queue.
+> > Let us make the skb's destructor responsible for producing all addrs
+> > that given skb used.
+> > 
+> > Commit from fixes tag introduced the buggy behavior, it was not broken
+> > from day 1, but rather when xsk multi-buffer got introduced.
+> > 
+> > Introduce a struct which will carry descriptor count with array of
+> > addresses taken from processed descriptors that will be carried via
+> > skb_shared_info::destructor_arg. This way we can refer to it within
+> > xsk_destruct_skb().
+> > 
+> > To summarize, behavior is changed from:
+> > - produce addr to cq, increase cq's cached_prod
+> > - increment descriptor count and store it on
+> > - (xmit and rest of path...)
+> >   skb_shared_info::destructor_arg
+> > - use destructor_arg on skb destructor to update global state of cq
+> >   producer
+> > 
+> > to the following:
+> > - increment cq's cached_prod
+> > - increment descriptor count, save xdp_desc::addr in custom array and
+> >   store this custom array on skb_shared_info::destructor_arg
+> > - (xmit and rest of path...)
+> > - use destructor_arg on skb destructor to walk the array of addrs and
+> >   write them to cq and finally update global state of cq producer
+> > 
+> > Fixes: b7f72a30e9ac ("xsk: introduce wrappers and helpers for supporting multi-buffer in Tx path")
+> > Reported-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
+> > Closes: https://lore.kernel.org/netdev/20250530103456.53564-1-e.kubanski@partner.samsung.com/
+> > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> > ---
+> > v1:
+> > https://lore.kernel.org/bpf/20250702101648.1942562-1-maciej.fijalkowski@intel.com/
+> > 
+> > v1->v2:
+> > * store addrs in array carried via destructor_arg instead having them
+> >   stored in skb headroom; cleaner and less hacky approach;
+> 
+> Might look cleaner, but what about the performance given that you're
+> adding a memory allocation?
+> 
+> (I realize that's only for the skb mode, still)
+> 
+> Yeah we anyway allocate an skb and may even copy the whole frame, just
+> curious.
+> I could recommend using skb->cb for that, but its 48 bytes would cover
+> only 6 addresses =\
 
-Cover letter does not link to your NPU patchset. You cannot add dead
-code to the kernel and now it is pure dead code. Post your user - in
-this or separate patchset.
-
-Your explanation of dependency is also confusing. If these are added to
-wireless tree (considering last experience how they rebase and cannot
-easily handle cross tree merges), how does it solve your problem? You
-will have it in one tree but not in the other, so still nothing...
-That's anyway separate problem, because main issue is you add code which
-we cannot even verify how it is being used.
-
-So far I see ABI break, but without user cannot judge. And that's the
-hard reason this cannot be accepted.
-
-Best regards,
-Krzysztof
+Can we pre-allocate an array of xsk_addrs during xsk_bind (the number of
+xsk_addrs is bound by the tx ring size)? Then we can remove the alloc on tx
+and replace it with some code to manage that pool of xsk_addrs..
 
