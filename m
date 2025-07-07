@@ -1,158 +1,196 @@
-Return-Path: <netdev+bounces-204589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A53DAFB46E
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 15:23:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CDDEAFB4CB
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 15:40:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82888179BF3
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 13:23:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 737EB171CF4
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 13:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87603289803;
-	Mon,  7 Jul 2025 13:23:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A25FC2BCF65;
+	Mon,  7 Jul 2025 13:40:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OtjH+USe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dKztURj2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3E728934D
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 13:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31D229C338
+	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 13:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751894610; cv=none; b=soU61yqLwu+In2mECItZ7RmIEBlsXgwF7a6uZjaI94LTWD0gpvD+VaQ+m6/vk4BLkEa40kFhvIfsclB51cOlbqyyPvOnBj+WH979HqvnaH8rDC5nE9+vTer8DMtUWwOJ50wJPQgWwmy6FQ1qqTi4SY0itfGW8xo8UrM02VqE+70=
+	t=1751895647; cv=none; b=YBeixBxJNTXLA01+NEScwJmOUETHrLJ3EsUpq6BPJ926tsth7N3OgBDdNlY7hyQr5iwWi6Hm1JcTaMh3zqZCOSeoXWGgKTytco9QPJPZUgimw5R24CKRnmh++Y5mwibZsR9E39LDHrT5kR8q5wponsfPtQRCee/k6etBkHrdXp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751894610; c=relaxed/simple;
-	bh=H0FeNN+P6Fwz9Kj2TemKg9xFvCUgymIvY3fuJdKM4sA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=K4adfN3DqK5O2MkEcICFBcKaNSDfARh32atWfJVxKmx6Q/XSYKqKgHJy0iMZU4Knp2zUUl5FtQK4rYc5+JeUftKWz9auIkfkFmiBBl2qWxz8LtQxHxFI4Dud0lkpDjS/WxTUgkaMpGzKKwTRbI/egh00OjFyNOrJQoxNG7zUfKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OtjH+USe; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1751895647; c=relaxed/simple;
+	bh=ul3tvYiiYuyxmNUs6c6tGf8iXCr1hDf1jpTi6pw0cEE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cfkdGuKDGb2R9YpTYe0/wT5Z06Jkt301ZgLThG2ZAl1fg6/6bPyxcGuAh5V1HT6tR4sYXvr3I1cepKdztfK/ZhSlDPFTKr5Woo/IuhsXmAd9Wtkv11nOKj1gZMJsjrGeKRb3wAhqgjJBLgkWMAp/oiYwqEvEUmFu5g8i8olInmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dKztURj2; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751894607;
+	s=mimecast20190719; t=1751895644;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RHuO5AsaFT5+p2FY+QJGOYcUuUvgKM52ns+6Pc/fS2s=;
-	b=OtjH+USeookGIQD3/NUOZqKSZOT+/BAyS6r4lLf6W5wXRYNWUTwzAhfEhQxrmmxzWVd2GJ
-	W5wDLvapKtXxS+pk9nuohYC16sLCQI0P9ViHAiShWE8rmQQe8TPxjLNrrVsyc7FT3NFjl7
-	kFqgBEo1Llt+H1Fz8Zr8XG173DvtVG0=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-583-m2JorT6FMPm9joGRjbf9sA-1; Mon,
- 07 Jul 2025 09:23:26 -0400
-X-MC-Unique: m2JorT6FMPm9joGRjbf9sA-1
-X-Mimecast-MFC-AGG-ID: m2JorT6FMPm9joGRjbf9sA_1751894605
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 46956195FCC6;
-	Mon,  7 Jul 2025 13:23:25 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.81.154])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7212C195608F;
-	Mon,  7 Jul 2025 13:23:23 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Ilya Maximets <i.maximets@ovn.org>
-Cc: netdev@vger.kernel.org,  dev@openvswitch.org,
-  linux-kernel@vger.kernel.org,  Eric Dumazet <edumazet@google.com>,  Simon
- Horman <horms@kernel.org>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  "David S. Miller" <davem@davemloft.net>
-Subject: Re: [ovs-dev] [PATCH net-next v2] net: openvswitch: allow providing
- upcall pid for the 'execute' command
-In-Reply-To: <20250702155043.2331772-1-i.maximets@ovn.org> (Ilya Maximets's
-	message of "Wed, 2 Jul 2025 17:50:34 +0200")
-References: <20250702155043.2331772-1-i.maximets@ovn.org>
-Date: Mon, 07 Jul 2025 09:23:21 -0400
-Message-ID: <f7ttt3oqgmu.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	bh=W2KJ06Vv9jNgPK/f5x2D67o6F5iefXJHvVBymbKYkgw=;
+	b=dKztURj2FL5x9836vVW2urQdzuM+bdMvz/wX0XF0eTsIJOJEplJXq4m2lA1uFta7UY5w7w
+	upr0j99EBR5hTJslNz5N2bElBNFVXvRgHtEF04Rkt3xIVVEouL0XDTuZX2fCwrhwqUZd2/
+	VF3qH5qGb+iikUaj1bqvcdWB6GA0Lo4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-356-zv9rlHO6Mn6qmvr2QFWHog-1; Mon, 07 Jul 2025 09:40:42 -0400
+X-MC-Unique: zv9rlHO6Mn6qmvr2QFWHog-1
+X-Mimecast-MFC-AGG-ID: zv9rlHO6Mn6qmvr2QFWHog_1751895641
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45311704d22so17869935e9.2
+        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 06:40:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751895641; x=1752500441;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W2KJ06Vv9jNgPK/f5x2D67o6F5iefXJHvVBymbKYkgw=;
+        b=M6zTvWbicWkBQ39xX/rzBprSxuwtvhEZ5sb5VE8vFIPcbLxBroxigF4WlcrFimt4S9
+         N+rD17RpiDF0+qYC4r5jJ5qO1zpaHuvy2AWgxuYS16fJMylTNPHVawE+yljVJCJrsJhR
+         4gx8qxrypsoNrIVVgyya28ZrUqjy1k1j/waZTGAr1TcZfboDfUNUv51eamuOyjNI+4pn
+         xJRAZ9C0CgRPPBU/IAXCRLWS0/RzpCoIO4m6nQkcW2q8zhm9muz96/VZZCXZDjvGD6JB
+         NdQeWIcpa9VCVHOrB3UkG5GfUi44wsXE04KSFQXjzL/dKY89GPJJz8iom5CYBNfvrgUL
+         WfWA==
+X-Forwarded-Encrypted: i=1; AJvYcCXIHdv9Cu50JZwY4Pyuo0Pv8ZstW1xdX5O+r33FzK0ERue7UFF4LlPBAuVFX/TaB2bYpI1hBY8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpYgHi7qe5rw5A37c6sQLRzWr5AyjjGCN+urS/ZYOyqQpJvnMS
+	N4bpZC9hDCo7KhtrL1hgFmVeDncAGqhArU+zABcrszudkNd41P3oKnp6RhFe4z+jgJhFtnkU1C/
+	TKRkAfDZ4PZZwZgGGHcSwEzQGsejEuK1q0oc789EJGxkDsNWr9fhWNm+HfA==
+X-Gm-Gg: ASbGncu4kw6jnuvNEAXTGgvzyWGXsl7tk/AAnK4vuFlhW1kctHzLt+SvsjUujWay990
+	AcqoRy+NA+6AB5/q6+quiAwny++euH5NPvbYgpWagm8FtRgqOAaj5dPWyBmMnC32Rth5PXzr055
+	K9tuBrra2uooYLzUFB1+oFLKQ+11dRMiOcNj7WFpj4+q7RBm/xLjaHJFRuMav9SKzv3Y1TrLEuJ
+	VsKyKkwgZthbnY1+dvcoahDmz1gPepwGMLzAzOhM6a5poE8Cob6qnZltVz2TubPVrKrTi+mQclN
+	3nv1lsebw9fz98KHyeCzugIoqFjW
+X-Received: by 2002:a05:600c:8214:b0:450:d568:909b with SMTP id 5b1f17b1804b1-454b4e74957mr117204095e9.14.1751895641293;
+        Mon, 07 Jul 2025 06:40:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGZ3sl8II9VgNMv0Hs+oc26TdXSoZydYWxbok3SEgKNUWhqxxpymtncK0H5qwe1x6+STsNFHw==
+X-Received: by 2002:a05:600c:8214:b0:450:d568:909b with SMTP id 5b1f17b1804b1-454b4e74957mr117203465e9.14.1751895640329;
+        Mon, 07 Jul 2025 06:40:40 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.144.135])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b47285c9f9sm10339166f8f.93.2025.07.07.06.40.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Jul 2025 06:40:39 -0700 (PDT)
+Date: Mon, 7 Jul 2025 15:40:31 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Xuewei Niu <niuxuewei97@gmail.com>
+Cc: "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Xuewei Niu <niuxuewei.nxw@antgroup.com>, fupan.lfp@antgroup.com
+Subject: Re: [PATCH net-next v5 1/4] hv_sock: Return the readable bytes in
+ hvs_stream_has_data()
+Message-ID: <xhzslzuxrhdoixffmzwprn254ctolimj7giuxj4nfrfg23eesy@ycpe6kma5vih>
+References: <20250706-siocinq-v5-0-8d0b96a87465@antgroup.com>
+ <20250706-siocinq-v5-1-8d0b96a87465@antgroup.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250706-siocinq-v5-1-8d0b96a87465@antgroup.com>
 
-Ilya Maximets <i.maximets@ovn.org> writes:
+On Sun, Jul 06, 2025 at 12:36:29PM +0800, Xuewei Niu wrote:
 
-> When a packet enters OVS datapath and there is no flow to handle it,
-> packet goes to userspace through a MISS upcall.  With per-CPU upcall
-> dispatch mechanism, we're using the current CPU id to select the
-> Netlink PID on which to send this packet.  This allows us to send
-> packets from the same traffic flow through the same handler.
->
-> The handler will process the packet, install required flow into the
-> kernel and re-inject the original packet via OVS_PACKET_CMD_EXECUTE.
->
-> While handling OVS_PACKET_CMD_EXECUTE, however, we may hit a
-> recirculation action that will pass the (likely modified) packet
-> through the flow lookup again.  And if the flow is not found, the
-> packet will be sent to userspace again through another MISS upcall.
->
-> However, the handler thread in userspace is likely running on a
-> different CPU core, and the OVS_PACKET_CMD_EXECUTE request is handled
-> in the syscall context of that thread.  So, when the time comes to
-> send the packet through another upcall, the per-CPU dispatch will
-> choose a different Netlink PID, and this packet will end up processed
-> by a different handler thread on a different CPU.
->
-> The process continues as long as there are new recirculations, each
-> time the packet goes to a different handler thread before it is sent
-> out of the OVS datapath to the destination port.  In real setups the
-> number of recirculations can go up to 4 or 5, sometimes more.
->
-> There is always a chance to re-order packets while processing upcalls,
-> because userspace will first install the flow and then re-inject the
-> original packet.  So, there is a race window when the flow is already
-> installed and the second packet can match it and be forwarded to the
-> destination before the first packet is re-injected.  But the fact that
-> packets are going through multiple upcalls handled by different
-> userspace threads makes the reordering noticeably more likely, because
-> we not only have a race between the kernel and a userspace handler
-> (which is hard to avoid), but also between multiple userspace handlers.
->
-> For example, let's assume that 10 packets got enqueued through a MISS
-> upcall for handler-1, it will start processing them, will install the
-> flow into the kernel and start re-injecting packets back, from where
-> they will go through another MISS to handler-2.  Handler-2 will install
-> the flow into the kernel and start re-injecting the packets, while
-> handler-1 continues to re-inject the last of the 10 packets, they will
-> hit the flow installed by handler-2 and be forwarded without going to
-> the handler-2, while handler-2 still re-injects the first of these 10
-> packets.  Given multiple recirculations and misses, these 10 packets
-> may end up completely mixed up on the output from the datapath.
->
-> Let's allow userspace to specify on which Netlink PID the packets
-> should be upcalled while processing OVS_PACKET_CMD_EXECUTE.
-> This makes it possible to ensure that all the packets are processed
-> by the same handler thread in the userspace even with them being
-> upcalled multiple times in the process.  Packets will remain in order
-> since they will be enqueued to the same socket and re-injected in the
-> same order.  This doesn't eliminate re-ordering as stated above, since
-> we still have a race between kernel and the userspace thread, but it
-> allows to eliminate races between multiple userspace threads.
->
-> Userspace knows the PID of the socket on which the original upcall is
-> received, so there is no need to send it up from the kernel.
->
-> Solution requires storing the value somewhere for the duration of the
-> packet processing.  There are two potential places for this: our skb
-> extension or the per-CPU storage.  It's not clear which is better,
-> so just following currently used scheme of storing this kind of things
-> along the skb.  We still have a decent amount of space in the cb.
->
-> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
-> ---
->
+Again, this patch should have `From: Dexuan Cui <decui@microsoft.com>` 
+on first line, and this is done automatically by `git format-patch` (or 
+others tools) if the author is the right one in your branch.
+I'm not sure what is going on on your side, but you should avoid to 
+reset the original author.
+Applying this patch we will have:
 
-Thanks Ilya - explanation is very clear.
+     commit ed36075e04ecbb1dd02a3d8eba5bfac6469d73e4
+     Author: Xuewei Niu <niuxuewei97@gmail.com>
+     Date:   Sun Jul 6 12:36:29 2025 +0800
 
-Acked-by: Aaron Conole <aconole@redhat.com>
+         hv_sock: Return the readable bytes in hvs_stream_has_data()
+
+This is not what we want, right?
+
+>When hv_sock was originally added, __vsock_stream_recvmsg() and
+>vsock_stream_has_data() actually only needed to know whether there
+>is any readable data or not, so hvs_stream_has_data() was written to
+>return 1 or 0 for simplicity.
+>
+>However, now hvs_stream_has_data() should return the readable bytes
+>because vsock_data_ready() -> vsock_stream_has_data() needs to know the
+>actual bytes rather than a boolean value of 1 or 0.
+>
+>The SIOCINQ ioctl support also needs hvs_stream_has_data() to return
+>the readable bytes.
+>
+>Let hvs_stream_has_data() return the readable bytes of the payload in
+>the next host-to-guest VMBus hv_sock packet.
+>
+>Note: there may be multpile incoming hv_sock packets pending in the
+>VMBus channel's ringbuffer, but so far there is not a VMBus API that
+>allows us to know all the readable bytes in total without reading and
+>caching the payload of the multiple packets, so let's just return the
+>readable bytes of the next single packet. In the future, we'll either
+>add a VMBus API that allows us to know the total readable bytes without
+>touching the data in the ringbuffer, or the hv_sock driver needs to
+>understand the VMBus packet format and parse the packets directly.
+>
+>Signed-off-by: Dexuan Cui <decui@microsoft.com>
+
+Your S-o-b was fine here, I was talking about the author.
+
+Thanks,
+Stefano
+
+>---
+> net/vmw_vsock/hyperv_transport.c | 17 ++++++++++++++---
+> 1 file changed, 14 insertions(+), 3 deletions(-)
+>
+>diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
+>index 31342ab502b4fc35feb812d2c94e0e35ded73771..432fcbbd14d4f44bd2550be8376e42ce65122758 100644
+>--- a/net/vmw_vsock/hyperv_transport.c
+>+++ b/net/vmw_vsock/hyperv_transport.c
+>@@ -694,15 +694,26 @@ static ssize_t hvs_stream_enqueue(struct vsock_sock *vsk, struct msghdr *msg,
+> static s64 hvs_stream_has_data(struct vsock_sock *vsk)
+> {
+> 	struct hvsock *hvs = vsk->trans;
+>+	bool need_refill;
+> 	s64 ret;
+>
+> 	if (hvs->recv_data_len > 0)
+>-		return 1;
+>+		return hvs->recv_data_len;
+>
+> 	switch (hvs_channel_readable_payload(hvs->chan)) {
+> 	case 1:
+>-		ret = 1;
+>-		break;
+>+		need_refill = !hvs->recv_desc;
+>+		if (!need_refill)
+>+			return -EIO;
+>+
+>+		hvs->recv_desc = hv_pkt_iter_first(hvs->chan);
+>+		if (!hvs->recv_desc)
+>+			return -ENOBUFS;
+>+
+>+		ret = hvs_update_recv_data(hvs);
+>+		if (ret)
+>+			return ret;
+>+		return hvs->recv_data_len;
+> 	case 0:
+> 		vsk->peer_shutdown |= SEND_SHUTDOWN;
+> 		ret = 0;
+>
+>-- 
+>2.34.1
+>
 
 
