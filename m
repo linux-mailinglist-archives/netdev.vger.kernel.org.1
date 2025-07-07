@@ -1,71 +1,100 @@
-Return-Path: <netdev+bounces-204691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA952AFBC44
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 22:04:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62A2BAFBC51
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 22:11:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E91C4561A20
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 20:04:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 371111AA1508
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 20:11:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB0821B8E7;
-	Mon,  7 Jul 2025 20:04:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3697217709;
+	Mon,  7 Jul 2025 20:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="efTs/r/9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R2AVmvJm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17552219E8F
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 20:04:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD9C215F48;
+	Mon,  7 Jul 2025 20:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751918652; cv=none; b=Xx/B/GDZd8/4zy3+XIVDNcGBErBMLn3wXSA5cLdol0sygN6jNQ7gLqmY87Bv0yPg6jhQ+at1plUBGEatrvlMCYz0CcPpsS59hkC8/Cw0AU27sjkrPXHPDgxQqpyaJN3eeXGDQUCTnvRK4QYlhLFNtMpM5ZVu3aWn7r2EZhds8Wc=
+	t=1751919058; cv=none; b=KElsXBiWkfulC+6gkQFz16Hid0bnxA3BBtoASLu1qThZiV76pxfs2Qm+N/ROtjHgRHRMp+YxMaXWvkNSgkfq2kurPF4vtCBzxxj1oYco3JFzDsBuOu0/gnAzMBzgh9yHk5iOBriX6lBOYbSMqzkLr0YvQx6uLUqW+6d0kdxNm1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751918652; c=relaxed/simple;
-	bh=s5Jz0tMxoYxHhS0zVMfQF7wOfqekhAZOPRpKrroXPgs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TmncI1zwlg2SnjBb866RmeFwkfWWY/NIL1+A2hQsvgYsSZiaGe6QazUj0VFsGK2+Gdk/2qqMa6aMP4y/993kJ0FwOVMy9fVbi/r9+fspGmP+i3rpup4sVnGfIkeXvvXHorulQ5vJRQeq9KxZ/XCHKRNsmfkKaGVQ+0wFDrHgpfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=efTs/r/9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0443FC4CEE3;
-	Mon,  7 Jul 2025 20:04:09 +0000 (UTC)
+	s=arc-20240116; t=1751919058; c=relaxed/simple;
+	bh=yUmnhHtSXefGDv9A7H+00RO52EpPa5m3zD+x8bBJpoQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cFxWnsnseT2UutcirJQb8+PnYja62XeprEUuPVBFtf+ZA6aw0JfjejkWYtHR5v2OXsNbRXmNmUJEyeSVSdKcoEwGa8g1pnB+Z9TYRrm9Zn/YGLoE8SQeeZ7Mlp6P5y5VQHEi0Qsf/FrVKQtSDSH6XHHMkIHc1vyIv2rKsiAT6IM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R2AVmvJm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9DA4C4CEE3;
+	Mon,  7 Jul 2025 20:10:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751918651;
-	bh=s5Jz0tMxoYxHhS0zVMfQF7wOfqekhAZOPRpKrroXPgs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=efTs/r/9eUCVRIU6inUu+ivnwoPdbX04cImZ/CG0/mrLsw9hp/1KG9ieB3R3cYNHU
-	 e9uCxz8/YiIiP43eekT8H0/pr0+O10Oo5ha8mESmKXbel+sSvr3dGeqwmJ/ZxsYtVA
-	 dlJWFcIFPN2Of/Kt/iYn9iEVYODVDfRTcd/vlefxLFvVNtbiwQKN6AEi45WEkwLk90
-	 sbvmNGxVK1ek/b1YZQ47f88l9OtwiXKqm4J6cJvT9MwIocp7m0EBdMZ1aAxuYzIqnh
-	 VkiZJmXfxRWgmkvnylG+z3STvkJt2kaBygbGZxvGh/bZ/zzhl6UAuHvEzEHfebNE46
-	 f0Wwg+oXkHROw==
-Date: Mon, 7 Jul 2025 21:04:08 +0100
-From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
-	eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next] udp: remove udp_tunnel_gro_init()
-Message-ID: <20250707200408.GE452973@horms.kernel.org>
-References: <20250707091634.311974-1-edumazet@google.com>
+	s=k20201202; t=1751919058;
+	bh=yUmnhHtSXefGDv9A7H+00RO52EpPa5m3zD+x8bBJpoQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=R2AVmvJm9YMQkqfvdI/wGcLCo+JKRJJEFvPVii73/DDETfNEO4onHfVs26lAPxj/E
+	 1Vqi0Srz6Mp/Qu9wWYb7wbBuiykC6dymIeAeU2Wf4/f6Uz/UnXBEzLfog45jH6Pd08
+	 jzInsT6muDJJk81coPddTWmtVBRddpJELvE6DWaoOFflEzHtsXnz62P2HHezM56kOY
+	 RtgQsJIFQmNajlRjuR21HIEhw4h9IG4cezwNH4Tj/GI+8Ua0ws3YH29hETqw3wwUH0
+	 73JfRg9gDBCWLmpD9soaYN75rYpB8kGjyxYHEwehQcw2qLIEZIjSmb0P+CoFk08uvx
+	 Dnh576rA8/ozQ==
+Date: Mon, 7 Jul 2025 13:10:56 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, shuah@kernel.org,
+ sdf@fomichev.me, jdamato@fastly.com, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v2 net-next] selftests: devmem: configure HDS threshold
+Message-ID: <20250707131056.2d7971bd@kernel.org>
+In-Reply-To: <CAHS8izPug-bFu3Tqc_sanCO-gip_e-pPY2Xx7qTAUV0+cKySXg@mail.gmail.com>
+References: <20250702104249.1665034-1-ap420073@gmail.com>
+	<20250702113930.79a9f060@kernel.org>
+	<CAHS8izPug-bFu3Tqc_sanCO-gip_e-pPY2Xx7qTAUV0+cKySXg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250707091634.311974-1-edumazet@google.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 07, 2025 at 09:16:34AM +0000, Eric Dumazet wrote:
-> Use DEFINE_MUTEX() to initialize udp_tunnel_gro_type_lock.
+On Mon, 7 Jul 2025 11:48:53 -0700 Mina Almasry wrote:
+> > On Wed,  2 Jul 2025 10:42:49 +0000 Taehee Yoo wrote:  
+> > > The devmem TCP requires the hds-thresh value to be 0, but it doesn't
+> > > change it automatically.
+> > > Therefore, make configure_headersplit() sets hds-thresh value to 0.  
+> >
+> > I don't see any undoing of the configuration :(
+> > The selftest should leave the system in the state that it started.
+> > We should either add some code to undo at shutdown or (preferably)
+> > move the logic to the Python script where we can handle this more
+> > cleanly with defer().  
 > 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> I'm sure you're aware but this test in general doesn't aim to undo any
+> of it's configuration AFAIR :( that includes ethtool tcp-data-split,
+> -X, -N and -L. Sorry about that.
+> 
+> I wonder if you want this series to clean that up completely such that
+> all configurations are cleaned up, or if you're asking Taehee to only
+> clean up the hds-thres configuration for now.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Just the hds-thrs config for now. Avoid adding more problems.
 
+> Also, sorry for the late reply, but FWIW, I prefer the configuration
+> cleanup to be in ncdevmem itself. We use it outside of the ksft to run
+> stress tests, and folks are going to copy-paste ncdevmem for their
+> applications, so having it be as nice as possible is a plus. But if
+> you feel strongly about doing this outside of ncdevmem.c itself I
+> don't mind that much.
+
+Stan & Bobby added devmem support to kperf I think that's a better
+choice for stress testing: https://github.com/facebookexperimental/kperf
+selftests are for testing the kernel, in the context of upstream CIs.
+The experience with netdevsim teaches me that having "out of tree"
+use cases as an explicit goal is a road to nowhere.
 
