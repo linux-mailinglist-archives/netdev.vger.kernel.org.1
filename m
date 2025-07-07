@@ -1,86 +1,85 @@
-Return-Path: <netdev+bounces-204685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2605AFBBE7
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 21:50:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90AB3AFBBE8
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 21:50:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 136CE1AA8145
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 19:51:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCA0616B8BD
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 19:50:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C2B42676C2;
-	Mon,  7 Jul 2025 19:50:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05FE1267AF1;
+	Mon,  7 Jul 2025 19:50:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FxqYag5+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qvo9gA0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3265233133
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 19:50:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713A82673BA
+	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 19:50:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751917839; cv=none; b=Iyte9SLJ0xikB3kxsT5Dr8zZ/io8E7ij6Wjsb0xUNY0h1edOFg6hhWxxM0ELcWWjWxv1dnrDt3EGPbrqG61anbDvb3Goh6HrVFrMBa9BHBZiGSOVylKUB1nQaRMxqlLPFY9EpbvymiKnJ97mnNBOx3zLKxkg6QTkXkrexBFHVOI=
+	t=1751917840; cv=none; b=BpVXvdWZQ16Qi6/Jcs2F/3lgDWFgBF+HdYe6R3xDMWZeS3ojwk6GjAwBwqvHRCCqc3XIN1JFHEuF95iul4aw4kd/NCTkDkDgGhyEg+q3ESOAtv/2jXR/cZbqOEq58rEHlibtECl35ezXbO8UIdehqEJADfzByM6u3S+99uydiW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751917839; c=relaxed/simple;
-	bh=n+8ygRUvxuPXgQI6FhxNazLbxzKwxoIUriSO+/zykr0=;
+	s=arc-20240116; t=1751917840; c=relaxed/simple;
+	bh=mkZXK+oLdik73FT6EnqFP6nuy0VpAaEGqJxTSei9Au0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UxeCKkHl0PUU0pOfqTXmxTdVqjul9EjOoiqwEyRnnevy1tyUo60im6QPzKr34qzBKkdJ85+QUpWvgAhVzvVMbnCN0A7Tte71lUT/odPExFuJMgvseDEdtodiY3ykiOgP0YpwRNNeoAI1vBxiFwOFzSzrBSupsbBQmc6q5sW7quQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FxqYag5+; arc=none smtp.client-ip=209.85.210.182
+	 MIME-Version; b=h8rz6TNZMZeiI82DQrkgpj+yQfWCwRYUDfKtZmv8C0CIeq4LHPf+p63oPyzwex8/uH9rw88Q5BGOqgHb3yBJE0CFeZev+oCZi4pScHiV4UORtAoE1bsOS6GJ/2rYF8trAqtjcLa1qtxnEH8UgIXBkbeBkaHgJnCbe6H2ReIlEBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qvo9gA0n; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-74ad4533ac5so3678955b3a.0
-        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 12:50:35 -0700 (PDT)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7426c44e014so2764068b3a.3
+        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 12:50:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751917835; x=1752522635; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1751917836; x=1752522636; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=C9eCODgmJwCsGd4snoMPFlN2SFUrB4swM7trdxaNN0s=;
-        b=FxqYag5+F/Y1eLF01D3yKDznRjPLVxXtnGqU2dSeZPfwgBtO4kBMyvKr4rAL1LiXLs
-         jqWgwW1Hd4C0g3D9inEA2KFZg216/tv+APLKylsGdMlmOhQe7VzQP8mlH60/uOBFy6Rm
-         UA6yomXrbBLgD6REEAO1pYuok9iiI4pkaEjuvfX5O5+tA+jHUBzs8Z8zCcEDDezZDT5V
-         jj1M6nFmUqNMI3dX1lyqh9+TWmWRcU/9xLLOR1SY5jVEtIp+rpuj4MIFF0T4uSI/Q7ga
-         +QKQtLC9uwTQUvJRcbhcaki/2eycyJunbxtTFAvyW1/YzLF5pe5pkCOO+Doux0y1TYYB
-         n1Ew==
+        bh=APBD3b7j0vs8jmKTVIjwDu666otCHObQFFsnQzW1W1E=;
+        b=Qvo9gA0nzMmVctAEMweurGdCGloiVpNEqLGN1uOcwy+xBp13YkgVqQYU5K889xjdOA
+         by4CyKxsiL4uglC4XuiOk+MmK8xepu9QqZnoabNjk34RpVeiXOxJE+idGTfeMxmxGQ4L
+         txiDfvlNG3UdCEhbwWM9ThKdU5nNjcw/JJEa8xriBgOtDvPB4jAhBEdfy9pdEzuJXvit
+         2gLJrdF1KUyJkYlIoNQN/cqktI2YTh06idNqGEFAE43gF9yTBuTDt+s2JgA3i201T0B4
+         RMBGE4XdMy5wiOdL6xDNQd5CJiuyT7K1kZPKCXLkUuiSQvN2m0vYqykG46RBH3kn9YvL
+         N+Vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751917835; x=1752522635;
+        d=1e100.net; s=20230601; t=1751917836; x=1752522636;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=C9eCODgmJwCsGd4snoMPFlN2SFUrB4swM7trdxaNN0s=;
-        b=PzlTDJQCU4x5CtRwemeEV81SWQ9Xwq0+kfdwnsTEOQhoZUPfVXD7LBCsGkDiSV60b5
-         aYZSCiD7Zijh4seZ3cfi7RXjjLNO+jzyho/AT3Powl4xAKEZ3Pm2fhuKTx0cwGV2ctrT
-         T5PewOyRy8pgQYpwUfyyxF8SYjnCOxUbFdYtJwIw3pxSOCiBI2Mg1h+o3idQIpYZuo8v
-         BU45d3dIzF16lUlyt4HIJ5YPAvkTdwI50JrhrFkC7R5z+oK84iKCkSNE7jLRpJ55TSWL
-         poEHJl3LXYau+7sgn49U9Qtwj3TEgNR/J99ha8eh3I1nYS6xS+HtVNqAHP54G/yQOyg0
-         mgLw==
-X-Gm-Message-State: AOJu0YxKovASjtdZdyoOgMCKVuDlfmvdolCjQsNL0D2ZlyXDCau9+HZq
-	GgO2tQAHUWqAVSaRxrOs7fgSunb4JjsaMrUkMBlD+acFYEcpLEf7RS1+jAojHA==
-X-Gm-Gg: ASbGncs6q5ws+Gu0vr9Ydz/5Bx6luAW7/vCLBeD3JjwWvCgOw2CjpZlgqXq8iv4ky3z
-	l17h1RUICHQqugH4OVlhITSKwLJrr41/nJtH29rBpUE3vhvm5LshJdYpLa13JZpwOfKdtyfoJSI
-	GLr0QI8l75BOT+0ms5APJIBETQ+oiFCF/Z2RUc493XDXhnBX/ysxzPJY4q8YDLs/PHAkbfdJzLW
-	3KhHYcKQn69W/Jtc//H2ONr8cz6fKanKEYjttSPCAhKKaeanZlwxUrHmvMm3wd8vvJza81TRZ28
-	bjaMQWTf40n9i+A5TjZir38TL9EFPkXl5pjSI8wP6jgTKuYPjAondwcISRhZVPLH+997ubZw
-X-Google-Smtp-Source: AGHT+IFpfcB1KZ2qWISxArPH1q2+IF4ozmFbTfVmN2rTOd+PNzyKXvh92FC8KqyBKzHVyTmfKkW5Dw==
-X-Received: by 2002:a05:6a00:b96:b0:736:4e14:8ec5 with SMTP id d2e1a72fcca58-74d23c3526dmr880199b3a.11.1751917834730;
-        Mon, 07 Jul 2025 12:50:34 -0700 (PDT)
+        bh=APBD3b7j0vs8jmKTVIjwDu666otCHObQFFsnQzW1W1E=;
+        b=ZDNKCq8iUS4B1nOLaCrxn1WSRhjzSWqwKOh4SmlCYLltb1CuaOPL/OWj9ZZGyQIVrP
+         AVIuQ1O6JLfvJcTTEN2ADo52OoaGa8+pltT5JtIgefX1SVhYxnVCqhoZsT+ubMLn7k9E
+         gnvTd1VzcoNQ6/jkTfVAoHzxsUNcprkizbJAWKUBTFqsd2LiVPPjd89jxHXO8x8plYsC
+         MKcBOP/D/OiNoSz/yBj8V41vieTJbspxtmvJVQ38jps9aP1d6715P9uGp8rlFQSUXWiP
+         BDxAU05ePr/114A4cKe5j2wIhlHetcUshQUB3UmhRDwq5L8WJxJNxEZee3AaL1My7z2H
+         yvBw==
+X-Gm-Message-State: AOJu0Yxc0ddh6XbpWS4jjl7JfRo1rcMscUOaURwRjCk2z/VZ/wkkJ5uK
+	rWJYXG5CcMIiXPEdEJQwr07/dRL0MCSoSIGiJi3hq5DlaY/Q1+ZvvNoZyhWwaQ==
+X-Gm-Gg: ASbGncvppuJ/4Uj0ee6MSB9cQQ/ESnEXuLfC0+o9PZwK0U0WouWfXcRYdoOtRJJcoPX
+	B7+BQG9z07JqVkPA4Ww1z4AJd2K9SoSDFPqtpNOQ8AvAZgVtHxw80mxKeNwUtpp7RCfV6VWE1wG
+	KawdtHHxp7ZgkdKdLeywZWTXgDRqYEUqLDECOQ/NdkGAVgmvgyoqxbT3bCy9YacEhuLKF8zvbcf
+	w3rECCEwOGT0cc9j0DI+bxxVg7eSUzWdbtg3FWDRS9fue6o2didBMXPMivMgAQAw/4TDZYrJJK/
+	wIk78B2JT/fFJtTnpbXNzZNU1HBVzcSZNDQeP+dHToDwxwZnK2y+kiojcPnSur5bmgvNglh/
+X-Google-Smtp-Source: AGHT+IGsEMC7j8m2D+fu/X39YsKmMLki9avSVqYk3C+cTH8xrFxO9v6tIR4fRIFcPAYWpI+ZR6BnFw==
+X-Received: by 2002:a05:6a00:2289:b0:73d:fefb:325 with SMTP id d2e1a72fcca58-74d242e84dfmr705028b3a.5.1751917836066;
+        Mon, 07 Jul 2025 12:50:36 -0700 (PDT)
 Received: from pop-os.scu.edu ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce42a2c10sm9648931b3a.136.2025.07.07.12.50.33
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce42a2c10sm9648931b3a.136.2025.07.07.12.50.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jul 2025 12:50:34 -0700 (PDT)
+        Mon, 07 Jul 2025 12:50:35 -0700 (PDT)
 From: Cong Wang <xiyou.wangcong@gmail.com>
 To: netdev@vger.kernel.org
 Cc: jhs@mojatatu.com,
 	will@willsroot.io,
 	stephen@networkplumber.org,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Savino Dicanosa <savy@syst3mfailure.io>
-Subject: [Patch v2 net 1/2] netem: Fix skb duplication logic to prevent infinite loops
-Date: Mon,  7 Jul 2025 12:50:14 -0700
-Message-Id: <20250707195015.823492-2-xiyou.wangcong@gmail.com>
+	Cong Wang <xiyou.wangcong@gmail.com>
+Subject: [Patch v2 net 2/2] selftests/tc-testing: Add a nested netem duplicate test
+Date: Mon,  7 Jul 2025 12:50:15 -0700
+Message-Id: <20250707195015.823492-3-xiyou.wangcong@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250707195015.823492-1-xiyou.wangcong@gmail.com>
 References: <20250707195015.823492-1-xiyou.wangcong@gmail.com>
@@ -92,65 +91,82 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch refines the packet duplication handling in netem_enqueue() to ensure
-that only newly cloned skbs are marked as duplicates. This prevents scenarios
-where nested netem qdiscs with 100% duplication could cause infinite loops of
-skb duplication.
+Integrate the reproducer from William into tc-testing and use scapy
+to generate packets for testing:
 
-By ensuring the duplicate flag is properly managed, this patch maintains skb
-integrity and avoids excessive packet duplication in complex qdisc setups.
+ # ./tdc.py -e 1676
+  -- ns/SubPlugin.__init__
+  -- scapy/SubPlugin.__init__
+ Test 1676: NETEM nested duplicate 100%
+ [ 1154.071135] v0p0id1676: entered promiscuous mode
+ [ 1154.101066] virtio_net virtio0 enp1s0: entered promiscuous mode
+ [ 1154.146301] virtio_net virtio0 enp1s0: left promiscuous mode
+ .
+ Sent 1 packets.
+ [ 1154.173695] v0p0id1676: left promiscuous mode
+ [ 1154.216159] v0p0id1676: entered promiscuous mode
+ .
+ Sent 1 packets.
+ [ 1154.238398] v0p0id1676: left promiscuous mode
+ [ 1154.260909] v0p0id1676: entered promiscuous mode
+ .
+ Sent 1 packets.
+ [ 1154.282708] v0p0id1676: left promiscuous mode
+ [ 1154.309399] v0p0id1676: entered promiscuous mode
+ .
+ Sent 1 packets.
+ [ 1154.337949] v0p0id1676: left promiscuous mode
+ [ 1154.360924] v0p0id1676: entered promiscuous mode
+ .
+ Sent 1 packets.
+ [ 1154.383522] v0p0id1676: left promiscuous mode
 
-Now we could also get rid of the ugly temporary overwrite of
-q->duplicate.
+ All test results:
 
-Fixes: 0afb51e72855 ("[PKT_SCHED]: netem: reinsert for duplication")
+ 1..1
+ ok 1 1676 - NETEM nested duplicate 100%
+
 Reported-by: William Liu <will@willsroot.io>
-Reported-by: Savino Dicanosa <savy@syst3mfailure.io>
 Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
 ---
- include/net/sch_generic.h | 1 +
- net/sched/sch_netem.c     | 7 +++----
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ .../tc-testing/tc-tests/qdiscs/netem.json     | 25 +++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index 638948be4c50..595b24180d62 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -1067,6 +1067,7 @@ struct tc_skb_cb {
- 	u8 post_ct:1;
- 	u8 post_ct_snat:1;
- 	u8 post_ct_dnat:1;
-+	u8 duplicate:1;
- };
- 
- static inline struct tc_skb_cb *tc_skb_cb(const struct sk_buff *skb)
-diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index fdd79d3ccd8c..249095ba7f98 100644
---- a/net/sched/sch_netem.c
-+++ b/net/sched/sch_netem.c
-@@ -460,7 +460,8 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	skb->prev = NULL;
- 
- 	/* Random duplication */
--	if (q->duplicate && q->duplicate >= get_crandom(&q->dup_cor, &q->prng))
-+	if (!tc_skb_cb(skb)->duplicate &&
-+	    q->duplicate >= get_crandom(&q->dup_cor, &q->prng))
- 		++count;
- 
- 	/* Drop packet? */
-@@ -538,11 +539,9 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	 */
- 	if (skb2) {
- 		struct Qdisc *rootq = qdisc_root_bh(sch);
--		u32 dupsave = q->duplicate; /* prevent duplicating a dup... */
- 
--		q->duplicate = 0;
-+		tc_skb_cb(skb2)->duplicate = 1;
- 		rootq->enqueue(skb2, rootq, to_free);
--		q->duplicate = dupsave;
- 		skb2 = NULL;
- 	}
- 
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json
+index 3c4444961488..1211497b2acc 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json
+@@ -336,5 +336,30 @@
+         "teardown": [
+             "$TC qdisc del dev $DUMMY handle 1: root"
+         ]
++    },
++    {
++        "id": "1676",
++        "name": "NETEM nested duplicate 100%",
++        "category": ["qdisc", "netem"],
++        "setup": [
++            "$TC qdisc add dev $DEV1 root handle 1: netem limit 1 duplicate 100%",
++            "$TC qdisc add dev $DEV1 parent 1: handle 2: netem gap 1 limit 1 duplicate 100% delay 1us reorder 100%"
++        ],
++        "teardown": [
++            "$TC qdisc del dev $DEV1 root"
++        ],
++        "plugins": {
++            "requires": ["nsPlugin", "scapyPlugin"]
++        },
++        "scapy": {
++            "iface": "$DEV0",
++            "count": 5,
++            "packet": "Ether()/IP(dst='10.10.10.1', src='10.10.10.10')/TCP(sport=12345, dport=80)"
++        },
++        "cmdUnderTest": "$TC -s qdisc show dev $DEV1",
++        "expExitCode": "0",
++        "verifyCmd": "$TC -s qdisc show dev $DEV1",
++        "matchPattern": "Sent [0-9]+ bytes [0-9]+ pkt",
++        "matchCount": "2"
+     }
+ ]
 -- 
 2.34.1
 
