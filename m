@@ -1,152 +1,130 @@
-Return-Path: <netdev+bounces-204562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9775CAFB2EE
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 14:10:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0CF7AFB31D
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 14:23:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AB77189CDBD
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 12:10:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 203CD42010F
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 12:22:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E666329AAF9;
-	Mon,  7 Jul 2025 12:09:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32F1A29AAF9;
+	Mon,  7 Jul 2025 12:22:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iwLNMnL5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aroYKfJf"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E6D29A9ED;
-	Mon,  7 Jul 2025 12:09:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13C728934F
+	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 12:22:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751890196; cv=none; b=eo0l+OS4cumOQ2YzNKUeIqT7FmYcIhVM9ainxer46MplUEZE06Unat+g2PCMmUl4PGVrrEZoYliZVOAEyDA9jUdJVDm1MKCbvFTG/Q5Awgs+wRgm9A8m7wgNDjNRy08/3WaI3B4glEP5dRCfL9nuPdyl/PwDoYiNNrqw+xxuWPg=
+	t=1751890978; cv=none; b=FkCOsxZfzXGi41b15s6HYRUrlK2+SHIC65hE82pbp0hdTRxaN88uwexwdhABviL8lultM34hzeQ9HzBQxmL8R71hV7eiYfe2CZJx5BmeJy+DToUPKrtb2pHktnB4MiIjXL/8IHOXubDLYODfzz/07emWrhwKbLlorueWIcoOAxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751890196; c=relaxed/simple;
-	bh=WFhdIKgugKGah05NOZFe35YaFk/IGcydxloP193R58w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uprL78Ff1dbM3LqI4yP335zMEpsK+t3XGFT2fcIIJfR1Lw8PmoLI0hE0QampnzONvzpZAM2FclE9YzO07b/q6eAfgDVoZd5T0KmV2urqe4bQOH4rV7Mlbgqk7Y7fRCduCvcUZfc94KzANoUCVPYEDo1SzkIq+hzZ7sQub4EuKjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iwLNMnL5; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=XEtC+wRhm6PC1IQQS5E7xcerOENVh/DYiOue9pVWljE=; b=iwLNMnL5wcAawTja01YDdDmjju
-	udQ9iDbTRGBFqafLcH1KFnPSPOmA5n9KUFgfmk+QdFye5lpAuhQj984chMKsVeWzW1FWm1zd1bQdm
-	FTxWZjXAbgH+kNi16ZekOrY+C2xE85OD/5YZv2OBMe+ywmI3bu5AUTKE6eqSfC6hD2rY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uYkex-000i4f-TV; Mon, 07 Jul 2025 14:09:23 +0200
-Date: Mon, 7 Jul 2025 14:09:23 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yibo Dong <dong100@mucse.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
-	andrew+netdev@lunn.ch, gur.stavi@huawei.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
-	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
-	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
-	alexanderduyck@fb.com, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 04/15] net: rnpgbe: Add get_capability mbx_fw ops support
-Message-ID: <e0610a11-18fa-42f6-9925-f15dac20643c@lunn.ch>
-References: <20250703014859.210110-1-dong100@mucse.com>
- <20250703014859.210110-5-dong100@mucse.com>
- <57497e14-3f9a-4da8-9892-ed794aadbf47@lunn.ch>
- <CB185D75E8EDC84A+20250707073743.GA164527@nic-Precision-5820-Tower>
+	s=arc-20240116; t=1751890978; c=relaxed/simple;
+	bh=EbIwVWGrvCj/w9SGk7EAImBhD9ATPqR/BLUabvsyYm0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nVrHHMg0QNgcGYkZDOUsEOUEaov8Cq+aV11a+UHD8mZjh/GMoy79J5J2X+GJafTYMFDRc0cVMLSJEqGtj0C81hWppJjyEUPxT+mjl89kIARPcNUgAyxKPqJ8pQ6kxn+ZRGUf1omImNnjncRiYqYKxELtGXkNGCRbqbjjcODVw/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aroYKfJf; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4a44e94f0b0so40553171cf.1
+        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 05:22:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751890975; x=1752495775; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kC2OTWmkGVSsuY5pTtvXdp/tUOOzmOOr9IcRB4wUDDM=;
+        b=aroYKfJftD16ZuvOuV8wMdmzkvcDv2PXn2Rhv+hhCFD80ltv8cFTTqDY/4XBOaFDpx
+         DJhoIFQu9cWEoVhDM25qYKgFNW5eCCDT7VZjPZosJt+LZqtnzlJmA068zRFPt5P3Y1FF
+         4U0kwKlU9/NlERCnBlRkw8Ahjda0h8qX23W3cgko1NkOb88zMBgI00JyFdw99EOdpRqJ
+         O+vmEd7VBWDgfpi35c+tGSK/JrFZZCQg7CGUFPfFPIvcOmQ1hfYZdoF8xsg3/1yJ2m7E
+         eylWcH4bjEoPUqdlLRBMiCMSyaw+/q97OpJpIw3Whq/knt2IexzR0RjjQPiCAxkO3p8f
+         lhgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751890975; x=1752495775;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kC2OTWmkGVSsuY5pTtvXdp/tUOOzmOOr9IcRB4wUDDM=;
+        b=oXeL/RnjxSnmufbDkbz+zybouaok10uSfh3aVQ3IZ5WswCcAEeskbDkIGkZEuj+xgB
+         DPr/diZEJnNR67nA44troGRGSAGsUXQgePYeRFMaOByLIPqsKc3Awpe7tLOBPH7hEYQw
+         zK5pBmlaBGrHj248uIRzJII1HgYh5H79a7cqHs6PoCeJSBtqrlsQ6qPsQLEp3v5p8KcR
+         FbWYq4gF+0XRhU3hWCbRBiIxHmK43C5SJdi06Nznds5Mzt2mUX6DtsINhIqcAtqYnnXR
+         eN3437c5Nz3r7W3vOGUkM6MOffJv8LfOp2c5z4uctutTS544ve+JtpyhZC6NNeKpCmqk
+         94IA==
+X-Forwarded-Encrypted: i=1; AJvYcCW74L2spSX7b8SQXLA49PooLtFSbzna/y5jW4yg8ASvhGZ0IOWCfcXIOw3Iv9/SsGu5kveoPZY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdSeADqnd3fUtY0gMg9a9/shYDIemIQu+Ft0tn4pfiwrhgPjvj
+	eq7Ut/0xAUVKcScoDybbTd3+f36o4auA8N9tR/KGRmsD71njLDbI//BlePuv4IVQxTh9/d9Thzc
+	zL+fNgczCi8Nonu0bEMPh4tTuB0TN8FqK9mh2c5Gx
+X-Gm-Gg: ASbGncvo/n7tYI1DWtn+jWsGVJBvc/EwF4k5Yi1YLmCY73RYa4L1XUsysMcc38nK4O6
+	JeEsY5PD9XocqNCnfKjpGvjUVC94pJFnyma9vyChkRAJFmIizN1kThR36wzeRPvoibFt2zdcqh/
+	pIupas5sLWRqLjEkxNtKWJoIfgyzayLgN9KLiAVmoJZeY=
+X-Google-Smtp-Source: AGHT+IGmu1jMB8m9mV8Tvai9M9eqluKCKwizyfOIqDCTpHTFG9NpgFDmREZITt+nSs5e8TFauiHUjuiBum43hF1gaYA=
+X-Received: by 2002:a05:622a:5e83:b0:4a7:1403:15c0 with SMTP id
+ d75a77b69052e-4a9a6828d6bmr143410911cf.4.1751890974914; Mon, 07 Jul 2025
+ 05:22:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CB185D75E8EDC84A+20250707073743.GA164527@nic-Precision-5820-Tower>
+References: <CANn89iJvyYjiweCESQL8E-Si7M=gosYvh1BAVWwAWycXW8GSdg@mail.gmail.com>
+ <202507071846455418y7RHD-cnstxL3SlD6hBH@zte.com.cn>
+In-Reply-To: <202507071846455418y7RHD-cnstxL3SlD6hBH@zte.com.cn>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 7 Jul 2025 05:22:43 -0700
+X-Gm-Features: Ac12FXxCIE-AGdCW1zPw0jMzjWM8tMZL_ZlRElWTTwxHobUT7zQ-ePBitnGFpAw
+Message-ID: <CANn89i+JGSt=_CtWfhDXypWW-34a6SoP3RAzWQ9B9VL4+PHjDw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] tcp: extend tcp_retransmit_skb tracepoint
+ with failure reasons
+To: xu.xin16@zte.com.cn
+Cc: kuba@kernel.org, kuniyu@amazon.com, ncardwell@google.com, 
+	davem@davemloft.net, horms@kernel.org, dsahern@kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, fan.yu9@zte.com.cn
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 07, 2025 at 03:37:43PM +0800, Yibo Dong wrote:
-> On Fri, Jul 04, 2025 at 08:25:12PM +0200, Andrew Lunn wrote:
-> > > +/**
-> > > + * mucse_fw_send_cmd_wait - Send cmd req and wait for response
-> > > + * @hw: Pointer to the HW structure
-> > > + * @req: Pointer to the cmd req structure
-> > > + * @reply: Pointer to the fw reply structure
-> > > + *
-> > > + * mucse_fw_send_cmd_wait sends req to pf-cm3 mailbox and wait
-> > > + * reply from fw.
-> > > + *
-> > > + * Returns 0 on success, negative on failure
-> > > + **/
-> > > +static int mucse_fw_send_cmd_wait(struct mucse_hw *hw,
-> > > +				  struct mbx_fw_cmd_req *req,
-> > > +				  struct mbx_fw_cmd_reply *reply)
-> > > +{
-> > > +	int err;
-> > > +	int retry_cnt = 3;
-> > > +
-> > > +	if (!hw || !req || !reply || !hw->mbx.ops.read_posted)
-> > 
-> > Can this happen?
-> > 
-> > If this is not supposed to happen, it is better the driver opps, so
-> > you get a stack trace and find where the driver is broken.
-> > 
-> Yes, it is not supposed to happen. So, you means I should remove this
-> check in order to get opps when this condition happen?
+On Mon, Jul 7, 2025 at 3:47=E2=80=AFAM <xu.xin16@zte.com.cn> wrote:
+>
+> > >
+> > > -/*
+> > > - * tcp event with arguments sk and skb
+> > > - *
+> > > - * Note: this class requires a valid sk pointer; while skb pointer c=
+ould
+> > > - *       be NULL.
+> > > - */
+> > > -DECLARE_EVENT_CLASS(tcp_event_sk_skb,
+> > > +#define TCP_RETRANSMIT_QUIT_REASON             \
+> > > +               ENUM(TCP_RETRANS_ERR_DEFAULT,           "retransmit t=
+erminate unexpectedly")    \
+> > > +               ENUM(TCP_RETRANS_SUCCESS,               "retransmit s=
+uccessfully")              \
+> > > +               ENUM(TCP_RETRANS_IN_HOST_QUEUE,         "packet still=
+ queued in driver")        \
+> > > +               ENUM(TCP_RETRANS_END_SEQ_ERROR,         "invalid end =
+sequence")                 \
+> > > +               ENUM(TCP_RETRANS_TRIM_HEAD_NOMEM,       "trim head no=
+ memory")                  \
+> > > +               ENUM(TCP_RETRANS_UNCLONE_NOMEM,         "skb unclone =
+keeptruesize no memory")   \
+> > > +               ENUM(TCP_RETRANS_FRAG_NOMEM,            "fragment no =
+memory")                   \
+> >
+> > Do we really need 3 + 1 different 'NOMEMORY' status ?
+>
+> Yes, different "NOMEM" status pinpoint exact failure stages in packet ret=
+ransmission,
+> which helps distinguish which process triggered it. Beneficia
 
-You should remove all defensive code. Let is explode with an Opps, so
-you can find your bugs.
+ENOMEM is ENOMEM. Honestly I fail to see why it matters.
 
-> > > +		return -EINVAL;
-> > > +
-> > > +	/* if pcie off, nothing todo */
-> > > +	if (pci_channel_offline(hw->pdev))
-> > > +		return -EIO;
-> > 
-> > What can cause it to go offline? Is this to do with PCIe hotplug?
-> > 
-> Yes, I try to get a PCIe hotplug condition by 'pci_channel_offline'.
-> If that happens, driver should never do bar-read/bar-write, so return
-> here.
-
-I don't know PCI hotplug too well, but i assume the driver core will
-call the .release function. Can this function be called as part of
-release? What actually happens on the PCI bus when you try to access a
-device which no longer exists?
-
-How have you tested this? Do you have the ability to do a hot{un}plug?
-
-> > > +	if (mutex_lock_interruptible(&hw->mbx.lock))
-> > > +		return -EAGAIN;
-> > 
-> > mutex_lock_interruptable() returns -EINTR, which is what you should
-> > return, not -EAGAIN.
-> > 
-> Got it, I should return '-EINTR' here.
-
-No, you should return whatever mutex_lock_interruptable()
-returns. Whenever you call a function which returns an error code, you
-should pass that error code up the call stack. Never replace one error
-code with another.
-
-> > > +	if (reply->error_code)
-> > > +		return -reply->error_code;
-> > 
-> > The mbox is using linux error codes? 
-> > 
-> It is used only between driver and fw, yay be just samply like this: 
-> 0     -- no error
-> not 0 -- error
-> So, it is not using linux error codes.
-
-Your functions should always use linux/POSIX error codes. So if your
-firmware says an error has happened, turn it into a linux/POSIX error
-code. EINVAL, TIMEDOUT, EIO, whatever makes the most sense.
-
-	Andrew
+If this was the case, we would have thousands of different ENOMEM errnos.
 
