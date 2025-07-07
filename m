@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-204573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7558AFB3CF
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 15:02:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9495AFB3E1
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 15:04:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50E97423227
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 13:01:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C837B3B5DE2
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 13:01:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F28129B766;
-	Mon,  7 Jul 2025 13:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 558042BCF4B;
+	Mon,  7 Jul 2025 13:01:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Nv1Jt8dN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vEQzb1HN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBEE529ACDD
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 13:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B45B929E10F
+	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 13:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751893280; cv=none; b=LT3GadvjFJQwz49xybKcI6YEBWmDMsP00Bi1aV+Cr37zEvtwvrH+/w++s5jnxiIQ4yAo2e9f2twND0yt9loacp0QvpPC50JcUnbzdu/HVI9NZEvugblj7b1itaWz4xfY7W1YlJYqToZK6gNNSglN1GG8ZNoqIrbd4h9RAch8mfI=
+	t=1751893301; cv=none; b=Sl5rDjirrWHZsKAal6yBlgmsUtiVcKPWhUFlPCUdElmbg1i7Vh5xAd5WzH+x3F4KW2+zSvGt5EAkGmezN52SvY40vuzfnloSvh4J28CoNo99VHvPS3BwXasOMXgYzGvYAFc4ZQWCigpvFshKXLgoF8807vjA6ECFVz13TWoLPgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751893280; c=relaxed/simple;
-	bh=YRCVWNSTqk8nTHsuxVrMx7xFmhTDxLU/ff6LPy1oEr8=;
+	s=arc-20240116; t=1751893301; c=relaxed/simple;
+	bh=H6j6fraweO5OKoZOA6jOVgJuLNPX2/ptk0SlBuzJF8I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kMlV0RA4WM2uTTkfdeh2PuiIAl6foQ7/DOQLv5gf8Dhuij3PVkI2LJMHsN9Ug+OheSFYqCLQivIuGFfg9K82aJoXkFYkujIcbvps9/H+lkKVaYNW78cHkJCMV5EwWvjULALUdk5K9rpMGf9crxq5CUfdm4Rkx4iujJIMSfa8RQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Nv1Jt8dN; arc=none smtp.client-ip=209.85.160.202
+	 To:Cc:Content-Type; b=bHSs39senpT70xt8ft68QUnYH1w6K5RR3Y7+9+y81nqWvkGKxd6ZCvKxgq2XuRCJfmgAPGG6YYubBjBS3v6eypJbxOuojHrKplevudvrrjqfsSiAE3oTELcgGWHjeQiR3cIFGR1lprGbp7fjr1dHK0p9skSO4RDdZlwbjy/mumU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vEQzb1HN; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4a7f6e08d92so38655131cf.3
-        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 06:01:18 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e81b9217352so3176374276.1
+        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 06:01:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751893278; x=1752498078; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1751893298; x=1752498098; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4EOklmCiEi2XRL3AgJubkAIQFnUMr2uDkKAWTyAPSUo=;
-        b=Nv1Jt8dNZj9ZGNtNJVOGZp+kHT2Zj+OjtmHtBxe/D39VzxOxWBTdXB2OcbCuz4edLi
-         YZPnPq+QYVKm7UuA4gmWa9DabIy4UfvuexyvWGdDiQk8vpIHhEhui73xIKhQtYXu7RH0
-         zroycfhGPERQ/IWkH8ViAZKvHohO+3tdq1Cl20in0jO+44Kow4cKnhUdMoNXCPhjw5E+
-         EA5hP1c6SZriVtxhXANu/2rBqk90pTe7nmOCdGUAwdiOlNWCoJY4cxvhcR5EV2l6Ur4E
-         BTOdTtSiDGWdPl5bMlh2PTIGOCw0XRR3SG4lHR8DpCVbPN+BSu7O4Xkf/Xrk0A83f6Y0
-         4J2w==
+        bh=RJNoe2JjTr+fPc7Xlv71b7dllYfIIf53YkSiJuaG9R0=;
+        b=vEQzb1HNZRYZORxR8FxluwzGLKhCwEw2/JUstkNu0Rzykv5xGxxbFVCdVIGSaseJUG
+         8MX5mDWidKtfOepPUV+MI3JET4hUuiHMyqRUJLFdtYHafM9BEpBLSeTOR541mMp+Lnhx
+         7PejnNyd8ZSKa3YP5fH0h8ThZ03WC7tSXpxs+zYspQefm0PC3EfopK7e6JXoFnQ0tIeT
+         G3MTDxe4kxUqp0FVzx9Qa+oziwS6fbDLzSDOVTcQ9AvBmh4zTpBBdbts1eHj9YH4ldSv
+         zvyq2Z1UhjUcKvPXYlEo0kjtKbciK2ptBL4XbvG3+fdg7cpge8R6TqT1dNEjzRrZzgvm
+         kH6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751893278; x=1752498078;
+        d=1e100.net; s=20230601; t=1751893298; x=1752498098;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4EOklmCiEi2XRL3AgJubkAIQFnUMr2uDkKAWTyAPSUo=;
-        b=GP9btR35vJN26MpORjpfJc6/s31/7EIAKxq18vdNE1OJJR5c1Fo3ooV7wW5sLBL0QW
-         SXHFGcjrTBxqAJvUHs5z5B/NND3sBrfyos4r6d2/hLJum9fYzeXk8SmzplXZv9iJuDy0
-         olkde6h5k1HFTenq+VVqWvwoDgtXmVWehsX13kQXNGy0AGn4SwrpQ+ga6ruEQ/rfFUDj
-         Ugk81sJh4CfbiuwfHube1VqA+gDTL+8SUINiMiBVMla2YS2paIUMo7SuD9ZswWfFlRrG
-         /AcOh/gM8LzxXkv2fbVJ45CbankX00YM1AVCun0nLm1DDh8stxU0PnKSlIehKnJ+bSz2
-         D/cA==
-X-Forwarded-Encrypted: i=1; AJvYcCWx68K2pNcRNPzrFpNm5rh2RVntUHEZrfXmTLHzK7e6KWrB2sHUO/uDHm0/2VbAfluE5THNKyQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNaLgksBTSfix8rRxN/5hIXNieolnOkJFeJU5r1Z5yZI+s1AOq
-	SheBgUhNmICS0HL5rvcR9XZg1TMpPIDCJ3Qzb6imB4lnOr+Z3fWL1Zz/jrQZ6OcGv7fcrrGzhIJ
-	aB9hmr/gYasFSoQ==
-X-Google-Smtp-Source: AGHT+IFzvGBMYipMhaLmFk6/wHy0f8PweQrYtUaMePAr4bDf/jgca4pPocq7AuZ7QIBewMen6tbNyCR9+hJ84Q==
-X-Received: from qtbck14.prod.google.com ([2002:a05:622a:230e:b0:491:3113:bb68])
+        bh=RJNoe2JjTr+fPc7Xlv71b7dllYfIIf53YkSiJuaG9R0=;
+        b=R6FluiJLJme+cVb3UHRHmgvtok0WOz0HoN6pF+UxxdGuxcvYt4F92XMr2NjwalD3EQ
+         kjBYZ+JUf0jOHqbp+XQ4FG/L+9yZ+y0y10l4cMGPs5NlsKbUAE6AWC5iTBuVVqZwVVGH
+         dwUibEH/ylqynkzGEWznPzT3Bpv/2JAi7jDPcNiXLg9ecILSXB6uSQPEDxHoVxrZZCHl
+         pSMWkSc0GJo/RZ9qgTTIUy/DhisZMRKrypLZJzkYINVLglEsgAWoretPneyIEQl2T3xx
+         FO+GuQJkRppGusTxe2mnFbF0OASWWHfmERvOFq6ku/UHpAuvIbq5rN2M1XO81uKZ35pq
+         K5Rg==
+X-Forwarded-Encrypted: i=1; AJvYcCXvQqsDGrcE+qAO0flSZTSRc/raiPn20XhYehSMP2AlETxCOYOtYmIbE34BqtZxQ53G0AhG3iw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQG5217XAGSdp3YP/0YlGHXYC6Rh3wcE/B9qjh0jOoarlCOu6t
+	XxTmviszdQJkw6885YdATOSeG2i8WuTR+n71CpaaFWulXvgXgLksTpMPGGHySCqyXhkCBVdvdMJ
+	qryOuOQFe8881Dg==
+X-Google-Smtp-Source: AGHT+IHGoTKJ39BVqm3MC0tqubgAXgqZLccUuMKDXQXNGA0FQhofdLGRBzTgK5cUa3V2/vzeReXpRJE6qfEaaw==
+X-Received: from qvbre17.prod.google.com ([2002:a05:6214:5e11:b0:6fb:4f55:79c6])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:2d0b:b0:4a9:ab9b:65da with SMTP id d75a77b69052e-4a9ab9b6a71mr93162231cf.13.1751893277723;
- Mon, 07 Jul 2025 06:01:17 -0700 (PDT)
-Date: Mon,  7 Jul 2025 13:01:01 +0000
+ 2002:a05:6102:5121:b0:4c3:6393:83f4 with SMTP id ada2fe7eead31-4f2f1e46a54mr7630332137.2.1751893279268;
+ Mon, 07 Jul 2025 06:01:19 -0700 (PDT)
+Date: Mon,  7 Jul 2025 13:01:02 +0000
 In-Reply-To: <20250707130110.619822-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250707130110.619822-1-edumazet@google.com>
 X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250707130110.619822-3-edumazet@google.com>
-Subject: [PATCH net-next 02/11] net_sched: act_connmark: use RCU in tcf_connmark_dump()
+Message-ID: <20250707130110.619822-4-edumazet@google.com>
+Subject: [PATCH net-next 03/11] net_sched: act_csum: use RCU in tcf_csum_dump()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -85,86 +85,85 @@ Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Also storing tcf_action into struct tcf_connmark_parms
-makes sure there is no discrepancy in tcf_connmark_act().
+Also storing tcf_action into struct tcf_csum_params
+makes sure there is no discrepancy in tcf_csum_act().
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/tc_act/tc_connmark.h |  1 +
- net/sched/act_connmark.c         | 18 ++++++++++--------
- 2 files changed, 11 insertions(+), 8 deletions(-)
+ include/net/tc_act/tc_csum.h |  1 +
+ net/sched/act_csum.c         | 18 +++++++++---------
+ 2 files changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/include/net/tc_act/tc_connmark.h b/include/net/tc_act/tc_connmark.h
-index e8dd77a967480352f398f654f331016e2733a371..a5ce83f3eea4bfd5ab2b20071738c08f64d1cdf7 100644
---- a/include/net/tc_act/tc_connmark.h
-+++ b/include/net/tc_act/tc_connmark.h
-@@ -7,6 +7,7 @@
- struct tcf_connmark_parms {
- 	struct net *net;
- 	u16 zone;
+diff --git a/include/net/tc_act/tc_csum.h b/include/net/tc_act/tc_csum.h
+index 2515da0142a671be82f873183077a12b5c8600b2..8d0c7a9f934525cc5fa5fd2d5ea9808629b4a550 100644
+--- a/include/net/tc_act/tc_csum.h
++++ b/include/net/tc_act/tc_csum.h
+@@ -8,6 +8,7 @@
+ 
+ struct tcf_csum_params {
+ 	u32 update_flags;
 +	int action;
  	struct rcu_head rcu;
  };
  
-diff --git a/net/sched/act_connmark.c b/net/sched/act_connmark.c
-index 0fce631e7c91113e5559d12ddc4d0ebeef1237e4..3e89927d711647d75f31c8d80a3ddd102e3d2e36 100644
---- a/net/sched/act_connmark.c
-+++ b/net/sched/act_connmark.c
-@@ -88,7 +88,7 @@ TC_INDIRECT_SCOPE int tcf_connmark_act(struct sk_buff *skb,
- 	/* using overlimits stats to count how many packets marked */
- 	tcf_action_inc_overlimit_qstats(&ca->common);
- out:
--	return READ_ONCE(ca->tcf_action);
-+	return parms->action;
- }
+diff --git a/net/sched/act_csum.c b/net/sched/act_csum.c
+index 5cc8e407e7911c6c9f252d58b458728174913317..0939e6b2ba4d1947df0f3dcfc09bfaa339a6ace2 100644
+--- a/net/sched/act_csum.c
++++ b/net/sched/act_csum.c
+@@ -99,6 +99,7 @@ static int tcf_csum_init(struct net *net, struct nlattr *nla,
+ 		goto put_chain;
+ 	}
+ 	params_new->update_flags = parm->update_flags;
++	params_new->action = parm->action;
  
- static const struct nla_policy connmark_policy[TCA_CONNMARK_MAX + 1] = {
-@@ -167,6 +167,8 @@ static int tcf_connmark_init(struct net *net, struct nlattr *nla,
- 	if (err < 0)
- 		goto release_idr;
- 
-+	nparms->action = parm->action;
-+
- 	spin_lock_bh(&ci->tcf_lock);
+ 	spin_lock_bh(&p->tcf_lock);
  	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	oparms = rcu_replace_pointer(ci->parms, nparms, lockdep_is_held(&ci->tcf_lock));
-@@ -190,20 +192,20 @@ static int tcf_connmark_init(struct net *net, struct nlattr *nla,
- static inline int tcf_connmark_dump(struct sk_buff *skb, struct tc_action *a,
- 				    int bind, int ref)
+@@ -580,7 +581,7 @@ TC_INDIRECT_SCOPE int tcf_csum_act(struct sk_buff *skb,
+ 	tcf_lastuse_update(&p->tcf_tm);
+ 	tcf_action_update_bstats(&p->common, skb);
+ 
+-	action = READ_ONCE(p->tcf_action);
++	action = params->action;
+ 	if (unlikely(action == TC_ACT_SHOT))
+ 		goto drop;
+ 
+@@ -631,9 +632,9 @@ TC_INDIRECT_SCOPE int tcf_csum_act(struct sk_buff *skb,
+ static int tcf_csum_dump(struct sk_buff *skb, struct tc_action *a, int bind,
+ 			 int ref)
  {
-+	const struct tcf_connmark_info *ci = to_connmark(a);
++	const struct tcf_csum *p = to_tcf_csum(a);
  	unsigned char *b = skb_tail_pointer(skb);
--	struct tcf_connmark_info *ci = to_connmark(a);
-+	const struct tcf_connmark_parms *parms;
- 	struct tc_connmark opt = {
- 		.index   = ci->tcf_index,
- 		.refcnt  = refcount_read(&ci->tcf_refcnt) - ref,
- 		.bindcnt = atomic_read(&ci->tcf_bindcnt) - bind,
+-	struct tcf_csum *p = to_tcf_csum(a);
+-	struct tcf_csum_params *params;
++	const struct tcf_csum_params *params;
+ 	struct tc_csum opt = {
+ 		.index   = p->tcf_index,
+ 		.refcnt  = refcount_read(&p->tcf_refcnt) - ref,
+@@ -641,10 +642,9 @@ static int tcf_csum_dump(struct sk_buff *skb, struct tc_action *a, int bind,
  	};
--	struct tcf_connmark_parms *parms;
  	struct tcf_t t;
  
--	spin_lock_bh(&ci->tcf_lock);
--	parms = rcu_dereference_protected(ci->parms, lockdep_is_held(&ci->tcf_lock));
+-	spin_lock_bh(&p->tcf_lock);
+-	params = rcu_dereference_protected(p->params,
+-					   lockdep_is_held(&p->tcf_lock));
+-	opt.action = p->tcf_action;
 +	rcu_read_lock();
-+	parms = rcu_dereference(ci->parms);
++	params = rcu_dereference(p->params);
++	opt.action = params->action;
+ 	opt.update_flags = params->update_flags;
  
--	opt.action = ci->tcf_action;
-+	opt.action = parms->action;
- 	opt.zone = parms->zone;
- 	if (nla_put(skb, TCA_CONNMARK_PARMS, sizeof(opt), &opt))
+ 	if (nla_put(skb, TCA_CSUM_PARMS, sizeof(opt), &opt))
+@@ -653,12 +653,12 @@ static int tcf_csum_dump(struct sk_buff *skb, struct tc_action *a, int bind,
+ 	tcf_tm_dump(&t, &p->tcf_tm);
+ 	if (nla_put_64bit(skb, TCA_CSUM_TM, sizeof(t), &t, TCA_CSUM_PAD))
  		goto nla_put_failure;
-@@ -212,12 +214,12 @@ static inline int tcf_connmark_dump(struct sk_buff *skb, struct tc_action *a,
- 	if (nla_put_64bit(skb, TCA_CONNMARK_TM, sizeof(t), &t,
- 			  TCA_CONNMARK_PAD))
- 		goto nla_put_failure;
--	spin_unlock_bh(&ci->tcf_lock);
+-	spin_unlock_bh(&p->tcf_lock);
 +	rcu_read_unlock();
  
  	return skb->len;
  
  nla_put_failure:
--	spin_unlock_bh(&ci->tcf_lock);
+-	spin_unlock_bh(&p->tcf_lock);
 +	rcu_read_unlock();
  	nlmsg_trim(skb, b);
  	return -1;
