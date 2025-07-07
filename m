@@ -1,106 +1,98 @@
-Return-Path: <netdev+bounces-204637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F48DAFB84C
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 18:06:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA811AFB849
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 18:06:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1E64422B2C
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 16:05:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD12C7AC9E8
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 16:04:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA4F21B9FE;
-	Mon,  7 Jul 2025 16:05:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41FA2264D0;
+	Mon,  7 Jul 2025 16:05:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Sr0HqWeS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uW8b2Nal"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DBF2225A5B;
-	Mon,  7 Jul 2025 16:05:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A00A2264C7;
+	Mon,  7 Jul 2025 16:05:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751904354; cv=none; b=OOUSrdKA00leckfcFUQTtHluqPg9LU6A+MVWzADRr2g2GFP4ByddbEHReFnnYatmA+EfdiP1hjpf6T53dDcYhzLZBAKJTYSsylP/48GuN5N//ytu35wjtlke9egUVPBXwh9RzBFoRJmVTt3yh5x7zAQ1wAx7///vP3k4Vc4rmks=
+	t=1751904355; cv=none; b=bP2pYovrUasNq01MBqYBkptxMRiIpjumeamJw8YukEslKzVXFIz0nSaAZfPmlKQXUrryoDjeS65xnDSLiZTf7xEXtYAY9Zp1r/ob2QOyFttrdGaEutSoq8HU2Sf4dSgwkJKgwCcKh0es72Afi7s8D902110T6/QDnhOI7+R6Dsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751904354; c=relaxed/simple;
-	bh=7+F/8Z+sos27/lZyHVZY96P6qXDO5dzJeLbCcUBiX9U=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=W1/3RAHaOLbVA0uOoRQK2NL1nLxV5HrxCYGyUDghhlYYpH1sqL/xWFRTBbVjrhJsUVEAJbLcfkyFOwb2fbvGzyv8LPFNviUU5GvIuAGLp9IDhIulhFyJi7C9cepFUYyXIJxE7Av+L9PEVIeYuB4IyTuCWFx7ZhAmsQOSrsv5wCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Sr0HqWeS; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version; bh=wx
-	Vdpvg7FeWQxkIMif3XMYiXYJJQ4LWlvR78pfeDiE0=; b=Sr0HqWeSroYdLh7VtF
-	7Oz9uPLf8S10XbTfNA1l/POCAdraR3f3VaxzCEfFwaNT6p7psn+vQJVeiEvaGSf+
-	Hz4hkPihNprS9MmacFVIaimxJpu7PH5qrOH7mLzaxSWOrApqr+fkxnvt70Ar0Mbf
-	acL1N+sWopf6L4kA+ahuFuG8g=
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [])
-	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wD3d+Uw8Gto+_41DQ--.4123S4;
-	Tue, 08 Jul 2025 00:05:05 +0800 (CST)
-From: Haoxiang Li <haoxiang_li2024@163.com>
-To: steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Haoxiang Li <haoxiang_li2024@163.com>
-Subject: [PATCH v2] af_key: Add check for the return value of pfkey_sadb2xfrm_user_sec_ctx()
-Date: Tue,  8 Jul 2025 00:05:03 +0800
-Message-Id: <20250707160503.2834390-1-haoxiang_li2024@163.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1751904355; c=relaxed/simple;
+	bh=OLXZd0KBQvPjOWpxBtPRwVVnDWfEjr+VS4Vu1kVOzIk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z4a9VcHC4jd6sBywVlmowc85GntC+Ma8g4MNkcstevMCI8V9fpfdva3WT4RXn7DbwU2ra4LZRUCLwJQlUaR9D+Hzzroa0ZduFIGZ8eOSGQN+I8nOStUX3fBbSeEYy4xAqoCibuzJLRMiyxqUblofH2MW5jIz/8NX3r2UdI4XaeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uW8b2Nal; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51712C4CEE3;
+	Mon,  7 Jul 2025 16:05:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751904355;
+	bh=OLXZd0KBQvPjOWpxBtPRwVVnDWfEjr+VS4Vu1kVOzIk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uW8b2Nal4M2l8ACxYu+6AJ2p5a1pZEGwKjGUtBc7d+Oekd5QssMCjQxHPAeo6VoVW
+	 1hlCRXSsoHMulrganY8cHN/EQhlFSZZWAqByicjREsb0KoFx2We/WG1xHdckXypjnq
+	 VYzHNmO1cX4JSH+j3vrTKSRJApbIE2APfRzvOiLfe4MCn7A2agn71Jy1EPxrj8WSpG
+	 i8/z38L3NrPrebNaiBrI4fZGUqSIQJR1p5sOkC48vHTmBVlL/2QP/UMMZDb00w1Ulx
+	 34+4+5Rnmn/tcVLU/WcMOHPRvdCssleQNZRgdEIYe7n/9hcdf/HhlxEqsm06KKA6AM
+	 +RmRF29tiCbPg==
+Date: Mon, 7 Jul 2025 17:05:51 +0100
+From: Simon Horman <horms@kernel.org>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ingo Molnar <mingo@kernel.org>, Kohei Enju <enjuk@amazon.com>,
+	Thomas Gleixner <tglx@linutronix.de>, linux-hams@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net/rose: Remove unnecessary if check in
+ rose_dev_first()
+Message-ID: <20250707160551.GM89747@horms.kernel.org>
+References: <20250704083309.321186-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3d+Uw8Gto+_41DQ--.4123S4
-X-Coremail-Antispam: 1Uf129KBjvJXoW7GFWrWrWDKFyDZryfGw1fXrb_yoW8JrWDpF
-	48G3sFgr4UZr15ta4xta1DuF4Fgr1rXrWqgFWSyw1agrn8Jw18G3yfKFWj9F1rZrZxJFWx
-	JFW5urZYka45XrUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pis2-rUUUUU=
-X-CM-SenderInfo: xkdr5xpdqjszblsqjki6rwjhhfrp/xtbBEg+Dbmhr7XlD-AAAsY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250704083309.321186-3-thorsten.blum@linux.dev>
 
-Add check for the return value of pfkey_sadb2xfrm_user_sec_ctx()
-in pfkey_compile_policy(), and set proper error flag.
+On Fri, Jul 04, 2025 at 10:33:08AM +0200, Thorsten Blum wrote:
+> dev_hold() already checks if its argument is NULL.
+> 
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 
-Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
----
-Changes in v2:
-- Set error flag '*dir' properly.
-- Hi, Steffen! I know that inside pfkey_sadb2xfrm_user_sec_ctx(), null
-value check has been done. This patch does the null value check after
-pfkey_sadb2xfrm_user_sec_ctx() being called in pfkey_compile_policy().
-Also, set proper error flag if pfkey_sadb2xfrm_user_sec_ctx() returns
-null. This patch code is similar to [1]. Thanks, Steffen!
+Hi Thorsten,
 
-[1]https://github.com/torvalds/linux/blob/master/net/key/af_key.c#L2404
----
- net/key/af_key.c | 5 +++++
- 1 file changed, 5 insertions(+)
+I agree that this is correct. But I think that cleanup like this
+needs to be in the context of other changes to make it worthwhile.
 
-diff --git a/net/key/af_key.c b/net/key/af_key.c
-index efc2a91f4c48..9cd14a31a427 100644
---- a/net/key/af_key.c
-+++ b/net/key/af_key.c
-@@ -3335,6 +3335,11 @@ static struct xfrm_policy *pfkey_compile_policy(struct sock *sk, int opt,
- 		if ((*dir = verify_sec_ctx_len(p)))
- 			goto out;
- 		uctx = pfkey_sadb2xfrm_user_sec_ctx(sec_ctx, GFP_ATOMIC);
-+		if (!uctx) {
-+			*dir = -ENOMEM;
-+			goto out;
-+		}
-+
- 		*dir = security_xfrm_policy_alloc(&xp->security, uctx, GFP_ATOMIC);
- 		kfree(uctx);
- 
--- 
-2.25.1
+Quoting documentation:
 
+  Clean-up patches
+  ~~~~~~~~~~~~~~~~
+
+  Netdev discourages patches which perform simple clean-ups, which are not in
+  the context of other work. For example:
+
+  * Addressing ``checkpatch.pl`` warnings
+  * Addressing :ref:`Local variable ordering<rcs>` issues
+  * Conversions to device-managed APIs (``devm_`` helpers)
+
+  This is because it is felt that the churn that such changes produce comes
+  at a greater cost than the value of such clean-ups.
+
+  Conversely, spelling and grammar fixes are not discouraged.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#clean-up-patches
+
+--
+pw-bot: cr
 
