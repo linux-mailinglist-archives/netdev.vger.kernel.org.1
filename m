@@ -1,114 +1,133 @@
-Return-Path: <netdev+bounces-204517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64E03AFAF8A
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 11:22:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 695B6AFAFE2
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 11:37:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE30B3B4F18
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 09:22:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06CD33B1D99
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 09:36:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67AC928D8EA;
-	Mon,  7 Jul 2025 09:22:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="hnItabx9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3006D28BABD;
+	Mon,  7 Jul 2025 09:37:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651A528CF7C;
-	Mon,  7 Jul 2025 09:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DE9728B41D
+	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 09:37:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751880156; cv=none; b=X+jyR+JobfkhDXZYw2MXbZEYfO556L9JMOydnt1eLdCXzuUNTbi8b1CMtOKzVMoH2FxjS+vVH2jEBI2l1e01qPKAazgMLRlxyJL3t0v38wTCqnSaH1lU0bJoGlcpg3ZbHXN29H2FNOUAeLktwIcDos5VYz5OO7BVb1pk41xy7sI=
+	t=1751881036; cv=none; b=rFWEx6g26EvSNnGzc86leuwpO6qlR2v8GIPPUiZbFwtKv2IggkW9cZSIIF98x7+SI27Jbf2pm/ldPrd45APLgn9KlPxQ+ihOHizEVAWcxVZ4hnutXCAONutcLQh1XH0a1kIFSGDgX5GrxYLxjZPG1xn4EmUEo426HR9PiU+Q+rs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751880156; c=relaxed/simple;
-	bh=kaWeX7KKkf1DeQg7+StlJB5g41RBud8WpmRtSGs7VWk=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=FBbmxa9SBENtPIJ9zxwo1N8YXRWq7MGswTuylx7HLaJyEUfM7jf+WDguBy/xdQ/Rl8z0iOKyEDbEkNjj5B6wE4bRi+G34E1CeeSV661hvX3/FFD8LUUL/8owQzqynfkttWiQ1RCY6Mr9f+Rauy784fSZFPf8uix/Yz8L2aukCkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=hnItabx9; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1751880152;
-	bh=kaWeX7KKkf1DeQg7+StlJB5g41RBud8WpmRtSGs7VWk=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=hnItabx9D+lF43Q0vxGNVa8XbTRVhlY3oAf3P61KfeTQXFEPJ9Yklj4hA/F4vD6JF
-	 iKk/2QgWf1iMcb35g16EozKH6Ck/gOG1/yI1BE3daKt9aYHAaYTqf22REp0Te/TdGa
-	 zfPNUgv+4vEy2xv4BNt6fdcVXkIhKbUmmzC0ulxsakNNjTLOcnJg/QsgOhy16W3AbS
-	 z8HQXjioQZbx5WJETw8JTc1RStFiTbY1smY7dg40fhm4e0SYX0UQhCDPkCOg6LFxFx
-	 RL6eAZfqVzqrRco6IUTUO8zEt5Qb20uc5cCgYxrcuLbZ2RUzUvQ4oVElqFq3gl9uis
-	 BNIPgPhXcDvBw==
-Received: from IcarusMOD.eternityproject.eu (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	s=arc-20240116; t=1751881036; c=relaxed/simple;
+	bh=JGOFzf8FYf1+D3TupbqRr5DVwxgxSvRWRLZy8SIFr2A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sX/x5+US3iEh9K7iD0PSbECtsYn4YxEMScRuOL39j0fEQURJ+C/MXTt15s8CRYDHLCRv242dZjKje1Az9AccaYS07BQoTLybw7xmns3gE1Fz6RrHzZOe8oG/MV1TD/13klYLcuH42AX54yC/on8m+1m5S1K7qcYr+4pOd3zsv5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.44.144] (unknown [185.238.219.24])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id EDED317E04AA;
-	Mon,  7 Jul 2025 11:22:30 +0200 (CEST)
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-To: MyungJoo Ham <myungjoo.ham@samsung.com>, 
- Kyungmin Park <kyungmin.park@samsung.com>, 
- Chanwoo Choi <cw00.choi@samsung.com>, Georgi Djakov <djakov@kernel.org>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- Johnson Wang <johnson.wang@mediatek.com>, 
- =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>, 
- Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>, 
- Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>, 
- Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
- Frank Wunderlich <linux@fw-web.de>
-Cc: Frank Wunderlich <frank-w@public-files.de>, linux-pm@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org
-In-Reply-To: <20250706132213.20412-1-linux@fw-web.de>
-References: <20250706132213.20412-1-linux@fw-web.de>
-Subject: Re: (subset) [PATCH v8 00/16] further mt7988 devicetree work
-Message-Id: <175188015088.67037.6051435285718584853.b4-ty@collabora.com>
-Date: Mon, 07 Jul 2025 11:22:30 +0200
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id B695B61E647AC;
+	Mon, 07 Jul 2025 11:36:38 +0200 (CEST)
+Message-ID: <667b6c18-76d2-4ea7-9133-b857ffb05795@molgen.mpg.de>
+Date: Mon, 7 Jul 2025 11:36:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v2 1/2] devlink: allow driver to
+ freely name interfaces
+To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+ netdev@vger.kernel.org, dhowells@redhat.com, David.Kaplan@amd.com,
+ jiri@resnulli.us, przemyslaw.kitszel@intel.com
+References: <20250707085837.1461086-1-jedrzej.jagielski@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250707085837.1461086-1-jedrzej.jagielski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.2
 
-On Sun, 06 Jul 2025 15:21:55 +0200, Frank Wunderlich wrote:
-> From: Frank Wunderlich <frank-w@public-files.de>
+Dear Jedrzej,
+
+
+Thank you for your patch.
+
+
+Am 07.07.25 um 10:58 schrieb Jedrzej Jagielski:
+> Currently when adding devlink port it is prohibited to let
+> a driver name an interface on its own. In some scenarios
+> it would not be preferable to provide such limitation,
+> eg some compatibility purposes.
+
+Re-flowing for 72 characters per line would save one line.
+
+> Add flag skip_phys_port_name_get to devlink_port_attrs struct
+> which indicates if devlink should not alter name of interface.
 > 
-> This series continues mt7988 devicetree work
+> Suggested-by: Jiri Pirko <jiri@resnulli.us>
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> ---
+> v2: add skip_phys_port_name_get flag to skip changing if name
+> ---
+>   include/net/devlink.h | 7 ++++++-
+>   net/devlink/port.c    | 3 +++
+>   2 files changed, 9 insertions(+), 1 deletion(-)
 > 
-> - Extend cpu frequency scaling with CCI
-> - GPIO leds
-> - Basic network-support (ethernet controller + builtin switch + SFP Cages)
-> 
-> [...]
+> diff --git a/include/net/devlink.h b/include/net/devlink.h
+> index 0091f23a40f7..414ae25de897 100644
+> --- a/include/net/devlink.h
+> +++ b/include/net/devlink.h
+> @@ -78,6 +78,7 @@ struct devlink_port_pci_sf_attrs {
+>    * @flavour: flavour of the port
+>    * @split: indicates if this is split port
+>    * @splittable: indicates if the port can be split.
+> + * @skip_phys_port_name_get: if set devlink doesn't alter interface name
+>    * @lanes: maximum number of lanes the port supports. 0 value is not passed to netlink.
+>    * @switch_id: if the port is part of switch, this is buffer with ID, otherwise this is NULL
+>    * @phys: physical port attributes
+> @@ -87,7 +88,11 @@ struct devlink_port_pci_sf_attrs {
+>    */
+>   struct devlink_port_attrs {
+>   	u8 split:1,
+> -	   splittable:1;
+> +	   splittable:1,
+> +	   skip_phys_port_name_get:1; /* This is for compatibility only,
+> +				       * newly added driver/port instance
+> +				       * should never set this.
+> +				       */
+>   	u32 lanes;
+>   	enum devlink_port_flavour flavour;
+>   	struct netdev_phys_item_id switch_id;
+> diff --git a/net/devlink/port.c b/net/devlink/port.c
+> index 939081a0e615..bf52c8a57992 100644
+> --- a/net/devlink/port.c
+> +++ b/net/devlink/port.c
+> @@ -1522,6 +1522,9 @@ static int __devlink_port_phys_port_name_get(struct devlink_port *devlink_port,
+>   	if (!devlink_port->attrs_set)
+>   		return -EOPNOTSUPP;
+>   
+> +	if (devlink_port->attrs.skip_phys_port_name_get)
+> +		return 0;
+> +
+>   	switch (attrs->flavour) {
+>   	case DEVLINK_PORT_FLAVOUR_PHYSICAL:
+>   		if (devlink_port->linecard)
 
-Applied to v6.16-next/dts64, thanks!
-
-[07/16] dt-bindings: interconnect: add mt7988-cci compatible
-        commit: bd9e0f5d90959d2d07986084fbd58042b62aa549
-[08/16] arm64: dts: mediatek: mt7988: add cci node
-        commit: 0cbdb6d04689f8c05074e348c8e0a42b229ef9a3
-[11/16] arm64: dts: mediatek: mt7988a-bpi-r4: add proc-supply for cci
-        commit: b5a4ad957114b59a74b3e3f598ae0785dd86cd32
-[12/16] arm64: dts: mediatek: mt7988a-bpi-r4: drop unused pins
-        commit: bc51660cd5fd2d0ee9a65b59e0c65e2d1b65975a
-[13/16] arm64: dts: mediatek: mt7988a-bpi-r4: add gpio leds
-        commit: 5a40efb8c9d26e51db8acc61e920c3eda9407c02
-
-Cheers,
-Angelo
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
 
+Kind regards,
+
+Paul
 
