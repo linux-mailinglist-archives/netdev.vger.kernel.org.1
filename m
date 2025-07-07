@@ -1,188 +1,94 @@
-Return-Path: <netdev+bounces-204580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA30AAFB3DC
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 15:03:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E354AFB3E0
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 15:04:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B9773AFEDF
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 13:01:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD5C31619BF
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 13:03:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC56129DB6E;
-	Mon,  7 Jul 2025 13:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE9929B23B;
+	Mon,  7 Jul 2025 13:03:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jKYYnwYL"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XJjnYEq9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A58E29B78F
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 13:01:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB4529ACDD
+	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 13:03:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751893295; cv=none; b=myyFT3iKlpL+LIz1ecLSeYWMWBYh/VLDyzxju+Zkx846A1lZ4QOQ9odle5tO5hUNr2nht3RPHPfL/eIHIE/B/OSou0xX9a+XS1t5F2/RpbWZQEWE7mJYkOuWyrHsj3t2JK6Jzy80rcq9bEshEFPGP2rWQLcBzudLE+fR77jU4L0=
+	t=1751893390; cv=none; b=Vd829sgT43F8cnyN7kElcKDVElo8KG//zz0W0mHWG5vzqNTYekK/dV3cYLPwons6OHSNc+f6jTYkIqQZbH9WRRdinMqkByWRvxGNPSLxX3JsDeEQRYkR0LsAhEIr+RjIuzEhONGJqbBSlthGdZFolJ7jY+DlayFsNd55tjiEmVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751893295; c=relaxed/simple;
-	bh=hsu7U466GN1+zy4Qwvhx4fxvDuIMte/Witb5P1gAEyQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Aol+xXug7AM4gzOjnMPcPgumYekYYbmZMWN5+j5DweK1VNOh8XxbAXG1G5QoR661aZaS9phEJKjfdVO7CepIX0mntQVSxBVDnqC4A0XkS4zIdVWRhDdNY540LL5A8cQvk00QuBWa4om0Qs9ERI3K0XHzlQHiWmjiS0V4uVKLC2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jKYYnwYL; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4a587c85a60so65955411cf.2
-        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 06:01:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751893293; x=1752498093; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8WK+EUgqHXjydIumFBu4wkgRGYQLwWKZHC1itmkKhpA=;
-        b=jKYYnwYLdQ20tKII6jo7zlxVs1lR9YJl6mAjPab8Er2Nix5R6GKxCz8zmORZHFR0DN
-         u3O5Tk+FpmfNJCHSjmDdvTxhavU7buRl/Txfp5HPRsigWO1IPX1P7a7I9dLfmdk3PzKa
-         Fg94NznIxdF7DYfomO/S5Edw9d9rhS4Ps6zIQuWRfD+kXE1bCzxsoC4AgORW/0bvom5z
-         4uh7mavgmnQY2StPmYqiKe8cXoSFho0O61qWWCGjlUD9dQ1J4iVr3LvTpCdssG+8M+h7
-         sN/uhqRMVxQkD1VmOs/ZYQI3NRbAGXa0LoromiPuluCALLlQTV8LbmlKKOW41OAu+BeR
-         6pug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751893293; x=1752498093;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8WK+EUgqHXjydIumFBu4wkgRGYQLwWKZHC1itmkKhpA=;
-        b=DYn4BIDGHqHk++a8juOXokRgeLi/to9TBCqChnX0Y4NiePVXF/CNZFYxH2IU65Sv5I
-         ipfdOEt7VQfMwuFu6yMx9bmGLMvM/tukwbjnfu69pKVGOzsRROQmpPawBtjYGFbU6549
-         RyWr7uIMawTxfkhdqG7gWvDcED02QQxTpdnMNZd60k0UH3NTMetef5mPlALJvCmhxorp
-         IQ7pesm6tY+NySqgwtG504A3FlsBDx0faOqybyOv3d3bnfXrIiqn6GR3ZEtfkOCj99GD
-         MHlDiBtX7nYpMKhRcGEsYB5ukNfD2I6oY8TyT9T+GYSJrqIiP95PKaABGcWsa8E5F8zx
-         HuKA==
-X-Forwarded-Encrypted: i=1; AJvYcCVnXghNJcBIeCLZX8p4TCs858cF0QCMRX/i1QCaQtvl7dKoyDqYPsqWB2ui8jDO6DfL9H0AdHc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZzH6jHMlocF2nJMgsOONa/GOg3HLVz0m8gEeYmBCr2mLQkUXT
-	Zw3vrAvO+wchTL7K45Yl9XULxS4wayDzakoD8mOnRu6DaRb/pH/H3dk3O1dBxWgMfI1vfNnHhUl
-	IlT1ai+obR4UGoQ==
-X-Google-Smtp-Source: AGHT+IHqaeLqWfQiXeuzM4njVqR7Fl2EOejPPn+f2lN8bwMYLc66/yyl+BGxyDois85HkytYn4D3dW3/W6+zdw==
-X-Received: from qtbfj12.prod.google.com ([2002:a05:622a:550c:b0:4a4:4c21:c3ac])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:580e:b0:476:8a27:6b01 with SMTP id d75a77b69052e-4a9a6977951mr143118931cf.47.1751893292964;
- Mon, 07 Jul 2025 06:01:32 -0700 (PDT)
-Date: Mon,  7 Jul 2025 13:01:10 +0000
-In-Reply-To: <20250707130110.619822-1-edumazet@google.com>
+	s=arc-20240116; t=1751893390; c=relaxed/simple;
+	bh=mrnFaKGus2WtvZtHVXHa7d0mdUSaJF5FamWa4/acV0A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aMOGi9hZaWI+Ub3YX/orZXasy1TW9HuGEar9NHbqnWwnGztnCBUlv4/6TJ0Rdmct5nVyf6vkM36RjyiTVVNmVTOhRwj74kEyhys8j7ntWAUsAsiGBdTcsxbB4Yjh5JFMHXeSoNTfzPIGB6RlbIIh8ka04o73b4P6U4yfUJq/1G0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XJjnYEq9; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <25360415-bd91-4523-b0a6-664d22ba9f37@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751893376;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TCV91GQv8wBvsbXZEB5eJKaglsk0gzDKuhgyVMjdx3A=;
+	b=XJjnYEq9/siVHn71lng8+uLXl175KinoAbXFrTaCEjpz6PRRF2Xxne+MqqiEQ/y2Bdwxjd
+	yN11QmxAwrC6UiaLw8KksCdGpny4IojU4uqD9jIYT+v9CqKsJObD8rrnxXPEAGQBROYwE9
+	yaD86UXkxrjlkXuZQDuJBZmoFfrz2N4=
+Date: Mon, 7 Jul 2025 14:02:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250707130110.619822-1-edumazet@google.com>
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250707130110.619822-12-edumazet@google.com>
-Subject: [PATCH net-next 11/11] net_sched: act_skbedit: use RCU in tcf_skbedit_dump()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Subject: Re: [PATCH net-next v13 12/12] dpll: zl3073x: Add support to get/set
+ frequency on pins
+To: Jiri Pirko <jiri@resnulli.us>, Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Shannon Nelson <shannon.nelson@amd.com>, Dave Jiang <dave.jiang@intel.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ Michal Schmidt <mschmidt@redhat.com>, Petr Oros <poros@redhat.com>
+References: <20250704182202.1641943-1-ivecera@redhat.com>
+ <20250704182202.1641943-13-ivecera@redhat.com>
+ <idzmiaubwlnkzds2jbminyr46vuqo37nz5twj7f2yytn4aqoff@r34cm3qpd5mj>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <idzmiaubwlnkzds2jbminyr46vuqo37nz5twj7f2yytn4aqoff@r34cm3qpd5mj>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Also storing tcf_action into struct tcf_skbedit_params
-makes sure there is no discrepancy in tcf_skbedit_act().
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/tc_act/tc_skbedit.h |  1 +
- net/sched/act_skbedit.c         | 20 +++++++++-----------
- 2 files changed, 10 insertions(+), 11 deletions(-)
-
-diff --git a/include/net/tc_act/tc_skbedit.h b/include/net/tc_act/tc_skbedit.h
-index 9649600fb3dcc35dee63950c9e0663c06604e1bd..31b2cd0bebb5b79d05a25aed00af98dd42e0c201 100644
---- a/include/net/tc_act/tc_skbedit.h
-+++ b/include/net/tc_act/tc_skbedit.h
-@@ -12,6 +12,7 @@
- #include <linux/tc_act/tc_skbedit.h>
- 
- struct tcf_skbedit_params {
-+	int action;
- 	u32 flags;
- 	u32 priority;
- 	u32 mark;
-diff --git a/net/sched/act_skbedit.c b/net/sched/act_skbedit.c
-index 1f1d9ce3e968a2342a524c068d15912623de058f..8c1d1554f6575d3b0feae4d26ef4865d44a63e59 100644
---- a/net/sched/act_skbedit.c
-+++ b/net/sched/act_skbedit.c
-@@ -43,13 +43,11 @@ TC_INDIRECT_SCOPE int tcf_skbedit_act(struct sk_buff *skb,
- {
- 	struct tcf_skbedit *d = to_skbedit(a);
- 	struct tcf_skbedit_params *params;
--	int action;
- 
- 	tcf_lastuse_update(&d->tcf_tm);
- 	bstats_update(this_cpu_ptr(d->common.cpu_bstats), skb);
- 
- 	params = rcu_dereference_bh(d->params);
--	action = READ_ONCE(d->tcf_action);
- 
- 	if (params->flags & SKBEDIT_F_PRIORITY)
- 		skb->priority = params->priority;
-@@ -85,7 +83,7 @@ TC_INDIRECT_SCOPE int tcf_skbedit_act(struct sk_buff *skb,
- 	}
- 	if (params->flags & SKBEDIT_F_PTYPE)
- 		skb->pkt_type = params->ptype;
--	return action;
-+	return params->action;
- 
- err:
- 	qstats_drop_inc(this_cpu_ptr(d->common.cpu_qstats));
-@@ -262,6 +260,7 @@ static int tcf_skbedit_init(struct net *net, struct nlattr *nla,
- 	if (flags & SKBEDIT_F_MASK)
- 		params_new->mask = *mask;
- 
-+	params_new->action = parm->action;
- 	spin_lock_bh(&d->tcf_lock);
- 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	params_new = rcu_replace_pointer(d->params, params_new,
-@@ -284,9 +283,9 @@ static int tcf_skbedit_init(struct net *net, struct nlattr *nla,
- static int tcf_skbedit_dump(struct sk_buff *skb, struct tc_action *a,
- 			    int bind, int ref)
- {
-+	const struct tcf_skbedit *d = to_skbedit(a);
- 	unsigned char *b = skb_tail_pointer(skb);
--	struct tcf_skbedit *d = to_skbedit(a);
--	struct tcf_skbedit_params *params;
-+	const struct tcf_skbedit_params *params;
- 	struct tc_skbedit opt = {
- 		.index   = d->tcf_index,
- 		.refcnt  = refcount_read(&d->tcf_refcnt) - ref,
-@@ -295,10 +294,9 @@ static int tcf_skbedit_dump(struct sk_buff *skb, struct tc_action *a,
- 	u64 pure_flags = 0;
- 	struct tcf_t t;
- 
--	spin_lock_bh(&d->tcf_lock);
--	params = rcu_dereference_protected(d->params,
--					   lockdep_is_held(&d->tcf_lock));
--	opt.action = d->tcf_action;
-+	rcu_read_lock();
-+	params = rcu_dereference(d->params);
-+	opt.action = params->action;
- 
- 	if (nla_put(skb, TCA_SKBEDIT_PARMS, sizeof(opt), &opt))
- 		goto nla_put_failure;
-@@ -333,12 +331,12 @@ static int tcf_skbedit_dump(struct sk_buff *skb, struct tc_action *a,
- 	tcf_tm_dump(&t, &d->tcf_tm);
- 	if (nla_put_64bit(skb, TCA_SKBEDIT_TM, sizeof(t), &t, TCA_SKBEDIT_PAD))
- 		goto nla_put_failure;
--	spin_unlock_bh(&d->tcf_lock);
-+	rcu_read_unlock();
- 
- 	return skb->len;
- 
- nla_put_failure:
--	spin_unlock_bh(&d->tcf_lock);
-+	rcu_read_unlock();
- 	nlmsg_trim(skb, b);
- 	return -1;
- }
--- 
-2.50.0.727.gbf7dc18ff4-goog
-
+On 07/07/2025 09:32, Jiri Pirko wrote:
+> Fri, Jul 04, 2025 at 08:22:02PM +0200, ivecera@redhat.com wrote:
+> 
+> [...]
+> 
+>> +static int
+>> +zl3073x_dpll_input_pin_frequency_set(const struct dpll_pin *dpll_pin,
+>> +				     void *pin_priv,
+>> +				     const struct dpll_device *dpll,
+>> +				     void *dpll_priv, u64 frequency,
+>> +				     struct netlink_ext_ack *extack)
+> 
+> Unrelated to this patch, but ny idea why we don't implement
+> "FREQUENCY_CAN_CHANGE" capability. I think we are missing it.
+> 
+Do you mean that some DPLLs may implement fixed frequency pins and
+we have to signal it back to user-space?
 
