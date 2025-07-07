@@ -1,123 +1,125 @@
-Return-Path: <netdev+bounces-204486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 856CEAFACF8
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 09:21:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CBE8AFAD02
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 09:24:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 287DE18979C7
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 07:22:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 257CF1889CB5
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 07:24:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E096D28643A;
-	Mon,  7 Jul 2025 07:21:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA1BF28641B;
+	Mon,  7 Jul 2025 07:24:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XJitShrA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rYI6CPV2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9BF627F019;
-	Mon,  7 Jul 2025 07:21:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32D0285C8B;
+	Mon,  7 Jul 2025 07:24:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751872901; cv=none; b=Ez4tstii6c17HkEb9B8I7CNfNTSX2EgylOg8VnvrBVazoZByHS1bCJhFlDkpGhta92H17nVyqd4P7Gp00EKD67El55Xz1P7cNJkPtd6if77J2/xXGfHXyBshRKrpiqLAjRZu5driodw+sGmE3OfKm3hZbPWqJ984dAAW1w/c3XU=
+	t=1751873074; cv=none; b=PbEi+TWbKBxRnxzDG1GzEiHNPWfBykaHAB1imjwqLhTVZMUWZcped+RQg+I7YJ/27LoLM7QKEFfE15iFI8p+btiWFO04Kn+iIhC4Q8FQTB72LhqiojZvZbO48WJR+/cNjymo1nIzbm1v+UHlKI0RZQ8fytXRqrHo5Cab5CYNaRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751872901; c=relaxed/simple;
-	bh=Tqrxaf8t756E8EVWDsGNzCk1d4o7iofq8FADaSeASks=;
+	s=arc-20240116; t=1751873074; c=relaxed/simple;
+	bh=vAfI9Wzfd2UxcyYtb1q0p59LDd0HpdCjyQmUuTb6HKY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c6eKDJ2L2KptYj4tvrsWJbb23kVGnT7w3Ly+hrHAYTZreLEdrlGctjAq7tfj1qwEtdROkElzvh1HTnbru+bo0+XmU0iXJV46zDDtnZT1aMnDK1uMV8LUXXjpnn11DMBgjr9or8nivLoMQ//N1eRVdMveJ6H1lyseJkzLEHmSXqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XJitShrA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89757C4CEE3;
-	Mon,  7 Jul 2025 07:21:40 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZNC1wxxN8SETKzezIS+6qzAyG0bjYT7/nL8XjKe4jSYfcwn+I94BW2Tlf+kZllVq6WirdO2xSVo0fHGhYgGbJ4pUGZPzTVB/LbciBr/hHC2eRLklPaL1uV7F2ziFEWE6NzgBMJHX5PX/TFe5ZPdQBbnXjTOwDNyhvtmmPdaEwUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rYI6CPV2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B09D7C4CEE3;
+	Mon,  7 Jul 2025 07:24:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751872901;
-	bh=Tqrxaf8t756E8EVWDsGNzCk1d4o7iofq8FADaSeASks=;
+	s=k20201202; t=1751873074;
+	bh=vAfI9Wzfd2UxcyYtb1q0p59LDd0HpdCjyQmUuTb6HKY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XJitShrAZtSYAU7TL0LPjb6yKeGuWJS8qyRPiD5ntRiocMfbqualW+a8wp0KJ8Y50
-	 zju/7VfmkBXOMXu3LugmJonPg8ya+dmLeYZ6UFVfWKN/mnrdWpMlggQvJRYMHi7+2V
-	 EB/93l6iQTmYEfjalcvIwi+gA0tn+VoBpfXqe1A5odSoaExTVzJ5MLrdSqVChZhZDf
-	 P1Igz8hz+dy5q8/GrR1WLRmkfd0Ljtk9Mr35cg/jOrrjNRqPv1jCG0XVim/ktvfXc+
-	 1+Z5TgYjEBT9tncovWuWW1V8aO0EnfRkWx8zX2X1pWydAxhMjl9urGnjkE21Ixg1fz
-	 UhLE++1rh0QNg==
-Date: Mon, 7 Jul 2025 10:21:37 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Abhijit Gangurde <abhijit.gangurde@amd.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, shannon.nelson@amd.com,
-	brett.creeley@amd.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
-	andrew+netdev@lunn.ch, allen.hubbe@amd.com, nikhil.agarwal@amd.com,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Andrew Boyer <andrew.boyer@amd.com>
-Subject: Re: [PATCH v3 10/14] RDMA/ionic: Register device ops for control path
-Message-ID: <20250707072137.GU6278@unreal>
-References: <20250624121315.739049-1-abhijit.gangurde@amd.com>
- <20250624121315.739049-11-abhijit.gangurde@amd.com>
- <20250701103844.GB118736@unreal>
- <20250702131803.GB904431@ziepe.ca>
- <20250702180007.GK6278@unreal>
- <bb0ac425-2f01-b8c7-2fd7-4ecf9e9ef8b1@amd.com>
- <20250704170807.GO6278@unreal>
- <15b773a4-424b-4aa9-2aa4-457fbbee8ec7@amd.com>
+	b=rYI6CPV2hkyw7EsU1mgnmwJKkZ/4uzpTCwsqqMswAmUP8Pi3GSQcPS9e/tFukS7t5
+	 dWi5olzbrTVSFCJv19R70GmujJn2hWuV1mpEj97fGLxnWjtGWeSRUvcRsEumMaDuwD
+	 w2mgAPuCjJj9cFaMEygQFVWmlaujA8sNK/4B/X/WcIhgmOADjvRnuLXuHFhPtN1F9X
+	 alWebXnGWNspziW3KTMpSPdgrCmWKMV1qGA60b8wBVuZuOfd92Wx4YZU+YTDsjWFJ7
+	 XIiNlksTPFD/JJAYbFZlEDqMO68R39OJGQiC60BPe8XrEVyLIFScxIdCmix9JvHKnH
+	 A5o136EeHBztA==
+Date: Mon, 7 Jul 2025 09:24:31 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	Felix Fietkau <nbd@nbd.name>
+Subject: Re: [PATCH net-next v2 2/7] net: airoha: npu: Add NPU wlan memory
+ initialization commands
+Message-ID: <aGt2L1e3xbWVoqOO@lore-desk>
+References: <20250705-airoha-en7581-wlan-offlaod-v2-0-3cf32785e381@kernel.org>
+ <20250705-airoha-en7581-wlan-offlaod-v2-2-3cf32785e381@kernel.org>
+ <20250707-agile-aardwolf-of-politeness-29fead@krzk-bin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="W0USTkeDKBVNDBPv"
+Content-Disposition: inline
+In-Reply-To: <20250707-agile-aardwolf-of-politeness-29fead@krzk-bin>
+
+
+--W0USTkeDKBVNDBPv
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <15b773a4-424b-4aa9-2aa4-457fbbee8ec7@amd.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 07, 2025 at 10:57:13AM +0530, Abhijit Gangurde wrote:
-> 
-> On 7/4/25 22:38, Leon Romanovsky wrote:
-> > On Thu, Jul 03, 2025 at 12:49:30PM +0530, Abhijit Gangurde wrote:
-> > > On 7/2/25 23:30, Leon Romanovsky wrote:
-> > > > On Wed, Jul 02, 2025 at 10:18:03AM -0300, Jason Gunthorpe wrote:
-> > > > > On Tue, Jul 01, 2025 at 01:38:44PM +0300, Leon Romanovsky wrote:
-> > > > > > > +static void ionic_flush_qs(struct ionic_ibdev *dev)
-> > > > > > > +{
-> > > > > > > +	struct ionic_qp *qp, *qp_tmp;
-> > > > > > > +	struct ionic_cq *cq, *cq_tmp;
-> > > > > > > +	LIST_HEAD(flush_list);
-> > > > > > > +	unsigned long index;
-> > > > > > > +
-> > > > > > > +	/* Flush qp send and recv */
-> > > > > > > +	rcu_read_lock();
-> > > > > > > +	xa_for_each(&dev->qp_tbl, index, qp) {
-> > > > > > > +		kref_get(&qp->qp_kref);
-> > > > > > > +		list_add_tail(&qp->ibkill_flush_ent, &flush_list);
-> > > > > > > +	}
-> > > > > > > +	rcu_read_unlock();
-> > > > > > Same question as for CQ. What does RCU lock protect here?
-> > > > > It should protect the kref_get against free of qp. The qp memory must
-> > > > > be RCU freed.
-> > > > I'm not sure that this was intension here. Let's wait for an answer from the author.
-> > > As Jason mentioned, It was intended to protect the kref_get against free of
-> > > cq and qp
-> > > in the destroy path.
-> > How is it possible? IB/core is supposed to protect from accessing verbs
-> > resources post their release/destroy.
-> > 
-> > After you answered what RCU is protecting, I don't see why you would
-> > have custom kref over QP/CQ/e.t.c objects.
-> > 
-> > Thanks
-> The RCU protected kref here is making sure that all the hw events are
-> processed before destroy callback returns. Similarly, when driver is
-> going for ib_unregister_device, it is draining the pending WRs and events.
+> On Sat, Jul 05, 2025 at 11:09:46PM +0200, Lorenzo Bianconi wrote:
+> > +
+> >  struct airoha_npu *airoha_npu_get(struct device *dev, dma_addr_t *stat=
+s_addr)
+> >  {
+> >  	struct platform_device *pdev;
+> > @@ -493,6 +573,7 @@ static int airoha_npu_probe(struct platform_device =
+*pdev)
+> >  	npu->ops.ppe_deinit =3D airoha_npu_ppe_deinit;
+> >  	npu->ops.ppe_flush_sram_entries =3D airoha_npu_ppe_flush_sram_entries;
+> >  	npu->ops.ppe_foe_commit_entry =3D airoha_npu_foe_commit_entry;
+> > +	npu->ops.wlan_init_reserved_memory =3D airoha_npu_wlan_init_memory;
+>=20
+> I cannot find in your code single place calling this (later you add a
+> wrapper... which is not called either).
+>=20
+> All this looks like dead code...
 
-I asked why do you have kref in first place? When ib_unregister_device
-is called all "pending MR" already supposed to be destroyed.
+As pointed out in the commit log, these callbacks will be used by MT76 driv=
+er
+to initialize the NPU reserved memory and registers during driver probe in
+order to initialize the WiFi offloading. Since MT76 patches are going via
+the wireless tree, I needed to add these callbacks first.
 
-Thansk
+Regards,
+Lorenzo
 
-> 
-> Thanks,
-> Abhijit
-> 
-> 
+>=20
+> Best regards,
+> Krzysztof
+>=20
+
+--W0USTkeDKBVNDBPv
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaGt2LwAKCRA6cBh0uS2t
+rEqNAPwMOyfRSkdrks1eKCEqkTbnlkMiO4b/hvkixAvW+Qz7VAD/X8vv31rQ27pa
+HzOWU62kGM7ToyWSw8D1Zvnc1cEe2ww=
+=Y9hx
+-----END PGP SIGNATURE-----
+
+--W0USTkeDKBVNDBPv--
 
