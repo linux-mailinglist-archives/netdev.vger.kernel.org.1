@@ -1,131 +1,115 @@
-Return-Path: <netdev+bounces-204716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CCF6AFBDE6
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 23:57:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F2DCAFBE12
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 00:03:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC1C81BC15A3
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 21:58:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D21711AA845F
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 22:04:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C204288525;
-	Mon,  7 Jul 2025 21:57:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B655628ECC0;
+	Mon,  7 Jul 2025 22:03:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jz1yy+7e"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Fkg3HJpF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59DFB16DEB3;
-	Mon,  7 Jul 2025 21:57:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6BAC28BA9D;
+	Mon,  7 Jul 2025 22:03:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751925473; cv=none; b=pzu+Q6d5H/HJTS6xLLsLp/4QUsrHv1Le8GErPKHsfCobz6o3HJM2nHLdQNW76APwxLAKFq/GmzGCohAd7jeDlZdvNux/Mdk7LiSmCqzJVWOR9/giepr5/M89SoSqIKYDCZy4mFCFk3pDOAK1zEGq9CG/FtJ7mIpyJS3LrMesPdA=
+	t=1751925824; cv=none; b=SXlFd9MN71KObhiixZCQL050Vek5tB8hFGmqsgRoA4LzNIhd/3heNHTUkxkW8998LuwrKyZ4JFzH4AEGjB8dFZ52YYxYijCRJYXU8GxGyREC2bUyo2ON2iRAUL77vRG71OLiIY5dxIvruJOfIGbRfyDHxq++IJtPghA6IgdjLFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751925473; c=relaxed/simple;
-	bh=wn4KLgMQi0FkygQy/dhVswDwIcW8jJc1HjU5vZfPamo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oN/lSab2r+yU/U44KEAgCwa2FJzFdEp5K7Ai8FQ+qnWbxUBwsVAhP0xERDI1VPzGEMlgqBo8Cq47R4fMt29y2Zrra/6gRRiqDGigOIwvz6CaKKOcypHz7Bs5OFyfUgmOAGqXGauLSDWBy/DpgAhiEbLrguNsFSOVwg2c/w3dS1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jz1yy+7e; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-450cb2ddd46so18895595e9.2;
-        Mon, 07 Jul 2025 14:57:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751925468; x=1752530268; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jmbxv3PdqFKnk2A9UCW4ls9PEGqEY+FhX8JmesHWPR8=;
-        b=jz1yy+7el4Mr1r7g24xjbx1LmrwfAFnFvKzaYqjNWg9Nf1IoYT+kLpzU8xu6NYKGEK
-         qslW2YIOrcdJBovhPlqXZJzCFvrqPM+joTMRNHBkjD2lqHjpNAA1APkOvyS2kpqL+rYw
-         tsNIgoFV8GL1HhhzSXd2vjTvexz/JK961wCYuU5ng0pAbq+C5QV7Igo7/JwgB3AGGc7e
-         kq4tVyI6ndfpXdu6xxPoTZpEXYalSYtdvIPcYcjoDaLTmCprs6XFPs62h3u9SiFOUf7M
-         qRtxsWCuxYe+UzA9RWquS05082ndqKf568uIInC4GC73YdoKZNfaBcsuvLmC9wJuiFEX
-         q0tA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751925468; x=1752530268;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jmbxv3PdqFKnk2A9UCW4ls9PEGqEY+FhX8JmesHWPR8=;
-        b=XQoWAzagi65Xkg/PbECAZ3KhBZAdrYlo5nQ6nIwDaiAXKgS0h17Pe+cCfRcrQErT8X
-         2qwiqRMuan59DZtY2q1Kua7Nz6vGp4IQ4kRkKEgCvEOPZB+tMtHYyne/zVLbpEZyNfVE
-         y9/QcDsHn09F2k2K80HvPsaKBsI8xFZd9NB/X9Mh4V+TG3P3WhrJTODtr0Dy+gMQPFLd
-         1n220Vbm1gFxHXU74B7ycjTF6pfV4QscNm1JH35mIgkIUR9S5khgLFmJbkr02m3plEb3
-         NFmOT/H4bM6oCCLAU+urWDFgz6ag8wyHU+Y1hjbc+3mySAwixXwn/WJG9fAfa58roNh5
-         sZmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUe7t9OTwiqeeZQiQY2L8kHExKS7Qv3nCfrGG8DTrdOwizdHl9wij3imqy8sDres/9HE6byfhzdMe1hPHoM@vger.kernel.org, AJvYcCWQFahxHjwOn4mA6i45XHRgVqpZh6nhH3e7B80beaqIHwUn1hLc7ZIBb71XPcYShg6zCwQ=@vger.kernel.org, AJvYcCWupgBuRYODU/NCfYG3z/0pYKr9fpcTEy9/y5FEbRnd//54LBDjonvs7WngzPxLnoGj+UzGHlVZ@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCpVMQmF2wdQJ6Q3yrbXT2lVQULF6dyPKRVOLHjbqJVIt0ppDU
-	sK9xK9BDGJuE0s1ebn5XTK9BaLcR1s3ysjJQYA2CqDHzU70c6WqnQTyx
-X-Gm-Gg: ASbGncuqhVq35NRi2yPhav4UjBgnyiYPhSpcJWX7K08M1E3TEAtlQXmeIT/JxIT5JU0
-	cIAwHwETFEdl+RqnK2uUOPpGajeFQQaRniImFbKl08wJnSsBHl5GhohSkeioGWYPcqbgOhzR5kN
-	yddBItJuhsp4Gp7avOEkHCiDCJGxQyDK17BSlyZCW6DnRLBETGq8dwT2rRLmGLXnui1Dr9pWMnN
-	W9YrPAd6GqMXuEoesjJSqeohvLdAyfWRZ87ZYcASa3res8BeM7mqBe8vnc/MLheu3UGXouUHnDB
-	3F4Mw1/s+C2Rt71O9rHE5xts7OVwExKavxvw/a1D+hWfLSD2MUIBvp6k0ulqr41kJIsBSthhACV
-	CuQHDIMax8Soot5XGtMoC3IIkKtV5hNv3iKCZ6A3N3ilcXKvBYV7Lg/gEKbvlxodPlVbxoU0=
-X-Google-Smtp-Source: AGHT+IEhIg4l6YStNvu65lWOa+vurZo381w6ywFHfdsoVupncE1hKIfHVv61bQAlipenXd9yoVNn3Q==
-X-Received: by 2002:a05:600c:a20f:b0:453:c39:d0c2 with SMTP id 5b1f17b1804b1-454cdab07cemr604855e9.24.1751925468311;
-        Mon, 07 Jul 2025 14:57:48 -0700 (PDT)
-Received: from mail.gmail.com (2a01cb0889497e00f536999e2663c8dd.ipv6.abo.wanadoo.fr. [2a01:cb08:8949:7e00:f536:999e:2663:c8dd])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454cd4943bdsm3303855e9.20.2025.07.07.14.57.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jul 2025 14:57:47 -0700 (PDT)
-Date: Mon, 7 Jul 2025 23:57:45 +0200
-From: Paul Chaignon <paul.chaignon@gmail.com>
-To: Eduard Zingerman <eddyz87@gmail.com>
-Cc: syzbot <syzbot+c711ce17dd78e5d4fdcf@syzkaller.appspotmail.com>,
-	andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
-	daniel@iogearbox.net, haoluo@google.com, john.fastabend@gmail.com,
-	jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org,
-	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@fomichev.me,
-	song@kernel.org, syzkaller-bugs@googlegroups.com,
-	yonghong.song@linux.dev
-Subject: Re: [syzbot] [bpf?] WARNING in reg_bounds_sanity_check
-Message-ID: <aGxC2aVjAm4m7oTU@mail.gmail.com>
-References: <68649190.a70a0220.3b7e22.20e8.GAE@google.com>
- <aGa3iOI1IgGuPDYV@Tunnel>
- <865f2345eaa61afbd26d9de0917e3b1d887c647d.camel@gmail.com>
- <aGgL_g3wA2w3yRrG@mail.gmail.com>
- <df2cdc5f4fa16a4e3e08e6a997af3722f3673d38.camel@gmail.com>
+	s=arc-20240116; t=1751925824; c=relaxed/simple;
+	bh=Pv3cdtRYR+8RAzNhg8UHDBTC+Z9xW3JmWHc0M2qgHMs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=WC+pDqXsZ2NqK0hKCJagaO9NPIhKqM28eJhjYcjtknOiC3Hjh8dNbTe7FyM8NsGY61sOwcIEqiiWP5hvO11oJE68P6cVZCMNjJhhDWz3zncmH5swB9Qcoh6C3TsHhBdhgkZMdm0h4Mvd6Y3i8JLKwD0MF8IM0oXeyQHTrmKgfQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Fkg3HJpF; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from easwarh-mobl2. (unknown [20.29.225.195])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 4D9B22054680;
+	Mon,  7 Jul 2025 15:03:41 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4D9B22054680
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1751925821;
+	bh=xNWC/0DZp7yoXd0DedMxkG7j3oORN78XzbDIgm9XdK8=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Fkg3HJpFQ+oDhLroLbYUEW9qEZwFbYxy7oALwDyhqNw1CuuIltqHEMrQqLCyTbbn1
+	 WWu4Gak8okrtXC9vo/7XmN2kWZEj7hTp5J41T3wGJft04dM70+IrwyG58vWSym84jl
+	 A7eUzam1ws+s/b8AtADkPkWdwnnHpyVg6vxxi6OY=
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+Subject: [PATCH net-next v2 0/2] Converge on using secs_to_jiffies() part
+ two
+Date: Mon, 07 Jul 2025 15:03:31 -0700
+Message-Id: <20250707-netdev-secs-to-jiffies-part-2-v2-0-b7817036342f@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <df2cdc5f4fa16a4e3e08e6a997af3722f3673d38.camel@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIADNEbGgC/4WNTQ6CMBBGr0Jm7ZC2/ARceQ/DAstUxgglbW0wh
+ Lvb9AIuv3x57x3gyTF5uBYHOIrs2a5pqEsBeh7XJyFPaYMSqhFSdbhSmCiiJ+0xWHyxMYnHbXQ
+ BFXZGTKqpGtG3IyTH5sjwnv13SGjC9wBDemb2wbpvDkeZ/9xQsv/TiBIF6rqrtW6rVsrH7c3rZ
+ y8X1s56a0Kp7QLDeZ4/OSsimt4AAAA=
+X-Change-ID: 20250128-netdev-secs-to-jiffies-part-2-8f0d2535096a
+To: "D. Wythe" <alibuda@linux.alibaba.com>, 
+ Dust Li <dust.li@linux.alibaba.com>, 
+ Sidraya Jayagond <sidraya@linux.ibm.com>, 
+ Wenjia Zhang <wenjia@linux.ibm.com>, 
+ Mahanta Jambigi <mjambigi@linux.ibm.com>, 
+ Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-rdma@vger.kernel.org, 
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Easwar Hariharan <eahariha@linux.microsoft.com>
+X-Mailer: b4 0.14.2
 
-On Fri, Jul 04, 2025 at 10:26:14AM -0700, Eduard Zingerman wrote:
-> On Fri, 2025-07-04 at 19:14 +0200, Paul Chaignon wrote:
-> > On Thu, Jul 03, 2025 at 11:54:27AM -0700, Eduard Zingerman wrote:
-> > > On Thu, 2025-07-03 at 19:02 +0200, Paul Chaignon wrote:
-> > > > The number of times syzkaller is currently hitting this (180 in 1.5
-> > > > days) suggests there are many different ways to reproduce.
-> > > 
-> > > It is a bit inconvenient to read syzbot BPF reports at the moment,
-> > > because it us hard to figure out how the program looks like.
-> > > Do you happen to know how complicated would it be to modify syzbot
-> > > output to:
-> > > - produce a comment with BPF program
-> > > - generating reproducer with a flag, allowing to print level 2
-> > >   verifier log
-> > > ?
-> > 
-> > I have the same thought sometimes. Right now, I add verifier logs to a
-> > syz or C reproducer to see the program. Producing the BPF program in a
-> > comment would likely be tricky as we'd need to maintain a disassembler
-> > in syzkaller.
-> 
-> So, it operates on raw bytes, not on logical instructions?
+This is the second series (part 1*) that converts users of msecs_to_jiffies() that
+either use the multiply pattern of either of:
+- msecs_to_jiffies(N*1000) or
+- msecs_to_jiffies(N*MSEC_PER_SEC)
 
-Both I would say. The syzkaller descriptions for BPF are structured
-around instructions [1], though they may not always match 1:1 with
-upstream instructions. Syzkaller then mutates raw bytes, taking some
-information from the descriptions into account (ex. known flag values).
+where N is a constant or an expression, to avoid the multiplication.
 
-1 - https://github.com/google/syzkaller/blob/master/sys/linux/bpf_prog.txt
+The conversion is made with Coccinelle with the secs_to_jiffies() script
+in scripts/coccinelle/misc. Attention is paid to what the best change
+can be rather than restricting to what the tool provides.
+
+This series is based on net-next.
+
+Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+
+* https://lore.kernel.org/all/20241212-netdev-converge-secs-to-jiffies-v4-0-6dac97a6d6ab@linux.microsoft.com/
+
+---
+Changes in v2:
+- Implemented report mode for the secs_to_jiffies coccicheck script (Jakub), patch has been queued by Andrew Morton in mm-nonmm-unstable
+  - Link: https://web.git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git/commit/?h=mm-nonmm-unstable&id=a01189aaf16e8d8d619067939ea21ea97a279864
+- Drop change to netfilter already merged upstream: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f4293c2baf6faa5f1a1638bcce698ed88d0d396e
+- Link to v1: https://lore.kernel.org/r/20250219-netdev-secs-to-jiffies-part-2-v1-0-c484cc63611b@linux.microsoft.com
+
+---
+Easwar Hariharan (2):
+      net/smc: convert timeouts to secs_to_jiffies()
+      net: ipconfig: convert timeouts to secs_to_jiffies()
+
+ net/ipv4/ipconfig.c | 6 +++---
+ net/smc/af_smc.c    | 3 +--
+ 2 files changed, 4 insertions(+), 5 deletions(-)
+---
+base-commit: 6b9fd8857b9fc4dd62e7cd300327f0e48dd76642
+change-id: 20250128-netdev-secs-to-jiffies-part-2-8f0d2535096a
+
+Best regards,
+-- 
+Easwar Hariharan <eahariha@linux.microsoft.com>
+
 
