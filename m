@@ -1,275 +1,152 @@
-Return-Path: <netdev+bounces-204728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1AE9AFBE8B
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 01:22:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55F0EAFBE99
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 01:29:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1849A17E78B
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 23:22:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F24141AA2A72
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 23:29:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2868259CBD;
-	Mon,  7 Jul 2025 23:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 979A4267386;
+	Mon,  7 Jul 2025 23:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="vXHyRYdS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f6oYTr5b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8E21C3C04
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 23:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 276E31A76D0;
+	Mon,  7 Jul 2025 23:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751930556; cv=none; b=hPhaf5oc2aSmhDcFnRR5xE+2+Hx5l/NjXxWFCxdNOp6IcrroUqYjSN9KNOaoI663cj8RrYDvcNMeNilZaYDeASDfYJPfrIHbYxh+sctmnYw4IX+E/sRUL+/3Vxf42PAaIXvurjKqXagYNjb8YPhWvMZ9xBSp9QzJtNDvVPR7pg4=
+	t=1751930975; cv=none; b=Va6G1utD0Xf0Um9DZjGK1HxpgADsiXPtytIsJ5vruX5TUjVn0vmgW06MTX3oHy3PIrqGGYfzlAmYGMSx8JIK9Gx+Iooxo5WYbep6n0IwEtvHzdONN4ODCo1BBxKkjmoI6zkK3E+9FgT1hb4h+SctNLO5sjEXBY/gnfbGIqUY5fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751930556; c=relaxed/simple;
-	bh=rUY+cXujY7fR1eCloQcH21DyFjaY/Xup9Blgkp+MNkU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XsvZxZU5B0qWw3Oq3A3hQDuYTtwam6PRqk9EdyaLf3F7rJEqD2lN1eX7+V8q1GMjdEP+KOoKEIYeNeL/pHVMaDBAU0wsOi6yd9X8HRxB/xnt90NGFFCdbVhXTRoyv+4HnTtaA56rAQIeuxaH8PTbBXpB1n2+7R2SUuDjO/J3lh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=vXHyRYdS; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 567N5GKO017358;
-	Mon, 7 Jul 2025 16:22:25 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2025-q2; bh=JKETNTJEw3no+DxFCy
-	KrYI86oqZmOEUl1Ji50MM1ap0=; b=vXHyRYdSjnNY1Dz/bvmad4y6rvPFu1fFqH
-	UKTcRIqEHJYCRltcv+4ZWC+dIzwM65n4HLyikbHVOmDC8nxIDnPV/7EFD1jAEAV3
-	udux3lbMLG/PpnMN+1Hz87dGUeg5uynTzXAWp/Hx4jxMJKTMTvR8a12T8xIx0Mdx
-	a4otGOpuBpHFi+ghuhsQTyWWI47/GFIosgxywM1mxi1jnE4EJEZ0kMcKb27a4vga
-	YjgqmQbHN11QIdDYk0ng6KbBG46I4jbMgZMfvmEzuiDZkQDlDDw9Bx1LRbQt9cbu
-	Tqia5xf1gDRnt4p8LyIjQtuKPv8cfeNrq1Msja1yvK3Zw5ZjJrKA==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by m0001303.ppops.net (PPS) with ESMTPS id 47rk9ja0n0-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Mon, 07 Jul 2025 16:22:25 -0700 (PDT)
-Received: from localhost (2620:10d:c085:208::7cb7) by mail.thefacebook.com
- (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.24; Mon, 7 Jul
- 2025 23:22:24 +0000
-From: Vishwanath Seshagiri <vishs@meta.com>
-To: "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, David Wei <dw@davidwei.uk>,
-        "Joe
- Damato" <jdamato@fastly.com>, Simon Horman <horms@kernel.org>,
-        "Vishwanath
- Seshagiri" <vishs@fb.com>, <netdev@vger.kernel.org>
-Subject: [PATCH] selftests: net: hw: modify ZCRX testing support
-Date: Mon, 7 Jul 2025 16:22:23 -0700
-Message-ID: <20250707232223.190242-1-vishs@meta.com>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1751930975; c=relaxed/simple;
+	bh=tDfslSGThUSSeDw6MEDGAodzhrzY37bUiuz93OXBkP4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=hWfIuaBOirky8LfvOg52jK3LcUdOhw3WivLUu7kvJXDvxV4dnkwY3qZ87rpmbTWSb+z8tzrNSz6T5DcsjVn6hjJRigLjNB0QK+uX3vAQ6OWTWXkk8FDRlw/3DaWPZ5ql7k8wFQUzW3ETX2fYZoFVdyuqg1jjR/oiQlQBKmDJ5Kw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f6oYTr5b; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b34a8f69862so3005946a12.2;
+        Mon, 07 Jul 2025 16:29:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751930973; x=1752535773; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=E2q/+ZmwOZVJfPSae1Ojo1PnKlFTAiIjYB1Ogh0Ew14=;
+        b=f6oYTr5bdFeHm2JKwrHCYK0p1b/J0NHdVsfZOVbOPNLVwmMD7PmvhZ4cUaAdiM6spv
+         e0s0ogS1/lGYtUvyeQNl0ZCtIRfgM0ha5tfnYcJI8DtbMPksY1tI/yYOd25p/84QfOl7
+         ATx7indAF77cTeahDrAc47kZgNnozs1yw4JRFkHbHnXDkCiqoe4JgGBufecs5DTU/w2t
+         TFdA5mtz9CMHUZ8UBQ6LiPIQ3w0XPgM39+f2PV6CGGxqd7U/GMwnVV5tyH8ODamcS09Q
+         vNT00mKh8Ah1HMDY5IOhTB+285bRA+m2mQAeHNWtbCq8ReevbWyYDmevh8WdidXOYH0K
+         xchg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751930973; x=1752535773;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=E2q/+ZmwOZVJfPSae1Ojo1PnKlFTAiIjYB1Ogh0Ew14=;
+        b=D92qyw9f6PBhZKNcMVDAqAqFt5L79QoNHJKgkPhWiNzCqA5lqSy8KjqyykM2n02paj
+         zzGWQ8g94IkW8VOHdIgHhNnCoc/GbV5rwkqj/zQfM2CgIZ7MIx6klRRORZEVksrL2FiD
+         dk6PvfJmU8T2vo8FIelQ+k5al/At4nKPVvnOgbP3/U1QV1cfbuxdoMpk+jaP74E2WZa1
+         jO5BuFErmjsKTfWnrT+BAIfjrRy8MKZqn5U37XUTzcm7gpqUSp/N/YBdMc1FwEHRbIsG
+         /K1AEMGtnXowRkkXwSfTetLEr0DEQ8BduQqGLjyexmdsXBHsda9uth29MzKPb7Cwonk2
+         bFGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU/5eJxtH6mtA+LGrL+WmdqOmeQ99ykDJb8sOUP3ajURwdy64b0ybYWa6YYIA3OzI8HFJf4YkzR@vger.kernel.org, AJvYcCWwH80N9VBPAwwgqC7mWwI50MYColfNrcRZ8HMKMPXvTLuowx6QDs1yDwv17J9T63s4+ys=@vger.kernel.org, AJvYcCXkRQGIm/czxCVC2y9/Oo0aB9ZW/7pnuRQk3lBLwUnwI9IPUu4xd7rl0KQ8+rzpt8r5YVUdNIA32ExUMO/5@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFScCagIwGFkxvamUTHFMCVS/c3EaBj/Mkv6Y4KYp68LtUReRM
+	vQhK/a460jVhOoTHoqihpZIFtz1sJajQlnv3kFq4hPAlLyi8sBu+b7Fd
+X-Gm-Gg: ASbGncvFtbwTxK2xQvvIXl0T4XnLTGvNPTEMWf6IQPYAA0ubFi+dWyNUtEcPwpML/Z1
+	khMco/khoSglInYUa94373PvV8J1yzTKG9vJOL2tXyeN1zpow33M2BVpuyHMd7RTtU7oyaSHWIQ
+	oYro1yZCZyvuWbJf8h00LBElZ4xEcOfjcDisxPzsOdRA8/B5O+urwOQ7SNaXxZ3t8rQbEL1QLlr
+	1eUh8bu+5abXc1qQhQZYPPj0qK/WuhYfmHvJwZTQoK2wU0X2eiwgNi6V45r/f0eEPCsXBeXlTt9
+	+YiH+2cI/4zEONQ3KXWM7i2k96QjgZ/BEh9hwB8oIOxY+twG0abArL6C+kf81sePxvOEjKOn3p/
+	upA==
+X-Google-Smtp-Source: AGHT+IErKy9RXCWcp7pW7oyb6XeYmVhmOvLiTSI7Vg7m1R7gHY/FjLmoN5ZMF2R+4YVgEEH8vs/AKQ==
+X-Received: by 2002:a05:6a20:43a1:b0:218:17c4:248c with SMTP id adf61e73a8af0-2260b2953dfmr21552737637.22.1751930973280;
+        Mon, 07 Jul 2025 16:29:33 -0700 (PDT)
+Received: from ?IPv6:2620:10d:c096:14a::647? ([2620:10d:c090:600::1:6ad])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b38ee450a61sm9882340a12.8.2025.07.07.16.29.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Jul 2025 16:29:32 -0700 (PDT)
+Message-ID: <2fb0a354ec117d36a24fe37a3184c1d40849ef1a.camel@gmail.com>
+Subject: Re: [syzbot] [bpf?] WARNING in reg_bounds_sanity_check
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Paul Chaignon <paul.chaignon@gmail.com>
+Cc: syzbot <syzbot+c711ce17dd78e5d4fdcf@syzkaller.appspotmail.com>, 
+	andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, 	haoluo@google.com, john.fastabend@gmail.com,
+ jolsa@kernel.org, kpsingh@kernel.org, 	linux-kernel@vger.kernel.org,
+ martin.lau@linux.dev, netdev@vger.kernel.org, 	sdf@fomichev.me,
+ song@kernel.org, syzkaller-bugs@googlegroups.com, 	yonghong.song@linux.dev
+Date: Mon, 07 Jul 2025 16:29:30 -0700
+In-Reply-To: <aGxKcF2Ceany8q7W@mail.gmail.com>
+References: <68649190.a70a0220.3b7e22.20e8.GAE@google.com>
+	 <aGa3iOI1IgGuPDYV@Tunnel>
+	 <865f2345eaa61afbd26d9de0917e3b1d887c647d.camel@gmail.com>
+	 <aGgL_g3wA2w3yRrG@mail.gmail.com>
+	 <df2cdc5f4fa16a4e3e08e6a997af3722f3673d38.camel@gmail.com>
+	 <e43c25b451395edff0886201ad3358acd9670eda.camel@gmail.com>
+	 <aGxKcF2Ceany8q7W@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: ZnXsv6xqhCFvJcj36YQl56UP8U2GPYMA
-X-Authority-Analysis: v=2.4 cv=ac9hnQot c=1 sm=1 tr=0 ts=686c56b1 cx=c_pps a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17 a=Wb1JkmetP80A:10 a=FOH2dFAWAAAA:8 a=TK1p4gQUNFFb7Zxd88cA:9
-X-Proofpoint-ORIG-GUID: ZnXsv6xqhCFvJcj36YQl56UP8U2GPYMA
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA3MDE2MyBTYWx0ZWRfX1eUMV1oPoLiL SjaDsKYeMD17W/sRtHuIm+02zD6Xks1q8hSwxQFQ8CihWgJNgbcv7AxIS+ib0rqFwoSkQgQjWcr tUwrofSkzsQSps3xom0Xo4di5JHfUF5Ls6xLxY2E9q/75DuLkXw6EYoHbvPyTHHYkynXNQ8bLI6
- 5e/lc34ZE05AfdA1MRI4KLtzi9RHeh2V0RpuuHyi2fLPPaEc99LEzAVdhlKS6ahpgZbx9rld/OV 7Ks3wKp7gctG6Xc2OXuliyWbR8dS7WWVpQNV0CF/mW7LfUyHUSUBXxQVV7GD6oqzrHwW2CG1rhp rKl6be9EHqs61UsayMOVJpj145zKrKORzfV+o8h76vJ4BD8MiFHJpRqYxGJRR2FX9R7NFsbaJWo
- /wJMonec1gk02as04sWQKT3v2DGz4fnEWvIjAUK/hWQ4jGPpveYJeAiKFGSIn5n/TxbYq59Y
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-07_06,2025-07-07_01,2025-03-28_01
 
-From: Vishwanath Seshagiri <vishs@fb.com>
+On Tue, 2025-07-08 at 00:30 +0200, Paul Chaignon wrote:
 
-Changed the test cases such that the endpoints of sender
-and receiver are flipped based on the typical conventions of netdev 
-selftests.
+[...]
 
-Test plan: ran selftests between 2 vms
+> This is really nice! I think we can extend it to detect some
+> always-true branches as well, and thus handle the initial case reported
+> by syzbot.
+>
+> - if a_min =3D=3D 0: we don't deduce anything
+> - bits that may be set in 'a' are: possible_a =3D or_range(a_min, a_max)
+> - bits that are always set in 'b' are: always_b =3D b_value & ~b_mask
+> - if possible_a & always_b =3D=3D possible_a: only true branch is possibl=
+e
+> - otherwise, we can't deduce anything
+>
+> For BPF_X case, we probably want to also check the reverse with
+> possible_b & always_a.
 
-Signed-off-by: Vishwanath Seshagiri <vishs@fb.com>
----
- .../selftests/drivers/net/hw/iou-zcrx.py      | 98 +++++++++----------
- 1 file changed, 49 insertions(+), 49 deletions(-)
+So, this would extend existing predictions:
+- [old] always_a & always_b -> infer always true
+- [old] !(possible_a & possible_b) -> infer always false
+- [new] if possible_a & always_b =3D=3D possible_a -> infer true
+        (but make sure 0 is not in possible_a)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-index 9c03fd777f3d..712c806508b5 100755
---- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-+++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-@@ -3,37 +3,37 @@
- 
- import re
- from os import path
--from lib.py import ksft_run, ksft_exit
-+from lib.py import ksft_run, ksft_exit, KsftSkipEx
- from lib.py import NetDrvEpEnv
- from lib.py import bkg, cmd, defer, ethtool, rand_port, wait_port_listen
- 
- 
- def _get_current_settings(cfg):
--    output = ethtool(f"-g {cfg.ifname}", json=True, host=cfg.remote)[0]
-+    output = ethtool(f"-g {cfg.ifname}", json=True)[0]
-     return (output['rx'], output['hds-thresh'])
- 
- 
- def _get_combined_channels(cfg):
--    output = ethtool(f"-l {cfg.ifname}", host=cfg.remote).stdout
-+    output = ethtool(f"-l {cfg.ifname}").stdout
-     values = re.findall(r'Combined:\s+(\d+)', output)
-     return int(values[1])
- 
- 
- def _create_rss_ctx(cfg, chan):
--    output = ethtool(f"-X {cfg.ifname} context new start {chan} equal 1", host=cfg.remote).stdout
-+    output = ethtool(f"-X {cfg.ifname} context new start {chan} equal 1").stdout
-     values = re.search(r'New RSS context is (\d+)', output).group(1)
-     ctx_id = int(values)
--    return (ctx_id, defer(ethtool, f"-X {cfg.ifname} delete context {ctx_id}", host=cfg.remote))
-+    return (ctx_id, defer(ethtool, f"-X {cfg.ifname} delete context {ctx_id}"))
- 
- 
- def _set_flow_rule(cfg, port, chan):
--    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {port} action {chan}", host=cfg.remote).stdout
-+    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {port} action {chan}").stdout
-     values = re.search(r'ID (\d+)', output).group(1)
-     return int(values)
- 
- 
- def _set_flow_rule_rss(cfg, port, ctx_id):
--    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {port} context {ctx_id}", host=cfg.remote).stdout
-+    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {port} context {ctx_id}").stdout
-     values = re.search(r'ID (\d+)', output).group(1)
-     return int(values)
- 
-@@ -47,26 +47,26 @@ def test_zcrx(cfg) -> None:
-     (rx_ring, hds_thresh) = _get_current_settings(cfg)
-     port = rand_port()
- 
--    ethtool(f"-G {cfg.ifname} tcp-data-split on", host=cfg.remote)
--    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto", host=cfg.remote)
-+    ethtool(f"-G {cfg.ifname} tcp-data-split on")
-+    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto")
- 
--    ethtool(f"-G {cfg.ifname} hds-thresh 0", host=cfg.remote)
--    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}", host=cfg.remote)
-+    ethtool(f"-G {cfg.ifname} hds-thresh 0")
-+    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}")
- 
--    ethtool(f"-G {cfg.ifname} rx 64", host=cfg.remote)
--    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}", host=cfg.remote)
-+    ethtool(f"-G {cfg.ifname} rx 64")
-+    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}")
- 
--    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}", host=cfg.remote)
--    defer(ethtool, f"-X {cfg.ifname} default", host=cfg.remote)
-+    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}")
-+    defer(ethtool, f"-X {cfg.ifname} default")
- 
-     flow_rule_id = _set_flow_rule(cfg, port, combined_chans - 1)
--    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}", host=cfg.remote)
-+    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
- 
--    rx_cmd = f"{cfg.bin_remote} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1}"
--    tx_cmd = f"{cfg.bin_local} -c -h {cfg.remote_addr_v['6']} -p {port} -l 12840"
--    with bkg(rx_cmd, host=cfg.remote, exit_wait=True):
--        wait_port_listen(port, proto="tcp", host=cfg.remote)
--        cmd(tx_cmd)
-+    rx_cmd = f"{cfg.bin_local} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1}"
-+    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {port} -l 12840"
-+    with bkg(rx_cmd, exit_wait=True):
-+        wait_port_listen(port, proto="tcp")
-+        cmd(tx_cmd, host=cfg.remote)
- 
- 
- def test_zcrx_oneshot(cfg) -> None:
-@@ -78,26 +78,26 @@ def test_zcrx_oneshot(cfg) -> None:
-     (rx_ring, hds_thresh) = _get_current_settings(cfg)
-     port = rand_port()
- 
--    ethtool(f"-G {cfg.ifname} tcp-data-split on", host=cfg.remote)
--    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto", host=cfg.remote)
-+    ethtool(f"-G {cfg.ifname} tcp-data-split on")
-+    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto")
- 
--    ethtool(f"-G {cfg.ifname} hds-thresh 0", host=cfg.remote)
--    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}", host=cfg.remote)
-+    ethtool(f"-G {cfg.ifname} hds-thresh 0")
-+    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}")
- 
--    ethtool(f"-G {cfg.ifname} rx 64", host=cfg.remote)
--    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}", host=cfg.remote)
-+    ethtool(f"-G {cfg.ifname} rx 64")
-+    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}")
- 
--    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}", host=cfg.remote)
--    defer(ethtool, f"-X {cfg.ifname} default", host=cfg.remote)
-+    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}")
-+    defer(ethtool, f"-X {cfg.ifname} default")
- 
-     flow_rule_id = _set_flow_rule(cfg, port, combined_chans - 1)
--    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}", host=cfg.remote)
-+    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
- 
--    rx_cmd = f"{cfg.bin_remote} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1} -o 4"
--    tx_cmd = f"{cfg.bin_local} -c -h {cfg.remote_addr_v['6']} -p {port} -l 4096 -z 16384"
--    with bkg(rx_cmd, host=cfg.remote, exit_wait=True):
--        wait_port_listen(port, proto="tcp", host=cfg.remote)
--        cmd(tx_cmd)
-+    rx_cmd = f"{cfg.bin_local} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1} -o 4"
-+    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {port} -l 4096 -z 16384"
-+    with bkg(rx_cmd, exit_wait=True):
-+        wait_port_listen(port, proto="tcp")
-+        cmd(tx_cmd, host=cfg.remote)
- 
- 
- def test_zcrx_rss(cfg) -> None:
-@@ -109,27 +109,27 @@ def test_zcrx_rss(cfg) -> None:
-     (rx_ring, hds_thresh) = _get_current_settings(cfg)
-     port = rand_port()
- 
--    ethtool(f"-G {cfg.ifname} tcp-data-split on", host=cfg.remote)
--    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto", host=cfg.remote)
-+    ethtool(f"-G {cfg.ifname} tcp-data-split on")
-+    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto")
- 
--    ethtool(f"-G {cfg.ifname} hds-thresh 0", host=cfg.remote)
--    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}", host=cfg.remote)
-+    ethtool(f"-G {cfg.ifname} hds-thresh 0")
-+    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}")
- 
--    ethtool(f"-G {cfg.ifname} rx 64", host=cfg.remote)
--    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}", host=cfg.remote)
-+    ethtool(f"-G {cfg.ifname} rx 64")
-+    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}")
- 
--    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}", host=cfg.remote)
--    defer(ethtool, f"-X {cfg.ifname} default", host=cfg.remote)
-+    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}")
-+    defer(ethtool, f"-X {cfg.ifname} default")
- 
-     (ctx_id, delete_ctx) = _create_rss_ctx(cfg, combined_chans - 1)
-     flow_rule_id = _set_flow_rule_rss(cfg, port, ctx_id)
--    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}", host=cfg.remote)
-+    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
- 
--    rx_cmd = f"{cfg.bin_remote} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1}"
--    tx_cmd = f"{cfg.bin_local} -c -h {cfg.remote_addr_v['6']} -p {port} -l 12840"
--    with bkg(rx_cmd, host=cfg.remote, exit_wait=True):
--        wait_port_listen(port, proto="tcp", host=cfg.remote)
--        cmd(tx_cmd)
-+    rx_cmd = f"{cfg.bin_local} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1}"
-+    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {port} -l 12840"
-+    with bkg(rx_cmd, exit_wait=True):
-+        wait_port_listen(port, proto="tcp")
-+        cmd(tx_cmd, host=cfg.remote)
- 
- 
- def main() -> None:
--- 
-2.47.1
+And it so happens, that it covers example at hand.
+Note that or_range(1, (u64)-1) =3D=3D (u64)-1, so maybe tnum would be
+sufficient, w/o the need for or_range().
 
+The part of the verifier that narrows the range after prediction:
+
+  regs_refine_cond_op:
+
+         case BPF_JSET | BPF_X: /* reverse of BPF_JSET, see rev_opcode() */
+                 if (!is_reg_const(reg: reg2, subreg32: is_jmp32))
+                         swap(reg1, reg2);
+                 if (!is_reg_const(reg: reg2, subreg32: is_jmp32))
+                         break;
+                 val =3D reg_const_value(reg: reg2, subreg32: is_jmp32);
+		 ...
+                         reg1->var_off =3D tnum_and(a: reg1->var_off, b: tn=
+um_const(value: ~val));
+		 ...
+                 break;
+
+And after suggested change this part would be executed only if tnum
+bounds can be changed by jset. So, this eliminates at-least a
+sub-class of a problem.
 
