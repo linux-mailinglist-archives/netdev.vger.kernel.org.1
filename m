@@ -1,361 +1,138 @@
-Return-Path: <netdev+bounces-204613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85A4AAFB790
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 17:38:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 070E1AFB7A4
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 17:41:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C2721AA44F5
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 15:38:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6031A4A678C
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 15:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986611E008B;
-	Mon,  7 Jul 2025 15:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7085F1F0E53;
+	Mon,  7 Jul 2025 15:41:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="BiwHNGok"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Yr0XVWux"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59AC142049
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 15:38:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BECE19D880;
+	Mon,  7 Jul 2025 15:41:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751902693; cv=none; b=hmzQoAHb5Wu2LAGs6igHlclofHv8e2smnwH0hKn63aBBFW4ek8cBolm+k2NUxc8I25w47tlEpfLB8DWpq85oL0dzyIp38pvBYmRXKFuGo2pspqrSV9c+VHcIOavNAEaImbqsTL1eet1mPPB/nyprG2mSxTdLmYIvG+aWTGTRK2o=
+	t=1751902874; cv=none; b=OW/N+S1W5xxJe+G8y9IUmCS/VFAh+0JZlOub1yvwOu39odsR/F3RkOX7Y5SkqrQSTpnAXhldeZsj5vkw19Qr0TNxFYnamoETLWRX/aX69CQiaQwa1JD0tr+tgoT44O92J1neu3q5rh2Bbtt0e3MzyO4kK4KM6Ya9nQstZ+r6RiU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751902693; c=relaxed/simple;
-	bh=HObM/Jxfe7QwZtiCGfVL9XuP1Ad2y6g/YVDLGudMq0w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m3MMiTwRHR7tYChKFnJshTCra4OkQj+zrF4sBobGSg+axU8flkk4PQoNy0nFosAQI+mgX4fOgGwrzdohGrI6YuZmE4me9LyChRHbXxjh5zEs2LuosWxMhKwF1nXPNArc1KdR5OMvqT59YFkT6UKLRvXMc9SDywE0dEpab3Z453o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=BiwHNGok; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gooddata.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ae36e88a5daso681717666b.1
-        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 08:38:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gooddata.com; s=google; t=1751902690; x=1752507490; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BndOEBoapVfNSq63pGc2Fatvjm6TLSvlOrpNdKm6s/s=;
-        b=BiwHNGokHQLh45wOYLmUNSg0RpMbFoX4wj0dVXVBjrgLI3xF1UW/9rlrOdcr5gd6Ba
-         U8QJ/J9m/uARtzal7V0BPzn5R2DUY/pYaqeObLSquQRTAXhE2CUeRmCwPXUcC3ICVrkB
-         C8lJWhrHyQ01VZnI91RlkfQjx6BnCyfHt0KBw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751902690; x=1752507490;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BndOEBoapVfNSq63pGc2Fatvjm6TLSvlOrpNdKm6s/s=;
-        b=NmQiF5uRWGQh9o4soW6tTG/Xylfwy2xkXuwV47R3HLSpK8jMHvHrDyc+UoikEO1Lrb
-         rBQOCKmC1acCEKAuvVkwc/lxjSv2a5/XSQvyMXtNji+8POkPCO1tzZUz0lKhPTOlkt8c
-         pEw+bMKqOM/pk+Jvgmk9hPCIzLJVNMwzeYZVHD0p1UX2YLgHGu1jcMuu0NjfjBjrIc1+
-         LCiB3C76+Sz15p9flZU24Q1FJ3/JSke8QQByFpS1IOTcuCBRYVUGQzPE7kfrkDJyFewm
-         Dv1FnRn8VKdjC3n7RcGmjwMYkq5u78XaKdoHtsXtK7TzfkXb+8AU6XUGgjOooMQVDzG6
-         EyHw==
-X-Forwarded-Encrypted: i=1; AJvYcCUs38wqk1NEd5j238m3wp7vXvJwjOhSh167cZ2m0XkS0hkNH99xtTo8lDkldtA1k57calXUb4A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNhhFO1Cnj2jCG003V/dJn/hLNir3RUiOgzJ2v2SQMsdV4YxUM
-	j3OW2zV4dnCuFWV+0hs2z9LS4FQyYGPBLb7qJd8TZiYZjF9wCX1EVhzSxDiH9DdFJD9AML6RMKn
-	gcicm4jP8dy9aWaahJEyMCGBH6ItGPkdY5jTVYeWB
-X-Gm-Gg: ASbGnctXsTtE/EsIatnU6So1/7kSN0E8jle7MXjX9vJMphC381r8d6187XZh6Bmoxmy
-	f9Awi6TU7fjR6ZcRqnt5u+P3Ym3xSJ+9i9S6LJlYGT+JvRfsfOmxzoHsBAfrIYXT7R1e8NwSHDX
-	iZ7TD5zj02uhtFEZx60axQmhAXDa1Nb7kNDcs+w9s5oy0c
-X-Google-Smtp-Source: AGHT+IHOYUvkhEP6dzIUmY2tfJXSQI8YR+A8r99THVqSLPzK4zR2R5BW8Nq2BAnrRgerPb0REY8aMdICwnxks854qCU=
-X-Received: by 2002:a17:907:3f87:b0:ae0:ad8c:a559 with SMTP id
- a640c23a62f3a-ae3fbc8c443mr1345997566b.4.1751902689476; Mon, 07 Jul 2025
- 08:38:09 -0700 (PDT)
+	s=arc-20240116; t=1751902874; c=relaxed/simple;
+	bh=ePOPubuWj17eRi0sYt5gn5zhUwG2cej8IddcFeCTXXM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XiW1zpPZ79fdmWeKdpD7l3GF9ecn58+dtUsi47wup8zQV/fnzDLjfSoZhWB9vI5tQqLuGBYVZ3YaIFDkb6cEeB2/pZTjUXn5PiYX1ZrkwD4kiVArRio1LaSbra2wvou6aiYLxqSTwpNVuOvu8n/kXZzLOmcXcVfdge9ErB3MUNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Yr0XVWux; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751902869;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=q3RrQWA0hl2m0Jg5mJm6780LOhvTRsObdRFSzyTIGtE=;
+	b=Yr0XVWuxfD334RtnfP0rxbc+BWxrdqSYqtRltclNSQJe/WG7/ZAUAZLPOgQonXSIf4O+zi
+	wPVs1mBAUazhpSsbztZiS7Vy3GfvHYgBMk2/BCsd/u0L258ep/8V8if24dVPYCtugI+bqE
+	7JRo1lDd8eyvUhNFvmxoanDff6hGxyk=
+From: Tao Chen <chen.dylane@linux.dev>
+To: ast@kernel.org,
+	daniel@iogearbox.net,
+	john.fastabend@gmail.com,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	mattbobrowski@google.com,
+	rostedt@goodmis.org,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	kuniyu@amazon.com,
+	willemb@google.com,
+	jakub@cloudflare.com,
+	pablo@netfilter.org,
+	kadlec@netfilter.org,
+	hawk@kernel.org
+Cc: bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	Tao Chen <chen.dylane@linux.dev>
+Subject: [PATCH bpf-next 0/6] Move attach_type into bpf_link
+Date: Mon,  7 Jul 2025 23:39:10 +0800
+Message-ID: <20250707153916.802802-1-chen.dylane@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
- <aGgHka8Nm8S3fKQK@localhost.localdomain> <CAK8fFZ6KzyfswFE=qj6pz-18QZ16swdwyFfTf=4e_0+sPLyUcg@mail.gmail.com>
-In-Reply-To: <CAK8fFZ6KzyfswFE=qj6pz-18QZ16swdwyFfTf=4e_0+sPLyUcg@mail.gmail.com>
-From: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Date: Mon, 7 Jul 2025 17:37:42 +0200
-X-Gm-Features: Ac12FXx34v3Y6SuX2doxQJKG8jqdJJvAFpjvYytGviyPvXyJJf9njcMtTrZuufo
-Message-ID: <CAK8fFZ4GwiG8PLYmsnEbjP4DF=3KK_Ni8Pk7KnrNxLUV3+GK7Q@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
- driver after upgrade to 6.13.y (regression in commit 492a044508ad)
-To: Michal Kubiak <michal.kubiak@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, jdamato@fastly.com, 
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	Igor Raits <igor@gooddata.com>, Daniel Secik <daniel.secik@gooddata.com>, 
-	Zdenek Pesek <zdenek.pesek@gooddata.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-so 5. 7. 2025 v 9:01 odes=C3=ADlatel Jaroslav Pulchart
-<jaroslav.pulchart@gooddata.com> napsal:
->
-> > On Mon, Apr 14, 2025 at 06:29:01PM +0200, Jaroslav Pulchart wrote:
-> > > Hello,
-> > >
-> > > While investigating increased memory usage after upgrading our
-> > > host/hypervisor servers from Linux kernel 6.12.y to 6.13.y, I observe=
-d
-> > > a regression in available memory per NUMA node. Our servers allocate
-> > > 60GB of each NUMA node=E2=80=99s 64GB of RAM to HugePages for VMs, le=
-aving 4GB
-> > > for the host OS.
-> > >
-> > > After the upgrade, we noticed approximately 500MB less free RAM on
-> > > NUMA nodes 0 and 2 compared to 6.12.y, even with no VMs running (just
-> > > the host OS after reboot). These nodes host Intel 810-XXV NICs. Here'=
-s
-> > > a snapshot of the NUMA stats on vanilla 6.13.y:
-> > >
-> > >      NUMA nodes:  0     1     2     3     4     5     6     7     8
-> > >  9    10    11    12    13    14    15
-> > >      HPFreeGiB:   60    60    60    60    60    60    60    60    60
-> > >  60   60    60    60    60    60    60
-> > >      MemTotal:    64989 65470 65470 65470 65470 65470 65470 65453
-> > > 65470 65470 65470 65470 65470 65470 65470 65462
-> > >      MemFree:     2793  3559  3150  3438  3616  3722  3520  3547  354=
-7
-> > >  3536  3506  3452  3440  3489  3607  3729
-> > >
-> > > We traced the issue to commit 492a044508ad13a490a24c66f311339bf891cb5=
-f
-> > > "ice: Add support for persistent NAPI config".
-> > >
-> > > We limit the number of channels on the NICs to match local NUMA cores
-> > > or less if unused interface (from ridiculous 96 default), for example=
-:
-> > >    ethtool -L em1 combined 6       # active port; from 96
-> > >    ethtool -L p3p2 combined 2      # unused port; from 96
-> > >
-> > > This typically aligns memory use with local CPUs and keeps NUMA-local
-> > > memory usage within expected limits. However, starting with kernel
-> > > 6.13.y and this commit, the high memory usage by the ICE driver
-> > > persists regardless of reduced channel configuration.
-> > >
-> > > Reverting the commit restores expected memory availability on nodes 0
-> > > and 2. Below are stats from 6.13.y with the commit reverted:
-> > >     NUMA nodes:  0     1     2     3     4     5     6     7     8
-> > > 9    10    11    12    13    14    15
-> > >     HPFreeGiB:   60    60    60    60    60    60    60    60    60
-> > > 60   60    60    60    60    60    60
-> > >     MemTotal:    64989 65470 65470 65470 65470 65470 65470 65453 6547=
-0
-> > > 65470 65470 65470 65470 65470 65470 65462
-> > >     MemFree:     3208  3765  3668  3507  3811  3727  3812  3546  3676=
-  3596 ...
-> > >
-> > > This brings nodes 0 and 2 back to ~3.5GB free RAM, similar to kernel
-> > > 6.12.y, and avoids swap pressure and memory exhaustion when running
-> > > services and VMs.
-> > >
-> > > I also do not see any practical benefit in persisting the channel
-> > > memory allocation. After a fresh server reboot, channels are not
-> > > explicitly configured, and the system will not automatically resize
-> > > them back to a higher count unless manually set again. Therefore,
-> > > retaining the previous memory footprint appears unnecessary and
-> > > potentially harmful in memory-constrained environments
-> > >
-> > > Best regards,
-> > > Jaroslav Pulchart
-> > >
-> >
-> >
-> > Hello Jaroslav,
-> >
-> > I have just sent a series for converting the Rx path of the ice driver
-> > to use the Page Pool.
-> > We suspect it may help for the memory consumption issue since it remove=
-s
-> > the problematic code and delegates some memory management to the generi=
-c
-> > code.
-> >
-> > Could you please give it a try and check if it helps for your issue.
-> > The link to the series: https://lore.kernel.org/intel-wired-lan/2025070=
-4161859.871152-1-michal.kubiak@intel.com/
->
-> I can try it, however I cannot apply the patch as-is @ 6.15.y:
-> $ git am ~/ice-convert-Rx-path-to-Page-Pool.patch
-> Applying: ice: remove legacy Rx and construct SKB
-> Applying: ice: drop page splitting and recycling
-> error: patch failed: drivers/net/ethernet/intel/ice/ice_txrx.h:480
-> error: drivers/net/ethernet/intel/ice/ice_txrx.h: patch does not apply
-> Patch failed at 0002 ice: drop page splitting and recycling
-> hint: Use 'git am --show-current-patch=3Ddiff' to see the failed patch
-> hint: When you have resolved this problem, run "git am --continue".
-> hint: If you prefer to skip this patch, run "git am --skip" instead.
-> hint: To restore the original branch and stop patching, run "git am --abo=
-rt".
-> hint: Disable this message with "git config set advice.mergeConflict fals=
-e"
->
+Andrii suggested moving the attach_type into bpf_link, the previous discussion
+is as follows:
+https://lore.kernel.org/bpf/CAEf4BzY7TZRjxpCJM-+LYgEqe23YFj5Uv3isb7gat2-HU4OSng@mail.gmail.com
 
-My colleague and I have applied the missing bits and have it building
-on 6.15.5 (note that we had to disable CONFIG_MEM_ALLOC_PROFILING, or
-the kernel won=E2=80=99t boot). The patches we used are:
+patch1 add attach_type in bpf_link, and pass it to bpf_link_init, which
+will init the attach_type field.
 
-0001-libeth-convert-to-netmem.patch
-0002-libeth-support-native-XDP-and-register-memory-model.patch
-0003-libeth-xdp-add-XDP_TX-buffers-sending.patch
-0004-libeth-xdp-add-.ndo_xdp_xmit-helpers.patch
-0005-libeth-xdp-add-XDPSQE-completion-helpers.patch
-0006-libeth-xdp-add-XDPSQ-locking-helpers.patch
-0007-libeth-xdp-add-XDPSQ-cleanup-timers.patch
-0008-libeth-xdp-add-helpers-for-preparing-processing-libe.patch
-0009-libeth-xdp-add-XDP-prog-run-and-verdict-result-handl.patch
-0010-libeth-xdp-add-templates-for-building-driver-side-ca.patch
-0011-libeth-xdp-add-RSS-hash-hint-and-XDP-features-setup-.patch
-0012-libeth-xsk-add-XSk-XDP_TX-sending-helpers.patch
-0013-libeth-xsk-add-XSk-xmit-functions.patch
-0014-libeth-xsk-add-XSk-Rx-processing-support.patch
-0015-libeth-xsk-add-XSkFQ-refill-and-XSk-wakeup-helpers.patch
-0016-libeth-xdp-xsk-access-adjacent-u32s-as-u64-where-app.patch
-0017-ice-add-a-separate-Rx-handler-for-flow-director-comm.patch
-0018-ice-remove-legacy-Rx-and-construct-SKB.patch
-0019-ice-drop-page-splitting-and-recycling.patch
-0020-ice-switch-to-Page-Pool.patch
+patch2-6 remove the attach_type in struct bpf_xx_link, update the info
+with bpf_link attach_type.
 
-Unfortunately, the new setup crashes after VMs are started. Here=E2=80=99s =
-the
-oops trace:
+There are some functions finally call bpf_link_init but do not have bpf_attr
+from user or do not need to init attach_type from user like bpf_raw_tracepoint_open,
+now use prog->expected_attach_type to init attach_type.
 
-[   82.816544] tun: Universal TUN/TAP device driver, 1.6
-[   82.823923] tap2c2b8dfc-91: entered promiscuous mode
-[   82.848913] tapa92181fc-b5: entered promiscuous mode
-[   84.030527] tap54ab9888-90: entered promiscuous mode
-[   84.043251] tap89f4f7ae-d1: entered promiscuous mode
-[   85.768578] tapf1e9f4f9-17: entered promiscuous mode
-[   85.780372] tap72c64909-77: entered promiscuous mode
-[   87.580455] tape1b2d2dd-bc: entered promiscuous mode
-[   87.593224] tap34fb2668-4a: entered promiscuous mode
-[  150.406899] Oops: general protection fault, probably for
-non-canonical address 0xffff3b95e757d5a0: 0000 [#1] SMP NOPTI
-[  150.417626] CPU: 4 UID: 0 PID: 0 Comm: swapper/4 Tainted: G
-   E       6.15.5-1.gdc+ice.el9.x86_64 #1 PREEMPT(lazy)
-[  150.428845] Tainted: [E]=3DUNSIGNED_MODULE
-[  150.432773] Hardware name: Dell Inc. PowerEdge R7525/0H3K7P, BIOS
-2.19.0 03/07/2025
-[  150.440432] RIP: 0010:page_pool_put_unrefed_netmem+0xe2/0x250
-[  150.446186] Code: 18 48 85 d2 0f 84 58 ff ff ff 8b 52 2c 4c 89 e7
-39 d0 41 0f 94 c5 e8 0d f2 ff ff 84 c0 0f 85 4f ff ff ff 48 8b 85 60
-06 00 00 <65> 48 ff 40 20 5b 4c 89 e6 48 89 ef 5d 41 5c 41 5d e9 f8 fa
-ff ff
-[  150.464947] RSP: 0018:ffffbc4a003fcd18 EFLAGS: 00010246
-[  150.470173] RAX: ffff9dcabfc37580 RBX: 00000000ffffffff RCX: 00000000000=
-00000
-[  150.477496] RDX: 0000000000000000 RSI: fffff2ec441924c0 RDI: fffff2ec441=
-924c0
-[  150.484773] RBP: ffff9dcabfc36f20 R08: ffff9dc330536d20 R09: 00000000005=
-51618
-[  150.492045] R10: 0000000000000000 R11: 0000000000000f82 R12: fffff2ec441=
-924c0
-[  150.499317] R13: 0000000000000000 R14: 0000000000000000 R15: 00000000000=
-01b69
-[  150.506584] FS:  0000000000000000(0000) GS:ffff9dcb27946000(0000)
-knlGS:0000000000000000
-[  150.514806] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  150.520677] CR2: 00007f82d00041b8 CR3: 000000012bcab00a CR4: 00000000007=
-70ef0
-[  150.527937] PKRU: 55555554
-[  150.530770] Call Trace:
-[  150.533342]  <IRQ>
-[  150.535484]  ice_clean_rx_irq+0x288/0x530 [ice]
-[  150.540171]  ? sched_balance_find_src_group+0x13f/0x210
-[  150.545521]  ? ice_clean_tx_irq+0x18f/0x3a0 [ice]
-[  150.550373]  ice_napi_poll+0xe2/0x290 [ice]
-[  150.554709]  __napi_poll+0x27/0x1e0
-[  150.558323]  net_rx_action+0x1d3/0x3f0
-[  150.562194]  ? __napi_schedule+0x8e/0xb0
-[  150.566239]  ? sched_clock+0xc/0x30
-[  150.569852]  ? sched_clock_cpu+0xb/0x190
-[  150.573897]  handle_softirqs+0xd0/0x2b0
-[  150.577858]  __irq_exit_rcu+0xcd/0xf0
-[  150.581636]  common_interrupt+0x7f/0xa0
-[  150.585601]  </IRQ>
-[  150.587826]  <TASK>
-[  150.590049]  asm_common_interrupt+0x22/0x40
-[  150.594352] RIP: 0010:flush_smp_call_function_queue+0x39/0x50
-[  150.600218] Code: 80 c0 bb 2e 98 48 85 c0 74 31 53 9c 5b fa bf 01
-00 00 00 e8 49 f5 ff ff 65 66 83 3d 58 af 90 02 00 75 0c 80 e7 02 74
-01 fb 5b <c3> cc cc cc cc e8 8d 1d f1 ff 80 e7 02 74 f0 eb ed c3 cc cc
-cc cc
-[  150.619204] RSP: 0018:ffffbc4a001e7ed8 EFLAGS: 00000202
-[  150.624550] RAX: 0000000000000000 RBX: ffff9dc2c0088000 RCX: 00000000000=
-f4240
-[  150.631806] RDX: 0000000000007f0c RSI: 0000000000000008 RDI: ffff9dcabfc=
-30880
-[  150.639057] RBP: 0000000000000004 R08: 0000000000000008 R09: ffff9dcabfc=
-311e8
-[  150.646314] R10: ffff9dcabfc1fd80 R11: 0000000000000004 R12: ffff9dc2c1e=
-64400
-[  150.653569] R13: ffffffff978da0e0 R14: 0000000000000001 R15: 00000000000=
-00000
-[  150.660829]  do_idle+0x13a/0x200
-[  150.664186]  cpu_startup_entry+0x25/0x30
-[  150.668241]  start_secondary+0x114/0x140
-[  150.672292]  common_startup_64+0x13e/0x141
-[  150.676525]  </TASK>
-[  150.678840] Modules linked in: target_core_user(E) uio(E)
-target_core_pscsi(E) target_core_file(E) target_core_iblock(E)
-nf_conntrack_netlink(E) vhost_net(E) vhost(E) vhost_iotlb(E) tap(E)
-tun(E) rpcsec_gss_krb5(E) auth_rpcgss(E) nfsv4(E) dns_resolver(E)
-nfs(E) lockd(E) grace(E) netfs(E) netconsole(E)
-scsi_transport_iscsi(E) sch_ingress(E) iscsi_target_mod(E)
-target_core_mod(E) 8021q(E) garp(E) mrp(E) bonding(E) tls(E)
-nfnetlink_cttimeout(E) nfnetlink(E) openvswitch(E) nf_conncount(E)
-nf_nat(E) psample(E) ib_core(E) binfmt_misc(E) dell_rbu(E) sunrpc(E)
-vfat(E) fat(E) dm_service_time(E) dm_multipath(E) amd_atl(E)
-intel_rapl_msr(E) intel_rapl_common(E) amd64_edac(E) ipmi_ssif(E)
-edac_mce_amd(E) kvm_amd(E) kvm(E) dell_pc(E) platform_profile(E)
-dell_smbios(E) dcdbas(E) mgag200(E) irqbypass(E)
-dell_wmi_descriptor(E) wmi_bmof(E) i2c_algo_bit(E) rapl(E)
-acpi_cpufreq(E) ptdma(E) i2c_piix4(E) acpi_power_meter(E) ipmi_si(E)
-k10temp(E) i2c_smbus(E) acpi_ipmi(E) wmi(E) ipmi_devintf(E)
-ipmi_msghandler(E) tcp_bbr(E) fuse(E) zram(E)
-[  150.678894]  lz4hc_compress(E) lz4_compress(E) zstd_compress(E)
-ext4(E) crc16(E) mbcache(E) jbd2(E) dm_crypt(E) sd_mod(E) sg(E) ice(E)
-ahci(E) polyval_clmulni(E) libie(E) libeth_xdp(E) polyval_generic(E)
-libahci(E) libeth(E) ghash_clmulni_intel(E) sha512_ssse3(E) libata(E)
-ccp(E) megaraid_sas(E) gnss(E) sp5100_tco(E) dm_mirror(E)
-dm_region_hash(E) dm_log(E) dm_mod(E) nf_conntrack(E)
-nf_defrag_ipv6(E) nf_defrag_ipv4(E) br_netfilter(E) bridge(E) stp(E)
-llc(E)
-[  150.770112] Unloaded tainted modules: fmpm(E):1 fjes(E):2 padlock_aes(E)=
-:2
-[  150.818140] ---[ end trace 0000000000000000 ]---
-[  150.913536] pstore: backend (erst) writing error (-22)
-[  150.918850] RIP: 0010:page_pool_put_unrefed_netmem+0xe2/0x250
-[  150.924764] Code: 18 48 85 d2 0f 84 58 ff ff ff 8b 52 2c 4c 89 e7
-39 d0 41 0f 94 c5 e8 0d f2 ff ff 84 c0 0f 85 4f ff ff ff 48 8b 85 60
-06 00 00 <65> 48 ff 40 20 5b 4c 89 e6 48 89 ef 5d 41 5c 41 5d e9 f8 fa
-ff ff
-[  150.943854] RSP: 0018:ffffbc4a003fcd18 EFLAGS: 00010246
-[  150.949245] RAX: ffff9dcabfc37580 RBX: 00000000ffffffff RCX: 00000000000=
-00000
-[  150.956556] RDX: 0000000000000000 RSI: fffff2ec441924c0 RDI: fffff2ec441=
-924c0
-[  150.963860] RBP: ffff9dcabfc36f20 R08: ffff9dc330536d20 R09: 00000000005=
-51618
-[  150.971166] R10: 0000000000000000 R11: 0000000000000f82 R12: fffff2ec441=
-924c0
-[  150.978475] R13: 0000000000000000 R14: 0000000000000000 R15: 00000000000=
-01b69
-[  150.985782] FS:  0000000000000000(0000) GS:ffff9dcb27946000(0000)
-knlGS:0000000000000000
-[  150.994036] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  150.999958] CR2: 00007f82d00041b8 CR3: 000000012bcab00a CR4: 00000000007=
-70ef0
-[  151.007270] PKRU: 55555554
-[  151.010151] Kernel panic - not syncing: Fatal exception in interrupt
-[  151.488873] Kernel Offset: 0x14600000 from 0xffffffff81000000
-(relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-[  151.581163] ---[ end Kernel panic - not syncing: Fatal exception in
-interrupt ]---
+bpf_struct_ops_map_update_elem
+bpf_raw_tracepoint_open
+bpf_struct_ops_test_run
 
-> >
-> > Thanks,
-> > Michal
-> >
+Feedback of any kind is welcome, thanks.
+
+Tao Chen (6):
+  bpf: Add attach_type in bpf_link
+  bpf: Remove attach_type in bpf_cgroup_link
+  bpf: Remove attach_type in bpf_sockmap_link
+  bpf: Remove location field in tcx_link
+  bpf: Remove attach_type in bpf_netns_link
+  bpf: Remove attach_type in bpf_tracing_link
+
+ include/linux/bpf-cgroup.h     |  1 -
+ include/linux/bpf.h            | 18 +++++++++------
+ include/net/tcx.h              |  1 -
+ kernel/bpf/bpf_iter.c          |  3 ++-
+ kernel/bpf/bpf_struct_ops.c    |  5 +++--
+ kernel/bpf/cgroup.c            | 17 +++++++--------
+ kernel/bpf/net_namespace.c     |  8 +++----
+ kernel/bpf/syscall.c           | 40 ++++++++++++++++++++--------------
+ kernel/bpf/tcx.c               | 16 +++++++-------
+ kernel/bpf/trampoline.c        | 10 +++++----
+ kernel/trace/bpf_trace.c       |  4 ++--
+ net/bpf/bpf_dummy_struct_ops.c |  3 ++-
+ net/core/dev.c                 |  3 ++-
+ net/core/sock_map.c            | 13 +++++------
+ net/netfilter/nf_bpf_link.c    |  3 ++-
+ 15 files changed, 79 insertions(+), 66 deletions(-)
+
+-- 
+2.48.1
+
 
