@@ -1,213 +1,98 @@
-Return-Path: <netdev+bounces-204700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87C44AFBD37
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 23:08:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EC7FAFBD3B
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 23:10:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDE08166FA1
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 21:08:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD3FF3A8149
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 21:10:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1C523D282;
-	Mon,  7 Jul 2025 21:08:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AADC426C393;
+	Mon,  7 Jul 2025 21:10:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="OxpJpK37"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OIk+2GFM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4B121D3FB
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 21:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C48219300
+	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 21:10:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751922496; cv=none; b=tieEx5V8JPPm3rw2s63NLH6L/zTLSXe+V9I8bZMAHq5aIIq43ga6N8dxscHghajqRfjE8tkzw7MSk3X6TjMhLg2L+cNNLrjf8cCHzATwsNClzmUV9HS7+J1ViV6vCW9MNB8UA2FU7TnDKhMbYuBMYWzph7QgAV7iiv8WhlB+fXc=
+	t=1751922636; cv=none; b=f+ZooILTHK6PsvUi9a3rDrccDm9EgG1pItDSIozJ6wpEH4pRqZvC9vL5IcALSvJlTu65BfXIxs6M5oe7Mc6SgdIYS2ybJNnECoB+U9fpJjy19Rg1rHMtnvAGflwPF6QT0hm7P3eA2LF5WZsQGf61rdXwa5RLIvN+I+6xsJmfH1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751922496; c=relaxed/simple;
-	bh=6xrkdtB+FXjKoaxAnl6nNrfKBkCNQfXPJJbZigmyVrA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NZ+oHaIxRgsQ4AL7o0p9ani68sW+bwXi+uwF/1QLUrIUGimkje/aljcvxh0KbJGmJx20n1uG+gRqxhWWPzwCpw/n6rdv72LF3iiYGySn6HHSDVrduAUDXCnZ7QvPOp3SgiKZK/k9fo30XJFrDc+37GkLcjFiubVvuGXCqmKEfZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=OxpJpK37; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4a43afb04a7so26247501cf.0
-        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 14:08:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1751922493; x=1752527293; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rzeov6sECCVZXzDOULDDRWXGvWvm8tYV84pd2voljaw=;
-        b=OxpJpK37HnucAr86BGrQIGu4/7kpL+z5Km8zqkHZI0ioX8d5KBM0nASDsqWFCAn2S1
-         IpBGDduyY1mSzwAcSMQVtiVNSJM4G2ax8k7AlhdkiMnfWdpr3y+ikd69uPBgndEOOLJR
-         oeDoSIH+KMpD8vyhK5nDdMmRVqRTG3qhwlARSMbMUUpFR3F9979CvA3nHTvCdalHvwdR
-         bOaZPvtmJfpLs2SjvRoDIQE12XEXGoI71fIcaKgIR0DA6J7CJkFItVLq8hqPYIiPPaw4
-         NWqkkYuBmb/Bpww1UpX1MMP4RG9TVqTgAhjeTrEQaGyU6bd4Hl2SVHZTdkYbVU+8IMYc
-         vdLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751922493; x=1752527293;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Rzeov6sECCVZXzDOULDDRWXGvWvm8tYV84pd2voljaw=;
-        b=BjGtQpRRh3RZCHNBPp2/nj5ic0SyqM/m0QtFj0ESdZKfxXkEIbPDDFGVkN9SVRGDrK
-         mf3fXDJWGCi6J6zuxYD6zvyEPMJyRcP9mWzsLBWkH5zgY0SBX3dl3ZmFzeIy/jb8efYB
-         r/mBjj+C7ccGZuy30THxFQiieQrXXWAY1rrWIsCFq9SRRhhnCYXCMVXpRE7Eik3YDaVD
-         dgzMAm8fL8LBNNK0cAd2/4i4i0kyv8sKl5oeYnrNA+Vk12ItMc3fmt3zu/UICzqiyPpq
-         KsZf7qHnNpTTYmZFvmbfHmmEbvPfTfAIGC+qzzo+SHJhnErTJ7IHXsqMbsGl0QCdB3MR
-         IsUw==
-X-Gm-Message-State: AOJu0Yw38uDITJIWkUuT3BQZS/5IXALTL3gikeI68h8J3jXlh25esvOF
-	1J2TEhvJn9Gs1y9NHeYdYxkcheLdU8y2HZ0s2RsEzyfecpHv9IMNODSXXde7suph8w==
-X-Gm-Gg: ASbGncsn3prQpFF5lnWjN3mHCQhN+Af8lKpZWGyb8C2sqBrqtOGYMIH1IQMoVefKN1X
-	QNUYy5t8YvpOHiK3C8lvh/TeE7OZGwKgwDSngiSAF7lk49wESfWDm5cIRCCLlWTHAo13kYRVbEr
-	j9QBv0G6LCedaf80mskhNuBLL9mR96RmsLKLwzu3XjbiNmxDfGDLDr/KsKdqbhaQWiGFK2CK+sk
-	ow8Yy1oYdsrevjxGTgD7Hc3fYaJZy6KzaODR/uo/UGxe0q99t9nS7idJ1k7WNsHf3qdDE6DeobB
-	+NDfbOFPirHccSUtqodD9S+t8hKU/1Ng0CDI8tfNyumhv4Q7QfiAcmdAmUW38NSsVAItIE+DW4+
-	4adluAiX2
-X-Google-Smtp-Source: AGHT+IE6EIS5Jeq4macBX+CiXgphFNGfZP08mmSFm+IJ1s5QhtPMNvbRh1nGONkEJQPSM4Gn+2LPZA==
-X-Received: by 2002:a05:622a:59cf:b0:4a4:4202:e77e with SMTP id d75a77b69052e-4a9985ff983mr214048711cf.6.1751922493281;
-        Mon, 07 Jul 2025 14:08:13 -0700 (PDT)
-Received: from exu-caveira.tail33bf8.ts.net ([2804:7f1:e2c1:ff57:26e6:7741:19c:69c5])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a994a8dfd5sm69567451cf.66.2025.07.07.14.08.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jul 2025 14:08:12 -0700 (PDT)
-From: Victor Nogueira <victor@mojatatu.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us
-Cc: netdev@vger.kernel.org,
-	pctammela@mojatatu.com,
-	syzbot+d8b58d7b0ad89a678a16@syzkaller.appspotmail.com,
-	syzbot+5eccb463fa89309d8bdc@syzkaller.appspotmail.com,
-	syzbot+1261670bbdefc5485a06@syzkaller.appspotmail.com,
-	syzbot+4dadc5aecf80324d5a51@syzkaller.appspotmail.com,
-	syzbot+15b96fc3aac35468fe77@syzkaller.appspotmail.com
-Subject: [PATCH net v2] net/sched: Abort __tc_modify_qdisc if parent class does not exist
-Date: Mon,  7 Jul 2025 18:08:01 -0300
-Message-ID: <20250707210801.372995-1-victor@mojatatu.com>
-X-Mailer: git-send-email 2.50.0
+	s=arc-20240116; t=1751922636; c=relaxed/simple;
+	bh=c0DJkAJx/ECBfUe8SsVB3Usym7EWpuZ/BH5DsypIWAw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qu2HmGcpxOZ6KFL5mwM6hCpv9ISLqMXC73NWgmEQFsf/eNj2D1mvy3+riKNuyIbNTN+2oI87eJJyJgHD/yeVreTeWAEB5EdexYVsXhIx+sIoI50VPQ76LXBKtRLkjtH12kRQRrIkdBaKZ54mFuv33avMVMbKMKnudYAicREQohs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OIk+2GFM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BD00C4CEE3;
+	Mon,  7 Jul 2025 21:10:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751922636;
+	bh=c0DJkAJx/ECBfUe8SsVB3Usym7EWpuZ/BH5DsypIWAw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OIk+2GFMjHNJ05zicv+2KuAT6bz/A9hVAJn80N7vPKiYi2CRXosraJeXhIHtdv7bw
+	 6nrp7ORgCOj25RcrbLxg36jjaGui4mLh6AxEtYY6NRuMfjv+uhrLwyLilyLhWYcGtO
+	 wCSISE/+u0BhcLaTIQBx+P2kHtRK+l7S/P1EoRjwjW/S+BfGnvZvJ8+XjlAG0fONJw
+	 l9AGvQmh44GCx+BAnjUhUKiYhHTIe4HjFYnaQTX8oMZbTrPY0e886AcorKQQh6mmA6
+	 xdlfGF2u9UkkdwbxQg8c+SxK/Hll8//RBjTiopKco2WkIier9f2x5c+7MCOXDgmRpH
+	 b7EtwwiA7rFEQ==
+Date: Mon, 7 Jul 2025 14:10:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Daniel Zahka <daniel.zahka@gmail.com>, Donald Hunter
+ <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Saeed Mahameed <saeedm@nvidia.com>, Leon
+ Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Boris
+ Pismenny <borisp@nvidia.com>, Kuniyuki Iwashima <kuniyu@google.com>, Willem
+ de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, Neal
+ Cardwell <ncardwell@google.com>, Patrisious Haddad <phaddad@nvidia.com>,
+ Raed Salem <raeds@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>, Dragos
+ Tatulea <dtatulea@nvidia.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdl?=
+ =?UTF-8?B?bnNlbg==?= <toke@redhat.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Jacob Keller <jacob.e.keller@intel.com>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH v3 08/19] net: psp: add socket security association code
+Message-ID: <20250707141034.2367cbc1@kernel.org>
+In-Reply-To: <686aa894a8b6e_3ad0f32946d@willemb.c.googlers.com.notmuch>
+References: <20250702171326.3265825-1-daniel.zahka@gmail.com>
+	<20250702171326.3265825-9-daniel.zahka@gmail.com>
+	<686aa894a8b6e_3ad0f32946d@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Lion's patch [1] revealed an ancient bug in the qdisc API.
-Whenever a user creates/modifies a qdisc specifying as a parent another
-qdisc, the qdisc API will, during grafting, detect that the user is
-not trying to attach to a class and reject. However grafting is
-performed after qdisc_create (and thus the qdiscs' init callback) is
-executed. In qdiscs that eventually call qdisc_tree_reduce_backlog
-during init or change (such as fq, hhf, choke, etc), an issue
-arises. For example, executing the following commands:
+On Sun, 06 Jul 2025 12:47:16 -0400 Willem de Bruijn wrote:
+> > +            - rx-key
+> > +        pre: psp-assoc-device-get-locked
+> > +        post: psp-device-unlock
+> > +    -
+> > +      name: tx-assoc
+> > +      doc: Add a PSP Tx association.
+> > +      attribute-set: assoc
+> > +      do:
+> > +        request:
+> > +          attributes:
+> > +            - dev-id
+> > +            - version  
+> 
+> Version must be the same for rx and tx alloc. It is already set for
+> rx, so no need to pass explicitly. Just adds the need to for a sanity
+> check in the handler.
 
-sudo tc qdisc add dev lo root handle a: htb default 2
-sudo tc qdisc add dev lo parent a: handle beef fq
-
-Qdiscs such as fq, hhf, choke, etc unconditionally invoke
-qdisc_tree_reduce_backlog() in their control path init() or change() which
-then causes a failure to find the child class; however, that does not stop
-the unconditional invocation of the assumed child qdisc's qlen_notify with
-a null class. All these qdiscs make the assumption that class is non-null.
-
-The solution is ensure that qdisc_leaf() which looks up the parent
-class, and is invoked prior to qdisc_create(), should return failure on
-not finding the class.
-In this patch, we leverage qdisc_leaf to return ERR_PTRs whenever the
-parentid doesn't correspond to a class, so that we can detect it
-earlier on and abort before qdisc_create is called.
-
-[1] https://lore.kernel.org/netdev/d912cbd7-193b-4269-9857-525bee8bbb6a@gmail.com/
-
-Fixes: 5e50da01d0ce ("[NET_SCHED]: Fix endless loops (part 2): "simple" qdiscs")
-Reported-by: syzbot+d8b58d7b0ad89a678a16@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/68663c93.a70a0220.5d25f.0857.GAE@google.com/
-Reported-by: syzbot+5eccb463fa89309d8bdc@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/68663c94.a70a0220.5d25f.0858.GAE@google.com/
-Reported-by: syzbot+1261670bbdefc5485a06@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/686764a5.a00a0220.c7b3.0013.GAE@google.com/
-Reported-by: syzbot+15b96fc3aac35468fe77@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/686764a5.a00a0220.c7b3.0014.GAE@google.com/
-Reported-by: syzbot+4dadc5aecf80324d5a51@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/68679e81.a70a0220.29cf51.0016.GAE@google.com/
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Reviewed-by: Cong Wang <xiyou.wangcong@gmail.com>
-Signed-off-by: Victor Nogueira <victor@mojatatu.com>
----
-v1 -> v2: 
-- Simplified qdisc_leaf error handling logic in __tc_get_qdisc (Jakub)
-- Added Cong's reviewed-by
----
- net/sched/sch_api.c | 23 ++++++++++++++++-------
- 1 file changed, 16 insertions(+), 7 deletions(-)
-
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index d8a33486c511..241e86cec9c5 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -336,17 +336,22 @@ struct Qdisc *qdisc_lookup_rcu(struct net_device *dev, u32 handle)
- 	return q;
- }
- 
--static struct Qdisc *qdisc_leaf(struct Qdisc *p, u32 classid)
-+static struct Qdisc *qdisc_leaf(struct Qdisc *p, u32 classid,
-+				struct netlink_ext_ack *extack)
- {
- 	unsigned long cl;
- 	const struct Qdisc_class_ops *cops = p->ops->cl_ops;
- 
--	if (cops == NULL)
--		return NULL;
-+	if (cops == NULL) {
-+		NL_SET_ERR_MSG(extack, "Parent qdisc is not classful");
-+		return ERR_PTR(-EOPNOTSUPP);
-+	}
- 	cl = cops->find(p, classid);
- 
--	if (cl == 0)
--		return NULL;
-+	if (cl == 0) {
-+		NL_SET_ERR_MSG(extack, "Specified class not found");
-+		return ERR_PTR(-ENOENT);
-+	}
- 	return cops->leaf(p, cl);
- }
- 
-@@ -1490,7 +1495,7 @@ static int __tc_get_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
- 					NL_SET_ERR_MSG(extack, "Failed to find qdisc with specified classid");
- 					return -ENOENT;
- 				}
--				q = qdisc_leaf(p, clid);
-+				q = qdisc_leaf(p, clid, extack);
- 			} else if (dev_ingress_queue(dev)) {
- 				q = rtnl_dereference(dev_ingress_queue(dev)->qdisc_sleeping);
- 			}
-@@ -1501,6 +1506,8 @@ static int __tc_get_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
- 			NL_SET_ERR_MSG(extack, "Cannot find specified qdisc on specified device");
- 			return -ENOENT;
- 		}
-+		if (IS_ERR(q))
-+			return PTR_ERR(q);
- 
- 		if (tcm->tcm_handle && q->handle != tcm->tcm_handle) {
- 			NL_SET_ERR_MSG(extack, "Invalid handle");
-@@ -1602,7 +1609,9 @@ static int __tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
- 					NL_SET_ERR_MSG(extack, "Failed to find specified qdisc");
- 					return -ENOENT;
- 				}
--				q = qdisc_leaf(p, clid);
-+				q = qdisc_leaf(p, clid, extack);
-+				if (IS_ERR(q))
-+					return PTR_ERR(q);
- 			} else if (dev_ingress_queue_create(dev)) {
- 				q = rtnl_dereference(dev_ingress_queue(dev)->qdisc_sleeping);
- 			}
--- 
-2.34.1
-
+I think because version implies the key size. No strong preference but
+without the version it's harder to split the request processing into
+pure parsing and operating on kernel objects (under relevant locks).
 
