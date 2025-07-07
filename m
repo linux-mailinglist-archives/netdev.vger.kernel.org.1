@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-204590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CDDEAFB4CB
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 15:40:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F54CAFB4F2
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 15:44:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 737EB171CF4
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 13:40:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B17F71895945
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 13:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A25FC2BCF65;
-	Mon,  7 Jul 2025 13:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147C12BEFE9;
+	Mon,  7 Jul 2025 13:43:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dKztURj2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dVFAV9hq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31D229C338
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 13:40:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 707902BEC3E
+	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 13:42:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751895647; cv=none; b=YBeixBxJNTXLA01+NEScwJmOUETHrLJ3EsUpq6BPJ926tsth7N3OgBDdNlY7hyQr5iwWi6Hm1JcTaMh3zqZCOSeoXWGgKTytco9QPJPZUgimw5R24CKRnmh++Y5mwibZsR9E39LDHrT5kR8q5wponsfPtQRCee/k6etBkHrdXp4=
+	t=1751895781; cv=none; b=fs9xOQtJRuC06DtIpDYqZvXcO2UV8D2M/wX8GXZZ4K0kF1gwiQHLRWFIAi+KyxcgvHm0qvsppaXCUyItXDrMvwVQYqZbYBf38vOpyCX6NJWZSdidNudsvoFpgAR11LDhKcepvKXG7sNzm5j5pa8lbXFARt/zkNRJ88i0StKMHZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751895647; c=relaxed/simple;
-	bh=ul3tvYiiYuyxmNUs6c6tGf8iXCr1hDf1jpTi6pw0cEE=;
+	s=arc-20240116; t=1751895781; c=relaxed/simple;
+	bh=xltTqBYmsiirVvBdNqG5/Fyy6AbHsBrBr+WSXMtuttA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cfkdGuKDGb2R9YpTYe0/wT5Z06Jkt301ZgLThG2ZAl1fg6/6bPyxcGuAh5V1HT6tR4sYXvr3I1cepKdztfK/ZhSlDPFTKr5Woo/IuhsXmAd9Wtkv11nOKj1gZMJsjrGeKRb3wAhqgjJBLgkWMAp/oiYwqEvEUmFu5g8i8olInmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dKztURj2; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=A/T7M6QquM0HRPmsOUJkWgP8KwjHIUVhayfgqWagkqoyjvxPJQbwPtP8OBz6O7ALj9lspavL3UYgA1JpU3pjcLSJsG7iVR7ak8c9/YQv9nxXq4jwKn/hwASXCr3KlbqxfdnlTEE16/JjPoX61Ytq9f5bGksrTllfmrQJB2AWF8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dVFAV9hq; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751895644;
+	s=mimecast20190719; t=1751895778;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=W2KJ06Vv9jNgPK/f5x2D67o6F5iefXJHvVBymbKYkgw=;
-	b=dKztURj2FL5x9836vVW2urQdzuM+bdMvz/wX0XF0eTsIJOJEplJXq4m2lA1uFta7UY5w7w
-	upr0j99EBR5hTJslNz5N2bElBNFVXvRgHtEF04Rkt3xIVVEouL0XDTuZX2fCwrhwqUZd2/
-	VF3qH5qGb+iikUaj1bqvcdWB6GA0Lo4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=VsmgUKFf5I0+AJIsgxdkjg4irOxBPoSgMLTf3OScQaQ=;
+	b=dVFAV9hqfihLamnCChTjmvQdBWwa5yraYDQW4/KHfrxWSye0sNcnlsMO5oW4XX/la8wMII
+	nzOBpBhQb6WbMn7b7Xp5KcwvRCoCjaziPwBPSnrc1dHXXJeim/JKhB+vnOeB1KoziFQPGh
+	J9MCrLts/sZkLPHUH2ZPckXRZpfmykw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-356-zv9rlHO6Mn6qmvr2QFWHog-1; Mon, 07 Jul 2025 09:40:42 -0400
-X-MC-Unique: zv9rlHO6Mn6qmvr2QFWHog-1
-X-Mimecast-MFC-AGG-ID: zv9rlHO6Mn6qmvr2QFWHog_1751895641
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-45311704d22so17869935e9.2
-        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 06:40:42 -0700 (PDT)
+ us-mta-93-xFr1KxkcNimcLG-riKJCdw-1; Mon, 07 Jul 2025 09:42:56 -0400
+X-MC-Unique: xFr1KxkcNimcLG-riKJCdw-1
+X-Mimecast-MFC-AGG-ID: xFr1KxkcNimcLG-riKJCdw_1751895774
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3a50049f8eeso1436353f8f.3
+        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 06:42:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751895641; x=1752500441;
+        d=1e100.net; s=20230601; t=1751895773; x=1752500573;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=W2KJ06Vv9jNgPK/f5x2D67o6F5iefXJHvVBymbKYkgw=;
-        b=M6zTvWbicWkBQ39xX/rzBprSxuwtvhEZ5sb5VE8vFIPcbLxBroxigF4WlcrFimt4S9
-         N+rD17RpiDF0+qYC4r5jJ5qO1zpaHuvy2AWgxuYS16fJMylTNPHVawE+yljVJCJrsJhR
-         4gx8qxrypsoNrIVVgyya28ZrUqjy1k1j/waZTGAr1TcZfboDfUNUv51eamuOyjNI+4pn
-         xJRAZ9C0CgRPPBU/IAXCRLWS0/RzpCoIO4m6nQkcW2q8zhm9muz96/VZZCXZDjvGD6JB
-         NdQeWIcpa9VCVHOrB3UkG5GfUi44wsXE04KSFQXjzL/dKY89GPJJz8iom5CYBNfvrgUL
-         WfWA==
-X-Forwarded-Encrypted: i=1; AJvYcCXIHdv9Cu50JZwY4Pyuo0Pv8ZstW1xdX5O+r33FzK0ERue7UFF4LlPBAuVFX/TaB2bYpI1hBY8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpYgHi7qe5rw5A37c6sQLRzWr5AyjjGCN+urS/ZYOyqQpJvnMS
-	N4bpZC9hDCo7KhtrL1hgFmVeDncAGqhArU+zABcrszudkNd41P3oKnp6RhFe4z+jgJhFtnkU1C/
-	TKRkAfDZ4PZZwZgGGHcSwEzQGsejEuK1q0oc789EJGxkDsNWr9fhWNm+HfA==
-X-Gm-Gg: ASbGncu4kw6jnuvNEAXTGgvzyWGXsl7tk/AAnK4vuFlhW1kctHzLt+SvsjUujWay990
-	AcqoRy+NA+6AB5/q6+quiAwny++euH5NPvbYgpWagm8FtRgqOAaj5dPWyBmMnC32Rth5PXzr055
-	K9tuBrra2uooYLzUFB1+oFLKQ+11dRMiOcNj7WFpj4+q7RBm/xLjaHJFRuMav9SKzv3Y1TrLEuJ
-	VsKyKkwgZthbnY1+dvcoahDmz1gPepwGMLzAzOhM6a5poE8Cob6qnZltVz2TubPVrKrTi+mQclN
-	3nv1lsebw9fz98KHyeCzugIoqFjW
-X-Received: by 2002:a05:600c:8214:b0:450:d568:909b with SMTP id 5b1f17b1804b1-454b4e74957mr117204095e9.14.1751895641293;
-        Mon, 07 Jul 2025 06:40:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGZ3sl8II9VgNMv0Hs+oc26TdXSoZydYWxbok3SEgKNUWhqxxpymtncK0H5qwe1x6+STsNFHw==
-X-Received: by 2002:a05:600c:8214:b0:450:d568:909b with SMTP id 5b1f17b1804b1-454b4e74957mr117203465e9.14.1751895640329;
-        Mon, 07 Jul 2025 06:40:40 -0700 (PDT)
+        bh=VsmgUKFf5I0+AJIsgxdkjg4irOxBPoSgMLTf3OScQaQ=;
+        b=qxpm9/lvUoiXvj+BqmlzmtmRxc4sSdS08vB5VUZAfdcSqpHGkvOr2cOPT9C/F2X5y8
+         5TGHkFsz5NBQoG0dt+wgM7mW6mfUceqcLWMO98lGvx6WsTyc7k4qGybKGTHQeEJDsgsi
+         UUsq7zHQw8TeuhRTgGk0tx4KG9o9zh4djOgNGf/urIi969Q56j+ork7dM79BYmSxoysc
+         dLaW2J3iPv8amzLSvFeveA/waoKJQon7MFcTN7pwW61rk8MFN+QG21zyOiuvZCZK1VSm
+         xq2w6QBqK49UpriXELz74yWnce3cYhzOK2JCM18nJ47zedvIROGB1npPyap6792NoLXh
+         lfzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV/DtHC8ksS1r+dCMueHql9SbpYP//znRMSyxKcfhW69HuOaTD9KNIJksO0lJTPCypAcmkx/tI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywx7/ytGspP7oPAc627dd4HerS6dskAGfe5STY9jrj9RsvRyIpA
+	UCM4I1TPeEsUbx/TtUnNVBBCXkNwlgyra91eVPzyz3ci9pakeXDDNAwOeIzzOW4BsUlnutxgoYm
+	EtrSzPCo47NT4+6x91bnkoy05XIsWXY6q9H0dMcZsVW1WLwC7UL7Yj1BnCPNACyE47g==
+X-Gm-Gg: ASbGncslPySHbanrG3YXVogLpOpQlHq9pjwKT8aNShPK2Vwme/zk2gTUkLqO4cIJ6GA
+	6ucEKlcOecYRCD0NSSsLAuCWscZMSvv8qDEcHOKuJ8QAC4Up/6RlS/onycOhJzjtUo6y+bqAxVc
+	YKxwP098puO0mCxk5Fj/MKciKym1Do6LY+6e/q4Uy8g/DLhI1X/lULqb4rS+XUx6W0Qph3L5Afa
+	7wKe0m6lG/bdWnAmnaVxIB6seYdUV/Tlolm6D2uFURQ+DS7LIZyjEtTpzmSpXPBvNrI/S6Az+Mq
+	leLzF17tVjj76lobHtaTtoc8VBr0
+X-Received: by 2002:a05:6000:400b:b0:3a5:1cc5:4a17 with SMTP id ffacd0b85a97d-3b49aa7d51dmr6564058f8f.42.1751895773409;
+        Mon, 07 Jul 2025 06:42:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFY8SiQF+6f5+bf4//S2AtBghoAdxNERSqvvMXKZJvwoNLtCvWhRhxkkv/MOEbunhybnSwajg==
+X-Received: by 2002:a05:6000:400b:b0:3a5:1cc5:4a17 with SMTP id ffacd0b85a97d-3b49aa7d51dmr6564020f8f.42.1751895772808;
+        Mon, 07 Jul 2025 06:42:52 -0700 (PDT)
 Received: from sgarzare-redhat ([193.207.144.135])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b47285c9f9sm10339166f8f.93.2025.07.07.06.40.37
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454a997b492sm140318785e9.13.2025.07.07.06.42.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jul 2025 06:40:39 -0700 (PDT)
-Date: Mon, 7 Jul 2025 15:40:31 +0200
+        Mon, 07 Jul 2025 06:42:52 -0700 (PDT)
+Date: Mon, 7 Jul 2025 15:42:45 +0200
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: Xuewei Niu <niuxuewei97@gmail.com>
 Cc: "K. Y. Srinivasan" <kys@microsoft.com>, 
@@ -89,7 +89,7 @@ Cc: "K. Y. Srinivasan" <kys@microsoft.com>,
 	linux-kernel@vger.kernel.org, Xuewei Niu <niuxuewei.nxw@antgroup.com>, fupan.lfp@antgroup.com
 Subject: Re: [PATCH net-next v5 1/4] hv_sock: Return the readable bytes in
  hvs_stream_has_data()
-Message-ID: <xhzslzuxrhdoixffmzwprn254ctolimj7giuxj4nfrfg23eesy@ycpe6kma5vih>
+Message-ID: <xphwpqqi42w5b3jug3vfooybrlft3z5ewravl7jvzci7ogs3nh@5i7yi66dg7fa>
 References: <20250706-siocinq-v5-0-8d0b96a87465@antgroup.com>
  <20250706-siocinq-v5-1-8d0b96a87465@antgroup.com>
 Precedence: bulk
@@ -103,22 +103,6 @@ Content-Disposition: inline
 In-Reply-To: <20250706-siocinq-v5-1-8d0b96a87465@antgroup.com>
 
 On Sun, Jul 06, 2025 at 12:36:29PM +0800, Xuewei Niu wrote:
-
-Again, this patch should have `From: Dexuan Cui <decui@microsoft.com>` 
-on first line, and this is done automatically by `git format-patch` (or 
-others tools) if the author is the right one in your branch.
-I'm not sure what is going on on your side, but you should avoid to 
-reset the original author.
-Applying this patch we will have:
-
-     commit ed36075e04ecbb1dd02a3d8eba5bfac6469d73e4
-     Author: Xuewei Niu <niuxuewei97@gmail.com>
-     Date:   Sun Jul 6 12:36:29 2025 +0800
-
-         hv_sock: Return the readable bytes in hvs_stream_has_data()
-
-This is not what we want, right?
-
 >When hv_sock was originally added, __vsock_stream_recvmsg() and
 >vsock_stream_has_data() actually only needed to know whether there
 >is any readable data or not, so hvs_stream_has_data() was written to
@@ -135,6 +119,9 @@ This is not what we want, right?
 >the next host-to-guest VMBus hv_sock packet.
 >
 >Note: there may be multpile incoming hv_sock packets pending in the
+
+s/multpile/multiple
+
 >VMBus channel's ringbuffer, but so far there is not a VMBus API that
 >allows us to know all the readable bytes in total without reading and
 >caching the payload of the multiple packets, so let's just return the
@@ -144,12 +131,6 @@ This is not what we want, right?
 >understand the VMBus packet format and parse the packets directly.
 >
 >Signed-off-by: Dexuan Cui <decui@microsoft.com>
-
-Your S-o-b was fine here, I was talking about the author.
-
-Thanks,
-Stefano
-
 >---
 > net/vmw_vsock/hyperv_transport.c | 17 ++++++++++++++---
 > 1 file changed, 14 insertions(+), 3 deletions(-)
