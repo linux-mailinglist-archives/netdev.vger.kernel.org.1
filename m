@@ -1,144 +1,123 @@
-Return-Path: <netdev+bounces-204485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FAB1AFACF5
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 09:21:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 856CEAFACF8
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 09:21:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A67A7176A0B
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 07:21:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 287DE18979C7
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 07:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD6F28641F;
-	Mon,  7 Jul 2025 07:21:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E096D28643A;
+	Mon,  7 Jul 2025 07:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D0UyZRAt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XJitShrA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3979C21CA08
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 07:21:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9BF627F019;
+	Mon,  7 Jul 2025 07:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751872895; cv=none; b=IuD4IExp3FNrjTc21S7Qy3OhT3mCk391QUo2lxvV5bRJCEBADNczypR+Yu5uja8v8rIQTHTIMploSSOuofX5ozU21QXNRSEohvRUPaHt8UIYR6MStdtB8u6R1LeaPqzlVW1eBM7gfkkkxAbMnHs0ChcgPZa5UGSUjmxEcI2hg7Q=
+	t=1751872901; cv=none; b=Ez4tstii6c17HkEb9B8I7CNfNTSX2EgylOg8VnvrBVazoZByHS1bCJhFlDkpGhta92H17nVyqd4P7Gp00EKD67El55Xz1P7cNJkPtd6if77J2/xXGfHXyBshRKrpiqLAjRZu5driodw+sGmE3OfKm3hZbPWqJ984dAAW1w/c3XU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751872895; c=relaxed/simple;
-	bh=qxc/X70pqNaJOhCIrlhit0fU5Btv3EL3u2/8T9VYUKY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WNBLuq1eUfTzMquTT6kzLqqzi5Z1mVwYiihELlqwYaRLD+kKgqlvzkxZ0BZ+i7yZ3X3QWXtYgK83/hGaH/oIj/Vu5vkOZs8C22bi1XlzdFkYkIysqLC1NJZ8lGVNWS3dCuHmMe0ypunuquJamkBBxn4b02zj8riWaMJQgYGQupI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D0UyZRAt; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4a818ed5b51so20124831cf.1
-        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 00:21:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751872890; x=1752477690; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qxc/X70pqNaJOhCIrlhit0fU5Btv3EL3u2/8T9VYUKY=;
-        b=D0UyZRAtT/QiYh5tgF46Ejr1kqfHQDLVm3ljY+k25/eUpYRPc+DFfhL5KvZrntoZLn
-         bVyd6X8vg+tju5js82pIDEAKNYZgdJiFyUa9sDhqw3VZoML7Pn9hTA7N5UdwS6WxsxnU
-         tU+rFOThkcGZgcBxKMqmexkRIMPynt9uf/ZrqO82heZNi2QYiHeqbstLPP0qvlth6xF+
-         JGMnjlibnjcwskMY8t8hlG2dcvcsxN/Np7Qw6wfHklH9T/wz5i1ovWKP/0YTTFtTqMmV
-         Cu9IQj682lnOg5SCowVIro0DCW8MU0itJSN2pa/wAlojDo/101kTDWtBR2P6lPDHwoYF
-         bC6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751872890; x=1752477690;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qxc/X70pqNaJOhCIrlhit0fU5Btv3EL3u2/8T9VYUKY=;
-        b=YVLx2r8SU3yF2ASMHYRBvBQ8qYclsY3tAMleKjlRe5sj9sDgL653ioKg5CuCC80qjW
-         xjbuw0eQHfwL3MChhS+Eb7RCRkza4+prgPAG4H+6OXdaSQKmmhjwNa30KqUvErw+rt+a
-         70kZjSKjWjlk/7gcYfq9TzNvQaiskSXAhSqruxdou5AbFnSusZyiKaVqMO67UdB2Eox7
-         M+J5pgTF3ocV23va5C98fJpykoIpFgXYco5bQCtXwZt+vB7ni1OnpLzbDjiyrfpWZP2H
-         yAhDMtupJxhgfuDY0pc24Y2/cyvw3AYhcYEsJnzhXz12ZIgjR7B/SUH8OTSsNwR2AitM
-         azEA==
-X-Gm-Message-State: AOJu0YxEMly2ERJVusGMHymLW+nzczF3fZf7JhpS5i0mfTTxm6Po/klC
-	ZLXc9PlLNM9WrZaOzqi/QFtC7pFCpHQx/npuA/rzh/qKqn0h9JQWTFnzDDj5Rtoq1qMwvhC86dQ
-	aVD5N60QXWn9FlADwEqam9Bh8AFMCL/SLyxMb+14d
-X-Gm-Gg: ASbGncs8mwBrhzuitdM5zr+RjgnehDGBU+hQ7SZWleoZJnEFJKbTTTwZtKYytYdKV+9
-	nf8joPpQpUxXnpZemgZDbV85y8jONbd2o44gZsD1Zmsj3OAZSrtKTFtSflG9xbVQyyMPZTnDOAE
-	S7CV6a9D5wrixhEF4pzXl11WcvwhzIYnzbJgvZoxDw+A==
-X-Google-Smtp-Source: AGHT+IG7wr5dEGh6h9pfxfRWkI384hQypq8lNPyCGN36O3Fa3+8sw2G/22BonIyraYeaEv0BoxQTe/Ssj2U6AuOxCXo=
-X-Received: by 2002:a05:622a:15cb:b0:4a7:6e64:a52b with SMTP id
- d75a77b69052e-4a9987f8adamr167676801cf.35.1751872889643; Mon, 07 Jul 2025
- 00:21:29 -0700 (PDT)
+	s=arc-20240116; t=1751872901; c=relaxed/simple;
+	bh=Tqrxaf8t756E8EVWDsGNzCk1d4o7iofq8FADaSeASks=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c6eKDJ2L2KptYj4tvrsWJbb23kVGnT7w3Ly+hrHAYTZreLEdrlGctjAq7tfj1qwEtdROkElzvh1HTnbru+bo0+XmU0iXJV46zDDtnZT1aMnDK1uMV8LUXXjpnn11DMBgjr9or8nivLoMQ//N1eRVdMveJ6H1lyseJkzLEHmSXqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XJitShrA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89757C4CEE3;
+	Mon,  7 Jul 2025 07:21:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751872901;
+	bh=Tqrxaf8t756E8EVWDsGNzCk1d4o7iofq8FADaSeASks=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XJitShrAZtSYAU7TL0LPjb6yKeGuWJS8qyRPiD5ntRiocMfbqualW+a8wp0KJ8Y50
+	 zju/7VfmkBXOMXu3LugmJonPg8ya+dmLeYZ6UFVfWKN/mnrdWpMlggQvJRYMHi7+2V
+	 EB/93l6iQTmYEfjalcvIwi+gA0tn+VoBpfXqe1A5odSoaExTVzJ5MLrdSqVChZhZDf
+	 P1Igz8hz+dy5q8/GrR1WLRmkfd0Ljtk9Mr35cg/jOrrjNRqPv1jCG0XVim/ktvfXc+
+	 1+Z5TgYjEBT9tncovWuWW1V8aO0EnfRkWx8zX2X1pWydAxhMjl9urGnjkE21Ixg1fz
+	 UhLE++1rh0QNg==
+Date: Mon, 7 Jul 2025 10:21:37 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Abhijit Gangurde <abhijit.gangurde@amd.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, shannon.nelson@amd.com,
+	brett.creeley@amd.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+	andrew+netdev@lunn.ch, allen.hubbe@amd.com, nikhil.agarwal@amd.com,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Andrew Boyer <andrew.boyer@amd.com>
+Subject: Re: [PATCH v3 10/14] RDMA/ionic: Register device ops for control path
+Message-ID: <20250707072137.GU6278@unreal>
+References: <20250624121315.739049-1-abhijit.gangurde@amd.com>
+ <20250624121315.739049-11-abhijit.gangurde@amd.com>
+ <20250701103844.GB118736@unreal>
+ <20250702131803.GB904431@ziepe.ca>
+ <20250702180007.GK6278@unreal>
+ <bb0ac425-2f01-b8c7-2fd7-4ecf9e9ef8b1@amd.com>
+ <20250704170807.GO6278@unreal>
+ <15b773a4-424b-4aa9-2aa4-457fbbee8ec7@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250707054112.101081-1-jiayuan.chen@linux.dev>
-In-Reply-To: <20250707054112.101081-1-jiayuan.chen@linux.dev>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 7 Jul 2025 00:21:18 -0700
-X-Gm-Features: Ac12FXxxeKN13WecyDKW9_C_Pkuorhiq_652hNh4S6bIhPzhaSIolIIPI1t4jqA
-Message-ID: <CANn89iLRxmaj=Tc__BbK=AaauTKm0Mvb_SxQmaFb=xdj+kQu_A@mail.gmail.com>
-Subject: Re: [PATCH net-next v4] tcp: Correct signedness in skb remaining
- space calculation
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, mrpre@163.com, 
-	syzbot+de6565462ab540f50e47@syzkaller.appspotmail.com, 
-	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Howells <dhowells@redhat.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <15b773a4-424b-4aa9-2aa4-457fbbee8ec7@amd.com>
 
-On Sun, Jul 6, 2025 at 10:41=E2=80=AFPM Jiayuan Chen <jiayuan.chen@linux.de=
-v> wrote:
->
-> Syzkaller reported a bug [1] where sk->sk_forward_alloc can overflow.
->
-> When we send data, if an skb exists at the tail of the write queue, the
-> kernel will attempt to append the new data to that skb. However, the code
-> that checks for available space in the skb is flawed:
-> '''
-> copy =3D size_goal - skb->len
-> '''
->
-> The types of the variables involved are:
-> '''
-> copy: ssize_t (s64 on 64-bit systems)
-> size_goal: int
-> skb->len: unsigned int
-> '''
->
-> Due to C's type promotion rules, the signed size_goal is converted to an
-> unsigned int to match skb->len before the subtraction. The result is an
-> unsigned int.
->
-> When this unsigned int result is then assigned to the s64 copy variable,
-> it is zero-extended, preserving its non-negative value. Consequently, cop=
-y
-> is always >=3D 0.
->
-> Assume we are sending 2GB of data and size_goal has been adjusted to a
-> value smaller than skb->len. The subtraction will result in copy holding =
-a
-> very large positive integer. In the subsequent logic, this large value is
-> used to update sk->sk_forward_alloc, which can easily cause it to overflo=
-w.
->
-> The syzkaller reproducer uses TCP_REPAIR to reliably create this
-> condition. However, this can also occur in real-world scenarios. The
-> tcp_bound_to_half_wnd() function can also reduce size_goal to a small
-> value. This would cause the subsequent tcp_wmem_schedule() to set
-> sk->sk_forward_alloc to a value close to INT_MAX. Further memory
-> allocation requests would then cause sk_forward_alloc to wrap around and
-> become negative.
->
-> [1]: https://syzkaller.appspot.com/bug?extid=3Dde6565462ab540f50e47
->
-> Reported-by: syzbot+de6565462ab540f50e47@syzkaller.appspotmail.com
-> Fixes: 270a1c3de47e ("tcp: Support MSG_SPLICE_PAGES")
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+On Mon, Jul 07, 2025 at 10:57:13AM +0530, Abhijit Gangurde wrote:
+> 
+> On 7/4/25 22:38, Leon Romanovsky wrote:
+> > On Thu, Jul 03, 2025 at 12:49:30PM +0530, Abhijit Gangurde wrote:
+> > > On 7/2/25 23:30, Leon Romanovsky wrote:
+> > > > On Wed, Jul 02, 2025 at 10:18:03AM -0300, Jason Gunthorpe wrote:
+> > > > > On Tue, Jul 01, 2025 at 01:38:44PM +0300, Leon Romanovsky wrote:
+> > > > > > > +static void ionic_flush_qs(struct ionic_ibdev *dev)
+> > > > > > > +{
+> > > > > > > +	struct ionic_qp *qp, *qp_tmp;
+> > > > > > > +	struct ionic_cq *cq, *cq_tmp;
+> > > > > > > +	LIST_HEAD(flush_list);
+> > > > > > > +	unsigned long index;
+> > > > > > > +
+> > > > > > > +	/* Flush qp send and recv */
+> > > > > > > +	rcu_read_lock();
+> > > > > > > +	xa_for_each(&dev->qp_tbl, index, qp) {
+> > > > > > > +		kref_get(&qp->qp_kref);
+> > > > > > > +		list_add_tail(&qp->ibkill_flush_ent, &flush_list);
+> > > > > > > +	}
+> > > > > > > +	rcu_read_unlock();
+> > > > > > Same question as for CQ. What does RCU lock protect here?
+> > > > > It should protect the kref_get against free of qp. The qp memory must
+> > > > > be RCU freed.
+> > > > I'm not sure that this was intension here. Let's wait for an answer from the author.
+> > > As Jason mentioned, It was intended to protect the kref_get against free of
+> > > cq and qp
+> > > in the destroy path.
+> > How is it possible? IB/core is supposed to protect from accessing verbs
+> > resources post their release/destroy.
+> > 
+> > After you answered what RCU is protecting, I don't see why you would
+> > have custom kref over QP/CQ/e.t.c objects.
+> > 
+> > Thanks
+> The RCU protected kref here is making sure that all the hw events are
+> processed before destroy callback returns. Similarly, when driver is
+> going for ib_unregister_device, it is draining the pending WRs and events.
 
-Reviewed-by : Eric Dumazet <edumazet@google.com>
+I asked why do you have kref in first place? When ib_unregister_device
+is called all "pending MR" already supposed to be destroyed.
+
+Thansk
+
+> 
+> Thanks,
+> Abhijit
+> 
+> 
 
