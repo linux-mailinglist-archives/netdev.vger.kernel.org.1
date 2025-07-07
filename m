@@ -1,162 +1,424 @@
-Return-Path: <netdev+bounces-204502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 030FFAFAEC0
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 10:38:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C739AAFAECB
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 10:41:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A9567A4A7F
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 08:37:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 568F17AA67E
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 08:40:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4644C28B414;
-	Mon,  7 Jul 2025 08:38:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B918D28A3F3;
+	Mon,  7 Jul 2025 08:41:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="M9HPD12S"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DYtrl365"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90DEE28A731
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 08:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCA628BAA5
+	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 08:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751877527; cv=none; b=SVabUnmFXIs6Gac1jmUiMRNH+TXFVknVpJEfj42kQa+NGrIaf5ilpAJcOxa7sPOS4qL2+bmA/UARGLsO8hY3i/VtA29SSByP9W0GXCMsJQp/M2nnvg+gwbED6IH7hQLJdDU+kIAz/cFhKaV3KzrGckxzaPzUj7jPKvOnwYuxOqg=
+	t=1751877674; cv=none; b=XI5HNU3Drkc+xVXULj2rfxTcjxkH3B1o6qIF8XFHouHIwsADpHuq7yauibQxnvH4LAOcfEVFnRwzToGhsNz90X1+HGIV0YhrBS78Ny1dSU10oUGCIWyxKk0GUFZgXlTlZnozSxD+VWD1tcj2H8KcGlVMZQrL6AY0sQ7R9uD+25c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751877527; c=relaxed/simple;
-	bh=9xBalXmnJgD4RmmIV/V6wnjZTZ9oSv6heR/g4f/2kZA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W8l/9fYCWDuEuj5c151YhuvQQbJBy4S3MqMNbJ7pVLosmHEsqPkM1o0/cWLQQ3yMvkDBTzhF6LsqZENeMZrUsKv0iWOfDo0XYKd/AxucDW94Xdtbc1D32Jx8JXMvhCKheyTbLY2+agLvjcN5OcQTPQb12U4MFL3pmfV6chAj6hE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=M9HPD12S; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3a6cdc27438so2340269f8f.2
-        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 01:38:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1751877524; x=1752482324; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7aL18uBiZMw/FWxoKoVSvm/jRO6BDbywt1DvLbU3XB8=;
-        b=M9HPD12SaZJS9ElrYZwvnTw1s9jInt7WNp/e8hYRFlSnM4NDnrHzWfQYvbvlxkqqVN
-         0FJtHpS55fXWw2A57xnWoo+lTBHYbEqOpjHuxsz6RZHbP/F8Kqjsfu30EyciP0XVnJG3
-         q80/A3D/4XrbljezffxiAYrodcZFgGgJ5JkT60z1COEcD11IjPPyrvrfLmJau/RFsT30
-         f3IQlO5uw4QMS2FwYvp32AThq4nf3Ll/qhA+zjecWJnjD8P4f68JenX0qZI2Jw6aFZg8
-         Tk62dIhYC8n/ZEAIfPmKKUgxgh8/9IkW54z8hViYhdqcNzGT9B7Rg32g6s8CogXw2xiH
-         rWPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751877524; x=1752482324;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7aL18uBiZMw/FWxoKoVSvm/jRO6BDbywt1DvLbU3XB8=;
-        b=WOtyVU2qzA9kUPRTXThYnoeFl1Qry5IetCF0u1qzwZxNk60VsmsWAmQ+uSFy9ipWdN
-         FzNx7OWuXTi7jgVDY/z8N9d0MOaIeH0IEsS/AFgIJUKyIGw1hFN7I+2yg15NHhNZkznK
-         794HRuSxUcaA3SyeoLLcPf6LT1KYPujOV4y/Fn48tCBjwgzoEVgFv0mhS42YcHLFtw+/
-         n/0fOP9g0V87CJvntzWQAAOJ5aPQgQFWUGbgHLk5vfbYq5qqVCv2foclopQgIOcWibnj
-         dmyVys3DDQltFf5YJXUjdaJ0snKsWEL53/n31wx3X43VJuwxcMcQuBzOmDxSnHsljFqu
-         qPOA==
-X-Gm-Message-State: AOJu0YySg8JWEZMbUWZJf+mS/Eb9dvwRPN/e9Np8GpI2wHFYJ78gY4sy
-	L5EHc1iirbWt6hTaSAl8uZfBZ7jGyk1avcytqcLUc7wP/kK8l0fuIWcqAEVR1nw5Q1s=
-X-Gm-Gg: ASbGncsgZe7Vcc6n75Cbc9Www0UqCHYILOwrxwOErMg87Mq5JUHXgF70xIAt5Ii3o74
-	fADmjOID/5M0LfgvjCAd53lVnvmMtNsOCw02CQIrfREk8D/9kAfVrZWM8fNrrSuq67F/2+KBJjD
-	k6JrHXcqzhM+pnwBrQRB7kcMEycNt8W9pYM4UIK8cvTyhW7KPQer4TfSOWI4zJksJGW6NlYSrYy
-	KSV+7or2X++s7NAORW0zBcBba2JoGjZRztd7HX+QSOqGi6H3bE9WmgBN0VaM0vNEOlE8HYhJ2f9
-	urEshcZBKhC+elGfrC2d7uK+mqCr6PRHuxeBFBRQ4f/WwLZ6E8qxDkEzdmiSGNg=
-X-Google-Smtp-Source: AGHT+IHOL134zxv2M5TIxjn1JcbIuqigNn/BoslUPqMt07/pkuCY3NvzphTd4fkc6LrVVlovNM0TJQ==
-X-Received: by 2002:a05:6000:24c9:b0:3a5:541c:b40f with SMTP id ffacd0b85a97d-3b49700c57cmr9041350f8f.9.1751877523572;
-        Mon, 07 Jul 2025 01:38:43 -0700 (PDT)
-Received: from jiri-mlt ([85.163.81.98])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454b1696ca8sm106595425e9.28.2025.07.07.01.38.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jul 2025 01:38:43 -0700 (PDT)
-Date: Mon, 7 Jul 2025 10:38:41 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Prathosh Satish <Prathosh.Satish@microchip.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Shannon Nelson <shannon.nelson@amd.com>, Dave Jiang <dave.jiang@intel.com>, 
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>, 
-	Petr Oros <poros@redhat.com>
-Subject: Re: [PATCH net-next v13 00/12] Add Microchip ZL3073x support (part 1)
-Message-ID: <cuqmu4cy52vj3njjltr3uf3ozsnmnhmo7v4lzzztftvupnf5wu@eekmg4a2wkla>
-References: <20250704182202.1641943-1-ivecera@redhat.com>
+	s=arc-20240116; t=1751877674; c=relaxed/simple;
+	bh=n4K8sTkcd70US6I93sLm1Ycf4p3o5su04bwLYUAnk0U=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=UjMOCeSzbPkkwdIUmMCJ9WEKTwNdtUo/JPc5pAcb3HNZbdJhfg7swlnoY4Sexa5RvhqzvbNCKr1CPqXgExWoBDt78Ipshw39yDttQpNOIpCuObbJJ/agtFp6M/TwlNgeE7GGmDyi+xQ9eD+V0lFxmT4ozn2RtKY7a1SJyUsso8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DYtrl365; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751877671;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l3xHQ8BSgPt/jlZ3R6F0MT30EQibaCu2QcMe6rwL1Oo=;
+	b=DYtrl365WE1WMKGEEPaKHwB4NWCrNi9uWbK8Hg7MG9RkEi7cykxyNauIK3b31Xaq100YlZ
+	MgdrAj6ZQ15O8W7yw4rvcsHD9AmRoxeWHNghXnY3oP0No1Lyj15Qh7dQminpgegQZlwvGi
+	/c4ncFoh23dB9X6vV3u7hdz1eqyocYM=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-18-yY1QVG9mPyijInsNMp77sQ-1; Mon,
+ 07 Jul 2025 04:41:09 -0400
+X-MC-Unique: yY1QVG9mPyijInsNMp77sQ-1
+X-Mimecast-MFC-AGG-ID: yY1QVG9mPyijInsNMp77sQ_1751877666
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B5B201809C8A;
+	Mon,  7 Jul 2025 08:41:05 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.81])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8287718FFCA6;
+	Mon,  7 Jul 2025 08:40:47 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <cover.1751743914.git.lucien.xin@gmail.com>
+References: <cover.1751743914.git.lucien.xin@gmail.com>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net,
+    kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+    Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>,
+    Tyler Fanelli <tfanelli@redhat.com>,
+    Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
+    Steve French <smfrench@gmail.com>,
+    Namjae Jeon <linkinjeon@kernel.org>,
+    Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
+    kernel-tls-handshake@lists.linux.dev,
+    Chuck Lever <chuck.lever@oracle.com>,
+    Jeff Layton <jlayton@kernel.org>,
+    Benjamin Coddington <bcodding@redhat.com>,
+    Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+    Alexander Aring <aahringo@redhat.com>,
+    Cong Wang <xiyou.wangcong@gmail.com>,
+    "D . Wythe" <alibuda@linux.alibaba.com>,
+    Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>,
+    Sabrina Dubroca <sd@queasysnail.net>,
+    Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+    Daniel Stenberg <daniel@haxx.se>,
+    Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: Re: [PATCH net-next 00/15] net: introduce QUIC infrastructure and core subcomponents
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250704182202.1641943-1-ivecera@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 07 Jul 2025 09:40:44 +0100
+Message-ID: <2334439.1751877644@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Fri, Jul 04, 2025 at 08:21:50PM +0200, ivecera@redhat.com wrote:
->Add support for Microchip Azurite DPLL/PTP/SyncE chip family that
->provides DPLL and PTP functionality. This series bring first part
->that adds the core functionality and basic DPLL support.
->
->The next part of the series will bring additional DPLL functionality
->like eSync support, phase offset and frequency offset reporting and
->phase adjustments.
->
->Testing was done by myself and by Prathosh Satish on Microchip EDS2
->development board with ZL30732 DPLL chip connected over I2C bus.
->
->---
->Changelog:
->v13:
->* added support for u64 devlink parameters
->* added support for generic devlink parameter 'clock_id'
->* several patches squashed into one per @jpirko's advice
->* renamed devlink version 'cfg.custom_ver' to 'custom_cfg'
->* per discussion with @jpirko, the clock_id is now generated randomly
->  and user have an option to change it via devlink
->* implemented devlink reload to apply clock_id change
->
->v12:
->* Using 'return dev_err_probe()'
->* Separate zl3073x_chip_info structures instead of array
->* Use mul_u64_u32_div() to compute input reference frequency to avoid
->  potential overflow
->* Removed superfluous check in zl3073x_dpll_output_pin_frequency_set()
->
->v11:
->* Fixed uninitialized 'rc' in error-path in patch 9
->
->v10:
->* Usage of str_enabled_disabled() where possible.
->
->v9:
->After discussion with Jakub Kicinski we agreed that it would be better
->to implement whole functionality in a single driver without touching
->MFD sub-system. Besides touching multiple sub-systems by single device
->there are also some technical issues that are easier resolvable
->in a single driver. Additionally the firmware flashing functionality
->would bring more than 1000 lines of code with previous approach to
->the MFD driver - it is not something the MFD maintainers would like
->to see.
->
->Ivan Vecera (12):
->  dt-bindings: dpll: Add DPLL device and pin
->  dt-bindings: dpll: Add support for Microchip Azurite chip family
->  devlink: Add support for u64 parameters
->  devlink: Add new "clock_id" generic device param
->  dpll: Add basic Microchip ZL3073x support
->  dpll: zl3073x: Fetch invariants during probe
->  dpll: zl3073x: Read DPLL types and pin properties from system firmware
->  dpll: zl3073x: Register DPLL devices and pins
->  dpll: zl3073x: Implement input pin selection in manual mode
->  dpll: zl3073x: Add support to get/set priority on input pins
->  dpll: zl3073x: Implement input pin state setting in automatic mode
->  dpll: zl3073x: Add support to get/set frequency on pins
 
-For the DPLL related code:
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Xin Long <lucien.xin@gmail.com> wrote:
+
+> Introduction
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> The QUIC protocol, as defined in RFC9000, offers a UDP-based, secure
+> transport with flow-controlled streams for efficient communication,
+> low-latency connection setup, and network path migration, ensuring
+> confidentiality, integrity, and availability across various deployments.
+>=20
+> This implementation introduces QUIC support in Linux Kernel, offering
+> several key advantages:
+>=20
+> - Seamless Integration for Kernel Subsystems: Kernel subsystems such as
+>   SMB and NFS can operate over QUIC seamlessly after the handshake,
+>   leveraging the net/handshake APIs.
+>=20
+> - Standardized Socket APIs for QUIC: This implementation standardizes the
+>   socket APIs for QUIC, covering essential operations like listen, accept,
+>   connect, sendmsg, recvmsg, close, get/setsockopt, and getsock/peername(=
+).
+>=20
+> - Efficient ALPN Routing: It incorporates ALPN routing within the kernel,
+>   efficiently directing incoming requests to the appropriate applications
+>   across different processes based on ALPN.
+>=20
+> - Performance Enhancements: By minimizing data duplication through
+>   zero-copy techniques such as sendfile(), and paving the way for crypto
+>   offloading in NICs, this implementation enhances performance and prepar=
+es
+>   for future optimizations.
+>=20
+> This implementation offers fundamental support for the following RFCs:
+>=20
+> - RFC9000 - QUIC: A UDP-Based Multiplexed and Secure Transport
+> - RFC9001 - Using TLS to Secure QUIC
+> - RFC9002 - QUIC Loss Detection and Congestion Control
+> - RFC9221 - An Unreliable Datagram Extension to QUIC
+> - RFC9287 - Greasing the QUIC Bit
+> - RFC9368 - Compatible Version Negotiation for QUIC
+> - RFC9369 - QUIC Version 2
+>=20
+> The socket APIs for QUIC follow the RFC draft [1]:
+>=20
+> - The Sockets API Extensions for In-kernel QUIC Implementations
+>=20
+> Implementation
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> The core idea is to implement QUIC within the kernel, using a userspace
+> handshake approach.
+>=20
+> Only the processing and creation of raw TLS Handshake Messages are handled
+> in userspace, facilitated by a TLS library like GnuTLS. These messages are
+> exchanged between kernel and userspace via sendmsg() and recvmsg(), with
+> cryptographic details conveyed through control messages (cmsg).
+>=20
+> The entire QUIC protocol, aside from the TLS Handshake Messages processing
+> and creation, is managed within the kernel. Rather than using a Upper Lay=
+er
+> Protocol (ULP) layer, this implementation establishes a socket of type
+> IPPROTO_QUIC (similar to IPPROTO_MPTCP), operating over UDP tunnels.
+>=20
+> For kernel consumers, they can initiate a handshake request from the kern=
+el
+> to userspace using the existing net/handshake netlink. The userspace
+> component, such as tlshd service [2], then manages the processing
+> of the QUIC handshake request.
+>=20
+> - Handshake Architecture:
+>=20
+>   =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=90  =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=90
+>   =E2=94=82 APP1 =E2=94=82  =E2=94=82 APP2 =E2=94=82 ...
+>   =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=98  =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=98
+>   =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=90
+>   =E2=94=82     {quic_client/server_handshake()}     =E2=94=82<=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=90
+>   =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=98       =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=90
+>    {send/recvmsg()}      {set/getsockopt()}          =E2=94=82    tlshd  =
+  =E2=94=82
+>    [CMSG handshake_info] [SOCKOPT_CRYPTO_SECRET]     =E2=94=94=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98
+>                          [SOCKOPT_TRANSPORT_PARAM_EXT]    =E2=94=82   ^
+>                 =E2=94=82 ^                  =E2=94=82 ^                 =
+ =E2=94=82   =E2=94=82
+>   Userspace     =E2=94=82 =E2=94=82                  =E2=94=82 =E2=94=82 =
+                 =E2=94=82   =E2=94=82
+>   =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=82=E2=94=80=
+=E2=94=82=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=82=E2=94=80=E2=94=82=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=82=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=82=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80
+>   Kernel        =E2=94=82 =E2=94=82                  =E2=94=82 =E2=94=82 =
+                 =E2=94=82   =E2=94=82
+>                 v =E2=94=82                  v =E2=94=82                 =
+ v   =E2=94=82
+>   =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=AC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=90       =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=90
+>   =E2=94=82 protocol, timer, =E2=94=82 socket (IPPROTO_QUIC) =E2=94=82<=
+=E2=94=80=E2=94=80=E2=94=90   =E2=94=82 handshake   =E2=94=82
+>   =E2=94=82                  =E2=94=9C=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=A4   =E2=94=82   =E2=94=82netlink APIs =E2=
+=94=82
+>   =E2=94=82 common, family,  =E2=94=82 outqueue  |  inqueue  =E2=94=82   =
+=E2=94=82   =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98
+>   =E2=94=82                  =E2=94=9C=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=A4   =E2=94=82      =E2=94=82       =E2=94=82
+>   =E2=94=82 stream, connid,  =E2=94=82         frame         =E2=94=82   =
+=E2=94=82   =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=90=
+ =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=90
+>   =E2=94=82                  =E2=94=9C=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=A4   =E2=94=82   =E2=94=82     =E2=94=82 =E2=
+=94=82     =E2=94=82
+>   =E2=94=82 path, pnspace,   =E2=94=82         packet        =E2=94=82   =
+=E2=94=82=E2=94=80=E2=94=80=E2=94=80=E2=94=82 SMB =E2=94=82 =E2=94=82 NFS =
+=E2=94=82...
+>   =E2=94=82                  =E2=94=9C=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=A4   =E2=94=82   =E2=94=82     =E2=94=82 =E2=
+=94=82     =E2=94=82
+>   =E2=94=82 cong, crypto     =E2=94=82       UDP tunnels     =E2=94=82   =
+=E2=94=82   =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98=
+ =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98
+>   =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=B4=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=98   =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=B4=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=98
+>=20
+> - User Data Architecture:
+>=20
+>   =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=90  =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=90
+>   =E2=94=82 APP1 =E2=94=82  =E2=94=82 APP2 =E2=94=82 ...
+>   =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=98  =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=98
+>    {send/recvmsg()}   {set/getsockopt()}              {recvmsg()}
+>    [CMSG stream_info] [SOCKOPT_KEY_UPDATE]            [EVENT conn update]
+>                       [SOCKOPT_CONNECTION_MIGRATION]  [EVENT stream updat=
+e]
+>                       [SOCKOPT_STREAM_OPEN/RESET/STOP]
+>                 =E2=94=82 ^               =E2=94=82 ^                    =
+ ^
+>   Userspace     =E2=94=82 =E2=94=82               =E2=94=82 =E2=94=82    =
+                 =E2=94=82
+>   =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=82=E2=94=80=
+=E2=94=82=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=82=E2=94=80=E2=94=82=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=82=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80
+>   Kernel        =E2=94=82 =E2=94=82               =E2=94=82 =E2=94=82    =
+                 =E2=94=82
+>                 v =E2=94=82               v =E2=94=82  =E2=94=8C=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=98
+>   =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=AC=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=90
+>   =E2=94=82 protocol, timer, =E2=94=82 socket (IPPROTO_QUIC) =E2=94=82<=
+=E2=94=80=E2=94=80=E2=94=90{kernel_send/recvmsg()}
+>   =E2=94=82                  =E2=94=9C=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=A4   =E2=94=82{kernel_set/getsockopt()}
+>   =E2=94=82 common, family,  =E2=94=82 outqueue  |  inqueue  =E2=94=82   =
+=E2=94=82{kernel_recvmsg()}
+>   =E2=94=82                  =E2=94=9C=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=A4   =E2=94=82
+>   =E2=94=82 stream, connid,  =E2=94=82         frame         =E2=94=82   =
+=E2=94=82   =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=90=
+ =E2=94=8C=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=90
+>   =E2=94=82                  =E2=94=9C=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=A4   =E2=94=82   =E2=94=82     =E2=94=82 =E2=
+=94=82     =E2=94=82
+>   =E2=94=82 path, pnspace,   =E2=94=82         packet        =E2=94=82   =
+=E2=94=82=E2=94=80=E2=94=80=E2=94=80=E2=94=82 SMB =E2=94=82 =E2=94=82 NFS =
+=E2=94=82...
+>   =E2=94=82                  =E2=94=9C=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=A4   =E2=94=82   =E2=94=82     =E2=94=82 =E2=
+=94=82     =E2=94=82
+>   =E2=94=82 cong, crypto     =E2=94=82       UDP tunnels     =E2=94=82   =
+=E2=94=82   =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98=
+ =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=98
+>   =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=B4=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=98   =E2=94=94=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=B4=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=98
+>=20
+> Interface
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D
+>=20
+> This implementation supports a mapping of QUIC into sockets APIs. Similar
+> to TCP and SCTP, a typical Server and Client use the following system call
+> sequence to communicate:
+>=20
+>     Client                             Server
+>   =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80
+>   sockfd =3D socket(IPPROTO_QUIC)      listenfd =3D socket(IPPROTO_QUIC)
+>   bind(sockfd)                       bind(listenfd)
+>                                      listen(listenfd)
+>   connect(sockfd)
+>   quic_client_handshake(sockfd)
+>                                      sockfd =3D accecpt(listenfd)
+>                                      quic_server_handshake(sockfd, cert)
+>=20
+>   sendmsg(sockfd)                    recvmsg(sockfd)
+>   close(sockfd)                      close(sockfd)
+>                                      close(listenfd)
+>=20
+> Please note that quic_client_handshake() and quic_server_handshake()
+> functions are currently sourced from libquic [3]. These functions are
+> responsible for receiving and processing the raw TLS handshake messages
+> until the completion of the handshake process.
+>=20
+> For utilization by kernel consumers, it is essential to have tlshd
+> service [2] installed and running in userspace. This service receives
+> and manages kernel handshake requests for kernel sockets. In the kernel,
+> the APIs closely resemble those used in userspace:
+>=20
+>     Client                             Server
+>   =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=
+=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=
+=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=
+=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80
+>   __sock_create(IPPROTO_QUIC, &sock)  __sock_create(IPPROTO_QUIC, &sock)
+>   kernel_bind(sock)                   kernel_bind(sock)
+>                                       kernel_listen(sock)
+>   kernel_connect(sock)
+>   tls_client_hello_x509(args:{sock})
+>                                       kernel_accept(sock, &newsock)
+>                                       tls_server_hello_x509(args:{newsock=
+})
+>=20
+>   kernel_sendmsg(sock)                kernel_recvmsg(newsock)
+>   sock_release(sock)                  sock_release(newsock)
+>                                       sock_release(sock)
+>=20
+> Please be aware that tls_client_hello_x509() and tls_server_hello_x509()
+> are APIs from net/handshake/. They are used to dispatch the handshake
+> request to the userspace tlshd service and subsequently block until the
+> handshake process is completed.
+
+Can you please put this (or something like this) into Documentation/
+somewhere?
+
+Thanks,
+David
+
 
