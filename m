@@ -1,292 +1,190 @@
-Return-Path: <netdev+bounces-204492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCF5CAFAE50
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 10:14:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13971AFAE59
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 10:16:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 320B6188DE4A
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 08:14:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 581CF3A5855
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 08:15:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81A69288530;
-	Mon,  7 Jul 2025 08:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="HwPO4CAY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B70E1C5F14;
+	Mon,  7 Jul 2025 08:15:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from OS0P286CU010.outbound.protection.outlook.com (mail-japanwestazon11011066.outbound.protection.outlook.com [40.107.74.66])
+Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.77.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A0E19F421;
-	Mon,  7 Jul 2025 08:14:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.74.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751876051; cv=fail; b=Vo4Y/Xqv9uTxaIEH6zuZyszUzmoHr3RACXN5xsDXnv8zHhlFNYzdQTaUivAh/n0PjPUL5gj4//h+SbYHQbho2KMup4wJ0CGmhRs2VSkScu0YaM4mQTiUaE8l/KZcdn2dB+Ztm9+gZ/9NMuhsGtTHXmbXkdovoAE/9PL1Xa/O80Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751876051; c=relaxed/simple;
-	bh=9uuWrfGJlMBC6scX+hsYdzmmlRs0OdJ7wOy0MG+4X2M=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=QpbsEYZ90jPJC0mdssNGMRH/QwmDS3JsvbCxvLYSnjTMFs6iJDgyuva+ode0+ybT3Xq4GEpnah8cpnvBxwhUwk7r84X2gzVFv2PgFPNpX3OhMaDhkA/8AWeOqmWir4coJrG0GNCUSb86ToWZ6evd/3blJ7VnZt4un8tq6kCoxvc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b=HwPO4CAY; arc=fail smtp.client-ip=40.107.74.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nwp96xWqeJn1cDcaJuFWmhW629OzDUWdHc+g5b2v8Ps4EfqKcdMPDI9RxLPZiqogRvMkfPHYO1lYG0u3pAuYaviM6fBiOLGTaBfDjYi+T+9eWUd6nHzRtcolVLZSV66u69qDoBi9oiNUIXfhEA8uJBkBKIqoK0xU5C1woAKkosxVvaSfhxL8KNqhExducgwZuUvySsk0MvcLLR7wZ5nA0EITUWPlEZBI7e8oh51+a6mcHExxAyEyJ79/k59hIwjrN59HbTIxAMKL4NsqI7f56q48sKDdsJx2aGRXG2/O1j7OpZ7hVINv4HGbjMVJV4DWTvMk9JHuPoRzsjTfA7ggOw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iwLK/R7j+k3rJZanUyKHovHeXRylRI3cip3wsA2YmQc=;
- b=Qk1k7K4vG1M+R5Hi42YNUcGw1U0u0kBxUmZ+4DN3sDTZbJ5+sUD49cfv806wVT6WnyGKqgYo2693b93AlNnSXxQL8kEyvUG7fI/qzD5CrpSV8coMf9GIlRkalW2wNjA8/hm8K/CvUCZuHcAPxMDfUMKPWNOIk1pPYvImHHi9L2+9MeCVxklTcxYiZ+3M/spPEiXqqGp3G902SlWuWaksJr3zFBI+2VjotUBSdFEmoWx/NiwWFRwKki/jhEWZ2Cd8GMoIrTo0ShjsBW/oazQ7beofvDJYa0casmNiclor8iZZ/VF/JhUt73HtpiSwAIRK2L+YDrYyzSM/kGZeL8hi3w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
- dkim=pass header.d=renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iwLK/R7j+k3rJZanUyKHovHeXRylRI3cip3wsA2YmQc=;
- b=HwPO4CAYUnq60jxkoDWnsfxeMuB8lZiKnRfv9sRMwMs0kXD/UeAVEE6u/f18Zvev+RM1F/4s5VJHtvGkq25LcH/yFclNvon4zV+35crlhFU3axPkEM4/OZBTUj4Fdgy+8bb3EfBSqJPPW6qEc96EXU4MXZAs+ypTdgbsTADgAvI=
-Received: from TY4PR01MB14282.jpnprd01.prod.outlook.com (2603:1096:405:20d::9)
- by OSZPR01MB8322.jpnprd01.prod.outlook.com (2603:1096:604:182::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.25; Mon, 7 Jul
- 2025 08:14:04 +0000
-Received: from TY4PR01MB14282.jpnprd01.prod.outlook.com
- ([fe80::37ea:efd9:8ca0:706a]) by TY4PR01MB14282.jpnprd01.prod.outlook.com
- ([fe80::37ea:efd9:8ca0:706a%7]) with mapi id 15.20.8901.023; Mon, 7 Jul 2025
- 08:13:58 +0000
-From: Michael Dege <michael.dege@renesas.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C75172CCC8;
+	Mon,  7 Jul 2025 08:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.77.159
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751876158; cv=none; b=Kuxtvx6HSYBDvF8EwwKHE9npNQp42TCdvCoqUzxF4NTTPX7rm21u72SwXylsAkaR4ZLkSJus0hDGYmtZEbibOTP9GE4t6RXztJNh6Ec+UkLQ2iiHVUncbUH/XzCldVllQ8JUAXGvPXsQwoGnsdZQm3TMttoNazEdCBDQKbTgdSY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751876158; c=relaxed/simple;
+	bh=Dd9Xk6xGGd0ME7zXV2jEaLbAC4FI8QKMO0ycCC1LHgU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pGxGEE4W24Ex4WyRj2ec7FuNE/N++cEW3lhcgNj2nPPQ6L1DDLGzUvUMsTLV37Oj8n4795CFhijuamSY76Ct+fAROHXgcFpDThoxzolsd3LchwzyI+DKjpWruRuuSCWl3r2iJH6yyp3cF456SgJx7tRaS1S6SOTGnCWr0gBaYyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=114.132.77.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: esmtpsz21t1751876057t3b8668fe
+X-QQ-Originating-IP: vPFkWzDcFDHcvaKiIAy0Ih4IzObjBkvW/Dpqgv0ZlPo=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 07 Jul 2025 16:14:15 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 13134278031464448130
+Date: Mon, 7 Jul 2025 16:14:14 +0800
+From: Yibo Dong <dong100@mucse.com>
 To: Andrew Lunn <andrew@lunn.ch>
-CC: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	=?iso-8859-1?Q?Niklas_S=F6derlund?= <niklas.soderlund@ragnatech.se>, Paul
- Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Nikita
- Yushchenko <nikita.yoush@cogentembedded.com>
-Subject: RE: [PATCH 2/3] net: renesas: rswitch: add offloading for L2
- switching
-Thread-Topic: [PATCH 2/3] net: renesas: rswitch: add offloading for L2
- switching
-Thread-Index: AQHb7Ke36EG/7WihdkaygD+7FM6lAbQhpj+AgASrcpA=
-Date: Mon, 7 Jul 2025 08:13:58 +0000
-Message-ID:
- <TY4PR01MB14282FF28B33F6A0EAD5251F8824FA@TY4PR01MB14282.jpnprd01.prod.outlook.com>
-References: <20250704-add_l2_switching-v1-0-ff882aacb258@renesas.com>
- <20250704-add_l2_switching-v1-2-ff882aacb258@renesas.com>
- <64e7de61-c4ed-4b42-83c6-5001a9d28ec0@lunn.ch>
-In-Reply-To: <64e7de61-c4ed-4b42-83c6-5001a9d28ec0@lunn.ch>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TY4PR01MB14282:EE_|OSZPR01MB8322:EE_
-x-ms-office365-filtering-correlation-id: 421944cd-a438-49cb-cca7-08ddbd2e3923
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?J/0C7omPsODf4yQ8gg47MP96SOnORfnHbZXeqSKyEsle93Y2KTuXl9EzRj?=
- =?iso-8859-1?Q?1yZc3FxkT5wRCvN61FVwozqwt1KimuRViXQahVRScr3qYpJ+hMygDgKIPB?=
- =?iso-8859-1?Q?EtZ5phJW1y2qNwIpseyKxtvaQd3WZgiLRx7DXR2SdPZ5ylJHLRgkr6io3S?=
- =?iso-8859-1?Q?tO6J3Zz75hFhYP5PB+ENQ7S1l2J7AaecW/5VHenUcJtzq/9m8pkrIC8JGT?=
- =?iso-8859-1?Q?MoK/tETj6bou4kXMVUGWlATtVEJaT5OjVCRAsFFHn6SLsP1zlryqe3/J9I?=
- =?iso-8859-1?Q?VJp30/UhycMRRWPwc3mjj7vUAYHSAUmXPIEwwb4P6K4YvhRlin0o1RCRd/?=
- =?iso-8859-1?Q?zrYS7lXMwEVjRXEkklDEvEVAUO9/uzcEskPcoOpBMpTp7cKMAZZ7LMuWR9?=
- =?iso-8859-1?Q?8TAdXphyJuPhMu5FFU5MxqrgJsdGNdnWkd6PNhDuqDxupkCSw9nJhzJPU8?=
- =?iso-8859-1?Q?Pb5Omq6hfUlQz5FbMr4IJBHABk/k5Shu540h8ESEGpblIDA8CANqDBypBx?=
- =?iso-8859-1?Q?f8uh97/bVXoFiByQsHz9XEwf69eVj5lVvt4ZgITSlSnn2dc8dJwSjpkRDR?=
- =?iso-8859-1?Q?Sthw25be4B/aXW5ijZDA1cS1ctRGojrXNfHWGCJiovubg9SktiC7onySz4?=
- =?iso-8859-1?Q?NTbCdS/GfRCveWmVo9C3DxrxXrrD99vhjmCrFaM4/GN0nHOBIDNsWEBIem?=
- =?iso-8859-1?Q?4jOtfu/4DX1q7DzhR0Gvfu2ekEzqz0fcfGgJCrOSMOi9jVd8UHMoDcU34e?=
- =?iso-8859-1?Q?ppxmNF0FZRxnPWAkxO+Nt9yo6i52hVjIMQQG+/8kyta1eI7oF8wJLGIs8v?=
- =?iso-8859-1?Q?6qDgg8ybbDLU0XdgGy8mM6B4LFi/geYY4b8TlW4iobYJ8vAFq2gKJ0WHHn?=
- =?iso-8859-1?Q?WFlhPu20JC0UIrfq9Mbhp5AliRbM4tYETICid7raGQ+HO9tNLKCbmByIlV?=
- =?iso-8859-1?Q?B18TxAWkkUwgwLQaxtP++BMwfYhwTOVnE9H5Qbi7RanVWHhEuQA5oLxobk?=
- =?iso-8859-1?Q?cCqHKjN3FTyZJmFFzYo/4jc7VQz2pb+s0/Fr26f7Ub7d087XCRfs1tucjO?=
- =?iso-8859-1?Q?cbO2ifOJunm0tueiEZsCpYzj6qNPbQdUoGgaukY9ZCB1GPtvAjMmCYj6Ih?=
- =?iso-8859-1?Q?nVz8QNjuDxcb29OLAAw4hx6/pN+i2XmBT2h2sqsFwTsPuEeqt3S6CzXz/M?=
- =?iso-8859-1?Q?7AegNWvSOp5hgtkKW8A+SyyyrVuBn7eHpjsnrTgDjdLttQgMKFc6qsK/jp?=
- =?iso-8859-1?Q?KQL3QLWglJWbsEn4meoZvI8YP3yo7HM33CqnuAB8dWD98CU1B/hWv4WEGU?=
- =?iso-8859-1?Q?Q8reDeBWcklIQQYYSXk29S6UvuZr3jc4Z2isd+8jQm7Ar6GLbA91zdwweq?=
- =?iso-8859-1?Q?kSPCQCsNP4qq1Eh2XMuQGFer9N5q6Zg/ht+CZw0kZMuRV8XaZAoFHP7Rsl?=
- =?iso-8859-1?Q?U3IFNzzFETvhrKSQIJr0hz/KbcjnP4rkGhImzqsDktoTAXRCXbOUCUiQv+?=
- =?iso-8859-1?Q?bQfHbaEUqsfZZknoPoaws/+p4HJw47ri3PhPCkYJBxQw=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY4PR01MB14282.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?/+1iC+wtxLd3POo8yI3ru/eEBsEMmY/3Daf4IR0PUb8Hn6rwVuXqyO+AFe?=
- =?iso-8859-1?Q?OvoJnaqrfiVHyqTSwWdGlLcEBWQyHDZWuMGNn0WXwph4YnUp2U+Xn75rrR?=
- =?iso-8859-1?Q?1mnHv94YobzOiMruJTDPGQx0Ngp6RJj/TCNR1aPmPV972VSshV2Jbg2n4l?=
- =?iso-8859-1?Q?i/V0AdSXroqIDwd5z8oO97k1V6tOqwBqaG0ttZCH4Azh/qmt+v6jUjrM0E?=
- =?iso-8859-1?Q?poYQXOH2d+eirbSiY5E4AaKswko2mI7C2+f+txJlX+grbgqQWFAhEb3CG7?=
- =?iso-8859-1?Q?UAJ1N5B/RLj3+BYlb4XWaSKfJn+7bLjPQj8aidnXN8SUYZ9b1nEIxiVuy5?=
- =?iso-8859-1?Q?lafshOCiXiHW+eK4a0PaNMvcaNAz5glx9SU6vLaekltBxH8p3f/J1h8367?=
- =?iso-8859-1?Q?36Gx8GtQC8RvNZsDZOCkgHrnNsl30LEiuqRtjBuafKTEXGx7AUr3KhRh1Y?=
- =?iso-8859-1?Q?FIIf1+tRK17V/dNVJ/cmHhK1WC9d8g5g7VA4z2OniRixxWQSlcz4+AoExi?=
- =?iso-8859-1?Q?tWWVK0TFHIPDQCpj/Rs8Gf96iLffAYqcjeQ5s1CQ6AcHqxEPoLZo+VsvEZ?=
- =?iso-8859-1?Q?O3wl76nq9jlqGrJsUuKKir7O7WYe66k1M+EDs5zLySefyz/QqnRSxTMfma?=
- =?iso-8859-1?Q?avEUxbNDBzDi8hNIXj100lrKhcOmRq/b5OHDQ0nleSFfQVt1Sus6iSD5ZJ?=
- =?iso-8859-1?Q?MG9KDLVPr+X5+RDjx3ppxS6P0DetmVmDBn1n0eiGBevotizKT5RJsaP2Db?=
- =?iso-8859-1?Q?HVlLGi+fGZ/g0f6naoU0kOTNTSBzCbUrUTyNdUUPy7PwEQYsHHVt3Wd6sJ?=
- =?iso-8859-1?Q?kWU6UlJ63We/gOitTz0tMufyUz/5T8Jm3jARKwvqLjx6ORCSNmneNK4rPz?=
- =?iso-8859-1?Q?OZjx7j6h0tKuJPbzgwKNtn90vWOi+5jdxswV/6xN8lcJXTxQ0d4bEiAL7C?=
- =?iso-8859-1?Q?/SCT47LhhIc0FcgocNtMIO8ps1pVUmtdAlnbGOVRjXH6X1mgi5GHwm8DyM?=
- =?iso-8859-1?Q?pius39EZlTh8/t3B2RGlMAig+RoZ1wm4WsgiyObjjybWuV0kGukmZPBJtW?=
- =?iso-8859-1?Q?Ymq84zaoTzooh2f+oKi6CGTf6cylikWXrBL5Ez1gLj7sQKjo0Jxps1Gpsu?=
- =?iso-8859-1?Q?2HTs+cayfiLUiVhjZRd9Yyr49iModEm6DVMJB2coWSyn/1PK85D5GVBVGj?=
- =?iso-8859-1?Q?M3vneEniup5iladredHud7UcqfOF2PcCAT2Hr2GQ4aY3KSYlD4II9gS5Z9?=
- =?iso-8859-1?Q?xXLvIuP8JJxaMUeQ6VeRSoVMhcal8KScfn/PhYM0TB/O73zNKe93IUuTve?=
- =?iso-8859-1?Q?COmKtP4jd771D66+DKeX9WZ8fVGEflVsUFDxsUyBQyI5DJajuJ+O+680Hg?=
- =?iso-8859-1?Q?BXy+iAsocVO1flcXqdd+vKhv6CRJFb7HmZhKTijDLd9GAOAVDSPhmo2xAA?=
- =?iso-8859-1?Q?rfGlD49TV1AOJq8H0246x1xkCbdcgsmkG92s9nvkvi8koPW1gUCwtKlM23?=
- =?iso-8859-1?Q?lt6Qy0b5MB6DlEDN1xTxVPigzkD488zua7Qgo1+7Zic/4tyNW+7g6WvwfK?=
- =?iso-8859-1?Q?8mQjmB3ZoKX4Hzt/fxdtyrZzBwRAnJhLLDyVLaiX0cmms0DvvfkKJdG15I?=
- =?iso-8859-1?Q?qpvbvS2FqQvzdwHBUQtlSV9aV67obj9NWJ?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+	andrew+netdev@lunn.ch, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 05/15] net: rnpgbe: Add download firmware for n210 chip
+Message-ID: <0FA3F272A6C59EFF+20250707081414.GA166175@nic-Precision-5820-Tower>
+References: <20250703014859.210110-1-dong100@mucse.com>
+ <20250703014859.210110-6-dong100@mucse.com>
+ <37ede55f-613b-481f-a8d9-43ee1414849a@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TY4PR01MB14282.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 421944cd-a438-49cb-cca7-08ddbd2e3923
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jul 2025 08:13:58.1136
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: NwIUdZ+uh/+2sOD6/6KjpydZMpYwCf5r7f7qs85i9rOM8Kd7sMfErBPL8epPlkFbmzxFoSdg9+V4bI7fH2zrwyaYoE2gJdMQTcfsmCuAshs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSZPR01MB8322
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <37ede55f-613b-481f-a8d9-43ee1414849a@lunn.ch>
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: Nj/O81qLKo2gDJk6/WQnhlZCV2blhLEjBNLp90yvs9tYHea82L5evEyl
+	qlLsenyPYn22vmYk6t6xCVLxNqZO+5HpvtvYhl//TpWfAf9B9/7KWBw8JACJV4uRlsZo1QU
+	r6ul2OC8j0dY7hDzEx+pePRHGAn9lO5uoRljzH5+k/w7h1MkFudqVgo2T0e9l6s3N1CuM6f
+	BT098Ch0tps+pPP4whjXT8shMKeBAkQu2t7/A+26d8N1HaELeJzU2gew8P/p3D+re5moDf/
+	KbDhNoRaN5E2R7+OxTvC7/gY+jarvUodKF5a7jLyDBO6SJejYiphNZdbaHFkX9yRuHxWUZ9
+	nhDomtUAaYQneV46721gMqatKoI617lmlyWesPl2s0CRZL9pCdgjOKEVUUpULTU7/oiUEVa
+	ihHpTxgOTzNEJ+HLuw2md1okRSaQs9nf3q0b6ehPD9uf3l9kEbLcHb68/lyDOzlPjJVHkS0
+	pMIGMDfQeFCGvK/6XwxPwdW9Ssha+ZXp4aoao8q9RMufno73Mw8Bbup3vJCpzGNILiDkq9p
+	BgGR81hdqSk9AV34+kNULpPHwoaKvmtEovzglMhI8PXgDMrWX4ouXY+jryBy3AruUzXqrNE
+	IQb3vX4edI6lKCcQ8ZePVLTXSyTqifmAZ9JCFKxXRH/ci6KYFi6FJx9l9DVJEcUBwyayXIf
+	ecwb6/i0G1F0igp2GW4jclrL0KgS7yP1dzcbO2XTGeIKijnBX/ir4AYJodsyyt7rrR/B1c7
+	u8LON5/0COcr7aapkj3vidhfxHYmJa7eRvprfVzyZXA2sKHwc897Z8cIsdqOUWRf36fjju4
+	jHPUzppgtuUHXKL3K9gByNZvePKvkAvGp4oTxgdEJYwQBUUcwcRHLEXSE4JdqDrdyI3HeyS
+	aVCn6SAYKSi7lrpPUAaeHwWGvSsMD0AAYK9Xm3cHAnHLE9C3S7gRnvNYMkCFr+1KFOspbiN
+	N8ux6UN12ZG1Hlw+dapiwTd3g9ek8glnNRpC+sQRmpY59HN05KzB5VnRhnIiOyDNwSHDUZM
+	xCkxdqPA==
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
-Hello Andrew,
-
-Thank you very much for your comments. I am currently figuring out how to t=
-ake them into account.
-
-> -----Original Message-----
-> From: Andrew Lunn <andrew@lunn.ch>
-> Sent: Friday, July 4, 2025 10:44 AM
-> To: Michael Dege <michael.dege@renesas.com>
-> Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>; Niklas S=F6derl=
-und
-> <niklas.soderlund@ragnatech.se>; Paul Barker <paul@pbarker.dev>; Andrew L=
-unn <andrew+netdev@lunn.ch>;
-> David S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>=
-; Jakub Kicinski
-> <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; netdev@vger.kernel.or=
-g; linux-renesas-
-> soc@vger.kernel.org; linux-kernel@vger.kernel.org; Nikita Yushchenko <nik=
-ita.yoush@cogentembedded.com>
-> Subject: Re: [PATCH 2/3] net: renesas: rswitch: add offloading for L2 swi=
-tching
->
-> >  #include <linux/platform_device.h>
-> > +#include <linux/phy.h>
+On Fri, Jul 04, 2025 at 08:33:14PM +0200, Andrew Lunn wrote:
+> >  static int init_firmware_for_n210(struct mucse_hw *hw)
+> >  {
+> > -	return 0;
+> > +	char *filename = "n210_driver_update.bin";
+> > +	const struct firmware *fw;
+> > +	struct pci_dev *pdev = hw->pdev;
+> > +	int rc = 0;
+> > +	int err = 0;
+> > +	struct mucse *mucse = (struct mucse *)hw->back;
 > > +
->
-> It seems odd that a patch adding L2 support needs to touch PHYs?
-
-I will figure out where it was needed. Maybe I can get rid of it, or if nee=
-ded I will move it to the
-File that needs it.
-
->
-> > @@ -994,10 +1018,18 @@ struct rswitch_device {
-> >     DECLARE_BITMAP(ts_skb_used, TS_TAGS_PER_PORT);
-> >     bool disabled;
-> >
-> > +   struct list_head list;
+> > +	rc = request_firmware(&fw, filename, &pdev->dev);
 > > +
-> >     int port;
-> >     struct rswitch_etha *etha;
-> >     struct device_node *np_port;
-> >     struct phy *serdes;
+> > +	if (rc != 0) {
+> > +		dev_err(&pdev->dev, "requesting firmware file failed\n");
+> > +		return rc;
+> > +	}
 > > +
-> > +   struct net_device *brdev;       /* master bridge device */
->
-> How many ports does this device have? If it is just two, this might work.=
- But for a multi-port device,
-> you need to keep this in the port structure.
->
-> > +bool is_rdev(const struct net_device *ndev); void rswitch_modify(void
-> > +__iomem *addr, enum rswitch_reg reg, u32 clear, u32 set);
->
-> Are these actually needed? It seems like they could be local functions.
-
-Currently is_rdev() is only used in rswitch_l2.c. I moved it to that file a=
-nd made it static. In the
-future it will also be used in the L3 routing. The function rswitch_modify(=
-) is used in rswitch_main.c
-and rswitch_l2.c I believe in this case it does make sense to have a single=
- implementation. Or should
-I use two local copies?
-
->
-> > +   if (offload_brdev && !priv->offload_brdev)
-> > +           dev_info(&priv->pdev->dev, "starting l2 offload for %s\n",
-> > +                    netdev_name(offload_brdev));
-> > +   else if (!offload_brdev && priv->offload_brdev)
-> > +           dev_info(&priv->pdev->dev, "stopping l2 offload for %s\n",
-> > +                    netdev_name(priv->offload_brdev));
->
-> Please don't spam the log like this dev_dbg() maybe.
-
-I'll change that.
-
->
-> > @@ -128,6 +134,14 @@ static void rswitch_fwd_init(struct rswitch_privat=
-e *priv)
-> >             iowrite32(0, priv->addr + FWPBFC(i));
-> >     }
-> >
-> > +   /* Configure MAC table aging */
-> > +   rswitch_modify(priv->addr, FWMACAGUSPC, FWMACAGUSPC_MACAGUSP,
-> > +                  FIELD_PREP(FWMACAGUSPC_MACAGUSP, 0x140));
+> > +	if (rnpgbe_check_fw_from_flash(hw, fw->data)) {
+> > +		dev_info(&pdev->dev, "firmware type error\n");
+> 
+> Why dev_info()? If this is an error then you should use dev_err().
+> 
+Yes, it should be dev_err().
+> > +	dev_info(&pdev->dev, "init firmware successfully.");
+> > +	dev_info(&pdev->dev, "Please reboot.");
+> 
+> Don't spam the lock with status messages.
+> 
+> Reboot? Humm, maybe this should be devlink flash command.
+> 
+> request_firmware() is normally used for download into SRAM which is
+> then used immediately. If you need to reboot the machine, devlink is
+> more appropriate.
+> 
+Yes, this is used to download flash to the chip, and then reboot to run.
+I will change it to devlink.
+> > +static inline void mucse_sfc_command(u8 __iomem *hw_addr, u32 cmd)
+> > +{
+> > +	iowrite32(cmd, (hw_addr + 0x8));
+> > +	iowrite32(1, (hw_addr + 0x0));
+> > +	while (ioread32(hw_addr) != 0)
+> > +		;
+> 
+> 
+> Never do endless loops waiting for hardware. It might never give what
+> you want, and there is no escape.
+> 
+Got it, I will update this.
+> > +static int32_t mucse_sfc_flash_wait_idle(u8 __iomem *hw_addr)
+> > +{
+> > +	int time = 0;
+> > +	int ret = HAL_OK;
 > > +
-> > +   reg_val =3D FIELD_PREP(FWMACAGC_MACAGT, RSW_AGEING_TIME);
-> > +   reg_val |=3D FWMACAGC_MACAGE | FWMACAGC_MACAGSL;
-> > +   iowrite32(reg_val, priv->addr + FWMACAGC);
+> > +	iowrite32(CMD_CYCLE(8), (hw_addr + 0x10));
+> > +	iowrite32(RD_DATA_CYCLE(8), (hw_addr + 0x14));
 > > +
->
-> Please pull ageing out into a patch of its own.
-
-OK, will do that.
-
-Best regards,
-
-Michael
->
->     Andrew
->
-> ---
-> pw-bot: cr
-________________________________
-
-Renesas Electronics Europe GmbH
-Registered Office: Arcadiastrasse 10
-DE-40472 Duesseldorf
-Commercial Registry: Duesseldorf, HRB 3708
-Managing Director: Carsten Jauch
-VAT-No.: DE 14978647
-Tax-ID-No: 105/5839/1793
-
-Legal Disclaimer: This e-mail communication (and any attachment/s) is confi=
-dential and contains proprietary information, some or all of which may be l=
-egally privileged. It is intended solely for the use of the individual or e=
-ntity to which it is addressed. Access to this email by anyone else is unau=
-thorized. If you are not the intended recipient, any disclosure, copying, d=
-istribution or any action taken or omitted to be taken in reliance on it, i=
-s prohibited and may be unlawful.
+> > +	while (1) {
+> > +		mucse_sfc_command(hw_addr, CMD_READ_STATUS);
+> > +		if ((ioread32(hw_addr + 0x4) & 0x1) == 0)
+> > +			break;
+> > +		time++;
+> > +		if (time > 1000)
+> > +			ret = HAL_FAIL;
+> > +	}
+> 
+> iopoll.h 
+> 
+Got it, I will use method in iopoll.h.
+> > +static int mucse_sfc_flash_erase_sector(u8 __iomem *hw_addr,
+> > +					u32 address)
+> > +{
+> > +	int ret = HAL_OK;
+> > +
+> > +	if (address >= RSP_FLASH_HIGH_16M_OFFSET)
+> > +		return HAL_EINVAL;
+> 
+> Use linux error codes, EINVAL.
+> 
+Got it.
+> > +
+> > +	if (address % 4096)
+> > +		return HAL_EINVAL;
+> 
+> EINVAL
+> 
+Got it.
+> > +
+> > +	mucse_sfc_flash_write_enable(hw_addr);
+> > +
+> > +	iowrite32((CMD_CYCLE(8) | ADDR_CYCLE(24)), (hw_addr + 0x10));
+> > +	iowrite32((RD_DATA_CYCLE(0) | WR_DATA_CYCLE(0)), (hw_addr + 0x14));
+> > +	iowrite32(SFCADDR(address), (hw_addr + 0xc));
+> > +	mucse_sfc_command(hw_addr, CMD_SECTOR_ERASE);
+> > +	if (mucse_sfc_flash_wait_idle(hw_addr)) {
+> > +		ret = HAL_FAIL;
+> > +		goto failed;
+> 
+> mucse_sfc_flash_wait_idle() should return -ETIMEDOUT, so return that.
+> 
+> 	Andrew
+> 
+Got it, I will return -ETIMEDOUT.
+Thanks for your feedback.
 
