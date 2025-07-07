@@ -1,396 +1,283 @@
-Return-Path: <netdev+bounces-204525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3330AFB05F
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 11:53:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D9FAAFB09B
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 12:01:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C1673A3731
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 09:53:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E35197A20DC
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 10:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA412957A9;
-	Mon,  7 Jul 2025 09:52:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B46C288C35;
+	Mon,  7 Jul 2025 10:01:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o6NRB7S8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C76293C48;
-	Mon,  7 Jul 2025 09:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BDB01F8755;
+	Mon,  7 Jul 2025 10:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751881951; cv=none; b=GOQeZhexeRzeWC1t2/luW4le7+xqABY8CijKRFyys1MBjzaIex4YbZGFo/P923TPYnHzpC+xnHqMxzqU3BGtDSiSzQ1eEP7m5iGvQqZmDfHbYNcWB4CdCm8QFc5qkVzRSchk9WLLi7aQ7runM+6pF8xA5dkL/x7lXjWA8X/pTuM=
+	t=1751882492; cv=none; b=Wp3B4M6iCSl3dVIqkto9mwTtKwye6vcM1gCB7V7Fs0P89kU1rrGj/Gt466fVZXuv4zRi0mmFqK7TBH7DE321yIDtwGpgb16f7KdX59JeWb3l6VHNkI8f7qH0wB4K++5UOTT5sRvHOHmolQcxEmumSgF073LjvikJgXBoyXJZhHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751881951; c=relaxed/simple;
-	bh=rS2IvUHGDP7e41GAbVUWMoGzeRdRQt6arlmFScKX+TE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iQGqpTneaDqJzotFfvq2KceJG58gFF+H58zj58iYF4KgdBsIMOYJAfDvrszTyYP1SzfvevxLPZgEZGdyuO2C+BZofsopocxq91GPjyHIBnG2hsEXDadwH7Wl629j9D4M2Y2zMSxOLsauGs6lOg7vcT58/riMdFmM90GPKUksZX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-32ca160b4bcso34245501fa.3;
-        Mon, 07 Jul 2025 02:52:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751881942; x=1752486742;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :reply-to:in-reply-to:references:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7+G9RXNsu4/lHuRGJgb9rsOZh1/O90NgzHuMfw5EvSM=;
-        b=BjmvpFxjzANy0wzshvig2Oo+odWTQWzv3ywaDwtIjrE38/shpGE1VOVMJH2o1B2Hsj
-         v/AXe6W5bNERMymbU8PRzDOyjCtLBTdlCxfrT/EilTRkq06Eiz40wAVTcirMs+2/fOs9
-         3JTcawvtKCJjqcgvBERqrWCumnHEnEhMiG/hSFz6Y9++iI3FeW4OKHMwbxCrQC4KW6FE
-         Zl/BzerMp8pzkSuwEcvANs/XN41V+dA65dJ4IQtmPlXkOhSWtH9FG5Zl0q2tC/TYcyPG
-         eq4A9O2Wh8OHT6rlnq/3uUlrTIYYM4lCd0baZN6qjdOk3HJy/9u2zC1REIT/hQmorB4S
-         wXCg==
-X-Forwarded-Encrypted: i=1; AJvYcCUnA76paxDxW+2EmkIeEXHQ/fZw6yBf+Z8dCG0Y2/8cpKHNYqhMGdJXc6EN4AY0DU3rxqjzEFM1iDz8@vger.kernel.org, AJvYcCVFy7UrB7aaJmWdwz4htc64EKzLQNYewuikjDye7vniXDD3qF0xCC7RkvhDWFP9UAeUe3wu6FU/ebp9z7G9@vger.kernel.org, AJvYcCWDtbuVJq7y3AKt8oLpLYe9+K5mhZu8gfYIqvFrMXej1gIZ90Fb5lechklnNjfXePRIZPShLLVdK/Yo3A==@vger.kernel.org, AJvYcCX1XAstKgKbb+KmPjlfTMYfk5dCFTsWf+AJEt53UnnTWmqU8fj3SukkxzshJgKBmrbeUdHDDDlT@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGbu6s5s8NdKuCNeOIQTbR6DfgrUNDoqXbw8Q3hvfA8sJLZDxw
-	AeACfzQEYcjOUfl8ry88j7StL7Ss0nzRGhS91S02w4rltE1b5aYUCExqwdNIi0L4
-X-Gm-Gg: ASbGnct3gxJeUiaubwu8QE7KXeySNL/aNVOQV/qW1FwMU4daLjIaf8d4PqAeG1NPNrJ
-	bLqJRSjHQx5g8pQ19CsKth/veKi0B3pQGkFXIqsoRdNONHW+ZM+2JoiHR1lE+ikYwmVDhcmItWK
-	loBmlJF/S3jBmzLndo4G/fh7B1dLlP8HMOb/IlQ+WGZLZojFDaNZLUmBqxKHKE7ZIikkDK0kUFA
-	QrbARLs2i25a2vJqPQQoAwUiEQFNY+gJ5Omi7E9eapk63V0aiX6wlaawH1+fHvviK2vVgKlzPWj
-	q0G9xYafk3u0AHM3xM9BxRiy9O7G6Zy45IU481gc/37KpWEPHJPdrZk/PJIk0QSIBQ7AsrwDe5y
-	D8a7qs/glY2LoQ/G5OGU/3aSreN+Y+Q==
-X-Google-Smtp-Source: AGHT+IEhPEBGggGxwkltvbwHInJFN3YyXcJ8/Tk2pg2oyagVcEeodztgDpeqcUIr2Ps8R12BGBGVgA==
-X-Received: by 2002:a05:651c:31c4:b0:32a:7dd7:ff47 with SMTP id 38308e7fff4ca-32f19ae2a9fmr20754931fa.30.1751881941607;
-        Mon, 07 Jul 2025 02:52:21 -0700 (PDT)
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com. [209.85.208.172])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-32e1af83020sm11780661fa.21.2025.07.07.02.52.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Jul 2025 02:52:20 -0700 (PDT)
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-32cd499007aso21846461fa.0;
-        Mon, 07 Jul 2025 02:52:20 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVXTqOSNiyoNsuvzB1D65CVzshVL+cEtIlvuV20t2KYbZLUPte71z5glKRV0a9zZaM1H1Ga6yakTysMBg==@vger.kernel.org, AJvYcCW4ttq1NU01Z5fxk0E5P9rBhva4EFjB26whA1OtZqK9nZcG/LBpUSGEvZfL9fP4wpGndiPhzs9CCBhE@vger.kernel.org, AJvYcCXF8dnYj131+5DfYQ3GyBWsFW6DhUlatqEP36e7hq6PK1O0lJXIeS70IQ6W3z4WGeuIOOIhgAUS@vger.kernel.org, AJvYcCXUyK82woEJIu2g8dKTpP10kEpShxAzfgzaqpN/Ht2TNux+QjgGQv0jHXO4/c3Wfq4aFb6vRrWei7zBxF0z@vger.kernel.org
-X-Received: by 2002:a2e:bc1c:0:b0:32c:a006:2a1d with SMTP id
- 38308e7fff4ca-32f199879cbmr17915751fa.4.1751881939832; Mon, 07 Jul 2025
- 02:52:19 -0700 (PDT)
+	s=arc-20240116; t=1751882492; c=relaxed/simple;
+	bh=LrbLvzvF6gmWIWOl/u5715b2a2XljRasgW9tuQ0jM6Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JQcBW/sNuDpSnsFFAdb3XNoAth+9sUHcGeMYl7mOqjS+o3T39z6owG5hRP5HRoy3X/HJtkrZe7MuoQfHjZ9YMVQD++cDkRfm8qjX7lYckGDoOfKiI5Y0eKbuMjt27STq7eVC5cb7ZhbAbhKn8QB/J4Wu70mj/6J1EWkFm+b02ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o6NRB7S8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 181DCC4CEE3;
+	Mon,  7 Jul 2025 10:01:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751882490;
+	bh=LrbLvzvF6gmWIWOl/u5715b2a2XljRasgW9tuQ0jM6Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=o6NRB7S8gi/pE+s4x+hbM9kCMnDJbR3mkeGKx8D65z8RIF9O/zQMzDaF9fKX2lZe5
+	 Nd0DpOG0gitZdCYiaqF1JNSqnOZ5KgaDUP3UqsA9MhbPpJd4J6jWznNxbPwjGew77M
+	 2+2tTI1brE2/H97GiNnLhgMhPy6DOzkvLNMZeNNdjXm9f32tnILnNwf90kIcCXoFlu
+	 VUupgU0UWvQsG9GqD9iFLY/+AbbhxD2252FQtSr1zJ8M1xYhxN0M+/jCQz30+VIqQ+
+	 jp/3pGkDcE+M9uDE4o9E+mIrIGYImdlp9Y0RI7xKh1bPXEfXNroQ1BOhfFc9e3fSvc
+	 4qCcaMf4Trtnw==
+Date: Mon, 7 Jul 2025 11:01:24 +0100
+From: Simon Horman <horms@kernel.org>
+To: Vivian Wang <wangruikang@iscas.ac.cn>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Yixun Lan <dlan@gentoo.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>, Vivian Wang <uwu@dram.page>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Junhui Liu <junhui.liu@pigmoral.tech>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 2/2] net: spacemit: Add K1 Ethernet MAC
+Message-ID: <20250707100124.GC89747@horms.kernel.org>
+References: <20250703-net-k1-emac-v4-0-686d09c4cfa8@iscas.ac.cn>
+ <20250703-net-k1-emac-v4-2-686d09c4cfa8@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250626080923.632789-1-paulk@sys-base.io> <20250626080923.632789-2-paulk@sys-base.io>
- <20250704233535.4b026641@minigeek.lan> <20250705153825.2be2b333@minigeek.lan>
- <aGm8n_wJPiGk85E4@collins> <CAGb2v66s-nWA2dFRpgX6DbDET3dWOm1jPKWm1k9SmGSqhTWoWA@mail.gmail.com>
- <aGuV3gcKSRIyey53@collins>
-In-Reply-To: <aGuV3gcKSRIyey53@collins>
-Reply-To: wens@csie.org
-From: Chen-Yu Tsai <wens@csie.org>
-Date: Mon, 7 Jul 2025 17:52:07 +0800
-X-Gmail-Original-Message-ID: <CAGb2v66U94RxVTC4O-Z9Pn2RyJK5Xz=pNZCvkFN-5Ax0wG6Cug@mail.gmail.com>
-X-Gm-Features: Ac12FXxL47gWjXZzuSKcW-0cl9NbdUx83T52e-2ARQaXs9NhvEcm9RfhLdsxmoU
-Message-ID: <CAGb2v66U94RxVTC4O-Z9Pn2RyJK5Xz=pNZCvkFN-5Ax0wG6Cug@mail.gmail.com>
-Subject: Re: [PATCH 1/5] pinctrl: sunxi: Fix a100 emac pin function name
-To: Paul Kocialkowski <paulk@sys-base.io>
-Cc: Andre Przywara <andre.przywara@arm.com>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
-	Linus Walleij <linus.walleij@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250703-net-k1-emac-v4-2-686d09c4cfa8@iscas.ac.cn>
 
-On Mon, Jul 7, 2025 at 5:39=E2=80=AFPM Paul Kocialkowski <paulk@sys-base.io=
-> wrote:
->
-> Hi Chen-Yu,
->
-> Le Sun 06 Jul 25, 23:04, Chen-Yu Tsai a =C3=A9crit :
-> > On Sun, Jul 6, 2025 at 8:00=E2=80=AFAM Paul Kocialkowski <paulk@sys-bas=
-e.io> wrote:
-> > >
-> > > Hi Andre,
-> > >
-> > > Le Sat 05 Jul 25, 15:38, Andre Przywara a =C3=A9crit :
-> > > > On Fri, 4 Jul 2025 23:35:35 +0100
-> > > > Andre Przywara <andre.przywara@arm.com> wrote:
-> > > >
-> > > > Hi,
-> > > >
-> > > > > On Thu, 26 Jun 2025 10:09:19 +0200
-> > > > > Paul Kocialkowski <paulk@sys-base.io> wrote:
-> > > > >
-> > > > > Hi Paul,
-> > > > >
-> > > > > > The Allwinner A100/A133 only has a single emac instance, which =
-is
-> > > > > > referred to as "emac" everywhere. Fix the pin names to drop the
-> > > > > > trailing "0" that has no reason to be.
-> > > > >
-> > > > > Sorry, but this is wrong. There *is* a second EMAC on the A133 di=
-e: it's
-> > > > > indeed not mentioned in the manual, but you can probe its MMIO
-> > > > > registers (@0x5030000), and there is a second syscon register
-> > > > > (@0x03000034). It's mentioned in several BSP code places ([1]).
-> > > > > It seem like no suitable pins are connected on the A133
-> > > > > package, but that should not affect the A100 .dtsi (we use a simi=
-lar
-> > > > > approach for the H616 and A523).
-> > > > >
-> > > > > So I think we should keep the emac0 name.
-> > > >
-> > > > just thinking that it's even worse: this changes the DT visible pin=
-ctrl
-> > > > function name, so it's a DT ABI change. With the "emac0" function n=
-ame,
-> > > > Ethernet would work with stable kernels already (as everything is
-> > > > compatible, it's just about DT changes). But with this change, pinc=
-trl
-> > > > drivers in older kernels would not match.
-> > >
-> > > Given that the port is still very early and experimental and has very=
- few users
-> > > and no field deployment so I don't really think it would have annoyed=
- anybody in
-> > > practice. But yes in principle you are right, while the header rename=
-s keep the
-> > > same value, the string names are used to match the device-tree defini=
-tions and
-> > > this constitues ABI that needs to remain stable.
-> > >
-> > > > So I would very much like to see this patch moved out. Is it just i=
-n
-> > > > LinusW's tree so far? I don't see it in -next yet.
-> > >
-> > > I don't think the patches were accepted for over a week so we can pro=
-bably
-> > > still act. I will send reverts, unless maintainers want to manually r=
-emove
-> > > these commits?
-> >
-> > I can drop the dts patches from the sunxi tree. Linus might be able to
-> > drop the pinctrl patch.
-> >
-> > You definitely need to send a revert for the DT binding patch that is
-> > already in net-next.
->
-> Should this really affect the bindings though?
->
-> From what Andre reported, both EMAC0 and EMAC1 should be the same block s=
-o it
-> doesn't seem particularly necessary to have a different compatible.
->
-> Looking at Allwiner's BSP code for the A133[0], I don't see any differenc=
-e
-> between the two. While there's device_type property in Allwinner's dt, it=
-'s
-> apparently not used by the driver[1].
->
-> So I think we're still fine with a single compatible (without the control=
-ler
-> index in it).
+On Thu, Jul 03, 2025 at 05:42:03PM +0800, Vivian Wang wrote:
+> The Ethernet MACs found on SpacemiT K1 appears to be a custom design
+> that only superficially resembles some other embedded MACs. SpacemiT
+> refers to them as "EMAC", so let's just call the driver "k1_emac".
+> 
+> This driver is based on "k1x-emac" in the same directory in the vendor's
+> tree [1]. Some debugging tunables have been fixed to vendor-recommended
+> defaults, and PTP support is not included yet.
+> 
+> [1]: https://github.com/spacemit-com/linux-k1x
+> 
+> Tested-by: Junhui Liu <junhui.liu@pigmoral.tech>
+> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
 
-The block is the same, but the integration is slightly different, as
-the register for the RGMII clock delays and other stuff is at a different
-offset in the system controller. The BSP handles this by directly
-including the register in the "reg" property.
+...
 
-So yes, you do need a separate compatible string, if only to deal with
-the slight difference in the integration layer.
+> diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
 
-ChenYu
+...
 
-> [0]: https://github.com/engSinteck/A133_Image/blob/main/longan/kernel/lin=
-ux-4.9/arch/arm64/boot/dts/sunxi/sun50iw10p1.dtsi#L2016
-> [1]: https://github.com/engSinteck/A133_Image/blob/main/longan/kernel/lin=
-ux-4.9/drivers/net/ethernet/allwinner/sunxi-gmac.c
->
-> All the best,
->
-> Paul
->
-> >
-> > ChenYu
-> >
-> >
-> > > Cheers,
-> > >
-> > > Paul
-> > >
-> > > > Cheers,
-> > > > Andre.
-> > > >
-> > > > > [1]
-> > > > > https://github.com/qiaoweibiao/T507_Kernel/blob/main/arch/arm64/b=
-oot/dts/sunxi/sun50iw10p1.dtsi
-> > > > >
-> > > > >
-> > > > > >
-> > > > > > Fixes: 473436e7647d ("pinctrl: sunxi: add support for the Allwi=
-nner A100 pin controller")
-> > > > > > Signed-off-by: Paul Kocialkowski <paulk@sys-base.io>
-> > > > > > ---
-> > > > > >  drivers/pinctrl/sunxi/pinctrl-sun50i-a100.c | 32 ++++++++++---=
---------
-> > > > > >  1 file changed, 16 insertions(+), 16 deletions(-)
-> > > > > >
-> > > > > > diff --git a/drivers/pinctrl/sunxi/pinctrl-sun50i-a100.c b/driv=
-ers/pinctrl/sunxi/pinctrl-sun50i-a100.c
-> > > > > > index b97de80ae2f3..95b764ee1c0d 100644
-> > > > > > --- a/drivers/pinctrl/sunxi/pinctrl-sun50i-a100.c
-> > > > > > +++ b/drivers/pinctrl/sunxi/pinctrl-sun50i-a100.c
-> > > > > > @@ -546,33 +546,33 @@ static const struct sunxi_desc_pin a100_p=
-ins[] =3D {
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
-> > > > > >             SUNXI_FUNCTION(0x2, "i2c0"),          /* SCK */
-> > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* RXD1 */
-> > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* RXD1 */
-> > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 0)),
-> > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 1),
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
-> > > > > >             SUNXI_FUNCTION(0x2, "i2c0"),          /* SDA */
-> > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* RXD0 */
-> > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* RXD0 */
-> > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 1)),
-> > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 2),
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
-> > > > > >             SUNXI_FUNCTION(0x2, "i2c1"),          /* SCK */
-> > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* RXCTL */
-> > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* RXCTL */
-> > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 2)),
-> > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 3),
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
-> > > > > >             SUNXI_FUNCTION(0x2, "i2c1"),          /* SDA */
-> > > > > >             SUNXI_FUNCTION(0x3, "cir0"),          /* OUT */
-> > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* CLKIN */
-> > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* CLKIN */
-> > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 3)),
-> > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 4),
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
-> > > > > >             SUNXI_FUNCTION(0x2, "uart3"),         /* TX */
-> > > > > >             SUNXI_FUNCTION(0x3, "spi1"),          /* CS */
-> > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* TXD1 */
-> > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* TXD1 */
-> > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 4)),
-> > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 5),
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > > > @@ -580,14 +580,14 @@ static const struct sunxi_desc_pin a100_p=
-ins[] =3D {
-> > > > > >             SUNXI_FUNCTION(0x2, "uart3"),         /* RX */
-> > > > > >             SUNXI_FUNCTION(0x3, "spi1"),          /* CLK */
-> > > > > >             SUNXI_FUNCTION(0x4, "ledc"),
-> > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* TXD0 */
-> > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* TXD0 */
-> > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 5)),
-> > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 6),
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
-> > > > > >             SUNXI_FUNCTION(0x2, "uart3"),         /* RTS */
-> > > > > >             SUNXI_FUNCTION(0x3, "spi1"),          /* MOSI */
-> > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* TXCK */
-> > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* TXCK */
-> > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 6)),
-> > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 7),
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > > > @@ -595,7 +595,7 @@ static const struct sunxi_desc_pin a100_pin=
-s[] =3D {
-> > > > > >             SUNXI_FUNCTION(0x2, "uart3"),         /* CTS */
-> > > > > >             SUNXI_FUNCTION(0x3, "spi1"),          /* MISO */
-> > > > > >             SUNXI_FUNCTION(0x4, "spdif"),         /* OUT */
-> > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* TXCTL */
-> > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* TXCTL */
-> > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 7)),
-> > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 8),
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > > > @@ -611,7 +611,7 @@ static const struct sunxi_desc_pin a100_pin=
-s[] =3D {
-> > > > > >             SUNXI_FUNCTION(0x2, "dmic"),          /* DATA0 */
-> > > > > >             SUNXI_FUNCTION(0x3, "spi2"),          /* CLK */
-> > > > > >             SUNXI_FUNCTION(0x4, "i2s2"),          /* BCLK */
-> > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* MDC */
-> > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* MDC */
-> > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 9)),
-> > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 10),
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > > > @@ -619,7 +619,7 @@ static const struct sunxi_desc_pin a100_pin=
-s[] =3D {
-> > > > > >             SUNXI_FUNCTION(0x2, "dmic"),          /* DATA1 */
-> > > > > >             SUNXI_FUNCTION(0x3, "spi2"),          /* MOSI */
-> > > > > >             SUNXI_FUNCTION(0x4, "i2s2"),          /* LRCK */
-> > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* MDIO */
-> > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* MDIO */
-> > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 10)),
-> > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 11),
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > > > @@ -642,33 +642,33 @@ static const struct sunxi_desc_pin a100_p=
-ins[] =3D {
-> > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
-> > > > > >             SUNXI_FUNCTION(0x3, "i2c3"),          /* SCK */
-> > > > > >             SUNXI_FUNCTION(0x4, "i2s3"),          /* MCLK */
-> > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* EPHY */
-> > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* EPHY */
-> > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 13)),
-> > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 14),
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
-> > > > > >             SUNXI_FUNCTION(0x4, "i2s3"),          /* BCLK */
-> > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* RXD3 */
-> > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* RXD3 */
-> > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 14)),
-> > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 15),
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
-> > > > > >             SUNXI_FUNCTION(0x4, "i2s3"),          /* LRCK */
-> > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* RXD2 */
-> > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* RXD2 */
-> > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 15)),
-> > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 16),
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
-> > > > > >             SUNXI_FUNCTION(0x3, "i2s3_dout0"),    /* DOUT0 */
-> > > > > >             SUNXI_FUNCTION(0x4, "i2s3_din1"),     /* DIN1 */
-> > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* RXCK */
-> > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* RXCK */
-> > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 16)),
-> > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 17),
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
-> > > > > >             SUNXI_FUNCTION(0x3, "i2s3_dout1"),    /* DOUT1 */
-> > > > > >             SUNXI_FUNCTION(0x4, "i2s3_din0"),     /* DIN0 */
-> > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* TXD3 */
-> > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* TXD3 */
-> > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 17)),
-> > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 18),
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > > > @@ -676,7 +676,7 @@ static const struct sunxi_desc_pin a100_pin=
-s[] =3D {
-> > > > > >             SUNXI_FUNCTION(0x2, "cir0"),          /* OUT */
-> > > > > >             SUNXI_FUNCTION(0x3, "i2s3_dout2"),    /* DOUT2 */
-> > > > > >             SUNXI_FUNCTION(0x4, "i2s3_din2"),     /* DIN2 */
-> > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* TXD2 */
-> > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* TXD2 */
-> > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 18)),
-> > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 19),
-> > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
-> > > > >
-> > > > >
-> > > >
-> > >
-> > > --
-> > > Paul Kocialkowski,
-> > >
-> > > Independent contractor - sys-base - https://www.sys-base.io/
-> > > Free software developer - https://www.paulk.fr/
-> > >
-> > > Expert in multimedia, graphics and embedded hardware support with Lin=
-ux.
->
-> --
-> Paul Kocialkowski,
->
-> Independent contractor - sys-base - https://www.sys-base.io/
-> Free software developer - https://www.paulk.fr/
->
-> Expert in multimedia, graphics and embedded hardware support with Linux.
+> +/**
+> + * struct emac_desc_ring - Software-side information for one descriptor ring
+> + * Same struture used for both RX and TX
+
+nit: structure
+
+> + * @desc_addr: Virtual address to the descriptor ring memory
+> + * @desc_dma_addr: DMA address of the descriptor ring
+> + * @total_size: Size of ring in bytes
+> + * @total_cnt: Number of descriptors
+> + * @head: Next descriptor to associate a buffer with
+> + * @tail: Next descriptor to check status bit
+> + * @rx_desc_buf: Array of descriptors for RX
+> + * @tx_desc_buf: Array of descriptors for TX, with max of two buffers each
+> + */
+
+...
+
+> +static void emac_set_mac_addr(struct emac_priv *priv, const unsigned char *addr)
+> +{
+> +	emac_wr(priv, MAC_ADDRESS1_HIGH, ((addr[1] << 8) | addr[0]));
+
+nit: no need for inner parentheses here,
+     the order of operations is on your side
+
+	emac_wr(priv, MAC_ADDRESS1_HIGH, addr[1] << 8 | addr[0]);
+
+> +	emac_wr(priv, MAC_ADDRESS1_MED, ((addr[3] << 8) | addr[2]));
+> +	emac_wr(priv, MAC_ADDRESS1_LOW, ((addr[5] << 8) | addr[4]));
+> +}
+
+...
+
+> +static int emac_rx_frame_status(struct emac_priv *priv, struct emac_desc *desc)
+> +{
+> +	/* Drop if not last descriptor */
+> +	if (!(desc->desc0 & RX_DESC_0_LAST_DESCRIPTOR)) {
+> +		netdev_dbg(priv->ndev, "RX not last descriptor\n");
+
+Unless I am mistaken these logs can occur on the basis of user
+(Network packet) input. If so, I think rate limited debug
+messages are more appropriate here and below.
+
+> +		return RX_FRAME_DISCARD;
+> +	}
+> +
+> +	if (desc->desc0 & RX_DESC_0_FRAME_RUNT) {
+> +		netdev_dbg(priv->ndev, "RX runt frame\n");
+> +		return RX_FRAME_DISCARD;
+> +	}
+> +
+> +	if (desc->desc0 & RX_DESC_0_FRAME_CRC_ERR) {
+> +		netdev_dbg(priv->ndev, "RX frame CRC error\n");
+> +		return RX_FRAME_DISCARD;
+> +	}
+> +
+> +	if (desc->desc0 & RX_DESC_0_FRAME_MAX_LEN_ERR) {
+> +		netdev_dbg(priv->ndev, "RX frame exceeds max length\n");
+> +		return RX_FRAME_DISCARD;
+> +	}
+> +
+> +	if (desc->desc0 & RX_DESC_0_FRAME_JABBER_ERR) {
+> +		netdev_dbg(priv->ndev, "RX frame jabber error\n");
+> +		return RX_FRAME_DISCARD;
+> +	}
+> +
+> +	if (desc->desc0 & RX_DESC_0_FRAME_LENGTH_ERR) {
+> +		netdev_dbg(priv->ndev, "RX frame length error\n");
+> +		return RX_FRAME_DISCARD;
+> +	}
+> +
+> +	if (rx_frame_len(desc) <= ETH_FCS_LEN ||
+> +	    rx_frame_len(desc) > priv->dma_buf_sz) {
+> +		netdev_dbg(priv->ndev, "RX frame length unacceptable\n");
+> +		return RX_FRAME_DISCARD;
+> +	}
+> +	return RX_FRAME_OK;
+> +}
+
+...
+
+> +static int emac_resume(struct device *dev)
+> +{
+> +	struct emac_priv *priv = dev_get_drvdata(dev);
+> +	struct net_device *ndev = priv->ndev;
+> +	int ret;
+> +
+> +	ret = clk_prepare_enable(priv->bus_clk);
+> +	if (ret < 0) {
+> +		dev_err(dev, "Failed to enable bus clock: %d\n", ret);
+> +		return ret;
+> +	}
+> +
+> +	if (!netif_running(ndev))
+> +		return 0;
+> +
+> +	ret = emac_open(ndev);
+> +	if (ret)
+
+Smatch flags that priv->bus_clk resources are leaked here, and I agree.
+
+> +		return ret;
+> +
+> +	netif_device_attach(ndev);
+> +	return 0;
+> +}
+
+I would suggest addressing that like this.
+(Compile tested only!)
+
+diff --git a/drivers/net/ethernet/spacemit/k1_emac.c b/drivers/net/ethernet/spacemit/k1_emac.c
+index 6158e776bc67..ebd02ec2bb01 100644
+--- a/drivers/net/ethernet/spacemit/k1_emac.c
++++ b/drivers/net/ethernet/spacemit/k1_emac.c
+@@ -1843,10 +1843,14 @@ static int emac_resume(struct device *dev)
+ 
+ 	ret = emac_open(ndev);
+ 	if (ret)
+-		return ret;
++		goto err_clk_disable_unprepare;
+ 
+ 	netif_device_attach(ndev);
+ 	return 0;
++
++err_clk_disable_unprepare:
++	clk_disable_unprepare(priv->bus_clk);
++	return ret;
+ }
+ 
+ static int emac_suspend(struct device *dev)
+
+...
+
+> diff --git a/drivers/net/ethernet/spacemit/k1_emac.h b/drivers/net/ethernet/spacemit/k1_emac.h
+
+...
+
+> +struct emac_hw_stats {
+> +	u32 tx_ok_pkts;
+> +	u32 tx_total_pkts;
+> +	u32 tx_ok_bytes;
+> +	u32 tx_err_pkts;
+> +	u32 tx_singleclsn_pkts;
+> +	u32 tx_multiclsn_pkts;
+> +	u32 tx_lateclsn_pkts;
+> +	u32 tx_excessclsn_pkts;
+> +	u32 tx_unicast_pkts;
+> +	u32 tx_multicast_pkts;
+> +	u32 tx_broadcast_pkts;
+> +	u32 tx_pause_pkts;
+> +	u32 rx_ok_pkts;
+> +	u32 rx_total_pkts;
+> +	u32 rx_crc_err_pkts;
+> +	u32 rx_align_err_pkts;
+> +	u32 rx_err_total_pkts;
+> +	u32 rx_ok_bytes;
+> +	u32 rx_total_bytes;
+> +	u32 rx_unicast_pkts;
+> +	u32 rx_multicast_pkts;
+> +	u32 rx_broadcast_pkts;
+> +	u32 rx_pause_pkts;
+> +	u32 rx_len_err_pkts;
+> +	u32 rx_len_undersize_pkts;
+> +	u32 rx_len_oversize_pkts;
+> +	u32 rx_len_fragment_pkts;
+> +	u32 rx_len_jabber_pkts;
+> +	u32 rx_64_pkts;
+> +	u32 rx_65_127_pkts;
+> +	u32 rx_128_255_pkts;
+> +	u32 rx_256_511_pkts;
+> +	u32 rx_512_1023_pkts;
+> +	u32 rx_1024_1518_pkts;
+> +	u32 rx_1519_plus_pkts;
+> +	u32 rx_drp_fifo_full_pkts;
+> +	u32 rx_truncate_fifo_full_pkts;
+> +};
+
+Many of the stats above appear to cover stats covered by struct
+rtnl_link_stats64, ethtool_pause_stats, struct ethtool_rmon_stats, and
+possibly others standardised in ethtool.h. Please only report standard
+counters using standard mechanisms. And only use get_ethtool_stats to
+report non-standard counters.
+
+Link: https://www.kernel.org/doc/html/v6.16-rc4/networking/statistics.html#notes-for-driver-authors
+
+...
+
+-- 
+pw-bot: changes-requested
 
