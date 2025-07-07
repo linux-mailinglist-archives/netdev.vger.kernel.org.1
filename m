@@ -1,121 +1,114 @@
-Return-Path: <netdev+bounces-204516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05831AFAF78
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 11:18:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64E03AFAF8A
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 11:22:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05D4A1AA3362
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 09:18:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE30B3B4F18
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 09:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0AF7B3E1;
-	Mon,  7 Jul 2025 09:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67AC928D8EA;
+	Mon,  7 Jul 2025 09:22:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="dn08LDGN"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="hnItabx9"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46811DA61B;
-	Mon,  7 Jul 2025 09:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651A528CF7C;
+	Mon,  7 Jul 2025 09:22:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751879877; cv=none; b=qGAtTAyNxJ7NtWipVVrb385Ov+Ttc5iKvFNxgSxxzdtFVRpJj5D1IH1HUPNtwQWN5Vnn0ndqw9il63KAohAzpYJn3buXfo/mY/cHcQSowfPN4Ofiw7teU8h6+df3JeSOiNNqf1u60JB58BeU8Qt5HWCenBTergNMNEMiZXSVdiU=
+	t=1751880156; cv=none; b=X+jyR+JobfkhDXZYw2MXbZEYfO556L9JMOydnt1eLdCXzuUNTbi8b1CMtOKzVMoH2FxjS+vVH2jEBI2l1e01qPKAazgMLRlxyJL3t0v38wTCqnSaH1lU0bJoGlcpg3ZbHXN29H2FNOUAeLktwIcDos5VYz5OO7BVb1pk41xy7sI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751879877; c=relaxed/simple;
-	bh=1XdBHyS/TdX5GE0UMDNbHyzwdZxMDzmN0TovPALsqow=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V2m1FwTt43f7XEJxyr+VjeQ2ik7/Bd/NyDoRNotka0SYhTgfOBZGUQQdueAqO/NCcnBYGqFM6ak/nc1e0/dRT90oguYRhW1H1Pb6i/JLguKmu9Fx53mzBgVqYpL8gMGECt8BEmvKjp8YQAyKN0sR8vWQ/c1yggLyerbQds0rmsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=dn08LDGN; arc=none smtp.client-ip=220.197.31.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
-	Content-Type; bh=BUqPmG1O7JzrnieJR9Ab76YUZOfd8wn7vgsa0nO9wJc=;
-	b=dn08LDGNj0yFFA1fHIbkp3GS4IE9C+AlqScgjyxRgeo4rRaHWo7gV4grsRwfD0
-	m0bdBzlf+JBtjSgvpYHPt6YYnz0XxzY/iirXuP2yR0daxk4WM7My2U/cMvp8xJ+P
-	AFk95Hn/LqB4OXeZ5Ip9xtxR2PmueLiChX0qfrrPJgh+o=
-Received: from [172.21.20.151] (unknown [])
-	by gzsmtp4 (Coremail) with SMTP id PygvCgD3HWCpkGtozG4IBg--.20542S2;
-	Mon, 07 Jul 2025 17:17:30 +0800 (CST)
-Message-ID: <a2834142-f683-4947-8fff-60727481d7e8@163.com>
-Date: Mon, 7 Jul 2025 17:17:28 +0800
+	s=arc-20240116; t=1751880156; c=relaxed/simple;
+	bh=kaWeX7KKkf1DeQg7+StlJB5g41RBud8WpmRtSGs7VWk=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=FBbmxa9SBENtPIJ9zxwo1N8YXRWq7MGswTuylx7HLaJyEUfM7jf+WDguBy/xdQ/Rl8z0iOKyEDbEkNjj5B6wE4bRi+G34E1CeeSV661hvX3/FFD8LUUL/8owQzqynfkttWiQ1RCY6Mr9f+Rauy784fSZFPf8uix/Yz8L2aukCkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=hnItabx9; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1751880152;
+	bh=kaWeX7KKkf1DeQg7+StlJB5g41RBud8WpmRtSGs7VWk=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=hnItabx9D+lF43Q0vxGNVa8XbTRVhlY3oAf3P61KfeTQXFEPJ9Yklj4hA/F4vD6JF
+	 iKk/2QgWf1iMcb35g16EozKH6Ck/gOG1/yI1BE3daKt9aYHAaYTqf22REp0Te/TdGa
+	 zfPNUgv+4vEy2xv4BNt6fdcVXkIhKbUmmzC0ulxsakNNjTLOcnJg/QsgOhy16W3AbS
+	 z8HQXjioQZbx5WJETw8JTc1RStFiTbY1smY7dg40fhm4e0SYX0UQhCDPkCOg6LFxFx
+	 RL6eAZfqVzqrRco6IUTUO8zEt5Qb20uc5cCgYxrcuLbZ2RUzUvQ4oVElqFq3gl9uis
+	 BNIPgPhXcDvBw==
+Received: from IcarusMOD.eternityproject.eu (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id EDED317E04AA;
+	Mon,  7 Jul 2025 11:22:30 +0200 (CEST)
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+To: MyungJoo Ham <myungjoo.ham@samsung.com>, 
+ Kyungmin Park <kyungmin.park@samsung.com>, 
+ Chanwoo Choi <cw00.choi@samsung.com>, Georgi Djakov <djakov@kernel.org>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ Johnson Wang <johnson.wang@mediatek.com>, 
+ =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>, 
+ Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>, 
+ Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
+ Frank Wunderlich <linux@fw-web.de>
+Cc: Frank Wunderlich <frank-w@public-files.de>, linux-pm@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org
+In-Reply-To: <20250706132213.20412-1-linux@fw-web.de>
+References: <20250706132213.20412-1-linux@fw-web.de>
+Subject: Re: (subset) [PATCH v8 00/16] further mt7988 devicetree work
+Message-Id: <175188015088.67037.6051435285718584853.b4-ty@collabora.com>
+Date: Mon, 07 Jul 2025 11:22:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] af_packet: fix soft lockup issue caused by tpacket_snd()
-To: Eric Dumazet <edumazet@google.com>
-Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250707081629.10344-1-luyun_611@163.com>
- <CANn89iKZRpJVduH0WZ57pqRaEma-HB2ymi9P9Q7aK-f7Q8r5XA@mail.gmail.com>
-Content-Language: en-US
-From: luyun <luyun_611@163.com>
-In-Reply-To: <CANn89iKZRpJVduH0WZ57pqRaEma-HB2ymi9P9Q7aK-f7Q8r5XA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PygvCgD3HWCpkGtozG4IBg--.20542S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7tF13Jw4rWrWUKw1Dur4DJwb_yoW5JF13p3
-	y5t3y2yFnrCr40qw1rAr4rJr1Ivw4rJFs8GrZrKryfAr98tas7trWxtayY9as7urZ2kw4a
-	vF42gryUu34DtaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UfnY7UUUUU=
-X-CM-SenderInfo: pox130jbwriqqrwthudrp/1tbiWxaDzmhrhbjP4wABsT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.2
 
+On Sun, 06 Jul 2025 15:21:55 +0200, Frank Wunderlich wrote:
+> From: Frank Wunderlich <frank-w@public-files.de>
+> 
+> This series continues mt7988 devicetree work
+> 
+> - Extend cpu frequency scaling with CCI
+> - GPIO leds
+> - Basic network-support (ethernet controller + builtin switch + SFP Cages)
+> 
+> [...]
 
-在 2025/7/7 16:56, Eric Dumazet 写道:
-> On Mon, Jul 7, 2025 at 1:16 AM Yun Lu <luyun_611@163.com> wrote:
->> From: Yun Lu <luyun@kylinos.cn>
->>
->> When MSG_DONTWAIT is not set, the tpacket_snd operation will wait for
->> pending_refcnt to decrement to zero before returning. The pending_refcnt
->> is decremented by 1 when the skb->destructor function is called,
->> indicating that the skb has been successfully sent and needs to be
->> destroyed.
->>
->> If an error occurs during this process, the tpacket_snd() function will
->> exit and return error, but pending_refcnt may not yet have decremented to
->> zero. Assuming the next send operation is executed immediately, but there
->> are no available frames to be sent in tx_ring (i.e., packet_current_frame
->> returns NULL), and skb is also NULL, the function will not execute
->> wait_for_completion_interruptible_timeout() to yield the CPU. Instead, it
->> will enter a do-while loop, waiting for pending_refcnt to be zero. Even
->> if the previous skb has completed transmission, the skb->destructor
->> function can only be invoked in the ksoftirqd thread (assuming NAPI
->> threading is enabled). When both the ksoftirqd thread and the tpacket_snd
->> operation happen to run on the same CPU, and the CPU trapped in the
->> do-while loop without yielding, the ksoftirqd thread will not get
->> scheduled to run. As a result, pending_refcnt will never be reduced to
->> zero, and the do-while loop cannot exit, eventually leading to a CPU soft
->> lockup issue.
->>
->> In fact, as long as pending_refcnt is not zero, even if skb is NULL,
->> wait_for_completion_interruptible_timeout() should be executed to yield
->> the CPU, allowing the ksoftirqd thread to be scheduled. Therefore, the
->> execution condition of this function should be modified to check if
->> pending_refcnt is not zero.
->>
->> Signed-off-by: Yun Lu <luyun@kylinos.cn>
-> I think you forgot a Fixes: tag.
-Thank you for your advise, I will add this tag in v2 version later.
->
-> Also it seems the soft lockup could happen if MSG_DONTWAIT is set ?
+Applied to v6.16-next/dts64, thanks!
 
-If MSG_DONTWAIT is set, need_wait will be false. In this case, once 
-there are no
+[07/16] dt-bindings: interconnect: add mt7988-cci compatible
+        commit: bd9e0f5d90959d2d07986084fbd58042b62aa549
+[08/16] arm64: dts: mediatek: mt7988: add cci node
+        commit: 0cbdb6d04689f8c05074e348c8e0a42b229ef9a3
+[11/16] arm64: dts: mediatek: mt7988a-bpi-r4: add proc-supply for cci
+        commit: b5a4ad957114b59a74b3e3f598ae0785dd86cd32
+[12/16] arm64: dts: mediatek: mt7988a-bpi-r4: drop unused pins
+        commit: bc51660cd5fd2d0ee9a65b59e0c65e2d1b65975a
+[13/16] arm64: dts: mediatek: mt7988a-bpi-r4: add gpio leds
+        commit: 5a40efb8c9d26e51db8acc61e920c3eda9407c02
 
-available frames to send (i.e., ph is NULL), the while loop condition 
-will not be
+Cheers,
+Angelo
 
-satisfied, and the loop will exit and return immediately without waiting for
-
-pending_refcnt to decrease to 0. The soft lockup issue should no longer 
-occur.
-
-while (likely((ph != NULL) ||
-                  (need_wait && packet_read_pending(&po->tx_ring))));
 
 
