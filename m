@@ -1,175 +1,131 @@
-Return-Path: <netdev+bounces-204527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E30C4AFB0B2
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 12:06:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68455AFB0C0
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 12:08:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B0E716AF00
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 10:06:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35138189E49F
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 10:08:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D47291C29;
-	Mon,  7 Jul 2025 10:06:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Nyz3P/mV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA95292B51;
+	Mon,  7 Jul 2025 10:07:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9640D202996;
-	Mon,  7 Jul 2025 10:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C7B293C4C
+	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 10:07:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751882768; cv=none; b=JoMOk5FP4AgPNHUl0ya4kxumsKiDNMoPXRNubIZlNeUCKSFSpcmWFDePcEAsdmHXzYp0/6SKG3OfsTZ3z1+F24PCPQIyZ2/kxDDdI6T6KvWMCsUN0ibhcaUu57Uy8TfsbgaoMDS0IygKwNVlzWzJE4p5EfBqM3mxQf0ntZYaZtc=
+	t=1751882870; cv=none; b=HCMSHu3i6QH4WSIaAdaRTY27Z4e2c+2mlh05WN9BLwF3UZvV5gZgYdHf6lcD5jfvl5KRO3elnLHMOVr+7hrMJ1iO9q+nVFP5IkdwE6MwQfjlg341GAJ520wCy6Yo8CoLHl9DCQpodZbnd9oKGYB5jXsntcjDRznHdC1PdI1QoOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751882768; c=relaxed/simple;
-	bh=T8iIMPb9brgtZdi72SAWfhA8roPO7vUHjVTHHnOQNVI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gvE8ynq4IWgbfi2LC4xnm05WJ1BqF12s3MLqMU7GjvH3uEJZfTlgUJ7e7hzlCG3gfNGKUYr4WYlNTBGqjLbWnAlxgTbLc9ckiFbGnjjKKq6WHi9CyJro4KPi3QoswmEzBNqbcBukpn9dLhjCxQ+htNV9HPb0GqKHJQXoo6YiC4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=Nyz3P/mV; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1751882764;
-	bh=T8iIMPb9brgtZdi72SAWfhA8roPO7vUHjVTHHnOQNVI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Nyz3P/mVFjxZfpeCi+JHgh8VJSn0xoox1dJhCSYXuFxwdM0sNvNwafLR/zAZnTyb5
-	 G312aUFagNYKNK6E1I1kbqOBbGEQkEaPk40y50SsokLo9okJt1SW3p3dOjBTz8bjv2
-	 Wky154Wu8MeJEVP0vKR5wGEm2/jwK6+2GqTN0ztwuL7vAUWf4ynz1JywSUZ+P8mrze
-	 6w8T8cHr3PtE+/HkwOM7xpiDiZ/Mj812jWdPqEYXBopHPpm4vjZUl1FlU/tTZY1Euk
-	 7RxWXNpMj991IsirfIg5/V1rgvS+ANZm9yFs7dZ88Ag05O5oT3IDfGNEQODCHAOFaZ
-	 EgqL5tUpvw0nQ==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 3BAA017E07C9;
-	Mon,  7 Jul 2025 12:06:03 +0200 (CEST)
-Message-ID: <90a3191f-882d-4302-afd5-e73e751b5b95@collabora.com>
-Date: Mon, 7 Jul 2025 12:06:02 +0200
+	s=arc-20240116; t=1751882870; c=relaxed/simple;
+	bh=FtQESEScKEGm4ZZCj0RN7mGsIyE/eoEObXJoSKFHpWQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YQd7q8+Vn90e8W9J2DyS6HFR/XIv8AuG1l3eZxJYgxVcuEmCmx+c+hiPCD8GPlsxgjn/c0KDmdNJ2XEYog2ZQWdHfQvhbweab2RrgUCKpH19jamwKMzxSHUMxf2Imu8cMikFzrBGywmYBuiSQg9YQBQ8G3cmgjaMmSUwIvdf2qQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uYikg-00055p-AG; Mon, 07 Jul 2025 12:07:10 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1uYikc-007EDt-2n;
+	Mon, 07 Jul 2025 12:07:06 +0200
+Received: from pengutronix.de (p5b1645f7.dip0.t-ipconnect.de [91.22.69.247])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 6B531439509;
+	Mon, 07 Jul 2025 10:07:06 +0000 (UTC)
+Date: Mon, 7 Jul 2025 12:07:05 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: Ming Yu <a0282524688@gmail.com>, Lee Jones <lee@kernel.org>, 
+	tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, 
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH v13 1/7] mfd: Add core driver for Nuvoton NCT6694
+Message-ID: <20250707-new-psychedelic-termite-a309d3-mkl@pengutronix.de>
+References: <20250627102730.71222-1-a0282524688@gmail.com>
+ <20250627102730.71222-2-a0282524688@gmail.com>
+ <20250702161513.GX10134@google.com>
+ <CAOoeyxXWbjWvOgsSvXb9u2y6yFExq347ceZe96bm9w+GQAp2Rg@mail.gmail.com>
+ <0360d2e0-e071-4259-a7c7-23c31e52e563@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 02/16] dt-bindings: net: mediatek,net: allow up to 8
- IRQs
-To: Frank Wunderlich <linux@fw-web.de>, Krzysztof Kozlowski <krzk@kernel.org>
-Cc: MyungJoo Ham <myungjoo.ham@samsung.com>,
- Kyungmin Park <kyungmin.park@samsung.com>,
- Chanwoo Choi <cw00.choi@samsung.com>, Georgi Djakov <djakov@kernel.org>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- Johnson Wang <johnson.wang@mediatek.com>, =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?=
- <arinc.unal@arinc9.com>, Landen Chao <Landen.Chao@mediatek.com>,
- DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
- Daniel Golle <daniel@makrotopia.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Felix Fietkau <nbd@nbd.name>, Frank Wunderlich <frank-w@public-files.de>,
- linux-pm@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <20250706132213.20412-1-linux@fw-web.de>
- <20250706132213.20412-3-linux@fw-web.de>
- <20250707-modest-awesome-baboon-aec601@krzk-bin>
- <B875B8FF-FEDB-4BBD-8843-9BA6E4E89A45@fw-web.de>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Content-Language: en-US
-In-Reply-To: <B875B8FF-FEDB-4BBD-8843-9BA6E4E89A45@fw-web.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="kr6nkexyn6izj5au"
+Content-Disposition: inline
+In-Reply-To: <0360d2e0-e071-4259-a7c7-23c31e52e563@wanadoo.fr>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Il 07/07/25 09:30, Frank Wunderlich ha scritto:
-> Am 7. Juli 2025 08:31:11 MESZ schrieb Krzysztof Kozlowski <krzk@kernel.org>:
->> On Sun, Jul 06, 2025 at 03:21:57PM +0200, Frank Wunderlich wrote:
->>> From: Frank Wunderlich <frank-w@public-files.de>
->>>
->>> Increase the maximum IRQ count to 8 (4 FE + 4 RSS/LRO).
->>
->> Because? Hardware was updated? It was missing before?
-> 
-> There is no RSS support in driver yet,so IRQs were not added to existing DTS yet.
-> 
 
-That's the problem. It's the hardware that you should've described, not the driver.
+--kr6nkexyn6izj5au
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v13 1/7] mfd: Add core driver for Nuvoton NCT6694
+MIME-Version: 1.0
 
-In short, you should've allowed the interrupts from the get-go, and you wouldn't
-be in this situation now :-)
+On 03.07.2025 11:44:27, Vincent Mailhol wrote:
+> On 03/07/2025 =C3=A0 11:39, Ming Yu wrote:
+> > Dear Lee,
+> >=20
+> > Thanks for your feedback and review.
+> > Currently, the status of the sub-device drivers is as follows (A/R/T):
+> >     [v13,1/7] mfd: Add core driver for Nuvoton NCT6694 (- - -)
+> >     [v13,2/7] gpio: Add Nuvoton NCT6694 GPIO support (1 1 -)
+> >     [v13,3/7] i2c: Add Nuvoton NCT6694 I2C support (1 - -)
+> >     [v13,4/7] can: Add Nuvoton NCT6694 CANFD support (- 2 -)
+>=20
+> For the CAN driver, my Reviewed-by can be interpreted as an Acked-by :)
 
->>>
->>> Frame-engine-IRQs (max 4):
->>> MT7621, MT7628: 1 IRQ
->>> MT7622, MT7623: 3 IRQs (only two used by the driver for now)
->>> MT7981, MT7986, MT7988: 4 IRQs (only two used by the driver for now)
->>
->> You updated commit msg - looks fine - but same problem as before in your
->> code. Now MT7981 has 4-8 interrupts, even though you say here it has only
->> 4.
-> 
-> Ethernet works with 4,but can be 8 for MT798x.
-> I cannot increase the MinItems here as it will
-> throw error because currently only 4 are defined in DTS.same for MT7986.
->>>
->>> Mediatek Filogic SoCs (mt798x) have 4 additional IRQs for RSS and/or
->>> LRO.
->>
->> Although I don't know how to treat this. Just say how many interrupts
->> are there (MT7981, MT7986, MT7988: 4 FE and 4 RSS), not 4 but later
->> actually 4+4.
-> 
-> First block is for Frame Engine IRQs and second for RSS/LRO. Only mention total count
-> across all SoCs is imho more confusing.
-> 
->> I also do not understand why 7 interrupts is now valid... Are these not
->> connected physically?
-> 
-> 7 does not make sense but i know no way to allow 8 with min 4 without between (5-7).
-> 
->> Best regards,
->> Krzysztof
-> 
-> Hi
-> 
-> Thanks for taking time for review again.
-> 
-> First block are the frame engine IRQs which are max 4 and on all SoCs.
-> The RSS IRQs are only valid on Filogic (MT798x),so there a total of 8, but on
-> MT7981 and MT7986 not yet added as i prepare the RSS/LRO driver in background.
-> We just want to add the IRQs for MT7988 now.
-> regards Frank
+Feel free to interpret my my Reviewed-by as an Acked-by, too.
 
-Again, it's not the driver but the hardware that you're describing.
+regards,
+Marc
 
-As long as you are fixing the description of the hardware, even for all three,
-I am personally even fine with breaking the ABI, because the hardware description
-has been wrong for all that time.
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-Just don't send those as Fixes commits, but next time you upstream something you
-must keep in mind that in bindings/dts you're describing hardware - the driver is
-something that should not drive any decision in what you write in bindings.
+--kr6nkexyn6izj5au
+Content-Type: application/pgp-signature; name="signature.asc"
 
-We're humans, so stuff like this happens - I'm not saying that you shall not make
-mistakes - but again please, for the next time, please please please keep in mind
-what I just said :-)
+-----BEGIN PGP SIGNATURE-----
 
-Now the options are two:
-  - Break the ABI; or
-  - Allow 4 or 8 interrupts (not 5, not 6, not 7)
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmhrnEYACgkQDHRl3/mQ
+kZz+HAgAo6jP3UtNysl6cnqkkovHfol1pDeGThMia/s6eTksN4DY0u5zqdBI03dN
+dXpm+0P8HVf83Alft8JysqSicG3HxMbdHs8En1RAlkkWYlr/kkL8zfEM06mFYVdL
+6EqNun8pwyIg9PrvRFwslkSTu6zKfqhafW8ouC9+65btTk0MG/AgbUgCLX2fe14v
+5jBv/B8OS97ARLf8pGTDQDqO6vXO2imOkP3Td+Ik61oUgLiQhUxLQVR8RvDKbuEA
++iyqwWyWKsyoiF+0sU+mGLy0ejmuzh+PSvo19hzEE7ic08gZYvB4BA5pxljMiGAR
+1NJdMVxN2BILPjtt1d6e95y9ZqFOiA==
+=dD5C
+-----END PGP SIGNATURE-----
 
-and that - not just on MT7988 but also on 81 and 86 in one go.
-
-Not sure if the second one is feasible, and I'm considering the first option only
-because of that; if the second option can be done, act like I never ever considered
-the first.
-
-Cheers,
-Angelo
+--kr6nkexyn6izj5au--
 
