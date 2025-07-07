@@ -1,662 +1,225 @@
-Return-Path: <netdev+bounces-204655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34F88AFBA2B
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 19:54:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D735DAFBA36
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 19:56:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8126316CE81
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 17:54:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F32A517DC2E
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 17:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D64C2367B5;
-	Mon,  7 Jul 2025 17:54:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00B4E263899;
+	Mon,  7 Jul 2025 17:56:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="B3ZTixbc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MWyzuVLQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2071.outbound.protection.outlook.com [40.107.244.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94527288A2
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 17:54:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.71
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751910864; cv=fail; b=eUEPO4WwZd8J+j+YzyTUr5SE7/SDhRJdmIU+zS/IKAwisC0cFbVOxjNCipTUtrt0NhMhAdTDtsU/snBTS8vvzdXUgWFMgLGyCLPADEC5L8/hVPpvng7GEr6ZWGeFf9KX+1r6N79qurKwLDFzSC5C2CyHXYbcZdEMD/s2FPpB+EQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751910864; c=relaxed/simple;
-	bh=+Iw8n4nu1oGc/i84crmSi76744ZxumHE4adHx8Rpo3Y=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HxE/L2W+NZbvrYLsPbvhJVMWJ2WlzN69OIkNkC9xzYLp8qgsjT1d+DqYu60ZTvIK8Eyyz5qqJmWnB0zwGSkPKdwIfX8DXYBdPyDYOH/yCbpAoYA6V5PcgRM86p0VkwJoTkYFmnlpVHV9Ah/sdyYWTD0cLHLTasSRUDNozCh7FqA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=B3ZTixbc; arc=fail smtp.client-ip=40.107.244.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=d6N2swYMLtvlR82npl8/9sX5UgBzBWmmZgkZgwQtFlCFVrydckEpfoLEIQ2CsmJqvOYlOF1DWtEdCEZx8NGvcYekCMHX3pDdZ5NDgxVDP385/IjwW94B7E+olymgn6sIli58artvU7od8btMQyxUQ6P5Lm/0Q4Kv2EItsheHDKS+NlpU0zhlL3Rrhru4GthtGSef0MmOQH1FCPJjIZ7kiR+uowczs9F9YGlySORXSvaS5ADM0viEvff1UHh6xxXwlYqzNBRaAwdPl21y01MLln9litnk8ln8vZeaNkjgcEiWaUO6PJe/Wu7B/NrGnQMUSUnH7GxYb99Ww1pV6A2rYQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wQSBXTwhkA2Zv2igGIS6+KMpjn4k+55qXxT0ZM3pUhs=;
- b=w+Q8xUbq1cBGdDOoLwrCC0vkZWICN5+H+HBNVO1JkSLri1W57e8V4/KsA7V/WsWnJNUKyiUYgkZocFACSkfoNTbJXqJm1+XwYN48396u6r71IQuVL1IQEd3lRLFFvNIPDCLc0Vu7TPs6QzO++qoyH+bn5o6kUPRJnAfTegfVp6F49NdT9fdi5w2Vm1jEFjOEKZd7MZhkjHLllttpOYT7No+LTDq2ScQwYJibpiYjR68zO7qb+M5RLY0+WfwsXZbGKBRDMgBSS8nFC4mgagh7wodwXOEOQjZXfNDMNUrJS63BPNluyu9/uty1aq42mOoSYTexaNvhb+WdwyLqUbyrUw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wQSBXTwhkA2Zv2igGIS6+KMpjn4k+55qXxT0ZM3pUhs=;
- b=B3ZTixbcHmSldC0aUw0wzFMvM90DkIZYIBEBTQ/n+DrB5OB/nlIj5okbArtnMMMYp6qQXOARnqQVaMB+7ymKB/0IKvfQgvEUbgCWtQm05gsqoyjVHDqH8amWQQ9dOymv+Vq23O1fDy5fT+srrNRX47RP5lujFjjWQKt9FrJadHU=
-Received: from BN9PR03CA0386.namprd03.prod.outlook.com (2603:10b6:408:f7::31)
- by DS7PR12MB5888.namprd12.prod.outlook.com (2603:10b6:8:7b::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8835.24; Mon, 7 Jul
- 2025 17:54:20 +0000
-Received: from MN1PEPF0000ECD7.namprd02.prod.outlook.com
- (2603:10b6:408:f7:cafe::fd) by BN9PR03CA0386.outlook.office365.com
- (2603:10b6:408:f7::31) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8901.27 via Frontend Transport; Mon,
- 7 Jul 2025 17:54:19 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- MN1PEPF0000ECD7.mail.protection.outlook.com (10.167.242.136) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8901.15 via Frontend Transport; Mon, 7 Jul 2025 17:54:19 +0000
-Received: from airavat.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 7 Jul
- 2025 12:54:16 -0500
-From: Raju Rangoju <Raju.Rangoju@amd.com>
-To: <netdev@vger.kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <Shyam-sundar.S-k@amd.com>, "Raju
- Rangoju" <Raju.Rangoju@amd.com>
-Subject: [net-next] amd-xgbe: add hardware PTP timestamping support
-Date: Mon, 7 Jul 2025 23:23:56 +0530
-Message-ID: <20250707175356.46246-1-Raju.Rangoju@amd.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684021B4F09
+	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 17:56:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751910962; cv=none; b=reV/GIFXlnHdZXt6j3+487FMHPTCpyIPijBbLDEQIYKuBt5EhZdOM6SZKGqkjwxEEdsSlDvRkqN2hUH6wpVv9phYkYtH1kEla0qaY+h7rKiOM8IAF6EWOFaoECVWbk4lAw1ewoHjsxHCRn92KSYA8deO3aHvfkO7Yhd27wdCgXc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751910962; c=relaxed/simple;
+	bh=vVIc41gik9SVwhmAAI4bLBDXrNxmon2C6F1Prz4QFwk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ORUmfe0mCZv4SSINdBQLrQtMa2Gq1LcB9ZeEZrpxJKKwC/pCzmXPBRKOY41bk0wh7Tp429vHD7g/aiiYR5xXKCN9n162XrURKYmI5npyFVZesPi5QEo1P1Vv55nwcKv+WimLfqjUayoqcGcWRz+xysb9PfALL16S1EkE2hGwF18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MWyzuVLQ; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-235e1d70d67so29802805ad.0
+        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 10:56:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751910960; x=1752515760; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PksTskkF7rBf7EDPYnUdjBZbUZnXVQyEOs1jfXyDuSU=;
+        b=MWyzuVLQy5q3IvSw5KyeP0eER5alqOq9Yz6I8AYYAKoKyre8b0pGVzn8sM4ZUwFXY3
+         a8Ood/+vZqvN9Yzo53SaLOC5Af7/3vFTtKxm6RbXtjr6OTdKgWigvqcF6vPPMYJfGV4O
+         A/XYploj/yPPE/X3O789l3MLLemm4e6Py21QFdexR4PAOPul82fSWSfyV8u3NR9RreEA
+         IezqsRRVhFEB9Dfcq7Z23hFbTlFB2OEy4ijEbGXl1BEtiYIYxyKzKLYQQHDb6btIxQbg
+         fGPKsTlFCwXl1p0x3XTc579PstCHFOdIA3GtwPWfEQCXxPLEArPaEq5LQtw+CuOvpwtx
+         s7rQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751910960; x=1752515760;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PksTskkF7rBf7EDPYnUdjBZbUZnXVQyEOs1jfXyDuSU=;
+        b=ns5cXn4MXPgI3y9cexlyEuaKy+B6RkGVPstquryYXh7gO5oULZjwY1YUh1dy23+a1C
+         izq8JAchcLRlLMvL08BXW5ox//9Nu97p0GDIB/zGctLhSrtkcyu3hI0yQRMkfTpt5a2J
+         sctDA45qO91BEQdKsTu3Ht6Ekn9lG+uQN1k5bcdT9YIhAbdrdVDBRYPNgkHx+K2m1XwJ
+         7Xlrk9yDqdUE2ydP++R8IzR3HApijZHBJgxHJ6N7RFf9BPGwvqjwSL7KLDlrHO+BZQpT
+         mRYM1nhXYGwtWEUsFKPE1fVqJu/U6o6QEAGHjIL2HDsrF4BVBe0DWS5imz6yQuE977zA
+         NMcg==
+X-Forwarded-Encrypted: i=1; AJvYcCXExR0VU1a/rvLK3Dx1fUmJcXd69rtrEm+gjCsC/7kstBOYWWX+mt0lOAl0opx5o2W1LwaaMLU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeiJ59HeD7qRZmfzH9B0ajM53W3lf9prWbwdkEN/zyHiI843zS
+	Jlzirk7201gJFz5VpUTV7J3oDzxDELcorRTOIbqb33db5QvxkhkdHipigOlUa9PZIbTFonMct+t
+	KSmwhUA==
+X-Google-Smtp-Source: AGHT+IGjoxuR7J9bZtEWt8qmP1ZiwKO8mmW0f980FXR0GimHGf7SuYCbHMqquUwAkQDFj9sQEueqivHvzgQ=
+X-Received: from pgh12.prod.google.com ([2002:a05:6a02:4e0c:b0:b2f:4c1b:e1a0])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d50d:b0:237:ec18:ead7
+ with SMTP id d9443c01a7336-23c87542792mr214269855ad.24.1751910959676; Mon, 07
+ Jul 2025 10:55:59 -0700 (PDT)
+Date: Mon,  7 Jul 2025 17:55:58 +0000
+In-Reply-To: <20250705052805.59618-1-linma@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD7:EE_|DS7PR12MB5888:EE_
-X-MS-Office365-Filtering-Correlation-Id: 487a806e-6393-44bb-21e9-08ddbd7f4c85
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?+t+oK916mYVMYNbGxllbrz/cB0OKgi81tZfuiW3KnnNkukssiSn9V5yX7rbn?=
- =?us-ascii?Q?gaw/mjLgzje41xumxeUsbfNvVjcIeu1Ml9BY6aVqlmMhGej4rat0imP3+9cR?=
- =?us-ascii?Q?+t4Yvw4HDS4uGWXBiExa9LD40avB80FCr2zP5qV8PvrrFyOnrXJtBSObD0Sx?=
- =?us-ascii?Q?FeSUGriFYQ0FndpzbMO5UYV9GQuxGT8daxcGjBnRfqcB41qdRsEz+75deJH3?=
- =?us-ascii?Q?3DTnkYdOXa17zQ2BN/HeRC7dT8GGEM+OPpP6PohAMdUKANyxzwGE71pqVkjR?=
- =?us-ascii?Q?hSrkMplwphfYatMdwH1/n68qdyKZwyAvR5GtbKSpPspz33OIyvqM2oRZMTj4?=
- =?us-ascii?Q?sbmZcW0Hkfh9VnW+yKqZFM4NGutfcwPRe/CrV9JY7h3E5sno4IdBIJCDib4d?=
- =?us-ascii?Q?rFuI5jLSZv9OzfJFvx3+gj1z9Ci2xn5hwt7y384O1Q5A69Po2pXqIsR16EGP?=
- =?us-ascii?Q?hpGQsAtTaCyhTiHUfNUChgIYD7rotavrmc1isHFCjVusX0Ggm/PToYpSG+aB?=
- =?us-ascii?Q?3P10J8toCppIX0o3HGywyLS5JzLOC6pMEAbq9ja4y+LHsuEJxLb+62D/CfhY?=
- =?us-ascii?Q?WeiIxpXxBIMQuG0UXiqnXDrOSFD9FKeByrXIgPNowGglAozoWxHHPbNW0ZxO?=
- =?us-ascii?Q?OuG2p7PtfSqUea+9d46tpx1gLe5EqqIFjCKK3OGioTEb9mCmity5UoEC7zTY?=
- =?us-ascii?Q?mvGK7ElY5QGqONkVFGgVyuQdwRAQU8unatllEh7Udip9yNr8H0JaxlP6yZUV?=
- =?us-ascii?Q?FsdauEmedvJK54S8+N8aAqNyptCKi8Itkikstb8nUmyFv6bJXaRgywkdjpLA?=
- =?us-ascii?Q?csRgessiayAdU/gG0xWTk1andEsfpHdpXwXx4ewj+lE4pJgPzXh9/wCKV7Pt?=
- =?us-ascii?Q?ND8tfs4+0xdpB1+a+JNiPB7bE2mn2Mjhj0asHz4Gmzu56khqPX7vUY3RE5D1?=
- =?us-ascii?Q?ee5rGRNedU6tR/tg/kTP5O/V7jKWYJD4UJ4mS4hu554QoAYWJ9ZGYwYk3V84?=
- =?us-ascii?Q?0bU2J0fqC9on2wt5gHGuDYjcbhAe16dwxDeUaU2XSaMOqp0p1fLps1GXHaqW?=
- =?us-ascii?Q?BVghibVrdsJLK/GIdb4t+xbAzhpxnJLKyQAymVMEMOgIv/9h6l3YqRHx0CmL?=
- =?us-ascii?Q?umWv5i2/y9dTIy5d/7B6K5QVEJ511X1QG8jJxZbfVcBF3bKv5dpq1Q3ryBsC?=
- =?us-ascii?Q?lpfHvH9t2GbDHlJgc61sus7SEHPTyCVb3hqV9TI5XCu7InGRTGTmpDWQLL+J?=
- =?us-ascii?Q?eHDSJ+joHw7SYGkHy2FSfPb6uLixeFTA6QgZNwW2MkiB1ykIOB1njt7ASvYn?=
- =?us-ascii?Q?CrbnlbIziz+c9LHWRzrv7ccYw1mfmuy/OURIcnqPJxKLY6rRFwwIzpSlZ4nx?=
- =?us-ascii?Q?/13CpfUWiW6beB8OZGpvG8vr/oRKYwbDVX3f5aJUm4Fwx+2h8vsPucW1R/bw?=
- =?us-ascii?Q?m0YrsAmyOVOi0IC8yuwKsL4RyuBlzrQdF6Y6v0zdYu18CEs+n6qwVD2f44VI?=
- =?us-ascii?Q?uUKlYlf7qFvpN0wbr8uJKdWk5lrK1P/U4XDi?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2025 17:54:19.8330
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 487a806e-6393-44bb-21e9-08ddbd7f4c85
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000ECD7.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5888
+Mime-Version: 1.0
+References: <20250705052805.59618-1-linma@zju.edu.cn>
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250707175558.3137384-1-kuniyu@google.com>
+Subject: Re: [PATCH net v4] net: atm: Fix incorrect net_device lec check
+From: Kuniyuki Iwashima <kuniyu@google.com>
+To: linma@zju.edu.cn
+Cc: davem@davemloft.net, gregkh@linuxfoundation.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kuniyu@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Adds support for hardware-based PTP (IEEE 1588) timestamping to
-the AMD XGBE driver.
+From: Lin Ma <linma@zju.edu.cn>
+Date: Sat,  5 Jul 2025 13:28:05 +0800
+> There are two sites in atm mpoa code that believe the fetched object
+> net_device is of lec type. However, both of them do just name checking
+> to ensure that the device name starts with "lec" pattern string.
+> 
+> That is, malicious user can hijack this by creating another device
+> starting with that pattern, thereby causing type confusion. For example,
+> create a *team* interface with lecX name, bind that interface and send
+> messages will get a crash like below:
+> 
+> [   18.450000] kernel tried to execute NX-protected page - exploit attempt? (uid: 0)
+> [   18.452366] BUG: unable to handle page fault for address: ffff888005702a70
+> [   18.454253] #PF: supervisor instruction fetch in kernel mode
+> [   18.455058] #PF: error_code(0x0011) - permissions violation
+> [   18.455366] PGD 3801067 P4D 3801067 PUD 3802067 PMD 80000000056000e3
+> [   18.455725] Oops: 0011 [#1] PREEMPT SMP PTI
+> [   18.455966] CPU: 0 PID: 130 Comm: trigger Not tainted 6.1.90 #7
+> [   18.456921] RIP: 0010:0xffff888005702a70
+> [   18.457151] Code: .....
+> [   18.458168] RSP: 0018:ffffc90000677bf8 EFLAGS: 00010286
+> [   18.458461] RAX: ffff888005702a70 RBX: ffff888005702000 RCX: 000000000000001b
+> [   18.458850] RDX: ffffc90000677c10 RSI: ffff88800565e0a8 RDI: ffff888005702000
+> [   18.459248] RBP: ffffc90000677c68 R08: 0000000000000000 R09: 0000000000000000
+> [   18.459644] R10: 0000000000000000 R11: ffff888005702a70 R12: ffff88800556c000
+> [   18.460033] R13: ffff888005964900 R14: ffff8880054b4000 R15: ffff8880054b5000
+> [   18.460425] FS:  0000785e61b5a740(0000) GS:ffff88807dc00000(0000) knlGS:0000000000000000
+> [   18.460872] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [   18.461183] CR2: ffff888005702a70 CR3: 00000000054c2000 CR4: 00000000000006f0
+> [   18.461580] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> [   18.461974] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> [   18.462368] Call Trace:
+> [   18.462518]  <TASK>
+> [   18.462645]  ? __die_body+0x64/0xb0
+> [   18.462856]  ? page_fault_oops+0x353/0x3e0
+> [   18.463092]  ? exc_page_fault+0xaf/0xd0
+> [   18.463322]  ? asm_exc_page_fault+0x22/0x30
+> [   18.463589]  ? msg_from_mpoad+0x431/0x9d0
+> [   18.463820]  ? vcc_sendmsg+0x165/0x3b0
+> [   18.464031]  vcc_sendmsg+0x20a/0x3b0
+> [   18.464238]  ? wake_bit_function+0x80/0x80
+> [   18.464511]  __sys_sendto+0x38c/0x3a0
+> [   18.464729]  ? percpu_counter_add_batch+0x87/0xb0
+> [   18.465002]  __x64_sys_sendto+0x22/0x30
+> [   18.465219]  do_syscall_64+0x6c/0xa0
+> [   18.465465]  ? preempt_count_add+0x54/0xb0
+> [   18.465697]  ? up_read+0x37/0x80
+> [   18.465883]  ? do_user_addr_fault+0x25e/0x5b0
+> [   18.466126]  ? exit_to_user_mode_prepare+0x12/0xb0
+> [   18.466435]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> [   18.466727] RIP: 0033:0x785e61be4407
+> [   18.467948] RSP: 002b:00007ffe61ae2150 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
+> [   18.468368] RAX: ffffffffffffffda RBX: 0000785e61b5a740 RCX: 0000785e61be4407
+> [   18.468758] RDX: 000000000000019c RSI: 00007ffe61ae21c0 RDI: 0000000000000003
+> [   18.469149] RBP: 00007ffe61ae2370 R08: 0000000000000000 R09: 0000000000000000
+> [   18.469542] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
+> [   18.469936] R13: 00007ffe61ae2498 R14: 0000785e61d74000 R15: 000057bddcbabd98
+> 
+> Correctly validating the net_device object has several methods. For
+> example, function xgbe_netdev_event() checks `netdev_ops` field,
+> function clip_device_event() checks `type` field. Considering the
+> related variable `lec_netdev_ops` is not defined in the same file, so
+> introduce another type value `ARPHRD_ATM_LANE` for a simple and correct
+> check.
+> 
+> By the way, this bug dates back to pre-git history (2.3.15), hence use
+> the first reference for tracking.
+> 
+> Signed-off-by: Lin Ma <linma@zju.edu.cn>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> ---
+> V3 -> V4: Fix the linking issue reported by intel kernel test robot.
+>           see details in https://lore.kernel.org/oe-kbuild-all/202507050831.2GTrUnFN-lkp@intel.com/
+>           As pointed out by Simon <horms@kernel.org>, not using netdev_ops
+>           for check in this case
+> 
+>  include/uapi/linux/if_arp.h | 1 +
+>  net/atm/lec.c               | 1 +
+>  net/atm/mpc.c               | 5 ++++-
+>  3 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/uapi/linux/if_arp.h b/include/uapi/linux/if_arp.h
+> index 4783af9fe520..d61ee711a495 100644
+> --- a/include/uapi/linux/if_arp.h
+> +++ b/include/uapi/linux/if_arp.h
+> @@ -38,6 +38,7 @@
+>  #define	ARPHRD_APPLETLK	8		/* APPLEtalk			*/
+>  #define ARPHRD_DLCI	15		/* Frame Relay DLCI		*/
+>  #define ARPHRD_ATM	19		/* ATM 				*/
+> +#define ARPHRD_ATM_LANE	20		/* ATM LAN Emulation		*/
 
-- Initialize and configure the MAC PTP registers based on link
-  speed and reference clock.
-- Support both 50MHz and 125MHz PTP reference clocks.
-- Update the driver interface and version data to support PTP
-  clock frequency selection.
+20 is assigned to Serial Line.
 
-Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
----
- drivers/net/ethernet/amd/xgbe/xgbe-common.h |  10 ++
- drivers/net/ethernet/amd/xgbe/xgbe-dev.c    | 145 ++++++++++++++++----
- drivers/net/ethernet/amd/xgbe/xgbe-drv.c    |  15 +-
- drivers/net/ethernet/amd/xgbe/xgbe-pci.c    |   2 +
- drivers/net/ethernet/amd/xgbe/xgbe-ptp.c    |  74 +++++-----
- drivers/net/ethernet/amd/xgbe/xgbe.h        |  25 +++-
- 6 files changed, 187 insertions(+), 84 deletions(-)
+Given all the recent commits are odd bug fixes and there are more bugs
+(e.g. firing netdev watchdog infinitely, lack of netns_immutable, etc),
+I'm leaning towards removing lec and mpc completely.  I don't think it's
+still used nowadays.
 
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-common.h b/drivers/net/ethernet/amd/xgbe/xgbe-common.h
-index e54e3e36d3f9..009fbc9b11ce 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-common.h
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-common.h
-@@ -223,6 +223,10 @@
- #define MAC_TSSR			0x0d20
- #define MAC_TXSNR			0x0d30
- #define MAC_TXSSR			0x0d34
-+#define MAC_TICNR                       0x0d58
-+#define MAC_TICSNR                      0x0d5C
-+#define MAC_TECNR                       0x0d60
-+#define MAC_TECSNR                      0x0d64
- 
- #define MAC_QTFCR_INC			4
- #define MAC_MACA_INC			4
-@@ -428,6 +432,8 @@
- #define MAC_TSCR_SNAPTYPSEL_WIDTH	2
- #define MAC_TSCR_TSADDREG_INDEX		5
- #define MAC_TSCR_TSADDREG_WIDTH		1
-+#define MAC_TSCR_TSUPDT_INDEX		3
-+#define MAC_TSCR_TSUPDT_WIDTH		1
- #define MAC_TSCR_TSCFUPDT_INDEX		1
- #define MAC_TSCR_TSCFUPDT_WIDTH		1
- #define MAC_TSCR_TSCTRLSSR_INDEX	9
-@@ -456,6 +462,10 @@
- #define MAC_TSSR_TXTSC_WIDTH		1
- #define MAC_TXSNR_TXTSSTSMIS_INDEX	31
- #define MAC_TXSNR_TXTSSTSMIS_WIDTH	1
-+#define MAC_TICSNR_TSICSNS_INDEX	8
-+#define MAC_TICSNR_TSICSNS_WIDTH	8
-+#define MAC_TECSNR_TSECSNS_INDEX	8
-+#define MAC_TECSNR_TSECSNS_WIDTH	8
- #define MAC_VLANHTR_VLHT_INDEX		0
- #define MAC_VLANHTR_VLHT_WIDTH		16
- #define MAC_VLANIR_VLTI_INDEX		20
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-index 9e4e79bfe624..559425fa1846 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-@@ -1558,6 +1558,29 @@ static void xgbe_rx_desc_init(struct xgbe_channel *channel)
- 	DBGPR("<--rx_desc_init\n");
- }
- 
-+static void xgbe_update_tstamp_time(struct xgbe_prv_data *pdata,
-+				    unsigned int sec, unsigned int nsec)
-+{
-+	unsigned int count = 10000;
-+
-+	/* Set the time values and tell the device */
-+	XGMAC_IOWRITE(pdata, MAC_STSUR, sec);
-+	XGMAC_IOWRITE(pdata, MAC_STNUR, nsec);
-+
-+	/* issue command to update the system time value */
-+	XGMAC_IOWRITE(pdata, MAC_TSCR,
-+		      XGMAC_IOREAD(pdata, MAC_TSCR) |
-+		      (1 << MAC_TSCR_TSUPDT_INDEX));
-+
-+	/* Wait for the time till update complete */
-+	while (--count && XGMAC_IOREAD_BITS(pdata, MAC_TSCR, TSUPDT))
-+		udelay(5);
-+
-+	if (!count)
-+		netdev_err(pdata->netdev,
-+			   "timed out updating system timestamp\n");
-+}
-+
- static void xgbe_update_tstamp_addend(struct xgbe_prv_data *pdata,
- 				      unsigned int addend)
- {
-@@ -1636,8 +1659,8 @@ static void xgbe_get_rx_tstamp(struct xgbe_packet_data *packet,
- 	if (XGMAC_GET_BITS_LE(rdesc->desc3, RX_CONTEXT_DESC3, TSA) &&
- 	    !XGMAC_GET_BITS_LE(rdesc->desc3, RX_CONTEXT_DESC3, TSD)) {
- 		nsec = le32_to_cpu(rdesc->desc1);
--		nsec <<= 32;
--		nsec |= le32_to_cpu(rdesc->desc0);
-+		nsec *= NSEC_PER_SEC;
-+		nsec += le32_to_cpu(rdesc->desc0);
- 		if (nsec != 0xffffffffffffffffULL) {
- 			packet->rx_tstamp = nsec;
- 			XGMAC_SET_BITS(packet->attributes, RX_PACKET_ATTRIBUTES,
-@@ -1646,39 +1669,18 @@ static void xgbe_get_rx_tstamp(struct xgbe_packet_data *packet,
- 	}
- }
- 
--static int xgbe_config_tstamp(struct xgbe_prv_data *pdata,
--			      unsigned int mac_tscr)
-+static void xgbe_config_tstamp(struct xgbe_prv_data *pdata,
-+			       unsigned int mac_tscr)
- {
--	/* Set one nano-second accuracy */
--	XGMAC_SET_BITS(mac_tscr, MAC_TSCR, TSCTRLSSR, 1);
--
--	/* Set fine timestamp update */
--	XGMAC_SET_BITS(mac_tscr, MAC_TSCR, TSCFUPDT, 1);
--
--	/* Overwrite earlier timestamps */
--	XGMAC_SET_BITS(mac_tscr, MAC_TSCR, TXTSSTSM, 1);
--
--	XGMAC_IOWRITE(pdata, MAC_TSCR, mac_tscr);
--
--	/* Exit if timestamping is not enabled */
--	if (!XGMAC_GET_BITS(mac_tscr, MAC_TSCR, TSENA))
--		return 0;
-+	unsigned int value = 0;
- 
--	/* Initialize time registers */
--	XGMAC_IOWRITE_BITS(pdata, MAC_SSIR, SSINC, XGBE_TSTAMP_SSINC);
--	XGMAC_IOWRITE_BITS(pdata, MAC_SSIR, SNSINC, XGBE_TSTAMP_SNSINC);
--	xgbe_update_tstamp_addend(pdata, pdata->tstamp_addend);
--	xgbe_set_tstamp_time(pdata, 0, 0);
--
--	/* Initialize the timecounter */
--	timecounter_init(&pdata->tstamp_tc, &pdata->tstamp_cc,
--			 ktime_to_ns(ktime_get_real()));
--
--	return 0;
-+	value = XGMAC_IOREAD(pdata, MAC_TSCR);
-+	value |= mac_tscr;
-+	XGMAC_IOWRITE(pdata, MAC_TSCR, value);
- }
- 
- static void xgbe_tx_start_xmit(struct xgbe_channel *channel,
--			       struct xgbe_ring *ring)
-+		struct xgbe_ring *ring)
- {
- 	struct xgbe_prv_data *pdata = channel->pdata;
- 	struct xgbe_ring_data *rdata;
-@@ -3512,6 +3514,87 @@ static void xgbe_powerdown_rx(struct xgbe_prv_data *pdata)
- 	}
- }
- 
-+static void xgbe_init_ptp(struct xgbe_prv_data *pdata)
-+{
-+	unsigned int mac_tscr = 0;
-+	struct timespec64 now;
-+	u64 dividend;
-+
-+	/* Register Settings to be done based on the link speed. */
-+	switch (pdata->phy.speed) {
-+	case SPEED_1000:
-+		XGMAC_IOWRITE(pdata, MAC_TICNR, MAC_TICNR_1G_INITVAL);
-+		XGMAC_IOWRITE(pdata, MAC_TECNR, MAC_TECNR_1G_INITVAL);
-+		break;
-+	case SPEED_2500:
-+	case SPEED_10000:
-+		XGMAC_IOWRITE_BITS(pdata, MAC_TICSNR, TSICSNS,
-+				   MAC_TICSNR_10G_INITVAL);
-+		XGMAC_IOWRITE(pdata, MAC_TECNR, MAC_TECNR_10G_INITVAL);
-+		XGMAC_IOWRITE_BITS(pdata, MAC_TECSNR, TSECSNS,
-+				   MAC_TECSNR_10G_INITVAL);
-+		break;
-+	case SPEED_UNKNOWN:
-+	default:
-+		break;
-+	}
-+
-+	/* Enable IEEE1588 PTP clock. */
-+	XGMAC_SET_BITS(mac_tscr, MAC_TSCR, TSENA, 1);
-+
-+	/* Overwrite earlier timestamps */
-+	XGMAC_SET_BITS(mac_tscr, MAC_TSCR, TXTSSTSM, 1);
-+
-+	/* Set one nano-second accuracy */
-+	XGMAC_SET_BITS(mac_tscr, MAC_TSCR, TSCTRLSSR, 1);
-+
-+	/* Set fine timestamp update */
-+	XGMAC_SET_BITS(mac_tscr, MAC_TSCR, TSCFUPDT, 1);
-+
-+	xgbe_config_tstamp(pdata, mac_tscr);
-+
-+	/* Exit if timestamping is not enabled */
-+	if (!XGMAC_GET_BITS(mac_tscr, MAC_TSCR, TSENA))
-+		return;
-+
-+	if (pdata->vdata->tstamp_ptp_clock_freq) {
-+		/* Initialize time registers based on
-+		 * 125MHz PTP Clock Frequency
-+		 */
-+		XGMAC_IOWRITE_BITS(pdata, MAC_SSIR, SSINC,
-+				   XGBE_V2_TSTAMP_SSINC);
-+		XGMAC_IOWRITE_BITS(pdata, MAC_SSIR, SNSINC,
-+				   XGBE_V2_TSTAMP_SNSINC);
-+	} else {
-+		/* Initialize time registers based on
-+		 * 50MHz PTP Clock Frequency
-+		 */
-+		XGMAC_IOWRITE_BITS(pdata, MAC_SSIR, SSINC, XGBE_TSTAMP_SSINC);
-+		XGMAC_IOWRITE_BITS(pdata, MAC_SSIR, SNSINC, XGBE_TSTAMP_SNSINC);
-+	}
-+
-+	/* Calculate the addend:
-+	 *   addend = 2^32 / (PTP ref clock / (PTP clock based on SSINC))
-+	 *          = (2^32 * (PTP clock based on SSINC)) / PTP ref clock
-+	 */
-+	if (pdata->vdata->tstamp_ptp_clock_freq)
-+		dividend = 100000000;           // PTP clock frequency is 125MHz
-+	else
-+		dividend = 50000000;            // PTP clock frequency is 50MHz
-+
-+	dividend <<= 32;
-+	pdata->tstamp_addend = div_u64(dividend, pdata->ptpclk_rate);
-+
-+	xgbe_update_tstamp_addend(pdata, pdata->tstamp_addend);
-+
-+	dma_wmb();
-+	/* initialize system time */
-+	ktime_get_real_ts64(&now);
-+
-+	/* lower 32 bits of tv_sec are safe until y2106 */
-+	xgbe_set_tstamp_time(pdata, (u32)now.tv_sec, now.tv_nsec);
-+}
-+
- static int xgbe_init(struct xgbe_prv_data *pdata)
- {
- 	struct xgbe_desc_if *desc_if = &pdata->desc_if;
-@@ -3672,9 +3755,11 @@ void xgbe_init_function_ptrs_dev(struct xgbe_hw_if *hw_if)
- 	hw_if->read_mmc_stats = xgbe_read_mmc_stats;
- 
- 	/* For PTP config */
-+	hw_if->init_ptp = xgbe_init_ptp;
- 	hw_if->config_tstamp = xgbe_config_tstamp;
- 	hw_if->update_tstamp_addend = xgbe_update_tstamp_addend;
- 	hw_if->set_tstamp_time = xgbe_set_tstamp_time;
-+	hw_if->update_tstamp_time = xgbe_update_tstamp_time;
- 	hw_if->get_tstamp_time = xgbe_get_tstamp_time;
- 	hw_if->get_tx_tstamp = xgbe_get_tx_tstamp;
- 
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-index 65447f9a0a59..a6b9d0cda48c 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
-@@ -1377,7 +1377,6 @@ static void xgbe_tx_tstamp(struct work_struct *work)
- 						   struct xgbe_prv_data,
- 						   tx_tstamp_work);
- 	struct skb_shared_hwtstamps hwtstamps;
--	u64 nsec;
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&pdata->tstamp_lock, flags);
-@@ -1385,11 +1384,8 @@ static void xgbe_tx_tstamp(struct work_struct *work)
- 		goto unlock;
- 
- 	if (pdata->tx_tstamp) {
--		nsec = timecounter_cyc2time(&pdata->tstamp_tc,
--					    pdata->tx_tstamp);
--
- 		memset(&hwtstamps, 0, sizeof(hwtstamps));
--		hwtstamps.hwtstamp = ns_to_ktime(nsec);
-+		hwtstamps.hwtstamp = ns_to_ktime(pdata->tx_tstamp);
- 		skb_tstamp_tx(pdata->tx_tstamp_skb, &hwtstamps);
- 	}
- 
-@@ -1776,6 +1772,9 @@ static int xgbe_open(struct net_device *netdev)
- 	INIT_WORK(&pdata->stopdev_work, xgbe_stopdev);
- 	INIT_WORK(&pdata->tx_tstamp_work, xgbe_tx_tstamp);
- 
-+	/* Initialize PTP timestamping and clock. */
-+	pdata->hw_if.init_ptp(pdata);
-+
- 	ret = xgbe_alloc_memory(pdata);
- 	if (ret)
- 		goto err_ptpclk;
-@@ -2546,12 +2545,8 @@ static int xgbe_rx_poll(struct xgbe_channel *channel, int budget)
- 
- 		if (XGMAC_GET_BITS(packet->attributes,
- 				   RX_PACKET_ATTRIBUTES, RX_TSTAMP)) {
--			u64 nsec;
--
--			nsec = timecounter_cyc2time(&pdata->tstamp_tc,
--						    packet->rx_tstamp);
- 			hwtstamps = skb_hwtstamps(skb);
--			hwtstamps->hwtstamp = ns_to_ktime(nsec);
-+			hwtstamps->hwtstamp = ns_to_ktime(packet->rx_tstamp);
- 		}
- 
- 		if (XGMAC_GET_BITS(packet->attributes,
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-pci.c b/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
-index 097ec5e4f261..e3e1dca9856a 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
-@@ -414,6 +414,7 @@ static struct xgbe_version_data xgbe_v2a = {
- 	.tx_max_fifo_size		= 229376,
- 	.rx_max_fifo_size		= 229376,
- 	.tx_tstamp_workaround		= 1,
-+	.tstamp_ptp_clock_freq		= 1,
- 	.ecc_support			= 1,
- 	.i2c_support			= 1,
- 	.irq_reissue_support		= 1,
-@@ -430,6 +431,7 @@ static struct xgbe_version_data xgbe_v2b = {
- 	.tx_max_fifo_size		= 65536,
- 	.rx_max_fifo_size		= 65536,
- 	.tx_tstamp_workaround		= 1,
-+	.tstamp_ptp_clock_freq		= 1,
- 	.ecc_support			= 1,
- 	.i2c_support			= 1,
- 	.irq_reissue_support		= 1,
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c b/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c
-index 978c4dd01fa0..52764dcd9f4d 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c
-@@ -13,18 +13,6 @@
- #include "xgbe.h"
- #include "xgbe-common.h"
- 
--static u64 xgbe_cc_read(const struct cyclecounter *cc)
--{
--	struct xgbe_prv_data *pdata = container_of(cc,
--						   struct xgbe_prv_data,
--						   tstamp_cc);
--	u64 nsec;
--
--	nsec = pdata->hw_if.get_tstamp_time(pdata);
--
--	return nsec;
--}
--
- static int xgbe_adjfine(struct ptp_clock_info *info, long scaled_ppm)
- {
- 	struct xgbe_prv_data *pdata = container_of(info,
-@@ -50,25 +38,55 @@ static int xgbe_adjtime(struct ptp_clock_info *info, s64 delta)
- 						   struct xgbe_prv_data,
- 						   ptp_clock_info);
- 	unsigned long flags;
-+	unsigned int sec, nsec;
-+	unsigned int neg_adjust = 0;
-+	u32 quotient, reminder;
-+
-+	if (delta < 0) {
-+		neg_adjust = 1;
-+		delta = -delta;
-+	}
-+
-+	quotient = div_u64_rem(delta, 1000000000ULL, &reminder);
-+	sec = quotient;
-+	nsec = reminder;
-+
-+	/* Negative adjustment for Hw timer register. */
-+	if (neg_adjust) {
-+		sec = -sec;
-+		if (XGMAC_IOREAD_BITS(pdata, MAC_TSCR, TSCTRLSSR))
-+			nsec = (1000000000UL - nsec);
-+		else
-+			nsec = (0x80000000UL - nsec);
-+	}
-+	nsec = (neg_adjust << 31) | nsec;
- 
- 	spin_lock_irqsave(&pdata->tstamp_lock, flags);
--	timecounter_adjtime(&pdata->tstamp_tc, delta);
-+	pdata->hw_if.update_tstamp_time(pdata, sec, nsec);
- 	spin_unlock_irqrestore(&pdata->tstamp_lock, flags);
- 
- 	return 0;
- }
- 
--static int xgbe_gettime(struct ptp_clock_info *info, struct timespec64 *ts)
-+static int xgbe_gettimex(struct ptp_clock_info *info,
-+			 struct timespec64 *ts,
-+			 struct ptp_system_timestamp *sts)
- {
- 	struct xgbe_prv_data *pdata = container_of(info,
- 						   struct xgbe_prv_data,
- 						   ptp_clock_info);
- 	unsigned long flags;
- 	u64 nsec;
-+	static int count = 3;
-+
-+	if (count > 0 && count--)
-+		dump_stack();
- 
- 	spin_lock_irqsave(&pdata->tstamp_lock, flags);
- 
--	nsec = timecounter_read(&pdata->tstamp_tc);
-+	ptp_read_system_prets(sts);
-+	nsec = pdata->hw_if.get_tstamp_time(pdata);
-+	ptp_read_system_postts(sts);
- 
- 	spin_unlock_irqrestore(&pdata->tstamp_lock, flags);
- 
-@@ -84,13 +102,10 @@ static int xgbe_settime(struct ptp_clock_info *info,
- 						   struct xgbe_prv_data,
- 						   ptp_clock_info);
- 	unsigned long flags;
--	u64 nsec;
--
--	nsec = timespec64_to_ns(ts);
- 
- 	spin_lock_irqsave(&pdata->tstamp_lock, flags);
- 
--	timecounter_init(&pdata->tstamp_tc, &pdata->tstamp_cc, nsec);
-+	pdata->hw_if.set_tstamp_time(pdata, ts->tv_sec, ts->tv_nsec);
- 
- 	spin_unlock_irqrestore(&pdata->tstamp_lock, flags);
- 
-@@ -107,8 +122,6 @@ void xgbe_ptp_register(struct xgbe_prv_data *pdata)
- {
- 	struct ptp_clock_info *info = &pdata->ptp_clock_info;
- 	struct ptp_clock *clock;
--	struct cyclecounter *cc = &pdata->tstamp_cc;
--	u64 dividend;
- 
- 	snprintf(info->name, sizeof(info->name), "%s",
- 		 netdev_name(pdata->netdev));
-@@ -116,7 +129,7 @@ void xgbe_ptp_register(struct xgbe_prv_data *pdata)
- 	info->max_adj = pdata->ptpclk_rate;
- 	info->adjfine = xgbe_adjfine;
- 	info->adjtime = xgbe_adjtime;
--	info->gettime64 = xgbe_gettime;
-+	info->gettimex64 = xgbe_gettimex;
- 	info->settime64 = xgbe_settime;
- 	info->enable = xgbe_enable;
- 
-@@ -128,23 +141,6 @@ void xgbe_ptp_register(struct xgbe_prv_data *pdata)
- 
- 	pdata->ptp_clock = clock;
- 
--	/* Calculate the addend:
--	 *   addend = 2^32 / (PTP ref clock / 50Mhz)
--	 *          = (2^32 * 50Mhz) / PTP ref clock
--	 */
--	dividend = 50000000;
--	dividend <<= 32;
--	pdata->tstamp_addend = div_u64(dividend, pdata->ptpclk_rate);
--
--	/* Setup the timecounter */
--	cc->read = xgbe_cc_read;
--	cc->mask = CLOCKSOURCE_MASK(64);
--	cc->mult = 1;
--	cc->shift = 0;
--
--	timecounter_init(&pdata->tstamp_tc, &pdata->tstamp_cc,
--			 ktime_to_ns(ktime_get_real()));
--
- 	/* Disable all timestamping to start */
- 	XGMAC_IOWRITE(pdata, MAC_TSCR, 0);
- 	pdata->tstamp_config.tx_type = HWTSTAMP_TX_OFF;
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
-index 70169ea23c7f..b5c5624eb827 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe.h
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
-@@ -119,6 +119,14 @@
- #define XGBE_MSI_BASE_COUNT	4
- #define XGBE_MSI_MIN_COUNT	(XGBE_MSI_BASE_COUNT + 1)
- 
-+/* Initial PTP register values based on Link Speed. */
-+#define MAC_TICNR_1G_INITVAL	0x10
-+#define MAC_TECNR_1G_INITVAL	0x28
-+
-+#define MAC_TICSNR_10G_INITVAL	0x33
-+#define MAC_TECNR_10G_INITVAL	0x14
-+#define MAC_TECSNR_10G_INITVAL	0xCC
-+
- /* PCI clock frequencies */
- #define XGBE_V2_DMA_CLOCK_FREQ	500000000	/* 500 MHz */
- #define XGBE_V2_PTP_CLOCK_FREQ	125000000	/* 125 MHz */
-@@ -129,6 +137,8 @@
- #define XGBE_TSTAMP_SSINC	20
- #define XGBE_TSTAMP_SNSINC	0
- 
-+#define XGBE_V2_TSTAMP_SSINC	0xA
-+#define XGBE_V2_TSTAMP_SNSINC	0
- /* Driver PMT macros */
- #define XGMAC_DRIVER_CONTEXT	1
- #define XGMAC_IOCTL_CONTEXT	2
-@@ -742,10 +752,16 @@ struct xgbe_hw_if {
- 	void (*read_mmc_stats)(struct xgbe_prv_data *);
- 
- 	/* For Timestamp config */
--	int (*config_tstamp)(struct xgbe_prv_data *, unsigned int);
--	void (*update_tstamp_addend)(struct xgbe_prv_data *, unsigned int);
--	void (*set_tstamp_time)(struct xgbe_prv_data *, unsigned int sec,
-+	void (*init_ptp)(struct xgbe_prv_data *pdata);
-+	void (*config_tstamp)(struct xgbe_prv_data *pdata,
-+			      unsigned int mac_tscr);
-+	void (*update_tstamp_addend)(struct xgbe_prv_data *pdata,
-+				     unsigned int addend);
-+	void (*set_tstamp_time)(struct xgbe_prv_data *pdata, unsigned int sec,
- 				unsigned int nsec);
-+	void (*update_tstamp_time)(struct xgbe_prv_data *pdata,
-+				   unsigned int sec,
-+				   unsigned int nsec);
- 	u64 (*get_tstamp_time)(struct xgbe_prv_data *);
- 	u64 (*get_tx_tstamp)(struct xgbe_prv_data *);
- 
-@@ -946,6 +962,7 @@ struct xgbe_version_data {
- 	unsigned int tx_max_fifo_size;
- 	unsigned int rx_max_fifo_size;
- 	unsigned int tx_tstamp_workaround;
-+	unsigned int tstamp_ptp_clock_freq;
- 	unsigned int ecc_support;
- 	unsigned int i2c_support;
- 	unsigned int irq_reissue_support;
-@@ -1131,8 +1148,6 @@ struct xgbe_prv_data {
- 	struct ptp_clock_info ptp_clock_info;
- 	struct ptp_clock *ptp_clock;
- 	struct hwtstamp_config tstamp_config;
--	struct cyclecounter tstamp_cc;
--	struct timecounter tstamp_tc;
- 	unsigned int tstamp_addend;
- 	struct work_struct tx_tstamp_work;
- 	struct sk_buff *tx_tstamp_skb;
--- 
-2.34.1
 
+>  #define ARPHRD_METRICOM	23		/* Metricom STRIP (new IANA id)	*/
+>  #define	ARPHRD_IEEE1394	24		/* IEEE 1394 IPv4 - RFC 2734	*/
+>  #define ARPHRD_EUI64	27		/* EUI-64                       */
+> diff --git a/net/atm/lec.c b/net/atm/lec.c
+> index 73078306504c..dd82a9f203cc 100644
+> --- a/net/atm/lec.c
+> +++ b/net/atm/lec.c
+> @@ -745,6 +745,7 @@ static int lecd_attach(struct atm_vcc *vcc, int arg)
+>  			return -ENOMEM;
+>  		dev_lec[i]->netdev_ops = &lec_netdev_ops;
+>  		dev_lec[i]->max_mtu = 18190;
+> +		dev_lec[i]->type = ARPHRD_ATM_LANE;
+>  		snprintf(dev_lec[i]->name, IFNAMSIZ, "lec%d", i);
+>  		if (register_netdev(dev_lec[i])) {
+>  			free_netdev(dev_lec[i]);
+> diff --git a/net/atm/mpc.c b/net/atm/mpc.c
+> index 583c27131b7d..4170453bbfd8 100644
+> --- a/net/atm/mpc.c
+> +++ b/net/atm/mpc.c
+> @@ -275,6 +275,9 @@ static struct net_device *find_lec_by_itfnum(int itf)
+>  	sprintf(name, "lec%d", itf);
+>  	dev = dev_get_by_name(&init_net, name);
+>  
+> +	if (!dev || dev->type != ARPHRD_ATM_LANE)
+> +		return NULL;
+> +
+>  	return dev;
+>  }
+>  
+> @@ -1006,7 +1009,7 @@ static int mpoa_event_listener(struct notifier_block *mpoa_notifier,
+>  	if (!net_eq(dev_net(dev), &init_net))
+>  		return NOTIFY_DONE;
+>  
+> -	if (strncmp(dev->name, "lec", 3))
+> +	if (dev->type != ARPHRD_ATM_LANE)
+>  		return NOTIFY_DONE; /* we are only interested in lec:s */
+>  
+>  	switch (event) {
+> -- 
+> 2.17.1
+> 
 
