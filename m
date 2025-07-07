@@ -1,155 +1,110 @@
-Return-Path: <netdev+bounces-204445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D728AFA892
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 02:22:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2517CAFA8A0
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 02:39:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B64431891213
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 00:22:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E74D21896573
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 00:39:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3953A86323;
-	Mon,  7 Jul 2025 00:22:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E9314EC46;
+	Mon,  7 Jul 2025 00:39:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S8jrbYZ0"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 393BE1373;
-	Mon,  7 Jul 2025 00:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48BF81487D1;
+	Mon,  7 Jul 2025 00:39:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751847721; cv=none; b=k6rW00htz8fjMO9KG94df7YKKJ8lTl0jL3OObsElykSdGyMas3lHm+B7dtvVrYBNcwgf84TlWPsENOI0m8nM5MCf6RyjKSoJoNMmEjglBOu0QcHjasj6nbtUVuU5unNvZ8SE/fIFWSL2gXdzkn3/vPKdnstgNExcijMnDBbcEIM=
+	t=1751848764; cv=none; b=GbhnppEEnNTJy3f8rJEDl0kL1nyPKZNNi1YQTZ1fKhybiQPz3IfSQazeTpVY6ZueDRi14ANqXX+B2VSIm87iXsHKwiQqCExi/tvuh/F3cpAznix7KXcSS/OV7M4hvVJGn/B0RVNS/RC7okyq8d7UdCWDd/UOEEDZ+zZk4vrwipc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751847721; c=relaxed/simple;
-	bh=hUyy8yKA2gGVH48GVBvBv9Us8897KhgL9cXpJipTfLI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jVK0L0xpxFVT6tA6fgQ/864CycZvZ0la9yxq1zz2Q9DId3tMrrVMmSam/DmbrO73OS33VgcbrERX6KTAiXvvDEGGnjCS0bAfB2Jo+r0xrtgtU/4gRgRT9M5Q7y3tIBzrfpx9lqbDldwRkIzzSdIt0EvWfXrzNJCRS8WnC3/p8Ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-681ff7000002311f-c0-686b131ab99d
-Date: Mon, 7 Jul 2025 09:21:41 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Harry Yoo <harry.yoo@oracle.com>, willy@infradead.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org, kernel_team@skhynix.com, almasrymina@google.com,
-	ilias.apalodimas@linaro.org, hawk@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
-	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
-	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
-	surenb@google.com, mhocko@suse.com, horms@kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
-	vishal.moola@gmail.com, hannes@cmpxchg.org, ziy@nvidia.com,
-	jackmanb@google.com
-Subject: Re: [PATCH net-next v7 1/7] netmem: introduce struct netmem_desc
- mirroring struct page
-Message-ID: <20250707002141.GA3379@system.software.com>
-References: <20250625043350.7939-1-byungchul@sk.com>
- <20250625043350.7939-2-byungchul@sk.com>
- <20250626174904.4a6125c9@kernel.org>
- <20250627035405.GA4276@system.software.com>
- <20250627173730.15b25a8c@kernel.org>
- <aGHNmKRng9H6kTqz@hyeyoo>
- <20250701164508.0738f00f@kernel.org>
+	s=arc-20240116; t=1751848764; c=relaxed/simple;
+	bh=hUlGAMos01Z1bRSKPkaBbJvcQU9JNXBPNs5QDP/hUNk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Koov1ic0gZYoBhfx5CqvN1mc9GrWCfxi5/T0CLqX6H0UZn7jfKFwHkRHZ+VxHly4Tkrr0dSb1xqnCDx7ww0BIG1TqOrJmyMfM6QEUGff/B2PTD5+S/Q9w0GZDzL4D3ZKF9JuE/QsiZhpo2c2a++i1xCLPkr7Ksj3nAXar5/gwgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S8jrbYZ0; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-234bfe37cccso27024825ad.0;
+        Sun, 06 Jul 2025 17:39:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751848762; x=1752453562; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=j00iWczHMP+VIwldTToHwbzFAy61a8TadUl5QKJDgHg=;
+        b=S8jrbYZ0L+O2LbPZNv6elFcYFWX+hKosBLtGyIyqBPFeNbj/0Y2fgAjYyf1+KvvwN5
+         5T+WRkrueOrIXIFMGPG1LzFWHZr6Yycm+FVuFw+F/d0+w5EnZmaFnSIde3pwdOr+ubrY
+         EOp/Ye1aIHd53HpJm1oYlkDxOLP4/kV+7eya8dnD6Q0sNn3bJ8RdmsQjufBdLi9USZtZ
+         pgvpiDSDvfAKsb4QWfIDkImu67GwHZYCWU+NfVPXu7egD1wgvt9GEn+uOn2Fv1WYYklP
+         QB4qQac/qQmcfrwIi9Z++Kj+YdtfsIMDeNw2k9IocdlImDFmN2a+N05z31A+um8htlTB
+         T0gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751848762; x=1752453562;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=j00iWczHMP+VIwldTToHwbzFAy61a8TadUl5QKJDgHg=;
+        b=JgXKPvMMPsCcDWH+Bnizst/ekDH2h1j4EFr9zON9si4Sr3JU3obs4UtZd7//CbICNX
+         HYW2BhV2I3f/dgzVH6da+fuqr7Tp+bJ813ScdU4do+yn01atTNtB0prr1IVGlHpLGybF
+         p8iCOAS55rMjeR4xMn0v0m8tuP22JzaxiFZ7auv2acmA6f8MoHYEnWukAVDp+TH8T2Rs
+         Clt3nEf7MmjgKwfxsji17j4vF5fQ7FW4W5Kfah8J+BnqPcHCShYkVIrYsgiMINyrdpTF
+         XQF7QxU+21iFuBrS4Mia+53CmgnSHJhlp4wivxoGqe/EJuOl5HIZf5taOJaR07oqdgod
+         ZbZA==
+X-Forwarded-Encrypted: i=1; AJvYcCWMUGNzWf/Z+1o9F62cW9wVA4fuHI8H0HHKHGiRrtDP4UYOLFBew7LsYsj8vxKkVaHH0LqWdyAbInFWeYo9IbQVcb8=@vger.kernel.org, AJvYcCXzNIcWPOnaiAfF4sQDFo++Qm1HzJYlFNO13Wbvx2J3DQ8P+VDV3IujT2dJGUxy7Vfa00yP/N4Kkh1Lot4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmVaIxn+5CMLj4SvxkA8zsbiJQx3FpHVJISY9Ga1qlWCiECcwO
+	RxeZ1nY355AfgAxhJMBnGaF/VU0eKmUyNb1MelAOD0OTDAEpJeXoTQT7A9hLMcqG6so=
+X-Gm-Gg: ASbGncsZyA8Cs+l17RVKmozDXoMgeMhrvqxD6hAFh83Tu6TWN8TfHFJqwwa4L6YQIq2
+	LF4sgxsrMzLdN552mcou7TvXjuMLyaX/NzeNws7j+ybVZ/shpgdOLNHGWQ4kuYbyZRsAuEFLK16
+	v7MYHb+q5GAnf+nPxwVaYv0g9vuqYQ3LLPvpkB0N7Wdh/wEKP/rR/+1quOWEGt1w1dWR83J2kVa
+	BOohNlyxymjvqiAj8QIN/XvoQTg+8ojLthALIJekyI0mvrvtv3Z+t1qM831w2Ba9KrSf5IRZM2X
+	0vK7hKUMX1rJum8TZRneDSAVhqpu04joX4Il3dwIUeQ=
+X-Google-Smtp-Source: AGHT+IGyM/ZLXthN/LSmg3V0+sA5KrUhCjnQDSFHkXoWIFobc4LpGyxHlqAPeAxc+vfqdae3GbsHIA==
+X-Received: by 2002:a17:902:d2cf:b0:235:f3df:bbff with SMTP id d9443c01a7336-23c90f3771cmr126516325ad.4.1751848762331;
+        Sun, 06 Jul 2025 17:39:22 -0700 (PDT)
+Received: from archlinux.lan ([2601:644:8200:dab8::1f6])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23c8431e2a4sm70308085ad.19.2025.07.06.17.39.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 06 Jul 2025 17:39:21 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
+	linux-kernel@vger.kernel.org (open list),
+	linux-renesas-soc@vger.kernel.org (open list:RENESAS RZ/N1 A5PSW SWITCH DRIVER)
+Subject: [PATCH 0/2] net: dsa: rzn1_a5psw: add COMPILE_TEST
+Date: Sun,  6 Jul 2025 17:39:16 -0700
+Message-ID: <20250707003918.21607-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250701164508.0738f00f@kernel.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHeXfOzjmuVsdp9WZFtUJD6KJYPdGFoi8vdCGwEMqogx7aci7b
-	0jQKrEaRqIVJ5NRYRnnpspqlK5bpXKlkZoZ1stpkXkiyRmbStNtmRX378f8//Ph/eDhKZZZH
-	cFr9AdGgF3RqRkErPkwsWxgRlqJZ8i0vDkqs1xi4+jUTyrvtciipqkEw7H/NwmdXEwOXLo5Q
-	UPLURMMX6ygFfY+8LFy1bQLPlX4aHCdrKfCebmYgzzRGwX3/RxaO2Stk0F6TL4fC0csU1GZ3
-	s/D8XgkD7ms/5dDvzKOhxVxJgyd/LTyyTIWRx4MIXNZaGYzkljJwtsPCQI/Jg6Cj0UtD8dF8
-	BNY6SQ5jXwOO4odudu180jjoo8jtylcyctf8liUWWzqprogmOVIHRWxVpxhiGypgyZsXDoY0
-	nx+jyV37ZxnJO/6RIZ/6umjiq+tkiPV2J01aLS52S+h2xapkUafNEA2L1+xWaNyuXCbNG5b5
-	8oyXzUb1k3NQCIf5OJztaWP/ssN9Rx5kmp+Pv5fVUUFm+CgsSf5xDg/kpuoiOgcpOIq/zuBC
-	dwsKFmG8gB3eYVmQlfxyLLU/GT9S8RdkePhB758iFLcU9dJBpvhoLP0YCORcgGfg8h9cMA7h
-	Y7C/0z4+Ygo/D9fXNMl+j7Nz2Dem/c3TcUOFRJ9BvPk/q/k/q/mf1YKoKqTS6jNSBa0ubpEm
-	S6/NXJS0L9WGAh9z5ci3HXY01B7vRDyH1BOVSxL2alRyIcOYlepEmKPU4coTTIpGpUwWsg6J
-	hn27DOk60ehEMzhaPU0ZO3IwWcXvEQ6IKaKYJhr+tjIuJCIbbTvxYDRqo9k5NMu02+rvG7iV
-	9P79ThW/bnVsQvGxZzsPz5kt1DfM/TKptHBrlLA0Kfy6/WbbrgmRzeA5XXBoDTnevipBP3R5
-	DxJiF7y2RcKApOi5sXJFV8S8/TpJSqzx9a2eqTvny1i2OdJR/i6sunVwQ7zFiKO6nyV6Vq5f
-	ENOmpo0aISaaMhiFX7d721stAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTcRiH+Z/bjsPhaZodrD60CsXSlG4vGGYfolNkRBBBRHnQQ5vOGVsb
-	WgSmK2vlvQ82L6wk56UYTJuzlprXpJso1iqbY6nYBc2ckpnWJkV9e/g97+/l/fDSuHSRCKMV
-	qrOCWsUrZZSYEB+Ky40KC06Tx9gur4EKy10KGr5ngtltJ6Gi3obAO/9OBDNdvRRU35rDoeKl
-	noBZyw8cxno8ImiwJsJIzTgBjrxmHDyFTyjI1y/g8Gh+UgQ59loMOiv7SOi3FZBw48cdHJqz
-	3SIYfFBBgevuLxLGO/IJ6DPWETBSkAA9plCYe/oFQZelGYO565UUlA6YKPigH0Ew0OkhoPxi
-	AQJLq5OEhe++HeXdLlHCRq7zyxTONdW9wbgW43sRZ7JqucbaSM7gHMA5a/1VirN+KxFxw68c
-	FPekbIHgWuwzGJefO0lx02NvCW6qdYjiqie+YpylaYg4LD0u3pUiKBU6Qb0lPkksd3Vdp854
-	gjNfF3lE2ag9yIACaJbZxjpc90k/E8wGdvF2K+5niglnnc75ZQ7x5frGm4QBiWmcuUexN1x9
-	yC+CGZ51eLyYnyXMTtbZ/3x5SMpUYay3bfSPWMH23Rwl/Iwzkaxz6aMvp328mjUv0f44gIll
-	54fsy0esZNaz7bZerAhJjP+1jf+1jf/aJoTXoxCFSpfOK5TbozVp8iyVIjM6OSPdinxPUXPh
-	Z7EdeQf3dSCGRrJAScyxVLmU5HWarPQOxNK4LERymUqTSyUpfNY5QZ1xSq1VCpoOtJomZKsk
-	B44JSVLmNH9WSBOEM4L6r8XogLBslKk1M47U4nXdeaURJyXhLdW5w61u3KV9UWYo67nljZma
-	fDpukkV5NjdeORivjziRyKyM99bsd15LCjUpX1QrPl/CtPDMbUwMakjcsSvj6NiRvaYg4/lp
-	szFu9+NNn0pm7xe6hk2VCQ/3rI0PSk6PC+zd2phUNbGxPXVUl0NuapMRGjkfG4mrNfxvX+2S
-	LBADAAA=
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 01, 2025 at 04:45:08PM -0700, Jakub Kicinski wrote:
-> On Mon, 30 Jun 2025 08:34:48 +0900 Harry Yoo wrote:
-> > > Ugh, you keep explaining the mechanics to me. Our goal here is not
-> > > just to move fields around and make it still compile :/
-> > >
-> > > Let me ask you this way: you said "netmem_desc" will be allocated
-> > > thru slab "shortly". How will calling the equivalent of page_address()
-> > > on netmem_desc work at that stage? Feel free to refer me to the existing
-> > > docs if its covered..
-> >
-> > https://kernelnewbies.org/MatthewWilcox/Memdescs/Path
-> > https://kernelnewbies.org/MatthewWilcox/Memdescs
-> >
-> > May not be the exact document you're looking for,
-> > but with this article I can imagine:
-> >
-> > - The ultimate goal is to shrink struct page to eventually from 64 bytes
-> >   to 8 bytes, by allocating only the minimum required metadata per 4k page
-> >   statically and moving the rest of metadata to dynamically-allocated
-> >   descriptors (netmem_desc, anon, file, ptdesc, zpdesc, etc.) using slab
-> >   at page allocation time.
-> >
-> > - We can't achieve that goal just yet, because several subsystems
-> >   still use struct page fields for their own purposes.
-> >
-> >   To achieve that, each of these subsystems needs to define
-> >   its own descriptor, which, for now, overlays struct page, and should be
-> >   converted to use the new descriptor.
-> >
-> >   Eventually, these descriptors will be allocated using slab.
-> >
-> > - For CPU-readable buffers, page->memdesc will point to a netmem_desc,
-> >   with a lower bit set indicating that it's a netmem_desc rather than
-> >   other type. Networking code will need to cast it to (netmem_desc *)
-> >   and dereference it to access networking specific fields.
-> >
-> > - The struct page array (vmemmap) will still be statically allocated
-> >   at boot time (or during memory hotplug time).
-> >   So no change in how page_address() works.
-> >
-> > net_iovs will continue to be not associated with struct pages,
-> > as the buffers don't have corresponding struct pages.
-> > net_iovs are already allocated using slab.
-> 
-> Thanks a lot, this clarifies things for me.
-> 
-> Unfortunately, I still think that it's hard to judge patches 1 and 7
-> in context limited to this series, so let's proceed to reposting just
-> the "middle 5" patches.
+Allows the various bots to test compilation. Also threw in a small devm
+conversion for enabling clocks.
 
-Just in case, I sent v8 with the "middle 5" last week as you requested.
-I'm convinced they are non-controversial but lemme know if any.
+Rosen Penev (2):
+  net: dsa: rzn1_a5psw: add COMPILE_TEST
+  net: dsa: rzn1_a5psw: use devm to enable clocks
 
-	Byungchul
+ drivers/net/dsa/Kconfig      |  2 +-
+ drivers/net/dsa/rzn1_a5psw.c | 22 ++++------------------
+ 2 files changed, 5 insertions(+), 19 deletions(-)
+
+-- 
+2.50.0
+
 
