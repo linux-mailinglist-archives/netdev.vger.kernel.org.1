@@ -1,131 +1,188 @@
-Return-Path: <netdev+bounces-204528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68455AFB0C0
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 12:08:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E29A9AFB0C9
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 12:10:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35138189E49F
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 10:08:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88ACF1AA0122
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 10:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA95292B51;
-	Mon,  7 Jul 2025 10:07:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04335291C32;
+	Mon,  7 Jul 2025 10:10:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C7B293C4C
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 10:07:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+Received: from zg8tmja5ljk3lje4mi4ymjia.icoremail.net (zg8tmja5ljk3lje4mi4ymjia.icoremail.net [209.97.182.222])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06E651BD9F0;
+	Mon,  7 Jul 2025 10:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.97.182.222
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751882870; cv=none; b=HCMSHu3i6QH4WSIaAdaRTY27Z4e2c+2mlh05WN9BLwF3UZvV5gZgYdHf6lcD5jfvl5KRO3elnLHMOVr+7hrMJ1iO9q+nVFP5IkdwE6MwQfjlg341GAJ520wCy6Yo8CoLHl9DCQpodZbnd9oKGYB5jXsntcjDRznHdC1PdI1QoOY=
+	t=1751883018; cv=none; b=dybJ8nK4u6xQspSRQ5SIYQ58+f7YaE+Lm4OkKY0NriW2gANfWBpzyCUcDzgHFmb6ynnD3XanM9OfuR5QA1K9I8mlhjqotEv0EGkidHqvm8y+msk9xgP2RkGzTKfOi2NgBQFk9cWLQTo99d18mQT3UTgHBO38YbmMUBiTtsZ+UCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751882870; c=relaxed/simple;
-	bh=FtQESEScKEGm4ZZCj0RN7mGsIyE/eoEObXJoSKFHpWQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YQd7q8+Vn90e8W9J2DyS6HFR/XIv8AuG1l3eZxJYgxVcuEmCmx+c+hiPCD8GPlsxgjn/c0KDmdNJ2XEYog2ZQWdHfQvhbweab2RrgUCKpH19jamwKMzxSHUMxf2Imu8cMikFzrBGywmYBuiSQg9YQBQ8G3cmgjaMmSUwIvdf2qQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uYikg-00055p-AG; Mon, 07 Jul 2025 12:07:10 +0200
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1uYikc-007EDt-2n;
-	Mon, 07 Jul 2025 12:07:06 +0200
-Received: from pengutronix.de (p5b1645f7.dip0.t-ipconnect.de [91.22.69.247])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 6B531439509;
-	Mon, 07 Jul 2025 10:07:06 +0000 (UTC)
-Date: Mon, 7 Jul 2025 12:07:05 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Cc: Ming Yu <a0282524688@gmail.com>, Lee Jones <lee@kernel.org>, 
-	tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, 
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH v13 1/7] mfd: Add core driver for Nuvoton NCT6694
-Message-ID: <20250707-new-psychedelic-termite-a309d3-mkl@pengutronix.de>
-References: <20250627102730.71222-1-a0282524688@gmail.com>
- <20250627102730.71222-2-a0282524688@gmail.com>
- <20250702161513.GX10134@google.com>
- <CAOoeyxXWbjWvOgsSvXb9u2y6yFExq347ceZe96bm9w+GQAp2Rg@mail.gmail.com>
- <0360d2e0-e071-4259-a7c7-23c31e52e563@wanadoo.fr>
+	s=arc-20240116; t=1751883018; c=relaxed/simple;
+	bh=ui+Tqx0GLOCsF0RBfWsJnK7CQFaewHN6GAdS5cq+j78=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=C79d9GR9eLYkbI5pGLSJW1rHiR/GF2nf4XHzUZBmBy152FUVD1p8b1gVDvbe0PgBv2+uC2L7aVZECNdvTw85ToKC9roJefaEwo+AuKbzSdFwBD9ALxnD8t/B+Rf8weZ30M5ZMREtcU2+kWdCo+nZDXxzBZaRWUJUq8erzJoevr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=209.97.182.222
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
+Received: from lizhi2$eswincomputing.com ( [10.11.96.26] ) by
+ ajax-webmail-app1 (Coremail) ; Mon, 7 Jul 2025 18:09:30 +0800 (GMT+08:00)
+Date: Mon, 7 Jul 2025 18:09:30 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: =?UTF-8?B?5p2O5b+X?= <lizhi2@eswincomputing.com>
+To: "Andrew Lunn" <andrew@lunn.ch>, "Krzysztof Kozlowski" <krzk@kernel.org>
+Cc: weishangjuan@eswincomputing.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk,
+	yong.liang.choong@linux.intel.com, vladimir.oltean@nxp.com,
+	jszhang@kernel.org, jan.petrous@oss.nxp.com,
+	prabhakar.mahadev-lad.rj@bp.renesas.com, inochiama@gmail.com,
+	boon.khai.ng@altera.com, dfustini@tenstorrent.com, 0x1207@gmail.com,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com,
+	linmin@eswincomputing.com
+Subject: Re: Re: [PATCH v3 2/2] ethernet: eswin: Add eic7700 ethernet driver
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2024.2-cmXT6 build
+ 20241203(6b039d88) Copyright (c) 2002-2025 www.mailtech.cn
+ mispb-72143050-eaf5-4703-89e0-86624513b4ce-eswincomputing.com
+In-Reply-To: <c212c50e-52ae-4330-8e67-792e83ab29e4@lunn.ch>
+References: <20250703091808.1092-1-weishangjuan@eswincomputing.com>
+ <20250703092015.1200-1-weishangjuan@eswincomputing.com>
+ <c212c50e-52ae-4330-8e67-792e83ab29e4@lunn.ch>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="kr6nkexyn6izj5au"
-Content-Disposition: inline
-In-Reply-To: <0360d2e0-e071-4259-a7c7-23c31e52e563@wanadoo.fr>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Message-ID: <6a3684b9.2f79.197e45cb6b9.Coremail.lizhi2@eswincomputing.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:TAJkCgAHLBLbnGtoDWyqAA--.13334W
+X-CM-SenderInfo: xol2xx2s6h245lqf0zpsxwx03jof0z/1tbiAgEQDGhqpUk+VwABsZ
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-
---kr6nkexyn6izj5au
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v13 1/7] mfd: Add core driver for Nuvoton NCT6694
-MIME-Version: 1.0
-
-On 03.07.2025 11:44:27, Vincent Mailhol wrote:
-> On 03/07/2025 =C3=A0 11:39, Ming Yu wrote:
-> > Dear Lee,
-> >=20
-> > Thanks for your feedback and review.
-> > Currently, the status of the sub-device drivers is as follows (A/R/T):
-> >     [v13,1/7] mfd: Add core driver for Nuvoton NCT6694 (- - -)
-> >     [v13,2/7] gpio: Add Nuvoton NCT6694 GPIO support (1 1 -)
-> >     [v13,3/7] i2c: Add Nuvoton NCT6694 I2C support (1 - -)
-> >     [v13,4/7] can: Add Nuvoton NCT6694 CANFD support (- 2 -)
->=20
-> For the CAN driver, my Reviewed-by can be interpreted as an Acked-by :)
-
-Feel free to interpret my my Reviewed-by as an Acked-by, too.
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---kr6nkexyn6izj5au
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmhrnEYACgkQDHRl3/mQ
-kZz+HAgAo6jP3UtNysl6cnqkkovHfol1pDeGThMia/s6eTksN4DY0u5zqdBI03dN
-dXpm+0P8HVf83Alft8JysqSicG3HxMbdHs8En1RAlkkWYlr/kkL8zfEM06mFYVdL
-6EqNun8pwyIg9PrvRFwslkSTu6zKfqhafW8ouC9+65btTk0MG/AgbUgCLX2fe14v
-5jBv/B8OS97ARLf8pGTDQDqO6vXO2imOkP3Td+Ik61oUgLiQhUxLQVR8RvDKbuEA
-+iyqwWyWKsyoiF+0sU+mGLy0ejmuzh+PSvo19hzEE7ic08gZYvB4BA5pxljMiGAR
-1NJdMVxN2BILPjtt1d6e95y9ZqFOiA==
-=dD5C
------END PGP SIGNATURE-----
-
---kr6nkexyn6izj5au--
+RGVhciBBbmRyZXcgTHVubiwKVGhhbmsgeW91IGZvciB5b3VyIHByb2Zlc3Npb25hbCBhbmQgdmFs
+dWFibGUgc3VnZ2VzdGlvbnMuCldlIGhhdmUgY2FyZWZ1bGx5IHJldmlld2VkIHlvdXIgY29tbWVu
+dHMgYW5kIG1hZGUgdGhlIGNvcnJlc3BvbmRpbmcgY2hhbmdlcy4gQ291bGQgeW91IHBsZWFzZSBo
+ZWxwIHVzIGV2YWx1YXRlIHdoZXRoZXIgdGhlIHVwZGF0ZXMgd2UgbWVudGlvbmVkIGluIG91ciBw
+cmV2aW91cyBlbWFpbCBwcm9wZXJseSBhZGRyZXNzIHlvdXIgY29uY2VybnMgYW5kIG1lZXQgdGhl
+IGV4cGVjdGVkIHN0YW5kYXJkcz8KQXQgdGhlIHNhbWUgdGltZSwgd2Ugc3RpbGwgaGF2ZSBzb21l
+IHF1ZXN0aW9ucyB0aGF0IG5lZWQgY2xhcmlmaWNhdGlvbi4gV2UgaGF2ZSBpbmNsdWRlZCB0aGVz
+ZSBpbiB0aGUgb3JpZ2luYWwgZW1haWwg4oCUIHdlIHdvdWxkIGFwcHJlY2lhdGUgaXQgaWYgeW91
+IGNvdWxkIGFsc28gdGFrZSBhIG1vbWVudCB0byByZXZpZXcgdGhvc2UgcG9pbnRzLgoKCkBLcnp5
+c3p0b2YgS296bG93c2tpCldlIG5vdGljZWQgeW91ciByZXZpZXcgY29tbWVudCBvbiB0aGUgZm9s
+bG93aW5nIHBhZ2UsIGJ1dCB3ZSBkaWQgbm90IHJlY2VpdmUgaXQgdmlhIGVtYWlsOgrwn5SXIGh0
+dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xrbWwvZjA5NmFmYTEtMjYwZS00ZjhjLTg1OTUtM2I0MTQy
+NWIyOTY0QGtlcm5lbC5vcmcvClRoYW5rIHlvdSBmb3IgeW91ciBwcm9mZXNzaW9uYWwgZmVlZGJh
+Y2sgb24gb3VyIEV0aGVybmV0IGRyaXZlci4KUmVnYXJkaW5nIHRoZSBpc3N1ZSB5b3UgcmFpc2Vk
+OgoiVGhlcmUgaXMgbm8gc3VjaCBwcm9wZXJ0eS4gSSBhbHJlYWR5IHNhaWQgYXQgdjIgeW91IGNh
+bm5vdCBoYXZlIHVuZG9jdW1lbnRlZCBBQkkuIgpVcG9uIHJlY2hlY2tpbmcsIHdlIHJlYWxpemVk
+IHRoYXQgZHVyaW5nIHZlcmlmaWNhdGlvbiwgd2UgbWlzdGFrZW5seSB1c2VkIHVuZGVyc2NvcmUt
+c2VwYXJhdGVkIHByb3BlcnR5IG5hbWVzIGluIHRoZSBkcml2ZXIsIHdoaWxlIGRhc2gtc2VwYXJh
+dGVkIG5hbWVzIHdlcmUgdXNlZCBpbiB0aGUgWUFNTCBiaW5kaW5ncy4gV2UgaGF2ZSBub3cgc3lu
+Y2hyb25pemVkIHRoZSBwcm9wZXJ0eSBuYW1pbmcuCkNvdWxkIHlvdSBwbGVhc2UgY29uZmlybSBp
+ZiB0aGlzIG1pc21hdGNoIHdhcyB0aGUgcm9vdCBjYXVzZSBvZiB5b3VyIGNvbmNlcm4/CgoKQmVz
+dCByZWdhcmRzLAoKTGkgWmhpCkVzd2luIENvbXB1dGluZwoKPiAtLS0tLeWOn+Wni+mCruS7ti0t
+LS0tCj4g5Y+R5Lu25Lq6OiAiQW5kcmV3IEx1bm4iIDxhbmRyZXdAbHVubi5jaD4KPiDlj5HpgIHm
+l7bpl7Q6MjAyNS0wNy0wNCAwMDoxMjoyOSAo5pif5pyf5LqUKQo+IOaUtuS7tuS6ujogd2Vpc2hh
+bmdqdWFuQGVzd2luY29tcHV0aW5nLmNvbQo+IOaKhOmAgTogYW5kcmV3K25ldGRldkBsdW5uLmNo
+LCBkYXZlbUBkYXZlbWxvZnQubmV0LCBlZHVtYXpldEBnb29nbGUuY29tLCBrdWJhQGtlcm5lbC5v
+cmcsIHJvYmhAa2VybmVsLm9yZywga3J6aytkdEBrZXJuZWwub3JnLCBjb25vcitkdEBrZXJuZWwu
+b3JnLCBuZXRkZXZAdmdlci5rZXJuZWwub3JnLCBkZXZpY2V0cmVlQHZnZXIua2VybmVsLm9yZywg
+bGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZywgbWNvcXVlbGluLnN0bTMyQGdtYWlsLmNvbSwg
+YWxleGFuZHJlLnRvcmd1ZUBmb3NzLnN0LmNvbSwgcm1rK2tlcm5lbEBhcm1saW51eC5vcmcudWss
+IHlvbmcubGlhbmcuY2hvb25nQGxpbnV4LmludGVsLmNvbSwgdmxhZGltaXIub2x0ZWFuQG54cC5j
+b20sIGpzemhhbmdAa2VybmVsLm9yZywgamFuLnBldHJvdXNAb3NzLm54cC5jb20sIHByYWJoYWth
+ci5tYWhhZGV2LWxhZC5yakBicC5yZW5lc2FzLmNvbSwgaW5vY2hpYW1hQGdtYWlsLmNvbSwgYm9v
+bi5raGFpLm5nQGFsdGVyYS5jb20sIGRmdXN0aW5pQHRlbnN0b3JyZW50LmNvbSwgMHgxMjA3QGdt
+YWlsLmNvbSwgbGludXgtc3RtMzJAc3QtbWQtbWFpbG1hbi5zdG9ybXJlcGx5LmNvbSwgbGludXgt
+YXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnLCBuaW5neXVAZXN3aW5jb21wdXRpbmcuY29t
+LCBsaW5taW5AZXN3aW5jb21wdXRpbmcuY29tLCBsaXpoaTJAZXN3aW5jb21wdXRpbmcuY29tCj4g
+5Li76aKYOiBSZTogW1BBVENIIHYzIDIvMl0gZXRoZXJuZXQ6IGVzd2luOiBBZGQgZWljNzcwMCBl
+dGhlcm5ldCBkcml2ZXIKPiAKPiA+ICsvKiBEZWZhdWx0IGRlbGF5IHZhbHVlKi8KPiA+ICsjZGVm
+aW5lIEVJQzc3MDBfREVMQVlfVkFMVUUwIDB4MjAyMDIwMjAKPiA+ICsjZGVmaW5lIEVJQzc3MDBf
+REVMQVlfVkFMVUUxIDB4OTYyMDVBMjAKPiAKPiBXZSBuZWVkIGEgYmV0dGVyIGV4cGxhbmF0aW9u
+IG9mIHdoYXQgaXMgZ29pbmcgb24gaGVyZS4gV2hhdCBkbyB0aGVzZQo+IG51bWJlcnMgbWVhbj8K
+PiAKCkluIHJlc3BvbnNlIHRvIHlvdXIgc3VnZ2VzdGlvbiwgd2UgYWRkZWQgdGhlIGZvbGxvd2lu
+ZyBtb3JlIGRldGFpbGVkIGNvbW1lbnRzIHRvIHRoZSBjb2RlLiBJcyB0aGlzIGFwcHJvcHJpYXRl
+PworLyoKK8KgKiBEZWZhdWx0IGRlbGF5IHJlZ2lzdGVyIHZhbHVlcyBmb3IgZGlmZmVyZW50IHNp
+Z25hbHM6CivCoCoKK8KgKiBFSUM3NzAwX0RFTEFZX1ZBTFVFMDogVXNlZCBmb3IgVFhEIGFuZCBS
+WEQgc2lnbmFscyBkZWxheSBjb25maWd1cmF0aW9uLgorwqAqIEJpdHMgbGF5b3V0OgorwqAqIMKg
+IEJ5dGUgMCAoYml0cyAwLTcpIMKgIDogVFhEMCAvIFJYRDAgZGVsYXkgKDB4MjAgPSAzLjIgbnMp
+CivCoCogwqAgQnl0ZSAxIChiaXRzIDgtMTUpIMKgOiBUWEQxIC8gUlhEMSBkZWxheSAoMHgyMCA9
+IDMuMiBucykKK8KgKiDCoCBCeXRlIDIgKGJpdHMgMTYtMjMpIDogVFhEMiAvIFJYRDIgZGVsYXkg
+KDB4MjAgPSAzLjIgbnMpCivCoCogwqAgQnl0ZSAzIChiaXRzIDI0LTMxKSA6IFRYRDMgLyBSWEQz
+IGRlbGF5ICgweDIwID0gMy4yIG5zKQorwqAqCivCoCogRUlDNzcwMF9ERUxBWV9WQUxVRTE6IFVz
+ZWQgZm9yIGNvbnRyb2wgc2lnbmFscyBkZWxheSBjb25maWd1cmF0aW9uLgorwqAqIEJpdHMgbGF5
+b3V0OgorwqAqIMKgIEJpdHMgMC02IMKgIMKgIDogVFhFTiBkZWxheQorwqAqIMKgIEJpdHMgOC0x
+NCDCoCDCoDogVFhDTEsgZGVsYXkKK8KgKiDCoCBCaXQgwqAxNSDCoCDCoCDCoDogVFhDTEsgaW52
+ZXJ0ICgxID0gaW52ZXJ0KQorwqAqIMKgIEJpdHMgMTYtMjIgwqAgOiBSWERWIGRlbGF5CivCoCog
+wqAgQml0cyAyNC0zMCDCoCA6IFJYQ0xLIGRlbGF5CivCoCogwqAgQml0IMKgMzEgwqAgwqAgwqA6
+IFJYQ0xLIGludmVydCAoMSA9IGludmVydCkKK8KgKi8KKyNkZWZpbmUgRUlDNzcwMF9ERUxBWV9W
+QUxVRTAgMHgyMDIwMjAyMAorI2RlZmluZSBFSUM3NzAwX0RFTEFZX1ZBTFVFMSAweDk2MjA1QTIw
+Cgo+ID4gKwlkd2NfcHJpdi0+ZGx5X3BhcmFtXzEwMDBtWzBdID0gRUlDNzcwMF9ERUxBWV9WQUxV
+RTA7Cj4gPiArCWR3Y19wcml2LT5kbHlfcGFyYW1fMTAwMG1bMV0gPSBFSUM3NzAwX0RFTEFZX1ZB
+TFVFMTsKPiA+ICsJZHdjX3ByaXYtPmRseV9wYXJhbV8xMDAwbVsyXSA9IEVJQzc3MDBfREVMQVlf
+VkFMVUUwOwo+ID4gKwlkd2NfcHJpdi0+ZGx5X3BhcmFtXzEwMG1bMF0gPSBFSUM3NzAwX0RFTEFZ
+X1ZBTFVFMDsKPiA+ICsJZHdjX3ByaXYtPmRseV9wYXJhbV8xMDBtWzFdID0gRUlDNzcwMF9ERUxB
+WV9WQUxVRTE7Cj4gPiArCWR3Y19wcml2LT5kbHlfcGFyYW1fMTAwbVsyXSA9IEVJQzc3MDBfREVM
+QVlfVkFMVUUwOwo+ID4gKwlkd2NfcHJpdi0+ZGx5X3BhcmFtXzEwbVswXSA9IDB4MDsKPiA+ICsJ
+ZHdjX3ByaXYtPmRseV9wYXJhbV8xMG1bMV0gPSAweDA7Cj4gPiArCWR3Y19wcml2LT5kbHlfcGFy
+YW1fMTBtWzJdID0gMHgwOwo+IAo+IFdoYXQgYXJlIHRoZSB0aHJlZSBkaWZmZXJlbnQgdmFsdWVz
+IGZvcj8KCkluIHJlc3BvbnNlIHRvIHlvdXIgcXVlc3Rpb24sIHdlIGhhdmUgYWRkZWQgdGhlIGZv
+bGxvd2luZyBtb3JlIGRldGFpbGVkIGNvbW1lbnRzIHRvIHRoZSBjb2RlLiBJcyB0aGlzIGFwcHJv
+cHJpYXRlPworICAgICAgICAvKiBJbml0aWFsaXplIGRlZmF1bHQgZGVsYXkgcGFyYW1ldGVycyBm
+b3IgMTAwME1icHMgYW5kIDEwME1icHMgc3BlZWRzICovCivCoCDCoCDCoCDCoCBkd2NfcHJpdi0+
+ZGx5X3BhcmFtXzEwMDBtWzBdID0gRUlDNzcwMF9ERUxBWV9WQUxVRTA7IC8qIFRYRCBkZWxheSAq
+LworwqAgwqAgwqAgwqAgZHdjX3ByaXYtPmRseV9wYXJhbV8xMDAwbVsxXSA9IEVJQzc3MDBfREVM
+QVlfVkFMVUUxOyAvKiBDb250cm9sIHNpZ25hbHMgZGVsYXkgKi8KK8KgIMKgIMKgIMKgIGR3Y19w
+cml2LT5kbHlfcGFyYW1fMTAwMG1bMl0gPSBFSUM3NzAwX0RFTEFZX1ZBTFVFMDsgLyogUlhEIGRl
+bGF5ICovCivCoCDCoCDCoCDCoCBkd2NfcHJpdi0+ZGx5X3BhcmFtXzEwMG1bMF0gPSBFSUM3NzAw
+X0RFTEFZX1ZBTFVFMDsKK8KgIMKgIMKgIMKgIGR3Y19wcml2LT5kbHlfcGFyYW1fMTAwbVsxXSA9
+IEVJQzc3MDBfREVMQVlfVkFMVUUxOworwqAgwqAgwqAgwqAgZHdjX3ByaXYtPmRseV9wYXJhbV8x
+MDBtWzJdID0gRUlDNzcwMF9ERUxBWV9WQUxVRTA7CivCoCDCoCDCoCDCoCAvKiBGb3IgMTBNYnBz
+LCBubyBkZWxheSBieSBkZWZhdWx0ICovCivCoCDCoCDCoCDCoCBkd2NfcHJpdi0+ZGx5X3BhcmFt
+XzEwbVswXSA9IDB4MDsKK8KgIMKgIMKgIMKgIGR3Y19wcml2LT5kbHlfcGFyYW1fMTBtWzFdID0g
+MHgwOworwqAgwqAgwqAgwqAgZHdjX3ByaXYtPmRseV9wYXJhbV8xMG1bMl0gPSAweDA7Cgo+IAo+
+ID4gKwo+ID4gKwlyZXQgPSBvZl9wcm9wZXJ0eV9yZWFkX3UzMihwZGV2LT5kZXYub2Zfbm9kZSwg
+InJ4LWludGVybmFsLWRlbGF5LXBzIiwKPiA+ICsJCQkJICAgJmR3Y19wcml2LT5yeF9kZWxheV9w
+cyk7Cj4gPiArCWlmIChyZXQpCj4gPiArCQlkZXZfZGJnKCZwZGV2LT5kZXYsICJjYW4ndCBnZXQg
+cngtaW50ZXJuYWwtZGVsYXktcHMsIHJldCglZCkuIiwgcmV0KTsKPiA+ICsJZWxzZQo+ID4gKwkJ
+aGFzX3J4X2RseSA9IHRydWU7Cj4gPiArCj4gPiArCXJldCA9IG9mX3Byb3BlcnR5X3JlYWRfdTMy
+KHBkZXYtPmRldi5vZl9ub2RlLCAidHgtaW50ZXJuYWwtZGVsYXktcHMiLAo+ID4gKwkJCQkgICAm
+ZHdjX3ByaXYtPnR4X2RlbGF5X3BzKTsKPiA+ICsJaWYgKHJldCkKPiA+ICsJCWRldl9kYmcoJnBk
+ZXYtPmRldiwgImNhbid0IGdldCB0eC1pbnRlcm5hbC1kZWxheS1wcywgcmV0KCVkKS4iLCByZXQp
+Owo+ID4gKwllbHNlCj4gPiArCQloYXNfdHhfZGx5ID0gdHJ1ZTsKPiA+ICsJaWYgKGhhc19yeF9k
+bHkgJiYgaGFzX3R4X2RseSkKPiAKPiBXaGF0IGlmIGkgb25seSB0byBzZXQgYSBUWCBkZWxheT8g
+SSB3YW50IHRoZSBSWCBkZWxheSB0byBkZWZhdWx0IHRvCj4gMHBzLgo+IAoKUmVnYXJkaW5nIHlv
+dXIgcXVlc3Rpb24sIHdlIGhhdmUgYWRkZWQgZGVmYXVsdCB2YWx1ZXMg4oCL4oCLZm9yIHR4IGRl
+bGF5IGFuZCByeCBkZWxheSBpbiB0aGUgY29kZSwgYW5kIGFzIGxvbmcgYXMgb25lIG9mIHRoZSB0
+d28gZGVsYXlzIGlzIGNvbmZpZ3VyZWQgaW4gRFRTLCB0aGUgb3JpZ2luYWwgY29uZmlndXJhdGlv
+biBjYW4gYmUgb3ZlcndyaXR0ZW4uIERvZXMgdGhpcyBwcm9jZXNzIG1lZXQgeW91ciBzdWdnZXN0
+aW9uPworICAgICAgICAvKiBEZWZhdWx0IGRlbGF5cyBpbiBwaWNvc2Vjb25kcyAqLworwqAgwqAg
+wqAgwqAgZHdjX3ByaXYtPnJ4X2RlbGF5X3BzID0gMDsKK8KgIMKgIMKgIMKgIGR3Y19wcml2LT50
+eF9kZWxheV9wcyA9IDA7CisKK8KgIMKgIMKgIMKgIGlmIChoYXNfcnhfZGx5IHx8IGhhc190eF9k
+bHkpIHsKCj4gewo+ID4gKwkJZWljNzcwMF9zZXRfZGVsYXkoZHdjX3ByaXYtPnJ4X2RlbGF5X3Bz
+LCBkd2NfcHJpdi0+dHhfZGVsYXlfcHMsCj4gPiArCQkJCSAgJmR3Y19wcml2LT5kbHlfcGFyYW1f
+MTAwMG1bMV0pOwo+ID4gKwkJZWljNzcwMF9zZXRfZGVsYXkoZHdjX3ByaXYtPnJ4X2RlbGF5X3Bz
+LCBkd2NfcHJpdi0+dHhfZGVsYXlfcHMsCj4gPiArCQkJCSAgJmR3Y19wcml2LT5kbHlfcGFyYW1f
+MTAwbVsxXSk7Cj4gPiArCQllaWM3NzAwX3NldF9kZWxheShkd2NfcHJpdi0+cnhfZGVsYXlfcHMs
+IGR3Y19wcml2LT50eF9kZWxheV9wcywKPiA+ICsJCQkJICAmZHdjX3ByaXYtPmRseV9wYXJhbV8x
+MG1bMV0pOwo+ID4gKwl9IGVsc2Ugewo+ID4gKwkJZGV2X2RiZygmcGRldi0+ZGV2LCAiIHVzZSBk
+ZWZhdWx0IGRseVxuIik7Cj4gCj4gV2hhdCBpcyB0aGUgZGVmYXVsdD8gSXQgc2hvdWxkIGJlIDBw
+cy4gU28gdGhlcmUgaXMgbm8gcG9pbnQgcHJpbnRpbmcKPiB0aGlzIG1lc3NhZ2UuCj4gCgpPdXIg
+b3JpZ2luYWwgc3RyYXRlZ3kgd2FzIHRvIHVzZSB0aGUgdmFsdWUgdXNlZCB3aGVuIGluaXRpYWxp
+emluZyBkbHlfcGFyYW1fKm0gYXMgdGhlIGRlZmF1bHQgdmFsdWUsIHNvIHNob3VsZCB3ZSBjb250
+aW51ZSB0byBmb2xsb3cgeW91ciBzdWdnZXN0aW9uIGFuZCB1c2UgMHBzIGFzIHRoZSBkZWZhdWx0
+IHZhbHVlPwoKPiAJQW5kcmV3Cg==
 
