@@ -1,171 +1,131 @@
-Return-Path: <netdev+bounces-204566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B6C4AFB36F
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 14:41:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A8474AFB37C
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 14:45:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7D5216CCBA
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 12:41:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FEB94A298C
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 12:45:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3630529ACEE;
-	Mon,  7 Jul 2025 12:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36F4B289E05;
+	Mon,  7 Jul 2025 12:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VewM37dd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83DDB1F9F51
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 12:41:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91EA11E51EF
+	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 12:45:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751892086; cv=none; b=rHdGViQ7PrxhG9Wjj8aO5AI6B7ZzeO+7pzkLr6Ga3vmgAjQZIvrTrQsdtEmXhOJ52CP612N4Gb+JPx/UneZA3d0nUgabpu4qxJEzTnVOq4428bncwXZM9yPwh87E4Fwp/uCa+SWGOmAdzc78Y8QoKl1ESaEhGfjFychJWWZIawM=
+	t=1751892322; cv=none; b=HL9eZoHZ+/r1wql0cTMuiWXLe1S3OPW/dHw6XQUfyjIQL84Q+qT8wXvz8ZtzleP+QsIEBXPqZk9MpS2y9MemUYtWV0GvwnBrZjseQv9qSudbo8Y+kpAjAcrLl4cGuWxqTETn1uXof0XWe3uX6d/eZvMmdyKnnNQBNegCGG7SBPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751892086; c=relaxed/simple;
-	bh=bj+Odb3qgJDQs2022pS0mtdf26UysnvMaJvSZm3GnYw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=aIAHZbFTFqWdVNsAiAndmEw8hG2nPYqwVGRdVr2QB++00SqTzqlZLyITAqwNkozgxcNnvhCVTT0bINXtp6CEQJV4yw5Nt5mOk/IXn2mF0/S2jxOvDT4zr8r5Cj5ZcbHerTPF0bjRlkxJEjES7U/gSaJIzZBHfhFqohLJrKRFUCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3ddba1b53e8so39656735ab.1
-        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 05:41:24 -0700 (PDT)
+	s=arc-20240116; t=1751892322; c=relaxed/simple;
+	bh=mAb87fXBGDVXDZ0JPirJNsxeZkkIXHxmpepCDDLlLls=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=iDpfLgeZkd7lF5v8JZAxXwDNo71tKaarEO7glEeqxglmtkvNQZs5/TtScGLET/PFy+a/Nm/5E1YQ2gOtUTMriIyAaj9ybJaFDS/Gnr2/JjyVPpzT5mfcRx57Z+yQ/pJfzlOFe9zXYm8oqcDMeev8AKT7VLRC7+pZIl3Prdj0vAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VewM37dd; arc=none smtp.client-ip=209.85.219.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-6fafc9f3e1bso49114106d6.0
+        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 05:45:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751892319; x=1752497119; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Mx/au/ucpX1Q+GazmfVIyz7+AbuT93/bgT+tTi6UiYM=;
+        b=VewM37dd0vv6DdBU1I8mrXgS/1sEObB4vBJKV7Yxuy2mpbxf3Lm6MQzk8DKHLXnSrG
+         LWF35I+cca67QYk6QDEu4G81CLKDkkVZTvELwYDD+sCvuTdWM9sGMqhGrUwQlAUA/JHo
+         lsncmqCfXgF89ozcuSTZZSkzO1164bdZ6UW3uowc81Nl/v2/OaeQVdIYYECCHs6550Pc
+         F2nZqyNeEpr49gjUQFKzpg3WVD6xl9yO0UVs6uFMaZUSDRcdeOIRrgUEAjP1YxfOP0/O
+         cneFX8lbYT1QQlQxLIsFZJiwYTxST8j4P+vChIlGM/BOI7nKRX/VnI4vMiMNRWCi3YRW
+         xR2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751892083; x=1752496883;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1751892319; x=1752497119;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=5UL8DGv3u86BZ2iy7UUrWxmj4dXg/MEAtl5jj3qd+64=;
-        b=HNKN80rZQyxWCnAPpgI+YanhcqENOhbZN4mWEXshY4Y2UNffmSph4W9GNd8lSuck8m
-         e/1zukkYlTgX3vkl7FgAxHUzVmQyKOrzy2RYrMv8IS2NG7CgATUH8WlwVG7ZLiO+NLcF
-         Gfahn7T1FnmoP0BCx+7jV7hnj+DkYIcep41jrb8Tcm+OXADr9ZeMC2Yq3Bt3Hj5IXHbi
-         Vtne96Ym8YB+sNE2F/msi1bUTJtafmCSGZG787chlMUqx1dOkM4/Y/uNCT7jy7q5x8rh
-         5jTugd4r/sVdo7k5iYlQETkXjSge6HRSZODPdTiJPgvpzgRBf4tldMejC9Tr7oazDVZT
-         2TKw==
-X-Forwarded-Encrypted: i=1; AJvYcCVSGvVkOfB/O1ok738YqYUzkyaB7MVIWjjYF2P2TI6SUl13JcGgy7HSPGCEBmoVSbADQBckf6M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSfyGq4SJ3241M8/vxu/8NecvM2svvqq6z5SJTCX6r+E7HlvnL
-	/iCw5DmBLx2svC6BqF3XQ52ytsvPHp7//A6rzwn7LSGOFp0694p8SkIAdjD8FBbJlQAQFeJBw9i
-	2uT2MD7012Co6lSlJlisDyBaTbv5y/zgC91wtoziGat+9atZvs3SJ0nB9628=
-X-Google-Smtp-Source: AGHT+IGX2iLZw64s3HkH71g7lS7g1rKZCKC+sOzM+LLesgWuBX51pg8fZP00pc0h6TNx86q4HBrlUs14QO2DU5fWYU5k8Qinys+P
+        bh=Mx/au/ucpX1Q+GazmfVIyz7+AbuT93/bgT+tTi6UiYM=;
+        b=D/XYCU+PEXaBGOVlY+s4u2imHIVI+dgKwQy1FEbQnawOHGoIiXSfGsM3x3A3M0X1mt
+         9s5vcVfG6ejlALBgwOW1urUJeGGE5fKH04LNvUJ0rPN+60IVWYGI7Y3W4k9Jc9DwYiwQ
+         hbESr5QV88wg0VLOG51cyGT9NvwIsA/8o3c7YVw2eMw7cy7o37dxYkQIq1lkiwxORiF2
+         VOsuHSRK+Rcwh0aibiYdbvvRxI425c8CA3BRYU12yMCnGj6Ox1CgUt1Vkx4i9NAPmM/b
+         3KJB677/HxKAFubNo1fU5nGhvznfGOYIyoVaFo0h6QYq2eh4pzT1XBFb5sMJrL+BMgpp
+         Gu8g==
+X-Gm-Message-State: AOJu0YyU7gm5rfVDt8/T7qKewN75LFOSytsWEwVEFoxmTFThkk0R2nUJ
+	f/eTmp9xJ2izcSSUndq895XwcOxdnX1OZG2lUu74h/tBmxWD5lfGWHl5b2R1i6TvrBU15DAGeJP
+	XYudlKaTiGtWwhA==
+X-Google-Smtp-Source: AGHT+IGbAx51UxKP3h0/ZliZVJ6ft5RP8SjqFxTr0zzXn/91aFTd+6YP5jLXtKyBp3vrcziylQJL0dHHNladxw==
+X-Received: from qvbmw8.prod.google.com ([2002:a05:6214:33c8:b0:6fd:74e5:26b1])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:5d0f:b0:6fd:609d:e924 with SMTP id 6a1803df08f44-702d16b5b13mr153633826d6.36.1751892319483;
+ Mon, 07 Jul 2025 05:45:19 -0700 (PDT)
+Date: Mon,  7 Jul 2025 12:45:17 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3f10:b0:3df:3bc5:bac1 with SMTP id
- e9e14a558f8ab-3e13ee8c225mr73500965ab.5.1751892083675; Mon, 07 Jul 2025
- 05:41:23 -0700 (PDT)
-Date: Mon, 07 Jul 2025 05:41:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <686bc073.a00a0220.c7b3.0086.GAE@google.com>
-Subject: [syzbot] [netfilter?] KMSAN: uninit-value in nf_flow_offload_inet_hook
- (2)
-From: syzbot <syzbot+bf6ed459397e307c3ad2@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250707124517.614489-1-edumazet@google.com>
+Subject: [PATCH net] netfilter: flowtable: account for Ethernet header in nf_flow_pppoe_proto()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+	Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	coreteam@netfilter.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+bf6ed459397e307c3ad2@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+syzbot found a potential access to uninit-value in nf_flow_pppoe_proto()
 
-syzbot found the following issue on:
+Blamed commit forgot the Ethernet header.
 
-HEAD commit:    1f988d0788f5 Merge tag 'hid-for-linus-2025070502' of git:/..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=162bef70580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=aa9af7332485152e
-dashboard link: https://syzkaller.appspot.com/bug?extid=bf6ed459397e307c3ad2
-compiler:       Debian clang version 20.1.7 (++20250616065708+6146a88f6049-1~exp1~20250616065826.132), Debian LLD 20.1.7
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1433e582580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16a6828c580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/84da6415798d/disk-1f988d07.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/62abf67637e4/vmlinux-1f988d07.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0bb719d426ed/bzImage-1f988d07.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+bf6ed459397e307c3ad2@syzkaller.appspotmail.com
-
-=====================================================
 BUG: KMSAN: uninit-value in nf_flow_offload_inet_hook+0x7e4/0x940 net/netfilter/nf_flow_table_inet.c:27
- nf_flow_offload_inet_hook+0x7e4/0x940 net/netfilter/nf_flow_table_inet.c:27
- nf_hook_entry_hookfn include/linux/netfilter.h:157 [inline]
- nf_hook_slow+0xe1/0x3d0 net/netfilter/core.c:623
- nf_hook_ingress include/linux/netfilter_netdev.h:34 [inline]
- nf_ingress net/core/dev.c:5742 [inline]
- __netif_receive_skb_core+0x4aff/0x70c0 net/core/dev.c:5837
- __netif_receive_skb_one_core net/core/dev.c:5975 [inline]
- __netif_receive_skb+0xcc/0xac0 net/core/dev.c:6090
- netif_receive_skb_internal net/core/dev.c:6176 [inline]
- netif_receive_skb+0x57/0x630 net/core/dev.c:6235
- tun_rx_batched+0x1df/0x980 drivers/net/tun.c:1485
- tun_get_user+0x4ee0/0x6b40 drivers/net/tun.c:1938
- tun_chr_write_iter+0x3e9/0x5c0 drivers/net/tun.c:1984
- new_sync_write fs/read_write.c:593 [inline]
- vfs_write+0xb4b/0x1580 fs/read_write.c:686
- ksys_write fs/read_write.c:738 [inline]
- __do_sys_write fs/read_write.c:749 [inline]
- __se_sys_write fs/read_write.c:746 [inline]
- __x64_sys_write+0x1fb/0x4d0 fs/read_write.c:746
- x64_sys_call+0x38c3/0x3db0 arch/x86/include/generated/asm/syscalls_64.h:2
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+  nf_flow_offload_inet_hook+0x7e4/0x940 net/netfilter/nf_flow_table_inet.c:27
+  nf_hook_entry_hookfn include/linux/netfilter.h:157 [inline]
+  nf_hook_slow+0xe1/0x3d0 net/netfilter/core.c:623
+  nf_hook_ingress include/linux/netfilter_netdev.h:34 [inline]
+  nf_ingress net/core/dev.c:5742 [inline]
+  __netif_receive_skb_core+0x4aff/0x70c0 net/core/dev.c:5837
+  __netif_receive_skb_one_core net/core/dev.c:5975 [inline]
+  __netif_receive_skb+0xcc/0xac0 net/core/dev.c:6090
+  netif_receive_skb_internal net/core/dev.c:6176 [inline]
+  netif_receive_skb+0x57/0x630 net/core/dev.c:6235
+  tun_rx_batched+0x1df/0x980 drivers/net/tun.c:1485
+  tun_get_user+0x4ee0/0x6b40 drivers/net/tun.c:1938
+  tun_chr_write_iter+0x3e9/0x5c0 drivers/net/tun.c:1984
+  new_sync_write fs/read_write.c:593 [inline]
+  vfs_write+0xb4b/0x1580 fs/read_write.c:686
+  ksys_write fs/read_write.c:738 [inline]
+  __do_sys_write fs/read_write.c:749 [inline]
 
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:4154 [inline]
- slab_alloc_node mm/slub.c:4197 [inline]
- kmem_cache_alloc_node_noprof+0x818/0xf00 mm/slub.c:4249
- kmalloc_reserve+0x13c/0x4b0 net/core/skbuff.c:579
- __alloc_skb+0x347/0x7d0 net/core/skbuff.c:670
- alloc_skb include/linux/skbuff.h:1336 [inline]
- alloc_skb_with_frags+0xc5/0xa60 net/core/skbuff.c:6665
- sock_alloc_send_pskb+0xad8/0xc70 net/core/sock.c:2999
- tun_alloc_skb drivers/net/tun.c:1461 [inline]
- tun_get_user+0x1019/0x6b40 drivers/net/tun.c:1782
- tun_chr_write_iter+0x3e9/0x5c0 drivers/net/tun.c:1984
- new_sync_write fs/read_write.c:593 [inline]
- vfs_write+0xb4b/0x1580 fs/read_write.c:686
- ksys_write fs/read_write.c:738 [inline]
- __do_sys_write fs/read_write.c:749 [inline]
- __se_sys_write fs/read_write.c:746 [inline]
- __x64_sys_write+0x1fb/0x4d0 fs/read_write.c:746
- x64_sys_call+0x38c3/0x3db0 arch/x86/include/generated/asm/syscalls_64.h:2
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xd9/0x210 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-CPU: 0 UID: 0 PID: 5890 Comm: syz-executor738 Not tainted 6.16.0-rc4-syzkaller-00324-g1f988d0788f5 #0 PREEMPT(undef) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-=====================================================
-
-
+Reported-by: syzbot+bf6ed459397e307c3ad2@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/686bc073.a00a0220.c7b3.0086.GAE@google.com/T/#u
+Fixes: 87b3593bed18 ("netfilter: flowtable: validate pppoe header")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ include/net/netfilter/nf_flow_table.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/include/net/netfilter/nf_flow_table.h b/include/net/netfilter/nf_flow_table.h
+index d711642e78b57c75043e94bf00b782398e5f3621..c003cd194fa2ae40545a196fcc74e83c2868b113 100644
+--- a/include/net/netfilter/nf_flow_table.h
++++ b/include/net/netfilter/nf_flow_table.h
+@@ -370,7 +370,7 @@ static inline __be16 __nf_flow_pppoe_proto(const struct sk_buff *skb)
+ 
+ static inline bool nf_flow_pppoe_proto(struct sk_buff *skb, __be16 *inner_proto)
+ {
+-	if (!pskb_may_pull(skb, PPPOE_SES_HLEN))
++	if (!pskb_may_pull(skb, ETH_HLEN + PPPOE_SES_HLEN))
+ 		return false;
+ 
+ 	*inner_proto = __nf_flow_pppoe_proto(skb);
+-- 
+2.50.0.727.gbf7dc18ff4-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
