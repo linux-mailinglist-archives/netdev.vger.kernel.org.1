@@ -1,148 +1,187 @@
-Return-Path: <netdev+bounces-204489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC068AFAD1E
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 09:31:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91867AFAD51
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 09:39:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82A423BBD94
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 07:30:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E77A716681D
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 07:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A63227A452;
-	Mon,  7 Jul 2025 07:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="tcPHlMoW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C229D27B4E8;
+	Mon,  7 Jul 2025 07:39:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout2.routing.net (mxout2.routing.net [134.0.28.12])
+Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.62.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446B3279918;
-	Mon,  7 Jul 2025 07:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAE111E5B88;
+	Mon,  7 Jul 2025 07:39:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.62.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751873438; cv=none; b=BQnn5cozS4YrbcP0qHNUkcgoM1nl9NTSYtkm39Kz13NwVBZqSW/vLeHS77fCpe9mErQ9ycXNg1y7iLuAAmSqELsjmAddnP0F6tqkHn6ECo2ps+oZR4IQJU+hxXUfLsdcClIqvDcZZ5voekMCj9mKX/mvoVpXeBpQV626/+4a0B0=
+	t=1751873977; cv=none; b=EgSyf15KDSfYIelH+g/zV/sc3cV9N3bFFoMlXxmSrtMYOEcOizQ09shACfBVhP5fPLCeJBdELqpqvUvqIrDYD2NM4D6273sDAQLZKm0H1S+6BauWjW1EXTFl5qGtAv6Wr9KfDZ2Oh8Z2AQqqE3kzQNCfLHsb4Wm+UK8+FWPOBMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751873438; c=relaxed/simple;
-	bh=zVp3mU9tpJoLyKShOFZbvOMZjx+sbDfvqdrK5RIOkbg=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=dnKZKvJFkxX0ObBgAWIdHZYyi2AfLGJdmzplvA+FMz7A63lWrxMDGJ7F9V8FTwGQWQ6uY48Sr3SVZeDmfP5UNY/wvFV0BGBbHOJ83W883p94JgD3wHroH2BQ114p6BhGRMkTe7k7rslbvu3fipw7Xx3oq+mei+V9FxsWqTAoLzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=tcPHlMoW; arc=none smtp.client-ip=134.0.28.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbox2.masterlogin.de (unknown [192.168.10.89])
-	by mxout2.routing.net (Postfix) with ESMTP id B0FE35FAAF;
-	Mon,  7 Jul 2025 07:30:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1751873433;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zVp3mU9tpJoLyKShOFZbvOMZjx+sbDfvqdrK5RIOkbg=;
-	b=tcPHlMoWChlrn8xTPaCqBQ/0kL86NAfoif4bczhRr5EPFM2mHMEWkuotkm7Qcm8BgxNhKd
-	cfd7uYKu7+c3NyNy1MFOYQHSkksnV/+Gw9qqAyCXu09nxFsZXLYurxI+bXh6AVtUosXhwp
-	CTur5EUurSQKKFv4T1RiC3Lo7PaHHeg=
-Received: from [IPv6:::1] (unknown [IPv6:2a01:599:808:65f4:756a:9686:4114:2d58])
-	by mxbox2.masterlogin.de (Postfix) with ESMTPSA id 3BB8D100758;
-	Mon,  7 Jul 2025 07:30:31 +0000 (UTC)
-Date: Mon, 07 Jul 2025 09:30:32 +0200
-From: Frank Wunderlich <linux@fw-web.de>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: MyungJoo Ham <myungjoo.ham@samsung.com>,
- Kyungmin Park <kyungmin.park@samsung.com>,
- Chanwoo Choi <cw00.choi@samsung.com>, Georgi Djakov <djakov@kernel.org>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Johnson Wang <johnson.wang@mediatek.com>,
- =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
- Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Daniel Golle <daniel@makrotopia.org>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- Frank Wunderlich <frank-w@public-files.de>, linux-pm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v8_02/16=5D_dt-bindings=3A_n?=
- =?US-ASCII?Q?et=3A_mediatek=2Cnet=3A_allow_up_to_8_IRQs?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20250707-modest-awesome-baboon-aec601@krzk-bin>
-References: <20250706132213.20412-1-linux@fw-web.de> <20250706132213.20412-3-linux@fw-web.de> <20250707-modest-awesome-baboon-aec601@krzk-bin>
-Message-ID: <B875B8FF-FEDB-4BBD-8843-9BA6E4E89A45@fw-web.de>
+	s=arc-20240116; t=1751873977; c=relaxed/simple;
+	bh=itVQ6V0Mr9OovVSe2MWKuCPuJjDkX6YRyGMqSSgLTOc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fa19oG0O1RVJcZi227x1Vbdo/dw/RmKyLFEyDK6p3N0gg7SPBCAD8mGkM8xaRnrtqA5DarqoFwML9vyn6u/ZFr7YJzFmXFmMLqrXFrSh5oUEtyeE/NhOLKmQd19MqNYxd7nkm6oCFspFTbCEqYQeqSF+C2/9lrvCXxq05Up6r9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=114.132.62.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: zesmtpsz7t1751873865tf5aee820
+X-QQ-Originating-IP: mJw/heq6b2Ta6GtlIIN+F3vmI3qSS3RNqcxng9NIU/M=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 07 Jul 2025 15:37:43 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 3322818785866076011
+Date: Mon, 7 Jul 2025 15:37:43 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+	andrew+netdev@lunn.ch, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 04/15] net: rnpgbe: Add get_capability mbx_fw ops support
+Message-ID: <CB185D75E8EDC84A+20250707073743.GA164527@nic-Precision-5820-Tower>
+References: <20250703014859.210110-1-dong100@mucse.com>
+ <20250703014859.210110-5-dong100@mucse.com>
+ <57497e14-3f9a-4da8-9892-ed794aadbf47@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Mail-ID: 03c03832-acef-4e85-9034-7323a57b8c25
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <57497e14-3f9a-4da8-9892-ed794aadbf47@lunn.ch>
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: Nc4Sv39/e83Wv/xSPCBI764BfkQBkT4hm9ezADdd7z/A2YTleb4RHIdg
+	X6CL3Xr8IsxwzEwNlqkt+2PM/L7tdj7omGDntaKG4PGMcYtYGAdxolutctGPTY4cDgbwjto
+	uN1cYczd8CIiri6UCfAdXOxjtggxEfnoHW0KJgPpbPmAEo2jwkNXNC7kvMOGUP8tyZ8xdVy
+	AOO8WFGJof2vSX+Msy/OcsP4F7dbaT0CMUOffiPgH0OzaHn2JusoWh/bH0JdGsxhvxiBCiz
+	Z1y+Bgtp/Zio9ppkib3X3iageHfK+etYLMwDdPnO2AY4pIIoc1hEd+sG8EldLT6H7swlnr8
+	mltF1PmFD5RCjVXFPc0yuzuRPBCeCUMdkL94jtFr0hYpZi3N+JLHpJq78OBelnJaRdBo8cP
+	tw7OgQaSv4HvrjqgzTPTh0mBlfGoBcgpKd93ItcbgXlFM/HrrNfFhu/6tgIz2caykgH0Wzx
+	7YUjx/0GSy73zNM8mBAROngRplUKDPLaG7PT3K10uPdOuh10s2C7J8EqT6uv8X7zLQWjtwB
+	a/3aRBTXhNKOhWANHug3puXbTyMDEi/+KCWSfl01IV7w1xWyX0c3j+0wa77IIEBSSD2BhfT
+	yHJ8KO4yelDhwb9SRas6pf/nS6M5mG6Ktpnb9Pm+8EMVxFi7RygSgD12SIkuseGFTYeLC0y
+	S/FpN5AwRlVoMY49IvMzerRc5x0Gm5ofdFMEsBu1lRF+5dg4pHt9vltW8zNTHuqGnWGSAHm
+	8aqCT/obbwKJvEvW4uzh6Ivwx4AErVu/FV+hzxpA0z9AgNtOrXGFfET3l6OOknTrtdh2X8P
+	0dF6JWn004Mz3jWydAomGKzY1ynVBdIp4eVjN303P+Tc+g8lXASgQRT5hA0tWSTFrIj52Sv
+	mymuDIrHW6pUPKbfc0uBodRH2fNszFzdpLYwfMfqToff/HoGUcrCSOAv20u2VxT3AaHrF7A
+	xSqmTwEp8D/2Sc6cgwE0cOOyaXcId2TUMmnEbETRszNoAnoGv/TlB8XSB
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-RECHKSPAM: 0
 
-Am 7=2E Juli 2025 08:31:11 MESZ schrieb Krzysztof Kozlowski <krzk@kernel=2E=
-org>:
->On Sun, Jul 06, 2025 at 03:21:57PM +0200, Frank Wunderlich wrote:
->> From: Frank Wunderlich <frank-w@public-files=2Ede>
->>=20
->> Increase the maximum IRQ count to 8 (4 FE + 4 RSS/LRO)=2E
->
->Because? Hardware was updated? It was missing before?
+On Fri, Jul 04, 2025 at 08:25:12PM +0200, Andrew Lunn wrote:
+> > +/**
+> > + * mucse_fw_send_cmd_wait - Send cmd req and wait for response
+> > + * @hw: Pointer to the HW structure
+> > + * @req: Pointer to the cmd req structure
+> > + * @reply: Pointer to the fw reply structure
+> > + *
+> > + * mucse_fw_send_cmd_wait sends req to pf-cm3 mailbox and wait
+> > + * reply from fw.
+> > + *
+> > + * Returns 0 on success, negative on failure
+> > + **/
+> > +static int mucse_fw_send_cmd_wait(struct mucse_hw *hw,
+> > +				  struct mbx_fw_cmd_req *req,
+> > +				  struct mbx_fw_cmd_reply *reply)
+> > +{
+> > +	int err;
+> > +	int retry_cnt = 3;
+> > +
+> > +	if (!hw || !req || !reply || !hw->mbx.ops.read_posted)
+> 
+> Can this happen?
+> 
+> If this is not supposed to happen, it is better the driver opps, so
+> you get a stack trace and find where the driver is broken.
+> 
+Yes, it is not supposed to happen. So, you means I should remove this
+check in order to get opps when this condition happen?
+> > +		return -EINVAL;
+> > +
+> > +	/* if pcie off, nothing todo */
+> > +	if (pci_channel_offline(hw->pdev))
+> > +		return -EIO;
+> 
+> What can cause it to go offline? Is this to do with PCIe hotplug?
+> 
+Yes, I try to get a PCIe hotplug condition by 'pci_channel_offline'.
+If that happens, driver should never do bar-read/bar-write, so return
+here.
+> > +
+> > +	if (mutex_lock_interruptible(&hw->mbx.lock))
+> > +		return -EAGAIN;
+> 
+> mutex_lock_interruptable() returns -EINTR, which is what you should
+> return, not -EAGAIN.
+> 
+Got it, I should return '-EINTR' here.
+> > +
+> > +	err = hw->mbx.ops.write_posted(hw, (u32 *)req,
+> > +				       L_WD(req->datalen + MBX_REQ_HDR_LEN),
+> > +				       MBX_FW);
+> > +	if (err) {
+> > +		mutex_unlock(&hw->mbx.lock);
+> > +		return err;
+> > +	}
+> > +
+> > +retry:
+> > +	retry_cnt--;
+> > +	if (retry_cnt < 0)
+> > +		return -EIO;
+> > +
+> > +	err = hw->mbx.ops.read_posted(hw, (u32 *)reply,
+> > +				      L_WD(sizeof(*reply)),
+> > +				      MBX_FW);
+> > +	if (err) {
+> > +		mutex_unlock(&hw->mbx.lock);
+> > +		return err;
+> > +	}
+> > +
+> > +	if (reply->opcode != req->opcode)
+> > +		goto retry;
+> > +
+> > +	mutex_unlock(&hw->mbx.lock);
+> > +
+> > +	if (reply->error_code)
+> > +		return -reply->error_code;
+> 
+> The mbox is using linux error codes? 
+> 
+It is used only between driver and fw, yay be just samply like this: 
+0     -- no error
+not 0 -- error
+So, it is not using linux error codes.
+> > +#define FLAGS_DD BIT(0) /* driver clear 0, FW must set 1 */
+> > +/* driver clear 0, FW must set only if it reporting an error */
+> > +#define FLAGS_ERR BIT(2)
+> > +
+> > +/* req is little endian. bigendian should be conserened */
+> > +struct mbx_fw_cmd_req {
+> > +	u16 flags; /* 0-1 */
+> > +	u16 opcode; /* 2-3 enum GENERIC_CMD */
+> > +	u16 datalen; /* 4-5 */
+> > +	u16 ret_value; /* 6-7 */
+> 
+> If this is little endian, please use __le16, __le32 etc, so that the
+> static analysers will tell you if you are missing cpu_to_le32 etc.
+> 
+> 	Andrew
+> 
+Got it, I will fix it.
 
-There is no RSS support in driver yet,so IRQs were not added to existing D=
-TS yet=2E
-
->>=20
->> Frame-engine-IRQs (max 4):
->> MT7621, MT7628: 1 IRQ
->> MT7622, MT7623: 3 IRQs (only two used by the driver for now)
->> MT7981, MT7986, MT7988: 4 IRQs (only two used by the driver for now)
->
->You updated commit msg - looks fine - but same problem as before in your
->code=2E Now MT7981 has 4-8 interrupts, even though you say here it has on=
-ly
->4=2E
-
-Ethernet works with 4,but can be 8 for MT798x=2E
-I cannot increase the MinItems here as it will
-throw error because currently only 4 are defined in DTS=2Esame for MT7986=
-=2E
->>=20
->> Mediatek Filogic SoCs (mt798x) have 4 additional IRQs for RSS and/or
->> LRO=2E
->
->Although I don't know how to treat this=2E Just say how many interrupts
->are there (MT7981, MT7986, MT7988: 4 FE and 4 RSS), not 4 but later
->actually 4+4=2E
-
-First block is for Frame Engine IRQs and second for RSS/LRO=2E Only mentio=
-n total count=20
-across all SoCs is imho more confusing=2E
-
->I also do not understand why 7 interrupts is now valid=2E=2E=2E Are these=
- not
->connected physically?
-
-7 does not make sense but i know no way to allow 8 with min 4 without betw=
-een (5-7)=2E
-
->Best regards,
->Krzysztof
-
-Hi
-
-Thanks for taking time for review again=2E
-
-First block are the frame engine IRQs which are max 4 and on all SoCs=2E
-The RSS IRQs are only valid on Filogic (MT798x),so there a total of 8, but=
- on
-MT7981 and MT7986 not yet added as i prepare the RSS/LRO driver in backgro=
-und=2E
-We just want to add the IRQs for MT7988 now=2E
-regards Frank
+Thanks for your feedback.
 
