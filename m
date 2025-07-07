@@ -1,254 +1,131 @@
-Return-Path: <netdev+bounces-204715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84879AFBDE4
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 23:55:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CCF6AFBDE6
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 23:57:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FA151BC04FE
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 21:55:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC1C81BC15A3
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 21:58:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0389D285C95;
-	Mon,  7 Jul 2025 21:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C204288525;
+	Mon,  7 Jul 2025 21:57:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1s7+89zi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jz1yy+7e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5900F1C6FE1
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 21:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59DFB16DEB3;
+	Mon,  7 Jul 2025 21:57:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751925326; cv=none; b=BzNoa87K3WxArrl8b8MbPVMjPb7hbD46oNxc4OSu9X6ylEsncLPl3RFnETlILDIlFjiAu77iqP/FrvvxqTx2sKMdI8DqAR5rrBz/irxY3kSatGYrq8w4BJLnwkFflh6KSuI7pmhBoIJI/pFnryduKEIQPbbj2vbeE5IdvisLlFg=
+	t=1751925473; cv=none; b=pzu+Q6d5H/HJTS6xLLsLp/4QUsrHv1Le8GErPKHsfCobz6o3HJM2nHLdQNW76APwxLAKFq/GmzGCohAd7jeDlZdvNux/Mdk7LiSmCqzJVWOR9/giepr5/M89SoSqIKYDCZy4mFCFk3pDOAK1zEGq9CG/FtJ7mIpyJS3LrMesPdA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751925326; c=relaxed/simple;
-	bh=9AGMi6aOUv8lZr+RXfz2XCf31Nuvt0TeuQmn1A5hoCM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HSP4bmM2kyAVpP6xyPDuSfM/LtfUt2oBcab2WYWjRNTx9ICbUpYGGn+oS9jb4PILoUcNLdNRrejJ6z9bUlzqhZFmgVcOPkRJX3X2USNNQtXr5HKOBSX+EJFHqWJLxFLH5B8Ljr7AcmnHQSlYsxVWe409o/YN7BfD6ezl0gTPINU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1s7+89zi; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-235e389599fso82785ad.0
-        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 14:55:25 -0700 (PDT)
+	s=arc-20240116; t=1751925473; c=relaxed/simple;
+	bh=wn4KLgMQi0FkygQy/dhVswDwIcW8jJc1HjU5vZfPamo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oN/lSab2r+yU/U44KEAgCwa2FJzFdEp5K7Ai8FQ+qnWbxUBwsVAhP0xERDI1VPzGEMlgqBo8Cq47R4fMt29y2Zrra/6gRRiqDGigOIwvz6CaKKOcypHz7Bs5OFyfUgmOAGqXGauLSDWBy/DpgAhiEbLrguNsFSOVwg2c/w3dS1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jz1yy+7e; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-450cb2ddd46so18895595e9.2;
+        Mon, 07 Jul 2025 14:57:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751925325; x=1752530125; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XjODZ7b3pUgkuHWTOlB6q0MkE7zknx2t+C23plqUGVI=;
-        b=1s7+89ziOyRjmhJfH/FQ+bDNeXbN5cONQvBuKNGoUepXlaG2u9sJM79RqrNVQGCb90
-         uBtqf/0oy5lfNYzHeYjJOsNwlvYUjPAvBVk9H7evj0w4jFAL/D+uJXvqWbqr9J0l3BRj
-         Iz6vmgHZPRugHTl7shBlWzM2mt/7HNyZ9z95kBdY4MuLSFlePtue91cVeuh9DqBzEV9l
-         6VRPueZGShp4niLyBW93uv3bvQ+Kcer4u/vsfAddhBPUQUmy87QDHBF1l24dakmJ5ZJJ
-         RkwjWuCjtVuSxiKK9FT7nPHwE0+jYydjHB3Ib7JfpqduMOGddTbti3KIQyo33svAq47h
-         9LPQ==
+        d=gmail.com; s=20230601; t=1751925468; x=1752530268; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jmbxv3PdqFKnk2A9UCW4ls9PEGqEY+FhX8JmesHWPR8=;
+        b=jz1yy+7el4Mr1r7g24xjbx1LmrwfAFnFvKzaYqjNWg9Nf1IoYT+kLpzU8xu6NYKGEK
+         qslW2YIOrcdJBovhPlqXZJzCFvrqPM+joTMRNHBkjD2lqHjpNAA1APkOvyS2kpqL+rYw
+         tsNIgoFV8GL1HhhzSXd2vjTvexz/JK961wCYuU5ng0pAbq+C5QV7Igo7/JwgB3AGGc7e
+         kq4tVyI6ndfpXdu6xxPoTZpEXYalSYtdvIPcYcjoDaLTmCprs6XFPs62h3u9SiFOUf7M
+         qRtxsWCuxYe+UzA9RWquS05082ndqKf568uIInC4GC73YdoKZNfaBcsuvLmC9wJuiFEX
+         q0tA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751925325; x=1752530125;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XjODZ7b3pUgkuHWTOlB6q0MkE7zknx2t+C23plqUGVI=;
-        b=WcxKSVfLy+RDyQCHLbEFGkcM3joQ1YafVBPnzRffKS44bf9fJyQ2Ak17AuRGioXEjr
-         ZwX3/st6jn1yGtPDtNmD03x+ns+5OmDmHdVAUPjFd/f/2FP1EFFf7Nrd/E5FhggW8h4k
-         PdNXcpdeHkw13dpj3HLUqInrlN3QCXL96SfABjwYwSZ2TDWGmr7gHKhNKlZlZYxmrcJr
-         O6YLg1UQMnx34LYxyrKEQFPBC4ZWydPUbIVbicvZGnH35vbVshqVrPjTCCMsFir5o9Fx
-         tiJulmUc/NtSCaMH9vzSb9/gofu6y66al4GZ/iJ7yCH1nSpOiVUx1My1l/iCDiVYhiyc
-         bOZg==
-X-Forwarded-Encrypted: i=1; AJvYcCU6WJnfkwCLXnxgqr9oNeG8tUCNb05ZD082nWpXeGudf3/AEaO+lRB1CIur8mwR/W80/r2cm0w=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzyr5YSCUNLm/JjhYBupviEyuyq51g6dpWDZx+STuuKL6LOylfK
-	AMtsJvdJ36oOjA3RbbSbwptRChrBkzHYIz0OGlg8CP0hJEQuzXUJ3vm0khFakB4YsDjpr78fmI8
-	yIOU1dluoKj3QQZsR9L1rw6MXoZI4cTRW2iYgBJXH
-X-Gm-Gg: ASbGncsjOYsAnJ3iK7nuHcs0YIlqx4Zv0a9FjyGuRKen8krjCmDWH06snug9cwIfr5R
-	FwL7Gftz0YyUMmPo31CBbl+IA9E1v8JpJRVrIfCrmqydC9L+Di/ZZPUwcVAPdIql8Yujp7z6AXk
-	D0Q5dVSH1cR7G6fwKmiKbfKin5iTIwg9fUj/vL1MI2+iWqvUO469AfouReZuJe/RxW2k0upJfpF
-	Q==
-X-Google-Smtp-Source: AGHT+IEUyNA21PNLfpesvG5K4xIaoCzv68+pnS1VVkTUe7gUYeQrdXt9UG8p4qMQV0+grM07E7RHnYwdtIk1mXmGjiA=
-X-Received: by 2002:a17:903:32c8:b0:235:f18f:291f with SMTP id
- d9443c01a7336-23dd1c67ccbmr300755ad.23.1751925324336; Mon, 07 Jul 2025
- 14:55:24 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751925468; x=1752530268;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jmbxv3PdqFKnk2A9UCW4ls9PEGqEY+FhX8JmesHWPR8=;
+        b=XQoWAzagi65Xkg/PbECAZ3KhBZAdrYlo5nQ6nIwDaiAXKgS0h17Pe+cCfRcrQErT8X
+         2qwiqRMuan59DZtY2q1Kua7Nz6vGp4IQ4kRkKEgCvEOPZB+tMtHYyne/zVLbpEZyNfVE
+         y9/QcDsHn09F2k2K80HvPsaKBsI8xFZd9NB/X9Mh4V+TG3P3WhrJTODtr0Dy+gMQPFLd
+         1n220Vbm1gFxHXU74B7ycjTF6pfV4QscNm1JH35mIgkIUR9S5khgLFmJbkr02m3plEb3
+         NFmOT/H4bM6oCCLAU+urWDFgz6ag8wyHU+Y1hjbc+3mySAwixXwn/WJG9fAfa58roNh5
+         sZmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUe7t9OTwiqeeZQiQY2L8kHExKS7Qv3nCfrGG8DTrdOwizdHl9wij3imqy8sDres/9HE6byfhzdMe1hPHoM@vger.kernel.org, AJvYcCWQFahxHjwOn4mA6i45XHRgVqpZh6nhH3e7B80beaqIHwUn1hLc7ZIBb71XPcYShg6zCwQ=@vger.kernel.org, AJvYcCWupgBuRYODU/NCfYG3z/0pYKr9fpcTEy9/y5FEbRnd//54LBDjonvs7WngzPxLnoGj+UzGHlVZ@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCpVMQmF2wdQJ6Q3yrbXT2lVQULF6dyPKRVOLHjbqJVIt0ppDU
+	sK9xK9BDGJuE0s1ebn5XTK9BaLcR1s3ysjJQYA2CqDHzU70c6WqnQTyx
+X-Gm-Gg: ASbGncuqhVq35NRi2yPhav4UjBgnyiYPhSpcJWX7K08M1E3TEAtlQXmeIT/JxIT5JU0
+	cIAwHwETFEdl+RqnK2uUOPpGajeFQQaRniImFbKl08wJnSsBHl5GhohSkeioGWYPcqbgOhzR5kN
+	yddBItJuhsp4Gp7avOEkHCiDCJGxQyDK17BSlyZCW6DnRLBETGq8dwT2rRLmGLXnui1Dr9pWMnN
+	W9YrPAd6GqMXuEoesjJSqeohvLdAyfWRZ87ZYcASa3res8BeM7mqBe8vnc/MLheu3UGXouUHnDB
+	3F4Mw1/s+C2Rt71O9rHE5xts7OVwExKavxvw/a1D+hWfLSD2MUIBvp6k0ulqr41kJIsBSthhACV
+	CuQHDIMax8Soot5XGtMoC3IIkKtV5hNv3iKCZ6A3N3ilcXKvBYV7Lg/gEKbvlxodPlVbxoU0=
+X-Google-Smtp-Source: AGHT+IEhIg4l6YStNvu65lWOa+vurZo381w6ywFHfdsoVupncE1hKIfHVv61bQAlipenXd9yoVNn3Q==
+X-Received: by 2002:a05:600c:a20f:b0:453:c39:d0c2 with SMTP id 5b1f17b1804b1-454cdab07cemr604855e9.24.1751925468311;
+        Mon, 07 Jul 2025 14:57:48 -0700 (PDT)
+Received: from mail.gmail.com (2a01cb0889497e00f536999e2663c8dd.ipv6.abo.wanadoo.fr. [2a01:cb08:8949:7e00:f536:999e:2663:c8dd])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454cd4943bdsm3303855e9.20.2025.07.07.14.57.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Jul 2025 14:57:47 -0700 (PDT)
+Date: Mon, 7 Jul 2025 23:57:45 +0200
+From: Paul Chaignon <paul.chaignon@gmail.com>
+To: Eduard Zingerman <eddyz87@gmail.com>
+Cc: syzbot <syzbot+c711ce17dd78e5d4fdcf@syzkaller.appspotmail.com>,
+	andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+	daniel@iogearbox.net, haoluo@google.com, john.fastabend@gmail.com,
+	jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org,
+	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@fomichev.me,
+	song@kernel.org, syzkaller-bugs@googlegroups.com,
+	yonghong.song@linux.dev
+Subject: Re: [syzbot] [bpf?] WARNING in reg_bounds_sanity_check
+Message-ID: <aGxC2aVjAm4m7oTU@mail.gmail.com>
+References: <68649190.a70a0220.3b7e22.20e8.GAE@google.com>
+ <aGa3iOI1IgGuPDYV@Tunnel>
+ <865f2345eaa61afbd26d9de0917e3b1d887c647d.camel@gmail.com>
+ <aGgL_g3wA2w3yRrG@mail.gmail.com>
+ <df2cdc5f4fa16a4e3e08e6a997af3722f3673d38.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250702172433.1738947-1-dtatulea@nvidia.com> <20250702172433.1738947-2-dtatulea@nvidia.com>
- <20250702113208.5adafe79@kernel.org> <c5pxc7ppuizhvgasy57llo2domksote5uvo54q65shch3sqmkm@bgcnojnxt4hh>
- <20250702135329.76dbd878@kernel.org> <CY8PR12MB7195361C14592016B8D2217DDC43A@CY8PR12MB7195.namprd12.prod.outlook.com>
- <22kf5wtxym5x3zllar7ek3onkav6nfzclf7w2lzifhebjme4jb@h4qycdqmwern>
- <CAHS8izN-yJ1tm0uUvQxq327-bU1Vzj8JVc6bqns0CwNnWhc_XQ@mail.gmail.com> <sdy27zexcqivv4bfccu36koe4feswl5panavq3t2k6nndugve3@bcbbjxiciaow>
-In-Reply-To: <sdy27zexcqivv4bfccu36koe4feswl5panavq3t2k6nndugve3@bcbbjxiciaow>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 7 Jul 2025 14:55:11 -0700
-X-Gm-Features: Ac12FXy6PtsGridoKCc-iCQycbBbvTllmo3prjwvZXhIWiUYJxClF9O2WMIZiK0
-Message-ID: <CAHS8izPTBY9vL-H31t26kEc4Y4UEMm+jW0K0NtbqmcsOA9s4Cw@mail.gmail.com>
-Subject: Re: [RFC net-next 1/4] net: Allow non parent devices to be used for
- ZC DMA
-To: Dragos Tatulea <dtatulea@nvidia.com>
-Cc: Parav Pandit <parav@nvidia.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"asml.silence@gmail.com" <asml.silence@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Tariq Toukan <tariqt@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <df2cdc5f4fa16a4e3e08e6a997af3722f3673d38.camel@gmail.com>
 
-On Mon, Jul 7, 2025 at 2:35=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com>=
- wrote:
->
-> On Mon, Jul 07, 2025 at 11:44:19AM -0700, Mina Almasry wrote:
-> > On Fri, Jul 4, 2025 at 6:11=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.=
-com> wrote:
-> > >
-> > > On Thu, Jul 03, 2025 at 01:58:50PM +0200, Parav Pandit wrote:
-> > > >
-> > > > > From: Jakub Kicinski <kuba@kernel.org>
-> > > > > Sent: 03 July 2025 02:23 AM
-> > > > >
-> > > [...]
-> > > > > Maybe someone with closer understanding can chime in. If the kind=
- of
-> > > > > subfunctions you describe are expected, and there's a generic way=
- of
-> > > > > recognizing them -- automatically going to parent of parent would=
- indeed be
-> > > > > cleaner and less error prone, as you suggest.
-> > > >
-> > > > I am not sure when the parent of parent assumption would fail, but =
-can be
-> > > > a good start.
-> > > >
-> > > > If netdev 8 bytes extension to store dma_dev is concern,
-> > > > probably a netdev IFF_DMA_DEV_PARENT can be elegant to refer parent=
-->parent?
-> > > > So that there is no guess work in devmem layer.
-> > > >
-> > > > That said, my understanding of devmem is limited, so I could be mis=
-taken here.
-> > > >
-> > > > In the long term, the devmem infrastructure likely needs to be
-> > > > modernized to support queue-level DMA mapping.
-> > > > This is useful because drivers like mlx5 already support
-> > > > socket-direct netdev that span across two PCI devices.
-> > > >
-> > > > Currently, devmem is limited to a single PCI device per netdev.
-> > > > While the buffer pool could be per device, the actual DMA
-> > > > mapping might need to be deferred until buffer posting
-> > > > time to support such multi-device scenarios.
-> > > >
-> > > > In an offline discussion, Dragos mentioned that io_uring already
-> > > > operates at the queue level, may be some ideas can be picked up
-> > > > from io_uring?
-> > > The problem for devmem is that the device based API is already set in
-> > > stone so not sure how we can change this. Maybe Mina can chime in.
-> > >
-> >
-> > I think what's being discussed here is pretty straight forward and
-> > doesn't need UAPI changes, right? Or were you referring to another
-> > API?
-> >
-> I was referring to the fact that devmem takes one big buffer, maps it
-> for a single device (in net_devmem_bind_dmabuf()) and then assigns it to
-> queues in net_devmem_bind_dmabuf_to_queue(). As the single buffer is
-> part of the API, I don't see how the mapping could be done in a per
-> queue way.
->
+On Fri, Jul 04, 2025 at 10:26:14AM -0700, Eduard Zingerman wrote:
+> On Fri, 2025-07-04 at 19:14 +0200, Paul Chaignon wrote:
+> > On Thu, Jul 03, 2025 at 11:54:27AM -0700, Eduard Zingerman wrote:
+> > > On Thu, 2025-07-03 at 19:02 +0200, Paul Chaignon wrote:
+> > > > The number of times syzkaller is currently hitting this (180 in 1.5
+> > > > days) suggests there are many different ways to reproduce.
+> > > 
+> > > It is a bit inconvenient to read syzbot BPF reports at the moment,
+> > > because it us hard to figure out how the program looks like.
+> > > Do you happen to know how complicated would it be to modify syzbot
+> > > output to:
+> > > - produce a comment with BPF program
+> > > - generating reproducer with a flag, allowing to print level 2
+> > >   verifier log
+> > > ?
+> > 
+> > I have the same thought sometimes. Right now, I add verifier logs to a
+> > syz or C reproducer to see the program. Producing the BPF program in a
+> > comment would likely be tricky as we'd need to maintain a disassembler
+> > in syzkaller.
+> 
+> So, it operates on raw bytes, not on logical instructions?
 
-Oh, I see. devmem does support mapping a single buffer to multiple
-queues in a single netlink API call, but there is nothing stopping the
-user from mapping N buffers to N queues in N netlink API calls.
+Both I would say. The syzkaller descriptions for BPF are structured
+around instructions [1], though they may not always match 1:1 with
+upstream instructions. Syzkaller then mutates raw bytes, taking some
+information from the descriptions into account (ex. known flag values).
 
-> > > To sum the conversation up, there are 2 imperfect and overlapping
-> > > solutions:
-> > >
-> > > 1) For the common case of having a single PCI device per netdev, goin=
-g one
-> > >    parent up if the parent device is not DMA capable would be a good
-> > >    starting point.
-> > >
-> > > 2) For multi-PF netdev [0], a per-queue get_dma_dev() op would be ide=
-al
-> > >    as it provides the right PF device for the given queue.
-> >
-> > Agreed these are the 2 options.
-> >
-> > > io_uring
-> > >    could use this but devmem can't. Devmem could use 1. but the
-> > >    driver has to detect and block the multi PF case.
-> > >
-> >
-> > Why? AFAICT both io_uring and devmem are in the exact same boat right
-> > now, and your patchset seems to show that? Both use dev->dev.parent as
-> > the mapping device, and AFAIU you want to use dev->dev.parent.parent
-> > or something like that?
-> >
-> Right. My patches show that. But the issue raised by Parav is different:
-> different queues can belong to different DMA devices from different
-> PFs in the case of Multi PF netdev.
->
-> io_uring can do it because it maps individual buffers to individual
-> queues. So it would be trivial to get the DMA device of each queue throug=
-h
-> a new queue op.
->
-
-Right, devmem doesn't stop you from mapping individual buffers to
-individual queues. It just also supports mapping the same buffer to
-multiple queues. AFAIR, io_uring also supports mapping a single buffer
-to multiple queues, but I could easily be very wrong about that. It's
-just a vague recollection from reviewing the iozcrx.c implementation a
-while back.
-
-In your case, I think, if the user is trying to map a single buffer to
-multiple queues, and those queues have different dma-devices, then you
-have to error out. I don't see how to sanely handle that without
-adding a lot of code. The user would have to fall back onto mapping a
-single buffer to a single queue (or multiple queues that share the
-same dma-device).
-
-> > Also AFAIU the driver won't need to block the multi PF case, it's
-> > actually core that would need to handle that. For example, if devmem
-> > wants to bind a dmabuf to 4 queues, but queues 0 & 1 use 1 dma device,
-> > but queues 2 & 3 use another dma-device, then core doesn't know what
-> > to do, because it can't map the dmabuf to both devices at once. The
-> > restriction would be at bind time that all the queues being bound to
-> > have the same dma device. Core would need to check that and return an
-> > error if the devices diverge. I imagine all of this is the same for
-> > io_uring, unless I'm missing something.
-> >
-> Agreed. Currently I didn't see an API for Multi PF netdev to expose
-> this information so my thinking defaulted to "let's block it from the
-> driver side".
->
-
-Agreed.
-
-> > > I think we need both. Either that or a netdev op with an optional que=
-ue
-> > > parameter. Any thoughts?
-> > >
-> >
-> > At the moment, from your description of the problem, I would lean to
-> > going with Jakub's approach and handling the common case via #1. If
-> > more use cases that require a very custom dma device to be passed we
-> > can always move to #2 later, but FWIW I don't see a reason to come up
-> > with a super future proof complicated solution right now, but I'm
-> > happy to hear disagreements.
-> But we also don't want to start off on the left foot when we know of
-> both issues right now. And I think we can wrap it up nicely in a single
-> function similary to how the current patch does it.
->
-
-FWIW I don't have a strong preference. I'm fine with the simple
-solution for now and I'm fine with the slightly more complicated
-future proof solution.
-
---=20
-Thanks,
-Mina
+1 - https://github.com/google/syzkaller/blob/master/sys/linux/bpf_prog.txt
 
