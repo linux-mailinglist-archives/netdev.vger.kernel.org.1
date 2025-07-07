@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-204559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22DEBAFB2A7
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 13:53:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08AFDAFB2C2
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 14:01:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 676BF3A77D6
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 11:53:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FF8D1AA1635
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 12:01:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4808729A30D;
-	Mon,  7 Jul 2025 11:53:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B61F1D416E;
+	Mon,  7 Jul 2025 12:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="s/XG/WfU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wEL90RUB"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 637751373;
-	Mon,  7 Jul 2025 11:53:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952E84EB38;
+	Mon,  7 Jul 2025 12:00:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751889226; cv=none; b=F1r28Ikosn6L1hYfIYyDTXLMiLVpgp6OHtzWmuUnrvr5AbtBNaUmo/RCXcDSLL/8cg9xZqGMxvisKaCp7rIRGzHTkcx3Bc6LyBEhNYQ6SUzbqNmv1fc/ix2agn2kzMk+nXcizxVlr+lq6d6/S8AB7S/mBAcGeG6JEtweeQE1zvc=
+	t=1751889659; cv=none; b=oIsHS4ZEoQRpmyOu8JOdt1AQo1k2GQqoieL1Vdk2wKplDpFK4eBBxVj28P4aqLmjdUFtTd6NEYifr2qYLRoIJhiQvN/2l+lyU0I1bqpfpZG10lNdv8LbKq8QsUCIqi3ohZhL+6ptQpLtRyTJ1X82iovDCwB76Qfyz4bFQyXDLNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751889226; c=relaxed/simple;
-	bh=jM+/UUCJoXc+bzfrp40R7IOgg6i7fASt5M7fn2z62CQ=;
+	s=arc-20240116; t=1751889659; c=relaxed/simple;
+	bh=P95bcMQU7ZPJZKZhLDXLyZrEYnchtk24M7xzCIyhGTs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eOzWgkOB2JkaA1Q820QF3JLGCuYXWs3oexY9jEjHlOOWEP2HIwN4QuEG0pA/9Wpsjo0PJSgQSOz0tP9N/0Qr2jDl0NSaBTisIffd5ln9OBoOkyY2DcoiOutaSLJOxZOGuTPbscYH5srZpRDy7G+Je6awMJ74KSGCG4aUbfXR3JI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=s/XG/WfU; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=oTBeKm9aWkpNTQ7v4k7KDGU/bieCh1uiPn2KvbMqf3CBz5ehdStmV8nk/I769WizCsXBI4Q7IfNOgOqixcCZhLpH4+b4uXbi3Q6dlu0olAC3CyrB48JPvqswKxYzopuzsK0Hjoky6HsQn+9qbuuBfWGW32phJ7x6QM9HbGq1+lU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wEL90RUB; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,31 +36,29 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xjTX6YNdxABo8Jl2jn8Lm6RPCYX+HMZYyUJcZGWNE5w=; b=s/XG/WfUD5TwLxJR21YjurMr1+
-	uIrql8eVFB8xIOWZb4jN66SOFhAIiOzXDuBzM8UYaxQPnp47ksUndJ1Mo8p9nminew4/FcaTjzxfH
-	vpDQ1eD4Ib2UtLuPW5FSqB7k5isk46x6lgS73u0NqgVfNgvLtqQYrjdEF9pRl//l0ReY=;
+	bh=Q+5AuUFTHWtlPlVeriGBMAZdNv3i5ihbtFUnvkIaFUI=; b=wEL90RUBpGaKK5y6QFqfX7IriG
+	oPoY/JS7G6uRRY8C/1LFAOBLiHjJCKlheHs6mJkHDOUUhzAXrW9gkh7AKiyTc+MRlDWttGVOHwHx/
+	ILc8cp8PlVawigpXOS1ISxhCsN/CVye+trXo4TnFkJLsHfHvOK/synbvKdMvAjBZENl8=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1uYkPc-000hxy-QL; Mon, 07 Jul 2025 13:53:32 +0200
-Date: Mon, 7 Jul 2025 13:53:32 +0200
+	id 1uYkW8-000i1l-Pb; Mon, 07 Jul 2025 14:00:16 +0200
+Date: Mon, 7 Jul 2025 14:00:16 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Michael Dege <michael.dege@renesas.com>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>,
-	Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Subject: Re: [PATCH 0/3] net: renesas: rswitch: R-Car S4 add HW offloading
- for layer 2 switching
-Message-ID: <dd75a12d-17cd-45a7-97d0-a243df54c215@lunn.ch>
-References: <20250704-add_l2_switching-v1-0-ff882aacb258@renesas.com>
- <9c8cb213-7daf-43bb-8d20-aaefa13127af@lunn.ch>
- <TY4PR01MB14282E8A9E82714106D448EA0824FA@TY4PR01MB14282.jpnprd01.prod.outlook.com>
+To: Yibo Dong <dong100@mucse.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+	andrew+netdev@lunn.ch, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 03/15] net: rnpgbe: Add basic mbx ops support
+Message-ID: <f8a69fa5-cc3d-4968-8b19-0bdb27e1e917@lunn.ch>
+References: <20250703014859.210110-1-dong100@mucse.com>
+ <20250703014859.210110-4-dong100@mucse.com>
+ <80644ec1-a313-403a-82dd-62eb551442d3@lunn.ch>
+ <9C6FCA38E28D6768+20250707063955.GA162739@nic-Precision-5820-Tower>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,24 +67,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <TY4PR01MB14282E8A9E82714106D448EA0824FA@TY4PR01MB14282.jpnprd01.prod.outlook.com>
+In-Reply-To: <9C6FCA38E28D6768+20250707063955.GA162739@nic-Precision-5820-Tower>
 
-> There is a discrepancy between the value being passed by iproute2 and brctl. Iproute2 passes the
-> value unaltered in seconds and brctl passes the value in seconds multiplied by 100. So far this
-> is OK because brctl is deprecated. But the default value being passed when neither brctl is called
-> nor the ageing parameter is added when the bridge is created is also multiplied by 100 resulting in
-> 30000s being set as default ageing time instead of 300s. Is this a known issue?
+On Mon, Jul 07, 2025 at 02:39:55PM +0800, Yibo Dong wrote:
+> On Fri, Jul 04, 2025 at 08:13:19PM +0200, Andrew Lunn wrote:
+> > >  #define MBX_FEATURE_WRITE_DELAY BIT(1)
+> > >  	u32 mbx_feature;
+> > >  	/* cm3 <-> pf mbx */
+> > > -	u32 cpu_pf_shm_base;
+> > > -	u32 pf2cpu_mbox_ctrl;
+> > > -	u32 pf2cpu_mbox_mask;
+> > > -	u32 cpu_pf_mbox_mask;
+> > > -	u32 cpu2pf_mbox_vec;
+> > > +	u32 fw_pf_shm_base;
+> > > +	u32 pf2fw_mbox_ctrl;
+> > > +	u32 pf2fw_mbox_mask;
+> > > +	u32 fw_pf_mbox_mask;
+> > > +	u32 fw2pf_mbox_vec;
+> > 
+> > Why is a patch adding a new feature deleting code?
+> > 
+> Not delete code, 'cpu' here means controller in the chip, not host.
+> So, I just rename 'cpu' to 'fw' to avoid confusion.
 
-You need to be careful of 100. It is probably the value of HZ you are
-using. This means it is probably in jiffies.
-
-It could be whoever added support to DSA was using HZ = 1000, and so
-assumed it has milliseconds, not jiffies, and the API is broken.
-
-If you have time, could you dig into this. Trace there where jiffies
-are used, seconds, and what conversions are preformed, for the default
-values, netlink API and sysfs API. Once we know where it goes wrong,
-we can figure out how to fix it.
+So, so let me rephrase my point. Why was it not called fw_foo right
+from the beginning? You are making the code harder to review by doing
+stuff like this. And your code is going to need a lot of review and
+revisions because its quality if low if you ask me.
 
 	Andrew
 
