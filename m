@@ -1,96 +1,155 @@
-Return-Path: <netdev+bounces-204444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7362AFA800
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 23:47:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D728AFA892
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 02:22:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2717F167A39
-	for <lists+netdev@lfdr.de>; Sun,  6 Jul 2025 21:47:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B64431891213
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 00:22:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0DE81DF27D;
-	Sun,  6 Jul 2025 21:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3953A86323;
+	Mon,  7 Jul 2025 00:22:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E731CD1E4
-	for <netdev@vger.kernel.org>; Sun,  6 Jul 2025 21:47:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 393BE1373;
+	Mon,  7 Jul 2025 00:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751838428; cv=none; b=B2ROucV7jbx/JGRswV6tbs9Q55uq+7DsUW8X6stc3gba3ozI4fiwMMWEHFAn3VSf10BJ8qatablTOLwl3w6BVxKPGnUAZYkRm0SdNl2J7lnT/kPPu/dV5/Ogkg0iEzBwdY2xIhu1dNOL4wiFp46NNYOdXqJf8SZQT3uvrn1UOac=
+	t=1751847721; cv=none; b=k6rW00htz8fjMO9KG94df7YKKJ8lTl0jL3OObsElykSdGyMas3lHm+B7dtvVrYBNcwgf84TlWPsENOI0m8nM5MCf6RyjKSoJoNMmEjglBOu0QcHjasj6nbtUVuU5unNvZ8SE/fIFWSL2gXdzkn3/vPKdnstgNExcijMnDBbcEIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751838428; c=relaxed/simple;
-	bh=wfC6pb06LVhsTYsLYsVaUHcm+Hi+5WQlNyegKa6NJXs=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=BviarsWmrzt+45O2LhSnZlYBZ9BMrUSZgktVlXIGvayrm7rEi5C2kwqn0m1mIUuZFfZzGYkVOBt9O4TlIaRVUBY+emAUQG4es+KGkpmyxA6eyZZV9J5r7LXZjWfCAWF1hC4jOUhwH5sfO2QgeKrsafJesfHrRdsG6k48FvOj+0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3ddd90ca184so19583285ab.0
-        for <netdev@vger.kernel.org>; Sun, 06 Jul 2025 14:47:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751838426; x=1752443226;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ixkLOm92PB3kA5hKonBVF6NTsAkdtIPeB+mFKWDyXEc=;
-        b=W3LsLSifrDY2GI+hFsExyEULn4O3YEO1emxx1KMttNCfZr66JF9ZMhYfyFZbgNUA1r
-         Y8yoc+40ybGGpTGwiM2uU8bP1e9y1U7TYhs0h+5e5VRc7DX9znKvcSYx1TCix/K+CBTF
-         b4Q3riqrB9CopfrSw11I8awrqHS1bD+GGh8b1QKEktA/+lUbeH/R3Kc/bua2X24O5kEr
-         7wJOk0XTP2Zv5OV4rhxin7RuTY/++6+9dKhe0c86Hp+vlBUqtxVZ3ahZP0ehU7ltFnJi
-         1m8unkOQnJqcLZYd4YS8V/6H4oaLvB64bfearUv03ips1Fdaopo0FE4uKFNEJj8OhfLy
-         dCvg==
-X-Forwarded-Encrypted: i=1; AJvYcCVHBfvNITNANUNRLWUS+5wQy6s/IZ0JISbLz7sOz8gGCtmpwqBHUl0a8y+lBwFF78dXZEIaR0E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0S7x3EY7v14ziFLUSjAaXrL/K4QPCMIM/IJ+OQ4L12yLTrpJv
-	+cicKLoV+Iya5PcAvzpamvQIHMvtU1YrzVmcqUlez8RBE0WgfaQOfFTsI3vccekOMZRf3Y439Dy
-	uJ2/G5foku/RQJirrvMrP2C0m/3qU9JSqsqVPCbiXoXv4g98tjVatfRdyhg8=
-X-Google-Smtp-Source: AGHT+IGOvkaWcRRlxGfeWW9ngMLdfdp6SsnKx5xXDRjn7fDFzE0uyggFtu2AuBaGZuhI/U9YHWkMoTdeW4CSvVR5hl8Svwo0ehVr
+	s=arc-20240116; t=1751847721; c=relaxed/simple;
+	bh=hUyy8yKA2gGVH48GVBvBv9Us8897KhgL9cXpJipTfLI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jVK0L0xpxFVT6tA6fgQ/864CycZvZ0la9yxq1zz2Q9DId3tMrrVMmSam/DmbrO73OS33VgcbrERX6KTAiXvvDEGGnjCS0bAfB2Jo+r0xrtgtU/4gRgRT9M5Q7y3tIBzrfpx9lqbDldwRkIzzSdIt0EvWfXrzNJCRS8WnC3/p8Ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-681ff7000002311f-c0-686b131ab99d
+Date: Mon, 7 Jul 2025 09:21:41 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Harry Yoo <harry.yoo@oracle.com>, willy@infradead.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org, kernel_team@skhynix.com, almasrymina@google.com,
+	ilias.apalodimas@linaro.org, hawk@kernel.org,
+	akpm@linux-foundation.org, davem@davemloft.net,
+	john.fastabend@gmail.com, andrew+netdev@lunn.ch,
+	asml.silence@gmail.com, toke@redhat.com, tariqt@nvidia.com,
+	edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com,
+	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+	david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, horms@kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+	vishal.moola@gmail.com, hannes@cmpxchg.org, ziy@nvidia.com,
+	jackmanb@google.com
+Subject: Re: [PATCH net-next v7 1/7] netmem: introduce struct netmem_desc
+ mirroring struct page
+Message-ID: <20250707002141.GA3379@system.software.com>
+References: <20250625043350.7939-1-byungchul@sk.com>
+ <20250625043350.7939-2-byungchul@sk.com>
+ <20250626174904.4a6125c9@kernel.org>
+ <20250627035405.GA4276@system.software.com>
+ <20250627173730.15b25a8c@kernel.org>
+ <aGHNmKRng9H6kTqz@hyeyoo>
+ <20250701164508.0738f00f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:32c3:b0:3df:2fda:e30b with SMTP id
- e9e14a558f8ab-3e13ef15bebmr70223205ab.21.1751838426600; Sun, 06 Jul 2025
- 14:47:06 -0700 (PDT)
-Date: Sun, 06 Jul 2025 14:47:06 -0700
-In-Reply-To: <682dd10b.a00a0220.29bc26.028e.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <686aeeda.a00a0220.c7b3.0066.GAE@google.com>
-Subject: Re: [syzbot] [bpf?] WARNING in bpf_check (4)
-From: syzbot <syzbot+0ef84a7bdf5301d4cbec@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	paul.chaignon@gmail.com, puranjay@kernel.org, sdf@fomichev.me, 
-	song@kernel.org, syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250701164508.0738f00f@kernel.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHeXfOzjmuVsdp9WZFtUJD6KJYPdGFoi8vdCGwEMqogx7aci7b
+	0jQKrEaRqIVJ5NRYRnnpspqlK5bpXKlkZoZ1stpkXkiyRmbStNtmRX378f8//Ph/eDhKZZZH
+	cFr9AdGgF3RqRkErPkwsWxgRlqJZ8i0vDkqs1xi4+jUTyrvtciipqkEw7H/NwmdXEwOXLo5Q
+	UPLURMMX6ygFfY+8LFy1bQLPlX4aHCdrKfCebmYgzzRGwX3/RxaO2Stk0F6TL4fC0csU1GZ3
+	s/D8XgkD7ms/5dDvzKOhxVxJgyd/LTyyTIWRx4MIXNZaGYzkljJwtsPCQI/Jg6Cj0UtD8dF8
+	BNY6SQ5jXwOO4odudu180jjoo8jtylcyctf8liUWWzqprogmOVIHRWxVpxhiGypgyZsXDoY0
+	nx+jyV37ZxnJO/6RIZ/6umjiq+tkiPV2J01aLS52S+h2xapkUafNEA2L1+xWaNyuXCbNG5b5
+	8oyXzUb1k3NQCIf5OJztaWP/ssN9Rx5kmp+Pv5fVUUFm+CgsSf5xDg/kpuoiOgcpOIq/zuBC
+	dwsKFmG8gB3eYVmQlfxyLLU/GT9S8RdkePhB758iFLcU9dJBpvhoLP0YCORcgGfg8h9cMA7h
+	Y7C/0z4+Ygo/D9fXNMl+j7Nz2Dem/c3TcUOFRJ9BvPk/q/k/q/mf1YKoKqTS6jNSBa0ubpEm
+	S6/NXJS0L9WGAh9z5ci3HXY01B7vRDyH1BOVSxL2alRyIcOYlepEmKPU4coTTIpGpUwWsg6J
+	hn27DOk60ehEMzhaPU0ZO3IwWcXvEQ6IKaKYJhr+tjIuJCIbbTvxYDRqo9k5NMu02+rvG7iV
+	9P79ThW/bnVsQvGxZzsPz5kt1DfM/TKptHBrlLA0Kfy6/WbbrgmRzeA5XXBoDTnevipBP3R5
+	DxJiF7y2RcKApOi5sXJFV8S8/TpJSqzx9a2eqTvny1i2OdJR/i6sunVwQ7zFiKO6nyV6Vq5f
+	ENOmpo0aISaaMhiFX7d721stAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTcRiH+Z/bjsPhaZodrD60CsXSlG4vGGYfolNkRBBBRHnQQ5vOGVsb
+	WgSmK2vlvQ82L6wk56UYTJuzlprXpJso1iqbY6nYBc2ckpnWJkV9e/g97+/l/fDSuHSRCKMV
+	qrOCWsUrZZSYEB+Ky40KC06Tx9gur4EKy10KGr5ngtltJ6Gi3obAO/9OBDNdvRRU35rDoeKl
+	noBZyw8cxno8ImiwJsJIzTgBjrxmHDyFTyjI1y/g8Gh+UgQ59loMOiv7SOi3FZBw48cdHJqz
+	3SIYfFBBgevuLxLGO/IJ6DPWETBSkAA9plCYe/oFQZelGYO565UUlA6YKPigH0Ew0OkhoPxi
+	AQJLq5OEhe++HeXdLlHCRq7zyxTONdW9wbgW43sRZ7JqucbaSM7gHMA5a/1VirN+KxFxw68c
+	FPekbIHgWuwzGJefO0lx02NvCW6qdYjiqie+YpylaYg4LD0u3pUiKBU6Qb0lPkksd3Vdp854
+	gjNfF3lE2ag9yIACaJbZxjpc90k/E8wGdvF2K+5niglnnc75ZQ7x5frGm4QBiWmcuUexN1x9
+	yC+CGZ51eLyYnyXMTtbZ/3x5SMpUYay3bfSPWMH23Rwl/Iwzkaxz6aMvp328mjUv0f44gIll
+	54fsy0esZNaz7bZerAhJjP+1jf+1jf/aJoTXoxCFSpfOK5TbozVp8iyVIjM6OSPdinxPUXPh
+	Z7EdeQf3dSCGRrJAScyxVLmU5HWarPQOxNK4LERymUqTSyUpfNY5QZ1xSq1VCpoOtJomZKsk
+	B44JSVLmNH9WSBOEM4L6r8XogLBslKk1M47U4nXdeaURJyXhLdW5w61u3KV9UWYo67nljZma
+	fDpukkV5NjdeORivjziRyKyM99bsd15LCjUpX1QrPl/CtPDMbUwMakjcsSvj6NiRvaYg4/lp
+	szFu9+NNn0pm7xe6hk2VCQ/3rI0PSk6PC+zd2phUNbGxPXVUl0NuapMRGjkfG4mrNfxvX+2S
+	LBADAAA=
+X-CFilter-Loop: Reflected
 
-syzbot has bisected this issue to:
+On Tue, Jul 01, 2025 at 04:45:08PM -0700, Jakub Kicinski wrote:
+> On Mon, 30 Jun 2025 08:34:48 +0900 Harry Yoo wrote:
+> > > Ugh, you keep explaining the mechanics to me. Our goal here is not
+> > > just to move fields around and make it still compile :/
+> > >
+> > > Let me ask you this way: you said "netmem_desc" will be allocated
+> > > thru slab "shortly". How will calling the equivalent of page_address()
+> > > on netmem_desc work at that stage? Feel free to refer me to the existing
+> > > docs if its covered..
+> >
+> > https://kernelnewbies.org/MatthewWilcox/Memdescs/Path
+> > https://kernelnewbies.org/MatthewWilcox/Memdescs
+> >
+> > May not be the exact document you're looking for,
+> > but with this article I can imagine:
+> >
+> > - The ultimate goal is to shrink struct page to eventually from 64 bytes
+> >   to 8 bytes, by allocating only the minimum required metadata per 4k page
+> >   statically and moving the rest of metadata to dynamically-allocated
+> >   descriptors (netmem_desc, anon, file, ptdesc, zpdesc, etc.) using slab
+> >   at page allocation time.
+> >
+> > - We can't achieve that goal just yet, because several subsystems
+> >   still use struct page fields for their own purposes.
+> >
+> >   To achieve that, each of these subsystems needs to define
+> >   its own descriptor, which, for now, overlays struct page, and should be
+> >   converted to use the new descriptor.
+> >
+> >   Eventually, these descriptors will be allocated using slab.
+> >
+> > - For CPU-readable buffers, page->memdesc will point to a netmem_desc,
+> >   with a lower bit set indicating that it's a netmem_desc rather than
+> >   other type. Networking code will need to cast it to (netmem_desc *)
+> >   and dereference it to access networking specific fields.
+> >
+> > - The struct page array (vmemmap) will still be statically allocated
+> >   at boot time (or during memory hotplug time).
+> >   So no change in how page_address() works.
+> >
+> > net_iovs will continue to be not associated with struct pages,
+> > as the buffers don't have corresponding struct pages.
+> > net_iovs are already allocated using slab.
+> 
+> Thanks a lot, this clarifies things for me.
+> 
+> Unfortunately, I still think that it's hard to judge patches 1 and 7
+> in context limited to this series, so let's proceed to reposting just
+> the "middle 5" patches.
 
-commit 0df1a55afa832f463f9ad68ddc5de92230f1bc8a
-Author: Paul Chaignon <paul.chaignon@gmail.com>
-Date:   Tue Jul 1 18:36:15 2025 +0000
+Just in case, I sent v8 with the "middle 5" last week as you requested.
+I'm convinced they are non-controversial but lemme know if any.
 
-    bpf: Warn on internal verifier errors
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17014bd4580000
-start commit:   cce3fee729ee selftests/bpf: Enable dynptr/test_probe_read_..
-git tree:       bpf-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=14814bd4580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=10814bd4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=79da270cec5ffd65
-dashboard link: https://syzkaller.appspot.com/bug?extid=0ef84a7bdf5301d4cbec
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=109df88c580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11705770580000
-
-Reported-by: syzbot+0ef84a7bdf5301d4cbec@syzkaller.appspotmail.com
-Fixes: 0df1a55afa83 ("bpf: Warn on internal verifier errors")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+	Byungchul
 
