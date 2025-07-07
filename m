@@ -1,268 +1,498 @@
-Return-Path: <netdev+bounces-204533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6F86AFB112
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 12:21:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 08D68AFB118
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 12:22:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41F653A81D7
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 10:21:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44DE23BEF01
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 10:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54738293C6F;
-	Mon,  7 Jul 2025 10:21:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MfpDa/Em"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1260295517;
+	Mon,  7 Jul 2025 10:22:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F3202E3712
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 10:21:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751883694; cv=fail; b=OtOjdWF2+uxR/p98hY7pV6/Mj3WxrR+wZjKo9nLg0DOcT2uy0UDYrPmwJt4Cte/lsR/Ykk+aqYQUZWQtGEzCKwVrgoMAB0fdNQ0sTVvFfwP8yxvsRSRYa9wZOypWBjhNJXdPwlZXPX493oR/6mHFRWZ0+nWBsX508s5gZTdypPs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751883694; c=relaxed/simple;
-	bh=cFiPG8QjUXuUCkPpEaLyAT7QAV4UzSGo8hn5toU0ssg=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=BkDX0hPdpbkgQJY9s173ZzoV/Jvwlm88Ox++cZAO+2vUsLYndnZHzsb/OiAT7B2wDg0oszrT7q0vXP+jaKHwOBJW3PFyaW05O1tqOKJqcyEz+NqO7WAdE1TLBLWTMT1c/NqpXEZwoZSOX+HZZRMQy/PgO7GoqmOzmBQq56XsN2A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MfpDa/Em; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1751883692; x=1783419692;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=cFiPG8QjUXuUCkPpEaLyAT7QAV4UzSGo8hn5toU0ssg=;
-  b=MfpDa/EmIgS5qFCvUoIAogKUkZ6NEGiyRGe7Lh9R9jBUKW04z8Z8ySTl
-   BrOJzEyKPsasbJ4+XPPXYm115uwvJLHA6rN2aHEMz2MdmUGTtYUhAqav/
-   Wt+8amxE3dvAMx/kX1mF7mXsMhK6nMmkDoVJiKWncz+xq39aBr0c6lJAK
-   yOcmL5i4CT2fSqVKx81cFj/i6qaPUaf8SfMqV/9zW7gLf9HOO8JYwJsTZ
-   y3PhH89TzcYy9t6UAhp40zGV//QiqLGjqHI2OtrnohKZsV26/OU2hqpDq
-   khPT6E8pJqJ5qKtQn5UEHMn1Jx/+PpVp6Qcp7V/nZZQlvRJNzWeX7moG4
-   Q==;
-X-CSE-ConnectionGUID: vggtELKXQX+ZX25/u6AZRQ==
-X-CSE-MsgGUID: LL9YGwyyQJqGI6z177jDLg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11486"; a="64341804"
-X-IronPort-AV: E=Sophos;i="6.16,294,1744095600"; 
-   d="scan'208";a="64341804"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2025 03:21:31 -0700
-X-CSE-ConnectionGUID: Qr7pgTe0TpyZPNnzEV8+gw==
-X-CSE-MsgGUID: 3I+SEaPlTQyDNGxhi3TDEw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,294,1744095600"; 
-   d="scan'208";a="159520277"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2025 03:21:32 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 7 Jul 2025 03:21:31 -0700
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25 via Frontend Transport; Mon, 7 Jul 2025 03:21:31 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (40.107.223.45)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 7 Jul 2025 03:21:28 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EZ3d2u+m5FuagIPR9//5iHQQBLubW9UyTNi0sRh55WLzSjlpE7X1aPnKToK494p+itgaJpHVdJofpKFcazVxAX/baQ9P3jCJtKfD6HtB3RSUBdGiFgKyhbWWmQQuUVDOFwUm3PxPlZh1gcdMt2X668cS+h04CfpxGqu4hPR5Lgx1ojMVezVHsM03WUnzBojQzB4KAKCTNkTR9Ys49WPVzKZRPZp0UjC+96JfmWdKAhdmEqX4QmKAzExO8IYzOuPqi+NMSCd+wZlTI27R2SlSxmOrCe7WJKNuF14fsmK6mlZh7QqT0oWxWp7R7tExuPg2Qcmr/U64aoeasqa0ULALAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ob70bp4DfkGw5vaixkPLtGng3uM5FWiLgZm2dPcySuw=;
- b=rHlNCbjn0usOtN69smcpH5xl9LGmP1wbO07/xTTumHpoqYoBYD4z8FxjO1VjpdIU8MFQ/3EURcF71DxIb0pl86UJacvt/srC8pSQlZRxmUyQJwcZp9eyr/EEiO7D744MKqJe0fT2o1aF9ix51qcpU19izMNkwH5jQo8SO5ZnfN4aswptHZ69E/5LLP/a7s6ecE16wIqaW64F+ACaGTGLzhtSMbOmtGDeYfKACix79b6ab763rwgIwLpNgqFariu4nETskYMgO1jlzUL4TqnBX+rpQj58FF53qgDgTy2aQjPsmw8Jb9omwOQ8Uhwy7/QGi/uWb3H8Wrw65I7Bd/24DA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by IA4PR11MB8944.namprd11.prod.outlook.com (2603:10b6:208:563::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8857.22; Mon, 7 Jul
- 2025 10:20:59 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%4]) with mapi id 15.20.8901.023; Mon, 7 Jul 2025
- 10:20:59 +0000
-Message-ID: <97405349-9b4a-4a4d-a311-5ac56f417399@intel.com>
-Date: Mon, 7 Jul 2025 12:20:55 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net v2 1/2] devlink: allow driver to freely name
- interfaces
-To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-CC: <anthony.l.nguyen@intel.com>, <netdev@vger.kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <dhowells@redhat.com>,
-	<David.Kaplan@amd.com>, <jiri@resnulli.us>
-References: <20250707085837.1461086-1-jedrzej.jagielski@intel.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <20250707085837.1461086-1-jedrzej.jagielski@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DB7PR05CA0019.eurprd05.prod.outlook.com
- (2603:10a6:10:36::32) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15AC928A3EF;
+	Mon,  7 Jul 2025 10:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1751883763; cv=none; b=ZsKDT8k1qBazRwtL2g52kK30PkbK2EU98UEGCrmoLzFRAYfpemWBCZg7wDrF+248cRyOmXQxZwKowTkcqDTp+aL1L6wDOHk/Adq+EWusKdLGyb3TAa000rQz6FcrreextIBFqi3rJkAXcZhsi55gkR8/KmnDJkyKHVUDdmyRltM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1751883763; c=relaxed/simple;
+	bh=AIkdq6M0L7MSBoi0kiJ4+qlLHbwYNXTLj0FbkVjibtU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EoIg2LLwT5TVMpoS16oTVfv/+gFT9/6LmvGnOJb6mcLg6b356cdBJnJooNztre3vJacmyCTicQ4047A995kdKLuHHFY24c9ZPC2l2or6eo1cIRrNWsoeeVpGbjg5EP+vyfpOlOV24Kshxnk6VchTKSiZ7dp64bsYebuICkp3kys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-553b544e7b4so2827978e87.3;
+        Mon, 07 Jul 2025 03:22:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751883754; x=1752488554;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :reply-to:in-reply-to:references:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6sLO+XCFjd6kZQcTbPTUaHXEMjyFiunpLQXn/d3kRmo=;
+        b=G2aEHJB4KMfsxOA4ohd+LpxSj0pqu4pW9L+xGB5/pnGoLMp/quECW4NBdEsvX9tOol
+         rf8pn8/7aZYlgPYMKeA5rfOsrRuZ5yzuidKKp9Gtn6oO3sIz8I5j5Ya9OrQ9cWAenxrR
+         U0ySrC3CxoPtquiqyGfPpgZsLHq1TAJs0jWPnhgN2G9xsjbaewfrjADCsFTM5KgiFpIQ
+         KVa9nDUuSvGprhgIokPyXha7F2vc2XqZczQTGNxyP/68JWRrj+NlAbExByFrjQUxWJWq
+         UuSk6n7Jk79tEz+FToOUfFGE/gYmGWOnzKhLwPp77Fd4m3HFbfcd4qu6imkOya6tKoX2
+         qpRw==
+X-Forwarded-Encrypted: i=1; AJvYcCVO/vjSQEcYEgeUBzu3kgfV11GwsxvRcmVOiyYI06pSLuEicW4yrpGv79pggLnlZ9bxcVZhgADJHxdn@vger.kernel.org, AJvYcCVTQMufckcYwZ4i9uLTT0VFhnewRsQE+sucFetKjwEVX1L9yIB59qzlzCKfiB36ZiCxlwpPlzuMqV/9Ug==@vger.kernel.org, AJvYcCWbMtlJoXU8vbywm8NIAExbhju8bnCCpAl2+OhSqC2dOVqa1XmfMbWSZ9HC7SP2s/y33nCCqx4y@vger.kernel.org, AJvYcCXLY9+nvjUSdI1xY9MdcQsiVR/PR9ZBfyVKn+megYTwokKMPsTPTz7q+pODStwnsKM45risHxuoOfbrqrR0@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMe4XZf3hNQ3rkPoAhoSpL41+GQBOFZXuEkIKoRmvm+5mMVS0O
+	Cy30X4bK2RaMObhw8/1Dpm/bS1zKy2RvNPSfetGC+Bwuq+8B+bHKNoUEXUG/puXM
+X-Gm-Gg: ASbGnctZp9s5wJs2/IfoH+2ANX+1iuDhNFwMmq0cvB7vO5MKAXAhfQoJnJ6pXwlqRyd
+	klV4bOY4vv3qZVztSYbzpRYmUJVKzcb8t2EOl01Tt6lrROiOFLI4LYXdqYPiT8HD1auQ9agxjui
+	oEdiiKbVnHG9VCn7QjMM5te7/gcEQr3iJlyG/yJWZnbyvqRslBplOXrElJG8kXrVYbE+MJhg3l3
+	iZecJiqqZBunA0YSib6HT/87oPqiGGlnGg+1fiHU9Ox2jcCvERyyenwgk+RlTtqxB/Zk0k0pAL9
+	7QeGVgWwXLwWoaIGc8YJhgKEp4DQ3ixhDtstz2jKKE21liNxJFqRwM3UF+ORwXF6Ftqm71dyGfG
+	msHfmdMZHNkbdeo/YJ40=
+X-Google-Smtp-Source: AGHT+IHPDVtKJGF4tTeA+7RigB6lLjHFufqa58UqulVE7fkNmT827EVpOyXniTphiAtCiwoSTu0AhA==
+X-Received: by 2002:a05:6512:3d88:b0:545:1082:91a1 with SMTP id 2adb3069b0e04-557a14219cemr3168477e87.7.1751883753740;
+        Mon, 07 Jul 2025 03:22:33 -0700 (PDT)
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com. [209.85.208.177])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-556383b518fsm1292917e87.14.2025.07.07.03.22.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Jul 2025 03:22:32 -0700 (PDT)
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-32b5226e6beso26266311fa.2;
+        Mon, 07 Jul 2025 03:22:32 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUjGwFgiCIHRLLNceH4HOhapzp5VVscZDCuShUiljlkakO03brtdC0CvLSV+SBehfxv+gGf2+bz@vger.kernel.org, AJvYcCVeNzotoG5PcWCaE47Us/CctpUw6uOlzDo7VcVAN+fl0aATiilTNpUEsFACE51shnIjtMG4tf7eCjC0@vger.kernel.org, AJvYcCWsWNkmCR0JCOs49VabAZUNj8ziapupY5KhC8t2oqCobvEmGPykQ/aLvJCNmHrlPsZ/ZEBogyOzUJhpPzDH@vger.kernel.org, AJvYcCXzQIaal9gRxxEbgn5lrPzWEgSBguG463dVsaFB9uaabeHs+pnAMmWdApA5fga3XtY4qTm7YLYP9dT7Ow==@vger.kernel.org
+X-Received: by 2002:a05:651c:2105:b0:32b:75f0:cfa4 with SMTP id
+ 38308e7fff4ca-32f092c6873mr36486781fa.25.1751883752130; Mon, 07 Jul 2025
+ 03:22:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|IA4PR11MB8944:EE_
-X-MS-Office365-Filtering-Correlation-Id: b03be23c-849c-461b-c663-08ddbd3ff787
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?S0E5RVRrNDc3Z0VuOVRRYTEvSGFiemk3MHN3TStEQm9JTVFCdGtLM2hUTlVR?=
- =?utf-8?B?V2VvT1dING1ybFAvaHVyYTlUZ05RdE1hK3N4OVhWaUZsclZKZGVFTFNWM254?=
- =?utf-8?B?YVJHSWtWQWJNRzIvcEJUR0k5SlJCNlZwTEE3QzR0T09kaVY0cDRia2xlMWdU?=
- =?utf-8?B?QUZkNjF5bHRxM05kOEd1bVBjK2lJVWVZS2J3ZTdHcFJZYkdjUUQvR0o2bk05?=
- =?utf-8?B?bk04Vi9kZXpxUFdQRFVnTkRyZ001VWM2anBzdkkzUCtXRUlkK1N2eit6M0lP?=
- =?utf-8?B?TW9pY245Q3MxSDI4a0MwdzBjSEFVdGphT09uQ252OVBYaGFlZ1lTbEVZWnRL?=
- =?utf-8?B?MktsOThQWHYzUGFNTUhtZHRvdjNLcms3aGltRlRpbGVBek42VDVxdDZuU1M5?=
- =?utf-8?B?ejZDNnlUM21QN29qNTlaRWRhWXp1MEcxbERacWJsTDFkTW00MDZydkFvVmVn?=
- =?utf-8?B?MTVGamMxcVNvOXY1Zmx0UHJ4OXVwWlNYNXFZVDdaMitRR1E3a2N5aEloczYv?=
- =?utf-8?B?Mk5GZHVEaDJwd2NCRzBUc3FNRVdkcjJXRXJWcXhtTW0vVENIUmxpMi9LWEdu?=
- =?utf-8?B?Y29FWGx4WWl1SDJ5RStlWjFaSkNrRm5YUFZTSHdiQVhrUm95cU1JT0RVSGpp?=
- =?utf-8?B?bVI0ZFQ3Q1VROTlQanZ4MjA0L2tuOTlNNThwRlljZmpyWldPSk8wK3F3aVlU?=
- =?utf-8?B?SHgreHIyZmtYOFVWcmhidmlQT0laVGJTTTZyN1YwbEx3M3R6UDJVb2FhSWlC?=
- =?utf-8?B?MjUrK2FkMnhxK2hwUStPbldrSXQrRG9ZbTNueEpzNDYxVXNFRlZ6Nm9idysr?=
- =?utf-8?B?azVqNk42dHdVRGxSQWRHSzhBb3kvUitkZGQxTDZDRXFjWDhJTTZiNmNpK2h2?=
- =?utf-8?B?SGZLZDVzd1RaNEhra09HVExJNko3MEFTZHZFdVBLczhsT3owZUZRVmVCbHEy?=
- =?utf-8?B?TzNidnV2ZTNhTVpjVFk4MnpqS2JHMC9uZ2N0cGFFVU5odnBQYVMwRkNTOG0r?=
- =?utf-8?B?d2o5SGxya3ZGZ1NOTkozN0lha09sd2ZvNjRtS1NXdEZWRUFGL3U0QWZtWXMx?=
- =?utf-8?B?UWpaa1JPbEk1bWU2R2VScUlOUG9oWTN6UVR5dGpjK0NaanlRb2NZaDlVaWp0?=
- =?utf-8?B?T1YrRUtGWDB5ZDc0S0JOaW5ONU5WTERWK3ZVSVhocyszMFUzc0N1ME05dGY0?=
- =?utf-8?B?ek51S3NRRWhNWHhMbTVmNkVNZjE2ODduanBOOUFzdTVJbkFZaUVGVEFTQ3l0?=
- =?utf-8?B?R0VVTFRmcVVoWG1tdHVFZXM2MjY1Zmg4eGxvSmhvSWlVRHVMdUJ2OFYzODZ3?=
- =?utf-8?B?M2NRcWZhNkdBNWU4NWVMK2RaUjdCUmxUMGpJYzF0SFpLWW1FZnNNdmFHdjdt?=
- =?utf-8?B?N3UwUzZWeHVOMzl4L1d0cHV4L2E0cEczU0FWUXplUWtWcDF4cjFlRDZBd3Ix?=
- =?utf-8?B?RTlIRHRxUTVqcWY2cE5PclFEY2ZPZzlLMTVsRGNHSHBma2xqSW5LZ0hzTzV4?=
- =?utf-8?B?cGJDcFN1M2RkdnNwdGxmS1VCeFhyNUFYOXhJUmdZdEFpK2p1RXhMVUtGUjBI?=
- =?utf-8?B?QUF2ZjZnbGNtY3N2NURGSWx4aVVtZElJZ0RtTlAzbzBGbmdmUXQxMXNNRjNG?=
- =?utf-8?B?S2lJbGp0QVk1YlcwOHhuZEh5N1Z0Z3ozdE1sbjUySmNsVmUxajlFelVsellv?=
- =?utf-8?B?QTdFM1hJdFM1b01OcVZOT1JPZFlKeWhxcmtmM3UrNklVNFdVUEZvQ3IxbjdP?=
- =?utf-8?B?c0cxL2ZMb281NWhGeTA4angrTlBsZkcvQU1MdHhGbUZtR1hEZjBlV2hKa2Jn?=
- =?utf-8?B?dmdRNVlZbW1zMGcrZm9kN2hTVU9INGg4WVdjV1lqbkRHRmk0aHJNcSt2c1Nw?=
- =?utf-8?B?OGtXYWNkN0UrUWxCcnFVa1FPV25DWVlzNHNOeTdzZEtDVGc9PQ==?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QmhBdnNSSzBQRmNuY2hhaDA4b0hiS09hSVRDTHdKUDAzaDZoUkVIUTl6cHBt?=
- =?utf-8?B?Qi9XZzNIT2puMDN3WTFNYkRtT0IzV05aVGJGREpqZXUrSGg2b3NsS1Znb1NX?=
- =?utf-8?B?SU9yaitpRFNrS3NrRTF2MGEvZklnSjFKTnNzN1J0OEVFRjRGL3ZmYTZWbTBh?=
- =?utf-8?B?T2thcStmb2dWZVoyRHR5cHFpNE8vdDBUQXc4cmtJVzZnMkhZekJ1WUJYRzZv?=
- =?utf-8?B?cHRwS2xmNlFsRlcvdmFqSGMwalIrQW91VzdXa3lVNGdpNzlOSDNlMFkzc2Ft?=
- =?utf-8?B?V2YrMXNXaDh0OURXY2FoRlRjQ0M4MjBJV09aOHFYMTBFd0pOZzFaZ0pMVG8w?=
- =?utf-8?B?NnpjSFIxY1VEd1phdGoxVzRmaTdKbWczRmhGNmZQdkxSTmxBZzE4Ynl3TGZJ?=
- =?utf-8?B?VS81bDN6VjJKT1BnN3NwZ3d2UzlGL3pnK1dQTnJuaVl3bXZJL1hoekJIOTdX?=
- =?utf-8?B?STB6L1EwN0JRaVUrdWZhWkVlVG9KdnJIdjM2RUE5dHFIVXlYODNDNlA2d3ZR?=
- =?utf-8?B?SW9raFhKTEE5M2gxbVZQNVNNRjNqMEFvTm9XSXZoQjhLT2p3SE9Ddi9oY2VI?=
- =?utf-8?B?NUx6L3pMQ3pIanBiS1ZPWndDTzZkbjJZRzdSOUdMSnFKbkNLK2EwT3lVYklY?=
- =?utf-8?B?NkszNjVyRDRDNVR2Z1orU3FlRm13V0JvRXVBY25ZNWk4cmZQUHhTWjNDbnlN?=
- =?utf-8?B?UytTMVdzQmpvODBwM2E3c2I0QmlraUs3bndLNEhwQXY4YloyckxGVGZMZlN2?=
- =?utf-8?B?TFJjMkhaa3gxQ3Z5a0JYUCtNV1dpa0NuL3oxazNyKzltYWE1UVByN3VoYmJi?=
- =?utf-8?B?cHdsbFIvaU9naDdpZ3JUa1kyK242NDJoc05GWE5Kd2NHRDhBR1lsMEZmOWpi?=
- =?utf-8?B?OVBUL0xSNytlNStTWVpCejVQVGVDak1pd3NUZXl5WmdzV3l0NFpiWC8vd0hy?=
- =?utf-8?B?TGx3UjBHYWEyNFNBVEZBSUI2a1AwRTU3NDUzeTVZdU1FS0xEbGR1TXFNWUh3?=
- =?utf-8?B?dFl5K20vRHljWjVLTEdoVnVNZFZ0SkdUU01GaHZ6dHQ3dzdIZTR3V0VtVnhB?=
- =?utf-8?B?d2w4cHlhM09EcTNqVklMMVNxRXF5OHFEOUtBZUpWcDNXTCs2WE0vdzBMa1FB?=
- =?utf-8?B?dDR4WjVDdWRudnRyd2p6NWRsVjNFKzY1bnFpMFU5Sk9nWnJMRmZZOVltT3Bo?=
- =?utf-8?B?SkpsQXJUNjhHaXcxZ2o2R0g3cTgvTmcxTXc0U0lyNTJGcHlRMnd2bFJ4UXhV?=
- =?utf-8?B?RTRqeC9uYXVQcmFzekZwT0VQSnJtVDh2T3F3cGViQUNWYlRzcmtIUU1Wd21q?=
- =?utf-8?B?NzlyTmQ4VXl6UUhCa3pTSG9TZFdkdFpseW5mYmhkNHN2WmE2dGdEc1BzMlN1?=
- =?utf-8?B?Y0xoY2N6NWZObmQ1M2FDN21FTDNNVzNoVnB4dGNqbStzZkVCZ1V2a0NmL1pu?=
- =?utf-8?B?M202dUdmWU9Ua2VVRlJCZGhKUjlEUG9rbWxTbWlDNEVlb21HcmJ6blNuS3Ay?=
- =?utf-8?B?dE1raTM0WDFPZG9RU0ZsZWpJSG5xb05MVWVkTnE4S0lqdXVWSUlMZ2VrYjVu?=
- =?utf-8?B?cmZiU21DR2pNODMwbnlzbE1hSUZtTVAwQmhIQ0I4OXlRSVVOdmM3RUhIOVA4?=
- =?utf-8?B?OUpiNlJMNHNqZnBsVDg4MkFnZ202aTY1cEJ1bU9XT2RqdEdBcFE0Y3NNTkpW?=
- =?utf-8?B?Z3dJczA4ZEZ6M2hMaWxaejFpWTVodit4b1MwbXd1UVUwU1VzZE9PbUFqeVpF?=
- =?utf-8?B?M0lOdkMwWXhUN2lGRyt0cVlaOWp0R3ZpYm5IUy9XcEIyaUxBMCsycTFSenNI?=
- =?utf-8?B?ODE3OTZOZHErd204TXltYUxndWlWdWZZUUk2dHJmMWV4NFBHOEdFOGtKcTZp?=
- =?utf-8?B?M0pudWVMVTZnN3ZrNVVvZkM5OFQxYWlxQWtEMFIwTGVqQUFiY2lGbG1uSVNC?=
- =?utf-8?B?OTRJQUV5azdrVWdmZW5obnljRG9tVVU0OXhndUlrbHJWSlJyVVZzZE1vLzVH?=
- =?utf-8?B?OHJ5RmY0UUQ3RFFWUzltbEtZZ0dYTEdKOTE3MnZ5bVA0eUpEczdFUkNmdjgr?=
- =?utf-8?B?UlRFQWdnNHV1SG9uc1c1WTEwSEZXMkptbVRxZ2JnS2l0cDFuYjdaaWdrRGRq?=
- =?utf-8?B?dXRzLzRHbjZ3ZGVCSVcweHoxNDk1ak9kTjVxYUkyWlpHUG9CdHBteEZoQ21R?=
- =?utf-8?B?Z1E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b03be23c-849c-461b-c663-08ddbd3ff787
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2025 10:20:59.1820
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AeSq4jmXdy0DvbrthLW8+yusC5nlQqJXUaWYINfHUEL1y91ILUUlU1nGxYN3a9kwdmFM9sCJI5iCI8MUbtXzCULCdKQrABYqw/naTefmIwM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA4PR11MB8944
-X-OriginatorOrg: intel.com
+References: <20250626080923.632789-1-paulk@sys-base.io> <20250626080923.632789-2-paulk@sys-base.io>
+ <20250704233535.4b026641@minigeek.lan> <20250705153825.2be2b333@minigeek.lan>
+ <aGm8n_wJPiGk85E4@collins> <CAGb2v66s-nWA2dFRpgX6DbDET3dWOm1jPKWm1k9SmGSqhTWoWA@mail.gmail.com>
+ <aGuV3gcKSRIyey53@collins> <CAGb2v66U94RxVTC4O-Z9Pn2RyJK5Xz=pNZCvkFN-5Ax0wG6Cug@mail.gmail.com>
+ <aGud0aVLHGoql3Vj@collins>
+In-Reply-To: <aGud0aVLHGoql3Vj@collins>
+Reply-To: wens@csie.org
+From: Chen-Yu Tsai <wens@csie.org>
+Date: Mon, 7 Jul 2025 18:22:19 +0800
+X-Gmail-Original-Message-ID: <CAGb2v64vCdsY7V2OsJVC+Qy+tbStYSWbh19mBrjuJMwZqUQ=Yw@mail.gmail.com>
+X-Gm-Features: Ac12FXyg9XXCP12FlM42TuajsfubuWC369QAdithyWrauBmCL6zemqSIgfSLhuw
+Message-ID: <CAGb2v64vCdsY7V2OsJVC+Qy+tbStYSWbh19mBrjuJMwZqUQ=Yw@mail.gmail.com>
+Subject: Re: [PATCH 1/5] pinctrl: sunxi: Fix a100 emac pin function name
+To: Paul Kocialkowski <paulk@sys-base.io>
+Cc: Andre Przywara <andre.przywara@arm.com>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
+	Linus Walleij <linus.walleij@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 7/7/25 10:58, Jedrzej Jagielski wrote:
-> Currently when adding devlink port it is prohibited to let
-> a driver name an interface on its own. In some scenarios
-> it would not be preferable to provide such limitation,
-> eg some compatibility purposes.
-> 
-> Add flag skip_phys_port_name_get to devlink_port_attrs struct
-> which indicates if devlink should not alter name of interface.
-> 
-> Suggested-by: Jiri Pirko <jiri@resnulli.us>
-> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> ---
-> v2: add skip_phys_port_name_get flag to skip changing if name
-> ---
->   include/net/devlink.h | 7 ++++++-
->   net/devlink/port.c    | 3 +++
->   2 files changed, 9 insertions(+), 1 deletion(-)
+On Mon, Jul 7, 2025 at 6:13=E2=80=AFPM Paul Kocialkowski <paulk@sys-base.io=
+> wrote:
+>
+> Hi,
+>
+> Le Mon 07 Jul 25, 17:52, Chen-Yu Tsai a =C3=A9crit :
+> > On Mon, Jul 7, 2025 at 5:39=E2=80=AFPM Paul Kocialkowski <paulk@sys-bas=
+e.io> wrote:
+> > >
+> > > Hi Chen-Yu,
+> > >
+> > > Le Sun 06 Jul 25, 23:04, Chen-Yu Tsai a =C3=A9crit :
+> > > > On Sun, Jul 6, 2025 at 8:00=E2=80=AFAM Paul Kocialkowski <paulk@sys=
+-base.io> wrote:
+> > > > >
+> > > > > Hi Andre,
+> > > > >
+> > > > > Le Sat 05 Jul 25, 15:38, Andre Przywara a =C3=A9crit :
+> > > > > > On Fri, 4 Jul 2025 23:35:35 +0100
+> > > > > > Andre Przywara <andre.przywara@arm.com> wrote:
+> > > > > >
+> > > > > > Hi,
+> > > > > >
+> > > > > > > On Thu, 26 Jun 2025 10:09:19 +0200
+> > > > > > > Paul Kocialkowski <paulk@sys-base.io> wrote:
+> > > > > > >
+> > > > > > > Hi Paul,
+> > > > > > >
+> > > > > > > > The Allwinner A100/A133 only has a single emac instance, wh=
+ich is
+> > > > > > > > referred to as "emac" everywhere. Fix the pin names to drop=
+ the
+> > > > > > > > trailing "0" that has no reason to be.
+> > > > > > >
+> > > > > > > Sorry, but this is wrong. There *is* a second EMAC on the A13=
+3 die: it's
+> > > > > > > indeed not mentioned in the manual, but you can probe its MMI=
+O
+> > > > > > > registers (@0x5030000), and there is a second syscon register
+> > > > > > > (@0x03000034). It's mentioned in several BSP code places ([1]=
+).
+> > > > > > > It seem like no suitable pins are connected on the A133
+> > > > > > > package, but that should not affect the A100 .dtsi (we use a =
+similar
+> > > > > > > approach for the H616 and A523).
+> > > > > > >
+> > > > > > > So I think we should keep the emac0 name.
+> > > > > >
+> > > > > > just thinking that it's even worse: this changes the DT visible=
+ pinctrl
+> > > > > > function name, so it's a DT ABI change. With the "emac0" functi=
+on name,
+> > > > > > Ethernet would work with stable kernels already (as everything =
+is
+> > > > > > compatible, it's just about DT changes). But with this change, =
+pinctrl
+> > > > > > drivers in older kernels would not match.
+> > > > >
+> > > > > Given that the port is still very early and experimental and has =
+very few users
+> > > > > and no field deployment so I don't really think it would have ann=
+oyed anybody in
+> > > > > practice. But yes in principle you are right, while the header re=
+names keep the
+> > > > > same value, the string names are used to match the device-tree de=
+finitions and
+> > > > > this constitues ABI that needs to remain stable.
+> > > > >
+> > > > > > So I would very much like to see this patch moved out. Is it ju=
+st in
+> > > > > > LinusW's tree so far? I don't see it in -next yet.
+> > > > >
+> > > > > I don't think the patches were accepted for over a week so we can=
+ probably
+> > > > > still act. I will send reverts, unless maintainers want to manual=
+ly remove
+> > > > > these commits?
+> > > >
+> > > > I can drop the dts patches from the sunxi tree. Linus might be able=
+ to
+> > > > drop the pinctrl patch.
+> > > >
+> > > > You definitely need to send a revert for the DT binding patch that =
+is
+> > > > already in net-next.
+> > >
+> > > Should this really affect the bindings though?
+> > >
+> > > From what Andre reported, both EMAC0 and EMAC1 should be the same blo=
+ck so it
+> > > doesn't seem particularly necessary to have a different compatible.
+> > >
+> > > Looking at Allwiner's BSP code for the A133[0], I don't see any diffe=
+rence
+> > > between the two. While there's device_type property in Allwinner's dt=
+, it's
+> > > apparently not used by the driver[1].
+> > >
+> > > So I think we're still fine with a single compatible (without the con=
+troller
+> > > index in it).
+> >
+> > The block is the same, but the integration is slightly different, as
+> > the register for the RGMII clock delays and other stuff is at a differe=
+nt
+> > offset in the system controller. The BSP handles this by directly
+> > including the register in the "reg" property.
+>
+> Ah I see, I forgot about the syscon register. However it doesn't seem lik=
+e a
+> very good approach to have a different compatible to express the idea tha=
+t an
+> external resource is different. Just like we do for clocks, resets and ot=
+her
+> things, we should probably find a way to express the offset via some dedi=
+cated
+> property instead of spinning a different compatible each time it changes.
+>
+> > So yes, you do need a separate compatible string, if only to deal with
+> > the slight difference in the integration layer.
+>
+> So maybe an additional allwinner,syscon-offset property or a new
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+If you can get that accepted, I think that works?
 
-> 
-> diff --git a/include/net/devlink.h b/include/net/devlink.h
-> index 0091f23a40f7..414ae25de897 100644
-> --- a/include/net/devlink.h
-> +++ b/include/net/devlink.h
-> @@ -78,6 +78,7 @@ struct devlink_port_pci_sf_attrs {
->    * @flavour: flavour of the port
->    * @split: indicates if this is split port
->    * @splittable: indicates if the port can be split.
-> + * @skip_phys_port_name_get: if set devlink doesn't alter interface name
->    * @lanes: maximum number of lanes the port supports. 0 value is not passed to netlink.
->    * @switch_id: if the port is part of switch, this is buffer with ID, otherwise this is NULL
->    * @phys: physical port attributes
-> @@ -87,7 +88,11 @@ struct devlink_port_pci_sf_attrs {
->    */
->   struct devlink_port_attrs {
->   	u8 split:1,
-> -	   splittable:1;
-> +	   splittable:1,
-> +	   skip_phys_port_name_get:1; /* This is for compatibility only,
-> +				       * newly added driver/port instance
-> +				       * should never set this.
-> +				       */
->   	u32 lanes;
->   	enum devlink_port_flavour flavour;
->   	struct netdev_phys_item_id switch_id;
-> diff --git a/net/devlink/port.c b/net/devlink/port.c
-> index 939081a0e615..bf52c8a57992 100644
-> --- a/net/devlink/port.c
-> +++ b/net/devlink/port.c
-> @@ -1522,6 +1522,9 @@ static int __devlink_port_phys_port_name_get(struct devlink_port *devlink_port,
->   	if (!devlink_port->attrs_set)
->   		return -EOPNOTSUPP;
->   
-> +	if (devlink_port->attrs.skip_phys_port_name_get)
-> +		return 0;
-> +
->   	switch (attrs->flavour) {
->   	case DEVLINK_PORT_FLAVOUR_PHYSICAL:
->   		if (devlink_port->linecard)
+> allwinner,syscon that takes the syscon phandle first and the offset secon=
+d?
 
+I would prefer to avoid any changes to the syscon reference that would
+require more custom code. I only just recently found that we could use
+the standard syscon code with the provider registering the syscon. We
+could drop the of_parse_phandle() + find device + dev_get_regmap() bits.
+This is partially covered in my GMAC200 series.
+
+ChenYu
+
+> It seems that various other platforms are doing similar things (e.g.
+> ti,syscon-pcie-mode).
+>
+> Thanks
+>
+> Paul
+>
+> >
+> > ChenYu
+> >
+> > > [0]: https://github.com/engSinteck/A133_Image/blob/main/longan/kernel=
+/linux-4.9/arch/arm64/boot/dts/sunxi/sun50iw10p1.dtsi#L2016
+> > > [1]: https://github.com/engSinteck/A133_Image/blob/main/longan/kernel=
+/linux-4.9/drivers/net/ethernet/allwinner/sunxi-gmac.c
+> > >
+> > > All the best,
+> > >
+> > > Paul
+> > >
+> > > >
+> > > > ChenYu
+> > > >
+> > > >
+> > > > > Cheers,
+> > > > >
+> > > > > Paul
+> > > > >
+> > > > > > Cheers,
+> > > > > > Andre.
+> > > > > >
+> > > > > > > [1]
+> > > > > > > https://github.com/qiaoweibiao/T507_Kernel/blob/main/arch/arm=
+64/boot/dts/sunxi/sun50iw10p1.dtsi
+> > > > > > >
+> > > > > > >
+> > > > > > > >
+> > > > > > > > Fixes: 473436e7647d ("pinctrl: sunxi: add support for the A=
+llwinner A100 pin controller")
+> > > > > > > > Signed-off-by: Paul Kocialkowski <paulk@sys-base.io>
+> > > > > > > > ---
+> > > > > > > >  drivers/pinctrl/sunxi/pinctrl-sun50i-a100.c | 32 +++++++++=
++-----------
+> > > > > > > >  1 file changed, 16 insertions(+), 16 deletions(-)
+> > > > > > > >
+> > > > > > > > diff --git a/drivers/pinctrl/sunxi/pinctrl-sun50i-a100.c b/=
+drivers/pinctrl/sunxi/pinctrl-sun50i-a100.c
+> > > > > > > > index b97de80ae2f3..95b764ee1c0d 100644
+> > > > > > > > --- a/drivers/pinctrl/sunxi/pinctrl-sun50i-a100.c
+> > > > > > > > +++ b/drivers/pinctrl/sunxi/pinctrl-sun50i-a100.c
+> > > > > > > > @@ -546,33 +546,33 @@ static const struct sunxi_desc_pin a1=
+00_pins[] =3D {
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
+> > > > > > > >             SUNXI_FUNCTION(0x2, "i2c0"),          /* SCK */
+> > > > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* RXD1 *=
+/
+> > > > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* RXD1 *=
+/
+> > > > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 0)),
+> > > > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 1),
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
+> > > > > > > >             SUNXI_FUNCTION(0x2, "i2c0"),          /* SDA */
+> > > > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* RXD0 *=
+/
+> > > > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* RXD0 *=
+/
+> > > > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 1)),
+> > > > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 2),
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
+> > > > > > > >             SUNXI_FUNCTION(0x2, "i2c1"),          /* SCK */
+> > > > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* RXCTL =
+*/
+> > > > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* RXCTL =
+*/
+> > > > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 2)),
+> > > > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 3),
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
+> > > > > > > >             SUNXI_FUNCTION(0x2, "i2c1"),          /* SDA */
+> > > > > > > >             SUNXI_FUNCTION(0x3, "cir0"),          /* OUT */
+> > > > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* CLKIN =
+*/
+> > > > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* CLKIN =
+*/
+> > > > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 3)),
+> > > > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 4),
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
+> > > > > > > >             SUNXI_FUNCTION(0x2, "uart3"),         /* TX */
+> > > > > > > >             SUNXI_FUNCTION(0x3, "spi1"),          /* CS */
+> > > > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* TXD1 *=
+/
+> > > > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* TXD1 *=
+/
+> > > > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 4)),
+> > > > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 5),
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > > > @@ -580,14 +580,14 @@ static const struct sunxi_desc_pin a1=
+00_pins[] =3D {
+> > > > > > > >             SUNXI_FUNCTION(0x2, "uart3"),         /* RX */
+> > > > > > > >             SUNXI_FUNCTION(0x3, "spi1"),          /* CLK */
+> > > > > > > >             SUNXI_FUNCTION(0x4, "ledc"),
+> > > > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* TXD0 *=
+/
+> > > > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* TXD0 *=
+/
+> > > > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 5)),
+> > > > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 6),
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
+> > > > > > > >             SUNXI_FUNCTION(0x2, "uart3"),         /* RTS */
+> > > > > > > >             SUNXI_FUNCTION(0x3, "spi1"),          /* MOSI *=
+/
+> > > > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* TXCK *=
+/
+> > > > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* TXCK *=
+/
+> > > > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 6)),
+> > > > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 7),
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > > > @@ -595,7 +595,7 @@ static const struct sunxi_desc_pin a100=
+_pins[] =3D {
+> > > > > > > >             SUNXI_FUNCTION(0x2, "uart3"),         /* CTS */
+> > > > > > > >             SUNXI_FUNCTION(0x3, "spi1"),          /* MISO *=
+/
+> > > > > > > >             SUNXI_FUNCTION(0x4, "spdif"),         /* OUT */
+> > > > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* TXCTL =
+*/
+> > > > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* TXCTL =
+*/
+> > > > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 7)),
+> > > > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 8),
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > > > @@ -611,7 +611,7 @@ static const struct sunxi_desc_pin a100=
+_pins[] =3D {
+> > > > > > > >             SUNXI_FUNCTION(0x2, "dmic"),          /* DATA0 =
+*/
+> > > > > > > >             SUNXI_FUNCTION(0x3, "spi2"),          /* CLK */
+> > > > > > > >             SUNXI_FUNCTION(0x4, "i2s2"),          /* BCLK *=
+/
+> > > > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* MDC */
+> > > > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* MDC */
+> > > > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 9)),
+> > > > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 10),
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > > > @@ -619,7 +619,7 @@ static const struct sunxi_desc_pin a100=
+_pins[] =3D {
+> > > > > > > >             SUNXI_FUNCTION(0x2, "dmic"),          /* DATA1 =
+*/
+> > > > > > > >             SUNXI_FUNCTION(0x3, "spi2"),          /* MOSI *=
+/
+> > > > > > > >             SUNXI_FUNCTION(0x4, "i2s2"),          /* LRCK *=
+/
+> > > > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* MDIO *=
+/
+> > > > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* MDIO *=
+/
+> > > > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 10)),
+> > > > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 11),
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > > > @@ -642,33 +642,33 @@ static const struct sunxi_desc_pin a1=
+00_pins[] =3D {
+> > > > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
+> > > > > > > >             SUNXI_FUNCTION(0x3, "i2c3"),          /* SCK */
+> > > > > > > >             SUNXI_FUNCTION(0x4, "i2s3"),          /* MCLK *=
+/
+> > > > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* EPHY *=
+/
+> > > > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* EPHY *=
+/
+> > > > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 13)),
+> > > > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 14),
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
+> > > > > > > >             SUNXI_FUNCTION(0x4, "i2s3"),          /* BCLK *=
+/
+> > > > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* RXD3 *=
+/
+> > > > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* RXD3 *=
+/
+> > > > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 14)),
+> > > > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 15),
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
+> > > > > > > >             SUNXI_FUNCTION(0x4, "i2s3"),          /* LRCK *=
+/
+> > > > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* RXD2 *=
+/
+> > > > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* RXD2 *=
+/
+> > > > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 15)),
+> > > > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 16),
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
+> > > > > > > >             SUNXI_FUNCTION(0x3, "i2s3_dout0"),    /* DOUT0 =
+*/
+> > > > > > > >             SUNXI_FUNCTION(0x4, "i2s3_din1"),     /* DIN1 *=
+/
+> > > > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* RXCK *=
+/
+> > > > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* RXCK *=
+/
+> > > > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 16)),
+> > > > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 17),
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > > >             SUNXI_FUNCTION(0x1, "gpio_out"),
+> > > > > > > >             SUNXI_FUNCTION(0x3, "i2s3_dout1"),    /* DOUT1 =
+*/
+> > > > > > > >             SUNXI_FUNCTION(0x4, "i2s3_din0"),     /* DIN0 *=
+/
+> > > > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* TXD3 *=
+/
+> > > > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* TXD3 *=
+/
+> > > > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 17)),
+> > > > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 18),
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > > > @@ -676,7 +676,7 @@ static const struct sunxi_desc_pin a100=
+_pins[] =3D {
+> > > > > > > >             SUNXI_FUNCTION(0x2, "cir0"),          /* OUT */
+> > > > > > > >             SUNXI_FUNCTION(0x3, "i2s3_dout2"),    /* DOUT2 =
+*/
+> > > > > > > >             SUNXI_FUNCTION(0x4, "i2s3_din2"),     /* DIN2 *=
+/
+> > > > > > > > -           SUNXI_FUNCTION(0x5, "emac0"),         /* TXD2 *=
+/
+> > > > > > > > +           SUNXI_FUNCTION(0x5, "emac"),          /* TXD2 *=
+/
+> > > > > > > >             SUNXI_FUNCTION_IRQ_BANK(0x6, 6, 18)),
+> > > > > > > >   SUNXI_PIN(SUNXI_PINCTRL_PIN(H, 19),
+> > > > > > > >             SUNXI_FUNCTION(0x0, "gpio_in"),
+> > > > > > >
+> > > > > > >
+> > > > > >
+> > > > >
+> > > > > --
+> > > > > Paul Kocialkowski,
+> > > > >
+> > > > > Independent contractor - sys-base - https://www.sys-base.io/
+> > > > > Free software developer - https://www.paulk.fr/
+> > > > >
+> > > > > Expert in multimedia, graphics and embedded hardware support with=
+ Linux.
+> > >
+> > > --
+> > > Paul Kocialkowski,
+> > >
+> > > Independent contractor - sys-base - https://www.sys-base.io/
+> > > Free software developer - https://www.paulk.fr/
+> > >
+> > > Expert in multimedia, graphics and embedded hardware support with Lin=
+ux.
+>
+> --
+> Paul Kocialkowski,
+>
+> Independent contractor - sys-base - https://www.sys-base.io/
+> Free software developer - https://www.paulk.fr/
+>
+> Expert in multimedia, graphics and embedded hardware support with Linux.
 
