@@ -1,195 +1,155 @@
-Return-Path: <netdev+bounces-204601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9537AFB6C8
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 17:04:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2C6CAFB6D1
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 17:05:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F7631AA6D2D
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 15:04:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64BA53A2798
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 15:04:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B8CB2E175E;
-	Mon,  7 Jul 2025 15:03:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8FE12E1749;
+	Mon,  7 Jul 2025 15:04:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HY+sawon"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hn188aKx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A012E172B;
-	Mon,  7 Jul 2025 15:03:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7E42E11D9;
+	Mon,  7 Jul 2025 15:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751900626; cv=none; b=dmIsaSAt3uDhVLEoSrkhZsbPx1meF2rMZiPckz3PQGhIZIM9/uhS7u36Y39b4uNYSvmnNptBe+eT8Z8qpio0g1D+xLV7z1K+JTbEhnbSYFytyreBLRk0s2pAorTZ/ahQGHszENfIeyJvhh5qh3TxxeDZWTRRzo4q6RsjwrI+sTM=
+	t=1751900687; cv=none; b=ePzS23Kg8mAF31Bja2AOQSRC78vIHzBomw0thHrG8BgaE80qT9yZxXJs1NrBbLTFRlESFh0QDYz6bX4HbucS28ngMJ/OWtYRJiD4DHOU7MtVMW/PMXdJaHTrkL5RZ28tDR+mcswMe/rReLywDukWKe5fXjJmXx7WdvZevyPdtD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751900626; c=relaxed/simple;
-	bh=8vpMMtLZ77ykFwEUeLprgWV5prX+b5ChNM4CEWq+U1A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g+maxgXjcx1Ho1fmgpJCNKJrCo5hlNFAzja5JwE6Zs+zsHeWCUattP6oDPdqIdPk1uxbPqweX4cbSOhjFHVNimWhZB0rjfnzP4HKvKRretBy9QN10IQjXhrEzBtCVAsSPV1FpSlwWGzu4Sjy1MfBhlzMqF1zqWot8wv+B4bdhG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HY+sawon; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b3182c6d03bso3698226a12.0;
-        Mon, 07 Jul 2025 08:03:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751900623; x=1752505423; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=PvPiz+8bXdawtqTn2ILmtUwar4MxSLrzHLdkvYFKuoU=;
-        b=HY+sawonyC9um/b7OhVpKkhgoZy+Xl56y9duBzzcsJeRDuJfb4/SKBKRkmY6qdowFr
-         y27LOjTRWn7x7qu68KEyR8lPipxwuaTuB4rPJ4mepHcTnfgm2mMPx1xmkpDPX0v8hEu1
-         lKcJfczcaOzdFxaiyiqEIzhcPvNPjcluNLDVAbybZZAEVRzYSPv0/fJ586euKO4ixM2e
-         xMMyh+hb/SJp71QApCx0W33ZZf3AkAilkm7bOoI0283AcQ47bvjkxhnDIJEzLoLfsRmq
-         kPmOnzNUSU1Tn5i0baZJd/Q0XVShF64SMKtnBi2i2ZG2+aKy43YjOu9dHdlwFiUtD8ne
-         6UrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751900623; x=1752505423;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PvPiz+8bXdawtqTn2ILmtUwar4MxSLrzHLdkvYFKuoU=;
-        b=s2S7pOl9xHrGw/P2Hh6yfB4yWIDFMpGSm4IF3RvtbVMCVIlPDLku7efpDqNTMCYG1X
-         mOuxunv90rjey4SUR02T4r5JXfuEkfIv/B0ObrQ8+rmtIPe27CUqX5VqkuwZtaoipI+j
-         hiGYMQjTM1A4R6bqv47TBZtqTWwK7vzaF5sHGxoBLVMGQliQwOnapNTvHegjwti1I0Y8
-         il+gRf3AKlfd7zyQ97Mf662+91ZHv3eiT0T2hSHUv0rhGUJNRk5slQCIu64JdK1RY5Wt
-         7LAOojAk2jpZjlJpmC9/U1qgDyF0k6hq1FOtytrY0PrJ3GHJ7bR1hXC2gbO9RUqTALNE
-         MEmA==
-X-Forwarded-Encrypted: i=1; AJvYcCUoUk4JNpj5kND9kmGF11RvKqxHwu6j4A9q3st58DdkiMsr+FHG2jTGIdCWF7AkOp1HXtDEd4NuEnyEK8WQ@vger.kernel.org, AJvYcCVDwh+xrnFQC4AWNmv0DNVwQNaud4rYDHMf1V8cmRgqKuwj+4JsnJVxIHPetNd6rYFdK94=@vger.kernel.org, AJvYcCX378w9kJehT4vExHBcz0sbbA7URVe1tY0LfXqLOB2w1Jzp9AjoGGGJQG6VxdZ+FFeTCY48y0xnNWckwa39Ih0F@vger.kernel.org, AJvYcCXUdEA+kfeKL8HjIMtiBIxkn0oaUX6+TCbfr6GzQDIAAf9yaD2RARjDTmBKaN8NSVyobVbCPLZE@vger.kernel.org, AJvYcCXlO9W+ipvDTVOrAJTXVHv9kXARIlh0PzbOsyfjhKeFJLQwGRd+oG0dQ5SRZoxewujFrgh5jKT11F1T@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzq8+ow8chSy3rrjg3wjI8bJPQ6rCJO38ainw23vCI6p73o2RvM
-	sNue1T/O7b0vlC/nwFp5VI3WwdXbkRtf++92c1GI+U5qsReY0fKrVJg=
-X-Gm-Gg: ASbGncvMbaL07dK38ztYphtSPwvGqLCLdjghzELHNG1ZtUN3rgb5Uxt3+7AiaKW06TE
-	aRWNOXyAGPYyTWXzoAgvoZCKs8mMFOoel8IT5ty9Z0oT0yUgUEpULx3CQy1qFihMjb/+Snl0D8h
-	kZHvQW6zpDCrgLWCyGLtvFuDYsBowyGK3+jVbfIJ03okpTXjSx4J8yY+tvinNqlks/AIs7Ag3x9
-	8a5bdnH8R/y/OtUlpXJxLWW0svbslg4kXlWT/TVkbGqX6PyIepVuayAf7Wq8U1pXXK+Bgex1zGd
-	YUIITCMYL+ZKIXqg26C0duB++ezTejAgxo4VRjEcSgBTTR74O5Med3/WvbPCgT567YKiVIT4I+h
-	Dx1sXSkAaxH2AS1OTHkiscd+yMPMf/nOG1Q==
-X-Google-Smtp-Source: AGHT+IGvlZOBcUhR/1tVJDqiFwZYhKHSIOJlcGfOmFaKACrXzn5rUykyWIsigtYL0QKTocWbHdKcFA==
-X-Received: by 2002:a17:90b:2e47:b0:311:abba:53d2 with SMTP id 98e67ed59e1d1-31aba8be13amr15776019a91.17.1751900623342;
-        Mon, 07 Jul 2025 08:03:43 -0700 (PDT)
-Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-31ac2f7ba56sm5415618a91.36.2025.07.07.08.03.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jul 2025 08:03:41 -0700 (PDT)
-Date: Mon, 7 Jul 2025 08:03:40 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
-	"Song, Yoong Siang" <yoong.siang.song@intel.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@gmail.com>,
-	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH bpf-next,v3 2/2] selftests/bpf: Enhance XDP Rx metadata
- handling
-Message-ID: <aGvhzDLSuOolCCWW@mini-arch>
-References: <20250702165757.3278625-1-yoong.siang.song@intel.com>
- <20250702165757.3278625-3-yoong.siang.song@intel.com>
- <77463344-1b1a-443a-97be-a7ef8a88b8af@kernel.org>
- <IA3PR11MB92546301B67FB3A9FDCD716DD842A@IA3PR11MB9254.namprd11.prod.outlook.com>
- <88a64a65-bd8c-4b73-af19-6764054d4572@kernel.org>
- <f5d724ab-0eb6-41a1-b694-8aea566e99ab@iogearbox.net>
+	s=arc-20240116; t=1751900687; c=relaxed/simple;
+	bh=RhkJAKLlY4Yx5V4ar6nowx9DR12JvZ+qhTjq8dUu1S8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pTORrJ8M1KqNJsv/5DDH0DJK9YBTNGtFzPivfvY18mabSqOOtJrfbwfBrrciFfSHaKCgAkTVwjEgVL7XCFu52kYcEU/VhmCivQMBsP4vXXekEX7VAWZF0101O11mMJDcvf2EbjEhJTEC+XoGz8S0zsM1JOv2tyD0nLmCTHcBxLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hn188aKx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C94A4C4CEF1;
+	Mon,  7 Jul 2025 15:04:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751900687;
+	bh=RhkJAKLlY4Yx5V4ar6nowx9DR12JvZ+qhTjq8dUu1S8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=hn188aKx/v6jVmCYoDu49FSfZzv8h1+ZBs0lktN1enyIT4JftJI3UknxmE6cVI57E
+	 7IYglXZuK0rUQFSgXzde7MpueugfJNmodR/rH1iAhxY/QqEVJaWCRhF+JeoNXXR2He
+	 S4AJqXrOZmt/IKXmLJHLgkLJIWFggVuSMavdu33fc/cBTsNMlMBEp01rgOMjDl02Y0
+	 auUfrhxr7sjnDNVa0cpSjlEHFnPPnkpPLnijbr4U9c+duGCe+rTUsN58oD6EgGRH9e
+	 Zee82vrDwb06dVOCZWZv0SwVqNrthmMr3AJI8hyN9CU7xkpHeodQ2CjK5GUb2v17MQ
+	 jpZcbt69m327Q==
+Message-ID: <679e6fd2-967f-4057-9ccd-92a37ecc4819@kernel.org>
+Date: Mon, 7 Jul 2025 17:04:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f5d724ab-0eb6-41a1-b694-8aea566e99ab@iogearbox.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 2/7] net: airoha: npu: Add NPU wlan memory
+ initialization commands
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, Simon Horman <horms@kernel.org>,
+ Felix Fietkau <nbd@nbd.name>
+References: <20250705-airoha-en7581-wlan-offlaod-v2-0-3cf32785e381@kernel.org>
+ <20250705-airoha-en7581-wlan-offlaod-v2-2-3cf32785e381@kernel.org>
+ <20250707-agile-aardwolf-of-politeness-29fead@krzk-bin>
+ <aGt2L1e3xbWVoqOO@lore-desk>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <aGt2L1e3xbWVoqOO@lore-desk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 07/04, Daniel Borkmann wrote:
-> On 7/4/25 11:58 AM, Jesper Dangaard Brouer wrote:
-> > On 04/07/2025 03.17, Song, Yoong Siang wrote:
-> > > On Friday, July 4, 2025 1:05 AM, Jesper Dangaard Brouer <hawk@kernel.org> wrote:
-> > > > On 02/07/2025 18.57, Song Yoong Siang wrote:
-> > > > > Introduce the XDP_METADATA_SIZE macro as a conservative measure to
-> > > > > accommodate any metadata areas reserved by Ethernet devices.
-> > > > 
-> > > > This seems like a sloppy workaround :-(
-> > > > 
-> > > > To me, the problem arise because AF_XDP is lacking the ability to
-> > > > communicate the size of the data_meta area.  If we had this capability,
-> > > > then we could allow the IGC driver to take some of the space, have the
-> > > > BPF-prog expand it futher (bpf_xdp_adjust_meta) and then userspace
-> > > > AF_XDP would simply be able to see the size of the data_meta area, and
-> > > > apply the struct xdp_meta at right offset.
-> > > > 
-> > > Thanks for your input.
-> > > 
-> > > I agree with you that the implementation will be simple if user application
-> > > able to get the size of data_meta area. The intention of this patch set is to let
-> > > developer aware of such limitations before we have a perfect solution.
-> > > 
-> > > Btw, do you got any suggestion on how to expose the metadata length?
-> > > I not sure whether xdp_desc.options is a simple and good idea or not?
-> > 
-> > That is a question to the AF_XDP maintainers... added them to this email.
-> > 
-> > /* Rx/Tx descriptor */
-> > struct xdp_desc {
-> >      __u64 addr;
-> >      __u32 len;
-> >      __u32 options;
-> > };
-> > 
-> > As far as I know, the xdp_desc.options field isn't used, right?
+On 07/07/2025 09:24, Lorenzo Bianconi wrote:
+>> On Sat, Jul 05, 2025 at 11:09:46PM +0200, Lorenzo Bianconi wrote:
+>>> +
+>>>  struct airoha_npu *airoha_npu_get(struct device *dev, dma_addr_t *stats_addr)
+>>>  {
+>>>  	struct platform_device *pdev;
+>>> @@ -493,6 +573,7 @@ static int airoha_npu_probe(struct platform_device *pdev)
+>>>  	npu->ops.ppe_deinit = airoha_npu_ppe_deinit;
+>>>  	npu->ops.ppe_flush_sram_entries = airoha_npu_ppe_flush_sram_entries;
+>>>  	npu->ops.ppe_foe_commit_entry = airoha_npu_foe_commit_entry;
+>>> +	npu->ops.wlan_init_reserved_memory = airoha_npu_wlan_init_memory;
+>>
+>> I cannot find in your code single place calling this (later you add a
+>> wrapper... which is not called either).
+>>
+>> All this looks like dead code...
 > 
-> The options holds flags, see also XDP_PKT_CONTD and XDP_TX_METADATA.
-> 
-> > (Please AF_XDP experts, please verify below statements:)
-> > Something else we likely want to document: The available headroom in the
-> > AF_XDP frame.  When accessing the metadata in userspace AF_XDP we do a
-> > negative offset from the UMEM packet pointer.  IIRC on RX the available
-> > headroom will be either 255 or 192 bytes (depending on NIC drivers).
-> > 
-> > Slightly confusing when AF_XDP transmitting from userspace the UMEM
-> > headroom is default zero (XSK_UMEM__DEFAULT_FRAME_HEADROOM is zero).
-> > This is configurable via xsk_umem_config.frame_headroom, like I did in
-> > this example[1].
-> > 
-> > Maybe I did something wrong in[1], because I see that the new method is
-> > setting xsk_umem_config.tx_metadata_len + flag XDP_UMEM_TX_METADATA_LEN.
-> > This is nicely documented in [2]. How does this interact with setting
-> > xsk_umem_config.frame_headroom ?
-> 
-> If you request XDP_UMEM_TX_METADATA_LEN then on TX side you can fill
-> struct xsk_tx_metadata before the start of packet data, that is,
-> meta = data - sizeof(struct xsk_tx_metadata). The validity of the
-> latter is indicated via desc->options |= XDP_TX_METADATA and then
-> you fill meta->flags with things like XDP_TXMD_FLAGS_CHECKSUM to
-> tell that the related fields are valid (ex. request.csum_start,
-> request.csum_offset) and that you expect the driver to do the
-> offload with this info. This is also what I mentioned in the other
-> thread some time ago that imho it would make sense to have this also
-> on RX side somewhat similar to virtio_net_hdr..
+> As pointed out in the commit log, these callbacks will be used by MT76 driver
+> to initialize the NPU reserved memory and registers during driver probe in
+> order to initialize the WiFi offloading. Since MT76 patches are going via
+> the wireless tree, I needed to add these callbacks first.
 
-Let's at least document the current behavior where some (small minority of)
-drivers can reuse the rx metadata area for some of its state? If we want
-to improve on that by adding another knob, we can follow up?
-(but I remember last time it was discussed, about a year ago, people
-were not enthusiastic about another parameter exported as uapi)
+Cover letter does not link to your NPU patchset. You cannot add dead
+code to the kernel and now it is pure dead code. Post your user - in
+this or separate patchset.
+
+Your explanation of dependency is also confusing. If these are added to
+wireless tree (considering last experience how they rebase and cannot
+easily handle cross tree merges), how does it solve your problem? You
+will have it in one tree but not in the other, so still nothing...
+That's anyway separate problem, because main issue is you add code which
+we cannot even verify how it is being used.
+
+So far I see ABI break, but without user cannot judge. And that's the
+hard reason this cannot be accepted.
+
+Best regards,
+Krzysztof
 
