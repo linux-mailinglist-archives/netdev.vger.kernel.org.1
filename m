@@ -1,404 +1,153 @@
-Return-Path: <netdev+bounces-204647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60186AFB96A
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 19:04:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B72CAFB996
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 19:07:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFB67172DF9
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 17:04:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 848387AB732
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 17:05:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76A0E2E8882;
-	Mon,  7 Jul 2025 17:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AB382E8892;
+	Mon,  7 Jul 2025 17:06:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mNkMJNo1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hWCEone0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E61122DF9E;
-	Mon,  7 Jul 2025 17:04:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549512264A0;
+	Mon,  7 Jul 2025 17:06:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751907853; cv=none; b=kcrQi7ZpNvdaTrvDk+7N1nHOQooHpK3noQ6iPzupyErtM62MHmwSy3I9VKGl34SzYxK/FI4NG2u2DslRcHstxb635c6vbSnUKqUw5BAdqydxHAFzl7OpOw21C+h53oadDtfX15LsXYDCzCW3Ht448u3Bc9iwU9xw2ZiEixxSJCw=
+	t=1751908006; cv=none; b=R4J6g4OSSUqDWSh+BqKgXCWzobuiA2fVbOoEzHG8dK7GOZZmhoP7UgJ1FTOmoGF8MWq0jsoG/O8vhwTm9XNr+Ol446sWe+Eb2MZSAQbTWZczUYS8fubPcQzh78ba2ScNuzfMqQck1h7k3D7X1tWXfXxrsrjA5LEnwUYJkJk6m8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751907853; c=relaxed/simple;
-	bh=7FmZ0GOKruQDqf7WjVP3GXsWqnFWGCYPhrZiwa3t3qs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OKWynlRUDMSh6i+J8V+oGahcTtl2s2uVA++Qp1BUdQjwWZM3sigG4b2pWCIwAIYdbrOyn1MD3aza9igi6TmKsjmW1ycSomf1vnt14ja+R5VgsUB1CstI6OS1HYG4wT/SPugtgz7gV1jiwusk6jnonzgHPaDOK26M5wgc4mmfTNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mNkMJNo1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60AC4C4CEE3;
-	Mon,  7 Jul 2025 17:04:12 +0000 (UTC)
+	s=arc-20240116; t=1751908006; c=relaxed/simple;
+	bh=RmgBMi2VW8e/N4LvJnOaj4Wgc8weyyjOi7wU4geY8+U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=prZ9M2ZfbnSRseMdGd1bNg5cas9vzMtGfq45DhHHlnCYu09X9UxL9ZV+TlcREOi/vkKH2rMrmlwlCCzhqbisTmoTenppv65OHNJdJfdmPDxbwVjob4/QDkP7rdj/3Xh1Mz8bZqoM0dUcIiRGK9nrt3gquxrC394tDsTgt3igTE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hWCEone0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 959F7C4CEFA;
+	Mon,  7 Jul 2025 17:06:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751907852;
-	bh=7FmZ0GOKruQDqf7WjVP3GXsWqnFWGCYPhrZiwa3t3qs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mNkMJNo1H01VyMNAHwEM4iAhJfc5/GPkt23kzC9sII+cwH7ubmRCzLQuvbpqLrkD6
-	 jsQtIXo8vggIB5HHnl0BGndDA8zAY1gH7lMkgF+lazCH7oi7aljwN5PZurtdfk8/0Q
-	 eHsLmOgTmY4kKDsHIZZsUYL0kCz4D1VjP7JWxq5pCciv+YO+n/waj9OYhpm31Q/Pc3
-	 0PCbjtyQyV8dwRAOZjMZqxM+ClG5aEfmBfXxZcmPV+blen89hRLuZX6uvz57mHpnrQ
-	 khEo10NYDNibnaXBiNcniiyWqhPeawtNq0xyFQvUSVvMbddlTuYtuPnVOap5ytiCpS
-	 A2NOWF1l4pZDA==
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Yishai Hadas <yishaih@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=k20201202; t=1751908005;
+	bh=RmgBMi2VW8e/N4LvJnOaj4Wgc8weyyjOi7wU4geY8+U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hWCEone0nNbiHJxkCKz0vnh51AVh/vJy0rWCQrBt2WkMeze4hEgcDH97m75KDycrK
+	 mxoRh7QXG/32b7PiDrQ+kaBICHKPE5MUKDkCHh4JYxvS+vBEVAc/m2+EHg2udAjV7Q
+	 FWxxqpNYsQO+oiuFWcfesOWnOUqyhtNmM4Io5/B88l0pCaYuALyRF430bgAAKh4BXn
+	 CVZALtGxrQiNikRInRzoneEcekpnNalAZHlTvavpGdCPXjR/GM15DRfQSWfBhaqcNJ
+	 fLPvspMAoBH1fvPweStN9HzAdvp7eCj2qoxI2yKsLp06pGRxL54Y8LRH5QPhEgvMg1
+	 t0PFw9aHTc0WQ==
+Date: Mon, 7 Jul 2025 18:06:36 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yassine Oudjana <y.oudjana@protonmail.com>
+Cc: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+	Jonathan Cameron <jic23@kernel.org>,
+	Lars-Peter Clausen <lars@metafoo.de>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: [PATCH mlx5-next 3/8] net/mlx5: Add support for device steering tag
-Date: Mon,  7 Jul 2025 20:03:03 +0300
-Message-ID: <dc4c7f6ba34e6beaf95a3c4f9c2e122925be97c9.1751907231.git.leon@kernel.org>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <cover.1751907231.git.leon@kernel.org>
-References: <cover.1751907231.git.leon@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas.schier@linux.dev>,
+	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
+	Sean Nyekjaer <sean@geanix.com>,
+	Javier Carrasco <javier.carrasco.cruz@gmail.com>,
+	Matti Vaittinen <mazziesaccount@gmail.com>,
+	Antoniu Miclaus <antoniu.miclaus@analog.com>,
+	Ramona Gradinariu <ramona.gradinariu@analog.com>,
+	"Yo-Jung (Leo) Lin" <0xff07@gmail.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	=?utf-8?B?QmFybmFiw6FzIEN6w6ltw6Fu?= <barnabas.czeman@mainlining.org>,
+	Danila Tikhonov <danila@jiaxyga.com>,
+	Antoni Pokusinski <apokusinski01@gmail.com>,
+	Vasileios Amoiridis <vassilisamir@gmail.com>,
+	Petar Stoykov <pd.pstoykov@gmail.com>,
+	shuaijie wang <wangshuaijie@awinic.com>,
+	Yasin Lee <yasin.lee.x@gmail.com>,
+	"Borislav Petkov (AMD)" <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Tony Luck <tony.luck@intel.com>,
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+	Ingo Molnar <mingo@kernel.org>,
+	Yassine Oudjana <yassine.oudjana@gmail.com>,
+	linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH 2/3] net: qrtr: Define macro to convert QMI version and
+ instance to QRTR instance
+Message-ID: <20250707170636.GR89747@horms.kernel.org>
+References: <20250406140706.812425-1-y.oudjana@protonmail.com>
+ <20250406140706.812425-3-y.oudjana@protonmail.com>
+ <fb61323b-aabd-4661-a202-02da7da557ea@oss.qualcomm.com>
+ <aMbAZigHiAN2xupOYs9DodY2mOdNtw_oVjOaweflgA8IoXRQ5ctoZ8GYJ8PNAKDgL4f9N_UD7tFmkePUy9BCE8v20Mae2x-eL1ZpyJEdLZY=@protonmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aMbAZigHiAN2xupOYs9DodY2mOdNtw_oVjOaweflgA8IoXRQ5ctoZ8GYJ8PNAKDgL4f9N_UD7tFmkePUy9BCE8v20Mae2x-eL1ZpyJEdLZY=@protonmail.com>
 
-From: Yishai Hadas <yishaih@nvidia.com>
+On Sat, Jul 05, 2025 at 06:29:39PM +0000, Yassine Oudjana wrote:
+> On Wednesday, April 9th, 2025 at 3:54 PM, Konrad Dybcio <konrad.dybcio@oss.qualcomm.com> wrote:
+> 
+> > On 4/6/25 4:07 PM, Yassine Oudjana wrote:
 
-Background, from PCIe specification 6.2.
+...
 
-TLP Processing Hints (TPH)
---------------------------
-TLP Processing Hints is an optional feature that provides hints in
-Request TLP headers to facilitate optimized processing of Requests that
-target Memory Space. These Processing Hints enable the system hardware
-(e.g., the Root Complex and/or Endpoints) to optimize platform
-resources such as system and memory interconnect on a per TLP basis.
-Steering Tags are system-specific values used to identify a processing
-resource that a Requester explicitly targets. System software discovers
-and identifies TPH capabilities to determine the Steering Tag allocation
-for each Function that supports TPH.
+> > > diff --git a/include/linux/soc/qcom/qrtr.h b/include/linux/soc/qcom/qrtr.h
+> > > index 4d7f25c64c56..10c89a35cbb9 100644
+> > > --- a/include/linux/soc/qcom/qrtr.h
+> > > +++ b/include/linux/soc/qcom/qrtr.h
+> > > @@ -13,6 +13,8 @@ struct qrtr_device {
+> > > 
+> > > #define to_qrtr_device(d) container_of(d, struct qrtr_device, dev)
+> > > 
+> > > +#define QRTR_INSTANCE(qmi_version, qmi_instance) (qmi_version | qmi_instance << 8)
+> > 
+> > 
+> > Please use FIELD_PREP + GENMASK to avoid potential overflows
+> > 
+> > Konrad
+> 
+> Since I'm using this macro in initializing QRTR match tables I am unable to use
+> FIELD_PREP. When I do, I get such errors:
 
-This patch adds steering tag support for mlx5 based NICs by:
+Does using FIELD_PREP_CONST, say in a QRTR_INSTANCE_CONST variant, help?
 
-- Enabling the TPH functionality over PCI if both FW and OS support it.
-- Managing steering tags and their matching steering indexes by
-  writing a ST to an ST index over the PCI configuration space.
-- Exposing APIs to upper layers (e.g.,mlx5_ib) to allow usage of
-  the PCI TPH infrastructure.
+> 
+> In file included from ../arch/arm64/include/asm/sysreg.h:1108,
+>                  from ../arch/arm64/include/asm/memory.h:223,
+>                  from ../arch/arm64/include/asm/pgtable-prot.h:8,
+>                  from ../arch/arm64/include/asm/sparsemem.h:8,
+>                  from ../include/linux/numa.h:23,
+>                  from ../include/linux/cpumask.h:17,
+>                  from ../include/linux/smp.h:13,
+>                  from ../include/linux/lockdep.h:14,
+>                  from ../include/linux/mutex.h:17,
+>                  from ../include/linux/kernfs.h:11,
+>                  from ../include/linux/sysfs.h:16,
+>                  from ../include/linux/iio/buffer.h:9,
+>                  from ../drivers/iio/common/qcom_smgr/qcom_smgr.c:8:
+> ../include/linux/bitfield.h:114:9: error: braced-group within expression allowed only inside a function
+>   114 |         ({                                                              \
+>       |         ^
+> ../include/linux/soc/qcom/qrtr.h:21:10: note: in expansion of macro 'FIELD_PREP'
+>    21 |         (FIELD_PREP(GENMASK(7, 0), qmi_version) | FIELD_PREP(GENMASK(15, 8), qmi_instance))
+>       |          ^~~~~~~~~~
+> ../drivers/iio/common/qcom_smgr/qcom_smgr.c:825:29: note: in expansion of macro 'QRTR_INSTANCE'
+>   825 |                 .instance = QRTR_INSTANCE(SNS_SMGR_QMI_SVC_V1,
+>       |                             ^~~~~~~~~~~~~
 
-Further details:
-- Upon probing of a device, the feature will be enabled based
-  on both capability detection and OS support.
-
-- It will retrieve the appropriate ST for a given CPU ID and memory
-  type using the pcie_tph_get_cpu_st() API.
-
-- It will track available ST indices according to the configuration
-  space table size (expected to be 63 entries), reserving index 0 to
-  indicate non-TPH use.
-
-- It will assign a free ST index with a ST using the
-  pcie_tph_set_st_entry() API.
-
-- It will reuse the same index for identical (CPU ID + memory type)
-  combinations by maintaining a reference count per entry.
-
-- It will expose APIs to upper layers (e.g., mlx5_ib) to allow usage of
-  the PCI TPH infrastructure.
-
-- SF will use its parent PF stuff.
-
-Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- .../net/ethernet/mellanox/mlx5/core/Makefile  |   5 +
- .../net/ethernet/mellanox/mlx5/core/lib/st.c  | 162 ++++++++++++++++++
- .../net/ethernet/mellanox/mlx5/core/main.c    |   2 +
- .../ethernet/mellanox/mlx5/core/mlx5_core.h   |   9 +
- include/linux/mlx5/driver.h                   |  20 +++
- 5 files changed, 198 insertions(+)
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/st.c
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-index d292e6a9e22c..bd9d46c6719f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-@@ -167,5 +167,10 @@ mlx5_core-$(CONFIG_MLX5_SF) += sf/vhca_event.o sf/dev/dev.o sf/dev/driver.o irq_
- #
- mlx5_core-$(CONFIG_MLX5_SF_MANAGER) += sf/cmd.o sf/hw_table.o sf/devlink.o
- 
-+#
-+# TPH support
-+#
-+mlx5_core-$(CONFIG_PCIE_TPH) += lib/st.o
-+
- obj-$(CONFIG_MLX5_DPLL) += mlx5_dpll.o
- mlx5_dpll-y :=	dpll.o
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/st.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/st.c
-new file mode 100644
-index 000000000000..85e4e0c90f34
---- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/st.c
-@@ -0,0 +1,162 @@
-+// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
-+/*
-+ * Copyright (c) 2025, NVIDIA CORPORATION & AFFILIATES. All rights reserved
-+ */
-+
-+#include <linux/mlx5/driver.h>
-+#include <linux/mlx5/device.h>
-+
-+#include "mlx5_core.h"
-+#include "lib/mlx5.h"
-+
-+struct mlx5_st_idx_data {
-+	refcount_t usecount;
-+	u16 tag;
-+};
-+
-+struct mlx5_st {
-+	/* serialize access upon alloc/free flows */
-+	struct mutex lock;
-+	struct xa_limit index_limit;
-+	struct xarray idx_xa; /* key == index, value == struct mlx5_st_idx_data */
-+};
-+
-+struct mlx5_st *mlx5_st_create(struct mlx5_core_dev *dev)
-+{
-+	struct pci_dev *pdev = dev->pdev;
-+	struct mlx5_st *st;
-+	u16 num_entries;
-+	int ret;
-+
-+	if (!MLX5_CAP_GEN(dev, mkey_pcie_tph))
-+		return NULL;
-+
-+	if (mlx5_core_is_sf(dev))
-+		return dev->priv.parent_mdev->st;
-+
-+	/* Checking whether the device is capable */
-+	if (!pdev->tph_cap)
-+		return NULL;
-+
-+	num_entries = pcie_tph_get_st_table_size(pdev);
-+	/* We need a reserved entry for non TPH cases */
-+	if (num_entries < 2)
-+		return NULL;
-+
-+	/* The OS doesn't support ST */
-+	ret = pcie_enable_tph(pdev, PCI_TPH_ST_DS_MODE);
-+	if (ret)
-+		return NULL;
-+
-+	st = kzalloc(sizeof(*st), GFP_KERNEL);
-+	if (!st)
-+		goto end;
-+
-+	mutex_init(&st->lock);
-+	xa_init_flags(&st->idx_xa, XA_FLAGS_ALLOC);
-+	/* entry 0 is reserved for non TPH cases */
-+	st->index_limit.min = MLX5_MKC_PCIE_TPH_NO_STEERING_TAG_INDEX + 1;
-+	st->index_limit.max = num_entries - 1;
-+
-+	return st;
-+
-+end:
-+	pcie_disable_tph(dev->pdev);
-+	return NULL;
-+}
-+
-+void mlx5_st_destroy(struct mlx5_core_dev *dev)
-+{
-+	struct mlx5_st *st = dev->st;
-+
-+	if (mlx5_core_is_sf(dev) || !st)
-+		return;
-+
-+	pcie_disable_tph(dev->pdev);
-+	WARN_ON_ONCE(!xa_empty(&st->idx_xa));
-+	kfree(st);
-+}
-+
-+int mlx5_st_alloc_index(struct mlx5_core_dev *dev, enum tph_mem_type mem_type,
-+			unsigned int cpu_uid, u16 *st_index)
-+{
-+	struct mlx5_st_idx_data *idx_data;
-+	struct mlx5_st *st = dev->st;
-+	unsigned long index;
-+	u32 xa_id;
-+	u16 tag;
-+	int ret;
-+
-+	if (!st)
-+		return -EOPNOTSUPP;
-+
-+	ret = pcie_tph_get_cpu_st(dev->pdev, mem_type, cpu_uid, &tag);
-+	if (ret)
-+		return ret;
-+
-+	mutex_lock(&st->lock);
-+
-+	xa_for_each(&st->idx_xa, index, idx_data) {
-+		if (tag == idx_data->tag) {
-+			refcount_inc(&idx_data->usecount);
-+			*st_index = index;
-+			goto end;
-+		}
-+	}
-+
-+	idx_data = kzalloc(sizeof(*idx_data), GFP_KERNEL);
-+	if (!idx_data) {
-+		ret = -ENOMEM;
-+		goto end;
-+	}
-+
-+	refcount_set(&idx_data->usecount, 1);
-+	idx_data->tag = tag;
-+
-+	ret = xa_alloc(&st->idx_xa, &xa_id, idx_data, st->index_limit, GFP_KERNEL);
-+	if (ret)
-+		goto clean_idx_data;
-+
-+	ret = pcie_tph_set_st_entry(dev->pdev, xa_id, tag);
-+	if (ret)
-+		goto clean_idx_xa;
-+
-+	*st_index = xa_id;
-+	goto end;
-+
-+clean_idx_xa:
-+	xa_erase(&st->idx_xa, xa_id);
-+clean_idx_data:
-+	kfree(idx_data);
-+end:
-+	mutex_unlock(&st->lock);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(mlx5_st_alloc_index);
-+
-+int mlx5_st_dealloc_index(struct mlx5_core_dev *dev, u16 st_index)
-+{
-+	struct mlx5_st_idx_data *idx_data;
-+	struct mlx5_st *st = dev->st;
-+	int ret = 0;
-+
-+	if (!st)
-+		return -EOPNOTSUPP;
-+
-+	mutex_lock(&st->lock);
-+	idx_data = xa_load(&st->idx_xa, st_index);
-+	if (WARN_ON_ONCE(!idx_data)) {
-+		ret = -EINVAL;
-+		goto end;
-+	}
-+
-+	if (refcount_dec_and_test(&idx_data->usecount)) {
-+		xa_erase(&st->idx_xa, st_index);
-+		/* We leave PCI config space as was before, no mkey will refer to it */
-+	}
-+
-+end:
-+	mutex_unlock(&st->lock);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(mlx5_st_dealloc_index);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-index b0043cfee29b..be3be043134f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-@@ -1102,6 +1102,7 @@ static int mlx5_init_once(struct mlx5_core_dev *dev)
- 	}
- 
- 	dev->dm = mlx5_dm_create(dev);
-+	dev->st = mlx5_st_create(dev);
- 	dev->tracer = mlx5_fw_tracer_create(dev);
- 	dev->hv_vhca = mlx5_hv_vhca_create(dev);
- 	dev->rsc_dump = mlx5_rsc_dump_create(dev);
-@@ -1150,6 +1151,7 @@ static void mlx5_cleanup_once(struct mlx5_core_dev *dev)
- 	mlx5_rsc_dump_destroy(dev);
- 	mlx5_hv_vhca_destroy(dev->hv_vhca);
- 	mlx5_fw_tracer_destroy(dev->tracer);
-+	mlx5_st_destroy(dev);
- 	mlx5_dm_cleanup(dev);
- 	mlx5_fs_core_free(dev);
- 	mlx5_sf_table_cleanup(dev);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h b/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
-index 2e02bdea8361..1cada2f87acf 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
-@@ -300,6 +300,15 @@ int mlx5_set_mtppse(struct mlx5_core_dev *mdev, u8 pin, u8 arm, u8 mode);
- struct mlx5_dm *mlx5_dm_create(struct mlx5_core_dev *dev);
- void mlx5_dm_cleanup(struct mlx5_core_dev *dev);
- 
-+#ifdef CONFIG_PCIE_TPH
-+struct mlx5_st *mlx5_st_create(struct mlx5_core_dev *dev);
-+void mlx5_st_destroy(struct mlx5_core_dev *dev);
-+#else
-+static inline struct mlx5_st *
-+mlx5_st_create(struct mlx5_core_dev *dev) { return NULL; }
-+static inline void mlx5_st_destroy(struct mlx5_core_dev *dev) { return; }
-+#endif
-+
- void mlx5_toggle_port_link(struct mlx5_core_dev *dev);
- int mlx5_set_port_admin_status(struct mlx5_core_dev *dev,
- 			       enum mlx5_port_status status);
-diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
-index 3475d33c75f4..8c5fbfb85749 100644
---- a/include/linux/mlx5/driver.h
-+++ b/include/linux/mlx5/driver.h
-@@ -36,6 +36,7 @@
- #include <linux/kernel.h>
- #include <linux/completion.h>
- #include <linux/pci.h>
-+#include <linux/pci-tph.h>
- #include <linux/irq.h>
- #include <linux/spinlock_types.h>
- #include <linux/semaphore.h>
-@@ -688,6 +689,7 @@ struct mlx5_fw_tracer;
- struct mlx5_vxlan;
- struct mlx5_geneve;
- struct mlx5_hv_vhca;
-+struct mlx5_st;
- 
- #define MLX5_LOG_SW_ICM_BLOCK_SIZE(dev) (MLX5_CAP_DEV_MEM(dev, log_sw_icm_alloc_granularity))
- #define MLX5_SW_ICM_BLOCK_SIZE(dev) (1 << MLX5_LOG_SW_ICM_BLOCK_SIZE(dev))
-@@ -757,6 +759,7 @@ struct mlx5_core_dev {
- 	u32			issi;
- 	struct mlx5e_resources  mlx5e_res;
- 	struct mlx5_dm          *dm;
-+	struct mlx5_st          *st;
- 	struct mlx5_vxlan       *vxlan;
- 	struct mlx5_geneve      *geneve;
- 	struct {
-@@ -1160,6 +1163,23 @@ int mlx5_dm_sw_icm_alloc(struct mlx5_core_dev *dev, enum mlx5_sw_icm_type type,
- int mlx5_dm_sw_icm_dealloc(struct mlx5_core_dev *dev, enum mlx5_sw_icm_type type,
- 			   u64 length, u16 uid, phys_addr_t addr, u32 obj_id);
- 
-+#ifdef CONFIG_PCIE_TPH
-+int mlx5_st_alloc_index(struct mlx5_core_dev *dev, enum tph_mem_type mem_type,
-+			unsigned int cpu_uid, u16 *st_index);
-+int mlx5_st_dealloc_index(struct mlx5_core_dev *dev, u16 st_index);
-+#else
-+static inline int mlx5_st_alloc_index(struct mlx5_core_dev *dev,
-+				      enum tph_mem_type mem_type,
-+				      unsigned int cpu_uid, u16 *st_index)
-+{
-+	return -EOPNOTSUPP;
-+}
-+static inline int mlx5_st_dealloc_index(struct mlx5_core_dev *dev, u16 st_index)
-+{
-+	return -EOPNOTSUPP;
-+}
-+#endif
-+
- struct mlx5_core_dev *mlx5_vf_get_core_dev(struct pci_dev *pdev);
- void mlx5_vf_put_core_dev(struct mlx5_core_dev *mdev);
- 
--- 
-2.50.0
-
+...
 
