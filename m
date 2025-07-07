@@ -1,141 +1,144 @@
-Return-Path: <netdev+bounces-204484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EA57AFACEC
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 09:19:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FAB1AFACF5
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 09:21:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 761547A3940
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 07:18:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A67A7176A0B
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 07:21:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4149D275844;
-	Mon,  7 Jul 2025 07:19:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD6F28641F;
+	Mon,  7 Jul 2025 07:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oaIoVQBT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D0UyZRAt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A51D27F006
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 07:19:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3979C21CA08
+	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 07:21:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751872768; cv=none; b=sW02O+gXCVMOHReY6D5ohUGY8cebarXaaeKgGy0BxPw7Gadr+hbRJznrtr6deAV9F7JnTvKZjeRVDm2tx4wn7NLsizQQTzJ8H6uZ+MlrQ/NSeL5boVkB7Xk7ay10hCDoYx6Te1dMlkT0FzBUyiMUm+J7Q85bL/0nqiuVCtTIP0o=
+	t=1751872895; cv=none; b=IuD4IExp3FNrjTc21S7Qy3OhT3mCk391QUo2lxvV5bRJCEBADNczypR+Yu5uja8v8rIQTHTIMploSSOuofX5ozU21QXNRSEohvRUPaHt8UIYR6MStdtB8u6R1LeaPqzlVW1eBM7gfkkkxAbMnHs0ChcgPZa5UGSUjmxEcI2hg7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751872768; c=relaxed/simple;
-	bh=htJZpPOj4gZZRU0I+jiYOIF5YRNV0fn3GX0M2AlliDQ=;
+	s=arc-20240116; t=1751872895; c=relaxed/simple;
+	bh=qxc/X70pqNaJOhCIrlhit0fU5Btv3EL3u2/8T9VYUKY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cWZO/Fqj5VEwXM6MI+pZYe2r84+WBsMZozfW8Npo9evi5No1uhRedO1adz8pdRnM6lNuFJz1skMMHRVtD3VcgG4ZkS1m7enAREN61Zl5v/tdMmpgGzlGMj1J5rw/Rn27X7GIJUy3oS5YpuB/AUMskaCQRURYBS+H3Skd+EFyFSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oaIoVQBT; arc=none smtp.client-ip=209.85.160.169
+	 To:Cc:Content-Type; b=WNBLuq1eUfTzMquTT6kzLqqzi5Z1mVwYiihELlqwYaRLD+kKgqlvzkxZ0BZ+i7yZ3X3QWXtYgK83/hGaH/oIj/Vu5vkOZs8C22bi1XlzdFkYkIysqLC1NJZ8lGVNWS3dCuHmMe0ypunuquJamkBBxn4b02zj8riWaMJQgYGQupI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D0UyZRAt; arc=none smtp.client-ip=209.85.160.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4a7f46f9bb6so36573731cf.3
-        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 00:19:26 -0700 (PDT)
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4a818ed5b51so20124831cf.1
+        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 00:21:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751872765; x=1752477565; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1751872890; x=1752477690; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zTVfC4cPTOGFHouVuim000ml3X3p9Az99Bki20NcXwY=;
-        b=oaIoVQBTwC1tHoM7er1y3GzkdMZXtjLOFvV5P9BLDyFA502cxxz8LC1SSynprtri+Y
-         KpCdGIcxVmLc05OMITGAJfXmayHqPZFept6SxGYm+m0AsZzFDmkJAhdezuwkP4tFKDD0
-         WTzAxzpyvByFpYOWbxEz//cHeOZegaWkag7xkGpSL/cSNbiLvERC9fxeLj3Jq8uMuIAw
-         cVEtIQaJzBvoyb2qeBNVdR6tNgK2scOrKlgbKMR3+xkJ8XINWVl6tPnQRyDaHG5Yqm3s
-         zRxAP6wHOlm4XxAq1RmSfOxjm45Fe8NiO1gafPpDdTK77wEVqJ5C7wn+lvksJMNPV9Ta
-         uo7g==
+        bh=qxc/X70pqNaJOhCIrlhit0fU5Btv3EL3u2/8T9VYUKY=;
+        b=D0UyZRAtT/QiYh5tgF46Ejr1kqfHQDLVm3ljY+k25/eUpYRPc+DFfhL5KvZrntoZLn
+         bVyd6X8vg+tju5js82pIDEAKNYZgdJiFyUa9sDhqw3VZoML7Pn9hTA7N5UdwS6WxsxnU
+         tU+rFOThkcGZgcBxKMqmexkRIMPynt9uf/ZrqO82heZNi2QYiHeqbstLPP0qvlth6xF+
+         JGMnjlibnjcwskMY8t8hlG2dcvcsxN/Np7Qw6wfHklH9T/wz5i1ovWKP/0YTTFtTqMmV
+         Cu9IQj682lnOg5SCowVIro0DCW8MU0itJSN2pa/wAlojDo/101kTDWtBR2P6lPDHwoYF
+         bC6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751872765; x=1752477565;
+        d=1e100.net; s=20230601; t=1751872890; x=1752477690;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zTVfC4cPTOGFHouVuim000ml3X3p9Az99Bki20NcXwY=;
-        b=DCYEp1Hlo0UHW6QQmmv79R07nYsjD+fxlK8HSWNCgUYKtLWuquaS78WRxwRsrH3AIw
-         y64vdSRNuHh5fMAJWD9etaL9HohHEIzMprgsj3ewJ+x7vdN3KJlXhNUHg5R0s+iuO6V/
-         wpW23fnV0BYfBLx78IcuxeBa/qg9fOiwZe7nafTbL+CJ2ngpIpENcWdNGLteppZWUKcG
-         mIzESXpUYQnlqoXd0tklVk9Fy+Wi6S8UOWLKyM8Jz/gDsOCNJJ4yJFbiZ6idXbWZEMAc
-         I3pZe8njDVDJlBxCyJj9E4UUnaJHXkoeANJYLIly8SPCYV9lOGXTfptHKXVB442A/vlG
-         j9UA==
-X-Forwarded-Encrypted: i=1; AJvYcCUCnKCwoVOzUxChi+QgTa/ufLG5lJrHMIwgOZOnstUcq8cenKsPcgZmGbdJ6wvgyw3Edk9t7LM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywfa7g/9PGKoO6U6Mf8pd1hOuI2H0E2u/kpQEC0tjaxHosnZ02r
-	Kq+39R7+FwqHGA3v0szAe6ioEZ5QzRanVuRJk2AzYmCczCKrLeaXnX0kl5p+H/RYCj2XEuq1KXh
-	WOivrxBC5g61yWXjcHUIjBDgOF0DybcwAymLNfTA4
-X-Gm-Gg: ASbGncuZNDZPcbtjaiQ6J8Dg0+tEQBsHUJ/I7/NCYXminsGTYZFiqAnLt9kD6OjSOq3
-	SUG7HFzXQwZ/d+OvwL8Imga1pze3v+7lvgXEbrWt7ULsuP3xX5RTRdfWXGgfu14/dh92029kyco
-	zvxz7wR0WTrUH58w3CxThw3I1Z4eFsyIeNSd6MHB2Fxw==
-X-Google-Smtp-Source: AGHT+IEYyJhquDhXJu2A8CjIMcrkTyNJiyOZCUfQrqQPO5fEMO//qsgPpSXFGCGxLZ6mkwnM1V3ab9TFgsOoAydVU/I=
-X-Received: by 2002:ac8:5fcf:0:b0:4a4:3d6e:57d4 with SMTP id
- d75a77b69052e-4a99883ca50mr157286881cf.46.1751872765053; Mon, 07 Jul 2025
- 00:19:25 -0700 (PDT)
+        bh=qxc/X70pqNaJOhCIrlhit0fU5Btv3EL3u2/8T9VYUKY=;
+        b=YVLx2r8SU3yF2ASMHYRBvBQ8qYclsY3tAMleKjlRe5sj9sDgL653ioKg5CuCC80qjW
+         xjbuw0eQHfwL3MChhS+Eb7RCRkza4+prgPAG4H+6OXdaSQKmmhjwNa30KqUvErw+rt+a
+         70kZjSKjWjlk/7gcYfq9TzNvQaiskSXAhSqruxdou5AbFnSusZyiKaVqMO67UdB2Eox7
+         M+J5pgTF3ocV23va5C98fJpykoIpFgXYco5bQCtXwZt+vB7ni1OnpLzbDjiyrfpWZP2H
+         yAhDMtupJxhgfuDY0pc24Y2/cyvw3AYhcYEsJnzhXz12ZIgjR7B/SUH8OTSsNwR2AitM
+         azEA==
+X-Gm-Message-State: AOJu0YxEMly2ERJVusGMHymLW+nzczF3fZf7JhpS5i0mfTTxm6Po/klC
+	ZLXc9PlLNM9WrZaOzqi/QFtC7pFCpHQx/npuA/rzh/qKqn0h9JQWTFnzDDj5Rtoq1qMwvhC86dQ
+	aVD5N60QXWn9FlADwEqam9Bh8AFMCL/SLyxMb+14d
+X-Gm-Gg: ASbGncs8mwBrhzuitdM5zr+RjgnehDGBU+hQ7SZWleoZJnEFJKbTTTwZtKYytYdKV+9
+	nf8joPpQpUxXnpZemgZDbV85y8jONbd2o44gZsD1Zmsj3OAZSrtKTFtSflG9xbVQyyMPZTnDOAE
+	S7CV6a9D5wrixhEF4pzXl11WcvwhzIYnzbJgvZoxDw+A==
+X-Google-Smtp-Source: AGHT+IG7wr5dEGh6h9pfxfRWkI384hQypq8lNPyCGN36O3Fa3+8sw2G/22BonIyraYeaEv0BoxQTe/Ssj2U6AuOxCXo=
+X-Received: by 2002:a05:622a:15cb:b0:4a7:6e64:a52b with SMTP id
+ d75a77b69052e-4a9987f8adamr167676801cf.35.1751872889643; Mon, 07 Jul 2025
+ 00:21:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1a24a603-b49f-4692-a116-f25605301af6@redhat.com> <20250707061707.74848-1-yangfeng59949@163.com>
-In-Reply-To: <20250707061707.74848-1-yangfeng59949@163.com>
+References: <20250707054112.101081-1-jiayuan.chen@linux.dev>
+In-Reply-To: <20250707054112.101081-1-jiayuan.chen@linux.dev>
 From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 7 Jul 2025 00:19:13 -0700
-X-Gm-Features: Ac12FXz9Oflp4WxYHT8N81vIRj_r3KU6iZACjxfFM-KEdW2Z-wtBpQlqG96pyAg
-Message-ID: <CANn89iLPYTArYRBKQmXF7TkcUxQCK53SJuAwmZY0GCxdFL7iNQ@mail.gmail.com>
-Subject: Re: [PATCH v3] skbuff: Add MSG_MORE flag to optimize large packet transmission
-To: Feng Yang <yangfeng59949@163.com>
-Cc: pabeni@redhat.com, aleksander.lobakin@intel.com, almasrymina@google.com, 
-	asml.silence@gmail.com, davem@davemloft.net, david.laight.linux@gmail.com, 
-	ebiggers@google.com, horms@kernel.org, kerneljasonxing@gmail.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	stfomichev@gmail.com, willemb@google.com, yangfeng@kylinos.cn
+Date: Mon, 7 Jul 2025 00:21:18 -0700
+X-Gm-Features: Ac12FXxxeKN13WecyDKW9_C_Pkuorhiq_652hNh4S6bIhPzhaSIolIIPI1t4jqA
+Message-ID: <CANn89iLRxmaj=Tc__BbK=AaauTKm0Mvb_SxQmaFb=xdj+kQu_A@mail.gmail.com>
+Subject: Re: [PATCH net-next v4] tcp: Correct signedness in skb remaining
+ space calculation
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, mrpre@163.com, 
+	syzbot+de6565462ab540f50e47@syzkaller.appspotmail.com, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	David Howells <dhowells@redhat.com>, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jul 6, 2025 at 11:17=E2=80=AFPM Feng Yang <yangfeng59949@163.com> w=
-rote:
-
+On Sun, Jul 6, 2025 at 10:41=E2=80=AFPM Jiayuan Chen <jiayuan.chen@linux.de=
+v> wrote:
 >
-> So do I need to resend the v2 version again (https://lore.kernel.org/all/=
-20250627094406.100919-1-yangfeng59949@163.com/),
-> or is this version also inapplicable in some cases?
+> Syzkaller reported a bug [1] where sk->sk_forward_alloc can overflow.
+>
+> When we send data, if an skb exists at the tail of the write queue, the
+> kernel will attempt to append the new data to that skb. However, the code
+> that checks for available space in the skb is flawed:
+> '''
+> copy =3D size_goal - skb->len
+> '''
+>
+> The types of the variables involved are:
+> '''
+> copy: ssize_t (s64 on 64-bit systems)
+> size_goal: int
+> skb->len: unsigned int
+> '''
+>
+> Due to C's type promotion rules, the signed size_goal is converted to an
+> unsigned int to match skb->len before the subtraction. The result is an
+> unsigned int.
+>
+> When this unsigned int result is then assigned to the s64 copy variable,
+> it is zero-extended, preserving its non-negative value. Consequently, cop=
+y
+> is always >=3D 0.
+>
+> Assume we are sending 2GB of data and size_goal has been adjusted to a
+> value smaller than skb->len. The subtraction will result in copy holding =
+a
+> very large positive integer. In the subsequent logic, this large value is
+> used to update sk->sk_forward_alloc, which can easily cause it to overflo=
+w.
+>
+> The syzkaller reproducer uses TCP_REPAIR to reliably create this
+> condition. However, this can also occur in real-world scenarios. The
+> tcp_bound_to_half_wnd() function can also reduce size_goal to a small
+> value. This would cause the subsequent tcp_wmem_schedule() to set
+> sk->sk_forward_alloc to a value close to INT_MAX. Further memory
+> allocation requests would then cause sk_forward_alloc to wrap around and
+> become negative.
+>
+> [1]: https://syzkaller.appspot.com/bug?extid=3Dde6565462ab540f50e47
+>
+> Reported-by: syzbot+de6565462ab540f50e47@syzkaller.appspotmail.com
+> Fixes: 270a1c3de47e ("tcp: Support MSG_SPLICE_PAGES")
+> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
 
-Or a V3 perhaps, limiting MSG_MORE hint to TCP sockets where it is
-definitely safe.
-
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index d6420b74ea9c6a9c53a7c16634cce82a1cd1bbd3..dc440252a68e5e7bb0588ab230f=
-bc5b7a656e220
-100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -3235,6 +3235,7 @@ typedef int (*sendmsg_func)(struct sock *sk,
-struct msghdr *msg);
- static int __skb_send_sock(struct sock *sk, struct sk_buff *skb, int offse=
-t,
-                           int len, sendmsg_func sendmsg, int flags)
- {
-+       int more_hint =3D sk_is_tcp(sk) ? MSG_MORE : 0;
-        unsigned int orig_len =3D len;
-        struct sk_buff *head =3D skb;
-        unsigned short fragidx;
-@@ -3252,7 +3253,8 @@ static int __skb_send_sock(struct sock *sk,
-struct sk_buff *skb, int offset,
-                kv.iov_len =3D slen;
-                memset(&msg, 0, sizeof(msg));
-                msg.msg_flags =3D MSG_DONTWAIT | flags;
--
-+               if (slen < len)
-+                       msg.msg_flags |=3D more_hint;
-                iov_iter_kvec(&msg.msg_iter, ITER_SOURCE, &kv, 1, slen);
-                ret =3D INDIRECT_CALL_2(sendmsg, sendmsg_locked,
-                                      sendmsg_unlocked, sk, &msg);
-@@ -3292,6 +3294,8 @@ static int __skb_send_sock(struct sock *sk,
-struct sk_buff *skb, int offset,
-                                             flags,
-                        };
-
-+                       if (slen < len)
-+                               msg.msg_flags |=3D more_hint;
-                        bvec_set_page(&bvec, skb_frag_page(frag), slen,
-                                      skb_frag_off(frag) + offset);
-                        iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1,
+Reviewed-by : Eric Dumazet <edumazet@google.com>
 
