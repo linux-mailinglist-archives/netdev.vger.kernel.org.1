@@ -1,145 +1,247 @@
-Return-Path: <netdev+bounces-204695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CDF6AFBCC5
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 22:48:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 721A1AFBCD1
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 22:50:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 190C17B3071
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 20:46:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B74C416DEE5
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 20:50:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21321F4CB2;
-	Mon,  7 Jul 2025 20:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5807121CC59;
+	Mon,  7 Jul 2025 20:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FtPObzA0"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="NvZLGt1Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B0A8488;
-	Mon,  7 Jul 2025 20:48:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F309221FC9
+	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 20:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751921283; cv=none; b=sD8Q8ReL+2rSV8ZEk977od97FkHiWR5d1lBEUNagi0eHqzq+4c80vFIIas7H4wmjMtCtcPJHf+abv+yhEtV7piaD4UZaIfTsySrsKeuoLOjtoCavbFg1Ynm3201QXf+koVcSlXQGDjEpVJyE0GuNXwUQqDVUtKSoOlVAu5ciEaA=
+	t=1751921400; cv=none; b=u4eOguXHRIaEu59YbbXWEWMCbLntznaZiOmK1bkxwB8xe6DrVRdftBhbZ1iT809A3G1ApusYBC7414xlfabfzIGW/e5/CsiBVOjMa1rPERXWXKMGb72fIy9tPBTi0ZovUlkRzrpZv5wiSBfr7XczLYMjw3ukhYku69EO/+s6QOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751921283; c=relaxed/simple;
-	bh=xJVtwmc/iK6WqebKZ4qTtDS2Kdb9R2RwXSRmNLz/nOc=;
+	s=arc-20240116; t=1751921400; c=relaxed/simple;
+	bh=1MhQRMD00+Av5qgq0nVni032LHE8EuKa1iorv+eBVqc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=is770slEQuetpqD0VAjtXZ15efvb9LBfrqVJbeVSchGvop7kI30xeQovAiknCmlw/Lyr7kLCeM7zmsOEfOTeCS7b8t07aIHjDXd5zJMlQdbGRtwdz8RztLbLaUtLbazKSTRdENCsvFbv569bAaDV/bYX5VTgwP5mwLcswFDSDy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FtPObzA0; arc=none smtp.client-ip=209.85.219.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e85e06a7f63so3155469276.1;
-        Mon, 07 Jul 2025 13:48:02 -0700 (PDT)
+	 To:Cc:Content-Type; b=M/0sS1Fcj6qSJFw3Si73r5U7+B+c4Y0YnsAahmP4/iUY3bQU050358co1641OToE7wmszcEP7lgaGkQ2rSOP+LH+oxhnofVd1z+eqlUSVFqOfuxTHYFxo+5OCl7iCKceXD6deb16Jnx6u0eYrpTsSsiDPnyVww8FMGu0JHHbdO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=NvZLGt1Y; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b321bd36a41so3110599a12.2
+        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 13:49:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751921281; x=1752526081; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1751921398; x=1752526198; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bTZfTlmBEIK7Q+Z0xK68TlVvd/e06jW2J6dQiNg6krg=;
-        b=FtPObzA0/hLiqKIwjbvR2R656SoCIlAe4n9rSnAPxC6LPezRzVqxqW2UbzDXfBEd9x
-         alyQlYRDJqYloqtZd+qexjaTpHgjKpsiB/i0PISQj+OtkjEDwvUtgvUGHl4BwyDiKSIk
-         iqTu49KEqLPOVBs3+FtEf9CgLr6hdKJv/s6Jq6+lg+92uLk+OSPDY//IQuL1IIUfsPPC
-         EWD0f+vlz79iSRPmMfGrSR85MoS9ebLpjY4qw4Og4tggGP87vzwDUuVrrHXwZcBK+Et1
-         yVk6vPV5+kasd+M+SorVULelFqf3LyTa+s4veXFV4D4/maZ07HDYQ4e4vSGbjYdH6ftu
-         GgPg==
+        bh=1MhQRMD00+Av5qgq0nVni032LHE8EuKa1iorv+eBVqc=;
+        b=NvZLGt1Yq/3uS9pHBjTgbuoTYC1IaEqf9D1erf8tzYw5W4Y4WhsSVV1PGg38R5K4eZ
+         AILMYddX9wzpXDyRhRVPn0wmSWYThzXeDQucDxMQaHx1fDSw/ODYye6JlWwXEjIwUQx0
+         Akv6PRn5Yx3dLozS56yEvXJg5DckbB+zNzHpkvHrtvCGQ0glXW1Mi/RqlCwcByjv1V3+
+         PZmMPoQL9VFDkcMVN+Lz+6OzqwkWPFLTKLSNVBowgxlyGa7rR9n+eIIiJJCtBB9PjJ9K
+         H7HG4NOsIwHmeJ73vni9rgfw8pxAxigZp3eOBy9Zs8YM3c0/N6R2sGZn1UxQUHN44tiQ
+         S9NA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751921281; x=1752526081;
+        d=1e100.net; s=20230601; t=1751921398; x=1752526198;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bTZfTlmBEIK7Q+Z0xK68TlVvd/e06jW2J6dQiNg6krg=;
-        b=V4wtAapzkpAFTdPn1g4spTxwmpSRr2vsNKl1cHuvUF0sfGf8ELjm5DghX7hTi3eh4d
-         yudUKJV0ZX7COAoxr2IjVK3WIr00hSkMeIVjcFeOzmGmVPkif++cs7UB3jqVHjRo8KxG
-         oBPtos57slVRlSrghoon6iWXdpVtOTTndhn0Jc6X4jRE9QHc/nY+/WJDijkr+jXySOM0
-         T3G2N01+k5ygk07SirAWYFrkwL4sWGU3gA78Qq6410FsShxUtayQMeImHSJOqaJZDw+X
-         ZQw+XOXHEVYTTJ8NV65LBV0tHTVzqmYsDk9KFUEtk7F7E4Cy/LDs3QKp63dvRWjtrdlG
-         9UAw==
-X-Forwarded-Encrypted: i=1; AJvYcCU5ic4NfXkFNE6A1yjoUVwrBtQ/tNyHjb8Lb9AHxvzmIYXgbE+zPA5St+DJgwbyDYupPK5IOUTPfJy+lZE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxo0Un/uaHsMvICXq06dCxbAiSWtYHqqKFknLJDv4R3vf3/vV6a
-	E7Jjf/Q8EfZE9lsSr1Qv1X71LPtl0ckHsNdjA7Ek0LKZmMHrJSIIiPz9mTnqMM3KmrsBR/bOkip
-	1ddEUiBRmk8Y/PFxPJLiGsDyjqQagCFw=
-X-Gm-Gg: ASbGnct/F6dEx0a54NnBZ6gyInMHG3+h5wfFPerikrQC5l7u3RsiyVIF2zhxLK+z2kG
-	DOEj23QgQEvXoO27nXRpFN8f2MTI7JbibBw6lhxb65LABUocMjuGIQUXkj+kH7I2dVel1f2MkfU
-	/9Eg/yLTbr+iWTD6hdO/mt9bUpTl6NkOcraGRntcXk651U5ek8Ho40YgsoEf+fU8aLt/4=
-X-Google-Smtp-Source: AGHT+IHWxLzF1XOgg0Mvh9rrnM+tU/Df1j+N31sIXa44sA1tQCOEDRPX9sKv0BiyOvyazV5xtA1UF0jHJJNPuiCbwdk=
-X-Received: by 2002:a05:690c:f10:b0:70e:1771:c165 with SMTP id
- 00721157ae682-71668d47310mr192088597b3.29.1751921281170; Mon, 07 Jul 2025
- 13:48:01 -0700 (PDT)
+        bh=1MhQRMD00+Av5qgq0nVni032LHE8EuKa1iorv+eBVqc=;
+        b=VViY82yKnovMIleate/43TsCrYNgwYM2a7u+oaWpggN+JtN6jIPJVi9UV69XGB3pCV
+         v+AXgm2rretBWIpm20Eu3+z82FxxTqKB+zrIffWgI+hAhNGZi/spw2L32DUKEzA9w1Q5
+         HcLtIim2Q31WHcXvr8bUMOvNNzK/MLWEsPop7QQZ31BnvEQyd3YCYmk678UKoIy++1K7
+         njb1JQBLMjDhxpNYu0aO29EttTeiwlA13UutJnHH2AfEfdYORmgrSdBYpXBrRu3l9N/H
+         BjoqCPZz6QL6yhJ8JlG02EtLP77xDP40yQYIeGbqEt1xrBND362TQRgTUP2CKV1iNaih
+         d2aw==
+X-Forwarded-Encrypted: i=1; AJvYcCVLHJ1AJyGD2yToAZH3uWZY6Vm5Ix7G7fzMM7pYky8C2p1NZxz35z6YOhHjQ+QoHyBFPkPiDkM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJ3N+RMpL+GHnbEKrTFfKgTDd0Ys6e55e4eldH0tXM65ossp3A
+	+eYph72BVGiIlruUfCc908snup0sMBlY1JZPJUEykz4QcbZed16Z/qsYIqckVvQcifnurLBXLb9
+	/+GH982JMlKr9CIGxui/R6/HKuy5L7C21s7giA8F2
+X-Gm-Gg: ASbGncuFxQp3oSV5ZCYGOjWiRpAUyfv6/z2T7xXLhuWKSUi/RxVvaBDGLpjUrxW+u+p
+	5F/u6SI+8gCbkebPipsQnZn3T4Hek+3Lt+hTZ39Jab0Nycp2do1w9KnngXciYIghmg9RqbL/fJs
+	ywTNXBMi+GTYJzx8V9/gqDo70W0kViNX83qyYl51f5aw==
+X-Google-Smtp-Source: AGHT+IH1Uc2/x6H7MOPzrWBvs8yZqvepSEedX1g7I7xn9HuCpzuxaCGEL50fSwR8DpcDpbduWbsH9tXyCTyi+wLyl+c=
+X-Received: by 2002:a05:6a20:7f9e:b0:1f5:a3e8:64c1 with SMTP id
+ adf61e73a8af0-226060889c5mr22790655637.0.1751921397560; Mon, 07 Jul 2025
+ 13:49:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250707003918.21607-2-rosenp@gmail.com> <202507080426.3RX5BOHi-lkp@intel.com>
-In-Reply-To: <202507080426.3RX5BOHi-lkp@intel.com>
-From: Rosen Penev <rosenp@gmail.com>
-Date: Mon, 7 Jul 2025 13:47:49 -0700
-X-Gm-Features: Ac12FXxnYnizo5pcZVLFOw4eNbzaqe2Xe-OqD4rjrt8Ta0IeWk0gI-_xVQvF8YI
-Message-ID: <CAKxU2N83JjTG19_GD-9LPJfe=aY4tU+7dFjRhFqGeLDn6beGKQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] net: dsa: rzn1_a5psw: add COMPILE_TEST
-To: kernel test robot <lkp@intel.com>
-Cc: netdev@vger.kernel.org, Paul Gazzillo <paul@pgazz.com>, 
-	Necip Fazil Yildiran <fazilyildiran@gmail.com>, oe-kbuild-all@lists.linux.dev, 
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	=?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	linux-kernel@vger.kernel.org
+References: <20250701231306.376762-1-xiyou.wangcong@gmail.com>
+ <20250701231306.376762-2-xiyou.wangcong@gmail.com> <aGSSF7K/M81Pjbyz@pop-os.localdomain>
+ <CAM0EoMmDj9TOafynkjVPaBw-9s7UDuS5DoQ_K3kAtioEdJa1-g@mail.gmail.com>
+ <CAM0EoMmBdZBzfUAms5-0hH5qF5ODvxWfgqrbHaGT6p3-uOD6vg@mail.gmail.com>
+ <aGh2TKCthenJ2xS2@pop-os.localdomain> <CAM0EoM=99ufQSzbYZU=wz8fbYOQ2v+cMa7BX1EM6OHk+dBrE0Q@mail.gmail.com>
+ <lhR3z8brE3wSKO4PDITIAGXGGW8vnrt1zIPo7C10g2rH0zdQ1lA8zFOuUBklLOTAgMcw4Z6N5YnqRXRzWnkHO-unr5g62msCAUHow-NmY7k=@willsroot.io>
+In-Reply-To: <lhR3z8brE3wSKO4PDITIAGXGGW8vnrt1zIPo7C10g2rH0zdQ1lA8zFOuUBklLOTAgMcw4Z6N5YnqRXRzWnkHO-unr5g62msCAUHow-NmY7k=@willsroot.io>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 7 Jul 2025 16:49:46 -0400
+X-Gm-Features: Ac12FXybeXnLOLjVUttkDQXM2ub0fX8k-T8tRXrLPgDiynef-zkiY0xdHH5TI08
+Message-ID: <CAM0EoM=SPbm6VdjPTTPRjtm7-gXzTvShrG=EdBiO7nCz=uJw0w@mail.gmail.com>
+Subject: Re: [Patch net 1/2] netem: Fix skb duplication logic to prevent
+ infinite loops
+To: William Liu <will@willsroot.io>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org, 
+	stephen@networkplumber.org, Savino Dicanosa <savy@syst3mfailure.io>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 7, 2025 at 1:25=E2=80=AFPM kernel test robot <lkp@intel.com> wr=
-ote:
+On Sun, Jul 6, 2025 at 10:59=E2=80=AFAM William Liu <will@willsroot.io> wro=
+te:
 >
-> Hi Rosen,
+> On Saturday, July 5th, 2025 at 1:52 PM, Jamal Hadi Salim <jhs@mojatatu.co=
+m> wrote:
 >
-> kernel test robot noticed the following build warnings:
+> >
+> >
+> > On Fri, Jul 4, 2025 at 8:48=E2=80=AFPM Cong Wang xiyou.wangcong@gmail.c=
+om wrote:
+> >
+> > > On Wed, Jul 02, 2025 at 11:04:22AM -0400, Jamal Hadi Salim wrote:
+> > >
+> > > > On Wed, Jul 2, 2025 at 10:12=E2=80=AFAM Jamal Hadi Salim jhs@mojata=
+tu.com wrote:
+> > > >
+> > > > > On Tue, Jul 1, 2025 at 9:57=E2=80=AFPM Cong Wang xiyou.wangcong@g=
+mail.com wrote:
+> > > > >
+> > > > > > On Tue, Jul 01, 2025 at 04:13:05PM -0700, Cong Wang wrote:
+> > > > > >
+> > > > > > > diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+> > > > > > > index fdd79d3ccd8c..33de9c3e4d1b 100644
+> > > > > > > --- a/net/sched/sch_netem.c
+> > > > > > > +++ b/net/sched/sch_netem.c
+> > > > > > > @@ -460,7 +460,8 @@ static int netem_enqueue(struct sk_buff *=
+skb, struct Qdisc *sch,
+> > > > > > > skb->prev =3D NULL;
+> > > > > > >
+> > > > > > > /* Random duplication */
+> > > > > > > - if (q->duplicate && q->duplicate >=3D get_crandom(&q->dup_c=
+or, &q->prng))
+> > > > > > > + if (tc_skb_cb(skb)->duplicate &&
+> > > > > >
+> > > > > > Oops, this is clearly should be !duplicate... It was lost durin=
+g my
+> > > > > > stupid copy-n-paste... Sorry for this mistake.
+> > > > >
+> > > > > I understood you earlier, Cong. My view still stands:
+> > > > > You are adding logic to a common data structure for a use case th=
+at
+> > >
+> > > You are exaggerating this. I only added 1 bit to the core data struct=
+ure,
+> > > the code logic remains in the netem, so it is contained within netem.
+> >
+> >
+> > Try it out ;->
+> >
+> > Here's an even simpler setup:
+> >
+> > sudo tc qdisc add dev lo root handle 1: prio bands 3 priomap 0 0 0 0 0
+> > 0 0 0 0 0 0 0 0 0 0 0
+> > sudo tc filter add dev lo parent 1:0 protocol ip bpf obj
+> > netem_bug_test.o sec classifier/pass classid 1:1
+> > sudo tc qdisc add dev lo parent 1:1 handle 10: netem limit 4 duplicate =
+100%
+> > then:
+> > ping -c 1 127.0.0.1
+> >
+> > Note: there are other issues as well but i thought citing the ebpf one
+> > was sufficient to get the point across.
+> >
+> > > > > really makes no sense. The ROI is not good.
+> > >
+> > > Speaking of ROI, I think you need to look at the patch stats:
+> > >
+> > > William/Your patch:
+> > > 1 file changed, 40 insertions(+)
+> > >
+> > > My patch:
+> > > 2 files changed, 4 insertions(+), 4 deletions(-)
+> >
+> >
+> > ROI is not just about LOC. The consequences of a patch are also part
+> > of that formula. And let's not forget the time spent so far debating
+> > instead of plugging the hole.
+> >
+> > > > > BTW: I am almost certain you will hit other issues when this goes=
+ out
+> > > > > or when you actually start to test and then you will have to fix =
+more
+> > > > > spots.
+> > > >
+> > > > Here's an example that breaks it:
+> > > >
+> > > > sudo tc qdisc add dev lo root handle 1: prio bands 3 priomap 0 0 0 =
+0 0
+> > > > 0 0 0 0 0 0 0 0 0 0 0
+> > > > sudo tc filter add dev lo parent 1:0 protocol ip bpf obj
+> > > > netem_bug_test.o sec classifier/pass classid 1:1
+> > > > sudo tc qdisc add dev lo parent 1:1 handle 10: netem limit 4 duplic=
+ate 100%
+> > > > sudo tc qdisc add dev lo parent 10: handle 30: netem gap 1 limit 4
+> > > > duplicate 100% delay 1us reorder 100%
+> > > >
+> > > > And the ping 127.0.0.1 -c 1
+> > > > I had to fix your patch for correctness (attached)
+> > > >
+> > > > the ebpf prog is trivial - make it just return the classid or even =
+zero.
+> > >
+> > > Interesting, are you sure this works before my patch?
+> > >
+> > > I don't intend to change any logic except closing the infinite loop. =
+IOW,
+> > > if it didn't work before, I don't expect to make it work with this pa=
+tch,
+> > > this patch merely fixes the infinite loop, which is sufficient as a b=
+ug fix.
+> > > Otherwise it would become a feature improvement. (Don't get me wrong,=
+ I
+> > > think this feature should be improved rather than simply forbidden, i=
+t just
+> > > belongs to a different patch.)
+> >
+> >
+> > A quick solution is what William had. I asked him to use ext_cb not
+> > because i think it is a better solution but just so we can move
+> > forward.
+> > Agree that for a longer term we need a more generic solution as discuss=
+ed ...
+> >
+> > cheers,
+> > jamal
 >
-> [auto build test WARNING on net/main]
-> [also build test WARNING on net-next/main linus/master horms-ipvs/master =
-v6.16-rc5 next-20250704]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> The tc_skb_ext approach has a problem... the config option that enables i=
+t is NET_TC_SKB_EXT. I assumed this is a generic name for skb extensions in=
+ the tc subsystem, but unfortunately this is hardcoded for NET_CLS_ACT reci=
+rculation support.
 >
-> url:    https://github.com/intel-lab-lkp/linux/commits/Rosen-Penev/net-ds=
-a-rzn1_a5psw-add-COMPILE_TEST/20250707-130922
-> base:   net/main
-> patch link:    https://lore.kernel.org/r/20250707003918.21607-2-rosenp%40=
-gmail.com
-> patch subject: [PATCH 1/2] net: dsa: rzn1_a5psw: add COMPILE_TEST
-> config: alpha-kismet-CONFIG_PCS_RZN1_MIIC-CONFIG_NET_DSA_RZN1_A5PSW-0-0 (=
-https://download.01.org/0day-ci/archive/20250708/202507080426.3RX5BOHi-lkp@=
-intel.com/config)
-> reproduce: (https://download.01.org/0day-ci/archive/20250708/202507080426=
-.3RX5BOHi-lkp@intel.com/reproduce)
+> So what this means is we have the following choices:
+> 1. Make SCH_NETEM depend on NET_CLS_ACT and NET_TC_SKB_EXT
+> 2. Add "|| IS_ENABLED(CONFIG_SCH_NETEM)" next to "IS_ENABLED(CONFIG_NET_T=
+C_SKB_EXT)"
+> 3. Separate NET_TC_SKB_EXT and the idea of recirculation support. But I'm=
+ not sure how people feel about renaming config options. And this would req=
+uire a small change to the Mellanox driver subsystem.
 >
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202507080426.3RX5BOHi-lkp=
-@intel.com/
+> None of these sound too nice to do, and I'm not sure which approach to ta=
+ke. In an ideal world, 3 would be best, but I'm not sure how others would f=
+eel about all that just to account for a netem edge case.
 >
-> kismet warnings: (new ones prefixed by >>)
-> >> kismet: WARNING: unmet direct dependencies detected for PCS_RZN1_MIIC =
-when selected by NET_DSA_RZN1_A5PSW
->    WARNING: unmet direct dependencies detected for PCS_RZN1_MIIC
->      Depends on [n]: NETDEVICES [=3Dy] && OF [=3Dn] && (ARCH_RZN1 [=3Dn] =
-|| COMPILE_TEST [=3Dy])
->      Selected by [y]:
->      - NET_DSA_RZN1_A5PSW [=3Dy] && NETDEVICES [=3Dy] && NET_DSA [=3Dy] &=
-& (OF [=3Dn] && ARCH_RZN1 [=3Dn] || COMPILE_TEST [=3Dy])
-so it's probably better to do
-depends on OF && (ARCH_RZN1 || COMPILE_TEST)
-to match the pcs driver.
 
-not sure it would fix this error though...
->
-> --
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
+I think you should just create a new field/type, add it here:
+include/linux/skbuff.h around line 4814 and make netem just select
+CONFIG_SKB_EXTENSIONS kconfig
+It's not the best solution but we are grasping for straws at this point.
+
+cheers,
+jamal
 
