@@ -1,131 +1,114 @@
-Return-Path: <netdev+bounces-204567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8474AFB37C
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 14:45:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DD53AFB388
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 14:48:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FEB94A298C
-	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 12:45:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F10361AA4132
+	for <lists+netdev@lfdr.de>; Mon,  7 Jul 2025 12:48:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36F4B289E05;
-	Mon,  7 Jul 2025 12:45:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF18B28FFE6;
+	Mon,  7 Jul 2025 12:48:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VewM37dd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EW5dwWOR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91EA11E51EF
-	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 12:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 612681E51EF
+	for <netdev@vger.kernel.org>; Mon,  7 Jul 2025 12:48:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751892322; cv=none; b=HL9eZoHZ+/r1wql0cTMuiWXLe1S3OPW/dHw6XQUfyjIQL84Q+qT8wXvz8ZtzleP+QsIEBXPqZk9MpS2y9MemUYtWV0GvwnBrZjseQv9qSudbo8Y+kpAjAcrLl4cGuWxqTETn1uXof0XWe3uX6d/eZvMmdyKnnNQBNegCGG7SBPY=
+	t=1751892514; cv=none; b=rDaGx4HCs8xMEJI6jUPfkETOMxrJh97B6neQsACLOSwOZXCR91HiiOxhWGUcF8VvpRFJIWFsFzHcQUtg/HAQUzI12lIcL6C2Su6kGb9ZmOm/OfkBOL6eTNK9k1bf6yrLGU/HDT43k2Bzw40VwcwPylmlUujQmM0ocwAPY1rZm78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751892322; c=relaxed/simple;
-	bh=mAb87fXBGDVXDZ0JPirJNsxeZkkIXHxmpepCDDLlLls=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=iDpfLgeZkd7lF5v8JZAxXwDNo71tKaarEO7glEeqxglmtkvNQZs5/TtScGLET/PFy+a/Nm/5E1YQ2gOtUTMriIyAaj9ybJaFDS/Gnr2/JjyVPpzT5mfcRx57Z+yQ/pJfzlOFe9zXYm8oqcDMeev8AKT7VLRC7+pZIl3Prdj0vAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VewM37dd; arc=none smtp.client-ip=209.85.219.74
+	s=arc-20240116; t=1751892514; c=relaxed/simple;
+	bh=NXpBj1xWmYSm2okDyKpLvpJZzkmkIQDkt0bkS1rc0rg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GAnljHCedDWV0gSnuu8u5qLOFMfvgpqbErcAI6zxftBf80Pq14cckemR4LyTSVvQkilQeD7TytrmlPA8SxzU7gGXOUoK3cmG+XIGaf8iJ1ymRtnHvNM7pLEZ4iR/mtMfWaSC5REU+zR4Ajo3Bch5y8I2EWZ2DHX/LZ4fcc/ruyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EW5dwWOR; arc=none smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-6fafc9f3e1bso49114106d6.0
-        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 05:45:20 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4a5903bceffso46494241cf.3
+        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 05:48:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751892319; x=1752497119; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Mx/au/ucpX1Q+GazmfVIyz7+AbuT93/bgT+tTi6UiYM=;
-        b=VewM37dd0vv6DdBU1I8mrXgS/1sEObB4vBJKV7Yxuy2mpbxf3Lm6MQzk8DKHLXnSrG
-         LWF35I+cca67QYk6QDEu4G81CLKDkkVZTvELwYDD+sCvuTdWM9sGMqhGrUwQlAUA/JHo
-         lsncmqCfXgF89ozcuSTZZSkzO1164bdZ6UW3uowc81Nl/v2/OaeQVdIYYECCHs6550Pc
-         F2nZqyNeEpr49gjUQFKzpg3WVD6xl9yO0UVs6uFMaZUSDRcdeOIRrgUEAjP1YxfOP0/O
-         cneFX8lbYT1QQlQxLIsFZJiwYTxST8j4P+vChIlGM/BOI7nKRX/VnI4vMiMNRWCi3YRW
-         xR2g==
+        d=google.com; s=20230601; t=1751892512; x=1752497312; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NXpBj1xWmYSm2okDyKpLvpJZzkmkIQDkt0bkS1rc0rg=;
+        b=EW5dwWORw1YPgr7fuixxgWCPXokw9thYRtVZiMWvRFBTDeuVAFni012yQRzx6Wk2DG
+         ziSiqdvXegPif9nKIK1IY3gFIA+kG8sB1nhWhTccXvFcA1viTYoI8n9GxjKQde5rvl/1
+         7WXlR/wp6dyAqvTv+hJF7xFojy/BDDSGnEjQkoLHdmFq7yk9QPcSugRfUnyoS2RhRqOh
+         5sj7pa2LBjII7AOB0/Nu4+gL2D0N730byb+tY3sf2f5rqMODIkYCqt0MIffHoKKTghzd
+         pvVj1JAVIu2yT43ViNxvljeYo3nZQqFsgcHjZzWRJoQBxt5R673OWVhBxJkGyM2e+Pfs
+         zkIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751892319; x=1752497119;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Mx/au/ucpX1Q+GazmfVIyz7+AbuT93/bgT+tTi6UiYM=;
-        b=D/XYCU+PEXaBGOVlY+s4u2imHIVI+dgKwQy1FEbQnawOHGoIiXSfGsM3x3A3M0X1mt
-         9s5vcVfG6ejlALBgwOW1urUJeGGE5fKH04LNvUJ0rPN+60IVWYGI7Y3W4k9Jc9DwYiwQ
-         hbESr5QV88wg0VLOG51cyGT9NvwIsA/8o3c7YVw2eMw7cy7o37dxYkQIq1lkiwxORiF2
-         VOsuHSRK+Rcwh0aibiYdbvvRxI425c8CA3BRYU12yMCnGj6Ox1CgUt1Vkx4i9NAPmM/b
-         3KJB677/HxKAFubNo1fU5nGhvznfGOYIyoVaFo0h6QYq2eh4pzT1XBFb5sMJrL+BMgpp
-         Gu8g==
-X-Gm-Message-State: AOJu0YyU7gm5rfVDt8/T7qKewN75LFOSytsWEwVEFoxmTFThkk0R2nUJ
-	f/eTmp9xJ2izcSSUndq895XwcOxdnX1OZG2lUu74h/tBmxWD5lfGWHl5b2R1i6TvrBU15DAGeJP
-	XYudlKaTiGtWwhA==
-X-Google-Smtp-Source: AGHT+IGbAx51UxKP3h0/ZliZVJ6ft5RP8SjqFxTr0zzXn/91aFTd+6YP5jLXtKyBp3vrcziylQJL0dHHNladxw==
-X-Received: from qvbmw8.prod.google.com ([2002:a05:6214:33c8:b0:6fd:74e5:26b1])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:5d0f:b0:6fd:609d:e924 with SMTP id 6a1803df08f44-702d16b5b13mr153633826d6.36.1751892319483;
- Mon, 07 Jul 2025 05:45:19 -0700 (PDT)
-Date: Mon,  7 Jul 2025 12:45:17 +0000
+        d=1e100.net; s=20230601; t=1751892512; x=1752497312;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NXpBj1xWmYSm2okDyKpLvpJZzkmkIQDkt0bkS1rc0rg=;
+        b=NNcpaxZSL8eph0BiQ0J66LU8GAlSS+Za2dIYY5dnrA39N4dZQcSVirmXujHKu1kM/o
+         Nm3ng8g3OcnSTq+2006njElWprNt5AOzrSIuduLwPV/706VMkAPUtanCfjbDOBZ3JTmK
+         I9dGERgOOQg7twVw2q/2tQx51crvvGUw5OmwBmJFh3n5XbIn0UerTxSIzmrSLdDKqB8c
+         /AKd7YctqxWmd0bVZgouC1lBtgUgeu2bQHuwc2TLe9MuRoxxQY/xunzWQ1FWvkaMhySQ
+         lbamfF96W1AvhE6h4w85PgNxMYoDTKv87/lSzLSzRs8JgqMa/8jfGsYsrkQV6ZPfcuTv
+         EG6A==
+X-Forwarded-Encrypted: i=1; AJvYcCWMeLkAeszFSFyJwQp010JCAf4pmsLgXBdmu3aC/ggFfHmDtcS0+LtgfOh402nddhgL8ee7lic=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1b8yPyLAMhL90i1OArnTaa+ebIJhLH7qHUmMRyMh4vG3xmdrG
+	gGba+dZuu5LMxbhUf0pFmDZDVIY95xVKO/26g+GCIW82JRLy3Ktd8N3BX7cax+zyW45zUstJoDW
+	OY2R60VtXUiYQVqfyeg5bQLh7bDCsZqGZeYkiql8b
+X-Gm-Gg: ASbGnctLA38ntTOnR2oq/L2oc/qGcDJDKmN/LxDxsMJ+P68Stm8DQ0Ho89tiiqK8BQS
+	2u3Q+/MJAow2XT8Ky1joXh2upv4rzjBw7OUnOJw6r7vaNFhS/R7LCBc+SBI/VKOPG5j/zQDYx1r
+	zYapuWvyHAPD8ZNVgDL9Nnws/E//0skxAxcHJEP9LD+co=
+X-Google-Smtp-Source: AGHT+IGE1/XRTdSQDLc9V189phd4jHM7XVm3uMpcn0vgf/Ns7dLtQveHK+v9fsiJrfRa4TWVDv16yAZUooYaDzGa39w=
+X-Received: by 2002:a05:622a:400f:b0:476:7b0b:30fb with SMTP id
+ d75a77b69052e-4a9a6dc6185mr151173411cf.22.1751892511959; Mon, 07 Jul 2025
+ 05:48:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250707124517.614489-1-edumazet@google.com>
-Subject: [PATCH net] netfilter: flowtable: account for Ethernet header in nf_flow_pppoe_proto()
+MIME-Version: 1.0
+References: <20250707105205.222558-1-daniel.sedlak@cdn77.com>
+In-Reply-To: <20250707105205.222558-1-daniel.sedlak@cdn77.com>
 From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Jozsef Kadlecsik <kadlec@netfilter.org>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	coreteam@netfilter.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+bf6ed459397e307c3ad2@syzkaller.appspotmail.com
+Date: Mon, 7 Jul 2025 05:48:19 -0700
+X-Gm-Features: Ac12FXzOaT691PWcNP8FePx9AQibU4CArjSNEVwylpr2hqUBjQG3P5r3EGY0ZLc
+Message-ID: <CANn89i+=haaDGHcG=5etnNcftKM4+YKwdiP6aJfMqrWpDgyhvg@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: account for memory pressure signaled by cgroup
+To: Daniel Sedlak <daniel.sedlak@cdn77.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	David Ahern <dsahern@kernel.org>, Jiayuan Chen <jiayuan.chen@linux.dev>, 
+	Christian Hopps <chopps@labn.net>, Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org, 
+	linux-doc@vger.kernel.org, Matyas Hurtik <matyas.hurtik@cdn77.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot found a potential access to uninit-value in nf_flow_pppoe_proto()
+On Mon, Jul 7, 2025 at 3:55=E2=80=AFAM Daniel Sedlak <daniel.sedlak@cdn77.c=
+om> wrote:
+>
+> Currently, we have two memory pressure counters for TCP sockets [1],
+> which we manipulate only when the memory pressure is signalled through
+> the proto struct [2].
+>
+> However, the memory pressure can also be signaled through the cgroup
+> memory subsystem, which we do not reflect in the netstat counters.
+>
+> This patch adds a new counter to account for memory pressure signaled by
+> the memory cgroup.
 
-Blamed commit forgot the Ethernet header.
+OK, but please amend the changelog to describe how to look at the
+per-cgroup information.
 
-BUG: KMSAN: uninit-value in nf_flow_offload_inet_hook+0x7e4/0x940 net/netfilter/nf_flow_table_inet.c:27
-  nf_flow_offload_inet_hook+0x7e4/0x940 net/netfilter/nf_flow_table_inet.c:27
-  nf_hook_entry_hookfn include/linux/netfilter.h:157 [inline]
-  nf_hook_slow+0xe1/0x3d0 net/netfilter/core.c:623
-  nf_hook_ingress include/linux/netfilter_netdev.h:34 [inline]
-  nf_ingress net/core/dev.c:5742 [inline]
-  __netif_receive_skb_core+0x4aff/0x70c0 net/core/dev.c:5837
-  __netif_receive_skb_one_core net/core/dev.c:5975 [inline]
-  __netif_receive_skb+0xcc/0xac0 net/core/dev.c:6090
-  netif_receive_skb_internal net/core/dev.c:6176 [inline]
-  netif_receive_skb+0x57/0x630 net/core/dev.c:6235
-  tun_rx_batched+0x1df/0x980 drivers/net/tun.c:1485
-  tun_get_user+0x4ee0/0x6b40 drivers/net/tun.c:1938
-  tun_chr_write_iter+0x3e9/0x5c0 drivers/net/tun.c:1984
-  new_sync_write fs/read_write.c:593 [inline]
-  vfs_write+0xb4b/0x1580 fs/read_write.c:686
-  ksys_write fs/read_write.c:738 [inline]
-  __do_sys_write fs/read_write.c:749 [inline]
-
-Reported-by: syzbot+bf6ed459397e307c3ad2@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/686bc073.a00a0220.c7b3.0086.GAE@google.com/T/#u
-Fixes: 87b3593bed18 ("netfilter: flowtable: validate pppoe header")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/netfilter/nf_flow_table.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/net/netfilter/nf_flow_table.h b/include/net/netfilter/nf_flow_table.h
-index d711642e78b57c75043e94bf00b782398e5f3621..c003cd194fa2ae40545a196fcc74e83c2868b113 100644
---- a/include/net/netfilter/nf_flow_table.h
-+++ b/include/net/netfilter/nf_flow_table.h
-@@ -370,7 +370,7 @@ static inline __be16 __nf_flow_pppoe_proto(const struct sk_buff *skb)
- 
- static inline bool nf_flow_pppoe_proto(struct sk_buff *skb, __be16 *inner_proto)
- {
--	if (!pskb_may_pull(skb, PPPOE_SES_HLEN))
-+	if (!pskb_may_pull(skb, ETH_HLEN + PPPOE_SES_HLEN))
- 		return false;
- 
- 	*inner_proto = __nf_flow_pppoe_proto(skb);
--- 
-2.50.0.727.gbf7dc18ff4-goog
-
+Imagine that in the future, someone finds this new counter being
+incremented and look at your changelog,
+I am sure that having some details on how to find the faulty cgroup
+would also help.
 
