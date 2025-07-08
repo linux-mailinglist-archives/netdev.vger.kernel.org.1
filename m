@@ -1,258 +1,74 @@
-Return-Path: <netdev+bounces-205110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75AC7AFD6B7
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 20:50:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E99EAFD6CF
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 21:03:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 808AC3AEC9D
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 18:50:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE5605631E2
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 19:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA8892DFF2E;
-	Tue,  8 Jul 2025 18:50:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C73BB22069A;
+	Tue,  8 Jul 2025 19:03:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="RH4BtjTr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EZaZWLDH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF76B21D3E1
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 18:50:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E334801;
+	Tue,  8 Jul 2025 19:03:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752000648; cv=none; b=sIRQc9RLczYVu7+JtLhkFntJFhcgC3Yr6pGtLhTk5e9pHUzHSFEVVsdwW3x974qJkf2wElAsTFDaQw3Ms4iyA4hn/5IzOyWjXZzx5bNay0OWiWt5hobXUDyw3h4GxcYtntHx4n0wtFmnOSzUyQHYXSiQfkI3qABP8o2inlNo1s8=
+	t=1752001418; cv=none; b=XbOnS03CkTi6vyE4TH8Mx8lg6HgVdjeil2IH0DRYkQ+rfwNZ8U+4vzyRSNX2sbkDEevvfawHZ/0msuaH5Jb6/mFw+2ld3tiAi9Llq0x+7tmf+t7ojmtiyk5PR/nm5j4G+JQ2CixXvX11HUlzgusP7yO8fz5VsCeA5giRAoymu+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752000648; c=relaxed/simple;
-	bh=3LdF7wva2jb4JemmjOKwhVJIDQ2UKzn/dAabjrrFtwI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l2f4VLFbQnffqtz6ZU18C2BQpnnKzsBI90vc/2eDZQjq5E+M9KNVsaAJphIF6h0Zo+ZcnF/vG75XJ0QbdnAyzRCn2dSGyyxlWIRQ+PTaCXqT3l//ekvnAdKMoQaQUC7dTpCz1Vg477inwuSr2IpEzEent9lNMnJb7V5dV75BJtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=RH4BtjTr; arc=none smtp.client-ip=209.85.215.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b31e0ead80eso3633023a12.0
-        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 11:50:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1752000646; x=1752605446; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=74q57dn8CmdfQ8s0Cfxkxh9Tgrle/3f5OFPRFmuxBh0=;
-        b=RH4BtjTr6xOONdyRThv2oo0FABhxpCtfrw7NyryVlasrpdaBh2SV6jv32O43Dfm5qJ
-         iJDlnfXcg2JWwmLIrrbGABN7wTrDmosehFHhoxg/lK0XoEaV/b26fw4QXEHP4eCgclLS
-         K4FvUxRG9bo0vMO9ya7itSiOY4p7UtgtU+iSeL9Dbt3N3S8kcCnBdIjQRm70mgfenut/
-         iz3ivYkO/H7DMc7QWuor58REf2b0uxqgENxT8gEgyLjYCcitbZRInRCjZ+KYs5AAKgT0
-         PYawn40IndQsW8/txeb1fTKqDCbUwkIIOaM7eG2Dlx585LDcox5IMBKa1gTHqYjeJXXD
-         sVWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752000646; x=1752605446;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=74q57dn8CmdfQ8s0Cfxkxh9Tgrle/3f5OFPRFmuxBh0=;
-        b=psFHIGHHbKJ6dFGED/3bzdIjtI+TE/54xDewRj1h7ENkQv+bdWU44Q7zqXznzK26Mw
-         piOJjgex+Ox2dAIUovUbUG15Mc9Ol35GU3K31e2SVGW+qDerVCjqA7FovLOCf0FPkm6z
-         m9/eeyL1IGeo31njmQi4xrdoTtvKrsKApi9JVUscepvpl/QXtaZI2I5mPv5tkJgYxV0s
-         XEi9qyfqJxqfKpKtpsatNN5BfxnzfZVxcZdbowV/PilsRXeD850Njmc3Wm9FKKJUZUT8
-         OGmQjkrILJ23BwYW6CWkiI07ECQyCxHuF3kL1UhbLxOClPV7e7oo+Pj96WeSDWY4siii
-         r0lQ==
-X-Gm-Message-State: AOJu0YwOf2z7LKftPhvJ3ASvGJtsVILZB9oBUC840Z09Lu8MCE+8RNAQ
-	Sm6UxNMSGCPJcWD2tlvEKZB4KvDh3IiITm9lBjttVNYoj/aJfJa4a0GN4Tr2liDViK4tV6Dmfe2
-	T4rZorplSzyKrX+M6IauYlpqSxfSTZovTrN4OuJzk
-X-Gm-Gg: ASbGncs7YHjIYqrMqyhWpltOzjDqNhTaihd6q4MO1/dsICYr6vIHIL8NTMllrHViL8l
-	z0q3Gs2lPhVF6oB+NklNd9c6iM/FbVljjb7hiKbhifzSdc1wq64G683QBq3w0da85t7Lo+vxjco
-	J/8mvRNXmIRaDjepJc/oVYeu8+nSZ/akPxIPBj9G+P/48Uj+mgAk49
-X-Google-Smtp-Source: AGHT+IGwzgF45bMHUzIdu5Y1Fa3gGjSJWsOR0yv7tvQhebpcdnbr8/DdZAwxmBKbrWZXqmNw/QZoaI8k+Peei3UC/Fg=
-X-Received: by 2002:a05:6a21:3285:b0:220:a509:dcc with SMTP id
- adf61e73a8af0-22c7e98f025mr883456637.26.1752000645882; Tue, 08 Jul 2025
- 11:50:45 -0700 (PDT)
+	s=arc-20240116; t=1752001418; c=relaxed/simple;
+	bh=GHcZnk2bIg2LnEuxbdd9Nbxx/LOWDNPMl+Rh13K5rGs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qZ5oX151xLJmW9W7EDnAt01NKb+1pUqAbR7V2i2u2dbF4GAOShxRg7XLXHPWfOIw0XumBg7VIcWCZKphNHgXG8R7xew9ngHtZ2HSZIHN9El1dPj3RqpAywgg0zi4tm5eleSQfsmwK6hCsM8C+V7bW1Ro/rnlXOJPsh/nFHZ+0H0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EZaZWLDH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81176C4CEED;
+	Tue,  8 Jul 2025 19:03:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752001418;
+	bh=GHcZnk2bIg2LnEuxbdd9Nbxx/LOWDNPMl+Rh13K5rGs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EZaZWLDHIls3zFiL6RkrOHXTN2RdqBsCrNWrk1rq2edSY9SYL2XUWZM/xK6qTXakv
+	 BbxzRJOTtCmGRBYPbdPAZV3NYxWBvxRJ8b1bDkbY7rIwWeAVd3WfMK1LwSYs1Mjyfw
+	 haUHBdpZuSVlJTMs63KMC8CsowiLEUYoK07+0GF72EHqgz9ACvM3w2HcQYr3BQsDAi
+	 WaFi3h3QogaK82PqX24TrW7L0lvV3j7EegCmADT+ZjfOKpdO47G+VVkARdIKM045oN
+	 G0aQVo7EBPJ5/xpNlHcox2tTFk6szhMwelkdjqz9uTUcgJV8ll9GWLC8WdKWhMdKA0
+	 vhbXCKoU2BNNw==
+Date: Tue, 8 Jul 2025 12:03:36 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, linux-afs@lists.infradead.org,
+ linux-kernel@vger.kernel.org, "Junvyyang, Tencent Zhuque Lab"
+ <zhuque@tencent.com>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net 2/2] rxrpc: Fix bug due to prealloc collision
+Message-ID: <20250708120336.03383758@kernel.org>
+In-Reply-To: <20250707102435.2381045-3-dhowells@redhat.com>
+References: <20250707102435.2381045-1-dhowells@redhat.com>
+	<20250707102435.2381045-3-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250708164141.875402-1-will@willsroot.io> <20250708164219.875521-1-will@willsroot.io>
-In-Reply-To: <20250708164219.875521-1-will@willsroot.io>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 8 Jul 2025 14:50:34 -0400
-X-Gm-Features: Ac12FXwXEkJ7U828-862RvGyjMm9NR9WyXgTAJHYKEEV397DPtZ2Tm94NhDXk08
-Message-ID: <CAM0EoMmG6fMxi_BaX5Rn7EEZHbMh=eea_+J50G6-OtHfWobSvQ@mail.gmail.com>
-Subject: Re: [PATCH net v5 2/2] selftests/tc-testing: Add tests for
- restrictions on netem duplication
-To: William Liu <will@willsroot.io>
-Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, victor@mojatatu.com, 
-	pctammela@mojatatu.com, pabeni@redhat.com, kuba@kernel.org, 
-	stephen@networkplumber.org, dcaratti@redhat.com, savy@syst3mfailure.io, 
-	jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 8, 2025 at 12:44=E2=80=AFPM William Liu <will@willsroot.io> wro=
-te:
->
-> Ensure that a duplicating netem cannot exist in a tree with other netems
-> in both qdisc addition and change. This is meant to prevent the soft
-> lockup and OOM loop scenario discussed in [1]. Also adjust a HFSC's
-> re-entrancy test case with netem for this new restriction - KASAN
-> still triggers upon its failure.
->
-> [1] https://lore.kernel.org/netdev/8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilx=
-sEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=3D@wi=
-llsroot.io/
->
-> Signed-off-by: William Liu <will@willsroot.io>
-> Reviewed-by: Savino Dicanosa <savy@syst3mfailure.io>
+On Mon,  7 Jul 2025 11:24:34 +0100 David Howells wrote:
+> +	rxrpc_prefail_call(call, RXRPC_CALL_LOCAL_ERROR, -EBADSLT);
+> +	__set_bit(RXRPC_CALL_RELEASED, &call->flags);
 
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+is the __set_bit() needed / intentional here?
+Looks like rxrpc_prefail_call() does:
 
-cheers,
-jamal
-
-> v1 -> v2:
->   - Fixed existing test case for new restrictions
->   - Add test cases
->   - Use dummy instead of lo
-> ---
->  .../tc-testing/tc-tests/infra/qdiscs.json     |  5 +-
->  .../tc-testing/tc-tests/qdiscs/netem.json     | 81 +++++++++++++++++++
->  2 files changed, 83 insertions(+), 3 deletions(-)
->
-> diff --git a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.jso=
-n b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-> index 9aa44d8176d9..9acc88297484 100644
-> --- a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-> +++ b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-> @@ -478,7 +478,6 @@
->              "$TC qdisc add dev $DUMMY parent 1:1 handle 2:0 netem duplic=
-ate 100%",
->              "$TC filter add dev $DUMMY parent 1:0 protocol ip prio 1 u32=
- match ip dst 10.10.10.1/32 flowid 1:1",
->              "$TC class add dev $DUMMY parent 1:0 classid 1:2 hfsc ls m2 =
-10Mbit",
-> -            "$TC qdisc add dev $DUMMY parent 1:2 handle 3:0 netem duplic=
-ate 100%",
->              "$TC filter add dev $DUMMY parent 1:0 protocol ip prio 2 u32=
- match ip dst 10.10.10.2/32 flowid 1:2",
->              "ping -c 1 10.10.10.1 -I$DUMMY > /dev/null || true",
->              "$TC filter del dev $DUMMY parent 1:0 protocol ip prio 1",
-> @@ -491,8 +490,8 @@
->              {
->                  "kind": "hfsc",
->                  "handle": "1:",
-> -                "bytes": 392,
-> -                "packets": 4
-> +                "bytes": 294,
-> +                "packets": 3
->              }
->          ],
->          "matchCount": "1",
-> diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.jso=
-n b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json
-> index 3c4444961488..718d2df2aafa 100644
-> --- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json
-> +++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/netem.json
-> @@ -336,5 +336,86 @@
->          "teardown": [
->              "$TC qdisc del dev $DUMMY handle 1: root"
->          ]
-> +    },
-> +    {
-> +        "id": "d34d",
-> +        "name": "NETEM test qdisc duplication restriction in qdisc tree =
-in netem_change root",
-> +        "category": ["qdisc", "netem"],
-> +        "plugins": {
-> +            "requires": "nsPlugin"
-> +        },
-> +        "setup": [
-> +            "$TC qdisc add dev $DUMMY root handle 1: netem limit 1",
-> +            "$TC qdisc add dev $DUMMY parent 1: handle 2: netem limit 1"
-> +        ],
-> +        "cmdUnderTest": "$TC qdisc change dev $DUMMY handle 1: netem dup=
-licate 50%",
-> +        "expExitCode": "2",
-> +        "verifyCmd": "$TC -s qdisc show dev $DUMMY",
-> +        "matchPattern": "qdisc netem",
-> +        "matchCount": "2",
-> +        "teardown": [
-> +            "$TC qdisc del dev $DUMMY handle 1:0 root"
-> +        ]
-> +    },
-> +    {
-> +        "id": "b33f",
-> +        "name": "NETEM test qdisc duplication restriction in qdisc tree =
-in netem_change non-root",
-> +        "category": ["qdisc", "netem"],
-> +        "plugins": {
-> +            "requires": "nsPlugin"
-> +        },
-> +        "setup": [
-> +            "$TC qdisc add dev $DUMMY root handle 1: netem limit 1",
-> +            "$TC qdisc add dev $DUMMY parent 1: handle 2: netem limit 1"
-> +        ],
-> +        "cmdUnderTest": "$TC qdisc change dev $DUMMY handle 2: netem dup=
-licate 50%",
-> +        "expExitCode": "2",
-> +        "verifyCmd": "$TC -s qdisc show dev $DUMMY",
-> +        "matchPattern": "qdisc netem",
-> +        "matchCount": "2",
-> +        "teardown": [
-> +            "$TC qdisc del dev $DUMMY handle 1:0 root"
-> +        ]
-> +    },
-> +    {
-> +        "id": "cafe",
-> +        "name": "NETEM test qdisc duplication restriction in qdisc tree"=
-,
-> +        "category": ["qdisc", "netem"],
-> +        "plugins": {
-> +            "requires": "nsPlugin"
-> +        },
-> +        "setup": [
-> +            "$TC qdisc add dev $DUMMY root handle 1: netem limit 1 dupli=
-cate 100%"
-> +        ],
-> +        "cmdUnderTest": "$TC qdisc add dev $DUMMY parent 1: handle 2: ne=
-tem duplicate 100%",
-> +        "expExitCode": "2",
-> +        "verifyCmd": "$TC -s qdisc show dev $DUMMY",
-> +        "matchPattern": "qdisc netem",
-> +        "matchCount": "1",
-> +        "teardown": [
-> +            "$TC qdisc del dev $DUMMY handle 1:0 root"
-> +        ]
-> +    },
-> +    {
-> +        "id": "1337",
-> +        "name": "NETEM test qdisc duplication restriction in qdisc tree =
-across branches",
-> +        "category": ["qdisc", "netem"],
-> +        "plugins": {
-> +            "requires": "nsPlugin"
-> +        },
-> +        "setup": [
-> +            "$TC qdisc add dev $DUMMY parent root handle 1:0 hfsc",
-> +            "$TC class add dev $DUMMY parent 1:0 classid 1:1 hfsc rt m2 =
-10Mbit",
-> +            "$TC qdisc add dev $DUMMY parent 1:1 handle 2:0 netem",
-> +            "$TC class add dev $DUMMY parent 1:0 classid 1:2 hfsc rt m2 =
-10Mbit"
-> +        ],
-> +        "cmdUnderTest": "$TC qdisc add dev $DUMMY parent 1:2 handle 3:0 =
-netem duplicate 100%",
-> +        "expExitCode": "2",
-> +        "verifyCmd": "$TC -s qdisc show dev $DUMMY",
-> +        "matchPattern": "qdisc netem",
-> +        "matchCount": "1",
-> +        "teardown": [
-> +            "$TC qdisc del dev $DUMMY handle 1:0 root"
-> +        ]
->      }
->  ]
-> --
-> 2.43.0
->
->
+	WARN_ON_ONCE(__test_and_set_bit(RXRPC_CALL_RELEASED, &call->flags));
 
