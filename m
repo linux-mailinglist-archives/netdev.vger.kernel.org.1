@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-205031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36666AFCE99
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 17:10:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E04A2AFCE9F
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 17:10:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D67A1425D84
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:09:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4344156068C
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:10:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7DE2E0B4B;
-	Tue,  8 Jul 2025 15:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458082E11C7;
+	Tue,  8 Jul 2025 15:09:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PK3WpzAw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BdYNNuvp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B042B2E093E;
-	Tue,  8 Jul 2025 15:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 187252E11B6;
+	Tue,  8 Jul 2025 15:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751987388; cv=none; b=SSExWuM9bTALuPfuOvuBwn5kYSy6eFdVzxo9SygQtCq1hPMFjOjZWqKdQ1Yw1GN0EprXvEcxT6nX36fteCgLrp9o4diIIjIwHKcjmJDeRsrdq1x5iESn2xwE/8uYdeW4GdZMLXg03Tv3uGoJEheE4OQPLtpUDpkPrDhoCjOTLog=
+	t=1751987390; cv=none; b=uwhFhhuAb/Eykhb+bRu7OOKTuUngG/NerjKG/JmNv2o0ZPBL5gW+eAn8VGHMiODo3CBDHqBbd3I1FYGpdkqSvirAZWA2M4z1wLpjlrlRsVf+GTfE8pJ8wbP+dvh6NocR4tDBNCyWvF+r8MA0gqYprtJAZEVGonYS7auzwH1b4V0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751987388; c=relaxed/simple;
-	bh=m8j9BgC+C683QcWhHpBX4bU5kkyY9xFVDvRjCOR5Lc8=;
+	s=arc-20240116; t=1751987390; c=relaxed/simple;
+	bh=Obbbwl3W/HPhrDX90tjKTuctvfC+PqY+HxmknvNnqrw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NC63e2LtO41db+rnJRZ34aTI6FJhzZcbu9CdY2vib20IaiGEV/R0oRLMWbNEuEmDjBW24w01VbiN/wiDx4G3MN5yGYIuFMLYGTTWVVwM3WYo0PEBfc/48SLLp6IB2usqZ8TBTi83A+MIQmjDDgGKub9QX+yv6Gx6MB4UEOGCYus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PK3WpzAw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54213C4CEEF;
-	Tue,  8 Jul 2025 15:09:48 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=scn+jBcmVFG88L84ISooy6fIrBmt2SZYZsBDRwyhxa9IE+1htu5bdLykKo1ywBLOt/RTjAeYvGNn589Qr6XL//KdPdSrICkz4L6rxkRYQp625NwqVR9J4jVyg3nDdnl/q8092jPFGPuruaYB7oGZDZfYTzyYgnmOGh3PHNh62WM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BdYNNuvp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95C27C4CEED;
+	Tue,  8 Jul 2025 15:09:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751987388;
-	bh=m8j9BgC+C683QcWhHpBX4bU5kkyY9xFVDvRjCOR5Lc8=;
+	s=k20201202; t=1751987389;
+	bh=Obbbwl3W/HPhrDX90tjKTuctvfC+PqY+HxmknvNnqrw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PK3WpzAwrnRqcEQcygXjS8tZX6H/H132xlWnZ7NlMhYbci+4L8MXtkFo8Ny3nzbZ4
-	 8P5khn3ztmh6lzDBa4bBygBwvhHvhFF/IjPUdm0SK5ZHeWiETNzcis5hBD8uapz9ec
-	 a+fZjJnaifXs8AOyqNxDU174JvTZYCB91pHdaZHGmVw7xB8VgaRo6WFxCTMyqK3G+T
-	 Tm+TZr7G42OBFxUemRixpDO4qgrSpbVmNTJ1DDctKR6vDIaqNAYVLogOfHblZwxz3i
-	 le5ylARfhMK7jCt8jJdcdcDH0cue/yhSHtfc9POOdkvEWYYPT8TMdu/Nn9vtB20Id4
-	 veWieW7tZ5zSA==
+	b=BdYNNuvpVKXd+jDJfxVt2lgxXXn7O+szpMyFGVvGowV1/fR31lF/VeCFCRvhxrxAg
+	 0o8UEXGoNMRhoIO0SrxerDtvnpuZecQn4HbGnHban2BqeJFElyXP8tEVnvXikgbN3h
+	 DEI/SuB+iph1eKriiRB70HPx1+ViIVU0WOHC6m/OlKgyizdyLtkSYVKs4HC+8sijsl
+	 gplc9KvjZZ2S91WYeZYh0n5uCFmf7zf0j82YDhVXtAxv0b886hYBmMwRKEQSSD/Vgu
+	 Xacvl1npLLwiRqDND8D6Pi60lUOFMAzNFhn9i+evgm62CDE4TEuBFgtSeOrvzXVRxU
+	 lcDQIe2DkfKLQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D83380DBEE;
-	Tue,  8 Jul 2025 15:10:12 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE908380DBEE;
+	Tue,  8 Jul 2025 15:10:13 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4] tcp: Correct signedness in skb remaining
- space
- calculation
+Subject: Re: [PATCH net 0/2] allwinner: a523: Rename emac0 to gmac0
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175198741125.4099273.6939974180776177373.git-patchwork-notify@kernel.org>
-Date: Tue, 08 Jul 2025 15:10:11 +0000
-References: <20250707054112.101081-1-jiayuan.chen@linux.dev>
-In-Reply-To: <20250707054112.101081-1-jiayuan.chen@linux.dev>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: netdev@vger.kernel.org, mrpre@163.com,
- syzbot+de6565462ab540f50e47@syzkaller.appspotmail.com, edumazet@google.com,
- ncardwell@google.com, kuniyu@google.com, davem@davemloft.net,
- dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- dhowells@redhat.com, linux-kernel@vger.kernel.org
+ <175198741250.4099273.971241156715124516.git-patchwork-notify@kernel.org>
+Date: Tue, 08 Jul 2025 15:10:12 +0000
+References: <20250628054438.2864220-1-wens@kernel.org>
+In-Reply-To: <20250628054438.2864220-1-wens@kernel.org>
+To: Chen-Yu Tsai <wens@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, andre.przywara@arm.com, wens@csie.org,
+ jernej@kernel.org, samuel@sholland.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-sunxi@lists.linux.dev
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  7 Jul 2025 13:41:11 +0800 you wrote:
-> Syzkaller reported a bug [1] where sk->sk_forward_alloc can overflow.
+On Sat, 28 Jun 2025 13:44:36 +0800 you wrote:
+> From: Chen-Yu Tsai <wens@csie.org>
 > 
-> When we send data, if an skb exists at the tail of the write queue, the
-> kernel will attempt to append the new data to that skb. However, the code
-> that checks for available space in the skb is flawed:
-> '''
-> copy = size_goal - skb->len
-> '''
+> Hi folks,
+> 
+> This small series aims to align the name of the first ethernet
+> controller found on the Allwinner A523 SoC family with the name
+> found in the datasheets. It renames the compatible string and
+> any other references from "emac0" to "gmac0".
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v4] tcp: Correct signedness in skb remaining space calculation
-    https://git.kernel.org/netdev/net/c/d3a5f2871adc
+  - [net,1/2] dt-bindings: net: sun8i-emac: Rename A523 EMAC0 to GMAC0
+    https://git.kernel.org/netdev/net/c/b3603c0466a8
+  - [net,2/2] arm64: dts: allwinner: a523: Rename emac0 to gmac0
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
