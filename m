@@ -1,113 +1,168 @@
-Return-Path: <netdev+bounces-204920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3901FAFC8C3
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 12:46:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23BD2AFC8D0
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 12:48:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20BAF56559E
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 10:45:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0EAF1666E8
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 10:47:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E3228467D;
-	Tue,  8 Jul 2025 10:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF38283FE4;
+	Tue,  8 Jul 2025 10:47:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IAxNgi4H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mWG37/zX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F08917CA17;
-	Tue,  8 Jul 2025 10:45:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416ED27054B;
+	Tue,  8 Jul 2025 10:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751971536; cv=none; b=qEk7fNBw24zibqBX+QUSRaM3+2Zorb3VtNBzoOK63u01HfEZb3kgxb2laFKFr30bW6XOjXQqPBR20oYDGQvDJqEMhyrnOt2wWzfZtl3ylZum2+9r5vt4RVmTCZAn8TL+ycbRZDluEXybT6JZYaO8WIACVMVvYz2sSmeHi/XRqao=
+	t=1751971666; cv=none; b=XcQFyvHAhlHdNk7/LXTgRKkoP+ddwPOOmna2kZ2Nq6XO3DjqhkEXvpceZgpGBL770hTRql55pyZNCLcuYzXOfY1gdnwtU7LIqUSyTnkM1/RjuoDkAxibZQHV4TveS5Gy7pSroWGQYHmVb04Lw0jrr7mNJClP/wQTeCZhHFzEPfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751971536; c=relaxed/simple;
-	bh=HSewAqhrTyK3ZVdcaOzrW5/o9Q0lTTzZYLPkKS9Ox8E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZrdScENM8odznKJ6MgE8RkLCVo6oHc4RmiO+kuC5NvEAVIchuNIn3uZPgBMVpIJM3LzXow7be7lUX25NbR4rOH0Mo01VnjAD2K1dA/bw9J28wFm70RgyeKrbZCmVqE5r5UBg72mZcLV4G6AgOtFqdjvMy93oy2oi56w/jYORIJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IAxNgi4H; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-235248ba788so3316875ad.0;
-        Tue, 08 Jul 2025 03:45:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751971534; x=1752576334; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HSewAqhrTyK3ZVdcaOzrW5/o9Q0lTTzZYLPkKS9Ox8E=;
-        b=IAxNgi4HIKGbQ/aUU+AbpOwHwd6lw5U2RGEVYDuVAXKgG+y3bymw9tZGQ+H0+AmhcZ
-         wV1XluQ3ua/uxQPUUEpix0h1vcXKi/GIYu6BIIFtmtjW8UZfmp7OgfR631+Hltt+5EjL
-         BVNEALKGlyf3tp7+uJtqKqeCZc/oDGXjJknb41t04cIz5cPf+VkN23vQOQKxcla9vf1A
-         muVT66yY9WEHvBrCtUSYn+IFVfI4t2GUOuij1o8vjhUF1vOAbmt/nufiEg/wi7ieexjz
-         kA062RcuaIwqa0aXDDBu13UQgFhcTyvgUpprWu6NbtUhGaccMI5dkX1UzUXYIWrVX0uu
-         YscQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751971534; x=1752576334;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HSewAqhrTyK3ZVdcaOzrW5/o9Q0lTTzZYLPkKS9Ox8E=;
-        b=Tw8m4QgbKzlXkxhyb7jHulHWRkrNK8s0bM/Aq9V5stsN9g4cW36tjINUuBpeNb04eS
-         Nc6UaZIBsiMxUkky27RwlKNgIrqsOqfbAn8hNAD7+ttLK8K0JZVdmGShczKsgpCTm5QQ
-         WklicEg5MPZ1i2zz1NgIQnC9gxE3c78WC5h3bP8YSRKLq+KqDbMqpFz3+Qt5kv0IZJdB
-         dxGXdR+4P1sDME4VmlnEHInBX1yB635L5yKCOZXNMERwST13tr8Gtu/zmZjb3B+IDjOQ
-         ESH97QFw4xNGaQZnUT/MbB2245rtkvjPHI36cbXsOTalcUZiUbpWYbfmh+2GA4jcbyqu
-         KNMw==
-X-Forwarded-Encrypted: i=1; AJvYcCVQ7pUiz7ZE/j4YHIQqJ6vmNM5OQLwn3LWoU80M0VjeVMN2l8lODXJKNOhPo0bU4/Qf8SMTd91u10st@vger.kernel.org, AJvYcCVRLod7NL8nj8rS/I2lfvBQKay7R1wnVsxeB+S4fil4AY+bMtK76i7IQXZyy5mjgrm2LYEZVk3VgDHXyfoW@vger.kernel.org, AJvYcCVTpXOMLsNMgFjY/piNSQ0hWOMgDs68GMtvRhbzGO4siObE6Kc94KITzAHyaCKWoHIwmOD8VGMf98Yr@vger.kernel.org, AJvYcCWI9P/T8kr+N0c86EtmeqU0nd7onR/idHp8HPyj+sA38yfic/uI33+bNQTsdp8KRziF82b8fNj3@vger.kernel.org, AJvYcCXJ//ytmM12ZVB8H+yDVQbbnsd737UVsKGmIVtj2u2b08UaLOpU1SSkYLH57p46S+tOGb/cL0HxPbz5Aowpr2k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOUGVUCpX68xuKruetSkWa6Z8FPofrsB0bk/NPtgRVc7TTa25O
-	PZ4JeDUwUoLoI3roif10XbqDTulown1ol1dl0I+85oJp6X/5CLzFJcNNI4EC5XrL55acAAzlH2P
-	/6jgfhX72qsHY5jZbbyQzQQDkiSik9ns=
-X-Gm-Gg: ASbGncuGO4qhHZYGPqeIpRoefwOx+hDB5yh2EnaW5GBbnsoaiPZh4aiu5Vbf33Emg6j
-	gc+nSA1Vg5Z3qbMX1fxzmhrBSGri3/Ldf3BW1Daw9fD2EdvwADzCqyZPE8StGa1KQQruXD3Y9CM
-	nkNxOwXt38LdI7VG/CKZZRKTSgRr4Tp3qK+jvCvm4ou9T0
-X-Google-Smtp-Source: AGHT+IEm3L7c8trcBPYqjxR6Ocp3T5kI3YMJkezrxQ89TyjzbFAZ+sfEnGRzsDPR5wrlqq6qJ/XkY9027ytzzYYdHeg=
-X-Received: by 2002:a17:902:e806:b0:234:bfe3:c4b8 with SMTP id
- d9443c01a7336-23c85eae541mr82553265ad.2.1751971533736; Tue, 08 Jul 2025
- 03:45:33 -0700 (PDT)
+	s=arc-20240116; t=1751971666; c=relaxed/simple;
+	bh=gNF5kIHsZITNZE/wVRzomd+2nIA/Rq2Srm2KIybh62I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r7SYsuouvqVZslcbBd0agw9KE5bYG2+eQrOrLPxUcMnCPVurezCzw+AI9/sxFYyP2VG++QljWlUlZZzVGgQVXbkjRcn6CqhsXZFeliG4OGCpsSof48v0NoC1L/OzesGsNRz3QcTyficVeDPo5kIqqOzEUP2wFUsOH+kglya6obA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mWG37/zX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E57EC4CEED;
+	Tue,  8 Jul 2025 10:47:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751971665;
+	bh=gNF5kIHsZITNZE/wVRzomd+2nIA/Rq2Srm2KIybh62I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mWG37/zXq8qflsPAZPW5mY2kWxxRKIzWGl+K7jvZFoBAI84nbX1aVYz0AZeVgrXki
+	 Ln7zdoEDFlNTYTl+dzs+KAe7I6bqA0Z5QrW4yX8V9cANDEeFXPhkBcDFFMgjCKjjop
+	 tMn4xt9n5mGQbGJ1uQIJoBvDnc1ARZDFH1NNP/HONRVvZcnYVrDbR+lpxrywhoO7jF
+	 hujxHev+nNHFZa+ByzUCT5sTdWR4kDu5dIyXbG7PVc/Ds0WNl0F6vJQv1iLv1zER3v
+	 TYlo9zzHyzv3K4NLKtVr3zAeDdEmRT9X6VDnszpNbr9NBFgx9X+NH+r77L9ZI2WMJt
+	 broObH8AWFYIg==
+Date: Tue, 8 Jul 2025 11:47:40 +0100
+From: Simon Horman <horms@kernel.org>
+To: Michael Dege <michael.dege@renesas.com>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+	Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Subject: Re: [PATCH v2 3/4] net: renesas: rswitch: add offloading for L2
+ switching
+Message-ID: <20250708104740.GF452973@horms.kernel.org>
+References: <20250708-add_l2_switching-v2-0-f91f5556617a@renesas.com>
+ <20250708-add_l2_switching-v2-3-f91f5556617a@renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250704041003.734033-1-fujita.tomonori@gmail.com> <20250707175350.1333bd59@kernel.org>
-In-Reply-To: <20250707175350.1333bd59@kernel.org>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Tue, 8 Jul 2025 12:45:20 +0200
-X-Gm-Features: Ac12FXyxXkuLp9PUeC-mS4nwqMQ5TUf2kfGzbt31LyPz8JoP83cE9x-RhgyyVJM
-Message-ID: <CANiq72=LUKSx6Sb4ks7Df6pyNMVQFnUY8Jn6TpoRQt-Eh5bt8w@mail.gmail.com>
-Subject: Re: [PATCH v3 0/3] rust: Build PHY device tables by using
- module_device_table macro
-To: Jakub Kicinski <kuba@kernel.org>, gregkh@linuxfoundation.org, robh@kernel.org, 
-	saravanak@google.com
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, alex.gaynor@gmail.com, dakr@kernel.org, 
-	ojeda@kernel.org, rafael@kernel.org, a.hindborg@kernel.org, 
-	aliceryhl@google.com, bhelgaas@google.com, bjorn3_gh@protonmail.com, 
-	boqun.feng@gmail.com, david.m.ertman@intel.com, devicetree@vger.kernel.org, 
-	gary@garyguo.net, ira.weiny@intel.com, kwilczynski@kernel.org, 
-	leon@kernel.org, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, 
-	lossin@kernel.org, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	tmgross@umich.edu
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250708-add_l2_switching-v2-3-f91f5556617a@renesas.com>
 
-On Tue, Jul 8, 2025 at 2:53=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> Does not apply to networking trees so I suspect someone else will take
-> these:
->
-> Acked-by: Jakub Kicinski <kuba@kernel.org>
+On Tue, Jul 08, 2025 at 11:27:39AM +0200, Michael Dege wrote:
+> This commit adds hardware offloading for L2 switching on R-Car S4.
+> 
+> On S4 brdev is limited to one per-device (not per port). Reasoning
+> is that hw L2 forwarding support lacks any sort of source port based
+> filtering, which makes it unusable to offload more than one bridge
+> device. Either you allow hardware to forward destination MAC to a
+> port, or you have to send it to CPU. You can't make it forward only
+> if src and dst ports are in the same brdev.
+> 
+> Signed-off-by: Michael Dege <michael.dege@renesas.com>
+> Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
 
-Thanks! Happy to take it through Rust tree if that is best.
+...
 
-Greg, Rob/Saravana: Acked-by's for auxiliary and OF (in patch #1)
-appreciated, thanks!
+> diff --git a/drivers/net/ethernet/renesas/rswitch_l2.c b/drivers/net/ethernet/renesas/rswitch_l2.c
 
-Cheers,
-Miguel
+...
+
+> +static void rswitch_update_offload_brdev(struct rswitch_private *priv,
+> +					 bool force_update_l2_offload)
+> +{
+> +	struct net_device *offload_brdev = NULL;
+> +	struct rswitch_device *rdev, *rdev2;
+> +
+> +	rswitch_for_all_ports(priv, rdev) {
+> +		if (!rdev->brdev)
+> +			continue;
+> +		rswitch_for_all_ports(priv, rdev2) {
+> +			if (rdev2 == rdev)
+> +				break;
+> +			if (rdev2->brdev == rdev->brdev) {
+> +				offload_brdev = rdev->brdev;
+> +				break;
+> +			}
+> +		}
+> +		if (offload_brdev)
+> +			break;
+> +	}
+> +
+> +	if (offload_brdev == priv->offload_brdev) {
+> +		if (offload_brdev && force_update_l2_offload)
+> +			rswitch_update_l2_offload(priv);
+> +		return;
+> +	}
+> +
+> +	if (offload_brdev && !priv->offload_brdev)
+> +		dev_dbg(&priv->pdev->dev, "starting l2 offload for %s\n",
+> +			netdev_name(offload_brdev));
+> +	else if (!offload_brdev && priv->offload_brdev)
+> +		dev_dbg(&priv->pdev->dev, "stopping l2 offload for %s\n",
+> +			netdev_name(priv->offload_brdev));
+> +	else
+> +		dev_dbg(&priv->pdev->dev,
+> +			"changing l2 offload from %s to %s\n",
+> +			netdev_name(priv->offload_brdev),
+> +			netdev_name(offload_brdev));
+
+Smatch flags a false-positive about possible NULL references by the
+netdev_name() calls on the line above.
+
+Due to the previous if statement it seems to me that cannot occur.
+But it did take me a few moments to convince myself of that.
+
+So while I don't think we should write our code to static analysis tooling.
+I did play around a bit to see if I could come up with something that is
+both easier on the eyes and keeps Smatch happy.
+
+Perhaps it isn't easier on the eyes, but rather I'm just more familiar with
+the code now. But in any case, I'm sharing what I came up with in case it
+is useful. (Compile tested only!).
+
+
+        if (!offload_brdev && !priv->offload_brdev)
+                return;
+
+        if (!priv->offload_brdev)
+                dev_dbg(&priv->pdev->dev, "starting l2 offload for %s\n",
+                        netdev_name(offload_brdev));
+        else if (!offload_brdev)
+                dev_dbg(&priv->pdev->dev, "stopping l2 offload for %s\n",
+                        netdev_name(priv->offload_brdev));
+        else if (offload_brdev != priv->offload_brdev)
+                dev_dbg(&priv->pdev->dev,
+                        "changing l2 offload from %s to %s\n",
+                        netdev_name(priv->offload_brdev),
+                        netdev_name(offload_brdev));
+        else if (!force_update_l2_offload)
+                return;
+
+> +
+> +	priv->offload_brdev = offload_brdev;
+> +
+> +	rswitch_update_l2_offload(priv);
+> +}
+
+...
 
