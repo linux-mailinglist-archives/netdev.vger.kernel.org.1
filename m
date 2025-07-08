@@ -1,114 +1,120 @@
-Return-Path: <netdev+bounces-204930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D6A1AFC911
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 12:59:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B573CAFC918
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 13:00:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B3103AF6E1
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 10:59:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 801621AA08BC
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 11:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D3827147B;
-	Tue,  8 Jul 2025 10:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1222D8768;
+	Tue,  8 Jul 2025 11:00:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U2OgfI9+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="trzAjsWU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1D9221D87;
-	Tue,  8 Jul 2025 10:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875D22D8764
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 11:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751972369; cv=none; b=ixKXE1dnWy/g62BSTGHNi2oqucKNyh3jor6Wnhuc9i7HBB+4O4oPVPZMI20hDivz2XazbrAyNikAz49L/jzChKsdkzsBPrlsFlRsa3wq3u5K/xk+MS2bm4CBuILq27SEUU3JwWAv/USAJrHzM2ZpAkdM/B2M3T6KU14wYg3UufA=
+	t=1751972402; cv=none; b=f6Q89lCSUmYLRhl3Aun9INT/5/iKk1yT3FMoYojp6nVdo2eNld3/dprjhKw7QTfyEfgUYaBBxMLhuCrAWmFxiD9iE/RuI01nARk8H7xyzPdfRf5J+rcM2HCYNNBFXM+Oj0wyg3K1W/2+KpXzrwXujfRNjmpy+TjDSVoZheDaKKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751972369; c=relaxed/simple;
-	bh=0/UNW9wheUfOWipBWnE9bEKfNH0w9NzGiUbVbmxjEVo=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=hxyCV1L7x/4U1z7l/sEAW8WmcTtsSkU4tGS7MBdWadA+0nFaYAvc51fYNy9A337+z51EI70bFaBMMXERgZBk+MlsuAKfXim4qBomBD3zIfJviPgBRiq0T8njHZ6x4d8+7NBb3WEszNjHpDwwcTPSJZpyURXSkMQPJCx9bWuWS8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U2OgfI9+; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-23c8a5053c2so30215705ad.1;
-        Tue, 08 Jul 2025 03:59:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751972367; x=1752577167; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0/UNW9wheUfOWipBWnE9bEKfNH0w9NzGiUbVbmxjEVo=;
-        b=U2OgfI9+e7fisbhfc5nimWqu7bWqoIAr7/J1GD3RsFeOIYkdKRAJ1K+D5FcgvIvvOr
-         0BqZrWVYB2rmVipQ+0M0m+PK2mR3J62U59NBgVMtu3S9gRM0g/lzTIeL6Qtr2AUyrrbI
-         EL+O48DAOL1XL4SS6gLZmM6Eee6NsHinW7D2GfDmsVL5+f7eyEWTtV7bkl5425+jv/P3
-         SSlc4JSBA1tWceroTnUZy4saekVx3aMY2dlPU7KtXgD0Da+GTZpVyzoV8zd57mVBvkPE
-         x3S2f+vT8cA8mW5vIgJglmriNCaoep+QHNdKzJOQb+5ehQX29GXO/z9q4VXSj1l4Dzor
-         aOiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751972367; x=1752577167;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0/UNW9wheUfOWipBWnE9bEKfNH0w9NzGiUbVbmxjEVo=;
-        b=cKQfTMekZwCeLcP4Dv6luduAZHFCdd2fcxtqMf6GFM0QRK/dmZHqaYXcEO/uswcVA3
-         VdtSqDWnlK6qVW7MD6HX/z1WjXM8PEqaD537JQdbFLI/eEK35ZTQR3u+09M+0CWJLh6k
-         RQEEtAtcTL3vEYdFWbsaduR9kzbCUqaofkDx24BeZbgXOX/aAWNwg6XgF4tlpLGk8IYk
-         8Bb00/3eOOq3Lfrb/8CbemwFjc9aUr2SWb2LLZuM6M9fYvGi8BbbBwUjdt/mbT/B408m
-         yLuCu5p7Ybe4dA5HF9xBMW/4dYlslPnRBYxKAWCqv4LjgB1Aem0LqQcYxW7WaAFS7NCU
-         fbAA==
-X-Forwarded-Encrypted: i=1; AJvYcCUFc0kb9pZwnMLarrxLJvulPiikhgd1Pp/NzMBCxvAZuo6BpYSRVJQD7AnCLf6SdxtKOjmJYNcBQDuh@vger.kernel.org, AJvYcCUoMVrIrxJSMRyKvwdRiwqfpLHHgUHWTOhQTBndlG/9bvtrjPM3JK6t+Kq59LM9JvJOLkSJmr10TRsN@vger.kernel.org, AJvYcCVhwzUf621Ze3/ngocIW3XBsk7z18Phg58r2uBy/x2sTDupLQQVdrVqjnjSSvanbLX7KbWLXFo1@vger.kernel.org, AJvYcCVk35H7CtCflfFVFfFGSxpOEtsrUe+eMeBIzwxJe1KNzFRq1roHKYwBCfPOTo4DePqjOuv9ck2eP9HqEeVG58k=@vger.kernel.org, AJvYcCWYSKy7Bnr3nVA/LRujmwUcfKFqMjZ8pCqAldRA4h10RaXwS20TIPwovbRol47CXhGIFBx6ehnoaU7T4iOQ@vger.kernel.org
-X-Gm-Message-State: AOJu0YzonG/KZXLvYg3RkHDQXuzd5E1bCu52TOitOt0G6SWJ35rM3c+b
-	dfJDuQz3PQsFLeErdw1Tvd5FjirJr35O3HPhdA0ji4mLa8hFhgbj1J7V
-X-Gm-Gg: ASbGncvG4/6eHF3iklPH4obJqUalz652hFUnPI/dZ4lvr9tqx1MdR7f4jJ2epVgSAL0
-	kpuXEo0W/3tkE9ZTlGoYbDGWomWCb9SkYOgnokfWi3qsmaDDz8Ej5Ay7FKoLO9l/FnAvNRdNcs0
-	tBXuReQaP0WrVPLM11M7TW2z1au0mGLF5C0A6QytlNwRRz1iaTAvUldnAdi0+eVQt8xN38nTG+B
-	BCHgkUTnAg9YhTTzUvxCSlfj6KCgD6iKmrPRfr2us6Lyjs+8u2MTP1Ixs+B3zaVTtuZXP5gnPwI
-	rHa4B/DYRAnEuqNFkVrAadLA09H5yQXIkHMBkh3EuLewo2YJ48J/kwXDHuD/Agjo8ULesaZsUvp
-	GvOiXd08a/DB8bCRA1yuanJMDLnZkXoXdbB3RB3pa
-X-Google-Smtp-Source: AGHT+IEjtoxx7Jmd2o3cc0PIJOXAP/15axQil3qlYOBXngZOSgGl0afSYQ0BfrpKWsYYD7pbrBr5HA==
-X-Received: by 2002:a17:903:1987:b0:231:ea68:4e2a with SMTP id d9443c01a7336-23dd1d47317mr36460885ad.34.1751972367127;
-        Tue, 08 Jul 2025 03:59:27 -0700 (PDT)
-Received: from localhost (p5332007-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.120.7])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23c8455d27asm116131995ad.129.2025.07.08.03.59.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jul 2025 03:59:25 -0700 (PDT)
-Date: Tue, 08 Jul 2025 19:59:08 +0900 (JST)
-Message-Id: <20250708.195908.2135845665984133268.fujita.tomonori@gmail.com>
-To: miguel.ojeda.sandonis@gmail.com
-Cc: kuba@kernel.org, gregkh@linuxfoundation.org, robh@kernel.org,
- saravanak@google.com, fujita.tomonori@gmail.com, alex.gaynor@gmail.com,
- dakr@kernel.org, ojeda@kernel.org, rafael@kernel.org,
- a.hindborg@kernel.org, aliceryhl@google.com, bhelgaas@google.com,
- bjorn3_gh@protonmail.com, boqun.feng@gmail.com, david.m.ertman@intel.com,
- devicetree@vger.kernel.org, gary@garyguo.net, ira.weiny@intel.com,
- kwilczynski@kernel.org, leon@kernel.org, linux-kernel@vger.kernel.org,
- linux-pci@vger.kernel.org, lossin@kernel.org, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, tmgross@umich.edu
-Subject: Re: [PATCH v3 0/3] rust: Build PHY device tables by using
- module_device_table macro
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <CANiq72=LUKSx6Sb4ks7Df6pyNMVQFnUY8Jn6TpoRQt-Eh5bt8w@mail.gmail.com>
-References: <20250704041003.734033-1-fujita.tomonori@gmail.com>
-	<20250707175350.1333bd59@kernel.org>
-	<CANiq72=LUKSx6Sb4ks7Df6pyNMVQFnUY8Jn6TpoRQt-Eh5bt8w@mail.gmail.com>
+	s=arc-20240116; t=1751972402; c=relaxed/simple;
+	bh=mVwSeLq8a1VGYPuJQZcrCJEYz09VXxFZ6ICwhYGF/G0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=SLT99E9ITtsYcHA4n9UzlIPHk9jPKCCEmOGC+2T+wUCvv/ApJra0M1MyQNLOrxc5Ec9RdwAn0TFnK2ybpoc/XXHaRZY2junB53qw/1OnPB3DrtZm/M6JJrzd3m8Rky0Gy0hsgKgK8fM+ktaWNycgmp7DBwwxekdWd9uo5FJCHpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=trzAjsWU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53204C4CEED;
+	Tue,  8 Jul 2025 11:00:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751972402;
+	bh=mVwSeLq8a1VGYPuJQZcrCJEYz09VXxFZ6ICwhYGF/G0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=trzAjsWUa8HWvakg6pr2L1EpQdn6N6hY4GjNTAFCERjGaZOPjETCs5hqIOZV0e8rs
+	 wrb2C1gAYbVhDSfg7nSfnZNYic9vRFidr6qHdOucly4HvEbRsZ0y5ZGf4YVq56V62/
+	 8OC0gPN/3TONjRBQf08Dld+rSXrVIqbKAG+bB5yLN/Jrt4KbGelOATdoU5mgAGt5K0
+	 MLHoAUGhehbwA4qbOyarQ0Sk75XCSi4XsZPLKWiGh/W+ohY1jKY125//LAGAmXoeKt
+	 gyti2F5BeSN0GFvQ6nKCRPqThWE/1wAnQ3tlc6uVoGYM+r7b2+72xLJlJ5pcjQ8c+A
+	 p9rs5mtxrOa1Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710F5380DBEE;
+	Tue,  8 Jul 2025 11:00:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v5 00/14] net: mctp: Add support for gateway
+ routing
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175197242527.4024640.15516341824210236859.git-patchwork-notify@kernel.org>
+Date: Tue, 08 Jul 2025 11:00:25 +0000
+References: <20250702-dev-forwarding-v5-0-1468191da8a4@codeconstruct.com.au>
+In-Reply-To: <20250702-dev-forwarding-v5-0-1468191da8a4@codeconstruct.com.au>
+To: Jeremy Kerr <jk@codeconstruct.com.au>
+Cc: matt@codeconstruct.com.au, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org
 
-T24gVHVlLCA4IEp1bCAyMDI1IDEyOjQ1OjIwICswMjAwDQpNaWd1ZWwgT2plZGEgPG1pZ3VlbC5v
-amVkYS5zYW5kb25pc0BnbWFpbC5jb20+IHdyb3RlOg0KDQo+IE9uIFR1ZSwgSnVsIDgsIDIwMjUg
-YXQgMjo1M+KAr0FNIEpha3ViIEtpY2luc2tpIDxrdWJhQGtlcm5lbC5vcmc+IHdyb3RlOg0KPj4N
-Cj4+IERvZXMgbm90IGFwcGx5IHRvIG5ldHdvcmtpbmcgdHJlZXMgc28gSSBzdXNwZWN0IHNvbWVv
-bmUgZWxzZSB3aWxsIHRha2UNCj4+IHRoZXNlOg0KPj4NCj4+IEFja2VkLWJ5OiBKYWt1YiBLaWNp
-bnNraSA8a3ViYUBrZXJuZWwub3JnPg0KPiANCj4gVGhhbmtzISBIYXBweSB0byB0YWtlIGl0IHRo
-cm91Z2ggUnVzdCB0cmVlIGlmIHRoYXQgaXMgYmVzdC4NCg0KVGhpcyBpcyBiYXNlZCBvbiBSdXN0
-IHRyZWUuIElmIEkgcmVtZW1iZXIgY29ycmVjdGx5LCBpdCBjYW4ndCBiZQ0KYXBwbGllZCBjbGVh
-bmx5IHRvIG90aGVyIHRyZWVzIGJlY2F1c2Ugb2YgVGFtaXIncyBwYXRjaCBpbiBSdXN0IHRyZWUu
-DQoNCg0KVGhhbmtzIGV2ZXJ5b25lIQ0K
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Wed, 02 Jul 2025 14:20:00 +0800 you wrote:
+> This series adds a gateway route type for the MCTP core, allowing
+> non-local EIDs as the match for a route.
+> 
+> Example setup using the mctp tools:
+> 
+>     mctp route add 9 via mctpi2c0
+>     mctp neigh add 9 dev mctpi2c0 lladdr 0x1d
+>     mctp route add 10 gw 9
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v5,01/14] net: mctp: don't use source cb data when forwarding, ensure pkt_type is set
+    https://git.kernel.org/netdev/net-next/c/e0f3c79cc0bb
+  - [net-next,v5,02/14] net: mctp: test: make cloned_frag buffers more appropriately-sized
+    https://git.kernel.org/netdev/net-next/c/fc2b87d036e2
+  - [net-next,v5,03/14] net: mctp: separate routing database from routing operations
+    https://git.kernel.org/netdev/net-next/c/269936db5eb3
+  - [net-next,v5,04/14] net: mctp: separate cb from direct-addressing routing
+    https://git.kernel.org/netdev/net-next/c/3007f90ec038
+  - [net-next,v5,05/14] net: mctp: test: Add an addressed device constructor
+    https://git.kernel.org/netdev/net-next/c/96b341a8e782
+  - [net-next,v5,06/14] net: mctp: test: Add extaddr routing output test
+    https://git.kernel.org/netdev/net-next/c/46ee16462fed
+  - [net-next,v5,07/14] net: mctp: test: move functions into utils.[ch]
+    https://git.kernel.org/netdev/net-next/c/80bcf05e54e0
+  - [net-next,v5,08/14] net: mctp: test: add sock test infrastructure
+    https://git.kernel.org/netdev/net-next/c/19396179a0f1
+  - [net-next,v5,09/14] net: mctp: test: Add initial socket tests
+    https://git.kernel.org/netdev/net-next/c/9b4a8c38f4fe
+  - [net-next,v5,10/14] net: mctp: pass net into route creation
+    https://git.kernel.org/netdev/net-next/c/48e6aa60bf28
+  - [net-next,v5,11/14] net: mctp: remove routes by netid, not by device
+    https://git.kernel.org/netdev/net-next/c/4a1de053d7f0
+  - [net-next,v5,12/14] net: mctp: allow NL parsing directly into a struct mctp_route
+    https://git.kernel.org/netdev/net-next/c/28ddbb2abe13
+  - [net-next,v5,13/14] net: mctp: add gateway routing support
+    https://git.kernel.org/netdev/net-next/c/ad39c12fcee3
+  - [net-next,v5,14/14] net: mctp: test: Add tests for gateway routes
+    https://git.kernel.org/netdev/net-next/c/48e1736e5dc1
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
