@@ -1,176 +1,76 @@
-Return-Path: <netdev+bounces-204937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2767FAFC94D
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 13:17:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E8F0AFC9AE
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 13:32:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3465F3B47EE
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 11:16:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7576656460D
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 11:32:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A28FA2D8DD9;
-	Tue,  8 Jul 2025 11:17:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E15F21D587;
+	Tue,  8 Jul 2025 11:32:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S3941vTR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h8C4s/n3"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C89D2D8388
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 11:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0B613633F
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 11:32:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751973433; cv=none; b=GscDXWP41IEyzjhpMfVZ3a8eta536GCPMP6imvOcnoTQxXYQAE+kNRoF0BU+60sZFjFlk+i5s5vT+ZeSeQTqNyQn2VdIzVXTjpeZqFtsPi3reVA4PDklj87+DDet7wZxzoXMZ3xusvze84L2pdl/Eka3gCE0Juod30y2WL6NcxI=
+	t=1751974339; cv=none; b=e12tBJ4hf6psGv9/O6LAlyq4/V/0h4A0Hepj0m9N27KzMtm2nqZXjfnL8Kq5wx6l5wm6/ztOOmCai5/JmLyQx6wb+TiKi0fdBbyGZBSGDFQzuYNAPxLYbsOom0r+U6LtFlyspZLgbrj9kXoWnww0M5gY0j4ozeaBISHvU0dUCOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751973433; c=relaxed/simple;
-	bh=SW4IfHix+f4Je4esfBdglGbT4aI4+HKwBw41uiZTcKM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SEampsP2OBNMXIv+9ibUNH26QfmX+iLg4knvj4Hvjb3ClnXvkYVXURGHIBlwA3YEx9Ui+3yED8xzyyFVmoYX5z/njjshdD6waSwr/I9SMCFZGazNZtPXl0XcJab/VFN3qmQLSk34rW4oZ8X5y7ilkckV6d7dTkfYHQNthHpKfO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S3941vTR; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751973431;
+	s=arc-20240116; t=1751974339; c=relaxed/simple;
+	bh=a2aQdzQGolo47nGWy87r7S4pemzwgOkADkTHecLWJY8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YzgFgz0QY1KBH2QyJf7SxklqwdM64za00xPiRYaE1Umy3AOfFMSnIgSMpgqBDim+mZCEBPSRiePiYVNcB2zjdi1nfi9Zgma368UfS5/IVdNXf0IkbP3aTAZ/gA55Yvhd1cx3AYMNhCCDKYqg25Rg3jc+DvrKssrpQPOt39Hp6wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h8C4s/n3; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <a879739a-0696-406a-8233-332a1fc20fc6@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751974334;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=hLJpDQTyK8jsS2YvDzZqaAeQiFLy072zwpHz83Qr2vg=;
-	b=S3941vTRZY10UrTr24XTj/M/BPIkNqMMUWx7zT+u+zCgsyoOQuk43VgdQMehP4SnJxKL/t
-	iqM951ychcW/FLoaXsgIhIedmS0tzC2Sw1zu2ZwjowR612A/Fm/Gv69zfB+9nV3lwPV7Pk
-	wAFPBf3BldMRJ5ITYddpE1cWVexRgEg=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-384-u2qMzOtwNKevuWP72zMlxg-1; Tue, 08 Jul 2025 07:17:10 -0400
-X-MC-Unique: u2qMzOtwNKevuWP72zMlxg-1
-X-Mimecast-MFC-AGG-ID: u2qMzOtwNKevuWP72zMlxg_1751973429
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4a58cd9b142so92073591cf.0
-        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 04:17:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751973429; x=1752578229;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hLJpDQTyK8jsS2YvDzZqaAeQiFLy072zwpHz83Qr2vg=;
-        b=YoMV4XZSRnz63+mScA1p5ewNot7NkhP9rmiaX3Ym8T0HGg2A8xI3j4jrjPPt/7TYQz
-         JfUDvLUy+CtwwuNLX0YZZpjgLb5oTEHLYFRJJwX+UJySDm8oR3GZzbDcghC+8ISM7RrM
-         zc8E2+jUvcYUoXT4bR7iVfxv0NJMpqhu1dhpWcgDCwqXKAknsbtOgKfMlQxDrxx27edL
-         LOnUvBdsua1AFD+xwtbzqzRy4QsYO0KK6I+4UR/ISOV/D5puf0qHXloK/alDpo5ibZZr
-         CsgdEySQ17m9ps982PrRVGec1CXHpfBClTN25C8ETmPU9ZU/szHhK2ls2RWfvtZ4sgek
-         Mqew==
-X-Gm-Message-State: AOJu0YwG3MnK1nz06Xjc+xrvWhuUdj5BN6wdO8fRPUvwUBZKq9gkwC4q
-	CvncvZrZLgo7zGPuWUcL+KZo5xrcK4sD2wHLOKJPFg77QWlquPyVG/M6VCINqZn6fsa5jOyaUn1
-	CCMxPPRubcM5c/oSSFsi17T3Bihd8JeqgPa4LCbtecKQHDHgI5OHBQxT7BY87S8QseVO/bNi3fH
-	Gs4IBPYdAgh1AqlbQOm/goaj54fFlBsaJXZJUVp1W2Iw==
-X-Gm-Gg: ASbGncsRcfg/zmhWuh1PEPnoey/+B5R7xaXsVxHg+GNbVN9Fi/e8T8p29VVIQzpF+8X
-	G2Bd2dBd4bfvuNOSRR7NQGniExtMb+VVU/cKmsP+ni9AdKVwsZYvhqVLrj+27QsGGaaZ9DNZP3A
-	BmlwjUvnjm3NwNeDcQYdlq9s7GZegOgNbpu27KoCRY10lnwTAAle/R4wC5yQNvNBjWuJAaLRVvH
-	hqH7zP5po2wrXKiEwpYZEVoecRlvX0URIjjqWe9HNDl5dXBGCviKiXJrBNrKtnO+iKgUp93xNg1
-	VvmFuLKTsfevZsdauIQ25+M02ARHVg==
-X-Received: by 2002:a05:6214:1c49:b0:702:d9d7:b6e2 with SMTP id 6a1803df08f44-7047daea654mr37844286d6.34.1751973428868;
-        Tue, 08 Jul 2025 04:17:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHmdZdg7FkyHCs2tm7yZmuVxog/GLdnlBjbdngjYdDrQNIKIT5juBSVSyb2m4opt+Qg+0n1ew==
-X-Received: by 2002:a05:6214:1c49:b0:702:d9d7:b6e2 with SMTP id 6a1803df08f44-7047daea654mr37843036d6.34.1751973427927;
-        Tue, 08 Jul 2025 04:17:07 -0700 (PDT)
-Received: from stex1.redhat.com ([193.207.147.103])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-702c4d5ac2csm74424756d6.95.2025.07.08.04.17.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jul 2025 04:17:07 -0700 (PDT)
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: netdev@vger.kernel.org
-Cc: virtualization@lists.linux.dev,
-	Jakub Kicinski <kuba@kernel.org>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Luigi Leonardi <leonardi@redhat.com>
-Subject: [PATCH net-next] vsock/test: fix test for null ptr deref when transport changes
-Date: Tue,  8 Jul 2025 13:17:01 +0200
-Message-ID: <20250708111701.129585-1-sgarzare@redhat.com>
-X-Mailer: git-send-email 2.50.0
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Wwqie4p/S/JtpJQWuktif2U9BwaYBKcyNY2So4udb8k=;
+	b=h8C4s/n3+dtWpLY+VHro0ibQuVi7ZeIWELFY0ol/ysXvob4aO//F/lGcrAiv7u8fRhS6yA
+	zD2rfZZlcTThAhqiyrLx6Gge7LSNcTq0KQhY9IzwRx822yXMYr7etdGjjorVUSNeOrTXhT
+	TZW3lkE+xC9Bi1zg6cS4tG1P6vCXYxY=
+Date: Tue, 8 Jul 2025 12:32:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next] amd-xgbe: add ethtool counters for error and dropped
+ packets
+To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, Shyam-sundar.S-k@amd.com
+References: <20250708041041.56787-1-Raju.Rangoju@amd.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250708041041.56787-1-Raju.Rangoju@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+On 08/07/2025 05:10, Raju Rangoju wrote:
+> add the ethtool counters for tx/rx dropped packets and tx/rx error
+> packets
+> 
+> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+> ---
 
-In test_stream_transport_change_client(), the client sends CONTROL_CONTINUE
-on each iteration, even when connect() is unsuccessful. This causes a flood
-of control messages in the server that hangs around for more than 10
-seconds after the test finishes, triggering several timeouts and causing
-subsequent tests to fail. This was discovered in testing a newly proposed
-test that failed in this way on the client side:
-    ...
-    33 - SOCK_STREAM transport change null-ptr-deref...ok
-    34 - SOCK_STREAM ioctl(SIOCINQ) functionality...recv timed out
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
-The CONTROL_CONTINUE message is used only to tell to the server to call
-accept() to consume successful connections, so that subsequent connect()
-will not fail for finding the queue full.
-
-Send CONTROL_CONTINUE message only when the connect() has succeeded, or
-found the queue full. Note that the second connect() can also succeed if
-the first one was interrupted after sending the request.
-
-Fixes: 3a764d93385c ("vsock/test: Add test for null ptr deref when transport changes")
-Cc: leonardi@redhat.com
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- tools/testing/vsock/vsock_test.c | 21 ++++++++++++++++-----
- 1 file changed, 16 insertions(+), 5 deletions(-)
-
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index be6ce764f694..630110ee31df 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -1937,6 +1937,7 @@ static void test_stream_transport_change_client(const struct test_opts *opts)
- 			.svm_cid = opts->peer_cid,
- 			.svm_port = opts->peer_port,
- 		};
-+		bool send_control = false;
- 		int s;
- 
- 		s = socket(AF_VSOCK, SOCK_STREAM, 0);
-@@ -1957,19 +1958,29 @@ static void test_stream_transport_change_client(const struct test_opts *opts)
- 			exit(EXIT_FAILURE);
- 		}
- 
-+		/* Notify the server if the connect() is successful or the
-+		 * receiver connection queue is full, so it will do accept()
-+		 * to drain it.
-+		 */
-+		if (!ret || errno == ECONNRESET)
-+			send_control = true;
-+
- 		/* Set CID to 0 cause a transport change. */
- 		sa.svm_cid = 0;
- 
--		/* Ignore return value since it can fail or not.
--		 * If the previous connect is interrupted while the
--		 * connection request is already sent, the second
-+		/* There is a case where this will not fail:
-+		 * if the previous connect() is interrupted while the
-+		 * connection request is already sent, this second
- 		 * connect() will wait for the response.
- 		 */
--		connect(s, (struct sockaddr *)&sa, sizeof(sa));
-+		ret = connect(s, (struct sockaddr *)&sa, sizeof(sa));
-+		if (!ret || errno == ECONNRESET)
-+			send_control = true;
- 
- 		close(s);
- 
--		control_writeulong(CONTROL_CONTINUE);
-+		if (send_control)
-+			control_writeulong(CONTROL_CONTINUE);
- 
- 	} while (current_nsec() < tout);
- 
--- 
-2.50.0
 
 
