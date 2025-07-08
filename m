@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-204868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6607AFC544
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 10:18:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C5E4AFC546
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 10:18:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 565E13A99CB
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 08:17:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E97C41BC09F5
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 08:19:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D37220F38;
-	Tue,  8 Jul 2025 08:18:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BB4B28724C;
+	Tue,  8 Jul 2025 08:18:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="JailAMKu"
+	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="n99aPzf/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C5A298261
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 08:18:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD08C184540
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 08:18:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751962695; cv=none; b=MTnKMGTbgbRqk4l8aK1XPcvByD3CTjJQ0GdXJl6PbrDhfyktTzq1Pony/XYyOkybbZ0VjR2mB0JGLNi/ewaGFKyFxffm4MW4V/9enRfMNJz2rZ0zCEYDvUXif+V7hcmSzvD12cAPHCTjg8MeF+BTqCYAIb6wkYz57aE0PUPAdDY=
+	t=1751962720; cv=none; b=SFCypw1SBv7iqO8/Zj3GOSbjmvTUzLNsKNIPb1l7IaIdDkg2u0ZPuhAAqh2febbUtzY6vn8A3U38KHsqJMLmn/FUNqG0aUH4RmDKrI38z+Z6LQNGF9L+CVOjKCbiz9RL5+lMyLIwTAffyK3VRrFy5GbliCsbANLcu9MbBpkCYjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751962695; c=relaxed/simple;
-	bh=4tRBDxMtruDyjx4h9FeUGhCFEb8lNysnBN5KjVruqcg=;
+	s=arc-20240116; t=1751962720; c=relaxed/simple;
+	bh=jAs2ENUFhzrm5luMQi4G2/6AxfpTlaHhZJ4St0jt02U=;
 	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=fwEbQNVeZlBnQnrIa7SbS6ecNPeW8zzLRZXfQW9Rk8Q9n2KKimyOSGLnBfHP4cHSUhclHJdrEIBjSDYIwJRf8Z6zL+gcJ5LhnMINOUaHUIGTMfC5hlW4ajAYfzcHn74RvoE0MdAagkbAF748c9FSqI6iyPjMvgdm46tTTjW6zX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=JailAMKu; arc=none smtp.client-ip=209.85.208.48
+	 In-Reply-To:Content-Type; b=q9cYqszefrJsiDmjX216rbzcvMlMpmMQlJLRQM6aTWit2caW7tgCUvMaKaGri8USSXfi7fGINOcX70XGswmgofJZSEqG784sddC7PJOLWUyCWdkABB0CF3NKxLzaI0ooXbQHwnnKkyj9cnoa3iVVFdazm9NQD0ofc4swxwHBmCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=n99aPzf/; arc=none smtp.client-ip=209.85.208.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jacekk.info
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-607434e1821so5734253a12.0
-        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 01:18:13 -0700 (PDT)
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-60867565fb5so6728858a12.3
+        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 01:18:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jacekk.info; s=g2024; t=1751962692; x=1752567492; darn=vger.kernel.org;
+        d=jacekk.info; s=g2024; t=1751962717; x=1752567517; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=ECt+dIdgaw3umoEGmjzQgPet8hBsCkTrNh5MzSehM/M=;
-        b=JailAMKuFHarC56HXIWsNsKi9b/mRu+AruWRpEYrOv98Xbh3irEL6UnRE9OnGGoi1h
-         ujqjdkOyivBsjbn6VE+ivmCvu9xV6cXk9qz31CKpEAt1asj7qD4XN1bMH4p9LKd6iygj
-         48G37e6GDTrWOHAp2qrvoiVoYrGtL++u/0C9IJ3rC4R6ASN+attz6QJ9eDok7aQE7oND
-         nh7r5jpVR3MPYOX2WCFR+e16mDdWCDkKZPjZnPBgp1hL1OR9EZ130UzvRimJlbqDpzjF
-         eC9tKS+TxZKEtfy/gkrdc+ztmkuL7sE5ibTw3a1rlQHPTrEP/qgRsLoMYEu32jt/ei5v
-         P0FQ==
+        bh=BJiSUu3hWE44EXsDXKkg8pF1uNLtKLtK6eYZS81KaN8=;
+        b=n99aPzf/iTA1Y1fHx2bnghmUc80MT7ZYbGZM8YcmNW2s7jNGcUdcFr6562s6mckwiH
+         E0+uFUxu99VtoFEcGbIYd9sqgV6Wf+shJnTDCDAlxP1Dqhn/s3C3bFz3TgreemOblrOw
+         x7rYzrPm2XYybblLGBotN1255CFuOF2YUf/fY5VP0ETo6vsWk3e6Ob7PW4OfAilpa4Rn
+         CIsGlugIlads2M2jllmvqGQTdC6aZZLkGfUMLIfXypoAMXAhlZ0lZ8F/ds6gRo5ZhwB5
+         IkHR7lYdgea5HkufyxLMEzVRhhzukwNH6pj48JsteJB6owpXn0FaKNVgPIuyBqGbuJuQ
+         DhAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751962692; x=1752567492;
+        d=1e100.net; s=20230601; t=1751962717; x=1752567517;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:subject:user-agent:mime-version:date:message-id:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ECt+dIdgaw3umoEGmjzQgPet8hBsCkTrNh5MzSehM/M=;
-        b=aSGQ6EQR65ccCFLNMHcV8oGIpE6x+HGFlaD5xQvvKUBlx7aFobRg/Xh5ap8CSu7pJ9
-         pfEQP0xYjru/cBZK5RGeOwQGNUPR081Vz1H9NW9y8WJnh4wqK2cnZyG0aAM0Vhul8r0V
-         5Tsf4zZs4pHK9H+0bTwmNBhA6PKu4Neu7HAZrHYIUnMZtRvCCOLmBHv/JMjsKEHubT3w
-         RtKecjKGIJCoeqR3G7OSJZGVmFwdhGvvzWPGUof/QpCI5unXeUEaBHN9vsuRj+DW2k3i
-         i4/3JTue6WJkWMRhkGG6UIg0Ki6CBrg4a484xsg/RZUA9Akp5lEpoMHHlqb2VWdBlv8j
-         WPhw==
-X-Forwarded-Encrypted: i=1; AJvYcCWcLNNOIZ/MTTDR7mLZv33B7d+hz5d2/XhN+J/a1HKwrt/243rE5RNio5tP08jTIbHxyloz+E8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWedsa1FnZSBGF1aYiod15RGhtDBHz+MyKpoeEkVh+8ADSvqqQ
-	dyzqMuppD0orTONOQs8mjOTp7tZqWqTvCI5pxGkllFw99Zpkdq4A4UQ1xqmu1a2aZA==
-X-Gm-Gg: ASbGncsnQ/ZMty2DDPWE2XeqGW65cgObwLkbRqWdHtKH3YqGE/y+JVk5aOvDp2ZdZpO
-	cF5Fw7JH3jiP7+3ibiYEz7ATZfO4Copd5UX0uc0HNYrSRuTCepQGHXw2MBgFF1w85r9Cz+OUsIL
-	i18j1zFdcu2mgUYZ77LnlG9PkWmfJmXlaZwXesVZ+DqEoPJ5SVkM/WsWR0nnNPIRi70kk1JAllN
-	UodYWMTPUnVK0t83QyFfGUWqjZiF/R/D0JcCCx8z7B907N8PmNg9QGjmljJmMs1pQ9GYqpf4d1S
-	AniK+AvIIuSAy1clZMfhcmiejFcBJwyUgRU7I5vNzrJ33pa8QrWdEGqTpn1M9/+y
-X-Google-Smtp-Source: AGHT+IH8qs65vRzOkiBv7Armbc4ZYw+Y95kPHGW+aoYsxCldr30MbvH4UbgdZEYl/QTOe4GB0PCvEQ==
-X-Received: by 2002:a17:907:e916:b0:add:ed3a:e792 with SMTP id a640c23a62f3a-ae3fbd6160emr1558661666b.47.1751962691879;
-        Tue, 08 Jul 2025 01:18:11 -0700 (PDT)
+        bh=BJiSUu3hWE44EXsDXKkg8pF1uNLtKLtK6eYZS81KaN8=;
+        b=qCpyFWRLEpixf4JOBnt5QSatCyD7Jggzrp3M9sV14dOF6tBYTSmIRYF0YHWVAJrXtu
+         tW7BFlkRwVbd8RXe2WPflCH3ytn6IEjS3l35Axgs8k7bTf9RfBxgj4Ty6JGiQiDMa36m
+         hoDZzEnxsnidjRB7zgAW7x3JvKwjX+mdK7iPwKkQ0qo+vjEwlriZx2TVZ6sjBZc9UWMo
+         4Z6v5NRfPel/Zb9wdmTKddbgGOc7t0414GBeXvWtlTsk7gCRn0OwbhUSi5OCD73Ct5Ph
+         GIr8IXJXXaoEQZ/bXZVQVpYSqK8HdfXz8e+Gf5G+9MW1+gg3RE26CHDZ76LB7daFrVqj
+         80wA==
+X-Forwarded-Encrypted: i=1; AJvYcCXmtGcbBZ/c9GflLW3XjkpcsGDjXbey58+aDqtvOxwHKhZ04m86slM28F+ZlDQzAaFLiK5jYc8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAwhVZVBxfk8gLKxZ9z1eokWTxbfmmAMBd5c4XqK6vHy959HVF
+	NG9n9oBL/dpsDjkWAwUvYc6MLqEW6oA0mKWdE2F8IUaaOrf+C1VLUHmroCpkNVXkaQ==
+X-Gm-Gg: ASbGncsAFRJYjPncoCXkutCAwBLreYh/QlAO6xsnKPVVvem1kmlmlL1prVR3cyjFw0b
+	R7YJqZXUYjk2dbbpsbxOCHNT9E3pVHdEPGryq2H45llLm8OhTyD0548nsKjTOSLOLtFXo9UBB6v
+	DrY9DkXYRq4rqIiEWivmIFddZ5oSNVoOcEqWZSvSA27GPjvXPaCZvTfnXkLwSpFmAeIUKqMF4L4
+	xXvd3ke/sr08wAjXsUgnLbSP8Pz5ZoRAGSs7e6YitFx8lnHTB2NzkkRNiK9vfbN1X4qnoKV+WPI
+	WnsuaR0jREFGm3yD1G8g+7ArwCZ1zgVb7dGf7OWvAULU2swUkoRfrKoy/cN+W9uh
+X-Google-Smtp-Source: AGHT+IH6lR2m+v3knkC3IYA1tue00Z6M59zefIm0jwHX8zDQCkZwXr6vajUJk9ZtXJhj60dlCyqTbQ==
+X-Received: by 2002:a50:ab07:0:b0:60c:3d54:4d2d with SMTP id 4fb4d7f45d1cf-6104ae32aafmr1281314a12.22.1751962716902;
+        Tue, 08 Jul 2025 01:18:36 -0700 (PDT)
 Received: from [192.168.0.114] ([91.196.212.106])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae3f66d93f2sm852055566b.19.2025.07.08.01.18.11
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60fca667681sm6881085a12.16.2025.07.08.01.18.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Jul 2025 01:18:11 -0700 (PDT)
+        Tue, 08 Jul 2025 01:18:36 -0700 (PDT)
 From: Jacek Kowalski <jacek@jacekk.info>
 X-Google-Original-From: Jacek Kowalski <Jacek@jacekk.info>
-Message-ID: <42811fde-9b80-44a5-bc0e-74d204e05fe7@jacekk.info>
-Date: Tue, 8 Jul 2025 10:18:10 +0200
+Message-ID: <33f2005d-4c06-4ed4-b49e-6863ad72c4c0@jacekk.info>
+Date: Tue, 8 Jul 2025 10:18:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,7 +83,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH iwl-next v2 4/5] igc: drop unnecessary constant casts to u16
+Subject: [PATCH iwl-next v2 5/5] ixgbe: drop unnecessary constant casts to u16
 To: Tony Nguyen <anthony.l.nguyen@intel.com>,
  Przemek Kitszel <przemyslaw.kitszel@intel.com>,
  Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
@@ -103,45 +103,50 @@ Let the C type system do it's job.
 Signed-off-by: Jacek Kowalski <Jacek@jacekk.info>
 Suggested-by: Simon Horman <horms@kernel.org>
 ---
- drivers/net/ethernet/intel/igc/igc_i225.c | 2 +-
- drivers/net/ethernet/intel/igc/igc_nvm.c  | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/intel/ixgbe/ixgbe_common.c | 2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c   | 2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c   | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_i225.c b/drivers/net/ethernet/intel/igc/igc_i225.c
-index 0dd61719f1ed..5226d10cc95b 100644
---- a/drivers/net/ethernet/intel/igc/igc_i225.c
-+++ b/drivers/net/ethernet/intel/igc/igc_i225.c
-@@ -435,7 +435,7 @@ static s32 igc_update_nvm_checksum_i225(struct igc_hw *hw)
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_common.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_common.c
+index 4ff19426ab74..cb28c26e12f2 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_common.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_common.c
+@@ -1739,7 +1739,7 @@ int ixgbe_calc_eeprom_checksum_generic(struct ixgbe_hw *hw)
  		}
- 		checksum += nvm_data;
- 	}
--	checksum = (u16)NVM_SUM - checksum;
-+	checksum = NVM_SUM - checksum;
- 	ret_val = igc_write_nvm_srwr(hw, NVM_CHECKSUM_REG, 1,
- 				     &checksum);
- 	if (ret_val) {
-diff --git a/drivers/net/ethernet/intel/igc/igc_nvm.c b/drivers/net/ethernet/intel/igc/igc_nvm.c
-index efd121c03967..a47b8d39238c 100644
---- a/drivers/net/ethernet/intel/igc/igc_nvm.c
-+++ b/drivers/net/ethernet/intel/igc/igc_nvm.c
-@@ -123,7 +123,7 @@ s32 igc_validate_nvm_checksum(struct igc_hw *hw)
- 		checksum += nvm_data;
  	}
  
--	if (checksum != (u16)NVM_SUM) {
-+	if (checksum != NVM_SUM) {
- 		hw_dbg("NVM Checksum Invalid\n");
- 		ret_val = -IGC_ERR_NVM;
- 		goto out;
-@@ -155,7 +155,7 @@ s32 igc_update_nvm_checksum(struct igc_hw *hw)
+-	checksum = (u16)IXGBE_EEPROM_SUM - checksum;
++	checksum = IXGBE_EEPROM_SUM - checksum;
+ 
+ 	return (int)checksum;
+ }
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c
+index c2353aed0120..07c4a42ea282 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c
+@@ -373,7 +373,7 @@ static int ixgbe_calc_eeprom_checksum_X540(struct ixgbe_hw *hw)
  		}
- 		checksum += nvm_data;
  	}
--	checksum = (u16)NVM_SUM - checksum;
-+	checksum = NVM_SUM - checksum;
- 	ret_val = hw->nvm.ops.write(hw, NVM_CHECKSUM_REG, 1, &checksum);
- 	if (ret_val)
- 		hw_dbg("NVM Write Error while updating checksum.\n");
+ 
+-	checksum = (u16)IXGBE_EEPROM_SUM - checksum;
++	checksum = IXGBE_EEPROM_SUM - checksum;
+ 
+ 	return (int)checksum;
+ }
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
+index bfa647086c70..0cc80ce8fcdc 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
+@@ -1060,7 +1060,7 @@ static int ixgbe_calc_checksum_X550(struct ixgbe_hw *hw, u16 *buffer,
+ 			return status;
+ 	}
+ 
+-	checksum = (u16)IXGBE_EEPROM_SUM - checksum;
++	checksum = IXGBE_EEPROM_SUM - checksum;
+ 
+ 	return (int)checksum;
+ }
 -- 
 2.47.2
 
