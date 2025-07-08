@@ -1,101 +1,129 @@
-Return-Path: <netdev+bounces-204985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03B6DAFCC55
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:41:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE64EAFCC5C
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:42:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D37F61AA7780
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 13:41:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 144BF4A459A
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 13:42:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B852DCF54;
-	Tue,  8 Jul 2025 13:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C119E2DCF54;
+	Tue,  8 Jul 2025 13:42:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ihDOmJvd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E6C1F949
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 13:41:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90AF7E107
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 13:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751982086; cv=none; b=LXQbgoagbNvxbbtrG7aMgAWTk3S54UkV7SFYeUy/igzVuB+4cQ3T9p/VrDs3lAaxWvWHy+qVENv30hr3k5tJkfwxYBuSyJYzaoEtVS6Jr/1ddms/v1HPW0hJi/X39e9bOv29t2C/oaMf0qhxVPfbG/hKDAdIYifdf4BSFvyRXkc=
+	t=1751982167; cv=none; b=gI0jtfvhUN6ho9d+9m8i7WyenlDAL20SiEv+nxd/CGbar869cffcUNmkSSqypqkDzZZmmsLUfjcc2aP/ELH1LAqkjCI1QuuNwn/fbpjcMkYu1767PKW7gllvtJJt6X6FBTZaHrVRrqw15a48hVHRJi9JEAGXkbIiP7ATw7gjfyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751982086; c=relaxed/simple;
-	bh=DtbB4lgJf9UiUqFjNROhOaOtq+Q+ZUvuWg6zmLKxZqc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=pGmWvM1j0CXhaOGUfPdYol7jVIlGa6UTJWfbYLmLRDBFt2aN1FGSchcKFt++h4x3vcKvoodYkeTptRhLU6+x6M6yT3YbgbidORmDB4Fiujdinw280eXLVCt5MS6DGk8vcl4WPzHuePT2uo48goUzwDHYDWKD42Hf+u+/jrbiEdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3e059add15eso47635475ab.0
-        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 06:41:25 -0700 (PDT)
+	s=arc-20240116; t=1751982167; c=relaxed/simple;
+	bh=7IMZwdtT4ONplTSo8XHJ6xX4Q4sptOL8v2V3UkoQjlw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dV7ZP+pb4HQUfk1mS89qFNdM5j86B/YKr7SNwguUyPyzUgjv3kWQmmQJkAE8V8B4jSdC1vq6CJR2h7wae0ekAlFrb73Fchn7+4vFsauzkxCmkekBLvpAABUTjv2OvZl5E8rMuyFP5cPanYzIKxgsSecCbJFTkoVFhZtFC2rQeSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ihDOmJvd; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751982163;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P27oZItgQlQTIEu6BrjTyR+ZcNfbW2DcDgBZkxGIz3s=;
+	b=ihDOmJvdrY2E265JJO7y9DLpzLGY0sviPFqgWmQsi70zhelyRwzN5aMfS3YSLk/sXF8s5P
+	1UYUWVOVY3CPkzFO+5mosNee7Y0YdCkAx5FCWs0rC/yIWBCuYkR2omM+IPToXY8Z0ssBLx
+	Bkt/SeReuvstDMoNBvNJdBk0QWG6MYE=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-255-dIOGweNCNLe47_RGWRtNJw-1; Tue, 08 Jul 2025 09:42:41 -0400
+X-MC-Unique: dIOGweNCNLe47_RGWRtNJw-1
+X-Mimecast-MFC-AGG-ID: dIOGweNCNLe47_RGWRtNJw_1751982161
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-45311704d22so25571975e9.2
+        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 06:42:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751982084; x=1752586884;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jlqaBHX5Z4gTs5jTlvB1HnLAHIY50wvLNKNDyz6F8Uo=;
-        b=HnIfE0xOqoXvc6MCzzVnwbSWvP9jZUMrDfgbYWuDZTNEBf1Ahkc2Hp5T2ma2uPOzlJ
-         rpzn+cV8wbC3MGoMk2SACmiG0r8GMBSlk7CiQYBG4gue216HCzHswujOvNe2C1HjDcNR
-         3Z4JG4kFUTVYJqZAUD4OcJiRFmU5IZoUS1NnDbCyiqSK/2gbCfPbbJH8x/7cssChwEq/
-         g2CXSmKyZdQsXx/7KHJSU+A3I4olqPxFLuavbTYVJS2jR8Tx8RRVekQYRHPTD4bgW4Jn
-         B/VO9w6Xdu1atgckbzEsEXWqvTnodWzZgGIEGbTVDU087yLlPwJt25irje/GngiL9oq8
-         Fizw==
-X-Forwarded-Encrypted: i=1; AJvYcCUOjJKjuvpz+B/dD587PRgzR3O+MZTEWx/KE39C3R0hlvK/ZkdCy+tU/CVzgwjrHyLlK+8AsX4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyc5jxBQsWxN3rULUsqly27KernpBcqEcCVMap0CPPWl+m+AbH9
-	8dWzBsL+8GEPff7CnKgAIuVI3XwlJrn7fL/sAy+nG7c/caE6iRZ2wNTxsiy4wKXLiXJVc+SDIm2
-	cJ8H35wQ7dduzp7199kGFX0LdnSEqMY4AjNrU5X1hHYFmjvFYBYL5nXUzRxI=
-X-Google-Smtp-Source: AGHT+IEHWDHAzY2BOBD1guc6Dv80BuQF/GE+kymFwnh2q2O4DxQH0bj2bZyWxe0lBsXIvMyxgolCgFnfYM1D3NrBPPPMtUM3bDFf
+        d=1e100.net; s=20230601; t=1751982160; x=1752586960;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P27oZItgQlQTIEu6BrjTyR+ZcNfbW2DcDgBZkxGIz3s=;
+        b=uTgN5k89nhpK+79JENRfooJH0IKUqrwzptdwdHLJ/L9NwJfRPLYTGGX3A1OPK1djqZ
+         dVrpcNpG64ZhevEYy9OCPMc89rD5Y2HxJJjCAgt8CgNcuN4syHRNvgIhux6ai91ELnoG
+         jHQUwCKWQ+uXebA27/lH3EregkBWGHbQvMhpYvHadWR+MN2WCKNv6y5I1YAN4vwEsnk8
+         PzwSta6nwpGvD+iq7ICi1qmT0JI+Jf9HOIgFlBWNQ2tLsJcgK0Vn0qs/ciTWRS50H7c6
+         ECv+NmfHCiQ2Cc5fzF+lyeZdkT5O6IMSmDKTpMMwN2O53v9xq5YfotKBMjB/t1QskFfR
+         0D3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWfO9X42Hrn+DHaHfnjq6Mqioub0+N6FQVx4iZes6iU+Af1WAwiWI14Dn5elvMjAAuYKs1iu7g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOos3+NTyjHQOUyxn8M371dDNmVILTiMKpmG6J30mP0XAdJCf2
+	AUJbbdEnwQK1t1nx90tzE4qh15zvAS7uxrE5nd9x+I1ZiINURE1R+bIaV2S8lw6F+5I8oRVUfhX
+	1S51N4gaDRXRDxfSJ6z0UHwfK5eSjOj+Wwq2tEiuzTSStxzE6aqQ+/0kxIg==
+X-Gm-Gg: ASbGncs5VJEIcFNrXzWhkpRt/M+WwvmT1F+gPXtMXJklydqvhIP+BOKg0iVYXSp0UKc
+	b1hKnsFtyODTliwXtSt60D05fBkLE1NqtIwYLBYUUwv/6RfC1RqzUfMeeHKovai+jrrYT7B8o/1
+	8Q5qLmnE4oOXmTunopEGbMJrrcWs5xhpcst+DHt8Gxj7b9+08LzPDrENoblk9repdF8CcPZViLN
+	bcsK87exBk8dfAUhgQ7f4OapETCvACZ4HMEOXOboSHl+EJ8YqIdyUC2l8qACbmF8a9i2jDr0x6R
+	q8bfbvSszI40aAl9mR8qZVnhgpSh5SPXmzZY7iyiOjR1lxyj2Gm6cH7Y4HJZ5HfZ9eUf4g==
+X-Received: by 2002:a05:600c:154c:b0:442:f482:c429 with SMTP id 5b1f17b1804b1-454b4eacc98mr145947515e9.8.1751982160582;
+        Tue, 08 Jul 2025 06:42:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGwFsHBVEro5CvXOCFzVmkJDQs/mNrwHrnzu4qHxJ8LIqAIs4YS5XK8sVi8hyjhO6N8NrfG4w==
+X-Received: by 2002:a05:600c:154c:b0:442:f482:c429 with SMTP id 5b1f17b1804b1-454b4eacc98mr145947095e9.8.1751982159842;
+        Tue, 08 Jul 2025 06:42:39 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2717:8910:b663:3b86:247e:dba2? ([2a0d:3344:2717:8910:b663:3b86:247e:dba2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b4708d0b9bsm13204192f8f.30.2025.07.08.06.42.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Jul 2025 06:42:39 -0700 (PDT)
+Message-ID: <b610c003-5c8b-4fef-8fea-a2b40f8d1377@redhat.com>
+Date: Tue, 8 Jul 2025 15:42:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c26a:0:b0:3df:3be7:59d1 with SMTP id
- e9e14a558f8ab-3e154e3ca6amr26140235ab.11.1751982084422; Tue, 08 Jul 2025
- 06:41:24 -0700 (PDT)
-Date: Tue, 08 Jul 2025 06:41:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <686d2004.050a0220.1ffab7.000b.GAE@google.com>
-Subject: [syzbot] Monthly nfc report (Jul 2025)
-From: syzbot <syzbot+list6b8e21ba94b2aeb18e4c@syzkaller.appspotmail.com>
-To: krzk@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 1/3] selftests: drv-net: add helper/wrapper
+ for bpftrace
+To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Simon Horman <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, bpf@vger.kernel.org,
+ kernel-team@meta.com
+References: <20250702-netpoll_test-v4-0-cec227e85639@debian.org>
+ <20250702-netpoll_test-v4-1-cec227e85639@debian.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250702-netpoll_test-v4-1-cec227e85639@debian.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello nfc maintainers/developers,
+On 7/2/25 1:21 PM, Breno Leitao wrote:
+> From: Jakub Kicinski <kuba@kernel.org>
+> 
+> bpftrace is very useful for low level driver testing. perf or trace-cmd
+> would also do for collecting data from tracepoints, but they require
+> much more post-processing.
+> 
+> Add a wrapper for running bpftrace and sanitizing its output.
+> bpftrace has JSON output, which is great, but it prints loose objects
+> and in a slightly inconvenient format. We have to read the objects
+> line by line, and while at it return them indexed by the map name.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Reviewed-by: Breno Leitao <leitao@debian.org>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-This is a 31-day syzbot report for the nfc subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/nfc
+Does not apply cleanly anymore. Please rebase and repost, thanks!
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 5 issues are still open and 27 have already been fixed.
+/P
 
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 459     Yes   INFO: task hung in nfc_rfkill_set_block
-                  https://syzkaller.appspot.com/bug?extid=3e3c2f8ca188e30b1427
-<2> 329     Yes   INFO: task hung in rfkill_unregister (3)
-                  https://syzkaller.appspot.com/bug?extid=bb540a4bbfb4ae3b425d
-<3> 63      Yes   KMSAN: uninit-value in nci_ntf_packet (3)
-                  https://syzkaller.appspot.com/bug?extid=3f8fa0edaa75710cd66e
-<4> 49      Yes   INFO: task hung in rfkill_sync_work
-                  https://syzkaller.appspot.com/bug?extid=9ef743bba3a17c756174
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
 
