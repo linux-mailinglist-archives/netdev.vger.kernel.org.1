@@ -1,205 +1,237 @@
-Return-Path: <netdev+bounces-205151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E64EAFD993
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 23:18:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E63FFAFD9FE
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 23:32:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFA461715F1
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 21:18:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7394C7B3D10
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 21:30:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37858253B7E;
-	Tue,  8 Jul 2025 21:17:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37E321C167;
+	Tue,  8 Jul 2025 21:32:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TWcmRgMC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cgyhviLD"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2054.outbound.protection.outlook.com [40.107.237.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7EB251792;
-	Tue,  8 Jul 2025 21:17:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752009437; cv=fail; b=EIdOhDXn0AwV/WxjwdrBibjt53mOBNoKlhcZ2q84rqHAV+OKw0b2v6k+VWIsKxFMM4/TQwrPs4/ddtTxgHJ7GZ48euRdbzdBqvAfb++svRq9HQ+OJn7FbhB/IPo80EFaIxqce0Hjn2RGSGpALRLwX9rKAuwHwbBzY7JyDX650yo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752009437; c=relaxed/simple;
-	bh=M7gic7/nVeVa8CPTx/GVnTPTpA/kvQobUY0MX4+g8dE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cVFkrd9rHJEeLfMkD8fBZ/V80ArWhgkiroeF6LuJ+YnuF00bQB2iGVd9c0JvCyJQSqnL30tvD5QM/XLAWOcf9Z/3KTMDOyL8T0LleR4azXyqSysZ2cyf+wRKQUvv9AHy/aGSSkH/txoWgyR18gldpgHjzHdKLT1yJtc18aNljlM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TWcmRgMC; arc=fail smtp.client-ip=40.107.237.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Wi/opI3ENvWGxA+MdhP1/OCYbLUsDLDPcGtW/THSYtPmz1Jmz7//fTCLrO54E/ld+r7if8SqEyn65PAfIVf3X0pUr3vGMsBuCNCafkGtElhgrBp+q/RhmrynqVq/34nqsohIjE12Kl/ZPpS2tL7JtPdNfCEAPBDphr9TxowKgUCj6dND7/QBCTbTiQuAeZqLBUDK21VGV3AU80VmIw/JhGQ0AXjH7F+ub7RFvXamEdHeH8wqEFmupw3hpR6n+Lj7pz5CfWsfEv+8gs7kZwGyLkN11AcjCWa7fV3t0Eu1RvKSzjpzvJIv/CBS/c2wf8QrXzT664I+clZV1JZLtSg/mw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dnxD2vJQ1xpim/Ofed8TCDALx6YRmKyfch4XJFCvv/8=;
- b=u8BQqllUcK41CiDRaDcatQhgj+hJplsXkQmeCnOTG/pKUcMg6CAc7ClpUxxZ+DuK9JKwSXBW0m7YjR2hwVmoInuPhsQl7xXKs0qCQ3u/b9jnQvTS1FBWqzgKcNSLK06dKs2DuKiAnOqZENzAGTA6NYQsqAiqVjKVTFixGH8Tc80MXGLe8X85gva6ToGC/rT0j7YMWmhz2CSYgEcg4bR48YCZov1A7XVai4Qd00xTxE29KW1AlLN7RSqDjUb6jDmxe3oDysJTGfMfOX+KEiLlDTpmyvDUyrdYcqfBQi1o6aKHYq+VrP5/teoT6JJ8dOf5O7bMYrU/fZzGJ4Jqjrt+NA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dnxD2vJQ1xpim/Ofed8TCDALx6YRmKyfch4XJFCvv/8=;
- b=TWcmRgMCctIiRhKYWW6Brfc/fvEF5xu09k69mr0z69P9U9mG1mLE4+2WBlU2+begt/0jSxEPVa5YTpYIK71TmNfbybaMUrL0gcYSjrIazRnp1g2fOZ7Fdw07a4+4zT0f20iUQU500nRnhbScaYUFgDd6/pkYkfitmOYnEqYJxgOQM8Rmc6uWAFSJXVD8uIX5En29n3qDp1uboPUGseYEPCRKytHgRhg9ep2ZqXNLX7yrGnrVdS7Q25ezbNt6mSyK+CmEYy/G2Cxc0eFFn8Nncq4CCRzIwm5TLZdguMJeror9GHCeuqu4D8QS2uvzy8s5bOQoeHZIK9jHF5xWq5d7ug==
-Received: from BN9P223CA0018.NAMP223.PROD.OUTLOOK.COM (2603:10b6:408:10b::23)
- by CH1PR12MB9647.namprd12.prod.outlook.com (2603:10b6:610:2b0::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.23; Tue, 8 Jul
- 2025 21:17:12 +0000
-Received: from MN1PEPF0000F0DF.namprd04.prod.outlook.com
- (2603:10b6:408:10b:cafe::8f) by BN9P223CA0018.outlook.office365.com
- (2603:10b6:408:10b::23) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8922.20 via Frontend Transport; Tue,
- 8 Jul 2025 21:17:12 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- MN1PEPF0000F0DF.mail.protection.outlook.com (10.167.242.37) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8901.20 via Frontend Transport; Tue, 8 Jul 2025 21:17:12 +0000
-Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 8 Jul 2025
- 14:16:57 -0700
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Tue, 8 Jul 2025 14:16:56 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.180) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
- Transport; Tue, 8 Jul 2025 14:16:53 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>
-CC: Saeed Mahameed <saeed@kernel.org>, Gal Pressman <gal@nvidia.com>, "Leon
- Romanovsky" <leon@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, "Tariq
- Toukan" <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next 5/5] net/mlx5e: RX, Remove unnecessary RQT redirects
-Date: Wed, 9 Jul 2025 00:16:27 +0300
-Message-ID: <1752009387-13300-6-git-send-email-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.8.0
-In-Reply-To: <1752009387-13300-1-git-send-email-tariqt@nvidia.com>
-References: <1752009387-13300-1-git-send-email-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4431423D2AF;
+	Tue,  8 Jul 2025 21:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752010332; cv=none; b=HnFDWGlnVH7pj1P5/h/TddhMKUam5inwZvUHHe1HVKwWgg+J7IMojz1nMmJ8rssonhU7AGXkkTBWr2bib1ux5RtiVWxB3PBBgy9slpjQtyE/yW5SA43KBCqHWZaxHnoROv8g9govFdMhtQLFS0E5A850kZpnFTFFTnZ9Pmnjc00=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752010332; c=relaxed/simple;
+	bh=Pw2tangHLjfnesfQFP7eKNC/pKemmrklHF/DkQvRmgk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A+uRgx1y+vMThH09oJFrc/22JgX37Wc364erDJ7JuEIefnTIaY/vUD08uToIzWmGYWcJQ/ssv9JKYEB4ph62l6PMmhx2Ho0Nry+OeMhFfWMi9rfetg4nXVB4to88LfqKVaol4MPJ4kaX0M91sO2GpEFuCfiFoIKMUCaUL1xFCEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cgyhviLD; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7490acf57b9so3344507b3a.2;
+        Tue, 08 Jul 2025 14:32:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752010330; x=1752615130; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=pnIHAWjCQETnK+vTDXiOL7mPc4/NFBBMGyX5aZiWfnY=;
+        b=cgyhviLD3bjWFTEf7JqusVZJPOPWxWtQUiPfsGlDejIpppJSBQRVjYgCSL6vc9VY5r
+         ru/Cp5P7EAwfkQU3MEh0xIkPve4bOHvsSoodXplmQv3hfc/uVYvJts4H9Bo20QZPQp4U
+         i1ySVPmvsrEY285dbjdD3J2I6w8+7JSe04OD+oGl8qLHwXryPIWNna65fIZCstInS2OA
+         7Kw3dWrsP8XOGEDQjGDjkX9w8TtKEpuNdLEVlC4xrfMPP7JEh61lmrMFFNa9EfHGdoNs
+         PJA6sycpkqYNM6p1/VIPWuiMSxfWqoLpWjBQIqeJUcExaxIAKjrYUHfbarrEuhzYOgMo
+         uTPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752010330; x=1752615130;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pnIHAWjCQETnK+vTDXiOL7mPc4/NFBBMGyX5aZiWfnY=;
+        b=WwSwyQimiCEI7HVTNf8K81FiyaBJ90UrdRRhSl7F+aeWSO2sLI/y/4/CLNuc/6ZPab
+         So/VIDq6dOLii/hRJJMuJDgl2KCdcYA/EURrukQPOSQUfjkAtr9F9KfZqD57noKLDeZU
+         G0oMnDeKnfsnGpeNlXtHQxztfpxcKi5HJNXlymI4rcKv1cB0qV+5RkgQZ7uPbUmwztXE
+         xaRbtrFPF9J0EceecSOlMNDgTOL+7ZZPeGPcXj8plgvjzZFrHBbyuDkZR3vyokBnA03v
+         nd6JrUR5hGsnWFEZkYLghQTw8djjUKFklIp6/ss8i+XR/fqUj4q6GlDthkJb1kPaZVLn
+         W91g==
+X-Forwarded-Encrypted: i=1; AJvYcCU6g0TTE0+oskwee6N9VKbHvYXXJUDsFyXVTjfTrh8tmWIgm+whJrRi0G5/vwwtO4mzbO7M/Uu4KAJ/g7g=@vger.kernel.org, AJvYcCUfQWqxfx4yL+srur3iF6T0pwoK3ZYwg62hPcMWQlSc76JUsBYRS40DgHRFnrVmN2iGv7MWyFkk@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqDVhSstiTPYyz8T3XXiWFv9fwx+YNA5m5DWsDspQmF7aAtu7y
+	RNALBz1PAFBEpEm0rm5sEen0oSBbmik1i12SNPTGDt6QFwZrwucoX815
+X-Gm-Gg: ASbGnctu5jwe70zp0+x0e4ZILYNxXOHliiEBFV7jpiYLyD8QrNXbyso/IGqRNw6NyJG
+	xLCtqVP13ZPLPv5ROndRslWSR4StVp6U2zbO2Iwa2/oM9xUZe62DVjaxPAsRX4O1qyFdpms7n6y
+	grfV6hlRFOVLX8bKr4cX2POffz13Q2G+x9FV1cU8Z59Ivadsk/00ctRZQcHrAD4bxbC07ZhEmFJ
+	gW+aO5ABPw89kWNiNvGGD96EHWzNP09I3+pwX2Si6q6CcegR4iIGkxEMntJ6jlA/S55PcBpVdHZ
+	BZRGGBXGXpzwmTEJfiXAE+nGQ4erAcsoEs8iAuKm/1USEJRm0sY1GYIBDlJM6YkORw==
+X-Google-Smtp-Source: AGHT+IH8aKfp83IIEeO5mbMYz+adwoxxvkgbVv/nQxIP4XshTEm/+Itqydsx+GqaCUQXCGAk75Bj7Q==
+X-Received: by 2002:a05:6a00:139c:b0:749:456:4082 with SMTP id d2e1a72fcca58-74ea63e6566mr242718b3a.1.1752010324394;
+        Tue, 08 Jul 2025 14:32:04 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74ce359eeddsm12635717b3a.7.2025.07.08.14.32.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Jul 2025 14:32:03 -0700 (PDT)
+Date: Tue, 8 Jul 2025 14:32:02 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: William Liu <will@willsroot.io>, netdev@vger.kernel.org,
+	victor@mojatatu.com, pctammela@mojatatu.com, pabeni@redhat.com,
+	kuba@kernel.org, stephen@networkplumber.org, dcaratti@redhat.com,
+	savy@syst3mfailure.io, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, horms@kernel.org, linux-kernel@vger.kernel.org,
+	torvalds@linux-foundation.org
+Subject: Re: This breaks netem use cases
+Message-ID: <aG2OUoDD2m5MqdSz@pop-os.localdomain>
+References: <20250708164141.875402-1-will@willsroot.io>
+ <aG10rqwjX6elG1Gx@pop-os.localdomain>
+ <CAM0EoMmP5SBzhoKGGxfdkfvMEZ0nFCiKNJ8hBa4L-0WTCqC5Ww@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0DF:EE_|CH1PR12MB9647:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2438859b-4462-44e7-1012-08ddbe64ce88
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|376014|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ymSnPN5Ke3LjpCk0KbNS8zg5pLuxdBTIBpnEhX4hWTH5WuINLYouzCOaphqt?=
- =?us-ascii?Q?RsG0lUr6JmHAtVC4hijOXGtgUuH3UokVb3I7k1cEV9BLTMbHSjkO5mqWzZ0I?=
- =?us-ascii?Q?rDA28MLqcTdgD7u/4d4NlXxARxNvBci3jnD1VfxsHctu5BlL03iHp0+JMj4U?=
- =?us-ascii?Q?wVxO51wKDfZsxigtVc9vdJikrgNl2/wUYnimhtnIE9C9JgK4bFU4v6umP2I6?=
- =?us-ascii?Q?keQ7Lj/JGp4uGwYY1nWTZ0ar1iDVUZ9RDRa4vo+DpRQOI/wCk9QGRe/sEpSL?=
- =?us-ascii?Q?23Sf4jDFG/485eoHggXSAZeG/o+iHzgmOBaHti1ELgYdZoP+FE7n6cgs3Pck?=
- =?us-ascii?Q?BF6TVLCOXuxINzks8ftuxVNLINuIn0lqkmBvY0jrdTclPNRrMtVPRrw0xcck?=
- =?us-ascii?Q?yWKSjpdQ5EcdRv7b2GqoI+QY2ofzwlor5oyQNws9nVGV4MlTgNBujiy3dbMV?=
- =?us-ascii?Q?SeXZBMAb9VzG5ZhiyYF5wM0hdA+Dj2MbNtdazpvFGagT5CuX87IYGYD8vpLG?=
- =?us-ascii?Q?7q8sREAZMLaCXUyo9EqV2BAv9Dw+X71+OIxK9b6BSEHRa6jooB0STwXXYoaa?=
- =?us-ascii?Q?hA9j+zQNKOyyOUUVwmDHxTrRdmJr5sieL4YjOOrIqS56OR/NCQTxiqqkazvO?=
- =?us-ascii?Q?HbauvkK6mHXGbin/ViXzKFNlBpO/eTVLtp3DQJG0idPCsUcUexr3k+eojXpy?=
- =?us-ascii?Q?qC2tjBZ1D7FGv0Rl6Ro0STEn9LH/fpIiE21D8QGsbgye70yHGCumQ58oj5Mj?=
- =?us-ascii?Q?XX3xCfw0XxSN4vVTuPRodhSsa756kou67+JIlsdvwRCK1KHYGVRcPGDv4etk?=
- =?us-ascii?Q?92QBgHz95dcbZR/FVTbOmznUv/4YViaiTfrJdDPs87UBKCYTQNJSFlm5BPs/?=
- =?us-ascii?Q?h09D3q29eObfHTFB1jc6w5UaUx3OfZCMXjLkLK/7c6cDDcVpCn43EsNm/RR7?=
- =?us-ascii?Q?ct07o5E/xdsFA925No1ymEOMtLy7Fpe7SLzzbV6er604bO9yvFTZ2eBfwxcS?=
- =?us-ascii?Q?YRw5hP99wn0DFTEc2x3ENpV4F4eP+0MMQAbZLXZWPyJcisxlZBByNdHWlR6f?=
- =?us-ascii?Q?9hT1Rzs6vdqRgzLn7TYR+cT9JCf3dWlTprrlhkxMyN6BK8ZJNLnPkKQiqKc2?=
- =?us-ascii?Q?Q1ymwuTQJxL58HJ0NrmOhDgJrD4Y6mhiBI+jNPnnb7kOKKGnkGaiuWPgIqjC?=
- =?us-ascii?Q?4ATk/oNwS984Y7RVNPhXJBzfQx+a2g5n2iz0GhRPKWQWfxDcAT+tR6vqvLCx?=
- =?us-ascii?Q?rwxJoiKRrtUmPy/RsMlW53ihOaBS6tM+wMbs0FZvB43MqJCU/94xGxeQTmDB?=
- =?us-ascii?Q?9cBwpEtenRq4gzKeSfR0G4RYgd3Ht8k0WrMlC28/X5F7fye68FX9SrJQHW7u?=
- =?us-ascii?Q?q10nsvDEPl3wZjAoTGlE5R42tLwjZ9ZaQNkpbg/H1JjREK0bkGNIISmfIWaE?=
- =?us-ascii?Q?z861XdySKZ5cTWAxG97VtuDLc17O9JlcuWO5wwkocU74mR7WqGwws4mGJEGL?=
- =?us-ascii?Q?C5NF359DsdD+RUWDpBT4VVggEuo6vAwc8c9N?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2025 21:17:12.5644
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2438859b-4462-44e7-1012-08ddbe64ce88
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000F0DF.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH1PR12MB9647
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM0EoMmP5SBzhoKGGxfdkfvMEZ0nFCiKNJ8hBa4L-0WTCqC5Ww@mail.gmail.com>
 
-RQTs (Receive Queue Table) should redirect traffic to the channels' RQs
-when they're active.  Otherwise, redirect to the designated "drop RQ".
+(Cc Linus Torvalds)
 
-RQTs are created in "inactive" state, pointing to the "drop RQ".
-In activate and de-activate flows, do not "deactivate" the rest of RQTs
-(beyond the num of channels), as they are already inactive.
+On Tue, Jul 08, 2025 at 04:35:37PM -0400, Jamal Hadi Salim wrote:
+> On Tue, Jul 8, 2025 at 3:42 PM Cong Wang <xiyou.wangcong@gmail.com> wrote:
+> >
+> > (Cc LKML for more audience, since this clearly breaks potentially useful
+> > use cases)
+> >
+> > On Tue, Jul 08, 2025 at 04:43:26PM +0000, William Liu wrote:
+> > > netem_enqueue's duplication prevention logic breaks when a netem
+> > > resides in a qdisc tree with other netems - this can lead to a
+> > > soft lockup and OOM loop in netem_dequeue, as seen in [1].
+> > > Ensure that a duplicating netem cannot exist in a tree with other
+> > > netems.
+> >
+> > As I already warned in your previous patchset, this breaks the following
+> > potentially useful use case:
+> >
+> > sudo tc qdisc add dev eth0 root handle 1: mq
+> > sudo tc qdisc add dev eth0 parent 1:1 handle 10: netem duplicate 100%
+> > sudo tc qdisc add dev eth0 parent 1:2 handle 20: netem duplicate 100%
+> >
+> > I don't see any logical problem of such use case, therefore we should
+> > consider it as valid, we can't break it.
+> >
+> 
+> I thought we are trying to provide an intermediate solution to plug an
+> existing hole and come up with a longer term solution.
 
-This cuts down unnecessary execution of FW commands (MODIFY_RQT), and
-improves the latency of open/close channels or configuration change.
+Breaking valid use cases even for a short period is still no way to go.
+Sorry, Jamal. Since I can't convince you, please ask Linus.
 
-Perf:
-NIC: Connect-X7.
-Configuration: 1 combined channel, max num channels 248.
-Measure time for "interface up + interface down".
+Also, I don't see you have proposed any long term solution. If you
+really have one, please state it clearly and provide a clear timeline to
+users.
 
-Before: 0.313 sec
-After:  0.057 sec (5.5x faster)
+> If there are users of such a "potential setup" you show above we are
+> going to find out very quickly.
 
-247 MODIFY_RQT commands saved in interface up.
-247 MODIFY_RQT commands saved in interface down.
+Please read the above specific example. It is more than just valid, it
+is very reasonable, installing netem for each queue is the right way of
+using netem duplication to avoid the global root spinlock in a multiqueue
+setup.
 
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Breaking users and letting them complain is not a good strategy either.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c b/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c
-index 5fcbe47337b0..b3fdb1afa1e6 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/rx_res.c
-@@ -579,8 +579,6 @@ void mlx5e_rx_res_channels_activate(struct mlx5e_rx_res *res, struct mlx5e_chann
- 
- 	for (ix = 0; ix < nch; ix++)
- 		mlx5e_rx_res_channel_activate_direct(res, chs, ix);
--	for (ix = nch; ix < res->max_nch; ix++)
--		mlx5e_rx_res_channel_deactivate_direct(res, ix);
- 
- 	if (res->features & MLX5E_RX_RES_FEATURE_PTP) {
- 		u32 rqn;
-@@ -603,7 +601,7 @@ void mlx5e_rx_res_channels_deactivate(struct mlx5e_rx_res *res)
- 
- 	mlx5e_rx_res_rss_disable(res);
- 
--	for (ix = 0; ix < res->max_nch; ix++)
-+	for (ix = 0; ix < res->rss_nch; ix++)
- 		mlx5e_rx_res_channel_deactivate_direct(res, ix);
- 
- 	if (res->features & MLX5E_RX_RES_FEATURE_PTP) {
--- 
-2.31.1
+On the other hand, thanks for acknowledging it breaks users, which
+confirms my point.
 
+I will wait for Linus' response.
+
+> We are working against security people who are finding all sorts of
+> "potential use cases" to create CVEs.
+
+I seriouly doubt the urgency of those CVE's, because none of them can be
+triggered without root. Please don't get me wrong, I already fixed many of
+them, but I believe they can wait, false urgency does not help anything.
+
+> 
+> > >
+> > > Previous approaches suggested in discussions in chronological order:
+> > >
+> > > 1) Track duplication status or ttl in the sk_buff struct. Considered
+> > > too specific a use case to extend such a struct, though this would
+> > > be a resilient fix and address other previous and potential future
+> > > DOS bugs like the one described in loopy fun [2].
+> >
+> > The link you provid is from 8 years ago, since then the redirection
+> > logic has been improved. I am not sure why it helps to justify your
+> > refusal of this approach.
+> >
+> > I also strongly disagree with "too specific a use case to extend such
+> > a struct", we simply have so many use-case-specific fields within
+> > sk_buff->cb. For example, the tc_skb_cb->zone is very specific
+> > for act_ct.
+> >
+> > skb->cb is precisely designed to be use-case-specific and layer-specific.
+> >
+> > None of the above points stands.
+> >
+> 
+> I doubt you have looked at the code based on how you keep coming back
+> with the same points.
+
+Please avoid personal attacks. It helps nothing to your argument here,
+in fact, it will only weaken your arguments.
+
+> > >
+> > > 2) Restrict netem_enqueue recursion depth like in act_mirred with a
+> > > per cpu variable. However, netem_dequeue can call enqueue on its
+> > > child, and the depth restriction could be bypassed if the child is a
+> > > netem.
+> > >
+> > > 3) Use the same approach as in 2, but add metadata in netem_skb_cb
+> > > to handle the netem_dequeue case and track a packet's involvement
+> > > in duplication. This is an overly complex approach, and Jamal
+> > > notes that the skb cb can be overwritten to circumvent this
+> > > safeguard.
+> >
+> > This is not true, except qdisc_skb_cb(skb)->data, other area of
+> > skb->cb is preserved within Qdisc layer.
+> >
+> 
+> Your approach has issues as i pointed out. At minimum invest the time
+> please and look at code.
+
+Sure, no one's patch is perfect. I am open to improve any of my patch.
+First, let's discard this user-breaking patch for disatractions and
+start focusing other solutions (not necessarily mine).
+
+If it could help you, I can set the author to be you. I have no interest
+to take any credit out of here, the reason why I sent out a patch is only
+because you asked me to help.
+
+> I am certain you could keep changing other code outside of netem and
+> fix all issues you are exposing.
+> We agreed this is for a short term solution and needs to be contained
+
+I never agreed with you on breaking users, to me it is out of table for
+discussion. Just to clarify.
+
+> on just netem, what is the point of this whole long discussion really?
+
+To defend users, obviously.
+
+> We have spent over a month already..
+
+Sorry to hear that, I think you are going to a wrong direction. The
+earlier you switch to a right direction, the sooner we will have a right
+solution without breaking any users.
+
+Once again, please let me know how I specifically can help you out of
+this situation. I am here to solve problems, not to bring one.
+
+(If you need a video call for help, my calendar is open.)
+
+Thanks for your understanding!
 
