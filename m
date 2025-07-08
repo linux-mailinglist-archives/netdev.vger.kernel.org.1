@@ -1,82 +1,145 @@
-Return-Path: <netdev+bounces-205010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B995AFCDC8
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 16:36:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC742AFCDD6
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 16:38:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 244F3580CFF
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 14:35:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFE01188FDE4
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 14:35:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A017C289E2C;
-	Tue,  8 Jul 2025 14:35:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D2A32E06F8;
+	Tue,  8 Jul 2025 14:35:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dQ8yZRHF"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="XPMe5JTP"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A3813957E;
-	Tue,  8 Jul 2025 14:35:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F852E03E0
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 14:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751985303; cv=none; b=W27El1kHOXPom6UKbOYIUmjilsBylh5ZHQbO5mDfMo5Kt2EoMKnPKndKY0EULpoMIFC9SVEbajaub91Bz6UWDoaihe0U0O2rKX+EgUVU/ZTngacKegtDKEnAqO5zAIf8YAACNN4bf5GpusDeh3XPBPipaPQcCEdNdKj3a6x0lUY=
+	t=1751985307; cv=none; b=D4IY/xwQW1ITJfrewvjMXiC3sWd66yMym7TwCqvkVcIQDDVGYuF/SFKZm9WJtVnIyTY0oLPOl2umrNTFnc/9dZphDg6waD5astDMCLy4pW9t0NfP/Zi1YR4x8v1g5O1szIAZ8Zav4FvP8e2VAtVe/Ulbq3vVknW/FOzryQH1wbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751985303; c=relaxed/simple;
-	bh=ECOKHVhK7xDoHwg8uSR2SY6e10kX8TNbz9priKpMX1w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wt3p9cpXmdb9Qwu8z2ieShZZ4XsKdd5QFgF9Mm7qksOW7zAnFsWXjA2cbS7OkOXxXNAAGAqfbdP+UjSb24lLLfUmlUNUIqrjgTjBfuRvY1J9k0UwCr/opJtLISiY+lZiZjMv+uhvNr6doz6hckAbUW56NoR+38UHCrzIRSpNMeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dQ8yZRHF; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=gdz0beR2fzyal7iK8mhUOStwe9TumUdajoByiuklz3M=; b=dQ8yZRHFNtcfSGeJj6SQ7JDVuG
-	suIPtCRFF4ysnj8g7sjhNEz+s6oWh6r0ynFF133iuOB4ddJ6dZHCtI6LZrvt+/wcUxEDU3Q/3EyXL
-	NcLcd99cVs3tukVBskxrS0t/JyHCSr/nD+VjAOx79e1WX0ec46XmmXN0zRBv6kFrLiLk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uZ9PJ-000pVD-3v; Tue, 08 Jul 2025 16:34:53 +0200
-Date: Tue, 8 Jul 2025 16:34:53 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	shenjian15@huawei.com, liuyonglong@huawei.com,
-	chenhao418@huawei.com, jonathan.cameron@huawei.com,
-	shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
-	arnd@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 03/11] net: hns3: use seq_file for files in
- queue/ in debugfs
-Message-ID: <2cae4f9f-9191-4e29-8204-23332b9ad55d@lunn.ch>
-References: <20250708130029.1310872-1-shaojijie@huawei.com>
- <20250708130029.1310872-4-shaojijie@huawei.com>
+	s=arc-20240116; t=1751985307; c=relaxed/simple;
+	bh=7frYhm6hNHHaV+KsH5p0Qn6S4lh/W0BUcifzlnaxQvQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=XCRqcvk5/ULLHVJErLQdN1j0QejP+OuWqcKyxLNcebY33FeC28Z7PTsWMCIHE0r19YD7ZHbFTQDBVtrYC6YrLuIxxAtL88r4SR8IFWHFXAevlm9eM4ciYkHC/swEPG7iCGquazBB0Rd8smtFlsCyd9/WqESRNF6Ll5qZf/azY+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=XPMe5JTP; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-ae0b6532345so1004687666b.1
+        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 07:35:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1751985303; x=1752590103; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hxwpTC4pjKEwraXDworePX6nm0pYbDVXaWFr1fnQfIg=;
+        b=XPMe5JTPDrv8TrmjIOiVEOcNeGfJdeEiNXkjDOiqYtdQThNqKCykHnfXYlntQmcnI9
+         PpvIzU5yOt2W7zStZtirYISkYrPLcyl71mNzRq/YyFiJZA/hOmdmFW4GzYXMVXRmw620
+         1Tk9CCKm6MZ5O/yGWrsHBlgrNhXoRndj/xMJd7PH0ctaEZ94b3aOjipW6aYn39tU3gcX
+         Y3cEvfXw/Ef8MhpuQbXPbHbtiEuG8jHRwv8x9I5he76kzU3urSmN0C2H5jD498ilp4KT
+         oXoNZ8OA2fayzxDo/oVpcWbbWhz8Hhc/yo6rQDk1A7qk9bCyoDEl6CzM6C5rsM+PyzVi
+         hpBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751985303; x=1752590103;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hxwpTC4pjKEwraXDworePX6nm0pYbDVXaWFr1fnQfIg=;
+        b=SXxnk6CxvlxX09F36WvTAiuTLJTz7SEyFjoU+ApaP1V7ilnZnyOYN24rUx8uYIHswx
+         fJnuFzpKC9lFim4WBGO+/H/fBd5pU20qt9TU7FaqwBm1KlcWlWrfNB20ccHGKqZy4Q5S
+         F4TEI+n9XqBVlYlJd6ioC+2dDcGRuj5QKtlztITaBwLA8JwrfIiu+yLKfV8Qcfj0RLnk
+         9iWQQGF6QUtefYcmXdwFyAdTEqP4BJx6n5TG3wJI36QegtezT7pFGx2XIrH8Rf7RyqQn
+         kHR7aZYMgysk54Ki/tIGeIevioDa+xI2ltTP9U9rV1AHnlzKv3xLOFNyawRQqbC/dKKO
+         uOOw==
+X-Gm-Message-State: AOJu0YwpvZxQrlE9rM9Gr1oolkwi6yN+bVOhhWz6y9KHxtdSyU8OBoJf
+	aWlXCTJojzb0DDSb0lB/7uaWak4UnMf0zrsWH1tu+6vU8XrgJfEAGdeQNxHTRKkYqg0=
+X-Gm-Gg: ASbGncuMVAr2+I98IdKimRWQRVm6GS2//UCn+uVyfQlJUnFCd/vGUcMHDtimJ7LHUA+
+	j2jtHcRq54wfz+o3dVvxLUgyqZG7sXcbmx/0OB8HnnoQ7wG+GMzL38MuE8c4NJbCvvJqW5RNUnz
+	R2HbaysBUidJy1vFJJWJNqf9cTEy14yiJUXuXkJvGM1o9ZrQybhxtLRfEGKQ2mZGppezaWXKBAO
+	JvxIW4itYHibEEIkDCgV9tfpjj0adsiGYA0oI2XngMZEhKIGMZ6dmVbAdXpurXX+X6t1OjKYNjY
+	Fcz4WnQA1WUKjq97RqUcdJwEcralj2H4oVA9yz7Yrezh03y550HQ88usxIIBpRQQMw==
+X-Google-Smtp-Source: AGHT+IGrXyge7FfOVN23iefvx++vUMDnJdYknk8QF22LCGBDXXJ6noAno8D8tYkciBmeZoIqRAR5RA==
+X-Received: by 2002:a17:907:3f0a:b0:ad8:91e4:a931 with SMTP id a640c23a62f3a-ae6b2b34160mr314160266b.26.1751985302632;
+        Tue, 08 Jul 2025 07:35:02 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:8c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae3f6b02c6dsm898889066b.127.2025.07.08.07.35.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Jul 2025 07:35:01 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org,  Paolo Abeni <pabeni@redhat.com>,  "David S.
+ Miller" <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>,  Neal
+ Cardwell <ncardwell@google.com>,  Kuniyuki Iwashima <kuniyu@google.com>,
+  kernel-team@cloudflare.com,  Lee Valentine <lvalentine@cloudflare.com>
+Subject: Re: [PATCH net-next v2 1/2] tcp: Consider every port when
+ connecting with IP_LOCAL_PORT_RANGE
+In-Reply-To: <CANn89iLm_hRW3+MHsP8p5aTUStohz0nvWbKTGZU6K3EdRadrYw@mail.gmail.com>
+	(Eric Dumazet's message of "Tue, 8 Jul 2025 04:38:39 -0700")
+References: <20250703-connect-port-search-harder-v2-1-d51bce6bd0a6@cloudflare.com>
+	<CANn89iLm_hRW3+MHsP8p5aTUStohz0nvWbKTGZU6K3EdRadrYw@mail.gmail.com>
+Date: Tue, 08 Jul 2025 16:35:00 +0200
+Message-ID: <874ivmhht7.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250708130029.1310872-4-shaojijie@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 08, 2025 at 09:00:21PM +0800, Jijie Shao wrote:
-> From: Jian Shen <shenjian15@huawei.com>
-> 
-> This patch use seq_file for the following nodes:
-> rx_queue_info/queue_map
-> 
-> Signed-off-by: Jian Shen <shenjian15@huawei.com>
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+On Tue, Jul 08, 2025 at 04:38 AM -07, Eric Dumazet wrote:
+> On Thu, Jul 3, 2025 at 8:59=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.c=
+om> wrote:
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+[...]
 
-    Andrew
+>> @@ -1070,6 +1107,8 @@ int __inet_hash_connect(struct inet_timewait_death=
+_row *death_row,
+>>                         if (!inet_bind_bucket_match(tb, net, port, l3mde=
+v))
+>>                                 continue;
+>>                         if (tb->fastreuse >=3D 0 || tb->fastreuseport >=
+=3D 0) {
+>> +                               if (unlikely(local_ports))
+>> +                                       break; /* optimistic assumption =
+*/
+>
+> I find this quite pessimistic :/
+>
+> It seems you had some internal code before my recent change (86c2bc293b81=
+30
+> "tcp: use RCU lookup in __inet_hash_connect()") ?
+>
+> Instead, make the RCU changes so that check_bound() can be called from RC=
+U,
+> and call it here before taking the decision to break off this loop.
+
+Thanks for taking a look. I appreciate it.
+
+That was intentional. Perhaps a bad call on my side.
+
+My thinking here was that since we're already short on ephemeral ports
+when these "blocked buckets" become an issue, then I wouldn't want to
+dismiss a potential port in case the socket blocking it from reuse due
+to src (IP, port) conflict goes away before we get to the second
+(locked) phase of the search.
+
+But then again, in hindsight, if we run into ephemeral port depletion,
+then we must be under pressure from outgoing connections, so it seems
+like a bad idea to put more stress on the bucket lock.
+
+I will rework it as suggested.
+
+>>                                 rcu_read_unlock();
+>>                                 goto next_port;
+>>                         }
+
+[...]
 
