@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-204965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C908DAFCB75
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:10:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DD34AFCB74
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:10:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 534C41889FCC
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 13:09:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7EBB560E3F
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 13:09:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A0CC2DF3EC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB642DF3C6;
 	Tue,  8 Jul 2025 13:08:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15832DC32D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDAB22DCF74;
 	Tue,  8 Jul 2025 13:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751980085; cv=none; b=Dvc2ORf8SNAvv9TRfX+jiM1PgZubPqrB+Ang/0cMUivLu1NMuDmzcdiYO0aUAGitfnHMCWwGbRQI3wXc4Q2ZjOco7y4V4mvyB6DegXMvRAWjP6EQM77d+TZpyHpC0bwuPd/ItKCI5aMKdm6c5pYfKpv1WgCXUVNpeQ2+nMAb11g=
+	t=1751980085; cv=none; b=NKCiLFO+D2uvUdLz4DzFayek0fNrEfAVk3a4+TFww9HgQHINviKSZpDMRcOQlDtR+pOOyXY0lPgUYtkpjilIaYbBxcLcaKwAoHiBSc0LiPQ1p5pWxlB4JYRf+mI6PPHo5KbQRQok+qA1C325zrTMBXyX1+JNNP5Nh/qIhaMaIuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1751980085; c=relaxed/simple;
-	bh=b8vuHSmLD847YmgnSabk2YMCZm2X0XhRaYN1i/qX0X4=;
+	bh=UnnpKBNm5rW40ncS/tagoIywMrmLiDgN2Y1t6vQ7/QU=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iIPgPtP0rha0LE2Wef2KOwuNO2RqPakma61QC4sb0rwS8lWDkXxOtIAjFqSFkoqgf6BmP4UwqDBL6qvFncq7HTS27bewtEv6FXhqC43n9n2BFZPhp8J+48go/fCMXttDDtK6BCATU2QZ+eelSowdUpwUVyx1TnmanyH91kjJqVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+	 MIME-Version:Content-Type; b=Ld3EJvBAabkk9XJtE+TfT5Iu4T/tryHFZ8EEMMbBHkJjiyfUIHndhFy+KmfTsTb/bHQRIq5y+gOJECWf5mbcG6ibWCfwOmR1D+WOf/PNJujPdGm2ol3O+KO0vH7PRn5QL8txX2DkdOMzHyBm3H8JMi4K4MK8x63bkARjZhVu7oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bc1WV4cBVzWfym;
-	Tue,  8 Jul 2025 21:03:34 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4bc1ZQ2PRjz2SSv7;
+	Tue,  8 Jul 2025 21:06:06 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0AD68140156;
+	by mail.maildlp.com (Postfix) with ESMTPS id 81B0F180044;
 	Tue,  8 Jul 2025 21:08:00 +0800 (CST)
 Received: from localhost.localdomain (10.90.31.46) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
@@ -47,9 +47,9 @@ CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
 	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
 	<arnd@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<shaojijie@huawei.com>
-Subject: [PATCH net-next 07/11] net: hns3: use seq_file for files in reg/ in debugfs
-Date: Tue, 8 Jul 2025 21:00:25 +0800
-Message-ID: <20250708130029.1310872-8-shaojijie@huawei.com>
+Subject: [PATCH net-next 08/11] net: hns3: use seq_file for files in fd/ in debugfs
+Date: Tue, 8 Jul 2025 21:00:26 +0800
+Message-ID: <20250708130029.1310872-9-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20250708130029.1310872-1-shaojijie@huawei.com>
 References: <20250708130029.1310872-1-shaojijie@huawei.com>
@@ -65,658 +65,212 @@ X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
  kwepemk100013.china.huawei.com (7.202.194.61)
 
 This patch use seq_file for the following nodes:
-bios_common/ssu/igu_egu/rpu/ncsi/rtc/ppp/rcb/tqp/mac/dcb
+fd_tcam/fd_counter
 
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- .../ethernet/hisilicon/hns3/hns3_debugfs.c    |  22 +-
- .../hisilicon/hns3/hns3pf/hclge_debugfs.c     | 271 +++++++++---------
- 2 files changed, 150 insertions(+), 143 deletions(-)
+ .../ethernet/hisilicon/hns3/hns3_debugfs.c    |  4 +-
+ .../hisilicon/hns3/hns3pf/hclge_debugfs.c     | 55 ++++++-------------
+ 2 files changed, 20 insertions(+), 39 deletions(-)
 
 diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
-index b6b3eb2f5652..c1a626ea845c 100644
+index c1a626ea845c..e471d6fcdd1b 100644
 --- a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
 +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
-@@ -212,77 +212,77 @@ static struct hns3_dbg_cmd_info hns3_dbg_cmd[] = {
- 		.cmd = HNAE3_DBG_CMD_REG_BIOS_COMMON,
- 		.dentry = HNS3_DBG_DENTRY_REG,
+@@ -310,7 +310,7 @@ static struct hns3_dbg_cmd_info hns3_dbg_cmd[] = {
+ 		.cmd = HNAE3_DBG_CMD_FD_TCAM,
+ 		.dentry = HNS3_DBG_DENTRY_FD,
+ 		.buf_len = HNS3_DBG_READ_LEN_1MB,
+-		.init = hns3_dbg_common_file_init,
++		.init = hns3_dbg_common_init_t2,
+ 	},
+ 	{
+ 		.name = "service_task_info",
+@@ -338,7 +338,7 @@ static struct hns3_dbg_cmd_info hns3_dbg_cmd[] = {
+ 		.cmd = HNAE3_DBG_CMD_FD_COUNTER,
+ 		.dentry = HNS3_DBG_DENTRY_FD,
  		.buf_len = HNS3_DBG_READ_LEN,
 -		.init = hns3_dbg_common_file_init,
 +		.init = hns3_dbg_common_init_t2,
  	},
  	{
- 		.name = "ssu",
- 		.cmd = HNAE3_DBG_CMD_REG_SSU,
- 		.dentry = HNS3_DBG_DENTRY_REG,
- 		.buf_len = HNS3_DBG_READ_LEN,
--		.init = hns3_dbg_common_file_init,
-+		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "igu_egu",
- 		.cmd = HNAE3_DBG_CMD_REG_IGU_EGU,
- 		.dentry = HNS3_DBG_DENTRY_REG,
- 		.buf_len = HNS3_DBG_READ_LEN,
--		.init = hns3_dbg_common_file_init,
-+		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "rpu",
- 		.cmd = HNAE3_DBG_CMD_REG_RPU,
- 		.dentry = HNS3_DBG_DENTRY_REG,
- 		.buf_len = HNS3_DBG_READ_LEN,
--		.init = hns3_dbg_common_file_init,
-+		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "ncsi",
- 		.cmd = HNAE3_DBG_CMD_REG_NCSI,
- 		.dentry = HNS3_DBG_DENTRY_REG,
- 		.buf_len = HNS3_DBG_READ_LEN,
--		.init = hns3_dbg_common_file_init,
-+		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "rtc",
- 		.cmd = HNAE3_DBG_CMD_REG_RTC,
- 		.dentry = HNS3_DBG_DENTRY_REG,
- 		.buf_len = HNS3_DBG_READ_LEN,
--		.init = hns3_dbg_common_file_init,
-+		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "ppp",
- 		.cmd = HNAE3_DBG_CMD_REG_PPP,
- 		.dentry = HNS3_DBG_DENTRY_REG,
- 		.buf_len = HNS3_DBG_READ_LEN,
--		.init = hns3_dbg_common_file_init,
-+		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "rcb",
- 		.cmd = HNAE3_DBG_CMD_REG_RCB,
- 		.dentry = HNS3_DBG_DENTRY_REG,
- 		.buf_len = HNS3_DBG_READ_LEN,
--		.init = hns3_dbg_common_file_init,
-+		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "tqp",
- 		.cmd = HNAE3_DBG_CMD_REG_TQP,
- 		.dentry = HNS3_DBG_DENTRY_REG,
- 		.buf_len = HNS3_DBG_READ_LEN_128KB,
--		.init = hns3_dbg_common_file_init,
-+		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "mac",
- 		.cmd = HNAE3_DBG_CMD_REG_MAC,
- 		.dentry = HNS3_DBG_DENTRY_REG,
- 		.buf_len = HNS3_DBG_READ_LEN,
--		.init = hns3_dbg_common_file_init,
-+		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "dcb",
- 		.cmd = HNAE3_DBG_CMD_REG_DCB,
- 		.dentry = HNS3_DBG_DENTRY_REG,
- 		.buf_len = HNS3_DBG_READ_LEN,
--		.init = hns3_dbg_common_file_init,
-+		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "queue_map",
+ 		.name = "umv_info",
 diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-index 29c842d3f184..be663823a3db 100644
+index be663823a3db..a8b87b8ec292 100644
 --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
 +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-@@ -829,7 +829,7 @@ int hclge_dbg_cmd_send(struct hclge_dev *hdev, struct hclge_desc *desc_src,
- static int
- hclge_dbg_dump_reg_tqp(struct hclge_dev *hdev,
- 		       const struct hclge_dbg_reg_type_info *reg_info,
--		       char *buf, int len, int *pos)
-+		       struct seq_file *s)
- {
- 	const struct hclge_dbg_dfx_message *dfx_message = reg_info->dfx_msg;
- 	const struct hclge_dbg_reg_common_msg *reg_msg = &reg_info->reg_msg;
-@@ -849,13 +849,12 @@ hclge_dbg_dump_reg_tqp(struct hclge_dev *hdev,
- 	min_num = min_t(int, bd_num * HCLGE_DESC_DATA_LEN, reg_msg->msg_num);
- 
- 	for (i = 0, cnt = 0; i < min_num; i++, dfx_message++)
--		*pos += scnprintf(buf + *pos, len - *pos, "item%u = %s\n",
--				  cnt++, dfx_message->message);
-+		seq_printf(s, "item%u = %s\n", cnt++, dfx_message->message);
- 
- 	for (i = 0; i < cnt; i++)
--		*pos += scnprintf(buf + *pos, len - *pos, "item%u\t", i);
-+		seq_printf(s, "item%u\t", i);
- 
--	*pos += scnprintf(buf + *pos, len - *pos, "\n");
-+	seq_puts(s, "\n");
- 
- 	for (index = 0; index < hdev->vport[0].alloc_tqps; index++) {
- 		dfx_message = reg_info->dfx_msg;
-@@ -870,10 +869,9 @@ hclge_dbg_dump_reg_tqp(struct hclge_dev *hdev,
- 			if (i > 0 && !entry)
- 				desc++;
- 
--			*pos += scnprintf(buf + *pos, len - *pos, "%#x\t",
--					  le32_to_cpu(desc->data[entry]));
-+			seq_printf(s, "%#x\t", le32_to_cpu(desc->data[entry]));
- 		}
--		*pos += scnprintf(buf + *pos, len - *pos, "\n");
-+		seq_puts(s, "\n");
- 	}
- 
- 	kfree(desc_src);
-@@ -883,7 +881,7 @@ hclge_dbg_dump_reg_tqp(struct hclge_dev *hdev,
- static int
- hclge_dbg_dump_reg_common(struct hclge_dev *hdev,
- 			  const struct hclge_dbg_reg_type_info *reg_info,
--			  char *buf, int len, int *pos)
-+			  struct seq_file *s)
- {
- 	const struct hclge_dbg_reg_common_msg *reg_msg = &reg_info->reg_msg;
- 	const struct hclge_dbg_dfx_message *dfx_message = reg_info->dfx_msg;
-@@ -917,9 +915,8 @@ hclge_dbg_dump_reg_common(struct hclge_dev *hdev,
- 		if (!dfx_message->flag)
- 			continue;
- 
--		*pos += scnprintf(buf + *pos, len - *pos, "%s: %#x\n",
--				  dfx_message->message,
--				  le32_to_cpu(desc->data[entry]));
-+		seq_printf(s, "%s: %#x\n", dfx_message->message,
-+			   le32_to_cpu(desc->data[entry]));
- 	}
- 
- 	kfree(desc_src);
-@@ -943,8 +940,8 @@ static const struct hclge_dbg_status_dfx_info hclge_dbg_mac_en_status[] = {
- 	{HCLGE_MAC_TX_OVERSIZE_TRUNCATE_B, "mac_tx_oversize_truncate_en"}
- };
- 
--static int  hclge_dbg_dump_mac_enable_status(struct hclge_dev *hdev, char *buf,
--					     int len, int *pos)
-+static int hclge_dbg_dump_mac_enable_status(struct hclge_dev *hdev,
-+					    struct seq_file *s)
- {
- 	struct hclge_config_mac_mode_cmd *req;
- 	struct hclge_desc desc;
-@@ -965,16 +962,15 @@ static int  hclge_dbg_dump_mac_enable_status(struct hclge_dev *hdev, char *buf,
- 
- 	for (i = 0; i < ARRAY_SIZE(hclge_dbg_mac_en_status); i++) {
- 		offset = hclge_dbg_mac_en_status[i].offset;
--		*pos += scnprintf(buf + *pos, len - *pos, "%s: %#x\n",
--				  hclge_dbg_mac_en_status[i].message,
--				  hnae3_get_bit(loop_en, offset));
-+		seq_printf(s, "%s: %#x\n", hclge_dbg_mac_en_status[i].message,
-+			   hnae3_get_bit(loop_en, offset));
- 	}
- 
+@@ -2009,17 +2009,14 @@ static int hclge_dbg_dump_mng_table(struct hclge_dev *hdev, char *buf, int len)
  	return 0;
  }
  
--static int hclge_dbg_dump_mac_frame_size(struct hclge_dev *hdev, char *buf,
--					 int len, int *pos)
-+static int hclge_dbg_dump_mac_frame_size(struct hclge_dev *hdev,
-+					 struct seq_file *s)
+-#define HCLGE_DBG_TCAM_BUF_SIZE 256
+-
+ static int hclge_dbg_fd_tcam_read(struct hclge_dev *hdev, bool sel_x,
+-				  char *tcam_buf,
++				  struct seq_file *s,
+ 				  struct hclge_dbg_tcam_msg tcam_msg)
  {
- 	struct hclge_config_max_frm_size_cmd *req;
- 	struct hclge_desc desc;
-@@ -991,16 +987,14 @@ static int hclge_dbg_dump_mac_frame_size(struct hclge_dev *hdev, char *buf,
- 
- 	req = (struct hclge_config_max_frm_size_cmd *)desc.data;
- 
--	*pos += scnprintf(buf + *pos, len - *pos, "max_frame_size: %u\n",
--			  le16_to_cpu(req->max_frm_size));
--	*pos += scnprintf(buf + *pos, len - *pos, "min_frame_size: %u\n",
--			  req->min_frm_size);
-+	seq_printf(s, "max_frame_size: %u\n", le16_to_cpu(req->max_frm_size));
-+	seq_printf(s, "min_frame_size: %u\n", req->min_frm_size);
- 
- 	return 0;
- }
- 
--static int hclge_dbg_dump_mac_speed_duplex(struct hclge_dev *hdev, char *buf,
--					   int len, int *pos)
-+static int hclge_dbg_dump_mac_speed_duplex(struct hclge_dev *hdev,
-+					   struct seq_file *s)
- {
- #define HCLGE_MAC_SPEED_SHIFT	0
- #define HCLGE_MAC_SPEED_MASK	GENMASK(5, 0)
-@@ -1021,33 +1015,31 @@ static int hclge_dbg_dump_mac_speed_duplex(struct hclge_dev *hdev, char *buf,
- 
- 	req = (struct hclge_config_mac_speed_dup_cmd *)desc.data;
- 
--	*pos += scnprintf(buf + *pos, len - *pos, "speed: %#lx\n",
--			  hnae3_get_field(req->speed_dup, HCLGE_MAC_SPEED_MASK,
--					  HCLGE_MAC_SPEED_SHIFT));
--	*pos += scnprintf(buf + *pos, len - *pos, "duplex: %#x\n",
--			  hnae3_get_bit(req->speed_dup,
--					HCLGE_MAC_DUPLEX_SHIFT));
-+	seq_printf(s, "speed: %#lx\n",
-+		   hnae3_get_field(req->speed_dup, HCLGE_MAC_SPEED_MASK,
-+				   HCLGE_MAC_SPEED_SHIFT));
-+	seq_printf(s, "duplex: %#x\n",
-+		   hnae3_get_bit(req->speed_dup, HCLGE_MAC_DUPLEX_SHIFT));
- 	return 0;
- }
- 
--static int hclge_dbg_dump_mac(struct hclge_dev *hdev, char *buf, int len)
-+static int hclge_dbg_dump_mac(struct seq_file *s, void *data)
- {
+ 	struct hclge_fd_tcam_config_1_cmd *req1;
+ 	struct hclge_fd_tcam_config_2_cmd *req2;
+ 	struct hclge_fd_tcam_config_3_cmd *req3;
+ 	struct hclge_desc desc[3];
 -	int pos = 0;
+ 	int ret, i;
+ 	__le32 *req;
+ 
+@@ -2041,27 +2038,23 @@ static int hclge_dbg_fd_tcam_read(struct hclge_dev *hdev, bool sel_x,
+ 	if (ret)
+ 		return ret;
+ 
+-	pos += scnprintf(tcam_buf + pos, HCLGE_DBG_TCAM_BUF_SIZE - pos,
+-			 "read result tcam key %s(%u):\n", sel_x ? "x" : "y",
+-			 tcam_msg.loc);
++	seq_printf(s, "read result tcam key %s(%u):\n",
++		   sel_x ? "x" : "y", tcam_msg.loc);
+ 
+ 	/* tcam_data0 ~ tcam_data1 */
+ 	req = (__le32 *)req1->tcam_data;
+ 	for (i = 0; i < 2; i++)
+-		pos += scnprintf(tcam_buf + pos, HCLGE_DBG_TCAM_BUF_SIZE - pos,
+-				 "%08x\n", le32_to_cpu(*req++));
++		seq_printf(s, "%08x\n", le32_to_cpu(*req++));
+ 
+ 	/* tcam_data2 ~ tcam_data7 */
+ 	req = (__le32 *)req2->tcam_data;
+ 	for (i = 0; i < 6; i++)
+-		pos += scnprintf(tcam_buf + pos, HCLGE_DBG_TCAM_BUF_SIZE - pos,
+-				 "%08x\n", le32_to_cpu(*req++));
++		seq_printf(s, "%08x\n", le32_to_cpu(*req++));
+ 
+ 	/* tcam_data8 ~ tcam_data12 */
+ 	req = (__le32 *)req3->tcam_data;
+ 	for (i = 0; i < 5; i++)
+-		pos += scnprintf(tcam_buf + pos, HCLGE_DBG_TCAM_BUF_SIZE - pos,
+-				 "%08x\n", le32_to_cpu(*req++));
++		seq_printf(s, "%08x\n", le32_to_cpu(*req++));
+ 
+ 	return ret;
+ }
+@@ -2085,14 +2078,13 @@ static int hclge_dbg_get_rules_location(struct hclge_dev *hdev, u16 *rule_locs)
+ 	return cnt;
+ }
+ 
+-static int hclge_dbg_dump_fd_tcam(struct hclge_dev *hdev, char *buf, int len)
++static int hclge_dbg_dump_fd_tcam(struct seq_file *s, void *data)
+ {
+-	u32 rule_num = hdev->fd_cfg.rule_num[HCLGE_FD_STAGE_1];
 +	struct hclge_dev *hdev = hclge_seq_file_to_hdev(s);
- 	int ret;
+ 	struct hclge_dbg_tcam_msg tcam_msg;
+ 	int i, ret, rule_cnt;
+ 	u16 *rule_locs;
+-	char *tcam_buf;
+-	int pos = 0;
++	u32 rule_num;
  
--	ret = hclge_dbg_dump_mac_enable_status(hdev, buf, len, &pos);
-+	ret = hclge_dbg_dump_mac_enable_status(hdev, s);
- 	if (ret)
- 		return ret;
- 
--	ret = hclge_dbg_dump_mac_frame_size(hdev, buf, len, &pos);
-+	ret = hclge_dbg_dump_mac_frame_size(hdev, s);
- 	if (ret)
- 		return ret;
- 
--	return hclge_dbg_dump_mac_speed_duplex(hdev, buf, len, &pos);
-+	return hclge_dbg_dump_mac_speed_duplex(hdev, s);
- }
- 
--static int hclge_dbg_dump_dcb_qset(struct hclge_dev *hdev, char *buf, int len,
--				   int *pos)
-+static int hclge_dbg_dump_dcb_qset(struct hclge_dev *hdev, struct seq_file *s)
- {
- 	struct hclge_dbg_bitmap_cmd req;
- 	struct hclge_desc desc;
-@@ -1058,8 +1050,8 @@ static int hclge_dbg_dump_dcb_qset(struct hclge_dev *hdev, char *buf, int len,
- 	if (ret)
- 		return ret;
- 
--	*pos += scnprintf(buf + *pos, len - *pos,
--			  "qset_id  roce_qset_mask  nic_qset_mask  qset_shaping_pass  qset_bp_status\n");
-+	seq_puts(s, "qset_id  roce_qset_mask  nic_qset_mask  ");
-+	seq_puts(s, "qset_shaping_pass  qset_bp_status\n");
- 	for (qset_id = 0; qset_id < qset_num; qset_id++) {
- 		ret = hclge_dbg_cmd_send(hdev, &desc, qset_id, 1,
- 					 HCLGE_OPC_QSET_DFX_STS);
-@@ -1068,17 +1060,14 @@ static int hclge_dbg_dump_dcb_qset(struct hclge_dev *hdev, char *buf, int len,
- 
- 		req.bitmap = (u8)le32_to_cpu(desc.data[1]);
- 
--		*pos += scnprintf(buf + *pos, len - *pos,
--				  "%04u           %#x            %#x             %#x               %#x\n",
--				  qset_id, req.bit0, req.bit1, req.bit2,
--				  req.bit3);
-+		seq_printf(s, "%04u     %#-16x%#-15x%#-19x%#-x\n",
-+			   qset_id, req.bit0, req.bit1, req.bit2, req.bit3);
+ 	if (!hnae3_ae_dev_fd_supported(hdev->ae_dev)) {
+ 		dev_err(&hdev->pdev->dev,
+@@ -2100,6 +2092,7 @@ static int hclge_dbg_dump_fd_tcam(struct hclge_dev *hdev, char *buf, int len)
+ 		return -EOPNOTSUPP;
  	}
  
- 	return 0;
- }
- 
--static int hclge_dbg_dump_dcb_pri(struct hclge_dev *hdev, char *buf, int len,
--				  int *pos)
-+static int hclge_dbg_dump_dcb_pri(struct hclge_dev *hdev, struct seq_file *s)
- {
- 	struct hclge_dbg_bitmap_cmd req;
- 	struct hclge_desc desc;
-@@ -1089,8 +1078,7 @@ static int hclge_dbg_dump_dcb_pri(struct hclge_dev *hdev, char *buf, int len,
- 	if (ret)
- 		return ret;
- 
--	*pos += scnprintf(buf + *pos, len - *pos,
--			  "pri_id  pri_mask  pri_cshaping_pass  pri_pshaping_pass\n");
-+	seq_puts(s, "pri_id  pri_mask  pri_cshaping_pass  pri_pshaping_pass\n");
- 	for (pri_id = 0; pri_id < pri_num; pri_id++) {
- 		ret = hclge_dbg_cmd_send(hdev, &desc, pri_id, 1,
- 					 HCLGE_OPC_PRI_DFX_STS);
-@@ -1099,24 +1087,21 @@ static int hclge_dbg_dump_dcb_pri(struct hclge_dev *hdev, char *buf, int len,
- 
- 		req.bitmap = (u8)le32_to_cpu(desc.data[1]);
- 
--		*pos += scnprintf(buf + *pos, len - *pos,
--				  "%03u       %#x           %#x                %#x\n",
--				  pri_id, req.bit0, req.bit1, req.bit2);
-+		seq_printf(s, "%03u     %#-10x%#-19x%#-x\n",
-+			   pri_id, req.bit0, req.bit1, req.bit2);
- 	}
- 
- 	return 0;
- }
- 
--static int hclge_dbg_dump_dcb_pg(struct hclge_dev *hdev, char *buf, int len,
--				 int *pos)
-+static int hclge_dbg_dump_dcb_pg(struct hclge_dev *hdev, struct seq_file *s)
- {
- 	struct hclge_dbg_bitmap_cmd req;
- 	struct hclge_desc desc;
- 	u8 pg_id;
- 	int ret;
- 
--	*pos += scnprintf(buf + *pos, len - *pos,
--			  "pg_id  pg_mask  pg_cshaping_pass  pg_pshaping_pass\n");
-+	seq_puts(s, "pg_id  pg_mask  pg_cshaping_pass  pg_pshaping_pass\n");
- 	for (pg_id = 0; pg_id < hdev->tm_info.num_pg; pg_id++) {
- 		ret = hclge_dbg_cmd_send(hdev, &desc, pg_id, 1,
- 					 HCLGE_OPC_PG_DFX_STS);
-@@ -1125,47 +1110,41 @@ static int hclge_dbg_dump_dcb_pg(struct hclge_dev *hdev, char *buf, int len,
- 
- 		req.bitmap = (u8)le32_to_cpu(desc.data[1]);
- 
--		*pos += scnprintf(buf + *pos, len - *pos,
--				  "%03u      %#x           %#x               %#x\n",
--				  pg_id, req.bit0, req.bit1, req.bit2);
-+		seq_printf(s, "%03u    %#-9x%#-18x%#-x\n",
-+			   pg_id, req.bit0, req.bit1, req.bit2);
- 	}
- 
- 	return 0;
- }
- 
--static int hclge_dbg_dump_dcb_queue(struct hclge_dev *hdev, char *buf, int len,
--				    int *pos)
-+static int hclge_dbg_dump_dcb_queue(struct hclge_dev *hdev, struct seq_file *s)
- {
- 	struct hclge_desc desc;
- 	u16 nq_id;
- 	int ret;
- 
--	*pos += scnprintf(buf + *pos, len - *pos,
--			  "nq_id  sch_nic_queue_cnt  sch_roce_queue_cnt\n");
-+	seq_puts(s, "nq_id  sch_nic_queue_cnt  sch_roce_queue_cnt\n");
- 	for (nq_id = 0; nq_id < hdev->num_tqps; nq_id++) {
- 		ret = hclge_dbg_cmd_send(hdev, &desc, nq_id, 1,
- 					 HCLGE_OPC_SCH_NQ_CNT);
- 		if (ret)
- 			return ret;
- 
--		*pos += scnprintf(buf + *pos, len - *pos, "%04u           %#x",
--				  nq_id, le32_to_cpu(desc.data[1]));
-+		seq_printf(s, "%04u   %#-19x",
-+			   nq_id, le32_to_cpu(desc.data[1]));
- 
- 		ret = hclge_dbg_cmd_send(hdev, &desc, nq_id, 1,
- 					 HCLGE_OPC_SCH_RQ_CNT);
- 		if (ret)
- 			return ret;
- 
--		*pos += scnprintf(buf + *pos, len - *pos,
--				  "               %#x\n",
--				  le32_to_cpu(desc.data[1]));
-+		seq_printf(s, "%#-x\n", le32_to_cpu(desc.data[1]));
- 	}
- 
- 	return 0;
- }
- 
--static int hclge_dbg_dump_dcb_port(struct hclge_dev *hdev, char *buf, int len,
--				   int *pos)
-+static int hclge_dbg_dump_dcb_port(struct hclge_dev *hdev, struct seq_file *s)
- {
- 	struct hclge_dbg_bitmap_cmd req;
- 	struct hclge_desc desc;
-@@ -1179,16 +1158,13 @@ static int hclge_dbg_dump_dcb_port(struct hclge_dev *hdev, char *buf, int len,
- 
- 	req.bitmap = (u8)le32_to_cpu(desc.data[1]);
- 
--	*pos += scnprintf(buf + *pos, len - *pos, "port_mask: %#x\n",
--			 req.bit0);
--	*pos += scnprintf(buf + *pos, len - *pos, "port_shaping_pass: %#x\n",
--			 req.bit1);
-+	seq_printf(s, "port_mask: %#x\n", req.bit0);
-+	seq_printf(s, "port_shaping_pass: %#x\n", req.bit1);
- 
- 	return 0;
- }
- 
--static int hclge_dbg_dump_dcb_tm(struct hclge_dev *hdev, char *buf, int len,
--				 int *pos)
-+static int hclge_dbg_dump_dcb_tm(struct hclge_dev *hdev, struct seq_file *s)
- {
- 	struct hclge_desc desc[2];
- 	u8 port_id = 0;
-@@ -1199,32 +1175,23 @@ static int hclge_dbg_dump_dcb_tm(struct hclge_dev *hdev, char *buf, int len,
- 	if (ret)
- 		return ret;
- 
--	*pos += scnprintf(buf + *pos, len - *pos, "SCH_NIC_NUM: %#x\n",
--			  le32_to_cpu(desc[0].data[1]));
--	*pos += scnprintf(buf + *pos, len - *pos, "SCH_ROCE_NUM: %#x\n",
--			  le32_to_cpu(desc[0].data[2]));
-+	seq_printf(s, "SCH_NIC_NUM: %#x\n", le32_to_cpu(desc[0].data[1]));
-+	seq_printf(s, "SCH_ROCE_NUM: %#x\n", le32_to_cpu(desc[0].data[2]));
- 
- 	ret = hclge_dbg_cmd_send(hdev, desc, port_id, 2,
- 				 HCLGE_OPC_TM_INTERNAL_STS);
- 	if (ret)
- 		return ret;
- 
--	*pos += scnprintf(buf + *pos, len - *pos, "pri_bp: %#x\n",
--			  le32_to_cpu(desc[0].data[1]));
--	*pos += scnprintf(buf + *pos, len - *pos, "fifo_dfx_info: %#x\n",
--			  le32_to_cpu(desc[0].data[2]));
--	*pos += scnprintf(buf + *pos, len - *pos,
--			  "sch_roce_fifo_afull_gap: %#x\n",
--			  le32_to_cpu(desc[0].data[3]));
--	*pos += scnprintf(buf + *pos, len - *pos,
--			  "tx_private_waterline: %#x\n",
--			  le32_to_cpu(desc[0].data[4]));
--	*pos += scnprintf(buf + *pos, len - *pos, "tm_bypass_en: %#x\n",
--			  le32_to_cpu(desc[0].data[5]));
--	*pos += scnprintf(buf + *pos, len - *pos, "SSU_TM_BYPASS_EN: %#x\n",
--			  le32_to_cpu(desc[1].data[0]));
--	*pos += scnprintf(buf + *pos, len - *pos, "SSU_RESERVE_CFG: %#x\n",
--			  le32_to_cpu(desc[1].data[1]));
-+	seq_printf(s, "pri_bp: %#x\n", le32_to_cpu(desc[0].data[1]));
-+	seq_printf(s, "fifo_dfx_info: %#x\n", le32_to_cpu(desc[0].data[2]));
-+	seq_printf(s, "sch_roce_fifo_afull_gap: %#x\n",
-+		   le32_to_cpu(desc[0].data[3]));
-+	seq_printf(s, "tx_private_waterline: %#x\n",
-+		   le32_to_cpu(desc[0].data[4]));
-+	seq_printf(s, "tm_bypass_en: %#x\n", le32_to_cpu(desc[0].data[5]));
-+	seq_printf(s, "SSU_TM_BYPASS_EN: %#x\n", le32_to_cpu(desc[1].data[0]));
-+	seq_printf(s, "SSU_RESERVE_CFG: %#x\n", le32_to_cpu(desc[1].data[1]));
- 
- 	if (hdev->hw.mac.media_type == HNAE3_MEDIA_TYPE_COPPER)
++	rule_num = hdev->fd_cfg.rule_num[HCLGE_FD_STAGE_1];
+ 	if (!hdev->hclge_fd_rule_num || !rule_num)
  		return 0;
-@@ -1234,65 +1201,60 @@ static int hclge_dbg_dump_dcb_tm(struct hclge_dev *hdev, char *buf, int len,
- 	if (ret)
- 		return ret;
  
--	*pos += scnprintf(buf + *pos, len - *pos, "TC_MAP_SEL: %#x\n",
--			  le32_to_cpu(desc[0].data[1]));
--	*pos += scnprintf(buf + *pos, len - *pos, "IGU_PFC_PRI_EN: %#x\n",
--			  le32_to_cpu(desc[0].data[2]));
--	*pos += scnprintf(buf + *pos, len - *pos, "MAC_PFC_PRI_EN: %#x\n",
--			  le32_to_cpu(desc[0].data[3]));
--	*pos += scnprintf(buf + *pos, len - *pos, "IGU_PRI_MAP_TC_CFG: %#x\n",
--			  le32_to_cpu(desc[0].data[4]));
--	*pos += scnprintf(buf + *pos, len - *pos,
--			  "IGU_TX_PRI_MAP_TC_CFG: %#x\n",
--			  le32_to_cpu(desc[0].data[5]));
-+	seq_printf(s, "TC_MAP_SEL: %#x\n", le32_to_cpu(desc[0].data[1]));
-+	seq_printf(s, "IGU_PFC_PRI_EN: %#x\n", le32_to_cpu(desc[0].data[2]));
-+	seq_printf(s, "MAC_PFC_PRI_EN: %#x\n", le32_to_cpu(desc[0].data[3]));
-+	seq_printf(s, "IGU_PRI_MAP_TC_CFG: %#x\n",
-+		   le32_to_cpu(desc[0].data[4]));
-+	seq_printf(s, "IGU_TX_PRI_MAP_TC_CFG: %#x\n",
-+		   le32_to_cpu(desc[0].data[5]));
+@@ -2107,12 +2100,6 @@ static int hclge_dbg_dump_fd_tcam(struct hclge_dev *hdev, char *buf, int len)
+ 	if (!rule_locs)
+ 		return -ENOMEM;
  
- 	return 0;
- }
+-	tcam_buf = kzalloc(HCLGE_DBG_TCAM_BUF_SIZE, GFP_KERNEL);
+-	if (!tcam_buf) {
+-		kfree(rule_locs);
+-		return -ENOMEM;
+-	}
+-
+ 	rule_cnt = hclge_dbg_get_rules_location(hdev, rule_locs);
+ 	if (rule_cnt < 0) {
+ 		ret = rule_cnt;
+@@ -2126,38 +2113,34 @@ static int hclge_dbg_dump_fd_tcam(struct hclge_dev *hdev, char *buf, int len)
+ 		tcam_msg.stage = HCLGE_FD_STAGE_1;
+ 		tcam_msg.loc = rule_locs[i];
  
--static int hclge_dbg_dump_dcb(struct hclge_dev *hdev, char *buf, int len)
-+static int hclge_dbg_dump_dcb(struct seq_file *s, void *data)
- {
--	int pos = 0;
-+	struct hclge_dev *hdev = hclge_seq_file_to_hdev(s);
- 	int ret;
- 
--	ret = hclge_dbg_dump_dcb_qset(hdev, buf, len, &pos);
-+	ret = hclge_dbg_dump_dcb_qset(hdev, s);
- 	if (ret)
- 		return ret;
- 
--	ret = hclge_dbg_dump_dcb_pri(hdev, buf, len, &pos);
-+	ret = hclge_dbg_dump_dcb_pri(hdev, s);
- 	if (ret)
- 		return ret;
- 
--	ret = hclge_dbg_dump_dcb_pg(hdev, buf, len, &pos);
-+	ret = hclge_dbg_dump_dcb_pg(hdev, s);
- 	if (ret)
- 		return ret;
- 
--	ret = hclge_dbg_dump_dcb_queue(hdev, buf, len, &pos);
-+	ret = hclge_dbg_dump_dcb_queue(hdev, s);
- 	if (ret)
- 		return ret;
- 
--	ret = hclge_dbg_dump_dcb_port(hdev, buf, len, &pos);
-+	ret = hclge_dbg_dump_dcb_port(hdev, s);
- 	if (ret)
- 		return ret;
- 
--	return hclge_dbg_dump_dcb_tm(hdev, buf, len, &pos);
-+	return hclge_dbg_dump_dcb_tm(hdev, s);
- }
- 
--static int hclge_dbg_dump_reg_cmd(struct hclge_dev *hdev,
--				  enum hnae3_dbg_cmd cmd, char *buf, int len)
-+static int hclge_dbg_dump_reg_cmd(enum hnae3_dbg_cmd cmd, struct seq_file *s)
- {
-+	struct hclge_dev *hdev = hclge_seq_file_to_hdev(s);
- 	const struct hclge_dbg_reg_type_info *reg_info;
--	int pos = 0, ret = 0;
-+	int ret = 0;
- 	u32 i;
- 
- 	for (i = 0; i < ARRAY_SIZE(hclge_dbg_reg_info); i++) {
- 		reg_info = &hclge_dbg_reg_info[i];
- 		if (cmd == reg_info->cmd) {
- 			if (cmd == HNAE3_DBG_CMD_REG_TQP)
--				return hclge_dbg_dump_reg_tqp(hdev, reg_info,
--							      buf, len, &pos);
-+				return hclge_dbg_dump_reg_tqp(hdev,
-+							      reg_info, s);
- 
--			ret = hclge_dbg_dump_reg_common(hdev, reg_info, buf,
--							len, &pos);
-+			ret = hclge_dbg_dump_reg_common(hdev, reg_info, s);
- 			if (ret)
- 				break;
+-		ret = hclge_dbg_fd_tcam_read(hdev, true, tcam_buf, tcam_msg);
++		ret = hclge_dbg_fd_tcam_read(hdev, true, s, tcam_msg);
+ 		if (ret) {
+ 			dev_err(&hdev->pdev->dev,
+ 				"failed to get fd tcam key x, ret = %d\n", ret);
+ 			goto out;
  		}
-@@ -1301,6 +1263,51 @@ static int hclge_dbg_dump_reg_cmd(struct hclge_dev *hdev,
+ 
+-		pos += scnprintf(buf + pos, len - pos, "%s", tcam_buf);
+-
+-		ret = hclge_dbg_fd_tcam_read(hdev, false, tcam_buf, tcam_msg);
++		ret = hclge_dbg_fd_tcam_read(hdev, false, s, tcam_msg);
+ 		if (ret) {
+ 			dev_err(&hdev->pdev->dev,
+ 				"failed to get fd tcam key y, ret = %d\n", ret);
+ 			goto out;
+ 		}
+ 
+-		pos += scnprintf(buf + pos, len - pos, "%s", tcam_buf);
+ 	}
+ 
+ out:
+-	kfree(tcam_buf);
+ 	kfree(rule_locs);
  	return ret;
  }
  
-+static int hclge_dbg_dump_bios_reg_cmd(struct seq_file *s, void *data)
-+{
-+	return hclge_dbg_dump_reg_cmd(HNAE3_DBG_CMD_REG_BIOS_COMMON, s);
-+}
-+
-+static int hclge_dbg_dump_ssu_reg_cmd(struct seq_file *s, void *data)
-+{
-+	return hclge_dbg_dump_reg_cmd(HNAE3_DBG_CMD_REG_SSU, s);
-+}
-+
-+static int hclge_dbg_dump_igu_egu_reg_cmd(struct seq_file *s, void *data)
-+{
-+	return hclge_dbg_dump_reg_cmd(HNAE3_DBG_CMD_REG_IGU_EGU, s);
-+}
-+
-+static int hclge_dbg_dump_rpu_reg_cmd(struct seq_file *s, void *data)
-+{
-+	return hclge_dbg_dump_reg_cmd(HNAE3_DBG_CMD_REG_RPU, s);
-+}
-+
-+static int hclge_dbg_dump_ncsi_reg_cmd(struct seq_file *s, void *data)
-+{
-+	return hclge_dbg_dump_reg_cmd(HNAE3_DBG_CMD_REG_NCSI, s);
-+}
-+
-+static int hclge_dbg_dump_rtc_reg_cmd(struct seq_file *s, void *data)
-+{
-+	return hclge_dbg_dump_reg_cmd(HNAE3_DBG_CMD_REG_RTC, s);
-+}
-+
-+static int hclge_dbg_dump_ppp_reg_cmd(struct seq_file *s, void *data)
-+{
-+	return hclge_dbg_dump_reg_cmd(HNAE3_DBG_CMD_REG_PPP, s);
-+}
-+
-+static int hclge_dbg_dump_rcb_reg_cmd(struct seq_file *s, void *data)
-+{
-+	return hclge_dbg_dump_reg_cmd(HNAE3_DBG_CMD_REG_RCB, s);
-+}
-+
-+static int hclge_dbg_dump_tqp_reg_cmd(struct seq_file *s, void *data)
-+{
-+	return hclge_dbg_dump_reg_cmd(HNAE3_DBG_CMD_REG_TQP, s);
-+}
-+
- static int hclge_dbg_dump_tc(struct seq_file *s, void *data)
+-static int hclge_dbg_dump_fd_counter(struct hclge_dev *hdev, char *buf, int len)
++static int hclge_dbg_dump_fd_counter(struct seq_file *s, void *data)
  {
- 	struct hclge_dev *hdev = hclge_seq_file_to_hdev(s);
-@@ -2969,47 +2976,47 @@ static const struct hclge_dbg_func hclge_dbg_cmd_func[] = {
- 	},
- 	{
- 		.cmd = HNAE3_DBG_CMD_REG_BIOS_COMMON,
--		.dbg_dump_reg = hclge_dbg_dump_reg_cmd,
-+		.dbg_read_func = hclge_dbg_dump_bios_reg_cmd,
- 	},
- 	{
- 		.cmd = HNAE3_DBG_CMD_REG_SSU,
--		.dbg_dump_reg = hclge_dbg_dump_reg_cmd,
-+		.dbg_read_func = hclge_dbg_dump_ssu_reg_cmd,
- 	},
- 	{
- 		.cmd = HNAE3_DBG_CMD_REG_IGU_EGU,
--		.dbg_dump_reg = hclge_dbg_dump_reg_cmd,
-+		.dbg_read_func = hclge_dbg_dump_igu_egu_reg_cmd,
- 	},
- 	{
- 		.cmd = HNAE3_DBG_CMD_REG_RPU,
--		.dbg_dump_reg = hclge_dbg_dump_reg_cmd,
-+		.dbg_read_func = hclge_dbg_dump_rpu_reg_cmd,
- 	},
- 	{
- 		.cmd = HNAE3_DBG_CMD_REG_NCSI,
--		.dbg_dump_reg = hclge_dbg_dump_reg_cmd,
-+		.dbg_read_func = hclge_dbg_dump_ncsi_reg_cmd,
- 	},
- 	{
- 		.cmd = HNAE3_DBG_CMD_REG_RTC,
--		.dbg_dump_reg = hclge_dbg_dump_reg_cmd,
-+		.dbg_read_func = hclge_dbg_dump_rtc_reg_cmd,
- 	},
- 	{
- 		.cmd = HNAE3_DBG_CMD_REG_PPP,
--		.dbg_dump_reg = hclge_dbg_dump_reg_cmd,
-+		.dbg_read_func = hclge_dbg_dump_ppp_reg_cmd,
- 	},
- 	{
- 		.cmd = HNAE3_DBG_CMD_REG_RCB,
--		.dbg_dump_reg = hclge_dbg_dump_reg_cmd,
-+		.dbg_read_func = hclge_dbg_dump_rcb_reg_cmd,
- 	},
- 	{
- 		.cmd = HNAE3_DBG_CMD_REG_TQP,
--		.dbg_dump_reg = hclge_dbg_dump_reg_cmd,
-+		.dbg_read_func = hclge_dbg_dump_tqp_reg_cmd,
- 	},
- 	{
- 		.cmd = HNAE3_DBG_CMD_REG_MAC,
--		.dbg_dump = hclge_dbg_dump_mac,
-+		.dbg_read_func = hclge_dbg_dump_mac,
- 	},
- 	{
- 		.cmd = HNAE3_DBG_CMD_REG_DCB,
--		.dbg_dump = hclge_dbg_dump_dcb,
-+		.dbg_read_func = hclge_dbg_dump_dcb,
++	struct hclge_dev *hdev = hclge_seq_file_to_hdev(s);
+ 	u8 func_num = pci_num_vf(hdev->pdev) + 1; /* pf and enabled vf num */
+ 	struct hclge_fd_ad_cnt_read_cmd *req;
+ 	char str_id[HCLGE_DBG_ID_LEN];
+ 	struct hclge_desc desc;
+-	int pos = 0;
+ 	int ret;
+ 	u64 cnt;
+ 	u8 i;
+@@ -2165,8 +2148,7 @@ static int hclge_dbg_dump_fd_counter(struct hclge_dev *hdev, char *buf, int len)
+ 	if (!hnae3_ae_dev_fd_supported(hdev->ae_dev))
+ 		return -EOPNOTSUPP;
+ 
+-	pos += scnprintf(buf + pos, len - pos,
+-			 "func_id\thit_times\n");
++	seq_puts(s, "func_id\thit_times\n");
+ 
+ 	for (i = 0; i < func_num; i++) {
+ 		hclge_cmd_setup_basic_desc(&desc, HCLGE_OPC_FD_CNT_OP, true);
+@@ -2180,8 +2162,7 @@ static int hclge_dbg_dump_fd_counter(struct hclge_dev *hdev, char *buf, int len)
+ 		}
+ 		cnt = le64_to_cpu(req->cnt);
+ 		hclge_dbg_get_func_id_str(str_id, i);
+-		pos += scnprintf(buf + pos, len - pos,
+-				 "%s\t%llu\n", str_id, cnt);
++		seq_printf(s, "%s\t%llu\n", str_id, cnt);
+ 	}
+ 
+ 	return 0;
+@@ -3020,7 +3001,7 @@ static const struct hclge_dbg_func hclge_dbg_cmd_func[] = {
  	},
  	{
  		.cmd = HNAE3_DBG_CMD_FD_TCAM,
+-		.dbg_dump = hclge_dbg_dump_fd_tcam,
++		.dbg_read_func = hclge_dbg_dump_fd_tcam,
+ 	},
+ 	{
+ 		.cmd = HNAE3_DBG_CMD_MAC_TNL_STATUS,
+@@ -3036,7 +3017,7 @@ static const struct hclge_dbg_func hclge_dbg_cmd_func[] = {
+ 	},
+ 	{
+ 		.cmd = HNAE3_DBG_CMD_FD_COUNTER,
+-		.dbg_dump = hclge_dbg_dump_fd_counter,
++		.dbg_read_func = hclge_dbg_dump_fd_counter,
+ 	},
+ 	{
+ 		.cmd = HNAE3_DBG_CMD_UMV_INFO,
 -- 
 2.33.0
 
