@@ -1,153 +1,129 @@
-Return-Path: <netdev+bounces-204896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70835AFC6E9
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 11:20:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7076BAFC6EB
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 11:20:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92E033A9358
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 09:20:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACCF33AC8D3
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 09:20:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33A28235063;
-	Tue,  8 Jul 2025 09:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CD242222CC;
+	Tue,  8 Jul 2025 09:20:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CgperA7C"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0F518A6DB
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 09:20:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1AE2144D2
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 09:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751966424; cv=none; b=cQDJWvfEY4f9LNsJZgF4eiY8rEcRp1MUH94tOVYolquTtOwDSUyUN7Cr947+rUBZYgaUq8zpcRWQvxDU6lh0ZS1a/chsAaJjVUD1QcXbi7xWieSkTQMQmpI34rZYo3G+4mjQy2TS9+gYmKo3giw2LCsYL3qdJtDSrhVRHFfQi5U=
+	t=1751966445; cv=none; b=f+odY5QKkB9djAhiGByUIpbnWRh8Iyc1NG9D/qs8MYvsEPgABOmbfHBo1nsi/jCtMIwfuQ5SJ9Fs2CioMpVY4GjGKNe8Qf6mgGtUb80z406LejFmSmLW+UQ4xkUsV5RfJI11/zWgL8pZgSimjQDswZddLlXZCwRZvxwAbZE7rns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751966424; c=relaxed/simple;
-	bh=X1ap/8oSHd5+obaob3rFdSeiHkv9x2Z/zC908cdecSY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RLUcUygHM8AnD3BZxUwKuGYfArp4tBVeGFfc4YX2weQY4g/vc4HU9dZoGSRBfxiMlN5abFs4pJanTZFiZRPHMbxG6+u9eyS25+OlsWKuWsAkzQ/qoX/XQi2q1+gdxDCTcgvaBbigTTwM+Iyix7Ua19hJRfsZYZ4Z9cx5dx1fU6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uZ4UP-0004wf-Tu; Tue, 08 Jul 2025 11:19:49 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uZ4UN-007OMx-2N;
-	Tue, 08 Jul 2025 11:19:47 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uZ4UN-007sDz-1t;
-	Tue, 08 Jul 2025 11:19:47 +0200
-Date: Tue, 8 Jul 2025 11:19:47 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	Andre Edich <andre.edich@microchip.com>
-Subject: Re: [PATCH net v1 2/2] net: phy: smsc: add adaptive polling to
- recover missed link-up on LAN8700
-Message-ID: <aGziszwhN1dykeks@pengutronix.de>
-References: <20250707153232.1082819-1-o.rempel@pengutronix.de>
- <20250707153232.1082819-3-o.rempel@pengutronix.de>
- <aGwNnBJbM9LWnJ8f@wunner.de>
+	s=arc-20240116; t=1751966445; c=relaxed/simple;
+	bh=l1p9E+2xD7IPs8x4YgdT+UmoalDBU43AFSMeGpgmz6k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kSJ7PkIJmV7QfuQpN+EApxDckjJt3vXiuyVB6DGaQO2AFg7mqkfDTHZr3WRm5t6S1l+uJfnbP5ltXbPdsCq8XfqfomYpDXTcPu3b4jSZ3Hp8haxmGJPczMdYLpJVoGaGkS+sFvc/9KWATN0dSymZRAALdF/ifVkWINhgivqRopw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CgperA7C; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751966442;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WlFrHWCBZ0GRvhfqPcMu6mVAR9pzqmTshDoLe8nyLtA=;
+	b=CgperA7C9IUvRXD5rN3JRI4rRW1Au1JZ3NQ9tRVy5a+NfYs+ODh3+kcd+ZZ7lJAflVpH3z
+	+VfmxpcOhZwz3Q6kdR1CQADi0kkhqzRvHallbRLxROHiuaBr/OAFWoiqn2/WdZXymxOqQx
+	xA3OZB6yg2OMIrULtrXfVGL01Ep17+Q=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-138-FMjqve7mMeqDMTjzUQ0erg-1; Tue, 08 Jul 2025 05:20:41 -0400
+X-MC-Unique: FMjqve7mMeqDMTjzUQ0erg-1
+X-Mimecast-MFC-AGG-ID: FMjqve7mMeqDMTjzUQ0erg_1751966440
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a52bfda108so1958823f8f.3
+        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 02:20:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751966440; x=1752571240;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WlFrHWCBZ0GRvhfqPcMu6mVAR9pzqmTshDoLe8nyLtA=;
+        b=PzhbOEeDFD8danHuInLCGpiD2wCLxVObe/RlOz3morcrFrGBhDT6bC2aEO5dhcqZtR
+         +UNlr8gghyH/kywJK4VXSygnGB1POaf/GyZ6qmosf/A51UjpvtMAgolHb+KbboajS9rd
+         7oeaggwuq5y4qHdCtYRtgQqMAfD1ZuLuhQVZvGu1I3FWPgzH1WCfk9eiQk3yjyixnwGR
+         bKZoMLJSgXLOEQ0BczBsdPrxrHBnku5Bh03OhsGk3ECOTpxAJiYZ+QQGi22o3u0Uc5wT
+         Woi1Oz5AwuLiCFYpWxqH2ZP1T97iZQ1APjk2W7OsGVyBevuYpR/ry6ndeyMtfvEJ+cdW
+         Fzqw==
+X-Forwarded-Encrypted: i=1; AJvYcCXRXnqq8QA1Vh4LKI+UoEBbkSHPv0k1cRIALurFkFSEDT/4rFFs/hI8/CSjJ1Q6laWIKCkPzQM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUTRCxcDW8qAmz40IOw+h7Os0Jd1pAEc3kc8avbOIMQrinaAu3
+	cCzIiBJPYeqsl/O9dafBP1hkgeWVwCNr5BjgnWz9AbZs0zjCkk/eD8A5qzMBih2HxfZge+NQG9O
+	T6DrsPSYzwGvx76cOhTQkXBj1MpsxBO6WFjLObrydghZbM/Z7fUVyK8fk7pfRUGcL1A==
+X-Gm-Gg: ASbGncvhwIShbXYttN7bTIBUiG+GvqOCX3vj0Vb6HmAkdFCGnCn24QLEL6JcACHz08/
+	R9klPB+RAcV7o7Vj0mDau+Dkqam4EPy8veyzY9CJjKL9sPMt2AsKrsIL+EybZ1c46yxzPwS0+Ie
+	QQJ4CSE1Ucm65zNqBtfFZOglMjxTJuGC7KRdyi4BxKKoz5+pKiEPSmFDhVcoNJ3/VJf6iR8AsHz
+	1+JnSyjt04n9xC6CftZyvmRVf4NZXVogsKC1y0NPx+O2WBy0JVJ0QjKo9dvIHIXOLONbPkVKORn
+	8bASooGON/i+iYHyt4m916rr1HHf4q18jtGi7e4Avz9NdE+9Eh08ZkuyErzHpxWImE8IqA==
+X-Received: by 2002:a05:6000:4a10:b0:3a3:67bb:8f3f with SMTP id ffacd0b85a97d-3b5ddea1c51mr2238696f8f.53.1751966440092;
+        Tue, 08 Jul 2025 02:20:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGh8nD1EiPG7m0mg6QXkWYeptqjWcfmnci5Vnj6Jp422MialDVXM6maHNA8ghrBApwgmMdE1Q==
+X-Received: by 2002:a05:6000:4a10:b0:3a3:67bb:8f3f with SMTP id ffacd0b85a97d-3b5ddea1c51mr2238665f8f.53.1751966439672;
+        Tue, 08 Jul 2025 02:20:39 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2717:8910:b663:3b86:247e:dba2? ([2a0d:3344:2717:8910:b663:3b86:247e:dba2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b47285d3c6sm12548795f8f.95.2025.07.08.02.20.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Jul 2025 02:20:39 -0700 (PDT)
+Message-ID: <b676eb1b-265a-4647-b340-be88559a3561@redhat.com>
+Date: Tue, 8 Jul 2025 11:20:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 0/2] allwinner: a523: Rename emac0 to gmac0
+To: wens@kernel.org, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jernej Skrabec <jernej@kernel.org>,
+ Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-sunxi@lists.linux.dev, Andre Przywara <andre.przywara@arm.com>
+References: <20250628054438.2864220-1-wens@kernel.org>
+ <20250705083600.2916bf0c@minigeek.lan>
+ <CAGb2v64My=A_Jw+CBCsqno3SsSSTtBFKXOrgLv+Nyq_z5oeYBg@mail.gmail.com>
+ <e9c5949d-9ac5-4b33-810d-b716ccce5fe9@lunn.ch>
+ <20250706002223.128ff760@minigeek.lan>
+ <CAGb2v64vxtAVi3QK3a=mvDz2u+gKQ6XPMN-JB46eEuwfusMG2w@mail.gmail.com>
+ <20250707181513.6efc6558@donnerap.manchester.arm.com>
+ <CAGb2v64UTr1YSm7VXtzk5jmD_J_20ddPcWww_NPzx-e5HvaOpQ@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CAGb2v64UTr1YSm7VXtzk5jmD_J_20ddPcWww_NPzx-e5HvaOpQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <aGwNnBJbM9LWnJ8f@wunner.de>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Jul 07, 2025 at 08:10:36PM +0200, Lukas Wunner wrote:
-> > Mitigate this by combining interrupts with adaptive polling:
-> > 
-> > - When the driver is running in pure polling mode it continues to poll
-> >   once per second (unchanged).
-> > - With an IRQ present we now
-> >   - poll every 30 s while the link is up (low overhead);
-> >   - switch to a 1 s poll for up to 30 s after the last IRQ and while the
-> >     link is down, ensuring we catch the final silent link-up.
+On 7/7/25 7:34 PM, Chen-Yu Tsai wrote:
+> On Tue, Jul 8, 2025 at 1:15 AM Andre Przywara <andre.przywara@arm.com> wrote:
+>> So if you really insist on this: please go ahead and merge it, so that
+>> the 6.16 release contains the new name.
 > 
-> I think this begs the question, if we *know* that the link may come up
-> belatedly without an interrupt, why poll?  Would it work to schedule a
-> one-off link check after a reasonable delay to catch the link change?
-
-The exact timing of the link-up depends on the link partner. For
-example, when testing with an Intel i350, the longest observed link-up
-time was 3.85 seconds. But I cannot measure all possible combinations of
-PHYs and link partners, and some might take even longer.
-
-If we use a one-shot delayed check, we would have to wait at least 5
-seconds to be safe-maybe more. This would increase the link-up time for
-most users, even in cases where the link is already up earlier. So the
-user experience would get worse, without guaranteeing we catch all
-cases.
-
-That’s why I decided to go with a conservative 1 Hz polling for 30
-seconds after the last interrupt. This keeps the link-up time short when
-possible, and also helps detect obscure link changes that may otherwise
-go unnoticed.
-
-> I'm also wondering if enabling EDPD changes the behavior?
-
-This is not straightforward to test. The PHY driver explicitly requires
-polling mode for EDPD support, so when EDPD is enabled, polling is
-already active. In that case, the missing IRQ issue is avoided by
-design, because the PHY state machine runs regularly regardless of
-interrupts. So enabling EDPD indirectly works around the problem, but
-not because it changes the PHY behavior-just because it activates
-polling.
-
-> > +static unsigned int smsc_phy_get_next_update(struct phy_device *phydev)
-> > +{
-> > +	struct smsc_phy_priv *priv = phydev->priv;
-> > +
-> > +	/* If interrupts are disabled, fall back to default polling */
-> > +	if (phydev->irq == PHY_POLL)
-> > +		return SMSC_NOIRQ_POLLING_INTERVAL;
-> > +
-> > +	/* The PHY sometimes drops the *final* link-up IRQ when we run
-> > +	 * with autoneg OFF (10 Mbps HD/FD) against an autonegotiating
-> > +	 * partner: we see several "link down" IRQs, none for "link up".
+> I'm afraid I insist.
 > 
-> Hm, I'm not seeing a check for all those conditions (e.g. autoneg off) here?
+> I think we still need an ack from the DT maintainers though, and then
+> the binding change would go through the net tree?
 
-You're right, I'm not checking explicitly for autoneg == off or speed ==
-10 in the code. I chose not to limit it to just that case, because if
-IRQ behavior is unreliable in one configuration, it's possible that
-other cases may also be affected in less obvious ways.
+Note that such ack could require a bit of time more, as there are a few
+patches in the DT backlog.
 
-Polling once per second for 30 seconds is a small cost in terms of
-power, but it greatly reduces the risk of missing a link-up event. In my
-opinion, it's a safer default and avoids user-visible issues without
-significantly impacting energy usage.
+/P
 
-Best Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
