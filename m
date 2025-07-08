@@ -1,152 +1,179 @@
-Return-Path: <netdev+bounces-205086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4138CAFD265
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 18:46:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DFBDAFD26F
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 18:46:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CFBD18949D2
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 16:43:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78053189A262
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 16:44:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C04E2DD5EF;
-	Tue,  8 Jul 2025 16:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E5FD2E5414;
+	Tue,  8 Jul 2025 16:43:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SKl9JPb3"
+	dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b="eI2CZS/Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail-4323.protonmail.ch (mail-4323.protonmail.ch [185.70.43.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B022E337A
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 16:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131B0215F5C
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 16:43:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751993006; cv=none; b=T8LKS/8x3dpqk2Ck5LYv/8AQIIPJ+PBlMuvBWXwlTRP6bLZzTYIe8g5pCSxS8M0PWRBQAmliAn42qAoJd2MBoRLlcZv5hVRNKs9ofaLXdEB/xVv5YBeSuzmT8yBajzdHQq0AjKztNpwODuClepSFznCDcKMy5n4CtCg4/cqSddI=
+	t=1751993018; cv=none; b=pAelePTz1cTL9XoiE7VFJPG0nZxpbFdqYZf4O3WKO3KzihKVlhZ1KryHqiBMLj+mt6MjDrk+Orfh/Kre4ollQZLCm3MyHByv2VSV2ckCAhnmgB5vC1spP+kPYgPVa+GvnaNZ4lEO52hsUZ1zpuaB7skQrtWmAPBZBIIgkMD9btg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751993006; c=relaxed/simple;
-	bh=zQQQOEa5mGNWa7KTGLmTSEf3V/CaEx2+ad3NkwQOBVg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qlz1/qDv0HU0Goocvt5+DzsWoEovaFdRK5wGRVJSS+VqLTLRu3cmHlZZ1ERxfe4wbiduEFkmLnZPazTEXFio+wW4/av0RqjYJ2OPjv7iZCA6wFg/qZ6svlznRQq7r24Q25sohO+orRVkexg5/N2K0YPLBZJJAmSaauMRvbUgGq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SKl9JPb3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751993003;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mRu3ITxR3iyfhxILJrwVnHOIYgR/CWymufaJy1Cpzno=;
-	b=SKl9JPb39uEDA2I3EKz7zSgU4JGx2mhgPxKg2Lr4Z01pQE5MZ9mJMjuLFlnTsTC6/X/z3X
-	utLmi9hLMBYP5uTHzve8rVM+rDzgtqnLy1YCO2qLkloc6hexXds3JbpYKc8UYrom6+O+ir
-	cGPNmaum0Wo1XVifa+HS/7X9SRHwyJE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-561-QG8CUyTINseUCNcCiLCNnA-1; Tue, 08 Jul 2025 12:43:22 -0400
-X-MC-Unique: QG8CUyTINseUCNcCiLCNnA-1
-X-Mimecast-MFC-AGG-ID: QG8CUyTINseUCNcCiLCNnA_1751993001
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-450d6768d4dso26387365e9.2
-        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 09:43:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751993000; x=1752597800;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mRu3ITxR3iyfhxILJrwVnHOIYgR/CWymufaJy1Cpzno=;
-        b=DFVWwYwnyvJHaTsJvStNrc6KuYoGRSD+G7hxhu57BK3jZmlfPHE/DSZk58Wr8xNp/X
-         QgZMq+net40TDB9PgNITta0qHYXct9EslD/WWnppDgbp6xbSdGe4BPY+5KvP150JRAYp
-         m9ov9X8Qcv+QtlR6xrvKfz4x+TJbkPQsO7EMA11H3i6fMDO+SXe0XQYT/gDTg+iJ+R8O
-         EeZ7Y8d9NlcfT7k33Fc7FRU/5N73JJT28GeybZGYlHk9XfnVZ16Yp4Ko/tmlrkEjMa0Z
-         Vo5Q7n3oSOH6Khx5RnGGMA2YUWIor1xtqdP06qwSsPwT5NgC7P0yYVYXs7zBNj8Ku7nT
-         kU5w==
-X-Gm-Message-State: AOJu0Yy5mOnU3jb+/kh7mIFsX8ebJi0X8fH1/jH9vGbX3XCX6Lxy8occ
-	GuDwo9ypT6kP6gxdNYPozwpO/b9v9+1UTLms9JD5FOgmQGVWg+PNCYNr0bVvqwP1MGJQvYr5Tkx
-	v+ZCJGEmJUmBgXd7vOBpN/LwSy+fu1aBERagl19PcGMfzHwSfgNNpdothl5mQscp9pg==
-X-Gm-Gg: ASbGnctZdfYEQIL4jkfa9sVWWN7KqQ0RTyL161ZCfOeWlkeWkjz9mNG0Jusvj5nzl9S
-	CW2Lwm9eGFEKLxuWzPfKDkLCS9UiXGD21m3tdYlU251hHE1o7jLQEZOEPHZIPV3Pu/t00+bdj6d
-	Lg5VTjkftwI31PSfJtX1pDX871qYubmDpmzITmpVxWFbip3ruPviFDvk26tQDVxA+KTraxnkA+H
-	K5O6hohd6V31DXE4Tf2wRzwjnjCaP8EFwsumY1bWBmiQ7OSupfgtBDzktX5y/f3R5pNn6TbiEAq
-	vtedTGL6AHv665NA5IupoIaQStHqqotDG/YOzcEY1w7cWcN16vjFvuHZWCTc/VBIhyCcZw==
-X-Received: by 2002:a05:6000:2087:b0:3a4:ee3f:8e1e with SMTP id ffacd0b85a97d-3b4964e5281mr14417953f8f.39.1751993000357;
-        Tue, 08 Jul 2025 09:43:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEoaIacReEb0vPyg2KsNrIYN4x3Ccy8WpA/YPm0UdY/EajOw0cVDGdH65ySWm0a4fAJVxH+hQ==
-X-Received: by 2002:a05:6000:2087:b0:3a4:ee3f:8e1e with SMTP id ffacd0b85a97d-3b4964e5281mr14417934f8f.39.1751992999900;
-        Tue, 08 Jul 2025 09:43:19 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2717:8910:b663:3b86:247e:dba2? ([2a0d:3344:2717:8910:b663:3b86:247e:dba2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b472446fddsm13597522f8f.66.2025.07.08.09.43.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Jul 2025 09:43:19 -0700 (PDT)
-Message-ID: <27d6b80a-3153-4523-9ccf-0471a85cb245@redhat.com>
-Date: Tue, 8 Jul 2025 18:43:17 +0200
+	s=arc-20240116; t=1751993018; c=relaxed/simple;
+	bh=n3IP9ZU9VK2W01DW+wdUCJO1NgFlXHm3ttZn3m5+r0k=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=mYYUvye1bHL6+GPI96J9wq/GMYT7Ds0lNAGiclRDMlgyln6sU9D6kCDsWJZvknW60QADQXKcfGT2Mm4FQ59ZRUxZYAC7xIsZhptSW0WkQuEwe1EmnjrKhrdICifKsunSqR2FrS2y90ovu01eLnKt24nQeNeip023X1nU8NW6Ba8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io; spf=pass smtp.mailfrom=willsroot.io; dkim=pass (2048-bit key) header.d=willsroot.io header.i=@willsroot.io header.b=eI2CZS/Y; arc=none smtp.client-ip=185.70.43.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=willsroot.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=willsroot.io
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=willsroot.io;
+	s=protonmail; t=1751993012; x=1752252212;
+	bh=3jSCw/CDwOXTmStLmsLOkLE793lTNMgwNdrFXEOOu4E=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=eI2CZS/YguQPjZSI6D8ToEJfjLqnkKxJSdskjV6pwf8iJ8NwHZRZPqLr/tnzWOyQZ
+	 JN7mqQKhf/B8/U0DG3JTjs6m9+ipr9pw2+TLY4ft8vJAFlpj9B1+OjfIsaKR2SuUpF
+	 01eVenN0NWeYG3DrbgaspKXSzmR6Dk4D4pSkcCJtTeDOAileTLwXWayfDnluvgzDcm
+	 m8LrkO4nhEUIpKlkrjpuxZZXqRtNFCKJZxgPgshCtt3OhPDZ24NbFuGNjOKmGd51ZU
+	 /Lvy8upSOlQf0zOyQH1LW/VHNBwuN7VyDzIdV0CWiMs1ADd3cgcasRlDZtAlesQi+5
+	 5liccNjsRXqnQ==
+Date: Tue, 08 Jul 2025 16:43:26 +0000
+To: netdev@vger.kernel.org
+From: William Liu <will@willsroot.io>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, victor@mojatatu.com, pctammela@mojatatu.com, pabeni@redhat.com, kuba@kernel.org, stephen@networkplumber.org, dcaratti@redhat.com, savy@syst3mfailure.io, jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org, William Liu <will@willsroot.io>
+Subject: [PATCH net v5 1/2] net/sched: Restrict conditions for adding duplicating netems to qdisc tree
+Message-ID: <20250708164141.875402-1-will@willsroot.io>
+Feedback-ID: 42723359:user:proton
+X-Pm-Message-ID: acfcf2bf1e2ca0907b67a6f3e88f0346c00687e3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 net-next 0/9] virtio: introduce GSO over UDP tunnel
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>,
- Akihiko Odaki <akihiko.odaki@daynix.com>, Jonathan Corbet <corbet@lwn.net>,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org
-References: <cover.1751874094.git.pabeni@redhat.com>
- <20250708105816-mutt-send-email-mst@kernel.org>
- <20250708082404.21d1fe61@kernel.org>
- <20250708120014-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250708120014-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 7/8/25 6:00 PM, Michael S. Tsirkin wrote:
-> On Tue, Jul 08, 2025 at 08:24:04AM -0700, Jakub Kicinski wrote:
->> On Tue, 8 Jul 2025 11:01:30 -0400 Michael S. Tsirkin wrote:
->>>> git@github.com:pabeni/linux-devel.git virtio_udp_tunnel_07_07_2025
->>>>
->>>> The first 5 patches in this series, that is, the virtio features
->>>> extension bits are also available at [2]:
->>>>
->>>> git@github.com:pabeni/linux-devel.git virtio_features_extension_07_07_2025
->>>>
->>>> Ideally the virtio features extension bit should go via the virtio tree
->>>> and the virtio_net/tun patches via the net-next tree. The latter have
->>>> a dependency in the first and will cause conflicts if merged via the
->>>> virtio tree, both when applied and at merge window time - inside Linus
->>>> tree.
->>>>
->>>> To avoid such conflicts and duplicate commits I think the net-next
->>>> could pull from [1], while the virtio tree could pull from [2].  
->>>
->>> Or I could just merge all of this in my tree, if that's ok
->>> with others?
->>
->> No strong preference here. My first choice would be a branch based
->> on v6.16-rc5 so we can all pull in and resolve the conflicts that
->> already exist. But I haven't looked how bad the conflicts would 
->> be for virtio if we did that. On net-next side they look manageable.
-> 
-> OK, let's do it the way Paolo wants then.
+netem_enqueue's duplication prevention logic breaks when a netem
+resides in a qdisc tree with other netems - this can lead to a
+soft lockup and OOM loop in netem_dequeue, as seen in [1].
+Ensure that a duplicating netem cannot exist in a tree with other
+netems.
 
-I actually messed a bit with my proposal, as I forgot I need to use a
-common ancestor for the branches I shared.
+Previous approaches suggested in discussions in chronological order:
 
-git@github.com:pabeni/linux-devel.git virtio_features_extension_07_07_2025
+1) Track duplication status or ttl in the sk_buff struct. Considered
+too specific a use case to extend such a struct, though this would
+be a resilient fix and address other previous and potential future
+DOS bugs like the one described in loopy fun [2].
 
-is based on current net-next and pulling from such tag will take a lot
-of unwanted stuff into the vhost tree.
+2) Restrict netem_enqueue recursion depth like in act_mirred with a
+per cpu variable. However, netem_dequeue can call enqueue on its
+child, and the depth restriction could be bypassed if the child is a
+netem.
 
-@Michael: AFAICS the current vhost devel tree is based on top of
-v6.15-rc7, am I correct?
+3) Use the same approach as in 2, but add metadata in netem_skb_cb
+to handle the netem_dequeue case and track a packet's involvement
+in duplication. This is an overly complex approach, and Jamal
+notes that the skb cb can be overwritten to circumvent this
+safeguard.
 
-/P
+4) Prevent the addition of a netem to a qdisc tree if its ancestral
+path contains a netem. However, filters and actions can cause a
+packet to change paths when re-enqueued to the root from netem
+duplication, leading us to the current solution: prevent a
+duplicating netem from inhabiting the same tree as other netems.
+
+[1] https://lore.kernel.org/netdev/8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsE=
+BNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=3D@will=
+sroot.io/
+[2] https://lwn.net/Articles/719297/
+
+Fixes: 0afb51e72855 ("[PKT_SCHED]: netem: reinsert for duplication")
+Reported-by: William Liu <will@willsroot.io>
+Reported-by: Savino Dicanosa <savy@syst3mfailure.io>
+Signed-off-by: William Liu <will@willsroot.io>
+Signed-off-by: Savino Dicanosa <savy@syst3mfailure.io>
+---
+v4 -> v5: no changes, reposting per Jakub's request
+v3 -> v4:
+  - Clarify changelog with chronological order of attempted solutions
+v2 -> v3:
+  - Clarify reasoning for approach in changelog
+  - Removed has_duplication
+v1 -> v2:
+  - Renamed only_duplicating to duplicates and invert logic for clarity
+---
+ net/sched/sch_netem.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+
+diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+index fdd79d3ccd8c..eafc316ae319 100644
+--- a/net/sched/sch_netem.c
++++ b/net/sched/sch_netem.c
+@@ -973,6 +973,41 @@ static int parse_attr(struct nlattr *tb[], int maxtype=
+, struct nlattr *nla,
+ =09return 0;
+ }
+=20
++static const struct Qdisc_class_ops netem_class_ops;
++
++static int check_netem_in_tree(struct Qdisc *sch, bool duplicates,
++=09=09=09       struct netlink_ext_ack *extack)
++{
++=09struct Qdisc *root, *q;
++=09unsigned int i;
++
++=09root =3D qdisc_root_sleeping(sch);
++
++=09if (sch !=3D root && root->ops->cl_ops =3D=3D &netem_class_ops) {
++=09=09if (duplicates ||
++=09=09    ((struct netem_sched_data *)qdisc_priv(root))->duplicate)
++=09=09=09goto err;
++=09}
++
++=09if (!qdisc_dev(root))
++=09=09return 0;
++
++=09hash_for_each(qdisc_dev(root)->qdisc_hash, i, q, hash) {
++=09=09if (sch !=3D q && q->ops->cl_ops =3D=3D &netem_class_ops) {
++=09=09=09if (duplicates ||
++=09=09=09    ((struct netem_sched_data *)qdisc_priv(q))->duplicate)
++=09=09=09=09goto err;
++=09=09}
++=09}
++
++=09return 0;
++
++err:
++=09NL_SET_ERR_MSG(extack,
++=09=09       "netem: cannot mix duplicating netems with other netems in tr=
+ee");
++=09return -EINVAL;
++}
++
+ /* Parse netlink message to set options */
+ static int netem_change(struct Qdisc *sch, struct nlattr *opt,
+ =09=09=09struct netlink_ext_ack *extack)
+@@ -1031,6 +1066,11 @@ static int netem_change(struct Qdisc *sch, struct nl=
+attr *opt,
+ =09q->gap =3D qopt->gap;
+ =09q->counter =3D 0;
+ =09q->loss =3D qopt->loss;
++
++=09ret =3D check_netem_in_tree(sch, qopt->duplicate, extack);
++=09if (ret)
++=09=09goto unlock;
++
+ =09q->duplicate =3D qopt->duplicate;
+=20
+ =09/* for compatibility with earlier versions.
+--=20
+2.43.0
+
 
 
