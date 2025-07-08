@@ -1,124 +1,222 @@
-Return-Path: <netdev+bounces-205108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5C5AAFD6AD
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 20:49:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62942AFD6B6
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 20:50:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4D843A8106
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 18:48:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19F511C2040C
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 18:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8C32DAFAE;
-	Tue,  8 Jul 2025 18:49:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93E262E266B;
+	Tue,  8 Jul 2025 18:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="kIr10rIw"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="vwc677cZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF552BE042
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 18:49:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9812DFF2E
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 18:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752000560; cv=none; b=YIsxYdKIUnbNrAYMG0sW5QIsYsmJY3A+1PtlHv9UWqdmZqt3f+9KHQSPq6eueMW+djh9hnlJRYnC0hoFCCXVmi60477tiACqTX7IY+zCMXyPoKsNQzHktpbCa2CS1BL8W9b7tyl5AlpKoCb1HAJANXRUZcyHx7f2TS98WcfbqtY=
+	t=1752000624; cv=none; b=WI/q2jCD8omFd0b91qy5VodKY4fmlNG581Ac08gRiicV1Z9soiUhCo4Cp86K4dUjO5bPNoY/8kGEqpOZg1dvxS/wEous7HPUpiklHE4fxAxlpDYqUiunC4Rt8CfjMV7dYOQb1g4dtS/IBoOPXkj2mcnbyOtQ3LoW7TH3+Z4rdMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752000560; c=relaxed/simple;
-	bh=6/88khiRTnlD+ovwd/33DZA5oXLHri0226vbFIHkPLE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sgJpYWjNuZUjNxcTfTs11oX3BNYwXhSk15zEQM4tANzKaZ3hox5DJEXjcUuW++A8wRdKMdrY0P0J5tERiEaLSJxs1I0FJXZKmRX12lOPUCVszBeVo8Dw+VAwHxhevzdWOMXZ188wI2Pfdz/X6rJF5WXaaQWwFBmBygT++/pA5Iw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=kIr10rIw; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-235d6de331fso61814275ad.3
-        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 11:49:17 -0700 (PDT)
+	s=arc-20240116; t=1752000624; c=relaxed/simple;
+	bh=9HxWJqHT9FN9BzCRLaRYdlMRRGWtCYNO2daX30sv49Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oUJrJ1vCOYH7002b/vekL9OvwdfibFra8P3fOZ8lUn9Nnh5TqxQ/EYvQUoTvpWrpVP/C3AcNHanhSUhQST0jbvdQYJ3kYEGawGCS+nOQPgU6hqLfh0iF5BULFhbKm/XNtukc0v+/qbJDU7cLbODaPu44iTzTgNWk3oc7Sn1I3JU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=vwc677cZ; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-739b3fe7ce8so4203208b3a.0
+        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 11:50:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1752000557; x=1752605357; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HQ9LIfhHht6H1tT57Mgqq/KVccjzkSxSjOGpsIFmJAQ=;
-        b=kIr10rIwkzkqrYQccX1VnYl7OCHuwte9zlo7AjWMoKvYJjfTmkm0UdQnnwE3+KHhE2
-         8Q1HD8nIma/x/gKmTivRyFX8k0v8EuRUE0nY64RolQUSDlTqWBYa9tl943/lgY7VWyv9
-         3azDJhOSnM4D0ImV9tQIAtwDGJNU/xI60rfxfHTq3WoKlywWpRK78qb3h/luMkDO/D7r
-         17oImBNq9N3VjxwuWAVT7yrbU4PELTh6GfpunrYOsiNWlQZqRKaqyO1S2VXH2V9PdcgH
-         4vyvl9wJSWHS3g5rzF6u4HPsYjPz9JQHOjjTERqS0grl0ZkNowI+VuFaXoquxqu0m7uD
-         rKwg==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1752000622; x=1752605422; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Muy8WUBD0m7A3Mb9SG99jx7LlhEhh7RdDHtxo6VshJA=;
+        b=vwc677cZdxTJgnHHcF2I2Gw8B8R3TQTgq/9rR6hfiY8sCTFHDNrLEKT6+7P/PiVuGW
+         TkrJfwBV/XqrBn6zd3E9kWg947gdNGL3BPQbH+h05xN266RxRu6vvOHE62IyMgcuD1q4
+         9i6+VpulEVHz0TBkdeQ+exrSO9tLOrU0ApTWv94Xpn5EtFEY9a23QWG+AFrwxL9pJtLf
+         2duRGVtUcUz9v8Sg/Hre5Ng+vrF5DftfA6lsj9ZhbZhRtp1UOs4lLOrpTc3oehJWwNKa
+         nh3A6cPh0w8j6EnjBqx6HgqQMY4ZvFmdFuEvoVEUamuLgeRx2v6QmYwnzc9ztiHLF0Mv
+         Zl0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752000557; x=1752605357;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HQ9LIfhHht6H1tT57Mgqq/KVccjzkSxSjOGpsIFmJAQ=;
-        b=VwXYbqRU+Pa8NmFq5jcN13nh3AO8rYMU11/lK0QKdz7HsXxewvShkJeFE7GI4y6vru
-         ZnwAs3aiQjKVpYJOd3oQjGvOjIqbnQD2DJYStTo+lVWdkGmFPBTr9G0M+dwZcgYu2Ncn
-         sNrQ70NpAbJO5tN1IB2D+X9NHVcUizH2T+2wIZ2/csSwzD1eJ1l7iQ3/3TJiLIBlcIzf
-         p4PAJ7xjqTQFCKzfGgAIOzwykJk+bGpiNVz2b+vQYMLXXrXcGLNQw65gU4XNmmVlZmYq
-         wLS5E3PR6uGQ7FzdmxAYl2jgDIwVA9UhYnqQ2sc1QyWkM/f5nM0vn7v7TuDnZHYcDKYG
-         tLJg==
-X-Forwarded-Encrypted: i=1; AJvYcCVUOgKCvKem+Oj7v3Gp/EyyKNUfPKswSO0dARV4WoWNbzAUa2TVl1kvMtWtjlQHE9GnkHK6kyY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAlT281OTtAH1dSg9kC8Dkvtzm1vgezkb4vPqVuaFIbVKFcDJ4
-	p2uW9B5Rg0oPnclXbWpPaosz6KCnQnze0itptZ43p+wrm+s42TWSNX5ZoK36m+tZsEOqFHyz+WR
-	QQ604CnM=
-X-Gm-Gg: ASbGncupgJXykmMn1+Cn1Qdekhn7/wOxmUBg4gQTGEdh9F2PFvg+KJtTciARQZ/rnSU
-	pBYLoRQJdYwpNjLBmrm+H7gm+o1g3wkEmtpDR/w0NvyjczoiOCBiSUABFDEtfWEUH9S2v8GQS7O
-	32sMDjtUGgxzJEUSD1hY1Gk8WxwnQXMqZo7Y+IlWflAfzW2z1tWe35SVj1+KjWNOAShGOW3Ct0n
-	5Td0ohwgQ3LqrxKPaorv52toSyOssxDno6Baq3ZHpqC9TBj0+8KBBXJibRjXlNMh8t6tDCtm2rr
-	5yIiOb7EnTe0LPYZDNdZyJlIEyI8cOdU2dmNKbzAT9nwJ+H0Ct8hV5wBPxHFXic20Ffb4lLoFeR
-	NNeIKgJe5UlwBbjnLrV27K11K6tquXLbS2vU=
-X-Google-Smtp-Source: AGHT+IElerbgV4E7bAWnn/FXpBfbzVbW3y4Yn+NthwGnxC0JaFok3uYEQvcgITGUFkqORd0IGvgmOA==
-X-Received: by 2002:a17:902:c408:b0:235:f70:fd39 with SMTP id d9443c01a7336-23c85d9df6bmr310008805ad.10.1752000556882;
-        Tue, 08 Jul 2025 11:49:16 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1156:1:14f8:5a41:7998:a806? ([2620:10d:c090:500::7:14ad])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23c8455d0b4sm116905655ad.125.2025.07.08.11.49.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Jul 2025 11:49:16 -0700 (PDT)
-Message-ID: <00448c06-1009-4248-8796-1a1308b850ec@davidwei.uk>
-Date: Tue, 8 Jul 2025 11:49:14 -0700
+        d=1e100.net; s=20230601; t=1752000622; x=1752605422;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Muy8WUBD0m7A3Mb9SG99jx7LlhEhh7RdDHtxo6VshJA=;
+        b=nSMLhXgMPOkZrSMhMl01wKO8iMfRcB292Xofy7c6g7sBM077Xzkx5ZFqwmEAqWendi
+         knLE2dvy2KE4bckXkrtuYY6gVSStlBvZe/qCylBEYXn+R70P6wJGnutnGAQO+h5gY/SA
+         R4jeJkUvL83jAy33C2qyvvxipOgndXK/pv0mzLJR9wE0g3JWKENNz99rDW+CHt9jZFI1
+         itxCBYvVRw64Kn6xnqXykP76EAadDCcr2b1c4k+Umq8Y2sRAsTgHouMlev7wUB7QXYER
+         yvgg7SZsD2c3PXEy5LAxyzDJRLQhIF0PviCZqGjAn4lAQV/gqbfhjSqLcV7JG7syQIpx
+         KXLg==
+X-Gm-Message-State: AOJu0YxVaA/+7VAWO9LSS79rtQlZfbwS7A9Lx3Zux6bRlMsTZEQI6UN7
+	POCBdxQ/sXp/9Mg/7iwNiVlYsJkSOxcbg27iTL5n0th2GA61pgE0dHmDqsIurnO36Bdvpd4VKb8
+	Pilvl0tgzJhoODxNMU/Qv/39JEZ07szO+bUzB9MfB
+X-Gm-Gg: ASbGncsW+/EHt5w/PL8YmixyYUt3njvUQbeXfK6AlHPN60e/7K1MGImZZizacxlFbw1
+	Au9/j5M8Rb031hHO7rZOyxcjICtQ+Qd9t5kbAaF9QNSy2iu5fvAgLmFRsI6SWkQt42lvvdiU2Mi
+	f5u/pqkZCMOnJwrdTjn0HHJ7OmA/d9Gp0+AVXxo6fXUo7COjPbPY/k
+X-Google-Smtp-Source: AGHT+IFKNwhSvpz/mOzq+MBlxZzCgErWgoggMVNzOcpu0XC3sUt+2qWAsuDmG7INVfSUjV1SLlwNzn5LTp6cL+NroWw=
+X-Received: by 2002:a05:6a00:3923:b0:748:3964:6177 with SMTP id
+ d2e1a72fcca58-74e4ab8f91emr623530b3a.19.1752000621945; Tue, 08 Jul 2025
+ 11:50:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] selftests: net: hw: modify ZCRX testing support
-To: Vishwanath Seshagiri <vishs@meta.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Joe Damato <jdamato@fastly.com>,
- Simon Horman <horms@kernel.org>, Vishwanath Seshagiri <vishs@fb.com>,
- netdev@vger.kernel.org
-References: <20250707232223.190242-1-vishs@meta.com>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20250707232223.190242-1-vishs@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250708164141.875402-1-will@willsroot.io>
+In-Reply-To: <20250708164141.875402-1-will@willsroot.io>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 8 Jul 2025 14:50:11 -0400
+X-Gm-Features: Ac12FXwJ0Ggu4JmVSpWv4PvNr2yFD7cl08t-ymUM1BFMaZ6oXo2Sap_Da-jmt4U
+Message-ID: <CAM0EoMkm9VHbgMW7E07rrc37__2ViXJb=AMLwuCfG2jhcB75=Q@mail.gmail.com>
+Subject: Re: [PATCH net v5 1/2] net/sched: Restrict conditions for adding
+ duplicating netems to qdisc tree
+To: William Liu <will@willsroot.io>
+Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, victor@mojatatu.com, 
+	pctammela@mojatatu.com, pabeni@redhat.com, kuba@kernel.org, 
+	stephen@networkplumber.org, dcaratti@redhat.com, savy@syst3mfailure.io, 
+	jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025-07-07 16:22, Vishwanath Seshagiri wrote:
-> From: Vishwanath Seshagiri <vishs@fb.com>
-> 
-> Changed the test cases such that the endpoints of sender
-> and receiver are flipped based on the typical conventions of netdev
-> selftests.
+On Tue, Jul 8, 2025 at 12:43=E2=80=AFPM William Liu <will@willsroot.io> wro=
+te:
+>
+> netem_enqueue's duplication prevention logic breaks when a netem
+> resides in a qdisc tree with other netems - this can lead to a
+> soft lockup and OOM loop in netem_dequeue, as seen in [1].
+> Ensure that a duplicating netem cannot exist in a tree with other
+> netems.
+>
+> Previous approaches suggested in discussions in chronological order:
+>
+> 1) Track duplication status or ttl in the sk_buff struct. Considered
+> too specific a use case to extend such a struct, though this would
+> be a resilient fix and address other previous and potential future
+> DOS bugs like the one described in loopy fun [2].
+>
+> 2) Restrict netem_enqueue recursion depth like in act_mirred with a
+> per cpu variable. However, netem_dequeue can call enqueue on its
+> child, and the depth restriction could be bypassed if the child is a
+> netem.
+>
+> 3) Use the same approach as in 2, but add metadata in netem_skb_cb
+> to handle the netem_dequeue case and track a packet's involvement
+> in duplication. This is an overly complex approach, and Jamal
+> notes that the skb cb can be overwritten to circumvent this
+> safeguard.
+>
+> 4) Prevent the addition of a netem to a qdisc tree if its ancestral
+> path contains a netem. However, filters and actions can cause a
+> packet to change paths when re-enqueued to the root from netem
+> duplication, leading us to the current solution: prevent a
+> duplicating netem from inhabiting the same tree as other netems.
+>
+> [1] https://lore.kernel.org/netdev/8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilx=
+sEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=3D@wi=
+llsroot.io/
+> [2] https://lwn.net/Articles/719297/
+>
+> Fixes: 0afb51e72855 ("[PKT_SCHED]: netem: reinsert for duplication")
+> Reported-by: William Liu <will@willsroot.io>
+> Reported-by: Savino Dicanosa <savy@syst3mfailure.io>
+> Signed-off-by: William Liu <will@willsroot.io>
+> Signed-off-by: Savino Dicanosa <savy@syst3mfailure.io>
 
-In v2 please change the subject to be: 1) more specific on what the
-patch does, and 2) add which tree the patch is intended for (net-next).
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-There's a 24h cooldown so please resend it after that.
+cheers,
+jamal
 
-> 
-> Test plan: ran selftests between 2 vms
-
-This isn't what you did right? Zero copy receive doesn't work in VMs.
-
-> 
-> Signed-off-by: Vishwanath Seshagiri <vishs@fb.com>
 > ---
->   .../selftests/drivers/net/hw/iou-zcrx.py      | 98 +++++++++----------
->   1 file changed, 49 insertions(+), 49 deletions(-)
-> 
+> v4 -> v5: no changes, reposting per Jakub's request
+> v3 -> v4:
+>   - Clarify changelog with chronological order of attempted solutions
+> v2 -> v3:
+>   - Clarify reasoning for approach in changelog
+>   - Removed has_duplication
+> v1 -> v2:
+>   - Renamed only_duplicating to duplicates and invert logic for clarity
+> ---
+>  net/sched/sch_netem.c | 40 ++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 40 insertions(+)
+>
+> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+> index fdd79d3ccd8c..eafc316ae319 100644
+> --- a/net/sched/sch_netem.c
+> +++ b/net/sched/sch_netem.c
+> @@ -973,6 +973,41 @@ static int parse_attr(struct nlattr *tb[], int maxty=
+pe, struct nlattr *nla,
+>         return 0;
+>  }
+>
+> +static const struct Qdisc_class_ops netem_class_ops;
+> +
+> +static int check_netem_in_tree(struct Qdisc *sch, bool duplicates,
+> +                              struct netlink_ext_ack *extack)
+> +{
+> +       struct Qdisc *root, *q;
+> +       unsigned int i;
+> +
+> +       root =3D qdisc_root_sleeping(sch);
+> +
+> +       if (sch !=3D root && root->ops->cl_ops =3D=3D &netem_class_ops) {
+> +               if (duplicates ||
+> +                   ((struct netem_sched_data *)qdisc_priv(root))->duplic=
+ate)
+> +                       goto err;
+> +       }
+> +
+> +       if (!qdisc_dev(root))
+> +               return 0;
+> +
+> +       hash_for_each(qdisc_dev(root)->qdisc_hash, i, q, hash) {
+> +               if (sch !=3D q && q->ops->cl_ops =3D=3D &netem_class_ops)=
+ {
+> +                       if (duplicates ||
+> +                           ((struct netem_sched_data *)qdisc_priv(q))->d=
+uplicate)
+> +                               goto err;
+> +               }
+> +       }
+> +
+> +       return 0;
+> +
+> +err:
+> +       NL_SET_ERR_MSG(extack,
+> +                      "netem: cannot mix duplicating netems with other n=
+etems in tree");
+> +       return -EINVAL;
+> +}
+> +
+>  /* Parse netlink message to set options */
+>  static int netem_change(struct Qdisc *sch, struct nlattr *opt,
+>                         struct netlink_ext_ack *extack)
+> @@ -1031,6 +1066,11 @@ static int netem_change(struct Qdisc *sch, struct =
+nlattr *opt,
+>         q->gap =3D qopt->gap;
+>         q->counter =3D 0;
+>         q->loss =3D qopt->loss;
+> +
+> +       ret =3D check_netem_in_tree(sch, qopt->duplicate, extack);
+> +       if (ret)
+> +               goto unlock;
+> +
+>         q->duplicate =3D qopt->duplicate;
+>
+>         /* for compatibility with earlier versions.
+> --
+> 2.43.0
+>
+>
 
