@@ -1,94 +1,208 @@
-Return-Path: <netdev+bounces-204736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31E0EAFBED7
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 02:00:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B8A7AFBEDB
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 02:02:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6B011AA5C49
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 00:00:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C57E3169852
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 00:02:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3330D28BA9D;
-	Mon,  7 Jul 2025 23:59:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AF5A28FD;
+	Tue,  8 Jul 2025 00:02:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H9A1+Z4g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pNGAtzut"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED09A28A704;
-	Mon,  7 Jul 2025 23:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3633191;
+	Tue,  8 Jul 2025 00:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751932798; cv=none; b=R1625FhQhvtzhe7Zz5tjIks3MWsh07iextNvzbRYgfArYj9r6u7YJe8vPVL/FoV4dVUYPArHAOI8keuQlmfPYMbaTROYCCbNJnGcVhmd3AAcIj0oisQotduETN6HDkw7n1kYtvC+yp0DK6tN5uC8q0NsNEcrA+IuASRqEaSo0Gk=
+	t=1751932940; cv=none; b=rFzSEbfJniahAAsvZDMwcHjPdqLYSJ/H8wOgmGM/a1WyoA0o5kA9TXV/06AI1CYUPxqMq7mE/3MWkHd54sto5we4vPgCgOhsCitfXpchS/CUGptg7d8K1H//uQ/4+8vpeCVc5b39RT0/ZCEFkUDKyXUcSlNKTx75xPXTBWBSaRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751932798; c=relaxed/simple;
-	bh=vVQAswP6Isaud9swQz92zL9tG6ep0AClXvMhgT4UBe0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=vEbJzsBsY0OtsPptTVYbfAB7RX9Z5BvG/2Jkw1wb8gn678CBRDLokk8qPP1hH12S3M8AhdMXqKq0HgftRaLez4WG1VjlVpkykrZWkMAdPwafsocf29SeIoKAyoMrL6iN8L+BNgXO6E8WK0QzsqZVu34XOrRzQfz0MH0JxQhHmsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H9A1+Z4g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43172C4CEE3;
-	Mon,  7 Jul 2025 23:59:57 +0000 (UTC)
+	s=arc-20240116; t=1751932940; c=relaxed/simple;
+	bh=t5zmAG5UEvVd4XtHi1/WfmDFoTa8UUYg8Lwk7/npk3w=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=o2X/iQPAZN9vvafP7lonKEbtUyns+amSQa8+xR7gTRalpRwsou2yQiARLL8vxwEV61/MZ6+QEvSZ37xg74tLcRgREknNYxTQMCOSAXoS8o453BqAmMePqUsS9tAh7fg5TwJIoCqy2qyE2vMk6Vf9cs4HlMD3haf39EZXDihJFH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pNGAtzut; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46B14C4CEF1;
+	Tue,  8 Jul 2025 00:02:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751932797;
-	bh=vVQAswP6Isaud9swQz92zL9tG6ep0AClXvMhgT4UBe0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=H9A1+Z4gROOCKkURpF3ESL/NkvX52UgyKI1DxVIl1MHC5/K4fOHH6Dg5tds9XQKa4
-	 5ybdggPqD5cemF4U+Iyi6nufTnGhjQP8Fh3KDc/l6Dmc+lkzE7MPbwnzMu/pbuy7aV
-	 /O22nJ4rZfkbp2Wjo9Q9gBvg4/7aokgjdcnJHZ5i5hRbqaA+6EbHk7vaxcskV+Ul7l
-	 dX7I7aNC8IOO4gtghbnNWHTQIYlnvKn2BkI+jj9hwetkZIGiW0O4zTh7LuhF+HwtGx
-	 Dtr3dVgPhWVqoAzJU4Zl59zjFXIvAR95IiGoJiZtWxbk6UVDwsbarvKbIGL/Ax6+NB
-	 TiX2lqI/pZ71g==
-Date: Mon, 7 Jul 2025 16:59:56 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
- <leon@kernel.org>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [pull-request] mlx5-next updates 2025-07-03
-Message-ID: <20250707165956.4f6f96df@kernel.org>
-In-Reply-To: <1751574385-24672-1-git-send-email-tariqt@nvidia.com>
-References: <1751574385-24672-1-git-send-email-tariqt@nvidia.com>
+	s=k20201202; t=1751932939;
+	bh=t5zmAG5UEvVd4XtHi1/WfmDFoTa8UUYg8Lwk7/npk3w=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=pNGAtzutSGSI+5bIJhYypmZDUmt9LdZkF5xEV5qZNofmWNSepe44I5Dn69u8Uzhdh
+	 C9sKubCf6ph512z8wQTMmI4UFeGEhpdZQpuENi2DhRtvSVOA+QoBw55820BCSBZ0VB
+	 JfwtmcSigjz1QeIk7HH1Mq2TxrqsqNj/K+ZgYSlxIT2dHo0zE1LQQA2rykfAsjWA4I
+	 tryCMH98jAg5OZ8aSpKgEGofXo+BRbbssF2rtlRrQXBYHVPl/xxwdyd5Yenm3frJiF
+	 a69nsERhDd3DzoXaIvTgwok1yJ7BtO28c81dFpomJFa51R2iGnXXHJLQtvdHABayJN
+	 emUf0wW1PVuTA==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Laurent Vivier <lvivier@redhat.com>,
+	Lei Yang <leiyang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sasha Levin <sashal@kernel.org>,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.15 2/8] virtio_net: Enforce minimum TX ring size for reliability
+Date: Mon,  7 Jul 2025 20:02:09 -0400
+Message-Id: <20250708000215.793090-2-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250708000215.793090-1-sashal@kernel.org>
+References: <20250708000215.793090-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.15.5
+Content-Transfer-Encoding: 8bit
 
-On Thu, 3 Jul 2025 23:26:25 +0300 Tariq Toukan wrote:
-> Hi,
-> 
-> The following pull-request contains common mlx5 updates
-> for your *net-next* tree.
-> Please pull and let me know of any problem.
-> 
-> Regards,
-> Tariq
-> 
-> ----------------------------------------------------------------
-> 
-> The following changes since commit e04c78d86a9699d136910cfc0bdcf01087e3267e:
-> 
->   Linux 6.16-rc2 (2025-06-15 13:49:41 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git 02943ac2f6fb
-> 
-> for you to fetch changes up to 02943ac2f6fbba8fc5e57c57e7cbc2d7c67ebf0d:
-> 
->   net/mlx5: fs, fix RDMA TRANSPORT init cleanup flow (2025-07-02 14:08:18 -0400)
+From: Laurent Vivier <lvivier@redhat.com>
 
-Doesn't work:
+[ Upstream commit 24b2f5df86aaebbe7bac40304eaf5a146c02367c ]
 
-fatal: couldn't find remote ref 02943ac2f6fb
+The `tx_may_stop()` logic stops TX queues if free descriptors
+(`sq->vq->num_free`) fall below the threshold of (`MAX_SKB_FRAGS` + 2).
+If the total ring size (`ring_num`) is not strictly greater than this
+value, queues can become persistently stopped or stop after minimal
+use, severely degrading performance.
 
-In general a named tag would be better.
+A single sk_buff transmission typically requires descriptors for:
+- The virtio_net_hdr (1 descriptor)
+- The sk_buff's linear data (head) (1 descriptor)
+- Paged fragments (up to MAX_SKB_FRAGS descriptors)
+
+This patch enforces that the TX ring size ('ring_num') must be strictly
+greater than (MAX_SKB_FRAGS + 2). This ensures that the ring is
+always large enough to hold at least one maximally-fragmented packet
+plus at least one additional slot.
+
+Reported-by: Lei Yang <leiyang@redhat.com>
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+Link: https://patch.msgid.link/20250521092236.661410-4-lvivier@redhat.com
+Tested-by: Lei Yang <leiyang@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+
+**YES**
+
+This commit should be backported to stable kernel trees. Here's my
+extensive analysis:
+
+## 1. **Critical Bug Fix**
+The commit fixes a severe bug where TX queues can become permanently
+stopped, causing complete network transmission failure. Looking at the
+code change, it adds a crucial validation in `virtnet_tx_resize()`:
+
+```c
+if (ring_num <= MAX_SKB_FRAGS + 2) {
+    netdev_err(vi->dev, "tx size (%d) cannot be smaller than %d\n",
+               ring_num, MAX_SKB_FRAGS + 2);
+    return -EINVAL;
+}
+```
+
+This prevents a configuration that would make the network interface
+essentially unusable.
+
+## 2. **Root Cause Analysis**
+The bug occurs because the `tx_may_stop()` logic (used throughout
+virtio_net for flow control) stops the TX queue when free descriptors
+fall below `MAX_SKB_FRAGS + 2`. If the total ring size is not strictly
+greater than this threshold, the queue can:
+- Stop after transmitting just one packet
+- Never have enough free slots to wake up again
+- Result in a permanently stalled TX queue
+
+## 3. **User Impact**
+This affects real users who:
+- Use virtio_net in virtualized environments (very common in cloud/VM
+  deployments)
+- Configure TX ring sizes via ethtool or other management tools
+- May unknowingly set ring sizes that trigger this bug
+
+The commit message explicitly mentions a report from Lei Yang at Red
+Hat, indicating this was discovered through real-world usage.
+
+## 4. **Minimal and Safe Fix**
+The fix is:
+- **Small**: Only 6 lines of code added
+- **Contained**: Only affects ring resize operations
+- **Safe**: Adds validation without changing existing behavior for valid
+  configurations
+- **Clear**: Returns -EINVAL with a descriptive error message
+
+## 5. **Meets Stable Criteria**
+According to stable kernel rules, this commit qualifies because it:
+- Fixes a bug that affects users (network stalls)
+- Is relatively small and contained
+- Has no major side effects
+- Doesn't introduce new features
+- Has been tested (by Lei Yang) and reviewed by maintainers (Jason Wang,
+  Michael S. Tsirkin)
+
+## 6. **Comparison with Similar Commits**
+Looking at the historical commits:
+- Similar commit #3 (virtio_net: ensure netdev_tx_reset_queue) was
+  backported because it fixed TX queue handling issues
+- This commit is even more critical as it prevents complete TX failure
+- The fix is simpler than commit #3 (just validation vs. callback
+  handling)
+
+## 7. **No Architectural Changes**
+Unlike commits #1 and #2 which made architectural changes to ring
+sizing, this commit:
+- Only adds input validation
+- Doesn't change data structures
+- Doesn't modify existing workflows
+- Simply prevents an invalid configuration
+
+The fact that experienced maintainers like Jason Wang and Michael S.
+Tsirkin acked this change further supports its importance for stable
+backporting. This is a textbook example of a fix that should go to
+stable: it addresses a real bug with minimal risk.
+
+ drivers/net/virtio_net.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index e53ba600605a5..3054b2b4f6a0c 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -3481,6 +3481,12 @@ static int virtnet_tx_resize(struct virtnet_info *vi, struct send_queue *sq,
+ {
+ 	int qindex, err;
+ 
++	if (ring_num <= MAX_SKB_FRAGS + 2) {
++		netdev_err(vi->dev, "tx size (%d) cannot be smaller than %d\n",
++			   ring_num, MAX_SKB_FRAGS + 2);
++		return -EINVAL;
++	}
++
+ 	qindex = sq - vi->sq;
+ 
+ 	virtnet_tx_pause(vi, sq);
+-- 
+2.39.5
+
 
