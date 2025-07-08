@@ -1,135 +1,108 @@
-Return-Path: <netdev+bounces-205039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE1F7AFCF21
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 17:26:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C6C0AFCF57
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 17:36:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 232E77B4893
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:25:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92FB1481EC6
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 271382E3367;
-	Tue,  8 Jul 2025 15:25:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A172D231824;
+	Tue,  8 Jul 2025 15:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ifMKTzzZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427A22E2653;
-	Tue,  8 Jul 2025 15:25:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 879A82E03FE
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 15:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751988352; cv=none; b=gHwrdu7MRzd1ewMEsSa0lw+BIa+qY9NOgwgcXrlrSCEZ+cjJG2GfpLpwdxGy12NAawKunKWceUYb6gibyOvu+qVN6nKmglB5PxVyiDU8qnxjxGIOEo9X4kHSgxAx2ZyOwoKPPGhcYNiX87g8tEnEJh78XpqnAI/7thwlecA4qDQ=
+	t=1751988856; cv=none; b=B3dvjsk3mpEXK3NuRMpUUG82Juncn7j2B67Zmon2zf+cYHkTOor6Sr8Kmbdgsi3nqfsaefKMFMrpJDVOKt6tjXf0z6B8iTxBdanW02LFEctjzuB4hpfGrfs9kstv0W3nhbMiVBB9lx7DDkYCy4FHAeTXVT4Bp4fw914shIjXLas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751988352; c=relaxed/simple;
-	bh=uGgX3GJd4mYElheRctbkZiUbQcWMpUgRQRqQiEn8HzM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z5ebym1HpN5XmP1TlHcQeElY9oqOvZJyjIfkKpAawBZXzQMNQdoeKZ0askdRXQpha6gEYXSGPlIVABrnx/mxTO63tIvqFJkM4OP+jIIalbKvFW2yCJ3j5idRhbwpfps3s67ajz0oePADHvYzh+WoIOw/QbWnpd/E6QMuaB1IuAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ae04d3d63e6so754887266b.2;
-        Tue, 08 Jul 2025 08:25:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751988348; x=1752593148;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OHdiudIvhlbsgKzAlTM7QB3ITrST0Cb2niiN+w8u02c=;
-        b=tuRE5PJt+++77tm01MNN+9oa8yoEswPo22GH67Pbul5le2m95HR1PnS0Q1EDAK5TQZ
-         KKzmEsdJ42tVvzUdPhPMziEVa/h8C6YA42hMN2kI+3gnxOBNF4TnnaDaSmWZJ/1bJZdt
-         7GrzVPFAvPK/3sqo3C9Vb6xu1/GkmaAIbHaJfJ2tok5lm0X9X7xCyL2OSy0gL+mngZXS
-         h4W61Hi2RCvOwjFN6NKh3CjaGz6TUie2zXENAlqquDdSFjcNFxQeOhCQYZJi3gzAFzR2
-         3z/80a9xnaPdPj5tND9B7X19J4QrX+QTqPOoRAZLAptKU0Qj5CVq/XYTPe9dSeWKwq6w
-         HMGg==
-X-Forwarded-Encrypted: i=1; AJvYcCUye+XpxnhsSgZlo2E8eGMfykZAUv2NcnbPSfYM7cUVGyr73qNHZ+1yyf1YS09a+cgH9IIQFbmPB6F1Gi/Q@vger.kernel.org, AJvYcCVz6Cmmntg0TWr8ZpIqAdVv5CzpqIoC32zJITzhXjPcjgoOhC+1zUYKzUyAm4kLngJP1rQ=@vger.kernel.org, AJvYcCWA+MFh/e2zQI+o0I8TGoNuCnSh/z2Jfnzj6MtKgMVW4TzYrooXa5VQhEARYrUQfh/SbqBdOWia@vger.kernel.org, AJvYcCXTGNZUHwYmjacCq2mn7nyxRXD1/lbhH8oKwqGOCzYFjqRCwfuucSHZOkcbuypzLKoeghklx0bYtMJ+2lujVr9S@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbAb7wSFCIHuGRXm0xV+5fLAfYph/rBMwyPYKod1QHD+jeyMQb
-	UIYN/fNABGTwjR1z71A+miH8B/ZbE3PoONgOG1hTzm7LQOWOfU8G+/hI
-X-Gm-Gg: ASbGncsgbg7deqaa1kv6+VY9ozjHE8UqlaNGjwea/dlFlkp5SAnAFLuF8mQM6ZZbFb1
-	yCyrG28qcxh+ROhx1Jf+dny3FAg4vuS9M3qf0IgWzgbwDaFgKznSe9wwHm0xPrR6QzSxjkJqCtQ
-	PibMu0KL3+fU9/MunvrlVv4hsuSI6CiV0uTY5ViHx3sEnn4czbdFRLOLf84s5NPM3/ThSP048sn
-	LjPed9xvfohQv+EgLDEL34ueuumJzPtzlYwG04s1/ryba3ySE7AMs8QS+PiDyxB1QOhoVXsiuVx
-	yWHE2c240Qbuxo27Q7f+089RP5PDLVfRzzd++t6nEOasIytthz72YQ==
-X-Google-Smtp-Source: AGHT+IEA+QZGmBo8k4QMmJoLm/1b04TQE9pmYlrZApkhUSPJ2o4Gc1WfGzMhLET8/ETifijZH+Wpmw==
-X-Received: by 2002:a17:907:d582:b0:ae0:bff9:98de with SMTP id a640c23a62f3a-ae3fbd50f78mr1862989866b.40.1751988348225;
-        Tue, 08 Jul 2025 08:25:48 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:74::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae3f6b5e757sm909637266b.156.2025.07.08.08.25.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jul 2025 08:25:47 -0700 (PDT)
-Date: Tue, 8 Jul 2025 08:25:45 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
-	kernel-team@meta.com
-Subject: Re: [PATCH net-next v4 3/3] selftests: net: add netpoll basic
- functionality test
-Message-ID: <aG04ece5RWJCpMmA@gmail.com>
-References: <20250702-netpoll_test-v4-0-cec227e85639@debian.org>
- <20250702-netpoll_test-v4-3-cec227e85639@debian.org>
- <686c88e0283_29b0d29422@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1751988856; c=relaxed/simple;
+	bh=ZhQARY+dMy04cmVCG3gKjNrTT6k7l5XUjHxmQQ3Odws=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DM8tcWuKW0SsxJWh7b0pDedi8E5tBrqYCKM4v7+6jd8CXEUAnYCWkioIJzYPuvpf1e0MGzBvJ3CM1CR1rbKXJQqUraabmtFniDwMyQcOx2AXOQsfRjSweH5FeM6IlWrgb9LMTO2hcUeZwmt2CEvx8QVrpdyVMOvPozuP52ZfgJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ifMKTzzZ; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <06710fb3-fc55-479e-b029-134f41fb93eb@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751988841;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UikPezaKOR74LDrxg8ACKqHsuH0yXZu32wrnQNh+phc=;
+	b=ifMKTzzZSNehwnTaGTAuaeH7r7ho9nFO+uR7Cs37lBKqjZPjj77jNkxFpkPFxX6gRmTI0p
+	GKXquz0dWmM+t4G/M4xfAwNee465VUQrrPcm7XPOsi3UDS26Sqk2c/OHj4fEU/e/weWkSB
+	IDum6qt7B0ZFVjFI6ycbReQeQ8GDsj8=
+Date: Tue, 8 Jul 2025 11:33:46 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <686c88e0283_29b0d29422@willemb.c.googlers.com.notmuch>
+Subject: Re: [PATCH net] net: phy: Don't register LEDs for genphy
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+ Florian Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Christian Marangi <ansuelsmth@gmail.com>
+References: <20250707195803.666097-1-sean.anderson@linux.dev>
+ <aGzduaQp3hWA5V-i@shell.armlinux.org.uk>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <aGzduaQp3hWA5V-i@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello Willem,
-
-On Mon, Jul 07, 2025 at 10:56:32PM -0400, Willem de Bruijn wrote:
-> > +def test_netpoll(cfg: NetDrvEpEnv) -> None:
-
-<snip>
-
-> > +        bpftrace_stop()
+On 7/8/25 04:58, Russell King (Oracle) wrote:
+> On Mon, Jul 07, 2025 at 03:58:03PM -0400, Sean Anderson wrote:
+>> If a PHY has no driver, the genphy driver is probed/removed directly in
+>> phy_attach/detach. If the PHY's ofnode has an "leds" subnode, then the
+>> LEDs will be (un)registered when probing/removing the genphy driver.
 > 
-> One risk with stateful tests is that the state is not reset if the
-> test exists (or crashes) before reaching the cleanup logic. There
-> are ways around it. Jakub added defer for this purpose, for one.
+> Maybe checking whether the PHY driver supports LEDs would be more
+> sensible than checking whether it's one of the genphy drivers?
 
-Agree. Jakub suggested about "defer" a while ago, but I didn't realize
-we had a "defer" helper in our test framework. For a second I though
-Jakub was talking calling the stop later, my bad.
+The genphy driver is special, since it is probed synchronously from
+phy_attach. All other drivers are probed asynchronously and don't have
+this problem.
 
-Now that you raised it, I found that we have "defer" as a helper, and we
-definitely should use it. How about something as simple as:
+>> This could occur if the leds are for a non-generic driver that isn't
+>> loaded for whatever reason. Synchronously removing the PHY device in
+>> phy_detach leads to the following deadlock:
+>> 
+>> rtnl_lock()
+>> ndo_close()
+>>     ...
+>>     phy_detach()
+>>         phy_remove()
+>>             phy_leds_unregister()
+>>                 led_classdev_unregister()
+>>                     led_trigger_set()
+>>                         netdev_trigger_deactivate()
+>>                             unregister_netdevice_notifier()
+>>                                 rtnl_lock()
+>> 
+>> There is a corresponding deadlock on the open/register side of things
+>> (and that one is reported by lockdep), but it requires a race while this
+>> one is deterministic.
+> 
+> Doesn't this deadlock exist irrespective of whether the genphy driver(s)
+> are being used, and whether or not the PHY driver supports LEDs?
 
-	diff --git a/tools/testing/selftests/drivers/net/netpoll_basic.py b/tools/testing/selftests/drivers/net/netpoll_basic.py
-	index 398ac959151b3..6017b71f154b2 100755
-	--- a/tools/testing/selftests/drivers/net/netpoll_basic.py
-	+++ b/tools/testing/selftests/drivers/net/netpoll_basic.py
-	@@ -27,6 +27,7 @@ from typing import Optional
+Nope.
 
-	from lib.py import (
-	bpftrace,
-	+    defer,
-	ip,
-	ethtool,
-	GenerateTraffic,
-	@@ -251,6 +252,7 @@ def do_netpoll_flush_monitored(cfg: NetDrvEpEnv, ifname: str, target_name: str)
-	# Start bpftrace in parallel, so, it is watching
-	# netpoll_poll_dev() while we are sending netconsole messages
-	bpftrace_start()
-	+    defer(bpftrace_stop)
-
-	do_netpoll_flush(cfg, ifname, target_name)
-
-	@@ -338,7 +340,6 @@ def test_netpoll(cfg: NetDrvEpEnv) -> None:
-		# Revert RX/TX queues
-		ethtool_set_rx_tx_queue(ifname, original_queues[0], original_queues[1])
-		netcons_delete_target(target_name)
-
-Thanks for th heads-up and review,
---breno
+--Sean
 
