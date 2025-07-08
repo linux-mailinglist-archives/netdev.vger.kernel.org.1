@@ -1,83 +1,71 @@
-Return-Path: <netdev+bounces-204993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCFF6AFCD14
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 16:12:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94FDDAFCD1A
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 16:13:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6C357AB41A
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 14:11:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2B8616A8CA
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 14:13:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A2112E0910;
-	Tue,  8 Jul 2025 14:12:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E9522DF3F2;
+	Tue,  8 Jul 2025 14:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BzSPBN3t"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ogUOJPh2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4F52E06F8;
-	Tue,  8 Jul 2025 14:12:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5D92DECD4;
+	Tue,  8 Jul 2025 14:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751983926; cv=none; b=CZSswSNUhV+ieUITZYkZqtAYt34DvPUtbF1TLGTp8096IbrraBsQ+vc28496NlyGMGNJORDR1TFWEh3MizLsUHpkmrBfdaqoS/YaN7WqPiPUIjctqJsarTkKyiForApiv+fTevWwWxnzWoMkESvrV7pHgmmao5mAamAH5rZDGFw=
+	t=1751983988; cv=none; b=qUIwP7+ad0/y/K/XYHqysj9TvFniqcMejjxKJXEDiAoN8TBzOnqix/YT9VjSKoQxpAEVT1Lf+IlSiF89Dn1ZzjOzqrkcy0BWo0pGy4ver70vLj2fGVE3ne3jcW/F4N3B+b/fF3u3DicLemTOaX74g68HtM8CZy+vKFWm883eLL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751983926; c=relaxed/simple;
-	bh=69kRkm6EgMW7idav5pc9DCpei/xJJlkEyeGgKUwRGE8=;
+	s=arc-20240116; t=1751983988; c=relaxed/simple;
+	bh=mUa5VGfPK7WXD/1exqzxKMcLrIOHwOGywgEaVxTJK+0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gBOjhm7JhcA9IOh0/KbKhOjBLRjRfb8gjAQLOI62sIscYmfqDNAKZNUnXjWrqJoJTQMlt02nfUkVFMepEj19YCAO/glw2VcXTspGSQgYjnsCNa5TQ/3XRuXrZU9gueKqkvQLooD02Sfjv0cTD+omleO0o2qGE1QAqySQ4PrVUMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BzSPBN3t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E42AC4CEEF;
-	Tue,  8 Jul 2025 14:12:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751983925;
-	bh=69kRkm6EgMW7idav5pc9DCpei/xJJlkEyeGgKUwRGE8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BzSPBN3tj97lE4r31NyH+0wfxQ6tXnjWLA9zhcUYkFb5a8nO8Z6Y0w9k/43WAyB8I
-	 hlWEjyFgE6A6q152X2lw5pCqK0v6945Xp8+F3PRouG1g25vyXQxC3ysOgQUMJigSvH
-	 JrHaz3XxysnrgqrABvIqUnFIScqYLjbuDkB7vIM7CbJN6dow+pYAFD1p4WOk3uMt/x
-	 NjAW9ngMbmaGzph6BP/zEngwyYdBAFGe2NP8DETzlsIi3BO1Z16oF1nsdlGSa1zSGw
-	 LnSSvFJFchRzSyuTu2ApCpCKAoLUqWZaJzghkleeRObbhNRtIjbrPdTHGqTGa7dicX
-	 u3sDXugikt5IQ==
-Date: Tue, 8 Jul 2025 07:12:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Qianfeng Rong <rongqianfeng@vivo.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Potnuri Bharat Teja <bharat@chelsio.com>,
- Veerasenareddy Burru <vburru@marvell.com>, Sathesh Edara
- <sedara@marvell.com>, Louis Peens <louis.peens@corigine.com>, Shahed Shaikh
- <shshaikh@marvell.com>, Manish Chopra <manishc@marvell.com>,
- GR-Linux-NIC-Dev@marvell.com, Jiri Slaby <jirislaby@kernel.org>, Nick
- Kossifidis <mickflemm@gmail.com>, Luis Chamberlain <mcgrof@kernel.org>,
- Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@toke.dk>, Arend van
- Spriel <arend.vanspriel@broadcom.com>, Brian Norris
- <briannorris@chromium.org>, Francesco Dolcini <francesco@dolcini.it>, Ajay
- Singh <ajay.kathat@microchip.com>, Claudiu Beznea
- <claudiu.beznea@tuxon.dev>, Ping-Ke Shih <pkshih@realtek.com>, Kees Cook
- <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, Benjamin
- =?UTF-8?B?R3Jvw59l?= <ste3ls@gmail.com>, Hayes Wang
- <hayeswang@realtek.com>, Lucas Sanchez Sagrado <lucsansag@gmail.com>,
- Philipp Hahn <phahn-oss@avm.de>, Aleksander Jan Bajkowski <olek2@wp.pl>,
- Eric Biggers <ebiggers@google.com>, Wentao Liang <vulab@iscas.ac.cn>,
- Johannes Berg <johannes.berg@intel.com>, Sebastian Reichel
- <sebastian.reichel@collabora.com>, Ondrej Jirman <megi@xff.cz>, Jacobe Zang
- <jacobe.zang@wesion.com>, Dmitry Antipov <dmantipov@yandex.ru>, Kalle Valo
- <kvalo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Aditya Kumar
- Singh <quic_adisi@quicinc.com>, David Lin <yu-hao.lin@nxp.com>, Roopni
- Devanathan <quic_rdevanat@quicinc.com>, Rameshkumar Sundaram
- <quic_ramess@quicinc.com>, Marek Vasut <marex@denx.de>, Alexis
- =?UTF-8?B?TG90aG9yw6k=?= <alexis.lothore@bootlin.com>, Arnd Bergmann
- <arnd@arndb.de>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- oss-drivers@corigine.com, linux-usb@vger.kernel.org,
- linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
- brcm80211-dev-list.pdl@broadcom.com, opensource.kernel@vivo.com
-Subject: Re: [PATCH 00/12] net: Use min()/max() to improve code
-Message-ID: <20250708071202.6b65bc30@kernel.org>
-In-Reply-To: <20250708135632.152673-1-rongqianfeng@vivo.com>
-References: <20250708135632.152673-1-rongqianfeng@vivo.com>
+	 MIME-Version:Content-Type; b=IFavBvtYENYyH0KplCCx6qcQf7Bi4t1uprHKrMO42hsKKhtCKLtxWziXHiFEWkHcpFq9t0r/y2EtI5WuBSbiaBjDHEojkdd+2QPF0DWII9fDDGu69FFjNBCkMTg/iPwOFIpS2LZBr4AlTeyqSZmK8meDpaY4zjktyAqpGJrwfAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ogUOJPh2; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8B192442C4;
+	Tue,  8 Jul 2025 14:13:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1751983984;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BHgoV1J57kxgaPxatKiQwpkPJq0wS14OFtwNdQBZLYI=;
+	b=ogUOJPh2phW8rRkZiDPVUySob0EeiFY37jzsRhS9zbj6BfCghW3oj4Cj09whsGdywKFMQN
+	21HB/lw8zNfC1liuLPbeiVv0mF0dv2opleJFBIx3twZ0hxKRSo7oGzH7umad8Zeji/OEi9
+	8c6R+j58lxFkhv1ewI8iaHEQ8mGjKF5AZIVKVz190kkrxaP4PdmQdcdhdYsHbl9k/D+MbZ
+	b7hur0wSBM8plY6vNg04QbKvNtAK5sn56dFWtaANCK9zypcan2upsrR6xiArXZVQgaNEJg
+	ko2rklFYR6LMhQZVTRN8J4H3IK0FLo30rKSuCTvAkpubX+BD1fH6zwamQttWeg==
+Date: Tue, 8 Jul 2025 16:13:00 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Florian Fainelli
+ <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] net: netdevsim: Add PHY support in
+ netdevsim
+Message-ID: <20250708161300.53e96d47@fedora>
+In-Reply-To: <c6685b48-b525-47bd-8364-a26d787b1e3a@lunn.ch>
+References: <20250702082806.706973-1-maxime.chevallier@bootlin.com>
+	<20250702082806.706973-2-maxime.chevallier@bootlin.com>
+	<c6685b48-b525-47bd-8364-a26d787b1e3a@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,12 +74,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefgeekkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepledtrdejiedriedvrddujedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdejiedriedvrddujedupdhhvghlohepfhgvughorhgrpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudejpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoo
+ hhtlhhinhdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Tue,  8 Jul 2025 21:55:50 +0800 Qianfeng Rong wrote:
-> Use min() to reduce the code and improve its readability.
+Hi Andrew,
+
+On Tue, 8 Jul 2025 16:01:06 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
+
+> > +static int nsim_phy_state_link_set(void *data, u64 val)
+> > +{
+> > +	struct nsim_phy_device *ns_phy = (struct nsim_phy_device *)data;
+> > +
+> > +	ns_phy->link = !!val;
+> > +
+> > +	phy_trigger_machine(ns_phy->phy);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int nsim_phy_state_link_get(void *data, u64 *val)
+> > +{
+> > +	struct nsim_phy_device *ns_phy = (struct nsim_phy_device *)data;
+> > +
+> > +	*val = ns_phy->link;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +DEFINE_DEBUGFS_ATTRIBUTE(nsim_phy_state_link_fops, nsim_phy_state_link_get,
+> > +			 nsim_phy_state_link_set, "%llu\n");
+> > +
+> > +static void nsim_phy_debugfs_create(struct nsim_dev_port *port,
+> > +				    struct nsim_phy_device *ns_phy)
+> > +{
+> > +	char phy_dir_name[sizeof("phy") + 10];
+> > +
+> > +	sprintf(phy_dir_name, "phy%u", ns_phy->phy->phyindex);
+> > +
+> > +	/* create debugfs stuff */
+> > +	ns_phy->phy_dir = debugfs_create_dir(phy_dir_name, port->ddir);
+> > +
+> > +	debugfs_create_file("link", 0600, ns_phy->phy_dir, ns_phy, &nsim_phy_state_link_fops);  
 > 
-> No functional changes.
+> Maybe this can be converted into:
+> 
+> debugfs_create_bool("link", 0600, ns_phy->phy_dir, &ns_phy->link);
+> 
+> You loose the phy_trigger_machine(), but that might actually be
+> good. PHYs are async to any operation you take on them. It can take up
+> to 1 second due to the polling before any change is reported. So any
+> user space tools which expect an immediate state change are broken. So
+> leaving the PHY state machine to poll the PHY to notice the link has
+> changed is a better simulation.
 
-I don't see any patches on the list, 15 min after receiving this cover
-letter. But either way, this sort of changes are not worth the churn.
+That's true indeed... Simpler and more accurate, I'll add that in V3.
+
+Thanks for the feedback :)
+
+Maxime
+
 
