@@ -1,61 +1,54 @@
-Return-Path: <netdev+bounces-205079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49B1BAFD127
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 18:32:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21CF4AFD134
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 18:32:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B23D3BE034
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 16:31:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E75E51C2227C
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 16:32:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08A4D2E5415;
-	Tue,  8 Jul 2025 16:31:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F342E5423;
+	Tue,  8 Jul 2025 16:31:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jY5uWivI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g3JoKTaX"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540722E427E;
-	Tue,  8 Jul 2025 16:31:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D864621773D
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 16:31:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751992288; cv=none; b=ITG3S0ZkXKfZbKqOh7A1oUDXgDFV8fzchS39ile3hTZ8mRCpjui5BoiAj6HHT4HizKqMu4HZfkri31NakmI8b461J+I1Q1U54TGr79Nzs2rBgMLhUp66z8EEFM1Cs95Qr+4VfjjqOCyJWrfdGDvKco8QJ2RPce78zH+s/T2jrPM=
+	t=1751992314; cv=none; b=T0XQrepwsdozKnyBB1GEPtZGlNEDCM48Wjnx3odZsYAvXk0pPYfre5qtK9UQv/h4DB/N/K8dNekVXhnaUdOHVc0idIW1m91Raw+KWg36NFFIUlIWA3lpCddEIJV46CxdxIyYvacq98UBUULjb7rIrgJhTaVHVaqyBkqWiwzGur8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751992288; c=relaxed/simple;
-	bh=tM8UU61oLb5NiOTVd1J7j8w068VJ63i5mhYSLUE3NLo=;
+	s=arc-20240116; t=1751992314; c=relaxed/simple;
+	bh=DVsdgoa/d+ExpJvnG8KNpGkW7aHcxcAC1wnq+SPYp6s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QLaEZl2GeaSwr3Hh/TNMIAl8JRiaZppC5HH/FwFOOI0tVuQ0H8vofeVX+IegxmEeSns3J0tngb9idJm4RE0go6g+TiWmj2V8sdrwj42I2aUUsA1SqyBp+6w6MN0+geutq9w9qZbCgdk+JRWlholaq3aYopxGBSdNNvdrity9Yfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jY5uWivI; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=G4Te8l81esj5WHrgUTJCOoPkkVEuLKBrAeWZP67mcxg=; b=jY5uWivIuyJn3mv2A5EwpXUAtQ
-	tNkPhMJYAOxe0Hsjf7JA2dqJ2yjgjJRc3OfPtXOGM9jd68zyCtSV+sAT07TbLYlKF7lkYV0BsSYi8
-	Qc0PKxj0kkQ8rTbi3iRosL2UArkrbAZNSjvKc7HCRebvoCuiaPdzn5aCdFVQzezwtPjE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uZBDr-000qNa-QF; Tue, 08 Jul 2025 18:31:11 +0200
-Date: Tue, 8 Jul 2025 18:31:11 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] net: phy: qcom: Add PHY counter support
-Message-ID: <d64c9e64-879a-431a-b53f-06cb7166b940@lunn.ch>
-References: <20250709-qcom_phy_counter-v1-0-93a54a029c46@quicinc.com>
- <20250709-qcom_phy_counter-v1-1-93a54a029c46@quicinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=F7rpqN/jQyNX9ES/0r7/rBgWYCcP7cQRk5rwpXnSahc3ZCeUg6gey81PpKPrjDLSn3q0MP+osclJtCuG7NjBI9wvPSGjbmCiIFDJO+4VoPaqMbqgxiE84kQGWFTJQ3Pfx8Z6FjtoCpDLeXHfsshb1WBWiCPDs4yeeUtY+lGmoso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g3JoKTaX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78CA4C4CEF5;
+	Tue,  8 Jul 2025 16:31:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751992314;
+	bh=DVsdgoa/d+ExpJvnG8KNpGkW7aHcxcAC1wnq+SPYp6s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=g3JoKTaXd0o3Jy+v6Mc2DCx+BRm1jEeXDe/WwPtJYZllkULNbeXIA1mIzinuIZ/8+
+	 6qUvO5jxYmeb/pHFdMecTKFxi0RE7RuKeW/op9H1vCC9URuT5/do5K6LTUec30jhLH
+	 NJdDSQRBWHkmcxQH5enodE5lWxq3iK9m9slxGOzRsZj+LCVeu9KH21EujkRRSlK9t1
+	 iM2C7EMmoiycLq+G2hIq3kATz2XWO1I4MJJAGNvX5JJgHlWM1TuRxOSCjEtF9dLy8o
+	 Us/GbDAs7eu0frJboPnQ3cUXFUXdkh4OilnJ/skl9/KfHFTxKyERi/y8SaO9/LWtMb
+	 8HB5sxp/HWnlA==
+Date: Tue, 8 Jul 2025 17:31:51 +0100
+From: Simon Horman <horms@kernel.org>
+To: Louis Peens <louis.peens@corigine.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org, oss-drivers@corigine.com
+Subject: Re: [net-next v2] MAINTAINERS: remove myself as netronome maintainer
+Message-ID: <20250708163151.GR452973@horms.kernel.org>
+References: <20250708082051.40535-1-louis.peens@corigine.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,69 +57,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250709-qcom_phy_counter-v1-1-93a54a029c46@quicinc.com>
+In-Reply-To: <20250708082051.40535-1-louis.peens@corigine.com>
 
-> +static const struct qcom_phy_hw_stat qcom_phy_hw_stats[] = {
-> +	{
-> +		.string		= "phy_rx_good_frame",
-> +		.devad		= MDIO_MMD_AN,
-> +		.cnt_31_16_reg	= QCA808X_MMD7_CNT_RX_GOOD_CRC_31_16,
-> +		.cnt_15_0_reg	= QCA808X_MMD7_CNT_RX_GOOD_CRC_15_0,
-> +	},
-> +	{
-> +		.string		= "phy_rx_bad_frame",
-> +		.devad		= MDIO_MMD_AN,
-> +		.cnt_31_16_reg	= 0xffff,
-> +		.cnt_15_0_reg	= QCA808X_MMD7_CNT_RX_BAD_CRC,
-> +	},
-> +	{
-> +		.string		= "phy_tx_good_frame",
-> +		.devad		= MDIO_MMD_AN,
-> +		.cnt_31_16_reg	= QCA808X_MMD7_CNT_TX_GOOD_CRC_31_16,
-> +		.cnt_15_0_reg	= QCA808X_MMD7_CNT_TX_GOOD_CRC_15_0,
-> +	},
-> +	{
-> +		.string		= "phy_tx_bad_frame",
-> +		.devad		= MDIO_MMD_AN,
+On Tue, Jul 08, 2025 at 10:20:51AM +0200, Louis Peens wrote:
+> I am moving on from Corigine to different things, for the moment
+> slightly removed from kernel development. Right now there is nobody I
+> can in good conscience recommend to take over the maintainer role, but
+> there are still people available for review, so put the driver state to
+> 'Odd Fixes'.
+> 
+> Additionally add Simon Horman as reviewer - thanks Simon.
+> 
+> Signed-off-by: Louis Peens <louis.peens@corigine.com>
+> ---
+> v2: Changed state from 'Oprhaned' to 'Odd fixes' after a quick offlist
+>     discussion with Jakub and Simon. Also added Simon as reviewer based on this
+>     discusson.
 
-Are there any counters which might be added later which are not in
-MDIO_MMD_AN? It seems pointless having this if it is fixed.
+Thanks Louis.
 
-> +		.cnt_31_16_reg	= 0xffff,
-> +		.cnt_15_0_reg	= QCA808X_MMD7_CNT_TX_BAD_CRC,
-> +	},
-> +};
-
-There has been an attempt to try to standardise PHY statistics. Please
-look at:
-
-**
- * struct ethtool_phy_stats - PHY-level statistics counters
- * @rx_packets: Total successfully received frames
- * @rx_bytes: Total successfully received bytes
- * @rx_errors: Total received frames with errors (e.g., CRC errors)
- * @tx_packets: Total successfully transmitted frames
- * @tx_bytes: Total successfully transmitted bytes
- * @tx_errors: Total transmitted frames with errors
- *
- * This structure provides a standardized interface for reporting
- * PHY-level statistics counters. It is designed to expose statistics
- * commonly provided by PHYs but not explicitly defined in the IEEE
- * 802.3 standard.
- */
-struct ethtool_phy_stats {
-        u64 rx_packets;
-        u64 rx_bytes;
-        u64 rx_errors;
-        u64 tx_packets;
-        u64 tx_bytes;
-        u64 tx_errors;
-};
-
-Please use this if possible.
-
-    Andrew
-
----
-pw-bot: cr
+Reviewed-by: Simon Horman <horms@kernel.org>
 
