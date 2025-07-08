@@ -1,134 +1,165 @@
-Return-Path: <netdev+bounces-204787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 214B2AFC109
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 04:53:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CA85AFC111
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 04:56:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 256001632A1
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 02:53:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13FF43AA7F8
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 02:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB43225788;
-	Tue,  8 Jul 2025 02:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00FA5226D17;
+	Tue,  8 Jul 2025 02:56:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="I+6eZrX2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LM5vCsSP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D3A383;
-	Tue,  8 Jul 2025 02:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59C0A225A32;
+	Tue,  8 Jul 2025 02:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751943181; cv=none; b=po4AaIjldPKB2s9jdbTV3ZoCc7FCaqM1hZL+qGsxbx2Q20+/QKomD51ux6sOZ+tgyB8ADNvQeCbw3xDz4i3Lb2VM7J7q6alY4Vu46/HJAOAjsmT5e+3bBfK9qF3P8lbd7MgzkPr037/oBaytWg5103kNrlpWh+M6tbIVwkwb33A=
+	t=1751943395; cv=none; b=IXhdAN4ZVc6lsFfne2GhNyBB8EI90LFTsO/BsIj+hppc9HnnZi0BZiBMLEefIkwEx6U/gt66bsp9ivKEfpgR2JLhaGGBzMDjw3xjvO6KnGzMS9l5LkyJF2g/x6Oy2/NXpEeMxUEM/lPDsWZlBPpTSevGNyaL18jctBBijoQSMqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751943181; c=relaxed/simple;
-	bh=2YPaOuP0AKZnwJ6QA5VdtBos5n+zVrR0TqRlQjwzdAQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=WCSNDDZX61b96FcilPKcsgaMRfDPudMicSDeebVGCdcG8JBgPTZmEroe2eDC0LGV7VOJg9ssPIU1pzKYqPHLR5rh2jKplbjVgnwe3W4zhLCQmrCEOxTVu+edYjRsJuuRQsWdmC84EhkquTh9fR8ov5CyT+ZW0jBhUYFNz4qtSd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=I+6eZrX2; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 567MXP4h019666;
-	Tue, 8 Jul 2025 02:52:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	sR815mEl+sUZgpjEY6ReuyVgD3GFXXoJSV6V6GNAHLw=; b=I+6eZrX29+efemxn
-	iD1gVeUEGSmsWSrR84vXr8U01pk+aRJoNIndtKmBRFtZz1cC5QOtWnI/gIL5aRQE
-	IUCXmUweQZ+6dEMDEZGdmxl81H+bJu0aznH16MwvJcYpCwnmAFixEn2yAQaG3Mit
-	4TZNzwEx1pNRxzHhAOjcI/fI+Kl0oov1LDHp3KxhIyq0a63c/cp/m8igg69trnbk
-	JH0J3Obtnk8kBHxRglg3w5gSLAz/QkBW4Y8ZaM0gyfp+l3tnABSq3DadxSjyky+q
-	Lmi4B/lAfGFgMAmm/WHc6TQM/bLXKPCTBliRQccEmCno+twRn8zAPgKzXWxRdD8Y
-	0gyv4Q==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47psdqtmbn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 08 Jul 2025 02:52:36 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 5682qZuI026457
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 8 Jul 2025 02:52:35 GMT
-Received: from [10.253.13.246] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Mon, 7 Jul
- 2025 19:52:32 -0700
-Message-ID: <720a6969-7d30-4eb8-a970-2e06740c2780@quicinc.com>
-Date: Tue, 8 Jul 2025 10:52:30 +0800
+	s=arc-20240116; t=1751943395; c=relaxed/simple;
+	bh=9ZTeoXsYlOG2Lm0VDPZA1m20VzIMr7P1sL3fBI04xvc=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=KL+ktN130lKiBOGpWmpoV9dgfSqm11PobqisXG3X28hbnMCqVzAOW8CcIBkfrKVp8rBO+BqlH+o3p+stX4yddFasHEGfJr9xslaFPFXCPAA/mIGw/6X8RBB8l+Wa7YVo0M08ddybzWwvrNJ4ih7q0lMJrqHePPiJnqSkfhg6gwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LM5vCsSP; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-71173646662so34141137b3.2;
+        Mon, 07 Jul 2025 19:56:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751943393; x=1752548193; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JxMX/xJxzy2hJc4qqxOWGP0PpMg37pMea6Q0wamjJr4=;
+        b=LM5vCsSPmnyZHrq4BZZ/luJ2EnIijsk0T9o1NxuEkDs6ux+THXDsf+t/0JnaX4Qvdu
+         0Qlih3bCUqrOk4ojA57Ll7szbuL1s9qXhju106dMYhAxrzOe6TZWpiJWWdbrEnm7vWjp
+         yWBIOX/W12VwgZ1ZyrfliHFWiMeqLww0Ac4VWcOmWDqOy+e3khQyG0YCcTOvblhnCvXa
+         bXvk5LVILh3PQD9VL9Bq2J7ZJAmGx7bvAVuQENV5mvnZp9UeKwMurkMxjRzPd3561ANM
+         1oxcvrLEXKDKxHCSpe9wcd2IGToaNLHb+miRRpqhupcF7Lr4rQaynrl5ljbt3QjR/dAb
+         e9cA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751943393; x=1752548193;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=JxMX/xJxzy2hJc4qqxOWGP0PpMg37pMea6Q0wamjJr4=;
+        b=Ll0bEANr+sWq1NAhRUI7iYpZH0zmM1vABs/xvR2yvEztKVTtkSRBLmcqP+TS5rdv2r
+         9z2k3KPJ6K17WA8w//FdtJ+8d5JqOCsnaAK6GFjgL+ytcLy5ldrfz/I3W3FHCiU7EBld
+         kYBe/1GkBPKzVowBGi3mfjzZ/iUrU92tDU93YZn0n5BtrIv5D7I8aQtDjExscWnVMEwc
+         VrjDFbFgzP8HKyPKSmEWjg2Mn2dBAiXyOud7BJM0AKNDRJ982fYwxIGDrSYHnDBEPRy6
+         i1lhWiTlWeQw91JQ+oBljYhBOkCgdGksq+X/PkcxSVPAj0vae5s95VFvMxRqE0nPV0PZ
+         FTYg==
+X-Forwarded-Encrypted: i=1; AJvYcCUBkzGt3quxaFMlVYC89rFAmDZxDk9eULhvHUnvotAIqjl0RE/Vztjql8oBHMrS7BujUAOL31SL4PUWCfyuc+aY@vger.kernel.org, AJvYcCUjSfR9UibUF3dne5mHvgoQejmgW+5A2zhoLBPByJsXv+IK/0YB7iJ+7bJ37T+VMgFhxq0=@vger.kernel.org, AJvYcCXmiIxTlZGp/PbaKxshKhZFzLnQM4eqLspZ7xkmXVVJz39gIdD643P/dqueLNRPmTcA5BnNyuT5@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx75w5sG3YVdAY98MslUcaF4nUb3pZEeC+zqCD1B8jmyG7x8F9z
+	Rz5N4078VzjGTS0XGgA90W6FkHtpgy5Cm/Dv5gjTk7S7+iRbGiJT9wUm
+X-Gm-Gg: ASbGncvZ/SZprGWOxYITDxIz2VTQMezaZwc3iM6S0h1mMW6uo5lnvNAet+KijjQrIgW
+	aA5+JlnYM05D4Zrx30zGa9ycIi9K0PlNQRaoxfecga8kwhhXWdcTUBcfIjGqqCRwmX0KeGYCiun
+	sQbPVq5PJbIxTj4oAnQ8ZPWYWamqTg+iiDOOFIMmsmoSONWHMfDam9JFf6Ozxfsl1dbLIOPAlTq
+	97RJR8PHUHFV749I6jcUPIoVDK5H3qN/tmgIn+15qpOWGab1C5VD05I2uGR20CYp/nrMQo3ieui
+	eUkvzUeQSmSBfYRMDv1XNaEvutDR7Ksn48Zmj3yWoZnPdjfxaFMJ/QRo20zOJqHIpZVnLOXp2Ds
+	KH32vGmbLjuTZL9DlrxSCOCV+ml6rKZ7SzvXVQkE=
+X-Google-Smtp-Source: AGHT+IGbyc1ivKnu4Md1jd3PRtXFprZzrt10RDAYU25UxhegDOAebXcSzzdd+a4hHyIKQsluIr5PFw==
+X-Received: by 2002:a05:690c:7012:b0:714:268:a9f8 with SMTP id 00721157ae682-71668e22b3fmr206639087b3.27.1751943393255;
+        Mon, 07 Jul 2025 19:56:33 -0700 (PDT)
+Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-716659a1440sm19459037b3.35.2025.07.07.19.56.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Jul 2025 19:56:32 -0700 (PDT)
+Date: Mon, 07 Jul 2025 22:56:32 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Breno Leitao <leitao@debian.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ bpf@vger.kernel.org, 
+ kernel-team@meta.com, 
+ Breno Leitao <leitao@debian.org>
+Message-ID: <686c88e0283_29b0d29422@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250702-netpoll_test-v4-3-cec227e85639@debian.org>
+References: <20250702-netpoll_test-v4-0-cec227e85639@debian.org>
+ <20250702-netpoll_test-v4-3-cec227e85639@debian.org>
+Subject: Re: [PATCH net-next v4 3/3] selftests: net: add netpoll basic
+ functionality test
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND net 3/3] net: phy: qcom: qca807x: Enable WoL
- support using shared library
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>,
-        Viorel Suman <viorel.suman@nxp.com>, Li Yang
-	<leoyang.li@nxp.com>,
-        "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-        Wei Fang <wei.fang@nxp.com>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <maxime.chevallier@bootlin.com>
-References: <20250704-qcom_phy_wol_support-v1-0-053342b1538d@quicinc.com>
- <20250704-qcom_phy_wol_support-v1-3-053342b1538d@quicinc.com>
- <20250707164332.1a3aaece@kernel.org>
-Content-Language: en-US
-From: Luo Jie <quic_luoj@quicinc.com>
-In-Reply-To: <20250707164332.1a3aaece@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=ffSty1QF c=1 sm=1 tr=0 ts=686c87f4 cx=c_pps
- a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10
- a=5vVSTZcSAIpnvYd1Sv0A:9 a=QEXdDO2ut3YA:10 a=0lgtpPvCYYIA:10
-X-Proofpoint-ORIG-GUID: YH3PtwPB5M3HBfmMXCuPuMKfiWXBU18m
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA4MDAyMiBTYWx0ZWRfXxiL6U2Luud0t
- DqhhkBXzEEByLIcuanmT/3wA+zcWDk05ueIVtroO1U18ORkT6No3LDZVhZ85L3C/qAajY2yjZjN
- eEVm4aE9x34c6uac7RpNtBllUQ/FhBgyZnDtSXDsahvJE4T9lRwMByftnn9rFwVS2EwKKAakmoF
- 2Sr5sC5MkI67nHoqu818BzjEujYgq2bICTslJV7pv84KUqJjJhLrJw9HphIcP3ulHVLw3WlSU7q
- nLE1HLwcmsW91L9Whl5o/aG1C1dbWPwpYvQuCaroKsOmLl1ItxUkjufceilbLz34BprwxmJkmDQ
- gbmTucIiC0MqZQCnTUVdbTYDBweD/UTjOO69nHFgXbTOvGFhjrxpKmzS+iHHPIy+NcrbJxvkWdj
- b76cwNXfTrJ1aZ9YQx0nomuTwKSuY7+XVOgPtxIfCoOG9aTJ2mFowpCvrTID+PK9Iq0TbAVr
-X-Proofpoint-GUID: YH3PtwPB5M3HBfmMXCuPuMKfiWXBU18m
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-08_01,2025-07-07_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 mlxlogscore=893 mlxscore=0 bulkscore=0 priorityscore=1501
- phishscore=0 clxscore=1015 suspectscore=0 impostorscore=0 lowpriorityscore=0
- spamscore=0 adultscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507080022
 
-
-
-On 7/8/2025 7:43 AM, Jakub Kicinski wrote:
-> On Fri, 4 Jul 2025 13:31:15 +0800 Luo Jie wrote:
->> The Wake-on-LAN (WoL) functionality for the QCA807x series is identical
->> to that of the AT8031. WoL support for QCA807x is enabled by utilizing
->> the at8031_set_wol() function provided in the shared library.
+Breno Leitao wrote:
+> Add a basic selftest for the netpoll polling mechanism, specifically
+> targeting the netpoll poll() side.
 > 
-> This needs to go to net-next in around a week (fixes go to net and
-> propagate to net-next only once a week, around Thursday/Friday).
-> I will apply the first 2 patches, please repost this later.
+> The test creates a scenario where network transmission is running at
+> maximum speed, and netpoll needs to poll the NIC. This is achieved by:
+> 
+>   1. Configuring a single RX/TX queue to create contention
+>   2. Generating background traffic to saturate the interface
+>   3. Sending netconsole messages to trigger netpoll polling
+>   4. Using dynamic netconsole targets via configfs
+>   5. Delete and create new netconsole targets after some messages
+>   6. Start a bpftrace in parallel to make sure netpoll_poll_dev() is
+>      called
+>   7. If bpftrace exists and netpoll_poll_dev() was called, stop.
+> 
+> The test validates a critical netpoll code path by monitoring traffic
+> flow and ensuring netpoll_poll_dev() is called when the normal TX path
+> is blocked.
+> 
+> This addresses a gap in netpoll test coverage for a path that is
+> tricky for the network stack.
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-Understand. Thank you for applying the first two patches. I will repost
-the remaining patch to net-next once the first two are available there,
-as advised.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
+> +def test_netpoll(cfg: NetDrvEpEnv) -> None:
+> +    """
+> +    Test netpoll by sending traffic to the interface and then sending
+> +    netconsole messages to trigger a poll
+> +    """
+> +
+> +    target_name = netcons_generate_random_target_name()
+> +    ifname = cfg.dev["ifname"]
+> +    traffic = None
+> +    original_queues = ethtool_read_rx_tx_queue(ifname)
+> +
+> +    try:
+> +        # Set RX/TX queues to 1 to force congestion
+> +        ethtool_set_rx_tx_queue(ifname, 1, 1)
+> +
+> +        traffic = GenerateTraffic(cfg)
+> +        do_netpoll_flush_monitored(cfg, ifname, target_name)
+> +    finally:
+> +        if traffic:
+> +            traffic.stop()
+> +
+> +        # Revert RX/TX queues
+> +        ethtool_set_rx_tx_queue(ifname, original_queues[0], original_queues[1])
+> +        netcons_delete_target(target_name)
+> +        bpftrace_stop()
+
+One risk with stateful tests is that the state is not reset if the
+test exists (or crashes) before reaching the cleanup logic. There
+are ways around it. Jakub added defer for this purpose, for one.
 
