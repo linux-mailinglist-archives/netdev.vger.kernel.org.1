@@ -1,120 +1,161 @@
-Return-Path: <netdev+bounces-204931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B573CAFC918
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 13:00:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B77A4AFC922
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 13:05:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 801621AA08BC
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 11:00:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7340F18949C2
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 11:05:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1222D8768;
-	Tue,  8 Jul 2025 11:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23C87221561;
+	Tue,  8 Jul 2025 11:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="trzAjsWU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cpzpIPXl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875D22D8764
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 11:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FDC31E9B2D;
+	Tue,  8 Jul 2025 11:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751972402; cv=none; b=f6Q89lCSUmYLRhl3Aun9INT/5/iKk1yT3FMoYojp6nVdo2eNld3/dprjhKw7QTfyEfgUYaBBxMLhuCrAWmFxiD9iE/RuI01nARk8H7xyzPdfRf5J+rcM2HCYNNBFXM+Oj0wyg3K1W/2+KpXzrwXujfRNjmpy+TjDSVoZheDaKKo=
+	t=1751972706; cv=none; b=JFDe1mXwP0ZMa5E2XUwlJP1v7h3lvO8zZolpqn3zgG8OYc+MhsY3fsrtEsvmCjjQCvP0jym1rZUWosybiWAsMhCl6xZu3p6fnQWC0RTVC6z/RpK6guFMFk3HOy11feVcoUtqVuDugQqNBYUOLkJAWcJufDyWKdTZzO6F+5Ozwm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751972402; c=relaxed/simple;
-	bh=mVwSeLq8a1VGYPuJQZcrCJEYz09VXxFZ6ICwhYGF/G0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SLT99E9ITtsYcHA4n9UzlIPHk9jPKCCEmOGC+2T+wUCvv/ApJra0M1MyQNLOrxc5Ec9RdwAn0TFnK2ybpoc/XXHaRZY2junB53qw/1OnPB3DrtZm/M6JJrzd3m8Rky0Gy0hsgKgK8fM+ktaWNycgmp7DBwwxekdWd9uo5FJCHpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=trzAjsWU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53204C4CEED;
-	Tue,  8 Jul 2025 11:00:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751972402;
-	bh=mVwSeLq8a1VGYPuJQZcrCJEYz09VXxFZ6ICwhYGF/G0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=trzAjsWUa8HWvakg6pr2L1EpQdn6N6hY4GjNTAFCERjGaZOPjETCs5hqIOZV0e8rs
-	 wrb2C1gAYbVhDSfg7nSfnZNYic9vRFidr6qHdOucly4HvEbRsZ0y5ZGf4YVq56V62/
-	 8OC0gPN/3TONjRBQf08Dld+rSXrVIqbKAG+bB5yLN/Jrt4KbGelOATdoU5mgAGt5K0
-	 MLHoAUGhehbwA4qbOyarQ0Sk75XCSi4XsZPLKWiGh/W+ohY1jKY125//LAGAmXoeKt
-	 gyti2F5BeSN0GFvQ6nKCRPqThWE/1wAnQ3tlc6uVoGYM+r7b2+72xLJlJ5pcjQ8c+A
-	 p9rs5mtxrOa1Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710F5380DBEE;
-	Tue,  8 Jul 2025 11:00:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1751972706; c=relaxed/simple;
+	bh=5cG4DeDqbfiWCmY8G3IQIEWAgFjNloJd5T7LEMyt5OQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=snfFrws8PHBe8XOLwwKnSR2anLx7F2o74AZAAKE9ZumVjdkVYq3C50TquxkjCy3skiFt4tDiDjMPV/64INxh2HPpXnFv6PjNr/QwEdBjf7Y/Pf2ZYQOplzqvaKtp8l1cq6j7ztyKTA6mHDqMw7Rf0NQvPTdf5okU0RhYF9xceVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cpzpIPXl; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ad56cbc7b07so704598166b.0;
+        Tue, 08 Jul 2025 04:05:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751972702; x=1752577502; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mRU/+hFkoTw5qHqNwj6ei+Jmw40bwtYgcu8fT+5zfjE=;
+        b=cpzpIPXl9e9zi4PLUSoLV9aiMMkD8aW4DKwSHb+Q7ORCU/DkX2CBCNWEWRwJplEqgf
+         WGG0hecsc8V9GFAQZSBfglgIVEvzt32eEIGySMVHEFrbsEuI1Ngg0fayrcKo+wusPdcq
+         U62qErTTcDOlOFEzBULfCQYySUYblVRnqNKfy2HWFxm2+GKjTdp/xlWtCm3R9vOWHirj
+         XMr2S6rgaah2My5G9u9aRstX2Qgs/M3nkFrvmbdYeusKaWPD4gRd034p8T6io2LSH1eT
+         iofdvg7ATVzKykeJYNrGdkk0x0z/lng4YPitBC2CsxqdApwprMSY0f3rBSKdHsv69BuC
+         QCDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751972702; x=1752577502;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mRU/+hFkoTw5qHqNwj6ei+Jmw40bwtYgcu8fT+5zfjE=;
+        b=QOREB9poCN5m/lsZXf7Rs6wMr1f3rp8d5M+oc6vSn8zT0lIJOLhlNgWmPffAzGmc8Y
+         lSMEsFUiVH3QjC6su8K6u/koLMUqSWFRE4kTK/QXdAvZPQlDjvT3vseWxs2rC7D95tj2
+         YjcpF+AcE7vtXrAsguup2FjlLGXIt6gdYAhwzDQK7Rb0LXWwarfuii2m957VVPAWeZJi
+         LPqjmvdUJ7l7SW28NAmfDPi3D1oTbA1umNdKfOFILYJAY/RVRE7SlcVF/RruQFGWGEkC
+         F0CmuNECQmbA33YYDtKEogHBCnx6pQpYhK9GNkNCmpfninuoxQVfKNkIkGNfNDk4R1Wb
+         unMg==
+X-Forwarded-Encrypted: i=1; AJvYcCVmjGf3uZWIhhIssHsZZytLlrMvLOlJvg4yv8lApOcRIL1gHbu+dHEM2JsG5/XxxT3YUwD5kGzhPhRDzuI=@vger.kernel.org, AJvYcCVnfxgMqEqWsSwZ7r7I+IS9cAaGl4RyawVSpFpI/JGFFtfbImSEVXtUZFgRecXIywu5kIiz5xZI@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJcoEhJJKUbpFB0EV2Zgp6qf88kfaDI3B1P+DN9X9F8j9MtCDZ
+	HjTIAIIpSKN/mcDz2kPgg4x7Wc3LrtSiut9V6jkkdb6INm3ekpWub9tq
+X-Gm-Gg: ASbGncuJatOsX+F6PIcbbpE9g6PEq2cQvjYQlDXQVjxz9rDX3mbZEZbijTliRHLlmtL
+	yJl7s/gqz4drcKXaeD60P27lX34SPoCXisGDVr5ty8KCVgWo5l/C3DOGbflsu8rFr00E/Iv2+rJ
+	nGsBJYNWNGJkBYlv7xZLG1BPQnHSGyEygtbPMvQ7VhH8B/jSw7yWaxsCmdkxDfzA3DJwK4zGExq
+	ox3G+pfieUS9qFUDldNTgU3lDJlN8wtzKYA4j2VrcEoTfJCVGOyRWmZaJMIMeQJjq0f1QFZD/b0
+	tT/AleUslsyXB1yRL1cQAslPWR4FMe0WPF7sF7+cSbD444hlJnJPzJjyOKRnkunEEJKo63Jn/m4
+	=
+X-Google-Smtp-Source: AGHT+IG/xzC3tI0puBmckI4rTlIlwCBfe5a4dxt1kiLb4lcsEsza24eX2Ju6QgEjiCI465RP05ncRw==
+X-Received: by 2002:a17:907:7287:b0:adb:23e0:9297 with SMTP id a640c23a62f3a-ae3fe6923b3mr1557685666b.17.1751972702138;
+        Tue, 08 Jul 2025 04:05:02 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::1ac? ([2620:10d:c092:600::1:4dfd])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae3f66d93c8sm884341566b.11.2025.07.08.04.05.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Jul 2025 04:05:01 -0700 (PDT)
+Message-ID: <32cb77d8-a4a5-4fc7-a427-d723e60efc59@gmail.com>
+Date: Tue, 8 Jul 2025 12:06:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 00/14] net: mctp: Add support for gateway
- routing
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175197242527.4024640.15516341824210236859.git-patchwork-notify@kernel.org>
-Date: Tue, 08 Jul 2025 11:00:25 +0000
-References: <20250702-dev-forwarding-v5-0-1468191da8a4@codeconstruct.com.au>
-In-Reply-To: <20250702-dev-forwarding-v5-0-1468191da8a4@codeconstruct.com.au>
-To: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: matt@codeconstruct.com.au, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next 1/4] net: Allow non parent devices to be used for
+ ZC DMA
+To: Dragos Tatulea <dtatulea@nvidia.com>, almasrymina@google.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, tariqt@nvidia.com, cratiu@nvidia.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250702172433.1738947-1-dtatulea@nvidia.com>
+ <20250702172433.1738947-2-dtatulea@nvidia.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250702172433.1738947-2-dtatulea@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 02 Jul 2025 14:20:00 +0800 you wrote:
-> This series adds a gateway route type for the MCTP core, allowing
-> non-local EIDs as the match for a route.
+On 7/2/25 18:24, Dragos Tatulea wrote:
+> For zerocopy (io_uring, devmem), there is an assumption that the
+> parent device can do DMA. However that is not always the case:
+> for example mlx5 SF devices have an auxiliary device as a parent.
 > 
-> Example setup using the mctp tools:
+> This patch introduces the possibility for the driver to specify
+> another DMA device to be used via the new dma_dev field. The field
+> should be set before register_netdev().
 > 
->     mctp route add 9 via mctpi2c0
->     mctp neigh add 9 dev mctpi2c0 lladdr 0x1d
->     mctp route add 10 gw 9
+> A new helper function is added to get the DMA device or return NULL.
+> The callers can check for NULL and fail early if the device is
+> not capable of DMA.
 > 
-> [...]
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> ---
+>   include/linux/netdevice.h | 13 +++++++++++++
+>   1 file changed, 13 insertions(+)
+> 
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 5847c20994d3..83faa2314c30 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -2550,6 +2550,9 @@ struct net_device {
+>   
+>   	struct hwtstamp_provider __rcu	*hwprov;
+>   
+> +	/* To be set by devices that can do DMA but not via parent. */
+> +	struct device		*dma_dev;
+> +
+>   	u8			priv[] ____cacheline_aligned
+>   				       __counted_by(priv_len);
+>   } ____cacheline_aligned;
+> @@ -5560,4 +5563,14 @@ extern struct net_device *blackhole_netdev;
+>   		atomic_long_add((VAL), &(DEV)->stats.__##FIELD)
+>   #define DEV_STATS_READ(DEV, FIELD) atomic_long_read(&(DEV)->stats.__##FIELD)
+>   
+> +static inline struct device *netdev_get_dma_dev(const struct net_device *dev)
+> +{
+> +	struct device *dma_dev = dev->dma_dev ? dev->dma_dev : dev->dev.parent;
+> +
+> +	if (!dma_dev->dma_mask)
 
-Here is the summary with links:
-  - [net-next,v5,01/14] net: mctp: don't use source cb data when forwarding, ensure pkt_type is set
-    https://git.kernel.org/netdev/net-next/c/e0f3c79cc0bb
-  - [net-next,v5,02/14] net: mctp: test: make cloned_frag buffers more appropriately-sized
-    https://git.kernel.org/netdev/net-next/c/fc2b87d036e2
-  - [net-next,v5,03/14] net: mctp: separate routing database from routing operations
-    https://git.kernel.org/netdev/net-next/c/269936db5eb3
-  - [net-next,v5,04/14] net: mctp: separate cb from direct-addressing routing
-    https://git.kernel.org/netdev/net-next/c/3007f90ec038
-  - [net-next,v5,05/14] net: mctp: test: Add an addressed device constructor
-    https://git.kernel.org/netdev/net-next/c/96b341a8e782
-  - [net-next,v5,06/14] net: mctp: test: Add extaddr routing output test
-    https://git.kernel.org/netdev/net-next/c/46ee16462fed
-  - [net-next,v5,07/14] net: mctp: test: move functions into utils.[ch]
-    https://git.kernel.org/netdev/net-next/c/80bcf05e54e0
-  - [net-next,v5,08/14] net: mctp: test: add sock test infrastructure
-    https://git.kernel.org/netdev/net-next/c/19396179a0f1
-  - [net-next,v5,09/14] net: mctp: test: Add initial socket tests
-    https://git.kernel.org/netdev/net-next/c/9b4a8c38f4fe
-  - [net-next,v5,10/14] net: mctp: pass net into route creation
-    https://git.kernel.org/netdev/net-next/c/48e6aa60bf28
-  - [net-next,v5,11/14] net: mctp: remove routes by netid, not by device
-    https://git.kernel.org/netdev/net-next/c/4a1de053d7f0
-  - [net-next,v5,12/14] net: mctp: allow NL parsing directly into a struct mctp_route
-    https://git.kernel.org/netdev/net-next/c/28ddbb2abe13
-  - [net-next,v5,13/14] net: mctp: add gateway routing support
-    https://git.kernel.org/netdev/net-next/c/ad39c12fcee3
-  - [net-next,v5,14/14] net: mctp: test: Add tests for gateway routes
-    https://git.kernel.org/netdev/net-next/c/48e1736e5dc1
+dev->dev.parent is NULL for veth and I assume other virtual devices as well.
 
-You are awesome, thank you!
+Mina, can you verify that devmem checks that? Seems like veth is rejected
+by netdev_need_ops_lock() in netdev_nl_bind_rx_doit(), but IIRC per netdev
+locking came after devmem got merged, and there are other virt devices that
+might already be converted.
+
+> +		dma_dev = NULL;
+> +
+> +	return dma_dev;
+> +}
+> +
+>   #endif	/* _LINUX_NETDEVICE_H */
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Pavel Begunkov
 
 
