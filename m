@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-205055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E0EFAFCFEA
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 17:59:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C75EAFCFEF
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 18:00:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24C447AC1C6
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:58:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B39CB3B4119
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:59:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72772E2654;
-	Tue,  8 Jul 2025 15:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F0C82E2EEC;
+	Tue,  8 Jul 2025 15:59:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PkIMF0lX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SRcaajSE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BAAF2E0B58;
-	Tue,  8 Jul 2025 15:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C8B2E0B58;
+	Tue,  8 Jul 2025 15:59:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751990388; cv=none; b=Ns0ENhaue0VyzqIG6f3aQNe9cukwrjokkrAw88E8Fc/CxyJh3QfnKARqykPo4hUXIy4nHRQ64LSAFptbC7p+9MdpVd+wPP9veaJzCQv76WWkjgx6VgNxwCTJ9iKmmhttqz4fvY9H/Oc+Zeza8LSxllQ4K6DATI+x+OvKI5ZV70E=
+	t=1751990399; cv=none; b=s7vAFOv+wzFi4k+DQEznw0cyRh821traw15Jh2dDMsLXjOgfXEPdJr+kl63pwBpNdAtrMLH5Z/9NmwRp7tNGA1qJ1+LLNzgx30LL4MlEUOww+9r7TCxF5riGwjP5WomnnmKd6oo/BhmqoubNx0eZlad58PWY16PMAe+/fmneGqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751990388; c=relaxed/simple;
-	bh=ZW6qYS+Al3lRmdQ1niU7FInxgnj6XAnZwHrqWAeO6iM=;
+	s=arc-20240116; t=1751990399; c=relaxed/simple;
+	bh=PVtjGWbHxgxwh9Sjq5IV6QMU4TmKcrY2ABdzMpTe7C0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qnpDBZtxgNYysGfI0+aGzNHKXsH/vns5K0yDWoMliH/SIA7Uh97iTOsJ51ioIYgj+o30ofeh98mlmBRSsRabGSzdmRnEFdp82AQfXQfzop2bLJTB7qAPBFCFqHs3/SICfDVEDZlVz1wf7XR1lLXD/UB4YlQ/HxhD79e5QxndjLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PkIMF0lX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BCC6C4CEED;
-	Tue,  8 Jul 2025 15:59:48 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=fmMpUBbCh2m6v+CEWBoj13OeEtHV1OP9gHMloMYQ3O5L6kNs+Y3m2oA6fb+bn19BDmFaKnIPKKHpC5vWz4xLXmFqFBQrjUlVppnsxuxCrZbqM4O1w41uo+LysQu0+87W//lh/5ZH7OZpghNF0NuAE07y+nb74NnUqgeqIRGD1+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SRcaajSE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95F4BC4CEED;
+	Tue,  8 Jul 2025 15:59:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751990388;
-	bh=ZW6qYS+Al3lRmdQ1niU7FInxgnj6XAnZwHrqWAeO6iM=;
+	s=k20201202; t=1751990398;
+	bh=PVtjGWbHxgxwh9Sjq5IV6QMU4TmKcrY2ABdzMpTe7C0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PkIMF0lXUU8ezPYgLNmJOrJWlC9o3VRIw5z6XAkvITcA8Y/fLJW3y/wvD5xHb5NXq
-	 H3nhnbzXQWfGJw6wcm4reb5YHnu8EcJqtCzqCHsIWl7MnAelQvCBieOJ9SFHZ3SzNl
-	 1x8pPDERkuipE43vZRFNLAuyKJ80kSNb1jdEDngjVjNqAVPdTd1pexGUh4Ec1H3PiI
-	 Ml5OmtVsm8AiMKhUa4ikPemOwDke/qKfiV/dfrdGKmsQoEqXhCoIMvGKoV8Ph6t25n
-	 8JXEBXNTJY42AxqbFasztHQSxc7oK4sVSo9/KRbFEf2ua74XU3jnHGTHOVqWW6bJZT
-	 jGRvfrnt3ee8w==
+	b=SRcaajSE7wM5jKY/za/I85TGN3JY88KOXnMYvjy7u9DSqqoIJ8jnQe1ycJ78tXbxY
+	 RrLpHvED/l0mRz921k4uO2jEh1aI7LF2Rb1C98MJXYul1/Zg1yJZpvnjexZwbEAsT5
+	 Gth7zTg+eK+UKurhT4qOSSbWaMo2YcksRxaMKRB3qXq9HKdKwwpb30B3PkaNVvJaGP
+	 VvrjHaIGz39GcA+uihWVlYPNJCmpdf1WEuRcZqxF/xz8DHCJ/RqFY3sSEMJ5MfyUpu
+	 nc4chBt+XJAS+f6xMcqOzlr0U60PCycTH27Q65QY6f8C7YgXr2hxq58mSX41ctaPwu
+	 /R2sXrEyUd6fw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F42380DBEE;
-	Tue,  8 Jul 2025 16:00:12 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADBCF380DBEE;
+	Tue,  8 Jul 2025 16:00:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4 0/3] vsock: Fix transport_{h2g,g2h,dgram,local}
- TOCTOU issues
+Subject: Re: [PATCH net-next v3 0/6] net: Remove unused function parameters in
+ skbuff.c
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175199041100.4117860.14540554652345521469.git-patchwork-notify@kernel.org>
-Date: Tue, 08 Jul 2025 16:00:11 +0000
-References: <20250703-vsock-transports-toctou-v4-0-98f0eb530747@rbox.co>
-In-Reply-To: <20250703-vsock-transports-toctou-v4-0-98f0eb530747@rbox.co>
+ <175199042124.4117860.11392671467837095763.git-patchwork-notify@kernel.org>
+Date: Tue, 08 Jul 2025 16:00:21 +0000
+References: <20250702-splice-drop-unused-v3-0-55f68b60d2b7@rbox.co>
+In-Reply-To: <20250702-splice-drop-unused-v3-0-55f68b60d2b7@rbox.co>
 To: Michal Luczaj <mhal@rbox.co>
-Cc: sgarzare@redhat.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, stefanha@redhat.com,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, ayush.sawal@chelsio.com,
+ andrew+netdev@lunn.ch, dsahern@kernel.org, ncardwell@google.com,
+ kuniyu@google.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+ sidraya@linux.ibm.com, dust.li@linux.alibaba.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 03 Jul 2025 17:18:17 +0200 you wrote:
-> transport_{h2g,g2h,dgram,local} may become NULL on vsock_core_unregister().
-> Make sure a poorly timed `rmmod transport` won't lead to a NULL/stale
-> pointer dereference.
+On Wed, 02 Jul 2025 15:38:06 +0200 you wrote:
+> Couple of cleanup patches to get rid of unused function parameters around
+> skbuff.c, plus little things spotted along the way.
 > 
-> Note that these oopses are pretty unlikely to happen in the wild. Splats
-> were collected after sprinkling kernel with mdelay()s.
+> Offshoot of my question in [1], but way more contained. Found by adding
+> "-Wunused-parameter -Wno-error" to KBUILD_CFLAGS and grepping for specific
+> skbuff.c warnings.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v4,1/3] vsock: Fix transport_{g2h,h2g} TOCTOU
-    https://git.kernel.org/netdev/net/c/209fd720838a
-  - [net,v4,2/3] vsock: Fix transport_* TOCTOU
-    https://git.kernel.org/netdev/net/c/687aa0c5581b
-  - [net,v4,3/3] vsock: Fix IOCTL_VM_SOCKETS_GET_LOCAL_CID to check also `transport_local`
-    https://git.kernel.org/netdev/net/c/1e7d9df379a0
+  - [net-next,v3,1/6] net: splice: Drop unused @pipe
+    https://git.kernel.org/netdev/net-next/c/1024f1207161
+  - [net-next,v3,2/6] net: splice: Drop unused @gfp
+    https://git.kernel.org/netdev/net-next/c/25489a4f5564
+  - [net-next,v3,3/6] net: splice: Drop nr_pages_max initialization
+    (no matching commit)
+  - [net-next,v3,4/6] net/smc: Drop nr_pages_max initialization
+    (no matching commit)
+  - [net-next,v3,5/6] net: skbuff: Drop unused @skb
+    https://git.kernel.org/netdev/net-next/c/ad0ac6cd9c04
+  - [net-next,v3,6/6] net: skbuff: Drop unused @skb
+    https://git.kernel.org/netdev/net-next/c/ab34e14258cd
 
 You are awesome, thank you!
 -- 
