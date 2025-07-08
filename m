@@ -1,92 +1,99 @@
-Return-Path: <netdev+bounces-205071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C58BAFD04A
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 18:12:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF7BAAFD065
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 18:16:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE22B1752F5
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 16:11:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D76C3A3BF7
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 16:16:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1AF32E5B3D;
-	Tue,  8 Jul 2025 16:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4B82E0902;
+	Tue,  8 Jul 2025 16:16:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uYT7nDvl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WHkDMXpm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE442E7169
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 16:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D45021B199;
+	Tue,  8 Jul 2025 16:16:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751991001; cv=none; b=cNQbNkdXuO3z66hbWzwqXr/uAIP8J3Rk/OrHi0H8/qyzw7QdLbhIADjpKcuF8DafliM4VylYzKGIgIfXfp36BozX4FxgXgGql+C4HteDlwEwW7/4e+AaEYVMSFM/vWO0rFPORnF1+SQoL3AsGR8F3GupHvCdj0u9jVIMftqrIEs=
+	t=1751991390; cv=none; b=GHj671il38FS2Zrcr9RUc+6dekQ4NvRKWgLQQZpKiTtQ/c+AP4nfEOoJU9yL8CIkLt42xd97Qu1peWvtNZGUiHCpw8w6PyTQBLB48ELwqMilA3zIUNNKxZOzGcUIWm5T5wUEKF4M2vah0v9KZUoY/kxGlMQqvja/XENJYswnvew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751991001; c=relaxed/simple;
-	bh=bDhonFgpdihbC4A+dmq6P/KdH0SHRMNa1pih4wOKYG8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LXzpxu/IOAlUDa967c8k0Ul3PN/2Y6S1PdBlqECMvlztZ5oD0ukpVj9BpFDgZgtQaPLxcY9kv2Vg/J+yeP51Hgk/WcPmrsBhaBe49/6XvdUlJFir2ZuzIKiikUaQwsreff7ITgKL1RKw/Z8JUJpMvL0L1klFMoTL8ntglUZsmqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uYT7nDvl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19211C4CEED;
-	Tue,  8 Jul 2025 16:10:01 +0000 (UTC)
+	s=arc-20240116; t=1751991390; c=relaxed/simple;
+	bh=MlvZZ4a52AP4+QDRvUm5hDSogr1vDDiw9bguTeqre4k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NccFFEyXZOxZIcbzWgtPX1xRdUDtQnfnn+di6RswOUqM5TXZgzXxXUhT8yQ//qFQ+Zk/ff4GVLZzdZ81qtE9xgpZhfY7Z4uN+IO4pDZKlv0JYTQopDwe0QjAiJFMhD0cCjLVGnGWn8C2OQdn30M1NowpHfunpU7hdTGDf/kTcJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WHkDMXpm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF4BEC4CEED;
+	Tue,  8 Jul 2025 16:16:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751991001;
-	bh=bDhonFgpdihbC4A+dmq6P/KdH0SHRMNa1pih4wOKYG8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uYT7nDvlSTVhYUhiRnf/5mVqWMZTuikr3R8lX1ppsFvBFsVYBUAR68AQTDGX+9GAp
-	 c+M48PFPMR9dLnfZDRfJ7kN9UtqOO2KEu/bRg6wN5kanLAT7Msl+s8g+YricH+3yCV
-	 8lq3/5MEWhq/eg0ITDD1eGk4nO+EJEFuPS6vsKBvK3C+nQledWOmC+fxPD5Z7rb/Z+
-	 Y4rOStUyov2UkRVma6HxyTRWlsSpzscRdEyp7xHuI3LdLrLpVQ6opDcmtWJVu/TXx7
-	 30JBDlkWDUxfq4sZKka9e165loL64/nreO9TZiZyW3HxSHsGhNYo9NC914RTGBv5go
-	 dEUTCy6tpzfPw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C37380DBEE;
-	Tue,  8 Jul 2025 16:10:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1751991390;
+	bh=MlvZZ4a52AP4+QDRvUm5hDSogr1vDDiw9bguTeqre4k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WHkDMXpma6mUHWY1TvjLFbvGC4viBk4MR8OV9MrwZ/dTNKgT07LJpTY/NtXTCDXrZ
+	 dLjEZd/2stfi0fb8CD8B0SfIzQ6PTtunA4hOdl0neEM346rL6WymLLAFpuM3/xZ6Gt
+	 QO9DkRI4enn0lmHhspykXYqEdWOWahdODkBNZ0jylxzCe7tU8dP/VwqS6CGmJWrNjv
+	 EAETLzByJ4JTzHbGr3uk4fmxiyz8y26a7mwrercqkQST5xUubduncf9Zx5ya/jTpl+
+	 AsCll8GNnqL7PMZs3WvYXratllAkSary35yho11OgaklEU601N3wuM3bez/8naSIX0
+	 JoFLA4S0GU+Ww==
+Date: Tue, 8 Jul 2025 11:16:28 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Chen-Yu Tsai <wens@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Conor Dooley <conor+dt@kernel.org>,
+	Samuel Holland <samuel@sholland.org>,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+	Jernej Skrabec <jernej@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-sunxi@lists.linux.dev
+Subject: Re: [PATCH RFT net-next 01/10] dt-bindings: net: sun8i-emac: Add
+ A523 GMAC200 compatible
+Message-ID: <175199138810.517400.11158407408233098308.robh@kernel.org>
+References: <20250701165756.258356-1-wens@kernel.org>
+ <20250701165756.258356-2-wens@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phy: declare package-related struct members
- only if CONFIG_PHY_PACKAGE is enabled
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175199102400.4122127.11571289435393980799.git-patchwork-notify@kernel.org>
-Date: Tue, 08 Jul 2025 16:10:24 +0000
-References: <f0daefa4-406a-4a06-a4f0-7e31309f82bc@gmail.com>
-In-Reply-To: <f0daefa4-406a-4a06-a4f0-7e31309f82bc@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: andrew@lunn.ch, linux@armlinux.org.uk, pabeni@redhat.com,
- edumazet@google.com, davem@davemloft.net, kuba@kernel.org,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250701165756.258356-2-wens@kernel.org>
 
-Hello:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 3 Jul 2025 07:55:52 +0200 you wrote:
-> Now that we have an own config symbol for the PHY package module,
-> we can use it to reduce size of these structs if it isn't enabled.
+On Wed, 02 Jul 2025 00:57:47 +0800, Chen-Yu Tsai wrote:
+> From: Chen-Yu Tsai <wens@csie.org>
 > 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> The Allwinner A523 SoC family has a second Ethernet controller, called
+> the GMAC200 in the BSP and T527 datasheet, and referred to as GMAC1 for
+> numbering. This controller, according to BSP sources, is fully
+> compatible with a slightly newer version of the Synopsys DWMAC core.
+> The glue layer around the controller is the same as found around older
+> DWMAC cores on Allwinner SoCs. The only slight difference is that since
+> this is the second controller on the SoC, the register for the clock
+> delay controls is at a different offset. Last, the integration includes
+> a dedicated clock gate for the memory bus and the whole thing is put in
+> a separately controllable power domain.
+> 
+> Add a compatible string entry for it, and work in the requirements for
+> a second clock and a power domain.
+> 
+> Signed-off-by: Chen-Yu Tsai <wens@csie.org>
 > ---
->  include/linux/phy.h | 4 ++++
->  1 file changed, 4 insertions(+)
+>  .../net/allwinner,sun8i-a83t-emac.yaml        | 68 ++++++++++++++++++-
+>  1 file changed, 66 insertions(+), 2 deletions(-)
+> 
 
-Here is the summary with links:
-  - [net-next] net: phy: declare package-related struct members only if CONFIG_PHY_PACKAGE is enabled
-    https://git.kernel.org/netdev/net-next/c/c523058713ab
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
 
