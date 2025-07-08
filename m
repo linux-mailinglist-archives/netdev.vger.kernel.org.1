@@ -1,140 +1,176 @@
-Return-Path: <netdev+bounces-205098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64C9AAFD598
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 19:40:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6170AFD5B4
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 19:50:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA3061646F2
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 17:40:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA6CE540568
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 17:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AC952E540C;
-	Tue,  8 Jul 2025 17:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944A02E6D16;
+	Tue,  8 Jul 2025 17:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vgUKd8v+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HfVturJ8"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3952E5B0F;
-	Tue,  8 Jul 2025 17:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06CC62E5B12;
+	Tue,  8 Jul 2025 17:49:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751996432; cv=none; b=DeCjzJ9yOanEcaz9dSvudLRkVyyq+6umveO/QwbVsmkl0IGYw9UyCYop5PJ31RzMXgdlRbHXSUnMDjCaX3nw+vr1VAzopUcAEMHySGGeD7iOj+qR626wsrx8gY+cOXJVNFIHwINjzSqiXl2igQ7R/IAeLlaEq089HscmDcrATYg=
+	t=1751996980; cv=none; b=ScK5/jxmrduvQDEzssPMcdjEyN21j2sQ8plUWllftDZf7c9lIHLK9bNjWPzheGDZeN59x65oEBn52XRrFvXjFeME5Rz4skdbO+/G4C/UReKnvULn23I3JZ/5EM1VRvAl7nAv45n1wVUbI8/jIVIopkfkmQgRaL3SdNO0xfrAInI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751996432; c=relaxed/simple;
-	bh=q8ErWWZB3bgtRnMHAOkyZzK9sHEQJyJpk0dmHap0jg4=;
+	s=arc-20240116; t=1751996980; c=relaxed/simple;
+	bh=mHw1y+UP8/AtOMHF8e3q6xPzlTeUZ9k27IU1C11V/tA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gg1Wh9nNELbVZ2hSC4lfRTFvqs7ql31IPTc1/zVE2VfFXNwOgI5eBPkAJSjTl3qQjEPD89EutMbIbk846Q1IL3X+z7tPdfwn1xLz6VeeEZt9WAHCFZw6KMRmOtO7igdQLPaO0VyYNKHlQ6kcob/sy3X3Z+mUPi/GDsHFkyddL1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vgUKd8v+; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rzBPjq7zJ/E4WWNdaVu+VzaEbNExyKV4C2BkFHWH5JM=; b=vgUKd8v++Eqkxpg6mZRw6MBhUs
-	L6B0/4PxzDGgU3aatVWOahA8IabF7XTcbn54qC5w0KfxKVHMEx6UT45rPfIXoM68b5HIzawTXC3Wn
-	IY+4vJFuwmsqlGuSP8twmV2XkJH8rnJg1vrr0W4AfqULD9obkLggL0RfSexdLwHHLyJg8vro3/A34
-	rSDwrKVBx4FMZ9Es4iFaZtg9q6qEU4jk7yPGm4tLCEDcZnNWTS4TWEI5tUDmJW2wTYc+xXXg29AKY
-	8t9zgN2X4OVHXC5W4zeYXzKxwdp9BNVktd58g0dHu0E4YA5/SgPAgoBvH6HCRIlyzN5DuQeZYcJ+x
-	YvrFdBRw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35708)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uZCIf-0006vc-11;
-	Tue, 08 Jul 2025 18:40:13 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uZCIY-0001nm-3D;
-	Tue, 08 Jul 2025 18:40:07 +0100
-Date: Tue, 8 Jul 2025 18:40:06 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Lizhe <sensor1010@163.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, vladimir.oltean@nxp.com,
-	maxime.chevallier@bootlin.com, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: stmmac: Support gpio high-level reset for devices
- requiring it
-Message-ID: <aG1X9pPYDGO8kfM9@shell.armlinux.org.uk>
-References: <20250708165044.3923-1-sensor1010@163.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bz2FxPZ0fFHlKRBF1iU4ZE5N6dVb1q7wPU9gLYhDfzjPuNgqnsc+E6UnA+FKLWn0AyrhUoEzs6zyc1evp6SF19brQ6wYaoGyTKsskbqZ+pv3SXWXpHIa5GZluyqCGz5nO/QaB5traHIHNfhvg6EnU7n7yuJLGZpQcMZ8JllbpBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HfVturJ8; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-742c3d06de3so5454759b3a.0;
+        Tue, 08 Jul 2025 10:49:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751996978; x=1752601778; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TfGHCpKiATO/car9fxGjjpC/yJtP9kbddUriJfKtC+Y=;
+        b=HfVturJ8mMYZ9Pg8FXHryidf/SNr+HE0NVkRpkr/64wmZ3Qy16SJtML8aYgiHxtPFg
+         7v4m5VY2ic9S82rvsJPu24m7MohUDYVavL+oSOliCC1CWvCTOhFv3Ip4TKkjGyWxJoMT
+         SUp/kZlrEwUI5cyelhNEjwK6yLbv9i2RZb0yNQoCPgwy8KhV6QATxbA07wrzJbnuMcXV
+         Y8Nv59b1XBVncH8EOHT0g4LKPujV3ZwMjb3PoNoGxsVt8Oht+pFywDgizoT+40HFoAF7
+         Lrjlfa412B4bdJclPZ/eHL5DZROX37ESXsN0S61yYPCT3VDkpPtdrxIWhn7jFWQGC9il
+         Cx1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751996978; x=1752601778;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TfGHCpKiATO/car9fxGjjpC/yJtP9kbddUriJfKtC+Y=;
+        b=F/YyU/txEc+TILQjzXYfCwirFF6u+SmZrX3Ha4Lq3xZCyuNJ1gRyagGx/qet5Dr2F5
+         PEY/jKGAYCop2lYR9CPYDPEWZTRdNbsOouNPxesPW8Srb7Eu6LQB/hGQVlqXn948KP6S
+         ZIdsqYQCrySLrlkJpdQbolyECJK6JJcuLD9oJQxoL3YP1iKjh8aR6KcuwJUQ58dRWsMA
+         3igR8NS9nYCrmqOGSlGxL8shXh2Nunrs9QWcza+GBhsD/09J7HIRjrf2MKpdN7porb0r
+         Xf8Zrt2IUMANLNh7AarwbrHuvBXfKKulgrDtuQIoU4d5/GS+cIzmbC29qF5fVTDvBxee
+         BI0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUdZZeoLV5TRtwyjMuLHPB19heMKhpGrwBl+mP5D553ipxWKDunhoW0Bfzs23GPPvZMCOk=@vger.kernel.org, AJvYcCW7XQHJ2PGzbELyTB+fJHoTLalTu3hRwY2Z0Jq6Hlkcc2b6j7zblSJsrhh3G1qla7xYeOQ1o42D@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCBfMcEuDB/TeZlIjGzolk7Aby1cY1VWRbVot7hB7u4ZEQSILg
+	nz7RigG0jQ4i7vdQ5pU5PrTgrVjnAU+aU+OBQwX/oFd4R3BYHoaSnD0=
+X-Gm-Gg: ASbGncuR+3RNlryYcBdjrS1d/aqUQEoZAfBle4uAcwMo9hQ2IlH7+qwHpxuOnN5ODQV
+	bFwUTZsPU1Pb5JDzW0j0WbN/eZqwNfp0diTbH3cr+5LcTYAx5tyoxdU/7Td4Ok0xcdcnBYUuuoL
+	qRdAeTV1xjfFmmelCBjLhLyljZM6YG3MCYxyKQTjAeqKNNQrALiYrfKLV0lscdSVICDbrwNW5ey
+	05F+AlDDB79Kafc7aJRTToDFkyMJmh4wnFYMLoujeaHtJ0R7h9eLNkL9D9PDKyvOGdm0VOsX/kv
+	BXLNM/Yh9AeC378Tf1huhZpAuqME6oNiqzOpYVWZhE/dZcqCEz1qyHw/TO0N3u8WdA+NQTrxD9Z
+	IuUyxrCDuillfjRFyMGIZ9j4=
+X-Google-Smtp-Source: AGHT+IHhBghnmKtGt4Ho8pyJxCqgQvss53AVS3Dstn95HlGvLtDNrezX/IgPnci/8V18srjoBnfeYQ==
+X-Received: by 2002:a05:6a00:3d01:b0:748:eedb:902a with SMTP id d2e1a72fcca58-74ce6688e28mr24171410b3a.17.1751996978138;
+        Tue, 08 Jul 2025 10:49:38 -0700 (PDT)
+Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-74ce429a0b1sm12572208b3a.115.2025.07.08.10.49.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Jul 2025 10:49:37 -0700 (PDT)
+Date: Tue, 8 Jul 2025 10:49:36 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+	netdev@vger.kernel.org, magnus.karlsson@intel.com,
+	Eryk Kubanski <e.kubanski@partner.samsung.com>
+Subject: Re: [PATCH v2 bpf] xsk: fix immature cq descriptor production
+Message-ID: <aG1aMOmnb-6K7syY@mini-arch>
+References: <20250705135512.1963216-1-maciej.fijalkowski@intel.com>
+ <d0e7fe46-1b9d-4228-bb0f-358e8360ee7b@intel.com>
+ <aGvibV5TkUBEmdWV@mini-arch>
+ <a113fe79-fa76-4952-81e4-f011147de8a3@intel.com>
+ <aGwUsDK0u3vegaYq@mini-arch>
+ <aG0nz2W/rBIbB7Bl@boxer>
+ <beaab8ec-d11a-4147-b7f4-487a4c3fe45b@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250708165044.3923-1-sensor1010@163.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <beaab8ec-d11a-4147-b7f4-487a4c3fe45b@intel.com>
 
-On Tue, Jul 08, 2025 at 09:50:44AM -0700, Lizhe wrote:
-> some devices only reset when the GPIO is at a high level, but the
-> current function lacks support for such devices. add high-level
-> reset functionality to the function to support devices that require
-> high-level triggering for reset
+On 07/08, Alexander Lobakin wrote:
+> From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> Date: Tue, 8 Jul 2025 16:14:39 +0200
 > 
-> Signed-off-by: Lizhe <sensor1010@163.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+> > On Mon, Jul 07, 2025 at 11:40:48AM -0700, Stanislav Fomichev wrote:
+> >> On 07/07, Alexander Lobakin wrote:
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> index 836f2848dfeb..cb989e6d7eac 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-> @@ -458,6 +458,7 @@ int stmmac_mdio_reset(struct mii_bus *bus)
->  
->  #ifdef CONFIG_OF
->  	if (priv->device->of_node) {
-> +		int active_low = 0;
->  		struct gpio_desc *reset_gpio;
->  		u32 delays[3] = { 0, 0, 0 };
->  
-> @@ -467,6 +468,9 @@ int stmmac_mdio_reset(struct mii_bus *bus)
->  		if (IS_ERR(reset_gpio))
->  			return PTR_ERR(reset_gpio);
->  
-> +		if (reset_gpio)
-> +			active_low = gpiod_is_active_low(reset_gpio);
-> +
->  		device_property_read_u32_array(priv->device,
->  					       "snps,reset-delays-us",
->  					       delays, ARRAY_SIZE(delays));
-> @@ -474,11 +478,11 @@ int stmmac_mdio_reset(struct mii_bus *bus)
->  		if (delays[0])
->  			msleep(DIV_ROUND_UP(delays[0], 1000));
->  
-> -		gpiod_set_value_cansleep(reset_gpio, 1);
-> +		gpiod_set_value_cansleep(reset_gpio, active_low ? 1 : 0);
->  		if (delays[1])
->  			msleep(DIV_ROUND_UP(delays[1], 1000));
->  
-> -		gpiod_set_value_cansleep(reset_gpio, 0);
-> +		gpiod_set_value_cansleep(reset_gpio, active_low ? 0 : 1);
->  		if (delays[2])
->  			msleep(DIV_ROUND_UP(delays[2], 1000));
->  	}
+> [...]
+> 
+> >>> BTW isn't num_descs from that new structure would be the same as
+> >>> shinfo->nr_frags + 1 (or just nr_frags for xsk_build_skb_zerocopy())?
+> >>
+> >> So you're saying we don't need to store it? Agreed. But storing the rest
+> >> in cb still might be problematic with kconfig-configurable MAX_SKB_FRAGS?
+> 
+> For sure skb->cb is too small for 17+ u64s.
+> 
+> > 
+> > Hi Stan & Olek,
+> > 
+> > no, as said in v1 drivers might linearize the skb and all frags will be
+> > lost. This storage is needed unfortunately.
+> 
+> Aaah sorry. In this case yeah, you need this separate frag count.
+> 
+> > 
+> >>
+> >>>> Can we pre-allocate an array of xsk_addrs during xsk_bind (the number of
+> >>>> xsk_addrs is bound by the tx ring size)? Then we can remove the alloc on tx
+> >>>> and replace it with some code to manage that pool of xsk_addrs..
+> > 
+> > That would be pool-bound which makes it a shared resource so I believe
+> > that we would repeat the problem being fixed here ;)
+> 
+> Except the system Page Pool idea right below maybe :>
+ 
+ It doesn't have to be a shared resource, the pool (in whatever form) can be
+ per xsk. (unless I'm missing something)
 
-NAK. Not required. The GPIO layer can cope with active-high and
-active-low signals declared in firmware without needing driver
-modification. Use the right data in the firmware and you don't
-need to patch.
+> >>> Nice idea BTW.
+> >>>
+> >>> We could even use system per-cpu Page Pools to allocate these structs*
+> >>> :D It wouldn't waste 1 page per one struct as PP is frag-aware and has
+> >>> API for allocating only a small frag.
+> >>>
+> >>> Headroom stuff was also ok to me: we either way allocate a new skb, so
+> >>> we could allocate it with a bit bigger headroom and put that table there
+> >>> being sure that nobody will overwrite it (some drivers insert special
+> >>> headers or descriptors in front of the actual skb->data).
+> > 
+> > headroom approach was causing one of bpf selftests to fail, but I didn't
+> > check in-depth the reason. I didn't really like the check in destructor if
+> > addr array was corrupted in v1 and I came up with v2 which seems to me a
+> > cleaner fix.
+> > 
+> >>>
+> >>> [*] Offtop: we could also use system PP to allocate skbs in
+> >>> xsk_build_skb() just like it's done in xdp_build_skb_from_zc() +
+> >>> xdp_copy_frags_from_zc() -- no way to avoid memcpy(), but the payload
+> >>> buffers would be recycled then.
+> >>
+> >> Or maybe kmem_cache_alloc_node with a custom cache is good enough?
+> >> Headroom also feels ok if we store the whole xsk_addrs struct in it.
+> > 
+> > Yep both of these approaches was something I considered, but keep in mind
+> > it's a bugfix so I didn't want to go with something flashy. I have not
+> > observed big performance impact but I checked only MAX_SKB_FRAGS being set
+> > to standard value.
+> > 
+> > Would you guys be ok if I do the follow-up with possible optimization
+> > after my vacation which would be a -next candidate?
+> 
+> As a fix, it's totally fine for me to go in the current form, sure.
 
-/* Bit 0 express polarity */
-#define GPIO_ACTIVE_HIGH 0
-#define GPIO_ACTIVE_LOW 1
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
++1
 
