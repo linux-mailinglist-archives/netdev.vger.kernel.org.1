@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-204737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B8A7AFBEDB
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 02:02:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 904ECAFBEEC
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 02:03:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C57E3169852
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 00:02:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA94B427088
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 00:02:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AF5A28FD;
-	Tue,  8 Jul 2025 00:02:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679F8191;
+	Tue,  8 Jul 2025 00:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pNGAtzut"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwvTI3mR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3633191;
-	Tue,  8 Jul 2025 00:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D81179DA;
+	Tue,  8 Jul 2025 00:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751932940; cv=none; b=rFzSEbfJniahAAsvZDMwcHjPdqLYSJ/H8wOgmGM/a1WyoA0o5kA9TXV/06AI1CYUPxqMq7mE/3MWkHd54sto5we4vPgCgOhsCitfXpchS/CUGptg7d8K1H//uQ/4+8vpeCVc5b39RT0/ZCEFkUDKyXUcSlNKTx75xPXTBWBSaRw=
+	t=1751932955; cv=none; b=mDcEV1N6Vm2OnxhJ3//5TTelpN89h+EOUlcBgjaDHb82ayb12hXzf/o8aou2uOTk67gTzTIIRvLuTOo5+xrW4MB3ftUV00A766e2K5l5DRlTwttO6qS048G2S62mL8PTRjGY3JrqCMNRGlgbKnnFWpuAdSAEudn142kqi+BFPgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751932940; c=relaxed/simple;
-	bh=t5zmAG5UEvVd4XtHi1/WfmDFoTa8UUYg8Lwk7/npk3w=;
+	s=arc-20240116; t=1751932955; c=relaxed/simple;
+	bh=amaBfhxhq9g2AYE6DhKBw6AfiPJFDociuNjRttU9LVE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=o2X/iQPAZN9vvafP7lonKEbtUyns+amSQa8+xR7gTRalpRwsou2yQiARLL8vxwEV61/MZ6+QEvSZ37xg74tLcRgREknNYxTQMCOSAXoS8o453BqAmMePqUsS9tAh7fg5TwJIoCqy2qyE2vMk6Vf9cs4HlMD3haf39EZXDihJFH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pNGAtzut; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46B14C4CEF1;
-	Tue,  8 Jul 2025 00:02:18 +0000 (UTC)
+	 MIME-Version; b=ETkIiMuBIPrHvSoCli/oFB1GhRxWNESredCRDDDYOpjR8AIYr0Xg1Dv59WqBTkmB3ivaNziw5Luio06p8/PkJQnjkidjPHkXS07s354QAnvl1QuBslj79yKu21Gmii+GqKmKhjKy6k0YZ8172L6mzBJOF3ZoE/Z60ipCsCJ6/R8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwvTI3mR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BD34C4CEF1;
+	Tue,  8 Jul 2025 00:02:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751932939;
-	bh=t5zmAG5UEvVd4XtHi1/WfmDFoTa8UUYg8Lwk7/npk3w=;
+	s=k20201202; t=1751932955;
+	bh=amaBfhxhq9g2AYE6DhKBw6AfiPJFDociuNjRttU9LVE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pNGAtzutSGSI+5bIJhYypmZDUmt9LdZkF5xEV5qZNofmWNSepe44I5Dn69u8Uzhdh
-	 C9sKubCf6ph512z8wQTMmI4UFeGEhpdZQpuENi2DhRtvSVOA+QoBw55820BCSBZ0VB
-	 JfwtmcSigjz1QeIk7HH1Mq2TxrqsqNj/K+ZgYSlxIT2dHo0zE1LQQA2rykfAsjWA4I
-	 tryCMH98jAg5OZ8aSpKgEGofXo+BRbbssF2rtlRrQXBYHVPl/xxwdyd5Yenm3frJiF
-	 a69nsERhDd3DzoXaIvTgwok1yJ7BtO28c81dFpomJFa51R2iGnXXHJLQtvdHABayJN
-	 emUf0wW1PVuTA==
+	b=dwvTI3mRQXfRmkoz1Ucl4MjYV5KG8grL9ctyhYB1HCDtCdQVQ8Rd7JSyMN4gIrLLF
+	 WEf+mv4uolZYL3UquwgcBQVFHru3OSRmM3S62zjSR7E8IMXS3TB7jFUfyzsNwemY+X
+	 9WSs94P9BBxtOSSCUSqhv8vqPUqUbBISwPdBXIuiNJHcr5Y9p/lVIZd4dxJCq/gkFF
+	 Vboukv2g+FPpOukx6gQGo9ik4M1YdKuLpE/ajmpk6yzZoO+x8VBXQIAFi30nLSiHwt
+	 FYdLLMdiRV9ln5SKxpduL6Tb3f8e+CJMPwjoZ7PBQ6n4FafwJx6D587CapmJU4LBsd
+	 hqTxTuaMYfrCQ==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -56,12 +56,12 @@ Cc: Laurent Vivier <lvivier@redhat.com>,
 	kuba@kernel.org,
 	virtualization@lists.linux-foundation.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.15 2/8] virtio_net: Enforce minimum TX ring size for reliability
-Date: Mon,  7 Jul 2025 20:02:09 -0400
-Message-Id: <20250708000215.793090-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 2/6] virtio_net: Enforce minimum TX ring size for reliability
+Date: Mon,  7 Jul 2025 20:02:26 -0400
+Message-Id: <20250708000230.793347-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250708000215.793090-1-sashal@kernel.org>
-References: <20250708000215.793090-1-sashal@kernel.org>
+In-Reply-To: <20250708000230.793347-1-sashal@kernel.org>
+References: <20250708000230.793347-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.15.5
+X-stable-base: Linux 6.12.36
 Content-Transfer-Encoding: 8bit
 
 From: Laurent Vivier <lvivier@redhat.com>
@@ -186,10 +186,10 @@ stable: it addresses a real bug with minimal risk.
  1 file changed, 6 insertions(+)
 
 diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index e53ba600605a5..3054b2b4f6a0c 100644
+index 6d36cb204f9bc..384aabca39964 100644
 --- a/drivers/net/virtio_net.c
 +++ b/drivers/net/virtio_net.c
-@@ -3481,6 +3481,12 @@ static int virtnet_tx_resize(struct virtnet_info *vi, struct send_queue *sq,
+@@ -3231,6 +3231,12 @@ static int virtnet_tx_resize(struct virtnet_info *vi, struct send_queue *sq,
  {
  	int qindex, err;
  
