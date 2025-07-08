@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-204745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51AC9AFBF4D
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 02:43:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA621AFBF4E
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 02:43:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C70E016DC15
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 00:43:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC36E426C77
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 00:43:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C47011DD525;
-	Tue,  8 Jul 2025 00:43:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E93121E5200;
+	Tue,  8 Jul 2025 00:43:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aV1t61Sr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="blD2VFLE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985C51DB375;
-	Tue,  8 Jul 2025 00:43:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A8A1E47A5
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 00:43:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751935386; cv=none; b=Xk1RBDhzQyI4TmTrc0Jpu/yeZbGdaZBiByZAl13f2GYA8llc/GX8HeB7NMa39uuy404BY0MvXeJxJK4ArJCjAY0ZFH0oydaDLgopp3iTvSiECw6mkdRu5GmhHYKVfrFfgGxCY2vXYyV/vudDcMtV4b6VkN2bTX4WZ+MDLNrUecI=
+	t=1751935387; cv=none; b=UTeVzcaiRFKOIyil9R0NwzOg8CuTA/S27pbh7LYJXHirQ7m7dVT0N1yt1Jx4O1NobjWt59kuHLtKbS5a4U6KmVui3o/Bclp9qxFf1kgiw+sBM8RHkn/UfxDSxeLbEdYr5Qc5tMB5JWFgN4Ar7Hk3Aa8invH+AtYW7CyXP+RyjeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751935386; c=relaxed/simple;
-	bh=OM6DSiPA2OlOE23y/X/4gQLKmsBitK2wNjT6uRVNGtE=;
+	s=arc-20240116; t=1751935387; c=relaxed/simple;
+	bh=Q70tUDXLtmDIrKXyjsgrDN6V88h7vLHZtP9FElPlc/M=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=VdJZ3Axb8IKoAqy2RLrOCuCYZW8vzkYCskeA+L0kZrKCxQboi/eR7GeI958qcyXvP28nrue7FjnVdeE8JP7S+uiWvG4aFNmnnp/wKrbiXIgOosySV7AQrrOBiQ6GPDwbwjhDoN2keneykAJCOZ/Z5mqmzmLiFrOPREuTxUo7Tiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aV1t61Sr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25EC0C4CEF1;
-	Tue,  8 Jul 2025 00:43:06 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=nqIlfTRf0XIMEs8vTDS5mbIPrJpqLvBXPljLIM2EnrBbjk0Z6U7f0VrPdAiGTNB+mS+05Cpdv+1Zl0r7QmSaniG4uNmkCZweshSdfZ+OVyDwpTEOLP3C5Y389sMqcKqeIxWXNY9SqrXEHtDLoAG+BMp9jwQnYLnCH/ll0PvOWBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=blD2VFLE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1D01C4CEE3;
+	Tue,  8 Jul 2025 00:43:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751935386;
-	bh=OM6DSiPA2OlOE23y/X/4gQLKmsBitK2wNjT6uRVNGtE=;
+	s=k20201202; t=1751935387;
+	bh=Q70tUDXLtmDIrKXyjsgrDN6V88h7vLHZtP9FElPlc/M=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=aV1t61SrWEvlq3+eeF4TbRzjQHr9n19UDQEBo5WuUjyrmxEyxTv16Qu4QEsuArIDn
-	 +qiPRz8FcQHb206V7CEDuISmazDDShsgcyHNprKxR+1xhGjgwlgwAYruzYqirM9dxs
-	 xVk1oHpw16awkz6qits3g9VZccRNWyqtE+MZd/glTEKaLoUBiZcYGLOfjrX8RR4KVF
-	 wCaF/a3rgnEKbBhKXV3B3VUo1SVTUbxbcnj8aYnj4eLviEPIa7B95sH+DSPZT1cHS8
-	 a2l3QNSS3ibRuYHXeu5VwbfEzi3GhMayuJ5y3LyOjsPQv3Rv7UCrZadfQsuLivegJI
-	 Vn8Jvcz6NV42w==
+	b=blD2VFLE9RoOq6djgaCcRed0qlRTnVTpu1lHkcmZE1vk7cXBAcuR8PE2SPGv1B8Cb
+	 NAgD86MhuMXq6RXfuc0aA68zXgf4H2V7RpFFRUgj5LaiKHUS0GvDj8pXWvbv8ZjKw3
+	 8TKjJN2/I5y8y35/7RC/wnEkcjAVQ7hzKmCaTTGftAZ19325t8j9HUVWH9I3yH3sxc
+	 8bqbFFxtP3xNjqTO+ApRTIo0/LaWJDT5dbkNCIUkB72ww7j4gKNxVM47xi+L3kHaa9
+	 5Z0tWC1XW1m+9ftrqIRpbHkwUtDX4DH8EH2UAvDptKWWOPvlWNx6MAcyJq9GTP+j+3
+	 nhLYdMZjO9arg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DCA38111DD;
-	Tue,  8 Jul 2025 00:43:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADF638111DD;
+	Tue,  8 Jul 2025 00:43:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH RESEND net 0/3] Fix QCA808X WoL Issue and Enable WoL
- Support for QCA807X
+Subject: Re: [PATCH v1 net] netlink: Fix wraparounds of sk->sk_rmem_alloc.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175193540924.3455828.4763600284207918560.git-patchwork-notify@kernel.org>
-Date: Tue, 08 Jul 2025 00:43:29 +0000
-References: <20250704-qcom_phy_wol_support-v1-0-053342b1538d@quicinc.com>
-In-Reply-To: <20250704-qcom_phy_wol_support-v1-0-053342b1538d@quicinc.com>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- viorel.suman@nxp.com, leoyang.li@nxp.com, rmk+kernel@armlinux.org.uk,
- wei.fang@nxp.com, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, maxime.chevallier@bootlin.com
+ <175193541050.3455828.16447608303346079951.git-patchwork-notify@kernel.org>
+Date: Tue, 08 Jul 2025 00:43:30 +0000
+References: <20250704054824.1580222-1-kuniyu@google.com>
+In-Reply-To: <20250704054824.1580222-1-kuniyu@google.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, kuni1840@gmail.com,
+ netdev@vger.kernel.org, jbaron@akamai.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 4 Jul 2025 13:31:12 +0800 you wrote:
-> Restore WoL (Wake-on-LAN) enablement via MMD3 register 0x8012 BIT5 for
-> the QCA808X PHY. This change resolves the issue where WoL functionality
-> was not working due to its unintended removal in a previous commit.
+On Fri,  4 Jul 2025 05:48:18 +0000 you wrote:
+> Netlink has this pattern in some places
 > 
-> Refactor at8031_set_wol() into a shared library to enable reuse of the
-> Wake-on-LAN (WoL) functionality by the AT8031, QCA807X and QCA808X PHY
-> drivers.
+>   if (atomic_read(&sk->sk_rmem_alloc) > sk->sk_rcvbuf)
+>   	atomic_add(skb->truesize, &sk->sk_rmem_alloc);
+> 
+> , which has the same problem fixed by commit 5a465a0da13e ("udp:
+> Fix multiple wraparounds of sk->sk_rmem_alloc.").
 > 
 > [...]
 
 Here is the summary with links:
-  - [RESEND,net,1/3] net: phy: qcom: move the WoL function to shared library
-    https://git.kernel.org/netdev/net/c/e31cf3cce210
-  - [RESEND,net,2/3] net: phy: qcom: qca808x: Fix WoL issue by utilizing at8031_set_wol()
-    https://git.kernel.org/netdev/net/c/4ab9ada765b7
-  - [RESEND,net,3/3] net: phy: qcom: qca807x: Enable WoL support using shared library
-    (no matching commit)
+  - [v1,net] netlink: Fix wraparounds of sk->sk_rmem_alloc.
+    https://git.kernel.org/netdev/net/c/ae8f160e7eb2
 
 You are awesome, thank you!
 -- 
