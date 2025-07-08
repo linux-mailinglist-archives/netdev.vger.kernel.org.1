@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-204851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E04ACAFC429
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 09:35:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6E19AFC455
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 09:40:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC0667B12C1
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 07:33:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDC0217BA16
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 07:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0C7299AAA;
-	Tue,  8 Jul 2025 07:35:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B625F298CC7;
+	Tue,  8 Jul 2025 07:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sd0vIGLO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XaH7xx8W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA812248BE;
-	Tue,  8 Jul 2025 07:35:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E69298CDC;
+	Tue,  8 Jul 2025 07:40:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751960110; cv=none; b=Gs9oV7VxSQdW8K714ljoHPG328hIMNuPrtyA4FUCtihAg8zyd3knvGIws5T+5fJisHxc/53wnnV1DgF9kOT7Xn0KsSsfK3JjA+4q84dLlAODKUQTEUxhxMv5iXCdTqOQFBGJ/LDKQ+PpKeujPZ4EwFeqairQDfZm8sBdHLyEsic=
+	t=1751960426; cv=none; b=kly8cGVGyAZhCHn1AfbgcfaYKT4MFkEtggme77W9WOErvzAqM9lafzH4ggj3KS1F2qGegKtKzpDYLOfvFTzESEgbCmdLxcitLnVCrb5attrDTUitqi3BveKHo+pxCzJLt/WMjwFZ02kgLYd4ydK9hRHbEBIc+Fr+hONBTq1ndr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751960110; c=relaxed/simple;
-	bh=d/TYnIdUHqL1gDc+g8DMoegQnKp7oqD6k62XmTekfJ0=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=eFNnsrczj4pTRxN6fH7SmHKaMuHev2zdCvGxbkg5E7nZyH7Z8NviQWACnPk2Leqy/gzjENvhJfpgvWMZYmNDrkCvFVP4EGL5i/8IVKx8fYn6TuDuJs2RSFOdgz9WvHVYexiz8ty/N8iRqcewJ1VOZqLjFDjV8Ew16mCAXNfk71s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sd0vIGLO; arc=none smtp.client-ip=209.85.208.174
+	s=arc-20240116; t=1751960426; c=relaxed/simple;
+	bh=IpoH5UJKnM+pB9pdNFO2rnnCUQXu6j/qNm4FivVuSfk=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=RMGseDUeJcyMhOwo0gpr/e8oLnPp3wcEwijTT1WSq3IOfaY4rwA9HhouK7sW5aYolzd4T99E1KoX6GOuYeJpNAcIkgRw7nJ+kpV+7hLZszpghmFVWT3WDH0H6xSVvojlxvp6QbOtO+gpzT0nlw9qiU4LXqIw+zH0gDeNgqFEv5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XaH7xx8W; arc=none smtp.client-ip=209.85.208.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-32b8134ef6aso34787841fa.0;
-        Tue, 08 Jul 2025 00:35:08 -0700 (PDT)
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-32e14cf205cso32669411fa.1;
+        Tue, 08 Jul 2025 00:40:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751960106; x=1752564906; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1751960423; x=1752565223; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=d/TYnIdUHqL1gDc+g8DMoegQnKp7oqD6k62XmTekfJ0=;
-        b=Sd0vIGLOV/PeWm+KHxTydX21FqzCGUwHO9oVAjFwNJLBVgtw5QwwO3+cfKOFypWoXP
-         Ove1LMru2rQpY2UB1Gsf9c6R5ANV4Wz3Qkaykn4+ymZba0OOva9OTrBLryizzN0mbaFW
-         /RwSdEglTPLd7BCZFVv85+Gwsjqb447ZZI3LVxe7/E+MYoHrYlE3d4giOsS9Qxvwc9v7
-         Dk//36aM2s5AX76gMFSyBj5zU5EYwkruJDgT6ET/4J3T2CVy07SR30fBIF7KBu+1t0f/
-         5KPND4v/BkRrDfrEj3JrarIZ98TZA2bnGmjX7LXqTPe0t9SHCWeHEJvXBwEQHEyFUVE1
-         wNpQ==
+        bh=IpoH5UJKnM+pB9pdNFO2rnnCUQXu6j/qNm4FivVuSfk=;
+        b=XaH7xx8W3WYk4X3ATbOlQXI/BmBLvootclHWb4sRi8PA1cqNGvk4BXQvkl2OlvZ35f
+         ZDzD3XXqa/otdB25hlHajJgSZDIPvDTj2v9sKZOFR5vCHhiJcsKtkIB/QaRuI2/x0ZjO
+         CTj59UM+yj1XLuUTMKlFV8D2l0c79vLmI+qukwkn7q0nQFDqez5Lsa1DYL/b8BSjjFUh
+         xu8x8w2smTAPtpXepHs+Oi0WoM4WDgTpGDaYJC+ybUHy/+ihC4LzD/2w/2fgUY23Kbi7
+         wHGMGRq/l9/VPZJZfJ8cIaIK2WSHIDY5PkeUBUdgor4XOecavotrIRin5IYddRNhVuB2
+         rhZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751960106; x=1752564906;
+        d=1e100.net; s=20230601; t=1751960423; x=1752565223;
         h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=d/TYnIdUHqL1gDc+g8DMoegQnKp7oqD6k62XmTekfJ0=;
-        b=oS/2merI+s1DjBr59ZxPkmod/kN/lpFcQ6MEOXFtcWNzuzTmX4GVfnc7om+yoB9dke
-         xhs+AbsaT5H4Hj693ujLHbL7TsEN329ss4jmOqDwc5gSVo9rN7jl2Sbt+XCE7jU8+a3B
-         ZDqHYhLtXQ5l/nIOplWMp/lX8KlIoEEUq/xfb1XSSX7mZv9jSYfBQDZ7p3qqDP9V2Yw7
-         dMOD6NEahJVu37iFcjkgzAO5Xiuszy4T+ZcErJzKhzt/iGrXxUegMVsccCZeqRMz8XfB
-         ungRCom9IsZ9PcQa8Ms40pvnctDtVekjP/06UTuIb/nivWGmQ5STKg2n7W7Z0k7SiX0d
-         U/0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWDpW84ycuPu7P1qPz3TK39FzXk3jbG6FfauSHJjqeWmM/pYt6+P+GTY2nZeh4pCvIZoJoSEMr5@vger.kernel.org, AJvYcCWEEUIFF0SpqItxxbYYX19BmheheVXGjM+t3A3MhobSqAD+1MBdAlhDjMnFTXfLGhps39X0xobWrdb5I6Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCFw1JewBUbTTMyETpU/bAfW6FuPSc9k76Ad4Z4/Ed2oae3oUn
-	OhJKTc6KHDS7r8k6EZ93cGBmW07hb31X7uHGbcLeTBpbLKE8MmxDZ0rOUxmBqdGcbz1fqMzszMv
-	kMw2bFIiRz4mdPEbimavoyopIxEbKWiUN3RYk
-X-Gm-Gg: ASbGncuAFxr+pBZArAzA1suDCrdzSZOIr5aQI7ufS9t5mBFX+qsomLvNJsAZjbTAQX/
-	Z11KiW4jDJulQsrjQcoUJUeqAGf4R05B4cgIKg6RL1vKgjN8hXlpmfITiSQS0YS9G+QKUuiDZVA
-	CS3uZV+LH0Fss6rSEOClUr0oYMic6boFC61zxfbNWvtbe5pRbCJKI11QeGrM9VuwTIXg==
-X-Google-Smtp-Source: AGHT+IHS+VMFjSUs8X6ux2eYl9znkhvwsXo5ZIAh4FLzrK9ZCDjn/WiGLGNs9MnqxDl1RjYb0yFt8edcbkgxPegrPMU=
-X-Received: by 2002:a2e:a7c1:0:b0:32b:82bf:cc45 with SMTP id
- 38308e7fff4ca-32f39a96ba6mr3774051fa.15.1751960106277; Tue, 08 Jul 2025
- 00:35:06 -0700 (PDT)
+        bh=IpoH5UJKnM+pB9pdNFO2rnnCUQXu6j/qNm4FivVuSfk=;
+        b=s7pB8QRZGbshov295VgKzTzBkxr/fWqDzYy7e0T/nRr0k17a+pywAvr8ets+fu0Cl0
+         sTP+JhYwjDclvhgOcikyfM3voITJskfVKl/guNOaEmyLrl5E5OhY1IOxlmjafffUEWKH
+         cL3akkwKjQZiSugGtWuzRWdyE9vYdOehpKjDTRHtDRyg8j9+X9a610cIpjVXhmTLV6MS
+         JPHLw+9cEAVk4qBCfVtUHa0lCN48v/W1YfqvXcYMghrQbh9d13g/JhsYXKQoJ9FMDjj/
+         PFVgZ97Szly5AqwO3HVCGBaXhVNL5H0Ft5ZFehen2EbWK+nRMefSEg2gL+D+aT9i3QGx
+         wV9w==
+X-Forwarded-Encrypted: i=1; AJvYcCVepDzoHJzYNFJMI01Hqv0+a0zTBe62aWPmVWTkYXQDjjwjpQK3yta/jULWHa+PW+2mF8cz82eTVb5Zlgc=@vger.kernel.org, AJvYcCXwzHIH8axDAl3+NzZY/xBmssC5zrkraD1Igi19ewnqT/34o/omxhmMa1BGyTYOaI0eG7Exsnvj@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEX27PzODxJyPSCVrD+IFh2yzsY3VeHknseS/TxmKoK5ga4sCH
+	bTDzqgLUD8H0EcN/G2DEvaeTuB7w8z8T/OzJ6QiovekuA5qi4fyzS7AV0tz9MiRB1/TOLg9ce5S
+	BSqbjU0JDjTnLeF5VwrO4wO92agdaUXk=
+X-Gm-Gg: ASbGncsMM4RwgXR+EYwGYNP60SER2wphpyBWz3vLvTH5VNkbf1HbYy3WQ9kSQJHKyz/
+	J+1HU4vS1mwe6P8mqXQQAAdp97xBdxBcDkb68eFg0YB3I9VBuJlYqTtVSOfUk6HwkvUTAvAt+TJ
+	UZTR91YuDpX06vZs0qaYw5eN2XOIcMWUFj6vuugkpVj2SfF1IWeO0r8/Mlf5s3kIxCAQ==
+X-Google-Smtp-Source: AGHT+IFN1H28agSvPK20T3e3S5R8SKpFL5I+d0jGXr1zZXskHqT+qpvaEJrcZ2tykFzB/uIoAtiSq/SDDWdnFP+iUeg=
+X-Received: by 2002:a2e:a549:0:b0:32f:219d:75e5 with SMTP id
+ 38308e7fff4ca-32f219d7aedmr36283691fa.33.1751960422829; Tue, 08 Jul 2025
+ 00:40:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,12 +72,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: Luka <luka.2016.cs@gmail.com>
-Date: Tue, 8 Jul 2025 15:34:53 +0800
-X-Gm-Features: Ac12FXz9JpuwpqCTDKW5H93gDKXnNqqTelYiArdy19j81d19WlFGt8bSmy-K-Ew
-Message-ID: <CALm_T+1zdfZ8Z-c6WseOfhrZBsZHHR-5ZFGefkGcxgUmxZcBdQ@mail.gmail.com>
-Subject: [Bug] soft lockup in netif_receive_skb_list_internal in Linux Kernel v6.15
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Date: Tue, 8 Jul 2025 15:40:10 +0800
+X-Gm-Features: Ac12FXxi_pU10RtKw7JiEpXK5im0OhM9BC6DtNU4SZiTTcFHUP94roVdFSAZkTA
+Message-ID: <CALm_T+3m_BDfKz3kPm_PmwH9BnsSySGxHE-hdceGQzObL+M6BA@mail.gmail.com>
+Subject: [Bug] soft lockup in __sock_create in Linux kernel v6.15
+To: Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
@@ -90,26 +91,20 @@ testing of the Linux Kernel version v6.15.
 
 Git Commit: 0ff41df1cb268fc69e703a08a57ee14ae967d0ca (tag: v6.15)
 
-Bug Location: netif_receive_skb_list_internal+0x2d3/0xc90 net/core/dev.c:6105
+Bug Location: __sock_create+0x369/0x810 net/socket.c:1541
 
-Bug report: https://pastebin.com/SfxZ8pRX
+Bug report: https://pastebin.com/X0NX8ddd
 
-Complete log: https://pastebin.com/e0ZLhhr6
+Complete log: https://pastebin.com/Kbsk4Qrc
 
 Entire kernel config: https://pastebin.com/jQ30sdLk
 
 Root Cause Analysis:
 
-The soft lockup is triggered in netif_receive_skb_list_internal() due
-to a logic error during concurrent packet processing in the softirq
-context. Specifically, the function fails to exit or yield properly
-when processing a large batch of SKBs (socket buffers), potentially
-under contention for shared resources and lock acquisition. This
-results in prolonged CPU occupation in interrupt context, as shown by
-repeated attempts to acquire locks via lock_acquire() without forward
-progress. The issue likely arises from inefficient list traversal and
-insufficient interrupt mitigation, leading to starvation of other
-system tasks and triggering watchdog detection of a soft lockup.
+During socket creation, prolonged lock retention within
+__sock_create() leads to a soft lockup, suggesting a potential
+deadlock or excessive CPU consumption in socket allocation and
+RCU-related memory management.
 
 At present, I have not yet obtained a minimal reproducer for this
 issue. However, I am actively working on reproducing it, and I will
