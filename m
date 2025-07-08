@@ -1,112 +1,213 @@
-Return-Path: <netdev+bounces-204835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8EF3AFC389
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 09:02:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63CDDAFC39E
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 09:09:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B347C1897F30
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 07:03:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 930703BC5B4
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 07:09:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF88A215F5C;
-	Tue,  8 Jul 2025 07:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60692256C7E;
+	Tue,  8 Jul 2025 07:09:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xbDlRtcc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IlEcKSx4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B61317BB6
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 07:02:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60F721B905
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 07:09:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751958162; cv=none; b=sAT18GHUTKxiBxcTniRaNoVikHYPeErBbrLQ2j0UDg8dhuqN7e7fyMLgYuF8LTAXD/eDPKxv5N8aR3ryK/8n6gOAnpLXr3EINSpHgaFZkUYcIbmjLDlZWbBsSpsFK/JpPAeXhmVJqLB2U3Flf5yZtQlqz23VSCfPvQqSXZ1QF8M=
+	t=1751958570; cv=none; b=lCReFjRs+POvtXu6OwNR3lD1mcM0yl4FhHzQ8+lm5tb9E6KA2T/udstPLp16qPNbqrieD24bXufT1BCX1Un9hJtVSYgTVd5n4VL2TOOtL94btmKkMMPMGBLQFhos/sK09hh6MtiQnNOQhm8C/UY/g7N8CdQkwkNEuI+HJc60bzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751958162; c=relaxed/simple;
-	bh=/bsmLrCEV92C3mRTMXEx6nF8N09VZ1LmSwDi+/feHPM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a7ogkOs+ltXTIN5Z9vusyQT6TflGnkxrK0S8MfQmrLFgrwjwJS48Vf/NNOCxPXjcFwIPfeqVbbnFUm2oc6JKhqwabYx/gpgbxqjzq1LlEKKYtrEv3sdY7x5u1Geogy5bWiJpFW9Meg5Jg4QhD/x7QY5fZAbAhth4gIHyeCvdM+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xbDlRtcc; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4a7f61ea32aso85171841cf.3
-        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 00:02:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1751958160; x=1752562960; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YjnYYgUN8sUeVXxQxm63poGOkmD4F1W7GEVvyuzu9n4=;
-        b=xbDlRtcc4dYwDmaDextarjCqaduZ5q6gGJxM+BWj0s46+JR06pp+vv1iVFAY5dv+9R
-         JFFIEk3NYIMaKo20dyAZyAZ/M/+ZUlF41PmRPgXkHfJNDqxFmlLaauo2zrCN/MTAYZQE
-         79/2jLHK6jzR5V/Knxas7dshdQFnF1lF0h0aNxkwSPMC3G7x/WvsndASewu+j4xmHNWI
-         V2hqKJ10yf7qIJ7YLV1I1LoIgeF70wJfZM5zscSkwqXZUJwB7C+pE2d94tRCe3qsaiY0
-         gZ3q7W9HYcPPb6HPOmb0qL3k+d4pIE5gA35RlKwfuzGcRXU466VeK/LlLZhQ5erUaQN0
-         QY4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751958160; x=1752562960;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YjnYYgUN8sUeVXxQxm63poGOkmD4F1W7GEVvyuzu9n4=;
-        b=Defi+iRbbVg962ZnymIac1N2rKVbAKyFqTbxE6VrPXP2GSQzGfVI3mKknwhGF6k3rq
-         2AV8Fjv0Hcb8Wl9yA0WBsidrtmsapQVxzlyVRlLhz6QE+A7obrCxEjvS8zxcbHBAmY0t
-         X8wqOsW5mN3oX9BJ0XauU3wPpB/JSDBmDfbvmdPdWrtqtSWHqIeGxBvqUp6Iyez0UPtS
-         FdYVs+FJqaeGTRTtmo5br8a+JIsQ69rJ7Nc2xCdscCpkhTBohXyPnR7TlYaPaLqyp/zX
-         J0eXyJ9W7BVGJoGVFekikUX9Ib1MlFjOoOXRICox5PPQFJr4hPQnbpxHW3hIL0Wg1RJi
-         S0Gg==
-X-Forwarded-Encrypted: i=1; AJvYcCVLlP2UpyRFy1BrcwZTRv6jLF9ejGvUaVuS+4OWNtWmUslsXglfoLhVRsIYr2/3Q7vTElS0vaQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTeWGb0VYBGeIQN3cuumuz79kKfiIXOtGQx7PRfmDkCBovok5f
-	tci34XqVXv0FkIPhtba56DjLgc541Czxlj+2yfggYT1Co90qMFLCujrcQ0z0zdonC5O89w7tFJ4
-	hKo3k2XE7Zvx2i+Yb34+8J1TR7BU0bbSq4OKPIDGe
-X-Gm-Gg: ASbGncvyz3VD0SKFGM7TWChVdWdpu+rsFbNnglfkt4RG03aEC4tgW20SVFH4RqnTh9A
-	3Tdh5E8xTJ1kuWDxEdFKvKmuetihXrAoVKIkcc3u2Krzn6QRHTyMNmjJfXpM1Z9+JmLjngAjN0Z
-	F2p92xE1fnIW1oTBBy3ETCOCnWrDFsXfTrYolfuBb2Iqo=
-X-Google-Smtp-Source: AGHT+IH7uSDpiVpe1Fj99Rocw9bDMmEBNalQ6ed3epcu+l1HGsYsnbZuU8Yau4Do9HuPxlXIrF2VJmjWmHmWv12CS8k=
-X-Received: by 2002:a05:622a:4e08:b0:4a4:3b41:916c with SMTP id
- d75a77b69052e-4a9cc6ad7femr37886061cf.17.1751958159958; Tue, 08 Jul 2025
- 00:02:39 -0700 (PDT)
+	s=arc-20240116; t=1751958570; c=relaxed/simple;
+	bh=c6JcEJHx34S+DDQ1X9ByoI5T3eS4CDivrbnmLjsLrLc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XRzpZ2yN4X7obkZ0rRTcohcCsCuHVWWjfVBY/EYhOvjRkw7iwkg0txp+8051gz8A6q6bgZVBPabirwf8zZ64AAY+vUqnL3UIz9e9H9CBhAa7WwLbJOA9P4MexeGtNARtHheAUgm+XrP0c5qkPMbh7xcK8e4CPjBrHc4WB6D3KyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IlEcKSx4; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751958566;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ENf0mzNjLnBBq2nYIWPCbEz6bh/GGs1s8F10BFrtKIY=;
+	b=IlEcKSx4jEBqDC2Q685K98bV575b/4JpeZGPqYaIBclEcN2RhVY3OuTioGdJVm/shdVlb6
+	jkvBd0jWojMVWPUmEEcTQzfSaLZeFUfaR7YRQMfwAfIY/4859jAYheZQacbJorZG4022jH
+	fBmt+QnhYXmwZeazJZ0rdu6BePUXg9A=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-135-G4-v3lrtP8SgKYf-3nX4WA-1; Tue,
+ 08 Jul 2025 03:09:23 -0400
+X-MC-Unique: G4-v3lrtP8SgKYf-3nX4WA-1
+X-Mimecast-MFC-AGG-ID: G4-v3lrtP8SgKYf-3nX4WA_1751958561
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 625DF1800366;
+	Tue,  8 Jul 2025 07:09:21 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.32.252])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AD9E0195608F;
+	Tue,  8 Jul 2025 07:09:15 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Yuri Benditovich <yuri.benditovich@daynix.com>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: [PATCH v7 net-next 0/9] virtio: introduce GSO over UDP tunnel
+Date: Tue,  8 Jul 2025 09:08:56 +0200
+Message-ID: <cover.1751874094.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250708054053.39551-1-yangfeng59949@163.com>
-In-Reply-To: <20250708054053.39551-1-yangfeng59949@163.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 8 Jul 2025 00:02:28 -0700
-X-Gm-Features: Ac12FXylk9_9JpdbK9qj06tieE_DRApYRaUt6LPCQH8g2ZXXGXwajRcN7lRdHhc
-Message-ID: <CANn89iKo9PXZiCtPJYoauVesx9JggSSbQ_+PMt9UgST1vF1Z+w@mail.gmail.com>
-Subject: Re: [PATCH v4] skbuff: Add MSG_MORE flag to optimize tcp large packet transmission
-To: Feng Yang <yangfeng59949@163.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	willemb@google.com, almasrymina@google.com, kerneljasonxing@gmail.com, 
-	ebiggers@google.com, asml.silence@gmail.com, aleksander.lobakin@intel.com, 
-	stfomichev@gmail.com, david.laight.linux@gmail.com, yangfeng@kylinos.cn, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Mon, Jul 7, 2025 at 10:41=E2=80=AFPM Feng Yang <yangfeng59949@163.com> w=
-rote:
->
-> From: Feng Yang <yangfeng@kylinos.cn>
->
-> When using sockmap for forwarding, the average latency for different pack=
-et sizes
-> after sending 10,000 packets is as follows:
-> size    old(us)         new(us)
-> 512     56              55
-> 1472    58              58
-> 1600    106             81
-> 3000    145             105
-> 5000    182             125
->
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Feng Yang <yangfeng@kylinos.cn>
+Some virtualized deployments use UDP tunnel pervasively and are impacted
+negatively by the lack of GSO support for such kind of traffic in the
+virtual NIC driver.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+The virtio_net specification recently introduced support for GSO over
+UDP tunnel, this series updates the virtio implementation to support
+such a feature.
+
+Currently the kernel virtio support limits the feature space to 64,
+while the virtio specification allows for a larger number of features.
+Specifically the GSO-over-UDP-tunnel-related virtio features use bits
+65-69.
+
+The first four patches in this series rework the virtio and vhost
+feature support to cope with up to 128 bits. The limit is set by
+a define and could be easily raised in future, as needed.
+
+This implementation choice is aimed at keeping the code churn as
+limited as possible. For the same reason, only the virtio_net driver is
+reworked to leverage the extended feature space; all other
+virtio/vhost drivers are unaffected, but could be upgraded to support
+the extended features space in a later time.
+
+The last four patches bring in the actual GSO over UDP tunnel support.
+As per specification, some additional fields are introduced into the
+virtio net header to support the new offload. The presence of such
+fields depends on the negotiated features.
+
+New helpers are introduced to convert the UDP-tunneled skb metadata to
+an extended virtio net header and vice versa. Such helpers are used by
+the tun and virtio_net driver to cope with the newly supported offloads.
+
+Tested with basic stream transfer with all the possible permutations of
+host kernel/qemu/guest kernel with/without GSO over UDP tunnel support.
+
+---
+WRT the merge plan, this is also are available in the Git repository at
+[1]:
+
+git@github.com:pabeni/linux-devel.git virtio_udp_tunnel_07_07_2025
+
+The first 5 patches in this series, that is, the virtio features
+extension bits are also available at [2]:
+
+git@github.com:pabeni/linux-devel.git virtio_features_extension_07_07_2025
+
+Ideally the virtio features extension bit should go via the virtio tree
+and the virtio_net/tun patches via the net-next tree. The latter have
+a dependency in the first and will cause conflicts if merged via the
+virtio tree, both when applied and at merge window time - inside Linus
+tree.
+
+To avoid such conflicts and duplicate commits I think the net-next
+could pull from [1], while the virtio tree could pull from [2].
+---
+v6 -> v7:
+  - avoid warning in csky build
+  - rebased
+v6: https://lore.kernel.org/netdev/cover.1750753211.git.pabeni@redhat.com/
+
+v5 -> v6:
+  - fix integer overflow in patch 4/9
+v5: https://lore.kernel.org/netdev/cover.1750436464.git.pabeni@redhat.com/
+
+v4 -> v5:
+  - added new patch 1/9 to avoid kdoc issues
+  - encapsulate guest features guessing in new tap helper
+  - cleaned-up SET_FEATURES_ARRAY
+  - a few checkpatch fixes
+v4: https://lore.kernel.org/netdev/cover.1750176076.git.pabeni@redhat.com/
+
+v3 -> v4:
+  - vnet sockopt cleanup
+  - fixed offset for UDP-tunnel related field
+  - use dev->features instead of flags
+v3: https://lore.kernel.org/netdev/cover.1749210083.git.pabeni@redhat.com/
+
+v2 -> v3:
+  - uint128_t -> u64[2]
+  - dropped related ifdef
+  - define and use vnet_hdr with tunnel layouts
+v2: https://lore.kernel.org/netdev/cover.1748614223.git.pabeni@redhat.com/
+
+v1 -> v2:
+  - fix build failures
+  - many comment clarification
+  - changed the vhost_net ioctl API
+  - fixed some hdr <> skb helper bugs
+v1: https://lore.kernel.org/netdev/cover.1747822866.git.pabeni@redhat.com/
+
+Paolo Abeni (9):
+  scripts/kernel_doc.py: properly handle VIRTIO_DECLARE_FEATURES
+  virtio: introduce extended features
+  virtio_pci_modern: allow configuring extended features
+  vhost-net: allow configuring extended features
+  virtio_net: add supports for extended offloads
+  net: implement virtio helpers to handle UDP GSO tunneling.
+  virtio_net: enable gso over UDP tunnel support.
+  tun: enable gso over UDP tunnel support.
+  vhost/net: enable gso over UDP tunnel support.
+
+ drivers/net/tun.c                      |  58 ++++++--
+ drivers/net/tun_vnet.h                 | 101 +++++++++++--
+ drivers/net/virtio_net.c               | 110 +++++++++++---
+ drivers/vhost/net.c                    |  95 +++++++++---
+ drivers/vhost/vhost.c                  |   2 +-
+ drivers/vhost/vhost.h                  |   4 +-
+ drivers/virtio/virtio.c                |  43 +++---
+ drivers/virtio/virtio_debug.c          |  27 ++--
+ drivers/virtio/virtio_pci_modern.c     |  10 +-
+ drivers/virtio/virtio_pci_modern_dev.c |  69 +++++----
+ include/linux/virtio.h                 |   9 +-
+ include/linux/virtio_config.h          |  43 +++---
+ include/linux/virtio_features.h        |  88 +++++++++++
+ include/linux/virtio_net.h             | 197 ++++++++++++++++++++++++-
+ include/linux/virtio_pci_modern.h      |  43 +++++-
+ include/uapi/linux/if_tun.h            |   9 ++
+ include/uapi/linux/vhost.h             |   7 +
+ include/uapi/linux/vhost_types.h       |   5 +
+ include/uapi/linux/virtio_net.h        |  33 +++++
+ scripts/lib/kdoc/kdoc_parser.py        |   1 +
+ 20 files changed, 790 insertions(+), 164 deletions(-)
+ create mode 100644 include/linux/virtio_features.h
+
+-- 
+2.49.0
+
 
