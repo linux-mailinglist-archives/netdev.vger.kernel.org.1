@@ -1,232 +1,171 @@
-Return-Path: <netdev+bounces-204754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 533C8AFBF8F
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 02:57:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 161A3AFBFA6
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 03:06:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F26877B1C4E
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 00:56:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67A0E7A7C72
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 01:05:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E31A1CEAC2;
-	Tue,  8 Jul 2025 00:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603681552FD;
+	Tue,  8 Jul 2025 01:06:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HHFnL/dB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TE0sXEr7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D94C18633F;
-	Tue,  8 Jul 2025 00:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F20800
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 01:06:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751936257; cv=none; b=SVNYN24vIoDOurkCygaMgoHOs+zrCUYH5IJ4fc4MhAqsUpemyWxkKsLrmmRGjPkxIWue/x3EE4yHTlTTPeJGSe96qfHdJ0aMwTiSm8hgSU548qGL2yTdAIhG+pISKHoWOQS/Vo4ff8t0/zTuWgFegjfIDi1rG+niXY1P+puY18M=
+	t=1751936780; cv=none; b=e5s5lwvM4GEjeBqppLRDxCOptaWpbukYWKs/pi2cBBAfu9MbAuzeyRqt7Ncep6KJ5keMIh7h0oSXX1GA7MXJmMFIKzbZQH8EB1BilE7uW3bfxal6ZChYdeYtD+7bnGF3wCfCDMAyQ36bjneRJIDq+hEGm/wcV6r7x3TkJ0f/mDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751936257; c=relaxed/simple;
-	bh=pEWuuzO75FdHQuUBjLHBDVKQP3TK9GJfR6oXQ/qgI+A=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=EmSxFZZ4zdWeY2XIEN6lsYHgBtl8uUgEQjvxZ+kfoKhnpNFeYBxJm2jw0A2j9csUqXIeRhLmi1hbWMVE2kqeM39ul39/U7+aaICDvZdvdUt6niDuEmZ0N9qwE7r22QmXSLrfIrKyI2dfbuIKBkOmPbhprfk0n1wBuyFjutjFYX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HHFnL/dB; arc=none smtp.client-ip=209.85.210.172
+	s=arc-20240116; t=1751936780; c=relaxed/simple;
+	bh=/fT/NmXMuVa3zCMvooo8p3zOpfWbMfhF8Yi8tZSEURs=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=I6Py+FzRCDq4uxkVffoGIaAmGNwiFU+XvxNtG3TAnxJYQ+7s2WXcJVuWxLT4o9rPvsdoGO8bZ6UvSe+ebvRAcqYl9BhO2pcUxBIPU4K9YgZJaV+kSZE5oFhROSPjrH87CCJitrmXbvWN+LknrTwGJNs6h45QqvpagTRGsjOYBnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TE0sXEr7; arc=none smtp.client-ip=209.85.219.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-74ad4533ac5so3841059b3a.0;
-        Mon, 07 Jul 2025 17:57:35 -0700 (PDT)
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e82278e3889so2790758276.2
+        for <netdev@vger.kernel.org>; Mon, 07 Jul 2025 18:06:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751936255; x=1752541055; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=wNUCviKwg+4KT+O9PcdqMmr4jCZBknZpXaowI9v0jKI=;
-        b=HHFnL/dBn8NkQuos5sjCMWqs/lbrbUfjIB8uF8+vpKp/48xpMG0K9t3xVSeUL70mmD
-         LNn/87O66Krr17yknBP+0Bm4ZFb9Z53HeRaH5jtSOk5Z64ECcEdaGfDp1f0N9VQRQsTd
-         bGI2MoQDluaHpLeqfJMxTRVhZSVEs5BJqYYvCoqA7jjWrXzJV8vxVEAhVgAP9qkOB8z5
-         YTZH7uOrKcSsl6n+wS1IcxiquzJtmeDHWTu2Zww+YlNFOUlKm3o2yzqFgejn7xHtgnvH
-         OO4fKIjgonyLzMWSZTLSUMkKMox7eUFF/19LbnlKmRqxTj+a6n+VfQCCRZQPkWocM1KV
-         tyBw==
+        d=gmail.com; s=20230601; t=1751936777; x=1752541577; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VsLlTnDeaQzxI/x9yKHoCPOzvBNsBs2AFj5oKDUt38k=;
+        b=TE0sXEr7m6O6jFO6r6FaC16OmEYHW2atFLPSj71iWV8IeQkfG5gehrbxoiOsGOlVi3
+         +t80tNBbOML3+st2VVIMQBwU3OKNVTeTVY0PwGJvKHYxRh0kK07w4I+JUeTyO+UVayND
+         ACilRjJcs7Xe43JAfE6XuC//mtk5ruEkGMOw5Gq2ePOUHSoccE2kd6V9o/Br22Udlrne
+         kI02SDed4MHA6M+zxfz+mOvOGMK9APW+MHJHzMwR5PcEs4nxdYPqhmZZpXj017Olh9up
+         2VcpQqmnUBFhP/AWQ/3SfHwOAOHf/iZJHQ0F84QFCsvXcVXzNZG2eWI2S8FteJMRBXqL
+         7t7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751936255; x=1752541055;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wNUCviKwg+4KT+O9PcdqMmr4jCZBknZpXaowI9v0jKI=;
-        b=EUneObfZUNacIVF1XDYBInzfm0USxo0X8NLfpZPrMMAJXcLFlCFfAv93iI+6Sv9kcb
-         KM4VxLQ3/sDgxLKznHqJR4RNXInIXrmjGpyl74TT4kO+nnHQmgL58YqXkVfDBS9EoTRY
-         87YLzosimPhpwrJK3qjODmJxyqoNPW2DMyORJg2BmQLUCpAqFCsCJ9UGm78MDT9G2J7N
-         XMYxNPcfYNqRXKYV9zAPlv0hRwjA+jj/aOLENbtUGezqw3kcIkLrcUciP9qdb+6z27lo
-         CouhhkfL2xdPBjujr7Wat6YFwDV8eMilxfvPt0Dj7ezQzRDDMeTmLatNwgwlhplAEGEt
-         Vl0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU8d6K9DJe1obY7IVQqR5EESsRkqwK4n5rTTuU9gZvVbKpXG/oH0TWvCXXsJBL0zTXWe17pgd00@vger.kernel.org, AJvYcCW6PNVQvmFxdaCZJLT8bgUghAZoA0t75fLuBcrvT8s0xlBSZPrPCVXr092G/p8TAY9Kbehdfnr5e0X04jAa@vger.kernel.org, AJvYcCWqS0+JOQNftyldBmjNXtqhwTg0zO2P+s2DrdCcxY7c8cJMk9JuGdc2l3VcgFwArev3Pco=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnAXaHXHuJhLJSiT2PCXMrAMc1OC1JwPHKRL08f0EcsMwFj0Qk
-	JP3vruG2esia6zHICAnjad43mCagiAW0/2ZHnIWex4fdWk2YM2K6GImk
-X-Gm-Gg: ASbGncsA/nwrThXU1aTDm+YChCRWEczUVcr+xnszeNaE0NbqivuLo1GepatArZOALli
-	P+InF9ZgW/e5hZCmnfsLT8bgMj0OdEEjMNgfoMMswP4EQdseIwycVB3874FEcIkR5cCugd1Jg1L
-	7lfPJQ42bCx4MqJldwQeJbzL45vga2N/T2x/uBeGb25qn6t7KPEhGL4eYlLsxf/SFyIGCeowHmh
-	a7CCuwUc0Kq0im/hFsdaxqh8dTAUSmcyk9KEL58SwNTlglrETIFKqq2y6EL4W44H3ajcX9Yqyr3
-	MBbmw+4LvbLzvsCcdMNZtdujQ3jC0TKgiutC0Tulx3e0TUTMtF6gOgIrRjHh9tdWXQk=
-X-Google-Smtp-Source: AGHT+IHXo366oRwc1N3ei11TOtbJeTTLtiBEy4xfBpN/11epTl7eJGrY2mvCVQ9NRC2R0trSH8Z85A==
-X-Received: by 2002:a05:6a20:c79a:b0:218:17a2:4421 with SMTP id adf61e73a8af0-22b60db4dc6mr1098705637.10.1751936255061;
-        Mon, 07 Jul 2025 17:57:35 -0700 (PDT)
-Received: from ?IPv6:2620:10d:c096:14a::647? ([2620:10d:c090:600::1:6ad])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b38ee62c615sm9889836a12.60.2025.07.07.17.57.32
+        d=1e100.net; s=20230601; t=1751936777; x=1752541577;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=VsLlTnDeaQzxI/x9yKHoCPOzvBNsBs2AFj5oKDUt38k=;
+        b=KXib2B6aV/1Nr9DVOq/NWx8jVgMlzv8XiR6d/q3oI3ufTfamB9wGvwzVByK02TjsiM
+         XcMS/WpI+mCMEJ1VRPif8GQ4Iwbs1Bbm6aPGDa2jDQpZtmC8uqjuYvYOhbzCYPA4ZIn1
+         Xcysn4viMm9542TTVX3TrBbHxls/o9T6ZtK6hkbiXlKK1yRiSy9C2aWTzNAhK7f0FISL
+         gF/vDCQwGv5WKhEwreb3pEftZ1Q8o0iQ/CTXMn1NKE7bRDwWXL+0S36nitBATYMAvaPb
+         pzPJAoeFLGQhPe652W+/YuNdSZLhwN1BDYfv7/K/qRvpwJUV7nrpc2aGGmi2bGwRV1OA
+         OD7A==
+X-Forwarded-Encrypted: i=1; AJvYcCW77YIbpk4aHMTGCWzQ8KJytCUp3M0YM8zS/Wn1yB+yMVLLLGnwtHt2HsIi6FqrF+YtTetPw7c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7++KAvZMc7R7BX6BcA0+95H/sHiZYYQwEiEFq8GoHxKtnPoIi
+	oRLa7D1z96sdgG4rpMHvo6oAXUbmd1Db+scTwu4DrzjNkK2/glDGXum5
+X-Gm-Gg: ASbGncsK6DQV7sbjTT4RTJfkTjcOxs/cd2NawXPaqHFI56JOcLBFo+QfV2SDsK2C/cN
+	VrtkP+DvEwewhuIxvMRn6vi3vOaI6uJUgIbJGq2w4huDiTMjpPxV6v7N1lmRCiqeaRZfUPTJBHd
+	qV7BB8qrBYiW+ScE571Iyn9W5V4r4WMIUkouI3fZRlxgCmWEWUHjrpUIcVQwkQlB9mbM1RXsOns
+	sNaS3H1o9qaBXn8ukLyAHsDuVx1ILVWJRLxCgP2LSqXE4FsSSdgNzEHlv7UMYtR4EVWgTPdIzte
+	RSinJ7iD+HOXcNkIyyxAIxbQTu9zfp19fKlRLvmaToZJ12OzZcnBvNqY5HGRxDrTtiqdHM27SqH
+	HavhgaCEfovLOMcJUwRKot6AZral6EclIK6sDDz0=
+X-Google-Smtp-Source: AGHT+IE4qAfvwzCqIZ7cWhk0QyUr+XAUyEf94c5MEmSy9nwAFyAP5PJPzChOsNrGxp7/IWjcLCwKlA==
+X-Received: by 2002:a05:690c:740a:b0:710:f470:154f with SMTP id 00721157ae682-717a0464c48mr12169247b3.34.1751936776682;
+        Mon, 07 Jul 2025 18:06:16 -0700 (PDT)
+Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-71665b121cesm18671057b3.90.2025.07.07.18.06.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jul 2025 17:57:34 -0700 (PDT)
-Message-ID: <4ae6fd0d54ff2650d0f6724fb44b33723e26ea49.camel@gmail.com>
-Subject: Re: [syzbot] [bpf?] WARNING in reg_bounds_sanity_check
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Paul Chaignon <paul.chaignon@gmail.com>, syzbot	
- <syzbot+c711ce17dd78e5d4fdcf@syzkaller.appspotmail.com>, Andrii Nakryiko	
- <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, bpf	
- <bpf@vger.kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Hao Luo	
- <haoluo@google.com>, John Fastabend <john.fastabend@gmail.com>, Jiri Olsa	
- <jolsa@kernel.org>, KP Singh <kpsingh@kernel.org>, LKML	
- <linux-kernel@vger.kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
- Network Development <netdev@vger.kernel.org>, Stanislav Fomichev
- <sdf@fomichev.me>, Song Liu <song@kernel.org>,  syzkaller-bugs
- <syzkaller-bugs@googlegroups.com>, Yonghong Song <yonghong.song@linux.dev>
-Date: Mon, 07 Jul 2025 17:57:32 -0700
-In-Reply-To: <CAADnVQKKdpj-0wXKoKJC4uGhMivdr9FMYvMxZ6jLdPMdva0Vvw@mail.gmail.com>
-References: <68649190.a70a0220.3b7e22.20e8.GAE@google.com>
-	 <aGa3iOI1IgGuPDYV@Tunnel>
-	 <865f2345eaa61afbd26d9de0917e3b1d887c647d.camel@gmail.com>
-	 <aGgL_g3wA2w3yRrG@mail.gmail.com>
-	 <df2cdc5f4fa16a4e3e08e6a997af3722f3673d38.camel@gmail.com>
-	 <e43c25b451395edff0886201ad3358acd9670eda.camel@gmail.com>
-	 <aGxKcF2Ceany8q7W@mail.gmail.com>
-	 <2fb0a354ec117d36a24fe37a3184c1d40849ef1a.camel@gmail.com>
-	 <c35d5392b961a4d5b54bdb4b92c4e104bd7857cc.camel@gmail.com>
-	 <CAADnVQKKdpj-0wXKoKJC4uGhMivdr9FMYvMxZ6jLdPMdva0Vvw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2 (3.56.2-1.fc42) 
+        Mon, 07 Jul 2025 18:06:15 -0700 (PDT)
+Date: Mon, 07 Jul 2025 21:06:15 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Daniel Zahka <daniel.zahka@gmail.com>, 
+ Donald Hunter <donald.hunter@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Saeed Mahameed <saeedm@nvidia.com>, 
+ Leon Romanovsky <leon@kernel.org>, 
+ Tariq Toukan <tariqt@nvidia.com>, 
+ Boris Pismenny <borisp@nvidia.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ David Ahern <dsahern@kernel.org>, 
+ Neal Cardwell <ncardwell@google.com>, 
+ Patrisious Haddad <phaddad@nvidia.com>, 
+ Raed Salem <raeds@nvidia.com>, 
+ Jianbo Liu <jianbol@nvidia.com>, 
+ Dragos Tatulea <dtatulea@nvidia.com>, 
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
+ Stanislav Fomichev <sdf@fomichev.me>, 
+ =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ Jacob Keller <jacob.e.keller@intel.com>, 
+ netdev@vger.kernel.org
+Message-ID: <686c6f073133f_266852946c@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250707141919.3a69d35f@kernel.org>
+References: <20250702171326.3265825-1-daniel.zahka@gmail.com>
+ <20250702171326.3265825-11-daniel.zahka@gmail.com>
+ <686aaac58f744_3ad0f32943d@willemb.c.googlers.com.notmuch>
+ <20250707141919.3a69d35f@kernel.org>
+Subject: Re: [PATCH v3 10/19] psp: track generations of device key
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2025-07-07 at 17:51 -0700, Alexei Starovoitov wrote:
-> On Mon, Jul 7, 2025 at 5:37=E2=80=AFPM Eduard Zingerman <eddyz87@gmail.co=
-m> wrote:
-> >
-> > On Mon, 2025-07-07 at 16:29 -0700, Eduard Zingerman wrote:
-> > > On Tue, 2025-07-08 at 00:30 +0200, Paul Chaignon wrote:
-> > >
-> > > [...]
-> > >
-> > > > This is really nice! I think we can extend it to detect some
-> > > > always-true branches as well, and thus handle the initial case repo=
-rted
-> > > > by syzbot.
-> > > >
-> > > > - if a_min =3D=3D 0: we don't deduce anything
-> > > > - bits that may be set in 'a' are: possible_a =3D or_range(a_min, a=
-_max)
-> > > > - bits that are always set in 'b' are: always_b =3D b_value & ~b_ma=
-sk
-> > > > - if possible_a & always_b =3D=3D possible_a: only true branch is p=
-ossible
-> > > > - otherwise, we can't deduce anything
-> > > >
-> > > > For BPF_X case, we probably want to also check the reverse with
-> > > > possible_b & always_a.
-> > >
-> > > So, this would extend existing predictions:
-> > > - [old] always_a & always_b -> infer always true
-> > > - [old] !(possible_a & possible_b) -> infer always false
-> > > - [new] if possible_a & always_b =3D=3D possible_a -> infer true
-> > >         (but make sure 0 is not in possible_a)
-> > >
-> > > And it so happens, that it covers example at hand.
-> > > Note that or_range(1, (u64)-1) =3D=3D (u64)-1, so maybe tnum would be
-> > > sufficient, w/o the need for or_range().
-> > >
-> > > The part of the verifier that narrows the range after prediction:
-> > >
-> > >   regs_refine_cond_op:
-> > >
-> > >          case BPF_JSET | BPF_X: /* reverse of BPF_JSET, see rev_opcod=
-e() */
-> > >                  if (!is_reg_const(reg: reg2, subreg32: is_jmp32))
-> > >                          swap(reg1, reg2);
-> > >                  if (!is_reg_const(reg: reg2, subreg32: is_jmp32))
-> > >                          break;
-> > >                  val =3D reg_const_value(reg: reg2, subreg32: is_jmp3=
-2);
-> > >                ...
-> > >                          reg1->var_off =3D tnum_and(a: reg1->var_off,=
- b: tnum_const(value: ~val));
-> > >                ...
-> > >                  break;
-> > >
-> > > And after suggested change this part would be executed only if tnum
-> > > bounds can be changed by jset. So, this eliminates at-least a
-> > > sub-class of a problem.
-> >
-> > But I think the program below would still be problematic:
-> >
-> > SEC("socket")
-> > __success
-> > __retval(0)
-> > __naked void jset_bug1(void)
-> > {
-> >         asm volatile ("                                 \
-> >         call %[bpf_get_prandom_u32];                    \
-> >         if r0 < 2 goto 1f;                              \
-> >         r0 |=3D 1;                                        \
-> >         if r0 & -2 goto 1f;                             \
-> > 1:      r0 =3D 0;                                         \
-> >         exit;                                           \
-> > "       :
-> >         : __imm(bpf_get_prandom_u32)
-> >         : __clobber_all);
-> > }
-> >
-> > The possible_r0 would be changed by `if r0 & -2`, so new rule will not =
-hit.
-> > And the problem remains unsolved. I think we need to reset min/max
-> > bounds in regs_refine_cond_op for JSET:
-> > - in some cases range is more precise than tnum
-> > - in these cases range cannot be compressed to a tnum
-> > - predictions in jset are done for a tnum
-> > - to avoid issues when narrowing tnum after prediction, forget the
-> >   range.
->
-> You're digging too deep. llvm doesn't generate JSET insn,
-> so this is syzbot only issue. Let's address it with minimal changes.
-> Do not introduce fancy branch taken analysis.
-> I would be fine with reverting this particular verifier_bug() hunk.
+Jakub Kicinski wrote:
+> On Sun, 06 Jul 2025 12:56:37 -0400 Willem de Bruijn wrote:
+> > > There is a (somewhat theoretical in absence of multi-host support)
+> > > possibility that another entity will rotate the key and we won't
+> > > know. This may lead to accepting packets with matching SPI but
+> > > which used different crypto keys than we expected.   =
 
-My point is that the fix should look as below (but extract it as a
-utility function):
+> > =
 
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index 53007182b46b..b2fe665901b7 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -16207,6 +16207,14 @@ static void regs_refine_cond_op(struct bpf_reg_sta=
-te *reg1, struct bpf_reg_state
-                        swap(reg1, reg2);
-                if (!is_reg_const(reg2, is_jmp32))
-                        break;
-+               reg1->u32_max_value =3D U32_MAX;
-+               reg1->u32_min_value =3D 0;
-+               reg1->s32_max_value =3D S32_MAX;
-+               reg1->s32_min_value =3D S32_MIN;
-+               reg1->umax_value =3D U64_MAX;
-+               reg1->umin_value =3D 0;
-+               reg1->smax_value =3D S64_MAX;
-+               reg1->smin_value =3D S32_MIN;
-                val =3D reg_const_value(reg2, is_jmp32);
-                if (is_jmp32) {
-                        t =3D tnum_and(tnum_subreg(reg1->var_off), tnum_con=
-st(~val));
+> > The device would not have decrypted those? As it only has two keys,
+> > one for each MSB of the SPI.
+> > =
 
-----
+> > Except for a narrow window during rotation, where a key for generatio=
+n
+> > N is decrypted and queued to the host, then a rotation happens, so th=
+at
+> > the host updates its valid keys to { N+1, N+2 }. These will now get
+> > dropped. That is not strictly necessary.
+> =
 
-Because of irreconcilable differences in what can be represented as a
-tnum and what can be represented as a range.
+> Yes, it's optional to avoid any races.
+
+Ok. I think on respin the commit can be revised a bit to make
+clearer that it is an optional good, no packets will
+accidentally be accepted with matching SPI but wrong key.
+
+> > > Maintain and compare "key generation" per PSP spec.  =
+
+> > =
+
+> > Where does the spec state this?
+> > =
+
+> > I know this generation bit is present in the Google PSP
+> > implementation, I'm just right now drawing a blank as to its exact
+> > purpose -- and whether the above explanation matches that.
+> =
+
+> I think this:
+> =
+
+>   Cryptography and key management status:
+>    =E2=97=8F Key generation (a counter incremented each time a master k=
+ey
+>      rotation occurs), when master keys are managed on the NIC.
+
+Ack. I saw that too. Unfortunately it has explanation why it's there.
 
