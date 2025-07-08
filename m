@@ -1,252 +1,158 @@
-Return-Path: <netdev+bounces-205090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35D74AFD2F7
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 18:51:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3A45AFD478
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 19:05:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D364E7B1D5E
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 16:50:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72B7F5476E7
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 17:00:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649722E4985;
-	Tue,  8 Jul 2025 16:51:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06CD32E62C2;
+	Tue,  8 Jul 2025 17:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="p8VNGwrW";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="dZevqjWv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ECGMAPn5"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b4-smtp.messagingengine.com (fhigh-b4-smtp.messagingengine.com [202.12.124.155])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B4D14A60D
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 16:51:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48ECB2E5B3E
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 17:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751993503; cv=none; b=Kk+2ZVLB/Kkf61tlkKT+29oZ3Z9X0xhtzlaz98K94iPnHQMW+PU8Dz0ZsOLdmW3A5Cg+Z3r9fDxjexjxg2/fI/TzLJhHBbSiUeCIvV79PElCriBnXUYnTCIBdZNry/HaOww+QfKIDYQDA45QmTj0RW0qUT8LIjX0IRipg09drDc=
+	t=1751994026; cv=none; b=R5EX3p6RhEWtk64unX1ZkXbonvvdxDk49E8SNFXhkrtpiCJvfXOIg7kC5iZg/qfsqjyx0G3QpTTKb+mFmS0hy9p9ZT22lguvW3F9Gb61onlohRiU9UKBOGyGFMdQMi6N1rwEuXjtvSzfiBE7RX4GEpMbqbM0rk37cD5CyD4GrSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751993503; c=relaxed/simple;
-	bh=OyljT9PSVKnpfH3jdIqUZjzrh0JCfRE96BnTBLczcIo=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=mpk7RHHAANUNBQ3m0PC+83Sm9m2mQQgRdhfQ3cYsBpjMAOajUyW/ad/nVR+ufG6zA4qXz0HtGAllZqOMZgrUqbvx8UG7EsbRMVPduTI2caA+1L7/DuoxWAPknTGaRfJiHVC3JWe+x/K7a3HnUr2JnY7qZ4gNOAgVQAeggVmEG9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=p8VNGwrW; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dZevqjWv; arc=none smtp.client-ip=202.12.124.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 3C90A7A0295;
-	Tue,  8 Jul 2025 12:51:39 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Tue, 08 Jul 2025 12:51:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-transfer-encoding:content-type
-	:content-type:date:date:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=fm3; t=1751993499; x=1752079899; bh=azCWh3JV1z2s7t1pYzDf4
-	+nhXiDyVCZ87JjSSxlCDFg=; b=p8VNGwrWBY2bnjh5RlYFBJUFsLE+7ReG92oRV
-	2edqxd/NmijGLN6NRCx+X9Z7QR2TQruKTDDum52OaaUumUpk9Z/0bKP4XRTbntJN
-	XFGjAasnqzNeFGUDGt6ybMMt/MCtzVK0n/TH39qv+xyjPDu3cNDn9ofwOvIrsQfQ
-	sy3wWN5sjJgcv2OH5Y92gDn9gk2RCJVCkS7su1kybvbq1ad2HJtwr4xqmySJdsvI
-	EQCLBG5ryvydXHYDOpgtgbCVa6snnGLE4iKQTiVjX3Jta32F4/9Zvr7PS82V6Uu7
-	5By/IgV4DvE6bg1dKqkiKGC5owEZPVki3oHQQqWmk9B1wXRdQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id
-	:content-transfer-encoding:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1751993499; x=1752079899; bh=azCWh3JV1z2s7t1pYzDf4+nhXiDyVCZ87Jj
-	SSxlCDFg=; b=dZevqjWv9YjjPeTVcWEPxQDSitNRBJAXouZJlhbb8UyiOsXYakR
-	gJvCzt/eskjDiksdoad4zn5JqmvjBOQ/ozFjybl7oXxykrtkVUQ8RrHlKEPDBogY
-	Ky8YL+Zc4LRZa8UpdnvuZyV/QGhUrbrXa4Fdwn0fX9SrCik/ZPI6OAaTf5OOfINd
-	luhHyjETMorU8RTm5xl1VPVLHxUO2lp6GnRcGVAQumYUsCTeqt3FITdOoyh2T8Yh
-	C6wTfwbiyj6eqf4EAe6KOsw1mSBgTrz1Cc/3ePLJYqjgFesvMZJYFnRM/fP2Lyhz
-	G4iuPTgIdHxIHiGW0ZxHZ3a+kK5R0E0ysAw==
-X-ME-Sender: <xms:mkxtaGDlQcOA3aapOKmmat2HDFNgweIIU6A1LVsfU0q9nCWYpmamZg>
-    <xme:mkxtaN7BwGekLt-ktlLLj0IZBykiDMfnwNPbtT9CVlFXFR9CHSGv8PqbFUtWQQLAI
-    qjZ48LRf2cRlxWS3W8>
-X-ME-Received: <xmr:mkxtaA536nAB6zvUGrEdRPQtXMEXrbykXeHb3Ns0klAeyCsr1438FBhYFxs4BETZJrThSw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefhedvtdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefhvfevufgjfhfogggtgfffkfesthhqredtredtvdenucfhrhhomheplfgrhicuggho
-    shgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvghtqeenucggtffrrghtthgvrh
-    hnpeeifedvleefleejveethfefieduueeivdefieevleffuddvveeftdehffffteefffen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjh
-    hvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtphho
-    uhhtpdhrtghpthhtohepughsrghhvghrnhesghhmrghilhdrtghomhdprhgtphhtthhope
-    hprhgruggvvghpsheslhhinhhugidrvhhnvghtrdhisghmrdgtohhmpdhrtghpthhtohep
-    shhtvghphhgvnhesnhgvthifohhrkhhplhhumhgsvghrrdhorhhgpdhrtghpthhtohepih
-    drmhgrgihimhgvthhssehovhhnrdhorhhgpdhrtghpthhtoheprghmohhrvghnohiisehr
-    vgguhhgrthdrtghomhdprhgtphhtthhopehhrghlihhusehrvgguhhgrthdrtghomhdprh
-    gtphhtthhopehprhgruggvvghpsehushdrihgsmhdrtghomhdprhgtphhtthhopeifihhl
-    uggvrhesuhhsrdhisghmrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkh
-    gvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:mkxtaPStczP27yg2mG6hOR1ehSagb_GOGE6Dj12m6enbSIhu-5JhwQ>
-    <xmx:mkxtaI9Z7I2XtPzHb3GkErc5m6kY5CY4zDolrfbdNouzcuLzOkgFbQ>
-    <xmx:mkxtaAZeZ-H4V2FwUukBsD013RNEiM-HuhHB-CgiDkYqWwOnQbtCEg>
-    <xmx:mkxtaJryfBsnmUseD6UJdLVFuxcGb5A_1FFAgBkU_7T0FulsDsTCcw>
-    <xmx:m0xtaJHgLD8cR8w3UI1jPIEtDDs4-0dn-z6BlMoD6DeFO6YnKW1MumUJ>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 8 Jul 2025 12:51:38 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 521BE9FC54; Tue,  8 Jul 2025 09:51:37 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 4ECD79FC3F;
-	Tue,  8 Jul 2025 09:51:37 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: David Wilder <wilder@us.ibm.com>
-cc: netdev@vger.kernel.org, pradeeps@linux.vnet.ibm.com,
-    pradeep@us.ibm.com, i.maximets@ovn.org, amorenoz@redhat.com,
-    haliu@redhat.com, stephen@networkplumber.org, dsahern@gmail.com
-Subject: Re: [PATCH iproute2-next v1 1/1] iproute: Extend bonding's
- "arp_ip_target" parameter to add vlan tags.
-In-reply-to: <20250627202430.1791970-2-wilder@us.ibm.com>
-References: <20250627202430.1791970-1-wilder@us.ibm.com>
- <20250627202430.1791970-2-wilder@us.ibm.com>
-Comments: In-reply-to David Wilder <wilder@us.ibm.com>
-   message dated "Fri, 27 Jun 2025 13:23:44 -0700."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1751994026; c=relaxed/simple;
+	bh=vqmP40l2sQm+jo5YrbdEYj98+Uk19D7cUQ2Z6s1E4Hg=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=g2ALVxvB7nksVnUQIo1yhLrAsfObinqPGyoCOJR02vmoeeigyHd/kJgH2eNwUWVIazPJV0FI9Rwu+z9DKrXqJjarPoumj6ikjOFfeRJIrfZah/xZ2Vbww/OU3OM6MgVjyU/b5TBYp1uHcWXhxw/6aLiJqnkCkB1mcePLZR/vYxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ECGMAPn5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751994024;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tOAUOdDQ/Ohpve7MT0b5vBpxcHJyYUTcEvYHV9S4P7A=;
+	b=ECGMAPn5LrV70INWAjv/wks1TyciBzQEGQvV8MfGa0BMUEfKsBZsmHfZLc8fAy20hGIQHw
+	nUD6ETqsVVWPjHwEVIoOf7Pt8k9BFkOuLFwLbrIUV5WdJwmGZQgABXk1HBJcAE48nPWjOq
+	rzde0zkD585akeZcH9sPxIYndturZVg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-275-6H3XbQ14PHCavhWURSUiEg-1; Tue, 08 Jul 2025 13:00:23 -0400
+X-MC-Unique: 6H3XbQ14PHCavhWURSUiEg-1
+X-Mimecast-MFC-AGG-ID: 6H3XbQ14PHCavhWURSUiEg_1751994022
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4538a2f4212so24684375e9.2
+        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 10:00:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751994021; x=1752598821;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tOAUOdDQ/Ohpve7MT0b5vBpxcHJyYUTcEvYHV9S4P7A=;
+        b=ABO+p/vqAW6iiDV3NGFnH0GUttkt509bvjYNcPEy+NI10gTqGLvyobGa48ieS+lqA2
+         L5ldukXqvgayw+WMLLXcdJjxo4kyl4jKhzOLqrWTSURvne0dCZTFp8NBhjstYv/RD0g2
+         DdTrNSDVY7VwZdUELtoN1EFQg5P8cOQF6OzAjVJzw8QXrXiLu75OkL71jSXU2o6tmM95
+         /S9pltcFC6UkjaXp7TAfQ2aCuc4YJaHCDwYbo3jpOtd1FoSedmOm4npjSMDH7Bv7lnIv
+         jvQInVbfvPz0Dz4/ZjiEpAFdteXoZ8zrKpdRubzqzeCr+KHuRmsP4Fs2gypTfMRcMWhm
+         0inQ==
+X-Gm-Message-State: AOJu0YwWto02XjHstH4W7JSwMGyE4sxzUn0L6RkpgRkkfv80ADaS5pOn
+	ir7Nasrcw/jcvL/yR5pCn31GYE9SQABGqlUWyRY0RGVAwYNHFYnKjYp8hRTl8yOxw3nAh8bXNZJ
+	4tCWfFFroHOYLfMkLV5hkGairwxcEdaquWw8VHnFrypTOOsNc/yDOsKMMbe/J43jkwQ==
+X-Gm-Gg: ASbGncstc57WHdTyPjn27l+TX2aTRyc6OHHi2gzy1GDU7SeZnys9Ozl4yhhm13a03hl
+	HAcZTj6qBG5wLqoKxPxZcnO1f2fqhWfPzV3mA9PzaUA58x8yEpy8/ELi43k++YPfHIOT+CE+sxw
+	9I840SJH8xuKqF+f4oQ1Fo8QtHvEmT8hnr3ky7PDN+EgqbuGF6brutqoKOoItDd7axzqr0xmUMI
+	IRj9LTVbsHx4u0onCKSxqN5K4VyngRbIhgdGHtx8A4Z7wxHcKZU8Nru6K5TTtUYSuzzROYZ3h7M
+	0H5h5coQo57kNHYo9cNNBjztrO9u8jslNXm3TOo8nJQniRzOeg/1zsDt2CVqRV94sFEMYg==
+X-Received: by 2002:a05:600c:1d1f:b0:43c:e7ae:4bcf with SMTP id 5b1f17b1804b1-454d3564b66mr5873955e9.0.1751994021589;
+        Tue, 08 Jul 2025 10:00:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEs2z8yosruby7WptbVhLXHCy2dc1fLMqvjmukcchZaNusQYuScrXtah/V+6PVdS+yzg4/ynA==
+X-Received: by 2002:a05:600c:1d1f:b0:43c:e7ae:4bcf with SMTP id 5b1f17b1804b1-454d3564b66mr5873475e9.0.1751994021106;
+        Tue, 08 Jul 2025 10:00:21 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:2717:8910:b663:3b86:247e:dba2? ([2a0d:3344:2717:8910:b663:3b86:247e:dba2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454cd39d0f6sm27320025e9.16.2025.07.08.10.00.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Jul 2025 10:00:20 -0700 (PDT)
+Message-ID: <ef9864e5-3198-4e85-81eb-a491dfbda0d2@redhat.com>
+Date: Tue, 8 Jul 2025 19:00:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <163666.1751993497.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Jul 2025 09:51:37 -0700
-Message-ID: <163667.1751993497@famine>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 net-next 0/9] virtio: introduce GSO over UDP tunnel
+From: Paolo Abeni <pabeni@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>, Jonathan Corbet <corbet@lwn.net>,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org
+References: <cover.1751874094.git.pabeni@redhat.com>
+ <20250708105816-mutt-send-email-mst@kernel.org>
+ <20250708082404.21d1fe61@kernel.org>
+ <20250708120014-mutt-send-email-mst@kernel.org>
+ <27d6b80a-3153-4523-9ccf-0471a85cb245@redhat.com>
+Content-Language: en-US
+In-Reply-To: <27d6b80a-3153-4523-9ccf-0471a85cb245@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-David Wilder <wilder@us.ibm.com> wrote:
+On 7/8/25 6:43 PM, Paolo Abeni wrote:
+> On 7/8/25 6:00 PM, Michael S. Tsirkin wrote:
+>> On Tue, Jul 08, 2025 at 08:24:04AM -0700, Jakub Kicinski wrote:
+>>> On Tue, 8 Jul 2025 11:01:30 -0400 Michael S. Tsirkin wrote:
+>>>>> git@github.com:pabeni/linux-devel.git virtio_udp_tunnel_07_07_2025
+>>>>>
+>>>>> The first 5 patches in this series, that is, the virtio features
+>>>>> extension bits are also available at [2]:
+>>>>>
+>>>>> git@github.com:pabeni/linux-devel.git virtio_features_extension_07_07_2025
+>>>>>
+>>>>> Ideally the virtio features extension bit should go via the virtio tree
+>>>>> and the virtio_net/tun patches via the net-next tree. The latter have
+>>>>> a dependency in the first and will cause conflicts if merged via the
+>>>>> virtio tree, both when applied and at merge window time - inside Linus
+>>>>> tree.
+>>>>>
+>>>>> To avoid such conflicts and duplicate commits I think the net-next
+>>>>> could pull from [1], while the virtio tree could pull from [2].  
+>>>>
+>>>> Or I could just merge all of this in my tree, if that's ok
+>>>> with others?
+>>>
+>>> No strong preference here. My first choice would be a branch based
+>>> on v6.16-rc5 so we can all pull in and resolve the conflicts that
+>>> already exist. But I haven't looked how bad the conflicts would 
+>>> be for virtio if we did that. On net-next side they look manageable.
+>>
+>> OK, let's do it the way Paolo wants then.
+> 
+> I actually messed a bit with my proposal, as I forgot I need to use a
+> common ancestor for the branches I shared.
+> 
+> git@github.com:pabeni/linux-devel.git virtio_features_extension_07_07_2025
+> 
+> is based on current net-next and pulling from such tag will take a lot
+> of unwanted stuff into the vhost tree.
+> 
+> @Michael: AFAICS the current vhost devel tree is based on top of
+> v6.15-rc7, am I correct?
 
->This change extends the "arp_ip_target" parameter format to allow for
->a list of vlan tags to be included for each arp target.
->
->The new format for arp_ip_target is:
->arp_ip_target=3Dipv4-address[vlan-tag\...],...
->
->Examples:
->arp_ip_target=3D10.0.0.1[10]
->arp_ip_target=3D10.0.0.1[100/200]
->
->Signed-off-by: David Wilder <wilder@us.ibm.com>
->---
-> ip/iplink_bond.c | 62 +++++++++++++++++++++++++++++++++++++++++++++---
-> 1 file changed, 59 insertions(+), 3 deletions(-)
->
->diff --git a/ip/iplink_bond.c b/ip/iplink_bond.c
->index 19af67d0..bb0b6e84 100644
->--- a/ip/iplink_bond.c
->+++ b/ip/iplink_bond.c
->@@ -173,6 +173,45 @@ static void explain(void)
-> 	print_explain(stderr);
-> }
-> =
+Which in turn means that you rebase your tree (before sending the PR to
+Linus), am I correct? If so we can't have stable hashes shared between
+net-next and vhost.
 
->+#define BOND_VLAN_PROTO_NONE htons(0xffff)
->+
->+struct bond_vlan_tag {
->+	__be16	vlan_proto;
->+	__be16	vlan_id;
->+};
->+
->+static inline struct bond_vlan_tag *bond_vlan_tags_parse(char *vlan_list=
-, int level, int *size)
->+{
->+	struct bond_vlan_tag *tags =3D NULL;
->+	char *vlan;
->+	int n;
->+
->+	if (!vlan_list || strlen(vlan_list) =3D=3D 0) {
->+		tags =3D calloc(level + 1, sizeof(*tags));
->+		*size =3D (level + 1) * (sizeof(*tags));
->+		if (tags)
->+			tags[level].vlan_proto =3D BOND_VLAN_PROTO_NONE;
->+		return tags;
->+	}
->+
->+	for (vlan =3D strsep(&vlan_list, "/"); (vlan !=3D 0); level++) {
->+		tags =3D bond_vlan_tags_parse(vlan_list, level + 1, size);
->+		if (!tags)
->+			continue;
->+
->+		tags[level].vlan_proto =3D htons(ETH_P_8021Q);
->+		n =3D sscanf(vlan, "%hu", &(tags[level].vlan_id));
->+
->+		if (n !=3D 1 || tags[level].vlan_id < 1 ||
->+		    tags[level].vlan_id > 4094)
->+			return NULL;
->+
->+		return tags;
->+	}
->+
->+	return NULL;
->+}
->+
-> static int bond_parse_opt(struct link_util *lu, int argc, char **argv,
-> 			  struct nlmsghdr *n)
-> {
->@@ -239,12 +278,29 @@ static int bond_parse_opt(struct link_util *lu, int=
- argc, char **argv,
-> 				NEXT_ARG();
-> 				char *targets =3D strdupa(*argv);
-> 				char *target =3D strtok(targets, ",");
->-				int i;
->+				struct bond_vlan_tag *tags;
->+				int size, i;
-> =
+/P
 
-> 				for (i =3D 0; target && i < BOND_MAX_ARP_TARGETS; i++) {
->-					__u32 addr =3D get_addr32(target);
->+					struct Data {
->+						__u32 addr;
->+						struct bond_vlan_tag vlans[];
->+					} data;
->+					char *vlan_list, *dup;
->+
->+					dup =3D strdupa(target);
->+					data.addr =3D get_addr32(strsep(&dup, "["));
->+					vlan_list =3D strsep(&dup, "]");
->+
->+					if (vlan_list) {
->+						tags =3D bond_vlan_tags_parse(vlan_list, 0, &size);
->+						memcpy(&data.vlans, tags, size);
->+						addattr_l(n, 1024, i, &data,
->+							  sizeof(data.addr)+size);
->+					} else {
->+						addattr32(n, 1024, i, data.addr);
->+					}
-> =
-
->-					addattr32(n, 1024, i, addr);
-
-	Another question occurred to me: is this method for sending the
-VLAN tags going to break compatibility?  New versions of iproute2 need
-to work on older kernels, so we can't simply change existing APIs in
-ways that require a lockstep change of iproute versions (going either
-forwards or backwards).
-
-	The above looks like it changes the structure being conveyed
-into the kernel, which I don't think we can do.  In the kernel, the old
-API will need to continue to function, and therefore the new "with VLAN
-tag" case will need to use a new API.
-
-	The existing IFLA_BOND_ARP_IP_TARGET type doesn't use nested
-netlink types, it just sends binary data, so I'm thinking we can't just
-change that binary data, and would need a new IFLA_BOND_ type.
-
-	-J
-
-> 					target =3D strtok(NULL, ",");
-> 				}
-> 				addattr_nest_end(n, nest);
->-- =
-
->2.43.5
->
-
----
-	-Jay Vosburgh, jv@jvosburgh.net
 
