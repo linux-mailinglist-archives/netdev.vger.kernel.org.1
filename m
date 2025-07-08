@@ -1,134 +1,171 @@
-Return-Path: <netdev+bounces-204804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67632AFC246
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 07:51:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D291EAFC289
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 08:19:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C3F11AA6B25
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 05:52:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2246F17AD46
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 06:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 223C321B905;
-	Tue,  8 Jul 2025 05:51:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8EE021771B;
+	Tue,  8 Jul 2025 06:19:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KGlRj9Gb"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WrvdItYj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3E3215F5C;
-	Tue,  8 Jul 2025 05:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7ED1F5413;
+	Tue,  8 Jul 2025 06:19:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751953900; cv=none; b=RwUFubdYicORTa5jkKyze1ERk3HHo3FZ0x8X6AagMP6MtyV0NZSXPQTEgIv82f0etX9Ric8lyIVa1zI+zrqf9GBKb+oQuLCOBRWJ+nrlCR1aidjuJ/9pZEpGSnmC3P8wpYhWvqWDmexZEGZcWf0AEQJg3bE8PxaxivBy2sNKOoE=
+	t=1751955571; cv=none; b=CXQZC94euVf7SHzEf/22D3aXszeekdOp3hcI144B1lTcGbr5chQ/aevvS3TwrGBaqNvA/Tv2L9YG12z9qb2fiZgWNXcAR2T1IMjb4HUGxJkfBqYLZkveKhAgG9zTtOF5ZY6czFMNnIv3ien5yx3i/ibQSuQVUXvymzAN61TrcL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751953900; c=relaxed/simple;
-	bh=gEdd/6I4My3ZZFI4I2HJXKrc31rPhkt8Ri9M8kHQgYk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n1pylqIqE9Gy3XLAhVM8ofEWPo5B+PU5Dsbnn647ItRo5Njr7awIDGNkJpLXRAudoYU95QBbOK9VIGm4ZXXQa0zMt6NxnSZbpV3B3VL+nOXWehejwf5Grg7vxrYm+QIT/N8DUwCs2jTIySaFOXejrX0lBN8C/r2uPgPTyPHoJHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KGlRj9Gb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E460DC4CEEF;
-	Tue,  8 Jul 2025 05:51:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751953897;
-	bh=gEdd/6I4My3ZZFI4I2HJXKrc31rPhkt8Ri9M8kHQgYk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KGlRj9GbXxDHc8w8+ukJnFaJi2BOx7GytdphJ8gHBDrfOrYw05eJ6ZBAy5lqzCZTO
-	 mfd6uqs0CNV9PNyJzTE+laSH2VXqQib+yhyHOVK57K1z0pl7iYmg+wDs/I1k05sYiX
-	 0Q2MHxs5RKQCWuoInO34VP27zHi3HoRo4dFwf2VvkHJAOxW+L0bj7U+inkf2voDbp4
-	 +s0DH6LphFatMbisKPAEke4WzZ8R8IaW1CiQN5zPV5F6IzMD0K2GQrKay5QssoFcP9
-	 +ddGgb+v10Mq+uTE+jANlilkCM7enI3+4zX/DJB2aAP6EJ/2IrJmDpgwNU8HUulaJu
-	 WRBIcUZYU0SPQ==
-Date: Tue, 8 Jul 2025 08:51:33 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Yishai Hadas <yishaih@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH mlx5-next 3/8] net/mlx5: Add support for device steering
- tag
-Message-ID: <20250708055133.GD592765@unreal>
-References: <cover.1751907231.git.leon@kernel.org>
- <dc4c7f6ba34e6beaf95a3c4f9c2e122925be97c9.1751907231.git.leon@kernel.org>
+	s=arc-20240116; t=1751955571; c=relaxed/simple;
+	bh=a9VQ/OKuMQxNDls3x39RI94adWFSYdHXGaxMD5Plndw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lU+zil2BvpPrr1xV0CLqWksSBA1h1CJJGpC6WsD4bOmR0lmSBEfc9zFQ4SyjDAQ0gLbsYbLe2/oK2zDEPeCp/iF2dEYcUxtHMy4nWaKWMSygJBLsyaif7w/99Ave488FmS8JDS3PZtW58arfjKrCyO/tsVRq2wx9Tio1CObpj3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WrvdItYj; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5685BZBc006198;
+	Tue, 8 Jul 2025 06:19:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=ppMPP8
+	ppoa84lSjqkTeweSkbyPG03QPa5F2neMbbDPU=; b=WrvdItYjSh2gjwq5iitiNW
+	tVKMx7eXkAcalY1zBI8ARZOa1FCzWs3ycvzy9/XkPiqSTpgRxIkZvkQmZcS2KXeQ
+	YxO+4zm9cbXkpXUIq2RzBq8hwjyfuH3uzvr73rf3csn/KZHa2xq0Y+S+BfgiqaTM
+	AKCihfKNPL6YSLWvVe8/O7Yn2C/0ealGtAACoU+QrNaMpwSSUWiq/OBEv4YLswnQ
+	XIOnfsqe1p0MhAGDtTZJPE3XDzFatjDVWrgmYQAS4Btzxn1A6u4t0CvfJ525e81/
+	ZGtyb002mBRymIMPtt8waWS0QpqyW4xOs6z0CW1ugLEJcrR7kBRKGOamfy95e3hg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47puk3x2s5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 08 Jul 2025 06:19:23 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 5686JMfo002363;
+	Tue, 8 Jul 2025 06:19:22 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47puk3x2s1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 08 Jul 2025 06:19:22 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5683fohR024317;
+	Tue, 8 Jul 2025 06:19:21 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 47qh329aek-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 08 Jul 2025 06:19:21 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5686JJXR28443186
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 8 Jul 2025 06:19:19 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6D6A558055;
+	Tue,  8 Jul 2025 06:19:19 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0F39958066;
+	Tue,  8 Jul 2025 06:19:14 +0000 (GMT)
+Received: from [9.109.246.12] (unknown [9.109.246.12])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  8 Jul 2025 06:19:13 +0000 (GMT)
+Message-ID: <88176330-73c3-45d0-ac14-d7ae0a14e80d@linux.ibm.com>
+Date: Tue, 8 Jul 2025 11:49:12 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dc4c7f6ba34e6beaf95a3c4f9c2e122925be97c9.1751907231.git.leon@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/2] net/smc: convert timeouts to
+ secs_to_jiffies()
+To: Easwar Hariharan <eahariha@linux.microsoft.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Dust Li <dust.li@linux.alibaba.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        Mahanta Jambigi
+ <mjambigi@linux.ibm.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        David Ahern <dsahern@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-rdma@vger.kernel.org,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20250707-netdev-secs-to-jiffies-part-2-v2-0-b7817036342f@linux.microsoft.com>
+ <20250707-netdev-secs-to-jiffies-part-2-v2-1-b7817036342f@linux.microsoft.com>
+Content-Language: en-US
+From: Sidraya Jayagond <sidraya@linux.ibm.com>
+In-Reply-To: <20250707-netdev-secs-to-jiffies-part-2-v2-1-b7817036342f@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA4MDA0OSBTYWx0ZWRfXyNZsdDHEcY90 u8UzrjIR5EU86PYRkYCM6Mxcj3byRjGQs0m1CrL+IIt595tsB5oUlWCI8b93uXBhXxR21rRFxa5 EDuS29D1SIzO3b6lQRiCEJLCkRhL/RShrie4QW5+b/ktEjLb3sQa3eYa0yJwBt7WrsbV7AB53nY
+ s59lh7HA3vVNtZEPqAkeG8wMCZKwfe92IH3UtiIDMYCrDpT58u5ZS7bxa0F9I0osqtAGsNTobn9 OfEnnu1SpNpy4tVOqsKDRGt94Mm5hDeEEVHKvVFeUVJSHr+0thHomgdDDYcZDSY5ehdCAaD6CHP oU4MEFs/iKib12OvqibScKv7O8UvYIgzEuGqkld33PONCMOQeOXz5Dyvsr4pf2jT7sxaIZL5S1i
+ brtHtPLVDExzHqgw75Ki1xDsLXF+T4ogiSn+UpNQfILh96GZfcVMoXn9ujmjo4V+4I3S1w30
+X-Authority-Analysis: v=2.4 cv=XYeJzJ55 c=1 sm=1 tr=0 ts=686cb86b cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=yMhMjlubAAAA:8 a=VnNF1IyMAAAA:8 a=Z_BCh-ONDyC5R4AT590A:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-ORIG-GUID: RMisSh4tEMnFjdxfY2J90WO6jupJWmpj
+X-Proofpoint-GUID: QFE95R7zLzfrV4WgjMEO0JngNJcfM5WB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-08_02,2025-07-07_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ lowpriorityscore=0 adultscore=0 priorityscore=1501 suspectscore=0
+ mlxscore=0 impostorscore=0 phishscore=0 bulkscore=0 clxscore=1011
+ spamscore=0 mlxlogscore=999 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507080049
 
-On Mon, Jul 07, 2025 at 08:03:03PM +0300, Leon Romanovsky wrote:
-> From: Yishai Hadas <yishaih@nvidia.com>
+
+
+On 08/07/25 3:33 am, Easwar Hariharan wrote:
+> Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
+> secs_to_jiffies().  As the value here is a multiple of 1000, use
+> secs_to_jiffies() instead of msecs_to_jiffies to avoid the multiplication.
 > 
-> Background, from PCIe specification 6.2.
+> This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
+> the following Coccinelle rules:
 > 
-> TLP Processing Hints (TPH)
-> --------------------------
-> TLP Processing Hints is an optional feature that provides hints in
-> Request TLP headers to facilitate optimized processing of Requests that
-> target Memory Space. These Processing Hints enable the system hardware
-> (e.g., the Root Complex and/or Endpoints) to optimize platform
-> resources such as system and memory interconnect on a per TLP basis.
-> Steering Tags are system-specific values used to identify a processing
-> resource that a Requester explicitly targets. System software discovers
-> and identifies TPH capabilities to determine the Steering Tag allocation
-> for each Function that supports TPH.
+> @depends on patch@
+> expression E;
+> @@
 > 
-> This patch adds steering tag support for mlx5 based NICs by:
+> -msecs_to_jiffies(E * 1000)
+> +secs_to_jiffies(E)
 > 
-> - Enabling the TPH functionality over PCI if both FW and OS support it.
-> - Managing steering tags and their matching steering indexes by
->   writing a ST to an ST index over the PCI configuration space.
-> - Exposing APIs to upper layers (e.g.,mlx5_ib) to allow usage of
->   the PCI TPH infrastructure.
+> -msecs_to_jiffies(E * MSEC_PER_SEC)
+> +secs_to_jiffies(E)
 > 
-> Further details:
-> - Upon probing of a device, the feature will be enabled based
->   on both capability detection and OS support.
-> 
-> - It will retrieve the appropriate ST for a given CPU ID and memory
->   type using the pcie_tph_get_cpu_st() API.
-> 
-> - It will track available ST indices according to the configuration
->   space table size (expected to be 63 entries), reserving index 0 to
->   indicate non-TPH use.
-> 
-> - It will assign a free ST index with a ST using the
->   pcie_tph_set_st_entry() API.
-> 
-> - It will reuse the same index for identical (CPU ID + memory type)
->   combinations by maintaining a reference count per entry.
-> 
-> - It will expose APIs to upper layers (e.g., mlx5_ib) to allow usage of
->   the PCI TPH infrastructure.
-> 
-> - SF will use its parent PF stuff.
-> 
-> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
 > ---
->  .../net/ethernet/mellanox/mlx5/core/Makefile  |   5 +
->  .../net/ethernet/mellanox/mlx5/core/lib/st.c  | 162 ++++++++++++++++++
->  .../net/ethernet/mellanox/mlx5/core/main.c    |   2 +
->  .../ethernet/mellanox/mlx5/core/mlx5_core.h   |   9 +
->  include/linux/mlx5/driver.h                   |  20 +++
->  5 files changed, 198 insertions(+)
->  create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/st.c
+>   net/smc/af_smc.c | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index 8d56e4db63e041724f156aa3ab30bab745a15bad..bdbaad17f98012c10d0bbc721c80d4c5ae4fb220 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -2735,8 +2735,7 @@ int smc_accept(struct socket *sock, struct socket *new_sock,
+>   
+>   	if (lsmc->sockopt_defer_accept && !(arg->flags & O_NONBLOCK)) {
+>   		/* wait till data arrives on the socket */
+> -		timeo = msecs_to_jiffies(lsmc->sockopt_defer_accept *
+> -								MSEC_PER_SEC);
+> +		timeo = secs_to_jiffies(lsmc->sockopt_defer_accept);
+>   		if (smc_sk(nsk)->use_fallback) {
+>   			struct sock *clcsk = smc_sk(nsk)->clcsock->sk;
+>   
+> 
+﻿﻿﻿Reviewed-by: Sidraya Jayagond <sidraya@linux.ibm.com>
 
-<...>
 
-> +	if (mlx5_core_is_sf(dev))
-
-Somehow this line was lost during rebase.
-This should be if (IS_ENABLED(CONFIG_MLX5_SF) && mlx5_core_is_sf(dev)) 
-
-Thanks
 
