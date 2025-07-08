@@ -1,756 +1,811 @@
-Return-Path: <netdev+bounces-204966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45FFBAFCB7C
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:11:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73FE8AFCB57
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:05:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A68A418856C2
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 13:10:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E857B1BC6844
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 13:05:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 257D32E0402;
-	Tue,  8 Jul 2025 13:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A132DCF63;
+	Tue,  8 Jul 2025 13:04:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PoV+6XCD"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80D672DECB0;
-	Tue,  8 Jul 2025 13:08:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF1E2DCF53
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 13:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751980087; cv=none; b=kHK4XaNOXSBeroN5r2LhngGM+de8hpe2CsK/poYNg5Is3IzmL7FUeB2unz03lnPF8B+7eLpgIWxXaAGS85+eovsz057jtmkdvTQBp77zJVL4DOlJ6PH9C8CP3e/W8ppBaVvUuhZ2YfGKfkjFGbQf61sT5SrJYB2pdfA3t2/RfF4=
+	t=1751979868; cv=none; b=gfilW4sYYU/BeS08rz8K9su31gCWvH4zURGkHgcmwT5b0w18x1ue2fzZ5RVLdFwgH75fSCtIRJ+Ts9V3OiB0vVNqMRVqPK2ei8wUDcjYBo1SHDevb5141z4EgvXCtfBQbqhK0JSmNAPwYztULAcRbOs2oGLwHgqhFMoJYLYelyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751980087; c=relaxed/simple;
-	bh=WEjS3l3mJFEPeKfelRFjnG+2aDpSvsO332XBbaTo2Qs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=g75LTAMEpcZ8r/NwOWLjJrFs9bO3hOlxbNmHAyUEGhKj6fCOPYr8e9Ha7+xbWanF/TdCu00urLwf38W4ro1fGk7HoAIJQ1bsC5aVD0YPJ79VYRavIjvy4UFu+kQ/s0gfh2h0016oyFmF9CVNO9uG+h/II5vcefKfZW2eGMwE+Io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4bc1bM3FGHztSmb;
-	Tue,  8 Jul 2025 21:06:55 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 226CE180494;
-	Tue,  8 Jul 2025 21:08:02 +0800 (CST)
-Received: from localhost.localdomain (10.90.31.46) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 8 Jul 2025 21:08:01 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
-	<arnd@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<shaojijie@huawei.com>
-Subject: [PATCH net-next 11/11] net: hns3: remove the unused code after using seq_file
-Date: Tue, 8 Jul 2025 21:00:29 +0800
-Message-ID: <20250708130029.1310872-12-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20250708130029.1310872-1-shaojijie@huawei.com>
-References: <20250708130029.1310872-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1751979868; c=relaxed/simple;
+	bh=tAJUleOaietVbTePqzUwib55roibyh5RmVs1il3tDT8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OTU5Nh4qX5hluxhTOWpsEEB5YjWaD3aHd9RPSPwjPfqN2Nwr+N3eaPnWnQmCcEWQyXyorwJvmDQWyvF+Cc0SrFxf0T0KxL5MZnFg+HRMBYKk4dfMFF43uy4j4Bw2ss7R+71CLBUnmDxmmg9GP72lWYKkSpGnMIkJT75skZ7Bung=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PoV+6XCD; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e4423242-74eb-48ad-940d-0f85c1fa181c@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1751979861;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ciC1+ikJUTaFmK3KKl/jL7NppAN9qYMimb98F9T+KwM=;
+	b=PoV+6XCDIoDOm64fGfVRP5SU2Zi5a1BKkRjvCa83PqSvnHWXJIV2JyTMCfJjcB8PBvVFlN
+	dZmEI/NI+xB+2B82CgUobGAuYlBGn8xGoGGMDECexA9W+niL4r82dkxn5ZYItbOuFXUTgC
+	M8R09DSeXYzFQCTgzPSdomU80g7TzOQ=
+Date: Tue, 8 Jul 2025 14:04:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Subject: Re: [PATCH net-next v12 10/14] xsc: Add eth needed qp and cq apis
+To: Xin Tian <tianx@yunsilicon.com>, netdev@vger.kernel.org
+Cc: leon@kernel.org, andrew+netdev@lunn.ch, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, davem@davemloft.net,
+ jeff.johnson@oss.qualcomm.com, przemyslaw.kitszel@intel.com,
+ weihg@yunsilicon.com, wanry@yunsilicon.com, jacky@yunsilicon.com,
+ horms@kernel.org, parthiban.veerasooran@microchip.com, masahiroy@kernel.org,
+ kalesh-anakkur.purayil@broadcom.com, geert+renesas@glider.be,
+ geert@linux-m68k.org
+References: <20250703075341.3488773-1-tianx@yunsilicon.com>
+ <20250703075405.3488773-11-tianx@yunsilicon.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250703075405.3488773-11-tianx@yunsilicon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Jian Shen <shenjian15@huawei.com>
+On 03/07/2025 08:54, Xin Tian wrote:
+> 1. For Ethernet data transmission and reception, this patch adds
+> APIs for using QP and CQ. For QPs, it includes Create QP, Modify QP
+> Status, and Destroy QP. For CQs, it includes Create CQ and Destroy
+> CQ. Since these operations are common to both Ethernet and RDMA,
+> they are added to the xsc_pci driver. In the xsc_eth driver,
+> Ethernet-specific operations are added, including create RSS RQ and
+> modify QP.
+> 
+> 2. Ethernet QP and CQ ring buffer allocation functions are added:
+> xsc_eth_cqwq_create for CQ and xsc_eth_wq_cyc_create for QP.
+> Corresponding DMA buffer allocation functions are also added
+> in alloc.c.
+> 
+> Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
+> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+> Co-developed-by: Lei Yan <jacky@yunsilicon.com>
+> Signed-off-by: Lei Yan <jacky@yunsilicon.com>
+> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
+> ---
+>   .../ethernet/yunsilicon/xsc/common/xsc_core.h |  27 +++
+>   .../net/ethernet/yunsilicon/xsc/net/Makefile  |   2 +-
+>   .../ethernet/yunsilicon/xsc/net/xsc_eth_wq.c  |  80 ++++++++
+>   .../ethernet/yunsilicon/xsc/net/xsc_eth_wq.h  | 187 ++++++++++++++++++
+>   .../net/ethernet/yunsilicon/xsc/pci/alloc.c   | 104 ++++++++++
+>   drivers/net/ethernet/yunsilicon/xsc/pci/cq.c  | 109 ++++++++++
+>   drivers/net/ethernet/yunsilicon/xsc/pci/qp.c  | 114 +++++++++++
+>   7 files changed, 622 insertions(+), 1 deletion(-)
+>   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_wq.c
+>   create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_wq.h
+> 
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+> index f310ca810..f9534993f 100644
+> --- a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+> +++ b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+> @@ -401,9 +401,36 @@ int xsc_core_create_resource_common(struct xsc_core_device *xdev,
+>   				    struct xsc_core_qp *qp);
+>   void xsc_core_destroy_resource_common(struct xsc_core_device *xdev,
+>   				      struct xsc_core_qp *qp);
+> +int xsc_core_eth_create_qp(struct xsc_core_device *xdev,
+> +			   struct xsc_create_qp_mbox_in *in,
+> +			   int insize, u32 *p_qpn);
+> +int xsc_core_eth_modify_qp_status(struct xsc_core_device *xdev,
+> +				  u32 qpn, u16 status);
+> +int xsc_core_eth_destroy_qp(struct xsc_core_device *xdev, u32 qpn);
+> +int xsc_core_eth_create_rss_qp_rqs(struct xsc_core_device *xdev,
+> +				   struct xsc_create_multiqp_mbox_in *in,
+> +				   int insize,
+> +				   u32 *p_qpn_base);
+> +int xsc_core_eth_modify_raw_qp(struct xsc_core_device *xdev,
+> +			       struct xsc_modify_raw_qp_mbox_in *in);
+> +int xsc_core_eth_create_cq(struct xsc_core_device *xdev,
+> +			   struct xsc_core_cq *xcq,
+> +			   struct xsc_create_cq_mbox_in *in,
+> +			   int insize);
+> +int xsc_core_eth_destroy_cq(struct xsc_core_device *xdev,
+> +			    struct xsc_core_cq *xcq);
+> +
+>   struct xsc_eq *xsc_core_eq_get(struct xsc_core_device *xdev, int i);
+>   int xsc_core_vector2eqn(struct xsc_core_device *xdev, int vector, u32 *eqn,
+>   			unsigned int *irqn);
+> +void xsc_core_fill_page_frag_array(struct xsc_frag_buf *buf,
+> +				   __be64 *pas, unsigned int npages);
+> +int xsc_core_frag_buf_alloc_node(struct xsc_core_device *xdev,
+> +				 unsigned long size,
+> +				 struct xsc_frag_buf *buf,
+> +				 int node);
+> +void xsc_core_frag_buf_free(struct xsc_core_device *xdev,
+> +			    struct xsc_frag_buf *buf);
+>   
+>   static inline void *xsc_buf_offset(struct xsc_buf *buf, unsigned long offset)
+>   {
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/Makefile b/drivers/net/ethernet/yunsilicon/xsc/net/Makefile
+> index 53300be3c..ccbc5a26d 100644
+> --- a/drivers/net/ethernet/yunsilicon/xsc/net/Makefile
+> +++ b/drivers/net/ethernet/yunsilicon/xsc/net/Makefile
+> @@ -6,4 +6,4 @@ ccflags-y += -I$(srctree)/drivers/net/ethernet/yunsilicon/xsc
+>   
+>   obj-$(CONFIG_YUNSILICON_XSC_ETH) += xsc_eth.o
+>   
+> -xsc_eth-y := main.o
+> +xsc_eth-y := main.o xsc_eth_wq.o
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_wq.c b/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_wq.c
+> new file mode 100644
+> index 000000000..5a722ab40
+> --- /dev/null
+> +++ b/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_wq.c
+> @@ -0,0 +1,80 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (c) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd. All
+> + * rights reserved.
+> + * Copyright (c) 2013-2015, Mellanox Technologies, Ltd.  All rights reserved.
+> + */
+> +
+> +#include "xsc_eth_wq.h"
+> +#include "xsc_eth.h"
+> +
+> +u32 xsc_wq_cyc_get_size(struct xsc_wq_cyc *wq)
+> +{
+> +	return (u32)wq->fbc.sz_m1 + 1;
+> +}
+> +
+> +static u32 wq_get_byte_sz(u8 log_sz, u8 log_stride)
+> +{
+> +	return ((u32)1 << log_sz) << log_stride;
+> +}
+> +
+> +int xsc_eth_cqwq_create(struct xsc_core_device *xdev,
+> +			struct xsc_wq_param *param,
+> +			u8 q_log_size,
+> +			u8 ele_log_size,
+> +			struct xsc_cqwq *wq,
+> +			struct xsc_wq_ctrl *wq_ctrl)
+> +{
+> +	u8 log_wq_stride = ele_log_size;
+> +	u8 log_wq_sz     = q_log_size;
 
-Remove the unused code after using seq_file.
+why do you need these local variables? If it makes the code more
+readable - why don't you name parameters this way?
 
-Signed-off-by: Jian Shen <shenjian15@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/ethernet/hisilicon/hns3/hnae3.h   |   4 -
- .../ethernet/hisilicon/hns3/hns3_debugfs.c    | 201 ------------------
- .../ethernet/hisilicon/hns3/hns3_debugfs.h    |  16 --
- .../hisilicon/hns3/hns3pf/hclge_debugfs.c     |  65 ------
- .../hisilicon/hns3/hns3pf/hclge_main.c        |   1 -
- .../hisilicon/hns3/hns3pf/hclge_main.h        |   2 -
- 6 files changed, 289 deletions(-)
+> +	int err;
+> +
+> +	err = xsc_core_frag_buf_alloc_node(xdev,
+> +					   wq_get_byte_sz(log_wq_sz,
+> +							  log_wq_stride),
+> +					   &wq_ctrl->buf,
+> +					   param->buf_numa_node);
+> +	if (err) {
+> +		netdev_err(xsc_dev_to_netdev(xdev),
+> +			   "xsc_core_frag_buf_alloc_node failed, %d\n", err);
+> +		return err;
+> +	}
+> +
+> +	xsc_init_fbc(wq_ctrl->buf.frags, log_wq_stride, log_wq_sz, &wq->fbc);
+> +	wq_ctrl->xdev = xdev;
+> +	return 0;
+> +}
+> +
+> +int xsc_eth_wq_cyc_create(struct xsc_core_device *xdev,
+> +			  struct xsc_wq_param *param,
+> +			  u8 q_log_size,
+> +			  u8 ele_log_size,
+> +			  struct xsc_wq_cyc *wq,
+> +			  struct xsc_wq_ctrl *wq_ctrl)
+> +{
+> +	struct xsc_frag_buf_ctrl *fbc = &wq->fbc;
+> +	u8 log_wq_stride = ele_log_size;
+> +	u8 log_wq_sz = q_log_size;
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-index 5e8dbe9230f8..dd6b6b7d1e34 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-@@ -588,8 +588,6 @@ typedef int (*read_func)(struct seq_file *s, void *data);
-  *   Delete clsflower rule
-  * cls_flower_active
-  *   Check if any cls flower rule exist
-- * dbg_read_cmd
-- *   Execute debugfs read command.
-  * set_tx_hwts_info
-  *   Save information for 1588 tx packet
-  * get_rx_hwts
-@@ -758,8 +756,6 @@ struct hnae3_ae_ops {
- 	void (*enable_fd)(struct hnae3_handle *handle, bool enable);
- 	int (*add_arfs_entry)(struct hnae3_handle *handle, u16 queue_id,
- 			      u16 flow_id, struct flow_keys *fkeys);
--	int (*dbg_read_cmd)(struct hnae3_handle *handle, enum hnae3_dbg_cmd cmd,
--			    char *buf, int len);
- 	pci_ers_result_t (*handle_hw_ras_error)(struct hnae3_ae_dev *ae_dev);
- 	bool (*get_hw_reset_stat)(struct hnae3_handle *handle);
- 	bool (*ae_dev_resetting)(struct hnae3_handle *handle);
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
-index e038e408de53..0255c8acb744 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c
-@@ -41,7 +41,6 @@ static struct hns3_dbg_dentry_info hns3_dbg_dentry[] = {
- };
- 
- static int hns3_dbg_bd_file_init(struct hnae3_handle *handle, u32 cmd);
--static int hns3_dbg_common_file_init(struct hnae3_handle *handle, u32 cmd);
- static int hns3_dbg_common_init_t1(struct hnae3_handle *handle, u32 cmd);
- static int hns3_dbg_common_init_t2(struct hnae3_handle *handle, u32 cmd);
- 
-@@ -50,315 +49,270 @@ static struct hns3_dbg_cmd_info hns3_dbg_cmd[] = {
- 		.name = "tm_nodes",
- 		.cmd = HNAE3_DBG_CMD_TM_NODES,
- 		.dentry = HNS3_DBG_DENTRY_TM,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "tm_priority",
- 		.cmd = HNAE3_DBG_CMD_TM_PRI,
- 		.dentry = HNS3_DBG_DENTRY_TM,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "tm_qset",
- 		.cmd = HNAE3_DBG_CMD_TM_QSET,
- 		.dentry = HNS3_DBG_DENTRY_TM,
--		.buf_len = HNS3_DBG_READ_LEN_1MB,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "tm_map",
- 		.cmd = HNAE3_DBG_CMD_TM_MAP,
- 		.dentry = HNS3_DBG_DENTRY_TM,
--		.buf_len = HNS3_DBG_READ_LEN_1MB,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "tm_pg",
- 		.cmd = HNAE3_DBG_CMD_TM_PG,
- 		.dentry = HNS3_DBG_DENTRY_TM,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "tm_port",
- 		.cmd = HNAE3_DBG_CMD_TM_PORT,
- 		.dentry = HNS3_DBG_DENTRY_TM,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "tc_sch_info",
- 		.cmd = HNAE3_DBG_CMD_TC_SCH_INFO,
- 		.dentry = HNS3_DBG_DENTRY_TM,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "qos_pause_cfg",
- 		.cmd = HNAE3_DBG_CMD_QOS_PAUSE_CFG,
- 		.dentry = HNS3_DBG_DENTRY_TM,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "qos_pri_map",
- 		.cmd = HNAE3_DBG_CMD_QOS_PRI_MAP,
- 		.dentry = HNS3_DBG_DENTRY_TM,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "qos_dscp_map",
- 		.cmd = HNAE3_DBG_CMD_QOS_DSCP_MAP,
- 		.dentry = HNS3_DBG_DENTRY_TM,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "qos_buf_cfg",
- 		.cmd = HNAE3_DBG_CMD_QOS_BUF_CFG,
- 		.dentry = HNS3_DBG_DENTRY_TM,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "dev_info",
- 		.cmd = HNAE3_DBG_CMD_DEV_INFO,
- 		.dentry = HNS3_DBG_DENTRY_COMMON,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t1,
- 	},
- 	{
- 		.name = "tx_bd_queue",
- 		.cmd = HNAE3_DBG_CMD_TX_BD,
- 		.dentry = HNS3_DBG_DENTRY_TX_BD,
--		.buf_len = HNS3_DBG_READ_LEN_5MB,
- 		.init = hns3_dbg_bd_file_init,
- 	},
- 	{
- 		.name = "rx_bd_queue",
- 		.cmd = HNAE3_DBG_CMD_RX_BD,
- 		.dentry = HNS3_DBG_DENTRY_RX_BD,
--		.buf_len = HNS3_DBG_READ_LEN_4MB,
- 		.init = hns3_dbg_bd_file_init,
- 	},
- 	{
- 		.name = "uc",
- 		.cmd = HNAE3_DBG_CMD_MAC_UC,
- 		.dentry = HNS3_DBG_DENTRY_MAC,
--		.buf_len = HNS3_DBG_READ_LEN_128KB,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "mc",
- 		.cmd = HNAE3_DBG_CMD_MAC_MC,
- 		.dentry = HNS3_DBG_DENTRY_MAC,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "mng_tbl",
- 		.cmd = HNAE3_DBG_CMD_MNG_TBL,
- 		.dentry = HNS3_DBG_DENTRY_COMMON,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "loopback",
- 		.cmd = HNAE3_DBG_CMD_LOOPBACK,
- 		.dentry = HNS3_DBG_DENTRY_COMMON,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "interrupt_info",
- 		.cmd = HNAE3_DBG_CMD_INTERRUPT_INFO,
- 		.dentry = HNS3_DBG_DENTRY_COMMON,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "reset_info",
- 		.cmd = HNAE3_DBG_CMD_RESET_INFO,
- 		.dentry = HNS3_DBG_DENTRY_COMMON,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "imp_info",
- 		.cmd = HNAE3_DBG_CMD_IMP_INFO,
- 		.dentry = HNS3_DBG_DENTRY_COMMON,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "ncl_config",
- 		.cmd = HNAE3_DBG_CMD_NCL_CONFIG,
- 		.dentry = HNS3_DBG_DENTRY_COMMON,
--		.buf_len = HNS3_DBG_READ_LEN_128KB,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "mac_tnl_status",
- 		.cmd = HNAE3_DBG_CMD_MAC_TNL_STATUS,
- 		.dentry = HNS3_DBG_DENTRY_COMMON,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "bios_common",
- 		.cmd = HNAE3_DBG_CMD_REG_BIOS_COMMON,
- 		.dentry = HNS3_DBG_DENTRY_REG,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "ssu",
- 		.cmd = HNAE3_DBG_CMD_REG_SSU,
- 		.dentry = HNS3_DBG_DENTRY_REG,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "igu_egu",
- 		.cmd = HNAE3_DBG_CMD_REG_IGU_EGU,
- 		.dentry = HNS3_DBG_DENTRY_REG,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "rpu",
- 		.cmd = HNAE3_DBG_CMD_REG_RPU,
- 		.dentry = HNS3_DBG_DENTRY_REG,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "ncsi",
- 		.cmd = HNAE3_DBG_CMD_REG_NCSI,
- 		.dentry = HNS3_DBG_DENTRY_REG,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "rtc",
- 		.cmd = HNAE3_DBG_CMD_REG_RTC,
- 		.dentry = HNS3_DBG_DENTRY_REG,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "ppp",
- 		.cmd = HNAE3_DBG_CMD_REG_PPP,
- 		.dentry = HNS3_DBG_DENTRY_REG,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "rcb",
- 		.cmd = HNAE3_DBG_CMD_REG_RCB,
- 		.dentry = HNS3_DBG_DENTRY_REG,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "tqp",
- 		.cmd = HNAE3_DBG_CMD_REG_TQP,
- 		.dentry = HNS3_DBG_DENTRY_REG,
--		.buf_len = HNS3_DBG_READ_LEN_128KB,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "mac",
- 		.cmd = HNAE3_DBG_CMD_REG_MAC,
- 		.dentry = HNS3_DBG_DENTRY_REG,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "dcb",
- 		.cmd = HNAE3_DBG_CMD_REG_DCB,
- 		.dentry = HNS3_DBG_DENTRY_REG,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "queue_map",
- 		.cmd = HNAE3_DBG_CMD_QUEUE_MAP,
- 		.dentry = HNS3_DBG_DENTRY_QUEUE,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t1,
- 	},
- 	{
- 		.name = "rx_queue_info",
- 		.cmd = HNAE3_DBG_CMD_RX_QUEUE_INFO,
- 		.dentry = HNS3_DBG_DENTRY_QUEUE,
--		.buf_len = HNS3_DBG_READ_LEN_1MB,
- 		.init = hns3_dbg_common_init_t1,
- 	},
- 	{
- 		.name = "tx_queue_info",
- 		.cmd = HNAE3_DBG_CMD_TX_QUEUE_INFO,
- 		.dentry = HNS3_DBG_DENTRY_QUEUE,
--		.buf_len = HNS3_DBG_READ_LEN_1MB,
- 		.init = hns3_dbg_common_init_t1,
- 	},
- 	{
- 		.name = "fd_tcam",
- 		.cmd = HNAE3_DBG_CMD_FD_TCAM,
- 		.dentry = HNS3_DBG_DENTRY_FD,
--		.buf_len = HNS3_DBG_READ_LEN_1MB,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "service_task_info",
- 		.cmd = HNAE3_DBG_CMD_SERV_INFO,
- 		.dentry = HNS3_DBG_DENTRY_COMMON,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "vlan_config",
- 		.cmd = HNAE3_DBG_CMD_VLAN_CONFIG,
- 		.dentry = HNS3_DBG_DENTRY_COMMON,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "ptp_info",
- 		.cmd = HNAE3_DBG_CMD_PTP_INFO,
- 		.dentry = HNS3_DBG_DENTRY_COMMON,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "fd_counter",
- 		.cmd = HNAE3_DBG_CMD_FD_COUNTER,
- 		.dentry = HNS3_DBG_DENTRY_FD,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "umv_info",
- 		.cmd = HNAE3_DBG_CMD_UMV_INFO,
- 		.dentry = HNS3_DBG_DENTRY_COMMON,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t2,
- 	},
- 	{
- 		.name = "page_pool_info",
- 		.cmd = HNAE3_DBG_CMD_PAGE_POOL_INFO,
- 		.dentry = HNS3_DBG_DENTRY_COMMON,
--		.buf_len = HNS3_DBG_READ_LEN,
- 		.init = hns3_dbg_common_init_t1,
- 	},
- 	{
- 		.name = "coalesce_info",
- 		.cmd = HNAE3_DBG_CMD_COAL_INFO,
- 		.dentry = HNS3_DBG_DENTRY_COMMON,
--		.buf_len = HNS3_DBG_READ_LEN_1MB,
- 		.init = hns3_dbg_common_init_t1,
- 	},
- };
-@@ -429,44 +383,6 @@ static const char * const dim_state_str[] = { "START", "IN_PROG", "APPLY" };
- static const char * const
- dim_tune_stat_str[] = { "ON_TOP", "TIRED", "RIGHT", "LEFT" };
- 
--static void hns3_dbg_fill_content(char *content, u16 len,
--				  const struct hns3_dbg_item *items,
--				  const char **result, u16 size)
--{
--#define HNS3_DBG_LINE_END_LEN	2
--	char *pos = content;
--	u16 item_len;
--	u16 i;
--
--	if (!len) {
--		return;
--	} else if (len <= HNS3_DBG_LINE_END_LEN) {
--		*pos++ = '\0';
--		return;
--	}
--
--	memset(content, ' ', len);
--	len -= HNS3_DBG_LINE_END_LEN;
--
--	for (i = 0; i < size; i++) {
--		item_len = strlen(items[i].name) + items[i].interval;
--		if (len < item_len)
--			break;
--
--		if (result) {
--			if (item_len < strlen(result[i]))
--				break;
--			memcpy(pos, result[i], strlen(result[i]));
--		} else {
--			memcpy(pos, items[i].name, strlen(items[i].name));
--		}
--		pos += item_len;
--		len -= item_len;
--	}
--	*pos++ = '\n';
--	*pos++ = '\0';
--}
--
- static void hns3_get_coal_info(struct hns3_enet_tqp_vector *tqp_vector,
- 			       struct seq_file *s, int i, bool is_tx)
- {
-@@ -899,104 +815,6 @@ static int hns3_dbg_page_pool_info(struct seq_file *s, void *data)
- 	return 0;
- }
- 
--static int hns3_dbg_get_cmd_index(struct hns3_dbg_data *dbg_data, u32 *index)
--{
--	u32 i;
--
--	for (i = 0; i < ARRAY_SIZE(hns3_dbg_cmd); i++) {
--		if (hns3_dbg_cmd[i].cmd == dbg_data->cmd) {
--			*index = i;
--			return 0;
--		}
--	}
--
--	dev_err(&dbg_data->handle->pdev->dev, "unknown command(%d)\n",
--		dbg_data->cmd);
--	return -EINVAL;
--}
--
--static const struct hns3_dbg_func hns3_dbg_cmd_func[] = {
--};
--
--static int hns3_dbg_read_cmd(struct hns3_dbg_data *dbg_data,
--			     enum hnae3_dbg_cmd cmd, char *buf, int len)
--{
--	const struct hnae3_ae_ops *ops = hns3_get_ops(dbg_data->handle);
--	const struct hns3_dbg_func *cmd_func;
--	u32 i;
--
--	for (i = 0; i < ARRAY_SIZE(hns3_dbg_cmd_func); i++) {
--		if (cmd == hns3_dbg_cmd_func[i].cmd) {
--			cmd_func = &hns3_dbg_cmd_func[i];
--			if (cmd_func->dbg_dump)
--				return cmd_func->dbg_dump(dbg_data->handle, buf,
--							  len);
--			else
--				return cmd_func->dbg_dump_bd(dbg_data, buf,
--							     len);
--		}
--	}
--
--	if (!ops->dbg_read_cmd)
--		return -EOPNOTSUPP;
--
--	return ops->dbg_read_cmd(dbg_data->handle, cmd, buf, len);
--}
--
--static ssize_t hns3_dbg_read(struct file *filp, char __user *buffer,
--			     size_t count, loff_t *ppos)
--{
--	char *buf = filp->private_data;
--
--	return simple_read_from_buffer(buffer, count, ppos, buf, strlen(buf));
--}
--
--static int hns3_dbg_open(struct inode *inode, struct file *filp)
--{
--	struct hns3_dbg_data *dbg_data = inode->i_private;
--	struct hnae3_handle *handle = dbg_data->handle;
--	struct hns3_nic_priv *priv = handle->priv;
--	u32 index;
--	char *buf;
--	int ret;
--
--	if (!test_bit(HNS3_NIC_STATE_INITED, &priv->state) ||
--	    test_bit(HNS3_NIC_STATE_RESETTING, &priv->state))
--		return -EBUSY;
--
--	ret = hns3_dbg_get_cmd_index(dbg_data, &index);
--	if (ret)
--		return ret;
--
--	buf = kvzalloc(hns3_dbg_cmd[index].buf_len, GFP_KERNEL);
--	if (!buf)
--		return -ENOMEM;
--
--	ret = hns3_dbg_read_cmd(dbg_data, hns3_dbg_cmd[index].cmd,
--				buf, hns3_dbg_cmd[index].buf_len);
--	if (ret) {
--		kvfree(buf);
--		return ret;
--	}
--
--	filp->private_data = buf;
--	return 0;
--}
--
--static int hns3_dbg_release(struct inode *inode, struct file *filp)
--{
--	kvfree(filp->private_data);
--	filp->private_data = NULL;
--	return 0;
--}
--
--static const struct file_operations hns3_dbg_fops = {
--	.owner = THIS_MODULE,
--	.open  = hns3_dbg_open,
--	.read  = hns3_dbg_read,
--	.release = hns3_dbg_release,
--};
--
- static int hns3_dbg_bd_info_show(struct seq_file *s, void *private)
- {
- 	struct hns3_dbg_data *data = s->private;
-@@ -1044,25 +862,6 @@ static int hns3_dbg_bd_file_init(struct hnae3_handle *handle, u32 cmd)
- 	return 0;
- }
- 
--static int
--hns3_dbg_common_file_init(struct hnae3_handle *handle, u32 cmd)
--{
--	struct hns3_dbg_data *data;
--	struct dentry *entry_dir;
--
--	data = devm_kzalloc(&handle->pdev->dev, sizeof(*data), GFP_KERNEL);
--	if (!data)
--		return -ENOMEM;
--
--	data->handle = handle;
--	data->cmd = hns3_dbg_cmd[cmd].cmd;
--	entry_dir = hns3_dbg_dentry[hns3_dbg_cmd[cmd].dentry].dentry;
--	debugfs_create_file(hns3_dbg_cmd[cmd].name, 0400, entry_dir,
--			    data, &hns3_dbg_fops);
--
--	return 0;
--}
--
- static int hns3_dbg_common_init_t1(struct hnae3_handle *handle, u32 cmd)
- {
- 	struct device *dev = &handle->pdev->dev;
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.h b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.h
-index 4a5ef8a90a10..57c9d3fc1b27 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.h
-@@ -6,15 +6,6 @@
- 
- #include "hnae3.h"
- 
--#define HNS3_DBG_READ_LEN	65536
--#define HNS3_DBG_READ_LEN_128KB	0x20000
--#define HNS3_DBG_READ_LEN_1MB	0x100000
--#define HNS3_DBG_READ_LEN_4MB	0x400000
--#define HNS3_DBG_READ_LEN_5MB	0x500000
--#define HNS3_DBG_WRITE_LEN	1024
--
--#define HNS3_DBG_DATA_STR_LEN	32
--#define HNS3_DBG_INFO_LEN	256
- #define HNS3_DBG_ITEM_NAME_LEN	32
- #define HNS3_DBG_FILE_NAME_LEN	16
- 
-@@ -49,16 +40,9 @@ struct hns3_dbg_cmd_info {
- 	const char *name;
- 	enum hnae3_dbg_cmd cmd;
- 	enum hns3_dbg_dentry_type dentry;
--	u32 buf_len;
- 	int (*init)(struct hnae3_handle *handle, unsigned int cmd);
- };
- 
--struct hns3_dbg_func {
--	enum hnae3_dbg_cmd cmd;
--	int (*dbg_dump)(struct hnae3_handle *handle, char *buf, int len);
--	int (*dbg_dump_bd)(struct hns3_dbg_data *data, char *buf, int len);
--};
--
- struct hns3_dbg_cap_info {
- 	const char *name;
- 	enum HNAE3_DEV_CAP_BITS cap_bit;
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-index 00cf6cc89eda..635e6bca5364 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
-@@ -724,48 +724,6 @@ static const struct hclge_dbg_reg_type_info hclge_dbg_reg_info[] = {
- 		       .cmd = HCLGE_OPC_DFX_TQP_REG } },
- };
- 
--/* make sure: len(name) + interval >= maxlen(item data) + 2,
-- * for example, name = "pkt_num"(len: 7), the prototype of item data is u32,
-- * and print as "%u"(maxlen: 10), so the interval should be at least 5.
-- */
--static void hclge_dbg_fill_content(char *content, u16 len,
--				   const struct hclge_dbg_item *items,
--				   const char **result, u16 size)
--{
--#define HCLGE_DBG_LINE_END_LEN	2
--	char *pos = content;
--	u16 item_len;
--	u16 i;
--
--	if (!len) {
--		return;
--	} else if (len <= HCLGE_DBG_LINE_END_LEN) {
--		*pos++ = '\0';
--		return;
--	}
--
--	memset(content, ' ', len);
--	len -= HCLGE_DBG_LINE_END_LEN;
--
--	for (i = 0; i < size; i++) {
--		item_len = strlen(items[i].name) + items[i].interval;
--		if (len < item_len)
--			break;
--
--		if (result) {
--			if (item_len < strlen(result[i]))
--				break;
--			memcpy(pos, result[i], strlen(result[i]));
--		} else {
--			memcpy(pos, items[i].name, strlen(items[i].name));
--		}
--		pos += item_len;
--		len -= item_len;
--	}
--	*pos++ = '\n';
--	*pos++ = '\0';
--}
--
- static char *hclge_dbg_get_func_id_str(char *buf, u8 id)
- {
- 	if (id)
-@@ -2977,29 +2935,6 @@ static const struct hclge_dbg_func hclge_dbg_cmd_func[] = {
- 	},
- };
- 
--int hclge_dbg_read_cmd(struct hnae3_handle *handle, enum hnae3_dbg_cmd cmd,
--		       char *buf, int len)
--{
--	struct hclge_vport *vport = hclge_get_vport(handle);
--	const struct hclge_dbg_func *cmd_func;
--	struct hclge_dev *hdev = vport->back;
--	u32 i;
--
--	for (i = 0; i < ARRAY_SIZE(hclge_dbg_cmd_func); i++) {
--		if (cmd == hclge_dbg_cmd_func[i].cmd) {
--			cmd_func = &hclge_dbg_cmd_func[i];
--			if (cmd_func->dbg_dump)
--				return cmd_func->dbg_dump(hdev, buf, len);
--			else
--				return cmd_func->dbg_dump_reg(hdev, cmd, buf,
--							      len);
--		}
--	}
--
--	dev_err(&hdev->pdev->dev, "invalid command(%d)\n", cmd);
--	return -EINVAL;
--}
--
- int hclge_dbg_get_read_func(struct hnae3_handle *handle, enum hnae3_dbg_cmd cmd,
- 			    read_func *func)
- {
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index 9c9e87c22b80..d3c71bc1855d 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -12864,7 +12864,6 @@ static const struct hnae3_ae_ops hclge_ops = {
- 	.get_fd_all_rules = hclge_get_all_rules,
- 	.enable_fd = hclge_enable_fd,
- 	.add_arfs_entry = hclge_add_fd_entry_by_arfs,
--	.dbg_read_cmd = hclge_dbg_read_cmd,
- 	.dbg_get_read_func = hclge_dbg_get_read_func,
- 	.handle_hw_ras_error = hclge_handle_hw_ras_error,
- 	.get_hw_reset_stat = hclge_get_hw_reset_stat,
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-index 57c09e8fd583..032b472d2368 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-@@ -1142,8 +1142,6 @@ int hclge_func_reset_cmd(struct hclge_dev *hdev, int func_id);
- int hclge_vport_start(struct hclge_vport *vport);
- void hclge_vport_stop(struct hclge_vport *vport);
- int hclge_set_vport_mtu(struct hclge_vport *vport, int new_mtu);
--int hclge_dbg_read_cmd(struct hnae3_handle *handle, enum hnae3_dbg_cmd cmd,
--		       char *buf, int len);
- int hclge_dbg_get_read_func(struct hnae3_handle *handle, enum hnae3_dbg_cmd cmd,
- 			    read_func *func);
- u16 hclge_covert_handle_qid_global(struct hnae3_handle *handle, u16 queue_id);
--- 
-2.33.0
+the same here
+
+> +	int err;
+> +
+> +	err = xsc_core_frag_buf_alloc_node(xdev,
+> +					   wq_get_byte_sz(log_wq_sz,
+> +							  log_wq_stride),
+> +					   &wq_ctrl->buf,
+> +					   param->buf_numa_node);
+> +	if (err) {
+> +		netdev_err(xsc_dev_to_netdev(xdev),
+> +			   "xsc_core_frag_buf_alloc_node failed, %d\n", err);
+> +		return err;
+> +	}
+> +
+> +	xsc_init_fbc(wq_ctrl->buf.frags, log_wq_stride, log_wq_sz, fbc);
+> +	wq->sz = xsc_wq_cyc_get_size(wq);
+> +	wq_ctrl->xdev = xdev;
+> +	return 0;
+> +}
+> +
+> +void xsc_eth_wq_destroy(struct xsc_wq_ctrl *wq_ctrl)
+> +{
+> +	xsc_core_frag_buf_free(wq_ctrl->xdev, &wq_ctrl->buf);
+> +}
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_wq.h b/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_wq.h
+> new file mode 100644
+> index 000000000..5abe155c0
+> --- /dev/null
+> +++ b/drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_wq.h
+> @@ -0,0 +1,187 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Copyright (c) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd. All
+> + * rights reserved.
+> + * Copyright (c) 2013-2015, Mellanox Technologies, Ltd.  All rights reserved.
+> + */
+> +
+> +#ifndef __XSC_WQ_H
+> +#define __XSC_WQ_H
+> +
+> +#include "common/xsc_core.h"
+> +
+> +struct xsc_wq_param {
+> +	int		buf_numa_node;
+> +	int		db_numa_node;
+> +};
+> +
+> +struct xsc_wq_ctrl {
+> +	struct xsc_core_device	*xdev;
+> +	struct xsc_frag_buf	buf;
+> +};
+> +
+> +struct xsc_wq_cyc {
+> +	struct xsc_frag_buf_ctrl fbc;
+> +	u16			sz;
+> +	u16			wqe_ctr;
+> +	u16			cur_sz;
+> +};
+> +
+> +struct xsc_cqwq {
+> +	struct xsc_frag_buf_ctrl fbc;
+> +	__be32			  *db;
+> +	u32			  cc; /* consumer counter */
+> +};
+> +
+> +enum xsc_res_type {
+> +	XSC_RES_UND	= 0,
+> +	XSC_RES_RQ,
+> +	XSC_RES_SQ,
+> +	XSC_RES_MAX,
+> +};
+> +
+> +u32 xsc_wq_cyc_get_size(struct xsc_wq_cyc *wq);
+> +
+> +/*api for eth driver*/
+> +int xsc_eth_cqwq_create(struct xsc_core_device *xdev,
+> +			struct xsc_wq_param *param,
+> +			u8 q_log_size,
+> +			u8 ele_log_size,
+> +			struct xsc_cqwq *wq,
+> +			struct xsc_wq_ctrl *wq_ctrl);
+> +
+> +int xsc_eth_wq_cyc_create(struct xsc_core_device *xdev,
+> +			  struct xsc_wq_param *param,
+> +			  u8 q_log_size,
+> +			  u8 ele_log_size,
+> +			  struct xsc_wq_cyc *wq,
+> +			  struct xsc_wq_ctrl *wq_ctrl);
+> +void xsc_eth_wq_destroy(struct xsc_wq_ctrl *wq_ctrl);
+> +
+> +static inline void xsc_init_fbc_offset(struct xsc_buf_list *frags,
+> +				       u8 log_stride, u8 log_sz,
+> +				       u16 strides_offset,
+> +				       struct xsc_frag_buf_ctrl *fbc)
+> +{
+> +	fbc->frags      = frags;
+> +	fbc->log_stride = log_stride;
+> +	fbc->log_sz     = log_sz;
+> +	fbc->sz_m1	= (1 << fbc->log_sz) - 1;
+> +	fbc->log_frag_strides = PAGE_SHIFT - fbc->log_stride;
+> +	fbc->frag_sz_m1	= (1 << fbc->log_frag_strides) - 1;
+> +	fbc->strides_offset = strides_offset;
+> +}
+> +
+> +static inline void xsc_init_fbc(struct xsc_buf_list *frags,
+> +				u8 log_stride, u8 log_sz,
+> +				struct xsc_frag_buf_ctrl *fbc)
+> +{
+> +	xsc_init_fbc_offset(frags, log_stride, log_sz, 0, fbc);
+> +}
+> +
+> +static inline void *xsc_frag_buf_get_wqe(struct xsc_frag_buf_ctrl *fbc,
+> +					 u32 ix)
+> +{
+> +	unsigned int frag;
+> +
+> +	ix  += fbc->strides_offset;
+> +	frag = ix >> fbc->log_frag_strides;
+> +
+> +	return fbc->frags[frag].buf +
+> +		((fbc->frag_sz_m1 & ix) << fbc->log_stride);
+> +}
+> +
+> +static inline u32
+> +xsc_frag_buf_get_idx_last_contig_stride(struct xsc_frag_buf_ctrl *fbc, u32 ix)
+> +{
+> +	u32 last_frag_stride_idx = (ix + fbc->strides_offset) | fbc->frag_sz_m1;
+> +
+> +	return min_t(u32, last_frag_stride_idx - fbc->strides_offset,
+> +		     fbc->sz_m1);
+
+no need for min_t() - simple min() will work as both params are u32.
+
+> +}
+> +
+> +static inline int xsc_wq_cyc_missing(struct xsc_wq_cyc *wq)
+> +{
+> +	return wq->sz - wq->cur_sz;
+> +}
+> +
+> +static inline int xsc_wq_cyc_is_empty(struct xsc_wq_cyc *wq)
+> +{
+> +	return !wq->cur_sz;
+> +}
+> +
+> +static inline void xsc_wq_cyc_push(struct xsc_wq_cyc *wq)
+> +{
+> +	wq->wqe_ctr++;
+> +	wq->cur_sz++;
+> +}
+> +
+> +static inline void xsc_wq_cyc_push_n(struct xsc_wq_cyc *wq, u8 n)
+> +{
+> +	wq->wqe_ctr += n;
+> +	wq->cur_sz += n;
+> +}
+> +
+> +static inline void xsc_wq_cyc_pop(struct xsc_wq_cyc *wq)
+> +{
+> +	wq->cur_sz--;
+> +}
+> +
+> +static inline u16 xsc_wq_cyc_ctr2ix(struct xsc_wq_cyc *wq, u16 ctr)
+> +{
+> +	return ctr & wq->fbc.sz_m1;
+> +}
+> +
+> +static inline u16 xsc_wq_cyc_get_head(struct xsc_wq_cyc *wq)
+> +{
+> +	return xsc_wq_cyc_ctr2ix(wq, wq->wqe_ctr);
+> +}
+> +
+> +static inline u16 xsc_wq_cyc_get_tail(struct xsc_wq_cyc *wq)
+> +{
+> +	return xsc_wq_cyc_ctr2ix(wq, wq->wqe_ctr - wq->cur_sz);
+> +}
+> +
+> +static inline void *xsc_wq_cyc_get_wqe(struct xsc_wq_cyc *wq, u16 ix)
+> +{
+> +	return xsc_frag_buf_get_wqe(&wq->fbc, ix);
+> +}
+> +
+> +static inline u32 xsc_cqwq_ctr2ix(struct xsc_cqwq *wq, u32 ctr)
+> +{
+> +	return ctr & wq->fbc.sz_m1;
+> +}
+> +
+> +static inline u32 xsc_cqwq_get_ci(struct xsc_cqwq *wq)
+> +{
+> +	return xsc_cqwq_ctr2ix(wq, wq->cc);
+> +}
+> +
+> +static inline u32 xsc_cqwq_get_ctr_wrap_cnt(struct xsc_cqwq *wq, u32 ctr)
+> +{
+> +	return ctr >> wq->fbc.log_sz;
+> +}
+> +
+> +static inline u32 xsc_cqwq_get_wrap_cnt(struct xsc_cqwq *wq)
+> +{
+> +	return xsc_cqwq_get_ctr_wrap_cnt(wq, wq->cc);
+> +}
+> +
+> +static inline void xsc_cqwq_pop(struct xsc_cqwq *wq)
+> +{
+> +	wq->cc++;
+> +}
+> +
+> +static inline u32 xsc_cqwq_get_size(struct xsc_cqwq *wq)
+> +{
+> +	return wq->fbc.sz_m1 + 1;
+> +}
+> +
+> +static inline struct xsc_cqe *xsc_cqwq_get_wqe(struct xsc_cqwq *wq, u32 ix)
+> +{
+> +	struct xsc_cqe *cqe = xsc_frag_buf_get_wqe(&wq->fbc, ix);
+> +
+> +	return cqe;
+> +}
+> +
+> +#endif /* __XSC_WQ_H */
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c b/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c
+> index fe9b125e1..1b0bb76d0 100644
+> --- a/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c
+> +++ b/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c
+> @@ -128,3 +128,107 @@ void xsc_fill_page_array(struct xsc_buf *buf, __be64 *pas, unsigned int npages)
+>   		pas[i] = cpu_to_be64(addr);
+>   	}
+>   }
+> +
+> +void xsc_core_fill_page_frag_array(struct xsc_frag_buf *buf,
+> +				   __be64 *pas,
+> +				   unsigned int npages)
+> +{
+> +	int i;
+> +	dma_addr_t addr;
+> +	unsigned int shift = PAGE_SHIFT - PAGE_SHIFT_4K;
+> +	unsigned int mask = (1 << shift) - 1;
+
+reverse x-mass tree please
+
+> +
+> +	for (i = 0; i < npages; i++) {
+> +		addr = buf->frags[i >> shift].map +
+> +			((i & mask) << PAGE_SHIFT_4K);
+> +		pas[i] = cpu_to_be64(addr);
+> +	}
+> +}
+> +EXPORT_SYMBOL(xsc_core_fill_page_frag_array);
+> +
+> +static void *xsc_dma_zalloc_coherent_node(struct xsc_core_device *xdev,
+> +					  size_t size, dma_addr_t *dma_handle,
+> +					  int node)
+> +{
+> +	struct xsc_dev_resource *dev_res = xdev->dev_res;
+> +	struct device *device = &xdev->pdev->dev;
+> +	int original_node;
+> +	void *cpu_handle;
+> +
+> +	/* WA for kernels that don't use numa_mem_id in alloc_pages_node */
+> +	if (node == NUMA_NO_NODE)
+> +		node = numa_mem_id();
+> +
+> +	mutex_lock(&dev_res->alloc_mutex);
+> +	original_node = dev_to_node(device);
+> +	set_dev_node(device, node);
+> +	cpu_handle = dma_alloc_coherent(device, size, dma_handle,
+> +					GFP_KERNEL);
+> +	set_dev_node(device, original_node);
+> +	mutex_unlock(&dev_res->alloc_mutex);
+> +	return cpu_handle;
+> +}
+> +
+> +int xsc_core_frag_buf_alloc_node(struct xsc_core_device *xdev,
+> +				 unsigned long size,
+> +				 struct xsc_frag_buf *buf,
+> +				 int node)
+> +{
+> +	int i;
+> +
+> +	buf->size = size;
+> +	buf->npages = DIV_ROUND_UP(size, PAGE_SIZE);
+> +	buf->page_shift = PAGE_SHIFT;
+> +	buf->frags = kcalloc(buf->npages, sizeof(struct xsc_buf_list),
+> +			     GFP_KERNEL);
+> +	if (!buf->frags)
+> +		goto err_out;
+> +
+> +	for (i = 0; i < buf->npages; i++) {
+> +		unsigned long frag_sz = min_t(unsigned long, size, PAGE_SIZE);
+> +		struct xsc_buf_list *frag = &buf->frags[i];
+> +
+> +		frag->buf = xsc_dma_zalloc_coherent_node(xdev, frag_sz,
+> +							 &frag->map, node);
+> +		if (!frag->buf)
+> +			goto err_free_buf;
+> +		if (frag->map & ((1 << buf->page_shift) - 1)) {
+> +			dma_free_coherent(&xdev->pdev->dev, frag_sz,
+> +					  buf->frags[i].buf, buf->frags[i].map);
+> +			pci_err(xdev->pdev, "unexpected map alignment: %pad, page_shift=%d\n",
+> +				&frag->map, buf->page_shift);
+> +			goto err_free_buf;
+> +		}
+> +		size -= frag_sz;
+> +	}
+> +
+> +	return 0;
+> +
+> +err_free_buf:
+> +	while (i--)
+> +		dma_free_coherent(&xdev->pdev->dev,
+> +				  PAGE_SIZE,
+> +				  buf->frags[i].buf,
+> +				  buf->frags[i].map);
+> +	kfree(buf->frags);
+> +err_out:
+> +	return -ENOMEM;
+> +}
+> +EXPORT_SYMBOL(xsc_core_frag_buf_alloc_node);
+> +
+> +void xsc_core_frag_buf_free(struct xsc_core_device *xdev,
+> +			    struct xsc_frag_buf *buf)
+> +{
+> +	unsigned long size = buf->size;
+> +	int i;
+> +
+> +	for (i = 0; i < buf->npages; i++) {
+> +		unsigned long frag_sz = min_t(unsigned long, size, PAGE_SIZE);
+> +
+> +		dma_free_coherent(&xdev->pdev->dev, frag_sz, buf->frags[i].buf,
+> +				  buf->frags[i].map);
+> +		size -= frag_sz;
+> +	}
+> +	kfree(buf->frags);
+> +}
+> +EXPORT_SYMBOL(xsc_core_frag_buf_free);
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/cq.c b/drivers/net/ethernet/yunsilicon/xsc/pci/cq.c
+> index 5cff9025c..068337fea 100644
+> --- a/drivers/net/ethernet/yunsilicon/xsc/pci/cq.c
+> +++ b/drivers/net/ethernet/yunsilicon/xsc/pci/cq.c
+> @@ -4,6 +4,7 @@
+>    */
+>   
+>   #include "common/xsc_core.h"
+> +#include "common/xsc_cmd_api.h"
+>   #include "cq.h"
+>   
+>   void xsc_cq_event(struct xsc_core_device *xdev, u32 cqn, int event_type)
+> @@ -37,3 +38,111 @@ void xsc_init_cq_table(struct xsc_core_device *xdev)
+>   	spin_lock_init(&table->lock);
+>   	INIT_RADIX_TREE(&table->tree, GFP_ATOMIC);
+>   }
+> +
+> +static int xsc_create_cq(struct xsc_core_device *xdev, u32 *p_cqn,
+> +			 struct xsc_create_cq_mbox_in *in, int insize)
+> +{
+> +	struct xsc_create_cq_mbox_out out;
+> +	int ret;
+> +
+> +	memset(&out, 0, sizeof(out));
+> +	in->hdr.opcode = cpu_to_be16(XSC_CMD_OP_CREATE_CQ);
+> +	ret = xsc_cmd_exec(xdev, in, insize, &out, sizeof(out));
+> +	if (ret) {
+> +		pci_err(xdev->pdev, "failed to create cq, err=%d out.status=%u\n",
+> +			ret, out.hdr.status);
+> +		return ret;
+> +	}
+> +
+> +	*p_cqn = be32_to_cpu(out.cqn) & 0xffffff;
+> +	return 0;
+> +}
+> +
+> +static int xsc_destroy_cq(struct xsc_core_device *xdev, u32 cqn)
+> +{
+> +	struct xsc_destroy_cq_mbox_out out;
+> +	struct xsc_destroy_cq_mbox_in in;
+> +
+> +	memset(&in, 0, sizeof(in));
+> +	memset(&out, 0, sizeof(out));
+> +	in.hdr.opcode = cpu_to_be16(XSC_CMD_OP_DESTROY_CQ);
+> +	in.cqn = cpu_to_be32(cqn);
+> +
+> +	return xsc_cmd_exec(xdev, &in, sizeof(in), &out, sizeof(out));
+> +}
+> +
+> +int xsc_core_eth_create_cq(struct xsc_core_device *xdev,
+> +			   struct xsc_core_cq *xcq,
+> +			   struct xsc_create_cq_mbox_in *in,
+> +			   int insize)
+> +{
+> +	struct xsc_cq_table *table = &xdev->dev_res->cq_table;
+> +	u32 cqn;
+> +	int ret;
+> +	int err;
+> +
+> +	ret = xsc_create_cq(xdev, &cqn, in, insize);
+> +	if (ret) {
+> +		pci_err(xdev->pdev, "xsc_create_cq failed\n");
+> +		return -ENOEXEC;
+> +	}
+> +	xcq->cqn = cqn;
+> +	xcq->cons_index = 0;
+> +	xcq->arm_sn = 0;
+> +	atomic_set(&xcq->refcount, 1);
+> +	init_completion(&xcq->free);
+> +
+> +	spin_lock_irq(&table->lock);
+> +	ret = radix_tree_insert(&table->tree, xcq->cqn, xcq);
+> +	spin_unlock_irq(&table->lock);
+> +	if (ret)
+> +		goto err_insert_cq;
+> +	return 0;
+> +err_insert_cq:
+> +	err = xsc_destroy_cq(xdev, cqn);
+> +	if (err)
+> +		pci_err(xdev->pdev, "failed to destroy cqn=%d, err=%d\n",
+> +			xcq->cqn, err);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL(xsc_core_eth_create_cq);
+> +
+> +int xsc_core_eth_destroy_cq(struct xsc_core_device *xdev,
+> +			    struct xsc_core_cq *xcq)
+> +{
+> +	struct xsc_cq_table *table = &xdev->dev_res->cq_table;
+> +	struct xsc_core_cq *tmp;
+> +	int err;
+> +
+> +	spin_lock_irq(&table->lock);
+> +	tmp = radix_tree_delete(&table->tree, xcq->cqn);
+> +	spin_unlock_irq(&table->lock);
+> +	if (!tmp) {
+> +		err = -ENOENT;
+> +		goto err_delete_cq;
+> +	}
+> +
+> +	if (tmp != xcq) {
+> +		err = -EINVAL;
+> +		goto err_delete_cq;
+> +	}
+> +
+> +	err = xsc_destroy_cq(xdev, xcq->cqn);
+> +	if (err)
+> +		goto err_destroy_cq;
+> +
+> +	if (atomic_dec_and_test(&xcq->refcount))
+> +		complete(&xcq->free);
+> +	wait_for_completion(&xcq->free);
+> +	return 0;
+> +
+> +err_destroy_cq:
+> +	pci_err(xdev->pdev, "failed to destroy cqn=%d, err=%d\n",
+> +		xcq->cqn, err);
+> +	return err;
+> +err_delete_cq:
+> +	pci_err(xdev->pdev, "cqn=%d not found in tree, err=%d\n",
+> +		xcq->cqn, err);
+> +	return err;
+> +}
+> +EXPORT_SYMBOL(xsc_core_eth_destroy_cq);
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/qp.c b/drivers/net/ethernet/yunsilicon/xsc/pci/qp.c
+> index cc79eaf92..e94f15b2d 100644
+> --- a/drivers/net/ethernet/yunsilicon/xsc/pci/qp.c
+> +++ b/drivers/net/ethernet/yunsilicon/xsc/pci/qp.c
+> @@ -9,6 +9,7 @@
+>   #include <linux/kthread.h>
+>   
+>   #include "common/xsc_core.h"
+> +#include "common/xsc_cmd_api.h"
+>   #include "qp.h"
+>   
+>   int xsc_core_create_resource_common(struct xsc_core_device *xdev,
+> @@ -78,3 +79,116 @@ void xsc_init_qp_table(struct xsc_core_device *xdev)
+>   	spin_lock_init(&table->lock);
+>   	INIT_RADIX_TREE(&table->tree, GFP_ATOMIC);
+>   }
+> +
+> +int xsc_core_eth_create_qp(struct xsc_core_device *xdev,
+> +			   struct xsc_create_qp_mbox_in *in,
+> +			   int insize, u32 *p_qpn)
+> +{
+> +	struct xsc_create_qp_mbox_out out;
+> +	int ret;
+> +
+> +	in->hdr.opcode = cpu_to_be16(XSC_CMD_OP_CREATE_QP);
+> +	ret = xsc_cmd_exec(xdev, in, insize, &out, sizeof(out));
+> +	if (ret) {
+> +		pci_err(xdev->pdev, "failed to create sq, err=%d out.status=%u\n",
+> +			ret, out.hdr.status);
+> +		return ret;
+> +	}
+> +
+> +	*p_qpn = be32_to_cpu(out.qpn) & 0xffffff;
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL(xsc_core_eth_create_qp);
+> +
+> +int xsc_core_eth_modify_qp_status(struct xsc_core_device *xdev,
+> +				  u32 qpn, u16 status)
+> +{
+> +	struct xsc_modify_qp_mbox_out out;
+> +	struct xsc_modify_qp_mbox_in in;
+> +	int ret = 0;
+> +
+> +	in.hdr.opcode = cpu_to_be16(status);
+> +	in.qpn = cpu_to_be32(qpn);
+> +	in.no_need_wait = 1;
+> +
+> +	ret = xsc_cmd_exec(xdev, &in, sizeof(in), &out, sizeof(out));
+> +	if (ret) {
+> +		pci_err(xdev->pdev, "failed to modify qp %u status=%u, err=%d out.status %u\n",
+> +			qpn, status, ret, out.hdr.status);
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(xsc_core_eth_modify_qp_status);
+> +
+> +int xsc_core_eth_destroy_qp(struct xsc_core_device *xdev, u32 qpn)
+> +{
+> +	struct xsc_destroy_qp_mbox_out out;
+> +	struct xsc_destroy_qp_mbox_in in;
+> +	int err;
+> +
+> +	err = xsc_core_eth_modify_qp_status(xdev, qpn, XSC_CMD_OP_2RST_QP);
+> +	if (err) {
+> +		pci_err(xdev->pdev, "failed to set sq%d status=rst, err=%d\n",
+> +			qpn, err);
+> +		return err;
+> +	}
+> +
+> +	memset(&in, 0, sizeof(in));
+> +	memset(&out, 0, sizeof(out));
+> +	in.hdr.opcode = cpu_to_be16(XSC_CMD_OP_DESTROY_QP);
+> +	in.qpn = cpu_to_be32(qpn);
+> +	err = xsc_cmd_exec(xdev, &in, sizeof(in), &out, sizeof(out));
+> +	if (err) {
+> +		pci_err(xdev->pdev, "failed to destroy sq%d, err=%d out.status=%u\n",
+> +			qpn, err, out.hdr.status);
+> +		return err;
+> +	}
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL(xsc_core_eth_destroy_qp);
+> +
+> +int xsc_core_eth_modify_raw_qp(struct xsc_core_device *xdev,
+> +			       struct xsc_modify_raw_qp_mbox_in *in)
+> +{
+> +	struct xsc_modify_raw_qp_mbox_out out;
+> +	int err;
+> +
+> +	in->hdr.opcode = cpu_to_be16(XSC_CMD_OP_MODIFY_RAW_QP);
+> +
+> +	err = xsc_cmd_exec(xdev, in, sizeof(struct xsc_modify_raw_qp_mbox_in),
+> +			   &out, sizeof(struct xsc_modify_raw_qp_mbox_out));
+> +	if (err) {
+> +		pci_err(xdev->pdev, "failed to modify sq, err=%d out.status=%u\n",
+> +			err, out.hdr.status);
+> +		return err;
+> +	}
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL(xsc_core_eth_modify_raw_qp);
+> +
+> +int xsc_core_eth_create_rss_qp_rqs(struct xsc_core_device *xdev,
+> +				   struct xsc_create_multiqp_mbox_in *in,
+> +				   int insize,
+> +				   u32 *p_qpn_base)
+> +{
+> +	struct xsc_create_multiqp_mbox_out out;
+> +	int err;
+> +
+> +	in->hdr.opcode = cpu_to_be16(XSC_CMD_OP_CREATE_MULTI_QP);
+> +	err = xsc_cmd_exec(xdev, in, insize, &out, sizeof(out));
+> +	if (err) {
+> +		pci_err(xdev->pdev,
+> +			"failed to create rss rq, qp_num=%d, type=%d, err=%d out.status=%u\n",
+> +			in->qp_num, in->qp_type, err, out.hdr.status);
+> +		return err;
+> +	}
+> +
+> +	*p_qpn_base = be32_to_cpu(out.qpn_base) & 0xffffff;
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL(xsc_core_eth_create_rss_qp_rqs);
 
 
