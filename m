@@ -1,64 +1,53 @@
-Return-Path: <netdev+bounces-205165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21760AFDA3E
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 23:57:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E147AFDA52
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 00:00:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 761D3585C5F
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 21:57:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE813176574
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 22:00:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 680FF2459D8;
-	Tue,  8 Jul 2025 21:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hDRYfFSx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BDC71FF5E3;
+	Tue,  8 Jul 2025 22:00:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4621C5F13;
-	Tue,  8 Jul 2025 21:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 493D93B7A8;
+	Tue,  8 Jul 2025 22:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752011818; cv=none; b=Iu/Dheih4+QSIVv7fI5gnq1cgZ9cO/LaAs3d9NASq7CLK04+Z08ZvwD3PdTCuyjwGHCLnUtFMuzweVmPXkycYDSw2WKgpkk4wumFy7fsUZyAYyiTsUntCRdfGlPSNAfcY7XyJFkIjNQPMDphWd/FpL4UGLNUZfq49w4v5xT+cZU=
+	t=1752012054; cv=none; b=WI6n4D1NQKbctBe1jbc2IJn818DmGixbHq4DfZS8MCasaAyQje2qtadXx+BFjS9c5xBHoxNzKlZR17myAcxvjv7X+JFKfL+ZxpJNVfJHsPyK4Au6kSVZIb7S4jKo6WDd+wEakqwhbktpvt3JpkUWeNnpPQNSQaVvFNX5DkpO1PA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752011818; c=relaxed/simple;
-	bh=mMYM0UqMMuLwofB6yHEOfU/Sj/tijRtxSclWHwv8EYE=;
+	s=arc-20240116; t=1752012054; c=relaxed/simple;
+	bh=7mFXvMq75GS63cOsJInVGaQYLNjUOZSwMKZHP+mbRYw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jiyA9vWvsb0n78d0oPdknQ9zHyvYgHCHpuJ3k+UlCEnHEs1sbQnfHHhVX885aCYo+pCXkhWOjnAX1AJreVPXCabQNnnmVaSu4TMY73zkFitopbiGyU4BpfvbhVtszEqOSAgEXBtOJSe2fORtyTVNb1kQUUJyZgN6Y1TIOWY1llk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hDRYfFSx; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=I2MNnurOuYs7GBps2jgmtMeQcUhEOvCBlbZC40vudRY=; b=hDRYfFSxrH4iT03pWeDD2npYwC
-	jKY8mOLJ9j+wDlgQDoRVHojeuTOBwagjozsoFwba0LUnTIoshwGKpkaZuEh27HHTX7J6JHU/1cRWw
-	IAkfTPE6yjIoee960pDTbIosU/MDb0cW6Y7+9H48/261LnJrpZ7baAIGeeNZV3mzbI2o=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uZGIv-000sFX-Pz; Tue, 08 Jul 2025 23:56:45 +0200
-Date: Tue, 8 Jul 2025 23:56:45 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Michael Dege <michael.dege@renesas.com>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>,
-	Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=qNJulJ/0cwL/EXdeCMtBh4LvLwvxw4j7wj7JEHSJY2POJfxEQc/VqaJi+nof1xUHU+zAvambchnazToRhqSGj1NFblKAQg+XJDaXyCeZqsBjHuSUPafSWw+NUxvsxjZyva94vcOQFmJpgDVPCAWaESL9Xd2gB4XXzF6mm4FKIA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 2D2CF6122E; Wed,  9 Jul 2025 00:00:49 +0200 (CEST)
+Date: Wed, 9 Jul 2025 00:00:47 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Subject: Re: [PATCH v2 2/4] net: renesas: rswitch: configure default ageing
- time
-Message-ID: <26784e9d-a660-498a-ae32-4493d463a23a@lunn.ch>
-References: <20250708-add_l2_switching-v2-0-f91f5556617a@renesas.com>
- <20250708-add_l2_switching-v2-2-f91f5556617a@renesas.com>
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	bridge@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH v14 nf-next 2/3] netfilter: bridge: Add conntrack double
+ vlan and pppoe
+Message-ID: <aG2VDyHfVsp5L2zR@strlen.de>
+References: <20250708151209.2006140-1-ericwouds@gmail.com>
+ <20250708151209.2006140-3-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,14 +56,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250708-add_l2_switching-v2-2-f91f5556617a@renesas.com>
+In-Reply-To: <20250708151209.2006140-3-ericwouds@gmail.com>
 
-> +	/* Configure MAC table aging */
-> +	rswitch_modify(priv->addr, FWMACAGUSPC, FWMACAGUSPC_MACAGUSP,
-> +		       FIELD_PREP(FWMACAGUSPC_MACAGUSP, 0x140));
+Eric Woudstra <ericwouds@gmail.com> wrote:
+> This adds the capability to conntrack 802.1ad, QinQ, PPPoE and PPPoE-in-Q
+> packets that are passing a bridge, only when a conntrack zone is set.
+> 
+> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+> ---
+>  net/bridge/netfilter/nf_conntrack_bridge.c | 88 ++++++++++++++++++----
+>  1 file changed, 72 insertions(+), 16 deletions(-)
+> 
+> +			data_len = ntohs(ph->hdr.length) - 2;
 
-Could you replace this 0x140 magic number with a #define explaining
-what it means?
+Shouldn't there be some validation on data_len here?
 
-	Andrew
+> +		if (!pskb_may_pull(skb, offset + sizeof(struct iphdr)))
+> +			goto do_not_track;
+ 
+>  		len = skb_ip_totlen(skb);
+> -		if (pskb_trim_rcsum(skb, len))
+> -			return NF_ACCEPT;
+> +		if (data_len < len)
+> +			len = data_len;
+
+Hmm.  So if ph->hdr.length is smaller than what ip header claims,
+len shrinks.
+
+If its higher, then the mismatch is ignored and we only use
+the ip header length (i.e., the smaller value).
+
+> +		if (pskb_trim_rcsum(skb, offset + len))
+> +			goto do_not_track;
+
+Is the intent that garbage data_len is caught here and
+
+>  		if (nf_ct_br_ip_check(skb))
+> -			return NF_ACCEPT;
+
+here?  If so, maybe a comment could help.
+
+> +		goto do_not_track;
+>  	}
+>  
+> -	if (ret != NF_ACCEPT)
+> -		return ret;
+> +	if (ret == NF_ACCEPT)
+> +		ret = nf_conntrack_in(skb, &bridge_state);
+>  
+> -	return nf_conntrack_in(skb, &bridge_state);
+> +do_not_track:
+> +	if (offset) {
+
+if (ret == NF_ACCEPT && offset) { ...
+
+Else skb could have been free'd. There should be test cases for this
+functionality included.  If we lack test cases for the existing
+functionality, which might be the case, please consider submitting
+a reduced test case first so it can be applied regardless of the
+remaining functionality.
 
