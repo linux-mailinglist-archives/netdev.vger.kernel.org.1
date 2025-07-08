@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-205089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B3F0AFD2F8
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 18:52:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6809CAFD10E
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 18:30:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0ABC1880832
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 16:49:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F04AC17301C
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 16:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53CD8257459;
-	Tue,  8 Jul 2025 16:49:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6571F2E3B03;
+	Tue,  8 Jul 2025 16:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="FLztgBcx"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="xTmIym+B"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26EC918EAB;
-	Tue,  8 Jul 2025 16:49:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FB21C6FEC;
+	Tue,  8 Jul 2025 16:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751993342; cv=none; b=EJf/qNi2DDdBjyhCAInsxkxN1s9Uecelq7RO+BAA9gtnpIvfDuDu/VDm1NgMO6xzbJhIksHjJ9+wCoKB94Hhefu5naFf5//F/ucVP391sh0gb7xQlRwDprzvnXkGKNtxLpAvOBKnwv+YaisXKFSN+TKL740gqv1WdxWIXOudkPY=
+	t=1751992202; cv=none; b=Asn/5vzJ5QxhyUS2Cw02A70JSrV029INI/Zz4IO7qEzkeRcp6dUu9+EA019w3siGxmTC358qFhbNt7dTJur/Bwsjycd4IdPJTtw5n7huZViPA8mxFuV2UsNEwYXnuAKI3DvbmuDzmAUxQv+kDjVvT87NTIdRbIKA86qPFKPqN1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751993342; c=relaxed/simple;
-	bh=CJuZZnS8E1IrIBoxNdGTRrydZnA/1nREEWJwecd/M1I=;
+	s=arc-20240116; t=1751992202; c=relaxed/simple;
+	bh=un9sD9x7n5QQzIwLfSUYN/9O4+kXaOErfTahqv0rHAs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Aoj4vcYUT1KL/2Fujsp3uCup07uA3s41ttPWi2L3YqVLsO+drOImLONLZKzckKK9ZNpb/36OTqf+hLUmYld4WfAp3RaoTce6/U7zJhFH7i5oIJBoYZbZEB1J02nVciLJ4vYwRUB3OzTAdBLdgVaYfmACqKzrFy7V/nYkJKGj5DA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=FLztgBcx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 759F4C4CEF0;
-	Tue,  8 Jul 2025 16:49:01 +0000 (UTC)
+	 MIME-Version; b=YAr8DgXfWb0j80eeMngMnzdn+rCC+ft5AukaDKmAzOd0rfWfoc0p9Jip1xtBxhkH8pUuOubSUpq6nKpmoa7MVP97xB3CBVtPJhGLjBsxnG4R3bBHKoVMXy1P9LT81fnGwRpb9DAwzecRdXKUeob1y9S5z72uTA9w25IYBXC2Wck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=xTmIym+B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CF85C4CEED;
+	Tue,  8 Jul 2025 16:30:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1751993342;
-	bh=CJuZZnS8E1IrIBoxNdGTRrydZnA/1nREEWJwecd/M1I=;
+	s=korg; t=1751992202;
+	bh=un9sD9x7n5QQzIwLfSUYN/9O4+kXaOErfTahqv0rHAs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FLztgBcxNqjQ9J+3IVaEHdisVSB8JbwT7RXJRxnZFH+OR4sjSCTmZNq6UpL4ZezfA
-	 izmnP6vgLe2muWZhXib+cXhU2QYh2zUVocOVA0fr0aPWWISCZUheYOZGxmjoPtR3uy
-	 QBlQrKEluCerGfvjGndhExLOOc6A4hd8K7FNuWIM=
+	b=xTmIym+BoZCzuQZZ1OlLMkBF/Qcvave7I8EhZkXVqas0Bl2YU57UfV0FhsUCu4srX
+	 01miA3+zeuMLuD5XQltrBAp9qQukXnF9EtZezHDEjaqnxb+jcQrPlYxMmze2nYNgG4
+	 EmTevgauSBr6d6LX/nm+LCFP9E2h6XlpNaLgoCAQ=
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -54,12 +54,12 @@ Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	netdev@vger.kernel.org,
 	stable <stable@kernel.org>,
 	HarshaVardhana S A <harshavardhana.sa@broadcom.com>
-Subject: [PATCH 6.15 010/178] vsock/vmci: Clear the vmci transport packet properly when initializing it
-Date: Tue,  8 Jul 2025 18:20:47 +0200
-Message-ID: <20250708162236.819209078@linuxfoundation.org>
+Subject: [PATCH 6.6 006/132] vsock/vmci: Clear the vmci transport packet properly when initializing it
+Date: Tue,  8 Jul 2025 18:21:57 +0200
+Message-ID: <20250708162230.951045547@linuxfoundation.org>
 X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250708162236.549307806@linuxfoundation.org>
-References: <20250708162236.549307806@linuxfoundation.org>
+In-Reply-To: <20250708162230.765762963@linuxfoundation.org>
+References: <20250708162230.765762963@linuxfoundation.org>
 User-Agent: quilt/0.68
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -71,7 +71,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-6.15-stable review patch.  If anyone has any objections, please let me know.
+6.6-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
