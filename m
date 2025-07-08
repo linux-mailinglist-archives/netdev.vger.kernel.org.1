@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-205043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7200EAFCF72
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 17:40:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5085AFCF74
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 17:40:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4042E7B54AD
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:38:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F58E5613D4
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:40:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C80C2E092F;
-	Tue,  8 Jul 2025 15:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE0422E2EE2;
+	Tue,  8 Jul 2025 15:39:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWgCcGxa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pc3DNh+l"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252901D5150;
-	Tue,  8 Jul 2025 15:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B762E266F;
+	Tue,  8 Jul 2025 15:39:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751989191; cv=none; b=TluuAre7N2h2aYhIpZtOHC8oMP9mgDvHlj7ys55XVq7aTWjE83c9xN/GMGlPDIbyIr44tkk8tcPWkJfZOMaxC+WtXD21+8Tavh4sHJfXxGbJFWVDfzJdl9qRYNl6lleRqaNnsswArTdS9FqITZZQ6es86aqeYLmMEWp2mTmtMqE=
+	t=1751989192; cv=none; b=nDr43yMOHE6ZtAlSt9AYB5dnWQs8i1YjbcEYQ55r02Ono5VlxTY2J/cL1ohfDO0cp4xJCQfvfw6mRZffJw9kQz4dTsPHC+6x5n2krXULauQnhWqi1js7Tf0cqWIkkZuCKhfj5DHXpsxnUMsvBvVGCf5uCfCUm1oN8JBIrdXhAes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751989191; c=relaxed/simple;
-	bh=6a64cyDgTkEAXdeAVE2ZqtPeIjHWMsvkoEkspXSXwXA=;
+	s=arc-20240116; t=1751989192; c=relaxed/simple;
+	bh=2dVWBRbn7gB2Ip/RlIdkUkZz/Rfmr06mo3cGo1b4rww=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LYAzuEW+4XEJjOs5ohqMhNGCfc6XSLXh1Zf4Jumf3TMNeTMX3ZvEUGVdNOruNyBQOSS7WIZH8o8IU1nGd5qsK5eoI8u977XCfyomN69yxJrsiBmEXkeh7U4WvKFcackwjN7pjBpRIEaFE7DJ5iA7ycHpZntc58yr2gLq+Citg7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZWgCcGxa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 810D4C4CEF0;
-	Tue,  8 Jul 2025 15:39:50 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=p5+9Mqhj8BLwRPfN31eU8qcRk3M7BBeYJSvmq52pYxTjSt6tEqmKD+1GcHJlck5CZ7Z8EKO+A/GaVh2aRI5SFdITWWINJ72AzPu1lNEJ1UcivPx0/Vk57N6tD61EzKrxYYhU0NMzwr7iowl0yq4nnmCEyT66UuxT+wdxyLVrDE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pc3DNh+l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02D58C113CF;
+	Tue,  8 Jul 2025 15:39:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751989190;
-	bh=6a64cyDgTkEAXdeAVE2ZqtPeIjHWMsvkoEkspXSXwXA=;
+	s=k20201202; t=1751989192;
+	bh=2dVWBRbn7gB2Ip/RlIdkUkZz/Rfmr06mo3cGo1b4rww=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZWgCcGxadlruCnTk5/zGHnJ2Gx4a7IZkFoi8w+nVew/c3NSU/glIJm2iJZLr5X7qV
-	 dsDEMmExqm92uBaYrnQoBbQSOhbOnKcj0hDP99ImV50K69RfJXtHi8Z46LjuS76O7h
-	 O8YC9LOypQxr7GWAT947nalfelgWFW0rK4RCfb9ct/1uR9OqG+8lNTtWkiJN7yUqGE
-	 ApmsPD0fA/MgPsgbk5KaIFMUv1qUKlQRTI4fwh3+Fw8gkqwWwrt7YcoLWkvSUg8V5c
-	 5kgq/WRUyFrq91Zx/9IEoKir1U1CLk17R91aTGj8zED1HC4rs4/P/qfnrdHj3KNhVB
-	 M+tlMb5QvK1Tg==
+	b=Pc3DNh+l1RpFaZlYhTszhX8cCsz1wthZhDWmuPo+ecfsby6b5ViLgOPTP49pfSLf2
+	 yaxaHFu5zySYk2NBkcq5YVmZLB0xieNPYwks7MxbJSoSO6ychhjvtRvpMprL+pksox
+	 B0U9UwFTOMF1IUoxapjFos8GW/xqW6rM/kteQf81UhoqbBspO1kLy2OL5MKHcV5F7P
+	 z5drLw7+5TpbO84YD3kmTAftUFVeTNUyHs+uQ1v6eDgf9HcqFSIBC9HKESOBK1kuHO
+	 WxK2iTvVdCDIykMvq8nG36uT0Eq37LD4JCb2KV3Qo/p6+vTDxnMkSjEmP34mTEOOup
+	 eD9pD934dD3JA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70ED4380DBEE;
-	Tue,  8 Jul 2025 15:40:14 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF23380DBEE;
+	Tue,  8 Jul 2025 15:40:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,18 +52,21 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] atm: lanai: fix "take a while" typo
+Subject: Re: [PATCH] net: Use of_reserved_mem_region_to_resource{_byname}()
+ for
+ "memory-region"
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175198921325.4109948.5911889991821254848.git-patchwork-notify@kernel.org>
-Date: Tue, 08 Jul 2025 15:40:13 +0000
-References: 
- <mn5rh6i773csmcrpfcr6bogvv2auypz2jwjn6dap2rxousxnw5@tarta.nabijaczleweli.xyz>
-In-Reply-To: 
- <mn5rh6i773csmcrpfcr6bogvv2auypz2jwjn6dap2rxousxnw5@tarta.nabijaczleweli.xyz>
-To: =?utf-8?q?Ahelenia_Ziemia=C5=84ska_=3Cnabijaczleweli=40nabijaczleweli=2Exyz?=@codeaurora.org,
-	=?utf-8?q?=3E?=@codeaurora.org
-Cc: 3chas3@gmail.com, linux-atm-general@lists.sourceforge.net,
+ <175198921449.4109948.4233904328306529560.git-patchwork-notify@kernel.org>
+Date: Tue, 08 Jul 2025 15:40:14 +0000
+References: <20250703183459.2074381-1-robh@kernel.org>
+In-Reply-To: <20250703183459.2074381-1-robh@kernel.org>
+To: Rob Herring (Arm) <robh@kernel.org>
+Cc: lorenzo@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, nbd@nbd.name,
+ sean.wang@mediatek.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, elder@kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
@@ -71,17 +74,23 @@ Hello:
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 3 Jul 2025 20:21:16 +0200 you wrote:
-> Signed-off-by: Ahelenia Ziemiańska <nabijaczleweli@nabijaczleweli.xyz>
-> ---
-> v1: https://lore.kernel.org/lkml/h2ieddqja5jfrnuh3mvlxt6njrvp352t5rfzp2cvnrufop6tch@tarta.nabijaczleweli.xyz/t/#u
+On Thu,  3 Jul 2025 13:34:57 -0500 you wrote:
+> Use the newly added of_reserved_mem_region_to_resource{_byname}()
+> functions to handle "memory-region" properties.
 > 
->  drivers/atm/lanai.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> The error handling is a bit different for mtk_wed_mcu_load_firmware().
+> A failed match of the "memory-region-names" would skip the entry, but
+> then other errors in the lookup and retrieval of the address would not
+> skip the entry. However, that distinction is not really important.
+> Either the region is available and usable or it is not. So now, errors
+> from of_reserved_mem_region_to_resource() are ignored so the region is
+> simply skipped.
+> 
+> [...]
 
 Here is the summary with links:
-  - [v2] atm: lanai: fix "take a while" typo
-    https://git.kernel.org/netdev/net-next/c/60687c2c5c3d
+  - net: Use of_reserved_mem_region_to_resource{_byname}() for "memory-region"
+    https://git.kernel.org/netdev/net-next/c/e27dba1951ce
 
 You are awesome, thank you!
 -- 
