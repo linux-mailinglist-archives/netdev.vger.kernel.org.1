@@ -1,79 +1,111 @@
-Return-Path: <netdev+bounces-205125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64CC1AFD7A0
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 21:52:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC520AFD7B9
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 21:57:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA5FE177071
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 19:52:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA9DF1BC246B
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 19:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F3F243379;
-	Tue,  8 Jul 2025 19:51:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61F1123C519;
+	Tue,  8 Jul 2025 19:57:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="nzVRSBrZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jPoIV2N1"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.qs.icloud.com (p-east3-cluster3-host12-snip4-4.eps.apple.com [57.103.86.117])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D38B242D72
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 19:51:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.86.117
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D085A23AB95
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 19:57:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752004295; cv=none; b=Wdja1opBZyshCEiYgJBY0ym5dNNDMPBQUtpf7SmOh1jW5QKFMJkKdW+C6TkEzMHKo1S5M0cF3gM3DwGnCIAzInrABgSIrJirANbNOjnxtnn6EZ65uVGA0w2mLoF5YdIvwBaD1vLCVOeQCI7HuwVdp9IrrgEzYdscTK15mm/7nEU=
+	t=1752004668; cv=none; b=pUAYzkLTEVNj6BtC0J++HwU/M+dq8sToMFhS/sGMVmTtJ6L4mXShDQcZqmEhWst0L6NRe3A8mk9GWtT0UEmCjEr3NPkTVOlw4qQG0e+AkjeZXK39ths2g5GjkFhP8yPT/DaOq4KvJto56bPei656qxyNBVOmVZEanXg6t5Txbag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752004295; c=relaxed/simple;
-	bh=oQVrm4JM1X0wDCMXvmOHv4D9tQl39pOLC72bTquZ9bE=;
-	h=Content-Type:From:Mime-Version:Date:Subject:Message-Id:To; b=LB9XJBSpOcW0P4pGrUUvhyJoqxBQjpEAf/mN3vDWldg9v2tM0kUESTkYIwxAv5mr69H7Ke7Qe6iuWQ7/Y6+RUo37n0F5CUrAFpVhFa7ML5DR8f9J+IfqePu9UezT8diDGZTuIXsE3Xx2dU4F98x7plu8a22Lc1G4/FZr0fHjHqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=nzVRSBrZ; arc=none smtp.client-ip=57.103.86.117
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; bh=oQVrm4JM1X0wDCMXvmOHv4D9tQl39pOLC72bTquZ9bE=;
-	h=Content-Type:From:Mime-Version:Date:Subject:Message-Id:To:x-icloud-hme;
-	b=nzVRSBrZBBHebvkSfTkBZX7N7Hb22MQ+RRukFr4vhyQ25ofrt0QNAWRK936G581By
-	 UXrwQKEbsVgqO6Ep4WayvMiFrcTNxFFGkOttWUK1btMEtfAUFQP8ykZCTgOfTA2RxY
-	 3hvHQzb6DQcW7Ppn0PVfB8D3GZRnjuyzBeVEAr2ejyHroIG7aDarPN/5+quJbQx+4U
-	 2mE+/d0/Z2416BU5ErXqjyT6YVStoPe1iXIQgd5f00ZuT1wx2RDM5q0iY8WPGGKT3N
-	 liEs76iwMal9ShlJDGtwMCgvnH8fYCB1RGg7XvIbuRGJNb0RHqFumzTftYH33NwO/9
-	 X+3iKWslvQ70w==
-Received: from outbound.qs.icloud.com (unknown [127.0.0.2])
-	by outbound.qs.icloud.com (Postfix) with ESMTPS id 3BE2D1800149
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 19:51:31 +0000 (UTC)
-Received: from smtpclient.apple (qs-asmtp-me-k8s.p00.prod.me.com [17.57.155.37])
-	by outbound.qs.icloud.com (Postfix) with ESMTPSA id 2613C1800129
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 19:51:30 +0000 (UTC)
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-From: Giga Meskh <giorgi.meskh@icloud.com>
+	s=arc-20240116; t=1752004668; c=relaxed/simple;
+	bh=3W01dS28+sBmQz557shX2kn/QrQq3Ky2Im+D6oEOqn0=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=bjUhlLO+AueCblLojbLU0jZQIBxmxV8BgTZPnVo3+JiFoXXPqhrUyz1V5jWvrPaDfLLL+m75nALQ07xw+JXdyQGedAQJBa9sOvOnjq9yaCVb26F74rguFyPVvVcEN3JfCNfLtL94gtWr04RnU4gmTkCn60j9kwUWo+lwvcX+Ifo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jPoIV2N1; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752004666;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6HGjclnOAXK9019FQJQ+HU3FhyBNdDo7cnQ/RXk00nA=;
+	b=jPoIV2N1UQTT3LiHX2zBCve2ICbcxNYWuMRXXD6KfwSTNks5/Trdwsy/oJGgeuJYck0Ojc
+	cy4ELVw586qJxB6XJuo5rHbXUcfNjr9UVfT0MeG/kuPZbrLba3LePZ7pedFc1tUy+xolMi
+	p7amcHWYfDSfQsGpQ1QxhSiWp20PQpo=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-627-c2RbVfKTNfuw-4QkRLBgkA-1; Tue,
+ 08 Jul 2025 15:57:39 -0400
+X-MC-Unique: c2RbVfKTNfuw-4QkRLBgkA-1
+X-Mimecast-MFC-AGG-ID: c2RbVfKTNfuw-4QkRLBgkA_1752004657
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 33F3219560AD;
+	Tue,  8 Jul 2025 19:57:35 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.81])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CCCB519560AB;
+	Tue,  8 Jul 2025 19:57:31 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20250708120336.03383758@kernel.org>
+References: <20250708120336.03383758@kernel.org> <20250707102435.2381045-1-dhowells@redhat.com> <20250707102435.2381045-3-dhowells@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    Marc Dionne <marc.dionne@auristor.com>,
+    "David S.
+ Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org,
+    "Junvyyang,
+                         Tencent Zhuque Lab" <zhuque@tencent.com>,
+    Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net 2/2] rxrpc: Fix bug due to prealloc collision
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (1.0)
-Date: Tue, 8 Jul 2025 15:51:29 -0400
-Subject: Giorgi Meskhidze
-Message-Id: <49CA493B-172B-4D4E-A5A1-AB7A9F29FA55@icloud.com>
-To: netdev@vger.kernel.org
-X-Mailer: iPhone Mail (22G5054d)
-X-Proofpoint-ORIG-GUID: PqG51GXmbYZWrFchYIIBp3pB_kxrzYQO
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA4MDE2NyBTYWx0ZWRfX8iO+NUAql26r
- n49uP4MifcIZVziH4AF71t3zMu67IcOweE/THD1BvHKCpmO2ldMHaeQ8EZqtFESDmiNp/8sLgpN
- At3+QxUUnhXLhZ0H4ql0sc2lahPyfbcD0FpCCKUGapGMrcd28+z61Z0navtig24pgf+Zmcx775p
- gHRjk56T2FIR27DaTS7dCMTyQNj4DjUsBrnFAn4YnO0PkK2xLJpehv9x0+p0+3bGStG1IcQ1C8Y
- jdXHfVqkdgeoTwhFLv71WLxTNnKdA9W/4YOYWggqP+zx8dElACLwjY9RRn/VQw3mu2Cp47064=
-X-Proofpoint-GUID: PqG51GXmbYZWrFchYIIBp3pB_kxrzYQO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-08_05,2025-07-08_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0 mlxscore=0 adultscore=0 mlxlogscore=613 spamscore=0
- bulkscore=0 phishscore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.22.0-2506270000 definitions=main-2507080167
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2687075.1752004650.1@warthog.procyon.org.uk>
+Date: Tue, 08 Jul 2025 20:57:30 +0100
+Message-ID: <2687076.1752004650@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-Sent from my iPhone
+> On Mon,  7 Jul 2025 11:24:34 +0100 David Howells wrote:
+> > +	rxrpc_prefail_call(call, RXRPC_CALL_LOCAL_ERROR, -EBADSLT);
+> > +	__set_bit(RXRPC_CALL_RELEASED, &call->flags);
+> 
+> is the __set_bit() needed / intentional here?
+> Looks like rxrpc_prefail_call() does:
+> 
+> 	WARN_ON_ONCE(__test_and_set_bit(RXRPC_CALL_RELEASED, &call->flags));
+
+Actually, it shouldn't be.  I added that first, then realised that wasn't
+sufficient.
+
+I also realised there should be a third patch I failed to restack onto the git
+branch.
+
+Can you take the first patch and I'll alter this and repost this patch and add
+the lost one?  Or should I just repost all three?
+
+David
+
 
