@@ -1,168 +1,135 @@
-Return-Path: <netdev+bounces-204922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23BD2AFC8D0
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 12:48:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68388AFC8C4
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 12:46:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0EAF1666E8
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 10:47:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D54A618913B1
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 10:46:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF38283FE4;
-	Tue,  8 Jul 2025 10:47:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54B3C29A9D2;
+	Tue,  8 Jul 2025 10:46:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mWG37/zX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SOgprKRY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416ED27054B;
-	Tue,  8 Jul 2025 10:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952EE285406;
+	Tue,  8 Jul 2025 10:46:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751971666; cv=none; b=XcQFyvHAhlHdNk7/LXTgRKkoP+ddwPOOmna2kZ2Nq6XO3DjqhkEXvpceZgpGBL770hTRql55pyZNCLcuYzXOfY1gdnwtU7LIqUSyTnkM1/RjuoDkAxibZQHV4TveS5Gy7pSroWGQYHmVb04Lw0jrr7mNJClP/wQTeCZhHFzEPfo=
+	t=1751971583; cv=none; b=ol2Qt0XLvc2Jlk3kLOmOUVSoX0eIXSuaG72zGn/gCIlur71hBjXE23HFU8lK8kaKtmZrI+3Wl6RuLnQH+2viW9rT/iexDzJunpWCXMhFpfYFuKJb6+GhULMnBb+iSpS+D346y7SEkSyQN+Kt6SkqAb2zc+7hIQIL8AffLjjB+7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751971666; c=relaxed/simple;
-	bh=gNF5kIHsZITNZE/wVRzomd+2nIA/Rq2Srm2KIybh62I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r7SYsuouvqVZslcbBd0agw9KE5bYG2+eQrOrLPxUcMnCPVurezCzw+AI9/sxFYyP2VG++QljWlUlZZzVGgQVXbkjRcn6CqhsXZFeliG4OGCpsSof48v0NoC1L/OzesGsNRz3QcTyficVeDPo5kIqqOzEUP2wFUsOH+kglya6obA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mWG37/zX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E57EC4CEED;
-	Tue,  8 Jul 2025 10:47:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751971665;
-	bh=gNF5kIHsZITNZE/wVRzomd+2nIA/Rq2Srm2KIybh62I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mWG37/zXq8qflsPAZPW5mY2kWxxRKIzWGl+K7jvZFoBAI84nbX1aVYz0AZeVgrXki
-	 Ln7zdoEDFlNTYTl+dzs+KAe7I6bqA0Z5QrW4yX8V9cANDEeFXPhkBcDFFMgjCKjjop
-	 tMn4xt9n5mGQbGJ1uQIJoBvDnc1ARZDFH1NNP/HONRVvZcnYVrDbR+lpxrywhoO7jF
-	 hujxHev+nNHFZa+ByzUCT5sTdWR4kDu5dIyXbG7PVc/Ds0WNl0F6vJQv1iLv1zER3v
-	 TYlo9zzHyzv3K4NLKtVr3zAeDdEmRT9X6VDnszpNbr9NBFgx9X+NH+r77L9ZI2WMJt
-	 broObH8AWFYIg==
-Date: Tue, 8 Jul 2025 11:47:40 +0100
-From: Simon Horman <horms@kernel.org>
-To: Michael Dege <michael.dege@renesas.com>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-	Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Subject: Re: [PATCH v2 3/4] net: renesas: rswitch: add offloading for L2
- switching
-Message-ID: <20250708104740.GF452973@horms.kernel.org>
-References: <20250708-add_l2_switching-v2-0-f91f5556617a@renesas.com>
- <20250708-add_l2_switching-v2-3-f91f5556617a@renesas.com>
+	s=arc-20240116; t=1751971583; c=relaxed/simple;
+	bh=ttQdL4tyQurb7Z1wSbCsRxZJsqZPUc/X/CgglrwIu14=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZTwgpqY+pf2qp4Jmo0QfaWQv2oFVFasUs5iXwUaC3xl1N0rIhjIzsYVYZcsbMc5S6D21Nql/sDCG0kGa/cqlfSF2STDLuY7CtrYV9kQeNIAbenLVNYzs51909f4ppmEGJIjqVtAxzqwe3gCZWhZjIPay5+k112RZiSNN3WuvGoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SOgprKRY; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-6097d144923so8635862a12.1;
+        Tue, 08 Jul 2025 03:46:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751971580; x=1752576380; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bSzcIEqfBflq6COaUtvcLoPgJp3tB4sR1/TnOwFihkA=;
+        b=SOgprKRYqIpbW8DXPVRJdagcwxSYNWGoMEJj7hwwBVXxlVM13CGz8X5abrJBEEXO+5
+         nN+WPOR+lqVeuw0gKWa/MCBwnl4UwA0vbhJBzIOnlBEvZw8sEDzTa6PlhcRJKqebEEKf
+         V9wv6SUeHXISVFE1o2UeUq4M2CXKSw9wc2PRlcA7LnbUUj2mlNmMIVoUPPU8Hhiy0h6C
+         6fWaecI9Oe+XC7AtrBcfnIqTgM1LnkAEwK4k7+Cb/B6x8rmVNa0boA2e57CnQHd1WkKH
+         kzN3Bx7dhVhmtjkLljwioxpRAH4oZMDUlNk1a1Ya7T7IzdJ6lVdmJ5p4sxvuhjBE/7o2
+         Kvxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751971580; x=1752576380;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bSzcIEqfBflq6COaUtvcLoPgJp3tB4sR1/TnOwFihkA=;
+        b=pgqTBwOj39EEzhZaP/HDDUMGlXLmfUZM/fs7uOOht8ZRYe+wJJfY+5sHrWUnhsTzOY
+         f5kPU+Ut6e28B6yzrrwMWdVUy9RlmpOxGYbSJ7n+K47Ms4vIGni/rQ1a/nBvnN3Ied0g
+         QzY0aBAlLLGNP+EB5BOpFdZRNxw32HR48NkFU7RuvqEyRw2DPDq6RSQ6uoImFf1Rb9vv
+         bZvxSBGI4EvhDf3lAdLktsEzsPAChKOSDoHel38Lqy1JaOeMFp89F+0DqWhm5WhrnXPk
+         fPdfVvyGvS3diQS+SWGxsEWdKPnhYVPIi8xKOIc3YU/Lmo9DkZSvH1rm9JfW3Q1HnVSs
+         iPUw==
+X-Forwarded-Encrypted: i=1; AJvYcCUGQgtEANpyRuwtAoNERW6hCgqTOR5cfy+CJcQn4sypC2PNlhOZUYCMWhY+LrTfdt/f6ACPM821VbyvYmo=@vger.kernel.org, AJvYcCV8qo1KGAmzuCz7fypakPJ5ldELwwVvphdkwSWRZeB/4+3Ga5UYI+kXkFapatYYwn1UQpHrgu0J@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUzyMROOEQ7HZ4Kz0sB3e3lAiiZlHvDYI/TVLmWKhmQd9GuL6j
+	jfSxxnepH2NRP3QkhbymJKVIlN51tBFHnEYZrMX2L0xCOPgolxiTTeFA
+X-Gm-Gg: ASbGncseQxE7FGSKEfGnYXDZAvItTI5uM8hAcCDylH8EBunW9y9hLFr5sXtsb0fOw5D
+	o/FZdvr+eo3Gem62Bt4fP7n3WZdl7Rk23GK0cR2W04chOFM+3+BhK2oil8M1/0ZyH6XBazdlH3a
+	GYsS163KZB3adkLJvjIGgVMvWPpl3QJ8mihn9BwD3DagS/cxk/Uj8rLOibmqoxGV9utY2XaWH/+
+	WW3Hah0rTyf2Rc4Iueof3cDib7G3JrzNX8ygaNWVfstx+sdllk7UTw7ipnIJHyOFFhU4bcfuys5
+	R4G7k7bRJYE/M5KBK8K2qlvQ0O4kMpSgt/zgJEhI8n8zJZyjyyR3wNW0AVxVbMYGwN/QXMAJDZU
+	=
+X-Google-Smtp-Source: AGHT+IGW8g7ypOx9xc5K0Ao5r6G+yDtrL+5c3NK/QrAUPDGwatJ+zP5X+l3M8rjoQKaiPuNFWlUIQg==
+X-Received: by 2002:a05:6402:691:b0:609:a4af:ae8 with SMTP id 4fb4d7f45d1cf-6104c079afemr1674355a12.11.1751971579599;
+        Tue, 08 Jul 2025 03:46:19 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::1ac? ([2620:10d:c092:600::1:4dfd])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-60fc81a70e4sm6850991a12.0.2025.07.08.03.46.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Jul 2025 03:46:18 -0700 (PDT)
+Message-ID: <edff4079-294e-4428-a2fa-f69bf9578785@gmail.com>
+Date: Tue, 8 Jul 2025 11:47:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250708-add_l2_switching-v2-3-f91f5556617a@renesas.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next 1/4] net: Allow non parent devices to be used for
+ ZC DMA
+To: Mina Almasry <almasrymina@google.com>,
+ Dragos Tatulea <dtatulea@nvidia.com>
+Cc: Parav Pandit <parav@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Cosmin Ratiu <cratiu@nvidia.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20250702172433.1738947-1-dtatulea@nvidia.com>
+ <20250702172433.1738947-2-dtatulea@nvidia.com>
+ <20250702113208.5adafe79@kernel.org>
+ <c5pxc7ppuizhvgasy57llo2domksote5uvo54q65shch3sqmkm@bgcnojnxt4hh>
+ <20250702135329.76dbd878@kernel.org>
+ <CY8PR12MB7195361C14592016B8D2217DDC43A@CY8PR12MB7195.namprd12.prod.outlook.com>
+ <22kf5wtxym5x3zllar7ek3onkav6nfzclf7w2lzifhebjme4jb@h4qycdqmwern>
+ <CAHS8izN-yJ1tm0uUvQxq327-bU1Vzj8JVc6bqns0CwNnWhc_XQ@mail.gmail.com>
+ <sdy27zexcqivv4bfccu36koe4feswl5panavq3t2k6nndugve3@bcbbjxiciaow>
+ <CAHS8izPTBY9vL-H31t26kEc4Y4UEMm+jW0K0NtbqmcsOA9s4Cw@mail.gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izPTBY9vL-H31t26kEc4Y4UEMm+jW0K0NtbqmcsOA9s4Cw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 08, 2025 at 11:27:39AM +0200, Michael Dege wrote:
-> This commit adds hardware offloading for L2 switching on R-Car S4.
+On 7/7/25 22:55, Mina Almasry wrote:
+> On Mon, Jul 7, 2025 at 2:35 PM Dragos Tatulea <dtatulea@nvidia.com> wrote:
+...>> Right. My patches show that. But the issue raised by Parav is different:
+>> different queues can belong to different DMA devices from different
+>> PFs in the case of Multi PF netdev.
+>>
+>> io_uring can do it because it maps individual buffers to individual
+>> queues. So it would be trivial to get the DMA device of each queue through
+>> a new queue op.
+>>
 > 
-> On S4 brdev is limited to one per-device (not per port). Reasoning
-> is that hw L2 forwarding support lacks any sort of source port based
-> filtering, which makes it unusable to offload more than one bridge
-> device. Either you allow hardware to forward destination MAC to a
-> port, or you have to send it to CPU. You can't make it forward only
-> if src and dst ports are in the same brdev.
-> 
-> Signed-off-by: Michael Dege <michael.dege@renesas.com>
-> Signed-off-by: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+> Right, devmem doesn't stop you from mapping individual buffers to
+> individual queues. It just also supports mapping the same buffer to
+> multiple queues. AFAIR, io_uring also supports mapping a single buffer
+> to multiple queues, but I could easily be very wrong about that. It's
 
-...
+It doesn't, but it could benefit from sharing depending on userspace,
+so it might eventually come to the same problem.
 
-> diff --git a/drivers/net/ethernet/renesas/rswitch_l2.c b/drivers/net/ethernet/renesas/rswitch_l2.c
+-- 
+Pavel Begunkov
 
-...
-
-> +static void rswitch_update_offload_brdev(struct rswitch_private *priv,
-> +					 bool force_update_l2_offload)
-> +{
-> +	struct net_device *offload_brdev = NULL;
-> +	struct rswitch_device *rdev, *rdev2;
-> +
-> +	rswitch_for_all_ports(priv, rdev) {
-> +		if (!rdev->brdev)
-> +			continue;
-> +		rswitch_for_all_ports(priv, rdev2) {
-> +			if (rdev2 == rdev)
-> +				break;
-> +			if (rdev2->brdev == rdev->brdev) {
-> +				offload_brdev = rdev->brdev;
-> +				break;
-> +			}
-> +		}
-> +		if (offload_brdev)
-> +			break;
-> +	}
-> +
-> +	if (offload_brdev == priv->offload_brdev) {
-> +		if (offload_brdev && force_update_l2_offload)
-> +			rswitch_update_l2_offload(priv);
-> +		return;
-> +	}
-> +
-> +	if (offload_brdev && !priv->offload_brdev)
-> +		dev_dbg(&priv->pdev->dev, "starting l2 offload for %s\n",
-> +			netdev_name(offload_brdev));
-> +	else if (!offload_brdev && priv->offload_brdev)
-> +		dev_dbg(&priv->pdev->dev, "stopping l2 offload for %s\n",
-> +			netdev_name(priv->offload_brdev));
-> +	else
-> +		dev_dbg(&priv->pdev->dev,
-> +			"changing l2 offload from %s to %s\n",
-> +			netdev_name(priv->offload_brdev),
-> +			netdev_name(offload_brdev));
-
-Smatch flags a false-positive about possible NULL references by the
-netdev_name() calls on the line above.
-
-Due to the previous if statement it seems to me that cannot occur.
-But it did take me a few moments to convince myself of that.
-
-So while I don't think we should write our code to static analysis tooling.
-I did play around a bit to see if I could come up with something that is
-both easier on the eyes and keeps Smatch happy.
-
-Perhaps it isn't easier on the eyes, but rather I'm just more familiar with
-the code now. But in any case, I'm sharing what I came up with in case it
-is useful. (Compile tested only!).
-
-
-        if (!offload_brdev && !priv->offload_brdev)
-                return;
-
-        if (!priv->offload_brdev)
-                dev_dbg(&priv->pdev->dev, "starting l2 offload for %s\n",
-                        netdev_name(offload_brdev));
-        else if (!offload_brdev)
-                dev_dbg(&priv->pdev->dev, "stopping l2 offload for %s\n",
-                        netdev_name(priv->offload_brdev));
-        else if (offload_brdev != priv->offload_brdev)
-                dev_dbg(&priv->pdev->dev,
-                        "changing l2 offload from %s to %s\n",
-                        netdev_name(priv->offload_brdev),
-                        netdev_name(offload_brdev));
-        else if (!force_update_l2_offload)
-                return;
-
-> +
-> +	priv->offload_brdev = offload_brdev;
-> +
-> +	rswitch_update_l2_offload(priv);
-> +}
-
-...
 
