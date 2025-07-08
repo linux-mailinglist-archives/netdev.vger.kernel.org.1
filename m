@@ -1,112 +1,95 @@
-Return-Path: <netdev+bounces-205041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5943AAFCF6C
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 17:39:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E33CCAFCF71
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 17:40:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AB913B5B1A
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:38:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C3963A35D7
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A7262E11A9;
-	Tue,  8 Jul 2025 15:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 791B92E0929;
+	Tue,  8 Jul 2025 15:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n9PbLbQ9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M7WxHPgG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE892E11C3;
-	Tue,  8 Jul 2025 15:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49831261595;
+	Tue,  8 Jul 2025 15:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751989109; cv=none; b=lv5Juoufd5tSAGXpT646DF/9c9ujnrM11/IQUS7KCQmjBswhRJov3BoNNFqAq5zQl7Hne8iLyXCwOFTJE6CRqAQNDQQWjlX9vMqkJMRvDB089HTo0dDpmjRtMiu20f/fYLkyYybU5OaweZnxOi+/qqiiN0ODXNmzs5sBPBEe8KM=
+	t=1751989183; cv=none; b=AXrlJ/K9eifMbeQYrkRyd6WNWt1Qhqw92gqChbIg9n0eQfCt6qZ/pQJV4TO/ckLqITTAD6GtloFjwHgNVqjV//LEAA4JHCjudcrMUqziqv95sbR4pI6Pmc6lSB78TASmgQixxp5cfeGbhJ7LKWmq+DmY7WNOSancmAKxN7+ZCQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751989109; c=relaxed/simple;
-	bh=oDEtOf0DaTfsiKg+dTzSTHuTGeQPH+ZbPyfhdxIehAo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eW08wBY+XfVNgVtn349kE7r9sfIzH7/ZuudxD0cvllf9PWIdSR7boJG0XmwudHt9cP57g0D5pihnB4rb4cqrtFVjEm/Z25ZCqYveItltAW4H3ltr/rTyI01NJDDIBUiXMJqVoiR1ofdAru4bXgbTJTayJv9P48+Ly/KNWo/ka8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n9PbLbQ9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D598C4CEED;
-	Tue,  8 Jul 2025 15:38:26 +0000 (UTC)
+	s=arc-20240116; t=1751989183; c=relaxed/simple;
+	bh=3uJaLMDGxq7dEIsrm2iuxqbE/biEgPL0woqTvJAxdqs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=fMC7xJ3KhmdlZHFE8D3t+B/vgC8+FrBqYTRW4NDbTN6NL9M+1wOJvQRXkTNkWwxzyBUdl2+wsJOoOt6jpPySqRoGWXx8ZDxigW0klT09h5YnKMwrrAGrcABIihE6/Ff6TrRGDt/DG4tg5c0b19iuET1oX5tj6P9oMX2yKWVxKCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M7WxHPgG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC9AFC4CEF9;
+	Tue,  8 Jul 2025 15:39:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751989108;
-	bh=oDEtOf0DaTfsiKg+dTzSTHuTGeQPH+ZbPyfhdxIehAo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n9PbLbQ9DxyvF2ZYdhO1L4fP9gUwKnXhGM1vEeabzvph5jN6AV4yyjNFpoTbw47f8
-	 S+Q8aAyfjkbCC4pqyV/qXa6M7F1y3K4Bp4CO5nSq/brqJz1Zci6a2rEyTsrvDzMyNY
-	 nHwAL0wmnYEM6YQF+Ij9iWqGjwWDaozG7oiav3//lv4qzSibydlDld+Ll1w8wng+m3
-	 bwVM80Xtw47Kh394C0tlvIXGvzgHgG6G/pcy+Rulh9/EueQA+imWyC32h9wvtz78ay
-	 U1Dh1lp4MfCN4dJ04q+S0S8YVRp1xsdKJP5ajdH4exlxyhPglxhKdE/gq20mPJuB2g
-	 Wc7OXHmbYDqOA==
-Date: Tue, 8 Jul 2025 16:38:24 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yuto Ohnuki <ytohnuki@amazon.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Kohei Enju <enjuk@amazon.com>
-Subject: Re: [PATCH iwl-next v1] igbvf: remove unused fields from struct
- igbvf_adapter
-Message-ID: <20250708153824.GM452973@horms.kernel.org>
-References: <20250707180116.44657-2-ytohnuki@amazon.com>
+	s=k20201202; t=1751989182;
+	bh=3uJaLMDGxq7dEIsrm2iuxqbE/biEgPL0woqTvJAxdqs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=M7WxHPgGke5vGo5mIjMVRSDpsiFORtah5Y+YXENqW0HFFi9U4+UlFosXLuhQU+bXM
+	 52EFVgtOdkqBIpvkvdeVbNsHonIx4XCGbmGnL99C/EOaVAOtKHSwQXXHoW5Sjjjduh
+	 uPiY+9Nay8A7EXLVSMIikkqgl2JDwg0Dn6HW4HNMvBsGB60Rnwc1nT9WHdBfr5ognM
+	 N3x1qxPwNxFp5WZvK8umJ53oWNML4FatXIbwOa+3/roqb+Jf6lnonE0Sl1CxsdLiZz
+	 fF4+1HBA12L9uwBz5TEzgEQtFlRPM/Nen05RDx5PK+Vl1PB4l1EYN6XUO/Y354ThNT
+	 tYFV432lO7WNQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB153380DBEE;
+	Tue,  8 Jul 2025 15:40:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250707180116.44657-2-ytohnuki@amazon.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] net: ethernet: rtsn: Fix a null pointer dereference in
+ rtsn_probe()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <175198920590.4109948.2039600149085241168.git-patchwork-notify@kernel.org>
+Date: Tue, 08 Jul 2025 15:40:05 +0000
+References: <20250703100109.2541018-1-haoxiang_li2024@163.com>
+In-Reply-To: <20250703100109.2541018-1-haoxiang_li2024@163.com>
+To: Haoxiang Li <haoxiang_li2024@163.com>
+Cc: niklas.soderlund@ragnatech.se, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
 
-On Mon, Jul 07, 2025 at 07:01:17PM +0100, Yuto Ohnuki wrote:
-> Remove following unused fields from struct igbvf_adapter that are never
-> referenced in the driver.
-> 
-> - blink_timer
-> - eeprom_wol
-> - fc_autoneg
-> - int_mode
-> - led_status
-> - mng_vlan_id
-> - polling_interval
-> - rx_dma_failed
-> - test_icr
-> - test_rx_ring
-> - test_tx_ring
-> - tx_dma_failed
-> - tx_fifo_head
-> - tx_fifo_size
-> - tx_head_addr
-> 
-> Also removed the following fields from struct igbvf_adapter since they
-> are never read or used after initialization by igbvf_probe() and igbvf_sw_init().
-> 
-> - bd_number
-> - rx_abs_int_delay
-> - tx_abs_int_delay
-> - rx_int_delay
-> - tx_int_delay
-> 
-> This changes simplify the igbvf driver by removing unused fields, which
-> improves maintenability.
-> 
-> Tested-by: Kohei Enju <enjuk@amazon.com>
-> Signed-off-by: Yuto Ohnuki <ytohnuki@amazon.com>
-> ---
->  drivers/net/ethernet/intel/igbvf/igbvf.h  | 25 -----------------------
->  drivers/net/ethernet/intel/igbvf/netdev.c |  7 -------
->  2 files changed, 32 deletions(-)
+Hello:
 
-Less is more :)
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+On Thu,  3 Jul 2025 18:01:09 +0800 you wrote:
+> Add check for the return value of rcar_gen4_ptp_alloc()
+> to prevent potential null pointer dereference.
+> 
+> Fixes: b0d3969d2b4d ("net: ethernet: rtsn: Add support for Renesas Ethernet-TSN")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Haoxiang Li <haoxiang_li2024@163.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2] net: ethernet: rtsn: Fix a null pointer dereference in rtsn_probe()
+    https://git.kernel.org/netdev/net/c/95a234f6affb
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
