@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-204925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48067AFC8F1
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 12:53:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E578AFC8FA
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 12:55:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27B3D1BC51F5
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 10:54:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F6757A1F68
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 10:53:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF332D9EDC;
-	Tue,  8 Jul 2025 10:53:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0356C2C3769;
+	Tue,  8 Jul 2025 10:54:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XGyi8GX/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B6ejZmVL"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7BF2D9EC5
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 10:53:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E3FC2D23A6
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 10:54:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751971984; cv=none; b=dloekCGtbGbENZbQgDVYEgF44aYGwluKbFv+dD/yxeK80rxoDlsUgzReFhRXlm9TjoFljNenGZMwCtH6qGkMHTcsdmo3k6/64CKQ8rv5iJ7hLwsWkomT5vZ/aolnwQCIbZL8teohZDOfqVYNk8jck9y0RbiBb5j2tj7CxfjPP0A=
+	t=1751972091; cv=none; b=Rwl7+0D+NZcQjeyVIK+XpjdD82hzdfuz5Q/2zUIFU77PiOwEXjDL4Rv9MwtG7LSMt2QQKWMQAjOUfofzLmGlfvFR3MUd29+ldHOtddcd0odWSMeLerzzI0+8j1jkPQFwQQVa5lNtM/248luMu13GPKewxK3YTYQhSJ8XAr34x7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751971984; c=relaxed/simple;
-	bh=1un7ouFwyBTSYIMY4zpatIXNYHrEz24iVPhqyQXJbbc=;
+	s=arc-20240116; t=1751972091; c=relaxed/simple;
+	bh=pt6duYiMCIehtx4IxrjJmNZ1YzZaoG3aJy7HoAatvQw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XbVND3tLEKSFoZNvKAIOwqdOSAu0Jh1nae/GgkBZ8TmyLvUjAUxn3TigzOT5VtSDbL/wyocMRqL+Npt7wAph2iw+spOdKl7zYiWlMwGP8Ly5y+M1JykTBM29sstGO4i2DEaUuGrDtTTXUFKZR/FszLvOF5ylNG5Vf6LW54UnpJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XGyi8GX/; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=QeAXVZdw5QKbmY4WPJCwmELQU5YNVztNH2lvHrMTkWQshWsgon6fPqHx6rUlD4PxIwzEe8dsaBDc4iv4sHO4y6hYKoa4j/pWmOWh17f932dkbflooK1pcAhDES7LJsaaGh63xQMazjRzHQU5ATnoNgC6QQBowmJYwtzCCvmGkBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B6ejZmVL; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1751971981;
+	s=mimecast20190719; t=1751972088;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=315fIenJWHN1D0z1wGXcALO7wPGrPSPVrNC7//PcDEU=;
-	b=XGyi8GX/BAF+tOmfHqd+RUxlCdsxzRVbD05HGxZ4kjHqn77OVe3cH1oDFRK3iEp19O6miC
-	2iYcWQ5gEJbkXmhZcZg5rxFWU3tGzHXpC+KHzOz5S7HI46bCAzBuyNEOWIDBOcmME0ehI0
-	4hpTPjKK1AOxhEM86Axbj1IeOsakvVs=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=6zVRF5eqOqy+l/yn1UXOkezwlr4g/SUUPIur6RAL+Y0=;
+	b=B6ejZmVLAb453YCu9tDrgsP68cdGmHBOCoHdKJDaCXAovhQY1nyfCA3Mdolrzp+f2+4GkB
+	I5DFlk+12RAxRqmPk7l6RjrwTOGapKRNT1TfVBARLD/MSesHJ0T3SI2tG841d7Wx5Fx1f7
+	xTRXuTEUj2nsWlXH0GG8OyWIADTDWM8=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-642-pAiSfsVfNL6z-0_MKakiGA-1; Tue, 08 Jul 2025 06:53:00 -0400
-X-MC-Unique: pAiSfsVfNL6z-0_MKakiGA-1
-X-Mimecast-MFC-AGG-ID: pAiSfsVfNL6z-0_MKakiGA_1751971980
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4a58f455cdbso56592231cf.3
-        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 03:53:00 -0700 (PDT)
+ us-mta-208--cZxe2dQNMKqGMvHxOxZzQ-1; Tue, 08 Jul 2025 06:54:47 -0400
+X-MC-Unique: -cZxe2dQNMKqGMvHxOxZzQ-1
+X-Mimecast-MFC-AGG-ID: -cZxe2dQNMKqGMvHxOxZzQ_1751972087
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7d38fe2eff2so590132685a.2
+        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 03:54:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751971980; x=1752576780;
+        d=1e100.net; s=20230601; t=1751972087; x=1752576887;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=315fIenJWHN1D0z1wGXcALO7wPGrPSPVrNC7//PcDEU=;
-        b=WxK3s8yH9007uHmb1HER+1fAwCAijxyIJLtuNjoqh0BPscuZK/R7YGNh4N7Xt3eoW1
-         KEeJZk5MmIj87tWdp5tYpxiTqpFP5LonH1/AsqG/2xZXmSbrBs0TPjmQtD5oMQLEWqTm
-         dxZ8i7mNwTCbMxrEiU2OanogIuMf78ZnbcvOh/RiNj/zqP3jXZaW+bp/sJQf/oeF2osZ
-         ZpiYoCKKFF7B8pxnxG7bjNz03Cv9Lkt9viTFXUKYgaJxppiAtbtyG8ubXPVLq+5+BBN5
-         L8DBAxZH0QJqIUliRIEu6PsiDzDyv13yZhvsLtf+AmV3EOR5or5sblhjM9iz99GzU1md
-         f3EA==
-X-Forwarded-Encrypted: i=1; AJvYcCX1UuzufHmL/k3VU2jLABDcc58M083rrPzgonEqprhwQO/F63xGJdYemp6nWGba2/4qJnrPpiU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyB0jcfVUXeTRloOOLKjlIyQ+la4tqLifG29cwXe1pg1JbGiHvD
-	VMeTjW+xzpTiDif7bJFEmWJUlpLtbkKByPnAvB3zApk5m9hRJExrqqGpH8Z0ax9jv2GqZCaOtSU
-	CtG2MBA4w6QJfvryykbt8mOgOkqdxluxHJrT4J4+YudHukUPcWBjxwmBmvw==
-X-Gm-Gg: ASbGncuWYNdtQPquMZevqe341IHvfiMNI4rVJyXeI+aElGNK2qNM0rjRzCkoQHuz1kL
-	W+u00HKeky5O4is505l50EU8Wx5MiDXMXGmxphHJC0eV1pctQbg/pcIHD0OqfeYtAllR0zbWqt0
-	5LWvgNEGmYk7eLcPDYIEqnDVOe6mAhQVhMok0MSfmWnU6dgm6RzyzgKjhIF1U94/oB/D2jEWzBV
-	aIthCuReE407N0x4L9dTOA9djJnWM+R98pO7dvCan/vS3ZtnhDOIU2FhM1QebQh98+qF0QYKYXC
-	UxiqLLAX22yJ5JXgkrG3l+eGsVxs
-X-Received: by 2002:ac8:7f95:0:b0:4a9:ae5a:e8a6 with SMTP id d75a77b69052e-4a9ae5afc23mr175966931cf.47.1751971979586;
-        Tue, 08 Jul 2025 03:52:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFzvc7u8j+WEd/fQJxoq873TigcJMGy49ozcWVyaqRVCjfg4qBqi9tMZtBOChGJAAMzAMDFrQ==
-X-Received: by 2002:ac8:7f95:0:b0:4a9:ae5a:e8a6 with SMTP id d75a77b69052e-4a9ae5afc23mr175966551cf.47.1751971979134;
-        Tue, 08 Jul 2025 03:52:59 -0700 (PDT)
+        bh=6zVRF5eqOqy+l/yn1UXOkezwlr4g/SUUPIur6RAL+Y0=;
+        b=Ymb2DeYPuzqoFaO++CFiIH+QCqAQHe0y3aIcZR3kmvRerY1OHaRda9X9ZVrGcDu48v
+         m9bTC4gCF43GImN0d5A9sTGnD+rdkIZqKrOwS5DfVXK5qp4NhEDRB2RcIerA3YpMDCDM
+         JZfccKTHfFEGVLzEl39OzG3eD1tRfFydMUD4af4nnB6sA+3M9ylASDZ0H3RleQBBOiWf
+         YrcrF6XAkeHx+Iy1fMmYBCKLmBDesJTRgk7Lan2cRqcJGo/kRDRzDG4UqZxXQGOmH5RY
+         23ruDpVM+o/Ly63jJ5XE3gcztFwm2X0qAtWdgbEBRx2/sH3Dji9ZO8F65U5eL/ftTmaY
+         /q6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUnO/BXj+ANYBNmiRe0eaBz2v9daAoyMlCBWN4UD3ubWvAbQE5kBNTCIhHeVkNoudIdgvz/8NU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIZsFSFSQIFJ9SD7peNzsFwGLoXowKyxLmbdfkOaN61GrcjR/+
+	UzVcu+LsktcdOZvoDPY0s6DHDcBC/MzYqFKb3flglRpY0c7C7r2Y+b/4Tc9b6SCee8Zy+fM28Gp
+	kaCCTLtFJXHDoFcGlSp7KeMeILCgWr8AJtdgLhFHlQIrfy9JiYUQmks/OXw==
+X-Gm-Gg: ASbGncuN93JsS2xPwog+5KNSsVWA5+2r3qRk1FRl6AE+68u9qweilQaDflav8wxFgly
+	O6kkCwQkJSecIT1z9/bqo7Ji5kyE1SkyWjYc92DBh8bDul6B8aTdwdN2tmjXJjoaRKdjAw4W8Sn
+	rb7ijZFz/zr35g0+wbCpUeq8C9yY7tQ3lUukiwMJGdi/NEy3Y8GVNQlWNGgF4FG0jXgCWc49W/6
+	s0qu8W7v3wqvVGkOPLGuV9Moyn8Le9hIo2m5WhJ8ZZwHB6BLwPIKSFGF/ybjXjIf1KeZbE1DNUd
+	bIZnE8g+Q6mzktn8F51V9rFHpfXf
+X-Received: by 2002:a05:620a:4089:b0:7d3:8f51:a5a5 with SMTP id af79cd13be357-7da04137a83mr344297185a.51.1751972087261;
+        Tue, 08 Jul 2025 03:54:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGODJ+k5iQwpBD8zrN9hRkPcNeibB7riAG/EN8ncnQ9dHTW0DTOP7oRQy4VBda/jQ7Oc5xqfg==
+X-Received: by 2002:a05:620a:4089:b0:7d3:8f51:a5a5 with SMTP id af79cd13be357-7da04137a83mr344292285a.51.1751972086595;
+        Tue, 08 Jul 2025 03:54:46 -0700 (PDT)
 Received: from sgarzare-redhat ([193.207.147.103])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a994aa85edsm77449631cf.74.2025.07.08.03.52.54
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7d5dbe8f861sm757715685a.86.2025.07.08.03.54.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jul 2025 03:52:58 -0700 (PDT)
-Date: Tue, 8 Jul 2025 12:52:51 +0200
+        Tue, 08 Jul 2025 03:54:46 -0700 (PDT)
+Date: Tue, 8 Jul 2025 12:54:37 +0200
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: Xuewei Niu <niuxuewei.nxw@antgroup.com>
 Cc: "K. Y. Srinivasan" <kys@microsoft.com>, 
@@ -87,10 +87,11 @@ Cc: "K. Y. Srinivasan" <kys@microsoft.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
 	linux-hyperv@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, niuxuewei97@gmail.com
-Subject: Re: [PATCH net-next v6 2/4] vsock: Add support for SIOCINQ ioctl
-Message-ID: <lh5vti5lmcxddhnfsz5pjhu7oepcbxcflqkyhlpwnwqzbe7tku@yw7bwfgafcby>
+Subject: Re: [PATCH net-next v6 3/4] test/vsock: Add retry mechanism to ioctl
+ wrapper
+Message-ID: <xvteph5sh4wkvfaa754xxakufgwkjzjawzfttnfqcvmei2zcpf@ig6fawckff2h>
 References: <20250708-siocinq-v6-0-3775f9a9e359@antgroup.com>
- <20250708-siocinq-v6-2-3775f9a9e359@antgroup.com>
+ <20250708-siocinq-v6-3-3775f9a9e359@antgroup.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,53 +100,96 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250708-siocinq-v6-2-3775f9a9e359@antgroup.com>
+In-Reply-To: <20250708-siocinq-v6-3-3775f9a9e359@antgroup.com>
 
-On Tue, Jul 08, 2025 at 02:36:12PM +0800, Xuewei Niu wrote:
->Add support for SIOCINQ ioctl, indicating the length of bytes unread in the
->socket. The value is obtained from `vsock_stream_has_data()`.
+On Tue, Jul 08, 2025 at 02:36:13PM +0800, Xuewei Niu wrote:
+>Wrap the ioctl in `ioctl_int()`, which takes a pointer to the actual
+>int value and an expected int value. The function will not return until
+>either the ioctl returns the expected value or a timeout occurs, thus
+>avoiding immediate failure.
 >
 >Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
 >---
-> net/vmw_vsock/af_vsock.c | 22 ++++++++++++++++++++++
-> 1 file changed, 22 insertions(+)
+> tools/testing/vsock/util.c | 30 +++++++++++++++++++++---------
+> tools/testing/vsock/util.h |  1 +
+> 2 files changed, 22 insertions(+), 9 deletions(-)
 
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
 >
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 2e7a3034e965db30b6ee295370d866e6d8b1c341..bae6b89bb5fb7dd7a3a378f92097561a98a0c814 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1389,6 +1389,28 @@ static int vsock_do_ioctl(struct socket *sock, unsigned int cmd,
-> 	vsk = vsock_sk(sk);
+>diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+>index 803f1e075b62228c25f9dffa1eff131b8072a06a..1e65c5abd85b8bcf5886272de15437d7be13eb89 100644
+>--- a/tools/testing/vsock/util.c
+>+++ b/tools/testing/vsock/util.c
+>@@ -17,6 +17,7 @@
+> #include <unistd.h>
+> #include <assert.h>
+> #include <sys/epoll.h>
+>+#include <sys/ioctl.h>
+> #include <sys/mman.h>
+> #include <linux/sockios.h>
 >
-> 	switch (cmd) {
->+	case SIOCINQ: {
->+		ssize_t n_bytes;
->+
->+		if (!vsk->transport) {
->+			ret = -EOPNOTSUPP;
->+			break;
->+		}
->+
->+		if (sock_type_connectible(sk->sk_type) &&
->+		    sk->sk_state == TCP_LISTEN) {
->+			ret = -EINVAL;
->+			break;
->+		}
->+
->+		n_bytes = vsock_stream_has_data(vsk);
->+		if (n_bytes < 0) {
->+			ret = n_bytes;
->+			break;
->+		}
->+		ret = put_user(n_bytes, arg);
->+		break;
->+	}
-> 	case SIOCOUTQ: {
-> 		ssize_t n_bytes;
+>@@ -101,28 +102,39 @@ void vsock_wait_remote_close(int fd)
+> 	close(epollfd);
+> }
 >
+>-/* Wait until transport reports no data left to be sent.
+>- * Return false if transport does not implement the unsent_bytes() callback.
+>+/* Wait until ioctl gives an expected int value.
+>+ * Return false if the op is not supported.
+>  */
+>-bool vsock_wait_sent(int fd)
+>+bool vsock_ioctl_int(int fd, unsigned long op, int expected)
+> {
+>-	int ret, sock_bytes_unsent;
+>+	int actual, ret;
+>+	char name[32];
+>+
+>+	snprintf(name, sizeof(name), "ioctl(%lu)", op);
+>
+> 	timeout_begin(TIMEOUT);
+> 	do {
+>-		ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
+>+		ret = ioctl(fd, op, &actual);
+> 		if (ret < 0) {
+> 			if (errno == EOPNOTSUPP)
+> 				break;
+>
+>-			perror("ioctl(SIOCOUTQ)");
+>+			perror(name);
+> 			exit(EXIT_FAILURE);
+> 		}
+>-		timeout_check("SIOCOUTQ");
+>-	} while (sock_bytes_unsent != 0);
+>+		timeout_check(name);
+>+	} while (actual != expected);
+> 	timeout_end();
+>
+>-	return !ret;
+>+	return ret >= 0;
+>+}
+>+
+>+/* Wait until transport reports no data left to be sent.
+>+ * Return false if transport does not implement the unsent_bytes() callback.
+>+ */
+>+bool vsock_wait_sent(int fd)
+>+{
+>+	return vsock_ioctl_int(fd, SIOCOUTQ, 0);
+> }
+>
+> /* Create socket <type>, bind to <cid, port>.
+>diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+>index fdd4649fe2d49f57c93c4aa5dfbb37b710c65918..142c02a6834acb7117aca485b661332b73754b63 100644
+>--- a/tools/testing/vsock/util.h
+>+++ b/tools/testing/vsock/util.h
+>@@ -87,6 +87,7 @@ int vsock_stream_listen(unsigned int cid, unsigned int port);
+> int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
+> 			   struct sockaddr_vm *clientaddrp);
+> void vsock_wait_remote_close(int fd);
+>+bool vsock_ioctl_int(int fd, unsigned long op, int expected);
+> bool vsock_wait_sent(int fd);
+> void send_buf(int fd, const void *buf, size_t len, int flags,
+> 	      ssize_t expected_ret);
 >
 >-- 
 >2.34.1
