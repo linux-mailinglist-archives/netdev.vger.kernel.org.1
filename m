@@ -1,133 +1,136 @@
-Return-Path: <netdev+bounces-204748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C4EBAFBF57
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 02:44:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D2C2AFBF63
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 02:45:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B099426E08
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 00:43:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 395FD4A33C1
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 00:45:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA241E47BA;
-	Tue,  8 Jul 2025 00:43:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C1D321A443;
+	Tue,  8 Jul 2025 00:43:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CoREUBop"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tPAZdu6T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3787B1DFE22;
-	Tue,  8 Jul 2025 00:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85C4218EA1;
+	Tue,  8 Jul 2025 00:43:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751935423; cv=none; b=XhKAqG84CjoulJ1H5bE6UAOcgQ8v7bNsK6lApGdgXNRBo1hJDWJDw2K4GZXsRzz5NC8jz43FUsFjb4NkES1j/5nPNbh8hjAaCJvXmOMCU8k5ed59by4ostpLfvt5n5kT1G5DzAR72B8Hvel9uvSnmbL0ujs7T2HC8b1MOQXgT4Y=
+	t=1751935427; cv=none; b=RRXeyyfNpNvrjuy4TeCLb9a8Z9dxA7o7vD06ry1jxS30Gm7MpO2uD0NgKIml5HkUm2mpcYFvOoCY0IXo2tuPNWNtTBD32lW6Lra+niXO/DUCxkDEjnZQZ9BTT2jR5Sf6YNiyYeNIwwfK+vLGgmkzTV9JfAT2NXV7tZuiK+matZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751935423; c=relaxed/simple;
-	bh=zNTKRq7aNErhkH8U18q1BjbgmqsaSp0PtB0iNkd7AU0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K3QOiSjoPoI5onuEHARQW0JLpmYxMYsiYE3A0dTcsxwM4WTZ1eietNU/PzbfMc5JMMdlVeAMlN815odhHZJSBZjgdGerxMsMIRmNXjwZeOQ3p5XGjmyLcg2Tb6EhC5E+vw2006hxZfpwat1ocuHxcSdk5Tcpkwf4bXElfam4Dxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CoREUBop; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-23c8f179e1bso32522695ad.1;
-        Mon, 07 Jul 2025 17:43:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751935421; x=1752540221; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dSX7rXG/Cb7Iv2C93GcbdXPfzK1jTKmoYKGXzw019z4=;
-        b=CoREUBopuU0k0XLyh1NYKmooO8tWe9jM+Svqlt8TMHM2Sw979T0QlTioYnF5gPh5Li
-         7GsYNJQ5piPCN0y5zARFh+7IHlR0o5JKp8hWoUecDRFUNJQgsWEAzmFBT1dRjLKDh0sa
-         sWXKJBygMRhV+9Q/gWhT6ODJIp5AQDkLjtUmxGq6xACUuDJWAE5kHjI1efKDmPfWO8Hx
-         ZZ0mK37A0QpbeVEAKluKghnEY7FPR835id6tGSp3BBX4GEMdH71LBI0WhH1Oin3xmb4Q
-         Mk2rK4lmtVf+4gdVNv8TGUV0lKldaAynlZOy8CnA+YMMUDHGG3Dm6QG4kjWhiD3Tts+V
-         zvFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751935421; x=1752540221;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dSX7rXG/Cb7Iv2C93GcbdXPfzK1jTKmoYKGXzw019z4=;
-        b=JmbBNx5aDWYyuPeil12I7Gf/rLZm1rhYzk0aoW0LjjfB6Ce1YV1umtFxFCi1kslA8O
-         PM6C3mL8W06K1Mc7RPk0mqfVaU3mTaAk7nRkY6S8PaVRzqoVXImXs3YX2iWebMpV7Kyp
-         VZ8nZUOXyM5uIvMKgcmFP2KzuFRKeMx/NFL37DocB9CaMaEQ6AKZnYXXQ/FpKLaAB0do
-         drZHUvfAjrUJxugMNTaefiFZrKmuYoC34YKpuTAUNJx2J5EDUQu8a51iOwu1PwhSTqF/
-         mj1MrHMpvnF4ndOlqP29bLgdPYyDiq7gXxsASuCQu+6k7TFVqfDTJkpRX+y7oZlz9Rtp
-         3WNA==
-X-Forwarded-Encrypted: i=1; AJvYcCWvFNHzKAGEQMgwpgsAvDnSXMTIAxtY94w1MKvV+rh4HDSXv8GD+sBbV5hqNagksVBH4m8waZHL@vger.kernel.org, AJvYcCXXFEJNt2koFDQjWVSdOeHay9OYsqxu+Sy95kJypoCT4JHeaQHsZC9epQTJQwQinatkInEJNUaJpBk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4bMugubprjBxtKZ4lq+QXh7rnMRb6WnVdhfTIJrh7QjSO2eyK
-	7JAfGRzxThfivksVVYlS2PKAzNt2bStvDXCVxs716hrG+POGSPVkJo8r
-X-Gm-Gg: ASbGncvps7YvriMjiyYtJjMFWB9GhcZxXUXDzB0P9RfSMGI07u8VcZv0q/wXRLsoI8J
-	YFJTTPaLBl94DWoVwDdZZg1oiaZ/6cPHNmnkHBNVBdvadJYWeYadyX3T6keXckVmnfO7IMlDCtw
-	6izxq+MjlxX9bOr7w4MONIoBKFlCLYPhRT/33my79+Smif8SX2udlZHS9gqZF4vXFmPqmIX1aFW
-	1KDyiMXUYGo05CnkWGeTBZ5f/j5OlFHiYktiEYUyinr4dFbCAvc7gAHvbpWADSVIa2z3dDq84v1
-	y4xIhyAWAnAPZ6synZM3UNVGYcA4MshrlQqDgmC9Xsr7CNPYqFq48vsfiQ2Ztw==
-X-Google-Smtp-Source: AGHT+IEAuHP6Svd8Lb4XpqwNEFCuT7DD/C+PIpC3nxFrsbTlP9Co8Vp8AGmR2u2x8S8eo9w2aPZQTQ==
-X-Received: by 2002:a17:903:2d2:b0:235:f078:4746 with SMTP id d9443c01a7336-23c875ac041mr222094905ad.42.1751935421299;
-        Mon, 07 Jul 2025 17:43:41 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23c845bd292sm94309265ad.236.2025.07.07.17.43.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jul 2025 17:43:40 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id ADB97410194E; Tue, 08 Jul 2025 07:43:37 +0700 (WIB)
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux PowerPC <linuxppc-dev@lists.ozlabs.org>,
-	Linux Networking <netdev@vger.kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Bagas Sanjaya <bagasdotme@gmail.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Haren Myneni <haren@linux.ibm.com>,
-	Andrew Donnellan <ajd@linux.ibm.com>
-Subject: [PATCH RESEND 3/3] Documentation: ioctl-number: Correct full path to papr-physical-attestation.h
-Date: Tue,  8 Jul 2025 07:43:33 +0700
-Message-ID: <20250708004334.15861-4-bagasdotme@gmail.com>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250708004334.15861-1-bagasdotme@gmail.com>
-References: <20250708004334.15861-1-bagasdotme@gmail.com>
+	s=arc-20240116; t=1751935427; c=relaxed/simple;
+	bh=OsxdDXKXe0QU2a4EA/UCYuWDTxhCuFMDmvt3V9Kv+BM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GXIsO/Km+v7aESwqpOkCWEdDUjlet+nbe28RTpa6NmZnvwj+ER8bGupzXLR3VTn6ycKROczlqAcS4L1GRbwC8VWJMhJQvMU2k6usxA5i5iX8nEDJYoqEMrapI8u0jigrTAJBpya29/BsgrBhfdw737xaYJvBa1FksPpU29vD5MM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tPAZdu6T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A4ECC4CEE3;
+	Tue,  8 Jul 2025 00:43:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751935427;
+	bh=OsxdDXKXe0QU2a4EA/UCYuWDTxhCuFMDmvt3V9Kv+BM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tPAZdu6TM33rYJ3PCvQbBIkRonbpfZONC5pyTLd9LsWQGVFJCf5XU4/WXDQDPujLC
+	 NLw1OS+GnQgwJp9EVUOoNavfeqxtX8djAQQT8bQl0zD/rZaJi2Zvd3T/BZhTlbao7c
+	 RCK5GVyIhF2mXWrT3LjxNwMMefTf+cegBwkieE0Eh/OKs+deFlBbk7f/i+l2QSE0Gt
+	 Ltf5X3GdwH+56HTypfzZGJUBbnS5DLlraYXhhx/YoqRZX/yWrO4gB6sv1Q+8B4mHBj
+	 HwQEhG26D9ArycFxI5zaATGK+ZqZTChF8F+Yp5jGPGoBscq5+rIwsuGYZlRXuxBMQ0
+	 Vk6EH5o2O6XIg==
+Date: Mon, 7 Jul 2025 17:43:46 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, Eric Dumazet
+ <eric.dumazet@gmail.com>, "David S. Miller" <davem@davemloft.net>, Paolo
+ Abeni <pabeni@redhat.com>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?=
+ <toke@toke.dk>, kernel-team@cloudflare.com, mfleming@cloudflare.com
+Subject: Re: [PATCH net-next V4] net: track pfmemalloc drops via
+ SKB_DROP_REASON_PFMEMALLOC
+Message-ID: <20250707174346.2211c46a@kernel.org>
+In-Reply-To: <175146472829.1363787.9293177520571232738.stgit@firesoul>
+References: <175146472829.1363787.9293177520571232738.stgit@firesoul>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1833; i=bagasdotme@gmail.com; h=from:subject; bh=zNTKRq7aNErhkH8U18q1BjbgmqsaSp0PtB0iNkd7AU0=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDBk5mbpnc/aLfFntdWb+ksXqk7k3b/g3t2Pf+8kl71fJd urti6q431HKwiDGxSArpsgyKZGv6fQuI5EL7WsdYeawMoEMYeDiFICJ2K1k+M3adUbuXhb7ds6/ rid/fNNL/ne+srxT6a1017R/89+ufSnD8N+FRzxG+9zjCasarx7YvWuDkPKi/kcmDBzHPRJCH4e Kz+UBAA==
-X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Commit 03c9d1a5a30d93 ("Documentation: Fix description format for
-powerpc RTAS ioctls") fixes Sphinx warning by chopping arch/ path
-component of papr-physical-attestation.h to fit existing "Include File"
-column. Now that the column has been widened just enough for that
-header file, add back its arch/ path component.
+On Wed, 02 Jul 2025 15:59:19 +0200 Jesper Dangaard Brouer wrote:
+> Add a new SKB drop reason (SKB_DROP_REASON_PFMEMALLOC) to track packets
+> dropped due to memory pressure. In production environments, we've observed
+> memory exhaustion reported by memory layer stack traces, but these drops
+> were not properly tracked in the SKB drop reason infrastructure.
+> 
+> While most network code paths now properly report pfmemalloc drops, some
+> protocol-specific socket implementations still use sk_filter() without
+> drop reason tracking:
+> - Bluetooth L2CAP sockets
+> - CAIF sockets
+> - IUCV sockets
+> - Netlink sockets
+> - SCTP sockets
+> - Unix domain sockets
 
-Fixes: 03c9d1a5a30d ("Documentation: Fix description format for powerpc RTAS ioctls")
-Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
----
- Documentation/userspace-api/ioctl/ioctl-number.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> @@ -1030,10 +1030,8 @@ static netdev_tx_t tun_net_xmit(struct sk_buff *skb, struct net_device *dev)
+>  	}
+>  
+>  	if (tfile->socket.sk->sk_filter &&
+> -	    sk_filter(tfile->socket.sk, skb)) {
+> -		drop_reason = SKB_DROP_REASON_SOCKET_FILTER;
+> +	    (sk_filter_reason(tfile->socket.sk, skb, &drop_reason)))
 
-diff --git a/Documentation/userspace-api/ioctl/ioctl-number.rst b/Documentation/userspace-api/ioctl/ioctl-number.rst
-index b45f5d857a00b6..5aa09865b3aa0f 100644
---- a/Documentation/userspace-api/ioctl/ioctl-number.rst
-+++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
-@@ -369,7 +369,7 @@ Code  Seq#    Include File                                             Comments
-                                                                        <mailto:linuxppc-dev@lists.ozlabs.org>
- 0xB2  06-07  arch/powerpc/include/uapi/asm/papr-platform-dump.h        powerpc/pseries Platform Dump API
-                                                                        <mailto:linuxppc-dev@lists.ozlabs.org>
--0xB2  08     powerpc/include/uapi/asm/papr-physical-attestation.h      powerpc/pseries Physical Attestation API
-+0xB2  08     arch/powerpc/include/uapi/asm/papr-physical-attestation.h powerpc/pseries Physical Attestation API
-                                                                        <mailto:linuxppc-dev@lists.ozlabs.org>
- 0xB3  00     linux/mmc/ioctl.h
- 0xB4  00-0F  linux/gpio.h                                              <mailto:linux-gpio@vger.kernel.org>
+why the outside brackets?
+
+> @@ -591,6 +592,10 @@ enum skb_drop_reason {
+>  	 * non conform CAN-XL frame (or device is unable to receive CAN frames)
+>  	 */
+>  	SKB_DROP_REASON_CANXL_RX_INVALID_FRAME,
+> +	/**
+> +	 * @SKB_DROP_REASON_PFMEMALLOC: dropped when under memory pressure
+
+I guess kinda, but in practice not very precise?
+
+How about: packet allocated from memory reserve reached a path or
+socket not eligible for use of memory reserves.
+
+I could be misremembering the meaning of "memory reserve" TBH.
+
+> +	 */
+> +	SKB_DROP_REASON_PFMEMALLOC,
+>  	/**
+>  	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
+>  	 * shouldn't be used as a real 'reason' - only for tracing code gen
+
+> -	if (unlikely(sk_add_backlog(sk, skb, limit))) {
+> +	if (unlikely((err = sk_add_backlog(sk, skb, limit)))) {
+
+I understand the else if () case but here you can simply:
+
+	err = sk_add_backlog(sk, skb, limit);
+	if (unlikely(err))
+
+no need to make checkpatch upset.
+
+> @@ -162,7 +163,7 @@ static int rose_state3_machine(struct sock *sk, struct sk_buff *skb, int framety
+>  		rose_frames_acked(sk, nr);
+>  		if (ns == rose->vr) {
+>  			rose_start_idletimer(sk);
+> -			if (sk_filter_trim_cap(sk, skb, ROSE_MIN_LEN) == 0 &&
+> +			if (sk_filter_trim_cap(sk, skb, ROSE_MIN_LEN, &dr) == 0 &&
+
+let's switch to negation rather than comparing to 0 while at it?
+otherwise we run over 80 chars
+
+>  			    __sock_queue_rcv_skb(sk, skb) == 0) {
+>  				rose->vr = (rose->vr + 1) % ROSE_MODULUS;
+>  				queued = 1;
 -- 
-An old man doll... just what I always wanted! - Clara
-
+pw-bot: cr
 
