@@ -1,128 +1,93 @@
-Return-Path: <netdev+bounces-205145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6305AFD972
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 23:16:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34E94AFD96E
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 23:16:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B1F5486C7A
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 21:15:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 499D54A8410
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 21:16:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB73224676F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 026042459D4;
 	Tue,  8 Jul 2025 21:15:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bHCZu89o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jXLgx+Nc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9970F1FF5F9
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 21:15:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55062459C6;
+	Tue,  8 Jul 2025 21:15:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752009341; cv=none; b=KeOxa9LlwbjXuNV04NdQ/kqVcdbJqeIWBvoP89v+7U/9L5UQPgYJfMOqmv7zYiU5J/XKC78IXfB3yiHDRFZgHIItsi0yzm1VAzBfL+4nHQlTzOLX3ub9WfkT0JSAem48q8IUOtER6I2Y67xKSCbPCVVSxTjSi+co0eGhxk4u3zU=
+	t=1752009340; cv=none; b=VVRvNSWUCp3OKkw7w+K/zw4kpiJWi/vJG39WQC1NWevhABtIO54LIoewntB5vbKyoMb3gPiuyC2nVK20GavClQdhbm8A51DDp115dm4dUTNERXtb8j7FQJxbJmlk+F+x7d16ovT/TIMJCqsq988EikG1018Nj6QESYMhQJHW3+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752009341; c=relaxed/simple;
-	bh=67biF2s7vghpTgu41A1+jjZdbCbNYkcPADl9PPNEn7k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qE/1+JUV9/1+Ql1MFLslZyceTlQkmemetFH5xVmfqCdUH2Z9jb2K9pogKyYmYM3G2T1dfzy/lLsv5xlOza+BD2zEmNan1sEkh7JA6jlxOwTQkUAbVGrN1tQBOaTmpQ78kZRkHic8l9F/YzkMspGdVwTxy83ksEEyHX4+3YfXvAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bHCZu89o; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752009337;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=U23alWt7Z8mxTe8Pg7NGMLFn77+q210vRmdrnodIX8s=;
-	b=bHCZu89o+mcG2Xg2NndENz8Xpq3tu37j9ZGWYLfW0EezhA/ZnKhVFzy+lex89ZXIANzPjD
-	EhBFtaejWng+rUb3IhXkNcESFvc3O5T6SO1vR7mv3gn9XlYXRcH57uNI5owxz3jCFpCiX9
-	vq0AKS+ksPFKGXK6neUnG0haTduWRyY=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-58-v27iGdYjOZmv7xT3FMipCA-1; Tue,
- 08 Jul 2025 17:15:36 -0400
-X-MC-Unique: v27iGdYjOZmv7xT3FMipCA-1
-X-Mimecast-MFC-AGG-ID: v27iGdYjOZmv7xT3FMipCA_1752009334
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C9BA81944A82;
-	Tue,  8 Jul 2025 21:15:27 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.81])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B896519560AB;
-	Tue,  8 Jul 2025 21:15:22 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	"Junvyyang, Tencent Zhuque Lab" <zhuque@tencent.com>,
-	LePremierHomme <kwqcheii@proton.me>,
-	Willy Tarreau <w@1wt.eu>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net v2 2/2] rxrpc: Fix oops due to non-existence of prealloc backlog struct
-Date: Tue,  8 Jul 2025 22:15:04 +0100
-Message-ID: <20250708211506.2699012-3-dhowells@redhat.com>
-In-Reply-To: <20250708211506.2699012-1-dhowells@redhat.com>
-References: <20250708211506.2699012-1-dhowells@redhat.com>
+	s=arc-20240116; t=1752009340; c=relaxed/simple;
+	bh=EsNrzNjV1ejegXwRqHZoNtXa4eBCU0UHv2etOg/t2Cs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=evyU04f1mVZLSf09j3VxH05WAqFXm8N9xu5pcLdD2+pBChlIn88MKlW3WlgFZ3/LaTytrin0EcCYwSazNhOgF1h3avgDHpz+iIkDbrgqTEAdMsmCl/lpyupiw4IvcYTmfYXhNhFFnhVXN4L8Mv+UxCnr6fn79oEf9PEoqjLBVDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jXLgx+Nc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1168CC4CEED;
+	Tue,  8 Jul 2025 21:15:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752009340;
+	bh=EsNrzNjV1ejegXwRqHZoNtXa4eBCU0UHv2etOg/t2Cs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jXLgx+Nc/Il0M8mnaWaTErBAJYW6UH/b3ChhI1LjEWZ1ml5fkzHdaCaYOl99XYH/f
+	 g1fyCkze9zHQfvieSG51xhB6PFC2OrGkDq77mm8FzJaQOQGL28nTAU6Im5pWJPQfNr
+	 xgqKcDlEBibsvEy1PMprvnPeFxlxa+i/MW9vQ5YjpWVQINxY8D89YrmlgshJrTMUJP
+	 Qn3QU3pn1T8APdplhYULYG5GDoEyHqAAUw8EvUfsB631uCVtnUbOzHcQD4jAKlGI+k
+	 uK0BTZzRanm6MTE1WDXUn9iqYvh9qBBbOzzGpGcMDpVWAee9dsresSCF62LDyVSqpa
+	 kjbm7xmjPgNnQ==
+Date: Tue, 8 Jul 2025 16:15:39 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Kamil =?iso-8859-1?Q?Hor=E1k?= - 2N <kamilh@axis.com>
+Cc: linux@armlinux.org.uk, corbet@lwn.net, linux-doc@vger.kernel.org,
+	krzk+dt@kernel.org, bcm-kernel-feedback-list@broadcom.com,
+	florian.fainelli@broadcom.com, hkallweit1@gmail.com,
+	pabeni@redhat.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, conor+dt@kernel.org,
+	netdev@vger.kernel.org, andrew+netdev@lunn.ch, horms@kernel.org,
+	davem@davemloft.net, edumazet@google.com,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, andrew@lunn.ch
+Subject: Re: [PATCH net-next v7 2/4] dt-bindings: ethernet-phy: add MII-Lite
+ phy interface type
+Message-ID: <175200933841.1032309.15245293992929519207.robh@kernel.org>
+References: <20250708090140.61355-1-kamilh@axis.com>
+ <20250708090140.61355-3-kamilh@axis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+In-Reply-To: <20250708090140.61355-3-kamilh@axis.com>
 
-If an AF_RXRPC service socket is opened and bound, but calls are
-preallocated, then rxrpc_alloc_incoming_call() will oops because the
-rxrpc_backlog struct doesn't get allocated until the first preallocation is
-made.
 
-Fix this by returning NULL from rxrpc_alloc_incoming_call() if there is no
-backlog struct.  This will cause the incoming call to be aborted.
+On Tue, 08 Jul 2025 11:01:38 +0200, Kamil Horák - 2N wrote:
+> Some Broadcom PHYs are capable to operate in simplified MII mode,
+> without TXER, RXER, CRS and COL signals as defined for the MII.
+> The MII-Lite mode can be used on most Ethernet controllers with full
+> MII interface by just leaving the input signals (RXER, CRS, COL)
+> inactive. The absence of COL signal makes half-duplex link modes
+> impossible but does not interfere with BroadR-Reach link modes on
+> Broadcom PHYs, because they are all full-duplex only.
+> 
+> Add new interface type "mii-lite" to phy-connection-type enum.
+> 
+> Signed-off-by: Kamil Horák - 2N <kamilh@axis.com>
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> ---
+>  Documentation/devicetree/bindings/net/ethernet-controller.yaml | 1 +
+>  1 file changed, 1 insertion(+)
+> 
 
-Reported-by: Junvyyang, Tencent Zhuque Lab <zhuque@tencent.com>
-Suggested-by: Junvyyang, Tencent Zhuque Lab <zhuque@tencent.com>
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: LePremierHomme <kwqcheii@proton.me>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Willy Tarreau <w@1wt.eu>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Simon Horman <horms@kernel.org>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
----
- net/rxrpc/call_accept.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/rxrpc/call_accept.c b/net/rxrpc/call_accept.c
-index 7271977b1683..49fccee1a726 100644
---- a/net/rxrpc/call_accept.c
-+++ b/net/rxrpc/call_accept.c
-@@ -255,6 +255,9 @@ static struct rxrpc_call *rxrpc_alloc_incoming_call(struct rxrpc_sock *rx,
- 	unsigned short call_tail, conn_tail, peer_tail;
- 	unsigned short call_count, conn_count;
- 
-+	if (!b)
-+		return NULL;
-+
- 	/* #calls >= #conns >= #peers must hold true. */
- 	call_head = smp_load_acquire(&b->call_backlog_head);
- 	call_tail = b->call_backlog_tail;
+Acked-by: Rob Herring (Arm) <robh@kernel.org>
 
 
