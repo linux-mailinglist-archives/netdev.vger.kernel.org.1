@@ -1,278 +1,130 @@
-Return-Path: <netdev+bounces-204859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EF38AFC4DB
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 09:59:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE797AFC4F6
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 10:03:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9441318942D5
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 07:59:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC0973B824E
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 08:02:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2712C2BD022;
-	Tue,  8 Jul 2025 07:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78BEA29ACF6;
+	Tue,  8 Jul 2025 08:03:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R+8qDZLW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cFEcL9Qh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5E629B201;
-	Tue,  8 Jul 2025 07:58:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DD02989BC
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 08:03:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751961508; cv=none; b=Nx8zhmywL/QstbF83QC6TEQMWY2yloqoJfewD3kQee+WRLWzYQ9VIV8+bxDtj52u/fcZG8Pk8bPXPtD+BCkrnbIHGEpt0z2+rcXLND7aikR/JGnKauzwQ7odITN5sgzSGIwfqBOKxF8CkmT9yJGIA5az2Qg7+vG42OaAJHSJuI0=
+	t=1751961782; cv=none; b=HZ8HWN3cctRjQJK14FfWObX+M5sm3f9doeY5/1f3N3l0HAZiONt2vTWFLhhE5cApWnm2hY1r6U9OEW3THj814Dv/Q6fVCwkHDGN0bBxteCnTSTXMsz5JDOjenIU2RW/vMrDl+HUfSd1IlxL4I55RmUmQrwhHyldUISLEcJgwLV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751961508; c=relaxed/simple;
-	bh=uE5MlteM8/gqfvbo7CDXi1yeE6bRnNqClJpOH7U1InQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gL4o5Oug1LXS5AYJc6Dp5JOCyyvEQcUxuSP9RocO6yrqXYPTbrHdRAqdz6ksWjGfqVMCus+ekWB6x88+WWtLebT+BRQEPuo+WPn9U/ncyxyZUrS85B0PuT1z9+a4GZGUE/PDh6fZwqL01FbyZ9tDZrNQVU+Gy0EuBLc8GU6xFV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R+8qDZLW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8524C4CEED;
-	Tue,  8 Jul 2025 07:58:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751961507;
-	bh=uE5MlteM8/gqfvbo7CDXi1yeE6bRnNqClJpOH7U1InQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=R+8qDZLWpOt2R5ZFZROnfKpVPl84XQjA6c9sV990pr8e2RO6PDyC9DdBA8sKbtpo9
-	 OGYQ5XhaTG+kMWgox9wqkzDkwpNK0Y6RnhCSAlHsWQQAWGsHErxA+mYIXIhfW9kG3y
-	 8TL10jy5azbo4EUvviEdaFKcAY0o7j3Qv5dX5GLsjSDpMTF5zSG2AzhRj2OEaevovs
-	 LYrXFypqSuk1zoFZ0LH6kUXXs13BVbNaMUWx4BeqgsaO760gKfAF2dRB9qs7chnQpe
-	 a9kbJtmNzDGf8XVCZ3z9UcqKbiLesxHTf9A+U+83zJ3U7dgNXuoLMRV9agyjsAXogL
-	 7tZSaTPWPptxg==
-Date: Tue, 8 Jul 2025 09:58:24 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH nf-next v3 1/2] net: netfilter: Add IPIP flowtable SW
- acceleration
-Message-ID: <aGzPoAKjq8mZGOn2@lore-desk>
-References: <20250703-nf-flowtable-ipip-v3-0-880afd319b9f@kernel.org>
- <20250703-nf-flowtable-ipip-v3-1-880afd319b9f@kernel.org>
- <aGaVKWKOKj1a-eG1@calendula>
- <aGfQeF_6c2W1ecrX@lore-desk>
- <aGwm7XrM4YaJREru@calendula>
+	s=arc-20240116; t=1751961782; c=relaxed/simple;
+	bh=BYX2nKw8V8H9vqiU/XTUcWHzYRV0LYBrsdNAvHDZ+P8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eEOpJfEf8/lKPBjOCzdsYjGNEfhM0iw2EdlrnNCBRetkNEwvVb4wmh4KoJeECvUejcGlvUtV/IF3VoS9fQTePO61tOaMHh75camsMHk8r602dnyo1bAZC831y1ll17lg+IIya6d3oDAe2tZDwXbpZjRJjQUokJBpNFBiu29N/WA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cFEcL9Qh; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4a43afb04a7so28564081cf.0
+        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 01:03:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1751961780; x=1752566580; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BYX2nKw8V8H9vqiU/XTUcWHzYRV0LYBrsdNAvHDZ+P8=;
+        b=cFEcL9QhPreK03FJp85LGP36od+UoZlqG5lI/nP0gB2lGwAWFnBm++xYmG7gxUUYcr
+         vbhvY4RwxkRTDOzWuWq/enwZGw0ykAE4MBrz5kGKHW4YzoEwZRt3kRzdV4a7nUCzbYEd
+         p+P192OLWib1/j+J4GiSjmEwOsAm/1AatC1h0GDkm6WtTh/QcpDbTcTQ7Dq2mqi0wYka
+         4d7y3c+uVP02f7U7f6H4H5Xph6Y9aSck9kSuSdV6KTkRdpRLV3hbMEgcZQ8NmsApk5LP
+         hnhwn1BzEuGCOKc8rmmetsQGIHj7xwzj1mG4pxwTksF1SqNCJNW7rg5Dog1ZHjuoB5Vh
+         Z0bQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751961780; x=1752566580;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BYX2nKw8V8H9vqiU/XTUcWHzYRV0LYBrsdNAvHDZ+P8=;
+        b=rUeY4f1YOrlvu01RpGLYcHSbC/SQZYGt4V2CfQEfAYfOk3c2Y5ikXE2QdlvHSFRzUR
+         IX8akkJiR2aElP6vx+l457UHEll5yaXgHK8m+b9fFkHYCnBHEjiP1uI2SFAhZ4ewWCbv
+         arIhZNvysa+0GBxpZP2ScDGiKAWFSpg/eDlpQV73LHlSDtKdokjOpKye4K2hX+309nxA
+         oNjKPEOM7QAtS0IXYFcAbnDLBJIsUCSt6hozWx5tmTkeeWoLqrXjh4RnwO6oYt08ETRh
+         AziAUEtsc65hexEuZFGnWVhO44pXsx/VZBb30bNCMQJ+VJmwmRVl9FC1qXNBZ6YXNfoA
+         cefw==
+X-Forwarded-Encrypted: i=1; AJvYcCV4PmE+R7zoiUr253unkxSfW93sm6WDIGVXP37i96Z/yjoaN2BokNgeka80+6EFQ8FBvfy5V+E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyPiOkmNQP8oLaufwWuhffknYdHrJEmHr4Toz2h9kZwSmgmdX+
+	vf5NMr3j0rnxjv0+upyZM6vzKTVigsWPH05l029iek6qJ5GFWeEtPRALneLZi/tSrsKUzqfaxpl
+	hHB7fL8mak+HqHQuPehGidX7acVL7EU3MlURfCa16
+X-Gm-Gg: ASbGncvNoWuY+7wSG0GKW1JMUhPcEPpRkDfiwk5ihugCcDQhZZBj5Dyr0I0nDIIMy3h
+	vdr4oUM2ufgKkhsnW4y7njgVAzehq8vXFfNIziUVwFbiSAZbN8dZRaPwPcEHd+0zQuObWhjA42b
+	K6a0YeJUCsIs3//inniH75FkblRYP7YB/odRk6dDiTpqA=
+X-Google-Smtp-Source: AGHT+IFOm/hoK8xA+2yvFbXSCCAzHPZ+sPNLb33EdBRk3X7TrVVP1viWYkerVhornPqbNaQVP3obbbaW2qn/ZYkLjsY=
+X-Received: by 2002:a05:622a:11ca:b0:4a7:62da:d0fc with SMTP id
+ d75a77b69052e-4a998692482mr204480061cf.12.1751961779405; Tue, 08 Jul 2025
+ 01:02:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="heBi9EOYhaWjRcX5"
-Content-Disposition: inline
-In-Reply-To: <aGwm7XrM4YaJREru@calendula>
-
-
---heBi9EOYhaWjRcX5
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <CALm_T+2rdmwCYLZVw=gALPDufXB5R8=pX8P2jhgYE=_0PCJJ_Q@mail.gmail.com>
+In-Reply-To: <CALm_T+2rdmwCYLZVw=gALPDufXB5R8=pX8P2jhgYE=_0PCJJ_Q@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 8 Jul 2025 01:02:48 -0700
+X-Gm-Features: Ac12FXymQQhYAGhjIWe-pEhGq4VdaeDatIELFoZWKE-dIJxatFkR6SO2JgRZscw
+Message-ID: <CANn89i+7m8koanZk=47FEhmTHUmOmu-yfViRPayjUct+voQiEQ@mail.gmail.com>
+Subject: Re: [Bug] soft lockup in neigh_timer_handler in Linux kernel v6.12
+To: Luka <luka.2016.cs@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Jul 07, Pablo Neira Ayuso wrote:
-> On Fri, Jul 04, 2025 at 03:00:40PM +0200, Lorenzo Bianconi wrote:
-> > > On Thu, Jul 03, 2025 at 04:16:02PM +0200, Lorenzo Bianconi wrote:
-> > > > Introduce SW acceleration for IPIP tunnels in the netfilter flowtab=
-le
-> > > > infrastructure.
-> > > > IPIP SW acceleration can be tested running the following scenario w=
-here
-> > > > the traffic is forwarded between two NICs (eth0 and eth1) and an IP=
-IP
-> > > > tunnel is used to access a remote site (using eth1 as the underlay =
-device):
-> > >=20
-> > > Question below.
-> > >=20
-> > > > ETH0 -- TUN0 <=3D=3D> ETH1 -- [IP network] -- TUN1 (192.168.100.2)
-> > > >=20
-> > > > $ip addr show
-> > > > 6: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue s=
-tate UP group default qlen 1000
-> > > >     link/ether 00:00:22:33:11:55 brd ff:ff:ff:ff:ff:ff
-> > > >     inet 192.168.0.2/24 scope global eth0
-> > > >        valid_lft forever preferred_lft forever
-> > > > 7: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue s=
-tate UP group default qlen 1000
-> > > >     link/ether 00:11:22:33:11:55 brd ff:ff:ff:ff:ff:ff
-> > > >     inet 192.168.1.1/24 scope global eth1
-> > > >        valid_lft forever preferred_lft forever
-> > > > 8: tun0@NONE: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1480 qdisc noqueu=
-e state UNKNOWN group default qlen 1000
-> > > >     link/ipip 192.168.1.1 peer 192.168.1.2
-> > > >     inet 192.168.100.1/24 scope global tun0
-> > > >        valid_lft forever preferred_lft forever
-> > > >=20
-> > > > $ip route show
-> > > > default via 192.168.100.2 dev tun0
-> > > > 192.168.0.0/24 dev eth0 proto kernel scope link src 192.168.0.2
-> > > > 192.168.1.0/24 dev eth1 proto kernel scope link src 192.168.1.1
-> > > > 192.168.100.0/24 dev tun0 proto kernel scope link src 192.168.100.1
-> > > >=20
-> > > > $nft list ruleset
-> > > > table inet filter {
-> > > >         flowtable ft {
-> > > >                 hook ingress priority filter
-> > > >                 devices =3D { eth0, eth1 }
-> > > >         }
-> > > >=20
-> > > >         chain forward {
-> > > >                 type filter hook forward priority filter; policy ac=
-cept;
-> > > >                 meta l4proto { tcp, udp } flow add @ft
-> > > >         }
-> > > > }
-> > > >=20
-> > > > Reproducing the scenario described above using veths I got the foll=
-owing
-> > > > results:
-> > > > - TCP stream transmitted into the IPIP tunnel:
-> > > >   - net-next:				~41Gbps
-> > > >   - net-next + IPIP flowtbale support:	~40Gbps
-> > >                       ^^^^^^^^^
-> > > no gain on tx side.
-> >=20
-> > In this case the IPIP flowtable acceleration is effective just on the A=
-CKs
-> > packets so I guess it is expected we have ~ the same results. The real =
-gain is
-> > when the TCP stream is from the tunnel net_device to the NIC one.
->=20
-> That is, only rx side follows the flowtable datapath.
->=20
-> > > > - TCP stream received from the IPIP tunnel:
-> > > >   - net-next:				~35Gbps
-> > > >   - net-next + IPIP flowtbale support:	~49Gbps
-> > > >=20
-> > > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > > > ---
-> > > >  net/ipv4/ipip.c                  | 21 +++++++++++++++++++++
-> > > >  net/netfilter/nf_flow_table_ip.c | 34 ++++++++++++++++++++++++++++=
-++++--
-> > > >  2 files changed, 53 insertions(+), 2 deletions(-)
-> > > >=20
-> > > > diff --git a/net/ipv4/ipip.c b/net/ipv4/ipip.c
-> > > > index 3e03af073a1ccc3d7597a998a515b6cfdded40b5..05fb1c859170d74009d=
-693bc8513183bdec3ff90 100644
-> > > > --- a/net/ipv4/ipip.c
-> > > > +++ b/net/ipv4/ipip.c
-> > > > @@ -353,6 +353,26 @@ ipip_tunnel_ctl(struct net_device *dev, struct=
- ip_tunnel_parm_kern *p, int cmd)
-> > > >  	return ip_tunnel_ctl(dev, p, cmd);
-> > > >  }
-> > > > =20
-> > > > +static int ipip_fill_forward_path(struct net_device_path_ctx *ctx,
-> > > > +				  struct net_device_path *path)
-> > > > +{
-> > > > +	struct ip_tunnel *tunnel =3D netdev_priv(ctx->dev);
-> > > > +	const struct iphdr *tiph =3D &tunnel->parms.iph;
-> > > > +	struct rtable *rt;
-> > > > +
-> > > > +	rt =3D ip_route_output(dev_net(ctx->dev), tiph->daddr, 0, 0, 0,
-> > > > +			     RT_SCOPE_UNIVERSE);
-> > > > +	if (IS_ERR(rt))
-> > > > +		return PTR_ERR(rt);
-> > > > +
-> > > > +	path->type =3D DEV_PATH_ETHERNET;
-> > > > +	path->dev =3D ctx->dev;
-> > > > +	ctx->dev =3D rt->dst.dev;
-> > > > +	ip_rt_put(rt);
-> > > > +
-> > > > +	return 0;
-> > > > +}
-> > > > +
-> > > >  static const struct net_device_ops ipip_netdev_ops =3D {
-> > > >  	.ndo_init       =3D ipip_tunnel_init,
-> > > >  	.ndo_uninit     =3D ip_tunnel_uninit,
-> > > > @@ -362,6 +382,7 @@ static const struct net_device_ops ipip_netdev_=
-ops =3D {
-> > > >  	.ndo_get_stats64 =3D dev_get_tstats64,
-> > > >  	.ndo_get_iflink =3D ip_tunnel_get_iflink,
-> > > >  	.ndo_tunnel_ctl	=3D ipip_tunnel_ctl,
-> > > > +	.ndo_fill_forward_path =3D ipip_fill_forward_path,
-> > > >  };
-> > > > =20
-> > > >  #define IPIP_FEATURES (NETIF_F_SG |		\
-> > > > diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_fl=
-ow_table_ip.c
-> > > > index 8cd4cf7ae21120f1057c4fce5aaca4e3152ae76d..6b55e00b1022f0a2b02=
-d9bfd1bd34bb55c1b83f7 100644
-> > > > --- a/net/netfilter/nf_flow_table_ip.c
-> > > > +++ b/net/netfilter/nf_flow_table_ip.c
-> > > > @@ -277,13 +277,37 @@ static unsigned int nf_flow_xmit_xfrm(struct =
-sk_buff *skb,
-> > > >  	return NF_STOLEN;
-> > > >  }
-> > > > =20
-> > > > +static bool nf_flow_ip4_encap_proto(struct sk_buff *skb, u16 *size)
-> > > > +{
-> > > > +	struct iphdr *iph;
-> > > > +
-> > > > +	if (!pskb_may_pull(skb, sizeof(*iph)))
-> > > > +		return false;
-> > > > +
-> > > > +	iph =3D (struct iphdr *)skb_network_header(skb);
-> > > > +	*size =3D iph->ihl << 2;
-> > > > +
-> > > > +	if (ip_is_fragment(iph) || unlikely(ip_has_options(*size)))
-> > > > +		return false;
-> > > > +
-> > > > +	if (iph->ttl <=3D 1)
-> > > > +		return false;
-> > > > +
-> > > > +	return iph->protocol =3D=3D IPPROTO_IPIP;
-> > >=20
-> >=20
-> > what kind of sanity checks are we supposed to perform? Something simila=
-r to
-> > what we have in ip_rcv_core()?
->=20
-> I am not referring to sanity checks.
->=20
-> VLAN/PPP ID (layer 2 encapsulation) is part of the lookup in the
-> flowtable, why IPIP (layer 3 tunnel) does not get the same handling?
+On Tue, Jul 8, 2025 at 12:54=E2=80=AFAM Luka <luka.2016.cs@gmail.com> wrote=
+:
+>
+> Dear Linux Kernel Maintainers,
+>
+> I hope this message finds you well.
+>
+> I am writing to report a potential vulnerability I encountered during
+> testing of the Linux Kernel version v6.12.
+>
+> Git Commit: adc218676eef25575469234709c2d87185ca223a (tag: v6.12)
+>
+> Bug Location: neigh_timer_handler+0xc17/0xfe0 net/core/neighbour.c:1148
+>
+> Bug report: https://pastebin.com/06NiBtXm
+>
+> Entire kernel config: https://pastebin.com/MRWGr3nv
+>
+> Root Cause Analysis:
+>
+> A soft lockup occurs in the neighbor subsystem due to prolonged
+> execution within neigh_timer_handler(), where repeated neighbor entry
+> invalidation and associated routing operations (e.g.,
+> ipv4_link_failure() and arp_error_report()) lead to excessive CPU
+> occupation without yielding, triggering the kernel watchdog.
+>
+> At present, I have not yet obtained a minimal reproducer for this
+> issue. However, I am actively working on reproducing it, and I will
+> promptly share any additional findings or a working reproducer as soon
+> as it becomes available.
+>
+> Thank you very much for your time and attention to this matter. I
+> truly appreciate the efforts of the Linux kernel community.
 
-ack, right. Do you have any suggestion about what field (or combination
-of fields) we can use from the outer IP header similar to the VLAN/PPP
-encapsulation?
+Please stop sending duplicates, and 'analysis' AI generated.
 
->=20
-> > > Once the flow is in the flowtable, it is possible to inject traffic
-> > > with forged outer IP header, this is only looking at the inner IP
-> > > header.
-> >=20
-> > what is the difference with the plain IP/TCP use-case?
->=20
-> Not referring to the generic packet forging scenario. I refer to the
-> scenario that would allow to forward packets for any IPIP outer header
-> given the inner header finds a matching in the flowtable. I think that
-> needs to be sorted out.
+If you really want to help, please provide a patch.
 
-ack.
-
-Regards,
-Lorenzo
-
---heBi9EOYhaWjRcX5
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaGzPoAAKCRA6cBh0uS2t
-rI/WAQDzIxwDuAnYbFygdncqXI698TcePfJGEsoicgF9XLelPAD/SH7UGxjjnFss
-s4b+TWT49Xp89aT2sRdVNG9IxOPWTwY=
-=6tTR
------END PGP SIGNATURE-----
-
---heBi9EOYhaWjRcX5--
+Thank you.
 
