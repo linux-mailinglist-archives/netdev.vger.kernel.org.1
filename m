@@ -1,80 +1,82 @@
-Return-Path: <netdev+bounces-204864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BE73AFC538
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 10:16:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3323AFC53D
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 10:17:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8AE9189F6D5
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 08:16:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86D973A8716
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 08:16:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14AE621A428;
-	Tue,  8 Jul 2025 08:16:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DFCF29B79B;
+	Tue,  8 Jul 2025 08:16:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="OAc8y+KB"
+	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="vn3k+Hm5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B73267B07
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 08:16:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C5118024
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 08:16:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751962581; cv=none; b=sBLb7WznOvXD6NAnOs8zR+lsaViRhDyMgM0y1jzjIE+gTk1pR6dPeSabXOln71ZS5DiBcFyx0LClzafhBWGaSqnUwGwlhgY1cCsk3Oa6AeTGAoGl+ERZN21utjcfHdAJSQMOpeas/dIkDWl86dinB6leTUaZREbycxJKzbe7r/E=
+	t=1751962617; cv=none; b=csxcHVG/muR9omRfSek8Bx1IuqKlPLD8MsyAQ6aC8NwmQDCyJOKaftcx2hgTfD4T6Cl0vtLlWn4TW4DHCb59stQkzariRBlDvlarltEOf9xtc6iKsOUICF27uufGlI8cyfHwRDOYDgy340nzmoGDu9ZWZ17fIhRGLWtLjANbJmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751962581; c=relaxed/simple;
-	bh=UO2Z/bTfKTqIs3KiTBzGr2WQH493d/AThkPY1/9jAvc=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:Content-Type; b=PG1zUSNRNZEO0DSbokJmgeyZP5vg4fJ+V3hLwGRq+0iIlDAzNph2ZBesmK1Ii6jp5q5xJldIO8EP0WNgoR0goE9Dg5ijY7wdVBtxhFxDpOydNYw6+cIBgXV0jBegKMmw2VGW5JkKUA8rsRSRXG5nc095NdmT4ZhmgsxHtYCTLfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=OAc8y+KB; arc=none smtp.client-ip=209.85.218.54
+	s=arc-20240116; t=1751962617; c=relaxed/simple;
+	bh=IhXo1js8HygvRtTjq4eoaew20MKa32TCzHzfgvE0JWc=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=nTNrteaSTdA3RYoMVIzT3pyJjreLwMIItCh1uvbsfIMThiMqdS5onn5b5AZuTL+uBpxzG6AQj1myu77DYp9nzaLB7bH0D2I0Wu9Rl5Jyg1ssxapH3ta2gxwgDPoyBajxAO/IFYJH2dFkxCIyQ4Fms5F6X8QCzD6QuEHRb5QBIJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=vn3k+Hm5; arc=none smtp.client-ip=209.85.218.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jacekk.info
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ae361e8ec32so810618166b.3
-        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 01:16:17 -0700 (PDT)
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ae0d758c3a2so677172866b.2
+        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 01:16:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jacekk.info; s=g2024; t=1751962576; x=1752567376; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:cc:to:subject:user-agent
-         :mime-version:date:message-id:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zX0N14y+ivi1tBXRE49xrBFjeTOrZmJtWYI5xIIo6pc=;
-        b=OAc8y+KBRmwi4bF8dxAUHEumEyEjB9FFiYpvyhGqYgLi73Emwp8ZLkniazCCfPj9Mi
-         pJYA247MjD3y8vTq8t683Ja6LIXoDWL9jEIkdd+Aaltb7JXNzQ47nR2+e7ehJxg6lDGW
-         jLNeoA5wEFuRryP6Q7iNPawLiQ0HvUUNJyLn0zihRn02QHhxcCpiiAD2ytiNlox6w9q+
-         +GQZN6xtIkVYYs2adI45L1MvP3ECgR5KpTuKnEQb34etafvQtVm4md26LpDxc3G4ImCq
-         JsZvHcYwl62JlRn3KgN6EHbkNGm3VOO8ekJQ40dF4ChdTVp9UvP9GHMh+9oQQx7dwwIJ
-         Rb0A==
+        d=jacekk.info; s=g2024; t=1751962613; x=1752567413; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=alMSpLLyvO2GyiUt4EFYi3zPSYajKqAuQFGQmWDvAF4=;
+        b=vn3k+Hm5blS/AdJ7+hWBRV+NwzY+upuXT03WdZ7yFVJ9QR8pJrjGmB8AIv0NAR8Yvc
+         OeYwQj1b2RSujyHzKY+ZupPjgLWCCMg6d7BYpiYUQGQh7liwPiv80IpmQ/XkEBeMLOJ1
+         0SXg19Hntc1fNEQJTt4DVdSmHv5GxMKplUo0vVtuZpO6WGAHXUHtqjoihnFlWM4UKF2a
+         +p2cnekpIWw1tp5tx0tsH0mOaOxrk1bDnT4hXl5MNbpLpKQdZKO9GlJZs3gy1N9wusBm
+         96IDTpxEaUfhRfi/MPqNvMt26jA/YFbrl00jHDnXQbs6w3txJUWOEsS2MLkdOC37zzak
+         Gn/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751962576; x=1752567376;
-        h=content-transfer-encoding:content-language:cc:to:subject:user-agent
-         :mime-version:date:message-id:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zX0N14y+ivi1tBXRE49xrBFjeTOrZmJtWYI5xIIo6pc=;
-        b=JBt6qCARaw/mfFGK7SBu8hIA/YYWycNlbsR/z+/HUw8eP7kPa8+um0xiNGPIsR3ZW6
-         ofhDf6gEeoZAK+NvX3PbXXy4rUWidlS4Mqjn6TIWA24efpFQ08ZaryeSzSQMg0rwz6mP
-         M2jXxYOaeH4GrSXEKbYY3hI9LofC7mza6lS0WCki0dNsqsHPcqhws7UnyqahEkwFoFcQ
-         2j9xCvAMwskR+/v2CfBLBqVtHr7OSFqNjr75HvZ0AlpEea9CL/eM/2D6nS9RDXgJBM3T
-         rSxfRiWrYivKhCaVNGdSYFWeFda+yCWQq/RImqNNPPfgL87/b4oF9XK2d9Y1YQ8S3Jz9
-         3Vng==
-X-Forwarded-Encrypted: i=1; AJvYcCVlePMDwt/mRo9IWZBtJLWLdL92vvJVzmYHwpqmZnI/6TETvDDWo/U928a2FHKu4X/Oq/XTM3M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2zjlF5zmxpHbEOB0BHWTi/T+lQs2/r7vmPo7bBdCuTClNFY8I
-	wPbngJwPFmMPuYSge+nuoN4NjzGFwzWRIGAbmIC0mjHALRTH6BjB/QvqMhvnWBjtLg==
-X-Gm-Gg: ASbGncvkHk7x6XV5W5LqDxPhalDevdMUwRE9SpeWLM4lazdRlDdNMXqrXMvfeegVuTu
-	+Q+ltNtXs2nJ9F5ccc671O5wFqsfYCV1pMOw1K3OEYP3z86JnjmYy6rv+efFhufLEJU0UxNyzoT
-	r0iHPcb+fsWRJ9u4O4RBLlS8DEJ2B8D/oTO6600NGOgE6ZXHmkCy40/vZJE02fik3C2SgZr0tk/
-	i67GyoqN02xC3yKjday3Bd7NXrs0OdCM0ukXRQ2IGqQjfqACTQMgryY0VXdQ4lFyXiIPEhyG1/l
-	0z+/LGi8aWlSHW5zq9diLQnsfqAUG8Olr/PrlyZ6SG6Xd8c/Ed8vP+xqwBpN1ulI
-X-Google-Smtp-Source: AGHT+IEEfsdJuAwx2RBd/D25PHj+3LLnLlD9Rv5k7fwF6VFsK1BsqBstgUYy7xzOJP6DzbbwMbM8CQ==
-X-Received: by 2002:a17:907:3f87:b0:ad5:7bc4:84be with SMTP id a640c23a62f3a-ae6b0eaf680mr201405766b.52.1751962576253;
-        Tue, 08 Jul 2025 01:16:16 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1751962613; x=1752567413;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=alMSpLLyvO2GyiUt4EFYi3zPSYajKqAuQFGQmWDvAF4=;
+        b=oHiLiQpjUEzwGqZw6QSq6MOU8THrD60FoiCWFGbpHMXK53IjyR+Kpm74xZWSAShwTL
+         i4/eRd68p0kbIG647PVlW0jznM3S3OzpRAO7g7kb9QKx8vBHItuKGt0l1wQFJqkGP1r9
+         Ur4ntKkl8bZ9xvHNFSyjhQ8odE8yZuDkRWCYAXactm7hajnSxk28G6QwsnnV4wxse6bj
+         ApiDkbFLl71M8DCehIVxXqyQ1zapPbcTVnuKteVdOhZ4lsfGiblX9ahNTJ/OUKhByx9W
+         U2bYiY33csoNPXcEoHvKr5umEXkhmP+pBTXM4mHWtnZhJtYhWAgDJzaXguHrTHWb/9uz
+         NDmw==
+X-Forwarded-Encrypted: i=1; AJvYcCXkLex5I+hLqKNxCXgTf+SNAOgwWAIfhKaKqctyuxJFeasghwGrmhD/EBevepf51G6eognGxqI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxa73rzXbmLugHaDbqrdLDjgdXnyOkRfZxYbQ7MZXgZ2vd4oIUt
+	tokMe0k47U4WX6JeuBdFWIFBpavvfYkIct55TN1hCpTcHLRos36KgG4tV3N1O5ilJg==
+X-Gm-Gg: ASbGncvr1xr6VOEqzrgkT7gIorZJroEEyait4uoqsT1ZoqMpWsVsevc7wNaNR1URvko
+	IvYzc2JUyc+eYHh74Ti3DCTy2tAyju6ONaDC80i6LAJll9m/qZjs5Jotxx/3VyW7yqJp5q6v7uo
+	/qOC6l/HG5FJvQyPS1vDf0axEfSAFYFY+24iWZ82TjsdRQihhRt5F8yCauPfbb2ldcYP5GanBIC
+	8EsC7Xg0aDp6uhfGl5vBSC+ceG82WdzD0vmKh6N+p54ICjV4CjlAwj4m/mwGhh/ROFHUS5GCatB
+	8dmhrlMngi92pDUKtCdy1s0QN47y5nGK7upya02T188P+ay9h7kU52RozvmyahNZoz9RnEYqD5Y
+	=
+X-Google-Smtp-Source: AGHT+IGUG5jFVLTQJ4/OOyiECMuv5LIxsil65WhixC0o4oqqqU29Q8wWHBD1+DnpgbskzSK+q5zHsw==
+X-Received: by 2002:a17:907:3e20:b0:ad8:96d2:f3a with SMTP id a640c23a62f3a-ae6b0b1f26dmr208544066b.8.1751962613079;
+        Tue, 08 Jul 2025 01:16:53 -0700 (PDT)
 Received: from [192.168.0.114] ([91.196.212.106])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae3f6929ab5sm834750566b.46.2025.07.08.01.16.15
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae410916ee7sm622992866b.15.2025.07.08.01.16.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Jul 2025 01:16:15 -0700 (PDT)
+        Tue, 08 Jul 2025 01:16:52 -0700 (PDT)
 From: Jacek Kowalski <jacek@jacekk.info>
 X-Google-Original-From: Jacek Kowalski <Jacek@jacekk.info>
-Message-ID: <b4ee0893-6e57-471d-90f4-fe2a7c0a2ada@jacekk.info>
-Date: Tue, 8 Jul 2025 10:16:14 +0200
+Message-ID: <e199da76-00d0-43d3-8f61-f433bc0352ad@jacekk.info>
+Date: Tue, 8 Jul 2025 10:16:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,7 +84,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH iwl-next v2 0/5] drop unnecessary constant casts to u16
+Subject: [PATCH iwl-next v2 1/5] e1000: drop unnecessary constant casts to u16
 To: Tony Nguyen <anthony.l.nguyen@intel.com>,
  Przemek Kitszel <przemyslaw.kitszel@intel.com>,
  Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
@@ -90,42 +92,71 @@ To: Tony Nguyen <anthony.l.nguyen@intel.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
  Simon Horman <horms@kernel.org>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+References: <b4ee0893-6e57-471d-90f4-fe2a7c0a2ada@jacekk.info>
 Content-Language: en-US
+In-Reply-To: <b4ee0893-6e57-471d-90f4-fe2a7c0a2ada@jacekk.info>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-As requested by Simon Horman, here's the patch set to drop casts of
-constants to u16 in comparisons and subtractions.
+Remove unnecessary casts of constant values to u16.
+Let the C type system do it's job.
 
-Changes are applied across all Intel wired drivers.
-
-No behavioural changes intended.
-Compile tested only.
-
-v1 -> v2: drop casts in subtractions as well
-
-Jacek Kowalski (5):
-  e1000: drop unnecessary constant casts to u16
-  e1000e: drop unnecessary constant casts to u16
-  igb: drop unnecessary constant casts to u16
-  igc: drop unnecessary constant casts to u16
-  ixgbe: drop unnecessary constant casts to u16
-
+Signed-off-by: Jacek Kowalski <Jacek@jacekk.info>
+Suggested-by: Simon Horman <horms@kernel.org>
+---
  drivers/net/ethernet/intel/e1000/e1000_ethtool.c | 2 +-
  drivers/net/ethernet/intel/e1000/e1000_hw.c      | 4 ++--
  drivers/net/ethernet/intel/e1000/e1000_main.c    | 2 +-
- drivers/net/ethernet/intel/e1000e/ethtool.c      | 2 +-
- drivers/net/ethernet/intel/e1000e/nvm.c          | 4 ++--
- drivers/net/ethernet/intel/igb/e1000_82575.c     | 4 ++--
- drivers/net/ethernet/intel/igb/e1000_i210.c      | 2 +-
- drivers/net/ethernet/intel/igb/e1000_nvm.c       | 4 ++--
- drivers/net/ethernet/intel/igc/igc_i225.c        | 2 +-
- drivers/net/ethernet/intel/igc/igc_nvm.c         | 4 ++--
- drivers/net/ethernet/intel/ixgbe/ixgbe_common.c  | 2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c    | 2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c    | 2 +-
- 13 files changed, 18 insertions(+), 18 deletions(-)
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/e1000/e1000_ethtool.c b/drivers/net/ethernet/intel/e1000/e1000_ethtool.c
+index d06d29c6c037..d152026a027b 100644
+--- a/drivers/net/ethernet/intel/e1000/e1000_ethtool.c
++++ b/drivers/net/ethernet/intel/e1000/e1000_ethtool.c
+@@ -806,7 +806,7 @@ static int e1000_eeprom_test(struct e1000_adapter *adapter, u64 *data)
+ 	}
+ 
+ 	/* If Checksum is not Correct return error else test passed */
+-	if ((checksum != (u16)EEPROM_SUM) && !(*data))
++	if ((checksum != EEPROM_SUM) && !(*data))
+ 		*data = 2;
+ 
+ 	return *data;
+diff --git a/drivers/net/ethernet/intel/e1000/e1000_hw.c b/drivers/net/ethernet/intel/e1000/e1000_hw.c
+index f9328f2e669f..0e5de52b1067 100644
+--- a/drivers/net/ethernet/intel/e1000/e1000_hw.c
++++ b/drivers/net/ethernet/intel/e1000/e1000_hw.c
+@@ -3970,7 +3970,7 @@ s32 e1000_validate_eeprom_checksum(struct e1000_hw *hw)
+ 		return E1000_SUCCESS;
+ 
+ #endif
+-	if (checksum == (u16)EEPROM_SUM)
++	if (checksum == EEPROM_SUM)
+ 		return E1000_SUCCESS;
+ 	else {
+ 		e_dbg("EEPROM Checksum Invalid\n");
+@@ -3997,7 +3997,7 @@ s32 e1000_update_eeprom_checksum(struct e1000_hw *hw)
+ 		}
+ 		checksum += eeprom_data;
+ 	}
+-	checksum = (u16)EEPROM_SUM - checksum;
++	checksum = EEPROM_SUM - checksum;
+ 	if (e1000_write_eeprom(hw, EEPROM_CHECKSUM_REG, 1, &checksum) < 0) {
+ 		e_dbg("EEPROM Write Error\n");
+ 		return -E1000_ERR_EEPROM;
+diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
+index d8595e84326d..09acba2ed483 100644
+--- a/drivers/net/ethernet/intel/e1000/e1000_main.c
++++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
+@@ -313,7 +313,7 @@ static void e1000_update_mng_vlan(struct e1000_adapter *adapter)
+ 		} else {
+ 			adapter->mng_vlan_id = E1000_MNG_VLAN_NONE;
+ 		}
+-		if ((old_vid != (u16)E1000_MNG_VLAN_NONE) &&
++		if ((old_vid != E1000_MNG_VLAN_NONE) &&
+ 		    (vid != old_vid) &&
+ 		    !test_bit(old_vid, adapter->active_vlans))
+ 			e1000_vlan_rx_kill_vid(netdev, htons(ETH_P_8021Q),
 -- 
 2.47.2
 
