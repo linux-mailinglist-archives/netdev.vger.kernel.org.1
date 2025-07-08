@@ -1,155 +1,76 @@
-Return-Path: <netdev+bounces-205173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41EB4AFDA88
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 00:07:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC369AFDAC7
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 00:17:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 474D23A2A21
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 22:06:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4CCE484959
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 22:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E465C256C88;
-	Tue,  8 Jul 2025 22:06:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E8C259C92;
+	Tue,  8 Jul 2025 22:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kVlTYJc9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L1dDNcpH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC338256C71;
-	Tue,  8 Jul 2025 22:06:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B613258CE5;
+	Tue,  8 Jul 2025 22:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752012412; cv=none; b=jfchdO2Xvi+mYAq3FHsSstPFI0fZdiFea71pAmrX+D6OXLdIWp64niF5kKmvw/qSY6WgackV6J1OeOKb6FltReIdbhwlAPc8Fr3RbXddT79fYQKq8JxSmZqGJ3u5aCqfMCQSy4XGujJ1II7PwmC3kOkYtCQkHuh70EL81zMr1pw=
+	t=1752013065; cv=none; b=A1bDerasWNiVnhGqnRlGQj5Gwpxnx21Qw18crhdQIQdzcmSIj5TQV+L6laaGsncitVsRAuVGYJuBQCUantz1v+hqxS68irNKlo3Wik+V19JOyI40maROxfeyrQAR3wmkCqhNYbrEwWpE6O/IIdPvdXp89PMFmiCWkzY6vGk7LEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752012412; c=relaxed/simple;
-	bh=0DCSh97tlsCNy2I2ppkjAiABuMiU4rgf/sYDZDRotrc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k5eXpynldLZyND+YbrPL2qmrIybGJDQ6G1kfffzpXH3i5t1951XJAt3rAgxmLcYR4S31mAe4Kz9uSK2FSdfBsOlXLG9+73NWoDmnFTJR1htAdY20zRWmdeSdelrCOqIdoeBD5ZvgmBfLRfIc+ZyVgnayfKZejTeo0epKimwEUkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kVlTYJc9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E31EBC4CEF7;
-	Tue,  8 Jul 2025 22:06:51 +0000 (UTC)
+	s=arc-20240116; t=1752013065; c=relaxed/simple;
+	bh=UnhukZ2YtMp4btbXj3uJao6sn+kZTAOJccb/Lr/x/nY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l1RKcoDTm31Qeg48wubIuezYaUDk6Vlyqf/jsLIt/ZKFk+CP1oWmwOPSr+Ok1gV1OoDnIjBNCqsV/ztLIa926VOI7gsMu6XPtTfLDY0Wo5S4JDuDEqo8HY7CwYFcPZCCEXkZs3UzRq2tq6slvW3070Bl88HT+U7/PNClNi08nSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L1dDNcpH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 842E6C4CEED;
+	Tue,  8 Jul 2025 22:17:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752012412;
-	bh=0DCSh97tlsCNy2I2ppkjAiABuMiU4rgf/sYDZDRotrc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kVlTYJc98J8WCKV0nyZRbLytsLGIDM/MbyWQZL8GB4HUzg7RdEnMj8kygQfuuUr47
-	 Q0CXrBIqhzlZWU6sKiV0a2zWSAA2Ce2B7aDEdwWJ669md1XHbZZFHkD3ydB9xiHp2q
-	 kfX/WMXY9jvsc5nJwB+SgrCxy614YOhaLMTRwe/MvtLIcbx4bLESp+gc55fSNxTCsl
-	 bSxdl61HvD7edt+jlG7hMzS/z5Zx4kCb2a/oRBLVWzrGhIwLFCftGl9lNQwWFDxWmA
-	 +rCHeviXYDOClzq7UElg5GMQqneemAHJ/mzQq0RygNnN/ZvXEvwIL3dk055y4hbHx+
-	 xIkfuIgyK0tJw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	donald.hunter@gmail.com,
-	shuah@kernel.org,
-	maxime.chevallier@bootlin.com,
-	ecree.xilinx@gmail.com,
-	gal@nvidia.com,
-	linux-kselftest@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 5/5] selftests: drv-net: test RSS header field configuration
-Date: Tue,  8 Jul 2025 15:06:40 -0700
-Message-ID: <20250708220640.2738464-6-kuba@kernel.org>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250708220640.2738464-1-kuba@kernel.org>
-References: <20250708220640.2738464-1-kuba@kernel.org>
+	s=k20201202; t=1752013064;
+	bh=UnhukZ2YtMp4btbXj3uJao6sn+kZTAOJccb/Lr/x/nY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=L1dDNcpHDcp4F8/mto6moccsYo9Xlh2jxhB9b5sbCf2GmlRISDjVMejqGqz7guwlA
+	 m5xnBVzQ5Fa3ZDkl0LSBPlp/5HSHaSpI1ZVkTRtSv+cBPDsR2/B2O467dDRutGn7lz
+	 w5R+P0wKtTp+R8h6jQEgn3SFC38FuUl9DgWo6hA9sd43x9PnJVB71EHdmreIAFzcit
+	 Jg3wjJ8lqrf5oWnTH8ucrLrfVvHEAkdKjeJSN06YmzqxWnIxqc0NbMX467yNS58col
+	 kNuHwxV7UaiyceGzeV4kX4L/ii7LjCRErmLX3YpZ3fkoegZyl2lrlTQxF0yP9mprF6
+	 ARHEXTfl5ybEg==
+Date: Tue, 8 Jul 2025 16:17:42 -0600
+From: Keith Busch <kbusch@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>, Lei Yang <leiyang@redhat.com>,
+	Keith Busch <kbusch@meta.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, x86@kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCHv3 0/2]
+Message-ID: <aG2ZBrRIpGMZFB6R@kbusch-mbp>
+References: <20250227230631.303431-1-kbusch@meta.com>
+ <CAPpAL=zmMXRLDSqe6cPSHoe51=R5GdY0vLJHHuXLarcFqsUHMQ@mail.gmail.com>
+ <Z8HE-Ou-_9dTlGqf@google.com>
+ <Z8HJD3m6YyCPrFMR@google.com>
+ <Z8HPENTMF5xZikVd@kbusch-mbp>
+ <Z8HWab5J5O29xsJj@google.com>
+ <Z8HYAtCxKD8-tfAP@kbusch-mbp>
+ <3b1046fb-962c-4c15-9c4e-9356171532a0@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3b1046fb-962c-4c15-9c4e-9356171532a0@redhat.com>
 
-Test reading RXFH fields over IOCTL and netlink.
+On Fri, Feb 28, 2025 at 05:43:43PM +0100, Paolo Bonzini wrote:
+> (Keith, I haven't forgotten about AVX by the way).
 
-  # ./tools/testing/selftests/drivers/net/hw/rss_api.py
-  TAP version 13
-  1..3
-  ok 1 rss_api.test_rxfh_indir_ntf
-  ok 2 rss_api.test_rxfh_indir_ctx_ntf
-  ok 3 rss_api.test_rxfh_fields
-  # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- .../selftests/drivers/net/hw/rss_api.py       | 47 +++++++++++++++++++
- 1 file changed, 47 insertions(+)
-
-diff --git a/tools/testing/selftests/drivers/net/hw/rss_api.py b/tools/testing/selftests/drivers/net/hw/rss_api.py
-index db0f723a674b..6ae908bed1a4 100755
---- a/tools/testing/selftests/drivers/net/hw/rss_api.py
-+++ b/tools/testing/selftests/drivers/net/hw/rss_api.py
-@@ -20,6 +20,38 @@ from lib.py import NetDrvEnv
-     return int(output.split()[-1])
- 
- 
-+def _ethtool_get_cfg(cfg, fl_type, to_nl=False):
-+    descr = ethtool(f"-n {cfg.ifname} rx-flow-hash {fl_type}").stdout
-+
-+    if to_nl:
-+        converter = {
-+            "IP SA": "ip-src",
-+            "IP DA": "ip-dst",
-+            "L4 bytes 0 & 1 [TCP/UDP src port]": "l4-b-0-1",
-+            "L4 bytes 2 & 3 [TCP/UDP dst port]": "l4-b-2-3",
-+        }
-+
-+        ret = set()
-+    else:
-+        converter = {
-+            "IP SA": "s",
-+            "IP DA": "d",
-+            "L3 proto": "t",
-+            "L4 bytes 0 & 1 [TCP/UDP src port]": "f",
-+            "L4 bytes 2 & 3 [TCP/UDP dst port]": "n",
-+        }
-+
-+        ret = ""
-+
-+    for line in descr.split("\n")[1:-2]:
-+        # if this raises we probably need to add more keys to converter above
-+        if to_nl:
-+            ret.add(converter[line])
-+        else:
-+            ret += converter[line]
-+    return ret
-+
-+
- def test_rxfh_indir_ntf(cfg):
-     """
-     Check that Netlink notifications are generated when RSS indirection
-@@ -77,6 +109,21 @@ from lib.py import NetDrvEnv
-     ksft_eq(set(ntf["msg"]["indir"]), {1})
- 
- 
-+def test_rxfh_fields(cfg):
-+    """
-+    Test reading Rx Flow Hash over Netlink.
-+    """
-+
-+    flow_types = ["tcp4", "tcp6", "udp4", "udp6"]
-+    ethnl = EthtoolFamily()
-+
-+    cfg_nl = ethnl.rss_get({"header": {"dev-index": cfg.ifindex}})
-+    for fl_type in flow_types:
-+        one = _ethtool_get_cfg(cfg, fl_type, to_nl=True)
-+        ksft_eq(one, cfg_nl["flow-hash"][fl_type],
-+                comment="Config for " + fl_type)
-+
-+
- def main() -> None:
-     """ Ksft boiler plate main """
- 
--- 
-2.50.0
-
+Hey, how's that going by the way? :) Just checking in as I'm still
+having to carrying this part out of tree.
 
