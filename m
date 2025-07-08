@@ -1,75 +1,112 @@
-Return-Path: <netdev+bounces-204759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3448BAFC017
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 03:37:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56B86AFC020
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 03:41:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 628173AE813
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 01:37:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4BCDB7A79D6
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 01:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78DD71EA7C6;
-	Tue,  8 Jul 2025 01:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75B6C1F0E55;
+	Tue,  8 Jul 2025 01:41:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jKCR0Vap"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QUtRqdFg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49E6A35893;
-	Tue,  8 Jul 2025 01:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AEDCBE6C;
+	Tue,  8 Jul 2025 01:41:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751938655; cv=none; b=ntqomELVIkkGL1RRpBB2ZP05NmAFS98bD4c5F/7vmioSa88k2gykK8MN/QMQhp6Yb+u6A9Z7o9mJgRUaVR/C1a1aj4I79alokp/FMBcsgr5DmkEV3DfnWfM+vtZDNbtcuUcDhY0Q6qe5Oa6CjcR5sT6i2s4l6BkyWC5HfVZePNA=
+	t=1751938909; cv=none; b=VWQDKtpNpliuLixpCR53vL9mp3KsdlzLnziKQ3ubkBqhy5ruo2cqZIwbabwbz68xzOQnDmOThHiOyrbmYlTdWv6OnchrGvgKOpv1ljwAqTc4HjHs3i4BdYHtmun96w3dzZKbFOOhmEIeyqaN8tcsXBFgJjQoSX+pFIFmj2REEX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751938655; c=relaxed/simple;
-	bh=0/e0f/iH5qAnC0FrVkBoQWY70peX3hblYE56Ge41Mek=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mrEf8ewJHVe8doVHmilKCAv1G2MFJQd/6k87GCpmPMHDTcNDbgGxkqxD7VAi9msrBpctFTyl96JJMYmajAaCMIfG/bjf6VZMlOZNbx0f1bf4x4eY3LG5OSIM6R/XK25OGb5rMXrjNAjOKhRYTN6PcVNIoL2bVvh517ofjo1sIbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jKCR0Vap; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EB00C4CEE3;
-	Tue,  8 Jul 2025 01:37:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1751938654;
-	bh=0/e0f/iH5qAnC0FrVkBoQWY70peX3hblYE56Ge41Mek=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jKCR0VapSS1zGE4Tc+APcWxosUmIwqlOR9+T8vWqOFOu/nE7+JLgXkw7FdfEjUSkO
-	 SiMK2VOcMAAQskVP9s0XHQqIG6V1kJK2TD+xQQixtEwAgRswaz3GVyfwd6btcPswkO
-	 8bNp9z2vp4csEoYGd5sc5B0ztfjZf3VQ6qFI4qiaCY4sVS7rflmwUr5cHRRFW4n/YB
-	 9nnH2LWWGmwykIljbhw5BijxupwiUTrc2RX30h5T1L1bPs+B1HbO3DcgII5cE49fhI
-	 0zEZu1Q49UnHIx0GBsaKmUwGcw/6GKxil2gntz+fTOimLCq4yysVbcI/99YA0mHWuT
-	 jLV/0nT8x10rg==
-Date: Mon, 7 Jul 2025 18:37:33 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: liming.wu@jaguarmicro.com
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang
- <jasowang@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, angus.chen@jaguarmicro.com
-Subject: Re: [PATCH] virtio_net: simplify tx queue wake condition check
-Message-ID: <20250707183733.4088e82f@kernel.org>
-In-Reply-To: <20250702014139.721-1-liming.wu@jaguarmicro.com>
-References: <20250702014139.721-1-liming.wu@jaguarmicro.com>
+	s=arc-20240116; t=1751938909; c=relaxed/simple;
+	bh=S3y/WuFAiIo7m4T5b2jYL2QN9NkxkYEUb8Fdjn2R1Nw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W5J6kx1Pi7DzU0T0TZVmHLv/IB3pbuNtk+8tzhLrFGrbdf/be33EchOEwDhwUdPBB6ptdt4SN/eGOeKeyZOWz+YkRnaVreXCcj8K5/qVFxrqwEiNYoCX0NSgLAN0ZJtL9r1lw6djrKWfx5mLe0kjItbhHROJPhS6uaMSzlEDroU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QUtRqdFg; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2349f096605so55437735ad.3;
+        Mon, 07 Jul 2025 18:41:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1751938907; x=1752543707; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IakO4W35TSMY6u1/w9JSMTmWeBzD16gb0pScrOwb7Ck=;
+        b=QUtRqdFg9KOe21uf9Gwrdtm61KLbOF6hXfpUnOxqXAzQeyVWlxGXecfrwMr3i/w3GG
+         Ftt0cdKgEISgqlXw+lqld5CK8ZrQfQDlqiwLTXwvq+i1ISuWVXy5gKBu+0d+vd21Zyvr
+         78Pq80p+AmCyNHaIBY3++nFAqsAbRkgbxlYaJa+O0KEV3POYBdx6Xz3fZH2rDimxBTlT
+         472Db9dPbfsDUbRt64Ez+u8pNdHVXPoa+juqbLTB4J0KcVireTkF2FUe6AbidpOME/Xt
+         JZmwOR4OG5xVoHGX6EDtTYnY0m5DWrUfQp+GwSiTFAPvaMMksu0Oubpow88LiVvJxJrn
+         fcNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1751938907; x=1752543707;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IakO4W35TSMY6u1/w9JSMTmWeBzD16gb0pScrOwb7Ck=;
+        b=NUI03y+AglGK2ERBbvZIDqFQe+xrFz+l/cu44fuTMIzovAS1GGhFCULNuIHuPwBdCt
+         KtNqbVwuCewl5OtNPxxQs3Utlb/JN5WzxxI/9Gfm4iPyLFCtvlzNxGfRMgtu0sWDMOX0
+         1iU1dntdgXHz9ElGBItQNtigCBSivKi8UWiKpLe9AigFj3ITa58GXkcfDdFlg41bJoY0
+         AF8nwwYjUecIoFtF6qlGRL/goTdphIL2QnjtRVZOdaUI9cRgZeCUbTruw1/MGvMgJnPd
+         NFAkI266VlGD0X1uJ422LqiwrPGqjZV70kHF8x/KAlWiF/CWNemHzbQkuyVVgR0tw35X
+         av0w==
+X-Forwarded-Encrypted: i=1; AJvYcCXDYTC5hpA+repyXzMnoO7OzfZ+Rezeisul/4O7QZDGStDR06PwpF65HcQGEVREjk4qY0Ppt4k2rd8VeYA=@vger.kernel.org, AJvYcCXm5JZ4b5+F1pA4YcUxrWlwEbDuGkGUgFWB0H+Of8Fyd19A0mCDv4Jc3njM7XbavaiEBFth28ftnXxiMAfLAkZV4ak=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCVnSEWn8m2M6MfQu5hYhUiFm92L4b+4Fb7vklINlnwsEgx9NT
+	78kDtJZ6zyyu9pvaOUADEBBMW7slkHOq+AuMfnZWbWRlQR6sE1ZFbCnhEvCjr1mTRUg=
+X-Gm-Gg: ASbGncuAGOomzV5R+TXzHAjhTI1VPuFuYImlHYI8EC+SFg5icg0oodA93L0HNEME9/n
+	UFTqrE4GyGhsSR2hsSr9qgUgwU2r68K0LVZJp6kgkluKBHvUXKQOyRXHkF/C5vZyQnmbVfDQijI
+	CyE7E3LlYclwD34QC9Ph1CLkJAOyCrLKmcmDefKgSgmTeHtM8njtEcKm9BzuAK/XamzLE1JaQo7
+	ZK8PUWW8J7WLfhIHWoEFUzHlldUdqO3qVLrC34KnZM58cXSaSyR1zb8+/ZFeg2k2EXuOERoNnEc
+	1U0gJW9ETsm8KIRPGEtu9m04IhdNjAtsJQrtikmL59E=
+X-Google-Smtp-Source: AGHT+IEoEeKwhtHThcBhfzCyDdKwWEsoAlC/o9w5SAkBFWOcK9I3ckuovCLHaByZafysiBJjMdWgEA==
+X-Received: by 2002:a17:902:cecb:b0:234:b123:b4ff with SMTP id d9443c01a7336-23c87484434mr269524945ad.21.1751938907170;
+        Mon, 07 Jul 2025 18:41:47 -0700 (PDT)
+Received: from archlinux.lan ([2601:644:8200:dab8::1f6])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23c845922b5sm95773395ad.199.2025.07.07.18.41.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Jul 2025 18:41:46 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
+	linux-kernel@vger.kernel.org (open list),
+	linux-renesas-soc@vger.kernel.org (open list:RENESAS RZ/N1 A5PSW SWITCH DRIVER)
+Subject: [PATCHv2 0/2] net: dsa: rzn1_a5psw: add COMPILE_TEST
+Date: Mon,  7 Jul 2025 18:41:42 -0700
+Message-ID: <20250708014144.2514-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed,  2 Jul 2025 09:41:39 +0800 liming.wu@jaguarmicro.com wrote:
-> From: Liming Wu <liming.wu@jaguarmicro.com>
-> 
-> Consolidate the two nested if conditions for checking tx queue wake
-> conditions into a single combined condition. This improves code
-> readability without changing functionality. And move netif_tx_wake_queue
-> into if condition to reduce unnecessary checks for queue stops.
+Allows the various bots to test compilation. Also threw in a small devm
+conversion for enabling clocks.
 
-No longer applies, please rebase and repost if its still necessary.
+v2: fix depends on line to match rzn1 pcs driver.
+
+Rosen Penev (2):
+  net: dsa: rzn1_a5psw: add COMPILE_TEST
+  net: dsa: rzn1_a5psw: use devm to enable clocks
+
+ drivers/net/dsa/Kconfig      |  2 +-
+ drivers/net/dsa/rzn1_a5psw.c | 22 ++++------------------
+ 2 files changed, 5 insertions(+), 19 deletions(-)
+
 -- 
-pw-bot: cr
+2.50.0
+
 
