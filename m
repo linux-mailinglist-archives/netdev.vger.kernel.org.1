@@ -1,179 +1,171 @@
-Return-Path: <netdev+bounces-204915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0B6DAFC834
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 12:21:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 622A1AFC844
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 12:23:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48AB57B22A2
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 10:19:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FFF83A9413
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 10:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCEC926B0BE;
-	Tue,  8 Jul 2025 10:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E8C241CBA;
+	Tue,  8 Jul 2025 10:22:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="H+b90jCr";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="T5EyIeBS"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EtfpzEtq"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C37269885
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 10:20:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9624B20C000;
+	Tue,  8 Jul 2025 10:22:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751970015; cv=none; b=eQx8rcGrP1OWm9PrmGhGZCy1TFs2b7/8ruw0uKWgGFwqr3HEArADJQP4x0j33aefvhdcs1PRqigzili9IY4zgBCAt1adMXuCCXKY6GFLgMU/31fAR22QayDHwJqriX0a+VVUnn9Q0NHXf52IPXnBLalyFHQepAUHizJpk7gbXLQ=
+	t=1751970171; cv=none; b=WUTlhUnQPuft9S5xurXUbWnQ3yTwE6iGNs7TsXNFEKz2Uf1NJ+gfyGzMUjcpCUOlcJbER03L0ittdR6s6qAUE3IdYH7x0xAS7e7wLovJg4sGhDNCOH8HngcGk1vd69AsEkeVHyNOU6eBb0Pqww45hVQO1xRozHKd7tPMbvWrrUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751970015; c=relaxed/simple;
-	bh=vFfzSjvh2eH6o0tp99/1qQ6Gv9iExXFSn+qdZqvJZG8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L1rWTzhOYMUIkgvIOUHvz9nrH3LzWltcElAmuaFUwbmtUFRHL6OZWgOrWAjVi0k16Apg6EjjgfZ2wJLiiRI5W0yY/16yjQE4d/qtmozLwi+u05MGEf/neZKVliSak4eUMGK/RyuZfzC4Cq4aG911Hmz6hzmB9SbgKSTAOH7I0MY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=H+b90jCr; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=T5EyIeBS; arc=none smtp.client-ip=202.12.124.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 0BEFD7A029E;
-	Tue,  8 Jul 2025 06:20:12 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Tue, 08 Jul 2025 06:20:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1751970011; x=
-	1752056411; bh=wGKat92IYxEQR6OqZKHWsVRPZ0slbjTDGnbVk7+0VHA=; b=H
-	+b90jCrHT2bx+RYj26ykNwjrDmxkcN7y58t3HWz2yDpJGfpHFdj+d0X0aKJn5r/4
-	JvCHrX156Ml/5ZjZ0tJ5DWLVbr+9C3Swrd1VP9uqzdeP1889Y4BdBSmLA1Ib32KO
-	kOLwUXATPtaRY+6nx0KAHggklYJgTEUtZT/Uw/KUp43jErYIkmNoIhiOYHHduU/L
-	CH7J/LEQIsEuJMy7TUdTll8VkwgOLhcROeaBe2OpdrBWZvU/ODriU5bXi3+U8HWu
-	ljvi26vEHLdfvBxNKexMdLhcdnUVsevXUAI3H+u8uWz9ZRooTPBEx8ce3Ny8gxCl
-	fTRABZMygHD8Ygksx9qlw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1751970011; x=1752056411; bh=wGKat92IYxEQR6OqZKHWsVRPZ0slbjTDGnb
-	Vk7+0VHA=; b=T5EyIeBSNF5oa198+t6xbTWhkLbl3dP18zSx0O+aTYT3/exAj8T
-	SSkZnoSKCA49tcU/WZAMhJQ4WpnWfSHMbQjJBYA7IB31kaxRtuSmP8LJaU9pAj2C
-	82KgPfK2f4KIi6ZafBNAABGUrbLIB+YNJoIdASFDzqwcopGaMt8SEXclqSqXA49r
-	LYxpcdXGr7yE2YIn/lic0K/UwpIZlPcJoixq+SpvCXkQ9K7SZErzKJ8bIaV02Zry
-	zJGpbzalNxaZr6dZ/k8p6645pILI39CCIBOLlL2JDEX7szaoTAcZU2iH5HEfKVkE
-	f9pbQ8gUa/wQKZ1UO3GSjgcNHxrelO3pTMg==
-X-ME-Sender: <xms:2_BsaBdTreQIX65heIGLzxrfyHBCXjxoelyRHpxP3hu-1rCkm0X7Wg>
-    <xme:2_BsaMLIMzW8pWFNWtaPndLatlQRYmcaKGOvhaUbIFHNsymGFQ4XPnM2p8JsJfXC0
-    l8KtZ5QJAQ8CG4CStw>
-X-ME-Received: <xmr:2_BsaGLkK_Hh2T5OHkkZSbHb3qvcrciys1e7ODcmER_Ir669kIh32ivlRweN>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefgeegvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgr
-    ucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrg
-    htthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffef
-    gfduffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepkedpmhhouggv
-    pehsmhhtphhouhhtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtph
-    htthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohep
-    rghnthhonhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvh
-    hgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhho
-    fhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprh
-    gtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprhgrlhhf
-    sehmrghnuggvlhgsihhtrdgtohhm
-X-ME-Proxy: <xmx:2_BsaDXYds3eO7FvQpljkarqU1Qdk34nCLOxxRuUQX9Eg4qSkD-50g>
-    <xmx:2_BsaHmqbWl7ZUX0GQcwwAtNGkuKp-QDcjj2-HomgmtDQ-ujb82RZg>
-    <xmx:2_BsaBmcKQPiNSE61Kkz4axsI4L64-Q1yKzX60Y0YFE_q8ujsAgW5g>
-    <xmx:2_BsaPbMtYLYgsyTwkQ4FmqZmfHxx8hWox0H03N6a-rO3WbRMvNWAQ>
-    <xmx:2_BsaPVCZMU0Zv1UbvI4qG_CMN6D4bw-CngQ89KV6Y0whxydy3iIHcAG>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 8 Jul 2025 06:20:10 -0400 (EDT)
-Date: Tue, 8 Jul 2025 12:20:09 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Donald Hunter <donald.hunter@gmail.com>,
-	Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Ralf Lici <ralf@mandelbit.com>
-Subject: Re: [PATCH net 2/3] ovpn: explicitly reject netlink attr
- PEER_LOCAL_PORT in CMD_PEER_NEW/SET
-Message-ID: <aGzw2RqUP-yMaVFh@krikkit>
-References: <20250703114513.18071-1-antonio@openvpn.net>
- <20250703114513.18071-3-antonio@openvpn.net>
- <aGaApy-muPmgfGtR@krikkit>
- <20250707144828.75f33945@kernel.org>
+	s=arc-20240116; t=1751970171; c=relaxed/simple;
+	bh=YtEADF3lFuj3Z5pMye6Y/M18yeKy3rho+TrgFJuM+SI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hmlSRhb6kygx0y97caWWiB7BNw5zSwHvcxd0d0LpANqUyi/51wYk0I/AvVApr5KHNGd6yYiMw4q36Kfw7QDa1yuf9qIvP2PWWeFp4RguCZ9h5gmp3DeWbIh94slF0gx67OGIoOf/ADiViUjYl8ckPxUPuNbg1VDnBN/B4nNpRrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EtfpzEtq; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8C81C1FCF0;
+	Tue,  8 Jul 2025 10:22:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1751970160;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zMltJK2jiEp2y6nrc3nJjItX/hovb2my2FZRg2UaWog=;
+	b=EtfpzEtq3AGL3tizdCjYquOunIRzmjz3c7QDmxkwzOBGVHg2jMrfMyjGPb0vdiCLdY7g1Y
+	4pgA9frjRF3i7RrO0o5C5UAtDjfSn3o8DnF97M6CatLSY3uDMcwSnPOP1z+rQxLbcGS6FU
+	/JLTyYRCYTC9eD2u4lkZC5KEqNZNTwvcrUASdvKiY4xx0fsiDIKmolnT5CJXaJW7EThper
+	9imBCfUN9FskkaMR2SMycsJQfFBRvIbEOfsNLwKaf+KHDQ2UwKuAEzMnQTz9iD9Hyx7gUA
+	nZHXOF+QWRVt/T9JrnG6hKrdclB042Zp21JGECQBpFVYNSeeS0aH36dIJLyPQg==
+Date: Tue, 8 Jul 2025 12:22:37 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: <Tristram.Ha@microchip.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, Rob Herring <robh@kernel.org>,
+ "Krzysztof Kozlowski" <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Marek Vasut <marex@denx.de>,
+ <UNGLinuxDriver@microchip.com>, <devicetree@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 6/6 v2] net: dsa: microchip: Setup fiber ports
+ for KSZ8463
+Message-ID: <20250708122237.08f4dd7c@device-24.home>
+In-Reply-To: <20250708031648.6703-7-Tristram.Ha@microchip.com>
+References: <20250708031648.6703-1-Tristram.Ha@microchip.com>
+	<20250708031648.6703-7-Tristram.Ha@microchip.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250707144828.75f33945@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefgeegvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepuggvvhhitggvqddvgedrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudeipdhrtghpthhtohepvfhrihhsthhrrghmrdfjrgesmhhitghrohgthhhiphdrtghomhdprhgtphhtthhopeifohhojhhunhhgrdhhuhhhsehmihgtrhhotghhihhprdgtohhmpdhrtghpthhtoheprghnughrvgifs
+ ehluhhnnhdrtghhpdhrtghpthhtohepohhlthgvrghnvhesghhmrghilhdrtghomhdprhgtphhtthhopehrohgshheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhriihkodgutheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheptghonhhorhdoughtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvght
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-2025-07-07, 14:48:28 -0700, Jakub Kicinski wrote:
-> On Thu, 3 Jul 2025 15:07:51 +0200 Sabrina Dubroca wrote:
-> > > The OVPN_A_PEER_LOCAL_PORT is designed to be a read-only attribute
-> > > that ovpn sends back to userspace to show the local port being used
-> > > to talk to that specific peer.  
-> > 
-> > Seems like we'd want NLA_REJECT in the nla_policy instead of
-> > NLA_POLICY_MIN, but my quick grepping in ynl and specs doesn't show
-> > anything like that. Donald/Jakub, does it already exist? If not, does
-> > it seem possible to extend the specs and ynl with something like:
-> > 
-> > name: local-port
-> > type: reject(u16)
-> > 
-> > or maybe:
-> > 
-> > name: local-port
-> > type: u16
-> > checks:
-> >   reject: true
+Hi Tristram,
+
+On Mon, 7 Jul 2025 20:16:48 -0700
+<Tristram.Ha@microchip.com> wrote:
+
+> From: Tristram Ha <tristram.ha@microchip.com>
 > 
-> There's no way to explicitly reject, because we expect that only what's
-> needed will be listed (IOW we depend on NLA_UNSPEC rather than
-> NLA_REJECT). It gets complicated at times but I think it should work
-> here. Key mechanism is to define subsets of the nests:
+> The fiber ports in KSZ8463 cannot be detected internally, so it requires
+> specifying that condition in the device tree.  Like the one used in
+> Micrel PHY the port link can only be read and there is no write to the
+> PHY.  The driver programs registers to operate fiber ports correctly.
+> 
+> The PTP function of the switch is also turned off as it may interfere the
+> normal operation of the MAC.
+> 
+> Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+> ---
+>  drivers/net/dsa/microchip/ksz8.c       | 26 ++++++++++++++++++++++++++
+>  drivers/net/dsa/microchip/ksz_common.c |  3 +++
+>  2 files changed, 29 insertions(+)
+> 
+> diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
+> index 904db68e11f3..1207879ef80c 100644
+> --- a/drivers/net/dsa/microchip/ksz8.c
+> +++ b/drivers/net/dsa/microchip/ksz8.c
+> @@ -1715,6 +1715,7 @@ void ksz8_config_cpu_port(struct dsa_switch *ds)
+>  	const u32 *masks;
+>  	const u16 *regs;
+>  	u8 remote;
+> +	u8 fiber_ports = 0;
+>  	int i;
+>  
+>  	masks = dev->info->masks;
+> @@ -1745,6 +1746,31 @@ void ksz8_config_cpu_port(struct dsa_switch *ds)
+>  		else
+>  			ksz_port_cfg(dev, i, regs[P_STP_CTRL],
+>  				     PORT_FORCE_FLOW_CTRL, false);
+> +		if (p->fiber)
+> +			fiber_ports |= (1 << i);
+> +	}
+> +	if (ksz_is_ksz8463(dev)) {
+> +		/* Setup fiber ports. */
 
-Ok, I see. It's a bit verbose, especially with the nest, but adding a
-reject here and there as I was suggesting wouldn't work for per-op
-policies.
+What does fiber port mean ? Is it 100BaseFX ? As this configuration is
+done only for the CPU port (it seems), looks like this mode is planned
+to be used as the MAC to MAC mode on the DSA conduit. So, instead of
+using this property maybe you should implement that as handling the
+"100base-x" phy-mode ?
 
+> +		if (fiber_ports) {
+> +			regmap_update_bits(ksz_regmap_16(dev),
+> +					   reg16(dev, KSZ8463_REG_CFG_CTRL),
+> +					   fiber_ports << PORT_COPPER_MODE_S,
+> +					   0);
+> +			regmap_update_bits(ksz_regmap_16(dev),
+> +					   reg16(dev, KSZ8463_REG_DSP_CTRL_6),
+> +					   COPPER_RECEIVE_ADJUSTMENT, 0);
+> +		}
+> +
+> +		/* Turn off PTP function as the switch's proprietary way of
+> +		 * handling timestamp is not supported in current Linux PTP
+> +		 * stack implementation.
+> +		 */
+> +		regmap_update_bits(ksz_regmap_16(dev),
+> +				   reg16(dev, KSZ8463_PTP_MSG_CONF1),
+> +				   PTP_ENABLE, 0);
+> +		regmap_update_bits(ksz_regmap_16(dev),
+> +				   reg16(dev, KSZ8463_PTP_CLK_CTRL),
+> +				   PTP_CLK_ENABLE, 0);
+>  	}
+>  }
+>  
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+> index c08e6578a0df..b3153b45ced9 100644
+> --- a/drivers/net/dsa/microchip/ksz_common.c
+> +++ b/drivers/net/dsa/microchip/ksz_common.c
+> @@ -5441,6 +5441,9 @@ int ksz_switch_register(struct ksz_device *dev)
+>  						&dev->ports[port_num].interface);
+>  
+>  				ksz_parse_rgmii_delay(dev, port_num, port);
+> +				dev->ports[port_num].fiber =
+> +					of_property_read_bool(port,
+> +							      "micrel,fiber-mode");
 
-In ovpn we should also reject attributes from GET and DEL that aren't
-currently used to match the peer we want to get/delete (ie everything
-except PEER_ID), while still being able to parse all possible peer
-attributes from the kernel's reply (only for GET). So I guess we'd
-want a different variant of the nested attribute "peer" for the
-request and reply here:
+Shouldn't this be described in the binding ?
 
-    -
-      name: peer-get
-      attribute-set: ovpn
-      flags: [admin-perm]
-      doc: Retrieve data about existing remote peers (or a specific one)
-      do:
-        pre: ovpn-nl-pre-doit
-        post: ovpn-nl-post-doit
-        request:
-          attributes:
-            - ifindex
-            - peer
-        reply:
-          attributes:
-            - peer
-      dump:
-        request:
-          attributes:
-            - ifindex
-        reply:
-          attributes:
-            - peer
-
-
--- 
-Sabrina
+>  			}
+>  			of_node_put(ports);
+>  		}
+Maxime
 
