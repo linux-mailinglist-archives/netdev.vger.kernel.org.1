@@ -1,108 +1,112 @@
-Return-Path: <netdev+bounces-205040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C6C0AFCF57
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 17:36:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5943AAFCF6C
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 17:39:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92FB1481EC6
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:33:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AB913B5B1A
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 15:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A172D231824;
-	Tue,  8 Jul 2025 15:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A7262E11A9;
+	Tue,  8 Jul 2025 15:38:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ifMKTzzZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n9PbLbQ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 879A82E03FE
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 15:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE892E11C3;
+	Tue,  8 Jul 2025 15:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751988856; cv=none; b=B3dvjsk3mpEXK3NuRMpUUG82Juncn7j2B67Zmon2zf+cYHkTOor6Sr8Kmbdgsi3nqfsaefKMFMrpJDVOKt6tjXf0z6B8iTxBdanW02LFEctjzuB4hpfGrfs9kstv0W3nhbMiVBB9lx7DDkYCy4FHAeTXVT4Bp4fw914shIjXLas=
+	t=1751989109; cv=none; b=lv5Juoufd5tSAGXpT646DF/9c9ujnrM11/IQUS7KCQmjBswhRJov3BoNNFqAq5zQl7Hne8iLyXCwOFTJE6CRqAQNDQQWjlX9vMqkJMRvDB089HTo0dDpmjRtMiu20f/fYLkyYybU5OaweZnxOi+/qqiiN0ODXNmzs5sBPBEe8KM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751988856; c=relaxed/simple;
-	bh=ZhQARY+dMy04cmVCG3gKjNrTT6k7l5XUjHxmQQ3Odws=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DM8tcWuKW0SsxJWh7b0pDedi8E5tBrqYCKM4v7+6jd8CXEUAnYCWkioIJzYPuvpf1e0MGzBvJ3CM1CR1rbKXJQqUraabmtFniDwMyQcOx2AXOQsfRjSweH5FeM6IlWrgb9LMTO2hcUeZwmt2CEvx8QVrpdyVMOvPozuP52ZfgJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ifMKTzzZ; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <06710fb3-fc55-479e-b029-134f41fb93eb@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1751988841;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UikPezaKOR74LDrxg8ACKqHsuH0yXZu32wrnQNh+phc=;
-	b=ifMKTzzZSNehwnTaGTAuaeH7r7ho9nFO+uR7Cs37lBKqjZPjj77jNkxFpkPFxX6gRmTI0p
-	GKXquz0dWmM+t4G/M4xfAwNee465VUQrrPcm7XPOsi3UDS26Sqk2c/OHj4fEU/e/weWkSB
-	IDum6qt7B0ZFVjFI6ycbReQeQ8GDsj8=
-Date: Tue, 8 Jul 2025 11:33:46 -0400
+	s=arc-20240116; t=1751989109; c=relaxed/simple;
+	bh=oDEtOf0DaTfsiKg+dTzSTHuTGeQPH+ZbPyfhdxIehAo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eW08wBY+XfVNgVtn349kE7r9sfIzH7/ZuudxD0cvllf9PWIdSR7boJG0XmwudHt9cP57g0D5pihnB4rb4cqrtFVjEm/Z25ZCqYveItltAW4H3ltr/rTyI01NJDDIBUiXMJqVoiR1ofdAru4bXgbTJTayJv9P48+Ly/KNWo/ka8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n9PbLbQ9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D598C4CEED;
+	Tue,  8 Jul 2025 15:38:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751989108;
+	bh=oDEtOf0DaTfsiKg+dTzSTHuTGeQPH+ZbPyfhdxIehAo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n9PbLbQ9DxyvF2ZYdhO1L4fP9gUwKnXhGM1vEeabzvph5jN6AV4yyjNFpoTbw47f8
+	 S+Q8aAyfjkbCC4pqyV/qXa6M7F1y3K4Bp4CO5nSq/brqJz1Zci6a2rEyTsrvDzMyNY
+	 nHwAL0wmnYEM6YQF+Ij9iWqGjwWDaozG7oiav3//lv4qzSibydlDld+Ll1w8wng+m3
+	 bwVM80Xtw47Kh394C0tlvIXGvzgHgG6G/pcy+Rulh9/EueQA+imWyC32h9wvtz78ay
+	 U1Dh1lp4MfCN4dJ04q+S0S8YVRp1xsdKJP5ajdH4exlxyhPglxhKdE/gq20mPJuB2g
+	 Wc7OXHmbYDqOA==
+Date: Tue, 8 Jul 2025 16:38:24 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yuto Ohnuki <ytohnuki@amazon.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Kohei Enju <enjuk@amazon.com>
+Subject: Re: [PATCH iwl-next v1] igbvf: remove unused fields from struct
+ igbvf_adapter
+Message-ID: <20250708153824.GM452973@horms.kernel.org>
+References: <20250707180116.44657-2-ytohnuki@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] net: phy: Don't register LEDs for genphy
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Florian Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Christian Marangi <ansuelsmth@gmail.com>
-References: <20250707195803.666097-1-sean.anderson@linux.dev>
- <aGzduaQp3hWA5V-i@shell.armlinux.org.uk>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <aGzduaQp3hWA5V-i@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250707180116.44657-2-ytohnuki@amazon.com>
 
-On 7/8/25 04:58, Russell King (Oracle) wrote:
-> On Mon, Jul 07, 2025 at 03:58:03PM -0400, Sean Anderson wrote:
->> If a PHY has no driver, the genphy driver is probed/removed directly in
->> phy_attach/detach. If the PHY's ofnode has an "leds" subnode, then the
->> LEDs will be (un)registered when probing/removing the genphy driver.
+On Mon, Jul 07, 2025 at 07:01:17PM +0100, Yuto Ohnuki wrote:
+> Remove following unused fields from struct igbvf_adapter that are never
+> referenced in the driver.
 > 
-> Maybe checking whether the PHY driver supports LEDs would be more
-> sensible than checking whether it's one of the genphy drivers?
-
-The genphy driver is special, since it is probed synchronously from
-phy_attach. All other drivers are probed asynchronously and don't have
-this problem.
-
->> This could occur if the leds are for a non-generic driver that isn't
->> loaded for whatever reason. Synchronously removing the PHY device in
->> phy_detach leads to the following deadlock:
->> 
->> rtnl_lock()
->> ndo_close()
->>     ...
->>     phy_detach()
->>         phy_remove()
->>             phy_leds_unregister()
->>                 led_classdev_unregister()
->>                     led_trigger_set()
->>                         netdev_trigger_deactivate()
->>                             unregister_netdevice_notifier()
->>                                 rtnl_lock()
->> 
->> There is a corresponding deadlock on the open/register side of things
->> (and that one is reported by lockdep), but it requires a race while this
->> one is deterministic.
+> - blink_timer
+> - eeprom_wol
+> - fc_autoneg
+> - int_mode
+> - led_status
+> - mng_vlan_id
+> - polling_interval
+> - rx_dma_failed
+> - test_icr
+> - test_rx_ring
+> - test_tx_ring
+> - tx_dma_failed
+> - tx_fifo_head
+> - tx_fifo_size
+> - tx_head_addr
 > 
-> Doesn't this deadlock exist irrespective of whether the genphy driver(s)
-> are being used, and whether or not the PHY driver supports LEDs?
+> Also removed the following fields from struct igbvf_adapter since they
+> are never read or used after initialization by igbvf_probe() and igbvf_sw_init().
+> 
+> - bd_number
+> - rx_abs_int_delay
+> - tx_abs_int_delay
+> - rx_int_delay
+> - tx_int_delay
+> 
+> This changes simplify the igbvf driver by removing unused fields, which
+> improves maintenability.
+> 
+> Tested-by: Kohei Enju <enjuk@amazon.com>
+> Signed-off-by: Yuto Ohnuki <ytohnuki@amazon.com>
+> ---
+>  drivers/net/ethernet/intel/igbvf/igbvf.h  | 25 -----------------------
+>  drivers/net/ethernet/intel/igbvf/netdev.c |  7 -------
+>  2 files changed, 32 deletions(-)
 
-Nope.
+Less is more :)
 
---Sean
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
