@@ -1,173 +1,149 @@
-Return-Path: <netdev+bounces-205100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E67BAFD5B9
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 19:51:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3077AFD5C7
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 19:53:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47F4C1C23608
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 17:52:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16241583511
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 17:53:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0A32E716D;
-	Tue,  8 Jul 2025 17:51:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D77962E3B03;
+	Tue,  8 Jul 2025 17:53:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="k9Ksgk6Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1D92E5B11
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 17:51:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5EC2DC33D;
+	Tue,  8 Jul 2025 17:53:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751997090; cv=none; b=scCiyWoltdI1i/ZSzuwN4kjJulbiaJIfltTMhAk0MHGS0WXzsijLD2N6KO1XGvrx1RDDrgc/9/utuNXmL03agChs07IbzkeN30FnmKDw1IG7rl7xBcWRMvkm+6GimSV8Fgfiy/Mswp7+cBJ7Wh1pAsCJjoekFlSVtGebN5yQdyU=
+	t=1751997218; cv=none; b=H5jEuaNL9MLGhOvWfzkgNnP7+Af3C0fIRpOzXKbshpVAIBlcZsnKFMlXKOQFzAdk7Yi2/psOglh/taDK80wt5ljbV8rJzm0yS93QglkVHDnGIS+rDbTJEzNvUq4rCzoO3JgL4BeORPh6MMRZLxq9lCjFpAuvPdkKf4mtje6YGt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751997090; c=relaxed/simple;
-	bh=j8S9vY8YEpgAZ+9EOTe6TqmituCFgPwLRcCdXTJ/ClI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=o00SWdFNM7PEjjjgJUr80ShakThZ6RvepzkDD2idqtkbkonhg76YmUHpgfzHgIr34GSdkxWMkoEZRBk4edUkTdikmbE94uHxkP8kNkoTWZB5MkDnxLBBn+IMA7BCrSVoDnTkzCCMBxYdnIcQIwkHlJiQhUyD4/PsCsB2wSNubZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3df309d9842so124020065ab.3
-        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 10:51:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751997087; x=1752601887;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+TeThu1b9aE+CPbvKACRdaDEcTafO62ZyIapw7YKedY=;
-        b=b9xq6FHzbfRmVkhSoBzJQOQdyioLN/u6NjMvFwh6h11nUSa+NKqchaTb5CrZPE5Ehn
-         9iJu6wI0cYvtqMBZIDGTcELK01Q1wJliem0laq1Hjmo1X7893Esh8JnYgpgqs0TWO2VI
-         mzqquzTyB0I2VNOA1FO9sFuetdPl+Z+89TGpnSHmwA3EjwTwaMewW9sRWR3yqBA62Vdg
-         AW0g5kM9SdHrll0nuLYACstGOIMCjZGueoO2W/vn70BaZzvnVU429WEd45vTSNBqN7+i
-         HPUjWUSdG0Ox1bODBFDgOEcYqiCj7NSPy4d4YxwYbFDE8SbN397bavlmlyheCIqwTJo4
-         gI2A==
-X-Forwarded-Encrypted: i=1; AJvYcCVg+j3Mzr3MaxCCTXyKWzGkS5pIqmM61wKv6Rvqc7Qk30DpEZ9jW/b72eYhm/NsgnWvnkDy6Ik=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHV3ulVnXnD+2JsceCDLc6a8P4ug1JAuVuB2gldtpT5PzS2JtI
-	4AxB0qIF0ueN6uWvZvHSexOTa9TGFQBhAWgmmZOzUCGosGRkDnFsZltqyfLr1yLGTvNm6VIM8j0
-	Z6U+azRBYuXr+w9mKi4VnSx9NSGohlMhCx4jWl41T5JHJCQ7qAQM6EBHZBdo=
-X-Google-Smtp-Source: AGHT+IHcCjqcbO63Nl0JY0A3bU593vUxVeXcAZKB6aOep3GpMpLNYi4983VKkyY8HO25v6N/RwGdaEJkUpU2NpS2Y/pqUD8Fpyqc
+	s=arc-20240116; t=1751997218; c=relaxed/simple;
+	bh=BvDV8p5FETSMWVU1BZi0FPj3bybZk7UYrX/ESm3UydU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RXchsVe+b5sE+mMSlFzspBSIARLy3lyYKa2OPJddhXhbk/5j3PBsvcD7yQDeMau3bCnVA3iFqLqJeepN7MDuv3HrZzO3OqnrmU6WkSFZ6QwR04JeYlad/wlv9U5g8MMjtZEsdPKjsYUhf3BRoss80Tygd1CVtrzSHsuftHJy1Mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=k9Ksgk6Y; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 568HbKIh029071;
+	Tue, 8 Jul 2025 17:53:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=corp-2025-04-25; bh=46+sQH1n5Knp03ba
+	6G7W6BAhaEyMNgWTRzlpacnlqMs=; b=k9Ksgk6YVqeA7vj2QWjdrCAism5+PcGe
+	A7hn+6+1PcV5lj7m/9paLe0X9ws0X2hk9lvveIv1JLxSwb5jdsES7gi5axod37LF
+	VZM9wHdeGfLoOmyIIPBgrGyUVWpwAthwvZnxyuc+ErYWWl2jki53MESaE6zJYU65
+	Wxy8L/sNPwUGFy3HxlaYuXDrjG19ZF24TZfxGONWGefg02/1yOGhB1kq09b3qCa/
+	IIuG61SYKQP3sWQ6pOfoKu2Gct5c9Vk/Ru/HwHg2AlKewzRcniHcr9C4GeEFkFBs
+	R5IintR7VM/Ht9wjKVldwoNpFvlhvWt1f87lww8kF6BVkD6KXaiTXg==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 47s7vsg11m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 08 Jul 2025 17:53:23 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 568H0j3j027404;
+	Tue, 8 Jul 2025 17:53:22 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 47ptg9x5bq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 08 Jul 2025 17:53:22 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 568HrLif020285;
+	Tue, 8 Jul 2025 17:53:21 GMT
+Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 47ptg9x5ag-1;
+	Tue, 08 Jul 2025 17:53:21 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: sgoutham@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        horms@kernel.org, netdev@vger.kernel.org
+Cc: alok.a.tiwari@oracle.com, linux-arm-kernel@lists.infradead.org,
+        darren.kenny@oracle.com, linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2] net: thunderx: Fix format-truncation warning in bgx_acpi_match_id()
+Date: Tue,  8 Jul 2025 10:52:43 -0700
+Message-ID: <20250708175250.2090112-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1527:b0:3e0:4f66:310a with SMTP id
- e9e14a558f8ab-3e1355a8e41mr169148195ab.16.1751997087610; Tue, 08 Jul 2025
- 10:51:27 -0700 (PDT)
-Date: Tue, 08 Jul 2025 10:51:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <686d5a9f.050a0220.1ffab7.0017.GAE@google.com>
-Subject: [syzbot] [usb?] WARNING in usbnet_status_start
-From: syzbot <syzbot+3f89ec3d1d0842e95d50@syzkaller.appspotmail.com>
-To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	netdev@vger.kernel.org, oneukum@suse.com, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-08_05,2025-07-07_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 adultscore=0
+ suspectscore=0 phishscore=0 mlxlogscore=999 bulkscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2505160000
+ definitions=main-2507080149
+X-Authority-Analysis: v=2.4 cv=dYCA3WXe c=1 sm=1 tr=0 ts=686d5b13 b=1 cx=c_pps a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=yPCof4ZbAAAA:8 a=xO2tqtdlJwZuTTCz-PAA:9 a=3ZKOabzyN94A:10
+ a=QEXdDO2ut3YA:10 cc=ntf awl=host:12057
+X-Proofpoint-GUID: BUzLkKWaWhkHOaiMx5gcs2nadI9h35Mu
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA4MDE0OSBTYWx0ZWRfX6BPQtWttynJU C6t848ZnUzq9hQjGXWGkV1PZGQQZ9lN38EIh9zD7t1fsSBfStknJTcxOqshnECVZcVc3SeVH+fo zmUtkIrAkyNpcxXLAD11ssxizZg+6/fFfTXn7NBWV2ChpWRfBOaNFHX0Ne/9BHEkN0KoeCTYV+N
+ hkMR7sGQBRIF5J0hwSl/C35/NrL5eggZ8xwdQkdr8vVd/3inDx1yBwBUufXw36dGEP2UZ2bLTUI vh2m714nDfN/tCC5zPcvokvICjJrZKVqi2Az6mhlV3vSf0Kb+PjF7epjDw2W4pkBMRITChbwuzf OZCZUUggiNF/kKapqRutc93FkPLrC3/tn40iwCiCLZ5AOKi4Jtg/qH/4HPeTP6rfICQ+UvBx8Xd
+ GbwYAOtjhysjPuZTN6RtE5vGHiU1VAtiX1kmpUIw5jrZGlBGoVfmLdJ5QehUgaFoxc6tPlpz
+X-Proofpoint-ORIG-GUID: BUzLkKWaWhkHOaiMx5gcs2nadI9h35Mu
 
-Hello,
+The buffer bgx_sel used in snprintf() was too small to safely hold
+the formatted string "BGX%d" for all valid bgx_id values. This caused
+a -Wformat-truncation warning with Werror enabled during build.
 
-syzbot found the following issue on:
+Increase the buffer size from 5 to 8 and use sizeof(bgx_sel) in
+snprintf() to ensure safety and suppress the warning.
 
-HEAD commit:    d1b07cc0868f arm64: dts: s32g: Add USB device tree informa..
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
-console output: https://syzkaller.appspot.com/x/log.txt?x=1554d582580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=28729dff5d03ad1
-dashboard link: https://syzkaller.appspot.com/bug?extid=3f89ec3d1d0842e95d50
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11680a8c580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14c9abd4580000
+Build warning:
+  CC      drivers/net/ethernet/cavium/thunder/thunder_bgx.o
+  drivers/net/ethernet/cavium/thunder/thunder_bgx.c: In function
+‘bgx_acpi_match_id’:
+  drivers/net/ethernet/cavium/thunder/thunder_bgx.c:1434:27: error: ‘%d’
+directive output may be truncated writing between 1 and 3 bytes into a
+region of size 2 [-Werror=format-truncation=]
+    snprintf(bgx_sel, 5, "BGX%d", bgx->bgx_id);
+                             ^~
+  drivers/net/ethernet/cavium/thunder/thunder_bgx.c:1434:23: note:
+directive argument in the range [0, 255]
+    snprintf(bgx_sel, 5, "BGX%d", bgx->bgx_id);
+                         ^~~~~~~
+  drivers/net/ethernet/cavium/thunder/thunder_bgx.c:1434:2: note:
+‘snprintf’ output between 5 and 7 bytes into a destination of size 5
+    snprintf(bgx_sel, 5, "BGX%d", bgx->bgx_id);
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3eab0cb43ae2/disk-d1b07cc0.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/934d59614ed5/vmlinux-d1b07cc0.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4b24078bc227/bzImage-d1b07cc0.xz
+compiler warning due to insufficient snprintf buffer size.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3f89ec3d1d0842e95d50@syzkaller.appspotmail.com
-
-sierra_net 4-1:0.11 wwan0: register 'sierra_net' at usb-dummy_hcd.3-1, Sierra Wireless USB-to-WWAN Modem, 00:00:00:00:01:0b
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 37 at drivers/net/usb/usbnet.c:266 usbnet_status_start+0x189/0x1e0 drivers/net/usb/usbnet.c:266
-Modules linked in:
-CPU: 1 UID: 0 PID: 37 Comm: kworker/1:1 Not tainted 6.16.0-rc4-syzkaller-00311-gd1b07cc0868f #0 PREEMPT(voluntary) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/07/2025
-Workqueue: usb_hub_wq hub_event
-RIP: 0010:usbnet_status_start+0x189/0x1e0 drivers/net/usb/usbnet.c:266
-Code: 00 fc ff df 48 c1 ea 03 80 3c 02 00 75 4e 48 8b bb 70 03 00 00 89 ee e8 25 95 0c 00 41 89 c5 e9 36 ff ff ff e8 a8 3f ec fc 90 <0f> 0b 90 45 31 ed e9 39 ff ff ff 4c 89 ff e8 d4 41 49 fd e9 e9 fe
-RSP: 0018:ffffc90000277098 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: ffff888100f80d00 RCX: ffffffff84930727
-RDX: ffff888105693a00 RSI: ffffffff84919188 RDI: ffff888100f80d00
-RBP: 0000000000000cc0 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000001 R12: ffff888100f81070
-R13: ffffffff89be8f70 R14: ffff88811da1f028 R15: ffff88811da1f024
-FS:  0000000000000000(0000) GS:ffff888269262000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffd6ab63358 CR3: 0000000116716000 CR4: 00000000003506f0
-Call Trace:
- <TASK>
- sierra_net_probe drivers/net/usb/sierra_net.c:929 [inline]
- sierra_net_probe+0x70/0xb0 drivers/net/usb/sierra_net.c:921
- usb_probe_interface+0x303/0x9c0 drivers/usb/core/driver.c:396
- call_driver_probe drivers/base/dd.c:579 [inline]
- really_probe+0x23e/0xa90 drivers/base/dd.c:657
- __driver_probe_device+0x1de/0x440 drivers/base/dd.c:799
- driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:829
- __device_attach_driver+0x1df/0x310 drivers/base/dd.c:957
- bus_for_each_drv+0x156/0x1e0 drivers/base/bus.c:462
- __device_attach+0x1e4/0x4b0 drivers/base/dd.c:1029
- bus_probe_device+0x17f/0x1c0 drivers/base/bus.c:537
- device_add+0x1148/0x1a70 drivers/base/core.c:3692
- usb_set_configuration+0x1187/0x1e20 drivers/usb/core/message.c:2210
- usb_generic_driver_probe+0xb1/0x110 drivers/usb/core/generic.c:250
- usb_probe_device+0xef/0x3e0 drivers/usb/core/driver.c:291
- call_driver_probe drivers/base/dd.c:579 [inline]
- really_probe+0x23e/0xa90 drivers/base/dd.c:657
- __driver_probe_device+0x1de/0x440 drivers/base/dd.c:799
- driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:829
- __device_attach_driver+0x1df/0x310 drivers/base/dd.c:957
- bus_for_each_drv+0x156/0x1e0 drivers/base/bus.c:462
- __device_attach+0x1e4/0x4b0 drivers/base/dd.c:1029
- bus_probe_device+0x17f/0x1c0 drivers/base/bus.c:537
- device_add+0x1148/0x1a70 drivers/base/core.c:3692
- usb_new_device+0xd07/0x1a20 drivers/usb/core/hub.c:2694
- hub_port_connect drivers/usb/core/hub.c:5566 [inline]
- hub_port_connect_change drivers/usb/core/hub.c:5706 [inline]
- port_event drivers/usb/core/hub.c:5866 [inline]
- hub_event+0x2f85/0x5030 drivers/usb/core/hub.c:5948
- process_one_work+0x9cc/0x1b70 kernel/workqueue.c:3238
- process_scheduled_works kernel/workqueue.c:3321 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3402
- kthread+0x3c2/0x780 kernel/kthread.c:464
- ret_from_fork+0x5b3/0x6c0 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
-
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+v1->v2
+No changes. Targeting for net-next.
+https://lore.kernel.org/all/20250708160957.GQ452973@horms.kernel.org/
+---
+ drivers/net/ethernet/cavium/thunder/thunder_bgx.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+index 3b7ad744b2dd6..2eea3142eebea 100644
+--- a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
++++ b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+@@ -1429,9 +1429,9 @@ static acpi_status bgx_acpi_match_id(acpi_handle handle, u32 lvl,
+ {
+ 	struct acpi_buffer string = { ACPI_ALLOCATE_BUFFER, NULL };
+ 	struct bgx *bgx = context;
+-	char bgx_sel[5];
++	char bgx_sel[8];
+ 
+-	snprintf(bgx_sel, 5, "BGX%d", bgx->bgx_id);
++	snprintf(bgx_sel, sizeof(bgx_sel), "BGX%d", bgx->bgx_id);
+ 	if (ACPI_FAILURE(acpi_get_name(handle, ACPI_SINGLE_NAME, &string))) {
+ 		pr_warn("Invalid link device\n");
+ 		return AE_OK;
+-- 
+2.46.0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
