@@ -1,180 +1,120 @@
-Return-Path: <netdev+bounces-204762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4739CAFC027
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 03:42:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AD92AFC037
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 03:46:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73F053BD329
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 01:41:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9243A3B2BF4
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 01:45:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F13217F23;
-	Tue,  8 Jul 2025 01:41:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kOBHc9oN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 660F81F4626;
+	Tue,  8 Jul 2025 01:46:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C6E201269;
-	Tue,  8 Jul 2025 01:41:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358E140BF5;
+	Tue,  8 Jul 2025 01:46:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751938912; cv=none; b=E2fltKVfs2yXcGwpP5so4mahRTAkqFI2I1UHP7GKN2jfdGJ4d4oiUnqk7ZbPXdds43uux3p27O119+MVwJburub/rMaewszchhRBGonvYQwJja9HHfNG1nt6mnRm1UrmXeEoc8R92RDWchJCr62hQV0IF1wYMXwlxL7LCqn40+I=
+	t=1751939167; cv=none; b=kvus6iedgtqU8iNDUpweUku8Wt8yNifV4f26xQFY31+ZS3uZ+rm322jhhIXWtuUEjczSYxs3EKDiSMj9rgu7XXhkldRSDXSR+PY2hwOlu2Tmyp27vUWjBmcOChEG1F9wxsFVoRnbjXtJfRBvZY8Xfn87gvrgn6BzzDDk275sCh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751938912; c=relaxed/simple;
-	bh=7Jp+7aoQlwHzBSLcGDasAf4OQ1Ko0V2RppLdpuU/eto=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aR/pwI76TBBfzYC8SC8ey+VuIF5wAZGYit8fSMF594zq+JTpTzwZa9MKQR8vFkLT4IZsrVx9DXP2jW95ciSWl46JEV7GRAZLDTgnTKpBCADvz0q9SXn9ApGEgcVg4nwmJ7mbxZZ8b6bwF4Xxwm/FPUd4RU+DOq1mAQqf7wVHcts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kOBHc9oN; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-23dc5bcf49eso21923825ad.2;
-        Mon, 07 Jul 2025 18:41:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1751938910; x=1752543710; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QxrAKwHku8E+qt+4+5rp0WxwZwqsAY76OjW42aieBp4=;
-        b=kOBHc9oNU1MJtSsxX9g6bN3QyCcRwVfa6h30mB5iKS7jHOMUgqLbVNQNL0+EcS1Npo
-         D7wUcDYCM3sW53bZairsctnmgc5alHv/ufPsKb5rcxm48M4D1Q+1yk8aNkX1WAaif6/Z
-         FNPuIAESuB4b85rA97sdHc/JQdw7m9QWc6+0o5Wxdy4tWWFEn1VGqWxSuBamqvXLTioq
-         Gc8vN3JwFfQuYGC0jbIVgCOtvMhRm4OfHWjdExDdeKakQL/JTInqEtv13Ian1ziI/t9G
-         k9f+Ctl/oxWEz+MRK+eobFdnjVoedHXGOAzfNnG5Kwx5yetCtuuYV2YLXhn65e5qCeJm
-         y2Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1751938910; x=1752543710;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QxrAKwHku8E+qt+4+5rp0WxwZwqsAY76OjW42aieBp4=;
-        b=wgERvyu62gBlcEi0WEcc/vDHQyp1wn/4IQ/HuLBUGeg+G+xKorcvavsZrfMb+OuBau
-         jTBGb25A2XnwdxeqSMK+RxPy2/PZPAj8YpJczfgLFf6msIZIJcuR29V4EjnPBIZPeho/
-         s/rqwX6ehtoBZV6shBaDhzp9zmZRdgNQ3mCFj024n7rL3JAFmfJ2a+WFf3NrLkWUWKw0
-         +FupULAqFu5pgyLPAx6gEXmaMFxK+OG8E0ii5/CMYZjxTe30X5R2GMgxCMB05OwOoGid
-         32++IwZUVcWkmB+ivRc+5DIO6o+z2q9sgoqxVlG3IdcuYFWNNH7KBOVnuazk1Fnqt4hu
-         xGiw==
-X-Forwarded-Encrypted: i=1; AJvYcCVOVn53YtXYuDQTjK6ANozsCKaCbN/bh5nxi0bnt+ztPnXdWASU8G2Y7/3lEtdsdE+1+o7TB6f6zjnSeyHd7+FcgYw=@vger.kernel.org, AJvYcCVok4+7ntc59CGu30xAy6u9vUF8xitZMoFWtc/bCvcWqdtNnIRHdJPxjjjkvfcPkj82lNevIlWBtrcTpGY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPlSqe3z8Q7hWb6DR8sW8F5nAgBvg6amNXYw33jXsgOWbg0hn4
-	c3uGHAiDaPIBj/hmwxRzve/d+H96J6OCmv0w3iVMlZZjum0U5kjOIWwIoTqZtv3RWdM=
-X-Gm-Gg: ASbGncvayEkqodzVy9KxHtM4tNlFuyt1QWE/YjTqIyCE3g1+W0bFz02ZeOm01rGzA5r
-	EX2tLzOwEUqfU0A9se/Lkxceu2r22wgRQ5jvJQzCo/PMuKmKyY5fK9158aEb0I1K73pStDul/Ra
-	IZll83VfPstSaFEpZwA9p2z3zaA4ZgZmw0LNxB1Myt9svUqrkn2fEYgRSFS/aIRtUXdwep/ts+B
-	Upu/3F5lEPHEo9fd1lCi9TuxhqJliFXLcrY6ExAeFhlORS63GwB0qaWp12yCPcRLt4k4+6UvSK5
-	GUhhsfBJzy8+qHoHBhuh1jEJue/K5Zprvj1pFIpDffc=
-X-Google-Smtp-Source: AGHT+IFzCMG4qYuwexIp6acrX8zDo2lSSPmgVfFJ4+vLa+eDUo4Iueq7SOdECyPmZVJEvXCkUQXJOA==
-X-Received: by 2002:a17:902:f642:b0:234:a139:1208 with SMTP id d9443c01a7336-23dd1cbdb3emr10929395ad.16.1751938909837;
-        Mon, 07 Jul 2025 18:41:49 -0700 (PDT)
-Received: from archlinux.lan ([2601:644:8200:dab8::1f6])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23c845922b5sm95773395ad.199.2025.07.07.18.41.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Jul 2025 18:41:49 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <clement.leger@bootlin.com>,
-	linux-kernel@vger.kernel.org (open list),
-	linux-renesas-soc@vger.kernel.org (open list:RENESAS RZ/N1 A5PSW SWITCH DRIVER)
-Subject: [PATCHv2 2/2] net: dsa: rzn1_a5psw: use devm to enable clocks
-Date: Mon,  7 Jul 2025 18:41:44 -0700
-Message-ID: <20250708014144.2514-3-rosenp@gmail.com>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <20250708014144.2514-1-rosenp@gmail.com>
-References: <20250708014144.2514-1-rosenp@gmail.com>
+	s=arc-20240116; t=1751939167; c=relaxed/simple;
+	bh=nh1nOo+b5eqCWDB++x2DN24D8FPhCx0Ss2EJiOM+OlE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZsAFPE8pONPZfx7uCFU9YfllYLtCjbTJQ2Hsa3EcGyhNbzeTIZLfiYBE150euUQRCxjhvvV6QMcC2D10xA1icIJvflJ1ej0OnOdy7XsgIm1mM7kvxJVXHM6mOkpWWHL04T+OxRmzpb2RqdA3SitwszjsGe7Ah/bTujbrIl5lajA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=18.194.254.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
+X-QQ-mid: zesmtpsz3t1751939082t7078b810
+X-QQ-Originating-IP: twOakQHm7qDk0ySEKf/UEQ4ZvX2xLJPYK2kg6T+4SrI=
+Received: from localhost ( [203.174.112.180])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 08 Jul 2025 09:44:40 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 6188477510607775095
+Date: Tue, 8 Jul 2025 09:44:40 +0800
+From: Yibo Dong <dong100@mucse.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+	andrew+netdev@lunn.ch, gur.stavi@huawei.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, danishanwar@ti.com, lee@trager.us,
+	gongfan1@huawei.com, lorenzo@kernel.org, geert+renesas@glider.be,
+	Parthiban.Veerasooran@microchip.com, lukas.bulwahn@redhat.com,
+	alexanderduyck@fb.com, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 03/15] net: rnpgbe: Add basic mbx ops support
+Message-ID: <6677D57C5FDDCB92+20250708014440.GA216877@nic-Precision-5820-Tower>
+References: <20250703014859.210110-1-dong100@mucse.com>
+ <20250703014859.210110-4-dong100@mucse.com>
+ <80644ec1-a313-403a-82dd-62eb551442d3@lunn.ch>
+ <9C6FCA38E28D6768+20250707063955.GA162739@nic-Precision-5820-Tower>
+ <f8a69fa5-cc3d-4968-8b19-0bdb27e1e917@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f8a69fa5-cc3d-4968-8b19-0bdb27e1e917@lunn.ch>
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: Ma+A2HZKKIKoltb8mRtc7YBDUt2RuMk8scYsQwnrzBMUUTeUfSuqJ8Bq
+	2sNdc1Ifj13id1WQeQZ4afdzt5fcDDEDeeHsv069JFfQyjbFoPcJSE3D4ccLZXjXFQQwbdr
+	0Pmnvvbloqw/3PMu9wTuQKu1pmVooxb0C5GSXk9FCaxjz6aHyqvHFZhbxkil6sAk158QHtl
+	CLZ3Br+A5bmjRch06Jzk0oJjnEtAb68Szl4eidB0jtba3PqN2rOvPOZMzcHgaCkbkY0sX37
+	xYCiCI4OUuI5o3UPtP7lTaHDoIxX7icoaRz9onehLf2YXw8zMc12dLroDo1wszmRHucHFYK
+	9z7veoJVVv26MRc59hUPXcL82B3ov/+JF5QasLKGjdA4rZP/flTaerSM91aG0rJZDtqsAcM
+	EbKyfUbv8qcIOdZA1D0LECoQKVT2guTI9Tl90VyqvZCtEJBJuQWZ1EoGbrY8G9SaAFqDTFy
+	F9kqBJCpOEkQdHYq9AN3KObaK/PpaLU8eWjXo+B5aeu1M2zOWjoFIdMvO48Pzi8KJXvEpin
+	8p6YIDwl4Ru4YOtPNzeWHqbZYUConTcG9uUYt8m6gGpm4Eb8QNdgEL9GrTwMW26xro9j800
+	iWjFHnVOsIVXvuseo5nKTZ07SyawM8LAMf7rReVKA1zYKBxBS9Lmui0FFk2RYH6OnP5Z1no
+	JrnJ3G9hyNlUM+HTVW1LO3F5iCkIfCy0ihQlq6Ov2GrVyCJNGYEOL0acbp9m2qvLvhCtaHU
+	lzXx1PFzMSy9ndfC94uY5OW3nh32SnWZnf5j3MFnpESwz2aui3i4HUuyXSk+mK3ktbWWH1Q
+	BSfoaOx/6yMkBUTsUppK58kZ4im03sPiQT2FQkuXR2pizvXt3gInFTfRGopAkFBrLuvMR4O
+	icL0NInPVfR+4BJyJ4ZydRZh47lI2yUodCf8RHq4YBq7rYg5EsjMR5hYoDVzKnUEYUTRosH
+	N5Hz304DwCNZuqqZDCGR5wLHkKpQ2H0mKS3Q=
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
-The remove function has these in the wrong order. The switch should be
-unregistered last. Simpler to use devm so that the right thing is done.
+On Mon, Jul 07, 2025 at 02:00:16PM +0200, Andrew Lunn wrote:
+> On Mon, Jul 07, 2025 at 02:39:55PM +0800, Yibo Dong wrote:
+> > On Fri, Jul 04, 2025 at 08:13:19PM +0200, Andrew Lunn wrote:
+> > > >  #define MBX_FEATURE_WRITE_DELAY BIT(1)
+> > > >  	u32 mbx_feature;
+> > > >  	/* cm3 <-> pf mbx */
+> > > > -	u32 cpu_pf_shm_base;
+> > > > -	u32 pf2cpu_mbox_ctrl;
+> > > > -	u32 pf2cpu_mbox_mask;
+> > > > -	u32 cpu_pf_mbox_mask;
+> > > > -	u32 cpu2pf_mbox_vec;
+> > > > +	u32 fw_pf_shm_base;
+> > > > +	u32 pf2fw_mbox_ctrl;
+> > > > +	u32 pf2fw_mbox_mask;
+> > > > +	u32 fw_pf_mbox_mask;
+> > > > +	u32 fw2pf_mbox_vec;
+> > > 
+> > > Why is a patch adding a new feature deleting code?
+> > > 
+> > Not delete code, 'cpu' here means controller in the chip, not host.
+> > So, I just rename 'cpu' to 'fw' to avoid confusion.
+> 
+> So, so let me rephrase my point. Why was it not called fw_foo right
+> from the beginning? You are making the code harder to review by doing
+> stuff like this. And your code is going to need a lot of review and
+> revisions because its quality if low if you ask me.
+> 
+> 	Andrew
+> 
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/dsa/rzn1_a5psw.c | 22 ++++------------------
- 1 file changed, 4 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/net/dsa/rzn1_a5psw.c b/drivers/net/dsa/rzn1_a5psw.c
-index df7466d4fe8f..1635255f58e4 100644
---- a/drivers/net/dsa/rzn1_a5psw.c
-+++ b/drivers/net/dsa/rzn1_a5psw.c
-@@ -1227,35 +1227,27 @@ static int a5psw_probe(struct platform_device *pdev)
- 	if (ret)
- 		return ret;
- 
--	a5psw->hclk = devm_clk_get(dev, "hclk");
-+	a5psw->hclk = devm_clk_get_enabled(dev, "hclk");
- 	if (IS_ERR(a5psw->hclk)) {
- 		dev_err(dev, "failed get hclk clock\n");
- 		ret = PTR_ERR(a5psw->hclk);
- 		goto free_pcs;
- 	}
- 
--	a5psw->clk = devm_clk_get(dev, "clk");
-+	a5psw->clk = devm_clk_get_enabled(dev, "clk");
- 	if (IS_ERR(a5psw->clk)) {
- 		dev_err(dev, "failed get clk_switch clock\n");
- 		ret = PTR_ERR(a5psw->clk);
- 		goto free_pcs;
- 	}
- 
--	ret = clk_prepare_enable(a5psw->clk);
--	if (ret)
--		goto free_pcs;
--
--	ret = clk_prepare_enable(a5psw->hclk);
--	if (ret)
--		goto clk_disable;
--
- 	mdio = of_get_available_child_by_name(dev->of_node, "mdio");
- 	if (mdio) {
- 		ret = a5psw_probe_mdio(a5psw, mdio);
- 		of_node_put(mdio);
- 		if (ret) {
- 			dev_err(dev, "Failed to register MDIO: %d\n", ret);
--			goto hclk_disable;
-+			goto free_pcs;
- 		}
- 	}
- 
-@@ -1269,15 +1261,11 @@ static int a5psw_probe(struct platform_device *pdev)
- 	ret = dsa_register_switch(ds);
- 	if (ret) {
- 		dev_err(dev, "Failed to register DSA switch: %d\n", ret);
--		goto hclk_disable;
-+		goto free_pcs;
- 	}
- 
- 	return 0;
- 
--hclk_disable:
--	clk_disable_unprepare(a5psw->hclk);
--clk_disable:
--	clk_disable_unprepare(a5psw->clk);
- free_pcs:
- 	a5psw_pcs_free(a5psw);
- 
-@@ -1293,8 +1281,6 @@ static void a5psw_remove(struct platform_device *pdev)
- 
- 	dsa_unregister_switch(&a5psw->ds);
- 	a5psw_pcs_free(a5psw);
--	clk_disable_unprepare(a5psw->hclk);
--	clk_disable_unprepare(a5psw->clk);
- }
- 
- static void a5psw_shutdown(struct platform_device *pdev)
--- 
-2.50.0
+Ok, you are right. It should be the right name at the beginning. I will
+try to avoid this in the future.
 
 
