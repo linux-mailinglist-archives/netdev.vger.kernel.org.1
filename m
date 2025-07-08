@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-205155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49674AFDA03
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 23:38:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83C9DAFDA04
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 23:38:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8CBC4E69BC
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 21:38:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62CAC7A2E08
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 21:37:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15173246763;
-	Tue,  8 Jul 2025 21:38:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14B77246794;
+	Tue,  8 Jul 2025 21:38:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E356923B602
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 21:38:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0231A8F84
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 21:38:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752010716; cv=none; b=NqItdTrBg0z3G7Ak2BzvtoHiNfGF8tQkpmH9DlVmYfVzvLC5pHCNQcq2opxvCmujYI/m2zV0Nkggmjfl0MeTijtKHhSYLhknfVFQveFJzqy1f+7uLnIPn5jCmignhNdcICMrts0D5gPzU7e5EXegIHF5rR6Abyw6tg4Yc90fl7Q=
+	t=1752010717; cv=none; b=EzdeYtSMFm3aFMdCGPsGIVkpXHUFcFCI1g5CemkJYSMzN4ilXXRs/1TrWJM8LHDZduyAtDcXUS2h+stWKF4BuaYk1GpPdl3kgS0cvNeMlHh4Yw3b1Gqf4XLsYHG28+0UiIzSN+QvhsmSNXQWu9n2ARsJlOr8eOYCjFmyWafaQGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752010716; c=relaxed/simple;
-	bh=8JtEV8Edn20xY/R+gvjmL79C6wG+I+WDbW4hQispIsI=;
+	s=arc-20240116; t=1752010717; c=relaxed/simple;
+	bh=RsRMk7LZwGGue36nElpAe7JZZaa3wqUeuAGfBjrmr0c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JqdBYqrIEMkwLH2kGj3P+DZLFPpM+15bmeO2L4+WzHVd8nwbgAFkkRslvNt2sV6Kq2/rhIQ7OOasAaWHqJ/QLRM568tsJxrnwxcs9YHzryYTkzshiKh+xFOXtB8kk63N0ACzPdtgBRXm/7KLRWLqtEs9kxMMUZ+buubbj0ta6FY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.171
+	 MIME-Version; b=YErQSkWl/aCZ/q7r3GSGrMDDIXT7ylJVLuQk6iXg+AAOmp+XJCn6A3C/wWn199zGX7+VxDvkK0o0vk+73vUq99o9RFPgdxafbqvBp2rtd0HmRdvUeV2PlEpQ2/0hTI6BDllC0vQneA8Cdz9igrpuYOxTxgFSPeWvIY6y79ehsqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2353a2bc210so47789745ad.2
-        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 14:38:33 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2349f096605so70468655ad.3
+        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 14:38:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752010713; x=1752615513;
+        d=1e100.net; s=20230601; t=1752010714; x=1752615514;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tmFtMDawu8t+RNvl8fVJOOLosen6Ct2Qo/duVLfCHPE=;
-        b=XjhI1raBBJ8ZQJ7MEEbMXdN5R27NUdNBs48Cfkn9Si0/JS1+E1u4Ux2EmHoxHFEbYL
-         ViCyNu89Y413PexVRj55JrDHJ7NSeTIsOY83WUkj78xRxNIYovCKTRcCraivSGSXD8fo
-         fcz5zByt8HWBjXaNQ2Y+vgwJ5/7yu9IgDdaXpiqqbnE0W4yVHecTc/pxVc19B+xGWv/O
-         GK7E/k7Ydzc0Oic1L3Kn5g4Q+GqLiLKzZxy6noLui0eUGTCTXxf/lJpn56pShr1R8QUt
-         0xnp1POcEPvu9RI3nlCRIVte/1vUGEYiCZ1r4QmyF/+G2yqCJGSnfqiYs07yQMGy6JLa
-         Rd5w==
-X-Gm-Message-State: AOJu0YxptDcdsFRJbsdJ5PFULCXICkI6NvX1KkWoLUZ4WyJ530b3XFCU
-	sQDEfGlFEcVMzpKe9nSLGVzPG2FMpfsp3zsjwEaoH5il2dPHzhntLx2QBNuy
-X-Gm-Gg: ASbGncsBLMjC//uXViOWe2xbFtzfjUFUkUd+d+ig4FMLTTV6Ch3xr6FFfZgCjMUPdmo
-	Z98P5soyPSjyqNig3qQVmagDYtreX3Kuw3RBv+PzSroL/XFga8qY6cONLrpC9WM2PxhKKTk1Auv
-	CR1N8j1HW8mAXseiEeA3VfNsQVg5sS3gZoXTe5OxRkEuA6d/lE9dCBljG49xMLFBWeXS8R2NvXK
-	sIU2g6hMDGTu1o6KRF2KLyFmMl9UlkmhHXgPZWcYw9+Rcd3OGhPYe/FgzUxymvhEw6zFpOMl5gJ
-	o0JsqwwAPd4UQKJgLUVBylyLrmUsb++N86mgupOull7/rhDPpoBuiDocwNZYEZ1EcfBESiDdmHv
-	wVu6aoiw9boid0zb5UcoxBnI=
-X-Google-Smtp-Source: AGHT+IH4pqBaIauoax0LUyZMkZTOx/MMihfS2IuyW3yt8VK3+ojlsXSThAI7n9DBZhfc27SIVNoAFw==
-X-Received: by 2002:a17:902:d60d:b0:235:e1d6:f98b with SMTP id d9443c01a7336-23ddb1b5e04mr975255ad.22.1752010712710;
-        Tue, 08 Jul 2025 14:38:32 -0700 (PDT)
+        bh=Imxlyyiv0dsEhQg0qUGXxFCM6Ol/jpVEC4ctBkLlHtc=;
+        b=S6YfdQgfUaNRuO+rcE/Z+0HWn4Xs8PxnIlmr0Mioaqm4A/GwkJT8H13x9WoabCOKTt
+         GDF7/uN30Roirt7e2Z6WsCKA0qHU846Zm3uUhFmeM99wYn9JXlK2Lv9pmCHtwGH+re7+
+         aPmYrG0ijFr8JmkOdB039MtsJBs3lM4CqEI8ackU1qzWAlQRKO6KD2V/qAIEFiLK7OU9
+         28ToOKYdf7eVNol4qvZYqVZIO2Bj75Q8P2oW7W028uuiwSMjd/bJ0o9zBGAdnAdvvYmb
+         xKxdAVy1rmx9R80QKLJAwWdmiDt5KXcyvsgtgrxFt6/GCpHNYxyIyS/9ZfhiOVtXBnZU
+         uDMQ==
+X-Gm-Message-State: AOJu0Yx/aivxkXN9onbUpp7rsDB2GV1zoVl35crJrzN2sqCRUbcTZIg7
+	L18Z+PsHgv82Q7HNk776A+gEuKDg5J69ySN2DU2odaX+rmC8nU+xKqjRPjvH
+X-Gm-Gg: ASbGncukYR2q39p/FK5UJNDE4mRiScONXtjAYyG6BTRdE+RpfnC/HSkdiPqSwMb5p7T
+	79uDoL8nT+E+WkBKz/eVjC8+HrnWq1FTUyqTzFAG0HdgjF9OKSaEGiZsutUrj5QmxAtsJmH3xNp
+	WTCC9B3apVEYAC52l1hJDV9zi/JfLcVF24SOxDUi0/UgvNCH4CopGZfVFn4zL9PFjpiIMd2ZXn/
+	fjMqnkp/q2wKpA6OxDYWOoUR1Jep2WrTrgSLVPgZlHcFiKmFxe22oAXazyouB72cxToRpneYnXd
+	hATMAGZ9SvIkzvstz91E8tHlnkOWlAxxmUHv4xX17mxrTSSdwigkxzMVRcDljpQgD4Hz4J8f4ta
+	XA8v+/Ju/Rfs1n2cPb2cUxoY=
+X-Google-Smtp-Source: AGHT+IE0BlVtxsLsZillCwGrewYnPBSgWZwEx+T+lFAXAWwlokNg+V3asENAUbz3e3oq9JtPpkNoZA==
+X-Received: by 2002:a17:903:f90:b0:235:a9b:21e7 with SMTP id d9443c01a7336-23ddb377578mr466315ad.48.1752010714130;
+        Tue, 08 Jul 2025 14:38:34 -0700 (PDT)
 Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-23c8a5051adsm115977745ad.40.2025.07.08.14.38.31
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-23c8431e28csm122398255ad.24.2025.07.08.14.38.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jul 2025 14:38:32 -0700 (PDT)
+        Tue, 08 Jul 2025 14:38:33 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Subject: [PATCH net-next v3 1/8] net: s/dev_get_stats/netif_get_stats/
-Date: Tue,  8 Jul 2025 14:38:22 -0700
-Message-ID: <20250708213829.875226-2-sdf@fomichev.me>
+Subject: [PATCH net-next v3 2/8] net: s/dev_get_port_parent_id/netif_get_port_parent_id/
+Date: Tue,  8 Jul 2025 14:38:23 -0700
+Message-ID: <20250708213829.875226-3-sdf@fomichev.me>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250708213829.875226-1-sdf@fomichev.me>
 References: <20250708213829.875226-1-sdf@fomichev.me>
@@ -86,403 +86,152 @@ now that don't fit. Rename them to netif_xxx where appropriate.
 
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- arch/s390/appldata/appldata_net_sum.c         |  2 +-
- drivers/leds/trigger/ledtrig-netdev.c         |  2 +-
- drivers/net/bonding/bond_main.c               |  4 ++--
- .../ethernet/apm/xgene/xgene_enet_ethtool.c   |  2 +-
- .../net/ethernet/broadcom/genet/bcmgenet.c    |  2 +-
- .../net/ethernet/hisilicon/hns/hns_ethtool.c  |  2 +-
- drivers/net/ethernet/intel/e1000e/ethtool.c   |  2 +-
- .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |  2 +-
- drivers/net/ethernet/intel/ixgbevf/ethtool.c  |  2 +-
- drivers/net/net_failover.c                    | 12 +++++------
- drivers/net/netdevsim/netdev.c                |  6 +++---
- drivers/scsi/fcoe/fcoe_transport.c            |  2 +-
- drivers/usb/gadget/function/rndis.c           |  2 +-
- include/linux/netdevice.h                     |  6 +++---
- net/8021q/vlanproc.c                          |  2 +-
- net/core/dev.c                                | 20 +++++++++----------
- net/core/net-procfs.c                         |  2 +-
- net/core/net-sysfs.c                          |  3 ++-
- net/core/rtnetlink.c                          |  4 ++--
- net/openvswitch/vport.c                       |  2 +-
- 20 files changed, 41 insertions(+), 40 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/en_tc.c   |  2 +-
+ include/linux/netdevice.h                     |  4 ++--
+ net/bridge/br_switchdev.c                     |  2 +-
+ net/core/dev.c                                | 23 +++++++++----------
+ net/core/net-sysfs.c                          |  2 +-
+ net/core/rtnetlink.c                          |  2 +-
+ net/ipv4/ipmr.c                               |  2 +-
+ 7 files changed, 18 insertions(+), 19 deletions(-)
 
-diff --git a/arch/s390/appldata/appldata_net_sum.c b/arch/s390/appldata/appldata_net_sum.c
-index 59c282ca002f..47609e5f9d5d 100644
---- a/arch/s390/appldata/appldata_net_sum.c
-+++ b/arch/s390/appldata/appldata_net_sum.c
-@@ -83,7 +83,7 @@ static void appldata_get_net_sum_data(void *data)
- 		const struct rtnl_link_stats64 *stats;
- 		struct rtnl_link_stats64 temp;
- 
--		stats = dev_get_stats(dev, &temp);
-+		stats = netif_get_stats(dev, &temp);
- 		rx_packets += stats->rx_packets;
- 		tx_packets += stats->tx_packets;
- 		rx_bytes   += stats->rx_bytes;
-diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
-index 4e048e08c4fd..da4a09b1335c 100644
---- a/drivers/leds/trigger/ledtrig-netdev.c
-+++ b/drivers/leds/trigger/ledtrig-netdev.c
-@@ -657,7 +657,7 @@ static void netdev_trig_work(struct work_struct *work)
- 	    !test_bit(TRIGGER_NETDEV_RX_ERR, &trigger_data->mode))
- 		return;
- 
--	dev_stats = dev_get_stats(trigger_data->net_dev, &temp);
-+	dev_stats = netif_get_stats(trigger_data->net_dev, &temp);
- 	new_activity =
- 	    (test_bit(TRIGGER_NETDEV_TX, &trigger_data->mode) ?
- 		dev_stats->tx_packets : 0) +
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 17c7542be6a5..69f9e8ff0101 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -2162,7 +2162,7 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
- 
- 	slave_dev->priv_flags |= IFF_BONDING;
- 	/* initialize slave stats */
--	dev_get_stats(new_slave->dev, &new_slave->slave_stats);
-+	netif_get_stats(new_slave->dev, &new_slave->slave_stats);
- 
- 	if (bond_is_lb(bond)) {
- 		/* bond_alb_init_slave() must be called before all other stages since
-@@ -4605,7 +4605,7 @@ static void bond_get_stats(struct net_device *bond_dev,
- 
- 	bond_for_each_slave_rcu(bond, slave, iter) {
- 		const struct rtnl_link_stats64 *new =
--			dev_get_stats(slave->dev, &temp);
-+			netif_get_stats(slave->dev, &temp);
- 
- 		bond_fold_stats(stats, new, &slave->slave_stats);
- 
-diff --git a/drivers/net/ethernet/apm/xgene/xgene_enet_ethtool.c b/drivers/net/ethernet/apm/xgene/xgene_enet_ethtool.c
-index ada70425b48c..4dcd4035f2a9 100644
---- a/drivers/net/ethernet/apm/xgene/xgene_enet_ethtool.c
-+++ b/drivers/net/ethernet/apm/xgene/xgene_enet_ethtool.c
-@@ -268,7 +268,7 @@ static void xgene_get_ethtool_stats(struct net_device *ndev,
- 	struct rtnl_link_stats64 stats;
- 	int i;
- 
--	dev_get_stats(ndev, &stats);
-+	netif_get_stats(ndev, &stats);
- 	for (i = 0; i < XGENE_STATS_LEN; i++)
- 		data[i] = *(u64 *)((char *)&stats + gstrings_stats[i].offset);
- 
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index 4f40f6afe88f..751e2dd6b827 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -1314,7 +1314,7 @@ static void bcmgenet_get_ethtool_stats(struct net_device *dev,
- 	if (netif_running(dev))
- 		bcmgenet_update_mib_counters(priv);
- 
--	dev_get_stats(dev, &stats64);
-+	netif_get_stats(dev, &stats64);
- 
- 	for (i = 0; i < BCMGENET_STATS_LEN; i++) {
- 		const struct bcmgenet_stats *s;
-diff --git a/drivers/net/ethernet/hisilicon/hns/hns_ethtool.c b/drivers/net/ethernet/hisilicon/hns/hns_ethtool.c
-index 60a586a951a0..d401fb4b1609 100644
---- a/drivers/net/ethernet/hisilicon/hns/hns_ethtool.c
-+++ b/drivers/net/ethernet/hisilicon/hns/hns_ethtool.c
-@@ -857,7 +857,7 @@ static void hns_get_ethtool_stats(struct net_device *netdev,
- 
- 	h->dev->ops->update_stats(h, &netdev->stats);
- 
--	net_stats = dev_get_stats(netdev, &temp);
-+	net_stats = netif_get_stats(netdev, &temp);
- 
- 	/* get netdev statistics */
- 	p[0] = net_stats->rx_packets;
-diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c b/drivers/net/ethernet/intel/e1000e/ethtool.c
-index c0bbb12eed2e..971356281afe 100644
---- a/drivers/net/ethernet/intel/e1000e/ethtool.c
-+++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
-@@ -2050,7 +2050,7 @@ static void e1000_get_ethtool_stats(struct net_device *netdev,
- 	int i;
- 	char *p = NULL;
- 
--	dev_get_stats(netdev, &net_stats);
-+	netif_get_stats(netdev, &net_stats);
- 
- 	for (i = 0; i < E1000_GLOBAL_STATS_LEN; i++) {
- 		switch (e1000_gstrings_stats[i].type) {
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index 25c3a09ad7f1..317d79f0ff8f 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -1406,7 +1406,7 @@ static void ixgbe_get_ethtool_stats(struct net_device *netdev,
- 	char *p = NULL;
- 
- 	ixgbe_update_stats(adapter);
--	net_stats = dev_get_stats(netdev, &temp);
-+	net_stats = netif_get_stats(netdev, &temp);
- 	for (i = 0; i < IXGBE_GLOBAL_STATS_LEN; i++) {
- 		switch (ixgbe_gstrings_stats[i].type) {
- 		case NETDEV_STATS:
-diff --git a/drivers/net/ethernet/intel/ixgbevf/ethtool.c b/drivers/net/ethernet/intel/ixgbevf/ethtool.c
-index 7ac53171b041..52eedfef9797 100644
---- a/drivers/net/ethernet/intel/ixgbevf/ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbevf/ethtool.c
-@@ -428,7 +428,7 @@ static void ixgbevf_get_ethtool_stats(struct net_device *netdev,
- 	char *p;
- 
- 	ixgbevf_update_stats(adapter);
--	net_stats = dev_get_stats(netdev, &temp);
-+	net_stats = netif_get_stats(netdev, &temp);
- 	for (i = 0; i < IXGBEVF_GLOBAL_STATS_LEN; i++) {
- 		switch (ixgbevf_gstrings_stats[i].type) {
- 		case NETDEV_STATS:
-diff --git a/drivers/net/net_failover.c b/drivers/net/net_failover.c
-index 5b50d9186f12..ac18dd861f52 100644
---- a/drivers/net/net_failover.c
-+++ b/drivers/net/net_failover.c
-@@ -190,14 +190,14 @@ static void net_failover_get_stats(struct net_device *dev,
- 
- 	slave_dev = rcu_dereference(nfo_info->primary_dev);
- 	if (slave_dev) {
--		new = dev_get_stats(slave_dev, &temp);
-+		new = netif_get_stats(slave_dev, &temp);
- 		net_failover_fold_stats(stats, new, &nfo_info->primary_stats);
- 		memcpy(&nfo_info->primary_stats, new, sizeof(*new));
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+index fef418e1ed1a..32c07a8b03d1 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+@@ -5446,7 +5446,7 @@ int mlx5e_tc_esw_init(struct mlx5_rep_uplink_priv *uplink_priv)
+ 		goto err_action_counter;
  	}
  
- 	slave_dev = rcu_dereference(nfo_info->standby_dev);
- 	if (slave_dev) {
--		new = dev_get_stats(slave_dev, &temp);
-+		new = netif_get_stats(slave_dev, &temp);
- 		net_failover_fold_stats(stats, new, &nfo_info->standby_stats);
- 		memcpy(&nfo_info->standby_stats, new, sizeof(*new));
- 	}
-@@ -540,11 +540,11 @@ static int net_failover_slave_register(struct net_device *slave_dev,
- 	if (slave_is_standby) {
- 		rcu_assign_pointer(nfo_info->standby_dev, slave_dev);
- 		standby_dev = slave_dev;
--		dev_get_stats(standby_dev, &nfo_info->standby_stats);
-+		netif_get_stats(standby_dev, &nfo_info->standby_stats);
- 	} else {
- 		rcu_assign_pointer(nfo_info->primary_dev, slave_dev);
- 		primary_dev = slave_dev;
--		dev_get_stats(primary_dev, &nfo_info->primary_stats);
-+		netif_get_stats(primary_dev, &nfo_info->primary_stats);
- 		failover_dev->min_mtu = slave_dev->min_mtu;
- 		failover_dev->max_mtu = slave_dev->max_mtu;
- 	}
-@@ -606,7 +606,7 @@ static int net_failover_slave_unregister(struct net_device *slave_dev,
- 	dev_close(slave_dev);
- 
- 	nfo_info = netdev_priv(failover_dev);
--	dev_get_stats(failover_dev, &nfo_info->failover_stats);
-+	netif_get_stats(failover_dev, &nfo_info->failover_stats);
- 
- 	slave_is_standby = slave_dev->dev.parent == failover_dev->dev.parent;
- 	if (slave_is_standby) {
-@@ -648,7 +648,7 @@ static int net_failover_slave_link_change(struct net_device *slave_dev,
- 		netif_carrier_on(failover_dev);
- 		netif_tx_wake_all_queues(failover_dev);
- 	} else {
--		dev_get_stats(failover_dev, &nfo_info->failover_stats);
-+		netif_get_stats(failover_dev, &nfo_info->failover_stats);
- 		netif_carrier_off(failover_dev);
- 		netif_tx_stop_all_queues(failover_dev);
- 	}
-diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index e36d3e846c2d..55d93c8c6050 100644
---- a/drivers/net/netdevsim/netdev.c
-+++ b/drivers/net/netdevsim/netdev.c
-@@ -581,7 +581,7 @@ static void nsim_get_queue_stats_rx(struct net_device *dev, int idx,
- 	struct rtnl_link_stats64 rtstats = {};
- 
- 	if (!idx)
--		dev_get_stats(dev, &rtstats);
-+		netif_get_stats(dev, &rtstats);
- 
- 	stats->packets = rtstats.rx_packets - !!rtstats.rx_packets;
- 	stats->bytes = rtstats.rx_bytes;
-@@ -593,7 +593,7 @@ static void nsim_get_queue_stats_tx(struct net_device *dev, int idx,
- 	struct rtnl_link_stats64 rtstats = {};
- 
- 	if (!idx)
--		dev_get_stats(dev, &rtstats);
-+		netif_get_stats(dev, &rtstats);
- 
- 	stats->packets = rtstats.tx_packets - !!rtstats.tx_packets;
- 	stats->bytes = rtstats.tx_bytes;
-@@ -605,7 +605,7 @@ static void nsim_get_base_stats(struct net_device *dev,
- {
- 	struct rtnl_link_stats64 rtstats = {};
- 
--	dev_get_stats(dev, &rtstats);
-+	netif_get_stats(dev, &rtstats);
- 
- 	rx->packets = !!rtstats.rx_packets;
- 	rx->bytes = 0;
-diff --git a/drivers/scsi/fcoe/fcoe_transport.c b/drivers/scsi/fcoe/fcoe_transport.c
-index 2f478426f16e..91ea25f7c5b6 100644
---- a/drivers/scsi/fcoe/fcoe_transport.c
-+++ b/drivers/scsi/fcoe/fcoe_transport.c
-@@ -191,7 +191,7 @@ void __fcoe_get_lesb(struct fc_lport *lport,
- 	lesb->lesb_vlink_fail = htonl(vlfc);
- 	lesb->lesb_miss_fka = htonl(mdac);
- 	lesb->lesb_fcs_error =
--			htonl(dev_get_stats(netdev, &temp)->rx_crc_errors);
-+			htonl(netif_get_stats(netdev, &temp)->rx_crc_errors);
- }
- EXPORT_SYMBOL_GPL(__fcoe_get_lesb);
- 
-diff --git a/drivers/usb/gadget/function/rndis.c b/drivers/usb/gadget/function/rndis.c
-index afd75d72412c..0cdb72f2d9ff 100644
---- a/drivers/usb/gadget/function/rndis.c
-+++ b/drivers/usb/gadget/function/rndis.c
-@@ -199,7 +199,7 @@ static int gen_ndis_query_resp(struct rndis_params *params, u32 OID, u8 *buf,
- 	resp->InformationBufferOffset = cpu_to_le32(16);
- 
- 	net = params->dev;
--	stats = dev_get_stats(net, &temp);
-+	stats = netif_get_stats(net, &temp);
- 
- 	switch (OID) {
- 
+-	err = dev_get_port_parent_id(priv->netdev, &ppid, false);
++	err = netif_get_port_parent_id(priv->netdev, &ppid, false);
+ 	if (!err) {
+ 		memcpy(&key, &ppid.id, sizeof(key));
+ 		mlx5_esw_offloads_devcom_init(esw, key);
 diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 5847c20994d3..eff09d110e25 100644
+index eff09d110e25..ac6b9e68e858 100644
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
-@@ -218,7 +218,7 @@ struct net_device_stats {
- #undef NET_DEV_STAT
+@@ -4222,8 +4222,8 @@ int dev_set_mac_address(struct net_device *dev, struct sockaddr_storage *ss,
+ int dev_set_mac_address_user(struct net_device *dev, struct sockaddr_storage *ss,
+ 			     struct netlink_ext_ack *extack);
+ int dev_get_mac_address(struct sockaddr *sa, struct net *net, char *dev_name);
+-int dev_get_port_parent_id(struct net_device *dev,
+-			   struct netdev_phys_item_id *ppid, bool recurse);
++int netif_get_port_parent_id(struct net_device *dev,
++			     struct netdev_phys_item_id *ppid, bool recurse);
+ bool netdev_port_same_parent_id(struct net_device *a, struct net_device *b);
  
- /* per-cpu stats, allocated on demand.
-- * Try to fit them in a single cache line, for dev_get_stats() sake.
-+ * Try to fit them in a single cache line, for netif_get_stats() sake.
-  */
- struct net_device_core_stats {
- 	unsigned long	rx_dropped;
-@@ -4997,8 +4997,8 @@ void netdev_notify_peers(struct net_device *dev);
- void netdev_features_change(struct net_device *dev);
- /* Load a device via the kmod */
- void dev_load(struct net *net, const char *name);
--struct rtnl_link_stats64 *dev_get_stats(struct net_device *dev,
--					struct rtnl_link_stats64 *storage);
-+struct rtnl_link_stats64 *netif_get_stats(struct net_device *dev,
-+					  struct rtnl_link_stats64 *storage);
- void netdev_stats_to_stats64(struct rtnl_link_stats64 *stats64,
- 			     const struct net_device_stats *netdev_stats);
- void dev_fetch_sw_netstats(struct rtnl_link_stats64 *s,
-diff --git a/net/8021q/vlanproc.c b/net/8021q/vlanproc.c
-index fa67374bda49..bcdcbf419e09 100644
---- a/net/8021q/vlanproc.c
-+++ b/net/8021q/vlanproc.c
-@@ -236,7 +236,7 @@ static int vlandev_seq_show(struct seq_file *seq, void *offset)
- 	if (!is_vlan_dev(vlandev))
- 		return 0;
+ struct sk_buff *validate_xmit_skb_list(struct sk_buff *skb, struct net_device *dev, bool *again);
+diff --git a/net/bridge/br_switchdev.c b/net/bridge/br_switchdev.c
+index 95d7355a0407..1385ff604bbd 100644
+--- a/net/bridge/br_switchdev.c
++++ b/net/bridge/br_switchdev.c
+@@ -834,7 +834,7 @@ int br_switchdev_port_offload(struct net_bridge_port *p,
+ 	struct netdev_phys_item_id ppid;
+ 	int err;
  
--	stats = dev_get_stats(vlandev, &temp);
-+	stats = netif_get_stats(vlandev, &temp);
- 	seq_printf(seq,
- 		   "%s  VID: %d	 REORDER_HDR: %i  dev->priv_flags: %x\n",
- 		   vlandev->name, vlan->vlan_id,
+-	err = dev_get_port_parent_id(dev, &ppid, false);
++	err = netif_get_port_parent_id(dev, &ppid, false);
+ 	if (err)
+ 		return err;
+ 
 diff --git a/net/core/dev.c b/net/core/dev.c
-index fe677ccec5b0..795a5d522cf8 100644
+index 795a5d522cf8..9ef790a9fce0 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -11559,17 +11559,17 @@ noinline void netdev_core_stats_inc(struct net_device *dev, u32 offset)
- EXPORT_SYMBOL_GPL(netdev_core_stats_inc);
+@@ -9817,16 +9817,15 @@ int dev_get_phys_port_name(struct net_device *dev,
+ }
  
  /**
-- *	dev_get_stats	- get network device statistics
-- *	@dev: device to get statistics from
-- *	@storage: place to store stats
-+ * netif_get_stats() - get network device statistics
-+ * @dev: device to get statistics from
-+ * @storage: place to store stats
+- *	dev_get_port_parent_id - Get the device's port parent identifier
+- *	@dev: network device
+- *	@ppid: pointer to a storage for the port's parent identifier
+- *	@recurse: allow/disallow recursion to lower devices
++ * netif_get_port_parent_id() - Get the device's port parent identifier
++ * @dev: network device
++ * @ppid: pointer to a storage for the port's parent identifier
++ * @recurse: allow/disallow recursion to lower devices
   *
-- *	Get network statistics from device. Return @storage.
-- *	The device driver may provide its own method by setting
-- *	dev->netdev_ops->get_stats64 or dev->netdev_ops->get_stats;
-- *	otherwise the internal statistics structure is used.
-+ * Get network statistics from device. Return @storage.
-+ * The device driver may provide its own method by setting
-+ * dev->netdev_ops->get_stats64 or dev->netdev_ops->get_stats;
-+ * otherwise the internal statistics structure is used.
+- *	Get the devices's port parent identifier
++ * Get the devices's port parent identifier
   */
--struct rtnl_link_stats64 *dev_get_stats(struct net_device *dev,
--					struct rtnl_link_stats64 *storage)
-+struct rtnl_link_stats64 *netif_get_stats(struct net_device *dev,
-+					  struct rtnl_link_stats64 *storage)
+-int dev_get_port_parent_id(struct net_device *dev,
+-			   struct netdev_phys_item_id *ppid,
+-			   bool recurse)
++int netif_get_port_parent_id(struct net_device *dev,
++			     struct netdev_phys_item_id *ppid, bool recurse)
  {
  	const struct net_device_ops *ops = dev->netdev_ops;
- 	const struct net_device_core_stats __percpu *p;
-@@ -11617,7 +11617,7 @@ struct rtnl_link_stats64 *dev_get_stats(struct net_device *dev,
- 	}
- 	return storage;
+ 	struct netdev_phys_item_id first = { };
+@@ -9845,7 +9844,7 @@ int dev_get_port_parent_id(struct net_device *dev,
+ 		return err;
+ 
+ 	netdev_for_each_lower_dev(dev, lower_dev, iter) {
+-		err = dev_get_port_parent_id(lower_dev, ppid, true);
++		err = netif_get_port_parent_id(lower_dev, ppid, true);
+ 		if (err)
+ 			break;
+ 		if (!first.id_len)
+@@ -9856,7 +9855,7 @@ int dev_get_port_parent_id(struct net_device *dev,
+ 
+ 	return err;
  }
--EXPORT_SYMBOL(dev_get_stats);
-+EXPORT_SYMBOL(netif_get_stats);
+-EXPORT_SYMBOL(dev_get_port_parent_id);
++EXPORT_SYMBOL(netif_get_port_parent_id);
  
  /**
-  *	dev_fetch_sw_netstats - get per-cpu network device statistics
-diff --git a/net/core/net-procfs.c b/net/core/net-procfs.c
-index 4f0f0709a1cb..14b8bebacefd 100644
---- a/net/core/net-procfs.c
-+++ b/net/core/net-procfs.c
-@@ -44,7 +44,7 @@ static void dev_seq_stop(struct seq_file *seq, void *v)
- static void dev_seq_printf_stats(struct seq_file *seq, struct net_device *dev)
- {
- 	struct rtnl_link_stats64 temp;
--	const struct rtnl_link_stats64 *stats = dev_get_stats(dev, &temp);
-+	const struct rtnl_link_stats64 *stats = netif_get_stats(dev, &temp);
+  *	netdev_port_same_parent_id - Indicate if two network devices have
+@@ -9869,8 +9868,8 @@ bool netdev_port_same_parent_id(struct net_device *a, struct net_device *b)
+ 	struct netdev_phys_item_id a_id = { };
+ 	struct netdev_phys_item_id b_id = { };
  
- 	seq_printf(seq, "%6s: %7llu %7llu %4llu %4llu %4llu %5llu %10llu %9llu "
- 		   "%8llu %7llu %4llu %4llu %4llu %5llu %7llu %10llu\n",
+-	if (dev_get_port_parent_id(a, &a_id, true) ||
+-	    dev_get_port_parent_id(b, &b_id, true))
++	if (netif_get_port_parent_id(a, &a_id, true) ||
++	    netif_get_port_parent_id(b, &b_id, true))
+ 		return false;
+ 
+ 	return netdev_phys_item_id_same(&a_id, &b_id);
 diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 8f897e2c8b4f..b4cc116acd4b 100644
+index b4cc116acd4b..b61cc04f1777 100644
 --- a/net/core/net-sysfs.c
 +++ b/net/core/net-sysfs.c
-@@ -818,7 +818,8 @@ static ssize_t netstat_show(const struct device *d,
- 	rcu_read_lock();
- 	if (dev_isalive(dev)) {
- 		struct rtnl_link_stats64 temp;
--		const struct rtnl_link_stats64 *stats = dev_get_stats(dev, &temp);
-+		const struct rtnl_link_stats64 *stats = netif_get_stats(dev,
-+									&temp);
+@@ -687,7 +687,7 @@ static ssize_t phys_switch_id_show(struct device *dev,
+ 	if (ret)
+ 		return ret;
  
- 		ret = sysfs_emit(buf, fmt_u64, *(u64 *)(((u8 *)stats) + offset));
- 	}
+-	ret = dev_get_port_parent_id(netdev, &ppid, false);
++	ret = netif_get_port_parent_id(netdev, &ppid, false);
+ 	if (!ret)
+ 		ret = sysfs_emit(buf, "%*phN\n", ppid.id_len, ppid.id);
+ 
 diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index a9555bfc372f..1cb3a264030f 100644
+index 1cb3a264030f..c75901e50a0c 100644
 --- a/net/core/rtnetlink.c
 +++ b/net/core/rtnetlink.c
-@@ -1473,7 +1473,7 @@ static noinline_for_stack int rtnl_fill_stats(struct sk_buff *skb,
- 		return -EMSGSIZE;
+@@ -1448,7 +1448,7 @@ static int rtnl_phys_switch_id_fill(struct sk_buff *skb, struct net_device *dev)
+ 	struct netdev_phys_item_id ppid = { };
+ 	int err;
  
- 	sp = nla_data(attr);
--	dev_get_stats(dev, sp);
-+	netif_get_stats(dev, sp);
+-	err = dev_get_port_parent_id(dev, &ppid, false);
++	err = netif_get_port_parent_id(dev, &ppid, false);
+ 	if (err) {
+ 		if (err == -EOPNOTSUPP)
+ 			return 0;
+diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+index 3a2044e6033d..e86a8a862c41 100644
+--- a/net/ipv4/ipmr.c
++++ b/net/ipv4/ipmr.c
+@@ -901,7 +901,7 @@ static int vif_add(struct net *net, struct mr_table *mrt,
+ 			vifc->vifc_flags | (!mrtsock ? VIFF_STATIC : 0),
+ 			(VIFF_TUNNEL | VIFF_REGISTER));
  
- 	attr = nla_reserve(skb, IFLA_STATS,
- 			   sizeof(struct rtnl_link_stats));
-@@ -5937,7 +5937,7 @@ static int rtnl_fill_statsinfo(struct sk_buff *skb, struct net_device *dev,
- 		}
- 
- 		sp = nla_data(attr);
--		dev_get_stats(dev, sp);
-+		netif_get_stats(dev, sp);
- 	}
- 
- 	if (stats_attr_valid(filter_mask, IFLA_STATS_LINK_XSTATS, *idxattr)) {
-diff --git a/net/openvswitch/vport.c b/net/openvswitch/vport.c
-index 6bbbc16ab778..29058e574eb9 100644
---- a/net/openvswitch/vport.c
-+++ b/net/openvswitch/vport.c
-@@ -286,7 +286,7 @@ void ovs_vport_get_stats(struct vport *vport, struct ovs_vport_stats *stats)
- 	const struct rtnl_link_stats64 *dev_stats;
- 	struct rtnl_link_stats64 temp;
- 
--	dev_stats = dev_get_stats(vport->dev, &temp);
-+	dev_stats = netif_get_stats(vport->dev, &temp);
- 	stats->rx_errors  = dev_stats->rx_errors;
- 	stats->tx_errors  = dev_stats->tx_errors;
- 	stats->tx_dropped = dev_stats->tx_dropped;
+-	err = dev_get_port_parent_id(dev, &ppid, true);
++	err = netif_get_port_parent_id(dev, &ppid, true);
+ 	if (err == 0) {
+ 		memcpy(v->dev_parent_id.id, ppid.id, ppid.id_len);
+ 		v->dev_parent_id.id_len = ppid.id_len;
 -- 
 2.50.0
 
