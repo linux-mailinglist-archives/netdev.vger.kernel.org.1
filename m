@@ -1,72 +1,75 @@
-Return-Path: <netdev+bounces-205154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12E30AFDA02
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 23:38:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49674AFDA03
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 23:38:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A0304A6669
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 21:38:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8CBC4E69BC
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 21:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1469E24339D;
-	Tue,  8 Jul 2025 21:38:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15173246763;
+	Tue,  8 Jul 2025 21:38:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E60F1A8F84
-	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 21:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E356923B602
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 21:38:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752010714; cv=none; b=nL4zgEwkSEcKwZMnStZcVMhYiDLahwToPzR274gRf5ZHLvyhPJCT4JkCKsrgozjrVtI1uu0Qn5xJ52TVdxHlN1jLEvMTEchOKjA4v6PMBiHZq4HgthmJQPDnGfCYmVZ23c34WSMIozIZIwKqlpkk2ayTXIkho5fIN4Sw5W7kiN0=
+	t=1752010716; cv=none; b=NqItdTrBg0z3G7Ak2BzvtoHiNfGF8tQkpmH9DlVmYfVzvLC5pHCNQcq2opxvCmujYI/m2zV0Nkggmjfl0MeTijtKHhSYLhknfVFQveFJzqy1f+7uLnIPn5jCmignhNdcICMrts0D5gPzU7e5EXegIHF5rR6Abyw6tg4Yc90fl7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752010714; c=relaxed/simple;
-	bh=N5rsGhHFQ9KxjOCG5LerPZnGccsQjgzhDv0mAdPz+bQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c0UjoRXV//P1WtL35x/9BRPEf1T3iCaP5IoGwmHRcncHQqe1IN73fukYVfiZKhvaP5nm1tuyCieE8O3aS/X8ZVeNwocvrURXtVHW49tNpPC1V68DpZeTPukOtY421yoryNlWr5+N4evB+RTZT3nAAYsllyqdiPGygCqlAqcABmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.182
+	s=arc-20240116; t=1752010716; c=relaxed/simple;
+	bh=8JtEV8Edn20xY/R+gvjmL79C6wG+I+WDbW4hQispIsI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=JqdBYqrIEMkwLH2kGj3P+DZLFPpM+15bmeO2L4+WzHVd8nwbgAFkkRslvNt2sV6Kq2/rhIQ7OOasAaWHqJ/QLRM568tsJxrnwxcs9YHzryYTkzshiKh+xFOXtB8kk63N0ACzPdtgBRXm/7KLRWLqtEs9kxMMUZ+buubbj0ta6FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-235f9e87f78so49826165ad.2
-        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 14:38:31 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2353a2bc210so47789745ad.2
+        for <netdev@vger.kernel.org>; Tue, 08 Jul 2025 14:38:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752010711; x=1752615511;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iyN4Yg7jCwg5fLCOLabDYDUL9PCU3JeK1Ars0nMFHas=;
-        b=Cu+HasrMfeMBKGT1vJKHXY8RM4zspKiXXAirpaTqdyc4oUqzfHmSjju4xePOhQJcf7
-         mN9PpH1Uu4NI3Dnk7iPQq1f6lUgOyEiKUU1fTGtfkqiygbMHC/mlN+Sx0MyDoxwLm2kB
-         zuqOBrCv2hKihkYbVCi/3a9jDJOeI3gez3p0oVmU+ZTIipAn/VYMnERN4CFHUR1sQx0B
-         X5+JVjbh56oMfCd6UHWhsBRRySlyPUkRRxRf0le8HIGIQ5Bv11Ei1RnEEtbpERdtSkV6
-         Meazo24GmNurqj4YdaaEeez/zD/pNbKjgW0LAw7SotQRBWxO+QGdYTdDwz0MZgERDlNJ
-         8vGw==
-X-Gm-Message-State: AOJu0YzTE888GDwV9DDh2yJZ751aM9FEG4srfu2Ker/H4/RJnIXz1vmd
-	aneQFiXXde10QzfgmZ2tUAZJrUTXqxe+qpfUASUeWZ22ft4elH3hyADcNCHB
-X-Gm-Gg: ASbGncsEQ/klxZcgYnWFCfyEALVIbNQUbx0RBRZFr7Et1CR1tpRJkHDq7UWywKIC43M
-	uDvZl/mvfOJqRHKW4LERhNsYVozkD50+hut/ZC0m1Aw8qzraLinYptD9fMNz/5dDpGdk9scyUn/
-	DzU+o8R2rqt0r4ogI/YMDAkbmjlhVmVl5zQCQ7U4GdrR4aC1Kql6SvdczWuzIO4751ld6LdPFxh
-	nUrzjnMXe2K0gvo7xmchzuvxo10pfjYkKPc6F2VZICX3y4h+uJh9He0kloxnrWFxQjKVshIjF6O
-	hdS9Ah5n8rFdI8x9peXMqaJ0TJ+hgpDfETiTP/fA/+s6VbzzqSYTiL+nt7wPMPx5K60SrASweq+
-	GDO98aw41+7pLHP9KXu0xfGQ=
-X-Google-Smtp-Source: AGHT+IGmw/FV+Gh8rSg+iGH2VK1PFdbu15UwxCMTb8K3Ka4diDss0jFe1zbJHF3QODdjt2Q95FgvGQ==
-X-Received: by 2002:a17:902:db06:b0:21f:617a:f1b2 with SMTP id d9443c01a7336-23ddb344481mr454155ad.46.1752010711027;
-        Tue, 08 Jul 2025 14:38:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752010713; x=1752615513;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tmFtMDawu8t+RNvl8fVJOOLosen6Ct2Qo/duVLfCHPE=;
+        b=XjhI1raBBJ8ZQJ7MEEbMXdN5R27NUdNBs48Cfkn9Si0/JS1+E1u4Ux2EmHoxHFEbYL
+         ViCyNu89Y413PexVRj55JrDHJ7NSeTIsOY83WUkj78xRxNIYovCKTRcCraivSGSXD8fo
+         fcz5zByt8HWBjXaNQ2Y+vgwJ5/7yu9IgDdaXpiqqbnE0W4yVHecTc/pxVc19B+xGWv/O
+         GK7E/k7Ydzc0Oic1L3Kn5g4Q+GqLiLKzZxy6noLui0eUGTCTXxf/lJpn56pShr1R8QUt
+         0xnp1POcEPvu9RI3nlCRIVte/1vUGEYiCZ1r4QmyF/+G2yqCJGSnfqiYs07yQMGy6JLa
+         Rd5w==
+X-Gm-Message-State: AOJu0YxptDcdsFRJbsdJ5PFULCXICkI6NvX1KkWoLUZ4WyJ530b3XFCU
+	sQDEfGlFEcVMzpKe9nSLGVzPG2FMpfsp3zsjwEaoH5il2dPHzhntLx2QBNuy
+X-Gm-Gg: ASbGncsBLMjC//uXViOWe2xbFtzfjUFUkUd+d+ig4FMLTTV6Ch3xr6FFfZgCjMUPdmo
+	Z98P5soyPSjyqNig3qQVmagDYtreX3Kuw3RBv+PzSroL/XFga8qY6cONLrpC9WM2PxhKKTk1Auv
+	CR1N8j1HW8mAXseiEeA3VfNsQVg5sS3gZoXTe5OxRkEuA6d/lE9dCBljG49xMLFBWeXS8R2NvXK
+	sIU2g6hMDGTu1o6KRF2KLyFmMl9UlkmhHXgPZWcYw9+Rcd3OGhPYe/FgzUxymvhEw6zFpOMl5gJ
+	o0JsqwwAPd4UQKJgLUVBylyLrmUsb++N86mgupOull7/rhDPpoBuiDocwNZYEZ1EcfBESiDdmHv
+	wVu6aoiw9boid0zb5UcoxBnI=
+X-Google-Smtp-Source: AGHT+IH4pqBaIauoax0LUyZMkZTOx/MMihfS2IuyW3yt8VK3+ojlsXSThAI7n9DBZhfc27SIVNoAFw==
+X-Received: by 2002:a17:902:d60d:b0:235:e1d6:f98b with SMTP id d9443c01a7336-23ddb1b5e04mr975255ad.22.1752010712710;
+        Tue, 08 Jul 2025 14:38:32 -0700 (PDT)
 Received: from localhost (c-73-158-218-242.hsd1.ca.comcast.net. [73.158.218.242])
-        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-b38f060165csm12245085a12.10.2025.07.08.14.38.30
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-23c8a5051adsm115977745ad.40.2025.07.08.14.38.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jul 2025 14:38:30 -0700 (PDT)
+        Tue, 08 Jul 2025 14:38:32 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Subject: [PATCH net-next v3 0/8] net: maintain netif vs dev prefix semantics
-Date: Tue,  8 Jul 2025 14:38:21 -0700
-Message-ID: <20250708213829.875226-1-sdf@fomichev.me>
+Subject: [PATCH net-next v3 1/8] net: s/dev_get_stats/netif_get_stats/
+Date: Tue,  8 Jul 2025 14:38:22 -0700
+Message-ID: <20250708213829.875226-2-sdf@fomichev.me>
 X-Mailer: git-send-email 2.50.0
+In-Reply-To: <20250708213829.875226-1-sdf@fomichev.me>
+References: <20250708213829.875226-1-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,107 +82,407 @@ Commit cc34acd577f1 ("docs: net: document new locking reality")
 introduced netif_ vs dev_ function semantics: the former expects locked
 netdev, the latter takes care of the locking. We don't strictly
 follow this semantics on either side, but there are more dev_xxx handlers
-now that don't fit. Rename them to netif_xxx where appropriate. We care only
-about driver-visible APIs, don't touch stack-internal routines.
+now that don't fit. Rename them to netif_xxx where appropriate.
 
-This is part 1, I'm considering following up with these (haven't looked
-deep, maybe the ones that are frequently used are fine to keep):
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+---
+ arch/s390/appldata/appldata_net_sum.c         |  2 +-
+ drivers/leds/trigger/ledtrig-netdev.c         |  2 +-
+ drivers/net/bonding/bond_main.c               |  4 ++--
+ .../ethernet/apm/xgene/xgene_enet_ethtool.c   |  2 +-
+ .../net/ethernet/broadcom/genet/bcmgenet.c    |  2 +-
+ .../net/ethernet/hisilicon/hns/hns_ethtool.c  |  2 +-
+ drivers/net/ethernet/intel/e1000e/ethtool.c   |  2 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |  2 +-
+ drivers/net/ethernet/intel/ixgbevf/ethtool.c  |  2 +-
+ drivers/net/net_failover.c                    | 12 +++++------
+ drivers/net/netdevsim/netdev.c                |  6 +++---
+ drivers/scsi/fcoe/fcoe_transport.c            |  2 +-
+ drivers/usb/gadget/function/rndis.c           |  2 +-
+ include/linux/netdevice.h                     |  6 +++---
+ net/8021q/vlanproc.c                          |  2 +-
+ net/core/dev.c                                | 20 +++++++++----------
+ net/core/net-procfs.c                         |  2 +-
+ net/core/net-sysfs.c                          |  3 ++-
+ net/core/rtnetlink.c                          |  4 ++--
+ net/openvswitch/vport.c                       |  2 +-
+ 20 files changed, 41 insertions(+), 40 deletions(-)
 
-  * dev_get_tstats64 dev_fetch_sw_netstats
-  * dev_xdp_prog_count,
-  * dev_add_pack dev_remove_pack dev_remove_pack
-  * dev_get_iflink
-  * dev_fill_forward_path
-  * dev_getbyhwaddr_rcu dev_getbyhwaddr dev_getfirstbyhwtype
-  * dev_valid_name dev_valid_name
-  * dev_forward dev_forward_skb
-  * dev_queue_xmit_nit dev_nit_active_rcu
-  * dev_pick_tx_zero
-
-Sending this out to get a sense of direction :-)
-
-v3:
-- move MODULE_IMPORT_NS closer to other module metadata (Willem)
-- add MODULE_IMPORT_NS to bridge (build bot)
-- add ops lock assert where appropriate (Willem)
-  - netif_close_many - calls __dev_close_many which has an assert
-  - netif_set_threaded - already has an assert
-  - netif_get_flags - READ_ONCE, does not need any locks
-  - netif_set_mtu_ext - added ops lock assert, updated the doc
-  - netif_get_mac_address - uses dev_addr_sem
-  - netif_get_port_parent_id - needs only rtnl?
-  - netif_get_stats - uses other mechanisms (seqlock)
-
-v2:
-- move a bunch of symbols into NETDEV_INTERNAL (Willem)
-  - netif_close_many
-  - __netif_set_mtu
-  - netif_pre_changeaddr_notify
-  - netif_get_mac_address
-- keep more info in the individual patches' commit message (Willem)
-
-Stanislav Fomichev (8):
-  net: s/dev_get_stats/netif_get_stats/
-  net: s/dev_get_port_parent_id/netif_get_port_parent_id/
-  net: s/dev_get_mac_address/netif_get_mac_address/
-  net: s/dev_pre_changeaddr_notify/netif_pre_changeaddr_notify/
-  net: s/__dev_set_mtu/__netif_set_mtu/
-  net: s/dev_get_flags/netif_get_flags/
-  net: s/dev_set_threaded/netif_set_threaded/
-  net: s/dev_close_many/netif_close_many/
-
- .../networking/net_cachelines/net_device.rst  |   2 +-
- arch/s390/appldata/appldata_net_sum.c         |   2 +-
- drivers/infiniband/sw/rxe/rxe_verbs.c         |   2 +-
- drivers/leds/trigger/ledtrig-netdev.c         |   2 +-
- drivers/net/bonding/bond_main.c               |   9 +-
- .../ethernet/apm/xgene/xgene_enet_ethtool.c   |   2 +-
- .../net/ethernet/atheros/atl1c/atl1c_main.c   |   2 +-
- .../net/ethernet/broadcom/genet/bcmgenet.c    |   2 +-
- .../net/ethernet/hisilicon/hns/hns_ethtool.c  |   2 +-
- drivers/net/ethernet/intel/e1000e/ethtool.c   |   2 +-
- .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |   2 +-
- drivers/net/ethernet/intel/ixgbevf/ethtool.c  |   2 +-
- drivers/net/ethernet/mediatek/mtk_eth_soc.c   |   3 +-
- .../net/ethernet/mellanox/mlx5/core/en_tc.c   |   2 +-
- drivers/net/ethernet/mellanox/mlxsw/pci.c     |   2 +-
- drivers/net/ethernet/renesas/ravb_main.c      |   2 +-
- drivers/net/ipvlan/ipvlan_main.c              |   7 +-
- drivers/net/net_failover.c                    |  12 +-
- drivers/net/netdevsim/netdev.c                |   6 +-
- drivers/net/tap.c                             |   5 +-
- drivers/net/tun.c                             |   3 +-
- drivers/net/wireguard/device.c                |   2 +-
- drivers/net/wireless/ath/ath10k/snoc.c        |   2 +-
- drivers/scsi/fcoe/fcoe_transport.c            |   2 +-
- drivers/usb/gadget/function/rndis.c           |   2 +-
- fs/smb/server/smb2pdu.c                       |   2 +-
- include/linux/netdevice.h                     |  23 ++--
- net/8021q/vlan.c                              |   5 +-
- net/8021q/vlanproc.c                          |   2 +-
- net/bridge/br.c                               |   7 +-
- net/bridge/br_if.c                            |   3 +-
- net/bridge/br_netlink.c                       |   2 +-
- net/bridge/br_switchdev.c                     |   2 +-
- net/core/dev.c                                | 109 +++++++++---------
- net/core/dev_addr_lists.c                     |   2 +-
- net/core/dev_api.c                            |  12 ++
- net/core/dev_ioctl.c                          |   5 +-
- net/core/net-procfs.c                         |   2 +-
- net/core/net-sysfs.c                          |   9 +-
- net/core/rtnetlink.c                          |  10 +-
- net/dsa/dsa.c                                 |   3 +-
- net/dsa/user.c                                |   2 +-
- net/ipv4/fib_frontend.c                       |   2 +-
- net/ipv4/fib_semantics.c                      |   2 +-
- net/ipv4/ipmr.c                               |   2 +-
- net/ipv4/nexthop.c                            |   2 +-
- net/ipv6/addrconf.c                           |   2 +-
- net/mpls/af_mpls.c                            |   6 +-
- net/openvswitch/vport.c                       |   2 +-
- net/wireless/wext-core.c                      |   2 +-
- 50 files changed, 163 insertions(+), 138 deletions(-)
-
+diff --git a/arch/s390/appldata/appldata_net_sum.c b/arch/s390/appldata/appldata_net_sum.c
+index 59c282ca002f..47609e5f9d5d 100644
+--- a/arch/s390/appldata/appldata_net_sum.c
++++ b/arch/s390/appldata/appldata_net_sum.c
+@@ -83,7 +83,7 @@ static void appldata_get_net_sum_data(void *data)
+ 		const struct rtnl_link_stats64 *stats;
+ 		struct rtnl_link_stats64 temp;
+ 
+-		stats = dev_get_stats(dev, &temp);
++		stats = netif_get_stats(dev, &temp);
+ 		rx_packets += stats->rx_packets;
+ 		tx_packets += stats->tx_packets;
+ 		rx_bytes   += stats->rx_bytes;
+diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
+index 4e048e08c4fd..da4a09b1335c 100644
+--- a/drivers/leds/trigger/ledtrig-netdev.c
++++ b/drivers/leds/trigger/ledtrig-netdev.c
+@@ -657,7 +657,7 @@ static void netdev_trig_work(struct work_struct *work)
+ 	    !test_bit(TRIGGER_NETDEV_RX_ERR, &trigger_data->mode))
+ 		return;
+ 
+-	dev_stats = dev_get_stats(trigger_data->net_dev, &temp);
++	dev_stats = netif_get_stats(trigger_data->net_dev, &temp);
+ 	new_activity =
+ 	    (test_bit(TRIGGER_NETDEV_TX, &trigger_data->mode) ?
+ 		dev_stats->tx_packets : 0) +
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 17c7542be6a5..69f9e8ff0101 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -2162,7 +2162,7 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
+ 
+ 	slave_dev->priv_flags |= IFF_BONDING;
+ 	/* initialize slave stats */
+-	dev_get_stats(new_slave->dev, &new_slave->slave_stats);
++	netif_get_stats(new_slave->dev, &new_slave->slave_stats);
+ 
+ 	if (bond_is_lb(bond)) {
+ 		/* bond_alb_init_slave() must be called before all other stages since
+@@ -4605,7 +4605,7 @@ static void bond_get_stats(struct net_device *bond_dev,
+ 
+ 	bond_for_each_slave_rcu(bond, slave, iter) {
+ 		const struct rtnl_link_stats64 *new =
+-			dev_get_stats(slave->dev, &temp);
++			netif_get_stats(slave->dev, &temp);
+ 
+ 		bond_fold_stats(stats, new, &slave->slave_stats);
+ 
+diff --git a/drivers/net/ethernet/apm/xgene/xgene_enet_ethtool.c b/drivers/net/ethernet/apm/xgene/xgene_enet_ethtool.c
+index ada70425b48c..4dcd4035f2a9 100644
+--- a/drivers/net/ethernet/apm/xgene/xgene_enet_ethtool.c
++++ b/drivers/net/ethernet/apm/xgene/xgene_enet_ethtool.c
+@@ -268,7 +268,7 @@ static void xgene_get_ethtool_stats(struct net_device *ndev,
+ 	struct rtnl_link_stats64 stats;
+ 	int i;
+ 
+-	dev_get_stats(ndev, &stats);
++	netif_get_stats(ndev, &stats);
+ 	for (i = 0; i < XGENE_STATS_LEN; i++)
+ 		data[i] = *(u64 *)((char *)&stats + gstrings_stats[i].offset);
+ 
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+index 4f40f6afe88f..751e2dd6b827 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+@@ -1314,7 +1314,7 @@ static void bcmgenet_get_ethtool_stats(struct net_device *dev,
+ 	if (netif_running(dev))
+ 		bcmgenet_update_mib_counters(priv);
+ 
+-	dev_get_stats(dev, &stats64);
++	netif_get_stats(dev, &stats64);
+ 
+ 	for (i = 0; i < BCMGENET_STATS_LEN; i++) {
+ 		const struct bcmgenet_stats *s;
+diff --git a/drivers/net/ethernet/hisilicon/hns/hns_ethtool.c b/drivers/net/ethernet/hisilicon/hns/hns_ethtool.c
+index 60a586a951a0..d401fb4b1609 100644
+--- a/drivers/net/ethernet/hisilicon/hns/hns_ethtool.c
++++ b/drivers/net/ethernet/hisilicon/hns/hns_ethtool.c
+@@ -857,7 +857,7 @@ static void hns_get_ethtool_stats(struct net_device *netdev,
+ 
+ 	h->dev->ops->update_stats(h, &netdev->stats);
+ 
+-	net_stats = dev_get_stats(netdev, &temp);
++	net_stats = netif_get_stats(netdev, &temp);
+ 
+ 	/* get netdev statistics */
+ 	p[0] = net_stats->rx_packets;
+diff --git a/drivers/net/ethernet/intel/e1000e/ethtool.c b/drivers/net/ethernet/intel/e1000e/ethtool.c
+index c0bbb12eed2e..971356281afe 100644
+--- a/drivers/net/ethernet/intel/e1000e/ethtool.c
++++ b/drivers/net/ethernet/intel/e1000e/ethtool.c
+@@ -2050,7 +2050,7 @@ static void e1000_get_ethtool_stats(struct net_device *netdev,
+ 	int i;
+ 	char *p = NULL;
+ 
+-	dev_get_stats(netdev, &net_stats);
++	netif_get_stats(netdev, &net_stats);
+ 
+ 	for (i = 0; i < E1000_GLOBAL_STATS_LEN; i++) {
+ 		switch (e1000_gstrings_stats[i].type) {
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+index 25c3a09ad7f1..317d79f0ff8f 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+@@ -1406,7 +1406,7 @@ static void ixgbe_get_ethtool_stats(struct net_device *netdev,
+ 	char *p = NULL;
+ 
+ 	ixgbe_update_stats(adapter);
+-	net_stats = dev_get_stats(netdev, &temp);
++	net_stats = netif_get_stats(netdev, &temp);
+ 	for (i = 0; i < IXGBE_GLOBAL_STATS_LEN; i++) {
+ 		switch (ixgbe_gstrings_stats[i].type) {
+ 		case NETDEV_STATS:
+diff --git a/drivers/net/ethernet/intel/ixgbevf/ethtool.c b/drivers/net/ethernet/intel/ixgbevf/ethtool.c
+index 7ac53171b041..52eedfef9797 100644
+--- a/drivers/net/ethernet/intel/ixgbevf/ethtool.c
++++ b/drivers/net/ethernet/intel/ixgbevf/ethtool.c
+@@ -428,7 +428,7 @@ static void ixgbevf_get_ethtool_stats(struct net_device *netdev,
+ 	char *p;
+ 
+ 	ixgbevf_update_stats(adapter);
+-	net_stats = dev_get_stats(netdev, &temp);
++	net_stats = netif_get_stats(netdev, &temp);
+ 	for (i = 0; i < IXGBEVF_GLOBAL_STATS_LEN; i++) {
+ 		switch (ixgbevf_gstrings_stats[i].type) {
+ 		case NETDEV_STATS:
+diff --git a/drivers/net/net_failover.c b/drivers/net/net_failover.c
+index 5b50d9186f12..ac18dd861f52 100644
+--- a/drivers/net/net_failover.c
++++ b/drivers/net/net_failover.c
+@@ -190,14 +190,14 @@ static void net_failover_get_stats(struct net_device *dev,
+ 
+ 	slave_dev = rcu_dereference(nfo_info->primary_dev);
+ 	if (slave_dev) {
+-		new = dev_get_stats(slave_dev, &temp);
++		new = netif_get_stats(slave_dev, &temp);
+ 		net_failover_fold_stats(stats, new, &nfo_info->primary_stats);
+ 		memcpy(&nfo_info->primary_stats, new, sizeof(*new));
+ 	}
+ 
+ 	slave_dev = rcu_dereference(nfo_info->standby_dev);
+ 	if (slave_dev) {
+-		new = dev_get_stats(slave_dev, &temp);
++		new = netif_get_stats(slave_dev, &temp);
+ 		net_failover_fold_stats(stats, new, &nfo_info->standby_stats);
+ 		memcpy(&nfo_info->standby_stats, new, sizeof(*new));
+ 	}
+@@ -540,11 +540,11 @@ static int net_failover_slave_register(struct net_device *slave_dev,
+ 	if (slave_is_standby) {
+ 		rcu_assign_pointer(nfo_info->standby_dev, slave_dev);
+ 		standby_dev = slave_dev;
+-		dev_get_stats(standby_dev, &nfo_info->standby_stats);
++		netif_get_stats(standby_dev, &nfo_info->standby_stats);
+ 	} else {
+ 		rcu_assign_pointer(nfo_info->primary_dev, slave_dev);
+ 		primary_dev = slave_dev;
+-		dev_get_stats(primary_dev, &nfo_info->primary_stats);
++		netif_get_stats(primary_dev, &nfo_info->primary_stats);
+ 		failover_dev->min_mtu = slave_dev->min_mtu;
+ 		failover_dev->max_mtu = slave_dev->max_mtu;
+ 	}
+@@ -606,7 +606,7 @@ static int net_failover_slave_unregister(struct net_device *slave_dev,
+ 	dev_close(slave_dev);
+ 
+ 	nfo_info = netdev_priv(failover_dev);
+-	dev_get_stats(failover_dev, &nfo_info->failover_stats);
++	netif_get_stats(failover_dev, &nfo_info->failover_stats);
+ 
+ 	slave_is_standby = slave_dev->dev.parent == failover_dev->dev.parent;
+ 	if (slave_is_standby) {
+@@ -648,7 +648,7 @@ static int net_failover_slave_link_change(struct net_device *slave_dev,
+ 		netif_carrier_on(failover_dev);
+ 		netif_tx_wake_all_queues(failover_dev);
+ 	} else {
+-		dev_get_stats(failover_dev, &nfo_info->failover_stats);
++		netif_get_stats(failover_dev, &nfo_info->failover_stats);
+ 		netif_carrier_off(failover_dev);
+ 		netif_tx_stop_all_queues(failover_dev);
+ 	}
+diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+index e36d3e846c2d..55d93c8c6050 100644
+--- a/drivers/net/netdevsim/netdev.c
++++ b/drivers/net/netdevsim/netdev.c
+@@ -581,7 +581,7 @@ static void nsim_get_queue_stats_rx(struct net_device *dev, int idx,
+ 	struct rtnl_link_stats64 rtstats = {};
+ 
+ 	if (!idx)
+-		dev_get_stats(dev, &rtstats);
++		netif_get_stats(dev, &rtstats);
+ 
+ 	stats->packets = rtstats.rx_packets - !!rtstats.rx_packets;
+ 	stats->bytes = rtstats.rx_bytes;
+@@ -593,7 +593,7 @@ static void nsim_get_queue_stats_tx(struct net_device *dev, int idx,
+ 	struct rtnl_link_stats64 rtstats = {};
+ 
+ 	if (!idx)
+-		dev_get_stats(dev, &rtstats);
++		netif_get_stats(dev, &rtstats);
+ 
+ 	stats->packets = rtstats.tx_packets - !!rtstats.tx_packets;
+ 	stats->bytes = rtstats.tx_bytes;
+@@ -605,7 +605,7 @@ static void nsim_get_base_stats(struct net_device *dev,
+ {
+ 	struct rtnl_link_stats64 rtstats = {};
+ 
+-	dev_get_stats(dev, &rtstats);
++	netif_get_stats(dev, &rtstats);
+ 
+ 	rx->packets = !!rtstats.rx_packets;
+ 	rx->bytes = 0;
+diff --git a/drivers/scsi/fcoe/fcoe_transport.c b/drivers/scsi/fcoe/fcoe_transport.c
+index 2f478426f16e..91ea25f7c5b6 100644
+--- a/drivers/scsi/fcoe/fcoe_transport.c
++++ b/drivers/scsi/fcoe/fcoe_transport.c
+@@ -191,7 +191,7 @@ void __fcoe_get_lesb(struct fc_lport *lport,
+ 	lesb->lesb_vlink_fail = htonl(vlfc);
+ 	lesb->lesb_miss_fka = htonl(mdac);
+ 	lesb->lesb_fcs_error =
+-			htonl(dev_get_stats(netdev, &temp)->rx_crc_errors);
++			htonl(netif_get_stats(netdev, &temp)->rx_crc_errors);
+ }
+ EXPORT_SYMBOL_GPL(__fcoe_get_lesb);
+ 
+diff --git a/drivers/usb/gadget/function/rndis.c b/drivers/usb/gadget/function/rndis.c
+index afd75d72412c..0cdb72f2d9ff 100644
+--- a/drivers/usb/gadget/function/rndis.c
++++ b/drivers/usb/gadget/function/rndis.c
+@@ -199,7 +199,7 @@ static int gen_ndis_query_resp(struct rndis_params *params, u32 OID, u8 *buf,
+ 	resp->InformationBufferOffset = cpu_to_le32(16);
+ 
+ 	net = params->dev;
+-	stats = dev_get_stats(net, &temp);
++	stats = netif_get_stats(net, &temp);
+ 
+ 	switch (OID) {
+ 
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 5847c20994d3..eff09d110e25 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -218,7 +218,7 @@ struct net_device_stats {
+ #undef NET_DEV_STAT
+ 
+ /* per-cpu stats, allocated on demand.
+- * Try to fit them in a single cache line, for dev_get_stats() sake.
++ * Try to fit them in a single cache line, for netif_get_stats() sake.
+  */
+ struct net_device_core_stats {
+ 	unsigned long	rx_dropped;
+@@ -4997,8 +4997,8 @@ void netdev_notify_peers(struct net_device *dev);
+ void netdev_features_change(struct net_device *dev);
+ /* Load a device via the kmod */
+ void dev_load(struct net *net, const char *name);
+-struct rtnl_link_stats64 *dev_get_stats(struct net_device *dev,
+-					struct rtnl_link_stats64 *storage);
++struct rtnl_link_stats64 *netif_get_stats(struct net_device *dev,
++					  struct rtnl_link_stats64 *storage);
+ void netdev_stats_to_stats64(struct rtnl_link_stats64 *stats64,
+ 			     const struct net_device_stats *netdev_stats);
+ void dev_fetch_sw_netstats(struct rtnl_link_stats64 *s,
+diff --git a/net/8021q/vlanproc.c b/net/8021q/vlanproc.c
+index fa67374bda49..bcdcbf419e09 100644
+--- a/net/8021q/vlanproc.c
++++ b/net/8021q/vlanproc.c
+@@ -236,7 +236,7 @@ static int vlandev_seq_show(struct seq_file *seq, void *offset)
+ 	if (!is_vlan_dev(vlandev))
+ 		return 0;
+ 
+-	stats = dev_get_stats(vlandev, &temp);
++	stats = netif_get_stats(vlandev, &temp);
+ 	seq_printf(seq,
+ 		   "%s  VID: %d	 REORDER_HDR: %i  dev->priv_flags: %x\n",
+ 		   vlandev->name, vlan->vlan_id,
+diff --git a/net/core/dev.c b/net/core/dev.c
+index fe677ccec5b0..795a5d522cf8 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -11559,17 +11559,17 @@ noinline void netdev_core_stats_inc(struct net_device *dev, u32 offset)
+ EXPORT_SYMBOL_GPL(netdev_core_stats_inc);
+ 
+ /**
+- *	dev_get_stats	- get network device statistics
+- *	@dev: device to get statistics from
+- *	@storage: place to store stats
++ * netif_get_stats() - get network device statistics
++ * @dev: device to get statistics from
++ * @storage: place to store stats
+  *
+- *	Get network statistics from device. Return @storage.
+- *	The device driver may provide its own method by setting
+- *	dev->netdev_ops->get_stats64 or dev->netdev_ops->get_stats;
+- *	otherwise the internal statistics structure is used.
++ * Get network statistics from device. Return @storage.
++ * The device driver may provide its own method by setting
++ * dev->netdev_ops->get_stats64 or dev->netdev_ops->get_stats;
++ * otherwise the internal statistics structure is used.
+  */
+-struct rtnl_link_stats64 *dev_get_stats(struct net_device *dev,
+-					struct rtnl_link_stats64 *storage)
++struct rtnl_link_stats64 *netif_get_stats(struct net_device *dev,
++					  struct rtnl_link_stats64 *storage)
+ {
+ 	const struct net_device_ops *ops = dev->netdev_ops;
+ 	const struct net_device_core_stats __percpu *p;
+@@ -11617,7 +11617,7 @@ struct rtnl_link_stats64 *dev_get_stats(struct net_device *dev,
+ 	}
+ 	return storage;
+ }
+-EXPORT_SYMBOL(dev_get_stats);
++EXPORT_SYMBOL(netif_get_stats);
+ 
+ /**
+  *	dev_fetch_sw_netstats - get per-cpu network device statistics
+diff --git a/net/core/net-procfs.c b/net/core/net-procfs.c
+index 4f0f0709a1cb..14b8bebacefd 100644
+--- a/net/core/net-procfs.c
++++ b/net/core/net-procfs.c
+@@ -44,7 +44,7 @@ static void dev_seq_stop(struct seq_file *seq, void *v)
+ static void dev_seq_printf_stats(struct seq_file *seq, struct net_device *dev)
+ {
+ 	struct rtnl_link_stats64 temp;
+-	const struct rtnl_link_stats64 *stats = dev_get_stats(dev, &temp);
++	const struct rtnl_link_stats64 *stats = netif_get_stats(dev, &temp);
+ 
+ 	seq_printf(seq, "%6s: %7llu %7llu %4llu %4llu %4llu %5llu %10llu %9llu "
+ 		   "%8llu %7llu %4llu %4llu %4llu %5llu %7llu %10llu\n",
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index 8f897e2c8b4f..b4cc116acd4b 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -818,7 +818,8 @@ static ssize_t netstat_show(const struct device *d,
+ 	rcu_read_lock();
+ 	if (dev_isalive(dev)) {
+ 		struct rtnl_link_stats64 temp;
+-		const struct rtnl_link_stats64 *stats = dev_get_stats(dev, &temp);
++		const struct rtnl_link_stats64 *stats = netif_get_stats(dev,
++									&temp);
+ 
+ 		ret = sysfs_emit(buf, fmt_u64, *(u64 *)(((u8 *)stats) + offset));
+ 	}
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index a9555bfc372f..1cb3a264030f 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -1473,7 +1473,7 @@ static noinline_for_stack int rtnl_fill_stats(struct sk_buff *skb,
+ 		return -EMSGSIZE;
+ 
+ 	sp = nla_data(attr);
+-	dev_get_stats(dev, sp);
++	netif_get_stats(dev, sp);
+ 
+ 	attr = nla_reserve(skb, IFLA_STATS,
+ 			   sizeof(struct rtnl_link_stats));
+@@ -5937,7 +5937,7 @@ static int rtnl_fill_statsinfo(struct sk_buff *skb, struct net_device *dev,
+ 		}
+ 
+ 		sp = nla_data(attr);
+-		dev_get_stats(dev, sp);
++		netif_get_stats(dev, sp);
+ 	}
+ 
+ 	if (stats_attr_valid(filter_mask, IFLA_STATS_LINK_XSTATS, *idxattr)) {
+diff --git a/net/openvswitch/vport.c b/net/openvswitch/vport.c
+index 6bbbc16ab778..29058e574eb9 100644
+--- a/net/openvswitch/vport.c
++++ b/net/openvswitch/vport.c
+@@ -286,7 +286,7 @@ void ovs_vport_get_stats(struct vport *vport, struct ovs_vport_stats *stats)
+ 	const struct rtnl_link_stats64 *dev_stats;
+ 	struct rtnl_link_stats64 temp;
+ 
+-	dev_stats = dev_get_stats(vport->dev, &temp);
++	dev_stats = netif_get_stats(vport->dev, &temp);
+ 	stats->rx_errors  = dev_stats->rx_errors;
+ 	stats->tx_errors  = dev_stats->tx_errors;
+ 	stats->tx_dropped = dev_stats->tx_dropped;
 -- 
 2.50.0
 
