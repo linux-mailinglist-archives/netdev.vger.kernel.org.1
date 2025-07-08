@@ -1,117 +1,117 @@
-Return-Path: <netdev+bounces-204892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-204893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FFD5AFC6B4
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 11:08:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88844AFC6B7
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 11:08:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5547C3A3E72
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 09:07:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 727A3188A446
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 09:09:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 278C31E376E;
-	Tue,  8 Jul 2025 09:08:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36ED42BE7CD;
+	Tue,  8 Jul 2025 09:08:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b="/ES0fewb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UqpH9CKl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-internal.sh.cz (mail-internal.sh.cz [95.168.196.40])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972FD1D5150;
-	Tue,  8 Jul 2025 09:08:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.168.196.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C1DA220F52
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 09:08:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751965691; cv=none; b=frkk4NpZUlLxAcRw2ZA1cDWd2O1XidBUcNxbwhuiQQDuv252mq73/26v4FMWxd2aBY6p24XFH1FkbZyZXUjuio5WHdfaxN2JiaTwD/z3tCkZr1H6YwbdcgtyrxqboRAFuMYsGV+yMVHrecvqHadRnP4OgUVabfyKA8kWnRz2EXw=
+	t=1751965723; cv=none; b=bZSo04ofIvdTLROhViupLwJrMlVJI/KuXcjX0eaCfNirenBuTspccR1yLC6AcD54TNKTZDFgBvqAJl5KqJlR2MtgSkXjECa8mNB5iBryjz0XSjSfwhL1SCcLYJB7zzUpOy3KJBk76QC0NK75DC2ju28W0zvDvDWwfIpFyRBjlbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751965691; c=relaxed/simple;
-	bh=3bRyRlRrZR9k8NH7omLwxN/7e8n86lC7Jh/MTrOJTT4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IV/kj0VWbcwXxoqGFZvtTSoBnBf4qQsyqLwqxEpulL43HbQb+GQh/8/KQLKQu5kEph2SNrGZHBtA0azVE55B5rdaKJKqYNVXN64fb4X5383aaguE2P8T7jXgOGfjbKcw4ignaOpVLrC6QrYSxNYnanyZgOv+SjDESzGbSrlxh9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com; spf=pass smtp.mailfrom=cdn77.com; dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b=/ES0fewb; arc=none smtp.client-ip=95.168.196.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cdn77.com
-DKIM-Signature: a=rsa-sha256; t=1751965686; x=1752570486; s=dkim2019; d=cdn77.com; c=relaxed/relaxed; v=1; bh=qmx/ei4aNZgcLguOQ4boGu+NqIav7okmG1X2YMA4xeI=; h=From:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:In-Reply-To:References;
-   b=/ES0fewbTc8qvZvKGOBlApOS/TQ48g8rL56YC8P5YmBnrmrZFFzZ9piECRwsa81NC5z6RsOEL8s82DTs5RyHV1BYqmi04tMl9ZVZ38VfUCifQ8JghdnVYJN3M9pK6amhDa5Lugi/ZO7ozK+O2jDsdrp9w3lKUFdFQ4hz88sr71w=
-Received: from [10.0.5.28] ([95.168.203.222])
-        by mail.sh.cz (14.1.0 build 16 ) with ASMTP (SSL) id 202507081108055862;
-        Tue, 08 Jul 2025 11:08:05 +0200
-Message-ID: <4a8ce60d-fd28-4df9-b568-99964fed837c@cdn77.com>
-Date: Tue, 8 Jul 2025 11:08:04 +0200
+	s=arc-20240116; t=1751965723; c=relaxed/simple;
+	bh=+BEhpRAI3WqIU5PHLov5vFkJrJLWkW1/+f220VxTYOQ=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=GROL5jzXC9jm2ZELDE1ivwEBkBuxE2AVCiIShbI5at4xNXJuiT/AV6spO11BnW7kN3bsLJLFXTJ7lY28bi6yGIY7+qJd5QPIVqzrSy7U+bF9LEzP3RJA6MrmuS03/aUNOfyj+8p6W1Xx9Z22P+EFrMtFB+qt/b0loImcFWIsl6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UqpH9CKl; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1751965720;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+BEhpRAI3WqIU5PHLov5vFkJrJLWkW1/+f220VxTYOQ=;
+	b=UqpH9CKlov3X8hGEQvv1m/buS9BBUXC14MKeWIuqdyBto1q5cqIO+2umSWUjiFOxqBrNbj
+	pil2AOvtNf8/xrZE1c9+URmx7mtewvYtE8ZlBUUr/MWEg1wGJn+3K4xEXtQsKUc8WSvkoQ
+	0ZAS4cZq7xL6OilKrdESaSsVbwn+Hu8=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-562-FCrmVsh2NjyN66k4myr0zQ-1; Tue,
+ 08 Jul 2025 05:08:37 -0400
+X-MC-Unique: FCrmVsh2NjyN66k4myr0zQ-1
+X-Mimecast-MFC-AGG-ID: FCrmVsh2NjyN66k4myr0zQ_1751965710
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 67F98180135B;
+	Tue,  8 Jul 2025 09:08:29 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.81])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3B3851956087;
+	Tue,  8 Jul 2025 09:08:19 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <CADvbK_cR9RCeZo5d3--h7iTBfHszpmdDS7+0kfCUsViOamwR5Q@mail.gmail.com>
+References: <CADvbK_cR9RCeZo5d3--h7iTBfHszpmdDS7+0kfCUsViOamwR5Q@mail.gmail.com> <cover.1751743914.git.lucien.xin@gmail.com> <2334439.1751877644@warthog.procyon.org.uk>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: dhowells@redhat.com, network dev <netdev@vger.kernel.org>,
+    davem@davemloft.net, kuba@kernel.org,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
+    Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
+    Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org,
+    Steve French <smfrench@gmail.com>,
+    Namjae Jeon <linkinjeon@kernel.org>,
+    Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
+    kernel-tls-handshake@lists.linux.dev,
+    Chuck Lever <chuck.lever@oracle.com>,
+    Jeff Layton <jlayton@kernel.org>,
+    Benjamin Coddington <bcodding@redhat.com>,
+    Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+    Alexander Aring <aahringo@redhat.com>,
+    Cong Wang <xiyou.wangcong@gmail.com>,
+    "D . Wythe" <alibuda@linux.alibaba.com>,
+    Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>,
+    Sabrina Dubroca <sd@queasysnail.net>,
+    Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+    Daniel Stenberg <daniel@haxx.se>,
+    Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: Re: [PATCH net-next 00/15] net: introduce QUIC infrastructure and core subcomponents
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] tcp: account for memory pressure signaled by
- cgroup
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- David Ahern <dsahern@kernel.org>, Jiayuan Chen <jiayuan.chen@linux.dev>,
- Christian Hopps <chopps@labn.net>, Sabrina Dubroca <sd@queasysnail.net>,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- Matyas Hurtik <matyas.hurtik@cdn77.com>
-References: <20250707105205.222558-1-daniel.sedlak@cdn77.com>
- <CANn89i+=haaDGHcG=5etnNcftKM4+YKwdiP6aJfMqrWpDgyhvg@mail.gmail.com>
- <825c60bd-33cf-443f-a737-daa2b34e6bea@cdn77.com>
- <CANn89iKQQ4TFx9Ch9pyDJro=tchVtySQfJTygCxjRP+zPkZfgg@mail.gmail.com>
-Content-Language: en-US
-From: Daniel Sedlak <daniel.sedlak@cdn77.com>
-In-Reply-To: <CANn89iKQQ4TFx9Ch9pyDJro=tchVtySQfJTygCxjRP+zPkZfgg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CTCH: RefID="str=0001.0A00639A.686CE009.001B,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0"; Spam="Unknown"; VOD="Unknown"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 08 Jul 2025 10:08:18 +0100
+Message-ID: <2545781.1751965698@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On 7/8/25 9:01 AM, Eric Dumazet wrote:
-> On Mon, Jul 7, 2025 at 11:45 PM Daniel Sedlak <daniel.sedlak@cdn77.com> wrote:
->>
->> Hi Eric,
->> Thank you for your feedback.
->>
->> On 7/7/25 2:48 PM, Eric Dumazet wrote:
->>> On Mon, Jul 7, 2025 at 3:55 AM Daniel Sedlak <daniel.sedlak@cdn77.com> wrote:
->>>>
->>>> Currently, we have two memory pressure counters for TCP sockets [1],
->>>> which we manipulate only when the memory pressure is signalled through
->>>> the proto struct [2].
->>>>
->>>> However, the memory pressure can also be signaled through the cgroup
->>>> memory subsystem, which we do not reflect in the netstat counters.
->>>>
->>>> This patch adds a new counter to account for memory pressure signaled by
->>>> the memory cgroup.
->>>
->>> OK, but please amend the changelog to describe how to look at the
->>> per-cgroup information.
->>
->> Sure, I will explain it more in v2. I was not sure how much of a
->> "storytelling" is appropriate in the commit message.
->>
->>
->>> I am sure that having some details on how to find the faulty cgroup
->>> would also help.
->>
->> Right now, we have a rather fragile bpftrace script for that, but we
->> have a WIP patch for memory management, which will expose which cgroup
->> is having "difficulties", but that is still ongoing work.
->>
->> Or do you have any suggestions on how we can incorporate this
->> information about "this particular cgroup is under pressure" into the
->> net subsystem? Maybe a log line?
-> 
-> Perhaps an additional trace point ?
+Xin Long <lucien.xin@gmail.com> wrote:
 
-Sounds good to me, we will incorporate that and send v2.
-> 
-> Ideally we could trace the cgroup path, or at least the pid.
+> Yes, there is a patch that adds Documentation/networking/quic.rst in the
+> subsequent patchset, which I=E2=80=99ll post after this one. It addresses=
+ exactly
+> what you pointed out:
+>=20
+> https://github.com/lxin/net-next/commit/9f978448531b958f859bbd48dce8a703b=
+256b25a
 
-Will try to do both, we will see.
+Excellent, thanks!
 
-Thanks!
-Daniel
+David
+
 
