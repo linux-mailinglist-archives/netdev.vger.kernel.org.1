@@ -1,85 +1,97 @@
-Return-Path: <netdev+bounces-205008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF3F6AFCDB3
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 16:33:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A608AFCDBA
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 16:34:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DA6E7A7DAC
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 14:32:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B3C77B2A88
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 14:33:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF8F2DFF1D;
-	Tue,  8 Jul 2025 14:33:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 212582DAFCC;
+	Tue,  8 Jul 2025 14:34:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="u6eO9xcf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dw3TnR2j"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6852D2DAFCC;
-	Tue,  8 Jul 2025 14:33:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A6F2AF07;
+	Tue,  8 Jul 2025 14:34:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1751985221; cv=none; b=SAwB7aRPVDj5TO4pMO0LxSWSBIxf5dTGC0HYp+fK2XNRiFn3A/9uOJYYWW+m3jA2kikCgbyS0XWLspsPVdD5+zgcT1UmlB3zj4eZU9ccx5NHRU8BMGKcowWd0mdMQEySTvWQfz/IjHJLDhtL7V7ZhMSmLuZtcLRXr1ba0Q+BOQM=
+	t=1751985270; cv=none; b=frInH9mz17eyDgm93FsanGLGQyM1ZsIkp1HAJEaOzwcjtaZAes4LbwYFr5gf/e7NjOMCMw2Q+xmZPeEXVq6lEkE8LFJ1DP4FhB50vvt3rZxmQau5gQzYGRZoGbTe3irtNR6Xug5KnOgwYcn5YkyNfYhs1n4oZZTAeDGVFNnKUc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1751985221; c=relaxed/simple;
-	bh=3XrEcxV9R9YR0M0lRSTBHME+sP4TmaTv2G0TNp4On1A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WfEm9ukitUEB378N8/BLt0jJGjP+UfDMyhme1YQY88gSJhiCB7+VZkUY+4v6b0xEtccnAblX0YRQ2DFmquuaxIpNm8S+AxJAg534Pl43/Y8kHGgBxvhQT7ly4Wvj6M9JIBvGZdlr2awxzhRiR0lBEzoRzNZ1GrJL4MUDXPf+FzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=u6eO9xcf; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=qt1Dm8hg4+cw50oWqi6P/j/pVrWP76gL+389q1zKEUU=; b=u6eO9xcfoR44wPODuVnEoYieT0
-	bDjS4u8R883wqyvoMQS+55McSgo4HVBObJERb0b4TBsGKInZFzuQBNGEgC+l1xMmgA3JpVpcxDxlk
-	E0U96Y8eatK3qtYsdFTmChtEPdd/43tPoMkQbN8NTotXCf8pSWfjbMrgw8Z/M47d4Hxg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uZ9Ny-000pU8-Du; Tue, 08 Jul 2025 16:33:30 +0200
-Date: Tue, 8 Jul 2025 16:33:30 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	shenjian15@huawei.com, liuyonglong@huawei.com,
-	chenhao418@huawei.com, jonathan.cameron@huawei.com,
-	shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
-	arnd@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 02/11] net: hns3: clean up the build warning in
- debugfs by use seq file
-Message-ID: <0531ff61-c88a-4029-92f1-fe463e973cb7@lunn.ch>
-References: <20250708130029.1310872-1-shaojijie@huawei.com>
- <20250708130029.1310872-3-shaojijie@huawei.com>
+	s=arc-20240116; t=1751985270; c=relaxed/simple;
+	bh=5tduTloL7o58Qv0JYfn4WgvECx8dhVTHJ7cQroK1ivM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tnKPdKD4Uo3E9pEb+tsFqR23s/akbDATIL3deWh7cEzGOxEP+oMTsGiIHlwgKWwXAUnCJhx1p9xKVGCVsmvN9EukswozQbKioRhHda9+/XLTYjsAtqYiKv1grVsGIiJ6HV8wDdFbrK3LkhdFY5ZVJn5HrkUOdCvTPPw4AS3odsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dw3TnR2j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0213AC4CEED;
+	Tue,  8 Jul 2025 14:34:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1751985269;
+	bh=5tduTloL7o58Qv0JYfn4WgvECx8dhVTHJ7cQroK1ivM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dw3TnR2jP3B6YiC5TeCFZdBjn23BoGVjN3kr1F4Th88b0dzAkmpsZ/2LGzaltUSxQ
+	 PH/r9NVuiAO4cVEuUtFCMBDn4TskePd802dJ9xaDyBb8QtwuiF8YRUWUidGSWsx24y
+	 Jprt3uoD+s8hJFCmD6y98PRpBhUNuMVp8vnq1N/idi/NrEdlytnOteNUZqzhDsucWj
+	 MkuO1p6Y0/A19x0K3tOuihyJC5esIcvbLGv8Nj6XVEZ8DzY+e4JIt8Bkx0OqNvr2pF
+	 ycf8i5sColU+22mFEHv/1FtyV1RHkuiYMUzWCX3hhd7hvw0WE6Gz6AIw6FqW577CwQ
+	 kOf9RJa252zAA==
+Date: Tue, 8 Jul 2025 07:34:27 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>, Moritz Buhl
+ <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, Pengtao He
+ <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, Steve French
+ <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara
+ <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
+ kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>,
+ Jeff Layton <jlayton@kernel.org>, Benjamin Coddington
+ <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke
+ <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, Jason
+ Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, Sabrina
+ Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner
+ <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, Andy
+ Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: Re: [PATCH net-next 05/15] quic: provide quic.h header files for
+ kernel and userspace
+Message-ID: <20250708073427.6ba38b45@kernel.org>
+In-Reply-To: <74b62316e4a265bf2e5c0b3cf7061b4a6fde68b1.1751743914.git.lucien.xin@gmail.com>
+References: <cover.1751743914.git.lucien.xin@gmail.com>
+	<74b62316e4a265bf2e5c0b3cf7061b4a6fde68b1.1751743914.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250708130029.1310872-3-shaojijie@huawei.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 08, 2025 at 09:00:20PM +0800, Jijie Shao wrote:
-> From: Jian Shen <shenjian15@huawei.com>
+On Sat,  5 Jul 2025 15:31:44 -0400 Xin Long wrote:
+> This commit adds quic.h to include/uapi/linux, providing the necessary
+> definitions for the QUIC socket API. Exporting this header allows both
+> user space applications and kernel subsystems to access QUIC-related
+> control messages, socket options, and event/notification interfaces.
 > 
-> Arnd reported that there are two build warning for on-stasck
-> buffer oversize. As Arnd's suggestion, using seq file way
-> to avoid the stack buffer or kmalloc buffer allocating.
+> Since kernel_get/setsockopt() is no longer available to kernel consumers,
+> a corresponding internal header, include/linux/quic.h, is added. This
+> provides kernel subsystems with the necessary declarations to handle
+> QUIC socket options directly.
 > 
-> Reported-by: Arnd Bergmann <arnd@kernel.org>
-> Closes: https://lore.kernel.org/all/20250610092113.2639248-1-arnd@kernel.org/
-> Signed-off-by: Jian Shen <shenjian15@huawei.com>
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> Detailed descriptions of these structures are available in [1], and will
+> be also provided when adding corresponding socket interfaces in the
+> later patches.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+Warning: net/quic/socket.c:142 No description found for return value of 'quic_kernel_setsockopt'
+Warning: net/quic/socket.c:175 No description found for return value of 'quic_kernel_getsockopt'
+-- 
+pw-bot: cr
 
