@@ -1,74 +1,147 @@
-Return-Path: <netdev+bounces-205111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E99EAFD6CF
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 21:03:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 835B2AFD6D9
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 21:07:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE5605631E2
-	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 19:03:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D0EF56407C
+	for <lists+netdev@lfdr.de>; Tue,  8 Jul 2025 19:06:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C73BB22069A;
-	Tue,  8 Jul 2025 19:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98AFE2E610A;
+	Tue,  8 Jul 2025 19:06:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EZaZWLDH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fryarhpI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E334801;
-	Tue,  8 Jul 2025 19:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744732E5B3E
+	for <netdev@vger.kernel.org>; Tue,  8 Jul 2025 19:06:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752001418; cv=none; b=XbOnS03CkTi6vyE4TH8Mx8lg6HgVdjeil2IH0DRYkQ+rfwNZ8U+4vzyRSNX2sbkDEevvfawHZ/0msuaH5Jb6/mFw+2ld3tiAi9Llq0x+7tmf+t7ojmtiyk5PR/nm5j4G+JQ2CixXvX11HUlzgusP7yO8fz5VsCeA5giRAoymu+o=
+	t=1752001600; cv=none; b=J9NQR95G0hHZmSehClBeoOi9FDvMz7da8LWVWw74ABf6gtnZDystf4fd7y/RspEChXS7G843vPHbHqMThGFljUbr6vlsbqhjFHlkeQ8OhAU+x60AYE9sAcNwMeJNQb0G7hOvmH51kEvDPvba7yAyfrRtgLrzPP31QZXqswzryz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752001418; c=relaxed/simple;
-	bh=GHcZnk2bIg2LnEuxbdd9Nbxx/LOWDNPMl+Rh13K5rGs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qZ5oX151xLJmW9W7EDnAt01NKb+1pUqAbR7V2i2u2dbF4GAOShxRg7XLXHPWfOIw0XumBg7VIcWCZKphNHgXG8R7xew9ngHtZ2HSZIHN9El1dPj3RqpAywgg0zi4tm5eleSQfsmwK6hCsM8C+V7bW1Ro/rnlXOJPsh/nFHZ+0H0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EZaZWLDH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81176C4CEED;
-	Tue,  8 Jul 2025 19:03:37 +0000 (UTC)
+	s=arc-20240116; t=1752001600; c=relaxed/simple;
+	bh=DlUlzmq1XBA7NBkVzqscejjs37rD2o/CbIOz3pFjXzQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oby0Gl5FQQXOnfeXMusfnctAWFAEnPfsUrA5paM27CRmOejyhuOConutT9mKA2nBiGzuaQbQegL0X0c3KyiG+DP7uNhHpqoaKx3TDz8Z3iGcyfjqtg/QVzQDomPq5EXGtiOl+pEDb9KJljuBdw3NGNBRRvRg6cmaUtpfA+cMvng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fryarhpI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E99D3C4CEED;
+	Tue,  8 Jul 2025 19:06:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752001418;
-	bh=GHcZnk2bIg2LnEuxbdd9Nbxx/LOWDNPMl+Rh13K5rGs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EZaZWLDHIls3zFiL6RkrOHXTN2RdqBsCrNWrk1rq2edSY9SYL2XUWZM/xK6qTXakv
-	 BbxzRJOTtCmGRBYPbdPAZV3NYxWBvxRJ8b1bDkbY7rIwWeAVd3WfMK1LwSYs1Mjyfw
-	 haUHBdpZuSVlJTMs63KMC8CsowiLEUYoK07+0GF72EHqgz9ACvM3w2HcQYr3BQsDAi
-	 WaFi3h3QogaK82PqX24TrW7L0lvV3j7EegCmADT+ZjfOKpdO47G+VVkARdIKM045oN
-	 G0aQVo7EBPJ5/xpNlHcox2tTFk6szhMwelkdjqz9uTUcgJV8ll9GWLC8WdKWhMdKA0
-	 vhbXCKoU2BNNw==
-Date: Tue, 8 Jul 2025 12:03:36 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, linux-afs@lists.infradead.org,
- linux-kernel@vger.kernel.org, "Junvyyang, Tencent Zhuque Lab"
- <zhuque@tencent.com>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net 2/2] rxrpc: Fix bug due to prealloc collision
-Message-ID: <20250708120336.03383758@kernel.org>
-In-Reply-To: <20250707102435.2381045-3-dhowells@redhat.com>
-References: <20250707102435.2381045-1-dhowells@redhat.com>
-	<20250707102435.2381045-3-dhowells@redhat.com>
+	s=k20201202; t=1752001600;
+	bh=DlUlzmq1XBA7NBkVzqscejjs37rD2o/CbIOz3pFjXzQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fryarhpIK+1nP7tSgoPcDvxI9XjtY+Hli2RSEAqJ4O9AK/HR81cZROSRp+wPlcQ7y
+	 iVjB/LFs7eZE55MzPELBmpBAmLczTovO5lCJiD3YG7rX+buEhZXrU3DUfEidusZPwk
+	 t2Zo1TYe0sjPJZqWIgG8+LK5G/Gf3Gl4hiLQJWn6fPbT1GfsD7m0cUXTOmvgGmKXQu
+	 U+aofVBWnsfZYyL+77DDDexbpDCOI0BgvYG7viab7Zhk67wruk+5Fs9d+xavMOx/Cp
+	 UjiWP4nSa4Q0cUcYHgtxSCroRDTPAyw8S0n9PARX4PpcePNDTaL+fcGKz1Hormv8wg
+	 nTExBnBWr09yQ==
+Date: Tue, 8 Jul 2025 20:06:35 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jacek Kowalski <jacek@jacekk.info>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next v2 1/5] e1000: drop unnecessary constant casts
+ to u16
+Message-ID: <20250708190635.GW452973@horms.kernel.org>
+References: <b4ee0893-6e57-471d-90f4-fe2a7c0a2ada@jacekk.info>
+ <e199da76-00d0-43d3-8f61-f433bc0352ad@jacekk.info>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e199da76-00d0-43d3-8f61-f433bc0352ad@jacekk.info>
 
-On Mon,  7 Jul 2025 11:24:34 +0100 David Howells wrote:
-> +	rxrpc_prefail_call(call, RXRPC_CALL_LOCAL_ERROR, -EBADSLT);
-> +	__set_bit(RXRPC_CALL_RELEASED, &call->flags);
+On Tue, Jul 08, 2025 at 10:16:52AM +0200, Jacek Kowalski wrote:
+> Remove unnecessary casts of constant values to u16.
+> Let the C type system do it's job.
+> 
+> Signed-off-by: Jacek Kowalski <Jacek@jacekk.info>
+> Suggested-by: Simon Horman <horms@kernel.org>
+> ---
+>  drivers/net/ethernet/intel/e1000/e1000_ethtool.c | 2 +-
+>  drivers/net/ethernet/intel/e1000/e1000_hw.c      | 4 ++--
+>  drivers/net/ethernet/intel/e1000/e1000_main.c    | 2 +-
+>  3 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/e1000/e1000_ethtool.c b/drivers/net/ethernet/intel/e1000/e1000_ethtool.c
+> index d06d29c6c037..d152026a027b 100644
+> --- a/drivers/net/ethernet/intel/e1000/e1000_ethtool.c
+> +++ b/drivers/net/ethernet/intel/e1000/e1000_ethtool.c
+> @@ -806,7 +806,7 @@ static int e1000_eeprom_test(struct e1000_adapter *adapter, u64 *data)
+>  	}
+>  
+>  	/* If Checksum is not Correct return error else test passed */
+> -	if ((checksum != (u16)EEPROM_SUM) && !(*data))
+> +	if ((checksum != EEPROM_SUM) && !(*data))
+>  		*data = 2;
 
-is the __set_bit() needed / intentional here?
-Looks like rxrpc_prefail_call() does:
+nit: If there is a v3 for some other reason, then I think
+     you could also drop the inner parentheses here.
 
-	WARN_ON_ONCE(__test_and_set_bit(RXRPC_CALL_RELEASED, &call->flags));
+>  
+>  	return *data;
+> diff --git a/drivers/net/ethernet/intel/e1000/e1000_hw.c b/drivers/net/ethernet/intel/e1000/e1000_hw.c
+> index f9328f2e669f..0e5de52b1067 100644
+> --- a/drivers/net/ethernet/intel/e1000/e1000_hw.c
+> +++ b/drivers/net/ethernet/intel/e1000/e1000_hw.c
+> @@ -3970,7 +3970,7 @@ s32 e1000_validate_eeprom_checksum(struct e1000_hw *hw)
+>  		return E1000_SUCCESS;
+>  
+>  #endif
+> -	if (checksum == (u16)EEPROM_SUM)
+> +	if (checksum == EEPROM_SUM)
+>  		return E1000_SUCCESS;
+>  	else {
+>  		e_dbg("EEPROM Checksum Invalid\n");
+> @@ -3997,7 +3997,7 @@ s32 e1000_update_eeprom_checksum(struct e1000_hw *hw)
+>  		}
+>  		checksum += eeprom_data;
+>  	}
+> -	checksum = (u16)EEPROM_SUM - checksum;
+> +	checksum = EEPROM_SUM - checksum;
+>  	if (e1000_write_eeprom(hw, EEPROM_CHECKSUM_REG, 1, &checksum) < 0) {
+>  		e_dbg("EEPROM Write Error\n");
+>  		return -E1000_ERR_EEPROM;
+> diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
+> index d8595e84326d..09acba2ed483 100644
+> --- a/drivers/net/ethernet/intel/e1000/e1000_main.c
+> +++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
+> @@ -313,7 +313,7 @@ static void e1000_update_mng_vlan(struct e1000_adapter *adapter)
+>  		} else {
+>  			adapter->mng_vlan_id = E1000_MNG_VLAN_NONE;
+>  		}
+> -		if ((old_vid != (u16)E1000_MNG_VLAN_NONE) &&
+> +		if ((old_vid != E1000_MNG_VLAN_NONE) &&
+
+Ditto.
+
+But more importantly, both Clang 20.1.7 W=1 builds (or at any rate, builds
+with -Wtautological-constant-out-of-range-compare), and Smatch complain
+that the comparison above is now always true because E1000_MNG_VLAN_NONE is
+-1, while old_vid is unsigned.
+
+Perhaps E1000_MNG_VLAN_NONE should be updated to be UINT16_MAX?
+
+
+>  		    (vid != old_vid) &&
+>  		    !test_bit(old_vid, adapter->active_vlans))
+>  			e1000_vlan_rx_kill_vid(netdev, htons(ETH_P_8021Q),
+> -- 
+> 2.47.2
+> 
 
