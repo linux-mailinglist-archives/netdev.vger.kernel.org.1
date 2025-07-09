@@ -1,116 +1,202 @@
-Return-Path: <netdev+bounces-205368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EEC4AFE5BA
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 12:28:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A12CAFE5D5
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 12:35:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2941E18906CB
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 10:29:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7A0B18948EF
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 10:34:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6667928C862;
-	Wed,  9 Jul 2025 10:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TGCDJVK0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EB0D27CCE7;
+	Wed,  9 Jul 2025 10:34:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6712C2853E9
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 10:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21E10258CC9;
+	Wed,  9 Jul 2025 10:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752056920; cv=none; b=dsvDjkEcChOWLnNfLLc7DD0Kb67+U/1l+jN/Ctrg8JqeYvbkJhLtovYgqpS/BM9cZ12uJykzyH9LITxRxsHCRuXF0EZkruUKmfrWmLFoO3p0gQqv67MeEjxVjAV1SM0uPkoMuGtE00jbRr5hXDAX75qdQG4m6gQiVYMgPTmB+Hk=
+	t=1752057266; cv=none; b=Wk5VpV/xbhjNwv3GaU3+26SfGPCzJXhnFpbN4LpbfoDuxr7zy5JtD6KEFVl88yzgx0gxjF02MqkwCytQHaWC5i2+Bgeu+SMYEWO2gey7lo+Q181Sgz5JYM827+vytGy0gD2TB0qNfw5rCT4gxngHh6acnnkz1VyWW+4it2EVydA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752056920; c=relaxed/simple;
-	bh=AkfwzbXzQfAXsW7SwyuiRXK49Dtsr0H/Zdta1XDnGuI=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=TpsF0OOAPfetlwsgkz7k/ek5ZzRJwb1glUMRQpgW8YqsHYYsZsvpgosWKtFErac/u2R03RfXCeb3QN4LW/CqI5O/pBvjbuV6MtoZiSTbdIxqHCAeQjzZCGdqNMslB/GkkvFXd1Ew1RgTXf8jBSjO6dLwvbK7dSF+VKTRm7IVJaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TGCDJVK0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752056917;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UPfT/80yQAK1NV+ddQxET2DiICWgTa0fvjoECxIz92M=;
-	b=TGCDJVK0G0J1s0pRi6IqDkI07l3LIAaItnSIT0JBgaHValA3MSU8RL94Xpw5maT6jk2mfw
-	ksqrb/qG+vOm8GbJUil+QnnlYH8flEyWOi1Z50qWYhNGiK8ZmFV4lVqWyEPDnRR5r5Wlm1
-	A8j/A7bvS4SOrOhOk1MbZiNw0pua6BA=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-680-En9MjsdWMLuEG60_hFMatw-1; Wed,
- 09 Jul 2025 06:28:34 -0400
-X-MC-Unique: En9MjsdWMLuEG60_hFMatw-1
-X-Mimecast-MFC-AGG-ID: En9MjsdWMLuEG60_hFMatw_1752056913
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6035D1944A8C;
-	Wed,  9 Jul 2025 10:28:33 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.81])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9C74D180035C;
-	Wed,  9 Jul 2025 10:28:31 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20250709071140.99461-1-ebiggers@kernel.org>
-References: <20250709071140.99461-1-ebiggers@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>,
-    Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dhowells@redhat.com, linux-crypto@vger.kernel.org,
-    netdev@vger.kernel.org
-Subject: Re: [PATCH] crypto/krb5: Fix memory leak in krb5_test_one_prf()
+	s=arc-20240116; t=1752057266; c=relaxed/simple;
+	bh=+cxS5MiAAf3humZhyh5TASrZIokPGp5nK7E4WHnrsPc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AnI+cP4sUY0eQ+Qq9Bhm6bAVMFoihEEa6NEtQYMMDNtw0dZZqqJpqg4bG4jCrivqKlkQkD/9CTfZjxINlJbAlh+okdGzXAMCFYzs8Eiy66xtIyEBFPH+4dr2qIClgQwtX6rSlu0SfjuGgdLf6oH9AVLY9hffLmb7ZLCiRXvlcJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ae3cd8fdd77so1130738066b.1;
+        Wed, 09 Jul 2025 03:34:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752057263; x=1752662063;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AYfFTk4cxPsv8qRd1XaiI9syNTWMKA25j0iuuFRQVKk=;
+        b=BXhIi7BZ+X5bTIUyvtq9eXX8iOIU2drBP6E3vApp1xlAB5/nCpKJ535mG5Rfk7yt8v
+         6FZQKpZ+Yn+L+3FIDJTE/rCY7FMM/Or0UCiS0P0G86nfMQafX5J+UQommvtHUqHIaFIS
+         PEWurJIHAdX+F5T7iCuTY1cKWGj9w9sCnrqxjjKWWlqUDl5oJUbKXvTcI7VFVCFDg3iA
+         ebLgWopPZ3GzGKi4pVGH6Kov8ZuUGEdpaPWyBeWmq1n7BFEyap4nWHyZZx2vVM+EClHz
+         dK2sGPq+CdtM22dyroRVsBIZekKBlbuUUftzcO5UkVG2TnqpYdzXmu7vYnuUDlF4/F8F
+         ceFA==
+X-Forwarded-Encrypted: i=1; AJvYcCVRlTzXo1d2XTcwXkG0oCCwFkesroh+9X+X04zEMny3F7se8Ze9VgRamkWyioajmmlqbPkWthxC6gxn9To=@vger.kernel.org, AJvYcCW4zsYOiOOCs91OqCh9wlNesLwtYrMNj0wtWWSnwsA2WB4dZRVpUoLqemILg1X5vQj+2XA/zXrz@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyn4Kh1TsGeqrOGUImY+K2rMI5jwn61kXTg+fo2dt9dNifMpgnm
+	00FXzTRMZ7V50DoGAs2dAQ5vitDL3TfwqY1IyLNY7QXE5diaJoDPxWMo
+X-Gm-Gg: ASbGncvokAVtJ1F4raat9eBxH/LNAlChRSeG2sTz4QF6TZ50WRxwO3GISU+xzlRbBQi
+	oyaX5GO7dUC7ZbU2UL1SngdMRljcdYMYNniIc9kqONBtmTgFLesQFY1jryLbUzmlSpvtLxlRQ6A
+	GNcCa8AR94AKazxBQmmQU4Ikhn++2EzskUvUTfX1sV9X0M31xZG5ZCEt+QLjgowT4r7lTzOLOKO
+	1g438IETDDijLZs6VWsBV9sSXzDhXlihfgz57lJxrYanri9t8PoIK7wTHJ9emJCMV7QAQsFKsK6
+	Bb+cKCnK8wvRWI+NvVc8Gzh1yAENjxuqQ9B7A8XrZUEptwYgcd76
+X-Google-Smtp-Source: AGHT+IGOi+B/tTlyqDjPISYuIBxUcZMVAQSNjhZWKRkiN4sDYO+PRKnKXLv+p3W0vyLpZGBziwj+EA==
+X-Received: by 2002:a17:907:86a7:b0:ade:9b52:4da0 with SMTP id a640c23a62f3a-ae6cfc8338fmr190623066b.60.1752057262696;
+        Wed, 09 Jul 2025 03:34:22 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:9::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae3f66e8c31sm1090625566b.18.2025.07.09.03.34.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Jul 2025 03:34:22 -0700 (PDT)
+Date: Wed, 9 Jul 2025 03:34:20 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-team@meta.com, dw@davidwei.uk
+Subject: Re: [PATCH net-next v2] netdevsim: implement peer queue flow control
+Message-ID: <aG5FrObkP+S8cRZh@gmail.com>
+References: <20250703-netdev_flow_control-v2-1-ab00341c9cc1@debian.org>
+ <20250708182718.29c4ae45@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2717584.1752056910.1@warthog.procyon.org.uk>
-Date: Wed, 09 Jul 2025 11:28:30 +0100
-Message-ID: <2717585.1752056910@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250708182718.29c4ae45@kernel.org>
 
-Hi Herbert,
+Hello Jakub,
 
-Can you pick this up?
-
-Eric Biggers <ebiggers@kernel.org> wrote:
-
-> Fix a leak reported by kmemleak:
+On Tue, Jul 08, 2025 at 06:27:18PM -0700, Jakub Kicinski wrote:
+> On Thu, 03 Jul 2025 06:09:31 -0700 Breno Leitao wrote:
+> > +static int nsim_napi_rx(struct net_device *dev, struct nsim_rq *rq,
+> > +			struct sk_buff *skb)
+> >  {
+> >  	if (skb_queue_len(&rq->skb_queue) > NSIM_RING_SIZE) {
+> > +		nsim_stop_peer_tx_queue(dev, rq, skb_get_queue_mapping(skb));
+> >  		dev_kfree_skb_any(skb);
+> >  		return NET_RX_DROP;
+> >  	}
 > 
->     unreferenced object 0xffff8880093bf7a0 (size 32):
->       comm "swapper/0", pid 1, jiffies 4294877529
->       hex dump (first 32 bytes):
->         9d 18 86 16 f6 38 52 fe 86 91 5b b8 40 b4 a8 86  .....8R...[.@...
->         ff 3e 6b b0 f8 19 b4 9b 89 33 93 d3 93 85 42 95  .>k......3....B.
->       backtrace (crc 8ba12f3b):
->         kmemleak_alloc+0x8d/0xa0
->         __kmalloc_noprof+0x3cd/0x4d0
->         prep_buf+0x36/0x70
->         load_buf+0x10d/0x1c0
->         krb5_test_one_prf+0x1e1/0x3c0
->         krb5_selftest.cold+0x7c/0x54c
->         crypto_krb5_init+0xd/0x20
->         do_one_initcall+0xa5/0x230
->         do_initcalls+0x213/0x250
->         kernel_init_freeable+0x220/0x260
->         kernel_init+0x1d/0x170
->         ret_from_fork+0x301/0x410
->         ret_from_fork_asm+0x1a/0x30
+> we should probably add:
 > 
-> Fixes: fc0cf10c04f4 ("crypto/krb5: Implement crypto self-testing")
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+> 	if (skb_queue_len(&rq->skb_queue) > NSIM_RING_SIZE)
+> 		nsim_stop_tx_queue(dev, rq, skb_get_queue_mapping(skb));
+> 
+> after enqueuing the skb, so that we stop the queue before any drops
+> happen
 
-Acked-by: David Howells <dhowells@redhat.com>
+Agree, we can stop the queue when queueing the packets instead. Since we
+need to check for the queue numbers, we cannot call nsim_stop_tx_queue()
+straight away. I think we still need to have a helper
+(nsim_stop_tx_queue). This is what I have in mind:
 
+	static void nsim_stop_tx_queue(struct net_device *tx_dev,
+					struct net_device *rx_dev,
+					struct nsim_rq *rq,
+					u16 idx)
+	{
+		/* If different queues size, do not stop, since it is not
+		* easy to find which TX queue is mapped here
+		*/
+		if (rx_dev->real_num_tx_queues != tx_dev->num_rx_queues)
+			return;
+
+		/* rq is the queue on the receive side */
+		netif_subqueue_try_stop(tx_dev, idx,
+					NSIM_RING_SIZE - skb_queue_len(&rq->skb_queue),
+					NSIM_RING_SIZE / 2);
+	}
+
+	static int nsim_napi_rx(struct net_device *tx_dev, struct net_device *rx_dev,
+				struct nsim_rq *rq, struct sk_buff *skb)
+	{
+		if (skb_queue_len(&rq->skb_queue) > NSIM_RING_SIZE) {
+			dev_kfree_skb_any(skb);
+			return NET_RX_DROP;
+		}
+
+		skb_queue_tail(&rq->skb_queue, skb);
+
+		/* Stop the peer TX queue avoiding dropping packets later */
+		if (skb_queue_len(&rq->skb_queue) >= NSIM_RING_SIZE)
+			nsim_stop_tx_queue(tx_dev, rx_dev, rq,
+					skb_get_queue_mapping(skb));
+
+		return NET_RX_SUCCESS;
+	}
+
+> > @@ -51,7 +109,7 @@ static int nsim_napi_rx(struct nsim_rq *rq, struct sk_buff *skb)
+> >  static int nsim_forward_skb(struct net_device *dev, struct sk_buff *skb,
+> >  			    struct nsim_rq *rq)
+> >  {
+> > -	return __dev_forward_skb(dev, skb) ?: nsim_napi_rx(rq, skb);
+> > +	return __dev_forward_skb(dev, skb) ?: nsim_napi_rx(dev, rq, skb);
+> >  }
+> >  
+> >  static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
+> 
+> nsim_start_xmit() has both dev and peer_dev, pass them all the way to
+> nsim_stop_peer_tx_queue() so that you don't have to try to dereference
+> the peer again.
+
+Sure. This is a good idea. I am using it, as you can see in the snippet
+above.
+
+> > +	if (dev->real_num_tx_queues != peer_dev->num_rx_queues)
+> 
+> given that we compare real_num_tx_queues I think we should also kick
+> the queues in nsim_set_channels(), like we do in unlink_device_store()
+
+Sure. I suppose something like the following. What do you think?
+
+	nsim_set_channels(struct net_device *dev, struct ethtool_channels *ch)
+	{
+		struct netdevsim *ns = netdev_priv(dev);
+	+       struct netdevsim *peer;
+		int err;
+
+		err = netif_set_real_num_queues(dev, ch->combined_count,
+	@@ -113,6 +114,14 @@ nsim_set_channels(struct net_device *dev, struct ethtool_channels *ch)
+			return err;
+
+		ns->ethtool.channels = ch->combined_count;
+	+
+	+	synchronize_net();
+	+       netif_tx_wake_all_queues(dev);
+	+       rcu_read_lock();
+	+       peer = rcu_dereference(ns->peer);
+	+       if (peer)
+	+               netif_tx_wake_all_queues(peer->netdev);
+	+       rcu_read_unlock();
+	+
+		return 0;
+	}
+
+
+Also, with this patch, we will eventually get the following critical
+message:
+
+	net_crit_ratelimited("Virtual device %s asks to queue packet!\n", dev->name);
+
+I am wondering if that alert is not valid anymore, and I can simply
+remove it.
+
+Thanks for your review!
+--breno
 
