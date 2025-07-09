@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-205213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 869FDAFDCF1
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 03:30:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A26DAFDCF2
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 03:30:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E3221895566
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 01:30:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F066580BE7
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 01:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC7C118CC1D;
-	Wed,  9 Jul 2025 01:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AFE6185B48;
+	Wed,  9 Jul 2025 01:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hBxye0uM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mILgQoPo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8E3B1898F8
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 01:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6658B1865FA
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 01:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752024590; cv=none; b=gqKBjU+SsU41rLOg7FMid5G5reGyepNHOMr6pidSYqdPSq8wAn05e0bX0/g9waKKZD3poIPR0DqVZUOH0q8Mb2IWKXOGvyxsL2oOMFD4MIlawipJc07DkxTy5TKuntFfFBCfCQ/8D1GcPRxJEmZLTBEccfnI6Dj75Ngbxhr9lIA=
+	t=1752024603; cv=none; b=J6NsEsIjWmklEqln4loe/3U8GIvNttJw5FeNJMFWTCeCAUgGCDkNNE1iPfZW/ErctZnvE4yPV0BKlP5GIgk4fRYsCXraIi8EkF7Tep6GYYWvKT9nKJYVARU15mMnXhi2SdY9VQo+6gCrWKh2Yjd9IgWC3tdCCf5th5GmqtJqRoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752024590; c=relaxed/simple;
-	bh=7dXDS5QBly9oO2sE1NM/JgPZtBGwsyEdMtJpZ+LZ7Tk=;
+	s=arc-20240116; t=1752024603; c=relaxed/simple;
+	bh=IjHEZZ0orhwPj02urZcBVPD6WjdFrLjxddI/K67lI0Q=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FsqHyAV/bYf0pTgycz16+WmKNkxk7ILuCk7OQ3knKc4Cr6Y+SF1XUOG+WSA5w06EFlAAd2zTisoNpFNtri5gGLyOvu8zIJrfRDVld7q+iZnEv5CfT61fkdxc4eEA81JIcK625z/KGftiClO8Zk7+hgUahV//nuTHevnDH0dB8Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hBxye0uM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82E03C4CEED;
-	Wed,  9 Jul 2025 01:29:50 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=W6UmXldMva9SpG+MJDK7HPhSYp5/hSKlASerGV9Fgq0K/xsQiSHoz0M2o91rUeXieqZcXSesan7qp7SRo2D0+HUzcuesUGfXuFB+BhFXRdGxgx1Y5D1Kqrauz0eCqipRMwTF4XfNKT03MJ/orWD0VjsIrshaGb+yYw0FtRO6jks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mILgQoPo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF664C4CEED;
+	Wed,  9 Jul 2025 01:30:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752024590;
-	bh=7dXDS5QBly9oO2sE1NM/JgPZtBGwsyEdMtJpZ+LZ7Tk=;
+	s=k20201202; t=1752024602;
+	bh=IjHEZZ0orhwPj02urZcBVPD6WjdFrLjxddI/K67lI0Q=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hBxye0uMCrEUrTeWl/Qf/7v1u4kA0MVIgjCW4N8ffwujCLYS1JwAbATanCZtksnVH
-	 ZW4QoF0m/I0TgKgFAqUz4gPFy2KEg3SwR6G38x/dCDa4qHhO29SB2jZ4Vi3EPdTGR9
-	 ypdy370jSOrKTuTrHl6CkLehzNHQUqmevR5VgDD/yyaR0EPHamkM4UOAP71RtpijlD
-	 4xZmxtKHhIR1g/y89Gq61JU4/Rh9qFDQgekmBdkznEVKu7fn6d2p5krt4EaAfUYT99
-	 PbUfUfcHbdZUdLIC9u7t/+Uvqh9wEzB7wvHnq2LmKeCahh0IW52prFYf42kPnmRCHN
-	 8GPS8n4NsR49Q==
+	b=mILgQoPo9uOoE1ThAo4mYcra1QcG/Xsx7eqoiPDouYVRitN2z1C6lt1EqPIA9aIdP
+	 iaZ0iXdNsLzGk1NfVRB31WUBbEnbQ7tC+jFQ3ShGdyoG7u5Pc31LepKtRHBwtGXSfk
+	 SjHMAh18MdxpGelXlFGgSYEvOBxbKoisXG5i2qDXHB1HCTsf9x+bDsn/+PfcX/dLLc
+	 ADYibbb8Eamn8ws3iRIPYlHyZu+bO4RFqQJA9Fsz39CYBk16fAhNoo2DCaGwlKYrZq
+	 +Am694Dzcuo9vBu0y2axjqHngbgdkb8MfSntP5jplbIR4FQ0dBhKpH6DFWyZNfI75R
+	 qCw+Wm30CDxKg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71845380DBEE;
-	Wed,  9 Jul 2025 01:30:14 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCED380DBEE;
+	Wed,  9 Jul 2025 01:30:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,48 +52,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] net: stmmac: Fix interrupt handling for
- level-triggered
- mode in DWC_XGMAC2
+Subject: Re: [PATCH v1 net-next 0/7] af_unix: Introduce SO_INQ & SCM_INQ.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175202461300.186229.18400851039185559146.git-patchwork-notify@kernel.org>
-Date: Wed, 09 Jul 2025 01:30:13 +0000
-References: <20250703020449.105730-1-chenchuangyu@xiaomi.com>
-In-Reply-To: <20250703020449.105730-1-chenchuangyu@xiaomi.com>
-To: EricChan <chenchuangyu@xiaomi.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, fancer.lancer@gmail.com,
- guyinggang@loongson.cn, chenhuacai@kernel.org, si.yanteng@linux.dev,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, xiaojianfeng1@xiaomi.com,
- xiongliang@xiaomi.com
+ <175202462524.186229.12251717755421668788.git-patchwork-notify@kernel.org>
+Date: Wed, 09 Jul 2025 01:30:25 +0000
+References: <20250702223606.1054680-1-kuniyu@google.com>
+In-Reply-To: <20250702223606.1054680-1-kuniyu@google.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, kuni1840@gmail.com,
+ netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 3 Jul 2025 10:04:49 +0800 you wrote:
-> According to the Synopsys Controller IP XGMAC-10G Ethernet MAC Databook
-> v3.30a (section 2.7.2), when the INTM bit in the DMA_Mode register is set
-> to 2, the sbd_perch_tx_intr_o[] and sbd_perch_rx_intr_o[] signals operate
-> in level-triggered mode. However, in this configuration, the DMA does not
-> assert the XGMAC_NIS status bit for Rx or Tx interrupt events.
+On Wed,  2 Jul 2025 22:35:12 +0000 you wrote:
+> We have an application that uses almost the same code for TCP and
+> AF_UNIX (SOCK_STREAM).
 > 
-> This creates a functional regression where the condition
-> if (likely(intr_status & XGMAC_NIS)) in dwxgmac2_dma_interrupt() will
-> never evaluate to true, preventing proper interrupt handling for
-> level-triggered mode. The hardware specification explicitly states that
-> "The DMA does not assert the NIS status bit for the Rx or Tx interrupt
-> events" (Synopsys DWC_XGMAC2 Databook v3.30a, sec. 2.7.2).
+> The application uses TCP_INQ for TCP, but AF_UNIX doesn't have it
+> and requires an extra syscall, ioctl(SIOCINQ) or getsockopt(SO_MEMINFO)
+> as an alternative.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] net: stmmac: Fix interrupt handling for level-triggered mode in DWC_XGMAC2
-    https://git.kernel.org/netdev/net/c/78b7920a0335
+  - [v1,net-next,1/7] af_unix: Don't hold unix_state_lock() in __unix_dgram_recvmsg().
+    https://git.kernel.org/netdev/net-next/c/b429a5ad19cb
+  - [v1,net-next,2/7] af_unix: Don't check SOCK_DEAD in unix_stream_read_skb().
+    https://git.kernel.org/netdev/net-next/c/772f01049c4b
+  - [v1,net-next,3/7] af_unix: Don't use skb_recv_datagram() in unix_stream_read_skb().
+    https://git.kernel.org/netdev/net-next/c/d0aac85449de
+  - [v1,net-next,4/7] af_unix: Use cached value for SOCK_STREAM in unix_inq_len().
+    https://git.kernel.org/netdev/net-next/c/f4e1fb04c123
+  - [v1,net-next,5/7] af_unix: Cache state->msg in unix_stream_read_generic().
+    https://git.kernel.org/netdev/net-next/c/8b77338eb2af
+  - [v1,net-next,6/7] af_unix: Introduce SO_INQ.
+    https://git.kernel.org/netdev/net-next/c/df30285b3670
+  - [v1,net-next,7/7] selftest: af_unix: Add test for SO_INQ.
+    https://git.kernel.org/netdev/net-next/c/e0f60ba041a0
 
 You are awesome, thank you!
 -- 
