@@ -1,51 +1,52 @@
-Return-Path: <netdev+bounces-205306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48E61AFE2AA
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 10:32:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C333CAFE2A5
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 10:31:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 700CB3A5EF1
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 08:31:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B18191C427F8
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 08:31:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8C2277031;
-	Wed,  9 Jul 2025 08:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6282750EE;
+	Wed,  9 Jul 2025 08:31:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="Yh3d9S3c"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="UA4mo3FY"
 X-Original-To: netdev@vger.kernel.org
 Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0FE274B48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D01323B63A
 	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 08:31:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752049890; cv=none; b=NePYO25bMfsIiitspb5NvoOyCkaHnL0UUT7151g7d7srsDC0E1QIQxT2MgeuYvAGIx3lY+m+YcB780uKjkGwV7Nl5TsMmgnYIOkZs5UV4L+VLI9M0uetgR6xH8GXDgNdPB6LgBFTGb0MlQPBt/wGbuZIjpH3UGlVFgrlVO+L6AU=
+	t=1752049889; cv=none; b=kKuBnGTKwpztRHr6Eq/3vpGMLttvhECZkqQRv453mCmQHB2nnRqkUldHgKl6IcJdIMCqZ2i0FalJmAjP4+ItiLnO9BFkxR6u/oTFdUB9a4uxkl7oFZAojHas4AuGZv0eSUylJ2sXV6b9IVxFo8+GbmHd3tGvJ78347yYgUX9viI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752049890; c=relaxed/simple;
-	bh=8Cc8vYayrEg/fUhvqL8UmdMZ45EOHGUlbb01UjvmRjU=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=c9qBEyfgPVcK+opVvbHyeW9q8ANl8kmq6C08oeei8N2PdvxIZsAsiNjM4yHkk2zDyXpnPLTvejrsKCVYVTgaQFwV58PcrVft/nGbDhdjkWq2x5K6wx5EHtmbdkZ8v1eS05tvdykmkGJZXkr/E1Czxugt43sdFvS3TrO9g/qKfYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=Yh3d9S3c; arc=none smtp.client-ip=203.29.241.158
+	s=arc-20240116; t=1752049889; c=relaxed/simple;
+	bh=BwFVz8vh7CbOYdMIh8YPUON/uj//ZtzyjkLecdsriu0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=guXtXi/ZT+wYoQYzJdZTV51cnqv184Mvh3MmUTJr2YAjdzL108KvQ7VW3ZtO4DC69D4t1GpeMWOsb6U5iAYt29/atyhnJRaOFBSWNsbTTcDNFgvamZw1cZjRJaVl184lsMYiNHjFfBD33ZPN9DYAniQY+8Uz3o7zOd2nZPNcPzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=UA4mo3FY; arc=none smtp.client-ip=203.29.241.158
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=codeconstruct.com.au; s=2022a; t=1752049879;
-	bh=ITrxfJWGyQsJ3Vn/O+6zvqyFnyfIsfGYltnS0fvPwp8=;
-	h=From:Subject:Date:To:Cc;
-	b=Yh3d9S3cum4urUeWq1W6W0TeJ0qwSfqw1irBqCaGq7fA6lxQOnVAed/M2YURZwhnx
-	 2UMLMJHShmSSNE5tIJbk33DNWRcTYFc0EnhOQfbEoKJx1hm5SCxURLeFxzjPusv3u9
-	 N05VabO56NV5WoR3Bh8jTFhPnyEIMXqKAI3U16/jXnJyy8iB6s2FLSpdt0tnLYpW6Y
-	 bW0/uEfYMNc1Sy9o+9vRYvmGcHlRG8wnhxFFmv+SQImGdGG0FqgO34WI2irM3P0rZI
-	 drFf+ecx9S9sqCaI+LVbq2+l4IkFv5lRSIp42wFWnitg+SRq5Nq/l7zhkCW6qZzHdc
-	 3AJ6hoR7wMFFw==
+	bh=vYP0t9l8jlLdy4sXCnodhmCI+4WfH27HFLOTTZMrmZ4=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc;
+	b=UA4mo3FY7kzfkFzfRrDKdv/PXr2CTq83G6PXb9H1wcKNhQORfsg2RfzsuCSXH+ivN
+	 7D2f9gf4d1r/SBPz4L75UryNVMqoKZgTh1mALyjwyiXOcKeCJXS8n5AxqYhMTczzV6
+	 lHYxFM52i5+ULc6FNP0xe9mTWhiP/b1u9Gx5J4Jj9ZomaexAZuKOcx/m+gOmqJvexx
+	 x0/VRHUlNITcejFj0x6SrWr+qWHvLKDxhFzfMk/gDqJZ//DGjDsCh/2sGKatrSjH+Z
+	 ynjHlPr40ZZ6HO23Faz5vhkA3WDhgSbdCpeVR6S7zT2Pgu4wYI1hSJuL6vQBp+qSuf
+	 rtuF8NiJ8gscQ==
 Received: by codeconstruct.com.au (Postfix, from userid 10001)
-	id 4E73B6B153; Wed,  9 Jul 2025 16:31:19 +0800 (AWST)
+	id AB3006B15D; Wed,  9 Jul 2025 16:31:19 +0800 (AWST)
 From: Matt Johnston <matt@codeconstruct.com.au>
-Subject: [PATCH net-next v3 0/8] net: mctp: Improved bind handling
-Date: Wed, 09 Jul 2025 16:31:01 +0800
-Message-Id: <20250709-mctp-bind-v3-0-eac98bbf5e95@codeconstruct.com.au>
+Date: Wed, 09 Jul 2025 16:31:02 +0800
+Subject: [PATCH net-next v3 1/8] net: mctp: mctp_test_route_extaddr_input
+ cleanup
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,90 +55,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAMUobmgC/3XNvQ6DIBwE8FcxzMXwYUU79T2aDgJ/KoNgAImN8
- d1LmFw6Xu7yuwNFCBYiejQHCpBttN6VwG8NUvPkPoCtLhkxwu6EM4oXlVYsrdMYhBj7wdCBGI3
- Kfg1g7F6tF3KQsIM9oXdpZhuTD996kmntqycIv3iZYoKlFDAKxbqe8qfyGpR3MYVNpVb5pZ22C
- mZ2RcQVYQUxcgI9KGpkp/8g53n+ANHHW1r8AAAA
-X-Change-ID: 20250321-mctp-bind-e77968f180fd
+Message-Id: <20250709-mctp-bind-v3-1-eac98bbf5e95@codeconstruct.com.au>
+References: <20250709-mctp-bind-v3-0-eac98bbf5e95@codeconstruct.com.au>
+In-Reply-To: <20250709-mctp-bind-v3-0-eac98bbf5e95@codeconstruct.com.au>
 To: Jeremy Kerr <jk@codeconstruct.com.au>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
  Simon Horman <horms@kernel.org>
 Cc: netdev@vger.kernel.org, Matt Johnston <matt@codeconstruct.com.au>
 X-Mailer: b4 0.15-dev-cbbb4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1752049878; l=2870;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1752049878; l=1495;
  i=matt@codeconstruct.com.au; s=20241018; h=from:subject:message-id;
- bh=8Cc8vYayrEg/fUhvqL8UmdMZ45EOHGUlbb01UjvmRjU=;
- b=0io8gpkGC69qpuZjtTXeZP60KbmKWS+iKJI/aZswOxHUam1LR4BR+OjBwnieFgjt5W0m17jrV
- x31GNb2oM6kAKzx2SWLpWZoJZ4WJWd5oIeNKPCqKuang0oACsl5n4dM
+ bh=BwFVz8vh7CbOYdMIh8YPUON/uj//ZtzyjkLecdsriu0=;
+ b=lGXvvaxTNDN9CliBletpZ2dlN77QEG8yKbGIVV5fOmuumfKlIYnnm7vj1sGS/bDnCtJ2ZYwDq
+ v4j49m3iamkCOLtTDiFzSCPPoiBQjZ4kwKJYTNXU25FzbAPMTL6J15o
 X-Developer-Key: i=matt@codeconstruct.com.au; a=ed25519;
  pk=exersTcCYD/pEBOzXGO6HkLd6kKXRuWxHhj+LXn3DYE=
 
-This series improves a couple of aspects of MCTP bind() handling.
+The sock was not being released. Other than leaking, the stale socket
+will conflict with subsequent bind() calls in unrelated MCTP tests.
 
-MCTP wasn't checking whether the same MCTP type was bound by multiple
-sockets. That would result in messages being received by an arbitrary
-socket, which isn't useful behaviour. Instead it makes more sense to
-have the duplicate binds fail, the same as other network protocols.
-An exception is made for more-specific binds to particular MCTP
-addresses.
-
-It is also useful to be able to limit a bind to only receive incoming
-request messages (MCTP TO bit set) from a specific peer+type, so that
-individual processes can communicate with separate MCTP peers. One
-example is a PLDM firmware update requester, which will initiate
-communication with a device, and then the device will connect back to the
-requester process. 
-
-These limited binds are implemented by a connect() call on the socket
-prior to bind. connect() isn't used in the general case for MCTP, since
-a plain send() wouldn't provide the required MCTP tag argument for
-addressing.
-
+Fixes: 11b67f6f22d6 ("net: mctp: test: Add extaddr routing output test")
 Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
----
-Changes in v3:
-- Rebased to net-next
-- kunit tests have been updated for MCTP gateway routing changes
-- Bind conflict tests are now in the new mctp/tests/sock-test.c
-- Added patch for mctp_test_route_extaddr_input kunit socket cleanup
-  (fixes MCTP gateway routing change in net-next, required by tests in
-  this series)
-- Link to v2: https://lore.kernel.org/r/20250707-mctp-bind-v2-0-fbaed8c1fb4d@codeconstruct.com.au
-
-Changes in v2:
-- Use DECLARE_HASHTABLE
-- Remove unused kunit test case
-- Avoid kunit test snprintf truncation warning
-- Fix lines >80 characters
-- Link to v1: https://lore.kernel.org/r/20250703-mctp-bind-v1-0-bb7e97c24613@codeconstruct.com.au
 
 ---
-Matt Johnston (8):
-      net: mctp: mctp_test_route_extaddr_input cleanup
-      net: mctp: Prevent duplicate binds
-      net: mctp: Treat MCTP_NET_ANY specially in bind()
-      net: mctp: Add test for conflicting bind()s
-      net: mctp: Use hashtable for binds
-      net: mctp: Allow limiting binds to a peer address
-      net: mctp: Test conflicts of connect() with bind()
-      net: mctp: Add bind lookup test
-
- include/net/mctp.h         |   5 +-
- include/net/netns/mctp.h   |  20 ++++-
- net/mctp/af_mctp.c         | 146 +++++++++++++++++++++++++++++++---
- net/mctp/route.c           |  85 ++++++++++++++++----
- net/mctp/test/route-test.c | 194 ++++++++++++++++++++++++++++++++++++++++++++-
- net/mctp/test/sock-test.c  | 167 ++++++++++++++++++++++++++++++++++++++
- net/mctp/test/utils.c      |  36 +++++++++
- net/mctp/test/utils.h      |  17 ++++
- 8 files changed, 635 insertions(+), 35 deletions(-)
+Added in v3. The problem was introduced in current net-next so
+this patch isn't needed in the stable tree.
 ---
-base-commit: ea988b450690448d5b12ce743a598ade7a8c34b1
-change-id: 20250321-mctp-bind-e77968f180fd
+ net/mctp/test/route-test.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-Best regards,
+diff --git a/net/mctp/test/route-test.c b/net/mctp/test/route-test.c
+index 7a398f41b6216afef72adecf118199753ed1bfea..12811032a2696167b4f319cbc9c81fef4cb2d951 100644
+--- a/net/mctp/test/route-test.c
++++ b/net/mctp/test/route-test.c
+@@ -1164,8 +1164,6 @@ static void mctp_test_route_extaddr_input(struct kunit *test)
+ 	rc = mctp_dst_input(&dst, skb);
+ 	KUNIT_ASSERT_EQ(test, rc, 0);
+ 
+-	mctp_test_dst_release(&dst, &tpq);
+-
+ 	skb2 = skb_recv_datagram(sock->sk, MSG_DONTWAIT, &rc);
+ 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, skb2);
+ 	KUNIT_ASSERT_EQ(test, skb2->len, len);
+@@ -1179,8 +1177,8 @@ static void mctp_test_route_extaddr_input(struct kunit *test)
+ 	KUNIT_EXPECT_EQ(test, cb2->halen, sizeof(haddr));
+ 	KUNIT_EXPECT_MEMEQ(test, cb2->haddr, haddr, sizeof(haddr));
+ 
+-	skb_free_datagram(sock->sk, skb2);
+-	mctp_test_destroy_dev(dev);
++	kfree_skb(skb2);
++	__mctp_route_test_fini(test, dev, &dst, &tpq, sock);
+ }
+ 
+ static void mctp_test_route_gw_lookup(struct kunit *test)
+
 -- 
-Matt Johnston <matt@codeconstruct.com.au>
+2.43.0
 
 
