@@ -1,196 +1,134 @@
-Return-Path: <netdev+bounces-205471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F4015AFEDE8
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 17:38:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97F7CAFEDF0
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 17:42:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F26C61C43CCA
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:38:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C7DE4E1ABB
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:41:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5436F290D85;
-	Wed,  9 Jul 2025 15:38:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E862E8E1C;
+	Wed,  9 Jul 2025 15:42:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J/0QFozT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CCrsZ/zO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7829F5383
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 15:38:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99B528DB7B
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 15:41:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752075511; cv=none; b=HblovsS7BIlcVuKxqTP4RXVQmT/wwNALpPg3fM3CEF0YDp1xb8I161zMcaakFzlrlNHyQLpvK19xmvKZZBAcWbigttJdetxF+0ybs+GKXCFfK5uacFVFqfE00+XIcGn0HPa3vKWI008bDR7VXqIRulztZBprU85GXIzoDslYgSc=
+	t=1752075721; cv=none; b=F0TCpBU13vk3VW9v9hUQ0eMztN8Hs8BJMs/AWlt4Es0kzZcL7Rogodw8Mk1eMMIuBtZFriaRWDgJ13B7Yskanhak+6C1a8teRM7fHJKtDCoyppqHOoqlbgQAW5AmWGThUla6m3WOlLH5F93/w9na/9QxxCt9IGQvnPL1xDVn/Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752075511; c=relaxed/simple;
-	bh=ZfS9t9LvkDtG2A+sgKcdwB7jtZxHvLQWHQRmye40iCk=;
+	s=arc-20240116; t=1752075721; c=relaxed/simple;
+	bh=XShysqjVfJShNze3cNJCjWk2VTczMmDbx321Os6iHCE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AN101CD6lTKYegY3pnA0Zf9K5Nyu6oLMUFeiqGqtky1Nj+MsW3SiCPVjjQSd0vQptSAtyNCT7Rfrp8GwT0zyhn6hguoxjNHrlt+sI4VTTVezkbFEbZLaL/6s4K38H73niCMEKZUQPgjQOnRtsl69W5nUYzJklvrLTdLZ1VmIfak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J/0QFozT; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3a503d9ef59so58467f8f.3
-        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 08:38:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752075508; x=1752680308; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IZpjnARJO0f/PoGWyVv2w1DHAAsBvLSVfbD4NIlm7dU=;
-        b=J/0QFozT0e+z+3qSYodRFSqLMVatE9YUpp6HsGAA7umTG5esYIXsv/udYzVnTUoa2J
-         Rp+FrHLyOsiT1lITFjq+3oob87iLZvoHNt+wxTqAaq62p+NrJZb0OmPlzpSnnQ6+O3LY
-         OPm+biBKS770I/HId2ZS4sSWDdiHgX8Zrw8HpYSNzM2ZUXY9wZshDlDWVT/0/mYgg/DC
-         lRo60Avy6y350qG0vBNWCpfeQP5b6gLeF333NMSZFAK+84Gg3PZAlR+iH6eochzDDG0M
-         MeoUxy6pfDyq4X59QOWatQ6JkwO68e/x9Js2FDA6+Z5zc/Z9slq8f7mYx3MlON65/+uR
-         8rIQ==
+	 To:Cc:Content-Type; b=G2ALSVSu8tfASauoKK6wnzRNA5I5sA4i8q8QSNQF1N5++UrX+A9UKlo2EjFCQBi0fKSApzd0dzfLt9rM7ylBPvtss0DzyB0lDLEfGV3Ckt2rSrFbQda+GPsFb9j4medC2/nQMl6R+LQFUfL+3L7x0dh0fbqrkNmEhbhCQpmHVDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CCrsZ/zO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752075718;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XShysqjVfJShNze3cNJCjWk2VTczMmDbx321Os6iHCE=;
+	b=CCrsZ/zOcr3ZqJ2oFfe+l2RNjYivD4Ah0CQQR5wtFLNWtlJQEPyDwqjaSa6ifPvOjaT+T5
+	it3jWRZTqBwUJTuif4ZxiibF2FxeUg4abZaY/+IwT5kpe+uYGdels2LbZMkceEOclB0CMe
+	LXriQanozKrQaVWxUoDbIBpSYR9N100=
+Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
+ [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-245-WMg8fF2AMW-x3tSHnrhhUQ-1; Wed, 09 Jul 2025 11:41:56 -0400
+X-MC-Unique: WMg8fF2AMW-x3tSHnrhhUQ-1
+X-Mimecast-MFC-AGG-ID: WMg8fF2AMW-x3tSHnrhhUQ_1752075716
+Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-70e4e62caa7so14883177b3.1
+        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 08:41:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752075508; x=1752680308;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IZpjnARJO0f/PoGWyVv2w1DHAAsBvLSVfbD4NIlm7dU=;
-        b=vnPuyIweshczT9gF4eOBlpbnUrsgG5V5Xq/9/viuqtXj8aYvAG80bA26hseoKZSmge
-         oH7WkvbJQOimW7mDH1JRrfGW3MTHZXbTiTL8cquwEq6qN/RFJNXlDEHc8Rmcv1AzVIwC
-         vm6ETd6r6Ylcacbl01ljG5alO1d/J1pOjm2IpYEj1iaQkTO5VdTcPl3GMrrR1My5inC7
-         5a7cF7iwOupmiFqiKfRmGFxA0ziAK1y7+u0NG41vzBQR8VTBibotlNZCPgAGoiq8Jjhi
-         oDtD+Ln1hV0VGFoGjdE2VOakrPpTR6orAMmPx1q4G4H8j4EIY7qCKnKdMRMgjRhR234x
-         YL8A==
-X-Forwarded-Encrypted: i=1; AJvYcCVRtAFoOLbWAPGnV9kSZwYC6qlwveSzDk5zasPwJ21cPpwjHmhhUyNf/isJvLW8XSuZQt0Max8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKjTzFZv+MrI0rmMZQAVqBdylY9YVmkYEjnegDobQGlR9XNGnC
-	Z3rviywpBCvCaMMnB1J/LCF1NL8i/whRoXtuker7sFFRdM6kigGUJtowJFVFFnLNhiR5zCwLcXW
-	JlBArthtdxWpclFYr+WerUfIWLCs7jSU=
-X-Gm-Gg: ASbGncsGFAlTOkFHcRWatSQBKQnbFLzpcVolfPCDS4MeIn0tT6IJb6er2VDub2b6dQa
-	nJA97bUYp9ItOfqcRA2fcbDOBDfUBUuIJfAjfYu/wwEnpDAAtIiJJdL/F0awVlowXfrlguETu+6
-	+oO6FxdXVTVkQE3TEuLXPlgYMeB7qo0HyFVKvervKxK787X5t8uI8dMdNJzQQXVC/cv64+/2OpT
-	41s
-X-Google-Smtp-Source: AGHT+IGzyNtp0tq09RP6SB6AIpoaxPAutGNojx0t2KFBu/kHa7dHO+Kj81oCbCM196nYMyzSbljw2E2q3d2IpYz41js=
-X-Received: by 2002:a05:6000:3106:b0:3a3:66cb:d530 with SMTP id
- ffacd0b85a97d-3b5e4513838mr2424904f8f.23.1752075507424; Wed, 09 Jul 2025
- 08:38:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752075715; x=1752680515;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XShysqjVfJShNze3cNJCjWk2VTczMmDbx321Os6iHCE=;
+        b=DPoY0FB8DhVwTqVAXgYAyfV5xvJ36F15tpFbPRvWPz3wDSJcPprm9Q5q8xsRgxZXvI
+         NU8y4gZSqeB5lIpI439Ci9imhHa/ptnMQYRO8GYY3gHqrFsUkq4F6gNmMPsO6ggFjm08
+         xpTJMvjcR0KzwZ4eNYc6qyskHmISTBEwzc+raW+DJimVp4QXmOPkKP4l0GKoSEbe5jcY
+         rw6FZYmq0T+eithhHArPkoI7Krtibj4/4EWS8USCbV58BkRofG6v5TQmJBl34NnC+m4z
+         c7CH3dJ2gmkvc7kVuVYGmW7cUfXWBN4Eex+osrmd0LwucTNO5QwJOJIZWRhdoetYCvPe
+         mTUA==
+X-Forwarded-Encrypted: i=1; AJvYcCUn0RBcKv+1b4W/8DVRyd6o2swD5VKlMyMjNcPDtcs/7H7EuLDXMfj2stb+CiVw8OAr89DwrbM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAXG4pdgiiRTtYj/BLPld0pE389z84jNAY2pdfO5JC0soL4Cs9
+	BYZCEY2+dNpHRsugyroST1fUWpmhEcHNGNVVh+ri7lUGmPLOwqeAHZv21ANn0RiNBJL1SVSBFg4
+	W3tXo+4zZ/oMSEe+rVAKAAJDA3TqFNk+hxOQjvDLr8BJboq/BnDxW0atXqrD90BYYAgXeint1ep
+	HTMprF8a8hBCpTw+XgLtg6pO8PKnUT5iTH
+X-Gm-Gg: ASbGncsm3+D5HwByozSPtOKIzU/sRlhN7b0QP7XKFms8ZrTBzpOdKGosJTJy6dkBZZP
+	kMEhCgQC0NYBwbhB0L4aCSz3Bz47G/TEQHNVGn5M9qeX2Im8Q4cVhoLDNNi8I4OtBCi7Uvoe74Y
+	2Vnm+h
+X-Received: by 2002:a05:690c:6409:b0:713:fe84:6f96 with SMTP id 00721157ae682-717a044be8amr108447547b3.14.1752075715503;
+        Wed, 09 Jul 2025 08:41:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IExFxKvhbTdzloCbFbyh1tiZpUMkvI+DBzINVmDyNWIx7ol4flKg78d/Go2l26/5A8S/OniJB3RHqWchsMadAI=
+X-Received: by 2002:a05:690c:6409:b0:713:fe84:6f96 with SMTP id
+ 00721157ae682-717a044be8amr108447057b3.14.1752075715039; Wed, 09 Jul 2025
+ 08:41:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aGT_hoBELDysGbrp@shell.armlinux.org.uk> <E1uWu14-005KXo-IO@rmk-PC.armlinux.org.uk>
- <20250702151426.0d25a4ac@fedora.home> <aGU2C3ipj8UmKHq_@shell.armlinux.org.uk>
- <CAKgT0UcWGH14B0zZnpHeJKw+5VU96LHFR1vR4CXVjqM10iBJSg@mail.gmail.com> <aGWF5Wee3vfoFtMj@shell.armlinux.org.uk>
-In-Reply-To: <aGWF5Wee3vfoFtMj@shell.armlinux.org.uk>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Wed, 9 Jul 2025 08:37:51 -0700
-X-Gm-Features: Ac12FXwsvl8XuHEZD-scGkdMI78RFcpKA7HQCkXUJAtsRItn03vi9P88FhTW7vQ
-Message-ID: <CAKgT0UdVW6_hewR7zNzMd_h7b_Lm_SHdt72yVhc7cLHcfFxuYQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] net: phylink: add phylink_sfp_select_interface_speed()
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	Paolo Abeni <pabeni@redhat.com>
+References: <472a5d43-4905-4fa4-8750-733bb848410d@linux.ibm.com> <CAGxU2F7bV7feiZs6FmdWkA7v9nxojuDbeSHyWoASS36fr1pSgw@mail.gmail.com>
+In-Reply-To: <CAGxU2F7bV7feiZs6FmdWkA7v9nxojuDbeSHyWoASS36fr1pSgw@mail.gmail.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Wed, 9 Jul 2025 17:41:43 +0200
+X-Gm-Features: Ac12FXyROMf2rt0OlirwLyo137Qn7MCpqP2NG-8va_x4r6nW2FeYLXGlppWreyI
+Message-ID: <CAGxU2F4GbeCJDYrs8Usd8JJcTrp99gyn3c_zXqpnz+UH2NNBGw@mail.gmail.com>
+Subject: Re: [PATCH net-next v4] vsock/test: Add test for null ptr deref when
+ transport changes
+To: Konstantin Shkolnyy <kshk@linux.ibm.com>
+Cc: mhal@rbox.co, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, v4bel@theori.io, leonardi@redhat.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 2, 2025 at 12:18=E2=80=AFPM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
+On Wed, 9 Jul 2025 at 17:26, Stefano Garzarella <sgarzare@redhat.com> wrote:
 >
-> On Wed, Jul 02, 2025 at 11:07:52AM -0700, Alexander Duyck wrote:
-> > On Wed, Jul 2, 2025 at 6:37=E2=80=AFAM Russell King (Oracle)
-> > <linux@armlinux.org.uk> wrote:
-> > >
-> > > On Wed, Jul 02, 2025 at 03:14:26PM +0200, Maxime Chevallier wrote:
-> > > > On Wed, 02 Jul 2025 10:44:34 +0100
-> > > > "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
-> > > >
-> > > > > Add phylink_sfp_select_interface_speed() which attempts to select=
- the
-> > > > > SFP interface based on the ethtool speed when autoneg is turned o=
-ff.
-> > > > > This allows users to turn off autoneg for SFPs that support multi=
-ple
-> > > > > interface modes, and have an appropriate interface mode selected.
-> > > > >
-> > > > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > > >
-> > > > Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > > >
-> > > > I don't have any hardware to perform relevant tests on this :(
-> > >
-> > > Me neither, I should've said. I'd like to see a t-b from
-> > > Alexander Duyck who originally had the problem before this is
-> > > merged.
+> On Wed, 9 Jul 2025 at 16:54, Konstantin Shkolnyy <kshk@linux.ibm.com> wrote:
 > >
-> > It will probably be several days before I can get around to testing it
-> > since I am slammed with meetings most of the next two days, then have
-> > a holiday weekend coming up.
+> > I'm seeing a problem on s390 with the new "SOCK_STREAM transport change
+> > null-ptr-deref" test. Here is how it appears to happen:
+> >
+> > test_stream_transport_change_client() spins for 2s and sends 70K+
+> > CONTROL_CONTINUE messages to the "control" socket.
+> >
+> > test_stream_transport_change_server() spins calling accept() because it
+> > keeps receiving CONTROL_CONTINUE.
+> >
+> > When the client exits, the server has received just under 1K of those
+> > 70K CONTROL_CONTINUE, so it calls accept() again but the client has
+> > exited, so accept() never returns and the server never exits.
+
+Just to be clear, I was seeing something a bit different.
+The accept() in the server is no-blocking, since we set O_NONBLOCK on
+the socket, so I see the server looping around a failing accept()
+(errno == EAGAIN) while dequeueing the CONTROL_CONTINUE messages, so
+after 10/15 seconds the server ends on my case.
+
+It seems strange that in your case it blocks, since it should be a
+no-blocking call.
+
+Stefano
+
+> >
 >
-> I, too, have a vacation - from tomorrow for three weeks. I may dip in
-> and out of kernel emails during that period, but it depends what
-> happens each day.
+> Yep, I saw exactly the same issue while testing a new test.
+> I already sent a fix:
+> https://lore.kernel.org/netdev/20250708111701.129585-1-sgarzare@redhat.com/
+>
+> Please, send a T-b/R-b on that if you can.
+>
+> Stefano
 
-So I was able to go in and test it. I ended up just running the
-testing in QEMU w/ my patch set that currently enables QSFP support.
-From what I can tell it appears to be mostly working. Before when I
-tried to alter the speed to go from 100G to 50G it wouldn't change.
-After your patch set it appears to change, although I am noticing a
-slight difference from the default config.
-
-So by default we come up in the 100G w/ the QSFP configuration:
-[root@localhost fbnic]# ethtool enp1s0
-Settings for enp1s0:
-        Supported ports: [  ]
-        Supported link modes:   50000baseCR/Full
-                                100000baseCR2/Full
-        Supported pause frame use: Symmetric Receive-only
-        Supports auto-negotiation: No
-        Supported FEC modes: RS
-        Advertised link modes:  100000baseCR2/Full
-        Advertised pause frame use: Symmetric Receive-only
-        Advertised auto-negotiation: No
-        Advertised FEC modes: RS
-        Link partner advertised link modes:  100000baseCR2/Full
-        Link partner advertised pause frame use: No
-        Link partner advertised auto-negotiation: No
-        Link partner advertised FEC modes: RS
-        Speed: 100000Mb/s
-        Duplex: Full
-        Auto-negotiation: off
-        Port: Other
-        PHYAD: 0
-        Transceiver: internal
-        Link detected: yes
-
-I then change the speed to 50G and it links back up after a few
-seconds, however the "Advertised link modes" goes from
-"100000baseCR2/Full" to "Not reported" as shown here:
-[root@localhost fbnic]# ethtool -s enp1s0 speed 50000
-[root@localhost fbnic]# ethtool enp1s0
-Settings for enp1s0:
-        Supported ports: [  ]
-        Supported link modes:   50000baseCR/Full
-                                100000baseCR2/Full
-        Supported pause frame use: Symmetric Receive-only
-        Supports auto-negotiation: No
-        Supported FEC modes: RS
-        Advertised link modes:  Not reported
-        Advertised pause frame use: Symmetric Receive-only
-        Advertised auto-negotiation: No
-        Advertised FEC modes: RS
-        Link partner advertised link modes:  100000baseCR2/Full
-        Link partner advertised pause frame use: No
-        Link partner advertised auto-negotiation: No
-        Link partner advertised FEC modes: RS
-        Speed: 50000Mb/s
-        Duplex: Full
-        Auto-negotiation: off
-        Port: Other
-        PHYAD: 0
-        Transceiver: internal
-        Link detected: yes
-
-So all-in-all it is an improvement over the previous behavior although
-there may still need to be some work done to improve the consistency
-so that it more closely matches up with what happens when you
-initially configure the interface.
 
