@@ -1,62 +1,58 @@
-Return-Path: <netdev+bounces-205546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5B72AFF2CF
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 22:18:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0236BAFF2D6
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 22:19:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BDD616B444
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 20:18:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF6CB3A62DF
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 20:18:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5620A220696;
-	Wed,  9 Jul 2025 20:18:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBBCB238173;
+	Wed,  9 Jul 2025 20:19:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DrdI+k3p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="thB86Zck"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F49B5661;
-	Wed,  9 Jul 2025 20:18:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A74741FF5F9
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 20:19:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752092284; cv=none; b=HgPsKzxDXs55mBZBL5LQh7QnirVcMsJ5/09OxAaqZqncNHG6xa4eXpZEu/mZ0Ydz4j8H1rS/KTK0E0B6lQB12s4+obw9vIZx7BzWjp3q5F81oXeirdC2VFaN0PIAqsC60KEwVcJMDj2BA4fs32l1YJ/QvmUCM97CdZ7tw3/Gvb8=
+	t=1752092362; cv=none; b=UuzNeOSUvlD5KnhWyfy9FOWkWMga11Efyn37Py9bSR2r5hPq7XMtAArZcnPxvwpEhkxo3bnucxDMwwe261jNtOackttaSS/XTH5pXKUgQbl++FY5bF3hX35uzkAg55e55wfOQ2KVSm20UKITM+oIVHvNEJVDox49dt07rHXKsC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752092284; c=relaxed/simple;
-	bh=RlYoB+kZXiNeUDJwbYgQWmg8iP/ByZitMwbHNP6vQLY=;
+	s=arc-20240116; t=1752092362; c=relaxed/simple;
+	bh=to8lwENjrk9Vo8aiV82QISxzcUgPD4RE1UdK590RVOo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lpxKoWX/XuxS5CTccywWlnPyV3H5iKLzn5XokmvtLoC6+rbAHkl+IvH+RPYbDj81F8RJgR5Ka99Z44qHs7BXiFeTNmHLhPMTkTQsa+/oxXEvW4Gi/EryccuRhu7IoBRKUewdMKsq0z/5BmNDUcBDaUrU5nfmidGYuch7R3UpZHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DrdI+k3p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44CB0C4CEEF;
-	Wed,  9 Jul 2025 20:18:01 +0000 (UTC)
+	 MIME-Version:Content-Type; b=OMW7CIA6o2RdcXJGTRruGjZpxeckE/cLv4ispuuLii2kNv8oaDa4Tyi57vr4GnGc3I220wa+XGyy5XM4Umb8inME0BxYH2ZnDmyyLz8dh0SGbv/DUc3sNvgpS2fhj/NkiKu7ebJFS3m99lRWuDWsx7ZHMf8w4qjRHLi7GI3Ot0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=thB86Zck; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07A03C4CEEF;
+	Wed,  9 Jul 2025 20:19:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752092281;
-	bh=RlYoB+kZXiNeUDJwbYgQWmg8iP/ByZitMwbHNP6vQLY=;
+	s=k20201202; t=1752092362;
+	bh=to8lwENjrk9Vo8aiV82QISxzcUgPD4RE1UdK590RVOo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DrdI+k3p53YVgWVZFb6P58txnLKWzPiZ3uKrdRzScDeb1Nz6zeY6F4KBO+H7nCqrx
-	 XwuuxwVFOZLzv/5FM5BTG0bQas+WmPUnwT+4EZrl4D0fWIAnA4e7sKcK2CJWxTSMq0
-	 U47a5NXlQDtRt9QTSCFXGK3Np2D6SnAP6esgKhKR6uXNdrKdRTGCneCqj/rURkpwM6
-	 AsBMelU1jz9R5cIuvYEcWGQybBqVjtuHPcOaGJ52VkL4PYqwaZuNtQ+LK3kJ0akibR
-	 0nbz0kZAeA2sHdqITGz8gPYyIEgmUnl8ADsWZwPFO0lLsLo4D95ZEDEYQSIb+WgPu1
-	 3iHNj+Qi5vapQ==
-Date: Wed, 9 Jul 2025 13:18:00 -0700
+	b=thB86ZckyzpAUmwe9ePdA4/Vj8+1hUaWAVMm/h4yxvRg3GXDzD0VvSodxbss+TivF
+	 P1gpOQmfZuE1BBh9FE3p6hrOlE99NuZjQUxlDKfyUO3acJP4Y/RBQs3lol6OPQjUSB
+	 HdXWHKi1jDctK9rta+T7cE2yPuPduWfqzEyycxcsKo1X11ahUTnwppdRgQ7p9tubzV
+	 mfrRQS5HQtkeuKSukOjMFWIlVg/79A1Wk/Owr7+ec6IUWcJ3rglw/D/K1xwQBUwZJd
+	 cYDKNplzvt5NOIDIvGTnJvxrjWdW/pmHeUrzwq3WKHfsnQg42wcl0EvcEtpruqccS8
+	 amO8xsVObn4Rw==
+Date: Wed, 9 Jul 2025 13:19:20 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Nimrod Oren <noren@nvidia.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Willem de Bruijn
- <willemb@google.com>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Gal Pressman <gal@nvidia.com>, Carolina
- Jubran <cjubran@nvidia.com>
-Subject: Re: [PATCH net] selftests: drv-net: rss_ctx: Add short delay
- between per-context traffic checks
-Message-ID: <20250709131800.580fde62@kernel.org>
-In-Reply-To: <6b8c512d-ced5-4116-9dde-fee081fda850@nvidia.com>
-References: <20250629111812.644282-1-noren@nvidia.com>
-	<20250701172352.5dd42418@kernel.org>
-	<6b8c512d-ced5-4116-9dde-fee081fda850@nvidia.com>
+To: Xiang Mei <xmei5@asu.edu>
+Cc: xiyou.wangcong@gmail.com, netdev@vger.kernel.org,
+ gregkh@linuxfoundation.org, jhs@mojatatu.com, jiri@resnulli.us,
+ security@kernel.org
+Subject: Re: [PATCH v2] net/sched: sch_qfq: Fix race condition on
+ qfq_aggregate
+Message-ID: <20250709131920.7ce33c83@kernel.org>
+In-Reply-To: <20250709180622.757423-1-xmei5@asu.edu>
+References: <aGwMBj5BBRuITOlA@pop-os.localdomain>
+	<20250709180622.757423-1-xmei5@asu.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,24 +62,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 9 Jul 2025 20:10:14 +0300 Nimrod Oren wrote:
-> On 02/07/2025 3:23, Jakub Kicinski wrote:
-> > On Sun, 29 Jun 2025 14:18:12 +0300 Nimrod Oren wrote:  
-> >> A few packets may still be sent and received during the termination of
-> >> the iperf processes. These late packets cause failures when they arrive
-> >> on queues expected to be empty.
-> >>
-> >> Add a one second delay between repeated _send_traffic_check() calls in
-> >> rss_ctx tests to ensure such packets are processed before the next
-> >> traffic checks are performed.  
-> > 
-> > Sprinklings sleeps should be last resort. Is there a way to wait for
-> > iperf to shut down cleanly, or wait for the socket to be closed fully?
-> > Like wait_port_listen() ?  
-> 
-> The socket may end up in TIME_WAIT state, so waiting for it to be fully
-> closed can take ~2 mins.
+On Wed,  9 Jul 2025 11:06:22 -0700 Xiang Mei wrote:
+> Reported-by: Xiang Mei <xmei5@asu.edu>
+> Fixes: 462dbc9101ac ("pkt_sched: QFQ Plus: fair-queueing service at DRR cost")
+> Signed-off-by: Xiang Mei <xmei5@asu.edu>
 
-TIME_WAIT is as good as CLOSED for our purposes. Once we got a FIN
-the chances of more traffic should be minuscule.
+Reported-by is for cases where the bug is reported by someone else than
+the author. And please do *not* send the patches as a reply in a thread.
+I already asked you not to do it once.
+-- 
+pw-bot: cr
 
