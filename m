@@ -1,63 +1,94 @@
-Return-Path: <netdev+bounces-205444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B148AFEB8F
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 16:17:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF1C1AFEBC8
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 16:24:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FC0A565DE9
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 14:13:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3135616466F
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 14:15:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12DD02E7183;
-	Wed,  9 Jul 2025 14:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FCA22DC330;
+	Wed,  9 Jul 2025 14:15:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qWX5KHiX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UBC825Gc"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56E0E290092;
-	Wed,  9 Jul 2025 14:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7883E2C3257
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 14:15:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752070259; cv=none; b=lKAC73NLIQv36pXijpT88JafQmG4Jr6wwr5sZixm7Aj2pwL13WMaoAwH5xiGYugT3oHV5DADI65yXwICztxab2H14uu+wjE15NQf5C8bdMONvS9pqTet4+CUlc0e7oBwzk/usXzxWyBX8k5Fs/v/D4NVjW/3JymOQ2szh4PderU=
+	t=1752070531; cv=none; b=j8kR6NH2Z+J0d0mpdt7PQ0ouIUTc+SgI3+T/yFq/S2ecETnXxrgCl5EtIYqgunZh9I985PFGr9YHMLhwN8Tzym+iocFFGQI71VJIo4Kug8n9LTAKYzjoXSWj9MOei6TfLQmdwFgArXmElzlBq3GfKxA5W3FLTXFaxSungXd0eQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752070259; c=relaxed/simple;
-	bh=+EexfIvgNZ+SVSR5duijOb51awN3SmpaycjndmOrpLI=;
+	s=arc-20240116; t=1752070531; c=relaxed/simple;
+	bh=kGkLKLbgp14TcmwsTFjLVyoBFEDP7o9mP/o6UPbzpcw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ixb51LBizR9jKxn3bmapMwM4X458NalRLEiVu74PiEh4YMsUdIH2rqKgVqheU++jasg3PvJQNoGtZafNuF8UxOOq0b8LEOA4xQCo6PFBGMaK8pZdiVT5zxhZ6i3QQ9GwIGQt1YhcnhHup1qapajQkZlsTLb0cRAMyf8qBQylEFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qWX5KHiX; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=DQqwHHKBZrRtmb4tOj3kH60Q18wJibg93eVRqot5J8w=; b=qWX5KHiXuay3OsOuQ27rw7rUJo
-	hRGFMn6hYvbJrXuoah8GPpYwFdO7TRaJGTOH60vBLXnCmAfoWjXDXRs4DiFepQd/MwFIEHD7KKrAX
-	XHFULLBunpBIpAXcQe9/90hzKftKFA5vS8V6z6wglVdSoCArBvNM/w67zU1T93Dx/h/I=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uZVVY-000wvo-EL; Wed, 09 Jul 2025 16:10:48 +0200
-Date: Wed, 9 Jul 2025 16:10:48 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	Andre Edich <andre.edich@microchip.com>,
-	Lukas Wunner <lukas@wunner.de>
-Subject: Re: [PATCH net v2 2/3] net: phy: allow drivers to disable polling
- via get_next_update_time()
-Message-ID: <e0b00f28-051e-4af6-afcb-7cdb5dc76549@lunn.ch>
-References: <20250709104210.3807203-1-o.rempel@pengutronix.de>
- <20250709104210.3807203-3-o.rempel@pengutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=R9dK8oDTraj0ntQuZdCKrXyIXFcbP77KjdaGh0GvMbfPJ1oRvqq6x7jjYg/bhIunUrTENWYKxDIrcM8nBNQ3POu37ki27enx+Izm7cPNBSwPhhcWvacuwdCDHyeK7gz4tLt/n8VzbUgf3+R2uHXhEgNXnYXcSyBhw8c9X5UV5U0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UBC825Gc; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752070528;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ky/7x6DvH9EhPAV3HjIH0no4xaouHgpeQ8/ySQ2r2rU=;
+	b=UBC825GcsgJ0b4yqBrExlsePqqKkPfpffvpbdmsMqh9+lkNsnUzlndTQbGcL69w8uwPesk
+	BmMDA7sCtXuENDpj6Z46d9T/H6ndyQHpCy3K68BKtHLbkf5Chywfho0/JBRO2VPRy7G02e
+	XBIfEqnihIzGjQ0SqS+DxujWZH8z+Dc=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-180-mCNevlZZNlWRKmuIS0yATw-1; Wed, 09 Jul 2025 10:15:26 -0400
+X-MC-Unique: mCNevlZZNlWRKmuIS0yATw-1
+X-Mimecast-MFC-AGG-ID: mCNevlZZNlWRKmuIS0yATw_1752070526
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3a4f7f1b932so3723127f8f.2
+        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 07:15:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752070525; x=1752675325;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ky/7x6DvH9EhPAV3HjIH0no4xaouHgpeQ8/ySQ2r2rU=;
+        b=ZcsxydY+T7GjH43eZbWNmqEngeP9qLHYGD0f4ALRkqBUxFiEsCDTeRuv2J5nhc+Z6C
+         PoiBdFDSGv5l6r7jcsLvbDjH682y2v7sBEKRvt4cqlkUkaJEqLZdtLyQQKewdFJdxQ27
+         kvSqBImKyZUWJmIT39XfLGYrXQXlWs20cUPRw4rhtKhzZztzPiYuO47dNPEbNRQk/537
+         ua+InXGSiepgpckSyPcBwTNar9Ml9X+YWElIYeqFqZC4lapLe5A4lP00hkMNgptWi4CX
+         OiJ2yuMCgUvhCniyQE5SRWnA07vWBVBe3TZ/H0iozZ8dXEGR7Ms1U+EYRCqXk9iZVtQD
+         iQ7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV9OVKTysuHls6v3stn3HTIGkWuQbIxIz9ymXTyGR33mtWkKknkuKNkQM4NkE08SFsQp6s+KwY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/nuB00upAPU325VAh3BfYVt008qmJb7LyPbJ+BfYrmJRIXkVd
+	0VaD5YGkXq0Damo2z1S0XVThZhg44LB9dWCTyC6vV4TrLwVioflPGxSqj3V07u6DYsgB7SzH17o
+	GGB38ZUBxYrwq79N3mca2dRKxO2Ov8cnB3qgbukesUAPgyDr5+7zkGeANww==
+X-Gm-Gg: ASbGncsCPDZk8c3GCxO+SIburfE7ELetho00jHfHlClwOgXIeixSCKZ6KXPGNKIJdfK
+	jjv4rsyovZGtRF5wolkXkZX94I5VXUFP7KrkYaxhmENQyaC7X6ZqE1pxl1CyvVTSrMmdqdhNLj7
+	jA36ekfuIOIbJmIOjCfAwPLWiggqAnxCl/nOaE4xlz/jJnvT4MLmubhxiri5JXeZRx7mkXoTpf2
+	0wOmBaIQhb/F5HXEitlw8uXUrka6mnFlpRM7gG01geSo2OumOd5isuCMUlwYriCNf999p6n3jTl
+	TCHIQxf2Sg==
+X-Received: by 2002:a05:6000:2313:b0:3a4:fbd9:58e6 with SMTP id ffacd0b85a97d-3b5e4530f28mr2348269f8f.50.1752070525539;
+        Wed, 09 Jul 2025 07:15:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHHJ9guzGEu6LsDd3s8dzvUQCpYjaNvz1LiX+hCFrH/tfoZaINYGrF+3wLoBFP8RviUuzjVig==
+X-Received: by 2002:a05:6000:2313:b0:3a4:fbd9:58e6 with SMTP id ffacd0b85a97d-3b5e4530f28mr2348225f8f.50.1752070525032;
+        Wed, 09 Jul 2025 07:15:25 -0700 (PDT)
+Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454d5050794sm24762395e9.13.2025.07.09.07.15.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Jul 2025 07:15:24 -0700 (PDT)
+Date: Wed, 9 Jul 2025 16:15:21 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Gary Guo <gary@kernel.org>
+Cc: davem@davemloft.net, idosch@idosch.org, kuba@kernel.org,
+	ling@moedove.com, netdev@vger.kernel.org, noc@moedove.com,
+	pabeni@redhat.com, Gary Guo <gary@garyguo.net>
+Subject: Re: [BUG] net: gre: IPv6 link-local multicast is silently dropped
+ (Regression)
+Message-ID: <aG55eUOdypOWYY2d@debian>
+References: <aGUGBjVZZPBWcRlA@debian>
+ <20250706154030.3010068-1-gary@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,44 +97,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250709104210.3807203-3-o.rempel@pengutronix.de>
+In-Reply-To: <20250706154030.3010068-1-gary@kernel.org>
 
->  	/* Only re-schedule a PHY state machine change if we are polling the
-> -	 * PHY, if PHY_MAC_INTERRUPT is set, then we will be moving
-> -	 * between states from phy_mac_interrupt().
-> +	 * PHY. If PHY_MAC_INTERRUPT is set or get_next_update_time() returns
-> +	 * PHY_STATE_IRQ, then we rely on interrupts for state changes.
->  	 *
->  	 * In state PHY_HALTED the PHY gets suspended, so rescheduling the
->  	 * state machine would be pointless and possibly error prone when
->  	 * called from phy_disconnect() synchronously.
->  	 */
-> -	if (phy_polling_mode(phydev) && phy_is_started(phydev))
-> -		phy_queue_state_machine(phydev,
-> -					phy_get_next_update_time(phydev));
-> +	if (phy_polling_mode(phydev) && phy_is_started(phydev)) {
-> +		unsigned int next_time = phy_get_next_update_time(phydev);
-> +
-> +		/* Drivers returning PHY_STATE_IRQ opt out of polling.
-> +		 * Use IRQ-only mode by not re-queuing the state machine.
-> +		 */
-> +		if (next_time != PHY_STATE_IRQ)
-> +			phy_queue_state_machine(phydev, next_time);
-> +	}
+On Sun, Jul 06, 2025 at 04:40:30PM +0100, Gary Guo wrote:
+> On Wed, 2 Jul 2025 12:12:22 +0200, Guillaume Nault wrote:
+> > Aiden, can you confirm that the following patch fixes the issue on your
+> > side?
+> 
+> Not Aiden, but I get hit with the same regression after updating kernel on my
+> router from v6.12.28 to v6.12.35 today. Symptom for me is bird complaining
+> about "Socket error: Network is unreachable", and strace shows that it's sending
+> packets to ff02::1:6 and get hit with ENETUNREACH.
+> 
+> I can confirm that applying this patch on top of v6.12.35 fixes the issue for me.
+> I also took a look of the code, not a net expert, but this approach does look
+> like a proper fix to me.
 
-How does this interact with update_stats()?
+Thanks Gary, it's good to have such feedback.
+I'm going to formally send the patch soon.
 
-phy_polling_mode() returns true because the update_stats() op is
-implemented. phy_get_next_update_time() returns PHY_STATE_IRQ, because
-the PHY is in a state where interrupts works, and then the statistics
-overflow.
+> Reviewed-by: Gary Guo <gary@garyguo.net>
+> Tested-by: Gary Guo <gary@garyguo.net>
+> 
+> > 
+> > ---- >8 ----
+> > 
+> > diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+> > index ba2ec7c870cc..870a0bd6c2ba 100644
+> > --- a/net/ipv6/addrconf.c
+> > +++ b/net/ipv6/addrconf.c
+> > @@ -3525,11 +3525,9 @@ static void addrconf_gre_config(struct net_device *dev)
+> >  
+> >  	ASSERT_RTNL();
+> >  
+> > -	idev = ipv6_find_idev(dev);
+> > -	if (IS_ERR(idev)) {
+> > -		pr_debug("%s: add_dev failed\n", __func__);
+> > +	idev = addrconf_add_dev(dev);
+> > +	if (IS_ERR(idev))
+> >  		return;
+> > -	}
+> >  
+> >  	/* Generate the IPv6 link-local address using addrconf_addr_gen(),
+> >  	 * unless we have an IPv4 GRE device not bound to an IP address and
+> > @@ -3543,9 +3541,6 @@ static void addrconf_gre_config(struct net_device *dev)
+> >  	}
+> >  
+> >  	add_v4_addrs(idev);
+> > -
+> > -	if (dev->flags & IFF_POINTOPOINT)
+> > -		addrconf_add_mroute(dev);
+> >  }
+> >  #endif
+> 
 
-It seems like this code needs to be somehow made part of
-phy_polling_mode(), so that it has the full picture of why polling is
-being used.
-
-    Andrew
-
----
-pw-bot: cr
 
