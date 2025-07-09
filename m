@@ -1,167 +1,202 @@
-Return-Path: <netdev+bounces-205271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6353FAFDFC4
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 08:04:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C583AFDFD4
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 08:12:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C2C71887D18
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 06:04:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81E83582BE6
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 06:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 270A7265CBE;
-	Wed,  9 Jul 2025 06:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB33E26B2DA;
+	Wed,  9 Jul 2025 06:12:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=strongswan.org header.i=@strongswan.org header.b="S9LTCZ5O"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="N1V6uSds"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.codelabs.ch (mail.codelabs.ch [109.202.192.35])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD1B176ADB
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 06:03:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.202.192.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89BCF1E7C27;
+	Wed,  9 Jul 2025 06:12:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752041043; cv=none; b=PmYYX4RW8tOuoquHQfi0+W0Gto1x+XKYhlkGNa0pZxOaMK6htUsSZrKig4EOcXslcsWdNI/qoudqksrN3ntSYCE/Qb4Kk3hoQBFHUEELeEuIPnaaQ8dC4lr5kZ08WiZOxoWL6XejAlt3bz3k1+yZvHrYzo+FlvBsJMF2lMGiLZA=
+	t=1752041546; cv=none; b=UKDRZHU9tPmlWTWQ1VogFk/JygT6qAMjt769mGb1uXIdqxdUTZeOl624did26vrAxM90YysL3jeJJPCxDs8KbAfY8BnEwuz1Y31H453LMZ8X9ggoBi53ZYx+fUNv+E9jPhymBNhbulWdNoZazC8Flxjc+BeCw5tDOOpQUFPY4Xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752041043; c=relaxed/simple;
-	bh=p/njsCtJJXwVxUS2Ilg5uxJ1bFEQJI0FFblvAXjsU1k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TlqpYNHF+4X7GOk2FsnzD8fN7gDv/GBQ+Ks/O/wxKBF6gA76gmVTVXBC74prAXqNu4cyUPOzTh9Np9gsvrOGSjzjUx/JvzZQ7rrOHwkO/oh9IU19RfGPR1Y9yiiBkKPjtA7TWFO3g7FKo0VjQ17HTq0sNOqDyWMiOehrBlAge7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strongswan.org; spf=pass smtp.mailfrom=strongswan.org; dkim=pass (2048-bit key) header.d=strongswan.org header.i=@strongswan.org header.b=S9LTCZ5O; arc=none smtp.client-ip=109.202.192.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strongswan.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strongswan.org
-Received: from localhost (localhost [127.0.0.1])
-	by mail.codelabs.ch (Postfix) with ESMTP id BBCCF5A0004;
-	Wed,  9 Jul 2025 07:56:55 +0200 (CEST)
-Received: from mail.codelabs.ch ([127.0.0.1])
- by localhost (fenrir.codelabs.ch [127.0.0.1]) (amavis, port 10024) with ESMTP
- id nAI3a8WkQ7eZ; Wed,  9 Jul 2025 07:56:54 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=strongswan.org;
-	s=default; t=1752040614;
-	bh=p/njsCtJJXwVxUS2Ilg5uxJ1bFEQJI0FFblvAXjsU1k=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=S9LTCZ5O0mLDqDmYmzhYGff1jqXfSElshfs9flKh2i8t2R3EKZLNZDbDDxc+vjA4N
-	 kjq5Agn+Tfr4nIlJKbv0lYskRSLF/Hx/AyTEny+fG6+tgodoqf83ZZ/Ff6GDFYtxfA
-	 0Nqx7LuXOdPIE9C7kQjumu7Qn133DG7DqHOh0lTnw+GGNpdkd4Uaekqk9LeDLZq+Dh
-	 6cuROzQh16nYvo2Na77X1SRnNRjiUoE6cYVoQCi1WYylfs8/78Wg5pbJUFWalmVUFy
-	 sdrq0johVwGIm2OUSkL0R+BiWtPiRBOkmfQmGHQB3oxQqgKhlE/tFL0KiR41mx5HYD
-	 DPT6nJ1Gv/Kiw==
-Received: from [IPV6:2a01:8b81:5406:7300:484c:4245:e897:1611] (unknown [IPv6:2a01:8b81:5406:7300:484c:4245:e897:1611])
-	by mail.codelabs.ch (Postfix) with ESMTPSA id 5948F5A0003;
-	Wed,  9 Jul 2025 07:56:54 +0200 (CEST)
-Message-ID: <7d95ac8b-2240-4d5a-8626-f17e4fae7131@strongswan.org>
-Date: Wed, 9 Jul 2025 07:56:54 +0200
+	s=arc-20240116; t=1752041546; c=relaxed/simple;
+	bh=b6fHflmKbdoQM8mgBF82jn0LzwgDIvXGI4ngEOI9Kho=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RrkYAehLCrFCtVyHziVwBzX6B3pkV6kwKafcuxNVH24AvwMbaaCX+NtKldr9EkqmCZP2c1bIkmOXHmGTP3Gq850oTlymFWB7Gb4G2c5Ev3GZ9BWf+kabKGkNOK24TR/hZnoHhJ4qPvSxBErvbuyCpy4yxrrcQlN3jr1mqyjVQNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=N1V6uSds; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B1A661FCF0;
+	Wed,  9 Jul 2025 06:12:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1752041541;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4KsS1Bbbca9XQYHQZD5JFcdb0dmQjAJZfp72T1bNefM=;
+	b=N1V6uSdsMSier0lYnfeBmwUGUxNP++lSOFVGh8ovo3TyUfJyrOMJWiFxiVxH8vJSJq1Trv
+	3sDyDQTjtNBBg2Jlyi77dJpiaOZrpzE5v/tGuXhA+Kyc7MXwqdtz9Ff0WtMhaKm4/PAPsn
+	zDwoY2Bt6stQZTDWS2YNg+Hui7CeGr0UxeNJH1k5oB49ADbef7NZfWNRRgD8c4e8DXWC9U
+	Rw7z24mcaiQp35pHC7rEZFfgNTWE01B6/5nkd0AIihjMpgcnmIsurJ+5a6AcLUhDPBVOnT
+	+xFv01g+7556/0rl/xHhBOwct960Rk6hXKlam+YPtJxLzC/EaHP+0p0Gy9hqkQ==
+Date: Wed, 9 Jul 2025 08:12:17 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: <Tristram.Ha@microchip.com>
+Cc: <Woojung.Huh@microchip.com>, <andrew@lunn.ch>, <olteanv@gmail.com>,
+ <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
+ <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+ <pabeni@redhat.com>, <marex@denx.de>, <UNGLinuxDriver@microchip.com>,
+ <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 6/6 v2] net: dsa: microchip: Setup fiber ports
+ for KSZ8463
+Message-ID: <20250709081217.368e1f7d@fedora>
+In-Reply-To: <DM3PR11MB8736DE8A01523BD67AF73766EC4EA@DM3PR11MB8736.namprd11.prod.outlook.com>
+References: <20250708031648.6703-1-Tristram.Ha@microchip.com>
+	<20250708031648.6703-7-Tristram.Ha@microchip.com>
+	<20250708122237.08f4dd7c@device-24.home>
+	<DM3PR11MB8736DE8A01523BD67AF73766EC4EA@DM3PR11MB8736.namprd11.prod.outlook.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC ipsec-next] pfkey: Deprecate pfkey
-To: Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Paul Wouters <paul@nohats.ca>,
- Andreas Steffen <andreas.steffen@strongswan.org>,
- Antony Antony <antony@phenome.org>, Tuomo Soini <tis@foobar.fi>,
- "David S. Miller" <davem@davemloft.net>
-Cc: netdev@vger.kernel.org, devel@linux-ipsec.org
-References: <aGd60lOmCtytjTYU@gauss3.secunet.de>
-From: Tobias Brunner <tobias@strongswan.org>
-Content-Language: de-CH, en-US
-Autocrypt: addr=tobias@strongswan.org; keydata=
- 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
- tvkh7XWO2ycrW1UlzUzM4KV3SDLIhfOU
-In-Reply-To: <aGd60lOmCtytjTYU@gauss3.secunet.de>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: 0
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefieektdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduiedprhgtphhtthhopefvrhhishhtrhgrmhdrjfgrsehmihgtrhhotghhihhprdgtohhmpdhrtghpthhtohephghoohhjuhhnghdrjfhuhhesmhhitghrohgthhhiphdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopeholhhtvggrnhhvsehgmhgri
+ hhlrdgtohhmpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkrhiikhdoughtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtohhnohhrodgutheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvth
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On 04.07.25 08:55, Steffen Klassert wrote:
-> The pfkey user configuration interface was replaced by the netlink
-> user configuration interface more than a decade ago. In between
-> all maintained IKE implementations moved to the netlink interface.
-> So let 'config NET_KEY' default to no in Kconfig. The pfkey code
-> will be removed in a second step.
+Hi Tristram
+
+On Tue, 8 Jul 2025 19:45:44 +0000
+<Tristram.Ha@microchip.com> wrote:
+
+> > Hi Tristram,
+> > 
+> > On Mon, 7 Jul 2025 20:16:48 -0700
+> > <Tristram.Ha@microchip.com> wrote:
+> >   
+> > > From: Tristram Ha <tristram.ha@microchip.com>
+> > >
+> > > The fiber ports in KSZ8463 cannot be detected internally, so it requires
+> > > specifying that condition in the device tree.  Like the one used in
+> > > Micrel PHY the port link can only be read and there is no write to the
+> > > PHY.  The driver programs registers to operate fiber ports correctly.
+> > >
+> > > The PTP function of the switch is also turned off as it may interfere the
+> > > normal operation of the MAC.
+> > >
+> > > Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+> > > ---
+> > >  drivers/net/dsa/microchip/ksz8.c       | 26 ++++++++++++++++++++++++++
+> > >  drivers/net/dsa/microchip/ksz_common.c |  3 +++
+> > >  2 files changed, 29 insertions(+)
+> > >
+> > > diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
+> > > index 904db68e11f3..1207879ef80c 100644
+> > > --- a/drivers/net/dsa/microchip/ksz8.c
+> > > +++ b/drivers/net/dsa/microchip/ksz8.c
+> > > @@ -1715,6 +1715,7 @@ void ksz8_config_cpu_port(struct dsa_switch *ds)
+> > >       const u32 *masks;
+> > >       const u16 *regs;
+> > >       u8 remote;
+> > > +     u8 fiber_ports = 0;
+> > >       int i;
+> > >
+> > >       masks = dev->info->masks;
+> > > @@ -1745,6 +1746,31 @@ void ksz8_config_cpu_port(struct dsa_switch *ds)
+> > >               else
+> > >                       ksz_port_cfg(dev, i, regs[P_STP_CTRL],
+> > >                                    PORT_FORCE_FLOW_CTRL, false);
+> > > +             if (p->fiber)
+> > > +                     fiber_ports |= (1 << i);
+> > > +     }
+> > > +     if (ksz_is_ksz8463(dev)) {
+> > > +             /* Setup fiber ports. */  
+> > 
+> > What does fiber port mean ? Is it 100BaseFX ? As this configuration is
+> > done only for the CPU port (it seems), looks like this mode is planned
+> > to be used as the MAC to MAC mode on the DSA conduit. So, instead of
+> > using this property maybe you should implement that as handling the
+> > "100base-x" phy-mode ?
+> >   
+> > > +             if (fiber_ports) {
+> > > +                     regmap_update_bits(ksz_regmap_16(dev),
+> > > +                                        reg16(dev, KSZ8463_REG_CFG_CTRL),
+> > > +                                        fiber_ports << PORT_COPPER_MODE_S,
+> > > +                                        0);
+> > > +                     regmap_update_bits(ksz_regmap_16(dev),
+> > > +                                        reg16(dev, KSZ8463_REG_DSP_CTRL_6),
+> > > +                                        COPPER_RECEIVE_ADJUSTMENT, 0);
+> > > +             }
+> > > +
+> > > +             /* Turn off PTP function as the switch's proprietary way of
+> > > +              * handling timestamp is not supported in current Linux PTP
+> > > +              * stack implementation.
+> > > +              */
+> > > +             regmap_update_bits(ksz_regmap_16(dev),
+> > > +                                reg16(dev, KSZ8463_PTP_MSG_CONF1),
+> > > +                                PTP_ENABLE, 0);
+> > > +             regmap_update_bits(ksz_regmap_16(dev),
+> > > +                                reg16(dev, KSZ8463_PTP_CLK_CTRL),
+> > > +                                PTP_CLK_ENABLE, 0);
+> > >       }
+> > >  }
+> > >
+> > > diff --git a/drivers/net/dsa/microchip/ksz_common.c  
+> > b/drivers/net/dsa/microchip/ksz_common.c  
+> > > index c08e6578a0df..b3153b45ced9 100644
+> > > --- a/drivers/net/dsa/microchip/ksz_common.c
+> > > +++ b/drivers/net/dsa/microchip/ksz_common.c
+> > > @@ -5441,6 +5441,9 @@ int ksz_switch_register(struct ksz_device *dev)
+> > >                                               &dev->ports[port_num].interface);
+> > >
+> > >                               ksz_parse_rgmii_delay(dev, port_num, port);
+> > > +                             dev->ports[port_num].fiber =
+> > > +                                     of_property_read_bool(port,
+> > > +                                                           "micrel,fiber-mode");  
+> > 
+> > Shouldn't this be described in the binding ?
+> >   
+> > >                       }
+> > >                       of_node_put(ports);
+> > >               }  
 > 
-> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
-> ---
->  net/xfrm/Kconfig | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
+> The "micrel,fiber-mode" is described in Documentation/devicetree/
+> bindings/net/micrel.txt.
+
+Yes but that's for PHYs right ? Yours is under the DSA "ports"
+node.
+
 > 
-> diff --git a/net/xfrm/Kconfig b/net/xfrm/Kconfig
-> index f0157702718f..aedea7a892db 100644
-> --- a/net/xfrm/Kconfig
-> +++ b/net/xfrm/Kconfig
-> @@ -110,14 +110,17 @@ config XFRM_IPCOMP
->  	select CRYPTO_DEFLATE
->  
->  config NET_KEY
-> -	tristate "PF_KEY sockets"
-> +	tristate "PF_KEY sockets (deprecated)"
->  	select XFRM_ALGO
-> +	default n
->  	help
->  	  PF_KEYv2 socket family, compatible to KAME ones.
-> -	  They are required if you are going to use IPsec tools ported
-> -	  from KAME.
->  
-> -	  Say Y unless you know what you are doing.
-> +	  The PF_KEYv2 socket interface is deprecated and
-> +	  scheduled for removal. Please use the netlink
-> +	  interface (XFRM_USER) to configure IPsec.
-> +
-> +	  If unsure, say N.
->  
->  config NET_KEY_MIGRATE
->  	bool "PF_KEY MIGRATE"
+> Some old KSZ88XX switches have option of using fiber in a port running
+> 100base-fx.  Typically they have a register indicating that configuration
+> and the driver just treats the port as having a PHY and reads the link
+> status and speed as normal except there is no write to those PHY related
+> registers.  KSZ8463 does not have that option so the driver needs to be
+> told.
 
-While we currently use this in our regression tests to test our PF_KEY
-implementation (which is used on FreeBSD/macOS), I'm fine with
-deprecating and eventually removing it.
+That's what I understood from your comments indeed, what thew me off
+guard is that all ports's fiber mode is configured in the
+config_cpu_port() callback.
 
-Acked-by: Tobias Brunner <tobias@strongswan.org>
+I'd like to one day be able to deprecate these
+micrel,fiber-mode/ti,fiber-mode properties in favor of the ports API
+that's being worked on, but I guess we can roll with it for now.
 
-Regards,
-Tobias
+Maxime
+
 
 
