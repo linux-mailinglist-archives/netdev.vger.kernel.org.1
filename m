@@ -1,93 +1,80 @@
-Return-Path: <netdev+bounces-205469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBA3EAFEDD0
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 17:33:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42D0EAFEDD3
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 17:34:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 476933BB849
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:32:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89AFD1BC0218
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:34:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FF742E8881;
-	Wed,  9 Jul 2025 15:33:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A6112E54D8;
+	Wed,  9 Jul 2025 15:33:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QWrqoDgA"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cctJyvpw"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2089.outbound.protection.outlook.com [40.107.102.89])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C549317578
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 15:33:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.89
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752075194; cv=fail; b=PHOyyXnNCCByqrJhnwJPK82WQk4kTxBPdiKeF2K+U1N8lsNZTPmsQAxVCiFtHckJt8wENEaeYuPsW/MP95r0x1Oh6cEdYZtvT2+sEJVYCKRHi3Jj646lQa+WWMzSO3u0zRLHTTQqP8lbDWF4qCCa6yepxOmsqTEhaeltRg61ckw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752075194; c=relaxed/simple;
-	bh=x2D0mgCpJhYrmUlsG213haUr2M4zsnrv2bCf8Aatvtk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DKcA+0F28BCef2tA4pnRHOmyoitBGIt0RfJO7LgEczVbnv4WqR5HfeFt60h/k1OTc7J3K3qsWOAXhyMSgCJl3YM3DK9t8Ys84lpnuc7X+OSI4M35SwMHSTa2Zt51c+OqJkfZ0dnHwv7ZNqDqYpwEssjNBVQVLp0eQlUtu82ybvs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QWrqoDgA; arc=fail smtp.client-ip=40.107.102.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XQbDybNcPzG4lDp4gsiNKhwkiHLdxOeqi1vQKqTBriUFF2TsaTgbICI4hAz2+bj7FDWtLXBHcg98b20cu2X1DZVfHzx5AfNT+xts4C6qaRjnNntl7EPAvVR/GNdP3V7kjRv8W6VvWmiMpF8hU8HfnEPj8fpgfgua5lT58EHlHcUfI1vCw8k8pAVDFAOJ/dDmsqNZL7mlY3PXdKBmDqEDLvBjfBA8wG7AaDjVgXtG3pc40fXnrrGqNYoIEW2xZrK16hT4lKsCWOs5B5HvPTToG5JqUX5/KF7SzRQc2jtwJ8xGVtCKv6LUUkLPUbaIXgZPl+oGc/smg7DOrK2kOHCzmQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Hu0yOVKwf6DYlr9J2B04id81pAnFpsjzrR3fAIkNkjE=;
- b=IfRa7ERuWl7kVbYnhwQiWL5vdD0KdvJU+5PBKK7EsHJHLQw/qQvNo4sVhnh+cqwgi5DgIuMQS8p20GWeFt1aDKy/6f+iTvksG2pkHA//shx1QhIhMzZivmHqrpaWcp3z+ASCvX9appp4eMMoUln++5mjxE2FnO9ASzAGlAfZ/gSSgcw1fQTPITpA0glmyktyiXFxHYmOOqx30rHo+Nwx2fN3GauEKud7onomquyykqrqAGPSJVkSOOyK/t3SCeozrLuCks8kIbxewyNmWdK4kfn+LcdGaDh5Kd0kzHxu3QvO+enTlhbuvCiU2LDWS3K8GoUUrjl2SOMzIuQTi0k6vw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Hu0yOVKwf6DYlr9J2B04id81pAnFpsjzrR3fAIkNkjE=;
- b=QWrqoDgADmOV4CtPLNGeZXO/uzgXGZsx3iswn5zA2yTksOJ6XqBZCsSVVEClZb30tRGWRaabfs6B4y4/tXurACiiH2zBZC58jRjsJ+vKsVL+ihC/JYqJtTPFwptxNhmCxSzyZm5YYg9KCRDQuX1XzmFmtYuXA6mi31fLJmkbRrydHCNu8uTfULwrxCTkUWvLJarpkB8YT8xPizpUMVaSDcw4bx1tEgRexc8I+UL3MGWV1RLe6Wnk4L4thwR+pjBGFvVkf/xOVLdOlz5WyQStP4hMQAICKTZssZcHKmpalc3A81Ysm1fZNL6bVdoyzroqzREPDC/Nc0khkYQFFGY8HQ==
-Received: from MN2PR16CA0057.namprd16.prod.outlook.com (2603:10b6:208:234::26)
- by SJ5PPF0C60B25BF.namprd12.prod.outlook.com (2603:10b6:a0f:fc02::98a) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.23; Wed, 9 Jul
- 2025 15:33:07 +0000
-Received: from BL02EPF0001A104.namprd05.prod.outlook.com
- (2603:10b6:208:234:cafe::20) by MN2PR16CA0057.outlook.office365.com
- (2603:10b6:208:234::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8922.21 via Frontend Transport; Wed,
- 9 Jul 2025 15:33:06 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BL02EPF0001A104.mail.protection.outlook.com (10.167.241.135) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8922.22 via Frontend Transport; Wed, 9 Jul 2025 15:33:06 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 9 Jul 2025
- 08:32:49 -0700
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 9 Jul
- 2025 08:32:48 -0700
-Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.6)
- with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Wed, 9 Jul
- 2025 08:32:45 -0700
-From: Gal Pressman <gal@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	<netdev@vger.kernel.org>
-CC: Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>, "Gal
- Pressman" <gal@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
-Subject: [PATCH net-next] ethtool: Fix set RXFH for drivers without RXFH fields support
-Date: Wed, 9 Jul 2025 18:32:51 +0300
-Message-ID: <20250709153251.360291-1-gal@nvidia.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9192E6127
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 15:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752075234; cv=none; b=bS85056lo+H9VQOFHkFGdmALXTO6sP/TZ92M4kaNhBC76zlmcjwjv7YJF5h5bT8nYWqwjrJ2SWLqfDo0rNt3Kpbs3wfsKcLiy9xV3OBPdoBtfS34mHH10T6W0iMtohrnjn1gCZm8FN8rOyIYwNbSz7C8j0XvcIcobnU3Sxj1VyI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752075234; c=relaxed/simple;
+	bh=ZLaQWqXGQv/+JRAdEgXBm0SPx52hwQqaydSg4LGXTZU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bLO2OJ4FgyOeEwChlUXXXab67uI/nByZ8RMFUYTmHaia87mWctvCpkekjYW5QWnPh6DTnt4QfB2FQW5NHgwjIPOP8A0zWUNu3r6Bvoh0UOnfuybmVHPWImzt5vqWUaTAkeiURoI2SD9V8Kvay4dTJ2Uhdn9rnXAHRPPsmaPd60g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cctJyvpw; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 569CmBLw026528;
+	Wed, 9 Jul 2025 15:33:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=78bIYBw791i4+HmQoK2JpOwCgNgqhUcyN1ahfrbhs
+	AA=; b=cctJyvpwL2dbqPfXv1ecTMVOlc1onXsLUr7Rj/i5oeINFXRRMlPE77ubA
+	HWriVa3VUkZG4HirvihRX4ushzDrDqg+a0FDJRxtaVQsVcDTjJIixQ7axNEaEj1X
+	DH7Z0V4xfUpBzLfERf35onNjJQlAsx9YW6KVkgG1jfmLTuoAtEHGIz+KSrofqVUY
+	f8KbMZqskkHaKL7raW8RAto6Sz6caE2eIgH9AmOf9XNimaymoacH5C3JxsemTafb
+	0T0s7Bd9x5FKFGFYT9NkFqhCsoCQP+T+mA4jyD/Ue619uGUlXi9S4cj+GcYYHqXN
+	dZ5sXE0Ia+JTl+BJGLH+pTeuF/q1w==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47ptfyxd00-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 09 Jul 2025 15:33:42 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 569Bu54o002888;
+	Wed, 9 Jul 2025 15:33:42 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 47qfvmgq25-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 09 Jul 2025 15:33:42 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 569FXeo726673846
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 9 Jul 2025 15:33:41 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9C9ED5806B;
+	Wed,  9 Jul 2025 15:33:40 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 51B4F5806A;
+	Wed,  9 Jul 2025 15:33:39 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.61.247.211])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  9 Jul 2025 15:33:39 +0000 (GMT)
+From: Mingming Cao <mmc@linux.ibm.com>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org, nnac123@linux.ibm.com, horms@kernel.org,
+        bjking1@linux.ibm.com, haren@linux.ibm.com, ricklind@linux.ibm.com,
+        davemarq@linux.ibm.com, mmc@linux.ibm.com
+Subject: [PATCH net] ibmvnic: Fix hardcoded NUM_RX_STATS/NUM_TX_STATS with dynamic sizeof
+Date: Wed,  9 Jul 2025 08:33:32 -0700
+Message-Id: <20250709153332.73892-1-mmc@linux.ibm.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,106 +82,76 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0001A104:EE_|SJ5PPF0C60B25BF:EE_
-X-MS-Office365-Filtering-Correlation-Id: b3741072-ffef-4a33-ac0b-08ddbefde6b8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?AAM3Glf8TNACwKVBFxxwu/n2DGMFp3nvftf2a2wnAHIdHr24zAEwWEsXH45j?=
- =?us-ascii?Q?uxbniUIGOBrXJdwz/2njhAo1wzXYyPQOScm+w5ZCu/A2jBUsGXMMr84ZW+2h?=
- =?us-ascii?Q?MjcvDvQv47KPYUiJyfmULxWTwc71fxhkOjmMvLipixYLXGwl0GaFWgCJvd2V?=
- =?us-ascii?Q?uZ1tME5yz4ylxrIoik9ZUnEeb2vOR6+DBpDOEf+Bfo8q6VS381JjjVCBfvz7?=
- =?us-ascii?Q?MOEMf91NUQknIsRQ9eiU52hGDsrZaIfSSNYZ8gqgOjcCfYLDGsVqfzZGajw4?=
- =?us-ascii?Q?MY8yAHSYfqyR2G3iZlsyHU6B/RbJYZcxhEct2ANC0PvJgSHoTb0NuUbsoue3?=
- =?us-ascii?Q?PzzvN2uCF3gMG3U/85jrIFmiqIHjkIy4fvFC2NksWWjtyaAF1FWucFf82LJc?=
- =?us-ascii?Q?oji2rDy4tSemxqpgxMI+2ejxrwSsg6H0PmCHYvGbvW9AbO6f84Phu9uF8FFs?=
- =?us-ascii?Q?ll2FOypcrj16H7Z9Nar7dr4GidhVScC9CLR9DqqcXj92fIIyh8L5I8442Wqz?=
- =?us-ascii?Q?S+kpTxWIwyNppTMGBCdxv3yS7+Z9J6SkddnZhqz1fLz7fdWF+sztqNVzy9bj?=
- =?us-ascii?Q?P+llcec5SIYvhlrHBCeTjKBoFd3ipEzs/4mPO0SCloVdQte7c25E//cOhSjZ?=
- =?us-ascii?Q?jNN3QHvqHNmPKFAA4fZFK7KCurKRVrcuQMXwsSYuRiFdLxk0M6rHNqvYdmMu?=
- =?us-ascii?Q?S9+tCMreAzgyee0TDz6KMcL9tPb6j5tVHS4wPX/2/DvxX+/MbsaymDDROTdP?=
- =?us-ascii?Q?f4lhgv0lzrBH44SHZ4dBJZ/50qz2rBsQ30aA3+Ggu/Jt/RwQFkzYXQk748Go?=
- =?us-ascii?Q?7dVchW3FDBHEBQil8gLjTu8Xk9cLQ0csL306SA2+TZqmFdZ3+ISIc2/3F+gS?=
- =?us-ascii?Q?lcumkKyMETQNGCxw7PR8GdNlIh7BxbZdQOMNQOjy+sZ2klOROC2POL5FQXfm?=
- =?us-ascii?Q?sUUS3WUNEzOk4y1jGVr6QbzztY59+YJSjV1u7HjCW1kuNvPSQAxldGobtheQ?=
- =?us-ascii?Q?o75tW8nM2MYDwlajykGUsbZxdNu+reFoNUZNG4YK0FkeYWUVSgqQuhzwz1Cu?=
- =?us-ascii?Q?ndwmQerW0R9PpfROgEO8q+ahR91djIgZJ5Q2dAeIvKAmSQAmlx7xDhEiI0vR?=
- =?us-ascii?Q?K8c5ilTCNGU/8uED8wm64GzJyFgPuUD1SCla2drkgkQ9yU0DCQnRVVF+c+k/?=
- =?us-ascii?Q?kBwyIc5zySChRy6Z58yC4mVzZvo9jKR29QLx/kVaKNqiwpE8xlySxPrfMj9P?=
- =?us-ascii?Q?dIT3Q8MdW/WI9j04jK2UvzjcBzxc7/agiDdiLLnMUSUv+kU/RBwcjDncjhI3?=
- =?us-ascii?Q?ANNw0sZ/oShh2nXHhVRC6Ta11z2aM+Z1pLR0eJqZ85zEm6uphd+Sj++8Wiqq?=
- =?us-ascii?Q?COVHcFQ11rF9WsrSmMrAg2/+lDGJYHpyZcBSQ+US42Wszbv+9QoahJCOf/qz?=
- =?us-ascii?Q?9rnqItQk3Y5AjHu7+kXXGpCGvfMns8VUwEPd6C+fhGYjf05dYwP+r7auQV1Z?=
- =?us-ascii?Q?JJx+0rnaqlvk0d5VwTMzFsQg6XPxqPfI2uIx?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2025 15:33:06.0718
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b3741072-ffef-4a33-ac0b-08ddbefde6b8
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0001A104.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF0C60B25BF
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=crubk04i c=1 sm=1 tr=0 ts=686e8bd6 cx=c_pps a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17 a=Wb1JkmetP80A:10 a=VnNF1IyMAAAA:8 a=iejt9ChpHOqe0sw4oRoA:9
+X-Proofpoint-ORIG-GUID: ggG0dmWUhDmQYNXekEiV4MFQSbBw5Soz
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA5MDEzOCBTYWx0ZWRfXy/ADfysU53Oh xDIvQvkTOKYZCsNfNv/Npxtrvzeq4FG6vcnJXTVPp9O1/wCyDB8M+M2NGXjxlYEp4+H+JpssCrm OUfRkhrSpz2cTY+ACX0XEEfibHsQCsFV9uWeQuRSbsaCRcs2lcE3tUir3eH7YDrcya0KxRN3R19
+ swUVThNs2mSM2u2cLP8M9wvmDd9qFKEQhFyXKYR9RaDcE2HDV2RfPB9uJIlSs0D2/p3NRHOhLCd kyxjRIlNRbEXbo+Elar2qwbvRoijD0qeoOVTnesu8uNoxzUZV7EI6eqcH34kSxFnI8RkHUJ5VAD BVvG8kWSoZyYLaMt4pK3JAudgoMEJL2DNxkMIJC4dvU1BbMuNIpaJw+sVFTzn02I7n+9q765vlb
+ yW79qaNgX+E3jAgipouQ/+sIj/07Wx/g76ARgx+7K541tQzfNAXy73nuNY/O/oyKMaoZJb07
+X-Proofpoint-GUID: ggG0dmWUhDmQYNXekEiV4MFQSbBw5Soz
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-09_03,2025-07-08_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=878
+ priorityscore=1501 adultscore=0 suspectscore=0 lowpriorityscore=0
+ clxscore=1011 impostorscore=0 malwarescore=0 spamscore=0 bulkscore=0
+ phishscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507090138
 
-Some drivers (e.g., mlx4_en) support ->set_rxfh() functionality (such as
-setting hash function), but not setting the RXFH fields.
+The previous hardcoded definitions of NUM_RX_STATS and
+NUM_TX_STATS were not updated when new fields were added
+to the ibmvnic_{rx,tx}_queue_stats structures. Specifically,
+commit 2ee73c54a615 ("ibmvnic: Add stat for tx direct vs tx
+batched") added a fourth TX stat, but NUM_TX_STATS remained 3,
+leading to a mismatch.
 
-The requirement of ->get_rxfh_fields() in ethtool_set_rxfh() is there to
-verify that we have no conflict with the RSS fields options, if it
-doesn't exist then there is no point in doing the check.
-Soften the check in ethtool_set_rxfh() so it doesn't fail when
-->get_rxfh_fields() doesn't exist.
+This patch replaces the static defines with dynamic sizeof-based
+calculations to ensure the stat arrays are correctly sized.
+This fixes incorrect indexing and prevents incomplete stat
+reporting in tools like ethtool.
 
-This fixes the following error:
-$ ethtool --set-rxfh-indir eth2 hfunc xor
-Cannot set RX flow hash configuration: Operation not supported
-
-Fixes: 72792461c8e8 ("net: ethtool: don't mux RXFH via rxnfc callbacks")
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-Signed-off-by: Gal Pressman <gal@nvidia.com>
+Fixes: 2ee73c54a615 ("ibmvnic: Add stat for tx direct vs tx batched")
+Signed-off-by: Mingming Cao <mmc@linux.ibm.com>
+Reviewed-by: Dave Marquardt <davemarq@linux.ibm.com>
+Reviewed-by: Haren Myneni <haren@linux.ibm.com>
 ---
- net/ethtool/ioctl.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/ibm/ibmvnic.h | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index b6d96e562c9a..4bb8bf20a0eb 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -1519,7 +1519,7 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
- 	u8 *rss_config;
- 	int ret;
+diff --git a/drivers/net/ethernet/ibm/ibmvnic.h b/drivers/net/ethernet/ibm/ibmvnic.h
+index a189038d88df..246ddce753f9 100644
+--- a/drivers/net/ethernet/ibm/ibmvnic.h
++++ b/drivers/net/ethernet/ibm/ibmvnic.h
+@@ -211,7 +211,6 @@ struct ibmvnic_statistics {
+ 	u8 reserved[72];
+ } __packed __aligned(8);
  
--	if (!ops->get_rxnfc || !ops->get_rxfh_fields || !ops->set_rxfh)
-+	if (!ops->get_rxnfc || !ops->set_rxfh)
- 		return -EOPNOTSUPP;
+-#define NUM_TX_STATS 3
+ struct ibmvnic_tx_queue_stats {
+ 	u64 batched_packets;
+ 	u64 direct_packets;
+@@ -219,13 +218,18 @@ struct ibmvnic_tx_queue_stats {
+ 	u64 dropped_packets;
+ };
  
- 	if (ops->get_rxfh_indir_size)
-@@ -1623,9 +1623,11 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
+-#define NUM_RX_STATS 3
++#define NUM_TX_STATS \
++	(sizeof(struct ibmvnic_tx_queue_stats) / sizeof(u64))
++
+ struct ibmvnic_rx_queue_stats {
+ 	u64 packets;
+ 	u64 bytes;
+ 	u64 interrupts;
+ };
  
- 	mutex_lock(&dev->ethtool->rss_lock);
- 
--	ret = ethtool_check_flow_types(dev, rxfh.input_xfrm);
--	if (ret)
--		goto out_unlock;
-+	if (ops->get_rxfh_fields) {
-+		ret = ethtool_check_flow_types(dev, rxfh.input_xfrm);
-+		if (ret)
-+			goto out_unlock;
-+	}
- 
- 	if (rxfh.rss_context && rxfh_dev.rss_delete) {
- 		ret = ethtool_check_rss_ctx_busy(dev, rxfh.rss_context);
++#define NUM_RX_STATS \
++	(sizeof(struct ibmvnic_rx_queue_stats) / sizeof(u64))
++
+ struct ibmvnic_acl_buffer {
+ 	__be32 len;
+ 	__be32 version;
 -- 
-2.40.1
+2.39.3 (Apple Git-146)
 
 
