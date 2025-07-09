@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-205244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 480ADAFDDD2
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 05:06:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B98FAFDDD4
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 05:06:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1294D1C27594
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 03:06:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24C5E1C2776C
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 03:06:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4AA51FBC91;
-	Wed,  9 Jul 2025 03:05:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7CFA20127D;
+	Wed,  9 Jul 2025 03:05:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tVnzraLQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y3SgDsdq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BC11FAC37
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 03:05:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B48FF1E25E8
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 03:05:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752030314; cv=none; b=FYsG3k7KUleoYL8GquO1IiP+MEu7dTBOny9nf+mkaMsIt3Xz5DeAfTwimVI/dpRLhrMRYBBTLyn3P2/oRmjfhj4KrBb7AqCw7g3MfqDbIXRfzE1xb+/E8P+2uYoyPfcn1pHJ4w7b9+HQYpvYKncRKVxAMWRr8HIHCCHs3LKkXzw=
+	t=1752030315; cv=none; b=JC69ekkpkTKyiLbHuWf5DMGOuJrHlfgXkV/QLJjBRQD0rG2Fg79N9pwnl2m2nzZWgwdUAE06lK9YRJ9JNAgcFtyoxcN61HHrrvlj8QoOor1x1LogK+xNSAyhl8Rx+kZsdzW1r0dZYhAurQ731USFzH2DiPbZ8fGdyb01Cn9qp8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752030314; c=relaxed/simple;
-	bh=G2LgNmVx4S5xTlFNr7uUw50yWWQ848dhr4TOEI/wUCA=;
+	s=arc-20240116; t=1752030315; c=relaxed/simple;
+	bh=DXqVxuYIAEa90ZYYRbvgMVMEobADNe0MEGhKuAHCwpU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j0pbnsEROZeWcsYPlSd7Iin8+/KQ+lX/0ZlfDj2xjBfwf1eClDUbqTIozpkNm5GRAcPx13SfPvzEwKdNI+bPVKx5vO9OK45rQfVbHJbmVtxMBIuUEkWLHe/Yh4AD+uWgauMq8E5NtRpX1czP50f8P3qoD208ck/RrLVHLPxCvS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tVnzraLQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E03AC4CEF0;
-	Wed,  9 Jul 2025 03:05:14 +0000 (UTC)
+	 MIME-Version; b=nhLe03EIra1qzI3pCtm616gmuK+v/bO8bVYFOPWmKz0yOHFPojoG4PPqZyyaP8NwY9Hd6YYgwfkHP7B8yZnYaZJb26zh/5AnlmOkkEQc4h26DEK47LkcdYO+T0DPKiu2CCFj3JVPgNAQB0aHuS8OcdBl/k/j5AHenVAtF4/njnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y3SgDsdq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49161C4CEF0;
+	Wed,  9 Jul 2025 03:05:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752030314;
-	bh=G2LgNmVx4S5xTlFNr7uUw50yWWQ848dhr4TOEI/wUCA=;
+	s=k20201202; t=1752030315;
+	bh=DXqVxuYIAEa90ZYYRbvgMVMEobADNe0MEGhKuAHCwpU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tVnzraLQaBeCxNlYa6dJUOrPfUqOZ97V3uAPBwAmLzPwTUcWda1NK4QpzFf9S70xu
-	 l1pNDiPu7Hz3hDlVDrVq+rkHvldM75xiejarIrhvzsHAd6g2PU+Onalw3tG/7VyheF
-	 DjFh9zTCHUo9/IjylK/fm4bcCPUW4IyqqWv/kbBNyz5jOoCRhmL2zhWGes7U7hVTiO
-	 FiChzNWpy/XScL1kRw/50jUkAZj/ZifUfvTz7cSYuM9lTFOBPQh2Fm3KunlBI8C02v
-	 3NlwdyHgsaRN4LotaEOBo1R5Ec4gdtG9PPg6WCGOdHw4UyeG5z8E2qtWruqXNECfZ6
-	 c846A0+OjuYUA==
+	b=Y3SgDsdqKmfKac3R2C8VdAn4tbXcNcbGYHtVtUAaFeFxA4UjC2jTiY9ygWbzJWDXL
+	 fa5jZDCqLSav9cH6Gb8vW8K5QymZI1l6H/VSoCJIcs/a+R4CzRZO/CJAG8sIM5BIU7
+	 Hgq9/mZZBkuvnwxQ6b1JBzeMLOOgurWBEGaNQFzUafhs0lfewze829wJn9gsAdybDn
+	 tkY4jZf0rGoWLkAf95+JfbDyXFttpAhRAtt0TJJddmM4DP80e++GUNGbl//E1rTiaD
+	 oTd0OMGJSPCVcZ67tUNGcvpAgm0MZzczND1hQS1zbnz0B191dBU1GBRL38C2f+DU/C
+	 B8U7Rr83RIDgQ==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -53,9 +53,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
 	Jiri Pirko <jiri@nvidia.com>,
 	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next V6 08/13] devlink: Implement set netlink command for port params
-Date: Tue,  8 Jul 2025 20:04:50 -0700
-Message-ID: <20250709030456.1290841-9-saeed@kernel.org>
+Subject: [PATCH net-next V6 09/13] devlink: Add 'keep_link_up' generic devlink device param
+Date: Tue,  8 Jul 2025 20:04:51 -0700
+Message-ID: <20250709030456.1290841-10-saeed@kernel.org>
 X-Mailer: git-send-email 2.50.0
 In-Reply-To: <20250709030456.1290841-1-saeed@kernel.org>
 References: <20250709030456.1290841-1-saeed@kernel.org>
@@ -69,124 +69,70 @@ Content-Transfer-Encoding: 8bit
 
 From: Saeed Mahameed <saeedm@nvidia.com>
 
-Add missing port-params netlink attributes and policies to devlink's
-spec, reuse existing set_doit of the devlink dev params.
+Devices that support this in permanent mode will be requested to keep the
+port link up even when driver is not loaded, netdev carrier state won't
+affect the physical port link state.
 
-This implements:
-  devlink port param set <device>/<port> name <param_name> value <val> \
-               cmode <cmode>
+This is useful for when the link is needed to access onboard management
+such as BMC, even if the host driver isn't loaded.
 
 Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- Documentation/netlink/specs/devlink.yaml |  9 ++++++++-
- net/devlink/netlink_gen.c                |  7 +++++--
- net/devlink/param.c                      | 16 ++++++++++++----
- 3 files changed, 25 insertions(+), 7 deletions(-)
+ Documentation/networking/devlink/devlink-params.rst | 4 ++++
+ include/net/devlink.h                               | 4 ++++
+ net/devlink/param.c                                 | 4 ++++
+ 3 files changed, 12 insertions(+)
 
-diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
-index 9e1cb4cc7fe1..606070ae75f5 100644
---- a/Documentation/netlink/specs/devlink.yaml
-+++ b/Documentation/netlink/specs/devlink.yaml
-@@ -1902,7 +1902,14 @@ operations:
-         pre: devlink-nl-pre-doit-port
-         post: devlink-nl-post-doit
-         request:
--          attributes: *port-id-attrs
-+          attributes:
-+            - bus-name
-+            - dev-name
-+            - port-index
-+            - param-name
-+            - param-type
-+            # param-value-data is missing here as the type is variable
-+            - param-value-cmode
+diff --git a/Documentation/networking/devlink/devlink-params.rst b/Documentation/networking/devlink/devlink-params.rst
+index f2920371622c..0e9c0e17573d 100644
+--- a/Documentation/networking/devlink/devlink-params.rst
++++ b/Documentation/networking/devlink/devlink-params.rst
+@@ -143,3 +143,7 @@ own name.
+    * - ``total_vfs``
+      - u32
+      - The total number of Virtual Functions (VFs) supported by the PF.
++   * - ``keep_link_up``
++     - Boolean
++     - When enabled, the device will keep the port link up even if the driver is
++       not loaded.
+diff --git a/include/net/devlink.h b/include/net/devlink.h
+index b2517813ce17..13331194e143 100644
+--- a/include/net/devlink.h
++++ b/include/net/devlink.h
+@@ -526,6 +526,7 @@ enum devlink_param_generic_id {
+ 	DEVLINK_PARAM_GENERIC_ID_EVENT_EQ_SIZE,
+ 	DEVLINK_PARAM_GENERIC_ID_ENABLE_PHC,
+ 	DEVLINK_PARAM_GENERIC_ID_TOTAL_VFS,
++	DEVLINK_PARAM_GENERIC_ID_KEEP_LINK_UP,
  
-     -
-       name: info-get
-diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
-index 010a7f216388..0c2e58e75022 100644
---- a/net/devlink/netlink_gen.c
-+++ b/net/devlink/netlink_gen.c
-@@ -369,10 +369,13 @@ static const struct nla_policy devlink_port_param_get_dump_nl_policy[DEVLINK_ATT
- };
+ 	/* add new param generic ids above here*/
+ 	__DEVLINK_PARAM_GENERIC_ID_MAX,
+@@ -590,6 +591,9 @@ enum devlink_param_generic_id {
+ #define DEVLINK_PARAM_GENERIC_TOTAL_VFS_NAME "total_vfs"
+ #define DEVLINK_PARAM_GENERIC_TOTAL_VFS_TYPE DEVLINK_PARAM_TYPE_U32
  
- /* DEVLINK_CMD_PORT_PARAM_SET - do */
--static const struct nla_policy devlink_port_param_set_nl_policy[DEVLINK_ATTR_PORT_INDEX + 1] = {
-+static const struct nla_policy devlink_port_param_set_nl_policy[DEVLINK_ATTR_PARAM_VALUE_CMODE + 1] = {
- 	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
- 	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
- 	[DEVLINK_ATTR_PORT_INDEX] = { .type = NLA_U32, },
-+	[DEVLINK_ATTR_PARAM_NAME] = { .type = NLA_NUL_STRING, },
-+	[DEVLINK_ATTR_PARAM_TYPE] = NLA_POLICY_VALIDATE_FN(NLA_U8, &devlink_attr_param_type_validate),
-+	[DEVLINK_ATTR_PARAM_VALUE_CMODE] = NLA_POLICY_MAX(NLA_U8, 2),
- };
- 
- /* DEVLINK_CMD_INFO_GET - do */
-@@ -999,7 +1002,7 @@ const struct genl_split_ops devlink_nl_ops[74] = {
- 		.doit		= devlink_nl_port_param_set_doit,
- 		.post_doit	= devlink_nl_post_doit,
- 		.policy		= devlink_port_param_set_nl_policy,
--		.maxattr	= DEVLINK_ATTR_PORT_INDEX,
-+		.maxattr	= DEVLINK_ATTR_PARAM_VALUE_CMODE,
- 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
- 	},
- 	{
++#define DEVLINK_PARAM_GENERIC_KEEP_LINK_UP_NAME "keep_link_up"
++#define DEVLINK_PARAM_GENERIC_KEEP_LINK_UP_TYPE DEVLINK_PARAM_TYPE_BOOL
++
+ #define DEVLINK_PARAM_GENERIC(_id, _cmodes, _get, _set, _validate)	\
+ {									\
+ 	.id = DEVLINK_PARAM_GENERIC_ID_##_id,				\
 diff --git a/net/devlink/param.c b/net/devlink/param.c
-index 9be343a0ffd3..5f9cd492e40c 100644
+index 5f9cd492e40c..2a222d1bf81c 100644
 --- a/net/devlink/param.c
 +++ b/net/devlink/param.c
-@@ -170,12 +170,15 @@ static int devlink_param_get(struct devlink *devlink,
- }
+@@ -102,6 +102,10 @@ static const struct devlink_param devlink_param_generic[] = {
+ 		.name = DEVLINK_PARAM_GENERIC_TOTAL_VFS_NAME,
+ 		.type = DEVLINK_PARAM_GENERIC_TOTAL_VFS_TYPE,
+ 	},
++	{	.id = DEVLINK_PARAM_GENERIC_ID_KEEP_LINK_UP,
++		.name = DEVLINK_PARAM_GENERIC_KEEP_LINK_UP_NAME,
++		.type = DEVLINK_PARAM_GENERIC_KEEP_LINK_UP_TYPE,
++	},
+ };
  
- static int devlink_param_set(struct devlink *devlink,
-+			     struct devlink_port *devlink_port,
- 			     const struct devlink_param *param,
- 			     struct devlink_param_gset_ctx *ctx,
- 			     struct netlink_ext_ack *extack)
- {
- 	if (!param->set)
- 		return -EOPNOTSUPP;
-+
-+	ctx->devlink_port = devlink_port;
- 	return param->set(devlink, param->id, ctx, extack);
- }
- 
-@@ -514,8 +517,8 @@ static int __devlink_nl_cmd_param_set_doit(struct devlink *devlink,
- 					   struct genl_info *info,
- 					   enum devlink_command cmd)
- {
-+	struct devlink_param_gset_ctx ctx = {};
- 	enum devlink_param_type param_type;
--	struct devlink_param_gset_ctx ctx;
- 	enum devlink_param_cmode cmode;
- 	struct devlink_param_item *param_item;
- 	const struct devlink_param *param;
-@@ -554,7 +557,8 @@ static int __devlink_nl_cmd_param_set_doit(struct devlink *devlink,
- 			return -EOPNOTSUPP;
- 		ctx.val = value;
- 		ctx.cmode = cmode;
--		err = devlink_param_set(devlink, param, &ctx, info->extack);
-+		err = devlink_param_set(devlink, devlink_port, param,
-+					&ctx, info->extack);
- 		if (err)
- 			return err;
- 	}
-@@ -640,8 +644,12 @@ int devlink_nl_port_param_get_doit(struct sk_buff *skb,
- int devlink_nl_port_param_set_doit(struct sk_buff *skb,
- 				   struct genl_info *info)
- {
--	NL_SET_ERR_MSG(info->extack, "Port params are not supported");
--	return -EINVAL;
-+	struct devlink_port *devlink_port = info->user_ptr[1];
-+	struct devlink *devlink = info->user_ptr[0];
-+
-+	return __devlink_nl_cmd_param_set_doit(devlink, devlink_port,
-+					       &devlink_port->params, info,
-+					       DEVLINK_CMD_PORT_PARAM_NEW);
- }
- 
- static int devlink_param_verify(const struct devlink_param *param)
+ static int devlink_param_generic_verify(const struct devlink_param *param)
 -- 
 2.50.0
 
