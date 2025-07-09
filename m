@@ -1,160 +1,122 @@
-Return-Path: <netdev+bounces-205496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BAB6AFEF5C
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 19:05:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2685AFEF64
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 19:07:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67116583074
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 17:05:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5A365C1F27
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 17:07:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74923221287;
-	Wed,  9 Jul 2025 17:05:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFFB82248AC;
+	Wed,  9 Jul 2025 17:06:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V892Zdg8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K3q9pn0d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E41E8224227;
-	Wed,  9 Jul 2025 17:05:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9EA82236F4;
+	Wed,  9 Jul 2025 17:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752080754; cv=none; b=LIlTMDAp6ldE02CoZnMVfPrtKNXawCluSfhDH7pZjm3FN9jEqqb/JYqmKFLY5opciIzmO0/JjgAQDn6gYEVqpgIldbq6v0J0bE3VwM6PD9EvJVpPRIxXeRaJ54IxylJkAMbGcqbulbmKbJUkv1wD82pr9xayub4XYapG9mZI7Xk=
+	t=1752080801; cv=none; b=bLwBLfYRcBSiYyuZ41gRC9PGNw8k3qv2pxiVXKfeTPt82cnFjr9AMbfWJYH5EwY2N8icmnMXpOkhV1VhhDsCf03+Y5py7GRHf5Dpai+RCfdJg5H9uiteCUrjF65fO+R8HMrjOeihDcDXjZt9iL7rFuWHlwpVZ9zXuAl5ns61YNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752080754; c=relaxed/simple;
-	bh=cFmMmbNOZ2lQJhyooZRxqPMgpHehUky7qeBgN96eCfc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sNs3tRG2cP4FwP2aB2fv4KOgI5RVQ41v5LnqT06ZiXT/EMoFjyFgXvT8ozGYzyQrViMOWPoCLm4JyRz+ILGJ8KafL/WZ/A0HzOGXb7S8P2c76hHaFVuMXGs7dm6KCLJqtkIivSn5/TkaEdRsVcCg8uB19LJqovl47R6dwOXXDa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V892Zdg8; arc=none smtp.client-ip=209.85.166.169
+	s=arc-20240116; t=1752080801; c=relaxed/simple;
+	bh=PCsRHb16/w6OPdQuqT/+FEz8a7zxthYKUoQWvwGfHyE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=XgX1hAraMGHhjPwnrnoxxouBCw4z9IWppjlwTwbISn6fKmwYFeJdEnMzP97JcNi9X+pmx6MiGkvqin8emH/pnLat4wg7P5VaerUHjx2U+j88uI1wmGfXC/6R/gTQsjPQv7dft4ptaQlASkwV1yjy0ax2qQHuArXk2M19oxqBw4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K3q9pn0d; arc=none smtp.client-ip=209.85.219.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3e05c718bedso611565ab.0;
-        Wed, 09 Jul 2025 10:05:52 -0700 (PDT)
+Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-e81826d5b72so27432276.3;
+        Wed, 09 Jul 2025 10:06:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752080752; x=1752685552; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1752080799; x=1752685599; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fGs7uOkUqSiWd98cc20bhkdpAwjdYLKrg86sS4UNbPk=;
-        b=V892Zdg8fsjyI89B0xMvGLjV18vVU9AvWE+4hFA3XhUI/+c9d6QsnUNp0fw7d3L1mb
-         Ita4u48xGVkJg5UJRpZzG97DG2FIlOh1/zIIl/jziqPfHC7vnf7WyScs1aFYifAE5jCi
-         +Fb251l4pCPhFJmHMdmTgsMZeREa5Z/yeeREyhhVmLKRHfDbDBEGzDdY8C/D2Q8JDjAV
-         gjOC5Wi16mRe6K/T55ivuNxGtZzm5be7cGUzj1qsSG+6FcgwoTcrH2bUK/2Kxmn6ZUcj
-         jTmGkI5L35GhNRKoohd/gUyYpeGgamOLWwmugmFcTLD2aC5resbE3adpS3M1Ju6UQ019
-         +DqQ==
+        bh=JKSNNxL5WsDnDxC3c90ixMXQtVsa+mzdB9YIiLJb/GM=;
+        b=K3q9pn0dsccBMDaF4nIIXByTcbcpnut14ocMZBp5NOP6uQ9gTy57K7/pK+Ho9HBuYD
+         lSg3jpgwNONVlOAdrHfxMmBPvVRHNr3sxyLmwlcprQj7cpsyTPF1X+xPrF08RYRtyUG2
+         IxD7SO3lqD5dKwqjRvPf4ziIh0f/W3LevsbsICN8LU5Mwl2gwguE2cJLGUS2nulaZn7y
+         mrA2v1RkdGQ6t5OFAJcTYv/oJZpz76leqMKHQhUWgdWLjx6tginYG6tTuPlkRMl8Uxhf
+         KcnGWZhL8Xj3ljLX4Et7/idp8dpSCv0izl1res2TaF3wbFvYUG4SnYTa6EdJ6XBqqgiS
+         3Clg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752080752; x=1752685552;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fGs7uOkUqSiWd98cc20bhkdpAwjdYLKrg86sS4UNbPk=;
-        b=Mvo4vHiqIG3NsO28Kw1IPhspoeuUsXV2R5aVHJgL2zwVzblQ4XLepam3E7YdfLvp04
-         dbcCdL7OY0BuZiDpxu0Fs0HjH7T1yXXtlocQeXRqujZzH0Xr4dtYe9gSAe5mhdC2pYQG
-         kdDHwGV7FI07X7e1O8FdZ0fYj+YKTyhW/+l6hCf+VE4O8i0Coh4WV0rpXXJcZmHJxwOf
-         7r1aj2eN1+7YHhe6eJ3RhiWALbnxRR+qcAWzmMIatpeBKOBxDS+ML+Ad4OvhQVpkfxCq
-         hV2lvfuyoOkLKKYcl8T/4LxQnIkywZp+A2fY9CfrWyt2xZ/ffaU+hnU5k8/aNoJ24Fsi
-         SszA==
-X-Forwarded-Encrypted: i=1; AJvYcCUb1GwvxkCeYL47T9uHin8zTBF94IZ9X5JzAxVDquFPfOBm9a1KHY8+jON9yAwyEXQOqa7jjzNiLP4Z@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdOy+JlkMKcsRLAUgIna3ug3/mYHHEwJ4yw9OAysDgORkNLsMn
-	+3Z2VbsIbyu9h4xhwtUGSKWiQVnqRItxQiwkGuFle/ezCePdRnFJnWA50VJiTKRuEh25t3Q5rE0
-	uG3nnIqnbxR0IV6qGr5xf7tc82a9qqYQ=
-X-Gm-Gg: ASbGncs8Wvd2kpuz6Rshxu9gJaGIybdENuzenU3UGTpYC+RQVfgd5jdiP/Hs8t/cpgx
-	eK1wvly1eYriMalvM/4DaWrp7anLGMgivOby8W8qN12umpWWq+WuISrv70xrJm4hWNfy/8mVQOq
-	2CUhyxtvwRwEs59yZeIQX4MmI0CHSheddtzPj0ArkLfq90y8pql+CNq/6zTDr3UhbO83yY7rleC
-	t8eCQ==
-X-Google-Smtp-Source: AGHT+IHkC8eqHXDge3FF4Xvot2aMbjbR7sKK8tVlJ313IzZe9U21AnU/z/HqEzLBntqyUltgr5L5GDqFvSXbBSlJJjc=
-X-Received: by 2002:a05:6e02:744:b0:3d6:cbad:235c with SMTP id
- e9e14a558f8ab-3e243f93c4amr7234935ab.6.1752080751927; Wed, 09 Jul 2025
- 10:05:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752080799; x=1752685599;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=JKSNNxL5WsDnDxC3c90ixMXQtVsa+mzdB9YIiLJb/GM=;
+        b=j4FF6LGpLo+VOKLVaNVLZgHowdXDhBNClo9EOUeIsBke0r6XsrllU+FaUu/esI3rXs
+         As4QhivIZRSZ2QUnRazq/WEJWfz0v+WuzSnoWj/O4qGNc9woxHkcRww6QaDAgX5bZxxr
+         yF/ThgWcMl+P85yU3pJKdszbLErmUnBUaefyFNsDbsXwfSLiB+WZ01PYv8YP57v5a/+S
+         hbpCEe6Z9y4e+3Rj1VKnfqL1MCrPvO2NlXnNaaL4ybSzn64ziJ0PIWIVy3RacFssORQ3
+         cIbqdL5D4LJEbD14RvCB+IL2kLUBDJ4L4tHG+fEx9tISfC9e+gK3VPkV8YvGV2JoP9PC
+         /UcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUZQCUIoF+vY8v4aPHKhZLQCuPQl5xB6f47pIjnU6Qn/RzY6MHsLoYLq2S3HH4fuSSIFfMLw+Yzbax7HvA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzydhD9FR0liRc3YlTo5LnyVZEIwpMdgVTs6u2+IA9/89B+Ux9N
+	XMViZ9oHQoyVWCJcshAnbrHakjWBmu/efIgI1lVZ/o3pOvD09Ka4iqhq
+X-Gm-Gg: ASbGncuBraoEPOgLqpDDA0QOGdo9xrVwVgOaDj15sP9RZNnnwB7ggVHr5KaMhlrn3c/
+	RGV2O0AqBOa3ne2s2zwGl20EaoxbIOlsaKJitgJt45HMbAmaK3h+gS5Ms1Cf+Ir+UfPa8dZvMwR
+	7OKe6h8tHQaeRijAHp40jFSKWzuKjPQDMU7SwaR/Azcx8zzeWg3xUZxpjjlLMufFin8W1EhqV/Z
+	e5ofPMDnoUtkea7KSLGGI7zOS5KENo4EiyRhAzUwbAUSd+SwyWtzCLHJMSPnwfhi3xoRX4IlI7b
+	rjs2LwAr27ZRf5zkQ7Wuhid38/tLVOzM3Gis/6ytWyVfIbJYG15ZTnw9GR9YZc5MCB4+ikQfVR4
+	gjoZFEegX6ASuCzH+bPRxZpu9UNtSz94uAHOCXi/jr/2aOH5XRg==
+X-Google-Smtp-Source: AGHT+IH+VORUh2t2kr4QaWB2b6rEwtDKXQx0qvLvW1/lu6Pjwzs5YpBiAZaSctfVyzxx+55Pa1iU8w==
+X-Received: by 2002:a05:6902:5005:b0:e7d:ce24:636e with SMTP id 3f1490d57ef6-e8b77e15710mr294385276.31.1752080798754;
+        Wed, 09 Jul 2025 10:06:38 -0700 (PDT)
+Received: from localhost (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with UTF8SMTPSA id 3f1490d57ef6-e899c4b3424sm4102244276.50.2025.07.09.10.06.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Jul 2025 10:06:38 -0700 (PDT)
+Date: Wed, 09 Jul 2025 13:06:37 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Yun Lu <luyun_611@163.com>, 
+ willemdebruijn.kernel@gmail.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com
+Cc: netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <686ea19d859a5_a6f4929455@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250709095653.62469-2-luyun_611@163.com>
+References: <20250709095653.62469-1-luyun_611@163.com>
+ <20250709095653.62469-2-luyun_611@163.com>
+Subject: Re: [PATCH v3 1/2] af_packet: fix the SO_SNDTIMEO constraint not
+ effective on tpacked_snd()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <cover.1751743914.git.lucien.xin@gmail.com> <74b62316e4a265bf2e5c0b3cf7061b4a6fde68b1.1751743914.git.lucien.xin@gmail.com>
- <2641256.1751992436@warthog.procyon.org.uk>
-In-Reply-To: <2641256.1751992436@warthog.procyon.org.uk>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 9 Jul 2025 13:05:40 -0400
-X-Gm-Features: Ac12FXw-Gy78wqwOzpg95VzRYPTCTxXs-MQSS5qJzV_rAfy_j3TuOneN8vlxOwI
-Message-ID: <CADvbK_dDbzdxdfZT43M17hG6TKFfoQZ+YuZGR6q6E5s7eRUr4A@mail.gmail.com>
-Subject: Re: [PATCH net-next 05/15] quic: provide quic.h header files for
- kernel and userspace
-To: David Howells <dhowells@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
-	Alexander Aring <aahringo@redhat.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
-	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 8, 2025 at 12:34=E2=80=AFPM David Howells <dhowells@redhat.com>=
- wrote:
->
-> Xin Long <lucien.xin@gmail.com> wrote:
->
-> > +#ifndef __uapi_quic_h__
-> > +#define __uapi_quic_h__
->
-> I think capital letters are preferred for system headers, e.g.:
-> _UAPI_LINUX_QUIC_H.
->
-Looks better, will update.
+Yun Lu wrote:
+> From: Yun Lu <luyun@kylinos.cn>
+> 
+> Due to the changes in commit 581073f626e3 ("af_packet: do not call
+> packet_read_pending() from tpacket_destruct_skb()"), every time
+> tpacket_destruct_skb() is executed, the skb_completion is marked as
+> completed. When wait_for_completion_interruptible_timeout() returns
+> completed, the pending_refcnt has not yet been reduced to zero.
+> Therefore, when ph is NULL, the wait function may need to be called
+> multiple times untill packet_read_pending() finally returns zero.
+> 
+> We should call sock_sndtimeo() only once, otherwise the SO_SNDTIMEO
+> constraint could be way off.
+> 
+> Fixes: 581073f626e3 ("af_packet: do not call packet_read_pending() from tpacket_destruct_skb()")
+> Cc: stable@kernel.org
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Yun Lu <luyun@kylinos.cn>
 
-> > +enum quic_crypto_level {
-> > +     QUIC_CRYPTO_APP,
-> > +     QUIC_CRYPTO_INITIAL,
-> > +     QUIC_CRYPTO_HANDSHAKE,
-> > +     QUIC_CRYPTO_EARLY,
-> > +     QUIC_CRYPTO_MAX,
-> > +};
->
-> I would recommend that you assign explicit values to enums in uapi header=
-s to
-> avoid accidental changes if someone tries inserting in the middle of the =
-list.
->
-That doesn't sound like an easy mistake to make. Assigning explicit values
-to zero-based, continuous enums isn=E2=80=99t commonly seen in other header=
- files
-either.
-
-But I will make such a change for QUIC_TRANSPORT_ enums, as their values
-are actually defined in:
-https://datatracker.ietf.org/doc/html/rfc9000#section-20.1
-
-> > +struct quic_transport_param {
-> > +     uint8_t         remote;
-> > +     uint8_t         disable_active_migration;
-> > +     uint8_t         grease_quic_bit;
->
-> I believe use of __u8, __u16, __s32 and similar is preferred to uint8_t,
-> uint16_t, int32_t, etc. in UAPI headers.
->
-Make sense, will update.
-
-Thanks for the suggestions.
-
-> > +enum {
-> > +     QUIC_TRANSPORT_ERROR_NONE,
-> > +     QUIC_TRANSPORT_ERROR_INTERNAL,
-> > +     QUIC_TRANSPORT_ERROR_CONNECTION_REFUSED,
->
-> Again, recommend assigning actual values.
->
-> David
->
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
