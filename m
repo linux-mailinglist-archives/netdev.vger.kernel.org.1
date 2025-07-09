@@ -1,140 +1,117 @@
-Return-Path: <netdev+bounces-205557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60714AFF3F6
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 23:36:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E735AFF410
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 23:43:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFC6817B0F2
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 21:36:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D373A7BA618
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 21:42:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357422356C3;
-	Wed,  9 Jul 2025 21:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B0BD23C514;
+	Wed,  9 Jul 2025 21:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YpNjpXql"
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="Zgf5ycfA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A38DA92E;
-	Wed,  9 Jul 2025 21:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD14723D29D
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 21:41:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752096990; cv=none; b=KfwcrTIFMcxrWEBNTLKK2XmcyvVH1rW8HoOsm9BoPxb2FWfmO6UCzQ0dFE9jurtWL+qC+OmPie4oYOem/Am4+9rRPvu5ynsSQM5DM694bwsfhQdffqQzBdPo6gGlUbThrum5iWJLEzCSi1FUZB//1+Z0Qk8kF0un3zkUnslKDNg=
+	t=1752097294; cv=none; b=WCv/VpianlXFwjiIzjOfvAKK/QLRi9lbv4FCSeKhvDEtBcfxoxkwgZYd/AaQGWe+jZnB9j50b4c2hTTIKuN2ztEwo9U4zRyTCzZBkhJ5PpsDYBATEMguarkhbUeHKdGq2bbh13+rgpN2FedaKTNQyyvvjMld/bjHri6Mv/53gqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752096990; c=relaxed/simple;
-	bh=X09/sEb3XhamlC+vt9JdvngiL7149Hhsv9cY4kynNSo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pWhrspTTNKLmyFYZ7/Z9ZZ0TNZG7s5zYd5cfvtesl42f6Y4WMaqRQHkURQkgFFJqPsjPm2An4QTIxm5MsvYLnFreOt4S3AYal7evqe5a5fl9hXe3pkqFe5wx7dzKttIoF1OKKtozy9+8+jFTGtMzPCSiDK8Vxa48AfH3ooRHr14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YpNjpXql; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E22C7C4CEEF;
-	Wed,  9 Jul 2025 21:36:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752096988;
-	bh=X09/sEb3XhamlC+vt9JdvngiL7149Hhsv9cY4kynNSo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YpNjpXql0cENeLUbrpd51BO7B3T+jfccpMyTxMWWNaQdJF4aYQwjmvfCoYMba0JzX
-	 0iB1TN6t6G5lZBG4SgE0RXIfFIWTxxlrb4005c9wEg9YHhFjBaQXpyIFSBh9HyKJXF
-	 ZHIiR5cQB4gxjY8W+pqtA7eq114vN3SYKk8Qb+TUj4dW9rez5/u2qLmkLnApxwZc3R
-	 H0yfpIsY53q2sqzYqoP7xqPAIyhXeWu5Hqromi2RVzkRo0cnG7gdQJIOyovAHIL+CB
-	 PlBglwVTvqO/kWSHiStJ50ImpFIrM+s8DHQid+Ut8RkRoWjwWYcJyP2VUSpjxvy3mW
-	 c8nk8uwxLqXEQ==
-Date: Wed, 9 Jul 2025 14:36:27 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-team@meta.com, dw@davidwei.uk
-Subject: Re: [PATCH net-next v2] netdevsim: implement peer queue flow
- control
-Message-ID: <20250709143627.5ddbf456@kernel.org>
-In-Reply-To: <aG5FrObkP+S8cRZh@gmail.com>
-References: <20250703-netdev_flow_control-v2-1-ab00341c9cc1@debian.org>
-	<20250708182718.29c4ae45@kernel.org>
-	<aG5FrObkP+S8cRZh@gmail.com>
+	s=arc-20240116; t=1752097294; c=relaxed/simple;
+	bh=qHr/ej+IX4u/FXh28EYJbuaYRkiMF1DPwAgk02tEV9E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TXJGA+5s0sFvvpPO20j+ZabD07NYgGtplfY5y2eHLhk5jitr/V9Ug/LV5u5RyOzfH3ZVHFugErVuqV+hV/MrykMhhZBuSXUhvcaecFYMOQER3lEtRzfK8ePlTi4pwYDHedvAeOCsJmcUSZWCONY9fVQ2Y5BcheBaQglzmvHLtl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=Zgf5ycfA; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2363616a1a6so3274765ad.3
+        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 14:41:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1752097292; x=1752702092; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hETGV1Ls3GgOBkGlRIJgrhnNVooPnMq+2ARFX1z9RCc=;
+        b=Zgf5ycfAfpC87hkKVUwDBl6PDm9jIvNXZuDdi4gEdY5xd0l71KOF0fHdUie5nz5xuq
+         2OHcbuaicONGrte8RKZlrkBV1k6WJO3Tsnwjqb4g+fSs/AfJqh41wkp6rxfNuApLz1K6
+         LfDrV3g2GBCakFI8cjn6jTSrD8BqCesEnqKxcaWQ7gw9WVaGP1CLUGbeaU8fwPZ2duea
+         0U53fg9jU+L6aw+IY/E3IQqcZ5fTGIhs2ri4eknTfh2MX/MPzxwf3WJIKyHfxLfF5AI9
+         UzQy7OBsaTnX8s/x3lmfHoR0RnT5/uc1IeWAnjK2gniJiEdKnr5bvbni2/I3G5e6H3Nn
+         oq8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752097292; x=1752702092;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hETGV1Ls3GgOBkGlRIJgrhnNVooPnMq+2ARFX1z9RCc=;
+        b=dEbca1SDih2YVo4oPhSSddm6TDBh1/ggnqv7SEnagie1a7IVxkPUwmXw0gIWYczfdu
+         CEPf5m2fYDExFt8oxQCmjxMVQ0QGgZxh3mO1njomFcqNmViF5I0QYuRe/Uy2NWkoiIcR
+         9i9w2RcvTnwWVw+9kiV+0cV4GhNB/nZ4Xcl5z2YPepb+c7Hup1u7lwCqxVLtlWwwEXwh
+         miOthpDxQepzjpORFBBPqbH1YAdGspJkvVNxUAiwqCAa9Gtaw0lwTNyAwpmbONwu4QTB
+         uRSEx9xpA6d+RY4Zzu1ABGmJr7+SmD2RCmQy3sX1WzTWPniNP23At5hvqDS4YaozqwQc
+         aNGw==
+X-Forwarded-Encrypted: i=1; AJvYcCU2mYsDhfCoWmflI1l3uhepW4o9+UzHZ6xA00L2po5RkiaqVFnPkNHtm1lTxzJItaCbZ4/IhCA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9dzCxrJR5m+I6aYXYDFi0+gcM5u5G6KzNwkDAjxGpU34hlpz8
+	El1LQYfu7QYXQFe1g1/Iwm2ywafa8RR01aUx07Xv2FIHUgimbme/48Z/gVeS+urHPQ==
+X-Gm-Gg: ASbGncsJx+vKZJjVXacpl8MAgm9Xix6FvF7s4gudIuC5VtLBNKb8FWQBb0uMyR/5YAg
+	1OSuZ+NVWBwaKSaHD/ULc/vvx52V43nA+EKkl0Dqzq9KCBcbsEJ5xFjZ1yC1zF34vAhY+UKKRtk
+	dDpA+eMOmPwAG+LKT5+pqlDJMMXsDU6nKPHEWb5O2T7baMhjjd1OXYJ9zB9R9d/sTxrxrEMKCsk
+	g+KcPr+IdD3ryehiZ0Cl5vGYuPGpTSMrdLhUs5zcVNNKdSR5p7NugFNt6IoN+aDX0YWudIXEr1r
+	yzai3syszBfq20odseqket0+XYJZqunL2dkfsOCYJx7BpYwUOes3B6K5y+Lla1EFwAFtR0J6
+X-Google-Smtp-Source: AGHT+IFnJcQwEQHae5JdSMVgd9oMj46DkZMI+34z6jt8pPMFYFoq1dG3JPWONtAz6v/TuAPp1s37/w==
+X-Received: by 2002:a17:902:ef02:b0:234:d679:72f7 with SMTP id d9443c01a7336-23de4832d76mr493955ad.23.1752097292143;
+        Wed, 09 Jul 2025 14:41:32 -0700 (PDT)
+Received: from xps (209-147-138-224.nat.asu.edu. [209.147.138.224])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de4341a99sm1394975ad.170.2025.07.09.14.41.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Jul 2025 14:41:31 -0700 (PDT)
+Date: Wed, 9 Jul 2025 14:41:29 -0700
+From: Xiang Mei <xmei5@asu.edu>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: xiyou.wangcong@gmail.com, netdev@vger.kernel.org,
+	gregkh@linuxfoundation.org, jhs@mojatatu.com, jiri@resnulli.us,
+	security@kernel.org
+Subject: Re: [PATCH v2] net/sched: sch_qfq: Fix race condition on
+ qfq_aggregate
+Message-ID: <aG7iCRECnB3VdT_2@xps>
+References: <aGwMBj5BBRuITOlA@pop-os.localdomain>
+ <20250709180622.757423-1-xmei5@asu.edu>
+ <20250709131920.7ce33c83@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250709131920.7ce33c83@kernel.org>
 
-On Wed, 9 Jul 2025 03:34:20 -0700 Breno Leitao wrote:
+On Wed, Jul 09, 2025 at 01:19:20PM -0700, Jakub Kicinski wrote:
+> On Wed,  9 Jul 2025 11:06:22 -0700 Xiang Mei wrote:
+> > Reported-by: Xiang Mei <xmei5@asu.edu>
+> > Fixes: 462dbc9101ac ("pkt_sched: QFQ Plus: fair-queueing service at DRR cost")
+> > Signed-off-by: Xiang Mei <xmei5@asu.edu>
+> 
+> Reported-by is for cases where the bug is reported by someone else than
 
-> On Tue, Jul 08, 2025 at 06:27:18PM -0700, Jakub Kicinski wrote:
-> > On Thu, 03 Jul 2025 06:09:31 -0700 Breno Leitao wrote:  
-> > > +static int nsim_napi_rx(struct net_device *dev, struct nsim_rq *rq,
-> > > +			struct sk_buff *skb)
-> > >  {
-> > >  	if (skb_queue_len(&rq->skb_queue) > NSIM_RING_SIZE) {
-> > > +		nsim_stop_peer_tx_queue(dev, rq, skb_get_queue_mapping(skb));
-> > >  		dev_kfree_skb_any(skb);
-> > >  		return NET_RX_DROP;
-> > >  	}  
-> > 
-> > we should probably add:
-> > 
-> > 	if (skb_queue_len(&rq->skb_queue) > NSIM_RING_SIZE)
-> > 		nsim_stop_tx_queue(dev, rq, skb_get_queue_mapping(skb));
-> > 
-> > after enqueuing the skb, so that we stop the queue before any drops
-> > happen  
-> 
-> Agree, we can stop the queue when queueing the packets instead. Since we
-> need to check for the queue numbers, we cannot call nsim_stop_tx_queue()
-> straight away. I think we still need to have a helper
-> (nsim_stop_tx_queue). This is what I have in mind:
+This bug's fixing is a little special since I am both the person who reported 
+it and the patch author. I may need a "Reported-by" tag mentioning me since I 
+exploited this bug in Google's bug bounty program (kerneCTF) and they will 
+verify the Reported-by tag to make sure I am the person found the bug.
 
-LGTM!
+> the author. And please do *not* send the patches as a reply in a thread.
+> I already asked you not to do it once.
 
-> > > +	if (dev->real_num_tx_queues != peer_dev->num_rx_queues)  
-> > 
-> > given that we compare real_num_tx_queues I think we should also kick
-> > the queues in nsim_set_channels(), like we do in unlink_device_store()  
-> 
-> Sure. I suppose something like the following. What do you think?
-> 
-> 	nsim_set_channels(struct net_device *dev, struct ethtool_channels *ch)
-> 	{
-> 		struct netdevsim *ns = netdev_priv(dev);
-> 	+       struct netdevsim *peer;
-> 		int err;
-> 
-> 		err = netif_set_real_num_queues(dev, ch->combined_count,
-> 	@@ -113,6 +114,14 @@ nsim_set_channels(struct net_device *dev, struct ethtool_channels *ch)
-> 			return err;
-> 
-> 		ns->ethtool.channels = ch->combined_count;
-> 	+
-> 	+	synchronize_net();
-> 	+       netif_tx_wake_all_queues(dev);
-> 	+       rcu_read_lock();
-> 	+       peer = rcu_dereference(ns->peer);
-> 	+       if (peer)
-> 	+               netif_tx_wake_all_queues(peer->netdev);
-> 	+       rcu_read_unlock();
+I am so sorry that I misunderstood it. Now it's clear, we should always 
+not use "-in-reply-to".
 
-That's sufficiently orthogonal to warrant a dedicated function / helper.
-
-In terms of code I think we can skip the whole dance if peer is NULL?
-
-> 		return 0;
-> 	}
-> 
-> 
-> Also, with this patch, we will eventually get the following critical
-> message:
-> 
-> 	net_crit_ratelimited("Virtual device %s asks to queue packet!\n", dev->name);
-> 
-> I am wondering if that alert is not valid anymore, and I can simply
-> remove it.
-
-Ah. In nsim_setup() we should remove IFF_NO_QUEUE and stop setting
-tx_queue_len to 0
+> -- 
+> pw-bot: cr
 
