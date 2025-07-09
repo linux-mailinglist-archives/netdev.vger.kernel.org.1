@@ -1,90 +1,80 @@
-Return-Path: <netdev+bounces-205428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 525DFAFEA4F
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:35:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5FFEAFEA53
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:36:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0400316F4A9
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:33:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8994481635
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AE822DAFB4;
-	Wed,  9 Jul 2025 13:33:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503AB276025;
+	Wed,  9 Jul 2025 13:35:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PgdVTFIW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z0Eb8pt1"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84132BE7D9;
-	Wed,  9 Jul 2025 13:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3922C187
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 13:35:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752068017; cv=none; b=m1+GipWvICqq0pxlT4fswFUBf7DURhkvhKfNGF1NUUeQ4mvZDwWT9pIh+l6EEPax1N0OFif8owWU4aoiztxqyhpDvi8F2zjAFVuxztl1Dw16vAfj+ozWSFHyhyvH+DozNFPiy52Qurkg2sLrX5cy5hLPfZB+qAIxD+Tf24UDkwI=
+	t=1752068156; cv=none; b=oLs2YF8JQZDa1s+25l5ViLEeUQPbGTfRyFb3KT3BjhDxu+Lqnl+s/RzTu26oTL0ItWPJjOzfNJH6vYTsSnT+zGNQqVVwbjjFMoHqhyq37DbMSF1Ge3dWuEAbudKOp3b6lTPJhDqLML11lnRCbBwjOtlLTnOYSvT9zvDQ1XGInWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752068017; c=relaxed/simple;
-	bh=EAjyN1mnuQEc2DPAj9sCbgFnm9w066/f8wIgUKYYUdg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nGJbpcvBZauk1bKGWpqwUbBqotTvWcy68ww+0eV2tKrUI2fzFxAahp+7pkk2Olex8aVdyA/9ejt9XJNKR7dUhp/VMIo2BrUlQAXgRHcEni5xoMfAr6ZIXmfS1OZKnlL2L2kmJ/xSC3V+kJ96z9kMvpXt3urbJtzG3Xk26gSwQh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PgdVTFIW; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/GZOP1kf5dBhxXZChg6bf018g5kHcCt9ChDwuA2ncBI=; b=PgdVTFIWg8Ltwdn7UXhgdbd7WQ
-	3oyHzL8fIi/r2E4SRo7qRg0IYkGHNAF1OmoakW4a6MvSW9vu61zW2lZMQ70axfr4Z4vWeZvUmyDmj
-	M7kJfeKRGKcwDsbIwGnFWe67zjN5xfQzv1YNXhJ18ZBoLiXiLehNayNhACc/VjqyxVQM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1uZUvV-000wfY-Is; Wed, 09 Jul 2025 15:33:33 +0200
-Date: Wed, 9 Jul 2025 15:33:33 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Buday Csaba <buday.csaba@prolan.hu>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] net: mdio: reset PHY before attempting to access
- registers in fwnode_mdiobus_register_phy
-Message-ID: <fbb2da18-0929-4c61-a940-6a3d4fbea3e2@lunn.ch>
-References: <20250709132425.48631-1-buday.csaba@prolan.hu>
+	s=arc-20240116; t=1752068156; c=relaxed/simple;
+	bh=gKiGZ0AksMwzHB5RRv/vFdwH3Y2aHQGDuyLyd2pl6Io=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mEzJ8dNJi9d8cSkByJKb3iEYPrhZKSvmGbCyuzjMM3orjOjqJGwkLMG2rq/QXurd9Dft9f63/fRQbcyAnOgm9y5Zo7Sv1Cab+WaNyZp/+RbL1XrRnyHaYuDW7cMA+fH358rFlZpjPnELWG3X0+FnnS+6e7ymsn0RH3UK5OST1+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z0Eb8pt1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C586C4CEEF;
+	Wed,  9 Jul 2025 13:35:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752068155;
+	bh=gKiGZ0AksMwzHB5RRv/vFdwH3Y2aHQGDuyLyd2pl6Io=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Z0Eb8pt1bpcj917PTMIV7dERDEjIPA83VaeWi0xqf0VnWpiOJ32+AWhoKbKIf8BaC
+	 6AAMcymB6tg/TVaa7hMqvpr+suQrRG3uBS5k9Xrd4yc7rn1hTwwhJD6EDA2qS2A1Jz
+	 w72e06qilRUH/RqJAcKrqEsS7Q0ICsD7EEGZbzfZutGGCoXP8P/YA5/ulwigT3ZB3f
+	 DFilxbP108NAqWAhYsyf++ToFBlTsRr8PKPcO8DXpLdFrx95Tdl3Zhk7j2UMxkgp4b
+	 +h03B97wXt4gtEzGLW5qp3T6smdW2ZTs82gldathYfYmLMd2jdy+OjoLEuqZZiKarj
+	 fFvo80qnVxCGA==
+Date: Wed, 9 Jul 2025 06:35:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com
+Subject: Re: [PATCH net-next v3 5/8] net: s/__dev_set_mtu/__netif_set_mtu/
+Message-ID: <20250709063554.7c771beb@kernel.org>
+In-Reply-To: <20250708213829.875226-6-sdf@fomichev.me>
+References: <20250708213829.875226-1-sdf@fomichev.me>
+	<20250708213829.875226-6-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250709132425.48631-1-buday.csaba@prolan.hu>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 09, 2025 at 03:24:24PM +0200, Buday Csaba wrote:
-> Some PHYs (e.g. LAN8710A) require a reset after power-on,even for
-> MDIO register access.
-> The current implementation of fwnode_mdiobus_register_phy() and
-> get_phy_device() attempt to read the id registers without ensuring
-> that the PHY had a reset before, which can fail on these devices.
+On Tue,  8 Jul 2025 14:38:26 -0700 Stanislav Fomichev wrote:
+>  int netif_set_mtu_ext(struct net_device *dev, int new_mtu,
+>  		      struct netlink_ext_ack *extack)
+>  {
+>  	int err, orig_mtu;
+>  
+> +	netdev_assert_locked_or_invisible(dev);
 
-This is specific to this device, so the driver for this device should
-take care of the reset.
+This one fires, should it be ops-locked?
 
-To solve the chicken/egg, you need to put a compatible in the PHY node
-listing the ID of the PHY. That will cause the correct PHY driver to
-load, and probe. The probe can then reset it.
-
-We have to be careful about changing the reset behaviour, it is likely
-to break PHYs which currently work, but stop working when they get an
-unexpected reset.
-
-    Andrew
-
----
+[ 3137.181693][T26830] ------------[ cut here ]------------
+[ 3137.182161][T26830] WARNING: CPU: 1 PID: 26830 at ./include/net/netdev_lock.h:17 netif_set_mtu_ext+0x27f/0x5c0
+[ 3137.185509][T26830] RIP: 0010:netif_set_mtu_ext+0x27f/0x5c0
+[ 3137.193144][T26830]  do_setlink.constprop.0+0x6b1/0x2480
+[ 3137.198661][T26830]  rtnl_newlink+0x69a/0xa60
+-- 
 pw-bot: cr
 
