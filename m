@@ -1,193 +1,112 @@
-Return-Path: <netdev+bounces-205392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1D54AFE757
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:16:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3AB2AFE71A
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:11:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3BCF482AB9
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 11:14:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29E5F1668A5
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 11:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9447528DF44;
-	Wed,  9 Jul 2025 11:12:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685F228C852;
+	Wed,  9 Jul 2025 11:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="MzVzvAE1"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YvNUzQZE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout4.routing.net (mxout4.routing.net [134.0.28.9])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86AED2BE7D9;
-	Wed,  9 Jul 2025 11:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893442701CE;
+	Wed,  9 Jul 2025 11:11:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752059533; cv=none; b=NhicIaz5frOMAHiyNBCUv1KUHgy7FeUZVhu4qdDUa10t5hEy30C/iJCLPsYCh1fY0QaWILNAx1DBkKhtldKGrapMtndmJyjeZTi+X7lZ7XT/nMBUfIP2JNVX8qAUnNLP8aAizjX3tAo9L+rRkIfQgT9tNwDlj5MaqmqE7pjIHfY=
+	t=1752059489; cv=none; b=DABH78rZ+obVP2y/nf0ruMNVipWmznJuijT8SFFcjFQKwu4rHpZ2Jeoxa48r253J0kjSfRVHcR9VgKPhNaZYbbLmiYfQuATTxZ4b8BGzXVjOu/ZHDTg8tLnohCwv3iryD58nM1jZJxFvsCJSsL2eYLj+AWwGHMosEQSBCZMeWM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752059533; c=relaxed/simple;
-	bh=owery2Y9xho1bAvAYoxF0F6uDfB7KsKdTzyV/Nr07xM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Er5VodP2n+B/eeO9ABPQLyZ/E444TWfp+IxJ5BSlVKRK5OMtptiOe9rYHARJoqNxI9Q4uwaPw9P0XwwoZNH1lS550R7HRJFZvuSxDAXRXP+w/HBbu1ixjJWBHhJ/3dXcz9Im6qR3FxEy6IoRDZ6pCQAtp+N60MaI77rh/N7gAt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=MzVzvAE1; arc=none smtp.client-ip=134.0.28.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
-	by mxout4.routing.net (Postfix) with ESMTP id 63661100935;
-	Wed,  9 Jul 2025 11:12:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=20200217; t=1752059521;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Mw75z6h4HeFha6AF7YI1R1VXg23z1dS7Y1C1o8vw7rQ=;
-	b=MzVzvAE1gokUWwIKohEWFrqkPn4hiv/+0+mq6sOvaeCNU1/FTCDq2+GTySkfzPhl6ikOep
-	ZGnFWnZqezfYLi7yFydOCJnMZWb9U2wsDEfnlrdP8rXQMx4xpbleJjClGOoMSCfIUYeGOI
-	WiKHQTbWf/Q44EYQYxitbsg1xxXa0U8=
-Received: from frank-u24.. (fttx-pool-217.61.157.99.bambit.de [217.61.157.99])
-	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 0C9701226CC;
-	Wed,  9 Jul 2025 11:12:01 +0000 (UTC)
-From: Frank Wunderlich <linux@fw-web.de>
-To: MyungJoo Ham <myungjoo.ham@samsung.com>,
-	Kyungmin Park <kyungmin.park@samsung.com>,
-	Chanwoo Choi <cw00.choi@samsung.com>,
-	Georgi Djakov <djakov@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Johnson Wang <johnson.wang@mediatek.com>,
-	=?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
-	linux-pm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH v9 13/13] arm64: dts: mediatek: mt7988a-bpi-r4: configure switch phys and leds
-Date: Wed,  9 Jul 2025 13:09:49 +0200
-Message-ID: <20250709111147.11843-14-linux@fw-web.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250709111147.11843-1-linux@fw-web.de>
-References: <20250709111147.11843-1-linux@fw-web.de>
+	s=arc-20240116; t=1752059489; c=relaxed/simple;
+	bh=VYDWf/aAkJYjnnaRdav3Kgh7Iq+nP304+3f+U8BMrlM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M71hcCqfx3EkgjidFyo0xoloJ0WCG2sFdoGaf0yCmkJjDWDtAo97T2qexAXc9K1g4qS0J3cSOEF9YEsUflPKZ6jp24OSF0Psrrjn5aH8xmWID7bDXLmcvc6ZddjMp2zp//jlX6NUXM0pLWiXvrT/fPguYd/h2k5/ynFLJmIOVnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=YvNUzQZE; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=vvZq130tiT45bvyCEcIJ+K9zjA5skCS0X4i6X4l6Bi0=; b=YvNUzQZEcwdbrQV8j3ZTIqZJZa
+	4HP+dnk7X61abQxSvtPEiHSu67e/O70tubpndvJGshW1wE7Rw645Ghcv6TIyLcFBige9a9uYqop0I
+	R+OOU+roJBWbQIWazOyqgOYN03OH07FCTN1B+SCFOc+GyasPNYxKsT+rRiyl9Miig+bNXl/9jzseA
+	Ex/MpQ1pYFn0Z9pAdk4tUwreZdx4z7qxGTsudBKN75fGUIXOFkF8Ld2b3KcO2bX2CqnUyg7K2HQls
+	mQhCdO2KqiqrVlw89GJpy1CPr2OQLsJyqVOieoY5DpNj0+86Jd41OsT+AMSNe/oyayroPljcDFRWQ
+	S4S+1uCw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55728)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uZShg-0007qh-2n;
+	Wed, 09 Jul 2025 12:11:09 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uZSha-0002bB-1i;
+	Wed, 09 Jul 2025 12:11:02 +0100
+Date: Wed, 9 Jul 2025 12:11:02 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: lizhe <sensor1010@163.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, vladimir.oltean@nxp.com,
+	maxime.chevallier@bootlin.com, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: Re: Re: [PATCH] net: stmmac: Support gpio high-level reset for
+ devices requiring it
+Message-ID: <aG5ORmbgMYd08eNR@shell.armlinux.org.uk>
+References: <20250708165044.3923-1-sensor1010@163.com>
+ <52b71fe7-d10a-4680-9549-ca55fd2e2864@lunn.ch>
+ <5c7adfef.1876.197ece74c25.Coremail.sensor1010@163.com>
+ <aG3vj1WYn3TjcBZe@shell.armlinux.org.uk>
+ <5bb49dc0.6933.197ee28444e.Coremail.sensor1010@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5bb49dc0.6933.197ee28444e.Coremail.sensor1010@163.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Frank Wunderlich <frank-w@public-files.de>
+On Wed, Jul 09, 2025 at 03:48:25PM +0800, lizhe wrote:
+> Hi, 
+> 
+> after replacing with this function, the function returns 0, meaning the gpio is
+> still at a low voltage level.
+> 
+> +              int gpio_state = -1;
+> 
+> 
+>                 if (delays[2])
+>                         msleep(DIV_ROUND_UP(delays[2], 1000));
+> +
+> +               gpio_state = gpiod_get_raw_value_cansleep(reset_gpio);
+> +               pr_info("gpio_state: %d\n", gpio_state);
+> +               pr_info("gpio_state: %d\n", gpio_state);
+> 
+>  gpio-111 (                    |snps,reset          ) out lo
+> 
+> 
+> [    3.899319] gpio_state: 0
+> [    3.899324] gpio_state: 0
 
-Assign pinctrl to switch phys and leds.
+How have you declared the snps,reset-gpio property in DT?
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
----
-v4:
-- reorder switch phy(-led) properties
-v2:
-- add labels and led-function and include after dropping from soc dtsi
----
- .../dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi | 61 +++++++++++++++++++
- 1 file changed, 61 insertions(+)
-
-diff --git a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-index 4d709ee527df..7c9df606f60d 100644
---- a/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-+++ b/arch/arm64/boot/dts/mediatek/mt7988a-bananapi-bpi-r4.dtsi
-@@ -4,6 +4,7 @@
- 
- #include <dt-bindings/gpio/gpio.h>
- #include <dt-bindings/regulator/richtek,rt5190a-regulator.h>
-+#include <dt-bindings/leds/common.h>
- 
- #include "mt7988a.dtsi"
- 
-@@ -152,6 +153,66 @@ &gmac2 {
- 	sfp = <&sfp1>;
- };
- 
-+&gsw_phy0 {
-+	pinctrl-0 = <&gbe0_led0_pins>;
-+	pinctrl-names = "gbe-led";
-+};
-+
-+&gsw_phy0_led0 {
-+	function = LED_FUNCTION_WAN;
-+	color = <LED_COLOR_ID_GREEN>;
-+	status = "okay";
-+};
-+
-+&gsw_port0 {
-+	label = "wan";
-+};
-+
-+&gsw_phy1 {
-+	pinctrl-0 = <&gbe1_led0_pins>;
-+	pinctrl-names = "gbe-led";
-+};
-+
-+&gsw_phy1_led0 {
-+	function = LED_FUNCTION_LAN;
-+	color = <LED_COLOR_ID_GREEN>;
-+	status = "okay";
-+};
-+
-+&gsw_port1 {
-+	label = "lan1";
-+};
-+
-+&gsw_phy2 {
-+	pinctrl-0 = <&gbe2_led0_pins>;
-+	pinctrl-names = "gbe-led";
-+};
-+
-+&gsw_phy2_led0 {
-+	function = LED_FUNCTION_LAN;
-+	color = <LED_COLOR_ID_GREEN>;
-+	status = "okay";
-+};
-+
-+&gsw_port2 {
-+	label = "lan2";
-+};
-+
-+&gsw_phy3 {
-+	pinctrl-0 = <&gbe3_led0_pins>;
-+	pinctrl-names = "gbe-led";
-+};
-+
-+&gsw_phy3_led0 {
-+	function = LED_FUNCTION_LAN;
-+	color = <LED_COLOR_ID_GREEN>;
-+	status = "okay";
-+};
-+
-+&gsw_port3 {
-+	label = "lan3";
-+};
-+
- &i2c0 {
- 	pinctrl-names = "default";
- 	pinctrl-0 = <&i2c0_pins>;
 -- 
-2.43.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
