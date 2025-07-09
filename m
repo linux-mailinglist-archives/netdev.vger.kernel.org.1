@@ -1,91 +1,92 @@
-Return-Path: <netdev+bounces-205452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B543DAFEC07
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 16:33:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DF15AFEC06
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 16:33:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3756A545B4A
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 14:30:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 538081C251FF
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 14:31:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37FB62E5B0A;
-	Wed,  9 Jul 2025 14:30:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D562E5B36;
+	Wed,  9 Jul 2025 14:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eLxEfJ4e"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DutG9ma+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91DA62E610F
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 14:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DEA82E5411
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 14:30:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752071420; cv=none; b=OS/n7XNUuXBPm0EjB6aQD4Xs1sgck3CTSfQdoUP7a0efDuIHQ3YP3AO3aMe+WyAT1c1+90LTHpC9l23audaF8w5+1ug+EAKTMLxpDwTpknEKhv2iXIA0fHB84kXAsAcC83VVvzKJaraTvbwZHZNwbzi8gzmLMntGRR6f0s/SuGM=
+	t=1752071426; cv=none; b=aDGbNHLFUf9egxvcCTf0HSdWoEcMnoZ6sROl3BlyfRNkB718+MBL1xOGLFHEf1rkrsEt1KiOUZqGKzyHjLLybUlg8oOelDAA/x5ByOBm2nwpbLMccSKLAR9Yydwyel6G7db32Q/rgVozOFX3fvNdrLJIZfjx+hsIJbwpMr4rmVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752071420; c=relaxed/simple;
-	bh=gj1GG73gbvX3g4y2pIm44H3/uC9C9K3NIW9KCinYm78=;
+	s=arc-20240116; t=1752071426; c=relaxed/simple;
+	bh=By0J8wWyf/hunfrBZN9RrQG/ja01k3CxLZiYw4mzMXU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T7Nh7CyWvktVBWevAwof6As3jUskH66jBYlissSG7Rhj08kpV3xZAZ8YGNO8dVrlBFGORXMB0kEGmSV0Zcc15pDvdc20R3dG1qOn1PS+7EHN6bTzffWktyH5LNFKUTBnXe/JDxFldMkjrF8yO0TzswdtwAJyqEIpQkWIJa8RAXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eLxEfJ4e; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=f87k5RCjGAf84KboyTP7Y1Rwle6Lk+slbIIsn7U2Kh9jJ8YLrY/FegtJAPuGb8m1eEZJHhuEN8+FKB6bbLxpYxqxFD7Vf6DCWBGlKF7kjS6ec5/h/y/iPpSZ4UpjjpWpna1PtVCaVQ10puUsaIu/z4/wAvqUkme4KJ8cIBWy58Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DutG9ma+; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752071417;
+	s=mimecast20190719; t=1752071424;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+zzn/qvGX/kYco+2RjqPmwKYggRHweDYxVHxTqcNT5o=;
-	b=eLxEfJ4ev9AzncPtZUKZfAJhOqK7wmrGwnYhOkv4B0gDj/B9ld5CNqOn9hLkml5fVzmOom
-	hFCudh4uts1I6cxhUtqB/aGn6gAzl+Xf58Tke/5vSz2DS1oNBQ4qjpwa2bdnWCJL+1SmHC
-	mW9k+A/MbZt4VOunAayOgLcA/8L7DoE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=MCzmRH3P+ffprY+eIO0UzEM5A1r6pOhEIIy7wBgpNX8=;
+	b=DutG9ma+R59cEStwAyxwLf6AJq8w3F7GuV1oQGqjtv1boXBoa2l3w8VK0GxRmnIe4ZxrqD
+	B4cDLDiptw4DTj7zM+t+49YxmvVzrQMIKyqJQ/vDNRasBxeIFcGA0uKnZ9rH+0Ggozbb9o
+	bv+bANn+9Q8/c3VXBBmKcyjYRlc5iUY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-689-Z17p44DEP3y9YztWn_cI2Q-1; Wed, 09 Jul 2025 10:30:16 -0400
-X-MC-Unique: Z17p44DEP3y9YztWn_cI2Q-1
-X-Mimecast-MFC-AGG-ID: Z17p44DEP3y9YztWn_cI2Q_1752071415
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-451d5600a54so45178955e9.2
-        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 07:30:16 -0700 (PDT)
+ us-mta-124-k7p3REK5PPqNMVMPmtbKyQ-1; Wed, 09 Jul 2025 10:30:23 -0400
+X-MC-Unique: k7p3REK5PPqNMVMPmtbKyQ-1
+X-Mimecast-MFC-AGG-ID: k7p3REK5PPqNMVMPmtbKyQ_1752071422
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43e9b0fd00cso34295e9.0
+        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 07:30:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752071415; x=1752676215;
+        d=1e100.net; s=20230601; t=1752071422; x=1752676222;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+zzn/qvGX/kYco+2RjqPmwKYggRHweDYxVHxTqcNT5o=;
-        b=KkJfniPLYcGG60hyf8zff/elYz7qBb7Dtnrpm4xjWgpGk8C2t7W6F3Fh6jDgYE2jI6
-         jUpPiZw9p6LPLm6BnXFpKP6YRipyTK0511gn3UIRCAT6DA8nj2qEY+Kct11vm3ijmutg
-         gXy8LeEILuABVmVdUB0fN3prKa4v3bF0DOPMWic82e+l1T8LxM9TS0vXIRzg9gKct1B9
-         2nqkWYSKfwOndyYgNrufEd7sizEjVklnu1qM0zGjEs6k6mgbeNZM1xr6RFKj/PRklapO
-         3eqGiqwswvgF6dPsmAQQKZ6KSAD0Sgd/9h2YSexrFPx8Ed6s44cRgbkR55+pvnXeQMNo
-         m5kA==
-X-Gm-Message-State: AOJu0YzfkdTBhw/Q276TUCJA36yN3+TVst/w3RFi0PTeT4kTJDM7BTss
-	olYxqI4ht8vQB+mdRpSmNap5PTodT79pVPmhbH2vC2nsGEqr6dx7i0R4tBBa2AggpHwmE+wnqxp
-	HFU6F45LwfPvLs8DF8976jMjEDbFWxdewpp2arD7Hk/xKRxgGQf4qLvf/MQ==
-X-Gm-Gg: ASbGncuSMr+V73ApfzYCaZkeZZHvjoWIdU0LuHFcSIO3csF1j7SCQVuoeBeI4QB9WkU
-	9LRCgPLKx+yyvX5Il6x9jypvo2yjHRTdd1KNm1kVfl+7jV5hDq2CoXpKbAZin56dvuKauaRXp8X
-	yd6uS7RvNaWzCRQbPhQ9F28sudrLFLUOJDmKmccqFtZXrUAk5G7mt+v6CbykJczHS3oSrNB3JxP
-	4VWU86vcbHOgjNKNfjaWddF3h01Bi6FrQXzQxiQQFLLSB2wTvL4HkmmbCadJLKYRi7XBOSTpYHh
-	NezBgmFEjw==
-X-Received: by 2002:a05:600c:46cc:b0:453:8bc7:5cbb with SMTP id 5b1f17b1804b1-454d53d4d63mr25962865e9.25.1752071414928;
-        Wed, 09 Jul 2025 07:30:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH/cG+HNGcV9Zio/1vqyD8GYIoan49l49yCf1a9T3pdrETB/urI7U7G162hg1m53O555jWPnw==
-X-Received: by 2002:a05:600c:46cc:b0:453:8bc7:5cbb with SMTP id 5b1f17b1804b1-454d53d4d63mr25962635e9.25.1752071414507;
-        Wed, 09 Jul 2025 07:30:14 -0700 (PDT)
+        bh=MCzmRH3P+ffprY+eIO0UzEM5A1r6pOhEIIy7wBgpNX8=;
+        b=Mh8fpiA8Db1pmSiV+iKE22CAor0e9GjEvEsIqS6+Nn2sbIOWgLEiD4UaVBbWRY0MGj
+         +z0Wsbn/dP5ikQ7RARujmlGvDVIoOd5ANUCWMHGTakLSSGe+bnRw5cnB1aZ96qussbwk
+         uEY4+HHpJNfYqFQz8nuj8rl02fWhZlKxAR99T7vEi2VlXFtFQYW/SPWd/Y0dQZBu3JTw
+         yEZE/A8aESd5KdIbP3llbP+8Do+gEIzWo4J+gbrMs5qJrW8hh4a158kdf6mGT3wfQRlH
+         riU1Y/DcACswIAZZ/nzTJLx5rwVGM8sBQEanu4wQK0x/UGltuFEfg35s+gD4pvy+/4sy
+         TImg==
+X-Gm-Message-State: AOJu0YxnuZ79g9r6nN+CvDy8WtlaChljKbmTEFZ5tXdJVZzIkbBHPlnR
+	HsuMfg2EMSt6b1cWFufXEHDi9v2/9WxGd+wytmnCPEoPEpFRG+1T4wcpfJQfnmEEPeMCTVWLsBi
+	SSw+zIkFr7nj4XlJ9b7ft5+96BUVi9eIj1OtlUWjZPq0Xq1tkm3wYo9qFhw==
+X-Gm-Gg: ASbGncuC786Phoh2rMNNHHLZPTANIP5hTlMZFJGjnDpLqCSAHpXPXosVXzUY2CUiHcN
+	yqh9eYgchWR0XvHyVx+A34yPOSdcbM8T1gXXHVn9rUlNJ31wBcWZKcMAEeSemE3bVTCCT6hUcYC
+	C+rcazMb6Iojwju/FUs8MtG5zGSdTkVSLLQc6jmQdEs/4znNTY5RLHHYfENQmy5xs+f2A5rLlNp
+	pdEZ1XDBfu5XIolB4266uLrWjh1KCu/qsidCDHS/feT1nQ3ZtZDCsam2ZI+WJJA/jNS6DUwdQHS
+	E6oNzVgVkw==
+X-Received: by 2002:a05:600c:8b0d:b0:454:b97a:486e with SMTP id 5b1f17b1804b1-454d5602748mr27399505e9.10.1752071421734;
+        Wed, 09 Jul 2025 07:30:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHCqqkMNXdv3YwaHIZdD4GhGE1vOFwEsTn/NpIpG6UsSCHXesxZe5mpIXtQkj6BhMWVcx98rA==
+X-Received: by 2002:a05:600c:8b0d:b0:454:b97a:486e with SMTP id 5b1f17b1804b1-454d5602748mr27399125e9.10.1752071421223;
+        Wed, 09 Jul 2025 07:30:21 -0700 (PDT)
 Received: from debian ([2001:4649:f075:0:a45e:6b9:73fc:f9aa])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454d50503d1sm26072225e9.10.2025.07.09.07.30.12
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b47225b5cdsm15689964f8f.85.2025.07.09.07.30.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Jul 2025 07:30:13 -0700 (PDT)
-Date: Wed, 9 Jul 2025 16:30:10 +0200
+        Wed, 09 Jul 2025 07:30:20 -0700 (PDT)
+Date: Wed, 9 Jul 2025 16:30:17 +0200
 From: Guillaume Nault <gnault@redhat.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
 Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
 	David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>,
 	Aiden Yang <ling@moedove.com>, Gary Guo <gary@kernel.org>
-Subject: [PATCH net 1/2] gre: Fix IPv6 multicast route creation.
-Message-ID: <027a923dcb550ad115e6d93ee8bb7d310378bd01.1752070620.git.gnault@redhat.com>
+Subject: [PATCH net 2/2] selftests: Add IPv6 multicast route generation tests
+ for GRE devices.
+Message-ID: <65a89583bde3bf866a1922c2e5158e4d72c520e2.1752070620.git.gnault@redhat.com>
 References: <cover.1752070620.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -97,61 +98,101 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1752070620.git.gnault@redhat.com>
 
-Use addrconf_add_dev() instead of ipv6_find_idev() in
-addrconf_gre_config() so that we don't just get the inet6_dev, but also
-install the default ff00::/8 multicast route.
+The previous patch fixes a bug that prevented the creation of the
+default IPv6 multicast route (ff00::/8) for some GRE devices. Now let's
+extend the GRE IPv6 selftests to cover this case.
 
-Before commit 3e6a0243ff00 ("gre: Fix again IPv6 link-local address
-generation."), the multicast route was created at the end of the
-function by addrconf_add_mroute(). But this code path is now only taken
-in one particular case (gre devices not bound to a local IP address and
-in EUI64 mode). For all other cases, the function exits early and
-addrconf_add_mroute() is not called anymore.
+Also, rename check_ipv6_ll_addr() to check_ipv6_device_config() and
+adapt comments and script output to take into account the fact that
+we're not limitted to link-local address generation.
 
-Using addrconf_add_dev() instead of ipv6_find_idev() in
-addrconf_gre_config(), fixes the problem as it will create the default
-multicast route for all gre devices. This also brings
-addrconf_gre_config() a bit closer to the normal netdevice IPv6
-configuration code (addrconf_dev_config()).
-
-Fixes: 3e6a0243ff00 ("gre: Fix again IPv6 link-local address generation.")
-Reported-by: Aiden Yang <ling@moedove.com>
-Closes: https://lore.kernel.org/netdev/CANR=AhRM7YHHXVxJ4DmrTNMeuEOY87K2mLmo9KMed1JMr20p6g@mail.gmail.com/
-Reviewed-by: Gary Guo <gary@garyguo.net>
-Tested-by: Gary Guo <gary@garyguo.net>
 Signed-off-by: Guillaume Nault <gnault@redhat.com>
 ---
- net/ipv6/addrconf.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+ .../testing/selftests/net/gre_ipv6_lladdr.sh  | 27 ++++++++++++-------
+ 1 file changed, 17 insertions(+), 10 deletions(-)
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index ba2ec7c870cc..870a0bd6c2ba 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -3525,11 +3525,9 @@ static void addrconf_gre_config(struct net_device *dev)
- 
- 	ASSERT_RTNL();
- 
--	idev = ipv6_find_idev(dev);
--	if (IS_ERR(idev)) {
--		pr_debug("%s: add_dev failed\n", __func__);
-+	idev = addrconf_add_dev(dev);
-+	if (IS_ERR(idev))
- 		return;
--	}
- 
- 	/* Generate the IPv6 link-local address using addrconf_addr_gen(),
- 	 * unless we have an IPv4 GRE device not bound to an IP address and
-@@ -3543,9 +3541,6 @@ static void addrconf_gre_config(struct net_device *dev)
- 	}
- 
- 	add_v4_addrs(idev);
--
--	if (dev->flags & IFF_POINTOPOINT)
--		addrconf_add_mroute(dev);
+diff --git a/tools/testing/selftests/net/gre_ipv6_lladdr.sh b/tools/testing/selftests/net/gre_ipv6_lladdr.sh
+index 5b34f6e1f831..48eb999a3120 100755
+--- a/tools/testing/selftests/net/gre_ipv6_lladdr.sh
++++ b/tools/testing/selftests/net/gre_ipv6_lladdr.sh
+@@ -24,7 +24,10 @@ setup_basenet()
+ 	ip -netns "${NS0}" address add dev lo 2001:db8::10/64 nodad
  }
- #endif
  
+-# Check if network device has an IPv6 link-local address assigned.
++# Check the IPv6 configuration of a network device.
++#
++# We currently check the generation of the link-local IPv6 address and the
++# creation of the ff00::/8 multicast route.
+ #
+ # Parameters:
+ #
+@@ -35,7 +38,7 @@ setup_basenet()
+ #         a link-local address)
+ #   * $4: The user visible name for the scenario being tested
+ #
+-check_ipv6_ll_addr()
++check_ipv6_device_config()
+ {
+ 	local DEV="$1"
+ 	local EXTRA_MATCH="$2"
+@@ -45,7 +48,11 @@ check_ipv6_ll_addr()
+ 	RET=0
+ 	set +e
+ 	ip -netns "${NS0}" -6 address show dev "${DEV}" scope link | grep "fe80::" | grep -q "${EXTRA_MATCH}"
+-	check_err_fail "${XRET}" $? ""
++	check_err_fail "${XRET}" $? "IPv6 link-local address generation"
++
++	ip -netns "${NS0}" -6 route show table local type multicast ff00::/8 proto kernel | grep -q "${DEV}"
++	check_err_fail 0 $? "IPv6 multicast route creation"
++
+ 	log_test "${MSG}"
+ 	set -e
+ }
+@@ -102,20 +109,20 @@ test_gre_device()
+ 		;;
+ 	esac
+ 
+-	# Check that IPv6 link-local address is generated when device goes up
++	# Check the IPv6 device configuration when it goes up
+ 	ip netns exec "${NS0}" sysctl -qw net.ipv6.conf.gretest.addr_gen_mode="${ADDR_GEN_MODE}"
+ 	ip -netns "${NS0}" link set dev gretest up
+-	check_ipv6_ll_addr gretest "${MATCH_REGEXP}" "${XRET}" "config: ${MSG}"
++	check_ipv6_device_config gretest "${MATCH_REGEXP}" "${XRET}" "config: ${MSG}"
+ 
+ 	# Now disable link-local address generation
+ 	ip -netns "${NS0}" link set dev gretest down
+ 	ip netns exec "${NS0}" sysctl -qw net.ipv6.conf.gretest.addr_gen_mode=1
+ 	ip -netns "${NS0}" link set dev gretest up
+ 
+-	# Check that link-local address generation works when re-enabled while
+-	# the device is already up
++	# Check the IPv6 device configuration when link-local address
++	# generation is re-enabled while the device is already up
+ 	ip netns exec "${NS0}" sysctl -qw net.ipv6.conf.gretest.addr_gen_mode="${ADDR_GEN_MODE}"
+-	check_ipv6_ll_addr gretest "${MATCH_REGEXP}" "${XRET}" "update: ${MSG}"
++	check_ipv6_device_config gretest "${MATCH_REGEXP}" "${XRET}" "update: ${MSG}"
+ 
+ 	ip -netns "${NS0}" link del dev gretest
+ }
+@@ -126,7 +133,7 @@ test_gre4()
+ 	local MODE
+ 
+ 	for GRE_TYPE in "gre" "gretap"; do
+-		printf "\n####\nTesting IPv6 link-local address generation on ${GRE_TYPE} devices\n####\n\n"
++		printf "\n####\nTesting IPv6 configuration of ${GRE_TYPE} devices\n####\n\n"
+ 
+ 		for MODE in "eui64" "none" "stable-privacy" "random"; do
+ 			test_gre_device "${GRE_TYPE}" 192.0.2.10 192.0.2.11 "${MODE}"
+@@ -142,7 +149,7 @@ test_gre6()
+ 	local MODE
+ 
+ 	for GRE_TYPE in "ip6gre" "ip6gretap"; do
+-		printf "\n####\nTesting IPv6 link-local address generation on ${GRE_TYPE} devices\n####\n\n"
++		printf "\n####\nTesting IPv6 configuration of ${GRE_TYPE} devices\n####\n\n"
+ 
+ 		for MODE in "eui64" "none" "stable-privacy" "random"; do
+ 			test_gre_device "${GRE_TYPE}" 2001:db8::10 2001:db8::11 "${MODE}"
 -- 
 2.39.2
 
