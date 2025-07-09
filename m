@@ -1,120 +1,120 @@
-Return-Path: <netdev+bounces-205467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66D1AAFEDB2
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 17:27:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DB05AFEDCC
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 17:32:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAC9E174BA5
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:27:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 710901887C0B
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:32:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F7AC299ABD;
-	Wed,  9 Jul 2025 15:26:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 313EB2D2389;
+	Wed,  9 Jul 2025 15:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e7S94nnE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JWDX3g7w"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A38272E7F20
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 15:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09330A920;
+	Wed,  9 Jul 2025 15:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752074812; cv=none; b=sG7+UH4Hn2ql8wa+J+kWmDx1Ywvyy9dJCfYMAx9t/TpRO9PaeM1RHciyLRP0uMkUGtlgjuWPecpYlggKCqxNLz/5tT8Nyay2OCjAUVaVWKVlDZvmSyu/v9uomWCUhmJouilwN1wTY1Noepaqe94Ojz7snZOHo5iS+9cNtIbmKDk=
+	t=1752075156; cv=none; b=N5xkIXF5glryyznv7USvtOg89gapTAS9y/IJX1nQRyWjjyYr4Az1Q22mfaH0G4OuGhso+5oF7XBPd2UXvC8+r/VxPLLQS6ejKbIl7ooxeK1dBPKEPayl0bJSKWWt6bQn82VRI8Kgwqx7QfjkmJwZs6+vUj0UsWjbzH7u5mVf+aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752074812; c=relaxed/simple;
-	bh=Lf7bJFk3uV9MKQuav7jQz6/MttJtMdGad9u+KUEboXU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fXLL01wD1YissYAuQ7DF43gm6Ob22mJtt9CS+wm8kxfRYaju3dlndSR7sMm8hipP+2ihZSnSPV3y8lwC4VAEY945x8xi7f+y+KSdo3qAnV/WUf1zHcbZqXXX13Cz9PblKN1cF5LhXUpNZyDaOPj95MkxU60Lj4whA2z5IVocdFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e7S94nnE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752074809;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Lf7bJFk3uV9MKQuav7jQz6/MttJtMdGad9u+KUEboXU=;
-	b=e7S94nnEGpSrKl0vjipYKF8SDOGfV4owufizDIvNlO0d3nq4F1+J3Q9rnuJfIZuz0PrlyQ
-	V22Dsxm68Y6EPeZ5O1wcwnFTSje6dmk/5Vfje/3vpvVLhnkqh4zvF2yIH797UUrsCxVbLQ
-	zd+vH/cbGBw0euLrC2d4pwUdrrRi4bE=
-Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
- [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-97-3Vw5VH1tM6m99I8tWqPklw-1; Wed, 09 Jul 2025 11:26:48 -0400
-X-MC-Unique: 3Vw5VH1tM6m99I8tWqPklw-1
-X-Mimecast-MFC-AGG-ID: 3Vw5VH1tM6m99I8tWqPklw_1752074807
-Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-70e7f66cd58so503197b3.1
-        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 08:26:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752074807; x=1752679607;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Lf7bJFk3uV9MKQuav7jQz6/MttJtMdGad9u+KUEboXU=;
-        b=M/UOpan4/xQ1ngGdx1G1rAJ6vPCZA9WDvhix8V5Ku7ITB90u1X2xmHjetDLoq8aDrq
-         D33Jd1AHVnqpT/VAOLhAMREnvd/2ddF0aCW3GHWfr+KvtvHB9y9elwZr1Bbnz65+Y6mk
-         22WDyhoFDN2Y7XqF+MgKkhL9pu+SZPvwgbCS0rAFylJ/pBGFnmRSb4KXBnOkAtc4LOsM
-         IRc081RQZWkvUqU93UHvmCjDFY11kk6ih8fd9srhDteRTEO1AYwa9+3RSkAiVKDISfyP
-         incUWXq1L+4iaMI9NaoYpdC83227smvfRy6/9dltmkEj0+4LWQbmBAIweskH4YIVVs2n
-         zIrw==
-X-Forwarded-Encrypted: i=1; AJvYcCUbMtsiavbRZIMRzClHuSdigGgJa09xPPy/KzfiZkRsC+9G5NVbRgQSHAmdiNZERcevJrzuACE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVxZLxSeAI6vPYGgrbycV+fK4C24UeoRSZcL/6mAoNVYvTBkRQ
-	NLtajtnsoCpeH4IS45trZQiD8LyECxqvn8OkUVZwMsF+tW8WOHBbAIhBvDMYIuNjqzQOAL911Yr
-	uK/xXj8mL42rx41pDEanjXPno4B2LkodVl8x8+XyXdL1YejqHbNPrMUeAoGZHRqUlZFZ5OPWmjG
-	2rXw2CkRyoc/vxHsxGuxC7Qy9noYAuUQVj
-X-Gm-Gg: ASbGncuxvNeSuHrZ6W2gdvqG/zZvlaDOhwfxkaUEICmbTQbxreTdb7T4i+YK1U790KA
-	gEB+toY4JD6X7kO6fxBmonIUm1U1mkLyLa653L5RPKhM5wUBuim2zY8MRGgr32yx0+bIdyK/sWa
-	qB5TuM
-X-Received: by 2002:a05:690c:4d83:b0:70e:326:6aeb with SMTP id 00721157ae682-717b1696280mr41605377b3.10.1752074807402;
-        Wed, 09 Jul 2025 08:26:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE9oyUbfKLC5sveWj0ptirc82cNeL70EgaNkak6GlzIurDedMJZY/972EbTHi8rpQ5YCU07IRWEQOOiaTHdLVE=
-X-Received: by 2002:a05:690c:4d83:b0:70e:326:6aeb with SMTP id
- 00721157ae682-717b1696280mr41604877b3.10.1752074806659; Wed, 09 Jul 2025
- 08:26:46 -0700 (PDT)
+	s=arc-20240116; t=1752075156; c=relaxed/simple;
+	bh=kcvivhZy27k1X84bIalCvwMRvuKqZj+zcGFUwVqQar0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=E9unOkWBp616jGXX++heVDd2pDnanrqxE0yqtDoHcrwFesJ6jGaDotdU0CIxXRPF9ZoT2iBjYaWuHQvWp6BU/cknc9VbDGzCSupyGOOkHx3zOB6V8kZos/RetResc0dJB6pvSHSVD/YM0+pbGv9cBQNMn9M67Bt3wHxHJt3lFI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JWDX3g7w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5BA1C4CEEF;
+	Wed,  9 Jul 2025 15:32:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752075155;
+	bh=kcvivhZy27k1X84bIalCvwMRvuKqZj+zcGFUwVqQar0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=JWDX3g7wylmHQW3/6AqwqbIM8VhJY2PNbjGM6/7xoXS1Z3s9d+8AFAkfuFoAAG5Hr
+	 VtylhNHTumNz/L250F07hrTJH4RBYHx7RPt2QiWCcVZbhR3a0G8wO5yQht5PB/08kz
+	 5UlRlFlK4eFF/kqE4T1PdlO8oKE5RNBFIMitd5M+x0RcUGloo8mwoYk6eRW2DfNNx2
+	 HlReH+SwhlghrP4Eh8DyyFS3EHjyf38+pihtJEMRF71S2zv+G/ZGG+BBux4GEwzWoY
+	 1oeYrgY7T+l4NUuHlSBYxtmzVj/5USDLbeiqADXiqJzWg+ET9aH8/wYmXPnJ4JpBfS
+	 0cMoAsge8DMHA==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Colin Ian King <colin.i.king@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: pse-pd: pd692x0: reduce stack usage in pd692x0_setup_pi_matrix
+Date: Wed,  9 Jul 2025 17:32:04 +0200
+Message-Id: <20250709153210.1920125-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <472a5d43-4905-4fa4-8750-733bb848410d@linux.ibm.com>
-In-Reply-To: <472a5d43-4905-4fa4-8750-733bb848410d@linux.ibm.com>
-From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Wed, 9 Jul 2025 17:26:35 +0200
-X-Gm-Features: Ac12FXyNj6u4xw4GpaDSraC2WH1PFh63NMAa2Sk2WZqN1f1LqOBvccFzhXYQrfM
-Message-ID: <CAGxU2F7bV7feiZs6FmdWkA7v9nxojuDbeSHyWoASS36fr1pSgw@mail.gmail.com>
-Subject: Re: [PATCH net-next v4] vsock/test: Add test for null ptr deref when
- transport changes
-To: Konstantin Shkolnyy <kshk@linux.ibm.com>
-Cc: mhal@rbox.co, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, v4bel@theori.io, leonardi@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, 9 Jul 2025 at 16:54, Konstantin Shkolnyy <kshk@linux.ibm.com> wrote:
->
-> I'm seeing a problem on s390 with the new "SOCK_STREAM transport change
-> null-ptr-deref" test. Here is how it appears to happen:
->
-> test_stream_transport_change_client() spins for 2s and sends 70K+
-> CONTROL_CONTINUE messages to the "control" socket.
->
-> test_stream_transport_change_server() spins calling accept() because it
-> keeps receiving CONTROL_CONTINUE.
->
-> When the client exits, the server has received just under 1K of those
-> 70K CONTROL_CONTINUE, so it calls accept() again but the client has
-> exited, so accept() never returns and the server never exits.
->
+From: Arnd Bergmann <arnd@arndb.de>
 
-Yep, I saw exactly the same issue while testing a new test.
-I already sent a fix:
-https://lore.kernel.org/netdev/20250708111701.129585-1-sgarzare@redhat.com/
+The pd692x0_manager array in this function is really too big to fit on the
+stack, though this never triggered a warning until a recent patch made
+it slightly bigger:
 
-Please, send a T-b/R-b on that if you can.
+drivers/net/pse-pd/pd692x0.c: In function 'pd692x0_setup_pi_matrix':
+drivers/net/pse-pd/pd692x0.c:1210:1: error: the frame size of 1584 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
 
-Stefano
+Change the function to dynamically allocate the array here.
+
+Fixes: 359754013e6a ("net: pse-pd: pd692x0: Add support for PSE PI priority feature")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/net/pse-pd/pd692x0.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/pse-pd/pd692x0.c b/drivers/net/pse-pd/pd692x0.c
+index 4de004813560..399ce9febda4 100644
+--- a/drivers/net/pse-pd/pd692x0.c
++++ b/drivers/net/pse-pd/pd692x0.c
+@@ -860,7 +860,7 @@ pd692x0_of_get_ports_manager(struct pd692x0_priv *priv,
+ 
+ static int
+ pd692x0_of_get_managers(struct pd692x0_priv *priv,
+-			struct pd692x0_manager manager[PD692X0_MAX_MANAGERS])
++			struct pd692x0_manager *manager)
+ {
+ 	struct device_node *managers_node, *node;
+ 	int ret, nmanagers, i, j;
+@@ -1164,7 +1164,7 @@ pd692x0_write_ports_matrix(struct pd692x0_priv *priv,
+ 
+ static int pd692x0_setup_pi_matrix(struct pse_controller_dev *pcdev)
+ {
+-	struct pd692x0_manager manager[PD692X0_MAX_MANAGERS] = {0};
++	struct pd692x0_manager *manager __free(kfree) = NULL;
+ 	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
+ 	struct pd692x0_matrix port_matrix[PD692X0_MAX_PIS];
+ 	int ret, i, j, nmanagers;
+@@ -1174,6 +1174,10 @@ static int pd692x0_setup_pi_matrix(struct pse_controller_dev *pcdev)
+ 	    priv->fw_state != PD692X0_FW_COMPLETE)
+ 		return 0;
+ 
++	manager = kcalloc(PD692X0_MAX_MANAGERS, sizeof(*manager), GFP_KERNEL);
++	if (!manager)
++		return -ENOMEM;
++
+ 	ret = pd692x0_of_get_managers(priv, manager);
+ 	if (ret < 0)
+ 		return ret;
+-- 
+2.39.5
 
 
