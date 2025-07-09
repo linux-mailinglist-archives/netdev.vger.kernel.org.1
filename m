@@ -1,315 +1,222 @@
-Return-Path: <netdev+bounces-205572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED289AFF51A
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 01:02:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0160AFF51E
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 01:03:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94A147A5392
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 23:01:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0B811C47097
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 23:04:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0FFC1E9B3D;
-	Wed,  9 Jul 2025 23:02:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873B923E347;
+	Wed,  9 Jul 2025 23:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Ifql+e8v"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="TgViNMRs"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2074.outbound.protection.outlook.com [40.107.220.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3EC16DEB1;
-	Wed,  9 Jul 2025 23:02:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.74
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752102159; cv=fail; b=XYLvCFYskGKlja1u295HKQRvt5M9jKqJjs8rA3xQcVnIrCISUQkkA5mIDQIT0FFmCZC2NC/4NOeD3B1VpvxSbbq4S+oDfmUoVO6w6xi1NiRxRWyXPW8uEbswpIas9WkfeDzmRS+QhBDs+HjwPRjnDP1tt2WlJclx4MOolsBq78g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752102159; c=relaxed/simple;
-	bh=I6iFhh3PgPo4vtodElybyr/1GbrHO4+5solziWcONrk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KbWb9pkudR6p3DKY4d24LCEvtSm2Uu5Vq4dc08o6Y34yDocPbNFAm9MrHuNV73FiXpsYWMx/wk8v+1TWlsTNfuBXuWO50nhEos/b2k9knnKlg6l3ToUBiCbUSEgI1FTR+4+GcKIPd4dWXgPfM46GHDA4zJDBlxq3cV25OEbYPLE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Ifql+e8v; arc=fail smtp.client-ip=40.107.220.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Oh40CnfovN3f95tutPplgfau5Hncns7tR2GCqMdWgHiXw1UzgtgaC1Qntb15ty8t3hYSnTRRSi2qB65Pr9LAENE+RaqJvVuZA85efw9bavsWwYmri53+Qsl68Qdn19asKxMCKeg72Q2iEt2njG7z/jkNCFEanJf/h7Sc4hluEsCIOsn9izUnEyBSdArFKOgPT0JUDI4XS2OGXql0OMP9c82kqMjeP/sFLkxBPCKbUZLyVeWycdFHGulKY5V1bN5UNv+9Q3AUNdM5kYDn8EuUnJsF6wWGUEBW7d2A1kCPQEXqmWKngECib5Heg5cS/XcRneWlcDfIHD0083i0trzT3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qdQE/6TEGHHVjlXz/ztUv7sfux8yajDe0hQHKdBg1l4=;
- b=shqkURvUUDCrN7kFdhlXqrguOA6R/QI3MFeVKRRj8I/2p6Cd5ngw/gKT0qHLd9Y85UBYUMjYbWm3e7zGsiG7vTA0dG3mKWyVK4M+cOT+WaW9PxRK4bGzldFLF30o6Eb4RpnQGnvpmZlMFR71OZ4vEZaI6XRguzyjNtAfPsbdKVd/PfACKXxmXf3vBwdOqoz9uSzklV6D8pz6cKak8Zyp4sjlAzuphpBKmQUZQWiFsQ888PvLX9BUntmWTYyWrtjXB4DkKKGTsspag6MEjDAoQZAny6b3LhQDlUp1z2me/IFycFdP28Bk0oNvt5CUqkfgoLF771BfK72YCcOVFGI5yw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qdQE/6TEGHHVjlXz/ztUv7sfux8yajDe0hQHKdBg1l4=;
- b=Ifql+e8vNyjMTt/7ZdM8nGPH91V+jywA+9eghLu5Jkj5pEJVVLtCp7G7HOfScpGPJR6ibYF+XaJ2jnyvzRJhcLHKQMoZDKeCFfCutBg6RY83O1gV99bmHCCOBwK3X1VW0UEthvzEcrj5jvjkGeHZfeNEJvTB9OJq9HeLnImNacQkSE3YvkTYyQeUkc8a3+lUya60BSbHQdLP9V2QTrxrxHxe1/qgG68giDGJmeZVBZu6ljAQMvIUO8DZb56+Rj7mx834U7Dd+m/uXnjNdvDZATPj2VdUxCn7JwVGqDwONaMDoE2XSnD4JCZKHwusrKtTlAGs8ZzAkHljCSTpOacHOw==
-Received: from LV3PR11MB8742.namprd11.prod.outlook.com (2603:10b6:408:212::14)
- by CY8PR11MB7827.namprd11.prod.outlook.com (2603:10b6:930:77::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.23; Wed, 9 Jul
- 2025 23:02:34 +0000
-Received: from LV3PR11MB8742.namprd11.prod.outlook.com
- ([fe80::d5c5:fbb6:36fe:3fbb]) by LV3PR11MB8742.namprd11.prod.outlook.com
- ([fe80::d5c5:fbb6:36fe:3fbb%7]) with mapi id 15.20.8901.024; Wed, 9 Jul 2025
- 23:02:34 +0000
-From: <Tristram.Ha@microchip.com>
-To: <maxime.chevallier@bootlin.com>
-CC: <Woojung.Huh@microchip.com>, <andrew@lunn.ch>, <olteanv@gmail.com>,
-	<robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <marex@denx.de>, <UNGLinuxDriver@microchip.com>,
-	<devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next 6/6 v2] net: dsa: microchip: Setup fiber ports
- for KSZ8463
-Thread-Topic: [PATCH net-next 6/6 v2] net: dsa: microchip: Setup fiber ports
- for KSZ8463
-Thread-Index: AQHb77bM67Dkv0j6akiDuvLgerj6T7QoBQaAgACcTtCAALAVgIABGc4g
-Date: Wed, 9 Jul 2025 23:02:34 +0000
-Message-ID:
- <LV3PR11MB874233C067E17B585571948AEC49A@LV3PR11MB8742.namprd11.prod.outlook.com>
-References: <20250708031648.6703-1-Tristram.Ha@microchip.com>
-	<20250708031648.6703-7-Tristram.Ha@microchip.com>
-	<20250708122237.08f4dd7c@device-24.home>
-	<DM3PR11MB8736DE8A01523BD67AF73766EC4EA@DM3PR11MB8736.namprd11.prod.outlook.com>
- <20250709081217.368e1f7d@fedora>
-In-Reply-To: <20250709081217.368e1f7d@fedora>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV3PR11MB8742:EE_|CY8PR11MB7827:EE_
-x-ms-office365-filtering-correlation-id: 23e22107-bb0f-4e1d-a6a1-08ddbf3cb0bd
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|376014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?mGaWZkrefzUDpuPFnBexkGptNBq7XQH5mSl0mjMK9EuKqAvzBvoZaJrKSCo+?=
- =?us-ascii?Q?KU2+P41ZO77BWRrYKBkho3yDBK1JsTlVV032TKqcMRe60jjDc+BcylGtuI9K?=
- =?us-ascii?Q?8ZmodAddctVT+IQaDC8KhZG/4Cm/Xa5iyI+OTPSh4ntodpoUwmyey3tqc8On?=
- =?us-ascii?Q?xGZmgAbPIbmd4GuqC7QHgK7aV5ngMLpedWZwcbT/xTO2/iRicrim5f/RNeZv?=
- =?us-ascii?Q?F+CMiADxX1+lXvWupG+QM+I5tZFaBYPvkAontHaMJz2rzql7kRKPm7HIlGmw?=
- =?us-ascii?Q?g5ptzYQR0bgQUnXUXyTAYG+byxaM5JAn/6GElNmZqS+Qp9sFHXcZXGD9DFjC?=
- =?us-ascii?Q?xGPcethIg3y7m39mmwom/SB8xJH/Y28n2FsZD2XYAf9cy8dCB1O592gBjuxG?=
- =?us-ascii?Q?jNqVGUdX5JAdCu/K2H0K2T9WUuu/9GfK3I4dsGz+9r/wTgRULfosRGnks373?=
- =?us-ascii?Q?4DPVPP3nTa8CXE6ZtUlmDE/yG5Y7Dymkl1VVt6OfPsFqiBXad3hzhn1M1YmK?=
- =?us-ascii?Q?q0Kib2+b3W0oLbMHWgOw30fiioi20xIC+TfZIhALqWBp3YYbjKYdRt3HqbVs?=
- =?us-ascii?Q?m8ajTTm9HZRZ5MnzLb+dG3SM7uBQeTvfnF4tHgfaQD5i2iKZydtEGYQnCSEX?=
- =?us-ascii?Q?YR++C6GSUBXyZrRopCS1N+6l5Oko3ONKx9bo9wySs6atLpjUy+FYCFpK5pd8?=
- =?us-ascii?Q?KkyV0P4ZmcS313J+Ekj6SFw4qox8VXydgegyNKcpB1OrvIrcO5GJvkolwwhs?=
- =?us-ascii?Q?1un+4yzi9pwc8Zq1MwdrkqSQ/jmi0/57rSrBgePa6FlfaBjwzQEy/GH01L/o?=
- =?us-ascii?Q?YbDTPjiErhf4UhIycKu6LHhpg3EylHqFzW3cBafDm889x/DM9c7I2KePBGMD?=
- =?us-ascii?Q?WXlI6XA0du/N+h2F4XHTKcsgJNZb3wYODb1VZiTGjP7+d2a/a1/V9il70lud?=
- =?us-ascii?Q?LG+PU5J31RMZmoOnKroZ7fFo4pL3vu//3Hq9lhb4lLf8LzP5wqkbF87/jhs6?=
- =?us-ascii?Q?WI+X35YqWyqIUsWhtyThq+Z/eWXBoGYcptjJBXN9HMDUSkggWTmOH2PeesNg?=
- =?us-ascii?Q?8wQMTNJfri0zMHc0CkF1jfiTLoD1nSXpCPb7vODm2FCAIyAkWyZC9fxt8mkd?=
- =?us-ascii?Q?oFkHBYX9m4USHIzG5dWn8/aO5po/6q0bW1ynjAROOjxARdn5/RzFdM1ca/DL?=
- =?us-ascii?Q?FPNPoTNg8Vx1Cv+UIp1oycUeFnd1O3B+AOPKXJAgmHnplwG359mfCmIJhTgo?=
- =?us-ascii?Q?J4BAW7pGeWUY9yrZKAAy362u7xLU9AjT0cnthSawP0PSoUUwV5MTiV1uUdhI?=
- =?us-ascii?Q?ZT6RoQApALVRpB2Kfifuro2llR9YjDlZ7IXle8ys3+h5slE4M9uBNXt/xK34?=
- =?us-ascii?Q?Gc4x1VlLnQ3+qZllKM1+UL1YDZK5wpZCcNSZ/7u2msydg7z4xC65AFRV7bm9?=
- =?us-ascii?Q?LsFJQ8k82bHnbbZeFv5ZOtj8I/qJZyoiLN2ECPvNomcF0IA5KfAE4g=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR11MB8742.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?RoTB/g05+SxYa7DSu114rJj1oK17KJoszHlFM9dFMvHrxS46bjOtakvqiUBs?=
- =?us-ascii?Q?BhuZ7bJuBIxpvjtgBlwFWPCgLA+46Qp0KaIS4kcLlH94Aufsf7HE7MQzBStK?=
- =?us-ascii?Q?blr58T4MjVfZXb45P6e0zguHj52+WaM53ejDOCnUlULWCklgALqejIVH9cRX?=
- =?us-ascii?Q?d5qjLlj6F/ISmncqw1ommRNuxSonTP6k7eajcU+VSnygMVEb0jYpKD27Dw/w?=
- =?us-ascii?Q?jlg/7OeVYvsOBc5nAmRZgiSusKjiohGEFQEj8JSPkLTiFeno+pD5D0PI8r5F?=
- =?us-ascii?Q?2htPl2cBRdFjazVxlLUn98I2OJGWZKTVuovasXvMRo5AHytLTgVmnzi26SWj?=
- =?us-ascii?Q?jqmrgVZs0qCzIp4FON/wJFdFSPYMRIiFmH3GU2bo2XcQu+7DloUuypc617c9?=
- =?us-ascii?Q?Ner0NOEgzFLEVs9N/KGgq78u3m1m6uA/FDhMFWnkdnTfzTz1f8ht2GfkjKKN?=
- =?us-ascii?Q?1mljl3QcWEfocLC66HAUULkSuSjFVQygc9YO/jsXyvr494GQZXqiy6rAG5mT?=
- =?us-ascii?Q?21LQUhvkVLMY9GU5Fq0Q5n0c1V0+eNDx5xDTApnkGN2hSX87uvE+V4boXdmO?=
- =?us-ascii?Q?NGpURTC1D1jX0PIRThuT6M39aaczb24VMTgu13eFbmZCzkrSby5MNSHtxP8O?=
- =?us-ascii?Q?cy1joHrARvFW46dQn9KFa6oJ5H9XF1KI5R366WcjH/mHloL/n8yb/GJSqzPW?=
- =?us-ascii?Q?LM0+w2HQI64iJ4w7Q08uudrYB5XGCHMTg6TECDszPkJtukjAB2ixlqFvHzVQ?=
- =?us-ascii?Q?Jaq+S7OPxjC/04mI0cjUCg+iaGBAYCDBv5hrHXcTkTsSOEl8Pn72GZK0KEW9?=
- =?us-ascii?Q?cb/Rt/b7pd1VOWP5Prah5eHOhmLQJSpzeHCykD8O9Y+guJlOse4IQ9hOYq/I?=
- =?us-ascii?Q?k++rkTUJlrqXU5S06SEaoWnZ98doAl2ao3OhM4Zos12RcgtGhK9TBaH9vGSQ?=
- =?us-ascii?Q?Peb3jqowGd910tV+Xb3WNJAovh+SCFZkJI4k2combjKH84MpoL9W2Ei3lHSk?=
- =?us-ascii?Q?TZ/n+Caai6y+z0mJacQAMWKxDfyu1iZCe+ra0+a8Hd6lVElmAayJRCHDmjYH?=
- =?us-ascii?Q?kKqFf1ZoNQBuW20kjhthW2+0i/nXwCTA/fKonIPdA4KnUCAHJShp8TAx4TiK?=
- =?us-ascii?Q?Mh5Tm8BNB5RURvCvhyBDk9+q2xDGN+oEOJmVFvXwmAu00B3G/miQTZ8cwFqB?=
- =?us-ascii?Q?HpwNQkG3hPIXmtjrUxZ4ThzeStWO81JuYnhLrG8XcGtWln8cdbd1RFUILCf7?=
- =?us-ascii?Q?QfA91+iCj8yVMu9+EPuJTzOM9NiFpT01p6NtmyE6fCX8dVDSQxzyA1z+v02N?=
- =?us-ascii?Q?hBG2so123CxI6SseZ168beT5RHWo8jRi+s9Xn4E8iMWmScpdM1WSfM3UhFMS?=
- =?us-ascii?Q?MS+b3ucmQF3pPdUw19n47165kYpnhE2Jrucjqj5+1Q2f80v4XIxG+EaNfRPh?=
- =?us-ascii?Q?JA63TZzj9WTUTN6myHBwEORVvJynrU7aHj9PhKqPx9yJ9GQhjEOZcoutsm3h?=
- =?us-ascii?Q?RIBn3E9N0Bd2XfaCIKTFrBsHR00nCcoEYi1VvJtxtGG0PU/nSd8PsYWux8Jx?=
- =?us-ascii?Q?nDmTP5gz2HKh4qf641SeewQb10SdPZcLenkQlU//?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E15171F4CA9
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 23:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752102221; cv=none; b=dszjuq3Jn1f1uSAP8e3I6hbAMTVCa2fBYU9wSXukjoHu2bJKE4beTfe9/ZzZNYjcralqqvjwyUGKkzAdz4toPhV+nQjQqf68FwvzsWIjYTkYZ8hrx7gYunPbzDOWvOo3ovRlxjP2wrz8fmcdegTuY/GCX8FuM1YvGd68lh2Kgyo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752102221; c=relaxed/simple;
+	bh=G4l0U8v6qtxX2a5Cv67gQ62BBvPc0uOfHuT7rjhuE3s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kjCeKu30J4k4i/PYGkSAHCHNRmc7+nfjkoeSOBacl3yo+7Fpa5zKG2tLwVNjWYdRRgAbr0UFnUMhZ3SA2HTMdmA1MK8/Pi4EbjqnJzJs5MEoy9aEFV57bQFag7CDE0/LR4mG1CvbwnZZLZVxhkJMtWq0ZKQqCw2xnY/IxFlcfdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=TgViNMRs; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-313fab41fd5so64960a91.1
+        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 16:03:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1752102218; x=1752707018; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2sq61u4s3i6R9XZ54TUym9J43VKll7/XUlJYVOqxzKg=;
+        b=TgViNMRscb9vAlxt2+pvWheWBvdnnIwk+o4awc03P5LKLgp8OdEfC6Qp+22MweBE8t
+         p+vPuoQ/A1kEz3xkhvK/VnEP0CUjdKTfOEHni8Cd7h58XMltFUhgZt5YK0SWg1MY+gyf
+         Jdp1N2eUyGDmJojeshHOBcxyx8TW/fHCdSj6HFta9AFBf9ygjM0VrgDf/q3iqzSaIw8H
+         pNy/cWZ69Eb/Cf47VL3VczXHAAuKo7/pthX7ng41+VwcaVV7wTPunaFkWI2RyPJPnkpH
+         Ux674aEg1FfDPCIZyldeAJ9I2dcrud9J4O3S/3YwIBDn9ca471t74VZ/zuKDh3QmWE+6
+         5Img==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752102218; x=1752707018;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2sq61u4s3i6R9XZ54TUym9J43VKll7/XUlJYVOqxzKg=;
+        b=KaHJ3lCyNdG5i6iceIF1uBNe9ql9EQLc9x3mxu4RjlK4BswmfOcmdRl9wM69o/uZKj
+         Mgz6K4oPxDuUolh6ds4CAmjIOm+T3xdajhAWnevn0YklNfNa4U0Iit4lT972xX/wDJKg
+         n2/YhSwwwbuTaQHF2guLLM52KgQwtZdT7Jp5eKGLShxBI7HbKWNFNnEXO8T9nE3UkWfg
+         CmE0c3BaViDtulG0O8PR7+ZERKI3Sf7HQ0IDWngDvB5CU7hfdMBNoWVoTRM2YnBYdBjn
+         YFJl4LVuf1kvjIO3Ni1b75NJZvdtJiwjVfR1XQdNjg33A6RXIaOVytTs9JqSWTkzpEO9
+         FBTw==
+X-Gm-Message-State: AOJu0YytlofoSxEeWM4jVJ8NsslfjxP8LWstGsR51y8Co/ZollI80ThQ
+	glQvo2clY+OifL1MT24nH4awdQnNgSlX5K5ySVz69xxgDIz2R92Ovva1Vm4yDugMDhYUNxuL9b1
+	AtxBg
+X-Gm-Gg: ASbGncuNN6mViLYg25reOf/+f2APP2ESU6j8oc6YlWFniHrGVFlcH91Tiu0tSGQLMGk
+	FwPnaZaXDkUPHJzuEELsTf7fhd4qn6z8eLHRuC7RrzPWeX6xe6NH/70wNrnDPG78prMPJw1FZlj
+	WREusyhqutkffQu7hXBb70KYjH947HDfPFV6dOBmM5Nqg8ek9cM5ce8M/4h5c7NNnRNxuIBg7dC
+	DdM9sDhAtGqAid8R63MkXvDSC7hLDeWkrFe/ITdua+IMzcLEm7jhAtfPWA6VVHk9bFBbvrD/vLO
+	LM9WP0Qh5LaECVnpERcz8Ub3P8Sew2am0mvFaDOh4OguLAoQ/TLM0ZAcn09YaQ==
+X-Google-Smtp-Source: AGHT+IFmHXoB3Ip2CYkHzoQba1frxutSZauyCNbFz6O0zRGhCMs4xjVFfuEHYlOG1qTdToIk4vXeqg==
+X-Received: by 2002:a17:90b:5848:b0:311:b0ec:135e with SMTP id 98e67ed59e1d1-31c2fcc49c0mr2503233a91.2.1752102217932;
+        Wed, 09 Jul 2025 16:03:37 -0700 (PDT)
+Received: from t14.. ([2001:5a8:4528:b100:d121:1d56:91c1:bbff])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de42ad212sm2679015ad.80.2025.07.09.16.03.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Jul 2025 16:03:37 -0700 (PDT)
+From: Jordan Rife <jordan@jrife.io>
+To: netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: Jordan Rife <jordan@jrife.io>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Stanislav Fomichev <stfomichev@gmail.com>
+Subject: [PATCH v5 bpf-next 00/12] bpf: tcp: Exactly-once socket iteration
+Date: Wed,  9 Jul 2025 16:03:20 -0700
+Message-ID: <20250709230333.926222-1-jordan@jrife.io>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR11MB8742.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 23e22107-bb0f-4e1d-a6a1-08ddbf3cb0bd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2025 23:02:34.0573
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: C8gOo/8GgCRl5RneTUI8P3bABKGrcvekefB3ZewAPtxGxc3e6+zCbnEbaQE+mXAqql+NcbSmPmFnRrtPFX5jlta3EqdhiJ2U6THLcpk4ofA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7827
+Content-Transfer-Encoding: 8bit
 
-> Hi Tristram
->=20
-> On Tue, 8 Jul 2025 19:45:44 +0000
-> <Tristram.Ha@microchip.com> wrote:
->=20
-> > > Hi Tristram,
-> > >
-> > > On Mon, 7 Jul 2025 20:16:48 -0700
-> > > <Tristram.Ha@microchip.com> wrote:
-> > >
-> > > > From: Tristram Ha <tristram.ha@microchip.com>
-> > > >
-> > > > The fiber ports in KSZ8463 cannot be detected internally, so it req=
-uires
-> > > > specifying that condition in the device tree.  Like the one used in
-> > > > Micrel PHY the port link can only be read and there is no write to =
-the
-> > > > PHY.  The driver programs registers to operate fiber ports correctl=
-y.
-> > > >
-> > > > The PTP function of the switch is also turned off as it may interfe=
-re the
-> > > > normal operation of the MAC.
-> > > >
-> > > > Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
-> > > > ---
-> > > >  drivers/net/dsa/microchip/ksz8.c       | 26 ++++++++++++++++++++++=
-++++
-> > > >  drivers/net/dsa/microchip/ksz_common.c |  3 +++
-> > > >  2 files changed, 29 insertions(+)
-> > > >
-> > > > diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/mic=
-rochip/ksz8.c
-> > > > index 904db68e11f3..1207879ef80c 100644
-> > > > --- a/drivers/net/dsa/microchip/ksz8.c
-> > > > +++ b/drivers/net/dsa/microchip/ksz8.c
-> > > > @@ -1715,6 +1715,7 @@ void ksz8_config_cpu_port(struct dsa_switch *=
-ds)
-> > > >       const u32 *masks;
-> > > >       const u16 *regs;
-> > > >       u8 remote;
-> > > > +     u8 fiber_ports =3D 0;
-> > > >       int i;
-> > > >
-> > > >       masks =3D dev->info->masks;
-> > > > @@ -1745,6 +1746,31 @@ void ksz8_config_cpu_port(struct dsa_switch =
-*ds)
-> > > >               else
-> > > >                       ksz_port_cfg(dev, i, regs[P_STP_CTRL],
-> > > >                                    PORT_FORCE_FLOW_CTRL, false);
-> > > > +             if (p->fiber)
-> > > > +                     fiber_ports |=3D (1 << i);
-> > > > +     }
-> > > > +     if (ksz_is_ksz8463(dev)) {
-> > > > +             /* Setup fiber ports. */
-> > >
-> > > What does fiber port mean ? Is it 100BaseFX ? As this configuration i=
-s
-> > > done only for the CPU port (it seems), looks like this mode is planne=
-d
-> > > to be used as the MAC to MAC mode on the DSA conduit. So, instead of
-> > > using this property maybe you should implement that as handling the
-> > > "100base-x" phy-mode ?
-> > >
-> > > > +             if (fiber_ports) {
-> > > > +                     regmap_update_bits(ksz_regmap_16(dev),
-> > > > +                                        reg16(dev, KSZ8463_REG_CFG=
-_CTRL),
-> > > > +                                        fiber_ports << PORT_COPPER=
-_MODE_S,
-> > > > +                                        0);
-> > > > +                     regmap_update_bits(ksz_regmap_16(dev),
-> > > > +                                        reg16(dev, KSZ8463_REG_DSP=
-_CTRL_6),
-> > > > +                                        COPPER_RECEIVE_ADJUSTMENT,=
- 0);
-> > > > +             }
-> > > > +
-> > > > +             /* Turn off PTP function as the switch's proprietary =
-way of
-> > > > +              * handling timestamp is not supported in current Lin=
-ux PTP
-> > > > +              * stack implementation.
-> > > > +              */
-> > > > +             regmap_update_bits(ksz_regmap_16(dev),
-> > > > +                                reg16(dev, KSZ8463_PTP_MSG_CONF1),
-> > > > +                                PTP_ENABLE, 0);
-> > > > +             regmap_update_bits(ksz_regmap_16(dev),
-> > > > +                                reg16(dev, KSZ8463_PTP_CLK_CTRL),
-> > > > +                                PTP_CLK_ENABLE, 0);
-> > > >       }
-> > > >  }
-> > > >
-> > > > diff --git a/drivers/net/dsa/microchip/ksz_common.c
-> > > b/drivers/net/dsa/microchip/ksz_common.c
-> > > > index c08e6578a0df..b3153b45ced9 100644
-> > > > --- a/drivers/net/dsa/microchip/ksz_common.c
-> > > > +++ b/drivers/net/dsa/microchip/ksz_common.c
-> > > > @@ -5441,6 +5441,9 @@ int ksz_switch_register(struct ksz_device *de=
-v)
-> > > >                                               &dev->ports[port_num]=
-.interface);
-> > > >
-> > > >                               ksz_parse_rgmii_delay(dev, port_num, =
-port);
-> > > > +                             dev->ports[port_num].fiber =3D
-> > > > +                                     of_property_read_bool(port,
-> > > > +                                                           "micrel=
-,fiber-mode");
-> > >
-> > > Shouldn't this be described in the binding ?
-> > >
-> > > >                       }
-> > > >                       of_node_put(ports);
-> > > >               }
-> >
-> > The "micrel,fiber-mode" is described in Documentation/devicetree/
-> > bindings/net/micrel.txt.
->=20
-> Yes but that's for PHYs right ? Yours is under the DSA "ports"
-> node.
->=20
-> >
-> > Some old KSZ88XX switches have option of using fiber in a port running
-> > 100base-fx.  Typically they have a register indicating that configurati=
-on
-> > and the driver just treats the port as having a PHY and reads the link
-> > status and speed as normal except there is no write to those PHY relate=
-d
-> > registers.  KSZ8463 does not have that option so the driver needs to be
-> > told.
->=20
-> That's what I understood from your comments indeed, what thew me off
-> guard is that all ports's fiber mode is configured in the
-> config_cpu_port() callback.
->=20
-> I'd like to one day be able to deprecate these
-> micrel,fiber-mode/ti,fiber-mode properties in favor of the ports API
-> that's being worked on, but I guess we can roll with it for now.
+TCP socket iterators use iter->offset to track progress through a
+bucket, which is a measure of the number of matching sockets from the
+current bucket that have been seen or processed by the iterator. On
+subsequent iterations, if the current bucket has unprocessed items, we
+skip at least iter->offset matching items in the bucket before adding
+any remaining items to the next batch. However, iter->offset isn't
+always an accurate measure of "things already seen" when the underlying
+bucket changes between reads, which can lead to repeated or skipped
+sockets. Instead, this series remembers the cookies of the sockets we
+haven't seen yet in the current bucket and resumes from the first cookie
+in that list that we can find on the next iteration.
 
-Is that required to declare the parameter in the device tree document?
-It is just a bit of hassle to create another one just for KSZ8463.  The
-other old switches likely do not need this.  And the new KSZ9477 and
-LAN937X switches use the SFP case logic.
+This is a continuation of the work started in [1]. This series largely
+replicates the patterns applied to UDP socket iterators, applying them
+instead to TCP socket iterators.
+
+CHANGES
+=======
+v4 -> v5:
+* Move WARN_ON_ONCE before the `done` label in patch two ("bpf: tcp:
+  Make sure iter->batch always contains a full bucket snapshot"")
+  (Martin).
+* Remove unnecessary kfunc declaration in patch eleven ("selftests/bpf:
+  Create iter_tcp_destroy test program") (Martin).
+* Make sure to close the socket fd at the end of `destroy` in patch
+  twelve ("selftests/bpf: Add tests for bucket resume logic in
+  established sockets") (Martin).
+
+v3 -> v4:
+* Drop braces around sk_nulls_for_each_from in patch five ("bpf: tcp:
+  Avoid socket skips and repeats during iteration") (Stanislav).
+* Add a break after the TCP_SEQ_STATE_ESTABLISHED case in patch five
+  (Stanislav).
+* Add an `if (sock_type == SOCK_STREAM)` check before assigning
+  TCP_LISTEN to skel->rodata->ss in patch eight ("selftests/bpf: Allow
+  for iteration over multiple states") to more clearly express the
+  intent that the option is only consumed for SOCK_STREAM tests
+  (Stanislav).
+* Move the `i = 0` assignment into the for loop in patch ten
+  ("selftests/bpf: Create established sockets in socket iterator
+  tests") (Stanislav).
+
+v2 -> v3:
+* Unroll the loop inside bpf_iter_tcp_batch to make the logic easier to
+  follow in patch two ("bpf: tcp: Make sure iter->batch always contains
+  a full bucket snapshot"). This gets rid of the `resizes` variable from
+  v2 and eliminates the extra conditional that checks how many batch
+  resize attempts have occurred so far (Stanislav).
+    Note: This changes the behavior slightly. Before, in the case that
+    the second call to tcp_seek_last_pos (and later bpf_iter_tcp_resume)
+    advances to a new bucket, which may happen if the current bucket is
+    emptied after releasing its lock, the `resizes` "budget" would be
+    reset, the net effect being that we would try a batch resize with
+    GFP_USER at most once per bucket. Now, we try to resize the batch
+    with GFP_USER at most once per call, so it makes it slightly more
+    likely that we hit the GFP_NOWAIT scenario. However, this edge case
+    should be rare in practice anyway, and the new behavior is more or
+    less consistent with the original retry logic, so avoid the loop and
+    prefer code clarity.
+* Move the call to bpf_iter_tcp_put_batch out of
+  bpf_iter_tcp_realloc_batch and call it directly before invoking
+  bpf_iter_tcp_realloc_batch with GFP_USER inside bpf_iter_tcp_batch.
+  /Don't/ call it before invoking bpf_iter_tcp_realloc_batch the second
+  time while we hold the lock with GFP_NOWAIT. This avoids a conditional
+  inside bpf_iter_tcp_realloc_batch from v2 that only calls
+  bpf_iter_tcp_put_batch if flags != GFP_NOWAIT and is a bit more
+  explicit (Stanislav).
+* Adjust patch five ("bpf: tcp: Avoid socket skips and repeats during
+  iteration") to fit with the new logic in patch two.
+
+v1 -> v2:
+* In patch five ("bpf: tcp: Avoid socket skips and repeats during
+  iteration"), remove unnecessary bucket bounds checks in
+  bpf_iter_tcp_resume. In either case, if st->bucket is outside the
+  current table's range then bpf_iter_tcp_resume_* calls *_get_first
+  which immediately returns NULL anyway and the logic will fall through.
+  (Martin)
+* Add a check at the top of bpf_iter_tcp_resume_listening and
+  bpf_iter_tcp_resume_established to see if we're done with the current
+  bucket and advance it immediately instead of wasting time finding the
+  first matching socket in that bucket with
+  (listening|established)_get_first. In v1, we originally discussed
+  adding logic to advance the bucket in bpf_iter_tcp_seq_next and
+  bpf_iter_tcp_seq_stop, but after trying this the logic seemed harder
+  to track. Overall, keeping everything inside bpf_iter_tcp_resume_*
+  seemed a bit clearer. (Martin)
+* Instead of using a timeout in the last patch ("selftests/bpf: Add
+  tests for bucket resume logic in established sockets") to wait for
+  sockets to leave the ehash table after calling close(), use
+  bpf_sock_destroy to deterministically destroy and remove them. This
+  introduces one more patch ("selftests/bpf: Create iter_tcp_destroy
+  test program") to create the iterator program that destroys a selected
+  socket. Drive this through a destroy() function in the last patch
+  which, just like close(), accepts a socket file descriptor. (Martin)
+* Introduce one more patch ("selftests/bpf: Allow for iteration over
+  multiple states") to fix a latent bug in iter_tcp_soreuse where the
+  sk->sk_state != TCP_LISTEN check was ignored. Add the "ss" variable to
+  allow test code to configure which socket states to allow.
+
+[1]: https://lore.kernel.org/bpf/20250502161528.264630-1-jordan@jrife.io/
+
+Jordan Rife (12):
+  bpf: tcp: Make mem flags configurable through
+    bpf_iter_tcp_realloc_batch
+  bpf: tcp: Make sure iter->batch always contains a full bucket snapshot
+  bpf: tcp: Get rid of st_bucket_done
+  bpf: tcp: Use bpf_tcp_iter_batch_item for bpf_tcp_iter_state batch
+    items
+  bpf: tcp: Avoid socket skips and repeats during iteration
+  selftests/bpf: Add tests for bucket resume logic in listening sockets
+  selftests/bpf: Allow for iteration over multiple ports
+  selftests/bpf: Allow for iteration over multiple states
+  selftests/bpf: Make ehash buckets configurable in socket iterator
+    tests
+  selftests/bpf: Create established sockets in socket iterator tests
+  selftests/bpf: Create iter_tcp_destroy test program
+  selftests/bpf: Add tests for bucket resume logic in established
+    sockets
+
+ net/ipv4/tcp_ipv4.c                           | 269 ++++++++---
+ .../bpf/prog_tests/sock_iter_batch.c          | 452 +++++++++++++++++-
+ .../selftests/bpf/progs/sock_iter_batch.c     |  36 +-
+ 3 files changed, 673 insertions(+), 84 deletions(-)
+
+-- 
+2.43.0
 
 
