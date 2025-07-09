@@ -1,196 +1,88 @@
-Return-Path: <netdev+bounces-205338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06329AFE375
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 11:03:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C00C1AFE37B
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 11:03:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59D2C4A6AF4
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 09:02:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73479541FCE
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 09:02:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F04F284B57;
-	Wed,  9 Jul 2025 09:02:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75034283151;
+	Wed,  9 Jul 2025 09:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cdcyfnAd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ICNOyLZL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4068D28469F
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 09:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA8427A90A
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 09:03:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752051745; cv=none; b=SLUy8hyU/cdZ7qpFz4FXj5TzvcJ1IFWKlD6GV0Znye+QhXlLfDGNF9+m8YtyNZLs+dxeVamXfAqMxGWZjp/9l4/5zhNgWROStVdDp6fIJVI34GiGSY+eAZSlEmT2Q7PMK9BB8SgG6UXfcUFdLXXmcq8MMyqAvFY9tK3KaaOdvlY=
+	t=1752051795; cv=none; b=rjxnCGZZ1DLvHX5eFXI6WQEgSUwJrR1WdjPvEGG01PDBuGK9DL1RR9+pZnzC/6LH+UN9Wsdbb78ymfLpQA6E2UbBU51tPORyRFhJAH4D8kOzQoiCMqN1a16ZKL/fLVs6OgeJ4nYe0sQD6k1r3OhhWlHigwr4VgT9Ix9dJmh9YIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752051745; c=relaxed/simple;
-	bh=/J0ESgh0mnZJh7VIVascAzPB03YG2Nks06BWwBkQ7wA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FoAGFDHJT4cXuI1P7f1DG48LWl6pP9eL6nSzyFUgcXTVhFnTJRgLhPmH6aEZ8zEG+UyAZsh+jmU2Z+0YEbQtH0WmlL21WuZGD44fjXdIL0OyvPECs+QI+p+qZGNjAJrSSdKGcedT+yljELd1IfEH7F66hQmlYs7Df63S3NiNLgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cdcyfnAd; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752051742;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gP/GXbkE1NcvqZ2RDyr5+g96OSyeyTW+E8pt68Nv348=;
-	b=cdcyfnAdDecCXP6N7ALPN6Wnh2huithZFmn3G9SCyLW9xrKhmyBUZpVSgTD+1hVKaG2Soh
-	T9l3Vbyh42064+Ux/Vb7pR5wiFb5XOFlVSW6PBMnccdf7E5SJaFuicVVeNY6Ppq3oNa921
-	DEhlpEAoG41kCXKtvKe9Gioh7hLVeOY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-327-4zHzcV1FPnK7N-ZA8J4sHg-1; Wed, 09 Jul 2025 05:02:21 -0400
-X-MC-Unique: 4zHzcV1FPnK7N-ZA8J4sHg-1
-X-Mimecast-MFC-AGG-ID: 4zHzcV1FPnK7N-ZA8J4sHg_1752051740
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a6d90929d6so2273803f8f.2
-        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 02:02:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752051740; x=1752656540;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gP/GXbkE1NcvqZ2RDyr5+g96OSyeyTW+E8pt68Nv348=;
-        b=jSkeyvkg/kiKKALPXORAwj4TgNRlvOGqr9sUU5hXYGKJla1/kGMXJBWd8hSt/r/wS+
-         hfcewFa7L7YDNfm/bpG+u2/AQWGxtRStgm2egTlCBWQ2YZekLASgPubwCZy63OgszQ7T
-         AjKJlKWWWaWgqaa2PLmdYyq/sLrbyBV4amDXes8MQAcg1Ars6exSICZ+PI2kCDPszyZq
-         DbRAji4cDUzrXk/ic0x+TZfbCspkiR84+/SvRtp3ic1utGglkQGT9mgNjs6qMwewYej6
-         Odhy5nWjdt5RyeQdOmwPzirJTo9Myx3T7A5ubUWVMD8VA0mmYdvn1LfcCSVcMoW/jRz/
-         NhqQ==
-X-Gm-Message-State: AOJu0YydEJIJL7qjkqtrZhH5xdxgvHZ1ssP/0jHdrLVtVJyCIq9sw1de
-	u6ou0V/apR8KPkUqE5abX9DHxq/jRK0v2GGbt/FI7WP+vffhfsY02dgVDeOGx7eoPSBBqqujieT
-	TwVYd/yT2o3RSfH3cC1yFe+MQf/8Xv6XernWJNearfPmMyBOKZAQdEminyA==
-X-Gm-Gg: ASbGnct5hZSFsKOk5i+MKTSqwwHYyHs2tDVBVmpGWVSdbOJdZdDDSADfXbhXDhcqDfK
-	TS3nZAmI4KFBsTfD4f6JuXvotSOz3s5P10wsUj0Es9/pAt/ft35ZX6NnejXr8kO8QhNetsifGet
-	nAat9/+ktBbnDo0mPAzqYHY65fDfOspRTCA7TZ3un9S2nMzrtq3L+mlYPZqq3u/FnOTWPR8+Jds
-	foLO6X5NqaOhWJdeI2iMJtOpqUu3VtnPsdaMdr+Dr9kwRDBwXgUXkQIT5qxARecpnAgV5hf1lzD
-	ozgpH58DTTkrBsNYRNia3hHRijL4lw+kxRd7iCQzPf1ZGh4bC9oW0dUog9MCSHabCzrPug==
-X-Received: by 2002:a05:6000:401e:b0:3a4:dd16:a26d with SMTP id ffacd0b85a97d-3b5e4557000mr1138904f8f.38.1752051739630;
-        Wed, 09 Jul 2025 02:02:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEw4zbfGS21uIVcbjgAQJWRQweoo04GUYIyOc9k/VYy3AR2hTTjemFRoGraFLo8yVdWPnB2Pw==
-X-Received: by 2002:a05:6000:401e:b0:3a4:dd16:a26d with SMTP id ffacd0b85a97d-3b5e4557000mr1138868f8f.38.1752051739120;
-        Wed, 09 Jul 2025 02:02:19 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:271f:bc10:144e:d87a:be22:d005? ([2a0d:3344:271f:bc10:144e:d87a:be22:d005])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b47030ba29sm14962982f8f.2.2025.07.09.02.02.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Jul 2025 02:02:18 -0700 (PDT)
-Message-ID: <cc4d09e8-d11a-4188-9f80-3ac7bb6e89e9@redhat.com>
-Date: Wed, 9 Jul 2025 11:02:17 +0200
+	s=arc-20240116; t=1752051795; c=relaxed/simple;
+	bh=xFtFNX/DlHX/+CSdrNQjnXsS0JV3DW/uHQEalrphf5E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EJ0vYZKmH2mDKoNB67pGwcWJce+68UrgGP7bNwSkU8CW38GWNe8KjDiUaH3hvq06cGWEntB7Ni2e1ClCgPSUc9WsVmUyJO1tQfbWTyN3Q5b4+uWO6BShQL9tO1xJjcGjSdav4ATZW7dG2JMalaMP9hf22dtxIlC9taHfPQ4ELNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ICNOyLZL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 620DBC4CEEF;
+	Wed,  9 Jul 2025 09:03:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752051794;
+	bh=xFtFNX/DlHX/+CSdrNQjnXsS0JV3DW/uHQEalrphf5E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ICNOyLZL7H6G6g58W7/9Qna6VrtrsBmVyQurn9UxBXQZ5RccyUeepbjn0x2zSJzm+
+	 BKGvUk3XUwFRmeyo+5kX+a0mQMuX8/mmTQfBp7S1Dlmo5EV38bAY6kRD/yj6Vr6kvc
+	 BSI4ixGXRjnokChtYRVk1o+kElsyGnZiXekX0OwfHE+/vVMbXiV1tawBPJiTLIKPCm
+	 NFzbXI8opJ8AyCW5sR9YhCw+LpzX7U9ep4rb1bGlLP7aFcF6YSExcdd87idosqm9ix
+	 Ff57etJtLnNfkKn/PbWg6IW7zC8JrEQzKdJeQB0eKtemzDi4XQrxO7pbvOAmAByj8Q
+	 cbNa0VOS3oAaQ==
+Date: Wed, 9 Jul 2025 10:03:11 +0100
+From: Simon Horman <horms@kernel.org>
+To: Matt Johnston <matt@codeconstruct.com.au>
+Cc: Jeremy Kerr <jk@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/8] net: mctp: mctp_test_route_extaddr_input
+ cleanup
+Message-ID: <20250709090311.GP452973@horms.kernel.org>
+References: <20250709-mctp-bind-v3-0-eac98bbf5e95@codeconstruct.com.au>
+ <20250709-mctp-bind-v3-1-eac98bbf5e95@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 net-next 0/9] virtio: introduce GSO over UDP tunnel
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>,
- Akihiko Odaki <akihiko.odaki@daynix.com>, Jonathan Corbet <corbet@lwn.net>,
- kvm@vger.kernel.org, linux-doc@vger.kernel.org
-References: <cover.1751874094.git.pabeni@redhat.com>
- <20250708105816-mutt-send-email-mst@kernel.org>
- <20250708082404.21d1fe61@kernel.org>
- <20250708120014-mutt-send-email-mst@kernel.org>
- <27d6b80a-3153-4523-9ccf-0471a85cb245@redhat.com>
- <20250708142248-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250708142248-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250709-mctp-bind-v3-1-eac98bbf5e95@codeconstruct.com.au>
 
-On 7/8/25 8:23 PM, Michael S. Tsirkin wrote:
-> On Tue, Jul 08, 2025 at 06:43:17PM +0200, Paolo Abeni wrote:
->> On 7/8/25 6:00 PM, Michael S. Tsirkin wrote:
->>> On Tue, Jul 08, 2025 at 08:24:04AM -0700, Jakub Kicinski wrote:
->>>> On Tue, 8 Jul 2025 11:01:30 -0400 Michael S. Tsirkin wrote:
->>>>>> git@github.com:pabeni/linux-devel.git virtio_udp_tunnel_07_07_2025
->>>>>>
->>>>>> The first 5 patches in this series, that is, the virtio features
->>>>>> extension bits are also available at [2]:
->>>>>>
->>>>>> git@github.com:pabeni/linux-devel.git virtio_features_extension_07_07_2025
->>>>>>
->>>>>> Ideally the virtio features extension bit should go via the virtio tree
->>>>>> and the virtio_net/tun patches via the net-next tree. The latter have
->>>>>> a dependency in the first and will cause conflicts if merged via the
->>>>>> virtio tree, both when applied and at merge window time - inside Linus
->>>>>> tree.
->>>>>>
->>>>>> To avoid such conflicts and duplicate commits I think the net-next
->>>>>> could pull from [1], while the virtio tree could pull from [2].  
->>>>>
->>>>> Or I could just merge all of this in my tree, if that's ok
->>>>> with others?
->>>>
->>>> No strong preference here. My first choice would be a branch based
->>>> on v6.16-rc5 so we can all pull in and resolve the conflicts that
->>>> already exist. But I haven't looked how bad the conflicts would 
->>>> be for virtio if we did that. On net-next side they look manageable.
->>>
->>> OK, let's do it the way Paolo wants then.
->>
->> I actually messed a bit with my proposal, as I forgot I need to use a
->> common ancestor for the branches I shared.
->>
->> git@github.com:pabeni/linux-devel.git virtio_features_extension_07_07_2025
->>
->> is based on current net-next and pulling from such tag will take a lot
->> of unwanted stuff into the vhost tree.
->>
->> @Michael: AFAICS the current vhost devel tree is based on top of
->> v6.15-rc7, am I correct?
+On Wed, Jul 09, 2025 at 04:31:02PM +0800, Matt Johnston wrote:
+> The sock was not being released. Other than leaking, the stale socket
+> will conflict with subsequent bind() calls in unrelated MCTP tests.
 > 
-> Yes I'll rebase it soon.
+> Fixes: 11b67f6f22d6 ("net: mctp: test: Add extaddr routing output test")
 
-I see you rebase on v6.16-rc5, thanks!
+Hi Matt,
 
-The whole series in now also available based on top of v6.16-rc5 here:
+What I assume is that commit seems to have a different hash in net-next.
 
-git@github.com:pabeni/linux-devel.git virtio_udp_tunnel_08_07_2025
+Fixes: 46ee16462fed ("net: mctp: test: Add extaddr routing output test")
 
-I'm not sending the above to netdev, as it will likely foul the bot and
-the CI. Please LMK if you prefer otherwise.
+> Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
+> 
+> ---
+> Added in v3. The problem was introduced in current net-next so
+> this patch isn't needed in the stable tree.
 
-With default config/strategy I can pull the above on top of the vhost
-tree with no conflicts and auto merging.
+Ack, thanks for noting that.
 
-Pulling on net-next will see a conflict in patch 8/9, file tun.c inside
-tun_xdp_one(), and the resolution is as follow, which will yield the
-code posted here:
-
-https://lore.kernel.org/netdev/f076f2e1fa91041b15cf46efadc6708924afe8e0.1751874094.git.pabeni@redhat.com/
-
----
-diff --cc drivers/net/tun.c
-index 447c37959504,abc91f28dac4..49bcd12a4ac8
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@@ -2356,12 -2378,15 +2378,14 @@@ static int tun_xdp_one(struct tun_struc
-                       struct tun_page *tpage)
-  {
-        unsigned int datasize = xdp->data_end - xdp->data;
- -      struct tun_xdp_hdr *hdr = xdp->data_hard_start;
- +      struct virtio_net_hdr *gso = xdp->data_hard_start;
-+       struct virtio_net_hdr_v1_hash_tunnel *tnl_hdr;
- -      struct virtio_net_hdr *gso = &hdr->gso;
-        struct bpf_prog *xdp_prog;
-        struct sk_buff *skb = NULL;
-        struct sk_buff_head *queue;
-+       netdev_features_t features;
-        u32 rxhash = 0, act;
- -      int buflen = hdr->buflen;
- +      int buflen = xdp->frame_sz;
-        int metasize = 0;
-
+...
 
