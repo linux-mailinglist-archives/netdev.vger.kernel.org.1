@@ -1,107 +1,135 @@
-Return-Path: <netdev+bounces-205434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95049AFEA8A
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:43:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46A32AFEAA8
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:49:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F224D4845B0
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:42:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B2617B6B55
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:47:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4C782DFA39;
-	Wed,  9 Jul 2025 13:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0750D2E090E;
+	Wed,  9 Jul 2025 13:49:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="mx2uOdn7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e44AM8vZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37E3A2DCF5B;
-	Wed,  9 Jul 2025 13:43:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB452DCF5B;
+	Wed,  9 Jul 2025 13:49:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752068583; cv=none; b=ToMw47bVKDns7Aq+HnVCd6NyszTc7TdLnHjbArHWDkVgIzYLPIZ10QSdNpHWZu0+pBiTh/eWZ2c6YWwjifqD8LDsoPY+5P44OHVs54xiI0UUYBk6ilzs0rGgyEXmxSspxZAKfPIALnPjU+YQpBYPQKGcdvuo6RSBqp0o/d4WxE0=
+	t=1752068945; cv=none; b=oahORcSBQ8asRSsBjPPDSj7kEK6Kb+yRg6xL4l7v81fyxCrfhUFXCyXK0T3ruz0RL0Jg9wPVrgHoLbsweJWKcDozp4uK503qHfLIIry3Z/5W6IokYFIguOYNacGHvqUPcP95yhRkU2wSb5S0UEfLXrYGYBDV0fRuyFoYMTj+5qY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752068583; c=relaxed/simple;
-	bh=xww6hMBOjTVwiOv2DC1vpenT+J8Pu/zpCSWlyZFCzGU=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=sE2TqtSrwnz2E8Ygd5qZkIKMHGOhO5E0DWsirPo+im7yjbo5SiScr7Xlz9tXMlBdsnpdeI2cEATIzEsTTXNU0SzKycXD7/eItVo1TnWhSPOi3c02nGHGJoH+PnDOoZXHlTWViY3bJksRTvVy5wZSXTtuVx2eZnjMPKj2MmzDN40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=mx2uOdn7; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id A69D4201656B; Wed,  9 Jul 2025 06:43:01 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A69D4201656B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1752068581;
-	bh=zpmJrbND/1sgJVHdc73Wad6MQdTQuZiNnFvSeRoR2HE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=mx2uOdn70UGsehG1znRqpXJo/VQuJtlRR5NmI+OVuS2bhQPpUVL4p5GPdytBaQiyv
-	 Lf0mpsKO0dxEYOKUVvhI7xrf4xxZR5lFzbr/tthoo2UKQu2FrfUUwsLjeCpXBZJHG8
-	 enXk/bQem1bHNrjuO5kLIyfVuAp8UmAyxrGNC+nI=
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Dexuan Cui <decui@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Dipayaan Roy <dipayanroy@linux.microsoft.com>,
-	Shiraz Saleem <shirazsaleem@microsoft.com>
-Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	netdev@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Paul Rosswurm <paulros@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>
-Subject: [PATCH] net: mana: fix spelling for mana_gd_deregiser_irq()
-Date: Wed,  9 Jul 2025 06:43:00 -0700
-Message-Id: <1752068580-27215-1-git-send-email-shradhagupta@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1752068945; c=relaxed/simple;
+	bh=d60WP6pubxI4wztZMJX26s9D12yMKyxg6mc078wlQIo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=buoyN0jHHQKXqKs3/x6r4I9w3HtBjz9TG6ecwswi5cS/TPJsoS7XXRo/WTBzVyeHlwK/98/6UWEftoIlVyV0Z2qV2i8S0ZqMNN3fWX5hipqY8OkwzmV/0nqjGwRYxdT2HU+xpBPW9ZtmaOA9APPTHdR1DfeJ9blLiYSzmWJXtxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e44AM8vZ; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ae3be3eabd8so219750166b.1;
+        Wed, 09 Jul 2025 06:49:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752068942; x=1752673742; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7tPZ2snfZJMpsUBAg/+z6Smy+g9cPqG2rxkyRsXfVc4=;
+        b=e44AM8vZvAzEQJXmAdebRGlpTfVJSMtlp85UgJp1/LI1OU+mpYaF/yZ+ju0DBV7Wkl
+         jX4Mvz+i6Ksl3CXjFY30sw/G/hGCC0wCX7Jef4X5BnSwMNFmIiUmN93ADxt5G60qbzxU
+         4LWPX8yL1XxWWntmbJRE0oHSvTmWbKcych1bDoS4Bk2jGMa6zuHmOpEGJAj3Bp0N/Tj9
+         J5LBpczW3ZlE+eCfoGolNrD1RISvzeBEN97zkihYRUTfJExvEfvs4xa2DbbPu4jxLiTS
+         hI0X+lGBzUgwteKUxzFOhs8gkG3DgDXAzlnsP7qwgjHFsa7AxYkbUtqYhabCPPbzanKJ
+         5ung==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752068942; x=1752673742;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7tPZ2snfZJMpsUBAg/+z6Smy+g9cPqG2rxkyRsXfVc4=;
+        b=u4T5QJc1iWkLkDd59B0YCMJbpbyvI3oPTptIkPHaWbOXLQiKqWp99CAm5jB38F9kS9
+         V8dPjWeyhFs5ejiQULLrZ1Eyz87KVoO34AgDUCdG8zj0MmaKbePxWQKpsU0/HEQYXzyo
+         Q/PgNMspEjM7A9vOlcW99UiGSVtoMjL/dK7d7TzemukzAhLBZttMgDddSwcL/RVsxmd7
+         5VR7xfGqPOSZ7Bjnz38CjsTbViMwOXfVksU0zRS4L+xVy425NWxP1VQSHRbHCD43M0wv
+         Oi5ZI3GJM8PBxNaWa6VccfUiZiwYbe+rQken3iUA/EQi6uCA8zcIids8Tzas7Xjw7QAd
+         6E7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUepg/e4EJ4uP6MQ2WJbFh8kbqarz+ViSiLH+fHIRqXy0YPNWbfX9cFldwiP1lxPrmuukX/xgaN@vger.kernel.org, AJvYcCWi8ISsSOYsDWb6tDErPPnpbydGezDtcFox7uNK/B/29eJvPcOc0CCMUG0p5MVOY7fYGU8f24Uu4w==@vger.kernel.org, AJvYcCWvsAoJiVdB6WK1Ex/x52xvOokjBPDADLQ2yiknexFTz6pTFaKD5nBxoAz0qgsXS8mPFBwL9smErgf9Mvg9@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxc19Angtd668f/J+tJO8EE75dpQ+SPTBeqO5fCFdhomNfzUU1j
+	/sqM2ma1dZCjWL3/fF5Uh5b2CV3yPf4qz9ykutBVx7VNEM6CQEhIFdYcmrLObg==
+X-Gm-Gg: ASbGncvj6HkhmfeEZIjnvc244upWqYJ5afiIh7mKG22aiFc9Nuq6qU485pIBN/4G309
+	26sGRSXtVeOxMP4aNKe/rfjfXoXUsftTYcH5aFQbxFafeAv/9KnlK366La2wmqhn2w/D2RlLie0
+	TXclNpEWRyeutcf074oC9U0MFdJxv4gvjuSf7Rkzb2l9uDsawzyqyMr4YTc2F/d2a2FWlKtrl+1
+	KTN6I13tcBn/JzlnSxkTp5yaynJWWCu7G58fpjXiXrYTN47X2ifdftKmkzTLXpuwItLnmg7FBXp
+	5cWpgV79P53KBDEz+i3Y6M+eMtfG/X+9mg7GejYkNUPj59GrLtdnFfGQwrvhJJvJyTbAWnN00v4
+	=
+X-Google-Smtp-Source: AGHT+IF31JR2looeKB7ac3iqDu1s74r171lLgGcy1Nj4GskaS7HfgrExrdlbN4zWs9o6Zi51j02V/A==
+X-Received: by 2002:a17:906:eecd:b0:ae6:dd93:2cac with SMTP id a640c23a62f3a-ae6dd932d17mr65632466b.7.1752068942242;
+        Wed, 09 Jul 2025 06:49:02 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::1ac? ([2620:10d:c092:600::1:e3ec])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae3f6abfd8bsm1103765266b.81.2025.07.09.06.49.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Jul 2025 06:49:01 -0700 (PDT)
+Message-ID: <020a278f-2fae-4242-b55a-7b4faab37e55@gmail.com>
+Date: Wed, 9 Jul 2025 14:50:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: Allow non parent devices to be used for ZC DMA
+To: Dragos Tatulea <dtatulea@nvidia.com>, almasrymina@google.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+ Simona Vetter <simona.vetter@ffwll.ch>, Willem de Bruijn
+ <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+Cc: cratiu@nvidia.com, parav@nvidia.com, Tariq Toukan <tariqt@nvidia.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ io-uring@vger.kernel.org
+References: <20250709124059.516095-2-dtatulea@nvidia.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250709124059.516095-2-dtatulea@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Fix the typo in function name mana_gd_deregiser_irq()
+On 7/9/25 13:40, Dragos Tatulea wrote:
+> For zerocopy (io_uring, devmem), there is an assumption that the
+> parent device can do DMA. However that is not always the case:
+> ScalableFunction devices have the DMA device in the grandparent.
+> 
+> This patch adds a helper for getting the DMA device for a netdev from
+> its parent or grandparent if necessary. The NULL case is handled in the
+> callers.
+> 
+> devmem and io_uring are updated accordingly to use this helper instead
+> of directly using the parent.
+> 
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Fixes: 170aafe35cb9 ("netdev: support binding dma-buf to netdevice")
+> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+> ---
+> Changes in v1:
+> - Upgraded from RFC status.
+> - Dropped driver specific bits for generic solution.
+> - Implemented single patch as a fix as requested in RFC.
+> - Handling of multi-PF netdevs will be handled in a subsequent patch
+>    series.
+> 
+> RFC: https://lore.kernel.org/all/20250702172433.1738947-2-dtatulea@nvidia.com/
+I can't say anything about the walking to grand parent part, but
+the rest looks good.
 
-Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
----
- drivers/net/ethernet/microsoft/mana/gdma_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index a468cd8e5f36..d6c0699bc8cf 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -657,7 +657,7 @@ static int mana_gd_register_irq(struct gdma_queue *queue,
- 	return 0;
- }
- 
--static void mana_gd_deregiser_irq(struct gdma_queue *queue)
-+static void mana_gd_deregister_irq(struct gdma_queue *queue)
- {
- 	struct gdma_dev *gd = queue->gdma_dev;
- 	struct gdma_irq_context *gic;
-@@ -750,7 +750,7 @@ static void mana_gd_destroy_eq(struct gdma_context *gc, bool flush_evenets,
- 			dev_warn(gc->dev, "Failed to flush EQ: %d\n", err);
- 	}
- 
--	mana_gd_deregiser_irq(queue);
-+	mana_gd_deregister_irq(queue);
- 
- 	if (queue->eq.disable_needed)
- 		mana_gd_disable_queue(queue);
-
-base-commit: ea988b450690448d5b12ce743a598ade7a8c34b1
 -- 
-2.34.1
+Pavel Begunkov
 
 
