@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-205283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01CEAAFE097
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 08:54:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE4A5AFE0D1
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 09:05:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEC2C1BC540F
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 06:54:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AA721AA2C68
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 07:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE92426B2B3;
-	Wed,  9 Jul 2025 06:54:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD26270EAB;
+	Wed,  9 Jul 2025 07:05:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eqrLfrxI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SqRwgVJi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B08D61B4153;
-	Wed,  9 Jul 2025 06:54:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3BB27055A;
+	Wed,  9 Jul 2025 07:05:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752044070; cv=none; b=AjCvZAMUUGHhrA4oJZ06nY7P+CXTdAq1QqUU9jw6+mrqKhMuB7mrpEeZRuiu5k7QWilhLSrM/vFnhMtP1oPwadc9Htxbs4flkTv6AF5kz0R/MN3Kdsv/UQYjU00u9zZGtFFNLUtgQ0rhwBJGCv3naxoWmCyvs4BPiW0VmYv5L8I=
+	t=1752044704; cv=none; b=MHOxQ8WBzSucyivazBJ5+x3JL7Bo997gChyZ0ygZSbmufsBCd+9S6L1/xGylqfqRZZGOGxImFiQU2xYXAJSZBsyw/9Zc1yhjIBFu6mt6T9hlQA3MlYEXl9hIRAX/3WyU0qQ91wIiA2DUm9FKtoMD+tE5HKtUXwgLxGxvNoHAveU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752044070; c=relaxed/simple;
-	bh=jSkYtAbBZp35/z4jcL3yY2+kEXDrxQhSiS5zpSyzP+Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Te69uJES/QI578g62g87Zy+2bQVu3/aMJbZpq/WuKt+tOQnAJyzAOPY0I/QjEqgNFl786pSHLUpwBJ2Kv3bWPXvaIl+15uoByrvGboRkwEq7hfPE2mtF06+hnVZQGb/7usvrej3GIjMrF8qJAZvw7HESLuV12Ca2a0Jionf1SVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eqrLfrxI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BC80C4CEF0;
-	Wed,  9 Jul 2025 06:54:26 +0000 (UTC)
+	s=arc-20240116; t=1752044704; c=relaxed/simple;
+	bh=sBMDGnv3Py+rrKCjUei3p5nhxQILF6SynaL6wTFYP4Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AA+ONmwqZwpiov9QpkJ0aqqtBhJ+zRQ4gzWcbHaWK+CS+BlTjvYK9uHBIhCjXtfOBZ0o9ZIrBgEjTuhEMXq4zMgxIHXM/ZQPjuEdErj9C14x70KV7SiFXc1mXOm8kqevsYyS/U9zEAkHfzcJU456vxe5dlnOitsqxJPWk0luHXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SqRwgVJi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59122C4CEF7;
+	Wed,  9 Jul 2025 07:05:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752044070;
-	bh=jSkYtAbBZp35/z4jcL3yY2+kEXDrxQhSiS5zpSyzP+Y=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=eqrLfrxIJhdGA2IsXhWrEJpqblQOzBS0DIG7bpfPkEFjfbv2ZgTlcmnuVLkSSvatt
-	 9cCXVUGd1akJACFXvD9uYvlvVgkGhbfjLlJg2bUoIlxyKPC6nFXuQN0TKPnLepa3LM
-	 bm2xvxXGLHIrrpv3KZGn8IntV5OwCzcZ6ssW92n+u7KEYxn93C3NqEfBEKtt8QKv0w
-	 eNAMvvSjJhkIk6O4JGBlu8hzxDqnNcE0XEqvitet6a5CR9Ax+OyoJYmFejqJdk7Cf+
-	 RlEfhyR7lN0mIcDlTTfj+dETee/zO7azwR7bbkw2XmxcsukunnEs9/EkSE2HBgz7hP
-	 +Zcb59XohjuSQ==
-Message-ID: <b752c340-bbb5-479f-bc2c-a9e8541509c3@kernel.org>
-Date: Wed, 9 Jul 2025 08:54:24 +0200
+	s=k20201202; t=1752044703;
+	bh=sBMDGnv3Py+rrKCjUei3p5nhxQILF6SynaL6wTFYP4Q=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=SqRwgVJiN4Ob83WHNKfgOe+bN9d1qa0i3+78kgLepnEDxjH1HHeIqjPSiVPtC3IN5
+	 t2DpqVX6RcWvL/dlt1sunuzK1LdyuFKqVgP99hijNf5bfkDTMDoUIy8VOGzHv5zyZO
+	 eOwAW456jjbv6JAyM/t+UfQr0hbS7Xp9RdU6+IHVkV8XV9CzmMgvvYVbg8hAMvrk13
+	 gDaxJus+SdGGZkV9MQNkKGl/MliWdLbZ4MqqxzwJbEMd1VCDrNghXtzM5sKRW8vws7
+	 urGsTqLB4yHW8q0pDE9C5Ka7nEkMCQyPAbL+rjgzLqxMsz0hyNgyxTgYd/Le2aOPvK
+	 Kq7VlzNpUGYCA==
+Message-ID: <64b43c77-68b9-4fd6-aa6e-b058689c8b83@kernel.org>
+Date: Wed, 9 Jul 2025 09:04:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,17 +50,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] dt-bindings: net: altr,socfpga-stmmac.yaml: add minItems
- to iommus
-To: Matthew Gerlach <matthew.gerlach@altera.com>, dinguyen@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, maxime.chevallier@bootlin.com,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <20250707154409.15527-1-matthew.gerlach@altera.com>
+Subject: Re: [Bug] soft lockup in ipv6_list_rcv in Linux kernel v6.15
+To: Luka <luka.2016.cs@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <CALm_T+1s19Kr0=v94oUJEbN5ciGcumZDZp-hbn5=z_wPefqG1Q@mail.gmail.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -106,40 +102,24 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20250707154409.15527-1-matthew.gerlach@altera.com>
+In-Reply-To: <CALm_T+1s19Kr0=v94oUJEbN5ciGcumZDZp-hbn5=z_wPefqG1Q@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 07/07/2025 17:44, Matthew Gerlach wrote:
-> Add missing 'minItems: 1' to iommus property of the Altera SOCFPGA SoC
-> implementation of the Synopsys DWMAC.
-
-Why? Explain why you are doing thing, not what you are doing. What is
-obvious which makes entire two-line commit msg redundant and useless.
-
-Original binding had no iommus and referenced commit does not explain
-why they appeared during conversion in the first place.
-
+On 08/07/2025 09:30, Luka wrote:
+> Dear Linux Kernel Maintainers,
 > 
-> Fixes: 6d359cf464f4 ("dt-bindings: net: Convert socfpga-dwmac bindings to yaml")
-> Signed-off-by: Matthew Gerlach <matthew.gerlach@altera.com>
-> ---
->  Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml | 1 +
->  1 file changed, 1 insertion(+)
+> I hope this message finds you well.
 > 
-> diff --git a/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml b/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml
-> index c5d8dfe5b801..ec34daff2aa0 100644
-> --- a/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml
-> @@ -59,6 +59,7 @@ properties:
->        - const: ptp_ref
->  
->    iommus:
-> +    minItems: 1
->      maxItems: 2
+> I am writing to report a potential vulnerability I encountered during
+> testing of the Linux Kernel version v6.15.
+> 
+> Git Commit: 0ff41df1cb268fc69e703a08a57ee14ae967d0ca (tag: v6.15)
 
-Why this has to be flexible on given SoC? This is weird. Same hardware
-differs somehow?
+The AI generated spam from this account restarted and continues. The
+person learnt nothing from previous feedback.
+
+I suggest ignoring completely.
 
 Best regards,
 Krzysztof
