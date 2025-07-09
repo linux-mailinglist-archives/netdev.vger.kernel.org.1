@@ -1,80 +1,86 @@
-Return-Path: <netdev+bounces-205430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5FFEAFEA53
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:36:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47C3BAFEA6A
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:39:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8994481635
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:35:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05846541C02
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503AB276025;
-	Wed,  9 Jul 2025 13:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE9072DECB4;
+	Wed,  9 Jul 2025 13:38:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z0Eb8pt1"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NGPhZo9C"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3922C187
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 13:35:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 451BB292B59;
+	Wed,  9 Jul 2025 13:38:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752068156; cv=none; b=oLs2YF8JQZDa1s+25l5ViLEeUQPbGTfRyFb3KT3BjhDxu+Lqnl+s/RzTu26oTL0ItWPJjOzfNJH6vYTsSnT+zGNQqVVwbjjFMoHqhyq37DbMSF1Ge3dWuEAbudKOp3b6lTPJhDqLML11lnRCbBwjOtlLTnOYSvT9zvDQ1XGInWE=
+	t=1752068328; cv=none; b=i7pOY9Cuj5oSI8kdK2sp4tXnOoiR+/3BO0EmKDkqx05QeOqYi15nKE8o7s3FQNoSiV8qQElad+tZ+l5MbhxeRMY/H2SK4D9i6QZaWd4q9qwnShCHB8l6JBM/2RUjHuLqQZhYwGvM+EHt8t1gwte4GX3+KSlzp+F8LNGUStq2ESw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752068156; c=relaxed/simple;
-	bh=gKiGZ0AksMwzHB5RRv/vFdwH3Y2aHQGDuyLyd2pl6Io=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mEzJ8dNJi9d8cSkByJKb3iEYPrhZKSvmGbCyuzjMM3orjOjqJGwkLMG2rq/QXurd9Dft9f63/fRQbcyAnOgm9y5Zo7Sv1Cab+WaNyZp/+RbL1XrRnyHaYuDW7cMA+fH358rFlZpjPnELWG3X0+FnnS+6e7ymsn0RH3UK5OST1+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z0Eb8pt1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C586C4CEEF;
-	Wed,  9 Jul 2025 13:35:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752068155;
-	bh=gKiGZ0AksMwzHB5RRv/vFdwH3Y2aHQGDuyLyd2pl6Io=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Z0Eb8pt1bpcj917PTMIV7dERDEjIPA83VaeWi0xqf0VnWpiOJ32+AWhoKbKIf8BaC
-	 6AAMcymB6tg/TVaa7hMqvpr+suQrRG3uBS5k9Xrd4yc7rn1hTwwhJD6EDA2qS2A1Jz
-	 w72e06qilRUH/RqJAcKrqEsS7Q0ICsD7EEGZbzfZutGGCoXP8P/YA5/ulwigT3ZB3f
-	 DFilxbP108NAqWAhYsyf++ToFBlTsRr8PKPcO8DXpLdFrx95Tdl3Zhk7j2UMxkgp4b
-	 +h03B97wXt4gtEzGLW5qp3T6smdW2ZTs82gldathYfYmLMd2jdy+OjoLEuqZZiKarj
-	 fFvo80qnVxCGA==
-Date: Wed, 9 Jul 2025 06:35:54 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com
-Subject: Re: [PATCH net-next v3 5/8] net: s/__dev_set_mtu/__netif_set_mtu/
-Message-ID: <20250709063554.7c771beb@kernel.org>
-In-Reply-To: <20250708213829.875226-6-sdf@fomichev.me>
-References: <20250708213829.875226-1-sdf@fomichev.me>
-	<20250708213829.875226-6-sdf@fomichev.me>
+	s=arc-20240116; t=1752068328; c=relaxed/simple;
+	bh=/qahDK0IYUkKuGYysnJtX6MM8jLq9TOrhizk1MDBSKs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=chiV8KWFeqXBQVs4rRTrqPswhq9UwDwZTHraAe0U4QbfwSuafP5BD/5gSYSW6wvOg44NYkMEVFMor7iOLtJpsEsPH0ymaAga2N1HJ1yhJC5NNGZ3ianiREIozt84B1u3Bgvmf606yAzGdXZ4cw0Wr04nLu4enbxr8FiajTg2ODE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NGPhZo9C; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=uFbfUiyAkr+pHnWKgq1GAWpjjH62LzZxy6ER26rGetM=; b=NG
+	PhZo9CF4z4CpWDVEOHzB6oY6vZFa5iJcnr2bewWpoSuvF9DTdsIJCeFkAzoPBip8OIhfbpLnJc0Q2
+	jD+bB9Z2dpYh2x9jSjGxfQybQX98CiMyMIxdeGd4dSCS5Zvkz64c15E34L2B8h8MWgvzfo5lfYh0M
+	GdouP+ZDXRmIayg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uZV0X-000wiG-7F; Wed, 09 Jul 2025 15:38:45 +0200
+Date: Wed, 9 Jul 2025 15:38:45 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Buday Csaba <buday.csaba@prolan.hu>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	=?iso-8859-1?B?Q3Pza+Fz?= Bence <csokas.bence@prolan.hu>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH 2/3] net: mdiobus: release reset_gpio in
+ mdiobus_unregister_device()
+Message-ID: <595b48b4-b830-411c-9cba-fcc3e8cf53a0@lunn.ch>
+References: <20250709133222.48802-1-buday.csaba@prolan.hu>
+ <20250709133222.48802-3-buday.csaba@prolan.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250709133222.48802-3-buday.csaba@prolan.hu>
 
-On Tue,  8 Jul 2025 14:38:26 -0700 Stanislav Fomichev wrote:
->  int netif_set_mtu_ext(struct net_device *dev, int new_mtu,
->  		      struct netlink_ext_ack *extack)
->  {
->  	int err, orig_mtu;
->  
-> +	netdev_assert_locked_or_invisible(dev);
+On Wed, Jul 09, 2025 at 03:32:21PM +0200, Buday Csaba wrote:
+> reset_gpio is claimed in mdiobus_register_device(), but it is not
+> released in mdiobus_unregister_device().
+> When a device uses the reset_gpio property, it becomes impossible
+> to unregister it and register it again, because the GPIO remains
+> claimed.
+> This patch resolves that issue.
+> 
+> Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
+> Cc: Csókás Bence <csokas.bence@prolan.hu>
 
-This one fires, should it be ops-locked?
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-[ 3137.181693][T26830] ------------[ cut here ]------------
-[ 3137.182161][T26830] WARNING: CPU: 1 PID: 26830 at ./include/net/netdev_lock.h:17 netif_set_mtu_ext+0x27f/0x5c0
-[ 3137.185509][T26830] RIP: 0010:netif_set_mtu_ext+0x27f/0x5c0
-[ 3137.193144][T26830]  do_setlink.constprop.0+0x6b1/0x2480
-[ 3137.198661][T26830]  rtnl_newlink+0x69a/0xa60
--- 
-pw-bot: cr
+    Andrew
 
