@@ -1,192 +1,141 @@
-Return-Path: <netdev+bounces-205528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D86D3AFF148
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 21:01:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FF20AFF15B
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 21:03:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8A751C83A40
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 19:02:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D32B1C85658
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 19:03:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B103222577;
-	Wed,  9 Jul 2025 19:01:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A614C241131;
+	Wed,  9 Jul 2025 19:03:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zOM6duQy"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="O20vyTVm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C160323B62B
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 19:01:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F212021A452;
+	Wed,  9 Jul 2025 19:03:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752087709; cv=none; b=dgAz3J35sKefMeNPhWbtXeE6PnbmJjpFNYfV1gFZ4eNCBBx+mGb21gY4OkopmftV0BxJETt3RTLrFsr994zz4eAQiTmu8nZX9zKu+E5VRPVI/BYAM6hejrOUlVx8yUDsTsJPflnjuQPdAx1FOG6PEVjOlCEvBYh4T4Xs4ca7tkA=
+	t=1752087796; cv=none; b=jgAjPLjQGm843BqP9SmsDfYrL7qcEw6USJU5GVY0n0L42+/E0S1AGY3MiG++WF5lHyHUfGXpRrYARbQsL1lFfKrzNlW4dCjrjG4lhFMFAOWqrKcCI89/mHZ38QVzuNFACrwR6C2tHR306R/omXXioxd7gpfEwLplNIN0GNjghHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752087709; c=relaxed/simple;
-	bh=4SDQqQVxcxlz98kvoSgBgI9FiVboo1CzKkWI1mtqqcI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=au2jBB7Ltap9KKogDPEo47OSW4/kQAQ+EuvaIM4Tfo+/lTM4DmDpvZY0IhkeFQn32c67sgwVAehoixwu+OObR/dKQVquRZ+Y0oYFQU9RDwj/vN8//zFIqD7P+wgpWcv8NFdnjPx+1F0ROnLwMSIOcsoXOhHw265XefQejE1vZLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zOM6duQy; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-315af0857f2so257202a91.0
-        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 12:01:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752087707; x=1752692507; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=DH06xcjaoyKJpgDHs3r8UB2aiXaTE3tzu4k28eppqh0=;
-        b=zOM6duQyOb7/ZAu8kbHbIOf6Nvq24JdF5C1082tZX0CjnlSWdOR/PjiwoOLfDxuptK
-         oNpBBFtk/5GpJcAPTYufaVY/u2ShgGt0HWxqFOaE9p0qE1tRdhDcM8lSONYb4CplmeQn
-         K9cPE7GsS+f3ocUI4PyZJmt1VzHqmZKemSYHShFz8Vd9r8B2ILt+fz7mhmZ+8vSt2Wui
-         pbvYLW4xpMLldTc/IlAjBWS9i9ZvFJnXRv16plMxWfiUsvUDCOoggmODVcID3usYGOQ2
-         Rc8PHFkOiHr5p06We1vJA57BcVaaJwxzaUMHdYIrMe8l0oc4ysAR0AUNFzFeMVS7rzmp
-         x/QQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752087707; x=1752692507;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DH06xcjaoyKJpgDHs3r8UB2aiXaTE3tzu4k28eppqh0=;
-        b=oteV3fyybuGLhnX1Sv7zTPb0ttYSfGuET+oNtll2cpjJ44vZQYFYrrv9lQLtd3WTFL
-         KfAp9CRtjrrUMA5YiG12NTTZyR32FYbZuBu3UWSFjA9Wys0Zx+p8Bu2swC4vJyfzowdS
-         UnCG861ns6I4E65wobFSVmBYNm3UohPtH/j+5uDjXwOcpZRFs0KBRT90cTRkvnWSrmWg
-         7Wo8A7FFU3fygcurlDdIOgIs25vqEu2nJQ8H1blzwwvTEi+glReEyQoHPtC2HNfOBgqJ
-         HOgBr4ZdpVBTzfSTVWhTekgX6aHvPcTsXh7vS2LlVSTqkpYZGXtMBk6vAsG6ElzGzz/4
-         4Q3A==
-X-Forwarded-Encrypted: i=1; AJvYcCWHDfQqOMhBt0SYRpPHq/Ysj1Klr7dhZbdHj+UqEvWyl5XORlrk8cA5IdSaz2s/2gDVAAjSftI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsXM25BBoSoKMggotJDzCA6hbueZcrKH0sgQyMyqBZPmmyAGVg
-	NZJq3lA9QZmxaNxde1GBehZqE8CEtv4biEdLH9zPtExY9SnZI+EVNZGb6D8uNuKdefmAR7Oq5UD
-	oHKd3kQ==
-X-Google-Smtp-Source: AGHT+IF36+RhGZwFyhoVbipmiG/0gnBhCdeylF/SsozHX/t/emEsLkCxo9mPEvZq5CayN4Qt1pF7xXU7Wmo=
-X-Received: from pjff11.prod.google.com ([2002:a17:90b:562b:b0:312:4b0b:a94])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4f8a:b0:312:1c83:58fb
- with SMTP id 98e67ed59e1d1-31c2fd26fbamr4980819a91.1.1752087707008; Wed, 09
- Jul 2025 12:01:47 -0700 (PDT)
-Date: Wed,  9 Jul 2025 19:01:32 +0000
+	s=arc-20240116; t=1752087796; c=relaxed/simple;
+	bh=w33Yy1b2aTYcQmR5hFPvM8miDleChN70erjham5PHCM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RJ6Vn5jbgdxHpAbSvdES1Jof4mIbDPAlBZsU6H0f1CmuLz3+/G2oMNPGezUzA5xIiBU9MEMSv+FgntJ3NgkhBTYeMgP8yZ9EnBUg6Ktyzkp38wyaleE6zQw89AoV2HU+aC+BD6JVcDDOUiDrzRhi01k2h7gq+K+/SwgLJv9ubwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=O20vyTVm; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 569F2Quu006870;
+	Wed, 9 Jul 2025 19:03:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=ifBq+E
+	R6NWxi5h+0YyMfp5vKAFMEsKXlgVcLfp9LX/Y=; b=O20vyTVmt7UI03X1PUbP6v
+	gLNn75TGOtHlui9nIWXXF4dW1KRgIQwUcvR8gZdpWNKXBv7cetag6bVmxkFJMYvi
+	9pwLjNfrRT4RBU+rR+wWDgiXGwnpAvWzdeH/ZjTH78cdOeUgqvlDGxTfCcPDX+nT
+	oFZEFOHFLNh7RCEBP/U+UToxyFDnDLOSzSlzFKZP1VwpuiSi4Rg2TjGn5GNtCBVg
+	aU4EbP1QFaoGRd1Og0KyfJ/689L2OzYMcM4ojNdQr1+1uG+2AazxaWMea7nP6YaA
+	OU54E3u/lsieh0Ee1gdDZnUFcrqxCS7VJLJM3wwwYmxSV3kXlpzBvRuozU68/1Kw
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47pur787jc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 09 Jul 2025 19:03:06 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 569I7DMs021519;
+	Wed, 9 Jul 2025 19:03:05 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 47qectsvqs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 09 Jul 2025 19:03:05 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 569J349930081604
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 9 Jul 2025 19:03:04 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5E15358043;
+	Wed,  9 Jul 2025 19:03:04 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E9B6E58059;
+	Wed,  9 Jul 2025 19:03:03 +0000 (GMT)
+Received: from [9.41.105.251] (unknown [9.41.105.251])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  9 Jul 2025 19:03:03 +0000 (GMT)
+Message-ID: <1915e11f-9513-4d9a-a46a-3f97ac152a3b@linux.ibm.com>
+Date: Wed, 9 Jul 2025 14:03:02 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250709190144.659194-1-kuniyu@google.com>
-Subject: [PATCH v1 net-next] dev: Pass netdevice_tracker to dev_get_by_flags_rcu().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	David Ahern <dsahern@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4] vsock/test: Add test for null ptr deref when
+ transport changes
+Content-Language: en-US
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: mhal@rbox.co, virtualization@lists.linux.dev, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, v4bel@theori.io, leonardi@redhat.com
+References: <472a5d43-4905-4fa4-8750-733bb848410d@linux.ibm.com>
+ <CAGxU2F7bV7feiZs6FmdWkA7v9nxojuDbeSHyWoASS36fr1pSgw@mail.gmail.com>
+ <CAGxU2F4GbeCJDYrs8Usd8JJcTrp99gyn3c_zXqpnz+UH2NNBGw@mail.gmail.com>
+From: Konstantin Shkolnyy <kshk@linux.ibm.com>
+In-Reply-To: <CAGxU2F4GbeCJDYrs8Usd8JJcTrp99gyn3c_zXqpnz+UH2NNBGw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA5MDE2OCBTYWx0ZWRfX3evddJ+8NLPa A+2M9HsTl5MiPujeHMFFR02XW0fE5ucHEGxkMPVMHjjdakA2qSTgz9gupgEQbxxuqsuTW91FV1B +fS00PioldEa7EgKcIG2FQuq4JUnRq0AlmDkzuUOmTOcOn2ihxKM2Wnx0Jp+dBKl7O2AXU0XQV7
+ PNfStIz7IyyIsvq77z9t4qWHipEzNmKjKubcrdV/t0R2hkSGvxGIFwH0Rt+PiK6Gzt3vBYMZWGp JAsei8gc/RGSlWcVoF65dZ3DIojsGgoiug5vtDPcXo4r3v912fVWeXFmoi4uJdqTeNnNQwhUqcQ MI3wEBEvh9UmniMQTuZzQxDikketwAF3jCVv6Ch+pyWnT4PMFMyByJFY5S2WY84/He7M15l/MM1
+ OeBfiJrtau0nC2T+6Jsqhg2W4zMm9TU9Vn/OVnbSzBs6czQova9jCw/FD8F6To4pRj2dBSbz
+X-Proofpoint-GUID: EcdP8gGMadH59a8D28cOtQinDaUFNt6X
+X-Proofpoint-ORIG-GUID: EcdP8gGMadH59a8D28cOtQinDaUFNt6X
+X-Authority-Analysis: v=2.4 cv=W/M4VQWk c=1 sm=1 tr=0 ts=686ebcea cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=20KFwNOVAAAA:8 a=VnNF1IyMAAAA:8 a=yc8Tnp-ilgVpimbPip8A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-09_04,2025-07-09_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ mlxscore=0 priorityscore=1501 adultscore=0 clxscore=1015 suspectscore=0
+ spamscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0 impostorscore=0
+ classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507090168
 
-This is a follow-up for commit eb1ac9ff6c4a5 ("ipv6: anycast: Don't
-hold RTNL for IPV6_JOIN_ANYCAST.").
+On 09-Jul-25 10:41, Stefano Garzarella wrote:
+> On Wed, 9 Jul 2025 at 17:26, Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>
+>> On Wed, 9 Jul 2025 at 16:54, Konstantin Shkolnyy <kshk@linux.ibm.com> wrote:
+>>>
+>>> I'm seeing a problem on s390 with the new "SOCK_STREAM transport change
+>>> null-ptr-deref" test. Here is how it appears to happen:
+>>>
+>>> test_stream_transport_change_client() spins for 2s and sends 70K+
+>>> CONTROL_CONTINUE messages to the "control" socket.
+>>>
+>>> test_stream_transport_change_server() spins calling accept() because it
+>>> keeps receiving CONTROL_CONTINUE.
+>>>
+>>> When the client exits, the server has received just under 1K of those
+>>> 70K CONTROL_CONTINUE, so it calls accept() again but the client has
+>>> exited, so accept() never returns and the server never exits.
+> 
+> Just to be clear, I was seeing something a bit different.
+> The accept() in the server is no-blocking, since we set O_NONBLOCK on
+> the socket, so I see the server looping around a failing accept()
+> (errno == EAGAIN) while dequeueing the CONTROL_CONTINUE messages, so
+> after 10/15 seconds the server ends on my case.
+> 
+> It seems strange that in your case it blocks, since it should be a
+> no-blocking call.
 
-We should not add a new device lookup API without netdevice_tracker.
-
-Let's pass netdevice_tracker to dev_get_by_flags_rcu() and rename it
-with netdev_ prefix to match other newer APIs.
-
-Note that we always use GFP_ATOMIC for netdev_hold() as it's expected
-to be called under RCU.
-
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Link: https://lore.kernel.org/netdev/20250708184053.102109f6@kernel.org/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- include/linux/netdevice.h | 4 ++--
- net/core/dev.c            | 8 ++++----
- net/ipv6/anycast.c        | 7 ++++---
- 3 files changed, 10 insertions(+), 9 deletions(-)
-
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index a80d21a146123..ec23cee5245d7 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3332,8 +3332,6 @@ int dev_get_iflink(const struct net_device *dev);
- int dev_fill_metadata_dst(struct net_device *dev, struct sk_buff *skb);
- int dev_fill_forward_path(const struct net_device *dev, const u8 *daddr,
- 			  struct net_device_path_stack *stack);
--struct net_device *dev_get_by_flags_rcu(struct net *net, unsigned short flags,
--					unsigned short mask);
- struct net_device *dev_get_by_name(struct net *net, const char *name);
- struct net_device *dev_get_by_name_rcu(struct net *net, const char *name);
- struct net_device *__dev_get_by_name(struct net *net, const char *name);
-@@ -3396,6 +3394,8 @@ struct net_device *netdev_get_by_index(struct net *net, int ifindex,
- 				       netdevice_tracker *tracker, gfp_t gfp);
- struct net_device *netdev_get_by_name(struct net *net, const char *name,
- 				      netdevice_tracker *tracker, gfp_t gfp);
-+struct net_device *netdev_get_by_flags_rcu(struct net *net, netdevice_tracker *tracker,
-+					   unsigned short flags, unsigned short mask);
- struct net_device *dev_get_by_index_rcu(struct net *net, int ifindex);
- void netdev_copy_name(struct net_device *dev, char *name);
- 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index e365b099484ec..48fa8b9836016 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -1267,7 +1267,7 @@ struct net_device *dev_getfirstbyhwtype(struct net *net, unsigned short type)
- EXPORT_SYMBOL(dev_getfirstbyhwtype);
- 
- /**
-- * dev_get_by_flags_rcu - find any device with given flags
-+ * netdev_get_by_flags_rcu - find any device with given flags
-  * @net: the applicable net namespace
-  * @if_flags: IFF_* values
-  * @mask: bitmask of bits in if_flags to check
-@@ -1277,14 +1277,14 @@ EXPORT_SYMBOL(dev_getfirstbyhwtype);
-  * Context: rcu_read_lock() must be held.
-  * Returns: NULL if a device is not found or a pointer to the device.
-  */
--struct net_device *dev_get_by_flags_rcu(struct net *net, unsigned short if_flags,
--					unsigned short mask)
-+struct net_device *netdev_get_by_flags_rcu(struct net *net, netdevice_tracker *tracker,
-+					   unsigned short if_flags, unsigned short mask)
- {
- 	struct net_device *dev;
- 
- 	for_each_netdev_rcu(net, dev) {
- 		if (((READ_ONCE(dev->flags) ^ if_flags) & mask) == 0) {
--			dev_hold(dev);
-+			netdev_hold(dev, tracker, GFP_ATOMIC);
- 			return dev;
- 		}
- 	}
-diff --git a/net/ipv6/anycast.c b/net/ipv6/anycast.c
-index 53cf68e0242bf..fa7f0c22167b4 100644
---- a/net/ipv6/anycast.c
-+++ b/net/ipv6/anycast.c
-@@ -69,6 +69,7 @@ int ipv6_sock_ac_join(struct sock *sk, int ifindex, const struct in6_addr *addr)
- 	struct ipv6_pinfo *np = inet6_sk(sk);
- 	struct ipv6_ac_socklist *pac = NULL;
- 	struct net *net = sock_net(sk);
-+	netdevice_tracker dev_tracker;
- 	struct net_device *dev = NULL;
- 	struct inet6_dev *idev;
- 	int err = 0, ishost;
-@@ -112,8 +113,8 @@ int ipv6_sock_ac_join(struct sock *sk, int ifindex, const struct in6_addr *addr)
- 			goto error;
- 		} else {
- 			/* router, no matching interface: just pick one */
--			dev = dev_get_by_flags_rcu(net, IFF_UP,
--						   IFF_UP | IFF_LOOPBACK);
-+			dev = netdev_get_by_flags_rcu(net, &dev_tracker, IFF_UP,
-+						      IFF_UP | IFF_LOOPBACK);
- 		}
- 		rcu_read_unlock();
- 	}
-@@ -159,7 +160,7 @@ int ipv6_sock_ac_join(struct sock *sk, int ifindex, const struct in6_addr *addr)
- error_idev:
- 	in6_dev_put(idev);
- error:
--	dev_put(dev);
-+	netdev_put(dev, &dev_tracker);
- 
- 	if (pac)
- 		sock_kfree_s(sk, pac, sizeof(*pac));
--- 
-2.50.0.727.gbf7dc18ff4-goog
+It was my mistake. The accept() doesn't block. I've retested it more 
+carefully and it keeps returning and the loop eventually consumes all 
+queued CONTROL_CONTINUE messages and quits, as you described.
 
 
