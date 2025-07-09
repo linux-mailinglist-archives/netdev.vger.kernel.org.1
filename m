@@ -1,156 +1,186 @@
-Return-Path: <netdev+bounces-205268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2A9EAFDF5D
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 07:43:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9FADAFDFA7
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 07:52:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA7111C22524
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 05:43:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC9B54E7062
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 05:51:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1528826A0DD;
-	Wed,  9 Jul 2025 05:43:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5385D26AABD;
+	Wed,  9 Jul 2025 05:51:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="OJj8VuxQ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PfRsqiMf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAE911C860E
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 05:43:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AD5E229B02;
+	Wed,  9 Jul 2025 05:51:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752039788; cv=none; b=jiE/nD4xbzl3Tia7atsrw3Aa54I4bfyyN06v+iSd91UFLLMSjmfhRzXO0UgRulw0LT3JRuhYLsSDXntUqf82i6eultPxB3l320POO3xEGXvqjMSG9US16JvVTdT/xC/3fXqM/TZq1h3fEXMq77Sl2F6kf20QA+FtVX0DreY0rtE=
+	t=1752040302; cv=none; b=sj0CZqkNrF0pPmjC7OjCYujORqhM19X9FKA7vsX9+uMxste+BBfd0+tI8hT82FPgzodXZOpUdmFx7qRjl5BqeqM/lLsJunVfpGTDULONfBehullp9+1x+VCNcMQCCP+6uhiIbc0DOWkSbmUdMY0wzjSihkaJVl20FzEdiKJxrCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752039788; c=relaxed/simple;
-	bh=SIXZE24PyghJGVkgKu0XjAqjgH0GjUlM0cEYNv0iNPU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FgJ2myHKUvCtBwjj6HcTTBfSb4AnUxtBmOnxYjSmwCr35QPzT1NS0PeGa8yRISVb3BpoBq0Z9b1ceEUU1ZkhsbdqmrJqgrcJJzXglnmmF1951ikiR/6+3/xZrDV/biwexkywwmB8w9ueKCHlAkq8MpvnLCpTUtfcnZxxQiAU3sQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=OJj8VuxQ; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id A4F91207B0;
-	Wed,  9 Jul 2025 07:42:56 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2kUI_GFA-SCr; Wed,  9 Jul 2025 07:42:56 +0200 (CEST)
-Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 0D7962064C;
-	Wed,  9 Jul 2025 07:42:56 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 0D7962064C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1752039776;
-	bh=giKehZyBlT8OVOfRbY3DK/cJ1Uw3oBQ9QM08TJu0jaE=;
-	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
-	b=OJj8VuxQusB3IQolmlT0kAqXuMefthiAm1r7msle4hu1XTbklNM86tnujO56Vs40J
-	 ZT9xQn9MihBwj89lxIE/IGrRMZs8Ky71uILkgQn7NtCIJmE+g6ajaAAiXSe2Dr3uO8
-	 Qy5aWGzKJu2eqK/yGaexmrMiHjO3DAbGIGRA/GQEQ63W6CR6rACdTVZsU0qr+SulG0
-	 MdRd3K910HjKeJcgn1NvvlSqDMLFeUhDhF7k38cKbkebwuefmV8Xv+7tXhVHhHIOzy
-	 R2aBvIoxTmSap2tXLCuqyRvHthEe3aQf8OlNXm4mC9t2SSgYcCl2AEWoVrBTtR7nF/
-	 X8qJhAg6T5Mvg==
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 9 Jul 2025 07:42:55 +0200
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 9 Jul
- 2025 07:42:55 +0200
-Date: Wed, 9 Jul 2025 07:42:47 +0200
-From: Antony Antony <antony.antony@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, Paul Wouters <paul@nohats.ca>,
-	Andreas Steffen <andreas.steffen@strongswan.org>, Tobias Brunner
-	<tobias@strongswan.org>, Antony Antony <antony@phenome.org>, Tuomo Soini
-	<tis@foobar.fi>, "David S. Miller" <davem@davemloft.net>,
-	<netdev@vger.kernel.org>, <devel@linux-ipsec.org>, Leon Romanovsky
-	<leon@kernel.org>
-Subject: Re: [devel-ipsec] [PATCH RFC ipsec-next] pfkey: Deprecate pfkey
-Message-ID: <aG4BV8I8ig67NhXS@moon.secunet.de>
-Reply-To: <antony.antony@secunet.com>
-References: <aGd60lOmCtytjTYU@gauss3.secunet.de>
+	s=arc-20240116; t=1752040302; c=relaxed/simple;
+	bh=6rtRYvn5+oReLjmAEWFFqxSeCvskD+CL2ea5tkQtHHE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dOhQmHo2QYIrU+37QbUZ5+qdSA+Po5KX89Cx/+orNHGyQ8Cev8fmLfqmXR4uzPnfoIRbNBgOzkTKOZqY2dPSE/VsJh5qirMbPkbz0IQKCSfU08eM3LihDGvBuQNplSnvOAzkFX699tvMqXavEA3UmtrEVox1WwCk3XtVSZh5GiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PfRsqiMf; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id EAC0B44212;
+	Wed,  9 Jul 2025 05:51:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1752040297;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GLjyFaofA8MNXqn/woK0DZj/5o9p6QECmD05JujYBHw=;
+	b=PfRsqiMfspPZsfmDfw3DJ1jZbMX4/9x4q0IlsVb149GC8jNxZlFK797V+NZuiLB3Xo/jtV
+	nFt6rK58HyYXt7VKmrxv6Y/p6BEs0Bg0EB7R/4/CXiXcnCi7JVfXxPFCuPiIKq62P1ykY3
+	pSOqKlzsjhw3/p/0q9q9/Ow4QWZEVWabUnUhiDWXJq/90p5lPvYpmftEhdmj+VZpZ+qCOd
+	jsikiYbzNYFtXZ1P90TaCm3muVUbUJg7Bll4G9+8vA52Zw3DVQum1Z/XE/BI8QNGVl9S2l
+	/lIw+NmCm/daRKlaO+93S/m3FBxXmw8zuPUPAYIs24qg8tJQOKv8UHdwfWuf8Q==
+Date: Wed, 9 Jul 2025 07:51:34 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: <Tristram.Ha@microchip.com>
+Cc: <Woojung.Huh@microchip.com>, <andrew@lunn.ch>, <olteanv@gmail.com>,
+ <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
+ <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+ <pabeni@redhat.com>, <marex@denx.de>, <UNGLinuxDriver@microchip.com>,
+ <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 6/6 v2] net: dsa: microchip: Setup fiber ports
+ for KSZ8463
+Message-ID: <20250709075134.0a0f5df2@fedora>
+In-Reply-To: <DM3PR11MB8736DE8A01523BD67AF73766EC4EA@DM3PR11MB8736.namprd11.prod.outlook.com>
+References: <20250708031648.6703-1-Tristram.Ha@microchip.com>
+	<20250708031648.6703-7-Tristram.Ha@microchip.com>
+	<20250708122237.08f4dd7c@device-24.home>
+	<DM3PR11MB8736DE8A01523BD67AF73766EC4EA@DM3PR11MB8736.namprd11.prod.outlook.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <aGd60lOmCtytjTYU@gauss3.secunet.de>
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: 0
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefieejiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduiedprhgtphhtthhopefvrhhishhtrhgrmhdrjfgrsehmihgtrhhotghhihhprdgtohhmpdhrtghpthhtohephghoohhjuhhnghdrjfhuhhesmhhitghrohgthhhiphdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopeholhhtvggrnhhvsehgmhgri
+ hhlrdgtohhmpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkrhiikhdoughtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtohhnohhrodgutheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvth
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Fri, Jul 04, 2025 at 08:55:14 +0200, Steffen Klassert via Devel wrote:
-> The pfkey user configuration interface was replaced by the netlink
-> user configuration interface more than a decade ago. In between
-> all maintained IKE implementations moved to the netlink interface.
-> So let 'config NET_KEY' default to no in Kconfig. The pfkey code
-> will be removed in a second step.
-> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+On Tue, 8 Jul 2025 19:45:44 +0000
+<Tristram.Ha@microchip.com> wrote:
 
-Acked-by: Antony Antony <antony.antony@secunet.com>
-
-I have tested libreswan and strongSwan CONFIG_NET_KEY=n; without HW offload.
-
-And I would also like to get a confirmation Hardware offload, crypt
-offload and packet offload works with CONFIG_NET_KEY n.
-
-I undderstand this patch is independent of HW offload.
-
-However, IMHO it is good to confirm now.  Otherwise I imagine
-distributions will flip CONFIG_NET_KEY=y to get HW offload working,
-which will make it harder to depreciate PF_KEY/NET_KEY
-
-Paul or Leon - would you like to confirm with
-CONFIG_NET_KEY=n XFRM HW offload still works?
-
--antony
-
-> ---
->  net/xfrm/Kconfig | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
+> > Hi Tristram,
+> > 
+> > On Mon, 7 Jul 2025 20:16:48 -0700
+> > <Tristram.Ha@microchip.com> wrote:
+> >   
+> > > From: Tristram Ha <tristram.ha@microchip.com>
+> > >
+> > > The fiber ports in KSZ8463 cannot be detected internally, so it requires
+> > > specifying that condition in the device tree.  Like the one used in
+> > > Micrel PHY the port link can only be read and there is no write to the
+> > > PHY.  The driver programs registers to operate fiber ports correctly.
+> > >
+> > > The PTP function of the switch is also turned off as it may interfere the
+> > > normal operation of the MAC.
+> > >
+> > > Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+> > > ---
+> > >  drivers/net/dsa/microchip/ksz8.c       | 26 ++++++++++++++++++++++++++
+> > >  drivers/net/dsa/microchip/ksz_common.c |  3 +++
+> > >  2 files changed, 29 insertions(+)
+> > >
+> > > diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
+> > > index 904db68e11f3..1207879ef80c 100644
+> > > --- a/drivers/net/dsa/microchip/ksz8.c
+> > > +++ b/drivers/net/dsa/microchip/ksz8.c
+> > > @@ -1715,6 +1715,7 @@ void ksz8_config_cpu_port(struct dsa_switch *ds)
+> > >       const u32 *masks;
+> > >       const u16 *regs;
+> > >       u8 remote;
+> > > +     u8 fiber_ports = 0;
+> > >       int i;
+> > >
+> > >       masks = dev->info->masks;
+> > > @@ -1745,6 +1746,31 @@ void ksz8_config_cpu_port(struct dsa_switch *ds)
+> > >               else
+> > >                       ksz_port_cfg(dev, i, regs[P_STP_CTRL],
+> > >                                    PORT_FORCE_FLOW_CTRL, false);
+> > > +             if (p->fiber)
+> > > +                     fiber_ports |= (1 << i);
+> > > +     }
+> > > +     if (ksz_is_ksz8463(dev)) {
+> > > +             /* Setup fiber ports. */  
+> > 
+> > What does fiber port mean ? Is it 100BaseFX ? As this configuration is
+> > done only for the CPU port (it seems), looks like this mode is planned
+> > to be used as the MAC to MAC mode on the DSA conduit. So, instead of
+> > using this property maybe you should implement that as handling the
+> > "100base-x" phy-mode ?
+> >   
+> > > +             if (fiber_ports) {
+> > > +                     regmap_update_bits(ksz_regmap_16(dev),
+> > > +                                        reg16(dev, KSZ8463_REG_CFG_CTRL),
+> > > +                                        fiber_ports << PORT_COPPER_MODE_S,
+> > > +                                        0);
+> > > +                     regmap_update_bits(ksz_regmap_16(dev),
+> > > +                                        reg16(dev, KSZ8463_REG_DSP_CTRL_6),
+> > > +                                        COPPER_RECEIVE_ADJUSTMENT, 0);
+> > > +             }
+> > > +
+> > > +             /* Turn off PTP function as the switch's proprietary way of
+> > > +              * handling timestamp is not supported in current Linux PTP
+> > > +              * stack implementation.
+> > > +              */
+> > > +             regmap_update_bits(ksz_regmap_16(dev),
+> > > +                                reg16(dev, KSZ8463_PTP_MSG_CONF1),
+> > > +                                PTP_ENABLE, 0);
+> > > +             regmap_update_bits(ksz_regmap_16(dev),
+> > > +                                reg16(dev, KSZ8463_PTP_CLK_CTRL),
+> > > +                                PTP_CLK_ENABLE, 0);
+> > >       }
+> > >  }
+> > >
+> > > diff --git a/drivers/net/dsa/microchip/ksz_common.c  
+> > b/drivers/net/dsa/microchip/ksz_common.c  
+> > > index c08e6578a0df..b3153b45ced9 100644
+> > > --- a/drivers/net/dsa/microchip/ksz_common.c
+> > > +++ b/drivers/net/dsa/microchip/ksz_common.c
+> > > @@ -5441,6 +5441,9 @@ int ksz_switch_register(struct ksz_device *dev)
+> > >                                               &dev->ports[port_num].interface);
+> > >
+> > >                               ksz_parse_rgmii_delay(dev, port_num, port);
+> > > +                             dev->ports[port_num].fiber =
+> > > +                                     of_property_read_bool(port,
+> > > +                                                           "micrel,fiber-mode");  
+> > 
+> > Shouldn't this be described in the binding ?
+> >   
+> > >                       }
+> > >                       of_node_put(ports);
+> > >               }  
 > 
-> diff --git a/net/xfrm/Kconfig b/net/xfrm/Kconfig
-> index f0157702718f..aedea7a892db 100644
-> --- a/net/xfrm/Kconfig
-> +++ b/net/xfrm/Kconfig
-> @@ -110,14 +110,17 @@ config XFRM_IPCOMP
->  	select CRYPTO_DEFLATE
->  
->  config NET_KEY
-> -	tristate "PF_KEY sockets"
-> +	tristate "PF_KEY sockets (deprecated)"
->  	select XFRM_ALGO
-> +	default n
->  	help
->  	  PF_KEYv2 socket family, compatible to KAME ones.
-> -	  They are required if you are going to use IPsec tools ported
-> -	  from KAME.
->  
-> -	  Say Y unless you know what you are doing.
-> +	  The PF_KEYv2 socket interface is deprecated and
-> +	  scheduled for removal. Please use the netlink
-> +	  interface (XFRM_USER) to configure IPsec.
-> +
-> +	  If unsure, say N.
->  
->  config NET_KEY_MIGRATE
->  	bool "PF_KEY MIGRATE"
-> -- 
-> 2.43.0
+> The "micrel,fiber-mode" is described in Documentation/devicetree/
+> bindings/net/micrel.txt.
 > 
-> -- 
-> Devel mailing list -- devel@lists.linux-ipsec.org
-> To unsubscribe send an email to devel-leave@lists.linux-ipsec.org
+> Some old KSZ88XX switches have option of using fiber in a port running
+> 100base-fx.  Typically they have a register indicating that configuration
+> and the driver just treats the port as having a PHY and reads the link
+> status and speed as normal except there is no write to those PHY related
+> registers.  KSZ8463 does not have that option so the driver needs to be
+> told.
+> 
+
 
