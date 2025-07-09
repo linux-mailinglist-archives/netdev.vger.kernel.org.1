@@ -1,121 +1,137 @@
-Return-Path: <netdev+bounces-205504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77971AFEFDB
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 19:28:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6077AFEFF1
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 19:37:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74824488564
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 17:28:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2384817AF20
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 17:37:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD272264AA;
-	Wed,  9 Jul 2025 17:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FF7122D7A5;
+	Wed,  9 Jul 2025 17:37:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UFU1Wq8j"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.blochl.de (mail.blochl.de [151.80.40.192])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73C2621171D;
-	Wed,  9 Jul 2025 17:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.40.192
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9559F2253AB;
+	Wed,  9 Jul 2025 17:37:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752082127; cv=none; b=HfUvwoOHHlWKQkSREcp70nPIZd6q/wBh1xhdjMyU5/ygP2ETV3qEd1xXXZLq0mFy3LTX6OQPX4QzdqkxaEegLwAecKnU/ybYQTSPgpYs+57aIK0I0Ped64wn9o/9pfUH3A0QAgoIGXB1jKVV5sEsLyO00AtWpyKFA2KpvskpT+8=
+	t=1752082664; cv=none; b=CyTM3XYqlVhKa2draFO0HaRg0eYMqb8AKFF1ZVzgZo42a/sQETkjJr03SfQ3EF4vkHqOM/BGca0/Ge7zxDzJVzek6JE/OULvZ6ljFAJ2N85tOPKVLH71yYtGm1uOyn8ubMUsOaiS5EK9nGPdzVntUGn4lhYDahTH2EMWDTQ0gxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752082127; c=relaxed/simple;
-	bh=GbbM/FhvQTBzWvNQNRBKpegqobekpqTyrcqSYpz/s38=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=UeeKtWU8A4a62yxU1j1MKoduE1wycgVJqlgiylahloUBKgmtv6ivmQFynYmZINRdmB/pcVp9qpSSlH0GW5XCEXg9UYYEH4xHdBGm9DDF33KwmD8uhFHAHadRfBn1wm1uOhCsWNzg5rGeJIpUgAIwbLjbHKYNnSHa1Gf2yjoxrdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blochl.de; spf=pass smtp.mailfrom=blochl.de; arc=none smtp.client-ip=151.80.40.192
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blochl.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blochl.de
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.blochl.de A45374466472
-Authentication-Results: mail.blochl.de; dmarc=none (p=none dis=none) header.from=blochl.de
-Authentication-Results: mail.blochl.de; spf=fail smtp.mailfrom=blochl.de
-Received: from workknecht.fritz.box (ppp-93-104-0-143.dynamic.mnet-online.de [93.104.0.143])
-	by smtp.blochl.de (Postfix) with ESMTPSA id A45374466472;
-	Wed, 09 Jul 2025 17:28:37 +0000 (UTC)
-X-Virus-Status: Clean
-X-Virus-Scanned: clamav-milter 1.4.2 at 472b552e6fe8
-From: =?utf-8?q?Markus_Bl=C3=B6chl?= <markus@blochl.de>
-Date: Wed, 09 Jul 2025 19:28:07 +0200
-Subject: [PATCH v2] e1000e: Populate entire system_counterval_t in
- get_time_fn() callback
+	s=arc-20240116; t=1752082664; c=relaxed/simple;
+	bh=VRKDvJ7Mx3EusPY3SGg5iLlDEDOQSoOskwCppCcPexQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kspklGA3VUCnKi6dF2hl+22RiNZCzUsA3KNgMelrSyrJxKEVRQKa2V2zMyaolDqvgbSMT0OPuiu29SDJVyprxtN8r9O/csCN8f7w+G0zbb5shv1hXO+qFucT+TDF6vNDvrfGW2ubRyyGh3vjUx5j6B9+BKKArbjFP7+veUa5SaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UFU1Wq8j; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3a54690d369so225879f8f.3;
+        Wed, 09 Jul 2025 10:37:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752082660; x=1752687460; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wTfCB8DZJRMBFAh3WBwFD09RAhdpo34c+dwDgOtiWP4=;
+        b=UFU1Wq8j3z9zCGPEKY0xc8D/rjneRgwjHC6NTk+pOYkxabROpsxu8StP54DhsxfkZ3
+         Esh97QtWYFi0fbPDPnKjRCzUhwvr+Laz688Wvt6xCpAktLRcrEOI3ZI2t0JI3bTYFkM8
+         v7ibwWywu5rc1W91ipHi3CMdFL27FGRUFbmcqS5SCf+7C01Jbo0wQTUj0LWalrJxkmiw
+         Vzv8//J4eFYk2X6inABzUnh++S/W4foX4FvA0pkuECrNczgdVru+P7K7Fs+0m6X1XyMz
+         p0ovv8uIaz2QfOT8q+2unYCRM+h9atAJWD7/bt1onfNtt69+wmVZ5XoZ3VLne+Sr5lBf
+         UUhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752082660; x=1752687460;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wTfCB8DZJRMBFAh3WBwFD09RAhdpo34c+dwDgOtiWP4=;
+        b=fuzA894je4gYVyXU6QUb/OZWPz2NnLxcNq2voK4Q6kMiitTwsRe2oqB+Wa7PsytQez
+         S2aJzy4fgF6RWHuv95/8iWaAfwaAgoDQ+WYdTm/QKtCqbt1QWvU5me/3fy4RDvN8+rdH
+         R5oFONccgCh/7QD0VOMrLykJaubsre3OnhkWjOPLRpaJh6CV8HT7zLwWRVHK+I6ysGaa
+         fv/ZEaOogYwqLqaV6S2EGkBFskx5jzVneHCxMpsmkkeclTcVoFGm7miorpjJYLVXYHIP
+         O9lHFjd3aadZjLHSVDc3asdOkPPYq1KxaHvuVTq6r9+mYuKRE/yeMOaJ/hHK6hrF98ch
+         t1Zg==
+X-Forwarded-Encrypted: i=1; AJvYcCXuUdQAxmBJEQXdWf7UHe0XlU4Ku/K9G39DSggBLyVROgsfA6dPwlldceFcGe9bZ/f8w18=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz09ektsgtITRoo3mTdU9zlpKBjDcLifN7KS8NG3iy0znca/3zJ
+	gAG6atAvJyJlrAEiLOu2VH/cjHjmGimEI7T7ibXByCb8peuFId2z8lxfi3tWM2ju
+X-Gm-Gg: ASbGncuH+9qKagbL49q11Q1jM/5EiHheM5FNOtp/Ib5iIQHH88ZIiStnzLiSOJ0Cbct
+	bd06gY+ZgZGMP77BfsbfBv93h9v1p8mfdZ3JB0iCoqDFazFdYLDUbpBU9lvod7AQhV9/cAHdpPi
+	M1GVl3MXq9KBo4DNPOrp/6YqbcJyhHII0DG9p6AOFvxLthppoBIlU73I+BUwDp8+Ue6x1wuMlNV
+	gLRPBQ0/9kFcaGYc3/e5G4gIN5sy1p6oCRm6PQK11Q1jePPb369qMiTGAL1CB29ifyuBp+KcCst
+	OsyZ7DLU6dm0dn1hKSx58mGcNW+OI9FdquuARRYGFDyIkg+2c7QfgFgjiB0=
+X-Google-Smtp-Source: AGHT+IFT7eD5fxL4jsTLzyqeGFLTf64Kf4BHqJEcZzQcCkBuwd0ANbl9LUtxhoGI2SV0SE3pdFSYzw==
+X-Received: by 2002:a05:6000:200f:b0:3b3:a6c2:1d1b with SMTP id ffacd0b85a97d-3b5e4521e89mr2665075f8f.28.1752082660208;
+        Wed, 09 Jul 2025 10:37:40 -0700 (PDT)
+Received: from localhost ([2a03:2880:31ff:4::])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454cd4f398csm39972195e9.2.2025.07.09.10.37.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Jul 2025 10:37:39 -0700 (PDT)
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	horms@kernel.org,
+	cratiu@nvidia.com,
+	noren@nvidia.com,
+	cjubran@nvidia.com,
+	mbloch@nvidia.com,
+	mohsin.bashr@gmail.com,
+	jdamato@fastly.com,
+	gal@nvidia.com,
+	sdf@fomichev.me,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next 0/5] selftests: drv-net: Test XDP native support
+Date: Wed,  9 Jul 2025 10:37:02 -0700
+Message-ID: <20250709173707.3177206-1-mohsin.bashr@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20250709-e1000e_crossts-v2-1-2aae94384c59@blochl.de>
-X-B4-Tracking: v=1; b=H4sIAKambmgC/3XMQQrCMBCF4auUWRuZhLZJXXkPKRLTiQ2URjIlK
- CV3N3bv8n/wvh2YUiCGS7NDohw4xLWGOjXgZrs+SYSpNihUHWocBElEpLtLkXljoXXb9br1vVE
- W6umVyIf3Ad7G2nPgLabP4Wf5W/9SWQopvLEGnR4Utf76WKKbl/NEMJZSvthCBrSsAAAA
-X-Change-ID: 20250709-e1000e_crossts-7745674f682a
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Thomas Gleixner <tglx@linutronix.de>
-Cc: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- markus.bloechl@ipetronik.com, John Stultz <jstultz@google.com>, 
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- =?utf-8?q?Markus_Bl=C3=B6chl?= <markus@blochl.de>
-X-Mailer: b4 0.14.2
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.6.4 (smtp.blochl.de [0.0.0.0]); Wed, 09 Jul 2025 17:28:38 +0000 (UTC)
 
-get_time_fn() callback implementations are expected to fill out the
-entire system_counterval_t struct as it may be initially uninitialized.
+This patch series add tests to validate XDP native support for PASS,
+DROP, ABORT, and TX actions, as well as headroom and tailroom adjustment.
+For adjustment tests, validate support for both the extension and
+shrinking cases across various packet sizes and offset values.
 
-This broke with the removal of convert_art_to_tsc() helper functions
-which left use_nsecs uninitialized.
+The pass criteria for head/tail adjustment tests require that at-least
+one adjustment value works for at-least one packet size. This ensure
+that the variability in maximum supported head/tail adjustment offset
+across different drivers is being incorporated.
 
-Assign the entire struct again.
+The results reported in this series are based on fbnic. However, the
+series is tested against multiple other drivers including netdevism.
 
-Fixes: bd48b50be50a ("e1000e: Replace convert_art_to_tsc()")
-Cc: stable@vger.kernel.org
-Signed-off-by: Markus Blöchl <markus@blochl.de>
----
-Notes:
-    Related-To: <https://lore.kernel.org/lkml/txyrr26hxe3xpq3ebqb5ewkgvhvp7xalotaouwludjtjifnah2@7tmgczln4aoo/>
+Note: The XDP support for fbnic will be added later.
 
-Changes in v2:
-- Add Lakshmi in Cc:
-- Add Signed-off-by: trailer which was lost in b4 workflow
-- Link to v1: https://lore.kernel.org/r/20250709-e1000e_crossts-v1-1-f8a80c792e4f@blochl.de
----
- drivers/net/ethernet/intel/e1000e/ptp.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Mohsin Bashir (5):
+  selftests: drv-net: Add bpftool util
+  selftests: drv-net: Test XDP_PASS/DROP support
+  selftests: drv-net: Test XDP_TX support
+  selftests: drv-net: Test tail-adjustment support
+  selftests: drv-net: Test head-adjustment support
 
-diff --git a/drivers/net/ethernet/intel/e1000e/ptp.c b/drivers/net/ethernet/intel/e1000e/ptp.c
-index ea3c3eb2ef2020d513d49c1368679f27d17edb04..f01506504ee3a11822930115e9ed07661d81532c 100644
---- a/drivers/net/ethernet/intel/e1000e/ptp.c
-+++ b/drivers/net/ethernet/intel/e1000e/ptp.c
-@@ -124,8 +124,11 @@ static int e1000e_phc_get_syncdevicetime(ktime_t *device,
- 	sys_cycles = er32(PLTSTMPH);
- 	sys_cycles <<= 32;
- 	sys_cycles |= er32(PLTSTMPL);
--	system->cycles = sys_cycles;
--	system->cs_id = CSID_X86_ART;
-+	*system = (struct system_counterval_t) {
-+		.cycles = sys_cycles,
-+		.cs_id = CSID_X86_ART,
-+		.use_nsecs = false,
-+	};
- 
- 	return 0;
- }
+ tools/testing/selftests/drivers/net/Makefile  |   1 +
+ .../selftests/drivers/net/lib/py/__init__.py  |   2 +-
+ tools/testing/selftests/drivers/net/xdp.py    | 663 ++++++++++++++++++
+ tools/testing/selftests/net/lib/py/utils.py   |   4 +
+ .../selftests/net/lib/xdp_native.bpf.c        | 528 ++++++++++++++
+ 5 files changed, 1197 insertions(+), 1 deletion(-)
+ create mode 100755 tools/testing/selftests/drivers/net/xdp.py
+ create mode 100644 tools/testing/selftests/net/lib/xdp_native.bpf.c
 
----
-base-commit: 733923397fd95405a48f165c9b1fbc8c4b0a4681
-change-id: 20250709-e1000e_crossts-7745674f682a
-
-Best regards,
 -- 
-Markus Blöchl <markus@blochl.de>
+2.47.1
 
 
