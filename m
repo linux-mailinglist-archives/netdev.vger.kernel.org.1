@@ -1,135 +1,134 @@
-Return-Path: <netdev+bounces-205437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46A32AFEAA8
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:49:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 934D9AFEACC
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:53:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B2617B6B55
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:47:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BF8C18863FE
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:52:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0750D2E090E;
-	Wed,  9 Jul 2025 13:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF0F32E041F;
+	Wed,  9 Jul 2025 13:52:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e44AM8vZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YCDKl75t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BB452DCF5B;
-	Wed,  9 Jul 2025 13:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6032D59E4
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 13:52:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752068945; cv=none; b=oahORcSBQ8asRSsBjPPDSj7kEK6Kb+yRg6xL4l7v81fyxCrfhUFXCyXK0T3ruz0RL0Jg9wPVrgHoLbsweJWKcDozp4uK503qHfLIIry3Z/5W6IokYFIguOYNacGHvqUPcP95yhRkU2wSb5S0UEfLXrYGYBDV0fRuyFoYMTj+5qY=
+	t=1752069122; cv=none; b=aC931qNdvPAFBNvzWaTbAuogR0fsV0hQvGFngl6p69tcTQJ1HRsmuUnyKv39YMR0fttyFcQ5dpiWVWV4NIkuAoPOWwHV7E9VHr/h5GrmeXySBYLh6dPkeWF5mV/Y+obOiXdsNwzekNLBj8ghqyK72val7sIUe2o6e8Eo9oGU5rs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752068945; c=relaxed/simple;
-	bh=d60WP6pubxI4wztZMJX26s9D12yMKyxg6mc078wlQIo=;
+	s=arc-20240116; t=1752069122; c=relaxed/simple;
+	bh=t9r2tCq4Koo6vPvZYpiCCJMYAZ61THXsNerWOF1rwJc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=buoyN0jHHQKXqKs3/x6r4I9w3HtBjz9TG6ecwswi5cS/TPJsoS7XXRo/WTBzVyeHlwK/98/6UWEftoIlVyV0Z2qV2i8S0ZqMNN3fWX5hipqY8OkwzmV/0nqjGwRYxdT2HU+xpBPW9ZtmaOA9APPTHdR1DfeJ9blLiYSzmWJXtxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e44AM8vZ; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ae3be3eabd8so219750166b.1;
-        Wed, 09 Jul 2025 06:49:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752068942; x=1752673742; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7tPZ2snfZJMpsUBAg/+z6Smy+g9cPqG2rxkyRsXfVc4=;
-        b=e44AM8vZvAzEQJXmAdebRGlpTfVJSMtlp85UgJp1/LI1OU+mpYaF/yZ+ju0DBV7Wkl
-         jX4Mvz+i6Ksl3CXjFY30sw/G/hGCC0wCX7Jef4X5BnSwMNFmIiUmN93ADxt5G60qbzxU
-         4LWPX8yL1XxWWntmbJRE0oHSvTmWbKcych1bDoS4Bk2jGMa6zuHmOpEGJAj3Bp0N/Tj9
-         J5LBpczW3ZlE+eCfoGolNrD1RISvzeBEN97zkihYRUTfJExvEfvs4xa2DbbPu4jxLiTS
-         hI0X+lGBzUgwteKUxzFOhs8gkG3DgDXAzlnsP7qwgjHFsa7AxYkbUtqYhabCPPbzanKJ
-         5ung==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752068942; x=1752673742;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7tPZ2snfZJMpsUBAg/+z6Smy+g9cPqG2rxkyRsXfVc4=;
-        b=u4T5QJc1iWkLkDd59B0YCMJbpbyvI3oPTptIkPHaWbOXLQiKqWp99CAm5jB38F9kS9
-         V8dPjWeyhFs5ejiQULLrZ1Eyz87KVoO34AgDUCdG8zj0MmaKbePxWQKpsU0/HEQYXzyo
-         Q/PgNMspEjM7A9vOlcW99UiGSVtoMjL/dK7d7TzemukzAhLBZttMgDddSwcL/RVsxmd7
-         5VR7xfGqPOSZ7Bjnz38CjsTbViMwOXfVksU0zRS4L+xVy425NWxP1VQSHRbHCD43M0wv
-         Oi5ZI3GJM8PBxNaWa6VccfUiZiwYbe+rQken3iUA/EQi6uCA8zcIids8Tzas7Xjw7QAd
-         6E7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUepg/e4EJ4uP6MQ2WJbFh8kbqarz+ViSiLH+fHIRqXy0YPNWbfX9cFldwiP1lxPrmuukX/xgaN@vger.kernel.org, AJvYcCWi8ISsSOYsDWb6tDErPPnpbydGezDtcFox7uNK/B/29eJvPcOc0CCMUG0p5MVOY7fYGU8f24Uu4w==@vger.kernel.org, AJvYcCWvsAoJiVdB6WK1Ex/x52xvOokjBPDADLQ2yiknexFTz6pTFaKD5nBxoAz0qgsXS8mPFBwL9smErgf9Mvg9@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxc19Angtd668f/J+tJO8EE75dpQ+SPTBeqO5fCFdhomNfzUU1j
-	/sqM2ma1dZCjWL3/fF5Uh5b2CV3yPf4qz9ykutBVx7VNEM6CQEhIFdYcmrLObg==
-X-Gm-Gg: ASbGncvj6HkhmfeEZIjnvc244upWqYJ5afiIh7mKG22aiFc9Nuq6qU485pIBN/4G309
-	26sGRSXtVeOxMP4aNKe/rfjfXoXUsftTYcH5aFQbxFafeAv/9KnlK366La2wmqhn2w/D2RlLie0
-	TXclNpEWRyeutcf074oC9U0MFdJxv4gvjuSf7Rkzb2l9uDsawzyqyMr4YTc2F/d2a2FWlKtrl+1
-	KTN6I13tcBn/JzlnSxkTp5yaynJWWCu7G58fpjXiXrYTN47X2ifdftKmkzTLXpuwItLnmg7FBXp
-	5cWpgV79P53KBDEz+i3Y6M+eMtfG/X+9mg7GejYkNUPj59GrLtdnFfGQwrvhJJvJyTbAWnN00v4
-	=
-X-Google-Smtp-Source: AGHT+IF31JR2looeKB7ac3iqDu1s74r171lLgGcy1Nj4GskaS7HfgrExrdlbN4zWs9o6Zi51j02V/A==
-X-Received: by 2002:a17:906:eecd:b0:ae6:dd93:2cac with SMTP id a640c23a62f3a-ae6dd932d17mr65632466b.7.1752068942242;
-        Wed, 09 Jul 2025 06:49:02 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325::1ac? ([2620:10d:c092:600::1:e3ec])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae3f6abfd8bsm1103765266b.81.2025.07.09.06.49.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Jul 2025 06:49:01 -0700 (PDT)
-Message-ID: <020a278f-2fae-4242-b55a-7b4faab37e55@gmail.com>
-Date: Wed, 9 Jul 2025 14:50:24 +0100
+	 In-Reply-To:Content-Type; b=c57onQ5trHYQuwIusUOlghsR/k5yJEdQAXNOLOmfItb7Ti7wqodUpfcvF7bJs6M0TZadtwLjuafL44wwfugXkRwASKJQZIFR4Jo87pIxs3Fg/rpVQgrc3lpZ6dLOeIBEu8CCMs3+6lE747+q/Kevecwi+SEXmp8x781wcO4cCWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YCDKl75t; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b8efdcd7-bc06-4c91-910f-3337be7408de@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752069118;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+eMsrQPAy6VNiHKZk80acEBT2ke3J3UIlQ0eRTJNEqo=;
+	b=YCDKl75tUYnxDzYuMVNvTLbAKsYHKVtrp6wdCN88VxRQSPToXT4oIBBB2SyolL6XlDOZDk
+	OkbjJXXKzuYz8An1jsldIliZsCRByCBvG9yL1AxgEid5k3JiJV67jKMCb2PGQGaXwwNpLM
+	Jh8l/q9prcKNbS/jhz9C2Po/pD2exPI=
+Date: Wed, 9 Jul 2025 14:51:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: Allow non parent devices to be used for ZC DMA
-To: Dragos Tatulea <dtatulea@nvidia.com>, almasrymina@google.com,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jens Axboe <axboe@kernel.dk>,
- Simona Vetter <simona.vetter@ffwll.ch>, Willem de Bruijn
- <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Cc: cratiu@nvidia.com, parav@nvidia.com, Tariq Toukan <tariqt@nvidia.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- io-uring@vger.kernel.org
-References: <20250709124059.516095-2-dtatulea@nvidia.com>
+Subject: Re: [PATCH net-next v3 03/12] net: libwx: add wangxun vf common api
+To: Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org
+Cc: michal.swiatkowski@linux.intel.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, andrew+netdev@lunn.ch, duanqiangwen@net-swift.com,
+ linglingzhang@trustnetic.com, jiawenwu@trustnetic.com
+References: <20250704094923.652-1-mengyuanlou@net-swift.com>
+ <20250704094923.652-4-mengyuanlou@net-swift.com>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20250709124059.516095-2-dtatulea@nvidia.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250704094923.652-4-mengyuanlou@net-swift.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 7/9/25 13:40, Dragos Tatulea wrote:
-> For zerocopy (io_uring, devmem), there is an assumption that the
-> parent device can do DMA. However that is not always the case:
-> ScalableFunction devices have the DMA device in the grandparent.
+On 04/07/2025 10:49, Mengyuan Lou wrote:
+> Add common wx_configure_vf and wx_set_mac_vf for
+> ngbevf and txgbevf.
 > 
-> This patch adds a helper for getting the DMA device for a netdev from
-> its parent or grandparent if necessary. The NULL case is handled in the
-> callers.
-> 
-> devmem and io_uring are updated accordingly to use this helper instead
-> of directly using the parent.
-> 
-> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Fixes: 170aafe35cb9 ("netdev: support binding dma-buf to netdevice")
-> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
 > ---
-> Changes in v1:
-> - Upgraded from RFC status.
-> - Dropped driver specific bits for generic solution.
-> - Implemented single patch as a fix as requested in RFC.
-> - Handling of multi-PF netdevs will be handled in a subsequent patch
->    series.
+>   drivers/net/ethernet/wangxun/libwx/Makefile   |   2 +-
+>   drivers/net/ethernet/wangxun/libwx/wx_hw.c    |   3 +-
+>   drivers/net/ethernet/wangxun/libwx/wx_hw.h    |   1 +
+>   drivers/net/ethernet/wangxun/libwx/wx_type.h  |   4 +
+>   drivers/net/ethernet/wangxun/libwx/wx_vf.h    |  50 ++++
+>   .../net/ethernet/wangxun/libwx/wx_vf_common.c | 196 ++++++++++++
+>   .../net/ethernet/wangxun/libwx/wx_vf_common.h |  14 +
+>   .../net/ethernet/wangxun/libwx/wx_vf_lib.c    | 280 ++++++++++++++++++
+>   .../net/ethernet/wangxun/libwx/wx_vf_lib.h    |  14 +
+>   9 files changed, 562 insertions(+), 2 deletions(-)
+>   create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_vf_common.c
+>   create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_vf_common.h
+>   create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_vf_lib.c
+>   create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_vf_lib.h
 > 
-> RFC: https://lore.kernel.org/all/20250702172433.1738947-2-dtatulea@nvidia.com/
-I can't say anything about the walking to grand parent part, but
-the rest looks good.
 
-Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+[...]
 
--- 
-Pavel Begunkov
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_vf.h b/drivers/net/ethernet/wangxun/libwx/wx_vf.h
+> index c523ef3e8502..e863a74c291d 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_vf.h
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_vf.h
+> @@ -14,6 +14,7 @@
+>   #define WX_VXMRQC                0x78
+>   #define WX_VXICR                 0x100
+>   #define WX_VXIMS                 0x108
+> +#define WX_VXIMC                 0x10C
+>   #define WX_VF_IRQ_CLEAR_MASK     7
+>   #define WX_VF_MAX_TX_QUEUES      4
+>   #define WX_VF_MAX_RX_QUEUES      4
+> @@ -22,6 +23,12 @@
+>   #define WX_VXRXDCTL_ENABLE       BIT(0)
+>   #define WX_VXTXDCTL_FLUSH        BIT(26)
+>   
+> +#define WX_VXITR(i)              (0x200 + (4 * (i))) /* i=[0,1] */
+> +#define WX_VXITR_MASK            GENMASK(8, 0)
+> +#define WX_VXITR_CNT_WDIS        BIT(31)
+> +#define WX_VXIVAR_MISC           0x260
+> +#define WX_VXIVAR(i)             (0x240 + (4 * (i))) /* i=[0,3] */
+> +
+>   #define WX_VXRXDCTL_RSCMAX(f)    FIELD_PREP(GENMASK(24, 23), f)
+>   #define WX_VXRXDCTL_BUFLEN(f)    FIELD_PREP(GENMASK(6, 1), f)
+>   #define WX_VXRXDCTL_BUFSZ(f)     FIELD_PREP(GENMASK(11, 8), f)
+> @@ -44,6 +51,49 @@
+>   #define WX_RX_HDR_SIZE           256
+>   #define WX_RX_BUF_SIZE           2048
+>   
+> +#define WX_RXBUFFER_2048         (2048)
+
+extra parentheses are not needed
+
+> +#define WX_RXBUFFER_3072         3072
+> +
+> +/* Receive Path */
+> +#define WX_VXRDBAL(r)            (0x1000 + (0x40 * (r)))
+> +#define WX_VXRDBAH(r)            (0x1004 + (0x40 * (r)))
+> +#define WX_VXRDT(r)              (0x1008 + (0x40 * (r)))
+> +#define WX_VXRDH(r)              (0x100C + (0x40 * (r)))
+
+[...]
 
 
