@@ -1,141 +1,152 @@
-Return-Path: <netdev+bounces-205529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FF20AFF15B
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 21:03:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F1AEAFF163
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 21:04:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D32B1C85658
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 19:03:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27C595458BE
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 19:04:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A614C241131;
-	Wed,  9 Jul 2025 19:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579EE23BCEC;
+	Wed,  9 Jul 2025 19:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="O20vyTVm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CDK671J3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F212021A452;
-	Wed,  9 Jul 2025 19:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF000239E89
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 19:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752087796; cv=none; b=jgAjPLjQGm843BqP9SmsDfYrL7qcEw6USJU5GVY0n0L42+/E0S1AGY3MiG++WF5lHyHUfGXpRrYARbQsL1lFfKrzNlW4dCjrjG4lhFMFAOWqrKcCI89/mHZ38QVzuNFACrwR6C2tHR306R/omXXioxd7gpfEwLplNIN0GNjghHs=
+	t=1752087871; cv=none; b=QHcevwbILxr8o4XBNa2O/sZFLinvi9pWhNsELK+v5z1MS1ADzwEwzk04tJYGtqUC6I2R1lVYqPTl4yYnnZqVzqHYXbYHd0N4815/RvbKgTTdcZAYfkZ5jZSnhJrg4SrzyS7gMalaBtDcDEWSOGwyuv63BNtJsMTvSVYw22A5N7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752087796; c=relaxed/simple;
-	bh=w33Yy1b2aTYcQmR5hFPvM8miDleChN70erjham5PHCM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RJ6Vn5jbgdxHpAbSvdES1Jof4mIbDPAlBZsU6H0f1CmuLz3+/G2oMNPGezUzA5xIiBU9MEMSv+FgntJ3NgkhBTYeMgP8yZ9EnBUg6Ktyzkp38wyaleE6zQw89AoV2HU+aC+BD6JVcDDOUiDrzRhi01k2h7gq+K+/SwgLJv9ubwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=O20vyTVm; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 569F2Quu006870;
-	Wed, 9 Jul 2025 19:03:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=ifBq+E
-	R6NWxi5h+0YyMfp5vKAFMEsKXlgVcLfp9LX/Y=; b=O20vyTVmt7UI03X1PUbP6v
-	gLNn75TGOtHlui9nIWXXF4dW1KRgIQwUcvR8gZdpWNKXBv7cetag6bVmxkFJMYvi
-	9pwLjNfrRT4RBU+rR+wWDgiXGwnpAvWzdeH/ZjTH78cdOeUgqvlDGxTfCcPDX+nT
-	oFZEFOHFLNh7RCEBP/U+UToxyFDnDLOSzSlzFKZP1VwpuiSi4Rg2TjGn5GNtCBVg
-	aU4EbP1QFaoGRd1Og0KyfJ/689L2OzYMcM4ojNdQr1+1uG+2AazxaWMea7nP6YaA
-	OU54E3u/lsieh0Ee1gdDZnUFcrqxCS7VJLJM3wwwYmxSV3kXlpzBvRuozU68/1Kw
-	==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47pur787jc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 09 Jul 2025 19:03:06 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 569I7DMs021519;
-	Wed, 9 Jul 2025 19:03:05 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 47qectsvqs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 09 Jul 2025 19:03:05 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 569J349930081604
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 9 Jul 2025 19:03:04 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5E15358043;
-	Wed,  9 Jul 2025 19:03:04 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E9B6E58059;
-	Wed,  9 Jul 2025 19:03:03 +0000 (GMT)
-Received: from [9.41.105.251] (unknown [9.41.105.251])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  9 Jul 2025 19:03:03 +0000 (GMT)
-Message-ID: <1915e11f-9513-4d9a-a46a-3f97ac152a3b@linux.ibm.com>
-Date: Wed, 9 Jul 2025 14:03:02 -0500
+	s=arc-20240116; t=1752087871; c=relaxed/simple;
+	bh=uHlcs8Omf3CS1KytlE/VWNw38oTCNOswfZed0aZbJ+I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JnO14qb8F9mXmlx9JqnTVKWBjihg2hRl9IEG09A6rPcJlx5pQdZPHBa7fmibW3lbr6GYJU2X7hrH4dXDBqDbLF7scyx6ldl/EfGHaZD0kff3K5zpIF3Tvu0+8TkBphS4W//2UJu4Nw1EUga26DXDc0rcKrAwDeMtNfyTfHnVrJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CDK671J3; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-31c38e75dafso315481a91.2
+        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 12:04:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752087869; x=1752692669; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H3NdMvV7Oc0jzRHM6vAQiXa6oLCVEsrYO5UT07DX7LY=;
+        b=CDK671J3auRipQv2SDFQPPdMU0QCMJqCurqC1Uuij31stAyBLNHZ7TaUVU0wMvrnVC
+         eA/ZY8TMuaI3cjFf5Ej6Vbsgkws0gqXp4OjB8ECSGOYYY9NvrsmBf/v7udHDyBeOt1Fz
+         ira8udH/h0E61sydoIcjANouAH/vje/lm0GS9NTQ2ye3rtRiD0vbO9Ww9or2WbYG8doI
+         Fu3/nCIe6krvySkKnpxZ4xiXdGXk06A55TDlt5zvv75KeQnLeydn7d/S9iEx82+z2jUL
+         b2uM/esmnbf+4cv5uw4a+iIUihzvXrmm/kNx/yi5S1DSLGey/eycVkiXt9ERhVlefWc2
+         twhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752087869; x=1752692669;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=H3NdMvV7Oc0jzRHM6vAQiXa6oLCVEsrYO5UT07DX7LY=;
+        b=B0EQACeIHyf1ynVHybpOO+tmYeSWEpJGpRamYMxsrfV2X0qTXVCoRfnTzXAUCm4M5K
+         6uxVDf52YUy/QZnmNUVH5ZjxN/lSouUyshqcEbJ15HV7unfwU5L5eLuGutl14pPazDJu
+         ymFyIhBoGHpXJjHkc4YNlUMN+/o+zCf9pzovN8Nd6e0AbC4weGy1QWvu7Eiv1BlJBB75
+         isb9c/zy5COEo4SwkqfioyQpM70UVPVDfSyMJREwTHN8eI7Dyq5E9h2pNmZVnwMR3ESG
+         S647oqSsTo3waYC4qBZH7eR2twxkesIxTKyvkpDQ3PZPFDtb1FiIoXhaJfyEwELhe4uG
+         zROQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVx36TPofFjTFNsJfNVubUq63Hwweh7RjSZU6oeF5NpueojTtWGe5bX8EaYkw//2EpjYagWlBI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZ/J7v4c2dOTB86ikzCS6p+jgZNScboRYDJCra0ZXt7bv/pEWE
+	KRt2U1q+0glQryzZTrLNx6labmvaaardKLbzoc7pYWZHMrIBgmMgYKXtEJWzUnY3GeZYX0hDtv/
+	j5dCi13BLxDPI7ayKWTGc9vwfQsYRYcpnc8G+d/GF
+X-Gm-Gg: ASbGncuJbTmvQMmsTCNveju1szsrstWsWwwWQs6++A8tmfy3/BLTSe5I3j/sw6RThLq
+	SYong521x+7cfqQHT89LSVELahCp7Ris3Lq783Kyk8ke9hv1NWagcSOGH0O2xSiM+q0f9V48XUW
+	TWiK/+UaHEJP0XJJvX3uwMhy13Cj6ca1bk3IZfwVdpNm6iS+Pd3WwkL+9AKl5qgwoMNtHwCUU96
+	IgeS968HLcb
+X-Google-Smtp-Source: AGHT+IHjN+1YxOoz4O6LpAmMlFJ5M/5Ec/pilG+KyM/ehzIbHUQ+C6XFZVejUv39ao1Y6bYfM9TS7h0QcJIqOVktj7s=
+X-Received: by 2002:a17:90b:3a8a:b0:311:c5d9:2c79 with SMTP id
+ 98e67ed59e1d1-31c3c2d4797mr1345957a91.21.1752087868873; Wed, 09 Jul 2025
+ 12:04:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4] vsock/test: Add test for null ptr deref when
- transport changes
-Content-Language: en-US
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: mhal@rbox.co, virtualization@lists.linux.dev, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, v4bel@theori.io, leonardi@redhat.com
-References: <472a5d43-4905-4fa4-8750-733bb848410d@linux.ibm.com>
- <CAGxU2F7bV7feiZs6FmdWkA7v9nxojuDbeSHyWoASS36fr1pSgw@mail.gmail.com>
- <CAGxU2F4GbeCJDYrs8Usd8JJcTrp99gyn3c_zXqpnz+UH2NNBGw@mail.gmail.com>
-From: Konstantin Shkolnyy <kshk@linux.ibm.com>
-In-Reply-To: <CAGxU2F4GbeCJDYrs8Usd8JJcTrp99gyn3c_zXqpnz+UH2NNBGw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA5MDE2OCBTYWx0ZWRfX3evddJ+8NLPa A+2M9HsTl5MiPujeHMFFR02XW0fE5ucHEGxkMPVMHjjdakA2qSTgz9gupgEQbxxuqsuTW91FV1B +fS00PioldEa7EgKcIG2FQuq4JUnRq0AlmDkzuUOmTOcOn2ihxKM2Wnx0Jp+dBKl7O2AXU0XQV7
- PNfStIz7IyyIsvq77z9t4qWHipEzNmKjKubcrdV/t0R2hkSGvxGIFwH0Rt+PiK6Gzt3vBYMZWGp JAsei8gc/RGSlWcVoF65dZ3DIojsGgoiug5vtDPcXo4r3v912fVWeXFmoi4uJdqTeNnNQwhUqcQ MI3wEBEvh9UmniMQTuZzQxDikketwAF3jCVv6Ch+pyWnT4PMFMyByJFY5S2WY84/He7M15l/MM1
- OeBfiJrtau0nC2T+6Jsqhg2W4zMm9TU9Vn/OVnbSzBs6czQova9jCw/FD8F6To4pRj2dBSbz
-X-Proofpoint-GUID: EcdP8gGMadH59a8D28cOtQinDaUFNt6X
-X-Proofpoint-ORIG-GUID: EcdP8gGMadH59a8D28cOtQinDaUFNt6X
-X-Authority-Analysis: v=2.4 cv=W/M4VQWk c=1 sm=1 tr=0 ts=686ebcea cx=c_pps a=bLidbwmWQ0KltjZqbj+ezA==:117 a=bLidbwmWQ0KltjZqbj+ezA==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=20KFwNOVAAAA:8 a=VnNF1IyMAAAA:8 a=yc8Tnp-ilgVpimbPip8A:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-09_04,2025-07-09_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- mlxscore=0 priorityscore=1501 adultscore=0 clxscore=1015 suspectscore=0
- spamscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0 impostorscore=0
- classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507090168
+References: <20250705085228.329202-1-yuehaibing@huawei.com> <20250709185626.GN721198@horms.kernel.org>
+In-Reply-To: <20250709185626.GN721198@horms.kernel.org>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Wed, 9 Jul 2025 12:04:15 -0700
+X-Gm-Features: Ac12FXzwUGGf7Mqw_5B3tPLa70x7c-uCFjkKyti--bnUncsh7gDOXqKvAtUzOSY
+Message-ID: <CAAVpQUBkD7zH9Ki6m2=xXFus5TbTXRqtv13AtEr7_Koqv_j9bA@mail.gmail.com>
+Subject: Re: [PATCH v2 net] atm: clip: Fix NULL pointer dereference in vcc_sendmsg()
+To: Simon Horman <horms@kernel.org>
+Cc: Yue Haibing <yuehaibing@huawei.com>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 09-Jul-25 10:41, Stefano Garzarella wrote:
-> On Wed, 9 Jul 2025 at 17:26, Stefano Garzarella <sgarzare@redhat.com> wrote:
->>
->> On Wed, 9 Jul 2025 at 16:54, Konstantin Shkolnyy <kshk@linux.ibm.com> wrote:
->>>
->>> I'm seeing a problem on s390 with the new "SOCK_STREAM transport change
->>> null-ptr-deref" test. Here is how it appears to happen:
->>>
->>> test_stream_transport_change_client() spins for 2s and sends 70K+
->>> CONTROL_CONTINUE messages to the "control" socket.
->>>
->>> test_stream_transport_change_server() spins calling accept() because it
->>> keeps receiving CONTROL_CONTINUE.
->>>
->>> When the client exits, the server has received just under 1K of those
->>> 70K CONTROL_CONTINUE, so it calls accept() again but the client has
->>> exited, so accept() never returns and the server never exits.
-> 
-> Just to be clear, I was seeing something a bit different.
-> The accept() in the server is no-blocking, since we set O_NONBLOCK on
-> the socket, so I see the server looping around a failing accept()
-> (errno == EAGAIN) while dequeueing the CONTROL_CONTINUE messages, so
-> after 10/15 seconds the server ends on my case.
-> 
-> It seems strange that in your case it blocks, since it should be a
-> no-blocking call.
+On Wed, Jul 9, 2025 at 11:56=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
+te:
+>
+> + Iwashima-san
 
-It was my mistake. The accept() doesn't block. I've retested it more 
-carefully and it keeps returning and the loop eventually consumes all 
-queued CONTROL_CONTINUE messages and quits, as you described.
+Thank you, Simon :)
 
+>
+> On Sat, Jul 05, 2025 at 04:52:28PM +0800, Yue Haibing wrote:
+> > atmarpd_dev_ops does not implement the send method, which may cause cra=
+sh
+> > as bellow.
+> >
+> > BUG: kernel NULL pointer dereference, address: 0000000000000000
+> > PGD 0 P4D 0
+> > Oops: Oops: 0010 [#1] SMP KASAN NOPTI
+> > CPU: 0 UID: 0 PID: 5324 Comm: syz.0.0 Not tainted 6.15.0-rc6-syzkaller-=
+00346-g5723cc3450bc #0 PREEMPT(full)
+> > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-=
+1.16.3-2~bpo12+1 04/01/2014
+> > RIP: 0010:0x0
+> > Code: Unable to access opcode bytes at 0xffffffffffffffd6.
+> > RSP: 0018:ffffc9000d3cf778 EFLAGS: 00010246
+> > RAX: 1ffffffff1910dd1 RBX: 00000000000000c0 RCX: dffffc0000000000
+> > RDX: ffffc9000dc82000 RSI: ffff88803e4c4640 RDI: ffff888052cd0000
+> > RBP: ffffc9000d3cf8d0 R08: ffff888052c9143f R09: 1ffff1100a592287
+> > R10: dffffc0000000000 R11: 0000000000000000 R12: 1ffff92001a79f00
+> > R13: ffff888052cd0000 R14: ffff88803e4c4640 R15: ffffffff8c886e88
+> > FS:  00007fbc762566c0(0000) GS:ffff88808d6c2000(0000) knlGS:00000000000=
+00000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: ffffffffffffffd6 CR3: 0000000041f1b000 CR4: 0000000000352ef0
+> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > Call Trace:
+> >  <TASK>
+> >  vcc_sendmsg+0xa10/0xc50 net/atm/common.c:644
+> >  sock_sendmsg_nosec net/socket.c:712 [inline]
+> >  __sock_sendmsg+0x219/0x270 net/socket.c:727
+> >  ____sys_sendmsg+0x52d/0x830 net/socket.c:2566
+> >  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
+> >  __sys_sendmmsg+0x227/0x430 net/socket.c:2709
+> >  __do_sys_sendmmsg net/socket.c:2736 [inline]
+> >  __se_sys_sendmmsg net/socket.c:2733 [inline]
+> >  __x64_sys_sendmmsg+0xa0/0xc0 net/socket.c:2733
+> >  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+> >  do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
+> >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> >
+> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> > Reported-by: syzbot+e34e5e6b5eddb0014def@syzkaller.appspotmail.com
+> > Closes: https://lore.kernel.org/all/682f82d5.a70a0220.1765ec.0143.GAE@g=
+oogle.com/T
+> > Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+
+v2 looks good.
+
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+
+Thanks!
 
