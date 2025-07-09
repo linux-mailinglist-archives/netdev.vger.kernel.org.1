@@ -1,310 +1,256 @@
-Return-Path: <netdev+bounces-205397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE07CAFE7E8
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:36:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7006BAFE7E1
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:35:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 301D01698D4
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 11:36:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C4163AFDD1
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 11:34:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A437E2D662D;
-	Wed,  9 Jul 2025 11:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4AB2D239F;
+	Wed,  9 Jul 2025 11:35:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="OtIZDkm3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+Received: from relay16.mail.gandi.net (relay16.mail.gandi.net [217.70.178.236])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95D72D8371
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 11:36:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 420B6293C57;
+	Wed,  9 Jul 2025 11:35:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.236
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752061002; cv=none; b=MOzd0+Gj7d3YO3schLoLWemIw62DWnGhHwdw1TXN919khcH59xanXgQlH2wBnSiOTwewpkUzf9YnU295FTglSceaFNS10rrleFerUbMyj+Wa7t+KAdH0fD1RcmiYQdl86gLymeJPNjIWa60/2EImUQKqloI6gdvlX0nWyMQq1+0=
+	t=1752060908; cv=none; b=ix0LkKKWue2HEPRsrC22Gf/VQItzx8phrW/F/Tz49Yd3gdjgb3gKJjjXzwH87Y8bTF3Y8D7fZmS+YEU9ohEcjqxPApj5MFO4qjn7YS9lc+s/2duAv9SnPOgK6NcKaPRF9SHAVLx8fXf5xh4OsmKoefauNDcPuChvOqygqZVw2+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752061002; c=relaxed/simple;
-	bh=vdK/mUulvNzF6GHgqpXR4Sz42DranKVzw9eQoQxzUmI=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=pARRYn2mAY9arhTrdrF19u/xx5LVNB0AZ5zvtR9BI+KQRoDhrl5NdV5JE3pee0NruO+b5UkseLItwwW61Hc3U8xhR+pkw+DagyjOZqpGAvsiXrgtPio7QdOiImXaR44bKbSCggDoDYmcG7rzYDzmbblsiRUs4skh9CPLlKknVok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.254.200.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
-X-QQ-mid: zesmtpgz9t1752060908t1022b59e
-X-QQ-Originating-IP: FTJ+5qZNlxt1l1iEpdpB/ODOkEJ1zOq6LDrWxFSxA+I=
-Received: from smtpclient.apple ( [111.202.70.100])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 09 Jul 2025 19:35:05 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 5700698603634300007
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1752060908; c=relaxed/simple;
+	bh=oblwm8tMGNrZF5HFXoNDxy5pPBMbR1TevhAMMCwDFj8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=G/SWBYur/4rWD2RJGwI+vbL/sShV0c+9UT6nuFJZioWqh1IOWDCpGtq/5zCJuGDOAKNCNv4QQYh8tyRuoC8Z/61QRanFTuL07zRuA69piQXTP6w8CG3WFKiwa24+UNMFQyexpcZwAmPbHFg8eiQsGgsuZ6DdfwiPFbvcDitSvzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=OtIZDkm3; arc=none smtp.client-ip=217.70.178.236
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 713EA449D6;
+	Wed,  9 Jul 2025 11:34:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1752060898;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Fg+lF8iCUctj//lCFSpvYMAI+SIBkJhPfi7cfKPHguU=;
+	b=OtIZDkm3ZbnfELbWNy5PaHZUrLwjjYGRrP0yT4tEpIrTnwP29OLeG0wFC5/lwDSbb+LA8u
+	siBCHRXdNP7JkSSJxfFhZHWKoJXu7JaRLvqxZD6BueETrv4RJe9iCQf57PKbPBxsDxVIlL
+	/r4z5u8Dt/ZrD+2s4hOrFL9HQAKSStUt5x79BNFMsvCSi/8J0qOoqviRACm0e17KyF5OSg
+	VjC+Tn+Gkims3XUcQNrlS52diOLCnIOH82C4i+ipeEpeUPCsX3MjN1W/kwTqyHAmLc1rcE
+	FEGEnvCyF0etkzYqPVUfbCnKB1lnAo2Tej0lq2BCsmznbZYY4v4KjBvCzC3l7w==
+Date: Wed, 9 Jul 2025 13:34:56 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Florian Fainelli
+ <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/3] net: netdevsim: Add PHY support in
+ netdevsim
+Message-ID: <20250709133456.46a1908e@fedora>
+In-Reply-To: <20250708115531.111326-2-maxime.chevallier@bootlin.com>
+References: <20250708115531.111326-1-maxime.chevallier@bootlin.com>
+	<20250708115531.111326-2-maxime.chevallier@bootlin.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.600.51.1.1\))
-Subject: Re: [PATCH net-next RESEND] net: bonding: add bond_is_icmpv6_nd()
- helper
-From: Tonghao Zhang <tonghao@bamaicloud.com>
-In-Reply-To: <196743.1752026655@famine>
-Date: Wed, 9 Jul 2025 19:34:55 +0800
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- Nikolay Aleksandrov <razor@blackwall.org>,
- Zengbing Tu <tuzengbing@didiglobal.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <B3527729-560E-485C-8E1F-F335236699FD@bamaicloud.com>
-References: <20250708123251.2475-1-tonghao@bamaicloud.com>
- <196743.1752026655@famine>
-To: Jay Vosburgh <jv@jvosburgh.net>
-X-Mailer: Apple Mail (2.3826.600.51.1.1)
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: OBUGnm9pFasAFq/FKAKa8hVmI4obhriXcEW33RocD19GtIRM8xf2rQJQ
-	RU0DFYTHVrEVQmeUAFZM3CAamneZxy75KjYrBCN5QiUlTcf4QX/qnwfHMiA7zbn5kC3+JlN
-	69y9XEUTRAV79NcBburN0Je3ZINOunw5wnhk+Fz6xmEWwdfqr6YYRQB/UXzwwX33fnjVD9j
-	wvz+1QNrRe3RjZsWstJECc/F881qLisJTs1pZqxfHbQjKBRlX0xfUXwN7ZdrDwunbzTEGk3
-	K5QZzXJEHz2NGKbf04Bi7KGhAFlYB+F60Qcm7iOOIhBzyFcg+FPJ5oAQKZwZA++KAhDvv+j
-	NEVEm6SZwZ5Cl0fbBmEWqSKR1yy/S8CdTSZOotNPbAIlmTrRRYKPjaY8g4Hj+duHAbyJgd5
-	y6KJ+jSeuYUkxPgKEBAJqCmmYf3Q98AwB5JlcLd+WqNJtb3h9l9ygiBft1hp2upjWDWLnoj
-	9YTYI+RXjH4A+pecUZAuSyvvFIrePRaqLweZruByGXaHGQqUuQDyO4za5jGg+Zf2whJmsSb
-	EMJj38+1zWUc99guqPtsyv6du6u7d88TI+umIBiZEOkqKmxdTbVemL9vYBKiFqSaYoA829v
-	q8jgcgljNKRHUxDwvAU7UCdQr28LeE2e8IXBG50jjMhYqAMsoYbEa7J2u1RNT+vm9Z6uhfF
-	7XAdkwvlLRTdCUAircATWJ4js1QQJCt0rIUse6Iu6iOao3+iT9RkdfJL4eJSv0+TbPZk0O2
-	bL7BnNDIDLUqo3aIgChHCA6yLgNAtCV/7MpGyzKpdZ9D3WajixYnNMKQddQ4PxhQ8HRNJdz
-	fsyT6xNkANm3vKW1P0qS89FIMA9b6996D5oG68K9hs3NFdUx3ax25DOUxLUP6AnUlJGoamn
-	Ywsx5oQ/kP3rBUaq6gbhYgkhblzLfhoo3JlhROU4STgVzz1Fnsz3SF7G/i13XyNxEV+h9ho
-	WRAeQt4k8oDiiyrWfNuZ2uJ3RRemQ+YnNr4xANjd5RnOXhQ==
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-X-QQ-RECHKSPAM: 0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefjeegiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegveeltddvveeuhefhvefhlefhkeevfedtgfeiudefffeiledttdfgfeeuhfeukeenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudejpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvl
+ hdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
 
+On Tue,  8 Jul 2025 13:55:28 +0200
+Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
 
-
-> 2025=E5=B9=B47=E6=9C=889=E6=97=A5 10:04=EF=BC=8CJay Vosburgh =
-<jv@jvosburgh.net> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> Tonghao Zhang <tonghao@bamaicloud.com> wrote:
->=20
->> Introduce ipv6 ns/nd checking helper, using skb_header_pointer()
->> instead of pskb_network_may_pull() on tx path.
->>=20
->> alb_determine_nd introduced from commit 0da8aa00bfcfe
->>=20
->> Cc: Jay Vosburgh <jv@jvosburgh.net>
->> Cc: "David S. Miller" <davem@davemloft.net>
->> Cc: Eric Dumazet <edumazet@google.com>
->> Cc: Jakub Kicinski <kuba@kernel.org>
->> Cc: Paolo Abeni <pabeni@redhat.com>
->> Cc: Simon Horman <horms@kernel.org>
->> Cc: Jonathan Corbet <corbet@lwn.net>
->> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
->> Cc: Nikolay Aleksandrov <razor@blackwall.org>
->> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
->> Signed-off-by: Zengbing Tu <tuzengbing@didiglobal.com>
->> ---
->> drivers/net/bonding/bond_alb.c  | 32 +++++++-------------------------
->> drivers/net/bonding/bond_main.c | 17 ++---------------
->> include/net/bonding.h           | 19 +++++++++++++++++++
->> 3 files changed, 28 insertions(+), 40 deletions(-)
->>=20
->> diff --git a/drivers/net/bonding/bond_alb.c =
-b/drivers/net/bonding/bond_alb.c
->> index 2d37b07c8215..8e5b9ce52077 100644
->> --- a/drivers/net/bonding/bond_alb.c
->> +++ b/drivers/net/bonding/bond_alb.c
->> @@ -19,7 +19,6 @@
->> #include <linux/in.h>
->> #include <net/arp.h>
->> #include <net/ipv6.h>
->> -#include <net/ndisc.h>
->> #include <asm/byteorder.h>
->> #include <net/bonding.h>
->> #include <net/bond_alb.h>
->> @@ -1280,27 +1279,6 @@ static int alb_set_mac_address(struct bonding =
-*bond, void *addr)
->> return res;
->> }
->>=20
->> -/* determine if the packet is NA or NS */
->> -static bool alb_determine_nd(struct sk_buff *skb, struct bonding =
-*bond)
->> -{
->> - struct ipv6hdr *ip6hdr;
->> - struct icmp6hdr *hdr;
->> -
->> - if (!pskb_network_may_pull(skb, sizeof(*ip6hdr)))
->> - return true;
->> -
->> - ip6hdr =3D ipv6_hdr(skb);
->> - if (ip6hdr->nexthdr !=3D IPPROTO_ICMPV6)
->> - return false;
->> -
->> - if (!pskb_network_may_pull(skb, sizeof(*ip6hdr) + sizeof(*hdr)))
->> - return true;
->> -
->> - hdr =3D icmp6_hdr(skb);
->> - return hdr->icmp6_type =3D=3D NDISC_NEIGHBOUR_ADVERTISEMENT ||
->> - hdr->icmp6_type =3D=3D NDISC_NEIGHBOUR_SOLICITATION;
->> -}
->> -
->> /************************ exported alb functions =
-************************/
->>=20
->> int bond_alb_initialize(struct bonding *bond, int rlb_enabled)
->> @@ -1381,7 +1359,7 @@ struct slave *bond_xmit_tlb_slave_get(struct =
-bonding *bond,
->> if (!is_multicast_ether_addr(eth_data->h_dest)) {
->> switch (skb->protocol) {
->> case htons(ETH_P_IPV6):
->> - if (alb_determine_nd(skb, bond))
->> + if (bond_is_icmpv6_nd(skb))
->> break;
->> fallthrough;
->> case htons(ETH_P_IP):
->> @@ -1467,16 +1445,20 @@ struct slave *bond_xmit_alb_slave_get(struct =
-bonding *bond,
->> break;
->> }
->>=20
->> - if (alb_determine_nd(skb, bond)) {
->> + if (bond_is_icmpv6_nd(skb)) {
->> do_tx_balance =3D false;
->> break;
->> }
->>=20
->> - /* The IPv6 header is pulled by alb_determine_nd */
->> /* Additionally, DAD probes should not be tx-balanced as that
->>  * will lead to false positives for duplicate addresses and
->>  * prevent address configuration from working.
->>  */
->> + if (!pskb_network_may_pull(skb, sizeof(*ip6hdr))) {
->> + do_tx_balance =3D false;
->> + break;
->> + }
->> +
->=20
-> It's nice to consolidate some duplicate code and use the more
-> efficient skb_header_pointer, but the above will do a pull anyway for
-> nearly every packet that passed through the function.
->=20
-> Would it be better to not use the bond_is_icmpv6_nd helper here,
-> but instead call skb_header_pointer directly, and then reuse its
-> returned data for the hash computation that occurs just after this =
-point
-> in the code?
-sounds good.
->=20
->> ip6hdr =3D ipv6_hdr(skb);
->> if (ipv6_addr_any(&ip6hdr->saddr)) {
->> do_tx_balance =3D false;
->> diff --git a/drivers/net/bonding/bond_main.c =
-b/drivers/net/bonding/bond_main.c
->> index 17c7542be6a5..a8034a561011 100644
->> --- a/drivers/net/bonding/bond_main.c
->> +++ b/drivers/net/bonding/bond_main.c
->> @@ -5338,10 +5338,6 @@ static bool =
-bond_should_broadcast_neighbor(struct sk_buff *skb,
->>    struct net_device *dev)
->> {
->> struct bonding *bond =3D netdev_priv(dev);
->> - struct {
->> - struct ipv6hdr ip6;
->> - struct icmp6hdr icmp6;
->> - } *combined, _combined;
->>=20
->> if (!static_branch_unlikely(&bond_bcast_neigh_enabled))
->> return false;
->> @@ -5349,19 +5345,10 @@ static bool =
-bond_should_broadcast_neighbor(struct sk_buff *skb,
->> if (!bond->params.broadcast_neighbor)
->> return false;
->>=20
->> - if (skb->protocol =3D=3D htons(ETH_P_ARP))
->> + if (skb->protocol =3D=3D htons(ETH_P_ARP) ||
->> +     (skb->protocol =3D=3D htons(ETH_P_IPV6) && =
-bond_is_icmpv6_nd(skb)))
->> return true;
->>=20
->> - if (skb->protocol =3D=3D htons(ETH_P_IPV6)) {
->> - combined =3D skb_header_pointer(skb, skb_mac_header_len(skb),
->> -       sizeof(_combined),
->> -       &_combined);
->> - if (combined && combined->ip6.nexthdr =3D=3D NEXTHDR_ICMP &&
->> -     (combined->icmp6.icmp6_type =3D=3D NDISC_NEIGHBOUR_SOLICITATION =
-||
->> -      combined->icmp6.icmp6_type =3D=3D =
-NDISC_NEIGHBOUR_ADVERTISEMENT))
->> - return true;
->> - }
->> -
->> return false;
->> }
->>=20
->> diff --git a/include/net/bonding.h b/include/net/bonding.h
->> index e06f0d63b2c1..32d9fcca858c 100644
->> --- a/include/net/bonding.h
->> +++ b/include/net/bonding.h
->> @@ -29,6 +29,7 @@
->> #include <net/bond_options.h>
->> #include <net/ipv6.h>
->> #include <net/addrconf.h>
->> +#include <net/ndisc.h>
->>=20
->> #define BOND_MAX_ARP_TARGETS 16
->> #define BOND_MAX_NS_TARGETS BOND_MAX_ARP_TARGETS
->> @@ -814,4 +815,22 @@ static inline netdev_tx_t bond_tx_drop(struct =
-net_device *dev, struct sk_buff *s
->> return NET_XMIT_DROP;
->> }
->>=20
->> +static inline bool bond_is_icmpv6_nd(struct sk_buff *skb)
->> +{
->=20
-> Minor nit: no need to specify inline, the compiler will decide.
-Hi Jay
-If we don=E2=80=99t use the inline in the header file, the linker will =
-report an error. I think we should keep the =E2=80=98inline=E2=80=99.
-ld: drivers/net/bonding/bond_procfs.o: in function `bond_is_icmpv6_nd':
-/root/net-next/./include/net/bonding.h:819: multiple definition of =
-`bond_is_icmpv6_nd'; =
-drivers/net/bonding/bond_main.o:/root/net-next/./include/net/bonding.h:819=
-: first defined here
->=20
-> -J
->=20
->> + struct {
->> + struct ipv6hdr ip6;
->> + struct icmp6hdr icmp6;
->> + } *combined, _combined;
->> +
->> + combined =3D skb_header_pointer(skb, skb_mac_header_len(skb),
->> +       sizeof(_combined),
->> +       &_combined);
->> + if (combined && combined->ip6.nexthdr =3D=3D NEXTHDR_ICMP &&
->> +     (combined->icmp6.icmp6_type =3D=3D NDISC_NEIGHBOUR_SOLICITATION =
-||
->> +      combined->icmp6.icmp6_type =3D=3D =
-NDISC_NEIGHBOUR_ADVERTISEMENT))
->> + return true;
->> +
->> + return false;
->> +}
->> +
->> #endif /* _NET_BONDING_H */
->> --=20
->> 2.34.1
->>=20
->=20
+> With the introduction of phy_link_topology, we have the ability to keep
+> track of PHY devices that sit behind a net_device. While we still can
+> only attach one single PHY to a netdev, we can look at all these PHYs
+> through netlink, with the ETHTOOL_MSG_PHY_GET command.
+> 
+> Moreover, netlink commands that are targeting PHY devices also now
+> allow specifying which PHY we want to address in a given netlink
+> command.
+> 
+> That whole process comes with its own complexity, and a few bugs were
+> dicovered over the months following the introduction of
+> phy_link_topology.
+> 
+> As devices with multiple PHYs are fairly uncommon, testing the corner
+> cases of multi-phy setups proves to be difficult.
+> 
+> To that extent, introduce PHY support in netdevsim. The main goal (for
+> now) is not to be able to test PHYlib, but these phy-specific
+> netlink interfaces.
+> 
+> These netdevsim PHYs use a custom phy_driver that relies on
+> re-implementing the phy_driver callbacks. In other words, this is not a
+> PHY driver that relies on mdio emulation, and will not work with any of
+> the genphy helpers.
+> 
+> The debugfs API for PHY creation and deletion works as follows :
+> 
+> PHY device creation :
+> 
+> echo $ID > /sys/kernel/debug/netdevsim/netdevsimXXX/ports/YY/phy_add
+> 
+> if $ID is 0, then the PHY parent will be the netdev corresponding to the
+> port's netdev. The first PHY that is added with the netdev as a parent
+> will be attached to the netdev.
+> 
+> if $ID > 0, the index must correspond to a previously added PHY. This
+> allows creating any arbitrary tree of PHYs.
+> 
+> Upon PHY addition, a phyXX directory will be created, XX being the
+> phyindex of the PHY in the topology:
+> 
+>  [...]/ports/YY/phyXX/
+> 
+> This directory contains a "link" file, allowing to toggle the virtual
+> PHY's link state.
+> 
+> One can then list the PHYs with "ethtool --show-phys ethX".
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 > ---
-> -Jay Vosburgh, jv@jvosburgh.net
+>  drivers/net/netdevsim/Makefile    |   4 +
+>  drivers/net/netdevsim/dev.c       |   2 +
+>  drivers/net/netdevsim/netdev.c    |   8 +
+>  drivers/net/netdevsim/netdevsim.h |  25 ++
+>  drivers/net/netdevsim/phy.c       | 398 ++++++++++++++++++++++++++++++
+>  5 files changed, 437 insertions(+)
+>  create mode 100644 drivers/net/netdevsim/phy.c
+> 
+> diff --git a/drivers/net/netdevsim/Makefile b/drivers/net/netdevsim/Makefile
+> index f8de93bc5f5b..49f4c515e5e3 100644
+> --- a/drivers/net/netdevsim/Makefile
+> +++ b/drivers/net/netdevsim/Makefile
+> @@ -21,3 +21,7 @@ endif
+>  ifneq ($(CONFIG_MACSEC),)
+>  netdevsim-objs += macsec.o
+>  endif
+> +
+> +ifneq ($(CONFIG_PHYLIB),)
+> +netdevsim-objs += phy.o
+> +endif
+> diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
+> index b3647691060c..1ebb4f5b3bdd 100644
+> --- a/drivers/net/netdevsim/dev.c
+> +++ b/drivers/net/netdevsim/dev.c
+> @@ -1510,6 +1510,7 @@ static int nsim_dev_reload_create(struct nsim_dev *nsim_dev,
+>  	devlink = priv_to_devlink(nsim_dev);
+>  	nsim_dev = devlink_priv(devlink);
+>  	INIT_LIST_HEAD(&nsim_dev->port_list);
+> +	INIT_LIST_HEAD(&nsim_dev->phy_list);
+>  	nsim_dev->fw_update_status = true;
+>  	nsim_dev->fw_update_overwrite_mask = 0;
+>  
+> @@ -1583,6 +1584,7 @@ int nsim_drv_probe(struct nsim_bus_dev *nsim_bus_dev)
+>  	nsim_dev->switch_id.id_len = sizeof(nsim_dev->switch_id.id);
+>  	get_random_bytes(nsim_dev->switch_id.id, nsim_dev->switch_id.id_len);
+>  	INIT_LIST_HEAD(&nsim_dev->port_list);
+> +	INIT_LIST_HEAD(&nsim_dev->phy_list);
+>  	nsim_dev->fw_update_status = true;
+>  	nsim_dev->fw_update_overwrite_mask = 0;
+>  	nsim_dev->max_macs = NSIM_DEV_MAX_MACS_DEFAULT;
+> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+> index e36d3e846c2d..ff891536f691 100644
+> --- a/drivers/net/netdevsim/netdev.c
+> +++ b/drivers/net/netdevsim/netdev.c
+> @@ -952,6 +952,7 @@ static int nsim_init_netdevsim(struct netdevsim *ns)
+>  
+>  	nsim_macsec_init(ns);
+>  	nsim_ipsec_init(ns);
+> +	nsim_phy_init(ns);
+>  
+>  	err = register_netdevice(ns->netdev);
+>  	if (err)
+> @@ -968,6 +969,7 @@ static int nsim_init_netdevsim(struct netdevsim *ns)
+>  	return 0;
+>  
+>  err_ipsec_teardown:
+> +	nsim_phy_teardown(ns);
+>  	nsim_ipsec_teardown(ns);
+>  	nsim_macsec_teardown(ns);
+>  	nsim_bpf_uninit(ns);
+> @@ -1058,6 +1060,7 @@ void nsim_destroy(struct netdevsim *ns)
+>  	RCU_INIT_POINTER(ns->peer, NULL);
+>  	unregister_netdevice(dev);
+>  	if (nsim_dev_port_is_pf(ns->nsim_dev_port)) {
+> +		nsim_phy_teardown(ns);
+>  		nsim_macsec_teardown(ns);
+>  		nsim_ipsec_teardown(ns);
+>  		nsim_bpf_uninit(ns);
+> @@ -1098,6 +1101,10 @@ static int __init nsim_module_init(void)
+>  {
+>  	int err;
+>  
+> +	err = nsim_phy_drv_register();
+> +	if (err)
+> +		return err;
+> +
+>  	err = nsim_dev_init();
+>  	if (err)
+>  		return err;
+> @@ -1124,6 +1131,7 @@ static void __exit nsim_module_exit(void)
+>  	rtnl_link_unregister(&nsim_link_ops);
+>  	nsim_bus_exit();
+>  	nsim_dev_exit();
+> +	nsim_phy_drv_unregister();
+>  }
+>  
+>  module_init(nsim_module_init);
+> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+> index 809dd29fc5fe..c73d16e67a3c 100644
+> --- a/drivers/net/netdevsim/netdevsim.h
+> +++ b/drivers/net/netdevsim/netdevsim.h
+> @@ -314,6 +314,7 @@ struct nsim_dev {
+>  	struct list_head bpf_bound_maps;
+>  	struct netdev_phys_item_id switch_id;
+>  	struct list_head port_list;
+> +	struct list_head phy_list;
+>  	bool fw_update_status;
+>  	u32 fw_update_overwrite_mask;
+>  	u32 max_macs;
+> @@ -419,6 +420,30 @@ static inline void nsim_macsec_teardown(struct netdevsim *ns)
+>  }
+>  #endif
+>  
+> +#if IS_ENABLED(CONFIG_PHYLIB)
+> +void nsim_phy_init(struct netdevsim *ns);
+> +void nsim_phy_teardown(struct netdevsim *dev);
+> +int nsim_phy_drv_register(void);
+> +void nsim_phy_drv_unregister(void);
+> +#else
+> +static inline void nsim_phy_init(struct netdevsim *ns)
+> +{
+> +}
+> +
+> +static inline void nsim_phy_teardown(struct netdevsim *ns);
 
+Meh... that's why this fails, stray ';' that slept through the cracks
+when building netdevsim with CONFIG_PHYLIB=n ...
+
+I'll address that,
+
+Maxime
 
 
