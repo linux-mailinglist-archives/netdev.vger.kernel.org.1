@@ -1,153 +1,88 @@
-Return-Path: <netdev+bounces-205234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E9E7AFDDC6
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 05:03:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E21A0AFDDC9
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 05:04:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79DAB1BC4722
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 03:03:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0A8B1C26A86
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 03:04:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D2251A3A80;
-	Wed,  9 Jul 2025 03:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225211AAE17;
+	Wed,  9 Jul 2025 03:04:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bOJNn0N2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lsngK2uH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE175A935
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 03:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2089188A0C
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 03:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752030215; cv=none; b=es2HIVeDFAb2rmeMPAm4x9LIJqUv2yNfEkBy+n0c4CT+g6HYEA8AIXI/+YAW2WSZA1KNZWUlhi1tHpvSmfjyAifq/4vkIXXckYrWs3D0TxLkprshMolSaE1tADwTpzJfZfYe51uhgi56NLjnnLwaXVTaMBq5uOU2lizRcfT6PCY=
+	t=1752030273; cv=none; b=nD/fiFbm/96gij58s9+QSs5ig2gbsvHws0M/4EGyMBt4aoNrerZ6mGK3Ap2nfwsMa4zn4H1KrMPB4gU+gxby5b2sV1yTqUugkMbq0YYZ7vavzkWR1UrXfQyo1Nd7t4GYdFgCXXmHZSZ4zRopTdE/097QKV7RMWwvjIQInze0jcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752030215; c=relaxed/simple;
-	bh=aIRy4P+mVHLYqEJlA1GuRMWQ8jpHGslA2lnonIu+p34=;
+	s=arc-20240116; t=1752030273; c=relaxed/simple;
+	bh=wuAErupuiEYf5tR4T1nl1riOnIjQi4zJzBtqpJBL+sg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XjBATKLvGOdV60fJyMvK9BH1VSaQDFQ/5XQxuz+3NGmZt6nriege5aM9+y86Ca0enMvZoKxtTMjzziG55asG3xNBguzFHwtErPMtMKlqEiV6O3gLEcXDs+VPm5OD5m9ZTbf0xYwEqhTrc9+kEXUmzeHTXoudK/AFQyPcIn3MFZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bOJNn0N2; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752030214; x=1783566214;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=aIRy4P+mVHLYqEJlA1GuRMWQ8jpHGslA2lnonIu+p34=;
-  b=bOJNn0N2PhU5/U80crGorG4l/0GVbV1YVbYCXz4D9NHhR4wUQbpRpav1
-   En+4FKv1Uil5azyffCZJjz3fzc2JxyTqUCvKpLm2eoJL514iI5XsdEcpd
-   1K/yeyCzGeKhEpGfNmFuOBIpKo54SW+Jb5/mwVNAxYFfMyMqjPuXv47QO
-   QbLPDJSucY7LEZFZGY6QtQMuvWdc+6rhqgmsqh5A/kb1GyYrOOoZO9emN
-   q4pBR2KDqq+5tybuDftFPKk0vlfYpbNd9vH3GN/RFB//FIOgy/PiW/Bt2
-   POq/6EQnfJyNQAwhxGNzicWZ+CPsiWi38CklpHHGhC4IkALI9gU3115Uo
-   Q==;
-X-CSE-ConnectionGUID: X1bKU2wESVSNttvNhJHTDA==
-X-CSE-MsgGUID: 3eTZX+yFQaSRHb3fIA7nrg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11487"; a="56887610"
-X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
-   d="scan'208";a="56887610"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2025 20:03:33 -0700
-X-CSE-ConnectionGUID: AF4LIbfdR2OXu4UASMSicA==
-X-CSE-MsgGUID: 3fGwvMpQTW+jbBZUovUC5g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
-   d="scan'208";a="156384912"
-Received: from lkp-server01.sh.intel.com (HELO 9ee84586c615) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 08 Jul 2025 20:03:30 -0700
-Received: from kbuild by 9ee84586c615 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1uZL5j-000319-2w;
-	Wed, 09 Jul 2025 03:03:27 +0000
-Date: Wed, 9 Jul 2025 11:03:16 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jacek Kowalski <jacek@jacekk.info>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=YOEdZh8/E+tMbwxoTfwTtkPzLKC/nSus/5Yz07S7znMU3wloqZUb1U+plQ2dTe+6GXCHtjo72uY3dz6jy+qYhBxSGJQKpSa6FZeWuj6N/Q+fRsctN9rkTQuc5ccyGj16bBA+jzbd0v8AM34D4S0ZfK5UxPqdWam0MM226P0g+lQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lsngK2uH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C396C4CEED;
+	Wed,  9 Jul 2025 03:04:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752030271;
+	bh=wuAErupuiEYf5tR4T1nl1riOnIjQi4zJzBtqpJBL+sg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lsngK2uHX0RSe1bsgigz4j+8WaVLc12F2AvMgFCSOtIcklUDfRasqaopHFceq23wB
+	 Iw2ATDQx6Q/79EkKlGGxMRaFvu01dPvr4RnnxTsZnKsOZwRfu+bh7bLp96FpYEw9dC
+	 PDPz6eIqe6TFoFCflmY6tmmVkxJkJylLFmJpcO5nVV46mpqyzoS2xN2EeSs5B7xa6O
+	 zHnDKDyi7p+bze3RHHH6bUGqCpWE89hNHjKpjfXwRSxDfSkaW4PZq1tbheA+ySHHZi
+	 lv/grGWARRQfaazWxDxuaJE9aUou2qDznFd6MYKderfmZjKSq3H7rQeis9/G13e85M
+	 yFFAE9gcJhvVg==
+Date: Tue, 8 Jul 2025 20:04:30 -0700
+From: Saeed Mahameed <saeed@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
-Subject: Re: [PATCH iwl-next v2 1/5] e1000: drop unnecessary constant casts
- to u16
-Message-ID: <202507091034.uiPhnpcc-lkp@intel.com>
-References: <e199da76-00d0-43d3-8f61-f433bc0352ad@jacekk.info>
+	Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next V5 00/13] devlink, mlx5: Add new parameters for
+ link management and SRIOV/eSwitch configurations
+Message-ID: <aG3cPvni2Lhwye7R@x130>
+References: <20250706020333.658492-1-saeed@kernel.org>
+ <20250707162546.GN89747@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <e199da76-00d0-43d3-8f61-f433bc0352ad@jacekk.info>
+In-Reply-To: <20250707162546.GN89747@horms.kernel.org>
 
-Hi Jacek,
+On 07 Jul 17:25, Simon Horman wrote:
+>On Sat, Jul 05, 2025 at 07:03:20PM -0700, Saeed Mahameed wrote:
+>> From: Saeed Mahameed <saeedm@nvidia.com>
+>>
+>> This patch series introduces several devlink parameters improving device
+>> configuration capabilities, link management, and SRIOV/eSwitch, by adding
+>> NV config boot time parameters.
+>
+>...
+>
+>Thanks Saeed.
+>
+>Overall this patchset looks good to me.
+>And, importantly, I believe review of earlier versions has been addressed.
+>
+>But unfortunately it does not apply cleanly against current net-next.
+>Could you rebase?
 
-kernel test robot noticed the following build warnings:
+Done, posting v6 now, Thanks Simon for the review.
 
-[auto build test WARNING on tnguy-next-queue/dev-queue]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Jacek-Kowalski/e1000-drop-unnecessary-constant-casts-to-u16/20250708-161919
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git dev-queue
-patch link:    https://lore.kernel.org/r/e199da76-00d0-43d3-8f61-f433bc0352ad%40jacekk.info
-patch subject: [PATCH iwl-next v2 1/5] e1000: drop unnecessary constant casts to u16
-config: riscv-randconfig-002-20250709 (https://download.01.org/0day-ci/archive/20250709/202507091034.uiPhnpcc-lkp@intel.com/config)
-compiler: clang version 21.0.0git (https://github.com/llvm/llvm-project 01c97b4953e87ae455bd4c41e3de3f0f0f29c61c)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250709/202507091034.uiPhnpcc-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202507091034.uiPhnpcc-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/intel/e1000/e1000_main.c:316:16: warning: result of comparison of constant -1 with expression of type 'u16' (aka 'unsigned short') is always true [-Wtautological-constant-out-of-range-compare]
-     316 |                 if ((old_vid != E1000_MNG_VLAN_NONE) &&
-         |                      ~~~~~~~ ^  ~~~~~~~~~~~~~~~~~~~
-   1 warning generated.
-
-
-vim +316 drivers/net/ethernet/intel/e1000/e1000_main.c
-
-   297	
-   298	static void e1000_update_mng_vlan(struct e1000_adapter *adapter)
-   299	{
-   300		struct e1000_hw *hw = &adapter->hw;
-   301		struct net_device *netdev = adapter->netdev;
-   302		u16 vid = hw->mng_cookie.vlan_id;
-   303		u16 old_vid = adapter->mng_vlan_id;
-   304	
-   305		if (!e1000_vlan_used(adapter))
-   306			return;
-   307	
-   308		if (!test_bit(vid, adapter->active_vlans)) {
-   309			if (hw->mng_cookie.status &
-   310			    E1000_MNG_DHCP_COOKIE_STATUS_VLAN_SUPPORT) {
-   311				e1000_vlan_rx_add_vid(netdev, htons(ETH_P_8021Q), vid);
-   312				adapter->mng_vlan_id = vid;
-   313			} else {
-   314				adapter->mng_vlan_id = E1000_MNG_VLAN_NONE;
-   315			}
- > 316			if ((old_vid != E1000_MNG_VLAN_NONE) &&
-   317			    (vid != old_vid) &&
-   318			    !test_bit(old_vid, adapter->active_vlans))
-   319				e1000_vlan_rx_kill_vid(netdev, htons(ETH_P_8021Q),
-   320						       old_vid);
-   321		} else {
-   322			adapter->mng_vlan_id = vid;
-   323		}
-   324	}
-   325	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
