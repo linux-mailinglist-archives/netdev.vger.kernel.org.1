@@ -1,188 +1,196 @@
-Return-Path: <netdev+bounces-205340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C735AFE37A
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 11:03:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06329AFE375
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 11:03:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF047189382A
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 09:03:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59D2C4A6AF4
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 09:02:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C4F283151;
-	Wed,  9 Jul 2025 09:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F04F284B57;
+	Wed,  9 Jul 2025 09:02:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jON4NLzf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cdcyfnAd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBEA28469F
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 09:02:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4068D28469F
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 09:02:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752051748; cv=none; b=RvQzMSetfqSeSPrf5uyXTpc5bx+E+1lUH0eqjxftSKI/CJ3Ehyy1P+NS1gLj+tMit2BYNBUGk9JNsfJHDsJOa53IzvXmPiZTpATYVp253jxcCgmGxFhxqf6h76ERdPTUN9mnw9wWjwc3Gq9uCgpRzPRmNlwtUkmen73fVk0xBZo=
+	t=1752051745; cv=none; b=SLUy8hyU/cdZ7qpFz4FXj5TzvcJ1IFWKlD6GV0Znye+QhXlLfDGNF9+m8YtyNZLs+dxeVamXfAqMxGWZjp/9l4/5zhNgWROStVdDp6fIJVI34GiGSY+eAZSlEmT2Q7PMK9BB8SgG6UXfcUFdLXXmcq8MMyqAvFY9tK3KaaOdvlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752051748; c=relaxed/simple;
-	bh=hsu7U466GN1+zy4Qwvhx4fxvDuIMte/Witb5P1gAEyQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YU331RqeXM3C0YQcMVJhk5i/G3xSL2ejyXWmt1Jxe1Cxz05OPgl29PMHCYMAGoMXbroBGSrmXG9CTyx12TVMFOTdvww2N3kDFB0n6dzVWezgYiTY9bHU6iyz1WjJEJ6z07f8Ec8FM808B29xxR5+FFfQnbGmNC1+dllQrUHnsHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jON4NLzf; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4a6ef72a544so111380131cf.1
-        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 02:02:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752051745; x=1752656545; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8WK+EUgqHXjydIumFBu4wkgRGYQLwWKZHC1itmkKhpA=;
-        b=jON4NLzfDuWcEP2vEnXOk8Y3+UqvIZgKkn/Xo0lMd1Jjmj+mRa6PT9xl1aM3heLi/X
-         HAjo5EyX6WEyxQVXHztCwy011NbAinLv39HqE/p+OBFTD/yqwos7gB6Ad4e1ZB+Q37D2
-         YuBj9vWp4uNMHFpoAZWas/cNEpw/TlG3pTYvCFTlk73u+b1QkhmOOSO4DdDKqRS6tFE1
-         twr1/iFxSaVi0Q+UVEVCQbsvtd0Ch3UE7ZxvQdJch29+Zx2h9Zhvw/8ujzPlIStb5iwf
-         lGVcSr7SX8z/GqwrTDkX+PVTCzEiBQP9OlU4Ww3+aicknexlgkQDg/KVhxbWNE7+7G0s
-         F5UA==
+	s=arc-20240116; t=1752051745; c=relaxed/simple;
+	bh=/J0ESgh0mnZJh7VIVascAzPB03YG2Nks06BWwBkQ7wA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FoAGFDHJT4cXuI1P7f1DG48LWl6pP9eL6nSzyFUgcXTVhFnTJRgLhPmH6aEZ8zEG+UyAZsh+jmU2Z+0YEbQtH0WmlL21WuZGD44fjXdIL0OyvPECs+QI+p+qZGNjAJrSSdKGcedT+yljELd1IfEH7F66hQmlYs7Df63S3NiNLgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cdcyfnAd; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752051742;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gP/GXbkE1NcvqZ2RDyr5+g96OSyeyTW+E8pt68Nv348=;
+	b=cdcyfnAdDecCXP6N7ALPN6Wnh2huithZFmn3G9SCyLW9xrKhmyBUZpVSgTD+1hVKaG2Soh
+	T9l3Vbyh42064+Ux/Vb7pR5wiFb5XOFlVSW6PBMnccdf7E5SJaFuicVVeNY6Ppq3oNa921
+	DEhlpEAoG41kCXKtvKe9Gioh7hLVeOY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-327-4zHzcV1FPnK7N-ZA8J4sHg-1; Wed, 09 Jul 2025 05:02:21 -0400
+X-MC-Unique: 4zHzcV1FPnK7N-ZA8J4sHg-1
+X-Mimecast-MFC-AGG-ID: 4zHzcV1FPnK7N-ZA8J4sHg_1752051740
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3a6d90929d6so2273803f8f.2
+        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 02:02:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752051745; x=1752656545;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8WK+EUgqHXjydIumFBu4wkgRGYQLwWKZHC1itmkKhpA=;
-        b=KAoA4YDfyyyMDjwuca4f3yekgUT8M7VkhAUj2++2Jj1hcAe2U5arNynHMDoTXJtqYT
-         T5KAbteI21RT68lkx0iqTPByJfmXXHzi5PW7j4qsYxMKnwMW02k9+UEwn8JDFg4M71P8
-         odDne4/Xlrh1slYp+O1I1WH7emt5AXVYEwGgmwkYaqmsdZygHBXXGpzm3RgIdHF+VdQ2
-         um21EUSNo9ED9cCuQYCzcHdTk5CTq/8/g+vvOphTcMlHmVKW8yEFpK1yGdRre07bJIAb
-         qV5XAvhuB1wUhiVMsxtoJxsapGU2pkhxN5spJ+aLtiYtvptSIN9EMcVA8WLd1h3fCj7f
-         FkQg==
-X-Forwarded-Encrypted: i=1; AJvYcCU/pw4WV24aPlQAftgunis3Fl0XXSO19J8+aEPwb0pCXxRj+IfaSa1uLNz59goL2GzSoivYM1w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYFE/V0+gv53wsa8gDluB3C9a0RBYadtJEbz9wf+/cZSJfxaMm
-	rGsDROpsoBTJMs+kSmHpFI9QPOsuMpePzKgk9HZXNnDsNVH/AD5iC5SukqPooQbG6URydnACKGz
-	fre1vgOPwregLXw==
-X-Google-Smtp-Source: AGHT+IHST1YJ4nvVqO92lNb+FTQKYDUJdWAHAEoPSW5K0cMJ+bsd1EqenL05O2jEKOlrQbc4yDJYOhynxYtgxw==
-X-Received: from qtbhh3.prod.google.com ([2002:a05:622a:6183:b0:4a9:7a92:c1b7])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5709:0:b0:4a3:fcc7:c72e with SMTP id d75a77b69052e-4a9dec2813cmr17843761cf.9.1752051745395;
- Wed, 09 Jul 2025 02:02:25 -0700 (PDT)
-Date: Wed,  9 Jul 2025 09:02:03 +0000
-In-Reply-To: <20250709090204.797558-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1752051740; x=1752656540;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gP/GXbkE1NcvqZ2RDyr5+g96OSyeyTW+E8pt68Nv348=;
+        b=jSkeyvkg/kiKKALPXORAwj4TgNRlvOGqr9sUU5hXYGKJla1/kGMXJBWd8hSt/r/wS+
+         hfcewFa7L7YDNfm/bpG+u2/AQWGxtRStgm2egTlCBWQ2YZekLASgPubwCZy63OgszQ7T
+         AjKJlKWWWaWgqaa2PLmdYyq/sLrbyBV4amDXes8MQAcg1Ars6exSICZ+PI2kCDPszyZq
+         DbRAji4cDUzrXk/ic0x+TZfbCspkiR84+/SvRtp3ic1utGglkQGT9mgNjs6qMwewYej6
+         Odhy5nWjdt5RyeQdOmwPzirJTo9Myx3T7A5ubUWVMD8VA0mmYdvn1LfcCSVcMoW/jRz/
+         NhqQ==
+X-Gm-Message-State: AOJu0YydEJIJL7qjkqtrZhH5xdxgvHZ1ssP/0jHdrLVtVJyCIq9sw1de
+	u6ou0V/apR8KPkUqE5abX9DHxq/jRK0v2GGbt/FI7WP+vffhfsY02dgVDeOGx7eoPSBBqqujieT
+	TwVYd/yT2o3RSfH3cC1yFe+MQf/8Xv6XernWJNearfPmMyBOKZAQdEminyA==
+X-Gm-Gg: ASbGnct5hZSFsKOk5i+MKTSqwwHYyHs2tDVBVmpGWVSdbOJdZdDDSADfXbhXDhcqDfK
+	TS3nZAmI4KFBsTfD4f6JuXvotSOz3s5P10wsUj0Es9/pAt/ft35ZX6NnejXr8kO8QhNetsifGet
+	nAat9/+ktBbnDo0mPAzqYHY65fDfOspRTCA7TZ3un9S2nMzrtq3L+mlYPZqq3u/FnOTWPR8+Jds
+	foLO6X5NqaOhWJdeI2iMJtOpqUu3VtnPsdaMdr+Dr9kwRDBwXgUXkQIT5qxARecpnAgV5hf1lzD
+	ozgpH58DTTkrBsNYRNia3hHRijL4lw+kxRd7iCQzPf1ZGh4bC9oW0dUog9MCSHabCzrPug==
+X-Received: by 2002:a05:6000:401e:b0:3a4:dd16:a26d with SMTP id ffacd0b85a97d-3b5e4557000mr1138904f8f.38.1752051739630;
+        Wed, 09 Jul 2025 02:02:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEw4zbfGS21uIVcbjgAQJWRQweoo04GUYIyOc9k/VYy3AR2hTTjemFRoGraFLo8yVdWPnB2Pw==
+X-Received: by 2002:a05:6000:401e:b0:3a4:dd16:a26d with SMTP id ffacd0b85a97d-3b5e4557000mr1138868f8f.38.1752051739120;
+        Wed, 09 Jul 2025 02:02:19 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:271f:bc10:144e:d87a:be22:d005? ([2a0d:3344:271f:bc10:144e:d87a:be22:d005])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b47030ba29sm14962982f8f.2.2025.07.09.02.02.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Jul 2025 02:02:18 -0700 (PDT)
+Message-ID: <cc4d09e8-d11a-4188-9f80-3ac7bb6e89e9@redhat.com>
+Date: Wed, 9 Jul 2025 11:02:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250709090204.797558-1-edumazet@google.com>
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250709090204.797558-12-edumazet@google.com>
-Subject: [PATCH v2 net-next 11/11] net_sched: act_skbedit: use RCU in tcf_skbedit_dump()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 net-next 0/9] virtio: introduce GSO over UDP tunnel
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Akihiko Odaki <akihiko.odaki@daynix.com>, Jonathan Corbet <corbet@lwn.net>,
+ kvm@vger.kernel.org, linux-doc@vger.kernel.org
+References: <cover.1751874094.git.pabeni@redhat.com>
+ <20250708105816-mutt-send-email-mst@kernel.org>
+ <20250708082404.21d1fe61@kernel.org>
+ <20250708120014-mutt-send-email-mst@kernel.org>
+ <27d6b80a-3153-4523-9ccf-0471a85cb245@redhat.com>
+ <20250708142248-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250708142248-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Also storing tcf_action into struct tcf_skbedit_params
-makes sure there is no discrepancy in tcf_skbedit_act().
+On 7/8/25 8:23 PM, Michael S. Tsirkin wrote:
+> On Tue, Jul 08, 2025 at 06:43:17PM +0200, Paolo Abeni wrote:
+>> On 7/8/25 6:00 PM, Michael S. Tsirkin wrote:
+>>> On Tue, Jul 08, 2025 at 08:24:04AM -0700, Jakub Kicinski wrote:
+>>>> On Tue, 8 Jul 2025 11:01:30 -0400 Michael S. Tsirkin wrote:
+>>>>>> git@github.com:pabeni/linux-devel.git virtio_udp_tunnel_07_07_2025
+>>>>>>
+>>>>>> The first 5 patches in this series, that is, the virtio features
+>>>>>> extension bits are also available at [2]:
+>>>>>>
+>>>>>> git@github.com:pabeni/linux-devel.git virtio_features_extension_07_07_2025
+>>>>>>
+>>>>>> Ideally the virtio features extension bit should go via the virtio tree
+>>>>>> and the virtio_net/tun patches via the net-next tree. The latter have
+>>>>>> a dependency in the first and will cause conflicts if merged via the
+>>>>>> virtio tree, both when applied and at merge window time - inside Linus
+>>>>>> tree.
+>>>>>>
+>>>>>> To avoid such conflicts and duplicate commits I think the net-next
+>>>>>> could pull from [1], while the virtio tree could pull from [2].  
+>>>>>
+>>>>> Or I could just merge all of this in my tree, if that's ok
+>>>>> with others?
+>>>>
+>>>> No strong preference here. My first choice would be a branch based
+>>>> on v6.16-rc5 so we can all pull in and resolve the conflicts that
+>>>> already exist. But I haven't looked how bad the conflicts would 
+>>>> be for virtio if we did that. On net-next side they look manageable.
+>>>
+>>> OK, let's do it the way Paolo wants then.
+>>
+>> I actually messed a bit with my proposal, as I forgot I need to use a
+>> common ancestor for the branches I shared.
+>>
+>> git@github.com:pabeni/linux-devel.git virtio_features_extension_07_07_2025
+>>
+>> is based on current net-next and pulling from such tag will take a lot
+>> of unwanted stuff into the vhost tree.
+>>
+>> @Michael: AFAICS the current vhost devel tree is based on top of
+>> v6.15-rc7, am I correct?
+> 
+> Yes I'll rebase it soon.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+I see you rebase on v6.16-rc5, thanks!
+
+The whole series in now also available based on top of v6.16-rc5 here:
+
+git@github.com:pabeni/linux-devel.git virtio_udp_tunnel_08_07_2025
+
+I'm not sending the above to netdev, as it will likely foul the bot and
+the CI. Please LMK if you prefer otherwise.
+
+With default config/strategy I can pull the above on top of the vhost
+tree with no conflicts and auto merging.
+
+Pulling on net-next will see a conflict in patch 8/9, file tun.c inside
+tun_xdp_one(), and the resolution is as follow, which will yield the
+code posted here:
+
+https://lore.kernel.org/netdev/f076f2e1fa91041b15cf46efadc6708924afe8e0.1751874094.git.pabeni@redhat.com/
+
 ---
- include/net/tc_act/tc_skbedit.h |  1 +
- net/sched/act_skbedit.c         | 20 +++++++++-----------
- 2 files changed, 10 insertions(+), 11 deletions(-)
-
-diff --git a/include/net/tc_act/tc_skbedit.h b/include/net/tc_act/tc_skbedit.h
-index 9649600fb3dcc35dee63950c9e0663c06604e1bd..31b2cd0bebb5b79d05a25aed00af98dd42e0c201 100644
---- a/include/net/tc_act/tc_skbedit.h
-+++ b/include/net/tc_act/tc_skbedit.h
-@@ -12,6 +12,7 @@
- #include <linux/tc_act/tc_skbedit.h>
- 
- struct tcf_skbedit_params {
-+	int action;
- 	u32 flags;
- 	u32 priority;
- 	u32 mark;
-diff --git a/net/sched/act_skbedit.c b/net/sched/act_skbedit.c
-index 1f1d9ce3e968a2342a524c068d15912623de058f..8c1d1554f6575d3b0feae4d26ef4865d44a63e59 100644
---- a/net/sched/act_skbedit.c
-+++ b/net/sched/act_skbedit.c
-@@ -43,13 +43,11 @@ TC_INDIRECT_SCOPE int tcf_skbedit_act(struct sk_buff *skb,
- {
- 	struct tcf_skbedit *d = to_skbedit(a);
- 	struct tcf_skbedit_params *params;
--	int action;
- 
- 	tcf_lastuse_update(&d->tcf_tm);
- 	bstats_update(this_cpu_ptr(d->common.cpu_bstats), skb);
- 
- 	params = rcu_dereference_bh(d->params);
--	action = READ_ONCE(d->tcf_action);
- 
- 	if (params->flags & SKBEDIT_F_PRIORITY)
- 		skb->priority = params->priority;
-@@ -85,7 +83,7 @@ TC_INDIRECT_SCOPE int tcf_skbedit_act(struct sk_buff *skb,
- 	}
- 	if (params->flags & SKBEDIT_F_PTYPE)
- 		skb->pkt_type = params->ptype;
--	return action;
-+	return params->action;
- 
- err:
- 	qstats_drop_inc(this_cpu_ptr(d->common.cpu_qstats));
-@@ -262,6 +260,7 @@ static int tcf_skbedit_init(struct net *net, struct nlattr *nla,
- 	if (flags & SKBEDIT_F_MASK)
- 		params_new->mask = *mask;
- 
-+	params_new->action = parm->action;
- 	spin_lock_bh(&d->tcf_lock);
- 	goto_ch = tcf_action_set_ctrlact(*a, parm->action, goto_ch);
- 	params_new = rcu_replace_pointer(d->params, params_new,
-@@ -284,9 +283,9 @@ static int tcf_skbedit_init(struct net *net, struct nlattr *nla,
- static int tcf_skbedit_dump(struct sk_buff *skb, struct tc_action *a,
- 			    int bind, int ref)
- {
-+	const struct tcf_skbedit *d = to_skbedit(a);
- 	unsigned char *b = skb_tail_pointer(skb);
--	struct tcf_skbedit *d = to_skbedit(a);
--	struct tcf_skbedit_params *params;
-+	const struct tcf_skbedit_params *params;
- 	struct tc_skbedit opt = {
- 		.index   = d->tcf_index,
- 		.refcnt  = refcount_read(&d->tcf_refcnt) - ref,
-@@ -295,10 +294,9 @@ static int tcf_skbedit_dump(struct sk_buff *skb, struct tc_action *a,
- 	u64 pure_flags = 0;
- 	struct tcf_t t;
- 
--	spin_lock_bh(&d->tcf_lock);
--	params = rcu_dereference_protected(d->params,
--					   lockdep_is_held(&d->tcf_lock));
--	opt.action = d->tcf_action;
-+	rcu_read_lock();
-+	params = rcu_dereference(d->params);
-+	opt.action = params->action;
- 
- 	if (nla_put(skb, TCA_SKBEDIT_PARMS, sizeof(opt), &opt))
- 		goto nla_put_failure;
-@@ -333,12 +331,12 @@ static int tcf_skbedit_dump(struct sk_buff *skb, struct tc_action *a,
- 	tcf_tm_dump(&t, &d->tcf_tm);
- 	if (nla_put_64bit(skb, TCA_SKBEDIT_TM, sizeof(t), &t, TCA_SKBEDIT_PAD))
- 		goto nla_put_failure;
--	spin_unlock_bh(&d->tcf_lock);
-+	rcu_read_unlock();
- 
- 	return skb->len;
- 
- nla_put_failure:
--	spin_unlock_bh(&d->tcf_lock);
-+	rcu_read_unlock();
- 	nlmsg_trim(skb, b);
- 	return -1;
- }
--- 
-2.50.0.727.gbf7dc18ff4-goog
+diff --cc drivers/net/tun.c
+index 447c37959504,abc91f28dac4..49bcd12a4ac8
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@@ -2356,12 -2378,15 +2378,14 @@@ static int tun_xdp_one(struct tun_struc
+                       struct tun_page *tpage)
+  {
+        unsigned int datasize = xdp->data_end - xdp->data;
+ -      struct tun_xdp_hdr *hdr = xdp->data_hard_start;
+ +      struct virtio_net_hdr *gso = xdp->data_hard_start;
++       struct virtio_net_hdr_v1_hash_tunnel *tnl_hdr;
+ -      struct virtio_net_hdr *gso = &hdr->gso;
+        struct bpf_prog *xdp_prog;
+        struct sk_buff *skb = NULL;
+        struct sk_buff_head *queue;
++       netdev_features_t features;
+        u32 rxhash = 0, act;
+ -      int buflen = hdr->buflen;
+ +      int buflen = xdp->frame_sz;
+        int metasize = 0;
 
 
