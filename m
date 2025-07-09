@@ -1,99 +1,109 @@
-Return-Path: <netdev+bounces-205443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD1F7AFEBAE
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 16:21:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B148AFEB8F
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 16:17:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7299E565545
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 14:11:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FC0A565DE9
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 14:13:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD2C62E92DA;
-	Wed,  9 Jul 2025 14:07:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12DD02E7183;
+	Wed,  9 Jul 2025 14:10:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iWAUgoEq"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qWX5KHiX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5CF2E8DFE;
-	Wed,  9 Jul 2025 14:07:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56E0E290092;
+	Wed,  9 Jul 2025 14:10:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752070057; cv=none; b=PsEimlzD1Sp+D65zYyh5ZH/QXHw3cjbHX3ldz35EJTSvZzf13j2VUbSKMF57QvmloHGa4YSvhibnmbzK5yz/oCFW6d1FktAzJzVxQ1Z18xcT0AFQd40+F3DaiDukGUA6Aae19GfrpamNoxvSgT0UY12sMcu5CTEuOJ9yo3Aoj4Q=
+	t=1752070259; cv=none; b=lKAC73NLIQv36pXijpT88JafQmG4Jr6wwr5sZixm7Aj2pwL13WMaoAwH5xiGYugT3oHV5DADI65yXwICztxab2H14uu+wjE15NQf5C8bdMONvS9pqTet4+CUlc0e7oBwzk/usXzxWyBX8k5Fs/v/D4NVjW/3JymOQ2szh4PderU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752070057; c=relaxed/simple;
-	bh=Hm0bvF4DG4aG9LPmmsB2p15ILEZrzXfJImhqafJXnvY=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=NxQ8yoNnHC+lNFr/+iicWk0iFPY1cK8p07GmLHPjU+WtabTLK9DvMn7P5v/WSvb73MGtnplO3Flivf61GXENk6MgtzHPK1oYUvBToLYb4djpSDHFs3tW9cCnakdiwwDF3crGZvyVCLKt6aqvOAGEtuD0j/gkYk3+/JKoMcodN/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iWAUgoEq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58832C4CEEF;
-	Wed,  9 Jul 2025 14:07:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752070057;
-	bh=Hm0bvF4DG4aG9LPmmsB2p15ILEZrzXfJImhqafJXnvY=;
-	h=Date:Subject:Cc:To:From:References:In-Reply-To:From;
-	b=iWAUgoEqjEQTQxZ36FcfbNFyFBVPNRA0D0JV+LccBOTVsCmu7JPvn/T8KCAllMK3m
-	 yxju8s4XhSpqboQ/ABUZU+sab5Sb9ZxwKjOPw0rMfPYjtgjoZYqhGJD7h7xPmOCk9F
-	 Q1eYDiHJ2Ck79lP1kalRvdLJAKjet2cN6wCrPYIG/feNTDBTuE9gBM7vk5Cl2+1ozD
-	 RSTRZGDDzDNMvJQdq++DOftuR0Ogn7QN5mmLbialUbGcKiRkAlsaVr66mYquIiKFAi
-	 pwcJA55gOMdV0+k/FI3k35OSsx2Vja23RzsrNV4BcLKC0bvdRt1UliBpANh/pnyf5I
-	 oTE0RvvJbcFzg==
+	s=arc-20240116; t=1752070259; c=relaxed/simple;
+	bh=+EexfIvgNZ+SVSR5duijOb51awN3SmpaycjndmOrpLI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ixb51LBizR9jKxn3bmapMwM4X458NalRLEiVu74PiEh4YMsUdIH2rqKgVqheU++jasg3PvJQNoGtZafNuF8UxOOq0b8LEOA4xQCo6PFBGMaK8pZdiVT5zxhZ6i3QQ9GwIGQt1YhcnhHup1qapajQkZlsTLb0cRAMyf8qBQylEFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qWX5KHiX; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=DQqwHHKBZrRtmb4tOj3kH60Q18wJibg93eVRqot5J8w=; b=qWX5KHiXuay3OsOuQ27rw7rUJo
+	hRGFMn6hYvbJrXuoah8GPpYwFdO7TRaJGTOH60vBLXnCmAfoWjXDXRs4DiFepQd/MwFIEHD7KKrAX
+	XHFULLBunpBIpAXcQe9/90hzKftKFA5vS8V6z6wglVdSoCArBvNM/w67zU1T93Dx/h/I=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uZVVY-000wvo-EL; Wed, 09 Jul 2025 16:10:48 +0200
+Date: Wed, 9 Jul 2025 16:10:48 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	Andre Edich <andre.edich@microchip.com>,
+	Lukas Wunner <lukas@wunner.de>
+Subject: Re: [PATCH net v2 2/3] net: phy: allow drivers to disable polling
+ via get_next_update_time()
+Message-ID: <e0b00f28-051e-4af6-afcb-7cdb5dc76549@lunn.ch>
+References: <20250709104210.3807203-1-o.rempel@pengutronix.de>
+ <20250709104210.3807203-3-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 09 Jul 2025 16:07:30 +0200
-Message-Id: <DB7KZXKOP5F0.1RMMCBJNR43KO@kernel.org>
-Subject: Re: [PATCH] drm: rust: rename Device::as_ref() to
- Device::from_raw()
-Cc: "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>, "Dave Ertman"
- <david.m.ertman@intel.com>, "Ira Weiny" <ira.weiny@intel.com>, "Leon
- Romanovsky" <leon@kernel.org>, "Miguel Ojeda" <ojeda@kernel.org>, "Boqun
- Feng" <boqun.feng@gmail.com>, "Gary Guo" <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
- <lossin@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Trevor
- Gross" <tmgross@umich.edu>, "Thomas Gleixner" <tglx@linutronix.de>, "Peter
- Zijlstra" <peterz@infradead.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
- "David Airlie" <airlied@gmail.com>, "Simona Vetter" <simona@ffwll.ch>,
- "Maarten Lankhorst" <maarten.lankhorst@linux.intel.com>, "Maxime Ripard"
- <mripard@kernel.org>, "Thomas Zimmermann" <tzimmermann@suse.de>, "FUJITA
- Tomonori" <fujita.tomonori@gmail.com>, "Bjorn Helgaas"
- <bhelgaas@google.com>, =?utf-8?q?Krzysztof_Wilczy=C5=84ski?=
- <kwilczynski@kernel.org>, <rust-for-linux@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
- <netdev@vger.kernel.org>, <linux-pci@vger.kernel.org>
-To: "Alice Ryhl" <aliceryhl@google.com>
-From: "Danilo Krummrich" <dakr@kernel.org>
-References: <20250709-device-as-ref-v1-1-ebf7059ffa9c@google.com>
-In-Reply-To: <20250709-device-as-ref-v1-1-ebf7059ffa9c@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250709104210.3807203-3-o.rempel@pengutronix.de>
 
-On Wed Jul 9, 2025 at 3:53 PM CEST, Alice Ryhl wrote:
-> The prefix as_* should not be used for a constructor. Constructors
-> usually use the prefix from_* instead.
->
-> Some prior art in the stdlib: Box::from_raw, CString::from_raw,
-> Rc::from_raw, Arc::from_raw, Waker::from_raw, File::from_raw_fd.
->
-> There is also prior art in the kernel crate: cpufreq::Policy::from_raw,
-> fs::File::from_raw_file, Kuid::from_raw, ARef::from_raw,
-> SeqFile::from_raw, VmaNew::from_raw, Io::from_raw.
->
-> Link: https://lore.kernel.org/r/aCZYcs6Aj-cz81qs@pollux
+>  	/* Only re-schedule a PHY state machine change if we are polling the
+> -	 * PHY, if PHY_MAC_INTERRUPT is set, then we will be moving
+> -	 * between states from phy_mac_interrupt().
+> +	 * PHY. If PHY_MAC_INTERRUPT is set or get_next_update_time() returns
+> +	 * PHY_STATE_IRQ, then we rely on interrupts for state changes.
+>  	 *
+>  	 * In state PHY_HALTED the PHY gets suspended, so rescheduling the
+>  	 * state machine would be pointless and possibly error prone when
+>  	 * called from phy_disconnect() synchronously.
+>  	 */
+> -	if (phy_polling_mode(phydev) && phy_is_started(phydev))
+> -		phy_queue_state_machine(phydev,
+> -					phy_get_next_update_time(phydev));
+> +	if (phy_polling_mode(phydev) && phy_is_started(phydev)) {
+> +		unsigned int next_time = phy_get_next_update_time(phydev);
+> +
+> +		/* Drivers returning PHY_STATE_IRQ opt out of polling.
+> +		 * Use IRQ-only mode by not re-queuing the state machine.
+> +		 */
+> +		if (next_time != PHY_STATE_IRQ)
+> +			phy_queue_state_machine(phydev, next_time);
+> +	}
 
-I think the link you actually wanted to refer to is probably [1]. :)
+How does this interact with update_stats()?
 
-[1] https://lore.kernel.org/all/aCd8D5IA0RXZvtcv@pollux/
+phy_polling_mode() returns true because the update_stats() op is
+implemented. phy_get_next_update_time() returns PHY_STATE_IRQ, because
+the PHY is in a state where interrupts works, and then the statistics
+overflow.
 
-> Signed-off-by: Alice Ryhl <aliceryhl@google.com>
+It seems like this code needs to be somehow made part of
+phy_polling_mode(), so that it has the full picture of why polling is
+being used.
 
-Can you please split this patch up in one for the DRM renames, i.e. drm::De=
-vice,
-gem::Object and drm::File, and one for device::Device?
+    Andrew
+
+---
+pw-bot: cr
 
