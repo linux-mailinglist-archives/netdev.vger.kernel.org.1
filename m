@@ -1,162 +1,143 @@
-Return-Path: <netdev+bounces-205294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1C3AAFE17C
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 09:38:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B36BDAFE18D
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 09:45:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99CBE1C23E1B
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 07:38:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A131F1BC7FE8
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 07:45:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61A22737F1;
-	Wed,  9 Jul 2025 07:37:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C7E272E50;
+	Wed,  9 Jul 2025 07:45:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="Fyx0jAOV"
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="U+l7Vgco"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-4325.protonmail.ch (mail-4325.protonmail.ch [185.70.43.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38CD272E54
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 07:37:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865CA2701CE;
+	Wed,  9 Jul 2025 07:45:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752046678; cv=none; b=s/dYCBTu2J79eiEB2vlp1udSU5lABC5t1TTNAAbhFXS0yMDbGLWLiGUfCTmUDdtiABWxKsXFulh9fyfgBfmP7y2fcpgnY1sN3qxKouhKiHz4PMYdMp7gDZfaNyNOlYK4EcOl3X75/gn00OtNH9RaBc3oLjXLqIvo+wmBPb4r7H4=
+	t=1752047104; cv=none; b=cRPohmC3m87sFA/wvp1N4HGfL9YBwrF/2ZNmmpdQ7h8raBUj3Jnj1cJ6GohGxm8OX+1Nz0kYI18ZXqCk6uab7dHwAPCUmEUqeXfUb66W2t54Srmt7Kswe8gs5gAw9NenutSk7H5A1nNaoEZJLQokHMusQfLPMqIMlmVCelWf+3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752046678; c=relaxed/simple;
-	bh=9OPmNg1Ke93Fs8SkZKBisFI6U+uVxoHqsm9QDX67Rgk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UxZRcq3Z1emgH7uiS+e/q7n6vo8AArsms4c9UMyq2uXmX2EkRkTnrRQ4XtJ8Gg1aWehanU43Kp+WINMCuOzBd0rFDx/uiDLRxG4CSbzGbaX+qwCr4iINI9Ua57n0dgjZWjVEjbDWOoED5L8ePWXnzXCkVXBnfj5FAw3EMumeyo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=Fyx0jAOV; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ae0df6f5758so868675466b.0
-        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 00:37:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1752046675; x=1752651475; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7AF17i32IwMLY62AXSip2mxJYEDMY02Ret/Hrjg5ZK0=;
-        b=Fyx0jAOVtP481WsWBZ5NWcYpPL1fT5ZKqKrZq+LAj+HgBJf945INpeqp56yXMTt9BI
-         1eE9321Nax0+yrQnBRuLuX384KLwGUk6XIEy9adBSzXKf+tGIFjiN/uRiRBdzouYiHnM
-         ZqnTu4cQNzotKyKcUHeaImmmetjzNbVlzQtq+r7UDGMN6AuxbtzZQEGEtQaQLD6xFdOB
-         mEGrJdrpxT0NLzlM7ZjgqlGsUQVNgRh1EoZ4mQJfs4xByBRUu5IzeehyDSSuLUl4mdEt
-         XgBN7nNkfWDPUra62kCWaPl94JtN+PGIVnZKKT+YTh5KAV7PRbINNxTZZOXlPF7D7tLx
-         0grg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752046675; x=1752651475;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7AF17i32IwMLY62AXSip2mxJYEDMY02Ret/Hrjg5ZK0=;
-        b=YBLPrwuxU0UrpwCA+3rUnE12tCwEgWpLj7Z1JCMbJVPYB1YgFSE88mrXR+cv8dSb1P
-         NSuU9rkzJS1bOepteEN5yJPZaSlf19ofdj2b1xJ2PbPA1kchafL93fSEakEAeUx6OgZm
-         gPX30yItmjglQ44FADHS9BZhSKZatAKRfswT4zonewHHViM0gzPLcchsxP8hujEvwfcV
-         hxvxS/DFbV4b20YiJYhB72T5vFTEBBWAOKbScAf5LCwLtxB6rYbc+kbypPzSnO2jB41w
-         21aSiD5e9hSY80XW9SYJGeF1CToTdnOqQSI2luD8TfdVe+9O3fTFvTslCWbGIWNjfawL
-         3vOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUvn+mtAd3elx/zYAePZJkwhX9pVZC12NvzSaFpElG09gEUTqSpMPlRblfLeLx0hwpuflBVGRc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKBliIaY4z30jXaXgqW5wEmZVJAPQ2lbA+Xp6+KWHcaBeWAj1A
-	5/vIPrCl9Q8+ED/UpGTLtPgYC3niwki4PuJXzruhGMSdVh5Muka+MiupjAVQ3kCZIBc=
-X-Gm-Gg: ASbGncsw1xaY+G9YX6hbb21sZvRna2Gll3A8uFY57HddQW6G676z94Uqnks7BuYr60j
-	qfPTmAI4xcTL30HH6pcbAk27Wf12bo69b/p/ZIoHPUaWJ+BU3FwhLu0GmpT3P/jf8Hk12cBHR97
-	W55s8n83cmD2HfDsziAYu3t3QldEoCc8CQCwtaRJjPFamPS1HDdp5CbFyoIaxlJJO6Fn2QyX9AT
-	B3AwIY92JWpsxVFn2jioaW91F2T3TdtgC6VEjrom5Lt0ToLRnB0YTKRgw1lUQ+8C4uVYaI6mOTa
-	mx3J2DpDLjZZvincz0jyYpravvFBs7hsMX0f6MUaLIi5JpdEqKA+BU3IKVTKEJeIVuTE4aTlqgK
-	sOBxu2gmxeXvLmznSEw==
-X-Google-Smtp-Source: AGHT+IGKNKwRhwXTcmwtGN+5HGqX7L50fvavD2PabeX9y+OqiZC5bMINAl/BO5b4T2iWDRdBG72Lbw==
-X-Received: by 2002:a17:907:3f9c:b0:ae0:cccd:3e7d with SMTP id a640c23a62f3a-ae6cf73f3f5mr147273866b.33.1752046674928;
-        Wed, 09 Jul 2025 00:37:54 -0700 (PDT)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ae3f6b02f68sm1054983366b.117.2025.07.09.00.37.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Jul 2025 00:37:54 -0700 (PDT)
-Message-ID: <f382be0d-6f30-443e-b161-d1d172dcd801@blackwall.org>
-Date: Wed, 9 Jul 2025 10:37:51 +0300
+	s=arc-20240116; t=1752047104; c=relaxed/simple;
+	bh=f8alaJu9QGnxkHKJvU+EAqsIi5uNm0RpUbioG++EzEo=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=c8KHV8FcvjKPzqJsn608TXSXrB2Ok2+lhZZU2LEI5euu4yaUn00/3YGBLJ7U3ujcdB0fMLKyOe6zMycimEqUF6/Pe/6vj3PIGtNJzgJZX+u2eOVljG5z425NilPa+4npfLTX4f/caELwu/xZwtVYUmdrUG0JVI9FO0y8lxk8VcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=U+l7Vgco; arc=none smtp.client-ip=185.70.43.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1752047098; x=1752306298;
+	bh=f8alaJu9QGnxkHKJvU+EAqsIi5uNm0RpUbioG++EzEo=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=U+l7VgcozOyYLykbS3qLvCc9HMc0Vi3UZsII0/jmMc/Zi+ap0gI1EonO0CiHymocP
+	 UXxP29lSmf9pq6A4EEkiCvUkUADDj3RTEZUGGOSWgizh7PPvqlqyWVcjQzQwgsGQNk
+	 PPwFx6W0dsQkFixQjE0AUAM11TgZVLKku2guLBx+DiHTpw5UMlx656MmCew3W92SlQ
+	 geWc2sclYkS8i2pU7VWMojmRaYnLIcYHfkEPFkfxY/Y4nxDMPXCiRZyJA4MXypxmU8
+	 KIXRu1J7hZ2yF7ZiZpMr1di7GIkDrN2GwrzEXVSUBPoAvlMRI1JSnsfvzfCi+BRfQi
+	 6e8EbSIJULohw==
+Date: Wed, 09 Jul 2025 07:44:49 +0000
+To: Simon Horman <horms@kernel.org>
+From: Yassine Oudjana <y.oudjana@protonmail.com>
+Cc: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>, Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, Alexander Sverdlin <alexander.sverdlin@gmail.com>, Sean Nyekjaer <sean@geanix.com>, Javier Carrasco <javier.carrasco.cruz@gmail.com>, Matti Vaittinen <mazziesaccount@gmail.com>, Antoniu Miclaus <antoniu.miclaus@analog.com>, Ramona Gradinariu <ramona.gradinariu@analog.com>, "Yo-Jung (Leo) Lin" <0xff07@gmail.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Neil Armstrong <neil.armstrong@linaro.org>, =?utf-8?Q?Barnab=C3=A1s_Cz=C3=A9m=C3=A1n?=
+	<barnabas.czeman@mainlining.org>, Danila Tikhonov <danila@jiaxyga.com>, Antoni Pokusinski <apokusinski01@gmail.com>, Vasileios Amoiridis <vassilisamir@gmail.com>, Petar Stoykov <pd.pstoykov@gmail.com>, shuaijie wang <wangshuaijie@awinic.com>, Yasin Lee <yasin.lee.x@gmail.com>, "Borislav Petkov (AMD)" <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, Tony Luck <tony.luck@intel.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Ingo Molnar <mingo@kernel.org>, Yassine Oudjana <yassine.oudjana@gmail.com>, linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH 2/3] net: qrtr: Define macro to convert QMI version and instance to QRTR instance
+Message-ID: <X2KJB3xtnC-pWM7o5TBw6ln3ItpMwn7tdn5Z8gpZY3oW31isE8PLTX5GUbJ6HcZk_9s72jb6ImwGL-anIoto4dK1MINTxzdRKfbejp_nXcA=@protonmail.com>
+In-Reply-To: <20250707170636.GR89747@horms.kernel.org>
+References: <20250406140706.812425-1-y.oudjana@protonmail.com> <20250406140706.812425-3-y.oudjana@protonmail.com> <fb61323b-aabd-4661-a202-02da7da557ea@oss.qualcomm.com> <aMbAZigHiAN2xupOYs9DodY2mOdNtw_oVjOaweflgA8IoXRQ5ctoZ8GYJ8PNAKDgL4f9N_UD7tFmkePUy9BCE8v20Mae2x-eL1ZpyJEdLZY=@protonmail.com> <20250707170636.GR89747@horms.kernel.org>
+Feedback-ID: 6882736:user:proton
+X-Pm-Message-ID: 8f8894673857ba0bbc9a24fcb09c28e5f1c802d5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v3 7/7] netkit: Remove location field in
- netkit_link
-To: Tao Chen <chen.dylane@linux.dev>, daniel@iogearbox.net,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, andrii@kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
- mattbobrowski@google.com, rostedt@goodmis.org, mhiramat@kernel.org,
- mathieu.desnoyers@efficios.com, horms@kernel.org, willemb@google.com,
- jakub@cloudflare.com, pablo@netfilter.org, kadlec@netfilter.org,
- hawk@kernel.org
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-References: <20250709030802.850175-1-chen.dylane@linux.dev>
- <20250709030802.850175-8-chen.dylane@linux.dev>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250709030802.850175-8-chen.dylane@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 7/9/25 06:08, Tao Chen wrote:
-> Use attach_type in bpf_link to replace the location field, and
-> remove location field in netkit_link.
-> 
-> Acked-by: Jiri Olsa <jolsa@kernel.org>
-> Signed-off-by: Tao Chen <chen.dylane@linux.dev>
-> ---
->  drivers/net/netkit.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
-> index 5928c99eac7..492be60f2e7 100644
-> --- a/drivers/net/netkit.c
-> +++ b/drivers/net/netkit.c
-> @@ -32,7 +32,6 @@ struct netkit {
->  struct netkit_link {
->  	struct bpf_link link;
->  	struct net_device *dev;
-> -	u32 location;
->  };
->  
->  static __always_inline int
-> @@ -733,8 +732,8 @@ static void netkit_link_fdinfo(const struct bpf_link *link, struct seq_file *seq
->  
->  	seq_printf(seq, "ifindex:\t%u\n", ifindex);
->  	seq_printf(seq, "attach_type:\t%u (%s)\n",
-> -		   nkl->location,
-> -		   nkl->location == BPF_NETKIT_PRIMARY ? "primary" : "peer");
-> +		   link->attach_type,
-> +		   link->attach_type == BPF_NETKIT_PRIMARY ? "primary" : "peer");
->  }
->  
->  static int netkit_link_fill_info(const struct bpf_link *link,
-> @@ -749,7 +748,7 @@ static int netkit_link_fill_info(const struct bpf_link *link,
->  	rtnl_unlock();
->  
->  	info->netkit.ifindex = ifindex;
-> -	info->netkit.attach_type = nkl->location;
-> +	info->netkit.attach_type = link->attach_type;
->  	return 0;
->  }
->  
-> @@ -776,7 +775,6 @@ static int netkit_link_init(struct netkit_link *nkl,
->  {
->  	bpf_link_init(&nkl->link, BPF_LINK_TYPE_NETKIT,
->  		      &netkit_link_lops, prog, attr->link_create.attach_type);
-> -	nkl->location = attr->link_create.attach_type;
->  	nkl->dev = dev;
->  	return bpf_link_prime(&nkl->link, link_primer);
->  }
 
-LGTM for netkit,
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
+
+
+
+Sent with Proton Mail secure email.
+
+On Monday, July 7th, 2025 at 6:06 PM, Simon Horman <horms@kernel.org> wrote=
+:
+
+> On Sat, Jul 05, 2025 at 06:29:39PM +0000, Yassine Oudjana wrote:
+>=20
+> > On Wednesday, April 9th, 2025 at 3:54 PM, Konrad Dybcio konrad.dybcio@o=
+ss.qualcomm.com wrote:
+> >=20
+> > > On 4/6/25 4:07 PM, Yassine Oudjana wrote:
+>=20
+>=20
+> ...
+>=20
+> > > > diff --git a/include/linux/soc/qcom/qrtr.h b/include/linux/soc/qcom=
+/qrtr.h
+> > > > index 4d7f25c64c56..10c89a35cbb9 100644
+> > > > --- a/include/linux/soc/qcom/qrtr.h
+> > > > +++ b/include/linux/soc/qcom/qrtr.h
+> > > > @@ -13,6 +13,8 @@ struct qrtr_device {
+> > > >=20
+> > > > #define to_qrtr_device(d) container_of(d, struct qrtr_device, dev)
+> > > >=20
+> > > > +#define QRTR_INSTANCE(qmi_version, qmi_instance) (qmi_version | qm=
+i_instance << 8)
+> > >=20
+> > > Please use FIELD_PREP + GENMASK to avoid potential overflows
+> > >=20
+> > > Konrad
+> >=20
+> > Since I'm using this macro in initializing QRTR match tables I am unabl=
+e to use
+> > FIELD_PREP. When I do, I get such errors:
+>=20
+>=20
+> Does using FIELD_PREP_CONST, say in a QRTR_INSTANCE_CONST variant, help?
+
+That works, but do we want to have two variants? Or in this case maybe
+I should leave qmi_interface.c untouched and define the macro only for use
+in match tables?
+
+>=20
+> > In file included from ../arch/arm64/include/asm/sysreg.h:1108,
+> > from ../arch/arm64/include/asm/memory.h:223,
+> > from ../arch/arm64/include/asm/pgtable-prot.h:8,
+> > from ../arch/arm64/include/asm/sparsemem.h:8,
+> > from ../include/linux/numa.h:23,
+> > from ../include/linux/cpumask.h:17,
+> > from ../include/linux/smp.h:13,
+> > from ../include/linux/lockdep.h:14,
+> > from ../include/linux/mutex.h:17,
+> > from ../include/linux/kernfs.h:11,
+> > from ../include/linux/sysfs.h:16,
+> > from ../include/linux/iio/buffer.h:9,
+> > from ../drivers/iio/common/qcom_smgr/qcom_smgr.c:8:
+> > ../include/linux/bitfield.h:114:9: error: braced-group within expressio=
+n allowed only inside a function
+> > 114 | ({ \
+> > | ^
+> > ../include/linux/soc/qcom/qrtr.h:21:10: note: in expansion of macro 'FI=
+ELD_PREP'
+> > 21 | (FIELD_PREP(GENMASK(7, 0), qmi_version) | FIELD_PREP(GENMASK(15, 8=
+), qmi_instance))
+> > | ^~~~~~~~~~
+> > ../drivers/iio/common/qcom_smgr/qcom_smgr.c:825:29: note: in expansion =
+of macro 'QRTR_INSTANCE'
+> > 825 | .instance =3D QRTR_INSTANCE(SNS_SMGR_QMI_SVC_V1,
+> > | ^~~~~~~~~~~~~
+>=20
+>=20
+> ...
 
