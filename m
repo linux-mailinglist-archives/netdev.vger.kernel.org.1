@@ -1,114 +1,103 @@
-Return-Path: <netdev+bounces-205261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D8ECAFDE9E
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 05:58:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62001AFDEC3
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 06:25:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27B6F1C20027
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 03:58:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4B2916B7E3
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 04:25:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9226123ABA3;
-	Wed,  9 Jul 2025 03:58:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 985E31E521A;
+	Wed,  9 Jul 2025 04:25:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="BSfZ9d8H"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="MsmRFSig"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-240.mail.qq.com (out203-205-221-240.mail.qq.com [203.205.221.240])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378CC3208;
-	Wed,  9 Jul 2025 03:58:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C1C29D05;
+	Wed,  9 Jul 2025 04:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752033498; cv=none; b=ktTwiPUOy4iaw5gQppaVnFyhXvdjZeOwNIvKX4xs/zezEd09rifPd4e5hSdV2XYbokAAI6jCLfrPWjyJubghhsjhT3B/ojpF4/a4oK1VrBM129wKEn7A3HHLAt1XozJ7qcrW5Tw0Xi+Kf5FLQAd7HjcnSKOXDMrZxZRkBog0dmw=
+	t=1752035131; cv=none; b=ff+NbD4WyWyAU53mh6qcTzHf0gVYRk83ployPTQcdwsujgXqXW4kL8vKBS288OtgRPybPJ9QiHV1b2eY/u3z3lGJ9vqB5eo+DAEruvMN+N5XhCKc4CscwTx2uKBCzuuWXpxUsX2+TP3A/U9jnOWmZGKCnS4IXCRL8NGueiNzrig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752033498; c=relaxed/simple;
-	bh=sGCCkkKJBfNJAqH361usUURY9F6NRDwevuWl//frjwE=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=BJBzTRJ7n3OZWqvYejerneoFg5cxvtLKVA905zucsnEe7Dkg58WG4RMyq3s7hJJiwl3WEHjlmFsbmB1tMP8eIPRw5zwGwHPBzhi4BW1RLufcJl5H+/j/tKHF/FMFglj5dmfhML11FUfRt7lkdad20WbkgoeVy1Cbx89blUWMSvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=BSfZ9d8H; arc=none smtp.client-ip=203.205.221.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1752033182;
-	bh=OfWCbJnUHkYMrgQBuEc+vQsMymRVSQZY/QYP2G5dMyc=;
-	h=From:To:Cc:Subject:Date;
-	b=BSfZ9d8HmgMuK16zekPEMd4Dmc0LJ+fCCAMi+0rikGaNusxKCbRuriTARjfFwCKHl
-	 7M725R4tDueed9omYWqePaN/BCh9i5xrVUlQFe/vMJMXvdCJppzPw7ieksb7bTkj7m
-	 OCFryoNNj5pBzWX0wrX0SVUHdR0Bz4W+we+Y7VhU=
-Received: from syzkaller.mshome.net ([183.192.14.250])
-	by newxmesmtplogicsvrszc13-0.qq.com (NewEsmtp) with SMTP
-	id D363D23B; Wed, 09 Jul 2025 11:52:54 +0800
-X-QQ-mid: xmsmtpt1752033174t8d37g693
-Message-ID: <tencent_E1A26771CDAB389A0396D1681A90A49E5D09@qq.com>
-X-QQ-XMAILINFO: NnYhxYSyuBnLQ17IAXwPkP52iNtESB5hKcOl3YXG7ztah5ip05U5RKqK+epaQO
-	 7OdrpZn2lPn2e3Pmzk7WmzRFvw6QEaeuuP0mVGtGG87OmG8CM+B3qEdjOwl79Qvlm2Qvp0WpRO/f
-	 cYcRYL/SGn/M4lQVJpodp70J1tPYS3/0OC1Y5Nc9A3t5AX66UKhqlPxC5LeK14j9qxrEVfnYu12I
-	 A2MfiP0M+uAXardUW7mSScr4wWMz2gBiJh4JHsrNDZylHZOjMeFwNHWhQkFQ3E+GaLzrnmXD2gR2
-	 aCNBvXH7cyBDqfIK6oAueZ8ztLkFD3IpqBHnYEb2A2/V+4vYCyZLb2Kf66njH08UQkNjfOzfirrV
-	 U6FDagPTB6ER6DiwWildeMTis2cuvGS4QbX0spHmWz9wwGuqRsvlt28VG0aqQkCzWyPAYAUimrvL
-	 QXhMeA3/dSM8Bgs8xkGEh6xBZUy2VnRY2xN+xnsuLOCT+NsNPjoco066ShswHA3jwN43pOHqCV3X
-	 0fer9/BaJ4Azsy9K5QD1jFdXxSuJ1vKvtwO15zT0bjRcPUVefaQac2p5DmMk7OZQAe05KvBHdWQ4
-	 +Xual3oek+rmy3fC3SMAaQQJKVfr7RdjHQ6yT07Ug8fABh+CF6GFdBpX6bkxhuhgolr3HSWsK7vi
-	 zghcWeRyhC/WiyFRy/eoNHQkLWpSFYCs68aRueHkWA4Hvf2VsaTwGGLQhQMSGg29fvDu7ijTINlL
-	 1k0pMFTrlPrFECYwFTY04GDOWAtgF/8bpBH3Et29lJqSU/tZ9v5b5KaQhu8IYWaFloVHyxHPu9vL
-	 kFa1Yy8UFSYPD32RlaWx6O1wh+DeXd2kG4H5duyriB6ywliR8EETq9JtwjDsM90H6rWAs94oqGwy
-	 5HfRpIEDHRjr9nEoCsLwYkVkZegCpMDi4y2unFKrPVDUT86ustBqpZSUwWsi1VdJPD83IcH03hAq
-	 DRIjoUO3F+QRDxQlVeX4bLBzmNKbuuI88raxJu/lPXi3aAYHUGSYMYX80dO4iovGRvvk0bKVHlca
-	 uDN2bfGQge7mRQuGnJx1DsAiqCrEfzRBVaqD44BSSWsMXZdNlpRZHqIW8Qb6WOEAli3EekbRyNWb
-	 8gpNPB
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-From: veritas501@foxmail.com
-To: davem@davemloft.net
-Cc: Kito Xu <veritas501@foxmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] net: appletalk: Fix device refcount leak in atrtr_create()
-Date: Wed,  9 Jul 2025 03:52:51 +0000
-X-OQ-MSGID: <20250709035253.492806-1-veritas501@foxmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1752035131; c=relaxed/simple;
+	bh=gsgp8/vgeHGjM6XpFgNr2Zi7Omy8rgp1/hLWZF7YhsU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nnih3J90UhigLBMc5JbdzjP3ctB0epRGn3g5hlE7okACcF5006aZ1NWIFmrdBG6eES1QUntsIReJbXjialtGRCh+U9bqh5mAUTRd1f8ZO8vA3k7W2fWZRsTQjcoUbACAKE731shPkTUzs5T3A3C7SY3yBc7z0bf/RqQ69JVb1NE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=MsmRFSig; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=aQhCFUQXqPLefJ8ih+mruiWIMzk9Nrdb8hgYrHL70VE=; b=MsmRFSigcjwHp0/QI7Y+z2ad1J
+	OzLRdnjHBrSem8CT+BNtEr0BbPkjhzGoFsa1LbsaUYxWHeXYMcJVKktOo9a9MV4eqJdtbiAut7gV5
+	lnpQ+Q1frb/YoQaniLYJiURHOU+AmNJHwZpEyC+Pvb4ZI2PtUNsTUVwIpjIImJHU2Z1EDk5/9kCyG
+	19W6fUV9LeNj9HoVjeF4J4VjtLPkWFQBdniGEckrsA1QYBjmRJB8bWP3Xy0CBJ2HYXz8dTe0jb01C
+	dG0J0wR8oEyLHinHhRXPuwXtBU8eCITvAaHdkZYsCvr4IImrHSA37oMbERsb7+Trttb6kiB46XqQm
+	wdxltntA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59580)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uZMMq-0007Pm-0q;
+	Wed, 09 Jul 2025 05:25:12 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uZMMi-0002Dj-0p;
+	Wed, 09 Jul 2025 05:25:04 +0100
+Date: Wed, 9 Jul 2025 05:25:04 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: lizhe <sensor1010@163.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, vladimir.oltean@nxp.com,
+	maxime.chevallier@bootlin.com, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: Re: [PATCH] net: stmmac: Support gpio high-level reset for
+ devices requiring it
+Message-ID: <aG3vIMHkPezr4rJT@shell.armlinux.org.uk>
+References: <20250708165044.3923-1-sensor1010@163.com>
+ <aG1X9pPYDGO8kfM9@shell.armlinux.org.uk>
+ <2588871d.189d.197ece7c486.Coremail.sensor1010@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2588871d.189d.197ece7c486.Coremail.sensor1010@163.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Kito Xu <veritas501@foxmail.com>
+On Wed, Jul 09, 2025 at 09:58:21AM +0800, lizhe wrote:
+> Hi, 
+> 
+> Thx !
+> 
+> i conducted an experiment, and no matter whether i configured it as 
+> GPIO_ACTIVE_LOW or GPIO_ACTIVE_HIGH in the dts, the resulting
+> GPIO pin state was 0, indicating a low level.
+> 
+> 
+> if (delays[2])
+>     msleep(DIV_ROUND_UP(DELAYS[2], 1000));
+> 
+> + gpio_state = gpiod_get_value_can_sleep(reset_gpio);
+> + pr_info("gpio_state: %d\n", gpio_state);
 
-When updating an existing route entry in atrtr_create(), the old device
-reference was not being released before assigning the new device,
-leading to a device refcount leak. Fix this by calling dev_put() to
-release the old device reference before holding the new one.
+Use gpiod_get_raw_value_cansleep().
 
-Fixes: c7f905f0f6d4 ("[ATALK]: Add missing dev_hold() to atrtr_create().")
-Signed-off-by: Kito Xu <veritas501@foxmail.com>
----
- net/appletalk/ddp.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/net/appletalk/ddp.c b/net/appletalk/ddp.c
-index 73ea7e67f05a..30242fe10341 100644
---- a/net/appletalk/ddp.c
-+++ b/net/appletalk/ddp.c
-@@ -576,6 +576,7 @@ static int atrtr_create(struct rtentry *r, struct net_device *devhint)
- 
- 	/* Fill in the routing entry */
- 	rt->target  = ta->sat_addr;
-+	dev_put(rt->dev); /* Release old device */
- 	dev_hold(devhint);
- 	rt->dev     = devhint;
- 	rt->flags   = r->rt_flags;
 -- 
-2.34.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
