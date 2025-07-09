@@ -1,109 +1,86 @@
-Return-Path: <netdev+bounces-205422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4B3DAFE9F8
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:21:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38213AFEA21
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:27:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FBDD170D27
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:20:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 906C5644330
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:25:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6EE328D8EF;
-	Wed,  9 Jul 2025 13:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 039A52E0937;
+	Wed,  9 Jul 2025 13:24:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="peL+eUcU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Fe0jgGso"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA75928DF43
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 13:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133562DE20E;
+	Wed,  9 Jul 2025 13:24:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752067230; cv=none; b=A76JGcWqtEWL9vp9+O4ZX5Ek+zlTVjix7IkLoCiLFIVlhiWN5ZWZciyWiOee/Uh9d+3RH8bPziTmEa6vGE+HMEf6TxVErM/kajFZRqub1ybpyynTck37FqCboEDpB/Kvo30irC0OD0KST4fYLmD2/DA/ern7qqhk15D/x5z8b9Y=
+	t=1752067450; cv=none; b=Ucrq+hywJfTKoW7b5EE+ZU6Gnf77Tz8umnoKEdKKrHJMqDPrsVQ+/khHtldxxaeCTF+HygJeVD2ZK+2e8/l8XnGlaqq3rXYJflHCiCm8OjRgFjqVxF09qP6sr77hFSPX6lNmtVl62A/JvHgKbPN091vQopRA1BrVfkNjCzv/vrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752067230; c=relaxed/simple;
-	bh=V+2EPrgkkzWuOdEbqmNF6WGjcqD7p1t3JxPmCI2+YIM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F6oYbDOqdurNRbyBCtxTPeNA8zXE8RKv6ehvVkblH65910F1AC4koGrutkOoUSzYOReVJ/qR42RjfpOXzDHkCYt9mHaEWu+HpcHNLqGkmr8z1dOHBF/9wuW2WSwcZRpDsPY7RNYLg2oUmuh7ggJObivi51G361bQTXnTf2fvCsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=peL+eUcU; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <1e1da86d-d544-425d-b1f6-fcc88bc49eed@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752067226;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e6AkmueMs31ei/4o3raKBuieFooL6H+6Yz+Dy9SBapE=;
-	b=peL+eUcUa9XgjfFgzUDgjYn0B6v5WqUErJ/O6Y6n5GCrfJNHFUgdNM1mPDanr/5ScRZYhE
-	Fn4AJGXMgr+QycfKYtHj+DDK5zEDFfmg3yXPiUnpV1faEIa9ngTiKmbhap4UOePsquedGK
-	uc53+NBbak/51yF9srk9ATTokD98xMY=
-Date: Wed, 9 Jul 2025 14:20:17 +0100
+	s=arc-20240116; t=1752067450; c=relaxed/simple;
+	bh=rQEpJHiChGmpt9oSBghyW3//Ouef5YkU5MtqrIoiTfY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CZqu9fz8o6HQoem9imK6ZTlMy6zJhLgJa5dLqeq9rvmhsPzCnB1eSiXHlQYGfxOL7hUMPXoeh4nLeWwVV9LspRAVWltIxbtxomF9UtTxpki38d9+l7ORBFACba2IFcOD7sXghaKhxxp3ZXfX5cYfIpI2gcLfuVjgwiNmRtyL5Z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Fe0jgGso; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=hQ9HxQ4CL5cwBPjvKDpDZamXchNvQ4T7qK3P3nj85G8=; b=Fe0jgGsoitEJIzGGN64xp/8LbW
+	PSANpYST+y4jFNuWxPL1FSw9Flcaw2JOQJMywR6O1NmbtVZaaIcBQ3wgcPIKZTgcvt2Dn424ws8lh
+	9BeU8GQk5eVXBWpUMgiEqoUxiNo1BrJuW5CszAKN9N1V4/Fswlmq39ewio9vZF4N7ULg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1uZUmG-000waz-04; Wed, 09 Jul 2025 15:24:00 +0200
+Date: Wed, 9 Jul 2025 15:23:59 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, joel@jms.id.au,
+	andrew@codeconstruct.com.au, mturquette@baylibre.com,
+	sboyd@kernel.org, p.zabel@pengutronix.de, horms@kernel.org,
+	jacob.e.keller@intel.com, u.kleine-koenig@baylibre.com,
+	hkallweit1@gmail.com, BMC-SW@aspeedtech.com
+Subject: Re: [net-next v4 4/4] net: ftgmac100: Add optional reset control for
+ RMII mode on Aspeed SoCs
+Message-ID: <3dee14d4-c8bd-4c27-b9b1-28b449510b84@lunn.ch>
+References: <20250709070809.2560688-1-jacky_chou@aspeedtech.com>
+ <20250709070809.2560688-5-jacky_chou@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v06 5/8] hinic3: TX & RX Queue coalesce
- interfaces
-To: Simon Horman <horms@kernel.org>, Gur Stavi <gur.stavi@huawei.com>
-Cc: andrew+netdev@lunn.ch, christophe.jaillet@wanadoo.fr, corbet@lwn.net,
- davem@davemloft.net, edumazet@google.com, gongfan1@huawei.com,
- guoxin09@huawei.com, helgaas@kernel.org, jdamato@fastly.com,
- kuba@kernel.org, lee@trager.us, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, luosifu@huawei.com, meny.yossefi@huawei.com,
- mpe@ellerman.id.au, netdev@vger.kernel.org, pabeni@redhat.com,
- przemyslaw.kitszel@intel.com, shenchenyang1@hisilicon.com,
- shijing34@huawei.com, sumang@marvell.com, wulike1@huawei.com,
- zhoushuai28@huawei.com, zhuyikai1@h-partners.com
-References: <ef88247b-e726-4f8b-9aec-b3601e44390f@linux.dev>
- <20250709082620.1015213-1-gur.stavi@huawei.com>
- <20250709115614.GZ452973@horms.kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250709115614.GZ452973@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250709070809.2560688-5-jacky_chou@aspeedtech.com>
 
-On 09/07/2025 12:56, Simon Horman wrote:
-> On Wed, Jul 09, 2025 at 11:26:20AM +0300, Gur Stavi wrote:
->>> On 27/06/2025 07:12, Fan Gong wrote:
->>>> Add TX RX queue coalesce interfaces initialization.
->>>> It configures the parameters of tx & tx msix coalesce.
->>>>
->>>> Co-developed-by: Xin Guo <guoxin09@huawei.com>
->>>> Signed-off-by: Xin Guo <guoxin09@huawei.com>
->>>> Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
->>>> Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
->>>> Signed-off-by: Fan Gong <gongfan1@huawei.com>
->>>> ---
->>>>    .../net/ethernet/huawei/hinic3/hinic3_main.c  | 61 +++++++++++++++++--
->>>>    .../ethernet/huawei/hinic3/hinic3_nic_dev.h   | 10 +++
->>>>    2 files changed, 66 insertions(+), 5 deletions(-)
->>>>
->>>
->>> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->>
->> Procedural question about submissions:
->> Are we allowed (or expected) to copy the "Reviewed-by" above to future
->> submissions as long as we do not modify this specific patch?
+On Wed, Jul 09, 2025 at 03:08:09PM +0800, Jacky Chou wrote:
+> On Aspeed SoCs, the internal MAC reset is insufficient to fully reset the
+> RMII interface; only the SoC-level reset line can properly reset the RMII
+> logic. This patch adds support for an optional "resets" property in the
+> device tree, allowing the driver to assert and deassert the SoC reset line
+> when operating in RMII mode. This ensures the MAC and RMII interface are
+> correctly reset and initialized.
 > 
-> Vadim is free to offer his own guidance, as it's his tag.
-> 
-> But in principle tags should be carried forward into future submissions
-> unless there is a material change. In this case I think that would
-> mean a material change this patch.
-> 
-> But if in doubt, please ask.
-> Thanks for doing so.
+> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
 
-As Simon said, in general if there are no changes in the patch you can
-carry forward Rb tag.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
