@@ -1,132 +1,117 @@
-Return-Path: <netdev+bounces-205455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDEFEAFECD0
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 16:57:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45402AFECCF
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 16:57:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3230E5A3896
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 14:55:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B07D91C80714
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 14:56:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC31F2E6135;
-	Wed,  9 Jul 2025 14:53:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5867F2E5B3E;
+	Wed,  9 Jul 2025 14:54:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A5KztfGL"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sL9AKewi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544D42E2653;
-	Wed,  9 Jul 2025 14:53:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC44B2E5439;
+	Wed,  9 Jul 2025 14:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752072794; cv=none; b=Fu53fHlEaKR5PsWxLmwisENCo1TwDGJRQfBzuYg8zz4wPdI3GboNuThlszmeBPhJS+tjtLI1IKV6UM+Sf6E3fkcaXDe6DYJGvrf3m/j3HPmbPwLqEqupuJEiAhDDTvGoOsB6GpTuZ3x7iM/K75T6Ep3jqWvm8vK4L5CifzHT/BY=
+	t=1752072855; cv=none; b=D/IMoMdmn9FgCaK0q4ITf+i3qdQLTcJ35bFKQ1Hg6m9XHiHi2ya+8w+gbt7q5gdIH/ya3PuDOAOXS6LRA9vs8DUFC+7qUgxYvy7NAak2092epTwQCmlYQ6XTfbsdfChs2qik7p4KapD5N4njtBHVvTF2USw2LniecGJqw83PmVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752072794; c=relaxed/simple;
-	bh=jPRX4Sap/8GRTBZpWK9P9CBzfDmuRAsuRNhbipq4yfc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IMPZcejOEycyOmu4uDUGoRmopL28Smc204lEXbX27vq1XcSmrLeLiJZaekgK+/jG18dVmvodKFsYydrYOYKtIgW3txWVoRfiUgPZGRWm5JvMu8D+Tmd04pprUodzVerRewhNIkE47zwLelV3JCttIvfvZuHgb7X6xp2ZLF34TAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A5KztfGL; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3df303e45d3so17398135ab.0;
-        Wed, 09 Jul 2025 07:53:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752072791; x=1752677591; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ce1CmkYRBQVzTjh/d+4qI/RIXf7zJn+MvFyGg8G0AGA=;
-        b=A5KztfGLHt3lYQk6fZpo/B0wtwT9a9HY8QCawAVRG+nlnCxbzhvo9eW+qTpDBsaCjy
-         h8UHVeSzbILiR1mO1HULmkVQZYhYpIlUGpDF5LGgvEsLu0VabYJaKlnWfH7ZDIDu5tc2
-         sgooCnbx2aKx9wvKMLUF8CR7evLmdhDX4HVQE+UuCQo+Z9GCX+Ba7ImFRv2ReZYKl9C/
-         l5pJIJ5C+FMA44bN9lJ6KRce8uuGMFPxELU72kpQ9jWnz3RLKl21eUvz5RdMqsUhwGqb
-         DfpD9hO0cox1CJqwY2VImf3Zj82ui7jLKmBFQ4qaiOFExL9qcTqfgrfOj2HQzupFGbhJ
-         oJrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752072791; x=1752677591;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ce1CmkYRBQVzTjh/d+4qI/RIXf7zJn+MvFyGg8G0AGA=;
-        b=QSUcXUXfhEHu5nXsJtTWwov7jrlG+DzpT6Bct9CBj3wjOQXeH1ymjFG/WccvcIL86v
-         MPee5gciLQWAE6NKoNTBw3uT1rDRkH4iyqwXKm6faEvAXVjvMOd6iZbQf0nvmmvps59r
-         vZzwKxY2vEaFpcXA3HUNJ9yVDgAvEdMkdpiGbtEckMTIJpv3waJx8yVMaC+Oe/DdiTvk
-         l+iIjnvMHzCtwJZEUmHpC13mxVR0xRQA3HyaGE57vfztfohmBe8oumPgmBqq/wQbAS33
-         lZCbfNeQJxFUqkMJkii9ucUzl+OnvamRhbA9pQFm2ImYHLro/s8xQveLjuwTLUaE3yX1
-         rigQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWiC2osKVDhz9UUKE6Cgigm9FjsVALJYor/CILyoBgAt9pF8vZ1FSWvuvHbDFiXWjU9vOq4bdqHjQt1@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoZsKjZ7BZPvpm0fwSTYgSAQeBsMwi3zaomgMMNCKXY+5GV+oK
-	id8pMNPjWZrE9ZFHKjcSPGkF3Cxpwh19ccb5UE3YdpOpTuQSpJYRunN1sID4ilsJRO++nrzmEsw
-	c+nr3/gzjhihBUWKcesf5zIt61pLOGPM=
-X-Gm-Gg: ASbGnctzusnUKeAGMcEDIth7lQ59ML1Jk1g5ktZVI3wLt8mNQjlaE9zeHoWFLwLcFtT
-	IqgiNbmNQovPjQRX5iB4sxZokUXYOczAuOImseCYxa4GG5GTA57WU7ARLwyoHjLH1C2DMOcQoNb
-	Gi/pIKBVndZvaOZR72Z3thpDgBnV3mfE3ml+x7KWp++ZofBEBzmjlip5xrOCl52rnluY5lFm1Qu
-	Z9WVg==
-X-Google-Smtp-Source: AGHT+IEz2E0d+HK64OuD1uw+y2e1HeVW68ZVG5JBVhNwb1az7fykUxkIZwtwiEUda3UIVaFQUBIAYtXACT2l3y0Ymc4=
-X-Received: by 2002:a05:6e02:1c2a:b0:3dc:8b57:b76c with SMTP id
- e9e14a558f8ab-3e16702baa3mr24944315ab.9.1752072791204; Wed, 09 Jul 2025
- 07:53:11 -0700 (PDT)
+	s=arc-20240116; t=1752072855; c=relaxed/simple;
+	bh=dNLzjC5cbAtc+WGHoz2N9GM8DGnG4GAdrFbTM0MLisk=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=N6dP1CxXLkDNWT0prVutTsVku2HMEK623mF630SLnXLTm12YTqHwcKysXkIOg5pWIEXYMEVCgwjGGbSkD9klFNSBz4QSjdx60OOztimv09lX74oAz4oBF4PnFgbDgx04gHPIzQuZ8t9CeS2WduvMBB1sPqkREf97NONBubMoGAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sL9AKewi; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 569EibIG002270;
+	Wed, 9 Jul 2025 14:54:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pp1; bh=prlAiOpLaURH0Js5JeA28ZU+M2LH
+	gadfDLjNoT5X4Iw=; b=sL9AKewi7GvexNKYRtU8mynQ8lRMcNUsw4hBgkAUkZtw
+	XQZayr5WaSMJG63vem7J9G+ozQ0AaDaQGHzg6ODOaiHZTKYV/bnNr9896Rvj/OAk
+	T9XAXhZhYKofixWn7OqMdE/9hPMypuOIjgFDaCjLXK7LwwRbdkchYND1jPo/K0Uj
+	qa+sBx0LBX24vTpeDMw0QZ6XiF5eXTrL1UKcR2mFPxYHICTKaEZpBbBkX+YBR8Mn
+	OIQVT0oD9lzZ8W9BptvxAOO5sYrz0hZqXS9l8mDCTRF7QEdHNcOnLnRI1dL1+1rW
+	jWSMmNfXr/wsiXFuIprShDqQ12hDpohBYc/rkWBgZQ==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 47pur76xad-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 09 Jul 2025 14:54:05 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 569C50fc024353;
+	Wed, 9 Jul 2025 14:54:04 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 47qh32gcj4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 09 Jul 2025 14:54:04 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 569Es3wX23528096
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 9 Jul 2025 14:54:04 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DCDDF58058;
+	Wed,  9 Jul 2025 14:54:03 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B0B3058057;
+	Wed,  9 Jul 2025 14:54:03 +0000 (GMT)
+Received: from [9.41.105.251] (unknown [9.41.105.251])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  9 Jul 2025 14:54:03 +0000 (GMT)
+Message-ID: <472a5d43-4905-4fa4-8750-733bb848410d@linux.ibm.com>
+Date: Wed, 9 Jul 2025 09:54:03 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1751743914.git.lucien.xin@gmail.com> <74b62316e4a265bf2e5c0b3cf7061b4a6fde68b1.1751743914.git.lucien.xin@gmail.com>
- <20250708073427.6ba38b45@kernel.org>
-In-Reply-To: <20250708073427.6ba38b45@kernel.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 9 Jul 2025 10:52:59 -0400
-X-Gm-Features: Ac12FXw4T8WkSPuPx8iY7P1m_t_n5Fw0GYfKAJYEdZpzrCcph37m-pIeEwqF1s0
-Message-ID: <CADvbK_e4XvwVcGSyu64Q0bhfXvn0onnwhOvreDt=r1jYYFmU2w@mail.gmail.com>
-Subject: Re: [PATCH net-next 05/15] quic: provide quic.h header files for
- kernel and userspace
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
-	Alexander Aring <aahringo@redhat.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
-	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: Konstantin Shkolnyy <kshk@linux.ibm.com>
+Subject: RE: [PATCH net-next v4] vsock/test: Add test for null ptr deref when
+ transport changes
+To: mhal@rbox.co, sgarzare@redhat.com
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, v4bel@theori.io, leonardi@redhat.com
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzA5MDEzMyBTYWx0ZWRfX53N/PUiiBrFU MaQgG2KYArLUO/pTwJVwCcpcxwFX40XiQkl5qcyc54T1nPARhzyQlL6XPtMOdF9BC2NY7iXJWUJ euYTfsfufS4/JT6464Ws5ppuUjIqlvx20vkjA+SOwvHc944xh3oIEWkOxVWL4d8sVBCtQ6bFrjb
+ hWVtaIK1QCk7ZiV/4pIuepwDYnyqDR7XdYZ8JA76jzSP2AGQXg0ImXkbDXijKJHgYC012O3ksHX SYjFMGrVAYR9uoD3lAcHFAuHJZssiCyuKwdy1vX0UEDrlNABePoeoxG+bKIlTO0a+5fVh8z7MTb fydCQzgq+7jBEGw8VeN6a6Qt0++LL4CjHGEviV6JBuJ9rMC6OaZEJtOxW5npf47uj2uCbedVPxi
+ 2U4OZSsowXe3kxp7pj2jFdcqQ4yuoOybvI3x9174e2u12S4k7HwvPkW/nghQIbhGBY8qFHp5
+X-Proofpoint-GUID: kpQOMYYazyKyewxIir8QAhgrx-roNt3U
+X-Proofpoint-ORIG-GUID: kpQOMYYazyKyewxIir8QAhgrx-roNt3U
+X-Authority-Analysis: v=2.4 cv=W/M4VQWk c=1 sm=1 tr=0 ts=686e828d cx=c_pps a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=hBMHHm5UMeqtWk0fnh8A:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-09_03,2025-07-08_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ mlxscore=0 priorityscore=1501 adultscore=0 clxscore=1011 suspectscore=0
+ spamscore=0 lowpriorityscore=0 mlxlogscore=754 bulkscore=0 impostorscore=0
+ classifier=spam authscore=0 authtc=n/a authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2505280000
+ definitions=main-2507090133
 
-On Tue, Jul 8, 2025 at 10:34=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Sat,  5 Jul 2025 15:31:44 -0400 Xin Long wrote:
-> > This commit adds quic.h to include/uapi/linux, providing the necessary
-> > definitions for the QUIC socket API. Exporting this header allows both
-> > user space applications and kernel subsystems to access QUIC-related
-> > control messages, socket options, and event/notification interfaces.
-> >
-> > Since kernel_get/setsockopt() is no longer available to kernel consumer=
-s,
-> > a corresponding internal header, include/linux/quic.h, is added. This
-> > provides kernel subsystems with the necessary declarations to handle
-> > QUIC socket options directly.
-> >
-> > Detailed descriptions of these structures are available in [1], and wil=
-l
-> > be also provided when adding corresponding socket interfaces in the
-> > later patches.
->
-> Warning: net/quic/socket.c:142 No description found for return value of '=
-quic_kernel_setsockopt'
-> Warning: net/quic/socket.c:175 No description found for return value of '=
-quic_kernel_getsockopt'
-It seems kernel-doc only recognizes "Return:", I will replace "Return
-values:" with it.
+I'm seeing a problem on s390 with the new "SOCK_STREAM transport change 
+null-ptr-deref" test. Here is how it appears to happen:
 
-Thanks.
+test_stream_transport_change_client() spins for 2s and sends 70K+ 
+CONTROL_CONTINUE messages to the "control" socket.
+
+test_stream_transport_change_server() spins calling accept() because it 
+keeps receiving CONTROL_CONTINUE.
+
+When the client exits, the server has received just under 1K of those 
+70K CONTROL_CONTINUE, so it calls accept() again but the client has 
+exited, so accept() never returns and the server never exits.
+
 
