@@ -1,109 +1,133 @@
-Return-Path: <netdev+bounces-205420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B8D9AFE9B9
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:10:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AF8FAFE9DC
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:16:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8666F6405D6
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:10:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC452642AA8
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:15:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C962DC330;
-	Wed,  9 Jul 2025 13:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D33F9287252;
+	Wed,  9 Jul 2025 13:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="VwJvzPgh"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DK8d9ZQe"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1941C2DC33E;
-	Wed,  9 Jul 2025 13:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5B81C1F13
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 13:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752066654; cv=none; b=D84lxd4h76ytqLDXMmq3+yc14siYqzS8DslnLz5/qPhtZgiNUtzGzDt1t8GWT+V3wB+C+mnVKD2j4qSeX0cLOVpF7l9F3+INV+qU42nHtFAzQUtN2dV5mT6qHaGt2TYXsVGChyD98AY/5YopXmgXq578Qd4bLTzIBFhySKgP/5s=
+	t=1752066938; cv=none; b=VTJnFINwgcoKI2H50hkRcfFLS+MF2eiqdgnZmRMvnpw5cuHdvu2DU4LaQJpfhPEOMpn8y5J02kz1p2DDjn2ck7FmfL/BDX9J2c9JaxMaUl9Ub/gko0zH0YyHolSQQVkhJRGXrtVv2f30klTt3/pPSXtLvEm8wW+tstwWt82UuFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752066654; c=relaxed/simple;
-	bh=pPubf83pVYobJU9g2Wig0sYU/aPQg0MEVYjmZeTm6F0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UZOPd49JDSd43/2eCakV9u9OB/UkMwqtLmXdW7zCZRCMA3UyxlMWhZPy/clTKxw/FUb7pZ3gSZn00d9LTdInzHsgeu5aIr84Jvqld7SeK/ijEzEIdN+8x0uqP2ZxFK9G6yHMKey7TMc8XU17dPRfSyII1io0//i9a/FlYV1D3r4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=VwJvzPgh; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 0DCAD1400331;
-	Wed,  9 Jul 2025 09:10:52 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-06.internal (MEProxy); Wed, 09 Jul 2025 09:10:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1752066652; x=1752153052; bh=NXULbg1haPQDJKrc/iX4fj4gLugfnbyp2M3
-	KPHjoCfk=; b=VwJvzPghw3cZybE/ATMrqb3s04CsbGGiFL1U9UqzdE9RYzrlJQD
-	mX6UGQEVSu6iTdif6LAfRQQxbsoZP89EgE79D6fqWo860FtR5C6Naz9rtyNBWxEG
-	SeA1trX/QjH1FzralUDcc2Xxf3SrBqslxvYnLlnocVzEOoWMgcbzDj4InlGIKS+7
-	2DplfbJxWKvsBJ/g7KHrEAGT/85DlaXQtoy4/78kV8jnuRXZP8eZfcbUN7oVo5dA
-	wAw0p6Q2H4uidMa1n95CwQjU2SNCu/YsKbPjGcGUaSq3WC2e/vmB3ixFGAUHsuLq
-	NRHkUcYUSq9mb7336z8W7sQa3E9jZLdwiKw==
-X-ME-Sender: <xms:W2puaLVNUp3NxWQfAAEX2TohnCwulLh4fgODMG8uUlx4m9Lc6vmQKg>
-    <xme:W2puaDtFc8kVI4An8BdHipOTcS4eaQsut3yZAWY_VaJ62xj6gmfextC65bfhoGdS2
-    ybBlu30WiiBQ9U>
-X-ME-Received: <xmr:W2puaO2Q4NlBTKpGYUqMnn9aXZbJV9Nd5OTK0AHtsC5i3hW4pLXcIikoQRjJ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefjeeihecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfutghh
-    ihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtthgvrh
-    hnpedvudefveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeghfen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughosh
-    gthhesihguohhstghhrdhorhhgpdhnsggprhgtphhtthhopedugedpmhhouggvpehsmhht
-    phhouhhtpdhrtghpthhtohepfigrnhhglhhirghnghejgeeshhhurgifvghirdgtohhmpd
-    hrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegv
-    ughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnh
-    gvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghp
-    thhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdgrrh
-    hinhhgsehgmhgrihhlrdgtohhmpdhrtghpthhtohepughsrghhvghrnheskhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtohephihuvghhrghisghinhhgsehhuhgrfigvihdrtghomh
-X-ME-Proxy: <xmx:W2puaM5CFVSpUWozHdBmmVMqc83BuinnCzqyAIW-PNmSZD0tcHwnoQ>
-    <xmx:W2puaNWpYTwFzRrzPNO0lkT-bLVXq04Sb4K5OFZIcX6F9UEuy7x4bQ>
-    <xmx:W2puaMiysU6mub0Ru0xoe5rLHki4-UZy-NUnOreg3Jr8rI1_J2k2Rw>
-    <xmx:W2puaFdCU5zdN_bwxKo6A46YgA33vg4OhKruxHEv01U30zhT8lbYUA>
-    <xmx:XGpuaPr6wYVUxry38-uc1ZfbmWPJj9sZWaLSMSeRJ4C3g2eptvx-rsvx>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 9 Jul 2025 09:10:50 -0400 (EDT)
-Date: Wed, 9 Jul 2025 16:10:48 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Wang Liang <wangliang74@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, alex.aring@gmail.com,
-	dsahern@kernel.org, yuehaibing@huawei.com,
-	zhangchangzhong@huawei.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-wpan@vger.kernel.org
-Subject: Re: [PATCH net-next v3] net: replace ND_PRINTK with dynamic debug
-Message-ID: <aG5qWGe8ifY1_JGo@shredder>
-References: <20250708033342.1627636-1-wangliang74@huawei.com>
+	s=arc-20240116; t=1752066938; c=relaxed/simple;
+	bh=YZYdhPz2GfdB32EO3U5noEq78q492csxWC6VeMboGyA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lW1uqh3e2qtytMlyHh7usPStFaBNFNawg5osd7kjRbubeVRa7tOKQDnrXvSbuKyn93f6XMgAYKGDtPRyKUACNXNEhEoLXZaDED0Ygie1+Ltzxd6OYN2ivbcmKYTIGToKTcgkYTl5NtBKE4hBEDW8ylhpjYO2mryrfg6nnoHQiCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DK8d9ZQe; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b6b78ea8-4235-4fd5-ab19-133bc04e4188@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752066932;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2frUebfYQu94FfAIDHz25jvoP9Zvayn0Ie7/y9CtSQk=;
+	b=DK8d9ZQerU+9oBelg/HoXu1ip/VKCzpxd0zBSg6TgiWDOr6Sop9WcZarxdHMydHDDBBrrX
+	xuUlCCLWVOUMoCSVecta5hje9R+PEQAlcGO+JQw6jdsg+HbyBCdBCllxqr3b1N/TNzWc9s
+	7zY0semditybCAgxh2ZO28SRs2U+dnY=
+Date: Wed, 9 Jul 2025 14:15:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250708033342.1627636-1-wangliang74@huawei.com>
+Subject: Re: [PATCH net-next v07 7/8] hinic3: Mailbox management interfaces
+To: Fan Gong <gongfan1@huawei.com>
+Cc: andrew+netdev@lunn.ch, christophe.jaillet@wanadoo.fr, corbet@lwn.net,
+ davem@davemloft.net, edumazet@google.com, guoxin09@huawei.com,
+ gur.stavi@huawei.com, helgaas@kernel.org, horms@kernel.org,
+ jdamato@fastly.com, kuba@kernel.org, lee@trager.us,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, luosifu@huawei.com,
+ meny.yossefi@huawei.com, mpe@ellerman.id.au, netdev@vger.kernel.org,
+ pabeni@redhat.com, przemyslaw.kitszel@intel.com,
+ shenchenyang1@hisilicon.com, shijing34@huawei.com, sumang@marvell.com,
+ wulike1@huawei.com, zhoushuai28@huawei.com, zhuyikai1@h-partners.com
+References: <54087858-3917-40db-891e-3656269a3a54@linux.dev>
+ <20250709083233.27344-1-gongfan1@huawei.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20250709083233.27344-1-gongfan1@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jul 08, 2025 at 11:33:42AM +0800, Wang Liang wrote:
-> ND_PRINTK with val > 1 only works when the ND_DEBUG was set in compilation
-> phase. Replace it with dynamic debug. Convert ND_PRINTK with val <= 1 to
-> net_{err,warn}_ratelimited, and convert the rest to net_dbg_ratelimited.
+On 09/07/2025 09:32, Fan Gong wrote:
+> Thanks for your reviewing.
 > 
-> Suggested-by: Ido Schimmel <idosch@idosch.org>
-> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+>>> +static int send_mbox_msg(struct hinic3_mbox *mbox, u8 mod, u16 cmd,
+>>> +			 const void *msg, u32 msg_len, u16 dst_func,
+>>> +			 enum mbox_msg_direction_type direction,
+>>> +			 enum mbox_msg_ack_type ack_type,
+>>> +			 struct mbox_msg_info *msg_info)
+>>> +{
+>>> +	enum mbox_msg_data_type data_type = MBOX_MSG_DATA_INLINE;
+>>> +	struct hinic3_hwdev *hwdev = mbox->hwdev;
+>>> +	struct mbox_dma_msg dma_msg;
+>>> +	u32 seg_len = MBOX_SEG_LEN;
+>>> +	u64 header = 0;
+>>> +	u32 seq_id = 0;
+>>> +	u16 rsp_aeq_id;
+>>> +	u8 *msg_seg;
+>>> +	int err = 0;
+>>> +	u32 left;
+>>> +
+>>> +	if (hwdev->hwif->attr.num_aeqs > MBOX_MSG_AEQ_FOR_MBOX)
+>>> +		rsp_aeq_id = MBOX_MSG_AEQ_FOR_MBOX;
+>>> +	else
+>>> +		rsp_aeq_id = 0;
+>>> +
+>>> +	mutex_lock(&mbox->msg_send_lock);
+>>
+>> this function is always called under mbox->mbox_send_lock, why do you
+>> need another mutex? From the experience, a double-locking schema usually
+>> brings more troubles than benefits...
+> 
+> In the current patch, send_mbox_msg is only used in mbox sending process.
+> But send_mbox_msg will be used in other functions like mbox response in the
+> future patch, so msg_send_lock is necessary to cover the remaining scenes.
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+I would still suggest you to implement it with one locking primitive as
+it will be safer and easier to maintain in the future
+
+> 
+>>>    int hinic3_send_mbox_to_mgmt(struct hinic3_hwdev *hwdev, u8 mod, u16 cmd,
+>>>    			     const struct mgmt_msg_params *msg_params)
+>>>    {
+>>> -	/* Completed by later submission due to LoC limit. */
+>>> -	return -EFAULT;
+>>> +	struct hinic3_mbox *mbox = hwdev->mbox;
+>>> +	struct mbox_msg_info msg_info = {};
+>>> +	struct hinic3_msg_desc *msg_desc;
+>>> +	int err;
+>>> +
+>>> +	/* expect response message */
+>>> +	msg_desc = get_mbox_msg_desc(mbox, MBOX_MSG_RESP, MBOX_MGMT_FUNC_ID);
+>>> +	mutex_lock(&mbox->mbox_send_lock);
+>>> +	msg_info.msg_id = (msg_info.msg_id + 1) & 0xF;
+>>
+>> msg_id is constant 1 here as msg_info is initialized to all zeroes a
+>> couple of lines above. It looks like a mistake to me and
+>> mbox->send_msg_id should be used instead.
+> 
+> This is our mistake. We will fix this error in the next version's patch.
+
 
