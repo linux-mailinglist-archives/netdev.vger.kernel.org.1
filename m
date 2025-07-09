@@ -1,153 +1,89 @@
-Return-Path: <netdev+bounces-205545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5D02AFF26F
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 22:03:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5B72AFF2CF
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 22:18:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BAE3547709
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 20:02:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BDD616B444
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 20:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE792E5B08;
-	Wed,  9 Jul 2025 19:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5620A220696;
+	Wed,  9 Jul 2025 20:18:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OS1daJ6w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DrdI+k3p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826632BEFF0;
-	Wed,  9 Jul 2025 19:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F49B5661;
+	Wed,  9 Jul 2025 20:18:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752091157; cv=none; b=F5iOHet1wLf+Y/HDrvtQnXHx0/OOoWbAXh2l5FAnUoAY24YjCml/QFVeXSv01S0sOiO5pkqL6GJ9hyGF04qHJoHsO6BhxbBME3gT4Au4/l6DIYOjpydoDodminrqXNmfSJh+wAYSIrCIyIULzYVjSVde5PQS0j4AVPHxolr0U4U=
+	t=1752092284; cv=none; b=HgPsKzxDXs55mBZBL5LQh7QnirVcMsJ5/09OxAaqZqncNHG6xa4eXpZEu/mZ0Ydz4j8H1rS/KTK0E0B6lQB12s4+obw9vIZx7BzWjp3q5F81oXeirdC2VFaN0PIAqsC60KEwVcJMDj2BA4fs32l1YJ/QvmUCM97CdZ7tw3/Gvb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752091157; c=relaxed/simple;
-	bh=+cXDYAYZ3gqoNEyU9rZ/9kReWz6XNmPa5fCe17wNmXs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dgCflbRoGor1H8myYAztTdM8ALYZdIM3kVLRSyTvtICHTwvf2WHGzPSaows6WjijFMVyMmt+o8yHesoFrsG0yRyZF6dgcAFwclnup6lv4TULEel58fAbwo+KnatAi66EuafCCsbniwvZUND7Q4xSQhkeE+wJcM/JXIcCUc/UItQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OS1daJ6w; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4a58d95ea53so4596281cf.0;
-        Wed, 09 Jul 2025 12:59:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752091154; x=1752695954; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=b8KQ4HSVORZvJyB3i3NF8gMFRoSic5laZrJaHuBt0is=;
-        b=OS1daJ6wF8Xa3vtgCTud3Zrz9GNR9o7v6rx/hCWVJoy9Furzuga6Bba7vXk+tSD0Md
-         odMWTf/lxRrqvevpBMrAnCFKCEx/D96WLrQKVqAmicXe7vH4rH6AYng03uSKeMsYy8nI
-         TwMoeNHhwGuKJT1R3VngFjkQYxGyi9vEyOpPAN5sNoEBK7Sbl5TmX3PXvCO8JbAiJEFJ
-         wBP2bLnuaUCgmlww3uKs2d+02qKHq47iGelkJ/Bm6Pi2meruRhvWzhNG+56P4zsd6v0J
-         rL+yOPmA45GZTY7ZEbKYEM/b9d/epYwo+tzJcj2bKEmZzLRhOOJ2Ufa2M9AheWfdwR8f
-         qX9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752091154; x=1752695954;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b8KQ4HSVORZvJyB3i3NF8gMFRoSic5laZrJaHuBt0is=;
-        b=Ni4htQqGgA1svD/VUZ3CJ49mQUlT/ma9xts34k6hPjsib7ZlMvalrChw34z81Mh5Mt
-         R63ISg5mJxS3AA5y/SdumQnJsz6WZ/2ntk0RcNNAL+/6Emeq75ZVdsIibTZGIu4/hH3k
-         xWg/v9ySsMly0QRHqwVTqRHMorGkD5o6k4u8RmM3MWjq7gUOmZHS8oBSfSOp5MFmmxF4
-         QTzKx9lsinXS+5HbwksaFgZ1p3CssmAC35SVhlozIw+zqdFCkXwE6/QC75UY+2WW99EF
-         /XNtgvLh5KTkupQ78ngLX2BuqP+wtaTXjU6IirlRsIFrUmQ/XMjbbJEHrm8MOMhfF7Vn
-         ucFg==
-X-Forwarded-Encrypted: i=1; AJvYcCU98S+1iN2HhTMIGKaw9pkoL2FwSwco7tBR5CwOIfaHxs+6CgUjksob1mFTB+VPfQtiqnZE4K0YgRw=@vger.kernel.org, AJvYcCV8Jd4fy+zK94wkxD/lohCZOUgHwRsuItfx11YDnWReGrsG8koc/TBD8rIXLkyDVY2F+OB8R6XN3TXf@vger.kernel.org, AJvYcCWjsRz336ndhANL1qFaMQ878bDwcXEDMxCg0EQLEmlw0QCq+Jx7qOo7RE5DqzSCL2Joq+RpVIUb3ePwEEvVqxv3@vger.kernel.org, AJvYcCXAkEyfBMTOcK6h38ugAuswqQP7C2xG4TwTKpRT09NP+maWpTQIsqLWlA7KmRa5e5t47IDl9nlt@vger.kernel.org, AJvYcCXFpWdtGfX6adToPbxxFpXUDDqc7Pkv6eyVKeGwx/ERfm8UlRQhdIexuNuFzC1MLT7LaOtgdyfwoImLhEZU@vger.kernel.org, AJvYcCXhHSFJ9JKql86S8Gjrr0BDH2MO28EQsHcfWM5HwmF2DhYjcfFXOiY+g8ONtLKbp1bT/qlgilcdFhqpd2JBKNA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqaiXHOR4Xn2PS0vSnA96gUc9lgPAIAIYaaCJK2U0gfWAAdrqp
-	IK9rT780WIHOUKtxXhVk1m4OCk06LKvon1IqR5ZFQ1AbSh5JyPFipxl3
-X-Gm-Gg: ASbGncsMXOsnn7/aqvGiJWPo7NfPkLIZ3U0mszLNghQDLUy4GOmw8ye5nX9QJLFELpY
-	35Hi3SpU5+JBBSMitaqjtE+fVbVK4C9VJ14+muXGDahDZwnNWIh/nfHwHqiShJRRJpmgsNYiOCw
-	ywAKzg88+OUGiAK37WSDvja1YlG7tm8rMIfAcOfyeTqHJMohFDE22aVnde5c1tzajkZcxmsKXjB
-	PiqhYcKvBGeu76n6l3DvC8WxPLVrSlJrCXEJ1F9gJZXZKZgLrQZKra13BUGwnFWeJQ3np3Ssqvb
-	nP/x0g8G+GkqlZlcpQGrvfggzB6gFw2/vBUV/6wuRHB4iz6cJklHextdrKaAJTJjk32RBqz102N
-	X1/HSF2Fat7UzjgJeRcIe5B3xYFOs7QV9u1sm/TuuDBkJvAZId/7kDFRvDJcaPxViDwQM
-X-Google-Smtp-Source: AGHT+IFvDoCZVGhGpiYkZdTD5/12K1S8bIsSpFpgXIGe1kCUt1tDQK8ef/tJ4gQAS++aXLB8qn27Jg==
-X-Received: by 2002:a05:622a:15d0:b0:4a9:a596:1bd6 with SMTP id d75a77b69052e-4a9e9c27e25mr10671631cf.9.1752091154172;
-        Wed, 09 Jul 2025 12:59:14 -0700 (PDT)
-Received: from 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.ip6.arpa ([148.76.185.197])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4a9949faf39sm103584281cf.28.2025.07.09.12.59.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Jul 2025 12:59:13 -0700 (PDT)
-From: Tamir Duberstein <tamird@gmail.com>
-Date: Wed, 09 Jul 2025 15:59:00 -0400
-Subject: [PATCH 10/10] rust: of: use `core::ffi::CStr` method names
+	s=arc-20240116; t=1752092284; c=relaxed/simple;
+	bh=RlYoB+kZXiNeUDJwbYgQWmg8iP/ByZitMwbHNP6vQLY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lpxKoWX/XuxS5CTccywWlnPyV3H5iKLzn5XokmvtLoC6+rbAHkl+IvH+RPYbDj81F8RJgR5Ka99Z44qHs7BXiFeTNmHLhPMTkTQsa+/oxXEvW4Gi/EryccuRhu7IoBRKUewdMKsq0z/5BmNDUcBDaUrU5nfmidGYuch7R3UpZHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DrdI+k3p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44CB0C4CEEF;
+	Wed,  9 Jul 2025 20:18:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752092281;
+	bh=RlYoB+kZXiNeUDJwbYgQWmg8iP/ByZitMwbHNP6vQLY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DrdI+k3p53YVgWVZFb6P58txnLKWzPiZ3uKrdRzScDeb1Nz6zeY6F4KBO+H7nCqrx
+	 XwuuxwVFOZLzv/5FM5BTG0bQas+WmPUnwT+4EZrl4D0fWIAnA4e7sKcK2CJWxTSMq0
+	 U47a5NXlQDtRt9QTSCFXGK3Np2D6SnAP6esgKhKR6uXNdrKdRTGCneCqj/rURkpwM6
+	 AsBMelU1jz9R5cIuvYEcWGQybBqVjtuHPcOaGJ52VkL4PYqwaZuNtQ+LK3kJ0akibR
+	 0nbz0kZAeA2sHdqITGz8gPYyIEgmUnl8ADsWZwPFO0lLsLo4D95ZEDEYQSIb+WgPu1
+	 3iHNj+Qi5vapQ==
+Date: Wed, 9 Jul 2025 13:18:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Nimrod Oren <noren@nvidia.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Willem de Bruijn
+ <willemb@google.com>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Gal Pressman <gal@nvidia.com>, Carolina
+ Jubran <cjubran@nvidia.com>
+Subject: Re: [PATCH net] selftests: drv-net: rss_ctx: Add short delay
+ between per-context traffic checks
+Message-ID: <20250709131800.580fde62@kernel.org>
+In-Reply-To: <6b8c512d-ced5-4116-9dde-fee081fda850@nvidia.com>
+References: <20250629111812.644282-1-noren@nvidia.com>
+	<20250701172352.5dd42418@kernel.org>
+	<6b8c512d-ced5-4116-9dde-fee081fda850@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250709-core-cstr-fanout-1-v1-10-fd793b3e58a2@gmail.com>
-References: <20250709-core-cstr-fanout-1-v1-0-fd793b3e58a2@gmail.com>
-In-Reply-To: <20250709-core-cstr-fanout-1-v1-0-fd793b3e58a2@gmail.com>
-To: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
- Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
- Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
- Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
- Danilo Krummrich <dakr@kernel.org>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
- Leon Romanovsky <leon@kernel.org>, Breno Leitao <leitao@debian.org>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, 
- Viresh Kumar <viresh.kumar@linaro.org>, 
- Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
- Brendan Higgins <brendan.higgins@linux.dev>, 
- David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
- FUJITA Tomonori <fujita.tomonori@gmail.com>, Rob Herring <robh@kernel.org>, 
- Saravana Kannan <saravanak@google.com>
-Cc: dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org, 
- rust-for-linux@vger.kernel.org, linux-pm@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
- netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- Tamir Duberstein <tamird@gmail.com>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openssh-sha256; t=1752091134; l=1106;
- i=tamird@gmail.com; h=from:subject:message-id;
- bh=+cXDYAYZ3gqoNEyU9rZ/9kReWz6XNmPa5fCe17wNmXs=;
- b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
- MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
- QEKD4zAoBzfzRUQWlR3BXr7MAa4XF//LBOWG1JnRpCMhRFh/BCmVtlUFm5UVBwPwBtNyQOWGm6n
- 0rH6S6+DKfQo=
-X-Developer-Key: i=tamird@gmail.com; a=openssh;
- fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
 
-Prepare for `core::ffi::CStr` taking the place of `kernel::str::CStr` by
-avoid methods that only exist on the latter.
+On Wed, 9 Jul 2025 20:10:14 +0300 Nimrod Oren wrote:
+> On 02/07/2025 3:23, Jakub Kicinski wrote:
+> > On Sun, 29 Jun 2025 14:18:12 +0300 Nimrod Oren wrote:  
+> >> A few packets may still be sent and received during the termination of
+> >> the iperf processes. These late packets cause failures when they arrive
+> >> on queues expected to be empty.
+> >>
+> >> Add a one second delay between repeated _send_traffic_check() calls in
+> >> rss_ctx tests to ensure such packets are processed before the next
+> >> traffic checks are performed.  
+> > 
+> > Sprinklings sleeps should be last resort. Is there a way to wait for
+> > iperf to shut down cleanly, or wait for the socket to be closed fully?
+> > Like wait_port_listen() ?  
+> 
+> The socket may end up in TIME_WAIT state, so waiting for it to be fully
+> closed can take ~2 mins.
 
-Link: https://github.com/Rust-for-Linux/linux/issues/1075
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-Signed-off-by: Tamir Duberstein <tamird@gmail.com>
----
- rust/kernel/of.rs | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/rust/kernel/of.rs b/rust/kernel/of.rs
-index 40d1bd13682c..5cf50979c1e8 100644
---- a/rust/kernel/of.rs
-+++ b/rust/kernel/of.rs
-@@ -29,7 +29,7 @@ fn index(&self) -> usize {
- impl DeviceId {
-     /// Create a new device id from an OF 'compatible' string.
-     pub const fn new(compatible: &'static CStr) -> Self {
--        let src = compatible.as_bytes_with_nul();
-+        let src = compatible.to_bytes_with_nul();
-         // Replace with `bindings::of_device_id::default()` once stabilized for `const`.
-         // SAFETY: FFI type is valid to be zero-initialized.
-         let mut of: bindings::of_device_id = unsafe { core::mem::zeroed() };
-
--- 
-2.50.0
-
+TIME_WAIT is as good as CLOSED for our purposes. Once we got a FIN
+the chances of more traffic should be minuscule.
 
