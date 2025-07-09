@@ -1,152 +1,346 @@
-Return-Path: <netdev+bounces-205530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F1AEAFF163
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 21:04:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94FBDAFF178
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 21:08:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27C595458BE
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 19:04:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF13117F791
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 19:08:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579EE23BCEC;
-	Wed,  9 Jul 2025 19:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550EE23B63F;
+	Wed,  9 Jul 2025 19:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CDK671J3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hu6SxGUP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF000239E89
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 19:04:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558E5238178
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 19:08:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752087871; cv=none; b=QHcevwbILxr8o4XBNa2O/sZFLinvi9pWhNsELK+v5z1MS1ADzwEwzk04tJYGtqUC6I2R1lVYqPTl4yYnnZqVzqHYXbYHd0N4815/RvbKgTTdcZAYfkZ5jZSnhJrg4SrzyS7gMalaBtDcDEWSOGwyuv63BNtJsMTvSVYw22A5N7w=
+	t=1752088106; cv=none; b=apuvxkfLNqBw5gQ9kqoGB9ppOUtJ50f0f68pJtY5HPP1TqAFCKyn9bgow8RVqzwoBevysfBfivp5zE70eJuYAryXSeWXBJeDX1dIy601LxVIUtf1l+PcqXtUP3wKYE/LRgDqg/h5ZkVPIzrJxo7CaD4edn1/RJs0ZmV/pASyfUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752087871; c=relaxed/simple;
-	bh=uHlcs8Omf3CS1KytlE/VWNw38oTCNOswfZed0aZbJ+I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JnO14qb8F9mXmlx9JqnTVKWBjihg2hRl9IEG09A6rPcJlx5pQdZPHBa7fmibW3lbr6GYJU2X7hrH4dXDBqDbLF7scyx6ldl/EfGHaZD0kff3K5zpIF3Tvu0+8TkBphS4W//2UJu4Nw1EUga26DXDc0rcKrAwDeMtNfyTfHnVrJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CDK671J3; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-31c38e75dafso315481a91.2
-        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 12:04:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752087869; x=1752692669; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H3NdMvV7Oc0jzRHM6vAQiXa6oLCVEsrYO5UT07DX7LY=;
-        b=CDK671J3auRipQv2SDFQPPdMU0QCMJqCurqC1Uuij31stAyBLNHZ7TaUVU0wMvrnVC
-         eA/ZY8TMuaI3cjFf5Ej6Vbsgkws0gqXp4OjB8ECSGOYYY9NvrsmBf/v7udHDyBeOt1Fz
-         ira8udH/h0E61sydoIcjANouAH/vje/lm0GS9NTQ2ye3rtRiD0vbO9Ww9or2WbYG8doI
-         Fu3/nCIe6krvySkKnpxZ4xiXdGXk06A55TDlt5zvv75KeQnLeydn7d/S9iEx82+z2jUL
-         b2uM/esmnbf+4cv5uw4a+iIUihzvXrmm/kNx/yi5S1DSLGey/eycVkiXt9ERhVlefWc2
-         twhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752087869; x=1752692669;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H3NdMvV7Oc0jzRHM6vAQiXa6oLCVEsrYO5UT07DX7LY=;
-        b=B0EQACeIHyf1ynVHybpOO+tmYeSWEpJGpRamYMxsrfV2X0qTXVCoRfnTzXAUCm4M5K
-         6uxVDf52YUy/QZnmNUVH5ZjxN/lSouUyshqcEbJ15HV7unfwU5L5eLuGutl14pPazDJu
-         ymFyIhBoGHpXJjHkc4YNlUMN+/o+zCf9pzovN8Nd6e0AbC4weGy1QWvu7Eiv1BlJBB75
-         isb9c/zy5COEo4SwkqfioyQpM70UVPVDfSyMJREwTHN8eI7Dyq5E9h2pNmZVnwMR3ESG
-         S647oqSsTo3waYC4qBZH7eR2twxkesIxTKyvkpDQ3PZPFDtb1FiIoXhaJfyEwELhe4uG
-         zROQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVx36TPofFjTFNsJfNVubUq63Hwweh7RjSZU6oeF5NpueojTtWGe5bX8EaYkw//2EpjYagWlBI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZ/J7v4c2dOTB86ikzCS6p+jgZNScboRYDJCra0ZXt7bv/pEWE
-	KRt2U1q+0glQryzZTrLNx6labmvaaardKLbzoc7pYWZHMrIBgmMgYKXtEJWzUnY3GeZYX0hDtv/
-	j5dCi13BLxDPI7ayKWTGc9vwfQsYRYcpnc8G+d/GF
-X-Gm-Gg: ASbGncuJbTmvQMmsTCNveju1szsrstWsWwwWQs6++A8tmfy3/BLTSe5I3j/sw6RThLq
-	SYong521x+7cfqQHT89LSVELahCp7Ris3Lq783Kyk8ke9hv1NWagcSOGH0O2xSiM+q0f9V48XUW
-	TWiK/+UaHEJP0XJJvX3uwMhy13Cj6ca1bk3IZfwVdpNm6iS+Pd3WwkL+9AKl5qgwoMNtHwCUU96
-	IgeS968HLcb
-X-Google-Smtp-Source: AGHT+IHjN+1YxOoz4O6LpAmMlFJ5M/5Ec/pilG+KyM/ehzIbHUQ+C6XFZVejUv39ao1Y6bYfM9TS7h0QcJIqOVktj7s=
-X-Received: by 2002:a17:90b:3a8a:b0:311:c5d9:2c79 with SMTP id
- 98e67ed59e1d1-31c3c2d4797mr1345957a91.21.1752087868873; Wed, 09 Jul 2025
- 12:04:28 -0700 (PDT)
+	s=arc-20240116; t=1752088106; c=relaxed/simple;
+	bh=zFU6F6R+koiqOtUxHIYQ8eIgap9mv25G25XLnH53hgk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Jy4ehb2oDbRkI6TnwcMqllORRBDSAAxbI0i82YgucXiwt1Yf42TPNIa0gDzD/AVyakjyXLzLoymEJqCt3Mqd6myFOgfMCfncmNE+NNxHrgOschZKLh3c6NobJWfQ0v5nAIID35EkJraQqG+qotsYCaf9nzrESBdiy5d8P6XCiqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hu6SxGUP; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752088105; x=1783624105;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:to:cc;
+  bh=zFU6F6R+koiqOtUxHIYQ8eIgap9mv25G25XLnH53hgk=;
+  b=Hu6SxGUPuFo+ar3XPWgimB+Mj3GMu3kTgcV48bU9iXpsZqnLKQgJkm1x
+   G6zLYNZ04S1WBW93SvRsSA7SIlRcuMzX8TwXZ3wXuuUxBZ8kzQUV2VjYn
+   6Jt05Cbxt89x4ki+BoHi2QDHShA4/Ac+r7jBF/THPUrh/fEcxAQqMBSDv
+   IFVUIafw4hzOBOQpt3CYsMXKZXp/6qV9e5bICeZ6HD0vWU1CkbNehaDTs
+   uo60e3ykdt9UE+MJSj4MZtj7OzWUq+tAcFeMC+yUB3QUT0vBUxlWT6ZnP
+   OsXp/KiZeIKJWIyc04UMpSFVZF43c02lnAKSsbNlK4PXmmxWPjMKLUnv+
+   A==;
+X-CSE-ConnectionGUID: WHu89sEOSFC7MV5lmZIMfg==
+X-CSE-MsgGUID: +XJ19qtURb252oEdWFDOAQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11489"; a="64616840"
+X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
+   d="scan'208";a="64616840"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2025 12:08:24 -0700
+X-CSE-ConnectionGUID: 9eXdvXbKSNGfVlzHpbJacA==
+X-CSE-MsgGUID: j2apNVoWRtC7bt/eooERYA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
+   d="scan'208";a="186828588"
+Received: from jekeller-desk.jf.intel.com ([10.166.241.15])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2025 12:08:23 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Date: Wed, 09 Jul 2025 12:07:30 -0700
+Subject: [PATCH iwl-net] ice: fix Rx page leak on multi-buffer frames
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250705085228.329202-1-yuehaibing@huawei.com> <20250709185626.GN721198@horms.kernel.org>
-In-Reply-To: <20250709185626.GN721198@horms.kernel.org>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Wed, 9 Jul 2025 12:04:15 -0700
-X-Gm-Features: Ac12FXzwUGGf7Mqw_5B3tPLa70x7c-uCFjkKyti--bnUncsh7gDOXqKvAtUzOSY
-Message-ID: <CAAVpQUBkD7zH9Ki6m2=xXFus5TbTXRqtv13AtEr7_Koqv_j9bA@mail.gmail.com>
-Subject: Re: [PATCH v2 net] atm: clip: Fix NULL pointer dereference in vcc_sendmsg()
-To: Simon Horman <horms@kernel.org>
-Cc: Yue Haibing <yuehaibing@huawei.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250709-jk-ice-fix-rx-mem-leak-v1-1-cfdd7eeea905@intel.com>
+X-B4-Tracking: v=1; b=H4sIAPK9bmgC/x2MywrCMBQFf6XctQdiakn1V6SLkB7b20eURLRQ+
+ u8GlwMzs0tmUma5VbskfjTrMxY4nyoJo48DoX1hscY2xpkW0wwNxEM3pA0rVyz0M2pf25Z9uLi
+ rkxK/EovyH99Fvwsi39Idxw9QEEnycQAAAA==
+X-Change-ID: 20250708-jk-ice-fix-rx-mem-leak-3a328edc4797
+To: maciej.fijalkowski@intel.com, 
+ Intel Wired LAN <intel-wired-lan@lists.osuosl.org>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Joe Damato <jdamato@fastly.com>, 
+ Anthony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org, 
+ Christoph Petrausch <christoph.petrausch@deepl.com>, 
+ Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>, 
+ Jacob Keller <jacob.e.keller@intel.com>
+X-Mailer: b4 0.15-dev-2503c
+X-Developer-Signature: v=1; a=openpgp-sha256; l=10401;
+ i=jacob.e.keller@intel.com; h=from:subject:message-id;
+ bh=zFU6F6R+koiqOtUxHIYQ8eIgap9mv25G25XLnH53hgk=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhoy8fXJyLfU3PVT+9y26u+5CR1BiOxfTkWsfA+489b7Zs
+ DnF9ZdJRykLgxgXg6yYIouCQ8jK68YTwrTeOMvBzGFlAhnCwMUpABN5o87wT6OgwWGD56qP789N
+ 2L3EfI1zo8Kx9jdvl/H7L3mYmK1pwc3wz3KB9hlu46u7dp5u8AtsEPmn2GK82vnddc4XNdMLg7n
+ n8wAA
+X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
+ fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 
-On Wed, Jul 9, 2025 at 11:56=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
-te:
->
-> + Iwashima-san
+The ice_put_rx_mbuf() function handles calling ice_put_rx_buf() for each
+buffer in the current frame. This function was introduced as part of
+handling multi-buffer XDP support in the ice driver.
 
-Thank you, Simon :)
+It works by iterating over the buffers from first_desc up to 1 plus the
+total number of fragments in the frame, cached from before the XDP program
+was executed.
 
->
-> On Sat, Jul 05, 2025 at 04:52:28PM +0800, Yue Haibing wrote:
-> > atmarpd_dev_ops does not implement the send method, which may cause cra=
-sh
-> > as bellow.
-> >
-> > BUG: kernel NULL pointer dereference, address: 0000000000000000
-> > PGD 0 P4D 0
-> > Oops: Oops: 0010 [#1] SMP KASAN NOPTI
-> > CPU: 0 UID: 0 PID: 5324 Comm: syz.0.0 Not tainted 6.15.0-rc6-syzkaller-=
-00346-g5723cc3450bc #0 PREEMPT(full)
-> > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-=
-1.16.3-2~bpo12+1 04/01/2014
-> > RIP: 0010:0x0
-> > Code: Unable to access opcode bytes at 0xffffffffffffffd6.
-> > RSP: 0018:ffffc9000d3cf778 EFLAGS: 00010246
-> > RAX: 1ffffffff1910dd1 RBX: 00000000000000c0 RCX: dffffc0000000000
-> > RDX: ffffc9000dc82000 RSI: ffff88803e4c4640 RDI: ffff888052cd0000
-> > RBP: ffffc9000d3cf8d0 R08: ffff888052c9143f R09: 1ffff1100a592287
-> > R10: dffffc0000000000 R11: 0000000000000000 R12: 1ffff92001a79f00
-> > R13: ffff888052cd0000 R14: ffff88803e4c4640 R15: ffffffff8c886e88
-> > FS:  00007fbc762566c0(0000) GS:ffff88808d6c2000(0000) knlGS:00000000000=
-00000
-> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: ffffffffffffffd6 CR3: 0000000041f1b000 CR4: 0000000000352ef0
-> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > Call Trace:
-> >  <TASK>
-> >  vcc_sendmsg+0xa10/0xc50 net/atm/common.c:644
-> >  sock_sendmsg_nosec net/socket.c:712 [inline]
-> >  __sock_sendmsg+0x219/0x270 net/socket.c:727
-> >  ____sys_sendmsg+0x52d/0x830 net/socket.c:2566
-> >  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2620
-> >  __sys_sendmmsg+0x227/0x430 net/socket.c:2709
-> >  __do_sys_sendmmsg net/socket.c:2736 [inline]
-> >  __se_sys_sendmmsg net/socket.c:2733 [inline]
-> >  __x64_sys_sendmmsg+0xa0/0xc0 net/socket.c:2733
-> >  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-> >  do_syscall_64+0xf6/0x210 arch/x86/entry/syscall_64.c:94
-> >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> >
-> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> > Reported-by: syzbot+e34e5e6b5eddb0014def@syzkaller.appspotmail.com
-> > Closes: https://lore.kernel.org/all/682f82d5.a70a0220.1765ec.0143.GAE@g=
-oogle.com/T
-> > Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+If the hardware posts a descriptor with a size of 0, the logic used in
+ice_put_rx_mbuf() breaks. Such descriptors get skipped and don't get added
+as fragments in ice_add_xdp_frag. Since the buffer isn't counted as a
+fragment, we do not iterate over it in ice_put_rx_mbuf(), and thus we don't
+call ice_put_rx_buf().
 
-v2 looks good.
+Because we don't call ice_put_rx_buf(), we don't attempt to re-use the
+page or free it. This leaves a stale page in the ring, as we don't
+increment next_to_alloc.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+The ice_reuse_rx_page() assumes that the next_to_alloc has been incremented
+properly, and that it always points to a buffer with a NULL page. Since
+this function doesn't check, it will happily recycle a page over the top
+of the next_to_alloc buffer, losing track of the old page.
 
-Thanks!
+Note that this leak only occurs for multi-buffer frames. The
+ice_put_rx_mbuf() function always handles at least one buffer, so a
+single-buffer frame will always get handled correctly. It is not clear
+precisely why the hardware hands us descriptors with a size of 0 sometimes,
+but it happens somewhat regularly with "jumbo frames" used by 9K MTU.
+
+To fix ice_put_rx_mbuf(), we need to make sure to call ice_put_rx_buf() on
+all buffers between first_desc and next_to_clean. Borrow the logic of a
+similar function in i40e used for this same purpose. Use the same logic
+also in ice_get_pgcnts().
+
+Instead of iterating over just the number of fragments, use a loop which
+iterates until the current index reaches to the next_to_clean element just
+past the current frame. Check the current number of fragments (post XDP
+program). For all buffers up 1 more than the number of fragments, we'll
+update the pagecnt_bias. For any buffers past this, pagecnt_bias is left
+as-is. This ensures that fragments released by the XDP program, as well as
+any buffers with zero-size won't have their pagecnt_bias updated
+incorrectly. Unlike i40e, the ice_put_rx_mbuf() function does call
+ice_put_rx_buf() on the last buffer of the frame indicating end of packet.
+
+Move the increment of the ntc local variable to ensure its updated *before*
+all calls to ice_get_pgcnts() or ice_put_rx_mbuf(), as the loop logic
+requires the index of the element just after the current frame.
+
+This has the advantage that we also no longer need to track or cache the
+number of fragments in the rx_ring, which saves a few bytes in the ring.
+
+Cc: Christoph Petrausch <christoph.petrausch@deepl.com>
+Reported-by: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Closes: https://lore.kernel.org/netdev/CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com/
+Fixes: 743bbd93cf29 ("ice: put Rx buffers after being done with current frame")
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+I've tested this in a setup with MTU 9000, using a combination of iperf3
+and wrk generated traffic.
+
+I tested this in a couple of ways. First, I check memory allocations using
+/proc/allocinfo:
+
+  awk '/ice_alloc_mapped_page/ { printf("%s %s\n", $1, $2) }' /proc/allocinfo | numfmt --to=iec
+
+Second, I ported some stats from i40e written by Joe Damato to track the
+page allocation and busy counts. I consistently saw that the allocate stat
+increased without the busy or waive stats increasing. I also added a stat
+to track directly when we overwrote a page pointer that was non-NULL in
+ice_reuse_rx_page(), and saw it increment consistently.
+
+With this fix, all of these indicators are fixed. I've tested both 1500
+byte and 9000 byte MTU and no longer see the leak. With the counters I was
+able to immediately see a leak within a few minutes of iperf3, so I am
+confident that I've resolved the leak with this fix.
+---
+ drivers/net/ethernet/intel/ice/ice_txrx.h |  1 -
+ drivers/net/ethernet/intel/ice/ice_txrx.c | 71 ++++++++++++-------------------
+ 2 files changed, 28 insertions(+), 44 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
+index a4b1e9514632..07155e615f75 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.h
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
+@@ -358,7 +358,6 @@ struct ice_rx_ring {
+ 	struct ice_tx_ring *xdp_ring;
+ 	struct ice_rx_ring *next;	/* pointer to next ring in q_vector */
+ 	struct xsk_buff_pool *xsk_pool;
+-	u32 nr_frags;
+ 	u16 max_frame;
+ 	u16 rx_buf_len;
+ 	dma_addr_t dma;			/* physical address of ring */
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+index 0e5107fe62ad..b139066b6f0d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+@@ -865,10 +865,6 @@ ice_add_xdp_frag(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+ 	__skb_fill_page_desc_noacc(sinfo, sinfo->nr_frags++, rx_buf->page,
+ 				   rx_buf->page_offset, size);
+ 	sinfo->xdp_frags_size += size;
+-	/* remember frag count before XDP prog execution; bpf_xdp_adjust_tail()
+-	 * can pop off frags but driver has to handle it on its own
+-	 */
+-	rx_ring->nr_frags = sinfo->nr_frags;
+ 
+ 	if (page_is_pfmemalloc(rx_buf->page))
+ 		xdp_buff_set_frag_pfmemalloc(xdp);
+@@ -939,20 +935,20 @@ ice_get_rx_buf(struct ice_rx_ring *rx_ring, const unsigned int size,
+ /**
+  * ice_get_pgcnts - grab page_count() for gathered fragments
+  * @rx_ring: Rx descriptor ring to store the page counts on
++ * @ntc: the next to clean element (not included in this frame!)
+  *
+  * This function is intended to be called right before running XDP
+  * program so that the page recycling mechanism will be able to take
+  * a correct decision regarding underlying pages; this is done in such
+  * way as XDP program can change the refcount of page
+  */
+-static void ice_get_pgcnts(struct ice_rx_ring *rx_ring)
++static void ice_get_pgcnts(struct ice_rx_ring *rx_ring, unsigned int ntc)
+ {
+-	u32 nr_frags = rx_ring->nr_frags + 1;
+ 	u32 idx = rx_ring->first_desc;
+ 	struct ice_rx_buf *rx_buf;
+ 	u32 cnt = rx_ring->count;
+ 
+-	for (int i = 0; i < nr_frags; i++) {
++	while (idx != ntc) {
+ 		rx_buf = &rx_ring->rx_buf[idx];
+ 		rx_buf->pgcnt = page_count(rx_buf->page);
+ 
+@@ -1125,62 +1121,49 @@ ice_put_rx_buf(struct ice_rx_ring *rx_ring, struct ice_rx_buf *rx_buf)
+ }
+ 
+ /**
+- * ice_put_rx_mbuf - ice_put_rx_buf() caller, for all frame frags
++ * ice_put_rx_mbuf - ice_put_rx_buf() caller, for all buffers in frame
+  * @rx_ring: Rx ring with all the auxiliary data
+  * @xdp: XDP buffer carrying linear + frags part
+  * @xdp_xmit: XDP_TX/XDP_REDIRECT verdict storage
+- * @ntc: a current next_to_clean value to be stored at rx_ring
++ * @ntc: the next to clean element (not included in this frame!)
+  * @verdict: return code from XDP program execution
+  *
+- * Walk through gathered fragments and satisfy internal page
+- * recycle mechanism; we take here an action related to verdict
+- * returned by XDP program;
++ * Called after XDP program is completed, or on error with verdict set to
++ * ICE_XDP_CONSUMED.
++ *
++ * Walk through buffers from first_desc to the end of the frame, releasing
++ * buffers and satisfying internal page recycle mechanism. The action depends
++ * on verdict from XDP program.
+  */
+ static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+ 			    u32 *xdp_xmit, u32 ntc, u32 verdict)
+ {
+-	u32 nr_frags = rx_ring->nr_frags + 1;
++	u32 nr_frags = xdp_get_shared_info_from_buff(xdp)->nr_frags;
+ 	u32 idx = rx_ring->first_desc;
+ 	u32 cnt = rx_ring->count;
+-	u32 post_xdp_frags = 1;
+ 	struct ice_rx_buf *buf;
+-	int i;
++	int i = 0;
+ 
+-	if (unlikely(xdp_buff_has_frags(xdp)))
+-		post_xdp_frags += xdp_get_shared_info_from_buff(xdp)->nr_frags;
+-
+-	for (i = 0; i < post_xdp_frags; i++) {
++	while (idx != ntc) {
+ 		buf = &rx_ring->rx_buf[idx];
++		if (++idx == cnt)
++			idx = 0;
+ 
+-		if (verdict & (ICE_XDP_TX | ICE_XDP_REDIR)) {
++		/* An XDP program could release fragments from the end of the
++		 * buffer. For these, we need to keep the pagecnt_bias as-is.
++		 * To do this, only adjust pagecnt_bias for fragments up to
++		 * the total remaining after the XDP program has run.
++		 */
++		if (verdict != ICE_XDP_CONSUMED)
+ 			ice_rx_buf_adjust_pg_offset(buf, xdp->frame_sz);
+-			*xdp_xmit |= verdict;
+-		} else if (verdict & ICE_XDP_CONSUMED) {
++		else if (i++ <= nr_frags)
+ 			buf->pagecnt_bias++;
+-		} else if (verdict == ICE_XDP_PASS) {
+-			ice_rx_buf_adjust_pg_offset(buf, xdp->frame_sz);
+-		}
+ 
+ 		ice_put_rx_buf(rx_ring, buf);
+-
+-		if (++idx == cnt)
+-			idx = 0;
+-	}
+-	/* handle buffers that represented frags released by XDP prog;
+-	 * for these we keep pagecnt_bias as-is; refcount from struct page
+-	 * has been decremented within XDP prog and we do not have to increase
+-	 * the biased refcnt
+-	 */
+-	for (; i < nr_frags; i++) {
+-		buf = &rx_ring->rx_buf[idx];
+-		ice_put_rx_buf(rx_ring, buf);
+-		if (++idx == cnt)
+-			idx = 0;
+ 	}
+ 
+ 	xdp->data = NULL;
+ 	rx_ring->first_desc = ntc;
+-	rx_ring->nr_frags = 0;
+ }
+ 
+ /**
+@@ -1260,6 +1243,10 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+ 		/* retrieve a buffer from the ring */
+ 		rx_buf = ice_get_rx_buf(rx_ring, size, ntc);
+ 
++		/* Increment ntc before calls to ice_put_rx_mbuf() */
++		if (++ntc == cnt)
++			ntc = 0;
++
+ 		if (!xdp->data) {
+ 			void *hard_start;
+ 
+@@ -1271,14 +1258,12 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+ 			ice_put_rx_mbuf(rx_ring, xdp, NULL, ntc, ICE_XDP_CONSUMED);
+ 			break;
+ 		}
+-		if (++ntc == cnt)
+-			ntc = 0;
+ 
+ 		/* skip if it is NOP desc */
+ 		if (ice_is_non_eop(rx_ring, rx_desc))
+ 			continue;
+ 
+-		ice_get_pgcnts(rx_ring);
++		ice_get_pgcnts(rx_ring, ntc);
+ 		xdp_verdict = ice_run_xdp(rx_ring, xdp, xdp_prog, xdp_ring, rx_desc);
+ 		if (xdp_verdict == ICE_XDP_PASS)
+ 			goto construct_skb;
+
+---
+base-commit: 31ec70afaaad11fb08970bd1b0dc9ebae3501e16
+change-id: 20250708-jk-ice-fix-rx-mem-leak-3a328edc4797
+
+Best regards,
+--  
+Jacob Keller <jacob.e.keller@intel.com>
+
 
