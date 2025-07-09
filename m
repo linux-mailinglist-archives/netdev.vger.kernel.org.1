@@ -1,136 +1,146 @@
-Return-Path: <netdev+bounces-205280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41936AFE033
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 08:44:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01CEAAFE097
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 08:54:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 463033B2A68
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 06:43:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEC2C1BC540F
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 06:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFF1275AFC;
-	Wed,  9 Jul 2025 06:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE92426B2B3;
+	Wed,  9 Jul 2025 06:54:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YiIr8oiw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eqrLfrxI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8AB275AE7;
-	Wed,  9 Jul 2025 06:42:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B08D61B4153;
+	Wed,  9 Jul 2025 06:54:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752043348; cv=none; b=QUkebVmD1febGFwc9echWvHW4KnJFqIUA9OAEuchYxJyZ+2gTLglO74a0NWtLTE7lytFDQuxpLnbiGPVQMWhBUykF7aA1WQw7MathZvcHoieFISjCoMkzD2IBwPsCf6tWLerWWTRtlW4bNdMp/hUbmKO2qV2YvVIV9YPxhoDt40=
+	t=1752044070; cv=none; b=AjCvZAMUUGHhrA4oJZ06nY7P+CXTdAq1QqUU9jw6+mrqKhMuB7mrpEeZRuiu5k7QWilhLSrM/vFnhMtP1oPwadc9Htxbs4flkTv6AF5kz0R/MN3Kdsv/UQYjU00u9zZGtFFNLUtgQ0rhwBJGCv3naxoWmCyvs4BPiW0VmYv5L8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752043348; c=relaxed/simple;
-	bh=aqKwt2R4domWj2Qf+nj3tEgmAE88WlyqP0DCKD+z32c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=W9rP9ClMHyc0HpjSxUuYhLlLsG+Q0uUzoKC7s8yobCQXE/7Qoxul6/t6r2inBqvM8NdR6pY8fpz1P/rGPVKIH+mMAFzQjH+Qcyj5L2DRB/dmLNAwStm58lyoXdkAFj3WAiDjErK3Z6ShF9rAnfrg1NPeAuPYgDPKEfnANFPbW8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YiIr8oiw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FCC2C4CEF5;
-	Wed,  9 Jul 2025 06:42:27 +0000 (UTC)
+	s=arc-20240116; t=1752044070; c=relaxed/simple;
+	bh=jSkYtAbBZp35/z4jcL3yY2+kEXDrxQhSiS5zpSyzP+Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Te69uJES/QI578g62g87Zy+2bQVu3/aMJbZpq/WuKt+tOQnAJyzAOPY0I/QjEqgNFl786pSHLUpwBJ2Kv3bWPXvaIl+15uoByrvGboRkwEq7hfPE2mtF06+hnVZQGb/7usvrej3GIjMrF8qJAZvw7HESLuV12Ca2a0Jionf1SVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eqrLfrxI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BC80C4CEF0;
+	Wed,  9 Jul 2025 06:54:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752043347;
-	bh=aqKwt2R4domWj2Qf+nj3tEgmAE88WlyqP0DCKD+z32c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YiIr8oiwEYShNkxmPcYEZfC2MGvVCf8N+QgCZYbdYEypIVBPPWKK0YZGdyLA7jkUj
-	 9W+rEozTYsj6d59daoPU4lyC1Vi/ZdSNGSuiG75oarIjWCr5UEs6MVKtflG7F5MMhH
-	 BRNNE460vggihWjSCJQJzmv0gCoaTKYUl+qtNy6OWPUPArgFmVH8tlMdd0di3kCyb8
-	 u07l5GiPjeglny1oMPQEncTlCj4MTtTflwhXLflDBXqcQf/GznGWFaHWqZqUilxO3k
-	 8fFEKrMZL/UWkFK8Rg8ufTO2RYiZ11MRgxivF+XIjF5oIQKokt3d05NnHxovfArs1S
-	 h4Ns2B1RH4/dg==
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Edward Srouji <edwards@nvidia.com>,
-	linux-rdma@vger.kernel.org,
-	Michael Guralnik <michaelgur@nvidia.com>,
-	netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: [PATCH mlx5-next 2/4] RDMA/mlx5: Fix UMR modifying of mkey page size
-Date: Wed,  9 Jul 2025 09:42:09 +0300
-Message-ID: <9f43a9c73bf2db6085a99dc836f7137e76579f09.1751979184.git.leon@kernel.org>
-X-Mailer: git-send-email 2.50.0
-In-Reply-To: <cover.1751979184.git.leon@kernel.org>
-References: <cover.1751979184.git.leon@kernel.org>
+	s=k20201202; t=1752044070;
+	bh=jSkYtAbBZp35/z4jcL3yY2+kEXDrxQhSiS5zpSyzP+Y=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=eqrLfrxIJhdGA2IsXhWrEJpqblQOzBS0DIG7bpfPkEFjfbv2ZgTlcmnuVLkSSvatt
+	 9cCXVUGd1akJACFXvD9uYvlvVgkGhbfjLlJg2bUoIlxyKPC6nFXuQN0TKPnLepa3LM
+	 bm2xvxXGLHIrrpv3KZGn8IntV5OwCzcZ6ssW92n+u7KEYxn93C3NqEfBEKtt8QKv0w
+	 eNAMvvSjJhkIk6O4JGBlu8hzxDqnNcE0XEqvitet6a5CR9Ax+OyoJYmFejqJdk7Cf+
+	 RlEfhyR7lN0mIcDlTTfj+dETee/zO7azwR7bbkw2XmxcsukunnEs9/EkSE2HBgz7hP
+	 +Zcb59XohjuSQ==
+Message-ID: <b752c340-bbb5-479f-bc2c-a9e8541509c3@kernel.org>
+Date: Wed, 9 Jul 2025 08:54:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] dt-bindings: net: altr,socfpga-stmmac.yaml: add minItems
+ to iommus
+To: Matthew Gerlach <matthew.gerlach@altera.com>, dinguyen@kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, mcoquelin.stm32@gmail.com,
+ alexandre.torgue@foss.st.com, maxime.chevallier@bootlin.com,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+References: <20250707154409.15527-1-matthew.gerlach@altera.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20250707154409.15527-1-matthew.gerlach@altera.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Edward Srouji <edwards@nvidia.com>
+On 07/07/2025 17:44, Matthew Gerlach wrote:
+> Add missing 'minItems: 1' to iommus property of the Altera SOCFPGA SoC
+> implementation of the Synopsys DWMAC.
 
-When changing the page size on an mkey, the driver needs to set the
-appropriate bits in the mkey mask to indicate which fields are being
-modified.
-The 6th bit of a page size in mlx5 driver is considered an extension,
-and this bit has a dedicated capability and mask bits.
+Why? Explain why you are doing thing, not what you are doing. What is
+obvious which makes entire two-line commit msg redundant and useless.
 
-Previously, the driver was not setting this mask in the mkey mask when
-performing page size changes, regardless of its hardware support,
-potentially leading to an incorrect page size updates.
+Original binding had no iommus and referenced commit does not explain
+why they appeared during conversion in the first place.
 
-This fixes the issue by setting the relevant bit in the mkey mask when
-performing page size changes on an mkey and the 6th bit of this field is
-supported by the hardware.
+> 
+> Fixes: 6d359cf464f4 ("dt-bindings: net: Convert socfpga-dwmac bindings to yaml")
+> Signed-off-by: Matthew Gerlach <matthew.gerlach@altera.com>
+> ---
+>  Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml b/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml
+> index c5d8dfe5b801..ec34daff2aa0 100644
+> --- a/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/altr,socfpga-stmmac.yaml
+> @@ -59,6 +59,7 @@ properties:
+>        - const: ptp_ref
+>  
+>    iommus:
+> +    minItems: 1
+>      maxItems: 2
 
-Fixes: cef7dde8836a ("net/mlx5: Expand mkey page size to support 6 bits")
-Signed-off-by: Edward Srouji <edwards@nvidia.com>
-Reviewed-by: Michael Guralnik <michaelgur@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- drivers/infiniband/hw/mlx5/umr.c | 6 ++++--
- include/linux/mlx5/device.h      | 1 +
- 2 files changed, 5 insertions(+), 2 deletions(-)
+Why this has to be flexible on given SoC? This is weird. Same hardware
+differs somehow?
 
-diff --git a/drivers/infiniband/hw/mlx5/umr.c b/drivers/infiniband/hw/mlx5/umr.c
-index 5be4426a2884..25601dea9e30 100644
---- a/drivers/infiniband/hw/mlx5/umr.c
-+++ b/drivers/infiniband/hw/mlx5/umr.c
-@@ -32,13 +32,15 @@ static __be64 get_umr_disable_mr_mask(void)
- 	return cpu_to_be64(result);
- }
- 
--static __be64 get_umr_update_translation_mask(void)
-+static __be64 get_umr_update_translation_mask(struct mlx5_ib_dev *dev)
- {
- 	u64 result;
- 
- 	result = MLX5_MKEY_MASK_LEN |
- 		 MLX5_MKEY_MASK_PAGE_SIZE |
- 		 MLX5_MKEY_MASK_START_ADDR;
-+	if (MLX5_CAP_GEN_2(dev->mdev, umr_log_entity_size_5))
-+		result |= MLX5_MKEY_MASK_PAGE_SIZE_5;
- 
- 	return cpu_to_be64(result);
- }
-@@ -654,7 +656,7 @@ static void mlx5r_umr_final_update_xlt(struct mlx5_ib_dev *dev,
- 		flags & MLX5_IB_UPD_XLT_ENABLE || flags & MLX5_IB_UPD_XLT_ADDR;
- 
- 	if (update_translation) {
--		wqe->ctrl_seg.mkey_mask |= get_umr_update_translation_mask();
-+		wqe->ctrl_seg.mkey_mask |= get_umr_update_translation_mask(dev);
- 		if (!mr->ibmr.length)
- 			MLX5_SET(mkc, &wqe->mkey_seg, length64, 1);
- 	}
-diff --git a/include/linux/mlx5/device.h b/include/linux/mlx5/device.h
-index 6822cfa5f4ad..9d2467f982ad 100644
---- a/include/linux/mlx5/device.h
-+++ b/include/linux/mlx5/device.h
-@@ -280,6 +280,7 @@ enum {
- 	MLX5_MKEY_MASK_SMALL_FENCE	= 1ull << 23,
- 	MLX5_MKEY_MASK_RELAXED_ORDERING_WRITE	= 1ull << 25,
- 	MLX5_MKEY_MASK_FREE			= 1ull << 29,
-+	MLX5_MKEY_MASK_PAGE_SIZE_5		= 1ull << 42,
- 	MLX5_MKEY_MASK_RELAXED_ORDERING_READ	= 1ull << 47,
- };
- 
--- 
-2.50.0
-
+Best regards,
+Krzysztof
 
