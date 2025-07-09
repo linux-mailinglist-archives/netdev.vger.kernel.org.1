@@ -1,124 +1,102 @@
-Return-Path: <netdev+bounces-205465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A69F3AFEDA1
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 17:23:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4201AAFEDA7
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 17:25:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31D134802A7
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:23:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26C241887BD1
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 15:25:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4F82E7622;
-	Wed,  9 Jul 2025 15:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4632E7BBF;
+	Wed,  9 Jul 2025 15:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ikPxL0de"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5778E2E7195
-	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 15:23:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78C91AD21;
+	Wed,  9 Jul 2025 15:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752074617; cv=none; b=NO/f7VQgBGJUfZYBrzL8obbbqZ4LSXPKzW6X3wQKgBex32dQrQ2QOKqe+2W+mTI5L89vH5Z29c7SGk23kv9LZCcENRWTsD4qWRDjUVsKb9wAbj9Lrp6ox/t0dGmAGO8hl9s1omtkaQkaupjBBIO6DoH9p6aOXuiwey0UaCdME9E=
+	t=1752074723; cv=none; b=TTApBaZxS9uVTHwjLcfUM6ez9XCnUouaSVMi9/2Wrn2oRNNZV7nSRx22Ro/ZRChLjM6iulUA/CKLHkFdQAbNK3EVs4ywMws9CyEIDO3vd1830+3KlZeUxxOw3lIYf+5leZyPzXqsbyvDfjbKG5tSynAkOEKpjR8ZEx5q8RZntYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752074617; c=relaxed/simple;
-	bh=jA466shT9OcyRSzYxq4e6vbv5RenQ1Yaspaa8D0m1kI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=scXJXTBIrrM9neuGJwIG/ly4M/C0aA+nKaIsKzP+ydvGURloBa9Y1TuDGOov2f0TisTDjqxviBRG4jwUBaK/7x4xyXgj4DcTTnXQvRf+eBogtdPtW8B36ZmKLy8if9BaHD8tOZqA18iLNvhXemCGVMZut0/FE2PbVDFJVoA+N9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uZWdq-0000kp-8l; Wed, 09 Jul 2025 17:23:26 +0200
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uZWdo-007beD-0I;
-	Wed, 09 Jul 2025 17:23:24 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1uZWdn-009ymh-39;
-	Wed, 09 Jul 2025 17:23:23 +0200
-Date: Wed, 9 Jul 2025 17:23:23 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	Andre Edich <andre.edich@microchip.com>,
-	Lukas Wunner <lukas@wunner.de>
-Subject: Re: [PATCH net v2 2/3] net: phy: allow drivers to disable polling
- via get_next_update_time()
-Message-ID: <aG6Ja_Y9JNKkEon6@pengutronix.de>
-References: <20250709104210.3807203-1-o.rempel@pengutronix.de>
- <20250709104210.3807203-3-o.rempel@pengutronix.de>
- <e0b00f28-051e-4af6-afcb-7cdb5dc76549@lunn.ch>
+	s=arc-20240116; t=1752074723; c=relaxed/simple;
+	bh=vQvUTZYDPFvJtZWLT3bsD4zVtLOSn/hT6DJD+GszzQ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ttQoATe+u4t1OHUkQS+bhvmGVoxCnb2+ClWGi7HC9I+O3eFzLIZQI+bvwLmKuAPubA7wZPdusAUNVSmTjXA0ey9WVIhO4JGZCm0WwY6WgIWm+bHaRjAsQvwRYFWJODpN0IfEfnAySZHxJlz6SVBXVi2oY9Qf7lZr3pZBSyA6TNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ikPxL0de; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDD41C4CEEF;
+	Wed,  9 Jul 2025 15:25:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752074723;
+	bh=vQvUTZYDPFvJtZWLT3bsD4zVtLOSn/hT6DJD+GszzQ8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ikPxL0deZqTQhV1qx988jIg1WQwS7TiasZUN6jIIG1fVwUWqn2ZJVuNt/sgdArR9x
+	 UxkEzZlprVh+dmbrWTTQZzbw3lyjWYJhoJo90HwOFwZ3s7mbZVv3I7SOJDAF7EV5vB
+	 RvEHdDUJu9v3HTnQ1AFyv14d6EXfzt9uNAr0qCkQ0a4RlRD+iDRaSK1Xm50YFbM7Fu
+	 q+0hWU+fQjdb8P6+jnUjfIvznP8iSqjnTD31hZTq+Dfl90dlaQ5iS+8Wq0CGVc28bG
+	 V8XK+76nKHlXpmaiJYYEhwx2pAd8xnVtdIYRYkQm87d9xgvd8ZIBaOdvqyled90aqY
+	 wTfFf7ljiNuFw==
+Date: Wed, 9 Jul 2025 17:25:10 +0200
+From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, "Akira Yokosawa" <akiyks@gmail.com>, "Breno Leitao"
+ <leitao@debian.org>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Ignacio Encinas Rubio"
+ <ignacio@iencinas.com>, "Jan Stancek" <jstancek@redhat.com>, "Marco Elver"
+ <elver@google.com>, "Paolo Abeni" <pabeni@redhat.com>, "Randy Dunlap"
+ <rdunlap@infradead.org>, "Ruben Wauters" <rubenru09@aol.com>, "Shuah Khan"
+ <skhan@linuxfoundation.org>, joel@joelfernandes.org,
+ linux-kernel-mentees@lists.linux.dev, linux-kernel@vger.kernel.org,
+ lkmm@lists.linux.dev, netdev@vger.kernel.org, peterz@infradead.org,
+ stern@rowland.harvard.edu
+Subject: Re: [PATCH v8 06/13] docs: use parser_yaml extension to handle
+ Netlink specs
+Message-ID: <20250709172510.191c116e@sal.lan>
+In-Reply-To: <m2wm8x8omf.fsf@gmail.com>
+References: <cover.1750925410.git.mchehab+huawei@kernel.org>
+	<34e491393347ca1ba6fd65e73a468752b1436a80.1750925410.git.mchehab+huawei@kernel.org>
+	<m2wm8x8omf.fsf@gmail.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e0b00f28-051e-4af6-afcb-7cdb5dc76549@lunn.ch>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 09, 2025 at 04:10:48PM +0200, Andrew Lunn wrote:
-> >  	/* Only re-schedule a PHY state machine change if we are polling the
-> > -	 * PHY, if PHY_MAC_INTERRUPT is set, then we will be moving
-> > -	 * between states from phy_mac_interrupt().
-> > +	 * PHY. If PHY_MAC_INTERRUPT is set or get_next_update_time() returns
-> > +	 * PHY_STATE_IRQ, then we rely on interrupts for state changes.
-> >  	 *
-> >  	 * In state PHY_HALTED the PHY gets suspended, so rescheduling the
-> >  	 * state machine would be pointless and possibly error prone when
-> >  	 * called from phy_disconnect() synchronously.
-> >  	 */
-> > -	if (phy_polling_mode(phydev) && phy_is_started(phydev))
-> > -		phy_queue_state_machine(phydev,
-> > -					phy_get_next_update_time(phydev));
-> > +	if (phy_polling_mode(phydev) && phy_is_started(phydev)) {
-> > +		unsigned int next_time = phy_get_next_update_time(phydev);
-> > +
-> > +		/* Drivers returning PHY_STATE_IRQ opt out of polling.
-> > +		 * Use IRQ-only mode by not re-queuing the state machine.
-> > +		 */
-> > +		if (next_time != PHY_STATE_IRQ)
-> > +			phy_queue_state_machine(phydev, next_time);
-> > +	}
-> 
-> How does this interact with update_stats()?
-> 
-> phy_polling_mode() returns true because the update_stats() op is
-> implemented. phy_get_next_update_time() returns PHY_STATE_IRQ, because
-> the PHY is in a state where interrupts works, and then the statistics
-> overflow.
-> 
-> It seems like this code needs to be somehow made part of
-> phy_polling_mode(), so that it has the full picture of why polling is
-> being used.
+Em Fri, 27 Jun 2025 11:28:40 +0100
+Donald Hunter <donald.hunter@gmail.com> escreveu:
 
-Ah, good point! I forgot about it.
+> Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
+> 
+> > Instead of manually calling ynl_gen_rst.py, use a Sphinx extension.
+> > This way, no .rst files would be written to the Kernel source
+> > directories.
+> >
+> > We are using here a toctree with :glob: property. This way, there
+> > is no need to touch the netlink/specs/index.rst file every time
+> > a new Netlink spec is added/renamed/removed.
+> >
+> > Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> > Reviewed-by: Donald Hunter <donald.hunter@gmail.com>  
+> 
+> This patch doesn't currently merge in the net-next tree because it
+> depends on a series in docs-next.
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+True. It has to either be applied on docs-next or you need to merge
+from it if you want to apply on your tree.
+
+This patch depends at the changes there to properly address 
+include_pattern/exclude_pattern.
+
+Regards,
+Mauro
 
