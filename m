@@ -1,201 +1,104 @@
-Return-Path: <netdev+bounces-205273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DA1FAFDFFE
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 08:36:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDF50AFE01A
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 08:42:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EC423AC462
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 06:36:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D50DF1BC77B2
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 06:42:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F34926B750;
-	Wed,  9 Jul 2025 06:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KRn8V0Zu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B47626CE3E;
+	Wed,  9 Jul 2025 06:41:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17011BE6C;
-	Wed,  9 Jul 2025 06:36:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 569A926B96A
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 06:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752042999; cv=none; b=eCKWV7AQsOOR0WMcWnvBBT/ItQkpTGBsdSGqiD7EkDdDC8z8H3EUBwFeblf57izHLG+4smOrJCmUxwKYpoZnIdgyU/m9XEWUdvKOftx1u55ZSZIr+L7PK/HwklEVEaNP38sJQNFXK2Md8nMAKDzwXpN45gx105DkU3HOs8NuAr4=
+	t=1752043319; cv=none; b=A9Zfyuhs4gEgFhssmkEbmUeqY7MuqPKnddXq1iYnoZ0Zbj6BNw8SVcZJUfKj2nPP1f5Bfl9J3TZRsYJvg557s6l84h7Y+VSSIi2/+RYmRtF4qHyMP8gcfreQX4rjktf9F+Co+ONVa/G87jQA0ohmQEa6mK95icGcYvKQX0mY6kU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752042999; c=relaxed/simple;
-	bh=t7TNE8T/BN5q/u1c7kQTCoIQImHkT+2oHgODk/uKb1k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ab8dBbQUYcpH+WBtFc4F2MAF08/7pyDFO5209QNpiYFsr4anJrhqTI3ZVKmpy+35rXciLFrq0pWGMcwneu8AZ/0TEFik7pyDx14xw7sRVDYPAwLpasIx9tzli4QEhwqwnbM6yqsyKjRWDnogqYvnnTaC3O3NdezAs11hEVOcTVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KRn8V0Zu; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 4CBC64435E;
-	Wed,  9 Jul 2025 06:36:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1752042994;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vUc1rTTw2VyF7BAekd7omjo2Z8aYGYza6CVNbqcGY2U=;
-	b=KRn8V0Zu0jfIjR28YR78LyIj8tqF3rpxEbNoc3XNnxRi4aiiY/gECZ+tae/K/8LhdGI9tD
-	UpSGuZpA8HRAJL7Upe2d7+exLpLO1ditmmG2MwmYf5tuI+EkAz4JCWrWmOCEAZ280BveNy
-	uAuDKP/tG/i+8krVn1cYjqS451yYW3M0bubz7NN1UkBgB0urhghuq+jtdJRUly0mOHD9Zz
-	KdT1ByLn3BPKYv7vu0mnLVu602OfAhMjLmjQKxtJqU2cpqfy7XWDfbxSwJQGpPZUHjC9GB
-	anUGsx253/1Obtp2OXvDkdMhT9gzxIPqjGVf8B1xqWaBrS2uxNsHCck9FVzbOw==
-Date: Wed, 9 Jul 2025 08:36:29 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Rob Herring <robh@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Romain Gantois
- <romain.gantois@bootlin.com>, Daniel Golle <daniel@makrotopia.org>, Dimitri
- Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v7 01/15] dt-bindings: net: Introduce the
- ethernet-connector description
-Message-ID: <20250709083629.51c95507@fedora>
-In-Reply-To: <20250708155733.GA481837-robh@kernel.org>
-References: <20250630143315.250879-1-maxime.chevallier@bootlin.com>
-	<20250630143315.250879-2-maxime.chevallier@bootlin.com>
-	<20250708155733.GA481837-robh@kernel.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1752043319; c=relaxed/simple;
+	bh=ST3X6UAnlQHvBgEeaB+GTiZNXNe0+OIR9F5Zd8U3IiE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JL3x6/ndAbuXAPdaphmJLEGKSHm3E+5SILAI6O4Xd9TfreRH/SpKmmx5BKy+RhxBm3OR87colKEINgFSfpCUHsLzP7wobixORBiHMP++pETwJERukkMM/hDRi4RH/4Z76y4LypENFa7IZRux13aFc5dBjtrJ7+NGh16Sq5IQ558=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.22.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: esmtpgz10t1752043242tf0ad3802
+X-QQ-Originating-IP: fJI8y6x9OdiHR7dMuuZjvX4YTFtaKrurT55ZdeDMOzQ=
+Received: from lap-jiawenwu.trustnetic.com ( [36.20.45.108])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 09 Jul 2025 14:40:39 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 15461137682457919814
+EX-QQ-RecipientCnt: 11
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: netdev@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	michal.kubiak@intel.com
+Cc: mengyuanlou@net-swift.com,
+	duanqiangwen@net-swift.com,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net 0/3] Fix Rx fatal errors
+Date: Wed,  9 Jul 2025 14:40:22 +0800
+Message-Id: <20250709064025.19436-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefieekiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpedvudehfffgudefhfefgeeufeekkeekheeufeeiudehtdehuddtgedvvdfhueeuteenucffohhmrghinhepuggvvhhitggvthhrvggvrdhorhhgnecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeeftddprhgtphhtthhopehrohgshheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesv
- hhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgrrhhmqdhmshhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: NvGGTAUhB2iWJeoK5ai6KYrrEah0F5+EQMkoYtcbwEZ40CYft2Aw8/vf
+	kXkbYRlYZdTDWIAhfVJTS7rU9qb4KV4Zt1StR12g74dI7iDzo9gZj4vVvF3BQa6NVTEYw1w
+	9YL9kehcsQF5Jp4hm6dS7738frNiBR8j3HPdyHH/9nFdi6IHfY1UVfD1F0lONMelgEibKQh
+	JV39+LrJlLkyYha+fGjrWVvr3DVzMK3JgftyX+/qYZ2E5Md3GZsWdRHgh1LQZJ2xxjIdvU/
+	q5e4aCwwo6+vmq7A0HAIsgoSyEm1vg+vzNSzDuCKKNY0OUBPm3RV20NiUZGCFwzeOCo9kNc
+	TI+TE9PIQjBXKnV9KaOaDJMt5EV1CIspHJ1DJBdrKV6YMa2Nx4ufIifwjb8UbBr7GjuSHkc
+	N3TP/A69y/wjr6KdxJQEeixIYAd02pUq/yIpnt/d8Du5hHJvC4Wqs/zljUerScwxAsMTiyV
+	F6jlVYc5aF6l6Y7PhOQTFFy0YFwF8JMS6mkcKQpPVl6bXxCDpd/4W1cryaMsVfdWYbv3LIA
+	MDMcGrHByJhdSruKrLFeAcdYN43+fSkDVrM+9PAXseXcdG21hUN5c7H1oIr7qM1r9ReP10u
+	g8t+BAFB+rLtWGyrFz7Gd4H1A+Z76ZXn4dsXZ+8rWjrnu8UosawhHM1InvyQSIU9lr7Ub/3
+	8ipav6+NnPfpG4+8/y8k/XELvvik2eKH+elAvesv7FdB+Rig1I9SwDPJOv2u7VLbIPg6F0C
+	qYNSjlffDSEWnNvtmjFL9rmYDGNl/Bg4xarBody2pACZ3tm/vd9uOaivK5u8axf/pn+I2tH
+	2DHomEAa3fmCZ5pXmaMZh1LAQj3vbfAWtkl+QdkTKmUhD9zVR7DCTL3cHOgzAir2K2HcQij
+	XDdgdjfYJbVBZ61C8N/hCL2AU8FdcLHw/CS+UhaDVg2UM8Tl9GBqkAiX1hB94orQRfz1FHN
+	lQHp7ASEwI0F72ednHtnQOe2G1qt2JSgBMFHH59OEUUbTh4QRFRTaeBEXKVLeokC29e2Yen
+	uL5/rB2xejXhqvuqvh+EMjBWUvfikBoOKP15Nv1QdEAIGS6BGTfoREm0NfqH4=
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
-Hi Rob,
+There are some fatal errors on the Rx NAPI path, which can cause the
+kernel to crash. Fix known issues and potential risks.
 
-On Tue, 8 Jul 2025 10:57:33 -0500
-Rob Herring <robh@kernel.org> wrote:
+The part of the patches has been mentioned before[1].
 
-> On Mon, Jun 30, 2025 at 04:33:00PM +0200, Maxime Chevallier wrote:
-> > The ability to describe the physical ports of Ethernet devices is useful
-> > to describe multi-port devices, as well as to remove any ambiguity with
-> > regard to the nature of the port.
-> > 
-> > Moreover, describing ports allows for a better description of features
-> > that are tied to connectors, such as PoE through the PSE-PD devices.
-> > 
-> > Introduce a binding to allow describing the ports, for now with 2
-> > attributes :
-> > 
-> >  - The number of lanes, which is a quite generic property that allows
-> >    differentating between multiple similar technologies such as BaseT1
-> >    and "regular" BaseT (which usually means BaseT4).
-> > 
-> >  - The media that can be used on that port, such as BaseT for Twisted
-> >    Copper, BaseC for coax copper, BaseS/L for Fiber, BaseK for backplane
-> >    ethernet, etc. This allows defining the nature of the port, and
-> >    therefore avoids the need for vendor-specific properties such as
-> >    "micrel,fiber-mode" or "ti,fiber-mode".
-> > 
-> > The port description lives in its own file, as it is intended in the
-> > future to allow describing the ports for phy-less devices.
-> > 
-> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > ---
-> >  .../bindings/net/ethernet-connector.yaml      | 47 +++++++++++++++++++
-> >  .../devicetree/bindings/net/ethernet-phy.yaml | 18 +++++++
-> >  MAINTAINERS                                   |  1 +
-> >  3 files changed, 66 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/net/ethernet-connector.yaml
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/ethernet-connector.yaml b/Documentation/devicetree/bindings/net/ethernet-connector.yaml
-> > new file mode 100644
-> > index 000000000000..2aa28e6c1523
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/ethernet-connector.yaml
-> > @@ -0,0 +1,47 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/ethernet-connector.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Generic Ethernet Connector
-> > +
-> > +maintainers:
-> > +  - Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > +
-> > +description:
-> > +  An Ethernet Connectr represents the output of a network component such as  
-> 
-> typo
-> 
-> > +  a PHY, an Ethernet controller with no PHY, or an SFP module.
-> > +
-> > +properties:
-> > +
-> > +  lanes:
-> > +    description:
-> > +      Defines the number of lanes on the port, that is the number of physical
-> > +      channels used to convey the data with the link partner.
-> > +    $ref: /schemas/types.yaml#/definitions/uint32  
-> 
-> maximum?
-> 
-> Or I'd guess this is power of 2 values?
+[1]: https://lore.kernel.org/all/C8A23A11DB646E60+20250630094102.22265-1-jiawenwu@trustnetic.com/
 
-All values that exist so far are indeed power of 2 values, but that's
-not a strict requirement, there may be other values one day. I'll add
-all possible values (1, 2 , 4 , 8) so far.
-> 
-> > +
-> > +  media:
-> > +    description:
-> > +      The mediums, as defined in 802.3, that can be used on the port.
-> > +    items:
-> > +      enum:
-> > +        - BaseT
-> > +        - BaseK
-> > +        - BaseS
-> > +        - BaseC
-> > +        - BaseL
-> > +        - BaseD
-> > +        - BaseE
-> > +        - BaseF
-> > +        - BaseV
-> > +        - BaseMLD
-> > +        - BaseX  
+Jiawen Wu (3):
+  net: libwx: remove duplicate page_pool_put_full_page()
+  net: libwx: fix the using of Rx buffer DMA
+  net: libwx: properly reset Rx ring descriptor
 
-Heh I need to remove BaseX
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c   |  7 +++----
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c  | 20 +++++++-------------
+ drivers/net/ethernet/wangxun/libwx/wx_type.h |  1 -
+ 3 files changed, 10 insertions(+), 18 deletions(-)
 
-> 
-> This can be multiple values? But then how does one know what is actually 
-> attached?
+-- 
+2.48.1
 
-I don't see a scenario where we would put multiple values actually. I
-need to update the code accordingly, but if we are in the case where we
-need to specify in DT which medium we use, then that means we can only
-use one.
-
-Thanks you for reviewing,
-
-Maxime
 
