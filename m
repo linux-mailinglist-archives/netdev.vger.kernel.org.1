@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-205288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D412EAFE0F4
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 09:09:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA31CAFE0F9
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 09:10:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5153754238F
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 07:08:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 465EE585ACC
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 07:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48AA8271456;
-	Wed,  9 Jul 2025 07:08:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E30E27380D;
+	Wed,  9 Jul 2025 07:08:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BFE32701C5;
-	Wed,  9 Jul 2025 07:08:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC162727E4;
+	Wed,  9 Jul 2025 07:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752044906; cv=none; b=KJZqVMHO9vfH7+z3K0wXea6JQ6D7EgfSg+ksjbB7OixOV25/UhII3hqphiIU4LVK0wXgNpvFYbZH5E2cjIHMtM91+q8A29zJF2mfpCAGH8bFsL6b6ROt9erU35n0moNFGl4sVyKXK4ylOr4WMObWGZ/3rpfl9njnaDHA+VLs7F0=
+	t=1752044908; cv=none; b=djh+AnePwxJChDWnhMvZe6Mkrn1xX7ezo2DGcDZ0xJiszeIy2oJuhBPMUg8qKUbgS3EvQgYp3SHow2mY25BCQZWfT0h3nXEolabV+QmjPuhjVfVLpHmrBjqk5psxKYG121gDdrQbDVjPraL+FtUITrApdGPBKJXXu0yK5vppAYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752044906; c=relaxed/simple;
-	bh=YQhsnLUMAU7ZH3pjjQGAg2eqdpC5eflBNrsKckB38kk=;
+	s=arc-20240116; t=1752044908; c=relaxed/simple;
+	bh=niTQfAe3mnitW8DHBUFf0G5gpxM1At2/3CYLdrDk0MA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T29rRBNK8IGejsDxzbrhqPhfO/4i/c+F/Tn8SJz2EG1KA8BJNqZYRR/h0Hw9s65B/e3Y/wiWEAZR+NNFQiluRXwZXOD/XK+zrxTVw+8wp0viPjW2NiPfxoWZG48drvFGcysv7m24o9Hx+8XTyXGWtIEUjt97kCHAJm5omsMZWMU=
+	 MIME-Version:Content-Type; b=f7i2XKEcRVxu91vKuuB+ycDv2G+7Zd/3fGxJBA56jPoJUWdyVp+/p/Q/ZYtly5YFO8hDejeSy/gGg4RbSTVeSRQTRhhKkRAUzoH/CIqoYvRqatZte5Q96Mcp4pqw1JCFUF2yR/uf2d2vZ5DTf9JY5vnKzBS0QvGWtKYHr5ZVkyA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
@@ -46,10 +46,10 @@ To: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
 	<andrew@codeconstruct.com.au>, <mturquette@baylibre.com>, <sboyd@kernel.org>,
 	<p.zabel@pengutronix.de>, <horms@kernel.org>, <jacob.e.keller@intel.com>,
 	<u.kleine-koenig@baylibre.com>, <hkallweit1@gmail.com>
-CC: <BMC-SW@aspeedtech.com>, Conor Dooley <conor.dooley@microchip.com>
-Subject: [net-next v4 2/4] dt-bindings: clock: ast2600: Add reset definitions for MAC1 and MAC2
-Date: Wed, 9 Jul 2025 15:08:07 +0800
-Message-ID: <20250709070809.2560688-3-jacky_chou@aspeedtech.com>
+CC: <BMC-SW@aspeedtech.com>
+Subject: [net-next v4 3/4] ARM: dts: aspeed-g6: Add resets property for MAC controllers
+Date: Wed, 9 Jul 2025 15:08:08 +0800
+Message-ID: <20250709070809.2560688-4-jacky_chou@aspeedtech.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250709070809.2560688-1-jacky_chou@aspeedtech.com>
 References: <20250709070809.2560688-1-jacky_chou@aspeedtech.com>
@@ -62,31 +62,50 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-Add ASPEED_RESET_MAC1 and ASPEED_RESET_MAC2 reset definitions to
-the ast2600-clock binding header. These are required for proper
-reset control of the MAC1 and MAC2 ethernet controllers on the
-AST2600 SoC.
+Add the "resets" property to the MAC nodes in the AST2600 device tree,
+using the appropriate ASPEED_RESET_MACx definitions.
 
 Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
-Acked-by: Stephen Boyd <sboyd@kernel.org>
 ---
- include/dt-bindings/clock/ast2600-clock.h | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm/boot/dts/aspeed/aspeed-g6.dtsi | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/include/dt-bindings/clock/ast2600-clock.h b/include/dt-bindings/clock/ast2600-clock.h
-index 7ae96c7bd72f..f60fff261130 100644
---- a/include/dt-bindings/clock/ast2600-clock.h
-+++ b/include/dt-bindings/clock/ast2600-clock.h
-@@ -122,6 +122,8 @@
- #define ASPEED_RESET_PCIE_DEV_OEN	20
- #define ASPEED_RESET_PCIE_RC_O		19
- #define ASPEED_RESET_PCIE_RC_OEN	18
-+#define ASPEED_RESET_MAC2		12
-+#define ASPEED_RESET_MAC1		11
- #define ASPEED_RESET_PCI_DP		5
- #define ASPEED_RESET_HACE		4
- #define ASPEED_RESET_AHB		1
+diff --git a/arch/arm/boot/dts/aspeed/aspeed-g6.dtsi b/arch/arm/boot/dts/aspeed/aspeed-g6.dtsi
+index 8ed715bd53aa..f9fe89665e49 100644
+--- a/arch/arm/boot/dts/aspeed/aspeed-g6.dtsi
++++ b/arch/arm/boot/dts/aspeed/aspeed-g6.dtsi
+@@ -236,6 +236,7 @@ mac0: ethernet@1e660000 {
+ 			reg = <0x1e660000 0x180>;
+ 			interrupts = <GIC_SPI 2 IRQ_TYPE_LEVEL_HIGH>;
+ 			clocks = <&syscon ASPEED_CLK_GATE_MAC1CLK>;
++			resets = <&syscon ASPEED_RESET_MAC1>;
+ 			status = "disabled";
+ 		};
+ 
+@@ -244,6 +245,7 @@ mac1: ethernet@1e680000 {
+ 			reg = <0x1e680000 0x180>;
+ 			interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>;
+ 			clocks = <&syscon ASPEED_CLK_GATE_MAC2CLK>;
++			resets = <&syscon ASPEED_RESET_MAC2>;
+ 			status = "disabled";
+ 		};
+ 
+@@ -252,6 +254,7 @@ mac2: ethernet@1e670000 {
+ 			reg = <0x1e670000 0x180>;
+ 			interrupts = <GIC_SPI 32 IRQ_TYPE_LEVEL_HIGH>;
+ 			clocks = <&syscon ASPEED_CLK_GATE_MAC3CLK>;
++			resets = <&syscon ASPEED_RESET_MAC3>;
+ 			status = "disabled";
+ 		};
+ 
+@@ -260,6 +263,7 @@ mac3: ethernet@1e690000 {
+ 			reg = <0x1e690000 0x180>;
+ 			interrupts = <GIC_SPI 33 IRQ_TYPE_LEVEL_HIGH>;
+ 			clocks = <&syscon ASPEED_CLK_GATE_MAC4CLK>;
++			resets = <&syscon ASPEED_RESET_MAC4>;
+ 			status = "disabled";
+ 		};
+ 
 -- 
 2.34.1
 
