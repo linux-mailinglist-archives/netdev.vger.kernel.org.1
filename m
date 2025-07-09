@@ -1,78 +1,119 @@
-Return-Path: <netdev+bounces-205550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50110AFF321
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 22:38:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00CFCAFF367
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 22:59:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4A165C0FBB
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 20:38:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE334189D2E7
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 20:59:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10F2F24676F;
-	Wed,  9 Jul 2025 20:37:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D010823AE62;
+	Wed,  9 Jul 2025 20:59:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="darP9BSv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sv7tv3T4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDCC92459F8;
-	Wed,  9 Jul 2025 20:37:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2041A3179
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 20:59:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752093467; cv=none; b=AiUmRTr08JzSvM5o8PRF0j11MB3iqUV3gtSXNuENSG2ipBEJqHIz0csL9VliUx3y2NndPizjAZt2Oi+hjcoVcjx+OeS69xQrJZpPpiwjCxAtyk2qoJZqdXPhjXxpgHRRNLrY5F1J5CiRMW3SPLT2NBSKnk5jtNwgMD0jVpujxcY=
+	t=1752094753; cv=none; b=CLScevxI7vKN31Ha7LfzcPrun0Eoegi84oYDrFbkH1kfL8VjTot/yR6xT1by4JCjnRkjf6pL7RYZ19t23SjL1sabBHws05QExF7yxpovte7/0HQNeBemQ2gXg6QxN2Fuy3ynj9egxY4iGry/pc5SCUUGJF/ELqZJ11LiJ32utls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752093467; c=relaxed/simple;
-	bh=FhBAQJsQxZeGPyRJGtl96KIDtVR+LyUU4HpDhMUyEM0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CyUu+5JfjhoxuACwWxPt+XOw4/p3vmFNKoD1QavJSKT9oJwfVYSKEXB3+e7WOIj0tuqnosCPqlZsLjk5nkQd5A1Zke3siJ6y90U+JqZgbHjGZ4RzWXVHCx84web1MRCnIr2CFSCOVPFQQhmtATJ8+bZyFe1Sdr+bHF9v3Qlh0Pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=darP9BSv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3099C4CEEF;
-	Wed,  9 Jul 2025 20:37:45 +0000 (UTC)
+	s=arc-20240116; t=1752094753; c=relaxed/simple;
+	bh=+16ufpkURu7uYjrIPcNtlF7ruHVM1/lL099Xu1ti9SI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m0S71/GHGef3fFal6scAt5QVvRMM5TOlB0C2swf0DE7e242Qqf2tYC1MgRR7PvTkyppZl55/UQcLAwS6Dz/+RBWjNES2ujEZqcTLcuwDSwy25r8i3Kp+Q52UtrgfTqvbXM/aajIgXAgzJa2RIBnl9jfbqBdvcMlEBgkILGVTZQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sv7tv3T4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3BEBC4CEEF;
+	Wed,  9 Jul 2025 20:59:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752093466;
-	bh=FhBAQJsQxZeGPyRJGtl96KIDtVR+LyUU4HpDhMUyEM0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=darP9BSvYoLyMOQeMBEYEvdbj5aZ1oSb+Rlhkc1Dan2c5QJXGYXvalbTzzRvqphD9
-	 Ufe+c2CyIIBLr8GA6TZeUYGEu82WsRhtEgys1eoIXvY8JpJSd+0v0C8e+NF3fDx4EM
-	 mxk/ybl/QWvj/l3ZfgQlGBbAZOU+rBXFthsbnEDep8d2WhgKiZN8r3z3StXSyg3K7g
-	 +UG3w+4D57tnb2g4DWAnRTtYTvkfu1MN2phFv/7iAFu9Ww1AtlEg9CWVCGXmv39vqu
-	 PlP9iEEiqPxpAgGYbft9eT6pIuYEuQiJxKceMyyaosxmyMcRKUwoAfiPjVyFaE9x+h
-	 FWoYYZyDvt+vw==
-Date: Wed, 9 Jul 2025 13:37:45 -0700
+	s=k20201202; t=1752094753;
+	bh=+16ufpkURu7uYjrIPcNtlF7ruHVM1/lL099Xu1ti9SI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=sv7tv3T4r2ohCfutnqZ/wPvLxHN3a6ZS+zjc57VO8f2qYJmKuB5Kf1wfaSyebzrFN
+	 nnEteGa9eSvjkJWziLhsgAvw0izOg4T5K2RkicbST7s8e25BOG5wVhpHNirO+rAZxL
+	 16N3KuJQjlAXoUyUsp5sP/T8xIw1nFJkMyJJ1H33hwRUILXHlVuOwkYUh88j36ggY8
+	 8iDnJLg6eX4mcU3qNqCiBVu2jqDktReKhHl7O81Z3VCWegFxC05QLQ7+dgQvDj8Rd5
+	 PPEWebx9yYeARFf/iD5eHa/NahwUnRNtUyUN3Vmr0ZP++0S7ObAZi0TGSCp9DTyTkL
+	 JfKB0zR16pXyQ==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mohsin Bashir <mohsin.bashr@gmail.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, shuah@kernel.org, horms@kernel.org,
- cratiu@nvidia.com, noren@nvidia.com, cjubran@nvidia.com, mbloch@nvidia.com,
- jdamato@fastly.com, gal@nvidia.com, sdf@fomichev.me, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 2/5] selftests: drv-net: Test XDP_PASS/DROP
- support
-Message-ID: <20250709133745.2a8ddfb8@kernel.org>
-In-Reply-To: <20250709173707.3177206-3-mohsin.bashr@gmail.com>
-References: <20250709173707.3177206-1-mohsin.bashr@gmail.com>
-	<20250709173707.3177206-3-mohsin.bashr@gmail.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	jacob.e.keller@intel.com,
+	lee@trager.us
+Subject: [PATCH net-next] eth: fbnic: fix ubsan complaints about OOB accesses
+Date: Wed,  9 Jul 2025 13:59:10 -0700
+Message-ID: <20250709205910.3107691-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed,  9 Jul 2025 10:37:04 -0700 Mohsin Bashir wrote:
-> +#include <xdp/xdp_helpers.h>
-> +#include <xdp/prog_dispatcher.h>
+UBSAN complains that we reach beyond the end of the log entry:
 
-Hm, you don't appear to use these headers and they require installing
-libxdp-devel (which is not universally packaged, sadly). Could you
-remove? Also these headers are reportedly unused:
+   UBSAN: array-index-out-of-bounds in drivers/net/ethernet/meta/fbnic/fbnic_fw_log.c:94:50
+   index 71 is out of range for type 'char [*]'
+   Call Trace:
+    <TASK>
+    ubsan_epilogue+0x5/0x2b
+    fbnic_fw_log_write+0x120/0x960
+    fbnic_fw_parse_logs+0x161/0x210
 
-#include <linux/tcp.h>
-#include <linux/bpf_common.h>
+We're just taking the address of the character after the array,
+so this really seems like something that should be legal.
+But whatever, easy enough to silence by doing direct pointer math.
+
+Fixes: c2b93d6beca8 ("eth: fbnic: Create ring buffer for firmware logs")
+Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: alexanderduyck@fb.com
+CC: jacob.e.keller@intel.com
+CC: lee@trager.us
+---
+ drivers/net/ethernet/meta/fbnic/fbnic_fw_log.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw_log.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw_log.c
+index 38749d47cee6..c1663f042245 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_fw_log.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw_log.c
+@@ -91,16 +91,16 @@ int fbnic_fw_log_write(struct fbnic_dev *fbd, u64 index, u32 timestamp,
+ 		entry = log->data_start;
+ 	} else {
+ 		head = list_first_entry(&log->entries, typeof(*head), list);
+-		entry = (struct fbnic_fw_log_entry *)&head->msg[head->len + 1];
+-		entry = PTR_ALIGN(entry, 8);
++		entry_end = head->msg + head->len + 1;
++		entry = PTR_ALIGN(entry_end, 8);
+ 	}
+ 
+-	entry_end = &entry->msg[msg_len + 1];
++	entry_end = entry->msg + msg_len + 1;
+ 
+ 	/* We've reached the end of the buffer, wrap around */
+ 	if (entry_end > log->data_end) {
+ 		entry = log->data_start;
+-		entry_end = &entry->msg[msg_len + 1];
++		entry_end = entry->msg + msg_len + 1;
+ 	}
+ 
+ 	/* Make room for entry by removing from tail. */
 -- 
-pw-bot: cr
+2.50.0
+
 
