@@ -1,57 +1,61 @@
-Return-Path: <netdev+bounces-205259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21912AFDE0E
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 05:23:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AEBDAFDE93
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 05:49:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 176EB1BC81C9
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 03:24:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A34CA584338
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 03:49:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3EB71F1313;
-	Wed,  9 Jul 2025 03:23:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 474601E5B6A;
+	Wed,  9 Jul 2025 03:49:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="MJ+rc8Mk"
+	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="c2WhWLj2"
 X-Original-To: netdev@vger.kernel.org
-Received: from lovable-gwydion.relay-egress.a.mail.umich.edu (relay-egress-host.us-east-2.a.mail.umich.edu [18.216.144.57])
+Received: from epicurean-pwyll.relay-egress.a.mail.umich.edu (relay-egress-host.us-east-2.a.mail.umich.edu [18.217.159.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E581DC988;
-	Wed,  9 Jul 2025 03:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.216.144.57
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF77AD517;
+	Wed,  9 Jul 2025 03:49:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.217.159.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752031418; cv=none; b=IKZ8lOueWxGNEU3ysCY8hn3pG3urWK+jqvBV9RIhuULA3lvwzbgubPOySyPIdsmq/1FrPMi6AYbJDBJQX71KzyZ5MAHtagVXwf6ebFYXRpFIE7QvQ3zsCKWVKAw3yUqGpf0Vlxu9oZibrURQyicjtpCEKVgkLCDC2EeUsW5wje8=
+	t=1752032946; cv=none; b=dSiCw6THFSyQp3IABuL7Cwr0v1rZegfJzi4qLA0sNcePBiLxKz8YkN+cMYGsX0KRnVAc9NNXIWZVC4t4+OvgmbAeMcNTk363fRFrWgkEP/J0NAJVscuh7rfN+wS0wn+BntszsWsGCKMlJ5maWokFLMktUrXr1Wp4RYTxdP6S46M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752031418; c=relaxed/simple;
-	bh=J79g9vzJT3nMxJqDIoa708wQy33SBgmf1m8Cws4Ftow=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=ixR4ezPjqLFjMVeCBoNx4HhXQ48tyUaxKMUWTTH/O9O+9OlguYLuyln6biBU1aav/AA8PQNzVOcVEk64J1T/Gm2eU9aDHrDaV+OYiA0p7dp1F8r/AsuL8NZYOhwzblWYrbYon0HaTNlfIoqh2aDlgmsAJnTDCpYMCbZAMMdr76o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=MJ+rc8Mk; arc=none smtp.client-ip=18.216.144.57
+	s=arc-20240116; t=1752032946; c=relaxed/simple;
+	bh=zjvjUcwS5qfI9jHWRzf+0fkXmbuLjmAbMYytraR6Tao=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=NhJZS7D6Anq9ooTwUr3B1njh/XUOEYgoG9N5sClGWlKjNDn0THsfA065UOyaXBG3vyryPdYY1OP0K0+TUM7OqQLAgkIYlgnQSGi7J3C6T7mkRQOYDm3Becp8jhOqXSh1HEqh0viS1Aw5vslbN1jbIPCh4jDgGdl9DwOtlqJNJe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=c2WhWLj2; arc=none smtp.client-ip=18.217.159.240
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
-Received: from debonair-kikimora.authn-relay.a.mail.umich.edu (ip-10-0-72-73.us-east-2.compute.internal [10.0.72.73])
-	by lovable-gwydion.relay-egress.a.mail.umich.edu with ESMTPS
-	id 686DE0B2.2864D6D3.2572D355.1083628;
-	Tue, 08 Jul 2025 23:23:30 -0400
+Received: from advisable-myrddin.jail.a.mail.umich.edu (ip-10-0-73-63.us-east-2.compute.internal [10.0.73.63])
+	by epicurean-pwyll.relay-egress.a.mail.umich.edu with ESMTPS
+	id 686DE6AD.359AA137.4E5FB9A4.222246;
+	Tue, 08 Jul 2025 23:49:01 -0400
+Received: from inspiring-wechuge.authn-relay.a.mail.umich.edu (ip-10-0-74-32.us-east-2.compute.internal [10.0.74.32])
+	by advisable-myrddin.jail.a.mail.umich.edu with ESMTPS
+	id 686DE47B.1ED842D5.6149EC18.933264;
+	Tue, 08 Jul 2025 23:39:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=umich.edu;
-	s=relay-1; t=1752031405;
-	bh=gRADj6VLSdadP6HhLwpFe0zFZFVzVf7XWMgj6Aw9DlE=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To;
-	b=MJ+rc8MkYnUEeecM6gzgQXV71IN2FrHafJW7K9hzIptIc7L/SmE/yQvQvQNU626X3
-	 sNyO3mcuR9vxiKd9qawWNoSOrU5FeyuEmvVfJtRfwAs2IE7t6CnbqyNFfEEIATXFCv
-	 OsIVChby1YgPACOOrclQp/S751GTT0MgiOLkiRCDUW1VeU/zUmniB7l1dfqkDK7FCv
-	 iSqtUmbPWcfQlKs0x5+EAF10pHHidJGapSSwNqUySx6rDdNdMgj1TrMNNkSoG6Ng37
-	 ORR435zHhFJJR71U8omE0lvRcl8i4DQaPA1/nt9zStuFppn0pfZXobztyjCjZLvZ3g
-	 zFsXXU5en8NFg==
-Authentication-Results: debonair-kikimora.authn-relay.a.mail.umich.edu; 
+	s=relay-1; t=1752032375;
+	bh=zjvjUcwS5qfI9jHWRzf+0fkXmbuLjmAbMYytraR6Tao=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=c2WhWLj2RRdNo3XYLXv5lxWvlmKbu/Bul0xOA1Tw6gXVdnZCqwEgoUPCMH5W86YMm
+	 ffM1Toa2+jAj+9FeLpxlKQlZvXt761mFqXIehtfh2rRY/UiNk4t16hiw1fJCCAJ3YO
+	 axsAaSDygz4JOXhtGagWeCgl8yJbecaMrwjNVPva3HAbvNA6wJcTSqVXHp6uOhTx1m
+	 accbNpYlhCvMkura/1cobgjggz44qOLJPIPEcrAR1GBTGqr92oLODzXAKf6inK8MJ0
+	 H9xzrATJuaOOEene4+oFC5TzJC3HxaiVqTsMHEwi7xPnwT3YbkEK8WjmNIlr3SXmgJ
+	 nSjjJvQeEwa8w==
+Authentication-Results: inspiring-wechuge.authn-relay.a.mail.umich.edu; 
 	iprev=pass policy.iprev=185.104.139.75 (ip-185-104-139-75.ptr.icomera.net);
 	auth=pass smtp.auth=tmgross
 Received: from localhost (ip-185-104-139-75.ptr.icomera.net [185.104.139.75])
-	by debonair-kikimora.authn-relay.a.mail.umich.edu with ESMTPSA
-	id 686DE0AA.29C8EFF2.5B22297C.2861961;
-	Tue, 08 Jul 2025 23:23:25 -0400
+	by inspiring-wechuge.authn-relay.a.mail.umich.edu with ESMTPSA
+	id 686DE474.2AFF1CF8.852C2E6.1056699;
+	Tue, 08 Jul 2025 23:39:35 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,8 +64,12 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Tue, 08 Jul 2025 23:23:20 -0400
-Message-Id: <DB77AQ53YOFK.VBSAP1H7FFB9@umich.edu>
+Date: Tue, 08 Jul 2025 23:39:30 -0400
+Message-Id: <DB77N3PDLA0W.26YMMAHG8LIVF@umich.edu>
+From: "Trevor Gross" <tmgross@umich.edu>
+To: "FUJITA Tomonori" <fujita.tomonori@gmail.com>, <alex.gaynor@gmail.com>,
+ <dakr@kernel.org>, <gregkh@linuxfoundation.org>, <ojeda@kernel.org>,
+ <rafael@kernel.org>, <robh@kernel.org>, <saravanak@google.com>
 Cc: <a.hindborg@kernel.org>, <aliceryhl@google.com>, <bhelgaas@google.com>,
  <bjorn3_gh@protonmail.com>, <boqun.feng@gmail.com>,
  <david.m.ertman@intel.com>, <devicetree@vger.kernel.org>,
@@ -69,59 +77,18 @@ Cc: <a.hindborg@kernel.org>, <aliceryhl@google.com>, <bhelgaas@google.com>,
  <leon@kernel.org>, <linux-kernel@vger.kernel.org>,
  <linux-pci@vger.kernel.org>, <lossin@kernel.org>, <netdev@vger.kernel.org>,
  <rust-for-linux@vger.kernel.org>
-Subject: Re: [PATCH v3 2/3] rust: net::phy represent DeviceId as transparent
- wrapper over mdio_device_id
-From: "Trevor Gross" <tmgross@umich.edu>
-To: "FUJITA Tomonori" <fujita.tomonori@gmail.com>, <alex.gaynor@gmail.com>,
- <dakr@kernel.org>, <gregkh@linuxfoundation.org>, <ojeda@kernel.org>,
- <rafael@kernel.org>, <robh@kernel.org>, <saravanak@google.com>
+Subject: Re: [PATCH v3 3/3] rust: net::phy Change module_phy_driver macro to
+ use module_device_table macro
 X-Mailer: aerc 0.20.1
 References: <20250704041003.734033-1-fujita.tomonori@gmail.com>
- <20250704041003.734033-3-fujita.tomonori@gmail.com>
-In-Reply-To: <20250704041003.734033-3-fujita.tomonori@gmail.com>
+ <20250704041003.734033-4-fujita.tomonori@gmail.com>
+In-Reply-To: <20250704041003.734033-4-fujita.tomonori@gmail.com>
 
 On Fri Jul 4, 2025 at 12:10 AM EDT, FUJITA Tomonori wrote:
-> Refactor the DeviceId struct to be a #[repr(transparent)] wrapper
-> around the C struct bindings::mdio_device_id.
+> Change module_phy_driver macro to build device tables which are
+> exported to userspace by using module_device_table macro.
 >
-> This refactoring is a preparation for enabling the PHY abstractions to
-> use device_id trait.
-
-Should this say "the `DeviceId` trait" (different case)?
-
 > Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> ---
->  rust/kernel/net/phy.rs | 53 +++++++++++++++++++++---------------------
->  1 file changed, 27 insertions(+), 26 deletions(-)
->
-> diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-> index 65ac4d59ad77..940972ffadae 100644
-> --- a/rust/kernel/net/phy.rs
-> +++ b/rust/kernel/net/phy.rs
-> [...]
-> @@ -734,18 +733,20 @@ pub const fn new_with_driver<T: Driver>() -> Self {
->          T::PHY_DEVICE_ID
->      }
-> =20
-> +    /// Get a `phy_id` as u32.
-> +    pub const fn id(&self) -> u32 {
-> +        self.0.phy_id
-> +    }
-
-For the docs maybe just:
-
-    /// Get the MDIO device's phy ID.
-
-Since `as u32` is slightly redundant (it's in the return type, and that
-is how it is stored anyway).
-
->      /// Get a `mask` as u32.
->      pub const fn mask_as_int(&self) -> u32 {
-> -        self.mask.as_int()
-> +        self.0.phy_id_mask
->      }
-
-One optional nit then:
 
 Reviewed-by: Trevor Gross <tmgross@umich.edu>
 
