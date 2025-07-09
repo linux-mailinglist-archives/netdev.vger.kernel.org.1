@@ -1,214 +1,261 @@
-Return-Path: <netdev+bounces-205569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CB25AFF506
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 00:54:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B2DCAFF509
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 00:56:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3DF11895BCE
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 22:54:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D390C1C40A26
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 22:56:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 461BB2367B8;
-	Wed,  9 Jul 2025 22:54:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CDBF238C1B;
+	Wed,  9 Jul 2025 22:56:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="rEpDgBWg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PY0a4vPm"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2071.outbound.protection.outlook.com [40.107.243.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6031821B8F8;
-	Wed,  9 Jul 2025 22:54:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.71
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752101671; cv=fail; b=C671r1tH7XKxhNCmSHhMX8b5m5YMqs+f98olDvtQID7B6YJcJgdU884gSxXbzRRHzjJowYYMelYjZIDgOdznssP8DiFwfIGOuCaKBMUFtagcLLCNvAYXP58BPy5TRBIA8pof6C8Sh3G+KD3lnWEx5G9Dw5Fp0qGSw7vd5k7w31M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752101671; c=relaxed/simple;
-	bh=+6xKEI9SKxAqSfyiAWtMDPcO2yjFNtemMFyAfenRcfM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=V3QlRtAcTpjxj4ryx/l9aZefIMt6WD+mu1wwfQrUvIi3wA/x+qy/wTf0SKyjb+m1QIdiSD15k51bp6ykdQbt+0fm/++la+JyKlrh01cyUEZycoUNiKm1tpiLYj7UmcUsHI2SdboyqGpgkxPeZQcd+ySZMZBCZfZVwgMNamnuEPw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=rEpDgBWg; arc=fail smtp.client-ip=40.107.243.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nokqHK/1XYYdNSVuWpfMTBBs5YkgfmxU264dB5E29fKU+WHilK07MyJtQ1otpgMR/JYUtkQIz44sWqI/1maMbCCVwjBV1gkZpxpHF4mz93l+c3vEzyN2aUgtGHwsIZezsqd05AOtvpVqymPG3/PuGw6jdk9/ge3lGUaqVFkHVALv/sI8fP6LF+S1ygbZbD6EZD5rGgk1bHPJnG1rtQ8+h0TeeJvC80G7pla7V/fV6X1mUF2En2h+CJtJtvQNF0U3vJULUsn3pgJ6LLG8UuIrJ1BWIWa8HkJAS3aEb6aHHnnWuFMrjxPxp0dbUYvsSGX/bTu9gw5cBHbWmvhqppQvyQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+6xKEI9SKxAqSfyiAWtMDPcO2yjFNtemMFyAfenRcfM=;
- b=oS78dOBagtuu3lRSCFkmuzzUJiQtPALngvCeK55jx/n2SSXLMYKrxzZKjhuRsmiLFoodi9I/MaemL56Z9zTOdl4Rf3BRoncBqmsbzzuVAZjzdprXKKwl6yd7Lim0yrzZvSA0t66j1c5NH/D4CXh3t5WNLkUcN0NJYmhMkTBpAHQmjMVGaCL6k22uQPwyZCkhAWbArwLO4kL4RBnZJdTzx3RYMVQrIVUytq+FVd9+CDKRcukNS7LWdg1xwbBM0COc6AKnYLP0BvTqn9MPIn4nd57NSDA7p899gxprF4BKjA3LI/O5EaH6RLfrV2QV9s1Ln/l6UOkJK2jpcP0odUonzg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+6xKEI9SKxAqSfyiAWtMDPcO2yjFNtemMFyAfenRcfM=;
- b=rEpDgBWgOfSQM6dUAZm/gueDgSCFF41i/yNsT3+Pe6f5e6hWx6a14JHZdRbrGBC4ZEvZCWnOfvfiLzvP1PFOXKGlCcTCFFaCPG3EBV+qxUTjorUIqDfmMTz8moLJLqi5SP7Fc58T1ubSYc9+dzV9phEM3V4rv9xNwz9RuZ6XOoyLQqZDiDmjWfHkwiJ+rfpxQMHFTwtYz6M4qsxcf1iNmlO7gmzKapN8NdX63FpSM3QGldu3TUMcVJgLpGURNx/V/fazVaXOlLFLW5BJuztjXpAp64IeZPmFZ6j9k6HdO3H6zkYn0XBlsmffCs+4grHbCUBzg9f4EO7IsQ84Pbdvlw==
-Received: from LV3PR11MB8742.namprd11.prod.outlook.com (2603:10b6:408:212::14)
- by BL3PR11MB6363.namprd11.prod.outlook.com (2603:10b6:208:3b6::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.27; Wed, 9 Jul
- 2025 22:54:24 +0000
-Received: from LV3PR11MB8742.namprd11.prod.outlook.com
- ([fe80::d5c5:fbb6:36fe:3fbb]) by LV3PR11MB8742.namprd11.prod.outlook.com
- ([fe80::d5c5:fbb6:36fe:3fbb%7]) with mapi id 15.20.8901.024; Wed, 9 Jul 2025
- 22:54:24 +0000
-From: <Tristram.Ha@microchip.com>
-To: <vadim.fedorenko@linux.dev>
-CC: <maxime.chevallier@bootlin.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<marex@denx.de>, <UNGLinuxDriver@microchip.com>,
-	<devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <Woojung.Huh@microchip.com>,
-	<andrew@lunn.ch>, <olteanv@gmail.com>, <robh@kernel.org>,
-	<krzk+dt@kernel.org>, <conor+dt@kernel.org>
-Subject: RE: [PATCH net-next v3 7/7] net: dsa: microchip: Disable PTP function
- of KSZ8463
-Thread-Topic: [PATCH net-next v3 7/7] net: dsa: microchip: Disable PTP
- function of KSZ8463
-Thread-Index: AQHb8GkNuhIQFaBZrUSJjTnvkDtJ/bQpy0CAgACbDpA=
-Date: Wed, 9 Jul 2025 22:54:24 +0000
-Message-ID:
- <LV3PR11MB87427E7BBE2FFC011FD4410DEC49A@LV3PR11MB8742.namprd11.prod.outlook.com>
-References: <20250709003234.50088-1-Tristram.Ha@microchip.com>
- <20250709003234.50088-8-Tristram.Ha@microchip.com>
- <96cdeb5c-dd55-4800-9046-09ebbb818e8b@linux.dev>
-In-Reply-To: <96cdeb5c-dd55-4800-9046-09ebbb818e8b@linux.dev>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV3PR11MB8742:EE_|BL3PR11MB6363:EE_
-x-ms-office365-filtering-correlation-id: 9f73459a-3cee-40ac-b62f-08ddbf3b8d0c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?ZFlLVGNNTEh1SFVDTk9ablo3NUg3NGVxT0lkWHdVMGhQSldLQ1N5NjR3NjZJ?=
- =?utf-8?B?TWp0eFNLbnZLSGhoTlJlZ1h2YTFGdUtMNDV0WjBMMVA1OFp0YlU1OWd0dWdQ?=
- =?utf-8?B?elA1TWRBWlR3UHlSTTlsNHJqeW51YmlpUkdYd3k5UGxjeFFndXo0d3FEdEtK?=
- =?utf-8?B?YWZ1TmhOUjJRdVRQYnlHUFFhanlEOGhNcW9zeVp6YkZaNUltdEJkWVlZZlZo?=
- =?utf-8?B?MHdwaXlCL2plZ2t3enk3MW9nUnlwYldyMkt4Z1NDeVRGZHlQU0QrOHpNeXo0?=
- =?utf-8?B?YWJjQzFYVGFHeHplREprWGZveDU3M096TldyK0RiODk3TDVoSklHZmVDdnIy?=
- =?utf-8?B?Z1FIWjAyL0gvU0pma0Q0U2twL0hZamFoc3MrS0owdVVvZXc5aXpYQjJHMnZU?=
- =?utf-8?B?cjRoUlpmMzV6cHB3dlN1Sms2ZDVFQWxEYWg2QmFQTXBpTDFMZTNCK2RkalRX?=
- =?utf-8?B?YkUwMExVUXVYMmhQSDkzWDRiNHEyMDBqRUo0SnNWTmFzZ0VzcUVVeG5IUE9D?=
- =?utf-8?B?andZWTlzd3ViT0lVUFlpTGpGMDVEdk9lWHh5U2JYQlJVb3Z2SnYrNzExKzBa?=
- =?utf-8?B?Nkw0Qnc3b252Rk5VbFA4Ym13R1IvWHU1cE5haDR6Y0lPc3pXL2VKTytidFpt?=
- =?utf-8?B?aVlkTitJdzdUdXVmMzNRTVhUV2lGNnF4aWVaaHkxUlJtT2hpbFBDNjJSdTJz?=
- =?utf-8?B?aFo4NlMxdjJHZzJaTEdvT2FwK2ZXL0ZkbllFK2xldkl6QnI5ckF0L0pjdlVm?=
- =?utf-8?B?S0JrdE5jU3FJUEZIRjEvUE91cmJ1dFNHemNJdG02THBhNktWTUd6SFg2Ymt3?=
- =?utf-8?B?K3I5NlJSK1o1emUyQnRZT3g5S0U2dkR6QnU1S3YvVGp0V1JDeVQ4MSttSTIz?=
- =?utf-8?B?ZWR6TWhXdWd6cFhVL3VCMXA4cVpGODRqMHdpaVJjbkk5SzR6MWZRaEFFR1hC?=
- =?utf-8?B?TkZ1dVROQ0N5SENtRHNCbWNGQ2xMVGFBcjJROEZ2WVJEeER2U3ZzR01DQ3lU?=
- =?utf-8?B?TmUzd0gzQ2NmeVJEZHVPR1MwaTFkRm5WSThod1dDdDJaNXl3bUtLRDJIWmhD?=
- =?utf-8?B?OTQzdTNmK2ZPWWd6ZXNaNEN3UXBiS2t6OHROazUxZHZRMHBDaWw3NWwxUmp4?=
- =?utf-8?B?a2hjeFQvZ2E2WVJoOEl3T0VTdmQxUUtrWVAzbk1jT2p0ZzdvcElIaU8ydmtN?=
- =?utf-8?B?enlPQit5dFZNQkFWbWxCanRtbWowMEdsRkFxZFUvemtaTG1OeXlyMEFzL2Jt?=
- =?utf-8?B?OVphVUE4TjBqNFphSEtJRTg0MmtTVWVGUlE0UFdFM3pYOGcyUXdSckV2czAz?=
- =?utf-8?B?VEhTZkRIZmdQMkhqbW93RXk3SEpuWS9vb2ZGa3hQbm5BTjVxekhvVjhvNXdy?=
- =?utf-8?B?MCtMak9la2t6TnhYS2RtblV4NTRYejZLanRSRlIxVnNVN2lROWlyb3QxeGQ5?=
- =?utf-8?B?elovRXJjNDEvazRIblprcU02Vkg3TUt3bmxwSXl3SEYwMnV1SllPSmluUEYv?=
- =?utf-8?B?aGJpc2tLNjVJTEs5QVl5Mm4yL3g2MTBIeTRBRS9ReFVHOFpCTUk5Q2MxbmFZ?=
- =?utf-8?B?UEhFUG9qZTJDNHZyWU9aWEJjcTY2cVJhR1hKNDB5R3FMNDRVT3d5QUxrTmZK?=
- =?utf-8?B?ZnFvRVJDeTMzTXhJVFBUZTFqT3NjSk0yZ3RFUlpjMDhrd3MxRFZ3elpCb3Fn?=
- =?utf-8?B?d2hxZllnRVRSRFVyUTY4YVhGMmlPbWhQNnhHRjdwa2cydXJRZlFNRlJnSllH?=
- =?utf-8?B?dVF2MlFjVGRWYkRUZzg3YUEzdVU1Z21GRW51dVdZRnVBRC9uSnc3UDk3UmdT?=
- =?utf-8?B?Tk5IL2ZuQUJVRkVYK1JUMURUVzR6UUNoQTR5Y2RhaENGakZERjdSK2JVcFRo?=
- =?utf-8?B?SSt5SFBOTTJVeERLTGRndDZRcHhZcHdMSW14a3hrbFpWQ2pDZGYrTUw0cE1I?=
- =?utf-8?B?amJvQnBzYmVPL2FOMXRUaEFzVlEwd3FJQU5YREdueG9CZlBSV0wveUo1dE9h?=
- =?utf-8?B?QW1RWnZVWFJ3PT0=?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR11MB8742.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?OEYwQTRtMWFVNlROdTRpN2xPbDdRTHhiZEhLWFdJWE5zeWxwUy83VDFzdTIz?=
- =?utf-8?B?cXRrYkNHb1kwS01rZUJMMWduU0VFY1VVdktOQWVlSmNIRmM4cElZUHdiWXA5?=
- =?utf-8?B?Syt1OVYxNDNOeE80cm9uelNIYUdLTnplMXFJc3lvUHAzTk9pWUJFMWRia2RI?=
- =?utf-8?B?Uy80MklRRHh2N1RLZXhtcy9uZTF2aXJ6TlVOaGYra0dSMG51elBRUFNHMUtH?=
- =?utf-8?B?UE40eFZPSzR6QnYycnZwemc3ZFlueVVWazZvUFU1RmhZS0xQcnJjTENhYjBX?=
- =?utf-8?B?RVdjeWJ3Sm5lUEZ0Q0dEMFFhU2wyWit1Y2FPaHc4VUVKWWJtVUkrNmJXRUJ3?=
- =?utf-8?B?U1lzUlluV0QyR0VTZmZ5VVBnT0xIb2owNEpaS1EzS3ZTM3RnSm4xZDZnc1hX?=
- =?utf-8?B?cjJITE5USVZKcTM2Ty9GYTZUaDZzM1BDcVRoSERqNEtHUXhjUU5UOWRrZm9h?=
- =?utf-8?B?MStyenR0emdUWXQ4ck5zK1FSSmxBRmNFK3dGMktERFpweUpQQ01TVG9rSmh3?=
- =?utf-8?B?engvY041RnJCTXdXczRRUFFIdEErMmQwL2tBdUpvR3NvMXBSOEtZU0srZWJH?=
- =?utf-8?B?VkNpUGMvOGlqSXh1YXhreFN0MXpxWmZBbU5Wbjh5bDI1LzBaQkNOczRidnBJ?=
- =?utf-8?B?MlJTQ043TmxnRnVuLy9BYXd3cERGWFBhK3ZzUGl2akVRUVFVQ2pRQzlxa1RS?=
- =?utf-8?B?TXN3M0czREh6OExqQ2pTakg2UnNEbU5VanAwTzhJM2NyaFdaaUMwR1R2NlJD?=
- =?utf-8?B?UkJQeUs2RWlBcmpWdmFHYytGckJsTy81R2t2cFpWelBZc3ozbUlEbFVCL3Zk?=
- =?utf-8?B?djZqdVFpMTBOd2RtUE4ya1ZrUEZHMTJ0SS9QUi82U1ZNaFpCNnV4Q0djRnlx?=
- =?utf-8?B?R0lLM3hIWEY2d0o3a2lMMXZqRVFUbEZCNGhPSWJYNlk0ZVJSRCsvV3N2ekFD?=
- =?utf-8?B?bXdMclJ6ank5R1FoODVJR0ZFaDQxeWt1Vm85YlErQmhVc2ZKSU5rN0ExWWMw?=
- =?utf-8?B?N0JaWEYvazdnUGlHV1BGNTBXem1hcmg0RnpUTUJ2K3hsZldBV3U0M0YyOUxi?=
- =?utf-8?B?VWQwbXJzZzlHemptQVI3NENoTVB3TlZQbGZLREMwZmRmelJWSkNRSUZmU2Fz?=
- =?utf-8?B?VW1Jak54a0IyV2cyeVJXa2NISVdRamEybnNmUElOaENRS2hlMXprRXdHNTJO?=
- =?utf-8?B?cktOWDU5YUcwSW1jcmZwa3lER3Y0UzRLMkdwNUxaWnlkV3ZEMjNqK1YxUElv?=
- =?utf-8?B?dUw5d0RRUXlXam9jZTIwM1ViWFFuMVloOERoSDNWRksvNGgvV2w4ZnhIdkJB?=
- =?utf-8?B?d2w0dUlqVVZiQWp0L0l1NWdKNExDT0w1VFNKWDJnTkRmbnFvNWowdmgzTm00?=
- =?utf-8?B?SUFRcU1ablQ3QXFRd0gydGF0QmZ3dkNrT09nSGFhMGNMZHRFU2xUZzBDWnMw?=
- =?utf-8?B?WEFPQjUrVk91NlpETFNIWjFqbHVoV1pXOG5qK2g2RXhOQlB4MDNSR0ZNNEN6?=
- =?utf-8?B?U21MaWZRWFQ3OC90V3QzUDRCMnBFdnpOd1BQVnhhTkV4VUJheFpnaUVzeXdE?=
- =?utf-8?B?M0w3cWJ2L0c0V2pCaFlJdklMME1hZnFGUjJzdDlQOVBOTzNxaGswRkQwd1pY?=
- =?utf-8?B?VC9SZ283WmEyOFNiMmx6SUVyT2pGeVBrNjhvZWdUSGJUTWNVMUNyQ1g3Nm1Z?=
- =?utf-8?B?WnVJcWZWaUdyOXc0NnVZeW1Ea0dFOENhQXR1eXFSK0NhejNML2lreXRKSWVj?=
- =?utf-8?B?WW1INTRSRDR1ZXlZV3dlL3lUMElsRlNRTWRFL1pPekkwYnUzYUNDa1NjQmh2?=
- =?utf-8?B?WTREV2FZZ0lWbi94YVhYV2h6Q0VNSDlmeUIxU3JONlRwME00VlZIVEhaUnEv?=
- =?utf-8?B?R3c2VmNuZEJhNTI4QU1oWlJyV3p5UWVseUNIdmJuN3h0a1lkbGZmYmcvaEFM?=
- =?utf-8?B?SUdBRTFIMTlhTldRclhNem54bVcyZGVtMWlmdm9lWXErZkM3RlluaGwzTWRY?=
- =?utf-8?B?SWtzZnN2MG5VYWFPaFg5WjFSakNhSks3cFlCeUpVaFY1ZFNKdFhha0puQ2ZM?=
- =?utf-8?B?STYwZmwrNzBMcXEwbzJONGhMZmorNERaVTFkb0wxbVZrdUFqVEs5by9TY21E?=
- =?utf-8?Q?3wUPh/SCOncYp9f06qL//bZmf?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64071FF1C4
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 22:56:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752101792; cv=none; b=PR76l829fVbp01ik3enVippmoSuHuetrwX6GpWG8fUOkgIstlzZGrjgq+0Yl3aHo+fFaLEjPqf8bgb8m1SdL3iMOEUzX7x0a5Qs4aWR3WqWEtCgnJjXk2BdeHZMFBd+hZTN07XyuiUivCHhS0ygnUFJufWOEWF1mKJQJu3b1t5Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752101792; c=relaxed/simple;
+	bh=n9O063liQXJSgV2rV5XFUPRQVKrP0E98SbyoZ9cMOK0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V6eT3KwpZf/ODlbLQUO+QHFGeAjRncOIRuHJbdWyrVAzS7+Sa2s03AbpcLwhhPZ/gC61EGQUcfafXhmjDws8rQQNOwl1wq0yOz2c3u/OjwQZmjZUZUQFRd+dUDu57uZt60boYZb6NbotNXfo9gXr7jBHO2YCCgHh8zJPmOkNGqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PY0a4vPm; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2357c61cda7so31895ad.1
+        for <netdev@vger.kernel.org>; Wed, 09 Jul 2025 15:56:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752101790; x=1752706590; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=psTNSOzBn8OXtmmYI+qHnBQfX9pvC9szIAAFuognR9c=;
+        b=PY0a4vPmHEXvh7gHoasn45CxLns63iH9QshE/XJXTROkT2cwy105Q5vZL9sUT+rt/S
+         /erM7tPvmxdiUTPslWNcK3tIOhjWsYYzy0gumCna+TVVT3oidUTt3weWfJts7igljro1
+         yl4dlqLhjNE8laOhCD4Q/h9APd8dEyA9XWstGmdKsWozXtQDBHCS+kpnzU9S03F3JgPL
+         96v+oeowxtgCKtcTZYuNEe8IYD3Nka7Bsdwf1ZW3S4wS5j9XvFCH63z/EkACOsi7mOlW
+         MZbY6oWo/byr+lJ61L1crlSe0wPi41awdqvE6nlrm35YO9ESw2UDt2sC+uKExMWZIYKt
+         y7ZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752101790; x=1752706590;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=psTNSOzBn8OXtmmYI+qHnBQfX9pvC9szIAAFuognR9c=;
+        b=brou47NXj7cjpVZycXihQNlDZcWz9V8kNN9eWHu2fQMdl1oD2fC9cWP95yO/0vF2lR
+         ATrIQ+BVpAvkksd50bcjp4uU3BWzW8mQK3cKyS/V233LUsmv7s+7m/Wdjy7cJnIHZmJs
+         IgPgv/isVxaiadAEuOWGqSlcONQChTzCaWzv6kMv8RbDpei+yqh9WzLNB/T+9xkGESzw
+         CTq6dfjwpnOtvzC12Yyper8NoSkqrg1jcJwX/9iKs+ibyptRlelIJWTJ0BByQL12rJJ/
+         ijVwgV2QDOs1RaoOrLsIga+wJvXUlXI/P15K/PbI3DZkhgkgUE5x7c9Vcte6FuitYn2f
+         BagQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXXAyPHNFBGlsxhO+xyyJaGdUdMaCHHsLIVYo2R9BmCuSGLPohSFCaxh0nALmMvF/lSUadYFf4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYHZ/WHyPrvg8Ys5ZdpMC7AoAnRZ5Eamviv/ZtafJSJNENy437
+	7lh7Gxax2hrfwSWEH6mkgk0NXGH+4Dr74CH89e78NLJReZx34AwQ7iMjvpDxyR8F6j82j6xQBBd
+	4AXE8rM7YJUur9P5S04/MBXCcBM55mMRltq+6p91J
+X-Gm-Gg: ASbGncvEzy/1ceXEwk+xpVnrGcOD0VNBIAdXCAWqKDk9u7W5Mq00gSr1qjzIvGaan2Z
+	W1+CFE6/4DxKVCeyazaEj0sx7+bLX1gsf7dAGHL3C3GHM1UWbF0zSBZdtAwEcOfI+q6ymTPfAhn
+	eoMpwofeuWs+174fCNteGEmTSuPmguAVrT73Lkp0S8c3R9MNPUPy1ipGLG3Cc3Z4f0KKyM215aj
+	AsB7qYP6pM=
+X-Google-Smtp-Source: AGHT+IGtnLZ7OWHggJ8+2pbK2Dk9UkhgmWPzA/1oDMJkDWju6K2XZ1R85Sq8cs803uGk0p6vBbGfH8ZG8DM1tLDCaZ8=
+X-Received: by 2002:a17:903:3b8e:b0:234:c37:85a with SMTP id
+ d9443c01a7336-23de38106e0mr1297665ad.24.1752101789722; Wed, 09 Jul 2025
+ 15:56:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR11MB8742.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f73459a-3cee-40ac-b62f-08ddbf3b8d0c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2025 22:54:24.6443
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +VMGXHPu+KmiaQ2a16K7kYi3HlSTGANjIOedKUNEawUL8wnka2I7CuSDOeUFQRcEuqMzJ1zAxl5WTkO6z05uNkipeDrdG3N6ZRqO4hPlkpg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6363
+References: <20250709124059.516095-2-dtatulea@nvidia.com> <CAHS8izNHXvtXF+Xftocvi+1E2hZ0v9FiTWBxaY7NWhemhPy-hQ@mail.gmail.com>
+ <bm4uszrqfszm5sgigrtmo2piowoaxzsprwxuezfze4lgbt22ki@rn2w2sncivv3>
+In-Reply-To: <bm4uszrqfszm5sgigrtmo2piowoaxzsprwxuezfze4lgbt22ki@rn2w2sncivv3>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 9 Jul 2025 15:56:16 -0700
+X-Gm-Features: Ac12FXwgXd9rszuQDYsn2GNHGMXg5QVxNUDYVkWuGeps_H3DDEY13GPvqZBPpZI
+Message-ID: <CAHS8izP18q7s8=fGCjknrEu3uJE5xnQCKceB8u1VvTV5GxTTTg@mail.gmail.com>
+Subject: Re: [PATCH net] net: Allow non parent devices to be used for ZC DMA
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: asml.silence@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Simona Vetter <simona.vetter@ffwll.ch>, 
+	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>, cratiu@nvidia.com, 
+	parav@nvidia.com, Tariq Toukan <tariqt@nvidia.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, io-uring@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-PiBPbiAwOS8wNy8yMDI1IDAxOjMyLCBUcmlzdHJhbS5IYUBtaWNyb2NoaXAuY29tIHdyb3RlOg0K
-PiA+IEZyb206IFRyaXN0cmFtIEhhIDx0cmlzdHJhbS5oYUBtaWNyb2NoaXAuY29tPg0KPiA+DQo+
-ID4gVGhlIFBUUCBmdW5jdGlvbiBvZiBLU1o4NDYzIGlzIG9uIGJ5IGRlZmF1bHQuICBIb3dldmVy
-LCBpdHMgcHJvcHJpZXRhcnkNCj4gPiB3YXkgb2Ygc3RvcmluZyB0aW1lc3RhbXAgZGlyZWN0bHkg
-aW4gYSByZXNlcnZlZCBmaWVsZCBpbnNpZGUgdGhlIFBUUA0KPiA+IG1lc3NhZ2UgaGVhZGVyIGlz
-IG5vdCBzdWl0YWJsZSBmb3IgdXNlIHdpdGggdGhlIGN1cnJlbnQgTGludXggUFRQIHN0YWNrDQo+
-ID4gaW1wbGVtZW50YXRpb24uICBJdCBpcyBuZWNlc3NhcnkgdG8gZGlzYWJsZSB0aGUgUFRQIGZ1
-bmN0aW9uIHRvIG5vdA0KPiA+IGludGVyZmVyZSB0aGUgbm9ybWFsIG9wZXJhdGlvbiBvZiB0aGUg
-TUFDLg0KPiANCj4gQ291bGQgeW91IHBsZWFzZSBleHBsYWluIHRoZSAicHJvcHJpZXRhcnkgd2F5
-IG9mIHN0b3JpbmcgdGltZXN0YW1wcyI/DQo+IE1heWJlIHlvdSBjYW4gcHJvdmlkZSBzb21lIGV4
-YW1wbGVzIG9mIGhlYWRlcnMgd2l0aCB0aW1lc3RhbXBzPw0KDQpUaGUgUFRQIGVuZ2luZSB1c2Vk
-IGluIEtTWjg0NjMgaXMgZmlyc3QgZ2VuZXJhdGlvbiwgc28gaXQgY29udGFpbnMgc29tZQ0KcXVp
-cmtzIGFuZCBjYW5ub3QgYmUgZWFzaWx5IHVzZWQgaW4gdGhlIGN1cnJlbnQgUFRQIHN0YWNrIGlt
-cGxlbWVudGF0aW9uLg0KVGhlIHJlY2VpdmUgdGltZXN0YW1wIGFuZCByZWNlaXZlIHBvcnQgaW5m
-b3JtYXRpb24gaXMgcHV0IGluIHRoZSAyDQpyZXNlcnZlZCBmaWVsZHMgb2YgdGhlIFBUUCBtZXNz
-YWdlIGhlYWRlci4gIEFzIHRob3NlIHJlc2VydmVkIGZpZWxkcyBhcmUNCm5vdCB1c2VkIHlldCBp
-biB2MiBpdCBkb2VzIG5vdCBwb3NlIGFuIGltbWVkaWF0ZSBwcm9ibGVtLiAgU29mdHdhcmUgY2Fu
-DQppZ25vcmUgdGhlbS4gIEEgcmVhbCBwcm9ibGVtIGlzIHRoZSBoYXJkd2FyZSB3aWxsIHVwZGF0
-ZSB0aGUgU3luYw0KdHJhbnNtaXQgdGltZXN0YW1wIHdoZW4gdGhlIG1lc3NhZ2UgaXMgc2VudCBv
-dXQgYW5kIHRoYXQgd2lsbCBkZWZpbml0ZWx5DQpjYXVzZSBpc3N1ZSBpZiB0aGUgTUFDIGlzIHVz
-aW5nIGl0cyBvd24gUFRQIGZ1bmN0aW9uLg0KDQpUaGUgc3dpdGNoIGFsc28gd2lsbCBmaWx0ZXIg
-c29tZSBQVFAgbWVzc2FnZXMgZnJvbSByZWFjaGluZyB0aGUgTUFDDQpiZWNhdXNlIGl0IHRoaW5r
-cyBzb2Z0d2FyZSB3YW50cyBpdCB0aGF0IHdheS4NCg0KVGhlIHJlY2VpdmUgdGltZXN0YW1wIGFu
-ZCByZWNlaXZlIHBvcnQgaW5mb3JtYXRpb24gaXMgcHV0IGluIHRoZSB0YWlsIHRhZw0KZm9yIHRo
-ZSBzZWNvbmQgZ2VuZXJhdGlvbiBQVFAgZW5naW5lIHVzZWQgaW4gS1NaOTQ3NyBhbmQgTEFOOTM3
-WC4NCg0KSXQgaXMgbm90IGxpa2VseSB0aGUgRFNBIFBUUCBkcml2ZXIgd2lsbCBiZSB1cGRhdGVk
-IHRvIHN1cHBvcnQgS1NaODQ2My4NCg0K
+On Wed, Jul 9, 2025 at 12:54=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
+> wrote:
+>
+> On Wed, Jul 09, 2025 at 12:29:22PM -0700, Mina Almasry wrote:
+> > On Wed, Jul 9, 2025 at 5:46=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.=
+com> wrote:
+> > >
+> > > For zerocopy (io_uring, devmem), there is an assumption that the
+> > > parent device can do DMA. However that is not always the case:
+> > > ScalableFunction devices have the DMA device in the grandparent.
+> > >
+> > > This patch adds a helper for getting the DMA device for a netdev from
+> > > its parent or grandparent if necessary. The NULL case is handled in t=
+he
+> > > callers.
+> > >
+> > > devmem and io_uring are updated accordingly to use this helper instea=
+d
+> > > of directly using the parent.
+> > >
+> > > Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> > > Fixes: 170aafe35cb9 ("netdev: support binding dma-buf to netdevice")
+> >
+> > nit: This doesn't seem like a fix? The current code supports all
+> > devices that are not SF well enough, right? And in the case of SF
+> > devices, I expect net_devmem_bind_dmabuf() to fail gracefully as the
+> > dma mapping of a device that doesn't support it, I think, would fail
+> > gracefully. So to me this seems like an improvement rather than a bug
+> > fix.
+> >
+> dma_buf_map_attachment_unlocked() will return a sg_table with 0 nents.
+> That is graceful. However this will result in page_pools that will
+> always be returning errors further down the line which is very confusing
+> regarding the motives that caused it.
+>
+> I am also fine to not make it a fix btw. Especially since the mlx5
+> devmem code was just accepted.
+>
+
+If you submit another version I'd rather it be a non-fix, especially
+since applying the io_uring hunk will be challenging when backporting
+this patch, but I assume hunk can be dropped while backporting, so I'm
+fine either way.
+
+> > > Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+> > > ---
+> > > Changes in v1:
+> > > - Upgraded from RFC status.
+> > > - Dropped driver specific bits for generic solution.
+> > > - Implemented single patch as a fix as requested in RFC.
+> > > - Handling of multi-PF netdevs will be handled in a subsequent patch
+> > >   series.
+> > >
+> > > RFC: https://lore.kernel.org/all/20250702172433.1738947-2-dtatulea@nv=
+idia.com/
+> > > ---
+> > >  include/linux/netdevice.h | 14 ++++++++++++++
+> > >  io_uring/zcrx.c           |  2 +-
+> > >  net/core/devmem.c         | 10 +++++++++-
+> > >  3 files changed, 24 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > > index 5847c20994d3..1cbde7193c4d 100644
+> > > --- a/include/linux/netdevice.h
+> > > +++ b/include/linux/netdevice.h
+> > > @@ -5560,4 +5560,18 @@ extern struct net_device *blackhole_netdev;
+> > >                 atomic_long_add((VAL), &(DEV)->stats.__##FIELD)
+> > >  #define DEV_STATS_READ(DEV, FIELD) atomic_long_read(&(DEV)->stats.__=
+##FIELD)
+> > >
+> > > +static inline struct device *netdev_get_dma_dev(const struct net_dev=
+ice *dev)
+> > > +{
+> > > +       struct device *dma_dev =3D dev->dev.parent;
+> > > +
+> > > +       if (!dma_dev)
+> > > +               return NULL;
+> > > +
+> > > +       /* Some devices (e.g. SFs) have the dma device as a grandpare=
+nt. */
+> > > +       if (!dma_dev->dma_mask)
+> >
+> > I was able to confirm that !dev->dma_mask means "this device doesn't
+> > support dma". Multiple existing places in the code seem to use this
+> > check.
+> >
+> Ack. That was my understanding as well.
+>
+> > > +               dma_dev =3D dma_dev->parent;
+> > > +
+> > > +       return (dma_dev && dma_dev->dma_mask) ? dma_dev : NULL;
+> >
+> > This may be a noob question, but are we sure that !dma_dev->dma_mask
+> > && dma_dev->parent->dma_mask !=3D NULL means that the parent is the
+> > dma-device that we should use? I understand SF devices work that way
+> > but it's not immediately obvious to me that this is generically true.
+> >
+> This is what I gathered from Parav's answer.
+>
+> > For example pavel came up with the case where for veth,
+> > netdev->dev.parent =3D=3D NULL , I wonder if there are weird devices in
+> > the wild where netdev->dev.parent->dma_mask =3D=3D NULL but that doesn'=
+t
+> > necessarily mean that the grandparent is the dma-device that we should
+> > use.
+> >
+> Yep.
+>
+> > I guess to keep my long question short: what makes you think this is
+> > generically safe to do? Or is it not, but we think most devices behave
+> > this way and we're going to handle more edge cases in follow up
+> > patches?
+> >
+> It is just what we know so far about SFs. See end of mail.
+>
+
+I see. OK, even though this is 'just what we know so far', I'm still
+in favor of this simple approach, but I would say it would be good to
+communicate in the comments that this is a best-effort dma-device
+finding and doesn't handle every case under the sun. Something like
+(untested):
+
+static inline struct device *netdev_get_dma_dev(const struct net_device *de=
+v)
+{
+       struct device *parent =3D dev->dev.parent;
+
+       if (!parent)
+               return NULL;
+
+       /* For most netdevs, the parent supports dma and is the correct
+        * dma-device
+        */
+       if (parent->dma_mask)
+               return parent;
+
+       /* For SF devices, the parent doesn't support dma, but the grandpare=
+nt
+        * does, and is the correct dma-device to use (link to docs that exp=
+lain
+        * this if any).
+        */
+       if (parent->parent && parent->parent->dma_mask)
+               return parent->parent;
+
+       /* If neither the parent nor grandparent support dma, then we're not
+        * sure what dma-device to use. Error out. Special handling for new
+        * netdevs may need to be added in the future.
+        */
+       return NULL;
+}
+
+With some comments explaining the logic a bit, you can add:
+
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+
+And let's see if Jakub likes this. If not, we can always do the future
+proof approach with the queue API giving the driver the ability to
+tell us what exactly is the dma-device to use (or whatever approach he
+prefers).
+
+--=20
+Thanks,
+Mina
 
