@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-205284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE4A5AFE0D1
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 09:05:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99151AFE0D7
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 09:06:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AA721AA2C68
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 07:05:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE82E7B01AB
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 07:05:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD26270EAB;
-	Wed,  9 Jul 2025 07:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69D1026E152;
+	Wed,  9 Jul 2025 07:06:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SqRwgVJi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bYSjW75U"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3BB27055A;
-	Wed,  9 Jul 2025 07:05:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A1721ABAC;
+	Wed,  9 Jul 2025 07:06:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752044704; cv=none; b=MHOxQ8WBzSucyivazBJ5+x3JL7Bo997gChyZ0ygZSbmufsBCd+9S6L1/xGylqfqRZZGOGxImFiQU2xYXAJSZBsyw/9Zc1yhjIBFu6mt6T9hlQA3MlYEXl9hIRAX/3WyU0qQ91wIiA2DUm9FKtoMD+tE5HKtUXwgLxGxvNoHAveU=
+	t=1752044790; cv=none; b=rQcXzF6urYd6bJKGfoPVz8Q8Rcgsp+ZLr8k1uGrcp5GE73E4QJ2MbJZggBbfbIeCmPpRkyrN+OeCNYD17HOPjyAVGR0eTeCY/X9bcIKiD3/qyjLQ+ljHG9FY7vnAsjvu97tdVZgD/qrLYb9AHciGqq+uQ0dIfIMgEsNQ+DkBo0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752044704; c=relaxed/simple;
-	bh=sBMDGnv3Py+rrKCjUei3p5nhxQILF6SynaL6wTFYP4Q=;
+	s=arc-20240116; t=1752044790; c=relaxed/simple;
+	bh=SBeultYsT9Kbc64yCGR/6hiyTPzJ8lgRnQ2ziEfS74k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AA+ONmwqZwpiov9QpkJ0aqqtBhJ+zRQ4gzWcbHaWK+CS+BlTjvYK9uHBIhCjXtfOBZ0o9ZIrBgEjTuhEMXq4zMgxIHXM/ZQPjuEdErj9C14x70KV7SiFXc1mXOm8kqevsYyS/U9zEAkHfzcJU456vxe5dlnOitsqxJPWk0luHXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SqRwgVJi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59122C4CEF7;
-	Wed,  9 Jul 2025 07:05:00 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=ia7AlkSGnJoAsqGS0V/S1oMxsn2JG69nS8TgQ9KCUac9qShwcTfszK4kGG0RRso6wfDMXDnxtJKMxYwHVdFCX/lhimsyFpmkEZ4EtsebOoDvuudLU86K6Dh4VZOugezI2DTrItlKw/6wUUNlgVwyJJx9UFinL1qmoLyLgd7tXFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bYSjW75U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B413BC4CEF0;
+	Wed,  9 Jul 2025 07:06:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752044703;
-	bh=sBMDGnv3Py+rrKCjUei3p5nhxQILF6SynaL6wTFYP4Q=;
+	s=k20201202; t=1752044789;
+	bh=SBeultYsT9Kbc64yCGR/6hiyTPzJ8lgRnQ2ziEfS74k=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SqRwgVJiN4Ob83WHNKfgOe+bN9d1qa0i3+78kgLepnEDxjH1HHeIqjPSiVPtC3IN5
-	 t2DpqVX6RcWvL/dlt1sunuzK1LdyuFKqVgP99hijNf5bfkDTMDoUIy8VOGzHv5zyZO
-	 eOwAW456jjbv6JAyM/t+UfQr0hbS7Xp9RdU6+IHVkV8XV9CzmMgvvYVbg8hAMvrk13
-	 gDaxJus+SdGGZkV9MQNkKGl/MliWdLbZ4MqqxzwJbEMd1VCDrNghXtzM5sKRW8vws7
-	 urGsTqLB4yHW8q0pDE9C5Ka7nEkMCQyPAbL+rjgzLqxMsz0hyNgyxTgYd/Le2aOPvK
-	 Kq7VlzNpUGYCA==
-Message-ID: <64b43c77-68b9-4fd6-aa6e-b058689c8b83@kernel.org>
-Date: Wed, 9 Jul 2025 09:04:57 +0200
+	b=bYSjW75UOwakqAmSqDR1eZ5i3/L5BLb979LAn2AbCxz3/CaGmLWoStZegJEuON7/Z
+	 F4DnHy8Wn8ole6wpXjzRdbTNmi/A/4KD1h0ap4IwWIuFhvQRfgdRKtJm/8ZJMaWWyp
+	 UJ7rkzmeKvvITTPFbg3oNF7UvtATiKSD2lLvb/u7SWofQisI4gN4KONnbZyTjzZOor
+	 kJOErazzfxOHz67VlSz1afTuw6ogmIpTo4sKxbocb3iIhP35chO8rAFC3A/WBtRSxJ
+	 BkPolr40RkGvdTdYopJhXd1TDd8+JIJS+gYGwQgCq/EGsztTnb8C5aHKQKzdEkZyv5
+	 4cK6SIZtQPqUw==
+Message-ID: <da0f1340-34c5-4932-953e-25cad641db87@kernel.org>
+Date: Wed, 9 Jul 2025 09:06:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,13 +50,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Bug] soft lockup in ipv6_list_rcv in Linux kernel v6.15
-To: Luka <luka.2016.cs@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+Subject: Re: [Bug] soft lockup in neigh_timer_handler in Linux kernel v6.12
+To: Eric Dumazet <edumazet@google.com>, Luka <luka.2016.cs@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org
-References: <CALm_T+1s19Kr0=v94oUJEbN5ciGcumZDZp-hbn5=z_wPefqG1Q@mail.gmail.com>
+References: <CALm_T+2rdmwCYLZVw=gALPDufXB5R8=pX8P2jhgYE=_0PCJJ_Q@mail.gmail.com>
+ <CANn89i+7m8koanZk=47FEhmTHUmOmu-yfViRPayjUct+voQiEQ@mail.gmail.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -102,24 +103,52 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <CALm_T+1s19Kr0=v94oUJEbN5ciGcumZDZp-hbn5=z_wPefqG1Q@mail.gmail.com>
+In-Reply-To: <CANn89i+7m8koanZk=47FEhmTHUmOmu-yfViRPayjUct+voQiEQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 08/07/2025 09:30, Luka wrote:
-> Dear Linux Kernel Maintainers,
+On 08/07/2025 10:02, Eric Dumazet wrote:
+> On Tue, Jul 8, 2025 at 12:54 AM Luka <luka.2016.cs@gmail.com> wrote:
+>>
+>> Dear Linux Kernel Maintainers,
+>>
+>> I hope this message finds you well.
+>>
+>> I am writing to report a potential vulnerability I encountered during
+>> testing of the Linux Kernel version v6.12.
+>>
+>> Git Commit: adc218676eef25575469234709c2d87185ca223a (tag: v6.12)
+>>
+>> Bug Location: neigh_timer_handler+0xc17/0xfe0 net/core/neighbour.c:1148
+>>
+>> Bug report: https://pastebin.com/06NiBtXm
+>>
+>> Entire kernel config: https://pastebin.com/MRWGr3nv
+>>
+>> Root Cause Analysis:
+>>
+>> A soft lockup occurs in the neighbor subsystem due to prolonged
+>> execution within neigh_timer_handler(), where repeated neighbor entry
+>> invalidation and associated routing operations (e.g.,
+>> ipv4_link_failure() and arp_error_report()) lead to excessive CPU
+>> occupation without yielding, triggering the kernel watchdog.
+>>
+>> At present, I have not yet obtained a minimal reproducer for this
+>> issue. However, I am actively working on reproducing it, and I will
+>> promptly share any additional findings or a working reproducer as soon
+>> as it becomes available.
+>>
+>> Thank you very much for your time and attention to this matter. I
+>> truly appreciate the efforts of the Linux kernel community.
 > 
-> I hope this message finds you well.
+> Please stop sending duplicates, and 'analysis' AI generated.
 > 
-> I am writing to report a potential vulnerability I encountered during
-> testing of the Linux Kernel version v6.15.
-> 
-> Git Commit: 0ff41df1cb268fc69e703a08a57ee14ae967d0ca (tag: v6.15)
+> If you really want to help, please provide a patch.
 
-The AI generated spam from this account restarted and continues. The
-person learnt nothing from previous feedback.
 
-I suggest ignoring completely.
+That's the same person which before was sending fake reports, based on
+AI hallucination. Just in case - don't waste any time in reading the
+reports.
 
 Best regards,
 Krzysztof
