@@ -1,64 +1,82 @@
-Return-Path: <netdev+bounces-205586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23D68AFF552
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 01:23:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BEC4AFF575
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 01:46:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72F13565C0C
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 23:23:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84F445A82CF
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 23:46:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4F32367C9;
-	Wed,  9 Jul 2025 23:23:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39BA11DF74F;
+	Wed,  9 Jul 2025 23:46:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c+zxMFKp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lcefPN/G"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7F1E55B;
-	Wed,  9 Jul 2025 23:23:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22A815A8;
+	Wed,  9 Jul 2025 23:46:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752103400; cv=none; b=g+6hvgPkdjQ5v4ZvUOIps1/sYBf4kQTdvmnitWQbXIDaeqIZ4jckFIGBs1/WhoSalU1FkKiULLTPAN85ERbjzwcF9EDc3acKaq9meuhmWZfahS4CODNAxEUSFIynxwqngyqad6nl3SQELl4554+jwuuDF1gwj6I6lgTJnKSL4Qs=
+	t=1752104764; cv=none; b=C3jWHsY51JoF5MeJ2B5dZWKFo38tEcAe880TpYjA5ZmIP1lbAw+F5lxLsup166OTUFg92wlAP4h7b+GHTxjL5I//lV08mXG42eXNkWQ3gZV9SKa3Eca0RagD65/BCcHZa5uc7l5ki/vM+UO/6Q3ql06NC+qppr35LSUuZryb7Zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752103400; c=relaxed/simple;
-	bh=bCV+LA15f6mlZ/QEVHI8ShEaF8U5+pTpFavarhgTyII=;
+	s=arc-20240116; t=1752104764; c=relaxed/simple;
+	bh=axC2a76eS0Ecj+bULnHkaTLKbCu8wx/KQo/SFlcpOZc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aJzT4m/finUse/JgGh2pcTdHnkliwgrX0SDRb8HNLZL0dIDgDPuTi/lPtj+ReKjKVlwOZi8wzQGPO3P8uLaqPOCoFNojk22tZYHrR41yBzR15HRT2WcqrSZUnF+dsadqAtoD3siRboa4DVcvF0//cfy5gYDzXm9SKVlLkEkKhvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c+zxMFKp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9122CC4CEEF;
-	Wed,  9 Jul 2025 23:23:18 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=naN0njqTM80JRb/w5T7ldLtvFrh20rOzgDzEk2AVoevAZj69ZBVbu+TzVuexRj3CACRFhTv+vZvhWFwEEpm9N9GVlaRPCe2aAUKganxY72q2Em1rkFfTyjcaR/LuLdrslh7PDp6rBuz6Gko2vJwURxOphJCqTiYCzMRSuLmqTEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lcefPN/G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 037D3C4CEEF;
+	Wed,  9 Jul 2025 23:46:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752103398;
-	bh=bCV+LA15f6mlZ/QEVHI8ShEaF8U5+pTpFavarhgTyII=;
+	s=k20201202; t=1752104763;
+	bh=axC2a76eS0Ecj+bULnHkaTLKbCu8wx/KQo/SFlcpOZc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=c+zxMFKpkli/jgyFaThavQyBVDB/5UvbL7D242K2RWsPNEhL+oriRrD5Oo+PvWpdI
-	 ERuh4BY6lw+zGM8xtx8wpoLxcgPZudq5njNzWtryJQtgegUUnDf05RJ3JmYwhkWguW
-	 JHKZrbQ+tpAleOND4ozNXDBpQRbMdrgJDx0U4Ds9lgX/hUc228hnU9K1JEMFPBWWHo
-	 XunAc+qZloL292ny0zgbrMjOWNFZ0vHSFooyM+nyXy3juF7yT1qHQ9Vnqxqkx+/mHd
-	 PoL3zzXuFrSVJePfVeWGXvo03t7L/uMjtTuvQAre0zWGxsskVGE6rKHgUfo12BDyzR
-	 /dXAI84cHqO9w==
-Date: Wed, 9 Jul 2025 23:23:17 +0000
+	b=lcefPN/GN20LhehDFn6H2UPmeiSGsyhpTVr7kO6OD2/HbaSNwgpJ3E2b9KWH67nyX
+	 xb+G1xge9Jf5VA7Icio2NhPU00Ru8z4E/VFtr61miV8+Z3E0e9RddIKkiAOT2oXUYu
+	 qTOwBLK6jkY/+ACDo+119X0K8A6QWugk/ZyMGSAUTAeUTCvyGrMZX3ztlXQr3lpXm6
+	 w2s9GZu4hhrJAEC7Thi8wzHgkM/4TRdEiuei4U/g7F2qkyQmXuZC1A1LPOiEccBpXh
+	 PtgrWJuAPC/RFsPIuj6Bwx4oZ7ERw7GvRMUNwwtEhAWaTFJH/mm79bOGBWtLXj1JwS
+	 /DWWMpHLKhP+Q==
+Date: Wed, 9 Jul 2025 23:46:00 +0000
 From: Wei Liu <wei.liu@kernel.org>
-To: Xuewei Niu <niuxuewei.nxw@antgroup.com>
-Cc: "K. Y. Srinivasan" <kys@microsoft.com>,
+To: Naman Jain <namjain@linux.microsoft.com>
+Cc: "K . Y . Srinivasan" <kys@microsoft.com>,
 	Haiyang Zhang <haiyangz@microsoft.com>,
 	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, linux-hyperv@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, niuxuewei97@gmail.com
-Subject: Re: [PATCH net-next v6 1/4] hv_sock: Return the readable bytes in
- hvs_stream_has_data()
-Message-ID: <aG755Yx-FVKIkHzH@liuwe-devbox-ubuntu-v2.lamzopl0uupeniq2etz1fddiyg.xx.internal.cloudapp.net>
-References: <20250708-siocinq-v6-0-3775f9a9e359@antgroup.com>
- <20250708-siocinq-v6-1-3775f9a9e359@antgroup.com>
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Rob Herring <robh@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Leon Romanovsky <leon@kernel.org>, Long Li <longli@microsoft.com>,
+	Shiraz Saleem <shirazsaleem@microsoft.com>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org
+Subject: Re: [PATCH 0/6] Fix warning for missing export.h in Hyper-V drivers
+Message-ID: <aG7_OCR9jN8j8lFp@liuwe-devbox-ubuntu-v2.lamzopl0uupeniq2etz1fddiyg.xx.internal.cloudapp.net>
+References: <20250611100459.92900-1-namjain@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,37 +85,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250708-siocinq-v6-1-3775f9a9e359@antgroup.com>
+In-Reply-To: <20250611100459.92900-1-namjain@linux.microsoft.com>
 
-On Tue, Jul 08, 2025 at 02:36:11PM +0800, Xuewei Niu wrote:
-> From: Dexuan Cui <decui@microsoft.com>
+On Wed, Jun 11, 2025 at 03:34:53PM +0530, Naman Jain wrote:
+> When the kernel is compiled with W=1 option, a warning is reported
+> if a .c file exports a symbol but does not include export.h header
+> file. This warning was added in below patch, which merged recently:
+> commit a934a57a42f6 ("scripts/misc-check: check missing #include <linux/export.h> when W=1")
 > 
-> When hv_sock was originally added, __vsock_stream_recvmsg() and
-> vsock_stream_has_data() actually only needed to know whether there
-> is any readable data or not, so hvs_stream_has_data() was written to
-> return 1 or 0 for simplicity.
+> Fix this issue in Hyper-V drivers. This does not bring any
+> functional changes.
 > 
-> However, now hvs_stream_has_data() should return the readable bytes
-> because vsock_data_ready() -> vsock_stream_has_data() needs to know the
-> actual bytes rather than a boolean value of 1 or 0.
+> The one in drivers/hv/vmbus_drv.c is going to be fixed with 
+> https://lore.kernel.org/all/20250611072704.83199-2-namjain@linux.microsoft.com/
+> so it is not included in this series.
 > 
-> The SIOCINQ ioctl support also needs hvs_stream_has_data() to return
-> the readable bytes.
-> 
-> Let hvs_stream_has_data() return the readable bytes of the payload in
-> the next host-to-guest VMBus hv_sock packet.
-> 
-> Note: there may be multiple incoming hv_sock packets pending in the
-> VMBus channel's ringbuffer, but so far there is not a VMBus API that
-> allows us to know all the readable bytes in total without reading and
-> caching the payload of the multiple packets, so let's just return the
-> readable bytes of the next single packet. In the future, we'll either
-> add a VMBus API that allows us to know the total readable bytes without
-> touching the data in the ringbuffer, or the hv_sock driver needs to
-> understand the VMBus packet format and parse the packets directly.
-> 
-> Signed-off-by: Dexuan Cui <decui@microsoft.com>
-> Signed-off-by: Xuewei Niu <niuxuewei.nxw@antgroup.com>
+> Naman Jain (6):
+>   Drivers: hv: Fix warnings for missing export.h header inclusion
+>   x86/hyperv: Fix warnings for missing export.h header inclusion
+>   KVM: x86: hyper-v: Fix warnings for missing export.h header inclusion
+>   clocksource: hyper-v: Fix warnings for missing export.h header
+>     inclusion
+>   PCI: hv: Fix warnings for missing export.h header inclusion
+>   net: mana: Fix warnings for missing export.h header inclusion
 
-Acked-by: Wei Liu <wei.liu@kernel.org>
+I applied all patches expect the KVM one to hyperv-fixes. Thanks.
 
