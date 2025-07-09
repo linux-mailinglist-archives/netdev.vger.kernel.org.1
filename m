@@ -1,100 +1,93 @@
-Return-Path: <netdev+bounces-205394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A288AFE77E
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:20:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C765AFE7C4
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 13:30:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A62281C465A2
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 11:20:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F9FC5A615A
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 11:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3A1B2900AD;
-	Wed,  9 Jul 2025 11:19:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 134182D3EC2;
+	Wed,  9 Jul 2025 11:29:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AwbJ+PTV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tgLCsqJk"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B3228F524;
-	Wed,  9 Jul 2025 11:19:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED5F2980BF;
+	Wed,  9 Jul 2025 11:29:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752059974; cv=none; b=Ivan6aa7TRAAjPcOJrkRDvJJhGvkuZVk0v6XRFujkV/SGgL+lIm+EtySYt8qVE/vIh6x7tHGsB5V95WzGjAp6dCURlR7wiakj2iPrDPIX4fv0/tHARxmICA617DCSCto6Q1idshWts6Db2qmWs4ZTBqxY2j15wbGgRSVbhWNKRQ=
+	t=1752060584; cv=none; b=nqsQL4wFhD7hxtGJPKjs+NLZ58Q8fmXEfYp3VjIOJOlt7qCzBfaIQWsPDmmejGxOvOPaDRFWHRlRM48aFmbOPlm2k6Mo2OBR0hvudQ2hnLjcQllfr4TzLb3MTdZCxnnyStXYZbgJhAbVh1MAqYi+9KSuqWEOXPl7/mCS2BB6ayM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752059974; c=relaxed/simple;
-	bh=URnW/UGiKI1+mA6CAcMxYpU7wlYxklb25J02kMDL3zw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NA5DwDtq8rfX7vdM9J9Z4zcUiYVVwUnegj/QL5CCcn+ZqX+OH9UT7HD0ytmA9fg/YwUHik6JHcDv1OHOvAHYmhSkoe6NiJ+A7w7EsSjGgLfu4yHrstKkvGfj3WZbsnkfQSuIbGtJtWAqRLWGsvVrVNI6BIgVCT/R3qun1LWp9Qs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AwbJ+PTV; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 05BB443A20;
-	Wed,  9 Jul 2025 11:19:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1752059964;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4iCHLPtESbfpbp85kiNVyKFls4xs+R9n/2d/k55Cwns=;
-	b=AwbJ+PTVYd2d5MaeWRbLOdvxyos7ExIxXuCwC6KtnHyPgdYpbhNTG8RwF9J5LPbtOa9NPC
-	zugXTh7WYqh12Yhn6lp8so3m8rHWEflOcTxD0KxXcmypykt3lJ8VO+osOiHUYZsVEq3yqO
-	XO7BTvS/cX5tIYWYbvphJKk2ZL9yfv2E3QBCjeKVYv/uW3dNNZZcVyyZcmtbhOs4Mx5WUP
-	gqxW3gp5oGxq0xEN1126CNgHwhya3geKrM+gR14FLXoJ0N7Oj0NHN6cRjWrvbBYouQgLHk
-	b3zK164yNShj1QNTCbi5hskukGohl/5ddw9GdeqJwnKfCOvsl7yUyUghGaQdcQ==
-Date: Wed, 9 Jul 2025 13:19:21 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
- <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Florian Fainelli
- <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
- <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v2 0/3] netdevsim: add support for PHY devices
-Message-ID: <20250709131921.20e77cde@fedora>
-In-Reply-To: <20250708135553.7fb9eeac@kernel.org>
-References: <20250708115531.111326-1-maxime.chevallier@bootlin.com>
-	<20250708135553.7fb9eeac@kernel.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1752060584; c=relaxed/simple;
+	bh=IRZxyqnzZvMjQk+tLWeeqMaC+6mkzZbTnyoHCMOOF1Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F6q8LhBNHk1lyA5v4K4z16/U0z4kDRjAjCD23yLVPahjS/7KnPRvcZMsWxNK82xldP5CRFJuwT6RqK0N7rTz0F3K1/m+WaPI/yrlB8Ep31IsrPP7CbU4Q6xsM3MhM8ptWc57c0s73jvCx+GO38UobJGD3zaGpTGc7t20DXfmsA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tgLCsqJk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B930FC4CEEF;
+	Wed,  9 Jul 2025 11:29:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752060581;
+	bh=IRZxyqnzZvMjQk+tLWeeqMaC+6mkzZbTnyoHCMOOF1Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tgLCsqJklmNxRry5+lRubsrkObVqrvr42VVdcT2TOrMB/7/wGOK+3/a8GwStVehvX
+	 XnDepqfuP6ecopmhwk3yC9jd2TCZVGicv5/jeNbCubQVvjGA4m/rvaFvvRK5Vsw0os
+	 qTBT6LxO5VvsVxuZULuLQDvZgAqlq6PopA0ylz43YPC0SaKX6uLh3gSNTD1RvJqoM0
+	 /dQavuc/WIef/vgeD9eJAoaLvp2FCMMlBAn/YCmS2SdcoJZurMmh+rE22JDXb1TV7w
+	 p48a8/n0p87WLsTMCxlAOvmmws0NYEwYOYATxOei89mHiAAWRAIAgvm2/SwnV8lRoj
+	 h0uFa9KMaLHtg==
+Date: Wed, 9 Jul 2025 12:29:37 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	mengyuanlou@net-swift.com, stable@vger.kernel.org
+Subject: Re: [PATCH net] net: libwx: fix multicast packets received count
+Message-ID: <20250709112937.GU452973@horms.kernel.org>
+References: <FD180EC06F384721+20250709063512.3343-1-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefjeegvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeffgfejgeegheeitefgleehgeejiedvheefudelhfeijedutdeihfeijeetgfegfeenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedujedprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrr
- dhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <FD180EC06F384721+20250709063512.3343-1-jiawenwu@trustnetic.com>
 
-On Tue, 8 Jul 2025 13:55:53 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
-
-> On Tue,  8 Jul 2025 13:55:27 +0200 Maxime Chevallier wrote:
-> > Here's a V2 for the netdevsim PHY support, including a bugfix for
-> > NETDEVSIM=m as well as a round of shellcheck cleanups for
-> > ethtool-phy.sh.
-> > 
-> > The idea of this series is to allow attaching virtual PHY devices to
-> > netdevsim, so that we can test PHY-related ethtool commands. This can be
-> > extended in the future for phylib testing as well.  
+On Wed, Jul 09, 2025 at 02:35:12PM +0800, Jiawen Wu wrote:
+> Multicast good packets received by PF rings that pass ethternet MAC
+> address filtering are counted for rtnl_link_stats64.multicast. The
+> counter is not cleared on read. Fix the duplicate counting on updating
+> statistics.
 > 
-> Appears to break the build for BPF CI:
+> Fixes: 46b92e10d631 ("net: libwx: support hardware statistics")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> ---
+>  drivers/net/ethernet/wangxun/libwx/wx_hw.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> https://github.com/kernel-patches/bpf/actions/runs/16150854854/job/45581507731
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+> index 0f4be72116b8..a9519997286b 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+> @@ -2778,6 +2778,7 @@ void wx_update_stats(struct wx *wx)
+>  		hwstats->fdirmiss += rd32(wx, WX_RDB_FDIR_MISS);
+>  	}
+>  
+> +	hwstats->qmprc = 0;
+>  	for (i = wx->num_vfs * wx->num_rx_queues_per_pool;
+>  	     i < wx->mac.max_rx_queues; i++)
+>  		hwstats->qmprc += rd32(wx, WX_PX_MPRC(i));
 
-aw :( I'll follow-up on that then, sorry :(
+Sorry if I am being dense, but I have a question:
 
-Maxime
+The treatment of qmprc prior to this patch seems consistent
+with other members of hwstats. What makes qmprc special?
 
