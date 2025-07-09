@@ -1,243 +1,92 @@
-Return-Path: <netdev+bounces-205316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C435BAFE2D9
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 10:39:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB06FAFE2D7
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 10:38:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B0B817EF25
-	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 08:38:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B542177147
+	for <lists+netdev@lfdr.de>; Wed,  9 Jul 2025 08:38:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948B727E04F;
-	Wed,  9 Jul 2025 08:38:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BC1927AC4C;
+	Wed,  9 Jul 2025 08:38:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TVN8KMgu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="edNcDO2V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C307227AC45;
-	Wed,  9 Jul 2025 08:38:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D4F26E71D
+	for <netdev@vger.kernel.org>; Wed,  9 Jul 2025 08:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752050291; cv=none; b=UhOn4Mzw/tjhwJi3CYIrnwtPR+gRpUF0v4BXdUi5VqaVkxfQTUNTKFJJQPBFfP1SzCVwLsc4DpcVTKaut/+b7pyN0nPvdnTooIfpeIYR2AWg2aIuAKouN9wfCyqY7pv4kP75lLKKy9jLFj59UHnGlguNyZCRyvDXe4yFZ5OM6zY=
+	t=1752050281; cv=none; b=fbaRa3gDGg5ATi+66oQUBPzEk4cOXr9dcFiGNiHCT7mL6TRTNRN/v6v3ywTjWqs3HoIYvMWGd+bliMHaL5ep87piq3/oI9UjCAxOoKhF085drLRvokEcQAHukRayhoetudATnYz0pRbyHHYT2O0jA3PceA44JjONcm41qmS8UxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752050291; c=relaxed/simple;
-	bh=pGyYIv6daCmou5xv4fwBlOVNjf+rn4iim5q/PHImEdA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X1gpP+7N1g0s3064k5Ed5Hm/pvfLU3soHyYb2J5U54pHooBSJPQtnmKVf3XUnqFjEahVTXT/bXEj2wUpoGquTxmKEw5z9vk+3Kx2v4YKrHyV36CGycQkpsgItPBffZB/+JT+kmDrPzpETOiiU5RvfTSNtMKwxbNiVXFgfD2/zpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TVN8KMgu; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1752050290; x=1783586290;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=pGyYIv6daCmou5xv4fwBlOVNjf+rn4iim5q/PHImEdA=;
-  b=TVN8KMguJ9wNwA9ThvjHa7VLYM+9PX2JCtI7xbYsnhOEawqaGiDz2fut
-   jW/FiHNQUU3gZOXwxUm9pn1whb3ilKlQKyrEV8Jv/q38KuQwDzRjDH1oE
-   k0j4+dXEDgmzmST16yDNnNjgZExbn4JlM8wBwp8Nq+S6uBYYThTgl3jFp
-   UwI/1/Ikx0R2IAJJGetl3bKJRWn/PopPhOBzAJJc7fJ6qmZwZcU4Vap5d
-   n8Yo5zhUGEsj+ZZITVb2BbemTxI+HnE/3eKi6d/3iCFkALq91TmMAHucL
-   39CDsWO5L3ZfwRVyfkgL5u8BDDqsmlMHmaD7Em789QttWmu7FBvuKF5P0
-   A==;
-X-CSE-ConnectionGUID: WJmCh4XBTx+/jgMc08nByA==
-X-CSE-MsgGUID: +1HNKk8CTG++crEpA2EClw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11487"; a="54159888"
-X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
-   d="scan'208";a="54159888"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2025 01:38:05 -0700
-X-CSE-ConnectionGUID: RHa09Dw8SbiQm1diB87Rsw==
-X-CSE-MsgGUID: dYPAEBpbSp+36T6d7Vib8A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.16,298,1744095600"; 
-   d="scan'208";a="155138224"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orviesa006.jf.intel.com with ESMTP; 09 Jul 2025 01:38:01 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 8C99A1B7; Wed, 09 Jul 2025 11:37:59 +0300 (EEST)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Shahar Shitrit <shshitrit@nvidia.com>,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Jason Gunthorpe <jgg@ziepe.ca>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1752050281; c=relaxed/simple;
+	bh=0ZaAyneRgfq2wmbLWwwFwPh1QuNS+AnFleyQ2oqLD80=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sg3AovvZIsADcj047GfumHd7ZfTx5rn6P36aIrgrz5dpFWpZLC6gBbyGF+D7YKvP7gmRu4QaNon6eUMLm5A0v5MX01KXzF8uzboSqpHxpBNnaqBCmT4c5VEHSvIaaBznK3P5JbXlabsSRnofOuimrDlq+sb6nEtHWsKia+/KTfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=edNcDO2V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDA99C4CEEF;
+	Wed,  9 Jul 2025 08:37:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752050281;
+	bh=0ZaAyneRgfq2wmbLWwwFwPh1QuNS+AnFleyQ2oqLD80=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=edNcDO2V6R2hzsMMgSAkpXFzw70yQIw6l/H7B6F9BftHmr2OtMujqrCOLfs6HtcAT
+	 JewLX4FaFHBFxng8LDhlMpciwi1W/E9QmHIUrOr7BWi4c2sWF523xTSh1Bv8Dn2i9A
+	 FYwRBkeurzeJpuU3XmiW4THcGLCCsLYgAAw27EZoEIhL+n1f76aCZhiVPNu2ksMJg8
+	 R9/97kaylQyUp0bHlpo8kCrBwYQibFi+IT1fOumzBo/rCgxQgSZFskHWl8ceP989fk
+	 vp7FxzOFJgKJuXQfSO3k+wwVe5hP/jDA9X63+ZmUSeyFq28JVTovZBU/Oqxu+kc6AV
+	 oOn/RePIageDQ==
+Date: Wed, 9 Jul 2025 09:37:56 +0100
+From: Simon Horman <horms@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH net-next v2 1/1] net/mlx5: Don't use "proxy" headers
-Date: Wed,  9 Jul 2025 11:37:41 +0300
-Message-ID: <20250709083757.181265-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.47.2
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	Vlad Dumitrescu <vdumitrescu@nvidia.com>,
+	Kamal Heib <kheib@redhat.com>
+Subject: Re: [PATCH net-next V6 04/13] net/mlx5: Implement devlink total_vfs
+ parameter
+Message-ID: <20250709083756.GF452973@horms.kernel.org>
+References: <20250709030456.1290841-1-saeed@kernel.org>
+ <20250709030456.1290841-5-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250709030456.1290841-5-saeed@kernel.org>
 
-Update header inclusions to follow IWYU (Include What You Use)
-principle.
+On Tue, Jul 08, 2025 at 08:04:46PM -0700, Saeed Mahameed wrote:
+> From: Vlad Dumitrescu <vdumitrescu@nvidia.com>
+> 
+> Some devices support both symmetric (same value for all PFs) and
+> asymmetric, while others only support symmetric configuration. This
+> implementation prefers asymmetric, since it is closer to the devlink
+> model (per function settings), but falls back to symmetric when needed.
+> 
+> Example usage:
+>   devlink dev param set pci/0000:01:00.0 name total_vfs value <u16> cmode permanent
+>   devlink dev reload pci/0000:01:00.0 action fw_activate
+>   echo 1 >/sys/bus/pci/devices/0000:01:00.0/remove
+>   echo 1 >/sys/bus/pci/rescan
+>   cat /sys/bus/pci/devices/0000:01:00.0/sriov_totalvfs
+> 
+> Signed-off-by: Vlad Dumitrescu <vdumitrescu@nvidia.com>
+> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+> Tested-by: Kamal Heib <kheib@redhat.com>
+> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 
-Note that kernel.h is discouraged to be included as it's written
-at the top of that file.
-
-While doing that, sort headers alphabetically.
-
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
-
-v2: fixed a few compilation issues in some cases (LKP)
-
- drivers/infiniband/hw/mlx5/mlx5_ib.h          | 17 ++++---
- .../ethernet/mellanox/mlx5/core/mlx5_core.h   | 12 +++--
- include/linux/mlx5/driver.h                   | 47 ++++++++++++-------
- 3 files changed, 48 insertions(+), 28 deletions(-)
-
-diff --git a/drivers/infiniband/hw/mlx5/mlx5_ib.h b/drivers/infiniband/hw/mlx5/mlx5_ib.h
-index a012e24d3afe..3e8c8ddda045 100644
---- a/drivers/infiniband/hw/mlx5/mlx5_ib.h
-+++ b/drivers/infiniband/hw/mlx5/mlx5_ib.h
-@@ -7,20 +7,23 @@
- #ifndef MLX5_IB_H
- #define MLX5_IB_H
- 
--#include <linux/kernel.h>
-+#include <linux/mempool.h>
- #include <linux/sched.h>
--#include <rdma/ib_verbs.h>
--#include <rdma/ib_umem.h>
-+#include <linux/types.h>
-+
- #include <rdma/ib_smi.h>
--#include <linux/mlx5/driver.h>
-+#include <rdma/ib_umem.h>
-+#include <rdma/ib_user_verbs.h>
-+#include <rdma/ib_verbs.h>
-+#include <rdma/uverbs_ioctl.h>
-+
- #include <linux/mlx5/cq.h>
-+#include <linux/mlx5/driver.h>
- #include <linux/mlx5/fs.h>
- #include <linux/mlx5/qp.h>
--#include <linux/types.h>
- #include <linux/mlx5/transobj.h>
--#include <rdma/ib_user_verbs.h>
-+
- #include <rdma/mlx5-abi.h>
--#include <rdma/uverbs_ioctl.h>
- #include <rdma/mlx5_user_ioctl_cmds.h>
- #include <rdma/mlx5_user_ioctl_verbs.h>
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h b/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
-index 2e02bdea8361..0b2dd9eab6a1 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
-@@ -33,14 +33,18 @@
- #ifndef __MLX5_CORE_H__
- #define __MLX5_CORE_H__
- 
--#include <linux/types.h>
-+#include <linux/firmware.h>
-+#include <linux/if_link.h>
- #include <linux/kernel.h>
- #include <linux/sched.h>
--#include <linux/if_link.h>
--#include <linux/firmware.h>
-+#include <linux/types.h>
-+
-+#include <net/devlink.h>
-+
- #include <linux/mlx5/cq.h>
--#include <linux/mlx5/fs.h>
- #include <linux/mlx5/driver.h>
-+#include <linux/mlx5/fs.h>
-+
- #include "lib/devcom.h"
- 
- extern uint mlx5_core_debug_mask;
-diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
-index 3475d33c75f4..54b82d55deb6 100644
---- a/include/linux/mlx5/driver.h
-+++ b/include/linux/mlx5/driver.h
-@@ -33,28 +33,40 @@
- #ifndef MLX5_DRIVER_H
- #define MLX5_DRIVER_H
- 
--#include <linux/kernel.h>
--#include <linux/completion.h>
--#include <linux/pci.h>
--#include <linux/irq.h>
--#include <linux/spinlock_types.h>
--#include <linux/semaphore.h>
--#include <linux/slab.h>
--#include <linux/vmalloc.h>
--#include <linux/xarray.h>
--#include <linux/workqueue.h>
--#include <linux/mempool.h>
--#include <linux/interrupt.h>
--#include <linux/notifier.h>
--#include <linux/refcount.h>
- #include <linux/auxiliary_bus.h>
--#include <linux/mutex.h>
-+#include <linux/completion.h>
-+#include <linux/idr.h>
-+#include <linux/io.h>
-+#include <linux/kref.h>
-+#include <linux/lockdep_types.h>
-+#include <linux/minmax.h>
-+#include <linux/mutex_types.h>
-+#include <linux/notifier.h>
-+#include <linux/pci.h>
-+#include <linux/printk.h>
-+#include <linux/refcount.h>
-+#include <linux/semaphore.h>
-+#include <linux/spinlock_types.h>
-+#include <linux/timer_types.h>
-+#include <linux/types.h>
-+#include <linux/workqueue.h>
-+#include <linux/xarray.h>
-+
-+#include <net/devlink.h>
-+
-+#include <rdma/ib_verbs.h>
-+
-+#include <asm/page.h>
- 
- #include <linux/mlx5/device.h>
- #include <linux/mlx5/doorbell.h>
- #include <linux/mlx5/eq.h>
--#include <linux/timecounter.h>
--#include <net/devlink.h>
-+
-+struct dentry;
-+struct device;
-+struct dma_pool;
-+struct net_device;
-+struct pci_dev;
- 
- #define MLX5_ADEV_NAME "mlx5_core"
- 
-@@ -243,6 +255,7 @@ struct mlx5_cmd_first {
- 	__be32		data[4];
- };
- 
-+struct cmd_msg_cache;
- struct mlx5_cmd_msg {
- 	struct list_head		list;
- 	struct cmd_msg_cache	       *parent;
--- 
-2.47.2
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
