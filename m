@@ -1,121 +1,110 @@
-Return-Path: <netdev+bounces-205630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C286AFF6EB
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 04:40:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3575AFF6F9
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 04:46:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CFA33B3EB3
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 02:40:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F39515A246F
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 02:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3830827F18C;
-	Thu, 10 Jul 2025 02:40:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E0727FB37;
+	Thu, 10 Jul 2025 02:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CnIcmjWa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Af9x6OHa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D33325BF14;
-	Thu, 10 Jul 2025 02:40:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7312236F4
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 02:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752115241; cv=none; b=UOX210H6CqJubMINaF3lJaW6hqIK2lqGZR6CcaNpye1Zdq4Lg+8JpXZ+jIMeHGaRiacF2Iltd/0XiuoR3Y02YmmfHhCtwE8v2T554s1nvrYn7evchhfr9rIOwEUFCHE3W1fxQoF/h43FPX9aMITxOrI4IO9uvkRVfpqFQ6bOC00=
+	t=1752115577; cv=none; b=BKW1/WOFH9I7SnY0pIbLKEqt7xDbvc+XaB0sBvEEfQxO6ROZRhGopmqivPe2VEwqu/VAOD7K37L72IuUzSPyDjgoyJpL+yBG2FA7wL5H74fetVXGiRlGhOFLL7NZ7x4z/kAOD0x7pZuyGgrRSqTAVYGFB60KNIP6d4ae4OI4W04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752115241; c=relaxed/simple;
-	bh=SbXUiYCtMWlpHCV2pzP17uIzAf874pHFFFrd6zNJLHc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LXt/i44F/Z55xE+nW1TZWbps0fE11ltXlyvVC8oARJ3PoZBqxIReOneflXjF4RM+YyRISkxszsuUq8UyUQcfDNqXHJCVHhTJGVpqGCph9UR6S1I9IX+ndX5fgPSN7cHYd55/y1rSw2wwLjVKJ8XAQ5k0jJ/blRS8HbQ22oBDvIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CnIcmjWa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CE1EC4CEEF;
-	Thu, 10 Jul 2025 02:40:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752115240;
-	bh=SbXUiYCtMWlpHCV2pzP17uIzAf874pHFFFrd6zNJLHc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CnIcmjWawEkECd7KPbCiN3OQ+p6HKq5Wuwb9+DVcJimaUCswv5Z+DOMJZljVYEMAY
-	 OkdDIKp0YK7Rpomq40HYzMOEJkzAyjtrrzbhxARSN0wP4Qi2JlnvRpL8W8KmZThEBb
-	 PVS402BTTrfkypwv+71HT7rk1OWsMSqvmt8erBGhaqvARDyh6tkvU8zyp+D5/l08z0
-	 YdRInM7ZjgaYIXP4p4ielp1yFTSi2b7K7nWeX2tO2xugvr01AHLcY37MT18ItbJwEW
-	 U5K/1R2+dnpICaSC0oDy1pRqvSD9rpTq2YsXH7+WWI+7HZ6kpXby4ewHKjf5ekercL
-	 /G3zNYAvYG7HA==
-Date: Wed, 9 Jul 2025 19:40:39 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v1 1/1] net: selftests: add PHY-loopback test
- for bad TCP checksums
-Message-ID: <20250709194039.72202043@kernel.org>
-In-Reply-To: <20250708122823.2435505-1-o.rempel@pengutronix.de>
-References: <20250708122823.2435505-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1752115577; c=relaxed/simple;
+	bh=Dq5E6qbcnp7OKpb31WemutPpvpSMukiF8kyCjkOa3q0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lAj6ylrI6/UC7ZYMWU9Jf/bhGRhTli4+AbwkHzdKJlAYRBqhA3/O7UaFhH8RYEy5lneYv2hf78/URSjrjuuA0AahZ9oj5het3VuG6ufaXDviucZXhnzGagM2Zuon9pbhxQolFMVYOtNtxsrke429aRaiejXzqSSFT/jXaZOVdrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Af9x6OHa; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752115574;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=iqwXOIteg9qCzt7xtB3xuBCygfMIm2/XPmfbhNkkYd8=;
+	b=Af9x6OHacRXW76pLnNnmOMj+VYkrhpa33NZRiRZAslPSmTy1bUz50js/M9Rc/boSLHc+55
+	uBrw7N6xifcmiKv+Cg4cbHs5k4IPu2Tn774pnHR58rcBHufbizfKopEDO9rg9BTgqBgzW3
+	9qwP+V2JuquR77I1dbRHq/djnG/aHJA=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-651-F9ekLMmrMuuv12pNqApSiw-1; Wed,
+ 09 Jul 2025 22:46:11 -0400
+X-MC-Unique: F9ekLMmrMuuv12pNqApSiw-1
+X-Mimecast-MFC-AGG-ID: F9ekLMmrMuuv12pNqApSiw_1752115570
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E1DEC1954236;
+	Thu, 10 Jul 2025 02:46:09 +0000 (UTC)
+Received: from laptop.redhat.com (unknown [10.72.116.89])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E4ECF18002B5;
+	Thu, 10 Jul 2025 02:46:05 +0000 (UTC)
+From: Li Tian <litian@redhat.com>
+To: netdev@vger.kernel.org,
+	linux-hyperv@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Dexuan Cui <decui@microsoft.com>
+Subject: [PATCH] hv_netvsc: Set VF priv_flags to IFF_NO_ADDRCONF before open  to prevent IPv6 addrconf
+Date: Thu, 10 Jul 2025 10:46:03 +0800
+Message-ID: <20250710024603.10162-1-litian@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Tue,  8 Jul 2025 14:28:23 +0200 Oleksij Rempel wrote:
->  	if (attr->tcp) {
->  		int l4len = skb->len - skb_transport_offset(skb);
->  
-> -		thdr->check = ~tcp_v4_check(l4len, ihdr->saddr, ihdr->daddr, 0);
-> -		skb->csum_start = skb_transport_header(skb) - skb->head;
-> -		skb->csum_offset = offsetof(struct tcphdr, check);
-> +		if (attr->bad_csum) {
-> +			__sum16 good_csum;
-> +			u16 bad_csum;
-> +
-> +			skb->ip_summed = CHECKSUM_NONE;
-> +			thdr->check = 0;
-> +			skb->csum = skb_checksum(skb, skb_transport_offset(skb),
-> +						 l4len, 0);
-> +			good_csum = csum_tcpudp_magic(ihdr->saddr, ihdr->daddr,
-> +						      l4len, IPPROTO_TCP,
-> +						      skb->csum);
-> +
-> +			/* Flip the least-significant bit.  This is fast,
-> +			 * deterministic, and cannot accidentally turn the
-> +			 * checksum back into a value the stack treats as valid
-> +			 * (0 or 0xFFFF).
-> +			 */
-> +			bad_csum = (__force u16)good_csum ^ 0x0001;
-> +			if (bad_csum == 0 || bad_csum == 0xFFFF) {
-> +				/* If the checksum is 0 or 0xFFFF, flip another
-> +				 * bit to ensure it is not valid.
-> +				 */
-> +				bad_csum ^= 0x0002;
-> +			}
-> +
-> +			thdr->check = (__force __sum16)bad_csum;
-> +		} else {
-> +			skb->csum = 0;
-> +			skb->ip_summed = CHECKSUM_PARTIAL;
-> +			thdr->check = ~tcp_v4_check(l4len, ihdr->saddr,
-> +						    ihdr->daddr, 0);
-> +			skb->csum_start = skb_transport_header(skb) - skb->head;
-> +			skb->csum_offset = offsetof(struct tcphdr, check);
-> +		}
->  	} else {
-> +		skb->csum = 0;
-> +		skb->ip_summed = CHECKSUM_PARTIAL;
->  		udp4_hwcsum(skb, ihdr->saddr, ihdr->daddr);
->  	}
+The use of the IFF_SLAVE flag was replaced by IFF_NO_ADDRCONF to
+prevent ipv6 addrconf.
 
-I think it'd be simpler if - after setting up CHECKSUM_PARTIAL
-we called skb_checksum_help() to get the correct checksum filled in
-and then did the bad checksum mangling.
+Commit 8a321cf7becc6c065ae595b837b826a2a81036b9
+("net: add IFF_NO_ADDRCONF and use it in bonding to prevent ipv6 addrconf")
 
-BTW mangling like this should be idiomatic enough to avoid the comment:
+This new flag change was not made to hv_netvsc resulting in the VF being
+assinged an IPv6.
 
-	thdr->check = thdr->check ^ 1 ?: CSUM_MANGLED_0;
+Suggested-by: Cathy Avery <cavery@redhat.com>
+
+Signed-off-by: Li Tian <litian@redhat.com>
+---
+ drivers/net/hyperv/netvsc_drv.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+index c41a025c66f0..a31521f00681 100644
+--- a/drivers/net/hyperv/netvsc_drv.c
++++ b/drivers/net/hyperv/netvsc_drv.c
+@@ -2317,8 +2317,8 @@ static int netvsc_prepare_bonding(struct net_device *vf_netdev)
+ 	if (!ndev)
+ 		return NOTIFY_DONE;
+ 
+-	/* set slave flag before open to prevent IPv6 addrconf */
+-	vf_netdev->flags |= IFF_SLAVE;
++	/* Set no addrconf flag before open to prevent IPv6 addrconf */
++	vf_netdev->priv_flags |= IFF_NO_ADDRCONF;
+ 	return NOTIFY_DONE;
+ }
+ 
 -- 
-pw-bot: cr
+2.50.0
+
 
