@@ -1,123 +1,241 @@
-Return-Path: <netdev+bounces-205756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F618B00074
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 13:22:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16967B00087
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 13:27:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33DC2483332
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 11:21:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 625A95A5420
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 11:27:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E1DB2D027F;
-	Thu, 10 Jul 2025 11:22:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B3A2E7182;
+	Thu, 10 Jul 2025 11:27:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BEBUgTqK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VSmWfrnF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1785A29ACEE;
-	Thu, 10 Jul 2025 11:22:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC9C02D97A6;
+	Thu, 10 Jul 2025 11:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752146536; cv=none; b=Z46Ye3lK8IPkRR3QQKn/nT6QSAf8CzLzcEEtl2GV6ksg9lMmNF3YCsqNoBTGweG2/E4qsX5kjwscdUO1KwAdskWXT7zNYmo7Df1jSLUswJzfbz+mJBxuKzzbtt3kGHj9O5EdPyGRSIG9Cm9TgX07XUW+m72//q/Ly3CbUnAtryg=
+	t=1752146863; cv=none; b=bH1cSwn1w3RJs9Z6FXr9DmgM8Pc1utjIa6YnYTRv2FMCrFMaKpXKMImGCi1YymTJbm/rhAYdoX2zv23TlDUIoQpKGO0l7MU8Yn/q1TTnF6n8WcgSLRktPGNUN+alfcJyg1Dky8V8FXnPeqkVnVW8B9oAx7C4rMWw85ckiSamGqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752146536; c=relaxed/simple;
-	bh=FO1OCNrq6w735NJWEpXhsPUksW6u1+YSWEZEvqgzblw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D8WOA2TzV15cozOAQt56IVJQTyz2SGuZI0qlhl2eCvGhjfOfEdyHExOzlg3aky1nVnsnURnB2CaRibWNKLbzlpKd/GwhbUSIROnqyIsHWWyalDlVyUAJfZh1IpGpd5wQDxO5A0asuWRiNeyqsZj3oMvy7lfkFd/hHc6tpqx9MJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BEBUgTqK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5026C4CEE3;
-	Thu, 10 Jul 2025 11:22:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752146535;
-	bh=FO1OCNrq6w735NJWEpXhsPUksW6u1+YSWEZEvqgzblw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BEBUgTqK5FsHJbbli1kLU6kCReCBYxmxDLzUtsHhyEcHly/o0I9ntYjbBPbdKlU3y
-	 BEPrgzxj0Ea6Kj8AN1W5Jj96n9eUeGF4UEXvD9w+dQwig3y0kCIeGDXKpsvvXeJjp4
-	 JyUa8VVGGuspSAmUTe2jlcd2YGdCkZ9YZg4wLZwwXQv0Hty8r6PVIubIKVaN9LhPGz
-	 bRUAdB8gSMAZeGHwZYdTuivHaBVSkHY3ThQYhEnaGY6JyhRuYAgOFPJYv3fm1g5wML
-	 7wYa2KD2BXFAu3FBwBXQqj5IjPQTREOwHIuKnW7sqh1d4r5fn8JkkxpdIZmgAf5XqM
-	 Fm7j6ckGZg7vw==
-Date: Thu, 10 Jul 2025 12:22:08 +0100
-From: Simon Horman <horms@kernel.org>
-To: y.oudjana@protonmail.com
-Cc: Manivannan Sadhasivam <mani@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nicolas Schier <nicolas.schier@linux.dev>,
-	Jonathan Cameron <jic23@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	Nuno =?utf-8?B?U8Oh?= <nuno.sa@analog.com>,
-	Andy Shevchenko <andy@kernel.org>, Luca Weiss <luca@lucaweiss.eu>,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
-	linux-iio@vger.kernel.org
-Subject: Re: [PATCH v2 0/4] QRTR bus and Qualcomm Sensor Manager IIO drivers
-Message-ID: <20250710112208.GR721198@horms.kernel.org>
-References: <20250710-qcom-smgr-v2-0-f6e198b7aa8e@protonmail.com>
+	s=arc-20240116; t=1752146863; c=relaxed/simple;
+	bh=KjSzvJUpxXfbbJMn+GnW97GcF7y9pkc6qt0xEvGgaAI=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=PSriA/5/w6yx5IGmbvX2fBwN04ezcaw+8IWoMV8N+dyXmqFA0ddnV4Ptdux2HdiKfmO0jzs+8Y0rOW8ZtNxN/rj0X6JQXxBE5lFbKm4zRerD4ZzgxkyuV/4TS+GpaD4lv7dvR/O1GaKOSaTwL5ZFq7eTquXvrzQBF/fBnuCY6jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VSmWfrnF; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3a507e88b0aso714582f8f.1;
+        Thu, 10 Jul 2025 04:27:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752146860; x=1752751660; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IR5AJVT4G5WLtAAqgPLSimQyStJGWsVwlw9CufaXOaE=;
+        b=VSmWfrnFYWAbmFVf+0lei1w04K/mJr/U5SK9QC99vbxrgsXO8kACipVIm3sG7izQKl
+         Q7SN4bQQFTB7cbT7MOeb8BhyDWlo4zptzmdLmo3HyeKhXH1Pok3pYaFH0VQhXhLN8Q/d
+         2mGFa2Ebzlbmbvrsq3wMzqteAoWV5TLHXiO12HwyUCs335xhHGa0KkT42MDF0x16Yr6n
+         vDBjYCiw3+jTG6yNCTYfuujFeK94WSC/fMv3ZjPOr1XPrxi2OEkQVXGK4QAw2LAx5oEX
+         eqyrLQqJY/fSJRWnkAhjwae9gY9u628WLtGDnH/G5uxCX3kBzUuWVI7fwA6K8Wxp/Rvr
+         G1Kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752146860; x=1752751660;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IR5AJVT4G5WLtAAqgPLSimQyStJGWsVwlw9CufaXOaE=;
+        b=m6levqJx884kofs/dYTbVUYerkR7+EhQMpnkEyazfDrOpz1pQ8uNVPDZKMriD2wM7L
+         LdABE1YebZxfuy0JqI1YiLTmgSwoPP4ChJKN2nszttbYki0kHbT2lHlo3eGMd9KkxHdn
+         33Jl+glJrVO8zeiq31vopayuegmR3ti9tv9qXY522QKsQmHL3tuUNXNvOQNV+B4cfzoX
+         XrVboceqRHaXx/Wnm2a39E1XAi5Zrocc3FzdB8BC61/HYUAd+bLfmbDVp70Dzd2QX3HJ
+         8HhuRHh6/WY06TN+VUDrZssMPUJijmn6g03tSYdfWXC9KSteZvGdycmK3lXnfs73/AsL
+         wKHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVK22uG2QpxSfdFMytGTlV65KV/+l/3EsaalNBnap/BR8oyQIe+7cXS1Yt1VanTnBQSiNiSIt2i@vger.kernel.org, AJvYcCWruDomNowC0qVneIGRuuuYHDcJ3dq9uws3pKZcsJWxC9A0NRyfoSZZT+gu4QDG3QLRqkElaJcv4bTb0TM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzGeIuTRG0YX4/65JPOPDs1ka2mhq18+qoMtgXKpSUp1iZk9MC
+	dYKQHVOppQ2eOhYM87y8STDt4+PtTaRwmtTtHi+YHnZZSsrfdK3H/f+G
+X-Gm-Gg: ASbGncvxm/XOqPbApJXZ5UTsU8vSjK4jFm1SPIK4IfkAyFjOvGtlJh9YW4SOcq2+L+5
+	jG/B/K3AjxWZlAoJVmWUQmtTTlnFMAeHHXBDpFCB98XGmc76a9E2CUu40y5X8BHnQys7e7y4aur
+	Bl2uO3dUWB/J+0QLwRxfweN0g0SkjCspb7a/7GyP3kYQbGsONRiSbRQcAYu9VVHppf4d/SO5PYM
+	cjWxtKVtXH0zToyZ/0o8NDzSNyYw1JrFsuBC5ZOX5bKDGYtN1+J9RY4MQxvyyuJZQBTdebLmpUH
+	fW34r/OWXHxFUTrSx+4igMgUdpNBOr+1eO/7Gkkrh4LbcgU66gxv1q3qyzj1A+xIWb3+jm0Vtvk
+	=
+X-Google-Smtp-Source: AGHT+IGJxYQYyVxwJGUcleyu2QUatvGZlx5j2drpe8o9TCCtxQrleJg0cqNcOTkJRlgizlSSl5qgwQ==
+X-Received: by 2002:a05:6000:43d5:b0:3b5:e2ca:1c2 with SMTP id ffacd0b85a97d-3b5e788d43cmr2498398f8f.2.1752146859857;
+        Thu, 10 Jul 2025 04:27:39 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:a8bc:3071:67a5:abea])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454dd474a9csm17122225e9.16.2025.07.10.04.27.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Jul 2025 04:27:39 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>,  Jonathan Corbet
+ <corbet@lwn.net>,  "Akira Yokosawa" <akiyks@gmail.com>,  "Breno Leitao"
+ <leitao@debian.org>,  "David S. Miller" <davem@davemloft.net>,  "Eric
+ Dumazet" <edumazet@google.com>,  "Ignacio Encinas Rubio"
+ <ignacio@iencinas.com>,  "Jan Stancek" <jstancek@redhat.com>,  "Marco
+ Elver" <elver@google.com>,  "Paolo Abeni" <pabeni@redhat.com>,  "Randy
+ Dunlap" <rdunlap@infradead.org>,  "Ruben Wauters" <rubenru09@aol.com>,
+  "Shuah Khan" <skhan@linuxfoundation.org>,  Jakub Kicinski
+ <kuba@kernel.org>,  Simon Horman <horms@kernel.org>,
+  joel@joelfernandes.org,  linux-kernel-mentees@lists.linux.dev,
+  linux-kernel@vger.kernel.org,  lkmm@lists.linux.dev,
+  netdev@vger.kernel.org,  peterz@infradead.org,  stern@rowland.harvard.edu
+Subject: Re: [PATCH v9 12/13] docs: parser_yaml.py: add support for line
+ numbers from the parser
+In-Reply-To: <3b18b30b1b50b01a014fd4b5a38423e529cde2fb.1752076293.git.mchehab+huawei@kernel.org>
+Date: Thu, 10 Jul 2025 12:25:56 +0100
+Message-ID: <m2zfdc5ltn.fsf@gmail.com>
+References: <cover.1752076293.git.mchehab+huawei@kernel.org>
+	<3b18b30b1b50b01a014fd4b5a38423e529cde2fb.1752076293.git.mchehab+huawei@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250710-qcom-smgr-v2-0-f6e198b7aa8e@protonmail.com>
+Content-Type: text/plain
 
-On Thu, Jul 10, 2025 at 09:06:26AM +0100, Yassine Oudjana via B4 Relay wrote:
-> Sensor Manager is a QMI service available on several Qualcomm SoCs which
-> exposes available sensors and allows for getting data from them. This
-> service is provided by either:
-> 
-> - SSC (Snapdragon Sensor Core): Also known as SLPI (Sensor Low Power
->   Island). Has its own set of pins and peripherals to which sensors are
->   connected. These peripherals are generally inaccessible from the AP,
->   meaning sensors need to be operated exclusively through SSC. The only
->   known SoCs in this category are MSM8996 and MSM8998 (and their
->   derivatives).
-> - ADSP (Audio DSP): Shares pins and peripherals with the AP. At least on
->   some devices, these pins could be configured as GPIOs which allows the AP
->   to access sensors by bit-banging their interfaces. Some SoCs in this
->   category are SDM630/660, MSM8953, MSM8974 and MSM8226.
-> 
-> Before Sensor Manager becomes accessible, another service known as Sensor
-> Registry needs to be provided by the AP. The remote processor that provides
-> Sensor Manager will then request data from it, and once that process is
-> done, will expose several services including Sensor Manager.
-> 
-> This series adds a kernel driver for the Sensor Manager service, exposing
-> sensors accessible through it as IIO devices. To facilitate probing of this
->  driver, QRTR is turned into a bus, with services being exposed as devices.
-> Once the Sensor Manager service becomes available, the kernel attaches its
-> device to the driver added in this series. This allows for dynamic probing
-> of Sensor Manager without the need for static DT bindings, which would also
-> not be ideal because they would be describing software rather than
-> hardware. Sensor Manager is given as a working example of the QRTR bus.
-> Kernel drivers for other services may also be able to benefit from this
-> change.
+Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
 
-...
+> Instead of printing line numbers from the temp converted ReST
+> file, get them from the original source.
+>
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 
-Hi Yassine,
+This doesn't seem to work. This is what I get when I change line 14 of
+rt-neigh.yaml
 
-This series both adds an IIO driver and updates Networking code.
+diff --git a/Documentation/netlink/specs/rt-neigh.yaml b/Documentation/netlink/specs/rt-neigh.yaml
+index e9cba164e3d1..937d2563f151 100644
+--- a/Documentation/netlink/specs/rt-neigh.yaml
++++ b/Documentation/netlink/specs/rt-neigh.yaml
+@@ -11,6 +11,7 @@ doc:
+ definitions:
+   -
+     name: ndmsg
++    doc: ".. bogus::"
+     type: struct
+     members:
+       -
 
-I'd suggest splitting the series so that the Networking updates can be
-targeted at net-next, while the IIO driver is targeted at a different tree.
+/home/donaldh/docs-next/Documentation/netlink/specs/rt-neigh.yaml:165: ERROR: Unknown directive type "bogus".
 
-Also, I note that this series does not compile against current net-next.
-This seems like it should be addressed, at least for the Networking
-changes.
+.. bogus:: [docutils]
 
--- 
-pw-bot: changes-requested
+
+> ---
+>  Documentation/sphinx/parser_yaml.py      | 12 ++++++++++--
+>  tools/net/ynl/pyynl/lib/doc_generator.py | 16 ++++++++++++----
+>  2 files changed, 22 insertions(+), 6 deletions(-)
+>
+> diff --git a/Documentation/sphinx/parser_yaml.py b/Documentation/sphinx/parser_yaml.py
+> index fa2e6da17617..8288e2ff7c7c 100755
+> --- a/Documentation/sphinx/parser_yaml.py
+> +++ b/Documentation/sphinx/parser_yaml.py
+> @@ -54,6 +54,8 @@ class YamlParser(Parser):
+>  
+>      netlink_parser = YnlDocGenerator()
+>  
+> +    re_lineno = re.compile(r"\.\. LINENO ([0-9]+)$")
+> +
+>      def rst_parse(self, inputstring, document, msg):
+>          """
+>          Receives a ReST content that was previously converted by the
+> @@ -66,8 +68,14 @@ class YamlParser(Parser):
+>  
+>          try:
+>              # Parse message with RSTParser
+> -            for i, line in enumerate(msg.split('\n')):
+> -                result.append(line, document.current_source, i)
+> +            lineoffset = 0;
+> +            for line in msg.split('\n'):
+> +                match = self.re_lineno.match(line)
+> +                if match:
+> +                    lineoffset = int(match.group(1))
+> +                    continue
+> +
+> +                result.append(line, document.current_source, lineoffset)
+
+I expect this would need to be source=document.current_source, offset=lineoffset
+
+>  
+>              rst_parser = RSTParser()
+>              rst_parser.parse('\n'.join(result), document)
+
+But anyway this discards any line information by just concatenating the
+lines together again.
+
+> diff --git a/tools/net/ynl/pyynl/lib/doc_generator.py b/tools/net/ynl/pyynl/lib/doc_generator.py
+> index 658759a527a6..403abf1a2eda 100644
+> --- a/tools/net/ynl/pyynl/lib/doc_generator.py
+> +++ b/tools/net/ynl/pyynl/lib/doc_generator.py
+> @@ -158,9 +158,11 @@ class YnlDocGenerator:
+>      def parse_do(self, do_dict: Dict[str, Any], level: int = 0) -> str:
+>          """Parse 'do' section and return a formatted string"""
+>          lines = []
+> +        if LINE_STR in do_dict:
+> +            lines.append(self.fmt.rst_lineno(do_dict[LINE_STR]))
+> +
+>          for key in do_dict.keys():
+>              if key == LINE_STR:
+> -                lines.append(self.fmt.rst_lineno(do_dict[key]))
+>                  continue
+>              lines.append(self.fmt.rst_paragraph(self.fmt.bold(key), level + 1))
+>              if key in ['request', 'reply']:
+> @@ -187,13 +189,15 @@ class YnlDocGenerator:
+>          lines = []
+>  
+>          for operation in operations:
+> +            if LINE_STR in operation:
+> +                lines.append(self.fmt.rst_lineno(operation[LINE_STR]))
+> +
+>              lines.append(self.fmt.rst_section(namespace, 'operation',
+>                                                operation["name"]))
+>              lines.append(self.fmt.rst_paragraph(operation["doc"]) + "\n")
+>  
+>              for key in operation.keys():
+>                  if key == LINE_STR:
+> -                    lines.append(self.fmt.rst_lineno(operation[key]))
+>                      continue
+>  
+>                  if key in preprocessed:
+> @@ -253,10 +257,12 @@ class YnlDocGenerator:
+>          lines = []
+>  
+>          for definition in defs:
+> +            if LINE_STR in definition:
+> +                lines.append(self.fmt.rst_lineno(definition[LINE_STR]))
+> +
+>              lines.append(self.fmt.rst_section(namespace, 'definition', definition["name"]))
+>              for k in definition.keys():
+>                  if k == LINE_STR:
+> -                    lines.append(self.fmt.rst_lineno(definition[k]))
+>                      continue
+>                  if k in preprocessed + ignored:
+>                      continue
+> @@ -284,6 +290,9 @@ class YnlDocGenerator:
+>              lines.append(self.fmt.rst_section(namespace, 'attribute-set',
+>                                                entry["name"]))
+>              for attr in entry["attributes"]:
+> +                if LINE_STR in attr:
+> +                    lines.append(self.fmt.rst_lineno(attr[LINE_STR]))
+> +
+>                  type_ = attr.get("type")
+>                  attr_line = attr["name"]
+>                  if type_:
+> @@ -294,7 +303,6 @@ class YnlDocGenerator:
+>  
+>                  for k in attr.keys():
+>                      if k == LINE_STR:
+> -                        lines.append(self.fmt.rst_lineno(attr[k]))
+>                          continue
+>                      if k in preprocessed + ignored:
+>                          continue
 
