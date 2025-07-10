@@ -1,124 +1,301 @@
-Return-Path: <netdev+bounces-205961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2E8AB00EE8
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 00:45:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C79E8B00F09
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 00:50:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0591F1CA7F73
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 22:45:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1558516ED87
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 22:50:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04D7A242D77;
-	Thu, 10 Jul 2025 22:45:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADAF23B632;
+	Thu, 10 Jul 2025 22:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="Y7E979Qo"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="E6fbpKKz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DB62980DB
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 22:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8274C1D432D
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 22:50:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752187504; cv=none; b=VYh1khzEU5UGQELe7Ct7TPFMUQ/ZUpd2TTxmAGi01F9xVOgbbKsd63CCVX8RBNao9jC3Rtn5y1qUbPbVb0KJ27wefPURxS/lee6jXbng6+YbvMs6hCYHNxTVGOVGE7xBC9tSTtpqbz6IkeJgJ+ZCtkqyFsPWqxk4jw+PhPLPUrQ=
+	t=1752187853; cv=none; b=SDM9ZjW1MNP+ht3w+DhQIpBjwABy544y/5TrfSNH6BngrpHqMfBZ7CtogOqKKTYjGpbtSQgEG4eblkUmg/NF4L5KdbhcUOBmbRJ6w2fbwzGtsJzRYdfff80iLVMtpjDxl3DUbQ9O2dtxSmuPFNzVZr456IcJqYsnWL/9TTcwVuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752187504; c=relaxed/simple;
-	bh=Ore9hSjB3VYYoGjxl/UMj4pm2gzutzgOVEwT7AcWxpc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D3KdaIW/efqVBuuZu50vCWAAENISfkRMLC0Ml+zWBbGEglqruVQan6wvyt31cLqfikLo2IrHG/CnmkKRkXuFLPttHYtF8oWwpccyXZb+uwYlkZ1owy7fisdM+b7R1pBiEp3WWO+lgR5YXC3XXyoQdHZpGQ/Yw8CYiFACMThsnFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=Y7E979Qo; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-315cd33fa79so1194503a91.3
-        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 15:45:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asu.edu; s=google; t=1752187503; x=1752792303; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xB5SrrEtDI48EpA39wusl5bCMI7x5UNVDdGJswsj15I=;
-        b=Y7E979QoCjSH8/p0Uh0CeMYtspynaZUJGdBHhw6O8vjF+TKTDO1ivM5CkhD+4agojd
-         bPnQCNh15kXiKjGVsMGah5OUhVFxXa0xaySghAKBGopb3ZfSJmlZ9ibrTzT9Ylxl/eQx
-         Q6R8HaEJ21H1wpLfnTr87EMC3Fj2hxzTDIqPDLSW3STz5lZ88dZykHK2cY6nYBp9rEaI
-         xaMmB0cMM+qKuKXXKEewYOkG/moE7HipD4LuV11zOsOe/KNe04HXfe7/c93esDucNamN
-         2AXV2mwQt/4GELyYkugnmhdLqqA7xpQbf++b3j3mJbHBEoXPxVqB5MafgK0YkPbkNrBO
-         r5dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752187503; x=1752792303;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xB5SrrEtDI48EpA39wusl5bCMI7x5UNVDdGJswsj15I=;
-        b=FK1NlZE5HJH7ne1gOFAmcgavKatG359cKjV+yZrOR625dE6mEy35U2ftWk13UUnmDz
-         F+t01QNwDN7NpTvLrWtHJSeuDsBLtHZ9u3F12BoFJ/LbifuAq7Td7IVxFkCJqLRwsSKn
-         GgfMkj0Fc4lOKUfj+LL991YOHMqf4O28GSAEJHos4p6MWbdAdplloptiVCCtvKl0yuRI
-         L6NGYsGcCl0KPHd3h9qEDe579wTDYX6GpVVJFa2KUO7YmObTkPZP/xGYTM/0XVq57Np1
-         J66LcVhETKbdF5OsCVSOkUIMKDsQZL6WhM0eibUS3nR3emSVBH88y0HjKr76gAtnmaSA
-         GBsw==
-X-Forwarded-Encrypted: i=1; AJvYcCUKqiDx5GdU0C1BZIR/vgc5REzSsGODiaDv18Qy+efhb5/3JmiYDI1axWwo6mawhDSEXjV+YoY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYSkFvYs+y1Uy3zzfpPPnhjqt32/EGtoNyk5rarlrCy0G0TDy4
-	nupS6/bff5Spe26tr5CfyaIHNFShVaUwuSUrNqVxPvJBo4uP/chu2OJSjVSM/mceYg==
-X-Gm-Gg: ASbGncsMMX+nCa6wY1Kn2CL+WDqIPqtdDvSZL1hQEiNdBFeWq0fb8Ra/6EiGSk/HLiq
-	cm0pNp01CTSN4Bl3yQSSVjd3kvIcvK8K7FmOszuT/jklPuk/Y/mp7Z0z3Ljv6M2Uea29sQ4dh8C
-	i5OUWK4rZrCji+9kNcZAypHvXoI4Z8ZvI0RWc0Gno5X7FOs30psFnXq/SQFgaGWeXQHJt19z5TS
-	6RU4h6jj2lSWXUBdG+mNymhJf9xILlpn2HB18+Xlg2ZHm4nKXvx+wOCcekEPTkxtX6X0gXrzN/S
-	Hhf/JHaVM1ESPj564be+Y2L8ZZ/+RW8LBdlovgsw1EOycYGChucIq0IeWRtQbZ+/z1EwrTQe
-X-Google-Smtp-Source: AGHT+IHq9ksF9uC3B9jBC6qqYz11U6SIkFmuJ1BG3UqK90kbsrWHtN/PLJsAE4QN8fMdi0uGvUFHVw==
-X-Received: by 2002:a17:90b:2d88:b0:311:b3e7:fb3c with SMTP id 98e67ed59e1d1-31c50e4664bmr16654a91.31.1752187502714;
-        Thu, 10 Jul 2025 15:45:02 -0700 (PDT)
-Received: from xps (209-147-138-224.nat.asu.edu. [209.147.138.224])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-31c300689aasm6282850a91.13.2025.07.10.15.45.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Jul 2025 15:45:02 -0700 (PDT)
-Date: Thu, 10 Jul 2025 15:45:00 -0700
-From: Xiang Mei <xmei5@asu.edu>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	gregkh@linuxfoundation.org, jhs@mojatatu.com, jiri@resnulli.us,
-	security@kernel.org
-Subject: Re: [PATCH v2] net/sched: sch_qfq: Fix race condition on
- qfq_aggregate
-Message-ID: <aHBCbIJgUnTNgRpE@xps>
-References: <aGwMBj5BBRuITOlA@pop-os.localdomain>
- <20250709180622.757423-1-xmei5@asu.edu>
- <20250709131920.7ce33c83@kernel.org>
- <aG7iCRECnB3VdT_2@xps>
- <aHAuLCWpBNC5hUwV@pop-os.localdomain>
+	s=arc-20240116; t=1752187853; c=relaxed/simple;
+	bh=+EolrvCVJsFGGB9pFMRheCmv0qBdUlfl2FkBbq662Nk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sSH4YWiu4yE1lEiuPhupM67fPyobIC5kQE8nbeRunf77YKJcL8MX/dIumZU9DFjQa2EJieBytnRBB98xbH+OYQpd1UJEC5C/VllXSZtFxGtGztSDXRl+se00lBhoAfdHDG70Vc3XMdWLVVOO6tQUHqaI5YuvtjbqLXfoPC0jUac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=E6fbpKKz; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c84518eb-15da-4356-ac6a-b2fcb807d92f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752187844;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gDk3n0e7IoK91zimJgnk+Q43ItNaULOpQqxSFl9TmHE=;
+	b=E6fbpKKz5TX6tsE+IXiP58sPW/EBymDyIjaWwOuxFLX8cq5HIH4bs5FsCVSJntzLmRKkVI
+	o78aYFySVzOte86DEiYk5ls60zLdKeL+zOC5GFw0ZlwaCzgz76rtz94oOs7B2ndkXXPSJ4
+	STjBmmTGW+8VyEXz0EJgwfA7rMwi65M=
+Date: Thu, 10 Jul 2025 18:50:16 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aHAuLCWpBNC5hUwV@pop-os.localdomain>
+Subject: Re: [RFC] comparing the propesed implementation for standalone PCS
+ drivers
+To: Simon Horman <horms@kernel.org>
+Cc: Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, linux-kernel@vger.kernel.org,
+ Kory Maincent <kory.maincent@bootlin.com>,
+ Christian Marangi <ansuelsmth@gmail.com>, Lei Wei <quic_leiwei@quicinc.com>,
+ Michal Simek <michal.simek@amd.com>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ Robert Hancock <robert.hancock@calian.com>, John Crispin <john@phrozen.org>,
+ Felix Fietkau <nbd@nbd.name>, Robert Marko <robimarko@gmail.com>
+References: <aEwfME3dYisQtdCj@pidgin.makrotopia.org>
+ <24c4dfe9-ae3a-4126-b4ec-baac7754a669@linux.dev>
+ <20250709135216.GA721198@horms.kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <20250709135216.GA721198@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jul 10, 2025 at 02:18:36PM -0700, Cong Wang wrote:
-> On Wed, Jul 09, 2025 at 02:41:29PM -0700, Xiang Mei wrote:
-> > On Wed, Jul 09, 2025 at 01:19:20PM -0700, Jakub Kicinski wrote:
-> > > On Wed,  9 Jul 2025 11:06:22 -0700 Xiang Mei wrote:
-> > > > Reported-by: Xiang Mei <xmei5@asu.edu>
-> > > > Fixes: 462dbc9101ac ("pkt_sched: QFQ Plus: fair-queueing service at DRR cost")
-> > > > Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> > > 
-> > > Reported-by is for cases where the bug is reported by someone else than
-> > 
-> > This bug's fixing is a little special since I am both the person who reported 
-> > it and the patch author. I may need a "Reported-by" tag mentioning me since I 
-> > exploited this bug in Google's bug bounty program (kerneCTF) and they will 
-> > verify the Reported-by tag to make sure I am the person found the bug.
+On 7/9/25 09:52, Simon Horman wrote:
+> On Fri, Jun 13, 2025 at 12:06:23PM -0400, Sean Anderson wrote:
+>> On 6/13/25 08:55, Daniel Golle wrote:
+>> > Hi netdev folks,
+>> > 
+>> > there are currently 2 competing implementations for the groundworks to
+>> > support standalone PCS drivers.
+>> > 
+>> > https://patchwork.kernel.org/project/netdevbpf/list/?series=970582&state=%2A&archive=both
+>> > 
+>> > https://patchwork.kernel.org/project/netdevbpf/list/?series=961784&state=%2A&archive=both
+>> > 
+>> > They both kinda stalled due to a lack of feedback in the past 2 months
+>> > since they have been published.
+>> > 
+>> > Merging the 2 implementation is not a viable option due to rather large
+>> > architecture differences:
+>> > 
+>> > 				| Sean			| Ansuel
+>> > --------------------------------+-----------------------+-----------------------
+>> > Architecture			| Standalone subsystem	| Built into phylink
+>> > Need OPs wrapped		| Yes			| No
+>> > resource lifecycle		| New subsystem		| phylink
+>> > Supports hot remove		| Yes			| Yes
+>> > Supports hot add		| Yes (*)		| Yes
+>> > provides generic select_pcs	| No			| Yes
+>> > support for #pcs-cell-cells	| No			| Yes
+>> > allows migrating legacy drivers	| Yes			| Yes
+>> > comes with tested migrations	| Yes			| No
+>> > 
+>> > (*) requires MAC driver to also unload and subsequent re-probe for link
+>> > to work again
+>> > 
+>> > Obviously both architectures have pros and cons, here an incomplete and
+>> > certainly biased list (please help completing it and discussing all
+>> > details):
+>> > 
+>> > Standalone Subsystem (Sean)
+>> > 
+>> > pros
+>> > ====
+>> >  * phylink code (mostly) untouched
+>> >  * doesn't burden systems which don't use dedicated PCS drivers
+>> >  * series provides tested migrations for all Ethernet drivers currently
+>> >    using dedicated PCS drivers
+>> > 
+>> > cons
+>> > ====
+>> >  * needs wrapper for each PCS OP
+>> >  * more complex resource management (malloc/free) 
+>> >  * hot add and PCS showing up late (eg. due to deferred probe) are
+>> >    problematic
+>> >  * phylink is anyway the only user of that new subsystem
+>> 
+>> I mean, if you want I can move the whole thing to live in phylink.c, but
+>> that just enlarges the kernel if PCSs are not being used. The reverse
+>> criticism can be made for Ansuel's series: most phylink users do not
+>> have "dynamic" PCSs but the code is imtimately integrated with phylink
+>> anyway.
 > 
-> Like others explained, "Reported-by" is for giving credits to the
-> reporter. Since you are both the author and reporter in this case, you already
-> have all the credits. They should understand this and credit you
-> properly. (Please do let us know if they don't, I am happy to help.)
+> At the risk of stating the obvious it seems to me that a key decision
+> that needs to be made is weather a new subsystem is the correct direction.
+>
+> If I understand things correctly it seems that not creating a new subsystem
+> is likely to lead to a simpler implementation, at least in the near term.
+
+It's really more of an unusual PCS driver with some routines for
+registering and looking up devices. I would like to note that Ansuel's
+approach has those same registration and lookup functions.
+
+> While doing so lends itself towards greater flexibility in terms of users,
+> I'd suggest a cleaner abstraction layer, and possibly a smaller footprint
+> (I assume space consumed by unused code) for cases where PCS is not used.
+
+I think the greatest strength of my implementation is its clean
+interface. The rest of phylink doesn't know or care whether the PCS is a
+traditional one (tied to the lifetime of the netdev) or whether it is
+dynamically looked up. 
+
+> On the last point, I do wonder if there are other approaches to managing
+> the footprint. And if so, that may tip the balance towards a new subsystem.
 > 
-> Thanks for keeping updating your patch!
+> 
+> Another way of framing this is: Say, hypothetically, Sean was to move his
+> implementation into phylink.c. Then we might be able to have a clearer
+> discussion of the merits of each implementation. Possibly driving towards
+> common ground. But it seems hard to do so if we're unsure if there should
+> be a new subsystem or not.
 
-Thank you, Jakub, and Willy for for the detailed explanations and patience.
-I'll let my future bug reports smoother.
+I really think it's just cosmetic. For example, in my implementation we have
 
-Cheers!
+/* pcs/core.c */
+static void pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
+			  struct phylink_link_state *state)
+{
+	struct pcs_wrapper *wrapper = pcs_to_wrapper(pcs);
+	struct phylink_pcs *wrapped;
+
+	guard(srcu)(&pcs_srcu);
+	wrapped = srcu_dereference(wrapper->wrapped, &pcs_srcu);
+	if (wrapped)
+		wrapped->ops->pcs_get_state(wrapped, neg_mode, state);
+	else
+		state->link = 0;
+}
+
+/* phylink.c */
+static void phylink_mac_pcs_get_state(struct phylink *pl,
+				      struct phylink_link_state *state)
+{
+	struct phylink_pcs *pcs;
+
+	/* ... snip ... */
+
+	pcs = pl->pcs;
+	if (pcs)
+		pcs->ops->pcs_get_state(pcs, pl->pcs_neg_mode, state);
+	else
+		state->link = 0;
+}
+
+and that would turn into
+
+/* phylink.c */
+static void phylink_mac_pcs_get_state(struct phylink *pl,
+				      struct phylink_link_state *state)
+{
+	struct pcs_wrapper *wrapper = pcs_to_wrapper(pcs);
+	struct phylink_pcs *pcs;
+
+	/* ... snip ... */
+	
+	guard(srcu)(&pcs_srcu);
+	if (pl->pcs->ops == &pcs_wrapper_ops)
+		pcs = srcu_dereference(wrapper->wrapped, &pcs_srcu);
+	else
+		pcs = pl->pcs;
+
+	if (pcs)
+		pcs->ops->pcs_get_state(pcs, pl->pcs_neg_mode, state);
+	else
+		state->link = 0;
+}
+
+and TBH I like the former much better since we avoid special-casing the
+wrapper stuff. We still have to do the wrapper stuff because the MAC
+owns the PCS and we can't prevent it from passing phylink a stale PCS
+pointer. Now, we could make phylink own the PCS, but that means going
+with Ansuel's approach. And the main problem phylink owning the PCS is
+that it complicates lookup for existing MACs that need to accomodate a
+variety of nonstandard ways of looking up a PCS for backwards-
+compatibility. The only real way to do it is something like
+
+/* In mac_probe() or whatever */
+scoped_guard(mutex)(&pcs_remove_lock) {
+	/* Just imagine some terrible contortions for compatibility here */
+	struct phylink_pcs *pcs = pcs_get(dev, "my_pcs");
+	if (IS_ERR(pcs))
+		return PTR_ERR(pcs);
+
+	list_add(pcs->list, &config.pcs_list);
+	ret = phylink_create(config, dev->fwnode, interface,
+			     &mac_phylink_ops);
+	if (ret)
+		return ret;
+}
+/* At this point the PCS could have already been removed */
+
+but even then the MAC has no idea how to mux the correct PCS. If you
+have more than one dynamically-looked-up PCS they can't be
+differentiated because they are both opaque pointers that may point to
+stale memory at any time.
+
+This is why I favor a wrapper approach because we can allocate some
+memory that's tied to the lifetime of the MAC rather than the lifetime
+of the PCS. Then we don't have to worry about whether the PCS is still
+valid and we can get on with our lives.
+
+--Sean
+
+>> > phylink-managed standalone PCS drivers (Ansuel)
+>> > 
+>> > pros
+>> > ====
+>> >  * trivial resource management
+>> 
+>> Actually, I would say the resource management is much more complex and
+>> difficult to follow due to being spread out over many different
+>> functions.
+>> 
+>> >  * no wrappers needed
+>> >  * full support for hot-add and deferred probe
+>> >  * avoids code duplication by providing generic select_pcs
+>> >    implementation
+>> >  * supports devices which provide more than one PCS port per device
+>> >    ('#pcs-cell-cells')
+>> > 
+>> > cons
+>> > ====
+>> >  * inclusion in phylink means more (dead) code on platforms not using
+>> >    dedicated PCS
+>> >  * series does not provide migrations for existing drivers
+>> >    (but that can be done after)
+>> >  * probably a bit harder to review as one needs to know phylink very well
+>> > 
+>> > 
+>> > It would be great if more people can take a look and help deciding the
+>> > general direction to go.
+>> 
+>> I also encourage netdev maintainers to have a look; Russell does not
+>> seem to have the time to review either system.
+>> 
+>> > There are many drivers awaiting merge which require such
+>> > infrastructure (most are fine with either of the two), some for more
+>> > than a year by now.
+>> 
+>> This is the major thing. PCS drivers should have been supported from the
+>> start of phylink, and the longer there is no solution the more legacy
+>> code there is to migrate.
+> 
+> This seems to be something we can all agree on :)
 
