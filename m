@@ -1,212 +1,204 @@
-Return-Path: <netdev+bounces-205676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9DEFAFF9AE
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 08:23:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63646AFFA26
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 08:52:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E6601C4136A
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 06:24:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A042F4A8496
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 06:52:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3EF8289340;
-	Thu, 10 Jul 2025 06:23:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F203280328;
+	Thu, 10 Jul 2025 06:52:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="XoFfrMXc"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pJKcGmpI"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2062.outbound.protection.outlook.com [40.107.223.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE7F280308;
-	Thu, 10 Jul 2025 06:23:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752128585; cv=none; b=q+iGpqUjlpuGIGcpd1ln+ULRFE/yBM1fPsw2KBusAUkr0Ix8iottRJjBRV94uRdUZFFL6ESLZmOAEcxGxKM4i3/4xeSWbsnwz3AEgt2Ig9XkS8ZA+biWgCFNvsOFZdvAq5QJLUsoMFG3SLkexxlC0csvG/SBOo3I0kh4qiOtme8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752128585; c=relaxed/simple;
-	bh=JXTBH1n5C03e9YAeMfPrLiKH4adM3tDux3oo/ksXWBE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BqkE07KGzZWqLSdMvtU0pXBoU3v3THcqvSFMAgjpqJ6A27cXpt9ouHf2FkHwPnim3z0scYDIJckL3iNb5OH6vaYBbuoFWZkxpaldvKmhniR06FE6+ZAz2naIkOxBJtdBb7Wp/kCvVMCNR6m5T5NMIjX/hFzbHZyQnp++4iDqiqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=XoFfrMXc; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 4EA0B42E77;
-	Thu, 10 Jul 2025 06:22:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1752128580;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FKLJQx8y+r0nUlrTaPnBNH5DOZUZAbdKtbnXwbqzRRE=;
-	b=XoFfrMXcolqyVgPd+HdseZ3We2zwCCKOHdsVjVwlU9N2O2+6X1RAx9StT1mTwDhUMWRtJ4
-	RMxeKaMorv3ulyGboQj/ut2ZDT4KU/i3cEOqTvshQVCOB2tYPQvRsmL4COVndxjQuy5e14
-	k3Hp1iCuyizKbH2RFCFWsd7tVhk90wCZyRUMzoEkRvJUnEgo5hHCOhWHlNLqoGhneqwQDH
-	ifO8A+2Dj8o3AyOC8IQZnt53TyiMi7Ir4hNdQVuiBjoSYhL2jXHQOI29th7VaEuGh7ywA/
-	YBgNXsoot19TAScvB4qPNjileoTkzpF7gJdtSIEe7dR5sKfdlU+srfL+S8uNcg==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v3 3/3] selftests: ethtool: Introduce ethernet PHY selftests on netdevsim
-Date: Thu, 10 Jul 2025 08:22:47 +0200
-Message-ID: <20250710062248.378459-4-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250710062248.378459-1-maxime.chevallier@bootlin.com>
-References: <20250710062248.378459-1-maxime.chevallier@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C3A22AE75;
+	Thu, 10 Jul 2025 06:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.62
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752130345; cv=fail; b=UYlmq4/rJv0k45gLMRrtrECovu9bqetwiAs65TpL5NVc/BGwxmNtzXlu7tJXsUdEB97+hRe4kho+LK52jC7YBHkHbvwNCzbeeOYR0wf8muRYr1fHBtwpbVWs02ruc2DFG6PyicG9psihFe0T4q4CLSBlvppqv0oWwc9pmXdx2ZA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752130345; c=relaxed/simple;
+	bh=UbVnQYw8e5Vnyd6Q3VcCcxwIH0+zlAweDYEJuK3UweI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YIZLum3gUxGlBAokO9dRN1YlP7OVFXjQ/oo8+ghTsveaLt+xGyWciLBtsZc/8i9FkSKy5nHtL4UnSpHG69fJVg2luR4o5feuX4l9xNvoo1ajLyP9ixQsxmGrQr1S4CltrEZnKrLEQvDpumIIm0+fxoMBtKkH7IHJvmVwpPxdkXs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pJKcGmpI; arc=fail smtp.client-ip=40.107.223.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=uS3zhaopcocZyNrpXvOxd+Ca9Gkl5Sim4cqqkA0guHeFQF9EAgApfXU9S722k8Vu3rd3T/ymVS4cztsU+3MntQjrjNeMG020/LxIGgrot5j49MM9FBE71BM4rp7uHQs5g0V0xFaIcCZgA9DcB7M9wZYH3tNDD72D2yrIenkcUz5hgqkCzFe7liPan6HfpIaDfFCJSZStp/fMP/DuHdL8SuXVr9Ukd0POt/0pTEz5K1Im1p2QpomYGMrRXPK1atfzuoMnf3D4jI2pTNy3K4XTAvltjBY3knyaJdSFNgpN2W6yqZ114sjr5YEyI8QGZxhZwuiZNUMe7lPv0GSxUG1ZWQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cZKVyVNiVyFb3+5k1AN3s8UfPvIfDLRgxAmOAtgEJRA=;
+ b=UCBx8p6GmUOIYLyo4pTyhlhCHVZq7fQUC/PVZMfSV3GQ8eZPQkcrFoVJIA7eOBIAY/1/VXk7iBxx9fsFpVJbmMlkv4qBNCZlY2SdMDnNz8D5zvp9xTQJRGPDlH5pWj7VsuTc+S4Wj1s9eldP6fUSWnVpzm4L463LmJNMhLBqDnRIDMlhf8O8FAZmqWe+PieMdOnGQuyZwRU8s5AOs05NdwN/eVntKJxxCtxLSgRP+F9eqJV2BH9Ew8MOCCWHnkj19QbdaRhBXZRwaJQtYSeostmM6R8EC3A+I2Vu8KRjpPhRvFDtlO5lZ7r7AFYCjmdm/QUKaqdbVOYZAA9xZNeYqw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cZKVyVNiVyFb3+5k1AN3s8UfPvIfDLRgxAmOAtgEJRA=;
+ b=pJKcGmpI4kKaUal/PHOnvKyTXWiw05pDhyP9FsGJUiC4HsJ8Bc9qK+crs+hmMYz+hCtJKsuPAdk+bpC+M29D+TTcsU0J5BsWfWaktJJ0YRFt9kDCzFT/G+HSC05F8ICrnpDOpEyerVaEkC7yYKueICaVIz6cp0FLegeFa6vX3luxt/CnWFWA92ZAw7RmBFp4PKnQ+2SRMkB5k+NLWJHMct2zzS8JPB3lW2RgTrB+RomkrHmTXYJIdDE5fOc+RoqImUyQV23gLTdarDlzgsAw7zYbnS0inJE4mA9zzw2mk5i1uTaj20KEATRW0qk4O1GIkghgWb7f61TnLuN34dC/qA==
+Received: from CH2PR18CA0024.namprd18.prod.outlook.com (2603:10b6:610:4f::34)
+ by BY5PR12MB4066.namprd12.prod.outlook.com (2603:10b6:a03:207::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.27; Thu, 10 Jul
+ 2025 06:52:20 +0000
+Received: from CH2PEPF0000009F.namprd02.prod.outlook.com
+ (2603:10b6:610:4f:cafe::32) by CH2PR18CA0024.outlook.office365.com
+ (2603:10b6:610:4f::34) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8922.21 via Frontend Transport; Thu,
+ 10 Jul 2025 06:52:20 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH2PEPF0000009F.mail.protection.outlook.com (10.167.244.21) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8922.22 via Frontend Transport; Thu, 10 Jul 2025 06:52:19 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 9 Jul 2025
+ 23:52:06 -0700
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 9 Jul
+ 2025 23:52:06 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.6)
+ with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Wed, 9 Jul
+ 2025 23:52:02 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>
+CC: Saeed Mahameed <saeed@kernel.org>, Gal Pressman <gal@nvidia.com>, "Leon
+ Romanovsky" <leon@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, "Tariq
+ Toukan" <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Jonathan Corbet
+	<corbet@lwn.net>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next V2 0/3] net/mlx5e: Add support for PCIe congestion events
+Date: Thu, 10 Jul 2025 09:51:29 +0300
+Message-ID: <1752130292-22249-1-git-send-email-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.8.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefleejudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeevgedtffelffelveeuleelgfejfeevvdejhfehgeefgfffvdefteegvedutefftdenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedukedprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkv
- ghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF0000009F:EE_|BY5PR12MB4066:EE_
+X-MS-Office365-Filtering-Correlation-Id: 56a45f5d-bf32-43bc-398a-08ddbf7e50e6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Y3ccTdSRPssmh7UC9L0qpIFiSGdgbsqhOgweNqL9/VZMfbKcpb3f3+tvnppE?=
+ =?us-ascii?Q?uu/WeZnfy+AxREQJAD3UP9WXd/WDcknrCSBc/hQ4bE8NwOfl+cXrbRBqjJZm?=
+ =?us-ascii?Q?pH2zpQXVq1oP/6re0LjSieOB7JlI90uUMfHJIgFvbID53Ic+dn0wLR6vdhad?=
+ =?us-ascii?Q?arTY3xr/83fvdAl1Q7SvfdH+I2xPPEEgc7K18HKATUzZT86Z+hqHJTV4bA6X?=
+ =?us-ascii?Q?iTJcEAWkriVVuA9i30nQnVWr2g8RE8IaBVebbY/9X/c+pBs/FItlsj0XmZm5?=
+ =?us-ascii?Q?5jCBUj8/NH62WgFBj20YRKw3hJZETB7H1cjp3YmjTT78vFoxwKSE+LWujbYE?=
+ =?us-ascii?Q?DsNfkvGJDjsDadX97Dcyax+3SzLDzGzd+7gCllNjnYuFq4D6+rRuS4jcOVaZ?=
+ =?us-ascii?Q?B1ay9Mh+RducwJk4z5ZxcVsUZ2ez+dLU+SGgLja9QTUZZLGoVmjK5xFRyB9D?=
+ =?us-ascii?Q?8YX7Mh7SnkNpD67kDEmZe3xQeinczhOCVegIUB2UQpEjD0AcSyvTnU/v7NYA?=
+ =?us-ascii?Q?bz0wW3bUJxsfcyXn83Ef6wjDhn8l/LUM3E3phHA1icijNNaJjTc/gRwdsPrj?=
+ =?us-ascii?Q?Yb7AOOmf6ksDY2uPunbFm24BK42WFJsg5G6pU7EkI+TCdM/+oCRb8Ythv732?=
+ =?us-ascii?Q?wkB3tfko7qa329VRLhf56MyfOKG6+YvUoKSlFaxO2cRH/A1l8qvJrNxi9ASA?=
+ =?us-ascii?Q?qBUVftidX8zNP/UEt3vDECWgp82ZL/xBUquwhM4hgm3kr05+iegJhSWGxRnC?=
+ =?us-ascii?Q?jd50UJRZxygwpeaHUHdpVKjTH8iFbo/w/Sq8HxxoCMS+9MkV2Bvg5oPsOyls?=
+ =?us-ascii?Q?lz1PhML7SE2VSq1EMj6tqnB50v4hbVp5PHqzP+2kkFzuYQHEhe7JVm46rD0E?=
+ =?us-ascii?Q?yv+t2/dWFBSoQKemgw1BcoJPfKXvyC9gmO50CJnl6bY0uaqazG+FOPugSNO4?=
+ =?us-ascii?Q?++OXpMsmW5ttcj1qFDBuyefBqhuoJgy7WqE9NHhM2JfhR50A7jNVJJH3LBAf?=
+ =?us-ascii?Q?a5AeuDK6iM4hIgKjpiJDu0F8l0B/D0MoiE6agquwaLJIbyPxAaaRrYDPBBnT?=
+ =?us-ascii?Q?Czy5wTGz4+ddau1yRqaHHCQmFOQql+4pGdF4nVGizfFzNOf2A3mD+tuwpHXR?=
+ =?us-ascii?Q?FqVfTQ8bXCmqLuhV7cJAEr44DoMCSZl0KrzVy8qB25cOVOkTL+wL/xCdwWtz?=
+ =?us-ascii?Q?uEe1128mrLRPcyKAeoeUhRWzZzOxTZ9CwFo0tDDfraC9IR078oqVsWfS9b2I?=
+ =?us-ascii?Q?XdWnsm+Dv1pj47xqV8jllVW8L0JVmp9EctKYPaNStvPVbuhKvrNYaTZmpKtm?=
+ =?us-ascii?Q?jtVy7jx64TG0rqmmdTSPx1EZP69MpiMoioYQjjt9XCdF2+LWb3LM41VF9SFr?=
+ =?us-ascii?Q?q5BIiiUZ7tWHt6vXwzzbKNl6BnYP6ApB7gTxovPKmhzXktwY56D8opWMATrx?=
+ =?us-ascii?Q?IGdDDj+YLShNCLsOCl8lYVK/pn4/RlKpb7qp7xntXB5Qj344EdFHMSOHdO4x?=
+ =?us-ascii?Q?utENJ1qPD8xWcNgl4WdR+d2+FHg3K2mon2BlqxkKcKEqBlv5bwSR9FXOWQ?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2025 06:52:19.8942
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56a45f5d-bf32-43bc-398a-08ddbf7e50e6
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF0000009F.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4066
 
-Now that netdevsim supports PHY device simulation, we can start writing
-some tests to cover a little bit all PHY-related ethtool commands.
+Hi,
 
-So far we only test the basic use of "ethtool --show-phys", with :
- - A simple command to get a PHY we just added
- - A DUMP command listing PHYs on multiple netdevsim instances
- - A Filtered DUMP command listing all PHYs on a netdevsim
+This is V2. Previous one submitted by Mark.
+Find it here:
+https://lore.kernel.org/all/20250619113721.60201-1-mbloch@nvidia.com/
 
-Introduce some helpers to create netdevsim PHYs, and a new test file.
+Find detailed feature description by Dragos below [1].
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- .../selftests/drivers/net/netdevsim/config    |  1 +
- .../drivers/net/netdevsim/ethtool-common.sh   | 15 +++++
- .../drivers/net/netdevsim/ethtool-phy.sh      | 64 +++++++++++++++++++
- 3 files changed, 80 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/netdevsim/ethtool-phy.sh
+Regards,
+Tariq
 
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/config b/tools/testing/selftests/drivers/net/netdevsim/config
-index 5117c78ddf0a..223e82cb7759 100644
---- a/tools/testing/selftests/drivers/net/netdevsim/config
-+++ b/tools/testing/selftests/drivers/net/netdevsim/config
-@@ -6,6 +6,7 @@ CONFIG_NETDEVSIM=m
- CONFIG_NET_SCH_MQPRIO=y
- CONFIG_NET_SCH_MULTIQ=y
- CONFIG_NET_SCH_PRIO=y
-+CONFIG_PHYLIB=m
- CONFIG_PSAMPLE=y
- CONFIG_PTP_1588_CLOCK_MOCK=y
- CONFIG_VXLAN=m
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/ethtool-common.sh b/tools/testing/selftests/drivers/net/netdevsim/ethtool-common.sh
-index d9c7a3d397a9..1bd0ac5e7bba 100644
---- a/tools/testing/selftests/drivers/net/netdevsim/ethtool-common.sh
-+++ b/tools/testing/selftests/drivers/net/netdevsim/ethtool-common.sh
-@@ -53,3 +53,18 @@ function make_netdev {
-     # get new device name
-     ls /sys/bus/netdevsim/devices/netdevsim${NSIM_ID}/net/
- }
-+
-+function make_phydev_on_netdev {
-+    local parent_ndev_nsim_id=$1
-+    local parent=$2
-+
-+    local ndev_dfs=/sys/kernel/debug/netdevsim/netdevsim$parent_ndev_nsim_id/ports/0
-+
-+    old_dev_dfs=$(find $ndev_dfs -type d)
-+    echo $parent > $ndev_dfs/phy_add
-+    new_dev_dfs=$(find $ndev_dfs -type d)
-+
-+    # The new phydev name corresponds to the new file that was created. Its
-+    # name isn't predictable.
-+    echo $old_dev_dfs $new_dev_dfs | xargs -n1 | sort  | uniq -u
-+}
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/ethtool-phy.sh b/tools/testing/selftests/drivers/net/netdevsim/ethtool-phy.sh
-new file mode 100755
-index 000000000000..b10440d108b2
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/netdevsim/ethtool-phy.sh
-@@ -0,0 +1,64 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0-only
-+
-+source ethtool-common.sh
-+
-+# Bail if ethtool is too old
-+if ! ethtool -h | grep show-phys >/dev/null 2>&1; then
-+    echo "SKIP: No --show-phys support in ethtool"
-+    exit 4
-+fi
-+
-+function make_netdev_from_id {
-+    local new_nsim_id="$1"
-+    # Make a netdevsim
-+    echo "$new_nsim_id" > /sys/bus/netdevsim/new_device
-+    udevadm settle
-+    # get new device name
-+    ls /sys/bus/netdevsim/devices/netdevsim"${new_nsim_id}"/net/
-+}
-+
-+function cleanup_netdev_from_id {
-+    local to_del_nsim_id="$1"
-+    echo "$to_del_nsim_id" > /sys/bus/netdevsim/del_device
-+}
-+
-+NSIM_NETDEV=$(make_netdev)
-+
-+set -o pipefail
-+
-+# Check simple PHY addition and listing
-+
-+# Parent == 0 means that the PHY's parent is the netdev
-+PHY_DFS=$(make_phydev_on_netdev "$NSIM_ID" 0)
-+
-+# First PHY gets index 1
-+index=$(ethtool --show-phys "$NSIM_NETDEV" | grep "PHY index" | cut -d ' ' -f 3)
-+check $? "$index" "1"
-+
-+# Insert a second PHY, same parent. It gets index 2.
-+PHY2_DFS=$(make_phydev_on_netdev "$NSIM_ID" 0)
-+
-+# Create another netdev
-+NSIM_ID2=$((RANDOM % 1024))
-+NSIM_NETDEV_2=$(make_netdev_from_id "$NSIM_ID2")
-+
-+PHY3_DFS=$(make_phydev_on_netdev "$NSIM_ID2" 0);
-+
-+# Check unfiltered PHY Dump
-+n_phy=$(ethtool --show-phys '*' | grep -c "PHY index")
-+check $? "$n_phy" "3"
-+
-+# Check filtered Dump
-+n_phy=$(ethtool --show-phys "$NSIM_NETDEV" | grep -c "PHY index")
-+check $? "$n_phy" "2"
-+
-+cleanup_netdev_from_id "$NSIM_ID2"
-+
-+if [ "$num_errors" -eq 0 ]; then
-+    echo "PASSED all $((num_passes)) checks"
-+    exit 0
-+else
-+    echo "FAILED $num_errors/$((num_errors+num_passes)) checks"
-+    exit 1
-+fi
+V2:
+- Rebase on top of the IFC patches, they got pulled through mlx5-next.
+
+
+[1]
+PCIe congestion events are events generated by the firmware when the
+device side has sustained PCIe inbound or outbound traffic above
+certain thresholds. The high and low threshold are hysteresis thresholds
+to prevent flapping: once the high threshold has been reached, a low
+threshold event will be triggered only after the bandwidth usage went
+below the low threshold.
+
+This series adds support for receiving and exposing such events as
+ethtool counters.
+
+2 new pairs of counters are exposed: pci_bw_in/outbound_high/low. These
+should help the user understand if the device PCI is under pressure.
+The thresholds are configurable via sysfs when the feature is supported.
+
+Dragos Tatulea (3):
+  net/mlx5e: Create/destroy PCIe Congestion Event object
+  net/mlx5e: Add device PCIe congestion ethtool stats
+  net/mlx5e: Make PCIe congestion event thresholds configurable
+
+ .../ethernet/mellanox/mlx5/counters.rst       |  32 ++
+ .../net/ethernet/mellanox/mlx5/core/Makefile  |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |   2 +
+ .../mellanox/mlx5/core/en/pcie_cong_event.c   | 464 ++++++++++++++++++
+ .../mellanox/mlx5/core/en/pcie_cong_event.h   |  11 +
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |   3 +
+ .../ethernet/mellanox/mlx5/core/en_stats.c    |   1 +
+ .../ethernet/mellanox/mlx5/core/en_stats.h    |   1 +
+ drivers/net/ethernet/mellanox/mlx5/core/eq.c  |   4 +
+ 9 files changed, 519 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en/pcie_cong_event.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/en/pcie_cong_event.h
+
+
+base-commit: c65d34296b2252897e37835d6007bbd01b255742
 -- 
-2.49.0
+2.31.1
 
 
