@@ -1,131 +1,200 @@
-Return-Path: <netdev+bounces-205758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96101B00083
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 13:27:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6563AFFEC3
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 12:09:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 793493BC5F2
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 11:27:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9BCC1C85E45
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 10:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DAB72D6618;
-	Thu, 10 Jul 2025 11:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF792D5A1F;
+	Thu, 10 Jul 2025 10:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IeaBNTbq"
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="nOIp1/U3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D05CD2C15B7;
-	Thu, 10 Jul 2025 11:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A352D5A10
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 10:09:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752146861; cv=none; b=dTBI3XHZIOTcW6SQmIthZ5LBQbvxdwMYGwNpEoHOIWzhc2MHDnJkpZcWO2pDOiTc5PYLvxfV+JretAz29nefJ0DMK14APgCNk8MF8VZczYK+AGtegv+KKGSHi+NVYJlKz7O/Cmw3QMPyREUX3lomQ9maHzvM9NzR5+R04TCjGUk=
+	t=1752142189; cv=none; b=a7fl31BGxZgA/0zCB9KVgPrp5fP43bpYj6ZThlFtfNVmTd13ZlxxH37BnJj0QWeRJyypajHrgGf4qa+9zE16gjcGIRJwQklFjdULeYDftJXXzPze/HGcHzrQXU6DebAZ2hVix1EXVGMv0B9lYJ/D52DeLpwnARnjwfpiB+8zvfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752146861; c=relaxed/simple;
-	bh=YclzCq5dgl0eE5mdpw+qGsvA9kPcMfcy+INW0Pn6OCk=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=I+Wrs/dHE9RXybAewVMGP8GFHlFQ3RC71zyeXFNPAcXS4Y7BooYAMG6pMQkIn/k2vtd8Z6IjR0gFMRJ7nkyyNDKsARb8Nt3OwFyQrEdXcJfkkwGm/Rj7E8yM/vV/uIyjaVX+eyBd3aRL3tyWL+cy3Xeb15PZCc8X9wwOVbE23AE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IeaBNTbq; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-453643020bdso6293235e9.1;
-        Thu, 10 Jul 2025 04:27:39 -0700 (PDT)
+	s=arc-20240116; t=1752142189; c=relaxed/simple;
+	bh=uGb5z1puunsnCCyaT5e2323HswJ7HchHcTGcTl7LYpk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AmAXorO6fpb7FdDB0/Yp7X8R7chDktBkvDC3ZJTmAs8ptkNlJDTl0j66pGNokv76yzPZ3PMjCgzTffCWf4OBCTOrKV55YdWTzAflIiIPPNu8lXp3baDjQJgFaKsXO5Sad6L4Ji8E73z5xXDFd1sy3uAPRrDx6FOOi2hYQKrJlBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=nOIp1/U3; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-74b27c1481bso526324b3a.2
+        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 03:09:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752146858; x=1752751658; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=aR5gXXhx3VKvItg1BxdxP0PttmLiDwY44F0xz6t0vkU=;
-        b=IeaBNTbqdhpaOEVBZy2z24GFg77a14/m5533IK2VXGO5oOSkCzl74Rr9/XgrXbQiOQ
-         QZh4sN9i1BpLOrlVbgB7SvZZcPtN5NH+u8hnQK1Y8xPY7qtWY9qWVGgFAIbaqS5ZbjUG
-         5QL+ZJvmu6EPNZx1uW9JYUmAmCVx2N4ArAtMbiAFRdO8W397/NAS/yGww5EULg8hyonp
-         z4sR7AcYNN40Jvc/HzFTHb+GoROLAY6xqI7dOxqRON1ZNqeev4j4drsui0Hyq6Xi+oY6
-         5gw+uvVVs4s0zowOBjV76aML7lwpuqOAx/AYVvb6xJ1WLgiFeXr501edeQKZkxlzw00L
-         YqqA==
+        d=asu.edu; s=google; t=1752142187; x=1752746987; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IUrw0IXmqX16TcWmQ7V7IGWA6zi9U/qCB2cW8nJ8SkA=;
+        b=nOIp1/U3C+u8xoca3KzLv69TaC2yCTP4Mxooo5hxh/Ak4Hw3QeN9cgmBelpdAof1Je
+         cgu/hXAf+A1t/wddSiw2ByXiDzwKnUwB/2cVOz1/ToOtWM+jE1YhdhW3KHt+GpZr4+Wh
+         zywHKlHAtUTpMbPs3EyKXh9sTPcqUg0d/1Bj7wSoMHroIdzNyV7u1PMhHB3pBVIMfDSY
+         xYHMPrCLf6rgN9WC+tQw4ekVFGuZ9or3ZpEadcUrM5/f9MKZWwqlLsK/91SIXGRvQKoc
+         IcJ661HsFSZzHu3FzvFhOYJPXQkt8/t0QIZ7yHYshKS7LCNQJuQd2f0szp9W89qvvnDv
+         eEjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752146858; x=1752751658;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aR5gXXhx3VKvItg1BxdxP0PttmLiDwY44F0xz6t0vkU=;
-        b=E12M3/J10xEngwn7KPbpipl0EXngR5Atp7fOrqUmN+Pb7m0rGY7vCsCU1vw/4JwtjD
-         HZLw0vAVsD0iBNNKfLrV99r5vto9U0SF0Ppfq/Vnuld+xQyLyhBBWPq7Cae9iyZPTr6X
-         h4iVsJkyPe6otJP/AEr7x/cMk99yXY3w2R/7jT+xmO9weWGsLxQ1d8PBVswbLzTSCiEK
-         G61FWdVw8oJznYbmz4SXlBSV7ohDoxUCl1qe59sMwm/QRYlBemKjIU2uiWY63gtbO/84
-         2MDmx+iDzYsfG4UBBoa7j2bsFlyhxYiR6TS2/PZPwzeNzbLaecmcS5HS7RABqlEeWF55
-         VAdw==
-X-Forwarded-Encrypted: i=1; AJvYcCWISgNXOI0kWVIXH3ENB293MSHMinwy4uynh0v5NGph7/yhzpFJK+GgIhzJ5bI0bFZKi5c7BRp4oP3IPYI=@vger.kernel.org, AJvYcCX9Uu3eSX0Qm//OL+3COgqtvXd17A4wqFrnE4HHuOMO0zFJldH8QHvD2i84yBOWuEmMvEj6rCQB@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2uoSCbYhOsAJv+NGeuP3Twj8rD24Hog9Kl10GNae7TM2GRfop
-	6uhHV61f8mMwgfMuyUCTWP7MS9w2QBJXOscjVC2zsINBJtXXLI4ht/0a
-X-Gm-Gg: ASbGncuNxB7wmrIizV6wr/RHU4YAnFK0qAlGJFY983tZoICtYkr/0XckrjgvcsGWeVD
-	JB3h8ZEVtShq6hLS5K6trdY1Va+VPC7prx9uVl49F/iPGOKkDUXxefrHF2+f268476usX9h5ee3
-	4gl7mFImzk8Ul5cQ3Mdq6lRJQ2DMBLzgCktzxsq84/PxgNIU7NC32LUp1kQuOS+/Fq3TuFQrXFP
-	qsDJM9a0sIlsHC2rWlgxr55k6YTskFnosbYAhjn7eHjCfPHKsCxxxuOXv8fCvBYJmJClrK/ylvQ
-	L9t/lve4NhZrIcSpZCtVM5+hHjfQnEM/QS8+3D5TvVd0DWiJ1JVvaqUeK0EzIZzzWZDPqxbgDJo
-	=
-X-Google-Smtp-Source: AGHT+IGeZUzCYmlnvQ1gNQzLgpBT+E7yRCR2OB33C3dIxv4RY59Cz2VgZaNawdxcr0x12uYPeJ5XMQ==
-X-Received: by 2002:a05:6000:310e:b0:3a5:85cb:e9f3 with SMTP id ffacd0b85a97d-3b5e44e3b34mr5080756f8f.12.1752146857827;
-        Thu, 10 Jul 2025 04:27:37 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:a8bc:3071:67a5:abea])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8bd1932sm1652558f8f.17.2025.07.10.04.27.36
+        d=1e100.net; s=20230601; t=1752142187; x=1752746987;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IUrw0IXmqX16TcWmQ7V7IGWA6zi9U/qCB2cW8nJ8SkA=;
+        b=xO5LUCRXkYK6avc/G5CchsKF3ub/L/i2VIIfrSeGw7kCr9CdWJbfJDfIhZnQjzBdJr
+         JnYlfwXofwEIPBW1OBjM2wKaaOsFm+612ZOGx26R0Zn6BqN+vbruetkol5WeYcPYsJ7h
+         iOcY61s92Bccm3X0qpveeUxCuglMya6ZIB9H/9y1qqiT12+fZfH/Dml7Yb3uMfKQwT8H
+         0msY4lOyH+dgi69r663KvHmkF/ymzOz/XnQJZwLFxS+w+6jXyPqwkyZXUwKxr1bcuA58
+         e7fcUufeqw7ffvFiUsxvz/oVk2+bRi/MsBQpHClo4xPyZot+jVMLfWNUPAgHI0ppKDqP
+         EXdQ==
+X-Gm-Message-State: AOJu0Yz4G8LJ/nmVVUauoO5vryWDDLlenrmZ9hb+IWp0MrQ/hDrdRy2u
+	wuqHY/i3rmT3A2B7a4T76SkgCmWHF4YTaocALKi6sIrbQ2SYb0oeopZfn6DYhItqgw==
+X-Gm-Gg: ASbGnctdSVY37L1pYWbJaJ6H3HHEqX4i9yOTssWTAb8Ke0s+j0aoI5/bkWpdXTopkMk
+	iwaXmhg1HvJRFVJGKdwh0Alsu7+2uf/ZutdCKs8wXBZZNUhBeOnR31h6kwStLszvOmv/W23uz0G
+	ycCDzb2bEwkSsmmoC/O07ngNehugoLNbG9ZeM8yDC4ZaUkis9mgJcPK+i41xOpVm3AssIQmbduG
+	FzJsNl7RMgaE0dXKM6bVjxOwj66LgCZhsCIQK8K8fxhmgbgtzUCr3Xbe+BUzyY4At+cu9maYxnX
+	VDoL+NSJ6qxeM8aVSUzXZd2ZUpzIzOX7xO635XVkPLGeI4aj/sUYsWd4W2eEPaUPiBXsPMro9uW
+	2aaTJJGYhLDaskA==
+X-Google-Smtp-Source: AGHT+IF1EoBjMkMKYlicecVPELls0rWiAZ3hqt3PW+YAZAfNXJW/mgrr8l66mLe1FKocQi2mPiCbZw==
+X-Received: by 2002:a05:6a21:9988:b0:216:1fc7:5d51 with SMTP id adf61e73a8af0-22cd8085875mr10001017637.37.1752142186935;
+        Thu, 10 Jul 2025 03:09:46 -0700 (PDT)
+Received: from xps.dhcp.asu.edu (209-147-138-224.nat.asu.edu. [209.147.138.224])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b3bbe72912asm1734645a12.71.2025.07.10.03.09.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Jul 2025 04:27:37 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>,  Jonathan Corbet
- <corbet@lwn.net>,  "Akira Yokosawa" <akiyks@gmail.com>,  "Breno Leitao"
- <leitao@debian.org>,  "David S. Miller" <davem@davemloft.net>,  "Eric
- Dumazet" <edumazet@google.com>,  "Ignacio Encinas Rubio"
- <ignacio@iencinas.com>,  "Jan Stancek" <jstancek@redhat.com>,  "Marco
- Elver" <elver@google.com>,  "Paolo Abeni" <pabeni@redhat.com>,  "Randy
- Dunlap" <rdunlap@infradead.org>,  "Ruben Wauters" <rubenru09@aol.com>,
-  "Shuah Khan" <skhan@linuxfoundation.org>,  joel@joelfernandes.org,
-  linux-kernel-mentees@lists.linux.dev,  linux-kernel@vger.kernel.org,
-  lkmm@lists.linux.dev,  netdev@vger.kernel.org,  peterz@infradead.org,
-  stern@rowland.harvard.edu
-Subject: Re: [PATCH v9 05/13] docs: sphinx: add a parser for yaml files for
- Netlink specs
-In-Reply-To: <eab7fb6b3ab7a29a71c35452478619745e66b621.1752076293.git.mchehab+huawei@kernel.org>
-Date: Thu, 10 Jul 2025 09:27:31 +0100
-Message-ID: <m24ivk78ng.fsf@gmail.com>
-References: <cover.1752076293.git.mchehab+huawei@kernel.org>
-	<eab7fb6b3ab7a29a71c35452478619745e66b621.1752076293.git.mchehab+huawei@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        Thu, 10 Jul 2025 03:09:46 -0700 (PDT)
+From: Xiang Mei <xmei5@asu.edu>
+To: xiyou.wangcong@gmail.com
+Cc: netdev@vger.kernel.org,
+	gregkh@linuxfoundation.org,
+	jhs@mojatatu.com,
+	jiri@resnulli.us,
+	security@kernel.org,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH v3] net/sched: sch_qfq: Fix race condition on qfq_aggregate
+Date: Thu, 10 Jul 2025 03:09:42 -0700
+Message-ID: <20250710100942.1274194-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
+A race condition can occur when 'agg' is modified in qfq_change_agg
+(called during qfq_enqueue) while other threads access it
+concurrently. For example, qfq_dump_class may trigger a NULL
+dereference, and qfq_delete_class may cause a use-after-free.
 
-> Add a simple sphinx.Parser to handle yaml files and add the
-> the code to handle Netlink specs. All other yaml files are
-> ignored.
->
-> The code was written in a way that parsing yaml for different
-> subsystems and even for different parts of Netlink are easy.
->
-> All it takes to have a different parser is to add an
-> import line similar to:
->
-> 	from doc_generator import YnlDocGenerator
->
-> adding the corresponding parser somewhere at the extension:
->
-> 	netlink_parser = YnlDocGenerator()
->
-> And then add a logic inside parse() to handle different
-> doc outputs, depending on the file location, similar to:
->
->         if "/netlink/specs/" in fname:
->             msg = self.netlink_parser.parse_yaml_file(fname)
->
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+This patch addresses the issue by:
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+1. Moved qfq_destroy_class into the critical section.
+
+2. Added sch_tree_lock protection to qfq_dump_class and
+qfq_dump_class_stats.
+
+Fixes: 462dbc9101ac ("pkt_sched: QFQ Plus: fair-queueing service at DRR cost")
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
+---
+v3: Remove Reported-by tag
+v2: Add Reported-by and Fixes tag 
+v1: Apply sch_tree_lock to avoid race conditions on qfq_aggregate.
+
+ net/sched/sch_qfq.c | 30 +++++++++++++++++++++---------
+ 1 file changed, 21 insertions(+), 9 deletions(-)
+
+diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
+index 5e557b960..a2b321fec 100644
+--- a/net/sched/sch_qfq.c
++++ b/net/sched/sch_qfq.c
+@@ -412,7 +412,7 @@ static int qfq_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
+ 	bool existing = false;
+ 	struct nlattr *tb[TCA_QFQ_MAX + 1];
+ 	struct qfq_aggregate *new_agg = NULL;
+-	u32 weight, lmax, inv_w;
++	u32 weight, lmax, inv_w, old_weight, old_lmax;
+ 	int err;
+ 	int delta_w;
+ 
+@@ -446,12 +446,16 @@ static int qfq_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
+ 	inv_w = ONE_FP / weight;
+ 	weight = ONE_FP / inv_w;
+ 
+-	if (cl != NULL &&
+-	    lmax == cl->agg->lmax &&
+-	    weight == cl->agg->class_weight)
+-		return 0; /* nothing to change */
++	if (cl != NULL) {
++		sch_tree_lock(sch);
++		old_weight = cl->agg->class_weight;
++		old_lmax   = cl->agg->lmax;
++		sch_tree_unlock(sch);
++		if (lmax == old_lmax && weight == old_weight)
++			return 0; /* nothing to change */
++	}
+ 
+-	delta_w = weight - (cl ? cl->agg->class_weight : 0);
++	delta_w = weight - (cl ? old_weight : 0);
+ 
+ 	if (q->wsum + delta_w > QFQ_MAX_WSUM) {
+ 		NL_SET_ERR_MSG_FMT_MOD(extack,
+@@ -558,10 +562,10 @@ static int qfq_delete_class(struct Qdisc *sch, unsigned long arg,
+ 
+ 	qdisc_purge_queue(cl->qdisc);
+ 	qdisc_class_hash_remove(&q->clhash, &cl->common);
++	qfq_destroy_class(sch, cl);
+ 
+ 	sch_tree_unlock(sch);
+ 
+-	qfq_destroy_class(sch, cl);
+ 	return 0;
+ }
+ 
+@@ -628,6 +632,7 @@ static int qfq_dump_class(struct Qdisc *sch, unsigned long arg,
+ {
+ 	struct qfq_class *cl = (struct qfq_class *)arg;
+ 	struct nlattr *nest;
++	u32 class_weight, lmax;
+ 
+ 	tcm->tcm_parent	= TC_H_ROOT;
+ 	tcm->tcm_handle	= cl->common.classid;
+@@ -636,8 +641,13 @@ static int qfq_dump_class(struct Qdisc *sch, unsigned long arg,
+ 	nest = nla_nest_start_noflag(skb, TCA_OPTIONS);
+ 	if (nest == NULL)
+ 		goto nla_put_failure;
+-	if (nla_put_u32(skb, TCA_QFQ_WEIGHT, cl->agg->class_weight) ||
+-	    nla_put_u32(skb, TCA_QFQ_LMAX, cl->agg->lmax))
++
++	sch_tree_lock(sch);
++	class_weight	= cl->agg->class_weight;
++	lmax		= cl->agg->lmax;
++	sch_tree_unlock(sch);
++	if (nla_put_u32(skb, TCA_QFQ_WEIGHT, class_weight) ||
++	    nla_put_u32(skb, TCA_QFQ_LMAX, lmax))
+ 		goto nla_put_failure;
+ 	return nla_nest_end(skb, nest);
+ 
+@@ -654,8 +664,10 @@ static int qfq_dump_class_stats(struct Qdisc *sch, unsigned long arg,
+ 
+ 	memset(&xstats, 0, sizeof(xstats));
+ 
++	sch_tree_lock(sch);
+ 	xstats.weight = cl->agg->class_weight;
+ 	xstats.lmax = cl->agg->lmax;
++	sch_tree_unlock(sch);
+ 
+ 	if (gnet_stats_copy_basic(d, NULL, &cl->bstats, true) < 0 ||
+ 	    gnet_stats_copy_rate_est(d, &cl->rate_est) < 0 ||
+-- 
+2.43.0
+
 
