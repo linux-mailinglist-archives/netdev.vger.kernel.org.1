@@ -1,121 +1,121 @@
-Return-Path: <netdev+bounces-205608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68EA1AFF680
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 03:50:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59218AFF683
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 03:55:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBC4E5A5C77
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 01:50:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D3EE483E67
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 01:55:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3E727E7CF;
-	Thu, 10 Jul 2025 01:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Se0Qf2AK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80CE927E7D2;
+	Thu, 10 Jul 2025 01:55:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A69D2D78A
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 01:50:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A789846C;
+	Thu, 10 Jul 2025 01:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752112203; cv=none; b=e4cwC2r4iw39K8tT/8HMBlKxVyVAivw2X0/FX36x/5Z1Cj8eXsY2qXYiPMdGjX/UYzsAfeHFRYPiHPBdWZ/Ei8830KeM4sFX0REcMGa2Fqj8Nb/aV++M7N+T8zhOdL610XhnzteeIUS3ViqlPU7TQHn0CAF6uBlvO64Tu24svvU=
+	t=1752112547; cv=none; b=rhStFfcRUspOaaRoQgtF76OHvAcevEtnx4HApbeWA2GDb8qpbHRCwai0CoYwvz0oIrQltI+uOW1XXSFM0usTVPoOqDfvH0Vwyuxohi/xGJ8Awgr4CA1Jhao43Rid3aiY5WaNvmyU4UDK2nHZPMJ+tIUxQqpeJtewomh1Akk9Zq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752112203; c=relaxed/simple;
-	bh=K6pQ4XrkUWHo97uLv6k+x9FoaN/bZFI/7F3Pc8AaV7g=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Xv7lUW41iOf6YgtbEQDodqj9p/zZ/Tagavu00E3DfU22y56K4yfFmnOMl8wUSAdJ1WBkBEra7usm7YZYdE04Skh3nXKV7KCrYDalYp390dAcqwNVFHdBhuS0TPp0ej/WFuvbD5jgS35crguZmiXFcvUMLEHOJwv08jtxQywWPJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Se0Qf2AK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CDDEC4CEEF;
-	Thu, 10 Jul 2025 01:50:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752112202;
-	bh=K6pQ4XrkUWHo97uLv6k+x9FoaN/bZFI/7F3Pc8AaV7g=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Se0Qf2AKaOB1rOf9rZ/pmZJSAVikJtlDM05Kxoxe63JiF6IWTySgIQsAMw6fNS2l9
-	 qurrNt1+KuDeELEGlVlvHOKv/kUapK6TNIfZQqSW0qRZxeWFd+Qzlpg0Wd+Y4cHxmR
-	 oktf0JsFO0yrdov389J1Na1BlKbFtwKE6hgstfSHFDmZ7P+/BJxKlekrnX1pQeKMvu
-	 mFXq3OAcHiGod4RAvh+7bEK3RHwYgp0XzaVZrllrIsI9Zj8mE1vc9g59EXwuB5QzS6
-	 /RnxFHZtOnfFzrxpIIzJ+KY1y7kb188B3hHqk6oGrMlsKRkuT+pTDsEg1Kw5mG4tOs
-	 YXcSVd9orRDAg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E7E383B261;
-	Thu, 10 Jul 2025 01:50:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1752112547; c=relaxed/simple;
+	bh=+L/rwZ6HABHIMhGOP2zkn36SLvTa9s3kx/uJ/DlIHRI=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=EJmbMdTiff/g3FUt1gPpCTnvE++p0uTGCov3nt3mtpW1Ta+HCXcpUpEPNk2UEi2JgIw1OF1MbaInPzcZ+qdH0XjCn5L3HHYCOLP62GAeMc3IFMymuFgXrx5JX8tGrjj2gBh8G04ConAb8KQOnqGQlXyCMmAYJTC0omw2zeorN2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas1t1752112454t545t20380
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.20.45.108])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 2056198709268237627
+To: "'Simon Horman'" <horms@kernel.org>
+Cc: <netdev@vger.kernel.org>,
+	<andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<mengyuanlou@net-swift.com>,
+	<stable@vger.kernel.org>
+References: <FD180EC06F384721+20250709063512.3343-1-jiawenwu@trustnetic.com> <20250709112937.GU452973@horms.kernel.org>
+In-Reply-To: <20250709112937.GU452973@horms.kernel.org>
+Subject: RE: [PATCH net] net: libwx: fix multicast packets received count
+Date: Thu, 10 Jul 2025 09:54:05 +0800
+Message-ID: <086c01dbf13d$84ab4ec0$8e01ec40$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 00/12] Add vf drivers for wangxun virtual
- functions
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <175211222501.955880.5880493276955983984.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Jul 2025 01:50:25 +0000
-References: <20250704094923.652-1-mengyuanlou@net-swift.com>
-In-Reply-To: <20250704094923.652-1-mengyuanlou@net-swift.com>
-To: Mengyuan Lou <mengyuanlou@net-swift.com>
-Cc: netdev@vger.kernel.org, michal.swiatkowski@linux.intel.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch,
- duanqiangwen@net-swift.com, linglingzhang@trustnetic.com,
- jiawenwu@trustnetic.com
+Content-Type: text/plain;
+	charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQFEaMASMAu75b72C5g8YPIt++TR2gHIKvCMtUtmlvA=
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: Nw9C1WBu09hPPyKucH/9W1kgI0owSi5xAGWjqu/a70S4ZshD0WHJAaHg
+	gG76x8QU2Wo7Mfu4QK4ISWu45mz+tbSHPeuHJVUk4y3h50JuyRZ1xcGSbJqMz7LK7uKf3dt
+	gEc2vist1fdQfvrTR8Psnev8KOjo//q1cHiOnhzmj5+Cq952dwcyVgcutinYJaKWZrAxeGq
+	QP1T02KfMCkuNQiuba2AS4sc/1WUdrczRABcgV9cPS77ZDO2ZlRhrYYUG1jL3renr2ffN0R
+	xekf1/xPInW2LkwKPKcc6qWquUOe0q0MDlKrtt6sfhpEveInfQ8EcdoCN7+z8qdDHNp7mgV
+	IB3RWYAliaZP1TYF4Id6H+FjtVyu9/RfwuShlcdGQSwrymMldU/DDT4LPMkK209RN/4zbWR
+	UdHC/n5Uquun9XHFaRRiNFHxLpKq8GrwdXhd61cOE+i0O1x2eFqyF4hC8IIWLYMwFZUNaHa
+	q4ogRHvSD9dJai4m1EHgZzDTZnbFlpNYFcuqmOn8BLnMJ+G63ZOvrEVALULq/1/4qt3N8ex
+	FkudbcfNFONH/seqn5Cwudw37+Nte6r3MlZTPXBrtETJ8mGmMKj0FGWflDVGxt11ICeticW
+	qP5oKlZ4DWnGpCcRHsTr6u28Su8g3Lfba5zlF8Rq4cQWQ+eCCk3dfaOHhyEL4m/ht82rI7u
+	AZ25Js8SCYfZ59/AO+REOu+U+MVBGe2Loy77fWvKfg3QEgA7cSAEI5KfLJvDcimwrf5erGX
+	lTjoV0OvRfkCnpL/FX5m2bIF0zbE/AT9zNl7fFQvV4Wc2Kyalz1eV1KfnSN6fPteD00BbTv
+	OPF+2z7aVVfCTOAPZjFUyLHsLO/fo2gXJStPVfjc5qCFRkZ37+QWN6JDfgs0ZBW9I97qcdU
+	gvppRUptexo/eVdmkrn0rcR9Q4V9LRoRib6nQ1I1u2iUYQeU3eBlZhbrR8pJhNqUjoEP3sh
+	uBwd75Hhz8FlOCcDzspzFMku9N6PxTDKT8goSMgKGHWbijiur9Z/dIcqOM2q4d/WQvdj9yY
+	QxdP2rdw==
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+X-QQ-RECHKSPAM: 0
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri,  4 Jul 2025 17:49:11 +0800 you wrote:
-> Introduces basic support for Wangxun’s virtual function (VF) network
-> drivers, specifically txgbevf and ngbevf. These drivers provide SR-IOV
-> VF functionality for Wangxun 10/25/40G network devices.
-> The first three patches add common APIs for Wangxun VF drivers, including
-> mailbox communication and shared initialization logic.These abstractions
-> are placed in libwx to reduce duplication across VF drivers.
-> Patches 4–8 introduce the txgbevf driver, including:
-> PCI device initialization, Hardware reset, Interrupt setup, Rx/Tx datapath
-> implementation and link status changeing flow.
-> Patches 9–12 implement the ngbevf driver, mirroring the functionality
-> added in txgbevf.
+On Wed, Jul 9, 2025 7:30 PM, Simon Horman wrote:
+> On Wed, Jul 09, 2025 at 02:35:12PM +0800, Jiawen Wu wrote:
+> > Multicast good packets received by PF rings that pass ethternet MAC
+> > address filtering are counted for rtnl_link_stats64.multicast. The
+> > counter is not cleared on read. Fix the duplicate counting on updating
+> > statistics.
+> >
+> > Fixes: 46b92e10d631 ("net: libwx: support hardware statistics")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> > ---
+> >  drivers/net/ethernet/wangxun/libwx/wx_hw.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+> > index 0f4be72116b8..a9519997286b 100644
+> > --- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+> > +++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+> > @@ -2778,6 +2778,7 @@ void wx_update_stats(struct wx *wx)
+> >  		hwstats->fdirmiss += rd32(wx, WX_RDB_FDIR_MISS);
+> >  	}
+> >
+> > +	hwstats->qmprc = 0;
+> >  	for (i = wx->num_vfs * wx->num_rx_queues_per_pool;
+> >  	     i < wx->mac.max_rx_queues; i++)
+> >  		hwstats->qmprc += rd32(wx, WX_PX_MPRC(i));
 > 
-> [...]
+> Sorry if I am being dense, but I have a question:
+> 
+> The treatment of qmprc prior to this patch seems consistent
+> with other members of hwstats. What makes qmprc special?
 
-Here is the summary with links:
-  - [net-next,v3,01/12] net: libwx: add mailbox api for wangxun vf drivers
-    https://git.kernel.org/netdev/net-next/c/8259946e6703
-  - [net-next,v3,02/12] net: libwx: add base vf api for vf drivers
-    https://git.kernel.org/netdev/net-next/c/ba3b8490bc2e
-  - [net-next,v3,03/12] net: libwx: add wangxun vf common api
-    https://git.kernel.org/netdev/net-next/c/eb4898fde1de
-  - [net-next,v3,04/12] net: wangxun: add txgbevf build
-    https://git.kernel.org/netdev/net-next/c/377d180bd71c
-  - [net-next,v3,05/12] net: txgbevf: add sw init pci info and reset hardware
-    https://git.kernel.org/netdev/net-next/c/4ee8afb44aee
-  - [net-next,v3,06/12] net: txgbevf: init interrupts and request irqs
-    https://git.kernel.org/netdev/net-next/c/fd0a2e03bf60
-  - [net-next,v3,07/12] net: txgbevf: Support Rx and Tx process path
-    https://git.kernel.org/netdev/net-next/c/ce12ba254655
-  - [net-next,v3,08/12] net: txgbevf: add link update flow
-    https://git.kernel.org/netdev/net-next/c/bf68010acc4b
-  - [net-next,v3,09/12] net: wangxun: add ngbevf build
-    https://git.kernel.org/netdev/net-next/c/a0008a3658a3
-  - [net-next,v3,10/12] net: ngbevf: add sw init pci info and reset hardware
-    https://git.kernel.org/netdev/net-next/c/85494c9bf5b0
-  - [net-next,v3,11/12] net: ngbevf: init interrupts and request irqs
-    https://git.kernel.org/netdev/net-next/c/0f71e3a6e59d
-  - [net-next,v3,12/12] net: ngbevf: add link update flow
-    https://git.kernel.org/netdev/net-next/c/cfeedf6a420d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+The other members are read from CAB registers, and they are cleaned
+on read. 'qmprc' is read from BAR register, it is designed not to be
+cleared on read.
 
 
 
