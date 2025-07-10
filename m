@@ -1,90 +1,84 @@
-Return-Path: <netdev+bounces-205937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D807B00DA7
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 23:18:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54444B00DBE
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 23:29:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC89C7AD739
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 21:17:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2ABA464577A
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 21:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F30A2FD595;
-	Thu, 10 Jul 2025 21:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B84472FE31A;
+	Thu, 10 Jul 2025 21:29:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HGvQTWFK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kp1FuqKq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C9728BAB1
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 21:18:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4384A23506E
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 21:29:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752182321; cv=none; b=qRQ+z/IBgfb74BA+m+BpMd1+BfZMLv1wfzaNIPXVQfzo/6LCXOX2tgwoxOsYRGvToj3TKfAi7jO4CL8ZM+9uMKj9DaIDDdhYZClz0iP213B6lGFnPdGn7pLwUKdFjjZUowkKq7D3zWzEaNQ83BpNMccvd+HzBABL3Xg0p1MMsXM=
+	t=1752182948; cv=none; b=DOuwwN6kcS0pqDZt6SDF+STw/RROEUg7VGGdJRfKgV48CQ3Gq5oJRVGLUwiHVfNElo7dreY0pJEz1Wi72tnlwNCnQadtL9DALGlZVui2KSmFJn20fwTBdfKATf71RBuSzBQNn+Hhyu49wJEsxmsfd7MAK2rYmTODS5jNyjvk644=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752182321; c=relaxed/simple;
-	bh=Kw8eJFGiyveHLHxOTN/htQ7rcEXtdy+sM8T+IeYLN6k=;
+	s=arc-20240116; t=1752182948; c=relaxed/simple;
+	bh=+u0Sf+6dzXDz1Hms/Q6cDVh4m4w2yVh1bevZG8JaA5c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DpXxnZ03JXTqrMwBCtX+e4Tcu5KUiHLI59Oq5MprG+TuSQL5h3Rss1HTyy/8/dEDfcvxkhIgIwXYIDaLI0d8QkIu6plFRorhgMzYbo7ZOQ2LtOw6a9YB/V11dI2QQ7lOLG0+ggCLeI0TyoXvOH/ABKNri64nIrziQOFek5HF6mM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HGvQTWFK; arc=none smtp.client-ip=209.85.210.174
+	 Content-Type:Content-Disposition:In-Reply-To; b=uhyCZuhel98Gd/UHW4NFuJL9Uwa4LeBWpEwoR1+QR9G+eStg4wPYOC9vYNDBIFry32ndwt24C58cu6LVModjl40IApyQ4NWlr86lv7BpujiQ/TKSD+9/ibq6vN7oW00oIrgB+5oS7t9rUuiGs1fctZGmUHgD3Ahv8A8nltaxL0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kp1FuqKq; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-74ad4533ac5so2232245b3a.0
-        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 14:18:38 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7399a2dc13fso1663375b3a.2
+        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 14:29:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752182318; x=1752787118; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1752182946; x=1752787746; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=90BXQUYS32JtT6yR1X+EcpEwleypFI059YuPrW40zvs=;
-        b=HGvQTWFK7uhYN1dY24T7mzeg5cpzFL/xmDd5RPkwAtrrRwdMGGxUIpLjF/P4ELxCrR
-         jgnLs/knx55Nr9/gfLKZAm/nKQ1G35UWiITtglKwWAfstue0UuStrblSHwIYoTBHXhCQ
-         /EycQAmUPaC9iKUmGUBsL4TMrBsXLIQ2cvzQYAa+oKOzDdkE/Fk39PZvhEYXz8Y2D7js
-         b67+YPWhzigMuxUDNj/YcWt5n6xnryCJ9BUAl/hv79HlbIqPVRA2zmxP1LO9+fPnI8oh
-         mvl3ljopTpazXXVMrrYrBdmvxFx0RQulfExMRO2YpglazeXIR/jLz5Ki1wQLLNipTDBN
-         8oQw==
+        bh=DpDJpyCiiZ90jTUDrcwe8h14+Lp264EARROBydownq0=;
+        b=kp1FuqKq9W6v9ytpn6dV68e93msuLTaYbxNuSCkGe1lRhvQ1EwbMDnbGAAJ4AinepV
+         AAIN2vEDJPhTIGs9AF+n4uSO6zUTdpyIgvyyYYuNYTYtZtwym73T10fQu+/63aHDG/M2
+         y0qRsLqOp/T82Mbe7o2ejchXQRS9D5hdkTDFTe9gass+ziX4wwvi/irzD0WLBDHSgpfF
+         3lpwX77ak6iOxL1UDDpQvJUbwOugAoqcrKwaCg55/9+vutzkSNgDanDXhV3i9cXS+mHv
+         vmBzNfuC+CQ9ON+oiPLjlTJkYcMzAwPrxlQ6ky0FphBQeGPoROphF3JqN4BNTxio6U0z
+         9hlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752182318; x=1752787118;
+        d=1e100.net; s=20230601; t=1752182946; x=1752787746;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=90BXQUYS32JtT6yR1X+EcpEwleypFI059YuPrW40zvs=;
-        b=KCl1bObTVX+4nI1uLqmU4RazVkd8EEYDb6f5L6aIAmUu5iqmCcPinvHNhMXrkNls8t
-         zV0sIUjwDllqA6yu+R3d+WWI4axyZClUdEWZMpucUva/LbhlIQI9+4IVA6pWK12P9jdb
-         6VDNyeF5haHqQVVIjd/qoaMAx2rSECsDoCEmiujiMnc/zw8nE+Y+3L/R1n8ynd57ZkaS
-         mgEFZ15jqG36TebVtZ+bPwxumVIvCdCRRv3A6Lc4Vj2GEMQ3zLx95rRMWV2iFJ6WEAXw
-         a3Gxe6VwL8AB/uMxt3jh/Em2LmO1gDQTN45UYXF6cU90OzhnAXYwb05SALQCbZEMeGPD
-         uNmg==
-X-Forwarded-Encrypted: i=1; AJvYcCW6zUCVqU4JFB1McM6zufDJcHnZ4uJd/eKieI0EOnPWKFOEU639+nhyeJIczAUfx4DF+NLrgwg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwauZ+xSwCbUNgNFuV6Him+L2cXqx4sg8X9VxWjwckuisdvGTwH
-	8VCmI0xMvLbV5m6JA9oCVkA3eE7Mi3FVU4xA5M4WNvf0bSjzJROhr8+l
-X-Gm-Gg: ASbGncvmFL91l/nDZcFd/Pgj21qHyD/JTEtBlrl3EutW0WK9E7hvK19vfAnSM1VsKNL
-	Dfl/UspsY1UMCi1zp6S4O2hEv/fRWwVzqo3BioVOaTO2BWQrCZVUxtpYMRTEjmTKKRNjK2wcJTU
-	UNLLautFcnyurSFO9iTcJI/ZRFCZXtOz9oX+w1TsQGGrj30GVTRG6HOv98y7sXNTo5pcBahHl65
-	SF5nrUzdzgcdhlKKTi5irWizS5VomT+0ddNtQFmqdyYILT3Yt9kl57LxNJV06jpVlX8ChXieEDA
-	f6wVSJ8n2c2upT7zMYTyEDiKB2GOg/2CV4xnTdqn42N4XrSYAidMWleNqrG7mxGorPWOLmv6Qb1
-	C
-X-Google-Smtp-Source: AGHT+IEEoSIBL6xB9Bpm8yMD7RFFUwq3a6dlbhuE1tzSVQL7Ok2fliDclIriULZ5E/FTJNdck3jRqA==
-X-Received: by 2002:a05:6a21:3287:b0:1f3:20be:c18a with SMTP id adf61e73a8af0-231272c58b1mr1030475637.10.1752182318089;
-        Thu, 10 Jul 2025 14:18:38 -0700 (PDT)
+        bh=DpDJpyCiiZ90jTUDrcwe8h14+Lp264EARROBydownq0=;
+        b=KAJ38/4RDXvBK5utCQ0nUm4vMy7MLulEh70Ilc3b44ATvcNHZCXDaROqdIqcja1cw7
+         u30GZep700qJed1WfqQuyfSEMDh1hMXyrOARLBEocT64FCbCEFKrWAk0ECfTSEDrmmeg
+         VYiCuKqGgVtVpmtahnfz7pgliU3YQlxAJGJ4ScJPJmDqngs3r46mr4p95sYX0lS0Kr5+
+         ioQDHjDJPBIwiBEvYOJLqWwyJsrp5P9HD6chgp7+cnTpHDpIr5iXlulrd/f1u/lBNgHa
+         k4eODhxtykWBgKIX0Ht1I2dfKgK4pDpLzBT2J1gAr9JQBx6sxLcIqiWxt9Frhe6HC9ZR
+         dHKA==
+X-Gm-Message-State: AOJu0YzGIsRI1809rgWiIbn4sEMTqGob6cDQ1A8lArw+HNU0eS4o8uRH
+	8KaGZdWl+58Ko01d2ChHPtXMGIw08y79wIUMRqUXVXilAF/809XRZKIw
+X-Gm-Gg: ASbGncsYqXvdni/9WX+OrwKTPxDxhsvNzbx3zbOPfbohsSoCoADuDSWMUChzHKMmOVw
+	T6PvAwMezQTKVBBWE0jlvrS+97hgymlw9PAdAN8mUIddkVKTD4QxYitIH6tnpEjiac++4eiUbLg
+	uCmsKrCwfS4/L2UrMJBWMzDZmQFPDe67EfGve8u+mJcEST9RWWWiCdVyT86ZeAfJIgGFRhDftm8
+	jp7ogwU9x8C5XBKRg8kpkFcNBS49mV2tWtlXAlYFCrDEHu1LiH6lQ97eKZoH/76VHvgY4jPLkjj
+	5jLda0NLSNtDyB9NdfI1hzQN6Fl+3X8UPOELco2PkPT9GcghLvogQTR5EzEiCaSxRQ==
+X-Google-Smtp-Source: AGHT+IHdl5dkwBKE3rn9rMU2SJLCsH/cRxgkqup65SEnwM65ZZN4PdHrIw54U0dYk+98zmzHUg9jOg==
+X-Received: by 2002:a05:6a00:39aa:b0:736:2a73:6756 with SMTP id d2e1a72fcca58-74ee3437398mr764974b3a.21.1752182946400;
+        Thu, 10 Jul 2025 14:29:06 -0700 (PDT)
 Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74eb9f8f878sm3065907b3a.166.2025.07.10.14.18.37
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-74eb9f1d337sm2972361b3a.73.2025.07.10.14.29.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Jul 2025 14:18:37 -0700 (PDT)
-Date: Thu, 10 Jul 2025 14:18:36 -0700
+        Thu, 10 Jul 2025 14:29:05 -0700 (PDT)
+Date: Thu, 10 Jul 2025 14:29:04 -0700
 From: Cong Wang <xiyou.wangcong@gmail.com>
 To: Xiang Mei <xmei5@asu.edu>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	gregkh@linuxfoundation.org, jhs@mojatatu.com, jiri@resnulli.us,
-	security@kernel.org
-Subject: Re: [PATCH v2] net/sched: sch_qfq: Fix race condition on
+Cc: netdev@vger.kernel.org, gregkh@linuxfoundation.org, jhs@mojatatu.com,
+	jiri@resnulli.us, security@kernel.org
+Subject: Re: [PATCH v3] net/sched: sch_qfq: Fix race condition on
  qfq_aggregate
-Message-ID: <aHAuLCWpBNC5hUwV@pop-os.localdomain>
-References: <aGwMBj5BBRuITOlA@pop-os.localdomain>
- <20250709180622.757423-1-xmei5@asu.edu>
- <20250709131920.7ce33c83@kernel.org>
- <aG7iCRECnB3VdT_2@xps>
+Message-ID: <aHAwoPHQQJvxSiNB@pop-os.localdomain>
+References: <20250710100942.1274194-1-xmei5@asu.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,26 +87,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aG7iCRECnB3VdT_2@xps>
+In-Reply-To: <20250710100942.1274194-1-xmei5@asu.edu>
 
-On Wed, Jul 09, 2025 at 02:41:29PM -0700, Xiang Mei wrote:
-> On Wed, Jul 09, 2025 at 01:19:20PM -0700, Jakub Kicinski wrote:
-> > On Wed,  9 Jul 2025 11:06:22 -0700 Xiang Mei wrote:
-> > > Reported-by: Xiang Mei <xmei5@asu.edu>
-> > > Fixes: 462dbc9101ac ("pkt_sched: QFQ Plus: fair-queueing service at DRR cost")
-> > > Signed-off-by: Xiang Mei <xmei5@asu.edu>
-> > 
-> > Reported-by is for cases where the bug is reported by someone else than
+On Thu, Jul 10, 2025 at 03:09:42AM -0700, Xiang Mei wrote:
+> A race condition can occur when 'agg' is modified in qfq_change_agg
+> (called during qfq_enqueue) while other threads access it
+> concurrently. For example, qfq_dump_class may trigger a NULL
+> dereference, and qfq_delete_class may cause a use-after-free.
 > 
-> This bug's fixing is a little special since I am both the person who reported 
-> it and the patch author. I may need a "Reported-by" tag mentioning me since I 
-> exploited this bug in Google's bug bounty program (kerneCTF) and they will 
-> verify the Reported-by tag to make sure I am the person found the bug.
+> This patch addresses the issue by:
+> 
+> 1. Moved qfq_destroy_class into the critical section.
+> 
+> 2. Added sch_tree_lock protection to qfq_dump_class and
+> qfq_dump_class_stats.
+> 
+> Fixes: 462dbc9101ac ("pkt_sched: QFQ Plus: fair-queueing service at DRR cost")
+> Signed-off-by: Xiang Mei <xmei5@asu.edu>
 
-Like others explained, "Reported-by" is for giving credits to the
-reporter. Since you are both the author and reporter in this case, you already
-have all the credits. They should understand this and credit you
-properly. (Please do let us know if they don't, I am happy to help.)
+Reviewed-by: Cong Wang <xiyou.wangcong@gmail.com>
 
-Thanks for keeping updating your patch!
+I am looking forward to your net-next patch to make it towards RCU. :)
+
+Thanks.
 
