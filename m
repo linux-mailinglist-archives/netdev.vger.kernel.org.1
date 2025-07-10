@@ -1,86 +1,105 @@
-Return-Path: <netdev+bounces-205975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98251B01002
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 02:01:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0935B01004
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 02:01:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E20B1888400
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 00:01:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34A1D5C2025
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 00:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5C7307AD3;
-	Thu, 10 Jul 2025 23:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A3363093BE;
+	Thu, 10 Jul 2025 23:59:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LEY/ZBhs"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AjiF6Bp9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60AD29ACDE;
-	Thu, 10 Jul 2025 23:58:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827052F3C3C
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 23:59:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752191933; cv=none; b=NVArzqkhbqyyA+lnS0HFkMeIpG1DD0S2+okKdPyxyyYpa0obWxXQ0AtXOr+2Ntg3c4/8rnPFWfqgVNuqRczIDrFPdJpzekIKPDGpuufRy+9mjzUVBE1R9llUBHaPK1E10EkpEznYGxP34bYKz0MaxpToRe0PVDGaHcfQrERDsnc=
+	t=1752191951; cv=none; b=lUEGyc52CLJNBafdFMne9vjp3DLFVe/FdDgWN1eIo5M2STSpOGyNiuxuEpRi4CZqd0PKWwMvCgko/zqDeLq0jeBHuQCMC7u65iqm3QWyAxH3k+ew7WjNp4nZm0V4tCm1wf5/bOckzzaljCdgtW2XKcKKqRJYjDsmlTAW4ZsDR6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752191933; c=relaxed/simple;
-	bh=RZSiQFQ5CJhU/h0mQJuZBqy5Y/7NgeYrUN8qKuNGZaI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VCzSRk1kbeK/4y05Aw0WudUjF0bnujMTlP6oNPHvLcA/gP89I5iKWUkMi1oatf8cuybuupV05abFvUSShqUWNmkNgoqNfPc61xVK2ez/6pz6p989O0fAxw7KCPc0yFbLCR0VCszYSvKtIckF8SAWMXJLNT4XbrFA8lsCLERUt68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LEY/ZBhs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B37E5C4CEE3;
-	Thu, 10 Jul 2025 23:58:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752191933;
-	bh=RZSiQFQ5CJhU/h0mQJuZBqy5Y/7NgeYrUN8qKuNGZaI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LEY/ZBhsaDpXenP21NMpx/v0+GdIHZP9qq9rcGq2t9XFbjm0DCSeVg/OP/j+KFDuu
-	 pLeuPg9fW/WQmiVRfAG/xwR0KitIoLbBTC+xJcj7MgQFrAqTQX4Qleugflp04piT0t
-	 9a+1uquoUkghyvYfix+SAtquNSpkwsnS4938SK+Ptg6cMTtMbm46w1mbyRniOsQ+Hr
-	 MAbPeSmLgAAATN+WIFgvc/b3phu3mDCF8tEv+babk1Uyg4sV8axpK6cCJQwT8pLDbL
-	 pFkzjcxZKkYh1Pk0Qcao5jxlna3CdJovmJlWsRLNHcqZ7DaFQ4AUxXbdZrA2Sp9KkJ
-	 nOzF8zO051G3A==
-Date: Thu, 10 Jul 2025 16:58:51 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Parav Pandit <parav@nvidia.com>
-Cc: Dragos Tatulea <dtatulea@nvidia.com>, "almasrymina@google.com"
- <almasrymina@google.com>, "asml.silence@gmail.com"
- <asml.silence@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Saeed Mahameed
- <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Cosmin Ratiu
- <cratiu@nvidia.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next 1/4] net: Allow non parent devices to be used for
- ZC DMA
-Message-ID: <20250710165851.7c86ba84@kernel.org>
-In-Reply-To: <CY8PR12MB7195361C14592016B8D2217DDC43A@CY8PR12MB7195.namprd12.prod.outlook.com>
-References: <20250702172433.1738947-1-dtatulea@nvidia.com>
-	<20250702172433.1738947-2-dtatulea@nvidia.com>
-	<20250702113208.5adafe79@kernel.org>
-	<c5pxc7ppuizhvgasy57llo2domksote5uvo54q65shch3sqmkm@bgcnojnxt4hh>
-	<20250702135329.76dbd878@kernel.org>
-	<CY8PR12MB7195361C14592016B8D2217DDC43A@CY8PR12MB7195.namprd12.prod.outlook.com>
+	s=arc-20240116; t=1752191951; c=relaxed/simple;
+	bh=NzBvjzZSlnSlEwD5PPYSMqLvkxiVg7UhqXlmM5Ui+i0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=cMWO5uIza5YCpsmy97p+BEgIDyq+9WrvfifFvXwqlT1KLayXeZNybKR0lGdJ0KS6ibFA6V9ZyCM8Oey8q07asFtKT7y6c6edkFXQ3mqBms1z2j/AGC5XD5T+toRnIECvFgsXH1EcQ4iXxucmwuWShHyKyWVzXWwFJJTniZXydbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AjiF6Bp9; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <2ce3b809-28c4-487a-85d2-c62bce7260b0@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1752191937;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5iXgdYm+l921dPhsin9euYhz1uRo0hm5DDdzuaPKGqE=;
+	b=AjiF6Bp9mwnViaXvmTFOYjWNgIxn2AVg35FSMpIdAFk6rkBv+dapf1s0mPZmEk5RqaXNsK
+	y8co69kxpKHE163QzjWR9WPW5vJTZyGEQzx1cSHv4Q4IZZKqaSHyGlIYDQAI2i5Dh6a8xO
+	W4OfIEfixTaZ4iPsAuUxNYIE++LVwcI=
+Date: Thu, 10 Jul 2025 19:58:52 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [RFC] comparing the propesed implementation for standalone PCS
+ drivers
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+To: Simon Horman <horms@kernel.org>
+Cc: Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, linux-kernel@vger.kernel.org,
+ Kory Maincent <kory.maincent@bootlin.com>,
+ Christian Marangi <ansuelsmth@gmail.com>, Lei Wei <quic_leiwei@quicinc.com>,
+ Michal Simek <michal.simek@amd.com>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ Robert Hancock <robert.hancock@calian.com>, John Crispin <john@phrozen.org>,
+ Felix Fietkau <nbd@nbd.name>, Robert Marko <robimarko@gmail.com>
+References: <aEwfME3dYisQtdCj@pidgin.makrotopia.org>
+ <24c4dfe9-ae3a-4126-b4ec-baac7754a669@linux.dev>
+ <20250709135216.GA721198@horms.kernel.org>
+ <c84518eb-15da-4356-ac6a-b2fcb807d92f@linux.dev>
+Content-Language: en-US
+In-Reply-To: <c84518eb-15da-4356-ac6a-b2fcb807d92f@linux.dev>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 3 Jul 2025 11:58:50 +0000 Parav Pandit wrote:
-> > In my head subfunctions are a way of configuring a PCIe PASID ergo they
-> > _only_ make sense in context of DMA.  
-> SF DMA is on the parent PCI device.
+On 7/10/25 18:50, Sean Anderson wrote:
+> /* In mac_probe() or whatever */
+> scoped_guard(mutex)(&pcs_remove_lock) {
+> 	/* Just imagine some terrible contortions for compatibility here */
+> 	struct phylink_pcs *pcs = pcs_get(dev, "my_pcs");
+> 	if (IS_ERR(pcs))
+> 		return PTR_ERR(pcs);
 > 
-> SIOV_R2 will have its own PCI RID which is ratified or getting ratified.
-> When its done, SF (as SIOV_R2 device) instantiation can be extended
-> with its own PCI RID. At that point they can be mapped to a VM.
+> 	list_add(pcs->list, &config.pcs_list);
 
-AFAIU every PCIe transaction for a queue with a PASID assigned
-should have a PASID prefix. Why is a different RID necessary?
-CPUs can't select IOMMU context based on RID+PASID?
+One thing we could do would be to add a mac_priv field to the PCS that the
+MAC could stick some kind of identifier in. I could live with that.
+
+But I still don't like how you'd need to hold a lock across pcs_get/
+phylink_create. It feels like an unwieldy API.
+
+> 	ret = phylink_create(config, dev->fwnode, interface,
+> 			     &mac_phylink_ops);
+> 	if (ret)
+> 		return ret;
+> }
+> /* At this point the PCS could have already been removed */
+
+--Sean
 
