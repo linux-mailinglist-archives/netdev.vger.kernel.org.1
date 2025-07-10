@@ -1,55 +1,82 @@
-Return-Path: <netdev+bounces-205875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F948B009D7
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 19:23:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64F07B009E3
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 19:28:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EDEE188AA0F
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 17:23:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 022477B82EE
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 17:27:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7612877EE;
-	Thu, 10 Jul 2025 17:23:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0E82F0C62;
+	Thu, 10 Jul 2025 17:28:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qUu4gP71"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DLZQuBOV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F2627F198
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 17:23:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368E4199BC;
+	Thu, 10 Jul 2025 17:28:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752168193; cv=none; b=kKWJKqslDYtJUoPqttv9114FablNJm4AWx62e3yya8eL1fdz0NhiGdqG6zTDFe1/8nXh2+fhJ1QoUeyNAMAK26QboglFlfqU3qm0Pd3X9uMAS9ysuug0HbvV/Q6cN7Pk5FEP66dQumJDYa8qGGkiyoFVkNxc76fMHj3/iXtGaPI=
+	t=1752168508; cv=none; b=EAhy1XEIZqdRMyD+HLNQO/sQ5+4jXiTHzC/R1Cc7ugSid/v7ZxJ2DCf/+3sboVNvlVPT6HEThK7YOSWg7fBN05Va73YTUAHY+OIGBAI4x3JoO9MlxKOWLrDHWju8hOVpQfwANf7auQ4pVRWGXfIx8ce9+lk9BmtnAz1ruVeHbZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752168193; c=relaxed/simple;
-	bh=B2TK+ftpnBWjLCVkZPBh/iwQ3C/9VlwJZpHkSpyYowU=;
+	s=arc-20240116; t=1752168508; c=relaxed/simple;
+	bh=AwA55W9+gm6iz71BET86U2X3eLl34NRDjvbJ7Mlg8hY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XjSPW6qZvEYLVytR8lnXelHbZe4bvrrLggPwGX+X/LIgULpOA7rFR1VQ+/wPqJh5Bu6v8DBIK/xYjxMOzpWAmri6rBSBM5b7WhLbXSWcjBcaBfqqWLuIf2S2QjyNRdKL0+eBS29RfaiM0o436kAkk310fOOMlwkT2ucO6StuGFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qUu4gP71; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4403DC4CEE3;
-	Thu, 10 Jul 2025 17:23:13 +0000 (UTC)
+	 MIME-Version:Content-Type; b=QQIORf400a6HoAQIGMAk7Si7NjL+HZsCBYOSpeyith9Rspt9KPIo56Wrod/0co5XAq0Kb0emDw2TTc1qdOkh76GdDGCdaIHVreWJDpoB3zvozc0AfjaYHm+HiqO18PGfugiyJIplhNiS3YLhvNshTZ9kvO0JzwfpN4ckXE60b8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DLZQuBOV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B8EAC4CEE3;
+	Thu, 10 Jul 2025 17:28:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752168193;
-	bh=B2TK+ftpnBWjLCVkZPBh/iwQ3C/9VlwJZpHkSpyYowU=;
+	s=k20201202; t=1752168507;
+	bh=AwA55W9+gm6iz71BET86U2X3eLl34NRDjvbJ7Mlg8hY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qUu4gP71HIsjhfyxIJDTBzB746HzRa2grE0D8rfrFjko1kJy8s/4rO9/N8WmfstkS
-	 cKordWFp5u9pbxvHdsr1J9fekLX9yvn8OcSvYv8KRozr1bmdEypgiZprcw75iyySsu
-	 gpsj9cvNAvIt+fk5aBN1eR1j1WUJr0iYd46wwqlZP0E4NYs1mwaK9QbGk+xDD2NYhW
-	 ufiKeBxlLBhiNXgAU7zDxWx2Lbiffqchbd56s4eds1Q5t6sEohdyG4tKrnNFfhMIbT
-	 A+6VVZJZTtZHgaiKq3wqofMgh8p6uC7oEc7JcXItEjMHjbPtrrVJAbXomswSPpKKQ2
-	 Px7Fn9M0EA0/A==
-Date: Thu, 10 Jul 2025 10:23:12 -0700
+	b=DLZQuBOVM7z1ub2QZgn2BpMj8Mw6rEWAZRIgkLTzSnC0YzSoJ+l/RaD7QSlPNWO0a
+	 1hEqUU40KmqWac29DAzk0nhlUvSZkE1UuLq0YU3wih+nQbfV7TqPeVqNaDcAiq3JqK
+	 HUwz+pbBLYyAhQYfonu1/mrcxno2mCwQ3s79NuvfAykZxbZw4+jx3EmQ5tQ5MY9y9h
+	 DgRXW2Mg4Pj9oZhCwbX6Pw2odh8+K+B7xfhLItEaadqoLxh80uQVCi3O7KpMzd1e2Z
+	 KMnbGjDT022efxgRxdHJrXVPytF7XUnK6ZsWl5FzC1ZWkXhZ2O/EbvLTRyzgjS+5JK
+	 sfRNwXFE17f3Q==
+Date: Thu, 10 Jul 2025 10:28:25 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [TEST] net/udpgro.sh is flaky on debug
-Message-ID: <20250710102312.5c33971b@kernel.org>
-In-Reply-To: <0455186e-290f-41b5-b2b3-78d5bfa2b74b@redhat.com>
-References: <20250710070907.33d11177@kernel.org>
-	<0455186e-290f-41b5-b2b3-78d5bfa2b74b@redhat.com>
+To: "Song, Yoong Siang" <yoong.siang.song@intel.com>
+Cc: Stanislav Fomichev <stfomichev@gmail.com>, Daniel Borkmann
+ <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, "David S
+ . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, Alexei Starovoitov <ast@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, "Stanislav Fomichev" <sdf@fomichev.me>, Andrii
+ Nakryiko <andrii@kernel.org>, "Martin KaFai Lau" <martin.lau@linux.dev>,
+ Eduard Zingerman <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Hao
+ Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko
+ <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, Magnus Karlsson
+ <magnus.karlsson@gmail.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>, "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>,
+ Jonathan Lemon <jonathan.lemon@gmail.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-doc@vger.kernel.org"
+ <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "bpf@vger.kernel.org"
+ <bpf@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
+ <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH bpf-next,v3 2/2] selftests/bpf: Enhance XDP Rx metadata
+ handling
+Message-ID: <20250710102825.744f2653@kernel.org>
+In-Reply-To: <IA3PR11MB92540CF6DB5BCFD34384A280D848A@IA3PR11MB9254.namprd11.prod.outlook.com>
+References: <20250702165757.3278625-1-yoong.siang.song@intel.com>
+	<20250702165757.3278625-3-yoong.siang.song@intel.com>
+	<77463344-1b1a-443a-97be-a7ef8a88b8af@kernel.org>
+	<IA3PR11MB92546301B67FB3A9FDCD716DD842A@IA3PR11MB9254.namprd11.prod.outlook.com>
+	<88a64a65-bd8c-4b73-af19-6764054d4572@kernel.org>
+	<f5d724ab-0eb6-41a1-b694-8aea566e99ab@iogearbox.net>
+	<aGvhzDLSuOolCCWW@mini-arch>
+	<27edae8a-f1a8-4000-ac1e-fd4d5b01e807@iogearbox.net>
+	<aG6Y1J9Li2DdjqWv@mini-arch>
+	<IA3PR11MB92540CF6DB5BCFD34384A280D848A@IA3PR11MB9254.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,10 +86,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 10 Jul 2025 16:20:28 +0200 Paolo Abeni wrote:
-> Something alike the following. I can send a formal patch, and we can let
-> it stage in PW for a bit to observe if it actually helps.
+On Thu, 10 Jul 2025 15:35:32 +0000 Song, Yoong Siang wrote:
+> Would it be advisable to update the documentation to indicate that
+> drivers are expected to copy any device-reserved metadata from the
+> metadata area? This would ensure that xdp_buff->data_meta is equal
+> to xdp_buff->data before a BPF program is executed. This approach
+> would allow BPF programs to freely manipulate the metadata area
+> in XDP_REDIRECT scenarios.
 
-Added to the local hacks, should start showing up from
-net-next-2025-07-10--18-00 onward. Thanks!
+Documenting sounds good.
+
+> Additionally, I am uncertain about the need to overriding metadata in
+> XDP_PASS scenarios. Should BPF programs refrain from overriding the
+> metadata in this case?
+
+IIRC XDP_PASS was the initial use case for the metadata area.
+The driver needs to evacuate any HW metadata before handing over
+to the XDP program.
 
