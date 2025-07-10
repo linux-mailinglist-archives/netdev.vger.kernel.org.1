@@ -1,217 +1,150 @@
-Return-Path: <netdev+bounces-205752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A36C4B0005C
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 13:17:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CB9EB00067
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 13:19:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F28035604BF
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 11:17:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 059FB1C85FCA
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 11:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE542D9485;
-	Thu, 10 Jul 2025 11:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31EFD2DAFDE;
+	Thu, 10 Jul 2025 11:18:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="l5SFYYn2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QLO7Mi21"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2078.outbound.protection.outlook.com [40.107.93.78])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E414D20FA9C
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 11:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.78
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752146240; cv=fail; b=XBgSFYxCD9GEtWlCjqdrpe+D7Jio9Oz31tdDeMlyTQlHoBeSIizTCAQnyA13GYh1K4wPqjvWvKs7d69xtY3Ziqw7OR5lzUI+3BRPpxHtnHt6BEmXRyp4FncH6607xDpQ8y/abdtavzvGWagHdV67metp9f0gQ7JBbHSt/rT+lqg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752146240; c=relaxed/simple;
-	bh=s3S6THEfHtZ2VfTNv1V27m2s11uk4XxqOtEThoyUCDA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=aUuECgMdlwcrqKRArlJeHUtj1qjsXgN90AIRfEIz7Z90lrSUnKuGjWG5yWOpmxqu0r/gp5mSQGL2L8RMikoJe0fec9FsIDBCyZGybymGLOKJ2rn5sIJDXGKAfOy2urDDSVCVKl6OtUti/ikuTEyphVO+pYRthmpFkBYRgN2WqH4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=l5SFYYn2; arc=fail smtp.client-ip=40.107.93.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TFbulNAL92lNfIr8j11umR7lpkmeM/FD0A/flfCuw401m7G/xywVUKuvopCqQqzWQQWJ0ExjlVypnOY7QjJQPN0g9cdXDKACsjkYuUjvPiHTusZ00p17CwZ4kbUcGX4TLL/Y5KITkp9JZEDM/dVKaO0H/U7kZrZt/G4PC4skjfpUnn4mEvr7cLqTQLZDD25IavHaFwuyDkINf1fZ3gfMo/P3q3LPeWfD9oDs/CGFEOPQd/o8fOyIhUIMppf25RITnRm7K9ItWKXCdNejH3f/jZIOnysmCo0kfPS+sdeBzhNifhjrVeU/Shcl9a28O8oOsXnwwZMi3YQ2YGA0CIsx+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KFu5tsYWGL+03g0qbE8OxI4i2qffsf8wpeqY8n3TqTM=;
- b=cNFNUog9lZA2dvUzCn+XZ/uPJ5mscHOF1NoLL4hwMYdxT2xFpiBbg5SvLCBOfDRd8A4UR5rrsLctkJZYiwlunx8QGJV/D7UGXDPEJ0J1Qykt0PSw+FH8NPbnd/e3+wgAZeCVUpHZ5lJnF2uRrxQrvf2ZsIkRCnfLQJnKQ2+7FA+6xzGw4i9MpEFHdh5zldnbmBwQrW+vk2SA+FLwSfiumdSUN37l3xLJ++2iyP8JiHR4+LJ3DuNbSmwxyFg5YPUeANghj53V6rhNzqceojBYY7LVSEB/8X6MGRhTtF48R53oPGgY81ItRfh6LUk7klzWSf/arbO/8tWxYjAAmeB0Lg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KFu5tsYWGL+03g0qbE8OxI4i2qffsf8wpeqY8n3TqTM=;
- b=l5SFYYn2TbfdeCFGRHGYAhsTV62v/Nd8UG+bvHtDuWLOHi9L7cxTzrUcIkZ8Q2xU4/r4H8rfIjLM1mOtvcQYOSVUuD+0OBYBCzD/xsEMOKGFCqrSbBeGwrMHL13ZtRpB46vTH8GBsybL189nUK87HeFmIK/IBZBAruxhnqUL0AfSv9Sbzrc0H+NnDUe4rN+jTe44f2F4Ei7jff5kSFPqIRFGKgAdnPpcl63JonbvQrDpKW4mI446eGsBp9GIBbWgUBIVy0oMuqEb136YBjm7u1XzoQuLCjYuZ7SRZHOja9z2zcM2EDHUjrxTMQp7x/ots821F9n7C01aPeti53q0UQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7500.namprd12.prod.outlook.com (2603:10b6:610:148::17)
- by DS7PR12MB9476.namprd12.prod.outlook.com (2603:10b6:8:250::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.26; Thu, 10 Jul
- 2025 11:17:16 +0000
-Received: from CH3PR12MB7500.namprd12.prod.outlook.com
- ([fe80::7470:5626:d269:2bf2]) by CH3PR12MB7500.namprd12.prod.outlook.com
- ([fe80::7470:5626:d269:2bf2%4]) with mapi id 15.20.8901.024; Thu, 10 Jul 2025
- 11:17:16 +0000
-Message-ID: <a6341aa1-dd8b-4449-ba95-38bb067d6483@nvidia.com>
-Date: Thu, 10 Jul 2025 14:17:11 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ethtool: Fix set RXFH for drivers without RXFH
- fields support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
- Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
- Dragos Tatulea <dtatulea@nvidia.com>
-References: <20250709153251.360291-1-gal@nvidia.com>
- <20250709172508.5df4e5c9@kernel.org>
-Content-Language: en-US
-From: Gal Pressman <gal@nvidia.com>
-In-Reply-To: <20250709172508.5df4e5c9@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TL2P290CA0011.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:2::14) To CH3PR12MB7500.namprd12.prod.outlook.com
- (2603:10b6:610:148::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82136243954
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 11:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752146330; cv=none; b=FUPxcSYTqJCrMjuphNpJsDhV91wWWO7e7HPE53JnvYtDvxGWZp7Loa7FcmafsBkyeMXvjohvJTaognOpYtx8v0vi3WAmezKlTDcYnpui0evLEjiWi3yOWG25WG3Zd4QLY6DKwWdqzLasKpqOCU5UTYrysoTH8yy+9HjAMhR8LEQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752146330; c=relaxed/simple;
+	bh=yvXMzVaEUAEaQ+QwmsWsIWflnIobHjov6sm4dK3YQWY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=QnarmHsStPAR4HWWIr4U8Fo+0mt11lvju9nRtBDat2ipLTDi5vb4cVDu8Ykig6V9ycKxeCsP/7aZcqA2FqD73biXDLJRKc2drhuBex5GNq3t5GezIGt3qVLpFYkmzR8ha5gpyGrLyl9YMx6OaUqvnHjbulcA2rb78Mo/MCbSLPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QLO7Mi21; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752146327;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nb9BcfvP4RQqClfQj6kwpdoGeGnUAyK4W/bW+bllRDM=;
+	b=QLO7Mi21GQlb8x2TgkvYIv4NIUPQDH515gvnxKkdihFuf5Wz89o5lPYmaeaQgmABl+pN94
+	dR2Pqdj9kjKGQxcBarr7yPe1tllhBQnI3tnavQlIwGA14dP7Gqrw2bxqEOz7PAc9k0DFnz
+	qPx4bcxbwTqqyXhytq6tXvIbtgVXnVI=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-549-vkXLKqf2ONGyDXHw1tpwVg-1; Thu, 10 Jul 2025 07:18:46 -0400
+X-MC-Unique: vkXLKqf2ONGyDXHw1tpwVg-1
+X-Mimecast-MFC-AGG-ID: vkXLKqf2ONGyDXHw1tpwVg_1752146325
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-553b5a75372so534697e87.3
+        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 04:18:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752146324; x=1752751124;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nb9BcfvP4RQqClfQj6kwpdoGeGnUAyK4W/bW+bllRDM=;
+        b=ENXgAze8sOUkOJuoEjjGoSAlRsEZ7FydsRhpIrU8/s4Vkz54uLcOKN5ZgrNdv95oOL
+         Y6eC8PCPne9500HoFaWGC6AzcVQtHBiA1AWhO/29noexnM1J7X0KFxweiFFibDHdyXga
+         OxvnNjYpFc6nvAJid+D66x9GU6I6njOM2K5kVSam3DJCuc8E5UTOzf6p1wvj5KwlYG+V
+         tdSw/7ALYo6gkHG0I68UtERQZ29qfj6u89AsTkiv14FW+8PCi02C33jdP7Uj2aGk0bfV
+         k6P/jw+rhaXRCXZ5Ypbz79Lb33gcdION8OwRb67Puy9wXzp/Q2rYygQ1CC+r5iMx8lmh
+         1wfQ==
+X-Gm-Message-State: AOJu0YwJL1qgNrvfHJ1Ah/MxeigyNI7tdpQrYMo5cwJ38zfCDRo0JlHy
+	vBmJEomWCD6Vevx+xAWPrBj1V/Pi0TutaUd/gEvHtCcErhFKA1qsUq+ODmSbgCoGtYv19YeN/JA
+	lpsKZaovrLFrNTzYYDpQ3Ft9dH4FnCMJInwf8hGI4b3elKHYXVt5UJxWfQKYinW4jiQ==
+X-Gm-Gg: ASbGncvvJkiOknyYZH+o54O6u7eJO03HSCa3CBmQ0Xo3Wxf1GAmxD3xaHfwlum0vBVh
+	rAgUBo95+0QHOnQAAqTFOpX2NWLU3BB/KbW+WkR9JS3UDL/KXNdxtugqsd1Pmx6tCvvwR5gu4Pv
+	Br5fbMWbIc9NcEDHiyINro1Qhhe6VJ0W6pzfHUG96z/CCPwZ2Xekt7UpiGehKbVk9m4nzFmEtS7
+	qjlvvkSEp4zVwih9ZoJ3E7GfN/YOuRsqxfdMV1oAjpFGP4vAR0F/cuAVU/mrMkeqxBvk4zjiPnt
+	wBoGSx9d2xnkAtlkYpAs
+X-Received: by 2002:a05:6512:1392:b0:553:a490:fee0 with SMTP id 2adb3069b0e04-5590002eeeemr1082204e87.10.1752146324254;
+        Thu, 10 Jul 2025 04:18:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEn6UYBxsuXMXVPpU2ziz8eNZ/zZnu75oqhq0nyzjKYPyzf9PTrICF1adNNCqyxgVabK7MRSg==
+X-Received: by 2002:a05:6512:1392:b0:553:a490:fee0 with SMTP id 2adb3069b0e04-5590002eeeemr1082189e87.10.1752146323732;
+        Thu, 10 Jul 2025 04:18:43 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5593c7bbb16sm335375e87.11.2025.07.10.04.18.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Jul 2025 04:18:43 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id EE4AB1B8A3D6; Thu, 10 Jul 2025 13:18:41 +0200 (CEST)
+From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Subject: [PATCH net-next v4 0/2] netdevsim: support setting a permanent
+ address
+Date: Thu, 10 Jul 2025 13:18:32 +0200
+Message-Id: <20250710-netdevsim-perm_addr-v4-0-c9db2fecf3bf@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7500:EE_|DS7PR12MB9476:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0a3531ff-69e2-4f44-577e-08ddbfa35371
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?aVhlVHBpMk9DN3dQaEhVTjFpaHNnQnZPM3NFcEZQcUFNZ0NBTEE0T3NnTjdX?=
- =?utf-8?B?elIyVTBGZlpXYUFzZDBsTXNlT1FXc2I5N2xhKzdsRjFPN3RTNG1mdDZacFZj?=
- =?utf-8?B?U1lOVW9yamh3TzVNam40eVZ5UFl1YlcyUUdMeFB5NGpSOXpxTUZiTGwxQU5m?=
- =?utf-8?B?bUJpT1M5RTY5OXh5cDlLV2VlVDBnWGo4UGdGUTFyc2VSYkpaOXdUQ3ZlWUc2?=
- =?utf-8?B?RXlWNUZTdGdraXZWbUVQYXRrbU94VnhxQkNGY0ZGSU11cENSRzdMbkhWNUF3?=
- =?utf-8?B?WEhvUnIyVmZLV0ZBOUlaWjE0eUx0VERNdHRUQXhLcHR6SVhrV0JtNHpZVzcv?=
- =?utf-8?B?SjBtMWcrWDMvQ2dtVlhtSlVqemx2UGREQXNybHIvai8reWt5UUtweUw5ZDNG?=
- =?utf-8?B?UGpTRzlTTVhtMkIrS3hKTXJ2SlZ4SnlDZ29WNmljNUw1ZkJFbXAxaVlibWV2?=
- =?utf-8?B?ZmxMSXVCNWlqVCttZ2JIckZTQTdyWFVWbXJzc1YrS2VUVk5ZdDRjV3JXU3Ni?=
- =?utf-8?B?bnF1UFFaN3JycXhlVWNnMi9kc2ZHNC8vMm9FL3d4RE5NSlZZbEdkaDRjUlpH?=
- =?utf-8?B?Q1prWC82Zyt5dmN5QlIyRjk5dXUxcVpwRUhjTkFTWXYzeDZJU2MzU0FhaC9y?=
- =?utf-8?B?eFFuaXBuU2t0dE53ZzBENmJPM05pemF4ck5oNlVnbFZGR1BRQWRCWmd5cHJD?=
- =?utf-8?B?elJ5RC9mTE1TRDZCSWt3akFpY053clNsdnBFYytxMk04V3JIMWtpV1JrTkxn?=
- =?utf-8?B?VzZUUmZPMEhyME8wQVZxTkovcmdwT1h0b3FzeEZYdlZsT1MrbUlCVnZwSFpk?=
- =?utf-8?B?bHR3MW1FcW4wZk9jeW5jc3ZUSEtJcU5PRitSeE9Rb3hPdmltVDJzaEl2T3NO?=
- =?utf-8?B?cm00SFpiQ3NoWEZ0Ukp3U2RnU3YwRWJ0OFhqUDhBVXlPQ3pRcXpQZUxrcGYw?=
- =?utf-8?B?UXFMYllKdXFUVzNZbFhvOW0wZ1lhMitFdVhwazk4ZEVlcnFVbWZQRTZNbDJR?=
- =?utf-8?B?NVc0cnBaY2h0M1NCZUxlUW9RczcyVzdnSFVPcmdPa0xCenR0eVFrcHVGbTh1?=
- =?utf-8?B?UjZ3b3ZEem92QStCWlBMOHJYYnZvZ1kxOW5EMEd1WkJ0UVQ5ckp6YUc4eG43?=
- =?utf-8?B?SW0wdmdyYlh5SkhwazJnTDk5RW43SVNzQ01NQzdpYkxMcDlRUy9QRWhVbmpi?=
- =?utf-8?B?eWxLR01TcDdUUEVnUWpEV2doMENYU2pVY2NzVjFvMjZMTWhEOFg5L2p6YmNp?=
- =?utf-8?B?ckxBNTAyUHB3QU82ckpNL1cyYTE5OHdDeDdjVE9FaHZLZERKZFd1MTZBWFY3?=
- =?utf-8?B?SkNrN0ZpOG1KUmVVUGVEL2tHYytIWUxaTHRUYU9zc3E0RFZvVXlXM3U5UDJo?=
- =?utf-8?B?NFNlZlJETUIvMGhZQlh3Z1B6cnU2cE1WY1VYRkgzekc4RUtzWVZKQUt0QnUv?=
- =?utf-8?B?akMvQnpzSWZkcXVYd1JUVWFiZXg2ZlVvbWNWaTRPLzJCN2JuRkFRV0xWSktM?=
- =?utf-8?B?V3I4UE91dkxSMFl0UW5qM2FpRlRkamxlaDZ4Z01ORlF4ZWhtd3FQSGZBS0Vm?=
- =?utf-8?B?eXk3T1pPUzJPU2d0WjVoby84amd4L0N0Z3I4SmRTdnJqcXhET3N6R3VCWkN4?=
- =?utf-8?B?OFdDQjVha2FlUFlQMVJKKzFRRVoxMmRjeXNNaWN5TmE5TXE5S3B0M0YydG15?=
- =?utf-8?B?VVJuY05FOVA0bXZOcWQ0R2JaSFBtMTZvYVpzbnFFOTI4OVNlb0t2dWIxeE1x?=
- =?utf-8?B?cGQyekxIZlpKM25lRTdqSVJ3Rk95OHBuNWJVdzlwVFhzS1lUUnVqbUdTMVd2?=
- =?utf-8?B?QWtBZUZkY3FVakJwV0RpWnFhMUtzUms2TERqM1NZWFR2UGo4b25zVnh1YnUr?=
- =?utf-8?B?Ykl0a0kxZlowTHZEbkhlcGcxd3ZoVnZrNDBpV09sMXRZcUE9PQ==?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?aGpvTUFrMCt4MEtRSUVxMmF6Nlg3Z1pmK2tUb2hVOE1sL1FDamJPVFpnTHQv?=
- =?utf-8?B?ejEwOFVPWHIxU2x4SjZnd0REZ0swMzBlejZGWW9mUnE2b1lQdzVER1pncUdJ?=
- =?utf-8?B?QXJITGcyOThzeHVJNGkrYUtBbDBDV1JtWEFuU0RGNWY5V2tZdUg5azhUSWM5?=
- =?utf-8?B?MFM1NVN5Q2lMT3JNZmpjcEF0UDFhV2xHbkFXVGZXcUp0YlJPSlQvbHRrL2ZE?=
- =?utf-8?B?a0lBVEFFcW0xMGQ0WTRwWTdvcVFhLzBRMjZRTEN5M0FyVkNFRlIwa0J3cElM?=
- =?utf-8?B?S041U1NJS3U3dGN2N0xpd1gvQTVmMlRnSWplSHVuaG1QY1Yzeko5cnFqbWJi?=
- =?utf-8?B?L3lHR2pnYnl5eHo3K0t2eE1TZlFHdkZXckwzdXg1TUN0cXl0cExZRXdBU1Nm?=
- =?utf-8?B?SGtoNVhNOUdoMU9BUWI3ekMyOENtMkF2T2pjSVc5Qkkxbm5ucjJhTmdvSWxn?=
- =?utf-8?B?bGJGSGcrTkk4blM1NDJLcDFpdVEySzJ1U2ltK01BclBRa2JEdHNYWWZ5Ly9q?=
- =?utf-8?B?ZkF1SUlNTSsxN2xFM1FhOXhEaW5naFVMMTZ4cnhQVTlmVG9wdjdLYy9vekR6?=
- =?utf-8?B?RldNaW1INkV2WVlDOUdLenNrdkNxVHZZczZVQjRNQUVtRkRhY2M0ejhOVVg3?=
- =?utf-8?B?N2sxOCswUE5icm1MNm9PenlBOUhTeVgvU1dLL2FIR3pDaUdxQXJGWjBiWUpI?=
- =?utf-8?B?QWtLbVlnUDNubGl6dzcyUWlkRFFwcVR4SUplQVhPUEJqdlRYOVBZdld3SDBB?=
- =?utf-8?B?aUhnb2RwbDllUU1mbGY4TlpoaVVmaDRjSE83S08rUnVnK3JDSTRCMS9TRGRW?=
- =?utf-8?B?VG5DVmhoMTFldjlxMjYyb2l5a3dyVkUyZzJNV2NSMkpBeUdHYUwvdUtjanVH?=
- =?utf-8?B?dTQ1eWY3NnRmSnY3OWxla09jeGo2NEZQUUdMVHljTS9TRTNGUmxxZS8wYjBl?=
- =?utf-8?B?SSs1SVlFT1JxNTZmSkh4OVVpY2kzVGtrNVRublUyQUlzVVR0TG9OazhSUThF?=
- =?utf-8?B?Uy9aRjBWSEtrVUhWdzBSTVU1M293dVZ2NjBwSFpTR2tWVWI2RlNIZ1huQ0NH?=
- =?utf-8?B?UTlPSCs1WEZQNTY4amlxbDVWRGI3WjBVOHV2MlVsYnVRdE1kcFJjWndIdTNx?=
- =?utf-8?B?YVJ2OXVQRGJ2UVJPcjQyS2V6UldPZnVjVzVMay95OGovQys3dDZ0RVNGTmJ2?=
- =?utf-8?B?Ykt1Z0VLb0FMOXFyQkpEQ2NCaXlTMDlKejloa3dIMTRZNitISlhwVFlxWnBR?=
- =?utf-8?B?UzhPOGU5Y1FUekp4U1IxczZzTVZqZTRSZ0xIdFZKZDVKbXFJSzh5UjFJMTdW?=
- =?utf-8?B?Uk5aUmtiUk05UGJVK2dzUy8rYVlQMkxEaFpjOThDZEIwUm9tMXdLMlp5QjBT?=
- =?utf-8?B?ZnkvUFpHYUJrai9PUWdxbFhIaUE2ck5DcmxwVkZqNmhmTHl4dnpDV05wM1l0?=
- =?utf-8?B?eWJ5Q0Q5Tit5azhaQk5hMFBXL0dHNUVGTTBJM2tEUzYzcjI5elEvdWgwU3Fx?=
- =?utf-8?B?VGhTMWRwbjdkNWFTZUhXK2trRmZkMExwdHNOWW9OaU1IUTZiUkw0a3lWQ2hj?=
- =?utf-8?B?ajhvVjZ0WnVHYTZtYk9QZGs4c2NKTFBubS9TZGtRY2hqaEk3Smxpd3dEREd3?=
- =?utf-8?B?VWMwdEFxRU03MEdXcm85azhNK1RNZ1lkUVd4WmMrK2krTmVlQWpkMkVMeVRH?=
- =?utf-8?B?OWI1d05wemlRYjg0bFE5eU5HUmpiVU82RHFBdnBLbjZNWGEvZmtIM1ZnQmlS?=
- =?utf-8?B?TnZ6L1dtYlVZMXVxai80Z1NnK1p1b2Nrc2tSeis0VGZ3MWEvSFlDdytUNjZ0?=
- =?utf-8?B?bUtCc2pIMHdKdFAreVRpVVpQdm1mUFc3RHVqbE5IektzM0VEeHc2Y20vZmll?=
- =?utf-8?B?Y1hMS1U1WEJXdlRmOWlnZGxOOStDaklJblRzUWQ5N2EvOHJkQlNEcnN4SytS?=
- =?utf-8?B?MUs0YUxDNTFzZG5lM1IyeU50YmpjVU9hM09QWWRtVGdSaWNkamxQa1FZRGZp?=
- =?utf-8?B?V29qYXJGSHVLMm9TZmttK2MzWHhjbUlnSzlINFlpR2pXbGlRN09wU2dFRXNi?=
- =?utf-8?B?R2N1b1RXdXFTNHJ1dDZSU0pxM1JSOW1JUXQ5N2hNNENTRlA1dENYeEhwRGoz?=
- =?utf-8?Q?PcSbnVJsJleYZhFSq1fz1S3zb?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0a3531ff-69e2-4f44-577e-08ddbfa35371
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7500.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2025 11:17:16.0009
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UsmwQJPvd+fQKTqz1IOZWUmo7NNZ/jUeysgg51PaWOc4rE7senmhpJhh4imVj0bc
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB9476
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAIihb2gC/23NwQrCMAwG4FeRnq2kabdVT76HiNQ1cz1sk3YUR
+ fbuhl5UHDn9JP+Xl0gUAyVx2LxEpBxSmEYOZrsRbe/GG8ngOQsErEChlSPNnnIKg7xTHC7O+yi
+ rrnWmcWBV1Qhu3iN14VHUk+AClx6zOPOmD2me4rO8y6rsi4ygV+WsJA+ANdd2r8GYYyTfu3nXT
+ kMBM36QBnAdQQmyrnW1dzVa28Efor+Reh3RjFirUBNe+bL5QZZleQNBEAVYSwEAAA==
+X-Change-ID: 20250128-netdevsim-perm_addr-5fca47a08157
+To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, 
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+X-Mailer: b4 0.14.2
 
-On 10/07/2025 3:25, Jakub Kicinski wrote:
-> On Wed, 9 Jul 2025 18:32:51 +0300 Gal Pressman wrote:
->> Some drivers (e.g., mlx4_en) support ->set_rxfh() functionality (such as
->> setting hash function), but not setting the RXFH fields.
->>
->> The requirement of ->get_rxfh_fields() in ethtool_set_rxfh() is there to
->> verify that we have no conflict with the RSS fields options, if it
->> doesn't exist then there is no point in doing the check.
->> Soften the check in ethtool_set_rxfh() so it doesn't fail when
->> ->get_rxfh_fields() doesn't exist.  
->>
->> This fixes the following error:
->> $ ethtool --set-rxfh-indir eth2 hfunc xor
->> Cannot set RX flow hash configuration: Operation not supported
-> 
-> Ah, thanks for the fix!
-> 
-> In this case I wonder if we wouldn't be better off returning early 
-> in ethtool_check_flow_types() if input_xfrm is 0 or NO_CHANGE.
-> Most drivers will have get_rxfh_fields - still there's no point
-> in doing the check if they have empty ops->supported_input_xfrm
+Network management daemons that match on the device permanent address
+currently have no virtual interface types to test against.
+NetworkManager, in particular, has carried an out of tree patch to set
+the permanent address on netdevsim devices to use in its CI for this
+purpose.
 
-Makes sense.
+This series adds support to netdevsim to set a permanent address on port
+creation, and adds a test script to test setting and getting of the
+different L2 address types.
 
-> 
-> We could add a:
-> 
-> 	if (WARN_ON(ops->supported_input_xfrm && !ops->get_rxfh_fields))
-> 		return -EINVAL;
-> 
-> into ethtool_check_ops() and we'd be both safe and slightly faster.
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+---
+Changes in v4:
+- Check permaddr with is_valid_ether_addr() before setting
+- Use ip -j and jq to parse address output
+- Add a test that setting an invalid perm_addr fails
+- Link to v3: https://lore.kernel.org/r/20250706-netdevsim-perm_addr-v3-0-88123e2b2027@redhat.com
 
-This is a step further.
+Changes in v3:
+- Fix shellcheck warnings in test script
+- Link to v2: https://lore.kernel.org/r/20250702-netdevsim-perm_addr-v2-0-66359a6288f0@redhat.com
 
-There could be a driver that allows setting of input xfrm but not rxfh
-fields. Failing the netdevice registration is different than skipping
-ethtool_check_flow_types().
+Changes in v2:
+- Set the permanent address on port creation instead of through debugfs
+- Add test script for testing L2 address setting and getting
+- Link to v1: https://lore.kernel.org/r/20250203-netdevsim-perm_addr-v1-1-10084bc93044@redhat.com
 
-Maybe there are no such devices and we shouldn't care?
+---
+Toke Høiland-Jørgensen (2):
+      net: netdevsim: Support setting dev->perm_addr on port creation
+      selftests: net: add netdev-l2addr.sh for testing L2 address functionality
+
+ drivers/net/netdevsim/bus.c                  | 26 ++++++++++--
+ drivers/net/netdevsim/dev.c                  | 14 +++----
+ drivers/net/netdevsim/netdev.c               |  9 +++--
+ drivers/net/netdevsim/netdevsim.h            |  9 +++--
+ tools/testing/selftests/net/Makefile         |  1 +
+ tools/testing/selftests/net/lib.sh           | 23 +++++++++++
+ tools/testing/selftests/net/netdev-l2addr.sh | 59 ++++++++++++++++++++++++++++
+ 7 files changed, 123 insertions(+), 18 deletions(-)
+---
+base-commit: e96ee511c906c59b7c4e6efd9d9b33917730e000
+change-id: 20250128-netdevsim-perm_addr-5fca47a08157
+
 
