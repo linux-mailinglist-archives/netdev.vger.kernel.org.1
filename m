@@ -1,263 +1,196 @@
-Return-Path: <netdev+bounces-205788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB089B00247
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 14:45:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39CF9B002B8
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 14:59:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1091D163B32
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 12:45:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E15C17115A
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 12:58:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC761195FE8;
-	Thu, 10 Jul 2025 12:45:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEB952676C9;
+	Thu, 10 Jul 2025 12:58:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K5ZnZxQV"
+	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="DdJSLOeC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from LO2P265CU024.outbound.protection.outlook.com (mail-uksouthazon11021143.outbound.protection.outlook.com [52.101.95.143])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C744F11CA0
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 12:45:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752151541; cv=none; b=BjQ9Wr/DrFseu5n03k0qT+Ycx/B/idJNeWFVlCl9hjV3GUFix2uhLFwH8J+ixgcFo1LEGb9JUSJvgTGT0RxbbNGLuuw9UGDokcQ88u0LEx1lGEKRgJpc8WgqmmeliDwAAZxvCTzMavmp7ot95UAiUnwdXlZAztktL4X3PM8gV5Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752151541; c=relaxed/simple;
-	bh=qzM1J0IyqdNKe7xLcZao/gywxjKq1jYq0uST8bF7sn4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YVWqbdjQw98F+aQLmq+7LFWgrg8da5q1y3dDG1UjQO3pTsz12Rk2uieaV2v9sYZk7n7VHAOobI6HnfN87bc0eujbvCuCO7Po8/WvwEUwQluziuTVuRxJAcmypCJNUgX90MIC5NCXUcXds/6+WaqccHR9ybUeIGlwupoqgbYjqco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K5ZnZxQV; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752151538;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=2BqWVLy/q6rFPIIJjYRdyMkSRIe24b5r477c8HimWtw=;
-	b=K5ZnZxQV/xbGlkjKjJjkyI97LZf1wlv65k5gH0PbeWA23usoG6vOIVXsfKxMRlvCPIwxaz
-	n4OR0MIb/CbqO9lA3BXQGR5ZXY6rTvDjt+4+cX2vMseo7UxPdMVz6/Snhq4ijPOpto+CC7
-	HTNCOh+8dn/nLNgN8IGyej6/CX3lV5Y=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-651-PQ5puK5KN1aNduoGAIufKA-1; Thu,
- 10 Jul 2025 08:45:35 -0400
-X-MC-Unique: PQ5puK5KN1aNduoGAIufKA-1
-X-Mimecast-MFC-AGG-ID: PQ5puK5KN1aNduoGAIufKA_1752151534
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EB91C18089B5;
-	Thu, 10 Jul 2025 12:45:33 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.173])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D2D0419560AD;
-	Thu, 10 Jul 2025 12:45:31 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL] Networking for v6.16-rc6
-Date: Thu, 10 Jul 2025 14:45:26 +0200
-Message-ID: <20250710124526.32220-1-pabeni@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37321E8333
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 12:58:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.95.143
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752152285; cv=fail; b=INV0H0+YdW6DSXxiEtIot+OretbGL3LswmYRtMkM8n82MNHMqKsCOZzrf2DYFF0X73JMF0hbheknT+wzA17xku7zCm/nRxAMsjn+j30Bj7YTe4CGxLjAmbHWVdEGqa8P0Qsw3BA2UK+tAGD1U/gl79kceuPQirJ9vwKePC7oeGo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752152285; c=relaxed/simple;
+	bh=bA3vMe4HMNXnro0Wj06Ao5QHdJJCh+XFd5OWjMcg4ho=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=n84lw7lLj9AyprtptVVVJzY+sWTkG8KGEymvgXNUyHgUY9LBqCgRZsMbiMokFJst4CZq+K2kmFOb/fGW81WTLMO7O78m9vafNDJp1fB9nI6zXNIEIjW02oHNjGrVI6nBh+zufZZMl09Nz8or5/+SA3HOepqp0VovUufQd5Os4h4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=DdJSLOeC; arc=fail smtp.client-ip=52.101.95.143
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=garyguo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bXRvohjYH29FxBIhX6i+x8PRpFvik7TwzksoORtlP1ExXtWzSqO+r+ww4Fh2qQsqhDLWEa9VQm2tHk7mAO74+BSCLhi6NLXG/8d2XHx3lklVUpf+q6r7zID1g/nCR7cEmObHi9twpr/PeeIRlLXd7NbiExRuNUxq/noBE6mbHAP+5pv1CVTzj3aVwHakpmcM5eOlI5XRiqZ0APQDVYLuIGr3OT/lf6OKhOjdFEzOnHTUiBnIKL1UMBYK62Wjnipz5QYzdPI7LoLfSsCB2bBb0j0Yo1+8ZIXy6QPoKx5PQHdt4OLjd+R2WFdEngLpGQ9H9ryYvh3W3PIad8T7n49sWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=A6GHvfpnti3lFXLafa6tBqoqrfAy20RwX0RdCpoGbrk=;
+ b=ft4dtUGEzY+orHd7Ejux4T0+aJuHo9oUCy2z0EyDhS+3AMIxwt9XFT/0M656KDuxpydIIk+XztuOKEjhEyOA6fe1OlHDuCIPpcfbD+DP8Tku/1dL307QCBLraIp9yl0NCVw4FYGZah3xa1ivw9DS3PrIRk6iAmClQMuLNd2ZuUj0GezukNLp2fkOcv3HLxNoLijfDCzemzt2ozm924ZtRIPvLLK5iJsHEgYk3fhchqqtPoqFs/12jjnf80/yOuSkzR4GShKsUDYJ7OP5XbQTbO85rc+itHUoegSH4/VFuz96YpTZs3YoUNFg8Z9mW/vqF06MVrQssgOH8//4jdY0Tg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
+ dkim=pass header.d=garyguo.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=A6GHvfpnti3lFXLafa6tBqoqrfAy20RwX0RdCpoGbrk=;
+ b=DdJSLOeCK5yA18RzKzzyRljp2cvwtFZwstSObqiObRrCCAsnCwZPTSQs0a5owG455ZUt7S6ctnkWJ6xVhefaL8gYWWHWonCXkY9K5giqZXMDey80FNdipNCxbI9E5eXvgBI6tQyy9AWdD5i+GSnQ/zOfWR6i4zSA20mXE+aZLkM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=garyguo.net;
+Received: from LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:253::10)
+ by CWXP265MB3064.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:c4::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8901.29; Thu, 10 Jul
+ 2025 12:57:59 +0000
+Received: from LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1818:a2bf:38a7:a1e7]) by LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
+ ([fe80::1818:a2bf:38a7:a1e7%4]) with mapi id 15.20.8901.028; Thu, 10 Jul 2025
+ 12:57:58 +0000
+Date: Thu, 10 Jul 2025 13:57:57 +0100
+From: Gary Guo <gary@garyguo.net>
+To: Guillaume Nault <gnault@redhat.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, David Ahern
+ <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>, Aiden Yang
+ <ling@moedove.com>
+Subject: Re: [PATCH net 1/2] gre: Fix IPv6 multicast route creation.
+Message-ID: <20250710135757.60581077@eugeo>
+In-Reply-To: <027a923dcb550ad115e6d93ee8bb7d310378bd01.1752070620.git.gnault@redhat.com>
+References: <cover.1752070620.git.gnault@redhat.com>
+	<027a923dcb550ad115e6d93ee8bb7d310378bd01.1752070620.git.gnault@redhat.com>
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.49; x86_64-pc-linux-gnu)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0179.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:18a::22) To LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:253::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LO2P265MB5183:EE_|CWXP265MB3064:EE_
+X-MS-Office365-Filtering-Correlation-Id: a1af22c1-0270-4c57-0f29-08ddbfb16554
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?KwQhwcbMgseLSN75RAxa8C6tH59dEPu6hhm9Zu5lJryP5buxLYQWwVBbtoN5?=
+ =?us-ascii?Q?4d9ACwGFzVkv57/THhJvVMv8vY43uiBhYMc63ZLC3rpKqES7AZoQPsK3PMwJ?=
+ =?us-ascii?Q?IIEqMV4OqN7VBfsRZM2mFmOQPcQwo9iIOZyOSvf8XkjNyr1V25dJx9W/S1aW?=
+ =?us-ascii?Q?u/JW1EYPUB52f850XXHSIXGwtxaITFPPK98YEInTgOLlAyE90kuvkKmvWmzZ?=
+ =?us-ascii?Q?qPJDx+Lw1iYn4Zly3You3cIUoI0Trn+uaddrAjocs0f0FuypFWdKHREai9lM?=
+ =?us-ascii?Q?MYn8AL2+uR5jVmKmEBHYfM59GWJ2iidpOJ7wJR/ur16n2CsNXMB4cdcEFrwc?=
+ =?us-ascii?Q?h6MeQFEMSmt313U9GGVJnz/iQvu+juOHEstICBuSCfFCb0Sh7ISe9HRpNOpy?=
+ =?us-ascii?Q?1EF8lRsMgsw1QYR/XqiTmg3wQaLAxyaEpad1a9xkJLoftb2kC1g0anQm1q4M?=
+ =?us-ascii?Q?W5A+8SDNUy1bYRkuuD2xpAI0NAEwPdnD/1WmhTwd07Vk90wpCuABsyJF+c1+?=
+ =?us-ascii?Q?7Dgw62Izg8Mc2ho4/JYcDPbBYvhI/5SetmssvhVz06nJmEZ6fg2fgTn2Y/Y9?=
+ =?us-ascii?Q?uAq8nHyVCKOuBHPcaOHrZmH+zoAyGFEK4SKyJmb2D8Y6zfNEw42X/jZoVZw9?=
+ =?us-ascii?Q?AfXUTaf9EGp0lt2ryIpp4fCgyXkJbxi5jV5SOgIIQUBCdi/P06pYVZEvA6mM?=
+ =?us-ascii?Q?UM45o/cofYvOzMhud8Hr2VrLPe8MRKg8Kv0aUNSbHV4RPsEJ+1Ve7jceZvvo?=
+ =?us-ascii?Q?ljtb+0RJw6TUSrUBiUg8Xjszv53Hlzo0hvpt58ZjqT6ypXBohOXqzRhPGVAC?=
+ =?us-ascii?Q?91V6WIUG4Lp5AAgxbL9YhEScEKaRxgyY/pQbawWmaSUuZdcy8cZjd1trmtNx?=
+ =?us-ascii?Q?E3ZltQyudi9eM57m/GbrYFIIHER35INZi2sj8Tk65Y01IelFI7jTrkPLpdN1?=
+ =?us-ascii?Q?c5VPkQq8yIsydU7cmUSHCmqLkFcIn/OkcNC2cNSzLYagSS6vtvhd4kft8o2n?=
+ =?us-ascii?Q?64KE+Dp0c3XAeEhzd/c1LEE8fWCuXzm7gNBZ3LdGL0jxMfQ5cZKhDYpF7XAy?=
+ =?us-ascii?Q?xOsO8Rr5DXpGolyg0Q7fUF6yR5haPVWRnhhW3jZAmNzMwCgDU0K8jTqmmKtz?=
+ =?us-ascii?Q?dFDHf5/TNhfCeBXAvpZvwZPL0QrhlOjk/Dx45Jjl1noH+1DLk4WNr0xxeHgJ?=
+ =?us-ascii?Q?5+wURFrTRWRjYthy45J1+n+I1O8g92IGnm/JLJEcH3dhkDYc9MBPk9fHpak1?=
+ =?us-ascii?Q?XzQzHYpwjc7dMCUly+0y8tPfjrkzZyUaSM6X4Y2QB/mPtkXscTkOPSYfog25?=
+ =?us-ascii?Q?W9ySg1/fS6SsKDOpAFwAgVFPY5hh6KOMZdhL824deExp+cxZTNebxSP5mF26?=
+ =?us-ascii?Q?yWavc8MXSfShgTbNuuHpzoZ3z68Q5okMvatfUILz2tUeZuOUC4/P1XKnVQfP?=
+ =?us-ascii?Q?WUJ6ttdcRKE=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?aM/IzvjklJ25QYquWzOyL5vkoKztOEfbzfezMRnYx4rzVExMoHf86Le7OP99?=
+ =?us-ascii?Q?yZBAwOhVZ+onvt+Xo9G/GMpUChT/VPNO8vSn1V4mQH2JKh8JaPEuJgNvyj+2?=
+ =?us-ascii?Q?JxHCCmLCgiDYEeYXRAH7bPBjKPTPBU3i2mwEZkUIkLTdS4DitgYGbFil63qV?=
+ =?us-ascii?Q?EnfY1hROvKHDIBBvQ4wrYzWR95tZJwhtft6tvA8P1w4UR14dB6S4M1+9qHOI?=
+ =?us-ascii?Q?bSVulQTwdCyG33pbjgPGDsrbjWLz5AbljAQM37tfSnEILkjKVBv72UeuTOUA?=
+ =?us-ascii?Q?wyKog1gE6+TZxH8X4ERw04IHP2kAjWJhymXhynydMYBrUwJRMBLAZRZOQ6ZD?=
+ =?us-ascii?Q?MWfs5MavUV/aRjHp/ryAAwsmf7+i4O1+696Q4p6+MksH1dBkwMO7HQJJLAjC?=
+ =?us-ascii?Q?V7WCq5TAzwMBvgb5EttUn5Socdyyjzmk49kDUPqpXTWFQofGOoK455wJ5nxC?=
+ =?us-ascii?Q?VzS7ZeYNK+ZdCOwgwB8hY0ut3V+rTphUchH8U2T/cl3kGhmm9LhWuSC1DmYX?=
+ =?us-ascii?Q?pHbQ6klEDTv7FFBO2v0i9RuDHPUgzgKkD0Uc5ZugQkrqyB1MPoUVSIlqTyTe?=
+ =?us-ascii?Q?ZPFp+dpwsjxDcLq2yo3Tdt69TDoEgrWVtKzsgA1d+Q8n6IMxaK4jtukMGVFg?=
+ =?us-ascii?Q?dLc5/yD3Kdm4KSG0ErZtWMXYdcjGlRRvI/jeXhk5f4ni/35c8W1fnI8Y87XC?=
+ =?us-ascii?Q?fbLaHUR19gwRM8jjl5rjtkGmbQy/hlqYiTzURkHm4yLOW8/ly5jpvk+4wAGQ?=
+ =?us-ascii?Q?EsBANTnUeDdene9GIROM9X8LpkQKzjcq9ItmQol2TlYgU+IELdNMPXfXgwy3?=
+ =?us-ascii?Q?NsNJ52Vl0Nmoewj16NGHQJCChyAU+e57EZskeojV7aoJ71srRrsbFbTtu2Us?=
+ =?us-ascii?Q?KmA+Th/ohv5qiYVrE0IYlH7ICmMX1tn3ucI3jWcaKZxovyvxb4YqRSeltH4B?=
+ =?us-ascii?Q?yOo9VLHneEP/krZZKY9uT2C029acZ9asWxJnMeCA8SGSINGNOAAHJ7cD4/EM?=
+ =?us-ascii?Q?J1aZE3aVKA66OTqS9jTas3YrwezVEQ9H8R7tqegcCVkBc/AglRHjX+/L7STp?=
+ =?us-ascii?Q?pksopQqHpfpwCUFzLMyti9Q0AJMMrNBoAbWf/UKXekFwxE9ysCrj9uu7uBz4?=
+ =?us-ascii?Q?XgsNWeec5hEagVt9DK7xc+DPTjNY6FAJMdiTBDHRwisYY6HQoxdRZhSU1Saa?=
+ =?us-ascii?Q?pgyhWmEC8Y6T0AwTiv6xeubyrQ60XjEhp8SpeW1rvUqcxJ5S6IUAQ7Xs9lSI?=
+ =?us-ascii?Q?tKeFe+01zvTSoNw2oJp9C1l3iKX9I/6Etdu1U6oA+4CDVLm+bfAVBlH89rn8?=
+ =?us-ascii?Q?yyhkKcfpdCCAQf1fVtqcN6K4CpYA8YxmR4Xz2XaZIuVi3OnijmKZSmTQ2DFV?=
+ =?us-ascii?Q?PUO/OPURt+grRloqFQsJylwj5lVSZV6gqYBUb0Unz7n462Ve6G/wEY7dAAGK?=
+ =?us-ascii?Q?ZdxtH2o7AwsUyGnmwQq5ppc1m9p7m6WR7F0n3iqxXi5PoYlCa5M+jBoS0xe8?=
+ =?us-ascii?Q?pS+NM6G0ITQl3N0mfnARwWN5vE4hU27/g9OkuULZbt16+afEJUQQC220mpnT?=
+ =?us-ascii?Q?/wDw1VGqPTBl17j1kEoQVoaL20bPBUXdpbGi/fnt?=
+X-OriginatorOrg: garyguo.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: a1af22c1-0270-4c57-0f29-08ddbfb16554
+X-MS-Exchange-CrossTenant-AuthSource: LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2025 12:57:58.8272
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VS4/L+PraDVMID/cBRDV0Lza2hY7D8wuYiulf9uvvkMqL8DsE+mXb20/AQI+QHJWwlX+AObwYa5rlXkJovqVkQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWXP265MB3064
 
-Hi Linus!
+On Wed, 9 Jul 2025 16:30:10 +0200
+Guillaume Nault <gnault@redhat.com> wrote:
 
-A slightly larger number of regressions than usual, but I'm not aware of
-any other pending ones.
+> Use addrconf_add_dev() instead of ipv6_find_idev() in
+> addrconf_gre_config() so that we don't just get the inet6_dev, but also
+> install the default ff00::/8 multicast route.
+> 
+> Before commit 3e6a0243ff00 ("gre: Fix again IPv6 link-local address
+> generation."), the multicast route was created at the end of the
+> function by addrconf_add_mroute(). But this code path is now only taken
+> in one particular case (gre devices not bound to a local IP address and
+> in EUI64 mode). For all other cases, the function exits early and
+> addrconf_add_mroute() is not called anymore.
+> 
+> Using addrconf_add_dev() instead of ipv6_find_idev() in
+> addrconf_gre_config(), fixes the problem as it will create the default
+> multicast route for all gre devices. This also brings
+> addrconf_gre_config() a bit closer to the normal netdevice IPv6
+> configuration code (addrconf_dev_config()).
+> 
+> Fixes: 3e6a0243ff00 ("gre: Fix again IPv6 link-local address generation.")
+> Reported-by: Aiden Yang <ling@moedove.com>
+> Closes: https://lore.kernel.org/netdev/CANR=AhRM7YHHXVxJ4DmrTNMeuEOY87K2mLmo9KMed1JMr20p6g@mail.gmail.com/
+> Reviewed-by: Gary Guo <gary@garyguo.net>
+> Tested-by: Gary Guo <gary@garyguo.net>
+> Signed-off-by: Guillaume Nault <gnault@redhat.com>
 
-The following changes since commit 17bbde2e1716e2ee4b997d476b48ae85c5a47671:
+You probably also want to
 
-  Merge tag 'net-6.16-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-07-03 09:18:55 -0700)
+Cc: stable@vger.kernel.org
 
-are available in the Git repository at:
+so this gets picked up by the stable team after it's merged.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.16-rc6
-
-for you to fetch changes up to dd831ac8221e691e9e918585b1003c7071df0379:
-
-  net/sched: sch_qfq: Fix null-deref in agg_dequeue (2025-07-10 11:08:35 +0200)
-
-----------------------------------------------------------------
-Including fixes from Bluetooth.
-
-Current release - regressions:
-
-  - tcp: refine sk_rcvbuf increase for ooo packets
-
-  - bluetooth: fix attempting to send HCI_Disconnect to BIS handle
-
-  - rxrpc: fix over large frame size warning
-
-  - eth: bcmgenet: initialize u64 stats seq counter
-
-Previous releases - regressions:
-
-  - tcp: correct signedness in skb remaining space calculation
-
-  - sched: abort __tc_modify_qdisc if parent class does not exist
-
-  - vsock: fix transport_{g2h,h2g} TOCTOU
-
-  - rxrpc: fix bug due to prealloc collision
-
-  - tipc: fix use-after-free in tipc_conn_close().
-
-  - bluetooth: fix not marking Broadcast Sink BIS as connected
-
-  - phy: qca808x: fix WoL issue by utilizing at8031_set_wol()
-
-  - eth: am65-cpsw-nuss: fix skb size by accounting for skb_shared_info
-
-Previous releases - always broken:
-
-  - netlink: fix wraparounds of sk->sk_rmem_alloc.
-
-  - atm: fix infinite recursive call of clip_push().
-
-  - eth: stmmac: fix interrupt handling for level-triggered mode in DWC_XGMAC2
-
-  - eth: rtsn: fix a null pointer dereference in rtsn_probe()
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Alok Tiwari (1):
-      net: thunderx: avoid direct MTU assignment after WRITE_ONCE()
-
-Chen-Yu Tsai (1):
-      dt-bindings: net: sun8i-emac: Rename A523 EMAC0 to GMAC0
-
-Chintan Vankar (1):
-      net: ethernet: ti: am65-cpsw-nuss: Fix skb size by accounting for skb_shared_info
-
-Christophe JAILLET (1):
-      net: airoha: Fix an error handling path in airoha_probe()
-
-David Howells (3):
-      rxrpc: Fix over large frame size warning
-      rxrpc: Fix bug due to prealloc collision
-      rxrpc: Fix oops due to non-existence of prealloc backlog struct
-
-Eric Dumazet (2):
-      tcp: refine sk_rcvbuf increase for ooo packets
-      selftests/net: packetdrill: add tcp_ooo-before-and-after-accept.pkt
-
-EricChan (1):
-      net: stmmac: Fix interrupt handling for level-triggered mode in DWC_XGMAC2
-
-Haoxiang Li (1):
-      net: ethernet: rtsn: Fix a null pointer dereference in rtsn_probe()
-
-Jakub Kicinski (8):
-      Merge branch 'fix-qca808x-wol-issue'
-      Merge tag 'for-net-2025-07-03' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
-      Merge branch 'allwinner-a523-rename-emac0-to-gmac0'
-      Merge branch 'vsock-fix-transport_-h2g-g2h-dgram-local-toctou-issues'
-      Merge branch 'net-phy-smsc-robustness-fixes-for-lan87xx-lan9500'
-      Merge branch 'atm-clip-fix-infinite-recursion-potential-null-ptr-deref-and-memleak'
-      Merge branch 'tcp-better-memory-control-for-not-yet-accepted-sockets'
-      Merge branch 'rxrpc-miscellaneous-fixes'
-
-Jason Xing (1):
-      bnxt_en: eliminate the compile warning in bnxt_request_irq due to CONFIG_RFS_ACCEL
-
-Jiayuan Chen (1):
-      tcp: Correct signedness in skb remaining space calculation
-
-Kuniyuki Iwashima (5):
-      netlink: Fix wraparounds of sk->sk_rmem_alloc.
-      tipc: Fix use-after-free in tipc_conn_close().
-      atm: clip: Fix potential null-ptr-deref in to_atmarpd().
-      atm: clip: Fix memory leak of struct clip_vcc.
-      atm: clip: Fix infinite recursive call of clip_push().
-
-Louis Peens (1):
-      MAINTAINERS: remove myself as netronome maintainer
-
-Luiz Augusto von Dentz (4):
-      Bluetooth: hci_sync: Fix not disabling advertising instance
-      Bluetooth: hci_core: Remove check of BDADDR_ANY in hci_conn_hash_lookup_big_state
-      Bluetooth: hci_sync: Fix attempting to send HCI_Disconnect to BIS handle
-      Bluetooth: hci_event: Fix not marking Broadcast Sink BIS as connected
-
-Luo Jie (2):
-      net: phy: qcom: move the WoL function to shared library
-      net: phy: qcom: qca808x: Fix WoL issue by utilizing at8031_set_wol()
-
-Michal Luczaj (3):
-      vsock: Fix transport_{g2h,h2g} TOCTOU
-      vsock: Fix transport_* TOCTOU
-      vsock: Fix IOCTL_VM_SOCKETS_GET_LOCAL_CID to check also `transport_local`
-
-Oleksij Rempel (3):
-      net: phy: smsc: Fix Auto-MDIX configuration when disabled by strap
-      net: phy: smsc: Force predictable MDI-X state on LAN87xx
-      net: phy: smsc: Fix link failure in forced mode with Auto-MDIX
-
-Ryo Takakura (1):
-      net: bcmgenet: Initialize u64 stats seq counter
-
-Stefano Garzarella (1):
-      vsock: fix `vsock_proto` declaration
-
-Victor Nogueira (2):
-      selftests/tc-testing: Create test case for UAF scenario with DRR/NETEM/BLACKHOLE chain
-      net/sched: Abort __tc_modify_qdisc if parent class does not exist
-
-Xiang Mei (1):
-      net/sched: sch_qfq: Fix null-deref in agg_dequeue
-
-Yue Haibing (1):
-      atm: clip: Fix NULL pointer dereference in vcc_sendmsg()
-
- .../bindings/net/allwinner,sun8i-a83t-emac.yaml    |  2 +-
- MAINTAINERS                                        |  4 +-
- drivers/net/ethernet/airoha/airoha_eth.c           |  1 +
- drivers/net/ethernet/broadcom/bnxt/bnxt.c          | 10 ++-
- drivers/net/ethernet/broadcom/genet/bcmgenet.c     |  6 ++
- drivers/net/ethernet/cavium/thunder/nicvf_main.c   | 12 +---
- drivers/net/ethernet/renesas/rtsn.c                |  5 ++
- drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c | 24 +++----
- drivers/net/ethernet/ti/am65-cpsw-nuss.c           |  4 +-
- drivers/net/phy/qcom/at803x.c                      | 27 --------
- drivers/net/phy/qcom/qca808x.c                     |  2 +-
- drivers/net/phy/qcom/qcom-phy-lib.c                | 25 +++++++
- drivers/net/phy/qcom/qcom.h                        |  5 ++
- drivers/net/phy/smsc.c                             | 57 +++++++++++++--
- include/net/af_vsock.h                             |  2 +-
- include/net/bluetooth/hci_core.h                   |  3 +-
- include/net/pkt_sched.h                            | 25 ++++++-
- net/atm/clip.c                                     | 64 ++++++++++++-----
- net/bluetooth/hci_event.c                          |  3 +
- net/bluetooth/hci_sync.c                           |  4 +-
- net/ipv4/tcp.c                                     |  2 +-
- net/ipv4/tcp_input.c                               |  4 +-
- net/netlink/af_netlink.c                           | 81 +++++++++++++---------
- net/rxrpc/ar-internal.h                            | 15 ++--
- net/rxrpc/call_accept.c                            |  4 ++
- net/rxrpc/output.c                                 |  5 +-
- net/sched/sch_api.c                                | 33 +++++----
- net/sched/sch_hfsc.c                               | 16 -----
- net/sched/sch_qfq.c                                |  2 +-
- net/tipc/topsrv.c                                  |  2 +
- net/vmw_vsock/af_vsock.c                           | 57 ++++++++++++---
- .../tcp_ooo-before-and-after-accept.pkt            | 53 ++++++++++++++
- .../tc-testing/tc-tests/infra/qdiscs.json          | 37 ++++++++++
- 33 files changed, 421 insertions(+), 175 deletions(-)
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_ooo-before-and-after-accept.pkt
-
+Best,
+Gary
 
