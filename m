@@ -1,78 +1,101 @@
-Return-Path: <netdev+bounces-205616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84088AFF6B4
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 04:20:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA93AAFF6BB
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 04:21:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EAB816C28F
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 02:20:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37C0616E649
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 02:21:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4162227F018;
-	Thu, 10 Jul 2025 02:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7223227F16A;
+	Thu, 10 Jul 2025 02:21:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qxerFq3l"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="gLjSDVh1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B57F27F00E
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 02:20:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B552A19D065;
+	Thu, 10 Jul 2025 02:21:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752114008; cv=none; b=gIOPvyRSX0Bv1eZjxihbs+Pm0WBTweBS+HxwPkJX7rIN+7YA9FBYsiE9PMh4gJZog4fH+CNi8BWPfDupdlmTPLItaoNNsRd6TTqbaIy+mk+fbwDDdJK8JJa20H0m6cE42L6M2fV7/2OtADjbpyBgMO6d13TffnxlJ6EZgc1/Na8=
+	t=1752114070; cv=none; b=RJHkcUh8mUEAgF/2riNgN1Dnz+R1DJEWSQ6tLofUKUWSwrMKbsSLsFCkAR5iNSDrruz05iNg3uVcv8lhq1/dH4BoMs1hL1hLDPBtzKttmWzTxsNefy93wJCSMLoQaMVc+78Vp1EI/jFzJrzoGG52HLVTlzcgKy6sEnqaY/ta3Bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752114008; c=relaxed/simple;
-	bh=DW/D7JVqK0xt8qLXrHJGXyltu1qAFr5ZVskNry40R48=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OGvhNUay+Ou9QLVCCWDrCwrhezQ1UHqCSzxTbqjvGSgjNz0rQbNhz96zpxqY4G1r3XlbDSQd58eqDgrTPSMjNro8et3QgqLTxnWkQ1kSYc3xZ6o1GPwibw2DmnxzHnOJlFatyJK6CfUs2ADSnk7bvnAWkMvQ8wod+H5NcGIEDME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qxerFq3l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3839C4CEEF;
-	Thu, 10 Jul 2025 02:20:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752114008;
-	bh=DW/D7JVqK0xt8qLXrHJGXyltu1qAFr5ZVskNry40R48=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qxerFq3labb2ipRm8sQ0knK3Q0XiXittIqeq2VyKVkva15u1/eW8pzNwDuPW/nQQ7
-	 +eNYnSLc0z5Y1pIxGywxgQWvPH17SCUD3z89fDJ/Nmi4XHhwv2dGMzc456MlDV3qca
-	 XOYHv6HcmEs3qtr7x/vuc/19krQohPKA7JCIF92Hlm5DFhnZ2OjMfMAHRVzWQxY0vA
-	 4Dl5MG1xRpf6y4uiV8aYuoTvgjzQDgLuGLYdk6sG1Zi5weXRVzxxGFCJRtSGN+6nuS
-	 LLG9jX4RNDEoZrajS/HOp1vvMHxV9TC2cmNGTAQ+RudRvsb7md/jkpzvmuR/WW+Vnn
-	 kpcCufKpEkBEg==
-Date: Wed, 9 Jul 2025 19:20:07 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/2] net: netdevsim: Support setting
- dev->perm_addr on port creation
-Message-ID: <20250709192007.145b8919@kernel.org>
-In-Reply-To: <20250706-netdevsim-perm_addr-v3-1-88123e2b2027@redhat.com>
-References: <20250706-netdevsim-perm_addr-v3-0-88123e2b2027@redhat.com>
-	<20250706-netdevsim-perm_addr-v3-1-88123e2b2027@redhat.com>
+	s=arc-20240116; t=1752114070; c=relaxed/simple;
+	bh=Vw+H+l2VvCbkV5x6YVAlKZGJQW+cJGkX/aq5oij9AsY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FXo1DZLVvRxDaslNn09aDEj1kkX74oNGrLoDEoShQgQDb23h7Zm0Q0jaOaMeuynrSt7QYmjIshFAf6AUO+8cOy9wArKnjbR58nly16EGzfr1uw+QaNFsUUV553LKwFLHnFw9Uvmw3RbmYxJEwIWGoXXrvk8NuKsBnfxGC8CDI48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=gLjSDVh1; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:To:From:
+	Content-Type; bh=0Ab0HC1lqiYJ7NrxbvY+EhcNWXngvgHGMfzBJl73UO8=;
+	b=gLjSDVh1CEBbTUJjwZcpiYlObvy0DRUe1TN6PUELf5piedDFkdrhPQzQB0B840
+	WalDINP0ZCkwB24OBawZQ3IklPS4M0bxhGAIbO4rN+/tau2YlDp5i0bpVAVHfxIs
+	0x8hPLSlAuKc1M5YDBgxCGRnQWoLh8ZlIfCcKHWR9DhUA=
+Received: from [172.21.20.151] (unknown [])
+	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wAn0Z93I29o3XTLDg--.384S2;
+	Thu, 10 Jul 2025 10:20:39 +0800 (CST)
+Message-ID: <9853d3f1-569f-4fde-846e-5c8d7f798725@163.com>
+Date: Thu, 10 Jul 2025 10:20:39 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/2] af_packet: fix soft lockup issue caused by
+ tpacket_snd()
+To: Simon Horman <horms@kernel.org>
+Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250709095653.62469-1-luyun_611@163.com>
+ <20250709095653.62469-3-luyun_611@163.com>
+ <20250709181434.GH721198@horms.kernel.org>
+Content-Language: en-US
+From: luyun <luyun_611@163.com>
+In-Reply-To: <20250709181434.GH721198@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wAn0Z93I29o3XTLDg--.384S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrZF45WFWDtw4ftFWfZry7Wrg_yoW3tFbEgr
+	45u397Kry5Ar1jg3Z7Cw48ArsIgrZruFWqqry3ta4Uta90qrZrtr4Dur93J3WfZ3Zxtrsr
+	K3ZrCrySyr1UujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUjS1vDUUUUU==
+X-CM-SenderInfo: pox130jbwriqqrwthudrp/1tbiOgGGzmhvITdkvgAAs4
 
-On Sun, 06 Jul 2025 16:45:31 +0200 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> +	ret =3D sscanf(buf, "%u %hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &port_index,
-> +		     &eth_addr[0], &eth_addr[1], &eth_addr[2], &eth_addr[3],
-> +		     &eth_addr[4], &eth_addr[5]);
-> +	switch (ret) {
-> +	case 7:
-> +		addr_set =3D true;
-> +		fallthrough;
 
-Feels like we should run is_valid_ether_addr() over the address.
---=20
-pw-bot: cr
+在 2025/7/10 02:14, Simon Horman 写道:
+> On Wed, Jul 09, 2025 at 05:56:53PM +0800, Yun Lu wrote:
+>
+> ...
+>
+>> @@ -2943,14 +2953,7 @@ static int tpacket_snd(struct packet_sock *po, struct msghdr *msg)
+>>   		}
+>>   		packet_increment_head(&po->tx_ring);
+>>   		len_sum += tp_len;
+>> -	} while (likely((ph != NULL) ||
+>> -		/* Note: packet_read_pending() might be slow if we have
+>> -		 * to call it as it's per_cpu variable, but in fast-path
+>> -		 * we already short-circuit the loop with the first
+>> -		 * condition, and luckily don't have to go that path
+>> -		 * anyway.
+>> -		 */
+>> -		 (need_wait && packet_read_pending(&po->tx_ring))));
+>> +	} while (likely(ph != NULL))
+> A semicolon is needed at the end of the line above.
+
+Sorry, this was my mistake. I will fix it in the next version.
+
+Thank you for pointing it out.
+
+>
+>>   
+>>   	err = len_sum;
+>>   	goto out_put;
+
 
