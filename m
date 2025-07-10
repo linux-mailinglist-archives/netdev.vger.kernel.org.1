@@ -1,379 +1,280 @@
-Return-Path: <netdev+bounces-205859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 803B3B00776
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 17:47:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D142B0078B
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 17:50:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB504487049
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 15:42:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F90C7AF9C8
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 15:48:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF0F27B4EE;
-	Thu, 10 Jul 2025 15:39:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42C76274FDF;
+	Thu, 10 Jul 2025 15:50:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AF2pMhzU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ie97GR1X"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1CF275B18
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 15:39:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752161977; cv=none; b=awBQdt79PcpmgBnwLjiiiSK/QkW/0v1PAQEVt9p88pMTPjcxKiWTBgzw3VF+sTnY6wlVOzIY2fmRny6XANke6SGJyalH8Bs7B6v6V+LBNwuT//q59PCVZZfE/weCOh8iXWDoX7wfMCQxe2wGlBd5piqagcI65lrJdnhs07uccrM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752161977; c=relaxed/simple;
-	bh=OpL2FDt9RCQRjb5xtdvRP249v/kqaDhGqSWlRUDnUJ8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=na/uPnL7Qe5DtfK9tXt+PQqQC/WH37wGyq7p+FN6b5Q2Z3IgAyNXbwYFuxvDHD+/XfN9mltiskSmCZ+rv7jPBekPi5VYl/SaWmNX+vCcoBPjkcYl5wFn+q39f0ybopiQXGk46izfQB5PllJ464pllAR1brF0JaOVUijAojM5Pv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AF2pMhzU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752161974;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Vw0GvPhTqoaGSG8Ri24kcD2QAy/l1QmTinEC6MhnSoM=;
-	b=AF2pMhzUdUZfuyYANm0PEHIlMLQ7VvM4VWhgq0CFe5uMr78YPV1kf+eaD/EebjC/TaAr9v
-	jkxPNgw+RMrvXAZ9FXd/5g2KoZLZ8NzLNIUJX1xOb8Qr00H202+MYSgH3QTRXPP3823OeD
-	5y67VBHbxnVHF+K+cniJ2M4P0/WPbr8=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-424-Qg4uvgukNdyQun6pGf3JJQ-1; Thu,
- 10 Jul 2025 11:39:15 -0400
-X-MC-Unique: Qg4uvgukNdyQun6pGf3JJQ-1
-X-Mimecast-MFC-AGG-ID: Qg4uvgukNdyQun6pGf3JJQ_1752161953
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A6C941956095;
-	Thu, 10 Jul 2025 15:39:13 +0000 (UTC)
-Received: from p16v.luc.cera.cz (unknown [10.44.33.211])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7133C1956094;
-	Thu, 10 Jul 2025 15:39:10 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Petr Oros <poros@redhat.com>
-Subject: [PATCH net-next 5/5] dpll: zl3073x: Add support to get fractional frequency offset
-Date: Thu, 10 Jul 2025 17:38:48 +0200
-Message-ID: <20250710153848.928531-6-ivecera@redhat.com>
-In-Reply-To: <20250710153848.928531-1-ivecera@redhat.com>
-References: <20250710153848.928531-1-ivecera@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25A0274FE4
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 15:49:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1752162601; cv=fail; b=VHeVj9OYbsOUi8oLYBtyY8cJGXIEoNvW0CEJhZUisRIylSR3fboFBWYuEwg+/TBps6aqwGMyhO/i1zUnZMwWBC6iknc+tmkA0+I8Zn/6tPMqO6u7QyzOyYC0xOYVtFHzwFkKcPDPcLkDVi4GEMJsOpXxzIPbkzwiu0aXeeVKNpo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1752162601; c=relaxed/simple;
+	bh=ysFUxkYeU+PAI7Fo8N+rG77JrElG0LBgG5XlGgWqtd4=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=kSQ+XaOZ62necXh4grjzO/VxuxHt61PgdZAMbryl3gLq6DFjF+MBCkGwOdXsJGbIZztWuAt+7zgUMoNuvCUN+Bzq5lEi3XWv8JwoCr+e5xNfZDKKWzlimmOPsnznxw+FnBrdJkOupa6v5v9FvvTJJ4Qtem9IyFw4RRzf/oxp3o4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ie97GR1X; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1752162599; x=1783698599;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:mime-version;
+  bh=ysFUxkYeU+PAI7Fo8N+rG77JrElG0LBgG5XlGgWqtd4=;
+  b=Ie97GR1XKIOxZNCKD7diIej0SfOcB8otrh5o3lQoXNEzsg7ks3DaNBzI
+   VPKgLGvTywBdHxRi2+aR7rcLVLRtaUmeRGImLb6Bn7Pub26/sGRW0WRz+
+   d2GzKYrxSiMtSK2cLBLyQnp+hRm89FQizbqxF9DGhGJ6CRLOJKRMQ8NNx
+   R+lA93+rvKOHtblG61jnMvVviyV5Ho39oqtxOW+AWubUNo77wwOKkuhGL
+   ZdFL0IQ2yOML4FjeLIuQfonCx5xpjZABwTmpcNb4fqKZSPqufs5e/6EQN
+   0/rCgHn7elyfk6PPrZL57XM7Qw72+cPSLOOHz6i0I9wusYepJh7T2D/RM
+   Q==;
+X-CSE-ConnectionGUID: OYonzSu6SaaT7mqBCVk6lg==
+X-CSE-MsgGUID: SrD11Eq/RJ+iP+cXean3VA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11490"; a="54602648"
+X-IronPort-AV: E=Sophos;i="6.16,300,1744095600"; 
+   d="asc'?scan'208";a="54602648"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2025 08:49:59 -0700
+X-CSE-ConnectionGUID: FQCjSSgsQqyuG5nryLtrYg==
+X-CSE-MsgGUID: knsC+HE8TRq3tD+mYZI6aQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.16,300,1744095600"; 
+   d="asc'?scan'208";a="155552386"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2025 08:49:59 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 10 Jul 2025 08:49:58 -0700
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25 via Frontend Transport; Thu, 10 Jul 2025 08:49:58 -0700
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (40.107.102.48)
+ by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 10 Jul 2025 08:49:57 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rgWPLI/EB5JgpyI+5LNGvxqGs/uGw1kohMgxnlMbjABLiaicMgZwyxZ0CLJ8um0XgfwdxRUbPhoNb5YCEKvlC5tzXnJFRMTGv66p52JcnTwh4QJUmO7lZgsGfBwSXs32/KjWhDHR8wAywG3LGLMzPVerAFxnoqpSz0wWDWudxD/LhyOQL0Zfc6C+yLUucD9Y2tBaqMJde746KuYu27MN2mfsGF3/WmSX9UpNyFtAiZdD/j3QgEEsCwZlRJ7fTVRM587yIHln6FL2Qkk+W+JifLMapFVIcn5JTBHDVFbdTk3NphVqQ0clPUgdj8kglHB/vkNssln1KBnDtnJSSLdiBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r7pigFKgIrWxJZP4oOkPNC6p0rK/KrynVVUlYHYd8kM=;
+ b=wxMOsQRj8Byy7GHXlCo9rvDmQjL0U2RNPZLtYTsAMCqVbi0V8Np83ZaE12JdE83MXvvZdyg3e/aULUdMwCtciBwnV6abukLLrxIRUQs0Js8TsJZD1pyW/yPXXysXBY/pJk/UHuRtS5BMl7iRZ87Hf6MWLe0M61mT8epJ++hvmWEVP4RVmXQg7T96zOZO5fVjO0vHxnE61l9byWowV1V7T+4c91X6zhL0cW82nO36flWB9Jugx6WHzDzbnK8uwDp97K7R0OSw+h8D1ilvQUicmd92OVjlgJiY10miZHUd7/rAwSuSI0UJyXe9KyNJP53JYlpTKwT2Hs7yInN6Z9j+VA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by PH8PR11MB7141.namprd11.prod.outlook.com (2603:10b6:510:22f::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8880.32; Thu, 10 Jul
+ 2025 15:49:41 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3%5]) with mapi id 15.20.8901.024; Thu, 10 Jul 2025
+ 15:49:41 +0000
+Message-ID: <70a20532-3602-4e3d-9d48-28fbb1f23060@intel.com>
+Date: Thu, 10 Jul 2025 08:49:40 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] eth: fbnic: fix ubsan complaints about OOB
+ accesses
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>, "Alexander
+ Duyck" <alexanderduyck@fb.com>, <lee@trager.us>
+References: <20250709205910.3107691-1-kuba@kernel.org>
+ <bfb5122f-e603-457c-8115-4c4acfe7360b@intel.com>
+ <20250709171138.5da9df21@kernel.org>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <20250709171138.5da9df21@kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="------------9Ey4CC9MPt7afkXaFuhJwDgM"
+X-ClientProxiedBy: MW4P223CA0022.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:303:80::27) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH8PR11MB7141:EE_
+X-MS-Office365-Filtering-Correlation-Id: f3648ec8-c36e-4903-6cb1-08ddbfc9625b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?TkQycmNYbDRiZklCbXhxbFJtVXFVZEpuK0hpbGRvb25pUnFjeXZhS0dKK2cv?=
+ =?utf-8?B?QkJZZmZ3cEZuQ2d5WFQ3d1Q3K1hqQjFOM2xqSnRNMCtjeG5qbGFQNXdjL21k?=
+ =?utf-8?B?dGFRWFZYQklNUVgwcWJOcmRGemp2SVR6K3FhRktiN09yUWw4czhYZ0VTNndt?=
+ =?utf-8?B?T0tUa1lGSWhNWGhCakhzbXBGU2hTb1N5eGxZZGhXN1F0dTJGenROL2syQWc0?=
+ =?utf-8?B?cktHRkJ6WFBhYVFrRXRsdnkrcmFyUHJvNWtjZ3IvZE81SERnaDRmQzVEVjdB?=
+ =?utf-8?B?ZTh5Z1p0NjFiK3RFVnhFa3o0a1IvM01QdTM5Z0Z3R3E4WXdPM1FpRTBkQTls?=
+ =?utf-8?B?RUVtbTEzOWExTi9oZU05SlU5MmQ1dHRmTWpVSzNiRnpqb2VQS2JIa08ydndw?=
+ =?utf-8?B?QXhreUxOT0tZaGhQMnhlQmdEdi9RcUg4dnpMZktSUnh4SjZkeUsxcnFrY0VC?=
+ =?utf-8?B?RjdrMzFtUU40cUUwWGcwekJtdE9qK0FoVDBvOEdUcUp1a1greFQ0WFJaK1Jr?=
+ =?utf-8?B?Y2VFdFY0NjlrLzQrdStBZWdUWWhOMzdGcUNINEFvMTNMb1k0VTlEVG01dW9n?=
+ =?utf-8?B?ZDBDNURoOVh0bGZ4ZlNGVVdzZmFrR05TeXJEOTduQ2VKQi9CbXV2ZVVIMFZn?=
+ =?utf-8?B?RHMxeE5pNC96c215U2J4UGIxSUp4Z0FwWnUyb3kxUDgvNHFRUkZrRG1jZlJr?=
+ =?utf-8?B?Ym16cWZGYzNySjc3YW8wd3hRL3RqU21ZQ3lSNkY5bnVNL3JrendHcER1Y1Y3?=
+ =?utf-8?B?bTdBTldvVVhEc3dkamcwQUJMWG04UCtaYTlTODNZNExqcjR5ZElWcU5qTzJH?=
+ =?utf-8?B?dmdibEpVU2ZZV1ArdUk5aTh3c081NGhDM3FrMXozTG8vUVFZN1RlK1Nkb0po?=
+ =?utf-8?B?cXByMzlIc2hkRjQrbnMwNFJOR2VoWjFNbjgxKzF4dmdqTUhyWUF1ZlhJNXpB?=
+ =?utf-8?B?TWVkWVRhNmppekhRQ2MvSUVralFsMUxzWmUrTmR0SElaa3VEclFOVUVMT1lP?=
+ =?utf-8?B?cWJraU1abGp6SXJ0OVROanp0QUZNM2JUWTlmRmhiRWRaWVlyd3pralpYRFJC?=
+ =?utf-8?B?YUVSOXdFY0E5TExJK2xUU2Vtb0o0bFFWN0p1WG1nU3FhS3ZMT1Q0WWZjNHA3?=
+ =?utf-8?B?VzJ0VHNaNmFhb2ZPZG8wUXh5UXMrdFZVTncwQ0V6THdWenNhWHBhd0NienVa?=
+ =?utf-8?B?ck1LamViRlVzSzdqRkRIdDRIT1M0TTBUMGZxM296M3RCQm13N2VTdUJvS1lL?=
+ =?utf-8?B?OXkwc0cvOUYzRU9RZUltOTBPVDZFZGdCb1dxMExjMHlpUm1kRXB2N0UzYnVT?=
+ =?utf-8?B?K0hMTU1sSVl1OHBWZHZoN09JRXJHWUN3dm5SMy9BUlhlZDhPQTZhdGtwdGlt?=
+ =?utf-8?B?V1htWE0rZnhkd0dBUGx3VkF5UG9NOG5LWDR2NXZXZ0VWc3ZxNFFwMk5KS0p6?=
+ =?utf-8?B?UXlITStINU8xM0F2OWpnSUpoYTlxdEw4L3lTTy9BTkRaM1FkV01IblQ0cjVP?=
+ =?utf-8?B?dVRVWDdpQm1OeWcrZkV1YnVrY1FYVjhwUDRHc0NmQUU3aEc4TCtFU1IxZW5w?=
+ =?utf-8?B?MjZ6SWlrb21ldHlhZDZvQmY3SlpEaXhMeXBVMXpxVkwwNWJwSGhrRXBUT1dK?=
+ =?utf-8?B?eWpKVDdiakZIMVBKUEsvUUI0Z3h4amI2NlQxNXhMYlBHUVpuL21mbWpyeVhz?=
+ =?utf-8?B?TDBLMFVaNTZNdTV2TmtmRzd3T3g2OXRGeTFCL0w4SktHdExNbFZVc1BsaW1N?=
+ =?utf-8?B?eWx1OGRmMmU4a2N5L1djc3VOd1YrUGhnaUpFa2tyNWhScU5QQ3pMV3lBRHpM?=
+ =?utf-8?B?eks4TzNSQXFQbDh4K2lvYStqdWZLR3JpVFQ3SFQ4ZWplRzJtT0F4bFVPSGpH?=
+ =?utf-8?B?Z2dIamdpa1NNUTBRb2tFS2RWRzI5RWN1Nm0rRzR0ckR3ak0zbmxDZG9MdzIz?=
+ =?utf-8?Q?jdaj/lI3klQ=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NnBhYXpzSjBrUmVabTFwSGNtR2dmTVI4UFU5Z0l0OTRObkJnOXZ2MnN1N3My?=
+ =?utf-8?B?a29rV1RLR0RrWUp0aXExQ2k3ekJwdFFUMjRvQUNsY29jWGc0bVNiejQvc0dI?=
+ =?utf-8?B?dEZOTENHMHgxZFhvb2J6czJGVCtGMlFhMGpBampXejhFOHo0RzJhQzJ2cjNy?=
+ =?utf-8?B?YitYbGVVRjlLWHRMQzVvQ1BhdVlueUpYSC9CQTZMUlNNRk1ucThDbUxnR0gv?=
+ =?utf-8?B?MlgzcUpaVDg0aGE4YmhVUVlCT1lCdWJmd1U2a1Q2MHo4dDFUTDEwNGVjc2po?=
+ =?utf-8?B?bjVOWjg5SkQzNHpETVVpTXBFQUVSOHl1dmdnd24zSEVGMXdRV29WbHVQdFY2?=
+ =?utf-8?B?bTVWNHpNcllyR2o0MmNGaSszUHQ5SXN0WmxmOFJzU0dkSWZhWDJGQURrOTFU?=
+ =?utf-8?B?Wm1ObnJGNCtIOXNKUVJJZ1h4TWlpUklQckVmMDNseFh1dXNybUhoRVRDNjRM?=
+ =?utf-8?B?eFQ2TXpKTG9RaS9GODUxdmNDczBtNHFtYzNvUlAveG1FR3ZGcmFBZVZydE4w?=
+ =?utf-8?B?a1dQbnkrelhCRlFPWU5FTVdGSjc5WUtMemF2N3pxejFHYXo3QVRNVVRkMEVo?=
+ =?utf-8?B?ZUsyWkhKMzRSa1crU0NsWTE5VzJhMWlCZGx0bk9JSDdYN3ZoLzNnT3pvdGJt?=
+ =?utf-8?B?ak9meE5FTGJKb3J2Y2phMXVya3ZuOGV2NG1BYlprTHYrWFFZQWdQSlZyMURW?=
+ =?utf-8?B?WWpjUHBjWk1ucGRjNCtsZnlmTk83SWNHZ3hGY0FmTmwwcHN1Z1lUSGhPelU1?=
+ =?utf-8?B?TDI1aC82UXZ2VE9kUjQ1VTB1dHVqcklFNndKNk9KRWlPN1lVbVVzR01NMEZ1?=
+ =?utf-8?B?MG9sRTBzWHlWQiswWURxT1ZCUkV4bXJRaUlvbE1ab3g5U1cyTngxLzNFR3Ry?=
+ =?utf-8?B?WXJoUG1kN0Z6a0VZbXFVWVpGMmRCWXpDZ3VxSXYvb3h4N3VoZ2M3aThjMXZI?=
+ =?utf-8?B?YktDM3J5OW9xeDNtdldjWUJhV0JuYytNWC96VnNoeUY5SjFuTk9ReXZTYlJs?=
+ =?utf-8?B?QVY2VXRGTGUrU1V1RDk5OGxaM1RDTWM3OFdROXN0QWxiVmFrdGtRWmhpMXdu?=
+ =?utf-8?B?RTJqYWN2NlBNV2w4ZVRUdDIxVU1kaTJjdVZNOUhOSnkrSFJrcmhVMHBsZS84?=
+ =?utf-8?B?dHJ5OURHdC93Y2MrVGhzVTlraVY4bXdQUWhod1l4MlVPNTIwUjEzSzVZZWpt?=
+ =?utf-8?B?R3Zwb2dwZmlyVm4zS3BvY0FoK1ZqbmxjdHprVmQ1RFp6WFNTeWdSZEtwbGxx?=
+ =?utf-8?B?TjB2NUp1WXZ0MmxLQnp1elBRT0ZOdXNTQS9pYUgrWmZLaTNSSERML1dOVWZh?=
+ =?utf-8?B?MnNtYmczL0xWdFZXWXMwa0lrN1NmeTNlOEhoNldqNFZ1RDNHbHlROGowN1Nv?=
+ =?utf-8?B?UXFnS3BVMGRMTFp6dS9tUEtDTnZXMCtzTTVrc245Ty9nTi81VjJ3dE9aS3Bk?=
+ =?utf-8?B?OFpyblNNc0tOSDJMNHJUbGhweVd2Ri9iV3M2TFgrVjFDai85S1ZPeDNnOFln?=
+ =?utf-8?B?cWEvck5Jc3hteFdzV3JPV0RzaUJ0YTBFekU0MHVHaTVNVThKbGFxNTlGWmR5?=
+ =?utf-8?B?ZUd3MXEyd2k1TXQwSjJSQmhxajRDK1k5ZHpxcHVoN3RlemE5YzViUHJCSTFH?=
+ =?utf-8?B?M0IxNUgweC9tallSdDEwWVZ3MTdNOTU5WWgvb1FSd2NDTUNWeXZuMWNGZ3Yx?=
+ =?utf-8?B?d1dkMFhzYW9QTlYxcUx1UEJzeHRiWnJsL1QyZmZtVVNVU2hJQiszR1hvMU9J?=
+ =?utf-8?B?VnNUNGo2VXVxdkZiNFFWOUZkSXRZV0huU2NHSnJha3plWmpQaDVzNEVIenVt?=
+ =?utf-8?B?ODNtNldPU2pWTW83czFudkN1UU1YVzV3VnB5bzZUU1VYby9iZGxvbUJCTUdy?=
+ =?utf-8?B?U3Q4cWhlRFpXS3QzN2VQQXdiR2F5RDBFY3JJdDBjWkt2NkRNMzdhM0hOWWJa?=
+ =?utf-8?B?MklvZUtnRy96NzNQcUQzbThPWjNiNVd5dHgxSjB0b1RsL0RhcEhDNWFuZ2Js?=
+ =?utf-8?B?MHZ5RVJISmRGcG1hM096SFZuWS9tSGdVWWdKQy9aN0RxcFNPU1k4bGlaeFhQ?=
+ =?utf-8?B?Z3B3QlV0LzFLOGpJVW5jUURMK3lpUGU3NjNRdTlROTExcWNWMHpsRHBLdnF6?=
+ =?utf-8?B?L1oxaGNUQXRZblhROUt6MjlubG1obStZTjkvT2tIT1ZOL1ZwQy9kajJlczNy?=
+ =?utf-8?B?UVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f3648ec8-c36e-4903-6cb1-08ddbfc9625b
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2025 15:49:41.7108
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PvoBfDqTicMjF2sWelj8JEBcO5HFUOV5HXW7STnpRbzdKbqBA2shmRY42dM9xbf15Cbfuo/HqntPdITRD28WgIxSqZPTh+tCNlElbyDKCw0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7141
+X-OriginatorOrg: intel.com
 
-Adds support to get fractional frequency offset for input pins. Implement
-the appropriate callback and function that periodicaly performs reference
-frequency measurement and notifies DPLL core about changes.
+--------------9Ey4CC9MPt7afkXaFuhJwDgM
+Content-Type: multipart/mixed; boundary="------------1JzskAXsTTuRZZsl3iYjsJk0";
+ protected-headers="v1"
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ Alexander Duyck <alexanderduyck@fb.com>, lee@trager.us
+Message-ID: <70a20532-3602-4e3d-9d48-28fbb1f23060@intel.com>
+Subject: Re: [PATCH net-next] eth: fbnic: fix ubsan complaints about OOB
+ accesses
+References: <20250709205910.3107691-1-kuba@kernel.org>
+ <bfb5122f-e603-457c-8115-4c4acfe7360b@intel.com>
+ <20250709171138.5da9df21@kernel.org>
+In-Reply-To: <20250709171138.5da9df21@kernel.org>
 
-Co-developed-by: Prathosh Satish <Prathosh.Satish@microchip.com>
-Signed-off-by: Prathosh Satish <Prathosh.Satish@microchip.com>
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/dpll/zl3073x/core.c | 67 +++++++++++++++++++++++++++++++++++
- drivers/dpll/zl3073x/core.h | 15 ++++++++
- drivers/dpll/zl3073x/dpll.c | 69 +++++++++++++++++++++++++++++++++++--
- drivers/dpll/zl3073x/regs.h | 19 ++++++++++
- 4 files changed, 168 insertions(+), 2 deletions(-)
+--------------1JzskAXsTTuRZZsl3iYjsJk0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
-index eb62a492b1727..7ebcfc5ec1f09 100644
---- a/drivers/dpll/zl3073x/core.c
-+++ b/drivers/dpll/zl3073x/core.c
-@@ -720,6 +720,66 @@ int zl3073x_ref_phase_offsets_update(struct zl3073x_dev *zldev, int channel)
- 				    ZL_REF_PHASE_ERR_READ_RQST_RD);
- }
- 
-+/**
-+ * zl3073x_ref_ffo_update - update reference fractional frequency offsets
-+ * @zldev: pointer to zl3073x_dev structure
-+ *
-+ * The function asks device to update fractional frequency offsets latch
-+ * registers the latest measured values, reads and stores them into
-+ *
-+ * Return: 0 on success, <0 on error
-+ */
-+static int
-+zl3073x_ref_ffo_update(struct zl3073x_dev *zldev)
-+{
-+	int i, rc;
-+
-+	/* Per datasheet we have to wait for 'ref_freq_meas_ctrl' to be zero
-+	 * to ensure that the measured data are coherent.
-+	 */
-+	rc = zl3073x_poll_zero_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
-+				  ZL_REF_FREQ_MEAS_CTRL);
-+	if (rc)
-+		return rc;
-+
-+	/* Select all references for measurement */
-+	rc = zl3073x_write_u8(zldev, ZL_REG_REF_FREQ_MEAS_MASK_3_0,
-+			      GENMASK(7, 0)); /* REF0P..REF3N */
-+	if (rc)
-+		return rc;
-+	rc = zl3073x_write_u8(zldev, ZL_REG_REF_FREQ_MEAS_MASK_4,
-+			      GENMASK(1, 0)); /* REF4P..REF4N */
-+	if (rc)
-+		return rc;
-+
-+	/* Request frequency offset measurement */
-+	rc = zl3073x_write_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
-+			      ZL_REF_FREQ_MEAS_CTRL_REF_FREQ_OFF);
-+	if (rc)
-+		return rc;
-+
-+	/* Wait for finish */
-+	rc = zl3073x_poll_zero_u8(zldev, ZL_REG_REF_FREQ_MEAS_CTRL,
-+				  ZL_REF_FREQ_MEAS_CTRL);
-+	if (rc)
-+		return rc;
-+
-+	/* Read DPLL-to-REFx frequency offset measurements */
-+	for (i = 0; i < ZL3073X_NUM_REFS; i++) {
-+		s32 value;
-+
-+		/* Read value stored in units of 2^-32 signed */
-+		rc = zl3073x_read_u32(zldev, ZL_REG_REF_FREQ(i), &value);
-+		if (rc)
-+			return rc;
-+
-+		/* Convert to ppm -> ffo = (10^6 * value) / 2^32 */
-+		zldev->ref[i].ffo = mul_s64_u64_shr(value, 1000000, 32);
-+	}
-+
-+	return 0;
-+}
-+
- static void
- zl3073x_dev_periodic_work(struct kthread_work *work)
- {
-@@ -734,6 +794,13 @@ zl3073x_dev_periodic_work(struct kthread_work *work)
- 		dev_warn(zldev->dev, "Failed to update phase offsets: %pe\n",
- 			 ERR_PTR(rc));
- 
-+	/* Update references' fractional frequency offsets */
-+	rc = zl3073x_ref_ffo_update(zldev);
-+	if (rc)
-+		dev_warn(zldev->dev,
-+			 "Failed to update fractional frequency offsets: %pe\n",
-+			 ERR_PTR(rc));
-+
- 	list_for_each_entry(zldpll, &zldev->dplls, list)
- 		zl3073x_dpll_changes_check(zldpll);
- 
-diff --git a/drivers/dpll/zl3073x/core.h b/drivers/dpll/zl3073x/core.h
-index 1a5edc4975735..71af2c8001109 100644
---- a/drivers/dpll/zl3073x/core.h
-+++ b/drivers/dpll/zl3073x/core.h
-@@ -30,10 +30,12 @@ struct zl3073x_dpll;
-  * struct zl3073x_ref - input reference invariant info
-  * @enabled: input reference is enabled or disabled
-  * @diff: true if input reference is differential
-+ * @ffo: current fractional frequency offset
-  */
- struct zl3073x_ref {
- 	bool	enabled;
- 	bool	diff;
-+	s64	ffo;
- };
- 
- /**
-@@ -170,6 +172,19 @@ zl3073x_output_pin_out_get(u8 id)
- 	return id / 2;
- }
- 
-+/**
-+ * zl3073x_ref_ffo_get - get current fractional frequency offset
-+ * @zldev: pointer to zl3073x device
-+ * @index: input reference index
-+ *
-+ * Return: the latest measured fractional frequency offset
-+ */
-+static inline s64
-+zl3073x_ref_ffo_get(struct zl3073x_dev *zldev, u8 index)
-+{
-+	return zldev->ref[index].ffo;
-+}
-+
- /**
-  * zl3073x_ref_is_diff - check if the given input reference is differential
-  * @zldev: pointer to zl3073x device
-diff --git a/drivers/dpll/zl3073x/dpll.c b/drivers/dpll/zl3073x/dpll.c
-index 4e05120c30b9a..b061a75aad1a7 100644
---- a/drivers/dpll/zl3073x/dpll.c
-+++ b/drivers/dpll/zl3073x/dpll.c
-@@ -37,6 +37,7 @@
-  * @esync_control: embedded sync is controllable
-  * @pin_state: last saved pin state
-  * @phase_offset: last saved pin phase offset
-+ * @freq_offset: last saved fractional frequency offset
-  */
- struct zl3073x_dpll_pin {
- 	struct list_head	list;
-@@ -50,6 +51,7 @@ struct zl3073x_dpll_pin {
- 	bool			esync_control;
- 	enum dpll_pin_state	pin_state;
- 	s64			phase_offset;
-+	s64			freq_offset;
- };
- 
- /*
-@@ -270,6 +272,18 @@ zl3073x_dpll_input_pin_esync_set(const struct dpll_pin *dpll_pin,
- 			     ZL_REG_REF_MB_MASK, BIT(ref));
- }
- 
-+static int
-+zl3073x_dpll_input_pin_ffo_get(const struct dpll_pin *dpll_pin, void *pin_priv,
-+			       const struct dpll_device *dpll, void *dpll_priv,
-+			       s64 *ffo, struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dpll_pin *pin = pin_priv;
-+
-+	*ffo = pin->freq_offset;
-+
-+	return 0;
-+}
-+
- static int
- zl3073x_dpll_input_pin_frequency_get(const struct dpll_pin *dpll_pin,
- 				     void *pin_priv,
-@@ -1582,6 +1596,7 @@ static const struct dpll_pin_ops zl3073x_dpll_input_pin_ops = {
- 	.direction_get = zl3073x_dpll_pin_direction_get,
- 	.esync_get = zl3073x_dpll_input_pin_esync_get,
- 	.esync_set = zl3073x_dpll_input_pin_esync_set,
-+	.ffo_get = zl3073x_dpll_input_pin_ffo_get,
- 	.frequency_get = zl3073x_dpll_input_pin_frequency_get,
- 	.frequency_set = zl3073x_dpll_input_pin_frequency_set,
- 	.phase_offset_get = zl3073x_dpll_input_pin_phase_offset_get,
-@@ -2037,6 +2052,52 @@ zl3073x_dpll_pin_phase_offset_check(struct zl3073x_dpll_pin *pin)
- 	return false;
- }
- 
-+/**
-+ * zl3073x_dpll_pin_ffo_check - check for pin fractional frequency offset change
-+ * @pin: pin to check
-+ *
-+ * Check for the given pin's fractional frequency change.
-+ *
-+ * Return: true on fractional frequency offset change, false otherwise
-+ */
-+static bool
-+zl3073x_dpll_pin_ffo_check(struct zl3073x_dpll_pin *pin)
-+{
-+	struct zl3073x_dpll *zldpll = pin->dpll;
-+	struct zl3073x_dev *zldev = zldpll->dev;
-+	u8 ref, status;
-+	s64 ffo;
-+	int rc;
-+
-+	/* Get reference monitor status */
-+	ref = zl3073x_input_pin_ref_get(pin->id);
-+	rc = zl3073x_read_u8(zldev, ZL_REG_REF_MON_STATUS(ref), &status);
-+	if (rc) {
-+		dev_err(zldev->dev, "Failed to read %s refmon status: %pe\n",
-+			pin->label, ERR_PTR(rc));
-+
-+		return false;
-+	}
-+
-+	/* Do not report ffo changes if the reference monitor report errors */
-+	if (status != ZL_REF_MON_STATUS_OK)
-+		return false;
-+
-+	/* Get the latest measured ref's ffo */
-+	ffo = zl3073x_ref_ffo_get(zldev, ref);
-+
-+	/* Compare with previous value */
-+	if (pin->freq_offset != ffo) {
-+		dev_dbg(zldev->dev, "%s freq offset changed: %lld -> %lld\n",
-+			pin->label, pin->freq_offset, ffo);
-+		pin->freq_offset = ffo;
-+
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
- /**
-  * zl3073x_dpll_changes_check - check for changes and send notifications
-  * @zldpll: pointer to zl3073x_dpll structure
-@@ -2117,11 +2178,15 @@ zl3073x_dpll_changes_check(struct zl3073x_dpll *zldpll)
- 			pin_changed = true;
- 		}
- 
--		/* Check for phase offset change once per second */
--		if (zldpll->check_count % 2 == 0)
-+		/* Check for phase offset and ffo change once per second */
-+		if (zldpll->check_count % 2 == 0) {
- 			if (zl3073x_dpll_pin_phase_offset_check(pin))
- 				pin_changed = true;
- 
-+			if (zl3073x_dpll_pin_ffo_check(pin))
-+				pin_changed = true;
-+		}
-+
- 		if (pin_changed)
- 			dpll_pin_change_ntf(pin->dpll_pin);
- 	}
-diff --git a/drivers/dpll/zl3073x/regs.h b/drivers/dpll/zl3073x/regs.h
-index a382cd4a109f5..614e33128a5c9 100644
---- a/drivers/dpll/zl3073x/regs.h
-+++ b/drivers/dpll/zl3073x/regs.h
-@@ -94,6 +94,9 @@
- #define ZL_DPLL_REFSEL_STATUS_STATE		GENMASK(6, 4)
- #define ZL_DPLL_REFSEL_STATUS_STATE_LOCK	4
- 
-+#define ZL_REG_REF_FREQ(_idx)						\
-+	ZL_REG_IDX(_idx, 2, 0x44, 4, ZL3073X_NUM_REFS, 4)
-+
- /**********************
-  * Register Page 4, Ref
-  **********************/
-@@ -101,6 +104,22 @@
- #define ZL_REG_REF_PHASE_ERR_READ_RQST		ZL_REG(4, 0x0f, 1)
- #define ZL_REF_PHASE_ERR_READ_RQST_RD		BIT(0)
- 
-+#define ZL_REG_REF_FREQ_MEAS_CTRL		ZL_REG(4, 0x1c, 1)
-+#define ZL_REF_FREQ_MEAS_CTRL			GENMASK(1, 0)
-+#define ZL_REF_FREQ_MEAS_CTRL_REF_FREQ		1
-+#define ZL_REF_FREQ_MEAS_CTRL_REF_FREQ_OFF	2
-+#define ZL_REF_FREQ_MEAS_CTRL_DPLL_FREQ_OFF	3
-+
-+#define ZL_REG_REF_FREQ_MEAS_MASK_3_0		ZL_REG(4, 0x1d, 1)
-+#define ZL_REF_FREQ_MEAS_MASK_3_0(_ref)		BIT(_ref)
-+
-+#define ZL_REG_REF_FREQ_MEAS_MASK_4		ZL_REG(4, 0x1e, 1)
-+#define ZL_REF_FREQ_MEAS_MASK_4(_ref)		BIT((_ref) - 8)
-+
-+#define ZL_REG_DPLL_MEAS_REF_FREQ_CTRL		ZL_REG(4, 0x1f, 1)
-+#define ZL_DPLL_MEAS_REF_FREQ_CTRL_EN		BIT(0)
-+#define ZL_DPLL_MEAS_REF_FREQ_CTRL_IDX		GENMASK(6, 4)
-+
- #define ZL_REG_REF_PHASE(_idx)						\
- 	ZL_REG_IDX(_idx, 4, 0x20, 6, ZL3073X_NUM_REFS, 6)
- 
--- 
-2.49.0
 
+
+On 7/9/2025 5:11 PM, Jakub Kicinski wrote:
+> On Wed, 9 Jul 2025 14:23:11 -0700 Jacob Keller wrote:
+>>>  		head =3D list_first_entry(&log->entries, typeof(*head), list);
+>>> -		entry =3D (struct fbnic_fw_log_entry *)&head->msg[head->len + 1]; =
+ =20
+>>
+>> I am guessing that UBSAN gets info about the hint for the length of th=
+e
+>> msg, via the counted_by annotation in the structure? Then it realizes
+>> that this is too large. Strictly taking address of a value doesn't
+>> actually directly access the memory... However, you then later access
+>> the value via the entry variable.. Perhaps UBSAN is complaining about =
+that?
+>=20
+> Could be.. The splat includes the line info for the line whether entry
+> is computed, but maybe that's just a nicety and the detection is done
+> at access time..
+
+It might just be the way the pointer is generated. I think I had issues
+with something similar when working on lib/pldmfw too... Been a while
+since I had an UBSAN splat though.
+
+--------------1JzskAXsTTuRZZsl3iYjsJk0--
+
+--------------9Ey4CC9MPt7afkXaFuhJwDgM
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaG/hFAUDAAAAAAAKCRBqll0+bw8o6DAq
+AQDmRZRqxM5zIpd3QrXQeCmPKM7bsDVesaHrvkZF2s+aTwEAraUkvKrCGND7VcSdk9QWK4IfePjf
+uTHPaMUaxoApYw0=
+=CpS8
+-----END PGP SIGNATURE-----
+
+--------------9Ey4CC9MPt7afkXaFuhJwDgM--
 
