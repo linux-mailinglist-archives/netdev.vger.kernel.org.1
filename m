@@ -1,270 +1,520 @@
-Return-Path: <netdev+bounces-205935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DC47B00D7D
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 23:08:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF60CB00D9F
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 23:13:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B666C58759E
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 21:08:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE4951CA4A82
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 21:13:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF502FD864;
-	Thu, 10 Jul 2025 21:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9FEB302069;
+	Thu, 10 Jul 2025 21:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LQIuVnOE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iHVvudpw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3FB82FCE09
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 21:07:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F82B30204F
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 21:12:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752181680; cv=none; b=rbd5suIQR2HLcVjQFYDEaOb8p9ZLWHuZ4NXKBoKvnSygw2fVvUGEhOaYgbTWwj72ddhniKkXZclD8OqaeT1ScSdludp8x8cRxLFwV7FSTRpkfskmvudDHV9ek2XjyxN54M5S7vLwRsDgCjHpaOsW6OvqA/xF6irTJ6F2YW7X5jk=
+	t=1752181927; cv=none; b=TZ/T9TxEMT7AeWg11puav+SPf6SvvIZr9nvoVkZZKKiEyFFnSQyV/jWHrOH7M85o7v8fc8zM7eDKHeWjfIV4u7UUFgxahw0GiK8G/EfbOin23O7logggojSUXWd54boQqKHQe4Nvsz572uq3sdJ/6Wmoixty7QH+5g/glKX2D88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752181680; c=relaxed/simple;
-	bh=H1IPeIccAnwjfs0WpZeHufMS44gCESa5qppZzC3iFek=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=olLqGZH4OscOH47Cq8LIyAlquF7mweosjae97rHdGKLaFVzAwLx6Si/3BvMlqqF7Le24iXJtpX/JgyIqvdxsqF87jHVInlnj8AwLaLOaNB+uQo8JQAsAT6hjeTJUrLkWKuib7M/pgbLKIQ/ZHa32KhMU/o8fl0zSvMMqB6rX1jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LQIuVnOE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752181676;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9yGXmz048mjHAM/oCbqLFH8FBN50Fh1/awgsA+FR9KU=;
-	b=LQIuVnOE9Tu/cfdxcYLzkF9UohfmFLdhcHdW2AjgDepOns2pv1GE/EMr4CrR0NFLKKY6Gm
-	qECDM0U+NILVFP0P8ICVfIqfoHRJKFFvnjZvNMZeaLmpo25mSWjxOK4YqKJi93wbaagmaj
-	e9Yl/GEHaMG9e70Uovr0bHijP5Q/N7w=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-126-leZR9H6VP7Wh_FDAX61j0A-1; Thu,
- 10 Jul 2025 17:07:53 -0400
-X-MC-Unique: leZR9H6VP7Wh_FDAX61j0A-1
-X-Mimecast-MFC-AGG-ID: leZR9H6VP7Wh_FDAX61j0A_1752181670
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8851A195609E;
-	Thu, 10 Jul 2025 21:07:50 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.88.100])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E607730001A1;
-	Thu, 10 Jul 2025 21:07:46 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: =?utf-8?Q?Adri=C3=A1n?= Moreno <amorenoz@redhat.com>
-Cc: dev@openvswitch.org,  netdev@vger.kernel.org,  Andrew Lunn
- <andrew+netdev@lunn.ch>,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
- Abeni <pabeni@redhat.com>,  Eelco Chaudron <echaudro@redhat.com>,  Ilya
- Maximets <i.maximets@ovn.org>,  Mike Pattrick <mpattric@redhat.com>,
-  Florian Westphal <fw@strlen.de>,  John Fastabend
- <john.fastabend@gmail.com>,  Jakub Sitnicki <jakub@cloudflare.com>,  Joe
- Stringer <joe@ovn.org>
-Subject: Re: [RFC] net: openvswitch: Inroduce a light-weight socket map
- concept.
-In-Reply-To: <CAG=2xmOXG_5da9+yX0z8hruTqgQxaHzRLVVHZU9M9cmZ475Qqw@mail.gmail.com>
-	(=?utf-8?Q?=22Adri=C3=A1n?= Moreno"'s message of "Thu, 10 Jul 2025 02:35:26
- -0700")
-References: <20250627210054.114417-1-aconole@redhat.com>
-	<CAG=2xmOXG_5da9+yX0z8hruTqgQxaHzRLVVHZU9M9cmZ475Qqw@mail.gmail.com>
-Date: Thu, 10 Jul 2025 17:07:45 -0400
-Message-ID: <f7ttt3jpxem.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1752181927; c=relaxed/simple;
+	bh=hNTm3mkwy1vJFUNETHkUAMy0RWJ5pB1ji8hkH8l9UB8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jPVIEQMQfsj480plZDmp2JeMMTW/vFUo+DMJaAvPlpB9A2tuLvutc/pTZFRF3Q1HyCRQyxKYeaWCz5CF4Macuel/fmJWkLy7oizNyMr84BhEPlXCn0hy+yLaa1GBmEkbOuThTYvuiKGuLrOweB8UUTJdBcM+B6iTq+7BAK5H5+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iHVvudpw; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-315af0857f2so1529400a91.0
+        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 14:12:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752181925; x=1752786725; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UejNwP83zsCnnH4gqP0c/oiT0qvNngp3q+GZsTl92W0=;
+        b=iHVvudpw0YLXMotaN04mLLGv2HGgufjS1+s7btKmu/xrFob/NibtnUXfKZuehZTmvp
+         +29PXR5a1fsbUbosaNiiyIqajHbRJeot+zm7ewqrHCRaXDnRQn3nAyw/8dqiKQD6nps/
+         1V8O4oFLmbqDoR99EYVwcXvCA+gUOL4s9jBFyB9cmakDbwjzsgIwAkhasJwbAAWVRw7P
+         P6GKf39Y5sh6NOPuXpbBgS1NbncNEbgojt1pYGYrZJClzrBicwsn6qNCoJnlwVVk5XdK
+         xSPz4d4t/5P4+XkCYdKa/HH9kNs3iQfdKmlT04BZNGBJ5IHU+kHQKEZwYRzjtRnukB0x
+         zHfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752181925; x=1752786725;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UejNwP83zsCnnH4gqP0c/oiT0qvNngp3q+GZsTl92W0=;
+        b=LZHxxsDn3rJv8TGxldy+p1CFdjFgVoA0XEA5fvbchb1MqKlw6QWgOAXFXQLNN+cFrk
+         UP7d2wjvPRKd+33oYk2rFNvyRgtLtnOQUF+YZgLUW82I6IYc3LhDK+G05deGYVOKd6sn
+         fOBNVPGBLpDwhf5PcjMIct/jAet9giyfQ6cT+V2aONIAeVHcbvnuRtP/pGKuMaQyZJrf
+         OuwvzuY9vrfW+2mz0GSCWwDTaWVYQYMTJ2RSuLwhQdKfn9DIykl1MNjCgt7Qip6N7yaj
+         6xsuTBxFxZC5lpOkS7wy+oxaKCYccm7JhfUdf9HJAdxGS7m8/YdI0si7Z5wEjxnXJQs0
+         EqFA==
+X-Gm-Message-State: AOJu0Yxv45nSFX1YazQZBvnvqvjIAMxHBZuEraneDQDoUQf/zBtCvbC/
+	3ByZo7sJPG0wY1K0nKetnqJC97dXDruADzclhkPW3q9jSsP+1bFC6DW5sLzkKI9Enpp7NN38j1K
+	G2U96LPxd6lhglw==
+X-Google-Smtp-Source: AGHT+IGoB9UmMvr9fScM/m10GpSrSiQe4RcSROR9NVkeyg/VXy9AvOtwI96EkB+Y1pD+gcueCv020dhFbMKUUg==
+X-Received: from pjbqo16.prod.google.com ([2002:a17:90b:3dd0:b0:312:14e5:174b])
+ (user=skhawaja job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:35cf:b0:313:14b5:2538 with SMTP id 98e67ed59e1d1-31c4f5a151emr138423a91.35.1752181924838;
+ Thu, 10 Jul 2025 14:12:04 -0700 (PDT)
+Date: Thu, 10 Jul 2025 21:12:03 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
+Message-ID: <20250710211203.3979655-1-skhawaja@google.com>
+Subject: [PATCH net-next v10] Add support to set NAPI threaded for individual NAPI
+From: Samiullah Khawaja <skhawaja@google.com>
+To: Jakub Kicinski <kuba@kernel.org>, "David S . Miller " <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
+	willemb@google.com, jdamato@fastly.com, mkarsten@uwaterloo.ca
+Cc: netdev@vger.kernel.org, skhawaja@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-Adri=C3=A1n Moreno <amorenoz@redhat.com> writes:
+A net device has a threaded sysctl that can be used to enable threaded
+NAPI polling on all of the NAPI contexts under that device. Allow
+enabling threaded NAPI polling at individual NAPI level using netlink.
 
-> On Fri, Jun 27, 2025 at 05:00:54PM -0400, Aaron Conole wrote:
->> The Open vSwitch module allows a user to implemnt a flow-based
->> layer 2 virtual switch.  This is quite useful to model packet
->> movement analagous to programmable physical layer 2 switches.
->> But the openvswitch module doesn't always strictly operate at
->> layer 2, since it implements higher layer concerns, like
->> fragmentation reassembly, connection tracking, TTL
->> manipulations, etc.  Rightly so, it isn't *strictly* a layer
->> 2 virtual forwarding function.
->>
->> Other virtual forwarding technologies allow for additional
->> concepts that 'break' this strict layer separation beyond
->> what the openvswitch module provides.  The most handy one for
->> openvswitch to start looking at is the concept of the socket
->> map, from eBPF.  This is very useful for TCP connections,
->> since in many cases we will do container<->container
->> communication (although this can be generalized for the
->> phy->container case).
->>
->> This patch provides two different implementations of actions
->> that can be used to construct the same kind of socket map
->> capability within the openvswitch module.  There are additional
->> ways of supporting this concept that I've discussed offline,
->> but want to bring it all up for discussion on the mailing list.
->> This way, "spirited debate" can occur before I spend too much
->> time implementing specific userspace support for an approach
->> that may not be acceptable.  I did 'port' these from
->> implementations that I had done some preliminary testing with
->> but no guarantees that what is included actually works well.
->>
->> For all of these, they are implemented using raw access to
->> the tcp socket.  This isn't ideal, and a proper
->> implementation would reuse the psock infrastructure - but
->> I wanted to get something that we can all at least poke (fun)
->> at rather than just being purely theoretical.  Some of the
->> validation that we may need (for example re-writing the
->> packet's headers) have been omitted to hopefully make the
->> implementations a bit easier to parse.  The idea would be
->> to validate these in the validate_and_copy routines.
->>
->> The first option that I'll present is the suite of management
->> actions presented as:
->>   * sock(commit)
->>   * sock(try)
->>   * sock(tuple)
->>
->> These options would take a 5-tuple stamp of the IP packet
->> coming in, and preserve it as it traverses any packet
->> modifications, recirculations, etc.  The idea of how it would
->> look in the datapath might be something like:
->>
->>    + recirc_id(0),eth(src=3DXXXX,dst=3DYYYY),eth_type(0x800), \
->>    | ip(src=3Da.b.c.d,dst=3De.f.g.h,proto=3D6),tcp(sport=3DAA,dport=3DBB=
-) \
->>    | actions:sock(tuple),sock(try,recirc(1))
->>    \
->>     + recirc_id(1),{match-action-pairs}
->>     ...
->>     + final-action: sock(commit, 2),output(2)
->>
->> When a packet enters ovs processing, it would have a tuple
->> saved, and then forwarded on to another recirc id (or any
->> other actions that might be desired).  For the first
->> packe, the sock(try,..) action will result in the
->> alternativet action list path being taken.  As the packet
->> is 'moving' through the flow table in the kernel, the
->> original tuple details for the socket map would not be
->> modified even if the flow key is updated and the physical
->> packet changed.  Finally, the sock(commit,2) will add
->> to the internal table that the stamped tuple should be
->> forwarded to the particular output port.
->>
->> The advantage to this suite of primitives is that the
->> userspace implementation may be a bit simpler.  Since
->> the table entries and management is done internally
->> by these actions, userspace is free to blanket adjust
->> all of the flows that are tcp destined for a specific
->> output port by inserting this special tuple/try set
->> without much additional logic for tracking
->> connections.  Another advantage is that the userspace
->> doesn't need to peer into a specific netns and pull
->> socket details to find matching tuples.
->
-> What if there is no match on tcp headers at all? Would userspace also
-> add these actions?
+Extend the netlink operation `napi-set` and allow setting the threaded
+attribute of a NAPI. This will enable the threaded polling on a NAPI
+context.
 
-Well, for now we discard the kernel provided flow key, but that does
-have the parsed details and we can use that.
+Add a test in `nl_netdev.py` that verifies various cases of threaded
+NAPI being set at NAPI and at device level.
 
-> I guess you could argue that, if OVS is not being asked to do L4, this
-> feature would not apply, but what if it's just the first flow that
-> doesn't have an L4 match? How would userspace now how to add the action?
+Tested
+ ./tools/testing/selftests/net/nl_netdev.py
+ TAP version 13
+ 1..7
+ ok 1 nl_netdev.empty_check
+ ok 2 nl_netdev.lo_check
+ ok 3 nl_netdev.page_pool_check
+ ok 4 nl_netdev.napi_list_check
+ ok 5 nl_netdev.dev_set_threaded
+ ok 6 nl_netdev.napi_set_threaded
+ ok 7 nl_netdev.nsim_rxq_reset_down
+ # Totals: pass:7 fail:0 xfail:0 xpass:0 skip:0 error:0
 
-You can see my answer to Eelco, maybe it helps - but the idea is to work
-by hooking the xlate layer's output.  There could be some kind of
-additional work we need to do when the rules are more complex, as you
-note (for instance looking in the xlate cache), but we should be able to
-do this.
+Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+---
 
->>
->> However, it means we need to keep a separate mapping
->> table in the kernel, and that includes all the
->> tradeoffs of managing that table (not added in the
->> patch because it got too clunky are the workqueues
->> that would check the table to basically stop counters
->> based on the tcp state so the flow could get expired).
->>
->> The userspace work gets simpler, but the work being
->> done by the kernel space is much more difficult.
->>
->> Next is the simpler 'socket(net,ino)' action.  The
->> flows for this may look something a bit more like:
->>
->>    + recirc_id(0),eth(src=3DXXXX,dst=3DYYYY),eth_type(0x800), \
->>    | ip(src=3Da.b.c.d,dst=3De.f.g.h,proto=3D6),tcp(sport=3DAA,dport=3DBB=
-) \
->>    | actions:socket(NS,INO,recirc(0x1))
->>
->> This is much more compact, but that hides what is
->> really needed to make this work.  Using the single
->> primitive would require that during upcall processing
->> the userspace is aware of the netns for the particular
->> packet.  When it is generating the flows, it can add
->> a socket call at the earliest flow possible when it
->> sees a socket that would be associated with the flow.
->>
->> The kernel then only needs to validate at the flow
->> installation time that the socket is valid.  However,
->> the userspace must do much more work.  It will need
->> to go back through the flows it generated and modify
->> them (or insert new flows) to take this path.  It
->> will have to peer into each netns and find the
->> corresponding socket inode, and program those.  If
->> it cannot find those details when the socket is
->> first added, it will probably not be able to add
->> these later (that's an implementation detail, but
->> at least it will lead to a slow ramp up).
->>
->> From a kernel perspective it is much easier.  We
->> keep a ref to the socket while the action is in
->> place, but that's all we need.  The
->> infrastructure needed is mostly all there, and
->> there aren't many new things we need to change
->> to make it work.
->>
->> So, it's much more work on the userspace side,
->> but much less 'intrusive' for the kernel.
->
-> I'm quite intrigued by what would userspace have to do in this case.
-> IIUC, it would have to:
-> 1) Track all sockets created in all affected namespaces
-> 2) Associate a socket with an upcalled packet
-> 3) Carry this information throughout recirculations until an output
-> action is detected and the destination socket found.
+v10:
+ - Remove kdoc of napi_set_threaded/napi_get_threaded functions.
 
-That's a way to do it, but it requires OVS to have a separate process
-running to track the sockets as well.  I'd rather just get it at the
-point we know we will output and then lookup the socket details and work
-backwards.  That also means we don't need to preserve information across
-controller callouts from the userspace side.
+v9:
+ - Fix usage of NAPI lower/upper case.
+ - Handle napi_set_threaded error.
+ - Move napi_set_threaded kdoc to function definition.
+ - In documentation, Use the ynl CLI form that is packaged with distros.
+ - Remove backtick usage in netdev.yaml for threaded attribute doc.
+ - Use nla_get_uint instead of nla_get_u8.
 
-> 4) Traverse the recirculation chain backwards to find the first flow
-> (recirc_id(0)) and modify it to add the socket action.
+v8:
+ - Fix napi_set_threaded kdoc in net/core/dev.h.
 
-Yes, this recirc lookup needs to be thought out because we will
-potentially need to get to the beginning of the chain - picking that is
-important.  We could default to just using recirc_id(0) and then
-doing a flow_mod on the start of the chain to have the right jump point.
-Picking the start of chain is difficult - but I figured that just
-choosing recirc_id(0) would be okay.
+v7:
+ - rebase
+ - stop kthread when napi threaded is unset at napi level.
+ - Update selftest to verify that kthread PID is not set when threaded
+   is disabled at napi level.
 
-> Is that what you had in mind or am I completely off-track?
+v6:
+ - Set the threaded property at device level even if the currently set
+   value is same. This is to override any per napi settings. Update
+   selftest to verify this scenario.
+ - Use u8 instead of uint in netdev_nl_napi_set_config implementation.
+ - Extend the selftest to verify the existing behaviour that the PID
+   stays valid once threaded napi is enabled. It stays valid even after
+   disabling the threaded napi. Also verify that the same kthread(PID)
+   is reused when threaded napi is enabled again. Will keep this
+   behaviour as based on the discussion on v5.
 
-Sortof - hopefully I explained it a bit better.
+v5:
+ - This patch was part of:
+ https://lore.kernel.org/netdev/Z92e2kCYXQ_RsrJh@LQ3V64L9R2/T/
+ It is being sent separately for the first time.
+ - Change threaded attribute type to uint
+ - Set napi threaded state when set at napi level. When set at device
+   level overwrite the state of each napi. This is the `write all`
+   symantics that is also followed by other configurations.
+ - Add a test to verify `write all` symantics.
 
-> Thanks.
-> Adri=C3=A1n
+ Documentation/netlink/specs/netdev.yaml  | 10 +++
+ Documentation/networking/napi.rst        |  9 ++-
+ include/linux/netdevice.h                |  1 +
+ include/uapi/linux/netdev.h              |  1 +
+ net/core/dev.c                           | 30 +++++++-
+ net/core/dev.h                           |  7 ++
+ net/core/netdev-genl-gen.c               |  5 +-
+ net/core/netdev-genl.c                   | 14 ++++
+ tools/include/uapi/linux/netdev.h        |  1 +
+ tools/testing/selftests/net/nl_netdev.py | 91 +++++++++++++++++++++++-
+ 10 files changed, 162 insertions(+), 7 deletions(-)
+
+diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+index ce4cfec82100..85d0ea6ac426 100644
+--- a/Documentation/netlink/specs/netdev.yaml
++++ b/Documentation/netlink/specs/netdev.yaml
+@@ -283,6 +283,14 @@ attribute-sets:
+         doc: The timeout, in nanoseconds, of how long to suspend irq
+              processing, if event polling finds events
+         type: uint
++      -
++        name: threaded
++        doc: Whether the NAPI is configured to operate in threaded polling
++             mode. If this is set to 1 then the NAPI context operates in
++             threaded polling mode.
++        type: uint
++        checks:
++          max: 1
+   -
+     name: xsk-info
+     attributes: []
+@@ -694,6 +702,7 @@ operations:
+             - defer-hard-irqs
+             - gro-flush-timeout
+             - irq-suspend-timeout
++            - threaded
+       dump:
+         request:
+           attributes:
+@@ -746,6 +755,7 @@ operations:
+             - defer-hard-irqs
+             - gro-flush-timeout
+             - irq-suspend-timeout
++            - threaded
+     -
+       name: bind-tx
+       doc: Bind dmabuf to netdev for TX
+diff --git a/Documentation/networking/napi.rst b/Documentation/networking/napi.rst
+index d0e3953cae6a..a15754adb041 100644
+--- a/Documentation/networking/napi.rst
++++ b/Documentation/networking/napi.rst
+@@ -444,7 +444,14 @@ dependent). The NAPI instance IDs will be assigned in the opposite
+ order than the process IDs of the kernel threads.
+ 
+ Threaded NAPI is controlled by writing 0/1 to the ``threaded`` file in
+-netdev's sysfs directory.
++netdev's sysfs directory. It can also be enabled for a specific NAPI using
++netlink interface.
++
++For example, using the script:
++
++.. code-block:: bash
++
++  $ ynl --family netdev --do napi-set --json='{"id": 66, "threaded": 1}'
+ 
+ .. rubric:: Footnotes
+ 
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index adb14db25798..35947d3e5f93 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -369,6 +369,7 @@ struct napi_config {
+ 	u64 irq_suspend_timeout;
+ 	u32 defer_hard_irqs;
+ 	cpumask_t affinity_mask;
++	bool threaded;
+ 	unsigned int napi_id;
+ };
+ 
+diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
+index 7eb9571786b8..1f3719a9a0eb 100644
+--- a/include/uapi/linux/netdev.h
++++ b/include/uapi/linux/netdev.h
+@@ -134,6 +134,7 @@ enum {
+ 	NETDEV_A_NAPI_DEFER_HARD_IRQS,
+ 	NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT,
+ 	NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT,
++	NETDEV_A_NAPI_THREADED,
+ 
+ 	__NETDEV_A_NAPI_MAX,
+ 	NETDEV_A_NAPI_MAX = (__NETDEV_A_NAPI_MAX - 1)
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 5baa4691074f..64ca82b2d2b9 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -6963,6 +6963,31 @@ static void napi_stop_kthread(struct napi_struct *napi)
+ 	napi->thread = NULL;
+ }
+ 
++int napi_set_threaded(struct napi_struct *napi, bool threaded)
++{
++	if (threaded) {
++		if (!napi->thread) {
++			int err = napi_kthread_create(napi);
++
++			if (err)
++				return err;
++		}
++	}
++
++	if (napi->config)
++		napi->config->threaded = threaded;
++
++	if (!threaded && napi->thread) {
++		napi_stop_kthread(napi);
++	} else {
++		/* Make sure kthread is created before THREADED bit is set. */
++		smp_mb__before_atomic();
++		assign_bit(NAPI_STATE_THREADED, &napi->state, threaded);
++	}
++
++	return 0;
++}
++
+ int dev_set_threaded(struct net_device *dev, bool threaded)
+ {
+ 	struct napi_struct *napi;
+@@ -6970,9 +6995,6 @@ int dev_set_threaded(struct net_device *dev, bool threaded)
+ 
+ 	netdev_assert_locked_or_invisible(dev);
+ 
+-	if (dev->threaded == threaded)
+-		return 0;
+-
+ 	if (threaded) {
+ 		list_for_each_entry(napi, &dev->napi_list, dev_list) {
+ 			if (!napi->thread) {
+@@ -7223,6 +7245,8 @@ static void napi_restore_config(struct napi_struct *n)
+ 		napi_hash_add(n);
+ 		n->config->napi_id = n->napi_id;
+ 	}
++
++	WARN_ON_ONCE(napi_set_threaded(n, n->config->threaded));
+ }
+ 
+ static void napi_save_config(struct napi_struct *n)
+diff --git a/net/core/dev.h b/net/core/dev.h
+index e93f36b7ddf3..a603387fb566 100644
+--- a/net/core/dev.h
++++ b/net/core/dev.h
+@@ -315,6 +315,13 @@ static inline void napi_set_irq_suspend_timeout(struct napi_struct *n,
+ 	WRITE_ONCE(n->irq_suspend_timeout, timeout);
+ }
+ 
++static inline bool napi_get_threaded(struct napi_struct *n)
++{
++	return test_bit(NAPI_STATE_THREADED, &n->state);
++}
++
++int napi_set_threaded(struct napi_struct *n, bool threaded);
++
+ int rps_cpumask_housekeeping(struct cpumask *mask);
+ 
+ #if defined(CONFIG_DEBUG_NET) && defined(CONFIG_BPF_SYSCALL)
+diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
+index 4fc44587f493..0994bd68a7e6 100644
+--- a/net/core/netdev-genl-gen.c
++++ b/net/core/netdev-genl-gen.c
+@@ -92,11 +92,12 @@ static const struct nla_policy netdev_bind_rx_nl_policy[NETDEV_A_DMABUF_FD + 1]
+ };
+ 
+ /* NETDEV_CMD_NAPI_SET - do */
+-static const struct nla_policy netdev_napi_set_nl_policy[NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT + 1] = {
++static const struct nla_policy netdev_napi_set_nl_policy[NETDEV_A_NAPI_THREADED + 1] = {
+ 	[NETDEV_A_NAPI_ID] = { .type = NLA_U32, },
+ 	[NETDEV_A_NAPI_DEFER_HARD_IRQS] = NLA_POLICY_FULL_RANGE(NLA_U32, &netdev_a_napi_defer_hard_irqs_range),
+ 	[NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT] = { .type = NLA_UINT, },
+ 	[NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT] = { .type = NLA_UINT, },
++	[NETDEV_A_NAPI_THREADED] = NLA_POLICY_MAX(NLA_UINT, 1),
+ };
+ 
+ /* NETDEV_CMD_BIND_TX - do */
+@@ -193,7 +194,7 @@ static const struct genl_split_ops netdev_nl_ops[] = {
+ 		.cmd		= NETDEV_CMD_NAPI_SET,
+ 		.doit		= netdev_nl_napi_set_doit,
+ 		.policy		= netdev_napi_set_nl_policy,
+-		.maxattr	= NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT,
++		.maxattr	= NETDEV_A_NAPI_THREADED,
+ 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+ 	},
+ 	{
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index 2afa7b2141aa..5875df372415 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -184,6 +184,10 @@ netdev_nl_napi_fill_one(struct sk_buff *rsp, struct napi_struct *napi,
+ 	if (napi->irq >= 0 && nla_put_u32(rsp, NETDEV_A_NAPI_IRQ, napi->irq))
+ 		goto nla_put_failure;
+ 
++	if (nla_put_uint(rsp, NETDEV_A_NAPI_THREADED,
++			 napi_get_threaded(napi)))
++		goto nla_put_failure;
++
+ 	if (napi->thread) {
+ 		pid = task_pid_nr(napi->thread);
+ 		if (nla_put_u32(rsp, NETDEV_A_NAPI_PID, pid))
+@@ -322,8 +326,18 @@ netdev_nl_napi_set_config(struct napi_struct *napi, struct genl_info *info)
+ {
+ 	u64 irq_suspend_timeout = 0;
+ 	u64 gro_flush_timeout = 0;
++	u8 threaded = 0;
+ 	u32 defer = 0;
+ 
++	if (info->attrs[NETDEV_A_NAPI_THREADED]) {
++		int ret;
++
++		threaded = nla_get_uint(info->attrs[NETDEV_A_NAPI_THREADED]);
++		ret = napi_set_threaded(napi, !!threaded);
++		if (ret)
++			return ret;
++	}
++
+ 	if (info->attrs[NETDEV_A_NAPI_DEFER_HARD_IRQS]) {
+ 		defer = nla_get_u32(info->attrs[NETDEV_A_NAPI_DEFER_HARD_IRQS]);
+ 		napi_set_defer_hard_irqs(napi, defer);
+diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
+index 7eb9571786b8..1f3719a9a0eb 100644
+--- a/tools/include/uapi/linux/netdev.h
++++ b/tools/include/uapi/linux/netdev.h
+@@ -134,6 +134,7 @@ enum {
+ 	NETDEV_A_NAPI_DEFER_HARD_IRQS,
+ 	NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT,
+ 	NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT,
++	NETDEV_A_NAPI_THREADED,
+ 
+ 	__NETDEV_A_NAPI_MAX,
+ 	NETDEV_A_NAPI_MAX = (__NETDEV_A_NAPI_MAX - 1)
+diff --git a/tools/testing/selftests/net/nl_netdev.py b/tools/testing/selftests/net/nl_netdev.py
+index c9109627a741..c8ffade79a52 100755
+--- a/tools/testing/selftests/net/nl_netdev.py
++++ b/tools/testing/selftests/net/nl_netdev.py
+@@ -35,6 +35,91 @@ def napi_list_check(nf) -> None:
+                 ksft_eq(len(napis), 100,
+                         comment=f"queue count after reset queue {q} mode {i}")
+ 
++def napi_set_threaded(nf) -> None:
++    """
++    Test that verifies various cases of napi threaded
++    set and unset at napi and device level.
++    """
++    with NetdevSimDev(queue_count=2) as nsimdev:
++        nsim = nsimdev.nsims[0]
++
++        ip(f"link set dev {nsim.ifname} up")
++
++        napis = nf.napi_get({'ifindex': nsim.ifindex}, dump=True)
++        ksft_eq(len(napis), 2)
++
++        napi0_id = napis[0]['id']
++        napi1_id = napis[1]['id']
++
++        # set napi threaded and verify
++        nf.napi_set({'id': napi0_id, 'threaded': 1})
++        napi0 = nf.napi_get({'id': napi0_id})
++        ksft_eq(napi0['threaded'], 1)
++        ksft_ne(napi0.get('pid'), None)
++
++        # check it is not set for napi1
++        napi1 = nf.napi_get({'id': napi1_id})
++        ksft_eq(napi1['threaded'], 0)
++        ksft_eq(napi1.get('pid'), None)
++
++        ip(f"link set dev {nsim.ifname} down")
++        ip(f"link set dev {nsim.ifname} up")
++
++        # verify if napi threaded is still set
++        napi0 = nf.napi_get({'id': napi0_id})
++        ksft_eq(napi0['threaded'], 1)
++        ksft_ne(napi0.get('pid'), None)
++
++        # check it is still not set for napi1
++        napi1 = nf.napi_get({'id': napi1_id})
++        ksft_eq(napi1['threaded'], 0)
++        ksft_eq(napi1.get('pid'), None)
++
++        # unset napi threaded and verify
++        nf.napi_set({'id': napi0_id, 'threaded': 0})
++        napi0 = nf.napi_get({'id': napi0_id})
++        ksft_eq(napi0['threaded'], 0)
++        ksft_eq(napi0.get('pid'), None)
++
++        # set threaded at device level
++        system(f"echo 1 > /sys/class/net/{nsim.ifname}/threaded")
++
++        # check napi threaded is set for both napis
++        napi0 = nf.napi_get({'id': napi0_id})
++        ksft_eq(napi0['threaded'], 1)
++        ksft_ne(napi0.get('pid'), None)
++        napi1 = nf.napi_get({'id': napi1_id})
++        ksft_eq(napi1['threaded'], 1)
++        ksft_ne(napi1.get('pid'), None)
++
++        # unset threaded at device level
++        system(f"echo 0 > /sys/class/net/{nsim.ifname}/threaded")
++
++        # check napi threaded is unset for both napis
++        napi0 = nf.napi_get({'id': napi0_id})
++        ksft_eq(napi0['threaded'], 0)
++        ksft_eq(napi0.get('pid'), None)
++        napi1 = nf.napi_get({'id': napi1_id})
++        ksft_eq(napi1['threaded'], 0)
++        ksft_eq(napi1.get('pid'), None)
++
++        # set napi threaded for napi0
++        nf.napi_set({'id': napi0_id, 'threaded': 1})
++        napi0 = nf.napi_get({'id': napi0_id})
++        ksft_eq(napi0['threaded'], 1)
++        ksft_ne(napi0.get('pid'), None)
++
++        # unset threaded at device level
++        system(f"echo 0 > /sys/class/net/{nsim.ifname}/threaded")
++
++        # check napi threaded is unset for both napis
++        napi0 = nf.napi_get({'id': napi0_id})
++        ksft_eq(napi0['threaded'], 0)
++        ksft_eq(napi0.get('pid'), None)
++        napi1 = nf.napi_get({'id': napi1_id})
++        ksft_eq(napi1['threaded'], 0)
++        ksft_eq(napi1.get('pid'), None)
++
+ def dev_set_threaded(nf) -> None:
+     """
+     Test that verifies various cases of napi threaded
+@@ -56,8 +141,10 @@ def dev_set_threaded(nf) -> None:
+ 
+         # check napi threaded is set for both napis
+         napi0 = nf.napi_get({'id': napi0_id})
++        ksft_eq(napi0['threaded'], 1)
+         ksft_ne(napi0.get('pid'), None)
+         napi1 = nf.napi_get({'id': napi1_id})
++        ksft_eq(napi1['threaded'], 1)
+         ksft_ne(napi1.get('pid'), None)
+ 
+         # unset threaded
+@@ -65,8 +152,10 @@ def dev_set_threaded(nf) -> None:
+ 
+         # check napi threaded is unset for both napis
+         napi0 = nf.napi_get({'id': napi0_id})
++        ksft_eq(napi0['threaded'], 0)
+         ksft_eq(napi0.get('pid'), None)
+         napi1 = nf.napi_get({'id': napi1_id})
++        ksft_eq(napi1['threaded'], 0)
+         ksft_eq(napi1.get('pid'), None)
+ 
+ def nsim_rxq_reset_down(nf) -> None:
+@@ -156,7 +245,7 @@ def page_pool_check(nf) -> None:
+ def main() -> None:
+     nf = NetdevFamily()
+     ksft_run([empty_check, lo_check, page_pool_check, napi_list_check,
+-              dev_set_threaded, nsim_rxq_reset_down],
++              dev_set_threaded, napi_set_threaded, nsim_rxq_reset_down],
+              args=(nf, ))
+     ksft_exit()
+ 
+
+base-commit: b1b36680107ede3a4ec7fa41d052971606d6b325
+-- 
+2.50.0.727.gbf7dc18ff4-goog
 
 
