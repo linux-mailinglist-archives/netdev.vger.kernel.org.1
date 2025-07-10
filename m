@@ -1,66 +1,71 @@
-Return-Path: <netdev+bounces-205672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B674AFF954
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 08:13:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7BD5AFF9A1
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 08:23:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C79E1C82059
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 06:13:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D1E71613C7
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 06:23:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF1928C843;
-	Thu, 10 Jul 2025 06:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C335285417;
+	Thu, 10 Jul 2025 06:23:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mEIYmXPT"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7898F28C5A1;
-	Thu, 10 Jul 2025 06:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C09D1F948;
+	Thu, 10 Jul 2025 06:22:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752127735; cv=none; b=G6SVtnonPaDCQrMJD8S2hcXIZyBUMTl9q9iJtg/StqvUWawZX8VBGRCF0nwfqitWm+useZTv0AENe+G/9XLBvkDjQgh57WOztwIebSTeD/Fb95FG91SBY/xcRwZGC5EqY8Zro5OaJPsGSOBQHepEPw24we0xaPjfJpYlvppL8I0=
+	t=1752128582; cv=none; b=LgblZPowztHOpPk2ozXiwixBZkHQEoJmYvxAlj3A29iRPqkl4V+HOd73RIOYRYw1bEiSaKNvG0yS7XBTKWDadV3S/XTcqyJ/ckeZzZ2Pr36MJuu57+43C+JlIZdUuZ5N9Rom0ivmnTIlbds4HpHM+JyXbFonABGOSuO/D50wP6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752127735; c=relaxed/simple;
-	bh=C6JZeS0Qw/YhDk9DwKnqZUrONlcD6XaumwjAX3SKUUU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YtpRf4eTAp8tjO1GHXcfduTwuIbFAEE1V0Un5qdzlfZMNdV2yX79amzn6EEW/ZQJyT/iL4aGVTP+wOkeNulz6fQ/vyqHYqSgvCDQgHgkeNQnhQdCTmPo0ScJn3J9QLXsM/E3hpXPLHjpFoHKNLwXAHOl0VBTNpU6idakwhcgYwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4bd4F861HGz2YPr1;
-	Thu, 10 Jul 2025 14:09:48 +0800 (CST)
-Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
-	by mail.maildlp.com (Postfix) with ESMTPS id F04AA140143;
-	Thu, 10 Jul 2025 14:08:50 +0800 (CST)
-Received: from DESKTOP-F6Q6J7K.china.huawei.com (10.174.175.220) by
- kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 10 Jul 2025 14:08:49 +0800
-From: Fan Gong <gongfan1@huawei.com>
-To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	<linux-doc@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Bjorn Helgaas
-	<helgaas@kernel.org>, luosifu <luosifu@huawei.com>, Xin Guo
-	<guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
- Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
-	<shijing34@huawei.com>, Fu Guiming <fuguiming@h-partners.com>, Meny Yossefi
-	<meny.yossefi@huawei.com>, Gur Stavi <gur.stavi@huawei.com>, Lee Trager
-	<lee@trager.us>, Michael Ellerman <mpe@ellerman.id.au>, Vadim Fedorenko
-	<vadim.fedorenko@linux.dev>, Suman Ghosh <sumang@marvell.com>, Przemek
- Kitszel <przemyslaw.kitszel@intel.com>, Joe Damato <jdamato@fastly.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: [PATCH net-next v08 8/8] hinic3: Interrupt request configuration
-Date: Thu, 10 Jul 2025 14:08:24 +0800
-Message-ID: <0549432719cbb3e0c657f544a984238953e65741.1752126177.git.zhuyikai1@h-partners.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <cover.1752126177.git.zhuyikai1@h-partners.com>
-References: <cover.1752126177.git.zhuyikai1@h-partners.com>
+	s=arc-20240116; t=1752128582; c=relaxed/simple;
+	bh=M8DuLG0HMb8JJA8QF4/LocOVETDgVy/0Q/eMqNzZrrY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sIz3Iqn7MQ9t3hjIjtYp/F/IQJ+MxXHEgPXr3p5OI0vTuW49h0puDonT+ZJDOO+vuXfwmH9d74mIqf6nS51yoylghYibl4uwE23y2LqIBgX8Ms9OCd49simuq5S/N8vcwd3Gx6ld9F5I/OUyKXtqBpBJ5c9vbSyQ4kEb4g8xLoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mEIYmXPT; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 23CDB44363;
+	Thu, 10 Jul 2025 06:22:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1752128577;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=rMYNYEgyyY1uHqv+Hw5rr8kPHp4rKI9o5Ur8Ushc1Iw=;
+	b=mEIYmXPTYCnmaPRAOJxI4hF1B2VvJ3eC1WZ91Dy0SaRHkLkRNG6vm1zOzkXC+NLJNMwif5
+	nvWnZ+sQH6PPjgDpuaIrgwgIiruHmKnI1fiyHhjnENG4nDycVRK/9N8SkEqbs8z/Jv5yFH
+	M5bxyQfhnnZ4P+qhzvUTQxe+A4B1BeT56I7uom6Pyi7pVxDHldRxDekZhqAQPEMCLzAYak
+	3txuuhnUyh3Tq/6uKKoc+PJDmqP40bc1TRN4227D0osGcYPK6HRoyfQlm1YZx/jenz3/5a
+	IIUDewyv3rLTXLhIz1B4CbqKz8sjlaAp1jBvN/g7DRlDNJEkj4498J1MaXRtDA==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next v3 0/3] netdevsim: add support for PHY devices
+Date: Thu, 10 Jul 2025 08:22:44 +0200
+Message-ID: <20250710062248.378459-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,265 +73,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- kwepemf100013.china.huawei.com (7.202.181.12)
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdefgdefleejudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeejhfelieehgfffiefftdffiedvheefteehkedukefgteffteevffeuueejiedtveenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudekpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhrtghpt
+ hhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhm
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Configure interrupt request initialization.
-It allows driver to receive packets and management information
-from HW.
+Hi everyone,
 
-Co-developed-by: Xin Guo <guoxin09@huawei.com>
-Signed-off-by: Xin Guo <guoxin09@huawei.com>
-Co-developed-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Zhu Yikai <zhuyikai1@h-partners.com>
-Signed-off-by: Fan Gong <gongfan1@huawei.com>
----
- .../ethernet/huawei/hinic3/hinic3_hw_comm.c   |  31 ++++
- .../ethernet/huawei/hinic3/hinic3_hw_comm.h   |  13 ++
- .../net/ethernet/huawei/hinic3/hinic3_irq.c   | 137 +++++++++++++++++-
- .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |   4 -
- 4 files changed, 179 insertions(+), 6 deletions(-)
+Here's a V3 for the netdevsim PHY support. This V3 includes :
+ - A fix for a compiling issue with PHYLIB=n
+ - An updated KConfig to only allow PHYLIB=y|n
+ - Converted the link setting file to a bool debugfs file, relying on
+   link state polling
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-index 434696ce7dc2..7adcdd569c7b 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-@@ -8,6 +8,37 @@
- #include "hinic3_hwif.h"
- #include "hinic3_mbox.h"
- 
-+int hinic3_set_interrupt_cfg_direct(struct hinic3_hwdev *hwdev,
-+				    const struct hinic3_interrupt_info *info)
-+{
-+	struct comm_cmd_cfg_msix_ctrl_reg msix_cfg = {};
-+	struct mgmt_msg_params msg_params = {};
-+	int err;
-+
-+	msix_cfg.func_id = hinic3_global_func_id(hwdev);
-+	msix_cfg.msix_index = info->msix_index;
-+	msix_cfg.opcode = MGMT_MSG_CMD_OP_SET;
-+
-+	msix_cfg.lli_credit_cnt = info->lli_credit_limit;
-+	msix_cfg.lli_timer_cnt = info->lli_timer_cfg;
-+	msix_cfg.pending_cnt = info->pending_limit;
-+	msix_cfg.coalesce_timer_cnt = info->coalesc_timer_cfg;
-+	msix_cfg.resend_timer_cnt = info->resend_timer_cfg;
-+
-+	mgmt_msg_params_init_default(&msg_params, &msix_cfg, sizeof(msix_cfg));
-+
-+	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_COMM,
-+				       COMM_CMD_CFG_MSIX_CTRL_REG, &msg_params);
-+	if (err || msix_cfg.head.status) {
-+		dev_err(hwdev->dev,
-+			"Failed to set interrupt config, err: %d, status: 0x%x\n",
-+			err, msix_cfg.head.status);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
- int hinic3_func_reset(struct hinic3_hwdev *hwdev, u16 func_id, u64 reset_flag)
- {
- 	struct comm_cmd_func_reset func_reset = {};
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
-index c33a1c77da9c..2270987b126f 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
-@@ -8,6 +8,19 @@
- 
- struct hinic3_hwdev;
- 
-+struct hinic3_interrupt_info {
-+	u32 lli_set;
-+	u32 interrupt_coalesc_set;
-+	u16 msix_index;
-+	u8  lli_credit_limit;
-+	u8  lli_timer_cfg;
-+	u8  pending_limit;
-+	u8  coalesc_timer_cfg;
-+	u8  resend_timer_cfg;
-+};
-+
-+int hinic3_set_interrupt_cfg_direct(struct hinic3_hwdev *hwdev,
-+				    const struct hinic3_interrupt_info *info);
- int hinic3_func_reset(struct hinic3_hwdev *hwdev, u16 func_id, u64 reset_flag);
- 
- #endif
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c b/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
-index 8b92eed25edf..cee28e67f252 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
-@@ -38,7 +38,7 @@ static int hinic3_poll(struct napi_struct *napi, int budget)
- 	return work_done;
- }
- 
--void qp_add_napi(struct hinic3_irq_cfg *irq_cfg)
-+static void qp_add_napi(struct hinic3_irq_cfg *irq_cfg)
- {
- 	struct hinic3_nic_dev *nic_dev = netdev_priv(irq_cfg->netdev);
- 
-@@ -50,7 +50,7 @@ void qp_add_napi(struct hinic3_irq_cfg *irq_cfg)
- 	napi_enable(&irq_cfg->napi);
- }
- 
--void qp_del_napi(struct hinic3_irq_cfg *irq_cfg)
-+static void qp_del_napi(struct hinic3_irq_cfg *irq_cfg)
- {
- 	napi_disable(&irq_cfg->napi);
- 	netif_queue_set_napi(irq_cfg->netdev, irq_cfg->irq_id,
-@@ -60,3 +60,136 @@ void qp_del_napi(struct hinic3_irq_cfg *irq_cfg)
- 	netif_stop_subqueue(irq_cfg->netdev, irq_cfg->irq_id);
- 	netif_napi_del(&irq_cfg->napi);
- }
-+
-+static irqreturn_t qp_irq(int irq, void *data)
-+{
-+	struct hinic3_irq_cfg *irq_cfg = data;
-+	struct hinic3_nic_dev *nic_dev;
-+
-+	nic_dev = netdev_priv(irq_cfg->netdev);
-+	hinic3_msix_intr_clear_resend_bit(nic_dev->hwdev,
-+					  irq_cfg->msix_entry_idx, 1);
-+
-+	napi_schedule(&irq_cfg->napi);
-+
-+	return IRQ_HANDLED;
-+}
-+
-+static int hinic3_request_irq(struct hinic3_irq_cfg *irq_cfg, u16 q_id)
-+{
-+	struct hinic3_interrupt_info info = {};
-+	struct hinic3_nic_dev *nic_dev;
-+	struct net_device *netdev;
-+	int err;
-+
-+	netdev = irq_cfg->netdev;
-+	nic_dev = netdev_priv(netdev);
-+	qp_add_napi(irq_cfg);
-+
-+	info.msix_index = irq_cfg->msix_entry_idx;
-+	info.interrupt_coalesc_set = 1;
-+	info.pending_limit = nic_dev->intr_coalesce[q_id].pending_limit;
-+	info.coalesc_timer_cfg =
-+		nic_dev->intr_coalesce[q_id].coalesce_timer_cfg;
-+	info.resend_timer_cfg = nic_dev->intr_coalesce[q_id].resend_timer_cfg;
-+	err = hinic3_set_interrupt_cfg_direct(nic_dev->hwdev, &info);
-+	if (err) {
-+		netdev_err(netdev, "Failed to set RX interrupt coalescing attribute.\n");
-+		qp_del_napi(irq_cfg);
-+		return err;
-+	}
-+
-+	err = request_irq(irq_cfg->irq_id, qp_irq, 0, irq_cfg->irq_name,
-+			  irq_cfg);
-+	if (err) {
-+		qp_del_napi(irq_cfg);
-+		return err;
-+	}
-+
-+	irq_set_affinity_hint(irq_cfg->irq_id, &irq_cfg->affinity_mask);
-+
-+	return 0;
-+}
-+
-+static void hinic3_release_irq(struct hinic3_irq_cfg *irq_cfg)
-+{
-+	irq_set_affinity_hint(irq_cfg->irq_id, NULL);
-+	synchronize_irq(irq_cfg->irq_id);
-+	free_irq(irq_cfg->irq_id, irq_cfg);
-+}
-+
-+int hinic3_qps_irq_init(struct net_device *netdev)
-+{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct pci_dev *pdev = nic_dev->pdev;
-+	struct hinic3_irq_cfg *irq_cfg;
-+	struct msix_entry *msix_entry;
-+	u32 local_cpu;
-+	u16 q_id;
-+	int err;
-+
-+	for (q_id = 0; q_id < nic_dev->q_params.num_qps; q_id++) {
-+		msix_entry = &nic_dev->qps_msix_entries[q_id];
-+		irq_cfg = &nic_dev->q_params.irq_cfg[q_id];
-+
-+		irq_cfg->irq_id = msix_entry->vector;
-+		irq_cfg->msix_entry_idx = msix_entry->entry;
-+		irq_cfg->netdev = netdev;
-+		irq_cfg->txq = &nic_dev->txqs[q_id];
-+		irq_cfg->rxq = &nic_dev->rxqs[q_id];
-+		nic_dev->rxqs[q_id].irq_cfg = irq_cfg;
-+
-+		local_cpu = cpumask_local_spread(q_id, dev_to_node(&pdev->dev));
-+		cpumask_set_cpu(local_cpu, &irq_cfg->affinity_mask);
-+
-+		snprintf(irq_cfg->irq_name, sizeof(irq_cfg->irq_name),
-+			 "%s_qp%u", netdev->name, q_id);
-+
-+		err = hinic3_request_irq(irq_cfg, q_id);
-+		if (err) {
-+			netdev_err(netdev, "Failed to request Rx irq\n");
-+			goto err_release_irqs;
-+		}
-+
-+		hinic3_set_msix_auto_mask_state(nic_dev->hwdev,
-+						irq_cfg->msix_entry_idx,
-+						HINIC3_SET_MSIX_AUTO_MASK);
-+		hinic3_set_msix_state(nic_dev->hwdev, irq_cfg->msix_entry_idx,
-+				      HINIC3_MSIX_ENABLE);
-+	}
-+
-+	return 0;
-+
-+err_release_irqs:
-+	while (q_id > 0) {
-+		q_id--;
-+		irq_cfg = &nic_dev->q_params.irq_cfg[q_id];
-+		qp_del_napi(irq_cfg);
-+		hinic3_set_msix_state(nic_dev->hwdev, irq_cfg->msix_entry_idx,
-+				      HINIC3_MSIX_DISABLE);
-+		hinic3_set_msix_auto_mask_state(nic_dev->hwdev,
-+						irq_cfg->msix_entry_idx,
-+						HINIC3_CLR_MSIX_AUTO_MASK);
-+		hinic3_release_irq(irq_cfg);
-+	}
-+
-+	return err;
-+}
-+
-+void hinic3_qps_irq_uninit(struct net_device *netdev)
-+{
-+	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-+	struct hinic3_irq_cfg *irq_cfg;
-+	u16 q_id;
-+
-+	for (q_id = 0; q_id < nic_dev->q_params.num_qps; q_id++) {
-+		irq_cfg = &nic_dev->q_params.irq_cfg[q_id];
-+		qp_del_napi(irq_cfg);
-+		hinic3_set_msix_state(nic_dev->hwdev, irq_cfg->msix_entry_idx,
-+				      HINIC3_MSIX_DISABLE);
-+		hinic3_set_msix_auto_mask_state(nic_dev->hwdev,
-+						irq_cfg->msix_entry_idx,
-+						HINIC3_CLR_MSIX_AUTO_MASK);
-+		hinic3_release_irq(irq_cfg);
-+	}
-+}
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-index 9577cc673257..9fad834f9e92 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
-@@ -85,8 +85,4 @@ void hinic3_set_netdev_ops(struct net_device *netdev);
- int hinic3_qps_irq_init(struct net_device *netdev);
- void hinic3_qps_irq_uninit(struct net_device *netdev);
- 
--/* Temporary prototypes. Functions become static in later submission. */
--void qp_add_napi(struct hinic3_irq_cfg *irq_cfg);
--void qp_del_napi(struct hinic3_irq_cfg *irq_cfg);
--
- #endif
+The idea of this series is to allow attaching virtual PHY devices to
+netdevsim, so that we can test PHY-related ethtool commands. This can be
+extended in the future for phylib testing as well.
+
+V2: https://lore.kernel.org/netdev/20250708115531.111326-1-maxime.chevallier@bootlin.com/
+ - Fix building with PHYLIB=m
+ - Use shellcheck on the shell scripts
+
+V1: https://lore.kernel.org/netdev/20250702082806.706973-1-maxime.chevallier@bootlin.com/
+
+Maxime Chevallier (3):
+  net: netdevsim: Add PHY support in netdevsim
+  selftests: ethtool: Drop the unused old_netdevs variable
+  selftests: ethtool: Introduce ethernet PHY selftests on netdevsim
+
+ drivers/net/Kconfig                           |   1 +
+ drivers/net/netdevsim/Makefile                |   4 +
+ drivers/net/netdevsim/dev.c                   |   2 +
+ drivers/net/netdevsim/netdev.c                |   8 +
+ drivers/net/netdevsim/netdevsim.h             |  25 ++
+ drivers/net/netdevsim/phy.c                   | 375 ++++++++++++++++++
+ .../selftests/drivers/net/netdevsim/config    |   1 +
+ .../drivers/net/netdevsim/ethtool-common.sh   |  19 +-
+ .../drivers/net/netdevsim/ethtool-phy.sh      |  64 +++
+ 9 files changed, 496 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/net/netdevsim/phy.c
+ create mode 100755 tools/testing/selftests/drivers/net/netdevsim/ethtool-phy.sh
+
 -- 
-2.43.0
+2.49.0
 
 
