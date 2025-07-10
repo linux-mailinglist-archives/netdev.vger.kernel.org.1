@@ -1,160 +1,237 @@
-Return-Path: <netdev+bounces-205777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01C6DB001EF
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 14:32:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68BB6B00208
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 14:34:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A7337B0C89
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 12:31:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 834725A69B6
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 12:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229062EA15C;
-	Thu, 10 Jul 2025 12:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA8E257423;
+	Thu, 10 Jul 2025 12:31:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ndX2buqC"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="iJIEyb17"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E7927056A;
-	Thu, 10 Jul 2025 12:30:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31FB2571CF;
+	Thu, 10 Jul 2025 12:31:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752150603; cv=none; b=YXfKt+oA+q3kMyJx31swkYvmiULOufxt82Tzf+9Z8IdMxz7mF+XwZpWOu5EDMQ9BHLTbghHlW/xC0Fey6XtN4+UI7rokl/Z4bga7WzR6nGhRWRHMqp5HteOxY/RHjDwkETsjM6YbENxZkyz/arvbX1NAm4+oHFcU3qBnDLN8IUs=
+	t=1752150679; cv=none; b=EfNW7k37/EI9wo6Vezaceg0eHgsGoiBan6VkaqtPnHBQm9A522uDulJ7FxfdopuCyhPqA9ChC1q0V4VwtWaUgnTuu1qDRiPFK8A7ZjYUIeJrlscH2L41qqck0Ge3tltZMZzuYSqCKNthX2S4ILk/hnmhXOFY39FRIIQB1LW1+1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752150603; c=relaxed/simple;
-	bh=2us2rpGL9zkiRlp32RB/c3CJ+1+7vDtLGPfyKLPCbE4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=LvKmas7adkcdXh2z6HqiXscX/9xH/b5oylID+q2+zcTERfziDaa+0JLS2b4i9KvAe3rm6O5H/XBuvAIIdLojqbNCN5kntleuoRLxHT7EJ2RPHnUU4Nhy8hqJs1EfbcqLb1EdhLoh8twjbGMWY+hGgzTOTjN1Ln8VxCJmplXy+90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ndX2buqC; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56A9GP9H012606;
-	Thu, 10 Jul 2025 12:29:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	1TC7OL6QmYBBMcwfPaJCbsNoDqxeC+lLH/AnYjZeqzk=; b=ndX2buqCM0ylFELs
-	FOyYnQgr1d/PcE/wNsULwgbM3vi9Lb2+oT1V+R1FWreuGznoIzijUk058LTgo5Yb
-	CdQQFPvjo0cuvFZ+Ep/xBA4w9ap8w7Wv0cHFEYr4cNBNuzauZnezdvFkcKIuzvoT
-	M43zIR05kPD/TQxiseCwr18nPCpKik9wJknBrKWvh3HsILnGOf+QZtPPHeyDwJ4v
-	hg/6dNbocWp/TXzxGqtZvYwxyOofSHeoIZu7UpTTNfIBxR/ku8Vise0U042qaS8q
-	t9lYvIs3Q+504+eUJ4E2DP+/4XJax3yNTa70qv6ejF6jYhx8pGVPLe1N8KWUwjKz
-	eEPDHA==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 47pucn8ehc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Jul 2025 12:29:50 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 56ACTnJ9020838
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 10 Jul 2025 12:29:49 GMT
-Received: from nsssdc-sh01-lnx.ap.qualcomm.com (10.80.80.8) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1748.10; Thu, 10 Jul 2025 05:29:44 -0700
-From: Luo Jie <quic_luoj@quicinc.com>
-Date: Thu, 10 Jul 2025 20:28:18 +0800
-Subject: [PATCH v3 10/10] arm64: defconfig: Build NSS clock controller
- driver for IPQ5424
+	s=arc-20240116; t=1752150679; c=relaxed/simple;
+	bh=wwleuq+r4O77Z7bgML7ZkfL3hRKXHLUAr1jyPk3ID64=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OcX+g/ZLrEbq8/SdhmC2S3VTGFeqknsLNS1F+id/Uaivu/STj/TZTbso/wslYlafU3hzvxTsvuD2Ym+e6m52ZzExrKR3h/r3Qef+d+sr0l9OKkA/Q4lIZQjV1pcecNM4eEwBkbgWN3cNB97G06TZHmeibnp5M0g8FMR1j1B1ZSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=iJIEyb17; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=ZJDqWFppJ26nq+PPFvY7IkCiKDpbprvS1vtvi+f1TRE=; t=1752150678; x=1753360278; 
+	b=iJIEyb17BqJeCToL/elMrX6SL/aFrW/sLuvpv7eAjUscFTThbDVUM+KcnzBaG2ML9TVGPJ3Rmca
+	nrLoQRwX5w1HowL41lxJc/qiOZPsflncB/7XUA20Y+aIWRCE/ZG9Gsbi110YF+OrQPs0W8VYc6bMV
+	D9yZYpOCj1V16qPlgq+ln0wH1+3y8XKK9f8wwCAAFs1Dc/0RRGZ9Vc7cZUJ8znEdt2z6ybl9vMbwm
+	1Y/TPSFyyKwIOfPUF+Omxuom2kkqD9r1lGXPdh8dHuZdLZBMv5UY8el+jZFjusIdQaGY3QH9YtA2V
+	kaD1KZrckzKNNiRpzEWgccFNxfYo1WZ0SfGA==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1uZqQl-0000000Em66-2raf;
+	Thu, 10 Jul 2025 14:31:15 +0200
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-next-2025-07-10
+Date: Thu, 10 Jul 2025 14:30:48 +0200
+Message-ID: <20250710123113.24878-3-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20250710-qcom_ipq5424_nsscc-v3-10-f149dc461212@quicinc.com>
-References: <20250710-qcom_ipq5424_nsscc-v3-0-f149dc461212@quicinc.com>
-In-Reply-To: <20250710-qcom_ipq5424_nsscc-v3-0-f149dc461212@quicinc.com>
-To: Georgi Djakov <djakov@kernel.org>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Michael Turquette
-	<mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>, Anusha Rao
-	<quic_anusha@quicinc.com>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        "Philipp
- Zabel" <p.zabel@pengutronix.de>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>
-CC: <linux-arm-msm@vger.kernel.org>, <linux-pm@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-clk@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <quic_kkumarcs@quicinc.com>,
-        <quic_linchen@quicinc.com>, <quic_leiwei@quicinc.com>,
-        <quic_pavir@quicinc.com>, <quic_suruchia@quicinc.com>,
-        Luo Jie
-	<quic_luoj@quicinc.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1752150529; l=836;
- i=quic_luoj@quicinc.com; s=20250209; h=from:subject:message-id;
- bh=2us2rpGL9zkiRlp32RB/c3CJ+1+7vDtLGPfyKLPCbE4=;
- b=/i5R2AyHvoZMtzHjoerIZKqJOxQNoYwSiAdf3gy4YWJm38DIula2xkxFraSGcdPdFGufQhWgR
- fTRXhtMSExuBn2Wwo6uXVrGXAS/id3zEzFmUGd//sVCYQX9iD9EsKhA
-X-Developer-Key: i=quic_luoj@quicinc.com; a=ed25519;
- pk=pzwy8bU5tJZ5UKGTv28n+QOuktaWuriznGmriA9Qkfc=
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Authority-Analysis: v=2.4 cv=GdQXnRXL c=1 sm=1 tr=0 ts=686fb23e cx=c_pps
- a=JYp8KDb2vCoCEuGobkYCKw==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Wb1JkmetP80A:10 a=KKAkSRfTAAAA:8
- a=COk6AnOGAAAA:8 a=ikIlBLl75NxfxiEf-eQA:9 a=QEXdDO2ut3YA:10
- a=cvBusfyB2V15izCimMoJ:22 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-GUID: VknlAFBTCf3bG_y0vBip5fQVobo6ugMt
-X-Proofpoint-ORIG-GUID: VknlAFBTCf3bG_y0vBip5fQVobo6ugMt
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzEwMDEwNiBTYWx0ZWRfX9LIz1D+9fKm4
- 0zZRFJqLT2Pe9E6x7z5z8oMEVrR2AxoW6vs5juKin3gT5mPirsaogzLYQws/+2WRGjuj8NuWs7L
- IKXJD6nzDmeHcn4aClsHhdEBtyC3orme0NIVKvtnEkYgywzeXGQRFENzp7nWg+Ngosew3lrpXq7
- ev58x9NvCaBa7YyIHJBmyb2YILOlgkiMPKhFXtceNpzY6NjsMjJ1aSUttDUkU9J3DwUxxtaPn8j
- 1fKJ5owlTqABW82zBaGmg/jj7uVRHfJ4Dd/x6TKFp/4dyRaebCK4ljBsD6pz3VOr565yZ9jSfrk
- g9ZLFoalFYeZceEdmC7y1cnJ1C2AF4At6dxCv9QR7ZxbTLD+A8Zurf2wj4hDrqy6DnFoazgIRF/
- LCkNuENri9m26oVutwB4I0+8bd9ifZGNNtRs1YRn4EHx6Qwm/q4Kzz/VHsY/DDQXwN1F40mi
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
- definitions=2025-07-10_02,2025-07-09_01,2025-03-28_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 phishscore=0 adultscore=0 bulkscore=0 clxscore=1015
- spamscore=0 suspectscore=0 mlxlogscore=809 priorityscore=1501 impostorscore=0
- malwarescore=0 mlxscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2505280000
- definitions=main-2507100106
+Content-Transfer-Encoding: 8bit
 
-NSS clock controller is needed for supplying clocks and resets to the
-networking blocks for the Ethernet functions on the IPQ5424 platforms.
+Hi,
 
-All boards based on the IPQ5424 SoC will require this driver to be enabled.
+And for -next, some work. There's more pending, but for
+now this is what I have today.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
----
- arch/arm64/configs/defconfig | 1 +
- 1 file changed, 1 insertion(+)
+Please pull and let us know if there's any problem.
 
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index f56a4ce84db8..b37addde371d 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -1372,6 +1372,7 @@ CONFIG_IPQ_GCC_5424=y
- CONFIG_IPQ_GCC_6018=y
- CONFIG_IPQ_GCC_8074=y
- CONFIG_IPQ_GCC_9574=y
-+CONFIG_IPQ_NSSCC_5424=m
- CONFIG_IPQ_NSSCC_9574=m
- CONFIG_MSM_GCC_8916=y
- CONFIG_MSM_MMCC_8994=m
+Thanks,
+johannes
 
--- 
-2.34.1
 
+
+The following changes since commit 6b9fd8857b9fc4dd62e7cd300327f0e48dd76642:
+
+  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-07-04 08:03:18 +0200)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git tags/wireless-next-2025-07-10
+
+for you to fetch changes up to 6b04716cdcac37bdbacde34def08bc6fdb5fc4e2:
+
+  wifi: mac80211: don't complete management TX on SAE commit (2025-07-09 11:56:45 +0200)
+
+----------------------------------------------------------------
+Quite a bit more work, notably:
+ - mt76: firmware recovery improvements, MLO work
+ - iwlwifi: use embedded PNVM in (to be released) FW images
+            to fix compatibility issues
+ - cfg80211/mac80211: extended regulatory info support (6 GHz)
+ - cfg80211: use "faux device" for regulatory
+
+----------------------------------------------------------------
+Benjamin Berg (3):
+      wifi: cfg80211: only verify part of Extended MLD Capabilities
+      wifi: cfg80211: add a flag for the first part of a scan
+      wifi: mac80211: copy first_part into HW scan
+
+Dan Carpenter (2):
+      wifi: iwlwifi: Fix error code in iwl_op_mode_dvm_start()
+      wifi: mt76: mt7925: fix off by one in mt7925_mcu_hw_scan()
+
+David Bauer (3):
+      wifi: mt76: mt7915: mcu: increase eeprom command timeout
+      wifi: mt76: mt7915: mcu: lower default timeout
+      wifi: mt76: mt7915: mcu: re-init MCU before loading FW patch
+
+Felix Fietkau (1):
+      wifi: mt76: fix vif link allocation
+
+Greg Kroah-Hartman (1):
+      wifi: cfg80211: move away from using a fake platform device
+
+Hari Chandrakanthan (1):
+      wifi: mac80211: fix rx link assignment for non-MLO stations
+
+Johannes Berg (14):
+      Merge tag 'mt76-next-2025-07-07' of https://github.com/nbd168/wireless
+      wifi: iwlwifi: use PNVM data embedded in .ucode files
+      wifi: iwlwifi: mvm/mld: make PHC messages debug messages
+      wifi: iwlwifi: remove Intel driver load message
+      wifi: iwlwifi: match discrete/integrated to fix some names
+      wifi: iwlwifi: pcie: rename iwl_pci_gen1_2_probe() argument
+      Merge tag 'iwlwifi-next-2025-07-09' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
+      wifi: mac80211: remove spurious blank line
+      wifi: mac80211: fix deactivated link CSA
+      wifi: cfg80211: hide scan internals
+      wifi: nl80211: make nl80211_check_scan_flags() type safe
+      wifi: mac80211: remove DISALLOW_PUNCTURING_5GHZ code
+      wifi: mac80211: send extended MLD capa/ops if AP has it
+      wifi: mac80211: don't complete management TX on SAE commit
+
+Leon Yen (1):
+      wifi: mt76: mt7921s: Introduce SDIO WiFi/BT combo module card reset
+
+Lorenzo Bianconi (9):
+      wifi: mt76: mt7996: Fix secondary link lookup in mt7996_mcu_sta_mld_setup_tlv()
+      wifi: mt76: mt7996: Rely on for_each_sta_active_link() in mt7996_mcu_sta_mld_setup_tlv()
+      wifi: mt76: mt7996: Do not set wcid.sta to 1 in mt7996_mac_sta_event()
+      wifi: mt76: mt7996: Fix mlink lookup in mt7996_tx_prepare_skb
+      wifi: mt76: mt7996: Fix possible OOB access in mt7996_tx()
+      wifi: mt76: mt7996: Fix valid_links bitmask in mt7996_mac_sta_{add,remove}
+      wifi: mt76: mt7996: Add MLO support to mt7996_tx_check_aggr()
+      wifi: mt76: mt7996: Move num_sta accounting in mt7996_mac_sta_{add,remove}_links
+      wifi: mt76: Get rid of dma_sync_single_for_device() for MMIO devices
+
+Ming Yen Hsieh (1):
+      wifi: mt76: mt792x: improve monitor interface handling
+
+Miri Korenblit (9):
+      wifi: iwlwifi: bump FW API to 102 for BZ/SC/DR
+      wifi: iwlwifi: pcie move common probe logic
+      wifi: iwlwifi: trans: remove iwl_trans_init
+      wifi: iwlwifi: mvm: remove MLO GTK rekey code
+      wifi: iwlwifi: mvm: remove unneeded argument
+      wifi: iwlwifi: bump minimum API version in BZ
+      wifi: iwlwifi: mvm: remove support for iwl_wowlan_info_notif_v4
+      wifi: mac80211: avoid weird state in error path
+      wifi: mac80211: verify state before connection
+
+Rotem Kerem (1):
+      wifi: iwlwifi: Add an helper function for polling bits
+
+Somashekhar Puttagangaiah (2):
+      wifi: mac80211: add mandatory bitrate support for 6 GHz
+      wifi: cfg80211/mac80211: implement dot11ExtendedRegInfoSupport
+
+Yedidya Benshimol (2):
+      wifi: iwlwifi: pcie move gen1_2 probe to gen1_2/trans.c
+      wifi: iwlwifi: pcie: Move txcmd size/align calculation to callers
+
+ drivers/net/wireless/intel/iwlwifi/cfg/bz.c        |   4 +-
+ drivers/net/wireless/intel/iwlwifi/cfg/dr.c        |   2 +-
+ drivers/net/wireless/intel/iwlwifi/cfg/sc.c        |   2 +-
+ drivers/net/wireless/intel/iwlwifi/dvm/eeprom.c    |  21 +-
+ drivers/net/wireless/intel/iwlwifi/dvm/main.c      |   3 +-
+ drivers/net/wireless/intel/iwlwifi/fw/api/d3.h     |  13 +-
+ drivers/net/wireless/intel/iwlwifi/fw/file.h       |   3 +
+ drivers/net/wireless/intel/iwlwifi/fw/img.h        |   5 +
+ drivers/net/wireless/intel/iwlwifi/fw/pnvm.c       |  32 +-
+ drivers/net/wireless/intel/iwlwifi/fw/pnvm.h       |   4 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-config.h    |  11 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-drv.c       |  14 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-io.c        |   8 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-io.h        |   9 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-trans.c     |  37 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-trans.h     |   7 +-
+ drivers/net/wireless/intel/iwlwifi/mld/fw.c        |   2 +-
+ drivers/net/wireless/intel/iwlwifi/mld/ptp.c       |  12 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/d3.c        | 232 ++----------
+ drivers/net/wireless/intel/iwlwifi/mvm/fw.c        |   2 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/ptp.c       |  14 +-
+ drivers/net/wireless/intel/iwlwifi/pcie/drv.c      | 352 ++----------------
+ .../wireless/intel/iwlwifi/pcie/gen1_2/internal.h  |   8 +-
+ .../net/wireless/intel/iwlwifi/pcie/gen1_2/trans.c | 413 ++++++++++++++++++---
+ .../net/wireless/intel/iwlwifi/pcie/gen1_2/tx.c    |   2 +-
+ drivers/net/wireless/intel/iwlwifi/tests/devinfo.c |  45 ++-
+ drivers/net/wireless/mediatek/mt76/channel.c       |   4 +-
+ drivers/net/wireless/mediatek/mt76/dma.c           |  11 +-
+ drivers/net/wireless/mediatek/mt76/mcu.c           |   4 +
+ drivers/net/wireless/mediatek/mt76/mt76.h          |   7 +-
+ drivers/net/wireless/mediatek/mt76/mt7915/mcu.c    |  30 +-
+ drivers/net/wireless/mediatek/mt76/mt7921/mac.c    |   2 +
+ drivers/net/wireless/mediatek/mt76/mt7921/sdio.c   |   2 +
+ .../net/wireless/mediatek/mt76/mt7921/sdio_mac.c   |  58 +++
+ drivers/net/wireless/mediatek/mt76/mt7925/mcu.c    |   4 +-
+ drivers/net/wireless/mediatek/mt76/mt792x_core.c   |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7996/mac.c    |  48 ++-
+ drivers/net/wireless/mediatek/mt76/mt7996/main.c   |  80 ++--
+ drivers/net/wireless/mediatek/mt76/mt7996/mcu.c    |  17 +-
+ drivers/net/wireless/mediatek/mt76/sdio_txrx.c     |   6 +-
+ drivers/net/wireless/mediatek/mt76/wed.c           |   6 +-
+ include/linux/ieee80211.h                          |  43 ++-
+ include/net/cfg80211.h                             |  12 +-
+ include/net/mac80211.h                             |   7 +-
+ net/mac80211/debugfs.c                             |   3 +-
+ net/mac80211/ieee80211_i.h                         |   2 +
+ net/mac80211/link.c                                |   9 +-
+ net/mac80211/mlme.c                                | 148 ++++++--
+ net/mac80211/rx.c                                  |  12 +-
+ net/mac80211/scan.c                                |   3 +-
+ net/mac80211/sta_info.c                            |   3 +-
+ net/mac80211/util.c                                |  17 +
+ net/wireless/core.c                                |   4 +-
+ net/wireless/core.h                                |  11 +-
+ net/wireless/mlme.c                                |  21 +-
+ net/wireless/nl80211.c                             | 144 +++----
+ net/wireless/rdev-ops.h                            |   6 +-
+ net/wireless/reg.c                                 |  28 +-
+ net/wireless/scan.c                                | 204 +++++-----
+ net/wireless/sme.c                                 |  40 +-
+ net/wireless/trace.h                               |  23 +-
+ 61 files changed, 1221 insertions(+), 1056 deletions(-)
 
