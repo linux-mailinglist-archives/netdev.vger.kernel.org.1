@@ -1,116 +1,94 @@
-Return-Path: <netdev+bounces-205906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B074CB00BBF
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 20:58:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E639B00BD9
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 21:09:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B62031CA77B1
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 18:58:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1341C1C82ABF
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 19:09:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA1532FCFF8;
-	Thu, 10 Jul 2025 18:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00FA72FCFF8;
+	Thu, 10 Jul 2025 19:09:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uYgkoNgp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O4OJJOdX"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A5A2FCFCC
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 18:58:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE88F2FCFD5;
+	Thu, 10 Jul 2025 19:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752173888; cv=none; b=oWxTwflh/YqoHK78WekXL7CvdGkPJSrkIAwiLZDPB19FICjfWDYAdi/aRqWBsa/DTClGC3cO6tLdPn6Mem/zYjrzdO40DLb8WFOvz7a4hnQ3f+DVCJLn+N0i0BjHFPIWD2v9IWMn4zZEbGziacHWwrlvAmX+d7LILnRWCyyhrdA=
+	t=1752174565; cv=none; b=HuwKgPvE78HvaCdbvsxp8oA1nXQ/VOFCCuiT8T5Nq9qigKdPoef5WUQnyNwCQ+Tkw8suI890leQlYUvUpfcKt44HYRQSePwSd7jIrxlW6aSbvdyUjXE2jxxm5xeAf2X4HeiKEMXSFWHnB2O7JwxsNgQlvgUzV0AhYiVyNBnHOew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752173888; c=relaxed/simple;
-	bh=J0z41YcdNDhVPc+tQ5S6Lf7LTq+A2yBhKUx5z5lEi+M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sn+7hDj5p/ZzBI3HuShIeuU1d07Th6KCp1ryyWfyqwHR7bDwvFkWQR76QeoZjvvhVfS3LnWWSxg3mf7Uu5xCcMA9hgQkTvxKKPu22yPvBhsjDDnoMbSVgIkbrYkdZTVahq9gg+UmuN4AuhnfFkoZ7xUSlgwj0vTqxQkxaWtoag0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uYgkoNgp; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <85f00716-4cd7-410c-a4c7-8efd52e04ec8@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1752173872;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UGN69Aqip2Ei+wODLe/q5fPyeWewM2lkK4zpVKbxqX0=;
-	b=uYgkoNgpaJ+NoFGgTAUxLPrD5UqRvwse3gJ3y6mIRX7bOZEjUZi4FvmZfx4R5tP6QaTxTY
-	+B5g7VqdmJiih7IwQ39ApUJrzW0LjeShNJbsAn4ZL9knSp+ZxrCogtFCFvC34gwAWaZ//n
-	3B/nCKt5OKpbtTU7l3bm0tGZgaAlupk=
-Date: Thu, 10 Jul 2025 14:57:48 -0400
+	s=arc-20240116; t=1752174565; c=relaxed/simple;
+	bh=vmAYK2Qk6hKH8H60VRTBpaX+y9L/EdzeZJY8RofpCQ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cBG+UPe2X6uSyQHeoR+/RwNT5+D0XzjHgMemyBZxFhHJrHc8HhFFXLpcRjyPdXYqSlGc18aLlSNul2XuCSNMeC1Yf8rHTs/L13ykFL1S0o2ZpVfStwMzNNvmAWsNOLFESRP3k4HzjktRYwsuzprp7PE33cFVbmrYOUiIUVZy6g4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O4OJJOdX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF8D4C4CEE3;
+	Thu, 10 Jul 2025 19:09:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752174565;
+	bh=vmAYK2Qk6hKH8H60VRTBpaX+y9L/EdzeZJY8RofpCQ8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=O4OJJOdXKelyY+H9tmV7Uc0hEO2OvMwEJ+Yw9BTkzTaInjCAejbNVo6WRxc96IoVE
+	 mmaFNVuH6mTWF5Od4zyB5WP6c0ebXiM9vUos6HP58V6NKfGnMZYWvBhp32qeo3bh9w
+	 KXRBTtP2LjWERTx6JT5+yu5NvKgnwJ2QyEOZ47k4Pt1M4Nkf1Lb5q3KOItH/NPddko
+	 Bev2h43uxcP6SxAAOI5XfPW/zNfS0Veh24av01OjgmgwqJWmgRl5FWTFvd1SpQNaic
+	 JHN/77s+cI1TOOcVAtO7OUzk71y7e45JjKwTE/jnt3xNr4frvXztPUGN/HZsfF3kTI
+	 aPr2/cHVslcUw==
+Date: Thu, 10 Jul 2025 12:09:23 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, Paolo Abeni
+ <pabeni@redhat.com>, linux-kernel@vger.kernel.org, "David S . Miller"
+ <davem@davemloft.net>, Florian Fainelli <f.fainelli@gmail.com>, Eric
+ Dumazet <edumazet@google.com>, Christian Marangi <ansuelsmth@gmail.com>
+Subject: Re: [PATCH net] net: phy: Don't register LEDs for genphy
+Message-ID: <20250710120923.0c307a9c@kernel.org>
+In-Reply-To: <85f00716-4cd7-410c-a4c7-8efd52e04ec8@linux.dev>
+References: <20250707195803.666097-1-sean.anderson@linux.dev>
+	<20250707163219.64c99f4d@kernel.org>
+	<3aae1c17-2ce8-4229-a397-a8a25cc58fe9@linux.dev>
+	<1019ee40-e7df-43a9-ae3f-ad3172e5bf3e@linux.dev>
+	<20250710105254.071c2af4@kernel.org>
+	<04583ed9-0997-4a54-a255-540837f1dff8@linux.dev>
+	<20250710114926.7ec3a64f@kernel.org>
+	<85f00716-4cd7-410c-a4c7-8efd52e04ec8@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] net: phy: Don't register LEDs for genphy
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
- "David S . Miller" <davem@davemloft.net>,
- Florian Fainelli <f.fainelli@gmail.com>, Eric Dumazet <edumazet@google.com>,
- Christian Marangi <ansuelsmth@gmail.com>
-References: <20250707195803.666097-1-sean.anderson@linux.dev>
- <20250707163219.64c99f4d@kernel.org>
- <3aae1c17-2ce8-4229-a397-a8a25cc58fe9@linux.dev>
- <1019ee40-e7df-43a9-ae3f-ad3172e5bf3e@linux.dev>
- <20250710105254.071c2af4@kernel.org>
- <04583ed9-0997-4a54-a255-540837f1dff8@linux.dev>
- <20250710114926.7ec3a64f@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <20250710114926.7ec3a64f@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 7/10/25 14:49, Jakub Kicinski wrote:
-> On Thu, 10 Jul 2025 14:17:18 -0400 Sean Anderson wrote:
->> On 7/10/25 13:52, Jakub Kicinski wrote:
->> > On Thu, 10 Jul 2025 13:40:33 -0400 Sean Anderson wrote:  
->> >> I see this is marked "Changes Requested" in patchwork. However, I don't
->> >> believe that I need to change anything until the above commit is merged
->> >> into net/main. Will you be merging that commit? Or should I just resend
->> >> without changes?  
->> > 
->> > The patch must build when posted. If it didn't you need to repost.  
->> 
->> It builds on net/main. Which is what I posted for. The CI applied it to net-next/main.
+On Thu, 10 Jul 2025 14:57:48 -0400 Sean Anderson wrote:
+> OK, so if A is this patch and B is the conflict above, you'd like me to
+> post an A' like:
 > 
-> Damn, I see your point now, sorry :/
-> So in net-next we'll have to drop the phy_driver_is_genphy_10g() ?
+>      B---merge---A' net-next
+>     /   /
+> base---A            net
+> 
+> ? Or did you have something in mind more like
+> 
+>      B---A' net-next
+>     /
+> base---A    net
 
-Yes. I believe phy_driver_is_genphy() is sufficient in net-next.
+The latter, so we will end up with:
 
-> I think it may be best if we turn this into an explicit merge
-> conflict, IOW if you could post both net and net-next version
-> I will merge them at the same time. Upstream trees like CI or
-> linux-next will have easier time handling a git conflict than
-> a build failure. Does that make sense? For the net-next version
-> describe it from the perspective of the net patch already being
-> merged and you're writing the "-next" version of the patch.
-> I'll edit in the git hash of the net commit when applying.
+     B---A' net-next --M
+    /                 /
+base---A    net -----
 
-OK, so if A is this patch and B is the conflict above, you'd like me to
-post an A' like:
-
-     B---merge---A' net-next
-    /   /
-base---A            net
-
-? Or did you have something in mind more like
-
-     B---A' net-next
-    /
-base---A    net
-
---Sean
+where M is a merge with a conflict, to resolve will basically pick 
+the net-next version.
 
