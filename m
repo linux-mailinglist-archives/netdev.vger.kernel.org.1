@@ -1,205 +1,168 @@
-Return-Path: <netdev+bounces-205895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92F3AB00B6A
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 20:30:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 388A1B00B7B
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 20:35:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 685A23B3AA1
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 18:29:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B2811C85F87
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 18:35:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 681BC2FCE39;
-	Thu, 10 Jul 2025 18:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C502FCE07;
+	Thu, 10 Jul 2025 18:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h6TBkXCj"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="RKBKX9Vq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77EB2FCE14
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 18:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7FB27145D
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 18:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752172190; cv=none; b=d/JxZdlpZsiCF4048n2Cppl4evmpsPhmqt/BbOX64Ey1oQZENxvEzoIjTjlxlB1uwhggm7YkLl/RahCbsOaek3LsZpcF7wVsDEcHOkyTVUmPQLLCrpIbaQ8rlxqZY5pxbmtW4DGhzjOKkhK9eb3IAbGQefqqG9J+kQJKsXjBL94=
+	t=1752172534; cv=none; b=doagVrb3Qs6FX/bXFdHfU+uCLehrFz47AvxWN1lyynGG2bp7MmKHYAGiu6Y82zejHJD1W7iDAV5CMRYzjJrYIkxxPEh/nfHPu4kh9Ew4uSQp/jBtkyQnauasofcDaK8ozwBP5mRhzK++s4pONP7vaZcyiiLDFdg5bKyEJ+ymQ3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752172190; c=relaxed/simple;
-	bh=XhzeOVnGG90EuOKlpcIA49U19NvJeJfXJnX6bYAZwwY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DOmwRDKm/QkN/niKmyamXtdG31Jit+0bdpmXIE84AXNln50lScs14BE8cB6BtqEpe7tmtpf1azYPTDivuzyHjdEOgiDU/B2pYOWVBr4oZ9zdCgwSM04L4pe35XcIgUnvsGf1ucPMY8vnR690eSRNZqJDhf9cS8B0578U8RGnfKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h6TBkXCj; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-235e389599fso32295ad.0
-        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 11:29:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752172188; x=1752776988; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ro/pNusaSjsWEAeWpTTGWyr6dzux21WEDh0Yp0DuJJc=;
-        b=h6TBkXCjIsIV5dQNID5gQEOPO0lCDvYKZbhkTuLlDQx0Zooy3DR4x9Erf3DpUOV4MJ
-         K+uMuJOnrIQqVyfBpAQKzzuqYH70sJFs7znUg0ApjSN79Gw0vorG3ghvE6TBYl4I8pw+
-         goDouEajQBH1lBPeOqAdRpHlIJ9aKc120R1fmb2eWIoech8A8nes8DBBXWeh6TOA/cPb
-         i5CuA9oG27Rtd/dWQlCBopV9+XsigaDwScnP2oh08ia2/kSrQRA4Y7BZFS6b0YCGGObC
-         UsDtAh0nscLBEPwgD6E1/IoFfoE02Xu1k+TwpkkHDtD/4X7YQYWIxW+FpbfFsiIsRksA
-         4iDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752172188; x=1752776988;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ro/pNusaSjsWEAeWpTTGWyr6dzux21WEDh0Yp0DuJJc=;
-        b=JqIW4nOMb6LYG2+eDbqvU0KZ5A9Bb47bKBHZEYMWyTH6+orF56/eA4WlNWNYwkd18T
-         KkfIr3KEeeE+Wakk/T3G6KH8DvNcuF0fo7c9dIzlFtjabLI79qXFFTVlzAqmFcNmhd6m
-         P6w+KAX+elvic+35UD3IiJm1kNf0mMt/ZXOc31uqYAaX9lpWy0rc4rZG1c5TiRr0JKVw
-         PCZVsNiithfCbz9XOpzmq5Hpr0Tv4TXXpgN6f33SfHPI5bt1vOB6oDz5kpFfhT7HGhmi
-         YFus0cxuCemESvDi0KiCwNMIZCa+8b87mgB+xUDwcrM1SvKmxNtCaevE4Jw2xYsQp1Ma
-         TRfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVw79UZ9iRZzDYukFXaGICOGSXzun17d2Lyk6UaHul9pHwmNshKD+pZ8g7+ih4+Xd6Qsz6TkNs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykzUpu5LElf86hzKbSvM3Z18P5fIZ7rL3RciiptSEjwYZv2/R2
-	5mf9E8749mTzAzFTqX1yzLV6T+orTFeaEaArRdpCpT1SWieGJ5verjC10u7lQwcl+6zE7PSJ8Ex
-	+Wnp2/olkquG/BqSoDQtG1U9XKYlF6xfOFGMVxfj+
-X-Gm-Gg: ASbGnct0GTO8aQ0Xi+vJZSbj8b9yprPzjfEpQGC+ZZZmUz7Bv1gHxWhi1XIy3SjefRB
-	BTkvP48gIOPDT3W0WNO6305x313tsQdQpM5i5zLzNPZAe3hnlLSoSWaeLkzH+qZ7mNfghaJ5Ax6
-	+9pjbzxkQVid2PWnH+18M+mk99oTs2IJnI41ySF9XVrnsG86uq3ClS/17xtMT7lfNpFHs0nVo=
-X-Google-Smtp-Source: AGHT+IGDUh9i2QR+OkMh4fD77Cn7MdjzQa4MMPj+bj7Pxco//T5atBLGYHjMI7EeJmWwYCLX+z0Vvq1jG9YvLKt6WQc=
-X-Received: by 2002:a17:902:e846:b0:235:e8da:8e1 with SMTP id
- d9443c01a7336-23dee27d5famr281145ad.18.1752172187759; Thu, 10 Jul 2025
- 11:29:47 -0700 (PDT)
+	s=arc-20240116; t=1752172534; c=relaxed/simple;
+	bh=pH7aKDfHuwDPJu1Oi1RhQC/3f4zNFI7iKK97pQk6ayI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JA9wpSoYsQQo7vzbKV2LLVnqrLlvRc86WSMrsDtQ0WC1NlY1k3ZOXWpzJN/JwLpZLcNWYru6temSm34DhkAo6CdeiH4uc8PBL0ZbxflcmA3WY6aAbB+goi23fNk1HKN+cXo7wC3zqVmy18D6Q8KZxxoNpjRNXqei6jxRtPrLheQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=RKBKX9Vq; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=82DTVPzCmslYsYBzEi/DNrIGykVn992BD4R5Z+9ByL4=; b=RKBKX9VqcNw5AqzXDOO0ImMNMp
+	jgPYVA7zjhha49tBD9s609A21Bo/0OMzylUSRGg4Fhgai53Ghr8PJUZIsfacuGZl1f3gitl7ViBW/
+	qxDUZROUIRHtL0eEvbR/KZm+3AoUXEOXzuN2tYzMibIcUdYKg4tME3L/Hn6YxndNkvEMpp9DHnFHQ
+	50VPbvWRo4erUAP0KaD/I8AI5JUxGUh0/YT5gRlAxMifRv+yE4ZkHgW/sKQeSaTfn9LA70WNPlTHv
+	vyOUU5ab/bZfXD8XLXrH6FpnM9SPA1bw7B9vkmjlX440TbgIDAYaXWMv7f4D1dGhdpCcZ50Crj34g
+	EMsJT1UA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43926)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1uZw79-0001T6-1O;
+	Thu, 10 Jul 2025 19:35:23 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1uZw75-0003qL-1P;
+	Thu, 10 Jul 2025 19:35:19 +0100
+Date: Thu, 10 Jul 2025 19:35:19 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 3/3] net: phylink: add
+ phylink_sfp_select_interface_speed()
+Message-ID: <aHAH53ZEE3snK4IE@shell.armlinux.org.uk>
+References: <aGT_hoBELDysGbrp@shell.armlinux.org.uk>
+ <E1uWu14-005KXo-IO@rmk-PC.armlinux.org.uk>
+ <20250702151426.0d25a4ac@fedora.home>
+ <aGU2C3ipj8UmKHq_@shell.armlinux.org.uk>
+ <CAKgT0UcWGH14B0zZnpHeJKw+5VU96LHFR1vR4CXVjqM10iBJSg@mail.gmail.com>
+ <aGWF5Wee3vfoFtMj@shell.armlinux.org.uk>
+ <CAKgT0UdVW6_hewR7zNzMd_h7b_Lm_SHdt72yVhc7cLHcfFxuYQ@mail.gmail.com>
+ <14b442ad-c0ab-4276-8491-c692f0b7c5c9@lunn.ch>
+ <CAKgT0UfXRsVEgvJScapiXNWyqB8Yd07t5dgrKX82MRup78tXrw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250710082807.27402-1-byungchul@sk.com> <20250710082807.27402-7-byungchul@sk.com>
-In-Reply-To: <20250710082807.27402-7-byungchul@sk.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 10 Jul 2025 11:29:35 -0700
-X-Gm-Features: Ac12FXzeYcyI9Q9DAscC8V1bkRMOGnCRm09FJHP9wMGxc_EiuS0WSo5wKouz6uY
-Message-ID: <CAHS8izM9FO01kTxFhM8VUOqDFdtA80BbY=5xpKDM=S9fMcd3YA@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 6/8] mlx4: use netmem descriptor and APIs for
- page pool
-To: Byungchul Park <byungchul@sk.com>
-Cc: willy@infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org, 
-	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org, 
-	akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com, 
-	andrew+netdev@lunn.ch, asml.silence@gmail.com, toke@redhat.com, 
-	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, 
-	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net, david@redhat.com, 
-	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz, 
-	rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org, 
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com, 
-	hannes@cmpxchg.org, ziy@nvidia.com, jackmanb@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKgT0UfXRsVEgvJScapiXNWyqB8Yd07t5dgrKX82MRup78tXrw@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Jul 10, 2025 at 1:28=E2=80=AFAM Byungchul Park <byungchul@sk.com> w=
-rote:
->
-> To simplify struct page, the effort to separate its own descriptor from
-> struct page is required and the work for page pool is on going.
->
-> Use netmem descriptor and APIs for page pool in mlx4 code.
->
-> Signed-off-by: Byungchul Park <byungchul@sk.com>
-> ---
->  drivers/net/ethernet/mellanox/mlx4/en_rx.c   | 48 +++++++++++---------
->  drivers/net/ethernet/mellanox/mlx4/en_tx.c   |  8 ++--
->  drivers/net/ethernet/mellanox/mlx4/mlx4_en.h |  4 +-
->  3 files changed, 32 insertions(+), 28 deletions(-)
->
-> diff --git a/drivers/net/ethernet/mellanox/mlx4/en_rx.c b/drivers/net/eth=
-ernet/mellanox/mlx4/en_rx.c
-> index b33285d755b9..7cf0d2dc5011 100644
-> --- a/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-> +++ b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
-> @@ -62,18 +62,18 @@ static int mlx4_en_alloc_frags(struct mlx4_en_priv *p=
-riv,
->         int i;
->
->         for (i =3D 0; i < priv->num_frags; i++, frags++) {
-> -               if (!frags->page) {
-> -                       frags->page =3D page_pool_alloc_pages(ring->pp, g=
-fp);
-> -                       if (!frags->page) {
-> +               if (!frags->netmem) {
-> +                       frags->netmem =3D page_pool_alloc_netmems(ring->p=
-p, gfp);
-> +                       if (!frags->netmem) {
->                                 ring->alloc_fail++;
->                                 return -ENOMEM;
->                         }
-> -                       page_pool_fragment_page(frags->page, 1);
-> +                       page_pool_fragment_netmem(frags->netmem, 1);
->                         frags->page_offset =3D priv->rx_headroom;
->
->                         ring->rx_alloc_pages++;
->                 }
-> -               dma =3D page_pool_get_dma_addr(frags->page);
-> +               dma =3D page_pool_get_dma_addr_netmem(frags->netmem);
->                 rx_desc->data[i].addr =3D cpu_to_be64(dma + frags->page_o=
-ffset);
->         }
->         return 0;
-> @@ -83,10 +83,10 @@ static void mlx4_en_free_frag(const struct mlx4_en_pr=
-iv *priv,
->                               struct mlx4_en_rx_ring *ring,
->                               struct mlx4_en_rx_alloc *frag)
->  {
-> -       if (frag->page)
-> -               page_pool_put_full_page(ring->pp, frag->page, false);
-> +       if (frag->netmem)
-> +               page_pool_put_full_netmem(ring->pp, frag->netmem, false);
->         /* We need to clear all fields, otherwise a change of priv->log_r=
-x_info
-> -        * could lead to see garbage later in frag->page.
-> +        * could lead to see garbage later in frag->netmem.
->          */
->         memset(frag, 0, sizeof(*frag));
->  }
-> @@ -440,29 +440,33 @@ static int mlx4_en_complete_rx_desc(struct mlx4_en_=
-priv *priv,
->         unsigned int truesize =3D 0;
->         bool release =3D true;
->         int nr, frag_size;
-> -       struct page *page;
-> +       netmem_ref netmem;
->         dma_addr_t dma;
->
->         /* Collect used fragments while replacing them in the HW descript=
-ors */
->         for (nr =3D 0;; frags++) {
->                 frag_size =3D min_t(int, length, frag_info->frag_size);
->
-> -               page =3D frags->page;
-> -               if (unlikely(!page))
-> +               netmem =3D frags->netmem;
-> +               if (unlikely(!netmem))
->                         goto fail;
->
-> -               dma =3D page_pool_get_dma_addr(page);
-> +               dma =3D page_pool_get_dma_addr_netmem(netmem);
->                 dma_sync_single_range_for_cpu(priv->ddev, dma, frags->pag=
-e_offset,
->                                               frag_size, priv->dma_dir);
->
-> -               __skb_fill_page_desc(skb, nr, page, frags->page_offset,
-> -                                    frag_size);
-> +               __skb_fill_netmem_desc(skb, nr, netmem, frags->page_offse=
-t,
-> +                                      frag_size);
->
->                 truesize +=3D frag_info->frag_stride;
->                 if (frag_info->frag_stride =3D=3D PAGE_SIZE / 2) {
-> +                       struct page *page =3D netmem_to_page(netmem);
+On Thu, Jul 10, 2025 at 10:22:44AM -0700, Alexander Duyck wrote:
+> On Thu, Jul 10, 2025 at 9:11 AM Andrew Lunn <andrew@lunn.ch> wrote:
+> > What is wrong, that it is reporting LP information, or that it is
+> > reporting it does not support autoneg when in fact it is actually
+> > doing autoneg?
+> 
+> I have some debug code on here that is reporting the FW config as the
+> "LP Advertised". I had borrowed that approach from the phylink
+> fixedlink config as I thought it was a good way for me to know what
+> the FW was requesting without having to report it out to a log file.
 
-This cast is not safe, try to use the netmem type directly.
+There are a few points to be made here.
 
---=20
-Thanks,
-Mina
+1. Fixed link configuration is not the same as !autoneg setting with
+   the presence of a PHY. !autoneg with a PHY present means that the
+   PHY has been instructed not to perform autonegotiation, but to set
+   the specified parameters for the link and only allow the link to
+   operate at the specified speed/duplex. There are exceptions - as
+   users expect 1G to work with "autoneg" disabled, and 1G requires
+   AN in order to bring the link up. Some PHYs support disabling the
+   autoneg function at 1G speed by internally ignoring the request
+   to disable autoneg, and instead only advertising to the link
+   partner that 1G at the specified duplex is supported. We took
+   that and turned it into a software thing for all PHYs as some
+   PHYs decided to go a different route - basically not supporting
+   the AN enable bit being turned off at 1G speeds.
+
+2. Fixed link configuration is a software concept where there is no
+   accessible PHY present. Phylink rejects fixed link configuration
+   with a PHY. There is no support to configure a PHY into fixed
+   speed/duplex if present, and has never been supported prior to
+   phylink.
+
+3. The history. Prior to phylink (and it remains in some cases today),
+   fixed link configuration was created by providing a software
+   emulated PHY to phylib for the MAC driver to use, thus avoiding
+   MAC drivers having to add explicit code for fixed links. They
+   looked just like a normal PHY, but was limited to no faster than
+   1G speeds as the software emulation is a Clause 22 PHY.
+
+   This software emulated PHY replaces the presence of a physical
+   PHY (there is none) and the PHY it emulates looks like a PHY that
+   supports AN, has AN enabled, but only supports a single speed
+   and duplex, only advertises a single baseT(x) speed and duplex,
+   and the link partner agrees on the speed and duplex. This "fools
+   phylib into resolving the speed and duplex as per the fixed link
+   configuration.
+
+   However, in reality, there is no AN.
+
+   This has become part of the user API, because the MII registers of
+   the fixed link PHY were exported to userspace, and of course through
+   ethtool.
+
+   There has never been a MII API for reading the fixed link parameters
+   for speeds > 1G, so while phylink enables fixed link configuration
+   for those speeds, there is no MII register support for this for
+   userspace.
+
+(As an aside)
+Someone earlier today sent a reminder about a bug I'd introduced for
+10GBASE-R, 5GBASE-R and another interface (I don't recall right now)
+and I proposed a patch that only cleared the Autoneg bit in the
+adertising mask. Having been reminded about it, and had Andrew's
+input on this thread, I'm wondering whether config.advertising
+should be entirely cleared as in !autoneg mode, the advertising mask
+makes no sense.
+
+However, I'm supposed to be on my vacation, so I'm not going to start
+testing anything... this email as a bonus that would've otherwise have
+been delayed by about two weeks... but the way things are going (family
+issues) it could turn out to be a lot longer as I may have to become a
+full time carer. So much for an opportunity to have an opportunity to
+relax, which I desperately need.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
