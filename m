@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-205605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 091B2AFF670
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 03:35:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E07B0AFF672
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 03:35:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF7825614EB
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 01:35:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE7DD1C48251
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 01:35:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3FB723B62C;
-	Thu, 10 Jul 2025 01:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 056E827E1DC;
+	Thu, 10 Jul 2025 01:35:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ojm3vSoW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nelftVPX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96618846C
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 01:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C893C846C;
+	Thu, 10 Jul 2025 01:35:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752111326; cv=none; b=AOeM2EQkWWIBFzJfAQlNI6cjh1hw4jdAIaoIJn2lUk0juRxvwRejlwYvM/vnVmC1+ydgNAGKOzlj0l+ki5h9hKoANfcOZ7ayDT1ItMhMDElLh+OASIrQf1o9N6FWxSIsJTKpPk1K352WfNHvvrUkniEVNjJSGNVowLVKdZv8Z6s=
+	t=1752111331; cv=none; b=XbhBE4jUnKg7ze2n5f/UelVS5VvZklMTRNyKhIWsQITrGlj8q//F9lr8ZPBbT/oHAn24tarGni9NhVOOERb3wE12wy2rlp69orSLxVKK+xmUPgOCa9vY+RlgI/wBptmkvHswQL/MUtuc2wEaGTLu0KfxqyZebw9U+3wCIyDVjlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752111326; c=relaxed/simple;
-	bh=z6ELCKGw1BjiXfhHAYVfSjAfd4R0/wtWRp8Jrpo1lnE=;
+	s=arc-20240116; t=1752111331; c=relaxed/simple;
+	bh=vuaZDssHpq/J3jA0y7OFz/bVN7cmfEs2MmNf4DnX/WM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dGP4Bhg1itTx1nF9I0smmUFWYNbZ3y5X+adqHXzmK1cdPNfQStns9HoFapItvPEWcrKHP/CQPp6jzXnrKXDwf0DIacht9SM3k37MmtgZ0RulnDH0TLNi9MO5r4wTyPfpHbys3RpHvQ/t0PViHVo+lajDK8F1WurvPk0NorqyzM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ojm3vSoW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E12AC4CEEF;
-	Thu, 10 Jul 2025 01:35:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=JKqKh6foRQV/cequXq1j6eSVmLhXNm7vqAA0IEDYr3pCoNPVS9vqQHViVZXkPtP6g3RQKcg5n2ST2SH8T/6ZpXNmei27uysfftEa5QyFKYLglmpATyuyL1TI49CMN6geihog0FaeNdX97pL8TjTRS5+KCgKyYEtjR/R3dwCgEZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nelftVPX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51F1EC4CEEF;
+	Thu, 10 Jul 2025 01:35:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752111326;
-	bh=z6ELCKGw1BjiXfhHAYVfSjAfd4R0/wtWRp8Jrpo1lnE=;
+	s=k20201202; t=1752111331;
+	bh=vuaZDssHpq/J3jA0y7OFz/bVN7cmfEs2MmNf4DnX/WM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ojm3vSoWTBwUfxBGc29lVzvgIJjibOxm4+a6RLERJ4QjTj6mTJDwIbSYni8RbozvM
-	 ej9W0lF8+ihrMwMX1w22VpqwwrB74xNfF6Aw/v5XN3TOHc2a2kGDA4wLLjPmn2pgF2
-	 EzmmBWqDGWve2L8QjoNQ1apERGZHjKisQPIMSYPO88qiZrMowQNwDrTSiPEdZidCFI
-	 DLwmNMn+yfipn8Xuq8/Hu95/hkLL6mH3pSnnGCj9wSPYkNNcMSoDn1TZFyE/42/GXh
-	 neDb/77x+yAlyCxTsiAQlCZwkpMAi53AzjHaC8K5IJomH+Kd70gkBmjq+2Z3TPmnul
-	 7nW19/c+Kn01Q==
+	b=nelftVPXCJB7ObKBwuBT3hh6ozJyMcEuIainJ1cEzbC3iWzXTEA77rqq1z5fs2+is
+	 zs8v8bbfSTTEKZyGjVQneoFkszzLVhyQym7SZEVdSRHut8t1Hk4Y7LII/G3HvvSQJg
+	 Dds0gjg62ARS3uJJEd1yNLkjPCspikXvFfFYpxRUKS9+xDEkkW7aBVCvwedELP81Hn
+	 E7Eqig0LBWy1BdiIQP4JrqNMDWP4T6DZunrtOBuW0bqgto6EOvBdQGtW38B0ong4kI
+	 9B/KNkFiCc8ofQxLOHq8OsYrpWvgbMug6jG5r0ZF+uEaBs9lqSrPQ6YRGlXS1CmKEf
+	 lBLM0KAqMN6IQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE5A4383B261;
-	Thu, 10 Jul 2025 01:35:49 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF61383B261;
+	Thu, 10 Jul 2025 01:35:53 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net 0/3] atm: clip: Fix infinite recursion, potential
- null-ptr-deref, and memleak.
+Subject: Re: [PATCH net-next] dt-bindings: net: Add support for Sophgo CV1800
+ dwmac
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <175211134851.897408.6508642456257203383.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Jul 2025 01:35:48 +0000
-References: <20250704062416.1613927-1-kuniyu@google.com>
-In-Reply-To: <20250704062416.1613927-1-kuniyu@google.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, kuni1840@gmail.com,
- netdev@vger.kernel.org
+ <175211135250.897408.2127630772719110412.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Jul 2025 01:35:52 +0000
+References: <20250703021220.124195-1-inochiama@gmail.com>
+In-Reply-To: <20250703021220.124195-1-inochiama@gmail.com>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, unicorn_wang@outlook.com, richardcochran@gmail.com,
+ paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+ alex@ghiti.fr, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ sophgo@lists.linux.dev, linux-kernel@vger.kernel.org,
+ linux-riscv@lists.infradead.org, dlan@gentoo.org, looong.bin@gmail.com,
+ conor.dooley@microchip.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  4 Jul 2025 06:23:50 +0000 you wrote:
-> Patch 1 fixes racy access to atmarpd found while checking RTNL usage
-> in clip.c.
+On Thu,  3 Jul 2025 10:12:19 +0800 you wrote:
+> The GMAC IP on CV1800 series SoC is a standard Synopsys
+> DesignWare MAC (version 3.70a).
 > 
-> Patch 2 fixes memory leak by ioctl(ATMARP_MKIP) and ioctl(ATMARPD_CTRL).
+> Add necessary compatible string for this device.
 > 
-> Patch 3 fixes infinite recursive call of clip_vcc->old_push(), which
-> was reported by syzbot.
+> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> Acked-by: Conor Dooley <conor.dooley@microchip.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net,1/3] atm: clip: Fix potential null-ptr-deref in to_atmarpd().
-    https://git.kernel.org/netdev/net/c/706cc3647713
-  - [v2,net,2/3] atm: clip: Fix memory leak of struct clip_vcc.
-    https://git.kernel.org/netdev/net/c/62dba28275a9
-  - [v2,net,3/3] atm: clip: Fix infinite recursive call of clip_push().
-    https://git.kernel.org/netdev/net/c/c489f3283dbf
+  - [net-next] dt-bindings: net: Add support for Sophgo CV1800 dwmac
+    https://git.kernel.org/netdev/net-next/c/6a971e48e2d8
 
 You are awesome, thank you!
 -- 
