@@ -1,168 +1,202 @@
-Return-Path: <netdev+bounces-205896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 388A1B00B7B
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 20:35:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06D9BB00B80
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 20:36:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B2811C85F87
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 18:35:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF6CB5A5E36
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 18:36:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C502FCE07;
-	Thu, 10 Jul 2025 18:35:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C79F2FCFD4;
+	Thu, 10 Jul 2025 18:35:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="RKBKX9Vq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V5VgZnHB"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7FB27145D
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 18:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38E627145D
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 18:35:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752172534; cv=none; b=doagVrb3Qs6FX/bXFdHfU+uCLehrFz47AvxWN1lyynGG2bp7MmKHYAGiu6Y82zejHJD1W7iDAV5CMRYzjJrYIkxxPEh/nfHPu4kh9Ew4uSQp/jBtkyQnauasofcDaK8ozwBP5mRhzK++s4pONP7vaZcyiiLDFdg5bKyEJ+ymQ3c=
+	t=1752172550; cv=none; b=PmlKGbughQpY6SCSx8mtgjTqWt3wmKIsZqd1pp1+RbaXTY0AIOAgwOVP0sD3X8cOmnUkjr8kuxdE2j9S3Hm1ZgQny2yO4Oetbctku0YHfFGS0aW+jlkqpWziKzo+k3XhD5xYBdWHoDqiJhzQBEJMtbYiNFsBqY5oV2o/MzIaGIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752172534; c=relaxed/simple;
-	bh=pH7aKDfHuwDPJu1Oi1RhQC/3f4zNFI7iKK97pQk6ayI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JA9wpSoYsQQo7vzbKV2LLVnqrLlvRc86WSMrsDtQ0WC1NlY1k3ZOXWpzJN/JwLpZLcNWYru6temSm34DhkAo6CdeiH4uc8PBL0ZbxflcmA3WY6aAbB+goi23fNk1HKN+cXo7wC3zqVmy18D6Q8KZxxoNpjRNXqei6jxRtPrLheQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=RKBKX9Vq; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=82DTVPzCmslYsYBzEi/DNrIGykVn992BD4R5Z+9ByL4=; b=RKBKX9VqcNw5AqzXDOO0ImMNMp
-	jgPYVA7zjhha49tBD9s609A21Bo/0OMzylUSRGg4Fhgai53Ghr8PJUZIsfacuGZl1f3gitl7ViBW/
-	qxDUZROUIRHtL0eEvbR/KZm+3AoUXEOXzuN2tYzMibIcUdYKg4tME3L/Hn6YxndNkvEMpp9DHnFHQ
-	50VPbvWRo4erUAP0KaD/I8AI5JUxGUh0/YT5gRlAxMifRv+yE4ZkHgW/sKQeSaTfn9LA70WNPlTHv
-	vyOUU5ab/bZfXD8XLXrH6FpnM9SPA1bw7B9vkmjlX440TbgIDAYaXWMv7f4D1dGhdpCcZ50Crj34g
-	EMsJT1UA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43926)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1uZw79-0001T6-1O;
-	Thu, 10 Jul 2025 19:35:23 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1uZw75-0003qL-1P;
-	Thu, 10 Jul 2025 19:35:19 +0100
-Date: Thu, 10 Jul 2025 19:35:19 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 3/3] net: phylink: add
- phylink_sfp_select_interface_speed()
-Message-ID: <aHAH53ZEE3snK4IE@shell.armlinux.org.uk>
-References: <aGT_hoBELDysGbrp@shell.armlinux.org.uk>
- <E1uWu14-005KXo-IO@rmk-PC.armlinux.org.uk>
- <20250702151426.0d25a4ac@fedora.home>
- <aGU2C3ipj8UmKHq_@shell.armlinux.org.uk>
- <CAKgT0UcWGH14B0zZnpHeJKw+5VU96LHFR1vR4CXVjqM10iBJSg@mail.gmail.com>
- <aGWF5Wee3vfoFtMj@shell.armlinux.org.uk>
- <CAKgT0UdVW6_hewR7zNzMd_h7b_Lm_SHdt72yVhc7cLHcfFxuYQ@mail.gmail.com>
- <14b442ad-c0ab-4276-8491-c692f0b7c5c9@lunn.ch>
- <CAKgT0UfXRsVEgvJScapiXNWyqB8Yd07t5dgrKX82MRup78tXrw@mail.gmail.com>
+	s=arc-20240116; t=1752172550; c=relaxed/simple;
+	bh=BQi/oAxmvttoMCkmYmgHMY9tc5kt6YdUCM6RxGff5II=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HvpGDdoAR89Dcec7V1uXKR+NQSvf2/TCQsEIcXxuOFBXDhJ/GjJJl6bkqxR57VkGMGdNV0J+pALz+J6QxUoZtHIKaGzZzWzXJbNCNmTqru2j/4gezT+UWT0K9XFjCSvA4EK4K4FKsK+z7tz8VKlxB0lKhuc4XsVF74eji+ceqe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V5VgZnHB; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-237f18108d2so31535ad.0
+        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 11:35:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1752172547; x=1752777347; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sUFyFG64jchMDy9nJZhwnx6mFvVO2+1zDBN4KcsNtGQ=;
+        b=V5VgZnHBUAwpIKTq3Kone9pNEIxn1KsfehINSGQXDEJfYnBfLnPl21en0eF6+49Qfs
+         IPEJOc8dP9hY6i4PbXLFaSWPpd4u/BMAuR8BV3qOcZuLxkYayCSzAwwTQX4zu9nf5vBp
+         r1kGNnpX6l1kYIdXy9XwnzsZvOrOMSuK1VNBw6KJbTceShJ1ZD/VRlIyTrsVYcw0R5eJ
+         a5xbvLIeqGPZs3bORCV26MrxNxkd/QG2JikR04f4cA66sAmjo0xfQxvVduEcfrGgaq9m
+         a8wbPnuILhBPwzAg+1iqeYBopGM5PoqkBRdJ41S1Ybp7lD6+mFpxx5MI7QLb3FBLVv4t
+         03tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752172547; x=1752777347;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sUFyFG64jchMDy9nJZhwnx6mFvVO2+1zDBN4KcsNtGQ=;
+        b=hbdNbu/UN4TZcOZxUrYXXRpCsZogpsx48lCZpUhEuThOHNqluJUY0+763kvgRLIvbE
+         ytcR0546+y0XB7Arru6L3ITdoSOVRlUuJa+VMEOxUIrbWPk4ZdQamVwNzhPeQ4N5Nil8
+         efdW4lnMTAkxOAQkiq85GQzLZBTAQo/N1Ufox1YNjdfk6+ryDiSynsuoqjnFTKIjtKHl
+         DCUBK2P+srz+HEcb3ei5a80xYRDYlqLd6sT5+62P2UPdJdaK2fP/CY1yqYG21QJfc7ID
+         RhEVqm8zDKjdsBmuASlnSsdcGQHSJJfx2PH2e6rTf9J6yuei5sVQafhL5b05bOXuQ3Ye
+         5v5A==
+X-Forwarded-Encrypted: i=1; AJvYcCW+YoOhJPuTTI+WynN9ktsTpNkySWQ0GdeAVzU+fsbHFMRVPtdbKAYZksHmx8kIUw8+LOUk90I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDitFMPQSF+xpDxtHhtWQU8p8qapxnm+15gWH0ixK4PV0vkySL
+	vGQh6GU53LMXugczT1ZQH8sNUkxnDPEkZxTrfLPfLH38C2hRO21J+L6N6YWAzXxVpwwOquO1615
+	kOWfuYVMnYgKRII3OGXKcNq5Eym5mgSY+jQANilHB
+X-Gm-Gg: ASbGncsV4k2103km/EV5hRUpWRlM6Sm2v/vRLFHo3CPV6RfR+vkA0Xd8GoavOkbJXoI
+	UuU69Q/Lx4nnrCjbDWjL0hNpL5K+AtWQRvCwn9ORRIBuD8IkEb5Wz74MolcaAl4bBxe7Z5Ar9xL
+	Js+y9S3WJ1+xh82JYR19S4mva9dvQA4oWG4sEgwckPsmfi4gesOfB6YiAy+vuO9f/edv1zhAY=
+X-Google-Smtp-Source: AGHT+IEzZmw78/OSXjJWOTZycozUs1vUEUMKIB/o/lKBX8kmUgnw2fbBaI4EEfFVqfugsZvpbjLQdKz5IhYTiVxWNgo=
+X-Received: by 2002:a17:902:b095:b0:231:f6bc:5c84 with SMTP id
+ d9443c01a7336-23dee18a914mr236695ad.8.1752172546684; Thu, 10 Jul 2025
+ 11:35:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKgT0UfXRsVEgvJScapiXNWyqB8Yd07t5dgrKX82MRup78tXrw@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20250710082807.27402-1-byungchul@sk.com>
+In-Reply-To: <20250710082807.27402-1-byungchul@sk.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 10 Jul 2025 11:35:33 -0700
+X-Gm-Features: Ac12FXzCBZV3mzo5-D0lWEghMlDgKwI9NFBNKAUpNVy6DriBk8SQ-mKMDpELnTI
+Message-ID: <CAHS8izMie=XQcVUhW9CmydTqYEscp5soeOT4nwvFj2T+8X1ypA@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 0/8] Split netmem from struct page
+To: Byungchul Park <byungchul@sk.com>
+Cc: willy@infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kernel_team@skhynix.com, kuba@kernel.org, 
+	ilias.apalodimas@linaro.org, harry.yoo@oracle.com, hawk@kernel.org, 
+	akpm@linux-foundation.org, davem@davemloft.net, john.fastabend@gmail.com, 
+	andrew+netdev@lunn.ch, asml.silence@gmail.com, toke@redhat.com, 
+	tariqt@nvidia.com, edumazet@google.com, pabeni@redhat.com, saeedm@nvidia.com, 
+	leon@kernel.org, ast@kernel.org, daniel@iogearbox.net, david@redhat.com, 
+	lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz, 
+	rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org, 
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org, vishal.moola@gmail.com, 
+	hannes@cmpxchg.org, ziy@nvidia.com, jackmanb@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 10, 2025 at 10:22:44AM -0700, Alexander Duyck wrote:
-> On Thu, Jul 10, 2025 at 9:11 AM Andrew Lunn <andrew@lunn.ch> wrote:
-> > What is wrong, that it is reporting LP information, or that it is
-> > reporting it does not support autoneg when in fact it is actually
-> > doing autoneg?
-> 
-> I have some debug code on here that is reporting the FW config as the
-> "LP Advertised". I had borrowed that approach from the phylink
-> fixedlink config as I thought it was a good way for me to know what
-> the FW was requesting without having to report it out to a log file.
+On Thu, Jul 10, 2025 at 1:28=E2=80=AFAM Byungchul Park <byungchul@sk.com> w=
+rote:
+>
+> Hi all,
+>
+> The MM subsystem is trying to reduce struct page to a single pointer.
+> See the following link for your information:
+>
+>    https://kernelnewbies.org/MatthewWilcox/Memdescs/Path
+>
+> The first step towards that is splitting struct page by its individual
+> users, as has already been done with folio and slab.  This patchset does
+> that for page pool.
+>
+> Matthew Wilcox tried and stopped the same work, you can see in:
+>
+>    https://lore.kernel.org/linux-mm/20230111042214.907030-1-willy@infrade=
+ad.org/
+>
+> I focused on removing the page pool members in struct page this time,
+> not moving the allocation code of page pool from net to mm.  It can be
+> done later if needed.
+>
+> The final patch removing the page pool fields will be posted once all
+> the converting of page to netmem are done:
+>
+>    1. converting use of the pp fields in struct page in prueth_swdata.
+>    2. converting use of the pp fields in struct page in freescale driver.
+>
+> For our discussion, I'm sharing what the final patch looks like, in this
+> cover letter.
+>
+>         Byungchul
+> --8<--
+> commit 1847d9890f798456b21ccb27aac7545303048492
+> Author: Byungchul Park <byungchul@sk.com>
+> Date:   Wed May 28 20:44:55 2025 +0900
+>
+>     mm, netmem: remove the page pool members in struct page
+>
+>     Now that all the users of the page pool members in struct page have b=
+een
+>     gone, the members can be removed from struct page.
+>
+>     However, since struct netmem_desc still uses the space in struct page=
+,
+>     the important offsets should be checked properly, until struct
+>     netmem_desc has its own instance from slab.
+>
+>     Remove the page pool members in struct page and modify static checker=
+s
+>     for the offsets.
+>
+>     Signed-off-by: Byungchul Park <byungchul@sk.com>
+>
+> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
+> index 32ba5126e221..db2fe0d0ebbf 100644
+> --- a/include/linux/mm_types.h
+> +++ b/include/linux/mm_types.h
+> @@ -120,17 +120,6 @@ struct page {
+>                          */
+>                         unsigned long private;
+>                 };
+> -               struct {        /* page_pool used by netstack */
+> -                       /**
+> -                        * @pp_magic: magic value to avoid recycling non
+> -                        * page_pool allocated pages.
+> -                        */
+> -                       unsigned long pp_magic;
+> -                       struct page_pool *pp;
+> -                       unsigned long _pp_mapping_pad;
+> -                       unsigned long dma_addr;
+> -                       atomic_long_t pp_ref_count;
+> -               };
+>                 struct {        /* Tail pages of compound page */
+>                         unsigned long compound_head;    /* Bit zero is se=
+t */
+>                 };
+> diff --git a/include/net/netmem.h b/include/net/netmem.h
+> index 8f354ae7d5c3..3414f184d018 100644
+> --- a/include/net/netmem.h
+> +++ b/include/net/netmem.h
+> @@ -42,11 +42,8 @@ struct netmem_desc {
+>         static_assert(offsetof(struct page, pg) =3D=3D \
+>                       offsetof(struct netmem_desc, desc))
+>  NETMEM_DESC_ASSERT_OFFSET(flags, _flags);
+> -NETMEM_DESC_ASSERT_OFFSET(pp_magic, pp_magic);
+> -NETMEM_DESC_ASSERT_OFFSET(pp, pp);
+> -NETMEM_DESC_ASSERT_OFFSET(_pp_mapping_pad, _pp_mapping_pad);
+> -NETMEM_DESC_ASSERT_OFFSET(dma_addr, dma_addr);
+> -NETMEM_DESC_ASSERT_OFFSET(pp_ref_count, pp_ref_count);
+> +NETMEM_DESC_ASSERT_OFFSET(lru, pp_magic);
+> +NETMEM_DESC_ASSERT_OFFSET(mapping, _pp_mapping_pad);
+>  #undef NETMEM_DESC_ASSERT_OFFSET
+>
+>  /*
 
-There are a few points to be made here.
 
-1. Fixed link configuration is not the same as !autoneg setting with
-   the presence of a PHY. !autoneg with a PHY present means that the
-   PHY has been instructed not to perform autonegotiation, but to set
-   the specified parameters for the link and only allow the link to
-   operate at the specified speed/duplex. There are exceptions - as
-   users expect 1G to work with "autoneg" disabled, and 1G requires
-   AN in order to bring the link up. Some PHYs support disabling the
-   autoneg function at 1G speed by internally ignoring the request
-   to disable autoneg, and instead only advertising to the link
-   partner that 1G at the specified duplex is supported. We took
-   that and turned it into a software thing for all PHYs as some
-   PHYs decided to go a different route - basically not supporting
-   the AN enable bit being turned off at 1G speeds.
+Can you remove the above patch/diff from the cover letter?
 
-2. Fixed link configuration is a software concept where there is no
-   accessible PHY present. Phylink rejects fixed link configuration
-   with a PHY. There is no support to configure a PHY into fixed
-   speed/duplex if present, and has never been supported prior to
-   phylink.
-
-3. The history. Prior to phylink (and it remains in some cases today),
-   fixed link configuration was created by providing a software
-   emulated PHY to phylib for the MAC driver to use, thus avoiding
-   MAC drivers having to add explicit code for fixed links. They
-   looked just like a normal PHY, but was limited to no faster than
-   1G speeds as the software emulation is a Clause 22 PHY.
-
-   This software emulated PHY replaces the presence of a physical
-   PHY (there is none) and the PHY it emulates looks like a PHY that
-   supports AN, has AN enabled, but only supports a single speed
-   and duplex, only advertises a single baseT(x) speed and duplex,
-   and the link partner agrees on the speed and duplex. This "fools
-   phylib into resolving the speed and duplex as per the fixed link
-   configuration.
-
-   However, in reality, there is no AN.
-
-   This has become part of the user API, because the MII registers of
-   the fixed link PHY were exported to userspace, and of course through
-   ethtool.
-
-   There has never been a MII API for reading the fixed link parameters
-   for speeds > 1G, so while phylink enables fixed link configuration
-   for those speeds, there is no MII register support for this for
-   userspace.
-
-(As an aside)
-Someone earlier today sent a reminder about a bug I'd introduced for
-10GBASE-R, 5GBASE-R and another interface (I don't recall right now)
-and I proposed a patch that only cleared the Autoneg bit in the
-adertising mask. Having been reminded about it, and had Andrew's
-input on this thread, I'm wondering whether config.advertising
-should be entirely cleared as in !autoneg mode, the advertising mask
-makes no sense.
-
-However, I'm supposed to be on my vacation, so I'm not going to start
-testing anything... this email as a bonus that would've otherwise have
-been delayed by about two weeks... but the way things are going (family
-issues) it could turn out to be a lot longer as I may have to become a
-full time carer. So much for an opportunity to have an opportunity to
-relax, which I desperately need.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+--=20
+Thanks,
+Mina
 
