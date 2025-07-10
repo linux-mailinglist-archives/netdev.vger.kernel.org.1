@@ -1,127 +1,86 @@
-Return-Path: <netdev+bounces-205974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E789BB00FE0
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 01:50:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98251B01002
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 02:01:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4380E584E86
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 23:50:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E20B1888400
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 00:01:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3C428FA9F;
-	Thu, 10 Jul 2025 23:50:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5C7307AD3;
+	Thu, 10 Jul 2025 23:58:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="n7GAN3m+";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="WuCSPTNA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LEY/ZBhs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 583FA18BC3D;
-	Thu, 10 Jul 2025 23:50:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60AD29ACDE;
+	Thu, 10 Jul 2025 23:58:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752191445; cv=none; b=dl9nMIvPCy1vK2HmnayOw2kxjOrJ5KUASMrqhtQMguTRnccwZd2P76/ULC48G5JUpKB702VL2Hd/SL9eDzIPmnP34qBozwTraRkBFNHm8GhHv0uAuBgeWiK3nzJikmvrzyqyBfxRZ5+fqmKuPt1Iqbdcj+X59S842yrRd5N2nNU=
+	t=1752191933; cv=none; b=NVArzqkhbqyyA+lnS0HFkMeIpG1DD0S2+okKdPyxyyYpa0obWxXQ0AtXOr+2Ntg3c4/8rnPFWfqgVNuqRczIDrFPdJpzekIKPDGpuufRy+9mjzUVBE1R9llUBHaPK1E10EkpEznYGxP34bYKz0MaxpToRe0PVDGaHcfQrERDsnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752191445; c=relaxed/simple;
-	bh=USCMUn54ndgPneDnVPufDeks8a9rh29vTPRvlAMeYh0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gBOw/9GGhgHuXKOm2gK8whL/B2a0lyXL7x76kNIr4uREZ+4GD4Ofsp+yjUM6CtZzWAJ3yMtNrVcPpjecvqFYaYpU6AGYpzSw+vb72p+FrZnbpaprvwMP9wBTP+v8RJZIWVBie7MnjSkKLTMApUfVFOetJTBgi3p2eXr2k8TRbdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=n7GAN3m+; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=WuCSPTNA; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 07C83602B2; Fri, 11 Jul 2025 01:50:39 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1752191439;
-	bh=xxjhWmH3emqRlh20xFujYzSVWcjcgdolVEQ4cUUbMWQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n7GAN3m+wyc3La9L+EQz2A3QknyljOHJTe04ERK7VMeZLQADnREUoDRak33wWIk6T
-	 tBEwYUGP64jnf8+blqqots4PTARFpIKsoJqCr6px4N8ewdcvKEtA1ncI0CqZSitmJB
-	 i+VmxdwQR8uQ0VdDlpE8VzQfvXZGw6sqMJFt5+A/9PYUFrbc63qD1Rcj4f92jHr1vn
-	 tFJGCy+R+XRQ3tsF9Nf2Zl8dLSc6uV97Wc6ib0Wk9bM8WmM+lb+MK/SNsRgarmhBzM
-	 VrefQXyPZtoau88x/qSBG6bSONsCofq8sJ5+7NSbPKPAcztZiwR5Ny2KsOiqRVxMqe
-	 oFMdnpHfx283w==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 4B902602AC;
-	Fri, 11 Jul 2025 01:50:37 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1752191437;
-	bh=xxjhWmH3emqRlh20xFujYzSVWcjcgdolVEQ4cUUbMWQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WuCSPTNA0WozrCJHux88U3ETjyHegViZ7dToIC1lv5Jpd/EwOkfCCQdwNFOdozdTe
-	 Bh2g1CDzAIcWRAtO6g2DUcEU7lNp+Uirn0Ydcs4ss95L/JgaWSoSZhj4If/MorJRXR
-	 kGGByfJZaq6WuvcAkEjQCQsAxaIPgZp33e2NPPA5XOlUGXOtlK05sUZYzqsd2p008g
-	 Pq2Tbgp/D08rkm3aOVJcC6MOJKxOagO1qYJBFZ7H4s6HBR0o40OewgHqNsvPb+tuLL
-	 lurHpVx2ckYBs3W3P2B1fVahlqm6KLWJ1nfjlYxgYTEnfF9Vfrf9tAGIIQ5j3zGh/N
-	 0B1z8au6DuZWw==
-Date: Fri, 11 Jul 2025 01:50:35 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	eric.dumazet@gmail.com,
-	syzbot+bf6ed459397e307c3ad2@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] netfilter: flowtable: account for Ethernet header in
- nf_flow_pppoe_proto()
-Message-ID: <aHBRudvDo5887q3F@calendula>
-References: <20250707124517.614489-1-edumazet@google.com>
+	s=arc-20240116; t=1752191933; c=relaxed/simple;
+	bh=RZSiQFQ5CJhU/h0mQJuZBqy5Y/7NgeYrUN8qKuNGZaI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VCzSRk1kbeK/4y05Aw0WudUjF0bnujMTlP6oNPHvLcA/gP89I5iKWUkMi1oatf8cuybuupV05abFvUSShqUWNmkNgoqNfPc61xVK2ez/6pz6p989O0fAxw7KCPc0yFbLCR0VCszYSvKtIckF8SAWMXJLNT4XbrFA8lsCLERUt68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LEY/ZBhs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B37E5C4CEE3;
+	Thu, 10 Jul 2025 23:58:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1752191933;
+	bh=RZSiQFQ5CJhU/h0mQJuZBqy5Y/7NgeYrUN8qKuNGZaI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LEY/ZBhsaDpXenP21NMpx/v0+GdIHZP9qq9rcGq2t9XFbjm0DCSeVg/OP/j+KFDuu
+	 pLeuPg9fW/WQmiVRfAG/xwR0KitIoLbBTC+xJcj7MgQFrAqTQX4Qleugflp04piT0t
+	 9a+1uquoUkghyvYfix+SAtquNSpkwsnS4938SK+Ptg6cMTtMbm46w1mbyRniOsQ+Hr
+	 MAbPeSmLgAAATN+WIFgvc/b3phu3mDCF8tEv+babk1Uyg4sV8axpK6cCJQwT8pLDbL
+	 pFkzjcxZKkYh1Pk0Qcao5jxlna3CdJovmJlWsRLNHcqZ7DaFQ4AUxXbdZrA2Sp9KkJ
+	 nOzF8zO051G3A==
+Date: Thu, 10 Jul 2025 16:58:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Parav Pandit <parav@nvidia.com>
+Cc: Dragos Tatulea <dtatulea@nvidia.com>, "almasrymina@google.com"
+ <almasrymina@google.com>, "asml.silence@gmail.com"
+ <asml.silence@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Saeed Mahameed
+ <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Cosmin Ratiu
+ <cratiu@nvidia.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC net-next 1/4] net: Allow non parent devices to be used for
+ ZC DMA
+Message-ID: <20250710165851.7c86ba84@kernel.org>
+In-Reply-To: <CY8PR12MB7195361C14592016B8D2217DDC43A@CY8PR12MB7195.namprd12.prod.outlook.com>
+References: <20250702172433.1738947-1-dtatulea@nvidia.com>
+	<20250702172433.1738947-2-dtatulea@nvidia.com>
+	<20250702113208.5adafe79@kernel.org>
+	<c5pxc7ppuizhvgasy57llo2domksote5uvo54q65shch3sqmkm@bgcnojnxt4hh>
+	<20250702135329.76dbd878@kernel.org>
+	<CY8PR12MB7195361C14592016B8D2217DDC43A@CY8PR12MB7195.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250707124517.614489-1-edumazet@google.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Eric,
-
-Thanks for your patch.
-
-On Mon, Jul 07, 2025 at 12:45:17PM +0000, Eric Dumazet wrote:
-> syzbot found a potential access to uninit-value in nf_flow_pppoe_proto()
+On Thu, 3 Jul 2025 11:58:50 +0000 Parav Pandit wrote:
+> > In my head subfunctions are a way of configuring a PCIe PASID ergo they
+> > _only_ make sense in context of DMA.  
+> SF DMA is on the parent PCI device.
 > 
-> Blamed commit forgot the Ethernet header.
+> SIOV_R2 will have its own PCI RID which is ratified or getting ratified.
+> When its done, SF (as SIOV_R2 device) instantiation can be extended
+> with its own PCI RID. At that point they can be mapped to a VM.
 
-I see, vlan indeed includes the ethernet header.
-
-        case htons(ETH_P_8021Q):
-+               if (!pskb_may_pull(skb, skb_mac_offset(skb) + sizeof(*veth)))
-
-validates this, after this patch this looks consistent.
-
-> BUG: KMSAN: uninit-value in nf_flow_offload_inet_hook+0x7e4/0x940 net/netfilter/nf_flow_table_inet.c:27
->   nf_flow_offload_inet_hook+0x7e4/0x940 net/netfilter/nf_flow_table_inet.c:27
->   nf_hook_entry_hookfn include/linux/netfilter.h:157 [inline]
->   nf_hook_slow+0xe1/0x3d0 net/netfilter/core.c:623
->   nf_hook_ingress include/linux/netfilter_netdev.h:34 [inline]
->   nf_ingress net/core/dev.c:5742 [inline]
->   __netif_receive_skb_core+0x4aff/0x70c0 net/core/dev.c:5837
->   __netif_receive_skb_one_core net/core/dev.c:5975 [inline]
->   __netif_receive_skb+0xcc/0xac0 net/core/dev.c:6090
->   netif_receive_skb_internal net/core/dev.c:6176 [inline]
->   netif_receive_skb+0x57/0x630 net/core/dev.c:6235
->   tun_rx_batched+0x1df/0x980 drivers/net/tun.c:1485
->   tun_get_user+0x4ee0/0x6b40 drivers/net/tun.c:1938
->   tun_chr_write_iter+0x3e9/0x5c0 drivers/net/tun.c:1984
->   new_sync_write fs/read_write.c:593 [inline]
->   vfs_write+0xb4b/0x1580 fs/read_write.c:686
->   ksys_write fs/read_write.c:738 [inline]
->   __do_sys_write fs/read_write.c:749 [inline]
-> 
-> Reported-by: syzbot+bf6ed459397e307c3ad2@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/686bc073.a00a0220.c7b3.0086.GAE@google.com/T/#u
-> Fixes: 87b3593bed18 ("netfilter: flowtable: validate pppoe header")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-
-Reviewed-by: Pablo Neira Ayuso <pablo@netfilter.org>
-
-Thanks.
+AFAIU every PCIe transaction for a queue with a PASID assigned
+should have a PASID prefix. Why is a different RID necessary?
+CPUs can't select IOMMU context based on RID+PASID?
 
