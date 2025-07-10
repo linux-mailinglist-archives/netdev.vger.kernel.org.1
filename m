@@ -1,141 +1,125 @@
-Return-Path: <netdev+bounces-205861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC187B007D7
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 17:57:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 940D8B0081B
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 18:08:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9F3C3B55C4
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 15:56:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7529717E209
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 16:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A9BE278741;
-	Thu, 10 Jul 2025 15:56:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599072EF651;
+	Thu, 10 Jul 2025 16:04:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Qz21eRi8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+PUp7IM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7F82798FF
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 15:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5020B25A357
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 16:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752163005; cv=none; b=VUyN8VJNmZqf8vRKdh/XZ/0aG86N//KRTUcAueORUwJee91hQia4XLtvAfcLHDcfXt71bKdBlAlnFJrENFQw+i3q4KFKKX2IPe9g1vp6UZl+aFZW650i98Osfh/muDrk99oa8kJR7hU2rmOXKLoUomBwsDvnJ0lJcU4WWXO5O4E=
+	t=1752163453; cv=none; b=tyJof861yuULaUbDTum1+08yGJe5QTc+Pk/zyxMOUqKaBSwDIl+k2fnqFN7aVmbkYBYv1pHOmYasY5D0O/JO8zwUi9++Id8SDhc3n2idile7CfVXFW8FZln+D+P53Tqw7P0R0J6prI0YbShruxGKyTeaa7RaDDcaG/r17RODvME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752163005; c=relaxed/simple;
-	bh=/cJq9KxvDP6A6XR240CsJYr9GJdHVkdxiK5Yep+6gEU=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=DeO7BRpk5+tXblHtaZ1sCVGXBJ/zqAEddHjz+xbpgnpLdfq6TX96GwaveKPOJS1Ypll/cf6drFJ8+6gP4jRIg/Rw/Yhw0C0tO8bs2O1Iv4wYVq2sbCFPZ3lo66axUk+Ys5e2sOmIMa3/FpJCd81tt7S7/FCN2ejZY42nb5WAHdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Qz21eRi8; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4a762876813so18130381cf.2
-        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 08:56:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1752163002; x=1752767802; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=xnKwmo1m6hLF5udTnifDik+BWf8EHwhcINoxCW5NYug=;
-        b=Qz21eRi88yNf86IGcpIEcbkJffzHTwicURmfCqki2Ev0yv0h4lfAmVY0zAhOKPekPD
-         CJFYmmbXxpKf2VkXgqUDPfJoyu3qfKzvD4C9NGapsCMullFBA1Mrs7lQH4KKXwFetXGK
-         yonADtrtnvGLn5i+ALlZ9fDRkYNViwRgcQjgt4fGI2DwUPnr5z82How33e2wtBlS2bmh
-         NkIbofp51P/NQwChAOaH0tECjHE7xxtgHRinnjo4AdjfAYUQUT7ECjzXmXEZvopr8KYp
-         uewGai9Sm8eMesM5/so0TvtJhirlkp5wDbbodduwTSDUn85ld5ThOHf/H5oyV5NpepGP
-         k/KA==
+	s=arc-20240116; t=1752163453; c=relaxed/simple;
+	bh=45SIG5rPi31Du7cZARxkbmyB/fEEYfkUbHU85m7Yd/I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AttBKhEOePIFTPvpmXLMzZEuOntlE0K2nH+fMiFrinNUXEsYtAKGMK1sQcfeUn0tbCgSjf7tVnaxmFd+21prZ8oLlqPr3MlkrKyZyNRDKuZsBcIw4vAMvVSJDKELQruzQ3TJy00ETY3bjiX0v/ZXT/L7HkXZH0GZcguvatGKj5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H+PUp7IM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752163449;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NSCoFxZmQFbdN64FGaIzAmf+ZfaD0SDOkGG3PDCYahE=;
+	b=H+PUp7IMeQqbdMbyuRzhPgUuTFM0ZTcJ2Z2AZoQrLu1BEcFaQWgLcbEBx5tXmBvtC1GD38
+	9bNOac6owKXxF+fWgVr8B9OeknyTRC56aDqZjrvWZZk9RhCBNi+j+8ZCETE64QL7Pogph9
+	aU1gXq6Odp5NlJtXOwhCjYfUR5GAg5I=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-267-vhCLnF9DP5-Zxd9fDofGtg-1; Thu, 10 Jul 2025 12:04:07 -0400
+X-MC-Unique: vhCLnF9DP5-Zxd9fDofGtg-1
+X-Mimecast-MFC-AGG-ID: vhCLnF9DP5-Zxd9fDofGtg_1752163446
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4532514dee8so9265515e9.0
+        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 09:04:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752163002; x=1752767802;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xnKwmo1m6hLF5udTnifDik+BWf8EHwhcINoxCW5NYug=;
-        b=XQo7Yvb08N0zs0AdIehTbbyqbOClUwZuw8QCNtftlpUkNjA5o+/uU3tA0TJnI+kMyv
-         AT9NKDGve1N2rAQr5TN+kLKfBiqRth2ckuyACSE0VhbbLr/dg5dXpvCdepE3a57ZT4q+
-         1pQlWPj+55mLCPz+dji3ysZPLzSJ+MZg3KGYqTwecIVxbL1h0P9HaqxgRroZKdjcak0b
-         f3ANIRtAgXu3sFqzd6fC48eO88Uk23SqF8lhD9SzJhP5MZre4rOBSAz98YvweeHY1lM0
-         fAzM740ZMVq5GJ9s8s3EZQ22TVdwsISAca1D7PAaaiuML2WjrBOOEJHDS+iefywogxza
-         3RKw==
-X-Forwarded-Encrypted: i=1; AJvYcCU/ras01Qt8gxH0sCAGbAJilgeZJJJIqfApN7b1yRzmtD6fsTnB1mRybJy2I7sk267FjWfnS50=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWG1xXW82DXo/4KAFabaTbD4dq4R5QQ2n43+cwIcfT4dTrPcW0
-	7+3qdeVO1gFBaT0rc17+Z3w9HTOdjl7AY0f5ibWG4vw5x33IpHZAyliIE0DX5RixgSw3sPFrNAR
-	BlVZg49x74wzQLA==
-X-Google-Smtp-Source: AGHT+IEdWtY83QZnIyvWQZo2KsUUfLJ3rQSPGe3zKRVXB19x3084wZd8FiHiJkQe0y4NyYuXVKr6yTvjn8XEig==
-X-Received: from qtbjb5.prod.google.com ([2002:a05:622a:7105:b0:4a9:85c8:9b0c])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:7f53:0:b0:494:acf1:bd0f with SMTP id d75a77b69052e-4a9ded10757mr103732781cf.42.1752163002630;
- Thu, 10 Jul 2025 08:56:42 -0700 (PDT)
-Date: Thu, 10 Jul 2025 15:56:41 +0000
+        d=1e100.net; s=20230601; t=1752163446; x=1752768246;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NSCoFxZmQFbdN64FGaIzAmf+ZfaD0SDOkGG3PDCYahE=;
+        b=Ebgq4sIP0E08z5Xzjfjp+9pSagixbTTd3hg75YEGJlSl+SfhBzvWcQiHEQ21fqOnCB
+         kCRGTjmqAqF0md+imAio0e3s5+4SuwKBoK4WBM9xxi2UPv4moUarjvNxwrHYk+VyZOQy
+         bLUS5BRZma71ZrOSxa1n1NQmyqYDC39mA0MYAAmalXzAXF0p+/uZ0zJkE8D0pH/2DUM3
+         t+XvEVMeVYjjsvSL6ycif9brZ40T3mEqN3hUENbi4bxKVRmeyDSlb4ZTB+yhB9vsAjWR
+         m3Wdx6zPS+bTnyJe0XyukhNDMq/x6z/Erb6R7Q84WIptXTtD5r6wL4YnvCf6+Jd8zxc/
+         Zo+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWIArsYsD7OE8+coEF+y2Vqgd9/x3ICpEEJebemOCSrMsqVi+oybo90zSMHdfMPH5UvH3TEw4U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmktgOf01dhtVRZ3MQcyjN0MBvJDXWsALvLbzY7ZjWwkT/iLOJ
+	nnL1sM+ocSayaL94vZL10BibBo/YheAO555RSZEnYPFGpr5IOtyaTFo8M2cJWyvLg3hzPJsoJYG
+	gy9rXjFDqNs0jCrJP+vAyhNCDPfkoMIdiU5k/WnD7ZqR+1OFzc2bFpEEO6Q==
+X-Gm-Gg: ASbGncvC2XAR0f4CE3tPQmKtwBRwY+FKOpgv0I0hnGUhalONzBCWhGkwj58FGYEP9eQ
+	UzUBWh+XqQD/U7ApdMAfqXimRf81LwI56hRpB/BpAG9Raqg7jZ2pGaRwccpgbLEOa9svn3lIf0x
+	d6mvlB+36BhASOIfSmH6uYahbMBoVJER/SF5xNcgwGbyEAfCbqqubAgvYzgEBzLEu3Nl/nMZFVh
+	+W4+Yz/MKV7/R7CJhmwQyEBlcxSiXCWTGmIymqzw3U+MiCRVg8+PJjtKzum05bXjovOjPmO5Pjg
+	vQ/BgJRldq9YzaSlP6lGbiHjDbQMKhtIU625QDHDiWF4wpV9mXgnxJUqZNEdSdsBofppSg==
+X-Received: by 2002:a05:600c:8b07:b0:43d:fa59:af97 with SMTP id 5b1f17b1804b1-454d5404715mr63096045e9.32.1752163446173;
+        Thu, 10 Jul 2025 09:04:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHwQsXap6CXeZtb932z9EyvfOv6madp5+KBeR3+NEb4XXN6+C92DcDbsyl7FzhVwLWiFi+d5w==
+X-Received: by 2002:a05:600c:8b07:b0:43d:fa59:af97 with SMTP id 5b1f17b1804b1-454d5404715mr63092535e9.32.1752163442931;
+        Thu, 10 Jul 2025 09:04:02 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:271f:bc10:144e:d87a:be22:d005? ([2a0d:3344:271f:bc10:144e:d87a:be22:d005])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-454d5032e9esm62029605e9.3.2025.07.10.09.04.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Jul 2025 09:04:02 -0700 (PDT)
+Message-ID: <e0f9befa-d29b-4cc4-ba41-e38f398a6589@redhat.com>
+Date: Thu, 10 Jul 2025 18:04:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.50.0.727.gbf7dc18ff4-goog
-Message-ID: <20250710155641.3028726-1-edumazet@google.com>
-Subject: [PATCH net-next] selftests/net: packetdrill: add --mss option to
- three tests
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [lsm?] [net?] WARNING in kvfree_call_rcu
+To: Kuniyuki Iwashima <kuniyu@google.com>,
+ syzbot+40bf00346c3fe40f90f2@syzkaller.appspotmail.com
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+ paul@paul-moore.com, syzkaller-bugs@googlegroups.com
+References: <686da18a.050a0220.1ffab7.0023.GAE@google.com>
+ <20250708231926.356365-1-kuniyu@google.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250708231926.356365-1-kuniyu@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Three tests are cooking GSO packets but do not provide
-gso_size information to the kernel, triggering this message:
+On 7/9/25 1:17 AM, Kuniyuki Iwashima wrote:
+> From: syzbot <syzbot+40bf00346c3fe40f90f2@syzkaller.appspotmail.com>
+> Date: Tue, 08 Jul 2025 15:54:02 -0700
+>> Hello,
+>>
+>> syzbot tried to test the proposed patch but the build/boot failed:
+>>
+>> net/smc/af_smc.c:365:3: error: call to undeclared function 'inet_sock_destruct'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+>>
+> 
+> #syz test
 
-TCP: tun0: Driver has suspect GRO implementation, TCP performance may be compromised.
+Please, strip down the CC list to strictly skyzaller related recipients
+while sending this kind of test, as they may foul PW and the CI.
 
-Add --mss option to avoid this warning.
+Thanks,
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- .../selftests/net/packetdrill/tcp_blocking_blocking-read.pkt   | 2 ++
- tools/testing/selftests/net/packetdrill/tcp_inq_client.pkt     | 3 +++
- tools/testing/selftests/net/packetdrill/tcp_inq_server.pkt     | 3 +++
- 3 files changed, 8 insertions(+)
-
-diff --git a/tools/testing/selftests/net/packetdrill/tcp_blocking_blocking-read.pkt b/tools/testing/selftests/net/packetdrill/tcp_blocking_blocking-read.pkt
-index 914eabab367aeb765a85e311513c3ca35ec27946..657e42ca65b5d4280875af49ba8775688172799d 100644
---- a/tools/testing/selftests/net/packetdrill/tcp_blocking_blocking-read.pkt
-+++ b/tools/testing/selftests/net/packetdrill/tcp_blocking_blocking-read.pkt
-@@ -1,6 +1,8 @@
- // SPDX-License-Identifier: GPL-2.0
- // Test for blocking read.
-+
- --tolerance_usecs=10000
-+--mss=1000
- 
- `./defaults.sh`
- 
-diff --git a/tools/testing/selftests/net/packetdrill/tcp_inq_client.pkt b/tools/testing/selftests/net/packetdrill/tcp_inq_client.pkt
-index df49c67645ac8f8bdef485f03af6e84d2b883ae9..e13f0eee97952a39a3b67cf276d01d0b9eee16cb 100644
---- a/tools/testing/selftests/net/packetdrill/tcp_inq_client.pkt
-+++ b/tools/testing/selftests/net/packetdrill/tcp_inq_client.pkt
-@@ -1,5 +1,8 @@
- // SPDX-License-Identifier: GPL-2.0
- // Test TCP_INQ and TCP_CM_INQ on the client side.
-+
-+--mss=1000
-+
- `./defaults.sh
- `
- 
-diff --git a/tools/testing/selftests/net/packetdrill/tcp_inq_server.pkt b/tools/testing/selftests/net/packetdrill/tcp_inq_server.pkt
-index 04a5e2590c62cf725e92f137470b0bcae309eaba..14dd5f813d50eb6425bb58a72e63d47433a29cb4 100644
---- a/tools/testing/selftests/net/packetdrill/tcp_inq_server.pkt
-+++ b/tools/testing/selftests/net/packetdrill/tcp_inq_server.pkt
-@@ -1,5 +1,8 @@
- // SPDX-License-Identifier: GPL-2.0
- // Test TCP_INQ and TCP_CM_INQ on the server side.
-+
-+--mss=1000
-+
- `./defaults.sh
- `
- 
--- 
-2.50.0.727.gbf7dc18ff4-goog
+Paolo
 
 
