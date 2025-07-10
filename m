@@ -1,125 +1,108 @@
-Return-Path: <netdev+bounces-205863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0C1BB00837
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 18:10:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B12BB00873
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 18:24:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97270177B4D
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 16:07:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 588643AAA74
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 16:23:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3987F27A918;
-	Thu, 10 Jul 2025 16:07:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 808852EFD86;
+	Thu, 10 Jul 2025 16:24:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FFqP+RSm"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="rkkMKh8u";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="VmOgyZwx"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94611271441
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 16:07:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1EFC2EFD80;
+	Thu, 10 Jul 2025 16:24:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752163664; cv=none; b=EI+uQcTuX+5FX/fCWw69sBG/dmT5bZBpquiUUOu4/hUK/C7BvltDQf3DFs7wFrlWF2ppD3pdi2PDAbLQGsLkMm11KMuRLjkcJe778TduKARthQCazu5zSeYXUMVz0BsN2+03yOuJCsBhothekcY5uoOPwyhgK02MJp8CVosH6y8=
+	t=1752164650; cv=none; b=LacGUuNMFKQQDXBqubEGWWnj8V8NV/jy3bBnRYa5vEKQdIRdoRIdwYBa+a7BfNcfArruHcZmbXevGAHftVwj76qCLqFd9dTq3keNL6HyOQB91udU2aaGZR/gOBNzN1SUo4Rf5hBm3FfnnL/1cMRRUShvB5uPuKdgY01DFr4D/2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752163664; c=relaxed/simple;
-	bh=1JPAgGXcOjSiPvGfcRcDiRFVmTU5ibj/DlZ8O3yc4bw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pid6iGK99k1kOaNTF8Q9O16o/ZqHhxCqeflVuTcU3yCTbSBEb9eoQR9q+BJkjQbB0EZLvKIh4nq/WFd5d4yjZ2IOXaT5XERH0wQ9jNJQZK27CX4FQh6ORLsSzuefGixEbXThz2KI7McXA9QAH7IjDleAvsQscoBAlUpIyepcwLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FFqP+RSm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1752163661;
+	s=arc-20240116; t=1752164650; c=relaxed/simple;
+	bh=yhXnlookodcUEcmo8ztk+UB5W/O098X3DHk1+abEzEw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VRzEWzSTiLjmIW4ZEslLatFp7rgToWhPsyl8LL4FHpCYL8igAwGQmBca9wWjfQTTzsC+ntAWX32nDuTq20bQLV09HS5VVPQJS+bibTKa+2jYK+NtlZOXtWAQsqVPcQjbFSLtnvAmFBQYRBC3srgAUkt1NNlsGyp2e/9rzw3uyaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=rkkMKh8u; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=VmOgyZwx; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1752164646;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=rC5Jhn+8+NRUFPS6Yn1vypt+ltUNxeE/XqdW1MRUqDU=;
-	b=FFqP+RSmrWD+nuytOqDIY9UcVv5dZJTAmRF9exB2ohBOJ1Wa9GgJfCTbZmim6kDqfeCh0X
-	7kO7U6qyPxrgjdCI3PAZiUuolBUKEDdH+BLq/ANH28R9F+pzZ+CWRz2p88dbniq8sxczQF
-	BplZ5KIAodX9T4qj0YSOhEPCdbHY+JY=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-620-yIiuJgkBMNKpKVKsYTlR1A-1; Thu,
- 10 Jul 2025 12:07:34 -0400
-X-MC-Unique: yIiuJgkBMNKpKVKsYTlR1A-1
-X-Mimecast-MFC-AGG-ID: yIiuJgkBMNKpKVKsYTlR1A_1752163652
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F411319560B5;
-	Thu, 10 Jul 2025 16:07:31 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.173])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 32CB6180035C;
-	Thu, 10 Jul 2025 16:07:28 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
+	bh=tQMC4S7/L1wvzxI5yirgcxP5rYPtfD7o+g83A17/u9o=;
+	b=rkkMKh8uvipgG6D7/Dq46KcRca2gSEbWJXohqfs3YbWf49pjBrSi4bduCLLIqkDw3vMTqq
+	fdHp4hNwzuuQ6q4Wtqi1qLJLotFL3RdE8E06z9GP/TxmSzMPdesynOCVGEHzC8uZQIh9eX
+	kFaxFa7gyiVwcODdTOxBKihcJYc6gv0uU/IhHH8hT5djihycps41vpKPby+cnxuw9IcJQs
+	GT6+wIj9Ckv5KCwZtp3/aQZhFmvutKzC9a3BMfvTB2/c3avbjTHXbXN/x0VCRMQE6K0c9u
+	OOGKsaH1NYG/G9bbh1FdIP+ZPuZJV0BboeGZnrShEjAkuX7q77ugUXWmnWVYtw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1752164646;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tQMC4S7/L1wvzxI5yirgcxP5rYPtfD7o+g83A17/u9o=;
+	b=VmOgyZwxeYAci8wXyNSCrI4xXM+Uw9pwyFdd1fp4tVT2xmUkDJAQWkHXIpABr2zdZ3Hz/K
+	qq69rt/nm96sblDQ==
+To: netdev@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev,
+	linux-ppp@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Clark Williams <clrkwllms@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net] selftests: net: increase inter-packet timeout in udpgro.sh
-Date: Thu, 10 Jul 2025 18:04:50 +0200
-Message-ID: <b0370c06ddb3235debf642c17de0284b2cd3c652.1752163107.git.pabeni@redhat.com>
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: [PATCH net-next v2 0/1] ppp: Replace per-CPU recursion counter with lock-owner field
+Date: Thu, 10 Jul 2025 18:24:02 +0200
+Message-ID: <20250710162403.402739-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The mentioned test is not very stable when running on top of
-debug kernel build. Increase the inter-packet timeout to allow
-more slack in such environments.
+This is another approach to avoid relying on local_bh_disable() for
+locking of per-CPU in ppp.
 
-Fixes: 3327a9c46352 ("selftests: add functionals test for UDP GRO")
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
- tools/testing/selftests/net/udpgro.sh | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+I redid it with the per-CPU lock and local_lock_nested_bh() as discussed
+in v1. The xmit_recursion counter has been removed since it served the
+same purpose as the owner field. Both were updated and checked.
 
-diff --git a/tools/testing/selftests/net/udpgro.sh b/tools/testing/selftests/net/udpgro.sh
-index 1dc337c709f8..b17e032a6d75 100755
---- a/tools/testing/selftests/net/udpgro.sh
-+++ b/tools/testing/selftests/net/udpgro.sh
-@@ -48,7 +48,7 @@ run_one() {
- 
- 	cfg_veth
- 
--	ip netns exec "${PEER_NS}" ./udpgso_bench_rx -C 1000 -R 10 ${rx_args} &
-+	ip netns exec "${PEER_NS}" ./udpgso_bench_rx -C 1000 -R 100 ${rx_args} &
- 	local PID1=$!
- 
- 	wait_local_port_listen ${PEER_NS} 8000 udp
-@@ -95,7 +95,7 @@ run_one_nat() {
- 	# will land on the 'plain' one
- 	ip netns exec "${PEER_NS}" ./udpgso_bench_rx -G ${family} -b ${addr1} -n 0 &
- 	local PID1=$!
--	ip netns exec "${PEER_NS}" ./udpgso_bench_rx -C 1000 -R 10 ${family} -b ${addr2%/*} ${rx_args} &
-+	ip netns exec "${PEER_NS}" ./udpgso_bench_rx -C 1000 -R 100 ${family} -b ${addr2%/*} ${rx_args} &
- 	local PID2=$!
- 
- 	wait_local_port_listen "${PEER_NS}" 8000 udp
-@@ -117,9 +117,9 @@ run_one_2sock() {
- 
- 	cfg_veth
- 
--	ip netns exec "${PEER_NS}" ./udpgso_bench_rx -C 1000 -R 10 ${rx_args} -p 12345 &
-+	ip netns exec "${PEER_NS}" ./udpgso_bench_rx -C 1000 -R 100 ${rx_args} -p 12345 &
- 	local PID1=$!
--	ip netns exec "${PEER_NS}" ./udpgso_bench_rx -C 2000 -R 10 ${rx_args} &
-+	ip netns exec "${PEER_NS}" ./udpgso_bench_rx -C 2000 -R 100 ${rx_args} &
- 	local PID2=$!
- 
- 	wait_local_port_listen "${PEER_NS}" 12345 udp
--- 
+The xmit_recursion looks like a counter in ppp_channel_push() but at
+this point, the counter should always be 0 so it always serves as a
+boolean. Therefore I removed it.
+
+I do admit that this looks easier to review. On the other hand v1 had a
+negative diffstat :)
+
+v1=E2=80=A6v2 https://lore.kernel.org/all/20250627105013.Qtv54bEk@linutroni=
+x.de/
+  - Instead of rewriting the sequence and adding two owner fields to
+    the two variables that may recurse it now adds a per-CPU variable
+    for locking and keeping mostly the old code flow.
+
+Sebastian Andrzej Siewior (1):
+  ppp: Replace per-CPU recursion counter with lock-owner field
+
+ drivers/net/ppp/ppp_generic.c | 38 ++++++++++++++++++++++++++---------
+ 1 file changed, 29 insertions(+), 9 deletions(-)
+
+--=20
 2.50.0
 
 
