@@ -1,116 +1,143 @@
-Return-Path: <netdev+bounces-205715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B07FBAFFD62
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 11:01:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A58EAFFD5E
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 11:01:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02FA31C46070
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 09:00:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52D627B2EC3
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 08:59:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46072BE04B;
-	Thu, 10 Jul 2025 08:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61714290BD5;
+	Thu, 10 Jul 2025 08:58:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ndmpyqvk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F8udDjTn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C4429993F;
-	Thu, 10 Jul 2025 08:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D235290083
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 08:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752137888; cv=none; b=MLv/KRlaQ8p5Xfs9UtwG209EXYdWOfCPkDIeAZU1PTim8tJORiowKIoNui9JSSP/7zyWRrCCyMnBZVKrdY9okCyf40tAwL8zhoC0XMMI0Zg1mDqLj+fYC8NOYC8M2f+jY6CnBFQflpntLcyJ/3Zcu0uKLHd0D2sBdh0CVEfHh7k=
+	t=1752137915; cv=none; b=BYZDqPdgPF5drsFmHoE4Px+oh0Of1TvPfIOg5nmnUNJmfRF+Tq5+++YOTF67Kag7Oq7IqAGBnzV7TQSQdm9CVKARbAXrle+t6ieiY2SyxU+aYB19tC8o2ovOEJcO8gj7CcRHgZjIxTQRKn6/U/JVcSHdP2IDxiJxovleZaAijIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752137888; c=relaxed/simple;
-	bh=ovY0wUbO/pvaHRTJ3gBlcrmaRXqj/rYP5snoHOc1kdk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b6+w7k0sKsqFej6drZBSAS1e55I3l2YdKwB+1x/KGWSsLs+1IfOsRkrnqq81W254tK4/BFOCs1i45tHQbYYX7efpizmgBEh7NB/MOcKFIkcewc+P47+kWyBpkqc62vGXwq8xoEZRLs5Yi19L3hnPcawhfnDQccgsmOE+2BHcBJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ndmpyqvk; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ade76b8356cso132896766b.2;
-        Thu, 10 Jul 2025 01:58:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1752137885; x=1752742685; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ovY0wUbO/pvaHRTJ3gBlcrmaRXqj/rYP5snoHOc1kdk=;
-        b=ndmpyqvk9WuJqukKF3xa5SvB9wrpnj8d/yJt1LMTLO6PV6id0uShr9SxtluSt43eHt
-         O6+yjeSuiOkp6jrv0ZoYlH9Gcj/DyoYO9t1Kksd1LSu9CrAunSpU58CxLqYxFUmCuYAJ
-         H4+cEmG43rb4VKooGmvHAvzD83kqjgQXhwzTLuuZkSlerfhOjFhwXdy6uECPDl7l6J5N
-         U7p/3jJt1niHJd1kpqyIcWQUsJFRIXdu6JUJBIeMXGw1yKtHZ4Rz3mEhCVRU77pbd+qa
-         4JR2k0qZsuhIJ+PvRaw8P89wR6dLdxsBF+6QKvCPFrX+aDsfGUvbx4ahBS5aW111UhN8
-         CaWg==
+	s=arc-20240116; t=1752137915; c=relaxed/simple;
+	bh=2IT9MY1RATVHLm7ZV+H0oG+4vlbv4+B1KFHHRv+w5+0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S8z6kScVPRTjMP1mbkWw1tNbLeg9zrwr76slcXBRPecxsHnx2ZKtuJN4HQw5EkTZ2Vaansz8OgaQhF+r/Uz0J4lCWDS79FmszKOxQ16M14cA+Rzq0RDmUXiDqH41zhlQbIHk1ajk9692SjnMumgO8hsY5GHMB/HWxZ9y6mYUMvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F8udDjTn; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1752137912;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A2jflg3WATaKBBDi6HmSHGxR6uEGPyyU47GcZAKSr9w=;
+	b=F8udDjTnsFeofwruYD7QoeRwHHWCtMETp8RssXOo4dXpFK36j/uIdOa+S7yxG2EzQI1PhV
+	l/gvHVe91A+KkenuXtV/AO92Pd+UG7eE+5zeqkgKr1P1gMHhQLsW1ZBh7gCJ9rQutdnzMQ
+	H+GIRKGv1nPYlgvTBK2e6kH2ejJed/M=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-539-LCKTP7VRP9-6uuz1POH3hg-1; Thu, 10 Jul 2025 04:58:31 -0400
+X-MC-Unique: LCKTP7VRP9-6uuz1POH3hg-1
+X-Mimecast-MFC-AGG-ID: LCKTP7VRP9-6uuz1POH3hg_1752137910
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-454c2c08d36so5093535e9.2
+        for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 01:58:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1752137885; x=1752742685;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ovY0wUbO/pvaHRTJ3gBlcrmaRXqj/rYP5snoHOc1kdk=;
-        b=scWyzRQQABROgFdzJcP6PYlJcuAIXKWikJi61RAIBcoCcmp8/q31szYhTPCTwAkq4V
-         UmiyyfOzJo0Cw5pZi98+i/J2EsCRw6tRxl9kTbeY1FH5qFyAfLMFGPPrYprpT1fAH2RH
-         07UfYLMwPDGXig2kyNfPzDd2IUC8m5M5CzN60fklJm5Q1Yuy3Hf+MDl6uMSt1LpSAWJG
-         cxmcMQ3c4+C5rFTWEJ8l+Ud+0MYrAzFWvSyV8q0sh6Q+NnImHcVmt6iRF+6V0j3A4mVc
-         BEHBi/vA6mt6lZ0nUdU5U+EidfV9I5J3ObD+WMYuha/wHSoTcSbCL33CJcNim/EjTJJu
-         EONQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU42flkMPx36FRBrBhlsyrQrGGLgsJ8ge0lZO5eCPEYm9YhZTRGUVYjDQKie4d3k6S57tLy+qwgJ6LvPOmC@vger.kernel.org, AJvYcCUwgntsYln3YZ0l5+DqpdvWfqChbmR7OEOSmWN2gRiCc2ltWYGUdSSvnSREkxHbVrQP6OrebOXRJgc0Ur8k@vger.kernel.org, AJvYcCVBR1KDM/LoJh6pWZKsvtOFEGE2/R7F7586JKznMyhm/VRIZipT1aOi+XBcQW7I+FwAc94391tI6a+2Y8T6@vger.kernel.org, AJvYcCWUCJ2DCwBZNaeIftEj3wzo6FuRhsu1xBYn9+Vu8qoYwdMLXELBtlFsZrcknMG0lqVcPFmTCigV15ql@vger.kernel.org, AJvYcCWXOqgenQjF4+fTPJZO3YRs/i2HeuRvL2JJIrL+bwQbeszw1skoWwnBSEQ9d9fkKp8mJzcvF4zr@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCH3woDXeuC4Eud5JgVyu3sDxT5OrQw3HydnmRt5Bzlz5u+iXC
-	OL3qOtuVvA5P/Tl5B6nuEdVkgbaWIzON9QpKzUm+IKB/JtMxCiSEaYiQdtJ4GJmOGfMnCDBYmoJ
-	OYqtQmx4RnKGRA8KvYV++UbU91Hoe8YE=
-X-Gm-Gg: ASbGncugAyc1O2je3NXsoTpzOSILa0ibfZ9BYia63XjNrREV9Zq3IqCTs1/bf7ekfKy
-	DcdPc9EjYwKtHQuRtV3/xtcOHVR0eNCFYDF4QpuY6+4XIGQP+70vfvRlFweBUnh+8DYPhzZ8mMd
-	laBfRlV3XEWSpDCtPXkgsZfgbTm3iAwddTC92QBzXrIheHrg==
-X-Google-Smtp-Source: AGHT+IF4vkQQS93GlTFcXA3IUZu+Ie6aWTqS+ryt/tNRDWHUfU7VoFm+JQoC4Q9KZJPIsOeBw8GwkZX2MWvIWqAsv48=
-X-Received: by 2002:a17:907:3f26:b0:ae3:60e5:ece3 with SMTP id
- a640c23a62f3a-ae6e6e308aamr206701866b.6.1752137885114; Thu, 10 Jul 2025
- 01:58:05 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1752137910; x=1752742710;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=A2jflg3WATaKBBDi6HmSHGxR6uEGPyyU47GcZAKSr9w=;
+        b=Pjwcu/2FNetE5CaVZpQBhw9E4FBF7q7l5v8El/kc/zIkH+ujqj5r+UvrAzcHRpjsL8
+         bu93KilNxaOeczQkixAF9thuURbw/lcGnekzTZUMjYPDLUpGp5XlmCelVK7ABzPV/aki
+         wOJLWXv3ZJgKDnM0voj2u0oCuhmYOIYJu8o3g6ie9FtI7bvDoWbvLiMKB12sZbw7VOpS
+         4pTuAJTdfAoEHpKlnyav8Kg1nRLzggY+w1T9f0ZsqKD746i/F9ZuJln8/wjS2L5AvQ0e
+         AuCj8vVgza8a6hhCJnPq2HzJ4Oa+BJW3Ke4s/7EoDLT9c97ST1hlgoA4oD7Y3qQO5YBS
+         qXhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU209E8MlxHFH+Z6jZFz6raEQMSjyLDY1HUt7EImSc7NGXcum0/8mKfNS8AQFbG8eCPySq590s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzryGvq2ABRt+9MoW5XpJR+2sPIr98p5GDavIsF+cetFyFTXjg9
+	QujNOL1FLSSioX82lKMrfZ9kxLiXLZgiS3K0ThNUvy3VY3qsAlQPyJ4fFU8dlltelJTUqtkmuOJ
+	ppCb6p3ZP0a58LWeScDHJ8C1csgkvNJlJzo8gw4/y/gS/jOmG8ORnnVS0YA==
+X-Gm-Gg: ASbGncvsqDE30bdhHt5gQPBuO4/GhvsNceg5rh58TD3ieZQ+d3qvEXR8PcDwTb2I+L6
+	HC+Ygo+zazPmRaVmcDwi2VsSQLmCwGfg0cnqt9eLoZu9lA/08LSoqNeH7uEtX/DffFqUpN7LVfP
+	3yLAb8CsbEfJZN9xdvyUJHm2YUEdptIR3oBQ2L56wRuOyp5u9OAI6DN1AB+zTOYePQuiC6FiwhH
+	NVMXZEc6AtaRrTskWCKA5qQBpJ/QVSY+L9R5Y7MSRuLvgl0Bh7KmgO+IFoU5h4AR/oDnPn9ZYBW
+	2Hse2h7LDC05HkOSiwMMXcgZSGz5aQ22fsqDB9WCniy9Ffl7gfFlEl0adM0MMOyZEPqNqw==
+X-Received: by 2002:a05:6000:4703:b0:3a5:783f:528a with SMTP id ffacd0b85a97d-3b5e86fd876mr1548694f8f.59.1752137910140;
+        Thu, 10 Jul 2025 01:58:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFSnNdMaTPqEf+Unk95Crd5eDsF8pipQDUbGam/OEzbuYLLgpwArK1puRfQ0V2wgOSSfOwGDw==
+X-Received: by 2002:a05:6000:4703:b0:3a5:783f:528a with SMTP id ffacd0b85a97d-3b5e86fd876mr1548662f8f.59.1752137909676;
+        Thu, 10 Jul 2025 01:58:29 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:271f:bc10:144e:d87a:be22:d005? ([2a0d:3344:271f:bc10:144e:d87a:be22:d005])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3b5e8e1e135sm1294564f8f.72.2025.07.10.01.58.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Jul 2025 01:58:29 -0700 (PDT)
+Message-ID: <47e7fb60-9e61-419f-ba22-8f3c5337627b@redhat.com>
+Date: Thu, 10 Jul 2025 10:58:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250710-qcom-smgr-v2-0-f6e198b7aa8e@protonmail.com> <20250710-qcom-smgr-v2-4-f6e198b7aa8e@protonmail.com>
-In-Reply-To: <20250710-qcom-smgr-v2-4-f6e198b7aa8e@protonmail.com>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Thu, 10 Jul 2025 11:57:28 +0300
-X-Gm-Features: Ac12FXxFEAw7JJzM8ZextWSIZ2sUSr-CBvVZPV0WO2mg2RfGdJ-GJxGQGSEknhU
-Message-ID: <CAHp75Vf8NzYRMeM=+S4p9LGnOd4iXcdw93hBjd=Rn=LqBXgwgA@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] iio: Add Qualcomm Sensor Manager driver
-To: y.oudjana@protonmail.com
-Cc: Manivannan Sadhasivam <mani@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, 
-	Jonathan Cameron <jic23@kernel.org>, David Lechner <dlechner@baylibre.com>, 
-	=?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
-	Andy Shevchenko <andy@kernel.org>, Luca Weiss <luca@lucaweiss.eu>, linux-arm-msm@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, linux-iio@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: fix segmentation after TCP/UDP fraglist GRO
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>,
+ Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ Willem de Bruijn <willemb@google.com>,
+ Richard Gobert <richardbgobert@gmail.com>
+Cc: linux-kernel@vger.kernel.org
+References: <20250705150622.10699-1-nbd@nbd.name>
+ <686a7e07728fc_3aa654294f9@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <686a7e07728fc_3aa654294f9@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 10, 2025 at 11:06=E2=80=AFAM Yassine Oudjana via B4 Relay
-<devnull+y.oudjana.protonmail.com@kernel.org> wrote:
->
-> Add a driver for sensors exposed by the Qualcomm Sensor Manager service,
-> which is provided by SLPI or ADSP on Qualcomm SoCs. Supported sensors
-> include accelerometers, gyroscopes, pressure sensors, proximity sensors
-> and magnetometers.
+On 7/6/25 3:45 PM, Willem de Bruijn wrote:
+> Felix Fietkau wrote:
+>> Since "net: gro: use cb instead of skb->network_header", the skb network
+>> header is no longer set in the GRO path.
+>> This breaks fraglist segmentation, which relies on ip_hdr()/tcp_hdr()
+> 
+> Only ip_hdr is in scope.
+> 
+> Reviewing TCP and UDP GSO, tcp_hdr/transport header is used also
+> outside segment list. Non segment list GSO also uses ip_hdr in case
+> pseudo checksum needs to be set.
+> 
+> The GSO code is called with skb->data at the relevant header, so L4
+> helpers are not strictly needed. The main issue is that data will be
+> at the L4 header, and some GSO code also needs to see the IP header
+> (e.g., for aforementioned pseudo checksum calculation).
+> 
+>> to check for address/port changes.
+> 
+> If in GSO, then the headers are probably more correctly set at the end
+> of GRO, in gro_complete.
 
-First of all it's almost 2kLoCs, it's on the edge of unreviewable
-code. Please, try to make 3+ patches out of this one.
-Second, take your time and check what your code is using from the
-kernel internal libraries and APIs and follow IWYU principle when
-including headers.
++1 on setting the headers at GSO time.
 
+> The blamed commit was added to support tunneling. It's not obvious
+> that unconditionally setting network header again, instead of inner
+> network header, will break that.
 
---=20
-With Best Regards,
-Andy Shevchenko
+I think this actually breaks tunneled use-case, when the aggregated
+packet is forwarded to an output device before traversing the relevant
+tunnel.
+
+/P
+
 
