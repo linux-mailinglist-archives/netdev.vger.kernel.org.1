@@ -1,54 +1,69 @@
-Return-Path: <netdev+bounces-205872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31A7AB00952
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 18:55:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF78DB00947
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 18:53:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A04F91C43292
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 16:55:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BCB697A1484
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 16:52:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57DF92F0C60;
-	Thu, 10 Jul 2025 16:55:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CA3E285062;
+	Thu, 10 Jul 2025 16:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="eaZDr9HK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04E42EFDA3
-	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 16:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357552AE6D
+	for <netdev@vger.kernel.org>; Thu, 10 Jul 2025 16:53:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752166514; cv=none; b=suVzIHPUokgtTacQEBrG6TdYtYibuQOWm5r+9tk7OCCXxh255+KL1E1TPowaAOxf7bYTfT0xVvOXmfMimMFoMOGP+yuTDgRrl8tDvGN631Do7HwnyNUAz4maF38cRfQVWT5HvbpU4aXNP+n0kDCQ+XQ5i1yS/8210N2I0b3eYIY=
+	t=1752166432; cv=none; b=DV2FpxsZnvyE9rqr7cIQo8UJsxsa4S8cS0gP0bDEScutGHXLMgNf0QuMLDnjJuKW7WBcichmtyc6QsHU39i3fxdMSdZ/x/9OFb8T2MsWfqx3wG8uKkjEWKMBWlQIZ2+W0JPHQPexbGNuZ96oUkI/OQf1pJLhll7cV5gAm8u1f1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752166514; c=relaxed/simple;
-	bh=h4OSjogbRRdgQNmi01DhxneS8iLgEvxRuRfqhA9Ospc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=L4c1SY6MeKroeZakhjPAJA8wU1CT5ZmJGM6FERVjn5gHSK04effyhjJPYIkZH8N1bxQB0h1rj+2xOKt2xPWexHSLUbdjAEdtR71O2WQeB6XHCijrPxl8QjwWjCaJ8tEdTRbboLJjghccMz1opH16quonZuGPBSJYq2cUmiRidvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; arc=none smtp.client-ip=23.88.38.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
-Received: from kero.packetmixer.de (p200300FA271Bac80353E86De392ba4aF.dip0.t-ipconnect.de [IPv6:2003:fa:271b:ac80:353e:86de:392b:a4af])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.simonwunderlich.de (Postfix) with ESMTPSA id BAC28FA131;
-	Thu, 10 Jul 2025 18:45:12 +0200 (CEST)
-From: Simon Wunderlich <sw@simonwunderlich.de>
-To: kuba@kernel.org,
-	davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	b.a.t.m.a.n@lists.open-mesh.org,
-	Matthias Schiffer <mschiffer@universe-factory.net>,
-	Sven Eckelmann <sven@narfation.org>,
-	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH net-next 2/2] batman-adv: store hard_iface as iflink private data
-Date: Thu, 10 Jul 2025 18:45:01 +0200
-Message-Id: <20250710164501.153872-3-sw@simonwunderlich.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250710164501.153872-1-sw@simonwunderlich.de>
-References: <20250710164501.153872-1-sw@simonwunderlich.de>
+	s=arc-20240116; t=1752166432; c=relaxed/simple;
+	bh=9p5PIIDJExfDkdS7BDiEdk4vP461ia5bkZdIubSjNnM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oRByFrb4rEBn7fzpkGtU2gfI4j46u6vhY4/MAdt8ND4wfdwplwc/5pKOKakV22xMNoDgyyGVqBDyNgcmum8JnL6ByfQoAyJyGn0aCkxSkJ6MIDcV/DtRoeUSMfn1akBYd1VZh2EftTpMfHWhclavEiwt+41BEf/jHhPmLZLTZk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=eaZDr9HK; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 56A9tqId032057;
+	Thu, 10 Jul 2025 09:53:40 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=s2048-2025-q2; bh=4gNO+Wk2qrWK5U2TND
+	gjCxSVrM4K8TX+5xEPWyGrPQ4=; b=eaZDr9HKCHu2rDHwA45TUPs9Hpgxg6SGTO
+	aMxTnrG/s8Mp+mt4UvuUJtPfj3iSf3k+e6AI5JoZ+q51ZYNWmafukmjlCLIPo0Nj
+	I3PDdlVIb9zalPbqqBnSsGxHN5MRMwz3dtd33AqjZTQ9heEZIE+G7TProTV7g4CA
+	S4IZpjPSIOQlHUOLfE07glttnfNDPoGc3uNozB+TeT6Apqo7apIYpJOlZ0BWw4Oh
+	SUII/LgwvIHb1STCNB7n6nJ6szigvLmpMWs3/sV+wSckjyL00EMaUoOB4J4fWWn8
+	5hVc/sDb61JGdyyIEf/3uhDOnXK4/ocn6WR70690OBX9y4xTmAfg==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 47tbak2w5r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Thu, 10 Jul 2025 09:53:39 -0700 (PDT)
+Received: from localhost (2620:10d:c0a8:1c::1b) by mail.thefacebook.com
+ (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.1748.24; Thu, 10 Jul
+ 2025 16:53:38 +0000
+From: Vishwanath Seshagiri <vishs@meta.com>
+To: "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, David Wei <dw@davidwei.uk>,
+        "Joe
+ Damato" <jdamato@fastly.com>, Simon Horman <horms@kernel.org>,
+        <netdev@vger.kernel.org>, Vishwanath Seshagiri <vishs@fb.com>
+Subject: [PATCH net-next v2] selftests: flip local/remote endpoints in iou-zcrx.py
+Date: Thu, 10 Jul 2025 09:53:37 -0700
+Message-ID: <20250710165337.614159-1-vishs@meta.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,548 +71,214 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: xyW6N7lC5ymfdO8OKsKzKVTlIHWDaktH
+X-Authority-Analysis: v=2.4 cv=Ip4ecK/g c=1 sm=1 tr=0 ts=686ff013 cx=c_pps a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17 a=Wb1JkmetP80A:10 a=VwQbUJbxAAAA:8 a=VabnemYjAAAA:8 a=FOH2dFAWAAAA:8 a=efhq1SeH5nsRmTzY6XAA:9 a=gKebqoRLp9LExxC7YDUY:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUwNzEwMDE0NCBTYWx0ZWRfX+LUXx4fBPygn c/XVkSprFfDLrWzfPsmQkRwHkYNliqnCi5+TF+bcCar9KieuXpqDM4fPW9HEk8Xb8GB0LZRZjLU H7uK2vWzgOrjLaER0Y2iKePS70NugcUDOCmvGDRuFB/N/fe435yWQj3Fo+USDYa8X0wnZ4B9E/P
+ 3EmH2OfIS4HeR3iykxeqTAGvWsQWzOloR5zkGRIajYlHw+KqmRgEwMnJJQhgl65ynujYGx17dhA gwcO1F43ALh+gudOqRQ7fE61E4bRej1oDyTgH9ZGvpyg/FFcf3cAHnldhvUhzLmt8FS386h+DPb pgqTfI2gPzd8k+Fn+6+chwTId2E5w4Dj5j8Je3C8BB4bZ2e6JwQqTkGcXFjcwOQSheuB4d0n/e3
+ aFKPyParkBOkWaGslu56/79JiAzQrVfuzHR0A6Gsz35H+uyVIHKH7ivYUN4yEFhwyE77Zzcc
+X-Proofpoint-GUID: xyW6N7lC5ymfdO8OKsKzKVTlIHWDaktH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1099,Hydra:6.1.7,FMLib:17.12.80.40
+ definitions=2025-07-10_04,2025-07-09_01,2025-03-28_01
 
-From: Matthias Schiffer <mschiffer@universe-factory.net>
+From: Vishwanath Seshagiri <vishs@fb.com>
 
-By passing the hard_iface to netdev_master_upper_dev_link() as private
-data, we can iterate over hardifs of a mesh interface more efficiently
-using netdev_for_each_lower_private*() (instead of iterating over the
-global hardif list). In addition, this will enable resolving a hardif
-from its netdev using netdev_lower_dev_get_private() and getting rid of
-the global list altogether in the following patches.
+The iou-zcrx selftest currently runs the server on the remote host
+and the client on the local host. This commit flips the endpoints
+such that server runs on localhost and client on remote.
+This change brings the iou-zcrx selftest in convention with other
+selftests.
 
-A similar approach can be seen in the bonding driver.
+Drive-by fix for a missing import exception that happens when the
+network interface has less than 2 combined channels.
 
-Signed-off-by: Matthias Schiffer <mschiffer@universe-factory.net>
-Signed-off-by: Sven Eckelmann <sven@narfation.org>
-Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
+Test plan: ran iou-zcrx.py selftest between 2 physical machines
+
+Signed-off-by: Vishwanath Seshagiri <vishs@fb.com>
 ---
- net/batman-adv/bat_algo.c       |  1 +
- net/batman-adv/bat_algo.h       |  2 --
- net/batman-adv/bat_iv_ogm.c     | 25 +++++++--------------
- net/batman-adv/bat_v.c          |  6 ++---
- net/batman-adv/bat_v_elp.c      |  8 ++-----
- net/batman-adv/bat_v_ogm.c      | 14 ++++--------
- net/batman-adv/hard-interface.c | 39 ++++++++++++---------------------
- net/batman-adv/main.c           |  7 ++----
- net/batman-adv/mesh-interface.c |  6 ++---
- net/batman-adv/multicast.c      |  6 ++---
- net/batman-adv/netlink.c        |  7 ++----
- net/batman-adv/originator.c     |  7 ++----
- net/batman-adv/send.c           |  7 ++----
- 13 files changed, 44 insertions(+), 91 deletions(-)
+Changelog:
+v2: Updated patch title, description to provide more context on the
+specific changes made.
+v1 link: https://lore.kernel.org/netdev/20250707232223.190242-1-vishs@meta.com/T/#u
+---
+ .../selftests/drivers/net/hw/iou-zcrx.py      | 98 +++++++++----------
+ 1 file changed, 49 insertions(+), 49 deletions(-)
 
-diff --git a/net/batman-adv/bat_algo.c b/net/batman-adv/bat_algo.c
-index c0c982b6f029..49e5861b58ec 100644
---- a/net/batman-adv/bat_algo.c
-+++ b/net/batman-adv/bat_algo.c
-@@ -14,6 +14,7 @@
- #include <linux/skbuff.h>
- #include <linux/stddef.h>
- #include <linux/string.h>
-+#include <linux/types.h>
- #include <net/genetlink.h>
- #include <net/netlink.h>
- #include <uapi/linux/batman_adv.h>
-diff --git a/net/batman-adv/bat_algo.h b/net/batman-adv/bat_algo.h
-index 2c486374af58..7ce9abbdb4b4 100644
---- a/net/batman-adv/bat_algo.h
-+++ b/net/batman-adv/bat_algo.h
-@@ -11,10 +11,8 @@
+diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
+index 9c03fd777f3d..712c806508b5 100755
+--- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
++++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
+@@ -3,37 +3,37 @@
  
- #include <linux/netlink.h>
- #include <linux/skbuff.h>
--#include <linux/types.h>
+ import re
+ from os import path
+-from lib.py import ksft_run, ksft_exit
++from lib.py import ksft_run, ksft_exit, KsftSkipEx
+ from lib.py import NetDrvEpEnv
+ from lib.py import bkg, cmd, defer, ethtool, rand_port, wait_port_listen
  
- extern char batadv_routing_algo[];
--extern struct list_head batadv_hardif_list;
  
- void batadv_algo_init(void);
- struct batadv_algo_ops *batadv_algo_get(const char *name);
-diff --git a/net/batman-adv/bat_iv_ogm.c b/net/batman-adv/bat_iv_ogm.c
-index 458879d21d66..54fe38b3b2fd 100644
---- a/net/batman-adv/bat_iv_ogm.c
-+++ b/net/batman-adv/bat_iv_ogm.c
-@@ -791,6 +791,7 @@ static void batadv_iv_ogm_schedule_buff(struct batadv_hard_iface *hard_iface)
- 	struct batadv_ogm_packet *batadv_ogm_packet;
- 	struct batadv_hard_iface *primary_if, *tmp_hard_iface;
- 	int *ogm_buff_len = &hard_iface->bat_iv.ogm_buff_len;
-+	struct list_head *iter;
- 	u32 seqno;
- 	u16 tvlv_len = 0;
- 	unsigned long send_time;
-@@ -847,10 +848,7 @@ static void batadv_iv_ogm_schedule_buff(struct batadv_hard_iface *hard_iface)
- 	 * interfaces.
- 	 */
- 	rcu_read_lock();
--	list_for_each_entry_rcu(tmp_hard_iface, &batadv_hardif_list, list) {
--		if (tmp_hard_iface->mesh_iface != hard_iface->mesh_iface)
--			continue;
--
-+	netdev_for_each_lower_private_rcu(hard_iface->mesh_iface, tmp_hard_iface, iter) {
- 		if (!kref_get_unless_zero(&tmp_hard_iface->refcount))
- 			continue;
+ def _get_current_settings(cfg):
+-    output = ethtool(f"-g {cfg.ifname}", json=True, host=cfg.remote)[0]
++    output = ethtool(f"-g {cfg.ifname}", json=True)[0]
+     return (output['rx'], output['hds-thresh'])
  
-@@ -1567,6 +1565,7 @@ static void batadv_iv_ogm_process(const struct sk_buff *skb, int ogm_offset,
- 	bool is_my_oldorig = false;
- 	bool is_my_addr = false;
- 	bool is_my_orig = false;
-+	struct list_head *iter;
  
- 	ogm_packet = (struct batadv_ogm_packet *)(skb->data + ogm_offset);
- 	ethhdr = eth_hdr(skb);
-@@ -1603,11 +1602,9 @@ static void batadv_iv_ogm_process(const struct sk_buff *skb, int ogm_offset,
- 		   ogm_packet->version, has_directlink_flag);
+ def _get_combined_channels(cfg):
+-    output = ethtool(f"-l {cfg.ifname}", host=cfg.remote).stdout
++    output = ethtool(f"-l {cfg.ifname}").stdout
+     values = re.findall(r'Combined:\s+(\d+)', output)
+     return int(values[1])
  
- 	rcu_read_lock();
--	list_for_each_entry_rcu(hard_iface, &batadv_hardif_list, list) {
--		if (hard_iface->if_status != BATADV_IF_ACTIVE)
--			continue;
  
--		if (hard_iface->mesh_iface != if_incoming->mesh_iface)
-+	netdev_for_each_lower_private_rcu(if_incoming->mesh_iface, hard_iface, iter) {
-+		if (hard_iface->if_status != BATADV_IF_ACTIVE)
- 			continue;
+ def _create_rss_ctx(cfg, chan):
+-    output = ethtool(f"-X {cfg.ifname} context new start {chan} equal 1", host=cfg.remote).stdout
++    output = ethtool(f"-X {cfg.ifname} context new start {chan} equal 1").stdout
+     values = re.search(r'New RSS context is (\d+)', output).group(1)
+     ctx_id = int(values)
+-    return (ctx_id, defer(ethtool, f"-X {cfg.ifname} delete context {ctx_id}", host=cfg.remote))
++    return (ctx_id, defer(ethtool, f"-X {cfg.ifname} delete context {ctx_id}"))
  
- 		if (batadv_compare_eth(ethhdr->h_source,
-@@ -1668,13 +1665,10 @@ static void batadv_iv_ogm_process(const struct sk_buff *skb, int ogm_offset,
- 					if_incoming, BATADV_IF_DEFAULT);
  
- 	rcu_read_lock();
--	list_for_each_entry_rcu(hard_iface, &batadv_hardif_list, list) {
-+	netdev_for_each_lower_private_rcu(bat_priv->mesh_iface, hard_iface, iter) {
- 		if (hard_iface->if_status != BATADV_IF_ACTIVE)
- 			continue;
+ def _set_flow_rule(cfg, port, chan):
+-    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {port} action {chan}", host=cfg.remote).stdout
++    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {port} action {chan}").stdout
+     values = re.search(r'ID (\d+)', output).group(1)
+     return int(values)
  
--		if (hard_iface->mesh_iface != bat_priv->mesh_iface)
--			continue;
--
- 		if (!kref_get_unless_zero(&hard_iface->refcount))
- 			continue;
  
-@@ -2142,6 +2136,7 @@ batadv_iv_ogm_neigh_dump(struct sk_buff *msg, struct netlink_callback *cb,
- 			 struct batadv_hard_iface *single_hardif)
- {
- 	struct batadv_hard_iface *hard_iface;
-+	struct list_head *iter;
- 	int i_hardif = 0;
- 	int i_hardif_s = cb->args[0];
- 	int idx = cb->args[1];
-@@ -2158,11 +2153,7 @@ batadv_iv_ogm_neigh_dump(struct sk_buff *msg, struct netlink_callback *cb,
- 				i_hardif++;
- 		}
- 	} else {
--		list_for_each_entry_rcu(hard_iface, &batadv_hardif_list,
--					list) {
--			if (hard_iface->mesh_iface != bat_priv->mesh_iface)
--				continue;
--
-+		netdev_for_each_lower_private_rcu(bat_priv->mesh_iface, hard_iface, iter) {
- 			if (i_hardif++ < i_hardif_s)
- 				continue;
+ def _set_flow_rule_rss(cfg, port, ctx_id):
+-    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {port} context {ctx_id}", host=cfg.remote).stdout
++    output = ethtool(f"-N {cfg.ifname} flow-type tcp6 dst-port {port} context {ctx_id}").stdout
+     values = re.search(r'ID (\d+)', output).group(1)
+     return int(values)
  
-diff --git a/net/batman-adv/bat_v.c b/net/batman-adv/bat_v.c
-index c16c2e60889d..de9444714264 100644
---- a/net/batman-adv/bat_v.c
-+++ b/net/batman-adv/bat_v.c
-@@ -212,6 +212,7 @@ batadv_v_neigh_dump(struct sk_buff *msg, struct netlink_callback *cb,
- 		    struct batadv_hard_iface *single_hardif)
- {
- 	struct batadv_hard_iface *hard_iface;
-+	struct list_head *iter;
- 	int i_hardif = 0;
- 	int i_hardif_s = cb->args[0];
- 	int idx = cb->args[1];
-@@ -227,10 +228,7 @@ batadv_v_neigh_dump(struct sk_buff *msg, struct netlink_callback *cb,
- 				i_hardif++;
- 		}
- 	} else {
--		list_for_each_entry_rcu(hard_iface, &batadv_hardif_list, list) {
--			if (hard_iface->mesh_iface != bat_priv->mesh_iface)
--				continue;
--
-+		netdev_for_each_lower_private_rcu(bat_priv->mesh_iface, hard_iface, iter) {
- 			if (i_hardif++ < i_hardif_s)
- 				continue;
+@@ -47,26 +47,26 @@ def test_zcrx(cfg) -> None:
+     (rx_ring, hds_thresh) = _get_current_settings(cfg)
+     port = rand_port()
  
-diff --git a/net/batman-adv/bat_v_elp.c b/net/batman-adv/bat_v_elp.c
-index 70d6778da0d7..cb16c1ed2a58 100644
---- a/net/batman-adv/bat_v_elp.c
-+++ b/net/batman-adv/bat_v_elp.c
-@@ -35,7 +35,6 @@
- #include <net/cfg80211.h>
- #include <uapi/linux/batadv_packet.h>
+-    ethtool(f"-G {cfg.ifname} tcp-data-split on", host=cfg.remote)
+-    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto", host=cfg.remote)
++    ethtool(f"-G {cfg.ifname} tcp-data-split on")
++    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto")
  
--#include "bat_algo.h"
- #include "bat_v_ogm.h"
- #include "hard-interface.h"
- #include "log.h"
-@@ -472,15 +471,12 @@ void batadv_v_elp_iface_activate(struct batadv_hard_iface *primary_iface,
- void batadv_v_elp_primary_iface_set(struct batadv_hard_iface *primary_iface)
- {
- 	struct batadv_hard_iface *hard_iface;
-+	struct list_head *iter;
+-    ethtool(f"-G {cfg.ifname} hds-thresh 0", host=cfg.remote)
+-    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}", host=cfg.remote)
++    ethtool(f"-G {cfg.ifname} hds-thresh 0")
++    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}")
  
- 	/* update orig field of every elp iface belonging to this mesh */
- 	rcu_read_lock();
--	list_for_each_entry_rcu(hard_iface, &batadv_hardif_list, list) {
--		if (primary_iface->mesh_iface != hard_iface->mesh_iface)
--			continue;
--
-+	netdev_for_each_lower_private_rcu(primary_iface->mesh_iface, hard_iface, iter)
- 		batadv_v_elp_iface_activate(primary_iface, hard_iface);
--	}
- 	rcu_read_unlock();
- }
+-    ethtool(f"-G {cfg.ifname} rx 64", host=cfg.remote)
+-    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}", host=cfg.remote)
++    ethtool(f"-G {cfg.ifname} rx 64")
++    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}")
  
-diff --git a/net/batman-adv/bat_v_ogm.c b/net/batman-adv/bat_v_ogm.c
-index b86bb647da5b..e3870492dab7 100644
---- a/net/batman-adv/bat_v_ogm.c
-+++ b/net/batman-adv/bat_v_ogm.c
-@@ -22,7 +22,6 @@
- #include <linux/mutex.h>
- #include <linux/netdevice.h>
- #include <linux/random.h>
--#include <linux/rculist.h>
- #include <linux/rcupdate.h>
- #include <linux/skbuff.h>
- #include <linux/slab.h>
-@@ -33,7 +32,6 @@
- #include <linux/workqueue.h>
- #include <uapi/linux/batadv_packet.h>
+-    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}", host=cfg.remote)
+-    defer(ethtool, f"-X {cfg.ifname} default", host=cfg.remote)
++    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}")
++    defer(ethtool, f"-X {cfg.ifname} default")
  
--#include "bat_algo.h"
- #include "hard-interface.h"
- #include "hash.h"
- #include "log.h"
-@@ -265,6 +263,7 @@ static void batadv_v_ogm_send_meshif(struct batadv_priv *bat_priv)
- 	struct batadv_ogm2_packet *ogm_packet;
- 	struct sk_buff *skb, *skb_tmp;
- 	unsigned char *ogm_buff;
-+	struct list_head *iter;
- 	int ogm_buff_len;
- 	u16 tvlv_len = 0;
- 	int ret;
-@@ -301,10 +300,7 @@ static void batadv_v_ogm_send_meshif(struct batadv_priv *bat_priv)
+     flow_rule_id = _set_flow_rule(cfg, port, combined_chans - 1)
+-    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}", host=cfg.remote)
++    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
  
- 	/* broadcast on every interface */
- 	rcu_read_lock();
--	list_for_each_entry_rcu(hard_iface, &batadv_hardif_list, list) {
--		if (hard_iface->mesh_iface != bat_priv->mesh_iface)
--			continue;
--
-+	netdev_for_each_lower_private_rcu(bat_priv->mesh_iface, hard_iface, iter) {
- 		if (!kref_get_unless_zero(&hard_iface->refcount))
- 			continue;
+-    rx_cmd = f"{cfg.bin_remote} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1}"
+-    tx_cmd = f"{cfg.bin_local} -c -h {cfg.remote_addr_v['6']} -p {port} -l 12840"
+-    with bkg(rx_cmd, host=cfg.remote, exit_wait=True):
+-        wait_port_listen(port, proto="tcp", host=cfg.remote)
+-        cmd(tx_cmd)
++    rx_cmd = f"{cfg.bin_local} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1}"
++    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {port} -l 12840"
++    with bkg(rx_cmd, exit_wait=True):
++        wait_port_listen(port, proto="tcp")
++        cmd(tx_cmd, host=cfg.remote)
  
-@@ -859,6 +855,7 @@ static void batadv_v_ogm_process(const struct sk_buff *skb, int ogm_offset,
- 	struct batadv_hard_iface *hard_iface;
- 	struct batadv_ogm2_packet *ogm_packet;
- 	u32 ogm_throughput, link_throughput, path_throughput;
-+	struct list_head *iter;
- 	int ret;
  
- 	ethhdr = eth_hdr(skb);
-@@ -921,13 +918,10 @@ static void batadv_v_ogm_process(const struct sk_buff *skb, int ogm_offset,
- 				       BATADV_IF_DEFAULT);
+ def test_zcrx_oneshot(cfg) -> None:
+@@ -78,26 +78,26 @@ def test_zcrx_oneshot(cfg) -> None:
+     (rx_ring, hds_thresh) = _get_current_settings(cfg)
+     port = rand_port()
  
- 	rcu_read_lock();
--	list_for_each_entry_rcu(hard_iface, &batadv_hardif_list, list) {
-+	netdev_for_each_lower_private_rcu(bat_priv->mesh_iface, hard_iface, iter) {
- 		if (hard_iface->if_status != BATADV_IF_ACTIVE)
- 			continue;
+-    ethtool(f"-G {cfg.ifname} tcp-data-split on", host=cfg.remote)
+-    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto", host=cfg.remote)
++    ethtool(f"-G {cfg.ifname} tcp-data-split on")
++    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto")
  
--		if (hard_iface->mesh_iface != bat_priv->mesh_iface)
--			continue;
--
- 		if (!kref_get_unless_zero(&hard_iface->refcount))
- 			continue;
+-    ethtool(f"-G {cfg.ifname} hds-thresh 0", host=cfg.remote)
+-    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}", host=cfg.remote)
++    ethtool(f"-G {cfg.ifname} hds-thresh 0")
++    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}")
  
-diff --git a/net/batman-adv/hard-interface.c b/net/batman-adv/hard-interface.c
-index 558d39dffc23..bace57e4f9a5 100644
---- a/net/batman-adv/hard-interface.c
-+++ b/net/batman-adv/hard-interface.c
-@@ -438,15 +438,13 @@ int batadv_hardif_no_broadcast(struct batadv_hard_iface *if_outgoing,
- }
+-    ethtool(f"-G {cfg.ifname} rx 64", host=cfg.remote)
+-    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}", host=cfg.remote)
++    ethtool(f"-G {cfg.ifname} rx 64")
++    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}")
  
- static struct batadv_hard_iface *
--batadv_hardif_get_active(const struct net_device *mesh_iface)
-+batadv_hardif_get_active(struct net_device *mesh_iface)
- {
- 	struct batadv_hard_iface *hard_iface;
-+	struct list_head *iter;
+-    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}", host=cfg.remote)
+-    defer(ethtool, f"-X {cfg.ifname} default", host=cfg.remote)
++    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}")
++    defer(ethtool, f"-X {cfg.ifname} default")
  
- 	rcu_read_lock();
--	list_for_each_entry_rcu(hard_iface, &batadv_hardif_list, list) {
--		if (hard_iface->mesh_iface != mesh_iface)
--			continue;
--
-+	netdev_for_each_lower_private_rcu(mesh_iface, hard_iface, iter) {
- 		if (hard_iface->if_status == BATADV_IF_ACTIVE &&
- 		    kref_get_unless_zero(&hard_iface->refcount))
- 			goto out;
-@@ -508,19 +506,17 @@ batadv_hardif_is_iface_up(const struct batadv_hard_iface *hard_iface)
+     flow_rule_id = _set_flow_rule(cfg, port, combined_chans - 1)
+-    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}", host=cfg.remote)
++    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
  
- static void batadv_check_known_mac_addr(const struct batadv_hard_iface *hard_iface)
- {
--	const struct net_device *mesh_iface = hard_iface->mesh_iface;
-+	struct net_device *mesh_iface = hard_iface->mesh_iface;
- 	const struct batadv_hard_iface *tmp_hard_iface;
-+	struct list_head *iter;
+-    rx_cmd = f"{cfg.bin_remote} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1} -o 4"
+-    tx_cmd = f"{cfg.bin_local} -c -h {cfg.remote_addr_v['6']} -p {port} -l 4096 -z 16384"
+-    with bkg(rx_cmd, host=cfg.remote, exit_wait=True):
+-        wait_port_listen(port, proto="tcp", host=cfg.remote)
+-        cmd(tx_cmd)
++    rx_cmd = f"{cfg.bin_local} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1} -o 4"
++    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {port} -l 4096 -z 16384"
++    with bkg(rx_cmd, exit_wait=True):
++        wait_port_listen(port, proto="tcp")
++        cmd(tx_cmd, host=cfg.remote)
  
- 	if (!mesh_iface)
- 		return;
  
--	list_for_each_entry(tmp_hard_iface, &batadv_hardif_list, list) {
-+	netdev_for_each_lower_private(mesh_iface, tmp_hard_iface, iter) {
- 		if (tmp_hard_iface == hard_iface)
- 			continue;
+ def test_zcrx_rss(cfg) -> None:
+@@ -109,27 +109,27 @@ def test_zcrx_rss(cfg) -> None:
+     (rx_ring, hds_thresh) = _get_current_settings(cfg)
+     port = rand_port()
  
--		if (tmp_hard_iface->mesh_iface != mesh_iface)
--			continue;
--
- 		if (tmp_hard_iface->if_status == BATADV_IF_NOT_IN_USE)
- 			continue;
+-    ethtool(f"-G {cfg.ifname} tcp-data-split on", host=cfg.remote)
+-    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto", host=cfg.remote)
++    ethtool(f"-G {cfg.ifname} tcp-data-split on")
++    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto")
  
-@@ -545,15 +541,13 @@ static void batadv_hardif_recalc_extra_skbroom(struct net_device *mesh_iface)
- 	unsigned short lower_headroom = 0;
- 	unsigned short lower_tailroom = 0;
- 	unsigned short needed_headroom;
-+	struct list_head *iter;
+-    ethtool(f"-G {cfg.ifname} hds-thresh 0", host=cfg.remote)
+-    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}", host=cfg.remote)
++    ethtool(f"-G {cfg.ifname} hds-thresh 0")
++    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}")
  
- 	rcu_read_lock();
--	list_for_each_entry_rcu(hard_iface, &batadv_hardif_list, list) {
-+	netdev_for_each_lower_private_rcu(mesh_iface, hard_iface, iter) {
- 		if (hard_iface->if_status == BATADV_IF_NOT_IN_USE)
- 			continue;
+-    ethtool(f"-G {cfg.ifname} rx 64", host=cfg.remote)
+-    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}", host=cfg.remote)
++    ethtool(f"-G {cfg.ifname} rx 64")
++    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}")
  
--		if (hard_iface->mesh_iface != mesh_iface)
--			continue;
--
- 		lower_header_len = max_t(unsigned short, lower_header_len,
- 					 hard_iface->net_dev->hard_header_len);
+-    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}", host=cfg.remote)
+-    defer(ethtool, f"-X {cfg.ifname} default", host=cfg.remote)
++    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}")
++    defer(ethtool, f"-X {cfg.ifname} default")
  
-@@ -586,17 +580,15 @@ int batadv_hardif_min_mtu(struct net_device *mesh_iface)
- {
- 	struct batadv_priv *bat_priv = netdev_priv(mesh_iface);
- 	const struct batadv_hard_iface *hard_iface;
-+	struct list_head *iter;
- 	int min_mtu = INT_MAX;
+     (ctx_id, delete_ctx) = _create_rss_ctx(cfg, combined_chans - 1)
+     flow_rule_id = _set_flow_rule_rss(cfg, port, ctx_id)
+-    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}", host=cfg.remote)
++    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
  
- 	rcu_read_lock();
--	list_for_each_entry_rcu(hard_iface, &batadv_hardif_list, list) {
-+	netdev_for_each_lower_private_rcu(mesh_iface, hard_iface, iter) {
- 		if (hard_iface->if_status != BATADV_IF_ACTIVE &&
- 		    hard_iface->if_status != BATADV_IF_TO_BE_ACTIVATED)
- 			continue;
+-    rx_cmd = f"{cfg.bin_remote} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1}"
+-    tx_cmd = f"{cfg.bin_local} -c -h {cfg.remote_addr_v['6']} -p {port} -l 12840"
+-    with bkg(rx_cmd, host=cfg.remote, exit_wait=True):
+-        wait_port_listen(port, proto="tcp", host=cfg.remote)
+-        cmd(tx_cmd)
++    rx_cmd = f"{cfg.bin_local} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1}"
++    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {port} -l 12840"
++    with bkg(rx_cmd, exit_wait=True):
++        wait_port_listen(port, proto="tcp")
++        cmd(tx_cmd, host=cfg.remote)
  
--		if (hard_iface->mesh_iface != mesh_iface)
--			continue;
--
- 		min_mtu = min_t(int, hard_iface->net_dev->mtu, min_mtu);
- 	}
- 	rcu_read_unlock();
-@@ -734,7 +726,7 @@ int batadv_hardif_enable_interface(struct batadv_hard_iface *hard_iface,
- 	bat_priv = netdev_priv(hard_iface->mesh_iface);
  
- 	ret = netdev_master_upper_dev_link(hard_iface->net_dev,
--					   mesh_iface, NULL, NULL, NULL);
-+					   mesh_iface, hard_iface, NULL, NULL);
- 	if (ret)
- 		goto err_dev;
- 
-@@ -803,18 +795,15 @@ int batadv_hardif_enable_interface(struct batadv_hard_iface *hard_iface,
-  *
-  * Return: number of connected/enslaved hard interfaces
-  */
--static size_t batadv_hardif_cnt(const struct net_device *mesh_iface)
-+static size_t batadv_hardif_cnt(struct net_device *mesh_iface)
- {
- 	struct batadv_hard_iface *hard_iface;
-+	struct list_head *iter;
- 	size_t count = 0;
- 
- 	rcu_read_lock();
--	list_for_each_entry_rcu(hard_iface, &batadv_hardif_list, list) {
--		if (hard_iface->mesh_iface != mesh_iface)
--			continue;
--
-+	netdev_for_each_lower_private_rcu(mesh_iface, hard_iface, iter)
- 		count++;
--	}
- 	rcu_read_unlock();
- 
- 	return count;
-diff --git a/net/batman-adv/main.c b/net/batman-adv/main.c
-index c0bc75513355..20346d7b6b69 100644
---- a/net/batman-adv/main.c
-+++ b/net/batman-adv/main.c
-@@ -27,7 +27,6 @@
- #include <linux/module.h>
- #include <linux/netdevice.h>
- #include <linux/printk.h>
--#include <linux/rculist.h>
- #include <linux/rcupdate.h>
- #include <linux/skbuff.h>
- #include <linux/slab.h>
-@@ -303,16 +302,14 @@ void batadv_mesh_free(struct net_device *mesh_iface)
- bool batadv_is_my_mac(struct batadv_priv *bat_priv, const u8 *addr)
- {
- 	const struct batadv_hard_iface *hard_iface;
-+	struct list_head *iter;
- 	bool is_my_mac = false;
- 
- 	rcu_read_lock();
--	list_for_each_entry_rcu(hard_iface, &batadv_hardif_list, list) {
-+	netdev_for_each_lower_private_rcu(bat_priv->mesh_iface, hard_iface, iter) {
- 		if (hard_iface->if_status != BATADV_IF_ACTIVE)
- 			continue;
- 
--		if (hard_iface->mesh_iface != bat_priv->mesh_iface)
--			continue;
--
- 		if (batadv_compare_eth(hard_iface->net_dev->dev_addr, addr)) {
- 			is_my_mac = true;
- 			break;
-diff --git a/net/batman-adv/mesh-interface.c b/net/batman-adv/mesh-interface.c
-index 5bbc366f974d..de2c2d9c6e4d 100644
---- a/net/batman-adv/mesh-interface.c
-+++ b/net/batman-adv/mesh-interface.c
-@@ -1101,9 +1101,9 @@ static void batadv_meshif_destroy_netlink(struct net_device *mesh_iface,
- 	struct batadv_hard_iface *hard_iface;
- 	struct batadv_meshif_vlan *vlan;
- 
--	list_for_each_entry(hard_iface, &batadv_hardif_list, list) {
--		if (hard_iface->mesh_iface == mesh_iface)
--			batadv_hardif_disable_interface(hard_iface);
-+	while (!list_empty(&mesh_iface->adj_list.lower)) {
-+		hard_iface = netdev_adjacent_get_private(mesh_iface->adj_list.lower.next);
-+		batadv_hardif_disable_interface(hard_iface);
- 	}
- 
- 	/* destroy the "untagged" VLAN */
-diff --git a/net/batman-adv/multicast.c b/net/batman-adv/multicast.c
-index 5786680aff30..e8c6b0bf670f 100644
---- a/net/batman-adv/multicast.c
-+++ b/net/batman-adv/multicast.c
-@@ -246,15 +246,13 @@ static u8 batadv_mcast_mla_rtr_flags_get(struct batadv_priv *bat_priv,
- static u8 batadv_mcast_mla_forw_flags_get(struct batadv_priv *bat_priv)
- {
- 	const struct batadv_hard_iface *hard_iface;
-+	struct list_head *iter;
- 
- 	rcu_read_lock();
--	list_for_each_entry_rcu(hard_iface, &batadv_hardif_list, list) {
-+	netdev_for_each_lower_private_rcu(bat_priv->mesh_iface, hard_iface, iter) {
- 		if (hard_iface->if_status != BATADV_IF_ACTIVE)
- 			continue;
- 
--		if (hard_iface->mesh_iface != bat_priv->mesh_iface)
--			continue;
--
- 		if (hard_iface->net_dev->mtu < IPV6_MIN_MTU) {
- 			rcu_read_unlock();
- 			return BATADV_NO_FLAGS;
-diff --git a/net/batman-adv/netlink.c b/net/batman-adv/netlink.c
-index e7c8f9f2bb1f..beb181b3a7d8 100644
---- a/net/batman-adv/netlink.c
-+++ b/net/batman-adv/netlink.c
-@@ -20,7 +20,6 @@
- #include <linux/if_vlan.h>
- #include <linux/init.h>
- #include <linux/limits.h>
--#include <linux/list.h>
- #include <linux/minmax.h>
- #include <linux/netdevice.h>
- #include <linux/netlink.h>
-@@ -968,6 +967,7 @@ batadv_netlink_dump_hardif(struct sk_buff *msg, struct netlink_callback *cb)
- 	struct batadv_priv *bat_priv;
- 	int portid = NETLINK_CB(cb->skb).portid;
- 	int skip = cb->args[0];
-+	struct list_head *iter;
- 	int i = 0;
- 
- 	mesh_iface = batadv_netlink_get_meshif(cb);
-@@ -979,10 +979,7 @@ batadv_netlink_dump_hardif(struct sk_buff *msg, struct netlink_callback *cb)
- 	rtnl_lock();
- 	cb->seq = batadv_hardif_generation << 1 | 1;
- 
--	list_for_each_entry(hard_iface, &batadv_hardif_list, list) {
--		if (hard_iface->mesh_iface != mesh_iface)
--			continue;
--
-+	netdev_for_each_lower_private(mesh_iface, hard_iface, iter) {
- 		if (i++ < skip)
- 			continue;
- 
-diff --git a/net/batman-adv/originator.c b/net/batman-adv/originator.c
-index d9cfc5c6b208..a464ff96b929 100644
---- a/net/batman-adv/originator.c
-+++ b/net/batman-adv/originator.c
-@@ -29,7 +29,6 @@
- #include <linux/workqueue.h>
- #include <uapi/linux/batadv_packet.h>
- 
--#include "bat_algo.h"
- #include "distributed-arp-table.h"
- #include "fragmentation.h"
- #include "gateway_client.h"
-@@ -1208,6 +1207,7 @@ static bool batadv_purge_orig_node(struct batadv_priv *bat_priv,
- 	struct batadv_neigh_node *best_neigh_node;
- 	struct batadv_hard_iface *hard_iface;
- 	bool changed_ifinfo, changed_neigh;
-+	struct list_head *iter;
- 
- 	if (batadv_has_timed_out(orig_node->last_seen,
- 				 2 * BATADV_PURGE_TIMEOUT)) {
-@@ -1232,13 +1232,10 @@ static bool batadv_purge_orig_node(struct batadv_priv *bat_priv,
- 
- 	/* ... then for all other interfaces. */
- 	rcu_read_lock();
--	list_for_each_entry_rcu(hard_iface, &batadv_hardif_list, list) {
-+	netdev_for_each_lower_private_rcu(bat_priv->mesh_iface, hard_iface, iter) {
- 		if (hard_iface->if_status != BATADV_IF_ACTIVE)
- 			continue;
- 
--		if (hard_iface->mesh_iface != bat_priv->mesh_iface)
--			continue;
--
- 		if (!kref_get_unless_zero(&hard_iface->refcount))
- 			continue;
- 
-diff --git a/net/batman-adv/send.c b/net/batman-adv/send.c
-index 9d72f4f15b3d..95849ba004e7 100644
---- a/net/batman-adv/send.c
-+++ b/net/batman-adv/send.c
-@@ -21,7 +21,6 @@
- #include <linux/list.h>
- #include <linux/netdevice.h>
- #include <linux/printk.h>
--#include <linux/rculist.h>
- #include <linux/rcupdate.h>
- #include <linux/skbuff.h>
- #include <linux/slab.h>
-@@ -924,6 +923,7 @@ static int __batadv_forw_bcast_packet(struct batadv_priv *bat_priv,
- {
- 	struct batadv_hard_iface *hard_iface;
- 	struct batadv_hard_iface *primary_if;
-+	struct list_head *iter;
- 	int ret = NETDEV_TX_OK;
- 
- 	primary_if = batadv_primary_if_get_selected(bat_priv);
-@@ -931,10 +931,7 @@ static int __batadv_forw_bcast_packet(struct batadv_priv *bat_priv,
- 		return NETDEV_TX_BUSY;
- 
- 	rcu_read_lock();
--	list_for_each_entry_rcu(hard_iface, &batadv_hardif_list, list) {
--		if (hard_iface->mesh_iface != bat_priv->mesh_iface)
--			continue;
--
-+	netdev_for_each_lower_private_rcu(bat_priv->mesh_iface, hard_iface, iter) {
- 		if (!kref_get_unless_zero(&hard_iface->refcount))
- 			continue;
- 
+ def main() -> None:
 -- 
-2.39.5
+2.47.1
 
 
