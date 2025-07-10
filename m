@@ -1,233 +1,122 @@
-Return-Path: <netdev+bounces-205965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-205966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B617B00F30
-	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 01:01:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C99BB00F34
+	for <lists+netdev@lfdr.de>; Fri, 11 Jul 2025 01:03:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A7433A2929
-	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 23:01:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4D2C5C4023
+	for <lists+netdev@lfdr.de>; Thu, 10 Jul 2025 23:03:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E12728F92F;
-	Thu, 10 Jul 2025 23:01:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84F872980A6;
+	Thu, 10 Jul 2025 23:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Id35bl8R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HVYfHP58"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F832235BE2;
-	Thu, 10 Jul 2025 23:01:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3E0235BE2;
+	Thu, 10 Jul 2025 23:03:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1752188485; cv=none; b=Ld6WaLVBmk3iL3w5YayrD5HJdWUrFFCSIJ8xeQ2GgVrpxVdqg4TMHopRt88WD6AK/Zmza1+LlRk9GaWcqRcqDHqsVu3aoQknQUGOWgznN8fbGgRjknlSg8eftadAkgJNCQQkqloe6lF+s5QqLpHMXfccMmwgkP74zUdrePaORKM=
+	t=1752188626; cv=none; b=CmcsbN/mI1ErbY8zIRlvSoxpdAgCY//VqblfGiFliP1gpPsD5ctB+BPe6GB/URTQiRrre/efQr1dUsw50U6rDfgDOKgQYGLZsa24Er09EcDmc5XTY0yWCUE80S7zclo6b4+btxKQHsmx4A0bYJvHgsUEFFv8guLzvtZlWXJWu9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1752188485; c=relaxed/simple;
-	bh=7ZHvFCmV3/wqSVJYpykZn9eCOEAwB+1FKd0S0WN3FJc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AdTBLP69H++1EEYXKK7aw6pQpiHCBsZkiwwhBrnuVoRkLZGpodL6zcfvACEMVzuyGPSmiJGM09Aj4MHjdYwssCM8s8VVKUQLM7JQ6ImEL0h7JxRrqW+hNF/LgdC1pDRsApR/73Dgyzg62NgLUSEFg3f6q6vOvOt68zSYWh5HYZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Id35bl8R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 535A8C4CEE3;
-	Thu, 10 Jul 2025 23:01:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1752188484;
-	bh=7ZHvFCmV3/wqSVJYpykZn9eCOEAwB+1FKd0S0WN3FJc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Id35bl8RsiWp5XMT7ujO65piGM28PG24E9ifGZSh5VQwSCi9hhfjkhRUKHd4iTuhp
-	 BK93YsSjoGS07SIW3HAatdra9mZZ6to86sX8UlbPVZQEZWuNPHekOyk0gopFCu3UXm
-	 UEj8axrjiiJqrwUkMHOjWKJwsgpxOfBYHZpJk2MS1M0JM82gPm4en2ske4uwIMsnPO
-	 R5I5xPg6EgqfcpNx1iRUeRHVOfWG6k66jsdEvHC2yma/xKIprWj34/RUYOPRl0c/Y3
-	 KqL0UyWXSNRW0Npd2e8MmQvlEhzhcM39SJ1VuHnQTQfC0hyHHTrSzdEDHpcG1LUnnd
-	 M2gbS6Jzncyrg==
-Date: Thu, 10 Jul 2025 18:01:18 -0500
-From: Rob Herring <robh@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v8 01/15] dt-bindings: net: Introduce the
- ethernet-connector description
-Message-ID: <20250710230118.GA31751-robh@kernel.org>
-References: <20250710134533.596123-1-maxime.chevallier@bootlin.com>
- <20250710134533.596123-2-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1752188626; c=relaxed/simple;
+	bh=a9enHCjaCkHMvTXJ1wWxdEuVCCVpWZ3hrmLMofq177g=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=eP62VhHkj1YUbyF9pQwMn//YMGq5KaOSBj1MuiFZFYXWMXisaMzf2ZFrbyNz+KEqf8ZQiFxf1uSzucM0tFYAmHfc8Qw4b1HeI7mUjEzHzcRpF/Kkij0B6nhZGc8TV2tsbbu3mZw0W14VMqk/DcX6wi3dDz23Rax5UP4l/iH+qBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HVYfHP58; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-234c5b57557so16256335ad.3;
+        Thu, 10 Jul 2025 16:03:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1752188624; x=1752793424; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IWfnonDyLQW4nF8T6gu1K43HYSw1uIJUKk+sbJA25mo=;
+        b=HVYfHP58JZVsvVyfijzJ2DBZhlXN3Ou9qrnsLUS/aGKlZXSsrd9G5hCg78uEm5ULZM
+         OL4d81wS5+7aWDHnSqm7ucxTn8Yj+tpuHtHXyGiGztJ1i5n0Jrrkx0ZFVQnAk9yPNdTI
+         s1iUhNhEayLtmbyJjBUfgnAIDKEVSWLBGgnASBdNQSvR8aFPVg+bWF449KoqQNTRv5b/
+         azjL8+9KSEma44/Dq2t4jGuYFJ2wJsa1rJ26KpsUyqoEMsHy58roOlBSMWaHZ5ygBoE7
+         wNMFY0V5Gk4WmQSE3dnFCAT5b/3BwNVl1zUN4FBoZjJfqalyBhaJ8a8mRaRJGF/X4hsT
+         gvUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1752188624; x=1752793424;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IWfnonDyLQW4nF8T6gu1K43HYSw1uIJUKk+sbJA25mo=;
+        b=oeFgnh0+0B/0gEcugyw4crg4o7XU1CUFLmm0n9e2h2a5q8iUhKYGuh4ZDDhUzRw75T
+         IOHk+4qc0MIefSeU0bB6A1hLv+qYhLFVSsy1hAfHfS8X4Zan5BIwf1J+8iPZyKvvqBoF
+         ofn8cc532TVKn3E4k7l34szVnzJz1gCfRyCrLiG7ENhuTcdM+dPwEFxpJ8tHTaLoEIK7
+         8RYFMljmAYciwS35xeqwxFO7S//fAoH3JznJ9ncm7gs6x8zk1GTeppTK/UiO9h9nqJeN
+         M2gY9qILj7PCKi67pPXFCRbiIidfnYu+LxmVrY6rkcw+a2tkhPJ+Wg3keDG/wNZhMmH5
+         knuw==
+X-Forwarded-Encrypted: i=1; AJvYcCUQFDCChw6Rr2doWWtUaWg5z/Tq6ITBDXKee0Y/IydguwXiW2FDUPhK+T8uBiCsOeWUKl3F3zijQxcHhFMR@vger.kernel.org, AJvYcCVVNJ5tkk24deXWzqDi+Hyh0zTmPGJowvTqjtQGyYMjPufKxNZzcdJHKgT8/vzfY4WpX5GmsEIiYWdq@vger.kernel.org, AJvYcCVr3VNt+dFeAuiVFtO1e4seyO755O8GVIFPp9TVRXGF0/B2H+iCnXCMDH5pk9Y/3nJD4Yyioiz0pZSQLR7D1Bs=@vger.kernel.org, AJvYcCXDpU0XMLOY2zW2smxU3xUO64DLzSE3RZwt773NOk9zr6/Gd8wwuzyHyZ8VMdj/aXSQnwzVRdAGIGOH@vger.kernel.org, AJvYcCXcbXqRrB2F0R+4GkFOUkeOvWor7gOSqooiE+Fz8OhsZEUi6F2iv1/ziem0gnnuyXQbWNZtRzo0@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4UJ1UTSDE4zi0+kf2DG0NeFkBrvIKneIDqQulrhhXJVLdi29p
+	qwY0dbXWtZ33vJvlKv2ME2T4B+vMR10kZZNjGOheC7SPaCxpjusGxy/GZ1l2WN7L
+X-Gm-Gg: ASbGnctlkagiUXPNtbon0kEUxtBCCuUyS59b7Q0umWBhR7teorGdymT8uQQAKPl3zDb
+	iBpa3iVFpaVlaSWMS9uR5pLergopr8C4gW7dmVV3aJAPZn0dV0Ti5suXr71BPKus7zX0BTKNyHg
+	2H/UUubMQs3jcP4cDL064Fy4DyN6MqLBYvRiuLk6pAJt8CzHjZ3GrfgFHn6YKLfG5bmmF9rKFEm
+	Lw+uj9iMIryr7l98qgNE1IHxYffKqYgtwbtCyB8LJ/i0cIiF4MeydZ9lFhM2Cy2p7Cg2ZegBbN0
+	ET+FxiSC/wppEatYDof2JHI/QLzic3/sF3+qRDeogYqa6pazBbZwocPCky3IMHs7c50g9dFTc8L
+	1Ya4ZrzHyMIo953+WyTh9Cqw/u3OllV5246Ma69RT2FmVh93iGCWFNkjVYyNF+JhyInvxYVZW2c
+	DM
+X-Google-Smtp-Source: AGHT+IEp6V8DzKUuaw7dIuw9i6/aRzFnGpSetRLQWo+gM4+bD2+wZcV715hpfDegv6ZhtdX0w3OqVA==
+X-Received: by 2002:a17:903:4b0d:b0:234:8f5d:e3a4 with SMTP id d9443c01a7336-23dede2f256mr13672265ad.2.1752188624200;
+        Thu, 10 Jul 2025 16:03:44 -0700 (PDT)
+Received: from localhost (p5332007-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.120.7])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-23de42ad3absm34659995ad.83.2025.07.10.16.03.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Jul 2025 16:03:43 -0700 (PDT)
+Date: Fri, 11 Jul 2025 08:03:37 +0900 (JST)
+Message-Id: <20250711.080337.1396232450801945990.fujita.tomonori@gmail.com>
+To: dakr@kernel.org
+Cc: fujita.tomonori@gmail.com, miguel.ojeda.sandonis@gmail.com,
+ kuba@kernel.org, gregkh@linuxfoundation.org, robh@kernel.org,
+ saravanak@google.com, alex.gaynor@gmail.com, ojeda@kernel.org,
+ rafael@kernel.org, a.hindborg@kernel.org, aliceryhl@google.com,
+ bhelgaas@google.com, bjorn3_gh@protonmail.com, boqun.feng@gmail.com,
+ david.m.ertman@intel.com, devicetree@vger.kernel.org, gary@garyguo.net,
+ ira.weiny@intel.com, kwilczynski@kernel.org, leon@kernel.org,
+ linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+ lossin@kernel.org, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ tmgross@umich.edu
+Subject: Re: [PATCH v3 0/3] rust: Build PHY device tables by using
+ module_device_table macro
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <bbd52251-a2ac-4d9a-9b3d-62f968c646bd@kernel.org>
+References: <aG2g7HgDdvmFJpMz@pollux>
+	<20250709.110837.298179611860747415.fujita.tomonori@gmail.com>
+	<bbd52251-a2ac-4d9a-9b3d-62f968c646bd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250710134533.596123-2-maxime.chevallier@bootlin.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 10, 2025 at 03:45:18PM +0200, Maxime Chevallier wrote:
-> The ability to describe the physical ports of Ethernet devices is useful
-> to describe multi-port devices, as well as to remove any ambiguity with
-> regard to the nature of the port.
-> 
-> Moreover, describing ports allows for a better description of features
-> that are tied to connectors, such as PoE through the PSE-PD devices.
-> 
-> Introduce a binding to allow describing the ports, for now with 2
-> attributes :
-> 
->  - The number of lanes, which is a quite generic property that allows
->    differentating between multiple similar technologies such as BaseT1
->    and "regular" BaseT (which usually means BaseT4).
-> 
->  - The media that can be used on that port, such as BaseT for Twisted
->    Copper, BaseC for coax copper, BaseS/L for Fiber, BaseK for backplane
->    ethernet, etc. This allows defining the nature of the port, and
->    therefore avoids the need for vendor-specific properties such as
->    "micrel,fiber-mode" or "ti,fiber-mode".
-> 
-> The port description lives in its own file, as it is intended in the
-> future to allow describing the ports for phy-less devices.
-> 
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> ---
->  .../bindings/net/ethernet-connector.yaml      | 47 +++++++++++++++++++
->  .../devicetree/bindings/net/ethernet-phy.yaml | 18 +++++++
->  MAINTAINERS                                   |  1 +
->  3 files changed, 66 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/ethernet-connector.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/ethernet-connector.yaml b/Documentation/devicetree/bindings/net/ethernet-connector.yaml
-> new file mode 100644
-> index 000000000000..8765efc6e233
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/ethernet-connector.yaml
-> @@ -0,0 +1,47 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/ethernet-connector.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Generic Ethernet Connector
-> +
-> +maintainers:
-> +  - Maxime Chevallier <maxime.chevallier@bootlin.com>
-> +
-> +description:
-> +  An Ethernet Connectr represents the output of a network component such as
+On Thu, 10 Jul 2025 22:01:56 +0200
+Danilo Krummrich <dakr@kernel.org> wrote:
 
-typo.
-
-> +  a PHY, an Ethernet controller with no PHY, or an SFP module.
-> +
-> +properties:
-> +
-> +  lanes:
-> +    description:
-> +      Defines the number of lanes on the port, that is the number of physical
-> +      channels used to convey the data with the link partner.
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +
-> +  media:
-> +    description:
-> +      The mediums, as defined in 802.3, that can be used on the port.
-> +    items:
-> +      enum:
-> +        - BaseT
-> +        - BaseK
-> +        - BaseS
-> +        - BaseC
-> +        - BaseL
-> +        - BaseD
-> +        - BaseE
-> +        - BaseF
-> +        - BaseV
-> +        - BaseMLD
-> +    maxItems: 1
-
-Drop 'items' and 'maxItems' and then it is implicitly only 1.
-
-> +
-> +required:
-> +  - lanes
-> +  - media
-> +
-> +additionalProperties: true
-> +
-> +...
-> diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> index 71e2cd32580f..6bf670beb66f 100644
-> --- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> +++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> @@ -277,6 +277,17 @@ properties:
->  
->      additionalProperties: false
->  
-> +  mdi:
-> +    type: object
-> +
-> +    patternProperties:
-> +      '^connector-[a-f0-9]+$':
-> +        $ref: /schemas/net/ethernet-connector.yaml#
-> +
-> +        unevaluatedProperties: false
-> +
-> +    additionalProperties: false
-> +
->  required:
->    - reg
->  
-> @@ -313,5 +324,12 @@ examples:
->                      default-state = "keep";
->                  };
->              };
-> +
-> +            mdi {
-> +              connector-0 {
-> +                lanes = <2>;
-> +                media = "BaseT";
-> +              };
-
-Your indentation is not consistent.
-
-I think we should consider a compatible here. Soon as you want to 
-distinguish one connector from another you will need one. Though we 
-could always retrofit that later.
-
-> +            };
->          };
->      };
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 881a1f08e665..b584f8dfdb24 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -8959,6 +8959,7 @@ R:	Russell King <linux@armlinux.org.uk>
->  L:	netdev@vger.kernel.org
->  S:	Maintained
->  F:	Documentation/ABI/testing/sysfs-class-net-phydev
-> +F:	Documentation/devicetree/bindings/net/ethernet-connector.yaml
->  F:	Documentation/devicetree/bindings/net/ethernet-phy.yaml
->  F:	Documentation/devicetree/bindings/net/mdio*
->  F:	Documentation/devicetree/bindings/net/qca,ar803x.yaml
-> -- 
-> 2.49.0
+> On 7/9/25 4:08 AM, FUJITA Tomonori wrote:
+>> On Wed, 9 Jul 2025 00:51:24 +0200
+>> Danilo Krummrich <dakr@kernel.org> wrote:
+>>> Here's the diff to fix up both, I already fixed it up on my end -- no
+>>> need to
+>>> send a new version.
+>> Thanks a lot!
 > 
+> Given the comments from Trevor, do you want me to wait for a respin,
+> consider
+> the few nits when applying, or apply as is?
+
+Thanks, I'll send v4 shortly.
 
